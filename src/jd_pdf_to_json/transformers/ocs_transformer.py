@@ -109,21 +109,7 @@ class OCSTransformer(BaseOCSTransformer):
             tables = first_page.extract_tables()
 
             if not tables:
-                self.logger.warning("未找到版本表格，將使用默認版本")
-                # 若無表格，嘗試從文本提取
-                text = first_page.extract_text() or ""
-                version_code = self._extract_first_code(text)
-                if version_code:
-                    versions.append(
-                        VersionEntry(
-                            version="V1",
-                            ocs_code=version_code,
-                            ocs_name="未知職能",
-                            status="最新版本",
-                            update_note=None,
-                            update_date="Unknown",
-                        )
-                    )
+                self.logger.warning("未找到版本表格，version_info.versions 將為空")
                 return VersionInfo(versions=versions)
 
             # 遍歷表格尋找版本信息

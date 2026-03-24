@@ -101,10 +101,6 @@ def convert(
         logger.error(f"❌ 輸出錯誤: {str(e)}")
         typer.echo(f"輸出失敗: {str(e)}", err=True)
         raise typer.Exit(1)
-    except Exception as e:
-        logger.error(f"❌ 未知錯誤: {str(e)}")
-        typer.echo(f"發生未知錯誤: {str(e)}", err=True)
-        raise typer.Exit(1)
 
 
 @app.command()
@@ -152,12 +148,12 @@ def batch(
                 
                 if validate:
                     validator = OCSSchemaValidator()
-                    is_valid, errors = validator.validate(ocs_doc.model_dump())
+                    is_valid, errors = validator.validate(ocs_doc)
                     if not is_valid:
                         logger.warning(f"驗證失敗: {len(errors)} 個錯誤")
                 
                 writer = JSONWriter()
-                writer.write(ocs_doc, str(output_path))
+                writer.write(ocs_doc, output_path)
                 
                 logger.info(f"✓ {pdf_path.name} → {output_path.name}")
                 success_count += 1

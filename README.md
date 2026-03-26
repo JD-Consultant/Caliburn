@@ -2,6 +2,68 @@
 
 OCS/iCAP PDF 轉換成結構化 JSON 的資料規範文件。
 
+## Quick Start
+
+### 1) 安裝
+
+```bash
+uv sync
+```
+
+### 2) 單檔轉換
+
+```bash
+uv run python -m jd_pdf_to_json.cli convert path\to\input.pdf -o path\to\output.json
+```
+
+### 3) 批次轉換
+
+```bash
+uv run python -m jd_pdf_to_json.cli batch path\to\pdf_folder -o path\to\json_folder
+```
+
+## CLI 使用方法
+
+### convert
+
+將單一 PDF 轉成 JSON。
+
+```bash
+uv run python -m jd_pdf_to_json.cli convert <pdf_path> -o <output_path>
+```
+
+參數：
+
+- `pdf_path`：輸入 PDF 檔案路徑。
+- `-o, --output`：輸出 JSON 路徑（不指定時，預設與 PDF 同名）。
+- `--validate/--no-validate`：是否啟用 schema 驗證（預設啟用）。
+
+### batch
+
+將資料夾內所有 PDF 批次轉成 JSON。
+
+```bash
+uv run python -m jd_pdf_to_json.cli batch <input_dir> -o <output_dir>
+```
+
+參數：
+
+- `input_dir`：PDF 來源資料夾。
+- `-o, --output`：JSON 輸出資料夾。
+- `--validate/--no-validate`：是否啟用 schema 驗證（預設啟用）。
+
+### validate
+
+驗證 JSON 檔案是否符合專案 schema。
+
+```bash
+uv run python -m jd_pdf_to_json.cli validate <json_path>
+```
+
+參數：
+
+- `json_path`：待驗證的 JSON 檔案路徑。
+
 ## 1. Purpose
 本專案定義可重複、可驗證、可擴充的 JSON 輸出格式，用於將職能基準（OCS）PDF 轉為結構化資料，支援：
 

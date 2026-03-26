@@ -63,7 +63,6 @@ class BehavioralIndicator(BaseModel):
     """Behavioral indicator."""
     indicator_code: str
     indicator_text: str
-    competency_level: Optional[int] = None
 
 
 class Task(BaseModel):

@@ -40,3 +40,18 @@ def test_parse_ocu_table_with_header_mapping() -> None:
     assert [s.code for s in task.skills_s] == ["S01", "S02"]
     assert [o.output_code for o in task.outputs] == ["O01"]
     assert [p.indicator_code for p in task.behavioral_indicators] == ["P01"]
+
+
+def test_extract_competency_items_preserves_leading_digit_in_name() -> None:
+    transformer = OCSTransformer()
+
+    items = transformer._extract_competency_items(
+        "S01 3D列印技術類型辨識能力\nS02 3D列印設備組裝與拆解能力",
+        "S",
+    )
+
+    assert [item.code for item in items] == ["S01", "S02"]
+    assert [item.name for item in items] == [
+        "3D列印技術類型辨識能力",
+        "3D列印設備組裝與拆解能力",
+    ]

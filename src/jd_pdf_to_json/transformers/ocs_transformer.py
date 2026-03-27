@@ -324,27 +324,55 @@ class OCSTransformer(BaseOCSTransformer):
         if not cell_value:
             return []
 
-        text = self._compact_wrapped_text(cell_value)
-        if not text:
+        raw_text = unicodedata.normalize("NFKC", str(cell_value)).replace("\r", "\n")
+        lines = [line.strip() for line in raw_text.split("\n") if line and line.strip()]
+        if not lines:
             return []
 
-        pattern = re.compile(rf"({code_prefix}\d+(?:[-.]\d+)*)", flags=re.IGNORECASE)
         results: List[CompetencyItem] = []
 
-        matches = list(pattern.finditer(text))
-        for idx, match in enumerate(matches):
+        # Prefer line-wise parsing where code and name are separated by whitespace.
+        line_pattern = re.compile(
+            rf"^({code_prefix}\d+(?:[-.]\d+)*)\s+(.+)$", flags=re.IGNORECASE
+        )
+        for line in lines:
+            match = line_pattern.match(line)
+            if not match:
+                continue
             code = match.group(1).strip()
-            start = match.end()
-            end = matches[idx + 1].start() if idx + 1 < len(matches) else len(text)
-            name = text[start:end].strip("；;，,") or code
+            name = match.group(2).strip("；;，,") or code
             results.append(CompetencyItem(code=code, name=name))
 
         if results:
             return results
 
-        for line in [ln.strip() for ln in text.split("\n") if ln.strip()]:
-            if re.search(rf"\b{code_prefix}\d+", line, flags=re.IGNORECASE):
-                results.append(CompetencyItem(code=line, name=line))
+        # Fallback: parse inline sequences such as "K01 AAA K02 BBB".
+        text = "\n".join(lines)
+        inline_pattern = re.compile(
+            rf"({code_prefix}\d+(?:[-.]\d+)*)\s+", flags=re.IGNORECASE
+        )
+        matches = list(inline_pattern.finditer(text))
+        for idx, match in enumerate(matches):
+            code = match.group(1).strip()
+            start = match.end()
+            end = matches[idx + 1].start() if idx + 1 < len(matches) else len(text)
+            name = text[start:end].strip("；;，,\n ") or code
+            results.append(CompetencyItem(code=code, name=name))
+
+        if results:
+            return results
+
+        # Final fallback for legacy formats without clear separators.
+        legacy_pattern = re.compile(
+            rf"({code_prefix}\d+(?:[-.]\d+)*)", flags=re.IGNORECASE
+        )
+        matches = list(legacy_pattern.finditer(text))
+        for idx, match in enumerate(matches):
+            code = match.group(1).strip()
+            start = match.end()
+            end = matches[idx + 1].start() if idx + 1 < len(matches) else len(text)
+            name = text[start:end].strip("；;，,\n ") or code
+            results.append(CompetencyItem(code=code, name=name))
 
         return results
 

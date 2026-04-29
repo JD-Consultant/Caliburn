@@ -164,31 +164,45 @@ uv run python -m jd_pdf_to_json.cli validate <json_path>
 
 ### 6.3 ocs_content
 
+在來源文件中，`Output (O)` 與 `Behavioral Indicator (P)` 常以「組」為單位出現（例如一組產出對應若干指標，並標註同一職能級別）。因此在 `task`（T）下採用「groups」表示法，每個 group 包含該組的 `outputs`、`indicators`、`competency_level`、以及該組專屬的 `knowledge_k` / `skills_s`。
+
+範例：
+
 ```json
 "ocs_content": {
   "ocu_units": [
     {
       "ocu_code": "T1",
-      "ocu_name": "業務開發與客戶管理",
+      "ocu_name": "研發創意",
       "tasks": [
         {
           "task_code": "T1.1",
-          "task_name": "業務開發",
-          "outputs": [
-            { "output_code": "O1.1.1", "output_name": "客戶聯繫與拜訪紀錄" }
-          ],
-          "behavioral_indicators": [
+          "task_name": "研發劇本與概念",
+          "groups": [
             {
-              "indicator_code": "P1.1.1",
-              "indicator_text": "..."
+              "competency_level": 3,
+              "outputs": [
+                {"output_code":"O1.1.1","output_name":"建議舞台設計構思"},
+                {"output_code":"O1.1.2","output_name":"製作時程表"}
+              ],
+              "indicators": [
+                {"indicator_code":"P1.1.1","indicator_text":"參與設計定檔會議"}
+              ],
+              "knowledge_k": [{"code":"K01","name":"舞台技術"}],
+              "skills_s": [{"code":"S01","name":"排程管理"}]
+            },
+            {
+              "competency_level": 4,
+              "outputs": [
+                {"output_code":"O1.1.3","output_name":"執行檢核清單"}
+              ],
+              "indicators": [
+                {"indicator_code":"P1.1.2","indicator_text":"完成場地評估報告"},
+                {"indicator_code":"P1.1.3","indicator_text":"確認人力需求"}
+              ],
+              "knowledge_k": [{"code":"K02","name":"場地規劃"}],
+              "skills_s": [{"code":"S02","name":"場務協調"}]
             }
-          ],
-          "competency_level": 2,
-          "knowledge_k": [
-            { "code": "K05", "name": "法律/法規" }
-          ],
-          "skills_s": [
-            { "code": "S01", "name": "人脈拓展" }
           ]
         }
       ]
@@ -197,21 +211,16 @@ uv run python -m jd_pdf_to_json.cli validate <json_path>
 }
 ```
 
-規則：
+規則要點：
 
-- `knowledge_k` 與 `skills_s` 必須為物件陣列，元素格式固定：`{ "code", "name" }`。
-- 禁止只存代碼字串陣列（例如 `["K01", "K02"]`）。
-- 若同一任務內行為指標具不同級別，可在指標上加欄位：
+- `groups`（或可命名為 `competency_groups`）為陣列，每一項定義一組「產出 + 指標 + 職能級別 + K/S」。
+- `outputs` 與 `indicators` 在 `task` 的 `groups` 內以物件陣列表示（`code` 與 `name/text` 成對）。
+- 若同一 `task` 中某個 `output` 或 `indicator` 出現於多個組（交叉引用），允許在多個 group 中重複宣告；若需避免重複，可改成先在 `task` 下定義 `outputs`/`indicators` 全部清單，再在 `groups` 使用 `output_codes` / `indicator_codes` 引用（實作上可視需要選擇）。
+- `knowledge_k` 與 `skills_s` 必須為物件陣列，元素包含 `code` 與 `name`。
+- 若來源在某個 `indicator` 明確標示不同於所屬 group 的 `competency_level`，可在該 `indicator` 物件加上 `competency_level` 覆寫。
+- 禁止把多筆 `outputs` 或 `indicators` 以單一長字串表示；請使用陣列結構以利自動化處理與驗證。
 
-```json
-{
-  "indicator_code": "P4.1.3",
-  "indicator_text": "...",
-  "competency_level": 5
-}
-```
-
-- 若任務層級與指標層級同值，可省略指標層級欄位。
+（範例中示範較扁平的 `groups` 結構，解析器可選擇直接從表格內段落或欄位偵測 group 邊界，或先收集 code 再以 `output_codes`/`indicator_codes` 建組。）
 
 ### 6.4 ocs_attitude
 

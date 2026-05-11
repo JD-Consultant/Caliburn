@@ -35,22 +35,29 @@ class OCSSchemaValidator:
         except Exception as e:
             errors.append(f"Failed to check top-level keys: {str(e)}")
 
-        # Rule 2: knowledge_k/skills_s must be objects with code+name
+        # Rule 2: competency blocks must carry P indicators, and knowledge/skills must be objects.
         if hasattr(model, "ocs_content") and model.ocs_content:
             for unit_idx, unit in enumerate(model.ocs_content.ocu_units):
                 for task_idx, task in enumerate(unit.tasks):
-                    for skill_idx, skill in enumerate(task.skills_s):
-                        if not hasattr(skill, "code") or not hasattr(skill, "name"):
+                    blocks = getattr(task, "competency_blocks", [])
+                    for block_idx, block in enumerate(blocks):
+                        if not getattr(block, "indicators", None):
                             errors.append(
-                                f"OCU {unit.ocu_code}, Task {task.task_code}: "
-                                f"skill[{skill_idx}] missing code or name"
+                                f"OCU {unit.ocu_code}, Task {task.task_code}, Block {block_idx}: missing behavioral indicators"
                             )
-                    for knowl_idx, knowl in enumerate(task.knowledge_k):
-                        if not hasattr(knowl, "code") or not hasattr(knowl, "name"):
-                            errors.append(
-                                f"OCU {unit.ocu_code}, Task {task.task_code}: "
-                                f"knowledge[{knowl_idx}] missing code or name"
-                            )
+
+                        for skill_idx, skill in enumerate(block.skills_s):
+                            if not hasattr(skill, "code") or not hasattr(skill, "name"):
+                                errors.append(
+                                    f"OCU {unit.ocu_code}, Task {task.task_code}, Block {block_idx}: "
+                                    f"skill[{skill_idx}] missing code or name"
+                                )
+                        for knowl_idx, knowl in enumerate(block.knowledge_k):
+                            if not hasattr(knowl, "code") or not hasattr(knowl, "name"):
+                                errors.append(
+                                    f"OCU {unit.ocu_code}, Task {task.task_code}, Block {block_idx}: "
+                                    f"knowledge[{knowl_idx}] missing code or name"
+                                )
 
         # Rule 3: attitude_description must have key (even if null)
         if hasattr(model, "ocs_attitude") and model.ocs_attitude:

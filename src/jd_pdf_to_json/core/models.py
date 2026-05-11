@@ -1,7 +1,8 @@
 """Data models for OCS documents."""
 
 from typing import Optional, List
-from pydantic import BaseModel, Field
+
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class VersionEntry(BaseModel):
@@ -65,15 +66,22 @@ class BehavioralIndicator(BaseModel):
     indicator_text: str
 
 
-class Task(BaseModel):
-    """Work task."""
-    task_code: str
-    task_name: str
-    outputs: List[OutputItem] = Field(default_factory=list)
-    behavioral_indicators: List[BehavioralIndicator] = Field(default_factory=list)
+class CompetencyBlock(BaseModel):
+    """P-centered competency block under a task."""
     competency_level: int = Field(..., ge=1, le=5)
+    indicators: List[BehavioralIndicator] = Field(default_factory=list)
+    outputs: List[OutputItem] = Field(default_factory=list)
     knowledge_k: List[CompetencyItem] = Field(default_factory=list)
     skills_s: List[CompetencyItem] = Field(default_factory=list)
+
+
+class Task(BaseModel):
+    """Work task."""
+    model_config = ConfigDict(populate_by_name=True)
+
+    task_code: str
+    task_name: str
+    competency_blocks: List[CompetencyBlock] = Field(default_factory=list)
 
 
 class OCSUnit(BaseModel):
@@ -131,3 +139,7 @@ class OCSDocument(BaseModel):
                 "notes_and_appendix": {"requirements": []},
             }
         }
+
+
+# Backward-compatible alias for older internal imports.
+TaskGroup = CompetencyBlock

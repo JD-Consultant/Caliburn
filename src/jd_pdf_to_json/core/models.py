@@ -141,5 +141,4 @@ class OCSDocument(BaseModel):
         }
 
 
-# Backward-compatible alias for older internal imports.
-TaskGroup = CompetencyBlock
+# Removed backward-compatible alias `TaskGroup` to enforce P-centric model.

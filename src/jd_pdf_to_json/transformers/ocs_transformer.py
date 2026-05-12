@@ -1174,10 +1174,11 @@ class OCSTransformer(BaseOCSTransformer):
 
                         has_primary_codes = bool(outputs or behavioral_indicators)
                         if has_primary_codes:
+                            block_outputs = outputs if outputs else list(previous_block.outputs)
                             new_block = CompetencyBlock(
                                 competency_level=self._extract_task_level(row, col_map),
                                 indicators=self._dedupe_indicators(behavioral_indicators),
-                                outputs=self._dedupe_outputs(outputs),
+                                outputs=self._dedupe_outputs(block_outputs),
                                 knowledge_k=self._dedupe_competencies(knowledge),
                                 skills_s=self._dedupe_competencies(skills),
                             )

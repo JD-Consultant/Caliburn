@@ -92,6 +92,23 @@ class OCSTransformer(BaseOCSTransformer):
         """Join normalized row cells into one string for table type checks."""
         return "".join(self._row_to_normalized_cells(row))
 
+    def _merge_rows_for_header(self, rows: List[List[Any]]) -> List[Any]:
+        """Merge adjacent header rows column-wise for split table headers."""
+        if not rows:
+            return []
+
+        max_len = max(len(row) for row in rows)
+        merged: List[str] = []
+        for idx in range(max_len):
+            parts = []
+            for row in rows:
+                if idx < len(row) and row[idx] is not None:
+                    text = str(row[idx]).strip()
+                    if text:
+                        parts.append(text)
+            merged.append(" ".join(parts))
+        return merged
+
     def _is_page_footer_row(self, row: List[Any]) -> bool:
         """Detect common page footer rows like '第1頁，總共11頁'."""
         text = self._row_to_joined_normalized_text(row)
@@ -133,6 +150,14 @@ class OCSTransformer(BaseOCSTransformer):
         has_skills = any(self._normalize_text(alias) in text for alias in self.CONTENT_HEADER_KEYS["skills"])
         return has_knowledge and has_skills
 
+    def _is_split_content_header(self, rows: List[List[Any]]) -> bool:
+        """Check whether adjacent rows together form the fixed content header."""
+        if not rows:
+            return False
+
+        merged = self._merge_rows_for_header(rows)
+        return self._is_content_header_row(merged)
+
     def _detect_table_type(self, table: List[List[Any]]) -> Optional[str]:
         """Classify table into one of five fixed sections."""
         rows = self._clean_table_rows(table)
@@ -152,7 +177,12 @@ class OCSTransformer(BaseOCSTransformer):
         if any("說明與補充事項" in self._row_to_joined_normalized_text(row) for row in sample):
             return "notes_and_appendix"
 
-        if self._is_content_header_row(rows[0]) or any(self._is_content_header_row(row) for row in sample):
+        if any(
+            self._is_content_header_row(row)
+            or self._is_split_content_header(rows[idx : idx + 2])
+            or self._is_split_content_header(rows[idx : idx + 3])
+            for idx, row in enumerate(sample)
+        ):
             return "ocs_content"
 
         if all(k in joined for k in ["版本", "職能基準代碼", "職能基準名稱", "狀態"]):
@@ -487,20 +517,27 @@ class OCSTransformer(BaseOCSTransformer):
         block.skills_s = self._dedupe_competencies(block.skills_s)
         return block
 
-    def _find_ocu_header_row(self, table: List[List[Any]]) -> tuple[Optional[int], Dict[str, int]]:
+    def _find_ocu_header_row(self, table: List[List[Any]]) -> tuple[Optional[int], Dict[str, int], int]:
         """Find the header row and mapped OCU columns in a table."""
         for row_idx, row in enumerate(table):
-            col_map = self._build_column_map(row, self.OCU_HEADER_ALIASES)
-            if "task_name" in col_map:
-                has_competency_cols = any(
-                    key in col_map for key in ("knowledge", "skills", "outputs", "behavioral")
-                )
-                if has_competency_cols:
-                    if "task_code" not in col_map:
-                        # 常見版型僅有「工作任務」欄，任務代碼內嵌在文字中。
-                        col_map["task_code"] = col_map["task_name"]
-                    return row_idx, col_map
-        return None, {}
+            candidates = [(row, 1)]
+            if row_idx + 1 < len(table):
+                candidates.append((self._merge_rows_for_header([row, table[row_idx + 1]]), 2))
+            if row_idx + 2 < len(table):
+                candidates.append((self._merge_rows_for_header([row, table[row_idx + 1], table[row_idx + 2]]), 3))
+
+            for candidate, span in candidates:
+                col_map = self._build_column_map(candidate, self.OCU_HEADER_ALIASES)
+                if "task_name" in col_map:
+                    has_competency_cols = any(
+                        key in col_map for key in ("knowledge", "skills", "outputs", "behavioral")
+                    )
+                    if has_competency_cols:
+                        if "task_code" not in col_map:
+                            # 常見版型僅有「工作任務」欄，任務代碼內嵌在文字中。
+                            col_map["task_code"] = col_map["task_name"]
+                        return row_idx, col_map, span
+        return None, {}, 0
 
     def _extract_task_level(self, row: List[Any], col_map: Dict[str, int]) -> int:
         """Extract task competency level from mapped row, fallback to 3."""
@@ -519,7 +556,7 @@ class OCSTransformer(BaseOCSTransformer):
         if not table:
             return False
 
-        header_idx, _ = self._find_ocu_header_row(table)
+        header_idx, _, _ = self._find_ocu_header_row(table)
         return header_idx is not None
 
     def transform(self, raw_data: dict) -> OCSDocument:
@@ -916,7 +953,7 @@ class OCSTransformer(BaseOCSTransformer):
                     if not cleaned_rows:
                         continue
 
-                    header_idx, _ = self._find_ocu_header_row(cleaned_rows)
+                    header_idx, _, header_span = self._find_ocu_header_row(cleaned_rows)
                     if header_idx is None:
                         # 若沒有標頭但上一頁已建立過 content header，視為續列。
                         if content_header is not None:
@@ -924,9 +961,9 @@ class OCSTransformer(BaseOCSTransformer):
                         continue
 
                     if content_header is None:
-                        content_header = cleaned_rows[header_idx]
+                        content_header = self._merge_rows_for_header(cleaned_rows[header_idx : header_idx + header_span])
 
-                    merged_content_rows.extend(cleaned_rows[header_idx + 1 :])
+                    merged_content_rows.extend(cleaned_rows[header_idx + header_span :])
 
             if content_header and merged_content_rows:
                 merged_table = [content_header] + merged_content_rows
@@ -975,16 +1012,16 @@ class OCSTransformer(BaseOCSTransformer):
             return []
 
         try:
-            header_idx, col_map = self._find_ocu_header_row(table)
+            header_idx, col_map, header_span = self._find_ocu_header_row(table)
             if header_idx is None:
                 return []
 
-            header = table[header_idx]
+            header = self._merge_rows_for_header(table[header_idx : header_idx + header_span])
             ocu_code = "Unknown"
             ocu_name = "Unknown"
 
             # 優先從 header 前方區塊找 OCU 代碼與名稱標籤
-            for meta_row in table[: header_idx + 1]:
+            for meta_row in table[: header_idx + header_span]:
                 for i, cell in enumerate(meta_row):
                     norm_cell = self._normalize_text(cell)
                     if "職能單元代碼" in norm_cell or "ocu代碼" in norm_cell:
@@ -1002,7 +1039,7 @@ class OCSTransformer(BaseOCSTransformer):
             if ocu_name == "Unknown" and len(header) > 1 and header[1]:
                 ocu_name = str(header[1]).strip()
 
-            data_rows = table[header_idx + 1 :]
+            data_rows = table[header_idx + header_span :]
 
             units: List[OCSUnit] = []
             unit_tasks: Dict[str, List[Task]] = {}

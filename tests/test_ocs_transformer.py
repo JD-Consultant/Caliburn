@@ -76,6 +76,35 @@ def test_detect_table_type_for_fixed_templates() -> None:
     assert transformer._detect_table_type(attitude_table) == "ocs_attitude"
 
 
+def test_detect_table_type_for_split_content_header() -> None:
+    transformer = OCSTransformer()
+
+    split_header_table = [
+        ["主要職責", "工作任務", "工作產出", "行為指標", "", "職能", "職能內涵", "職能內涵"],
+        ["", "", "", "", "職能級別", "（K=knowledge知識）", "（S=skills技能）", ""],
+        ["T2", "T2.1 系統整合測試", "O2.1.1 系統整合測試報告", "P2.1.1 規劃系統整合架構圖", "4", "K01 職業安全與衛生相關規範", "S01 溝通協調能力", ""],
+    ]
+
+    assert transformer._detect_table_type(split_header_table) == "ocs_content"
+
+
+def test_parse_ocu_table_with_split_header_rows() -> None:
+    transformer = OCSTransformer()
+
+    split_header_table = [
+        ["主要職責", "工作任務", "工作產出", "行為指標", "", "職能", "職能內涵", "職能內涵"],
+        ["", "", "", "", "職能級別", "（K=knowledge知識）", "（S=skills技能）", ""],
+        ["T2", "T2.1 系統整合測試", "O2.1.1 系統整合測試報告", "P2.1.1 規劃系統整合架構圖", "4", "K01 職業安全與衛生相關規範", "S01 溝通協調能力", ""],
+        ["", "T2.2 跨部門協作與技術支援", "", "P2.1.4 完成符合國際安規認證與電磁安全規定等整合測試。", "4", "", "", ""],
+    ]
+
+    units = transformer._parse_ocu_table_units(split_header_table)
+
+    assert len(units) == 1
+    assert len(units[0].tasks) == 2
+    assert units[0].tasks[1].competency_blocks[0].outputs == []
+
+
 def test_parse_ocu_table_keeps_multiple_p_codes_in_one_block() -> None:
     transformer = OCSTransformer()
 

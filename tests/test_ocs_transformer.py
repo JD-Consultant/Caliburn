@@ -168,3 +168,44 @@ def test_parse_ocu_table_continuation_tail_text_without_codes() -> None:
     task = units[0].tasks[0]
     assert task.task_name == "對潛在資安問題進行發掘及影響評估"
     assert task.competency_blocks[0].indicators[0].indicator_text == "評估現有資訊安全執行方式之合理性、有效性及必要性。"
+
+
+def test_parse_ocu_table_inherits_outputs_for_merged_rows() -> None:
+    transformer = OCSTransformer()
+
+    merged_table = [
+        ["主要職責", "工作任務", "工作產出", "行為指標", "職能級別", "職能內涵（K=knowledge知識）", "職能內涵（S=skills技能）"],
+        [
+            "T4通訊及感測系統建置與測試",
+            "T4.1AIoT通訊品質評估",
+            "O4.1.1通訊產品之讀取效能測試報告",
+            "P4.1.1了解電信主管機關要求與測試方法。",
+            "3",
+            "K04工業通訊標準\nK32無線通訊技術",
+            "S29無線頻譜量測技術",
+        ],
+        [
+            "",
+            "",
+            "",
+            "P4.1.2針對通訊產品效能測試結果進行讀取效能分析並提出優化方案。",
+            "4",
+            "K32無線通訊技術\nK33天線設計基本原理",
+            "S30網路層系統備援方案評估與導入策略",
+        ],
+        [
+            "",
+            "",
+            "",
+            "P4.1.3協助客戶選擇適合之設備佈建場域,排除環境干擾因素影響使AIoT系統之讀取效能達最佳化。",
+            "5",
+            "K03基礎通訊原理\nK32無線通訊技術\nK34電磁學知識\nK35信號調節技術",
+            "S30網路層系統備援方案評估與導入策略\nS31網路層無線通訊實作能力\nS32雜訊干擾防範處理",
+        ],
+    ]
+
+    units = transformer._parse_ocu_table_units(merged_table)
+
+    assert len(units) == 1
+    task = units[0].tasks[0]
+    assert [block.outputs[0].output_code for block in task.competency_blocks] == ["O4.1.1", "O4.1.1", "O4.1.1"]

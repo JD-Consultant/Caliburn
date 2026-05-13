@@ -164,31 +164,74 @@ uv run python -m jd_pdf_to_json.cli validate <json_path>
 
 ### 6.3 ocs_content
 
+每個 `task`（T1.x）下包含一至多個 `competency_blocks`。每個 block 代表一組能力切片，以對應的 `P`、`O`、`K/S` 為核心。
+
+#### 6.3.1 Block 分界規則
+
+從 PDF 表格提取時，**同時滿足以下兩個條件**才視為新 block 的開始：
+
+1. **出現新的 O-code**（工作產出欄有明確的 `O` 代碼）OR **`competency_level` 改變**（職能級別欄位非空且與前一個 block 不同）
+2. **AND 同列有 K/S codes**（職能內涵欄位非空）
+
+任何不符合上述條件的資料列（無論是否含有新 P-code 或新 O 名稱文字）均視為**同一 block 的延續**，其 P / O / K / S 全部 append 進前一個 block。
+
+#### 6.3.2 常見 PDF 版型對應
+
+| PDF 版型 | 特徵 | 結果 |
+|---------|------|------|
+| 每列各自有 O + P + K/S（如 T6.3） | 每列有 O-code 且有 K/S | 每列 = 一個 block |
+| 同 task 多 P，K/S 只在第一列（如 T2.2、T3.3） | 後續列無 K/S | 全部 P 同一個 block |
+| 同 task 多 P，K/S 只在第一列，但多個 O-code（如 T1.2） | 後續列有 O-code 但無 K/S | 全部 O + P 同一個 block |
+| 同 task 一個 O，多個 P，各自有 level 和 K/S（如 T4.1） | 後續列 level 改變且有 K/S | 每個 level = 一個 block；O 重複宣告 |
+| **跨頁**（如 T1.3、T2.1） | 次頁無 O-code（O 名稱跨頁截斷）、無 level | 全部 append 到同一 block |
+
+#### 6.3.3 跨頁處理
+
+當 PDF 表格跨頁時，次頁通常：
+- 工作任務（T）欄位空白
+- 工作產出欄只剩 O 名稱的後半段文字（無 `O` 代碼前綴）
+- 職能級別空白
+
+此情況不滿足分界條件，次頁的 P / K / S 全部 append 進前一個 block，O 名稱後半段文字接續拼入前一個 output 的 `name`。
+
+#### 6.3.4 JSON 格式範例
+
 ```json
 "ocs_content": {
   "ocu_units": [
     {
       "ocu_code": "T1",
-      "ocu_name": "業務開發與客戶管理",
+      "ocu_name": "研發創意",
       "tasks": [
         {
           "task_code": "T1.1",
-          "task_name": "業務開發",
-          "outputs": [
-            { "output_code": "O1.1.1", "output_name": "客戶聯繫與拜訪紀錄" }
-          ],
-          "behavioral_indicators": [
+          "task_name": "研發劇本與概念",
+          "competency_blocks": [
             {
-              "indicator_code": "P1.1.1",
-              "indicator_text": "..."
+              "competency_level": 3,
+              "indicators": [
+                {"code": "P1.1.1", "text": "參與設計定檔會議"},
+                {"code": "P1.1.2", "text": "彙整素材並確認需求"}
+              ],
+              "outputs": [
+                {"code": "O1.1.1", "name": "建議舞台設計構思"},
+                {"code": "O1.1.2", "name": "製作時程表"}
+              ],
+              "knowledge": [{"code": "K01", "name": "舞台技術"}],
+              "skills": [{"code": "S01", "name": "排程管理"}]
+            },
+            {
+              "competency_level": 4,
+              "indicators": [
+                {"code": "P1.1.3", "text": "完成場地評估報告"},
+                {"code": "P1.1.4", "text": "確認人力需求"}
+              ],
+              "outputs": [
+                {"code": "O1.1.3", "name": "執行檢核清單"}
+              ],
+              "knowledge": [{"code": "K02", "name": "場地規劃"}],
+              "skills": [{"code": "S02", "name": "場務協調"}]
             }
-          ],
-          "competency_level": 2,
-          "knowledge_k": [
-            { "code": "K05", "name": "法律/法規" }
-          ],
-          "skills_s": [
-            { "code": "S01", "name": "人脈拓展" }
           ]
         }
       ]
@@ -197,21 +240,23 @@ uv run python -m jd_pdf_to_json.cli validate <json_path>
 }
 ```
 
-規則：
+#### 6.3.5 欄位規則
 
-- `knowledge_k` 與 `skills_s` 必須為物件陣列，元素格式固定：`{ "code", "name" }`。
-- 禁止只存代碼字串陣列（例如 `["K01", "K02"]`）。
-- 若同一任務內行為指標具不同級別，可在指標上加欄位：
+- `competency_blocks` 為陣列，至少包含一個 block。
+- `indicators` 為必填陣列；一個 block 可包含多個 P-code。
+- `outputs` 為可選陣列；無 O 時為空陣列 `[]`。
+- `knowledge_k` 與 `skills_s` 為必填陣列，元素包含 `code` 與 `name`。
+- 若同一 task 中某個 O 在多個 block 出現（例如 T4.1 的 O 跨 level），允許重複宣告。
+- `indicators[*].text` 若跨行或分段，保留完整內容，不壓縮為代碼字串。
+- `competency_level` 為整數或 `null`；無級別資料時填 `null`。
 
-```json
-{
-  "indicator_code": "P4.1.3",
-  "indicator_text": "...",
-  "competency_level": 5
-}
-```
+建議理解方式：
 
-- 若任務層級與指標層級同值，可省略指標層級欄位。
+- `T` = 職能單元（容器）
+- `T1.1` = 工作任務（容器）
+- `competency_block` = 一組 P/O/K/S 的能力切片，由 K/S 是否出現新值作為分界訊號
+- `O` = 產出描述，可有可無，可跨 block 共用
+- `K/S` = block 的「分界訊號」，同時也是該 block 所需的知識與技能
 
 ### 6.4 ocs_attitude
 
@@ -219,9 +264,9 @@ uv run python -m jd_pdf_to_json.cli validate <json_path>
 "ocs_attitude": {
   "attitudes": [
     {
-      "attitude_code": "A01",
-      "attitude_name": "主動積極",
-      "attitude_description": null
+      "code": "A01",
+      "name": "主動積極",
+      "description": null
     }
   ]
 }
@@ -229,7 +274,7 @@ uv run python -m jd_pdf_to_json.cli validate <json_path>
 
 規則：
 
-- `attitude_description` 永遠保留鍵名。
+- `description` 永遠保留鍵名。
 - 來源有描述時填完整文字；無描述時填 `null`。
 
 ### 6.5 notes_and_appendix
@@ -272,24 +317,89 @@ uv run python -m jd_pdf_to_json.cli validate <json_path>
 
 ```json
 {
-  "version_info": { "versions": [] },
+  "version_info": {
+    "versions": [
+      {
+        "version": "V3",
+        "ocs_code": "FSI3311-001v3",
+        "ocs_name": "證券業-受託買賣業務人員",
+        "status": "最新版本",
+        "update_note": "略",
+        "update_date": "2025/11/24"
+      }
+    ]
+  },
   "ocs_profile": {
-    "ocs_code": "THM9112-001v3",
+    "ocs_code": "FSI3311-001v3",
     "ocs_name": {
       "job_category_name": null,
-      "occupation_name": "房務人員"
+      "occupation_name": "證券業-受託買賣業務人員"
     },
     "category": {
-      "job_categories": [{ "name": "休閒與觀光旅遊／旅館管理", "code": "THM" }],
-      "occupations": [{ "name": "辦公室、旅館及類似場所清潔工及幫工", "code": "9112" }],
-      "industries": [{ "name": "住宿及餐飲業／住宿業", "code": "I55" }]
+      "job_categories": [
+        { "name": "金融財務／證券及投資", "code": "FSI" }
+      ],
+      "occupations": [
+        { "name": "證券金融交易員及經紀人", "code": "3311" }
+      ],
+      "industries": [
+        { "name": "金融及保險業／證券期貨及金融輔助業（證券業）", "code": "K6611" }
+      ]
     },
-    "job_description": "...",
+    "job_description": "負責代理客戶買賣有價證券，並提供相關投資諮詢服務。",
     "ocs_level": 3
   },
-  "ocs_content": { "ocu_units": [] },
-  "ocs_attitude": { "attitudes": [] },
-  "notes_and_appendix": { "requirements": [] }
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "研發創意",
+        "tasks": [
+          {
+            "task_code": "T1.1",
+            "task_name": "研發劇本與概念",
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  { "code": "P1.1.1", "text": "參與設計定檔會議" },
+                  { "code": "P1.1.2", "text": "彙整素材並確認需求" }
+                ],
+                "outputs": [
+                  { "code": "O1.1.1", "name": "建議舞台設計構思" },
+                  { "code": "O1.1.2", "name": "製作時程表" }
+                ],
+                "knowledge": [
+                  { "code": "K01", "name": "舞台技術" }
+                ],
+                "skills": [
+                  { "code": "S01", "name": "排程管理" }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "attitude_code": "A01",
+        "attitude_name": "主動積極",
+        "description": null
+      }
+    ]
+  },
+  "notes_and_appendix": {
+    "requirements": [
+      {
+        "category": "建議擔任此職類／職業之學歷／經歷／或能力條件",
+        "content": "無",
+        "notes": null
+      }
+    ]
+  }
 }
 ```
 

@@ -1,7 +1,8 @@
 """Data models for OCS documents."""
 
 from typing import Optional, List
-from pydantic import BaseModel, Field
+
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class VersionEntry(BaseModel):
@@ -10,7 +11,7 @@ class VersionEntry(BaseModel):
     ocs_code: str
     ocs_name: str
     status: str
-    update_note: Optional[str] = Field(None, description="Update notes, 'skip' if empty")
+    update_note: Optional[str] = Field(None)
     update_date: str = Field(..., description="Date in YYYY/MM/DD format")
 
 
@@ -55,25 +56,32 @@ class CompetencyItem(BaseModel):
 
 class OutputItem(BaseModel):
     """Work output item."""
-    output_code: str
-    output_name: str
+    code: str
+    name: str
 
 
 class BehavioralIndicator(BaseModel):
-    """Behavioral indicator."""
-    indicator_code: str
-    indicator_text: str
+    """Behavioral indicator (P-code)."""
+    code: str
+    text: str
+
+
+class CompetencyBlock(BaseModel):
+    """Competency block under a task, anchored by one or more P-codes."""
+    competency_level: int = Field(..., ge=1, le=5)
+    indicators: List[BehavioralIndicator] = Field(default_factory=list)
+    outputs: List[OutputItem] = Field(default_factory=list)
+    knowledge: List[CompetencyItem] = Field(default_factory=list)
+    skills: List[CompetencyItem] = Field(default_factory=list)
 
 
 class Task(BaseModel):
     """Work task."""
+    model_config = ConfigDict(populate_by_name=True)
+
     task_code: str
     task_name: str
-    outputs: List[OutputItem] = Field(default_factory=list)
-    behavioral_indicators: List[BehavioralIndicator] = Field(default_factory=list)
-    competency_level: int = Field(..., ge=1, le=5)
-    knowledge_k: List[CompetencyItem] = Field(default_factory=list)
-    skills_s: List[CompetencyItem] = Field(default_factory=list)
+    competency_blocks: List[CompetencyBlock] = Field(default_factory=list)
 
 
 class OCSUnit(BaseModel):
@@ -90,9 +98,9 @@ class OCSContent(BaseModel):
 
 class Attitude(BaseModel):
     """Attitude competency."""
-    attitude_code: str
-    attitude_name: str
-    attitude_description: Optional[str] = None
+    code: str
+    name: str
+    description: Optional[str] = None
 
 
 class OCSAttitude(BaseModel):
@@ -119,15 +127,3 @@ class OCSDocument(BaseModel):
     ocs_content: OCSContent = Field(default_factory=OCSContent)
     ocs_attitude: OCSAttitude = Field(default_factory=OCSAttitude)
     notes_and_appendix: NotesAndAppendix = Field(default_factory=NotesAndAppendix)
-
-    class Config:
-        """Pydantic configuration."""
-        json_schema_extra = {
-            "example": {
-                "version_info": {"versions": []},
-                "ocs_profile": {},
-                "ocs_content": {"ocu_units": []},
-                "ocs_attitude": {"attitudes": []},
-                "notes_and_appendix": {"requirements": []},
-            }
-        }

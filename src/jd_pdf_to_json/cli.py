@@ -166,8 +166,8 @@ def batch(
         typer.echo(f"\n{'='*60}")
         typer.echo(f"批次轉換摘要:")
         typer.echo(f"  總計: {len(pdf_files)} 個")
-        typer.echo(f"  成功: {success_count} ✓")
-        typer.echo(f"  失敗: {fail_count} ✗")
+        typer.echo(f"  成功: {success_count} (OK)")
+        typer.echo(f"  失敗: {fail_count} (FAIL)")
         typer.echo(f"輸出目錄: {output_dir}")
         typer.echo(f"{'='*60}")
         

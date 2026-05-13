@@ -462,7 +462,7 @@ class OCSTransformer(BaseOCSTransformer):
         )
         if not row_text:
             return []
-        pattern = re.compile(r"(P\d+(?:[-.]\d+)*)", re.IGNORECASE)
+        pattern = re.compile(r"(P\.?\d+(?:[-.]\d+)*)", re.IGNORECASE)
         matches = list(pattern.finditer(row_text))
         if not matches:
             return []
@@ -515,7 +515,8 @@ class OCSTransformer(BaseOCSTransformer):
         if not text:
             return []
 
-        pattern = re.compile(r"([PT]\d+(?:[-.]\d+)*)", re.IGNORECASE)
+        # [PT]\.? handles both P1.1.1 and P.1.1.1 (old-format PDFs use dot after P)
+        pattern = re.compile(r"([PT]\.?\d+(?:[-.]\d+)*)", re.IGNORECASE)
         indicators: List[BehavioralIndicator] = []
 
         matches = list(pattern.finditer(text))
@@ -529,6 +530,20 @@ class OCSTransformer(BaseOCSTransformer):
                     text=indicator_text,
                 )
             )
+
+        if not indicators:
+            # Last-resort: cell has numeric-only codes (e.g. "2.3.1 text" missing P prefix)
+            # or O-prefixed codes (historical PDFs sometimes write O1.6.1 in behavioral col)
+            num_pattern = re.compile(r"(?<![A-Za-z])(\d+(?:[.-]\d+)+)")
+            num_matches = list(num_pattern.finditer(text))
+            for idx, match in enumerate(num_matches):
+                start = match.end()
+                end = num_matches[idx + 1].start() if idx + 1 < len(num_matches) else len(text)
+                indicator_text = text[start:end].strip("；;，,") or match.group(1).strip()
+                indicators.append(BehavioralIndicator(
+                    code=f"P{match.group(1)}",
+                    text=indicator_text,
+                ))
 
         return indicators
 
@@ -1138,8 +1153,9 @@ class OCSTransformer(BaseOCSTransformer):
                     task_name = str(row[task_code_idx]).strip() if row[task_code_idx] else ""
 
                 # 任務代碼常內嵌在 task_name，例如 T1.1xxxx
+                # 負向前視 (?![.\d]) 確保 T5.3.1 不會被錯誤截為 T5.3
                 if task_name:
-                    match = re.search(r"(T\d+(?:\.\d+)?)", task_name)
+                    match = re.search(r"(T\d+(?:\.\d+)?)(?![.\d])", task_name)
                     if match:
                         if (not task_code) or task_code == task_name:
                             task_code = match.group(1)

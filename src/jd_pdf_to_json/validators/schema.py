@@ -49,7 +49,6 @@ class OCSSchemaValidator:
                 errors.append(f"Attitude[{i}]: missing description key")
 
         if errors:
-            logger.warning(f"Validation failed with {len(errors)} error(s)")
             for error in errors:
                 logger.debug(f"  - {error}")
 

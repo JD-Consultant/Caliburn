@@ -16,6 +16,7 @@ from jd_pdf_to_json.core.models import (
     CategoryItem,
     OCSUnit,
     Task,
+    CompetencyBlock,
     OutputItem,
     BehavioralIndicator,
     CompetencyItem,
@@ -60,6 +61,16 @@ class OCSTransformer(BaseOCSTransformer):
         "ocs_level": ["基準級別", "職能級別", "level"],
     }
 
+    CONTENT_HEADER_KEYS: Dict[str, List[str]] = {
+        "major_duty": ["主要職責"],
+        "task": ["工作任務"],
+        "output": ["工作產出"],
+        "behavioral": ["行為指標"],
+        "level": ["職能級別", "職能級別"],
+        "knowledge": ["知識", "kknowledge知識", "knowledge知識"],
+        "skills": ["技能", "sskills技能", "skills技能"],
+    }
+
     def __init__(self):
         """Initialize transformer."""
         self.logger = logger
@@ -76,6 +87,111 @@ class OCSTransformer(BaseOCSTransformer):
 
     def _row_to_normalized_cells(self, row: List[Any]) -> List[str]:
         return [self._normalize_text(cell) for cell in row]
+
+    def _row_to_joined_normalized_text(self, row: List[Any]) -> str:
+        """Join normalized row cells into one string for table type checks."""
+        return "".join(self._row_to_normalized_cells(row))
+
+    def _merge_rows_for_header(self, rows: List[List[Any]]) -> List[Any]:
+        """Merge adjacent header rows column-wise for split table headers."""
+        if not rows:
+            return []
+
+        max_len = max(len(row) for row in rows)
+        merged: List[str] = []
+        for idx in range(max_len):
+            parts = []
+            for row in rows:
+                if idx < len(row) and row[idx] is not None:
+                    text = str(row[idx]).strip()
+                    if text:
+                        parts.append(text)
+            merged.append(" ".join(parts))
+        return merged
+
+    def _is_page_footer_row(self, row: List[Any]) -> bool:
+        """Detect common page footer rows like '第1頁，總共11頁'."""
+        text = self._row_to_joined_normalized_text(row)
+        if not text:
+            return False
+        return bool(re.search(r"^第\d+頁總共\d+頁$", text))
+
+    def _clean_table_rows(self, table: List[List[Any]]) -> List[List[Any]]:
+        """Remove empty rows and page footer noise from table rows."""
+        cleaned: List[List[Any]] = []
+        for row in table:
+            if not row:
+                continue
+            if all(cell is None or not str(cell).strip() for cell in row):
+                continue
+            if self._is_page_footer_row(row):
+                continue
+            cleaned.append(row)
+        return cleaned
+
+    def _is_content_header_row(self, row: List[Any]) -> bool:
+        """Check whether a row matches the fixed ocs_content header layout."""
+        text = self._row_to_joined_normalized_text(row)
+        if not text:
+            return False
+
+        required_groups = [
+            self.CONTENT_HEADER_KEYS["task"],
+            self.CONTENT_HEADER_KEYS["output"],
+            self.CONTENT_HEADER_KEYS["behavioral"],
+            self.CONTENT_HEADER_KEYS["level"],
+        ]
+
+        for aliases in required_groups:
+            if not any(self._normalize_text(alias) in text for alias in aliases):
+                return False
+
+        has_knowledge = any(self._normalize_text(alias) in text for alias in self.CONTENT_HEADER_KEYS["knowledge"])
+        has_skills = any(self._normalize_text(alias) in text for alias in self.CONTENT_HEADER_KEYS["skills"])
+        return has_knowledge and has_skills
+
+    def _is_split_content_header(self, rows: List[List[Any]]) -> bool:
+        """Check whether adjacent rows together form the fixed content header."""
+        if not rows:
+            return False
+
+        merged = self._merge_rows_for_header(rows)
+        return self._is_content_header_row(merged)
+
+    def _detect_table_type(self, table: List[List[Any]]) -> Optional[str]:
+        """Classify table into one of five fixed sections."""
+        rows = self._clean_table_rows(table)
+        if not rows:
+            return None
+
+        sample = rows[: min(len(rows), 5)]
+        joined = " ".join(self._row_to_joined_normalized_text(row) for row in sample)
+
+        if any(
+            ("職能內涵" in self._row_to_joined_normalized_text(row))
+            and ("attitude" in self._row_to_joined_normalized_text(row))
+            for row in sample
+        ):
+            return "ocs_attitude"
+
+        if any("說明與補充事項" in self._row_to_joined_normalized_text(row) for row in sample):
+            return "notes_and_appendix"
+
+        if any(
+            self._is_content_header_row(row)
+            or self._is_split_content_header(rows[idx : idx + 2])
+            or self._is_split_content_header(rows[idx : idx + 3])
+            for idx, row in enumerate(sample)
+        ):
+            return "ocs_content"
+
+        if all(k in joined for k in ["版本", "職能基準代碼", "職能基準名稱", "狀態"]):
+            return "version_info"
+
+        if any(k in joined for k in ["職能基準代碼", "所屬類別", "工作描述", "基準級別"]):
+            return "ocs_profile"
+
+        return None
 
     def _find_value_to_right(self, row: List[Any], index: int) -> Optional[str]:
         """Get the nearest non-empty value on the right side of a label cell."""
@@ -126,8 +242,8 @@ class OCSTransformer(BaseOCSTransformer):
         deduped: List[OutputItem] = []
         for item in items:
             key = (
-                self._normalize_text((item.output_code or "").strip().upper()),
-                self._normalize_text((item.output_name or "").strip()),
+                self._normalize_text((item.code or "").strip().upper()),
+                self._normalize_text((item.name or "").strip()),
             )
             if key in seen:
                 continue
@@ -142,8 +258,8 @@ class OCSTransformer(BaseOCSTransformer):
         deduped: List[BehavioralIndicator] = []
         for item in items:
             key = (
-                self._normalize_text((item.indicator_code or "").strip().upper()),
-                self._normalize_text((item.indicator_text or "").strip()),
+                self._normalize_text((item.code or "").strip().upper()),
+                self._normalize_text((item.text or "").strip()),
             )
             if key in seen:
                 continue
@@ -271,15 +387,6 @@ class OCSTransformer(BaseOCSTransformer):
                             if code_pattern.fullmatch(c.strip().upper())
                         ]
 
-                # fallback：從整列尋找符合代碼格式的儲存格。
-                if not codes:
-                    for cell in row:
-                        if cell is None:
-                            continue
-                        text = unicodedata.normalize("NFKC", str(cell)).strip().upper()
-                        if code_pattern.fullmatch(text):
-                            codes.append(text)
-
                 if not codes:
                     return [CategoryItem(name=name, code="Unknown") for name in names]
 
@@ -289,15 +396,6 @@ class OCSTransformer(BaseOCSTransformer):
                 return [CategoryItem(name=names[0], code=codes[0])]
 
         return []
-
-    def _extract_competency_items_from_row(
-        self, row: List[Any], code_prefix: str
-    ) -> List[CompetencyItem]:
-        """Fallback parser: scan the entire row and collect competency codes."""
-        items: List[CompetencyItem] = []
-        for cell in row:
-            items.extend(self._extract_competency_items(cell, code_prefix))
-        return self._dedupe_competencies(items)
 
     def _build_column_map(
         self, header_row: List[Any], aliases: Dict[str, List[str]]
@@ -320,61 +418,61 @@ class OCSTransformer(BaseOCSTransformer):
     def _extract_competency_items(
         self, cell_value: Any, code_prefix: str
     ) -> List[CompetencyItem]:
-        """Parse K/S competency items from a cell text block."""
+        """Parse K/S competency items from a fixed-template cell text block."""
         if not cell_value:
             return []
 
         raw_text = unicodedata.normalize("NFKC", str(cell_value)).replace("\r", "\n")
-        lines = [line.strip() for line in raw_text.split("\n") if line and line.strip()]
-        if not lines:
+        text = "\n".join([line.strip() for line in raw_text.split("\n") if line and line.strip()])
+        if not text:
             return []
 
         results: List[CompetencyItem] = []
 
-        # Prefer line-wise parsing where code and name are separated by whitespace.
-        line_pattern = re.compile(
-            rf"^({code_prefix}\d+(?:[-.]\d+)*)\s+(.+)$", flags=re.IGNORECASE
+        # For K/S parsing, stop at the next K or S code to avoid cross-contamination.
+        pattern = re.compile(
+            rf"({code_prefix}\d+(?:[-.]\d+)*)([\s\S]*?)(?=(?:[KS]\d+(?:[-.]\d+)*)|$)",
+            flags=re.IGNORECASE,
         )
-        for line in lines:
-            match = line_pattern.match(line)
-            if not match:
-                continue
+        matches = list(pattern.finditer(text))
+        for match in matches:
             code = match.group(1).strip()
-            name = match.group(2).strip("；;，,") or code
-            results.append(CompetencyItem(code=code, name=name))
-
-        if results:
-            return results
-
-        # Fallback: parse inline sequences such as "K01 AAA K02 BBB".
-        text = "\n".join(lines)
-        inline_pattern = re.compile(
-            rf"({code_prefix}\d+(?:[-.]\d+)*)\s+", flags=re.IGNORECASE
-        )
-        matches = list(inline_pattern.finditer(text))
-        for idx, match in enumerate(matches):
-            code = match.group(1).strip()
-            start = match.end()
-            end = matches[idx + 1].start() if idx + 1 < len(matches) else len(text)
-            name = text[start:end].strip("；;，,\n ") or code
-            results.append(CompetencyItem(code=code, name=name))
-
-        if results:
-            return results
-
-        # Final fallback for legacy formats without clear separators.
-        legacy_pattern = re.compile(
-            rf"({code_prefix}\d+(?:[-.]\d+)*)", flags=re.IGNORECASE
-        )
-        matches = list(legacy_pattern.finditer(text))
-        for idx, match in enumerate(matches):
-            code = match.group(1).strip()
-            start = match.end()
-            end = matches[idx + 1].start() if idx + 1 < len(matches) else len(text)
-            name = text[start:end].strip("；;，,\n ") or code
+            name = re.sub(r"\s+", " ", match.group(2)).strip("；;，, ") or code
             results.append(CompetencyItem(code=code, name=name))
 
         return results
+
+    def _extract_competency_items_from_row(
+        self, row: List[Any], code_prefix: str
+    ) -> List[CompetencyItem]:
+        """Fallback extraction for K/S codes from all cells in a row."""
+        row_text = "\n".join(
+            str(cell).strip() for cell in row if cell is not None and str(cell).strip()
+        )
+        if not row_text:
+            return []
+        return self._extract_competency_items(row_text, code_prefix)
+
+    def _extract_behavioral_indicators_from_row(
+        self, row: List[Any]
+    ) -> List[BehavioralIndicator]:
+        """Fallback extraction for P-codes from all cells in a row (P-only, avoids T-codes)."""
+        row_text = "\n".join(
+            str(cell).strip() for cell in row if cell is not None and str(cell).strip()
+        )
+        if not row_text:
+            return []
+        pattern = re.compile(r"(P\.?\d+(?:[-.]\d+)*)", re.IGNORECASE)
+        matches = list(pattern.finditer(row_text))
+        if not matches:
+            return []
+        indicators: List[BehavioralIndicator] = []
+        for idx, match in enumerate(matches):
+            start = match.end()
+            end = matches[idx + 1].start() if idx + 1 < len(matches) else len(row_text)
+            indicator_text = row_text[start:end].strip("；;，,") or match.group(1).strip()
+            indicators.append(BehavioralIndicator(code=match.group(1).strip(), text=indicator_text))
+        return indicators
 
     def _extract_output_items(self, cell_value: Any) -> List[OutputItem]:
         """Parse O-code work outputs from a cell text block."""
@@ -394,7 +492,7 @@ class OCSTransformer(BaseOCSTransformer):
             start = match.end()
             end = matches[idx + 1].start() if idx + 1 < len(matches) else len(text)
             name = text[start:end].strip("；;，,")
-            outputs.append(OutputItem(output_code=code, output_name=name))
+            outputs.append(OutputItem(code=code, name=name))
 
         if outputs:
             return outputs
@@ -402,7 +500,7 @@ class OCSTransformer(BaseOCSTransformer):
         for token in re.split(r"[\s,，;；\n]+", text):
             token = token.strip()
             if re.fullmatch(r"O\d+(?:[-.]\d+)*", token, flags=re.IGNORECASE):
-                outputs.append(OutputItem(output_code=token, output_name=""))
+                outputs.append(OutputItem(code=token, name=""))
 
         return outputs
 
@@ -417,7 +515,8 @@ class OCSTransformer(BaseOCSTransformer):
         if not text:
             return []
 
-        pattern = re.compile(r"([PT]\d+(?:[-.]\d+)*)", re.IGNORECASE)
+        # [PT]\.? handles both P1.1.1 and P.1.1.1 (old-format PDFs use dot after P)
+        pattern = re.compile(r"([PT]\.?\d+(?:[-.]\d+)*)", re.IGNORECASE)
         indicators: List[BehavioralIndicator] = []
 
         matches = list(pattern.finditer(text))
@@ -427,85 +526,75 @@ class OCSTransformer(BaseOCSTransformer):
             indicator_text = text[start:end].strip("；;，,") or match.group(1).strip()
             indicators.append(
                 BehavioralIndicator(
-                    indicator_code=match.group(1).strip(),
-                    indicator_text=indicator_text,
+                    code=match.group(1).strip(),
+                    text=indicator_text,
                 )
             )
 
+        if not indicators:
+            # Last-resort: cell has numeric-only codes (e.g. "2.3.1 text" missing P prefix)
+            # or O-prefixed codes (historical PDFs sometimes write O1.6.1 in behavioral col)
+            num_pattern = re.compile(r"(?<![A-Za-z])(\d+(?:[.-]\d+)+)")
+            num_matches = list(num_pattern.finditer(text))
+            for idx, match in enumerate(num_matches):
+                start = match.end()
+                end = num_matches[idx + 1].start() if idx + 1 < len(num_matches) else len(text)
+                indicator_text = text[start:end].strip("；;，,") or match.group(1).strip()
+                indicators.append(BehavioralIndicator(
+                    code=f"P{match.group(1)}",
+                    text=indicator_text,
+                ))
+
         return indicators
 
-    def _find_ocu_header_row(self, table: List[List[Any]]) -> tuple[Optional[int], Dict[str, int]]:
+    def _append_text_if_new(self, original: str, tail: str) -> str:
+        """Append continuation text if not already included."""
+        if not tail:
+            return original
+        if not original:
+            return tail
+        if tail in original:
+            return original
+        return f"{original}{tail}"
+
+    def _dedupe_block(self, block: CompetencyBlock) -> CompetencyBlock:
+        """Deduplicate all collections in a competency block."""
+        block.outputs = self._dedupe_outputs(block.outputs)
+        block.indicators = self._dedupe_indicators(block.indicators)
+        block.knowledge = self._dedupe_competencies(block.knowledge)
+        block.skills = self._dedupe_competencies(block.skills)
+        return block
+
+    def _find_ocu_header_row(self, table: List[List[Any]]) -> tuple[Optional[int], Dict[str, int], int]:
         """Find the header row and mapped OCU columns in a table."""
+        best: tuple[Optional[int], Dict[str, int], int, int] = (None, {}, 0, -1)
+
         for row_idx, row in enumerate(table):
-            col_map = self._build_column_map(row, self.OCU_HEADER_ALIASES)
-            if "task_name" in col_map:
-                has_competency_cols = any(
-                    key in col_map for key in ("knowledge", "skills", "outputs", "behavioral")
-                )
-                if has_competency_cols:
-                    if "task_code" not in col_map:
-                        # 常見版型僅有「工作任務」欄，任務代碼內嵌在文字中。
-                        col_map["task_code"] = col_map["task_name"]
-                    return row_idx, col_map
+            candidates = [(row, 1)]
+            if row_idx + 1 < len(table):
+                candidates.append((self._merge_rows_for_header([row, table[row_idx + 1]]), 2))
+            if row_idx + 2 < len(table):
+                candidates.append((self._merge_rows_for_header([row, table[row_idx + 1], table[row_idx + 2]]), 3))
 
-            normalized_cells = self._row_to_normalized_cells(row)
-            if len(row) >= 6 and any("knowledge" in c for c in normalized_cells) and any(
-                "skills" in c for c in normalized_cells
-            ):
-                # AIoT PDF 常見固定欄位：主要職責/工作任務/工作產出/行為指標/職能級別/K/S
-                inferred_map = {
-                    "task_name": 1,
-                    "task_code": 1,
-                    "outputs": 2,
-                    "behavioral": 3,
-                    "level": 4,
-                    "knowledge": 5,
-                    "skills": 6,
-                }
-                return row_idx, inferred_map
+            for candidate, span in candidates:
+                col_map = self._build_column_map(candidate, self.OCU_HEADER_ALIASES)
+                if "task_name" in col_map:
+                    has_competency_cols = any(
+                        key in col_map for key in ("knowledge", "skills", "outputs", "behavioral")
+                    )
+                    if has_competency_cols:
+                        if "task_code" not in col_map:
+                            # 常見版型僅有「工作任務」欄，任務代碼內嵌在文字中。
+                            col_map["task_code"] = col_map["task_name"]
 
-        # Fallback: 從第一個「看起來像任務資料列」反推欄位位置，處理多層表頭對齊偏移。
-        for row_idx, row in enumerate(table):
-            if not row:
-                continue
+                        score = sum(
+                            key in col_map
+                            for key in ("outputs", "behavioral", "knowledge", "skills", "level", "task_code")
+                        )
+                        if score > best[3]:
+                            best = (row_idx, col_map, span, score)
 
-            inferred: Dict[str, int] = {}
-            task_code_like_idx: Optional[int] = None
-            task_name_idx: Optional[int] = None
-
-            for idx, cell in enumerate(row):
-                cell_text = self._compact_wrapped_text(cell)
-                if not cell_text:
-                    continue
-
-                if "outputs" not in inferred and re.search(r"\bO\d+(?:[-.]\d+)*", cell_text, re.IGNORECASE):
-                    inferred["outputs"] = idx
-                if "behavioral" not in inferred and re.search(r"\bP\d+(?:[-.]\d+)*", cell_text, re.IGNORECASE):
-                    inferred["behavioral"] = idx
-                if "knowledge" not in inferred and re.search(r"\bK\d+(?:[-.]\d+)*", cell_text, re.IGNORECASE):
-                    inferred["knowledge"] = idx
-                if "skills" not in inferred and re.search(r"\bS\d+(?:[-.]\d+)*", cell_text, re.IGNORECASE):
-                    inferred["skills"] = idx
-                if "level" not in inferred and re.fullmatch(r"[1-5]", cell_text):
-                    inferred["level"] = idx
-
-                if task_name_idx is None and re.search(r"\bT\d+\.\d+", cell_text, re.IGNORECASE):
-                    task_name_idx = idx
-                if task_code_like_idx is None and re.search(r"\bT\d+(?:\.\d+)?", cell_text, re.IGNORECASE):
-                    task_code_like_idx = idx
-
-            if task_name_idx is None and task_code_like_idx is not None:
-                task_name_idx = task_code_like_idx
-
-            has_task = task_name_idx is not None
-            has_detail = "outputs" in inferred or "behavioral" in inferred
-            has_comp = "knowledge" in inferred or "skills" in inferred
-
-            if has_task and has_detail and has_comp:
-                inferred["task_name"] = task_name_idx
-                inferred["task_code"] = task_name_idx
-                return max(0, row_idx - 1), inferred
-        return None, {}
+        return best[0], best[1], best[2]
 
     def _extract_task_level(self, row: List[Any], col_map: Dict[str, int]) -> int:
         """Extract task competency level from mapped row, fallback to 3."""
@@ -524,44 +613,8 @@ class OCSTransformer(BaseOCSTransformer):
         if not table:
             return False
 
-        header_idx, _ = self._find_ocu_header_row(table)
-        if header_idx is not None:
-            return True
-
-        # Fallback heuristic: sample rows contain task code + competency/output markers.
-        sample_rows = table[: min(len(table), 6)]
-        has_task_code = False
-        has_detail_code = False
-
-        for row in sample_rows:
-            for cell in row:
-                cell_text = self._compact_wrapped_text(cell)
-                if not cell_text:
-                    continue
-                if re.search(r"T\d+(?:\.\d+)?", cell_text, flags=re.IGNORECASE):
-                    has_task_code = True
-                if re.search(r"[KOSP]\d+(?:[-.]\d+)*", cell_text, flags=re.IGNORECASE):
-                    has_detail_code = True
-
-        return has_task_code and has_detail_code
-
-    def _derive_task_code_from_items(
-        self,
-        outputs: List[OutputItem],
-        indicators: List[BehavioralIndicator],
-    ) -> Optional[str]:
-        """Derive task code (e.g., T3.1) from output/indicator codes like O3.1.2."""
-        for output in outputs:
-            match = re.match(r"O(\d+\.\d+)\.\d+", output.output_code, flags=re.IGNORECASE)
-            if match:
-                return f"T{match.group(1)}"
-
-        for indicator in indicators:
-            match = re.match(r"P(\d+\.\d+)\.\d+", indicator.indicator_code, flags=re.IGNORECASE)
-            if match:
-                return f"T{match.group(1)}"
-
-        return None
+        header_idx, _, _ = self._find_ocu_header_row(table)
+        return header_idx is not None
 
     def transform(self, raw_data: dict) -> OCSDocument:
         """
@@ -694,23 +747,6 @@ class OCSTransformer(BaseOCSTransformer):
                         )
                         versions.append(version_record)
                     continue
-
-                # fallback: 舊邏輯
-                for row in table:
-                    if len(row) >= 4 and row[0] and "V" in str(row[0]).upper():
-                        version_record = VersionEntry(
-                            version=str(row[0]).strip(),
-                            ocs_code=str(row[1]).strip() if row[1] else "Unknown",
-                            ocs_name=str(row[2]).strip() if row[2] else "Unknown",
-                            status=str(row[3]).strip() if row[3] else "Unknown",
-                            update_note=(
-                                str(row[4]).strip() if len(row) > 4 and row[4] else None
-                            ),
-                            update_date=(
-                                str(row[5]).strip() if len(row) > 5 and row[5] else "Unknown"
-                            ),
-                        )
-                        versions.append(version_record)
 
         except Exception as e:
             self.logger.warning(f"版本提取失敗: {str(e)}")
@@ -941,19 +977,12 @@ class OCSTransformer(BaseOCSTransformer):
                     for task in unit.tasks:
                         if task.task_code in existing_task_map:
                             target = existing_task_map[task.task_code]
-                            target.outputs.extend(task.outputs)
-                            target.behavioral_indicators.extend(task.behavioral_indicators)
-                            target.knowledge_k.extend(task.knowledge_k)
-                            target.skills_s.extend(task.skills_s)
-                            target.outputs = self._dedupe_outputs(target.outputs)
-                            target.behavioral_indicators = self._dedupe_indicators(
-                                target.behavioral_indicators
-                            )
-                            target.knowledge_k = self._dedupe_competencies(target.knowledge_k)
-                            target.skills_s = self._dedupe_competencies(target.skills_s)
+                            target.competency_blocks.extend(task.competency_blocks)
+                            target.competency_blocks = [
+                                self._dedupe_block(block) for block in target.competency_blocks
+                            ]
                             if not target.task_name and task.task_name:
                                 target.task_name = task.task_name
-                            target.competency_level = max(target.competency_level, task.competency_level)
                         else:
                             existing.tasks.append(task)
                     if is_generic_unit_name(existing.ocu_name) and not is_generic_unit_name(unit.ocu_name):
@@ -962,6 +991,9 @@ class OCSTransformer(BaseOCSTransformer):
             ocu_units.append(unit)
 
         try:
+            content_header: Optional[List[Any]] = None
+            merged_content_rows: List[List[Any]] = []
+
             # 由第一頁開始掃描所有表格；有些 PDF（如金融科技）第一頁就有 OCU 主表。
             for page_idx in range(0, len(pdf.pages)):
                 page = pdf.pages[page_idx]
@@ -970,45 +1002,58 @@ class OCSTransformer(BaseOCSTransformer):
                 for table in tables:
                     if not table:
                         continue
-                    header_row = table[0] if table and table[0] else []
-                    header_norm = "".join(self._row_to_normalized_cells(header_row))
-                    # 跳過態度與補充表格，但不終止整頁/後續掃描。
-                    if "attitude" in header_norm or "態度" in header_norm:
-                        continue
-                    if "說明與補充" in header_norm:
-                        continue
-                    if not self._is_ocu_candidate_table(table):
+
+                    cleaned_rows = self._clean_table_rows(table)
+                    if not cleaned_rows:
                         continue
 
-                    parsed_units = self._parse_ocu_table_units(table)
-                    if parsed_units:
-                        for unit in parsed_units:
-                            # 若單元代碼有效，先記住名稱，供跨頁續表回填。
-                            if re.fullmatch(r"T\d+", unit.ocu_code) and not is_generic_unit_name(
-                                unit.ocu_name
-                            ):
-                                known_ocu_names[unit.ocu_code] = unit.ocu_name
+                    header_idx, _, header_span = self._find_ocu_header_row(cleaned_rows)
+                    if header_idx is None:
+                        # 若沒有標頭但上一頁已建立過 content header，視為續列。
+                        if content_header is not None:
+                            merged_content_rows.extend(cleaned_rows)
+                        continue
 
-                            # 若代碼/名稱是表頭泛稱，改依 task_code 前綴回掛。
-                            if not re.fullmatch(r"T\d+", unit.ocu_code) or is_generic_unit_name(
-                                unit.ocu_name
-                            ):
-                                grouped_tasks: Dict[str, List[Task]] = {}
-                                for task in unit.tasks:
-                                    match = re.match(r"(T\d+)", task.task_code)
-                                    ocu_code = match.group(1) if match else unit.ocu_code
-                                    grouped_tasks.setdefault(ocu_code, []).append(task)
+                    if content_header is None:
+                        content_header = self._merge_rows_for_header(cleaned_rows[header_idx : header_idx + header_span])
 
-                                for ocu_code, tasks in grouped_tasks.items():
-                                    fallback_name = unit.ocu_name if not is_generic_unit_name(unit.ocu_name) else "Unknown"
-                                    normalized_unit = OCSUnit(
-                                        ocu_code=ocu_code,
-                                        ocu_name=known_ocu_names.get(ocu_code, fallback_name),
-                                        tasks=tasks,
-                                    )
-                                    merge_unit(normalized_unit)
-                            else:
-                                merge_unit(unit)
+                    merged_content_rows.extend(cleaned_rows[header_idx + header_span :])
+
+            if content_header and merged_content_rows:
+                merged_table = [content_header] + merged_content_rows
+                if self._is_ocu_candidate_table(merged_table):
+                    parsed_units = self._parse_ocu_table_units(merged_table)
+                else:
+                    parsed_units = []
+
+                if parsed_units:
+                    for unit in parsed_units:
+                        # 若單元代碼有效，先記住名稱，供跨頁續表回填。
+                        if re.fullmatch(r"T\d+", unit.ocu_code) and not is_generic_unit_name(
+                            unit.ocu_name
+                        ):
+                            known_ocu_names[unit.ocu_code] = unit.ocu_name
+
+                        # 若代碼/名稱是表頭泛稱，改依 task_code 前綴回掛。
+                        if not re.fullmatch(r"T\d+", unit.ocu_code) or is_generic_unit_name(
+                            unit.ocu_name
+                        ):
+                            grouped_tasks: Dict[str, List[Task]] = {}
+                            for task in unit.tasks:
+                                match = re.match(r"(T\d+)", task.task_code)
+                                ocu_code = match.group(1) if match else unit.ocu_code
+                                grouped_tasks.setdefault(ocu_code, []).append(task)
+
+                            for ocu_code, tasks in grouped_tasks.items():
+                                fallback_name = unit.ocu_name if not is_generic_unit_name(unit.ocu_name) else "Unknown"
+                                normalized_unit = OCSUnit(
+                                    ocu_code=ocu_code,
+                                    ocu_name=known_ocu_names.get(ocu_code, fallback_name),
+                                    tasks=tasks,
+                                )
+                                merge_unit(normalized_unit)
+                        else:
+                            merge_unit(unit)
 
         except Exception as e:
             self.logger.warning(f"OCU 內容提取失敗: {str(e)}")
@@ -1021,39 +1066,34 @@ class OCSTransformer(BaseOCSTransformer):
             return []
 
         try:
-            header_idx, col_map = self._find_ocu_header_row(table)
-
+            header_idx, col_map, header_span = self._find_ocu_header_row(table)
             if header_idx is None:
-                # fallback: 嘗試舊格式（第一行視為 OCU 標題）
-                header = table[0]
-                ocu_code = str(header[0]).strip() if header[0] else "T0"
-                ocu_name = str(header[1]).strip() if len(header) > 1 else "Unknown"
-                data_rows = table[1:]
-            else:
-                header = table[header_idx]
-                ocu_code = "Unknown"
-                ocu_name = "Unknown"
+                return []
 
-                # 優先從 header 前方區塊找 OCU 代碼與名稱標籤
-                for meta_row in table[: header_idx + 1]:
-                    for i, cell in enumerate(meta_row):
-                        norm_cell = self._normalize_text(cell)
-                        if "職能單元代碼" in norm_cell or "ocu代碼" in norm_cell:
-                            value = self._find_value_to_right(meta_row, i)
-                            if value:
-                                ocu_code = value
-                        if "職能單元名稱" in norm_cell or "ocu名稱" in norm_cell:
-                            value = self._find_value_to_right(meta_row, i)
-                            if value:
-                                ocu_name = value
+            header = self._merge_rows_for_header(table[header_idx : header_idx + header_span])
+            ocu_code = "Unknown"
+            ocu_name = "Unknown"
 
-                # 若未找到，使用 header 左側欄位 fallback
-                if ocu_code == "Unknown" and header and header[0]:
-                    ocu_code = str(header[0]).strip()
-                if ocu_name == "Unknown" and len(header) > 1 and header[1]:
-                    ocu_name = str(header[1]).strip()
+            # 優先從 header 前方區塊找 OCU 代碼與名稱標籤
+            for meta_row in table[: header_idx + header_span]:
+                for i, cell in enumerate(meta_row):
+                    norm_cell = self._normalize_text(cell)
+                    if "職能單元代碼" in norm_cell or "ocu代碼" in norm_cell:
+                        value = self._find_value_to_right(meta_row, i)
+                        if value:
+                            ocu_code = value
+                    if "職能單元名稱" in norm_cell or "ocu名稱" in norm_cell:
+                        value = self._find_value_to_right(meta_row, i)
+                        if value:
+                            ocu_name = value
 
-                data_rows = table[header_idx + 1 :]
+            # 若未找到，使用 header 左側欄位 fallback
+            if ocu_code == "Unknown" and header and header[0]:
+                ocu_code = str(header[0]).strip()
+            if ocu_name == "Unknown" and len(header) > 1 and header[1]:
+                ocu_name = str(header[1]).strip()
+
+            data_rows = table[header_idx + header_span :]
 
             units: List[OCSUnit] = []
             unit_tasks: Dict[str, List[Task]] = {}
@@ -1082,145 +1122,209 @@ class OCSTransformer(BaseOCSTransformer):
                         current_ocu_name = duty_match.group(2).strip() or current_ocu_name
                         _ensure_unit(current_ocu_code, current_ocu_name)
 
-                # 欄位映射優先；若沒有欄位映射，採舊規則 fallback
-                if col_map:
-                    task_code_idx = col_map.get("task_code")
-                    task_name_idx = col_map.get("task_name")
-                    task_code = (
-                        str(row[task_code_idx]).strip()
-                        if task_code_idx is not None
-                        and task_code_idx < len(row)
-                        and row[task_code_idx]
-                        else ""
-                    )
-                    task_name = (
-                        str(row[task_name_idx]).strip()
-                        if task_name_idx is not None
-                        and task_name_idx < len(row)
-                        and row[task_name_idx]
-                        else ""
-                    )
+                task_code_idx = col_map.get("task_code")
+                task_name_idx = col_map.get("task_name")
+                task_code = (
+                    str(row[task_code_idx]).strip()
+                    if task_code_idx is not None
+                    and task_code_idx < len(row)
+                    and row[task_code_idx]
+                    else ""
+                )
+                task_name = (
+                    str(row[task_name_idx]).strip()
+                    if task_name_idx is not None
+                    and task_name_idx < len(row)
+                    and row[task_name_idx]
+                    else ""
+                )
 
-                    if not task_name and task_code_idx is not None and task_code_idx < len(row):
-                        task_name = str(row[task_code_idx]).strip() if row[task_code_idx] else ""
+                # 模板沒有獨立 task_code 欄時，避免把純文字尾段誤判成新 task code。
+                if (
+                    task_code
+                    and task_code_idx is not None
+                    and task_name_idx is not None
+                    and task_code_idx == task_name_idx
+                    and not re.search(r"T\d+(?:\.\d+)?", task_code, flags=re.IGNORECASE)
+                ):
+                    task_code = ""
 
-                    # 任務代碼常內嵌在 task_name，例如 T1.1xxxx
-                    if task_name:
-                        match = re.search(r"(T\d+(?:\.\d+)?)", task_name)
+                if not task_name and task_code_idx is not None and task_code_idx < len(row):
+                    task_name = str(row[task_code_idx]).strip() if row[task_code_idx] else ""
+
+                # 任務代碼常內嵌在 task_name，例如 T1.1xxxx
+                # 負向前視 (?![.\d]) 確保 T5.3.1 不會被錯誤截為 T5.3
+                if task_name:
+                    match = re.search(r"(T\d+(?:\.\d+)?)(?![.\d])", task_name)
+                    if match:
                         if (not task_code) or task_code == task_name:
-                            task_code = match.group(1) if match else task_name
-                        if match:
-                            task_name = task_name.replace(match.group(1), "", 1).strip()
+                            task_code = match.group(1)
+                        task_name = task_name.replace(match.group(1), "", 1).strip()
 
-                    task_name = self._compact_wrapped_text(task_name)
+                task_name = self._compact_wrapped_text(task_name)
 
-                    outputs = self._extract_output_items(
-                        row[col_map["outputs"]]
-                    ) if "outputs" in col_map and col_map["outputs"] < len(row) else []
+                outputs = self._extract_output_items(
+                    row[col_map["outputs"]]
+                ) if "outputs" in col_map and col_map["outputs"] < len(row) else []
 
-                    knowledge = self._extract_competency_items(
-                        row[col_map["knowledge"]], "K"
-                    ) if "knowledge" in col_map and col_map["knowledge"] < len(row) else []
+                knowledge: List[CompetencyItem] = []
+                if "knowledge" in col_map and col_map["knowledge"] < len(row):
+                    knowledge = self._extract_competency_items(row[col_map["knowledge"]], "K")
+                if not knowledge:
+                    knowledge = self._extract_competency_items_from_row(row, "K")
 
-                    skills = self._extract_competency_items(
-                        row[col_map["skills"]], "S"
-                    ) if "skills" in col_map and col_map["skills"] < len(row) else []
+                skills: List[CompetencyItem] = []
+                if "skills" in col_map and col_map["skills"] < len(row):
+                    skills = self._extract_competency_items(row[col_map["skills"]], "S")
+                if not skills:
+                    skills = self._extract_competency_items_from_row(row, "S")
 
-                    # 某些 PDF 的多層表頭會讓 K/S 欄位在資料列位移，改以整列代碼掃描補抓。
-                    if not knowledge:
-                        knowledge = self._extract_competency_items_from_row(row, "K")
-                    if not skills:
-                        skills = self._extract_competency_items_from_row(row, "S")
+                behavioral_indicators = self._extract_behavioral_indicators(
+                    row[col_map["behavioral"]]
+                ) if "behavioral" in col_map and col_map["behavioral"] < len(row) else []
+                if not behavioral_indicators:
+                    behavioral_indicators = self._extract_behavioral_indicators_from_row(row)
 
-                    behavioral_indicators = self._extract_behavioral_indicators(
-                        row[col_map["behavioral"]]
-                    ) if "behavioral" in col_map and col_map["behavioral"] < len(row) else []
-
-                    # 非標準 task_code（例如整段文字、章節小標）嘗試由 O/P 代碼反推；失敗則當續列/雜訊列處理。
-                    if task_code and not re.fullmatch(r"T\d+(?:\.\d+)?", task_code, flags=re.IGNORECASE):
-                        inferred_task_code = self._derive_task_code_from_items(
-                            outputs, behavioral_indicators
-                        )
-                        task_code = inferred_task_code if inferred_task_code else ""
-
-                    # 續列（跨頁/跨列）通常沒有 task_code，需併到上一個 task。
-                    if not task_code:
-                        previous_task = last_task_by_ocu.get(current_ocu_code)
-                        if previous_task:
-                            previous_task.outputs.extend(outputs)
-                            previous_task.behavioral_indicators.extend(behavioral_indicators)
-                            previous_task.knowledge_k.extend(knowledge)
-                            previous_task.skills_s.extend(skills)
-                            previous_task.outputs = self._dedupe_outputs(previous_task.outputs)
-                            previous_task.behavioral_indicators = self._dedupe_indicators(
-                                previous_task.behavioral_indicators
-                            )
-                            previous_task.knowledge_k = self._dedupe_competencies(
-                                previous_task.knowledge_k
-                            )
-                            previous_task.skills_s = self._dedupe_competencies(
-                                previous_task.skills_s
-                            )
-                            previous_task.competency_level = self._extract_task_level(row, col_map)
-                            continue
-
-                        # 若是跨頁新表第一列續接，嘗試由 O/P 代碼反推 task_code。
-                        inferred_task_code = self._derive_task_code_from_items(
-                            outputs, behavioral_indicators
-                        )
-                        if inferred_task_code:
-                            task_code = inferred_task_code
-                        else:
-                            continue
-                    task_level = self._extract_task_level(row, col_map)
-                else:
-                    if not row[0]:
-                        continue
-                    task_code = str(row[0]).strip()
-                    task_name = str(row[1]).strip() if len(row) > 1 else ""
-                    task_name = self._compact_wrapped_text(task_name)
-
-                    outputs = []
-                    knowledge = []
-                    skills = []
-                    behavioral_indicators = []
-                    task_level = 3
-
-                    for col in row:
-                        if not col or not isinstance(col, str):
-                            continue
-                        stripped = col.strip()
-                        if stripped.startswith("O"):
-                            outputs.append(OutputItem(output_code=stripped, output_name=""))
-                        if stripped.startswith("K"):
-                            knowledge.append(CompetencyItem(code=stripped, name=stripped))
-                        if stripped.startswith("S"):
-                            skills.append(CompetencyItem(code=stripped, name=stripped))
-                        if stripped.startswith("P") or stripped.startswith("T"):
-                            behavioral_indicators.append(
-                                BehavioralIndicator(
-                                    indicator_code=stripped,
-                                    indicator_text=stripped,
+                # Continuation rows (no task_code) are appended to the previous task.
+                if not task_code:
+                    previous_task = last_task_by_ocu.get(current_ocu_code)
+                    if previous_task:
+                        if not previous_task.competency_blocks:
+                            previous_task.competency_blocks.append(
+                                CompetencyBlock(
+                                    competency_level=self._extract_task_level(row, col_map),
+                                    indicators=[],
+                                    outputs=[],
+                                    knowledge=[],
+                                    skills=[],
                                 )
                             )
+                        previous_block = previous_task.competency_blocks[-1]
+
+                        output_idx = col_map.get("outputs")
+                        behavioral_idx = col_map.get("behavioral")
+                        knowledge_idx = col_map.get("knowledge")
+                        skills_idx = col_map.get("skills")
+
+                        output_tail = (
+                            self._compact_wrapped_text(row[output_idx])
+                            if output_idx is not None and output_idx < len(row) and row[output_idx]
+                            else ""
+                        )
+                        behavioral_tail = (
+                            self._compact_wrapped_text(row[behavioral_idx])
+                            if behavioral_idx is not None and behavioral_idx < len(row) and row[behavioral_idx]
+                            else ""
+                        )
+                        knowledge_tail = (
+                            self._compact_wrapped_text(row[knowledge_idx])
+                            if knowledge_idx is not None and knowledge_idx < len(row) and row[knowledge_idx]
+                            else ""
+                        )
+                        skills_tail = (
+                            self._compact_wrapped_text(row[skills_idx])
+                            if skills_idx is not None and skills_idx < len(row) and row[skills_idx]
+                            else ""
+                        )
+
+                        # Append plain-text continuations (no new code found in tail).
+                        if not outputs and output_tail and previous_block.outputs and not re.search(
+                            r"\bO\d+(?:[-.]\d+)*", output_tail, flags=re.IGNORECASE
+                        ):
+                            previous_block.outputs[-1].name = self._append_text_if_new(
+                                previous_block.outputs[-1].name,
+                                output_tail,
+                            )
+
+                        if (
+                            not behavioral_indicators
+                            and behavioral_tail
+                            and previous_block.indicators
+                            and not re.search(r"\b[PT]\d+(?:[-.]\d+)*", behavioral_tail, flags=re.IGNORECASE)
+                        ):
+                            previous_block.indicators[-1].text = self._append_text_if_new(
+                                previous_block.indicators[-1].text,
+                                behavioral_tail,
+                            )
+
+                        if not knowledge and knowledge_tail and previous_block.knowledge and not re.search(
+                            r"\bK\d+(?:[-.]\d+)*", knowledge_tail, flags=re.IGNORECASE
+                        ):
+                            previous_block.knowledge[-1].name = self._append_text_if_new(
+                                previous_block.knowledge[-1].name,
+                                knowledge_tail,
+                            )
+
+                        if not skills and skills_tail and previous_block.skills and not re.search(
+                            r"\bS\d+(?:[-.]\d+)*", skills_tail, flags=re.IGNORECASE
+                        ):
+                            previous_block.skills[-1].name = self._append_text_if_new(
+                                previous_block.skills[-1].name,
+                                skills_tail,
+                            )
+
+                        if task_name:
+                            previous_task.task_name = self._append_text_if_new(
+                                previous_task.task_name,
+                                task_name,
+                            )
+
+                        # New block rule: needs BOTH a structural trigger (new O-code OR level
+                        # change) AND new K/S codes. This correctly handles:
+                        #   - multiple O+P at same level sharing K/S (T1.2) → same block
+                        #   - each O+P pair with its own K/S (T6.3, T6.4) → new block
+                        #   - cross-page continuation where O name is split → same block
+                        new_level = self._extract_task_level(row, col_map)
+                        level_changed = new_level != previous_block.competency_level
+                        has_new_o = bool(outputs)
+                        has_new_ks = bool(knowledge or skills)
+
+                        if (has_new_o or level_changed) and has_new_ks and behavioral_indicators:
+                            block_outputs = outputs if outputs else list(previous_block.outputs)
+                            new_block = CompetencyBlock(
+                                competency_level=new_level,
+                                indicators=self._dedupe_indicators(behavioral_indicators),
+                                outputs=self._dedupe_outputs(block_outputs),
+                                knowledge=self._dedupe_competencies(knowledge),
+                                skills=self._dedupe_competencies(skills),
+                            )
+                            previous_task.competency_blocks.append(new_block)
+                        else:
+                            previous_block.outputs.extend(outputs)
+                            previous_block.indicators.extend(behavioral_indicators)
+                            previous_block.knowledge.extend(knowledge)
+                            previous_block.skills.extend(skills)
+                            self._dedupe_block(previous_block)
+                        continue
+
+                    continue
+
+                task_level = self._extract_task_level(row, col_map)
 
                 if task_code:
+                    task_block = CompetencyBlock(
+                        competency_level=task_level,
+                        indicators=self._dedupe_indicators(behavioral_indicators),
+                        outputs=self._dedupe_outputs(outputs),
+                        knowledge=self._dedupe_competencies(knowledge),
+                        skills=self._dedupe_competencies(skills),
+                    )
                     task = Task(
                         task_code=task_code,
                         task_name=task_name,
-                        outputs=self._dedupe_outputs(outputs),
-                        behavioral_indicators=self._dedupe_indicators(
-                            behavioral_indicators
-                        ),
-                        competency_level=task_level,
-                        knowledge_k=self._dedupe_competencies(knowledge),
-                        skills_s=self._dedupe_competencies(skills),
+                        competency_blocks=[task_block],
                     )
                     _ensure_unit(current_ocu_code, current_ocu_name)
                     unit_tasks[current_ocu_code].append(task)
                     last_task_by_ocu[current_ocu_code] = task
 
             for code, tasks in unit_tasks.items():
+                for task in tasks:
+                    task.competency_blocks = [
+                        b for b in task.competency_blocks
+                        if b.indicators or b.outputs or b.knowledge or b.skills
+                    ]
+                tasks = [t for t in tasks if t.competency_blocks]
                 if tasks:
                     units.append(
                         OCSUnit(
@@ -1237,64 +1341,38 @@ class OCSTransformer(BaseOCSTransformer):
 
         return []
 
-    def _parse_ocu_table(self, table: List[List[Any]]) -> Optional[OCSUnit]:
-        """Backward-compatible wrapper: return first OCU from a table."""
-        units = self._parse_ocu_table_units(table)
-        return units[0] if units else None
-
     def _extract_attitude(self, pdf) -> OCSAttitude:
-        """提取態度信息。"""
-        attitudes = []
+        """Extract attitude competency items from full PDF text.
+
+        Handles both one-attitude-per-line and multiple-attitudes-on-one-line formats,
+        e.g. 'A01外部意識、A02溝通協調能力、A03成果導向' all on a single line.
+        """
+        attitudes: List[Attitude] = []
+        seen_codes: set[str] = set()
 
         try:
-            full_text = "\n".join(
-                [page.extract_text() or "" for page in pdf.pages]
-            )
+            full_text = "\n".join(page.extract_text() or "" for page in pdf.pages)
+            code_re = re.compile(r"A(\d{1,2})")
 
-            # 行式解析：A01主動積極 / A02正直誠實
-            seen_codes: set[str] = set()
             for line in full_text.splitlines():
-                text = line.strip()
-                if not text:
+                line = line.strip()
+                if not line:
+                    continue
+                if not re.match(r"A\d{1,2}", line):
                     continue
 
-                match = re.match(r"^A(\d{1,2})\s*(.+)$", text)
-                if not match:
-                    continue
-
-                code_num = int(match.group(1))
-                att_code = f"A{code_num:02d}"
-                att_name = match.group(2).strip("、,，;； ")
-
-                if not att_name or att_code in seen_codes:
-                    continue
-
-                seen_codes.add(att_code)
-                attitudes.append(
-                    Attitude(
-                        attitude_code=att_code,
-                        attitude_name=att_name,
-                        attitude_description=None,
-                    )
-                )
-
-            # 保留原正則做補捉（某些 PDF 會把多個 Axx 黏在同一行）
-            if not attitudes:
-                attitude_pattern = r"A(\d{1,2})\s*([^\n]+?)(?=\s*A\d{1,2}|\s*說明與補充|$)"
-                for match in re.finditer(attitude_pattern, full_text, re.DOTALL):
-                    code_num = int(match.group(1))
-                    att_code = f"A{code_num:02d}"
-                    att_name = match.group(2).strip("、,，;； \n")
-                    if not att_name or att_code in seen_codes:
+                hits = list(code_re.finditer(line))
+                for i, m in enumerate(hits):
+                    att_code = f"A{int(m.group(1)):02d}"
+                    if att_code in seen_codes:
+                        continue
+                    name_start = m.end()
+                    name_end = hits[i + 1].start() if i + 1 < len(hits) else len(line)
+                    name = line[name_start:name_end].strip("、,，;； \t")
+                    if not name:
                         continue
                     seen_codes.add(att_code)
-                    attitudes.append(
-                        Attitude(
-                            attitude_code=att_code,
-                            attitude_name=att_name,
-                            attitude_description=None,
-                        )
-                    )
+                    attitudes.append(Attitude(code=att_code, name=name, description=None))
 
         except Exception as e:
             self.logger.warning(f"態度提取失敗: {str(e)}")

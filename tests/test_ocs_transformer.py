@@ -39,10 +39,10 @@ def test_parse_ocu_table_with_header_mapping() -> None:
     assert task.task_name == "佈建感測端到資料平台"
     assert len(task.competency_blocks) == 1
     block = task.competency_blocks[0]
-    assert [k.code for k in block.knowledge_k] == ["K01", "K02"]
-    assert [s.code for s in block.skills_s] == ["S01", "S02"]
-    assert [o.output_code for o in block.outputs] == ["O01"]
-    assert [p.indicator_code for p in block.indicators] == ["P01"]
+    assert [k.code for k in block.knowledge] == ["K01", "K02"]
+    assert [s.code for s in block.skills] == ["S01", "S02"]
+    assert [o.code for o in block.outputs] == ["O01"]
+    assert [p.code for p in block.indicators] == ["P01"]
 
 
 def test_extract_competency_items_preserves_leading_digit_in_name() -> None:
@@ -105,6 +105,23 @@ def test_parse_ocu_table_with_split_header_rows() -> None:
     assert units[0].tasks[1].competency_blocks[0].outputs == []
 
 
+def test_parse_ocu_table_row_wide_fallback_for_knowledge_skills() -> None:
+    transformer = OCSTransformer()
+
+    table = [
+        ["主要職責", "工作任務", "工作產出", "行為指標", "", "職能", "職能內涵", "", "職能內涵", ""],
+        ["", "", "", "", "職能級別", "（K=knowledge知識）", "", "", "（S=skills技能）", ""],
+        ["T1", "T1.1需求分析", "O1.1.1需求報告", "P1.1.1完成需求盤點", "4", "K01 網路基礎\nK02 通訊協定", "S01 協調能力\nS02 撰寫能力"],
+    ]
+
+    units = transformer._parse_ocu_table_units(table)
+
+    assert len(units) == 1
+    block = units[0].tasks[0].competency_blocks[0]
+    assert [item.code for item in block.knowledge] == ["K01", "K02"]
+    assert [item.code for item in block.skills] == ["S01", "S02"]
+
+
 def test_parse_ocu_table_keeps_multiple_p_codes_in_one_block() -> None:
     transformer = OCSTransformer()
 
@@ -126,8 +143,10 @@ def test_parse_ocu_table_keeps_multiple_p_codes_in_one_block() -> None:
     assert len(units) == 1
     task = units[0].tasks[0]
     assert len(task.competency_blocks) == 1
-    assert [p.indicator_code for p in task.competency_blocks[0].indicators] == ["P5.1.2", "P5.1.3"]
+    assert [p.code for p in task.competency_blocks[0].indicators] == ["P5.1.2", "P5.1.3"]
     assert task.competency_blocks[0].competency_level == 5
+
+
 def test_parse_ocu_table_continuation_row_without_task_code() -> None:
     transformer = OCSTransformer()
 
@@ -161,8 +180,8 @@ def test_parse_ocu_table_continuation_row_without_task_code() -> None:
     task = units[0].tasks[0]
     assert task.task_code == "T1.1"
     assert len(task.competency_blocks) == 1
-    assert [k.code for k in task.competency_blocks[0].knowledge_k] == ["K01", "K02"]
-    assert [s.code for s in task.competency_blocks[0].skills_s] == ["S01", "S02"]
+    assert [k.code for k in task.competency_blocks[0].knowledge] == ["K01", "K02"]
+    assert [s.code for s in task.competency_blocks[0].skills] == ["S01", "S02"]
 
 
 def test_parse_ocu_table_continuation_tail_text_without_codes() -> None:
@@ -196,7 +215,7 @@ def test_parse_ocu_table_continuation_tail_text_without_codes() -> None:
     assert len(units[0].tasks) == 1
     task = units[0].tasks[0]
     assert task.task_name == "對潛在資安問題進行發掘及影響評估"
-    assert task.competency_blocks[0].indicators[0].indicator_text == "評估現有資訊安全執行方式之合理性、有效性及必要性。"
+    assert task.competency_blocks[0].indicators[0].text == "評估現有資訊安全執行方式之合理性、有效性及必要性。"
 
 
 def test_parse_ocu_table_inherits_outputs_for_merged_rows() -> None:
@@ -237,4 +256,4 @@ def test_parse_ocu_table_inherits_outputs_for_merged_rows() -> None:
 
     assert len(units) == 1
     task = units[0].tasks[0]
-    assert [block.outputs[0].output_code for block in task.competency_blocks] == ["O4.1.1", "O4.1.1", "O4.1.1"]
+    assert [block.outputs[0].code for block in task.competency_blocks] == ["O4.1.1", "O4.1.1", "O4.1.1"]

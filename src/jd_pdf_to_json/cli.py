@@ -150,7 +150,9 @@ def batch(
                     validator = OCSSchemaValidator()
                     is_valid, errors = validator.validate(ocs_doc)
                     if not is_valid:
-                        logger.warning(f"驗證失敗: {len(errors)} 個錯誤")
+                        logger.warning(f"[{pdf_path.name}] 驗證失敗: {len(errors)} 個錯誤")
+                        for err in errors:
+                            logger.warning(f"  [{pdf_path.name}] {err}")
                 
                 writer = JSONWriter()
                 writer.write(ocs_doc, output_path)

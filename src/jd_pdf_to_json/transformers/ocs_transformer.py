@@ -453,6 +453,27 @@ class OCSTransformer(BaseOCSTransformer):
             return []
         return self._extract_competency_items(row_text, code_prefix)
 
+    def _extract_behavioral_indicators_from_row(
+        self, row: List[Any]
+    ) -> List[BehavioralIndicator]:
+        """Fallback extraction for P-codes from all cells in a row (P-only, avoids T-codes)."""
+        row_text = "\n".join(
+            str(cell).strip() for cell in row if cell is not None and str(cell).strip()
+        )
+        if not row_text:
+            return []
+        pattern = re.compile(r"(P\d+(?:[-.]\d+)*)", re.IGNORECASE)
+        matches = list(pattern.finditer(row_text))
+        if not matches:
+            return []
+        indicators: List[BehavioralIndicator] = []
+        for idx, match in enumerate(matches):
+            start = match.end()
+            end = matches[idx + 1].start() if idx + 1 < len(matches) else len(row_text)
+            indicator_text = row_text[start:end].strip("；;，,") or match.group(1).strip()
+            indicators.append(BehavioralIndicator(code=match.group(1).strip(), text=indicator_text))
+        return indicators
+
     def _extract_output_items(self, cell_value: Any) -> List[OutputItem]:
         """Parse O-code work outputs from a cell text block."""
         if not cell_value:
@@ -1145,6 +1166,8 @@ class OCSTransformer(BaseOCSTransformer):
                 behavioral_indicators = self._extract_behavioral_indicators(
                     row[col_map["behavioral"]]
                 ) if "behavioral" in col_map and col_map["behavioral"] < len(row) else []
+                if not behavioral_indicators:
+                    behavioral_indicators = self._extract_behavioral_indicators_from_row(row)
 
                 # Continuation rows (no task_code) are appended to the previous task.
                 if not task_code:
@@ -1240,7 +1263,7 @@ class OCSTransformer(BaseOCSTransformer):
                         has_new_o = bool(outputs)
                         has_new_ks = bool(knowledge or skills)
 
-                        if (has_new_o or level_changed) and has_new_ks:
+                        if (has_new_o or level_changed) and has_new_ks and behavioral_indicators:
                             block_outputs = outputs if outputs else list(previous_block.outputs)
                             new_block = CompetencyBlock(
                                 competency_level=new_level,
@@ -1280,6 +1303,12 @@ class OCSTransformer(BaseOCSTransformer):
                     last_task_by_ocu[current_ocu_code] = task
 
             for code, tasks in unit_tasks.items():
+                for task in tasks:
+                    task.competency_blocks = [
+                        b for b in task.competency_blocks
+                        if b.indicators or b.outputs or b.knowledge or b.skills
+                    ]
+                tasks = [t for t in tasks if t.competency_blocks]
                 if tasks:
                     units.append(
                         OCSUnit(

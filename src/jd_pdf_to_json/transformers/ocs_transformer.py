@@ -679,6 +679,17 @@ class OCSTransformer(BaseOCSTransformer):
             self.logger.error(f"✗ 轉換失敗: {str(e)}")
             raise TransformationError(f"Failed to transform PDF: {str(e)}") from e
 
+    def _find_cell_value(self, row: List[Any], idx: int, window: int = 2) -> Optional[str]:
+        """Return the nearest non-empty cell value around idx within ±window."""
+        for offset in range(0, window + 1):
+            for sign in ([0] if offset == 0 else [1, -1]):
+                check_idx = idx + sign * offset
+                if 0 <= check_idx < len(row) and row[check_idx]:
+                    val = str(row[check_idx]).strip()
+                    if val:
+                        return val
+        return None
+
     def _extract_version_info(self, pdf) -> VersionInfo:
         """提取版本歷史信息（通常在第一頁表格）。"""
         versions = []
@@ -706,8 +717,8 @@ class OCSTransformer(BaseOCSTransformer):
                     for row in table[header_idx + 1 :]:
                         version_idx = header_map.get("version")
                         version_val = (
-                            str(row[version_idx]).strip()
-                            if version_idx is not None and version_idx < len(row) and row[version_idx]
+                            self._find_cell_value(row, version_idx) or ""
+                            if version_idx is not None
                             else ""
                         )
                         if not version_val:
@@ -715,33 +726,17 @@ class OCSTransformer(BaseOCSTransformer):
 
                         version_record = VersionEntry(
                             version=version_val,
-                            ocs_code=(
-                                str(row[header_map["ocs_code"]]).strip()
-                                if header_map["ocs_code"] < len(row) and row[header_map["ocs_code"]]
-                                else "Unknown"
-                            ),
-                            ocs_name=(
-                                str(row[header_map["ocs_name"]]).strip()
-                                if header_map["ocs_name"] < len(row) and row[header_map["ocs_name"]]
-                                else "Unknown"
-                            ),
-                            status=(
-                                str(row[header_map["status"]]).strip()
-                                if header_map["status"] < len(row) and row[header_map["status"]]
-                                else "Unknown"
-                            ),
+                            ocs_code=self._find_cell_value(row, header_map["ocs_code"]) or "Unknown",
+                            ocs_name=self._find_cell_value(row, header_map["ocs_name"]) or "Unknown",
+                            status=self._find_cell_value(row, header_map["status"]) or "Unknown",
                             update_note=(
-                                str(row[header_map["update_note"]]).strip()
+                                self._find_cell_value(row, header_map["update_note"])
                                 if "update_note" in header_map
-                                and header_map["update_note"] < len(row)
-                                and row[header_map["update_note"]]
                                 else None
                             ),
                             update_date=(
-                                str(row[header_map["update_date"]]).strip()
+                                self._find_cell_value(row, header_map["update_date"]) or "Unknown"
                                 if "update_date" in header_map
-                                and header_map["update_date"] < len(row)
-                                and row[header_map["update_date"]]
                                 else "Unknown"
                             ),
                         )
@@ -754,8 +749,8 @@ class OCSTransformer(BaseOCSTransformer):
         return VersionInfo(versions=versions)
 
     def _extract_first_code(self, text: str) -> Optional[str]:
-        """從文本中提取第一個職能代碼（格式：ABC123-001v1）。"""
-        match = re.search(r"[A-Z]{2,}[\d]+-\d+[vV]\d+", text)
+        """從文本中提取第一個職能代碼（格式：ABC123-001 或 ABC123-001v1）。"""
+        match = re.search(r"[A-Z]{2,}\d+-\d+(?:[vV]\d+)?", text)
         return match.group(0) if match else None
 
     def _extract_profile(self, pdf, version_info: VersionInfo) -> OCSProfile:

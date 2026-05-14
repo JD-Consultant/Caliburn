@@ -11,6 +11,7 @@ from jd_pdf_to_json.transformers import OCSTransformer
 from jd_pdf_to_json.validators import OCSSchemaValidator
 from jd_pdf_to_json.writers import JSONWriter
 from jd_pdf_to_json.utils.logger import logger
+from jd_pdf_to_json.core.models import OCSDocument
 from jd_pdf_to_json.utils.exceptions import (
     PDFParsingError,
     TransformationError,
@@ -241,8 +242,9 @@ def validate(
             data = json.load(f)
         
         # 驗證
+        ocs_doc = OCSDocument.model_validate(data)
         validator = OCSSchemaValidator()
-        is_valid, errors = validator.validate(data)
+        is_valid, errors = validator.validate(ocs_doc)
         
         if is_valid:
             typer.echo(f"✅ 驗證通過: {json_path}")

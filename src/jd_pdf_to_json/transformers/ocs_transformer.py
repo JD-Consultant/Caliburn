@@ -16,6 +16,7 @@ from jd_pdf_to_json.core.models import (
     CategoryItem,
     OCSUnit,
     Task,
+    TaskCodeEntry,
     CompetencyBlock,
     OutputItem,
     BehavioralIndicator,
@@ -690,6 +691,37 @@ class OCSTransformer(BaseOCSTransformer):
                         return val
         return None
 
+    def _parse_task_codes(
+        self, task_code_raw: str, task_name_raw: str, same_column: bool
+    ) -> List[TaskCodeEntry]:
+        """Extract one or more TaskCodeEntry from raw cell values.
+
+        - Separate columns with a clean T-code: single entry.
+        - Combined cell or embedded codes: extract every T-code and its trailing name.
+        """
+        if not same_column and re.fullmatch(r"T\d+(?:\.\d+)?", task_code_raw, re.IGNORECASE):
+            return [TaskCodeEntry(code=task_code_raw, name=self._compact_wrapped_text(task_name_raw))]
+
+        text = task_name_raw or task_code_raw
+        if not text:
+            return []
+
+        matches = list(re.finditer(r"(T\d+(?:\.\d+)?)(?![.\d])", text, re.IGNORECASE))
+        if not matches:
+            return []
+
+        entries: List[TaskCodeEntry] = []
+        for i, m in enumerate(matches):
+            name_start = m.end()
+            name_end = matches[i + 1].start() if i + 1 < len(matches) else len(text)
+            entries.append(
+                TaskCodeEntry(
+                    code=m.group(1),
+                    name=self._compact_wrapped_text(text[name_start:name_end]),
+                )
+            )
+        return entries
+
     def _extract_version_info(self, pdf) -> VersionInfo:
         """提取版本歷史信息（通常在第一頁表格）。"""
         versions = []
@@ -968,16 +1000,25 @@ class OCSTransformer(BaseOCSTransformer):
             """Merge parsed unit into accumulator by OCU code."""
             for existing in ocu_units:
                 if existing.ocu_code == unit.ocu_code:
-                    existing_task_map = {task.task_code: task for task in existing.tasks}
+                    existing_task_map = {
+                        task.task_codes[0].code: task
+                        for task in existing.tasks
+                        if task.task_codes
+                    }
                     for task in unit.tasks:
-                        if task.task_code in existing_task_map:
-                            target = existing_task_map[task.task_code]
+                        if not task.task_codes:
+                            continue
+                        primary_code = task.task_codes[0].code
+                        if primary_code in existing_task_map:
+                            target = existing_task_map[primary_code]
                             target.competency_blocks.extend(task.competency_blocks)
                             target.competency_blocks = [
                                 self._dedupe_block(block) for block in target.competency_blocks
                             ]
-                            if not target.task_name and task.task_name:
-                                target.task_name = task.task_name
+                            existing_codes = {e.code for e in target.task_codes}
+                            for entry in task.task_codes:
+                                if entry.code not in existing_codes:
+                                    target.task_codes.append(entry)
                         else:
                             existing.tasks.append(task)
                     if is_generic_unit_name(existing.ocu_name) and not is_generic_unit_name(unit.ocu_name):
@@ -1035,7 +1076,8 @@ class OCSTransformer(BaseOCSTransformer):
                         ):
                             grouped_tasks: Dict[str, List[Task]] = {}
                             for task in unit.tasks:
-                                match = re.match(r"(T\d+)", task.task_code)
+                                primary_code = task.task_codes[0].code if task.task_codes else ""
+                                match = re.match(r"(T\d+)", primary_code)
                                 ocu_code = match.group(1) if match else unit.ocu_code
                                 grouped_tasks.setdefault(ocu_code, []).append(task)
 
@@ -1134,29 +1176,16 @@ class OCSTransformer(BaseOCSTransformer):
                     else ""
                 )
 
-                # 模板沒有獨立 task_code 欄時，避免把純文字尾段誤判成新 task code。
-                if (
-                    task_code
-                    and task_code_idx is not None
-                    and task_name_idx is not None
-                    and task_code_idx == task_name_idx
-                    and not re.search(r"T\d+(?:\.\d+)?", task_code, flags=re.IGNORECASE)
-                ):
-                    task_code = ""
-
                 if not task_name and task_code_idx is not None and task_code_idx < len(row):
                     task_name = str(row[task_code_idx]).strip() if row[task_code_idx] else ""
 
-                # 任務代碼常內嵌在 task_name，例如 T1.1xxxx
-                # 負向前視 (?![.\d]) 確保 T5.3.1 不會被錯誤截為 T5.3
-                if task_name:
-                    match = re.search(r"(T\d+(?:\.\d+)?)(?![.\d])", task_name)
-                    if match:
-                        if (not task_code) or task_code == task_name:
-                            task_code = match.group(1)
-                        task_name = task_name.replace(match.group(1), "", 1).strip()
-
-                task_name = self._compact_wrapped_text(task_name)
+                same_column = (
+                    task_code_idx is not None
+                    and task_name_idx is not None
+                    and task_code_idx == task_name_idx
+                )
+                parsed_task_codes = self._parse_task_codes(task_code, task_name, same_column)
+                primary_task_code = parsed_task_codes[0].code if parsed_task_codes else ""
 
                 outputs = self._extract_output_items(
                     row[col_map["outputs"]]
@@ -1181,7 +1210,7 @@ class OCSTransformer(BaseOCSTransformer):
                     behavioral_indicators = self._extract_behavioral_indicators_from_row(row)
 
                 # Continuation rows (no task_code) are appended to the previous task.
-                if not task_code:
+                if not primary_task_code:
                     previous_task = last_task_by_ocu.get(current_ocu_code)
                     if previous_task:
                         if not previous_task.competency_blocks:
@@ -1258,11 +1287,9 @@ class OCSTransformer(BaseOCSTransformer):
                                 skills_tail,
                             )
 
-                        if task_name:
-                            previous_task.task_name = self._append_text_if_new(
-                                previous_task.task_name,
-                                task_name,
-                            )
+                        if task_name and previous_task.task_codes:
+                            last_entry = previous_task.task_codes[-1]
+                            last_entry.name = self._append_text_if_new(last_entry.name, task_name)
 
                         # New block rule: needs BOTH a structural trigger (new O-code OR level
                         # change) AND new K/S codes. This correctly handles:
@@ -1296,7 +1323,7 @@ class OCSTransformer(BaseOCSTransformer):
 
                 task_level = self._extract_task_level(row, col_map)
 
-                if task_code:
+                if primary_task_code:
                     task_block = CompetencyBlock(
                         competency_level=task_level,
                         indicators=self._dedupe_indicators(behavioral_indicators),
@@ -1305,8 +1332,7 @@ class OCSTransformer(BaseOCSTransformer):
                         skills=self._dedupe_competencies(skills),
                     )
                     task = Task(
-                        task_code=task_code,
-                        task_name=task_name,
+                        task_codes=parsed_task_codes,
                         competency_blocks=[task_block],
                     )
                     _ensure_unit(current_ocu_code, current_ocu_name)

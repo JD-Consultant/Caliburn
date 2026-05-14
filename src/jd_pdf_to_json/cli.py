@@ -1,7 +1,14 @@
 """CLI entry point."""
 
+import io
+import sys
 import json
 import typer
+
+if isinstance(sys.stdout, io.TextIOWrapper) and sys.stdout.encoding.lower() != "utf-8":
+    sys.stdout.reconfigure(encoding="utf-8")
+if isinstance(sys.stderr, io.TextIOWrapper) and sys.stderr.encoding.lower() != "utf-8":
+    sys.stderr.reconfigure(encoding="utf-8")
 from datetime import datetime
 from pathlib import Path
 from typing import Optional

@@ -90,3 +90,5 @@ converted_json/
 tmp/
 temp/
 *.tmp
+
+check_output.py

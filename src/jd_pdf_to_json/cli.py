@@ -1,7 +1,15 @@
 """CLI entry point."""
 
+import io
+import sys
 import json
 import typer
+
+if isinstance(sys.stdout, io.TextIOWrapper) and sys.stdout.encoding.lower() != "utf-8":
+    sys.stdout.reconfigure(encoding="utf-8")
+if isinstance(sys.stderr, io.TextIOWrapper) and sys.stderr.encoding.lower() != "utf-8":
+    sys.stderr.reconfigure(encoding="utf-8")
+from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
@@ -10,6 +18,7 @@ from jd_pdf_to_json.transformers import OCSTransformer
 from jd_pdf_to_json.validators import OCSSchemaValidator
 from jd_pdf_to_json.writers import JSONWriter
 from jd_pdf_to_json.utils.logger import logger
+from jd_pdf_to_json.core.models import OCSDocument
 from jd_pdf_to_json.utils.exceptions import (
     PDFParsingError,
     TransformationError,
@@ -67,13 +76,28 @@ def convert(
             logger.info("【3/4】驗證 Schema...")
             validator = OCSSchemaValidator()
             is_valid, errors = validator.validate(ocs_doc)
-            
+
             if is_valid:
                 logger.info("✓ 驗證通過")
             else:
                 logger.warning(f"⚠️  驗證失敗，發現 {len(errors)} 個錯誤:")
+                # 記錄驗證錯誤到 log 檔
+                log_dir = Path("logs")
+                log_dir.mkdir(exist_ok=True)
+                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                log_name = pdf_path.stem.replace(" ", "_")
+                log_path = log_dir / f"convert_{log_name}_{timestamp}.log"
+                log_lines = [
+                    f"=== Conversion Validation Log ===",
+                    f"PDF  : {pdf_path.name}",
+                    f"Time : {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+                    f"",
+                ]
                 for err in errors:
                     logger.warning(f"  - {err}")
+                    log_lines.append(f"- {err}")
+                log_path.write_text("\n".join(log_lines), encoding="utf-8")
+                logger.info(f"Log  : {log_path}")
         else:
             logger.info("【3/4】略過驗證")
         
@@ -126,54 +150,84 @@ def batch(
             raise typer.Exit(0)
         
         logger.info(f"找到 {len(pdf_files)} 個 PDF 檔案")
-        
+
+        # 建立 log 目錄與本次紀錄檔
+        log_dir = Path("logs")
+        log_dir.mkdir(exist_ok=True)
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        log_path = log_dir / f"batch_{timestamp}.log"
+        log_lines: list[str] = [
+            f"=== Batch Validation Log ===",
+            f"Run : {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+            f"PDFs: {len(pdf_files)}",
+            f"Out : {output_dir}",
+            "",
+        ]
+
         success_count = 0
         fail_count = 0
-        
+        validation_fail_count = 0
+
         for idx, pdf_path in enumerate(pdf_files, 1):
             output_path = output_dir / pdf_path.with_suffix(".json").name
-            
+
             typer.echo(f"\n[{idx}/{len(pdf_files)}] 轉換: {pdf_path.name}")
-            
+
             try:
                 parser = PDFPlumberParser()
                 raw_data = parser.parse(pdf_path)
-                
+
                 transformer = OCSTransformer()
                 ocs_doc = transformer.transform({
                     "file_path": str(pdf_path),
                     "metadata": raw_data.get("metadata", {}),
                     "pages": raw_data.get("pages", []),
                 })
-                
+
                 if validate:
                     validator = OCSSchemaValidator()
                     is_valid, errors = validator.validate(ocs_doc)
                     if not is_valid:
                         logger.warning(f"[{pdf_path.name}] 驗證失敗: {len(errors)} 個錯誤")
+                        log_lines.append(f"[FAIL] {pdf_path.name} ({len(errors)} errors)")
                         for err in errors:
-                            logger.warning(f"  [{pdf_path.name}] {err}")
-                
+                            log_lines.append(f"  - {err}")
+                        log_lines.append("")
+                        validation_fail_count += 1
+
                 writer = JSONWriter()
                 writer.write(ocs_doc, output_path)
-                
+
                 logger.info(f"✓ {pdf_path.name} → {output_path.name}")
                 success_count += 1
-                
+
             except Exception as e:
                 logger.error(f"✗ 轉換失敗: {pdf_path.name} - {str(e)}")
+                log_lines.append(f"[ERROR] {pdf_path.name}: {str(e)}")
+                log_lines.append("")
                 fail_count += 1
-        
+
         # 摘要
+        log_lines += [
+            "=== Summary ===",
+            f"Total             : {len(pdf_files)}",
+            f"OK                : {success_count}",
+            f"Validation errors : {validation_fail_count}",
+            f"Convert errors    : {fail_count}",
+        ]
+        log_path.write_text("\n".join(log_lines), encoding="utf-8")
+
         typer.echo(f"\n{'='*60}")
         typer.echo(f"批次轉換摘要:")
         typer.echo(f"  總計: {len(pdf_files)} 個")
         typer.echo(f"  成功: {success_count} (OK)")
-        typer.echo(f"  失敗: {fail_count} (FAIL)")
+        typer.echo(f"  驗證錯誤: {validation_fail_count}")
+        typer.echo(f"  轉換失敗: {fail_count} (FAIL)")
         typer.echo(f"輸出目錄: {output_dir}")
+        typer.echo(f"驗證 Log: {log_path}")
         typer.echo(f"{'='*60}")
         
-        if fail_count > 0:
+        if fail_count > 0 or validation_fail_count > 0:
             raise typer.Exit(1)
             
     except Exception as e:
@@ -195,8 +249,9 @@ def validate(
             data = json.load(f)
         
         # 驗證
+        ocs_doc = OCSDocument.model_validate(data)
         validator = OCSSchemaValidator()
-        is_valid, errors = validator.validate(data)
+        is_valid, errors = validator.validate(ocs_doc)
         
         if is_valid:
             typer.echo(f"✅ 驗證通過: {json_path}")

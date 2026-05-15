@@ -32,8 +32,12 @@ class OCSSchemaValidator:
         #         knowledge/skill items must have code and name
         for unit in model.ocs_content.ocu_units:
             for task in unit.tasks:
+                if not task.task_codes:
+                    errors.append(f"OCU {unit.ocu_code}: task with empty task_codes")
+                    continue
+                primary_code = task.task_codes[0].code
                 for block_idx, block in enumerate(task.competency_blocks):
-                    loc = f"OCU {unit.ocu_code}, Task {task.task_code}, Block {block_idx}"
+                    loc = f"OCU {unit.ocu_code}, Task {primary_code}, Block {block_idx}"
                     if not block.indicators:
                         errors.append(f"{loc}: missing behavioral indicators")
                     for i, item in enumerate(block.knowledge):

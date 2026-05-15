@@ -691,6 +691,48 @@ class OCSTransformer(BaseOCSTransformer):
                         return val
         return None
 
+    def _scan_ocu_names_from_text(self, pdf) -> Dict[str, str]:
+        """Extract OCU T-code names from the leftmost column using bbox word positions.
+
+        Historical PDFs have merged cells where pdfplumber returns None for table cells.
+        We crop to the leftmost 12% of each page (the 工作職責 column) and collect
+        word fragments near each T-code word's x-position. Fragments are concatenated
+        to reconstruct names that are split across multiple rows in the column.
+        Pure code tokens (K01, S02, O1.1 …) are excluded; mixed Chinese-English names
+        (e.g. "AI 應用") are kept because only bare code patterns are filtered out.
+        """
+        names: Dict[str, str] = {}
+        ocu_code_re = re.compile(r"^T\d+$")
+        pure_code_re = re.compile(r"^[KSOP]\d+(?:[.\-]\d+)*$", re.IGNORECASE)
+
+        for page in pdf.pages:
+            left_crop = page.crop((0, 0, page.width * 0.12, page.height))
+            words = left_crop.extract_words()
+
+            current_ocu: Optional[str] = None
+            name_parts: List[str] = []
+            ocu_x: float = 0.0
+
+            for word in words:
+                text = word["text"].strip()
+                if not text:
+                    continue
+                wx = float(word.get("x0", 0))
+
+                if ocu_code_re.match(text):
+                    if current_ocu and name_parts and current_ocu not in names:
+                        names[current_ocu] = "".join(name_parts)
+                    current_ocu = text
+                    name_parts = []
+                    ocu_x = wx
+                elif current_ocu and wx <= ocu_x + 30 and not pure_code_re.match(text):
+                    name_parts.append(text)
+
+            if current_ocu and name_parts and current_ocu not in names:
+                names[current_ocu] = "".join(name_parts)
+
+        return names
+
     def _parse_task_codes(
         self, task_code_raw: str, task_name_raw: str, same_column: bool
     ) -> List[TaskCodeEntry]:
@@ -1091,6 +1133,13 @@ class OCSTransformer(BaseOCSTransformer):
                                 merge_unit(normalized_unit)
                         else:
                             merge_unit(unit)
+
+            # Backfill "Unknown" ocu_names from raw page text (handles merged cells in historical PDFs)
+            if any(is_generic_unit_name(u.ocu_name) for u in ocu_units):
+                text_ocu_names = self._scan_ocu_names_from_text(pdf)
+                for unit in ocu_units:
+                    if is_generic_unit_name(unit.ocu_name) and unit.ocu_code in text_ocu_names:
+                        unit.ocu_name = text_ocu_names[unit.ocu_code]
 
         except Exception as e:
             self.logger.warning(f"OCU 內容提取失敗: {str(e)}")

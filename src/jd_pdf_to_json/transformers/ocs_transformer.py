@@ -1209,6 +1209,18 @@ class OCSTransformer(BaseOCSTransformer):
                 if not behavioral_indicators:
                     behavioral_indicators = self._extract_behavioral_indicators_from_row(row)
 
+                # T codes without P-codes: append T codes to the previous task, then
+                # fall through as a continuation row (cross-page grouped tasks pattern).
+                if primary_task_code and not behavioral_indicators:
+                    previous_task = last_task_by_ocu.get(current_ocu_code)
+                    if previous_task:
+                        existing_codes = {e.code for e in previous_task.task_codes}
+                        for entry in parsed_task_codes:
+                            if entry.code not in existing_codes:
+                                previous_task.task_codes.append(entry)
+                        primary_task_code = ""
+                        parsed_task_codes = []
+
                 # Continuation rows (no task_code) are appended to the previous task.
                 if not primary_task_code:
                     previous_task = last_task_by_ocu.get(current_ocu_code)

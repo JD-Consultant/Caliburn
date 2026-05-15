@@ -195,6 +195,7 @@ uv run python -m jd_pdf_to_json.cli validate <json_path>
 | 同 task 多 P，K/S 只在第一列，但多個 O-code（如 T1.2） | 後續列有 O-code 但無 K/S | 全部 O + P 同一個 block |
 | 同 task 一個 O，多個 P，各自有 level 和 K/S（如 T4.1） | 後續列 level 改變且有 K/S | 每個 level = 一個 block；O 重複宣告 |
 | **同格多 T code**（如 T1.1+T1.2 同一格） | 工作任務欄含多個 T code，共用 K/S | 一個 task 條目，`task_codes` 長度 > 1 |
+| **跨頁多 T code 無 P-code**（如 T2.8–T2.11 接續 T2.1–T2.7） | 次頁工作任務欄有新 T code，但行為指標欄空白 | 新 T code 追加至前一 task 的 `task_codes`，O/K/S append 進前一個 block |
 | **跨頁**（如 T1.3、T2.1） | 次頁無 O-code（O 名稱跨頁截斷）、無 level | 全部 append 到同一 block |
 
 #### 6.3.4 跨頁處理
@@ -205,6 +206,8 @@ uv run python -m jd_pdf_to_json.cli validate <json_path>
 - 職能級別空白
 
 此情況不滿足分界條件，次頁的 P / K / S 全部 append 進前一個 block，O 名稱後半段文字接續拼入前一個 output 的 `name`。
+
+**跨頁多 T code 無 P-code：** 次頁工作任務欄出現新 T code，但行為指標欄空白（無 P-code）。此類列視為前一 task 的延續——新 T code 追加至前一 task 的 `task_codes` 陣列，O/K/S 同樣依 block 分界規則 append 進前一個 block。
 
 #### 6.3.5 JSON 格式範例
 

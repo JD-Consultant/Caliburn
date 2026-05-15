@@ -764,6 +764,22 @@ class OCSTransformer(BaseOCSTransformer):
             )
         return entries
 
+    def _derive_task_code_from_p_codes(
+        self, indicators: List[BehavioralIndicator], ocu_code: str
+    ) -> Optional[str]:
+        """Derive task code from P-code numbering when the task code table cell is None.
+
+        OCS P-code format: P{ocu}.{task}.{seq} → task code T{ocu}.{task}.
+        E.g. P1.1.1 → T1.1.  The ocu_code hint is used when available but the
+        derivation works from the P-code structure alone so it also handles tables
+        where current_ocu_code has not yet been resolved (e.g. "工作職責").
+        """
+        for ind in indicators:
+            m = re.match(r"P\.?(\d+)\.(\d+)", ind.code, re.IGNORECASE)
+            if m:
+                return f"T{m.group(1)}.{m.group(2)}"
+        return None
+
     def _extract_version_info(self, pdf) -> VersionInfo:
         """提取版本歷史信息（通常在第一頁表格）。"""
         versions = []
@@ -1257,6 +1273,16 @@ class OCSTransformer(BaseOCSTransformer):
                 ) if "behavioral" in col_map and col_map["behavioral"] < len(row) else []
                 if not behavioral_indicators:
                     behavioral_indicators = self._extract_behavioral_indicators_from_row(row)
+
+                # When task code cell is None but behavioral indicators exist and there is no
+                # previous task yet, derive the task code from P-code numbering.
+                # Historical PDFs sometimes have the task code in a merged cell that
+                # pdfplumber cannot read (returns None), e.g. P1.1.1 → T1.1.
+                if not primary_task_code and behavioral_indicators and not last_task_by_ocu.get(current_ocu_code):
+                    derived = self._derive_task_code_from_p_codes(behavioral_indicators, current_ocu_code)
+                    if derived:
+                        parsed_task_codes = [TaskCodeEntry(code=derived, name="")]
+                        primary_task_code = derived
 
                 # T codes without P-codes: append T codes to the previous task, then
                 # fall through as a continuation row (cross-page grouped tasks pattern).

@@ -75,12 +75,15 @@ class CompetencyBlock(BaseModel):
     skills: List[CompetencyItem] = Field(default_factory=list)
 
 
-class Task(BaseModel):
-    """Work task."""
-    model_config = ConfigDict(populate_by_name=True)
+class TaskCodeEntry(BaseModel):
+    """Single task code and its name within a task group."""
+    code: str
+    name: str
 
-    task_code: str
-    task_name: str
+
+class Task(BaseModel):
+    """Work task group — one or more T-codes sharing the same competency blocks."""
+    task_codes: List[TaskCodeEntry] = Field(default_factory=list)
     competency_blocks: List[CompetencyBlock] = Field(default_factory=list)
 
 

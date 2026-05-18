@@ -13,7 +13,7 @@ class OCSSchemaValidator:
         "ocs_profile",
         "ocs_content",
         "ocs_attitude",
-        "notes_and_appendix",
+        "notes",
     }
 
     def validate(self, model: OCSDocument) -> Tuple[bool, List[str]]:
@@ -47,10 +47,10 @@ class OCSSchemaValidator:
                         if not item.code or not item.name:
                             errors.append(f"{loc}: skill[{i}] missing code or name")
 
-        # Rule 3: attitude description key must always exist (even if null)
+        # Rule 3: every attitude must have code and name
         for i, att in enumerate(model.ocs_attitude.attitudes):
-            if not hasattr(att, "description"):
-                errors.append(f"Attitude[{i}]: missing description key")
+            if not att.code or not att.name:
+                errors.append(f"Attitude[{i}]: missing code or name")
 
         if errors:
             for error in errors:

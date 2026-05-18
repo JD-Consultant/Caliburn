@@ -79,7 +79,7 @@ uv run python -m jd_pdf_to_json.cli validate <json_path>
 2. `ocs_profile`
 3. `ocs_content`
 4. `ocs_attitude`
-5. `notes_and_appendix`
+5. `notes`
 
 ## 3. Design Principles
 
@@ -108,7 +108,7 @@ uv run python -m jd_pdf_to_json.cli validate <json_path>
   "ocs_profile": {},
   "ocs_content": { "ocu_units": [] },
   "ocs_attitude": { "attitudes": [] },
-  "notes_and_appendix": { "requirements": [] }
+  "notes": { "prerequisites": [], "supplements": [] }
 }
 ```
 
@@ -308,38 +308,38 @@ uv run python -m jd_pdf_to_json.cli validate <json_path>
 ```json
 "ocs_attitude": {
   "attitudes": [
-    {
-      "code": "A01",
-      "name": "主動積極",
-      "description": null
-    }
+    { "code": "A01", "name": "主動積極" }
   ]
 }
 ```
 
 規則：
 
-- `description` 永遠保留鍵名。
-- 來源有描述時填完整文字；無描述時填 `null`。
+- `attitudes` 依 A-code 順序排列。
+- 部分 PDF 的 `name` 含描述文字（格式：`名稱：描述`），保留原文，不拆分。
 
-### 6.5 notes_and_appendix
+### 6.5 notes
+
+PDF 末頁「說明與補充事項」分為兩個子區塊：
 
 ```json
-"notes_and_appendix": {
-  "requirements": [
-    {
-      "category": "建議擔任此職類／職業之學歷／經歷／或能力條件",
-      "content": "無",
-      "notes": null
-    }
+"notes": {
+  "prerequisites": [
+    "大專以上畢業，且具3年以上相關工作經驗。",
+    "具備程式語言能力或相關工具應用能力。"
+  ],
+  "supplements": [
+    "【註1】品質管理理論：包括品質政策、制度、程序、績效指標與檢核標準等。",
+    "【註2】管理方法：如走動式管理（MBWA）。"
   ]
 }
 ```
 
 規則：
 
-- `requirements` 為陣列，支援多段補充。
-- `notes` 為可選補註欄位；建議保留，無值時 `null`。
+- `prerequisites`：「建議擔任此職類／職業之學歷／經歷／或能力條件」下的每一條文字，不含標題行本身。
+- `supplements`：「其他補充說明」下的所有條文；無此區塊時為空陣列 `[]`。
+- 兩個欄位均為 `List[str]`，每個元素為一條去除項目符號後的純文字。
 
 ## 7. Validation Checklist
 
@@ -348,9 +348,10 @@ uv run python -m jd_pdf_to_json.cli validate <json_path>
 - Top-level 五區塊鍵名完整存在。
 - `ocs_profile.category` 三類別皆為陣列型別。
 - `knowledge`/`skills` 元素都具備 `code` 與 `name`。
-- `ocs_attitude.attitudes[*].attitude_description` 不可缺鍵。
+- `ocs_attitude.attitudes[*]` 具備 `code` 與 `name`。
 - `version_info.versions` 存在且每筆具 `version`、`ocs_code`、`status`。
 - `ocs_content.ocu_units[*].tasks[*].task_codes` 為非空陣列，每個元素具備 `code` 與 `name`。
+- `notes.prerequisites` 與 `notes.supplements` 均為字串陣列。
 - 所有代碼欄位不應混入無結構長字串拼接。
 
 ## 8. Backward Compatibility
@@ -431,21 +432,12 @@ uv run python -m jd_pdf_to_json.cli validate <json_path>
   },
   "ocs_attitude": {
     "attitudes": [
-      {
-        "attitude_code": "A01",
-        "attitude_name": "主動積極",
-        "description": null
-      }
+      { "code": "A01", "name": "主動積極" }
     ]
   },
-  "notes_and_appendix": {
-    "requirements": [
-      {
-        "category": "建議擔任此職類／職業之學歷／經歷／或能力條件",
-        "content": "無",
-        "notes": null
-      }
-    ]
+  "notes": {
+    "prerequisites": ["大專以上畢業，且具3年以上相關工作經驗。"],
+    "supplements": ["【註1】管理系統相關知識：組織程序、政策、結構、文化與策略。"]
   }
 }
 ```

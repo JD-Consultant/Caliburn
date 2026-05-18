@@ -5,7 +5,7 @@ from jd_pdf_to_json.core.models import (
     OCSProfile,
     OCSContent,
     OCSAttitude,
-    NotesAndAppendix,
+    Notes,
 )
 
 __all__ = [
@@ -13,5 +13,5 @@ __all__ = [
     "OCSProfile",
     "OCSContent",
     "OCSAttitude",
-    "NotesAndAppendix",
+    "Notes",
 ]

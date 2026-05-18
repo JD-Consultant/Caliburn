@@ -22,10 +22,9 @@ from jd_pdf_to_json.core.models import (
     BehavioralIndicator,
     CompetencyItem,
     Attitude,
-    Requirement,
     OCSContent,
     OCSAttitude,
-    NotesAndAppendix,
+    Notes,
 )
 from jd_pdf_to_json.transformers.base import BaseOCSTransformer
 from jd_pdf_to_json.utils.exceptions import TransformationError
@@ -110,15 +109,17 @@ class OCSTransformer(BaseOCSTransformer):
                 ocs_attitude = self._extract_attitude(pdf)
                 self.logger.debug(f"✓ 態度: {len(ocs_attitude.attitudes)} 個態度")
 
-                notes_appendix = self._extract_notes_and_appendix(pdf)
-                self.logger.debug(f"✓ 補充: {len(notes_appendix.requirements)} 項建議")
+                notes = self._extract_notes(pdf)
+                self.logger.debug(
+                    f"✓ 補充: {len(notes.prerequisites)} 條件 / {len(notes.supplements)} 補充說明"
+                )
 
                 doc = OCSDocument(
                     version_info=version_info,
                     ocs_profile=ocs_profile,
                     ocs_content=ocs_content,
                     ocs_attitude=ocs_attitude,
-                    notes_and_appendix=notes_appendix,
+                    notes=notes,
                 )
                 self.logger.info(f"✓ 轉換完成: {ocs_profile.ocs_code}")
                 return doc
@@ -1442,24 +1443,50 @@ class OCSTransformer(BaseOCSTransformer):
                     if not name:
                         continue
                     seen_codes.add(att_code)
-                    attitudes.append(Attitude(code=att_code, name=name, description=None))
+                    attitudes.append(Attitude(code=att_code, name=name))
         except Exception as e:
             self.logger.warning(f"態度提取失敗: {str(e)}")
         return OCSAttitude(attitudes=attitudes)
 
-    def _extract_notes_and_appendix(self, pdf) -> NotesAndAppendix:
-        """Extract requirements from the '說明與補充' section."""
-        requirements = []
+    def _extract_notes(self, pdf) -> Notes:
+        """Extract prerequisites and supplementary notes from '說明與補充事項'."""
+        prerequisites: List[str] = []
+        supplements: List[str] = []
+
+        # Bullet/marker characters commonly used in OCS PDFs
+        _bullet_re = re.compile(r"^[\s⚫◆•◎\-＊\*\d+\.]+\s*")
+        # Section header patterns
+        _prereq_re = re.compile(r"建議擔任此職類.{0,6}學歷.{0,6}(經歷|經驗)")
+        _supp_re = re.compile(r"其他補充說明")
+
         try:
             full_text = "".join(page.extract_text() or "" for page in pdf.pages)
             notes_start = full_text.find("說明與補充")
-            if notes_start != -1:
-                for line in full_text[notes_start:].split("\n")[1:]:
-                    line = line.strip()
-                    if line and not line.startswith("第"):
-                        requirements.append(
-                            Requirement(category="建議", content=line, notes=None)
-                        )
+            if notes_start == -1:
+                return Notes()
+
+            in_supplements = False
+            for line in full_text[notes_start:].split("\n")[1:]:
+                line = line.strip()
+                if not line or line.startswith("第") and "頁" in line:
+                    continue
+                # Section header switches
+                if _prereq_re.search(line):
+                    in_supplements = False
+                    continue
+                if _supp_re.search(line):
+                    in_supplements = True
+                    continue
+                # Strip leading bullets/markers before storing
+                clean = _bullet_re.sub("", line).strip()
+                if not clean:
+                    continue
+                if in_supplements:
+                    supplements.append(clean)
+                else:
+                    prerequisites.append(clean)
+
         except Exception as e:
             self.logger.warning(f"補充信息提取失敗: {str(e)}")
-        return NotesAndAppendix(requirements=requirements)
+
+        return Notes(prerequisites=prerequisites, supplements=supplements)

@@ -103,7 +103,6 @@ class Attitude(BaseModel):
     """Attitude competency."""
     code: str
     name: str
-    description: Optional[str] = None
 
 
 class OCSAttitude(BaseModel):
@@ -111,16 +110,10 @@ class OCSAttitude(BaseModel):
     attitudes: List[Attitude] = Field(default_factory=list)
 
 
-class Requirement(BaseModel):
-    """Single requirement in notes."""
-    category: str
-    content: str
-    notes: Optional[str] = None
-
-
-class NotesAndAppendix(BaseModel):
+class Notes(BaseModel):
     """Notes and supplementary information."""
-    requirements: List[Requirement] = Field(default_factory=list)
+    prerequisites: List[str] = Field(default_factory=list)
+    supplements: List[str] = Field(default_factory=list)
 
 
 class OCSDocument(BaseModel):
@@ -129,4 +122,4 @@ class OCSDocument(BaseModel):
     ocs_profile: OCSProfile
     ocs_content: OCSContent = Field(default_factory=OCSContent)
     ocs_attitude: OCSAttitude = Field(default_factory=OCSAttitude)
-    notes_and_appendix: NotesAndAppendix = Field(default_factory=NotesAndAppendix)
+    notes: Notes = Field(default_factory=Notes)

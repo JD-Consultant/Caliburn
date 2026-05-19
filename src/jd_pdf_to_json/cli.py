@@ -46,21 +46,24 @@ def convert(
     if output_path is None:
         output_path = pdf_path.with_suffix(".json")
     
+    validation_failed = False
+    validation_error_count = 0
+
     try:
         logger.info(f"開始轉換: {pdf_path}")
         logger.info(f"輸出: {output_path}")
         logger.info(f"驗證: {'啟用' if validate else '停用'}")
-        
+
         # =========== PARSE ===========
         logger.info("【1/4】解析 PDF...")
         parser = PDFPlumberParser()
         raw_data = parser.parse(pdf_path)
-        
+
         if not parser.validate_source(pdf_path):
             logger.warning("⚠️  PDF 可能不是 OCS 文件（未找到關鍵字）")
-        
+
         logger.info("✓ 解析完成")
-        
+
         # =========== TRANSFORM ===========
         logger.info("【2/4】轉換為 OCS 模型...")
         transformer = OCSTransformer()
@@ -70,7 +73,7 @@ def convert(
             "pages": raw_data.get("pages", []),
         })
         logger.info("✓ 轉換完成")
-        
+
         # =========== VALIDATE ===========
         if validate:
             logger.info("【3/4】驗證 Schema...")
@@ -80,6 +83,8 @@ def convert(
             if is_valid:
                 logger.info("✓ 驗證通過")
             else:
+                validation_failed = True
+                validation_error_count = len(errors)
                 logger.warning(f"⚠️  驗證失敗，發現 {len(errors)} 個錯誤:")
                 # 記錄驗證錯誤到 log 檔
                 log_dir = Path("logs")
@@ -100,15 +105,26 @@ def convert(
                 logger.info(f"Log  : {log_path}")
         else:
             logger.info("【3/4】略過驗證")
-        
+
         # =========== WRITE ===========
+        # 即使驗證失敗仍寫出 JSON，方便人工檢查問題，但最後以 exit 1 告知失敗。
         logger.info("【4/4】輸出 JSON...")
         writer = JSONWriter()
         writer.write(ocs_doc, output_path)
         logger.info(f"✓ 轉換完成，已輸出至: {output_path}")
-        
+
+        if validation_failed:
+            typer.echo(
+                f"\n⚠️  已輸出但驗證失敗 ({validation_error_count} 個錯誤): "
+                f"{pdf_path} → {output_path}",
+                err=True,
+            )
+            raise typer.Exit(1)
+
         typer.echo(f"\n✅ 成功轉換: {pdf_path} → {output_path}")
-        
+
+    except typer.Exit:
+        raise
     except PDFParsingError as e:
         logger.error(f"❌ 解析錯誤: {str(e)}")
         typer.echo(f"解析失敗: {str(e)}", err=True)

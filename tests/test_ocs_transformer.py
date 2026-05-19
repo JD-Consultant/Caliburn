@@ -35,8 +35,8 @@ def test_parse_ocu_table_with_header_mapping() -> None:
     assert len(ocu.tasks) == 1
 
     task = ocu.tasks[0]
-    assert task.task_code == "T1"
-    assert task.task_name == "佈建感測端到資料平台"
+    assert task.task_codes[0].code == "T1"
+    assert task.task_codes[0].name == "佈建感測端到資料平台"
     assert len(task.competency_blocks) == 1
     block = task.competency_blocks[0]
     assert [k.code for k in block.knowledge] == ["K01", "K02"]
@@ -178,7 +178,7 @@ def test_parse_ocu_table_continuation_row_without_task_code() -> None:
     assert units[0].ocu_code == "T1"
     assert len(units[0].tasks) == 1
     task = units[0].tasks[0]
-    assert task.task_code == "T1.1"
+    assert task.task_codes[0].code == "T1.1"
     assert len(task.competency_blocks) == 1
     assert [k.code for k in task.competency_blocks[0].knowledge] == ["K01", "K02"]
     assert [s.code for s in task.competency_blocks[0].skills] == ["S01", "S02"]
@@ -214,7 +214,7 @@ def test_parse_ocu_table_continuation_tail_text_without_codes() -> None:
     assert len(units) == 1
     assert len(units[0].tasks) == 1
     task = units[0].tasks[0]
-    assert task.task_name == "對潛在資安問題進行發掘及影響評估"
+    assert task.task_codes[0].name == "對潛在資安問題進行發掘及影響評估"
     assert task.competency_blocks[0].indicators[0].text == "評估現有資訊安全執行方式之合理性、有效性及必要性。"
 
 

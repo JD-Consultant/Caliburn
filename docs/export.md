@@ -134,7 +134,11 @@ Row 7+: 資料列
 
 ## 來源標籤（display_label）
 
-每個指標、K/S/A、態度項目均在文件中標示 `display_label`，顏色對應如下：
+每個指標、K/S/A、態度項目均在文件中標示 `display_label`。
+
+> **注意：匯出文件顏色與前端 UI 顏色不同。** 前端 `SourceBadge` 元件使用 Tailwind 色票（藍/紫/琥珀/灰）；匯出文件使用以下 HEX 值，符合印刷可讀性要求。
+
+### 匯出文件顏色（DOCX / PDF / XLSX，`document_service.py` 定義）
 
 | 標籤 | 顏色（HEX） | 意義 |
 |------|-----------|------|
@@ -142,6 +146,15 @@ Row 7+: 資料列
 | `[iCAP參考]` | `#1D4ED8`（藍）| 來自 iCAP 官方或 icap_reference |
 | `[AI整理]` | `#6B7280`（灰）| AI 從結構化欄位萃取，未直接引述 |
 | `[待確認]` | `#D97706`（橘）| 品質不足或尚未確認 |
+
+### 前端 UI 顏色（`SourceBadge.tsx` 定義）
+
+| 標籤 | Tailwind 色票 | 視覺色 |
+|------|-------------|------|
+| `[訪談確認]` | `bg-blue-100 text-blue-700` | 藍 |
+| `[AI整理]` | `bg-violet-100 text-violet-700` | 紫 |
+| `[iCAP參考]` | `bg-amber-100 text-amber-700` | 琥珀 |
+| `[待確認]` | `bg-gray-100 text-gray-600` | 灰 |
 
 DOCX：以括號文字附在內容後。  
 PDF：以彩色小字標示於行尾。  

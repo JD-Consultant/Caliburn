@@ -150,7 +150,7 @@ basic_info → icap_ref → interview → task_extraction
 | `id` | UUID PK | |
 | `job_profile_id` | UUID FK → job_profiles | CASCADE DELETE |
 | `version` | INTEGER | 版本號，從 1 開始 |
-| `format` | TEXT | `pdf` / `docx` / `json` |
+| `format` | TEXT | `pdf` / `docx` / `xlsx` / `json` |
 | `file_path` | TEXT | 檔案路徑（匯出檔） |
 | `content` | JSONB | 凍結的 OCS JSON 內容 |
 | `status` | TEXT | `draft` / `frozen` |

@@ -4,7 +4,7 @@
 
 | 層 | 技術 |
 |----|------|
-| Frontend | Next.js 15 (App Router), TypeScript, Tailwind CSS, shadcn/ui |
+| Frontend | Next.js 16 (App Router), TypeScript, Tailwind CSS, shadcn/ui |
 | Backend | FastAPI (Python 3.11+), asyncio |
 | AI / Graph | LangGraph (StateGraph), LangChain, OpenAI GPT-4o |
 | Embeddings | OpenAI `text-embedding-3-small` (1536 維) |
@@ -22,6 +22,7 @@ jobintel-ai/
 │   │   ├── main.py               # FastAPI app、CORS、lifespan
 │   │   ├── config.py             # Settings（.env）含 icap_high/medium_threshold
 │   │   ├── database.py           # async engine / session
+│   │   ├── logging_config.py     # setup_logging()：structlog 格式、第三方套件降噪
 │   │   ├── models/               # SQLAlchemy ORM models
 │   │   │   └── job_profile.py    # User / JobProfile / InterviewSession / KsaItem / DocumentVersion
 │   │   ├── schemas/              # Pydantic I/O schemas

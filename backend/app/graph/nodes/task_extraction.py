@@ -2,12 +2,9 @@
 import asyncio
 import logging
 
-from langchain_core.messages import HumanMessage
-
-from app.graph.llm import get_chat_llm
+from app.graph.llm_gateway import LLMGateway
 from app.graph.state import InterviewState
-from app.services.icap_ksa_rag import search_tasks
-from app.utils import safe_parse_json
+from app.services.icap_retriever import search_tasks
 
 logger = logging.getLogger("jobintel")
 
@@ -95,7 +92,6 @@ async def _enrich_tasks_with_icap(
 
 
 async def task_extraction_node(state: InterviewState) -> dict:
-    llm = get_chat_llm(0.0)
     prev_round = state.get("task_extraction_round", 0)
     existing_tasks = state.get("extracted_tasks", [])
 
@@ -118,12 +114,11 @@ async def task_extraction_node(state: InterviewState) -> dict:
 
     signals_context = _build_signals_context(state.get("interview_readiness_detail", {}))
     logger.info("task_extraction_node: extracting from %d messages", len(state["messages"]))
-    response = await llm.ainvoke([HumanMessage(content=_EXTRACTION_PROMPT.format(
+    prompt = _EXTRACTION_PROMPT.format(
         signals_context=signals_context,
         conversation=conversation,
-    ))])
-
-    tasks = safe_parse_json(response.content, default=[])
+    )
+    tasks = await LLMGateway(temperature=0.0).invoke_json(prompt, default=[])
     logger.info("task_extraction_node: extracted %d tasks (round %d)", len(tasks), prev_round + 1)
 
     # 補上穩定的 task_id（後續流程以 task_id 為 key，task_name 僅供顯示）

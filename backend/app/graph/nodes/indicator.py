@@ -10,7 +10,7 @@ from app.graph.constants import INDICATOR_REQUIRED_FIELDS
 from app.graph.llm_gateway import LLMGateway
 from app.graph.state import InterviewState
 from app.graph.task_loop import TaskLoopManager
-from app.services.icap_ksa_rag import search_indicators
+from app.services.icap_retriever import search_indicators
 import app.graph.prompts.indicator as prompts
 
 logger = logging.getLogger("jobintel")

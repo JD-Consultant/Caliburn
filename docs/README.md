@@ -6,11 +6,15 @@
 
 | 文件 | 說明 |
 |------|------|
-| [architecture.md](./architecture.md) | 系統架構總覽、技術棧、資料流、環境變數 |
+| [architecture.md](./architecture.md) | 系統架構總覽、技術棧、資料流、環境變數、Docker Compose |
 | [api.md](./api.md) | REST API 端點參考（SSE / 輪詢 / 匯出） |
 | [graph-pipeline.md](./graph-pipeline.md) | LangGraph 訪談狀態機（8 節點流程、逐任務迴圈） |
 | [ocs-schema.md](./ocs-schema.md) | OCS 職能文件 JSON 結構、Pydantic schema、代碼規則 |
 | [icap-pipeline.md](./icap-pipeline.md) | iCAP Parser + pgvector 向量嵌入 + 6 個 RAG 檢索點 |
+| [rag-pipeline.md](./rag-pipeline.md) | RAG 完整流程：從職稱命中到 K/S/A 代碼對照（7 個節點 × RAG 觸發點） |
+| [db-schema.md](./db-schema.md) | 完整資料庫 Schema（7 張表 + icap_embeddings + graph_state 欄位說明） |
+| [frontend.md](./frontend.md) | 前端頁面行為、元件說明、API 呼叫、狀態管理 |
+| [testing.md](./testing.md) | 測試指南（RAG 查詢 / 端對端訪談 / 匯出 / API / 手動冒煙） |
 | [export.md](./export.md) | 匯出格式（JSON / DOCX / PDF / Excel）與 display_label |
 | [roadmap.md](./roadmap.md) | 第一〜四階段完成狀態、Bug 修復紀錄、第五〜七階段計畫 |
 

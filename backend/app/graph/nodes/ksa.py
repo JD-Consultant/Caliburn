@@ -1,11 +1,8 @@
 """K/S/A 對齊節點：整理知識、技能、態度，區分 iCAP 來源 vs 企業專屬。"""
 import logging
 
-from langchain_core.messages import HumanMessage
-
-from app.graph.llm import get_chat_llm
+from app.graph.llm_gateway import LLMGateway
 from app.graph.state import InterviewState
-from app.utils import safe_parse_json
 
 logger = logging.getLogger("jobintel")
 
@@ -51,7 +48,6 @@ async def ksa_alignment_node(state: InterviewState) -> dict:
         f"- {c['icap_title']}（相似度 {int(c['similarity'] * 100)}%）" for c in icap
     ) or "無 iCAP 命中（企業自建模式）"
 
-    llm = get_chat_llm(0.2)
     prompt = _KSA_PROMPT.format(
         job_title=state["job_title"],
         tasks_summary=tasks_summary,
@@ -60,8 +56,7 @@ async def ksa_alignment_node(state: InterviewState) -> dict:
     )
 
     logger.info("ksa_node: generating KSA for %d tasks", len(tasks))
-    response = await llm.ainvoke([HumanMessage(content=prompt)])
-    result = safe_parse_json(response.content, default={})
+    result = await LLMGateway(temperature=0.2).invoke_json(prompt, default={})
 
     ksa_items = []
     for k in result.get("knowledge", []):

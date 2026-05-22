@@ -153,8 +153,17 @@
 
 ---
 
+## 第八階段 — 訪談體驗優化（2026-05-23 完成）
+
+| # | 項目 | 說明 |
+|---|------|------|
+| ✅ 32 | **iCAP Live Preview 版面** | 訪談頁改為左右分割：聊天室（36%）+ iCAP 職能基準表格即時預覽（64%）；格式完全對齊官方 iCAP 表格（主要職責 / 工作任務 / 產出 / 行為指標 / 職能級別 / K/S）；未填欄位顯示 skeleton 動畫，隨訪談逐步填入；OCS 文件完成後自動切換為完整資料。元件：`LiveDocPanel`。 |
+
+---
+
 ## P2 — 產品成熟期
 
+- **RAG 輔助訪談問題**：`interview_node` 在 RAG #1 命中後，將 iCAP unit chunk（職能單元）注入 system prompt，讓 LLM 知道此職種官方認定應有哪些工作面向，訪談時主動問出工作者未提及的任務，而非完全靠工作者自述；`company_defined` 模式亦可注入相似度最高的 top-N 候選作為軟參考。目前 `interview_node` 完全無 RAG，`five_w2h_node` 僅 `outputs` 欄位有 RAG #3 注入，其餘欄位（`situation`、`purpose`、`workflow_steps`、`quality_standards`、`time_standards`）皆無。
 - iCAP 多粒度 RAG 完整接入（unit / notes chunk）
 - Reranker（提升 iCAP RAG 精準度）
 - 任務自動合併與去重 UI

@@ -36,7 +36,7 @@ jobintel-ai/
 │   │   ├── graph/
 │   │   │   ├── state.py          # InterviewState TypedDict
 │   │   │   ├── graph.py          # build_interview_graph() + 條件邊路由函式
-│   │   │   ├── llm.py            # get_chat_llm() / get_embeddings()
+│   │   │   ├── llm.py            # get_chat_llm() factory（支援 openai/google/anthropic）/ get_embeddings()
 │   │   │   ├── llm_gateway.py    # LLMGateway：invoke_text / invoke_json（含 retry）
 │   │   │   ├── phase.py          # Phase dataclass：star/five_w2h/general，to_str/from_str
 │   │   │   ├── task_loop.py      # TaskLoopManager：current_task / advance / skip_completed
@@ -59,7 +59,7 @@ jobintel-ai/
 │   │   │   ├── interview_orchestrator.py  # InterviewOrchestrator：stream()，SSE + 圖執行 + 持久化
 │   │   │   ├── document_service.py   # generate_docx / generate_pdf / generate_xlsx
 │   │   │   │                         # get_enriched_export_json（含 evidence_refs / icap_reference_pack）
-│   │   │   └── icap_ksa_rag.py       # 6 種 RAG 函式：search_knowledge/skills/attitudes/tasks/indicators/outputs
+│   │   │   └── icap_retriever.py       # 6 種 RAG 函式：search_knowledge/skills/attitudes/tasks/indicators/outputs
 │   │   └── utils.py                  # safe_parse_json
 │   └── scripts/
 │       ├── icap_parser.py        # iCAP JSON → TextNode chunks（9 種 chunk_type）
@@ -117,7 +117,7 @@ LangGraph get_interview_graph()  ← lru_cache，compile 一次共用
     │  呼叫 LLMGateway.invoke_text / invoke_json（含 retry）
     │  Phase.star/five_w2h(task_id).to_str() 生成 phase key
     │  TaskLoopManager 管理任務推進與 skip_completed 邏輯
-    │  icap_ksa_rag：6 種 pgvector 向量檢索（6 個 RAG 觸發點）
+    │  icap_retriever：6 種 pgvector 向量檢索（6 個 RAG 觸發點）
     │  完成後 accumulated state 存回 DB
     ▼
 PostgreSQL  jobintel DB
@@ -133,9 +133,14 @@ PostgreSQL  jobintel DB
 |------|------|--------|
 | `DATABASE_URL` | asyncpg 連線字串 | `postgresql+asyncpg://postgres:password@localhost:5432/jobintel` |
 | `DATABASE_URL_SYNC` | psycopg2 連線字串（ingest script） | 同上但不含 `+asyncpg` |
+| `LLM_PROVIDER` | Chat LLM provider 選擇：`openai` / `google` / `anthropic` | `openai` |
 | `OPENAI_API_KEY` | OpenAI API 金鑰 | — |
-| `OPENAI_MODEL` | Chat 模型 | `gpt-4o` |
-| `OPENAI_EMBEDDING_MODEL` | Embedding 模型 | `text-embedding-3-small` |
+| `OPENAI_MODEL` | OpenAI Chat 模型 | `gpt-4o` |
+| `OPENAI_EMBEDDING_MODEL` | Embedding 模型（固定 OpenAI，不隨 provider 切換） | `text-embedding-3-small` |
+| `GOOGLE_API_KEY` | Google Gemini API 金鑰（`LLM_PROVIDER=google` 時必填） | — |
+| `GOOGLE_MODEL` | Gemini Chat 模型 | `gemini-2.5-flash` |
+| `ANTHROPIC_API_KEY` | Anthropic API 金鑰（`LLM_PROVIDER=anthropic` 時必填） | — |
+| `ANTHROPIC_MODEL` | Claude Chat 模型 | `claude-sonnet-4-6` |
 | `ICAP_HIGH_THRESHOLD` | iCAP 高信心門檻（≥ → reference mode） | `0.70` |
 | `ICAP_MEDIUM_THRESHOLD` | iCAP 中信心門檻（≥ → hybrid mode；< → company_defined） | `0.55` |
 | `ICAP_TOP_K` | iCAP RAG 返回候選數 | `5` |
@@ -143,6 +148,7 @@ PostgreSQL  jobintel DB
 | `FONT_PATH` | PDF 中文字型路徑（跨平台） | `assets/fonts/NotoSansTC-Regular.ttf` |
 
 > `ICAP_HIGH_THRESHOLD` / `ICAP_MEDIUM_THRESHOLD` 取代舊版單一 `ICAP_SIMILARITY_THRESHOLD`，支援三段式信心判斷。
+> Embedding 固定使用 OpenAI `text-embedding-3-small`，不隨 `LLM_PROVIDER` 切換；向量資料庫已有資料時切換 provider 無需重新 ingest。
 
 ## 持久化狀態（`StateService.PERSISTENT_KEYS`）
 
@@ -164,6 +170,60 @@ interview_readiness_detail, interview_ready, interview_ready_confirmed
 | `StateService.persist(db, profile_id, stage, state)` | 更新 DB 中的 `stage` 與 `graph_state` |
 
 > AI 訊息的 `phase` 欄位以 `accumulated.get("phase", message.phase)` 寫入 DB，確保節點輸出的 phase（`"star_task_001"` 等）正確持久化，供下次呼叫的訊息過濾使用。
+
+---
+
+## Docker Compose
+
+`docker-compose.yml` 包含三個服務，可一鍵啟動開發環境的基礎設施（DB + Redis + Backend API）。
+
+### 服務總覽
+
+| 服務 | Image | 容器名稱 | Port |
+|------|-------|----------|------|
+| `db` | `pgvector/pgvector:pg16` | `jobintel_db` | 5432 |
+| `redis` | `redis:7-alpine` | `jobintel_redis` | 6379 |
+| `api` | Build from `backend/Dockerfile` | `jobintel_api` | 8000 |
+
+> Frontend（Next.js）**不在** docker-compose 內，需另外以 `npm run dev` 啟動。
+
+### 啟動方式
+
+```bash
+# 建立 backend/.env（複製範本後填入金鑰）
+cp backend/.env.example backend/.env
+
+# 啟動全部服務（DB → Redis → API，依 healthcheck 順序）
+docker compose up -d
+
+# 查看 API 日誌
+docker compose logs -f api
+
+# 關閉並保留資料
+docker compose down
+
+# 關閉並清除 DB volume（重置資料庫）
+docker compose down -v
+```
+
+### 初始化細節
+
+- **PostgreSQL**：啟動時自動執行 `backend/migrations/init.sql`（建表 + pgvector extension）
+- **API**：等待 `db` 與 `redis` 通過 healthcheck 後才啟動，避免連線失敗
+- **Hot reload**：API 容器掛載 `./backend:/app`，修改程式碼後自動重啟（`--reload`）
+- **資料持久化**：DB 資料存於 Docker volume `pgdata`，`docker compose down` 不會刪除
+
+### 環境變數注入
+
+`api` 服務透過 `env_file: ./backend/.env` 載入設定，Docker Compose 內的 DB/Redis 連線位址需改為服務名稱：
+
+```env
+DATABASE_URL=postgresql+asyncpg://postgres:password@db:5432/jobintel
+DATABASE_URL_SYNC=postgresql://postgres:password@db:5432/jobintel
+REDIS_URL=redis://redis:6379/0
+```
+
+> 本機直跑（`uvicorn`）時則用 `localhost`；Docker 環境用服務名 `db` / `redis`。
 
 ---
 

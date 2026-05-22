@@ -15,10 +15,21 @@ class Settings(BaseSettings):
     # Redis
     redis_url: str = "redis://localhost:6379/0"
 
+    # LLM provider selection: "openai" | "google" | "anthropic"
+    llm_provider: str = "openai"
+
     # OpenAI
     openai_api_key: str = ""
     openai_model: str = "gpt-4o"
     openai_embedding_model: str = "text-embedding-3-small"
+
+    # Google Gemini
+    google_api_key: str = ""
+    google_model: str = "gemini-2.5-flash"
+
+    # Anthropic Claude
+    anthropic_api_key: str = ""
+    anthropic_model: str = "claude-sonnet-4-6"
 
     # iCAP RAG — 三段式信心門檻
     icap_high_threshold: float = 0.70    # >= 此值 → high → reference mode

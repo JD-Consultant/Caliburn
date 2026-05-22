@@ -76,7 +76,8 @@ def chunk_icap(data: dict, source_path: str = "") -> list[TextNode]:
     nodes.append(TextNode(
         id_=str(uuid.uuid4()),
         text=f"職能標準：{occupation_name}\n職務描述：{job_description}",
-        metadata={**base_meta, "chunk_type": "competency"},
+        metadata={**base_meta, "chunk_type": "competency",
+                  "breadcrumb": f"{occupation_name} ({ocs_code})"},
     ))
 
     # ── Level 1b: notes chunk (說明與補充事項) ─────────────────────────────────
@@ -84,7 +85,8 @@ def chunk_icap(data: dict, source_path: str = "") -> list[TextNode]:
         nodes.append(TextNode(
             id_=str(uuid.uuid4()),
             text=f"說明與補充事項：{occupation_name}\n{notes_text}",
-            metadata={**base_meta, "chunk_type": "notes"},
+            metadata={**base_meta, "chunk_type": "notes",
+                      "breadcrumb": f"{occupation_name} ({ocs_code}) > 說明補充"},
         ))
 
     ocu_units = data.get("ocs_content", {}).get("ocu_units", [])
@@ -102,6 +104,7 @@ def chunk_icap(data: dict, source_path: str = "") -> list[TextNode]:
                 "chunk_type": "unit",
                 "ocu_code": ocu_code,
                 "ocu_name": ocu_name,
+                "breadcrumb": f"{occupation_name} ({ocs_code}) > {ocu_name} ({ocu_code})",
             },
         ))
 
@@ -130,7 +133,8 @@ def chunk_icap(data: dict, source_path: str = "") -> list[TextNode]:
                     "ocu_name":    ocu_name,
                     "task_code":   task_code,
                     "task_name":   task_name,
-                    "task_codes":  task_codes_raw,  # full list stored
+                    "task_codes":  task_codes_raw,
+                    "breadcrumb":  f"{occupation_name} ({ocs_code}) > {ocu_name} ({ocu_code}) > {task_name} ({task_code})",
                 },
             ))
 
@@ -159,6 +163,7 @@ def chunk_icap(data: dict, source_path: str = "") -> list[TextNode]:
                             **block_meta,
                             "chunk_type": "indicator",
                             "indicator_code": ind_code,
+                            "breadcrumb": f"{occupation_name} ({ocs_code}) > {ocu_name} ({ocu_code}) > {task_name} ({task_code}) > {ind_code}",
                         },
                     ))
 
@@ -176,6 +181,7 @@ def chunk_icap(data: dict, source_path: str = "") -> list[TextNode]:
                             **block_meta,
                             "chunk_type": "output",
                             "output_code": out_code,
+                            "breadcrumb": f"{occupation_name} ({ocs_code}) > {ocu_name} ({ocu_code}) > {task_name} ({task_code}) > {out_code}",
                         },
                     ))
 
@@ -193,6 +199,7 @@ def chunk_icap(data: dict, source_path: str = "") -> list[TextNode]:
                             **block_meta,
                             "chunk_type": "knowledge",
                             "knowledge_code": k_code,
+                            "breadcrumb": f"{occupation_name} ({ocs_code}) > {ocu_name} ({ocu_code}) > {task_name} ({task_code}) > {k_code}",
                         },
                     ))
 
@@ -210,6 +217,7 @@ def chunk_icap(data: dict, source_path: str = "") -> list[TextNode]:
                             **block_meta,
                             "chunk_type": "skill",
                             "skill_code": s_code,
+                            "breadcrumb": f"{occupation_name} ({ocs_code}) > {ocu_name} ({ocu_code}) > {task_name} ({task_code}) > {s_code}",
                         },
                     ))
 
@@ -227,6 +235,7 @@ def chunk_icap(data: dict, source_path: str = "") -> list[TextNode]:
                 **base_meta,
                 "chunk_type": "attitude",
                 "attitude_code": att_code,
+                "breadcrumb": f"{occupation_name} ({ocs_code}) > {att_code}",
             },
         ))
 

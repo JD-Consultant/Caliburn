@@ -77,6 +77,24 @@ CREATE INDEX ON icap_embeddings (ocs_code);
 
 > `job_categories`/`occupations`/`industries` 儲存完整 `{name, code}` dict，支援 `icap_rag_node` 讀取職業代碼（`occ_code`）。
 
+### Breadcrumb 欄位
+
+每個 chunk 的 metadata 包含 `breadcrumb` 字串，表示該 chunk 在 iCAP 階層中的完整路徑，供 LLM 引用來源、debug 與 UI 顯示使用：
+
+| chunk_type | breadcrumb 格式 | 範例 |
+|---|---|---|
+| `competency` | `{occupation_name} ({ocs_code})` | `資料庫管理師 (DAT-001)` |
+| `notes` | `{occupation_name} ({ocs_code}) > 說明補充` | `資料庫管理師 (DAT-001) > 說明補充` |
+| `unit` | `{occupation_name} ({ocs_code}) > {ocu_name} ({ocu_code})` | `資料庫管理師 (DAT-001) > 系統維運 (DAT-001-03)` |
+| `task` | `... > {ocu_name} ({ocu_code}) > {task_name} ({task_code})` | `... > 系統維運 (DAT-001-03) > 資料庫維護 (T3.1)` |
+| `indicator` | `... > {task_name} ({task_code}) > {indicator_code}` | `... > 資料庫維護 (T3.1) > P1.1.1` |
+| `output` | `... > {task_name} ({task_code}) > {output_code}` | `... > 資料庫維護 (T3.1) > O1.1` |
+| `knowledge` | `... > {task_name} ({task_code}) > {knowledge_code}` | `... > 資料庫維護 (T3.1) > K-INF-001` |
+| `skill` | `... > {task_name} ({task_code}) > {skill_code}` | `... > 資料庫維護 (T3.1) > S-INF-001` |
+| `attitude` | `{occupation_name} ({ocs_code}) > {attitude_code}` | `資料庫管理師 (DAT-001) > A-GEN-001` |
+
+> `breadcrumb` 存於 metadata JSONB，需重新執行 `icap_ingest.py` 後才會寫入資料庫（已有資料不會自動更新）。
+
 ### Chunk 生成邏輯
 
 1. **competency chunk**：`職能基準摘要：{occupation_name}\n{competency_level}\n{ocu_unit_names…}`
@@ -122,7 +140,7 @@ python -m scripts.icap_ingest \
 
 ---
 
-## icap_ksa_rag（`app/services/icap_ksa_rag.py`）
+## icap_retriever（`app/services/icap_retriever.py`）
 
 提供 6 個非同步查詢函式，供各 LangGraph 節點呼叫：
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useEffect, useRef } from "react";
+import { use, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useProfile } from "@/hooks/useProfiles";
@@ -8,12 +8,10 @@ import { useInterview } from "@/hooks/useInterview";
 import { ProgressTracker } from "@/components/interview/ProgressTracker";
 import { IcapBadges } from "@/components/interview/IcapBadges";
 import { ChatBubble } from "@/components/interview/ChatBubble";
-import { TaskPanel } from "@/components/interview/TaskPanel";
+import { LiveDocPanel } from "@/components/interview/LiveDocPanel";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Send, BriefcaseIcon, FileText, CheckCircle2 } from "lucide-react";
-import { useState } from "react";
-import type { InterviewMessage } from "@/types";
 
 export default function InterviewPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -25,7 +23,6 @@ export default function InterviewPage({ params }: { params: Promise<{ id: string
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const autoStarted = useRef(false);
 
-  // 新 profile（無歷史訊息）自動觸發第一次 iCAP RAG
   useEffect(() => {
     if (
       !profileLoading &&
@@ -62,10 +59,10 @@ export default function InterviewPage({ params }: { params: Promise<{ id: string
   const candidates = profile?.graph_state?.icap_candidates ?? [];
   const readiness = profile?.graph_state?.interview_readiness_detail;
   const behaviorIndicators = profile?.graph_state?.behavior_indicators ?? [];
+  const ksaItems = profile?.graph_state?.ksa_items ?? [];
   const stage = profile?.stage ?? "basic_info";
   const isPreview = stage === "preview";
 
-  // phase tag for outgoing messages
   const currentTaskIndex = profile?.graph_state?.current_task_index ?? 0;
   const currentTask = tasks[currentTaskIndex];
   const outgoingPhase =
@@ -129,9 +126,9 @@ export default function InterviewPage({ params }: { params: Promise<{ id: string
       {candidates.length > 0 && <IcapBadges candidates={candidates} />}
 
       {/* Main area */}
-      <div className="flex flex-1 min-h-0">
-        {/* Chat */}
-        <div className="flex flex-col flex-1 min-w-0">
+      <div className="flex flex-1 min-h-0 overflow-hidden">
+        {/* Chat — left column */}
+        <div className="w-[36%] shrink-0 flex flex-col min-h-0 overflow-hidden">
           <ScrollArea className="flex-1">
             <div className="py-4 space-y-1">
               {histLoading && (
@@ -185,7 +182,11 @@ export default function InterviewPage({ params }: { params: Promise<{ id: string
               <textarea
                 ref={inputRef}
                 className="flex-1 rounded-xl border bg-muted/50 px-4 py-3 text-sm resize-none outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent min-h-[44px] max-h-32"
-                placeholder={streaming ? "AI 回覆中..." : stage === "task_extraction" && tasks.length > 0 ? "如有遺漏或修改，請直接輸入..." : "輸入訊息，按 Enter 送出"}
+                placeholder={
+                  streaming ? "AI 回覆中..." :
+                  stage === "task_extraction" && tasks.length > 0 ? "如有遺漏或修改，請直接輸入..." :
+                  "輸入訊息，按 Enter 送出"
+                }
                 rows={1}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
@@ -204,13 +205,16 @@ export default function InterviewPage({ params }: { params: Promise<{ id: string
           </div>
         </div>
 
-        {/* Task sidebar */}
-        <TaskPanel
+        {/* Live document panel — right column */}
+        <LiveDocPanel
+          profile={profile}
           tasks={tasks}
+          indicators={behaviorIndicators}
+          ksaItems={ksaItems}
           stage={stage}
-          readiness={readiness}
           currentTaskIndex={currentTaskIndex}
-          behaviorIndicators={behaviorIndicators}
+          candidates={candidates}
+          ocsDocument={profile.graph_state?.ocs_document}
         />
       </div>
     </div>

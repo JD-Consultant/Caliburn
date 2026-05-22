@@ -5,7 +5,7 @@ from app.graph.constants import FIVE_W2H_LIST_FIELDS, FIVE_W2H_REQUIRED
 from app.graph.phase import Phase
 from app.graph.state import InterviewState
 from app.graph.task_loop import TaskLoopManager
-from app.services.icap_ksa_rag import search_outputs
+from app.services.icap_retriever import search_outputs
 
 logger = logging.getLogger("jobintel")
 

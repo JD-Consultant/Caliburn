@@ -8,12 +8,9 @@ state["ksa_items"] list for backward compatibility with the preview page.
 import logging
 import re
 
-from langchain_core.messages import HumanMessage
-
-from app.graph.llm import get_chat_llm
+from app.graph.llm_gateway import LLMGateway
 from app.graph.state import InterviewState
-from app.services.icap_ksa_rag import search_knowledge, search_skills, search_attitudes
-from app.utils import safe_parse_json
+from app.services.icap_retriever import search_knowledge, search_skills, search_attitudes
 
 logger = logging.getLogger("jobintel")
 
@@ -556,7 +553,6 @@ async def ocs_builder_node(state: InterviewState) -> dict:
         for c in icap_candidates
     ) or "無 iCAP 命中"
 
-    llm = get_chat_llm(0.2)
     prompt = _OCS_BUILD_PROMPT.format(
         job_title=state["job_title"],
         department=state.get("department", ""),
@@ -568,8 +564,7 @@ async def ocs_builder_node(state: InterviewState) -> dict:
     )
 
     logger.info("ocs_builder: building OCS document for %d tasks", len(tasks))
-    response = await llm.ainvoke([HumanMessage(content=prompt)])
-    raw = safe_parse_json(response.content, default={})
+    raw = await LLMGateway(temperature=0.2).invoke_json(prompt, default={})
 
     ocs_doc = await _enrich_and_assign_codes(
         raw, state["job_title"], state.get("job_summary", ""), icap_candidates,

@@ -1,6 +1,6 @@
 # Implementation Plan
 
-本文件是 `jd-ocs-indexer` 的實作決策版。目標是讓實作者不需要再重新判斷架構邊界，就能直接建立 v1 程式骨架。
+本文件是 `jd-ocs-indexer` 的實作決策版。目標是讓實作者可直接建立 v1 程式骨架，並產出可供未來 JD Authoring RAG service 使用的 Qdrant collection。
 
 ---
 
@@ -11,55 +11,74 @@ v1 只負責索引與儲存：
 ```text
 S:\jd-pdf-to-json\output\0518\*.json
     -> OCSJSONReader
-    -> OCSNodeBuilder
+    -> OCSNormalizer
+    -> ChunkBuilder
     -> MarkdownRenderer
     -> EmbeddingService
     -> QdrantWriter
     -> Qdrant collection ocs_bgem3_v1
 ```
 
-v1 不提供正式查詢服務，不開 HTTP API，不在 indexer 內產生 LLM 回答。CLI 只提供 smoke query，用來驗證寫入後的資料能被 count、retrieve、filter。
+本 repo 不提供正式查詢服務、不開 HTTP API、不開 MCP server、不在 indexer 內產生 LLM 回答。CLI 只提供 smoke query，用來驗證寫入後的資料能被 count、retrieve、filter、dev-only vector probe。
 
-v2 才處理正式 retrieval service、相似職務、hybrid search、small-to-big context、RAG answer engine。
+未來 JD Authoring RAG 應另開 service repo，讀取本 repo 建好的 Qdrant collection，負責長工作描述拆項、候選職務聚合、遺漏工作提示、完整 JSON context assembly、LLM JD draft。
 
 ---
 
-## 2. Scope
+## 2. Product Context
+
+未來產品流程：
+
+```text
+使用者描述自己的工作內容
+  -> RAG 找出可能相關的 OCS 職務 / unit / block / K/S
+  -> 系統提示使用者可能遺漏的工作任務
+  -> 使用者確認、刪除、補充
+  -> 產生專屬職務說明書
+```
+
+這代表 indexer 的 v1 設計重點不是一般文件問答，而是：
+
+- 能用自然語言工作活動命中 OCS unit/block。
+- 能聚合 `ocs_code`、unit、K/S codes。
+- 能用 parent chunk 補小到大的上下文。
+- 能用 `source_file` 讀回完整 JSON，支援 JD 生成背景資料。
+
+---
+
+## 3. Scope
 
 ### v1 要做
 
 - 讀取 `jd-pdf-to-json` 的既有 JSON。
-- 驗證 JSON schema，容忍已知缺漏欄位。
+- 驗證與 normalize JSON schema，容忍已知缺漏欄位。
 - 產生三層 chunks：
   - `profile`: 每份 OCS 一個。
   - `unit`: 每個 `ocu_unit` 一個。
   - `block`: 每個 `competency_block` 一個。
-- Render Markdown 作為 embedding text。
-- 產生 deterministic point id 與 payload。
+- Render Markdown 作為 embedding text 與未來 LLM context。
+- 產生 deterministic point id 與完整 payload。
 - 建立 Qdrant collection 與 payload indexes。
 - Upsert dense/sparse vectors 與 payload。
 - 支援增量索引：source hash 未變則跳過。
-- 提供 CLI：
-  - `render`
-  - `index`
-  - `stats`
-  - `doctor`
-  - `smoke-query`
+- 提供 CLI：`render`、`index`、`stats`、`doctor`、`smoke-query`。
 
 ### v1 不做
 
 - 不從 PDF 重抽資料。
-- 不用 LlamaParse 當正式來源。
 - 不提供正式 retrieval API。
 - 不提供 HTTP server。
-- 不實作 LLM answer generation。
+- 不提供 MCP server。
+- 不實作長工作描述拆項。
+- 不實作遺漏任務提示。
+- 不實作 LLM answer / JD generation。
 - 不用 LlamaIndex `IngestionPipeline` 作主線。
 
 ---
 
-## 3. Architecture
+## 4. Architecture
 
-### 3.1 模組結構
+### 4.1 模組結構
 
 ```text
 src/jd_ocs_indexer/
@@ -70,6 +89,7 @@ src/jd_ocs_indexer/
     chunk.py
   ingestion/
     reader.py
+    normalizer.py
     builder.py
     renderer.py
     manifest.py
@@ -88,40 +108,69 @@ src/jd_ocs_indexer/
     smoke_query.py
 ```
 
-### 3.2 Data flow
+不在本 repo 建立 `serving/`、`api/`、`mcp/`、`rag/` 模組。
+
+### 4.2 Data flow
 
 ```text
 JSON file
   -> OCSDocument
-  -> ChunkSpec[]
+  -> NormalizedOCSDocument
+  -> ChunkRecord[]
   -> Markdown text + payload
-  -> dense/sparse vectors
+  -> EmbeddedChunk[]
   -> Qdrant PointStruct
 ```
 
-`MarkdownRenderer` 只負責 text projection；chunk 邊界由 JSON schema 決定，不由 Markdown headings 或 token splitter 決定。
+概念命名：
 
-### 3.3 Direct Qdrant writer
+```text
+ChunkRecord:
+  chunk_key
+  chunk_level
+  text
+  payload
+
+EmbeddedChunk:
+  ChunkRecord + dense_vector + sparse_vector?
+
+Qdrant point:
+  id + vectors + payload
+```
+
+### 4.3 Direct Qdrant writer
 
 v1 直接使用 `qdrant-client` 建 collection、建 payload indexes、upsert points。這比先接 LlamaIndex 更符合本案需求，原因是：
 
 - 需要精準控制 named vectors：`dense` / `sparse`。
 - 需要精準控制 payload 欄位、nullable、empty arrays。
-- 需要 deterministic point id 與 source hash。
-- v1 不是 retrieval framework，而是 storage/indexer。
-
-LlamaIndex 可作 future adapter，但不是 v1 dependency。
+- 需要 deterministic point id。
+- 需要 relative source path、source hash、chunk content hash。
+- v1 是 storage/indexer，不是 retriever framework。
 
 ---
 
-## 4. Data Model
+## 5. Source Data
 
-### 4.1 Source of truth
-
-正式輸入是：
+正式輸入：
 
 ```text
 S:\jd-pdf-to-json\output\0518\*.json
+```
+
+payload 不寫絕對路徑，改寫相對於 source root 的路徑：
+
+```json
+{
+  "source_root_alias": "jd-pdf-to-json",
+  "source_file": "output/0518/example.json"
+}
+```
+
+實際 root 由 config/env 管理：
+
+```text
+OCS_SOURCE_ROOT=S:/jd-pdf-to-json
 ```
 
 實測資料：
@@ -134,48 +183,88 @@ S:\jd-pdf-to-json\output\0518\*.json
 - 903 files missing job category
 - 53 multi-task groups
 
-### 4.2 Chunk keys
+---
+
+## 6. Chunk Keys
 
 ```text
-profile: {ocs_code}::profile
-unit:    {ocs_code}::unit::{ocu_code}
-block:   {ocs_code}::block::{ocu_code}::{primary_task_code}::{block_idx}
+profile: ocs:{ocs_code}:profile
+unit:    ocs:{ocs_code}:unit:{unit_key}
+block:   ocs:{ocs_code}:unit:{unit_key}:task:{primary_task_key}:block:{block_key}
 ```
 
-`primary_task_code` 使用該 task group 的第一個 T-code。完整 `task_codes` 仍寫入 payload，供 filter 與未來 retrieval 使用。
+規則：
 
-### 4.3 Payload 缺漏規則
+- 若 JSON 有穩定代碼，沿用原代碼作 `unit_key` / `task_key`。
+- 若缺穩定代碼，用 zero-padded index fallback，例如 `0001`。
+- 多 task group 時，`primary_task_key = sorted(task_keys)[0]`，完整 `task_keys` 仍寫入 payload。
+- Qdrant point id 用 `uuid5(namespace, chunk_key)`，`chunk_key` 本身存 payload。
 
-- Required：
-  - `chunk_key`
-  - `chunk_type`
-  - `ocs_code`
-  - `ocs_name`
-  - `ocs_level`
-  - `source_file`
-  - `source_hash`
-  - `indexed_at`
-- Nullable：
-  - `parent_id`
-  - `version`
-  - `version_seq`
-  - `update_date`
-  - `ocu_code`
-  - `ocu_name`
-  - `competency_level`
-- Empty array default：
-  - category arrays
-  - task arrays
-  - indicator/output/knowledge/skill/attitude arrays
-  - prerequisites/supplements derived flags
-
-若 version history 缺失，從 `ocs_profile.ocs_code` 解析尾端 `vN`。可解析則寫 `version="VN"`、`version_seq=N`；不可解析則設為 null。`is_current` 預設 true，除非 version history 明確指出不是最新版本。
+Markdown dump 檔名將 `:` 替換為 `_` 或使用 URL-safe sanitizer，避免 Windows 檔名限制。
 
 ---
 
-## 5. Embedding and Qdrant
+## 7. Payload Contract
 
-### 5.1 v1 default
+完整欄位定義見 [SCHEMA.md](./SCHEMA.md)。v1 payload 的核心規則：
+
+Required：
+
+- `chunk_key`
+- `chunk_level`
+- `ocs_code`
+- `job_title`
+- `text`
+- `source_root_alias`
+- `source_file`
+- `source_json_hash`
+- `chunk_content_hash`
+- `schema_version`
+- `embedding_provider`
+- `indexed_at`
+
+Nullable：
+
+- `job_category`
+- `version`
+- `version_seq`
+- `update_date`
+- `unit_id`
+- `unit_title`
+- `block_id`
+- `block_title`
+- `competency_level`
+- `profile_chunk_id`
+- `unit_chunk_id`
+
+Empty array default：
+
+- `task_ids`
+- `task_titles`
+- `k_codes`
+- `s_codes`
+- `attitude_codes`
+- `industry_codes`
+- `occupation_codes`
+- `knowledge_terms`
+- `skill_terms`
+- `work_activity_terms`
+
+Trace fields：
+
+- `source_path`
+- `source_labels`
+- `unit_order`
+- `task_orders`
+- `block_order`
+
+`T1`、`T1.1`、`P1.1.1`、`O1.1.1` 這類代碼不作主要搜尋入口，但應保留在 `source_labels` 或 code arrays 中，供 citation、排序、debug、回溯原始 JSON 使用。
+
+---
+
+## 8. Embedding and Qdrant
+
+### 8.1 v1 default
 
 - Collection: `ocs_bgem3_v1`
 - Dense vector:
@@ -184,43 +273,48 @@ block:   {ocs_code}::block::{ocu_code}::{primary_task_code}::{block_idx}
   - distance: cosine
 - Sparse vector:
   - name: `sparse`
-  - source: BGE-M3 lexical weights
-  - distance: dot product by Qdrant sparse vector behavior
+  - source: BGE-M3 lexical_weights
+  - distance: dot product
+  - 不加 Qdrant `Modifier.IDF`
 
 預設不啟用 ColBERT multi-vector。若後續 retrieval 品質不足，再以新 collection 重新評估。
 
-### 5.2 Provider options
+### 8.2 Provider options
 
 | Provider | 優點 | 缺點 | v1 建議 |
 |---|---|---|---|
 | BGE-M3 local | 中文與代碼/術語混合友善，可 dense+sparse 離線 | 依賴較重，CPU 較慢 | 預設 |
-| OpenAI dense-only | 部署簡單，品質穩 | 成本、API key、無 sparse | adapter |
+| OpenAI dense-only | 部署簡單，品質穩，支援降維 | 成本、API key、無 sparse | adapter |
 | FastEmbed/BM25 | Qdrant 生態整合順 | 語意與中文效果需實測 | adapter/PoC |
 
-不同 provider 不混同一 collection。換 provider 或向量維度即建立新 collection。
+不同 provider 或不同維度都不混同一 collection；換 provider 或調維度即建立新 collection。
 
-### 5.3 Payload indexes
+### 8.3 Payload indexes
 
-v1 payload indexes 以未來 filter 為準：
+只對常用 filter 欄位建立 payload index：
 
-- `chunk_type`
+- `chunk_level`
 - `ocs_code`
 - `ocs_code_base`
+- `job_title`
+- `job_category`
 - `version`
 - `is_current`
-- `ocs_level`
-- `competency_level`
-- `occupation_codes`
-- `industry_codes`
-- `task_codes`
-- `knowledge_codes`
-- `skill_codes`
+- `unit_id`
+- `task_ids`
+- `k_codes`
+- `s_codes`
 - `attitude_codes`
-- `ocs_name` text index
+- `industry_codes`
+- `occupation_codes`
+- `schema_version`
+- `embedding_provider`
+
+不建 index 但保留：`source_file`、`source_json_hash`、`chunk_content_hash`、`source_path`、`source_labels`、各種 title/name、order 欄位。
 
 ---
 
-## 6. CLI
+## 9. CLI
 
 ### `render`
 
@@ -236,7 +330,7 @@ uv run python -m jd_ocs_indexer.cli render S:\jd-pdf-to-json\output\0518 -o outp
 uv run python -m jd_ocs_indexer.cli index S:\jd-pdf-to-json\output\0518
 ```
 
-執行完整 pipeline，依 source hash 跳過未變檔案。
+執行完整 pipeline，依 `source_json_hash` 跳過未變檔案。
 
 ### `stats`
 
@@ -260,46 +354,55 @@ uv run python -m jd_ocs_indexer.cli doctor S:\jd-pdf-to-json\output\0518
 ```bash
 uv run python -m jd_ocs_indexer.cli smoke-query --collection ocs_bgem3_v1 --ocs-code INM3513-009v1
 uv run python -m jd_ocs_indexer.cli smoke-query --collection ocs_bgem3_v1 --knowledge K01 --skill S01
+uv run python -m jd_ocs_indexer.cli smoke-query --collection ocs_bgem3_v1 --probe-vector "資料清理 報表 需求確認"
 ```
 
-僅用於驗證索引，不視為正式查詢接口。
+僅用於驗證索引，不視為正式查詢接口。輸出格式不作穩定 API 承諾。
 
 ---
 
-## 7. LlamaParse Notes
+## 10. Future Service Contract
 
-LlamaParse v2 不進 v1 主線。保留用途：
+未來 service repo 應使用本 repo 產出的 payload contract 做：
 
-- 重新解析 PDF，與既有 JSON 比對。
-- 取 `markdown` / `items` 檢查表格抽取品質。
-- 作為未來資料補洞或品質稽核工具。
+```text
+match_user_work_description()
+suggest_candidate_jobs()
+match_user_activities()
+suggest_missing_work_tasks()
+suggest_knowledge_skills()
+assemble_jd_context()
+draft_job_description()
+```
 
-截至本報告撰寫時，LlamaParse v2 的關鍵用法：
+典型查詢策略：
 
-- Python SDK: `llama-cloud>=2.1`
-- client: `LlamaCloud()`
-- required parse fields: `tier`、`version`
-- result selection: `expand=["markdown", "items"]`
-- v2 request options 分為 `input_options`、`processing_options`、`agentic_options`、`output_options`
-
-參考：https://developers.llamaindex.ai/llamaparse/
+```text
+whole user description -> search profile/unit
+extracted activities -> search unit/block per activity
+hits -> group by ocs_code and unit_id
+high confidence ocs_code -> load full JSON via source_file
+block hits -> retrieve unit/profile chunks via parent ids when small context is enough
+```
 
 ---
 
-## 8. Acceptance Criteria
+## 11. Acceptance Criteria
 
-- `README.md` 清楚描述 v1 做什麼與不做什麼。
-- `IMPLEMENTATION_PLAN.md` 足以直接建立程式骨架。
-- 文件不再把正式 RetrievalService 寫成 v1 目標。
+- `README.md` 清楚描述本 repo 做什麼與不做什麼。
+- `ARCHITECTURE.md` 清楚切分 indexer repo 與 future JD Authoring RAG service。
+- `SCHEMA.md` 足以直接實作 Qdrant payload 與 indexes。
+- 文件不再把正式查詢服務 / MCP / API 寫成本 repo v1 目標。
 - `render` 能對 fixture JSON 產出 profile/unit/block Markdown。
 - `doctor` 能回報已知資料缺漏，不把缺 version/job_category 視為 fatal。
 - `index` 對 fixture 可建立 Qdrant collection 並 upsert points。
+- 重跑 `index` 對未變檔案會 skip。
 - `smoke-query` 可驗證 count、retrieve by `ocs_code`、filter by K/S code。
+- `smoke-query --probe-vector` 可驗證 dense/sparse 寫入路徑。
 
 ---
 
-## 9. References
+## 12. References
 
-- LlamaParse: https://developers.llamaindex.ai/llamaparse/
 - Qdrant overview: https://qdrant.tech/documentation/overview/
 - Qdrant hybrid queries: https://qdrant.tech/documentation/search/hybrid-queries/

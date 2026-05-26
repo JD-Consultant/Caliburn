@@ -1,12 +1,14 @@
-# Retrieval 設計
+# Retrieval and Future JD Authoring Service
 
-本文件描述未來 v2 retrieval 方向，以及 v1 僅保留的 CLI smoke query。
+本文件描述未來 JD Authoring RAG service 如何使用本 repo 建好的 Qdrant collection，以及 v1 indexer 只保留的 CLI smoke query。
 
-v1 的正式範圍是索引與儲存，不提供正式查詢服務：
+v1 的正式範圍是索引與儲存：
 
 - 不開 HTTP API。
+- 不開 MCP server。
 - 不提供穩定 Python retrieval SDK。
 - 不組裝 LLM answer。
+- 不產生職務說明書。
 - 不承諾 `smoke-query` 輸出格式。
 
 ---
@@ -16,8 +18,6 @@ v1 的正式範圍是索引與儲存，不提供正式查詢服務：
 v1 smoke query 的目的只有驗證 Qdrant collection 寫入是否正確。
 
 ### 1.1 Count
-
-檢查 collection 存在、point 數合理、chunk_type 分布合理。
 
 ```bash
 uv run python -m jd_ocs_indexer.cli stats --collection ocs_bgem3_v1
@@ -53,7 +53,7 @@ models.Filter(
 
 - 驗證 profile/unit/block 都有寫入。
 - 驗證 `ocs_code` payload index 可用。
-- 驗證 source metadata 存在。
+- 驗證 `source_file`、hash、parent ids 存在。
 
 ### 1.3 Filter by K/S code
 
@@ -66,9 +66,9 @@ uv run python -m jd_ocs_indexer.cli smoke-query --collection ocs_bgem3_v1 --know
 ```python
 models.Filter(
     must=[
-        models.FieldCondition(key="chunk_type", match=models.MatchValue(value="block")),
-        models.FieldCondition(key="knowledge_codes", match=models.MatchAny(any=["K01"])),
-        models.FieldCondition(key="skill_codes", match=models.MatchAny(any=["S01"])),
+        models.FieldCondition(key="chunk_level", match=models.MatchValue(value="block")),
+        models.FieldCondition(key="k_codes", match=models.MatchAny(any=["K01"])),
+        models.FieldCondition(key="s_codes", match=models.MatchAny(any=["S01"])),
     ]
 )
 ```
@@ -77,234 +77,205 @@ models.Filter(
 
 - 驗證 K/S code arrays 寫入正確。
 - 驗證 payload indexes 正常。
-- 驗證未來「能力找職務」的資料基礎可行。
+- 驗證未來「能力/技能找職務」的資料基礎可行。
 
----
+### 1.4 Dev-only vector probe
 
-## 2. v2 Retrieval Scenarios
-
-v2 才會把下列能力整理成正式 service。
-
-| 情境 | 入口 chunk_type | 主要機制 | 是否需要 LLM |
-|---|---|---|---|
-| 依職能/技能查職位 | block | payload filter | 否 |
-| 依職位查職能內涵 | profile -> unit -> block | filter + 結構展開 | 否 |
-| 跨基準比對 / 相似度 | profile / unit | hybrid vector search | 否 |
-| RAG context retrieval | block + parent unit/profile | hybrid + small-to-big | 不一定 |
-| RAG answer engine | context chunks | LLM + citations | 是 |
-
----
-
-## 3. Future Service API
-
-以下 API 是 v2 方向，不在 v1 實作。
-
-```python
-class RetrievalService:
-    def find_jobs_by_competencies(
-        self,
-        knowledge_codes: list[str] | None = None,
-        skill_codes: list[str] | None = None,
-        attitude_codes: list[str] | None = None,
-        match: Literal["any", "all"] = "any",
-        industry_codes: list[str] | None = None,
-        ocs_level: tuple[int, int] | None = None,
-        only_current: bool = True,
-        limit: int = 50,
-    ) -> list[JobMatch]: ...
-
-    def get_job_profile(
-        self,
-        ocs_code: str | None = None,
-        ocs_name_query: str | None = None,
-    ) -> JobProfileFull: ...
-
-    def find_similar_jobs(
-        self,
-        reference_ocs_code: str,
-        granularity: Literal["profile", "unit"] = "profile",
-        only_current: bool = True,
-        limit: int = 10,
-    ) -> list[SimilarJobMatch]: ...
-
-    def search(
-        self,
-        query: str,
-        chunk_types: list[Literal["profile", "unit", "block"]] | None = None,
-        filters: SearchFilters | None = None,
-        limit: int = 20,
-    ) -> list[Hit]: ...
-
-    def retrieve_for_rag(
-        self,
-        query: str,
-        merge_strategy: Literal["small_to_big", "auto_merge", "none"] = "small_to_big",
-        top_k_fine: int = 10,
-        filters: SearchFilters | None = None,
-    ) -> list[RAGContext]: ...
+```bash
+uv run python -m jd_ocs_indexer.cli smoke-query --collection ocs_bgem3_v1 --probe-vector "資料清理 報表 需求確認"
 ```
 
+用途是確認 dense/sparse vectors 有正確寫入與可查，不是正式 retrieval API。
+
 ---
 
-## 4. 情境 1：依職能/技能查職位
+## 2. Future Service Boundary
 
-這個情境可以純 payload filter 完成，不需要向量。
+正式查詢與 RAG 不在本 repo。建議另開 service repo，例如：
 
-範例：「找所有需要 K01 且 S01 的職位」：
-
-```python
-filter_ = models.Filter(
-    must=[
-        models.FieldCondition(key="chunk_type", match=models.MatchValue(value="block")),
-        models.FieldCondition(key="knowledge_codes", match=models.MatchAny(any=["K01"])),
-        models.FieldCondition(key="skill_codes", match=models.MatchAny(any=["S01"])),
-        models.FieldCondition(key="is_current", match=models.MatchValue(value=True)),
-    ]
-)
-
-hits, _ = client.scroll(
-    collection_name="ocs_bgem3_v1",
-    scroll_filter=filter_,
-    limit=10000,
-    with_payload=True,
-    with_vectors=False,
-)
+```text
+jd-ocs-rag-service
+jd-ocs-mcp
+jd-ocs-query-api
 ```
 
-應用層再依 `ocs_code` group，回傳每個職務命中的 blocks 與 codes。
+該 repo 的責任：
+
+- 接收使用者職務名稱與長段工作描述。
+- 抽取工作活動候選項。
+- 對 Qdrant 做 vector search / payload filter。
+- 聚合候選 `ocs_code`、unit、block、K/S codes。
+- 回讀完整 source JSON 組 JD context。
+- 產生「你是否也會...」確認問題。
+- 產生專屬職務說明書。
 
 ---
 
-## 5. 情境 2：依職位查職能內涵
+## 3. JD Authoring Retrieval Flow
 
-若使用者提供 `ocs_code`：
+### 3.1 使用者只給職務名稱
+
+```text
+query = user_job_title
+search chunk_level = profile
+top_k = 5
+```
+
+目的：
+
+- 找候選 OCS 職務。
+- 讓使用者確認哪個比較接近。
+- 或與工作描述一起做 weighted ranking。
+
+### 3.2 使用者給一大段工作內容
+
+不要只搜尋整段一次。建議：
+
+```text
+whole description -> search profile/unit
+activity extraction -> per-activity search unit/block
+hits -> group by ocs_code, unit_id, k_codes, s_codes
+```
+
+例如使用者說：
+
+```text
+我會跟業務確認需求，整理 Excel 和資料庫資料，用 SQL 做清理，
+建立 Power BI 報表，每週追蹤營運指標，也會跟主管說明異常原因。
+```
+
+future service 先拆成：
+
+```text
+1. 與業務確認資料或報表需求
+2. 整理 Excel 與資料庫來源資料
+3. 使用 SQL 清理資料
+4. 建立 Power BI 報表
+5. 每週追蹤營運指標
+6. 向主管說明異常原因
+```
+
+每一項再搜尋 `unit` / `block`，避免長段 embedding 被平均後漏掉次要活動。
+
+### 3.3 已知或已確認 `ocs_code`
+
+拿標準任務不需要 vector search：
 
 ```python
-filter_ = models.Filter(
+models.Filter(
     must=[
         models.FieldCondition(key="ocs_code", match=models.MatchValue(value=ocs_code)),
+        models.FieldCondition(
+            key="chunk_level",
+            match=models.MatchAny(any=["unit", "block"]),
+        ),
         models.FieldCondition(key="is_current", match=models.MatchValue(value=True)),
     ]
-)
-```
-
-取回該 OCS 的所有 chunks 後，應用層依：
-
-1. `profile`
-2. `unit` by `ocu_code`
-3. `block` by `ocu_code` / `task_codes` / `competency_level`
-
-排序組裝成完整職能內涵。
-
-若使用者提供職務名稱，v2 可先用 `ocs_name` text index 或 hybrid search resolve `ocs_code`。
-
----
-
-## 6. 情境 3：相似職務
-
-v2 使用 Qdrant Query API 做 hybrid search。Qdrant 支援在同一個 point 上存 named dense/sparse vectors，再用 prefetch + RRF fusion 合併結果。
-
-範例：
-
-```python
-client.query_points(
-    collection_name="ocs_bgem3_v1",
-    prefetch=[
-        models.Prefetch(
-            query=dense_vec,
-            using="dense",
-            limit=30,
-            filter=profile_filter,
-        ),
-        models.Prefetch(
-            query=models.SparseVector(indices=sparse_indices, values=sparse_values),
-            using="sparse",
-            limit=30,
-            filter=profile_filter,
-        ),
-    ],
-    query=models.FusionQuery(fusion=models.Fusion.RRF),
-    limit=10,
-    with_payload=True,
 )
 ```
 
 用途：
 
-- 給一個 OCS 找相似 OCS。
-- 給一段自然語描述找相近職務。
-- 給 unit/block 找相似職能片段。
+- 列出該職務的標準 unit/block。
+- 與使用者已描述活動做 coverage/gap comparison。
+- 產生確認型提示。
 
 ---
 
-## 7. 情境 4：RAG Context Retrieval
+## 4. Parent Expansion
 
-v2 可先做 retrieval-only，不急著在本 repo 內產生 LLM 答案。
-
-流程：
+block 命中很精準，但常常太碎。future service 可用 parent chunk id 補上下文：
 
 ```text
-query
-  -> embed query
-  -> hybrid search block chunks
-  -> expand parent unit/profile
-  -> return context + citations
+block hit
+  -> unit_chunk_id
+  -> retrieve unit Markdown
+
+many block hits with same ocs_code
+  -> profile_chunk_id
+  -> retrieve profile Markdown
 ```
 
-### Small-to-big
+使用情境：
 
-每個 block hit 都附帶 parent unit context。
+- block 命中「資料品質檢查」，用 parent unit 取得同組任務。
+- 多個 block 命中同一職務，用 parent profile 取得職務定位。
+- 組 small-to-big RAG context，不必馬上讀完整 JSON。
 
-優點：
-
-- citation 細。
-- context 足夠。
-- 實作簡單。
-
-### Auto-merge
-
-若 top-K blocks 多數落在同一個 unit，直接回傳 unit 作為 context。
-
-優點：
-
-- 適合問「某職務的一整段職責」。
-- 減少重複 block。
-
-風險：
-
-- context 變大。
-- citation 粒度較粗。
+完整 JD draft 前仍建議用 `source_file` 回讀完整 JSON。
 
 ---
 
-## 8. RAG Answer Engine
+## 5. Full JSON Context
 
-若 v3 要在本 repo 內加入 answer engine，需要額外決策：
+完整 JSON 不塞進 Qdrant。future service 需要完整背景時：
 
-- LLM provider。
-- prompt template。
-- citation 格式。
-- hallucination guard。
-- evaluation set。
-- streaming / non-streaming。
+```text
+hits
+  -> group by source_file / ocs_code
+  -> load source JSON from configured source root
+  -> verify source_json_hash
+  -> assemble JD context package
+```
 
-目前不納入 v1，也不作 v2 必做項目。
+建議規則：
 
----
-
-## 9. 評估方向
-
-v2 retrieval 評估建議：
-
-- payload filter 正確率：K/S/T/O/P code 查詢。
-- 相似職務 top-k：人工標註 30-50 組 query。
-- hybrid vs dense-only：比較中文術語與代碼命中。
-- small-to-big context 品質：人工檢查 citations。
-- latency：不含 embedding 的 Qdrant query P50/P95。
+- 精準問答 / evidence retrieval：可只用 chunks + parent context。
+- 撰寫完整職務說明書：應讀完整 JSON，整理後再給 LLM。
+- 不把 raw JSON 原封不動塞給 LLM；應組成精簡 Markdown context。
 
 ---
 
-## 10. 參考
+## 6. Suggested Future Tools
+
+未來 MCP/API 可設計成：
+
+```python
+def suggest_candidate_jobs(
+    job_title: str | None,
+    work_description: str,
+    limit: int = 5,
+) -> list[CandidateJob]: ...
+
+def match_user_activities(
+    work_description: str,
+    candidate_ocs_codes: list[str] | None = None,
+) -> list[ActivityMatch]: ...
+
+def suggest_missing_work_tasks(
+    confirmed_ocs_codes: list[str],
+    confirmed_activities: list[str],
+) -> list[Question]: ...
+
+def suggest_knowledge_skills(
+    matched_chunk_ids: list[str],
+) -> KnowledgeSkillSummary: ...
+
+def assemble_jd_context(
+    confirmed_ocs_codes: list[str],
+    confirmed_activities: list[str],
+    include_full_json: bool = True,
+) -> str: ...
+```
+
+這些工具都屬 future service，不在 indexer repo 實作。
+
+---
+
+## 7. Evaluation Direction
+
+未來 service 評估建議：
+
+- 職務候選 top-k：使用者職務名稱 + 工作描述能否找對相關 OCS。
+- 活動 coverage：長段描述拆項後，每個活動是否命中合理 unit/block。
+- gap suggestion quality：提示是否像「可能需要確認」而不是硬說使用者漏了。
+- K/S 聚合品質：是否能合理歸納知識與技能。
+- full JSON context：產生 JD 是否比只用 top-k chunks 更完整。
+- latency：embedding + Qdrant query + parent retrieve + JSON load。
+
+---
+
+## 8. References
 
 - Qdrant hybrid queries: https://qdrant.tech/documentation/search/hybrid-queries/
 - Qdrant overview: https://qdrant.tech/documentation/overview/

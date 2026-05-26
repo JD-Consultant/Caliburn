@@ -178,9 +178,11 @@ export interface StarCase {
 
 export interface BehaviorIndicator {
   task_name: string;
+  task_id?: string;
   indicator_5w2h?: string;
   indicator_abcd?: string;
   quality_score?: number;
+  quality_status?: "ok" | "force_accepted";
 }
 
 export interface KsaItem {

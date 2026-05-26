@@ -31,6 +31,7 @@ interface DocRow {
   taskName: string;
   outputs: string[];
   indicatorTexts: string[];
+  hasQualityWarning: boolean;
   level: number;
   knowledge: string[];
   skills: string[];
@@ -67,6 +68,7 @@ function buildRows(
           taskName: tc.name,
           outputs: block.outputs.map((o) => o.name),
           indicatorTexts: block.indicators.map((p) => p.text),
+          hasQualityWarning: false,
           level: block.competency_level,
           knowledge: block.knowledge.map((k) => k.name),
           skills: block.skills.map((s) => s.name),
@@ -88,10 +90,12 @@ function buildRows(
     const unitTaskIdx = i % TASKS_PER_UNIT;
     const unitSize = Math.min(TASKS_PER_UNIT, tasks.length - unitIdx * TASKS_PER_UNIT);
 
-    const ind = indicators.find((b) => b.task_name === t.task_name);
+    const taskInds = indicators.filter((b) => b.task_name === t.task_name);
+    const ind = taskInds[0];
     const isDone = !!ind;
     const isActive = isPerTask && i === currentTaskIndex;
     const isPending = isPerTask && i > currentTaskIndex && !isDone;
+    const hasQualityWarning = taskInds.some((b) => b.quality_status === "force_accepted");
 
     // Spread K/S across tasks
     const kSlice = kList.slice(i * 2, i * 2 + 3);
@@ -108,6 +112,7 @@ function buildRows(
       taskName: t.task_name,
       outputs: t.outputs ?? [],
       indicatorTexts: ind?.indicator_5w2h ? [ind.indicator_5w2h] : [],
+      hasQualityWarning,
       level: 3,
       knowledge: kSlice,
       skills: sSlice,
@@ -281,14 +286,24 @@ export function LiveDocPanel({ profile, tasks, indicators, ksaItems, stage, curr
                       {/* Indicators */}
                       <td className={cn(tdBase)}>
                         {row.indicatorTexts.length > 0 ? (
-                          row.indicatorTexts.map((text, pi) => (
-                            <div key={pi} className="mb-1 leading-relaxed">
-                              <span className="font-mono text-[8px] text-gray-400 mr-1">
-                                P{row.taskCode.slice(1)}.{pi + 1}
+                          <>
+                            {row.hasQualityWarning && (
+                              <span
+                                className="inline-flex items-center gap-0.5 text-[8px] text-amber-600 bg-amber-50 border border-amber-200 rounded px-1 py-0.5 mb-1"
+                                title="品質分數未達標，建議人工確認"
+                              >
+                                ! 待確認
                               </span>
-                              {text}
-                            </div>
-                          ))
+                            )}
+                            {row.indicatorTexts.map((text, pi) => (
+                              <div key={pi} className="mb-1 leading-relaxed">
+                                <span className="font-mono text-[8px] text-gray-400 mr-1">
+                                  P{row.taskCode.slice(1)}.{pi + 1}
+                                </span>
+                                {text}
+                              </div>
+                            ))}
+                          </>
                         ) : row.isActive ? (
                           <><Sk /><Sk w="3/4" /><Sk w="2/3" /></>
                         ) : row.isPending ? (

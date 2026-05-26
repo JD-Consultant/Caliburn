@@ -151,17 +151,29 @@ export interface GraphState {
 }
 
 export interface Task {
+  task_id?: string;
   task_name: string;
   description?: string;
   category?: string;
   frequency?: string;
   responsibility_type?: string;
+  evidence_from_user?: string;
+  uncertainty_fields?: string[];
   situation?: string;
   purpose?: string;
+  collaborators?: string[];
   stakeholders?: string[];
+  workflow_steps?: string[];
   tools?: string[];
   outputs?: string[];
-  quality_standards?: string;
+  quality_standards?: string | string[];
+  time_standards?: string | string[];
+  icap_task_ref?: {
+    code: string;
+    name: string;
+    ocs_code: string;
+    similarity: number;
+  };
   star_case?: StarCase;
   behavior_indicator_5w2h?: string;
   behavior_indicator_abcd?: string;

@@ -166,11 +166,22 @@ uv run python -m jd_ocs_indexer.cli index tests/fixtures --rebuild   # 忽略 ma
 # Qdrant 端統計：total points + by chunk_level
 uv run python -m jd_ocs_indexer.cli stats --collection ocs_bgem3_v1
 
-# smoke-query：驗證 payload filter / 向量檢索
+# smoke-query：驗證 payload filter / 向量檢索（原始輸出，不格式化）
 uv run python -m jd_ocs_indexer.cli smoke-query --collection ocs_bgem3_v1 --ocs-code SMS2512-002v1
 uv run python -m jd_ocs_indexer.cli smoke-query --collection ocs_bgem3_v1 -k K01 -s S01
 uv run python -m jd_ocs_indexer.cli smoke-query --collection ocs_bgem3_v1 --probe-vector "AI 應用開發 部署 系統整合"
+
+# query：自然語言查詢（人類可讀輸出 + 工作路徑 + 程式碼摘要）
+uv run python -m jd_ocs_indexer.cli query "我想做AI應用部署與系統整合"
+uv run python -m jd_ocs_indexer.cli query "資料處理 ETL" --hybrid --level block --top-k 5
+uv run python -m jd_ocs_indexer.cli query "資料蒐集分析" --ocs-code SMS2512-002v1 --level unit
 ```
+
+`query` 與 `smoke-query` 的差別：
+- `smoke-query` 為驗證工具，輸出 raw（chunk_key、score、level、ocs_code），用來確認索引有沒有寫好。
+- `query` 為人類可讀的探索工具，顯示職務 / 單元 / 任務 / 區塊 breadcrumb、K/S codes、source 檔名、Markdown 摘要。預設純 dense 檢索；加 `--hybrid` 啟用 BGE-M3 dense + sparse 經 Qdrant RRF 融合。
+
+> Windows 終端機若有中文亂碼，先 `$env:PYTHONIOENCODING="utf-8"`（PowerShell）。VSCode 終端機預設就是 UTF-8。
 
 ### 4. 全量索引
 
@@ -219,6 +230,7 @@ src/jd_ocs_indexer/
   validation/
     stats.py              # source 與 collection 統計
     smoke_query.py        # by ocs_code / K/S filter / dense probe / sparse probe
+    search.py             # dense + hybrid(RRF) helpers for the `query` CLI
 ```
 
 ---

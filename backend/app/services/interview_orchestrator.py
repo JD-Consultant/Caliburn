@@ -1,6 +1,7 @@
 import json
 import logging
 from collections.abc import AsyncGenerator
+from datetime import datetime, timedelta, timezone
 from uuid import UUID
 
 from sqlalchemy import select
@@ -38,7 +39,7 @@ class InterviewOrchestrator:
         initial_state = StateService.build_initial_state(profile, phase, user_input, history)
         graph = get_interview_graph()
 
-        ai_content = ""
+        ai_messages: list[dict[str, str]] = []
         final_stage = initial_state["current_stage"]
         accumulated = dict(initial_state)
 
@@ -47,7 +48,10 @@ class InterviewOrchestrator:
                 for _node_name, node_output in event.items():
                     if node_output.get("ai_response"):
                         chunk = node_output["ai_response"]
-                        ai_content += chunk
+                        ai_messages.append({
+                            "content": chunk,
+                            "phase": node_output.get("phase") or phase,
+                        })
                         yield f"data: {json.dumps(chunk, ensure_ascii=False)}\n\n"
                     accumulated.update(node_output)
                     if "current_stage" in node_output:
@@ -60,12 +64,15 @@ class InterviewOrchestrator:
         new_graph_state = StateService.extract_persistent(accumulated)
 
         async with AsyncSessionLocal() as new_db:
-            new_db.add(InterviewSession(
-                job_profile_id=profile_id,
-                role="ai",
-                phase=accumulated.get("phase", phase),
-                content=ai_content,
-            ))
+            created_at = datetime.now(timezone.utc)
+            for index, ai_message in enumerate(ai_messages):
+                new_db.add(InterviewSession(
+                    job_profile_id=profile_id,
+                    role="ai",
+                    phase=ai_message["phase"],
+                    content=ai_message["content"],
+                    created_at=created_at + timedelta(microseconds=index),
+                ))
             await StateService.persist(new_db, profile_id, final_stage, new_graph_state)
 
         logger.info(

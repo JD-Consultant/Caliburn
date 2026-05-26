@@ -17,7 +17,7 @@ export default function InterviewPage({ params }: { params: Promise<{ id: string
   const { id } = use(params);
   const router = useRouter();
   const { data: profile, isLoading: profileLoading } = useProfile(id);
-  const { messages, isLoading: histLoading, streaming, streamBuffer, send, sendSilent } = useInterview(id);
+  const { messages, isLoading: histLoading, streaming, streamBubbles, send, sendSilent } = useInterview(id);
   const [input, setInput] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -38,7 +38,7 @@ export default function InterviewPage({ params }: { params: Promise<{ id: string
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, streamBuffer]);
+  }, [messages, streamBubbles]);
 
   const handleSend = async () => {
     const text = input.trim();
@@ -62,6 +62,9 @@ export default function InterviewPage({ params }: { params: Promise<{ id: string
   const ksaItems = profile?.graph_state?.ksa_items ?? [];
   const stage = profile?.stage ?? "basic_info";
   const isPreview = stage === "preview";
+  const visibleMessages = messages.filter(
+    (msg) => !(msg.role === "user" && msg.content === "開始訪談")
+  );
 
   const currentTaskIndex = profile?.graph_state?.current_task_index ?? 0;
   const currentTask = tasks[currentTaskIndex];
@@ -136,17 +139,16 @@ export default function InterviewPage({ params }: { params: Promise<{ id: string
                   <div className="text-xs text-muted-foreground">載入對話記錄...</div>
                 </div>
               )}
-              {messages
-                .filter((msg) => !(msg.role === "user" && msg.content === "開始訪談"))
-                .map((msg, i) => (
-                  <ChatBubble key={i} message={msg} />
-                ))}
-              {streaming && streamBuffer && (
+              {visibleMessages.map((msg, i) => (
+                <ChatBubble key={`${msg.id ?? msg.role}-${i}`} message={msg} />
+              ))}
+              {streamBubbles.map((content, i) => (
                 <ChatBubble
-                  message={{ role: "ai", content: streamBuffer }}
-                  streaming={true}
+                  key={`stream-${i}`}
+                  message={{ role: "ai", content }}
+                  streaming={streaming && i === streamBubbles.length - 1}
                 />
-              )}
+              ))}
               <div ref={bottomRef} />
             </div>
           </ScrollArea>

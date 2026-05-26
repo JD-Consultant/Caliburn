@@ -6,7 +6,7 @@ import type { InterviewMessage } from "@/types";
 export function useInterview(profileId: string) {
   const qc = useQueryClient();
   const [streaming, setStreaming] = useState(false);
-  const [streamBubbles, setStreamBubbles] = useState<string[]>([]);
+  const [streamBuffer, setStreamBuffer] = useState("");
   const abortRef = useRef<AbortController | null>(null);
 
   const { data: messages = [], isLoading } = useQuery({
@@ -27,27 +27,25 @@ export function useInterview(profileId: string) {
       }
 
       setStreaming(true);
-      setStreamBubbles([]);
+      setStreamBuffer("");
 
       try {
-        const aiBubbles: string[] = [];
+        let full = "";
         for await (const chunk of streamChat(profileId, content, phase)) {
-          if (!chunk.trim()) continue;
-          aiBubbles.push(chunk);
-          setStreamBubbles([...aiBubbles]);
+          full += chunk;
+          setStreamBuffer(full);
         }
-        // Flush streamed stage messages into history and refresh profile
-        setStreamBubbles([]);
+        // Flush streamed message into history and refresh profile
         qc.setQueryData<InterviewMessage[]>(["history", profileId], (prev = []) => [
           ...prev,
-          ...aiBubbles.map((bubble) => ({ role: "ai" as const, content: bubble })),
+          { role: "ai", content: full },
         ]);
         await qc.invalidateQueries({ queryKey: ["profile", profileId] });
       } catch (err) {
         console.error("stream error", err);
       } finally {
         setStreaming(false);
-        setStreamBubbles([]);
+        setStreamBuffer("");
       }
     },
     [profileId, streaming, qc]
@@ -58,5 +56,5 @@ export function useInterview(profileId: string) {
     [send]
   );
 
-  return { messages, isLoading, streaming, streamBubbles, send, sendSilent };
+  return { messages, isLoading, streaming, streamBuffer, send, sendSilent };
 }

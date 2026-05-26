@@ -146,50 +146,192 @@ MANIFEST_PATH=.data/manifest.json
 
 ### 3. CLI
 
+所有命令共用前綴 `uv run python -m jd_ocs_indexer.cli`。也可以 `uv run jd-ocs-indexer ...`（pyproject 已註冊 entry-point）。任何命令加 `--help` 看完整選項。
+
+> Windows 終端機若有中文亂碼，先 `$env:PYTHONIOENCODING="utf-8"`（PowerShell）。VSCode 內建終端機預設就是 UTF-8。
+
+---
+
+#### `render` — JSON → Markdown chunks（不連 Qdrant）
+
+用途：人工檢查 chunk 文字、debug normalizer / renderer。
+
 ```bash
-# 只把 JSON render 成 Markdown（不連 Qdrant），人工檢查 chunk 文字
-uv run python -m jd_ocs_indexer.cli render tests/fixtures -o output/md
-
-# 來源端統計：files / units / tasks / blocks / 缺漏欄位數
-uv run python -m jd_ocs_indexer.cli stats tests/fixtures
-
-# 已知資料缺漏的健康報告（不阻斷索引）
-uv run python -m jd_ocs_indexer.cli doctor tests/fixtures --show-files 10
-
-# 完整 pipeline：reader -> normalizer -> builder -> renderer -> embed -> upsert
-uv run python -m jd_ocs_indexer.cli index tests/fixtures
-
-# 重跑會依 source_json_hash 自動 skip 未變檔案
-uv run python -m jd_ocs_indexer.cli index tests/fixtures   # 全部 skipped
-uv run python -m jd_ocs_indexer.cli index tests/fixtures --rebuild   # 忽略 manifest
-
-# Qdrant 端統計：total points + by chunk_level
-uv run python -m jd_ocs_indexer.cli stats --collection ocs_bgem3_v1
-
-# smoke-query：驗證 payload filter / 向量檢索（原始輸出，不格式化）
-uv run python -m jd_ocs_indexer.cli smoke-query --collection ocs_bgem3_v1 --ocs-code SMS2512-002v1
-uv run python -m jd_ocs_indexer.cli smoke-query --collection ocs_bgem3_v1 -k K01 -s S01
-uv run python -m jd_ocs_indexer.cli smoke-query --collection ocs_bgem3_v1 --probe-vector "AI 應用開發 部署 系統整合"
-
-# query：自然語言查詢（人類可讀輸出 + 工作路徑 + 程式碼摘要）
-uv run python -m jd_ocs_indexer.cli query "我想做AI應用部署與系統整合"
-uv run python -m jd_ocs_indexer.cli query "資料處理 ETL" --hybrid --level block --top-k 5
-uv run python -m jd_ocs_indexer.cli query "資料蒐集分析" --ocs-code SMS2512-002v1 --level unit
+uv run python -m jd_ocs_indexer.cli render <SCAN_DIR> [OPTIONS]
 ```
 
-`query` 與 `smoke-query` 的差別：
-- `smoke-query` 為驗證工具，輸出 raw（chunk_key、score、level、ocs_code），用來確認索引有沒有寫好。
-- `query` 為人類可讀的探索工具，顯示職務 / 單元 / 任務 / 區塊 breadcrumb、K/S codes、source 檔名、Markdown 摘要。預設純 dense 檢索；加 `--hybrid` 啟用 BGE-M3 dense + sparse 經 Qdrant RRF 融合。
+| 參數 / Flag | 必填 | 預設 | 說明 |
+|---|---|---|---|
+| `SCAN_DIR` | ✓ | — | 要掃描的目錄，會吃裡面所有 `*.json`。例：`tests/fixtures` 或 `S:/jd-pdf-to-json/output/0518` |
+| `-o, --output PATH` |  | `output/md` | Markdown 輸出根目錄；每份 OCS 一個子資料夾 `<ocs_code>/<chunk_key>.md` |
+| `--limit N` |  | `0` | 只處理前 N 個檔案（0 = 不限制） |
 
-> Windows 終端機若有中文亂碼，先 `$env:PYTHONIOENCODING="utf-8"`（PowerShell）。VSCode 終端機預設就是 UTF-8。
+範例：
+```bash
+uv run python -m jd_ocs_indexer.cli render tests/fixtures -o output/md
+uv run python -m jd_ocs_indexer.cli render S:/jd-pdf-to-json/output/0518 --limit 5
+```
 
-### 4. 全量索引
+---
+
+#### `stats` — 統計
+
+兩種模式：source 端（掃 JSON）或 Qdrant 端（查 collection）。可同時帶兩種。
 
 ```bash
+uv run python -m jd_ocs_indexer.cli stats [SCAN_DIR] [--collection NAME]
+```
+
+| 參數 / Flag | 必填 | 預設 | 說明 |
+|---|---|---|---|
+| `SCAN_DIR` |  | — | 給了就統計 source 端：檔數 / units / tasks / blocks / 缺漏欄位數 |
+| `--collection NAME` |  | — | 給了就統計 Qdrant collection：total points + by chunk_level |
+
+範例：
+```bash
+uv run python -m jd_ocs_indexer.cli stats tests/fixtures
+uv run python -m jd_ocs_indexer.cli stats --collection ocs_bgem3_v1
+uv run python -m jd_ocs_indexer.cli stats S:/jd-pdf-to-json/output/0518 --collection ocs_bgem3_v1
+```
+
+---
+
+#### `doctor` — 健康檢查
+
+掃描已知資料缺漏（不阻斷索引）：parse 失敗 / 缺 version / 缺 job_category / zero-block unit / multi-task group。
+
+```bash
+uv run python -m jd_ocs_indexer.cli doctor <SCAN_DIR> [--show-files N]
+```
+
+| 參數 / Flag | 必填 | 預設 | 說明 |
+|---|---|---|---|
+| `SCAN_DIR` | ✓ | — | 要掃描的目錄 |
+| `--show-files N` |  | `10` | 每類問題顯示前 N 個檔名 |
+
+範例：
+```bash
+uv run python -m jd_ocs_indexer.cli doctor S:/jd-pdf-to-json/output/0518 --show-files 20
+```
+
+---
+
+#### `index` — 完整 pipeline（write to Qdrant）
+
+reader → normalizer → builder → renderer → embed → upsert。依 `source_json_hash` 自動 skip 未變檔案。
+
+```bash
+uv run python -m jd_ocs_indexer.cli index <SCAN_DIR> [--limit N] [--rebuild]
+```
+
+| 參數 / Flag | 必填 | 預設 | 說明 |
+|---|---|---|---|
+| `SCAN_DIR` | ✓ | — | 要 index 的目錄 |
+| `--limit N` |  | `0` | 只處理前 N 個檔（0 = 不限制） |
+| `--rebuild` |  | `false` | 忽略 manifest，所有檔重新 embed + upsert |
+
+範例：
+```bash
+# fixture 端到端測試
+uv run python -m jd_ocs_indexer.cli index tests/fixtures
+
+# 重跑 → 全部 skipped
+uv run python -m jd_ocs_indexer.cli index tests/fixtures
+
+# 強制重建（換 embedding model / 改 chunk 格式時用）
+uv run python -m jd_ocs_indexer.cli index tests/fixtures --rebuild
+
+# 全量
 uv run python -m jd_ocs_indexer.cli index S:/jd-pdf-to-json/output/0518
 ```
 
-預估 ~12,869 chunks。CPU 上 BGE-M3 一個 batch (8 chunks) 約 2-3 秒，總時間估 60-90 分鐘。跑到一半中斷不會壞 — 已 upsert 的檔會寫進 `.data/manifest.json`，下次重跑自動 skip。
+---
+
+#### `smoke-query` — 索引驗證（原始輸出）
+
+只用來確認寫入是否正確，輸出格式不保證穩定。**人類查詢請用 `query`**。
+
+```bash
+uv run python -m jd_ocs_indexer.cli smoke-query --collection NAME [QUERY_OPTIONS]
+```
+
+| 參數 / Flag | 必填 | 預設 | 說明 |
+|---|---|---|---|
+| `--collection NAME` | ✓ | — | Qdrant collection 名稱 |
+| `--ocs-code CODE` |  | — | 用 payload filter 撈出該 OCS 的所有 chunk |
+| `-k, --knowledge CODE` |  | — | K-code filter（可重複）：`-k K01 -k K02` |
+| `-s, --skill CODE` |  | — | S-code filter（可重複） |
+| `--probe-vector "<text>"` |  | — | 把 text 用 BGE-M3 embed 後做 dense + sparse 雙路驗證 |
+| `--limit N` |  | `10` | 顯示前 N 筆 |
+
+範例：
+```bash
+# 撈出某個職務的所有 chunk（profile + unit + block）
+uv run python -m jd_ocs_indexer.cli smoke-query --collection ocs_bgem3_v1 --ocs-code SMS2512-002v1
+
+# 找同時涵蓋 K01 + S01 的 block（K 與 S 之間是 AND，同欄多個是 OR）
+uv run python -m jd_ocs_indexer.cli smoke-query --collection ocs_bgem3_v1 -k K01 -s S01
+
+# 驗證 dense + sparse 都寫進去了
+uv run python -m jd_ocs_indexer.cli smoke-query --collection ocs_bgem3_v1 --probe-vector "AI 應用開發 部署 系統整合"
+```
+
+---
+
+#### `query` — 自然語言查詢（人類可讀）
+
+包裝 BGE-M3 + Qdrant 給人探索用。輸出含分數、chunk level、能力等級、職務→單元→任務→區塊 breadcrumb、K/S codes、source 檔名、Markdown 摘要。
+
+```bash
+uv run python -m jd_ocs_indexer.cli query "<TEXT>" [OPTIONS]
+```
+
+| 參數 / Flag | 必填 | 預設 | 說明 |
+|---|---|---|---|
+| `TEXT` | ✓ | — | 自然語言查詢文字（用引號括起來） |
+| `--collection NAME` |  | `.env` 的 `QDRANT_COLLECTION` | 指定 collection 覆寫預設 |
+| `-l, --level LEVEL` |  | 不限 | `profile` / `unit` / `block`；只看某一層 |
+| `--ocs-code CODE` |  | 不限 | 鎖定特定職務（找它底下的 unit / block） |
+| `-k, --top-k N` |  | `10` | 顯示前 N 筆 |
+| `-H, --hybrid` |  | `false` | 啟用 dense + sparse RRF 融合（適合精確術語混語意的查詢） |
+| `--text-lines N` |  | `4` | 每筆顯示幾行 Markdown 摘要（0 = 只顯示 metadata 不顯示 body） |
+
+策略建議：
+- **找候選職務**：`--level profile --top-k 5`
+- **找具體能力 / 工作活動**：`--level block --hybrid`
+- **查特定職務的標準任務**：`--ocs-code XXX --level unit`
+- **長段工作描述**：拆成多個短查詢分別跑，再交集 / 排序（v1 indexer 不做這件事，由未來 service 負責）
+
+範例：
+```bash
+# 從職務描述找最相關的具體能力
+uv run python -m jd_ocs_indexer.cli query "我會用 SQL 清理資料並做 Power BI 報表" --level block --hybrid --top-k 5
+
+# 找候選職務
+uv run python -m jd_ocs_indexer.cli query "AI 導入規劃" --level profile --top-k 3
+
+# 鎖定一個職務看它的工作任務
+uv run python -m jd_ocs_indexer.cli query "資料蒐集分析" --ocs-code SMS2512-002v1 --level unit
+
+# 只看 metadata 不顯示 Markdown 摘要
+uv run python -m jd_ocs_indexer.cli query "AI 部署" --text-lines 0
+```
+
+#### `query` 與 `smoke-query` 差別
+
+| | `smoke-query` | `query` |
+|---|---|---|
+| 用途 | 索引驗證 | 人類探索 |
+| 輸入 | code filter / probe text | 自然語言 |
+| 輸出 | raw（chunk_key、score） | breadcrumb + K/S + 摘要 |
+| 融合 | dense / sparse 各跑一次 | 預設 dense；`--hybrid` 走 Qdrant RRF |
+| 穩定性 | 不保證輸出格式穩定 | 主要使用介面，會盡量穩 |
+
+### 4. 全量索引時間估計
+
+`index S:/jd-pdf-to-json/output/0518` 預估 ~12,869 chunks。CPU 上 BGE-M3 一個 `INDEX_BATCH_SIZE=64` 約 28-40 秒，總時間估 **80-100 分鐘**。GPU 上會快 10-20 倍。
+
+跑到一半中斷不會壞 — 每一 batch upsert 成功會更新 `.data/manifest.json`，下次重跑自動 skip 已完成的檔案。
 
 ### 5. v1 fixture acceptance（已驗證）
 

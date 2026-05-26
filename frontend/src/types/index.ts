@@ -201,10 +201,28 @@ export interface IcapCandidate {
 
 export type IcapMode = "reference" | "hybrid" | "company_defined";
 
+export type AiMessageKind = "summary" | "question" | "status" | "error";
+
+export interface InterviewMessageMeta {
+  kind?: AiMessageKind;
+  stage?: Stage;
+  node?: string;
+}
+
 export interface InterviewMessage {
   id?: string;
   role: "user" | "ai";
   content: string;
   phase?: string;
+  extra_data?: InterviewMessageMeta;
   created_at?: string;
+}
+
+export interface AiStreamMessage {
+  type?: "message";
+  kind: AiMessageKind;
+  stage?: Stage;
+  phase?: string;
+  node?: string;
+  content: string;
 }

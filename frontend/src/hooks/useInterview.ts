@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getHistory, streamChat } from "@/lib/api";
 import type { InterviewMessage } from "@/types";
@@ -6,8 +6,7 @@ import type { InterviewMessage } from "@/types";
 export function useInterview(profileId: string) {
   const qc = useQueryClient();
   const [streaming, setStreaming] = useState(false);
-  const [streamBuffer, setStreamBuffer] = useState("");
-  const abortRef = useRef<AbortController | null>(null);
+  const [streamMessages, setStreamMessages] = useState<InterviewMessage[]>([]);
 
   const { data: messages = [], isLoading } = useQuery({
     queryKey: ["history", profileId],
@@ -27,25 +26,36 @@ export function useInterview(profileId: string) {
       }
 
       setStreaming(true);
-      setStreamBuffer("");
+      setStreamMessages([]);
 
       try {
-        let full = "";
-        for await (const chunk of streamChat(profileId, content, phase)) {
-          full += chunk;
-          setStreamBuffer(full);
+        const aiMessages: InterviewMessage[] = [];
+        for await (const event of streamChat(profileId, content, phase)) {
+          if (!event.content.trim()) continue;
+          aiMessages.push({
+            role: "ai",
+            content: event.content,
+            phase: event.phase,
+            extra_data: {
+              kind: event.kind,
+              stage: event.stage,
+              node: event.node,
+            },
+          });
+          setStreamMessages([...aiMessages]);
         }
-        // Flush streamed message into history and refresh profile
+        // Flush streamed stage messages into history and refresh profile
+        setStreamMessages([]);
         qc.setQueryData<InterviewMessage[]>(["history", profileId], (prev = []) => [
           ...prev,
-          { role: "ai", content: full },
+          ...aiMessages,
         ]);
         await qc.invalidateQueries({ queryKey: ["profile", profileId] });
       } catch (err) {
         console.error("stream error", err);
       } finally {
         setStreaming(false);
-        setStreamBuffer("");
+        setStreamMessages([]);
       }
     },
     [profileId, streaming, qc]
@@ -56,5 +66,5 @@ export function useInterview(profileId: string) {
     [send]
   );
 
-  return { messages, isLoading, streaming, streamBuffer, send, sendSilent };
+  return { messages, isLoading, streaming, streamMessages, send, sendSilent };
 }

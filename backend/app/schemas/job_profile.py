@@ -121,6 +121,7 @@ class InterviewMessageOut(BaseModel):
     role: str
     content: str
     phase: str
+    extra_data: Optional[dict] = None
     created_at: datetime
 
     model_config = {"from_attributes": True}

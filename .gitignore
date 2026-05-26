@@ -216,3 +216,15 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# jd-ocs-indexer project-specific
+.data/
+output/
+manifest.json
+failed_files.jsonl
+failed_chunks.jsonl
+models/
+.model_cache/
+
+# Claude Code local agent state
+.claude/

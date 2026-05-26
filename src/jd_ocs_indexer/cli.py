@@ -23,7 +23,7 @@ from jd_ocs_indexer.ingestion.renderer import MarkdownRenderer
 from jd_ocs_indexer.models.chunk import ChunkRecord, EmbeddedChunk
 from jd_ocs_indexer.store.qdrant_client import make_client
 from jd_ocs_indexer.store.writer import QdrantWriter
-from jd_ocs_indexer.validation import smoke_query, stats as stats_mod
+from jd_ocs_indexer.validation import search as search_mod, smoke_query, stats as stats_mod
 
 app = typer.Typer(
     add_completion=False,
@@ -399,6 +399,131 @@ def smoke_query_cmd(
                 limit=limit,
             )
             _print_hits(f"sparse probe: {probe_vector!r}", sparse_hits)
+
+
+# ---------- query ----------
+
+
+@app.command()
+def query(
+    text: str = typer.Argument(..., help="Natural-language query."),
+    collection: Optional[str] = typer.Option(None, "--collection"),
+    level: Optional[str] = typer.Option(
+        None, "--level", "-l",
+        help="Filter chunk level: profile / unit / block.",
+    ),
+    ocs_code: Optional[str] = typer.Option(None, "--ocs-code"),
+    top_k: int = typer.Option(10, "--top-k", "-k"),
+    hybrid: bool = typer.Option(
+        False, "--hybrid", "-H",
+        help="Use dense+sparse RRF fusion instead of dense-only.",
+    ),
+    text_lines: int = typer.Option(
+        4, "--text-lines",
+        help="Number of body lines to show per hit (0 = no body).",
+    ),
+) -> None:
+    """Run a natural-language query against the indexed collection."""
+    settings = load_settings()
+    coll = collection or settings.qdrant_collection
+    client = make_client(url=settings.qdrant_url, api_key=settings.qdrant_api_key)
+
+    from jd_ocs_indexer.embeddings.bge_m3 import BGEM3Embedder
+
+    embedder = BGEM3Embedder(
+        model_name=settings.bge_m3_model,
+        device=settings.bge_m3_device,
+        use_fp16=settings.bge_m3_use_fp16,
+        batch_size=1,
+    )
+    vec = embedder.embed_query(text)
+
+    if hybrid:
+        hits = search_mod.hybrid_search(
+            client,
+            coll,
+            vec.dense,
+            vec.sparse.indices if vec.sparse else [],
+            vec.sparse.values if vec.sparse else [],
+            level=level,
+            ocs_code=ocs_code,
+            limit=top_k,
+        )
+        mode = "hybrid"
+    else:
+        hits = search_mod.dense_search(
+            client,
+            coll,
+            vec.dense,
+            level=level,
+            ocs_code=ocs_code,
+            limit=top_k,
+        )
+        mode = "dense"
+
+    console.print(
+        f"[bold]query[/bold]={text!r}  [dim]mode={mode}  collection={coll}  "
+        f"level={level or '*'}  ocs_code={ocs_code or '*'}  top_k={top_k}[/dim]"
+    )
+    if not hits:
+        console.print("[yellow]no hits[/yellow]")
+        return
+
+    for i, h in enumerate(hits, start=1):
+        _print_query_hit(i, h, text_lines=text_lines)
+
+
+def _print_query_hit(idx: int, hit, text_lines: int) -> None:
+    p = hit.payload
+    score = f"{hit.score:.4f}" if hit.score is not None else "-"
+    level_color = {"profile": "magenta", "unit": "cyan", "block": "green"}.get(
+        hit.chunk_level, "white"
+    )
+    head = (
+        f"[bold][{idx}][/bold] [dim]score=[/dim]{score}  "
+        f"[{level_color}]{hit.chunk_level}[/{level_color}]  "
+        f"[dim]ocs=[/dim]{hit.ocs_code}"
+    )
+    cl = p.get("competency_level")
+    if cl is not None:
+        head += f"  [dim]L{cl}[/dim]"
+    console.print(head)
+
+    breadcrumb_parts: list[str] = [hit.job_title or "?"]
+    if p.get("unit_title"):
+        unit_id = p.get("unit_id") or ""
+        breadcrumb_parts.append(f"{unit_id} {p['unit_title']}".strip())
+    task_titles = p.get("task_titles") or []
+    if task_titles:
+        task_ids = p.get("task_ids") or []
+        tid = task_ids[0] if task_ids else ""
+        breadcrumb_parts.append(f"{tid} {task_titles[0]}".strip())
+    if p.get("block_title"):
+        breadcrumb_parts.append(p["block_title"])
+    console.print("    [dim]path:[/dim] " + " / ".join(breadcrumb_parts))
+
+    k = p.get("k_codes") or []
+    s = p.get("s_codes") or []
+    if k or s:
+        console.print(
+            "    [dim]codes:[/dim] "
+            + (f"K={','.join(k)}" if k else "")
+            + ("  " if k and s else "")
+            + (f"S={','.join(s)}" if s else "")
+        )
+
+    src = p.get("source_file")
+    if src:
+        console.print(f"    [dim]src:[/dim] {src}")
+
+    if text_lines > 0:
+        body = (p.get("text") or "").strip().splitlines()
+        # Skip the title line (always `# job_title (ocs_code)`)
+        body_lines = [ln for ln in body[1:] if ln.strip()][:text_lines]
+        if body_lines:
+            for ln in body_lines:
+                console.print(f"    [dim]│[/dim] {ln}")
+    console.print()
 
 
 def _print_hits(title: str, hits: list) -> None:

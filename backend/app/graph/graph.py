@@ -38,6 +38,12 @@ from app.graph.state import InterviewState
 
 _CONFIRM_KEYWORDS = {"確認", "好", "對", "沒問題", "ok", "OK", "可以", "繼續", "正確", "yes", "Yes"}
 
+
+def _is_pure_confirmation(text: str) -> bool:
+    cleaned = text.strip().rstrip("！!。，, ")
+    return cleaned in _CONFIRM_KEYWORDS or cleaned.lower() in {"ok", "yes"}
+
+
 def route_after_task_extraction(state: InterviewState) -> str:
     """
     第一輪：萃取後展示給用戶，停在 task_extraction 等確認。
@@ -53,8 +59,8 @@ def route_after_task_extraction(state: InterviewState) -> str:
     # 看最後一條 user 訊息是否為確認語
     user_msgs = [m for m in state.get("messages", []) if m.get("role") == "user"]
     if user_msgs:
-        last_user = user_msgs[-1]["content"].strip()
-        if any(kw in last_user for kw in _CONFIRM_KEYWORDS):
+        last_user = user_msgs[-1]["content"]
+        if _is_pure_confirmation(last_user):
             return "star"
 
     # 用戶提出修正，重新萃取後再等確認

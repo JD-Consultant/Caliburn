@@ -23,12 +23,19 @@ interface Props {
 }
 
 const FIELD_LABEL: Record<string, string> = {
+  category: "任務類型",
+  frequency: "頻率",
+  responsibility_type: "責任類型",
+  evidence_from_user: "原話證據",
   situation: "情境",
   purpose: "目的",
+  collaborators: "協作對象",
   stakeholders: "相關人員",
+  workflow_steps: "流程步驟",
   tools: "工具",
   outputs: "產出",
   quality_standards: "品質標準",
+  time_standards: "時效標準",
 };
 
 const SIGNAL_SHORT: Record<string, string> = {
@@ -352,7 +359,29 @@ export function TaskPanel({
                         ) : null;
                       })()}
 
-                    {/* Missing fields (task_extraction / non-per-task stages) */}
+                    {/* Extraction uncertainty fields */}
+                    {!stageStatus &&
+                      task.uncertainty_fields &&
+                      task.uncertainty_fields.length > 0 && (
+                        <div className="pt-2">
+                          <p className="text-[10px] text-muted-foreground mb-1">
+                            待確認
+                          </p>
+                          <div className="flex flex-wrap gap-1">
+                            {task.uncertainty_fields.map((f) => (
+                              <Badge
+                                key={f}
+                                variant="outline"
+                                className="text-[10px] px-1.5 py-0 h-4 text-amber-600 border-amber-200"
+                              >
+                                {FIELD_LABEL[f] ?? f}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                    {/* Missing fields (deep interview stages) */}
                     {!stageStatus &&
                       task.missing_fields &&
                       task.missing_fields.length > 0 && (
@@ -377,6 +406,11 @@ export function TaskPanel({
                     {task.category && (
                       <p className="text-[11px] text-muted-foreground pt-1">
                         類別：{task.category}
+                      </p>
+                    )}
+                    {task.evidence_from_user && (
+                      <p className="text-[11px] text-muted-foreground pt-1 line-clamp-2">
+                        依據：「{task.evidence_from_user}」
                       </p>
                     )}
                   </div>

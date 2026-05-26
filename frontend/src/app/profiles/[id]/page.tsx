@@ -9,6 +9,7 @@ import { ProgressTracker } from "@/components/interview/ProgressTracker";
 import { IcapBadges } from "@/components/interview/IcapBadges";
 import { ChatBubble } from "@/components/interview/ChatBubble";
 import { LiveDocPanel } from "@/components/interview/LiveDocPanel";
+import { StageGuide } from "@/components/interview/StageGuide";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Send, BriefcaseIcon, FileText, CheckCircle2 } from "lucide-react";
@@ -17,7 +18,7 @@ export default function InterviewPage({ params }: { params: Promise<{ id: string
   const { id } = use(params);
   const router = useRouter();
   const { data: profile, isLoading: profileLoading } = useProfile(id);
-  const { messages, isLoading: histLoading, streaming, streamBuffer, send, sendSilent } = useInterview(id);
+  const { messages, isLoading: histLoading, streaming, streamMessages, send, sendSilent } = useInterview(id);
   const [input, setInput] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -34,11 +35,11 @@ export default function InterviewPage({ params }: { params: Promise<{ id: string
       autoStarted.current = true;
       sendSilent("開始訪談");
     }
-  }, [profileLoading, histLoading, messages.length, profile?.stage, send]);
+  }, [profileLoading, histLoading, messages.length, profile?.stage, sendSilent]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, streamBuffer]);
+  }, [messages, streamMessages]);
 
   const handleSend = async () => {
     const text = input.trim();
@@ -62,6 +63,7 @@ export default function InterviewPage({ params }: { params: Promise<{ id: string
   const ksaItems = profile?.graph_state?.ksa_items ?? [];
   const stage = profile?.stage ?? "basic_info";
   const isPreview = stage === "preview";
+  const missingFields = profile?.graph_state?.missing_fields ?? [];
 
   const currentTaskIndex = profile?.graph_state?.current_task_index ?? 0;
   const currentTask = tasks[currentTaskIndex];
@@ -141,12 +143,13 @@ export default function InterviewPage({ params }: { params: Promise<{ id: string
                 .map((msg, i) => (
                   <ChatBubble key={i} message={msg} />
                 ))}
-              {streaming && streamBuffer && (
+              {streamMessages.map((msg, i) => (
                 <ChatBubble
-                  message={{ role: "ai", content: streamBuffer }}
-                  streaming={true}
+                  key={`stream-${i}`}
+                  message={msg}
+                  streaming={streaming && i === streamMessages.length - 1}
                 />
-              )}
+              ))}
               <div ref={bottomRef} />
             </div>
           </ScrollArea>
@@ -178,6 +181,15 @@ export default function InterviewPage({ params }: { params: Promise<{ id: string
 
           {/* Input */}
           <div className="border-t p-4 shrink-0">
+            <StageGuide
+              stage={stage}
+              currentTask={currentTask}
+              currentTaskIndex={currentTaskIndex}
+              taskCount={tasks.length}
+              missingFields={missingFields}
+              readiness={readiness}
+              streaming={streaming}
+            />
             <div className="flex gap-2 items-end">
               <textarea
                 ref={inputRef}

@@ -46,7 +46,7 @@ export async function* streamChat(
   profileId: string,
   content: string,
   phase = "general"
-): AsyncGenerator<string> {
+): AsyncGenerator<import("@/types").AiStreamMessage> {
   const res = await fetch(`${BASE}/api/v1/interviews/${profileId}/chat`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -67,13 +67,30 @@ export async function* streamChat(
     for (const line of lines) {
       if (line.startsWith("data: ")) {
         const raw = line.slice(6);
+        if (raw === "[DONE]") return;
+        let chunk:
+          | string
+          | import("@/types").AiStreamMessage
+          | { type: "error"; error: string };
         try {
-          const chunk = JSON.parse(raw) as string;
-          if (chunk === "[DONE]") return;
-          yield chunk;
+          chunk = JSON.parse(raw) as typeof chunk;
         } catch {
-          if (raw === "[DONE]") return;
-          yield raw;
+          yield { kind: "question", content: raw };
+          continue;
+        }
+        if (chunk === "[DONE]") return;
+        if (typeof chunk === "string") {
+          yield { kind: "question", content: chunk };
+        } else if (chunk.type === "error") {
+          throw new Error(chunk.error);
+        } else {
+          yield {
+            kind: chunk.kind ?? "question",
+            content: chunk.content,
+            phase: chunk.phase,
+            stage: chunk.stage,
+            node: chunk.node,
+          };
         }
       }
     }

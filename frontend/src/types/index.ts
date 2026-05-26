@@ -195,8 +195,14 @@ export interface IcapCandidate {
   icap_title: string;
   similarity: number;
   confidence: "high" | "medium" | "low";
-  recommendation: "建議參考" | "部分參考" | "低信心";
+  confidence_label?: string;
+  recommendation: "主要參考" | "可參考" | "低信心" | "建議參考" | "部分參考";
   match_reason?: string;
+  score_detail?: {
+    coverage?: number;
+    evidence_count?: number;
+    by_chunk_type?: Record<string, number>;
+  };
 }
 
 export type IcapMode = "reference" | "hybrid" | "company_defined";

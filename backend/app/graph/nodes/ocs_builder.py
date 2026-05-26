@@ -14,6 +14,29 @@ from app.services.icap_retriever import search_knowledge, search_skills, search_
 
 logger = logging.getLogger("jobintel")
 
+_ICAP_CONFIDENCE_LABEL = {
+    "high": "高信心",
+    "medium": "中信心",
+    "low": "低信心",
+}
+
+
+def _icap_confidence_label(candidate: dict) -> str:
+    return candidate.get("confidence_label") or _ICAP_CONFIDENCE_LABEL.get(
+        candidate.get("confidence", ""),
+        "未評估",
+    )
+
+
+def _icap_recommendation_label(candidate: dict) -> str:
+    return {
+        "建議參考": "主要參考",
+        "部分參考": "可參考",
+        "主要參考": "主要參考",
+        "可參考": "可參考",
+        "低信心": "低信心",
+    }.get(candidate.get("recommendation", ""), candidate.get("recommendation", ""))
+
 _OCS_BUILD_PROMPT = """\
 你是 iCAP 職能標準撰寫專家。根據下列訪談資料，生成符合 iCAP OCS 架構的職能文件。
 
@@ -549,7 +572,7 @@ async def ocs_builder_node(state: InterviewState) -> dict:
     indicators_detail = "\n".join(ind_lines) or "（未生成行為指標）"
 
     icap_ref = "\n".join(
-        f"- {c['icap_title']} ({int(c['similarity'] * 100)}%) [{c.get('confidence', '?')}]"
+        f"- {c['icap_title']} [{_icap_confidence_label(c)}] {_icap_recommendation_label(c)}"
         for c in icap_candidates
     ) or "無 iCAP 命中"
 

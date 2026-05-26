@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import { icapConfidenceLabel, icapRecommendationLabel } from "@/lib/icap";
 import {
   ArrowLeft,
   BriefcaseIcon,
@@ -185,9 +186,11 @@ export default function PreviewPage({ params }: { params: Promise<{ id: string }
                     key={c.icap_id}
                     className="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm"
                   >
-                    <span className="font-semibold">{Math.round(c.similarity * 100)}%</span>
+                    <span className="font-semibold">{icapConfidenceLabel(c)}</span>
                     {c.icap_title}
-                    <Badge variant="secondary" className="text-xs">{c.recommendation}</Badge>
+                    <Badge variant="secondary" className="text-xs">
+                      {icapRecommendationLabel(c)}
+                    </Badge>
                   </span>
                 ))}
               </div>

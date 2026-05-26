@@ -70,7 +70,7 @@ def filter_by_ks_code(
     skill: list[str] | None = None,
     limit: int = 50,
 ) -> list[Hit]:
-    musts: list[models.FieldCondition] = [
+    musts: list[models.Condition] = [
         models.FieldCondition(
             key="chunk_level",
             match=models.MatchValue(value="block"),

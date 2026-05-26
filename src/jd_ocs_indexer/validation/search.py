@@ -16,7 +16,7 @@ from jd_ocs_indexer.validation.smoke_query import Hit, _to_hit
 
 
 def _level_filter(level: str | None, ocs_code: str | None) -> models.Filter | None:
-    musts: list[models.FieldCondition] = []
+    musts: list[models.Condition] = []
     if level:
         musts.append(
             models.FieldCondition(

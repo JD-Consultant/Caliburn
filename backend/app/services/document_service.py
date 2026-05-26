@@ -76,6 +76,30 @@ _XLSX_FONT = _resolve_xlsx_font()
 
 SOURCE_LABEL = {"icap_official": "iCAP 標準", "company_defined": "企業自訂"}
 
+ICAP_CONFIDENCE_LABEL = {
+    "high": "高信心",
+    "medium": "中信心",
+    "low": "低信心",
+}
+
+
+def _icap_confidence_label(candidate: dict) -> str:
+    return candidate.get("confidence_label") or ICAP_CONFIDENCE_LABEL.get(
+        candidate.get("confidence", ""),
+        "未評估",
+    )
+
+
+def _icap_recommendation_label(candidate: dict) -> str:
+    return {
+        "建議參考": "主要參考",
+        "部分參考": "可參考",
+        "主要參考": "主要參考",
+        "可參考": "可參考",
+        "低信心": "低信心",
+    }.get(candidate.get("recommendation", ""), candidate.get("recommendation", ""))
+
+
 # display_label → (hex R, hex G, hex B) for DOCX/PDF coloring
 _LABEL_RGB = {
     "[訪談確認]": (0x05, 0x96, 0x6B),  # green
@@ -206,12 +230,12 @@ def generate_docx(profile_id: UUID, profile_data: dict) -> Path:
         table = doc.add_table(rows=1, cols=3)
         table.style = "Table Grid"
         hdr = table.rows[0].cells
-        hdr[0].text, hdr[1].text, hdr[2].text = "職業名稱", "相似度", "建議"
+        hdr[0].text, hdr[1].text, hdr[2].text = "職業名稱", "匹配信心", "參考方式"
         for c in candidates:
             row = table.add_row().cells
             row[0].text = c.get("icap_title", "")
-            row[1].text = f"{round(c.get('similarity', 0) * 100)}%"
-            row[2].text = c.get("recommendation", "")
+            row[1].text = _icap_confidence_label(c)
+            row[2].text = _icap_recommendation_label(c)
 
     # ── OCU units ──
     for unit in ocs.get("ocs_content", {}).get("ocu_units", []):
@@ -351,12 +375,12 @@ def generate_pdf(profile_id: UUID, profile_data: dict) -> Path:
     candidates = state.get("icap_candidates", [])
     if candidates:
         story.append(Paragraph("iCAP 職能基準對應", s_h1))
-        tdata = [["職業名稱", "相似度", "建議"]]
+        tdata = [["職業名稱", "匹配信心", "參考方式"]]
         for c in candidates:
             tdata.append([
                 Paragraph(c.get("icap_title", ""), s_body),
-                f"{round(c.get('similarity', 0) * 100)}%",
-                c.get("recommendation", ""),
+                _icap_confidence_label(c),
+                _icap_recommendation_label(c),
             ])
         t = Table(tdata, colWidths=[90 * mm, 25 * mm, 45 * mm])
         t.setStyle(TableStyle([

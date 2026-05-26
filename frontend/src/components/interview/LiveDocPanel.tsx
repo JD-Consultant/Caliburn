@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import { icapConfidenceLabel, icapRecommendationLabel } from "@/lib/icap";
 import type { Task, Stage, BehaviorIndicator, KsaItem, IcapCandidate, OcsDocument, JobProfile } from "@/types";
 
 interface Props {
@@ -176,7 +177,7 @@ export function LiveDocPanel({ profile, tasks, indicators, ksaItems, stage, curr
                 <tr>
                   <td className={cn(thBase, "text-left")}>iCAP 對應</td>
                   <td className={cn(tdBase)} colSpan={5}>
-                    {topCandidate.icap_title}（相似度 {Math.round(topCandidate.similarity * 100)}%・{topCandidate.confidence === "high" ? "高信心" : topCandidate.confidence === "medium" ? "中信心" : "低信心"}）
+                    {topCandidate.icap_title}（{icapConfidenceLabel(topCandidate)}・{icapRecommendationLabel(topCandidate)}）
                   </td>
                 </tr>
               )}

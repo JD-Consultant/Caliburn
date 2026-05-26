@@ -4,6 +4,7 @@ import logging
 
 from app.graph.llm_gateway import LLMGateway
 from app.graph.state import InterviewState
+from app.services.icap_matcher import match_icap_candidates
 from app.services.icap_retriever import search_tasks
 
 logger = logging.getLogger("jobintel")
@@ -125,13 +126,23 @@ async def task_extraction_node(state: InterviewState) -> dict:
     for i, task in enumerate(tasks, 1):
         task.setdefault("task_id", f"task_{i:03d}")
 
-    # 多粒度 RAG：注入 iCAP task chunk 對應
-    icap_mode = state.get("icap_mode", "company_defined")
-    top_ocs_code = (state.get("icap_candidates") or [{}])[0].get("ocs_code")
+    # 任務萃取後重新比對 iCAP，讓任務、產出、工具等細節也參與候選排序。
+    icap_match = await match_icap_candidates(
+        job_title=state["job_title"],
+        department=state.get("department", ""),
+        job_summary=state.get("job_summary", ""),
+        readiness_detail=state.get("interview_readiness_detail", {}),
+        tasks=tasks,
+    )
+    icap_mode = icap_match["icap_mode"]
+    top_ocs_code = (icap_match["candidates"] or [{}])[0].get("ocs_code")
     tasks = await _enrich_tasks_with_icap(tasks, icap_mode, top_ocs_code)
 
     return {
         "extracted_tasks": tasks,
+        "icap_candidates": icap_match["candidates"],
+        "icap_hit": icap_match["icap_hit"],
+        "icap_mode": icap_mode,
         "current_stage": "task_extraction",
         "ai_response": _build_task_summary(tasks, is_revision=prev_round >= 1),
         "current_task_index": 0,

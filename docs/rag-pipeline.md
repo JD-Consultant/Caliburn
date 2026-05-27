@@ -6,42 +6,47 @@
 職稱 + 工作摘要
       │
       ▼
-① icap_rag_node          ← RAG #1：competency 向量搜尋，決定 icap_mode
+① icap_rag_node          ← RAG #1：多粒度候選排序，決定 icap_mode
       │
       ▼
 ② interview_node         ← 無 RAG：AI 訪談，收集工作描述
       │
       ▼
-③ task_extraction_node   ← LLM 萃取任務 + RAG #2：task 向量搜尋注入 icap_task_ref
+③ task_extraction_node   ← LLM 萃取任務 + RAG #2：task 向量搜尋注入 icap_task_ref，並用任務證據重算 iCAP 信心
       │
       ▼
-④ five_w2h_node          ← 逐欄追問 5W2H + RAG #3：output 向量搜尋提示產出
+④ responsibility_grouping_node ← 主要職責分組；iCAP 只作命名風格參考
       │
       ▼
 ⑤ star_node              ← 無 RAG：收集 STAR 案例
       │
       ▼
-⑥ indicator_node         ← RAG #4：indicator 向量搜尋提供指標範本
+⑥ five_w2h_node          ← 逐欄追問 5W2H + RAG #3：依欄位提供 iCAP 參考提示泡泡
       │
       ▼
-⑦ ocs_builder_node       ← LLM 建 OCS 文件 + RAG #5/#6/#7：K/S/A 代碼對照
+⑦ indicator_node         ← RAG #4：indicator 向量搜尋提供措辭參考
+      │
+      ▼
+⑧ ocs_builder_node       ← LLM 建 OCS 文件 + RAG #5/#6/#7：K/S/A 代碼對照
 ```
 
 ---
 
 ## 二、RAG 觸發點逐一說明
 
-### RAG #1 — `icap_rag_node`：職稱命中判斷
+### RAG #1 — `icap_rag_node`：iCAP 候選信心判斷
 
 **觸發**：流程起點，使用者輸入職稱 + 部門 + 工作摘要後立即執行。
 
 **查詢**：
 ```
 query      = "{job_title} {department} {job_summary}"
-chunk_type = "competency"
+chunk_type = "competency" + "unit"
 ```
 
-**結果**：依 cosine similarity 決定 `icap_mode`，影響後續**所有** RAG 是否啟動：
+`task_extraction_node` 完成任務萃取後會再次呼叫 `match_icap_candidates()`，加入 `task` / `output` / `indicator` 證據重算候選職種信心。
+
+**結果**：依 weighted similarity 決定 `icap_mode`，影響後續**所有** RAG 是否啟動：
 
 | similarity | icap_mode | 後續行為 |
 |---|---|---|
@@ -49,7 +54,9 @@ chunk_type = "competency"
 | ≥ 0.55 | `hybrid` | icap_official 與 company_defined 均衡 |
 | < 0.55 | `company_defined` | 跳過所有 iCAP 注入 |
 
-**輸出至 state**：`icap_candidates`（含 ocs_code）、`icap_mode`、`icap_hit`
+**輸出至 state**：`icap_candidates`（含 ocs_code、confidence_label、score_detail）、`icap_mode`、`icap_hit`
+
+> 這裡的數值是 retrieval confidence，不是「準確率百分比」。目前不使用職稱關鍵字硬性降權；百工百業的匹配品質後續應靠 reranker / judge 與任務證據覆蓋提升。
 
 ---
 
@@ -79,24 +86,24 @@ ocs_code_filter = top_ocs_code   ← 縮窄到命中職種
 
 ---
 
-### RAG #3 — `five_w2h_node`：產出欄位填寫建議
+### RAG #3 — `five_w2h_node`：5W2H 欄位參考提示
 
-**觸發**：追問 `outputs` 欄位時，且 `icap_mode != company_defined`。
+**觸發**：追問 `workflow_steps`, `tools`, `outputs`, `quality_standards` 欄位時，且 `icap_mode != company_defined`。
 
 **查詢**：
 ```
-query           = "{task_name} 工作產出"
-chunk_type      = "output"
+query           = "{task_name} {欄位語意}"
+chunk_type      = "task" | "output" | "indicator" | "knowledge" | "skill"
 top_k           = 3
 ocs_code_filter = top_ocs_code
 ```
 
-**結果**：拼成提示文字附在問題後方：
+**結果**：以獨立 `kind="reference"` SSE 訊息送到前端，再送出 `kind="question"` 的正式問題：
 ```
 （iCAP 參考：此類職務常見產出包含 維護報告、效能基準文件、備份日誌，可參考或自行描述）
 ```
 
-**用途**：引導使用者填出符合 iCAP 規格的產出項，降低空白率。
+**用途**：提供工作者可忽略的參考，降低空白率；不把 iCAP 當成固定答案。
 
 ---
 
@@ -119,7 +126,7 @@ iCAP 參考指標範例（措辭參考，勿直接複製）：
   - 監控資料庫效能指標並於閾值異常時回報
 ```
 
-**用途**：統一 5W2H / ABCD 指標的措辭風格與 P/O code 格式，LLM 參考語氣但不直接複製。
+**用途**：讓 LLM 參考措辭風格與 P/O code 格式，但不直接複製。行為指標要呈現企業內部知識體系，不能被壓成官方基準式短句。
 
 ---
 
@@ -171,7 +178,7 @@ LIMIT :k
 
 ## 四、icap_mode 對各 RAG 的影響
 
-| icap_mode | RAG #2 task | RAG #3 output | RAG #4 indicator | RAG #5/#6/#7 K/S/A |
+| icap_mode | RAG #2 task | RAG #3 5W2H hints | RAG #4 indicator | RAG #5/#6/#7 K/S/A |
 |---|---|---|---|---|
 | `reference` | ✅ 執行 | ✅ 執行 | ✅ 執行 | ✅ icap_official 為主 |
 | `hybrid` | ✅ 執行 | ✅ 執行 | ✅ 執行 | ✅ icap_official + company_defined 混合 |
@@ -185,6 +192,6 @@ LIMIT :k
 |---|---|---|
 | 單段式檢索，`top_k=1` 直接信任第一名 | K/S/A 代碼可能對錯 | `ocs_builder_node` |
 | 無 reranker | `task_extraction` 的 `icap_task_ref` 精準度依賴 cosine | `task_extraction_node` |
-| `unit` / `notes` chunk 尚未接入 | 訪談無法注入職能單元參考與學歷要求 | P2 backlog |
+| `unit` 已用於候選排序但尚未注入訪談 prompt；`notes` 尚未接入 | 訪談無法直接提示職能單元與學歷要求 | P2 backlog |
 | `icap_standards` 主資料表缺失 | 無法做版本管理與資料品質警告 | 第六階段規劃 |
 | embedding model 版本未記錄 | 模型升版後舊向量不可比較 | 第六階段規劃 |

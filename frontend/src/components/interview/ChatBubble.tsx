@@ -45,6 +45,7 @@ export function ChatBubble({ message, streaming }: Props) {
 const KIND_LABEL: Record<AiMessageKind, string> = {
   summary: "整理結果",
   question: "下一個問題",
+  reference: "參考提示",
   status: "處理狀態",
   error: "錯誤",
 };
@@ -52,6 +53,7 @@ const KIND_LABEL: Record<AiMessageKind, string> = {
 const KIND_STYLE: Record<AiMessageKind, string> = {
   summary: "border border-emerald-200 bg-emerald-50 text-emerald-950 dark:border-emerald-900 dark:bg-emerald-950/20 dark:text-emerald-50",
   question: "bg-muted text-foreground",
+  reference: "border border-sky-200 bg-sky-50 text-sky-950 dark:border-sky-900 dark:bg-sky-950/20 dark:text-sky-50",
   status: "border border-amber-200 bg-amber-50 text-amber-950 dark:border-amber-900 dark:bg-amber-950/20 dark:text-amber-50",
   error: "border border-destructive/30 bg-destructive/10 text-destructive",
 };

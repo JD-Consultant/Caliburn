@@ -2,7 +2,7 @@
 
 > 基於 2026-05-19 系統架構 Review 整理；2026-05-20 重排優先序。  
 > **P0 已於 2026-05-20 全部完成。** **第一〜四階段已於 2026-05-20 全部完成。** 系統現況：工作者完整 Demo Flow 骨架已打通，8 個關鍵 Bug 已修復（含 STAR 無限迴圈、AI phase 持久化、task_id 流程鍵），Schema 已穩定，可進入測試。  
-> **現階段主線**：讓單一工作者可從建立職務 → AI 訪談 → 任務確認 → STAR/5W2H → OCS 預覽 → 匯出，完整跑通。JWT / 企業權限不是現在重點。
+> **現階段主線**：讓單一工作者可從建立職務 → AI 訪談 → 任務確認 → 主要職責分組 → STAR/5W2H → OCS 預覽 → 匯出，完整跑通。JWT / 企業權限不是現在重點。
 
 ## 系統定位
 
@@ -15,7 +15,7 @@
 | 單次輸入、單次生成 | 逐步訪談、萃取、補洞、生成、驗證、匯出的流程系統 |
 | 只產出文件 | 沉澱任務、流程、工具、產出、行為指標、K/S/A 的知識庫 |
 
-**產品核心鏈條**：工作者原話 → 任務萃取 → STAR 證據 → 5W2H 完整度 → 行為指標 → iCAP 對應 → OCS 文件 → 可追溯匯出
+**產品核心鏈條**：工作者原話 → 任務萃取 → 主要職責分組 → STAR 證據 → 5W2H 完整度 → 行為指標 → iCAP 對應 → OCS 文件 → 可追溯匯出
 
 ---
 
@@ -68,7 +68,7 @@
 |---|------|------|---------|
 | ✅ 11 | `GET /job-profiles/{id}/state` | 頁面重整後恢復階段、readiness score、document_ready | [api.md](./api.md) |
 | ✅ 12 | `GET /documents/{profile_id}/preview` | 取得預覽版 OCS JSON（含 quality_scores） | [api.md](./api.md) |
-| ⏸ 13 | `POST /tasks/{id}/confirm` | 任務萃取確認，推進至 STAR（延後；目前由前端按鈕 + chat 流程處理） | [api.md](./api.md) |
+| ⏸ 13 | `POST /tasks/{id}/confirm` | 任務萃取確認，推進至主要職責分組（延後；目前由前端按鈕 + chat 流程處理） | [api.md](./api.md) |
 | ⏸ 14 | `POST /tasks/{id}/regenerate-indicator` | 修改 5W2H 後重生單一任務行為指標（延後） | [api.md](./api.md) |
 | ✅ 15 | `POST /documents/{id}/freeze` | Preview 後鎖定文件版本；設 stage="preview"（terminal state） | [api.md](./api.md) |
 
@@ -161,11 +161,22 @@
 
 ---
 
+## 第九階段 — 訪談結構與 iCAP 參考優化（2026-05-27 完成）
+
+| # | 項目 | 說明 |
+|---|------|------|
+| ✅ 33 | **主要職責分組節點** | 任務萃取確認後先整理 `主要職責 → 工作任務`，使用者確認後才進入 STAR；OCS builder 以確認後分組決定 OCU。 |
+| ✅ 34 | **SSE 多泡泡訊息** | Graph node 可輸出 `ai_messages`；5W2H 的 iCAP 參考提示與正式提問分成 `reference` / `question` 兩個泡泡。 |
+| ✅ 35 | **5W2H iCAP 參考提示擴充** | `workflow_steps`, `tools`, `outputs`, `quality_standards` 可依 iCAP 候選提供參考提示，但使用者實際工作內容仍是主資料。 |
+| ✅ 36 | **iCAP 信心語意整理** | iCAP 對應以高/中/低信心與 `reference` / `hybrid` / `company_defined` 呈現，不把檢索分數包裝成準確率；暫不採用職稱關鍵字硬性降權。 |
+
+---
+
 ## P2 — 產品成熟期
 
-- **RAG 輔助訪談問題**：`interview_node` 在 RAG #1 命中後，將 iCAP unit chunk（職能單元）注入 system prompt，讓 LLM 知道此職種官方認定應有哪些工作面向，訪談時主動問出工作者未提及的任務，而非完全靠工作者自述；`company_defined` 模式亦可注入相似度最高的 top-N 候選作為軟參考。目前 `interview_node` 完全無 RAG，`five_w2h_node` 僅 `outputs` 欄位有 RAG #3 注入，其餘欄位（`situation`、`purpose`、`workflow_steps`、`quality_standards`、`time_standards`）皆無。
+- **RAG 輔助訪談問題**：`interview_node` 在 RAG #1 命中後，將 iCAP unit chunk（職能單元）注入 system prompt，讓 LLM 知道此職種官方認定應有哪些工作面向，訪談時主動問出工作者未提及的任務，而非完全靠工作者自述；`company_defined` 模式亦可注入相似度最高的 top-N 候選作為軟參考。目前 `interview_node` 完全無 RAG，`five_w2h_node` 已針對 `workflow_steps`、`tools`、`outputs`、`quality_standards` 提供參考提示，但 `situation`、`purpose`、`stakeholders`、`time_standards` 尚未接入。
 - iCAP 多粒度 RAG 完整接入（unit / notes chunk）
-- Reranker（提升 iCAP RAG 精準度）
+- Reranker / judge（提升 iCAP 候選信心，不靠職稱字面規則硬切）
 - 任務自動合併與去重 UI
 - 企業自建職能基準庫（讓系統越用越準）
 - 多職務比較（同部門不同職等）

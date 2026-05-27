@@ -13,6 +13,7 @@
 | 態度 | `A01`, `A02` | A = Attitude |
 
 K/S 去重邏輯：以 `name` 為 key，同一份文件內相同名稱只保留一個代碼，所有任務引用同一個代碼物件。
+OCU 主要職責優先使用使用者確認過的 `graph_state.responsibility_groups`；若沒有分組資料，才由 OCS builder 依任務內容 fallback 分組。
 
 ---
 

@@ -18,6 +18,7 @@ const STAGE_LABEL: Record<Stage, string> = {
   icap_ref: "iCAP 比對",
   interview: "基本訪談",
   task_extraction: "任務萃取",
+  responsibility_grouping: "主要職責",
   star: "STAR 深訪",
   five_w2h: "5W2H 補充",
   indicator: "行為指標",

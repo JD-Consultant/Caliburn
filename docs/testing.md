@@ -54,7 +54,7 @@ python -m scripts.test_full_interview
 **流程覆蓋**：
 ```
 basic_info → icap_rag → interview（3 輪）
-→ task_extraction（確認） → star（STAR 四槽）
+→ task_extraction（確認） → responsibility_grouping（確認） → star（STAR 四槽）
 → five_w2h（9 欄補洞） → indicator → ocs_builder → preview
 ```
 
@@ -109,10 +109,11 @@ cd frontend && npm run dev
 
 1. **新增職務** — 填寫職稱、部門、工作摘要
 2. **訪談** — 描述工作內容，直到出現「整理任務清單」提示
-3. **確認任務清單** — 說「確認」後進入 STAR 追問
-4. **STAR + 5W2H** — 依提示回答每個任務
-5. **行為指標生成** — 確認指標品質評分 ≥ 0.60
-6. **預覽頁** — 確認 OCS 文件結構正確，匯出 DOCX / PDF
+3. **確認任務清單** — 說「確認」後進入主要職責分組
+4. **確認主要職責分組** — 檢查 `主要職責 → 工作任務` 是否合理；正確則說「確認」，需要調整則直接描述移動方式
+5. **STAR + 5W2H** — 依提示回答每個任務；若出現 iCAP 參考提示，應和正式問題分成兩個 AI 泡泡
+6. **行為指標生成** — 確認指標品質評分 ≥ 0.60
+7. **預覽頁** — 確認 OCS 文件結構正確，匯出 DOCX / PDF
 
 ---
 

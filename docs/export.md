@@ -46,9 +46,9 @@ OCS 文件結構見 [ocs-schema.md](./ocs-schema.md)。
 
 ### 文件結構
 1. **標題**：職稱（Heading 1）
-2. **基本資訊表**：部門、OCS 代碼、iCAP 命中基準（最高相似度）
+2. **基本資訊表**：部門、OCS 代碼、iCAP 候選信心（高/中/低信心）
 3. **職務描述**：`ocs_profile.job_description`
-4. **iCAP 對應**：候選清單（相似度 + 職稱 + 推薦等級）
+4. **iCAP 對應**：候選清單（信心標籤 + 職稱 + 推薦等級 + 檢索分數）
 5. **職能單元與任務**：
    - 每個 OCU 一個 Heading 2（代碼 + 名稱）
    - 每個 Task 一個 Heading 3（代碼 + 名稱）

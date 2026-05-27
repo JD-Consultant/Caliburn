@@ -73,16 +73,28 @@ async def _search_ksa(
 
 # ── K/S/A (used by ocs_builder) ───────────────────────────────────────────────
 
-async def search_knowledge(query: str, top_k: int = 1) -> list[dict]:
-    return await _search_ksa(query, "knowledge", "knowledge_code", top_k)
+async def search_knowledge(
+    query: str,
+    top_k: int = 1,
+    ocs_code_filter: str | None = None,
+) -> list[dict]:
+    return await _search_ksa(query, "knowledge", "knowledge_code", top_k, ocs_code_filter)
 
 
-async def search_skills(query: str, top_k: int = 1) -> list[dict]:
-    return await _search_ksa(query, "skill", "skill_code", top_k)
+async def search_skills(
+    query: str,
+    top_k: int = 1,
+    ocs_code_filter: str | None = None,
+) -> list[dict]:
+    return await _search_ksa(query, "skill", "skill_code", top_k, ocs_code_filter)
 
 
-async def search_attitudes(query: str, top_k: int = 1) -> list[dict]:
-    return await _search_ksa(query, "attitude", "attitude_code", top_k)
+async def search_attitudes(
+    query: str,
+    top_k: int = 1,
+    ocs_code_filter: str | None = None,
+) -> list[dict]:
+    return await _search_ksa(query, "attitude", "attitude_code", top_k, ocs_code_filter)
 
 
 # ── Task / Indicator / Output (multi-granularity RAG) ─────────────────────────

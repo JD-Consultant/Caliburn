@@ -47,12 +47,13 @@ jobintel-ai/
 │   │   │   │   ├── interview.py  # SYSTEM / TARGETED / READY
 │   │   │   │   ├── star.py       # SLOT_EXTRACT / SLOT_SYNTHESIZE
 │   │   │   │   └── indicator.py  # PER_OUTPUT / SINGLE
-│   │   │   └── nodes/            # 7 個 LangGraph 節點
-│   │   │       ├── icap_rag.py         # iCAP 職能基準 RAG（competency chunk）
+│   │   │   └── nodes/            # 8 個 LangGraph 節點
+│   │   │       ├── icap_rag.py         # iCAP 職能基準 RAG（候選職種信心判斷）
 │   │   │       ├── interview.py        # 自然訪談（含兩段式 readiness 確認）
 │   │   │       ├── task_extraction.py  # 任務萃取 + task_id 分配 + task RAG 注入
+│   │   │       ├── responsibility_grouping.py # 主要職責分組 + 使用者確認
 │   │   │       ├── star.py             # STAR slot filling（4 槽 + synthesis fallback）
-│   │   │       ├── five_w2h.py         # 5W2H 補洞（9 欄 + output RAG 提示）
+│   │   │       ├── five_w2h.py         # 5W2H 補洞（9 欄 + iCAP 參考提示泡泡）
 │   │   │       ├── indicator.py        # per-output 行為指標生成 + 品質評分
 │   │   │       └── ocs_builder.py      # OCS 文件生成 + K/S/A RAG 對應 + display_labels
 │   │   ├── services/
@@ -60,6 +61,7 @@ jobintel-ai/
 │   │   │   ├── interview_orchestrator.py  # InterviewOrchestrator：stream()，SSE + 圖執行 + 持久化
 │   │   │   ├── document_service.py   # generate_docx / generate_pdf / generate_xlsx
 │   │   │   │                         # get_enriched_export_json（含 evidence_refs / icap_reference_pack）
+│   │   │   ├── icap_matcher.py        # iCAP 候選職種信心判斷與推薦文字
 │   │   │   └── icap_retriever.py       # 6 種 RAG 函式：search_knowledge/skills/attitudes/tasks/indicators/outputs
 │   │   └── utils.py                  # safe_parse_json
 │   └── scripts/
@@ -107,23 +109,23 @@ FastAPI  interviews.py  ← 只負責 HTTP 層（驗證、存 user 訊息、回 
     │
     ▼
 InterviewOrchestrator.stream()  ← 載入歷史、組裝 InterviewState、驅動 graph、持久化
-    │  StateService.build_initial_state()  ← 從 profile.graph_state 恢復 16 個持久欄位
+    │  StateService.build_initial_state()  ← 從 profile.graph_state 恢復 18 個持久欄位
     ▼
 LangGraph get_interview_graph()  ← lru_cache，compile 一次共用
     │  entry_router 依 current_stage 跳入對應節點
-    │  節點輸出 ai_response 逐 chunk yield 給前端
+    │  節點輸出 ai_response 或 ai_messages，逐則 yield 給前端
     │  多節點可在同一 API call 內串接（star→five_w2h→indicator→star 逐任務迴圈）
     ▼
 各 Graph Node（8 節點）
     │  呼叫 LLMGateway.invoke_text / invoke_json（含 retry）
     │  Phase.star/five_w2h(task_id).to_str() 生成 phase key
     │  TaskLoopManager 管理任務推進與 skip_completed 邏輯
-    │  icap_retriever：6 種 pgvector 向量檢索（6 個 RAG 觸發點）
+    │  icap_matcher：多粒度候選排序；icap_retriever：6 種 pgvector 查詢函式
     │  完成後 accumulated state 存回 DB
     ▼
 PostgreSQL  jobintel DB
     icap_embeddings      ← pgvector 向量表（9 種 chunk_type）
-    job_profiles         ← stage + graph_state JSONB（跨 call 持久化 16 個 key）
+    job_profiles         ← stage + graph_state JSONB（跨 call 持久化 18 個 key）
     interview_sessions   ← 完整對話歷史（含 phase 欄位）
     document_versions    ← 凍結版本（freeze 後建立）
 ```
@@ -153,10 +155,11 @@ PostgreSQL  jobintel DB
 
 ## 持久化狀態（`StateService.PERSISTENT_KEYS`）
 
-以下 16 個欄位由 `StateService` 統一管理，在每次 API call 結束後存回 `job_profiles.graph_state` JSONB：
+以下 18 個欄位由 `StateService` 統一管理，在每次 API call 結束後存回 `job_profiles.graph_state` JSONB：
 
 ```
-extracted_tasks, current_task_index, task_extraction_round, missing_fields,
+extracted_tasks, responsibility_groups, responsibility_grouping_round,
+current_task_index, task_extraction_round, missing_fields,
 star_slots_by_task, star_completed_task_ids,
 behavior_indicators, indicator_retry_counts,
 ksa_items, ocs_document,
@@ -166,8 +169,8 @@ interview_readiness_detail, interview_ready, interview_ready_confirmed
 
 | 方法 | 說明 |
 |------|------|
-| `StateService.build_initial_state(profile, phase, user_input, history)` | 從 `profile.graph_state` 恢復全部 16 個欄位，組裝完整 `InterviewState` |
-| `StateService.extract_persistent(accumulated)` | 從 graph 執行後的 accumulated dict 取出 16 個持久欄位 |
+| `StateService.build_initial_state(profile, phase, user_input, history)` | 從 `profile.graph_state` 恢復全部 18 個欄位，組裝完整 `InterviewState` |
+| `StateService.extract_persistent(accumulated)` | 從 graph 執行後的 accumulated dict 取出 18 個持久欄位 |
 | `StateService.persist(db, profile_id, stage, state)` | 更新 DB 中的 `stage` 與 `graph_state` |
 
 > AI 訊息的 `phase` 欄位以 `accumulated.get("phase", message.phase)` 寫入 DB，確保節點輸出的 phase（`"star_task_001"` 等）正確持久化，供下次呼叫的訊息過濾使用。

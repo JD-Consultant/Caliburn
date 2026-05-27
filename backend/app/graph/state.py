@@ -24,8 +24,10 @@ class InterviewState(TypedDict):
 
     # task extraction
     extracted_tasks: list[dict]
+    responsibility_groups: list[dict]
+    responsibility_grouping_round: int  # 0=not yet, 1=shown awaiting confirm, 2+=confirmed into STAR
     current_task_index: int
-    task_extraction_round: int   # 0=not yet, 1=shown awaiting confirm, 2+=confirmed into STAR
+    task_extraction_round: int   # 0=not yet, 1=shown awaiting confirm, 2+=confirmed into responsibility grouping
 
     # STAR slot filling
     star_slots_by_task: dict      # { task_id: { "S": str|None, "T": str|None, "A": str|None, "R": str|None } }

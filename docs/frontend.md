@@ -55,7 +55,7 @@
 
 **自動觸發**：頁面載入時若 `messages.length === 0 && profile.stage === "basic_info"`，自動以 `sendSilent("開始訪談")` 觸發第一次 iCAP RAG，不在聊天室顯示使用者訊息。
 
-**SSE 串流**：`useInterview` hook 呼叫 `POST /api/v1/interviews/{id}/chat`，以 `text/event-stream` 接收 AI 回應，逐 chunk 更新 `streamBuffer`，串流結束後 flush 進 `messages`。
+**SSE 串流**：`useInterview` hook 呼叫 `POST /api/v1/interviews/{id}/chat`，以 `text/event-stream` 接收結構化 AI message event。每個 event 會加入 `streamMessages` 並立即顯示成獨立泡泡；串流結束後 flush 進 `messages`。`kind="reference"` 用於 iCAP 參考提示，`kind="question"` 用於正式提問。
 
 **phase 傳遞**：
 ```
@@ -68,7 +68,7 @@ stage = "five_w2h"  → phase = "five_w2h_{task_id}"
 
 | 元件 | 說明 |
 |---|---|
-| `ChatBubble` | AI / 使用者訊息泡泡，支援 Markdown 渲染 |
+| `ChatBubble` | AI / 使用者訊息泡泡，支援 Markdown 渲染；AI 訊息依 `extra_data.kind` 顯示「整理摘要 / 提問 / 參考提示 / 狀態」 |
 | `IcapBadges` | 顯示 iCAP 候選職種命中結果（`icap_candidates`） |
 | `ProgressTracker` | 顯示整體流程進度（stage） |
 | `LiveDocPanel` | 右側 iCAP 職能基準表格（64% 寬）；以官方格式呈現：主要職責 / 工作任務 / 工作產出 / 行為指標 / 職能級別 / K知識 / S技能；未填欄位顯示 skeleton 動畫，隨訪談即時更新；OCS 文件完成後切換至完整資料 |
@@ -78,7 +78,7 @@ stage = "five_w2h"  → phase = "five_w2h_{task_id}"
 | 欄位 | 資料來源 | 狀態 |
 |---|---|---|
 | 職能基準代碼 / 名稱 | `profile.job_title` + `icap_candidates[0].ocs_code` | 訪談開始即顯示 |
-| 主要職責（T1/T2…） | `extracted_tasks`（每 2 任務合為一職責） | 任務萃取後出現 |
+| 主要職責（T1/T2…） | `responsibility_groups`；若尚未產生 OCS，Live Preview 以該分組骨架顯示 | 主要職責分組後出現 |
 | 工作任務（T1.1…） | `extracted_tasks[].task_name` | 任務萃取後出現 |
 | 工作產出（O…） | `extracted_tasks[].outputs` | 5W2H 訪談後填入 |
 | 行為指標（P…） | `behavior_indicators[].indicator_5w2h` | 指標生成後填入 |
@@ -89,7 +89,7 @@ stage = "five_w2h"  → phase = "five_w2h_{task_id}"
 
 | hook | 說明 |
 |---|---|
-| `useInterview(profileId)` | SSE 串流、訊息歷史、`send` / `sendSilent` |
+| `useInterview(profileId)` | SSE 串流、`streamMessages` 即時泡泡、訊息歷史、`send` / `sendSilent` |
 | `useProfile(profileId)` | 取得 profile 狀態（stage、graph_state），串流結束後自動 invalidate |
 
 ---
@@ -151,4 +151,4 @@ stage = "five_w2h"  → phase = "five_w2h_{task_id}"
 |---|---|
 | `["profiles", userId]` | 職務列表 |
 | `["profile", profileId]` | 單一職務（訪談結束後 invalidate） |
-| `["history", profileId]` | 對話歷史（SSE flush 後 optimistic update） |
+| `["history", profileId]` | 對話歷史（SSE message events flush 後 optimistic update） |

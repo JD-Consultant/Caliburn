@@ -125,7 +125,7 @@ async def indicator_generation_node(state: InterviewState) -> dict:
     icap_ref_section = await _get_icap_ref(task_name, task.get("purpose", ""), icap_mode, top_ocs_code)
     retry_counts.setdefault(task_id, retry_counts.pop(task_name, 0))
     icap_ref_rule = (
-        "- 若有 iCAP 參考指標，可參考其措辭風格，但內容必須以工作者的真實描述為主\n"
+        "- 若有 iCAP 參考指標，只能參考措辭風格；不得直接複製，也不得加入任務資訊中沒有的對象、工具、產出或標準\n"
         if icap_ref_section else ""
     )
 

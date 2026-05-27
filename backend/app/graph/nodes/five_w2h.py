@@ -5,9 +5,22 @@ from app.graph.constants import FIVE_W2H_LIST_FIELDS, FIVE_W2H_REQUIRED
 from app.graph.phase import Phase
 from app.graph.state import InterviewState
 from app.graph.task_loop import TaskLoopManager
-from app.services.icap_retriever import search_outputs
+from app.services.icap_retriever import (
+    search_indicators,
+    search_knowledge,
+    search_outputs,
+    search_skills,
+    search_tasks,
+)
 
 logger = logging.getLogger("jobintel")
+
+_ICAP_SUGGESTION_FIELDS = frozenset({
+    "workflow_steps",
+    "tools",
+    "outputs",
+    "quality_standards",
+})
 
 
 def _prefill_from_star(task: dict) -> dict:
@@ -37,6 +50,57 @@ def _store_answer(task: dict, field: str, answer: str) -> dict:
     else:
         task[field] = answer
     return task
+
+
+def _unique_names(hits: list[dict], limit: int = 3) -> list[str]:
+    names = []
+    seen = set()
+    for hit in hits:
+        name = (hit.get("name") or "").strip()
+        if not name or name in seen:
+            continue
+        seen.add(name)
+        names.append(name)
+        if len(names) >= limit:
+            break
+    return names
+
+
+async def _icap_suggestion(field: str, task_name: str, state: InterviewState) -> str:
+    if field not in _ICAP_SUGGESTION_FIELDS:
+        return ""
+    if state.get("icap_mode", "company_defined") == "company_defined":
+        return ""
+
+    top_ocs_code = (state.get("icap_candidates") or [{}])[0].get("ocs_code")
+    if not top_ocs_code:
+        return ""
+
+    if field == "outputs":
+        hits = await search_outputs(f"{task_name} 工作產出", top_k=3, ocs_code_filter=top_ocs_code)
+        names = _unique_names(hits)
+        hint = f"這類任務常見產出包含：{'、'.join(names)}。" if names else ""
+    elif field == "workflow_steps":
+        hits = await search_tasks(f"{task_name} 工作流程 步驟", top_k=3, ocs_code_filter=top_ocs_code)
+        names = _unique_names(hits)
+        hint = f"iCAP 中相近任務包含：{'、'.join(names)}。" if names else ""
+    elif field == "quality_standards":
+        hits = await search_indicators(f"{task_name} 品質 標準 行為指標", top_k=3, ocs_code_filter=top_ocs_code)
+        names = _unique_names(hits)
+        hint = f"相近指標常提到：{'、'.join(names)}。" if names else ""
+    else:  # tools
+        skill_hits = await search_skills(f"{task_name} 工具 系統 方法", top_k=2, ocs_code_filter=top_ocs_code)
+        knowledge_hits = await search_knowledge(f"{task_name} 工具 系統 方法", top_k=2, ocs_code_filter=top_ocs_code)
+        names = _unique_names(skill_hits + knowledge_hits)
+        hint = f"相關職能常見知識或技能包含：{'、'.join(names)}。" if names else ""
+
+    if not hint:
+        return ""
+
+    return (
+        f"iCAP 參考提示：{hint}\n\n"
+        "這只是參考，不一定適用；請以你的實際工作為準，沒有符合也可以直接忽略。"
+    )
 
 
 async def five_w2h_node(state: InterviewState) -> dict:
@@ -89,27 +153,22 @@ async def five_w2h_node(state: InterviewState) -> dict:
 
     field, label, question = missing[0]
 
-    icap_suggestion = ""
-    if field == "outputs" and state.get("icap_mode", "company_defined") != "company_defined":
-        top_ocs_code = (state.get("icap_candidates") or [{}])[0].get("ocs_code")
-        hits = await search_outputs(
-            f"{task_name} 工作產出",
-            top_k=3,
-            ocs_code_filter=top_ocs_code,
-        )
-        if hits:
-            suggestions = "、".join(h["name"] for h in hits)
-            icap_suggestion = f"\n\n（iCAP 參考：此類職務常見產出包含 {suggestions}，可參考或自行描述）"
-
+    icap_suggestion = await _icap_suggestion(field, task_name, state)
     direct_question = (
         f"關於「{task_name}」，我還需要了解一個細節：\n\n"
-        f"**{label}** — {question}{icap_suggestion}"
+        f"**{label}** — {question}"
     )
     logger.debug("five_w2h: asking '%s' for task=%s", field, task_name)
+
+    ai_messages = []
+    if icap_suggestion:
+        ai_messages.append({"kind": "reference", "content": icap_suggestion})
+    ai_messages.append({"kind": "question", "content": direct_question})
 
     return {
         "extracted_tasks": tasks,
         "ai_response":     direct_question,
+        "ai_messages":     ai_messages,
         "current_stage":   "five_w2h",
         "phase":           phase_key,
         "missing_fields":  [f for f, _, _ in missing],

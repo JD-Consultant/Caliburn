@@ -41,6 +41,7 @@ const STAGE_LABEL: Record<Stage, string> = {
   icap_ref: "iCAP 比對",
   interview: "基本訪談",
   task_extraction: "任務確認",
+  responsibility_grouping: "主要職責",
   star: "真實案例",
   five_w2h: "工作細節",
   indicator: "行為指標",
@@ -53,6 +54,7 @@ const STAGE_ICON: Record<Stage, ElementType> = {
   icap_ref: SearchCheck,
   interview: MessageSquareText,
   task_extraction: ListChecks,
+  responsibility_grouping: ListChecks,
   star: ClipboardCheck,
   five_w2h: ClipboardCheck,
   indicator: Sparkles,
@@ -150,6 +152,12 @@ function buildGuide(
       return {
         title: "檢查 AI 整理的任務清單",
         action: "請確認任務是否正確；如果有遺漏、命名不準或分類錯誤，直接在下方補充。",
+        next: "確認後會整理主要職責分組",
+      };
+    case "responsibility_grouping":
+      return {
+        title: "檢查主要職責分組",
+        action: "請確認主要職責名稱與任務歸屬是否合理；如果要合併、拆分或移動任務，直接在下方說明。",
         next: "確認後會逐一進入深度訪談",
       };
     case "star":

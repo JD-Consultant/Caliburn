@@ -30,6 +30,40 @@ def _message_kind(node_name: str, node_output: dict) -> str:
     return "summary"
 
 
+def _node_messages(node_name: str, node_output: dict, default_phase: str, accumulated: dict) -> list[dict]:
+    """Normalize a graph node output into one or more chat messages."""
+    stage = node_output.get("current_stage") or accumulated.get("current_stage")
+    phase = node_output.get("phase") or default_phase
+
+    if node_output.get("ai_messages"):
+        messages = []
+        for item in node_output["ai_messages"]:
+            content = (item.get("content") or "").strip()
+            if not content:
+                continue
+            messages.append({
+                "type": "message",
+                "kind": item.get("kind") or _message_kind(node_name, node_output),
+                "stage": item.get("stage") or stage,
+                "phase": item.get("phase") or phase,
+                "node": item.get("node") or node_name,
+                "content": content,
+            })
+        return messages
+
+    content = (node_output.get("ai_response") or "").strip()
+    if not content:
+        return []
+    return [{
+        "type": "message",
+        "kind": _message_kind(node_name, node_output),
+        "stage": stage,
+        "phase": phase,
+        "node": node_name,
+        "content": content,
+    }]
+
+
 class InterviewOrchestrator:
     @staticmethod
     async def stream(
@@ -61,17 +95,7 @@ class InterviewOrchestrator:
         try:
             async for event in graph.astream(initial_state):
                 for node_name, node_output in event.items():
-                    if node_output.get("ai_response"):
-                        chunk = node_output["ai_response"]
-                        stage = node_output.get("current_stage") or accumulated.get("current_stage")
-                        message = {
-                            "type": "message",
-                            "kind": _message_kind(node_name, node_output),
-                            "stage": stage,
-                            "phase": node_output.get("phase") or phase,
-                            "node": node_name,
-                            "content": chunk,
-                        }
+                    for message in _node_messages(node_name, node_output, phase, accumulated):
                         ai_messages.append(message)
                         yield f"data: {json.dumps(message, ensure_ascii=False)}\n\n"
                     accumulated.update(node_output)

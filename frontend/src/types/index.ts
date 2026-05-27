@@ -3,6 +3,7 @@ export type Stage =
   | "icap_ref"
   | "interview"
   | "task_extraction"
+  | "responsibility_grouping"
   | "star"
   | "five_w2h"
   | "indicator"
@@ -138,6 +139,7 @@ export interface ReadinessDetail {
 
 export interface GraphState {
   extracted_tasks?: Task[];
+  responsibility_groups?: ResponsibilityGroup[];
   behavior_indicators?: BehaviorIndicator[];
   ksa_items?: KsaItem[];
   icap_candidates?: IcapCandidate[];
@@ -148,6 +150,13 @@ export interface GraphState {
   ocs_document?: OcsDocument;
   interview_readiness_detail?: ReadinessDetail;
   [key: string]: unknown;
+}
+
+export interface ResponsibilityGroup {
+  responsibility_id: string;
+  title: string;
+  description?: string;
+  task_ids: string[];
 }
 
 export interface Task {
@@ -219,7 +228,7 @@ export interface IcapCandidate {
 
 export type IcapMode = "reference" | "hybrid" | "company_defined";
 
-export type AiMessageKind = "summary" | "question" | "status" | "error";
+export type AiMessageKind = "summary" | "question" | "reference" | "status" | "error";
 
 export interface InterviewMessageMeta {
   kind?: AiMessageKind;

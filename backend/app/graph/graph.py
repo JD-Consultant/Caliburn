@@ -6,6 +6,7 @@ LangGraph 訪談狀態機主體。
     → icap_rag          （iCAP RAG 檢索）
     → interview         （一般訪談）
     → task_extraction   （萃取任務）
+    → responsibility_grouping （主要職責分組）
     → [per task loop]:
         star            （STAR 深度追問，四槽 slot filling）
         → five_w2h      （5W2H 補洞，9 欄）
@@ -28,6 +29,7 @@ from app.graph.nodes.icap_rag import icap_rag_node
 from app.graph.nodes.indicator import indicator_generation_node
 from app.graph.nodes.interview import interview_node
 from app.graph.nodes.ocs_builder import ocs_builder_node
+from app.graph.nodes.responsibility_grouping import responsibility_grouping_node
 from app.graph.nodes.star import star_node
 from app.graph.nodes.task_extraction import task_extraction_node
 from app.graph.nodes.five_w2h import five_w2h_node
@@ -48,7 +50,7 @@ def route_after_task_extraction(state: InterviewState) -> str:
     """
     第一輪：萃取後展示給用戶，停在 task_extraction 等確認。
     第二輪起：
-      - 用戶說確認/好/OK → 進 STAR
+      - 用戶說確認/好/OK → 進主要職責分組
       - 否則重新萃取（含用戶修正）再等一次確認
     """
     round_count = state.get("task_extraction_round", 0)
@@ -61,9 +63,21 @@ def route_after_task_extraction(state: InterviewState) -> str:
     if user_msgs:
         last_user = user_msgs[-1]["content"]
         if _is_pure_confirmation(last_user):
-            return "star"
+            return "responsibility_grouping"
 
     # 用戶提出修正，重新萃取後再等確認
+    return END
+
+
+def route_after_responsibility_grouping(state: InterviewState) -> str:
+    """主要職責分組先給用戶確認；確認後才進入逐任務 STAR。"""
+    round_count = state.get("responsibility_grouping_round", 0)
+    if round_count <= 1:
+        return END
+
+    user_msgs = [m for m in state.get("messages", []) if m.get("role") == "user"]
+    if user_msgs and _is_pure_confirmation(user_msgs[-1]["content"]):
+        return "star"
     return END
 
 
@@ -113,6 +127,7 @@ _STAGE_TO_NODE: dict[str, str] = {
     "icap_ref":        "icap_rag",
     "interview":       "interview",
     "task_extraction": "task_extraction",
+    "responsibility_grouping": "responsibility_grouping",
     "star":            "star",
     "five_w2h":        "five_w2h",
     "indicator":       "indicator",
@@ -142,6 +157,7 @@ def build_interview_graph() -> StateGraph:
     graph.add_node("icap_rag", icap_rag_node)
     graph.add_node("interview", interview_node)
     graph.add_node("task_extraction", task_extraction_node)
+    graph.add_node("responsibility_grouping", responsibility_grouping_node)
     graph.add_node("star", star_node)
     graph.add_node("five_w2h", five_w2h_node)
     graph.add_node("indicator", indicator_generation_node)
@@ -167,6 +183,13 @@ def build_interview_graph() -> StateGraph:
     graph.add_conditional_edges(
         "task_extraction",
         route_after_task_extraction,
+        {"responsibility_grouping": "responsibility_grouping", END: END},
+    )
+
+    # 主要職責分組 → 等確認 or 進 STAR
+    graph.add_conditional_edges(
+        "responsibility_grouping",
+        route_after_responsibility_grouping,
         {"star": "star", END: END},
     )
 

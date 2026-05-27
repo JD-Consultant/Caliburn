@@ -49,6 +49,9 @@ iCAP 使用模式：{icap_mode_instruction}
 已萃取任務（含 5W2H）：
 {tasks_detail}
 
+已確認主要職責分組：
+{responsibility_groups_detail}
+
 已生成行為指標：
 {indicators_detail}
 
@@ -85,6 +88,7 @@ iCAP 使用模式：{icap_mode_instruction}
 4. 每任務 knowledge 2-4 項、skills 2-4 項（根據行為指標內容推斷所需知識技能）
 5. attitudes：4-6 項，涵蓋通用職業態度及企業特有要求
 6. competency_level 參考 iCAP 命中結果（預設 3）
+7. 若有「已確認主要職責分組」，ocu_units 必須依照該分組名稱與任務歸屬輸出
 """
 
 _MODE_INSTRUCTIONS: dict[str, str] = {
@@ -258,6 +262,70 @@ def _format_tasks_detail(tasks: list[dict]) -> str:
     return "\n".join(lines)
 
 
+def _format_responsibility_groups(groups: list[dict], tasks: list[dict]) -> str:
+    if not groups:
+        return "（尚未確認主要職責分組，請自行依任務相關性分組）"
+    task_name_by_id = {task.get("task_id"): task.get("task_name", "") for task in tasks}
+    lines = []
+    for group in groups:
+        task_names = [
+            task_name_by_id.get(task_id, task_id)
+            for task_id in group.get("task_ids", [])
+        ]
+        lines.append(f"- {group.get('title', '')}：{'、'.join(task_names)}")
+    return "\n".join(lines)
+
+
+def _apply_responsibility_groups(raw: dict, groups: list[dict], extracted_tasks: list[dict]) -> dict:
+    if not groups:
+        return raw
+
+    task_name_by_id = {task.get("task_id"): task.get("task_name", "") for task in extracted_tasks}
+    known_task_names = {task.get("task_name", "") for task in extracted_tasks}
+    raw_task_by_name: dict[str, dict] = {}
+    for unit in raw.get("ocu_units", []):
+        for task in unit.get("tasks", []):
+            task_name = task.get("task_name", "")
+            if task_name:
+                raw_task_by_name[task_name] = task
+
+    assigned_names: set[str] = set()
+    units = []
+    for group in groups:
+        grouped_tasks = []
+        for task_id in group.get("task_ids", []):
+            task_name = task_name_by_id.get(task_id)
+            if not task_name:
+                continue
+            task_raw = dict(raw_task_by_name.get(task_name, {"task_name": task_name}))
+            task_raw["task_name"] = task_name
+            grouped_tasks.append(task_raw)
+            assigned_names.add(task_name)
+        if grouped_tasks:
+            units.append({
+                "ocu_name": group.get("title", "主要職責"),
+                "tasks": grouped_tasks,
+            })
+
+    unassigned = [
+        task_name for task_name in known_task_names
+        if task_name and task_name not in assigned_names
+    ]
+    if unassigned:
+        units.append({
+            "ocu_name": "其他工作任務",
+            "tasks": [
+                dict(raw_task_by_name.get(task_name, {"task_name": task_name}))
+                for task_name in unassigned
+            ],
+        })
+
+    if units:
+        raw = dict(raw)
+        raw["ocu_units"] = units
+    return raw
+
+
 async def _enrich_and_assign_codes(
     raw: dict,
     job_title: str,
@@ -265,6 +333,7 @@ async def _enrich_and_assign_codes(
     icap_candidates: list[dict],
     extracted_tasks: list[dict] | None = None,
     behavior_indicators: list[dict] | None = None,
+    responsibility_groups: list[dict] | None = None,
     icap_mode: str = "company_defined",
 ) -> dict:
     """Assign hierarchical codes, RAG-match K/S/A, inject evidence_refs and display_labels.
@@ -280,6 +349,7 @@ async def _enrich_and_assign_codes(
     """
     prefix = _make_prefix(job_title)
     competency_level = raw.get("competency_level", 3)
+    raw = _apply_responsibility_groups(raw, responsibility_groups or [], extracted_tasks or [])
     task_lookup: dict[str, dict] = {t["task_name"]: t for t in (extracted_tasks or [])}
     # Per-output: one task_name → multiple indicator entries
     indicator_meta_lookup: dict[str, list[dict]] = {}
@@ -287,7 +357,9 @@ async def _enrich_and_assign_codes(
         indicator_meta_lookup.setdefault(ind["task_name"], []).append(ind)
 
     # Build OCS code from prefix + first iCAP OCS code suffix if available
-    base_code = icap_candidates[0].get("ocs_code", "") if icap_candidates else ""
+    trusted_icap_candidates = icap_candidates if icap_mode != "company_defined" else []
+    top_ocs_code = trusted_icap_candidates[0].get("ocs_code", "") if trusted_icap_candidates else ""
+    base_code = top_ocs_code
     ocs_code = f"{prefix}-001" if not base_code else f"{prefix}-{base_code[-3:]}"
 
     # Document-level K/S registries keyed by name for deduplication
@@ -350,7 +422,11 @@ async def _enrich_and_assign_codes(
                         "source_type": k_raw.get("source_type", "company_defined"),
                     }
                     if k_raw.get("source_type") == "icap_official":
-                        hits = await search_knowledge(f"{name} {task_query}", top_k=1)
+                        hits = await search_knowledge(
+                            f"{name} {task_query}",
+                            top_k=1,
+                            ocs_code_filter=top_ocs_code or None,
+                        )
                         if hits:
                             item["icap_ref"] = hits[0]["code"]
                     k_labels = _compute_display_labels(
@@ -373,7 +449,11 @@ async def _enrich_and_assign_codes(
                         "source_type": s_raw.get("source_type", "company_defined"),
                     }
                     if s_raw.get("source_type") == "icap_official":
-                        hits = await search_skills(f"{name} {task_query}", top_k=1)
+                        hits = await search_skills(
+                            f"{name} {task_query}",
+                            top_k=1,
+                            ocs_code_filter=top_ocs_code or None,
+                        )
                         if hits:
                             item["icap_ref"] = hits[0]["code"]
                     s_labels = _compute_display_labels(
@@ -443,7 +523,11 @@ async def _enrich_and_assign_codes(
             "source_type": a_raw.get("source_type", "company_defined"),
         }
         if a_raw.get("source_type") == "icap_official":
-            hits = await search_attitudes(a_raw["name"], top_k=1)
+            hits = await search_attitudes(
+                a_raw["name"],
+                top_k=1,
+                ocs_code_filter=top_ocs_code or None,
+            )
             if hits:
                 item["icap_ref"] = hits[0]["code"]
         a_labels = _compute_display_labels(
@@ -459,8 +543,8 @@ async def _enrich_and_assign_codes(
     occupations    = []
     occ_code       = ""
     notes          = ""
-    if icap_candidates:
-        c0 = icap_candidates[0]
+    if trusted_icap_candidates:
+        c0 = trusted_icap_candidates[0]
 
         # Accept both legacy str items and new {name, code} dicts
         def _norm(items: list) -> list[dict]:
@@ -554,6 +638,7 @@ def _format_ocs_summary(ocs_doc: dict) -> str:
 
 async def ocs_builder_node(state: InterviewState) -> dict:
     tasks = state.get("extracted_tasks", [])
+    responsibility_groups = state.get("responsibility_groups", [])
     indicators_raw = state.get("behavior_indicators", [])
     icap_candidates = state.get("icap_candidates", [])
     icap_mode = state.get("icap_mode", "company_defined")
@@ -583,6 +668,7 @@ async def ocs_builder_node(state: InterviewState) -> dict:
         icap_ref=icap_ref,
         icap_mode_instruction=_MODE_INSTRUCTIONS.get(icap_mode, _MODE_INSTRUCTIONS["company_defined"]),
         tasks_detail=_format_tasks_detail(tasks),
+        responsibility_groups_detail=_format_responsibility_groups(responsibility_groups, tasks),
         indicators_detail=indicators_detail,
     )
 
@@ -593,6 +679,7 @@ async def ocs_builder_node(state: InterviewState) -> dict:
         raw, state["job_title"], state.get("job_summary", ""), icap_candidates,
         extracted_tasks=tasks,
         behavior_indicators=indicators_raw,
+        responsibility_groups=responsibility_groups,
         icap_mode=icap_mode,
     )
 

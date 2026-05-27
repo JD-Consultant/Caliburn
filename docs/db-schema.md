@@ -46,14 +46,14 @@ icap_embeddings（獨立向量表，與上方無 FK 關聯）
 | `completion_pct` | INTEGER | 完成百分比 0–100 |
 | `icap_source_type` | TEXT | `icap_official` / `company_defined` |
 | `document_draft` | JSONB | 草稿 OCS JSON |
-| `graph_state` | JSONB | LangGraph 跨 call 持久化狀態（16 個 key） |
+| `graph_state` | JSONB | LangGraph 跨 call 持久化狀態（18 個 key） |
 | `created_at` | TIMESTAMPTZ | |
 | `updated_at` | TIMESTAMPTZ | |
 
 **stage 值流轉**：
 ```
 basic_info → icap_ref → interview → task_extraction
-→ star → five_w2h → indicator → ksa → preview（terminal）
+→ responsibility_grouping → star → five_w2h → indicator → ksa → preview（terminal）
 ```
 
 ---
@@ -184,11 +184,13 @@ CREATE INDEX ON icap_embeddings (ocs_code);
 
 ## graph_state 持久化欄位（`job_profiles.graph_state`）
 
-`graph_state` JSONB 由 `StateService` 統一管理，儲存以下 16 個 LangGraph 狀態欄位：
+`graph_state` JSONB 由 `StateService` 統一管理，儲存以下 18 個 LangGraph 狀態欄位：
 
 | 欄位 | 型別 | 說明 |
 |---|---|---|
 | `extracted_tasks` | list | 結構化任務列表（含 5W2H、icap_task_ref） |
+| `responsibility_groups` | list | 已確認或待確認的主要職責分組（`responsibility_id`, `title`, `task_ids`） |
+| `responsibility_grouping_round` | int | 主要職責分組輪次（0=未分組，1+=已展示） |
 | `current_task_index` | int | 當前處理的任務索引 |
 | `task_extraction_round` | int | 萃取輪次（0=未萃取，1+=已展示） |
 | `missing_fields` | list | 5W2H 待補欄位 |

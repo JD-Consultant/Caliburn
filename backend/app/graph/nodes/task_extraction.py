@@ -275,7 +275,7 @@ def _build_task_summary(tasks: list[dict], is_revision: bool = False) -> str:
             f"{evidence_text}{uncertainty_text}"
         )
     if is_revision:
-        lines.append("\n如果這樣正確，請說「確認」，我們繼續深入訪談。如還需修改，請繼續告訴我。")
+        lines.append("\n如果這樣正確，請說「確認」，接著我會整理主要職責分組。如還需修改，請繼續告訴我。")
     else:
-        lines.append("\n如有遺漏或分類不正確，請直接告訴我（例如：「還有一個任務是…」或「把第2項改成…」）。\n確認後請說「確認」或「好」，我們將針對每個任務深入訪談。")
+        lines.append("\n如有遺漏或分類不正確，請直接告訴我（例如：「還有一個任務是…」或「把第2項改成…」）。\n確認後請說「確認」或「好」，我會先整理主要職責分組。")
     return "\n".join(lines)

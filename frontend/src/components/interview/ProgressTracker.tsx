@@ -8,6 +8,8 @@ import type { Stage, ReadinessDetail } from "@/types";
 const STAGES: { key: Stage; label: string }[] = [
   { key: "icap_ref", label: "iCAP 比對" },
   { key: "interview", label: "基本訪談" },
+  { key: "task_extraction", label: "任務確認" },
+  { key: "responsibility_grouping", label: "主要職責" },
   { key: "star", label: "STAR 深訪" },
   { key: "five_w2h", label: "5W2H 補充" },
   { key: "indicator", label: "行為指標" },

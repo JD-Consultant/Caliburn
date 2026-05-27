@@ -26,33 +26,34 @@ CREATE INDEX ON icap_embeddings (ocs_code);
 
 | chunk_type | 內容 | 查詢用途 |
 |------------|------|---------|
-| `competency` | 整體職能基準摘要 | `icap_rag` 節點：職稱命中判斷（三段式信心） |
-| `unit` | 職能單元描述 | P2 backlog：訪談節點注入任務參考 |
-| `task` | 工作任務描述 | ✅ **已接入**：`task_extraction` 節點任務萃取時注入 iCAP 官方任務參考 |
+| `competency` | 整體職能基準摘要 | `icap_matcher`：職種候選與三段式信心判斷 |
+| `unit` | 職能單元描述 | ✅ **已接入候選排序**：與 competency 一起作 profile-level matching；訪談 prompt 注入仍為 P2 |
+| `task` | 工作任務描述 | ✅ **已接入**：候選排序與 `task_extraction` 任務參考 |
 | `indicator` | 行為指標文字 | ✅ **已接入**：`indicator` 節點注入官方指標語氣與格式範本 |
-| `output` | 工作產出列表 | ✅ **已接入**：`five_w2h` 節點注入 iCAP 官方產出清單 |
+| `output` | 工作產出列表 | ✅ **已接入**：候選排序與 `five_w2h` 節點參考提示 |
 | `knowledge` | 知識項目 | ✅ **已接入**：`ocs_builder` 節點 K 項 iCAP 代碼對應 |
 | `skill` | 技能項目 | ✅ **已接入**：`ocs_builder` 節點 S 項 iCAP 代碼對應 |
 | `attitude` | 態度項目 | ✅ **已接入**：`ocs_builder` 節點 A 項 iCAP 代碼對應 |
 | `notes` | 說明與補充事項 | P2 backlog：訪談開始時注入學歷/年資要求 |
 
-**已接入 RAG 查詢：7 種**（`competency`, `task`, `indicator`, `output`, `knowledge`, `skill`, `attitude`）  
-**尚未接入：** `unit`, `notes`（P2 backlog）
+**已接入 RAG 查詢：8 種**（`competency`, `unit`, `task`, `indicator`, `output`, `knowledge`, `skill`, `attitude`）
+**尚未接入：** `notes`；`unit` 已用於候選排序，但尚未注入一般訪談 prompt。
 
 ---
 
-## 6 個 RAG 檢索點
+## RAG / iCAP 參考檢索點
 
 | # | 觸發節點 | chunk_type | 函式 | 用途 |
 |---|---------|-----------|------|------|
-| 1 | `icap_rag_node` | `competency` | `pgvector cosine` 直接查 | 職稱對應 iCAP 代碼，決定三段式信心（`icap_mode`） |
-| 2 | `task_extraction_node` | `task` | `search_tasks()` | 任務萃取時注入 iCAP 官方任務描述，引導 LLM 對齊標準名稱 |
-| 3 | `five_w2h_node` | `output` | `search_outputs()` | 5W2H 填洞時注入官方產出清單，提示 LLM 補齊 output 欄位 |
+| 1 | `icap_rag_node` / `task_extraction_node` | `competency`, `unit`, `task`, `output`, `indicator` | `match_icap_candidates()` | 以 profile 與已萃取任務重新排名候選職種，決定三段式信心（`icap_mode`） |
+| 2 | `task_extraction_node` | `task` | `search_tasks()` | 任務萃取後為每個任務附上 `icap_task_ref`，供使用者確認時參考 |
+| 3 | `five_w2h_node` | `task`, `output`, `indicator`, `knowledge`, `skill` | `search_tasks()` / `search_outputs()` / `search_indicators()` / `search_knowledge()` / `search_skills()` | 追問 `workflow_steps`, `tools`, `outputs`, `quality_standards` 時產生 iCAP 參考提示泡泡 |
 | 4 | `indicator_node` | `indicator` | `search_indicators()` | 行為指標生成前注入官方指標範本，統一語氣與 P/O code 格式 |
 | 5 | `ocs_builder_node` | `knowledge` | `search_knowledge()` | 每個 K 項對應 iCAP 知識代碼 |
 | 6 | `ocs_builder_node` | `skill` / `attitude` | `search_skills()` / `search_attitudes()` | 每個 S/A 項對應 iCAP 代碼 |
 
 > RAG 觸發條件：`icap_mode` 為 `reference` 或 `hybrid` 時 (checkpoint 2~6 視節點條件啟用)；`company_defined` 時部分節點跳過 iCAP 注入。
+> iCAP 是「信心與參考」來源，不是硬性準確率或套版依據；行為指標仍以企業訪談內容為主。
 
 ---
 
@@ -142,7 +143,7 @@ python -m scripts.icap_ingest \
 
 ## icap_retriever（`app/services/icap_retriever.py`）
 
-提供 6 個非同步查詢函式，供各 LangGraph 節點呼叫：
+提供 6 個非同步查詢函式，供各 LangGraph 節點呼叫；職種候選排序則由 `app/services/icap_matcher.py` 統一處理：
 
 ```python
 # K/S/A（ocs_builder_node）
@@ -185,17 +186,19 @@ LIMIT :k
 
 ---
 
-## 三段式信心判斷（`icap_rag_node`）
+## 三段式信心判斷（`icap_matcher.py`）
 
-`icap_rag_node` 執行 competency chunk 向量搜尋後，依以下邏輯設定 `icap_mode`：
+`icap_matcher.py` 會依 profile-level query（職稱/部門/摘要/readiness 訊號）與 task-level query（已萃取任務）組合多個 chunk_type 的證據，計算候選職種的檢索信心。此分數是 retrieval confidence，不是使用者可解讀的百分比準確率。
 
 | 信心層級 | 條件 | `icap_mode` |
 |---------|------|------------|
-| 高信心 | profile similarity ≥ `ICAP_HIGH_THRESHOLD`（0.70）且 task_match_rate 高 | `"reference"` |
-| 中信心 | similarity ≥ `ICAP_MEDIUM_THRESHOLD`（0.55）（職稱或任務部分符合） | `"hybrid"` |
-| 低信心 | similarity < 0.55 或任務幾乎不匹配 | `"company_defined"` |
+| 高信心 | weighted similarity ≥ `ICAP_HIGH_THRESHOLD`（0.70）且證據覆蓋合理 | `"reference"` |
+| 中信心 | weighted similarity ≥ `ICAP_MEDIUM_THRESHOLD`（0.55） | `"hybrid"` |
+| 低信心 | weighted similarity < 0.55 | `"company_defined"` |
 
 `icap_mode` 存入 `InterviewState` 並持久化至 `job_profiles.graph_state`，後續所有節點依此決定是否注入 iCAP 官方內容。
+
+> 目前未採用職稱關鍵字硬性降權，也尚未實作 reranker / judge。百工百業的準確提升應靠任務證據、候選職種語意覆蓋與後續 reranker，而不是用職稱字面規則硬切。
 
 ---
 
@@ -234,4 +237,4 @@ iCAP 原始資料可能出現版本狀態矛盾（`raw_status = "最新版本"` 
 
 ### unit / notes chunk 接入（第七階段 P2）
 
-`unit` chunk 可在訪談節點注入職能單元參考，`notes` chunk 可在訪談開始時注入學歷/年資要求，目前列為第七階段 P2 backlog。
+`unit` chunk 已用於候選排序；後續仍可在訪談節點注入職能單元參考。`notes` chunk 可在訪談開始時注入學歷/年資要求，目前列為第七階段 P2 backlog。

@@ -57,6 +57,7 @@ export default function InterviewPage({ params }: { params: Promise<{ id: string
   };
 
   const tasks = profile?.graph_state?.extracted_tasks ?? [];
+  const responsibilityGroups = profile?.graph_state?.responsibility_groups ?? [];
   const candidates = profile?.graph_state?.icap_candidates ?? [];
   const readiness = profile?.graph_state?.interview_readiness_detail;
   const behaviorIndicators = profile?.graph_state?.behavior_indicators ?? [];
@@ -163,7 +164,7 @@ export default function InterviewPage({ params }: { params: Promise<{ id: string
                     AI 整理出 {tasks.length} 項任務
                   </p>
                   <p className="text-xs text-blue-700/70 dark:text-blue-300/70 mt-0.5">
-                    確認正確後進入深度訪談。如有遺漏請在下方輸入補充。
+                    確認正確後整理主要職責。如有遺漏請在下方輸入補充。
                   </p>
                 </div>
                 <Button
@@ -174,6 +175,30 @@ export default function InterviewPage({ params }: { params: Promise<{ id: string
                 >
                   <CheckCircle2 className="w-3.5 h-3.5" />
                   確認任務清單
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {stage === "responsibility_grouping" && responsibilityGroups.length > 0 && !streaming && (
+            <div className="border-t bg-sky-50/70 dark:bg-sky-950/20 px-4 py-3 shrink-0">
+              <div className="flex items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-sky-900 dark:text-sky-100">
+                    AI 整理出 {responsibilityGroups.length} 個主要職責
+                  </p>
+                  <p className="text-xs text-sky-700/70 dark:text-sky-300/70 mt-0.5">
+                    確認後會依任務逐一進入 STAR 與 5W2H 深度訪談。
+                  </p>
+                </div>
+                <Button
+                  size="sm"
+                  className="shrink-0 gap-1.5"
+                  onClick={() => sendSilent("確認", "general")}
+                  disabled={streaming}
+                >
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  確認主要職責
                 </Button>
               </div>
             </div>
@@ -197,6 +222,7 @@ export default function InterviewPage({ params }: { params: Promise<{ id: string
                 placeholder={
                   streaming ? "AI 回覆中..." :
                   stage === "task_extraction" && tasks.length > 0 ? "如有遺漏或修改，請直接輸入..." :
+                  stage === "responsibility_grouping" ? "如需調整主要職責，請直接輸入..." :
                   "輸入訊息，按 Enter 送出"
                 }
                 rows={1}

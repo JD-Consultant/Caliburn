@@ -6,6 +6,8 @@ from app.models import JobProfile
 
 PERSISTENT_KEYS: list[str] = [
     "extracted_tasks",
+    "responsibility_groups",
+    "responsibility_grouping_round",
     "current_task_index",
     "task_extraction_round",
     "missing_fields",
@@ -25,6 +27,8 @@ PERSISTENT_KEYS: list[str] = [
 
 _DEFAULTS: dict = {
     "extracted_tasks":            [],
+    "responsibility_groups":      [],
+    "responsibility_grouping_round": 0,
     "current_task_index":         0,
     "task_extraction_round":      0,
     "missing_fields":             [],

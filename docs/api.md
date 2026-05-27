@@ -69,7 +69,7 @@ Query params: `limit` (default 200), `offset` (default 0)
 ```json
 [
   { "role": "ai",   "content": "...", "phase": "general",         "created_at": "..." },
-  { "role": "user", "content": "...", "phase": "star_任務名稱",   "created_at": "..." }
+  { "role": "user", "content": "...", "phase": "star_task_001",   "created_at": "..." }
 ]
 ```
 
@@ -83,12 +83,13 @@ Query params: `limit` (default 200), `offset` (default 0)
 
 **Response** `text/event-stream`
 ```
-data: "系統找到以下相近 iCAP 職能基準..."
-data: "..."
+data: {"type":"message","kind":"summary","stage":"task_extraction","phase":"general","node":"task_extraction","content":"我整理出 4 項任務..."}
+data: {"type":"message","kind":"reference","stage":"five_w2h","phase":"five_w2h_task_001","node":"five_w2h","content":"iCAP 參考提示：這類任務常見產出包含..."}
+data: {"type":"message","kind":"question","stage":"five_w2h","phase":"five_w2h_task_001","node":"five_w2h","content":"關於「資料清理」，我還需要了解一個細節..."}
 data: "[DONE]"
 ```
 
-每個 `data:` 是 JSON 字串（一小段文字），前端累積後顯示。
+每個 `data:` 是一個 JSON event。`kind` 目前包含 `summary` / `question` / `reference` / `status` / `error`；前端會把每個 message event 顯示成獨立 AI 泡泡，因此 iCAP 參考提示和正式提問不會黏在同一泡泡。
 
 **phase 值**
 | 值 | 說明 |
@@ -119,9 +120,11 @@ data: "[DONE]"
 **Response**
 ```json
 {
-  "stage": "star",
+  "stage": "responsibility_grouping",
   "graph_state": {
     "extracted_tasks": [...],
+    "responsibility_groups": [...],
+    "responsibility_grouping_round": 1,
     "current_task_index": 1,
     "star_slots_by_task": {...},
     "behavior_indicators": [...],

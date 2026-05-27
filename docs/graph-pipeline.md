@@ -14,6 +14,10 @@ icap_rag ───────────────────────�
                                    │
                     [round <= 1 or 未確認] │ [用戶確認]
                               ↓ END        ▼
+                         responsibility_grouping
+                                  │
+                 [round <= 1 or 未確認] │ [用戶確認]
+                             ↓ END        ▼
                               ┌──────────────────────────────────────┐
                               │     逐任務迴圈（per-task loop）        │
                               │                                       │
@@ -42,10 +46,10 @@ icap_rag ───────────────────────�
 ### 1. `icap_rag` — iCAP RAG 檢索
 **檔案**: `app/graph/nodes/icap_rag.py`
 
-- 將 `job_title + department + job_summary` embed 後查詢 `icap_embeddings` 表（`chunk_type = 'competency'`）
-- CTE 先 `DISTINCT ON (ocs_code)` 去重，再按 cosine similarity 排序取 Top-K
-- `similarity >= 0.55` → `icap_hit = True`
-- 回傳 `icap_candidates`（含 `ocs_code`, `icap_title`, `similarity`, `job_categories`, `occupations`, `industries`, `notes`, `recommendation`）
+- 透過 `app/services/icap_matcher.py` 以職稱、部門、工作摘要先找出 iCAP 候選職種
+- 目前主軸仍是向量相似度 + 三段式信心，不用職稱關鍵字硬性過濾百工百業
+- 回傳 `icap_candidates`（含 `ocs_code`, `icap_title`, `similarity`, `confidence_label`, `recommendation` 等）
+- 依信心設定 `icap_mode`：`reference` / `hybrid` / `company_defined`
 
 ### 2. `interview` — 自然訪談
 **檔案**: `app/graph/nodes/interview.py`
@@ -76,11 +80,23 @@ icap_rag ───────────────────────�
 **檔案**: `app/graph/nodes/task_extraction.py`
 
 - 以全部對話 + 固定 prompt 呼叫 LLM（temperature=0）
-- 輸出 JSON 陣列：`[{task_name, description, category, frequency, responsibility_type, evidence_from_user}]`
+- 輸出 JSON 陣列，每個任務包含：`task_name`, `description`, `category`, `frequency`, `responsibility_type`, `evidence_from_user`, `collaborators`, `stakeholders`, `tools`, `outputs`, `workflow_steps`, `uncertainty_fields`
+- 若 `icap_mode != company_defined`，會以任務名稱/描述重新查 iCAP task chunk，附上 `icap_task_ref` 作為參考；這不是硬性準確率判定
 - 每呼叫一次 `task_extraction_round += 1`
-- 第一次呼叫後停在 END 等用戶確認；用戶說「確認/好/OK/繼續…」後 → `star`
+- 第一次呼叫後停在 END 等用戶確認；用戶說純「確認/好/OK/繼續…」後 → `responsibility_grouping`
+- 若使用者提出修正，會保留既有 `task_id` 並重新整理任務清單
 
-### 4. `star` — STAR 深度追問
+### 4. `responsibility_grouping` — 主要職責分組
+**檔案**: `app/graph/nodes/responsibility_grouping.py`
+
+- 將已確認的 `extracted_tasks` 整理成 1–5 個主要職責分組
+- 每個分組包含：`responsibility_id`, `title`, `description`, `task_ids`
+- 規則：不新增任務；每個任務必須且只能出現在一個主要職責
+- 若 iCAP 有參考基準，只作命名風格與架構參考，不硬套官方職類
+- 第一次產生後停在 END 等使用者確認；確認後才進入 STAR
+- 使用者可用自然語言修正，例如「把 API 測試移到後端服務開發」
+
+### 5. `star` — STAR 深度追問
 **檔案**: `app/graph/nodes/star.py`
 
 - 針對 `extracted_tasks[current_task_index]` 進行 STAR 框架追問
@@ -106,7 +122,7 @@ icap_rag ───────────────────────�
 
 > `task_id` 由 `task_extraction_node` 於萃取後立即分配（`task_001`, `task_002`…），穩定不受 LLM 重新命名影響。`phase` 也以 `task_id` 構建：`star_task_001`、`five_w2h_task_001`。
 
-### 5. `five_w2h` — 5W2H 補洞
+### 6. `five_w2h` — 5W2H 補洞
 **檔案**: `app/graph/nodes/five_w2h.py`
 
 必填欄位（`FIVE_W2H_REQUIRED`，共 9 欄）：
@@ -126,13 +142,15 @@ icap_rag ───────────────────────�
 > ✦ = P0 新增欄位，用於讓行為指標包含協作邊界、執行步驟與時效標準。
 
 每輪只問一個欄位；前一輪的用戶回答存回 `extracted_tasks[idx]`。
+當補問 `workflow_steps`, `tools`, `outputs`, `quality_standards` 且 `icap_mode != company_defined` 時，節點會先送出 `kind="reference"` 的 iCAP 參考提示，再送出 `kind="question"` 的正式問題。前端會顯示成兩個泡泡，避免「參考資料 + 提問」黏在同一段。
 所有欄位補齊 → `current_stage = "indicator"`（同任務），進入指標生成。
 
-### 6. `indicator` — 行為指標生成（含品質評分與 Guardrail）
+### 7. `indicator` — 行為指標生成（含品質評分與 Guardrail）
 **檔案**: `app/graph/nodes/indicator.py`
 
 - 逐任務處理（以 `task_id` 追蹤已完成任務，防止重入）
 - **Per-output 模式**（Stage 4 #18）：若任務有 `outputs` list，每個 output 生成獨立指標；無 outputs 時 fallback 為整任務單一指標
+- iCAP indicator 僅作措辭與格式參考；行為指標仍要呈現企業內部知識體系，不限制成基準式短句
 - 每筆指標包含：
   - `indicator_5w2h`：「在【情境】下，為了【目的】，…，產出【此具體產出物】，達到【標準】。」
   - `indicator_abcd`：「面對【對象】，能…達到…標準。」
@@ -172,7 +190,7 @@ icap_rag ───────────────────────�
 - `current_stage == "star"` → 前往 star（下一任務）
 - 其他 → 前往 ksa（全部完成）
 
-### 7. `ksa` / `ocs_builder` — OCS 文件生成
+### 8. `ksa` / `ocs_builder` — OCS 文件生成
 **檔案**: `app/graph/nodes/ocs_builder.py`
 
 （節點名稱是 `ksa`，函式是 `ocs_builder_node`）
@@ -183,8 +201,9 @@ icap_rag ───────────────────────�
 3. `_enrich_and_assign_codes()` 賦予階層式代碼 + RAG 對應 K/S/A 至 iCAP code
 4. `_attach_evidence_to_ocs_task()` 將 STAR / 5W2H 資料注入 `evidence_refs`
 5. `_compute_display_labels()` / `_primary_display_label()` 計算並注入每個 task / indicator / output / KSA 的 `display_label` 與 `display_labels`
-6. `_extract_legacy_ksa()` 產生 flat KSA 列表（backward compat）
-7. 設定 `document_ready = True`, `current_stage = "preview"`
+6. `_apply_responsibility_groups()` 依已確認的 `responsibility_groups` 決定 OCU 主要職責與任務歸屬
+7. `_extract_legacy_ksa()` 產生 flat KSA 列表（backward compat）
+8. 設定 `document_ready = True`, `current_stage = "preview"`
 
 ---
 
@@ -200,7 +219,8 @@ class InterviewState(TypedDict):
 
     # 流程控制
     current_stage: str    # basic_info → icap_ref → interview → task_extraction
-                          # → star → five_w2h → indicator → ksa → preview（terminal）
+                          # → responsibility_grouping → star → five_w2h → indicator
+                          # → ksa → preview（terminal）
     phase: str            # general | star_<task_id> | five_w2h_<task_id>
 
     # 對話
@@ -215,8 +235,10 @@ class InterviewState(TypedDict):
 
     # 任務萃取
     extracted_tasks: list[dict]
+    responsibility_groups: list[dict]
+    responsibility_grouping_round: int  # 0=未分組, 1=已展示等確認, 2+=已確認進 STAR
     current_task_index: int
-    task_extraction_round: int    # 0=未萃取, 1=已展示等確認, 2+=已確認
+    task_extraction_round: int    # 0=未萃取, 1=已展示等確認, 2+=已確認進主要職責分組
 
     # STAR slot filling
     star_slots_by_task: dict      # { task_id: { "S": str|None, "T": str|None, "A": str|None, "R": str|None } }
@@ -242,7 +264,8 @@ class InterviewState(TypedDict):
 ```
 
 跨 API call 持久化欄位（存入 `job_profiles.graph_state` JSONB，由 `_PERSISTENT_STATE_KEYS` 管理）：
-`extracted_tasks`, `current_task_index`, `task_extraction_round`, `missing_fields`,
+`extracted_tasks`, `responsibility_groups`, `responsibility_grouping_round`,
+`current_task_index`, `task_extraction_round`, `missing_fields`,
 `star_slots_by_task`, `star_completed_task_ids`,
 `behavior_indicators`, `indicator_retry_counts`,
 `ksa_items`, `ocs_document`,
@@ -259,6 +282,7 @@ _STAGE_TO_NODE = {
     "icap_ref":        "icap_rag",
     "interview":       "interview",
     "task_extraction": "task_extraction",
+    "responsibility_grouping": "responsibility_grouping",
     "star":            "star",
     "five_w2h":        "five_w2h",
     "indicator":       "indicator",

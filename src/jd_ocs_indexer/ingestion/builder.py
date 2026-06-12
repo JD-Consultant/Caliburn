@@ -113,6 +113,23 @@ class ChunkBuilder:
         chunk_key: str,
     ) -> ChunkRecord:
         payload = self._base_payload(norm, ctx, chunk_key, "profile")
+
+        # v2: OCS-wide aggregated pools for LLM curator to pick from
+        # (preserves first-seen name for each code; OCS rarely has same code with
+        # different names across blocks).
+        all_k: dict[str, str] = {}
+        all_s: dict[str, str] = {}
+        all_output: dict[str, str] = {}
+        for u in norm.units:
+            for g in u.task_groups:
+                for b in g.blocks:
+                    for p in b.k_pairs:
+                        all_k.setdefault(p.code, p.name)
+                    for p in b.s_pairs:
+                        all_s.setdefault(p.code, p.name)
+                    for p in b.output_pairs:
+                        all_output.setdefault(p.code, p.name)
+
         payload.update(
             {
                 "unit_id": None,
@@ -132,6 +149,16 @@ class ChunkBuilder:
                 "knowledge_terms": [],
                 "skill_terms": [],
                 "work_activity_terms": [],
+                # v2: empty pair fields at this level for consistency
+                "k_pairs": [],
+                "s_pairs": [],
+                "output_pairs": [],
+                "evidence": [],
+                # v2: OCS-wide pools (curator picks from these when customizing)
+                "all_k_pairs": [{"code": c, "name": n} for c, n in all_k.items()],
+                "all_s_pairs": [{"code": c, "name": n} for c, n in all_s.items()],
+                "all_a_pairs": [{"code": p.code, "name": p.name} for p in norm.attitude_pairs],
+                "all_output_pairs": [{"code": c, "name": n} for c, n in all_output.items()],
                 "profile_chunk_id": None,
                 "unit_chunk_id": None,
                 "source_path": "$",
@@ -171,6 +198,11 @@ class ChunkBuilder:
         seen_kt: set[str] = set()
         seen_st: set[str] = set()
 
+        # v2: aggregated pair dicts (dedup by code, preserving first-seen name)
+        k_pairs_dict: dict[str, str] = {}
+        s_pairs_dict: dict[str, str] = {}
+        output_pairs_dict: dict[str, str] = {}
+
         for group in unit.task_groups:
             for tid, ttl in zip(group.task_ids, group.task_titles or [None] * len(group.task_ids)):
                 if tid not in task_ids:
@@ -201,6 +233,13 @@ class ChunkBuilder:
                 for t in block.indicator_texts:
                     if t and t not in work_activity_terms:
                         work_activity_terms.append(t)
+                # v2 pair aggregation
+                for p in block.k_pairs:
+                    k_pairs_dict.setdefault(p.code, p.name)
+                for p in block.s_pairs:
+                    s_pairs_dict.setdefault(p.code, p.name)
+                for p in block.output_pairs:
+                    output_pairs_dict.setdefault(p.code, p.name)
 
         payload = self._base_payload(norm, ctx, unit_chunk_key, "unit")
         payload.update(
@@ -222,6 +261,11 @@ class ChunkBuilder:
                 "knowledge_terms": knowledge_terms,
                 "skill_terms": skill_terms,
                 "work_activity_terms": work_activity_terms,
+                # v2 aggregated pairs
+                "k_pairs": [{"code": c, "name": n} for c, n in k_pairs_dict.items()],
+                "s_pairs": [{"code": c, "name": n} for c, n in s_pairs_dict.items()],
+                "output_pairs": [{"code": c, "name": n} for c, n in output_pairs_dict.items()],
+                "evidence": [],
                 "profile_chunk_id": profile_chunk_key,
                 "unit_chunk_id": None,
                 "source_path": f"$.ocs_content.ocu_units[{unit.unit_order - 1}]",
@@ -268,6 +312,14 @@ class ChunkBuilder:
                 "knowledge_terms": block.knowledge_terms,
                 "skill_terms": block.skill_terms,
                 "work_activity_terms": block.indicator_texts,
+                # v2 pair structures
+                "k_pairs": [{"code": p.code, "name": p.name} for p in block.k_pairs],
+                "s_pairs": [{"code": p.code, "name": p.name} for p in block.s_pairs],
+                "output_pairs": [{"code": p.code, "name": p.name} for p in block.output_pairs],
+                "evidence": [
+                    {"indicator_code": p.code, "activity_text": p.name}
+                    for p in block.evidence
+                ],
                 "profile_chunk_id": profile_chunk_key,
                 "unit_chunk_id": unit_chunk_key,
                 "source_path": (

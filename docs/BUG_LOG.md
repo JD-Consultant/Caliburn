@@ -410,8 +410,131 @@ git config --global core.quotepath false
 | 4 openresty body size | 高 | 是（無法 upsert） | 環境設定 | 立即修 |
 | 5 git 檔名 escape | 低 | 否 | 1 行設定 | 不修 |
 | 6 HF / Qdrant warning | 低 | 否 | 環境設定 | 不修 |
+| 7 v2 payload ReadTimeout | 中 | 是（全量無法寫入） | retry + timeout | 立即修 |
+| 8 來源資料 ocs_code 重複 | 低 | 否（4 筆覆寫） | 不修（上游問題） | 文件化 |
 
-修了 4 個阻塞 bug，留 2 個 noise。整體成本（含學習 / 診斷 / 編程）約 4 工時。
+修了 5 個阻塞 bug，留 2 個 noise + 1 個來源資料問題。整體成本（含學習 / 診斷 / 編程）約 8 工時。
+
+---
+
+## Bug 7: v2 payload 撐爆 60 秒 Qdrant client timeout（全量無法寫入）
+
+### 時間 / 觸發場景
+全量 908 份 rebuild 啟動後，每個 64-point batch 的 upsert 都 timeout，0 點寫入。
+
+### 症狀
+```
+ResponseHandlingException: The read operation timed out
+```
+- 全量 rebuild 立刻失敗
+- Collection 0 points、manifest 空（manifest 機制保證未成功的 batch 不會被標記為已 indexed）
+
+### 診斷過程
+
+1. 對比 v1：v1 全量也是 64-batch，沒這問題
+2. v2 payload 變化：
+   - 每個 block 新增 `k_pairs` / `s_pairs` / `output_pairs` / `evidence` (~3-5KB)
+   - 每個 profile 新增 `all_k_pairs` / `all_s_pairs` / `all_a_pairs` / `all_output_pairs` 池 (~10KB)
+   - profile markdown 技能雲 (~1KB 文字 + sparse weights 翻倍)
+3. 估算單 chunk JSON size：v1 ~20KB → v2 ~30-35KB
+4. 單 batch (64 chunks) ~ 2MB body，跨 openresty + cloudflare 上行
+5. Qdrant 端 `wait=True` 要 sparse vector 算完才回應；批量大導致 indexing 時間 >60s
+6. qdrant-client 預設 timeout 60s → read timeout
+
+### 根因
+- v2 schema 變更後單請求工作量 + 上行時間翻倍，原本剛好穩在 60s 內的 batch 現在常超過
+- timeout 設計成「常數」沒考慮 schema 演化
+
+### 修法
+
+`config.py` 加 `qdrant_timeout` 欄位（env: `QDRANT_TIMEOUT`，預設 300s）：
+
+```python
+qdrant_timeout=_env_float("QDRANT_TIMEOUT", 300.0),
+```
+
+`make_client(timeout=...)` 把這個值傳進 qdrant-client；CLI 所有 `make_client(...)` 呼叫一律帶上 `timeout=settings.qdrant_timeout`。
+
+降 `INDEX_BATCH_SIZE` 從 64 → 32（單請求工作量減半，retry 成本也減半）。
+
+`QdrantWriter._flush` 加 retry：
+
+```python
+_RETRYABLE_STATUSES = {408, 425, 429, 500, 502, 503, 504}
+
+def _flush(self, batch):
+    for attempt in range(self.max_retries + 1):
+        try:
+            self.client.upsert(...)
+            return
+        except Exception as exc:
+            if attempt >= self.max_retries or not _is_retryable(exc):
+                raise
+            time.sleep(self.retry_base_delay * (2 ** attempt))
+```
+
+`ResponseHandlingException`（包含 ReadTimeout）和 `UnexpectedResponse` 4xx/5xx transient 都 retry，指數 backoff 2s/4s/8s/16s。CLI report 加 `upsert_retries` 欄位讓 operator 看 proxy 健康。
+
+### 預防 / 啟示
+- **timeout 必須是 env 可調，不能寫死**：production 部署的網路 latency 跟 dev 不同
+- **schema 變更要算 payload size 增長率**：v1 → v2 增 ~50% 沒被前期注意到
+- **批量處理一定要有 retry**：跨多層 proxy 的鏈路單次成功率不可能 100%
+- **manifest only-after-success 是正確設計**：失敗後 0 points 0 entries，沒髒狀態，下次重跑乾淨
+
+### 影響使用者體驗
+全量 rebuild 5.4 小時跑完，0 retry / 0 failed — 對 v2 payload 大小 + yokosama 反向代理鏈路是穩的。如果未來 payload 更大或網路更差，retry 機制會自動吸收 transient 失敗。
+
+---
+
+## Bug 8: 來源資料 4 個 ocs_code 重複導致 8 個檔案覆寫到 4 個
+
+### 時間 / 觸發場景
+v2 全量 rebuild 完成後 stats 顯示 `total_points=12810` 而非預估 12869，少 59 點。
+
+### 症狀
+- index report: `indexed_files: 908, chunks: 12869`
+- `stats --collection ocs_bgem3_v2`: `profile=904, unit=3260, block=8646, total=12810`
+- 缺 4 profile + 12 unit + 43 block = 59 chunks
+
+### 診斷過程
+
+1. profile 缺 4 個，但 indexer 是「一個 file 一個 profile chunk」，所以猜「有 4 個 file 的 ocs_code 跟其他 file 撞」
+2. 跑 source-side ocs_code 統計：
+
+```python
+total files: 908
+unique ocs_codes: 904
+duplicates: 4 (各佔 2 筆 file)
+```
+
+3. 重複的 4 個 code：
+   - `BLM2621-001v1` × 2（壽險營業類 vs 壽險推廣／核保 兩個職務共享）
+   - `KRM2421-001v4` × 2（產業布署 vs 客戶服務 兩個職務共享）
+   - `BHR4910-008v4` × 2（業績管理 vs 課程設計與規劃 兩個職務共享）
+   - `Unknown` × 2（兩個 OCS 解析 ocs_code 失敗 → 都 fallback 成 "Unknown"）
+
+4. 第二份 file 的 chunks（profile + units + blocks）覆寫第一份 → 各層各少 4 個 → 但 unit 少 12 個 / block 少 43 個，因為兩份重複 file 的 unit/block 數量不同（後者覆蓋前者全部）
+
+### 根因
+- 來源資料品質問題：jd-pdf-to-json 從 PDF 抽取 ocs_code 時，4 對職務基準碰巧抽到相同 code
+- 「Unknown」這 2 筆是 PDF 沒寫 ocs_code 或 OCR 失敗 → fallback 統一變 "Unknown" → 互撞
+- chunk_key 用 `ocs:{ocs_code}:...` 開頭，code 撞 = chunk_key 撞 = uuid5 撞 = upsert 覆寫
+
+### 修法
+**不修 indexer**。這是來源資料的 invariant 違反（OCS 標準要求 ocs_code 是 unique key），不該由 indexer 處理。Indexer 的 deterministic chunk_key 是 by-design 的正確行為。
+
+**未來可選的補強**：
+- `doctor` 命令加新檢查：scan 所有 file 的 ocs_code，若有重複就 warn + 列出檔名
+- 上游 jd-pdf-to-json 修正 ocs_code 抽取（理想方案）
+- 若上游不修，可在 normalizer 對 fallback `Unknown` 改用 file basename 當變體 key
+
+### 預防 / 啟示
+- **deterministic key 的雙面性**：保證 idempotent upsert（重跑不重複）的同時，也意味著「source 端 invariant 失敗」會靜默變成「資料覆寫」
+- **acceptance test 要對齊預期數字**：發現 12810 ≠ 12869 才查到，平時隨手 stats 是必要的健康檢查
+- **fallback value 是 silent merger**：兩個 "Unknown" 互撞 vs 拋 error 二選一時，前者更難 debug
+
+### 影響使用者體驗
+失去 4 個職務的索引（含被覆寫的那一份）。**使用者搜尋這 4 個原始 file 的內容會找不到**。對 12,810 / 12,869 ≈ 0.5% 的內容遺失，但對遺失職務的單一搜尋是 100% miss。建議 jd-pdf-to-json 端修正後重 index。
 
 ---
 

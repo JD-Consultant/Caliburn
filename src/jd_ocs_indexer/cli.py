@@ -498,19 +498,36 @@ def _print_query_hit(idx: int, hit, text_lines: int) -> None:
         task_ids = p.get("task_ids") or []
         tid = task_ids[0] if task_ids else ""
         breadcrumb_parts.append(f"{tid} {task_titles[0]}".strip())
-    if p.get("block_title"):
+    if p.get("block_order") is not None and hit.chunk_level == "block":
+        breadcrumb_parts.append(f"區塊#{p['block_order']}")
+    elif p.get("block_title"):  # legacy v1 payload fallback
         breadcrumb_parts.append(p["block_title"])
     console.print("    [dim]path:[/dim] " + " / ".join(breadcrumb_parts))
 
-    k = p.get("k_codes") or []
-    s = p.get("s_codes") or []
-    if k or s:
-        console.print(
-            "    [dim]codes:[/dim] "
-            + (f"K={','.join(k)}" if k else "")
-            + ("  " if k and s else "")
-            + (f"S={','.join(s)}" if s else "")
-        )
+    # v2: prefer pair structures for human-readable display.
+    k_pairs = p.get("k_pairs") or []
+    s_pairs = p.get("s_pairs") or []
+    if k_pairs:
+        shown = ", ".join(f"{kp['code']} {kp['name']}" for kp in k_pairs[:5])
+        if len(k_pairs) > 5:
+            shown += f" (+{len(k_pairs) - 5} more)"
+        console.print(f"    [dim]K:[/dim] {shown}")
+    if s_pairs:
+        shown = ", ".join(f"{sp['code']} {sp['name']}" for sp in s_pairs[:5])
+        if len(s_pairs) > 5:
+            shown += f" (+{len(s_pairs) - 5} more)"
+        console.print(f"    [dim]S:[/dim] {shown}")
+    # legacy v1 fallback: show codes-only if pairs missing
+    if not k_pairs and not s_pairs:
+        k = p.get("k_codes") or []
+        s = p.get("s_codes") or []
+        if k or s:
+            console.print(
+                "    [dim]codes:[/dim] "
+                + (f"K={','.join(k)}" if k else "")
+                + ("  " if k and s else "")
+                + (f"S={','.join(s)}" if s else "")
+            )
 
     src = p.get("source_file")
     if src:

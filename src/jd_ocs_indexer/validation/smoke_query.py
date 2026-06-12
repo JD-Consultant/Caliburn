@@ -70,6 +70,9 @@ def filter_by_ks_code(
     skill: list[str] | None = None,
     limit: int = 50,
 ) -> list[Hit]:
+    # Filter uses parallel k_codes/s_codes arrays (Qdrant payload index).
+    # Pair structures (k_pairs / s_pairs) are for display only — Qdrant payload
+    # index on list[object] sub-fields is less efficient than list[keyword].
     musts: list[models.Condition] = [
         models.FieldCondition(
             key="chunk_level",

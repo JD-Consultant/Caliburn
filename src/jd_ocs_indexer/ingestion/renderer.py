@@ -117,6 +117,35 @@ class MarkdownRenderer:
                 unit_lines.append(f"- {label} {title}".rstrip())
             lines.extend(unit_lines)
 
+        # v2: skill cloud — aggregate dedup K-names and S-names from all child
+        # blocks. Provides retrieval signal for stage 1 (candidate OCS selection)
+        # when user query contains tool-level terms that only appear deep in blocks.
+        all_k_names: list[str] = []
+        all_s_names: list[str] = []
+        seen_k: set[str] = set()
+        seen_s: set[str] = set()
+        for u in norm.units:
+            for g in u.task_groups:
+                for b in g.blocks:
+                    for p in b.k_pairs:
+                        if p.name and p.name not in seen_k:
+                            seen_k.add(p.name)
+                            all_k_names.append(p.name)
+                    for p in b.s_pairs:
+                        if p.name and p.name not in seen_s:
+                            seen_s.add(p.name)
+                            all_s_names.append(p.name)
+
+        if all_k_names:
+            lines.append("")
+            lines.append("## 核心知識領域")
+            lines.append(_bullet_list(all_k_names))
+
+        if all_s_names:
+            lines.append("")
+            lines.append("## 核心技能")
+            lines.append(_bullet_list(all_s_names))
+
         if norm.attitude_terms:
             lines.append("")
             lines.append("## 態度需求")

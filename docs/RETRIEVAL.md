@@ -20,7 +20,7 @@ v1 smoke query 的目的只有驗證 Qdrant collection 寫入是否正確。
 ### 1.1 Count
 
 ```bash
-uv run python -m jd_ocs_indexer.cli stats --collection ocs_bgem3_v1
+uv run python -m jd_ocs_indexer.cli stats --collection ocs_bgem3_v2
 ```
 
 預期：
@@ -33,7 +33,7 @@ uv run python -m jd_ocs_indexer.cli stats --collection ocs_bgem3_v1
 ### 1.2 Retrieve by `ocs_code`
 
 ```bash
-uv run python -m jd_ocs_indexer.cli smoke-query --collection ocs_bgem3_v1 --ocs-code INM3513-009v1
+uv run python -m jd_ocs_indexer.cli smoke-query --collection ocs_bgem3_v2 --ocs-code INM3513-009v1
 ```
 
 底層用 payload filter：
@@ -58,7 +58,7 @@ models.Filter(
 ### 1.3 Filter by K/S code
 
 ```bash
-uv run python -m jd_ocs_indexer.cli smoke-query --collection ocs_bgem3_v1 --knowledge K01 --skill S01
+uv run python -m jd_ocs_indexer.cli smoke-query --collection ocs_bgem3_v2 --knowledge K01 --skill S01
 ```
 
 底層用 payload filter，不做 vector search：
@@ -82,7 +82,7 @@ models.Filter(
 ### 1.4 Dev-only vector probe
 
 ```bash
-uv run python -m jd_ocs_indexer.cli smoke-query --collection ocs_bgem3_v1 --probe-vector "資料清理 報表 需求確認"
+uv run python -m jd_ocs_indexer.cli smoke-query --collection ocs_bgem3_v2 --probe-vector "資料清理 報表 需求確認"
 ```
 
 用途是確認 dense/sparse vectors 有正確寫入與可查，不是正式 retrieval API。
@@ -112,6 +112,18 @@ jd-ocs-query-api
 ---
 
 ## 3. JD Authoring Retrieval Flow
+
+### 3.0 重要：所有 query 預設加 `is_current=true` filter
+
+908 份 OCS 含舊版本（v1/v2/v3/v4 並存於同一 collection）。Consumer 端寫 query 時建議**預設加**：
+
+```python
+models.FieldCondition(key="is_current", match=models.MatchValue(value=True))
+```
+
+避免推薦到已被取代的舊版本。只有審計、版本比對等特殊需求才查 `is_current=false`。
+
+v2 indexer 保留此欄位但不強制 filter — 留給 consumer 決定政策。
 
 ### 3.1 使用者只給職務名稱
 

@@ -89,6 +89,24 @@ def main() -> int:
                         f"{loaded.rel_path}: schema_version={p.get('schema_version')} "
                         f"expected ocs-index-v2"
                     )
+                # v2 skill cloud in markdown
+                text = r.text
+                if "## 核心知識領域" not in text:
+                    errors.append(f"{loaded.rel_path}: profile missing '## 核心知識領域' section")
+                if "## 核心技能" not in text:
+                    errors.append(f"{loaded.rel_path}: profile missing '## 核心技能' section")
+                # cloud bullets reasonably populated (fixtures all have 15+ K, 10+ S)
+                k_section = (
+                    text.split("## 核心知識領域")[1].split("## ")[0]
+                    if "## 核心知識領域" in text
+                    else ""
+                )
+                k_bullets = [ln for ln in k_section.splitlines() if ln.startswith("- ")]
+                if len(k_bullets) < 5:
+                    errors.append(
+                        f"{loaded.rel_path}: profile 核心知識領域 only {len(k_bullets)} bullets"
+                    )
+
                 if sample_profile_payload is None:
                     sample_profile_payload = p
 

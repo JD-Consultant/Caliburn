@@ -257,8 +257,8 @@ class ChunkBuilder:
                 "task_ids": group.task_ids,
                 "task_titles": group.task_titles,
                 "task_orders": group.task_orders,
-                "block_id": block.block_id,
-                "block_title": block.block_title,
+                "block_id": None,           # v2: removed synthetic id
+                "block_title": None,        # v2: removed synthetic title
                 "block_order": block.block_order,
                 "competency_level": block.competency_level,
                 "indicator_codes": block.indicator_codes,

@@ -13,6 +13,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 
+from jd_ocs_indexer.models.chunk import Pair
 from jd_ocs_indexer.models.ocs import OCSDocument
 
 
@@ -24,8 +25,6 @@ _LATEST_STATUS_TOKENS = ("最新",)
 class NormalizedBlock:
     block_order: int                         # 1-based within parent task group
     competency_level: int | None
-    block_id: str | None                     # fallback to padded order if missing
-    block_title: str | None
     indicator_codes: list[str] = field(default_factory=list)
     output_codes: list[str] = field(default_factory=list)
     indicator_texts: list[str] = field(default_factory=list)
@@ -34,6 +33,11 @@ class NormalizedBlock:
     s_codes: list[str] = field(default_factory=list)
     knowledge_terms: list[str] = field(default_factory=list)
     skill_terms: list[str] = field(default_factory=list)
+    # v2: pair structures (code-name bound together to prevent misalignment)
+    k_pairs: list[Pair] = field(default_factory=list)
+    s_pairs: list[Pair] = field(default_factory=list)
+    output_pairs: list[Pair] = field(default_factory=list)
+    evidence: list[Pair] = field(default_factory=list)  # indicator code + activity text
 
 
 @dataclass
@@ -83,6 +87,7 @@ class NormalizedOCS:
     # Attitudes
     attitude_codes: list[str]
     attitude_terms: list[str]                # rich descriptive text
+    attitude_pairs: list[Pair]               # v2: code-name bound
 
     # Notes
     prerequisites: list[str]
@@ -205,40 +210,43 @@ def normalize(doc: OCSDocument) -> NormalizedOCS:
 
             norm_blocks: list[NormalizedBlock] = []
             for b_idx, b in enumerate(group.competency_blocks, start=1):
-                ind_codes = [i.code for i in b.indicators if i.code]
-                out_codes = [o.code for o in b.outputs if o.code]
-                ind_texts = [i.text.strip() for i in b.indicators if i.text]
-                out_names = [o.name.strip() for o in b.outputs if o.name]
-                k_codes = [k.code for k in b.knowledge if k.code]
-                s_codes = [s.code for s in b.skills if s.code]
-                k_terms = [k.name.strip() for k in b.knowledge if k.name]
-                s_terms = [s.name.strip() for s in b.skills if s.name]
+                # v2: build pairs first (single filter — code AND name both present),
+                # then derive parallel arrays from the pairs so they're always aligned.
+                k_pairs = [
+                    Pair(code=k.code, name=k.name.strip())
+                    for k in b.knowledge
+                    if k.code and k.name and k.name.strip()
+                ]
+                s_pairs = [
+                    Pair(code=s.code, name=s.name.strip())
+                    for s in b.skills
+                    if s.code and s.name and s.name.strip()
+                ]
+                output_pairs = [
+                    Pair(code=o.code, name=o.name.strip())
+                    for o in b.outputs
+                    if o.code and o.name and o.name.strip()
+                ]
+                evidence = [
+                    Pair(code=i.code, name=i.text.strip())  # name field reused as activity_text
+                    for i in b.indicators
+                    if i.code and i.text and i.text.strip()
+                ]
 
-                # block_id fallback: first indicator code prefix (e.g. P1.1.1 -> P1.1) is fragile.
-                # Use the block order; payload still preserves indicator/output codes.
-                block_id = None
-                if ind_codes:
-                    # Compose a stable label like "P1.1" (drop last segment) for human reference
-                    head = ind_codes[0]
-                    parts = head.split(".")
-                    if len(parts) >= 2:
-                        block_id = ".".join(parts[:-1])
-                if not block_id:
-                    block_id = _padded(b_idx)
-
-                block_title = None
-                if out_names:
-                    block_title = out_names[0]
-                elif ind_texts:
-                    snippet = ind_texts[0].strip()
-                    block_title = snippet[:24] + ("…" if len(snippet) > 24 else "")
+                # Parallel arrays derived from pairs — guaranteed aligned.
+                k_codes = [p.code for p in k_pairs]
+                s_codes = [p.code for p in s_pairs]
+                k_terms = [p.name for p in k_pairs]
+                s_terms = [p.name for p in s_pairs]
+                out_codes = [p.code for p in output_pairs]
+                out_names = [p.name for p in output_pairs]
+                ind_codes = [p.code for p in evidence]
+                ind_texts = [p.name for p in evidence]
 
                 norm_blocks.append(
                     NormalizedBlock(
                         block_order=b_idx,
                         competency_level=b.competency_level,
-                        block_id=block_id,
-                        block_title=block_title,
                         indicator_codes=ind_codes,
                         output_codes=out_codes,
                         indicator_texts=ind_texts,
@@ -247,6 +255,10 @@ def normalize(doc: OCSDocument) -> NormalizedOCS:
                         s_codes=s_codes,
                         knowledge_terms=k_terms,
                         skill_terms=s_terms,
+                        k_pairs=k_pairs,
+                        s_pairs=s_pairs,
+                        output_pairs=output_pairs,
+                        evidence=evidence,
                     )
                 )
 
@@ -270,13 +282,14 @@ def normalize(doc: OCSDocument) -> NormalizedOCS:
             )
         )
 
-    attitude_codes: list[str] = []
-    attitude_terms: list[str] = []
-    for a in doc.ocs_attitude.attitudes:
-        if a.code:
-            attitude_codes.append(a.code)
-        if a.name:
-            attitude_terms.append(a.name.strip())
+    # v2: build pairs first, derive parallel arrays from them
+    attitude_pairs = [
+        Pair(code=a.code, name=a.name.strip())
+        for a in doc.ocs_attitude.attitudes
+        if a.code and a.name and a.name.strip()
+    ]
+    attitude_codes = [p.code for p in attitude_pairs]
+    attitude_terms = [p.name for p in attitude_pairs]
 
     prerequisites = [p.strip() for p in doc.notes.prerequisites if p and p.strip()]
     supplements = [s.strip() for s in doc.notes.supplements if s and s.strip()]
@@ -300,6 +313,7 @@ def normalize(doc: OCSDocument) -> NormalizedOCS:
         units=units,
         attitude_codes=attitude_codes,
         attitude_terms=attitude_terms,
+        attitude_pairs=attitude_pairs,
         prerequisites=prerequisites,
         supplements=supplements,
     )

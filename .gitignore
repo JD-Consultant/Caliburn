@@ -223,7 +223,7 @@ output/
 manifest.json
 failed_files.jsonl
 failed_chunks.jsonl
-models/
+/models/
 .model_cache/
 
 # Claude Code local agent state

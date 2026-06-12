@@ -262,58 +262,66 @@ class MarkdownRenderer:
             if id_text:
                 lines.append(f"- 任務代碼：{id_text}")
 
-        block_title = p.get("block_title") or ""
+        # v2: no synthetic block_title — identify block by its order within task
+        block_order = p.get("block_order")
         lines.append("")
-        lines.append(f"#### 能力區塊：{block_title}".rstrip())
+        if block_order is not None:
+            lines.append(f"#### 能力區塊 #{block_order}")
+        else:
+            lines.append("#### 能力區塊")
         if p.get("competency_level") is not None:
             lines.append(f"- 能力等級：L{p['competency_level']}")
 
-        activities = p.get("work_activity_terms") or []
-        if activities:
+        # v2: render evidence / output / K / S directly from payload pair fields
+        # in '(code) name' format — gives LLM a citable atom in the markdown.
+
+        evidence = p.get("evidence") or []
+        if evidence:
             lines.append("")
             lines.append("工作活動：")
-            lines.append(_bullet_list(activities))
+            for ev in evidence:
+                code = ev.get("indicator_code", "")
+                text = ev.get("activity_text", "")
+                if code and text:
+                    lines.append(f"- ({code}) {text}")
+                elif text:
+                    lines.append(f"- {text}")
 
-        outputs = []
-        # outputs are in payload as `output_codes`; the renderer prefers the
-        # raw output names which we still hold in the NormalizedOCS.
-        unit = self._find_unit(norm, p.get("unit_id"))
-        primary_task = sorted(task_ids)[0] if task_ids else None
-        if unit:
-            for g in unit.task_groups:
-                if primary_task and g.primary_task_key != primary_task:
-                    continue
-                # match block by order
-                for b in g.blocks:
-                    if b.block_order == p.get("block_order"):
-                        outputs = b.output_names
-                        knowledge_terms_local = b.knowledge_terms
-                        skill_terms_local = b.skill_terms
-                        break
-                else:
-                    continue
-                break
-            else:
-                knowledge_terms_local = p.get("knowledge_terms") or []
-                skill_terms_local = p.get("skill_terms") or []
-        else:
-            knowledge_terms_local = p.get("knowledge_terms") or []
-            skill_terms_local = p.get("skill_terms") or []
-
-        if outputs:
+        output_pairs = p.get("output_pairs") or []
+        if output_pairs:
             lines.append("")
             lines.append("工作產出：")
-            lines.append(_bullet_list(outputs))
+            for op in output_pairs:
+                code = op.get("code", "")
+                name = op.get("name", "")
+                if code and name:
+                    lines.append(f"- ({code}) {name}")
+                elif name:
+                    lines.append(f"- {name}")
 
-        if knowledge_terms_local:
+        k_pairs = p.get("k_pairs") or []
+        if k_pairs:
             lines.append("")
             lines.append("必備知識：")
-            lines.append(_bullet_list(knowledge_terms_local))
+            for kp in k_pairs:
+                code = kp.get("code", "")
+                name = kp.get("name", "")
+                if code and name:
+                    lines.append(f"- ({code}) {name}")
+                elif name:
+                    lines.append(f"- {name}")
 
-        if skill_terms_local:
+        s_pairs = p.get("s_pairs") or []
+        if s_pairs:
             lines.append("")
             lines.append("必備技能：")
-            lines.append(_bullet_list(skill_terms_local))
+            for sp in s_pairs:
+                code = sp.get("code", "")
+                name = sp.get("name", "")
+                if code and name:
+                    lines.append(f"- ({code}) {name}")
+                elif name:
+                    lines.append(f"- {name}")
 
         return "\n".join(lines).rstrip() + "\n"
 

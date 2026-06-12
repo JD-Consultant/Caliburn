@@ -106,6 +106,50 @@ future service 用途：
 - 多個 block 命中同一職務時補職務定位。
 - JD draft 前提供職務摘要。
 
+### v2: profile 加技能雲段落
+
+v2 起 profile markdown 在「主要工作任務」之後新增兩個區塊：
+
+- `## 核心知識領域`：去重彙整所有子 block 的 K-names
+- `## 核心技能`：去重彙整所有子 block 的 S-names
+
+**為什麼**：使用者粗描述常用工具名稱（SQL、Python、Power BI），這類詞原本只在 block 層的 skill_terms 出現，profile 層 dense + sparse 都漏。加技能雲後 stage 1 retrieval 命中率明顯改善。
+
+成本：profile chunk text 從 ~500 字增至 ~1500 字，BGE-M3 max_length 8192 容得下。Sparse vector nnz 增加，Qdrant 處理無壓力。
+
+範例（v2 profile 含技能雲）：
+
+```markdown
+# AI應用規劃師 (SMS2512-002v1)
+
+- 職能基準等級：L5
+- 適用產業：資訊服務業
+
+## 工作描述
+了解 AI 工具的特性...
+
+## 主要工作任務
+- T1 評估與分析AI技術
+- T2 提出AI應用策略及建議
+- T3 負責AI應用開發與部署規劃
+
+## 核心知識領域
+- AI 技術基本原理
+- 機器學習概論
+- 資料處理與分析概念
+- 系統整合方法
+- 技術部署流程知識
+...
+
+## 核心技能
+- 資料蒐集能力
+- 技術評估與分析能力
+- AI技術/工具應用能力
+- 程式語言能力
+- 系統整合能力
+...
+```
+
 ---
 
 ## 5. Unit Chunk
@@ -199,6 +243,49 @@ future service 用途：
 - 從使用者工作活動命中具體能力。
 - 聚合 K/S codes。
 - 當作 evidence chunk。
+
+### v2: 用 (code) name 格式 + 移除合成 block_title
+
+v2 block markdown 改變：
+
+1. `#### 能力區塊：<合成名稱>` → `#### 能力區塊 #N`（N 為 block_order）。OCS 沒有 block 名稱欄位，v1 合成的「資料清理與品質檢查」其實是從 output[0].name 截斷的，會誤導 LLM
+2. 工作活動 / 工作產出 / 必備知識 / 必備技能 每條都用 `(code) name` 格式
+
+範例（v2）：
+
+```markdown
+# AI應用規劃師 (SMS2512-002v1)
+
+## 職能單元：負責AI應用開發與部署規劃
+- 單元代碼：T3
+
+### 工作任務：確保AI應用部署與系統整合
+- 任務代碼：T3.3
+
+#### 能力區塊 #1
+- 能力等級：L3
+
+工作活動：
+- (P3.3.1) 將AI應用開發與現有系統整合,及確保技術部署過程順利進行...
+
+工作產出：
+- (O3.3.1) 技術部署方案或系統整合報告
+
+必備知識：
+- (K05) 機器學習概論
+- (K08) 專案管理知識
+- (K17) 系統整合方法
+
+必備技能：
+- (S03) 技術評估與分析能力
+- (S17) 系統整合能力
+- (S18) 技術部署能力
+```
+
+**為什麼**：
+- LLM 引用時 code 就在 name 旁邊，不用反查
+- block 不寫合成名稱避免誤導
+- payload 同時用 `evidence` / `k_pairs` / `s_pairs` / `output_pairs` 存結構化版本給 consumer 直接讀
 
 ---
 

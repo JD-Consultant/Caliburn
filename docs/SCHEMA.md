@@ -85,7 +85,7 @@ payload 分成三類：
     # Identification
     "chunk_key": str,                 # ocs:{ocs_code}:unit:{unit_key}:...
     "chunk_level": Literal["profile", "unit", "block"],
-    "schema_version": str,            # "ocs-index-v1"
+    "schema_version": str,            # "ocs-index-v2"
     "embedding_provider": str,        # "bge-m3"
     "text_format": Literal["markdown"],
     "text": str,                      # Markdown text used for embedding and context
@@ -118,9 +118,9 @@ payload 分成三類：
     "task_titles": list[str],
     "task_orders": list[int],
 
-    # Block context
-    "block_id": Optional[str],
-    "block_title": Optional[str],
+    # Block context (v2: block_id / block_title always None — were synthetic)
+    "block_id": None,                 # v2 deprecated
+    "block_title": None,              # v2 deprecated
     "block_order": Optional[int],
     "competency_level": Optional[int],
 
@@ -128,17 +128,32 @@ payload 分成三類：
     "profile_chunk_id": Optional[str],
     "unit_chunk_id": Optional[str],
 
-    # OCS codes for filter / evidence
-    "indicator_codes": list[str],     # P codes
-    "output_codes": list[str],        # O codes
-    "k_codes": list[str],
-    "s_codes": list[str],
-    "attitude_codes": list[str],
+    # OCS codes for filter / evidence (kept for Qdrant payload index)
+    "indicator_codes": list[str],     # P codes (block) — derived from evidence
+    "output_codes": list[str],        # O codes (block) — derived from output_pairs
+    "k_codes": list[str],             # — derived from k_pairs
+    "s_codes": list[str],             # — derived from s_pairs
+    "attitude_codes": list[str],      # — derived from all_a_pairs
 
-    # Human-readable terms for JD authoring service
+    # Human-readable terms (kept for legacy/v1 compatibility)
     "knowledge_terms": list[str],
     "skill_terms": list[str],
     "work_activity_terms": list[str],
+
+    # v2: PAIR STRUCTURES — code + name bound together, prevents misalignment.
+    # block: per-block K/S/output/indicator pairs
+    # unit:  aggregated dedup K/S/output pairs across child blocks
+    # profile: empty at this level (see all_*_pairs below)
+    "k_pairs": list[{"code": str, "name": str}],
+    "s_pairs": list[{"code": str, "name": str}],
+    "output_pairs": list[{"code": str, "name": str}],
+    "evidence": list[{"indicator_code": str, "activity_text": str}],
+
+    # v2: OCS-wide pools (profile chunk only — empty/missing on unit/block)
+    "all_k_pairs": list[{"code": str, "name": str}],       # profile only
+    "all_s_pairs": list[{"code": str, "name": str}],       # profile only
+    "all_a_pairs": list[{"code": str, "name": str}],       # profile only
+    "all_output_pairs": list[{"code": str, "name": str}],  # profile only
 
     # Source trace
     "source_root_alias": str,         # "jd-pdf-to-json"
@@ -275,6 +290,60 @@ parent chunk id 是 Qdrant 內的快速上下文捷徑：
 ```
 
 這些標籤不是主要搜尋入口，不預設建 index。用途是 citation、排序、debug、回原始 JSON 對照。
+
+### v2: `*_pairs` 與 `evidence`
+
+每個 pair 形式為 `{"code": str, "name": str}`。Code 與 name 永遠捆綁，不會分離：
+
+```json
+{
+  "k_pairs": [
+    {"code": "K01", "name": "AI 技術基本原理"},
+    {"code": "K02", "name": "AI應用場景知識"}
+  ],
+  "s_pairs": [
+    {"code": "S03", "name": "技術評估與分析能力"}
+  ],
+  "output_pairs": [
+    {"code": "O3.3.1", "name": "技術部署方案或系統整合報告"}
+  ],
+  "evidence": [
+    {"indicator_code": "P3.3.1", "activity_text": "將AI應用開發與現有系統整合..."}
+  ]
+}
+```
+
+**為什麼**：v1 用平行 list（`k_codes` + `knowledge_terms`）有靜默 misalignment 風險 — 過濾條件不一致時，K01 可能對應到 K02 的 name。Pair 結構從建立時就配對好，consumer 端拿 `k_pairs[i]` 永遠完整。
+
+`evidence` 是 block 層的「OCS 官方原句」結構化版本：`indicator_code` 是引用 key，`activity_text` 是 LLM 顧問可以原句引用的句子。
+
+平行的 `k_codes` / `s_codes` / `output_codes` / `indicator_codes` 仍會寫入 payload（給 Qdrant payload index 做 filter 用），但是**從 pairs 反推**而不是獨立 build，所以保證對齊。
+
+### v2: `all_*_pairs` (profile 層特有)
+
+只在 profile chunk 出現：
+
+```json
+{
+  "all_k_pairs": [...],       // 該 OCS 全部 K（跨 block 去重）
+  "all_s_pairs": [...],       // 該 OCS 全部 S
+  "all_a_pairs": [...],       // 該 OCS 全部態度（含完整敘述）
+  "all_output_pairs": [...]   // 該 OCS 全部工作產出
+}
+```
+
+**用途**：
+1. **LLM 顧問訪談**：使用者新增自訂工作項目時，顧問從 `all_k_pairs` / `all_s_pairs` 池中挑代碼建議，不需要憑空編造
+2. **UI 選單**：「對應的能力 (可選)」介面直接列 pool 給使用者勾
+3. **覆蓋 gap 分析**：consumer 可以對比「使用者選了哪些 K/S」vs「OCS 完整 pool」找出缺漏
+
+### v2: deprecated `block_id` / `block_title`
+
+OCS JSON 沒有 block 層名稱欄位。v1 從 indicator code prefix 或 output[0].name 截斷產生「合成名稱」，但這會：
+- 造成 chunk_key 碰撞（多個 block 撞同 indicator prefix）
+- 誤導 LLM 以為「這 block 叫 XXX」
+
+v2 起 block payload `block_id = block_title = None`，markdown 標題改用 `#### 能力區塊 #N`（N 為 block_order）。block 身份由 ocs_code + unit + task + block_order 共同確認。
 
 ---
 

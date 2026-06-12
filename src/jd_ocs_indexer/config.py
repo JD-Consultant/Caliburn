@@ -68,10 +68,10 @@ def load_settings() -> Settings:
     return Settings(
         qdrant_url=_env("QDRANT_URL", "http://localhost:6333") or "",
         qdrant_api_key=_env("QDRANT_API_KEY"),
-        qdrant_collection=_env("QDRANT_COLLECTION", "ocs_bgem3_v1") or "ocs_bgem3_v1",
+        qdrant_collection=_env("QDRANT_COLLECTION", "ocs_bgem3_v2") or "ocs_bgem3_v2",
         source_root=source_root,
         source_root_alias=_env("OCS_SOURCE_ROOT_ALIAS", "jd-pdf-to-json") or "jd-pdf-to-json",
-        schema_version=_env("SCHEMA_VERSION", "ocs-index-v1") or "ocs-index-v1",
+        schema_version=_env("SCHEMA_VERSION", "ocs-index-v2") or "ocs-index-v2",
         embedding_provider=_env("EMBEDDING_PROVIDER", "bge-m3") or "bge-m3",
         bge_m3_model=_env("BGE_M3_MODEL", "BAAI/bge-m3") or "BAAI/bge-m3",
         bge_m3_device=_env("BGE_M3_DEVICE", "cpu") or "cpu",

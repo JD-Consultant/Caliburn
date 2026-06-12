@@ -219,6 +219,7 @@ __marimo__/
 
 # jd-ocs-indexer project-specific
 .data/
+/data/
 output/
 manifest.json
 failed_files.jsonl

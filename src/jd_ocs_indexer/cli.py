@@ -125,7 +125,7 @@ def _index_impl(settings: Settings, scan_dir: Path, *, limit: int, rebuild: bool
         batch_size=settings.bge_m3_batch_size,
     )
 
-    client = make_client(url=settings.qdrant_url, api_key=settings.qdrant_api_key)
+    client = make_client(url=settings.qdrant_url, api_key=settings.qdrant_api_key, timeout=settings.qdrant_timeout)
     writer = QdrantWriter(
         client,
         settings.qdrant_collection,
@@ -153,8 +153,10 @@ def _index_impl(settings: Settings, scan_dir: Path, *, limit: int, rebuild: bool
     pending_file_chunks: dict[str, list[str]] = {}
     pending_files: dict[str, str] = {}  # rel_path -> source_json_hash
 
+    upsert_retries = 0
+
     def flush_batch() -> None:
-        nonlocal total_chunks
+        nonlocal total_chunks, upsert_retries
         if not pending_records:
             return
         texts = [r.text for r in pending_records]
@@ -163,7 +165,8 @@ def _index_impl(settings: Settings, scan_dir: Path, *, limit: int, rebuild: bool
             EmbeddedChunk(record=r, dense=v.dense, sparse=v.sparse)
             for r, v in zip(pending_records, vecs)
         ]
-        writer.upsert(embedded)
+        report = writer.upsert(embedded)
+        upsert_retries += report.retries
         total_chunks += len(embedded)
         pending_records.clear()
 
@@ -241,6 +244,7 @@ def _index_impl(settings: Settings, scan_dir: Path, *, limit: int, rebuild: bool
     table.add_row("skipped_files", str(skipped))
     table.add_row("failed_files", str(failed))
     table.add_row("chunks", str(total_chunks))
+    table.add_row("upsert_retries", str(upsert_retries))
     table.add_row("elapsed_sec", f"{elapsed:.1f}")
     console.print(table)
 
@@ -274,7 +278,7 @@ def stats(
         console.print(table)
 
     if collection:
-        client = make_client(url=settings.qdrant_url, api_key=settings.qdrant_api_key)
+        client = make_client(url=settings.qdrant_url, api_key=settings.qdrant_api_key, timeout=settings.qdrant_timeout)
         c = stats_mod.collection_stats(client, collection)
         table = Table(title=f"Collection: {c.name}")
         table.add_column("metric")
@@ -360,7 +364,7 @@ def smoke_query_cmd(
 ) -> None:
     """Validate the indexed collection. Output is not a stable API."""
     settings = load_settings()
-    client = make_client(url=settings.qdrant_url, api_key=settings.qdrant_api_key)
+    client = make_client(url=settings.qdrant_url, api_key=settings.qdrant_api_key, timeout=settings.qdrant_timeout)
 
     if ocs_code:
         hits = smoke_query.retrieve_by_ocs_code(client, collection, ocs_code, limit=200)
@@ -426,7 +430,7 @@ def query(
     """Run a natural-language query against the indexed collection."""
     settings = load_settings()
     coll = collection or settings.qdrant_collection
-    client = make_client(url=settings.qdrant_url, api_key=settings.qdrant_api_key)
+    client = make_client(url=settings.qdrant_url, api_key=settings.qdrant_api_key, timeout=settings.qdrant_timeout)
 
     from jd_ocs_indexer.embeddings.bge_m3 import BGEM3Embedder
 

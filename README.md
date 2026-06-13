@@ -346,6 +346,35 @@ uv run python -m jd_ocs_indexer.cli query "AI 部署" --text-lines 0
 
 ---
 
+## Query API (for jobintel-ai)
+
+Stateless HTTP read layer over the Qdrant index. Embeds query text server-side
+(BGE-M3), so callers send plain text. No conversation state / LLM here.
+
+Install + run:
+
+```bash
+uv sync --extra api
+jd-ocs-indexer serve --host 127.0.0.1 --port 8000
+```
+
+| Method | Path | Use |
+|---|---|---|
+| POST | `/search` | NL query → hits (server-side embed; `level`/`filters`/`hybrid`/`top_k`) |
+| POST | `/task-pool` | merge `ocs_codes` → unit→task menu with activity examples |
+| GET | `/profile/{ocs_code}/pairs` | OCS-wide K/S/A/output vocabulary pools |
+| GET | `/healthz` | model + Qdrant readiness (200 ok / 503 degraded) |
+| GET | `/stats` | collection point counts by level |
+
+Interactive OpenAPI docs at `/docs`. Example:
+
+```bash
+curl -s localhost:8000/search -H 'content-type: application/json' \
+  -d '{"query":"資料分析 Python SQL","level":"profile","top_k":5}'
+```
+
+---
+
 ## 模組結構
 
 ```text

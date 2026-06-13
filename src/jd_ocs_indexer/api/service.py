@@ -11,11 +11,13 @@ from jd_ocs_indexer.validation import search as search_mod
 
 def _project_hit(hit, *, include_text: bool, text_lines: int) -> dict:
     p = hit.payload or {}
+    # All display fields come from the payload; score is the query-result rank
+    # score (not in payload), so it's the one field read off the Hit itself.
     out = {
-        "chunk_key": hit.chunk_key,
-        "chunk_level": hit.chunk_level,
-        "ocs_code": hit.ocs_code,
-        "job_title": hit.job_title,
+        "chunk_key": p.get("chunk_key", ""),
+        "chunk_level": p.get("chunk_level", ""),
+        "ocs_code": p.get("ocs_code", ""),
+        "job_title": p.get("job_title", ""),
         "score": hit.score,
         "version": p.get("version"),
         "is_current": p.get("is_current"),

@@ -27,6 +27,7 @@ def test_search_hybrid_mode(make_qdrant, fake_point, stub_embedder):
     fake = make_qdrant(query_points=[fake_point(payload=_payload(), score=0.5)])
     out = service.search(fake, stub_embedder, "coll", query="hi", hybrid=True)
     assert out["mode"] == "hybrid"
+    assert len(out["hits"]) == 1
 
 
 def test_search_include_text_snippet(make_qdrant, fake_point, stub_embedder):

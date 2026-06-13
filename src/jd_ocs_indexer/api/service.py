@@ -7,6 +7,7 @@ imports here so the layer stays unit-testable with fakes.
 from __future__ import annotations
 
 from jd_ocs_indexer.validation import search as search_mod
+from qdrant_client.http import models
 
 
 def _project_hit(hit, *, include_text: bool, text_lines: int) -> dict:
@@ -83,3 +84,90 @@ def search(
         "level": level,
         "hits": [_project_hit(h, include_text=include_text, text_lines=text_lines) for h in hits],
     }
+
+
+def _scroll_all(client, collection: str, flt, *, page: int = 256) -> list[dict]:
+    out: list[dict] = []
+    offset = None
+    while True:
+        records, offset = client.scroll(
+            collection_name=collection,
+            scroll_filter=flt,
+            with_payload=True,
+            with_vectors=False,
+            limit=page,
+            offset=offset,
+        )
+        out.extend((r.payload or {}) for r in records)
+        if offset is None:
+            break
+    return out
+
+
+def build_task_pool(client, collection: str, *, ocs_codes: list[str], activity_examples: int = 1) -> dict:
+    """Round 2 task menu. Shaped from block chunks (not unit payload) because the
+    unit payload's task_ids/task_titles are independently deduped and not safely
+    zippable; block chunks carry aligned per-group task arrays + activities."""
+    flt = models.Filter(
+        must=[
+            models.FieldCondition(key="chunk_level", match=models.MatchValue(value="block")),
+            models.FieldCondition(key="ocs_code", match=models.MatchAny(any=list(ocs_codes))),
+        ]
+    )
+    payloads = _scroll_all(client, collection, flt)
+
+    groups: dict[str, dict] = {}
+    for p in payloads:
+        oc = p.get("ocs_code")
+        if oc is None:
+            continue
+        g = groups.setdefault(oc, {"ocs_code": oc, "job_title": p.get("job_title") or "", "units": {}})
+        if not g["job_title"] and p.get("job_title"):
+            g["job_title"] = p["job_title"]
+        uorder = p.get("unit_order")
+        ukey = ("o", uorder) if uorder is not None else ("i", p.get("unit_id"))
+        u = g["units"].setdefault(
+            ukey,
+            {"unit_id": p.get("unit_id"), "unit_title": p.get("unit_title"), "unit_order": uorder, "tasks": {}},
+        )
+        task_ids = p.get("task_ids") or []
+        task_titles = p.get("task_titles") or []
+        activities = p.get("work_activity_terms") or []
+        for i, tid in enumerate(task_ids):
+            ttl = task_titles[i] if i < len(task_titles) else None
+            t = u["tasks"].setdefault(tid, {"task_id": tid, "task_title": ttl, "acts": []})
+            if not t["task_title"] and ttl:
+                t["task_title"] = ttl
+            for a in activities:
+                if a and a not in t["acts"]:
+                    t["acts"].append(a)
+
+    out_groups = []
+    for oc in ocs_codes:
+        g = groups.get(oc)
+        if not g:
+            continue
+        units_sorted = sorted(
+            g["units"].values(),
+            key=lambda u: (u["unit_order"] is None, u["unit_order"] or 0),
+        )
+        units_out = []
+        for u in units_sorted:
+            tasks_sorted = sorted(u["tasks"].values(), key=lambda t: t["task_id"])
+            units_out.append(
+                {
+                    "unit_id": u["unit_id"],
+                    "unit_title": u["unit_title"],
+                    "unit_order": u["unit_order"],
+                    "tasks": [
+                        {
+                            "task_id": t["task_id"],
+                            "task_title": t["task_title"],
+                            "activity_examples": t["acts"][:activity_examples],
+                        }
+                        for t in tasks_sorted
+                    ],
+                }
+            )
+        out_groups.append({"ocs_code": g["ocs_code"], "job_title": g["job_title"], "units": units_out})
+    return {"groups": out_groups}

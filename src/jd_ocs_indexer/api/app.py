@@ -47,6 +47,8 @@ def create_app(*, settings: Settings | None = None, embedder=None, client=None) 
                 url=s.qdrant_url, api_key=s.qdrant_api_key, timeout=s.qdrant_timeout
             )
 
+        # Guards the BGE-M3 call only (not thread-safe). Scroll endpoints must
+        # NOT take this lock, or all reads would serialize behind embedding.
         app.state.embed_lock = threading.Lock()
         yield
 

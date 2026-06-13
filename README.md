@@ -10,6 +10,8 @@ OCS JSON -> profile/unit/block Markdown chunks -> embeddings -> Qdrant storage
 
 v1 **不提供正式查詢 API / MCP server tool / RAG answer engine**。本 repo 只保留 CLI smoke query，用來驗證 Qdrant 寫入、payload filter、point retrieve 正常。
 
+> v1 之後已加上一個 **無狀態查詢 HTTP API**（給下游 `jobintel-ai` 用），見下方 [Query API](#query-api給-jobintel-ai-的查詢介面)。它只做 read + server 端 embed，不含 LLM / 對話 / state。
+
 > **目前狀態：v1 骨架已實作，3 份 fixture 端到端通過**。可對 `S:\jd-pdf-to-json\output\0518\` 全量 908 份跑 `index`。詳見下方 [快速開始](#快速開始)。
 
 ---
@@ -346,32 +348,140 @@ uv run python -m jd_ocs_indexer.cli query "AI 部署" --text-lines 0
 
 ---
 
-## Query API (for jobintel-ai)
+## Query API（給 jobintel-ai 的查詢介面）
 
-Stateless HTTP read layer over the Qdrant index. Embeds query text server-side
-(BGE-M3), so callers send plain text. No conversation state / LLM here.
+Qdrant 索引之上的 **無狀態 HTTP read 層**。查詢文字在 **server 端用 BGE-M3 embed**，所以 caller 只送純文字。API 本身不做對話 / LLM / state —— 那些是下游 `jobintel-ai` 的事。每個 endpoint 對應 [docs/USER_FLOW.md](docs/USER_FLOW.md) 的一個訪談 round。
 
-Install + run:
+### 啟動
 
 ```bash
-uv sync --extra api
-jd-ocs-indexer serve --host 127.0.0.1 --port 8000
+uv sync --extra api                                  # 裝 fastapi + uvicorn
+uv run jd-ocs-indexer serve --host 127.0.0.1 --port 8000
 ```
 
-| Method | Path | Use |
-|---|---|---|
-| POST | `/search` | NL query → hits (server-side embed; `level`/`filters`/`hybrid`/`top_k`) |
-| POST | `/task-pool` | merge `ocs_codes` → unit→task menu with activity examples |
-| GET | `/profile/{ocs_code}/pairs` | OCS-wide K/S/A/output vocabulary pools |
-| GET | `/healthz` | model + Qdrant readiness (200 ok / 503 degraded) |
-| GET | `/stats` | collection point counts by level |
+- 啟動時 lifespan **載入一次 BGE-M3**（約 2.3GB）並連線 Qdrant；單一 worker。
+- 預設綁 `127.0.0.1`（loopback、**無 auth**；要對外請擺反向代理 / 加 middleware，`create_app()` 是擴充點）。
+- 互動式 OpenAPI 文件：`http://127.0.0.1:8000/docs`。
 
-Interactive OpenAPI docs at `/docs`. Example:
+| Method | Path | 用途 | USER_FLOW |
+|---|---|---|---|
+| POST | `/search` | 自然語言 → hits（server 端 embed） | Round 0-1、2-自訂 |
+| POST | `/task-pool` | 合併多 OCS 的 unit→task 選單 | Round 2 |
+| GET | `/profile/{ocs_code}/pairs` | 該 OCS 的 K/S/A/output 詞彙池 | Round 4 |
+| GET | `/healthz` | 模型 + Qdrant 就緒狀態 | ops |
+| GET | `/stats` | collection 各層點數 | ops |
 
+---
+
+### `POST /search` — 自然語言向量搜尋
+
+Request body（JSON）：
+
+| 欄位 | 型別 | 預設 | 說明 |
+|---|---|---|---|
+| `query` | string | （必填） | 自然語言查詢；空字串 → 422 |
+| `level` | string? | null | `profile` / `unit` / `block`；不給 = 跨層 |
+| `hybrid` | bool | `true` | dense + sparse RRF 融合；`false` = dense-only |
+| `top_k` | int | `10` | 1–50 |
+| `filters` | object | `{}` | payload 過濾（見下；**無隱藏預設**，未給的不套用） |
+| `include_text` | bool | `false` | 是否回 Markdown body 摘要 |
+| `text_lines` | int | `6` | `include_text` 時取幾行（0–50） |
+
+`filters` 子欄位（全部 optional）：`ocs_code`（精確）、`is_current`（bool）、`k_codes` / `s_codes` / `attitude_codes`（list，MatchAny）。
+
+Response：`{ "mode": "hybrid"|"dense", "level": <level>, "hits": [Hit, …] }`，每個 `Hit` 是 payload 的精選投影：
+
+```jsonc
+{
+  "chunk_key": "...", "chunk_level": "profile",       // profile|unit|block
+  "ocs_code": "SMS2521-001v3", "job_title": "巨量資料分析師",
+  "score": 1.0, "version": "v3", "is_current": true, "ocs_level": 5,
+  "competency_level": null,
+  "unit_id": null, "unit_title": null, "unit_order": null,
+  "task_ids": [], "task_titles": [], "block_order": null,
+  "k_pairs": [{"code": "K01", "name": "..."}], "s_pairs": [],
+  "industry_names": ["..."], "occupation_names": ["..."],
+  "source_file": "jd-ocs/.../SMS2521-001v3.json",
+  "snippet": null                                      // 只有 include_text=true 才有
+}
+```
+
+範例：
 ```bash
+# 找候選職務（profile + hybrid）
 curl -s localhost:8000/search -H 'content-type: application/json' \
-  -d '{"query":"資料分析 Python SQL","level":"profile","top_k":5}'
+  -d '{"query":"資料分析 Python SQL 機器學習","level":"profile","hybrid":true,"top_k":5}'
+
+# 自訂工作項目找掛點（block-level，只看現行版）
+curl -s localhost:8000/search -H 'content-type: application/json' \
+  -d '{"query":"LLM 模型微調與部署","level":"block","filters":{"is_current":true}}'
 ```
+
+---
+
+### `POST /task-pool` — 合併 task 選單（Round 2）
+
+給定一組 `ocs_codes`，回每個 OCS 的 unit→task 結構（從 block chunks 整形，含代表性 activity 例句）。
+
+| 欄位 | 型別 | 預設 | 說明 |
+|---|---|---|---|
+| `ocs_codes` | list[string] | （必填，≥1） | 要合併的 OCS 代碼 |
+| `activity_examples` | int | `1` | 每個 task 取幾句 activity 例句（0–10） |
+
+Response：
+```jsonc
+{ "groups": [ {
+  "ocs_code": "SMS2521-001v3", "job_title": "...",
+  "units": [ { "unit_id": "U1", "unit_title": "...", "unit_order": 1,
+    "tasks": [ {"task_id": "T1.1", "task_title": "...", "activity_examples": ["..."]} ] } ]
+} ] }
+```
+`groups` 依 request 的 `ocs_codes` 順序、`units` 依 `unit_order`、`tasks` 依 `task_id`。
+
+```bash
+curl -s localhost:8000/task-pool -H 'content-type: application/json' \
+  -d '{"ocs_codes":["SMS2521-001v3","INM3513-009v1"],"activity_examples":1}'
+```
+
+---
+
+### `GET /profile/{ocs_code}/pairs` — 詞彙池（Round 4）
+
+回該 OCS 全部的 K/S/A/output code-name 配對池（給 LLM 顧問挑選與提問用）。查無該 `ocs_code` → **404**。
+
+```jsonc
+{ "ocs_code": "SMS2521-001v3", "job_title": "...",
+  "all_k_pairs": [{"code": "K01", "name": "..."}],
+  "all_s_pairs": [...], "all_a_pairs": [...], "all_output_pairs": [...] }
+```
+
+```bash
+curl -s localhost:8000/profile/SMS2521-001v3/pairs
+```
+
+---
+
+### `GET /healthz` ／ `GET /stats` — 維運
+
+`/healthz`：模型已載入且 Qdrant 可連 → `200` `{"status":"ok",…}`；否則 → `503` `{"status":"degraded",…}`。
+
+```bash
+curl -s localhost:8000/healthz
+# {"status":"ok","model_loaded":true,"qdrant":"reachable","collection":"ocs_bgem3_v2"}
+curl -s localhost:8000/stats
+# {"collection":"ocs_bgem3_v2","total_points":12810,"by_level":{"profile":904,"unit":3260,"block":8646}}
+```
+
+---
+
+### 錯誤碼
+
+| 情境 | HTTP |
+|---|---|
+| request schema 違規（空 `query` / 未知 `level` / `top_k` 超界） | 422 |
+| `/pairs` 未知 `ocs_code` | 404 |
+| Qdrant upstream 回錯 / 連不上 | 502 / 503 |
+| 模型未就緒或 Qdrant 不通（`/healthz`） | 503 |
 
 ---
 
@@ -379,7 +489,7 @@ curl -s localhost:8000/search -H 'content-type: application/json' \
 
 ```text
 src/jd_ocs_indexer/
-  cli.py                  # render / index / stats / doctor / smoke-query
+  cli.py                  # render / index / stats / doctor / smoke-query / query / serve
   config.py               # .env -> Settings dataclass
   models/
     ocs.py                # OCS JSON Pydantic models（tolerant，未知欄位忽略）
@@ -401,7 +511,12 @@ src/jd_ocs_indexer/
   validation/
     stats.py              # source 與 collection 統計
     smoke_query.py        # by ocs_code / K/S filter / dense probe / sparse probe
-    search.py             # dense + hybrid(RRF) helpers for the `query` CLI
+    search.py             # build_filter + dense / hybrid(RRF) helpers（CLI query + API 共用）
+  api/                    # 查詢 HTTP API（optional extra：uv sync --extra api）
+    schemas.py            # Pydantic request / response models
+    service.py            # 無狀態編排：search / task_pool / pairs / stats / health
+    routes.py             # FastAPI router（threadpool + embed lock + 502/503）
+    app.py                # create_app() factory + lifespan（載模型 / 連 Qdrant 一次）
 ```
 
 ---

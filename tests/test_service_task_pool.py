@@ -49,3 +49,12 @@ def test_task_pool_titles_shorter_than_ids(make_qdrant):
     out = service.build_task_pool(fake, "coll", ocs_codes=["OC1"])
     tasks = {t["task_id"]: t["task_title"] for t in out["groups"][0]["units"][0]["tasks"]}
     assert tasks == {"T1.1": "only-one", "T1.2": None}
+
+
+def test_task_pool_scroll_paginates(make_qdrant):
+    # _scroll_all must consume every page until offset is None (shared primitive).
+    page1 = [_block("OC1", 1, "U1", "Unit One", ["T1.1"], ["t11"], ["a1"])]
+    page2 = [_block("OC1", 2, "U2", "Unit Two", ["T2.1"], ["t21"], ["a2"])]
+    fake = make_qdrant(scroll_pages=[(page1, "cursor"), (page2, None)])
+    out = service.build_task_pool(fake, "coll", ocs_codes=["OC1"])
+    assert [u["unit_id"] for u in out["groups"][0]["units"]] == ["U1", "U2"]

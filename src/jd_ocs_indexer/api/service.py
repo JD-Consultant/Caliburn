@@ -125,6 +125,9 @@ def build_task_pool(client, collection: str, *, ocs_codes: list[str], activity_e
         if not g["job_title"] and p.get("job_title"):
             g["job_title"] = p["job_title"]
         uorder = p.get("unit_order")
+        # unit_order is authoritative when present; fall back to unit_id otherwise.
+        # The builder stamps every block of a unit with that unit's order, so all
+        # blocks of one unit agree on the key form (no phantom-duplicate units).
         ukey = ("o", uorder) if uorder is not None else ("i", p.get("unit_id"))
         u = g["units"].setdefault(
             ukey,
@@ -149,7 +152,7 @@ def build_task_pool(client, collection: str, *, ocs_codes: list[str], activity_e
             continue
         units_sorted = sorted(
             g["units"].values(),
-            key=lambda u: (u["unit_order"] is None, u["unit_order"] or 0),
+            key=lambda u: (u["unit_order"] is None, u["unit_order"] if u["unit_order"] is not None else 0),
         )
         units_out = []
         for u in units_sorted:

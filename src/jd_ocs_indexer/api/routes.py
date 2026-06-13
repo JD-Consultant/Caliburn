@@ -9,6 +9,7 @@ from fastapi.responses import JSONResponse
 
 from jd_ocs_indexer.api import service
 from jd_ocs_indexer.api.schemas import (
+    HealthResponse,
     PairsResponse,
     SearchRequest,
     SearchResponse,
@@ -76,7 +77,9 @@ async def get_stats(request: Request):
     )
 
 
-@router.get("/healthz")
+# response_model documents the shape in OpenAPI; we still return JSONResponse
+# directly so the status code can be 200 (ok) or 503 (degraded).
+@router.get("/healthz", response_model=HealthResponse)
 async def get_healthz(request: Request):
     app = request.app
     result = await run_in_threadpool(

@@ -1,4 +1,5 @@
 from fastapi.testclient import TestClient
+from qdrant_client.http.exceptions import UnexpectedResponse
 
 
 def test_search_route_ok(make_app, make_qdrant, fake_point):
@@ -51,3 +52,26 @@ def test_stats_route(make_app, make_qdrant):
         r = c.get("/stats")
         assert r.status_code == 200
         assert r.json()["total_points"] == 5
+
+
+def test_healthz_route_degraded(make_app):
+    # Qdrant unreachable -> healthcheck reports degraded -> 503
+    class Down:
+        def get_collections(self):
+            raise RuntimeError("boom")
+
+    with TestClient(make_app(Down())) as c:
+        r = c.get("/healthz")
+        assert r.status_code == 503
+        assert r.json()["status"] == "degraded"
+
+
+def test_search_route_qdrant_unexpected_502(make_app):
+    # Qdrant UnexpectedResponse from the query path -> exception handler -> 502
+    class Boom:
+        def query_points(self, **kw):
+            raise UnexpectedResponse(status_code=500, reason_phrase="err", content=b"", headers=None)
+
+    with TestClient(make_app(Boom())) as c:
+        r = c.post("/search", json={"query": "hi", "hybrid": False})
+        assert r.status_code == 502

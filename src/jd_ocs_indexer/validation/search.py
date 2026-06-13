@@ -1,8 +1,8 @@
 """User-facing query helpers built on Qdrant primitives.
 
-Layered above `smoke_query`: smoke_query stays as raw validation; this module
-adds payload-filtered dense search and hybrid (RRF) fusion of dense + sparse
-named vectors for the `query` CLI command.
+Layered above `smoke_query`: adds payload-filtered dense search and hybrid
+(RRF) fusion of dense + sparse named vectors. `build_filter` is the single
+filter constructor shared by the CLI `query` command and the HTTP API.
 """
 
 from __future__ import annotations
@@ -15,21 +15,29 @@ from qdrant_client.http import models
 from jd_ocs_indexer.validation.smoke_query import Hit, _to_hit
 
 
-def _level_filter(level: str | None, ocs_code: str | None) -> models.Filter | None:
+def build_filter(
+    *,
+    level: str | None = None,
+    ocs_code: str | None = None,
+    is_current: bool | None = None,
+    k_codes: list[str] | None = None,
+    s_codes: list[str] | None = None,
+    attitude_codes: list[str] | None = None,
+) -> models.Filter | None:
     musts: list[models.Condition] = []
     if level:
-        musts.append(
-            models.FieldCondition(
-                key="chunk_level",
-                match=models.MatchValue(value=level),
-            )
-        )
+        musts.append(models.FieldCondition(key="chunk_level", match=models.MatchValue(value=level)))
     if ocs_code:
+        musts.append(models.FieldCondition(key="ocs_code", match=models.MatchValue(value=ocs_code)))
+    if is_current is not None:
+        musts.append(models.FieldCondition(key="is_current", match=models.MatchValue(value=is_current)))
+    if k_codes:
+        musts.append(models.FieldCondition(key="k_codes", match=models.MatchAny(any=list(k_codes))))
+    if s_codes:
+        musts.append(models.FieldCondition(key="s_codes", match=models.MatchAny(any=list(s_codes))))
+    if attitude_codes:
         musts.append(
-            models.FieldCondition(
-                key="ocs_code",
-                match=models.MatchValue(value=ocs_code),
-            )
+            models.FieldCondition(key="attitude_codes", match=models.MatchAny(any=list(attitude_codes)))
         )
     return models.Filter(must=musts) if musts else None
 
@@ -41,13 +49,21 @@ def dense_search(
     *,
     level: str | None = None,
     ocs_code: str | None = None,
+    is_current: bool | None = None,
+    k_codes: list[str] | None = None,
+    s_codes: list[str] | None = None,
+    attitude_codes: list[str] | None = None,
     limit: int = 10,
 ) -> list[Hit]:
+    flt = build_filter(
+        level=level, ocs_code=ocs_code, is_current=is_current,
+        k_codes=k_codes, s_codes=s_codes, attitude_codes=attitude_codes,
+    )
     results = client.query_points(
         collection_name=collection,
         query=dense,
         using="dense",
-        query_filter=_level_filter(level, ocs_code),
+        query_filter=flt,
         limit=limit,
         with_payload=True,
     )
@@ -63,32 +79,30 @@ def hybrid_search(
     *,
     level: str | None = None,
     ocs_code: str | None = None,
+    is_current: bool | None = None,
+    k_codes: list[str] | None = None,
+    s_codes: list[str] | None = None,
+    attitude_codes: list[str] | None = None,
     limit: int = 10,
     prefetch_limit: int = 50,
 ) -> list[Hit]:
     """Reciprocal Rank Fusion of dense + sparse using Qdrant's built-in fusion."""
-    flt = _level_filter(level, ocs_code)
+    flt = build_filter(
+        level=level, ocs_code=ocs_code, is_current=is_current,
+        k_codes=k_codes, s_codes=s_codes, attitude_codes=attitude_codes,
+    )
     prefetch: list[Any] = [
-        models.Prefetch(
-            query=dense,
-            using="dense",
-            limit=prefetch_limit,
-            filter=flt,
-        ),
+        models.Prefetch(query=dense, using="dense", limit=prefetch_limit, filter=flt),
     ]
     if sparse_indices:
         prefetch.append(
             models.Prefetch(
-                query=models.SparseVector(
-                    indices=sparse_indices,
-                    values=sparse_values,
-                ),
+                query=models.SparseVector(indices=sparse_indices, values=sparse_values),
                 using="sparse",
                 limit=prefetch_limit,
                 filter=flt,
             )
         )
-
     results = client.query_points(
         collection_name=collection,
         prefetch=prefetch,

@@ -7,6 +7,7 @@ imports here so the layer stays unit-testable with fakes.
 from __future__ import annotations
 
 from jd_ocs_indexer.validation import search as search_mod
+from jd_ocs_indexer.validation import stats as stats_mod
 from qdrant_client.http import models
 
 
@@ -201,4 +202,25 @@ def get_pairs(client, collection: str, *, ocs_code: str) -> dict | None:
         "all_s_pairs": p.get("all_s_pairs") or [],
         "all_a_pairs": p.get("all_a_pairs") or [],
         "all_output_pairs": p.get("all_output_pairs") or [],
+    }
+
+
+def get_stats(client, collection: str) -> dict:
+    c = stats_mod.collection_stats(client, collection)
+    return {"collection": c.name, "total_points": c.total_points, "by_level": c.by_level}
+
+
+def healthcheck(client, embedder, collection: str) -> dict:
+    model_loaded = embedder is not None
+    qdrant_ok = True
+    try:
+        client.get_collections()
+    except Exception:
+        qdrant_ok = False
+    status = "ok" if (model_loaded and qdrant_ok) else "degraded"
+    return {
+        "status": status,
+        "model_loaded": model_loaded,
+        "qdrant": "reachable" if qdrant_ok else "unreachable",
+        "collection": collection,
     }

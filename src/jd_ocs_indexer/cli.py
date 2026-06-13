@@ -477,6 +477,26 @@ def query(
         _print_query_hit(i, h, text_lines=text_lines)
 
 
+# ---------- serve ----------
+
+
+@app.command()
+def serve(
+    host: str = typer.Option("127.0.0.1", "--host", help="Bind host (localhost by default)."),
+    port: int = typer.Option(8000, "--port"),
+) -> None:
+    """Run the query API (FastAPI + uvicorn, single worker, loads BGE-M3 once)."""
+    import uvicorn
+
+    uvicorn.run(
+        "jd_ocs_indexer.api.app:create_app",
+        factory=True,
+        host=host,
+        port=port,
+        workers=1,
+    )
+
+
 def _print_query_hit(idx: int, hit, text_lines: int) -> None:
     p = hit.payload
     score = f"{hit.score:.4f}" if hit.score is not None else "-"

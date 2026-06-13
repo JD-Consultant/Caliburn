@@ -223,13 +223,12 @@ block payload 則同時帶對齊的 per-group `task_ids/task_titles` 與
 
 | 情境 | HTTP | body |
 |---|---|---|
-| schema 違規（FastAPI 內建） | 422 | `{detail: [...]}` |
-| 空 query / 未知 level / top_k 超界 | 400 | `{detail: "..."}` |
+| schema 違規（空 query / 未知 level / top_k 超界 — 皆由 Pydantic `Field` 約束，FastAPI 自動驗證） | 422 | `{detail: [...]}` |
 | `/pairs` 未知 ocs_code | 404 | `{detail: "ocs_code not found"}` |
 | Qdrant 不通 / upstream 錯（map `ResponseHandlingException`/`UnexpectedResponse`） | 502/503 | `{detail: "..."}` |
 | `/healthz` 模型未就緒或 Qdrant 不通 | 503 | `{status: "degraded", ...}` |
 
-統一錯誤 envelope：`{"detail": "..."}`。
+驗證類錯誤走 FastAPI 預設 422（不另做 400）；其餘錯誤統一 envelope `{"detail": "..."}`。
 
 ---
 

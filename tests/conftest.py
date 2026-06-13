@@ -37,9 +37,12 @@ class StubEmbedder:
 
 def _level_of(flt) -> str:
     try:
-        return flt.must[0].match.value
+        for cond in flt.must:
+            if getattr(cond, "key", None) == "chunk_level":
+                return cond.match.value
     except Exception:
-        return "__total__"
+        pass
+    return "__total__"
 
 
 class FakeQdrant:
@@ -55,7 +58,9 @@ class FakeQdrant:
         return SimpleNamespace(points=list(self._qp))
 
     def scroll(self, **kw):
-        recs, offset = self._scroll_pages[min(self._i, len(self._scroll_pages) - 1)]
+        if self._i >= len(self._scroll_pages):
+            return [], None  # past the end → always signal done (no infinite loops)
+        recs, offset = self._scroll_pages[self._i]
         self._i += 1
         wrapped = [r if isinstance(r, FakePoint) else FakePoint(payload=r) for r in recs]
         return wrapped, offset

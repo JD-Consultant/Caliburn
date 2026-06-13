@@ -174,3 +174,31 @@ def build_task_pool(client, collection: str, *, ocs_codes: list[str], activity_e
             )
         out_groups.append({"ocs_code": g["ocs_code"], "job_title": g["job_title"], "units": units_out})
     return {"groups": out_groups}
+
+
+def get_pairs(client, collection: str, *, ocs_code: str) -> dict | None:
+    """Round 4 / gap detection: the OCS-wide K/S/A/output vocabulary pools."""
+    flt = models.Filter(
+        must=[
+            models.FieldCondition(key="ocs_code", match=models.MatchValue(value=ocs_code)),
+            models.FieldCondition(key="chunk_level", match=models.MatchValue(value="profile")),
+        ]
+    )
+    records, _ = client.scroll(
+        collection_name=collection,
+        scroll_filter=flt,
+        with_payload=True,
+        with_vectors=False,
+        limit=1,
+    )
+    if not records:
+        return None
+    p = records[0].payload or {}
+    return {
+        "ocs_code": ocs_code,
+        "job_title": p.get("job_title") or "",
+        "all_k_pairs": p.get("all_k_pairs") or [],
+        "all_s_pairs": p.get("all_s_pairs") or [],
+        "all_a_pairs": p.get("all_a_pairs") or [],
+        "all_output_pairs": p.get("all_output_pairs") or [],
+    }

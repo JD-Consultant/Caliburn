@@ -84,75 +84,58 @@ def _scroll_all(client, collection: str, flt, *, page: int = 256) -> list[dict]:
     return out
 
 
-def build_task_pool(client, collection: str, *, ocs_codes: list[str], activity_examples: int = 1) -> dict:
-    """Round 2 task menu. Shaped from block chunks (not unit payload) because the
-    unit payload's task_ids/task_titles are independently deduped and not safely
-    zippable; block chunks carry aligned per-group task arrays + activities."""
-    flt = models.Filter(
-        must=[
-            models.FieldCondition(key="chunk_level", match=models.MatchValue(value="block")),
-            models.FieldCondition(key="ocs_code", match=models.MatchAny(any=list(ocs_codes))),
-        ]
-    )
-    payloads = _scroll_all(client, collection, flt)
+def _scroll_records(client, collection: str, flt, *, page: int = 256) -> list:
+    out: list = []
+    offset = None
+    while True:
+        records, offset = client.scroll(
+            collection_name=collection, scroll_filter=flt,
+            with_payload=True, with_vectors=False, limit=page, offset=offset,
+        )
+        out.extend(records)
+        if offset is None:
+            break
+    return out
 
+
+def build_task_pool(client, collection: str, *, ocs_codes: list[str], activity_examples: int = 1) -> dict:
+    """Round-2 task menu, sourced from v3 task points (one point per task)."""
+    prof_flt = models.Filter(must=[
+        models.FieldCondition(key="chunk_level", match=models.MatchValue(value="profile")),
+        models.FieldCondition(key="ocs_code", match=models.MatchAny(any=list(ocs_codes))),
+    ])
+    job_titles = {
+        (r.payload or {}).get("ocs_code"): (r.payload or {}).get("job_title") or ""
+        for r in _scroll_records(client, collection, prof_flt)
+    }
+    task_flt = models.Filter(must=[
+        models.FieldCondition(key="chunk_level", match=models.MatchValue(value="task")),
+        models.FieldCondition(key="ocs_code", match=models.MatchAny(any=list(ocs_codes))),
+    ])
     groups: dict[str, dict] = {}
-    for p in payloads:
+    for r in _scroll_records(client, collection, task_flt):
+        p = r.payload or {}
         oc = p.get("ocs_code")
         if oc is None:
             continue
-        g = groups.setdefault(oc, {"ocs_code": oc, "job_title": p.get("job_title") or "", "units": {}})
-        if not g["job_title"] and p.get("job_title"):
-            g["job_title"] = p["job_title"]
-        uorder = p.get("unit_order")
-        # unit_order is authoritative when present; fall back to unit_id otherwise.
-        # The builder stamps every block of a unit with that unit's order, so all
-        # blocks of one unit agree on the key form (no phantom-duplicate units).
-        ukey = ("o", uorder) if uorder is not None else ("i", p.get("unit_id"))
-        u = g["units"].setdefault(
-            ukey,
-            {"unit_id": p.get("unit_id"), "unit_title": p.get("unit_title"), "unit_order": uorder, "tasks": {}},
-        )
-        task_ids = p.get("task_ids") or []
-        task_titles = p.get("task_titles") or []
-        activities = p.get("work_activity_terms") or []
-        for i, tid in enumerate(task_ids):
-            ttl = task_titles[i] if i < len(task_titles) else None
-            t = u["tasks"].setdefault(tid, {"task_id": tid, "task_title": ttl, "acts": []})
-            if not t["task_title"] and ttl:
-                t["task_title"] = ttl
-            for a in activities:
-                if a and a not in t["acts"]:
-                    t["acts"].append(a)
-
+        g = groups.setdefault(oc, {"units": {}})
+        ukey = p.get("unit_id")
+        u = g["units"].setdefault(ukey, {"unit_id": p.get("unit_id"), "unit_title": p.get("unit_title"), "tasks": []})
+        u["tasks"].append({
+            "id": getattr(r, "id", None),
+            "task_id": p.get("task_id"),
+            "task_title": p.get("task_title"),
+            "activity_examples": (p.get("activity_examples") or [])[:activity_examples],
+        })
     out_groups = []
     for oc in ocs_codes:
         g = groups.get(oc)
         if not g:
             continue
-        units_sorted = sorted(
-            g["units"].values(),
-            key=lambda u: (u["unit_order"] is None, u["unit_order"] if u["unit_order"] is not None else 0),
-        )
-        units_out = []
+        units_sorted = sorted(g["units"].values(), key=lambda u: (u["unit_id"] is None, u["unit_id"] or ""))
         for u in units_sorted:
-            tasks_sorted = sorted(u["tasks"].values(), key=lambda t: t["task_id"])
-            units_out.append(
-                {
-                    "unit_id": u["unit_id"],
-                    "unit_title": u["unit_title"],
-                    "unit_order": u["unit_order"],
-                    "tasks": [
-                        {
-                            "task_id": t["task_id"],
-                            "task_title": t["task_title"],
-                            "activity_examples": t["acts"][:activity_examples],
-                        }
-                        for t in tasks_sorted
-                    ],
-                }
-            )
-        out_groups.append({"ocs_code": g["ocs_code"], "job_title": g["job_title"], "units": units_out})
+            u["tasks"].sort(key=lambda t: (t["task_id"] is None, t["task_id"] or ""))
+        out_groups.append({"ocs_code": oc, "job_title": job_titles.get(oc, ""), "units": units_sorted})
     return {"groups": out_groups}
 
 

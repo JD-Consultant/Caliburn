@@ -221,6 +221,8 @@ __marimo__/
 .data/
 /data/
 output/
+# design records kept local-only (specs / plans), not tracked
+docs/superpowers/
 manifest.json
 failed_files.jsonl
 failed_chunks.jsonl

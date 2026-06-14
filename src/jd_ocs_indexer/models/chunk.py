@@ -10,7 +10,7 @@ from dataclasses import dataclass, field
 from typing import Any, Literal
 
 
-ChunkLevel = Literal["profile", "unit", "block", "task"]
+ChunkLevel = Literal["profile", "task"]
 
 
 @dataclass

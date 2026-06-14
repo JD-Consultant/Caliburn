@@ -68,7 +68,7 @@ class CollectionStats:
 def collection_stats(client: QdrantClient, collection: str) -> CollectionStats:
     total = client.count(collection_name=collection, exact=True).count
     by_level: dict[str, int] = {}
-    for level in ("profile", "unit", "block"):
+    for level in ("profile", "task"):
         n = client.count(
             collection_name=collection,
             exact=True,

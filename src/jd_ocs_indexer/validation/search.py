@@ -20,9 +20,6 @@ def build_filter(
     level: str | None = None,
     ocs_code: str | None = None,
     is_current: bool | None = None,
-    k_codes: list[str] | None = None,
-    s_codes: list[str] | None = None,
-    attitude_codes: list[str] | None = None,
 ) -> models.Filter | None:
     musts: list[models.Condition] = []
     if level:
@@ -31,14 +28,6 @@ def build_filter(
         musts.append(models.FieldCondition(key="ocs_code", match=models.MatchValue(value=ocs_code)))
     if is_current is not None:
         musts.append(models.FieldCondition(key="is_current", match=models.MatchValue(value=is_current)))
-    if k_codes:
-        musts.append(models.FieldCondition(key="k_codes", match=models.MatchAny(any=list(k_codes))))
-    if s_codes:
-        musts.append(models.FieldCondition(key="s_codes", match=models.MatchAny(any=list(s_codes))))
-    if attitude_codes:
-        musts.append(
-            models.FieldCondition(key="attitude_codes", match=models.MatchAny(any=list(attitude_codes)))
-        )
     return models.Filter(must=musts) if musts else None
 
 
@@ -50,15 +39,9 @@ def dense_search(
     level: str | None = None,
     ocs_code: str | None = None,
     is_current: bool | None = None,
-    k_codes: list[str] | None = None,
-    s_codes: list[str] | None = None,
-    attitude_codes: list[str] | None = None,
     limit: int = 10,
 ) -> list[Hit]:
-    flt = build_filter(
-        level=level, ocs_code=ocs_code, is_current=is_current,
-        k_codes=k_codes, s_codes=s_codes, attitude_codes=attitude_codes,
-    )
+    flt = build_filter(level=level, ocs_code=ocs_code, is_current=is_current)
     results = client.query_points(
         collection_name=collection,
         query=dense,
@@ -80,17 +63,11 @@ def hybrid_search(
     level: str | None = None,
     ocs_code: str | None = None,
     is_current: bool | None = None,
-    k_codes: list[str] | None = None,
-    s_codes: list[str] | None = None,
-    attitude_codes: list[str] | None = None,
     limit: int = 10,
     prefetch_limit: int = 50,
 ) -> list[Hit]:
     """Reciprocal Rank Fusion of dense + sparse using Qdrant's built-in fusion."""
-    flt = build_filter(
-        level=level, ocs_code=ocs_code, is_current=is_current,
-        k_codes=k_codes, s_codes=s_codes, attitude_codes=attitude_codes,
-    )
+    flt = build_filter(level=level, ocs_code=ocs_code, is_current=is_current)
     prefetch: list[Any] = [
         models.Prefetch(query=dense, using="dense", limit=prefetch_limit, filter=flt),
     ]

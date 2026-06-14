@@ -18,6 +18,7 @@ from jd_ocs_indexer.models.chunk import SparseVector
 class FakePoint:
     payload: dict
     score: float | None = None
+    id: str | None = None
 
 
 class StubEmbedder:
@@ -81,8 +82,8 @@ def stub_embedder():
 
 @pytest.fixture
 def fake_point():
-    def _make(*, payload: dict, score: float | None = None):
-        return FakePoint(payload=payload, score=score)
+    def _make(*, payload: dict, score: float | None = None, id: str | None = None):
+        return FakePoint(payload=payload, score=score, id=id)
     return _make
 
 

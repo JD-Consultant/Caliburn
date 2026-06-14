@@ -10,19 +10,14 @@ from pydantic import BaseModel, Field
 class SearchFilters(BaseModel):
     ocs_code: Optional[str] = None
     is_current: Optional[bool] = None
-    k_codes: Optional[list[str]] = None
-    s_codes: Optional[list[str]] = None
-    attitude_codes: Optional[list[str]] = None
 
 
 class SearchRequest(BaseModel):
     query: str = Field(min_length=1)
-    level: Optional[Literal["profile", "unit", "block"]] = None
+    level: Optional[Literal["profile", "task"]] = None
     hybrid: bool = True
     top_k: int = Field(10, ge=1, le=50)
     filters: SearchFilters = Field(default_factory=SearchFilters)
-    include_text: bool = False
-    text_lines: int = Field(6, ge=0, le=50)
 
 
 class Pair(BaseModel):
@@ -31,27 +26,29 @@ class Pair(BaseModel):
 
 
 class Hit(BaseModel):
-    chunk_key: str
+    id: Optional[str] = None
     chunk_level: str
     ocs_code: str
-    job_title: str
     score: Optional[float] = None
+    # profile fields
+    job_title: Optional[str] = None
+    job_description: Optional[str] = None
     version: Optional[str] = None
     is_current: Optional[bool] = None
     ocs_level: Optional[int] = None
-    competency_level: Optional[int] = None
-    unit_id: Optional[str] = None
-    unit_title: Optional[str] = None
-    unit_order: Optional[int] = None
-    task_ids: list[str] = Field(default_factory=list)
-    task_titles: list[str] = Field(default_factory=list)
-    block_order: Optional[int] = None
-    k_pairs: list[Pair] = Field(default_factory=list)
-    s_pairs: list[Pair] = Field(default_factory=list)
     industry_names: list[str] = Field(default_factory=list)
     occupation_names: list[str] = Field(default_factory=list)
+    # task fields
+    unit_id: Optional[str] = None
+    unit_title: Optional[str] = None
+    task_id: Optional[str] = None
+    task_title: Optional[str] = None
+    competency_level: Optional[int] = None
+    activity_examples: list[str] = Field(default_factory=list)
+    k_pairs: list[Pair] = Field(default_factory=list)
+    s_pairs: list[Pair] = Field(default_factory=list)
+    output_pairs: list[Pair] = Field(default_factory=list)
     source_file: Optional[str] = None
-    snippet: Optional[str] = None
 
 
 class SearchResponse(BaseModel):
@@ -66,6 +63,7 @@ class TaskPoolRequest(BaseModel):
 
 
 class Task(BaseModel):
+    id: Optional[str] = None
     task_id: str
     task_title: Optional[str] = None
     activity_examples: list[str] = Field(default_factory=list)
@@ -74,7 +72,6 @@ class Task(BaseModel):
 class Unit(BaseModel):
     unit_id: Optional[str] = None
     unit_title: Optional[str] = None
-    unit_order: Optional[int] = None
     tasks: list[Task]
 
 

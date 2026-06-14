@@ -71,8 +71,8 @@ class QdrantWriter:
                 ),
             )
 
-    def ensure_payload_indexes(self) -> None:
-        for field_name, field_schema in PAYLOAD_INDEXES:
+    def ensure_payload_indexes(self, indexes=None) -> None:
+        for field_name, field_schema in (indexes if indexes is not None else PAYLOAD_INDEXES):
             try:
                 self.client.create_payload_index(
                     collection_name=self.collection,

@@ -76,7 +76,7 @@ def load_settings() -> Settings:
     return Settings(
         qdrant_url=_env("QDRANT_URL", "http://localhost:6333") or "",
         qdrant_api_key=_env("QDRANT_API_KEY"),
-        qdrant_collection=_env("QDRANT_COLLECTION", "ocs_bgem3_v2") or "ocs_bgem3_v2",
+        qdrant_collection=_env("QDRANT_COLLECTION", "ocs_v3") or "ocs_v3",
         qdrant_timeout=_env_float("QDRANT_TIMEOUT", 300.0),
         source_root=source_root,
         source_root_alias=_env("OCS_SOURCE_ROOT_ALIAS", "jd-ocs") or "jd-ocs",

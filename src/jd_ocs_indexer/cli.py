@@ -2,9 +2,6 @@
 
 from __future__ import annotations
 
-import json
-import re
-import sys
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -14,13 +11,11 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
-from jd_ocs_indexer.config import Settings, load_settings
-from jd_ocs_indexer.ingestion import manifest as manifest_mod
-from jd_ocs_indexer.ingestion.builder import BuilderContext, ChunkBuilder
+from jd_ocs_indexer.config import load_settings
+from jd_ocs_indexer.ingestion.builder import BuildContext, build
 from jd_ocs_indexer.ingestion.normalizer import normalize
 from jd_ocs_indexer.ingestion.reader import OCSJSONReader
-from jd_ocs_indexer.ingestion.renderer import MarkdownRenderer
-from jd_ocs_indexer.models.chunk import ChunkRecord, EmbeddedChunk
+from jd_ocs_indexer.models.chunk import EmbeddedChunk
 from jd_ocs_indexer.store.qdrant_client import make_client
 from jd_ocs_indexer.store.writer import QdrantWriter
 from jd_ocs_indexer.validation import search as search_mod, smoke_query, stats as stats_mod
@@ -32,68 +27,10 @@ app = typer.Typer(
 console = Console()
 
 
-_SAFE_FILENAME = re.compile(r"[^A-Za-z0-9._\-]+")
-
-
-def _safe_filename(chunk_key: str) -> str:
-    return _SAFE_FILENAME.sub("_", chunk_key).strip("._-")
-
 
 def _now_iso() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S+00:00")
 
-
-# ---------- render ----------
-
-
-@app.command()
-def render(
-    scan_dir: Path = typer.Argument(..., exists=True, file_okay=False, dir_okay=True),
-    output: Path = typer.Option(Path("output/md"), "-o", "--output"),
-    limit: int = typer.Option(0, "--limit", help="Stop after N files (0 = all)."),
-) -> None:
-    """Render JSON -> Markdown chunks. Does not touch Qdrant."""
-    settings = load_settings()
-    reader = OCSJSONReader(settings.source_root)
-    builder = ChunkBuilder()
-    renderer = MarkdownRenderer()
-
-    output.mkdir(parents=True, exist_ok=True)
-    total_files = 0
-    total_chunks = 0
-    failed = 0
-
-    for i, (loaded, fail) in enumerate(reader.iter_loaded(scan_dir)):
-        if limit and i >= limit:
-            break
-        if fail is not None:
-            failed += 1
-            console.print(f"[red]FAIL[/red] {fail.rel_path}: {fail.error}")
-            continue
-        assert loaded is not None
-        norm = normalize(loaded.document)
-        ctx = BuilderContext(
-            source_root_alias=settings.source_root_alias,
-            source_file=loaded.rel_path,
-            source_json_hash=loaded.source_json_hash,
-            schema_version=settings.schema_version,
-            embedding_provider=settings.embedding_provider,
-        )
-        records = builder.build(norm, ctx)
-        renderer.render(norm, records)
-
-        sub = output / norm.ocs_code
-        sub.mkdir(parents=True, exist_ok=True)
-        for rec in records:
-            fname = _safe_filename(rec.chunk_key) + ".md"
-            (sub / fname).write_text(rec.text, encoding="utf-8")
-
-        total_files += 1
-        total_chunks += len(records)
-
-    console.print(
-        f"[green]Rendered[/green] files={total_files} chunks={total_chunks} failed={failed} -> {output}"
-    )
 
 
 # ---------- index ----------
@@ -103,20 +40,13 @@ def render(
 def index(
     scan_dir: Path = typer.Argument(..., exists=True, file_okay=False, dir_okay=True),
     limit: int = typer.Option(0, "--limit", help="Stop after N files (0 = all)."),
-    rebuild: bool = typer.Option(False, "--rebuild", help="Ignore manifest, re-embed everything."),
 ) -> None:
-    """Full pipeline: render -> embed -> upsert to Qdrant. Uses manifest for incremental skip."""
+    """v3 pipeline: reader -> normalize -> build -> embed -> upsert (profile + task points)."""
     settings = load_settings()
-    _index_impl(settings, scan_dir, limit=limit, rebuild=rebuild)
-
-
-def _index_impl(settings: Settings, scan_dir: Path, *, limit: int, rebuild: bool) -> None:
     reader = OCSJSONReader(settings.source_root)
-    builder = ChunkBuilder()
-    renderer = MarkdownRenderer()
 
-    # Lazy import — heavy
     from jd_ocs_indexer.embeddings.bge_m3 import BGEM3Embedder
+    from jd_ocs_indexer.store import schema
 
     embedder = BGEM3Embedder(
         model_name=settings.bge_m3_model,
@@ -124,7 +54,6 @@ def _index_impl(settings: Settings, scan_dir: Path, *, limit: int, rebuild: bool
         use_fp16=settings.bge_m3_use_fp16,
         batch_size=settings.bge_m3_batch_size,
     )
-
     client = make_client(url=settings.qdrant_url, api_key=settings.qdrant_api_key, timeout=settings.qdrant_timeout)
     writer = QdrantWriter(
         client,
@@ -133,43 +62,11 @@ def _index_impl(settings: Settings, scan_dir: Path, *, limit: int, rebuild: bool
         supports_sparse=embedder.supports_sparse,
         batch_size=settings.index_batch_size,
     )
-
     writer.ensure_collection()
-    writer.ensure_payload_indexes()
-
-    manifest = manifest_mod.load(settings.manifest_path)
-    manifest.collection = settings.qdrant_collection
-    manifest.embedding_provider = settings.embedding_provider
-    manifest.source_root_alias = settings.source_root_alias
-    manifest.schema_version = settings.schema_version
+    writer.ensure_payload_indexes(schema.PAYLOAD_INDEXES)
 
     started = time.time()
-    skipped = 0
-    indexed = 0
-    failed = 0
-    total_chunks = 0
-
-    pending_records: list[ChunkRecord] = []
-    pending_file_chunks: dict[str, list[str]] = {}
-    pending_files: dict[str, str] = {}  # rel_path -> source_json_hash
-
-    upsert_retries = 0
-
-    def flush_batch() -> None:
-        nonlocal total_chunks, upsert_retries
-        if not pending_records:
-            return
-        texts = [r.text for r in pending_records]
-        vecs = embedder.embed_texts(texts)
-        embedded = [
-            EmbeddedChunk(record=r, dense=v.dense, sparse=v.sparse)
-            for r, v in zip(pending_records, vecs)
-        ]
-        report = writer.upsert(embedded)
-        upsert_retries += report.retries
-        total_chunks += len(embedded)
-        pending_records.clear()
-
+    indexed = failed = total = 0
     for i, (loaded, fail) in enumerate(reader.iter_loaded(scan_dir)):
         if limit and i >= limit:
             break
@@ -178,73 +75,23 @@ def _index_impl(settings: Settings, scan_dir: Path, *, limit: int, rebuild: bool
             console.print(f"[red]FAIL[/red] {fail.rel_path}: {fail.error}")
             continue
         assert loaded is not None
-
-        prev = manifest.files.get(loaded.rel_path)
-        if (
-            not rebuild
-            and prev is not None
-            and prev.source_json_hash == loaded.source_json_hash
-        ):
-            skipped += 1
-            continue
-
         norm = normalize(loaded.document)
-        ctx = BuilderContext(
-            source_root_alias=settings.source_root_alias,
-            source_file=loaded.rel_path,
-            source_json_hash=loaded.source_json_hash,
-            schema_version=settings.schema_version,
-            embedding_provider=settings.embedding_provider,
-            indexed_at=_now_iso(),
-        )
-        records = builder.build(norm, ctx)
-        renderer.render(norm, records)
-
-        # If we previously had different chunk keys for this file, delete the stale ones.
-        if prev is not None:
-            new_keys = {r.chunk_key for r in records}
-            stale = [k for k in prev.chunk_keys if k not in new_keys]
-            if stale:
-                writer.delete_by_chunk_keys(stale)
-
-        pending_records.extend(records)
-        pending_file_chunks[loaded.rel_path] = [r.chunk_key for r in records]
-        pending_files[loaded.rel_path] = loaded.source_json_hash
+        ctx = BuildContext(source_file=loaded.rel_path, indexed_at=_now_iso())
+        records = build(norm, ctx)
+        vecs = embedder.embed_texts([r.text for r in records])
+        embedded = [EmbeddedChunk(record=r, dense=v.dense, sparse=v.sparse) for r, v in zip(records, vecs)]
+        report = writer.upsert(embedded)
+        total += report.upserted
         indexed += 1
 
-        if len(pending_records) >= settings.index_batch_size:
-            flush_batch()
-            # Persist manifest progress after each flush.
-            for rel, h in pending_files.items():
-                manifest.files[rel] = manifest_mod.FileEntry(
-                    source_json_hash=h,
-                    chunk_keys=pending_file_chunks[rel],
-                    indexed_at=_now_iso(),
-                )
-            manifest_mod.save(settings.manifest_path, manifest)
-            pending_files.clear()
-            pending_file_chunks.clear()
-
-    flush_batch()
-    for rel, h in pending_files.items():
-        manifest.files[rel] = manifest_mod.FileEntry(
-            source_json_hash=h,
-            chunk_keys=pending_file_chunks[rel],
-            indexed_at=_now_iso(),
-        )
-    manifest_mod.save(settings.manifest_path, manifest)
-
     elapsed = time.time() - started
-    table = Table(title="Index report")
+    table = Table(title="Index v3 report")
     table.add_column("metric")
     table.add_column("value", justify="right")
     table.add_row("collection", settings.qdrant_collection)
-    table.add_row("embedding_provider", settings.embedding_provider)
     table.add_row("indexed_files", str(indexed))
-    table.add_row("skipped_files", str(skipped))
     table.add_row("failed_files", str(failed))
-    table.add_row("chunks", str(total_chunks))
-    table.add_row("upsert_retries", str(upsert_retries))
+    table.add_row("points", str(total))
     table.add_row("elapsed_sec", f"{elapsed:.1f}")
     console.print(table)
 

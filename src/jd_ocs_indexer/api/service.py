@@ -11,38 +11,31 @@ from jd_ocs_indexer.validation import stats as stats_mod
 from qdrant_client.http import models
 
 
-def _project_hit(hit, *, include_text: bool, text_lines: int) -> dict:
+def _project_hit(hit) -> dict:
     p = hit.payload or {}
-    # All display fields come from the payload; score is the query-result rank
-    # score (not in payload), so it's the one field read off the Hit itself.
-    out = {
-        "chunk_key": p.get("chunk_key", ""),
+    return {
+        "id": getattr(hit, "id", None),
         "chunk_level": p.get("chunk_level", ""),
         "ocs_code": p.get("ocs_code", ""),
-        "job_title": p.get("job_title", ""),
         "score": hit.score,
+        "job_title": p.get("job_title"),
+        "job_description": p.get("job_description"),
         "version": p.get("version"),
         "is_current": p.get("is_current"),
         "ocs_level": p.get("ocs_level"),
-        "competency_level": p.get("competency_level"),
-        "unit_id": p.get("unit_id"),
-        "unit_title": p.get("unit_title"),
-        "unit_order": p.get("unit_order"),
-        "task_ids": p.get("task_ids") or [],
-        "task_titles": p.get("task_titles") or [],
-        "block_order": p.get("block_order"),
-        "k_pairs": p.get("k_pairs") or [],
-        "s_pairs": p.get("s_pairs") or [],
         "industry_names": p.get("industry_names") or [],
         "occupation_names": p.get("occupation_names") or [],
+        "unit_id": p.get("unit_id"),
+        "unit_title": p.get("unit_title"),
+        "task_id": p.get("task_id"),
+        "task_title": p.get("task_title"),
+        "competency_level": p.get("competency_level"),
+        "activity_examples": p.get("activity_examples") or [],
+        "k_pairs": p.get("k_pairs") or [],
+        "s_pairs": p.get("s_pairs") or [],
+        "output_pairs": p.get("output_pairs") or [],
         "source_file": p.get("source_file"),
-        "snippet": None,
     }
-    if include_text and text_lines > 0:
-        body = (p.get("text") or "").strip().splitlines()
-        lines = [ln for ln in body[1:] if ln.strip()][:text_lines]
-        out["snippet"] = "\n".join(lines) if lines else None
-    return out
 
 
 def search(
@@ -55,20 +48,10 @@ def search(
     hybrid: bool = True,
     top_k: int = 10,
     filters: dict | None = None,
-    include_text: bool = False,
-    text_lines: int = 6,
 ) -> dict:
     filters = filters or {}
     vec = embedder.embed_query(query)
-    kw = dict(
-        level=level,
-        ocs_code=filters.get("ocs_code"),
-        is_current=filters.get("is_current"),
-        k_codes=filters.get("k_codes"),
-        s_codes=filters.get("s_codes"),
-        attitude_codes=filters.get("attitude_codes"),
-        limit=top_k,
-    )
+    kw = dict(level=level, ocs_code=filters.get("ocs_code"), is_current=filters.get("is_current"), limit=top_k)
     if hybrid:
         hits = search_mod.hybrid_search(
             client, collection, vec.dense,
@@ -80,11 +63,7 @@ def search(
     else:
         hits = search_mod.dense_search(client, collection, vec.dense, **kw)
         mode = "dense"
-    return {
-        "mode": mode,
-        "level": level,
-        "hits": [_project_hit(h, include_text=include_text, text_lines=text_lines) for h in hits],
-    }
+    return {"mode": mode, "level": level, "hits": [_project_hit(h) for h in hits]}
 
 
 def _scroll_all(client, collection: str, flt, *, page: int = 256) -> list[dict]:

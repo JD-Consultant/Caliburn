@@ -36,8 +36,6 @@ async def post_search(req: SearchRequest, request: Request):
                 hybrid=req.hybrid,
                 top_k=req.top_k,
                 filters=req.filters.model_dump(),
-                include_text=req.include_text,
-                text_lines=req.text_lines,
             )
 
     return await run_in_threadpool(_run)

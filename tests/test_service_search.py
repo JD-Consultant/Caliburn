@@ -1,36 +1,28 @@
 from jd_ocs_indexer.api import service
+from tests.conftest import FakeQdrant, FakePoint, StubEmbedder
 
 
-def _payload(**over):
-    p = {
-        "chunk_key": "k", "chunk_level": "profile", "ocs_code": "OC1", "job_title": "JT",
-        "version": "v1", "is_current": True, "ocs_level": 5,
-        "k_pairs": [{"code": "K01", "name": "n"}], "s_pairs": [],
-        "industry_names": ["ind"], "occupation_names": ["occ"],
-        "source_file": "f.json", "text": "# JT (OC1)\nline1\nline2\nline3",
-    }
-    p.update(over)
-    return p
-
-
-def test_search_dense_projection(make_qdrant, fake_point, stub_embedder):
-    fake = make_qdrant(query_points=[fake_point(payload=_payload(), score=0.9)])
-    out = service.search(fake, stub_embedder, "coll", query="hi", hybrid=False, top_k=5)
+def test_search_projects_task_hit_with_id():
+    pt = FakePoint(id="pt-1", score=0.9, payload={
+        "chunk_level": "task", "ocs_code": "OC1", "unit_id": "U1", "unit_title": "U",
+        "task_id": "T1.1", "task_title": "任務一", "competency_level": 3,
+        "activity_examples": ["a1"], "k_pairs": [{"code": "K01", "name": "k"}],
+        "s_pairs": [], "output_pairs": [{"code": "O01", "name": "o"}],
+    })
+    fake = FakeQdrant(query_points=[pt])
+    out = service.search(fake, StubEmbedder(), "ocs_v3", query="x", hybrid=False, top_k=5)
     assert out["mode"] == "dense"
     h = out["hits"][0]
-    assert h["ocs_code"] == "OC1" and h["score"] == 0.9
-    assert h["k_pairs"] == [{"code": "K01", "name": "n"}]
-    assert h["snippet"] is None
+    assert h["id"] == "pt-1" and h["task_id"] == "T1.1" and h["competency_level"] == 3
+    assert h["activity_examples"] == ["a1"] and h["output_pairs"] == [{"code": "O01", "name": "o"}]
+    assert "snippet" not in h and "task_titles" not in h
 
 
-def test_search_hybrid_mode(make_qdrant, fake_point, stub_embedder):
-    fake = make_qdrant(query_points=[fake_point(payload=_payload(), score=0.5)])
-    out = service.search(fake, stub_embedder, "coll", query="hi", hybrid=True)
-    assert out["mode"] == "hybrid"
-    assert len(out["hits"]) == 1
-
-
-def test_search_include_text_snippet(make_qdrant, fake_point, stub_embedder):
-    fake = make_qdrant(query_points=[fake_point(payload=_payload(), score=0.5)])
-    out = service.search(fake, stub_embedder, "coll", query="hi", include_text=True, text_lines=2)
-    assert out["hits"][0]["snippet"] == "line1\nline2"
+def test_search_projects_profile_hit():
+    pt = FakePoint(id="pf-1", score=0.8, payload={
+        "chunk_level": "profile", "ocs_code": "OC1", "job_title": "JT",
+        "job_description": "desc", "is_current": True, "ocs_level": 4,
+    })
+    out = service.search(FakeQdrant(query_points=[pt]), StubEmbedder(), "ocs_v3", query="x", hybrid=True)
+    h = out["hits"][0]
+    assert h["chunk_level"] == "profile" and h["job_title"] == "JT" and h["job_description"] == "desc"

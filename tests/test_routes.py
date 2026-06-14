@@ -4,7 +4,9 @@ from qdrant_client.http.exceptions import UnexpectedResponse
 
 def test_search_route_ok(make_app, make_qdrant, fake_point):
     fake = make_qdrant(query_points=[fake_point(
-        payload={"chunk_key": "k", "chunk_level": "profile", "ocs_code": "OC1", "job_title": "JT"},
+        id="pt-1",
+        payload={"chunk_level": "task", "ocs_code": "OC1", "task_id": "T1",
+                 "task_title": "t", "job_title": "JT"},
         score=0.9,
     )])
     with TestClient(make_app(fake)) as c:
@@ -12,7 +14,7 @@ def test_search_route_ok(make_app, make_qdrant, fake_point):
         assert r.status_code == 200
         body = r.json()
         assert body["mode"] == "dense"
-        assert body["hits"][0]["ocs_code"] == "OC1"
+        assert body["hits"][0]["id"] == "pt-1" and body["hits"][0]["task_id"] == "T1"
 
 
 def test_search_route_empty_query_422(make_app, make_qdrant):
@@ -21,16 +23,19 @@ def test_search_route_empty_query_422(make_app, make_qdrant):
         assert r.status_code == 422
 
 
-def test_task_pool_route(make_app, make_qdrant):
-    block = {
-        "ocs_code": "OC1", "chunk_level": "block", "job_title": "JT", "unit_order": 1,
-        "unit_id": "U1", "unit_title": "U1", "task_ids": ["T1"], "task_titles": ["t1"],
-        "work_activity_terms": ["a1"],
-    }
-    with TestClient(make_app(make_qdrant(scroll_pages=[([block], None)]))) as c:
+def test_task_pool_route(make_app, make_qdrant, fake_point):
+    profile = {"chunk_level": "profile", "ocs_code": "OC1", "job_title": "JT"}
+    task = fake_point(id="OC1-T1", payload={
+        "chunk_level": "task", "ocs_code": "OC1", "unit_id": "U1", "unit_title": "U1",
+        "task_id": "T1", "task_title": "t1", "activity_examples": ["a1"],
+    })
+    # build_task_pool scrolls profiles first (job_title), then task points
+    fake = make_qdrant(scroll_pages=[([profile], None), ([task], None)])
+    with TestClient(make_app(fake)) as c:
         r = c.post("/task-pool", json={"ocs_codes": ["OC1"], "activity_examples": 1})
         assert r.status_code == 200
-        assert r.json()["groups"][0]["units"][0]["tasks"][0]["task_id"] == "T1"
+        t = r.json()["groups"][0]["units"][0]["tasks"][0]
+        assert t["task_id"] == "T1" and t["id"] == "OC1-T1"
 
 
 def test_pairs_route_404(make_app, make_qdrant):
@@ -47,11 +52,13 @@ def test_healthz_route(make_app, make_qdrant):
 
 
 def test_stats_route(make_app, make_qdrant):
-    fake = make_qdrant(counts={"__total__": 5, "profile": 1, "unit": 2, "block": 2})
+    fake = make_qdrant(counts={"__total__": 55, "profile": 5, "task": 50})
     with TestClient(make_app(fake)) as c:
         r = c.get("/stats")
         assert r.status_code == 200
-        assert r.json()["total_points"] == 5
+        body = r.json()
+        assert body["total_points"] == 55
+        assert body["by_level"] == {"profile": 5, "task": 50}
 
 
 def test_healthz_route_degraded(make_app):

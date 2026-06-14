@@ -2,10 +2,10 @@ from jd_ocs_indexer.api import service
 
 
 def test_get_stats(make_qdrant):
-    fake = make_qdrant(counts={"__total__": 100, "profile": 10, "unit": 30, "block": 60})
+    fake = make_qdrant(counts={"__total__": 55, "profile": 5, "task": 50})
     out = service.get_stats(fake, "coll")
-    assert out["total_points"] == 100
-    assert out["by_level"] == {"profile": 10, "unit": 30, "block": 60}
+    assert out["total_points"] == 55
+    assert out["by_level"] == {"profile": 5, "task": 50}
 
 
 def test_healthcheck_ok(make_qdrant, stub_embedder):

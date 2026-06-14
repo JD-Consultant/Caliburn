@@ -61,3 +61,17 @@ def test_block_less_task_record():
     t13 = [r for r in build(_norm_two_tasks(), _CTX) if r.payload.get("task_id") == "T1.3"][0]
     assert t13.payload["k_pairs"] == [] and t13.payload["activity_examples"] == []
     assert t13.payload["competency_level"] is None
+
+
+def test_only_profile_and_task_levels_emitted():
+    levels = {r.chunk_level for r in build(_norm_two_tasks(), _CTX)}
+    assert levels == {"profile", "task"}
+
+
+def test_multi_task_group_shares_aggregation():
+    recs = build(_norm_two_tasks(), _CTX)
+    t12 = [r for r in recs if r.payload.get("task_id") == "T1.2"][0]
+    assert t12.payload["task_title"] == "任務二"
+    assert t12.payload["k_pairs"] == [{"code": "K01", "name": "知識一"}]
+    assert t12.payload["s_pairs"] == [{"code": "S01", "name": "技能一"}]
+    assert t12.payload["competency_level"] == 3

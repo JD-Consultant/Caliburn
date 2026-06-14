@@ -75,6 +75,7 @@ def _all_skill_names(norm: NormalizedOCS) -> list[str]:
 
 def _profile_embed_text(norm: NormalizedOCS) -> str:
     task_titles = [p.name for u in norm.units for g in u.task_groups for p in g.tasks]
+    skill_names = _all_skill_names(norm)
     sample_activities: list[str] = []
     for u in norm.units:
         for g in u.task_groups:
@@ -85,9 +86,9 @@ def _profile_embed_text(norm: NormalizedOCS) -> str:
     parts = [
         norm.job_title,
         norm.job_description or "",
-        "工作內容：" + "、".join(task_titles),
-        "活動：" + "、".join(sample_activities),
-        "技能：" + "、".join(_all_skill_names(norm)),
+        ("工作內容：" + "、".join(task_titles)) if task_titles else "",
+        ("活動：" + "、".join(sample_activities)) if sample_activities else "",
+        ("技能：" + "、".join(skill_names)) if skill_names else "",
     ]
     return "\n".join(part for part in parts if part.strip())
 

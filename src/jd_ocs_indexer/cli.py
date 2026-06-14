@@ -202,8 +202,6 @@ def doctor(
 def smoke_query_cmd(
     collection: str = typer.Option(..., "--collection"),
     ocs_code: Optional[str] = typer.Option(None, "--ocs-code"),
-    knowledge: Optional[list[str]] = typer.Option(None, "--knowledge", "-k"),
-    skill: Optional[list[str]] = typer.Option(None, "--skill", "-s"),
     probe_vector: Optional[str] = typer.Option(None, "--probe-vector"),
     limit: int = typer.Option(10, "--limit"),
 ) -> None:
@@ -215,16 +213,6 @@ def smoke_query_cmd(
         hits = smoke_query.retrieve_by_ocs_code(client, collection, ocs_code, limit=200)
         _print_hits(f"by ocs_code={ocs_code}", hits[:limit])
         console.print(f"[dim]total matched: {len(hits)}[/dim]")
-
-    if knowledge or skill:
-        hits = smoke_query.filter_by_ks_code(
-            client,
-            collection,
-            knowledge=knowledge or None,
-            skill=skill or None,
-            limit=limit,
-        )
-        _print_hits(f"by k={knowledge} s={skill}", hits)
 
     if probe_vector:
         from jd_ocs_indexer.embeddings.bge_m3 import BGEM3Embedder
@@ -418,10 +406,10 @@ def _print_hits(title: str, hits: list) -> None:
     table.add_column("level")
     table.add_column("ocs_code")
     table.add_column("job_title")
-    table.add_column("chunk_key", overflow="fold")
+    table.add_column("id", overflow="fold")
     for h in hits:
         score_str = f"{h.score:.4f}" if h.score is not None else "-"
-        table.add_row(score_str, h.chunk_level, h.ocs_code, h.job_title, h.chunk_key)
+        table.add_row(score_str, h.chunk_level, h.ocs_code, h.job_title, str(h.id) if h.id is not None else "-")
     console.print(table)
 
 

@@ -247,17 +247,13 @@ def query(
     collection: Optional[str] = typer.Option(None, "--collection"),
     level: Optional[str] = typer.Option(
         None, "--level", "-l",
-        help="Filter chunk level: profile / unit / block.",
+        help="Filter chunk level: profile / task.",
     ),
     ocs_code: Optional[str] = typer.Option(None, "--ocs-code"),
     top_k: int = typer.Option(10, "--top-k", "-k"),
     hybrid: bool = typer.Option(
         False, "--hybrid", "-H",
         help="Use dense+sparse RRF fusion instead of dense-only.",
-    ),
-    text_lines: int = typer.Option(
-        4, "--text-lines",
-        help="Number of body lines to show per hit (0 = no body).",
     ),
 ) -> None:
     """Run a natural-language query against the indexed collection."""
@@ -307,7 +303,7 @@ def query(
         return
 
     for i, h in enumerate(hits, start=1):
-        _print_query_hit(i, h, text_lines=text_lines)
+        _print_query_hit(i, h)
 
 
 # ---------- serve ----------
@@ -330,12 +326,10 @@ def serve(
     )
 
 
-def _print_query_hit(idx: int, hit, text_lines: int) -> None:
+def _print_query_hit(idx: int, hit) -> None:
     p = hit.payload
     score = f"{hit.score:.4f}" if hit.score is not None else "-"
-    level_color = {"profile": "magenta", "unit": "cyan", "block": "green"}.get(
-        hit.chunk_level, "white"
-    )
+    level_color = {"profile": "magenta", "task": "green"}.get(hit.chunk_level, "white")
     head = (
         f"[bold][{idx}][/bold] [dim]score=[/dim]{score}  "
         f"[{level_color}]{hit.chunk_level}[/{level_color}]  "
@@ -344,59 +338,38 @@ def _print_query_hit(idx: int, hit, text_lines: int) -> None:
     cl = p.get("competency_level")
     if cl is not None:
         head += f"  [dim]L{cl}[/dim]"
+    if hit.id is not None:
+        head += f"  [dim]id=[/dim]{hit.id}"
     console.print(head)
 
     breadcrumb_parts: list[str] = [hit.job_title or "?"]
     if p.get("unit_title"):
         unit_id = p.get("unit_id") or ""
         breadcrumb_parts.append(f"{unit_id} {p['unit_title']}".strip())
-    task_titles = p.get("task_titles") or []
-    if task_titles:
-        task_ids = p.get("task_ids") or []
-        tid = task_ids[0] if task_ids else ""
-        breadcrumb_parts.append(f"{tid} {task_titles[0]}".strip())
-    if p.get("block_order") is not None and hit.chunk_level == "block":
-        breadcrumb_parts.append(f"區塊#{p['block_order']}")
-    elif p.get("block_title"):  # legacy v1 payload fallback
-        breadcrumb_parts.append(p["block_title"])
+    if p.get("task_title"):
+        tid = p.get("task_id") or ""
+        breadcrumb_parts.append(f"{tid} {p['task_title']}".strip())
     console.print("    [dim]path:[/dim] " + " / ".join(breadcrumb_parts))
 
-    # v2: prefer pair structures for human-readable display.
-    k_pairs = p.get("k_pairs") or []
-    s_pairs = p.get("s_pairs") or []
-    if k_pairs:
-        shown = ", ".join(f"{kp['code']} {kp['name']}" for kp in k_pairs[:5])
-        if len(k_pairs) > 5:
-            shown += f" (+{len(k_pairs) - 5} more)"
-        console.print(f"    [dim]K:[/dim] {shown}")
-    if s_pairs:
-        shown = ", ".join(f"{sp['code']} {sp['name']}" for sp in s_pairs[:5])
-        if len(s_pairs) > 5:
-            shown += f" (+{len(s_pairs) - 5} more)"
-        console.print(f"    [dim]S:[/dim] {shown}")
-    # legacy v1 fallback: show codes-only if pairs missing
-    if not k_pairs and not s_pairs:
-        k = p.get("k_codes") or []
-        s = p.get("s_codes") or []
-        if k or s:
-            console.print(
-                "    [dim]codes:[/dim] "
-                + (f"K={','.join(k)}" if k else "")
-                + ("  " if k and s else "")
-                + (f"S={','.join(s)}" if s else "")
-            )
+    def _print_pairs(label: str, pairs: list) -> None:
+        if not pairs:
+            return
+        shown = ", ".join(f"{p['code']} {p['name']}" for p in pairs[:5])
+        if len(pairs) > 5:
+            shown += f" (+{len(pairs) - 5} more)"
+        console.print(f"    [dim]{label}:[/dim] {shown}")
+
+    _print_pairs("K", p.get("k_pairs") or [])
+    _print_pairs("S", p.get("s_pairs") or [])
+    _print_pairs("O", p.get("output_pairs") or [])
+
+    acts = p.get("activity_examples") or []
+    if acts:
+        console.print(f"    [dim]活動:[/dim] {', '.join(acts[:5])}")
 
     src = p.get("source_file")
     if src:
         console.print(f"    [dim]src:[/dim] {src}")
-
-    if text_lines > 0:
-        body = (p.get("text") or "").strip().splitlines()
-        # Skip the title line (always `# job_title (ocs_code)`)
-        body_lines = [ln for ln in body[1:] if ln.strip()][:text_lines]
-        if body_lines:
-            for ln in body_lines:
-                console.print(f"    [dim]│[/dim] {ln}")
     console.print()
 
 

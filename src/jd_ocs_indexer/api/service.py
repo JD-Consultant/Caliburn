@@ -140,30 +140,43 @@ def build_task_pool(client, collection: str, *, ocs_codes: list[str], activity_e
 
 
 def get_pairs(client, collection: str, *, ocs_code: str) -> dict | None:
-    """Round 4 / gap detection: the OCS-wide K/S/A/output vocabulary pools."""
-    flt = models.Filter(
-        must=[
-            models.FieldCondition(key="ocs_code", match=models.MatchValue(value=ocs_code)),
-            models.FieldCondition(key="chunk_level", match=models.MatchValue(value="profile")),
-        ]
+    """OCS-wide K/S/output pools (union of task points) + attitudes (profile)."""
+    prof_flt = models.Filter(must=[
+        models.FieldCondition(key="ocs_code", match=models.MatchValue(value=ocs_code)),
+        models.FieldCondition(key="chunk_level", match=models.MatchValue(value="profile")),
+    ])
+    prof_recs, _ = client.scroll(
+        collection_name=collection, scroll_filter=prof_flt,
+        with_payload=True, with_vectors=False, limit=1,
     )
-    records, _ = client.scroll(
-        collection_name=collection,
-        scroll_filter=flt,
-        with_payload=True,
-        with_vectors=False,
-        limit=1,
-    )
-    if not records:
+    if not prof_recs:
         return None
-    p = records[0].payload or {}
+    pp = prof_recs[0].payload or {}
+
+    task_flt = models.Filter(must=[
+        models.FieldCondition(key="ocs_code", match=models.MatchValue(value=ocs_code)),
+        models.FieldCondition(key="chunk_level", match=models.MatchValue(value="task")),
+    ])
+    task_payloads = _scroll_all(client, collection, task_flt)
+
+    def _union(key: str) -> list[dict]:
+        out: list[dict] = []
+        seen: set = set()
+        for p in task_payloads:
+            for pair in (p.get(key) or []):
+                code = pair.get("code")
+                if code not in seen:
+                    seen.add(code)
+                    out.append(pair)
+        return out
+
     return {
         "ocs_code": ocs_code,
-        "job_title": p.get("job_title") or "",
-        "all_k_pairs": p.get("all_k_pairs") or [],
-        "all_s_pairs": p.get("all_s_pairs") or [],
-        "all_a_pairs": p.get("all_a_pairs") or [],
-        "all_output_pairs": p.get("all_output_pairs") or [],
+        "job_title": pp.get("job_title") or "",
+        "all_k_pairs": _union("k_pairs"),
+        "all_s_pairs": _union("s_pairs"),
+        "all_a_pairs": pp.get("all_a_pairs") or [],
+        "all_output_pairs": _union("output_pairs"),
     }
 
 

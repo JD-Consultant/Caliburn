@@ -48,6 +48,7 @@ class NormalizedTaskGroup:
     task_ids: list[str]                      # full list of T-codes
     task_titles: list[str]
     primary_task_key: str                    # sorted(task_ids)[0]; fallback to padded order
+    tasks: list[Pair] = field(default_factory=list)   # v3: aligned (code, title) — single filter
     blocks: list[NormalizedBlock] = field(default_factory=list)
 
 
@@ -198,6 +199,12 @@ def normalize(doc: OCSDocument) -> NormalizedOCS:
                     task_ids.append(tc.code)
                 if tc.name:
                     task_titles.append(tc.name.strip())
+            # v3: aligned (code, title) pairs — single filter so code↔title never drifts
+            task_pairs = [
+                Pair(code=tc.code, name=tc.name.strip())
+                for tc in task_codes
+                if tc.code and tc.name and tc.name.strip()
+            ]
             task_orders: list[int] = []
             for _ in range(max(len(task_codes), 1)):
                 task_order_cursor += 1
@@ -268,6 +275,7 @@ def normalize(doc: OCSDocument) -> NormalizedOCS:
                     task_ids=task_ids,
                     task_titles=task_titles,
                     primary_task_key=primary_task_key,
+                    tasks=task_pairs,
                     blocks=norm_blocks,
                 )
             )

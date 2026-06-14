@@ -135,6 +135,34 @@
 
 ---
 
+## F. Phase 2 — 查詢層 v3 化（2026-06-15）
+
+> Phase 1（索引）+ v2 移除 + live 驗收完成後，把查詢層從 v2（profile/unit/block）改讀 v3（profile+task）。
+
+### F1. `/search` 改搜 profile + task、砍碼 filter
+- **決定**：`/search` 涵蓋 profile 與 task 兩種點；filter 只留 `level`(profile|task)/`ocs_code`/`is_current`。
+- **棄用**：`k_codes`/`s_codes`/`attitude_codes` filter——v3 payload 不存裸碼也沒索引（B1/B5），全域碼過濾本來就沒語意。
+
+### F2. `/task-pool` 從 block 重組 → 直接 scroll task 點
+- **決定**：scroll **task** 點 by ocs_code、按 `unit_id` 分組；每個 task 點就是一筆任務（task_id/title/activity_examples 都在 payload）。排序：unit 按 unit_id、task 按 task_id（v3 砍了 unit_order/task_order，array 序不可靠 → 用 id 穩定排）。
+- **棄用**：v2「scroll block → 用 task_ids/task_titles 平行陣列重組」——會漏 block-less task + 陣列錯位（B2）。v3 一個 task 一個點，重組消失。
+
+### F3. `/pairs` 從 profile 欄位 → task 點聚合
+- **決定**：scroll task 點 union `k_pairs`/`s_pairs`/`output_pairs`（依 code dedup）+ profile 的 `all_a_pairs`。
+- **棄用**：v2 讀 profile 的 `all_k_pairs`/`all_s_pairs`/`all_output_pairs`——v3 profile 不再存這些池（只留 all_a_pairs，態度是職務級）。
+
+### F4. by-id 取回：Hit 露出 point id（方案 1）
+- **決定**：`/search`、`/task-pool` 每筆 task 多回 Qdrant **point id**（uuid）。jobintel-ai 記住即可日後 by-id retrieve（D3 沒改任務走捷徑）。實際 retrieve 端點之後再加（吃 id 清單）。
+- **理由**：`_to_hit` 本來就拿得到 `p.id`，零成本、不改 payload、不用 re-index。
+- **棄用**：
+  - 「payload 加回 chunk_key」→ 要 re-index、又得另算 uuid5，沒真的省。
+  - 「jobintel-ai 自己拼 chunk_key 再 uuid5」→ 跨 repo 洩漏 chunk_key 格式 + namespace 常數、格式一改靜默壞、unit_key fallback 對不上（違反 A1/A2 知識服務邊界）。
+
+### F5. Hit/schema 砍 v2 欄位、cli/stats/smoke 跟進
+- **決定**：Hit 改 `task_id`/`task_title`(單) + `activity_examples`/`output_pairs`/`competency_level`；砍 `task_ids`/`task_titles`(複)/`block_order`/`unit_order`/`snippet`（v3 不存 text）。`stats` by_level 數 profile/task。砍 `smoke_query.filter_by_ks_code`（碼沒了）。cli `query` 顯示 + `--level` 改 profile/task。
+
+---
+
 ## 方法論註記（給報告）
 
 1. **access-pattern 驅動**：審欄位看「誰讀」，不憑印象。

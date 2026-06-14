@@ -1,4 +1,4 @@
-"""CLI entrypoint: render / index / stats / doctor / smoke-query."""
+"""CLI entrypoint: index / stats / doctor / smoke-query / query / serve."""
 
 from __future__ import annotations
 
@@ -27,10 +27,8 @@ app = typer.Typer(
 console = Console()
 
 
-
 def _now_iso() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S+00:00")
-
 
 
 # ---------- index ----------

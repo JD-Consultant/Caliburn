@@ -58,3 +58,70 @@ def _aggregate_group(group: NormalizedTaskGroup) -> dict:
         "activities": activities,
         "competency_level": max(levels) if levels else None,
     }
+
+
+def _all_skill_names(norm: NormalizedOCS) -> list[str]:
+    names: list[str] = []
+    seen: set[str] = set()
+    for u in norm.units:
+        for g in u.task_groups:
+            for b in g.blocks:
+                for p in (*b.k_pairs, *b.s_pairs):
+                    if p.name and p.name not in seen:
+                        seen.add(p.name)
+                        names.append(p.name)
+    return names
+
+
+def _profile_embed_text(norm: NormalizedOCS) -> str:
+    task_titles = [p.name for u in norm.units for g in u.task_groups for p in g.tasks]
+    sample_activities: list[str] = []
+    for u in norm.units:
+        for g in u.task_groups:
+            for b in g.blocks:
+                for ev in b.evidence:
+                    if ev.name and len(sample_activities) < 20:
+                        sample_activities.append(ev.name)
+    parts = [
+        norm.job_title,
+        norm.job_description or "",
+        "工作內容：" + "、".join(task_titles),
+        "活動：" + "、".join(sample_activities),
+        "技能：" + "、".join(_all_skill_names(norm)),
+    ]
+    return "\n".join(part for part in parts if part.strip())
+
+
+def _profile_record(norm: NormalizedOCS, ctx: BuildContext) -> ChunkRecord:
+    payload = {
+        "chunk_level": "profile",
+        "ocs_code": norm.ocs_code,
+        "ocs_code_base": norm.ocs_code_base,
+        "job_title": norm.job_title,
+        "job_category": norm.job_category,
+        "industry_codes": list(norm.industry_codes),
+        "industry_names": list(norm.industry_names),
+        "occupation_codes": list(norm.occupation_codes),
+        "occupation_names": list(norm.occupation_names),
+        "version": norm.version,
+        "version_seq": norm.version_seq,
+        "is_current": norm.is_current,
+        "update_date": norm.update_date,
+        "ocs_level": norm.ocs_level,
+        "job_description": norm.job_description,
+        "all_a_pairs": [{"code": p.code, "name": p.name} for p in norm.attitude_pairs],
+        "prerequisites": list(norm.prerequisites),
+        "supplements": list(norm.supplements),
+        "source_file": ctx.source_file,
+        "indexed_at": ctx.indexed_at,
+    }
+    return ChunkRecord(
+        chunk_key=f"ocs:{norm.ocs_code}:profile",
+        chunk_level="profile",
+        text=_profile_embed_text(norm),
+        payload=payload,
+    )
+
+
+def build(norm: NormalizedOCS, ctx: BuildContext) -> list[ChunkRecord]:
+    return [_profile_record(norm, ctx)]

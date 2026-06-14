@@ -123,5 +123,36 @@ def _profile_record(norm: NormalizedOCS, ctx: BuildContext) -> ChunkRecord:
     )
 
 
+def _task_record(norm: NormalizedOCS, unit: NormalizedUnit, task: Pair, agg: dict, ctx: BuildContext) -> ChunkRecord:
+    activities = agg["activities"]
+    embed_parts = [task.name, *activities]
+    payload = {
+        "chunk_level": "task",
+        "ocs_code": norm.ocs_code,
+        "unit_id": unit.unit_id,
+        "unit_title": unit.unit_title,
+        "task_id": task.code,
+        "task_title": task.name,
+        "activity_examples": activities[:_ACTIVITY_EXAMPLES],
+        "k_pairs": [{"code": p.code, "name": p.name} for p in agg["k_pairs"]],
+        "s_pairs": [{"code": p.code, "name": p.name} for p in agg["s_pairs"]],
+        "output_pairs": [{"code": p.code, "name": p.name} for p in agg["output_pairs"]],
+        "competency_level": agg["competency_level"],
+        "source_file": ctx.source_file,
+    }
+    return ChunkRecord(
+        chunk_key=f"ocs:{norm.ocs_code}:unit:{unit.unit_key}:task:{task.code}",
+        chunk_level="task",
+        text="\n".join(part for part in embed_parts if part and part.strip()),
+        payload=payload,
+    )
+
+
 def build(norm: NormalizedOCS, ctx: BuildContext) -> list[ChunkRecord]:
-    return [_profile_record(norm, ctx)]
+    records: list[ChunkRecord] = [_profile_record(norm, ctx)]
+    for unit in norm.units:
+        for group in unit.task_groups:
+            agg = _aggregate_group(group)
+            for task in group.tasks:
+                records.append(_task_record(norm, unit, task, agg, ctx))
+    return records

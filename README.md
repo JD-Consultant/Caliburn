@@ -190,7 +190,8 @@ Qdrant 之上的 **無狀態 HTTP read 層**。查詢文字在 **server 端用 B
 |---|---|---|
 | POST | `/search` | 自然語言 → profile / task hits（server 端 embed） |
 | POST | `/task-pool` | 合併多 OCS 的 unit→task 選單 |
-| GET | `/profile/{ocs_code}/pairs` | 該 OCS 的 K/S/A/output 詞彙池 |
+| POST | `/tasks/by-id` | 用 point id 批次取回完整 task（K/S/output + 活動 + level） |
+| GET | `/profile/{ocs_code}/pairs` | 該 OCS 的 K/S/A/output 詞彙池 + 建議條件/補充 |
 | GET | `/healthz` | 模型 + Qdrant 就緒狀態 |
 | GET | `/stats` | collection 各層點數 |
 
@@ -240,14 +241,30 @@ Request：`{ "ocs_codes": [str, …], "activity_examples": int=1 }`
 ```
 `groups` 依 request 的 `ocs_codes` 順序；`units` 依 `unit_id`、`tasks` 依 `task_id`。`job_title` 取自 profile。
 
+### `POST /tasks/by-id`
+
+用 `/search` / `/task-pool` 回傳的 point id 批次取回完整 task payload——供「內容沒改的任務」走 by-id 捷徑拿 K/S（含 `/task-pool` 沒帶的 `output_pairs`）。不存在的 id 靜默略過。
+
+Request：`{ "ids": [str, …] }`（≥1）
+
+```jsonc
+{ "tasks": [ {
+  "id": "f1e2…", "ocs_code": "SMS2521-001v3",
+  "unit_id": "U1", "unit_title": "...", "task_id": "T1.1", "task_title": "...",
+  "competency_level": 3, "activity_examples": ["..."],
+  "k_pairs": [{"code":"K01","name":"..."}], "s_pairs": [...], "output_pairs": [...]
+} ] }
+```
+
 ### `GET /profile/{ocs_code}/pairs`
 
-該 OCS 全部的 K/S/output 詞彙池（**task points 的聯集，依 code 去重**）+ attitudes（取自 profile）。查無 → **404**。
+該 OCS 全部的 K/S/output 詞彙池（**task points 的聯集，依 code 去重**）+ attitudes / 建議條件 / 補充（取自 profile）。查無 → **404**。
 
 ```jsonc
 { "ocs_code": "SMS2521-001v3", "job_title": "...",
   "all_k_pairs": [{"code":"K01","name":"..."}], "all_s_pairs": [...],
-  "all_a_pairs": [...], "all_output_pairs": [...] }
+  "all_a_pairs": [...], "all_output_pairs": [...],
+  "prerequisites": ["建議學歷/經驗/能力條件…"], "supplements": ["其他補充說明…"] }
 ```
 
 ### `GET /healthz` ／ `GET /stats`

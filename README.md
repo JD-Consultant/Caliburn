@@ -87,7 +87,7 @@ uv sync --extra api     # 額外裝 fastapi + uvicorn（查詢 API）
 複製 `.env.example` 為 `.env`：
 
 ```bash
-QDRANT_URL=https://qdrant.yokosama.com   # 或 http://localhost:6333（只寫 host，不需 port）
+QDRANT_URL=https://your-qdrant-host   # 或 http://localhost:6333（只寫 host，不需 port）
 QDRANT_API_KEY=<your-api-key>
 QDRANT_TIMEOUT=300
 QDRANT_COLLECTION=ocs_v3

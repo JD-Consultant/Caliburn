@@ -10,7 +10,7 @@ OCS JSON ─► normalize ─► build(profile + 每任務 task) ─► BGE-M3 e
                                           jobintel-ai ◄─ 無狀態查詢 API ◄─┘
 ```
 
-> **狀態**：schema v3 索引管線 + 查詢 API 已完成，全測試綠；已對真實資料做過小量 live 驗收。全量 re-index（~9,200 點）尚未跑。
+> **狀態**：schema v3 索引管線 + 查詢 API 已完成，全測試綠；**全量 re-index 已完成**（`ocs_v3` = 904 profile + 8,549 task = 9,453 點，已 live 驗收 `/search`·`/task-pool`·`/pairs`）。
 
 ---
 
@@ -80,6 +80,8 @@ uv sync --extra api     # 額外裝 fastapi + uvicorn（查詢 API）
 
 首次 `index` 會下載 BGE-M3（約 2.3GB）到 `~/.cache/huggingface/`，之後不再重抓。
 
+> **GPU（選用）**：Windows 上 `uv sync` 會自動從 PyTorch 官方 index 裝 CUDA 版 torch（`pyproject.toml` 已設定；非 Windows 平台走 PyPI 的 CPU 版）。要用 GPU 把 `.env` 設 `BGE_M3_DEVICE=cuda` + `BGE_M3_USE_FP16=true`；CPU 也能跑，只是 embed 慢很多。BGE-M3 在 GPU 約佔 ~1.1GB VRAM。
+
 ### 2. 設定 `.env`
 
 複製 `.env.example` 為 `.env`：
@@ -93,8 +95,8 @@ QDRANT_COLLECTION=ocs_v3
 OCS_SOURCE_ROOT=./data
 
 BGE_M3_MODEL=BAAI/bge-m3
-BGE_M3_DEVICE=cpu          # 或 cuda
-BGE_M3_USE_FP16=false
+BGE_M3_DEVICE=cpu          # GPU 改 cuda
+BGE_M3_USE_FP16=false       # GPU 建議 true
 BGE_M3_BATCH_SIZE=8
 
 INDEX_BATCH_SIZE=32

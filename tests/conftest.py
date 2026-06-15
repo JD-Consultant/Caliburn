@@ -49,10 +49,11 @@ def _level_of(flt) -> str:
 class FakeQdrant:
     """Minimal stand-in for QdrantClient covering the methods service.py uses."""
 
-    def __init__(self, *, query_points=None, scroll_pages=None, counts=None):
+    def __init__(self, *, query_points=None, scroll_pages=None, counts=None, retrieve_points=None):
         self._qp = list(query_points or [])
         self._scroll_pages = list(scroll_pages or [([], None)])
         self._counts = counts or {}
+        self._retrieve = list(retrieve_points or [])
         self._i = 0
 
     def query_points(self, **kw):
@@ -70,6 +71,10 @@ class FakeQdrant:
         flt = kw.get("count_filter")
         key = _level_of(flt) if flt is not None else "__total__"
         return SimpleNamespace(count=self._counts.get(key, 0))
+
+    def retrieve(self, **kw):
+        # ids are ignored; returns the canned points (tests control what's "found")
+        return [r if isinstance(r, FakePoint) else FakePoint(payload=r) for r in self._retrieve]
 
     def get_collections(self):
         return SimpleNamespace(collections=[])

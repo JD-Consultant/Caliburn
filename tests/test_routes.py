@@ -38,6 +38,28 @@ def test_task_pool_route(make_app, make_qdrant, fake_point):
         assert t["task_id"] == "T1" and t["id"] == "OC1-T1"
 
 
+def test_tasks_by_id_route(make_app, make_qdrant, fake_point):
+    pt = fake_point(id="pt-1", payload={
+        "chunk_level": "task", "ocs_code": "OC1", "unit_id": "U1", "unit_title": "U1",
+        "task_id": "T1.1", "task_title": "t1", "competency_level": 3,
+        "activity_examples": ["a1"], "k_pairs": [{"code": "K01", "name": "k1"}],
+        "s_pairs": [], "output_pairs": [{"code": "O01", "name": "o1"}],
+    })
+    with TestClient(make_app(make_qdrant(retrieve_points=[pt]))) as c:
+        r = c.post("/tasks/by-id", json={"ids": ["pt-1"]})
+        assert r.status_code == 200
+        t = r.json()["tasks"][0]
+        assert t["id"] == "pt-1" and t["task_id"] == "T1.1" and t["competency_level"] == 3
+        assert t["k_pairs"] == [{"code": "K01", "name": "k1"}]
+        assert t["output_pairs"] == [{"code": "O01", "name": "o1"}]
+
+
+def test_tasks_by_id_empty_ids_422(make_app, make_qdrant):
+    with TestClient(make_app(make_qdrant())) as c:
+        r = c.post("/tasks/by-id", json={"ids": []})
+        assert r.status_code == 422
+
+
 def test_pairs_route_404(make_app, make_qdrant):
     with TestClient(make_app(make_qdrant(scroll_pages=[([], None)]))) as c:
         r = c.get("/profile/NOPE/pairs")

@@ -177,7 +177,38 @@ def get_pairs(client, collection: str, *, ocs_code: str) -> dict | None:
         "all_s_pairs": _union("s_pairs"),
         "all_a_pairs": pp.get("all_a_pairs") or [],
         "all_output_pairs": _union("output_pairs"),
+        "prerequisites": pp.get("prerequisites") or [],
+        "supplements": pp.get("supplements") or [],
     }
+
+
+def _project_task_detail(rec) -> dict:
+    p = rec.payload or {}
+    return {
+        "id": str(getattr(rec, "id", "")),
+        "ocs_code": p.get("ocs_code", ""),
+        "unit_id": p.get("unit_id"),
+        "unit_title": p.get("unit_title"),
+        "task_id": p.get("task_id"),
+        "task_title": p.get("task_title"),
+        "competency_level": p.get("competency_level"),
+        "activity_examples": p.get("activity_examples") or [],
+        "k_pairs": p.get("k_pairs") or [],
+        "s_pairs": p.get("s_pairs") or [],
+        "output_pairs": p.get("output_pairs") or [],
+    }
+
+
+def retrieve_tasks(client, collection: str, *, ids: list[str]) -> dict:
+    """By-id task retrieve (Step 4 output_pairs + Step 5 unchanged-task K/S shortcut).
+
+    Returns only the points that exist; missing ids are silently dropped.
+    """
+    records = client.retrieve(
+        collection_name=collection, ids=list(ids),
+        with_payload=True, with_vectors=False,
+    )
+    return {"tasks": [_project_task_detail(r) for r in records]}
 
 
 def get_stats(client, collection: str) -> dict:

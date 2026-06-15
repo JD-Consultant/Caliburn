@@ -14,8 +14,10 @@ from jd_ocs_indexer.api.schemas import (
     SearchRequest,
     SearchResponse,
     StatsResponse,
+    TaskByIdRequest,
     TaskPoolRequest,
     TaskPoolResponse,
+    TasksResponse,
 )
 
 router = APIRouter()
@@ -50,6 +52,17 @@ async def post_task_pool(req: TaskPoolRequest, request: Request):
         app.state.settings.qdrant_collection,
         ocs_codes=req.ocs_codes,
         activity_examples=req.activity_examples,
+    )
+
+
+@router.post("/tasks/by-id", response_model=TasksResponse)
+async def post_tasks_by_id(req: TaskByIdRequest, request: Request):
+    app = request.app
+    return await run_in_threadpool(
+        service.retrieve_tasks,
+        app.state.client,
+        app.state.settings.qdrant_collection,
+        ids=req.ids,
     )
 
 

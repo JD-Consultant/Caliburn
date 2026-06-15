@@ -31,6 +31,11 @@ class Settings(BaseSettings):
     anthropic_api_key: str = ""
     anthropic_model: str = "claude-sonnet-4-6"
 
+    # jd-ocs-indexer query API
+    indexer_base_url: str = "http://localhost:8000"
+    indexer_api_key: str = ""
+    indexer_timeout_s: float = 30.0
+
     # iCAP RAG — 三段式信心門檻
     icap_high_threshold: float = 0.70    # >= 此值 → high → reference mode
     icap_medium_threshold: float = 0.55  # >= 此值 → medium → hybrid mode；< 此值 → company_defined

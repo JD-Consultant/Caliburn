@@ -6,6 +6,7 @@ def test_get_pairs_unions_task_pairs_plus_profile_attitudes():
     profile = [FakePoint(payload={
         "chunk_level": "profile", "ocs_code": "OC1", "job_title": "JT",
         "all_a_pairs": [{"code": "A01", "name": "主動"}],
+        "prerequisites": ["大學以上學歷"], "supplements": ["須具備證照"],
     })]
     tasks = [
         FakePoint(payload={"chunk_level": "task", "ocs_code": "OC1",
@@ -23,6 +24,8 @@ def test_get_pairs_unions_task_pairs_plus_profile_attitudes():
     assert [p["code"] for p in out["all_s_pairs"]] == ["S01"]
     assert [p["code"] for p in out["all_output_pairs"]] == ["O01"]
     assert out["all_a_pairs"] == [{"code": "A01", "name": "主動"}]
+    assert out["prerequisites"] == ["大學以上學歷"]
+    assert out["supplements"] == ["須具備證照"]
 
 
 def test_get_pairs_missing_profile_returns_none():

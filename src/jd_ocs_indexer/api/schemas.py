@@ -92,6 +92,30 @@ class PairsResponse(BaseModel):
     all_s_pairs: list[Pair]
     all_a_pairs: list[Pair]
     all_output_pairs: list[Pair]
+    prerequisites: list[str] = Field(default_factory=list)
+    supplements: list[str] = Field(default_factory=list)
+
+
+class TaskByIdRequest(BaseModel):
+    ids: list[str] = Field(min_length=1)
+
+
+class TaskDetail(BaseModel):
+    id: str
+    ocs_code: str
+    unit_id: Optional[str] = None
+    unit_title: Optional[str] = None
+    task_id: Optional[str] = None
+    task_title: Optional[str] = None
+    competency_level: Optional[int] = None
+    activity_examples: list[str] = Field(default_factory=list)
+    k_pairs: list[Pair] = Field(default_factory=list)
+    s_pairs: list[Pair] = Field(default_factory=list)
+    output_pairs: list[Pair] = Field(default_factory=list)
+
+
+class TasksResponse(BaseModel):
+    tasks: list[TaskDetail]
 
 
 class HealthResponse(BaseModel):

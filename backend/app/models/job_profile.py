@@ -39,6 +39,7 @@ class JobProfile(Base):
     stage = Column(Text, nullable=False, default="basic_info")
     completion_pct = Column(Integer, nullable=False, default=0)
     icap_source_type = Column(Text, default="icap_official")
+    selected_ocs_code = Column(Text)  # v3: 使用者選定的 OCS profile
     document_draft = Column(JSONB)
     graph_state = Column(JSONB, default=dict)  # 跨 API call 持久化的 graph state
 
@@ -101,6 +102,8 @@ class CompanyTask(Base):
     importance = Column(Text, default="中")
     responsibility_type = Column(Text, default="主責")
     sort_order = Column(Integer, default=0)
+    source = Column(Text, default="company")   # v3 provenance: catalog | company
+    indexer_ref = Column(JSONB)                 # v3: {ocs_code, task_id}
 
     # 5W2H
     situation = Column(Text)

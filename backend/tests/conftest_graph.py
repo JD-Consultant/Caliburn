@@ -22,3 +22,26 @@ class SpyPersist:
     def __init__(self): self.selected = None; self.flushed = None
     async def set_selected_ocs(self, pid, ocs): self.selected = (str(pid), ocs)
     async def flush_tasks(self, pid, tasks): self.flushed = (str(pid), tasks)
+
+
+class FakeLlm:
+    """可配的 LlmPort 假件。json/text 可給 callable 或固定值；raises=True 模擬失敗。"""
+    def __init__(self, json=None, text="", raises=False):
+        self._json = json
+        self._text = text
+        self._raises = raises
+        self.calls = []
+
+    async def complete_text(self, prompt, *, role="cheap"):
+        self.calls.append(("text", role))
+        if self._raises:
+            raise RuntimeError("llm down")
+        return self._text(prompt) if callable(self._text) else self._text
+
+    async def complete_json(self, prompt, *, role="cheap", default=None):
+        self.calls.append(("json", role))
+        if self._raises:
+            return default
+        if self._json is None:
+            return default
+        return self._json(prompt) if callable(self._json) else self._json

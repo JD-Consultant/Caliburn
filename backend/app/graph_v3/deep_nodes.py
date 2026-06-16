@@ -246,3 +246,8 @@ async def indicator_node(state: InterviewState, config) -> dict:
     deep["missing_fields"] = []
     logger.info("indicator_node: task=%s accepted score=%.2f", task_name, score)
     return {"tasks": tasks, "deep": deep}
+
+
+def route_after_indicator(state: InterviewState) -> str:
+    """indicator 後分流：有未填弱欄 → 回 five_w2h 重補；否則 → advance（推進下一任務）。"""
+    return "five_w2h" if state["deep"].get("missing_fields") else "advance"

@@ -1,8 +1,15 @@
+import asyncio
 import os
+import sys
 
 import pytest
 import pytest_asyncio
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+
+
+# psycopg3 async cannot use ProactorEventLoop on Windows; switch to SelectorEventLoop
+if sys.platform == "win32":
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 TEST_DATABASE_URL = os.getenv("TEST_DATABASE_URL", "")
 

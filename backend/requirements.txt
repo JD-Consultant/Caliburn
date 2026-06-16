@@ -4,25 +4,18 @@ uvicorn[standard]==0.30.6
 
 # Database
 sqlalchemy==2.0.35
-asyncpg==0.29.0
+asyncpg==0.30.0
 alembic==1.13.3
-psycopg2-binary==2.9.9
-pgvector==0.3.2
+psycopg[binary]==3.3.4
+# v3: dropped psycopg2-binary + pgvector + llama-index — retrieval 外包 jd-ocs-indexer (Qdrant), 無 in-DB 向量 (D5)
 
-# AI / LLM
-langchain==0.3.0
-langchain-openai==0.2.0
-langchain-google-genai==2.0.0
-langchain-anthropic==0.2.0
+# AI / LLM (v3: LangGraph + CopilotKit)
+langchain==1.3.9
+langchain-core==1.4.7
 langgraph==1.2.5
 langgraph-checkpoint-postgres==3.1.0
-psycopg[binary]==3.3.4
-# Phase ③ TODO: langgraph 1.x 需 langchain-core 1.x → 屆時把上方 langchain* 一併升到 1.x
-# （現 0.3.x 與之衝突；v3 的 pick_profile/build_task_pool 節點暫不使用 langchain）
-langchain-community==0.3.0
-llama-index==0.11.14
-llama-index-vector-stores-postgres==0.2.2
-openai==1.51.0
+copilotkit==0.1.94
+# v3 TODO: LLM gateway 重建 (D10) 時再加 langchain-openai（OpenRouter base_url，1.x 相容版）
 
 # Background tasks
 celery==5.4.0

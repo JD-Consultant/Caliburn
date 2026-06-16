@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Protocol
+from typing import Any, Protocol, runtime_checkable
 from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -9,9 +9,17 @@ from app.services.knowledge.base import KnowledgeClient
 from app.services.persistence import TaskRepo
 
 
+@runtime_checkable
 class PersistPort(Protocol):
     async def set_selected_ocs(self, job_profile_id: UUID, ocs_code: str) -> None: ...
     async def flush_tasks(self, job_profile_id: UUID, tasks: list[dict]) -> None: ...
+
+
+@runtime_checkable
+class LlmPort(Protocol):
+    """per-role LLM 介面（D10）。role ∈ {"deep","indicator","cheap"}。"""
+    async def complete_text(self, prompt: str, *, role: str = "cheap") -> str: ...
+    async def complete_json(self, prompt: str, *, role: str = "cheap", default: Any = None) -> Any: ...
 
 
 class DbPersist:
@@ -33,3 +41,4 @@ class DbPersist:
 class Deps:
     knowledge: KnowledgeClient
     persist: PersistPort
+    llm: LlmPort | None = None

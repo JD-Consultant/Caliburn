@@ -1,11 +1,13 @@
 """v3 深問三階段節點（interrupt 驅動）：star / five_w2h / indicator。
 重用 app.graph.prompts.* 與 app.graph.constants（純資料模組）；控制流為新寫。"""
+import json
 import logging
 
 from langgraph.types import interrupt
 
 from app.graph_v3.state import InterviewState
-from app.graph.constants import FIVE_W2H_REQUIRED, FIVE_W2H_LIST_FIELDS
+from app.graph.constants import FIVE_W2H_REQUIRED, FIVE_W2H_LIST_FIELDS, INDICATOR_REQUIRED_FIELDS
+import app.graph.prompts.indicator as ind_prompts
 
 logger = logging.getLogger("jobintel")
 
@@ -136,3 +138,111 @@ async def five_w2h_node(state: InterviewState, config) -> dict:
     tasks[idx] = task
     logger.info("five_w2h_node: task=%s complete -> indicator", task_name)
     return {"tasks": tasks}
+
+
+# ---- Indicator 節點 ----
+
+_QUALITY_THRESHOLD = 0.60
+_MAX_QUALITY_RETRIES = 1
+_DIM_TO_FIELDS = {
+    "has_situation": ["situation"], "has_purpose": ["purpose"],
+    "has_collaborators": ["collaborators"], "has_tools": ["tools"],
+    "has_action": ["workflow_steps"], "has_output": ["outputs"],
+    "has_standard": ["quality_standards", "time_standards"],
+}
+
+
+def _score_quality(dims: dict) -> tuple[float, list[str]]:
+    weak: list[str] = []
+    hits = 0
+    for dim, fields in _DIM_TO_FIELDS.items():
+        if dims.get(dim):
+            hits += 1
+        else:
+            weak.extend(fields)
+    return round(hits / len(_DIM_TO_FIELDS), 3), weak
+
+
+def _avg_quality(results: list[dict]) -> tuple[float, list[str]]:
+    if not results:
+        return 0.0, list({f for fs in _DIM_TO_FIELDS.values() for f in fs})
+    total = 0.0
+    weak: set[str] = set()
+    for r in results:
+        sc, wk = _score_quality(r.get("quality_dims", {}))
+        total += sc
+        weak.update(wk)
+    return round(total / len(results), 3), list(weak)
+
+
+def _build_indicator_prompt(task: dict) -> tuple[str, bool]:
+    """回 (prompt, is_per_output)。catalog/iCAP 參考段落留空（檢索已外包/移除）。"""
+    common = dict(
+        task_name=task["task_name"], situation=task.get("situation", ""),
+        purpose=task.get("purpose", ""),
+        collaborators=", ".join(task.get("collaborators") or []),
+        stakeholders=", ".join(task.get("stakeholders") or []),
+        tools=", ".join(task.get("tools") or []),
+        workflow_steps="\n".join(task.get("workflow_steps") or []),
+        quality_standards=", ".join(task.get("quality_standards") or []),
+        time_standards=", ".join(task.get("time_standards") or []),
+        star_case=json.dumps(task.get("star_case", {}), ensure_ascii=False),
+        icap_ref_section="",
+    )
+    outputs = task.get("outputs") or []
+    if outputs:
+        prompt = ind_prompts.PER_OUTPUT.format(
+            outputs_numbered="\n".join(f"{i}. {o}" for i, o in enumerate(outputs, 1)),
+            icap_ref_rule="", **common)
+        return prompt, True
+    return ind_prompts.SINGLE.format(**common), False
+
+
+async def indicator_node(state: InterviewState, config) -> dict:
+    deps = config["configurable"]["deps"]
+    idx, task, task_id = _current_task(state)
+    task_name = task["task_name"]
+    deep = dict(state["deep"])
+    retry = dict(deep.get("retry") or {})
+
+    # Guardrail：必填欄缺 → 退回 five_w2h
+    missing = [f for f in INDICATOR_REQUIRED_FIELDS if not task.get(f)]
+    if missing:
+        deep["missing_fields"] = missing
+        logger.warning("indicator_node: guardrail missing=%s -> five_w2h", missing)
+        return {"deep": deep}
+
+    prompt, per_output = _build_indicator_prompt(task)
+    raw = await deps.llm.complete_json(prompt, role="indicator", default=[] if per_output else {})
+    results = raw if per_output and isinstance(raw, list) else ([raw] if raw else [])
+    score, weak = _avg_quality(results)
+
+    if score < _QUALITY_THRESHOLD and retry.get(task_id, 0) < _MAX_QUALITY_RETRIES:
+        retry[task_id] = retry.get(task_id, 0) + 1
+        for f in weak:
+            task.pop(f, None)
+        tasks = list(state["tasks"]); tasks[idx] = task
+        deep["retry"] = retry
+        deep["missing_fields"] = weak
+        logger.warning("indicator_node: task=%s score=%.2f weak=%s retry#%d -> five_w2h",
+                       task_name, score, weak, retry[task_id])
+        return {"tasks": tasks, "deep": deep}
+
+    status = "ok" if score >= _QUALITY_THRESHOLD else "force_accepted"
+    indicators = [{
+        "task_id": task_id, "task_name": task_name,
+        "output_name": r.get("output_name", ""),
+        "indicator_5w2h": r.get("indicator_5w2h", ""),
+        "indicator_abcd": r.get("indicator_abcd", ""),
+        "quality_score": score, "quality_status": status,
+    } for r in results] or [{
+        "task_id": task_id, "task_name": task_name, "output_name": "",
+        "indicator_5w2h": "", "indicator_abcd": "",
+        "quality_score": 0.0, "quality_status": "force_accepted",
+    }]
+    task["behavior_indicators"] = indicators
+    tasks = list(state["tasks"]); tasks[idx] = task
+    deep["retry"] = retry
+    deep["missing_fields"] = []
+    logger.info("indicator_node: task=%s accepted score=%.2f", task_name, score)
+    return {"tasks": tasks, "deep": deep}

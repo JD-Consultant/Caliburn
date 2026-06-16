@@ -111,7 +111,7 @@ async def _prefill_from_catalog(task: dict, deps) -> dict:
 def _store_answer(task: dict, field: str, answer: str) -> dict:
     if field in FIVE_W2H_LIST_FIELDS:
         task[field] = [s.strip() for s in answer.replace("；", ",").replace("、", ",").replace("，", ",").split(",")
-                       if s.strip()] or [answer]
+                       if s.strip()] or ([answer.strip()] if answer.strip() else [])
     else:
         task[field] = answer
     return task
@@ -212,12 +212,15 @@ async def indicator_node(state: InterviewState, config) -> dict:
         logger.warning("indicator_node: guardrail missing=%s -> five_w2h", missing)
         return {"deep": deep}
 
-    prompt, per_output = _build_indicator_prompt(task)
-    raw = await deps.llm.complete_json(prompt, role="indicator", default=[] if per_output else {})
-    results = raw if per_output and isinstance(raw, list) else ([raw] if raw else [])
+    if deps.llm is None:
+        results = []
+    else:
+        prompt, per_output = _build_indicator_prompt(task)
+        raw = await deps.llm.complete_json(prompt, role="indicator", default=[] if per_output else {})
+        results = raw if per_output and isinstance(raw, list) else ([raw] if raw else [])
     score, weak = _avg_quality(results)
 
-    if score < _QUALITY_THRESHOLD and retry.get(task_id, 0) < _MAX_QUALITY_RETRIES:
+    if score < _QUALITY_THRESHOLD and retry.get(task_id, 0) < _MAX_QUALITY_RETRIES and deps.llm is not None:
         retry[task_id] = retry.get(task_id, 0) + 1
         for f in weak:
             task.pop(f, None)

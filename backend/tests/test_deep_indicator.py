@@ -53,6 +53,19 @@ async def test_indicator_accepts_good_quality():
 
 
 @pytest.mark.asyncio
+async def test_indicator_none_llm_yields_force_accepted():
+    """None llm must not crash; must write force_accepted placeholder and clear missing_fields."""
+    graph = _graph()
+    cfg = {"configurable": {"thread_id": "t_none_llm",
+                            "deps": Deps(knowledge=FakeKnowledge(), persist=SpyPersist(), llm=None)}}
+    out = await graph.ainvoke(_state_with(_full_task()), cfg)
+    inds = out["tasks"][0]["behavior_indicators"]
+    assert inds, "expected at least one placeholder indicator"
+    assert inds[0]["quality_status"] == "force_accepted"
+    assert out["deep"]["missing_fields"] == []
+
+
+@pytest.mark.asyncio
 async def test_indicator_low_quality_signals_retry_and_clears_weak():
     # 4 個維度為 False → 命中 3/7 ≈ 0.43 < 0.60 門檻 → 觸發重試
     bad_dims = dict(_GOOD_DIMS, has_tools=False, has_action=False,

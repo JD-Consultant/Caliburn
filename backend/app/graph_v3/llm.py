@@ -38,7 +38,10 @@ def get_chat_llm(role: str, temperature: float = 0.2) -> ChatOpenAI:
 
 
 class OpenRouterLlm:
-    """LlmPort 實作（網路）。retries 涵蓋網路錯誤與 JSON 解析失敗。"""
+    """LlmPort 實作（網路）。retries 涵蓋網路錯誤與 JSON 解析失敗。
+    Note: ``complete_json`` wraps ``complete_text``, so a fully-failing
+    ``complete_json`` call performs up to ``retries * retries`` underlying
+    network attempts (e.g. 4 with the default ``retries=2``)."""
 
     def __init__(self, retries: int = 2):
         self._retries = retries
@@ -48,7 +51,8 @@ class OpenRouterLlm:
         for attempt in range(self._retries):
             try:
                 resp = await llm.ainvoke([HumanMessage(content=prompt)])
-                return resp.content
+                content = resp.content
+                return content if isinstance(content, str) else str(content)
             except Exception as exc:  # noqa: BLE001
                 if attempt < self._retries - 1:
                     logger.warning("OpenRouterLlm text attempt %d failed: %s", attempt + 1, exc)

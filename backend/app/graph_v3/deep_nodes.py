@@ -97,7 +97,7 @@ async def _prefill_from_catalog(task: dict, deps) -> dict:
     """catalog k/s/output 當 just-in-time prefill：目前實填 outputs（output_pairs 名稱）。"""
     ref = task.get("indexer_ref") or {}
     task_id = ref.get("task_id")
-    if not task_id or deps.knowledge is None:
+    if not task_id or deps.knowledge is None or task.get("outputs"):
         return task
     res = await deps.knowledge.tasks_by_id([task_id])
     detail = next((t for t in res.tasks if t.task_id == task_id), None)
@@ -108,7 +108,7 @@ async def _prefill_from_catalog(task: dict, deps) -> dict:
 
 def _store_answer(task: dict, field: str, answer: str) -> dict:
     if field in FIVE_W2H_LIST_FIELDS:
-        task[field] = [s.strip() for s in answer.replace("、", ",").replace("，", ",").split(",")
+        task[field] = [s.strip() for s in answer.replace("；", ",").replace("、", ",").replace("，", ",").split(",")
                        if s.strip()] or [answer]
     else:
         task[field] = answer

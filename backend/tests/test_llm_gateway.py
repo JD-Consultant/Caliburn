@@ -19,6 +19,8 @@ def test_model_for_role_maps_three_tiers():
 def test_get_chat_llm_uses_openrouter_base_url():
     settings.openrouter_base_url = "https://openrouter.ai/api/v1"
     settings.openrouter_api_key = "sk-test"
+    settings.model_indicator = "vendor/mid"
+    llm_mod._build_chat.cache_clear()
     chat = llm_mod.get_chat_llm("indicator")
     # langchain_openai ChatOpenAI 暴露 model_name 與 openai_api_base
     assert chat.model_name == settings.model_indicator

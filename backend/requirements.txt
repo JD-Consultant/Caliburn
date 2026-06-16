@@ -15,7 +15,7 @@ langchain-core==1.4.7
 langgraph==1.2.5
 langgraph-checkpoint-postgres==3.1.0
 copilotkit==0.1.94
-# v3 TODO: LLM gateway 重建 (D10) 時再加 langchain-openai（OpenRouter base_url，1.x 相容版）
+langchain-openai==1.3.2
 
 # Background tasks
 celery==5.4.0

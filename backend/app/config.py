@@ -42,6 +42,13 @@ class Settings(BaseSettings):
     icap_similarity_threshold: float = 0.55  # 保留向下相容（等同 icap_medium_threshold）
     icap_top_k: int = 5
 
+    # OpenRouter LLM gateway（D10）— per-role 模型分層，OpenAI 相容
+    openrouter_api_key: str = ""
+    openrouter_base_url: str = "https://openrouter.ai/api/v1"
+    model_deep: str = "deepseek/deepseek-chat"       # 強階：STAR 整理（OpenRouter slug，可改）
+    model_indicator: str = "deepseek/deepseek-chat"  # 中階：行為指標生成
+    model_cheap: str = "deepseek/deepseek-chat"      # 便宜：措辭/雜項
+
     # Document output
     document_output_dir: str = "./output/documents"
 

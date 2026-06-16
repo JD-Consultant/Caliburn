@@ -54,3 +54,5 @@ async def test_two_task_deep_loop_reaches_assemble():
     assert out["current_step"] == "assemble_ksa"
     assert all(t.get("behavior_indicators") for t in out["tasks"])
     assert len(out["tasks"]) == 2
+    assert out["tasks"][0]["behavior_indicators"][0]["task_id"] == "T1.1"
+    assert out["tasks"][1]["behavior_indicators"][0]["task_id"] == "T1.2"

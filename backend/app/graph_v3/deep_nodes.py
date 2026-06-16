@@ -5,6 +5,7 @@ import logging
 from langgraph.types import interrupt
 
 from app.graph_v3.state import InterviewState
+from app.graph.constants import FIVE_W2H_REQUIRED, FIVE_W2H_LIST_FIELDS
 
 logger = logging.getLogger("jobintel")
 
@@ -76,3 +77,62 @@ async def star_node(state: InterviewState, config) -> dict:
 
     logger.info("star_node: task=%s STAR complete -> five_w2h", task_name)
     return {"tasks": tasks, "deep": deep}
+
+
+# ---- Five W2H 節點 ----
+
+def _prefill_from_star(task: dict) -> dict:
+    """S → situation；A → workflow_steps（以「、」「；」拆分）。"""
+    star = task.get("star_case") or {}
+    if not task.get("situation") and star.get("situation"):
+        task["situation"] = star["situation"]
+    if not task.get("workflow_steps") and star.get("action"):
+        action = star["action"]
+        steps = [s.strip() for s in action.replace("；", "、").split("、") if s.strip()]
+        task["workflow_steps"] = steps if len(steps) > 1 else [action]
+    return task
+
+
+async def _prefill_from_catalog(task: dict, deps) -> dict:
+    """catalog k/s/output 當 just-in-time prefill：目前實填 outputs（output_pairs 名稱）。"""
+    ref = task.get("indexer_ref") or {}
+    task_id = ref.get("task_id")
+    if not task_id or deps.knowledge is None:
+        return task
+    res = await deps.knowledge.tasks_by_id([task_id])
+    detail = next((t for t in res.tasks if t.task_id == task_id), None)
+    if detail and not task.get("outputs") and detail.output_pairs:
+        task["outputs"] = [p.name for p in detail.output_pairs if p.name]
+    return task
+
+
+def _store_answer(task: dict, field: str, answer: str) -> dict:
+    if field in FIVE_W2H_LIST_FIELDS:
+        task[field] = [s.strip() for s in answer.replace("、", ",").replace("，", ",").split(",")
+                       if s.strip()] or [answer]
+    else:
+        task[field] = answer
+    return task
+
+
+async def five_w2h_node(state: InterviewState, config) -> dict:
+    deps = config["configurable"]["deps"]
+    idx, task, _ = _current_task(state)
+    task = _prefill_from_star(task)
+    task = await _prefill_from_catalog(task, deps)
+    task_name = task["task_name"]
+
+    for field, (label, question) in FIVE_W2H_REQUIRED.items():
+        if task.get(field):
+            continue
+        answer = interrupt({
+            "kind": "ask_human", "stage": "five_w2h", "field": field,
+            "task_name": task_name, "label": label,
+            "question": f"關於「{task_name}」：{question}",
+        })
+        task = _store_answer(task, field, answer if isinstance(answer, str) else str(answer))
+
+    tasks = list(state["tasks"])
+    tasks[idx] = task
+    logger.info("five_w2h_node: task=%s complete -> indicator", task_name)
+    return {"tasks": tasks}

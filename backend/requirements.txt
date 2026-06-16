@@ -14,7 +14,11 @@ langchain==0.3.0
 langchain-openai==0.2.0
 langchain-google-genai==2.0.0
 langchain-anthropic==0.2.0
-langgraph==0.2.28
+langgraph==1.2.5
+langgraph-checkpoint-postgres==3.1.0
+psycopg[binary]==3.3.4
+# Phase ③ TODO: langgraph 1.x 需 langchain-core 1.x → 屆時把上方 langchain* 一併升到 1.x
+# （現 0.3.x 與之衝突；v3 的 pick_profile/build_task_pool 節點暫不使用 langchain）
 langchain-community==0.3.0
 llama-index==0.11.14
 llama-index-vector-stores-postgres==0.2.2

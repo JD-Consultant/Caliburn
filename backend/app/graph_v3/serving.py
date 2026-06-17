@@ -1,8 +1,8 @@
-"""CopilotKit serving for graph_v3 (stub-first demo).
+"""CopilotKit serving for graph_v3.
 
-probe-grounded（copilotkit 0.1.94）：CopilotKitRemoteEndpoint(agents=[LangGraphAGUIAgent(...)])。
-deps 經 LangGraphAGUIAgent(config=...) 注入（透到 node 的 config["configurable"]["deps"]）。
-demo 用 MemorySaver + stub deps；真 PostgresSaver/HttpIndexerClient/DbPersist 留後續 phase。"""
+Provides two paths: build_demo_sdk (MemorySaver + stub deps for tests/local);
+build_live_deps/build_live_sdk (HttpIndexerClient + LiveDbPersist + OpenRouterLlm for app).
+deps injected via LangGraphAGUIAgent(config={"configurable": {"deps": ...}})."""
 from copilotkit import CopilotKitRemoteEndpoint, LangGraphAGUIAgent
 from langgraph.checkpoint.memory import MemorySaver
 

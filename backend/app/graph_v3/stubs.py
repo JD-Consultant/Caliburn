@@ -4,6 +4,7 @@ from uuid import UUID
 
 from app.services.knowledge.models import (
     Hit,
+    Pair,
     Pairs,
     PoolGroup,
     PoolTask,
@@ -34,7 +35,10 @@ class StubKnowledge:
             ])])])
 
     async def pairs(self, ocs_code) -> Pairs:
-        return Pairs(ocs_code=ocs_code)
+        return Pairs(ocs_code=ocs_code,
+                     knowledge=[Pair(code="K01", name="設備保養原理")],
+                     skills=[Pair(code="S01", name="點檢操作")],
+                     attitudes=[Pair(code="A01", name="細心負責")])
 
     async def tasks_by_id(self, ids) -> TasksByIdResult:
         return TasksByIdResult(tasks=[])

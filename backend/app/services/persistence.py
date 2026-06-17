@@ -71,6 +71,7 @@ class KsaRepo:
     async def hydrate(self, job_profile_id: UUID) -> dict:
         rows = (await self.s.execute(
             select(KsaItem).where(KsaItem.job_profile_id == job_profile_id)
+            .order_by(KsaItem.created_at, KsaItem.id)
         )).scalars().all()
         out: dict[str, list[dict]] = {"knowledge": [], "skills": [], "attitudes": []}
         bucket = {"K": "knowledge", "S": "skills", "A": "attitudes"}

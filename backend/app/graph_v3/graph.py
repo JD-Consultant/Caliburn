@@ -4,6 +4,8 @@ from app.graph_v3.state import InterviewState
 from app.graph_v3.nodes import pick_profile, build_task_pool
 from app.graph_v3.deep_nodes import (
     star_node, five_w2h_node, indicator_node, route_after_indicator)
+from app.graph_v3.assemble_nodes import assemble_ksa
+from app.graph_v3.build_doc import build_doc
 
 
 def route_deep(state: InterviewState) -> str:
@@ -44,6 +46,8 @@ def build_graph_v3(checkpointer=None):
     g.add_node("indicator", indicator_node)
     g.add_node("advance_deep", advance_deep)
     g.add_node("finish_deep", finish_deep)
+    g.add_node("assemble_ksa", assemble_ksa)
+    g.add_node("build_doc", build_doc)
 
     g.add_edge(START, "pick_profile")
     g.add_edge("pick_profile", "build_task_pool")
@@ -55,5 +59,7 @@ def build_graph_v3(checkpointer=None):
                             {"five_w2h": "five_w2h", "advance": "advance_deep"})
     g.add_conditional_edges("advance_deep", route_deep,
                             {"star": "star", "finish_deep": "finish_deep"})
-    g.add_edge("finish_deep", END)
+    g.add_edge("finish_deep", "assemble_ksa")
+    g.add_edge("assemble_ksa", "build_doc")
+    g.add_edge("build_doc", END)
     return g.compile(checkpointer=checkpointer)

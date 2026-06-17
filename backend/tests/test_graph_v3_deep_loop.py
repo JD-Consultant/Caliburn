@@ -51,7 +51,7 @@ async def test_two_task_deep_loop_reaches_assemble():
         guard += 1
         assert guard < 60, "深問迴圈未收斂"
 
-    assert out["current_step"] == "assemble_ksa"
+    assert out["current_step"] == "done"
     assert all(t.get("behavior_indicators") for t in out["tasks"])
     assert len(out["tasks"]) == 2
     assert out["tasks"][0]["behavior_indicators"][0]["task_id"] == "T1.1"

@@ -4,10 +4,10 @@ flush 以 (job_profile_id, task_name) 為穩定鍵做 row-level upsert：
 既有 row 更新、不存在才新建、清單中消失的刪除 → 保 row id 穩定，免斷 ksa_items FK。"""
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models import CompanyTask, KsaItem
+from app.models import CompanyTask, DocumentVersion, KsaItem
 
 # flush 寫回的清單欄（深問產出之外）
 _TASK_FIELDS = ("task_name", "description", "category", "frequency",
@@ -104,3 +104,35 @@ class KsaRepo:
             if key not in seen:
                 await self.s.delete(row)
         await self.s.flush()
+
+
+class DocRepo:
+    """document_versions：每次 save 版本遞增；content 為 OCS 文件 JSONB。"""
+
+    def __init__(self, session: AsyncSession):
+        self.s = session
+
+    async def save(self, job_profile_id: UUID, content: dict, fmt: str = "json") -> dict:
+        cur_max = (await self.s.execute(
+            select(func.max(DocumentVersion.version))
+            .where(DocumentVersion.job_profile_id == job_profile_id)
+        )).scalar()
+        row = DocumentVersion(job_profile_id=job_profile_id,
+                              version=(cur_max or 0) + 1, format=fmt,
+                              content=content, status="draft")
+        self.s.add(row)
+        await self.s.flush()
+        return self._to_dict(row)
+
+    async def latest(self, job_profile_id: UUID) -> dict | None:
+        row = (await self.s.execute(
+            select(DocumentVersion)
+            .where(DocumentVersion.job_profile_id == job_profile_id)
+            .order_by(DocumentVersion.version.desc())
+        )).scalars().first()
+        return self._to_dict(row) if row else None
+
+    @staticmethod
+    def _to_dict(r: DocumentVersion) -> dict:
+        return {"id": str(r.id), "version": r.version, "format": r.format,
+                "content": r.content, "status": r.status}

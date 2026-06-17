@@ -13,8 +13,10 @@ import { NextRequest } from "next/server";
 
 // Backend AG-UI run endpoint. Live app default :8001
 // (.venv\Scripts\python run_live.py). Override via COPILOTKIT_REMOTE_URL.
+// Use 127.0.0.1 (not localhost): Node/undici on Windows resolves localhost to
+// IPv6 ::1, but uvicorn binds IPv4 127.0.0.1 → "fetch failed" before reaching it.
 const REMOTE_URL =
-  process.env.COPILOTKIT_REMOTE_URL ?? "http://localhost:8001/copilotkit";
+  process.env.COPILOTKIT_REMOTE_URL ?? "http://127.0.0.1:8001/copilotkit";
 
 const runtime = new CopilotRuntime({
   agents: {

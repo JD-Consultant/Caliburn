@@ -43,9 +43,16 @@ def _assemble(state: InterviewState) -> dict:
 
     ksa = state.get("ksa") or {"knowledge": [], "skills": [], "attitudes": []}
     def _coded(items, prefix):
-        return [{"code": it.get("icap_ref") or f"{prefix}{i:02d}", "name": it["content"],
-                 "source": it.get("source", "company"), "icap_ref": it.get("icap_ref")}
-                for i, it in enumerate(items, 1)]
+        out = []
+        i = 0
+        for it in items:
+            content = (it.get("content") or "").strip()
+            if not content:
+                continue
+            i += 1
+            out.append({"code": it.get("icap_ref") or f"{prefix}{i:02d}", "name": content,
+                        "source": it.get("source", "company"), "icap_ref": it.get("icap_ref")})
+        return out
 
     return {
         "ocs_profile": {

@@ -37,7 +37,7 @@ def finish_deep(state: InterviewState) -> dict:
 
 def build_graph_v3(checkpointer=None):
     """v3 骨幹 + 逐任務深問迴圈（單層 node loop，interrupt 驅動）。
-    Phase ④ 會把 finish_deep 後接 assemble_ksa/build_doc。"""
+    finish_deep → assemble_ksa → build_doc → END。"""
     g = StateGraph(InterviewState)
     g.add_node("pick_profile", pick_profile)
     g.add_node("build_task_pool", build_task_pool)

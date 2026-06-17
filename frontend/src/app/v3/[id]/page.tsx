@@ -1,15 +1,18 @@
 "use client";
 
-// Slice 1 smoke surface for the v3 CopilotKit wiring. Deliberately minimal and
-// separate from the legacy profiles/[id] page (which is built on the removed old
-// backend). Seeds job_title/job_summary into the agent state (pick_profile reads
-// those, not chat messages) and triggers the graph; the select_profile interrupt
-// is rendered by <InterruptHandlers/>. Later slices add the remaining interrupts,
-// useCoAgent-driven editable panels, and retire useInterview.
-import { use, useState } from "react";
+// Slice 1 smoke surface for the v3 CopilotKit wiring. Separate from the legacy
+// profiles/[id] page (built on the removed old backend). The agent is driven via
+// <CopilotChat> (which manages the run session) rather than a headless run() call
+// (headless run() crashes — no chat session for its abortController). useCoAgent
+// seeds job_title/job_summary into the shared state, which pick_profile reads
+// (it does not read chat messages). Send any message (e.g. 「開始」) to kick off
+// the graph; the select_profile interrupt is rendered by <InterruptHandlers/>.
+// Later slices add the remaining interrupts, editable panels, and retire useInterview.
+import "@copilotkit/react-ui/styles.css";
+import { use } from "react";
 import { useCoAgent } from "@copilotkit/react-core";
+import { CopilotChat } from "@copilotkit/react-ui";
 import { InterruptHandlers } from "@/components/interview/v3/InterruptHandlers";
-import { Button } from "@/components/ui/button";
 
 const AGENT_NAME = "jd_authoring";
 
@@ -26,15 +29,13 @@ type AgentState = {
 
 export default function V3Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const [jobTitle, setJobTitle] = useState("設備維護工程師");
-  const [jobSummary, setJobSummary] = useState("");
 
-  const { state, setState, run, running } = useCoAgent<AgentState>({
+  const { state, setState } = useCoAgent<AgentState>({
     name: AGENT_NAME,
     initialState: {
       job_profile_id: id,
-      job_title: jobTitle,
-      job_summary: jobSummary,
+      job_title: "設備維護工程師",
+      job_summary: "",
       current_step: "pick_profile",
       profile: { candidates: [], selected_ocs_code: null },
       tasks: [],
@@ -44,46 +45,37 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
   });
 
   return (
-    <div className="mx-auto max-w-2xl space-y-4 p-6">
-      <h1 className="text-lg font-semibold">v3 訪談（Slice 1 smoke）</h1>
-      <p className="text-xs text-muted-foreground">profile {id}</p>
+    <div className="mx-auto flex h-screen max-w-3xl flex-col gap-3 p-4">
+      <div>
+        <h1 className="text-lg font-semibold">v3 訪談（Slice 1 smoke）</h1>
+        <p className="text-xs text-muted-foreground">profile {id}</p>
+      </div>
 
-      <div className="space-y-2">
+      <label className="text-sm">
+        職稱（pick_profile 會用它搜尋 OCS）：
         <input
-          className="w-full rounded-lg border px-3 py-2 text-sm"
-          placeholder="職稱"
-          value={jobTitle}
-          onChange={(e) => setJobTitle(e.target.value)}
+          className="ml-2 rounded-lg border px-2 py-1 text-sm"
+          value={state?.job_title ?? ""}
+          onChange={(e) => setState({ ...state!, job_title: e.target.value })}
         />
-        <textarea
-          className="w-full rounded-lg border px-3 py-2 text-sm"
-          placeholder="職務簡述（可空）"
-          value={jobSummary}
-          onChange={(e) => setJobSummary(e.target.value)}
-        />
-        <Button
-          disabled={running}
-          onClick={() => {
-            setState({
-              ...state,
-              job_profile_id: id,
-              job_title: jobTitle,
-              job_summary: jobSummary,
-              current_step: "pick_profile",
-            });
-            run();
-          }}
-        >
-          {running ? "執行中…" : "開始（搜尋 OCS）"}
-        </Button>
-      </div>
-
-      <div className="text-sm text-muted-foreground">
+      </label>
+      <p className="text-sm text-muted-foreground">
         current_step：<span className="font-mono">{state?.current_step ?? "—"}</span>
-      </div>
+      </p>
 
-      {/* select_profile（與其他）interrupt 在此渲染 */}
+      {/* select_profile（與後續）interrupt 在此渲染 */}
       <InterruptHandlers />
+
+      {/* 在聊天框輸入任意訊息（例如「開始」）即觸發 agent 跑 pick_profile */}
+      <div className="min-h-0 flex-1 rounded-xl border">
+        <CopilotChat
+          className="h-full"
+          labels={{
+            title: "JD 訪談",
+            initial: "輸入任意訊息（例如「開始」）即用上方職稱搜尋 OCS 候選。",
+          }}
+        />
+      </div>
     </div>
   );
 }

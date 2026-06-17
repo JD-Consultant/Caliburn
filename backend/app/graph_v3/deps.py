@@ -6,13 +6,15 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import JobProfile
 from app.services.knowledge.base import KnowledgeClient
-from app.services.persistence import TaskRepo
+from app.services.persistence import TaskRepo, KsaRepo, DocRepo
 
 
 @runtime_checkable
 class PersistPort(Protocol):
     async def set_selected_ocs(self, job_profile_id: UUID, ocs_code: str) -> None: ...
     async def flush_tasks(self, job_profile_id: UUID, tasks: list[dict]) -> None: ...
+    async def flush_ksa(self, job_profile_id: UUID, ksa: dict) -> None: ...
+    async def save_document(self, job_profile_id: UUID, content: dict) -> dict: ...
 
 
 @runtime_checkable
@@ -35,6 +37,12 @@ class DbPersist:
 
     async def flush_tasks(self, job_profile_id: UUID, tasks: list[dict]) -> None:
         await TaskRepo(self.s).flush(job_profile_id, tasks)
+
+    async def flush_ksa(self, job_profile_id: UUID, ksa: dict) -> None:
+        await KsaRepo(self.s).flush(job_profile_id, ksa)
+
+    async def save_document(self, job_profile_id: UUID, content: dict) -> dict:
+        return await DocRepo(self.s).save(job_profile_id, content)
 
 
 @dataclass

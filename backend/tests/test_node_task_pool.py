@@ -42,3 +42,15 @@ async def test_task_pool_interrupt_then_flush_edited():
     assert [t["task_name"] for t in out2["tasks"]] == ["例行巡檢", "公司自訂任務"]
     assert out2["current_step"] == "deep"
     assert spy.flushed[0] == "p1" and len(spy.flushed[1]) == 2
+
+
+@pytest.mark.asyncio
+async def test_pool_tasks_carry_unit_info():
+    from app.services.knowledge.models import TaskPool, PoolGroup, PoolUnit, PoolTask
+    from app.graph_v3.nodes import _pool_to_tasks
+    pool = TaskPool(groups=[PoolGroup(ocs_code="OC1", units=[
+        PoolUnit(unit_id="U1", unit_title="預防保養", tasks=[
+            PoolTask(id="x", task_id="T1.1", task_title="巡檢")])])])
+    tasks = _pool_to_tasks(pool)
+    assert tasks[0]["unit_id"] == "U1"
+    assert tasks[0]["unit_title"] == "預防保養"

@@ -7,6 +7,7 @@ from langgraph.types import interrupt
 
 from app.graph_v3.state import InterviewState
 from app.graph_v3.constants import FIVE_W2H_REQUIRED, FIVE_W2H_LIST_FIELDS, INDICATOR_REQUIRED_FIELDS
+from app.graph_v3.tracing import traced_node
 import app.graph_v3.prompts.indicator as ind_prompts
 
 logger = logging.getLogger("jobintel")
@@ -44,6 +45,7 @@ def _current_task(state: InterviewState) -> tuple[int, dict, str]:
     return idx, task, task_id
 
 
+@traced_node("star")
 async def star_node(state: InterviewState, config) -> dict:
     deps = config["configurable"]["deps"]
     idx, task, task_id = _current_task(state)
@@ -117,6 +119,7 @@ def _store_answer(task: dict, field: str, answer: str) -> dict:
     return task
 
 
+@traced_node("five_w2h")
 async def five_w2h_node(state: InterviewState, config) -> dict:
     deps = config["configurable"]["deps"]
     idx, task, _ = _current_task(state)
@@ -198,6 +201,7 @@ def _build_indicator_prompt(task: dict) -> tuple[str, bool]:
     return ind_prompts.SINGLE.format(**common), False
 
 
+@traced_node("indicator")
 async def indicator_node(state: InterviewState, config) -> dict:
     deps = config["configurable"]["deps"]
     idx, task, task_id = _current_task(state)

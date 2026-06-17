@@ -5,6 +5,7 @@ import logging
 from langgraph.types import interrupt
 
 from app.graph_v3.state import InterviewState
+from app.graph_v3.tracing import traced_node
 
 logger = logging.getLogger("jobintel")
 
@@ -15,6 +16,7 @@ def _pairs_to_items(pairs_list) -> list[dict]:
             for p in pairs_list if p.name]
 
 
+@traced_node("assemble_ksa")
 async def assemble_ksa(state: InterviewState, config) -> dict:
     deps = config["configurable"]["deps"]
     ocs = state["profile"]["selected_ocs_code"]

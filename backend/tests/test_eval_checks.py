@@ -36,3 +36,6 @@ def test_deep_quality_ok():
     assert deep_quality_ok(good)
     bad = {"behavior_indicators": [{"quality_score": 0.3}]}
     assert not deep_quality_ok(bad)
+    # 好分數但缺 5W2H 欄 → 不過
+    missing_5w2h = {"behavior_indicators": [{"quality_score": 0.9}]}
+    assert not deep_quality_ok(missing_5w2h)

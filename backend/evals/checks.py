@@ -51,8 +51,13 @@ def doc_structure_ok(doc: dict) -> tuple[bool, list[str]]:
     return (not reasons, reasons)
 
 
+_REQUIRED_5W2H = ("situation", "purpose", "workflow_steps", "outputs")
+
+
 def deep_quality_ok(task: dict, threshold: float = 0.60) -> bool:
     inds = task.get("behavior_indicators") or []
     if not inds:
+        return False
+    if not all(task.get(f) for f in _REQUIRED_5W2H):  # 必填 5W2H 欄非空
         return False
     return all((i.get("quality_score") or 0) >= threshold for i in inds)

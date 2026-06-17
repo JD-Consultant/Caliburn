@@ -5,7 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.graph.constants import TASK_COMPLETENESS_FIELDS
+from app.graph_v3.constants import TASK_COMPLETENESS_FIELDS
 from app.models import CompanyTask
 from app.schemas import CompanyTaskCreate, CompanyTaskOut, CompanyTaskUpdate
 

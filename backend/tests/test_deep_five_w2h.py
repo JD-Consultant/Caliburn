@@ -8,7 +8,7 @@ from app.graph_v3.deep_nodes import five_w2h_node
 from app.graph_v3.deps import Deps
 from app.services.knowledge.models import TasksByIdResult, TaskDetail, Pair
 from tests.conftest_graph import FakeKnowledge, SpyPersist, FakeLlm
-from app.graph.constants import FIVE_W2H_REQUIRED
+from app.graph_v3.constants import FIVE_W2H_REQUIRED
 
 
 def _graph():

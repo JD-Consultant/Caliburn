@@ -5,6 +5,7 @@ import logging
 from langgraph.types import interrupt
 
 from app.graph_v3.state import InterviewState
+from app.graph_v3.tracing import traced_node
 
 logger = logging.getLogger("jobintel")
 
@@ -69,6 +70,7 @@ def _assemble(state: InterviewState) -> dict:
     }
 
 
+@traced_node("build_doc")
 async def build_doc(state: InterviewState, config) -> dict:
     deps = config["configurable"]["deps"]
     doc = _assemble(state)

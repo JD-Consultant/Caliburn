@@ -1,8 +1,10 @@
 from langgraph.types import interrupt
 
 from app.graph_v3.state import InterviewState
+from app.graph_v3.tracing import traced_node
 
 
+@traced_node("pick_profile")
 async def pick_profile(state: InterviewState, config) -> dict:
     deps = config["configurable"]["deps"]
     query = state.get("job_summary") or state["job_title"]
@@ -35,6 +37,7 @@ def _pool_to_tasks(pool) -> list[dict]:
     return out
 
 
+@traced_node("build_task_pool")
 async def build_task_pool(state: InterviewState, config) -> dict:
     deps = config["configurable"]["deps"]
     ocs = state["profile"]["selected_ocs_code"]

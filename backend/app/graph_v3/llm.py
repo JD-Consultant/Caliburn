@@ -8,6 +8,7 @@ from langchain_core.messages import HumanMessage
 from langchain_openai import ChatOpenAI
 
 from app.config import settings
+from app.graph_v3.tracing import get_tracer
 from app.utils import safe_parse_json
 
 logger = logging.getLogger("jobintel")
@@ -48,9 +49,19 @@ class OpenRouterLlm:
 
     async def complete_text(self, prompt: str, *, role: str = "cheap") -> str:
         llm = get_chat_llm(role)
+        model = model_for_role(role)
         for attempt in range(self._retries):
             try:
-                resp = await llm.ainvoke([HumanMessage(content=prompt)])
+                with get_tracer().start_as_current_span("gen_ai.chat") as span:
+                    span.set_attribute("gen_ai.system", "openrouter")
+                    span.set_attribute("gen_ai.operation.name", "chat")
+                    span.set_attribute("gen_ai.request.model", model)
+                    resp = await llm.ainvoke([HumanMessage(content=prompt)])
+                    um = getattr(resp, "usage_metadata", None) or {}
+                    if um.get("input_tokens") is not None:
+                        span.set_attribute("gen_ai.usage.input_tokens", um["input_tokens"])
+                    if um.get("output_tokens") is not None:
+                        span.set_attribute("gen_ai.usage.output_tokens", um["output_tokens"])
                 content = resp.content
                 return content if isinstance(content, str) else str(content)
             except Exception as exc:  # noqa: BLE001

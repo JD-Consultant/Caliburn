@@ -1,41 +1,26 @@
 "use client";
 
-// Slice 1 smoke surface for the v3 CopilotKit wiring (button-driven, no visible chat).
+// Slice 1 smoke surface for the v3 CopilotKit wiring (button-driven, no chat) — v2 API (D22).
 // Separate from the legacy profiles/[id] page (built on the removed old backend).
-//
-// useCoAgent().run() is broken headlessly in CopilotKit 1.60 (sets abortController on
-// an undefined run object). The working v1 trigger is useCopilotChat().appendMessage()
-// — the same session path CopilotChat uses internally — driven from a button, so no
-// chat UI is shown. useCoAgent seeds the shared state (pick_profile reads
-// state.job_title, not the message). The select_profile interrupt is rendered by
-// <InterruptHandlers/>. Later slices add the remaining interrupts + editable panels.
+// useAgent() returns the AG-UI agent; the button seeds shared state (pick_profile reads
+// state.job_title, not chat messages) via agent.setState, adds a trigger turn, then
+// agent.runAgent(). The select_profile interrupt is rendered by <InterruptHandlers/>
+// (v2 useInterrupt, renderInChat:false). Later slices add the remaining interrupts.
 import { use, useState } from "react";
-import { useCoAgent, useCopilotChat } from "@copilotkit/react-core";
-import { TextMessage, MessageRole } from "@copilotkit/runtime-client-gql";
+import { useAgent } from "@copilotkit/react-core/v2";
 import { InterruptHandlers } from "@/components/interview/v3/InterruptHandlers";
 import { Button } from "@/components/ui/button";
 
 const AGENT_NAME = "jd_authoring";
 
-type AgentState = {
-  job_profile_id: string;
-  job_title: string;
-  job_summary: string;
-  current_step: string;
-  profile: { candidates: unknown[]; selected_ocs_code: string | null };
-  tasks: unknown[];
-  ksa: { knowledge: unknown[]; skills: unknown[]; attitudes: unknown[] };
-  document: unknown | null;
-};
-
 export default function V3Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const [jobTitle, setJobTitle] = useState("設備維護工程師");
   const [jobSummary, setJobSummary] = useState("");
+  const { agent } = useAgent({ agentId: AGENT_NAME });
 
-  const { state, setState } = useCoAgent<AgentState>({
-    name: AGENT_NAME,
-    initialState: {
+  const start = () => {
+    agent.setState({
       job_profile_id: id,
       job_title: jobTitle,
       job_summary: jobSummary,
@@ -44,21 +29,12 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
       tasks: [],
       ksa: { knowledge: [], skills: [], attitudes: [] },
       document: null,
-    },
-  });
-  const { appendMessage, isLoading } = useCopilotChat();
-
-  const start = () => {
-    setState({
-      ...state!,
-      job_profile_id: id,
-      job_title: jobTitle,
-      job_summary: jobSummary,
-      current_step: "pick_profile",
     });
-    // 觸發 agent 跑一個 turn（pick_profile 讀的是上面 state 的 job_title，不是這則訊息）
-    void appendMessage(new TextMessage({ content: "開始", role: MessageRole.User }));
+    agent.addMessage({ id: crypto.randomUUID(), role: "user", content: "開始" });
+    void agent.runAgent().catch((e: unknown) => console.error("runAgent failed", e));
   };
+
+  const state = agent.state as { current_step?: string } | undefined;
 
   return (
     <div className="mx-auto max-w-2xl space-y-4 p-6">
@@ -80,9 +56,7 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
           value={jobSummary}
           onChange={(e) => setJobSummary(e.target.value)}
         />
-        <Button disabled={isLoading} onClick={start}>
-          {isLoading ? "執行中…" : "開始（搜尋 OCS）"}
-        </Button>
+        <Button onClick={start}>開始（搜尋 OCS）</Button>
       </div>
 
       <p className="text-sm text-muted-foreground">

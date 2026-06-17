@@ -1,10 +1,13 @@
 "use client";
 
-// v3 HITL: render graph_v3 interrupts via CopilotKit's useLangGraphInterrupt.
-// Slice 1 wires only `select_profile`; the other kinds (edit_tasks / ask_human /
-// edit_ksa / preview) are added in later slices.
-import { useLangGraphInterrupt } from "@copilotkit/react-core";
+// v3 HITL via CopilotKit v2 useInterrupt (D22). renderInChat:false → the hook
+// returns a ReactElement we place in our own (no-chat) UI. Listens to the agent's
+// on_interrupt custom events. Slice 1 wires only `select_profile`; later slices add
+// edit_tasks / ask_human / edit_ksa / preview.
+import { useInterrupt } from "@copilotkit/react-core/v2";
 import { useState } from "react";
+
+const AGENT_NAME = "jd_authoring";
 
 type ProfileCandidate = {
   id?: string;
@@ -12,11 +15,7 @@ type ProfileCandidate = {
   job_title?: string | null;
   task_title?: string | null;
 };
-
-type InterruptValue = {
-  kind?: string;
-  candidates?: ProfileCandidate[];
-};
+type InterruptValue = { kind?: string; candidates?: ProfileCandidate[] };
 
 function ProfilePicker({
   candidates,
@@ -54,10 +53,21 @@ function ProfilePicker({
 }
 
 export function InterruptHandlers() {
-  useLangGraphInterrupt<InterruptValue>({
+  return useInterrupt({
+    agentId: AGENT_NAME,
+    renderInChat: false,
     render: ({ event, resolve }) => {
-      const value = event.value;
-      if (value?.kind === "select_profile") {
+      // event.value is normally the parsed payload; tolerate a JSON string too.
+      let raw: unknown = event.value;
+      if (typeof raw === "string") {
+        try {
+          raw = JSON.parse(raw);
+        } catch {
+          /* leave as-is */
+        }
+      }
+      const value = (raw ?? {}) as InterruptValue;
+      if (value.kind === "select_profile") {
         return (
           <ProfilePicker
             candidates={value.candidates ?? []}
@@ -69,5 +79,4 @@ export function InterruptHandlers() {
       return <></>;
     },
   });
-  return null;
 }

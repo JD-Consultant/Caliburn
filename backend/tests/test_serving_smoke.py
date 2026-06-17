@@ -1,7 +1,6 @@
-from app.graph_v3.serving import AGENT_NAME, build_demo_sdk
+from app.graph_v3.serving import AGENT_NAME, build_demo_agent
 
 
-def test_demo_sdk_builds_and_registers_agent():
-    sdk = build_demo_sdk()
-    names = [a.name for a in sdk.agents]
-    assert AGENT_NAME in names
+def test_demo_agent_builds_with_name():
+    agent = build_demo_agent()
+    assert agent.name == AGENT_NAME

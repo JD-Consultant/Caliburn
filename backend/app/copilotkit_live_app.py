@@ -5,11 +5,11 @@ from contextlib import AsyncExitStack, asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from copilotkit.integrations.fastapi import add_fastapi_endpoint
+from ag_ui_langgraph import add_langgraph_fastapi_endpoint
 
 from app.config import settings
 from app.graph_v3.checkpointer import open_pg_checkpointer
-from app.graph_v3.serving import build_live_deps, build_live_sdk
+from app.graph_v3.serving import build_live_agent, build_live_deps
 from app.graph_v3.tracing import setup_tracing
 
 
@@ -19,7 +19,7 @@ async def lifespan(app: FastAPI):
     async with AsyncExitStack() as stack:
         saver = await stack.enter_async_context(open_pg_checkpointer(settings.database_url))
         deps = build_live_deps()
-        add_fastapi_endpoint(app, build_live_sdk(saver, deps), "/copilotkit")
+        add_langgraph_fastapi_endpoint(app, build_live_agent(saver, deps), "/copilotkit")
         try:
             yield
         finally:

@@ -1,20 +1,25 @@
-// CopilotKit runtime endpoint (App Router). Proxies to the Python backend's
-// /copilotkit (CopilotKitRemoteEndpoint, served by app.copilotkit_live_app).
-// No LLM in the Next runtime — the agent is remote — so EmptyAdapter is used.
+// CopilotKit runtime endpoint (App Router). Connects to the Python backend's
+// AG-UI endpoint (served by ag-ui-langgraph add_langgraph_fastapi_endpoint at
+// /copilotkit on app.copilotkit_live_app) via an AG-UI HttpAgent registered on
+// the runtime. This replaces the legacy copilotKitEndpoint/remoteEndpoints path,
+// which is incompatible with new CopilotKit JS useAgent (decision-log D22).
 import {
   CopilotRuntime,
   EmptyAdapter,
-  copilotKitEndpoint,
   copilotRuntimeNextJSAppRouterEndpoint,
 } from "@copilotkit/runtime";
+import { HttpAgent } from "@ag-ui/client";
 import { NextRequest } from "next/server";
 
-// Backend CopilotKit endpoint. Live app default :8001 (uvicorn app.copilotkit_live_app:app --port 8001).
+// Backend AG-UI run endpoint. Live app default :8001
+// (.venv\Scripts\python run_live.py). Override via COPILOTKIT_REMOTE_URL.
 const REMOTE_URL =
   process.env.COPILOTKIT_REMOTE_URL ?? "http://localhost:8001/copilotkit";
 
 const runtime = new CopilotRuntime({
-  remoteEndpoints: [copilotKitEndpoint({ url: REMOTE_URL })],
+  agents: {
+    jd_authoring: new HttpAgent({ url: REMOTE_URL }),
+  },
 });
 
 export const POST = async (req: NextRequest): Promise<Response> => {

@@ -45,6 +45,35 @@ class DbPersist:
         return await DocRepo(self.s).save(job_profile_id, content)
 
 
+class LiveDbPersist:
+    """Live serving 的 PersistPort：每操作開一短命 session、委派 DbPersist、各自 commit
+    （write-through，D16）。deps 在 app 啟動一次性注入、無 per-request scope，故用 factory。"""
+
+    def __init__(self, session_factory):
+        self._sf = session_factory
+
+    async def set_selected_ocs(self, job_profile_id: UUID, ocs_code: str) -> None:
+        async with self._sf() as s:
+            await DbPersist(s).set_selected_ocs(job_profile_id, ocs_code)
+            await s.commit()
+
+    async def flush_tasks(self, job_profile_id: UUID, tasks: list[dict]) -> None:
+        async with self._sf() as s:
+            await DbPersist(s).flush_tasks(job_profile_id, tasks)
+            await s.commit()
+
+    async def flush_ksa(self, job_profile_id: UUID, ksa: dict) -> None:
+        async with self._sf() as s:
+            await DbPersist(s).flush_ksa(job_profile_id, ksa)
+            await s.commit()
+
+    async def save_document(self, job_profile_id: UUID, content: dict) -> dict:
+        async with self._sf() as s:
+            doc = await DbPersist(s).save_document(job_profile_id, content)
+            await s.commit()
+            return doc
+
+
 @dataclass
 class Deps:
     knowledge: KnowledgeClient

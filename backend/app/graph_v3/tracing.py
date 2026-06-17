@@ -23,16 +23,15 @@ def setup_tracing(exporter=None, *, force: bool = False) -> TracerProvider:
     elif os.getenv("OTEL_EXPORTER_OTLP_ENDPOINT"):
         from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
         provider.add_span_processor(BatchSpanProcessor(OTLPSpanExporter()))
-    if force:
-        # Reset the global flag to allow re-setting the provider (for testing)
-        from opentelemetry.util._once import Once
-        trace._TRACER_PROVIDER_SET_ONCE = Once()
     trace.set_tracer_provider(provider)
     _PROVIDER = provider
     return provider
 
 
 def get_tracer():
+    if _PROVIDER is not None:
+        return _PROVIDER.get_tracer("jobintel.graph_v3")
+    from opentelemetry import trace
     return trace.get_tracer("jobintel.graph_v3")
 
 

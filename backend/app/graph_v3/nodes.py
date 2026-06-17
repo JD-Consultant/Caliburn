@@ -28,6 +28,8 @@ def _pool_to_tasks(pool) -> list[dict]:
                     "task_name": t.task_title,
                     "source": "catalog",
                     "indexer_ref": {"ocs_code": g.ocs_code, "task_id": t.task_id},
+                    "unit_id": u.unit_id,
+                    "unit_title": u.unit_title,
                     "activity_examples": t.activity_examples,
                 })
     return out

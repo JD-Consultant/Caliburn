@@ -31,7 +31,8 @@ async def test_dbpersist_flush_ksa_and_save_document(db_session):
     await db_session.flush()
 
     p = DbPersist(db_session)
-    await p.flush_ksa(prof.id, {"knowledge": [{"content": "A", "source": "catalog", "icap_ref": "K01"}],
-                                "skills": [], "attitudes": []})
+    await p.flush_ksa(prof.id,
+                      by_task={},
+                      attitudes=[{"content": "細心", "source": "catalog", "icap_ref": "A01"}])
     doc = await p.save_document(prof.id, {"ocs_profile": {"ocs_code": "ENT-001"}})
     assert doc["version"] == 1

@@ -22,8 +22,9 @@ async def test_live_persist_commits_each_op_visible_in_new_session():
     try:
         live = LiveDbPersist(AsyncSessionLocal)
         await live.set_selected_ocs(pid, "OC1")
-        await live.flush_ksa(pid, {"knowledge": [{"content": "設備原理", "source": "catalog", "icap_ref": "K01"}],
-                                   "skills": [], "attitudes": []})
+        await live.flush_ksa(pid,
+                             by_task={},
+                             attitudes=[{"content": "設備原理", "source": "catalog", "icap_ref": "A01"}])
         doc = await live.save_document(pid, {"ocs_profile": {"ocs_code": "ENT-001"}})
         assert doc["version"] == 1
 
@@ -32,7 +33,7 @@ async def test_live_persist_commits_each_op_visible_in_new_session():
             prof = await s.get(JobProfile, pid)
             assert prof.selected_ocs_code == "OC1"
             ksa = await KsaRepo(s).hydrate(pid)
-            assert ksa["knowledge"][0]["content"] == "設備原理"
+            assert ksa["attitudes"][0]["content"] == "設備原理"
             latest = await DocRepo(s).latest(pid)
             assert latest["content"]["ocs_profile"]["ocs_code"] == "ENT-001"
     finally:

@@ -39,17 +39,6 @@ def _assemble(state: InterviewState) -> dict:
                         "source": it.get("source", "company"), "icap_ref": it.get("icap_ref")})
         return out
 
-    def _coded_ks(items, prefix):
-        out, i = [], 0
-        for it in items:
-            content = (it.get("content") or "").strip()
-            if not content:
-                continue
-            i += 1
-            out.append({"code": it.get("icap_ref") or f"{prefix}{i:02d}", "name": content,
-                        "source": it.get("source", "company"), "icap_ref": it.get("icap_ref")})
-        return out
-
     ocu_units = []
     for u_idx, unit in enumerate(units_grouped, 1):
         tasks_out = []
@@ -66,8 +55,8 @@ def _assemble(state: InterviewState) -> dict:
             tasks_out.append({"task_code": f"T{u_idx}.{t_idx}",
                               "task_name": task.get("task_name", ""),
                               "indicators": indicators, "outputs": outputs,
-                              "knowledge": _coded_ks(ks.get("knowledge", []), f"K{u_idx}.{t_idx}"),
-                              "skills": _coded_ks(ks.get("skills", []), f"S{u_idx}.{t_idx}")})
+                              "knowledge": _coded(ks.get("knowledge", []), f"K{u_idx}.{t_idx}"),
+                              "skills": _coded(ks.get("skills", []), f"S{u_idx}.{t_idx}")})
         ocu_units.append({"ocu_code": f"T{u_idx}", "ocu_name": unit["unit_title"], "tasks": tasks_out})
 
     attitudes = (state.get("ksa") or {}).get("attitudes", [])

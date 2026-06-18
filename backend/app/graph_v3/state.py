@@ -32,7 +32,7 @@ class InterviewState(TypedDict):
     job_profile_id: str
     job_title: str
     job_summary: str
-    current_step: str            # pick_profile|task_pool|deep|assemble_ksa|build_doc|done
+    current_step: str            # pick_profile|task_pool|deep|fetch_ksa_pool|curate_ks|curate_attitudes|build_doc|done
     profile: ProfilePick
     tasks: list[dict]            # editable; each item carries provenance
     deep: DeepState

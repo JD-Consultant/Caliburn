@@ -22,7 +22,7 @@ def test_doc_structure_ok():
             {"task_code": "T1.1", "task_name": "巡檢",
              "indicators": [{"code": "P1.1.1", "text": "x"}],
              "outputs": [{"code": "O1.1.1", "name": "點檢表"}]}]}]},
-        "ocs_ksa": {"knowledge": [], "skills": [], "attitudes": []}}
+        "ocs_ksa": {"attitudes": []}}
     ok, reasons = doc_structure_ok(good)
     assert ok, reasons
     bad = {"ocs_content": {"ocu_units": []}, "ocs_ksa": {}}

@@ -59,7 +59,6 @@ class TaskRepo:
                 "indexer_ref": r.indexer_ref, "sort_order": r.sort_order}
 
 
-_KSA_TYPES = (("knowledge", "K"), ("skills", "S"), ("attitudes", "A"))
 _SRC_TO_DB = {"catalog": "icap_official", "company": "company_defined"}
 _DB_TO_SRC = {v: k for k, v in _SRC_TO_DB.items()}
 

@@ -1,9 +1,10 @@
 """jd-ocs-indexer query API 的回應模型（typed，extra 欄位忽略以容忍 API 演進）。"""
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class _Base(BaseModel):
-    model_config = ConfigDict(extra="ignore")
+    # populate_by_name：別名欄位仍可用欄位名建構（stub/測試用 Pairs(knowledge=...)）。
+    model_config = ConfigDict(extra="ignore", populate_by_name=True)
 
 
 class Pair(_Base):
@@ -52,13 +53,15 @@ class TaskPool(_Base):
 
 
 class Pairs(_Base):
+    # indexer 的 PairsResponse 用 all_*_pairs 為 key（任務 K/S 的 union + profile A）；
+    # alias 對應到我們消費端的名稱。沒對到時就是這個 bug（K/S/A 全空）。
     ocs_code: str = ""
-    knowledge: list[Pair] = []
-    skills: list[Pair] = []
-    attitudes: list[Pair] = []
-    outputs: list[Pair] = []
-    prerequisites: list[str] = []
-    supplements: list[str] = []
+    knowledge: list[Pair] = Field(default_factory=list, alias="all_k_pairs")
+    skills: list[Pair] = Field(default_factory=list, alias="all_s_pairs")
+    attitudes: list[Pair] = Field(default_factory=list, alias="all_a_pairs")
+    outputs: list[Pair] = Field(default_factory=list, alias="all_output_pairs")
+    prerequisites: list[str] = Field(default_factory=list)
+    supplements: list[str] = Field(default_factory=list)
 
 
 class TaskDetail(_Base):

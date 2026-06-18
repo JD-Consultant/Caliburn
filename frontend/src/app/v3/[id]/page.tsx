@@ -29,6 +29,14 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
       current_step: "pick_profile",
       profile: { candidates: [], selected_ocs_codes: [], selected_ocs_code: null },
       tasks: [],
+      // 完整 InterviewState：deep 不能漏，否則 route_deep 讀 state["deep"] → KeyError
+      deep: {
+        current_task_index: 0,
+        slots_by_task: {},
+        missing_fields: [],
+        completed_task_ids: [],
+        retry: {},
+      },
       ksa: { knowledge: [], skills: [], attitudes: [] },
       document: null,
     });

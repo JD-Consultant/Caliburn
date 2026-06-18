@@ -137,6 +137,13 @@ function ProfilePicker({
   );
 }
 
+// Single editable review surface for the task pool (D24-b: 勾/改/增/刪 + provenance).
+// Each row carries a stable client _id so inline inputs keep focus across edits,
+// plus an `included` flag (keep/drop). Confirm resolves the full task objects
+// (provenance preserved: catalog rows keep indexer_ref/unit/activity_examples;
+// custom rows are source="company").
+type TaskRow = PoolTask & { _id: number; included: boolean };
+
 function TaskCurator({
   tasks,
   onConfirm,
@@ -144,79 +151,122 @@ function TaskCurator({
   tasks: PoolTask[];
   onConfirm: (tasks: PoolTask[]) => void;
 }) {
-  // Default: keep all proposed tasks; user un-checks the ones to drop.
-  const [kept, setKept] = useState<Set<number>>(
-    () => new Set(tasks.map((_, i) => i)),
+  const [rows, setRows] = useState<TaskRow[]>(
+    () => tasks.map((t, i) => ({ ...t, _id: i, included: true })),
   );
+  const [nextId, setNextId] = useState(tasks.length);
   const [done, setDone] = useState(false);
 
-  if (!tasks.length) {
-    return <div className="text-sm text-muted-foreground">indexer 沒有回傳任務。</div>;
-  }
+  const patch = (id: number, p: Partial<TaskRow>) =>
+    setRows((rs) => rs.map((r) => (r._id === id ? { ...r, ...p } : r)));
+  const removeRow = (id: number) => setRows((rs) => rs.filter((r) => r._id !== id));
+  const addCustom = () => {
+    setRows((rs) => [...rs, { _id: nextId, included: true, task_name: "", source: "company" }]);
+    setNextId((n) => n + 1);
+  };
 
-  // Preserve catalog order while grouping by unit for readability.
-  const units: { unit_title: string; items: { task: PoolTask; idx: number }[] }[] = [];
-  tasks.forEach((task, idx) => {
-    const title = task.unit_title ?? "（未分類）";
-    let group = units.find((u) => u.unit_title === title);
-    if (!group) {
-      group = { unit_title: title, items: [] };
-      units.push(group);
+  // Group by unit for readability; custom rows (no unit) fall under 公司自訂任務.
+  const groups: { title: string; rows: TaskRow[] }[] = [];
+  rows.forEach((r) => {
+    const title = r.unit_title ?? "公司自訂任務";
+    let g = groups.find((x) => x.title === title);
+    if (!g) {
+      g = { title, rows: [] };
+      groups.push(g);
     }
-    group.items.push({ task, idx });
+    g.rows.push(r);
   });
 
-  const toggle = (idx: number) =>
-    setKept((prev) => {
-      const next = new Set(prev);
-      if (next.has(idx)) next.delete(idx);
-      else next.add(idx);
-      return next;
-    });
+  const keptCount = rows.filter((r) => r.included && r.task_name.trim()).length;
 
   return (
     <div className="space-y-3 rounded-xl border p-3">
-      <p className="text-sm font-medium">
-        確認任務清單（保留 {kept.size} / {tasks.length}）
-      </p>
+      <p className="text-sm font-medium">確認任務清單（可勾選/改名/刪除/新增）— 保留 {keptCount}</p>
       <div className="space-y-3">
-        {units.map((u) => (
-          <div key={u.unit_title} className="space-y-1">
-            <p className="text-xs font-medium text-muted-foreground">{u.unit_title}</p>
-            {u.items.map(({ task, idx }) => (
-              <label
-                key={idx}
-                className="flex cursor-pointer items-start gap-2 rounded-lg border px-3 py-2 text-sm hover:bg-muted"
+        {groups.map((g) => (
+          <div key={g.title} className="space-y-1">
+            <p className="text-xs font-medium text-muted-foreground">{g.title}</p>
+            {g.rows.map((r) => (
+              <div
+                key={r._id}
+                className="flex items-start gap-2 rounded-lg border px-3 py-2 text-sm"
               >
                 <input
                   type="checkbox"
-                  className="mt-0.5"
-                  checked={kept.has(idx)}
+                  className="mt-1.5"
+                  checked={r.included}
                   disabled={done}
-                  onChange={() => toggle(idx)}
+                  onChange={() => patch(r._id, { included: !r.included })}
                 />
                 <span className="flex-1">
-                  <span className={kept.has(idx) ? "" : "text-muted-foreground line-through"}>
-                    {task.task_name}
+                  <span className="flex items-center gap-1.5">
+                    <input
+                      className={`flex-1 rounded border px-2 py-1 text-sm ${
+                        r.included ? "" : "text-muted-foreground line-through"
+                      }`}
+                      value={r.task_name}
+                      disabled={done}
+                      placeholder={r.source === "company" ? "輸入自訂任務名稱…" : ""}
+                      onChange={(e) => patch(r._id, { task_name: e.target.value })}
+                    />
+                    <span
+                      className={`shrink-0 rounded px-1.5 py-0.5 text-[10px] ${
+                        r.source === "company"
+                          ? "bg-amber-100 text-amber-700"
+                          : "bg-blue-50 text-blue-600"
+                      }`}
+                    >
+                      {r.source === "company" ? "公司" : "catalog"}
+                    </span>
                   </span>
-                  {task.activity_examples?.length ? (
+                  {r.activity_examples?.length ? (
                     <span className="mt-0.5 block text-xs text-muted-foreground">
-                      {task.activity_examples.slice(0, 3).join("、")}
+                      {r.activity_examples.slice(0, 3).join("、")}
                     </span>
                   ) : null}
                 </span>
-              </label>
+                <button
+                  type="button"
+                  className="mt-0.5 rounded px-1 text-red-500 hover:bg-red-50 disabled:opacity-50"
+                  disabled={done}
+                  onClick={() => removeRow(r._id)}
+                  aria-label="刪除任務"
+                >
+                  ✕
+                </button>
+              </div>
             ))}
           </div>
         ))}
       </div>
       <button
         type="button"
+        className="text-xs text-blue-600 hover:underline disabled:opacity-50"
+        disabled={done}
+        onClick={addCustom}
+      >
+        ＋ 新增自訂任務
+      </button>
+      <button
+        type="button"
         className="w-full rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
-        disabled={done || kept.size === 0}
+        disabled={done || keptCount === 0}
         onClick={() => {
           setDone(true);
-          onConfirm(tasks.filter((_, i) => kept.has(i)));
+          // keep included rows with a non-blank name; emit clean PoolTask
+          // objects (drop client-only _id/included), provenance preserved.
+          onConfirm(
+            rows
+              .filter((r) => r.included && r.task_name.trim())
+              .map((r) => ({
+                task_name: r.task_name.trim(),
+                source: r.source,
+                indexer_ref: r.indexer_ref,
+                unit_id: r.unit_id,
+                unit_title: r.unit_title,
+                activity_examples: r.activity_examples,
+              })),
+          );
         }}
       >
         確認，開始深度訪談

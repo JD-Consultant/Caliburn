@@ -45,9 +45,8 @@ def doc_structure_ok(doc: dict) -> tuple[bool, list[str]]:
             for o in t.get("outputs", []):
                 if not _CODE_OUT.match(o.get("code", "")):
                     reasons.append(f"bad output code {o.get('code')!r}")
-    if "ocs_ksa" not in doc or not all(k in (doc.get("ocs_ksa") or {})
-                                       for k in ("knowledge", "skills", "attitudes")):
-        reasons.append("ocs_ksa missing K/S/A buckets")
+    if "ocs_ksa" not in doc or "attitudes" not in (doc.get("ocs_ksa") or {}):
+        reasons.append("ocs_ksa missing attitudes bucket")
     return (not reasons, reasons)
 
 

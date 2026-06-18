@@ -21,6 +21,13 @@ class KsaDraft(TypedDict):
     attitudes: list[dict]
 
 
+class KsaState(TypedDict):
+    pool: KsaDraft                 # fetch_ksa_pool 填的職類池候選
+    by_task: dict[str, dict]       # task_key -> {"knowledge": list[dict], "skills": list[dict]}
+    attitudes: list[dict]          # 全域 A（curate_attitudes 填）
+    ks_index: int                  # 觀測用進度
+
+
 class InterviewState(TypedDict):
     job_profile_id: str
     job_title: str
@@ -29,7 +36,7 @@ class InterviewState(TypedDict):
     profile: ProfilePick
     tasks: list[dict]            # editable; each item carries provenance
     deep: DeepState
-    ksa: KsaDraft
+    ksa: KsaState
     document: dict | None
 
 
@@ -43,6 +50,12 @@ def new_state(*, job_profile_id: str, job_title: str, job_summary: str = "") -> 
         "tasks": [],
         "deep": {"current_task_index": 0, "slots_by_task": {}, "missing_fields": [],
                  "completed_task_ids": [], "retry": {}},
-        "ksa": {"knowledge": [], "skills": [], "attitudes": []},
+        "ksa": {"pool": {"knowledge": [], "skills": [], "attitudes": []},
+                "by_task": {}, "attitudes": [], "ks_index": 0},
         "document": None,
     }
+
+
+def task_key(task: dict) -> str:
+    """逐任務穩定鍵：優先 indexer task_id，否則 task_name。"""
+    return (task.get("indexer_ref") or {}).get("task_id") or task["task_name"]

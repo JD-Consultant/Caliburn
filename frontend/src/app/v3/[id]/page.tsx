@@ -3,8 +3,8 @@
 // v3 interview surface (button-driven, no chat — D11/D22). Loads the JobProfile
 // from the DB and seeds the AG-UI agent state from it; pick_profile reads
 // state.job_title (not chat messages) to search OCS. The interrupts (select_profile,
-// edit_tasks, ask_human, edit_ksa, preview) are rendered by <InterruptHandlers/>
-// via v2 useInterrupt (renderInChat:false) into our own UI.
+// edit_tasks, ask_human, curate_ks, curate_attitudes, preview) are rendered by
+// <InterruptHandlers/> via v2 useInterrupt (renderInChat:false) into our own UI.
 import { use } from "react";
 import Link from "next/link";
 import { useAgent } from "@copilotkit/react-core/v2";
@@ -37,7 +37,7 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
         completed_task_ids: [],
         retry: {},
       },
-      ksa: { knowledge: [], skills: [], attitudes: [] },
+      ksa: { pool: { knowledge: [], skills: [], attitudes: [] }, by_task: {}, attitudes: [], ks_index: 0 },
       document: null,
     });
     agent.addMessage({ id: crypto.randomUUID(), role: "user", content: "開始" });
@@ -71,7 +71,7 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
         current_step：<span className="font-mono">{state?.current_step ?? "—"}</span>
       </p>
 
-      {/* select_profile / edit_tasks / ask_human / edit_ksa / preview interrupts */}
+      {/* select_profile / edit_tasks / ask_human / curate_ks / curate_attitudes / preview interrupts */}
       <InterruptHandlers />
     </div>
   );

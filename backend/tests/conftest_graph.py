@@ -6,6 +6,7 @@ class FakeKnowledge:
         self._search = search or SearchResult(mode="dense", hits=[])
         self._pool = pool or TaskPool(groups=[])
         self._tasks = tasks  # TasksByIdResult | None
+        self._pairs = None
         self.calls = []
 
     async def search(self, query, **kw):
@@ -15,7 +16,7 @@ class FakeKnowledge:
         self.calls.append(("task_pool", ocs_codes)); return self._pool
 
     async def pairs(self, ocs_code):
-        self.calls.append(("pairs", ocs_code)); return Pairs(ocs_code=ocs_code)
+        self.calls.append(("pairs", ocs_code)); return self._pairs or Pairs(ocs_code=ocs_code)
 
     async def tasks_by_id(self, ids):
         from app.services.knowledge.models import TasksByIdResult

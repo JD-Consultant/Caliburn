@@ -31,8 +31,7 @@ def _state():
          "behavior_indicators": [{"output_name": "", "indicator_5w2h": "異常即時通報"}]},
     ]
     s["ksa"] = {
-        "knowledge": [{"content": "設備原理", "source": "catalog", "icap_ref": "K01"}],
-        "skills": [{"content": "點檢操作", "source": "company", "icap_ref": None}],
+        "by_task": {},
         "attitudes": [{"content": "細心", "source": "company", "icap_ref": None}],
     }
     return s
@@ -57,12 +56,42 @@ async def test_build_doc_deterministic_assembly_then_preview():
     assert units[0]["tasks"][0]["indicators"][0]["text"] == "每日晨班完成點檢表"
     assert units[0]["tasks"][0]["outputs"][0]["code"] == "O1.1.1"
     assert units[1]["tasks"][0]["task_code"] == "T2.1"
-    # ksa 注入（doc-level）
-    assert doc["ocs_ksa"]["knowledge"][0]["code"] == "K01"
-    assert doc["ocs_ksa"]["skills"][0]["name"] == "點檢操作"
+    # ocs_ksa now only has attitudes (K/S are nested per task)
+    assert "attitudes" in doc["ocs_ksa"]
+    assert doc["ocs_ksa"]["attitudes"][0]["name"] == "細心"
 
-    # preview 確認 → 結束 + save_document
+    # preview 確認 → 結束 + save_document + flush_ksa
     out = await graph.ainvoke(Command(resume="confirm"), cfg)
     assert out["current_step"] == "done"
     assert out["document"]["ocs_profile"]["occupation_name"] == "設備維護工程師"
     assert spy.doc_saved[0] == "p1"
+    assert spy.ksa_flushed is not None
+
+
+def _one():
+    g = StateGraph(InterviewState); g.add_node("n", build_doc)
+    g.add_edge(START, "n"); g.add_edge("n", END)
+    return g.compile(checkpointer=MemorySaver())
+
+
+@pytest.mark.asyncio
+async def test_build_doc_nests_ks_per_task_and_flushes():
+    s = new_state(job_profile_id="p1", job_title="工程師")
+    s["tasks"] = [{"task_name": "巡檢", "indexer_ref": {"task_id": "T1"}, "unit_id": "U1", "unit_title": "保養"}]
+    s["ksa"]["by_task"] = {"T1": {"knowledge": [{"content": "PLC", "source": "catalog", "icap_ref": "K01"}],
+                                  "skills": [{"content": "排障", "source": "company", "icap_ref": None}]}}
+    s["ksa"]["attitudes"] = [{"content": "細心", "source": "catalog", "icap_ref": "A01"}]
+    spy = SpyPersist()
+    cfg = {"configurable": {"thread_id": "t", "deps": Deps(knowledge=FakeKnowledge(), persist=spy)}}
+    graph = _one()
+    out = await graph.ainvoke(s, cfg)
+    assert out["__interrupt__"][0].value["kind"] == "preview"
+    out = await graph.ainvoke(Command(resume=True), cfg)
+    task0 = out["document"]["ocs_content"]["ocu_units"][0]["tasks"][0]
+    assert task0["knowledge"][0]["name"] == "PLC"
+    assert task0["skills"][0]["name"] == "排障"
+    assert out["document"]["ocs_ksa"]["attitudes"][0]["name"] == "細心"
+    assert spy.ksa_flushed[1]["T1"]["knowledge"][0]["content"] == "PLC"   # by_task
+    assert spy.ksa_flushed[2][0]["content"] == "細心"                      # attitudes
+    assert spy.doc_saved is not None
+    assert out["current_step"] == "done"

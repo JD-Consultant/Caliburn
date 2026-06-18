@@ -4,7 +4,7 @@ import logging
 
 from langgraph.types import interrupt
 
-from app.graph_v3.state import InterviewState
+from app.graph_v3.state import InterviewState, task_key
 from app.graph_v3.tracing import traced_node
 
 logger = logging.getLogger("jobintel")
@@ -25,24 +25,8 @@ def _group_units(tasks: list[dict]) -> list[dict]:
 
 def _assemble(state: InterviewState) -> dict:
     units_grouped = _group_units(state["tasks"])
-    ocu_units = []
-    for u_idx, unit in enumerate(units_grouped, 1):
-        tasks_out = []
-        for t_idx, task in enumerate(unit["tasks"], 1):
-            inds = task.get("behavior_indicators") or []
-            indicators = [{"code": f"P{u_idx}.{t_idx}.{p}", "text": ind.get("indicator_5w2h", "")}
-                          for p, ind in enumerate(inds, 1) if ind.get("indicator_5w2h")]
-            # outputs：優先用 indicator 的 output_name，否則 task["outputs"]
-            out_names = [ind["output_name"] for ind in inds if ind.get("output_name")] \
-                or [o for o in (task.get("outputs") or []) if o]
-            outputs = [{"code": f"O{u_idx}.{t_idx}.{o}", "name": name}
-                       for o, name in enumerate(out_names, 1)]
-            tasks_out.append({"task_code": f"T{u_idx}.{t_idx}",
-                              "task_name": task.get("task_name", ""),
-                              "indicators": indicators, "outputs": outputs})
-        ocu_units.append({"ocu_code": f"T{u_idx}", "ocu_name": unit["unit_title"], "tasks": tasks_out})
+    by_task = (state.get("ksa") or {}).get("by_task") or {}
 
-    ksa = state.get("ksa") or {"knowledge": [], "skills": [], "attitudes": []}
     def _coded(items, prefix):
         out = []
         i = 0
@@ -55,6 +39,38 @@ def _assemble(state: InterviewState) -> dict:
                         "source": it.get("source", "company"), "icap_ref": it.get("icap_ref")})
         return out
 
+    def _coded_ks(items, prefix):
+        out, i = [], 0
+        for it in items:
+            content = (it.get("content") or "").strip()
+            if not content:
+                continue
+            i += 1
+            out.append({"code": it.get("icap_ref") or f"{prefix}{i:02d}", "name": content,
+                        "source": it.get("source", "company"), "icap_ref": it.get("icap_ref")})
+        return out
+
+    ocu_units = []
+    for u_idx, unit in enumerate(units_grouped, 1):
+        tasks_out = []
+        for t_idx, task in enumerate(unit["tasks"], 1):
+            inds = task.get("behavior_indicators") or []
+            indicators = [{"code": f"P{u_idx}.{t_idx}.{p}", "text": ind.get("indicator_5w2h", "")}
+                          for p, ind in enumerate(inds, 1) if ind.get("indicator_5w2h")]
+            # outputs：優先用 indicator 的 output_name，否則 task["outputs"]
+            out_names = [ind["output_name"] for ind in inds if ind.get("output_name")] \
+                or [o for o in (task.get("outputs") or []) if o]
+            outputs = [{"code": f"O{u_idx}.{t_idx}.{o}", "name": name}
+                       for o, name in enumerate(out_names, 1)]
+            ks = by_task.get(task_key(task), {})
+            tasks_out.append({"task_code": f"T{u_idx}.{t_idx}",
+                              "task_name": task.get("task_name", ""),
+                              "indicators": indicators, "outputs": outputs,
+                              "knowledge": _coded_ks(ks.get("knowledge", []), f"K{u_idx}.{t_idx}"),
+                              "skills": _coded_ks(ks.get("skills", []), f"S{u_idx}.{t_idx}")})
+        ocu_units.append({"ocu_code": f"T{u_idx}", "ocu_name": unit["unit_title"], "tasks": tasks_out})
+
+    attitudes = (state.get("ksa") or {}).get("attitudes", [])
     return {
         "ocs_profile": {
             "ocs_code": (state["profile"].get("selected_ocs_code") or ""),
@@ -62,11 +78,7 @@ def _assemble(state: InterviewState) -> dict:
             "job_description": state.get("job_summary", ""),
         },
         "ocs_content": {"ocu_units": ocu_units},
-        "ocs_ksa": {
-            "knowledge": _coded(ksa.get("knowledge", []), "K"),
-            "skills": _coded(ksa.get("skills", []), "S"),
-            "attitudes": _coded(ksa.get("attitudes", []), "A"),
-        },
+        "ocs_ksa": {"attitudes": _coded(attitudes, "A")},
     }
 
 
@@ -74,7 +86,11 @@ def _assemble(state: InterviewState) -> dict:
 async def build_doc(state: InterviewState, config) -> dict:
     deps = config["configurable"]["deps"]
     doc = _assemble(state)
-    interrupt({"kind": "preview", "document": doc})   # 人確認預覽
+    interrupt({"kind": "preview", "document": doc})   # REVIEW（唯讀）
+    ksa = state.get("ksa") or {}
+    await deps.persist.flush_ksa(state["job_profile_id"],
+                                 by_task=ksa.get("by_task") or {},
+                                 attitudes=ksa.get("attitudes") or [])
     await deps.persist.save_document(state["job_profile_id"], doc)
-    logger.info("build_doc: assembled %d OCU units", len(doc["ocs_content"]["ocu_units"]))
+    logger.info("build_doc: %d OCU units, flushed KSA", len(doc["ocs_content"]["ocu_units"]))
     return {"document": doc, "current_step": "done"}

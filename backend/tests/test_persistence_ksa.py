@@ -23,3 +23,8 @@ async def test_flush_ksa_links_ks_to_task_and_a_global(db_session):
     assert by_type[("K", "PLC 原理")].task_id == t.id
     assert by_type[("S", "故障排除")].task_id == t.id
     assert by_type[("A", "細心")].task_id is None
+
+    result = await KsaRepo(db_session).hydrate(prof.id)
+    assert result["by_task"]["T1"]["knowledge"][0]["content"] == "PLC 原理"
+    assert result["by_task"]["T1"]["skills"][0]["content"] == "故障排除"
+    assert result["attitudes"][0]["content"] == "細心"

@@ -2,7 +2,10 @@
 
 flush 以 (job_profile_id, task_name) 為穩定鍵做 row-level upsert：
 既有 row 更新、不存在才新建、清單中消失的刪除 → 保 row id 穩定，免斷 ksa_items FK。"""
+import logging
 from uuid import UUID
+
+logger = logging.getLogger("jobintel")
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -75,6 +78,8 @@ class KsaRepo:
         out = {}
         for r in rows:
             key = (r.indexer_ref or {}).get("task_id") or r.task_name
+            if key in out:
+                logger.warning("jobintel: _task_id_map duplicate key %r — overwriting", key)
             out[key] = r.id
         return out
 
@@ -120,6 +125,9 @@ class KsaRepo:
 
         for tkey, ks in (by_task or {}).items():
             tid = tmap.get(tkey)
+            if tid is None:
+                logger.warning("jobintel: flush skipping K/S for unresolved task key %r", tkey)
+                continue
             for item in ks.get("knowledge", []):
                 _upsert("K", item, tid)
             for item in ks.get("skills", []):

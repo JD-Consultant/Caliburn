@@ -62,45 +62,71 @@ _DB_TO_SRC = {v: k for k, v in _SRC_TO_DB.items()}
 
 
 class KsaRepo:
-    """ksa_items 的 doc-level hydrate/flush。以 (job_profile_id, ksa_type, content)
-    為穩定鍵 row-level upsert：保 row id 穩定。task_id 本階段留 NULL（per-task 連結為未來）。"""
+    """ksa_items：K/S 帶 task_id（per task）、A task_id=NULL（全域）。
+    穩定鍵 (ksa_type, content, task_id) row-level upsert。"""
 
     def __init__(self, session: AsyncSession):
         self.s = session
+
+    async def _task_id_map(self, job_profile_id: UUID) -> dict[str, "UUID"]:
+        rows = (await self.s.execute(
+            select(CompanyTask).where(CompanyTask.job_profile_id == job_profile_id)
+        )).scalars().all()
+        out = {}
+        for r in rows:
+            key = (r.indexer_ref or {}).get("task_id") or r.task_name
+            out[key] = r.id
+        return out
 
     async def hydrate(self, job_profile_id: UUID) -> dict:
         rows = (await self.s.execute(
             select(KsaItem).where(KsaItem.job_profile_id == job_profile_id)
             .order_by(KsaItem.created_at, KsaItem.id)
         )).scalars().all()
-        out: dict[str, list[dict]] = {"knowledge": [], "skills": [], "attitudes": []}
-        bucket = {"K": "knowledge", "S": "skills", "A": "attitudes"}
+        id_to_key = {v: k for k, v in (await self._task_id_map(job_profile_id)).items()}
+        by_task: dict[str, dict] = {}
+        attitudes: list[dict] = []
+        bucket = {"K": "knowledge", "S": "skills"}
         for r in rows:
-            key = bucket.get(r.ksa_type)
-            if key:
-                out[key].append({"id": str(r.id), "content": r.content,
-                                 "source": _DB_TO_SRC.get(r.source_type, "company"),
-                                 "icap_ref": r.icap_ref})
-        return out
+            item = {"id": str(r.id), "content": r.content,
+                    "source": _DB_TO_SRC.get(r.source_type, "company"), "icap_ref": r.icap_ref}
+            if r.ksa_type == "A":
+                attitudes.append(item)
+            elif r.ksa_type in bucket and r.task_id is not None:
+                key = id_to_key.get(r.task_id)
+                if key:
+                    by_task.setdefault(key, {"knowledge": [], "skills": []})[bucket[r.ksa_type]].append(item)
+        return {"by_task": by_task, "attitudes": attitudes}
 
-    async def flush(self, job_profile_id: UUID, ksa: dict) -> None:
-        existing = {(r.ksa_type, r.content): r for r in (await self.s.execute(
+    async def flush(self, job_profile_id: UUID, *, by_task: dict, attitudes: list) -> None:
+        existing = {(r.ksa_type, r.content, r.task_id): r for r in (await self.s.execute(
             select(KsaItem).where(KsaItem.job_profile_id == job_profile_id)
         )).scalars().all()}
-        seen: set[tuple[str, str]] = set()
-        for field, code in _KSA_TYPES:
-            for item in ksa.get(field, []):
-                content = (item.get("content") or "").strip()
-                if not content:
-                    continue
-                key = (code, content)
-                seen.add(key)
-                row = existing.get(key) or KsaItem(
-                    job_profile_id=job_profile_id, ksa_type=code, content=content)
-                row.source_type = _SRC_TO_DB.get(item.get("source", "company"), "company_defined")
-                row.icap_ref = item.get("icap_ref")
-                if key not in existing:
-                    self.s.add(row)
+        tmap = await self._task_id_map(job_profile_id)
+        seen: set = set()
+
+        def _upsert(code: str, item: dict, task_id):
+            content = (item.get("content") or "").strip()
+            if not content:
+                return
+            key = (code, content, task_id)
+            seen.add(key)
+            row = existing.get(key) or KsaItem(
+                job_profile_id=job_profile_id, ksa_type=code, content=content, task_id=task_id)
+            row.source_type = _SRC_TO_DB.get(item.get("source", "company"), "company_defined")
+            row.icap_ref = item.get("icap_ref")
+            if key not in existing:
+                self.s.add(row)
+
+        for tkey, ks in (by_task or {}).items():
+            tid = tmap.get(tkey)
+            for item in ks.get("knowledge", []):
+                _upsert("K", item, tid)
+            for item in ks.get("skills", []):
+                _upsert("S", item, tid)
+        for item in (attitudes or []):
+            _upsert("A", item, None)
+
         for key, row in existing.items():
             if key not in seen:
                 await self.s.delete(row)

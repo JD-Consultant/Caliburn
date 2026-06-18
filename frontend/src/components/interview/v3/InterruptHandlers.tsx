@@ -43,10 +43,12 @@ type DocPreview = {
         task_name?: string;
         indicators?: { code?: string; text?: string }[];
         outputs?: { code?: string; name?: string }[];
+        knowledge?: { code?: string; name?: string }[];
+        skills?: { code?: string; name?: string }[];
       }>;
     }>;
   };
-  ocs_ksa?: { knowledge?: CodedKsa[]; skills?: CodedKsa[]; attitudes?: CodedKsa[] };
+  ocs_ksa?: { attitudes?: CodedKsa[] };
 };
 
 type InterruptValue = {
@@ -404,6 +406,16 @@ function DocPreviewPanel({
                       指標：{t.indicators.length} 項
                     </span>
                   ) : null}
+                  {t.knowledge?.length ? (
+                    <span className="block pl-4 text-xs text-muted-foreground">
+                      K：{t.knowledge.map((x) => x.name).join("、")}
+                    </span>
+                  ) : null}
+                  {t.skills?.length ? (
+                    <span className="block pl-4 text-xs text-muted-foreground">
+                      S：{t.skills.map((x) => x.name).join("、")}
+                    </span>
+                  ) : null}
                 </li>
               ))}
             </ul>
@@ -412,8 +424,6 @@ function DocPreviewPanel({
       </div>
 
       <div className="space-y-1">
-        {ksaRow("知識 K", ksa.knowledge)}
-        {ksaRow("技能 S", ksa.skills)}
         {ksaRow("態度 A", ksa.attitudes)}
       </div>
 

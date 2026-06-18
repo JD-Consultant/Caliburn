@@ -23,7 +23,7 @@ export function useCreateProfile() {
   const qc = useQueryClient();
   const ensureUser = useUserStore((s) => s.ensureUser);
   return useMutation({
-    mutationFn: async (data: { job_title: string; department: string; job_summary?: string }) => {
+    mutationFn: async (data: { job_title: string; department?: string; job_summary?: string }) => {
       const userId = await ensureUser();
       return createProfile(userId, data);
     },

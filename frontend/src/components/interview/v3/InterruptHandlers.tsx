@@ -2,8 +2,8 @@
 
 // v3 HITL via CopilotKit v2 useInterrupt (D22). renderInChat:false → the hook
 // returns a ReactElement we place in our own (no-chat) UI. Listens to the agent's
-// on_interrupt custom events. Wired: select_profile, edit_tasks. Deep-interview
-// (ask_human) + edit_ksa/preview are deferred until the LLM API is testable.
+// on_interrupt custom events. Wired: select_profile, edit_tasks, ask_human,
+// curate_ks (per-task K/S), curate_attitudes, preview.
 import { useInterrupt } from "@copilotkit/react-core/v2";
 import { useState } from "react";
 
@@ -27,10 +27,8 @@ type PoolTask = {
   activity_examples?: string[];
 };
 
-// edit_ksa payload (assemble_ksa). Item = {content, source, icap_ref}.
-// Resume: backend reads edited["ksa"] → resolve({ ksa }).
+// KSA item shape shared by curate_ks + curate_attitudes.
 type KsaItem = { content: string; source?: string; icap_ref?: string | null };
-type Ksa = { knowledge: KsaItem[]; skills: KsaItem[]; attitudes: KsaItem[] };
 
 // preview payload (build_doc _assemble). resume value ignored → resolve() to confirm.
 type CodedKsa = { code?: string; name?: string; source?: string };
@@ -53,6 +51,7 @@ type DocPreview = {
 
 type InterruptValue = {
   kind?: string;
+  // select_profile
   candidates?: ProfileCandidate[];
   tasks?: PoolTask[];
   // ask_human
@@ -62,8 +61,13 @@ type InterruptValue = {
   task_name?: string;
   label?: string;
   question?: string;
-  // edit_ksa / preview
-  ksa?: Ksa;
+  // curate_ks
+  task_index?: number;
+  task_total?: number;
+  // curate_ks candidates structure + selected
+  // curate_attitudes: candidates/selected are flat KsaItem arrays (typed via `as never` at call site)
+  selected?: { knowledge?: KsaItem[]; skills?: KsaItem[] } | KsaItem[];
+  // preview
   document?: DocPreview;
 };
 
@@ -265,93 +269,85 @@ function AskHuman({
   );
 }
 
-function KsaEditor({
-  ksa,
-  onConfirm,
+function CurateList({
+  title, candidates, value, onChange, done,
 }: {
-  ksa: Ksa;
-  onConfirm: (ksa: Ksa) => void;
+  title: string;
+  candidates: KsaItem[];
+  value: KsaItem[];
+  onChange: (items: KsaItem[]) => void;
+  done: boolean;
 }) {
-  const [draft, setDraft] = useState<Ksa>(() => ({
-    knowledge: [...(ksa.knowledge ?? [])],
-    skills: [...(ksa.skills ?? [])],
-    attitudes: [...(ksa.attitudes ?? [])],
-  }));
-  const [done, setDone] = useState(false);
-
-  const cats: { key: keyof Ksa; label: string }[] = [
-    { key: "knowledge", label: "知識 K" },
-    { key: "skills", label: "技能 S" },
-    { key: "attitudes", label: "態度 A" },
-  ];
-
-  const edit = (key: keyof Ksa, i: number, content: string) =>
-    setDraft((d) => {
-      const items = [...d[key]];
-      items[i] = { ...items[i], content };
-      return { ...d, [key]: items };
-    });
-  const remove = (key: keyof Ksa, i: number) =>
-    setDraft((d) => ({ ...d, [key]: d[key].filter((_, j) => j !== i) }));
-  const add = (key: keyof Ksa) =>
-    setDraft((d) => ({ ...d, [key]: [...d[key], { content: "", source: "company", icap_ref: null }] }));
-
+  // candidates default unchecked: check by content match
+  const has = (c: string) => value.some((v) => v.content === c);
+  const toggle = (it: KsaItem) =>
+    onChange(has(it.content) ? value.filter((v) => v.content !== it.content) : [...value, it]);
+  const edit = (i: number, content: string) =>
+    onChange(value.map((v, j) => (j === i ? { ...v, content } : v)));
+  const remove = (i: number) => onChange(value.filter((_, j) => j !== i));
+  const add = () => onChange([...value, { content: "", source: "company", icap_ref: null }]);
   return (
-    <div className="space-y-3 rounded-xl border p-3">
-      <p className="text-sm font-medium">編輯 KSA（catalog 帶入，可增刪改）</p>
-      {cats.map(({ key, label }) => (
-        <div key={key} className="space-y-1">
-          <p className="text-xs font-medium text-muted-foreground">
-            {label}（{draft[key].length}）
-          </p>
-          {draft[key].map((it, i) => (
-            <div key={i} className="flex items-center gap-2">
-              <input
-                className="flex-1 rounded-lg border px-2 py-1 text-sm"
-                value={it.content}
-                disabled={done}
-                onChange={(e) => edit(key, i, e.target.value)}
-              />
-              {it.icap_ref ? (
-                <span className="font-mono text-[10px] text-muted-foreground">{it.icap_ref}</span>
-              ) : null}
-              <button
-                type="button"
-                className="rounded px-2 text-sm text-red-500 hover:bg-red-50 disabled:opacity-50"
-                disabled={done}
-                onClick={() => remove(key, i)}
-              >
-                ✕
-              </button>
-            </div>
-          ))}
-          <button
-            type="button"
-            className="text-xs text-blue-600 hover:underline disabled:opacity-50"
-            disabled={done}
-            onClick={() => add(key)}
-          >
-            ＋ 新增
-          </button>
+    <div className="space-y-1">
+      <p className="text-xs font-medium text-muted-foreground">{title}（已選 {value.length}）</p>
+      {candidates.map((c) => (
+        <label key={c.content} className="flex items-center gap-2 text-sm">
+          <input type="checkbox" checked={has(c.content)} disabled={done} onChange={() => toggle(c)} />
+          <span className={has(c.content) ? "" : "text-muted-foreground"}>{c.content}</span>
+          {c.icap_ref ? <span className="font-mono text-[10px] text-muted-foreground">{c.icap_ref}</span> : null}
+        </label>
+      ))}
+      {value.filter((v) => !candidates.some((c) => c.content === v.content)).map((v, i) => (
+        <div key={`extra-${i}`} className="flex items-center gap-2">
+          <input className="flex-1 rounded border px-2 py-1 text-sm" value={v.content} disabled={done}
+                 onChange={(e) => edit(value.indexOf(v), e.target.value)} />
+          <button type="button" className="text-red-500" disabled={done} onClick={() => remove(value.indexOf(v))}>✕</button>
         </div>
       ))}
-      <button
-        type="button"
-        className="w-full rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
-        disabled={done}
-        onClick={() => {
-          setDone(true);
-          // drop blank rows; keep item shape {content, source, icap_ref}
-          const clean = (items: KsaItem[]) =>
-            items.filter((it) => it.content.trim()).map((it) => ({ ...it, content: it.content.trim() }));
-          onConfirm({
-            knowledge: clean(draft.knowledge),
-            skills: clean(draft.skills),
-            attitudes: clean(draft.attitudes),
-          });
-        }}
-      >
-        確認 KSA，產生文件
+      <button type="button" className="text-xs text-blue-600 hover:underline" disabled={done} onClick={add}>＋ 新增自訂</button>
+    </div>
+  );
+}
+
+function CurateKsPanel({ value, onConfirm }: {
+  value: { task_index: number; task_total: number; task_name: string;
+           candidates: { knowledge: KsaItem[]; skills: KsaItem[] };
+           selected: { knowledge: KsaItem[]; skills: KsaItem[] } };
+  onConfirm: (ks: { knowledge: KsaItem[]; skills: KsaItem[] }) => void;
+}) {
+  const [k, setK] = useState<KsaItem[]>(value.selected?.knowledge ?? []);
+  const [s, setS] = useState<KsaItem[]>(value.selected?.skills ?? []);
+  const [done, setDone] = useState(false);
+  return (
+    <div className="space-y-3 rounded-xl border p-3">
+      <p className="text-sm font-medium">
+        任務 {value.task_index + 1}/{value.task_total}：{value.task_name} — 選知識(K) / 技能(S)
+      </p>
+      <CurateList title="知識 K" candidates={value.candidates.knowledge} value={k} onChange={setK} done={done} />
+      <CurateList title="技能 S" candidates={value.candidates.skills} value={s} onChange={setS} done={done} />
+      <button type="button" className="w-full rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+              disabled={done}
+              onClick={() => { setDone(true);
+                onConfirm({ knowledge: k.filter((x) => x.content.trim()), skills: s.filter((x) => x.content.trim()) }); }}>
+        確認此任務，下一個
+      </button>
+    </div>
+  );
+}
+
+function CurateAttitudesPanel({ value, onConfirm }: {
+  value: { candidates: KsaItem[]; selected: KsaItem[] };
+  onConfirm: (attitudes: KsaItem[]) => void;
+}) {
+  const [a, setA] = useState<KsaItem[]>(value.selected ?? []);
+  const [done, setDone] = useState(false);
+  return (
+    <div className="space-y-3 rounded-xl border p-3">
+      <p className="text-sm font-medium">選態度（A，全職類共用）</p>
+      <CurateList title="態度 A" candidates={value.candidates} value={a} onChange={setA} done={done} />
+      <button type="button" className="w-full rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+              disabled={done}
+              onClick={() => { setDone(true); onConfirm(a.filter((x) => x.content.trim())); }}>
+        確認態度，產生文件
       </button>
     </div>
   );
@@ -473,14 +469,11 @@ export function InterruptHandlers() {
         // backend: answer if isinstance(answer, str) → resolve a STRING (not a dict).
         return <AskHuman value={value} onAnswer={(answer) => resolve(answer)} />;
       }
-      if (value.kind === "edit_ksa") {
-        // backend reads edited["ksa"] → resolve a dict.
-        return (
-          <KsaEditor
-            ksa={value.ksa ?? { knowledge: [], skills: [], attitudes: [] }}
-            onConfirm={(ksa) => resolve({ ksa })}
-          />
-        );
+      if (value.kind === "curate_ks") {
+        return <CurateKsPanel value={value as never} onConfirm={(ks) => resolve({ ks })} />;
+      }
+      if (value.kind === "curate_attitudes") {
+        return <CurateAttitudesPanel value={value as never} onConfirm={(attitudes) => resolve({ attitudes })} />;
       }
       if (value.kind === "preview") {
         // backend ignores the resume value → resolve() just confirms/saves.

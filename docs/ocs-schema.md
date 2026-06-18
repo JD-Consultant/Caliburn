@@ -1,5 +1,7 @@
 # OCS 職能文件 JSON 結構
 
+> **v3 註記**：代碼規則（T/P/O/K/S/A）仍對應 v3 `build_doc` 產出。差異：v3 OCU 分組改用 **catalog `unit_id`/`unit_title`**（非舊 `graph_state.responsibility_groups`）；K/S 巢狀在每個任務下、A 為全域（對齊 OCS 職能基準，見 `superpowers/specs/2026-06-18-ksa-flow-redesign-design.md`）。
+
 ## 代碼規則
 
 | 代碼類型 | 格式 | 說明 |

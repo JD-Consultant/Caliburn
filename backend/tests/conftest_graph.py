@@ -30,7 +30,7 @@ class SpyPersist:
     def __init__(self): self.selected = None; self.flushed = None; self.ksa_flushed = None; self.doc_saved = None
     async def set_selected_ocs(self, pid, ocs): self.selected = (str(pid), ocs)
     async def flush_tasks(self, pid, tasks): self.flushed = (str(pid), tasks)
-    async def flush_ksa(self, pid, ksa): self.ksa_flushed = (str(pid), ksa)
+    async def flush_ksa(self, pid, *, by_task, attitudes): self.ksa_flushed = (str(pid), by_task, attitudes)
     async def save_document(self, pid, content):
         self.doc_saved = (str(pid), content)
         return {"id": "spy-1", "version": 1, "format": "json", "content": content, "status": "draft"}

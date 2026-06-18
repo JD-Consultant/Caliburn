@@ -62,8 +62,8 @@ class InMemoryPersist:
     async def flush_tasks(self, job_profile_id: UUID, tasks: list[dict]) -> None:
         self.tasks[str(job_profile_id)] = tasks
 
-    async def flush_ksa(self, job_profile_id, ksa) -> None:
-        self.ksa[str(job_profile_id)] = ksa
+    async def flush_ksa(self, job_profile_id, *, by_task, attitudes) -> None:
+        self.ksa[str(job_profile_id)] = {"by_task": by_task, "attitudes": attitudes}
 
     async def save_document(self, job_profile_id, content) -> dict:
         v = len(self.docs.get(str(job_profile_id), [])) + 1

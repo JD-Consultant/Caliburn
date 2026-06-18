@@ -13,7 +13,7 @@ from app.services.persistence import TaskRepo, KsaRepo, DocRepo
 class PersistPort(Protocol):
     async def set_selected_ocs(self, job_profile_id: UUID, ocs_code: str) -> None: ...
     async def flush_tasks(self, job_profile_id: UUID, tasks: list[dict]) -> None: ...
-    async def flush_ksa(self, job_profile_id: UUID, ksa: dict) -> None: ...
+    async def flush_ksa(self, job_profile_id: UUID, *, by_task: dict, attitudes: list) -> None: ...
     async def save_document(self, job_profile_id: UUID, content: dict) -> dict: ...
 
 
@@ -38,8 +38,9 @@ class DbPersist:
     async def flush_tasks(self, job_profile_id: UUID, tasks: list[dict]) -> None:
         await TaskRepo(self.s).flush(job_profile_id, tasks)
 
-    async def flush_ksa(self, job_profile_id: UUID, ksa: dict) -> None:
-        await KsaRepo(self.s).flush(job_profile_id, ksa)
+    async def flush_ksa(self, job_profile_id: UUID, *, by_task: dict, attitudes: list) -> None:
+        await KsaRepo(self.s).flush(job_profile_id, by_task=by_task, attitudes=attitudes)
+        await self.s.flush()
 
     async def save_document(self, job_profile_id: UUID, content: dict) -> dict:
         return await DocRepo(self.s).save(job_profile_id, content)
@@ -62,9 +63,9 @@ class LiveDbPersist:
             await DbPersist(s).flush_tasks(job_profile_id, tasks)
             await s.commit()
 
-    async def flush_ksa(self, job_profile_id: UUID, ksa: dict) -> None:
+    async def flush_ksa(self, job_profile_id: UUID, *, by_task: dict, attitudes: list) -> None:
         async with self._sf() as s:
-            await DbPersist(s).flush_ksa(job_profile_id, ksa)
+            await KsaRepo(s).flush(job_profile_id, by_task=by_task, attitudes=attitudes)
             await s.commit()
 
     async def save_document(self, job_profile_id: UUID, content: dict) -> dict:

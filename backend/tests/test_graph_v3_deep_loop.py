@@ -14,7 +14,7 @@ _GOOD = {"has_situation": True, "has_purpose": True, "has_collaborators": True,
 
 
 @pytest.mark.asyncio
-async def test_two_task_deep_loop_reaches_assemble():
+async def test_two_task_deep_loop_reaches_fetch_ksa_pool():
     indicators = [{"output_name": "", "indicator_5w2h": "x", "indicator_abcd": "y",
                    "quality_dims": _GOOD}]
     star_refine = {"S": "s", "T": "t", "A": "a", "R": "r"}
@@ -44,12 +44,22 @@ async def test_two_task_deep_loop_reaches_assemble():
                "indexer_ref": {"ocs_code": "OC1", "task_id": "T1.2"}}]
     out = await graph.ainvoke(Command(resume={"tasks": edited}), cfg)
 
-    # 深問所有 interrupt：固定 answer 餵到結束
+    # 深問 + curate_ks（逐任務）+ curate_attitudes + build_doc preview 全部 interrupt
+    # 深問用 str resume；curate 用對應 dict；preview 用 True
     guard = 0
     while "__interrupt__" in out:
-        out = await graph.ainvoke(Command(resume="作業員、ERP、零漏檢、當日完成"), cfg)
+        kind = out["__interrupt__"][0].value.get("kind")
+        if kind == "curate_ks":
+            resume = {"ks": {"knowledge": [], "skills": []}}
+        elif kind == "curate_attitudes":
+            resume = {"attitudes": []}
+        elif kind == "preview":
+            resume = True
+        else:
+            resume = "作業員、ERP、零漏檢、當日完成"
+        out = await graph.ainvoke(Command(resume=resume), cfg)
         guard += 1
-        assert guard < 60, "深問迴圈未收斂"
+        assert guard < 60, "迴圈未收斂"
 
     assert out["current_step"] == "done"
     assert all(t.get("behavior_indicators") for t in out["tasks"])

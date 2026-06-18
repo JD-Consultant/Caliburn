@@ -40,17 +40,20 @@ async def test_full_flow_pick_to_done(monkeypatch):
     out = await graph.ainvoke(Command(resume={"tasks": [
         {"task_name": "巡檢", "source": "catalog", "unit_id": "U1", "unit_title": "預防保養",
          "indexer_ref": {"ocs_code": "OC1", "task_id": "T1.1"}}]}), cfg)        # edit_tasks
-    # 深問所有 interrupt
+    # 深問所有 interrupt（ask_human）
     guard = 0
     while "__interrupt__" in out and out["__interrupt__"][0].value["kind"] == "ask_human":
         out = await graph.ainvoke(Command(resume="作業員、ERP、零漏檢、當日完成"), cfg)
         guard += 1; assert guard < 40
-    # edit_ksa
-    assert out["__interrupt__"][0].value["kind"] == "edit_ksa"
-    out = await graph.ainvoke(Command(resume={"ksa": out["__interrupt__"][0].value["ksa"]}), cfg)
-    # preview
+    # curate_ks：逐任務一次（本測試 1 任務）
+    assert out["__interrupt__"][0].value["kind"] == "curate_ks"
+    out = await graph.ainvoke(Command(resume={"ks": {"knowledge": [], "skills": []}}), cfg)
+    # curate_attitudes：全域一次
+    assert out["__interrupt__"][0].value["kind"] == "curate_attitudes"
+    out = await graph.ainvoke(Command(resume={"attitudes": []}), cfg)
+    # build_doc preview
     assert out["__interrupt__"][0].value["kind"] == "preview"
-    out = await graph.ainvoke(Command(resume="confirm"), cfg)
+    out = await graph.ainvoke(Command(resume=True), cfg)
 
     assert out["current_step"] == "done"
     assert out["document"]["ocs_content"]["ocu_units"][0]["tasks"][0]["task_code"] == "T1.1"

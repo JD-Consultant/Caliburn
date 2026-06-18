@@ -33,12 +33,16 @@ def build_demo_agent() -> LangGraphAgent:
 
 
 def build_live_deps() -> Deps:
+    # 沒設 OPENROUTER_API_KEY 就不建 LLM：深問/收尾節點對 llm=None 優雅降級
+    # （STAR 保留原答、indicator force_accepted），可全程 interrupt 驅動測完整流程，
+    # 且免去注定失敗的 API 呼叫 retry+backoff。
+    llm = OpenRouterLlm() if settings.openrouter_api_key else None
     return Deps(
         knowledge=HttpIndexerClient(settings.indexer_base_url,
                                     settings.indexer_api_key,
                                     settings.indexer_timeout_s),
         persist=LiveDbPersist(AsyncSessionLocal),
-        llm=OpenRouterLlm(),
+        llm=llm,
     )
 
 

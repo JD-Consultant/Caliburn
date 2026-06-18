@@ -3,7 +3,8 @@ from typing import Any, TypedDict
 
 class ProfilePick(TypedDict):
     candidates: list[dict]
-    selected_ocs_code: str | None
+    selected_ocs_codes: list[str]   # 複選，順序=優先度
+    selected_ocs_code: str | None   # primary = selected_ocs_codes[0]（相容既有欄位）
 
 
 class DeepState(TypedDict):
@@ -38,7 +39,7 @@ def new_state(*, job_profile_id: str, job_title: str, job_summary: str = "") -> 
         "job_title": job_title,
         "job_summary": job_summary,
         "current_step": "pick_profile",
-        "profile": {"candidates": [], "selected_ocs_code": None},
+        "profile": {"candidates": [], "selected_ocs_codes": [], "selected_ocs_code": None},
         "tasks": [],
         "deep": {"current_task_index": 0, "slots_by_task": {}, "missing_fields": [],
                  "completed_task_ids": [], "retry": {}},

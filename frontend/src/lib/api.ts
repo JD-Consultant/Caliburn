@@ -1,4 +1,9 @@
-const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+// v3 API client. Talks to the live AG-UI app (copilotkit_live_app) on 8001,
+// which now mounts users + job_profiles CRUD under /api/v1. Legacy interview /
+// tasks / documents endpoints were removed with the old backend (Concern B).
+import type { JobProfile, User } from "@/types";
+
+const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8001";
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE}/api/v1${path}`, {
@@ -9,143 +14,30 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     const text = await res.text().catch(() => res.statusText);
     throw new Error(`${res.status} ${text}`);
   }
+  // 204 No Content (delete) has no body.
+  if (res.status === 204) return undefined as T;
   return res.json() as Promise<T>;
 }
 
 // ── Users ──────────────────────────────────────────────────────────────────
 export const createUser = (data: { email: string; name: string; company?: string }) =>
-  request<{ id: string; email: string; name: string }>("/users/", {
-    method: "POST",
-    body: JSON.stringify(data),
-  });
+  request<User>("/users/", { method: "POST", body: JSON.stringify(data) });
 
-// ── Job Profiles ───────────────────────────────────────────────────────────
+// ── Job Profiles ─────────────────────────────────────────────────────────────
 export const listProfiles = (userId: string) =>
-  request<import("@/types").JobProfile[]>(`/job-profiles/?user_id=${userId}`);
+  request<JobProfile[]>(`/job-profiles/?user_id=${userId}`);
 
 export const getProfile = (profileId: string) =>
-  request<import("@/types").JobProfile>(`/job-profiles/${profileId}`);
+  request<JobProfile>(`/job-profiles/${profileId}`);
 
 export const createProfile = (
   userId: string,
-  data: { job_title: string; department: string; job_summary?: string }
+  data: { job_title: string; department?: string; job_summary?: string },
 ) =>
-  request<import("@/types").JobProfile>(`/job-profiles/?user_id=${userId}`, {
+  request<JobProfile>(`/job-profiles/?user_id=${userId}`, {
     method: "POST",
     body: JSON.stringify(data),
   });
 
 export const deleteProfile = (profileId: string) =>
   request<void>(`/job-profiles/${profileId}`, { method: "DELETE" });
-
-// ── Interview ──────────────────────────────────────────────────────────────
-export const getHistory = (profileId: string) =>
-  request<import("@/types").InterviewMessage[]>(`/interviews/${profileId}/history`);
-
-export async function* streamChat(
-  profileId: string,
-  content: string,
-  phase = "general"
-): AsyncGenerator<import("@/types").AiStreamMessage> {
-  const res = await fetch(`${BASE}/api/v1/interviews/${profileId}/chat`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ content, phase }),
-  });
-  if (!res.ok || !res.body) throw new Error(`${res.status}`);
-
-  const reader = res.body.getReader();
-  const decoder = new TextDecoder();
-  let buf = "";
-
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    buf += decoder.decode(value, { stream: true });
-    const lines = buf.split("\n");
-    buf = lines.pop() ?? "";
-    for (const line of lines) {
-      if (line.startsWith("data: ")) {
-        const raw = line.slice(6);
-        if (raw === "[DONE]") return;
-        let chunk:
-          | string
-          | import("@/types").AiStreamMessage
-          | { type: "error"; error: string };
-        try {
-          chunk = JSON.parse(raw) as typeof chunk;
-        } catch {
-          yield { kind: "question", content: raw };
-          continue;
-        }
-        if (chunk === "[DONE]") return;
-        if (typeof chunk === "string") {
-          yield { kind: "question", content: chunk };
-        } else if (chunk.type === "error") {
-          throw new Error(chunk.error);
-        } else {
-          yield {
-            kind: chunk.kind ?? "question",
-            content: chunk.content,
-            phase: chunk.phase,
-            stage: chunk.stage,
-            node: chunk.node,
-          };
-        }
-      }
-    }
-  }
-}
-
-export const getProfileState = (profileId: string) =>
-  request<{ profile_id: string; stage: import("@/types").Stage; graph_state: import("@/types").GraphState }>(
-    `/job-profiles/${profileId}/state`
-  );
-
-// ── Tasks ──────────────────────────────────────────────────────────────────
-export const listTasks = (profileId: string) =>
-  request<import("@/types").Task[]>(`/tasks/${profileId}`);
-
-// ── Documents ──────────────────────────────────────────────────────────────
-export async function exportDocument(
-  profileId: string,
-  format: "docx" | "pdf" | "xlsx" | "json"
-): Promise<void> {
-  const res = await fetch(
-    `${BASE}/api/v1/documents/${profileId}/export?format=${format}`,
-    { method: "POST" }
-  );
-  if (!res.ok) throw new Error(`Export failed: ${res.status}`);
-
-  const blob = await res.blob();
-  const disposition = res.headers.get("content-disposition") ?? "";
-  const match = disposition.match(/filename="?([^"]+)"?/);
-  const filename = match?.[1] ?? `document.${format}`;
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-export const getDocumentPreview = (profileId: string) =>
-  request<{
-    profile_id: string;
-    stage: import("@/types").Stage;
-    ocs_document: import("@/types").OcsDocument;
-    behavior_indicators: import("@/types").BehaviorIndicator[];
-    ksa_items: import("@/types").KsaItem[];
-    extracted_tasks: import("@/types").Task[];
-  }>(`/documents/${profileId}/preview`);
-
-export const freezeDocument = (profileId: string) =>
-  request<{ id: string; format: string; status: string; profile_stage: string }>(
-    `/documents/${profileId}/freeze`,
-    { method: "POST" }
-  );
-
-export const listDocumentVersions = (profileId: string) =>
-  request<{ id: string; format: string; status: string; created_at: string }[]>(
-    `/documents/${profileId}/versions`
-  );

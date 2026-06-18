@@ -1,30 +1,17 @@
 "use client";
 
-import { useEffect } from "react";
+// v3 dashboard. Lists the user's job profiles and creates new ones, then routes
+// into the v3 interview surface (/v3/[id]). No old conversation stages — v3
+// progress lives in the LangGraph checkpointer, not on the JobProfile row.
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { useProfiles, useDeleteProfile } from "@/hooks/useProfiles";
+import { useProfiles, useCreateProfile, useDeleteProfile } from "@/hooks/useProfiles";
 import { useUserStore } from "@/store/user";
 import { useHydrated } from "@/hooks/useHydrated";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { Plus, Trash2, ChevronRight, BriefcaseIcon } from "lucide-react";
-import type { Stage } from "@/types";
-
-const STAGE_LABEL: Record<Stage, string> = {
-  basic_info: "初始化",
-  icap_ref: "iCAP 比對",
-  interview: "基本訪談",
-  task_extraction: "任務萃取",
-  responsibility_grouping: "主要職責",
-  star: "STAR 深訪",
-  five_w2h: "5W2H 補充",
-  indicator: "行為指標",
-  ksa: "K/S/A 整理",
-  preview: "完成",
-};
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -32,7 +19,13 @@ export default function DashboardPage() {
   const userId = useUserStore((s) => s.userId);
   const ensureUser = useUserStore((s) => s.ensureUser);
   const { data: profiles = [], isLoading } = useProfiles();
+  const { mutateAsync: createProfile, isPending: creating } = useCreateProfile();
   const { mutate: deleteProfile } = useDeleteProfile();
+
+  const [showForm, setShowForm] = useState(false);
+  const [jobTitle, setJobTitle] = useState("");
+  const [department, setDepartment] = useState("");
+  const [jobSummary, setJobSummary] = useState("");
 
   useEffect(() => {
     ensureUser();
@@ -40,99 +33,125 @@ export default function DashboardPage() {
 
   const loading = !hydrated || isLoading || (!userId && hydrated);
 
+  const submit = async () => {
+    if (!jobTitle.trim()) return;
+    const profile = await createProfile({
+      job_title: jobTitle.trim(),
+      department: department.trim() || undefined,
+      job_summary: jobSummary.trim() || undefined,
+    });
+    router.push(`/v3/${profile.id}`);
+  };
+
   return (
     <div className="min-h-screen bg-muted/30">
-      {/* Top Nav */}
-      <header className="bg-background border-b px-6 py-4 flex items-center justify-between">
+      <header className="flex items-center justify-between border-b bg-background px-6 py-4">
         <div className="flex items-center gap-2">
-          <BriefcaseIcon className="w-5 h-5 text-blue-600" />
-          <span className="font-semibold text-lg">JobIntel AI</span>
+          <BriefcaseIcon className="h-5 w-5 text-blue-600" />
+          <span className="text-lg font-semibold">JobIntel AI</span>
+          <Badge variant="outline" className="text-xs">v3</Badge>
         </div>
-        <Link href="/profiles/new">
-          <Button size="sm" className="gap-2">
-            <Plus className="w-4 h-4" />
-            新增職務
-          </Button>
-        </Link>
+        <Button size="sm" className="gap-2" onClick={() => setShowForm((v) => !v)}>
+          <Plus className="h-4 w-4" />
+          新增職務
+        </Button>
       </header>
 
-      <main className="max-w-4xl mx-auto px-6 py-8">
+      <main className="mx-auto max-w-4xl px-6 py-8">
         <div className="mb-6">
           <h1 className="text-2xl font-bold">職務檔案</h1>
-          <p className="text-muted-foreground text-sm mt-1">管理你的 AI 訪談與職能萃取任務</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            建立職務後進入 v3 訪談：選職類 → 整理任務 → 深度訪談 → 產生 OCS 文件
+          </p>
         </div>
+
+        {showForm && (
+          <Card className="mb-6 space-y-3 p-4">
+            <p className="text-sm font-medium">新增職務</p>
+            <input
+              className="w-full rounded-lg border px-3 py-2 text-sm"
+              placeholder="職稱（必填，例：設備維護工程師）"
+              value={jobTitle}
+              onChange={(e) => setJobTitle(e.target.value)}
+              autoFocus
+            />
+            <input
+              className="w-full rounded-lg border px-3 py-2 text-sm"
+              placeholder="部門（可空）"
+              value={department}
+              onChange={(e) => setDepartment(e.target.value)}
+            />
+            <textarea
+              className="w-full rounded-lg border px-3 py-2 text-sm"
+              placeholder="職務簡述（可空，會用於搜尋職類 OCS）"
+              rows={2}
+              value={jobSummary}
+              onChange={(e) => setJobSummary(e.target.value)}
+            />
+            <div className="flex gap-2">
+              <Button size="sm" disabled={!jobTitle.trim() || creating} onClick={submit}>
+                {creating ? "建立中…" : "建立並開始訪談"}
+              </Button>
+              <Button size="sm" variant="ghost" onClick={() => setShowForm(false)}>
+                取消
+              </Button>
+            </div>
+          </Card>
+        )}
 
         {loading && (
           <div className="space-y-3">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-24 rounded-xl bg-muted animate-pulse" />
+              <div key={i} className="h-20 animate-pulse rounded-xl bg-muted" />
             ))}
           </div>
         )}
 
-        {!loading && profiles.length === 0 && (
-          <div className="text-center py-20">
-            <BriefcaseIcon className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-            <h2 className="text-lg font-medium mb-2">尚無職務檔案</h2>
-            <p className="text-muted-foreground text-sm mb-6">
-              建立第一個職務檔案，開始 AI 訪談與職能萃取
-            </p>
-            <Link href="/profiles/new">
-              <Button className="gap-2">
-                <Plus className="w-4 h-4" />
-                新增職務
-              </Button>
-            </Link>
+        {!loading && profiles.length === 0 && !showForm && (
+          <div className="py-20 text-center">
+            <BriefcaseIcon className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
+            <h2 className="mb-2 text-lg font-medium">尚無職務檔案</h2>
+            <p className="mb-6 text-sm text-muted-foreground">建立第一個職務，開始 v3 訪談</p>
+            <Button className="gap-2" onClick={() => setShowForm(true)}>
+              <Plus className="h-4 w-4" />
+              新增職務
+            </Button>
           </div>
         )}
 
         <div className="space-y-3">
           {profiles.map((profile) => (
-            <Card key={profile.id} className="p-4 hover:shadow-md transition-shadow">
+            <Card key={profile.id} className="p-4 transition-shadow hover:shadow-md">
               <div className="flex items-center gap-4">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h2 className="font-semibold text-base truncate">{profile.job_title}</h2>
-                    <Badge variant="outline" className="shrink-0 text-xs">
-                      {profile.department}
-                    </Badge>
+                <div className="min-w-0 flex-1">
+                  <div className="mb-1 flex items-center gap-2">
+                    <h2 className="truncate text-base font-semibold">{profile.job_title}</h2>
+                    {profile.department ? (
+                      <Badge variant="outline" className="shrink-0 text-xs">
+                        {profile.department}
+                      </Badge>
+                    ) : null}
                   </div>
-                  <div className="flex items-center gap-3 mt-2">
-                    <Progress value={profile.completion_pct} className="h-1.5 flex-1 max-w-48" />
-                    <span className="text-xs text-muted-foreground">{profile.completion_pct}%</span>
-                    <Badge
-                      variant="secondary"
-                      className={
-                        profile.stage === "preview"
-                          ? "bg-emerald-100 text-emerald-700"
-                          : "bg-blue-50 text-blue-700"
-                      }
-                    >
-                      {STAGE_LABEL[profile.stage]}
-                    </Badge>
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-1.5">
-                    更新：{new Date(profile.updated_at).toLocaleDateString("zh-TW")}
+                  {profile.job_summary ? (
+                    <p className="truncate text-xs text-muted-foreground">{profile.job_summary}</p>
+                  ) : null}
+                  <p className="mt-1.5 text-xs text-muted-foreground">
+                    更新：{new Date(profile.updated_at).toLocaleString("zh-TW")}
                   </p>
                 </div>
-                <div className="flex items-center gap-2 shrink-0">
+                <div className="flex shrink-0 items-center gap-2">
                   <Button
                     variant="ghost"
                     size="icon"
                     className="text-muted-foreground hover:text-destructive"
-                    onClick={(e) => {
-                      e.stopPropagation();
+                    onClick={() => {
                       if (confirm("確定刪除此職務檔案？")) deleteProfile(profile.id);
                     }}
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <Trash2 className="h-4 w-4" />
                   </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => router.push(`/profiles/${profile.id}`)}
-                  >
-                    <ChevronRight className="w-4 h-4" />
+                  <Button variant="ghost" size="icon" onClick={() => router.push(`/v3/${profile.id}`)}>
+                    <ChevronRight className="h-4 w-4" />
                   </Button>
                 </div>
               </div>

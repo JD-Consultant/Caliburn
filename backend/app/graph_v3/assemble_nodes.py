@@ -20,7 +20,13 @@ def _pairs_to_items(pairs_list) -> list[dict]:
 async def assemble_ksa(state: InterviewState, config) -> dict:
     deps = config["configurable"]["deps"]
     ocs = state["profile"]["selected_ocs_code"]
-    pairs = await deps.knowledge.pairs(ocs) if ocs else None
+    # catalog K/S/A 為 prefill（best-effort）：indexer 失敗就空 draft，由 edit_ksa 人補。
+    pairs = None
+    if ocs:
+        try:
+            pairs = await deps.knowledge.pairs(ocs)
+        except Exception as exc:  # noqa: BLE001
+            logger.warning("assemble_ksa: catalog pairs failed, empty draft: %s", exc)
 
     draft = {
         "knowledge": _pairs_to_items(pairs.knowledge) if pairs else [],

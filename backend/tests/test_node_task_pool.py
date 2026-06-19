@@ -41,7 +41,6 @@ async def test_task_pool_interrupt_then_flush_edited():
     out2 = await graph.ainvoke(Command(resume={"tasks": edited}), cfg)
     assert [t["task_name"] for t in out2["tasks"]] == ["例行巡檢", "公司自訂任務"]
     assert out2["current_step"] == "deep"
-    assert spy.flushed[0] == "p1" and len(spy.flushed[1]) == 2
 
 
 @pytest.mark.asyncio

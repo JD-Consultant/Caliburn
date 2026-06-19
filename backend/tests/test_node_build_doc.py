@@ -60,12 +60,11 @@ async def test_build_doc_deterministic_assembly_then_preview():
     assert "attitudes" in doc["ocs_ksa"]
     assert doc["ocs_ksa"]["attitudes"][0]["name"] == "細心"
 
-    # preview 確認 → 結束 + save_document + flush_ksa
+    # preview 確認 → 結束 + save_document
     out = await graph.ainvoke(Command(resume="confirm"), cfg)
     assert out["current_step"] == "done"
     assert out["document"]["ocs_profile"]["occupation_name"] == "設備維護工程師"
     assert spy.doc_saved[0] == "p1"
-    assert spy.ksa_flushed is not None
 
 
 def _one():
@@ -75,7 +74,7 @@ def _one():
 
 
 @pytest.mark.asyncio
-async def test_build_doc_nests_ks_per_task_and_flushes():
+async def test_build_doc_nests_ks_per_task_and_saves():
     s = new_state(job_profile_id="p1", job_title="工程師")
     s["tasks"] = [{"task_name": "巡檢", "indexer_ref": {"task_id": "T1"}, "unit_id": "U1", "unit_title": "保養"}]
     s["ksa"]["by_task"] = {"T1": {"knowledge": [{"content": "PLC", "source": "catalog", "icap_ref": "K01"}],
@@ -91,7 +90,5 @@ async def test_build_doc_nests_ks_per_task_and_flushes():
     assert task0["knowledge"][0]["name"] == "PLC"
     assert task0["skills"][0]["name"] == "排障"
     assert out["document"]["ocs_ksa"]["attitudes"][0]["name"] == "細心"
-    assert spy.ksa_flushed[1]["T1"]["knowledge"][0]["content"] == "PLC"   # by_task
-    assert spy.ksa_flushed[2][0]["content"] == "細心"                      # attitudes
     assert spy.doc_saved is not None
     assert out["current_step"] == "done"

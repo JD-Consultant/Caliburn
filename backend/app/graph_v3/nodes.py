@@ -15,7 +15,7 @@ async def pick_profile(state: InterviewState, config) -> dict:
     codes = _resume_to_codes(selected)          # 有序清單，順序=優先度
     primary = codes[0] if codes else None
 
-    await deps.persist.set_selected_ocs(state["job_profile_id"], primary)
+    await deps.persist.set_selected_ocs(state["job_profile_id"], codes)
     return {
         "profile": {
             "candidates": candidates,
@@ -75,5 +75,4 @@ async def build_task_pool(state: InterviewState, config) -> dict:
     edited = interrupt({"kind": "edit_tasks", "tasks": proposed})
     tasks = edited.get("tasks", proposed) if isinstance(edited, dict) else proposed
 
-    await deps.persist.flush_tasks(state["job_profile_id"], tasks)
     return {"tasks": tasks, "current_step": "deep"}

@@ -28,4 +28,4 @@ async def test_full_two_node_slice():
     out = await graph.ainvoke(Command(resume={"tasks": [{"task_name": "巡檢", "source": "catalog"}]}), cfg)
     # Phase ③：task_pool 後直接進深問，停在第一個 STAR 提問
     assert out["__interrupt__"][0].value["stage"] == "star"
-    assert spy.selected == ("p1", "OC1") and spy.flushed[0] == "p1"
+    assert spy.selected == ("p1", ["OC1"])

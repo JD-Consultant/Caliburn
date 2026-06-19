@@ -57,4 +57,4 @@ async def test_full_flow_pick_to_done(monkeypatch):
 
     assert out["current_step"] == "done"
     assert out["document"]["ocs_content"]["ocu_units"][0]["tasks"][0]["task_code"] == "T1.1"
-    assert spy.ksa_flushed[0] == "p1" and spy.doc_saved[0] == "p1"
+    assert spy.doc_saved[0] == "p1"

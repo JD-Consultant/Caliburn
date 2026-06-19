@@ -76,10 +76,6 @@ async def build_doc(state: InterviewState, config) -> dict:
     deps = config["configurable"]["deps"]
     doc = _assemble(state)
     interrupt({"kind": "preview", "document": doc})   # REVIEW（唯讀）
-    ksa = state.get("ksa") or {}
-    await deps.persist.flush_ksa(state["job_profile_id"],
-                                 by_task=ksa.get("by_task") or {},
-                                 attitudes=ksa.get("attitudes") or [])
     await deps.persist.save_document(state["job_profile_id"], doc)
-    logger.info("build_doc: %d OCU units, flushed KSA", len(doc["ocs_content"]["ocu_units"]))
+    logger.info("build_doc: %d OCU units saved", len(doc["ocs_content"]["ocu_units"]))
     return {"document": doc, "current_step": "done"}

@@ -4,19 +4,17 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
-from app.api.routes import documents, job_profiles, users
+from app.api.routes import job_profiles, users
 from app.config import settings
 from app.database import AsyncSessionLocal, engine
 from app.logging_config import setup_logging
-from app.models.base import Base
 
 setup_logging(debug=settings.debug)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+    # Schema is managed by Alembic (alembic upgrade head) — no create_all here.
     yield
     await engine.dispose()
 
@@ -38,7 +36,6 @@ app.add_middleware(
 
 app.include_router(users.router,        prefix="/api/v1")
 app.include_router(job_profiles.router, prefix="/api/v1")
-app.include_router(documents.router,    prefix="/api/v1")
 
 
 @app.get("/health")

@@ -52,21 +52,13 @@ class InMemoryPersist:
 
     def __init__(self):
         self.selected: dict = {}
-        self.tasks: dict = {}
-        self.ksa: dict = {}
         self.docs: dict = {}
 
-    async def set_selected_ocs(self, job_profile_id: UUID, ocs_code: str) -> None:
-        self.selected[str(job_profile_id)] = ocs_code
-
-    async def flush_tasks(self, job_profile_id: UUID, tasks: list[dict]) -> None:
-        self.tasks[str(job_profile_id)] = tasks
-
-    async def flush_ksa(self, job_profile_id, *, by_task, attitudes) -> None:
-        self.ksa[str(job_profile_id)] = {"by_task": by_task, "attitudes": attitudes}
+    async def set_selected_ocs(self, job_profile_id: UUID, codes: list[str]) -> None:
+        self.selected[str(job_profile_id)] = list(codes or [])
 
     async def save_document(self, job_profile_id, content) -> dict:
         v = len(self.docs.get(str(job_profile_id), [])) + 1
         self.docs.setdefault(str(job_profile_id), []).append(content)
-        return {"id": f"mem-{v}", "version": v, "format": "json",
+        return {"id": f"mem-{v}", "version": v,
                 "content": content, "status": "draft"}

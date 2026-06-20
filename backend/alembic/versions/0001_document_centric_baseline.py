@@ -71,7 +71,8 @@ def upgrade() -> None:
         sa.Column(
             "selected_ocs_codes",
             postgresql.ARRAY(sa.Text()),
-            nullable=True,
+            nullable=False,
+            server_default=sa.text("'{}'"),
         ),
         sa.Column(
             "created_at",

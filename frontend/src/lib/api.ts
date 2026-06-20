@@ -23,6 +23,8 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 export const createUser = (data: { email: string; name: string; company?: string }) =>
   request<User>("/users/", { method: "POST", body: JSON.stringify(data) });
 
+export const getUser = (userId: string) => request<User>(`/users/${userId}`);
+
 // ── Job Profiles ─────────────────────────────────────────────────────────────
 export const listProfiles = (userId: string) =>
   request<JobProfile[]>(`/job-profiles/?user_id=${userId}`);

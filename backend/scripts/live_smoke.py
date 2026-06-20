@@ -38,7 +38,7 @@ def _ask(prompt: str) -> str:
 
 
 async def _ensure_profile(job_title: str, job_summary: str) -> uuid.UUID:
-    """建一筆 User+JobProfile（company_tasks/ksa_items 的 FK 需要），回 profile id。"""
+    """建一筆 User+JobProfile，回 profile id。"""
     uid = uuid.uuid4()
     pid = uuid.uuid4()
     async with AsyncSessionLocal() as s:
@@ -154,7 +154,7 @@ async def main() -> None:
         print("current_step =", out.get("current_step"))
         if out.get("document"):
             print(json.dumps(out["document"], ensure_ascii=False, indent=2))
-        print(f"（K/S/A 已落 ksa_items、文件已落 document_versions；profile={thread_id}）")
+        print(f"（文件已落 document_versions；profile={thread_id}）")
 
     await deps.knowledge.aclose()
 

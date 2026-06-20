@@ -142,24 +142,3 @@ class OcsDocument(BaseModel):
     ocs_profile: OcsProfile
     ocs_content: OcsContent
     ocs_attitude: OcsAttitudeSection
-
-
-# ── Export response schemas ────────────────────────────────────────────────────
-
-class IcapReferencePack(BaseModel):
-    icap_mode: str                    # reference | hybrid | company_defined
-    icap_hit: bool
-    candidates: list[dict] = Field(default_factory=list)
-
-
-class TaskQualityScore(BaseModel):
-    quality_score: Optional[float] = None
-    quality_status: Optional[str] = None   # ok | force_accepted
-
-
-class EnrichedExportJson(BaseModel):
-    """完整 JSON 匯出結構（含 evidence_refs、iCAP 參照包、品質分數）。"""
-    ocs_document: dict
-    evidence_refs: list[dict] = Field(default_factory=list)
-    icap_reference_pack: IcapReferencePack
-    quality_scores: dict[str, TaskQualityScore] = Field(default_factory=dict)

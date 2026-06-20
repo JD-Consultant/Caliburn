@@ -74,21 +74,6 @@ async def update_job_profile(
     return profile
 
 
-@router.get("/{profile_id}/state")
-async def get_profile_state(
-    profile_id: UUID,
-    db: AsyncSession = Depends(get_db),
-):
-    """輕量端點：只回傳 stage + graph_state，供前端輪詢用。"""
-    profile = await db.get(JobProfile, profile_id)
-    if not profile:
-        raise HTTPException(status_code=404, detail="Job profile not found")
-    return {
-        "profile_id": str(profile_id),
-        "stage": profile.stage,
-        "graph_state": profile.graph_state or {},
-    }
-
 
 @router.delete("/{profile_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_job_profile(

@@ -30,7 +30,7 @@ class DocRepo:
     def __init__(self, session: AsyncSession):
         self.s = session
 
-    async def save(self, job_profile_id: UUID, content: dict, fmt: str = "json") -> dict:
+    async def save(self, job_profile_id: UUID, content: dict) -> dict:
         cur_max = (await self.s.execute(
             select(func.max(DocumentVersion.version))
             .where(DocumentVersion.job_profile_id == job_profile_id)

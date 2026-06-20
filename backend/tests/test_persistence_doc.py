@@ -18,6 +18,8 @@ async def test_set_selected_ocs_writes_array(db_session):
 async def test_doc_repo_save_increments_version(db_session):
     u = User(email=f"{uuid4()}@x.com", name="n"); db_session.add(u); await db_session.flush()
     p = JobProfile(user_id=u.id, job_title="工程師"); db_session.add(p); await db_session.flush()
-    r1 = await DocRepo(db_session).save(p.id, {"ocs_profile": {}})
-    r2 = await DocRepo(db_session).save(p.id, {"ocs_profile": {}})
+    r1 = await DocRepo(db_session).save(p.id, {"ocs_profile": {"ocs_code": "ENT-001"}})
+    r2 = await DocRepo(db_session).save(p.id, {"ocs_profile": {"ocs_code": "ENT-002"}})
     assert r1["version"] == 1 and r2["version"] == 2
+    latest = await DocRepo(db_session).latest(p.id)
+    assert latest["version"] == 2 and latest["content"]["ocs_profile"]["ocs_code"] == "ENT-002"

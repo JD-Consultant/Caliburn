@@ -2,7 +2,7 @@ import uuid
 
 from sqlalchemy import (
     Column, DateTime, ForeignKey,
-    Integer, Text, ARRAY, func,
+    Integer, Text, ARRAY, func, text,
 )
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import relationship
@@ -31,7 +31,7 @@ class JobProfile(Base):
     job_title = Column(Text, nullable=False)
     department = Column(Text)
     job_summary = Column(Text)
-    selected_ocs_codes = Column(ARRAY(Text))
+    selected_ocs_codes = Column(ARRAY(Text), nullable=False, server_default=text("'{}'"))
 
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())

@@ -29,6 +29,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Badge } from "@/components/ui/badge";
+import { DocHeader } from "./DocHeader";
 import { Check, GripVertical, Pencil, Plus, Trash2 } from "lucide-react";
 
 export type CellKind = "op" | "k" | "s";
@@ -239,7 +240,6 @@ export function JobDocTable({
   onCell: (target: CellTarget) => void;
   onChange: (d: OcsDocument) => void;
 }) {
-  const profile = document.ocs_profile;
   const units = document.ocs_content?.ocu_units ?? [];
   const attitudes = document.ocs_attitude?.attitudes ?? [];
   const notes = document.notes;
@@ -268,23 +268,8 @@ export function JobDocTable({
 
   return (
     <div className="space-y-5">
-      {/* 表頭 */}
-      <div className="rounded-lg border bg-background p-4">
-        <div className="flex flex-wrap items-center gap-2">
-          <h2 className="text-base font-semibold">
-            {profile?.ocs_name?.occupation_name || "（未選職類）"}
-          </h2>
-          {profile?.ocs_code ? (
-            <Badge variant="outline" className="font-mono text-xs">{profile.ocs_code}</Badge>
-          ) : null}
-          {profile?.ocs_level != null ? (
-            <Badge variant="secondary" className="text-xs">基準級別 {profile.ocs_level}</Badge>
-          ) : null}
-        </div>
-        {profile?.job_description ? (
-          <p className="mt-2 text-sm text-muted-foreground">{profile.job_description}</p>
-        ) : null}
-      </div>
+      {/* 官方職能基準表頭（可編輯） */}
+      <DocHeader document={document} onChange={onChange} />
 
       {/* 單元 → 任務（可拖拉） */}
       {units.length === 0 ? (

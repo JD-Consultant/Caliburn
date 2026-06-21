@@ -202,6 +202,30 @@ async def test_finalize_no_document_returns_400(client):
 
 
 @pytest.mark.asyncio
+async def test_export_returns_clean_ocs_json(client):
+    p = await _mk_profile(client._db)
+    skel = ocs_doc.skeleton({"ocs_code": "OC1", "job_title": "x"},
+                            [{"task_name": "t", "unit_id": "T1", "unit_title": "u",
+                              "indexer_ref": {"task_id": "T1.1"}}])
+    skel["_pool"] = {"knowledge": [], "skills": [], "attitudes": []}
+    skel["ocs_content"]["ocu_units"][0]["_uid"] = "u-x"
+    await client.patch(f"/api/v1/job-profiles/{p.id}/document", json=skel)
+    r = await client.get(f"/api/v1/job-profiles/{p.id}/document/export")
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert "_pool" not in body
+    assert "_uid" not in body["ocs_content"]["ocu_units"][0]
+    assert set(["version_info", "ocs_profile", "ocs_content", "ocs_attitude", "notes"]).issubset(body)
+
+
+@pytest.mark.asyncio
+async def test_export_no_document_returns_400(client):
+    p = await _mk_profile(client._db)
+    r = await client.get(f"/api/v1/job-profiles/{p.id}/document/export")
+    assert r.status_code == 400, r.text
+
+
+@pytest.mark.asyncio
 async def test_ksa_pool_happy(client):
     p = await _mk_profile(client._db, codes=["OC1"])
     app.dependency_overrides[get_knowledge] = lambda: StubKnowledge(

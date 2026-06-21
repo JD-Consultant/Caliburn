@@ -5,9 +5,11 @@
 // draft（自動儲存）。續做＝重開自動載 draft。finalize 產正式版本。不碰 CopilotKit。
 import { use, useMemo, useState } from "react";
 import Link from "next/link";
-import { ChevronLeft, FileCheck2, Layers, ListChecks } from "lucide-react";
+import { ChevronLeft, Download, FileCheck2, Layers, ListChecks } from "lucide-react";
 import { useProfile } from "@/hooks/useProfiles";
 import { useDocument, useFinalizeDocument, useKsaPool, usePatchDocument } from "@/hooks/useDocument";
+import { getDocumentExport } from "@/lib/api";
+import { downloadJson } from "@/lib/download";
 import { JobDocTable, type CellTarget } from "@/components/interview/v3/JobDocTable";
 import { CellFillerPanel } from "@/components/interview/v3/CellFillerPanel";
 import { OccupationPicker } from "@/components/interview/v3/OccupationPicker";
@@ -61,6 +63,17 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
     });
   };
 
+  const exportJson = async () => {
+    setError(null);
+    try {
+      const data = await getDocumentExport(id);
+      const occ = data.ocs_profile?.ocs_name?.occupation_name || profile?.job_title || "職務說明書";
+      downloadJson(`${occ}-職能基準.json`, data);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "匯出失敗");
+    }
+  };
+
   const pct = doc ? Math.round(completion(doc) * 100) : 0;
 
   return (
@@ -86,6 +99,10 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
           <Button size="sm" variant="outline" className="gap-1" disabled={!hasOccupations} onClick={() => setShowTasks(true)}>
             <ListChecks className="h-4 w-4" />
             選任務
+          </Button>
+          <Button size="sm" variant="outline" className="gap-1" onClick={exportJson} disabled={status === "none"}>
+            <Download className="h-4 w-4" />
+            匯出 JSON
           </Button>
           <Button size="sm" className="gap-1" onClick={runFinalize} disabled={finalize.isPending || status === "none"}>
             <FileCheck2 className="h-4 w-4" />

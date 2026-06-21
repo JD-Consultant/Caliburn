@@ -1,11 +1,35 @@
 "use client";
 
-// D27 工作台主表（T6）：把一份 OCS 文件 render 成可互動表格（照官方版型：
-// 單元 → 任務（級別）→ 產出O / 指標P / K / S）。純呈現元件，不抓資料、不碰
-// CopilotKit；點空/已填格 → onCell(target)，由上層（T8 shell）開 filler 面板。
+// D27 工作台主表（兩層、可編輯、可拖拉）。職責(unit)→任務(task)，皆可改名/增/刪/
+// 拖拉排序；任務可跨職責拖拉。每任務 4 格（產出O/指標P/K/S）點擊開 filler。
+// 純呈現+結構編輯：所有變更經 onChange(newDoc) 交回上層 PATCH。不碰 CopilotKit。
 import type { CompetencyBlock, OcsDocument, OcsTask } from "@/types";
+import {
+  addTask,
+  addUnit,
+  deleteTask,
+  deleteUnit,
+  relocateTask,
+  renameTask,
+  renameUnit,
+  reorderUnits,
+} from "@/lib/ocsDoc";
+import {
+  DndContext,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { Badge } from "@/components/ui/badge";
-import { Check, Pencil } from "lucide-react";
+import { Check, GripVertical, Pencil, Plus, Trash2 } from "lucide-react";
 
 export type CellKind = "op" | "k" | "s";
 export type CellTarget =
@@ -18,6 +42,35 @@ export function firstBlock(task: OcsTask): CompetencyBlock | undefined {
 
 function count(arr: unknown[] | undefined): number {
   return Array.isArray(arr) ? arr.length : 0;
+}
+
+function EditableText({
+  value,
+  placeholder,
+  onCommit,
+  className = "",
+}: {
+  value: string;
+  placeholder?: string;
+  onCommit: (v: string) => void;
+  className?: string;
+}) {
+  return (
+    <input
+      defaultValue={value}
+      placeholder={placeholder}
+      onBlur={(e) => {
+        if (e.target.value !== value) onCommit(e.target.value);
+      }}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") e.currentTarget.blur();
+      }}
+      className={
+        "rounded border border-transparent bg-transparent px-1 py-0.5 hover:border-input focus:border-input focus:bg-background focus:outline-none " +
+        className
+      }
+    />
+  );
 }
 
 function Cell({
@@ -49,17 +102,169 @@ function Cell({
   );
 }
 
+function TaskRow({
+  id,
+  task,
+  unitIdx,
+  taskIdx,
+  onCell,
+  onChange,
+  doc,
+}: {
+  id: string;
+  task: OcsTask;
+  unitIdx: number;
+  taskIdx: number;
+  onCell: (t: CellTarget) => void;
+  onChange: (d: OcsDocument) => void;
+  doc: OcsDocument;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+  const style = { transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.5 : 1 };
+  const block = firstBlock(task);
+  const level = block?.competency_level;
+  const tc = task.task_codes?.[0];
+
+  return (
+    <div ref={setNodeRef} style={style} className="rounded-md border bg-background px-3 py-2">
+      <div className="mb-2 flex items-center gap-1.5">
+        <button
+          type="button"
+          className="cursor-grab text-muted-foreground/60 hover:text-foreground"
+          {...attributes}
+          {...listeners}
+        >
+          <GripVertical className="h-4 w-4" />
+        </button>
+        <span className="font-mono text-xs text-muted-foreground">{tc?.code}</span>
+        <EditableText
+          value={tc?.name ?? ""}
+          placeholder="任務名稱"
+          onCommit={(v) => onChange(renameTask(doc, unitIdx, taskIdx, v))}
+          className="flex-1 text-sm font-medium"
+        />
+        <span className="text-xs text-muted-foreground">級別 {level != null ? level : "—"}</span>
+        <button
+          type="button"
+          className="text-muted-foreground hover:text-destructive"
+          onClick={() => onChange(deleteTask(doc, unitIdx, taskIdx))}
+        >
+          <Trash2 className="h-3.5 w-3.5" />
+        </button>
+      </div>
+      <div className="flex flex-wrap gap-2 pl-6">
+        <Cell label="產出 O" filled={count(block?.outputs) > 0} n={count(block?.outputs)} onClick={() => onCell({ kind: "op", unitIdx, taskIdx })} />
+        <Cell label="指標 P" filled={count(block?.indicators) > 0} n={count(block?.indicators)} onClick={() => onCell({ kind: "op", unitIdx, taskIdx })} />
+        <Cell label="知識 K" filled={count(block?.knowledge) > 0} n={count(block?.knowledge)} onClick={() => onCell({ kind: "k", unitIdx, taskIdx })} />
+        <Cell label="技能 S" filled={count(block?.skills) > 0} n={count(block?.skills)} onClick={() => onCell({ kind: "s", unitIdx, taskIdx })} />
+      </div>
+    </div>
+  );
+}
+
+function UnitRow({
+  id,
+  unit,
+  unitIdx,
+  onCell,
+  onChange,
+  doc,
+}: {
+  id: string;
+  unit: OcsDocument["ocs_content"]["ocu_units"][number];
+  unitIdx: number;
+  onCell: (t: CellTarget) => void;
+  onChange: (d: OcsDocument) => void;
+  doc: OcsDocument;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+  const style = { transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.5 : 1 };
+  const tasks = unit.tasks ?? [];
+  const taskIds = tasks.map((_, ti) => `task:${unitIdx}:${ti}`);
+
+  return (
+    <div ref={setNodeRef} style={style} className="rounded-lg border bg-background">
+      <div className="flex items-center gap-1.5 border-b bg-muted/40 px-3 py-2">
+        <button type="button" className="cursor-grab text-muted-foreground/60 hover:text-foreground" {...attributes} {...listeners}>
+          <GripVertical className="h-4 w-4" />
+        </button>
+        <Badge variant="outline" className="font-mono text-xs">{unit.ocu_code}</Badge>
+        <EditableText
+          value={unit.ocu_name ?? ""}
+          placeholder="職責名稱（點擊命名）"
+          onCommit={(v) => onChange(renameUnit(doc, unitIdx, v))}
+          className="flex-1 text-sm font-medium"
+        />
+        {unit.source?.occupation_name ? (
+          <span className="text-xs text-muted-foreground">來源：{unit.source.occupation_name}</span>
+        ) : null}
+        <button type="button" className="text-muted-foreground hover:text-destructive" onClick={() => onChange(deleteUnit(doc, unitIdx))}>
+          <Trash2 className="h-4 w-4" />
+        </button>
+      </div>
+      <div className="space-y-2 p-2">
+        <SortableContext items={taskIds} strategy={verticalListSortingStrategy}>
+          {tasks.map((task, ti) => (
+            <TaskRow
+              key={`task:${unitIdx}:${ti}`}
+              id={`task:${unitIdx}:${ti}`}
+              task={task}
+              unitIdx={unitIdx}
+              taskIdx={ti}
+              onCell={onCell}
+              onChange={onChange}
+              doc={doc}
+            />
+          ))}
+        </SortableContext>
+        <button
+          type="button"
+          className="inline-flex items-center gap-1 rounded-md border border-dashed px-2.5 py-1.5 text-xs text-muted-foreground hover:text-foreground"
+          onClick={() => onChange(addTask(doc, unitIdx))}
+        >
+          <Plus className="h-3.5 w-3.5" />
+          新增任務
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export function JobDocTable({
   document,
   onCell,
+  onChange,
 }: {
   document: OcsDocument;
   onCell: (target: CellTarget) => void;
+  onChange: (d: OcsDocument) => void;
 }) {
   const profile = document.ocs_profile;
   const units = document.ocs_content?.ocu_units ?? [];
   const attitudes = document.ocs_attitude?.attitudes ?? [];
   const notes = document.notes;
+  const unitIds = units.map((_, ui) => `unit:${ui}`);
+
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
+
+  const onDragEnd = (e: DragEndEvent) => {
+    const a = String(e.active.id);
+    const o = e.over ? String(e.over.id) : "";
+    if (!o || a === o) return;
+    if (a.startsWith("unit:") && o.startsWith("unit:")) {
+      onChange(reorderUnits(document, Number(a.slice(5)), Number(o.slice(5))));
+      return;
+    }
+    if (a.startsWith("task:")) {
+      const [, fu, ft] = a.split(":");
+      if (o.startsWith("task:")) {
+        const [, tu, tt] = o.split(":");
+        onChange(relocateTask(document, Number(fu), Number(ft), Number(tu), Number(tt)));
+      } else if (o.startsWith("unit:")) {
+        onChange(relocateTask(document, Number(fu), Number(ft), Number(o.slice(5)), -1));
+      }
+    }
+  };
 
   return (
     <div className="space-y-5">
@@ -67,17 +272,13 @@ export function JobDocTable({
       <div className="rounded-lg border bg-background p-4">
         <div className="flex flex-wrap items-center gap-2">
           <h2 className="text-base font-semibold">
-            {profile?.ocs_name?.occupation_name || "（未命名職務）"}
+            {profile?.ocs_name?.occupation_name || "（未選職類）"}
           </h2>
           {profile?.ocs_code ? (
-            <Badge variant="outline" className="font-mono text-xs">
-              {profile.ocs_code}
-            </Badge>
+            <Badge variant="outline" className="font-mono text-xs">{profile.ocs_code}</Badge>
           ) : null}
           {profile?.ocs_level != null ? (
-            <Badge variant="secondary" className="text-xs">
-              基準級別 {profile.ocs_level}
-            </Badge>
+            <Badge variant="secondary" className="text-xs">基準級別 {profile.ocs_level}</Badge>
           ) : null}
         </div>
         {profile?.job_description ? (
@@ -85,80 +286,45 @@ export function JobDocTable({
         ) : null}
       </div>
 
-      {/* 單元 → 任務 */}
+      {/* 單元 → 任務（可拖拉） */}
       {units.length === 0 ? (
         <div className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
-          尚無任務。請先選職類（seed）以帶入任務骨架。
+          尚無任務。上方〔選職類〕→〔選任務〕帶入，或〔＋新增職責〕手動建立。
         </div>
       ) : (
-        units.map((unit, unitIdx) => (
-          <div key={`${unit.ocu_code}-${unitIdx}`} className="rounded-lg border bg-background">
-            <div className="flex items-center gap-2 border-b bg-muted/40 px-4 py-2">
-              <Badge variant="outline" className="font-mono text-xs">
-                {unit.ocu_code}
-              </Badge>
-              <span className="text-sm font-medium">{unit.ocu_name}</span>
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
+          <SortableContext items={unitIds} strategy={verticalListSortingStrategy}>
+            <div className="space-y-4">
+              {units.map((unit, ui) => (
+                <UnitRow
+                  key={`unit:${ui}`}
+                  id={`unit:${ui}`}
+                  unit={unit}
+                  unitIdx={ui}
+                  onCell={onCell}
+                  onChange={onChange}
+                  doc={document}
+                />
+              ))}
             </div>
-            <div className="divide-y">
-              {(unit.tasks ?? []).map((task, taskIdx) => {
-                const block = firstBlock(task);
-                const level = block?.competency_level;
-                const tc = task.task_codes?.[0];
-                return (
-                  <div key={`${unitIdx}-${taskIdx}`} className="px-4 py-3">
-                    <div className="mb-2 flex items-center gap-2">
-                      {tc?.code ? (
-                        <span className="font-mono text-xs text-muted-foreground">{tc.code}</span>
-                      ) : null}
-                      <span className="text-sm font-medium">{tc?.name || "（未命名任務）"}</span>
-                      <span className="ml-auto text-xs text-muted-foreground">
-                        級別 {level != null ? level : "—"}
-                      </span>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      <Cell
-                        label="產出 O"
-                        filled={count(block?.outputs) > 0}
-                        n={count(block?.outputs)}
-                        onClick={() => onCell({ kind: "op", unitIdx, taskIdx })}
-                      />
-                      <Cell
-                        label="指標 P"
-                        filled={count(block?.indicators) > 0}
-                        n={count(block?.indicators)}
-                        onClick={() => onCell({ kind: "op", unitIdx, taskIdx })}
-                      />
-                      <Cell
-                        label="知識 K"
-                        filled={count(block?.knowledge) > 0}
-                        n={count(block?.knowledge)}
-                        onClick={() => onCell({ kind: "k", unitIdx, taskIdx })}
-                      />
-                      <Cell
-                        label="技能 S"
-                        filled={count(block?.skills) > 0}
-                        n={count(block?.skills)}
-                        onClick={() => onCell({ kind: "s", unitIdx, taskIdx })}
-                      />
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        ))
+          </SortableContext>
+        </DndContext>
       )}
+
+      <button
+        type="button"
+        className="inline-flex items-center gap-1 rounded-md border border-dashed px-3 py-2 text-sm text-muted-foreground hover:text-foreground"
+        onClick={() => onChange(addUnit(document))}
+      >
+        <Plus className="h-4 w-4" />
+        新增職責
+      </button>
 
       {/* 全域態度 A */}
       <div className="rounded-lg border bg-background p-4">
         <div className="flex items-center gap-3">
           <span className="text-sm font-medium">全域態度 A</span>
-          <Cell
-            label="態度 A"
-            filled={attitudes.length > 0}
-            n={attitudes.length}
-            onClick={() => onCell({ kind: "a" })}
-          />
+          <Cell label="態度 A" filled={attitudes.length > 0} n={attitudes.length} onClick={() => onCell({ kind: "a" })} />
         </div>
       </div>
 
@@ -169,9 +335,7 @@ export function JobDocTable({
             <div className="mb-2">
               <p className="mb-1 font-medium text-foreground">學經歷/能力建議</p>
               <ul className="list-disc space-y-0.5 pl-4">
-                {notes.prerequisites.map((p, i) => (
-                  <li key={i}>{p}</li>
-                ))}
+                {notes.prerequisites.map((p, i) => <li key={i}>{p}</li>)}
               </ul>
             </div>
           ) : null}
@@ -179,9 +343,7 @@ export function JobDocTable({
             <div>
               <p className="mb-1 font-medium text-foreground">補充說明</p>
               <ul className="list-disc space-y-0.5 pl-4">
-                {notes.supplements.map((s, i) => (
-                  <li key={i}>{s}</li>
-                ))}
+                {notes.supplements.map((s, i) => <li key={i}>{s}</li>)}
               </ul>
             </div>
           ) : null}

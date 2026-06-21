@@ -51,11 +51,13 @@ export interface CompetencyBlock {
 export interface OcsTask {
   task_codes: CodeName[];
   competency_blocks: CompetencyBlock[];
+  provenance?: { ocs_code: string; task_id: string };
 }
 
 export interface OcuUnit {
   ocu_code: string;
   ocu_name: string;
+  source?: { ocs_code: string; occupation_name: string };
   tasks: OcsTask[];
 }
 
@@ -103,4 +105,33 @@ export interface KsaPool {
 export interface OcsSearchHit {
   ocs_code: string;
   job_title: string;
+}
+
+// 選任務候選（task-candidates）：依職類 → 職責(unit) 分組。
+export interface CandidateTask {
+  task_id: string;
+  task_title: string;
+}
+export interface CandidateUnit {
+  unit_id: string;
+  unit_title: string;
+  tasks: CandidateTask[];
+}
+export interface CandidateGroup {
+  ocs_code: string;
+  occupation_name: string;
+  units: CandidateUnit[];
+}
+export interface TaskCandidates {
+  groups: CandidateGroup[];
+}
+
+// build-tasks 送出的一筆勾選任務。unit_title 留白＝cherry-pick（職責名讓使用者填）。
+export interface PickedTask {
+  ocs_code: string;
+  unit_id: string;
+  unit_title: string;
+  occupation_name: string;
+  task_id: string;
+  task_name: string;
 }

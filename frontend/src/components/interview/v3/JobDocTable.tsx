@@ -247,22 +247,32 @@ export function JobDocTable({
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
 
+  // 把 id 正規化成 {u, t}（t<0 表示這是職責本身/某職責容器）。
+  const resolve = (id: string): { u: number; t: number } | null => {
+    if (id.startsWith("unit:")) return { u: Number(id.slice(5)), t: -1 };
+    if (id.startsWith("task:")) {
+      const [, u, t] = id.split(":");
+      return { u: Number(u), t: Number(t) };
+    }
+    return null;
+  };
+
   const onDragEnd = (e: DragEndEvent) => {
     const a = String(e.active.id);
-    const o = e.over ? String(e.over.id) : "";
-    if (!o || a === o) return;
-    if (a.startsWith("unit:") && o.startsWith("unit:")) {
-      onChange(reorderUnits(document, Number(a.slice(5)), Number(o.slice(5))));
+    const A = resolve(a);
+    const O = e.over ? resolve(String(e.over.id)) : null;
+    if (!A || !O) return;
+
+    if (a.startsWith("unit:")) {
+      // 拖職責：不論 over 是職責或其底下任務，都換算成該任務所屬職責來重排。
+      if (A.u !== O.u) onChange(reorderUnits(document, A.u, O.u));
       return;
     }
-    if (a.startsWith("task:")) {
-      const [, fu, ft] = a.split(":");
-      if (o.startsWith("task:")) {
-        const [, tu, tt] = o.split(":");
-        onChange(relocateTask(document, Number(fu), Number(ft), Number(tu), Number(tt)));
-      } else if (o.startsWith("unit:")) {
-        onChange(relocateTask(document, Number(fu), Number(ft), Number(o.slice(5)), -1));
-      }
+    // 拖任務：over 是任務→精準插入；是職責容器→接到該職責尾端。
+    if (O.t >= 0) {
+      onChange(relocateTask(document, A.u, A.t, O.u, O.t));
+    } else {
+      onChange(relocateTask(document, A.u, A.t, O.u, -1));
     }
   };
 

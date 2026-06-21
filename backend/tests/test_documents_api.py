@@ -328,6 +328,23 @@ async def test_set_occupations(client, db_session):
 
 
 @pytest.mark.asyncio
+async def test_set_occupations_refreshes_stale_draft_header(client):
+    # repro: an empty draft (no ocs_code) exists before 選職類 → occupations must
+    # refresh the draft header so 選任務 (FE gates on ocs_code) becomes enabled.
+    p = await _mk_profile(client._db)
+    await client.patch(
+        f"/api/v1/job-profiles/{p.id}/document",
+        json={"ocs_content": {"ocu_units": []}, "ocs_profile": {"ocs_code": ""}},
+    )
+    r = await client.post(
+        f"/api/v1/job-profiles/{p.id}/occupations", json={"ocs_codes": ["OC1"]}
+    )
+    assert r.status_code == 200, r.text
+    g = await client.get(f"/api/v1/job-profiles/{p.id}/document")
+    assert g.json()["content"]["ocs_profile"]["ocs_code"] == "OC1"
+
+
+@pytest.mark.asyncio
 async def test_set_occupations_empty_400(client):
     p = await _mk_profile(client._db)
     r = await client.post(

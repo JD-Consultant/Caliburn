@@ -181,7 +181,7 @@ function UnitRow({
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
   const style = { transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.5 : 1 };
   const tasks = unit.tasks ?? [];
-  const taskIds = tasks.map((_, ti) => `task:${unitIdx}:${ti}`);
+  const taskIds = tasks.map((t) => `t:${t._tid}`);
 
   return (
     <div ref={setNodeRef} style={style} className="rounded-lg border bg-background">
@@ -207,8 +207,8 @@ function UnitRow({
         <SortableContext items={taskIds} strategy={verticalListSortingStrategy}>
           {tasks.map((task, ti) => (
             <TaskRow
-              key={`task:${unitIdx}:${ti}`}
-              id={`task:${unitIdx}:${ti}`}
+              key={task._tid}
+              id={`t:${task._tid}`}
               task={task}
               unitIdx={unitIdx}
               taskIdx={ti}
@@ -243,16 +243,22 @@ export function JobDocTable({
   const units = document.ocs_content?.ocu_units ?? [];
   const attitudes = document.ocs_attitude?.attitudes ?? [];
   const notes = document.notes;
-  const unitIds = units.map((_, ui) => `unit:${ui}`);
+  const unitIds = units.map((u) => `u:${u._uid}`);
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
 
-  // 把 id 正規化成 {u, t}（t<0 表示這是職責本身/某職責容器）。
+  // 由穩定 id（u:<uid> / t:<tid>）查出目前索引。t<0 表示這是職責本身/容器。
   const resolve = (id: string): { u: number; t: number } | null => {
-    if (id.startsWith("unit:")) return { u: Number(id.slice(5)), t: -1 };
-    if (id.startsWith("task:")) {
-      const [, u, t] = id.split(":");
-      return { u: Number(u), t: Number(t) };
+    if (id.startsWith("u:")) {
+      const u = units.findIndex((x) => x._uid === id.slice(2));
+      return u < 0 ? null : { u, t: -1 };
+    }
+    if (id.startsWith("t:")) {
+      const tid = id.slice(2);
+      for (let u = 0; u < units.length; u++) {
+        const t = (units[u].tasks ?? []).findIndex((x) => x._tid === tid);
+        if (t >= 0) return { u, t };
+      }
     }
     return null;
   };
@@ -263,7 +269,7 @@ export function JobDocTable({
     const O = e.over ? resolve(String(e.over.id)) : null;
     if (!A || !O) return;
 
-    if (a.startsWith("unit:")) {
+    if (a.startsWith("u:")) {
       // 拖職責：不論 over 是職責或其底下任務，都換算成該任務所屬職責來重排。
       if (A.u !== O.u) onChange(reorderUnits(document, A.u, O.u));
       return;
@@ -292,8 +298,8 @@ export function JobDocTable({
             <div className="space-y-4">
               {units.map((unit, ui) => (
                 <UnitRow
-                  key={`unit:${ui}`}
-                  id={`unit:${ui}`}
+                  key={unit._uid}
+                  id={`u:${unit._uid}`}
                   unit={unit}
                   unitIdx={ui}
                   onCell={onCell}

@@ -3,7 +3,7 @@
 // D27 文件即工作台。表格優先：一進來就是（可能空的）職務說明書表格，頂部
 // 〔選職類〕〔選任務〕入口。所有編輯（選職類/選任務/改名/增刪/拖拉/填格）→ PATCH
 // draft（自動儲存）。續做＝重開自動載 draft。finalize 產正式版本。不碰 CopilotKit。
-import { use, useState } from "react";
+import { use, useMemo, useState } from "react";
 import Link from "next/link";
 import { ChevronLeft, FileCheck2, Layers, ListChecks } from "lucide-react";
 import { useProfile } from "@/hooks/useProfiles";
@@ -12,7 +12,7 @@ import { JobDocTable, type CellTarget } from "@/components/interview/v3/JobDocTa
 import { CellFillerPanel } from "@/components/interview/v3/CellFillerPanel";
 import { OccupationPicker } from "@/components/interview/v3/OccupationPicker";
 import { TaskCuratePanel } from "@/components/interview/v3/TaskCuratePanel";
-import { completion } from "@/lib/ocsDoc";
+import { completion, ensureIds } from "@/lib/ocsDoc";
 import type { KsaPool, OcsDocument } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -28,7 +28,8 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
   const { id } = use(params);
   const { data: profile } = useProfile(id);
   const { data: envelope, isLoading } = useDocument(id);
-  const doc: OcsDocument | undefined = envelope?.content;
+  // 補上穩定 id（拖拉用）；memo 讓 id 在重繪間穩定，編輯時 clone 會保留。
+  const doc: OcsDocument | undefined = useMemo(() => ensureIds(envelope?.content), [envelope]);
   const status = envelope?.status ?? "none";
   const hasOccupations = !!doc?.ocs_profile?.ocs_code;
   const { data: pool } = useKsaPool(id, hasOccupations);

@@ -30,6 +30,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { Badge } from "@/components/ui/badge";
 import { DocHeader } from "./DocHeader";
+import { DocNotes } from "./DocNotes";
 import { Check, GripVertical, Pencil, Plus, Trash2 } from "lucide-react";
 
 export type CellKind = "o" | "p" | "k" | "s";
@@ -242,7 +243,6 @@ export function JobDocTable({
 }) {
   const units = document.ocs_content?.ocu_units ?? [];
   const attitudes = document.ocs_attitude?.attitudes ?? [];
-  const notes = document.notes;
   const unitIds = units.map((u) => `u:${u._uid}`);
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
@@ -321,35 +321,35 @@ export function JobDocTable({
         新增職責
       </button>
 
-      {/* 全域態度 A */}
+      {/* 職能內涵（A=attitude 態度） */}
       <div className="rounded-lg border bg-background p-4">
-        <div className="flex items-center gap-3">
-          <span className="text-sm font-medium">全域態度 A</span>
-          <Cell label="態度 A" filled={attitudes.length > 0} n={attitudes.length} onClick={() => onCell({ kind: "a" })} />
+        <div className="mb-2 flex items-center justify-between">
+          <span className="text-sm font-medium">職能內涵（A=attitude 態度）</span>
+          <button
+            type="button"
+            className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-xs text-muted-foreground hover:text-foreground"
+            onClick={() => onCell({ kind: "a" })}
+          >
+            <Pencil className="h-3 w-3" />
+            {attitudes.length > 0 ? "編輯" : "點此填"}
+          </button>
         </div>
+        {attitudes.length > 0 ? (
+          <ul className="space-y-1 text-sm">
+            {attitudes.map((a, i) => (
+              <li key={`${a.code || a.name}-${i}`} className="flex gap-2">
+                {a.code ? <span className="shrink-0 font-mono text-xs text-muted-foreground">{a.code}</span> : null}
+                <span>{a.name}</span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-xs text-muted-foreground">尚未選擇態度。</p>
+        )}
       </div>
 
-      {/* 說明（唯讀） */}
-      {notes && (notes.prerequisites?.length || notes.supplements?.length) ? (
-        <div className="rounded-lg border bg-background p-4 text-xs text-muted-foreground">
-          {notes.prerequisites?.length ? (
-            <div className="mb-2">
-              <p className="mb-1 font-medium text-foreground">學經歷/能力建議</p>
-              <ul className="list-disc space-y-0.5 pl-4">
-                {notes.prerequisites.map((p, i) => <li key={i}>{p}</li>)}
-              </ul>
-            </div>
-          ) : null}
-          {notes.supplements?.length ? (
-            <div>
-              <p className="mb-1 font-medium text-foreground">補充說明</p>
-              <ul className="list-disc space-y-0.5 pl-4">
-                {notes.supplements.map((s, i) => <li key={i}>{s}</li>)}
-              </ul>
-            </div>
-          ) : null}
-        </div>
-      ) : null}
+      {/* 說明與補充事項（可編輯） */}
+      <DocNotes document={document} onChange={onChange} />
     </div>
   );
 }

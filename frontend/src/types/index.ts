@@ -99,3 +99,8 @@ export interface KsaPool {
   skills: CodeName[];
   attitudes: CodeName[];
 }
+
+export interface OcsSearchHit {
+  ocs_code: string;
+  job_title: string;
+}

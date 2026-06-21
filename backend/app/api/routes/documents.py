@@ -122,6 +122,29 @@ async def seed_document(
     return await DocRepo(db).upsert_draft(profile_id, doc)
 
 
+@router.get("/{profile_id}/ocs-search")
+async def ocs_search(
+    profile_id: UUID,
+    q: str,
+    db: AsyncSession = Depends(get_db),
+    knowledge: KnowledgeClient = Depends(get_knowledge),
+):
+    """職類層搜尋（seed 用）：回 [{ocs_code, job_title}]，依 ocs_code 去重保序。"""
+    await _require_profile(profile_id, db)
+    if not q.strip():
+        return {"hits": []}
+    try:
+        res = await knowledge.search(q, level="profile", top_k=8)
+    except Exception:
+        logger.warning("ocs-search indexer query failed", exc_info=True)
+        raise HTTPException(status_code=502, detail="indexer unavailable")
+    seen: dict[str, dict] = {}
+    for h in res.hits:
+        if h.ocs_code and h.ocs_code not in seen:
+            seen[h.ocs_code] = {"ocs_code": h.ocs_code, "job_title": h.job_title or h.ocs_code}
+    return {"hits": list(seen.values())}
+
+
 @router.get("/{profile_id}/ksa-pool")
 async def get_ksa_pool(
     profile_id: UUID,

@@ -39,6 +39,60 @@ function move<T>(arr: T[], idx: number, dir: -1 | 1): void {
   [arr[idx], arr[j]] = [arr[j], arr[idx]];
 }
 
+// ── 表頭(ocs_profile) 編輯 ────────────────────────────────────────────────────
+export type CatKind = "job_categories" | "occupations" | "industries";
+
+export function setProfileField(
+  doc: OcsDocument,
+  key: "ocs_code" | "job_description",
+  value: string,
+): OcsDocument {
+  const next = clone(doc);
+  next.ocs_profile[key] = value;
+  return next;
+}
+
+export function setOcsLevel(doc: OcsDocument, value: string): OcsDocument {
+  const next = clone(doc);
+  const n = parseInt(value, 10);
+  next.ocs_profile.ocs_level = Number.isFinite(n) ? n : null;
+  return next;
+}
+
+export function setOcsName(
+  doc: OcsDocument,
+  key: "job_category_name" | "occupation_name",
+  value: string,
+): OcsDocument {
+  const next = clone(doc);
+  next.ocs_profile.ocs_name[key] = value;
+  return next;
+}
+
+export function updateCategory(
+  doc: OcsDocument,
+  kind: CatKind,
+  idx: number,
+  field: "name" | "code",
+  value: string,
+): OcsDocument {
+  const next = clone(doc);
+  next.ocs_profile.category[kind][idx][field] = value;
+  return next;
+}
+
+export function addCategory(doc: OcsDocument, kind: CatKind): OcsDocument {
+  const next = clone(doc);
+  next.ocs_profile.category[kind].push({ name: "", code: "" });
+  return next;
+}
+
+export function deleteCategory(doc: OcsDocument, kind: CatKind, idx: number): OcsDocument {
+  const next = clone(doc);
+  next.ocs_profile.category[kind].splice(idx, 1);
+  return next;
+}
+
 // ── 職責(unit) 層編輯 ─────────────────────────────────────────────────────────
 export function addUnit(doc: OcsDocument): OcsDocument {
   const next = clone(doc);

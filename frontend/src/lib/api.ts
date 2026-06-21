@@ -1,7 +1,13 @@
 // v3 API client. Talks to the live AG-UI app (copilotkit_live_app) on 8001,
 // which now mounts users + job_profiles CRUD under /api/v1. Legacy interview /
 // tasks / documents endpoints were removed with the old backend (Concern B).
-import type { JobProfile, User } from "@/types";
+import type {
+  DocumentEnvelope,
+  JobProfile,
+  KsaPool,
+  OcsDocument,
+  User,
+} from "@/types";
 
 const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8001";
 
@@ -43,3 +49,30 @@ export const createProfile = (
 
 export const deleteProfile = (profileId: string) =>
   request<void>(`/job-profiles/${profileId}`, { method: "DELETE" });
+
+// ── OCS document worktable (D27) ─────────────────────────────────────────────
+// GET 無文件時回空殼（status:"none", version:0）。PATCH body = 整份 OCS 文件，
+// 存成/更新 draft。finalize 組裝+驗 schema（失敗 422）。seed 用已選 ocs_codes
+// 產骨架。ksa-pool 為 catalog 候選池（indexer 掛則回空池）。
+export const getDocument = (profileId: string) =>
+  request<DocumentEnvelope>(`/job-profiles/${profileId}/document`);
+
+export const patchDocument = (profileId: string, content: OcsDocument) =>
+  request<DocumentEnvelope>(`/job-profiles/${profileId}/document`, {
+    method: "PATCH",
+    body: JSON.stringify(content),
+  });
+
+export const finalizeDocument = (profileId: string) =>
+  request<DocumentEnvelope>(`/job-profiles/${profileId}/document/finalize`, {
+    method: "POST",
+  });
+
+export const seedDocument = (profileId: string, ocsCodes: string[]) =>
+  request<DocumentEnvelope>(`/job-profiles/${profileId}/seed`, {
+    method: "POST",
+    body: JSON.stringify({ ocs_codes: ocsCodes }),
+  });
+
+export const getKsaPool = (profileId: string) =>
+  request<KsaPool>(`/job-profiles/${profileId}/ksa-pool`);

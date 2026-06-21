@@ -84,7 +84,11 @@ def skeleton(profile: dict, units_tasks: list[dict]) -> dict:
                 "ocu_code": f"T{u}",
                 # blank when 職責 not adopted (cherry-picked task) → user names it.
                 "ocu_name": first.get("unit_title") or "",
-                "source": {"ocs_code": key[0], "occupation_name": first.get("occupation_name") or ""},
+                "source": {
+                    "ocs_code": key[0],
+                    "unit_id": key[1],
+                    "occupation_name": first.get("occupation_name") or "",
+                },
                 "tasks": ocu_tasks,
             }
         )
@@ -104,53 +108,65 @@ def skeleton(profile: dict, units_tasks: list[dict]) -> dict:
     }
 
 
-def build_from_picked(profile: dict, picked: list[dict], prev: dict | None = None) -> dict:
-    """Build a curated doc from the picked task list, preserving already-filled
-    cells (matched by provenance ocs_code+task_id) and any custom tasks from
-    ``prev``. Re-running 選任務 therefore never wipes work in progress."""
-    doc = skeleton(profile, picked)
-    if not prev:
-        return doc
+def _renumber(doc: dict) -> dict:
+    """Resequence 職責 T1,T2… and 任務 T{u}.{t}; names/blocks/provenance untouched."""
+    for u, unit in enumerate(doc["ocs_content"]["ocu_units"], start=1):
+        unit["ocu_code"] = f"T{u}"
+        for t, task in enumerate(unit.get("tasks") or [], start=1):
+            tcs = task.get("task_codes") or [{"code": "", "name": ""}]
+            tcs[0]["code"] = f"T{u}.{t}"
+            task["task_codes"] = tcs
+    return doc
 
-    # Index prev catalog tasks by provenance → their filled blocks.
-    filled: dict[tuple, list] = {}
-    custom: list[dict] = []
-    for unit in (prev.get("ocs_content") or {}).get("ocu_units") or []:
+
+def build_from_picked(profile: dict, picked: list[dict], prev: dict | None = None) -> dict:
+    """ADDITIVE 選任務：保留 prev 全部任務（含已填/自訂/使用者編輯），只「加」picked
+    中尚未存在（依 provenance ocs_code+task_id）的任務。新任務若來源職責
+    (ocs_code+unit_id) 已在文件 → 併入該職責；否則新增職責（名稱依 adopt：
+    picked.unit_title 有值＝採用整組保留名，留白＝cherry-pick）。"""
+    if not prev or not ((prev.get("ocs_content") or {}).get("ocu_units")):
+        return skeleton(profile, picked)
+
+    doc = copy.deepcopy(prev)
+    units = doc["ocs_content"]["ocu_units"]
+
+    existing: set[tuple] = set()
+    for unit in units:
         for task in unit.get("tasks") or []:
             p = task.get("provenance") or {}
-            k = (p.get("ocs_code") or "", p.get("task_id") or "")
-            if k != ("", ""):
-                filled[k] = task.get("competency_blocks") or []
-            elif task.get("competency_blocks") and any(
-                b.get(f) for b in task["competency_blocks"]
-                for f in ("indicators", "outputs", "knowledge", "skills")
-            ):
-                custom.append(copy.deepcopy(task))  # user-added task with content
+            existing.add((p.get("ocs_code") or "", p.get("task_id") or ""))
 
-    for unit in doc["ocs_content"]["ocu_units"]:
-        for task in unit["tasks"]:
-            p = task["provenance"]
-            k = (p["ocs_code"], p["task_id"])
-            if filled.get(k):
-                task["competency_blocks"] = copy.deepcopy(filled[k])
+    for it in picked:
+        ref = it.get("indexer_ref") or {}
+        oc = ref.get("ocs_code") or ""
+        tid = ref.get("task_id") or ""
+        key = (oc, tid)
+        if key in existing:
+            continue
+        existing.add(key)
+        uid = it.get("unit_id") or ""
+        target = None
+        for unit in units:
+            src = unit.get("source") or {}
+            if uid and src.get("ocs_code") == oc and src.get("unit_id") == uid:
+                target = unit
+                break
+        if target is None:
+            target = {
+                "ocu_code": "",
+                "ocu_name": it.get("unit_title") or "",  # blank = cherry-pick
+                "source": {"ocs_code": oc, "unit_id": uid,
+                           "occupation_name": it.get("occupation_name") or ""},
+                "tasks": [],
+            }
+            units.append(target)
+        target["tasks"].append({
+            "task_codes": [{"code": "", "name": it.get("task_name", "")}],
+            "competency_blocks": [_empty_block()],
+            "provenance": {"ocs_code": oc, "task_id": tid},
+        })
 
-    # Carry forward custom tasks (no catalog provenance) into a trailing unit.
-    if custom:
-        n = len(doc["ocs_content"]["ocu_units"]) + 1
-        for t, task in enumerate(custom, start=1):
-            task["task_codes"] = [
-                {"code": f"T{n}.{t}", "name": (task.get("task_codes") or [{}])[0].get("name", "")}
-            ]
-            task.setdefault("provenance", {"ocs_code": "", "task_id": ""})
-        doc["ocs_content"]["ocu_units"].append(
-            {"ocu_code": f"T{n}", "ocu_name": "自訂任務",
-             "source": {"ocs_code": "", "occupation_name": ""}, "tasks": custom}
-        )
-
-    # Preserve global edits.
-    doc["ocs_attitude"] = prev.get("ocs_attitude") or doc["ocs_attitude"]
-    doc["notes"] = prev.get("notes") or doc["notes"]
-    return doc
+    return _renumber(doc)
 
 
 def assemble_final(draft: dict) -> dict:

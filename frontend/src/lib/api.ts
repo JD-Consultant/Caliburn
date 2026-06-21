@@ -7,6 +7,8 @@ import type {
   KsaPool,
   OcsDocument,
   OcsSearchHit,
+  PickedTask,
+  TaskCandidates,
   User,
 } from "@/types";
 
@@ -69,10 +71,22 @@ export const finalizeDocument = (profileId: string) =>
     method: "POST",
   });
 
-export const seedDocument = (profileId: string, ocsCodes: string[]) =>
-  request<DocumentEnvelope>(`/job-profiles/${profileId}/seed`, {
+// 選職類：設定 selected_ocs_codes（順序=優先度）。
+export const setOccupations = (profileId: string, ocsCodes: string[]) =>
+  request<{ ocs_codes: string[] }>(`/job-profiles/${profileId}/occupations`, {
     method: "POST",
     body: JSON.stringify({ ocs_codes: ocsCodes }),
+  });
+
+// 選任務候選（已選職類的所有任務，依職責分組）。
+export const getTaskCandidates = (profileId: string) =>
+  request<TaskCandidates>(`/job-profiles/${profileId}/task-candidates`);
+
+// 用勾選的任務建/更新文件（遞進重編、保留已填）。
+export const buildTasks = (profileId: string, picked: PickedTask[]) =>
+  request<DocumentEnvelope>(`/job-profiles/${profileId}/build-tasks`, {
+    method: "POST",
+    body: JSON.stringify({ picked }),
   });
 
 export const getKsaPool = (profileId: string) =>

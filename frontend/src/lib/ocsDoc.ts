@@ -1,10 +1,128 @@
 // D27 OCS 文件的就地（immutable）更新與完成度計算。每任務一個 competency_block
 // → 都讀寫 competency_blocks[0]。完成度公式對齊後端 compute_completion：
 // filled = 1(表頭) + (A?1:0) + Σ_task[(O>0)+(P>0)+(K>0)+(S>0)]；total = 4*任務數 + 2。
-import type { CodeName, CompetencyBlock, Indicator, OcsDocument } from "@/types";
+import type { CodeName, CompetencyBlock, Indicator, OcsDocument, OcsTask, OcuUnit } from "@/types";
 
 function clone(doc: OcsDocument): OcsDocument {
   return structuredClone(doc);
+}
+
+function emptyBlock(): CompetencyBlock {
+  return { competency_level: null, indicators: [], outputs: [], knowledge: [], skills: [] };
+}
+
+function emptyTask(): OcsTask {
+  return {
+    task_codes: [{ code: "", name: "" }],
+    competency_blocks: [emptyBlock()],
+    provenance: { ocs_code: "", task_id: "" },
+  };
+}
+
+// 結構變動後重新遞進編號：職責 T1,T2…；任務 T{u}.{t}。名稱/區塊/provenance 不動。
+function renumber(doc: OcsDocument): OcsDocument {
+  const units = doc.ocs_content?.ocu_units ?? [];
+  units.forEach((u, ui) => {
+    u.ocu_code = `T${ui + 1}`;
+    (u.tasks ?? []).forEach((t, ti) => {
+      const tc = t.task_codes?.[0] ?? { code: "", name: "" };
+      tc.code = `T${ui + 1}.${ti + 1}`;
+      t.task_codes = [tc, ...(t.task_codes ?? []).slice(1)];
+    });
+  });
+  return doc;
+}
+
+function move<T>(arr: T[], idx: number, dir: -1 | 1): void {
+  const j = idx + dir;
+  if (j < 0 || j >= arr.length) return;
+  [arr[idx], arr[j]] = [arr[j], arr[idx]];
+}
+
+// ── 職責(unit) 層編輯 ─────────────────────────────────────────────────────────
+export function addUnit(doc: OcsDocument): OcsDocument {
+  const next = clone(doc);
+  next.ocs_content.ocu_units.push({
+    ocu_code: "",
+    ocu_name: "",
+    source: { ocs_code: "", occupation_name: "" },
+    tasks: [],
+  } as OcuUnit);
+  return renumber(next);
+}
+
+export function deleteUnit(doc: OcsDocument, ui: number): OcsDocument {
+  const next = clone(doc);
+  next.ocs_content.ocu_units.splice(ui, 1);
+  return renumber(next);
+}
+
+export function renameUnit(doc: OcsDocument, ui: number, name: string): OcsDocument {
+  const next = clone(doc);
+  next.ocs_content.ocu_units[ui].ocu_name = name;
+  return next;
+}
+
+export function moveUnit(doc: OcsDocument, ui: number, dir: -1 | 1): OcsDocument {
+  const next = clone(doc);
+  move(next.ocs_content.ocu_units, ui, dir);
+  return renumber(next);
+}
+
+// ── 任務(task) 層編輯 ─────────────────────────────────────────────────────────
+export function addTask(doc: OcsDocument, ui: number): OcsDocument {
+  const next = clone(doc);
+  next.ocs_content.ocu_units[ui].tasks.push(emptyTask());
+  return renumber(next);
+}
+
+export function deleteTask(doc: OcsDocument, ui: number, ti: number): OcsDocument {
+  const next = clone(doc);
+  next.ocs_content.ocu_units[ui].tasks.splice(ti, 1);
+  return renumber(next);
+}
+
+export function renameTask(doc: OcsDocument, ui: number, ti: number, name: string): OcsDocument {
+  const next = clone(doc);
+  const tc = next.ocs_content.ocu_units[ui].tasks[ti].task_codes?.[0] ?? { code: "", name: "" };
+  tc.name = name;
+  next.ocs_content.ocu_units[ui].tasks[ti].task_codes = [tc];
+  return next;
+}
+
+export function moveTask(doc: OcsDocument, ui: number, ti: number, dir: -1 | 1): OcsDocument {
+  const next = clone(doc);
+  move(next.ocs_content.ocu_units[ui].tasks, ti, dir);
+  return renumber(next);
+}
+
+// ── 拖拉用：任意位置搬移 ──────────────────────────────────────────────────────
+export function reorderUnits(doc: OcsDocument, from: number, to: number): OcsDocument {
+  const next = clone(doc);
+  const units = next.ocs_content.ocu_units;
+  if (from < 0 || from >= units.length || to < 0 || to >= units.length || from === to) return next;
+  const [u] = units.splice(from, 1);
+  units.splice(to, 0, u);
+  return renumber(next);
+}
+
+// 把任務從 (fromUi,fromTi) 搬到 toUi 的 toIndex（toIndex<0 = 接到該職責尾端）。
+export function relocateTask(
+  doc: OcsDocument,
+  fromUi: number,
+  fromTi: number,
+  toUi: number,
+  toIndex: number,
+): OcsDocument {
+  const next = clone(doc);
+  const units = next.ocs_content.ocu_units;
+  if (!units[fromUi] || !units[toUi]) return next;
+  const [task] = units[fromUi].tasks.splice(fromTi, 1);
+  if (!task) return next;
+  const dest = units[toUi].tasks;
+  const idx = toIndex < 0 || toIndex > dest.length ? dest.length : toIndex;
+  dest.splice(idx, 0, task);
+  return renumber(next);
 }
 
 function ensureBlock(doc: OcsDocument, unitIdx: number, taskIdx: number): CompetencyBlock {

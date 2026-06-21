@@ -417,6 +417,24 @@ async def test_build_tasks_preserves_filled_on_rebuild(client):
 
 
 @pytest.mark.asyncio
+async def test_build_tasks_additive_adds_without_removing(client):
+    p = await _mk_profile(client._db, codes=["OC1"])
+    # first build: only T1.1
+    r1 = await client.post(
+        f"/api/v1/job-profiles/{p.id}/build-tasks", json={"picked": [_picked()[0]]}
+    )
+    u1 = r1.json()["content"]["ocs_content"]["ocu_units"]
+    assert [t["task_codes"][0]["code"] for t in u1[0]["tasks"]] == ["T1.1"]
+    # second build: only T1.2 → additive: keeps T1.1, adds T1.2 into same unit
+    r2 = await client.post(
+        f"/api/v1/job-profiles/{p.id}/build-tasks", json={"picked": [_picked()[1]]}
+    )
+    units = r2.json()["content"]["ocs_content"]["ocu_units"]
+    assert len(units) == 1  # merged into the same 職責 (same ocs_code+unit_id)
+    assert [t["task_codes"][0]["code"] for t in units[0]["tasks"]] == ["T1.1", "T1.2"]
+
+
+@pytest.mark.asyncio
 async def test_build_tasks_missing_profile_404(client):
     r = await client.post(
         f"/api/v1/job-profiles/{uuid4()}/build-tasks", json={"picked": _picked()}

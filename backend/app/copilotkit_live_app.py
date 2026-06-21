@@ -7,7 +7,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from ag_ui_langgraph import add_langgraph_fastapi_endpoint
 
-from app.api.routes import job_profiles, users
+from app.api.routes import documents, job_profiles, users
 from app.config import settings
 from app.graph_v3.checkpointer import open_pg_checkpointer
 from app.graph_v3.serving import build_live_agent, build_live_deps
@@ -35,10 +35,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# v3 CRUD（dashboard/新增職務用）：只掛 users + job_profiles，
-# 不掛舊 documents/tasks/interviews 路由（綁已移除的 graph_state，屬舊架構）。
+# v3 CRUD（dashboard/新增職務用）+ D27 文件即工作台 REST（documents：
+# GET/PATCH/finalize/seed/ksa-pool）。documents 為 D27 重寫版（非舊 graph_state 路由）。
 app.include_router(users.router, prefix="/api/v1")
 app.include_router(job_profiles.router, prefix="/api/v1")
+app.include_router(documents.router, prefix="/api/v1")
 
 
 @app.get("/healthz")

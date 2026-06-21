@@ -1,7 +1,13 @@
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
+
+// SSR-safe hydration guard. Server snapshot = false (matches SSR markup), client
+// snapshot = true; React swaps after hydration. Avoids setState-in-effect.
+const emptySubscribe = () => () => {};
 
 export function useHydrated() {
-  const [hydrated, setHydrated] = useState(false);
-  useEffect(() => setHydrated(true), []);
-  return hydrated;
+  return useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false,
+  );
 }

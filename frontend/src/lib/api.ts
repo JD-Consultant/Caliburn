@@ -6,6 +6,7 @@ import type {
   JobProfile,
   KsaPool,
   OcsDocument,
+  OcsSearchHit,
   User,
 } from "@/types";
 
@@ -76,3 +77,8 @@ export const seedDocument = (profileId: string, ocsCodes: string[]) =>
 
 export const getKsaPool = (profileId: string) =>
   request<KsaPool>(`/job-profiles/${profileId}/ksa-pool`);
+
+export const ocsSearch = (profileId: string, q: string) =>
+  request<{ hits: OcsSearchHit[] }>(
+    `/job-profiles/${profileId}/ocs-search?q=${encodeURIComponent(q)}`,
+  );

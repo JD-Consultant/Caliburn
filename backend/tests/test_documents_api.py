@@ -15,18 +15,21 @@ from app.main import app
 from app.models import JobProfile, User
 from app.services import ocs_doc
 from app.services.knowledge.models import (
+    Hit,
     Pair,
     Pairs,
     PoolGroup,
     PoolTask,
     PoolUnit,
+    SearchResult,
     TaskPool,
 )
 
 
 class StubKnowledge:
-    def __init__(self, pairs_map=None, fail=False, pool=None):
+    def __init__(self, pairs_map=None, fail=False, pool=None, hits=None):
         self.pairs_map, self.fail, self.pool = pairs_map or {}, fail, pool
+        self.hits = hits or []
 
     async def pairs(self, ocs_code):
         if self.fail:
@@ -37,6 +40,11 @@ class StubKnowledge:
         if self.fail:
             raise RuntimeError("indexer down")
         return self.pool if self.pool is not None else TaskPool()
+
+    async def search(self, query, *, level=None, hybrid=True, top_k=10):
+        if self.fail:
+            raise RuntimeError("indexer down")
+        return SearchResult(hits=self.hits)
 
 
 def _mk_pool():
@@ -211,6 +219,42 @@ async def test_ksa_pool_happy(client):
     assert body["knowledge"][0]["code"] == "K01"
     assert body["skills"][0]["code"] == "S01"
     assert body["attitudes"][0]["code"] == "A01"
+
+
+@pytest.mark.asyncio
+async def test_ocs_search_dedupes_by_code(client):
+    p = await _mk_profile(client._db)
+    app.dependency_overrides[get_knowledge] = lambda: StubKnowledge(
+        hits=[
+            Hit(id="1", ocs_code="OC1", job_title="AIoT 應用工程師"),
+            Hit(id="2", ocs_code="OC1", job_title="dup chunk"),
+            Hit(id="3", ocs_code="OC2", job_title="資料工程師"),
+        ]
+    )
+    r = await client.get(f"/api/v1/job-profiles/{p.id}/ocs-search?q=AIoT")
+    assert r.status_code == 200, r.text
+    hits = r.json()["hits"]
+    assert [h["ocs_code"] for h in hits] == ["OC1", "OC2"]
+    assert hits[0]["job_title"] == "AIoT 應用工程師"
+
+
+@pytest.mark.asyncio
+async def test_ocs_search_blank_query_empty(client):
+    p = await _mk_profile(client._db)
+    app.dependency_overrides[get_knowledge] = lambda: StubKnowledge(
+        hits=[Hit(id="1", ocs_code="OC1", job_title="x")]
+    )
+    r = await client.get(f"/api/v1/job-profiles/{p.id}/ocs-search?q=   ")
+    assert r.status_code == 200, r.text
+    assert r.json()["hits"] == []
+
+
+@pytest.mark.asyncio
+async def test_ocs_search_indexer_down_502(client):
+    p = await _mk_profile(client._db)
+    app.dependency_overrides[get_knowledge] = lambda: StubKnowledge(fail=True)
+    r = await client.get(f"/api/v1/job-profiles/{p.id}/ocs-search?q=AIoT")
+    assert r.status_code == 502, r.text
 
 
 @pytest.mark.asyncio

@@ -12,6 +12,25 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Trash2, ChevronRight, BriefcaseIcon } from "lucide-react";
+import type { DocStatus } from "@/types";
+
+function DocStatusBadge({ status, completion }: { status: DocStatus; completion: number }) {
+  if (status === "final") {
+    return <Badge className="bg-emerald-600 text-xs hover:bg-emerald-600">已完成</Badge>;
+  }
+  if (status === "draft") {
+    return (
+      <Badge variant="secondary" className="text-xs">
+        進行中 {Math.round(completion * 100)}%
+      </Badge>
+    );
+  }
+  return (
+    <Badge variant="outline" className="text-xs text-muted-foreground">
+      未開始
+    </Badge>
+  );
+}
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -135,9 +154,15 @@ export default function DashboardPage() {
                   {profile.job_summary ? (
                     <p className="truncate text-xs text-muted-foreground">{profile.job_summary}</p>
                   ) : null}
-                  <p className="mt-1.5 text-xs text-muted-foreground">
-                    更新：{new Date(profile.updated_at).toLocaleString("zh-TW")}
-                  </p>
+                  <div className="mt-1.5 flex items-center gap-2">
+                    <DocStatusBadge
+                      status={profile.doc_status ?? "none"}
+                      completion={profile.completion ?? 0}
+                    />
+                    <span className="text-xs text-muted-foreground">
+                      更新：{new Date(profile.updated_at).toLocaleString("zh-TW")}
+                    </span>
+                  </div>
                 </div>
                 <div className="flex shrink-0 items-center gap-2">
                   <Button

@@ -41,6 +41,8 @@ class JobProfileOut(BaseModel):
     department: Optional[str]
     job_summary: Optional[str]
     selected_ocs_codes: list[str] = []
+    doc_status: str = "none"
+    completion: float = 0.0
     created_at: datetime
     updated_at: datetime
 

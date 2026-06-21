@@ -16,7 +16,7 @@ from app.models import JobProfile
 from app.services import ocs_doc
 from app.services.knowledge.base import KnowledgeClient
 from app.services.knowledge.http_client import HttpIndexerClient
-from app.services.persistence import DocRepo
+from app.services.persistence import DocRepo, ProfileRepo
 
 logger = logging.getLogger("jobintel")
 
@@ -84,6 +84,42 @@ async def finalize_document(profile_id: UUID, db: AsyncSession = Depends(get_db)
             status_code=422, detail={"detail": "invalid document", "errors": errs}
         )
     return await repo.finalize(profile_id, content=assembled)
+
+
+@router.post("/{profile_id}/seed")
+async def seed_document(
+    profile_id: UUID,
+    body: dict = Body(...),
+    db: AsyncSession = Depends(get_db),
+    knowledge: KnowledgeClient = Depends(get_knowledge),
+):
+    profile = await _require_profile(profile_id, db)
+    codes = body.get("ocs_codes") or []
+    if not codes:
+        raise HTTPException(status_code=400, detail="no ocs_codes provided")
+    await ProfileRepo(db).set_selected_ocs(profile_id, codes)
+    try:
+        pool = await knowledge.task_pool(codes)
+    except Exception:
+        logger.warning("seed: indexer task_pool failed", exc_info=True)
+        raise HTTPException(status_code=502, detail="indexer unavailable")
+    units_tasks = []
+    for g in pool.groups:
+        for u in g.units:
+            for t in u.tasks:
+                units_tasks.append({
+                    "task_name": t.task_title,
+                    "unit_id": u.unit_id,
+                    "unit_title": u.unit_title,
+                    "indexer_ref": {"ocs_code": g.ocs_code, "task_id": t.task_id},
+                })
+    profile_dict = {
+        "ocs_code": codes[0],
+        "job_title": profile.job_title,
+        "job_summary": profile.job_summary,
+    }
+    doc = ocs_doc.skeleton(profile_dict, units_tasks)
+    return await DocRepo(db).upsert_draft(profile_id, doc)
 
 
 @router.get("/{profile_id}/ksa-pool")

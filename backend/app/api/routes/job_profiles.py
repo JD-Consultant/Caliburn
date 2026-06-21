@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
 from app.models import JobProfile, User
 from app.schemas import JobProfileCreate, JobProfileOut, JobProfileUpdate
+from app.services.persistence import DocRepo
 
 router = APIRouter(prefix="/job-profiles", tags=["job-profiles"])
 
@@ -42,7 +43,14 @@ async def list_job_profiles(
         .limit(limit)
         .offset(offset)
     )
-    return result.scalars().all()
+    profiles = result.scalars().all()
+    items = []
+    for p in profiles:
+        st, comp = await DocRepo(db).status_of(p.id)
+        item = JobProfileOut.model_validate(p)
+        item.doc_status, item.completion = st, comp
+        items.append(item)
+    return items
 
 
 @router.get("/{profile_id}", response_model=JobProfileOut)

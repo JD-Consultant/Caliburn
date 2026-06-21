@@ -71,6 +71,10 @@ export const finalizeDocument = (profileId: string) =>
     method: "POST",
   });
 
+// 唯讀匯出：乾淨合法的 OCS JSON（不寫 DB）。
+export const getDocumentExport = (profileId: string) =>
+  request<OcsDocument>(`/job-profiles/${profileId}/document/export`);
+
 // 選職類：設定 selected_ocs_codes（順序=優先度）。
 export const setOccupations = (profileId: string, ocsCodes: string[]) =>
   request<{ ocs_codes: string[] }>(`/job-profiles/${profileId}/occupations`, {

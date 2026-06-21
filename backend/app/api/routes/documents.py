@@ -98,6 +98,16 @@ def _refresh_header(content: dict, profile, code: str) -> dict:
     return content
 
 
+@router.get("/{profile_id}/document/export")
+async def export_document(profile_id: UUID, db: AsyncSession = Depends(get_db)):
+    """唯讀匯出：把最新文件（draft 或 final）組裝成乾淨合法的 OCS JSON（不寫 DB）。"""
+    await _require_profile(profile_id, db)
+    latest = await DocRepo(db).latest(profile_id)
+    if latest is None:
+        raise HTTPException(status_code=400, detail="no document to export")
+    return ocs_doc.assemble_final(latest["content"])
+
+
 @router.post("/{profile_id}/occupations")
 async def set_occupations(
     profile_id: UUID,

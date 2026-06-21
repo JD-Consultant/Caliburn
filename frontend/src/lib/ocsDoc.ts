@@ -81,6 +81,21 @@ export function updateCategory(
   return next;
 }
 
+// 就地更新；若該 idx 還不存在（空白虛擬列）則補到該長度再寫。
+export function upsertCategory(
+  doc: OcsDocument,
+  kind: CatKind,
+  idx: number,
+  field: "name" | "code",
+  value: string,
+): OcsDocument {
+  const next = clone(doc);
+  const arr = next.ocs_profile.category[kind];
+  while (arr.length <= idx) arr.push({ name: "", code: "" });
+  arr[idx][field] = value;
+  return next;
+}
+
 export function addCategory(doc: OcsDocument, kind: CatKind): OcsDocument {
   const next = clone(doc);
   next.ocs_profile.category[kind].push({ name: "", code: "" });

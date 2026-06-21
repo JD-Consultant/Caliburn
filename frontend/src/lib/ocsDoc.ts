@@ -126,6 +126,36 @@ export function deleteCategory(doc: OcsDocument, kind: CatKind, idx: number): Oc
   return next;
 }
 
+// ── 說明與補充事項（notes）編輯 ──────────────────────────────────────────────
+export type NoteField = "prerequisites" | "supplements";
+
+function ensureNotes(doc: OcsDocument) {
+  if (!doc.notes) doc.notes = { prerequisites: [], supplements: [] };
+  if (!doc.notes.prerequisites) doc.notes.prerequisites = [];
+  if (!doc.notes.supplements) doc.notes.supplements = [];
+}
+
+export function addNote(doc: OcsDocument, field: NoteField): OcsDocument {
+  const next = clone(doc);
+  ensureNotes(next);
+  next.notes[field].push("");
+  return next;
+}
+
+export function updateNote(doc: OcsDocument, field: NoteField, idx: number, value: string): OcsDocument {
+  const next = clone(doc);
+  ensureNotes(next);
+  next.notes[field][idx] = value;
+  return next;
+}
+
+export function deleteNote(doc: OcsDocument, field: NoteField, idx: number): OcsDocument {
+  const next = clone(doc);
+  ensureNotes(next);
+  next.notes[field].splice(idx, 1);
+  return next;
+}
+
 // ── 職責(unit) 層編輯 ─────────────────────────────────────────────────────────
 export function addUnit(doc: OcsDocument): OcsDocument {
   const next = clone(doc);

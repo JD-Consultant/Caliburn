@@ -86,39 +86,83 @@ async def finalize_document(profile_id: UUID, db: AsyncSession = Depends(get_db)
     return await repo.finalize(profile_id, content=assembled)
 
 
-@router.post("/{profile_id}/seed")
-async def seed_document(
+@router.post("/{profile_id}/occupations")
+async def set_occupations(
     profile_id: UUID,
     body: dict = Body(...),
     db: AsyncSession = Depends(get_db),
-    knowledge: KnowledgeClient = Depends(get_knowledge),
 ):
-    profile = await _require_profile(profile_id, db)
+    """選職類：設定 selected_ocs_codes（順序=優先度）。不建文件——任務待 curate。"""
+    await _require_profile(profile_id, db)
     codes = body.get("ocs_codes") or []
     if not codes:
         raise HTTPException(status_code=400, detail="no ocs_codes provided")
     await ProfileRepo(db).set_selected_ocs(profile_id, codes)
+    return {"ocs_codes": codes}
+
+
+@router.get("/{profile_id}/task-candidates")
+async def task_candidates(
+    profile_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    knowledge: KnowledgeClient = Depends(get_knowledge),
+):
+    """選任務候選：已選職類的所有任務，依職類→職責(unit)分組（含來源），供勾選。"""
+    profile = await _require_profile(profile_id, db)
+    codes = profile.selected_ocs_codes or []
+    if not codes:
+        return {"groups": []}
     try:
         pool = await knowledge.task_pool(codes)
     except Exception:
-        logger.warning("seed: indexer task_pool failed", exc_info=True)
+        logger.warning("task-candidates: indexer task_pool failed", exc_info=True)
         raise HTTPException(status_code=502, detail="indexer unavailable")
-    units_tasks = []
+    groups = []
     for g in pool.groups:
-        for u in g.units:
-            for t in u.tasks:
-                units_tasks.append({
-                    "task_name": t.task_title,
+        groups.append({
+            "ocs_code": g.ocs_code,
+            "occupation_name": g.job_title,
+            "units": [
+                {
                     "unit_id": u.unit_id,
                     "unit_title": u.unit_title,
-                    "indexer_ref": {"ocs_code": g.ocs_code, "task_id": t.task_id},
-                })
+                    "tasks": [{"task_id": t.task_id, "task_title": t.task_title} for t in u.tasks],
+                }
+                for u in g.units
+            ],
+        })
+    return {"groups": groups}
+
+
+@router.post("/{profile_id}/build-tasks")
+async def build_tasks(
+    profile_id: UUID,
+    body: dict = Body(...),
+    db: AsyncSession = Depends(get_db),
+):
+    """用勾選的任務建/更新文件（遞進重編、保留已填）。picked 每筆：
+    {ocs_code, unit_id, unit_title, occupation_name, task_id, task_name}。
+    unit_title 留白＝cherry-pick（職責名讓使用者自填）。"""
+    profile = await _require_profile(profile_id, db)
+    picked = body.get("picked") or []
+    units_tasks = [
+        {
+            "task_name": p.get("task_name", ""),
+            "unit_id": p.get("unit_id") or "",
+            "unit_title": p.get("unit_title") or "",
+            "occupation_name": p.get("occupation_name") or "",
+            "indexer_ref": {"ocs_code": p.get("ocs_code") or "", "task_id": p.get("task_id") or ""},
+        }
+        for p in picked
+    ]
+    codes = profile.selected_ocs_codes or []
     profile_dict = {
-        "ocs_code": codes[0],
+        "ocs_code": codes[0] if codes else "",
         "job_title": profile.job_title,
         "job_summary": profile.job_summary,
     }
-    doc = ocs_doc.skeleton(profile_dict, units_tasks)
+    prev = await DocRepo(db).latest(profile_id)
+    doc = ocs_doc.build_from_picked(profile_dict, units_tasks, prev["content"] if prev else None)
     return await DocRepo(db).upsert_draft(profile_id, doc)
 
 

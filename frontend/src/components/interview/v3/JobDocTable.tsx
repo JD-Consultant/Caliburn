@@ -105,7 +105,7 @@ export function JobDocTable({
                 const level = block?.competency_level;
                 const tc = task.task_codes?.[0];
                 return (
-                  <div key={`${tc?.code ?? taskIdx}`} className="px-4 py-3">
+                  <div key={`${unitIdx}-${taskIdx}`} className="px-4 py-3">
                     <div className="mb-2 flex items-center gap-2">
                       {tc?.code ? (
                         <span className="font-mono text-xs text-muted-foreground">{tc.code}</span>

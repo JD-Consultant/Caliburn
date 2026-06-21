@@ -86,18 +86,41 @@ async def finalize_document(profile_id: UUID, db: AsyncSession = Depends(get_db)
     return await repo.finalize(profile_id, content=assembled)
 
 
+def _refresh_header(content: dict, profile, code: str) -> dict:
+    """Update the document header (ocs_profile) to reflect current occupation."""
+    content.setdefault("ocs_profile", {})
+    content["ocs_profile"]["ocs_code"] = code
+    name = content["ocs_profile"].setdefault(
+        "ocs_name", {"job_category_name": None, "occupation_name": ""}
+    )
+    name["occupation_name"] = profile.job_title
+    content["ocs_profile"].setdefault("job_description", profile.job_summary or "")
+    return content
+
+
 @router.post("/{profile_id}/occupations")
 async def set_occupations(
     profile_id: UUID,
     body: dict = Body(...),
     db: AsyncSession = Depends(get_db),
 ):
-    """選職類：設定 selected_ocs_codes（順序=優先度）。不建文件——任務待 curate。"""
-    await _require_profile(profile_id, db)
+    """選職類：設定 selected_ocs_codes（順序=優先度），並把文件表頭刷新成該職類
+    （已有 draft 則就地更新表頭，否則建一個只有表頭的 draft）。任務待 curate。"""
+    profile = await _require_profile(profile_id, db)
     codes = body.get("ocs_codes") or []
     if not codes:
         raise HTTPException(status_code=400, detail="no ocs_codes provided")
     await ProfileRepo(db).set_selected_ocs(profile_id, codes)
+    repo = DocRepo(db)
+    prev = await repo.latest(profile_id)
+    if prev:
+        content = _refresh_header(prev["content"], profile, codes[0])
+    else:
+        content = ocs_doc.skeleton(
+            {"ocs_code": codes[0], "job_title": profile.job_title, "job_summary": profile.job_summary},
+            [],
+        )
+    await repo.upsert_draft(profile_id, content)
     return {"ocs_codes": codes}
 
 
@@ -163,6 +186,7 @@ async def build_tasks(
     }
     prev = await DocRepo(db).latest(profile_id)
     doc = ocs_doc.build_from_picked(profile_dict, units_tasks, prev["content"] if prev else None)
+    _refresh_header(doc, profile, codes[0] if codes else "")
     return await DocRepo(db).upsert_draft(profile_id, doc)
 
 

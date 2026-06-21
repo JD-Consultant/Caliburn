@@ -62,7 +62,8 @@ export function DocHeader({
 }) {
   const p = doc.ocs_profile;
 
-  // 攤平成多列：每個子類別至少一列（空則顯示一列可填的虛擬列）。
+  // 攤平成多列：每個子類別至少一列（空則顯示一列可填的虛擬列）。子類別/代碼標籤
+  // 只在該類第一列出現並 rowSpan 蓋住整類（加列時不重複標籤）。
   const catRows = KINDS.flatMap((k) => {
     const entries = p.category?.[k.key] ?? [];
     const rows = entries.length ? entries : [{ name: "", code: "" }];
@@ -73,6 +74,7 @@ export function DocHeader({
       code: e.code,
       real: i < entries.length,
       firstOfKind: i === 0,
+      kindCount: rows.length,
     }));
   });
 
@@ -112,23 +114,23 @@ export function DocHeader({
 
         {catRows.map((r, gi) => (
           <tr key={`${r.key}-${r.idx}`}>
-            {gi === 0 ? (
-              <th className={TH} rowSpan={catRows.length}>所屬類別</th>
-            ) : null}
-            <th className={TH}>
-              <div className="flex items-center justify-between gap-1">
-                <span>{r.label}</span>
-                {r.firstOfKind ? (
+            {gi === 0 ? <th className={TH} rowSpan={catRows.length}>所屬類別</th> : null}
+            {r.firstOfKind ? (
+              <th className={TH} rowSpan={r.kindCount}>
+                <div className="flex items-center justify-between gap-1">
+                  <span>{r.label}</span>
                   <button type="button" className="text-muted-foreground hover:text-foreground" title="加一列" onClick={() => onChange(addCategory(doc, r.key))}>
                     <Plus className="h-3.5 w-3.5" />
                   </button>
-                ) : null}
-              </div>
-            </th>
+                </div>
+              </th>
+            ) : null}
             <td className={TD}>
               <Cell value={r.name} placeholder="名稱" onCommit={(v) => onChange(upsertCategory(doc, r.key, r.idx, "name", v))} />
             </td>
-            <th className={TH}>{r.codeLabel}</th>
+            {r.firstOfKind ? (
+              <th className={TH} rowSpan={r.kindCount}>{r.codeLabel}</th>
+            ) : null}
             <td className={TD}>
               <div className="flex items-center">
                 <Cell value={r.code} placeholder="代碼" onCommit={(v) => onChange(upsertCategory(doc, r.key, r.idx, "code", v))} />

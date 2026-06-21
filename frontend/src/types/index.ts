@@ -88,6 +88,8 @@ export interface OcsDocument {
   ocs_content: { ocu_units: OcuUnit[] };
   ocs_attitude: { attitudes: CodeName[] };
   notes: { prerequisites: string[]; supplements: string[] };
+  // 前端全域候選池（使用者新增的 K/S/A，跨任務共用；非 OCS 契約欄，finalize 可忽略）
+  _pool?: { knowledge: CodeName[]; skills: CodeName[]; attitudes: CodeName[] };
 }
 
 // GET/PATCH/finalize/seed 的回傳信封（DocRepo._to_dict / no-doc 空殼）。

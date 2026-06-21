@@ -264,6 +264,21 @@ export function setAttitudes(doc: OcsDocument, items: CodeName[]): OcsDocument {
   return next;
 }
 
+// 把使用者新增的 K/S/A 併進全域池（去重 by code+name），供所有任務選單共用。
+export function mergePool(
+  doc: OcsDocument,
+  kind: "knowledge" | "skills" | "attitudes",
+  items: CodeName[],
+): OcsDocument {
+  const next = clone(doc);
+  if (!next._pool) next._pool = { knowledge: [], skills: [], attitudes: [] };
+  const arr = next._pool[kind] ?? (next._pool[kind] = []);
+  for (const it of items) {
+    if (!arr.some((x) => x.code === it.code && x.name === it.name)) arr.push(it);
+  }
+  return next;
+}
+
 export function completion(doc: OcsDocument): number {
   const units = doc.ocs_content?.ocu_units ?? [];
   const tasks = units.flatMap((u) => u.tasks ?? []);

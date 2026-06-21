@@ -32,7 +32,7 @@ import { Badge } from "@/components/ui/badge";
 import { DocHeader } from "./DocHeader";
 import { Check, GripVertical, Pencil, Plus, Trash2 } from "lucide-react";
 
-export type CellKind = "op" | "k" | "s";
+export type CellKind = "o" | "p" | "k" | "s";
 export type CellTarget =
   | { kind: CellKind; unitIdx: number; taskIdx: number }
   | { kind: "a" };
@@ -154,8 +154,8 @@ function TaskRow({
         </button>
       </div>
       <div className="flex flex-wrap gap-2 pl-6">
-        <Cell label="產出 O" filled={count(block?.outputs) > 0} n={count(block?.outputs)} onClick={() => onCell({ kind: "op", unitIdx, taskIdx })} />
-        <Cell label="指標 P" filled={count(block?.indicators) > 0} n={count(block?.indicators)} onClick={() => onCell({ kind: "op", unitIdx, taskIdx })} />
+        <Cell label="產出 O" filled={count(block?.outputs) > 0} n={count(block?.outputs)} onClick={() => onCell({ kind: "o", unitIdx, taskIdx })} />
+        <Cell label="指標 P" filled={count(block?.indicators) > 0} n={count(block?.indicators)} onClick={() => onCell({ kind: "p", unitIdx, taskIdx })} />
         <Cell label="知識 K" filled={count(block?.knowledge) > 0} n={count(block?.knowledge)} onClick={() => onCell({ kind: "k", unitIdx, taskIdx })} />
         <Cell label="技能 S" filled={count(block?.skills) > 0} n={count(block?.skills)} onClick={() => onCell({ kind: "s", unitIdx, taskIdx })} />
       </div>

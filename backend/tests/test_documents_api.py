@@ -14,17 +14,50 @@ from app.database import get_db
 from app.main import app
 from app.models import JobProfile, User
 from app.services import ocs_doc
-from app.services.knowledge.models import Pair, Pairs
+from app.services.knowledge.models import (
+    Pair,
+    Pairs,
+    PoolGroup,
+    PoolTask,
+    PoolUnit,
+    TaskPool,
+)
 
 
 class StubKnowledge:
-    def __init__(self, pairs_map=None, fail=False):
-        self.pairs_map, self.fail = pairs_map or {}, fail
+    def __init__(self, pairs_map=None, fail=False, pool=None):
+        self.pairs_map, self.fail, self.pool = pairs_map or {}, fail, pool
 
     async def pairs(self, ocs_code):
         if self.fail:
             raise RuntimeError("indexer down")
         return self.pairs_map.get(ocs_code, Pairs())
+
+    async def task_pool(self, ocs_codes, *, activity_examples=3):
+        if self.fail:
+            raise RuntimeError("indexer down")
+        return self.pool if self.pool is not None else TaskPool()
+
+
+def _mk_pool():
+    return TaskPool(
+        groups=[
+            PoolGroup(
+                ocs_code="OC1",
+                job_title="x",
+                units=[
+                    PoolUnit(
+                        unit_id="T1",
+                        unit_title="u1",
+                        tasks=[
+                            PoolTask(id="1", task_id="T1.1", task_title="蒐集標準"),
+                            PoolTask(id="2", task_id="T1.2", task_title="分析趨勢"),
+                        ],
+                    )
+                ],
+            )
+        ]
+    )
 
 
 @pytest_asyncio.fixture
@@ -227,3 +260,91 @@ async def test_list_doc_status(client):
     entry2 = next(i for i in r2.json() if i["id"] == str(p.id))
     assert entry2["doc_status"] == "draft"
     assert entry2["completion"] > 0
+
+
+@pytest.mark.asyncio
+async def test_seed_happy_path(client, db_session):
+    p = await _mk_profile(client._db)
+    app.dependency_overrides[get_knowledge] = lambda: StubKnowledge(pool=_mk_pool())
+    r = await client.post(
+        f"/api/v1/job-profiles/{p.id}/seed", json={"ocs_codes": ["OC1"]}
+    )
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert body["status"] == "draft"
+    assert body["version"] == 1
+    units = body["content"]["ocs_content"]["ocu_units"]
+    assert len(units) == 1
+    tasks = units[0]["tasks"]
+    assert len(tasks) == 2
+    for t in tasks:
+        block = t["competency_blocks"][0]
+        assert block["outputs"] == []
+        assert block["indicators"] == []
+        assert block["knowledge"] == []
+        assert block["skills"] == []
+    codes = [t["task_codes"][0]["code"] for t in tasks]
+    assert codes == ["T1.1", "T1.2"]
+
+    await db_session.refresh(p)
+    assert p.selected_ocs_codes == ["OC1"]
+
+
+@pytest.mark.asyncio
+async def test_seed_then_get_document(client):
+    p = await _mk_profile(client._db)
+    app.dependency_overrides[get_knowledge] = lambda: StubKnowledge(pool=_mk_pool())
+    rs = await client.post(
+        f"/api/v1/job-profiles/{p.id}/seed", json={"ocs_codes": ["OC1"]}
+    )
+    assert rs.status_code == 200, rs.text
+    seeded_units = rs.json()["content"]["ocs_content"]["ocu_units"]
+
+    r = await client.get(f"/api/v1/job-profiles/{p.id}/document")
+    assert r.status_code == 200, r.text
+    units = r.json()["content"]["ocs_content"]["ocu_units"]
+    assert len(units) == len(seeded_units) == 1
+    assert len(units[0]["tasks"]) == 2
+
+
+@pytest.mark.asyncio
+async def test_seed_empty_codes_returns_400(client):
+    p = await _mk_profile(client._db)
+    app.dependency_overrides[get_knowledge] = lambda: StubKnowledge(pool=_mk_pool())
+    r = await client.post(
+        f"/api/v1/job-profiles/{p.id}/seed", json={"ocs_codes": []}
+    )
+    assert r.status_code == 400, r.text
+
+
+@pytest.mark.asyncio
+async def test_seed_indexer_down_returns_502(client):
+    p = await _mk_profile(client._db)
+    app.dependency_overrides[get_knowledge] = lambda: StubKnowledge(fail=True)
+    r = await client.post(
+        f"/api/v1/job-profiles/{p.id}/seed", json={"ocs_codes": ["OC1"]}
+    )
+    assert r.status_code == 502, r.text
+
+
+@pytest.mark.asyncio
+async def test_seed_missing_profile_returns_404(client):
+    app.dependency_overrides[get_knowledge] = lambda: StubKnowledge(pool=_mk_pool())
+    r = await client.post(
+        f"/api/v1/job-profiles/{uuid4()}/seed", json={"ocs_codes": ["OC1"]}
+    )
+    assert r.status_code == 404, r.text
+
+
+@pytest.mark.asyncio
+async def test_reseed_updates_in_place(client):
+    p = await _mk_profile(client._db)
+    app.dependency_overrides[get_knowledge] = lambda: StubKnowledge(pool=_mk_pool())
+    r1 = await client.post(
+        f"/api/v1/job-profiles/{p.id}/seed", json={"ocs_codes": ["OC1"]}
+    )
+    assert r1.json()["version"] == 1
+    r2 = await client.post(
+        f"/api/v1/job-profiles/{p.id}/seed", json={"ocs_codes": ["OC1"]}
+    )
+    assert r2.json()["version"] == 1

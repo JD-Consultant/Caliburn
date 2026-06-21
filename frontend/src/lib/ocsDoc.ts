@@ -11,12 +11,30 @@ function emptyBlock(): CompetencyBlock {
   return { competency_level: null, indicators: [], outputs: [], knowledge: [], skills: [] };
 }
 
+function uid(): string {
+  return (globalThis.crypto?.randomUUID?.() ?? `id-${Math.random().toString(36).slice(2)}`);
+}
+
 function emptyTask(): OcsTask {
   return {
     task_codes: [{ code: "", name: "" }],
     competency_blocks: [emptyBlock()],
     provenance: { ocs_code: "", task_id: "" },
+    _tid: uid(),
   };
+}
+
+// 補上缺少的穩定 id（dnd 用）。新載入的文件（seed/build 來的）沒有 id → 在此補。
+export function ensureIds(doc: OcsDocument | undefined): OcsDocument | undefined {
+  if (!doc) return doc;
+  const next = clone(doc);
+  for (const u of next.ocs_content?.ocu_units ?? []) {
+    if (!u._uid) u._uid = uid();
+    for (const t of u.tasks ?? []) {
+      if (!t._tid) t._tid = uid();
+    }
+  }
+  return next;
 }
 
 // 結構變動後重新遞進編號：職責 T1,T2…；任務 T{u}.{t}。名稱/區塊/provenance 不動。
@@ -116,6 +134,7 @@ export function addUnit(doc: OcsDocument): OcsDocument {
     ocu_name: "",
     source: { ocs_code: "", occupation_name: "" },
     tasks: [],
+    _uid: uid(),
   } as OcuUnit);
   return renumber(next);
 }

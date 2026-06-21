@@ -52,6 +52,7 @@ export interface OcsTask {
   task_codes: CodeName[];
   competency_blocks: CompetencyBlock[];
   provenance?: { ocs_code: string; task_id: string };
+  _tid?: string; // 前端穩定 id（拖拉用；隨項目移動）
 }
 
 export interface OcuUnit {
@@ -59,6 +60,7 @@ export interface OcuUnit {
   ocu_name: string;
   source?: { ocs_code: string; occupation_name: string };
   tasks: OcsTask[];
+  _uid?: string; // 前端穩定 id（拖拉用）
 }
 
 export interface OcsName {

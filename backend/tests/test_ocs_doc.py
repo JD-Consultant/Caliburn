@@ -88,12 +88,14 @@ def test_skeleton_shape_and_grouping():
 
 
 def test_skeleton_synthetic_unit_bucket():
+    # no unit info → unit code synthesised T1, name left BLANK for the user to
+    # fill (cherry-pick semantics); task renumbered sequentially T1.1.
     tasks = [{"task_name": "孤兒任務", "indexer_ref": {}}]
     doc = skeleton(_profile(), tasks)
     units = doc["ocs_content"]["ocu_units"]
     assert len(units) == 1
     assert units[0]["ocu_code"] == "T1"
-    assert units[0]["ocu_name"] == "其他工作任務"
+    assert units[0]["ocu_name"] == ""
     assert units[0]["tasks"][0]["task_codes"][0]["code"] == "T1.1"
 
 

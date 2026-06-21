@@ -306,89 +306,119 @@ async def test_list_doc_status(client):
     assert entry2["completion"] > 0
 
 
+def _picked(unit_title="u1"):
+    return [
+        {"ocs_code": "OC1", "unit_id": "T1", "unit_title": unit_title,
+         "occupation_name": "AIoT", "task_id": "T1.1", "task_name": "蒐集標準"},
+        {"ocs_code": "OC1", "unit_id": "T1", "unit_title": unit_title,
+         "occupation_name": "AIoT", "task_id": "T1.2", "task_name": "分析趨勢"},
+    ]
+
+
 @pytest.mark.asyncio
-async def test_seed_happy_path(client, db_session):
+async def test_set_occupations(client, db_session):
     p = await _mk_profile(client._db)
-    app.dependency_overrides[get_knowledge] = lambda: StubKnowledge(pool=_mk_pool())
     r = await client.post(
-        f"/api/v1/job-profiles/{p.id}/seed", json={"ocs_codes": ["OC1"]}
+        f"/api/v1/job-profiles/{p.id}/occupations", json={"ocs_codes": ["OC1", "OC2"]}
     )
     assert r.status_code == 200, r.text
-    body = r.json()
-    assert body["status"] == "draft"
-    assert body["version"] == 1
-    units = body["content"]["ocs_content"]["ocu_units"]
-    assert len(units) == 1
-    tasks = units[0]["tasks"]
-    assert len(tasks) == 2
-    for t in tasks:
-        block = t["competency_blocks"][0]
-        assert block["outputs"] == []
-        assert block["indicators"] == []
-        assert block["knowledge"] == []
-        assert block["skills"] == []
-    codes = [t["task_codes"][0]["code"] for t in tasks]
-    assert codes == ["T1.1", "T1.2"]
-
+    assert r.json()["ocs_codes"] == ["OC1", "OC2"]
     await db_session.refresh(p)
-    assert p.selected_ocs_codes == ["OC1"]
+    assert p.selected_ocs_codes == ["OC1", "OC2"]
 
 
 @pytest.mark.asyncio
-async def test_seed_then_get_document(client):
+async def test_set_occupations_empty_400(client):
     p = await _mk_profile(client._db)
-    app.dependency_overrides[get_knowledge] = lambda: StubKnowledge(pool=_mk_pool())
-    rs = await client.post(
-        f"/api/v1/job-profiles/{p.id}/seed", json={"ocs_codes": ["OC1"]}
-    )
-    assert rs.status_code == 200, rs.text
-    seeded_units = rs.json()["content"]["ocs_content"]["ocu_units"]
-
-    r = await client.get(f"/api/v1/job-profiles/{p.id}/document")
-    assert r.status_code == 200, r.text
-    units = r.json()["content"]["ocs_content"]["ocu_units"]
-    assert len(units) == len(seeded_units) == 1
-    assert len(units[0]["tasks"]) == 2
-
-
-@pytest.mark.asyncio
-async def test_seed_empty_codes_returns_400(client):
-    p = await _mk_profile(client._db)
-    app.dependency_overrides[get_knowledge] = lambda: StubKnowledge(pool=_mk_pool())
     r = await client.post(
-        f"/api/v1/job-profiles/{p.id}/seed", json={"ocs_codes": []}
+        f"/api/v1/job-profiles/{p.id}/occupations", json={"ocs_codes": []}
     )
     assert r.status_code == 400, r.text
 
 
 @pytest.mark.asyncio
-async def test_seed_indexer_down_returns_502(client):
+async def test_task_candidates_grouped(client):
+    p = await _mk_profile(client._db, codes=["OC1"])
+    app.dependency_overrides[get_knowledge] = lambda: StubKnowledge(pool=_mk_pool())
+    r = await client.get(f"/api/v1/job-profiles/{p.id}/task-candidates")
+    assert r.status_code == 200, r.text
+    groups = r.json()["groups"]
+    assert groups[0]["ocs_code"] == "OC1"
+    units = groups[0]["units"]
+    assert units[0]["unit_id"] == "T1"
+    assert [t["task_id"] for t in units[0]["tasks"]] == ["T1.1", "T1.2"]
+
+
+@pytest.mark.asyncio
+async def test_task_candidates_no_codes_empty(client):
     p = await _mk_profile(client._db)
+    app.dependency_overrides[get_knowledge] = lambda: StubKnowledge(pool=_mk_pool())
+    r = await client.get(f"/api/v1/job-profiles/{p.id}/task-candidates")
+    assert r.status_code == 200, r.text
+    assert r.json()["groups"] == []
+
+
+@pytest.mark.asyncio
+async def test_task_candidates_indexer_down_502(client):
+    p = await _mk_profile(client._db, codes=["OC1"])
     app.dependency_overrides[get_knowledge] = lambda: StubKnowledge(fail=True)
-    r = await client.post(
-        f"/api/v1/job-profiles/{p.id}/seed", json={"ocs_codes": ["OC1"]}
-    )
+    r = await client.get(f"/api/v1/job-profiles/{p.id}/task-candidates")
     assert r.status_code == 502, r.text
 
 
 @pytest.mark.asyncio
-async def test_seed_missing_profile_returns_404(client):
-    app.dependency_overrides[get_knowledge] = lambda: StubKnowledge(pool=_mk_pool())
+async def test_build_tasks_happy(client):
+    p = await _mk_profile(client._db, codes=["OC1"])
     r = await client.post(
-        f"/api/v1/job-profiles/{uuid4()}/seed", json={"ocs_codes": ["OC1"]}
+        f"/api/v1/job-profiles/{p.id}/build-tasks", json={"picked": _picked()}
     )
-    assert r.status_code == 404, r.text
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert body["status"] == "draft" and body["version"] == 1
+    units = body["content"]["ocs_content"]["ocu_units"]
+    assert len(units) == 1
+    assert units[0]["ocu_code"] == "T1" and units[0]["ocu_name"] == "u1"
+    tasks = units[0]["tasks"]
+    assert [t["task_codes"][0]["code"] for t in tasks] == ["T1.1", "T1.2"]
+    assert tasks[0]["provenance"] == {"ocs_code": "OC1", "task_id": "T1.1"}
+    assert tasks[0]["competency_blocks"][0]["knowledge"] == []
 
 
 @pytest.mark.asyncio
-async def test_reseed_updates_in_place(client):
-    p = await _mk_profile(client._db)
-    app.dependency_overrides[get_knowledge] = lambda: StubKnowledge(pool=_mk_pool())
-    r1 = await client.post(
-        f"/api/v1/job-profiles/{p.id}/seed", json={"ocs_codes": ["OC1"]}
+async def test_build_tasks_cherry_pick_blank_unit_name(client):
+    p = await _mk_profile(client._db, codes=["OC1"])
+    r = await client.post(
+        f"/api/v1/job-profiles/{p.id}/build-tasks", json={"picked": _picked(unit_title="")}
     )
-    assert r1.json()["version"] == 1
-    r2 = await client.post(
-        f"/api/v1/job-profiles/{p.id}/seed", json={"ocs_codes": ["OC1"]}
+    assert r.status_code == 200, r.text
+    units = r.json()["content"]["ocs_content"]["ocu_units"]
+    assert units[0]["ocu_name"] == ""  # 留白讓使用者自填
+
+
+@pytest.mark.asyncio
+async def test_build_tasks_preserves_filled_on_rebuild(client):
+    p = await _mk_profile(client._db, codes=["OC1"])
+    await client.post(
+        f"/api/v1/job-profiles/{p.id}/build-tasks", json={"picked": _picked()}
     )
-    assert r2.json()["version"] == 1
+    # fill T1.1's knowledge via PATCH
+    g = await client.get(f"/api/v1/job-profiles/{p.id}/document")
+    doc = g.json()["content"]
+    doc["ocs_content"]["ocu_units"][0]["tasks"][0]["competency_blocks"][0]["knowledge"] = [
+        {"code": "K1", "name": "k"}
+    ]
+    await client.patch(f"/api/v1/job-profiles/{p.id}/document", json=doc)
+    # rebuild with same picks → filled cell preserved by provenance
+    r = await client.post(
+        f"/api/v1/job-profiles/{p.id}/build-tasks", json={"picked": _picked()}
+    )
+    tasks = r.json()["content"]["ocs_content"]["ocu_units"][0]["tasks"]
+    assert tasks[0]["competency_blocks"][0]["knowledge"] == [{"code": "K1", "name": "k"}]
+
+
+@pytest.mark.asyncio
+async def test_build_tasks_missing_profile_404(client):
+    r = await client.post(
+        f"/api/v1/job-profiles/{uuid4()}/build-tasks", json={"picked": _picked()}
+    )
+    assert r.status_code == 404, r.text

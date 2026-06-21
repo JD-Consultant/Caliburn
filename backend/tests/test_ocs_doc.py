@@ -99,6 +99,18 @@ def test_skeleton_synthetic_unit_bucket():
     assert units[0]["tasks"][0]["task_codes"][0]["code"] == "T1.1"
 
 
+def test_assemble_final_strips_frontend_keys():
+    draft = skeleton(_profile(), _units_tasks())
+    draft["_pool"] = {"knowledge": [{"code": "K99", "name": "x"}], "skills": [], "attitudes": []}
+    draft["ocs_content"]["ocu_units"][0]["_uid"] = "u-abc"
+    draft["ocs_content"]["ocu_units"][0]["tasks"][0]["_tid"] = "t-abc"
+    out = assemble_final(draft)
+    assert "_pool" not in out
+    assert "_uid" not in out["ocs_content"]["ocu_units"][0]
+    assert "_tid" not in out["ocs_content"]["ocu_units"][0]["tasks"][0]
+    assert validate(out) == []
+
+
 def test_assemble_final_completes_and_no_mutation():
     draft = skeleton(_profile(), _units_tasks())
     import copy

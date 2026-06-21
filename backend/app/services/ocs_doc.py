@@ -244,6 +244,16 @@ def assemble_final(draft: dict) -> dict:
             }
         )
 
+    # Strip front-end-only keys (_uid/_tid/_pool) → contract-pure final JSON.
+    doc.pop("_pool", None)
+    for unit in units:
+        if not isinstance(unit, dict):
+            continue
+        unit.pop("_uid", None)
+        for task in unit.get("tasks") or []:
+            if isinstance(task, dict):
+                task.pop("_tid", None)
+
     return doc
 
 

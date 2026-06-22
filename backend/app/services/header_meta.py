@@ -61,8 +61,7 @@ def aggregate(metas: list[ProfileMeta], primary_code: str = "") -> dict:
 
     for m in metas:
         src = m.ocs_code
-        if m.job_category and (m.job_category.code or m.job_category.name):
-            _merge_pairs(job_categories, [m.job_category], src)
+        _merge_pairs(job_categories, m.job_categories, src)
         _merge_pairs(occupations, m.occupations, src)
         _merge_pairs(industries, m.industries, src)
         _merge_pairs(attitudes, m.attitudes, src)
@@ -74,7 +73,7 @@ def aggregate(metas: list[ProfileMeta], primary_code: str = "") -> dict:
     primary_out = {
         "ocs_code": primary.ocs_code if primary else "",
         "occupation_name": primary.job_title if primary else "",
-        "job_category_name": (primary.job_category.name if primary and primary.job_category else "") or "",
+        "job_category_name": (primary.job_category_name if primary else "") or "",
         "job_description": primary.job_description if primary else "",
         "ocs_level": primary.ocs_level if primary else None,
     }
@@ -85,7 +84,7 @@ def aggregate(metas: list[ProfileMeta], primary_code: str = "") -> dict:
             {
                 "ocs_code": m.ocs_code,
                 "occupation_name": m.job_title,
-                "job_category_name": (m.job_category.name if m.job_category else "") or "",
+                "job_category_name": m.job_category_name or "",
                 "job_description": m.job_description,
                 "ocs_level": m.ocs_level,
             }

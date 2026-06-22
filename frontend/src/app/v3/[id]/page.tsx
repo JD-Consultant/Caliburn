@@ -186,6 +186,7 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
         <TaskCuratePanel
           profileId={id}
           currentDoc={doc}
+          intake={profile?.job_summary || ""}
           onClose={() => setShowTasks(false)}
           onError={setError}
         />

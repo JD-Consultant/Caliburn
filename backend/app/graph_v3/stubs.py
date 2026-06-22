@@ -9,6 +9,7 @@ from app.services.knowledge.models import (
     PoolGroup,
     PoolTask,
     PoolUnit,
+    ProfileMeta,
     SearchResult,
     TaskPool,
     TasksByIdResult,
@@ -39,6 +40,13 @@ class StubKnowledge:
                      knowledge=[Pair(code="K01", name="設備保養原理")],
                      skills=[Pair(code="S01", name="點檢操作")],
                      attitudes=[Pair(code="A01", name="細心負責")])
+
+    async def profile(self, ocs_code) -> ProfileMeta:
+        return ProfileMeta(ocs_code=ocs_code, job_title="設備維護工程師",
+                           job_category=Pair(code="KRM", name="機械類"),
+                           industries=[Pair(code="C", name="製造業")],
+                           attitudes=[Pair(code="A01", name="細心負責")],
+                           job_description="負責設備維護", ocs_level=4)
 
     async def tasks_by_id(self, ids) -> TasksByIdResult:
         return TasksByIdResult(tasks=[])

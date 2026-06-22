@@ -64,6 +64,20 @@ class Pairs(_Base):
     supplements: list[str] = Field(default_factory=list)
 
 
+class ProfileMeta(_Base):
+    """jd-ocs-indexer ``GET /profile/{ocs_code}`` 回應（D29）：文件表頭用的職類 metadata。"""
+    ocs_code: str = ""
+    job_title: str = ""
+    job_category: Pair = Field(default_factory=Pair)
+    occupations: list[Pair] = Field(default_factory=list)
+    industries: list[Pair] = Field(default_factory=list)
+    job_description: str = ""
+    ocs_level: int | None = None
+    attitudes: list[Pair] = Field(default_factory=list)
+    prerequisites: list[str] = Field(default_factory=list)
+    supplements: list[str] = Field(default_factory=list)
+
+
 class TaskDetail(_Base):
     id: str
     ocs_code: str = ""

@@ -13,7 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.config import settings
 from app.database import get_db
 from app.models import JobProfile
-from app.services import ocs_doc
+from app.services import header_meta, ocs_doc
 from app.services.knowledge.base import KnowledgeClient
 from app.services.knowledge.http_client import HttpIndexerClient
 from app.services.persistence import DocRepo, ProfileRepo
@@ -221,6 +221,26 @@ async def ocs_search(
         if h.ocs_code and h.ocs_code not in seen:
             seen[h.ocs_code] = {"ocs_code": h.ocs_code, "job_title": h.job_title or h.ocs_code}
     return {"hits": list(seen.values())}
+
+
+@router.get("/{profile_id}/header-meta")
+async def get_header_meta(
+    profile_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    knowledge: KnowledgeClient = Depends(get_knowledge),
+):
+    """表頭候選池（D29）：逐已選職類取官方 metadata，聯集去重成所屬職類/職業/行業 +
+    態度 + notes 候選，並回主基準單值（預設第一順位）。唯讀、不寫文件——前端勾選後
+    自行 PATCH 寫入，故重選職類不會洗掉使用者編輯。indexer 掛或某 code 失敗則略過該 code。"""
+    profile = await _require_profile(profile_id, db)
+    codes = profile.selected_ocs_codes or []
+    metas = []
+    for code in codes:
+        try:
+            metas.append(await knowledge.profile(code))
+        except Exception:
+            logger.warning("header-meta: profile(%s) failed; skipping", code, exc_info=True)
+    return header_meta.aggregate(metas, primary_code=codes[0] if codes else "")
 
 
 @router.get("/{profile_id}/ksa-pool")

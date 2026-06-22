@@ -104,10 +104,12 @@ def test_assemble_final_strips_frontend_keys():
     draft["_pool"] = {"knowledge": [{"code": "K99", "name": "x"}], "skills": [], "attitudes": []}
     draft["ocs_content"]["ocu_units"][0]["_uid"] = "u-abc"
     draft["ocs_content"]["ocu_units"][0]["tasks"][0]["_tid"] = "t-abc"
+    draft["ocs_content"]["ocu_units"][0]["tasks"][0]["_notes"] = "5W2H 原文：每月彙整..."
     out = assemble_final(draft)
     assert "_pool" not in out
     assert "_uid" not in out["ocs_content"]["ocu_units"][0]
     assert "_tid" not in out["ocs_content"]["ocu_units"][0]["tasks"][0]
+    assert "_notes" not in out["ocs_content"]["ocu_units"][0]["tasks"][0]
     assert validate(out) == []
 
 

@@ -244,7 +244,9 @@ def assemble_final(draft: dict) -> dict:
             }
         )
 
-    # Strip front-end-only keys (_uid/_tid/_pool) → contract-pure final JSON.
+    # Strip front-end-only keys (_pool/_uid/_tid/_notes) → contract-pure final JSON.
+    # _notes = per-task 工作筆記 (5W2H/CIT raw text fed to AI + shown to the consultant);
+    # like the others it is NOT part of the OCS contract, so finalize/export drop it.
     doc.pop("_pool", None)
     for unit in units:
         if not isinstance(unit, dict):
@@ -253,6 +255,7 @@ def assemble_final(draft: dict) -> dict:
         for task in unit.get("tasks") or []:
             if isinstance(task, dict):
                 task.pop("_tid", None)
+                task.pop("_notes", None)
 
     return doc
 

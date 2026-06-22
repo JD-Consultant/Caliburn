@@ -55,6 +55,15 @@ export const createProfile = (
     body: JSON.stringify(data),
   });
 
+export const updateProfile = (
+  profileId: string,
+  data: { job_title?: string; department?: string; job_summary?: string },
+) =>
+  request<JobProfile>(`/job-profiles/${profileId}`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+
 export const deleteProfile = (profileId: string) =>
   request<void>(`/job-profiles/${profileId}`, { method: "DELETE" });
 

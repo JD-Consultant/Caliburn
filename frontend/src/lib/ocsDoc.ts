@@ -288,6 +288,26 @@ export function setKS(
   return next;
 }
 
+// ── 工作筆記 _notes（D28，非契約欄；finalize/export 後端剝除） ────────────────
+export function getTaskNotes(doc: OcsDocument, unitIdx: number, taskIdx: number): string {
+  return doc.ocs_content?.ocu_units?.[unitIdx]?.tasks?.[taskIdx]?._notes ?? "";
+}
+
+export function setTaskNotes(
+  doc: OcsDocument,
+  unitIdx: number,
+  taskIdx: number,
+  notes: string,
+): OcsDocument {
+  const next = clone(doc);
+  const task = next.ocs_content?.ocu_units?.[unitIdx]?.tasks?.[taskIdx];
+  if (task) {
+    if (notes.trim()) task._notes = notes;
+    else delete task._notes;
+  }
+  return next;
+}
+
 export function setAttitudes(doc: OcsDocument, items: CodeName[]): OcsDocument {
   const next = clone(doc);
   next.ocs_attitude = { attitudes: items };

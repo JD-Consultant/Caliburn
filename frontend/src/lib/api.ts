@@ -2,12 +2,17 @@
 // which now mounts users + job_profiles CRUD under /api/v1. Legacy interview /
 // tasks / documents endpoints were removed with the old backend (Concern B).
 import type {
+  ClarifyResult,
   DocumentEnvelope,
+  DraftOpResult,
+  ExtractTasksResult,
   JobProfile,
   KsaPool,
   OcsDocument,
   OcsSearchHit,
   PickedTask,
+  RecommendKsResult,
+  StructureTaskResult,
   TaskCandidates,
   User,
 } from "@/types";
@@ -100,3 +105,42 @@ export const ocsSearch = (profileId: string, q: string) =>
   request<{ hits: OcsSearchHit[] }>(
     `/job-profiles/${profileId}/ocs-search?q=${encodeURIComponent(q)}`,
   );
+
+// ── AI 提議端點（D28 /ai/*）─────────────────────────────────────────────────
+// 全部「只提議、不寫 DB」：回結構化提議，前端暫存→使用者套用才走 PATCH。
+// 沒設後端金鑰時降級成只回 catalog（recommend-ks/draft-op）或空（extract/clarify）。
+
+// 每任務 K/S 推薦：有 note→LLM 篩選+理由；無 note/無金鑰→回 catalog 全部（source=catalog）。
+export const recommendKS = (body: { profile_id: string; task_key: string; note?: string }) =>
+  request<RecommendKsResult>("/ai/recommend-ks", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+
+// 每任務 產出/指標 草擬：有 note→LLM 個人化（source=ai）；無 note/無金鑰→catalog 官方。
+export const draftOP = (body: { profile_id: string; task_key: string; note?: string }) =>
+  request<DraftOpResult>("/ai/draft-op", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+
+// intake 自述 → 預勾 catalog 任務 UUID + 候選自訂任務。
+export const extractTasks = (body: { intake: string; ocs_codes: string[] }) =>
+  request<ExtractTasksResult>("/ai/extract-tasks", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+
+// 一句描述 → 任務名 + 職責建議（自訂任務用）。
+export const structureTask = (body: { description: string; ocs_codes?: string[] }) =>
+  request<StructureTaskResult>("/ai/structure-task", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+
+// 太薄的任務 note → 一個追問字串或 null。
+export const clarify = (body: { task: string; note: string }) =>
+  request<ClarifyResult>("/ai/clarify", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });

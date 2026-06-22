@@ -51,8 +51,10 @@ export interface CompetencyBlock {
 export interface OcsTask {
   task_codes: CodeName[];
   competency_blocks: CompetencyBlock[];
-  provenance?: { ocs_code: string; task_id: string };
+  // D28: provenance.id = catalog 任務 UUID（自訂/cherry-pick 任務為 ""）→ /ai/* 用它取官方 K/S/O。
+  provenance?: { ocs_code: string; task_id: string; id?: string };
   _tid?: string; // 前端穩定 id（拖拉用；隨項目移動）
+  _notes?: string; // D28 工作筆記（5W2H/CIT 原文，餵 AI＋給顧問）；非契約欄，finalize/export 剝除
 }
 
 export interface OcuUnit {
@@ -113,6 +115,7 @@ export interface OcsSearchHit {
 
 // 選任務候選（task-candidates）：依職類 → 職責(unit) 分組。
 export interface CandidateTask {
+  id: string; // D28 catalog 任務 UUID（extract-tasks 預勾、/ai/* 取官方內容用）
   task_id: string;
   task_title: string;
 }
@@ -138,4 +141,51 @@ export interface PickedTask {
   occupation_name: string;
   task_id: string;
   task_name: string;
+  id?: string; // D28 catalog 任務 UUID（→ provenance.id；自訂任務可省）
+}
+
+// ── AI 提議（D28 /ai/*）：結構化提議、不寫 DB；前端暫存→使用者套用→走現有 PATCH ──
+export type AiSource = "catalog" | "ai";
+
+// recommend-ks：每項標來源；K/S 帶一句理由（catalog 篩選/AI 生成）。
+export interface KsSuggestion {
+  code: string;
+  name: string;
+  source: AiSource;
+  reason?: string;
+}
+export interface RecommendKsResult {
+  knowledge: KsSuggestion[];
+  skills: KsSuggestion[];
+}
+
+// draft-op：產出(O)/指標(P) 提議，帶來源。
+export interface OutputSuggestion {
+  name: string;
+  source: AiSource;
+}
+export interface IndicatorSuggestion {
+  text: string;
+  source: AiSource;
+}
+export interface DraftOpResult {
+  outputs: OutputSuggestion[];
+  indicators: IndicatorSuggestion[];
+}
+
+// extract-tasks：預勾的 catalog 任務 UUID + 候選自訂任務（名）。
+export interface ExtractTasksResult {
+  suggested_task_ids: string[];
+  custom_candidates: { name: string }[];
+}
+
+// structure-task：自訂任務一句描述 → 任務名 + 職責建議。
+export interface StructureTaskResult {
+  task_name: string;
+  unit_suggestion: string;
+}
+
+// clarify：太薄時回一個追問；否則 null。
+export interface ClarifyResult {
+  question: string | null;
 }

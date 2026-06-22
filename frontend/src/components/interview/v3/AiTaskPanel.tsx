@@ -4,8 +4,8 @@
 // 「產生草稿」→ 呼 /ai/draft-op + /ai/recommend-ks（帶 note）→ 暫存（O/P 可改、K/S
 // 勾選+來源/理由）→「套用」走現有 setOp/setKS + PATCH。太薄→clarify 一輪追問。
 // 工作筆記隨套用存進 task._notes（finalize/export 後端剝除）。不碰 CopilotKit。
-import { useMemo, useState } from "react";
-import { ChevronDown, ChevronRight, Loader2, Plus, Sparkles, Trash2, X } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { ChevronDown, ChevronRight, Layers, Loader2, Plus, Sparkles, Trash2, X } from "lucide-react";
 import type {
   IndicatorSuggestion,
   KsSuggestion,
@@ -146,6 +146,7 @@ export function AiTaskPanel({
   unitIdx,
   taskIdx,
   saving,
+  autoCatalog = false,
   onApply,
   onClose,
 }: {
@@ -154,6 +155,9 @@ export function AiTaskPanel({
   unitIdx: number;
   taskIdx: number;
   saving: boolean;
+  // T12 次要任務「一鍵帶 catalog」：開啟即以空 note 自動產生 → 回 catalog 官方
+  // O/P/K/S（source=catalog），跳過 5W2H 卡片與 clarify，使用者瞄一眼採用/略過。
+  autoCatalog?: boolean;
   onApply: (doc: OcsDocument) => void;
   onClose: () => void;
 }) {
@@ -189,19 +193,20 @@ export function AiTaskPanel({
     return parts.join("\n");
   };
 
-  const generate = async (noteArg?: string) => {
+  const generate = async (noteArg?: string, skipClarify = false) => {
     const note = noteArg ?? buildNote();
     if (!taskKey) {
       setErr("此任務尚未儲存（無任務代碼），請先關閉面板讓變更自動儲存後再試。");
       return;
     }
+    const askClarify = !skipClarify && !autoCatalog && !clarifyAsked;
     setBusy(true);
     setErr(null);
     try {
       const [op, ks, cl] = await Promise.all([
         draftOP({ profile_id: profileId, task_key: taskKey, note }),
         recommendKS({ profile_id: profileId, task_key: taskKey, note }),
-        clarifyAsked ? Promise.resolve({ question: null }) : clarify({ task: taskName, note }),
+        askClarify ? clarify({ task: taskName, note }) : Promise.resolve({ question: null }),
       ]);
       setStaged({
         outputs: op.outputs,
@@ -209,13 +214,22 @@ export function AiTaskPanel({
         knowledge: ks.knowledge.map((k) => ({ ...k, checked: true })),
         skills: ks.skills.map((s) => ({ ...s, checked: true })),
       });
-      setClarifyQ(clarifyAsked ? null : cl.question);
+      setClarifyQ(cl.question);
     } catch (e: unknown) {
       setErr(e instanceof Error ? e.message : "產生失敗");
     } finally {
       setBusy(false);
     }
   };
+
+  // T12：catalog 模式開啟即自動帶入官方內容（空 note，跳過 clarify），只跑一次。
+  // 用 setTimeout 把 setState 推離 effect 同步階段（避免 set-state-in-effect 連鎖渲染）。
+  useEffect(() => {
+    if (!autoCatalog) return;
+    const t = setTimeout(() => void generate("", true), 0);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const refineOnce = async () => {
     setClarifyAsked(true);
@@ -271,8 +285,17 @@ export function AiTaskPanel({
       >
         <div className="mb-4 flex items-center justify-between">
           <h3 className="flex items-center gap-1.5 text-sm font-semibold">
-            <Sparkles className="h-4 w-4 text-violet-500" />
-            ✨ AI 協助填寫：{taskName}
+            {autoCatalog ? (
+              <>
+                <Layers className="h-4 w-4 text-sky-500" />
+                一鍵帶入 catalog：{taskName}
+              </>
+            ) : (
+              <>
+                <Sparkles className="h-4 w-4 text-violet-500" />
+                ✨ AI 協助填寫：{taskName}
+              </>
+            )}
           </h3>
           <button type="button" onClick={onClose} className="text-muted-foreground hover:text-foreground">
             <X className="h-5 w-5" />
@@ -285,7 +308,21 @@ export function AiTaskPanel({
           </div>
         ) : null}
 
-        {/* ── 5W2H 卡片 ── */}
+        {/* ── catalog 模式：略過 5W2H，僅顯示說明 + 重新帶入 ── */}
+        {autoCatalog ? (
+          <div className="space-y-2 rounded-lg border bg-muted/20 p-3">
+            <p className="text-xs text-muted-foreground">
+              直接帶入此任務在職能基準目錄的官方產出 O／指標 P／知識 K／技能 S。瞄一眼後採用或略過。
+            </p>
+            <Button size="sm" variant="outline" className="w-full gap-1.5" disabled={busy} onClick={() => generate("", true)}>
+              {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Layers className="h-4 w-4" />}
+              重新帶入
+            </Button>
+          </div>
+        ) : null}
+
+        {/* ── 5W2H 卡片（✨ 模式） ── */}
+        {!autoCatalog ? (
         <div className="space-y-3 rounded-lg border bg-muted/20 p-3">
           <div>
             <label className="mb-1 block text-sm font-medium">
@@ -329,6 +366,7 @@ export function AiTaskPanel({
             {staged ? "重新產生" : "產生草稿"}
           </Button>
         </div>
+        ) : null}
 
         {/* ── clarify 追問（最多一輪） ── */}
         {clarifyQ ? (

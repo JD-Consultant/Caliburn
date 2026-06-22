@@ -41,7 +41,7 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
   const finalize = useFinalizeDocument(id);
 
   const [target, setTarget] = useState<CellTarget | null>(null);
-  const [starTarget, setStarTarget] = useState<{ unitIdx: number; taskIdx: number } | null>(null);
+  const [starTarget, setStarTarget] = useState<{ unitIdx: number; taskIdx: number; mode: "ai" | "catalog" } | null>(null);
   const [showOcc, setShowOcc] = useState(false);
   const [showTasks, setShowTasks] = useState(false);
   const [savedAt, setSavedAt] = useState<string | null>(null);
@@ -139,7 +139,7 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
               <JobDocTable
                 document={doc}
                 onCell={setTarget}
-                onStar={(unitIdx, taskIdx) => setStarTarget({ unitIdx, taskIdx })}
+                onStar={(unitIdx, taskIdx, mode) => setStarTarget({ unitIdx, taskIdx, mode })}
                 onChange={(d) => persist(d)}
               />
             </div>
@@ -161,12 +161,13 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
 
       {starTarget && doc ? (
         <AiTaskPanel
-          key={`star-${starTarget.unitIdx}-${starTarget.taskIdx}`}
+          key={`star-${starTarget.mode}-${starTarget.unitIdx}-${starTarget.taskIdx}`}
           document={doc}
           profileId={id}
           unitIdx={starTarget.unitIdx}
           taskIdx={starTarget.taskIdx}
           saving={patch.isPending}
+          autoCatalog={starTarget.mode === "catalog"}
           onApply={(next) => persist(next, () => setStarTarget(null))}
           onClose={() => setStarTarget(null)}
         />

@@ -209,12 +209,14 @@ async def test_export_returns_clean_ocs_json(client):
                               "indexer_ref": {"task_id": "T1.1"}}])
     skel["_pool"] = {"knowledge": [], "skills": [], "attitudes": []}
     skel["ocs_content"]["ocu_units"][0]["_uid"] = "u-x"
+    skel["ocs_content"]["ocu_units"][0]["tasks"][0]["_notes"] = "工作筆記原文"
     await client.patch(f"/api/v1/job-profiles/{p.id}/document", json=skel)
     r = await client.get(f"/api/v1/job-profiles/{p.id}/document/export")
     assert r.status_code == 200, r.text
     body = r.json()
     assert "_pool" not in body
     assert "_uid" not in body["ocs_content"]["ocu_units"][0]
+    assert "_notes" not in body["ocs_content"]["ocu_units"][0]["tasks"][0]
     assert set(["version_info", "ocs_profile", "ocs_content", "ocs_attitude", "notes"]).issubset(body)
 
 

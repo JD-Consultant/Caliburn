@@ -308,12 +308,12 @@ async def test_header_meta_aggregates_multi_ocs(client):
     app.dependency_overrides[get_knowledge] = lambda: StubKnowledge(
         profiles={
             "OC1": ProfileMeta(ocs_code="OC1", job_title="人資專員",
-                               job_category=Pair(code="BHR", name="人資類"),
+                               job_categories=[Pair(code="BHR", name="人資類")],
                                industries=[Pair(code="A", name="農林漁牧業")],
                                attitudes=[Pair(code="A01", name="主動")],
                                job_description="d1", ocs_level=4),
             "OC2": ProfileMeta(ocs_code="OC2", job_title="人資主管",
-                               job_category=Pair(code="BHR", name="人資類"),
+                               job_categories=[Pair(code="BHR", name="人資類")],
                                industries=[Pair(code="A", name="農林漁牧業"),
                                            Pair(code="N", name="支援服務業")],
                                ocs_level=5),

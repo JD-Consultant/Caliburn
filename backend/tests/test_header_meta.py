@@ -10,14 +10,15 @@ def _meta(code, **kw):
 def test_aggregate_dedupes_by_code_and_tracks_sources():
     metas = [
         _meta("OC1", job_title="人資專員",
-              job_category=Pair(code="BHR", name="人資類"),
+              job_categories=[Pair(code="BHR", name="人資類")],
               occupations=[Pair(code="2422", name="人資專業人員")],
               industries=[Pair(code="A", name="農林漁牧業")],
               attitudes=[Pair(code="A01", name="主動")],
               prerequisites=["大學以上"], supplements=["須證照"],
               job_description="desc1", ocs_level=4),
         _meta("OC2", job_title="人資主管",
-              job_category=Pair(code="BHR", name="人資類"),          # dup code BHR
+              job_categories=[Pair(code="BHR", name="人資類"),         # dup code BHR
+                              Pair(code="MPM", name="製造類")],
               occupations=[Pair(code="1120", name="高階主管")],
               industries=[Pair(code="A", name="農林漁牧業"),         # dup A
                           Pair(code="N", name="支援服務業")],
@@ -26,9 +27,10 @@ def test_aggregate_dedupes_by_code_and_tracks_sources():
     ]
     out = header_meta.aggregate(metas, primary_code="OC1")
 
-    # dedupe by code, first-seen order
-    assert [x["code"] for x in out["job_categories"]] == ["BHR"]
+    # job_categories 多值聯集去重（BHR 兩來源、MPM 僅 OC2）
+    assert [x["code"] for x in out["job_categories"]] == ["BHR", "MPM"]
     assert out["job_categories"][0]["sources"] == ["OC1", "OC2"]
+    assert out["job_categories"][1]["sources"] == ["OC2"]
     assert [x["code"] for x in out["occupations"]] == ["2422", "1120"]
     assert [x["code"] for x in out["industries"]] == ["A", "N"]
     assert out["industries"][0]["sources"] == ["OC1", "OC2"]   # A from both
@@ -42,7 +44,7 @@ def test_aggregate_dedupes_by_code_and_tracks_sources():
 
 def test_primary_defaults_to_primary_code():
     metas = [
-        _meta("OC1", job_title="專員", job_category=Pair(code="B", name="乙"),
+        _meta("OC1", job_title="專員", job_category_name="乙",
               job_description="d1", ocs_level=3),
         _meta("OC2", job_title="主管", job_description="d2", ocs_level=5),
     ]

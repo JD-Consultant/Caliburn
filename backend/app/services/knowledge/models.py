@@ -65,10 +65,13 @@ class Pairs(_Base):
 
 
 class ProfileMeta(_Base):
-    """jd-ocs-indexer ``GET /profile/{ocs_code}`` 回應（D29）：文件表頭用的職類 metadata。"""
+    """jd-ocs-indexer ``GET /profile/{ocs_code}`` 回應（D29）：文件表頭用的職類 metadata。
+    所屬類別三組（job_categories/occupations/industries）皆多值 {code,name}；
+    job_category_name 為標題用的單一職類名（ocs_name.job_category_name，常空）。"""
     ocs_code: str = ""
     job_title: str = ""
-    job_category: Pair = Field(default_factory=Pair)
+    job_category_name: str = ""
+    job_categories: list[Pair] = Field(default_factory=list)
     occupations: list[Pair] = Field(default_factory=list)
     industries: list[Pair] = Field(default_factory=list)
     job_description: str = ""

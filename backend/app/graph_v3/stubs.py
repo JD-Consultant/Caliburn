@@ -43,7 +43,8 @@ class StubKnowledge:
 
     async def profile(self, ocs_code) -> ProfileMeta:
         return ProfileMeta(ocs_code=ocs_code, job_title="設備維護工程師",
-                           job_category=Pair(code="KRM", name="機械類"),
+                           job_category_name="",
+                           job_categories=[Pair(code="KRM", name="機械類")],
                            industries=[Pair(code="C", name="製造業")],
                            attitudes=[Pair(code="A01", name="細心負責")],
                            job_description="負責設備維護", ocs_level=4)

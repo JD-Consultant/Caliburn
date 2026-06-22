@@ -31,7 +31,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { Badge } from "@/components/ui/badge";
 import { DocHeader } from "./DocHeader";
 import { DocNotes } from "./DocNotes";
-import { Check, GripVertical, Pencil, Plus, Sparkles, Trash2 } from "lucide-react";
+import { Check, GripVertical, Layers, Pencil, Plus, Sparkles, Trash2 } from "lucide-react";
 
 export type CellKind = "o" | "p" | "k" | "s";
 export type CellTarget =
@@ -119,7 +119,7 @@ function TaskRow({
   unitIdx: number;
   taskIdx: number;
   onCell: (t: CellTarget) => void;
-  onStar: (unitIdx: number, taskIdx: number) => void;
+  onStar: (unitIdx: number, taskIdx: number, mode: "ai" | "catalog") => void;
   onChange: (d: OcsDocument) => void;
   doc: OcsDocument;
 }) {
@@ -151,11 +151,20 @@ function TaskRow({
         <button
           type="button"
           className="inline-flex items-center gap-1 rounded-md border border-violet-200 bg-violet-50 px-2 py-1 text-xs font-medium text-violet-700 hover:bg-violet-100"
-          onClick={() => onStar(unitIdx, taskIdx)}
-          title="用 AI 協助填寫這個任務"
+          onClick={() => onStar(unitIdx, taskIdx, "ai")}
+          title="用 AI 協助填寫這個任務（5W2H 深填）"
         >
           <Sparkles className="h-3.5 w-3.5" />
           AI 填寫
+        </button>
+        <button
+          type="button"
+          className="inline-flex items-center gap-1 rounded-md border border-sky-200 bg-sky-50 px-2 py-1 text-xs font-medium text-sky-700 hover:bg-sky-100"
+          onClick={() => onStar(unitIdx, taskIdx, "catalog")}
+          title="一鍵帶入職能基準目錄的官方 O/P/K/S（次要任務輕量）"
+        >
+          <Layers className="h-3.5 w-3.5" />
+          帶 catalog
         </button>
         <button
           type="button"
@@ -188,7 +197,7 @@ function UnitRow({
   unit: OcsDocument["ocs_content"]["ocu_units"][number];
   unitIdx: number;
   onCell: (t: CellTarget) => void;
-  onStar: (unitIdx: number, taskIdx: number) => void;
+  onStar: (unitIdx: number, taskIdx: number, mode: "ai" | "catalog") => void;
   onChange: (d: OcsDocument) => void;
   doc: OcsDocument;
 }) {
@@ -254,7 +263,7 @@ export function JobDocTable({
 }: {
   document: OcsDocument;
   onCell: (target: CellTarget) => void;
-  onStar: (unitIdx: number, taskIdx: number) => void;
+  onStar: (unitIdx: number, taskIdx: number, mode: "ai" | "catalog") => void;
   onChange: (d: OcsDocument) => void;
 }) {
   const units = document.ocs_content?.ocu_units ?? [];

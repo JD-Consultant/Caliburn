@@ -21,20 +21,27 @@ from app.services.knowledge.models import (
     PoolGroup,
     PoolTask,
     PoolUnit,
+    ProfileMeta,
     SearchResult,
     TaskPool,
 )
 
 
 class StubKnowledge:
-    def __init__(self, pairs_map=None, fail=False, pool=None, hits=None):
+    def __init__(self, pairs_map=None, fail=False, pool=None, hits=None, profiles=None):
         self.pairs_map, self.fail, self.pool = pairs_map or {}, fail, pool
         self.hits = hits or []
+        self.profiles = profiles or {}
 
     async def pairs(self, ocs_code):
         if self.fail:
             raise RuntimeError("indexer down")
         return self.pairs_map.get(ocs_code, Pairs())
+
+    async def profile(self, ocs_code):
+        if self.fail:
+            raise RuntimeError("indexer down")
+        return self.profiles[ocs_code]  # KeyError surfaces missing test setup
 
     async def task_pool(self, ocs_codes, *, activity_examples=3):
         if self.fail:
@@ -293,6 +300,56 @@ async def test_ksa_pool_indexer_down(client):
     assert body["knowledge"] == []
     assert body["skills"] == []
     assert body["attitudes"] == []
+
+
+@pytest.mark.asyncio
+async def test_header_meta_aggregates_multi_ocs(client):
+    p = await _mk_profile(client._db, codes=["OC1", "OC2"])
+    app.dependency_overrides[get_knowledge] = lambda: StubKnowledge(
+        profiles={
+            "OC1": ProfileMeta(ocs_code="OC1", job_title="人資專員",
+                               job_category=Pair(code="BHR", name="人資類"),
+                               industries=[Pair(code="A", name="農林漁牧業")],
+                               attitudes=[Pair(code="A01", name="主動")],
+                               job_description="d1", ocs_level=4),
+            "OC2": ProfileMeta(ocs_code="OC2", job_title="人資主管",
+                               job_category=Pair(code="BHR", name="人資類"),
+                               industries=[Pair(code="A", name="農林漁牧業"),
+                                           Pair(code="N", name="支援服務業")],
+                               ocs_level=5),
+        }
+    )
+    r = await client.get(f"/api/v1/job-profiles/{p.id}/header-meta")
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert body["primary"]["ocs_code"] == "OC1"  # codes[0]
+    assert [x["code"] for x in body["industries"]] == ["A", "N"]
+    assert body["industries"][0]["sources"] == ["OC1", "OC2"]
+    assert [x["code"] for x in body["job_categories"]] == ["BHR"]
+    assert [o["ocs_code"] for o in body["primary_options"]] == ["OC1", "OC2"]
+
+
+@pytest.mark.asyncio
+async def test_header_meta_skips_failed_code(client):
+    p = await _mk_profile(client._db, codes=["OC1"])
+
+    class Flaky(StubKnowledge):
+        async def profile(self, ocs_code):
+            raise RuntimeError("indexer down")
+
+    app.dependency_overrides[get_knowledge] = lambda: Flaky()
+    r = await client.get(f"/api/v1/job-profiles/{p.id}/header-meta")
+    assert r.status_code == 200, r.text  # degrades, no crash
+    assert r.json()["industries"] == []
+
+
+@pytest.mark.asyncio
+async def test_header_meta_no_codes_empty(client):
+    p = await _mk_profile(client._db)
+    app.dependency_overrides[get_knowledge] = lambda: StubKnowledge()
+    r = await client.get(f"/api/v1/job-profiles/{p.id}/header-meta")
+    assert r.status_code == 200, r.text
+    assert r.json()["primary"]["ocs_code"] == ""
 
 
 @pytest.mark.asyncio

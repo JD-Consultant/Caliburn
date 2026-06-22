@@ -2,7 +2,13 @@
 日後要外部多客戶，indexer 端加 MCP surface 即可，本 client 不變。"""
 import httpx
 
-from app.services.knowledge.models import Pairs, SearchResult, TaskPool, TasksByIdResult
+from app.services.knowledge.models import (
+    Pairs,
+    ProfileMeta,
+    SearchResult,
+    TaskPool,
+    TasksByIdResult,
+)
 
 
 class HttpIndexerClient:
@@ -34,6 +40,11 @@ class HttpIndexerClient:
         resp = await self._client.get(f"/profile/{ocs_code}/pairs")
         resp.raise_for_status()
         return Pairs.model_validate(resp.json())
+
+    async def profile(self, ocs_code: str) -> ProfileMeta:
+        resp = await self._client.get(f"/profile/{ocs_code}")
+        resp.raise_for_status()
+        return ProfileMeta.model_validate(resp.json())
 
     async def tasks_by_id(self, ids: list[str]) -> TasksByIdResult:
         resp = await self._client.post("/tasks/by-id", json={"ids": ids})

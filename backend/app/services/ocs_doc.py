@@ -33,7 +33,7 @@ def _empty_block() -> dict[str, Any]:
 
 def _task_prov(task: dict) -> dict:
     ref = task.get("indexer_ref") or {}
-    return {"ocs_code": ref.get("ocs_code") or "", "task_id": ref.get("task_id") or ""}
+    return {"ocs_code": ref.get("ocs_code") or "", "task_id": ref.get("task_id") or "", "id": ref.get("id") or ""}
 
 
 def skeleton(profile: dict, units_tasks: list[dict]) -> dict:
@@ -163,7 +163,7 @@ def build_from_picked(profile: dict, picked: list[dict], prev: dict | None = Non
         target["tasks"].append({
             "task_codes": [{"code": "", "name": it.get("task_name", "")}],
             "competency_blocks": [_empty_block()],
-            "provenance": {"ocs_code": oc, "task_id": tid},
+            "provenance": {"ocs_code": oc, "task_id": tid, "id": ref.get("id") or ""},
         })
 
     return _renumber(doc)

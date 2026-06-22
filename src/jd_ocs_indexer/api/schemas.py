@@ -96,6 +96,26 @@ class PairsResponse(BaseModel):
     supplements: list[str] = Field(default_factory=list)
 
 
+class CodeName(BaseModel):
+    code: str = ""
+    name: str = ""
+
+
+class ProfileMetaResponse(BaseModel):
+    """Profile-metadata for the document header (D29)."""
+
+    ocs_code: str
+    job_title: str = ""
+    job_category: CodeName = Field(default_factory=CodeName)
+    occupations: list[CodeName] = Field(default_factory=list)
+    industries: list[CodeName] = Field(default_factory=list)
+    job_description: str = ""
+    ocs_level: Optional[int] = None
+    attitudes: list[Pair] = Field(default_factory=list)
+    prerequisites: list[str] = Field(default_factory=list)
+    supplements: list[str] = Field(default_factory=list)
+
+
 class TaskByIdRequest(BaseModel):
     ids: list[str] = Field(min_length=1)
 

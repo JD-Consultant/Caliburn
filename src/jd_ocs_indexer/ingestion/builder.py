@@ -100,6 +100,7 @@ def _profile_record(norm: NormalizedOCS, ctx: BuildContext) -> ChunkRecord:
         "ocs_code_base": norm.ocs_code_base,
         "job_title": norm.job_title,
         "job_category": norm.job_category,
+        "job_category_codes": list(norm.job_category_codes),
         "industry_codes": list(norm.industry_codes),
         "industry_names": list(norm.industry_names),
         "occupation_codes": list(norm.occupation_codes),

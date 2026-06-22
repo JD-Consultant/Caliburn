@@ -66,6 +66,33 @@ def test_pairs_route_404(make_app, make_qdrant):
         assert r.status_code == 404
 
 
+def test_profile_route_ok(make_app, make_qdrant, fake_point):
+    profile = fake_point(payload={
+        "chunk_level": "profile", "ocs_code": "OC1", "job_title": "JT",
+        "job_category": "人資類", "job_category_codes": ["BHR"],
+        "industry_codes": ["A"], "industry_names": ["農林漁牧業"],
+        "occupation_codes": ["2422"], "occupation_names": ["人資專業人員"],
+        "job_description": "desc", "ocs_level": 4,
+        "all_a_pairs": [{"code": "A01", "name": "主動"}],
+        "prerequisites": ["x"], "supplements": ["y"],
+    })
+    with TestClient(make_app(make_qdrant(scroll_pages=[([profile], None)]))) as c:
+        r = c.get("/profile/OC1")
+        assert r.status_code == 200
+        b = r.json()
+        assert b["ocs_code"] == "OC1" and b["ocs_level"] == 4
+        assert b["job_category"] == {"code": "BHR", "name": "人資類"}
+        assert b["industries"] == [{"code": "A", "name": "農林漁牧業"}]
+        assert b["attitudes"] == [{"code": "A01", "name": "主動"}]
+        assert b["prerequisites"] == ["x"] and b["supplements"] == ["y"]
+
+
+def test_profile_route_404(make_app, make_qdrant):
+    with TestClient(make_app(make_qdrant(scroll_pages=[([], None)]))) as c:
+        r = c.get("/profile/NOPE")
+        assert r.status_code == 404
+
+
 def test_healthz_route(make_app, make_qdrant):
     with TestClient(make_app(make_qdrant())) as c:
         r = c.get("/healthz")

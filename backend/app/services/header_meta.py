@@ -81,7 +81,16 @@ def aggregate(metas: list[ProfileMeta], primary_code: str = "") -> dict:
 
     return {
         "primary": primary_out,
-        "primary_options": [{"ocs_code": m.ocs_code, "occupation_name": m.job_title} for m in metas],
+        "primary_options": [
+            {
+                "ocs_code": m.ocs_code,
+                "occupation_name": m.job_title,
+                "job_category_name": (m.job_category.name if m.job_category else "") or "",
+                "job_description": m.job_description,
+                "ocs_level": m.ocs_level,
+            }
+            for m in metas
+        ],
         "job_categories": _strip(job_categories),
         "occupations": _strip(occupations),
         "industries": _strip(industries),

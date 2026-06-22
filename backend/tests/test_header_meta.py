@@ -51,8 +51,9 @@ def test_primary_defaults_to_primary_code():
     assert out["primary"]["occupation_name"] == "主管"
     assert out["primary"]["job_description"] == "d2"
     assert out["primary"]["ocs_level"] == 5
-    # switcher options list all selected
+    # switcher options list all selected, each carrying its bound job_category_name
     assert [o["ocs_code"] for o in out["primary_options"]] == ["OC1", "OC2"]
+    assert out["primary_options"][0]["job_category_name"] == "乙"
 
 
 def test_empty_is_safe():

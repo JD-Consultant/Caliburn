@@ -144,6 +144,41 @@ export interface PickedTask {
   id?: string; // D28 catalog 任務 UUID（→ provenance.id；自訂任務可省）
 }
 
+// ── 表頭候選池（D29 /header-meta）：多 OCS 聯集去重；勾選後 PATCH 寫文件表頭 ──
+// 每候選帶 sources（哪些 ocs_code 帶入），供「最後一個來源移除才下架」。
+export interface HeaderMetaCandidate {
+  code: string;
+  name: string;
+  sources: string[];
+}
+export interface HeaderMetaText {
+  text: string;
+  sources: string[];
+}
+export interface HeaderMetaPrimaryOption {
+  ocs_code: string;
+  occupation_name: string;
+  job_category_name: string;
+  job_description: string;
+  ocs_level: number | null;
+}
+export interface HeaderMeta {
+  primary: {
+    ocs_code: string;
+    occupation_name: string;
+    job_category_name: string;
+    job_description: string;
+    ocs_level: number | null;
+  };
+  primary_options: HeaderMetaPrimaryOption[];
+  job_categories: HeaderMetaCandidate[];
+  occupations: HeaderMetaCandidate[];
+  industries: HeaderMetaCandidate[];
+  attitudes: HeaderMetaCandidate[];
+  prerequisites: HeaderMetaText[];
+  supplements: HeaderMetaText[];
+}
+
 // ── AI 提議（D28 /ai/*）：結構化提議、不寫 DB；前端暫存→使用者套用→走現有 PATCH ──
 export type AiSource = "catalog" | "ai";
 

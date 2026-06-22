@@ -6,6 +6,7 @@ import type {
   DocumentEnvelope,
   DraftOpResult,
   ExtractTasksResult,
+  HeaderMeta,
   JobProfile,
   KsaPool,
   OcsDocument,
@@ -109,6 +110,10 @@ export const buildTasks = (profileId: string, picked: PickedTask[]) =>
 
 export const getKsaPool = (profileId: string) =>
   request<KsaPool>(`/job-profiles/${profileId}/ksa-pool`);
+
+// 表頭候選池（D29）：多 OCS 官方 metadata 聯集（職類/職業/行業/態度/notes）+ 主基準。
+export const getHeaderMeta = (profileId: string) =>
+  request<HeaderMeta>(`/job-profiles/${profileId}/header-meta`);
 
 export const ocsSearch = (profileId: string, q: string) =>
   request<{ hits: OcsSearchHit[] }>(

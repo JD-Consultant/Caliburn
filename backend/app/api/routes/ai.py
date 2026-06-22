@@ -19,8 +19,11 @@ from app.config import settings
 from app.database import get_db
 from app.graph_v3.deps import LlmPort
 from app.graph_v3.llm import OpenRouterLlm
+from app.services.ai import clarify as _clarify
 from app.services.ai import draft_op as _draft_op
+from app.services.ai import extract_tasks as _extract_tasks
 from app.services.ai import recommend_ks as _recommend_ks
+from app.services.ai import structure_task as _structure_task
 from app.services.ai import tasks as _tasks
 from app.services.knowledge.base import KnowledgeClient
 from app.services.persistence import DocRepo
@@ -131,3 +134,65 @@ async def draft_op_ep(
         indicators_catalog=examples,
         llm=llm,
     )
+
+
+async def _task_candidates(knowledge: KnowledgeClient, ocs_codes: list[str]) -> list[dict]:
+    """Flatten the indexer task pool for the given OCS codes into grounding candidates
+    ``[{"id", "title"}]``. Indexer down → ``[]`` (caller degrades, never crashes)."""
+    if not ocs_codes:
+        return []
+    try:
+        pool = await knowledge.task_pool(ocs_codes)
+    except Exception:
+        logger.warning("ai: task_pool failed", exc_info=True)
+        return []
+    return [
+        {"id": t.id, "title": t.task_title}
+        for g in pool.groups
+        for u in g.units
+        for t in u.tasks
+    ]
+
+
+@router.post("/extract-tasks")
+async def extract_tasks_ep(
+    body: dict = Body(...),
+    knowledge: KnowledgeClient = Depends(get_knowledge),
+    llm: LlmPort | None = Depends(get_llm),
+):
+    """Propose which catalog tasks an employee performs from their self-description +
+    any clearly-mentioned tasks not in the catalog as custom candidates."""
+    intake = body.get("intake") or ""
+    ocs_codes = body.get("ocs_codes") or []
+    candidates = await _task_candidates(knowledge, ocs_codes)
+    return await _extract_tasks.extract_tasks(intake=intake, candidates=candidates, llm=llm)
+
+
+@router.post("/structure-task")
+async def structure_task_ep(
+    body: dict = Body(...),
+    llm: LlmPort | None = Depends(get_llm),
+):
+    """Turn a one-line free-text description into a formal 任務名稱 + suggested 職責."""
+    description = body.get("description") or ""
+    if not description.strip():
+        raise HTTPException(status_code=400, detail="description required")
+    occupation_context = ", ".join(body.get("ocs_codes") or [])
+    return await _structure_task.structure_task(
+        description=description,
+        occupation_context=occupation_context,
+        llm=llm,
+    )
+
+
+@router.post("/clarify")
+async def clarify_ep(
+    body: dict = Body(...),
+    llm: LlmPort | None = Depends(get_llm),
+):
+    """Ask ONE short follow-up question for a too-thin task note, or ``null`` if the
+    note is already sufficient (stable typed contract for the frontend)."""
+    task = body.get("task") or ""
+    note = body.get("note") or ""
+    question = await _clarify.clarify(task=task, note=note, llm=llm)
+    return {"question": question}

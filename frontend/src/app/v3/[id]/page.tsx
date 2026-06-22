@@ -12,6 +12,7 @@ import { getDocumentExport } from "@/lib/api";
 import { downloadJson } from "@/lib/download";
 import { JobDocTable, type CellTarget } from "@/components/interview/v3/JobDocTable";
 import { CellFillerPanel } from "@/components/interview/v3/CellFillerPanel";
+import { AiTaskPanel } from "@/components/interview/v3/AiTaskPanel";
 import { OccupationPicker } from "@/components/interview/v3/OccupationPicker";
 import { TaskCuratePanel } from "@/components/interview/v3/TaskCuratePanel";
 import { completion, ensureIds } from "@/lib/ocsDoc";
@@ -40,6 +41,7 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
   const finalize = useFinalizeDocument(id);
 
   const [target, setTarget] = useState<CellTarget | null>(null);
+  const [starTarget, setStarTarget] = useState<{ unitIdx: number; taskIdx: number } | null>(null);
   const [showOcc, setShowOcc] = useState(false);
   const [showTasks, setShowTasks] = useState(false);
   const [savedAt, setSavedAt] = useState<string | null>(null);
@@ -134,7 +136,12 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
               </div>
             </aside>
             <div className="min-w-0 flex-1">
-              <JobDocTable document={doc} onCell={setTarget} onChange={(d) => persist(d)} />
+              <JobDocTable
+                document={doc}
+                onCell={setTarget}
+                onStar={(unitIdx, taskIdx) => setStarTarget({ unitIdx, taskIdx })}
+                onChange={(d) => persist(d)}
+              />
             </div>
           </div>
         )}
@@ -149,6 +156,19 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
           saving={patch.isPending}
           onSave={(next) => persist(next, () => setTarget(null))}
           onClose={() => setTarget(null)}
+        />
+      ) : null}
+
+      {starTarget && doc ? (
+        <AiTaskPanel
+          key={`star-${starTarget.unitIdx}-${starTarget.taskIdx}`}
+          document={doc}
+          profileId={id}
+          unitIdx={starTarget.unitIdx}
+          taskIdx={starTarget.taskIdx}
+          saving={patch.isPending}
+          onApply={(next) => persist(next, () => setStarTarget(null))}
+          onClose={() => setStarTarget(null)}
         />
       ) : null}
 

@@ -31,7 +31,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { Badge } from "@/components/ui/badge";
 import { DocHeader } from "./DocHeader";
 import { DocNotes } from "./DocNotes";
-import { Check, GripVertical, Pencil, Plus, Trash2 } from "lucide-react";
+import { Check, GripVertical, Pencil, Plus, Sparkles, Trash2 } from "lucide-react";
 
 export type CellKind = "o" | "p" | "k" | "s";
 export type CellTarget =
@@ -110,6 +110,7 @@ function TaskRow({
   unitIdx,
   taskIdx,
   onCell,
+  onStar,
   onChange,
   doc,
 }: {
@@ -118,6 +119,7 @@ function TaskRow({
   unitIdx: number;
   taskIdx: number;
   onCell: (t: CellTarget) => void;
+  onStar: (unitIdx: number, taskIdx: number) => void;
   onChange: (d: OcsDocument) => void;
   doc: OcsDocument;
 }) {
@@ -148,6 +150,15 @@ function TaskRow({
         <span className="text-xs text-muted-foreground">級別 {level != null ? level : "—"}</span>
         <button
           type="button"
+          className="inline-flex items-center gap-1 rounded-md border border-violet-200 bg-violet-50 px-2 py-1 text-xs font-medium text-violet-700 hover:bg-violet-100"
+          onClick={() => onStar(unitIdx, taskIdx)}
+          title="用 AI 協助填寫這個任務"
+        >
+          <Sparkles className="h-3.5 w-3.5" />
+          AI 填寫
+        </button>
+        <button
+          type="button"
           className="text-muted-foreground hover:text-destructive"
           onClick={() => onChange(deleteTask(doc, unitIdx, taskIdx))}
         >
@@ -169,6 +180,7 @@ function UnitRow({
   unit,
   unitIdx,
   onCell,
+  onStar,
   onChange,
   doc,
 }: {
@@ -176,6 +188,7 @@ function UnitRow({
   unit: OcsDocument["ocs_content"]["ocu_units"][number];
   unitIdx: number;
   onCell: (t: CellTarget) => void;
+  onStar: (unitIdx: number, taskIdx: number) => void;
   onChange: (d: OcsDocument) => void;
   doc: OcsDocument;
 }) {
@@ -214,6 +227,7 @@ function UnitRow({
               unitIdx={unitIdx}
               taskIdx={ti}
               onCell={onCell}
+              onStar={onStar}
               onChange={onChange}
               doc={doc}
             />
@@ -235,10 +249,12 @@ function UnitRow({
 export function JobDocTable({
   document,
   onCell,
+  onStar,
   onChange,
 }: {
   document: OcsDocument;
   onCell: (target: CellTarget) => void;
+  onStar: (unitIdx: number, taskIdx: number) => void;
   onChange: (d: OcsDocument) => void;
 }) {
   const units = document.ocs_content?.ocu_units ?? [];
@@ -303,6 +319,7 @@ export function JobDocTable({
                   unit={unit}
                   unitIdx={ui}
                   onCell={onCell}
+                  onStar={onStar}
                   onChange={onChange}
                   doc={document}
                 />

@@ -114,6 +114,25 @@ export function upsertCategory(
   return next;
 }
 
+// 整類取代（D29 表頭選單套用）：把某類的清單換成勾選結果。
+export function setCategory(doc: OcsDocument, kind: CatKind, items: CodeName[]): OcsDocument {
+  const next = clone(doc);
+  next.ocs_profile.category[kind] = items.map((it) => ({ code: it.code, name: it.name }));
+  return next;
+}
+
+// 切換主基準（D29）：代碼↔名稱綁定一起換（含職類名）；不動工作描述/級別等使用者欄位。
+export function setPrimaryBasis(
+  doc: OcsDocument,
+  basis: { ocs_code: string; occupation_name: string; job_category_name: string },
+): OcsDocument {
+  const next = clone(doc);
+  next.ocs_profile.ocs_code = basis.ocs_code;
+  next.ocs_profile.ocs_name.occupation_name = basis.occupation_name;
+  next.ocs_profile.ocs_name.job_category_name = basis.job_category_name;
+  return next;
+}
+
 export function addCategory(doc: OcsDocument, kind: CatKind): OcsDocument {
   const next = clone(doc);
   next.ocs_profile.category[kind].push({ name: "", code: "" });
@@ -133,6 +152,14 @@ function ensureNotes(doc: OcsDocument) {
   if (!doc.notes) doc.notes = { prerequisites: [], supplements: [] };
   if (!doc.notes.prerequisites) doc.notes.prerequisites = [];
   if (!doc.notes.supplements) doc.notes.supplements = [];
+}
+
+// 整欄取代（D29 表頭選單套用 prerequisites/supplements）。
+export function setNotes(doc: OcsDocument, field: NoteField, items: string[]): OcsDocument {
+  const next = clone(doc);
+  ensureNotes(next);
+  next.notes[field] = [...items];
+  return next;
 }
 
 export function addNote(doc: OcsDocument, field: NoteField): OcsDocument {

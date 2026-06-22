@@ -5,7 +5,7 @@
 // draft（自動儲存）。續做＝重開自動載 draft。finalize 產正式版本。不碰 CopilotKit。
 import { use, useMemo, useState } from "react";
 import Link from "next/link";
-import { ChevronLeft, Download, FileCheck2, Layers, ListChecks, Sparkles } from "lucide-react";
+import { ChevronLeft, Download, FileCheck2, Layers, ListChecks, Sparkles, Tags } from "lucide-react";
 import { useProfile } from "@/hooks/useProfiles";
 import { useDocument, useFinalizeDocument, useKsaPool, usePatchDocument } from "@/hooks/useDocument";
 import { getDocumentExport } from "@/lib/api";
@@ -15,6 +15,7 @@ import { CellFillerPanel } from "@/components/interview/v3/CellFillerPanel";
 import { AiTaskPanel } from "@/components/interview/v3/AiTaskPanel";
 import { OccupationPicker } from "@/components/interview/v3/OccupationPicker";
 import { TaskCuratePanel } from "@/components/interview/v3/TaskCuratePanel";
+import { HeaderMetaPanel } from "@/components/interview/v3/HeaderMetaPanel";
 import { completion, ensureIds } from "@/lib/ocsDoc";
 import type { KsaPool, OcsDocument } from "@/types";
 import { Button } from "@/components/ui/button";
@@ -44,6 +45,7 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
   const [starTarget, setStarTarget] = useState<{ unitIdx: number; taskIdx: number; mode: "ai" | "catalog" } | null>(null);
   const [showOcc, setShowOcc] = useState(false);
   const [showTasks, setShowTasks] = useState(false);
+  const [showHeaderMeta, setShowHeaderMeta] = useState(false);
   const [savedAt, setSavedAt] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -101,6 +103,10 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
           <Button size="sm" variant="outline" className="gap-1" disabled={!hasOccupations} onClick={() => setShowTasks(true)}>
             <ListChecks className="h-4 w-4" />
             選任務
+          </Button>
+          <Button size="sm" variant="outline" className="gap-1" disabled={!hasOccupations} onClick={() => setShowHeaderMeta(true)}>
+            <Tags className="h-4 w-4" />
+            表頭分類
           </Button>
           <Button size="sm" variant="outline" className="gap-1" onClick={exportJson} disabled={status === "none"}>
             <Download className="h-4 w-4" />
@@ -206,6 +212,16 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
           intake={profile?.job_summary || ""}
           onClose={() => setShowTasks(false)}
           onError={setError}
+        />
+      ) : null}
+
+      {showHeaderMeta && doc ? (
+        <HeaderMetaPanel
+          profileId={id}
+          document={doc}
+          saving={patch.isPending}
+          onApply={(next) => persist(next, () => setShowHeaderMeta(false))}
+          onClose={() => setShowHeaderMeta(false)}
         />
       ) : null}
     </div>

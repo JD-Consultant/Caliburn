@@ -3,6 +3,7 @@ import {
   buildTasks,
   finalizeDocument,
   getDocument,
+  getHeaderMeta,
   getKsaPool,
   getTaskCandidates,
   patchDocument,
@@ -25,6 +26,16 @@ export function useKsaPool(profileId: string, enabled: boolean) {
   return useQuery({
     queryKey: ["ksa-pool", profileId],
     queryFn: () => getKsaPool(profileId),
+    enabled,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
+}
+
+export function useHeaderMeta(profileId: string, enabled: boolean) {
+  return useQuery({
+    queryKey: ["header-meta", profileId],
+    queryFn: () => getHeaderMeta(profileId),
     enabled,
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,

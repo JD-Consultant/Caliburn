@@ -182,6 +182,48 @@ def get_pairs(client, collection: str, *, ocs_code: str) -> dict | None:
     }
 
 
+def _zip_pairs(codes, names) -> list[dict]:
+    """Zip parallel code/name arrays into [{code,name}] pairs, tolerating length
+    mismatch or one side missing (fill the short side with '')."""
+    codes = list(codes or [])
+    names = list(names or [])
+    n = max(len(codes), len(names))
+    return [
+        {"code": codes[i] if i < len(codes) else "", "name": names[i] if i < len(names) else ""}
+        for i in range(n)
+    ]
+
+
+def get_profile(client, collection: str, *, ocs_code: str) -> dict | None:
+    """Profile-metadata projection for the document header (D29): occupation/category/
+    industry (with codes) + description + level + attitudes + notes. One profile point,
+    pure payload projection — no embedding, no task scroll. None when not found."""
+    flt = models.Filter(must=[
+        models.FieldCondition(key="ocs_code", match=models.MatchValue(value=ocs_code)),
+        models.FieldCondition(key="chunk_level", match=models.MatchValue(value="profile")),
+    ])
+    recs, _ = client.scroll(
+        collection_name=collection, scroll_filter=flt,
+        with_payload=True, with_vectors=False, limit=1,
+    )
+    if not recs:
+        return None
+    p = recs[0].payload or {}
+    jc_codes = list(p.get("job_category_codes") or [])
+    return {
+        "ocs_code": p.get("ocs_code", ""),
+        "job_title": p.get("job_title") or "",
+        "job_category": {"code": jc_codes[0] if jc_codes else "", "name": p.get("job_category") or ""},
+        "occupations": _zip_pairs(p.get("occupation_codes"), p.get("occupation_names")),
+        "industries": _zip_pairs(p.get("industry_codes"), p.get("industry_names")),
+        "job_description": p.get("job_description") or "",
+        "ocs_level": p.get("ocs_level"),
+        "attitudes": p.get("all_a_pairs") or [],
+        "prerequisites": p.get("prerequisites") or [],
+        "supplements": p.get("supplements") or [],
+    }
+
+
 def _project_task_detail(rec) -> dict:
     p = rec.payload or {}
     return {

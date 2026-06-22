@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
-from app.api.routes import documents, job_profiles, users
+from app.api.routes import ai, documents, job_profiles, users
 from app.config import settings
 from app.database import AsyncSessionLocal, engine
 from app.logging_config import setup_logging
@@ -37,6 +37,7 @@ app.add_middleware(
 app.include_router(users.router,        prefix="/api/v1")
 app.include_router(job_profiles.router, prefix="/api/v1")
 app.include_router(documents.router,    prefix="/api/v1")
+app.include_router(ai.router,           prefix="/api/v1")
 
 
 @app.get("/health")

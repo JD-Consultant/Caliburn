@@ -209,11 +209,13 @@ def get_profile(client, collection: str, *, ocs_code: str) -> dict | None:
     if not recs:
         return None
     p = recs[0].payload or {}
-    jc_codes = list(p.get("job_category_codes") or [])
     return {
         "ocs_code": p.get("ocs_code", ""),
         "job_title": p.get("job_title") or "",
-        "job_category": {"code": jc_codes[0] if jc_codes else "", "name": p.get("job_category") or ""},
+        # 標題用的單一職類名（ocs_name.job_category_name，常為 null）。
+        "job_category_name": p.get("job_category") or "",
+        # 所屬類別三組皆多值 {code,name}（job_categories 與 occupations/industries 並列）。
+        "job_categories": _zip_pairs(p.get("job_category_codes"), p.get("job_category_names")),
         "occupations": _zip_pairs(p.get("occupation_codes"), p.get("occupation_names")),
         "industries": _zip_pairs(p.get("industry_codes"), p.get("industry_names")),
         "job_description": p.get("job_description") or "",

@@ -69,7 +69,8 @@ def test_pairs_route_404(make_app, make_qdrant):
 def test_profile_route_ok(make_app, make_qdrant, fake_point):
     profile = fake_point(payload={
         "chunk_level": "profile", "ocs_code": "OC1", "job_title": "JT",
-        "job_category": "人資類", "job_category_codes": ["BHR"],
+        "job_category": None,
+        "job_category_codes": ["BHR", "MPM"], "job_category_names": ["人資類", "製造類"],
         "industry_codes": ["A"], "industry_names": ["農林漁牧業"],
         "occupation_codes": ["2422"], "occupation_names": ["人資專業人員"],
         "job_description": "desc", "ocs_level": 4,
@@ -81,7 +82,8 @@ def test_profile_route_ok(make_app, make_qdrant, fake_point):
         assert r.status_code == 200
         b = r.json()
         assert b["ocs_code"] == "OC1" and b["ocs_level"] == 4
-        assert b["job_category"] == {"code": "BHR", "name": "人資類"}
+        assert b["job_category_name"] == ""
+        assert b["job_categories"] == [{"code": "BHR", "name": "人資類"}, {"code": "MPM", "name": "製造類"}]
         assert b["industries"] == [{"code": "A", "name": "農林漁牧業"}]
         assert b["attitudes"] == [{"code": "A01", "name": "主動"}]
         assert b["prerequisites"] == ["x"] and b["supplements"] == ["y"]

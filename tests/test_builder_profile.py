@@ -19,7 +19,7 @@ def _norm() -> NormalizedOCS:
                           unit_key="U1", task_groups=[group])
     return NormalizedOCS(
         ocs_code="OC1v2", ocs_code_base="OC1", job_title="資料分析師",
-        job_category="資訊", job_category_codes=["JC1"],
+        job_category="資訊", job_category_codes=["JC1"], job_category_names=["資訊類"],
         industry_codes=["I1"], industry_names=["資訊業"],
         occupation_codes=["OCC1"], occupation_names=["分析師"],
         job_description="負責資料分析", ocs_level=4,
@@ -42,8 +42,8 @@ def test_profile_record_payload():
     assert p["job_title"] == "資料分析師" and p["is_current"] is True
     assert p["ocs_level"] == 4 and p["version"] == "v2"
     assert p["job_description"] == "負責資料分析"
-    # category codes must be persisted so GET /profile can return {code,name} pairs (D29)
-    assert p["job_category_codes"] == ["JC1"]
+    # category code+name must be persisted so GET /profile returns {code,name} pairs (D29)
+    assert p["job_category_codes"] == ["JC1"] and p["job_category_names"] == ["資訊類"]
     assert p["industry_codes"] == ["I1"] and p["industry_names"] == ["資訊業"]
     assert p["occupation_codes"] == ["OCC1"] and p["occupation_names"] == ["分析師"]
     assert p["all_a_pairs"] == [{"code": "A01", "name": "主動積極"}]

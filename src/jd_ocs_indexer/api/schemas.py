@@ -106,7 +106,8 @@ class ProfileMetaResponse(BaseModel):
 
     ocs_code: str
     job_title: str = ""
-    job_category: CodeName = Field(default_factory=CodeName)
+    job_category_name: str = ""  # 標題用單一職類名（ocs_name.job_category_name，常空）
+    job_categories: list[CodeName] = Field(default_factory=list)  # 所屬職類別（多值）
     occupations: list[CodeName] = Field(default_factory=list)
     industries: list[CodeName] = Field(default_factory=list)
     job_description: str = ""

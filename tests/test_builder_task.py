@@ -25,7 +25,7 @@ def _norm_two_tasks() -> NormalizedOCS:
                           unit_key="U1", task_groups=[multi, blockless])
     return NormalizedOCS(
         ocs_code="OC1v1", ocs_code_base="OC1", job_title="JT",
-        job_category=None, job_category_codes=[], industry_codes=[], industry_names=[],
+        job_category=None, job_category_codes=[], job_category_names=[], industry_codes=[], industry_names=[],
         occupation_codes=[], occupation_names=[], job_description=None, ocs_level=None,
         version="v1", version_seq=1, update_date=None, is_current=True, units=[unit],
         attitude_codes=[], attitude_terms=[], attitude_pairs=[],

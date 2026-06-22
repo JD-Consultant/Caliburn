@@ -69,6 +69,7 @@ class NormalizedOCS:
     job_title: str
     job_category: str | None
     job_category_codes: list[str]
+    job_category_names: list[str]
     industry_codes: list[str]
     industry_names: list[str]
     occupation_codes: list[str]
@@ -158,16 +159,21 @@ def normalize(doc: OCSDocument) -> NormalizedOCS:
 
     category = profile.category
     job_category_codes: list[str] = []
+    job_category_names: list[str] = []
     industry_codes: list[str] = []
     industry_names: list[str] = []
     occupation_codes: list[str] = []
     occupation_names: list[str] = []
     if category is not None:
+        # job_categories 是多值 [{code,name}]（同 occupations/industries）。code+name
+        # 鎖步收集、依 code|name 去重，確保兩平行陣列永遠對齊。
         seen_jc: set[str] = set()
         for jc in category.job_categories:
-            if jc.code and jc.code not in seen_jc:
-                job_category_codes.append(jc.code)
-                seen_jc.add(jc.code)
+            key = jc.code or jc.name
+            if key and key not in seen_jc:
+                seen_jc.add(key)
+                job_category_codes.append(jc.code or "")
+                job_category_names.append(jc.name or "")
         for ind in category.industries:
             if ind.code:
                 industry_codes.append(ind.code)
@@ -308,6 +314,7 @@ def normalize(doc: OCSDocument) -> NormalizedOCS:
         job_title=job_title.strip(),
         job_category=job_category.strip() if job_category else None,
         job_category_codes=job_category_codes,
+        job_category_names=job_category_names,
         industry_codes=industry_codes,
         industry_names=industry_names,
         occupation_codes=occupation_codes,

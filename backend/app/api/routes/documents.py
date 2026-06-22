@@ -159,7 +159,7 @@ async def task_candidates(
                 {
                     "unit_id": u.unit_id,
                     "unit_title": u.unit_title,
-                    "tasks": [{"task_id": t.task_id, "task_title": t.task_title} for t in u.tasks],
+                    "tasks": [{"id": t.id, "task_id": t.task_id, "task_title": t.task_title} for t in u.tasks],
                 }
                 for u in g.units
             ],
@@ -184,7 +184,7 @@ async def build_tasks(
             "unit_id": p.get("unit_id") or "",
             "unit_title": p.get("unit_title") or "",
             "occupation_name": p.get("occupation_name") or "",
-            "indexer_ref": {"ocs_code": p.get("ocs_code") or "", "task_id": p.get("task_id") or ""},
+            "indexer_ref": {"ocs_code": p.get("ocs_code") or "", "task_id": p.get("task_id") or "", "id": p.get("id") or ""},
         }
         for p in picked
     ]

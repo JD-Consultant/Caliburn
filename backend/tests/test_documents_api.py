@@ -333,9 +333,9 @@ async def test_list_doc_status(client):
 def _picked(unit_title="u1"):
     return [
         {"ocs_code": "OC1", "unit_id": "T1", "unit_title": unit_title,
-         "occupation_name": "AIoT", "task_id": "T1.1", "task_name": "蒐集標準"},
+         "occupation_name": "AIoT", "task_id": "T1.1", "task_name": "蒐集標準", "id": "uuid-1"},
         {"ocs_code": "OC1", "unit_id": "T1", "unit_title": unit_title,
-         "occupation_name": "AIoT", "task_id": "T1.2", "task_name": "分析趨勢"},
+         "occupation_name": "AIoT", "task_id": "T1.2", "task_name": "分析趨勢", "id": "uuid-2"},
     ]
 
 
@@ -388,6 +388,7 @@ async def test_task_candidates_grouped(client):
     units = groups[0]["units"]
     assert units[0]["unit_id"] == "T1"
     assert [t["task_id"] for t in units[0]["tasks"]] == ["T1.1", "T1.2"]
+    assert [t["id"] for t in units[0]["tasks"]] == ["1", "2"]
 
 
 @pytest.mark.asyncio
@@ -421,7 +422,7 @@ async def test_build_tasks_happy(client):
     assert units[0]["ocu_code"] == "T1" and units[0]["ocu_name"] == "u1"
     tasks = units[0]["tasks"]
     assert [t["task_codes"][0]["code"] for t in tasks] == ["T1.1", "T1.2"]
-    assert tasks[0]["provenance"] == {"ocs_code": "OC1", "task_id": "T1.1"}
+    assert tasks[0]["provenance"] == {"ocs_code": "OC1", "task_id": "T1.1", "id": "uuid-1"}
     assert tasks[0]["competency_blocks"][0]["knowledge"] == []
 
 

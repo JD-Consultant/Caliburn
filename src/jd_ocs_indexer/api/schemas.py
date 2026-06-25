@@ -174,6 +174,18 @@ class TasksResponse(BaseModel):
     tasks: list[TaskDetail]
 
 
+class OccupationHit(BaseModel):
+    ocs_code: str
+    urn: str
+    ocs_name: str = ""
+    job_description: str = ""
+    ocs_level: Optional[int] = None
+    score: Optional[float] = None
+
+class OccupationSearchResponse(BaseModel):
+    hits: list[OccupationHit]
+
+
 class HealthResponse(BaseModel):
     status: str
     model_loaded: bool

@@ -12,6 +12,7 @@ from jd_ocs_indexer.api.schemas import (
     CompetencyPool,
     HealthResponse,
     OccupationDetail,
+    OccupationSearchResponse,
     OccupationTasks,
     PairsResponse,
     ProfileMetaResponse,
@@ -45,6 +46,17 @@ async def post_search(req: SearchRequest, request: Request):
                 filters=req.filters.model_dump(),
             )
 
+    return await run_in_threadpool(_run)
+
+
+@router.post("/occupations/search", response_model=OccupationSearchResponse)
+async def search_occupations(req: SearchRequest, request: Request):
+    app = request.app
+    def _run():
+        with app.state.embed_lock:
+            return service.search_occupations(
+                app.state.client, app.state.embedder,
+                app.state.settings.qdrant_collection, query=req.query, top_k=req.top_k)
     return await run_in_threadpool(_run)
 
 

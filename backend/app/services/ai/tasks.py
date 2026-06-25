@@ -28,3 +28,9 @@ def task_name(task: dict) -> str:
 def catalog_id(task: dict) -> str:
     """provenance.id (catalog UUID), or '' for custom/cherry-picked tasks."""
     return (task.get("provenance") or {}).get("id") or ""
+
+
+def catalog_ref(task: dict) -> dict:
+    """provenance (ocs_code, task_code) for catalog tasks; empty strings for custom."""
+    p = task.get("provenance") or {}
+    return {"ocs_code": p.get("ocs_code") or "", "task_code": p.get("task_code") or ""}

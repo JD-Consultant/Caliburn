@@ -1,4 +1,4 @@
-"""T4 /ai/extract-tasks (D28). FakeLlm + stub indexer (task_pool) — no API key needed."""
+"""T4 /ai/extract-tasks (D28). FakeLlm + stub indexer (occupation_tasks) — no API key needed."""
 import httpx
 import pytest
 import pytest_asyncio
@@ -7,42 +7,30 @@ from app.api.routes.ai import get_llm
 from app.api.routes.documents import get_knowledge
 from app.database import get_db
 from app.main import app
-from app.services.knowledge.models import PoolGroup, PoolTask, PoolUnit, TaskPool
+from app.services.knowledge.models import OccupationTasks, TaskRef, UnitTasks
 from tests.conftest_graph import FakeLlm
 
 
 class StubKnowledge:
-    """Minimal KnowledgeClient for /ai/extract-tasks: only task_pool is exercised."""
+    """Minimal KnowledgeClient for /ai/extract-tasks: only occupation_tasks is exercised."""
 
-    def __init__(self, pool=None, fail=False):
-        self.pool = pool or TaskPool()
+    def __init__(self, occ=None, fail=False):
+        self.occ = occ
         self.fail = fail
         self.calls = []
 
-    async def task_pool(self, ocs_codes, *, activity_examples=3):
-        self.calls.append(list(ocs_codes))
+    async def occupation_tasks(self, ocs_code):
+        self.calls.append(ocs_code)
         if self.fail:
             raise RuntimeError("indexer down")
-        return self.pool
+        return self.occ or OccupationTasks(ocs_code=ocs_code)
 
 
-def _pool():
-    return TaskPool(
-        groups=[
-            PoolGroup(
-                ocs_code="OC1",
-                units=[
-                    PoolUnit(
-                        unit_id="U1",
-                        tasks=[
-                            PoolTask(id="cat-1", task_id="T1.1", task_title="蒐集標準"),
-                            PoolTask(id="cat-2", task_id="T1.2", task_title="撰寫報告"),
-                        ],
-                    )
-                ],
-            )
-        ]
-    )
+def _occ():
+    return OccupationTasks(ocs_code="OC1", ocs_name="JT", units=[
+        UnitTasks(ocu_code="U1", ocu_name="U", urn="ocs:OC1:U:U1", tasks=[
+            TaskRef(task_code="T1.1", task_name="蒐集標準", urn="ocs:OC1:T:T1.1"),
+            TaskRef(task_code="T1.2", task_name="撰寫報告", urn="ocs:OC1:T:T1.2")])])
 
 
 @pytest_asyncio.fixture
@@ -61,7 +49,7 @@ async def client(db_session):
 
 @pytest.mark.asyncio
 async def test_extract_tasks_no_llm_returns_empty(client):
-    app.dependency_overrides[get_knowledge] = lambda: StubKnowledge(_pool())
+    app.dependency_overrides[get_knowledge] = lambda: StubKnowledge(_occ())
     app.dependency_overrides[get_llm] = lambda: None
     r = await client.post(
         "/api/v1/ai/extract-tasks", json={"intake": "我做標準蒐集", "ocs_codes": ["OC1"]}
@@ -72,37 +60,37 @@ async def test_extract_tasks_no_llm_returns_empty(client):
 
 @pytest.mark.asyncio
 async def test_extract_tasks_llm_keeps_known_ids_and_maps_customs(client):
-    app.dependency_overrides[get_knowledge] = lambda: StubKnowledge(_pool())
+    app.dependency_overrides[get_knowledge] = lambda: StubKnowledge(_occ())
     app.dependency_overrides[get_llm] = lambda: FakeLlm(
-        json={"suggested_task_ids": ["cat-1"], "custom_candidates": ["客製任務A", "客製任務B"]}
+        json={"suggested_task_ids": ["T1.1"], "custom_candidates": ["客製任務A", "客製任務B"]}
     )
     r = await client.post(
         "/api/v1/ai/extract-tasks", json={"intake": "我做標準蒐集和一些客製事務", "ocs_codes": ["OC1"]}
     )
     assert r.status_code == 200, r.text
     body = r.json()
-    assert body["suggested_task_ids"] == ["cat-1"]
+    assert body["suggested_task_ids"] == ["T1.1"]
     assert body["custom_candidates"] == [{"name": "客製任務A"}, {"name": "客製任務B"}]
 
 
 @pytest.mark.asyncio
 async def test_extract_tasks_unknown_id_is_dropped(client):
-    app.dependency_overrides[get_knowledge] = lambda: StubKnowledge(_pool())
+    app.dependency_overrides[get_knowledge] = lambda: StubKnowledge(_occ())
     app.dependency_overrides[get_llm] = lambda: FakeLlm(
-        json={"suggested_task_ids": ["cat-2", "cat-999"], "custom_candidates": []}
+        json={"suggested_task_ids": ["T1.2", "T9.9"], "custom_candidates": []}
     )
     r = await client.post(
         "/api/v1/ai/extract-tasks", json={"intake": "做事", "ocs_codes": ["OC1"]}
     )
     assert r.status_code == 200, r.text
-    assert r.json()["suggested_task_ids"] == ["cat-2"]
+    assert r.json()["suggested_task_ids"] == ["T1.2"]
 
 
 @pytest.mark.asyncio
 async def test_extract_tasks_indexer_down_returns_empty(client):
     app.dependency_overrides[get_knowledge] = lambda: StubKnowledge(fail=True)
     app.dependency_overrides[get_llm] = lambda: FakeLlm(
-        json={"suggested_task_ids": ["cat-1"], "custom_candidates": ["x"]}
+        json={"suggested_task_ids": ["T1.1"], "custom_candidates": ["x"]}
     )
     r = await client.post(
         "/api/v1/ai/extract-tasks", json={"intake": "我做標準蒐集", "ocs_codes": ["OC1"]}

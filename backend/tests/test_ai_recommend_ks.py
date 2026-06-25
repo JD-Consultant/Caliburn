@@ -12,33 +12,34 @@ from app.database import get_db
 from app.graph_v3.llm import OpenRouterLlm
 from app.main import app
 from app.models import JobProfile, User
-from app.services.knowledge.models import Pair, TaskDetail, TasksByIdResult
+from app.services.knowledge.models import CitableItem, CompetencyPool, SourceRef
 from tests.conftest_graph import FakeLlm
 
 
 class StubKnowledge:
-    """Minimal KnowledgeClient for /ai/*: only tasks_by_id is exercised here."""
+    """Minimal KnowledgeClient for /ai/*: only competencies is exercised here."""
 
-    def __init__(self, tasks_map=None, fail=False):
-        self.tasks_map = tasks_map or {}
+    def __init__(self, pool=None, fail=False):
+        self.pool = pool
         self.fail = fail
         self.calls = []
 
-    async def tasks_by_id(self, ids):
-        self.calls.append(list(ids))
+    async def competencies(self, ocs_code):
+        self.calls.append(ocs_code)
         if self.fail:
             raise RuntimeError("indexer down")
-        tasks = [self.tasks_map[i] for i in ids if i in self.tasks_map]
-        return TasksByIdResult(tasks=tasks)
+        return self.pool or CompetencyPool(ocs_code=ocs_code)
 
 
-def _task_detail(cat_id):
-    return TaskDetail(
-        id=cat_id,
-        task_id="T1.1",
-        task_title="蒐集標準",
-        k_pairs=[Pair(code="K01", name="標準知識"), Pair(code="K02", name="法規知識")],
-        s_pairs=[Pair(code="S01", name="分析技能")],
+def _pool(task_code="T1.1"):
+    src = [SourceRef(task_code=task_code)]
+    return CompetencyPool(
+        ocs_code="OC1",
+        knowledge=[
+            CitableItem(code="K01", name="標準知識", sources=src),
+            CitableItem(code="K02", name="法規知識", sources=src),
+        ],
+        skills=[CitableItem(code="S01", name="分析技能", sources=src)],
     )
 
 
@@ -79,7 +80,7 @@ def _doc_with_task(cat_id="cat-1", code="T1.1"):
                             "task_codes": [{"code": code, "name": "蒐集標準"}],
                             "competency_blocks": [{"outputs": [], "indicators": [],
                                                    "knowledge": [], "skills": []}],
-                            "provenance": {"ocs_code": "OC1", "task_id": "T1.1", "id": cat_id},
+                            "provenance": {"ocs_code": "OC1", "task_code": code},
                         }
                     ],
                 }
@@ -111,7 +112,7 @@ def test_ai_router_mounted():
 async def test_recommend_ks_no_note_returns_full_catalog(client):
     p = await _mk_profile_with_task(client._db)
     await client.patch(f"/api/v1/job-profiles/{p.id}/document", json=_doc_with_task())
-    app.dependency_overrides[get_knowledge] = lambda: StubKnowledge({"cat-1": _task_detail("cat-1")})
+    app.dependency_overrides[get_knowledge] = lambda: StubKnowledge(_pool())
     app.dependency_overrides[get_llm] = lambda: FakeLlm(json={"knowledge": [], "skills": []})
     r = await client.post("/api/v1/ai/recommend-ks", json={"profile_id": str(p.id), "task_key": "T1.1"})
     assert r.status_code == 200, r.text
@@ -126,7 +127,7 @@ async def test_recommend_ks_no_note_returns_full_catalog(client):
 async def test_recommend_ks_with_note_filters_and_adds_reason(client):
     p = await _mk_profile_with_task(client._db)
     await client.patch(f"/api/v1/job-profiles/{p.id}/document", json=_doc_with_task())
-    app.dependency_overrides[get_knowledge] = lambda: StubKnowledge({"cat-1": _task_detail("cat-1")})
+    app.dependency_overrides[get_knowledge] = lambda: StubKnowledge(_pool())
     app.dependency_overrides[get_llm] = lambda: FakeLlm(
         json={"knowledge": [{"code": "K01", "reason": "與描述高度相關"}], "skills": []}
     )
@@ -146,7 +147,7 @@ async def test_recommend_ks_with_note_filters_and_adds_reason(client):
 async def test_recommend_ks_no_llm_degrades_to_catalog(client):
     p = await _mk_profile_with_task(client._db)
     await client.patch(f"/api/v1/job-profiles/{p.id}/document", json=_doc_with_task())
-    app.dependency_overrides[get_knowledge] = lambda: StubKnowledge({"cat-1": _task_detail("cat-1")})
+    app.dependency_overrides[get_knowledge] = lambda: StubKnowledge(_pool())
     app.dependency_overrides[get_llm] = lambda: None
     r = await client.post(
         "/api/v1/ai/recommend-ks",

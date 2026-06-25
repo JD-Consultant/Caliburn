@@ -6,7 +6,7 @@ from langgraph.types import Command
 from app.graph_v3.state import new_state, InterviewState
 from app.graph_v3.deep_nodes import star_node, five_w2h_node, indicator_node, route_after_indicator
 from app.graph_v3.deps import Deps
-from app.services.knowledge.models import TasksByIdResult, TaskDetail, Pair
+from app.services.knowledge.models import CompetencyPool, CitableItem, SourceRef
 from tests.conftest_graph import FakeKnowledge, SpyPersist, FakeLlm
 
 _GOOD = {"has_situation": True, "has_purpose": True, "has_collaborators": True,
@@ -28,8 +28,9 @@ def _deep_graph():
 
 @pytest.mark.asyncio
 async def test_single_task_deep_interview_completes():
-    detail = TaskDetail(id="T1.1", ocs_code="OC1", task_id="T1.1", task_title="例行設備巡檢",
-                        output_pairs=[Pair(code="O1", name="點檢表")])
+    pool = CompetencyPool(ocs_code="OC1", outputs=[
+        CitableItem(id="ocs:OC1:O:O1", type="O", code="O1", name="點檢表",
+                    ocs_code="OC1", ocs_name="設備維護工程師", sources=[SourceRef(task_code="T1.1")])])
     star_refine = {"S": "晨班A線", "T": "確保可用", "A": "逐項點檢、記錄", "R": "停機下降"}
     indicators = [{"output_name": "點檢表", "indicator_5w2h": "在晨班…點檢表…",
                    "indicator_abcd": "面對…", "quality_dims": _GOOD}]
@@ -37,11 +38,11 @@ async def test_single_task_deep_interview_completes():
     def _json(prompt):
         return star_refine if "STAR 四槽" in prompt else indicators
     llm = FakeLlm(json=_json)
-    fake = FakeKnowledge(tasks=TasksByIdResult(tasks=[detail]))
+    fake = FakeKnowledge(); fake._competencies = pool
 
     s = new_state(job_profile_id="p1", job_title="設備維護工程師")
     s["tasks"] = [{"task_name": "例行設備巡檢", "source": "catalog",
-                   "indexer_ref": {"ocs_code": "OC1", "task_id": "T1.1"}}]
+                   "indexer_ref": {"ocs_code": "OC1", "task_code": "T1.1"}}]
     graph = _deep_graph()
     cfg = {"configurable": {"thread_id": "t1",
                             "deps": Deps(knowledge=fake, persist=SpyPersist(), llm=llm)}}

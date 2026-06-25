@@ -3,6 +3,8 @@
 from uuid import UUID
 
 from app.services.knowledge.models import (
+    CitableItem,
+    CompetencyPool,
     Hit,
     OccupationHit,
     OccupationSearchResponse,
@@ -14,6 +16,7 @@ from app.services.knowledge.models import (
     PoolUnit,
     ProfileMeta,
     SearchResult,
+    SourceRef,
     TaskPool,
     TaskRef,
     TasksByIdResult,
@@ -58,6 +61,16 @@ class StubKnowledge:
                      knowledge=[Pair(code="K01", name="設備保養原理")],
                      skills=[Pair(code="S01", name="點檢操作")],
                      attitudes=[Pair(code="A01", name="細心負責")])
+
+    async def competencies(self, ocs_code) -> CompetencyPool:
+        return CompetencyPool(ocs_code=ocs_code,
+            knowledge=[CitableItem(id=f"ocs:{ocs_code}:K:K01", type="K", code="K01",
+                                   name="設備保養原理", ocs_code=ocs_code, ocs_name="設備維護工程師",
+                                   sources=[SourceRef(task_code="T1.1")])],
+            skills=[CitableItem(id=f"ocs:{ocs_code}:S:S01", type="S", code="S01", name="點檢操作",
+                                ocs_code=ocs_code, ocs_name="設備維護工程師", sources=[SourceRef(task_code="T1.1")])],
+            attitudes=[CitableItem(id=f"ocs:{ocs_code}:A:A01", type="A", code="A01", name="細心負責",
+                                   ocs_code=ocs_code, ocs_name="設備維護工程師", sources=[])])
 
     async def profile(self, ocs_code) -> ProfileMeta:
         return ProfileMeta(ocs_code=ocs_code, job_title="設備維護工程師",

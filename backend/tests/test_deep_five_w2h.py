@@ -6,7 +6,7 @@ from langgraph.types import Command
 from app.graph_v3.state import new_state, InterviewState
 from app.graph_v3.deep_nodes import five_w2h_node
 from app.graph_v3.deps import Deps
-from app.services.knowledge.models import TasksByIdResult, TaskDetail, Pair
+from app.services.knowledge.models import CompetencyPool, CitableItem, SourceRef
 from tests.conftest_graph import FakeKnowledge, SpyPersist, FakeLlm
 from app.graph_v3.constants import FIVE_W2H_REQUIRED
 
@@ -23,7 +23,7 @@ def _state():
     s = new_state(job_profile_id="p1", job_title="設備維護工程師")
     s["tasks"] = [{
         "task_name": "例行設備巡檢", "source": "catalog",
-        "indexer_ref": {"ocs_code": "OC1", "task_id": "T1.1"},
+        "indexer_ref": {"ocs_code": "OC1", "task_code": "T1.1"},
         "star_case": {"situation": "晨班產線A", "task": "確保可用",
                       "action": "逐項點檢、記錄異常", "result": "停機下降"},
     }]
@@ -33,9 +33,12 @@ def _state():
 @pytest.mark.asyncio
 async def test_five_w2h_prefills_then_asks_remaining():
     # catalog 供 outputs → outputs 不再問；star 供 situation+workflow_steps
-    detail = TaskDetail(id="T1.1", ocs_code="OC1", task_id="T1.1", task_title="例行設備巡檢",
-                        output_pairs=[Pair(code="O1", name="點檢表"), Pair(code="O2", name="異常通報")])
-    fake = FakeKnowledge(tasks=TasksByIdResult(tasks=[detail]))
+    pool = CompetencyPool(ocs_code="OC1", outputs=[
+        CitableItem(id="ocs:OC1:O:O1", type="O", code="O1", name="點檢表",
+                    ocs_code="OC1", ocs_name="設備維護工程師", sources=[SourceRef(task_code="T1.1")]),
+        CitableItem(id="ocs:OC1:O:O2", type="O", code="O2", name="異常通報",
+                    ocs_code="OC1", ocs_name="設備維護工程師", sources=[SourceRef(task_code="T1.1")])])
+    fake = FakeKnowledge(); fake._competencies = pool
     graph = _graph()
     cfg = {"configurable": {"thread_id": "t1",
                             "deps": Deps(knowledge=fake, persist=SpyPersist(), llm=FakeLlm())}}
@@ -68,11 +71,11 @@ async def test_five_w2h_prefills_then_asks_remaining():
 async def test_five_w2h_company_task_no_catalog_prefill():
     s = new_state(job_profile_id="p1", job_title="X")
     s["tasks"] = [{"task_name": "公司自訂任務", "source": "company"}]  # 無 indexer_ref
-    fake = FakeKnowledge()  # tasks_by_id → 空
+    fake = FakeKnowledge()  # competencies → 空
     graph = _graph()
     cfg = {"configurable": {"thread_id": "t2",
                             "deps": Deps(knowledge=fake, persist=SpyPersist(), llm=FakeLlm())}}
     out = await graph.ainvoke(s, cfg)
-    # 無 catalog → 不應呼叫 tasks_by_id（無 indexer_ref 時跳過）
-    assert not any(c[0] == "tasks_by_id" for c in fake.calls)
+    # 無 catalog → 不應呼叫 competencies（無 indexer_ref 時跳過 prefill）
+    assert not any(c[0] == "competencies" for c in fake.calls)
     assert "__interrupt__" in out  # 直接開始逐欄問

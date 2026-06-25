@@ -16,10 +16,10 @@ Multi-OCS rules (防雷):
 """
 from __future__ import annotations
 
-from app.services.knowledge.models import Pair, ProfileMeta
+from app.services.knowledge.models import CodeName, OccupationDetail
 
 
-def _merge_pairs(acc: list[dict], pairs: list[Pair], source: str) -> None:
+def _merge_pairs(acc: list[dict], pairs: list[CodeName], source: str) -> None:
     """Union ``pairs`` into ``acc`` (list of {code,name,sources}) deduped by code|name."""
     for p in pairs:
         key = (p.code or "").strip() or ("name:" + (p.name or "").strip())
@@ -48,7 +48,7 @@ def _strip(items: list[dict]) -> list[dict]:
     return [{k: v for k, v in x.items() if k != "_key"} for x in items]
 
 
-def aggregate(metas: list[ProfileMeta], primary_code: str = "") -> dict:
+def aggregate(metas: list[OccupationDetail], primary_code: str = "") -> dict:
     """Aggregate per-OCS metadata into header candidate pools + 主基準 single values."""
     job_categories: list[dict] = []
     occupations: list[dict] = []
@@ -72,8 +72,8 @@ def aggregate(metas: list[ProfileMeta], primary_code: str = "") -> dict:
     primary = by_code.get(primary_code) or (metas[0] if metas else None)
     primary_out = {
         "ocs_code": primary.ocs_code if primary else "",
-        "occupation_name": primary.job_title if primary else "",
-        "job_category_name": (primary.job_category_name if primary else "") or "",
+        "occupation_name": (primary.ocs_name.occupation_name if primary else "") or "",
+        "job_category_name": (primary.ocs_name.job_category_name if primary else "") or "",
         "job_description": primary.job_description if primary else "",
         "ocs_level": primary.ocs_level if primary else None,
     }
@@ -83,8 +83,8 @@ def aggregate(metas: list[ProfileMeta], primary_code: str = "") -> dict:
         "primary_options": [
             {
                 "ocs_code": m.ocs_code,
-                "occupation_name": m.job_title,
-                "job_category_name": m.job_category_name or "",
+                "occupation_name": m.ocs_name.occupation_name or "",
+                "job_category_name": m.ocs_name.job_category_name or "",
                 "job_description": m.job_description,
                 "ocs_level": m.ocs_level,
             }

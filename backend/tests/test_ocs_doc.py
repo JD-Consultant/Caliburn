@@ -21,19 +21,19 @@ def _units_tasks():
             "task_name": "接待客戶",
             "unit_id": "T1",
             "unit_title": "客戶服務",
-            "indexer_ref": {"ocs_code": "FSI3311-001v3", "task_id": "T1.1"},
+            "indexer_ref": {"ocs_code": "FSI3311-001v3", "task_code": "T1.1"},
         },
         {
             "task_name": "處理申訴",
             "unit_id": "T1",
             "unit_title": "客戶服務",
-            "indexer_ref": {"ocs_code": "FSI3311-001v3", "task_id": "T1.2"},
+            "indexer_ref": {"ocs_code": "FSI3311-001v3", "task_code": "T1.2"},
         },
         {
             "task_name": "撰寫報告",
             "unit_id": "T2",
             "unit_title": "行政作業",
-            # no task_id -> should be synthesized
+            # no task_code -> should be synthesized
             "indexer_ref": {"ocs_code": "FSI3311-001v3"},
         },
     ]
@@ -64,7 +64,7 @@ def test_skeleton_shape_and_grouping():
     # task_codes use real task_ids when given
     assert units[0]["tasks"][0]["task_codes"][0]["code"] == "T1.1"
     assert units[0]["tasks"][1]["task_codes"][0]["code"] == "T1.2"
-    # synthesize f"{ocu_code}.{t}" when missing task_id
+    # synthesize f"{ocu_code}.{t}" when missing task_code
     assert units[1]["tasks"][0]["task_codes"][0]["code"] == "T2.1"
     assert units[1]["tasks"][0]["task_codes"][0]["name"] == "撰寫報告"
 

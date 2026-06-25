@@ -145,23 +145,26 @@ async def task_candidates(
     codes = profile.selected_ocs_codes or []
     if not codes:
         return {"groups": []}
-    try:
-        pool = await knowledge.task_pool(codes)
-    except Exception:
-        logger.warning("task-candidates: indexer task_pool failed", exc_info=True)
-        raise HTTPException(status_code=502, detail="indexer unavailable")
     groups = []
-    for g in pool.groups:
+    for code in codes:
+        try:
+            occ = await knowledge.occupation_tasks(code)
+        except Exception:
+            logger.warning("task-candidates: occupation_tasks(%s) failed", code, exc_info=True)
+            raise HTTPException(status_code=502, detail="indexer unavailable")
         groups.append({
-            "ocs_code": g.ocs_code,
-            "occupation_name": g.job_title,
+            "ocs_code": occ.ocs_code,
+            "ocs_name": occ.ocs_name,
             "units": [
                 {
-                    "unit_id": u.unit_id,
-                    "unit_title": u.unit_title,
-                    "tasks": [{"id": t.id, "task_id": t.task_id, "task_title": t.task_title} for t in u.tasks],
+                    "ocu_code": u.ocu_code,
+                    "ocu_name": u.ocu_name,
+                    "tasks": [
+                        {"task_code": t.task_code, "task_name": t.task_name, "urn": t.urn}
+                        for t in u.tasks
+                    ],
                 }
-                for u in g.units
+                for u in occ.units
             ],
         })
     return {"groups": groups}
@@ -174,7 +177,7 @@ async def build_tasks(
     db: AsyncSession = Depends(get_db),
 ):
     """用勾選的任務建/更新文件（遞進重編、保留已填）。picked 每筆：
-    {ocs_code, unit_id, unit_title, occupation_name, task_id, task_name}。
+    {ocs_code, unit_id, unit_title, occupation_name, task_code, task_name}。
     unit_title 留白＝cherry-pick（職責名讓使用者自填）。"""
     profile = await _require_profile(profile_id, db)
     picked = body.get("picked") or []
@@ -184,7 +187,7 @@ async def build_tasks(
             "unit_id": p.get("unit_id") or "",
             "unit_title": p.get("unit_title") or "",
             "occupation_name": p.get("occupation_name") or "",
-            "indexer_ref": {"ocs_code": p.get("ocs_code") or "", "task_id": p.get("task_id") or "", "id": p.get("id") or ""},
+            "indexer_ref": {"ocs_code": p.get("ocs_code") or "", "task_code": p.get("task_code") or ""},
         }
         for p in picked
     ]
@@ -207,19 +210,19 @@ async def ocs_search(
     db: AsyncSession = Depends(get_db),
     knowledge: KnowledgeClient = Depends(get_knowledge),
 ):
-    """職類層搜尋（seed 用）：回 [{ocs_code, job_title}]，依 ocs_code 去重保序。"""
+    """職類層搜尋（seed 用）：回 [{ocs_code, ocs_name}]，依 ocs_code 去重保序。"""
     await _require_profile(profile_id, db)
     if not q.strip():
         return {"hits": []}
     try:
-        res = await knowledge.search(q, level="profile", top_k=8)
+        res = await knowledge.search_occupations(q, top_k=8)
     except Exception:
         logger.warning("ocs-search indexer query failed", exc_info=True)
         raise HTTPException(status_code=502, detail="indexer unavailable")
     seen: dict[str, dict] = {}
     for h in res.hits:
         if h.ocs_code and h.ocs_code not in seen:
-            seen[h.ocs_code] = {"ocs_code": h.ocs_code, "job_title": h.job_title or h.ocs_code}
+            seen[h.ocs_code] = {"ocs_code": h.ocs_code, "ocs_name": h.ocs_name or h.ocs_code}
     return {"hits": list(seen.values())}
 
 
@@ -237,9 +240,9 @@ async def get_header_meta(
     metas = []
     for code in codes:
         try:
-            metas.append(await knowledge.profile(code))
+            metas.append(await knowledge.occupation(code))
         except Exception:
-            logger.warning("header-meta: profile(%s) failed; skipping", code, exc_info=True)
+            logger.warning("header-meta: occupation(%s) failed; skipping", code, exc_info=True)
     return header_meta.aggregate(metas, primary_code=codes[0] if codes else "")
 
 
@@ -262,16 +265,20 @@ async def get_ksa_pool(
         }
         loose: dict[str, list[dict]] = {"knowledge": [], "skills": [], "attitudes": []}
         for code in codes:
-            pairs = await knowledge.pairs(code)
+            comp = await knowledge.competencies(code)
             for bucket, items in (
-                ("knowledge", pairs.knowledge),
-                ("skills", pairs.skills),
-                ("attitudes", pairs.attitudes),
+                ("knowledge", comp.knowledge),
+                ("skills", comp.skills),
+                ("attitudes", comp.attitudes),
             ):
-                for pair in items:
-                    entry = {"code": pair.code, "name": pair.name}
-                    if pair.code:
-                        buckets[bucket].setdefault(pair.code, entry)
+                for it in items:
+                    entry = {
+                        "code": it.code,
+                        "name": it.name or "",
+                        "sources": [s.task_code for s in it.sources if s.task_code],
+                    }
+                    if it.code:
+                        buckets[bucket].setdefault(it.code, entry)
                     else:
                         loose[bucket].append(entry)
         return {

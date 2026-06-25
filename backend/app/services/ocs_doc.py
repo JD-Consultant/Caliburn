@@ -33,7 +33,8 @@ def _empty_block() -> dict[str, Any]:
 
 def _task_prov(task: dict) -> dict:
     ref = task.get("indexer_ref") or {}
-    return {"ocs_code": ref.get("ocs_code") or "", "task_id": ref.get("task_id") or "", "id": ref.get("id") or ""}
+    return {"ocs_code": ref.get("ocs_code") or "", "task_code": ref.get("task_code") or "",
+            "urn": ref.get("urn") or ""}
 
 
 def skeleton(profile: dict, units_tasks: list[dict]) -> dict:
@@ -121,7 +122,7 @@ def _renumber(doc: dict) -> dict:
 
 def build_from_picked(profile: dict, picked: list[dict], prev: dict | None = None) -> dict:
     """ADDITIVE 選任務：保留 prev 全部任務（含已填/自訂/使用者編輯），只「加」picked
-    中尚未存在（依 provenance ocs_code+task_id）的任務。新任務若來源職責
+    中尚未存在（依 provenance ocs_code+task_code）的任務。新任務若來源職責
     (ocs_code+unit_id) 已在文件 → 併入該職責；否則新增職責（名稱依 adopt：
     picked.unit_title 有值＝採用整組保留名，留白＝cherry-pick）。"""
     if not prev or not ((prev.get("ocs_content") or {}).get("ocu_units")):
@@ -134,13 +135,13 @@ def build_from_picked(profile: dict, picked: list[dict], prev: dict | None = Non
     for unit in units:
         for task in unit.get("tasks") or []:
             p = task.get("provenance") or {}
-            existing.add((p.get("ocs_code") or "", p.get("task_id") or ""))
+            existing.add((p.get("ocs_code") or "", p.get("task_code") or ""))
 
     for it in picked:
         ref = it.get("indexer_ref") or {}
         oc = ref.get("ocs_code") or ""
-        tid = ref.get("task_id") or ""
-        key = (oc, tid)
+        tcode = ref.get("task_code") or ""
+        key = (oc, tcode)
         if key in existing:
             continue
         existing.add(key)
@@ -163,7 +164,7 @@ def build_from_picked(profile: dict, picked: list[dict], prev: dict | None = Non
         target["tasks"].append({
             "task_codes": [{"code": "", "name": it.get("task_name", "")}],
             "competency_blocks": [_empty_block()],
-            "provenance": {"ocs_code": oc, "task_id": tid, "id": ref.get("id") or ""},
+            "provenance": {"ocs_code": oc, "task_code": tcode, "urn": ref.get("urn") or ""},
         })
 
     return _renumber(doc)

@@ -1,28 +1,32 @@
 """D29 V1: header-metadata aggregation (pure function, no DB/HTTP)."""
 from app.services import header_meta
-from app.services.knowledge.models import Pair, ProfileMeta
+from app.services.knowledge.models import CodeName, OccupationDetail, OcsName
 
 
-def _meta(code, **kw):
-    return ProfileMeta(ocs_code=code, **kw)
+def _meta(code, *, job_title="", job_category_name=None, **kw):
+    return OccupationDetail(
+        ocs_code=code,
+        ocs_name=OcsName(occupation_name=job_title, job_category_name=job_category_name),
+        **kw,
+    )
 
 
 def test_aggregate_dedupes_by_code_and_tracks_sources():
     metas = [
         _meta("OC1", job_title="人資專員",
-              job_categories=[Pair(code="BHR", name="人資類")],
-              occupations=[Pair(code="2422", name="人資專業人員")],
-              industries=[Pair(code="A", name="農林漁牧業")],
-              attitudes=[Pair(code="A01", name="主動")],
+              job_categories=[CodeName(code="BHR", name="人資類")],
+              occupations=[CodeName(code="2422", name="人資專業人員")],
+              industries=[CodeName(code="A", name="農林漁牧業")],
+              attitudes=[CodeName(code="A01", name="主動")],
               prerequisites=["大學以上"], supplements=["須證照"],
               job_description="desc1", ocs_level=4),
         _meta("OC2", job_title="人資主管",
-              job_categories=[Pair(code="BHR", name="人資類"),         # dup code BHR
-                              Pair(code="MPM", name="製造類")],
-              occupations=[Pair(code="1120", name="高階主管")],
-              industries=[Pair(code="A", name="農林漁牧業"),         # dup A
-                          Pair(code="N", name="支援服務業")],
-              attitudes=[Pair(code="A01", name="主動")],             # dup A01
+              job_categories=[CodeName(code="BHR", name="人資類"),         # dup code BHR
+                              CodeName(code="MPM", name="製造類")],
+              occupations=[CodeName(code="1120", name="高階主管")],
+              industries=[CodeName(code="A", name="農林漁牧業"),         # dup A
+                          CodeName(code="N", name="支援服務業")],
+              attitudes=[CodeName(code="A01", name="主動")],             # dup A01
               prerequisites=["大學以上"], ocs_level=5),
     ]
     out = header_meta.aggregate(metas, primary_code="OC1")
@@ -66,8 +70,8 @@ def test_empty_is_safe():
 
 def test_code_empty_falls_back_to_name_dedupe():
     metas = [
-        _meta("OC1", industries=[Pair(code="", name="自訂行業")]),
-        _meta("OC2", industries=[Pair(code="", name="自訂行業")]),  # same name, no code
+        _meta("OC1", industries=[CodeName(code="", name="自訂行業")]),
+        _meta("OC2", industries=[CodeName(code="", name="自訂行業")]),  # same name, no code
     ]
     out = header_meta.aggregate(metas, primary_code="OC1")
     assert [x["name"] for x in out["industries"]] == ["自訂行業"]

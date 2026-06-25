@@ -1,8 +1,9 @@
-"""Schema v3 chunk builder: profile + per-task records.
+"""Schema v4 chunk builder: profile + per-task_code records.
 
 Reuses the normalizer's OCS tree. Emits one `profile` record per OCS and one
-`task` record per task (aggregating that task-group's blocks). The embed string
-is set on ChunkRecord.text for the embedder but is NEVER written to payload.
+`task` record per task_code, carrying that task-group's competency_blocks
+(nested, K/S sliced per block). The embed string is set on ChunkRecord.text for
+the embedder but is NEVER written to payload.
 """
 
 from __future__ import annotations
@@ -10,54 +11,21 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from jd_ocs_indexer.models.chunk import ChunkRecord, Pair
-from jd_ocs_indexer.ingestion.normalizer import (
-    NormalizedOCS,
-    NormalizedTaskGroup,
-    NormalizedUnit,
+from jd_ocs_indexer.ingestion.normalizer import NormalizedBlock, NormalizedOCS, NormalizedUnit
+from jd_ocs_indexer.ingestion.payloads import (
+    CodeName,
+    CompetencyBlock,
+    Indicator,
+    OcsName,
+    ProfilePayload,
+    TaskPayload,
 )
-
-_ACTIVITY_EXAMPLES = 3
 
 
 @dataclass
 class BuildContext:
     source_file: str
     indexed_at: str
-
-
-def _dedup_pairs(pairs: list[Pair]) -> list[Pair]:
-    out: list[Pair] = []
-    seen: set[str] = set()
-    for p in pairs:
-        if p.code not in seen:
-            seen.add(p.code)
-            out.append(p)
-    return out
-
-
-def _aggregate_group(group: NormalizedTaskGroup) -> dict:
-    """Aggregate a task-group's blocks into per-task K/S/output/activities/level."""
-    k: list[Pair] = []
-    s: list[Pair] = []
-    out: list[Pair] = []
-    activities: list[str] = []
-    levels: list[int] = []
-    for b in group.blocks:
-        k.extend(b.k_pairs)
-        s.extend(b.s_pairs)
-        out.extend(b.output_pairs)
-        for ev in b.evidence:  # ev.name == activity text
-            if ev.name and ev.name not in activities:
-                activities.append(ev.name)
-        if b.competency_level is not None:
-            levels.append(b.competency_level)
-    return {
-        "k_pairs": _dedup_pairs(k),
-        "s_pairs": _dedup_pairs(s),
-        "output_pairs": _dedup_pairs(out),
-        "activities": activities,
-        "competency_level": max(levels) if levels else None,
-    }
 
 
 def _all_skill_names(norm: NormalizedOCS) -> list[str]:
@@ -93,31 +61,27 @@ def _profile_embed_text(norm: NormalizedOCS) -> str:
     return "\n".join(part for part in parts if part.strip())
 
 
+def _code_names(pairs: list[Pair]) -> list[CodeName]:
+    return [CodeName(code=p.code, name=p.name) for p in pairs]
+
+
 def _profile_record(norm: NormalizedOCS, ctx: BuildContext) -> ChunkRecord:
-    payload = {
-        "chunk_level": "profile",
-        "ocs_code": norm.ocs_code,
-        "ocs_code_base": norm.ocs_code_base,
-        "job_title": norm.job_title,
-        "job_category": norm.job_category,
-        "job_category_codes": list(norm.job_category_codes),
-        "job_category_names": list(norm.job_category_names),
-        "industry_codes": list(norm.industry_codes),
-        "industry_names": list(norm.industry_names),
-        "occupation_codes": list(norm.occupation_codes),
-        "occupation_names": list(norm.occupation_names),
-        "version": norm.version,
-        "version_seq": norm.version_seq,
-        "is_current": norm.is_current,
-        "update_date": norm.update_date,
-        "ocs_level": norm.ocs_level,
-        "job_description": norm.job_description,
-        "all_a_pairs": [{"code": p.code, "name": p.name} for p in norm.attitude_pairs],
-        "prerequisites": list(norm.prerequisites),
-        "supplements": list(norm.supplements),
-        "source_file": ctx.source_file,
-        "indexed_at": ctx.indexed_at,
-    }
+    payload = ProfilePayload(
+        ocs_code=norm.ocs_code,
+        ocs_code_base=norm.ocs_code_base,
+        is_current=norm.is_current,
+        ocs_name=OcsName(job_category_name=norm.job_category, occupation_name=norm.job_title),
+        job_description=norm.job_description,
+        ocs_level=norm.ocs_level,
+        job_categories=_code_names(norm.job_category_pairs),
+        occupations=_code_names(norm.occupation_pairs),
+        industries=_code_names(norm.industry_pairs),
+        attitudes=_code_names(norm.attitude_pairs),
+        prerequisites=list(norm.prerequisites),
+        supplements=list(norm.supplements),
+        indexed_at=ctx.indexed_at,
+        source_file=ctx.source_file,
+    ).model_dump()
     return ChunkRecord(
         chunk_key=f"ocs:{norm.ocs_code}:profile",
         chunk_level="profile",
@@ -126,25 +90,43 @@ def _profile_record(norm: NormalizedOCS, ctx: BuildContext) -> ChunkRecord:
     )
 
 
-def _task_record(norm: NormalizedOCS, unit: NormalizedUnit, task: Pair, agg: dict, ctx: BuildContext) -> ChunkRecord:
-    activities = agg["activities"]
-    embed_parts = [task.name, *activities]
-    payload = {
-        "chunk_level": "task",
-        "ocs_code": norm.ocs_code,
-        "unit_id": unit.unit_id,
-        "unit_title": unit.unit_title,
-        "task_id": task.code,
-        "task_title": task.name,
-        "activity_examples": activities[:_ACTIVITY_EXAMPLES],
-        "k_pairs": [{"code": p.code, "name": p.name} for p in agg["k_pairs"]],
-        "s_pairs": [{"code": p.code, "name": p.name} for p in agg["s_pairs"]],
-        "output_pairs": [{"code": p.code, "name": p.name} for p in agg["output_pairs"]],
-        "competency_level": agg["competency_level"],
-        "source_file": ctx.source_file,
-    }
+def _block_payload(b: NormalizedBlock) -> CompetencyBlock:
+    return CompetencyBlock(
+        competency_level=b.competency_level,
+        indicators=[Indicator(code=p.code, text=p.name) for p in b.evidence],
+        outputs=_code_names(b.output_pairs),
+        knowledge=_code_names(b.k_pairs),
+        skills=_code_names(b.s_pairs),
+    )
+
+
+def _embed_activities(blocks: list[CompetencyBlock]) -> list[str]:
+    """Indicator texts (deduped) — embed signal only, never stored in payload."""
+    out: list[str] = []
+    seen: set[str] = set()
+    for b in blocks:
+        for ind in b.indicators:
+            if ind.text and ind.text not in seen:
+                seen.add(ind.text)
+                out.append(ind.text)
+    return out
+
+
+def _task_record(norm: NormalizedOCS, unit: NormalizedUnit, task: Pair,
+                 blocks: list[CompetencyBlock], ctx: BuildContext) -> ChunkRecord:
+    payload = TaskPayload(
+        ocs_code=norm.ocs_code,
+        ocs_name=norm.job_title,
+        ocu_code=unit.unit_id,
+        ocu_name=unit.unit_title,
+        task_code=task.code,
+        task_name=task.name,
+        competency_blocks=blocks,
+        source_file=ctx.source_file,
+    ).model_dump()
+    embed_parts = [task.name, *_embed_activities(blocks)]
     return ChunkRecord(
-        chunk_key=f"ocs:{norm.ocs_code}:unit:{unit.unit_key}:task:{task.code}",
+        chunk_key=f"ocs:{norm.ocs_code}:task:{task.code}",
         chunk_level="task",
         text="\n".join(part for part in embed_parts if part and part.strip()),
         payload=payload,
@@ -155,7 +137,7 @@ def build(norm: NormalizedOCS, ctx: BuildContext) -> list[ChunkRecord]:
     records: list[ChunkRecord] = [_profile_record(norm, ctx)]
     for unit in norm.units:
         for group in unit.task_groups:
-            agg = _aggregate_group(group)
+            blocks = [_block_payload(b) for b in group.blocks]
             for task in group.tasks:
-                records.append(_task_record(norm, unit, task, agg, ctx))
+                records.append(_task_record(norm, unit, task, blocks, ctx))
     return records

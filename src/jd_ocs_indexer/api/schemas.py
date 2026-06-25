@@ -135,6 +135,23 @@ class OccupationDetail(BaseModel):
     supplements: list[str] = Field(default_factory=list)
 
 
+class TaskRef(BaseModel):
+    task_code: str
+    task_name: str
+    urn: str
+
+class UnitTasks(BaseModel):
+    ocu_code: Optional[str] = None
+    ocu_name: Optional[str] = None
+    urn: str
+    tasks: list[TaskRef] = Field(default_factory=list)
+
+class OccupationTasks(BaseModel):
+    ocs_code: str
+    ocs_name: str
+    units: list[UnitTasks] = Field(default_factory=list)
+
+
 class TaskByIdRequest(BaseModel):
     ids: list[str] = Field(min_length=1)
 

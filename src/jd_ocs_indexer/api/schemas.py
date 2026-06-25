@@ -150,3 +150,22 @@ class StatsResponse(BaseModel):
     collection: str
     total_points: int
     by_level: dict[str, int]
+
+
+class SourceRef(BaseModel):
+    ocu_code: Optional[str] = None
+    ocu_name: Optional[str] = None
+    task_code: Optional[str] = None
+    task_name: Optional[str] = None
+    competency_level: Optional[int] = None
+
+
+class CitableItem(BaseModel):
+    id: str                      # URN
+    type: str                    # K | S | O | P | A
+    code: str
+    name: Optional[str] = None   # K/S/O/A
+    text: Optional[str] = None   # P
+    ocs_code: str
+    ocs_name: str
+    sources: list[SourceRef] = Field(default_factory=list)

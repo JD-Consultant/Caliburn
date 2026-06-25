@@ -157,7 +157,9 @@ function Picker({
 
   const isSel = (c: CodeName) => selected.some((s) => (c.code ? s.code === c.code : s.name === c.name));
   const toggle = (c: CodeName) =>
-    setSelected((prev) => (isSel(c) ? prev.filter((s) => (c.code ? s.code !== c.code : s.name !== c.name)) : [...prev, { ...c }]));
+    // of-record 只存 {code,name}：不可 {...c}，否則候選的 display-only sources 會被
+    // setKS/setAttitudes 原樣寫進文件並 PATCH 到後端（違反 sources 僅展示用）。
+    setSelected((prev) => (isSel(c) ? prev.filter((s) => (c.code ? s.code !== c.code : s.name !== c.name)) : [...prev, { code: c.code, name: c.name }]));
 
   const add = () => {
     const n = name.trim();

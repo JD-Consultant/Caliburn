@@ -257,3 +257,25 @@ class TaskDetail(BaseModel):
 
 class TasksResponse(BaseModel):
     tasks: list[TaskDetail]
+
+
+class FindSimilarRequest(BaseModel):
+    ocs_codes: list[str] = Field(min_length=1)
+    score_threshold: float = Field(0.85, ge=0.0, le=1.0)
+
+
+class SimilarTaskRef(BaseModel):
+    urn: str
+    ocs_code: str
+    task_code: str
+    task_name: str
+
+
+class SimilarPair(BaseModel):
+    a: SimilarTaskRef
+    b: SimilarTaskRef
+    score: float
+
+
+class FindSimilarResponse(BaseModel):
+    candidates: list[SimilarPair]

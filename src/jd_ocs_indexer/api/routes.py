@@ -10,6 +10,8 @@ from fastapi.responses import JSONResponse
 from jd_ocs_indexer.api import service
 from jd_ocs_indexer.api.schemas import (
     CompetencyPool,
+    FindSimilarRequest,
+    FindSimilarResponse,
     HealthResponse,
     OccupationDetail,
     OccupationSearchResponse,
@@ -101,6 +103,15 @@ async def batch_get_tasks(req: TaskBatchGetRequest, request: Request):
     return await run_in_threadpool(
         service.batch_get_tasks, app.state.client,
         app.state.settings.qdrant_collection, ids=req.ids)
+
+
+@router.post("/tasks/findSimilar", response_model=FindSimilarResponse)
+async def find_similar_tasks(req: FindSimilarRequest, request: Request):
+    app = request.app
+    return await run_in_threadpool(
+        service.find_similar_tasks, app.state.client,
+        app.state.settings.qdrant_collection,
+        ocs_codes=req.ocs_codes, score_threshold=req.score_threshold)
 
 
 @router.get("/occupations/{ocs_code}", response_model=OccupationDetail)

@@ -242,6 +242,51 @@ def _resolve_ocs_name(profile_payload: dict) -> str:
     return n.get("occupation_name") or n.get("job_category_name") or profile_payload.get("ocs_code", "")
 
 
+def _task_points(client, collection, ocs_code):
+    flt = models.Filter(must=[
+        models.FieldCondition(key="ocs_code", match=models.MatchValue(value=ocs_code)),
+        models.FieldCondition(key="chunk_level", match=models.MatchValue(value="task")),
+    ])
+    return _scroll_all(client, collection, flt)
+
+
+def get_competencies(client, collection: str, *, ocs_code: str) -> dict | None:
+    prof = _profile_point(client, collection, ocs_code)
+    if prof is None:
+        return None
+    ocs_name = _resolve_ocs_name(prof)
+    buckets: dict[str, dict[str, dict]] = {"K": {}, "S": {}, "O": {}, "P": {}}
+    for p in _task_points(client, collection, ocs_code):
+        for blk in (p.get("competency_blocks") or []):
+            src = {"ocu_code": p.get("ocu_code"), "ocu_name": p.get("ocu_name"),
+                   "task_code": p.get("task_code"), "task_name": p.get("task_name"),
+                   "competency_level": blk.get("competency_level")}
+            for type_, field, val_key in (("K", "knowledge", "name"), ("S", "skills", "name"),
+                                          ("O", "outputs", "name"), ("P", "indicators", "text")):
+                for it in (blk.get(field) or []):
+                    code = it.get("code")
+                    if not code:
+                        continue
+                    key = urn.item_urn(ocs_code, type_, code)
+                    item = buckets[type_].get(key)
+                    if item is None:
+                        item = {"id": key, "type": type_, "code": code,
+                                "name": it.get("name"), "text": it.get("text"),
+                                "ocs_code": ocs_code, "ocs_name": ocs_name, "sources": []}
+                        buckets[type_][key] = item
+                    item["sources"].append(src)
+    attitudes = [{"id": urn.item_urn(ocs_code, "A", a.get("code", "")), "type": "A",
+                  "code": a.get("code", ""), "name": a.get("name"), "text": None,
+                  "ocs_code": ocs_code, "ocs_name": ocs_name, "sources": []}
+                 for a in (prof.get("attitudes") or []) if a.get("code")]
+    return {
+        "ocs_code": ocs_code,
+        "knowledge": list(buckets["K"].values()), "skills": list(buckets["S"].values()),
+        "outputs": list(buckets["O"].values()), "indicators": list(buckets["P"].values()),
+        "attitudes": attitudes,
+    }
+
+
 def get_occupation(client, collection: str, *, ocs_code: str) -> dict | None:
     p = _profile_point(client, collection, ocs_code)
     if p is None:

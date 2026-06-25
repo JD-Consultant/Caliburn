@@ -187,3 +187,12 @@ class CitableItem(BaseModel):
     ocs_code: str
     ocs_name: str
     sources: list[SourceRef] = Field(default_factory=list)
+
+
+class CompetencyPool(BaseModel):
+    ocs_code: str
+    knowledge: list[CitableItem] = Field(default_factory=list)
+    skills: list[CitableItem] = Field(default_factory=list)
+    outputs: list[CitableItem] = Field(default_factory=list)
+    indicators: list[CitableItem] = Field(default_factory=list)
+    attitudes: list[CitableItem] = Field(default_factory=list)

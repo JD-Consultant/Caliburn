@@ -3,10 +3,15 @@
 from typing import Protocol
 
 from app.services.knowledge.models import (
+    CompetencyPool,
+    OccupationDetail,
+    OccupationSearchResponse,
+    OccupationTasks,
     Pairs,
     ProfileMeta,
     SearchResult,
     TaskPool,
+    TaskSearchResponse,
     TasksByIdResult,
 )
 
@@ -23,5 +28,15 @@ class KnowledgeClient(Protocol):
     async def profile(self, ocs_code: str) -> ProfileMeta: ...
 
     async def tasks_by_id(self, ids: list[str]) -> TasksByIdResult: ...
+
+    async def search_occupations(self, query: str, *, top_k: int = 10) -> OccupationSearchResponse: ...
+
+    async def search_tasks(self, query: str, *, top_k: int = 10) -> TaskSearchResponse: ...
+
+    async def occupation(self, ocs_code: str) -> OccupationDetail: ...
+
+    async def competencies(self, ocs_code: str) -> CompetencyPool: ...
+
+    async def occupation_tasks(self, ocs_code: str) -> OccupationTasks: ...
 
     async def healthz(self) -> bool: ...

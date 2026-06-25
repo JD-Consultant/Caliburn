@@ -1,4 +1,11 @@
-from app.services.knowledge.models import SearchResult, TaskPool, Pairs
+from app.services.knowledge.models import (
+    CompetencyPool,
+    OccupationSearchResponse,
+    OccupationTasks,
+    Pairs,
+    SearchResult,
+    TaskPool,
+)
 
 
 class FakeKnowledge:
@@ -7,6 +14,9 @@ class FakeKnowledge:
         self._pool = pool or TaskPool(groups=[])
         self._tasks = tasks  # TasksByIdResult | None
         self._pairs = None
+        self._competencies = None
+        self._occ_tasks = None
+        self._occ_search = None
         self.calls = []
 
     async def search(self, query, **kw):
@@ -22,6 +32,18 @@ class FakeKnowledge:
         from app.services.knowledge.models import TasksByIdResult
         self.calls.append(("tasks_by_id", list(ids)))
         return self._tasks or TasksByIdResult(tasks=[])
+
+    async def search_occupations(self, query, *, top_k=10):
+        self.calls.append(("search_occupations", query))
+        return self._occ_search or OccupationSearchResponse(hits=[])
+
+    async def occupation_tasks(self, ocs_code):
+        self.calls.append(("occupation_tasks", ocs_code))
+        return self._occ_tasks or OccupationTasks(ocs_code=ocs_code)
+
+    async def competencies(self, ocs_code):
+        self.calls.append(("competencies", ocs_code))
+        return self._competencies or CompetencyPool(ocs_code=ocs_code)
 
     async def healthz(self):
         return True

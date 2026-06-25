@@ -3,10 +3,15 @@
 import httpx
 
 from app.services.knowledge.models import (
+    CompetencyPool,
+    OccupationDetail,
+    OccupationSearchResponse,
+    OccupationTasks,
     Pairs,
     ProfileMeta,
     SearchResult,
     TaskPool,
+    TaskSearchResponse,
     TasksByIdResult,
 )
 
@@ -50,6 +55,31 @@ class HttpIndexerClient:
         resp = await self._client.post("/tasks/by-id", json={"ids": ids})
         resp.raise_for_status()
         return TasksByIdResult.model_validate(resp.json())
+
+    async def search_occupations(self, query: str, *, top_k: int = 10) -> OccupationSearchResponse:
+        resp = await self._client.post("/occupations/search", json={"query": query, "top_k": top_k})
+        resp.raise_for_status()
+        return OccupationSearchResponse.model_validate(resp.json())
+
+    async def search_tasks(self, query: str, *, top_k: int = 10) -> TaskSearchResponse:
+        resp = await self._client.post("/tasks/search", json={"query": query, "top_k": top_k})
+        resp.raise_for_status()
+        return TaskSearchResponse.model_validate(resp.json())
+
+    async def occupation(self, ocs_code: str) -> OccupationDetail:
+        resp = await self._client.get(f"/occupations/{ocs_code}")
+        resp.raise_for_status()
+        return OccupationDetail.model_validate(resp.json())
+
+    async def competencies(self, ocs_code: str) -> CompetencyPool:
+        resp = await self._client.get(f"/occupations/{ocs_code}/competencies")
+        resp.raise_for_status()
+        return CompetencyPool.model_validate(resp.json())
+
+    async def occupation_tasks(self, ocs_code: str) -> OccupationTasks:
+        resp = await self._client.get(f"/occupations/{ocs_code}/tasks")
+        resp.raise_for_status()
+        return OccupationTasks.model_validate(resp.json())
 
     async def healthz(self) -> bool:
         try:

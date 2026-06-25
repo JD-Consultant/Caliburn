@@ -1,6 +1,7 @@
 """Derive a single task's K/S/O/indicators from an occupation CompetencyPool by
-filtering CitableItems on their source task_code. Replaces the old per-point
-tasks_by_id path — the v4 surface exposes no Qdrant point ids to feed batchGet."""
+filtering CitableItems on their source task_code. The v4 surface is
+resource-oriented (occupation/competencies), so a task is resolved by its
+task_code rather than by per-point lookup."""
 from __future__ import annotations
 
 from app.services.knowledge.models import CompetencyPool

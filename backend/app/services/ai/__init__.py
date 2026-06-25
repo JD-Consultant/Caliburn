@@ -7,8 +7,8 @@ the design §I constraint: the ✨ panel calls them today; a future autonomous
 interview agent reuses the same functions unchanged.
 
 Shared rules:
-- catalog-first: standard items come from the indexer (``tasks_by_id`` / task pool);
-  the LLM only personalises / filters / drafts custom content.
+- catalog-first: standard items come from the indexer (occupation ``competencies``
+  filtered per task_code); the LLM only personalises / filters / drafts custom content.
 - no LLM (key absent) or no note → degrade to catalog-only (never crash, never empty
   when catalog is available).
 - every proposed item carries ``source: "catalog" | "ai"`` (+ a one-line ``reason``

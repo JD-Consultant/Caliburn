@@ -1,6 +1,6 @@
 """Document-header metadata aggregation (D29 V1).
 
-Pure functions over a list of indexer ``ProfileMeta`` (one per selected OCS).
+Pure functions over a list of indexer ``OccupationDetail`` (one per selected OCS).
 Produces the candidate pools for the header pickers (所屬職類/職業/行業 + 態度)
 and the single-value 主基準 fields. The frontend ticks candidates and writes the
 result into ``ocs_profile.category`` / ``notes`` / ``ocs_attitude`` via PATCH —

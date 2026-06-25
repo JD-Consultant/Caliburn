@@ -6,7 +6,7 @@ from langgraph.types import Command
 from app.graph_v3.state import new_state, InterviewState
 from app.graph_v3.nodes import pick_profile
 from app.graph_v3.deps import Deps
-from app.services.knowledge.models import SearchResult, Hit
+from app.services.knowledge.models import OccupationSearchResponse, OccupationHit
 from tests.conftest_graph import FakeKnowledge, SpyPersist
 
 
@@ -20,8 +20,9 @@ def _one_node_graph():
 
 @pytest.mark.asyncio
 async def test_pick_profile_interrupts_then_persists_selection():
-    fake = FakeKnowledge(search=SearchResult(mode="dense", hits=[
-        Hit(id="p1", ocs_code="OC1", chunk_level="profile", job_title="工程師")]))
+    fake = FakeKnowledge()
+    fake._occ_search = OccupationSearchResponse(hits=[
+        OccupationHit(ocs_code="OC1", urn="ocs:OC1", ocs_name="工程師")])
     spy = SpyPersist()
     graph = _one_node_graph()
     cfg = {"configurable": {"thread_id": "t1", "deps": Deps(knowledge=fake, persist=spy)}}
@@ -39,9 +40,10 @@ async def test_pick_profile_interrupts_then_persists_selection():
 
 @pytest.mark.asyncio
 async def test_pick_profile_multi_select_keeps_order_as_priority():
-    fake = FakeKnowledge(search=SearchResult(mode="dense", hits=[
-        Hit(id="p1", ocs_code="OC1", chunk_level="profile", job_title="工程師"),
-        Hit(id="p2", ocs_code="OC2", chunk_level="profile", job_title="技術員")]))
+    fake = FakeKnowledge()
+    fake._occ_search = OccupationSearchResponse(hits=[
+        OccupationHit(ocs_code="OC1", urn="ocs:OC1", ocs_name="工程師"),
+        OccupationHit(ocs_code="OC2", urn="ocs:OC2", ocs_name="技術員")])
     spy = SpyPersist()
     graph = _one_node_graph()
     cfg = {"configurable": {"thread_id": "t2", "deps": Deps(knowledge=fake, persist=spy)}}

@@ -4,6 +4,9 @@ from uuid import UUID
 
 from app.services.knowledge.models import (
     Hit,
+    OccupationHit,
+    OccupationSearchResponse,
+    OccupationTasks,
     Pair,
     Pairs,
     PoolGroup,
@@ -12,7 +15,9 @@ from app.services.knowledge.models import (
     ProfileMeta,
     SearchResult,
     TaskPool,
+    TaskRef,
     TasksByIdResult,
+    UnitTasks,
 )
 
 
@@ -34,6 +39,19 @@ class StubKnowledge:
                 PoolTask(id="T1.2", task_id="T1.2", task_title="保養排程管理",
                          activity_examples=["排定週期保養"]),
             ])])])
+
+    async def search_occupations(self, query, *, top_k=10) -> OccupationSearchResponse:
+        return OccupationSearchResponse(hits=[
+            OccupationHit(ocs_code="KRM2421-001v4", urn="ocs:KRM2421-001v4", ocs_name="設備維護工程師"),
+            OccupationHit(ocs_code="KRM2422-001v4", urn="ocs:KRM2422-001v4", ocs_name="生產線技術員"),
+        ])
+
+    async def occupation_tasks(self, ocs_code) -> OccupationTasks:
+        return OccupationTasks(ocs_code=ocs_code, ocs_name="設備維護工程師", units=[
+            UnitTasks(ocu_code="U1", ocu_name="預防保養", urn=f"ocs:{ocs_code}:U:U1", tasks=[
+                TaskRef(task_code="T1.1", task_name="例行設備巡檢", urn=f"ocs:{ocs_code}:T:T1.1"),
+                TaskRef(task_code="T1.2", task_name="保養排程管理", urn=f"ocs:{ocs_code}:T:T1.2"),
+            ])])
 
     async def pairs(self, ocs_code) -> Pairs:
         return Pairs(ocs_code=ocs_code,

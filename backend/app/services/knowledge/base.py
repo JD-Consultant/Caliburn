@@ -7,28 +7,11 @@ from app.services.knowledge.models import (
     OccupationDetail,
     OccupationSearchResponse,
     OccupationTasks,
-    Pairs,
-    ProfileMeta,
-    SearchResult,
-    TaskPool,
     TaskSearchResponse,
-    TasksByIdResult,
 )
 
 
 class KnowledgeClient(Protocol):
-    async def search(self, query: str, *, level: str | None = None,
-                     hybrid: bool = True, top_k: int = 10) -> SearchResult: ...
-
-    async def task_pool(self, ocs_codes: list[str], *,
-                        activity_examples: int = 3) -> TaskPool: ...
-
-    async def pairs(self, ocs_code: str) -> Pairs: ...
-
-    async def profile(self, ocs_code: str) -> ProfileMeta: ...
-
-    async def tasks_by_id(self, ids: list[str]) -> TasksByIdResult: ...
-
     async def search_occupations(self, query: str, *, top_k: int = 10) -> OccupationSearchResponse: ...
 
     async def search_tasks(self, query: str, *, top_k: int = 10) -> TaskSearchResponse: ...

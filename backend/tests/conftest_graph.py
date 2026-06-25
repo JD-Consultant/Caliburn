@@ -2,36 +2,15 @@ from app.services.knowledge.models import (
     CompetencyPool,
     OccupationSearchResponse,
     OccupationTasks,
-    Pairs,
-    SearchResult,
-    TaskPool,
 )
 
 
 class FakeKnowledge:
-    def __init__(self, search=None, pool=None, tasks=None):
-        self._search = search or SearchResult(mode="dense", hits=[])
-        self._pool = pool or TaskPool(groups=[])
-        self._tasks = tasks  # TasksByIdResult | None
-        self._pairs = None
+    def __init__(self):
         self._competencies = None
         self._occ_tasks = None
         self._occ_search = None
         self.calls = []
-
-    async def search(self, query, **kw):
-        self.calls.append(("search", query)); return self._search
-
-    async def task_pool(self, ocs_codes, **kw):
-        self.calls.append(("task_pool", ocs_codes)); return self._pool
-
-    async def pairs(self, ocs_code):
-        self.calls.append(("pairs", ocs_code)); return self._pairs or Pairs(ocs_code=ocs_code)
-
-    async def tasks_by_id(self, ids):
-        from app.services.knowledge.models import TasksByIdResult
-        self.calls.append(("tasks_by_id", list(ids)))
-        return self._tasks or TasksByIdResult(tasks=[])
 
     async def search_occupations(self, query, *, top_k=10):
         self.calls.append(("search_occupations", query))

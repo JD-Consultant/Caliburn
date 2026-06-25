@@ -5,43 +5,17 @@ from uuid import UUID
 from app.services.knowledge.models import (
     CitableItem,
     CompetencyPool,
-    Hit,
     OccupationHit,
     OccupationSearchResponse,
     OccupationTasks,
-    Pair,
-    Pairs,
-    PoolGroup,
-    PoolTask,
-    PoolUnit,
-    ProfileMeta,
-    SearchResult,
     SourceRef,
-    TaskPool,
     TaskRef,
-    TasksByIdResult,
     UnitTasks,
 )
 
 
 class StubKnowledge:
     """假 KnowledgeClient（canned 資料）。"""
-
-    async def search(self, query, **kw) -> SearchResult:
-        return SearchResult(mode="dense", hits=[
-            Hit(id="OC1", ocs_code="KRM2421-001v4", chunk_level="profile", job_title="設備維護工程師"),
-            Hit(id="OC2", ocs_code="KRM2422-001v4", chunk_level="profile", job_title="生產線技術員"),
-        ])
-
-    async def task_pool(self, ocs_codes, **kw) -> TaskPool:
-        return TaskPool(groups=[PoolGroup(
-            ocs_code=(ocs_codes or ["OC1"])[0], job_title="設備維護工程師",
-            units=[PoolUnit(unit_id="U1", unit_title="預防保養", tasks=[
-                PoolTask(id="T1.1", task_id="T1.1", task_title="例行設備巡檢",
-                         activity_examples=["每日點檢", "異常記錄"]),
-                PoolTask(id="T1.2", task_id="T1.2", task_title="保養排程管理",
-                         activity_examples=["排定週期保養"]),
-            ])])])
 
     async def search_occupations(self, query, *, top_k=10) -> OccupationSearchResponse:
         return OccupationSearchResponse(hits=[
@@ -56,12 +30,6 @@ class StubKnowledge:
                 TaskRef(task_code="T1.2", task_name="保養排程管理", urn=f"ocs:{ocs_code}:T:T1.2"),
             ])])
 
-    async def pairs(self, ocs_code) -> Pairs:
-        return Pairs(ocs_code=ocs_code,
-                     knowledge=[Pair(code="K01", name="設備保養原理")],
-                     skills=[Pair(code="S01", name="點檢操作")],
-                     attitudes=[Pair(code="A01", name="細心負責")])
-
     async def competencies(self, ocs_code) -> CompetencyPool:
         return CompetencyPool(ocs_code=ocs_code,
             knowledge=[CitableItem(id=f"ocs:{ocs_code}:K:K01", type="K", code="K01",
@@ -71,17 +39,6 @@ class StubKnowledge:
                                 ocs_code=ocs_code, ocs_name="設備維護工程師", sources=[SourceRef(task_code="T1.1")])],
             attitudes=[CitableItem(id=f"ocs:{ocs_code}:A:A01", type="A", code="A01", name="細心負責",
                                    ocs_code=ocs_code, ocs_name="設備維護工程師", sources=[])])
-
-    async def profile(self, ocs_code) -> ProfileMeta:
-        return ProfileMeta(ocs_code=ocs_code, job_title="設備維護工程師",
-                           job_category_name="",
-                           job_categories=[Pair(code="KRM", name="機械類")],
-                           industries=[Pair(code="C", name="製造業")],
-                           attitudes=[Pair(code="A01", name="細心負責")],
-                           job_description="負責設備維護", ocs_level=4)
-
-    async def tasks_by_id(self, ids) -> TasksByIdResult:
-        return TasksByIdResult(tasks=[])
 
     async def healthz(self) -> bool:
         return True

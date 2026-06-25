@@ -7,12 +7,7 @@ from app.services.knowledge.models import (
     OccupationDetail,
     OccupationSearchResponse,
     OccupationTasks,
-    Pairs,
-    ProfileMeta,
-    SearchResult,
-    TaskPool,
     TaskSearchResponse,
-    TasksByIdResult,
 )
 
 
@@ -24,37 +19,6 @@ class HttpIndexerClient:
 
     async def aclose(self) -> None:
         await self._client.aclose()
-
-    async def search(self, query: str, *, level: str | None = None,
-                     hybrid: bool = True, top_k: int = 10) -> SearchResult:
-        payload: dict = {"query": query, "hybrid": hybrid, "top_k": top_k}
-        if level:
-            payload["level"] = level
-        resp = await self._client.post("/search", json=payload)
-        resp.raise_for_status()
-        return SearchResult.model_validate(resp.json())
-
-    async def task_pool(self, ocs_codes: list[str], *,
-                        activity_examples: int = 3) -> TaskPool:
-        resp = await self._client.post("/task-pool", json={
-            "ocs_codes": ocs_codes, "activity_examples": activity_examples})
-        resp.raise_for_status()
-        return TaskPool.model_validate(resp.json())
-
-    async def pairs(self, ocs_code: str) -> Pairs:
-        resp = await self._client.get(f"/profile/{ocs_code}/pairs")
-        resp.raise_for_status()
-        return Pairs.model_validate(resp.json())
-
-    async def profile(self, ocs_code: str) -> ProfileMeta:
-        resp = await self._client.get(f"/profile/{ocs_code}")
-        resp.raise_for_status()
-        return ProfileMeta.model_validate(resp.json())
-
-    async def tasks_by_id(self, ids: list[str]) -> TasksByIdResult:
-        resp = await self._client.post("/tasks/by-id", json={"ids": ids})
-        resp.raise_for_status()
-        return TasksByIdResult.model_validate(resp.json())
 
     async def search_occupations(self, query: str, *, top_k: int = 10) -> OccupationSearchResponse:
         resp = await self._client.post("/occupations/search", json={"query": query, "top_k": top_k})

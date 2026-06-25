@@ -5,8 +5,6 @@ from langgraph.types import Command
 from app.graph_v3.graph import build_graph_v3
 from app.graph_v3.state import new_state
 from app.graph_v3.deps import Deps
-from app.services.knowledge.models import (
-    SearchResult, Hit, TaskPool, PoolGroup, PoolUnit, PoolTask, TasksByIdResult)
 from tests.conftest_graph import FakeKnowledge, SpyPersist, FakeLlm
 
 _GOOD = {"has_situation": True, "has_purpose": True, "has_collaborators": True,
@@ -22,13 +20,7 @@ async def test_two_task_deep_loop_reaches_fetch_ksa_pool():
     def _json(prompt):
         return star_refine if "STAR 四槽" in prompt else indicators
     llm = FakeLlm(json=_json)
-    fake = FakeKnowledge(
-        search=SearchResult(mode="dense", hits=[Hit(id="p1", ocs_code="OC1", chunk_level="profile")]),
-        pool=TaskPool(groups=[PoolGroup(ocs_code="OC1", units=[PoolUnit(tasks=[
-            PoolTask(id="x1", task_id="T1.1", task_title="任務一"),
-            PoolTask(id="x2", task_id="T1.2", task_title="任務二")])])]),
-        tasks=TasksByIdResult(tasks=[]),  # 無 catalog outputs → 5W2H 全問
-    )
+    fake = FakeKnowledge()
     graph = build_graph_v3(checkpointer=MemorySaver())
     cfg = {"configurable": {"thread_id": "t1",
                             "deps": Deps(knowledge=fake, persist=SpyPersist(), llm=llm)}}

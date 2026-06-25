@@ -25,8 +25,7 @@ def _norm_two_tasks() -> NormalizedOCS:
                           unit_key="U1", task_groups=[multi, blockless])
     return NormalizedOCS(
         ocs_code="OC1v1", ocs_code_base="OC1", job_title="JT",
-        job_category=None, job_category_codes=[], job_category_names=[], industry_codes=[], industry_names=[],
-        occupation_codes=[], occupation_names=[], job_description=None, ocs_level=None,
+        job_category=None, job_description=None, ocs_level=None,
         version="v1", version_seq=1, update_date=None, is_current=True, units=[unit],
         attitude_codes=[], attitude_terms=[], attitude_pairs=[],
         prerequisites=[], supplements=[],
@@ -35,32 +34,40 @@ def _norm_two_tasks() -> NormalizedOCS:
 
 _CTX = BuildContext(source_file="jd-ocs/OC1v1.json", indexed_at="2026-06-14T00:00:00+00:00")
 
+_SHARED_BLOCK = {
+    "competency_level": 3,
+    "indicators": [{"code": "P01", "text": "活動一"}, {"code": "P02", "text": "活動二"},
+                   {"code": "P03", "text": "活動三"}, {"code": "P04", "text": "活動四"}],
+    "outputs": [{"code": "O01", "name": "產出一"}],
+    "knowledge": [{"code": "K01", "name": "知識一"}],
+    "skills": [{"code": "S01", "name": "技能一"}],
+}
 
-def test_one_task_record_per_task_id():
+
+def test_one_task_record_per_task_code():
     tasks = [r for r in build(_norm_two_tasks(), _CTX) if r.chunk_level == "task"]
-    assert sorted(r.payload["task_id"] for r in tasks) == ["T1.1", "T1.2", "T1.3"]
+    assert sorted(r.payload["task_code"] for r in tasks) == ["T1.1", "T1.2", "T1.3"]
 
 
-def test_task_record_payload_and_examples():
-    t11 = [r for r in build(_norm_two_tasks(), _CTX) if r.payload.get("task_id") == "T1.1"][0]
+def test_task_record_payload_nested_blocks():
+    t11 = [r for r in build(_norm_two_tasks(), _CTX) if r.payload.get("task_code") == "T1.1"][0]
     p = t11.payload
-    assert t11.chunk_key == "ocs:OC1v1:unit:U1:task:T1.1"
-    assert p["chunk_level"] == "task" and p["ocs_code"] == "OC1v1"
-    assert p["unit_id"] == "U1" and p["unit_title"] == "單元一"
-    assert p["task_id"] == "T1.1" and p["task_title"] == "任務一"
-    assert p["k_pairs"] == [{"code": "K01", "name": "知識一"}]
-    assert p["s_pairs"] == [{"code": "S01", "name": "技能一"}]
-    assert p["output_pairs"] == [{"code": "O01", "name": "產出一"}]
-    assert p["competency_level"] == 3
-    assert p["activity_examples"] == ["活動一", "活動二", "活動三"]
-    assert "text" not in p
-    assert "任務一" in t11.text and "活動一" in t11.text
+    assert t11.chunk_key == "ocs:OC1v1:task:T1.1"
+    assert p["chunk_level"] == "task" and p["schema_version"] == "v4"
+    assert p["ocs_code"] == "OC1v1" and p["ocs_name"] == "JT"
+    assert p["ocu_code"] == "U1" and p["ocu_name"] == "單元一"
+    assert p["task_code"] == "T1.1" and p["task_name"] == "任務一"
+    assert p["competency_blocks"] == [_SHARED_BLOCK]
+    # dropped: flattened k/s/output_pairs, task-level competency_level, activity_examples
+    for gone in ("k_pairs", "s_pairs", "output_pairs", "competency_level",
+                 "activity_examples", "unit_id", "task_id", "text"):
+        assert gone not in p
+    assert "任務一" in t11.text and "活動一" in t11.text  # indicator text feeds embed
 
 
-def test_block_less_task_record():
-    t13 = [r for r in build(_norm_two_tasks(), _CTX) if r.payload.get("task_id") == "T1.3"][0]
-    assert t13.payload["k_pairs"] == [] and t13.payload["activity_examples"] == []
-    assert t13.payload["competency_level"] is None
+def test_blockless_task_record_has_empty_blocks():
+    t13 = [r for r in build(_norm_two_tasks(), _CTX) if r.payload.get("task_code") == "T1.3"][0]
+    assert t13.payload["competency_blocks"] == []
 
 
 def test_only_profile_and_task_levels_emitted():
@@ -68,10 +75,9 @@ def test_only_profile_and_task_levels_emitted():
     assert levels == {"profile", "task"}
 
 
-def test_multi_task_group_shares_aggregation():
+def test_style_b_tasks_share_blocks():
+    """同格多 T code（風格 B）：T1.1 與 T1.2 各自一個 record、共用同一份 blocks。"""
     recs = build(_norm_two_tasks(), _CTX)
-    t12 = [r for r in recs if r.payload.get("task_id") == "T1.2"][0]
-    assert t12.payload["task_title"] == "任務二"
-    assert t12.payload["k_pairs"] == [{"code": "K01", "name": "知識一"}]
-    assert t12.payload["s_pairs"] == [{"code": "S01", "name": "技能一"}]
-    assert t12.payload["competency_level"] == 3
+    t12 = [r for r in recs if r.payload.get("task_code") == "T1.2"][0]
+    assert t12.payload["task_name"] == "任務二"
+    assert t12.payload["competency_blocks"] == [_SHARED_BLOCK]

@@ -68,12 +68,6 @@ class NormalizedOCS:
     ocs_code_base: str
     job_title: str
     job_category: str | None
-    job_category_codes: list[str]
-    job_category_names: list[str]
-    industry_codes: list[str]
-    industry_names: list[str]
-    occupation_codes: list[str]
-    occupation_names: list[str]
     job_description: str | None
     ocs_level: int | None
 
@@ -95,9 +89,28 @@ class NormalizedOCS:
     prerequisites: list[str]
     supplements: list[str]
 
+    # Category as lockstep pairs (code↔name never drift). Defaults keep existing
+    # constructors (tests) working; normalize() always populates them.
+    job_category_pairs: list[Pair] = field(default_factory=list)
+    occupation_pairs: list[Pair] = field(default_factory=list)
+    industry_pairs: list[Pair] = field(default_factory=list)
+
 
 def _padded(n: int) -> str:
     return f"{n:04d}"
+
+
+def _category_pairs(items) -> list[Pair]:
+    """Lockstep [{code,name}] from a list of CodeName: dedup by code|name,
+    fill the missing side with "" so code and name never misalign."""
+    out: list[Pair] = []
+    seen: set[str] = set()
+    for it in items:
+        key = it.code or it.name
+        if key and key not in seen:
+            seen.add(key)
+            out.append(Pair(code=it.code or "", name=it.name or ""))
+    return out
 
 
 def _ocs_code_base(ocs_code: str) -> str:
@@ -158,32 +171,9 @@ def normalize(doc: OCSDocument) -> NormalizedOCS:
     job_category = (profile.ocs_name.job_category_name if profile.ocs_name else None)
 
     category = profile.category
-    job_category_codes: list[str] = []
-    job_category_names: list[str] = []
-    industry_codes: list[str] = []
-    industry_names: list[str] = []
-    occupation_codes: list[str] = []
-    occupation_names: list[str] = []
-    if category is not None:
-        # job_categories 是多值 [{code,name}]（同 occupations/industries）。code+name
-        # 鎖步收集、依 code|name 去重，確保兩平行陣列永遠對齊。
-        seen_jc: set[str] = set()
-        for jc in category.job_categories:
-            key = jc.code or jc.name
-            if key and key not in seen_jc:
-                seen_jc.add(key)
-                job_category_codes.append(jc.code or "")
-                job_category_names.append(jc.name or "")
-        for ind in category.industries:
-            if ind.code:
-                industry_codes.append(ind.code)
-            if ind.name:
-                industry_names.append(ind.name)
-        for occ in category.occupations:
-            if occ.code:
-                occupation_codes.append(occ.code)
-            if occ.name:
-                occupation_names.append(occ.name)
+    job_category_pairs = _category_pairs(category.job_categories) if category else []
+    occupation_pairs = _category_pairs(category.occupations) if category else []
+    industry_pairs = _category_pairs(category.industries) if category else []
 
     version, version_seq, update_date, is_current = _derive_version(doc)
 
@@ -313,12 +303,6 @@ def normalize(doc: OCSDocument) -> NormalizedOCS:
         ocs_code_base=ocs_code_base,
         job_title=job_title.strip(),
         job_category=job_category.strip() if job_category else None,
-        job_category_codes=job_category_codes,
-        job_category_names=job_category_names,
-        industry_codes=industry_codes,
-        industry_names=industry_names,
-        occupation_codes=occupation_codes,
-        occupation_names=occupation_names,
         job_description=(profile.job_description.strip() if profile.job_description else None),
         ocs_level=profile.ocs_level,
         version=version,
@@ -331,4 +315,7 @@ def normalize(doc: OCSDocument) -> NormalizedOCS:
         attitude_pairs=attitude_pairs,
         prerequisites=prerequisites,
         supplements=supplements,
+        job_category_pairs=job_category_pairs,
+        occupation_pairs=occupation_pairs,
+        industry_pairs=industry_pairs,
     )

@@ -12,6 +12,7 @@ from jd_ocs_indexer.api.schemas import (
     CompetencyPool,
     HealthResponse,
     OccupationDetail,
+    OccupationTasks,
     PairsResponse,
     ProfileMetaResponse,
     SearchRequest,
@@ -74,6 +75,17 @@ async def get_occupation(ocs_code: str, request: Request):
     app = request.app
     result = await run_in_threadpool(
         service.get_occupation, app.state.client,
+        app.state.settings.qdrant_collection, ocs_code=ocs_code)
+    if result is None:
+        raise HTTPException(status_code=404, detail="ocs_code not found")
+    return result
+
+
+@router.get("/occupations/{ocs_code}/tasks", response_model=OccupationTasks)
+async def get_occupation_tasks(ocs_code: str, request: Request):
+    app = request.app
+    result = await run_in_threadpool(
+        service.get_occupation_tasks, app.state.client,
         app.state.settings.qdrant_collection, ocs_code=ocs_code)
     if result is None:
         raise HTTPException(status_code=404, detail="ocs_code not found")

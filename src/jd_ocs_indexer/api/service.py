@@ -250,6 +250,23 @@ def _task_points(client, collection, ocs_code):
     return _scroll_all(client, collection, flt)
 
 
+def get_occupation_tasks(client, collection: str, *, ocs_code: str) -> dict | None:
+    prof = _profile_point(client, collection, ocs_code)
+    if prof is None:
+        return None
+    units: dict[str, dict] = {}
+    for p in _task_points(client, collection, ocs_code):
+        uc = p.get("ocu_code")
+        u = units.setdefault(uc, {"ocu_code": uc, "ocu_name": p.get("ocu_name"),
+                                  "urn": urn.unit_urn(ocs_code, uc or ""), "tasks": []})
+        u["tasks"].append({"task_code": p.get("task_code"), "task_name": p.get("task_name"),
+                           "urn": urn.task_urn(ocs_code, p.get("task_code") or "")})
+    for u in units.values():
+        u["tasks"].sort(key=lambda t: (t["task_code"] is None, t["task_code"] or ""))
+    units_sorted = sorted(units.values(), key=lambda u: (u["ocu_code"] is None, u["ocu_code"] or ""))
+    return {"ocs_code": ocs_code, "ocs_name": _resolve_ocs_name(prof), "units": units_sorted}
+
+
 def get_competencies(client, collection: str, *, ocs_code: str) -> dict | None:
     prof = _profile_point(client, collection, ocs_code)
     if prof is None:

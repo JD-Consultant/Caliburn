@@ -10,6 +10,7 @@ from fastapi.responses import JSONResponse
 from jd_ocs_indexer.api import service
 from jd_ocs_indexer.api.schemas import (
     HealthResponse,
+    OccupationDetail,
     PairsResponse,
     ProfileMetaResponse,
     SearchRequest,
@@ -65,6 +66,17 @@ async def post_tasks_by_id(req: TaskByIdRequest, request: Request):
         app.state.settings.qdrant_collection,
         ids=req.ids,
     )
+
+
+@router.get("/occupations/{ocs_code}", response_model=OccupationDetail)
+async def get_occupation(ocs_code: str, request: Request):
+    app = request.app
+    result = await run_in_threadpool(
+        service.get_occupation, app.state.client,
+        app.state.settings.qdrant_collection, ocs_code=ocs_code)
+    if result is None:
+        raise HTTPException(status_code=404, detail="ocs_code not found")
+    return result
 
 
 @router.get("/profile/{ocs_code}/pairs", response_model=PairsResponse)

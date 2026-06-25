@@ -6,6 +6,7 @@ imports here so the layer stays unit-testable with fakes.
 
 from __future__ import annotations
 
+from jd_ocs_indexer.api import urn
 from jd_ocs_indexer.validation import search as search_mod
 from jd_ocs_indexer.validation import stats as stats_mod
 from qdrant_client.http import models
@@ -221,6 +222,40 @@ def get_profile(client, collection: str, *, ocs_code: str) -> dict | None:
         "job_description": p.get("job_description") or "",
         "ocs_level": p.get("ocs_level"),
         "attitudes": p.get("all_a_pairs") or [],
+        "prerequisites": p.get("prerequisites") or [],
+        "supplements": p.get("supplements") or [],
+    }
+
+
+def _profile_point(client, collection, ocs_code):
+    flt = models.Filter(must=[
+        models.FieldCondition(key="ocs_code", match=models.MatchValue(value=ocs_code)),
+        models.FieldCondition(key="chunk_level", match=models.MatchValue(value="profile")),
+    ])
+    recs, _ = client.scroll(collection_name=collection, scroll_filter=flt,
+                            with_payload=True, with_vectors=False, limit=1)
+    return (recs[0].payload or {}) if recs else None
+
+
+def _resolve_ocs_name(profile_payload: dict) -> str:
+    n = profile_payload.get("ocs_name") or {}
+    return n.get("occupation_name") or n.get("job_category_name") or profile_payload.get("ocs_code", "")
+
+
+def get_occupation(client, collection: str, *, ocs_code: str) -> dict | None:
+    p = _profile_point(client, collection, ocs_code)
+    if p is None:
+        return None
+    return {
+        "ocs_code": p.get("ocs_code", ""),
+        "urn": urn.occupation_urn(p.get("ocs_code", "")),
+        "ocs_name": p.get("ocs_name") or {"job_category_name": None, "occupation_name": None},
+        "job_categories": p.get("job_categories") or [],
+        "occupations": p.get("occupations") or [],
+        "industries": p.get("industries") or [],
+        "job_description": p.get("job_description") or "",
+        "ocs_level": p.get("ocs_level"),
+        "attitudes": p.get("attitudes") or [],
         "prerequisites": p.get("prerequisites") or [],
         "supplements": p.get("supplements") or [],
     }

@@ -10,10 +10,8 @@ import { useState } from "react";
 const AGENT_NAME = "jd_authoring";
 
 type ProfileCandidate = {
-  id?: string;
   ocs_code: string;
-  job_title?: string | null;
-  task_title?: string | null;
+  ocs_name?: string | null;
 };
 
 // edit_tasks payload (backend build_task_pool → _pool_to_tasks). Resume contract:
@@ -21,10 +19,9 @@ type ProfileCandidate = {
 type PoolTask = {
   task_name: string;
   source?: string;
-  indexer_ref?: { ocs_code?: string; task_id?: string };
+  indexer_ref?: { ocs_code?: string; task_code?: string };
   unit_id?: string;
   unit_title?: string;
-  activity_examples?: string[];
 };
 
 // KSA item shape shared by curate_ks + curate_attitudes.
@@ -117,7 +114,7 @@ function ProfilePicker({
             </span>
             <span className="flex-1">
               <span className="font-mono text-xs text-muted-foreground">{c.ocs_code}</span>
-              {c.job_title ? `　${c.job_title}` : ""}
+              {c.ocs_name ? `　${c.ocs_name}` : ""}
             </span>
           </button>
         );
@@ -140,7 +137,7 @@ function ProfilePicker({
 // Single editable review surface for the task pool (D24-b: 勾/改/增/刪 + provenance).
 // Each row carries a stable client _id so inline inputs keep focus across edits,
 // plus an `included` flag (keep/drop). Confirm resolves the full task objects
-// (provenance preserved: catalog rows keep indexer_ref/unit/activity_examples;
+// (provenance preserved: catalog rows keep indexer_ref/unit;
 // custom rows are source="company").
 type TaskRow = PoolTask & { _id: number; included: boolean };
 
@@ -219,11 +216,6 @@ function TaskCurator({
                       {r.source === "company" ? "公司" : "catalog"}
                     </span>
                   </span>
-                  {r.activity_examples?.length ? (
-                    <span className="mt-0.5 block text-xs text-muted-foreground">
-                      {r.activity_examples.slice(0, 3).join("、")}
-                    </span>
-                  ) : null}
                 </span>
                 <button
                   type="button"
@@ -264,7 +256,6 @@ function TaskCurator({
                 indexer_ref: r.indexer_ref,
                 unit_id: r.unit_id,
                 unit_title: r.unit_title,
-                activity_examples: r.activity_examples,
               })),
           );
         }}

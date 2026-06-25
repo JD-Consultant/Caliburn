@@ -51,8 +51,8 @@ export interface CompetencyBlock {
 export interface OcsTask {
   task_codes: CodeName[];
   competency_blocks: CompetencyBlock[];
-  // D28: provenance.id = catalog 任務 UUID（自訂/cherry-pick 任務為 ""）→ /ai/* 用它取官方 K/S/O。
-  provenance?: { ocs_code: string; task_id: string; id?: string };
+  // 來源：v4 indexer task URN 拆解（ocs_code, task_code）；自訂/cherry-pick 任務 task_code 為 ""。
+  provenance?: { ocs_code: string; task_code: string; urn?: string };
   _tid?: string; // 前端穩定 id（拖拉用；隨項目移動）
   _notes?: string; // D28 工作筆記（5W2H/CIT 原文，餵 AI＋給顧問）；非契約欄，finalize/export 剝除
 }
@@ -110,38 +110,37 @@ export interface KsaPool {
 
 export interface OcsSearchHit {
   ocs_code: string;
-  job_title: string;
+  ocs_name: string;
 }
 
 // 選任務候選（task-candidates）：依職類 → 職責(unit) 分組。
 export interface CandidateTask {
-  id: string; // D28 catalog 任務 UUID（extract-tasks 預勾、/ai/* 取官方內容用）
-  task_id: string;
-  task_title: string;
+  task_code: string;
+  task_name: string;
+  urn: string;
 }
 export interface CandidateUnit {
-  unit_id: string;
-  unit_title: string;
+  ocu_code: string;
+  ocu_name: string;
   tasks: CandidateTask[];
 }
 export interface CandidateGroup {
   ocs_code: string;
-  occupation_name: string;
+  ocs_name: string;
   units: CandidateUnit[];
 }
 export interface TaskCandidates {
   groups: CandidateGroup[];
 }
 
-// build-tasks 送出的一筆勾選任務。unit_title 留白＝cherry-pick（職責名讓使用者填）。
+// build-tasks 送出的一筆勾選任務。ocu_name 留白＝cherry-pick（職責名讓使用者填）。
 export interface PickedTask {
   ocs_code: string;
-  unit_id: string;
-  unit_title: string;
-  occupation_name: string;
-  task_id: string;
+  ocu_code: string;
+  ocu_name: string;
+  ocs_name: string;
+  task_code: string;
   task_name: string;
-  id?: string; // D28 catalog 任務 UUID（→ provenance.id；自訂任務可省）
 }
 
 // ── 表頭候選池（D29 /header-meta）：多 OCS 聯集去重；勾選後 PATCH 寫文件表頭 ──

@@ -75,7 +75,7 @@ export function OccupationPicker({
                     {order + 1}
                   </Badge>
                 ) : null}
-                <span className="flex-1">{h.job_title}</span>
+                <span className="flex-1">{h.ocs_name}</span>
                 <span className="font-mono text-xs text-muted-foreground">{h.ocs_code}</span>
               </label>
             );

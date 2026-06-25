@@ -45,7 +45,7 @@ export function TaskCuratePanel({
     for (const u of currentDoc?.ocs_content?.ocu_units ?? []) {
       for (const t of u.tasks ?? []) {
         const p = t.provenance;
-        if (p?.ocs_code && p?.task_id) s.add(tkey(p.ocs_code, p.task_id));
+        if (p?.ocs_code && p?.task_code) s.add(tkey(p.ocs_code, p.task_code));
       }
     }
     return s;
@@ -71,13 +71,17 @@ export function TaskCuratePanel({
     setExtracted(true);
     try {
       const res = await extractTasks({ intake, ocs_codes: ocsCodes });
-      const byId = new Map<string, { oc: string; tid: string }>();
-      for (const g of groups) for (const u of g.units) for (const t of u.tasks) byId.set(t.id, { oc: g.ocs_code, tid: t.task_id });
+      const byCode = new Map<string, { oc: string; tc: string }>();
+      for (const g of groups) for (const u of g.units) for (const t of u.tasks)
+        byCode.set(`${g.ocs_code}__${t.task_code}`, { oc: g.ocs_code, tc: t.task_code });
       setPicked((prev) => {
         const next = new Set(prev);
+        // suggested_task_ids are task_codes scoped per OCS: try each group
         for (const id of res.suggested_task_ids) {
-          const m = byId.get(id);
-          if (m && !alreadyIn.has(tkey(m.oc, m.tid))) next.add(tkey(m.oc, m.tid));
+          for (const g of groups) {
+            const m = byCode.get(`${g.ocs_code}__${id}`);
+            if (m && !alreadyIn.has(tkey(m.oc, m.tc))) next.add(tkey(m.oc, m.tc));
+          }
         }
         return next;
       });
@@ -105,12 +109,11 @@ export function TaskCuratePanel({
       ...prev,
       {
         ocs_code: "",
-        unit_id: u, // 同建議職責名 → build_from_picked 併入同一自訂職責
-        unit_title: u,
-        occupation_name: "",
-        task_id: `custom:${newUid()}`, // 唯一假碼，避免 provenance dedup 撞（catalog 用真 task_id）
+        ocu_code: u, // 同建議職責名 → build_from_picked 併入同一自訂職責
+        ocu_name: u,
+        ocs_name: "",
+        task_code: `custom:${newUid()}`, // 唯一假碼，避免 provenance dedup 撞（catalog 用真 task_code）
         task_name: n,
-        id: "",
       },
     ]);
   };
@@ -160,17 +163,17 @@ export function TaskCuratePanel({
     const out: PickedTask[] = [];
     for (const g of groups) {
       for (const u of g.units) {
-        const adopt = adopted.has(ukey(g.ocs_code, u.unit_id));
+        const adopt = adopted.has(ukey(g.ocs_code, u.ocu_code));
         for (const t of u.tasks) {
-          const k = tkey(g.ocs_code, t.task_id);
+          const k = tkey(g.ocs_code, t.task_code);
           if (alreadyIn.has(k) || !picked.has(k)) continue;
           out.push({
             ocs_code: g.ocs_code,
-            unit_id: u.unit_id,
-            unit_title: adopt ? u.unit_title : "", // 不採用 → 職責名留白
-            occupation_name: g.occupation_name,
-            task_id: t.task_id,
-            task_name: t.task_title,
+            ocu_code: u.ocu_code,
+            ocu_name: adopt ? u.ocu_name : "", // 不採用 → 職責名留白
+            ocs_name: g.ocs_name,
+            task_code: t.task_code,
+            task_name: t.task_name,
           });
         }
       }
@@ -210,34 +213,34 @@ export function TaskCuratePanel({
           {groups.map((g) => (
             <div key={g.ocs_code}>
               <div className="mb-1 flex items-center gap-2">
-                <Badge variant="outline" className="text-xs">{g.occupation_name}</Badge>
+                <Badge variant="outline" className="text-xs">{g.ocs_name}</Badge>
                 <span className="font-mono text-xs text-muted-foreground">{g.ocs_code}</span>
               </div>
               <div className="space-y-2">
                 {g.units.map((u) => {
-                  const ids = u.tasks.map((t) => t.task_id);
+                  const ids = u.tasks.map((t) => t.task_code);
                   const addable = ids.filter((id) => !alreadyIn.has(tkey(g.ocs_code, id)));
                   const unitDone = addable.length === 0;
                   return (
-                    <div key={u.unit_id} className="rounded-md border">
+                    <div key={u.ocu_code} className="rounded-md border">
                       <label className="flex cursor-pointer items-center gap-2 border-b bg-muted/40 px-2 py-1.5 text-sm font-medium">
                         <input
                           type="checkbox"
                           disabled={unitDone}
-                          checked={adopted.has(ukey(g.ocs_code, u.unit_id))}
-                          onChange={(e) => toggleUnit(g.ocs_code, u.unit_id, ids, e.target.checked)}
+                          checked={adopted.has(ukey(g.ocs_code, u.ocu_code))}
+                          onChange={(e) => toggleUnit(g.ocs_code, u.ocu_code, ids, e.target.checked)}
                         />
-                        <span className="font-mono text-xs text-muted-foreground">{u.unit_id}</span>
-                        <span>{u.unit_title}</span>
+                        <span className="font-mono text-xs text-muted-foreground">{u.ocu_code}</span>
+                        <span>{u.ocu_name}</span>
                         {unitDone ? <Badge variant="secondary" className="ml-auto text-[10px]">已加入</Badge> : null}
                       </label>
                       <div className="space-y-0.5 p-1.5">
                         {u.tasks.map((t) => {
-                          const k = tkey(g.ocs_code, t.task_id);
+                          const k = tkey(g.ocs_code, t.task_code);
                           const inDoc = alreadyIn.has(k);
                           return (
                             <label
-                              key={t.task_id}
+                              key={t.task_code}
                               className={
                                 "flex items-center gap-2 rounded px-2 py-1 text-sm " +
                                 (inDoc ? "opacity-50" : "cursor-pointer hover:bg-muted/50")
@@ -249,8 +252,8 @@ export function TaskCuratePanel({
                                 checked={inDoc || picked.has(k)}
                                 onChange={() => toggleTask(k)}
                               />
-                              <span className="font-mono text-xs text-muted-foreground">{t.task_id}</span>
-                              <span>{t.task_title}</span>
+                              <span className="font-mono text-xs text-muted-foreground">{t.task_code}</span>
+                              <span>{t.task_name}</span>
                               {inDoc ? <span className="ml-auto text-[10px] text-muted-foreground">已加入</span> : null}
                             </label>
                           );
@@ -331,7 +334,7 @@ export function TaskCuratePanel({
           {customPicks.length > 0 ? (
             <ul className="space-y-1">
               {customPicks.map((c, i) => (
-                <li key={c.task_id} className="flex items-center gap-2 text-sm">
+                <li key={c.task_code} className="flex items-center gap-2 text-sm">
                   <Badge variant="secondary" className="text-[10px]">自訂</Badge>
                   <span className="flex-1">{c.task_name}</span>
                   <button

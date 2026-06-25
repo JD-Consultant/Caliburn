@@ -23,6 +23,7 @@ from jd_ocs_indexer.api.schemas import (
     TaskByIdRequest,
     TaskPoolRequest,
     TaskPoolResponse,
+    TaskSearchResponse,
     TasksResponse,
 )
 
@@ -55,6 +56,17 @@ async def search_occupations(req: SearchRequest, request: Request):
     def _run():
         with app.state.embed_lock:
             return service.search_occupations(
+                app.state.client, app.state.embedder,
+                app.state.settings.qdrant_collection, query=req.query, top_k=req.top_k)
+    return await run_in_threadpool(_run)
+
+
+@router.post("/tasks/search", response_model=TaskSearchResponse)
+async def search_tasks(req: SearchRequest, request: Request):
+    app = request.app
+    def _run():
+        with app.state.embed_lock:
+            return service.search_tasks(
                 app.state.client, app.state.embedder,
                 app.state.settings.qdrant_collection, query=req.query, top_k=req.top_k)
     return await run_in_threadpool(_run)

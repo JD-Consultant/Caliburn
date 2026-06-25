@@ -176,17 +176,17 @@ async def build_tasks(
     body: dict = Body(...),
     db: AsyncSession = Depends(get_db),
 ):
-    """用勾選的任務建/更新文件（遞進重編、保留已填）。picked 每筆：
-    {ocs_code, unit_id, unit_title, occupation_name, task_code, task_name}。
-    unit_title 留白＝cherry-pick（職責名讓使用者自填）。"""
+    """用勾選的任務建/更新文件（遞進重編、保留已填）。picked 每筆（v4 PickedTask）：
+    {ocs_code, ocu_code, ocu_name, ocs_name, task_code, task_name}。
+    ocu_name 留白＝cherry-pick（職責名讓使用者自填）。"""
     profile = await _require_profile(profile_id, db)
     picked = body.get("picked") or []
     units_tasks = [
         {
             "task_name": p.get("task_name", ""),
-            "unit_id": p.get("unit_id") or "",
-            "unit_title": p.get("unit_title") or "",
-            "occupation_name": p.get("occupation_name") or "",
+            "unit_id": p.get("ocu_code") or "",
+            "unit_title": p.get("ocu_name") or "",
+            "occupation_name": p.get("ocs_name") or "",
             "indexer_ref": {"ocs_code": p.get("ocs_code") or "", "task_code": p.get("task_code") or ""},
         }
         for p in picked

@@ -400,12 +400,12 @@ async def test_list_doc_status(client):
     assert entry2["completion"] > 0
 
 
-def _picked(unit_title="u1"):
+def _picked(ocu_name="u1"):
     return [
-        {"ocs_code": "OC1", "unit_id": "T1", "unit_title": unit_title,
-         "occupation_name": "AIoT", "task_code": "T1.1", "task_name": "蒐集標準"},
-        {"ocs_code": "OC1", "unit_id": "T1", "unit_title": unit_title,
-         "occupation_name": "AIoT", "task_code": "T1.2", "task_name": "分析趨勢"},
+        {"ocs_code": "OC1", "ocu_code": "T1", "ocu_name": ocu_name,
+         "ocs_name": "AIoT", "task_code": "T1.1", "task_name": "蒐集標準"},
+        {"ocs_code": "OC1", "ocu_code": "T1", "ocu_name": ocu_name,
+         "ocs_name": "AIoT", "task_code": "T1.2", "task_name": "分析趨勢"},
     ]
 
 
@@ -502,7 +502,7 @@ async def test_build_tasks_happy(client):
 async def test_build_tasks_cherry_pick_blank_unit_name(client):
     p = await _mk_profile(client._db, codes=["OC1"])
     r = await client.post(
-        f"/api/v1/job-profiles/{p.id}/build-tasks", json={"picked": _picked(unit_title="")}
+        f"/api/v1/job-profiles/{p.id}/build-tasks", json={"picked": _picked(ocu_name="")}
     )
     assert r.status_code == 200, r.text
     units = r.json()["content"]["ocs_content"]["ocu_units"]

@@ -19,7 +19,7 @@ function emptyTask(): OcsTask {
   return {
     task_codes: [{ code: "", name: "" }],
     competency_blocks: [emptyBlock()],
-    provenance: { ocs_code: "", task_id: "" },
+    provenance: { ocs_code: "", task_code: "" },
     _tid: uid(),
   };
 }

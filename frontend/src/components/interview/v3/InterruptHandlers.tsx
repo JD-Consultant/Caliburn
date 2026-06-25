@@ -25,7 +25,8 @@ type PoolTask = {
 };
 
 // KSA item shape shared by curate_ks + curate_attitudes.
-type KsaItem = { content: string; source?: string; icap_ref?: string | null };
+// sources：展示用 provenance（哪些 task_code 帶入此候選），不寫入文件。
+type KsaItem = { content: string; source?: string; icap_ref?: string | null; sources?: string[] };
 
 // preview payload (build_doc _assemble). resume value ignored → resolve() to confirm.
 type CodedKsa = { code?: string; name?: string; source?: string };
@@ -337,6 +338,12 @@ function CurateList({
           <input type="checkbox" checked={has(c.content)} disabled={done} onChange={() => toggle(c)} />
           <span className={has(c.content) ? "" : "text-muted-foreground"}>{c.content}</span>
           {c.icap_ref ? <span className="font-mono text-[10px] text-muted-foreground">{c.icap_ref}</span> : null}
+          {c.sources?.length ? (
+            <span className="shrink-0 rounded bg-sky-100 px-1 py-0.5 text-[10px] text-sky-700"
+                  title={"來自：" + c.sources.join("、")}>
+              共 {c.sources.length}
+            </span>
+          ) : null}
         </label>
       ))}
       {value.filter((v) => !candidates.some((c) => c.content === v.content)).map((v, i) => (

@@ -4,7 +4,7 @@
 // ——顯示代號、依代號排序、可「新增」(只打名稱，代號自動 K01/S01/A01 遞增) 並進
 // 全域池(_pool，跨任務共用) 再打勾。儲存即 PATCH。不碰 CopilotKit。
 import { useState } from "react";
-import type { CodeName, Indicator, KsaPool, OcsDocument } from "@/types";
+import type { CodeName, Indicator, KsaPool, KsaPoolItem, OcsDocument } from "@/types";
 import { getBlock, mergePool, setAttitudes, setKS, setOp } from "@/lib/ocsDoc";
 import type { CellTarget } from "./JobDocTable";
 import { Button } from "@/components/ui/button";
@@ -116,7 +116,7 @@ function Picker({
 }: {
   doc: OcsDocument;
   kind: "knowledge" | "skills" | "attitudes";
-  catalog: CodeName[];
+  catalog: KsaPoolItem[];
   unitIdx: number;
   taskIdx: number;
   saving: boolean;
@@ -126,7 +126,7 @@ function Picker({
   const poolExtra = doc._pool?.[kind] ?? [];
   // catalog + 全域池，去重 by code（無 code 以 name 區分）。
   const seen = new Set<string>();
-  const base: CodeName[] = [];
+  const base: KsaPoolItem[] = [];
   for (const c of [...catalog, ...poolExtra]) {
     const k = c.code || `name:${c.name}`;
     if (!seen.has(k)) {
@@ -183,6 +183,12 @@ function Picker({
               <input type="checkbox" className="mt-0.5" checked={isSel(c)} onChange={() => toggle(c)} />
               {c.code ? <span className="font-mono text-xs text-muted-foreground">{c.code}</span> : null}
               <span>{c.name}</span>
+              {(c as KsaPoolItem).sources && (c as KsaPoolItem).sources!.length > 0 ? (
+                <span className="ml-auto shrink-0 rounded bg-sky-100 px-1 py-0.5 text-[10px] text-sky-700"
+                      title={"來自：" + (c as KsaPoolItem).sources!.join("、")}>
+                  共 {(c as KsaPoolItem).sources!.length}
+                </span>
+              ) : null}
             </label>
           ))}
         </div>

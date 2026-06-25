@@ -102,10 +102,15 @@ export interface DocumentEnvelope {
   content: OcsDocument;
 }
 
+// 候選池項目：of-record 仍是 {code,name}（CodeName）；sources 為展示用 provenance
+// （哪些 task_code 帶入此項），不寫入文件。
+export interface KsaPoolItem extends CodeName {
+  sources?: string[];
+}
 export interface KsaPool {
-  knowledge: CodeName[];
-  skills: CodeName[];
-  attitudes: CodeName[];
+  knowledge: KsaPoolItem[];
+  skills: KsaPoolItem[];
+  attitudes: KsaPoolItem[];
 }
 
 export interface OcsSearchHit {

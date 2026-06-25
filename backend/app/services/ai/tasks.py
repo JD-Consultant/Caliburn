@@ -25,11 +25,6 @@ def task_name(task: dict) -> str:
     return (tcs[0].get("name") if tcs and isinstance(tcs[0], dict) else "") or ""
 
 
-def catalog_id(task: dict) -> str:
-    """provenance.id (catalog UUID), or '' for custom/cherry-picked tasks."""
-    return (task.get("provenance") or {}).get("id") or ""
-
-
 def catalog_ref(task: dict) -> dict:
     """provenance (ocs_code, task_code) for catalog tasks; empty strings for custom."""
     p = task.get("provenance") or {}

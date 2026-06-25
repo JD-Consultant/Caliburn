@@ -370,6 +370,24 @@ def batch_get_tasks(client, collection: str, *, ids: list[str]) -> dict:
     return {"tasks": [_project_task(r) for r in records]}
 
 
+def search_tasks(client, embedder, collection: str, *, query: str, top_k: int = 10) -> dict:
+    vec = embedder.embed_query(query)
+    hits = search_mod.hybrid_search(
+        client, collection, vec.dense,
+        vec.sparse.indices if vec.sparse else [],
+        vec.sparse.values if vec.sparse else [],
+        level="task", ocs_code=None, is_current=None, limit=top_k)
+    out = []
+    for h in hits:
+        p = h.payload or {}
+        oc = p.get("ocs_code", "")
+        out.append({"ocs_code": oc, "ocs_name": p.get("ocs_name") or "",
+                    "ocu_code": p.get("ocu_code"), "ocu_name": p.get("ocu_name"),
+                    "task_code": p.get("task_code"), "task_name": p.get("task_name"),
+                    "urn": urn.task_urn(oc, p.get("task_code") or ""), "score": h.score})
+    return {"hits": out}
+
+
 def search_occupations(client, embedder, collection: str, *, query: str, top_k: int = 10) -> dict:
     vec = embedder.embed_query(query)
     hits = search_mod.hybrid_search(

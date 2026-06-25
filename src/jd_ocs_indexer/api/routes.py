@@ -18,6 +18,7 @@ from jd_ocs_indexer.api.schemas import (
     SearchRequest,
     SearchResponse,
     StatsResponse,
+    TaskBatchGetRequest,
     TaskByIdRequest,
     TaskPoolRequest,
     TaskPoolResponse,
@@ -68,6 +69,14 @@ async def post_tasks_by_id(req: TaskByIdRequest, request: Request):
         app.state.settings.qdrant_collection,
         ids=req.ids,
     )
+
+
+@router.post("/tasks/batchGet", response_model=TasksResponse)
+async def batch_get_tasks(req: TaskBatchGetRequest, request: Request):
+    app = request.app
+    return await run_in_threadpool(
+        service.batch_get_tasks, app.state.client,
+        app.state.settings.qdrant_collection, ids=req.ids)
 
 
 @router.get("/occupations/{ocs_code}", response_model=OccupationDetail)

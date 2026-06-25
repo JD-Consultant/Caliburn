@@ -213,3 +213,21 @@ class CompetencyPool(BaseModel):
     outputs: list[CitableItem] = Field(default_factory=list)
     indicators: list[CitableItem] = Field(default_factory=list)
     attitudes: list[CitableItem] = Field(default_factory=list)
+
+
+class TaskBatchGetRequest(BaseModel):
+    ids: list[str] = Field(min_length=1)
+
+class TaskDetail(BaseModel):
+    id: str
+    urn: str
+    ocs_code: str
+    ocs_name: str = ""
+    ocu_code: Optional[str] = None
+    ocu_name: Optional[str] = None
+    task_code: Optional[str] = None
+    task_name: Optional[str] = None
+    competency_blocks: list[dict] = Field(default_factory=list)
+
+class TasksResponse(BaseModel):
+    tasks: list[TaskDetail]

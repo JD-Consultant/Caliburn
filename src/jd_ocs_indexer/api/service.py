@@ -352,6 +352,24 @@ def retrieve_tasks(client, collection: str, *, ids: list[str]) -> dict:
     return {"tasks": [_project_task_detail(r) for r in records]}
 
 
+def _project_task(rec) -> dict:
+    p = rec.payload or {}
+    return {
+        "id": str(getattr(rec, "id", "")),
+        "urn": urn.task_urn(p.get("ocs_code", ""), p.get("task_code") or ""),
+        "ocs_code": p.get("ocs_code", ""), "ocs_name": p.get("ocs_name") or "",
+        "ocu_code": p.get("ocu_code"), "ocu_name": p.get("ocu_name"),
+        "task_code": p.get("task_code"), "task_name": p.get("task_name"),
+        "competency_blocks": p.get("competency_blocks") or [],
+    }
+
+
+def batch_get_tasks(client, collection: str, *, ids: list[str]) -> dict:
+    records = client.retrieve(collection_name=collection, ids=list(ids),
+                              with_payload=True, with_vectors=False)
+    return {"tasks": [_project_task(r) for r in records]}
+
+
 def get_stats(client, collection: str) -> dict:
     c = stats_mod.collection_stats(client, collection)
     return {"collection": c.name, "total_points": c.total_points, "by_level": c.by_level}

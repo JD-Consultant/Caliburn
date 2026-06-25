@@ -11,9 +11,10 @@ from app.graph_v3.tracing import traced_node
 logger = logging.getLogger("jobintel")
 
 
-def _pairs_to_items(pairs_list) -> list[dict]:
-    return [{"content": p.name, "source": "catalog", "icap_ref": p.code or None}
-            for p in pairs_list if p.name]
+def _citables_to_items(items) -> list[dict]:
+    return [{"content": it.name, "source": "catalog", "icap_ref": it.code or None,
+             "sources": [s.task_code for s in it.sources if s.task_code]}
+            for it in items if it.name]
 
 
 @traced_node("fetch_ksa_pool")
@@ -23,12 +24,12 @@ async def fetch_ksa_pool(state: InterviewState, config) -> dict:
     pool = {"knowledge": [], "skills": [], "attitudes": []}
     if ocs:
         try:
-            pairs = await deps.knowledge.pairs(ocs)
-            pool = {"knowledge": _pairs_to_items(pairs.knowledge),
-                    "skills": _pairs_to_items(pairs.skills),
-                    "attitudes": _pairs_to_items(pairs.attitudes)}
+            comp = await deps.knowledge.competencies(ocs)
+            pool = {"knowledge": _citables_to_items(comp.knowledge),
+                    "skills": _citables_to_items(comp.skills),
+                    "attitudes": _citables_to_items(comp.attitudes)}
         except Exception as exc:  # noqa: BLE001
-            logger.warning("fetch_ksa_pool: pairs() failed, empty pool: %s", exc)
+            logger.warning("fetch_ksa_pool: competencies() failed, empty pool: %s", exc)
     return {"ksa": {**state["ksa"], "pool": pool}, "current_step": "curate_ks"}
 
 

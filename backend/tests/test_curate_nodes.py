@@ -6,7 +6,7 @@ from langgraph.types import Command
 from app.graph_v3.state import new_state, InterviewState
 from app.graph_v3.curate_nodes import fetch_ksa_pool, curate_ks, curate_attitudes
 from app.graph_v3.deps import Deps
-from app.services.knowledge.models import Pairs, Pair
+from app.services.knowledge.models import CompetencyPool, CitableItem, SourceRef
 from tests.conftest_graph import FakeKnowledge, SpyPersist
 
 
@@ -18,15 +18,22 @@ def _one(node):
 
 
 @pytest.mark.asyncio
-async def test_fetch_ksa_pool_caches_pairs():
-    pairs = Pairs(ocs_code="OC1", knowledge=[Pair(code="K01", name="PLC")],
-                  skills=[Pair(code="S01", name="排障")], attitudes=[Pair(code="A01", name="細心")])
-    fake = FakeKnowledge(); fake._pairs = pairs  # see conftest patch below
+async def test_fetch_ksa_pool_from_competencies():
+    pool = CompetencyPool(ocs_code="OC1",
+        knowledge=[CitableItem(id="ocs:OC1:K:K01", type="K", code="K01", name="PLC",
+                               ocs_code="OC1", ocs_name="工程師",
+                               sources=[SourceRef(task_code="T1.1")])],
+        skills=[CitableItem(id="ocs:OC1:S:S01", type="S", code="S01", name="排障",
+                            ocs_code="OC1", ocs_name="工程師", sources=[SourceRef(task_code="T1.1")])],
+        attitudes=[CitableItem(id="ocs:OC1:A:A01", type="A", code="A01", name="細心",
+                               ocs_code="OC1", ocs_name="工程師", sources=[])])
+    fake = FakeKnowledge(); fake._competencies = pool
     s = new_state(job_profile_id="p1", job_title="工程師")
     s["profile"]["selected_ocs_code"] = "OC1"
     cfg = {"configurable": {"thread_id": "t", "deps": Deps(knowledge=fake, persist=SpyPersist())}}
     out = await _one(fetch_ksa_pool).ainvoke(s, cfg)
     assert out["ksa"]["pool"]["knowledge"][0]["content"] == "PLC"
+    assert out["ksa"]["pool"]["knowledge"][0]["sources"] == ["T1.1"]
     assert out["ksa"]["pool"]["attitudes"][0]["content"] == "細心"
     assert out["current_step"] == "curate_ks"
 

@@ -98,20 +98,21 @@ def _prefill_from_star(task: dict) -> dict:
 
 
 async def _prefill_from_catalog(task: dict, deps) -> dict:
-    """catalog k/s/output 當 just-in-time prefill（架構 §JIT prefill，best-effort）：
-    目前實填 outputs。prefill 是便利層、非 of-record；indexer 失敗就跳過，由 5W2H 問人。"""
+    """catalog outputs 當 just-in-time prefill（best-effort）。v4：以 (ocs_code, task_code)
+    從 competencies pool 過濾該任務的 outputs。indexer 失敗就跳過，由 5W2H 問人。"""
     ref = task.get("indexer_ref") or {}
-    task_id = ref.get("task_id")
-    if not task_id or deps.knowledge is None or task.get("outputs"):
+    ocs_code, task_code = ref.get("ocs_code"), ref.get("task_code")
+    if not ocs_code or not task_code or deps.knowledge is None or task.get("outputs"):
         return task
     try:
-        res = await deps.knowledge.tasks_by_id([task_id])
+        pool = await deps.knowledge.competencies(ocs_code)
     except Exception as exc:  # noqa: BLE001
-        logger.warning("five_w2h prefill skipped (tasks_by_id failed): %s", exc)
+        logger.warning("five_w2h prefill skipped (competencies failed): %s", exc)
         return task
-    detail = next((t for t in res.tasks if t.task_id == task_id), None)
-    if detail and not task.get("outputs") and detail.output_pairs:
-        task["outputs"] = [p.name for p in detail.output_pairs if p.name]
+    from app.services.knowledge.task_detail import task_competencies
+    detail = task_competencies(pool, task_code)
+    if not task.get("outputs") and detail["outputs"]:
+        task["outputs"] = [o["name"] for o in detail["outputs"] if o["name"]]
     return task
 
 

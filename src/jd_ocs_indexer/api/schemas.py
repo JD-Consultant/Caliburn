@@ -117,6 +117,24 @@ class ProfileMetaResponse(BaseModel):
     supplements: list[str] = Field(default_factory=list)
 
 
+class OcsName(BaseModel):
+    job_category_name: Optional[str] = None
+    occupation_name: Optional[str] = None
+
+class OccupationDetail(BaseModel):
+    ocs_code: str
+    urn: str
+    ocs_name: OcsName
+    job_categories: list[CodeName] = Field(default_factory=list)
+    occupations: list[CodeName] = Field(default_factory=list)
+    industries: list[CodeName] = Field(default_factory=list)
+    job_description: str = ""
+    ocs_level: Optional[int] = None
+    attitudes: list[CodeName] = Field(default_factory=list)
+    prerequisites: list[str] = Field(default_factory=list)
+    supplements: list[str] = Field(default_factory=list)
+
+
 class TaskByIdRequest(BaseModel):
     ids: list[str] = Field(min_length=1)
 

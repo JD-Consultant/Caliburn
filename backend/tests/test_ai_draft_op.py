@@ -10,33 +10,37 @@ from app.api.routes.documents import get_knowledge
 from app.database import get_db
 from app.main import app
 from app.models import JobProfile, User
-from app.services.knowledge.models import Pair, TaskDetail, TasksByIdResult
+from app.services.knowledge.models import CitableItem, CompetencyPool, SourceRef
 from tests.conftest_graph import FakeLlm
 
 
 class StubKnowledge:
-    """Minimal KnowledgeClient for /ai/draft-op: only tasks_by_id is exercised."""
+    """Minimal KnowledgeClient for /ai/draft-op: only competencies is exercised."""
 
-    def __init__(self, tasks_map=None, fail=False):
-        self.tasks_map = tasks_map or {}
+    def __init__(self, pool=None, fail=False):
+        self.pool = pool
         self.fail = fail
         self.calls = []
 
-    async def tasks_by_id(self, ids):
-        self.calls.append(list(ids))
+    async def competencies(self, ocs_code):
+        self.calls.append(ocs_code)
         if self.fail:
             raise RuntimeError("indexer down")
-        tasks = [self.tasks_map[i] for i in ids if i in self.tasks_map]
-        return TasksByIdResult(tasks=tasks)
+        return self.pool or CompetencyPool(ocs_code=ocs_code)
 
 
-def _task_detail(cat_id):
-    return TaskDetail(
-        id=cat_id,
-        task_id="T1.1",
-        task_title="蒐集標準",
-        output_pairs=[Pair(code="O01", name="月報表"), Pair(code="O02", name="分析摘要")],
-        activity_examples=["蒐集資料並彙整", "撰寫分析報告"],
+def _pool(task_code="T1.1"):
+    src = [SourceRef(task_code=task_code)]
+    return CompetencyPool(
+        ocs_code="OC1",
+        outputs=[
+            CitableItem(code="O01", name="月報表", sources=src),
+            CitableItem(code="O02", name="分析摘要", sources=src),
+        ],
+        indicators=[
+            CitableItem(code="P01", text="蒐集資料並彙整", sources=src),
+            CitableItem(code="P02", text="撰寫分析報告", sources=src),
+        ],
     )
 
 
@@ -65,7 +69,7 @@ async def _mk_profile(db_session):
     return p
 
 
-def _doc_with_task(cat_id="cat-1", code="T1.1"):
+def _doc_with_task(code="T1.1", provenance=None):
     return {
         "ocs_content": {
             "ocu_units": [
@@ -77,7 +81,8 @@ def _doc_with_task(cat_id="cat-1", code="T1.1"):
                             "task_codes": [{"code": code, "name": "蒐集標準"}],
                             "competency_blocks": [{"outputs": [], "indicators": [],
                                                    "knowledge": [], "skills": []}],
-                            "provenance": {"ocs_code": "OC1", "task_id": "T1.1", "id": cat_id},
+                            "provenance": {"ocs_code": "OC1", "task_code": code}
+                            if provenance is None else provenance,
                         }
                     ],
                 }
@@ -91,7 +96,7 @@ def _doc_with_task(cat_id="cat-1", code="T1.1"):
 async def test_draft_op_no_note_returns_full_catalog(client):
     p = await _mk_profile(client._db)
     await client.patch(f"/api/v1/job-profiles/{p.id}/document", json=_doc_with_task())
-    app.dependency_overrides[get_knowledge] = lambda: StubKnowledge({"cat-1": _task_detail("cat-1")})
+    app.dependency_overrides[get_knowledge] = lambda: StubKnowledge(_pool())
     app.dependency_overrides[get_llm] = lambda: FakeLlm(json={"outputs": [], "indicators": []})
     r = await client.post("/api/v1/ai/draft-op", json={"profile_id": str(p.id), "task_key": "T1.1"})
     assert r.status_code == 200, r.text
@@ -106,7 +111,7 @@ async def test_draft_op_no_note_returns_full_catalog(client):
 async def test_draft_op_with_note_returns_ai_drafts(client):
     p = await _mk_profile(client._db)
     await client.patch(f"/api/v1/job-profiles/{p.id}/document", json=_doc_with_task())
-    app.dependency_overrides[get_knowledge] = lambda: StubKnowledge({"cat-1": _task_detail("cat-1")})
+    app.dependency_overrides[get_knowledge] = lambda: StubKnowledge(_pool())
     app.dependency_overrides[get_llm] = lambda: FakeLlm(
         json={"outputs": ["客製產出"], "indicators": ["客製指標"]}
     )
@@ -126,7 +131,7 @@ async def test_draft_op_with_note_returns_ai_drafts(client):
 async def test_draft_op_no_llm_degrades_to_catalog(client):
     p = await _mk_profile(client._db)
     await client.patch(f"/api/v1/job-profiles/{p.id}/document", json=_doc_with_task())
-    app.dependency_overrides[get_knowledge] = lambda: StubKnowledge({"cat-1": _task_detail("cat-1")})
+    app.dependency_overrides[get_knowledge] = lambda: StubKnowledge(_pool())
     app.dependency_overrides[get_llm] = lambda: None
     r = await client.post(
         "/api/v1/ai/draft-op",
@@ -169,8 +174,11 @@ async def test_draft_op_missing_fields_400(client):
 @pytest.mark.asyncio
 async def test_draft_op_thin_task_returns_empty(client):
     p = await _mk_profile(client._db)
-    await client.patch(f"/api/v1/job-profiles/{p.id}/document", json=_doc_with_task(cat_id=""))
-    app.dependency_overrides[get_knowledge] = lambda: StubKnowledge({"cat-1": _task_detail("cat-1")})
+    await client.patch(
+        f"/api/v1/job-profiles/{p.id}/document",
+        json=_doc_with_task(provenance={}),
+    )
+    app.dependency_overrides[get_knowledge] = lambda: StubKnowledge(_pool())
     app.dependency_overrides[get_llm] = lambda: None
     r = await client.post("/api/v1/ai/draft-op", json={"profile_id": str(p.id), "task_key": "T1.1"})
     assert r.status_code == 200, r.text

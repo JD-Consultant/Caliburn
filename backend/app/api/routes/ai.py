@@ -26,6 +26,7 @@ from app.services.ai import recommend_ks as _recommend_ks
 from app.services.ai import structure_task as _structure_task
 from app.services.ai import tasks as _tasks
 from app.services.knowledge.base import KnowledgeClient
+from app.services.knowledge.task_detail import task_competencies
 from app.services.persistence import DocRepo
 
 logger = logging.getLogger("jobintel")
@@ -38,22 +39,19 @@ def get_llm() -> LlmPort | None:
     return OpenRouterLlm() if settings.openrouter_api_key else None
 
 
-async def _catalog_ks(knowledge: KnowledgeClient, catalog_id: str) -> tuple[list[dict], list[dict]]:
-    """Fetch a task's official K/S from the indexer by catalog UUID. Indexer down or
-    no id → empty lists (caller degrades gracefully, never crashes)."""
-    if not catalog_id:
+async def _catalog_ks(knowledge: KnowledgeClient, ref: dict) -> tuple[list[dict], list[dict]]:
+    """Per-task official K/S from the v4 competency pool, sliced on ``(ocs_code,
+    task_code)`` from provenance. No ref or indexer down → empty lists (caller
+    degrades gracefully, never crashes)."""
+    if not ref.get("ocs_code") or not ref.get("task_code"):
         return [], []
     try:
-        res = await knowledge.tasks_by_id([catalog_id])
+        pool = await knowledge.competencies(ref["ocs_code"])
     except Exception:
-        logger.warning("ai: tasks_by_id failed", exc_info=True)
+        logger.warning("ai: competencies failed", exc_info=True)
         return [], []
-    k: list[dict] = []
-    s: list[dict] = []
-    for td in res.tasks:
-        k += [{"code": p.code, "name": p.name} for p in td.k_pairs]
-        s += [{"code": p.code, "name": p.name} for p in td.s_pairs]
-    return k, s
+    detail = task_competencies(pool, ref["task_code"])
+    return detail["knowledge"], detail["skills"]
 
 
 @router.post("/recommend-ks")
@@ -77,7 +75,7 @@ async def recommend_ks_ep(
     task = _tasks.find_task(content, task_key)
     if task is None:
         raise HTTPException(status_code=404, detail="task not found in document")
-    k_candidates, s_candidates = await _catalog_ks(knowledge, _tasks.catalog_id(task))
+    k_candidates, s_candidates = await _catalog_ks(knowledge, _tasks.catalog_ref(task))
     return await _recommend_ks.recommend_ks(
         task_name=_tasks.task_name(task),
         note=note,
@@ -87,22 +85,19 @@ async def recommend_ks_ep(
     )
 
 
-async def _catalog_op(knowledge: KnowledgeClient, catalog_id: str) -> tuple[list[str], list[str]]:
-    """Fetch a task's official outputs + activity examples from the indexer by catalog
-    UUID. Indexer down or no id → empty lists (caller degrades gracefully)."""
-    if not catalog_id:
+async def _catalog_op(knowledge: KnowledgeClient, ref: dict) -> tuple[list[str], list[str]]:
+    """Per-task official outputs + indicators from the v4 competency pool, sliced on
+    ``(ocs_code, task_code)`` from provenance. No ref or indexer down → empty lists
+    (caller degrades gracefully)."""
+    if not ref.get("ocs_code") or not ref.get("task_code"):
         return [], []
     try:
-        res = await knowledge.tasks_by_id([catalog_id])
+        pool = await knowledge.competencies(ref["ocs_code"])
     except Exception:
-        logger.warning("ai: tasks_by_id failed", exc_info=True)
+        logger.warning("ai: competencies failed", exc_info=True)
         return [], []
-    outputs: list[str] = []
-    examples: list[str] = []
-    for td in res.tasks:
-        outputs += [p.name for p in td.output_pairs]
-        examples += list(td.activity_examples)
-    return outputs, examples
+    detail = task_competencies(pool, ref["task_code"])
+    return [o["name"] for o in detail["outputs"]], [p["text"] for p in detail["indicators"]]
 
 
 @router.post("/draft-op")
@@ -126,7 +121,7 @@ async def draft_op_ep(
     task = _tasks.find_task(content, task_key)
     if task is None:
         raise HTTPException(status_code=404, detail="task not found in document")
-    outputs, examples = await _catalog_op(knowledge, _tasks.catalog_id(task))
+    outputs, examples = await _catalog_op(knowledge, _tasks.catalog_ref(task))
     return await _draft_op.draft_op(
         task_name=_tasks.task_name(task),
         note=note,
@@ -137,21 +132,20 @@ async def draft_op_ep(
 
 
 async def _task_candidates(knowledge: KnowledgeClient, ocs_codes: list[str]) -> list[dict]:
-    """Flatten the indexer task pool for the given OCS codes into grounding candidates
-    ``[{"id", "title"}]``. Indexer down → ``[]`` (caller degrades, never crashes)."""
+    """Flatten the v4 occupation task lists for the given OCS codes into grounding
+    candidates ``[{"id": task_code, "title": task_name}]``. Indexer down for a code →
+    skip it (caller degrades, never crashes)."""
     if not ocs_codes:
         return []
-    try:
-        pool = await knowledge.task_pool(ocs_codes)
-    except Exception:
-        logger.warning("ai: task_pool failed", exc_info=True)
-        return []
-    return [
-        {"id": t.id, "title": t.task_title}
-        for g in pool.groups
-        for u in g.units
-        for t in u.tasks
-    ]
+    out: list[dict] = []
+    for code in ocs_codes:
+        try:
+            occ = await knowledge.occupation_tasks(code)
+        except Exception:
+            logger.warning("ai: occupation_tasks failed", exc_info=True)
+            continue
+        out += [{"id": t.task_code, "title": t.task_name} for u in occ.units for t in u.tasks]
+    return out
 
 
 @router.post("/extract-tasks")

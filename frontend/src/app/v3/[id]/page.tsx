@@ -171,7 +171,7 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
           document={doc}
           target={target}
           profileId={id}
-          onSave={(next) => persist(next, () => setTarget(null))}
+          onSave={(next) => persist(next)}
           onClose={() => setTarget(null)}
         />
       ) : null}

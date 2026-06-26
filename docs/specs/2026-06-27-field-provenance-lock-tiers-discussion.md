@@ -58,6 +58,15 @@
 - 回歸：既有 `test_task_competencies` 斷言 dict 全等，因新增 key 需同步（已修）。
 - commit：`793685b`（功能）、`ebc8ec2`（修回歸測試）。
 
+## 9. 任務級別來源 UI + 來源含任務（F21，2026-06-27）
+
+使用者：「一樣要有來源 UI 可以參考基準級別」+「來源 要包含任務」。
+
+- **F21a 任務級別下拉改用 OfficialMenu**：任務列的「級別」由 native `<select>` 改成與基準級別同一個 `OfficialMenu`（勾選目前值 + 來源行）。為共用，把 `OfficialMenu` 從 DocHeader 抽到 `fields/OfficialMenu.tsx`。
+- **F21b 任務級別來源 = `_levelSrc`**：因「官方級別是哪一級」需要 pool 才知道，採「帶官方時把官方級別 + 來源（含任務）記在 `task._levelSrc`」（`_` 前綴→export 剝除、draft 持久化），避免每列各自 fetch。下拉在該官方級別選項顯示來源行。
+- **F21c 來源含任務**：`SourceRef` 加 `task_code?`/`task_name?`；來源行抽成共用 `fields/SourceLine.tsx`（格式 `來源:職業 ocs_code · 任務碼 任務名`，多來源 +N hover）。FieldCombobox / CategoryPicker / OfficialMenu 全改用它；CellFiller 的 O/P/K/S 來源帶上 task_code/task_name。
+- commit `d49bb1e`。
+
 ### commit 軌跡（feat/v3）
 `fde4100`(後端剝除) · `962c627`(型別) · `fa1989c`(ensureIds/序碼) · `180f4eb`(setters 連號) · `4985c90`(headerMeta srcs) · `6ef14f8`(選單來源行) · `460f169`(_src/改即自訂) · `8337b0f`(CellFiller list+來源) · `931e121`(類別唯讀) · `3986f3d`(名稱唯讀) · `f8f9431`(勾選修) · `7d821d0`(帶官方去重) · `85b4eb0`(基準級別來源) · `5c5df48`(單選勾)
 

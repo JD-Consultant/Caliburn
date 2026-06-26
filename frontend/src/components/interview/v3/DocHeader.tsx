@@ -151,6 +151,7 @@ export function DocHeader({ document: doc, profileId, onChange }: {
   const p = doc.ocs_profile;
   const { data: meta } = useHeaderMeta(profileId, !!p.ocs_code);
   const opts = meta ? primaryOptions(meta) : [];
+  const isOfficialBasis = !!p.ocs_code && opts.some((o) => o.ocs_code === p.ocs_code);
   const catOptions = (kind: CatKind): OptionItem[] => (meta ? categoryOptions(meta, kind) : []);
   const catStatus = (e: { _src?: "official" | "custom" }): "official" | "custom" =>
     e._src === "custom" ? "custom" : e._src === "official" ? "official" : "custom";
@@ -216,15 +217,23 @@ export function DocHeader({ document: doc, profileId, onChange }: {
           </th>
           <th className={TH}>職類</th>
           <td className={TD} colSpan={3}>
-            <FieldText value={p.ocs_name?.job_category_name ?? ""} placeholder="職類名稱"
-              onCommit={(v) => onChange(setOcsName(doc, "job_category_name", v))} />
+            {isOfficialBasis ? (
+              <span className="block px-1.5 py-1">{p.ocs_name?.job_category_name || "—"}</span>
+            ) : (
+              <FieldText value={p.ocs_name?.job_category_name ?? ""} placeholder="職類名稱"
+                onCommit={(v) => onChange(setOcsName(doc, "job_category_name", v))} />
+            )}
           </td>
         </tr>
         <tr>
           <th className={TH}>職業</th>
           <td className={TD} colSpan={3}>
-            <FieldText value={p.ocs_name?.occupation_name ?? ""} placeholder="職業名稱"
-              onCommit={(v) => onChange(setOcsName(doc, "occupation_name", v))} />
+            {isOfficialBasis ? (
+              <span className="block px-1.5 py-1">{p.ocs_name?.occupation_name || "—"}</span>
+            ) : (
+              <FieldText value={p.ocs_name?.occupation_name ?? ""} placeholder="職業名稱"
+                onCommit={(v) => onChange(setOcsName(doc, "occupation_name", v))} />
+            )}
           </td>
         </tr>
 

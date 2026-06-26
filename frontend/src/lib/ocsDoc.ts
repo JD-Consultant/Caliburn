@@ -138,7 +138,9 @@ export function upsertCategory(
 // 整類取代（D29 表頭選單套用）：把某類的清單換成勾選結果。
 export function setCategory(doc: OcsDocument, kind: CatKind, items: CodeName[]): OcsDocument {
   const next = clone(doc);
-  next.ocs_profile.category[kind] = items.map((it) => ({ code: it.code, name: it.name }));
+  next.ocs_profile.category[kind] = items.map((it) => ({
+    code: it.code, name: it.name, _id: it._id, _src: it._src, _ref: it._ref,
+  }));
   return next;
 }
 
@@ -318,8 +320,11 @@ export function setOp(
 ): OcsDocument {
   const next = clone(doc);
   const block = ensureBlock(next, unitIdx, taskIdx);
-  block.outputs = outputs;
-  block.indicators = indicators;
+  const taskNum = (next.ocs_content.ocu_units[unitIdx].tasks[taskIdx].task_codes?.[0]?.code ?? "").replace(/^T/i, "");
+  block.outputs = [...outputs];
+  block.indicators = [...indicators];
+  renumberCoded(block.outputs, `O${taskNum}.`);
+  renumberCoded(block.indicators, `P${taskNum}.`);
   return next;
 }
 
@@ -332,7 +337,8 @@ export function setKS(
 ): OcsDocument {
   const next = clone(doc);
   const block = ensureBlock(next, unitIdx, taskIdx);
-  block[field] = items;
+  block[field] = [...items];
+  renumberCoded(block[field], field === "knowledge" ? "K" : "S");
   return next;
 }
 
@@ -358,14 +364,9 @@ export function setTaskNotes(
 
 export function setAttitudes(doc: OcsDocument, items: CodeName[]): OcsDocument {
   const next = clone(doc);
-  // 依代碼遞增排序（A01、A02…）；無代碼者排最後。
-  const sorted = [...items].sort((a, b) => {
-    if (!a.code && !b.code) return 0;
-    if (!a.code) return 1;
-    if (!b.code) return -1;
-    return a.code.localeCompare(b.code, undefined, { numeric: true });
-  });
-  next.ocs_attitude = { attitudes: sorted };
+  const list = [...items];
+  renumberCoded(list, "A"); // 位置序碼即遞增（A01、A02…）；身分由 _id 維持。
+  next.ocs_attitude = { attitudes: list };
   return next;
 }
 

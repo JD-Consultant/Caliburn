@@ -1,14 +1,15 @@
 "use client";
 import { useState } from "react";
 import { Check, ChevronsUpDown, ChevronDown, Plus, X } from "lucide-react";
-import type { OptionItem } from "@/types";
+import type { OptionItem, SourceRef } from "@/types";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Button } from "@/components/ui/button";
 import { FieldText } from "./FieldText";
 
-type Item = { code: string; name: string };
+type Item = { code: string; name: string; _id?: string; _src?: "official" | "custom"; _ref?: SourceRef };
 const keyOf = (i: { code: string; name: string }) => i.code || "name:" + i.name;
+const newId = () => (globalThis.crypto?.randomUUID?.() ?? `id-${Math.random().toString(36).slice(2)}`);
 
 export function FieldCombobox({
   label, value, options, allowCustom = false, onCommit, pillSources = false,
@@ -39,16 +40,17 @@ export function FieldCombobox({
   const sel = new Set(value.map(keyOf));
   const sourcesOf = (k: string) => options.find((o) => keyOf(o) === k)?.sources ?? [];
 
-  const toggle = (opt: { code: string; name: string }) => {
+  const toggle = (opt: OptionItem) => {
     const k = keyOf(opt);
-    if (sel.has(k)) onCommit(value.filter((v) => keyOf(v) !== k));
-    else onCommit([...value, { code: opt.code, name: opt.name }]);
+    if (sel.has(k)) { onCommit(value.filter((v) => keyOf(v) !== k)); return; }
+    const ref: SourceRef = opt.srcs?.[0] ?? { ocs_code: "", occupation_name: "", code: opt.code };
+    onCommit([...value, { code: opt.code, name: opt.name, _id: newId(), _src: "official", _ref: ref }]);
   };
   const remove = (k: string) => onCommit(value.filter((v) => keyOf(v) !== k));
   const addCustomFromQuery = () => {
     const n = query.trim();
     if (!n || value.some((v) => v.name === n)) { setQuery(""); return; }
-    onCommit([...value, { code: "", name: n }]);
+    onCommit([...value, { code: "", name: n, _id: newId(), _src: "custom" }]);
     setQuery("");
   };
   const nextCode = (prefix: string) => {
@@ -67,12 +69,15 @@ export function FieldCombobox({
     const n = cName.trim();
     if (!n) return;
     const code = autoCode ? nextCode(autoCode) : footerWithCode ? cCode.trim() : "";
-    onCommit([...value, { code, name: n }]);
+    onCommit([...value, { code, name: n, _id: newId(), _src: "custom" }]);
     setCCode(""); setCName(""); setAdding(false);
   };
   const selectAllOfficial = () => {
     const next = [...value];
-    for (const o of options) if (!next.some((v) => keyOf(v) === keyOf(o))) next.push({ code: o.code, name: o.name });
+    for (const o of options) if (!next.some((v) => keyOf(v) === keyOf(o))) {
+      const ref: SourceRef = o.srcs?.[0] ?? { ocs_code: "", occupation_name: "", code: o.code };
+      next.push({ code: o.code, name: o.name, _id: newId(), _src: "official", _ref: ref });
+    }
     onCommit(next);
   };
 
@@ -153,27 +158,21 @@ export function FieldCombobox({
     </Command>
   );
 
-  const statusOf = (item: Item): "official" | "edited" | "custom" => {
-    if (options.some((o) => o.code === item.code && o.name === item.name)) return "official";
-    if (item.code && options.some((o) => o.code === item.code)) return "edited";
-    return "custom";
-  };
-  const officialNameOf = (code: string) => options.find((o) => o.code === code)?.name ?? "";
+  const statusOf = (item: Item): "official" | "custom" =>
+    item._src === "custom" ? "custom" : item._src === "official" ? "official" : "custom";
 
   const selectedView = layout === "list" ? (
     <div className="space-y-1">
       {value.map((v, idx) => {
         const status = statusOf(v);
         return (
-          <div key={`${keyOf(v)}-${idx}`} className="flex items-start gap-2">
+          <div key={v._id ?? `${keyOf(v)}-${idx}`} className="flex items-start gap-2">
             {v.code ? <span className="mt-2 shrink-0 font-mono text-xs text-muted-foreground">{v.code}</span> : null}
             <div className="min-w-0 flex-1">
               <FieldText value={v.name} multiline={editMultiline}
-                onCommit={(name) => onCommit(value.map((x, i) => (i === idx ? { ...x, name } : x)))} />
+                onCommit={(name) => onCommit(value.map((x, i) => (i === idx ? { ...x, name, _src: "custom" as const, _ref: undefined } : x)))} />
             </div>
-            {status === "edited" ? (
-              <span className="mt-2 shrink-0 rounded bg-amber-100 px-1 text-[10px] text-amber-700" title={`已改（官方原為：${officialNameOf(v.code)}）`}>已改</span>
-            ) : status === "custom" ? (
+            {status === "custom" ? (
               <span className="mt-2 shrink-0 rounded bg-amber-100 px-1 text-[10px] text-amber-700" title="自訂項目">自訂</span>
             ) : null}
             <button type="button" className="mt-2 shrink-0 text-muted-foreground hover:text-destructive" onClick={() => onCommit(value.filter((_, i) => i !== idx))}><X className="h-3.5 w-3.5" /></button>

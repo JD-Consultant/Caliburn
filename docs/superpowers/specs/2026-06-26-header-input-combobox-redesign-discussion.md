@@ -238,3 +238,44 @@ v4 紅利：`competencies` 依 `task_code`（`task_detail.task_competencies`）�
 - **AI/LLM 內部先不改、只保留按鈕**（`AiTaskPanel` 的 draftOP/recommendKS 邏輯不動）。
 
 **D13 = 任務 O/P/K/S：每格抽屜升級 combobox（官方候選＝task_competencies 依 task_code；預勾+pills+自訂+該格帶官方）+ 任務列「帶官方」一鍵整任務（沿用現按鈕）+ 保留 ✨AI；AI/LLM 內部不改。**
+
+---
+
+## 13. 實作與迭代記錄（2026-06-27）
+
+計畫（`docs/superpowers/plans/2026-06-26-header-input-combobox-redesign.md`，12 任務）已於另一 session 執行完成並 commit。之後使用者實際操作、逐項回饋，於本 session 大幅迭代表頭/態度/說明/任務 UI。以下記錄與 spec 的差異、追加決策、bug、參考資料。
+
+### 13.1 與 spec 的主要差異（spec 寫 pills，實作改官方表格）
+- **表頭 `DocHeader` 改為官方 OCS 5 欄表格**（對齊 `S:\jd-pdf-to-json` 的 AIoT 應用工程師 PDF：代碼｜名稱(職類/職業)｜所屬類別(子類別｜名稱｜代碼)｜工作描述｜基準級別），**取代** spec 的 FieldCombobox pills 版類別 UI。理由：使用者提供官方 PDF，要求「長得像官方表格」且類別「可編輯/可自訂」（pills 版兩者皆缺）。
+- **態度 A、說明與補充**亦由 pills 改為**直式清單**（每項一行，貼近官方）。
+
+### 13.2 追加決策（D14–D21）
+- **D14** 表頭 = 官方 5 欄表格；所屬三類為「名稱｜代碼」可編輯列（可加列/刪列/自訂）。
+- **D15** 全站官方選取統一為「**▾ 在標籤旁**」：職能基準代碼（綁定 OCS→code+名稱）、所屬三類、工作描述、基準級別、態度、說明。`FieldBoundSelect.tsx` 因此停用（dead code，待刪）。
+- **D16** 下拉一律**無搜尋**：清單可勾選/取消官方 + 底部「**＋ 加自訂**」（同所屬類別）。`FieldCombobox` 保留 `customMode="search"|"footer"`，目前全部用 `footer`。
+- **D17** 來源標記＝**只標非官方**（amber）：官方原樣不標；改過官方→「已改」（hover 顯示官方原值）；查無官方→「自訂」。**清單列與下拉選項皆標**「已改」。（先前一度加「官方」標，因「一定是官方」而移除。）
+- **D18** 自訂代碼**自動遞增、不讓使用者填**：態度 A01.. / K K01.. / S S01..（純字母前綴補零 2 位）；**O/P 為任務範圍階層碼**（T1.1 → O1.1.1、P1.1.1，依任務遞增，不補零）。
+- **D19** 工作描述 = **單一 textarea（自動長高/縮短）**；下拉「點一下把官方描述加到下一行」（空白直接加、有文字先空一行 `\n\n` 再加）。**否決多框方案**：經討論（單一字串契約 + split/join 無損 + 自動存/版本）確認「不可復原」疑慮不存在，但仍選單框 append 較簡單。
+- **D20** 態度依代碼遞增排序（`setAttitudes` commit 時排序，numeric-aware）。
+- **D21** autosave = react-query 樂觀（onMutate）+ debounced（沿用計畫 D9/D10）。
+
+### 13.3 Bug
+- **CellFiller 一勾就關**：`page.tsx` 的 `onSave={(next)=>persist(next,()=>setTarget(null))}` 讓每次儲存就關面板 → 任務 OPKS 無法連續勾。**修**：改 `onSave={(next)=>persist(next)}`，面板留著（已即時自動存），按 × / 背景才關。（commit `fcb347e`）
+- **類別改不了/不能自訂**：pills 版未開 allowCustom 且不可內聯編輯 → 改官方表格可編輯列解決。
+
+### 13.4 參考資料（本輪研究，與 §2/§9–§11 並用）
+- inline 編輯 vs 側邊抽屜（多列×多欄 → 抽屜）：PatternFly、LogRocket data-table、Pencil&Paper、Airtable record-detail。
+- 來源/「已改」指示 + 避免徽章過載（只標非官方）：Mobbin、Setproduct、Smart Interface Design Patterns、Termly（pre-ticked 同意 dark pattern 之界線）。
+- smart defaults 預填可改：NN/g Power of Defaults、Baymard input fields、ui-patterns Good Defaults。
+- React 19 / 2026 表單與樂觀更新：react.dev useOptimistic、RHF vs React 19（LogRocket）、Formisch/Croct 2026 比較、GitLab Pajamas（autosave hybrid）、react-admin AutoSave。
+- Combobox：Shopify Polaris、W3C ARIA 1.2。
+
+### 13.5 commit 軌跡（本輪迭代）
+`54798fb`(官方表格) → `bb6040e`(▾統一/描述自動長高/無搜尋) → `8e684d6`/`7b53775`(下拉已改) → `441aaf5`/`43b3c0c`(描述單框 append/空行) → `8527292`(態度/說明清單+footer) → `1c67275`(態度自動碼) → `d4f7cf4`(可編輯列+標記) → `52396a8`(下拉已改) → `586b621`(態度排序) → `594c7cf`(任務 OPKS 無搜尋+footer) → `fcb347e`(修連續選) → `fcf7539`(O/P 任務範圍碼)。
+
+### 13.6 待辦/未定（下次討論設計時接續）
+- 刪 dead code `FieldBoundSelect.tsx`；視需要把 `FieldCombobox` 的 `search` 模式移除（已無人用）。
+- 來源標記在「初次載入舊資料未排序態度」的邊角（目前互動後才排序）。
+- 補充說明（notes）無代碼 → 無法判「已改」（僅官方/自訂），與資料性質一致。
+- spec（§ design）類別段仍寫 pills → 與實作官方表格不一致，報告時以本節為準（或回頭同步 spec）。
+- 使用者表示「等等來討論設計」——待其開啟下一輪。

@@ -67,6 +67,14 @@
 - **F21c 來源含任務**：`SourceRef` 加 `task_code?`/`task_name?`；來源行抽成共用 `fields/SourceLine.tsx`（格式 `來源:職業 ocs_code · 任務碼 任務名`，多來源 +N hover）。FieldCombobox / CategoryPicker / OfficialMenu 全改用它；CellFiller 的 O/P/K/S 來源帶上 task_code/task_name。
 - commit `d49bb1e`。
 
+## 10. 任務級別來源「看不到」除錯 + 主動顯示（F22，2026-06-27）
+
+使用者回報「任務的級別沒有來源」。現場用 indexer 驗證資料**正常**（`/occupations/{ocs_code}/competencies` 每個點帶 `ocs_name` + `sources[].task_code/task_name/competency_level`，如 INM3513-009v1 K01 → T1.1 級別 3）。
+
+- **BUG-3 `_levelSrc` 漏記**：原本「填級別值」與「記來源」綁在同一個 fill-if-empty 條件下；任務級別早被自動填過 → 後續帶官方因「級別非空」連來源都跳過。**修法**：帶官方時**一律記來源**，級別「值」才維持填空不覆寫。commit `ec805eb`。
+- **F22 主動顯示（使用者選 B）**：任務級別來源不必等帶官方——打開級別下拉時**即時查該任務官方級別**（`useTaskLevel`，無 note→不跑 LLM、cache 5min、僅 enabled 時查），在該官方級別選項顯示來源（職業＋ocs_code＋任務）。`_levelSrc` 保留為離線/已帶官方的 fallback。為此 `OfficialMenu` 加 `onOpenChange`、`profileId`/`unitSource` 串到 `TaskRow`。commit `6c3f174`。
+- 與基準級別差異說明：基準級別來源來自 header-meta（一律已載），任務級別要查該任務 pool，故採「開下拉即時查」。
+
 ### commit 軌跡（feat/v3）
 `fde4100`(後端剝除) · `962c627`(型別) · `fa1989c`(ensureIds/序碼) · `180f4eb`(setters 連號) · `4985c90`(headerMeta srcs) · `6ef14f8`(選單來源行) · `460f169`(_src/改即自訂) · `8337b0f`(CellFiller list+來源) · `931e121`(類別唯讀) · `3986f3d`(名稱唯讀) · `f8f9431`(勾選修) · `7d821d0`(帶官方去重) · `85b4eb0`(基準級別來源) · `5c5df48`(單選勾)
 

@@ -90,8 +90,6 @@ export interface OcsDocument {
   ocs_content: { ocu_units: OcuUnit[] };
   ocs_attitude: { attitudes: CodeName[] };
   notes: { prerequisites: string[]; supplements: string[] };
-  // 前端全域候選池（使用者新增的 K/S/A，跨任務共用；非 OCS 契約欄，finalize 可忽略）
-  _pool?: { knowledge: CodeName[]; skills: CodeName[]; attitudes: CodeName[] };
 }
 
 // GET/PATCH/finalize/seed 的回傳信封（DocRepo._to_dict / no-doc 空殼）。
@@ -100,17 +98,6 @@ export interface DocumentEnvelope {
   version: number;
   status: DocStatus;
   content: OcsDocument;
-}
-
-// 候選池項目：of-record 仍是 {code,name}（CodeName）；sources 為展示用 provenance
-// （哪些 task_code 帶入此項），不寫入文件。
-export interface KsaPoolItem extends CodeName {
-  sources?: string[];
-}
-export interface KsaPool {
-  knowledge: KsaPoolItem[];
-  skills: KsaPoolItem[];
-  attitudes: KsaPoolItem[];
 }
 
 export interface OcsSearchHit {

@@ -129,7 +129,7 @@ function OfficialMenu({ trigger, options, onPick }: {
               {options.map((o, i) => (
                 <CommandItem key={i} value={`${o.label}-${i}`} onSelect={() => { onPick(o.value); setOpen(false); }}>
                   <span className="flex-1 truncate">{o.label}</span>
-                  {o.hint ? <span className="ml-1 shrink-0 text-[10px] text-sky-700">{o.hint}</span> : null}
+                  {o.hint ? <span className={"ml-1 shrink-0 rounded px-1 text-[10px] " + (o.hint === "已改" ? "bg-amber-100 text-amber-700" : "text-sky-700")}>{o.hint}</span> : null}
                 </CommandItem>
               ))}
             </CommandGroup>
@@ -281,7 +281,11 @@ export function DocHeader({ document: doc, profileId, onChange }: {
               <span>工作描述</span>
               <OfficialMenu
                 trigger={<button type="button" className="inline-flex items-center text-muted-foreground hover:text-foreground" title="選官方描述"><ChevronDown className="h-3.5 w-3.5" /></button>}
-                options={opts.filter((o) => o.job_description).map((o) => ({ value: o.job_description, label: `${o.ocs_code}　${o.occupation_name}`, hint: "官方" }))}
+                options={opts.filter((o) => o.job_description).map((o) => ({
+                  value: o.job_description,
+                  label: `${o.ocs_code}　${o.occupation_name}`,
+                  hint: o.ocs_code === p.ocs_code && (p.job_description ?? "") !== "" && p.job_description !== o.job_description ? "已改" : undefined,
+                }))}
                 onPick={(v) => onChange(setProfileField(doc, "job_description", v))}
               />
             </div>

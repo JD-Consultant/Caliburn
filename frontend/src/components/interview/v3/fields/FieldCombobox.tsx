@@ -11,7 +11,7 @@ const keyOf = (i: { code: string; name: string }) => i.code || "name:" + i.name;
 
 export function FieldCombobox({
   label, value, options, allowCustom = false, onCommit, pillSources = false,
-  layout = "pills", title, customMode = "search", footerWithCode = true,
+  layout = "pills", title, customMode = "search", footerWithCode = true, autoCode,
 }: {
   label: string;
   value: Item[];
@@ -25,6 +25,8 @@ export function FieldCombobox({
   // search：搜尋框 + 輸入即新增；footer：無搜尋 + 底部「＋ 加自訂」（同所屬類別）。
   customMode?: "search" | "footer";
   footerWithCode?: boolean;
+  // 設了前綴（如 "A"）→ 自訂只填名稱、代碼自動遞增（A01、A02…）。
+  autoCode?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -46,10 +48,20 @@ export function FieldCombobox({
     onCommit([...value, { code: "", name: n }]);
     setQuery("");
   };
+  const nextCode = (prefix: string) => {
+    let max = 0;
+    const re = new RegExp(`^${prefix}(\\d+)$`);
+    for (const c of [...value, ...options]) {
+      const m = re.exec(c.code || "");
+      if (m) max = Math.max(max, parseInt(m[1], 10));
+    }
+    return `${prefix}${String(max + 1).padStart(2, "0")}`;
+  };
   const confirmFooterAdd = () => {
     const n = cName.trim();
     if (!n) return;
-    onCommit([...value, { code: footerWithCode ? cCode.trim() : "", name: n }]);
+    const code = autoCode ? nextCode(autoCode) : footerWithCode ? cCode.trim() : "";
+    onCommit([...value, { code, name: n }]);
     setCCode(""); setCName(""); setAdding(false);
   };
   const selectAllOfficial = () => {
@@ -85,10 +97,10 @@ export function FieldCombobox({
       <div className="border-t p-1.5">
         {adding ? (
           <div className="flex items-center gap-1">
-            {footerWithCode ? (
+            {footerWithCode && !autoCode ? (
               <input autoFocus className="w-16 rounded border px-1.5 py-1 text-xs" placeholder="代碼" value={cCode} onChange={(e) => setCCode(e.target.value)} />
             ) : null}
-            <input autoFocus={!footerWithCode} className="min-w-0 flex-1 rounded border px-1.5 py-1 text-xs" placeholder="名稱" value={cName}
+            <input autoFocus={!(footerWithCode && !autoCode)} className="min-w-0 flex-1 rounded border px-1.5 py-1 text-xs" placeholder="名稱" value={cName}
               onChange={(e) => setCName(e.target.value)}
               onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); confirmFooterAdd(); } else if (e.key === "Escape") setAdding(false); }} />
             <button type="button" className="shrink-0 rounded border px-2 py-1 text-xs hover:bg-accent" onClick={confirmFooterAdd}>加</button>

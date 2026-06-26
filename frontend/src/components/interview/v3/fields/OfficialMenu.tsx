@@ -9,15 +9,17 @@ import { SourceLine } from "./SourceLine";
 export type OfficialMenuOption = { value: string; label: string; hint?: string; srcs?: SourceRef[] };
 
 // 單值「選官方」選單：列官方候選 + 來源行；selected 時打勾。基準級別/職能基準代碼/任務級別共用。
-export function OfficialMenu({ trigger, options, onPick, selected }: {
+export function OfficialMenu({ trigger, options, onPick, selected, onOpenChange }: {
   trigger: ReactNode;
   options: OfficialMenuOption[];
   onPick: (value: string) => void;
   selected?: string; // 目前選中值（單選時打勾）；不傳＝不顯示勾（如 append 用途）
+  onOpenChange?: (open: boolean) => void; // 開關通知（讓父層在開啟時才 lazy 取資料）
 }) {
   const [open, setOpen] = useState(false);
+  const setOpenAnd = (o: boolean) => { setOpen(o); onOpenChange?.(o); };
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={setOpenAnd}>
       <PopoverTrigger asChild>{trigger}</PopoverTrigger>
       <PopoverContent className="w-72">
         <Command>

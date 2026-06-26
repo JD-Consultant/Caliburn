@@ -228,3 +228,9 @@ export interface StructureTaskResult {
 export interface ClarifyResult {
   question: string | null;
 }
+
+export interface OptionItem {
+  code: string;
+  name: string;
+  sources?: string[];
+}

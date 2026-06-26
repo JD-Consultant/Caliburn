@@ -170,6 +170,18 @@ def build_from_picked(profile: dict, picked: list[dict], prev: dict | None = Non
     return _renumber(doc)
 
 
+def _strip_underscore(node) -> None:
+    """Recursively remove any dict key starting with '_' (front-end-only fields)."""
+    if isinstance(node, dict):
+        for k in [k for k in node if k.startswith("_")]:
+            node.pop(k, None)
+        for v in node.values():
+            _strip_underscore(v)
+    elif isinstance(node, list):
+        for v in node:
+            _strip_underscore(v)
+
+
 def assemble_final(draft: dict) -> dict:
     """Return a contract-complete deep copy of ``draft`` that passes validate."""
     doc = copy.deepcopy(draft or {})
@@ -245,18 +257,10 @@ def assemble_final(draft: dict) -> dict:
             }
         )
 
-    # Strip front-end-only keys (_pool/_uid/_tid/_notes) → contract-pure final JSON.
-    # _notes = per-task 工作筆記 (5W2H/CIT raw text fed to AI + shown to the consultant);
-    # like the others it is NOT part of the OCS contract, so finalize/export drop it.
-    doc.pop("_pool", None)
-    for unit in units:
-        if not isinstance(unit, dict):
-            continue
-        unit.pop("_uid", None)
-        for task in unit.get("tasks") or []:
-            if isinstance(task, dict):
-                task.pop("_tid", None)
-                task.pop("_notes", None)
+    # Strip ALL front-end-only keys (any "_"-prefixed key, at any depth) →
+    # contract-pure final JSON. Covers _pool/_uid/_tid/_notes (unit/task) and
+    # _id/_src/_ref (leaf O/P/K/S, attitudes, categories) + any future _ field.
+    _strip_underscore(doc)
 
     return doc
 

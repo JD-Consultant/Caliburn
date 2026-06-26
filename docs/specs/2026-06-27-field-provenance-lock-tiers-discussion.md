@@ -31,6 +31,8 @@
 - **F10 來源版面採 A（Material 3 supporting text，名稱下方次要行）**，否決 B（靠右）/ C（上方 overline），理由見 §3。
 - **F11 來源僅在選單顯示**（不在文件項目上）；自訂項不進選單故無來源行。
 - **F12 UI 不變原則**：只在下拉選單列加文字 + hover；文件/表格版型不動。🔒 類別官方列改唯讀屬「行為變更非版型」，且為使用者規範本身所要求。
+- **F13 export 剝除＝本專案後端遞迴清 `_` 欄位**：發現本專案後端 `build()`（`ocs_doc.py`）原為「逐一 pop 指定 key、且只到 unit/task 層」，不會清葉項目的 `_id`/`_src`/`_ref`。經使用者同意（「可以隨便改，要規範、主流架構、解耦」），改為遞迴 helper `_strip_underscore`（刪任意深度任何 `_` 開頭 key），一勞永逸涵蓋既有 `_pool/_uid/_tid/_notes` 與新欄位。註：此為**本專案後端**，與延後的 O/P 原始碼（indexer/catalog 端）無關。
+- **F14 多來源放 `OptionItem.srcs`、文件項 `_ref` 為單一 SourceRef**：spec §3 原將多來源寫成自我遞迴的 `SourceRef.sources?`；實作精化為——選單候選的多來源放 `OptionItem.srcs: SourceRef[]`，文件項 `_ref` 只記選中當下的首要來源。語意等價、較不自我遞迴。
 
 ## 3. 被否決 / 不採用的方案（為什麼不做）
 

@@ -46,6 +46,18 @@
 
 > 系統性教訓：本次多個 bug 同源——「code 已從『身分』降為『位置序碼』」後，任何仍用 code 做比對/去重/勾選的舊邏輯都會壞。原則：**比對一律用 `_src` + 名稱（或 `_id`），永不用 code**。
 
+## 8. 追加功能：任務級別自動帶入（F20，2026-06-27）
+
+使用者問「任務可以抓到級別嗎?」→ 可以。indexer 的每個職能點 `CitableItem.sources[].competency_level`（[models.py:25](../../backend/app/services/knowledge/models.py)）就帶該 `task_code` 的級別，原本 `task_competencies` 把它丟掉、文件的 `competency_block.competency_level` 一直是 null（任務列顯示「級別 —」且不可改）。
+
+- **F20 決策（使用者：要，接起來 + 顯示/可改）**：
+  - 後端 `task_competencies` 多回 `competency_level`（取匹配 task_code 的第一個非空級別；OCS 契約裡一個任務的點共用一個級別）；recommend-ks 回應帶上它。
+  - 前端 `setTaskLevel` setter；「帶官方/AI 填寫」套用時**填空不覆寫**（任務尚未設級別才自動帶入官方級別，已改不動）。
+  - 任務列「級別」由純文字改成 **1–6 可選下拉**（含「—」清除）。
+- **注意（這是本專案後端的改動）**：與先前延後的「O/P 原始來源碼」不同——級別資料 indexer 已提供，故本次接上；O/P 原始碼仍延後。
+- 回歸：既有 `test_task_competencies` 斷言 dict 全等，因新增 key 需同步（已修）。
+- commit：`793685b`（功能）、`ebc8ec2`（修回歸測試）。
+
 ### commit 軌跡（feat/v3）
 `fde4100`(後端剝除) · `962c627`(型別) · `fa1989c`(ensureIds/序碼) · `180f4eb`(setters 連號) · `4985c90`(headerMeta srcs) · `6ef14f8`(選單來源行) · `460f169`(_src/改即自訂) · `8337b0f`(CellFiller list+來源) · `931e121`(類別唯讀) · `3986f3d`(名稱唯讀) · `f8f9431`(勾選修) · `7d821d0`(帶官方去重) · `85b4eb0`(基準級別來源) · `5c5df48`(單選勾)
 

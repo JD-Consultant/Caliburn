@@ -6,7 +6,6 @@ import {
   finalizeDocument,
   getDocument,
   getHeaderMeta,
-  getKsaPool,
   getTaskCandidates,
   patchDocument,
   setOccupations,
@@ -20,16 +19,6 @@ export function useDocument(profileId: string) {
   return useQuery({
     queryKey: ["document", profileId],
     queryFn: () => getDocument(profileId),
-    refetchOnWindowFocus: false,
-  });
-}
-
-export function useKsaPool(profileId: string, enabled: boolean) {
-  return useQuery({
-    queryKey: ["ksa-pool", profileId],
-    queryFn: () => getKsaPool(profileId),
-    enabled,
-    staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
   });
 }
@@ -60,7 +49,9 @@ export function usePatchDocument(profileId: string) {
       if (ctx?.prev) qc.setQueryData(["document", profileId], ctx.prev);
     },
     onSuccess: (env: DocumentEnvelope) =>
-      qc.setQueryData(["document", profileId], env),
+      qc.setQueryData<DocumentEnvelope>(["document", profileId], (old) =>
+        old ? { ...env, content: old.content } : env,
+      ),
   });
 }
 
@@ -82,7 +73,6 @@ export function useSetOccupations(profileId: string) {
     onSuccess: () => {
       // 重抓 document（GET 空殼會用新 selected codes 帶表頭）+ 候選池/候選任務。
       qc.invalidateQueries({ queryKey: ["document", profileId] });
-      qc.invalidateQueries({ queryKey: ["ksa-pool", profileId] });
       qc.invalidateQueries({ queryKey: ["task-candidates", profileId] });
     },
   });

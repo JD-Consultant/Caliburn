@@ -8,7 +8,6 @@ import type {
   ExtractTasksResult,
   HeaderMeta,
   JobProfile,
-  KsaPool,
   OcsDocument,
   OcsSearchHit,
   PickedTask,
@@ -71,7 +70,7 @@ export const deleteProfile = (profileId: string) =>
 // ── OCS document worktable (D27) ─────────────────────────────────────────────
 // GET 無文件時回空殼（status:"none", version:0）。PATCH body = 整份 OCS 文件，
 // 存成/更新 draft。finalize 組裝+驗 schema（失敗 422）。seed 用已選 ocs_codes
-// 產骨架。ksa-pool 為 catalog 候選池（indexer 掛則回空池）。
+// 產骨架。
 export const getDocument = (profileId: string) =>
   request<DocumentEnvelope>(`/job-profiles/${profileId}/document`);
 
@@ -107,9 +106,6 @@ export const buildTasks = (profileId: string, picked: PickedTask[]) =>
     method: "POST",
     body: JSON.stringify({ picked }),
   });
-
-export const getKsaPool = (profileId: string) =>
-  request<KsaPool>(`/job-profiles/${profileId}/ksa-pool`);
 
 // 表頭候選池（D29）：多 OCS 官方 metadata 聯集（職類/職業/行業/態度/notes）+ 主基準。
 export const getHeaderMeta = (profileId: string) =>

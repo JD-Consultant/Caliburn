@@ -25,25 +25,25 @@ export function DocHeader({ document: doc, profileId, onChange }: {
       <tbody>
         <tr><th className={TH}>職能基準（代碼/名稱）</th><td className={TD}>
           <FieldBoundSelect
-            value={{ ocs_code: p.ocs_code, name: p.ocs_name.occupation_name }}
+            value={{ ocs_code: p.ocs_code, name: p.ocs_name?.occupation_name ?? "" }}
             options={opts.map((o) => ({ ocs_code: o.ocs_code, name: o.occupation_name }))}
             onCommit={(o) => onChange(setPrimaryBasis(doc, { ocs_code: o.ocs_code, occupation_name: o.name, job_category_name: opts.find((x) => x.ocs_code === o.ocs_code)?.job_category_name || "" }))}
           />
         </td></tr>
         <tr><th className={TH}>職類名稱</th><td className={TD}>
-          <FieldText value={p.ocs_name.job_category_name ?? ""} official={cur?.job_category_name ?? ""}
+          <FieldText value={p.ocs_name?.job_category_name ?? ""} official={cur?.job_category_name ?? ""}
             onCommit={(v) => onChange(setOcsName(doc, "job_category_name", v))} />
         </td></tr>
         <tr><th className={TH}>所屬職類別</th><td className={TD}>
-          <FieldCombobox label="選職類別" value={p.category.job_categories} options={cats("job_categories")}
+          <FieldCombobox label="選職類別" value={p.category?.job_categories ?? []} options={cats("job_categories")}
             onCommit={(items) => onChange(setCategory(doc, "job_categories", items))} />
         </td></tr>
         <tr><th className={TH}>所屬職業別</th><td className={TD}>
-          <FieldCombobox label="選職業別" value={p.category.occupations} options={cats("occupations")}
+          <FieldCombobox label="選職業別" value={p.category?.occupations ?? []} options={cats("occupations")}
             onCommit={(items) => onChange(setCategory(doc, "occupations", items))} />
         </td></tr>
         <tr><th className={TH}>所屬行業別</th><td className={TD}>
-          <FieldCombobox label="選行業別" value={p.category.industries} options={cats("industries")}
+          <FieldCombobox label="選行業別" value={p.category?.industries ?? []} options={cats("industries")}
             onCommit={(items) => onChange(setCategory(doc, "industries", items))} />
         </td></tr>
         <tr><th className={TH}>工作描述</th><td className={TD}>

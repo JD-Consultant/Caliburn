@@ -278,12 +278,13 @@ function AttitudeBlock({
   const { data: meta } = useHeaderMeta(profileId, !!doc.ocs_profile.ocs_code);
   return (
     <div className="rounded-lg border bg-background p-4">
-      <p className="mb-2 text-sm font-medium">職能內涵（A=態度，全職類共用）</p>
       <FieldCombobox
         label="選態度"
+        title="職能內涵（A=態度，全職類共用）"
+        layout="list"
+        customMode="footer"
         value={doc.ocs_attitude?.attitudes ?? []}
         options={meta ? attitudeOptions(meta) : []}
-        allowCustom
         onCommit={(items) => onChange(setAttitudes(doc, items))}
       />
     </div>

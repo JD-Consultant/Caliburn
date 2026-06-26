@@ -13,8 +13,8 @@ function NoteCombo({ doc, profileId, field, title, onChange }: {
   const value = (doc.notes?.[field] ?? []).map((t) => ({ code: "", name: t }));
   return (
     <div>
-      <p className="mb-1.5 text-sm font-medium">{title}</p>
-      <FieldCombobox label="選/輸入" value={value} options={options} allowCustom
+      <FieldCombobox label="選/輸入" title={title} layout="list" customMode="footer" footerWithCode={false}
+        value={value} options={options}
         onCommit={(items) => onChange(setNotes(doc, field, items.map((i) => i.name).filter(Boolean)))} />
     </div>
   );

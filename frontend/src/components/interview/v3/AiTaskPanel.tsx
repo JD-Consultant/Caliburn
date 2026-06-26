@@ -275,9 +275,18 @@ export function AiTaskPanel({
       "skills",
       staged.skills.filter((k) => k.checked).map((k) => ({ code: k.code, name: k.name })),
     );
-    // 級別：官方帶入「填空不覆寫」——任務尚未設級別時才自動填入官方級別。
+    // 級別：官方帶入「填空不覆寫」——任務尚未設級別時才自動填入官方級別 + 記來源（含任務）。
     if (catalogLevel != null && getBlock(d, unitIdx, taskIdx)?.competency_level == null) {
-      d = setTaskLevel(d, unitIdx, taskIdx, catalogLevel);
+      const u = document.ocs_content?.ocu_units?.[unitIdx];
+      const t = u?.tasks?.[taskIdx];
+      d = setTaskLevel(d, unitIdx, taskIdx, catalogLevel, {
+        ocs_code: u?.source?.ocs_code ?? "",
+        occupation_name: u?.source?.occupation_name ?? "",
+        code: "",
+        task_code: t?.task_codes?.[0]?.code ?? "",
+        task_name: t?.task_codes?.[0]?.name ?? "",
+        level: catalogLevel,
+      });
     }
     d = setTaskNotes(d, unitIdx, taskIdx, buildNote());
     onApply(d);

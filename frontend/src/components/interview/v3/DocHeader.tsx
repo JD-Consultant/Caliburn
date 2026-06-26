@@ -3,9 +3,9 @@
 // D27 官方職能基準「表頭」版型（5 欄對齊官方表格，可編輯/可自訂）。
 // 代碼↔名稱綁定（選官方基準下拉）；所屬類別三類各列為 名稱|代碼（可手打自訂、加列刪列），
 // 並提供「選官方▾」下拉把官方 {code,name} 綁定帶入；工作描述/級別預填可改+帶官方。
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import { Check, ChevronDown, Plus, X } from "lucide-react";
-import type { CodeName, OcsDocument, OptionItem, SourceRef } from "@/types";
+import type { CodeName, OcsDocument, OptionItem } from "@/types";
 import { useHeaderMeta } from "@/hooks/useDocument";
 import { categoryOptions, primaryOptions } from "@/lib/headerMeta";
 import {
@@ -19,6 +19,8 @@ import {
   type CatKind,
 } from "@/lib/ocsDoc";
 import { FieldText } from "./fields/FieldText";
+import { OfficialMenu } from "./fields/OfficialMenu";
+import { SourceLine } from "./fields/SourceLine";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
 
@@ -73,13 +75,7 @@ function CategoryPicker({ options, existing, onToggle, onAddCustom }: {
                       {o.code ? <span className="font-mono text-xs text-muted-foreground">{o.code}</span> : null}
                       <span className="flex-1">{o.name}</span>
                     </div>
-                    {(o.srcs?.length ?? 0) > 0 ? (
-                      <div className="mt-0.5 text-[10px] text-muted-foreground"
-                        title={o.srcs!.length > 1 ? o.srcs!.map((r) => `${r.occupation_name} ${r.ocs_code}`).join("\n") : undefined}>
-                        來源:{o.srcs![0].occupation_name} · {o.srcs![0].ocs_code}
-                        {o.srcs!.length > 1 ? <span className="ml-1 rounded bg-muted px-1">+{o.srcs!.length - 1}</span> : null}
-                      </div>
-                    ) : null}
+                    <SourceLine srcs={o.srcs} />
                   </div>
                 </CommandItem>
               ))}
@@ -111,50 +107,6 @@ function Marker({ status }: { status: "official" | "custom" }) {
   if (status === "official") return null;
   return (
     <span className="shrink-0 rounded bg-amber-100 px-1 py-0.5 text-[10px] text-amber-700" title="自訂項目">自訂</span>
-  );
-}
-
-// 單值「選官方」選單：列官方候選，點一個即填入（值仍可在欄位編輯）。
-function OfficialMenu({ trigger, options, onPick, selected }: {
-  trigger: ReactNode;
-  options: { value: string; label: string; hint?: string; srcs?: SourceRef[] }[];
-  onPick: (value: string) => void;
-  selected?: string; // 目前選中值（單選時打勾）；不傳＝不顯示勾（如 append 用途）
-}) {
-  const [open, setOpen] = useState(false);
-  return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>{trigger}</PopoverTrigger>
-      <PopoverContent className="w-72">
-        <Command>
-          <CommandList>
-            <CommandEmpty>無官方候選</CommandEmpty>
-            <CommandGroup>
-              {options.map((o, i) => (
-                <CommandItem key={i} value={`${o.label}-${i}`} onSelect={() => { onPick(o.value); setOpen(false); }} className="items-start">
-                  {selected !== undefined ? (
-                    <Check className={"mt-0.5 h-3.5 w-3.5 " + (o.value === selected ? "opacity-100" : "opacity-0")} />
-                  ) : null}
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-1">
-                      <span className="flex-1 truncate">{o.label}</span>
-                      {o.hint ? <span className={"ml-1 shrink-0 rounded px-1 text-[10px] " + (o.hint === "已改" ? "bg-amber-100 text-amber-700" : "text-sky-700")}>{o.hint}</span> : null}
-                    </div>
-                    {(o.srcs?.length ?? 0) > 0 ? (
-                      <div className="mt-0.5 text-[10px] text-muted-foreground"
-                        title={o.srcs!.length > 1 ? o.srcs!.map((r) => `${r.occupation_name} ${r.ocs_code}`).join("\n") : undefined}>
-                        來源:{o.srcs![0].occupation_name} · {o.srcs![0].ocs_code}
-                        {o.srcs!.length > 1 ? <span className="ml-1 rounded bg-muted px-1">+{o.srcs!.length - 1}</span> : null}
-                      </div>
-                    ) : null}
-                  </div>
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </Popover>
   );
 }
 

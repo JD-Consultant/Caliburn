@@ -36,6 +36,8 @@ export interface SourceRef {
   ocs_code: string;        // 來源官方基準碼，如 INM3513-009v1
   occupation_name: string; // 來源職業名，如 AIoT應用工程師
   code: string;            // 該項在來源文件的原始碼（O1.1.1 / K01 / INM；O/P 暫為 ""）
+  task_code?: string;      // 來源任務碼（任務範圍項目才有，如 T1.1）
+  task_name?: string;      // 來源任務名
 }
 
 export interface CodeName {
@@ -69,6 +71,7 @@ export interface OcsTask {
   provenance?: { ocs_code: string; task_code: string; urn?: string };
   _tid?: string; // 前端穩定 id（拖拉用；隨項目移動）
   _notes?: string; // D28 工作筆記（5W2H/CIT 原文，餵 AI＋給顧問）；非契約欄，finalize/export 剝除
+  _levelSrc?: SourceRef & { level: number }; // 帶官方時記下「官方級別 + 來源（含任務）」；export 剝除
 }
 
 export interface OcuUnit {

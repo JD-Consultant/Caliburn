@@ -172,10 +172,10 @@ function TaskRow({
           type="button"
           className="inline-flex items-center gap-1 rounded-md border border-sky-200 bg-sky-50 px-2 py-1 text-xs font-medium text-sky-700 hover:bg-sky-100"
           onClick={() => onStar(unitIdx, taskIdx, "catalog")}
-          title="一鍵帶入職能基準目錄的官方 O/P/K/S（次要任務輕量）"
+          title="一鍵帶入此任務的職能基準官方 O/P/K/S"
         >
           <Layers className="h-3.5 w-3.5" />
-          帶 catalog
+          帶官方
         </button>
         <button
           type="button"

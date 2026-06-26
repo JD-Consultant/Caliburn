@@ -288,7 +288,7 @@ export function AiTaskPanel({
             {autoCatalog ? (
               <>
                 <Layers className="h-4 w-4 text-sky-500" />
-                一鍵帶入 catalog：{taskName}
+                帶官方：{taskName}
               </>
             ) : (
               <>

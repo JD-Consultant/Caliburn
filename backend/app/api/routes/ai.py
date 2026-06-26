@@ -39,19 +39,19 @@ def get_llm() -> LlmPort | None:
     return OpenRouterLlm() if settings.openrouter_api_key else None
 
 
-async def _catalog_ks(knowledge: KnowledgeClient, ref: dict) -> tuple[list[dict], list[dict]]:
-    """Per-task official K/S from the v4 competency pool, sliced on ``(ocs_code,
-    task_code)`` from provenance. No ref or indexer down → empty lists (caller
-    degrades gracefully, never crashes)."""
+async def _catalog_ks(knowledge: KnowledgeClient, ref: dict) -> tuple[list[dict], list[dict], int | None]:
+    """Per-task official K/S + competency_level from the v4 competency pool, sliced on
+    ``(ocs_code, task_code)`` from provenance. No ref or indexer down → empty lists +
+    None level (caller degrades gracefully, never crashes)."""
     if not ref.get("ocs_code") or not ref.get("task_code"):
-        return [], []
+        return [], [], None
     try:
         pool = await knowledge.competencies(ref["ocs_code"])
     except Exception:
         logger.warning("ai: competencies failed", exc_info=True)
-        return [], []
+        return [], [], None
     detail = task_competencies(pool, ref["task_code"])
-    return detail["knowledge"], detail["skills"]
+    return detail["knowledge"], detail["skills"], detail["competency_level"]
 
 
 @router.post("/recommend-ks")
@@ -75,14 +75,16 @@ async def recommend_ks_ep(
     task = _tasks.find_task(content, task_key)
     if task is None:
         raise HTTPException(status_code=404, detail="task not found in document")
-    k_candidates, s_candidates = await _catalog_ks(knowledge, _tasks.catalog_ref(task))
-    return await _recommend_ks.recommend_ks(
+    k_candidates, s_candidates, level = await _catalog_ks(knowledge, _tasks.catalog_ref(task))
+    result = await _recommend_ks.recommend_ks(
         task_name=_tasks.task_name(task),
         note=note,
         k_candidates=k_candidates,
         s_candidates=s_candidates,
         llm=llm,
     )
+    result["competency_level"] = level
+    return result
 
 
 async def _catalog_op(knowledge: KnowledgeClient, ref: dict) -> tuple[list[str], list[str]]:

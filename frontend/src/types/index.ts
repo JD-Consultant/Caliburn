@@ -197,6 +197,7 @@ export interface KsSuggestion {
 export interface RecommendKsResult {
   knowledge: KsSuggestion[];
   skills: KsSuggestion[];
+  competency_level?: number | null; // 該任務的官方級別（從來源 competency_level 取）
 }
 
 // draft-op：產出(O)/指標(P) 提議，帶來源。

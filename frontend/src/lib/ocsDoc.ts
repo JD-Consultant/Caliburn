@@ -362,6 +362,16 @@ export function setTaskNotes(
   return next;
 }
 
+// 設定單一任務的級別（competency_block.competency_level）。空字串→null。
+export function setTaskLevel(doc: OcsDocument, unitIdx: number, taskIdx: number, value: number | string | null): OcsDocument {
+  const next = clone(doc);
+  const block = ensureBlock(next, unitIdx, taskIdx);
+  if (value === null || value === "") { block.competency_level = null; return next; }
+  const n = typeof value === "number" ? value : parseInt(value, 10);
+  block.competency_level = Number.isFinite(n) ? n : null;
+  return next;
+}
+
 export function setAttitudes(doc: OcsDocument, items: CodeName[]): OcsDocument {
   const next = clone(doc);
   const list = [...items];

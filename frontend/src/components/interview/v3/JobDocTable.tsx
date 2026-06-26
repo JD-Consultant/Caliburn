@@ -15,6 +15,7 @@ import {
   renameUnit,
   reorderUnits,
   setAttitudes,
+  setTaskLevel,
 } from "@/lib/ocsDoc";
 import { useHeaderMeta } from "@/hooks/useDocument";
 import { attitudeOptions } from "@/lib/headerMeta";
@@ -158,7 +159,17 @@ function TaskRow({
           onCommit={(v) => onChange(renameTask(doc, unitIdx, taskIdx, v))}
           className="flex-1 text-sm font-medium"
         />
-        <span className="text-xs text-muted-foreground">級別 {level != null ? level : "—"}</span>
+        <select
+          className="rounded border bg-transparent px-1 py-0.5 text-xs text-muted-foreground"
+          title="任務級別（帶官方時自動填入，可改）"
+          value={level != null ? String(level) : ""}
+          onChange={(e) => onChange(setTaskLevel(doc, unitIdx, taskIdx, e.target.value))}
+        >
+          <option value="">級別 —</option>
+          {[1, 2, 3, 4, 5, 6].map((n) => (
+            <option key={n} value={n}>級別 {n}</option>
+          ))}
+        </select>
         <button
           type="button"
           className="inline-flex items-center gap-1 rounded-md border border-violet-200 bg-violet-50 px-2 py-1 text-xs font-medium text-violet-700 hover:bg-violet-100"

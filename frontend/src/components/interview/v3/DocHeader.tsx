@@ -280,13 +280,9 @@ export function DocHeader({ document: doc, profileId, onChange }: {
             <div className="flex items-center justify-between gap-1">
               <span>工作描述</span>
               <OfficialMenu
-                trigger={<button type="button" className="inline-flex items-center text-muted-foreground hover:text-foreground" title="選官方描述"><ChevronDown className="h-3.5 w-3.5" /></button>}
-                options={opts.filter((o) => o.job_description).map((o) => ({
-                  value: o.job_description,
-                  label: `${o.ocs_code}　${o.occupation_name}`,
-                  hint: o.ocs_code === p.ocs_code && (p.job_description ?? "") !== "" && p.job_description !== o.job_description ? "已改" : undefined,
-                }))}
-                onPick={(v) => onChange(setProfileField(doc, "job_description", v))}
+                trigger={<button type="button" className="inline-flex items-center text-muted-foreground hover:text-foreground" title="加入官方描述（加到下一行）"><ChevronDown className="h-3.5 w-3.5" /></button>}
+                options={opts.filter((o) => o.job_description).map((o) => ({ value: o.job_description, label: `${o.ocs_code}　${o.occupation_name}` }))}
+                onPick={(v) => { const curDesc = p.job_description ?? ""; onChange(setProfileField(doc, "job_description", curDesc ? `${curDesc}\n${v}` : v)); }}
               />
             </div>
           </th>

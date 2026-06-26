@@ -80,7 +80,8 @@ export function FieldCombobox({
   };
   const selectAllOfficial = () => {
     const next = [...value];
-    for (const o of options) if (!next.some((v) => keyOf(v) === keyOf(o))) {
+    for (const o of options) {
+      if (next.some((v) => v._src === "official" && v.name === o.name)) continue; // 已選官方→跳過
       const ref: SourceRef = o.srcs?.[0] ?? { ocs_code: "", occupation_name: "", code: o.code };
       next.push({ code: o.code, name: o.name, _id: newId(), _src: "official", _ref: ref });
     }

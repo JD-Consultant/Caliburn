@@ -3,11 +3,11 @@
 // D27 文件即工作台。表格優先：一進來就是（可能空的）職務說明書表格，頂部
 // 〔選職類〕〔選任務〕入口。所有編輯（選職類/選任務/改名/增刪/拖拉/填格）→ PATCH
 // draft（自動儲存）。續做＝重開自動載 draft。finalize 產正式版本。不碰 CopilotKit。
-import { use, useMemo, useState } from "react";
+import { use, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { ChevronLeft, Download, FileCheck2, Layers, ListChecks, Sparkles, Tags } from "lucide-react";
+import { ChevronLeft, Download, FileCheck2, Layers, ListChecks, Sparkles } from "lucide-react";
 import { useProfile } from "@/hooks/useProfiles";
-import { useDocument, useFinalizeDocument, useKsaPool, usePatchDocument } from "@/hooks/useDocument";
+import { useAutosaveDocument, useDocument, useFinalizeDocument, useKsaPool } from "@/hooks/useDocument";
 import { getDocumentExport } from "@/lib/api";
 import { downloadJson } from "@/lib/download";
 import { JobDocTable, type CellTarget } from "@/components/interview/v3/JobDocTable";
@@ -15,7 +15,6 @@ import { CellFillerPanel } from "@/components/interview/v3/CellFillerPanel";
 import { AiTaskPanel } from "@/components/interview/v3/AiTaskPanel";
 import { OccupationPicker } from "@/components/interview/v3/OccupationPicker";
 import { TaskCuratePanel } from "@/components/interview/v3/TaskCuratePanel";
-import { HeaderMetaPanel } from "@/components/interview/v3/HeaderMetaPanel";
 import { completion, ensureIds } from "@/lib/ocsDoc";
 import type { KsaPool, OcsDocument } from "@/types";
 import { Button } from "@/components/ui/button";
@@ -38,26 +37,24 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
   const hasOccupations = !!doc?.ocs_profile?.ocs_code;
   const { data: pool } = useKsaPool(id, hasOccupations);
 
-  const patch = usePatchDocument(id);
+  const { status: saveStatus, commit, flush } = useAutosaveDocument(id);
   const finalize = useFinalizeDocument(id);
+
+  // flush on unmount (lint-clean: update ref in effect, cleanup calls it)
+  const flushRef = useRef(flush);
+  useEffect(() => { flushRef.current = flush; });
+  useEffect(() => () => { flushRef.current(); }, []);
 
   const [target, setTarget] = useState<CellTarget | null>(null);
   const [starTarget, setStarTarget] = useState<{ unitIdx: number; taskIdx: number; mode: "ai" | "catalog" } | null>(null);
   const [showOcc, setShowOcc] = useState(false);
   const [showTasks, setShowTasks] = useState(false);
-  const [showHeaderMeta, setShowHeaderMeta] = useState(false);
-  const [savedAt, setSavedAt] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const persist = (next: OcsDocument, after?: () => void) => {
     setError(null);
-    patch.mutate(next, {
-      onSuccess: () => {
-        setSavedAt(new Date().toLocaleTimeString("zh-TW"));
-        after?.();
-      },
-      onError: (e: unknown) => setError(e instanceof Error ? e.message : "儲存失敗"),
-    });
+    commit(next);
+    after?.();
   };
 
   const runFinalize = () => {
@@ -95,7 +92,11 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
         ) : null}
 
         <div className="ml-auto flex flex-wrap items-center gap-2">
-          {savedAt ? <span className="text-xs text-muted-foreground">✓ 已自動儲存 {savedAt}</span> : null}
+          {saveStatus === "saving" ? (
+            <span className="text-xs text-muted-foreground">儲存中…</span>
+          ) : saveStatus === "saved" ? (
+            <span className="text-xs text-muted-foreground">✓ 已自動儲存</span>
+          ) : null}
           <Button size="sm" variant="outline" className="gap-1" onClick={() => setShowOcc(true)}>
             <Layers className="h-4 w-4" />
             選職類
@@ -103,10 +104,6 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
           <Button size="sm" variant="outline" className="gap-1" disabled={!hasOccupations} onClick={() => setShowTasks(true)}>
             <ListChecks className="h-4 w-4" />
             選任務
-          </Button>
-          <Button size="sm" variant="outline" className="gap-1" disabled={!hasOccupations} onClick={() => setShowHeaderMeta(true)}>
-            <Tags className="h-4 w-4" />
-            表頭分類
           </Button>
           <Button size="sm" variant="outline" className="gap-1" onClick={exportJson} disabled={status === "none"}>
             <Download className="h-4 w-4" />
@@ -177,7 +174,7 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
           document={doc}
           target={target}
           pool={pool ?? EMPTY_POOL}
-          saving={patch.isPending}
+          saving={saveStatus === "saving"}
           onSave={(next) => persist(next, () => setTarget(null))}
           onClose={() => setTarget(null)}
         />
@@ -190,7 +187,7 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
           profileId={id}
           unitIdx={starTarget.unitIdx}
           taskIdx={starTarget.taskIdx}
-          saving={patch.isPending}
+          saving={saveStatus === "saving"}
           autoCatalog={starTarget.mode === "catalog"}
           onApply={(next) => persist(next, () => setStarTarget(null))}
           onClose={() => setStarTarget(null)}
@@ -216,15 +213,6 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
         />
       ) : null}
 
-      {showHeaderMeta && doc ? (
-        <HeaderMetaPanel
-          profileId={id}
-          document={doc}
-          saving={patch.isPending}
-          onApply={(next) => persist(next, () => setShowHeaderMeta(false))}
-          onClose={() => setShowHeaderMeta(false)}
-        />
-      ) : null}
     </div>
   );
 }

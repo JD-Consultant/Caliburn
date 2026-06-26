@@ -283,6 +283,7 @@ function AttitudeBlock({
         title="職能內涵（A=態度，全職類共用）"
         layout="list"
         customMode="footer"
+        autoCode="A"
         value={doc.ocs_attitude?.attitudes ?? []}
         options={meta ? attitudeOptions(meta) : []}
         onCommit={(items) => onChange(setAttitudes(doc, items))}

@@ -7,7 +7,7 @@ import { use, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { ChevronLeft, Download, FileCheck2, Layers, ListChecks, Sparkles } from "lucide-react";
 import { useProfile } from "@/hooks/useProfiles";
-import { useAutosaveDocument, useDocument, useFinalizeDocument, useKsaPool } from "@/hooks/useDocument";
+import { useAutosaveDocument, useDocument, useFinalizeDocument } from "@/hooks/useDocument";
 import { getDocumentExport } from "@/lib/api";
 import { downloadJson } from "@/lib/download";
 import { JobDocTable, type CellTarget } from "@/components/interview/v3/JobDocTable";
@@ -16,15 +16,13 @@ import { AiTaskPanel } from "@/components/interview/v3/AiTaskPanel";
 import { OccupationPicker } from "@/components/interview/v3/OccupationPicker";
 import { TaskCuratePanel } from "@/components/interview/v3/TaskCuratePanel";
 import { completion, ensureIds } from "@/lib/ocsDoc";
-import type { KsaPool, OcsDocument } from "@/types";
+import type { OcsDocument } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 
-const EMPTY_POOL: KsaPool = { knowledge: [], skills: [], attitudes: [] };
-
 function targetKey(t: CellTarget): string {
-  return t.kind === "a" ? "a" : `${t.kind}-${t.unitIdx}-${t.taskIdx}`;
+  return `${t.kind}-${t.unitIdx}-${t.taskIdx}`;
 }
 
 export default function V3Page({ params }: { params: Promise<{ id: string }> }) {
@@ -35,7 +33,6 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
   const doc: OcsDocument | undefined = useMemo(() => ensureIds(envelope?.content), [envelope]);
   const status = envelope?.status ?? "none";
   const hasOccupations = !!doc?.ocs_profile?.ocs_code;
-  const { data: pool } = useKsaPool(id, hasOccupations);
 
   const { status: saveStatus, commit, flush } = useAutosaveDocument(id);
   const finalize = useFinalizeDocument(id);
@@ -173,8 +170,7 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
           key={targetKey(target)}
           document={doc}
           target={target}
-          pool={pool ?? EMPTY_POOL}
-          saving={saveStatus === "saving"}
+          profileId={id}
           onSave={(next) => persist(next, () => setTarget(null))}
           onClose={() => setTarget(null)}
         />

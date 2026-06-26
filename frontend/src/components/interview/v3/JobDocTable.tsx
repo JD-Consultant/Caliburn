@@ -39,9 +39,7 @@ import { DocNotes } from "./DocNotes";
 import { Check, GripVertical, Layers, Pencil, Plus, Sparkles, Trash2 } from "lucide-react";
 
 export type CellKind = "o" | "p" | "k" | "s";
-export type CellTarget =
-  | { kind: CellKind; unitIdx: number; taskIdx: number }
-  | { kind: "a" };
+export type CellTarget = { kind: CellKind; unitIdx: number; taskIdx: number };
 
 export function firstBlock(task: OcsTask): CompetencyBlock | undefined {
   return task.competency_blocks?.[0];

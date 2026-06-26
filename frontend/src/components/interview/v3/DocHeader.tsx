@@ -5,7 +5,7 @@
 // 並提供「選官方▾」下拉把官方 {code,name} 綁定帶入；工作描述/級別預填可改+帶官方。
 import { useState, type ReactNode } from "react";
 import { Check, ChevronDown, Plus, X } from "lucide-react";
-import type { CodeName, OcsDocument, OptionItem } from "@/types";
+import type { CodeName, OcsDocument, OptionItem, SourceRef } from "@/types";
 import { useHeaderMeta } from "@/hooks/useDocument";
 import { categoryOptions, primaryOptions } from "@/lib/headerMeta";
 import {
@@ -117,7 +117,7 @@ function Marker({ status }: { status: "official" | "custom" }) {
 // 單值「選官方」選單：列官方候選，點一個即填入（值仍可在欄位編輯）。
 function OfficialMenu({ trigger, options, onPick }: {
   trigger: ReactNode;
-  options: { value: string; label: string; hint?: string }[];
+  options: { value: string; label: string; hint?: string; srcs?: SourceRef[] }[];
   onPick: (value: string) => void;
 }) {
   const [open, setOpen] = useState(false);
@@ -130,9 +130,20 @@ function OfficialMenu({ trigger, options, onPick }: {
             <CommandEmpty>無官方候選</CommandEmpty>
             <CommandGroup>
               {options.map((o, i) => (
-                <CommandItem key={i} value={`${o.label}-${i}`} onSelect={() => { onPick(o.value); setOpen(false); }}>
-                  <span className="flex-1 truncate">{o.label}</span>
-                  {o.hint ? <span className={"ml-1 shrink-0 rounded px-1 text-[10px] " + (o.hint === "已改" ? "bg-amber-100 text-amber-700" : "text-sky-700")}>{o.hint}</span> : null}
+                <CommandItem key={i} value={`${o.label}-${i}`} onSelect={() => { onPick(o.value); setOpen(false); }} className="items-start">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1">
+                      <span className="flex-1 truncate">{o.label}</span>
+                      {o.hint ? <span className={"ml-1 shrink-0 rounded px-1 text-[10px] " + (o.hint === "已改" ? "bg-amber-100 text-amber-700" : "text-sky-700")}>{o.hint}</span> : null}
+                    </div>
+                    {(o.srcs?.length ?? 0) > 0 ? (
+                      <div className="mt-0.5 text-[10px] text-muted-foreground"
+                        title={o.srcs!.length > 1 ? o.srcs!.map((r) => `${r.occupation_name} ${r.ocs_code}`).join("\n") : undefined}>
+                        來源:{o.srcs![0].occupation_name} · {o.srcs![0].ocs_code}
+                        {o.srcs!.length > 1 ? <span className="ml-1 rounded bg-muted px-1">+{o.srcs!.length - 1}</span> : null}
+                      </div>
+                    ) : null}
+                  </div>
                 </CommandItem>
               ))}
             </CommandGroup>
@@ -313,7 +324,10 @@ export function DocHeader({ document: doc, profileId, onChange }: {
               <span>基準級別</span>
               <OfficialMenu
                 trigger={<button type="button" className="inline-flex items-center text-muted-foreground hover:text-foreground" title="選級別"><ChevronDown className="h-3.5 w-3.5" /></button>}
-                options={[1, 2, 3, 4, 5, 6].map((n) => ({ value: String(n), label: `級別 ${n}`, hint: opts.some((o) => o.ocs_level === n) ? "官方" : undefined }))}
+                options={[1, 2, 3, 4, 5, 6].map((n) => ({
+                  value: String(n), label: `級別 ${n}`,
+                  srcs: opts.filter((o) => o.ocs_level === n).map((o) => ({ ocs_code: o.ocs_code, occupation_name: o.occupation_name, code: "" })),
+                }))}
                 onPick={(v) => onChange(setOcsLevel(doc, v))}
               />
             </div>

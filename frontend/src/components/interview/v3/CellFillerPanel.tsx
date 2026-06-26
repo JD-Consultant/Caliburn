@@ -53,7 +53,8 @@ export function CellFillerPanel({
         label="選知識 K"
         value={block?.knowledge ?? []}
         options={cat.knowledge}
-        allowCustom
+        customMode="footer"
+        autoCode="K"
         onCommit={(items) => onSave(setKS(document, unitIdx, taskIdx, "knowledge", items))}
       />
     );
@@ -63,7 +64,8 @@ export function CellFillerPanel({
         label="選技能 S"
         value={block?.skills ?? []}
         options={cat.skills}
-        allowCustom
+        customMode="footer"
+        autoCode="S"
         onCommit={(items) => onSave(setKS(document, unitIdx, taskIdx, "skills", items))}
       />
     );
@@ -73,7 +75,8 @@ export function CellFillerPanel({
         label="選產出 O"
         value={block?.outputs ?? []}
         options={cat.outputs}
-        allowCustom
+        customMode="footer"
+        autoCode="O"
         onCommit={(items) => onSave(setOp(document, unitIdx, taskIdx, items, block?.indicators ?? []))}
       />
     );
@@ -84,7 +87,8 @@ export function CellFillerPanel({
         label="選指標 P"
         value={(block?.indicators ?? []).map((i) => ({ code: i.code, name: i.text }))}
         options={cat.indicators.map((i) => ({ code: i.code, name: i.text }))}
-        allowCustom
+        customMode="footer"
+        autoCode="P"
         onCommit={(items) =>
           onSave(
             setOp(

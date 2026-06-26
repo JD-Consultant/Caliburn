@@ -20,6 +20,7 @@ import {
 import { useHeaderMeta } from "@/hooks/useDocument";
 import { attitudeOptions } from "@/lib/headerMeta";
 import { FieldCombobox } from "./fields/FieldCombobox";
+import { OfficialMenu } from "./fields/OfficialMenu";
 import {
   DndContext,
   PointerSensor,
@@ -37,7 +38,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { Badge } from "@/components/ui/badge";
 import { DocHeader } from "./DocHeader";
 import { DocNotes } from "./DocNotes";
-import { Check, GripVertical, Layers, Pencil, Plus, Sparkles, Trash2 } from "lucide-react";
+import { Check, ChevronDown, GripVertical, Layers, Pencil, Plus, Sparkles, Trash2 } from "lucide-react";
 
 export type CellKind = "o" | "p" | "k" | "s";
 export type CellTarget = { kind: CellKind; unitIdx: number; taskIdx: number };
@@ -159,17 +160,22 @@ function TaskRow({
           onCommit={(v) => onChange(renameTask(doc, unitIdx, taskIdx, v))}
           className="flex-1 text-sm font-medium"
         />
-        <select
-          className="rounded border bg-transparent px-1 py-0.5 text-xs text-muted-foreground"
-          title="任務級別（帶官方時自動填入，可改）"
-          value={level != null ? String(level) : ""}
-          onChange={(e) => onChange(setTaskLevel(doc, unitIdx, taskIdx, e.target.value))}
-        >
-          <option value="">級別 —</option>
-          {[1, 2, 3, 4, 5, 6].map((n) => (
-            <option key={n} value={n}>級別 {n}</option>
-          ))}
-        </select>
+        <OfficialMenu
+          trigger={
+            <button type="button" className="inline-flex items-center gap-0.5 rounded border px-1.5 py-0.5 text-xs text-muted-foreground hover:text-foreground" title="任務級別（帶官方時自動填入，可改）">
+              級別 {level != null ? level : "—"}<ChevronDown className="h-3 w-3" />
+            </button>
+          }
+          options={[1, 2, 3, 4, 5, 6].map((n) => ({
+            value: String(n),
+            label: `級別 ${n}`,
+            srcs: task._levelSrc && task._levelSrc.level === n
+              ? [{ ocs_code: task._levelSrc.ocs_code, occupation_name: task._levelSrc.occupation_name, code: "", task_code: task._levelSrc.task_code, task_name: task._levelSrc.task_name }]
+              : [],
+          }))}
+          selected={level != null ? String(level) : ""}
+          onPick={(v) => onChange(setTaskLevel(doc, unitIdx, taskIdx, v))}
+        />
         <button
           type="button"
           className="inline-flex items-center gap-1 rounded-md border border-violet-200 bg-violet-50 px-2 py-1 text-xs font-medium text-violet-700 hover:bg-violet-100"

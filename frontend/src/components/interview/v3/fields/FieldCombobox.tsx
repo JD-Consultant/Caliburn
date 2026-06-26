@@ -6,6 +6,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Button } from "@/components/ui/button";
 import { FieldText } from "./FieldText";
+import { SourceLine } from "./SourceLine";
 
 type Item = { code: string; name: string; _id?: string; _src?: "official" | "custom"; _ref?: SourceRef };
 const keyOf = (i: { code: string; name: string }) => i.code || "name:" + i.name;
@@ -88,21 +89,6 @@ export function FieldCombobox({
     onCommit(next);
   };
 
-  // 選單來源行（版面 A：Material 3 supporting text）：首個來源 + 多來源「+N」hover 全部。
-  const srcLine = (o: OptionItem) => {
-    const s = o.srcs ?? [];
-    if (s.length === 0) return null;
-    const first = s[0];
-    const more = s.length - 1;
-    const full = s.map((r) => `${r.occupation_name} ${r.ocs_code}`).join("\n");
-    return (
-      <div className="mt-0.5 text-[10px] text-muted-foreground" title={more > 0 ? full : undefined}>
-        來源:{first.occupation_name} · {first.ocs_code}
-        {more > 0 ? <span className="ml-1 rounded bg-muted px-1">+{more}</span> : null}
-      </div>
-    );
-  };
-
   const toggleList = (
     <CommandGroup>
       {options.map((o) => {
@@ -115,7 +101,7 @@ export function FieldCombobox({
                 {o.code ? <span className="font-mono text-xs text-muted-foreground">{o.code}</span> : null}
                 <span className="flex-1">{o.name}</span>
               </div>
-              {srcLine(o)}
+              <SourceLine srcs={o.srcs} />
             </div>
           </CommandItem>
         );

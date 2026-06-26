@@ -52,7 +52,10 @@ export function CellFillerPanel({
   const withSrc = (items: { code: string; name: string }[]) =>
     items.map((it) => ({
       ...it,
-      srcs: [{ ocs_code: unitSrc?.ocs_code ?? "", occupation_name: unitSrc?.occupation_name ?? "", code: it.code }],
+      srcs: [{
+        ocs_code: unitSrc?.ocs_code ?? "", occupation_name: unitSrc?.occupation_name ?? "",
+        code: it.code, task_code: taskCode, task_name: tn,
+      }],
     }));
 
   let combobox: React.ReactNode = null;

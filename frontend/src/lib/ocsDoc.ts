@@ -1,7 +1,7 @@
 // D27 OCS 文件的就地（immutable）更新與完成度計算。每任務一個 competency_block
 // → 都讀寫 competency_blocks[0]。完成度公式對齊後端 compute_completion：
 // filled = 1(表頭) + (A?1:0) + Σ_task[(O>0)+(P>0)+(K>0)+(S>0)]；total = 4*任務數 + 2。
-import type { CodeName, CompetencyBlock, Indicator, OcsDocument, OcsTask, OcuUnit } from "@/types";
+import type { CodeName, CompetencyBlock, Indicator, OcsDocument, OcsTask, OcuUnit, SourceRef } from "@/types";
 
 function clone(doc: OcsDocument): OcsDocument {
   return structuredClone(doc);
@@ -363,12 +363,22 @@ export function setTaskNotes(
 }
 
 // 設定單一任務的級別（competency_block.competency_level）。空字串→null。
-export function setTaskLevel(doc: OcsDocument, unitIdx: number, taskIdx: number, value: number | string | null): OcsDocument {
+// src 有值時（帶官方）一併記下任務的官方級別來源 _levelSrc（含任務；export 剝除）。
+export function setTaskLevel(
+  doc: OcsDocument,
+  unitIdx: number,
+  taskIdx: number,
+  value: number | string | null,
+  src?: SourceRef & { level: number },
+): OcsDocument {
   const next = clone(doc);
   const block = ensureBlock(next, unitIdx, taskIdx);
-  if (value === null || value === "") { block.competency_level = null; return next; }
-  const n = typeof value === "number" ? value : parseInt(value, 10);
-  block.competency_level = Number.isFinite(n) ? n : null;
+  if (value === null || value === "") block.competency_level = null;
+  else {
+    const n = typeof value === "number" ? value : parseInt(value, 10);
+    block.competency_level = Number.isFinite(n) ? n : null;
+  }
+  if (src) next.ocs_content.ocu_units[unitIdx].tasks[taskIdx]._levelSrc = src;
   return next;
 }
 

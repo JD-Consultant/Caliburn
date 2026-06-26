@@ -44,6 +44,9 @@ export function CellFillerPanel({
   const block = getBlock(document, unitIdx, taskIdx);
   const tn = taskName(document, unitIdx, taskIdx);
   const title = `${tn}：${TITLES[target.kind]}`;
+  // 任務範圍碼：T1.1 → O1.1.1 / P1.1.1（自訂時依任務遞增）。
+  const taskCode = document.ocs_content?.ocu_units?.[unitIdx]?.tasks?.[taskIdx]?.task_codes?.[0]?.code ?? "";
+  const taskNum = taskCode.replace(/^T/i, "");
 
   let combobox: React.ReactNode = null;
 
@@ -76,7 +79,7 @@ export function CellFillerPanel({
         value={block?.outputs ?? []}
         options={cat.outputs}
         customMode="footer"
-        autoCode="O"
+        autoCode={`O${taskNum}.`}
         onCommit={(items) => onSave(setOp(document, unitIdx, taskIdx, items, block?.indicators ?? []))}
       />
     );
@@ -88,7 +91,7 @@ export function CellFillerPanel({
         value={(block?.indicators ?? []).map((i) => ({ code: i.code, name: i.text }))}
         options={cat.indicators.map((i) => ({ code: i.code, name: i.text }))}
         customMode="footer"
-        autoCode="P"
+        autoCode={`P${taskNum}.`}
         onCommit={(items) =>
           onSave(
             setOp(

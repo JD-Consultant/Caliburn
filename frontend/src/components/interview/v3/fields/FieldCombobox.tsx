@@ -52,13 +52,16 @@ export function FieldCombobox({
     setQuery("");
   };
   const nextCode = (prefix: string) => {
+    const esc = prefix.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const re = new RegExp(`^${esc}(\\d+)$`);
     let max = 0;
-    const re = new RegExp(`^${prefix}(\\d+)$`);
     for (const c of [...value, ...options]) {
       const m = re.exec(c.code || "");
       if (m) max = Math.max(max, parseInt(m[1], 10));
     }
-    return `${prefix}${String(max + 1).padStart(2, "0")}`;
+    // 純字母前綴（A/K/S）補零到 2 位（A01）；含數字/點的任務範圍前綴（O1.1.）不補零（O1.1.1）。
+    const pad = /^[A-Za-z]+$/.test(prefix) ? 2 : 0;
+    return `${prefix}${String(max + 1).padStart(pad, "0")}`;
   };
   const confirmFooterAdd = () => {
     const n = cName.trim();

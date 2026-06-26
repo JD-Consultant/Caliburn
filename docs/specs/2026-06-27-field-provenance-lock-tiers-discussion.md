@@ -33,6 +33,7 @@
 - **F12 UI 不變原則**：只在下拉選單列加文字 + hover；文件/表格版型不動。🔒 類別官方列改唯讀屬「行為變更非版型」，且為使用者規範本身所要求。
 - **F13 export 剝除＝本專案後端遞迴清 `_` 欄位**：發現本專案後端 `build()`（`ocs_doc.py`）原為「逐一 pop 指定 key、且只到 unit/task 層」，不會清葉項目的 `_id`/`_src`/`_ref`。經使用者同意（「可以隨便改，要規範、主流架構、解耦」），改為遞迴 helper `_strip_underscore`（刪任意深度任何 `_` 開頭 key），一勞永逸涵蓋既有 `_pool/_uid/_tid/_notes` 與新欄位。註：此為**本專案後端**，與延後的 O/P 原始碼（indexer/catalog 端）無關。
 - **F14 多來源放 `OptionItem.srcs`、文件項 `_ref` 為單一 SourceRef**：spec §3 原將多來源寫成自我遞迴的 `SourceRef.sources?`；實作精化為——選單候選的多來源放 `OptionItem.srcs: SourceRef[]`，文件項 `_ref` 只記選中當下的首要來源。語意等價、較不自我遞迴。
+- **F15 CellFiller 的 O/P/K/S 由 chips 改「可編輯直式列」（layout="list"）**：執行時發現主表格只把 OPKS 當計數格、編輯都在 CellFiller，而 CellFiller 原用 pills（chips）只能加/刪、無法就地改字 → 無法實現「改官方 O 內容→變自訂」。經使用者拍板改成與「態度」一致的可編輯直式列（代碼 + 名稱輸入框 + 自訂標記 + 刪除）。屬計畫缺口的修正，已停下確認後再做。
 
 ## 3. 被否決 / 不採用的方案（為什麼不做）
 

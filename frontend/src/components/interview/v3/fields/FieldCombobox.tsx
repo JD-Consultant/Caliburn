@@ -82,6 +82,9 @@ export function FieldCombobox({
             <Check className={"h-3.5 w-3.5 " + (sel.has(k) ? "opacity-100" : "opacity-0")} />
             {o.code ? <span className="font-mono text-xs text-muted-foreground">{o.code}</span> : null}
             <span className="flex-1">{o.name}</span>
+            {value.some((e) => e.code && e.code === o.code && e.name !== o.name) ? (
+              <span className="ml-1 shrink-0 rounded bg-amber-100 px-1 text-[10px] text-amber-700">已改</span>
+            ) : null}
             {pillSources && (o.sources?.length ?? 0) > 1 ? <span className="text-[10px] text-sky-700">共 {o.sources!.length}</span> : null}
           </CommandItem>
         );

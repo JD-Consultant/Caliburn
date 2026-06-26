@@ -5,7 +5,7 @@
 // 並提供「選官方▾」下拉把官方 {code,name} 綁定帶入；工作描述/級別預填可改+帶官方。
 import { useState, type ReactNode } from "react";
 import { Check, ChevronDown, Plus, X } from "lucide-react";
-import type { OcsDocument, OptionItem } from "@/types";
+import type { CodeName, OcsDocument, OptionItem } from "@/types";
 import { useHeaderMeta } from "@/hooks/useDocument";
 import { categoryOptions, primaryOptions } from "@/lib/headerMeta";
 import {
@@ -32,6 +32,7 @@ const KINDS: { key: CatKind; label: string; codeLabel: string }[] = [
 ];
 
 const ekey = (i: { code: string; name: string }) => i.code || "name:" + i.name;
+const newId = () => (globalThis.crypto?.randomUUID?.() ?? `id-${Math.random().toString(36).slice(2)}`);
 
 // 每類別的「選/加 ▾」下拉：官方候選可勾選/取消勾選（toggle）；
 // 底部「＋」展開一列 代碼／名稱／[加] 加自訂。
@@ -65,13 +66,21 @@ function CategoryPicker({ options, existing, onToggle, onAddCustom }: {
             <CommandEmpty>無候選</CommandEmpty>
             <CommandGroup>
               {options.map((o) => (
-                <CommandItem key={ekey(o)} value={`${o.code} ${o.name}`} onSelect={() => onToggle(o)}>
-                  <Check className={"h-3.5 w-3.5 " + (has(o) ? "opacity-100" : "opacity-0")} />
-                  {o.code ? <span className="font-mono text-xs text-muted-foreground">{o.code}</span> : null}
-                  <span className="flex-1">{o.name}</span>
-                  {existing.some((e) => e.code && e.code === o.code && e.name !== o.name) ? (
-                    <span className="ml-1 shrink-0 rounded bg-amber-100 px-1 text-[10px] text-amber-700">已改</span>
-                  ) : null}
+                <CommandItem key={ekey(o)} value={`${o.code} ${o.name}`} onSelect={() => onToggle(o)} className="items-start">
+                  <Check className={"mt-0.5 h-3.5 w-3.5 " + (has(o) ? "opacity-100" : "opacity-0")} />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1">
+                      {o.code ? <span className="font-mono text-xs text-muted-foreground">{o.code}</span> : null}
+                      <span className="flex-1">{o.name}</span>
+                    </div>
+                    {(o.srcs?.length ?? 0) > 0 ? (
+                      <div className="mt-0.5 text-[10px] text-muted-foreground"
+                        title={o.srcs!.length > 1 ? o.srcs!.map((r) => `${r.occupation_name} ${r.ocs_code}`).join("\n") : undefined}>
+                        來源:{o.srcs![0].occupation_name} · {o.srcs![0].ocs_code}
+                        {o.srcs!.length > 1 ? <span className="ml-1 rounded bg-muted px-1">+{o.srcs!.length - 1}</span> : null}
+                      </div>
+                    ) : null}
+                  </div>
                 </CommandItem>
               ))}
             </CommandGroup>
@@ -97,17 +106,11 @@ function CategoryPicker({ options, existing, onToggle, onAddCustom }: {
   );
 }
 
-// 來源標記（只標非官方）：官方原樣→不標（乾淨像官方表）；edited→「已改」；custom→「自訂」。
-function Marker({ status, official }: {
-  status: "official" | "edited" | "custom";
-  official?: string;
-}) {
+// 來源標記（只標非官方）：官方→不標（乾淨像官方表）；custom→「自訂」。
+function Marker({ status }: { status: "official" | "custom" }) {
   if (status === "official") return null;
   return (
-    <span className="shrink-0 rounded bg-amber-100 px-1 py-0.5 text-[10px] text-amber-700"
-      title={status === "edited" ? `已改（官方原為：${official ?? ""}）` : "自訂項目"}>
-      {status === "edited" ? "已改" : "自訂"}
-    </span>
+    <span className="shrink-0 rounded bg-amber-100 px-1 py-0.5 text-[10px] text-amber-700" title="自訂項目">自訂</span>
   );
 }
 
@@ -149,27 +152,24 @@ export function DocHeader({ document: doc, profileId, onChange }: {
   const { data: meta } = useHeaderMeta(profileId, !!p.ocs_code);
   const opts = meta ? primaryOptions(meta) : [];
   const catOptions = (kind: CatKind): OptionItem[] => (meta ? categoryOptions(meta, kind) : []);
-  const catStatus = (kind: CatKind, e: { code: string; name: string }): "official" | "edited" | "custom" => {
-    const options = catOptions(kind);
-    if (!e.name && !e.code) return "custom";
-    if (options.some((o) => o.code === e.code && o.name === e.name)) return "official";
-    if (e.code && options.some((o) => o.code === e.code)) return "edited";
-    return "custom";
-  };
+  const catStatus = (e: { _src?: "official" | "custom" }): "official" | "custom" =>
+    e._src === "custom" ? "custom" : e._src === "official" ? "official" : "custom";
 
-  // 下拉勾選：官方項已在→取消（移除），不在→加入（綁定 name+code）。
+  // 下拉勾選：官方項已在→取消（移除），不在→加入（綁定 name+code + 來源 meta）。
   const toggleOfficial = (kind: CatKind, o: OptionItem) => {
     const existing = p.category?.[kind] ?? [];
     if (existing.some((e) => ekey(e) === ekey(o)))
       onChange(setCategory(doc, kind, existing.filter((e) => ekey(e) !== ekey(o))));
-    else
-      onChange(setCategory(doc, kind, [...existing, { code: o.code, name: o.name }]));
+    else {
+      const ref = o.srcs?.[0] ?? { ocs_code: "", occupation_name: "", code: o.code };
+      onChange(setCategory(doc, kind, [...existing, { code: o.code, name: o.name, _id: newId(), _src: "official", _ref: ref }]));
+    }
   };
   // 下拉底部「加自訂」：加一列 {code,name}（代碼/名稱皆可填）。
   const addCustom = (kind: CatKind, code: string, name: string) => {
     const existing = p.category?.[kind] ?? [];
     if (existing.some((e) => e.name === name && e.code === code)) return;
-    onChange(setCategory(doc, kind, [...existing, { code, name }]));
+    onChange(setCategory(doc, kind, [...existing, { code, name, _id: newId(), _src: "custom" }]));
   };
 
   // 攤平成多列：每類至少一列（空則一列可填的虛擬列）；子類別/代碼標籤只在該類第一列 rowSpan。
@@ -177,7 +177,7 @@ export function DocHeader({ document: doc, profileId, onChange }: {
     const entries = p.category?.[k.key] ?? [];
     const rows = entries.length ? entries : [{ name: "", code: "" }];
     return rows.map((e, i) => ({
-      ...k, idx: i, name: e.name, code: e.code,
+      ...k, idx: i, name: e.name, code: e.code, src: (e as CodeName)._src,
       real: i < entries.length, firstOfKind: i === 0, kindCount: rows.length,
     }));
   });
@@ -248,21 +248,26 @@ export function DocHeader({ document: doc, profileId, onChange }: {
             <td className={TD}>
               <div className="flex items-center gap-1.5">
                 <div className="min-w-0 flex-1">
-                  <FieldText value={r.name} placeholder="名稱（可自訂）"
-                    onCommit={(v) => onChange(upsertCategory(doc, r.key, r.idx, "name", v))} />
+                  {r.real && r.src === "official" ? (
+                    <span className="block px-1.5 py-1">{r.name}</span>
+                  ) : (
+                    <FieldText value={r.name} placeholder="名稱（可自訂）"
+                      onCommit={(v) => onChange(upsertCategory(doc, r.key, r.idx, "name", v))} />
+                  )}
                 </div>
-                {r.real ? (
-                  <Marker status={catStatus(r.key, { code: r.code, name: r.name })}
-                    official={catOptions(r.key).find((o) => o.code === r.code)?.name} />
-                ) : null}
+                {r.real ? <Marker status={catStatus({ _src: r.src })} /> : null}
               </div>
             </td>
             {r.firstOfKind ? <th className={TH} rowSpan={r.kindCount}>{r.codeLabel}</th> : null}
             <td className={TD}>
               <div className="flex items-center gap-1">
                 <div className="flex-1">
-                  <FieldText value={r.code} placeholder="代碼"
-                    onCommit={(v) => onChange(upsertCategory(doc, r.key, r.idx, "code", v))} />
+                  {r.real && r.src === "official" ? (
+                    <span className="block px-1.5 py-1 font-mono">{r.code}</span>
+                  ) : (
+                    <FieldText value={r.code} placeholder="代碼"
+                      onCommit={(v) => onChange(upsertCategory(doc, r.key, r.idx, "code", v))} />
+                  )}
                 </div>
                 {r.real ? (
                   <button type="button" className="shrink-0 text-muted-foreground hover:text-destructive" title="刪除此列" onClick={() => onChange(deleteCategory(doc, r.key, r.idx))}>

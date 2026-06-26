@@ -115,10 +115,11 @@ function Marker({ status }: { status: "official" | "custom" }) {
 }
 
 // 單值「選官方」選單：列官方候選，點一個即填入（值仍可在欄位編輯）。
-function OfficialMenu({ trigger, options, onPick }: {
+function OfficialMenu({ trigger, options, onPick, selected }: {
   trigger: ReactNode;
   options: { value: string; label: string; hint?: string; srcs?: SourceRef[] }[];
   onPick: (value: string) => void;
+  selected?: string; // 目前選中值（單選時打勾）；不傳＝不顯示勾（如 append 用途）
 }) {
   const [open, setOpen] = useState(false);
   return (
@@ -131,6 +132,9 @@ function OfficialMenu({ trigger, options, onPick }: {
             <CommandGroup>
               {options.map((o, i) => (
                 <CommandItem key={i} value={`${o.label}-${i}`} onSelect={() => { onPick(o.value); setOpen(false); }} className="items-start">
+                  {selected !== undefined ? (
+                    <Check className={"mt-0.5 h-3.5 w-3.5 " + (o.value === selected ? "opacity-100" : "opacity-0")} />
+                  ) : null}
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1">
                       <span className="flex-1 truncate">{o.label}</span>
@@ -208,6 +212,7 @@ export function DocHeader({ document: doc, profileId, onChange }: {
               <OfficialMenu
                 trigger={<button type="button" className="inline-flex items-center text-muted-foreground hover:text-foreground" title="選職能基準"><ChevronDown className="h-3.5 w-3.5" /></button>}
                 options={opts.map((o) => ({ value: o.ocs_code, label: `${o.ocs_code}　${o.occupation_name}` }))}
+                selected={p.ocs_code}
                 onPick={(code) => {
                   const o = opts.find((x) => x.ocs_code === code);
                   if (o) onChange(setPrimaryBasis(doc, { ocs_code: o.ocs_code, occupation_name: o.occupation_name, job_category_name: o.job_category_name || "" }));
@@ -328,6 +333,7 @@ export function DocHeader({ document: doc, profileId, onChange }: {
                   value: String(n), label: `級別 ${n}`,
                   srcs: opts.filter((o) => o.ocs_level === n).map((o) => ({ ocs_code: o.ocs_code, occupation_name: o.occupation_name, code: "" })),
                 }))}
+                selected={p.ocs_level != null ? String(p.ocs_level) : ""}
                 onPick={(v) => onChange(setOcsLevel(doc, v))}
               />
             </div>

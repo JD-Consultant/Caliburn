@@ -4,7 +4,7 @@
 // 拖拉排序；任務可跨職責拖拉。每任務 4 格（產出O/指標P/K/S）點擊開 filler。
 // 純呈現+結構編輯：所有變更經 onChange(newDoc) 交回上層 PATCH。不碰 CopilotKit。
 import { useEffect, useRef, useState } from "react";
-import type { CompetencyBlock, OcsDocument, OcsTask } from "@/types";
+import type { CompetencyBlock, OcsDocument, OcsTask, SourceRef } from "@/types";
 import {
   addTask,
   addUnit,
@@ -18,6 +18,7 @@ import {
   setTaskLevel,
 } from "@/lib/ocsDoc";
 import { useHeaderMeta } from "@/hooks/useDocument";
+import { useTaskLevel } from "@/hooks/useTaskCatalog";
 import { attitudeOptions } from "@/lib/headerMeta";
 import { FieldCombobox } from "./fields/FieldCombobox";
 import { OfficialMenu } from "./fields/OfficialMenu";
@@ -122,6 +123,8 @@ function TaskRow({
   task,
   unitIdx,
   taskIdx,
+  profileId,
+  unitSource,
   onCell,
   onStar,
   onChange,
@@ -131,6 +134,8 @@ function TaskRow({
   task: OcsTask;
   unitIdx: number;
   taskIdx: number;
+  profileId: string;
+  unitSource?: { ocs_code: string; occupation_name: string };
   onCell: (t: CellTarget) => void;
   onStar: (unitIdx: number, taskIdx: number, mode: "ai" | "catalog") => void;
   onChange: (d: OcsDocument) => void;
@@ -141,6 +146,17 @@ function TaskRow({
   const block = firstBlock(task);
   const level = block?.competency_level;
   const tc = task.task_codes?.[0];
+  // 級別來源：打開下拉時即時查該任務的官方級別（fallback 用帶官方時記下的 _levelSrc）。
+  const [levelOpen, setLevelOpen] = useState(false);
+  const fetchedLevel = useTaskLevel(profileId, tc?.code ?? "", levelOpen);
+  const officialLevel = fetchedLevel ?? task._levelSrc?.level ?? null;
+  const levelSrc: SourceRef = {
+    ocs_code: unitSource?.ocs_code ?? task._levelSrc?.ocs_code ?? "",
+    occupation_name: unitSource?.occupation_name ?? task._levelSrc?.occupation_name ?? "",
+    code: "",
+    task_code: tc?.code ?? "",
+    task_name: tc?.name ?? "",
+  };
 
   return (
     <div ref={setNodeRef} style={style} className="rounded-md border bg-background px-3 py-2">
@@ -169,11 +185,10 @@ function TaskRow({
           options={[1, 2, 3, 4, 5, 6].map((n) => ({
             value: String(n),
             label: `級別 ${n}`,
-            srcs: task._levelSrc && task._levelSrc.level === n
-              ? [{ ocs_code: task._levelSrc.ocs_code, occupation_name: task._levelSrc.occupation_name, code: "", task_code: task._levelSrc.task_code, task_name: task._levelSrc.task_name }]
-              : [],
+            srcs: officialLevel === n ? [levelSrc] : [],
           }))}
           selected={level != null ? String(level) : ""}
+          onOpenChange={setLevelOpen}
           onPick={(v) => onChange(setTaskLevel(doc, unitIdx, taskIdx, v))}
         />
         <button
@@ -216,6 +231,7 @@ function UnitRow({
   id,
   unit,
   unitIdx,
+  profileId,
   onCell,
   onStar,
   onChange,
@@ -224,6 +240,7 @@ function UnitRow({
   id: string;
   unit: OcsDocument["ocs_content"]["ocu_units"][number];
   unitIdx: number;
+  profileId: string;
   onCell: (t: CellTarget) => void;
   onStar: (unitIdx: number, taskIdx: number, mode: "ai" | "catalog") => void;
   onChange: (d: OcsDocument) => void;
@@ -263,6 +280,8 @@ function UnitRow({
               task={task}
               unitIdx={unitIdx}
               taskIdx={ti}
+              profileId={profileId}
+              unitSource={unit.source}
               onCell={onCell}
               onStar={onStar}
               onChange={onChange}
@@ -382,6 +401,7 @@ export function JobDocTable({
                   id={`u:${unit._uid}`}
                   unit={unit}
                   unitIdx={ui}
+                  profileId={profileId}
                   onCell={onCell}
                   onStar={onStar}
                   onChange={onChange}

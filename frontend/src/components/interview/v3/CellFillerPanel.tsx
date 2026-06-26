@@ -47,6 +47,13 @@ export function CellFillerPanel({
   // 任務範圍碼：T1.1 → O1.1.1 / P1.1.1（自訂時依任務遞增）。
   const taskCode = document.ocs_content?.ocu_units?.[unitIdx]?.tasks?.[taskIdx]?.task_codes?.[0]?.code ?? "";
   const taskNum = taskCode.replace(/^T/i, "");
+  // 候選來源＝該任務的來源職業（一個任務僅來自一個官方職業）。O/P 暫無原始碼。
+  const unitSrc = document.ocs_content?.ocu_units?.[unitIdx]?.source;
+  const withSrc = (items: { code: string; name: string }[]) =>
+    items.map((it) => ({
+      ...it,
+      srcs: [{ ocs_code: unitSrc?.ocs_code ?? "", occupation_name: unitSrc?.occupation_name ?? "", code: it.code }],
+    }));
 
   let combobox: React.ReactNode = null;
 
@@ -54,8 +61,9 @@ export function CellFillerPanel({
     combobox = (
       <FieldCombobox
         label="選知識 K"
+        layout="list"
         value={block?.knowledge ?? []}
-        options={cat.knowledge}
+        options={withSrc(cat.knowledge)}
         customMode="footer"
         autoCode="K"
         onCommit={(items) => onSave(setKS(document, unitIdx, taskIdx, "knowledge", items))}
@@ -65,8 +73,9 @@ export function CellFillerPanel({
     combobox = (
       <FieldCombobox
         label="選技能 S"
+        layout="list"
         value={block?.skills ?? []}
-        options={cat.skills}
+        options={withSrc(cat.skills)}
         customMode="footer"
         autoCode="S"
         onCommit={(items) => onSave(setKS(document, unitIdx, taskIdx, "skills", items))}
@@ -76,8 +85,9 @@ export function CellFillerPanel({
     combobox = (
       <FieldCombobox
         label="選產出 O"
+        layout="list"
         value={block?.outputs ?? []}
-        options={cat.outputs}
+        options={withSrc(cat.outputs)}
         customMode="footer"
         autoCode={`O${taskNum}.`}
         onCommit={(items) => onSave(setOp(document, unitIdx, taskIdx, items, block?.indicators ?? []))}
@@ -88,8 +98,9 @@ export function CellFillerPanel({
     combobox = (
       <FieldCombobox
         label="選指標 P"
-        value={(block?.indicators ?? []).map((i) => ({ code: i.code, name: i.text }))}
-        options={cat.indicators.map((i) => ({ code: i.code, name: i.text }))}
+        layout="list"
+        value={(block?.indicators ?? []).map((i) => ({ code: i.code, name: i.text, _id: i._id, _src: i._src, _ref: i._ref }))}
+        options={withSrc(cat.indicators.map((i) => ({ code: i.code, name: i.text })))}
         customMode="footer"
         autoCode={`P${taskNum}.`}
         onCommit={(items) =>
@@ -99,7 +110,7 @@ export function CellFillerPanel({
               unitIdx,
               taskIdx,
               block?.outputs ?? [],
-              items.map((i) => ({ code: i.code, text: i.name })),
+              items.map((i) => ({ code: i.code, text: i.name, _id: i._id, _src: i._src, _ref: i._ref })),
             ),
           )
         }

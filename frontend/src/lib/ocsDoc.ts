@@ -24,6 +24,17 @@ function emptyTask(): OcsTask {
   };
 }
 
+// 位置序碼：字母前綴補零 2 位（A→A01）；含點/數字前綴不補零（O1.1.→O1.1.1）。
+export function positionalCode(prefix: string, idx: number): string {
+  const pad = /^[A-Za-z]+$/.test(prefix) ? 2 : 0;
+  return `${prefix}${String(idx + 1).padStart(pad, "0")}`;
+}
+
+// 依陣列位置就地重寫每筆 code（身分由 _id 維持，故重編不影響來源/自訂判定）。
+function renumberCoded<T extends { code: string }>(items: T[], prefix: string): void {
+  items.forEach((it, i) => { it.code = positionalCode(prefix, i); });
+}
+
 // 補上缺少的穩定 id（dnd 用）。新載入的文件（seed/build 來的）沒有 id → 在此補。
 export function ensureIds(doc: OcsDocument | undefined): OcsDocument | undefined {
   if (!doc) return doc;
@@ -32,7 +43,17 @@ export function ensureIds(doc: OcsDocument | undefined): OcsDocument | undefined
     if (!u._uid) u._uid = uid();
     for (const t of u.tasks ?? []) {
       if (!t._tid) t._tid = uid();
+      const b = t.competency_blocks?.[0];
+      if (b) {
+        for (const arr of [b.outputs, b.indicators, b.knowledge, b.skills]) {
+          for (const it of arr ?? []) if (!it._id) it._id = uid();
+        }
+      }
     }
+  }
+  for (const a of next.ocs_attitude?.attitudes ?? []) if (!a._id) a._id = uid();
+  for (const kind of ["job_categories", "occupations", "industries"] as const) {
+    for (const c of next.ocs_profile?.category?.[kind] ?? []) if (!c._id) c._id = uid();
   }
   return next;
 }

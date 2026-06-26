@@ -27,4 +27,4 @@ def test_task_competencies_unknown_task_code_is_empty():
     pool = CompetencyPool(ocs_code="OC1",
                           knowledge=[_item("K", "K01", name="k1", task_codes=["T1.1"])])
     assert task_competencies(pool, "T9.9") == {
-        "knowledge": [], "skills": [], "outputs": [], "indicators": []}
+        "knowledge": [], "skills": [], "outputs": [], "indicators": [], "competency_level": None}

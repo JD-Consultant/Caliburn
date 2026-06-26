@@ -275,11 +275,12 @@ export function AiTaskPanel({
       "skills",
       staged.skills.filter((k) => k.checked).map((k) => ({ code: k.code, name: k.name })),
     );
-    // 級別：官方帶入「填空不覆寫」——任務尚未設級別時才自動填入官方級別 + 記來源（含任務）。
-    if (catalogLevel != null && getBlock(d, unitIdx, taskIdx)?.competency_level == null) {
+    // 級別：帶官方時「一律記下官方來源（含任務）」；級別「值」維持填空不覆寫（不蓋使用者已改）。
+    if (catalogLevel != null) {
       const u = document.ocs_content?.ocu_units?.[unitIdx];
       const t = u?.tasks?.[taskIdx];
-      d = setTaskLevel(d, unitIdx, taskIdx, catalogLevel, {
+      const cur = getBlock(d, unitIdx, taskIdx)?.competency_level;
+      d = setTaskLevel(d, unitIdx, taskIdx, cur == null ? catalogLevel : cur, {
         ocs_code: u?.source?.ocs_code ?? "",
         occupation_name: u?.source?.occupation_name ?? "",
         code: "",

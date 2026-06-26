@@ -5,13 +5,14 @@ import type { OptionItem } from "@/types";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Button } from "@/components/ui/button";
+import { FieldText } from "./FieldText";
 
 type Item = { code: string; name: string };
 const keyOf = (i: { code: string; name: string }) => i.code || "name:" + i.name;
 
 export function FieldCombobox({
   label, value, options, allowCustom = false, onCommit, pillSources = false,
-  layout = "pills", title, customMode = "search", footerWithCode = true, autoCode,
+  layout = "pills", title, customMode = "search", footerWithCode = true, autoCode, editMultiline = false,
 }: {
   label: string;
   value: Item[];
@@ -27,6 +28,8 @@ export function FieldCombobox({
   footerWithCode?: boolean;
   // 設了前綴（如 "A"）→ 自訂只填名稱、代碼自動遞增（A01、A02…）。
   autoCode?: string;
+  // list 模式名稱欄是否多行（長文字如補充說明）。
+  editMultiline?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -128,15 +131,30 @@ export function FieldCombobox({
     </Command>
   );
 
+  const statusOf = (item: Item): "official" | "edited" | "custom" => {
+    if (options.some((o) => o.code === item.code && o.name === item.name)) return "official";
+    if (item.code && options.some((o) => o.code === item.code)) return "edited";
+    return "custom";
+  };
+  const officialNameOf = (code: string) => options.find((o) => o.code === code)?.name ?? "";
+
   const selectedView = layout === "list" ? (
     <div className="space-y-1">
-      {value.map((v) => {
-        const k = keyOf(v);
+      {value.map((v, idx) => {
+        const status = statusOf(v);
         return (
-          <div key={k} className="flex items-start gap-2 rounded-md border bg-background px-2 py-1 text-sm">
-            {v.code ? <span className="shrink-0 font-mono text-xs text-muted-foreground">{v.code}</span> : null}
-            <span className="flex-1">{v.name}</span>
-            <button type="button" className="mt-0.5 shrink-0 text-muted-foreground hover:text-destructive" onClick={() => remove(k)}><X className="h-3.5 w-3.5" /></button>
+          <div key={`${keyOf(v)}-${idx}`} className="flex items-start gap-2">
+            {v.code ? <span className="mt-2 shrink-0 font-mono text-xs text-muted-foreground">{v.code}</span> : null}
+            <div className="min-w-0 flex-1">
+              <FieldText value={v.name} multiline={editMultiline}
+                onCommit={(name) => onCommit(value.map((x, i) => (i === idx ? { ...x, name } : x)))} />
+            </div>
+            {status === "edited" ? (
+              <span className="mt-2 shrink-0 rounded bg-amber-100 px-1 text-[10px] text-amber-700" title={`已改（官方原為：${officialNameOf(v.code)}）`}>已改</span>
+            ) : status === "custom" ? (
+              <span className="mt-2 shrink-0 rounded bg-amber-100 px-1 text-[10px] text-amber-700" title="自訂項目">自訂</span>
+            ) : null}
+            <button type="button" className="mt-2 shrink-0 text-muted-foreground hover:text-destructive" onClick={() => onCommit(value.filter((_, i) => i !== idx))}><X className="h-3.5 w-3.5" /></button>
           </div>
         );
       })}

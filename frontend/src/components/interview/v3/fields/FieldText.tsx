@@ -7,14 +7,23 @@ export function FieldText({
 }: { value: string; placeholder?: string; multiline?: boolean; official?: string; onCommit: (v: string) => void }) {
   const [draft, setDraft] = useState(value);
   const focused = useRef(false);
+  const taRef = useRef<HTMLTextAreaElement>(null);
   // value 變且未聚焦 → 同步（反映自動帶入/綁定/外部寫入）
   useEffect(() => { if (!focused.current) setDraft(value); }, [value]);
+  // 自動長高/縮短：高度貼合內容。
+  useEffect(() => {
+    if (!multiline) return;
+    const el = taRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${el.scrollHeight}px`;
+  }, [draft, multiline]);
   const commit = () => { if (draft !== value) onCommit(draft); };
   const cls = "w-full rounded-md border px-2.5 py-1.5 text-sm focus:outline-none";
   return (
     <div className="space-y-1">
       {multiline ? (
-        <textarea className={cls} rows={3} placeholder={placeholder} value={draft}
+        <textarea ref={taRef} className={cls + " resize-none overflow-hidden"} rows={2} placeholder={placeholder} value={draft}
           onFocus={() => (focused.current = true)} onBlur={() => { focused.current = false; commit(); }}
           onChange={(e) => setDraft(e.target.value)} />
       ) : (

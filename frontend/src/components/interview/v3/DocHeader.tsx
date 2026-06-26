@@ -3,7 +3,7 @@
 // D27 官方職能基準「表頭」版型（5 欄對齊官方表格，可編輯/可自訂）。
 // 代碼↔名稱綁定（選官方基準下拉）；所屬類別三類各列為 名稱|代碼（可手打自訂、加列刪列），
 // 並提供「選官方▾」下拉把官方 {code,name} 綁定帶入；工作描述/級別預填可改+帶官方。
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { Check, ChevronDown, Plus, X } from "lucide-react";
 import type { OcsDocument, OptionItem } from "@/types";
 import { useHeaderMeta } from "@/hooks/useDocument";
@@ -19,9 +19,8 @@ import {
   type CatKind,
 } from "@/lib/ocsDoc";
 import { FieldText } from "./fields/FieldText";
-import { FieldBoundSelect } from "./fields/FieldBoundSelect";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
 
 const TH = "border bg-muted/50 px-3 py-2 text-left align-middle font-medium whitespace-nowrap";
 const TD = "border align-middle px-1";
@@ -62,7 +61,6 @@ function CategoryPicker({ options, existing, onToggle, onAddCustom }: {
       </PopoverTrigger>
       <PopoverContent className="w-72">
         <Command>
-          <CommandInput placeholder="搜尋官方…" />
           <CommandList>
             <CommandEmpty>無候選</CommandEmpty>
             <CommandGroup>
@@ -110,6 +108,35 @@ function Marker({ status, official }: {
   );
 }
 
+// 單值「選官方」選單：列官方候選，點一個即填入（值仍可在欄位編輯）。
+function OfficialMenu({ trigger, options, onPick }: {
+  trigger: ReactNode;
+  options: { value: string; label: string; hint?: string }[];
+  onPick: (value: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>{trigger}</PopoverTrigger>
+      <PopoverContent className="w-72">
+        <Command>
+          <CommandList>
+            <CommandEmpty>無官方候選</CommandEmpty>
+            <CommandGroup>
+              {options.map((o, i) => (
+                <CommandItem key={i} value={`${o.label}-${i}`} onSelect={() => { onPick(o.value); setOpen(false); }}>
+                  <span className="flex-1 truncate">{o.label}</span>
+                  {o.hint ? <span className="ml-1 shrink-0 text-[10px] text-sky-700">{o.hint}</span> : null}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
 export function DocHeader({ document: doc, profileId, onChange }: {
   document: OcsDocument;
   profileId: string;
@@ -118,7 +145,6 @@ export function DocHeader({ document: doc, profileId, onChange }: {
   const p = doc.ocs_profile;
   const { data: meta } = useHeaderMeta(profileId, !!p.ocs_code);
   const opts = meta ? primaryOptions(meta) : [];
-  const cur = opts.find((o) => o.ocs_code === p.ocs_code);
   const catOptions = (kind: CatKind): OptionItem[] => (meta ? categoryOptions(meta, kind) : []);
   const catStatus = (kind: CatKind, e: { code: string; name: string }): "official" | "edited" | "custom" => {
     const options = catOptions(kind);
@@ -159,18 +185,23 @@ export function DocHeader({ document: doc, profileId, onChange }: {
         <col className="w-24" /><col className="w-20" /><col /><col className="w-24" /><col className="w-32" />
       </colgroup>
       <tbody>
-        {/* 職能基準代碼（綁定下拉：選官方基準 → code+名稱一起帶） */}
+        {/* 職能基準代碼：▾ 在標籤旁，選官方基準 → code+名稱綁定一起帶；值顯示於格 */}
         <tr>
-          <th className={TH} colSpan={2}>職能基準代碼</th>
+          <th className={TH} colSpan={2}>
+            <div className="flex items-center justify-between gap-1">
+              <span>職能基準代碼</span>
+              <OfficialMenu
+                trigger={<button type="button" className="inline-flex items-center text-muted-foreground hover:text-foreground" title="選職能基準"><ChevronDown className="h-3.5 w-3.5" /></button>}
+                options={opts.map((o) => ({ value: o.ocs_code, label: `${o.ocs_code}　${o.occupation_name}` }))}
+                onPick={(code) => {
+                  const o = opts.find((x) => x.ocs_code === code);
+                  if (o) onChange(setPrimaryBasis(doc, { ocs_code: o.ocs_code, occupation_name: o.occupation_name, job_category_name: o.job_category_name || "" }));
+                }}
+              />
+            </div>
+          </th>
           <td className={TD} colSpan={3}>
-            <FieldBoundSelect
-              value={{ ocs_code: p.ocs_code, name: p.ocs_name?.occupation_name ?? "" }}
-              options={opts.map((o) => ({ ocs_code: o.ocs_code, name: o.occupation_name }))}
-              onCommit={(o) => onChange(setPrimaryBasis(doc, {
-                ocs_code: o.ocs_code, occupation_name: o.name,
-                job_category_name: opts.find((x) => x.ocs_code === o.ocs_code)?.job_category_name || "",
-              }))}
-            />
+            <span className="px-1.5 font-mono text-sm">{p.ocs_code || "—"}</span>
           </td>
         </tr>
 
@@ -182,14 +213,14 @@ export function DocHeader({ document: doc, profileId, onChange }: {
           </th>
           <th className={TH}>職類</th>
           <td className={TD} colSpan={3}>
-            <FieldText value={p.ocs_name?.job_category_name ?? ""} placeholder="職類名稱" official={cur?.job_category_name ?? ""}
+            <FieldText value={p.ocs_name?.job_category_name ?? ""} placeholder="職類名稱"
               onCommit={(v) => onChange(setOcsName(doc, "job_category_name", v))} />
           </td>
         </tr>
         <tr>
           <th className={TH}>職業</th>
           <td className={TD} colSpan={3}>
-            <FieldText value={p.ocs_name?.occupation_name ?? ""} placeholder="職業名稱" official={cur?.occupation_name ?? ""}
+            <FieldText value={p.ocs_name?.occupation_name ?? ""} placeholder="職業名稱"
               onCommit={(v) => onChange(setOcsName(doc, "occupation_name", v))} />
           </td>
         </tr>
@@ -240,21 +271,38 @@ export function DocHeader({ document: doc, profileId, onChange }: {
           </tr>
         ))}
 
-        {/* 工作描述（預填可改 + 帶官方） */}
+        {/* 工作描述：▾ 在標籤旁（同所屬類別），textarea 自動長高/縮短 */}
         <tr>
-          <th className={TH} colSpan={2}>工作描述</th>
+          <th className={TH} colSpan={2}>
+            <div className="flex items-center justify-between gap-1">
+              <span>工作描述</span>
+              <OfficialMenu
+                trigger={<button type="button" className="inline-flex items-center text-muted-foreground hover:text-foreground" title="選官方描述"><ChevronDown className="h-3.5 w-3.5" /></button>}
+                options={opts.filter((o) => o.job_description).map((o) => ({ value: o.job_description, label: `${o.ocs_code}　${o.occupation_name}`, hint: "官方" }))}
+                onPick={(v) => onChange(setProfileField(doc, "job_description", v))}
+              />
+            </div>
+          </th>
           <td className={TD} colSpan={3}>
-            <FieldText multiline value={p.job_description ?? ""} placeholder="（本職務的工作描述）" official={cur?.job_description ?? ""}
+            <FieldText multiline value={p.job_description ?? ""} placeholder="（本職務的工作描述）"
               onCommit={(v) => onChange(setProfileField(doc, "job_description", v))} />
           </td>
         </tr>
 
-        {/* 基準級別 */}
+        {/* 基準級別：▾ 在標籤旁（同所屬類別），值顯示於格 */}
         <tr>
-          <th className={TH} colSpan={2}>基準級別</th>
+          <th className={TH} colSpan={2}>
+            <div className="flex items-center justify-between gap-1">
+              <span>基準級別</span>
+              <OfficialMenu
+                trigger={<button type="button" className="inline-flex items-center text-muted-foreground hover:text-foreground" title="選級別"><ChevronDown className="h-3.5 w-3.5" /></button>}
+                options={[1, 2, 3, 4, 5, 6].map((n) => ({ value: String(n), label: `級別 ${n}`, hint: opts.some((o) => o.ocs_level === n) ? "官方" : undefined }))}
+                onPick={(v) => onChange(setOcsLevel(doc, v))}
+              />
+            </div>
+          </th>
           <td className={TD} colSpan={3}>
-            <FieldText value={p.ocs_level != null ? String(p.ocs_level) : ""} placeholder="—" official={cur?.ocs_level != null ? String(cur.ocs_level) : ""}
-              onCommit={(v) => onChange(setOcsLevel(doc, v))} />
+            <span className="px-1.5 text-sm">{p.ocs_level != null ? `級別 ${p.ocs_level}` : "—"}</span>
           </td>
         </tr>
       </tbody>

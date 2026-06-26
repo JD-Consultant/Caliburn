@@ -377,7 +377,7 @@ export function JobDocTable({
       </div>
 
       {/* 說明與補充事項（可編輯） */}
-      <DocNotes document={document} onChange={onChange} />
+      <DocNotes document={document} profileId={profileId} onChange={onChange} />
     </div>
   );
 }

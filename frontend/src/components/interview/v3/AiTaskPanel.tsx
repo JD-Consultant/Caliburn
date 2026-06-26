@@ -13,7 +13,7 @@ import type {
   OutputSuggestion,
 } from "@/types";
 import { clarify, draftOP, recommendKS } from "@/lib/api";
-import { getTaskNotes, setKS, setOp, setTaskNotes } from "@/lib/ocsDoc";
+import { getBlock, getTaskNotes, setKS, setOp, setTaskLevel, setTaskNotes } from "@/lib/ocsDoc";
 import { Button } from "@/components/ui/button";
 
 type CheckedKs = KsSuggestion & { checked: boolean };
@@ -178,6 +178,7 @@ export function AiTaskPanel({
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [staged, setStaged] = useState<Staged | null>(null);
+  const [catalogLevel, setCatalogLevel] = useState<number | null>(null);
   const [clarifyQ, setClarifyQ] = useState<string | null>(null);
   const [clarifyAsked, setClarifyAsked] = useState(false);
   const [clarifyAnswer, setClarifyAnswer] = useState("");
@@ -214,6 +215,7 @@ export function AiTaskPanel({
         knowledge: ks.knowledge.map((k) => ({ ...k, checked: true })),
         skills: ks.skills.map((s) => ({ ...s, checked: true })),
       });
+      setCatalogLevel(ks.competency_level ?? null);
       setClarifyQ(cl.question);
     } catch (e: unknown) {
       setErr(e instanceof Error ? e.message : "產生失敗");
@@ -273,6 +275,10 @@ export function AiTaskPanel({
       "skills",
       staged.skills.filter((k) => k.checked).map((k) => ({ code: k.code, name: k.name })),
     );
+    // 級別：官方帶入「填空不覆寫」——任務尚未設級別時才自動填入官方級別。
+    if (catalogLevel != null && getBlock(d, unitIdx, taskIdx)?.competency_level == null) {
+      d = setTaskLevel(d, unitIdx, taskIdx, catalogLevel);
+    }
     d = setTaskNotes(d, unitIdx, taskIdx, buildNote());
     onApply(d);
   };

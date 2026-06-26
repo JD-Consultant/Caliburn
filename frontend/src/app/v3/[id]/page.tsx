@@ -160,6 +160,7 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
             <div className="min-w-0 flex-1">
               <JobDocTable
                 document={doc}
+                profileId={id}
                 onCell={setTarget}
                 onStar={(unitIdx, taskIdx, mode) => setStarTarget({ unitIdx, taskIdx, mode })}
                 onChange={(d) => persist(d)}

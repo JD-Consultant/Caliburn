@@ -257,11 +257,13 @@ function UnitRow({
 
 export function JobDocTable({
   document,
+  profileId,
   onCell,
   onStar,
   onChange,
 }: {
   document: OcsDocument;
+  profileId: string;
   onCell: (target: CellTarget) => void;
   onStar: (unitIdx: number, taskIdx: number, mode: "ai" | "catalog") => void;
   onChange: (d: OcsDocument) => void;
@@ -310,7 +312,7 @@ export function JobDocTable({
   return (
     <div className="space-y-5">
       {/* 官方職能基準表頭（可編輯） */}
-      <DocHeader document={document} onChange={onChange} />
+      <DocHeader document={document} profileId={profileId} onChange={onChange} />
 
       {/* 單元 → 任務（可拖拉） */}
       {units.length === 0 ? (

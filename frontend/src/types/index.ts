@@ -30,14 +30,28 @@ export interface JobProfile {
 // of-record = 一份合法 OCS JSON（jd-pdf-to-json 契約）。MVP 採「每任務一個
 // competency_block」；K/S/A item 為 {code,name}（code 可空字串），P 為 {code,text}。
 
+export type ItemSource = "official" | "custom";
+
+export interface SourceRef {
+  ocs_code: string;        // 來源官方基準碼，如 INM3513-009v1
+  occupation_name: string; // 來源職業名，如 AIoT應用工程師
+  code: string;            // 該項在來源文件的原始碼（O1.1.1 / K01 / INM；O/P 暫為 ""）
+}
+
 export interface CodeName {
   code: string;
   name: string;
+  _id?: string;            // 穩定 UUID：dnd/編輯 key + 排序錨點
+  _src?: ItemSource;       // 來源；加入當下即定
+  _ref?: SourceRef;        // 官方來源；改內容→清空（轉自訂）
 }
 
 export interface Indicator {
   code: string;
   text: string;
+  _id?: string;
+  _src?: ItemSource;
+  _ref?: SourceRef;
 }
 
 export interface CompetencyBlock {
@@ -219,5 +233,6 @@ export interface ClarifyResult {
 export interface OptionItem {
   code: string;
   name: string;
-  sources?: string[];
+  sources?: string[];      // 既有：ocs_code 清單（向後相容）
+  srcs?: SourceRef[];      // 新：完整來源（選單顯示用；首個 + 其餘）
 }

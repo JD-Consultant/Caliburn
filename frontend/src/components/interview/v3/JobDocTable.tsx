@@ -3,6 +3,7 @@
 // D27 工作台主表（兩層、可編輯、可拖拉）。職責(unit)→任務(task)，皆可改名/增/刪/
 // 拖拉排序；任務可跨職責拖拉。每任務 4 格（產出O/指標P/K/S）點擊開 filler。
 // 純呈現+結構編輯：所有變更經 onChange(newDoc) 交回上層 PATCH。不碰 CopilotKit。
+import { useEffect, useRef, useState } from "react";
 import type { CompetencyBlock, OcsDocument, OcsTask } from "@/types";
 import {
   addTask,
@@ -13,7 +14,11 @@ import {
   renameTask,
   renameUnit,
   reorderUnits,
+  setAttitudes,
 } from "@/lib/ocsDoc";
+import { useHeaderMeta } from "@/hooks/useDocument";
+import { attitudeOptions } from "@/lib/headerMeta";
+import { FieldCombobox } from "./fields/FieldCombobox";
 import {
   DndContext,
   PointerSensor,
@@ -57,16 +62,24 @@ function EditableText({
   onCommit: (v: string) => void;
   className?: string;
 }) {
+  const [draft, setDraft] = useState(value);
+  const focused = useRef(false);
+  useEffect(() => {
+    if (!focused.current) setDraft(value);
+  }, [value]);
   return (
     <input
-      defaultValue={value}
+      value={draft}
       placeholder={placeholder}
-      onBlur={(e) => {
-        if (e.target.value !== value) onCommit(e.target.value);
+      onFocus={() => (focused.current = true)}
+      onBlur={() => {
+        focused.current = false;
+        if (draft !== value) onCommit(draft);
       }}
       onKeyDown={(e) => {
         if (e.key === "Enter") e.currentTarget.blur();
       }}
+      onChange={(e) => setDraft(e.target.value)}
       className={
         "rounded border border-transparent bg-transparent px-1 py-0.5 hover:border-input focus:border-input focus:bg-background focus:outline-none " +
         className
@@ -255,6 +268,30 @@ function UnitRow({
   );
 }
 
+function AttitudeBlock({
+  document: doc,
+  profileId,
+  onChange,
+}: {
+  document: OcsDocument;
+  profileId: string;
+  onChange: (d: OcsDocument) => void;
+}) {
+  const { data: meta } = useHeaderMeta(profileId, !!doc.ocs_profile.ocs_code);
+  return (
+    <div className="rounded-lg border bg-background p-4">
+      <p className="mb-2 text-sm font-medium">職能內涵（A=態度，全職類共用）</p>
+      <FieldCombobox
+        label="選態度"
+        value={doc.ocs_attitude?.attitudes ?? []}
+        options={meta ? attitudeOptions(meta) : []}
+        allowCustom
+        onCommit={(items) => onChange(setAttitudes(doc, items))}
+      />
+    </div>
+  );
+}
+
 export function JobDocTable({
   document,
   profileId,
@@ -269,7 +306,6 @@ export function JobDocTable({
   onChange: (d: OcsDocument) => void;
 }) {
   const units = document.ocs_content?.ocu_units ?? [];
-  const attitudes = document.ocs_attitude?.attitudes ?? [];
   const unitIds = units.map((u) => `u:${u._uid}`);
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
@@ -350,31 +386,7 @@ export function JobDocTable({
       </button>
 
       {/* 職能內涵（A=attitude 態度） */}
-      <div className="rounded-lg border bg-background p-4">
-        <div className="mb-2 flex items-center justify-between">
-          <span className="text-sm font-medium">職能內涵（A=attitude 態度）</span>
-          <button
-            type="button"
-            className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-xs text-muted-foreground hover:text-foreground"
-            onClick={() => onCell({ kind: "a" })}
-          >
-            <Pencil className="h-3 w-3" />
-            {attitudes.length > 0 ? "編輯" : "點此填"}
-          </button>
-        </div>
-        {attitudes.length > 0 ? (
-          <ul className="space-y-1 text-sm">
-            {attitudes.map((a, i) => (
-              <li key={`${a.code || a.name}-${i}`} className="flex gap-2">
-                {a.code ? <span className="shrink-0 font-mono text-xs text-muted-foreground">{a.code}</span> : null}
-                <span>{a.name}</span>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-xs text-muted-foreground">尚未選擇態度。</p>
-        )}
-      </div>
+      <AttitudeBlock document={document} profileId={profileId} onChange={onChange} />
 
       {/* 說明與補充事項（可編輯） */}
       <DocNotes document={document} profileId={profileId} onChange={onChange} />

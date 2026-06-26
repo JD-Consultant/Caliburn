@@ -11,16 +11,19 @@
 
 ## Scope
 
-**In（本 spec）**
+**In — Phase 1（表頭/說明）**
 - 表頭 `DocHeader`：代碼/名稱、所屬類別（職類別/職業別/行業別）、工作描述、基準級別。
 - 說明 `DocNotes`：應備資格、補充說明。
 - 態度 A（目前由 CellFiller(a) + HeaderMetaPanel 編輯）→ 納入同 combobox 範式。
 - 刪除 `HeaderMetaPanel` 側面板（行為折進 inline）。
 - 狀態/儲存管線：`usePatchDocument` 升級樂觀 + debounced；新 `<FieldCombobox>` / `<FieldText>` 元件；共享候選 hooks。
 
-**Out（後續增量，非本 spec）**
-- 每任務 O/P/K/S 自動帶入：同範式套用，但 **inline 於格子 vs 維持 CellFiller/AiTaskPanel 面板**尚未定 → 另開增量。
-- 未來 LLM/CopilotKit 整合（目前 CopilotKit 大概率重設計；本 spec 只守「LLM 相容三原則」鋪路，不實作）。
+**In — Phase 2（任務 O/P/K/S，D13）**
+- `CellFillerPanel` 每格抽屜升級成 combobox 範式（官方候選＝`task_competencies` 依 task_code；預勾+pills+自訂+該格帶官方）。
+- 任務列保留「帶官方」一鍵整任務（沿用現〔帶 catalog〕）+ 保留 ✨AI(5W2H)；**AI/LLM 內部不改，只保留按鈕**。
+
+**Out（非本 spec）**
+- 未來 LLM/CopilotKit 整合（目前 CopilotKit 大概率重設計；本 spec 只守「LLM 相容三原則」鋪路，不實作；AI 面板內部邏輯不動）。
 - 兩條編輯路徑（工作台 vs guided interrupt）長遠收斂。
 
 ## 決策摘要（D1–D12，詳見討論記錄）
@@ -37,6 +40,7 @@
 - **D10** 狀態架構＝react-query 樂觀(`onMutate`) + 欄位隔離（手刻）；不引 RHF、不用 React 19 Actions。
 - **D11** 自動帶入呈現＝**選單內預勾 + 外部可移除 pills + 每欄/區重拉鈕**；不盲目一鍵寫死；自由文字欄預填可改。
 - **D12** 所屬類別三類各自 **name↔code 綁定**（選官方 {code,name} pair 一起帶；自訂可手填、code 可空）。
+- **D13** 任務 O/P/K/S＝**每格側邊抽屜（一次一格）升級 combobox** + 任務列「帶官方」一鍵整任務 + 保留 ✨AI；候選＝`task_competencies` 依 task_code；**AI/LLM 內部不改**。
 
 ## 架構
 
@@ -97,7 +101,9 @@
 | `components/interview/v3/DocHeader.tsx` | **重寫**：各格改用 Field* 元件（D11/D12）|
 | `components/interview/v3/DocNotes.tsx` | **重寫**：改 `<FieldCombobox allowCustom>` |
 | `components/interview/v3/HeaderMetaPanel.tsx` | **刪除**（行為折進 inline；確認無其他引用）|
-| `components/interview/v3/JobDocTable.tsx` `EditableText` | **改受控**（D7）；A 區改用 FieldCombobox |
+| `components/interview/v3/JobDocTable.tsx` `EditableText` | **改受控**（D7）；A 區改用 FieldCombobox；任務格顯示摘要 pills、保留列上「帶官方」+✨按鈕（Phase 2）|
+| `components/interview/v3/CellFillerPanel.tsx` | **Phase 2 升級**：每格抽屜改用 `<FieldCombobox>`（O/P/K/S 四格皆官方候選=task_competencies；預勾+pills+自訂+該格帶官方）|
+| `components/interview/v3/AiTaskPanel.tsx` | **保留**（✨5W2H + 帶 catalog）；**內部 LLM 邏輯不改**，只跟著欄位/型別 rename 微調 |
 | `lib/ocsDoc.ts` setters | 沿用既有 `setPrimaryBasis/setOcsName/setProfileField/setOcsLevel/setCategory/upsertCategory/addCategory/deleteCategory/setAttitudes/setNotes`；視綁定需求補小 setter |
 | `types/index.ts` | 視需要加 `KsaPoolItem`/候選型別；表頭文件契約 CodeName 不變 |
 | shadcn `command`/`popover` | 若未安裝則 **新增**（`@/components/ui`）|
@@ -117,7 +123,18 @@
 - 手動驗證：選 OCS 綁定帶入、類別預勾/pills/全選官方、描述預填可改、autosave「儲存中/已儲存」、刪 HeaderMetaPanel 後無斷點。
 - 後端不需改（`/header-meta`、`/document` PATCH 既有）。
 
+## 任務 O/P/K/S（Phase 2，D13）
+
+研究：多列×多欄複雜輸入 → **側邊抽屜**優於 inline（表頭=一筆→inline；任務=多列→抽屜）。
+
+- **每格側邊抽屜（一次一格）**：點任務的某格（O/P/K/S）→ 抽屜開該格 `<FieldCombobox>`。
+  - 候選＝該任務官方 `task_competencies(competencies(ocs_code), task_code)`：K/S/O＝`{code,name}`、P＝`{code,text}`。
+  - 行為同 D11：官方預勾 + pills 可移除 + 可自訂 + 該格「帶官方」重拉。
+  - 沿用現有「local state、按鈕提交」（對程式寫入安全）。
+- **任務列**：保留一顆「帶官方」一鍵整任務（沿用現〔帶 catalog〕＝`AiTaskPanel autoCatalog`）；保留 ✨AI(5W2H)。
+- **AI/LLM 內部不改**：`AiTaskPanel` 的 `draftOP/recommendKS/clarify` 邏輯不動，只跟欄位/型別 rename 微調。
+- 候選來源：per-task 需要 `competencies(ocs_code)` 的 per-task 切片；沿用 `useKsaPool`/新增 per-task selector（依 task 的 `provenance.ocs_code` + `task_code`）。
+
 ## Out of Scope / 後續
-- 每任務 O/P/K/S 自動帶入（同範式；inline vs panel 待決）。
-- LLM/CopilotKit 整合；兩路徑收斂。
+- 未來 LLM/CopilotKit 整合；兩路徑收斂（AI 面板內部邏輯不動）。
 - 「聚焦中遇外部寫入是否提示官方值不同」（預設不覆蓋，提示待議）。

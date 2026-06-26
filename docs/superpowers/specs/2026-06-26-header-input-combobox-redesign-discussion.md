@@ -221,3 +221,19 @@
 - **D11 = 自動帶入以「選單內預勾 + 外部可移除 pills + 每欄/區重拉鈕」呈現**；不做盲目一鍵寫死；自由文字欄預填可改。
 - **D12 = 所屬類別三類各自 name↔code 綁定**（職類別↔職類別代碼、職業別↔職業別代碼、行業別↔行業別代碼）。combobox 每個選項＝一個官方 `{code,name}` pair，選官方項即 code+名稱一起帶（綁定）；自訂項才允許手填、code 可空。延伸 D5。
   - 影響：取代現在 DocHeader「name/code 兩格各自手打」會對不起來的問題。
+
+---
+
+## 12. 任務 O/P/K/S 定案（D13）
+
+研究（inline vs 抽屜）：多列×多欄複雜輸入 → **側邊抽屜**優於 inline（PatternFly/LogRocket/Pencil&Paper/Airtable）。表頭=一筆記錄→inline；任務=很多列→抽屜。
+
+v4 紅利：`competencies` 依 `task_code`（`task_detail.task_competencies`）能給該任務官方 **O/P/K/S 全部**候選 → 四格都可同 combobox 範式（舊版 O/P 只能手打）。
+
+使用者定案（2026-06-26）：
+- **每格各開的側邊抽屜（一次一格）**——因每個 combobox 選項多，一格獨佔抽屜才不擠。＝升級現 `CellFillerPanel`。
+- **任務列保留一顆「帶官方」一鍵整任務**（＝現〔帶 catalog〕/`AiTaskPanel autoCatalog`）。
+- **✨ AI(5W2H) 保留**。
+- **AI/LLM 內部先不改、只保留按鈕**（`AiTaskPanel` 的 draftOP/recommendKS 邏輯不動）。
+
+**D13 = 任務 O/P/K/S：每格抽屜升級 combobox（官方候選＝task_competencies 依 task_code；預勾+pills+自訂+該格帶官方）+ 任務列「帶官方」一鍵整任務（沿用現按鈕）+ 保留 ✨AI；AI/LLM 內部不改。**

@@ -1,4 +1,6 @@
+import { useRef } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useDebouncedCallback } from "use-debounce";
 import {
   buildTasks,
   finalizeDocument,
@@ -46,6 +48,17 @@ export function usePatchDocument(profileId: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (content: OcsDocument) => patchDocument(profileId, content),
+    onMutate: async (content: OcsDocument) => {
+      await qc.cancelQueries({ queryKey: ["document", profileId] });
+      const prev = qc.getQueryData<DocumentEnvelope>(["document", profileId]);
+      qc.setQueryData<DocumentEnvelope>(["document", profileId], (old) =>
+        old ? { ...old, content } : old,
+      );
+      return { prev };
+    },
+    onError: (_e, _content, ctx) => {
+      if (ctx?.prev) qc.setQueryData(["document", profileId], ctx.prev);
+    },
     onSuccess: (env: DocumentEnvelope) =>
       qc.setQueryData(["document", profileId], env),
   });
@@ -94,4 +107,34 @@ export function useBuildTasks(profileId: string) {
       qc.invalidateQueries({ queryKey: ["profiles"] });
     },
   });
+}
+
+export function useAutosaveDocument(profileId: string) {
+  const qc = useQueryClient();
+  const patch = usePatchDocument(profileId);
+  const latest = useRef<OcsDocument | undefined>(undefined);
+  const flushPatch = useDebouncedCallback(() => {
+    if (latest.current) patch.mutate(latest.current);
+  }, 500);
+  const commit = (next: OcsDocument) => {
+    latest.current = next;
+    qc.setQueryData<DocumentEnvelope>(["document", profileId], (old) =>
+      old ? { ...old, content: next } : old,
+    );
+    flushPatch();
+  };
+  const env = qc.getQueryData<DocumentEnvelope>(["document", profileId]);
+  const status = patch.isPending
+    ? "saving"
+    : patch.isError
+      ? "error"
+      : patch.isSuccess
+        ? "saved"
+        : "idle";
+  return {
+    doc: env?.content,
+    status: status as "idle" | "saving" | "saved" | "error",
+    commit,
+    flush: () => flushPatch.flush(),
+  };
 }

@@ -69,6 +69,7 @@ function CategoryPicker({ options, existing, onToggle, onAddCustom }: {
                   <Check className={"h-3.5 w-3.5 " + (has(o) ? "opacity-100" : "opacity-0")} />
                   {o.code ? <span className="font-mono text-xs text-muted-foreground">{o.code}</span> : null}
                   <span className="flex-1">{o.name}</span>
+                  <span className="ml-1 shrink-0 text-[10px] text-sky-700">官方</span>
                 </CommandItem>
               ))}
             </CommandGroup>

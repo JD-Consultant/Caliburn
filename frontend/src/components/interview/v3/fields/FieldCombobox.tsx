@@ -37,12 +37,18 @@ export function FieldCombobox({
   const [adding, setAdding] = useState(false);
   const [cCode, setCCode] = useState("");
   const [cName, setCName] = useState("");
-  const sel = new Set(value.map(keyOf));
   const sourcesOf = (k: string) => options.find((o) => keyOf(o) === k)?.sources ?? [];
 
+  // 勾選判定：用「官方來源 + 名稱」比對（code 已是位置序碼、與選單官方碼不同步）。
+  // 改過內容的項目 _src 變 custom → 自動視為未勾選；自訂項不勾任何官方。
+  const isOfficialSelected = (o: { name: string }) =>
+    value.some((v) => v._src === "official" && v.name === o.name);
+
   const toggle = (opt: OptionItem) => {
-    const k = keyOf(opt);
-    if (sel.has(k)) { onCommit(value.filter((v) => keyOf(v) !== k)); return; }
+    if (isOfficialSelected(opt)) {
+      onCommit(value.filter((v) => !(v._src === "official" && v.name === opt.name)));
+      return;
+    }
     const ref: SourceRef = opt.srcs?.[0] ?? { ocs_code: "", occupation_name: "", code: opt.code };
     onCommit([...value, { code: opt.code, name: opt.name, _id: newId(), _src: "official", _ref: ref }]);
   };
@@ -102,7 +108,7 @@ export function FieldCombobox({
         const k = keyOf(o);
         return (
           <CommandItem key={k} value={`${o.code} ${o.name}`} onSelect={() => toggle(o)} className="items-start">
-            <Check className={"mt-0.5 h-3.5 w-3.5 " + (sel.has(k) ? "opacity-100" : "opacity-0")} />
+            <Check className={"mt-0.5 h-3.5 w-3.5 " + (isOfficialSelected(o) ? "opacity-100" : "opacity-0")} />
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-1">
                 {o.code ? <span className="font-mono text-xs text-muted-foreground">{o.code}</span> : null}

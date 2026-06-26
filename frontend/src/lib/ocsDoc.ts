@@ -337,7 +337,14 @@ export function setTaskNotes(
 
 export function setAttitudes(doc: OcsDocument, items: CodeName[]): OcsDocument {
   const next = clone(doc);
-  next.ocs_attitude = { attitudes: items };
+  // 依代碼遞增排序（A01、A02…）；無代碼者排最後。
+  const sorted = [...items].sort((a, b) => {
+    if (!a.code && !b.code) return 0;
+    if (!a.code) return 1;
+    if (!b.code) return -1;
+    return a.code.localeCompare(b.code, undefined, { numeric: true });
+  });
+  next.ocs_attitude = { attitudes: sorted };
   return next;
 }
 

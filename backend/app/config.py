@@ -12,9 +12,6 @@ class Settings(BaseSettings):
     database_url: str = "postgresql+asyncpg://postgres:password@localhost:5432/jobintel"
     database_url_sync: str = "postgresql://postgres:password@localhost:5432/jobintel"
 
-    # Redis
-    redis_url: str = "redis://localhost:6379/0"
-
     # LLM provider selection: "openai" | "google" | "anthropic"
     llm_provider: str = "openai"
 

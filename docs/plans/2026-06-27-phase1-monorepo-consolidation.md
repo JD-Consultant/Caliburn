@@ -4,9 +4,9 @@
 
 **Goal:** 把三個現有 repo（`jobintel-ai`、`jd-ocs-indexer`、`jd-pdf-to-json`）併進一個新的 `caliburn/` monorepo，保留各自 git 歷史，接好 Turborepo + uv workspace，且三專案的既有測試「原樣全綠」——**一行邏輯都不改**。
 
-**Architecture:** 新建 `caliburn/` git repo（pnpm workspaces + Turborepo 任務編排 + uv workspace 共用 Python lockfile）。三個來源 repo 以 `git subtree add`（保留歷史）併入 `apps/`；`jobintel-ai` 拆成 `apps/api`（後端）+ `apps/web`（前端）。每個 Python app 加一個薄 `package.json` 讓 Turborepo 編排。
+**Architecture:** 新建 `caliburn/` git repo（npm workspaces + Turborepo 任務編排 + uv workspace 共用 Python lockfile）。三個來源 repo 以 `git subtree add`（保留歷史）併入 `apps/`；`jobintel-ai` 拆成 `apps/api`（後端）+ `apps/web`（前端）。每個 Python app 加一個薄 `package.json` 讓 Turborepo 編排。
 
-**Tech Stack:** git subtree、pnpm（workspaces）、Turborepo、uv（workspace）、Python 3.13（api）/ 3.11+（indexer、pdf-to-json）、Next.js 16（web）、pytest、Windows + Git Bash。
+**Tech Stack:** git subtree、npm（workspaces）、Turborepo、uv（workspace）、Python 3.13（api）/ 3.11+（indexer、pdf-to-json）、Next.js 16（web）、pytest、Windows + Git Bash。
 
 ## Global Constraints
 
@@ -14,7 +14,7 @@
 - **保留 git 歷史**：三 repo 一律用 `git subtree add`（不可只複製檔案）。
 - **驗收 = 既有測試原樣全綠 + 工具指令可跑**（非寫新測試）。
 - **平台**：Windows + Git Bash；路徑用 `/s/...`。Python 用各 app 既有版本。
-- **來源 repo 路徑**：`/s/jobintel-ai`、`/s/jd-ocs-indexer`、`/s/jd-pdf-to-json`（皆為本機 git repo）。
+- **來源 repo 路徑 + 分支**：`/s/jobintel-ai`@`feat/v3`、`/s/jd-ocs-indexer`@`dev`、`/s/jd-pdf-to-json`@`feat/pdf-parser`（皆為本機 git repo；subtree 用這些分支）。
 - **新 monorepo 路徑**：`/s/caliburn`。
 - **api 啟動 gotcha 不變**：`run_live.py` 需 `WindowsSelectorEventLoopPolicy`；重啟要 `taskkill /F /T` + 確認 8001 單一 listener（沿用既有紀律）。
 - **不 commit `.venv` / `node_modules` / `__pycache__`**。
@@ -25,14 +25,13 @@
 
 **Files:**
 - Create: `/s/caliburn/.git`（git init）
-- Create: `/s/caliburn/package.json`
-- Create: `/s/caliburn/pnpm-workspace.yaml`
+- Create: `/s/caliburn/package.json`（含 `workspaces` 欄；npm workspaces 無需額外檔）
 - Create: `/s/caliburn/turbo.json`
 - Create: `/s/caliburn/.gitignore`
 - Create: `/s/caliburn/README.md`
 
 **Interfaces:**
-- Produces: 一個可 `pnpm install` 的空 monorepo 根；`apps/` 與 `packages/` 由後續 task 填入。
+- Produces: 一個可 `npm install` 的空 monorepo 根（npm workspaces）；`apps/` 與 `packages/` 由後續 task 填入。
 
 - [ ] **Step 1: 建 repo 與目錄**
 
@@ -48,7 +47,7 @@ mkdir -p apps packages docs/specs docs/plans
 {
   "name": "caliburn",
   "private": true,
-  "packageManager": "pnpm@9.12.0",
+  "packageManager": "npm@10.9.0",
   "workspaces": ["apps/*", "packages/*"],
   "scripts": {
     "dev": "turbo dev",
@@ -62,13 +61,9 @@ mkdir -p apps packages docs/specs docs/plans
 }
 ```
 
-- [ ] **Step 3: 寫 `pnpm-workspace.yaml`**
+- [ ] **Step 3:（npm workspaces 無需額外檔）**
 
-```yaml
-packages:
-  - "apps/*"
-  - "packages/*"
-```
+npm 直接用 `package.json` 的 `workspaces` 欄即可，跳過此步（不建 `pnpm-workspace.yaml`）。
 
 - [ ] **Step 4: 寫 `turbo.json`**（任務圖；Python app 的 test/lint 之後由各自 package.json 的 script 提供）
 
@@ -110,14 +105,14 @@ uv.lock.bak
 - [ ] **Step 7: 安裝並驗證空 monorepo**
 
 ```bash
-cd /s/caliburn && pnpm install
+cd /s/caliburn && npm install
 ```
-Expected: pnpm 成功安裝 turbo，無 workspace 套件錯誤（apps/ packages/ 尚空）。
+Expected: npm 成功安裝 turbo，無 workspace 套件錯誤（apps/ packages/ 尚空）。
 
 - [ ] **Step 8: Commit**
 
 ```bash
-git add -A && git commit -m "chore: scaffold Caliburn monorepo (pnpm workspaces + Turborepo)"
+git add -A && git commit -m "chore: scaffold Caliburn monorepo (npm workspaces + Turborepo)"
 ```
 
 ---
@@ -452,7 +447,7 @@ cat /s/caliburn/apps/web/package.json
 - [ ] **Step 3: 全倉跑 test（Turborepo 編排）**
 
 ```bash
-cd /s/caliburn && pnpm install && npx turbo test
+cd /s/caliburn && npm install && npx turbo test
 ```
 Expected: turbo 平行跑四個 `test` task；三 Python app 綠、web 無 test 任務則略過或顯示 no-op。整體結果＝各 app 既有結果之和（無新增 fail）。
 
@@ -497,7 +492,7 @@ git remote remove src-jobintel
 
 ```bash
 cd /s/caliburn
-pnpm install
+npm install
 uv sync --all-packages || true
 npx turbo test
 npx turbo lint

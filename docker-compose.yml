@@ -19,17 +19,6 @@ services:
       timeout: 5s
       retries: 5
 
-  redis:
-    image: redis:7-alpine
-    container_name: jobintel_redis
-    ports:
-      - "6379:6379"
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
-      timeout: 3s
-      retries: 5
-
   api:
     build:
       context: ./backend
@@ -41,8 +30,6 @@ services:
       - ./backend/.env
     depends_on:
       db:
-        condition: service_healthy
-      redis:
         condition: service_healthy
     volumes:
       - ./backend:/app

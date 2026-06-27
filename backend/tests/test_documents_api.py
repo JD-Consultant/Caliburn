@@ -412,6 +412,14 @@ def _picked(ocu_name="u1"):
 @pytest.mark.asyncio
 async def test_set_occupations(client, db_session):
     p = await _mk_profile(client._db)
+    app.dependency_overrides[get_knowledge] = lambda: StubKnowledge(
+        occupations={
+            "OC1": OccupationDetail(
+                ocs_code="OC1",
+                ocs_name=OcsName(occupation_name="官方職業A", job_category_name="類別A"),
+            )
+        }
+    )
     r = await client.post(
         f"/api/v1/job-profiles/{p.id}/occupations", json={"ocs_codes": ["OC1", "OC2"]}
     )
@@ -419,6 +427,11 @@ async def test_set_occupations(client, db_session):
     assert r.json()["ocs_codes"] == ["OC1", "OC2"]
     await db_session.refresh(p)
     assert p.selected_ocs_codes == ["OC1", "OC2"]
+    g = await client.get(f"/api/v1/job-profiles/{p.id}/document")
+    name = g.json()["content"]["ocs_profile"]["ocs_name"]
+    # 官方名/職類名填入；絕不用 job_title（_mk_profile 的職稱）。
+    assert name["occupation_name"] == "官方職業A"
+    assert name["job_category_name"] == "類別A"
 
 
 @pytest.mark.asyncio
@@ -426,6 +439,14 @@ async def test_set_occupations_refreshes_stale_draft_header(client):
     # repro: an empty draft (no ocs_code) exists before 選職類 → occupations must
     # refresh the draft header so 選任務 (FE gates on ocs_code) becomes enabled.
     p = await _mk_profile(client._db)
+    app.dependency_overrides[get_knowledge] = lambda: StubKnowledge(
+        occupations={
+            "OC1": OccupationDetail(
+                ocs_code="OC1",
+                ocs_name=OcsName(occupation_name="官方職業A", job_category_name="類別A"),
+            )
+        }
+    )
     await client.patch(
         f"/api/v1/job-profiles/{p.id}/document",
         json={"ocs_content": {"ocu_units": []}, "ocs_profile": {"ocs_code": ""}},
@@ -435,7 +456,9 @@ async def test_set_occupations_refreshes_stale_draft_header(client):
     )
     assert r.status_code == 200, r.text
     g = await client.get(f"/api/v1/job-profiles/{p.id}/document")
-    assert g.json()["content"]["ocs_profile"]["ocs_code"] == "OC1"
+    prof = g.json()["content"]["ocs_profile"]
+    assert prof["ocs_code"] == "OC1"
+    assert prof["ocs_name"]["occupation_name"] == "官方職業A"
 
 
 @pytest.mark.asyncio

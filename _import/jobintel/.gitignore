@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+*.egg
+
+# Virtual environments
+backend/.venv/
+.venv/
+venv/
+env/
+
+# Environment variables (secrets)
+backend/.env
+frontend/.env.local
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+
+# Agent skills / internal tooling
+.agents/
+backend/.agents/
+
+# Build artifacts
+frontend/.next/
+frontend/out/
+frontend/build/
+frontend/node_modules/
+*.tsbuildinfo
+
+# Docker
+*.override.yml
+
+# Test / output
+output/

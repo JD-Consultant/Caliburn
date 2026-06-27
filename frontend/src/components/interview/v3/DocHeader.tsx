@@ -36,69 +36,49 @@ const KINDS: { key: CatKind; label: string; codeLabel: string }[] = [
 const ekey = (i: { code: string; name: string }) => i.code || "name:" + i.name;
 const newId = () => (globalThis.crypto?.randomUUID?.() ?? `id-${Math.random().toString(36).slice(2)}`);
 
-// 每類別的「選/加 ▾」下拉：官方候選可勾選/取消勾選（toggle）；
-// 底部「＋」展開一列 代碼／名稱／[加] 加自訂。
-function CategoryPicker({ options, existing, onToggle, onAddCustom }: {
+// 每類別的「選 ▾」下拉（官方候選勾選/取消）＋ 右側「+」直接加一列空白自訂。
+function CategoryPicker({ options, existing, onToggle, onAddBlank }: {
   options: OptionItem[];
   existing: { code: string; name: string }[];
   onToggle: (o: OptionItem) => void;
-  onAddCustom: (code: string, name: string) => void;
+  onAddBlank: () => void;
 }) {
   const [open, setOpen] = useState(false);
-  const [adding, setAdding] = useState(false);
-  const [code, setCode] = useState("");
-  const [name, setName] = useState("");
   const has = (o: OptionItem) => existing.some((e) => ekey(e) === ekey(o));
-  const confirmAdd = () => {
-    const n = name.trim();
-    if (!n) return;
-    onAddCustom(code.trim(), n);
-    setCode(""); setName(""); setAdding(false);
-  };
   return (
-    <Popover open={open} onOpenChange={(o) => { setOpen(o); if (!o) setAdding(false); }}>
-      <PopoverTrigger asChild>
-        <button type="button" className="inline-flex items-center text-muted-foreground hover:text-foreground" title="選/加">
-          <ChevronDown className="h-3.5 w-3.5" />
-        </button>
-      </PopoverTrigger>
-      <PopoverContent className="w-72">
-        <Command>
-          <CommandList>
-            <CommandEmpty>無候選</CommandEmpty>
-            <CommandGroup>
-              {options.map((o) => (
-                <CommandItem key={ekey(o)} value={`${o.code} ${o.name}`} onSelect={() => onToggle(o)} className="items-start">
-                  <Check className={"mt-0.5 h-3.5 w-3.5 " + (has(o) ? "opacity-100" : "opacity-0")} />
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-1">
-                      {o.code ? <span className="font-mono text-xs text-muted-foreground">{o.code}</span> : null}
-                      <span className="flex-1">{o.name}</span>
+    <div className="flex items-center gap-0.5">
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <button type="button" className="inline-flex items-center text-muted-foreground hover:text-foreground" title="選官方">
+            <ChevronDown className="h-3.5 w-3.5" />
+          </button>
+        </PopoverTrigger>
+        <PopoverContent className="w-72">
+          <Command>
+            <CommandList>
+              <CommandEmpty>無候選</CommandEmpty>
+              <CommandGroup>
+                {options.map((o) => (
+                  <CommandItem key={ekey(o)} value={`${o.code} ${o.name}`} onSelect={() => onToggle(o)} className="items-start">
+                    <Check className={"mt-0.5 h-3.5 w-3.5 " + (has(o) ? "opacity-100" : "opacity-0")} />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-1">
+                        {o.code ? <span className="font-mono text-xs text-muted-foreground">{o.code}</span> : null}
+                        <span className="flex-1">{o.name}</span>
+                      </div>
+                      <SourceLine srcs={o.srcs} />
                     </div>
-                    <SourceLine srcs={o.srcs} />
-                  </div>
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </CommandList>
-        </Command>
-        <div className="border-t p-1.5">
-          {adding ? (
-            <div className="flex items-center gap-1">
-              <input autoFocus className="w-16 rounded border px-1.5 py-1 text-xs" placeholder="代碼" value={code} onChange={(e) => setCode(e.target.value)} />
-              <input className="min-w-0 flex-1 rounded border px-1.5 py-1 text-xs" placeholder="名稱" value={name}
-                onChange={(e) => setName(e.target.value)}
-                onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); confirmAdd(); } else if (e.key === "Escape") setAdding(false); }} />
-              <button type="button" className="shrink-0 rounded border px-2 py-1 text-xs hover:bg-accent" onClick={confirmAdd}>加</button>
-            </div>
-          ) : (
-            <button type="button" className="flex w-full items-center justify-center gap-1 rounded px-2 py-1 text-xs text-muted-foreground hover:bg-accent" onClick={() => setAdding(true)}>
-              <Plus className="h-3.5 w-3.5" /> 加自訂
-            </button>
-          )}
-        </div>
-      </PopoverContent>
-    </Popover>
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
+      <button type="button" className="inline-flex items-center text-muted-foreground hover:text-foreground" title="加自訂（空白列）" onClick={onAddBlank}>
+        <Plus className="h-3.5 w-3.5" />
+      </button>
+    </div>
   );
 }
 
@@ -133,11 +113,10 @@ export function DocHeader({ document: doc, profileId, onChange }: {
       onChange(setCategory(doc, kind, [...existing, { code: o.code, name: o.name, _id: newId(), _src: "official", _ref: ref }]));
     }
   };
-  // 下拉底部「加自訂」：加一列 {code,name}（代碼/名稱皆可填）。
-  const addCustom = (kind: CatKind, code: string, name: string) => {
+  // 右側「+」：直接加一列空白自訂（名稱/代碼就地編輯）。
+  const addBlankCategory = (kind: CatKind) => {
     const existing = p.category?.[kind] ?? [];
-    if (existing.some((e) => e.name === name && e.code === code)) return;
-    onChange(setCategory(doc, kind, [...existing, { code, name, _id: newId(), _src: "custom" }]));
+    onChange(setCategory(doc, kind, [...existing, { code: "", name: "", _id: newId(), _src: "custom" }]));
   };
 
   // 攤平成多列：每類至少一列（空則一列可填的虛擬列）；子類別/代碼標籤只在該類第一列 rowSpan。
@@ -217,7 +196,7 @@ export function DocHeader({ document: doc, profileId, onChange }: {
                     options={catOptions(r.key)}
                     existing={p.category?.[r.key] ?? []}
                     onToggle={(o) => toggleOfficial(r.key, o)}
-                    onAddCustom={(code, name) => addCustom(r.key, code, name)}
+                    onAddBlank={() => addBlankCategory(r.key)}
                   />
                 </div>
               </th>

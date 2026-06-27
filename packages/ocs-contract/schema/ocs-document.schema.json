@@ -7,24 +7,23 @@
   "required": ["ocs_profile"],
   "additionalProperties": true,
   "properties": {
-    "version_info": { "$ref": "#/$defs/VersionInfo" },
+    "version_info": { "allOf": [{ "$ref": "#/$defs/VersionInfo" }], "default": {} },
     "ocs_profile": { "$ref": "#/$defs/OcsProfile" },
-    "ocs_content": { "$ref": "#/$defs/OcsContent" },
-    "ocs_attitude": { "$ref": "#/$defs/OcsAttitude" },
-    "notes": { "$ref": "#/$defs/Notes" }
+    "ocs_content": { "allOf": [{ "$ref": "#/$defs/OcsContent" }], "default": {} },
+    "ocs_attitude": { "allOf": [{ "$ref": "#/$defs/OcsAttitude" }], "default": {} },
+    "notes": { "allOf": [{ "$ref": "#/$defs/Notes" }], "default": {} }
   },
   "$defs": {
     "CodeName": {
       "type": "object",
-      "required": ["code", "name"],
       "additionalProperties": true,
-      "properties": { "code": { "type": "string" }, "name": { "type": "string" } }
+      "description": "OCS code↔name 條目;code/name 容忍缺漏(消費端 lockstep 過濾),但結構必為物件(防 string 飄移)。",
+      "properties": { "code": { "type": ["string", "null"] }, "name": { "type": ["string", "null"] } }
     },
     "CodeText": {
       "type": "object",
-      "required": ["code", "text"],
       "additionalProperties": true,
-      "properties": { "code": { "type": "string" }, "text": { "type": "string" } }
+      "properties": { "code": { "type": ["string", "null"] }, "text": { "type": ["string", "null"] } }
     },
     "VersionEntry": {
       "type": "object",
@@ -41,7 +40,7 @@
     "VersionInfo": {
       "type": "object",
       "additionalProperties": true,
-      "properties": { "versions": { "type": "array", "items": { "$ref": "#/$defs/VersionEntry" } } }
+      "properties": { "versions": { "type": "array", "default": [], "items": { "$ref": "#/$defs/VersionEntry" } } }
     },
     "OcsName": {
       "type": "object",
@@ -55,9 +54,9 @@
       "type": "object",
       "additionalProperties": true,
       "properties": {
-        "job_categories": { "type": "array", "items": { "$ref": "#/$defs/CodeName" } },
-        "occupations": { "type": "array", "items": { "$ref": "#/$defs/CodeName" } },
-        "industries": { "type": "array", "items": { "$ref": "#/$defs/CodeName" } }
+        "job_categories": { "type": "array", "default": [], "items": { "$ref": "#/$defs/CodeName" } },
+        "occupations": { "type": "array", "default": [], "items": { "$ref": "#/$defs/CodeName" } },
+        "industries": { "type": "array", "default": [], "items": { "$ref": "#/$defs/CodeName" } }
       }
     },
     "OcsProfile": {
@@ -66,10 +65,10 @@
       "additionalProperties": true,
       "properties": {
         "ocs_code": { "type": "string" },
-        "ocs_name": { "$ref": "#/$defs/OcsName" },
-        "category": { "$ref": "#/$defs/Category" },
+        "ocs_name": { "allOf": [{ "$ref": "#/$defs/OcsName" }], "default": {} },
+        "category": { "allOf": [{ "$ref": "#/$defs/Category" }], "default": {} },
         "job_description": { "type": "string" },
-        "ocs_level": { "type": "integer", "minimum": 1, "maximum": 5 }
+        "ocs_level": { "type": ["integer", "null"], "minimum": 1, "maximum": 5 }
       }
     },
     "CompetencyBlock": {
@@ -77,18 +76,18 @@
       "additionalProperties": true,
       "properties": {
         "competency_level": { "type": ["integer", "null"], "minimum": 1, "maximum": 5 },
-        "indicators": { "type": "array", "items": { "$ref": "#/$defs/CodeText" } },
-        "outputs": { "type": "array", "items": { "$ref": "#/$defs/CodeName" } },
-        "knowledge": { "type": "array", "items": { "$ref": "#/$defs/CodeName" } },
-        "skills": { "type": "array", "items": { "$ref": "#/$defs/CodeName" } }
+        "indicators": { "type": "array", "default": [], "items": { "$ref": "#/$defs/CodeText" } },
+        "outputs": { "type": "array", "default": [], "items": { "$ref": "#/$defs/CodeName" } },
+        "knowledge": { "type": "array", "default": [], "items": { "$ref": "#/$defs/CodeName" } },
+        "skills": { "type": "array", "default": [], "items": { "$ref": "#/$defs/CodeName" } }
       }
     },
     "TaskGroup": {
       "type": "object",
       "additionalProperties": true,
       "properties": {
-        "task_codes": { "type": "array", "items": { "$ref": "#/$defs/CodeName" } },
-        "competency_blocks": { "type": "array", "items": { "$ref": "#/$defs/CompetencyBlock" } }
+        "task_codes": { "type": "array", "default": [], "items": { "$ref": "#/$defs/CodeName" } },
+        "competency_blocks": { "type": "array", "default": [], "items": { "$ref": "#/$defs/CompetencyBlock" } }
       }
     },
     "OcuUnit": {
@@ -97,25 +96,25 @@
       "properties": {
         "ocu_code": { "type": "string" },
         "ocu_name": { "type": "string" },
-        "tasks": { "type": "array", "items": { "$ref": "#/$defs/TaskGroup" } }
+        "tasks": { "type": "array", "default": [], "items": { "$ref": "#/$defs/TaskGroup" } }
       }
     },
     "OcsContent": {
       "type": "object",
       "additionalProperties": true,
-      "properties": { "ocu_units": { "type": "array", "items": { "$ref": "#/$defs/OcuUnit" } } }
+      "properties": { "ocu_units": { "type": "array", "default": [], "items": { "$ref": "#/$defs/OcuUnit" } } }
     },
     "OcsAttitude": {
       "type": "object",
       "additionalProperties": true,
-      "properties": { "attitudes": { "type": "array", "items": { "$ref": "#/$defs/CodeName" } } }
+      "properties": { "attitudes": { "type": "array", "default": [], "items": { "$ref": "#/$defs/CodeName" } } }
     },
     "Notes": {
       "type": "object",
       "additionalProperties": true,
       "properties": {
-        "prerequisites": { "type": "array", "items": { "type": "string" } },
-        "supplements": { "type": "array", "items": { "type": "string" } }
+        "prerequisites": { "type": "array", "default": [], "items": { "type": "string" } },
+        "supplements": { "type": "array", "default": [], "items": { "type": "string" } }
       }
     }
   }

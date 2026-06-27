@@ -1,27 +1,26 @@
-# JobIntel AI — 文件索引
+# Caliburn — 文件索引
 
-> 企業職務知識萃取 / OCS 職務說明書生成 AI（v3）
+給顧問用的多租戶 B2B SaaS（職能基準 → 職務說明書）。Monorepo：Turborepo + uv（per-app）。
 
-v3 重構後，**架構/決策/計畫文件集中在 [`superpowers/`](./superpowers/)**（本地記錄、未納版控）。
+## 文件擺放原則（hybrid + colocation，業界共識）
 
-## 設計與決策（`superpowers/specs/`）
-| 文件 | 說明 |
-|---|---|
-| `2026-06-16-jobintel-ai-v3-architecture.md` | v3 目標架構（5 骨幹節點 + 深問迴圈 + KnowledgeClient + persistence） |
-| `2026-06-16-refactor-decision-log.md` | 決策日誌 D1–D25（含權威來源、取捨、討論過程） |
-| `2026-06-18-ksa-flow-redesign-design.md` | 逐任務 K/S + 全域 A + REVIEW（D24，已實作） |
-| `2026-06-18-db-document-centric-design.md` | DB 文件導向重設計（D25，已核准／待實作） |
-| `2026-06-15-architecture-research.md` | 架構研究資料總表 |
-| `2026-06-14-jobintel-ocs-integration-design.md`／`2026-06-14-jd-authoring-flow.md` | 早期整合設計／流程目標 |
+- **中央 `docs/`** —— 跨專案 / 系統級 / 活的設計文檔（本資料夾）。
+- **各 app 旁邊 `apps/<app>/`** —— 該 app 自己的 README / ARCHITECTURE / 指南（colocation，就近維護）。
+- **`docs/archive/`** —— 歷史記錄（不再現行維護，僅供追溯）。
 
-## 實作計畫（`superpowers/plans/`）
-各 phase（資料層／骨幹／深問／assemble-build／OTel-eval）＋ Concern B、Live-wire A、KSA 流程重設計的 subagent-driven 計畫（歷史執行紀錄）。
+## 中央系統文檔（現行）
 
-## 仍有效的參考文件
-| 文件 | 說明 |
-|---|---|
-| [ocs-schema.md](./ocs-schema.md) | OCS 職能文件 JSON 結構 + 代碼規則（T/P/O/K/S/A），對應 v3 `build_doc` 產出 |
+- [`specs/2026-06-27-system-architecture-design.md`](specs/2026-06-27-system-architecture-design.md) —— Caliburn 大框架架構設計（monorepo / 契約優先 / 3 bounded context / Hexagonal+DDD / 多租戶）。
+- [`plans/2026-06-27-phase1-monorepo-consolidation.md`](plans/2026-06-27-phase1-monorepo-consolidation.md) —— Phase 1（三 repo 併入 monorepo）實作計畫，已執行（tag `phase1-monorepo`）。
+- [`ocs-schema.md`](ocs-schema.md) —— OCS JSON 結構與代碼規則（T/P/O/K/S/A）；跨專案共享契約的參考，Phase 2 抽 `packages/ocs-contract` 時的依據。
 
----
+## 各 app 自帶文檔（colocated）
 
-> **註**：頂層原有的舊架構文件（`architecture` / `db-schema` / `api` / `graph-pipeline` / `frontend` / `icap-pipeline` / `rag-pipeline` / `export` / `roadmap` / `testing`）描述的是重構前架構（iCAP 比對、RAG、pgvector、舊 8 節點狀態機、手刻 SSE 前端），已於 v3（Concern B + D24/D25）移除，故一併刪除。需要時可由 git 歷史取回。v3 的權威說明見上方 `superpowers/`。
+- `apps/api/` —— FastAPI + LangGraph 後端。
+- `apps/web/` —— Next.js 前端（見 `apps/web/README.md` / `AGENTS.md`）。
+- `apps/ocs-indexer/` —— Qdrant + BGE-M3 知識/查詢服務（見 `apps/ocs-indexer/README.md`）。
+- `apps/pdf-to-json/` —— OCS PDF→JSON ETL（見 `apps/pdf-to-json/README.md`、`ARCHITECTURE.md`、`docs/`）。
+
+## 歷史
+
+- [`archive/jobintel-v3/`](archive/jobintel-v3/) —— 併入 monorepo 前的 jobintel-ai v3 時代設計/決策/計畫文件（2026-06-14～06-27），保留供追溯。

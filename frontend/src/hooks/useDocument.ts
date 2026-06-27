@@ -74,6 +74,9 @@ export function useSetOccupations(profileId: string) {
       // 重抓 document（GET 空殼會用新 selected codes 帶表頭）+ 候選池/候選任務。
       qc.invalidateQueries({ queryKey: ["document", profileId] });
       qc.invalidateQueries({ queryKey: ["task-candidates", profileId] });
+      // header-meta（職能基準代碼選單/所屬類別/態度候選）也要隨選的職類更新，否則
+      // 第二次選職類時主基準下拉不會刷新。
+      qc.invalidateQueries({ queryKey: ["header-meta", profileId] });
     },
   });
 }

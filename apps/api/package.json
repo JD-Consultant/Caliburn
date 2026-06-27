@@ -3,6 +3,7 @@
   "private": true,
   "scripts": {
     "test": "uv run pytest -q",
+    "dev": "uv run python run_live.py",
     "build": "echo \"no build\""
   }
 }

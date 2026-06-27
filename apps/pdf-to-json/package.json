@@ -3,7 +3,6 @@
   "private": true,
   "scripts": {
     "test": "uv run --extra dev pytest -q",
-    "lint": "uv run --extra dev ruff check src",
     "build": "echo \"no build\""
   }
 }

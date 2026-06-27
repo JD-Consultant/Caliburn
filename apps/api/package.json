@@ -1,0 +1,8 @@
+{
+  "name": "@caliburn/api",
+  "private": true,
+  "scripts": {
+    "test": "uv run pytest -q",
+    "build": "echo \"no build\""
+  }
+}

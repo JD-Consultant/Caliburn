@@ -13,6 +13,9 @@
 - [`specs/2026-06-27-system-architecture-design.md`](specs/2026-06-27-system-architecture-design.md) —— Caliburn 大框架架構設計（monorepo / 契約優先 / 3 bounded context / Hexagonal+DDD / 多租戶）。
 - [`plans/2026-06-27-phase1-monorepo-consolidation.md`](plans/2026-06-27-phase1-monorepo-consolidation.md) —— Phase 1（三 repo 併入 monorepo）實作計畫，已執行（tag `phase1-monorepo`）。
 - [`ocs-schema.md`](ocs-schema.md) —— OCS JSON 結構與代碼規則（T/P/O/K/S/A）；跨專案共享契約的參考，Phase 2 抽 `packages/ocs-contract` 時的依據。
+- [`adr/`](adr/) —— Architecture Decision Records（決策的「為什麼」+ 取捨;0001–0007）。
+- [`runbook.md`](runbook.md) —— 維運操作:起停、重啟紀律、故障排除、部署。
+- 開發上手見根目錄 [`../CONTRIBUTING.md`](../CONTRIBUTING.md)。
 
 ## 各 app 自帶文檔（colocated）
 

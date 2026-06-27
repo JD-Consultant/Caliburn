@@ -1,0 +1,54 @@
+# Runbook — Caliburn(本地開發 / 維運操作)
+
+開發環境=四個服務 + 一個 DB。本檔記錄起停、重啟紀律、與踩過的故障排除。
+首次安裝/測試見 [`../CONTRIBUTING.md`](../CONTRIBUTING.md)。
+
+## 埠位圖
+
+| 埠 | 服務 | 起法 | 依賴 |
+|---|---|---|---|
+| 5432 | Postgres(`jobintel_db`,docker) | `docker compose up -d db` | — |
+| 8000 | ocs-indexer(知識/查詢) | `cd apps/ocs-indexer && uv run jd-ocs-indexer serve --port 8000` | Qdrant |
+| 8001 | api(FastAPI+LangGraph,`run_live.py`) | `npx turbo dev`(或 `cd apps/api && uv run python run_live.py`) | Postgres(+indexer 供知識) |
+| 3000 | web(Next.js) | `npx turbo dev` | api |
+
+## 起整套(順序)
+
+```bash
+docker compose up -d db                       # 1. DB(等 healthy)
+cd apps/ocs-indexer && uv run jd-ocs-indexer serve --port 8000 &   # 2. indexer(冷啟載 BGE-M3 ~3s;要知識查詢才需要)
+cd /s/caliburn && npx turbo dev               # 3. api(:8001) + web(:3000)
+```
+驗:`curl 127.0.0.1:8001/healthz`(api 活的 live app 是 `/healthz`,**不是** `/health`)、瀏覽器開 `localhost:3000`。
+
+## 停 / 重啟(乾淨,**重要紀律**)
+
+api 的 `run_live.py` 用 uvicorn reload → **reloader 父進程 + worker 子進程**。只殺 worker 會被 reloader 重生 → 殘留舊碼。
+
+```powershell
+# 找 8001/3000 的 owning process 與其「父進程」(run_live reloader / next dev launcher)
+Get-NetTCPConnection -State Listen -LocalPort 8001 | % { Get-CimInstance Win32_Process -Filter "ProcessId=$($_.OwningProcess)" } | ft ProcessId,ParentProcessId,CommandLine
+# 殺「父」那棵樹(reloader),不是只殺 worker
+taskkill /F /T /PID <reloader_pid>
+# 驗證真的空了
+Get-NetTCPConnection -State Listen -LocalPort 8001,3000   # 應為空
+```
+> 經驗法則:重啟後一定要**確認 :8001 只剩一個 listener**,否則「改了沒效」十之八九是殘留 worker 在跑舊碼。
+
+## 故障排除
+
+| 症狀 | 多半原因 | 處置 |
+|---|---|---|
+| 改了程式「沒效」 | 殘留舊 worker(reloader 沒殺乾淨) | 上面的 `taskkill /F /T` + 驗單一 listener |
+| 前端 **Failed to fetch** | api 掛了 / 回 500 / CORS | `curl 127.0.0.1:8001/healthz`;看 turbo dev log;檢查 api 例外 |
+| api 某端點 500「No module named 'greenlet'」類 | 執行期缺依賴(測試 skip DB 沒測到) | 比對真實環境補進 `pyproject.toml` + `uv lock`;async DB 要 `sqlalchemy[asyncio]` |
+| `uv run pytest` 說 pytest not found | 該 app 的測試依賴在 extra 裡 | 用對的指令:`--all-extras`(indexer)/`--extra dev`(pdf-to-json) |
+| 埠被占 | 舊服務(或別 repo)還在跑 | 用埠位圖查 PID,`taskkill /F /T` |
+
+## 部署(SaaS,後端我方託管)
+
+交付 = 客戶連網址,不交程式碼。各 app 獨立部署(monorepo affected-only):
+- `web` → Vercel 或容器;`api` → 容器;`ocs-indexer` → 容器(+持久卷,內部不對外);`pdf-to-json` → 離線 job(非服務)。
+- Postgres / Qdrant:**先自架**(見 [ADR 0006](adr/0006-multitenancy-pool-rls.md));有真實客戶資料後再評估託管。
+- 新客戶 = 建一個 Organization(租戶),**零額外部署**(多租戶 Pool + RLS)。
+> 詳細部署拓撲見 spec §部署章節;正式 CI/CD 與 silo 升級為後續工作。

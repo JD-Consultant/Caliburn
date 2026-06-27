@@ -5,7 +5,7 @@
 // draft（自動儲存）。續做＝重開自動載 draft。finalize 產正式版本。不碰 CopilotKit。
 import { use, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { ChevronLeft, Download, FileCheck2, Layers, ListChecks, Sparkles } from "lucide-react";
+import { ChevronLeft, Download, FileCheck2, Layers, ListChecks } from "lucide-react";
 import { useProfile } from "@/hooks/useProfiles";
 import { useAutosaveDocument, useDocument, useFinalizeDocument } from "@/hooks/useDocument";
 import { getDocumentExport } from "@/lib/api";
@@ -123,21 +123,6 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
           <div className="h-40 animate-pulse rounded-xl bg-muted" />
         ) : (
           <div className="flex flex-col gap-6">
-          {status === "none" ? (
-            <Link
-              href={`/v3/${id}/intake`}
-              className="flex items-center gap-3 rounded-lg border border-violet-200 bg-violet-50 px-4 py-3 text-sm text-violet-800 hover:bg-violet-100"
-            >
-              <Sparkles className="h-5 w-5 shrink-0 text-violet-500" />
-              <span className="flex-1">
-                <span className="font-medium">還沒開始？先做 3 題小訪談</span>
-                <span className="block text-xs text-violet-700/80">
-                  用你的話描述工作，AI 幫你預選職類、預勾任務（可跳過）。
-                </span>
-              </span>
-              <ChevronLeft className="h-4 w-4 rotate-180" />
-            </Link>
-          ) : null}
           <div className="flex flex-col gap-6 md:flex-row">
             <aside className="md:w-48 md:shrink-0">
               <div className="rounded-lg border bg-background p-4 md:sticky md:top-6">

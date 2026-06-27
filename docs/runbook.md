@@ -21,25 +21,25 @@ cd /s/caliburn && npx turbo dev               # 3. api(:8001) + web(:3000)
 ```
 驗:`curl 127.0.0.1:8001/healthz`(api 活的 live app 是 `/healthz`,**不是** `/health`)、瀏覽器開 `localhost:3000`。
 
-## 停 / 重啟(乾淨,**重要紀律**)
+## 停 / 重啟
 
-api 的 `run_live.py` 用 uvicorn reload → **reloader 父進程 + worker 子進程**。只殺 worker 會被 reloader 重生 → 殘留舊碼。
+**api 的 `reload` 已關閉(單一進程)。** 日常停止:在跑 `turbo dev` / `run_live.py` 的終端機按 **Ctrl-C** 即乾淨關閉(turbo 把訊號往下傳,uvicorn 單進程直接收掉)。
+
+> ⚠️ **改了後端碼要自己重啟**(無自動 reload) —— Ctrl-C 後重跑即可。
+
+只有進程被**孤兒化**時(終端機沒 Ctrl-C 就關掉、或背景 detached 跑)才需手動清:
 
 ```powershell
-# 找 8001/3000 的 owning process 與其「父進程」(run_live reloader / next dev launcher)
-Get-NetTCPConnection -State Listen -LocalPort 8001 | % { Get-CimInstance Win32_Process -Filter "ProcessId=$($_.OwningProcess)" } | ft ProcessId,ParentProcessId,CommandLine
-# 殺「父」那棵樹(reloader),不是只殺 worker
-taskkill /F /T /PID <reloader_pid>
-# 驗證真的空了
-Get-NetTCPConnection -State Listen -LocalPort 8001,3000   # 應為空
+# 殺掉佔住 8001/3000 的進程(reload 已關,沒有 reloader+worker 雙進程,不需 /T 殺整棵樹)
+Get-NetTCPConnection -State Listen -LocalPort 8001,3000 | % { taskkill /F /PID $_.OwningProcess }
+Get-NetTCPConnection -State Listen -LocalPort 8001,3000   # 驗證已空
 ```
-> 經驗法則:重啟後一定要**確認 :8001 只剩一個 listener**,否則「改了沒效」十之八九是殘留 worker 在跑舊碼。
 
 ## 故障排除
 
 | 症狀 | 多半原因 | 處置 |
 |---|---|---|
-| 改了程式「沒效」 | 殘留舊 worker(reloader 沒殺乾淨) | 上面的 `taskkill /F /T` + 驗單一 listener |
+| 改了後端碼「沒效」 | reload 已關,忘了手動重啟 | Ctrl-C 後重跑 `run_live`(改碼需手動重啟) |
 | 前端 **Failed to fetch** | api 掛了 / 回 500 / CORS | `curl 127.0.0.1:8001/healthz`;看 turbo dev log;檢查 api 例外 |
 | api 某端點 500「No module named 'greenlet'」類 | 執行期缺依賴(測試 skip DB 沒測到) | 比對真實環境補進 `pyproject.toml` + `uv lock`;async DB 要 `sqlalchemy[asyncio]` |
 | `uv run pytest` 說 pytest not found | 該 app 的測試依賴在 extra 裡 | 用對的指令:`--all-extras`(indexer)/`--extra dev`(pdf-to-json) |

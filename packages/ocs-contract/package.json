@@ -1,0 +1,8 @@
+{
+  "name": "@caliburn/ocs-contract",
+  "private": true,
+  "scripts": {
+    "codegen": "uv run datamodel-codegen --input schema/ocs-document.schema.json --input-file-type jsonschema --output src/ocs_contract/models.py --output-model-type pydantic_v2.BaseModel --use-standard-collections --use-union-operator --use-schema-description --target-python-version 3.11",
+    "build": "echo \"no build\""
+  }
+}

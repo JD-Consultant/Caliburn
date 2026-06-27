@@ -39,6 +39,12 @@ def _units_tasks():
     ]
 
 
+def test_skeleton_does_not_leak_job_title_into_occupation_name():
+    # 一開始(未選職類)：只有 job_title，職能基準名稱(職業)必須留空。
+    doc = skeleton({"job_title": "ddd"}, [])
+    assert doc["ocs_profile"]["ocs_name"]["occupation_name"] == ""
+
+
 def test_skeleton_shape_and_grouping():
     doc = skeleton(_profile(), _units_tasks())
 

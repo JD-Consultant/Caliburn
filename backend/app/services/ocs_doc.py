@@ -49,7 +49,9 @@ def skeleton(profile: dict, units_tasks: list[dict]) -> dict:
     profile = profile or {}
 
     ocs_code = profile.get("ocs_code") or profile.get("selected_ocs_code") or ""
-    occupation = profile.get("occupation_name") or profile.get("job_title") or ""
+    # 職能基準名稱(職業)只用官方/已選的 occupation_name；絕不退回使用者職稱(job_title)，
+    # 一開始(未選職類)應為空，待〔選職類〕帶入官方名。
+    occupation = profile.get("occupation_name") or ""
     description = profile.get("job_description") or profile.get("job_summary") or ""
     category = profile.get("category")
     if not isinstance(category, dict):

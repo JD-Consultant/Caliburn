@@ -1,7 +1,16 @@
 """Production v3 CopilotKit app：live deps + AsyncPostgresSaver（D15/D17）。
 跑：uvicorn app.copilotkit_live_app:app --port 8000
 demo（無依賴）仍在 app.copilotkit_app。"""
-from contextlib import AsyncExitStack, asynccontextmanager
+# Windows: psycopg async（AsyncPostgresSaver checkpointer）需 SelectorEventLoop，
+# 不可用預設 ProactorEventLoop。在「模組 import 時」設好 loop policy，這樣不論
+# 經由 run_live.py 或 uvicorn --reload 的 worker 子進程（會 import 本模組）都生效。
+import asyncio  # noqa: E402
+import sys  # noqa: E402
+
+if sys.platform == "win32":
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+
+from contextlib import AsyncExitStack, asynccontextmanager  # noqa: E402
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware

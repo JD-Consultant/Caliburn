@@ -1,0 +1,9 @@
+{
+  "name": "@caliburn/ocs-indexer",
+  "private": true,
+  "scripts": {
+    "test": "uv run --all-extras pytest -q",
+    "lint": "uv run --all-extras ruff check src",
+    "build": "echo \"no build\""
+  }
+}

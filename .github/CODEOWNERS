@@ -1,0 +1,11 @@
+# Code owners — 預設全部由維護者擁有(GitHub 會在 PR 自動要求審查)。
+# 未來分權時,在各路徑指派不同 owner 即可(資料夾層級分權,monorepo 慣例)。
+
+*                       @ArIs0x145
+
+/apps/api/              @ArIs0x145
+/apps/web/              @ArIs0x145
+/apps/ocs-indexer/      @ArIs0x145
+/apps/pdf-to-json/      @ArIs0x145
+/packages/              @ArIs0x145
+/docs/                  @ArIs0x145

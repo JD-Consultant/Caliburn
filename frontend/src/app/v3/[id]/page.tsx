@@ -12,7 +12,6 @@ import { getDocumentExport } from "@/lib/api";
 import { downloadJson } from "@/lib/download";
 import { JobDocTable, type CellTarget } from "@/components/interview/v3/JobDocTable";
 import { CellFillerPanel } from "@/components/interview/v3/CellFillerPanel";
-import { AiTaskPanel } from "@/components/interview/v3/AiTaskPanel";
 import { OccupationPicker } from "@/components/interview/v3/OccupationPicker";
 import { TaskCuratePanel } from "@/components/interview/v3/TaskCuratePanel";
 import { completion, ensureIds } from "@/lib/ocsDoc";
@@ -43,7 +42,6 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
   useEffect(() => () => { flushRef.current(); }, []);
 
   const [target, setTarget] = useState<CellTarget | null>(null);
-  const [starTarget, setStarTarget] = useState<{ unitIdx: number; taskIdx: number; mode: "ai" | "catalog" } | null>(null);
   const [showOcc, setShowOcc] = useState(false);
   const [showTasks, setShowTasks] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -156,7 +154,6 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
                 document={doc}
                 profileId={id}
                 onCell={setTarget}
-                onStar={(unitIdx, taskIdx, mode) => setStarTarget({ unitIdx, taskIdx, mode })}
                 onChange={(d) => persist(d)}
               />
             </div>
@@ -176,19 +173,6 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
         />
       ) : null}
 
-      {starTarget && doc ? (
-        <AiTaskPanel
-          key={`star-${starTarget.mode}-${starTarget.unitIdx}-${starTarget.taskIdx}`}
-          document={doc}
-          profileId={id}
-          unitIdx={starTarget.unitIdx}
-          taskIdx={starTarget.taskIdx}
-          saving={saveStatus === "saving"}
-          autoCatalog={starTarget.mode === "catalog"}
-          onApply={(next) => persist(next, () => setStarTarget(null))}
-          onClose={() => setStarTarget(null)}
-        />
-      ) : null}
 
       {showOcc ? (
         <OccupationPicker

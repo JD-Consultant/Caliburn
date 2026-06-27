@@ -1,0 +1,131 @@
+# 欄位來源標記／鎖定等級／UUID 身分 — 討論與決策記錄（living）
+
+> 日期：2026-06-27　配套：`2026-06-27-field-provenance-lock-tiers-design.md`
+> 用途：完整保留討論脈絡、每個決策的理由、被否決的方案與原因、參考資料、延後不做的項目與原因。供日後報告。
+
+## 1. 緣起與問題
+
+使用者問「我們不是有 uuid 嗎？就是 OPKST」，希望「欄位可以標記，改值就知道改的是官方的，也能區分自訂或官方，並能自行排序而不錯亂」。
+
+釐清現況（事實）：
+- 只有 **職責單元 `_uid`** 與 **任務 `_tid`** 有前端臨時 id（`ocsDoc.ts` `ensureIds`/`uid`），**O/P/K/S 完全沒有 id**。
+- `_uid`/`_tid` 是**前端臨時 id**（dnd 用），**不進契約、重載重生**，非真 UUID。
+- 「官方/已改/自訂」標記是**畫面即時比對官方清單推導**（`FieldCombobox.statusOf`、`DocHeader.catStatus`），不是存的。
+
+→ 這正是「會錯亂」的根因：官方清單沒載入全判自訂；code+name 都改就對不回官方；不持久化、重載即失。
+
+## 2. 決策清單（含理由）
+
+- **F1 不是要 uuid，是要「存起來的來源標記」**：uuid 只解決身分/排序，無法分辨官方 vs 自訂。真正解法＝把 `_src`（官方/自訂）+ 來源直接存在項目上，不靠比對。
+- **F2 持久化分層**：`_id`/`_src`/`_ref` **存進 draft**（重載不消失），**export 正式 JSON 一律剝除**（使用者：「我們有 JSON 特定格式」）。→ 採「只存 draft、出檔剝除」（非「存進 export」、非「純前端不持久化」）。
+- **F3 不靠 code 比對判來源**：因為「有些項目沒有 code」「code 是位置序號、非唯一」（使用者明示：別職位的 K01 不一樣、K01/K02 換序沒差）。→ 身分用 UUID（代理鍵），code 僅顯示。
+- **F4 三層 binding tier**（對齊 FHIR）：
+  - 🔒 鎖定配對（基準代碼↔名稱、所屬類別三類）：官方唯讀，要不同走「＋加自訂」。
+  - ✏️ 自由值（工作描述、基準級別）：自由改、**完全不標記**。
+  - 📋 在地清單（O/P/K/S、態度、說明）：改即自訂、可自由排序、code 連號重編。
+- **F5 移除「已改」與「重設回官方」**：使用者模型是「改了就直接變自訂，官方原封不動還在選單、可重選」。既然官方一直都在，要回去重選即可，「重設」多餘 → **砍掉已改中間態與 reset**。
+- **F6 OPKS 兩套碼並存**：選單顯示「來源原始碼」（固定，取自來源職業文件）；文件顯示「位置序碼」（依順序連號重編）。同一筆在選單 `O1.1.1`、在文件 `O1.1.2` 是**預期行為**。
+- **F7 排序採「連號重編 + UUID 身分」**：而非 LexoRank/fractional indexing（理由見 §3）。
+- **F8 單值欄位（工作描述/基準級別）= 純自由值、不標記**（選項 A）。理由：單格無法 fork 成另一筆；標「已改」會把砍掉的中間態帶回、與 OPKS 不一致。
+- **F9 來源顯示「首個 + +N + hover 全部」**，且 **+N = 隱藏數**（業界 avatar-group 慣例），非「共N 總數」。
+- **F10 來源版面採 A（Material 3 supporting text，名稱下方次要行）**，否決 B（靠右）/ C（上方 overline），理由見 §3。
+- **F11 來源僅在選單顯示**（不在文件項目上）；自訂項不進選單故無來源行。
+- **F12 UI 不變原則**：只在下拉選單列加文字 + hover；文件/表格版型不動。🔒 類別官方列改唯讀屬「行為變更非版型」，且為使用者規範本身所要求。
+- **F13 export 剝除＝本專案後端遞迴清 `_` 欄位**：發現本專案後端 `build()`（`ocs_doc.py`）原為「逐一 pop 指定 key、且只到 unit/task 層」，不會清葉項目的 `_id`/`_src`/`_ref`。經使用者同意（「可以隨便改，要規範、主流架構、解耦」），改為遞迴 helper `_strip_underscore`（刪任意深度任何 `_` 開頭 key），一勞永逸涵蓋既有 `_pool/_uid/_tid/_notes` 與新欄位。註：此為**本專案後端**，與延後的 O/P 原始碼（indexer/catalog 端）無關。
+- **F14 多來源放 `OptionItem.srcs`、文件項 `_ref` 為單一 SourceRef**：spec §3 原將多來源寫成自我遞迴的 `SourceRef.sources?`；實作精化為——選單候選的多來源放 `OptionItem.srcs: SourceRef[]`，文件項 `_ref` 只記選中當下的首要來源。語意等價、較不自我遞迴。
+- **F15 CellFiller 的 O/P/K/S 由 chips 改「可編輯直式列」（layout="list"）**：執行時發現主表格只把 OPKS 當計數格、編輯都在 CellFiller，而 CellFiller 原用 pills（chips）只能加/刪、無法就地改字 → 無法實現「改官方 O 內容→變自訂」。經使用者拍板改成與「態度」一致的可編輯直式列（代碼 + 名稱輸入框 + 自訂標記 + 刪除）。屬計畫缺口的修正，已停下確認後再做。
+
+## 7. 執行記錄與 live-review 修正（2026-06-27）
+
+10 個任務全數實作並逐一 commit（`fde4100`→`5c5df48`）；自動 gate 全綠（前端 `tsc --noEmit`+`eslint`；後端 `pytest` 83 passed）。export 剝除有後端單元測試保證。以下為 live 點測時使用者回報並當場修掉的 bug：
+
+- **BUG-1 改自訂後選單的勾沒消（F16 修法）**：勾選原以 `code` 比對，但 OPKS 的 code 已改為「位置序碼」與選單官方碼不同步 → 改成自訂後勾消不掉。**修法**：勾選改用「`_src==="official"` + 名稱」判定（不靠 code）；改內容→`_src` 變 custom→自動視為未勾。commit `f8f9431`。
+- **BUG-2「帶官方」重複加（F17）**：同 code 比對毛病，導致「帶官方」每按一律重複加官方項。**修法**：以「官方+名稱」判斷已選則跳過。commit `7d821d0`。
+- **F18 基準級別下拉「官方」改「來源」**：原本只標「官方」徽章，改為顯示來源職業（`來源:職業名 · ocs_code`，多個→`+N` hover），與其他選單版面一致。commit `85b4eb0`。
+- **F19 單選下拉顯示選中勾**：`OfficialMenu` 加 `selected`，基準級別/職能基準代碼會對目前選中值打勾；工作描述為 append 用途不加勾。commit `5c5df48`。
+
+> 系統性教訓：本次多個 bug 同源——「code 已從『身分』降為『位置序碼』」後，任何仍用 code 做比對/去重/勾選的舊邏輯都會壞。原則：**比對一律用 `_src` + 名稱（或 `_id`），永不用 code**。
+
+## 8. 追加功能：任務級別自動帶入（F20，2026-06-27）
+
+使用者問「任務可以抓到級別嗎?」→ 可以。indexer 的每個職能點 `CitableItem.sources[].competency_level`（[models.py:25](../../backend/app/services/knowledge/models.py)）就帶該 `task_code` 的級別，原本 `task_competencies` 把它丟掉、文件的 `competency_block.competency_level` 一直是 null（任務列顯示「級別 —」且不可改）。
+
+- **F20 決策（使用者：要，接起來 + 顯示/可改）**：
+  - 後端 `task_competencies` 多回 `competency_level`（取匹配 task_code 的第一個非空級別；OCS 契約裡一個任務的點共用一個級別）；recommend-ks 回應帶上它。
+  - 前端 `setTaskLevel` setter；「帶官方/AI 填寫」套用時**填空不覆寫**（任務尚未設級別才自動帶入官方級別，已改不動）。
+  - 任務列「級別」由純文字改成 **1–6 可選下拉**（含「—」清除）。
+- **注意（這是本專案後端的改動）**：與先前延後的「O/P 原始來源碼」不同——級別資料 indexer 已提供，故本次接上；O/P 原始碼仍延後。
+- 回歸：既有 `test_task_competencies` 斷言 dict 全等，因新增 key 需同步（已修）。
+- commit：`793685b`（功能）、`ebc8ec2`（修回歸測試）。
+
+## 9. 任務級別來源 UI + 來源含任務（F21，2026-06-27）
+
+使用者：「一樣要有來源 UI 可以參考基準級別」+「來源 要包含任務」。
+
+- **F21a 任務級別下拉改用 OfficialMenu**：任務列的「級別」由 native `<select>` 改成與基準級別同一個 `OfficialMenu`（勾選目前值 + 來源行）。為共用，把 `OfficialMenu` 從 DocHeader 抽到 `fields/OfficialMenu.tsx`。
+- **F21b 任務級別來源 = `_levelSrc`**：因「官方級別是哪一級」需要 pool 才知道，採「帶官方時把官方級別 + 來源（含任務）記在 `task._levelSrc`」（`_` 前綴→export 剝除、draft 持久化），避免每列各自 fetch。下拉在該官方級別選項顯示來源行。
+- **F21c 來源含任務**：`SourceRef` 加 `task_code?`/`task_name?`；來源行抽成共用 `fields/SourceLine.tsx`（格式 `來源:職業 ocs_code · 任務碼 任務名`，多來源 +N hover）。FieldCombobox / CategoryPicker / OfficialMenu 全改用它；CellFiller 的 O/P/K/S 來源帶上 task_code/task_name。
+- commit `d49bb1e`。
+
+## 10. 任務級別來源「看不到」除錯 + 主動顯示（F22，2026-06-27）
+
+使用者回報「任務的級別沒有來源」。現場用 indexer 驗證資料**正常**（`/occupations/{ocs_code}/competencies` 每個點帶 `ocs_name` + `sources[].task_code/task_name/competency_level`，如 INM3513-009v1 K01 → T1.1 級別 3）。
+
+- **BUG-3 `_levelSrc` 漏記**：原本「填級別值」與「記來源」綁在同一個 fill-if-empty 條件下；任務級別早被自動填過 → 後續帶官方因「級別非空」連來源都跳過。**修法**：帶官方時**一律記來源**，級別「值」才維持填空不覆寫。commit `ec805eb`。
+- **F22 主動顯示（使用者選 B）**：任務級別來源不必等帶官方——打開級別下拉時**即時查該任務官方級別**（`useTaskLevel`，無 note→不跑 LLM、cache 5min、僅 enabled 時查），在該官方級別選項顯示來源（職業＋ocs_code＋任務）。`_levelSrc` 保留為離線/已帶官方的 fallback。為此 `OfficialMenu` 加 `onOpenChange`、`profileId`/`unitSource` 串到 `TaskRow`。commit `6c3f174`。
+- 與基準級別差異說明：基準級別來源來自 header-meta（一律已載），任務級別要查該任務 pool，故採「開下拉即時查」。
+
+## 11. 後端跑舊碼導致「來源沒顯示」+ 開啟 reload（BUG-4 / F23，2026-06-27）
+
+F22 上線後使用者仍「任務級別沒來源」（即使不管 LLM/帶官方）。前端邏輯查無誤，逐層追到根因：
+
+- **BUG-4 後端跑舊碼**：`run_live.py` 用 `uvicorn.run(...)` **未開 reload**，8001 跑的是啟動當時的舊程式 → 我新加在 recommend-ks 的 `competency_level` 根本沒上線 → 前端查到 undefined → 無來源。**解法：重啟後端**（使用者授權，殺舊 PID + 用 `run_live.py` 重起）。重啟後使用者確認「有了」。教訓：**改了後端必須重啟（除非 reload）**；live 驗證前先確認後端載入的是最新碼。
+- **F23 開啟 uvicorn reload（含 Windows loop-policy 陷阱）**：`run_live.py` 加 `reload=True, reload_dirs=["app"]`。但 reload 的 worker 子進程**不會執行 `run_live.py` 的 `__main__`**，拿不到原本在那裡設定的 `WindowsSelectorEventLoopPolicy`（psycopg async/AsyncPostgresSaver checkpointer 在 Windows 必需，否則用到 ProactorEventLoop 會壞）。**修法**：把 loop-policy 設定移到 **`app/copilotkit_live_app.py` 模組 import 時**（worker 會 import 本模組，故必生效）。實測重啟：`Started reloader process ... WatchFiles` + `Application startup complete`（checkpointer 正常開啟＝policy 已到 worker）+ `/healthz ok`。commit `81151ba`。
+
+## 12. 選職類表頭 bug + 殘留後端進程坑（BUG-5/6 + F24，2026-06-27）
+
+- **BUG-5 選職類不自動填職能基準名稱 + job_title 漏入職業**：①`set_occupations` 的 `_refresh_header` 把 `occupation_name` 設成 `profile.job_title`（非官方名）；②`skeleton` 的 `occupation = occupation_name or job_title` 在「未選職類的空殼」就把職稱填進職業欄。使用者要求「一開始職能基準名稱要空、選職類才填、且絕不用職稱」。**修法**：`set_occupations` 改抓 `knowledge.occupation(codes[0])` 填**官方職業名 + 職類名**（同 `setPrimaryBasis`），indexer 掛則留空；`skeleton` 拿掉 `job_title` fallback（加測試 `test_skeleton_does_not_leak_job_title_into_occupation_name`）。commit `2a3fd2c`、`cbd9be2`。註：`build_doc.py:66`（graph/deep-interview 路徑）仍用 job_title，與 v3 REST 流程無關、其測試也依此，故不動。
+- **BUG-6 第二次選職類代碼選單不更新**：`useSetOccupations.onSuccess` 只 invalidate `document`/`task-candidates`，漏 `header-meta`（主基準下拉/類別/態度候選的資料源）。**修法**：補 invalidate `["header-meta", profileId]`。commit `2a3fd2c`。
+- **F24 殘留 uvicorn 進程坑（重要操作教訓）**：修了碼卻「改了沒效」，追到根因＝**舊後端 worker 進程沒被殺乾淨、仍聽 8001 並服務舊碼**，與新進程同時 LISTENING → 請求隨機打到舊進程。Windows 上 `taskkill /F /PID <reloader>` **不會**連帶殺 worker 子進程，且 netstat 會把 socket 記在已死的父 PID 名下。**正確做法**：`taskkill /F /T /PID`（整棵樹）+ 殺掉實際存活的 worker PID + **確認 `netstat | grep :8001` 只剩一個 LISTENING** 才算乾淨；驗證時直接打 API 確認回應是新碼行為。教訓：**live 驗證「改了沒效」時，先懷疑後端是否真的是單一最新進程**。
+
+### commit 軌跡（feat/v3）
+`fde4100`(後端剝除) · `962c627`(型別) · `fa1989c`(ensureIds/序碼) · `180f4eb`(setters 連號) · `4985c90`(headerMeta srcs) · `6ef14f8`(選單來源行) · `460f169`(_src/改即自訂) · `8337b0f`(CellFiller list+來源) · `931e121`(類別唯讀) · `3986f3d`(名稱唯讀) · `f8f9431`(勾選修) · `7d821d0`(帶官方去重) · `85b4eb0`(基準級別來源) · `5c5df48`(單選勾)
+
+## 3. 被否決 / 不採用的方案（為什麼不做）
+
+- **`_dirty` 布林 vs `_ref` 快照**：早期曾提「存 `_dirty` 翻 true」。**不採用**——無法顯示原值、無法判斷是否改回。最終因 F5 砍掉「已改」，`_ref` 改作「來源描述子」而非「已改比對基準」。
+- **Figma 式「就地改→偷偷變自訂」用於 🔒**：**不採用於鎖定配對**。會讓人困惑「我改的明明是官方怎變自訂」。🔒 改採 Salesforce restricted picklist：官方唯讀、要不同就另加（最不意外，且字面對齊使用者規範）。注意：📋 在地清單**仍採**「改即自訂（fork）」——因為清單可以多一筆、且官方仍在選單可重選，不會困惑。
+- **LexoRank / fractional indexing（Jira/Figma）做排序**：**不採用**。那是為「大量資料 + 多人協作」避免群體重編；本案每任務 K/S 僅寥寥數筆，重編成本趨近零，而 LexoRank 會產生**不連號的醜 code**，違背「本質上是遞增」。身分/排序分離的精神用 UUID 已達成，順序直接用陣列序、code 用位置算最簡單。
+- **來源版面 B（靠右 metadata）**：**否決**。選單寬僅 ~288px（`w-72`），職業名 6~10 字 + ocs_code 同列幾乎必被截斷（Carbon 也提醒次要文字要短）。
+- **來源版面 C（上方 overline）**：**否決**。把來源放名稱上方會切斷「勾選＋名稱」主動作的視覺連續、選單也少見此法、占垂直空間。
+- **計數寫「共N（總數）」**：**否決**（使用者選 +N）。+N 為跨設計系統通用 overflow 慣例。
+- **本期改後端讓 O/P 回原始來源碼**：**延後**（使用者：「之後再討論，先用已有的，不改後端」）。影響：O/P 來源行暫不含 `O1.1.1` 後綴。
+
+## 4. 參考資料（權威/主流，不限年份）
+
+- FHIR Terminologies — binding strength required/extensible/preferred/example：<https://www.hl7.org/fhir/terminologies.html>　→ 三層 tier 的依據。
+- GNU gettext「Fuzzy Entries」+ `#|` previous-string：<https://www.gnu.org/software/gettext/manual/html_node/Fuzzy-Entries.html>　→ 「原值改了標記＋保留原文」的範式（最終因 F5 未採已改，但啟發 `_ref` 概念）。
+- dbt：surrogate key 指南：<https://www.getdbt.com/blog/guide-to-surrogate-key>；Agile Data 自然鍵 vs 代理鍵：<https://agiledata.org/essays/keys.html>　→ UUID 當身分、code 當自然鍵。
+- Salesforce restricted vs unrestricted picklist：<https://www.salesforceben.com/bad-value-for-restricted-picklist-field/>　→ 🔒 鎖定配對互動。
+- VS Code settings modified indicator / reset-to-default：<https://code.visualstudio.com/docs/getstarted/settings>　→ 「只標非預設」呈現（與既有 D14「只標非官方」一致）。
+- Figma 元件 override / detach / 本地副本：<https://help.figma.com/hc/en-us/articles/18490793776023-Update-1-Tokens-variables-and-styles>　→ 「改共用項即 fork」概念。
+- 受控字彙 provenance（來源治理）：<https://jessicatalisman.substack.com/p/controlled-vocabularies-part-ii>；Wikipedia 受控字彙：<https://en.wikipedia.org/wiki/Controlled_vocabulary>。
+- Material Design 3 List Item（overline/headline/supporting/trailing 槽位）：<https://m3.material.io/components/lists/guidelines>　→ 來源放 supporting text。
+- Avatar group「+N」overflow + hover popover：GitLab Pajamas <https://design.gitlab.com/components/avatar-group/>、Atlassian <https://atlassian.design/components/avatar-group>、SAP Fiori、Innovaccer、Emplifi Soul、Procore（多家一致）。
+- Carbon dropdown 次要文字要短：<https://carbondesignsystem.com/components/dropdown/usage/>。
+- Atlassian Select 自訂 option 渲染：<https://atlassian.design/components/select>。
+
+## 5. Bug / 風險記錄
+
+- 本次設計階段未引入新 bug（未寫碼）。
+- 既往相關 bug（背景）：CellFiller「一勾就關」已於前一輪修復（`fcb347e`，`onSave` 不再帶關閉 callback），本設計沿用「選了/不選不退出選單」前提以支援連續選取。
+- 實作風險（計畫階段須驗證）：
+  - **export/finalize 剝除**：須確認 finalize/export 對未知 `_` 欄位的處理；若後端 Pydantic 嚴格拒收未知欄位，PATCH draft 也須容忍（既有 `_tid`/`_uid`/`_notes` 已在 draft 流通，推測可行，仍須證實）。
+  - **🔒 類別官方列改唯讀**：屬行為變更，須確認不影響既有「＋加自訂／刪列」路徑。
+  - **位置序碼連號重編**：須確保重編後 `_ref`（來源原始碼）不被覆寫、判定仍正確。
+
+## 6. 延後／未定（待之後討論）
+
+- O/P 原始來源碼後綴（需後端 task-catalog 回原始碼 + per-item 來源）。
+- export/finalize 是否將 `_src` 折成契約既有 `source_type`（`icap_official`/`company_defined`）——目前決定**不折、直接剝除**（使用者：JSON 特定格式不留），但日後若要在輸出保留 provenance 可重議。
+- 跨來源去重的 K/S 在「改即自訂」後，是否影響文件層級去重邏輯（計畫階段釐清）。

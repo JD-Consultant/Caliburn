@@ -132,7 +132,7 @@ export function DocHeader({ document: doc, profileId, onChange }: {
   return (
     <table className="w-full table-fixed border-collapse overflow-hidden rounded-lg border text-sm">
       <colgroup>
-        <col className="w-24" /><col className="w-20" /><col /><col className="w-24" /><col className="w-32" />
+        <col className="w-24" /><col className="w-28" /><col /><col className="w-24" /><col className="w-32" />
       </colgroup>
       <tbody>
         {/* 職能基準代碼：▾ 在標籤旁，選官方基準 → code+名稱綁定一起帶；值顯示於格 */}

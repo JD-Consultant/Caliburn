@@ -190,7 +190,7 @@ export function DocHeader({ document: doc, profileId, onChange }: {
             {gi === 0 ? <th className={TH} rowSpan={catRows.length}>所屬類別</th> : null}
             {r.firstOfKind ? (
               <th className={TH} rowSpan={r.kindCount}>
-                <div className="flex items-center justify-between gap-1">
+                <div className="flex items-center gap-1">
                   <span>{r.label}</span>
                   <CategoryPicker
                     options={catOptions(r.key)}

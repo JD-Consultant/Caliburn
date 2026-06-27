@@ -82,6 +82,12 @@ F22 上線後使用者仍「任務級別沒來源」（即使不管 LLM/帶官�
 - **BUG-4 後端跑舊碼**：`run_live.py` 用 `uvicorn.run(...)` **未開 reload**，8001 跑的是啟動當時的舊程式 → 我新加在 recommend-ks 的 `competency_level` 根本沒上線 → 前端查到 undefined → 無來源。**解法：重啟後端**（使用者授權，殺舊 PID + 用 `run_live.py` 重起）。重啟後使用者確認「有了」。教訓：**改了後端必須重啟（除非 reload）**；live 驗證前先確認後端載入的是最新碼。
 - **F23 開啟 uvicorn reload（含 Windows loop-policy 陷阱）**：`run_live.py` 加 `reload=True, reload_dirs=["app"]`。但 reload 的 worker 子進程**不會執行 `run_live.py` 的 `__main__`**，拿不到原本在那裡設定的 `WindowsSelectorEventLoopPolicy`（psycopg async/AsyncPostgresSaver checkpointer 在 Windows 必需，否則用到 ProactorEventLoop 會壞）。**修法**：把 loop-policy 設定移到 **`app/copilotkit_live_app.py` 模組 import 時**（worker 會 import 本模組，故必生效）。實測重啟：`Started reloader process ... WatchFiles` + `Application startup complete`（checkpointer 正常開啟＝policy 已到 worker）+ `/healthz ok`。commit `81151ba`。
 
+## 12. 選職類表頭 bug + 殘留後端進程坑（BUG-5/6 + F24，2026-06-27）
+
+- **BUG-5 選職類不自動填職能基準名稱 + job_title 漏入職業**：①`set_occupations` 的 `_refresh_header` 把 `occupation_name` 設成 `profile.job_title`（非官方名）；②`skeleton` 的 `occupation = occupation_name or job_title` 在「未選職類的空殼」就把職稱填進職業欄。使用者要求「一開始職能基準名稱要空、選職類才填、且絕不用職稱」。**修法**：`set_occupations` 改抓 `knowledge.occupation(codes[0])` 填**官方職業名 + 職類名**（同 `setPrimaryBasis`），indexer 掛則留空；`skeleton` 拿掉 `job_title` fallback（加測試 `test_skeleton_does_not_leak_job_title_into_occupation_name`）。commit `2a3fd2c`、`cbd9be2`。註：`build_doc.py:66`（graph/deep-interview 路徑）仍用 job_title，與 v3 REST 流程無關、其測試也依此，故不動。
+- **BUG-6 第二次選職類代碼選單不更新**：`useSetOccupations.onSuccess` 只 invalidate `document`/`task-candidates`，漏 `header-meta`（主基準下拉/類別/態度候選的資料源）。**修法**：補 invalidate `["header-meta", profileId]`。commit `2a3fd2c`。
+- **F24 殘留 uvicorn 進程坑（重要操作教訓）**：修了碼卻「改了沒效」，追到根因＝**舊後端 worker 進程沒被殺乾淨、仍聽 8001 並服務舊碼**，與新進程同時 LISTENING → 請求隨機打到舊進程。Windows 上 `taskkill /F /PID <reloader>` **不會**連帶殺 worker 子進程，且 netstat 會把 socket 記在已死的父 PID 名下。**正確做法**：`taskkill /F /T /PID`（整棵樹）+ 殺掉實際存活的 worker PID + **確認 `netstat | grep :8001` 只剩一個 LISTENING** 才算乾淨；驗證時直接打 API 確認回應是新碼行為。教訓：**live 驗證「改了沒效」時，先懷疑後端是否真的是單一最新進程**。
+
 ### commit 軌跡（feat/v3）
 `fde4100`(後端剝除) · `962c627`(型別) · `fa1989c`(ensureIds/序碼) · `180f4eb`(setters 連號) · `4985c90`(headerMeta srcs) · `6ef14f8`(選單來源行) · `460f169`(_src/改即自訂) · `8337b0f`(CellFiller list+來源) · `931e121`(類別唯讀) · `3986f3d`(名稱唯讀) · `f8f9431`(勾選修) · `7d821d0`(帶官方去重) · `85b4eb0`(基準級別來源) · `5c5df48`(單選勾)
 

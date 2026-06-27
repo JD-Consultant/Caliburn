@@ -221,10 +221,7 @@ __marimo__/
 .data/
 /data/
 output/
-# design records kept local-only (specs / plans / bug + decision logs), not tracked
-docs/superpowers/
-docs/BUG_LOG.md
-docs/DESIGN_DECISIONS.md
+# design records now tracked in the Caliburn monorepo (apps/ocs-indexer/docs/)
 manifest.json
 failed_files.jsonl
 failed_chunks.jsonl

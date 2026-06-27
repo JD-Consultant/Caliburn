@@ -75,6 +75,13 @@
 - **F22 主動顯示（使用者選 B）**：任務級別來源不必等帶官方——打開級別下拉時**即時查該任務官方級別**（`useTaskLevel`，無 note→不跑 LLM、cache 5min、僅 enabled 時查），在該官方級別選項顯示來源（職業＋ocs_code＋任務）。`_levelSrc` 保留為離線/已帶官方的 fallback。為此 `OfficialMenu` 加 `onOpenChange`、`profileId`/`unitSource` 串到 `TaskRow`。commit `6c3f174`。
 - 與基準級別差異說明：基準級別來源來自 header-meta（一律已載），任務級別要查該任務 pool，故採「開下拉即時查」。
 
+## 11. 後端跑舊碼導致「來源沒顯示」+ 開啟 reload（BUG-4 / F23，2026-06-27）
+
+F22 上線後使用者仍「任務級別沒來源」（即使不管 LLM/帶官方）。前端邏輯查無誤，逐層追到根因：
+
+- **BUG-4 後端跑舊碼**：`run_live.py` 用 `uvicorn.run(...)` **未開 reload**，8001 跑的是啟動當時的舊程式 → 我新加在 recommend-ks 的 `competency_level` 根本沒上線 → 前端查到 undefined → 無來源。**解法：重啟後端**（使用者授權，殺舊 PID + 用 `run_live.py` 重起）。重啟後使用者確認「有了」。教訓：**改了後端必須重啟（除非 reload）**；live 驗證前先確認後端載入的是最新碼。
+- **F23 開啟 uvicorn reload（含 Windows loop-policy 陷阱）**：`run_live.py` 加 `reload=True, reload_dirs=["app"]`。但 reload 的 worker 子進程**不會執行 `run_live.py` 的 `__main__`**，拿不到原本在那裡設定的 `WindowsSelectorEventLoopPolicy`（psycopg async/AsyncPostgresSaver checkpointer 在 Windows 必需，否則用到 ProactorEventLoop 會壞）。**修法**：把 loop-policy 設定移到 **`app/copilotkit_live_app.py` 模組 import 時**（worker 會 import 本模組，故必生效）。實測重啟：`Started reloader process ... WatchFiles` + `Application startup complete`（checkpointer 正常開啟＝policy 已到 worker）+ `/healthz ok`。commit `81151ba`。
+
 ### commit 軌跡（feat/v3）
 `fde4100`(後端剝除) · `962c627`(型別) · `fa1989c`(ensureIds/序碼) · `180f4eb`(setters 連號) · `4985c90`(headerMeta srcs) · `6ef14f8`(選單來源行) · `460f169`(_src/改即自訂) · `8337b0f`(CellFiller list+來源) · `931e121`(類別唯讀) · `3986f3d`(名稱唯讀) · `f8f9431`(勾選修) · `7d821d0`(帶官方去重) · `85b4eb0`(基準級別來源) · `5c5df48`(單選勾)
 

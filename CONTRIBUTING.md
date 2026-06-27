@@ -67,6 +67,6 @@ feat(api): …   fix(web): …   chore(indexer): …   docs(contract): …
 ## 平台 / 工具注意(踩過的坑)
 
 - **Windows + api**:`run_live.py` 需 `WindowsSelectorEventLoopPolicy`(psycopg async checkpointer)—— 已內建,別改。
-- **重啟 api 要乾淨**:uvicorn reload 是 reloader+worker 雙進程,殺要 `taskkill /F /T` 整棵樹、確認 :8001 單一 listener,否則殘留 worker 跑舊碼=「改了沒效」。見 runbook。
+- **api `reload` 已關(單一進程)**:停止用終端機 Ctrl-C 即乾淨;**改後端碼要手動重啟**。孤兒進程清理見 runbook。
 - **uv venv 沒有 pip**:列套件用 `uv pip list` / `uv pip freeze`,不是 `python -m pip`。
 - **依賴以 `pyproject.toml` 為準**:api 舊 `requirements.txt` 已過期(pydantic/dotenv/email-validator/greenlet 都對不上真實環境),勿再依賴它(Phase 3 退役)。新增依賴改 pyproject + `uv lock`。

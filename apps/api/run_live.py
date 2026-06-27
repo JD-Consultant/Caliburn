@@ -22,6 +22,6 @@ if __name__ == "__main__":
         host="127.0.0.1",
         port=int(os.getenv("PORT", "8001")),
         log_level="info",
-        reload=True,
-        reload_dirs=["app"],
+        # reload 刻意關閉：單一進程,Ctrl-C 永遠乾淨(避免 Windows uvicorn reload
+        # 的 reloader+worker 殘留 worker / 「改了沒效」)。改後端碼後手動重啟即可。
     )

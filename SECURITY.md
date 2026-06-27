@@ -4,7 +4,7 @@
 
 請**私下**回報,不要開公開 issue:
 - GitHub Security Advisories(本 repo → Security → Report a vulnerability),或
-- Email:`<security-contact>`(請填入維護者安全聯絡信箱)。
+- Email:`<f1206009@cloud.dyu.edu.tw>`
 
 我們會盡快確認收到並回覆處理時程。請給合理的修補時間後再公開。
 
@@ -19,4 +19,4 @@ Caliburn 是多租戶 B2B SaaS。安全上特別關注:
 
 ## 支援版本
 
-產品 pre-launch,僅維護 `master` 最新狀態;尚無多版本支援承諾。
+產品 pre-launch,僅維護 `main` 最新狀態;尚無多版本支援承諾。

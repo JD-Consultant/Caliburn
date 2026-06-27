@@ -27,6 +27,7 @@ dependencies = [
     "typer[all]>=0.9,<1",
     "jsonschema>=4.20,<5",
     "loguru>=0.7,<1",
+    "ocs-contract",
 ]
 
 [project.optional-dependencies]
@@ -39,6 +40,9 @@ dev = [
     "mypy>=1.5,<2",
     "types-jsonschema>=4.20",
 ]
+
+[tool.uv.sources]
+ocs-contract = { path = "../../packages/ocs-contract", editable = true }
 
 [project.scripts]
 jd-convert = "jd_pdf_to_json.cli:app"

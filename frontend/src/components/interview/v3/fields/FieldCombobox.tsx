@@ -14,7 +14,7 @@ const newId = () => (globalThis.crypto?.randomUUID?.() ?? `id-${Math.random().to
 
 export function FieldCombobox({
   label, value, options, allowCustom = false, onCommit, pillSources = false,
-  layout = "pills", title, customMode = "search", footerWithCode = true, autoCode, editMultiline = false,
+  layout = "pills", title, customMode = "search", autoCode, editMultiline = false,
 }: {
   label: string;
   value: Item[];
@@ -23,21 +23,17 @@ export function FieldCombobox({
   onCommit: (next: Item[]) => void;
   pillSources?: boolean;
   layout?: "pills" | "list";
-  // 有 title → 標題列（標題 + ▾ 在右）+ 清單在下（同所屬類別/基準級別）。
+  // 有 title → 標題列（標題 + ▾ + 「+」加自訂 在右）+ 清單在下。
   title?: string;
-  // search：搜尋框 + 輸入即新增；footer：無搜尋 + 底部「＋ 加自訂」（同所屬類別）。
+  // search：搜尋框 + 輸入即新增；footer：無搜尋（自訂用右側「+」直接加空白列）。
   customMode?: "search" | "footer";
-  footerWithCode?: boolean;
-  // 設了前綴（如 "A"）→ 自訂只填名稱、代碼自動遞增（A01、A02…）。
+  // 設了前綴（如 "A"）→ 加的空白列暫定碼 A01…；OPKS 由 setter 依位置重編。
   autoCode?: string;
   // list 模式名稱欄是否多行（長文字如補充說明）。
   editMultiline?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const [adding, setAdding] = useState(false);
-  const [cCode, setCCode] = useState("");
-  const [cName, setCName] = useState("");
   const sourcesOf = (k: string) => options.find((o) => keyOf(o) === k)?.sources ?? [];
 
   // 勾選判定：用「官方來源 + 名稱」比對（code 已是位置序碼、與選單官方碼不同步）。
@@ -72,13 +68,8 @@ export function FieldCombobox({
     const pad = /^[A-Za-z]+$/.test(prefix) ? 2 : 0;
     return `${prefix}${String(max + 1).padStart(pad, "0")}`;
   };
-  const confirmFooterAdd = () => {
-    const n = cName.trim();
-    if (!n) return;
-    const code = autoCode ? nextCode(autoCode) : footerWithCode ? cCode.trim() : "";
-    onCommit([...value, { code, name: n, _id: newId(), _src: "custom" }]);
-    setCCode(""); setCName(""); setAdding(false);
-  };
+  // 「+」直接加一列空白自訂（就地編輯）。OPKS/態度由 setter 依位置重編碼，故給暫定碼即可。
+  const addBlank = () => onCommit([...value, { code: autoCode ? nextCode(autoCode) : "", name: "", _id: newId(), _src: "custom" }]);
   const selectAllOfficial = () => {
     const next = [...value];
     for (const o of options) {
@@ -110,31 +101,12 @@ export function FieldCombobox({
   );
 
   const menu = customMode === "footer" ? (
-    <>
-      <Command>
-        <CommandList>
-          <CommandEmpty>無候選</CommandEmpty>
-          {toggleList}
-        </CommandList>
-      </Command>
-      <div className="border-t p-1.5">
-        {adding ? (
-          <div className="flex items-center gap-1">
-            {footerWithCode && !autoCode ? (
-              <input autoFocus className="w-16 rounded border px-1.5 py-1 text-xs" placeholder="代碼" value={cCode} onChange={(e) => setCCode(e.target.value)} />
-            ) : null}
-            <input autoFocus={!(footerWithCode && !autoCode)} className="min-w-0 flex-1 rounded border px-1.5 py-1 text-xs" placeholder="名稱" value={cName}
-              onChange={(e) => setCName(e.target.value)}
-              onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); confirmFooterAdd(); } else if (e.key === "Escape") setAdding(false); }} />
-            <button type="button" className="shrink-0 rounded border px-2 py-1 text-xs hover:bg-accent" onClick={confirmFooterAdd}>加</button>
-          </div>
-        ) : (
-          <button type="button" className="flex w-full items-center justify-center gap-1 rounded px-2 py-1 text-xs text-muted-foreground hover:bg-accent" onClick={() => setAdding(true)}>
-            <Plus className="h-3.5 w-3.5" /> 加自訂
-          </button>
-        )}
-      </div>
-    </>
+    <Command>
+      <CommandList>
+        <CommandEmpty>無候選</CommandEmpty>
+        {toggleList}
+      </CommandList>
+    </Command>
   ) : (
     <Command>
       <CommandInput placeholder={allowCustom ? "搜尋或輸入自訂…" : "搜尋官方候選…"} value={query} onValueChange={setQuery} />
@@ -190,7 +162,7 @@ export function FieldCombobox({
     </div>
   );
 
-  const onMenuOpenChange = (o: boolean) => { setOpen(o); if (!o) setAdding(false); };
+  const onMenuOpenChange = (o: boolean) => setOpen(o);
 
   // 標題模式：標題 + ▾ + 帶官方 在右，清單在下（同所屬類別/基準級別）。
   if (title !== undefined) {
@@ -207,6 +179,9 @@ export function FieldCombobox({
               </PopoverTrigger>
               <PopoverContent className="w-72">{menu}</PopoverContent>
             </Popover>
+            <button type="button" className="inline-flex items-center text-muted-foreground hover:text-foreground" title="加自訂（空白列）" onClick={addBlank}>
+              <Plus className="h-4 w-4" />
+            </button>
             <button type="button" className="text-xs text-muted-foreground hover:text-foreground" onClick={selectAllOfficial}>帶官方</button>
           </div>
         </div>
@@ -228,6 +203,9 @@ export function FieldCombobox({
           </PopoverTrigger>
           <PopoverContent className="w-72">{menu}</PopoverContent>
         </Popover>
+        <Button type="button" variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground" title="加自訂（空白列）" onClick={addBlank}>
+          <Plus className="h-4 w-4" />
+        </Button>
         <Button type="button" variant="ghost" size="sm" className="text-xs text-muted-foreground" onClick={selectAllOfficial}>帶官方</Button>
       </div>
     </div>

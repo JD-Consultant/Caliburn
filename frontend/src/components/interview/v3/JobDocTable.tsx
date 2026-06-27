@@ -39,7 +39,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { Badge } from "@/components/ui/badge";
 import { DocHeader } from "./DocHeader";
 import { DocNotes } from "./DocNotes";
-import { Check, ChevronDown, GripVertical, Layers, Pencil, Plus, Sparkles, Trash2 } from "lucide-react";
+import { Check, ChevronDown, GripVertical, Pencil, Plus, Trash2 } from "lucide-react";
 
 export type CellKind = "o" | "p" | "k" | "s";
 export type CellTarget = { kind: CellKind; unitIdx: number; taskIdx: number };
@@ -126,7 +126,6 @@ function TaskRow({
   profileId,
   unitSource,
   onCell,
-  onStar,
   onChange,
   doc,
 }: {
@@ -137,7 +136,6 @@ function TaskRow({
   profileId: string;
   unitSource?: { ocs_code: string; occupation_name: string };
   onCell: (t: CellTarget) => void;
-  onStar: (unitIdx: number, taskIdx: number, mode: "ai" | "catalog") => void;
   onChange: (d: OcsDocument) => void;
   doc: OcsDocument;
 }) {
@@ -178,7 +176,7 @@ function TaskRow({
         />
         <OfficialMenu
           trigger={
-            <button type="button" className="inline-flex items-center gap-0.5 rounded border px-1.5 py-0.5 text-xs text-muted-foreground hover:text-foreground" title="任務級別（帶官方時自動填入，可改）">
+            <button type="button" className="inline-flex items-center gap-0.5 rounded border px-1.5 py-0.5 text-xs text-muted-foreground hover:text-foreground" title="任務級別（可改；下拉顯示官方來源）">
               級別 {level != null ? level : "—"}<ChevronDown className="h-3 w-3" />
             </button>
           }
@@ -191,24 +189,6 @@ function TaskRow({
           onOpenChange={setLevelOpen}
           onPick={(v) => onChange(setTaskLevel(doc, unitIdx, taskIdx, v))}
         />
-        <button
-          type="button"
-          className="inline-flex items-center gap-1 rounded-md border border-violet-200 bg-violet-50 px-2 py-1 text-xs font-medium text-violet-700 hover:bg-violet-100"
-          onClick={() => onStar(unitIdx, taskIdx, "ai")}
-          title="用 AI 協助填寫這個任務（5W2H 深填）"
-        >
-          <Sparkles className="h-3.5 w-3.5" />
-          AI 填寫
-        </button>
-        <button
-          type="button"
-          className="inline-flex items-center gap-1 rounded-md border border-sky-200 bg-sky-50 px-2 py-1 text-xs font-medium text-sky-700 hover:bg-sky-100"
-          onClick={() => onStar(unitIdx, taskIdx, "catalog")}
-          title="一鍵帶入此任務的職能基準官方 O/P/K/S"
-        >
-          <Layers className="h-3.5 w-3.5" />
-          帶官方
-        </button>
         <button
           type="button"
           className="text-muted-foreground hover:text-destructive"
@@ -233,7 +213,6 @@ function UnitRow({
   unitIdx,
   profileId,
   onCell,
-  onStar,
   onChange,
   doc,
 }: {
@@ -242,7 +221,6 @@ function UnitRow({
   unitIdx: number;
   profileId: string;
   onCell: (t: CellTarget) => void;
-  onStar: (unitIdx: number, taskIdx: number, mode: "ai" | "catalog") => void;
   onChange: (d: OcsDocument) => void;
   doc: OcsDocument;
 }) {
@@ -283,7 +261,6 @@ function UnitRow({
               profileId={profileId}
               unitSource={unit.source}
               onCell={onCell}
-              onStar={onStar}
               onChange={onChange}
               doc={doc}
             />
@@ -332,13 +309,11 @@ export function JobDocTable({
   document,
   profileId,
   onCell,
-  onStar,
   onChange,
 }: {
   document: OcsDocument;
   profileId: string;
   onCell: (target: CellTarget) => void;
-  onStar: (unitIdx: number, taskIdx: number, mode: "ai" | "catalog") => void;
   onChange: (d: OcsDocument) => void;
 }) {
   const units = document.ocs_content?.ocu_units ?? [];
@@ -403,7 +378,6 @@ export function JobDocTable({
                   unitIdx={ui}
                   profileId={profileId}
                   onCell={onCell}
-                  onStar={onStar}
                   onChange={onChange}
                   doc={document}
                 />

@@ -13,7 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.config import settings
 from app.database import get_db
 from app.models import JobProfile
-from app.services import header_meta, ocs_doc
+from app.core.domain import header_meta, ocs_doc
 from app.core.ports import KnowledgeClient
 from app.adapters.knowledge_http import HttpIndexerClient
 from app.adapters.persistence import DocRepo, ProfileRepo

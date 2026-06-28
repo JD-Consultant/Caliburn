@@ -1,6 +1,6 @@
-"""Pure tests for app.services.ocs_doc (D27 T2). No DB, no async."""
+"""Pure tests for app.core.domain.ocs_doc (D27 T2). No DB, no async."""
 
-from app.services.ocs_doc import skeleton, assemble_final, validate
+from app.core.domain.ocs_doc import skeleton, assemble_final, validate
 
 
 TOP_KEYS = {"version_info", "ocs_profile", "ocs_content", "ocs_attitude", "notes"}

@@ -1,4 +1,4 @@
-from app.services.ocs_doc import assemble_final
+from app.core.domain.ocs_doc import assemble_final
 
 
 def _has_underscore_key(node) -> bool:

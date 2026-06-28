@@ -21,3 +21,4 @@ ADR 是「為什麼」層;搭配 `../specs/`(細節設計)與 `../runbook.md`(�
 | [0010](0010-indexer-contract-shared-package.md) | 契約 #2 indexer 查詢 API：共用 pydantic 套件（非 codegen/Pact） | Accepted（契約 #2 已實作） |
 
 完整脈絡見 [`../specs/2026-06-27-system-architecture-design.md`](../specs/2026-06-27-system-architecture-design.md)。
+契約怎麼選/怎麼交付的規範見 [`../contract-strategy.md`](../contract-strategy.md)（ADR 0004/0010 的一般化、預答契約 #3）。

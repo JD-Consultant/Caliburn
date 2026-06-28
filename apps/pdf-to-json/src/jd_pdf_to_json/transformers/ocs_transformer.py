@@ -1,71 +1,26 @@
-"""OCS PDF → OCSDocument transformer implementation."""
+"""OCS PDF → OCSDocument transformer (thin orchestrator).
 
-import re
-import unicodedata
-from typing import Any, Callable, Dict, List, Optional, TypeVar
+Delegates each PDF section to its extractor in ``sections/``; shared stateless
+helpers live in ``support/``. See the Phase 3b decomposition plan.
+"""
 
 import pdfplumber
 
-from jd_pdf_to_json.core.models import (
-    OCSDocument,
-    VersionInfo,
-    VersionEntry,
-    OCSProfile,
-    OCSName,
-    OCSCategory,
-    CategoryItem,
-    OCSUnit,
-    Task,
-    TaskCodeEntry,
-    CompetencyBlock,
-    OutputItem,
-    BehavioralIndicator,
-    CompetencyItem,
-    Attitude,
-    OCSContent,
-    OCSAttitude,
-    Notes,
-)
+from jd_pdf_to_json.core.models import OCSDocument
 from jd_pdf_to_json.transformers.base import BaseOCSTransformer
-from jd_pdf_to_json.transformers.sections import attitude_extractor
-from jd_pdf_to_json.transformers.sections import content_extractor
-from jd_pdf_to_json.transformers.sections import notes_extractor
-from jd_pdf_to_json.transformers.sections import profile_extractor
-from jd_pdf_to_json.transformers.sections import version_extractor
-from jd_pdf_to_json.transformers.support import dedupe as dd
-from jd_pdf_to_json.transformers.support import items as itm
-from jd_pdf_to_json.transformers.support import scanning as scan
-from jd_pdf_to_json.transformers.support import tables as tbl
-from jd_pdf_to_json.transformers.support import text as txt
+from jd_pdf_to_json.transformers.sections import (
+    attitude_extractor,
+    content_extractor,
+    notes_extractor,
+    profile_extractor,
+    version_extractor,
+)
 from jd_pdf_to_json.utils.exceptions import TransformationError
 from jd_pdf_to_json.utils.logger import logger
 
-_T = TypeVar("_T")
-
 
 class OCSTransformer(BaseOCSTransformer):
-    """Transform PDF raw data into OCSDocument model."""
-
-    # ── Column / label alias tables ───────────────────────────────────────────
-
-    VERSION_HEADER_ALIASES: Dict[str, List[str]] = {
-        "version": ["版本", "version"],
-        "ocs_code": ["職能基準代碼", "職能代碼", "ocscode"],
-        "ocs_name": ["職能基準名稱", "職能名稱", "ocsname"],
-        "status": ["狀態", "status"],
-        "update_note": ["更新說明", "修訂內容", "備註", "note"],
-        "update_date": ["發展更新日期", "更新日期", "date"],
-    }
-
-    PROFILE_LABEL_ALIASES: Dict[str, List[str]] = {
-        "job_category": ["職類別", "職類", "jobcategory"],
-        "occupation": ["職業", "occupation"],
-        "industry": ["所屬產業", "產業", "行業別", "行業", "industry"],
-        "job_description": ["工作描述", "職務描述", "jobdescription"],
-        "ocs_level": ["基準級別", "職能級別", "level"],
-    }
-
-    # ── Lifecycle ─────────────────────────────────────────────────────────────
+    """Transform PDF raw data into an OCSDocument by orchestrating section extractors."""
 
     def __init__(self):
         self.logger = logger
@@ -74,7 +29,7 @@ class OCSTransformer(BaseOCSTransformer):
         """Transform raw PDF data into a structured OCSDocument.
 
         Args:
-            raw_data: Dict with keys 'file_path', 'metadata', and 'pages'.
+            raw_data: Dict with key 'file_path' (the PDF is re-opened here).
 
         Returns:
             Validated OCSDocument model.
@@ -117,4 +72,3 @@ class OCSTransformer(BaseOCSTransformer):
         except Exception as e:
             self.logger.error(f"✗ 轉換失敗: {str(e)}")
             raise TransformationError(f"Failed to transform PDF: {str(e)}") from e
-

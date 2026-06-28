@@ -1,6 +1,6 @@
 """Tests for header-driven OCU table parsing."""
 
-from jd_pdf_to_json.transformers.ocs_transformer import OCSTransformer
+from jd_pdf_to_json.transformers.sections import content_extractor
 from jd_pdf_to_json.transformers.support import items, tables, text
 
 
@@ -10,7 +10,6 @@ def test_normalize_text_handles_spaces_and_fullwidth() -> None:
 
 
 def test_parse_ocu_table_with_header_mapping() -> None:
-    transformer = OCSTransformer()
 
     table = [
         ["職能單元代碼", "AIOT-01", "職能單元名稱", "感測資料蒐集"],
@@ -25,7 +24,7 @@ def test_parse_ocu_table_with_header_mapping() -> None:
         ],
     ]
 
-    units = transformer._parse_ocu_table_units(table)
+    units = content_extractor.parse_ocu_table_units(table)
 
     assert len(units) == 1
     ocu = units[0]
@@ -82,7 +81,6 @@ def test_detect_table_type_for_split_content_header() -> None:
 
 
 def test_parse_ocu_table_with_split_header_rows() -> None:
-    transformer = OCSTransformer()
 
     split_header_table = [
         ["主要職責", "工作任務", "工作產出", "行為指標", "", "職能", "職能內涵", "職能內涵"],
@@ -91,7 +89,7 @@ def test_parse_ocu_table_with_split_header_rows() -> None:
         ["", "T2.2 跨部門協作與技術支援", "", "P2.1.4 完成符合國際安規認證與電磁安全規定等整合測試。", "4", "", "", ""],
     ]
 
-    units = transformer._parse_ocu_table_units(split_header_table)
+    units = content_extractor.parse_ocu_table_units(split_header_table)
 
     assert len(units) == 1
     assert len(units[0].tasks) == 2
@@ -99,7 +97,6 @@ def test_parse_ocu_table_with_split_header_rows() -> None:
 
 
 def test_parse_ocu_table_row_wide_fallback_for_knowledge_skills() -> None:
-    transformer = OCSTransformer()
 
     table = [
         ["主要職責", "工作任務", "工作產出", "行為指標", "", "職能", "職能內涵", "", "職能內涵", ""],
@@ -107,7 +104,7 @@ def test_parse_ocu_table_row_wide_fallback_for_knowledge_skills() -> None:
         ["T1", "T1.1需求分析", "O1.1.1需求報告", "P1.1.1完成需求盤點", "4", "K01 網路基礎\nK02 通訊協定", "S01 協調能力\nS02 撰寫能力"],
     ]
 
-    units = transformer._parse_ocu_table_units(table)
+    units = content_extractor.parse_ocu_table_units(table)
 
     assert len(units) == 1
     block = units[0].tasks[0].competency_blocks[0]
@@ -116,7 +113,6 @@ def test_parse_ocu_table_row_wide_fallback_for_knowledge_skills() -> None:
 
 
 def test_parse_ocu_table_keeps_multiple_p_codes_in_one_block() -> None:
-    transformer = OCSTransformer()
 
     table = [
         ["主要職責", "工作任務", "工作產出", "行為指標", "職能級別", "職能內涵（K=knowledge知識）", "職能內涵（S=skills技能）"],
@@ -131,7 +127,7 @@ def test_parse_ocu_table_keeps_multiple_p_codes_in_one_block() -> None:
         ],
     ]
 
-    units = transformer._parse_ocu_table_units(table)
+    units = content_extractor.parse_ocu_table_units(table)
 
     assert len(units) == 1
     task = units[0].tasks[0]
@@ -141,7 +137,6 @@ def test_parse_ocu_table_keeps_multiple_p_codes_in_one_block() -> None:
 
 
 def test_parse_ocu_table_continuation_row_without_task_code() -> None:
-    transformer = OCSTransformer()
 
     merged_table = [
         ["主要職責", "工作任務", "工作產出", "行為指標", "職能級別", "職能內涵（K=knowledge知識）", "職能內涵（S=skills技能）"],
@@ -165,7 +160,7 @@ def test_parse_ocu_table_continuation_row_without_task_code() -> None:
         ],
     ]
 
-    units = transformer._parse_ocu_table_units(merged_table)
+    units = content_extractor.parse_ocu_table_units(merged_table)
 
     assert len(units) == 1
     assert units[0].ocu_code == "T1"
@@ -178,7 +173,6 @@ def test_parse_ocu_table_continuation_row_without_task_code() -> None:
 
 
 def test_parse_ocu_table_continuation_tail_text_without_codes() -> None:
-    transformer = OCSTransformer()
 
     merged_table = [
         ["主要職責", "工作任務", "工作產出", "行為指標", "職能級別", "職能內涵（K=knowledge知識）", "職能內涵（S=skills技能）"],
@@ -202,7 +196,7 @@ def test_parse_ocu_table_continuation_tail_text_without_codes() -> None:
         ],
     ]
 
-    units = transformer._parse_ocu_table_units(merged_table)
+    units = content_extractor.parse_ocu_table_units(merged_table)
 
     assert len(units) == 1
     assert len(units[0].tasks) == 1
@@ -212,7 +206,6 @@ def test_parse_ocu_table_continuation_tail_text_without_codes() -> None:
 
 
 def test_parse_ocu_table_inherits_outputs_for_merged_rows() -> None:
-    transformer = OCSTransformer()
 
     merged_table = [
         ["主要職責", "工作任務", "工作產出", "行為指標", "職能級別", "職能內涵（K=knowledge知識）", "職能內涵（S=skills技能）"],
@@ -245,7 +238,7 @@ def test_parse_ocu_table_inherits_outputs_for_merged_rows() -> None:
         ],
     ]
 
-    units = transformer._parse_ocu_table_units(merged_table)
+    units = content_extractor.parse_ocu_table_units(merged_table)
 
     assert len(units) == 1
     task = units[0].tasks[0]

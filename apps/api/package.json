@@ -4,6 +4,7 @@
   "scripts": {
     "test": "uv run pytest -q",
     "dev": "uv run python run_live.py",
+    "migrate": "uv run alembic upgrade head",
     "build": "echo \"no build\""
   }
 }

@@ -8,17 +8,14 @@ authors = [
 ]
 requires-python = ">=3.11"
 dependencies = [
-    "flagembedding>=1.4.0",
-    # Pin transformers to 4.x: FlagEmbedding 1.4.0 targets transformers 4.x; the 5.x
-    # rewrite breaks BGE-M3 at query time (lazy sonicmoe→torch._dynamo double-register
-    # AssertionError) and is unstable with torch 2.12. Its declared <6 bound is too loose.
-    "transformers>=4.44.2,<5",
+    # Embedding (BGE-M3 dense+sparse) is served by apps/embedder over HTTP (ADR 0012):
+    # no torch/FlagEmbedding/transformers in-process here — that lived on the Windows host
+    # and caused OMP segfault + torch._dynamo double-register. The indexer is now pure Python.
     "pydantic>=2.13.4",
     "python-dotenv>=1.2.2",
     "qdrant-client>=1.18.0",
     "httpx>=0.27",
     "rich>=15.0.0",
-    "torch>=2.12.0",
     "typer>=0.26.1",
     "ocs-contract",
     "indexer-contract",
@@ -36,15 +33,7 @@ testpaths = ["tests"]
 addopts = "-q"
 pythonpath = ["."]
 
-# On Windows, CUDA torch isn't on PyPI — pull it from the official PyTorch index.
-# Marker keeps non-Windows resolving torch from PyPI as usual.
-[[tool.uv.index]]
-name = "pytorch-cu130"
-url = "https://download.pytorch.org/whl/cu130"
-explicit = true
-
 [tool.uv.sources]
-torch = { index = "pytorch-cu130", marker = "sys_platform == 'win32'" }
 ocs-contract = { path = "../../packages/ocs-contract", editable = true }
 indexer-contract = { path = "../../packages/indexer-contract", editable = true }
 

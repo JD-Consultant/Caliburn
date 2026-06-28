@@ -174,14 +174,9 @@ def smoke_query_cmd(
         console.print(f"[dim]total matched: {len(hits)}[/dim]")
 
     if probe_vector:
-        from jd_ocs_indexer.embeddings.bge_m3 import BGEM3Embedder
+        from jd_ocs_indexer.embeddings.factory import make_embedder
 
-        embedder = BGEM3Embedder(
-            model_name=settings.bge_m3_model,
-            device=settings.bge_m3_device,
-            use_fp16=settings.bge_m3_use_fp16,
-            batch_size=1,
-        )
+        embedder = make_embedder(settings)
         vec = embedder.embed_query(probe_vector)
         dense_hits = smoke_query.probe_dense(client, collection, vec.dense, limit=limit)
         _print_hits(f"dense probe: {probe_vector!r}", dense_hits)

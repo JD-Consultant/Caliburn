@@ -48,11 +48,6 @@ class Settings:
 
     source_root: Path
 
-    bge_m3_model: str
-    bge_m3_device: str
-    bge_m3_use_fp16: bool
-    bge_m3_batch_size: int
-
     index_batch_size: int
 
     # Embedder service (ADR 0012): BGE-M3 served by apps/embedder over HTTP.
@@ -76,10 +71,6 @@ def load_settings() -> Settings:
         qdrant_collection=_env("QDRANT_COLLECTION", "ocs_v4") or "ocs_v4",
         qdrant_timeout=_env_float("QDRANT_TIMEOUT", 300.0),
         source_root=source_root,
-        bge_m3_model=_env("BGE_M3_MODEL", "BAAI/bge-m3") or "BAAI/bge-m3",
-        bge_m3_device=_env("BGE_M3_DEVICE", "cpu") or "cpu",
-        bge_m3_use_fp16=_env_bool("BGE_M3_USE_FP16", False),
-        bge_m3_batch_size=_env_int("BGE_M3_BATCH_SIZE", 8),
         index_batch_size=_env_int("INDEX_BATCH_SIZE", 32),
         embedder_url=_env("EMBEDDER_URL", "http://localhost:8082") or "http://localhost:8082",
     )

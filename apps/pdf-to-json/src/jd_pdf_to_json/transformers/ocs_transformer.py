@@ -27,6 +27,7 @@ from jd_pdf_to_json.core.models import (
     Notes,
 )
 from jd_pdf_to_json.transformers.base import BaseOCSTransformer
+from jd_pdf_to_json.transformers.support import dedupe as dd
 from jd_pdf_to_json.transformers.support import items as itm
 from jd_pdf_to_json.transformers.support import tables as tbl
 from jd_pdf_to_json.transformers.support import text as txt
@@ -110,54 +111,6 @@ class OCSTransformer(BaseOCSTransformer):
         except Exception as e:
             self.logger.error(f"✗ 轉換失敗: {str(e)}")
             raise TransformationError(f"Failed to transform PDF: {str(e)}") from e
-
-    # ── Deduplication ─────────────────────────────────────────────────────────
-
-    def _dedupe(self, items: List[_T], key: Callable[[_T], tuple]) -> List[_T]:
-        """Remove duplicates from *items* preserving first-occurrence order."""
-        seen: set[tuple] = set()
-        result: List[_T] = []
-        for item in items:
-            k = key(item)
-            if k not in seen:
-                seen.add(k)
-                result.append(item)
-        return result
-
-    def _dedupe_outputs(self, items: List[OutputItem]) -> List[OutputItem]:
-        return self._dedupe(
-            items,
-            lambda i: (
-                txt.normalize_text((i.code or "").upper()),
-                txt.normalize_text(i.name or ""),
-            ),
-        )
-
-    def _dedupe_indicators(self, items: List[BehavioralIndicator]) -> List[BehavioralIndicator]:
-        return self._dedupe(
-            items,
-            lambda i: (
-                txt.normalize_text((i.code or "").upper()),
-                txt.normalize_text(i.text or ""),
-            ),
-        )
-
-    def _dedupe_competencies(self, items: List[CompetencyItem]) -> List[CompetencyItem]:
-        return self._dedupe(
-            items,
-            lambda i: (
-                txt.normalize_text((i.code or "").upper()),
-                txt.normalize_text(i.name or ""),
-            ),
-        )
-
-    def _dedupe_block(self, block: CompetencyBlock) -> CompetencyBlock:
-        """Deduplicate all item lists in a competency block in-place."""
-        block.outputs = self._dedupe_outputs(block.outputs)
-        block.indicators = self._dedupe_indicators(block.indicators)
-        block.knowledge = self._dedupe_competencies(block.knowledge)
-        block.skills = self._dedupe_competencies(block.skills)
-        return block
 
     # ── Historical PDF scanning ────────────────────────────────────────────────
 
@@ -267,7 +220,7 @@ class OCSTransformer(BaseOCSTransformer):
                     target = task_map[primary]
                     target.competency_blocks.extend(task.competency_blocks)
                     target.competency_blocks = [
-                        self._dedupe_block(b) for b in target.competency_blocks
+                        dd.dedupe_block(b) for b in target.competency_blocks
                     ]
                     existing_codes = {e.code for e in target.task_codes}
                     for entry in task.task_codes:
@@ -996,12 +949,12 @@ class OCSTransformer(BaseOCSTransformer):
                             previous_task.competency_blocks.append(
                                 CompetencyBlock(
                                     competency_level=new_level,
-                                    indicators=self._dedupe_indicators(behavioral_indicators),
-                                    outputs=self._dedupe_outputs(
+                                    indicators=dd.dedupe_indicators(behavioral_indicators),
+                                    outputs=dd.dedupe_outputs(
                                         outputs if outputs else list(previous_block.outputs)
                                     ),
-                                    knowledge=self._dedupe_competencies(knowledge),
-                                    skills=self._dedupe_competencies(skills),
+                                    knowledge=dd.dedupe_competencies(knowledge),
+                                    skills=dd.dedupe_competencies(skills),
                                 )
                             )
                         else:
@@ -1009,7 +962,7 @@ class OCSTransformer(BaseOCSTransformer):
                             previous_block.indicators.extend(behavioral_indicators)
                             previous_block.knowledge.extend(knowledge)
                             previous_block.skills.extend(skills)
-                            self._dedupe_block(previous_block)
+                            dd.dedupe_block(previous_block)
                         continue
 
                     continue
@@ -1021,10 +974,10 @@ class OCSTransformer(BaseOCSTransformer):
                         competency_blocks=[
                             CompetencyBlock(
                                 competency_level=task_level,
-                                indicators=self._dedupe_indicators(behavioral_indicators),
-                                outputs=self._dedupe_outputs(outputs),
-                                knowledge=self._dedupe_competencies(knowledge),
-                                skills=self._dedupe_competencies(skills),
+                                indicators=dd.dedupe_indicators(behavioral_indicators),
+                                outputs=dd.dedupe_outputs(outputs),
+                                knowledge=dd.dedupe_competencies(knowledge),
+                                skills=dd.dedupe_competencies(skills),
                             )
                         ],
                     )

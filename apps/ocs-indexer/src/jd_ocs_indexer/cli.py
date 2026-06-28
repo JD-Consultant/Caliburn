@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import time
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
@@ -12,12 +10,9 @@ from rich.console import Console
 from rich.table import Table
 
 from jd_ocs_indexer.config import load_settings
-from jd_ocs_indexer.ingestion.builder import BuildContext, build
 from jd_ocs_indexer.ingestion.normalizer import normalize
 from jd_ocs_indexer.ingestion.reader import OCSJSONReader
-from jd_ocs_indexer.models.chunk import EmbeddedChunk
 from jd_ocs_indexer.store.qdrant_client import make_client
-from jd_ocs_indexer.store.writer import QdrantWriter
 from jd_ocs_indexer.validation import search as search_mod, smoke_query, stats as stats_mod
 
 app = typer.Typer(
@@ -25,10 +20,6 @@ app = typer.Typer(
     help="jd-ocs-indexer: OCS JSON -> Qdrant index builder.",
 )
 console = Console()
-
-
-def _now_iso() -> str:
-    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S+00:00")
 
 
 # ---------- index ----------
@@ -40,52 +31,21 @@ def index(
     limit: int = typer.Option(0, "--limit", help="Stop after N files (0 = all)."),
 ) -> None:
     """v3 pipeline: reader -> normalize -> build -> embed -> upsert (profile + task points)."""
+    from jd_ocs_indexer.pipeline import run_index
+
     settings = load_settings()
-    reader = OCSJSONReader(settings.source_root)
+    report = run_index(settings, scan_dir, limit=limit)
+    for rel, err in report.failures:
+        console.print(f"[red]FAIL[/red] {rel}: {err}")
 
-    from jd_ocs_indexer.embeddings.factory import make_embedder
-    from jd_ocs_indexer.store import schema
-
-    embedder = make_embedder(settings)
-    client = make_client(url=settings.qdrant_url, api_key=settings.qdrant_api_key, timeout=settings.qdrant_timeout)
-    writer = QdrantWriter(
-        client,
-        settings.qdrant_collection,
-        dense_size=embedder.dense_size,
-        supports_sparse=embedder.supports_sparse,
-        batch_size=settings.index_batch_size,
-    )
-    writer.ensure_collection()
-    writer.ensure_payload_indexes(schema.PAYLOAD_INDEXES)
-
-    started = time.time()
-    indexed = failed = total = 0
-    for i, (loaded, fail) in enumerate(reader.iter_loaded(scan_dir)):
-        if limit and i >= limit:
-            break
-        if fail is not None:
-            failed += 1
-            console.print(f"[red]FAIL[/red] {fail.rel_path}: {fail.error}")
-            continue
-        assert loaded is not None
-        norm = normalize(loaded.document)
-        ctx = BuildContext(source_file=loaded.rel_path, indexed_at=_now_iso())
-        records = build(norm, ctx)
-        vecs = embedder.embed_texts([r.text for r in records])
-        embedded = [EmbeddedChunk(record=r, dense=v.dense, sparse=v.sparse) for r, v in zip(records, vecs)]
-        report = writer.upsert(embedded)
-        total += report.upserted
-        indexed += 1
-
-    elapsed = time.time() - started
     table = Table(title="Index v3 report")
     table.add_column("metric")
     table.add_column("value", justify="right")
-    table.add_row("collection", settings.qdrant_collection)
-    table.add_row("indexed_files", str(indexed))
-    table.add_row("failed_files", str(failed))
-    table.add_row("points", str(total))
-    table.add_row("elapsed_sec", f"{elapsed:.1f}")
+    table.add_row("collection", report.collection)
+    table.add_row("indexed_files", str(report.indexed_files))
+    table.add_row("failed_files", str(report.failed_files))
+    table.add_row("points", str(report.points))
+    table.add_row("elapsed_sec", f"{report.elapsed_sec:.1f}")
     console.print(table)
 
 

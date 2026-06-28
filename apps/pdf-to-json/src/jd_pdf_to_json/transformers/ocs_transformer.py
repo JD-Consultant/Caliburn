@@ -27,6 +27,7 @@ from jd_pdf_to_json.core.models import (
     Notes,
 )
 from jd_pdf_to_json.transformers.base import BaseOCSTransformer
+from jd_pdf_to_json.transformers.support import tables as tbl
 from jd_pdf_to_json.transformers.support import text as txt
 from jd_pdf_to_json.utils.exceptions import TransformationError
 from jd_pdf_to_json.utils.logger import logger
@@ -38,16 +39,6 @@ class OCSTransformer(BaseOCSTransformer):
     """Transform PDF raw data into OCSDocument model."""
 
     # ── Column / label alias tables ───────────────────────────────────────────
-
-    OCU_HEADER_ALIASES: Dict[str, List[str]] = {
-        "task_code": ["工作任務代碼", "任務代碼", "taskcode", "task id"],
-        "task_name": ["工作任務", "任務名稱", "taskname", "task"],
-        "level": ["職能級別", "級別", "等級", "level"],
-        "knowledge": ["知識", "knowledge", "知能"],
-        "skills": ["技能", "skill"],
-        "outputs": ["工作產出", "產出", "output"],
-        "behavioral": ["行為指標", "behavioral", "indicator", "績效指標"],
-    }
 
     VERSION_HEADER_ALIASES: Dict[str, List[str]] = {
         "version": ["版本", "version"],
@@ -64,16 +55,6 @@ class OCSTransformer(BaseOCSTransformer):
         "industry": ["所屬產業", "產業", "行業別", "行業", "industry"],
         "job_description": ["工作描述", "職務描述", "jobdescription"],
         "ocs_level": ["基準級別", "職能級別", "level"],
-    }
-
-    CONTENT_HEADER_KEYS: Dict[str, List[str]] = {
-        "major_duty": ["主要職責"],
-        "task": ["工作任務"],
-        "output": ["工作產出"],
-        "behavioral": ["行為指標"],
-        "level": ["職能級別", "職能級別"],
-        "knowledge": ["知識", "kknowledge知識", "knowledge知識"],
-        "skills": ["技能", "sskills技能", "skills技能"],
     }
 
     # ── Lifecycle ─────────────────────────────────────────────────────────────
@@ -128,194 +109,6 @@ class OCSTransformer(BaseOCSTransformer):
         except Exception as e:
             self.logger.error(f"✗ 轉換失敗: {str(e)}")
             raise TransformationError(f"Failed to transform PDF: {str(e)}") from e
-
-
-    # ── Table utilities ───────────────────────────────────────────────────────
-
-    def _row_to_normalized_cells(self, row: List[Any]) -> List[str]:
-        return [txt.normalize_text(cell) for cell in row]
-
-    def _row_to_joined_normalized_text(self, row: List[Any]) -> str:
-        """Join all normalized row cells into one string for table-type checks."""
-        return "".join(self._row_to_normalized_cells(row))
-
-    def _merge_rows_for_header(self, rows: List[List[Any]]) -> List[Any]:
-        """Column-wise merge of adjacent header rows for split table headers."""
-        if not rows:
-            return []
-        max_len = max(len(row) for row in rows)
-        merged: List[str] = []
-        for idx in range(max_len):
-            parts = [
-                str(row[idx]).strip()
-                for row in rows
-                if idx < len(row) and row[idx] is not None and str(row[idx]).strip()
-            ]
-            merged.append(" ".join(parts))
-        return merged
-
-    def _is_page_footer_row(self, row: List[Any]) -> bool:
-        """Return True for common pagination footers like '第1頁，總共11頁'."""
-        text = self._row_to_joined_normalized_text(row)
-        return bool(text and re.search(r"^第\d+頁總共\d+頁$", text))
-
-    def _clean_table_rows(self, table: List[List[Any]]) -> List[List[Any]]:
-        """Strip empty rows and page-footer noise from a table."""
-        result: List[List[Any]] = []
-        for row in table:
-            if not row:
-                continue
-            if all(cell is None or not str(cell).strip() for cell in row):
-                continue
-            if self._is_page_footer_row(row):
-                continue
-            result.append(row)
-        return result
-
-    def _is_content_header_row(self, row: List[Any]) -> bool:
-        """Return True when a row matches the fixed OCS content header layout."""
-        text = self._row_to_joined_normalized_text(row)
-        if not text:
-            return False
-        required = [
-            self.CONTENT_HEADER_KEYS["task"],
-            self.CONTENT_HEADER_KEYS["output"],
-            self.CONTENT_HEADER_KEYS["behavioral"],
-            self.CONTENT_HEADER_KEYS["level"],
-        ]
-        if not all(
-            any(txt.normalize_text(a) in text for a in aliases) for aliases in required
-        ):
-            return False
-        has_knowledge = any(
-            txt.normalize_text(a) in text for a in self.CONTENT_HEADER_KEYS["knowledge"]
-        )
-        has_skills = any(
-            txt.normalize_text(a) in text for a in self.CONTENT_HEADER_KEYS["skills"]
-        )
-        return has_knowledge and has_skills
-
-    def _is_split_content_header(self, rows: List[List[Any]]) -> bool:
-        """Return True when adjacent rows together form the content header."""
-        if not rows:
-            return False
-        return self._is_content_header_row(self._merge_rows_for_header(rows))
-
-    def _detect_table_type(self, table: List[List[Any]]) -> Optional[str]:
-        """Classify a table as one of five fixed section types."""
-        rows = self._clean_table_rows(table)
-        if not rows:
-            return None
-
-        sample = rows[: min(len(rows), 5)]
-        joined = " ".join(self._row_to_joined_normalized_text(r) for r in sample)
-
-        if any(
-            "職能內涵" in self._row_to_joined_normalized_text(r)
-            and "attitude" in self._row_to_joined_normalized_text(r)
-            for r in sample
-        ):
-            return "ocs_attitude"
-
-        if any("說明與補充事項" in self._row_to_joined_normalized_text(r) for r in sample):
-            return "notes_and_appendix"
-
-        if any(
-            self._is_content_header_row(r)
-            or self._is_split_content_header(rows[i : i + 2])
-            or self._is_split_content_header(rows[i : i + 3])
-            for i, r in enumerate(sample)
-        ):
-            return "ocs_content"
-
-        if all(k in joined for k in ["版本", "職能基準代碼", "職能基準名稱", "狀態"]):
-            return "version_info"
-
-        if any(k in joined for k in ["職能基準代碼", "所屬類別", "工作描述", "基準級別"]):
-            return "ocs_profile"
-
-        return None
-
-    def _find_ocu_header_row(
-        self, table: List[List[Any]]
-    ) -> tuple[Optional[int], Dict[str, int], int]:
-        """Find the OCU header row; return (row_index, col_map, row_span)."""
-        best: tuple[Optional[int], Dict[str, int], int, int] = (None, {}, 0, -1)
-
-        for row_idx, row in enumerate(table):
-            candidates = [(row, 1)]
-            if row_idx + 1 < len(table):
-                candidates.append(
-                    (self._merge_rows_for_header([row, table[row_idx + 1]]), 2)
-                )
-            if row_idx + 2 < len(table):
-                candidates.append(
-                    (
-                        self._merge_rows_for_header(
-                            [row, table[row_idx + 1], table[row_idx + 2]]
-                        ),
-                        3,
-                    )
-                )
-
-            for candidate, span in candidates:
-                col_map = self._build_column_map(candidate, self.OCU_HEADER_ALIASES)
-                if "task_name" not in col_map:
-                    continue
-                has_competency = any(
-                    k in col_map for k in ("knowledge", "skills", "outputs", "behavioral")
-                )
-                if not has_competency:
-                    continue
-                if "task_code" not in col_map:
-                    # Common layout: task code is embedded in the task name column.
-                    col_map["task_code"] = col_map["task_name"]
-                score = sum(
-                    k in col_map
-                    for k in ("outputs", "behavioral", "knowledge", "skills", "level", "task_code")
-                )
-                if score > best[3]:
-                    best = (row_idx, col_map, span, score)
-
-        return best[0], best[1], best[2]
-
-    def _is_ocu_candidate_table(self, table: List[List[Any]]) -> bool:
-        """Return True when a table likely contains OCU task data."""
-        return bool(table) and self._find_ocu_header_row(table)[0] is not None
-
-    def _find_value_to_right(self, row: List[Any], index: int) -> Optional[str]:
-        """Return the nearest non-empty cell to the right of *index*."""
-        for cell in row[index + 1 :]:
-            if cell is not None and str(cell).strip():
-                return str(cell).strip()
-        return None
-
-    def _find_cell_value(self, row: List[Any], idx: int, window: int = 2) -> Optional[str]:
-        """Return the nearest non-empty cell around *idx* within ±*window*."""
-        for offset in range(0, window + 1):
-            for sign in ([0] if offset == 0 else [1, -1]):
-                check_idx = idx + sign * offset
-                if 0 <= check_idx < len(row) and row[check_idx]:
-                    val = str(row[check_idx]).strip()
-                    if val:
-                        return val
-        return None
-
-    def _build_column_map(
-        self, header_row: List[Any], aliases: Dict[str, List[str]]
-    ) -> Dict[str, int]:
-        """Build a semantic column-index mapping from a header row."""
-        mapping: Dict[str, int] = {}
-        normalized_cells = self._row_to_normalized_cells(header_row)
-        for idx, cell in enumerate(normalized_cells):
-            if not cell:
-                continue
-            for field, alias_list in aliases.items():
-                if field in mapping:
-                    continue
-                if any(txt.normalize_text(a) in cell for a in alias_list):
-                    mapping[field] = idx
-        return mapping
 
     # ── Item extraction ───────────────────────────────────────────────────────
 
@@ -679,7 +472,7 @@ class OCSTransformer(BaseOCSTransformer):
             for row in table:
                 if not row:
                     continue
-                normalized_cells = self._row_to_normalized_cells(row)
+                normalized_cells = tbl.row_to_normalized_cells(row)
                 name_label_idx: Optional[int] = None
                 code_label_idx: Optional[int] = None
 
@@ -699,7 +492,7 @@ class OCSTransformer(BaseOCSTransformer):
 
                 if name_label_idx is None:
                     continue
-                name_value = self._find_value_to_right(row, name_label_idx)
+                name_value = tbl.find_value_to_right(row, name_label_idx)
                 if not name_value:
                     continue
                 names = txt.split_lines(name_value)
@@ -708,7 +501,7 @@ class OCSTransformer(BaseOCSTransformer):
 
                 codes: List[str] = []
                 if code_label_idx is not None:
-                    code_value = self._find_value_to_right(row, code_label_idx)
+                    code_value = tbl.find_value_to_right(row, code_label_idx)
                     if code_value:
                         codes = [
                             c.strip().upper()
@@ -739,7 +532,7 @@ class OCSTransformer(BaseOCSTransformer):
                 header_idx: Optional[int] = None
                 header_map: Dict[str, int] = {}
                 for row_idx, row in enumerate(table):
-                    current_map = self._build_column_map(row, self.VERSION_HEADER_ALIASES)
+                    current_map = tbl.build_column_map(row, self.VERSION_HEADER_ALIASES)
                     if all(k in current_map for k in ("version", "ocs_code", "ocs_name", "status")):
                         header_idx = row_idx
                         header_map = current_map
@@ -751,7 +544,7 @@ class OCSTransformer(BaseOCSTransformer):
                 for row in table[header_idx + 1 :]:
                     version_idx = header_map.get("version")
                     version_val = (
-                        self._find_cell_value(row, version_idx) or ""
+                        tbl.find_cell_value(row, version_idx) or ""
                         if version_idx is not None
                         else ""
                     )
@@ -760,16 +553,16 @@ class OCSTransformer(BaseOCSTransformer):
                     versions.append(
                         VersionEntry(
                             version=version_val,
-                            ocs_code=self._find_cell_value(row, header_map["ocs_code"]) or "Unknown",
-                            ocs_name=self._find_cell_value(row, header_map["ocs_name"]) or "Unknown",
-                            status=self._find_cell_value(row, header_map["status"]) or "Unknown",
+                            ocs_code=tbl.find_cell_value(row, header_map["ocs_code"]) or "Unknown",
+                            ocs_name=tbl.find_cell_value(row, header_map["ocs_name"]) or "Unknown",
+                            status=tbl.find_cell_value(row, header_map["status"]) or "Unknown",
                             update_note=(
-                                self._find_cell_value(row, header_map["update_note"])
+                                tbl.find_cell_value(row, header_map["update_note"])
                                 if "update_note" in header_map
                                 else None
                             ),
                             update_date=(
-                                self._find_cell_value(row, header_map["update_date"]) or "Unknown"
+                                tbl.find_cell_value(row, header_map["update_date"]) or "Unknown"
                                 if "update_date" in header_map
                                 else "Unknown"
                             ),
@@ -808,7 +601,7 @@ class OCSTransformer(BaseOCSTransformer):
                 for row_idx, row in enumerate(table):
                     if row_idx > 3:
                         break
-                    normalized_cells = self._row_to_normalized_cells(row)
+                    normalized_cells = tbl.row_to_normalized_cells(row)
                     for i, cell_norm in enumerate(normalized_cells):
                         if not cell_norm:
                             continue
@@ -816,24 +609,24 @@ class OCSTransformer(BaseOCSTransformer):
                             ("職類" == cell_norm or cell_norm == "jobcategory")
                             and "職類別" not in cell_norm
                         ):
-                            value = self._find_value_to_right(row, i)
+                            value = tbl.find_value_to_right(row, i)
                             if value:
                                 explicit_job_category_name = value
                         if "職類別代碼" in cell_norm or cell_norm == "jobcategorycode":
-                            value = self._find_value_to_right(row, i)
+                            value = tbl.find_value_to_right(row, i)
                             if value:
                                 explicit_job_category_code = value.strip().upper()
                         if (
                             ("職業" == cell_norm or cell_norm == "occupation")
                             and "職業別代碼" not in str(row[i])
                         ):
-                            value = self._find_value_to_right(row, i)
+                            value = tbl.find_value_to_right(row, i)
                             if value:
                                 explicit_occupation_name = value
 
             for table in first_page_tables:
                 for row in table:
-                    normalized_cells = self._row_to_normalized_cells(row)
+                    normalized_cells = tbl.row_to_normalized_cells(row)
                     for i, cell_norm in enumerate(normalized_cells):
                         if not cell_norm:
                             continue
@@ -848,7 +641,7 @@ class OCSTransformer(BaseOCSTransformer):
                             if values:
                                 job_description_text = "\n".join(values)
                         if self._match_profile_label(cell_norm, "ocs_level"):
-                            level_raw = self._find_value_to_right(row, i)
+                            level_raw = tbl.find_value_to_right(row, i)
                             if level_raw:
                                 m = re.search(r"\d+", level_raw)
                                 if m:
@@ -860,14 +653,14 @@ class OCSTransformer(BaseOCSTransformer):
                 tables = pdf.pages[page_idx].extract_tables() or []
                 for table in tables:
                     for row in table:
-                        normalized_cells = self._row_to_normalized_cells(row)
+                        normalized_cells = tbl.row_to_normalized_cells(row)
                         for i, cell_norm in enumerate(normalized_cells):
                             if not cell_norm:
                                 continue
                             if not job_categories and self._match_profile_label(
                                 cell_norm, "job_category"
                             ):
-                                value = self._find_value_to_right(row, i)
+                                value = tbl.find_value_to_right(row, i)
                                 if value:
                                     for cat_name in txt.split_multi_value(value):
                                         cat_code = (
@@ -884,7 +677,7 @@ class OCSTransformer(BaseOCSTransformer):
                             if not occupations and self._match_profile_label(
                                 cell_norm, "occupation"
                             ) and "職業別代碼" not in str(row[i]):
-                                value = self._find_value_to_right(row, i)
+                                value = tbl.find_value_to_right(row, i)
                                 if value:
                                     for occ_name in txt.split_multi_value(value):
                                         occ_code = self._extract_occupation_code(text)
@@ -897,7 +690,7 @@ class OCSTransformer(BaseOCSTransformer):
                             if not industries and self._match_profile_label(
                                 cell_norm, "industry"
                             ):
-                                value = self._find_value_to_right(row, i)
+                                value = tbl.find_value_to_right(row, i)
                                 if value:
                                     for ind_name in txt.split_multi_value(value):
                                         if ind_name and ind_name not in [
@@ -965,21 +758,21 @@ class OCSTransformer(BaseOCSTransformer):
                 for table in page.extract_tables() or []:
                     if not table:
                         continue
-                    cleaned_rows = self._clean_table_rows(table)
+                    cleaned_rows = tbl.clean_table_rows(table)
                     if not cleaned_rows:
                         continue
 
-                    header_idx, _, header_span = self._find_ocu_header_row(cleaned_rows)
+                    header_idx, _, header_span = tbl.find_ocu_header_row(cleaned_rows)
                     if header_idx is None:
                         # ocs_attitude / notes_and_appendix tables are not OCU content.
                         if content_header is not None:
-                            section_type = self._detect_table_type(table)
+                            section_type = tbl.detect_table_type(table)
                             if section_type not in ("ocs_attitude", "notes_and_appendix"):
                                 merged_content_rows.extend(cleaned_rows)
                         continue
 
                     if content_header is None:
-                        content_header = self._merge_rows_for_header(
+                        content_header = tbl.merge_rows_for_header(
                             cleaned_rows[header_idx : header_idx + header_span]
                         )
                     merged_content_rows.extend(cleaned_rows[header_idx + header_span :])
@@ -988,7 +781,7 @@ class OCSTransformer(BaseOCSTransformer):
                 merged_table = [content_header] + merged_content_rows
                 parsed_units = (
                     self._parse_ocu_table_units(merged_table)
-                    if self._is_ocu_candidate_table(merged_table)
+                    if tbl.is_ocu_candidate_table(merged_table)
                     else []
                 )
 
@@ -1084,11 +877,11 @@ class OCSTransformer(BaseOCSTransformer):
             return []
 
         try:
-            header_idx, col_map, header_span = self._find_ocu_header_row(table)
+            header_idx, col_map, header_span = tbl.find_ocu_header_row(table)
             if header_idx is None:
                 return []
 
-            header = self._merge_rows_for_header(table[header_idx : header_idx + header_span])
+            header = tbl.merge_rows_for_header(table[header_idx : header_idx + header_span])
             ocu_code = "Unknown"
             ocu_name = "Unknown"
 
@@ -1096,11 +889,11 @@ class OCSTransformer(BaseOCSTransformer):
                 for i, cell in enumerate(meta_row):
                     norm_cell = txt.normalize_text(cell)
                     if "職能單元代碼" in norm_cell or "ocu代碼" in norm_cell:
-                        value = self._find_value_to_right(meta_row, i)
+                        value = tbl.find_value_to_right(meta_row, i)
                         if value:
                             ocu_code = value
                     if "職能單元名稱" in norm_cell or "ocu名稱" in norm_cell:
-                        value = self._find_value_to_right(meta_row, i)
+                        value = tbl.find_value_to_right(meta_row, i)
                         if value:
                             ocu_name = value
 

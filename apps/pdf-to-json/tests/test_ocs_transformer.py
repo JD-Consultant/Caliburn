@@ -1,7 +1,7 @@
 """Tests for header-driven OCU table parsing."""
 
 from jd_pdf_to_json.transformers.ocs_transformer import OCSTransformer
-from jd_pdf_to_json.transformers.support import text
+from jd_pdf_to_json.transformers.support import tables, text
 
 
 def test_normalize_text_handles_spaces_and_fullwidth() -> None:
@@ -60,8 +60,6 @@ def test_extract_competency_items_preserves_leading_digit_in_name() -> None:
 
 
 def test_detect_table_type_for_fixed_templates() -> None:
-    transformer = OCSTransformer()
-
     content_table = [
         ["主要職責", "工作任務", "工作產出", "行為指標", "職能級別", "職能內涵（K=knowledge知識）", "職能內涵（S=skills技能）"],
         ["T1", "T1.1測試", "O1.1.1產出", "P1.1.1指標", "4", "K01知識", "S01技能"],
@@ -71,20 +69,18 @@ def test_detect_table_type_for_fixed_templates() -> None:
         ["A01主動積極。"],
     ]
 
-    assert transformer._detect_table_type(content_table) == "ocs_content"
-    assert transformer._detect_table_type(attitude_table) == "ocs_attitude"
+    assert tables.detect_table_type(content_table) == "ocs_content"
+    assert tables.detect_table_type(attitude_table) == "ocs_attitude"
 
 
 def test_detect_table_type_for_split_content_header() -> None:
-    transformer = OCSTransformer()
-
     split_header_table = [
         ["主要職責", "工作任務", "工作產出", "行為指標", "", "職能", "職能內涵", "職能內涵"],
         ["", "", "", "", "職能級別", "（K=knowledge知識）", "（S=skills技能）", ""],
         ["T2", "T2.1 系統整合測試", "O2.1.1 系統整合測試報告", "P2.1.1 規劃系統整合架構圖", "4", "K01 職業安全與衛生相關規範", "S01 溝通協調能力", ""],
     ]
 
-    assert transformer._detect_table_type(split_header_table) == "ocs_content"
+    assert tables.detect_table_type(split_header_table) == "ocs_content"
 
 
 def test_parse_ocu_table_with_split_header_rows() -> None:

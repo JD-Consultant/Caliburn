@@ -1,24 +1,10 @@
 from dataclasses import dataclass
-from typing import Any, Protocol, runtime_checkable
 from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.services.knowledge.base import KnowledgeClient
+from app.core.ports import KnowledgeClient, LlmPort, PersistPort
 from app.services.persistence import ProfileRepo, DocRepo
-
-
-@runtime_checkable
-class PersistPort(Protocol):
-    async def set_selected_ocs(self, job_profile_id: UUID, codes: list[str]) -> None: ...
-    async def save_document(self, job_profile_id: UUID, content: dict) -> dict: ...
-
-
-@runtime_checkable
-class LlmPort(Protocol):
-    """per-role LLM 介面（D10）。role ∈ {"deep","indicator","cheap"}。"""
-    async def complete_text(self, prompt: str, *, role: str = "cheap") -> str: ...
-    async def complete_json(self, prompt: str, *, role: str = "cheap", default: Any = None) -> Any: ...
 
 
 class DbPersist:

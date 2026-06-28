@@ -7,7 +7,7 @@ from app.api.routes.ai import get_llm
 from app.api.routes.documents import get_knowledge
 from app.database import get_db
 from app.main import app
-from app.services.knowledge.models import OccupationTasks, TaskRef, UnitTasks
+from app.core.knowledge_dto import OccupationTasks, TaskRef, UnitTasks
 from tests.conftest_graph import FakeLlm
 
 

@@ -1,6 +1,6 @@
 """D29 V1: header-metadata aggregation (pure function, no DB/HTTP)."""
 from app.services import header_meta
-from app.services.knowledge.models import CodeName, OccupationDetail, OcsName
+from app.core.knowledge_dto import CodeName, OccupationDetail, OcsName
 
 
 def _meta(code, *, job_title="", job_category_name=None, **kw):

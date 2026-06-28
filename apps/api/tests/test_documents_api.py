@@ -14,7 +14,7 @@ from app.database import get_db
 from app.main import app
 from app.models import JobProfile, User
 from app.services import ocs_doc
-from app.services.knowledge.models import (
+from app.core.knowledge_dto import (
     CitableItem,
     CodeName,
     CompetencyPool,

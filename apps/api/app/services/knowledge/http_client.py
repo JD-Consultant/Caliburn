@@ -2,7 +2,7 @@
 日後要外部多客戶，indexer 端加 MCP surface 即可，本 client 不變。"""
 import httpx
 
-from app.services.knowledge.models import (
+from app.core.knowledge_dto import (
     CompetencyPool,
     OccupationDetail,
     OccupationSearchResponse,

@@ -12,7 +12,7 @@ from app.database import get_db
 from app.graph_v3.llm import OpenRouterLlm
 from app.main import app
 from app.models import JobProfile, User
-from app.services.knowledge.models import CitableItem, CompetencyPool, SourceRef
+from app.core.knowledge_dto import CitableItem, CompetencyPool, SourceRef
 from tests.conftest_graph import FakeLlm
 
 

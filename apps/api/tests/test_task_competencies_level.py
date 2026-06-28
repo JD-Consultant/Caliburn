@@ -1,4 +1,4 @@
-from app.services.knowledge.models import CitableItem, CompetencyPool, SourceRef
+from app.core.knowledge_dto import CitableItem, CompetencyPool, SourceRef
 from app.services.knowledge.task_detail import task_competencies
 
 

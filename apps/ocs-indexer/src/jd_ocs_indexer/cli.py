@@ -43,15 +43,10 @@ def index(
     settings = load_settings()
     reader = OCSJSONReader(settings.source_root)
 
-    from jd_ocs_indexer.embeddings.bge_m3 import BGEM3Embedder
+    from jd_ocs_indexer.embeddings.factory import make_embedder
     from jd_ocs_indexer.store import schema
 
-    embedder = BGEM3Embedder(
-        model_name=settings.bge_m3_model,
-        device=settings.bge_m3_device,
-        use_fp16=settings.bge_m3_use_fp16,
-        batch_size=settings.bge_m3_batch_size,
-    )
+    embedder = make_embedder(settings)
     client = make_client(url=settings.qdrant_url, api_key=settings.qdrant_api_key, timeout=settings.qdrant_timeout)
     writer = QdrantWriter(
         client,
@@ -261,14 +256,9 @@ def query(
     coll = collection or settings.qdrant_collection
     client = make_client(url=settings.qdrant_url, api_key=settings.qdrant_api_key, timeout=settings.qdrant_timeout)
 
-    from jd_ocs_indexer.embeddings.bge_m3 import BGEM3Embedder
+    from jd_ocs_indexer.embeddings.factory import make_embedder
 
-    embedder = BGEM3Embedder(
-        model_name=settings.bge_m3_model,
-        device=settings.bge_m3_device,
-        use_fp16=settings.bge_m3_use_fp16,
-        batch_size=1,
-    )
+    embedder = make_embedder(settings, batch_size=1)
     vec = embedder.embed_query(text)
 
     if hybrid:

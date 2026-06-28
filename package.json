@@ -4,6 +4,10 @@
   "packageManager": "npm@10.9.0",
   "workspaces": ["apps/*", "packages/*"],
   "scripts": {
+    "up": "docker compose up -d && turbo dev",
+    "down": "docker compose down",
+    "infra": "docker compose up -d",
+    "db:migrate": "npm run migrate -w @caliburn/api",
     "dev": "turbo dev",
     "build": "turbo build",
     "test": "turbo test",

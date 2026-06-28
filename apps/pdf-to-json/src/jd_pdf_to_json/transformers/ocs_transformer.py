@@ -27,6 +27,9 @@ from jd_pdf_to_json.core.models import (
     Notes,
 )
 from jd_pdf_to_json.transformers.base import BaseOCSTransformer
+from jd_pdf_to_json.transformers.sections import attitude_extractor
+from jd_pdf_to_json.transformers.sections import notes_extractor
+from jd_pdf_to_json.transformers.sections import version_extractor
 from jd_pdf_to_json.transformers.support import dedupe as dd
 from jd_pdf_to_json.transformers.support import items as itm
 from jd_pdf_to_json.transformers.support import scanning as scan
@@ -82,7 +85,7 @@ class OCSTransformer(BaseOCSTransformer):
             self.logger.info(f"開始轉換: {file_path}")
 
             with pdfplumber.open(file_path) as pdf:
-                version_info = self._extract_version_info(pdf)
+                version_info = version_extractor.extract_version_info(pdf)
                 self.logger.debug(f"✓ 版本信息: {len(version_info.versions)} 筆紀錄")
 
                 ocs_profile = self._extract_profile(pdf, version_info)
@@ -91,10 +94,10 @@ class OCSTransformer(BaseOCSTransformer):
                 ocs_content = self._extract_content(pdf)
                 self.logger.debug(f"✓ 內容: {len(ocs_content.ocu_units)} 個職能單元")
 
-                ocs_attitude = self._extract_attitude(pdf)
+                ocs_attitude = attitude_extractor.extract_attitude(pdf)
                 self.logger.debug(f"✓ 態度: {len(ocs_attitude.attitudes)} 個態度")
 
-                notes = self._extract_notes(pdf)
+                notes = notes_extractor.extract_notes(pdf)
                 self.logger.debug(
                     f"✓ 補充: {len(notes.prerequisites)} 條件 / {len(notes.supplements)} 補充說明"
                 )
@@ -233,61 +236,6 @@ class OCSTransformer(BaseOCSTransformer):
         return []
 
     # ── Main extractors ───────────────────────────────────────────────────────
-
-    def _extract_version_info(self, pdf) -> VersionInfo:
-        """Extract version history from the first-page table."""
-        versions = []
-        try:
-            tables = pdf.pages[0].extract_tables()
-            if not tables:
-                self.logger.warning("未找到版本表格，version_info.versions 將為空")
-                return VersionInfo(versions=versions)
-
-            for table in tables:
-                header_idx: Optional[int] = None
-                header_map: Dict[str, int] = {}
-                for row_idx, row in enumerate(table):
-                    current_map = tbl.build_column_map(row, self.VERSION_HEADER_ALIASES)
-                    if all(k in current_map for k in ("version", "ocs_code", "ocs_name", "status")):
-                        header_idx = row_idx
-                        header_map = current_map
-                        break
-
-                if header_idx is None:
-                    continue
-
-                for row in table[header_idx + 1 :]:
-                    version_idx = header_map.get("version")
-                    version_val = (
-                        tbl.find_cell_value(row, version_idx) or ""
-                        if version_idx is not None
-                        else ""
-                    )
-                    if not version_val:
-                        continue
-                    versions.append(
-                        VersionEntry(
-                            version=version_val,
-                            ocs_code=tbl.find_cell_value(row, header_map["ocs_code"]) or "Unknown",
-                            ocs_name=tbl.find_cell_value(row, header_map["ocs_name"]) or "Unknown",
-                            status=tbl.find_cell_value(row, header_map["status"]) or "Unknown",
-                            update_note=(
-                                tbl.find_cell_value(row, header_map["update_note"])
-                                if "update_note" in header_map
-                                else None
-                            ),
-                            update_date=(
-                                tbl.find_cell_value(row, header_map["update_date"]) or "Unknown"
-                                if "update_date" in header_map
-                                else "Unknown"
-                            ),
-                        )
-                    )
-
-        except Exception as e:
-            self.logger.warning(f"版本提取失敗: {str(e)}")
-
-        return VersionInfo(versions=versions)
 
     def _extract_profile(self, pdf, version_info: VersionInfo) -> OCSProfile:
         """Extract OCS profile: code, name, categories, level, and description."""
@@ -885,75 +833,3 @@ class OCSTransformer(BaseOCSTransformer):
             self.logger.warning(f"OCU 表解析失敗: {str(e)}")
             return []
 
-    def _extract_attitude(self, pdf) -> OCSAttitude:
-        """Extract attitude competency items (A-codes) from full PDF text.
-
-        Handles both one-per-line and multiple-per-line formats, e.g.
-        'A01外部意識、A02溝通協調能力、A03成果導向' all on a single line.
-        """
-        attitudes: List[Attitude] = []
-        seen_codes: set[str] = set()
-        try:
-            full_text = "\n".join(page.extract_text() or "" for page in pdf.pages)
-            code_re = re.compile(r"A(\d{1,2})")
-            for line in full_text.splitlines():
-                line = line.strip()
-                if not line or not re.match(r"A\d{1,2}", line):
-                    continue
-                hits = list(code_re.finditer(line))
-                for i, m in enumerate(hits):
-                    att_code = f"A{int(m.group(1)):02d}"
-                    if att_code in seen_codes:
-                        continue
-                    name_end = hits[i + 1].start() if i + 1 < len(hits) else len(line)
-                    name = line[m.end() : name_end].strip("、,，;； \t")
-                    if not name:
-                        continue
-                    seen_codes.add(att_code)
-                    attitudes.append(Attitude(code=att_code, name=name))
-        except Exception as e:
-            self.logger.warning(f"態度提取失敗: {str(e)}")
-        return OCSAttitude(attitudes=attitudes)
-
-    def _extract_notes(self, pdf) -> Notes:
-        """Extract prerequisites and supplementary notes from '說明與補充事項'."""
-        prerequisites: List[str] = []
-        supplements: List[str] = []
-
-        # Bullet/marker characters commonly used in OCS PDFs
-        _bullet_re = re.compile(r"^[\s⚫◆•◎\-＊\*\d+\.]+\s*")
-        # Section header patterns
-        _prereq_re = re.compile(r"建議擔任此職類.{0,6}學歷.{0,6}(經歷|經驗)")
-        _supp_re = re.compile(r"其他補充說明")
-
-        try:
-            full_text = "".join(page.extract_text() or "" for page in pdf.pages)
-            notes_start = full_text.find("說明與補充")
-            if notes_start == -1:
-                return Notes()
-
-            in_supplements = False
-            for line in full_text[notes_start:].split("\n")[1:]:
-                line = line.strip()
-                if not line or line.startswith("第") and "頁" in line:
-                    continue
-                # Section header switches
-                if _prereq_re.search(line):
-                    in_supplements = False
-                    continue
-                if _supp_re.search(line):
-                    in_supplements = True
-                    continue
-                # Strip leading bullets/markers before storing
-                clean = _bullet_re.sub("", line).strip()
-                if not clean:
-                    continue
-                if in_supplements:
-                    supplements.append(clean)
-                else:
-                    prerequisites.append(clean)
-
-        except Exception as e:
-            self.logger.warning(f"補充信息提取失敗: {str(e)}")
-
-        return Notes(prerequisites=prerequisites, supplements=supplements)

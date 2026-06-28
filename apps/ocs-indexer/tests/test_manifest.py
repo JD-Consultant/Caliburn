@@ -3,9 +3,9 @@ from jd_ocs_indexer.store import manifest as M
 
 
 def test_bge_signature():
-    from jd_ocs_indexer.embeddings.bge_m3 import BGEM3Embedder
+    from jd_ocs_indexer.embeddings.http_embedder import HttpEmbedder
 
-    sig = BGEM3Embedder(model_name="BAAI/bge-m3").signature
+    sig = HttpEmbedder("http://embedder").signature
     assert sig == EmbeddingSignature(provider="bge-m3", model="BAAI/bge-m3", dim=1024, revision=1)
 
 

@@ -34,11 +34,21 @@ cd apps/pdf-to-json  && uv sync --extra dev
 
 ## 跑開發環境
 
-依賴先起:`docker compose up -d db`(Postgres :5432);需要知識查詢時另起 indexer(見 runbook)。
+**一鍵全開 / 全關**(基礎設施跑 docker，app dev server 跑 host —— 對齊 Vercel 官方 turborepo `with-docker` 範例:Docker 管 infra/部署、dev 跑本機):
 
 ```bash
-npx turbo dev          # 一鍵起 api(:8001)+ web(:3000)
-npx turbo dev --filter=web    # 只起某一個
+npm run up      # = docker compose up -d (db:5432 + qdrant:6333) && turbo dev (api:8001 + web:3000 + indexer:8000)
+# Ctrl-C 收掉三個 dev server；
+npm run down    # = docker compose down（停 infra；named volume 資料保留）
+```
+
+首次 / DB schema 變更後跑一次遷移:`npm run db:migrate`（= apps/api `alembic upgrade head`）。
+本地 Qdrant 為空時需建索引一次:`cd apps/ocs-indexer && uv run jd-ocs-indexer index ./data/jd-json`。
+
+其他常用:
+```bash
+npm run infra                 # 只起 docker infra（db + qdrant）
+npx turbo dev --filter=web    # 只起某一個 app
 ```
 詳細起停 / 重啟紀律見 [`docs/runbook.md`](docs/runbook.md)。
 

@@ -15,8 +15,8 @@ from app.database import get_db
 from app.models import JobProfile
 from app.services import header_meta, ocs_doc
 from app.core.ports import KnowledgeClient
-from app.services.knowledge.http_client import HttpIndexerClient
-from app.services.persistence import DocRepo, ProfileRepo
+from app.adapters.knowledge_http import HttpIndexerClient
+from app.adapters.persistence import DocRepo, ProfileRepo
 
 logger = logging.getLogger("jobintel")
 

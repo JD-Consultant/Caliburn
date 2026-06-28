@@ -37,13 +37,15 @@ cd apps/pdf-to-json  && uv sync --extra dev
 **一鍵全開 / 全關**(基礎設施跑 docker，app dev server 跑 host —— 對齊 Vercel 官方 turborepo `with-docker` 範例:Docker 管 infra/部署、dev 跑本機):
 
 ```bash
-npm run up      # = docker compose up -d (db:5432 + qdrant:6333) && turbo dev (api:8001 + web:3000 + indexer:8000)
+npm run up      # = docker compose up -d (db:5432 + qdrant:6333 + embedder:8082) && turbo dev (api:8001 + web:3000 + indexer:8000)
 # Ctrl-C 收掉三個 dev server；
 npm run down    # = docker compose down（停 infra；named volume 資料保留）
 ```
 
+**嵌入服務**:BGE-M3(dense+sparse)跑在 `apps/embedder` 容器(GPU,ADR 0012),indexer 用 HTTP 呼叫它(無 in-process torch)。首次需 build 映像(~15GB,含 CUDA torch):`docker compose up -d --build embedder`(需 NVIDIA GPU + Docker Desktop WSL2)。
+
 首次 / DB schema 變更後跑一次遷移:`npm run db:migrate`（= apps/api `alembic upgrade head`）。
-本地 Qdrant 為空時需建索引一次:`cd apps/ocs-indexer && uv run jd-ocs-indexer index ./data/jd-json`。
+本地 Qdrant 為空時需建索引一次:`cd apps/ocs-indexer && uv run jd-ocs-indexer index ./data/jd-json`(會打 embedder 服務,不需本機 torch)。
 
 其他常用:
 ```bash

@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",
+    "@caliburn/ocs-contract": "*",
     "@copilotkit/react-core": "^1.61.0",
     "@copilotkit/react-ui": "^1.61.0",
     "@copilotkit/runtime": "^1.61.0",

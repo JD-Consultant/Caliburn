@@ -27,6 +27,7 @@ from jd_pdf_to_json.core.models import (
     Notes,
 )
 from jd_pdf_to_json.transformers.base import BaseOCSTransformer
+from jd_pdf_to_json.transformers.support import text as txt
 from jd_pdf_to_json.utils.exceptions import TransformationError
 from jd_pdf_to_json.utils.logger import logger
 
@@ -128,53 +129,11 @@ class OCSTransformer(BaseOCSTransformer):
             self.logger.error(f"✗ 轉換失敗: {str(e)}")
             raise TransformationError(f"Failed to transform PDF: {str(e)}") from e
 
-    # ── Text normalization ────────────────────────────────────────────────────
-
-    def _normalize_text(self, value: Any) -> str:
-        """Normalize text for robust header matching across layouts."""
-        if value is None:
-            return ""
-        text = unicodedata.normalize("NFKC", str(value))
-        text = text.replace("\n", " ").replace("\r", " ")
-        text = re.sub(r"[\s　]+", "", text)
-        text = re.sub(r"[：:()（）\[\]【】、,，.-]+", "", text)
-        return text.lower().strip()
-
-    def _compact_wrapped_text(self, value: Any) -> str:
-        """Collapse a wrapped cell value into a single readable line."""
-        if value is None:
-            return ""
-        text = unicodedata.normalize("NFKC", str(value))
-        text = text.replace("\r", "").replace("\n", "")
-        return re.sub(r"\s+", "", text).strip()
-
-    def _split_lines(self, value: Any) -> List[str]:
-        """Split cell text by newline, keeping slash-combined phrases intact."""
-        if not value:
-            return []
-        text = unicodedata.normalize("NFKC", str(value)).replace("\r", "\n")
-        return [line.strip() for line in text.split("\n") if line and line.strip()]
-
-    def _split_multi_value(self, value: str) -> List[str]:
-        """Split a profile cell into candidate items on common delimiters."""
-        normalized = unicodedata.normalize("NFKC", value)
-        parts = re.split(r"[、,，;；\n]+", normalized)
-        return [p.strip() for p in parts if p and p.strip()]
-
-    def _append_text_if_new(self, original: str, tail: str) -> str:
-        """Append continuation text only when it is not already present."""
-        if not tail:
-            return original
-        if not original:
-            return tail
-        if tail in original:
-            return original
-        return f"{original}{tail}"
 
     # ── Table utilities ───────────────────────────────────────────────────────
 
     def _row_to_normalized_cells(self, row: List[Any]) -> List[str]:
-        return [self._normalize_text(cell) for cell in row]
+        return [txt.normalize_text(cell) for cell in row]
 
     def _row_to_joined_normalized_text(self, row: List[Any]) -> str:
         """Join all normalized row cells into one string for table-type checks."""
@@ -225,14 +184,14 @@ class OCSTransformer(BaseOCSTransformer):
             self.CONTENT_HEADER_KEYS["level"],
         ]
         if not all(
-            any(self._normalize_text(a) in text for a in aliases) for aliases in required
+            any(txt.normalize_text(a) in text for a in aliases) for aliases in required
         ):
             return False
         has_knowledge = any(
-            self._normalize_text(a) in text for a in self.CONTENT_HEADER_KEYS["knowledge"]
+            txt.normalize_text(a) in text for a in self.CONTENT_HEADER_KEYS["knowledge"]
         )
         has_skills = any(
-            self._normalize_text(a) in text for a in self.CONTENT_HEADER_KEYS["skills"]
+            txt.normalize_text(a) in text for a in self.CONTENT_HEADER_KEYS["skills"]
         )
         return has_knowledge and has_skills
 
@@ -354,7 +313,7 @@ class OCSTransformer(BaseOCSTransformer):
             for field, alias_list in aliases.items():
                 if field in mapping:
                     continue
-                if any(self._normalize_text(a) in cell for a in alias_list):
+                if any(txt.normalize_text(a) in cell for a in alias_list):
                     mapping[field] = idx
         return mapping
 
@@ -364,7 +323,7 @@ class OCSTransformer(BaseOCSTransformer):
         """Parse O-code work outputs from a cell."""
         if not cell_value:
             return []
-        text = self._compact_wrapped_text(cell_value)
+        text = txt.compact_wrapped_text(cell_value)
         if not text:
             return []
 
@@ -389,7 +348,7 @@ class OCSTransformer(BaseOCSTransformer):
         """Parse P/T behavioral indicators from a cell."""
         if not cell_value:
             return []
-        text = self._compact_wrapped_text(cell_value)
+        text = txt.compact_wrapped_text(cell_value)
         if not text:
             return []
 
@@ -492,8 +451,8 @@ class OCSTransformer(BaseOCSTransformer):
         return self._dedupe(
             items,
             lambda i: (
-                self._normalize_text((i.code or "").upper()),
-                self._normalize_text(i.name or ""),
+                txt.normalize_text((i.code or "").upper()),
+                txt.normalize_text(i.name or ""),
             ),
         )
 
@@ -501,8 +460,8 @@ class OCSTransformer(BaseOCSTransformer):
         return self._dedupe(
             items,
             lambda i: (
-                self._normalize_text((i.code or "").upper()),
-                self._normalize_text(i.text or ""),
+                txt.normalize_text((i.code or "").upper()),
+                txt.normalize_text(i.text or ""),
             ),
         )
 
@@ -510,8 +469,8 @@ class OCSTransformer(BaseOCSTransformer):
         return self._dedupe(
             items,
             lambda i: (
-                self._normalize_text((i.code or "").upper()),
-                self._normalize_text(i.name or ""),
+                txt.normalize_text((i.code or "").upper()),
+                txt.normalize_text(i.name or ""),
             ),
         )
 
@@ -615,7 +574,7 @@ class OCSTransformer(BaseOCSTransformer):
 
     def _is_generic_unit_name(self, name: str) -> bool:
         """Return True when *name* is a placeholder rather than a real OCU name."""
-        return self._normalize_text(name) in {"主要職責", "工作任務", "unknown", ""}
+        return txt.normalize_text(name) in {"主要職責", "工作任務", "unknown", ""}
 
     def _merge_ocu_unit(self, unit: OCSUnit, ocu_units: List[OCSUnit]) -> None:
         """Merge *unit* into *ocu_units*, combining tasks for matching OCU codes."""
@@ -651,7 +610,7 @@ class OCSTransformer(BaseOCSTransformer):
     def _match_profile_label(self, cell_norm: str, label_key: str) -> bool:
         """Match a normalized cell against profile label aliases conservatively."""
         for alias in self.PROFILE_LABEL_ALIASES.get(label_key, []):
-            alias_norm = self._normalize_text(alias)
+            alias_norm = txt.normalize_text(alias)
             if not alias_norm:
                 continue
             # Short labels like "職業" / "產業" require exact match to avoid false positives.
@@ -686,8 +645,8 @@ class OCSTransformer(BaseOCSTransformer):
             for row in table:
                 if not row or len(row) < 6:
                     continue
-                names = self._split_lines(row[2] if len(row) > 2 else None)
-                codes = [c.upper() for c in self._split_lines(row[5] if len(row) > 5 else None)]
+                names = txt.split_lines(row[2] if len(row) > 2 else None)
+                codes = [c.upper() for c in txt.split_lines(row[5] if len(row) > 5 else None)]
                 if not names or not codes:
                     continue
                 if len(names) == len(codes) and set(codes).issubset(target_codes):
@@ -702,8 +661,8 @@ class OCSTransformer(BaseOCSTransformer):
             for row in table:
                 if not row or len(row) < 6:
                     continue
-                names = self._split_lines(row[2] if len(row) > 2 else None)
-                raw_codes = self._split_lines(row[5] if len(row) > 5 else None)
+                names = txt.split_lines(row[2] if len(row) > 2 else None)
+                raw_codes = txt.split_lines(row[5] if len(row) > 5 else None)
                 codes = [c.strip() for c in raw_codes if re.fullmatch(r"\d{2,4}", c.strip())]
                 if not names or not codes or len(names) != len(codes):
                     continue
@@ -743,7 +702,7 @@ class OCSTransformer(BaseOCSTransformer):
                 name_value = self._find_value_to_right(row, name_label_idx)
                 if not name_value:
                     continue
-                names = self._split_lines(name_value)
+                names = txt.split_lines(name_value)
                 if not names:
                     continue
 
@@ -753,7 +712,7 @@ class OCSTransformer(BaseOCSTransformer):
                     if code_value:
                         codes = [
                             c.strip().upper()
-                            for c in self._split_lines(code_value)
+                            for c in txt.split_lines(code_value)
                             if code_pattern.fullmatch(c.strip().upper())
                         ]
 
@@ -910,7 +869,7 @@ class OCSTransformer(BaseOCSTransformer):
                             ):
                                 value = self._find_value_to_right(row, i)
                                 if value:
-                                    for cat_name in self._split_multi_value(value):
+                                    for cat_name in txt.split_multi_value(value):
                                         cat_code = (
                                             explicit_job_category_code
                                             if explicit_job_category_code
@@ -927,7 +886,7 @@ class OCSTransformer(BaseOCSTransformer):
                             ) and "職業別代碼" not in str(row[i]):
                                 value = self._find_value_to_right(row, i)
                                 if value:
-                                    for occ_name in self._split_multi_value(value):
+                                    for occ_name in txt.split_multi_value(value):
                                         occ_code = self._extract_occupation_code(text)
                                         if occ_name and occ_name not in [
                                             o.name for o in occupations
@@ -940,7 +899,7 @@ class OCSTransformer(BaseOCSTransformer):
                             ):
                                 value = self._find_value_to_right(row, i)
                                 if value:
-                                    for ind_name in self._split_multi_value(value):
+                                    for ind_name in txt.split_multi_value(value):
                                         if ind_name and ind_name not in [
                                             d.name for d in industries
                                         ]:
@@ -1100,7 +1059,7 @@ class OCSTransformer(BaseOCSTransformer):
         """
         if not same_column and re.fullmatch(r"T\d+(?:\.\d+)?", task_code_raw, re.IGNORECASE):
             return [
-                TaskCodeEntry(code=task_code_raw, name=self._compact_wrapped_text(task_name_raw))
+                TaskCodeEntry(code=task_code_raw, name=txt.compact_wrapped_text(task_name_raw))
             ]
 
         text = task_name_raw or task_code_raw
@@ -1114,7 +1073,7 @@ class OCSTransformer(BaseOCSTransformer):
             entries.append(
                 TaskCodeEntry(
                     code=m.group(1),
-                    name=self._compact_wrapped_text(text[m.end() : name_end]),
+                    name=txt.compact_wrapped_text(text[m.end() : name_end]),
                 )
             )
         return entries
@@ -1135,7 +1094,7 @@ class OCSTransformer(BaseOCSTransformer):
 
             for meta_row in table[: header_idx + header_span]:
                 for i, cell in enumerate(meta_row):
-                    norm_cell = self._normalize_text(cell)
+                    norm_cell = txt.normalize_text(cell)
                     if "職能單元代碼" in norm_cell or "ocu代碼" in norm_cell:
                         value = self._find_value_to_right(meta_row, i)
                         if value:
@@ -1169,7 +1128,7 @@ class OCSTransformer(BaseOCSTransformer):
                     continue
 
                 if col_map and row:
-                    major_duty_raw = self._compact_wrapped_text(row[0])
+                    major_duty_raw = txt.compact_wrapped_text(row[0])
                     duty_match = re.match(r"(T\d+)(.+)", major_duty_raw)
                     if duty_match:
                         current_ocu_code = duty_match.group(1)
@@ -1273,26 +1232,26 @@ class OCSTransformer(BaseOCSTransformer):
                         skills_idx = col_map.get("skills")
 
                         output_tail = (
-                            self._compact_wrapped_text(row[output_idx])
+                            txt.compact_wrapped_text(row[output_idx])
                             if output_idx is not None and output_idx < len(row) and row[output_idx]
                             else ""
                         )
                         behavioral_tail = (
-                            self._compact_wrapped_text(row[behavioral_idx])
+                            txt.compact_wrapped_text(row[behavioral_idx])
                             if behavioral_idx is not None
                             and behavioral_idx < len(row)
                             and row[behavioral_idx]
                             else ""
                         )
                         knowledge_tail = (
-                            self._compact_wrapped_text(row[knowledge_idx])
+                            txt.compact_wrapped_text(row[knowledge_idx])
                             if knowledge_idx is not None
                             and knowledge_idx < len(row)
                             and row[knowledge_idx]
                             else ""
                         )
                         skills_tail = (
-                            self._compact_wrapped_text(row[skills_idx])
+                            txt.compact_wrapped_text(row[skills_idx])
                             if skills_idx is not None and skills_idx < len(row) and row[skills_idx]
                             else ""
                         )
@@ -1305,7 +1264,7 @@ class OCSTransformer(BaseOCSTransformer):
                                 r"\bO\d+(?:[-.]\d+)*", output_tail, flags=re.IGNORECASE
                             )
                         ):
-                            previous_block.outputs[-1].name = self._append_text_if_new(
+                            previous_block.outputs[-1].name = txt.append_text_if_new(
                                 previous_block.outputs[-1].name, output_tail
                             )
 
@@ -1317,7 +1276,7 @@ class OCSTransformer(BaseOCSTransformer):
                                 r"\b[PT]\d+(?:[-.]\d+)*", behavioral_tail, flags=re.IGNORECASE
                             )
                         ):
-                            previous_block.indicators[-1].text = self._append_text_if_new(
+                            previous_block.indicators[-1].text = txt.append_text_if_new(
                                 previous_block.indicators[-1].text, behavioral_tail
                             )
 
@@ -1329,7 +1288,7 @@ class OCSTransformer(BaseOCSTransformer):
                                 r"\bK\d+(?:[-.]\d+)*", knowledge_tail, flags=re.IGNORECASE
                             )
                         ):
-                            previous_block.knowledge[-1].name = self._append_text_if_new(
+                            previous_block.knowledge[-1].name = txt.append_text_if_new(
                                 previous_block.knowledge[-1].name, knowledge_tail
                             )
 
@@ -1341,13 +1300,13 @@ class OCSTransformer(BaseOCSTransformer):
                                 r"\bS\d+(?:[-.]\d+)*", skills_tail, flags=re.IGNORECASE
                             )
                         ):
-                            previous_block.skills[-1].name = self._append_text_if_new(
+                            previous_block.skills[-1].name = txt.append_text_if_new(
                                 previous_block.skills[-1].name, skills_tail
                             )
 
                         if task_name and previous_task.task_codes:
                             last_entry = previous_task.task_codes[-1]
-                            last_entry.name = self._append_text_if_new(last_entry.name, task_name)
+                            last_entry.name = txt.append_text_if_new(last_entry.name, task_name)
 
                         # New block when both a structural trigger (new O or level change)
                         # and new K/S codes are present.

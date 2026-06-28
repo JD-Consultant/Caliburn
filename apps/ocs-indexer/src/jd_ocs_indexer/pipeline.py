@@ -67,5 +67,8 @@ def run_index(settings: Settings, scan_dir: Path, *, limit: int = 0,
         report.points += rep.upserted
         report.indexed_files += 1
     report.elapsed_sec = time.time() - started
-    # (T3 will append: write_manifest(client, settings.qdrant_collection, embedder.signature))
+    if report.indexed_files:  # stamp the embedding identity only on a non-empty run
+        from jd_ocs_indexer.store.manifest import write_manifest
+
+        write_manifest(client, settings.qdrant_collection, embedder.signature)
     return report

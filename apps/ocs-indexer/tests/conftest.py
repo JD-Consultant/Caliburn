@@ -26,6 +26,12 @@ class StubEmbedder:
     dense_size = 1024
     supports_sparse = True
 
+    @property
+    def signature(self):
+        from jd_ocs_indexer.embeddings.base import EmbeddingSignature
+
+        return EmbeddingSignature(provider="stub", model="stub", dim=1024, revision=1)
+
     def embed_query(self, text: str) -> EmbeddedVector:
         return EmbeddedVector(
             dense=[0.1] * 1024,

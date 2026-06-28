@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from jd_ocs_indexer.embeddings.base import EmbeddedVector
+from jd_ocs_indexer.embeddings.base import EmbeddedVector, EmbeddingSignature
 from jd_ocs_indexer.models.chunk import SparseVector
 
 
@@ -17,6 +17,16 @@ class BGEM3Embedder:
     provider = "bge-m3"
     dense_size = 1024
     supports_sparse = True
+    REVISION = 1
+
+    @property
+    def signature(self) -> EmbeddingSignature:
+        return EmbeddingSignature(
+            provider=self.provider,
+            model=self.model_name,
+            dim=self.dense_size,
+            revision=self.REVISION,
+        )
 
     def __init__(
         self,

@@ -1,4 +1,9 @@
-"""Embedding service factory — the single construction site for the embedder."""
+"""Embedding service factory — the single construction site for the embedder.
+
+Returns the HTTP adapter to the `apps/embedder` BGE-M3 service (ADR 0012); the
+indexer no longer runs torch/FlagEmbedding in-process. `batch_size` is accepted
+for call-site compatibility but is handled by the service.
+"""
 from __future__ import annotations
 
 from jd_ocs_indexer.config import Settings
@@ -6,11 +11,6 @@ from jd_ocs_indexer.embeddings.base import EmbeddingService
 
 
 def make_embedder(settings: Settings, *, batch_size: int | None = None) -> EmbeddingService:
-    from jd_ocs_indexer.embeddings.bge_m3 import BGEM3Embedder  # lazy: avoid torch on import
+    from jd_ocs_indexer.embeddings.http_embedder import HttpEmbedder
 
-    return BGEM3Embedder(
-        model_name=settings.bge_m3_model,
-        device=settings.bge_m3_device,
-        use_fp16=settings.bge_m3_use_fp16,
-        batch_size=batch_size if batch_size is not None else settings.bge_m3_batch_size,
-    )
+    return HttpEmbedder(settings.embedder_url)

@@ -55,6 +55,9 @@ class Settings:
 
     index_batch_size: int
 
+    # Embedder service (ADR 0012): BGE-M3 served by apps/embedder over HTTP.
+    embedder_url: str
+
     extra: dict[str, str] = field(default_factory=dict)
 
 
@@ -78,4 +81,5 @@ def load_settings() -> Settings:
         bge_m3_use_fp16=_env_bool("BGE_M3_USE_FP16", False),
         bge_m3_batch_size=_env_int("BGE_M3_BATCH_SIZE", 8),
         index_batch_size=_env_int("INDEX_BATCH_SIZE", 32),
+        embedder_url=_env("EMBEDDER_URL", "http://localhost:8082") or "http://localhost:8082",
     )

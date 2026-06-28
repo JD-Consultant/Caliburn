@@ -9,9 +9,14 @@ authors = [
 requires-python = ">=3.11"
 dependencies = [
     "flagembedding>=1.4.0",
+    # Pin transformers to 4.x: FlagEmbedding 1.4.0 targets transformers 4.x; the 5.x
+    # rewrite breaks BGE-M3 at query time (lazy sonicmoe→torch._dynamo double-register
+    # AssertionError) and is unstable with torch 2.12. Its declared <6 bound is too loose.
+    "transformers>=4.44.2,<5",
     "pydantic>=2.13.4",
     "python-dotenv>=1.2.2",
     "qdrant-client>=1.18.0",
+    "httpx>=0.27",
     "rich>=15.0.0",
     "torch>=2.12.0",
     "typer>=0.26.1",

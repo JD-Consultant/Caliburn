@@ -1,9 +1,18 @@
 {
   "name": "@caliburn/ocs-contract",
   "private": true,
+  "types": "./types/ocs-document.ts",
+  "exports": {
+    ".": { "types": "./types/ocs-document.ts" }
+  },
   "scripts": {
-    "codegen": "uv run datamodel-codegen --input schema/ocs-document.schema.json --input-file-type jsonschema --output src/ocs_contract/models.py --output-model-type pydantic_v2.BaseModel --use-standard-collections --use-union-operator --use-schema-description --target-python-version 3.11 --disable-timestamp",
+    "codegen": "npm run codegen:py && npm run codegen:ts",
+    "codegen:py": "uv run datamodel-codegen --input schema/ocs-document.schema.json --input-file-type jsonschema --output src/ocs_contract/models.py --output-model-type pydantic_v2.BaseModel --use-standard-collections --use-union-operator --use-schema-description --target-python-version 3.11 --disable-timestamp",
+    "codegen:ts": "json2ts --input schema/ocs-document.schema.json --output types/ocs-document.ts",
     "check-codegen": "bash scripts/check-codegen.sh",
     "build": "echo \"no build\""
+  },
+  "devDependencies": {
+    "json-schema-to-typescript": "^15.0.0"
   }
 }

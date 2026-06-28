@@ -21,3 +21,17 @@ if ! git diff --quiet -- src/ocs_contract/models.py; then
   exit 1
 fi
 echo "OK: generated models in sync with schema."
+
+# --- TypeScript (Contract #3): regen types/ocs-document.ts + diff ---
+npx --no-install json2ts \
+  --input schema/ocs-document.schema.json \
+  --output types/ocs-document.ts
+
+if ! git diff --quiet -- types/ocs-document.ts; then
+  echo "ERROR: types/ocs-document.ts is out of sync with schema/ocs-document.schema.json."
+  echo "       Run 'npm run codegen:ts' (in packages/ocs-contract) and commit the result."
+  git --no-pager diff --stat -- types/ocs-document.ts
+  git checkout -- types/ocs-document.ts   # restore — non-destructive check
+  exit 1
+fi
+echo "OK: generated TS in sync with schema."

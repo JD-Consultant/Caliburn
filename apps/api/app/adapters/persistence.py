@@ -10,29 +10,8 @@ logger = logging.getLogger("jobintel")
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.domain.ocs_doc import compute_completion
 from app.models import DocumentVersion, JobProfile
-
-
-def compute_completion(content: dict) -> float:
-    """OCS 文件填充率：header 與 A 各算一格，每 task 4 格(O/P/K/S)。
-
-    分子 filled = 1(header) + (1 if A) + Σ 每 task 已填格數；
-    分母 total  = 4*num_tasks + 1(A) + 1(header)。回傳 filled/total ∈ [0,1]。"""
-    units = (content.get("ocs_content") or {}).get("ocu_units") or []
-    num_tasks = 0
-    filled = 1  # header
-    for unit in units:
-        for task in (unit.get("tasks") or []):
-            num_tasks += 1
-            blocks = task.get("competency_blocks") or []
-            block = blocks[0] if blocks else {}
-            for key in ("outputs", "indicators", "knowledge", "skills"):
-                if block.get(key):
-                    filled += 1
-    if (content.get("ocs_attitude") or {}).get("attitudes"):
-        filled += 1
-    total = 4 * num_tasks + 1 + 1  # A + header
-    return filled / total
 
 
 class ProfileRepo:

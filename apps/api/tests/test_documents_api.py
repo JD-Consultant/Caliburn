@@ -13,7 +13,7 @@ from app.api.routes.documents import get_knowledge
 from app.database import get_db
 from app.main import app
 from app.models import JobProfile, User
-from app.services import ocs_doc
+from app.core.domain import ocs_doc
 from app.core.knowledge_dto import (
     CitableItem,
     CodeName,

@@ -1,5 +1,5 @@
 """D29 V1: header-metadata aggregation (pure function, no DB/HTTP)."""
-from app.services import header_meta
+from app.core.domain import header_meta
 from app.core.knowledge_dto import CodeName, OccupationDetail, OcsName
 
 

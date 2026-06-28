@@ -2,7 +2,8 @@ import pytest
 from uuid import uuid4
 from sqlalchemy import select
 from app.models import JobProfile, User
-from app.adapters.persistence import ProfileRepo, DocRepo, compute_completion
+from app.adapters.persistence import ProfileRepo, DocRepo
+from app.core.domain.ocs_doc import compute_completion
 
 
 def _doc(*, outputs=None, indicators=None, knowledge=None, skills=None, attitudes=None):

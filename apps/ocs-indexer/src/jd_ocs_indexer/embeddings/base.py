@@ -29,6 +29,31 @@ class EmbeddingSignature:
     revision: int
 
 
+class EmbeddingMismatchError(RuntimeError):
+    """Index was built with a different embedding model than the live embedder."""
+
+
+def assert_compatible(manifest: "EmbeddingSignature | None", current: "EmbeddingSignature") -> None:
+    """Fail fast when the query embedder does not match the index's.
+
+    `None` manifest (pre-manifest index) is a soft allow with a warning; a
+    provider/model/dim mismatch is a hard error; a revision-only difference warns.
+    """
+    import logging
+
+    log = logging.getLogger("jd_ocs_indexer")
+    if manifest is None:
+        log.warning("No embedding manifest in collection; cannot verify compatibility (pre-manifest index?).")
+        return
+    if (manifest.provider, manifest.model, manifest.dim) != (current.provider, current.model, current.dim):
+        raise EmbeddingMismatchError(
+            f"index embedder {manifest.provider}/{manifest.model}/{manifest.dim} "
+            f"!= query embedder {current.provider}/{current.model}/{current.dim}"
+        )
+    if manifest.revision != current.revision:
+        log.warning("Embedding revision differs (index r%s vs query r%s).", manifest.revision, current.revision)
+
+
 class EmbeddingService(Protocol):
     provider: str
     dense_size: int

@@ -57,5 +57,11 @@ def create_app(*, settings: Settings | None = None, embedder=None, client=None) 
     async def _qdrant_unreachable(request, exc):  # noqa: ANN001
         return JSONResponse(status_code=503, content={"detail": f"qdrant unreachable: {exc}"})
 
+    from jd_ocs_indexer.embeddings.base import EmbeddingMismatchError
+
+    @app.exception_handler(EmbeddingMismatchError)
+    async def _embed_mismatch(request, exc):  # noqa: ANN001
+        return JSONResponse(status_code=409, content={"detail": f"embedding mismatch: {exc}"})
+
     app.include_router(routes.router)
     return app

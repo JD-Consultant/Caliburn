@@ -80,10 +80,14 @@ def stats(
     if collection:
         client = make_client(url=settings.qdrant_url, api_key=settings.qdrant_api_key, timeout=settings.qdrant_timeout)
         c = stats_mod.collection_stats(client, collection)
+        from jd_ocs_indexer.store.manifest import read_manifest
+
+        m = read_manifest(client, collection)
         table = Table(title=f"Collection: {c.name}")
         table.add_column("metric")
         table.add_column("value", justify="right")
         table.add_row("total_points", str(c.total_points))
+        table.add_row("index_model", f"{m.provider}/{m.model}/{m.dim}" if m else "—")
         for lvl, n in c.by_level.items():
             table.add_row(f"level_{lvl}", str(n))
         console.print(table)
@@ -216,9 +220,12 @@ def query(
     coll = collection or settings.qdrant_collection
     client = make_client(url=settings.qdrant_url, api_key=settings.qdrant_api_key, timeout=settings.qdrant_timeout)
 
+    from jd_ocs_indexer.embeddings.base import assert_compatible
     from jd_ocs_indexer.embeddings.factory import make_embedder
+    from jd_ocs_indexer.store.manifest import read_manifest
 
     embedder = make_embedder(settings, batch_size=1)
+    assert_compatible(read_manifest(client, coll), embedder.signature)
     vec = embedder.embed_query(text)
 
     if hybrid:

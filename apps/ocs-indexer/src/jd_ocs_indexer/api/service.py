@@ -9,6 +9,8 @@ from __future__ import annotations
 import numpy as np
 
 from jd_ocs_indexer.api import urn
+from jd_ocs_indexer.embeddings.base import assert_compatible
+from jd_ocs_indexer.store.manifest import read_manifest
 from jd_ocs_indexer.validation import search as search_mod
 from jd_ocs_indexer.validation import stats as stats_mod
 from qdrant_client.http import models
@@ -147,6 +149,7 @@ def batch_get_tasks(client, collection: str, *, ids: list[str]) -> dict:
 
 
 def search_tasks(client, embedder, collection: str, *, query: str, top_k: int = 10) -> dict:
+    assert_compatible(read_manifest(client, collection), embedder.signature)
     vec = embedder.embed_query(query)
     hits = search_mod.hybrid_search(
         client, collection, vec.dense,
@@ -165,6 +168,7 @@ def search_tasks(client, embedder, collection: str, *, query: str, top_k: int = 
 
 
 def search_occupations(client, embedder, collection: str, *, query: str, top_k: int = 10) -> dict:
+    assert_compatible(read_manifest(client, collection), embedder.signature)
     vec = embedder.embed_query(query)
     hits = search_mod.hybrid_search(
         client, collection, vec.dense,
@@ -195,11 +199,19 @@ def healthcheck(client, embedder, collection: str) -> dict:
     except Exception:
         qdrant_ok = False
     status = "ok" if (model_loaded and qdrant_ok) else "degraded"
+    index_model = None
+    if qdrant_ok:
+        try:
+            m = read_manifest(client, collection)
+            index_model = f"{m.provider}/{m.model}/{m.dim}" if m else None
+        except Exception:
+            index_model = None
     return {
         "status": status,
         "model_loaded": model_loaded,
         "qdrant": "reachable" if qdrant_ok else "unreachable",
         "collection": collection,
+        "index_model": index_model,
     }
 
 

@@ -1,4 +1,4 @@
-from app.services.knowledge.models import (
+from app.core.knowledge_dto import (
     CompetencyPool,
     OccupationSearchResponse,
     OccupationTasks,

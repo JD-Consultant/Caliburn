@@ -4,7 +4,7 @@ resource-oriented (occupation/competencies), so a task is resolved by its
 task_code rather than by per-point lookup."""
 from __future__ import annotations
 
-from app.services.knowledge.models import CompetencyPool
+from app.core.knowledge_dto import CompetencyPool
 
 
 def _matches(item, task_code: str) -> bool:

@@ -11,7 +11,7 @@ note + an optional ``LlmPort``, return
 """
 from __future__ import annotations
 
-from app.graph_v3.deps import LlmPort
+from app.core.ports import LlmPort
 from app.services.ai import prompts
 
 

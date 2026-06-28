@@ -6,7 +6,7 @@ from langgraph.types import Command
 from app.graph_v3.state import new_state, InterviewState
 from app.graph_v3.nodes import pick_profile
 from app.graph_v3.deps import Deps
-from app.services.knowledge.models import OccupationSearchResponse, OccupationHit
+from app.core.knowledge_dto import OccupationSearchResponse, OccupationHit
 from tests.conftest_graph import FakeKnowledge, SpyPersist
 
 

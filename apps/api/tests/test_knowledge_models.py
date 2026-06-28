@@ -1,5 +1,5 @@
 def test_competency_pool_parses_citable_items():
-    from app.services.knowledge.models import CompetencyPool
+    from app.core.knowledge_dto import CompetencyPool
     p = CompetencyPool.model_validate({
         "ocs_code": "OC1",
         "knowledge": [{"id": "ocs:OC1:K:K01", "type": "K", "code": "K01", "name": "k1",
@@ -11,7 +11,7 @@ def test_competency_pool_parses_citable_items():
 
 
 def test_occupation_detail_parses_nested_ocs_name():
-    from app.services.knowledge.models import OccupationDetail
+    from app.core.knowledge_dto import OccupationDetail
     d = OccupationDetail.model_validate({
         "ocs_code": "OC1", "urn": "ocs:OC1",
         "ocs_name": {"job_category_name": None, "occupation_name": "資料分析師"},

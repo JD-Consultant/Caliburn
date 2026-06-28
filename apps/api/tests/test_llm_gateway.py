@@ -2,7 +2,7 @@ import pytest
 
 from app.config import settings
 from app.graph_v3 import llm as llm_mod
-from app.graph_v3.deps import LlmPort
+from app.core.ports import LlmPort
 
 
 def test_model_for_role_maps_three_tiers():

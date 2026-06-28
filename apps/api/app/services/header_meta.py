@@ -16,7 +16,7 @@ Multi-OCS rules (防雷):
 """
 from __future__ import annotations
 
-from app.services.knowledge.models import CodeName, OccupationDetail
+from app.core.knowledge_dto import CodeName, OccupationDetail
 
 
 def _merge_pairs(acc: list[dict], pairs: list[CodeName], source: str) -> None:

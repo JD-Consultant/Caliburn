@@ -14,7 +14,7 @@ from app.config import settings
 from app.database import get_db
 from app.models import JobProfile
 from app.services import header_meta, ocs_doc
-from app.services.knowledge.base import KnowledgeClient
+from app.core.ports import KnowledgeClient
 from app.services.knowledge.http_client import HttpIndexerClient
 from app.services.persistence import DocRepo, ProfileRepo
 

@@ -2,7 +2,7 @@
 仍走 KnowledgeClient / PersistPort 抽象（D6/D7）。真實作於後續 phase 接上。"""
 from uuid import UUID
 
-from app.services.knowledge.models import (
+from app.core.knowledge_dto import (
     CitableItem,
     CompetencyPool,
     OccupationHit,

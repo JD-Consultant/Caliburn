@@ -6,7 +6,7 @@ from langgraph.types import Command
 from app.graph_v3.state import new_state, InterviewState
 from app.graph_v3.deep_nodes import star_node, five_w2h_node, indicator_node, route_after_indicator
 from app.graph_v3.deps import Deps
-from app.services.knowledge.models import CompetencyPool, CitableItem, SourceRef
+from app.core.knowledge_dto import CompetencyPool, CitableItem, SourceRef
 from tests.conftest_graph import FakeKnowledge, SpyPersist, FakeLlm
 
 _GOOD = {"has_situation": True, "has_purpose": True, "has_collaborators": True,

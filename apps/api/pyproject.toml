@@ -27,7 +27,11 @@ dependencies = [
   "httpx==0.27.2",
   "opentelemetry-sdk==1.42.1",
   "opentelemetry-exporter-otlp-proto-http==1.42.1",
+  "indexer-contract",
 ]
+
+[tool.uv.sources]
+indexer-contract = { path = "../../packages/indexer-contract", editable = true }
 
 # 應用程式（非函式庫）：無 [build-system] → uv 視為非套件專案，只管 venv 與依賴。
 # import 名仍為 `app`（pytest.ini 的 pythonpath=. 提供）；rename → caliburn_api 屬 Phase 3。

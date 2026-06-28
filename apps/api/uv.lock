@@ -102,6 +102,7 @@ dependencies = [
     { name = "email-validator" },
     { name = "fastapi" },
     { name = "httpx" },
+    { name = "indexer-contract" },
     { name = "jinja2" },
     { name = "langchain" },
     { name = "langchain-core" },
@@ -137,6 +138,7 @@ requires-dist = [
     { name = "email-validator", specifier = "==2.3.0" },
     { name = "fastapi", specifier = "==0.115.0" },
     { name = "httpx", specifier = "==0.27.2" },
+    { name = "indexer-contract", editable = "../../packages/indexer-contract" },
     { name = "jinja2", specifier = "==3.1.4" },
     { name = "langchain", specifier = "==1.3.9" },
     { name = "langchain-core", specifier = "==1.4.7" },
@@ -474,6 +476,17 @@ sdist = { url = "https://files.pythonhosted.org/packages/cd/63/9496c57188a2ee585
 wheels = [
     { url = "https://files.pythonhosted.org/packages/1e/5e/d4e9f1a599fb8e573b7b87160658329fbf28d19eac2718f51fc3def3aa5a/idna-3.18-py3-none-any.whl", hash = "sha256:7f952cbe720b688055e3f87de14f5c3e5fdaa8bc3928985c4077ca689de849a2", size = 65455, upload-time = "2026-06-02T14:34:06.319Z" },
 ]
+
+[[package]]
+name = "indexer-contract"
+version = "0.1.0"
+source = { editable = "../../packages/indexer-contract" }
+dependencies = [
+    { name = "pydantic" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "pydantic", specifier = ">=2.9,<3" }]
 
 [[package]]
 name = "iniconfig"

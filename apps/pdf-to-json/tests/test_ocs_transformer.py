@@ -1,13 +1,12 @@
 """Tests for header-driven OCU table parsing."""
 
 from jd_pdf_to_json.transformers.ocs_transformer import OCSTransformer
+from jd_pdf_to_json.transformers.support import text
 
 
 def test_normalize_text_handles_spaces_and_fullwidth() -> None:
-    transformer = OCSTransformer()
-
-    assert transformer._normalize_text(" 知識（ K ）\n") == "知識k"
-    assert transformer._normalize_text("工作 任務 代碼") == "工作任務代碼"
+    assert text.normalize_text(" 知識（ K ）\n") == "知識k"
+    assert text.normalize_text("工作 任務 代碼") == "工作任務代碼"
 
 
 def test_parse_ocu_table_with_header_mapping() -> None:

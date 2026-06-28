@@ -7,3 +7,6 @@ dist/
 .turbo/
 .env
 uv.lock.bak
+
+# local-only agent orientation (not version-controlled, per maintainer)
+CLAUDE.md

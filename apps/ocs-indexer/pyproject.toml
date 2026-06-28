@@ -16,6 +16,7 @@ dependencies = [
     "torch>=2.12.0",
     "typer>=0.26.1",
     "ocs-contract",
+    "indexer-contract",
 ]
 
 [project.scripts]
@@ -40,6 +41,7 @@ explicit = true
 [tool.uv.sources]
 torch = { index = "pytorch-cu130", marker = "sys_platform == 'win32'" }
 ocs-contract = { path = "../../packages/ocs-contract", editable = true }
+indexer-contract = { path = "../../packages/indexer-contract", editable = true }
 
 [build-system]
 requires = ["uv_build>=0.10.8,<0.11.0"]

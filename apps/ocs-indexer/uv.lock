@@ -913,6 +913,17 @@ wheels = [
 ]
 
 [[package]]
+name = "indexer-contract"
+version = "0.1.0"
+source = { editable = "../../packages/indexer-contract" }
+dependencies = [
+    { name = "pydantic" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "pydantic", specifier = ">=2.9,<3" }]
+
+[[package]]
 name = "iniconfig"
 version = "2.3.0"
 source = { registry = "https://pypi.org/simple" }
@@ -966,6 +977,7 @@ version = "0.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "flagembedding" },
+    { name = "indexer-contract" },
     { name = "ocs-contract" },
     { name = "pydantic" },
     { name = "python-dotenv" },
@@ -991,6 +1003,7 @@ requires-dist = [
     { name = "fastapi", marker = "extra == 'api'", specifier = ">=0.115" },
     { name = "flagembedding", specifier = ">=1.4.0" },
     { name = "httpx", marker = "extra == 'dev'", specifier = ">=0.27" },
+    { name = "indexer-contract", editable = "../../packages/indexer-contract" },
     { name = "ocs-contract", editable = "../../packages/ocs-contract" },
     { name = "pydantic", specifier = ">=2.13.4" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8" },

@@ -70,7 +70,7 @@ def load_settings() -> Settings:
     return Settings(
         qdrant_url=_env("QDRANT_URL", "http://localhost:6333") or "",
         qdrant_api_key=_env("QDRANT_API_KEY"),
-        qdrant_collection=_env("QDRANT_COLLECTION", "ocs_v3") or "ocs_v3",
+        qdrant_collection=_env("QDRANT_COLLECTION", "ocs_v4") or "ocs_v4",
         qdrant_timeout=_env_float("QDRANT_TIMEOUT", 300.0),
         source_root=source_root,
         bge_m3_model=_env("BGE_M3_MODEL", "BAAI/bge-m3") or "BAAI/bge-m3",

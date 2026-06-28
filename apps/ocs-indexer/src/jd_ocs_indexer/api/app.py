@@ -29,14 +29,9 @@ def create_app(*, settings: Settings | None = None, embedder=None, client=None) 
         if embedder is not None:
             app.state.embedder = embedder
         else:
-            from jd_ocs_indexer.embeddings.bge_m3 import BGEM3Embedder
+            from jd_ocs_indexer.embeddings.factory import make_embedder
 
-            app.state.embedder = BGEM3Embedder(
-                model_name=s.bge_m3_model,
-                device=s.bge_m3_device,
-                use_fp16=s.bge_m3_use_fp16,
-                batch_size=1,
-            )
+            app.state.embedder = make_embedder(s, batch_size=1)
 
         if client is not None:
             app.state.client = client

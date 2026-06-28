@@ -1,7 +1,7 @@
 """Tests for header-driven OCU table parsing."""
 
 from jd_pdf_to_json.transformers.ocs_transformer import OCSTransformer
-from jd_pdf_to_json.transformers.support import tables, text
+from jd_pdf_to_json.transformers.support import items, tables, text
 
 
 def test_normalize_text_handles_spaces_and_fullwidth() -> None:
@@ -45,15 +45,13 @@ def test_parse_ocu_table_with_header_mapping() -> None:
 
 
 def test_extract_competency_items_preserves_leading_digit_in_name() -> None:
-    transformer = OCSTransformer()
-
-    items = transformer._extract_competency_items(
+    result = items.extract_competency_items(
         "S01 3D列印技術類型辨識能力\nS02 3D列印設備組裝與拆解能力",
         "S",
     )
 
-    assert [item.code for item in items] == ["S01", "S02"]
-    assert [item.name for item in items] == [
+    assert [item.code for item in result] == ["S01", "S02"]
+    assert [item.name for item in result] == [
         "3D列印技術類型辨識能力",
         "3D列印設備組裝與拆解能力",
     ]

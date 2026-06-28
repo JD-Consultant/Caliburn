@@ -39,6 +39,28 @@ services:
     restart: unless-stopped
     # 本地非公開 → 不設 API key（QDRANT__SERVICE__API_KEY）；indexer QDRANT_API_KEY 留空。
 
+  embedder:
+    build: ./apps/embedder
+    image: caliburn-embedder:local
+    container_name: jobintel_embedder
+    gpus: all                              # RTX 4060 已驗證（Docker Desktop + WSL2 nvidia）
+    ports:
+      - "8082:80"                          # indexer EMBEDDER_URL=http://localhost:8082
+    environment:
+      MODEL_ID: BAAI/bge-m3
+      DEVICE: cuda
+      USE_FP16: "true"
+    volumes:
+      - hf_cache:/root/.cache/huggingface  # 避免每次重抓 BGE-M3 權重
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 180s                   # 首次載入/下載模型較久
+    restart: unless-stopped
+
 volumes:
   pgdata:
   qdrant_storage:
+  hf_cache:

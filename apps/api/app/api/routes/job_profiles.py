@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
 from app.models import JobProfile, User
 from app.schemas import JobProfileCreate, JobProfileOut, JobProfileUpdate
-from app.services.persistence import DocRepo
+from app.adapters.persistence import DocRepo
 
 router = APIRouter(prefix="/job-profiles", tags=["job-profiles"])
 

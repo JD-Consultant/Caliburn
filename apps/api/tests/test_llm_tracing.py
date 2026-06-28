@@ -3,7 +3,7 @@ from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanE
 from langchain_core.messages import AIMessage
 
 from app.config import settings
-from app.graph_v3 import llm as llm_mod
+from app.adapters import llm_openrouter as llm_mod
 from app.graph_v3.tracing import setup_tracing
 
 

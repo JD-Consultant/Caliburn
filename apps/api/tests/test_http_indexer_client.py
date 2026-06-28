@@ -2,7 +2,7 @@ import httpx
 import pytest
 import respx
 
-from app.services.knowledge.http_client import HttpIndexerClient
+from app.adapters.knowledge_http import HttpIndexerClient
 
 BASE = "http://idx.test"
 

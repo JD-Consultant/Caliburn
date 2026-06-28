@@ -9,7 +9,7 @@ from app.api.routes.ai import get_llm
 from app.api.routes.documents import get_knowledge
 from app.config import settings
 from app.database import get_db
-from app.graph_v3.llm import OpenRouterLlm
+from app.adapters.llm_openrouter import OpenRouterLlm
 from app.main import app
 from app.models import JobProfile, User
 from app.core.knowledge_dto import CitableItem, CompetencyPool, SourceRef

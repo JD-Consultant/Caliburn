@@ -1,7 +1,7 @@
 import pytest
 
 from app.config import settings
-from app.graph_v3 import llm as llm_mod
+from app.adapters import llm_openrouter as llm_mod
 from app.core.ports import LlmPort
 
 

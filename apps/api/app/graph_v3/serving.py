@@ -13,11 +13,12 @@ from langgraph.checkpoint.memory import MemorySaver
 
 from app.config import settings
 from app.database import AsyncSessionLocal
-from app.graph_v3.deps import Deps, LiveDbPersist
+from app.adapters.persistence import LiveDbPersist
+from app.graph_v3.deps import Deps
 from app.graph_v3.graph import build_graph_v3
-from app.graph_v3.llm import OpenRouterLlm
-from app.graph_v3.stubs import InMemoryPersist, StubKnowledge
-from app.services.knowledge.http_client import HttpIndexerClient
+from app.adapters.llm_openrouter import OpenRouterLlm
+from app.adapters.stubs import InMemoryPersist, StubKnowledge
+from app.adapters.knowledge_http import HttpIndexerClient
 
 AGENT_NAME = "jd_authoring"
 

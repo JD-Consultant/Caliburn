@@ -18,7 +18,7 @@ from app.api.routes.documents import _require_profile, get_knowledge
 from app.config import settings
 from app.database import get_db
 from app.core.ports import LlmPort
-from app.graph_v3.llm import OpenRouterLlm
+from app.adapters.llm_openrouter import OpenRouterLlm
 from app.services.ai import clarify as _clarify
 from app.services.ai import draft_op as _draft_op
 from app.services.ai import extract_tasks as _extract_tasks
@@ -27,7 +27,7 @@ from app.services.ai import structure_task as _structure_task
 from app.services.ai import tasks as _tasks
 from app.core.ports import KnowledgeClient
 from app.services.knowledge.task_detail import task_competencies
-from app.services.persistence import DocRepo
+from app.adapters.persistence import DocRepo
 
 logger = logging.getLogger("jobintel")
 

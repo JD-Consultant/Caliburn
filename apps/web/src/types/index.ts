@@ -30,6 +30,22 @@ export interface JobProfile {
 // of-record = 一份合法 OCS JSON（jd-pdf-to-json 契約）。MVP 採「每任務一個
 // competency_block」；K/S/A item 為 {code,name}（code 可空字串），P 為 {code,text}。
 
+// The OCS document shape is generated from packages/ocs-contract's JSON schema
+// (single source of truth). The web layers front-end-only fields (_id/_uid/…)
+// on top via these UI types = generated base (Omit + re-tighten) & UI fields.
+// Contract #3 Part A; see docs/contract-strategy.md + ADR 0011.
+import type {
+  Category as GenCategory,
+  CodeName as GenCodeName,
+  CodeText as GenCodeText,
+  CompetencyBlock as GenBlock,
+  OCSDocument as GenDoc,
+  OcsName as GenOcsName,
+  OcsProfile as GenProfile,
+  OcuUnit as GenUnit,
+  TaskGroup as GenTask,
+} from "@caliburn/ocs-contract";
+
 export type ItemSource = "official" | "custom";
 
 export interface SourceRef {
@@ -40,31 +56,36 @@ export interface SourceRef {
   task_name?: string;      // 來源任務名
 }
 
-export interface CodeName {
+// Leaves: derived from the generated contract, with code/name(/text) tightened to
+// non-null strings (the editing UI always holds strings, never null) + UI fields.
+export type CodeName = Omit<GenCodeName, "code" | "name"> & {
   code: string;
   name: string;
   _id?: string;            // 穩定 UUID：dnd/編輯 key + 排序錨點
   _src?: ItemSource;       // 來源；加入當下即定
   _ref?: SourceRef;        // 官方來源；改內容→清空（轉自訂）
-}
+};
 
-export interface Indicator {
+export type Indicator = Omit<GenCodeText, "code" | "text"> & {
   code: string;
   text: string;
   _id?: string;
   _src?: ItemSource;
   _ref?: SourceRef;
-}
+};
 
-export interface CompetencyBlock {
+export type CompetencyBlock = Omit<
+  GenBlock,
+  "competency_level" | "indicators" | "outputs" | "knowledge" | "skills"
+> & {
   competency_level: number | null;
   indicators: Indicator[];
   outputs: CodeName[];
   knowledge: CodeName[];
   skills: CodeName[];
-}
+};
 
-export interface OcsTask {
+export type OcsTask = Omit<GenTask, "task_codes" | "competency_blocks"> & {
   task_codes: CodeName[];
   competency_blocks: CompetencyBlock[];
   // 來源：v4 indexer task URN 拆解（ocs_code, task_code）；自訂/cherry-pick 任務 task_code 為 ""。
@@ -72,42 +93,47 @@ export interface OcsTask {
   _tid?: string; // 前端穩定 id（拖拉用；隨項目移動）
   _notes?: string; // D28 工作筆記（5W2H/CIT 原文，餵 AI＋給顧問）；非契約欄，finalize/export 剝除
   _levelSrc?: SourceRef & { level: number }; // 帶官方時記下「官方級別 + 來源（含任務）」；export 剝除
-}
+};
 
-export interface OcuUnit {
+export type OcuUnit = Omit<GenUnit, "ocu_code" | "ocu_name" | "tasks"> & {
   ocu_code: string;
   ocu_name: string;
   source?: { ocs_code: string; occupation_name: string };
   tasks: OcsTask[];
   _uid?: string; // 前端穩定 id（拖拉用）
-}
+};
 
-export interface OcsName {
+export type OcsName = Omit<GenOcsName, "job_category_name" | "occupation_name"> & {
   job_category_name: string | null;
   occupation_name: string;
-}
+};
 
-export interface OcsCategory {
+export type OcsCategory = Omit<GenCategory, "job_categories" | "occupations" | "industries"> & {
   job_categories: CodeName[];
   occupations: CodeName[];
   industries: CodeName[];
-}
+};
 
-export interface OcsProfile {
-  ocs_code: string;
+export type OcsProfile = Omit<
+  GenProfile,
+  "ocs_name" | "category" | "job_description" | "ocs_level"
+> & {
   ocs_name: OcsName;
   category: OcsCategory;
   job_description: string;
   ocs_level: number | null;
-}
+};
 
-export interface OcsDocument {
+export type OcsDocument = Omit<
+  GenDoc,
+  "version_info" | "ocs_profile" | "ocs_content" | "ocs_attitude" | "notes"
+> & {
   version_info: { versions: unknown[] };
   ocs_profile: OcsProfile;
   ocs_content: { ocu_units: OcuUnit[] };
   ocs_attitude: { attitudes: CodeName[] };
   notes: { prerequisites: string[]; supplements: string[] };
-}
+};
 
 // GET/PATCH/finalize/seed 的回傳信封（DocRepo._to_dict / no-doc 空殼）。
 export interface DocumentEnvelope {

@@ -10,7 +10,7 @@ from app.graph_v3.constants import FIVE_W2H_REQUIRED, FIVE_W2H_LIST_FIELDS, INDI
 from app.graph_v3.tracing import traced_node
 import app.graph_v3.prompts.indicator as ind_prompts
 
-logger = logging.getLogger("jobintel")
+logger = logging.getLogger("caliburn")
 
 # ---- STAR 槽位（domain 資料；自舊 app.graph.nodes.star 移植） ----
 _SLOT_ORDER = ["S", "T", "A", "R"]

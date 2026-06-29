@@ -3,7 +3,7 @@ import json
 import logging
 import re
 
-logger = logging.getLogger("jobintel")
+logger = logging.getLogger("caliburn")
 
 
 def safe_parse_json(text: str, default=None):

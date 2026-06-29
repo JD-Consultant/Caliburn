@@ -29,7 +29,7 @@ from app.core.ports import KnowledgeClient
 from app.services.knowledge.task_detail import task_competencies
 from app.adapters.persistence import DocRepo
 
-logger = logging.getLogger("jobintel")
+logger = logging.getLogger("caliburn")
 
 router = APIRouter(prefix="/ai", tags=["ai"])
 

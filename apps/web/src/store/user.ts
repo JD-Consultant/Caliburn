@@ -33,6 +33,6 @@ export const useUserStore = create<UserStore>()(
         return createAnon(set);
       },
     }),
-    { name: "jobintel-user" }
+    { name: "caliburn-user" }
   )
 );

@@ -11,7 +11,7 @@ from app.config import settings
 from app.graph_v3.tracing import get_tracer
 from app.utils import safe_parse_json
 
-logger = logging.getLogger("jobintel")
+logger = logging.getLogger("caliburn")
 
 _MISSING = object()
 

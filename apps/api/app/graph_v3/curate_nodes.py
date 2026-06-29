@@ -8,7 +8,7 @@ from langgraph.types import interrupt
 from app.graph_v3.state import InterviewState, task_key
 from app.graph_v3.tracing import traced_node
 
-logger = logging.getLogger("jobintel")
+logger = logging.getLogger("caliburn")
 
 
 def _citables_to_items(items) -> list[dict]:

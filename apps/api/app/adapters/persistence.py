@@ -5,7 +5,7 @@ DocRepo: save — INSERT document_versions，版本遞增。"""
 import logging
 from uuid import UUID
 
-logger = logging.getLogger("jobintel")
+logger = logging.getLogger("caliburn")
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession

@@ -18,7 +18,7 @@ from app.core.ports import KnowledgeClient
 from app.adapters.knowledge_http import HttpIndexerClient
 from app.adapters.persistence import DocRepo, ProfileRepo
 
-logger = logging.getLogger("jobintel")
+logger = logging.getLogger("caliburn")
 
 router = APIRouter(prefix="/job-profiles", tags=["documents"])
 

@@ -1,0 +1,720 @@
+{
+  "version_info": {
+    "versions": [
+      {
+        "version": "SET2144-005v3",
+        "ocs_code": "SET2144-005v3",
+        "ocs_name": "機電熱能工程人員",
+        "status": "最新版本",
+        "update_note": "略",
+        "update_date": "2024/12/15"
+      },
+      {
+        "version": "SET2144-005v2",
+        "ocs_code": "SET2144-005v2",
+        "ocs_name": "機械熱傳工程人員",
+        "status": "最新版本",
+        "update_note": "略",
+        "update_date": "2022/12/13"
+      },
+      {
+        "version": "SET2144-005v1",
+        "ocs_code": "SET2144-005v1",
+        "ocs_name": "機械熱傳工程人員",
+        "status": "歷史版本",
+        "update_note": "已被《SET2144-005v2》取代",
+        "update_date": "2020/11/25"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "ocs_code": "SET2144-005v3",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "機電熱能工程人員"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "科學",
+          "code": "SET"
+        },
+        {
+          "name": "技術",
+          "code": "SET"
+        },
+        {
+          "name": "工程",
+          "code": "SET"
+        },
+        {
+          "name": "數學/工程及技術",
+          "code": "SET"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "機電熱能工程人員",
+          "code": "2144"
+        }
+      ],
+      "industries": [
+        {
+          "name": "製造業/機械設備製造業",
+          "code": "C2939"
+        }
+      ]
+    },
+    "job_description": "從事機電產品生產之熱能處理、交換、應用等作業。",
+    "ocs_level": 4
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "評估產品的功與熱",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "評估生產設備發展及產品動力行為"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "瞭解生產設備的發展趨勢及現有資源。"
+                  },
+                  {
+                    "code": "P1.1.2",
+                    "text": "依產品製造屬性評估其產生的動力及能源類型。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "產業發展趨勢"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "資源分析概論"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "各種安規認證知識"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "動力行為知識"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "能源型態及種類"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "綠能製造概念"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "動力行為使用能力"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "資訊蒐集能力"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "溝通協調能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.2",
+                "name": "評估產品熱能使用"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.2.1",
+                    "text": "評估產品的熱傳導形式。"
+                  },
+                  {
+                    "code": "P1.2.2",
+                    "text": "掌握產品製造生產時所需的熱能運用及需求。"
+                  },
+                  {
+                    "code": "P1.2.3",
+                    "text": "進行熱交換器的設計與繪圖。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.2.1",
+                    "name": "熱產生單元效率報表"
+                  },
+                  {
+                    "code": "O1.2.2",
+                    "name": "設計圖"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K05",
+                    "name": "能源型態及種類"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "熱傳導概論"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "製造生產流程概論"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "工程圖學"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S04",
+                    "name": "動力功種類辨識能力"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "生產流程分解能力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "工程設計所需之技術性計算 能力"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "識圖及製圖能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "管控產品功與熱的轉換效能",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "熱轉換效能的管控"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "控管產品生產製造時的熱量能源變化。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K10",
+                    "name": "材料特性知識"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "感測器原理與應用"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "資訊蒐集能力"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "感測器使用能力"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "量測儀器操作能力"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "材料檢測能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.2",
+                "name": "功轉換為其他能量的管控"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.2.1",
+                    "text": "確認熱交換轉換為熱能時的運作狀態。"
+                  },
+                  {
+                    "code": "P2.2.2",
+                    "text": "能正確執行熱交換轉換為其它能量時的量測作業。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K11",
+                    "name": "感測器原理與應用"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S08",
+                    "name": "感測器使用能力"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "量測儀器操作能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T3",
+        "ocu_name": "運用熱交換設備",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T3.1",
+                "name": "固相轉換為固相的熱交換運用"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.1.1",
+                    "text": "認識各種熱傳材料,並能充分運用與測試。"
+                  },
+                  {
+                    "code": "P3.1.2",
+                    "text": "應用高傳導效率的材料,提升熱傳效能。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K10",
+                    "name": "材料特性知識"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "熱力學"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "保溫材知識"
+                  },
+                  {
+                    "code": "K14",
+                    "name": "職業安全衛生相關規範"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S06",
+                    "name": "工程設計所需之技術性計算 能力"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "材料檢測能力"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "問題解決能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.2",
+                "name": "固相轉換為液相的熱交換運用"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.2.1",
+                    "text": "規劃設計快速散熱機構,以提升散熱效能。"
+                  },
+                  {
+                    "code": "P3.2.2",
+                    "text": "運用強化熱對流效應的材料或設備。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K10",
+                    "name": "材料特性知識"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "熱力學"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "保溫材知識"
+                  },
+                  {
+                    "code": "K14",
+                    "name": "職業安全衛生相關規範"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S06",
+                    "name": "工程設計所需之技術性計算 能力"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "材料檢測能力"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "問題解決能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.3",
+                "name": "液相轉換為液相的熱交換運用"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.3.1",
+                    "text": "認識加熱與散熱的機構或裝置。"
+                  },
+                  {
+                    "code": "P3.3.2",
+                    "text": "熟練液相轉液相的操作程序,以進行熱傳作業。"
+                  },
+                  {
+                    "code": "P3.3.3",
+                    "text": "能正確執行流力功能轉換與量測作業。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K07",
+                    "name": "熱傳導概論"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "材料特性知識"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "熱力學"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "保溫材知識"
+                  },
+                  {
+                    "code": "K14",
+                    "name": "職業安全衛生相關規範"
+                  },
+                  {
+                    "code": "K15",
+                    "name": "冷卻知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S06",
+                    "name": "工程設計所需之技術性計算 能力"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "材料檢測能力"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "問題解決能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.4",
+                "name": "熱交換器的操作規範"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.4.1",
+                    "text": "訂定熱交換器操作說明書。"
+                  },
+                  {
+                    "code": "P3.4.2",
+                    "text": "提升及改善熱交換器的熱傳效能。"
+                  },
+                  {
+                    "code": "P3.4.3",
+                    "text": "熱交換設備異常排除及問題處理記錄。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.4.1",
+                    "name": "熱交換器操作說明書"
+                  },
+                  {
+                    "code": "O3.4.3",
+                    "name": "異常處理紀錄表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K10",
+                    "name": "材料特性知識"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "保溫材知識"
+                  },
+                  {
+                    "code": "K14",
+                    "name": "職業安全衛生相關規範"
+                  },
+                  {
+                    "code": "K16",
+                    "name": "熱交換器結構知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S06",
+                    "name": "工程設計所需之技術性計算 能力"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "問題解決能力"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "安全防護執行能力"
+                  },
+                  {
+                    "code": "S13",
+                    "name": "熱交換器操作及管理能力"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "文書撰寫能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T4",
+        "ocu_name": "廢熱能再應用",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T4.1",
+                "name": "生產單元廢熱能的再應用"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.1.1",
+                    "text": "確認生產單元產生的廢熱能相關數據。"
+                  },
+                  {
+                    "code": "P4.1.2",
+                    "text": "強化廢熱能的改善及應用措施。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K11",
+                    "name": "感測器原理與應用"
+                  },
+                  {
+                    "code": "K16",
+                    "name": "熱交換器結構知識"
+                  },
+                  {
+                    "code": "K17",
+                    "name": "廢熱節能及儲能實務知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S03",
+                    "name": "溝通協調能力"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "量測儀器操作能力"
+                  },
+                  {
+                    "code": "S15",
+                    "name": "節能及儲能設計及規劃能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T4.2",
+                "name": "工作系統廢熱能的再應用"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.2.1",
+                    "text": "確認工作系統產生的廢熱能相關數據做為應用與改善措施。"
+                  },
+                  {
+                    "code": "P4.2.2",
+                    "text": "執行工作系統廢熱能的節能及儲能應用。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K11",
+                    "name": "感測器原理與應用"
+                  },
+                  {
+                    "code": "K16",
+                    "name": "熱交換器結構知識"
+                  },
+                  {
+                    "code": "K17",
+                    "name": "廢熱節能及儲能實務知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S03",
+                    "name": "溝通協調能力"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "量測儀器操作能力"
+                  },
+                  {
+                    "code": "S15",
+                    "name": "節能及儲能設計及規劃能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "主動積極：不需他人指示或要求能自動自發做事，面臨問題立即採取行動加以解決，且為達目標願意主動承擔額外責任。"
+      },
+      {
+        "code": "A02",
+        "name": "持續學習：能夠展現自我提升的企圖心，利用且積極參與各種機會，學習任務所需的新知識與技能，並能有效應用在特定任務。"
+      },
+      {
+        "code": "A03",
+        "name": "自我管理：設立定義明確且實際可行的個人目標；對於及時完成任務展現高度進取、努力、承諾及負責任的行為。"
+      },
+      {
+        "code": "A04",
+        "name": "團隊意識：積極參與並支持團隊，能彼此鼓勵共同達成團隊目標。"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "大專機械、電機、化工、能源等相關工程科系畢業，且具1年以上工程相關工作經驗者。",
+      "高中職機械、電機、化工相關工程群科畢業或同等學歷，且具3年以上相關工作經驗者。"
+    ],
+    "supplements": [
+      "動力行為知識：如電能、機械能、壓力能、流力能等。",
+      "技術性計算：如熱力學、溫度等。",
+      "材料特性知識：如材料的熱焓值、傳熱係數等。",
+      "感測器：如溫度、壓力、流量、電流計等。",
+      "量測儀器：如電流、壓力、溫度、濕度等。",
+      "熱傳材料：如導熱凝膠、導熱矽膠片、導熱墊片、熱導管、均溫板、散熱風扇等。",
+      "散熱機構：如散熱墊片結構、風扇散熱機構、熱傳材料固定機構等。"
+    ]
+  }
+}

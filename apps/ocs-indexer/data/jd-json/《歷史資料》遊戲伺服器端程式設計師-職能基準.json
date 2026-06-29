@@ -1,0 +1,736 @@
+{
+  "version_info": {
+    "versions": []
+  },
+  "ocs_profile": {
+    "ocs_code": "ISD2513-002",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "遊戲伺服器端程式設計師"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "資訊科技/軟體開發及程式設計",
+          "code": "ISD"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "遊戲伺服器端程式設計師",
+          "code": "2513"
+        }
+      ],
+      "industries": [
+        {
+          "name": "出版、影音製作、傳播及資通訊服務業/電腦程式設計、諮詢及相關服務業",
+          "code": "J6201"
+        }
+      ]
+    },
+    "job_description": "負責遊戲伺服器開發流程建置、伺服器及資料庫的架構設計、功能開發、軟體測試與維護更新；制定遊戲通訊規格、串接平台與金流系統，並建\n立對應的安全機制。",
+    "ocs_level": 5
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "開發前置作業",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "平台規格評估"
+              },
+              {
+                "code": "T1.2",
+                "name": "使用技術評估"
+              },
+              {
+                "code": "T1.3",
+                "name": "框架與套件評估"
+              },
+              {
+                "code": "T1.4",
+                "name": "其他開發工具需求評估"
+              },
+              {
+                "code": "T1.5",
+                "name": "人力需求評估"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.1",
+                    "text": "了解技術趨勢,熟悉各種框架、套件與開發工具的特性"
+                  },
+                  {
+                    "code": "P1.2",
+                    "text": "精確了解不同類型的遊戲,在硬體與軟體上的瓶頸與限制"
+                  },
+                  {
+                    "code": "P1.3",
+                    "text": "評估團隊能力與所具備的資源,正確判斷遊戲規格的可行性"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.1",
+                    "name": "框架與套件評估報告"
+                  },
+                  {
+                    "code": "O1.2",
+                    "name": "平台規格文件"
+                  },
+                  {
+                    "code": "O1.3",
+                    "name": "軟體需求評估報告"
+                  },
+                  {
+                    "code": "O1.4",
+                    "name": "人力需求評估報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "開發工具知識"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "遊戲引擎知識"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "技術趨勢判斷"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "開發流程管理"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "專案成本控管"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "Linux/BSD"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "C++/C#/Java"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "JacaScript/python/ Ruby/PHP"
+                  },
+                  {
+                    "code": "S04",
+                    "name": ".net/JSP/Spring"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "nodeJS/django/RoR"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "MySQL/MS SQL/ Oracle/Redis"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "開發流程建置",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "專案管理環境建置"
+              },
+              {
+                "code": "T2.2",
+                "name": "系統架構設計分析"
+              },
+              {
+                "code": "T2.3",
+                "name": "開發規格文件撰寫"
+              },
+              {
+                "code": "T2.4",
+                "name": "訂定程式開發規範"
+              },
+              {
+                "code": "T2.5",
+                "name": "除錯環境建置"
+              },
+              {
+                "code": "T2.6",
+                "name": "協助訂定資料整合流程"
+              },
+              {
+                "code": "T2.7",
+                "name": "版本控制"
+              },
+              {
+                "code": "T2.8",
+                "name": "協助製作編輯器"
+              },
+              {
+                "code": "T2.9",
+                "name": "協助製作開發輔助工具T2.3開發規格文件撰\n寫\nT2.4訂定程式開發規\n範\nT2.5除錯環境建置\nT2.6協助訂定資料整\n合流程\nT2.7版本控制\nT2.8協助製作編輯器\nT2.9協助製作開發輔\n助工具"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.1",
+                    "text": "了解遊戲開發流程,協助其他專業建立資料產出流程"
+                  },
+                  {
+                    "code": "P2.2",
+                    "text": "在團隊開發規範下進行作業"
+                  },
+                  {
+                    "code": "P2.3",
+                    "text": "使用團隊開發工具進行版本管理"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.1",
+                    "name": "專案管理環境"
+                  },
+                  {
+                    "code": "O2.2",
+                    "name": "開發規格文件"
+                  },
+                  {
+                    "code": "O2.3",
+                    "name": "企劃資料整合流程與說明文件"
+                  },
+                  {
+                    "code": "O2.4",
+                    "name": "測試版本發佈流程與說明文件"
+                  },
+                  {
+                    "code": "O2.5",
+                    "name": "正式版本發佈流程與說明文件"
+                  },
+                  {
+                    "code": "O2.6",
+                    "name": "遊戲編輯器"
+                  },
+                  {
+                    "code": "O2.7",
+                    "name": "開發輔助工具(轉檔、輸出等)"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K06",
+                    "name": "資料結構"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "遊戲製作流程"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "版本管理工具"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S07",
+                    "name": "GIT/SVN/Mecurial"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T3",
+        "ocu_name": "遊戲開發製作",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T3.1",
+                "name": "專案進度管理"
+              },
+              {
+                "code": "T3.2",
+                "name": "規格文件撰寫"
+              },
+              {
+                "code": "T3.3",
+                "name": "遊戲邏輯程式碼撰寫"
+              },
+              {
+                "code": "T3.4",
+                "name": "遊戲程式碼撰寫(使用框架、套件)"
+              },
+              {
+                "code": "T3.5",
+                "name": "驗證與安全性設計"
+              },
+              {
+                "code": "T3.6",
+                "name": "通訊資料規格與安全性設計"
+              },
+              {
+                "code": "T3.7",
+                "name": "資料庫設計"
+              },
+              {
+                "code": "T3.8",
+                "name": "多人同步處理"
+              },
+              {
+                "code": "T3.9",
+                "name": "登入與金流串接"
+              },
+              {
+                "code": "T3.10",
+                "name": "協助開發營運工具T3.9登入與金流串接\nT3.10協助開發營運\n工具"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.1",
+                    "text": "理解遊戲內容規格,並協助企劃人員評估可行性"
+                  },
+                  {
+                    "code": "P3.2",
+                    "text": "熟悉並正確使用框架及套件,依照遊戲規格與開發規範撰寫程式碼"
+                  },
+                  {
+                    "code": "P3.3",
+                    "text": "理解團隊的整體程式架構規劃,在此前提之下,考量擴充性與效能進行設計"
+                  },
+                  {
+                    "code": "P3.4",
+                    "text": "配合營運需求,提供金流、歷程等各方面的記錄分析工具"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.1",
+                    "name": "專案時程"
+                  },
+                  {
+                    "code": "O3.2",
+                    "name": "規格文件"
+                  },
+                  {
+                    "code": "O3.3",
+                    "name": "遊戲邏輯"
+                  },
+                  {
+                    "code": "O3.4",
+                    "name": "人工智慧"
+                  },
+                  {
+                    "code": "O3.5",
+                    "name": "登入系統"
+                  },
+                  {
+                    "code": "O3.6",
+                    "name": "金流串接"
+                  },
+                  {
+                    "code": "O3.7",
+                    "name": "營運工具"
+                  },
+                  {
+                    "code": "O3.8",
+                    "name": "歷程紀錄功能"
+                  },
+                  {
+                    "code": "O3.9",
+                    "name": "歷程紀錄檢視分析工具"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K09",
+                    "name": "基本專案管理知識"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "系統分析"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "資料結構"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "物件導向"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "設計模式/程式架構 概念(design pattern)"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "演算法"
+                  },
+                  {
+                    "code": "K14",
+                    "name": "進階網路通訊知識"
+                  },
+                  {
+                    "code": "K15",
+                    "name": "基本資料庫知識"
+                  },
+                  {
+                    "code": "K16",
+                    "name": "網路平台串接"
+                  },
+                  {
+                    "code": "K17",
+                    "name": "PAAS/BAAS運用"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "Linux/BSD"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "C++/C#/Java"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "JavaScript/python/ Ruby/PHP"
+                  },
+                  {
+                    "code": "S04",
+                    "name": ".net/JSP/Spring"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "nodeJS/django/ RoR"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "MySQL/MS SQL/ Oracle/Redis"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "socket/http/AJAX /REST"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "Xcode/Android SDK"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "FB SDK/Line SDK"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "GAE/AWS/Parse /firebase"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T4",
+        "ocu_name": "程式優化",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T4.1",
+                "name": "程式功能驗證與測試"
+              },
+              {
+                "code": "T4.2",
+                "name": "除錯"
+              },
+              {
+                "code": "T4.3",
+                "name": "各功能區塊效能分析與效能優化"
+              },
+              {
+                "code": "T4.4",
+                "name": "資料庫存儲規格優化"
+              },
+              {
+                "code": "T4.5",
+                "name": "通訊規格優化"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.1",
+                    "text": "熟悉程式運作流程,尋找功能面的錯誤並加以修正"
+                  },
+                  {
+                    "code": "P4.2",
+                    "text": "檢視程式碼與架構配置,針對效能可再優化的部分進行補強"
+                  },
+                  {
+                    "code": "P4.3",
+                    "text": "具備基本網路安全知識,了解各通訊協定特性"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.1",
+                    "name": "專案進度回報"
+                  },
+                  {
+                    "code": "O4.2",
+                    "name": "除錯記錄"
+                  },
+                  {
+                    "code": "O4.3",
+                    "name": "各功能區塊效能分析報告"
+                  },
+                  {
+                    "code": "O4.4",
+                    "name": "資料庫存儲規格優化"
+                  },
+                  {
+                    "code": "O4.5",
+                    "name": "通訊API優化"
+                  },
+                  {
+                    "code": "O4.6",
+                    "name": "通訊資料格式優化"
+                  },
+                  {
+                    "code": "O4.7",
+                    "name": "減低資料庫存取次數"
+                  },
+                  {
+                    "code": "O4.8",
+                    "name": "降低資料庫存取指令複雜度"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K10",
+                    "name": "系統分析"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "資料結構"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "演算法"
+                  },
+                  {
+                    "code": "K18",
+                    "name": "編輯器原理"
+                  },
+                  {
+                    "code": "K14",
+                    "name": "進階網路通訊知識"
+                  },
+                  {
+                    "code": "K19",
+                    "name": "進階資料庫知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "Linux/BSD"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "C++/C#/Java"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "JacaScript/python/ Ruby/PHP"
+                  },
+                  {
+                    "code": "S04",
+                    "name": ".net/JSP/Spring"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "nodeJS/django/ RoR"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "MySQL/MS SQL/ Oracle/Redis"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T5",
+        "ocu_name": "遊戲上架與維護",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T5.1",
+                "name": "遊戲發佈上架"
+              },
+              {
+                "code": "T5.2",
+                "name": "營運活動可行性評估"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P5.1",
+                    "text": "遵循平台規範與操作步驟上傳並發佈遊戲"
+                  },
+                  {
+                    "code": "P5.2",
+                    "text": "理解營運單位活動內容規格,協助其評估可行性"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O5.1",
+                    "name": "遊戲發佈上架"
+                  },
+                  {
+                    "code": "O5.2",
+                    "name": "遊戲定期結算時間點建議"
+                  },
+                  {
+                    "code": "O5.3",
+                    "name": "營運活動可行性建議"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K20",
+                    "name": "基本網路通訊知識"
+                  },
+                  {
+                    "code": "K16",
+                    "name": "網路平台串接"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "Linux/BSD"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "C++/C#/Java"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "JacaScript/python/ Ruby/PHP"
+                  },
+                  {
+                    "code": "S04",
+                    "name": ".net/JSP/Spring"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "nodeJS/django/ RoR"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "MySQL/MS SQL/ Oracle/Redis"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "Xcode/Android SDK"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "FB SDK/Line SDK"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "產業熱忱"
+      },
+      {
+        "code": "A02",
+        "name": "樂於分享"
+      },
+      {
+        "code": "A03",
+        "name": "邏輯性強"
+      },
+      {
+        "code": "A04",
+        "name": "溝通能力"
+      },
+      {
+        "code": "A05",
+        "name": "團隊合作"
+      },
+      {
+        "code": "A06",
+        "name": "抗壓性強"
+      },
+      {
+        "code": "A07",
+        "name": "快速學習"
+      },
+      {
+        "code": "A08",
+        "name": "獨立作業能力"
+      },
+      {
+        "code": "A09",
+        "name": "新技術探索"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "大學以上或同等學力，資訊工程、資訊管理、數學及電算機科學相關科系畢業，並具行動應用程式或遊戲產業相關領域實務經驗1~3年以上經驗。",
+      "基準更新紀錄"
+    ],
+    "supplements": []
+  }
+}

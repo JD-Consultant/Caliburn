@@ -1,0 +1,934 @@
+{
+  "version_info": {
+    "versions": [
+      {
+        "version": "V4",
+        "ocs_code": "KRM3323-001v4",
+        "ocs_name": "綜合零售業商品採購人員",
+        "status": "最新版本",
+        "update_note": "略",
+        "update_date": "2025/06/18"
+      },
+      {
+        "version": "V3",
+        "ocs_code": "KRM3323-001v3",
+        "ocs_name": "綜合零售業商品採購人員",
+        "status": "歷史版本",
+        "update_note": "已被《KRM3323-001v4》取代",
+        "update_date": "2022/09/06"
+      },
+      {
+        "version": "V2",
+        "ocs_code": "KRM3323-001v2",
+        "ocs_name": "綜合零售業商品採購人員",
+        "status": "歷史版本",
+        "update_note": "已被《KRM3323-001v3》取代",
+        "update_date": "2019/09/05"
+      },
+      {
+        "version": "V1",
+        "ocs_code": "KRM3323-001v1",
+        "ocs_name": "綜合零售業商品採購人員",
+        "status": "歷史版本",
+        "update_note": "已被《KRM3323-001v2》取代",
+        "update_date": "2016/11/18"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "ocs_code": "KRM3323-001v4",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "綜合零售業商品採購人員"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "行銷與銷售/零售與通路管理",
+          "code": "KRM"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "綜合零售業商品採購人員",
+          "code": "3323"
+        }
+      ],
+      "industries": [
+        {
+          "name": "批發及零售業/零售業",
+          "code": "G471"
+        }
+      ]
+    },
+    "job_description": "⚫ 工作定義：負責執行零售業貨品採買管理作業以規劃、接洽供應商及議價。\n⚫ 工作描述：\n1. 負責廠商開發業務，掌握供應商動向。\n2. 能夠擔負議價協商的任務。\n3. 賣場存貨以及成本管理。\n4. 瞭解進銷管理以及採買管理作業流程。",
+    "ocs_level": 3
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "商品營銷活動規劃",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "市場需求開發"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "從業人員能依據市場潮流,蒐集市場資訊,分析與選擇商品項目及平均價格,以掌握市場脈動及現況。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.1.1",
+                    "name": "需求企劃書"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "市場分析知識"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "商品推出期程知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "分析推理"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "外部意識"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "有效聯結"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "策略性思考"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.2",
+                "name": "商品採購"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.2.1",
+                    "text": "從業人員能針對相似行業進行競爭態勢分析,並以消費者行為及消費習性進行深度調查,以做為制定採購及銷售策略之依據。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.2.1",
+                    "name": "採購說明書"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "市場分析知識"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "採購計畫知識"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "銷售策略知識"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "通路開發知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "分析推理"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "外部意識"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "有效聯結"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "策略性思考"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "商品開發",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "發掘具潛力新商品"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "從業人員可透過各種資訊管道,蒐集適合自己公司通路的新廠商及新商品,藉此瞭解公司本身的營運狀況及目標市場之商品類型,以做出適當之採購判斷。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.1.1",
+                    "name": "新商品開發名冊"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K07",
+                    "name": "銷售策略知識"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "通路開發知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "分析推理"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "外部意識"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "有效聯結"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "創新導向"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "策略性思考"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.2",
+                "name": "開發廠商"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.2.1",
+                    "text": "從業人員可藉由目前之進貨需求條件,彙整過去連繫過的廠商並將資料文件化,分析各廠商之產品特色,以供未來選擇廠商之參考。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.2.1",
+                    "name": "廠商資料庫"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K12",
+                    "name": "數據分析知識"
+                  },
+                  {
+                    "code": "K18",
+                    "name": "商品問題分析知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "分析推理"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "成果導向"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "有效聯結"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "價值判斷"
+                  },
+                  {
+                    "code": "S15",
+                    "name": "資料整理"
+                  },
+                  {
+                    "code": "S16",
+                    "name": "資料分析"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T3",
+        "ocu_name": "採購條件協商",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T3.1",
+                "name": "引進具暢銷商機的潛力商品"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.1.1",
+                    "text": "從業人員能提出具潛力之廠商名冊,依據潛力商品之各項條件提出優勢、劣勢、機會、以及威脅等評估,供主管分析與選擇,以達新商品引進之效益。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.1.1",
+                    "name": "潛力廠商之SWOT分析文件"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K12",
+                    "name": "數據分析知識"
+                  },
+                  {
+                    "code": "K18",
+                    "name": "商品問題分析知識"
+                  },
+                  {
+                    "code": "K19",
+                    "name": "廠商SWOT知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "分析推理"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "溝通"
+                  },
+                  {
+                    "code": "S15",
+                    "name": "資料整理"
+                  },
+                  {
+                    "code": "S16",
+                    "name": "資料分析"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.2",
+                "name": "引進商品合作模式"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.2.1",
+                    "text": "從業人員可在選定適合的通路商之後,透過商品詢價、議價、下單、以及物流進度追蹤等工作項目,進而彙整出合作模式,提供精準的商品需求數量及品質予廠商參考。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.2.1",
+                    "name": "合作模式提案書"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K10",
+                    "name": "定價策略"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "貨運知識"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "數據分析知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "分析推理"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "成果導向"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "溝通"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "價值判斷"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T4",
+        "ocu_name": "物流管理",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T4.1",
+                "name": "進貨業務"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.1.1",
+                    "text": "從業人員能依據公司需求,監管貨品運輸與配送是否符合時程,檢查貨品包裝、裝卸、倉儲等作業是否有缺失,以配合公司需求進行控制與調整。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.1.1",
+                    "name": "進貨項目管理表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K02",
+                    "name": "商品推出期程知識"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "倉儲知識"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "商品盤點知識"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "貨運知識"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "數據分析知識"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "成本控管知識"
+                  },
+                  {
+                    "code": "K16",
+                    "name": "報表分析知識"
+                  },
+                  {
+                    "code": "K18",
+                    "name": "商品問題分析知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "分析推理"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "成果導向"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "品質導向"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "問題解決"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "策略性思考"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T4.2",
+                "name": "配送業務"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.2.1",
+                    "text": "從業人員可藉由檢視物流作業流中人力安排及實際需求,瞭解如何協調各部門之人力調動,以最適人力調配完成配送業務。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.2.1",
+                    "name": "物流管理單"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K09",
+                    "name": "人員分配知識"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "數據分析知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "分析推理"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "成果導向"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "品質導向"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T4.3",
+                "name": "庫存管理"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.3.1",
+                    "text": "從業人員應將各項商品妥善分類,規劃應存放之區域,並掌握應盤點之項目製作盤點存貨單,據以規劃最佳之盤點時程及人員分配比例,以促進庫存管理效率。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.3.1",
+                    "name": "盤點存貨單"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K04",
+                    "name": "商品分類知識"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "商品盤點知識"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "人員分配知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S03",
+                    "name": "成果導向"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "品質導向"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "組織計畫"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T5",
+        "ocu_name": "促銷方案",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T5.1",
+                "name": "設計及評估活動方案"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P5.1.1",
+                    "text": "從業人員能針對公司產品進行消費者市場調查,掌握消費者族群分佈情況,並分析不同族群之消費偏好,彙整資訊並擬訂活動企劃書,供主管決策參考。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O5.1.1",
+                    "name": "促銷方案企劃書"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "市場分析知識"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "數據分析知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "分析推理"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "成果導向"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "品質導向"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "策略性思考"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "顧客導向"
+                  },
+                  {
+                    "code": "S15",
+                    "name": "資料整理"
+                  },
+                  {
+                    "code": "S16",
+                    "name": "資料分析"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T5.2",
+                "name": "追蹤活動確實執行"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P5.2.1",
+                    "text": "從業人員能以公司銷售目標為基礎,依據各類消費者之消費偏好,擬定各式促銷方案,以供公司主管作為訂定下次促銷目標之參考。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O5.2.1",
+                    "name": "促銷活動評估表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K02",
+                    "name": "商品推出期程知識"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "銷售策略知識"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "定價策略"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "數據分析知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "分析推理"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "成果導向"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "品質導向"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "創新導向"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "策略性思考"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "顧客導向"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T6",
+        "ocu_name": "資料處理與分析",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T6.1",
+                "name": "蒐集商品銷售資訊"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P6.1.1",
+                    "text": "從業人員可依據銷貨管理系統製作存貨表單,蒐集商品銷售資訊,以達正確解讀與核對存貨單資訊,供公司主管決策參考之用。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O6.1.1",
+                    "name": "商品銷售報表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K15",
+                    "name": "貨單分析知識"
+                  },
+                  {
+                    "code": "K16",
+                    "name": "報表分析知識"
+                  },
+                  {
+                    "code": "K17",
+                    "name": "報表製作知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "分析推理"
+                  },
+                  {
+                    "code": "S13",
+                    "name": "閱讀能力"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "資訊科技能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T6.2",
+                "name": "定訂採購決策"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P6.2.1",
+                    "text": "從業人員藉由製作簡易的財務報表,進行採購成本分析與控管,釐清商品銷售狀況,並評核該商品之供應商是否能成為長期合作對象,提升採購決策之效益。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O6.2.1",
+                    "name": "採購決策分析表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K13",
+                    "name": "成本控管知識"
+                  },
+                  {
+                    "code": "K14",
+                    "name": "基礎財會知識"
+                  },
+                  {
+                    "code": "K16",
+                    "name": "報表分析知識"
+                  },
+                  {
+                    "code": "K17",
+                    "name": "報表製作知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "分析推理"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "價值判斷"
+                  },
+                  {
+                    "code": "S13",
+                    "name": "閱讀能力"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "資訊科技能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "誠信正直"
+      },
+      {
+        "code": "A02",
+        "name": "主動積極"
+      },
+      {
+        "code": "A03",
+        "name": "自我管理"
+      },
+      {
+        "code": "A04",
+        "name": "抗壓性高"
+      },
+      {
+        "code": "A05",
+        "name": "謹慎細心"
+      },
+      {
+        "code": "A06",
+        "name": "勇於承擔"
+      },
+      {
+        "code": "A07",
+        "name": "情緒管理佳"
+      },
+      {
+        "code": "A08",
+        "name": "具自信心"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "專科以上學歷，大學以上為佳。",
+      "熟悉綜合零售業（例如:量販、便利商店、超市、百貨業）業務為佳。",
+      "具備英文、日文之語言能力為佳。",
+      "熟悉文書處理軟體之基本操作。"
+    ],
+    "supplements": [
+      "物流管理乃是針對小型之綜合零售業（便利商店、超級市場），其從業人員需要配合公司需求，監管貨品運輸與配送是否符合時程，以配合公司需求進行控",
+      "制與調整，以最適人力調配完成配送、盤點、及人員分配比例業務。",
+      "適用範疇與對象：綜合零售業包含便利商店、超級市場、零售式量販店、以及百貨業，其規模與販賣品項各有不同，在徵詢領域專家意見之後認為「商品採",
+      "購人員職能基準」適用範疇暫排除百貨業，以便利商店、超級市場、以及零售式量販店之從業人員為主。"
+    ]
+  }
+}

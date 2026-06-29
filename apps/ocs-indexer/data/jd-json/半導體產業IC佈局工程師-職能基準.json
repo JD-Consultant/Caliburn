@@ -1,0 +1,331 @@
+{
+  "version_info": {
+    "versions": [
+      {
+        "version": "V4",
+        "ocs_code": "SET2152-001v4",
+        "ocs_name": "半導體產業IC佈局工程師",
+        "status": "最新版本",
+        "update_note": "因應產業需求，檢視更新職能內涵。",
+        "update_date": "2023/12/31"
+      },
+      {
+        "version": "V3",
+        "ocs_code": "SET2152-001v3",
+        "ocs_name": "半導體產業IC佈局工程師",
+        "status": "歷史版本",
+        "update_note": "已被《SET2152-001v4》取代",
+        "update_date": "2021/01/18"
+      },
+      {
+        "version": "V2",
+        "ocs_code": "SET2152-001v2",
+        "ocs_name": "半導體產業IC佈局工程師",
+        "status": "歷史版本",
+        "update_note": "已被《SET2152-001v3》取代",
+        "update_date": "2017/12/31"
+      },
+      {
+        "version": "V1",
+        "ocs_code": "SET2152-001v1",
+        "ocs_name": "半導體產業IC佈局工程師",
+        "status": "歷史版本",
+        "update_note": "已被《SET2152-001v2》取代",
+        "update_date": "2015/12/31"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "ocs_code": "SET2152-001v4",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "半導體產業IC佈局工程師"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "科學",
+          "code": "SET"
+        },
+        {
+          "name": "技術",
+          "code": "SET"
+        },
+        {
+          "name": "工程",
+          "code": "SET"
+        },
+        {
+          "name": "數學/工程及技術",
+          "code": "SET"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "半導體產業IC佈局工程師",
+          "code": "2152"
+        }
+      ],
+      "industries": [
+        {
+          "name": "製造業/電子零組件製造業(俗稱「半導體產業」)",
+          "code": "C2611"
+        }
+      ]
+    },
+    "job_description": "1. 依據邏輯設計圖轉換邏輯閘為電晶體。\n2. 使用EDA工具在IC晶片上配置電晶體位置。\n3. 使用EDA工具在IC晶片上以金屬導線連接電晶體。\n4. 使用EDA工具轉換邏輯設計圖所對應的多層光罩圖形。\n5. 模擬驗證電晶體位置與繞線功能正確性。\n6. 時脈分析特定工作頻率下佈局與繞線是否正確運作。\n7. 維護光罩圖形智慧財產權。\n8. 協助建置與管理IC設計軟體。\n9. 依時程進度完成專案計畫。\n10. 配合設計任務需求落實協同工作。\n11. 協助部門規劃執行教育訓練。",
+    "ocs_level": 4
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "IC佈局",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "依功能需求了解IC功能、工作頻率、操作速度、介面規格、消耗功率等基本規格。"
+              },
+              {
+                "code": "T1.2",
+                "name": "瞭解晶片製程熟悉製程參數與DesignRule。"
+              },
+              {
+                "code": "T1.3",
+                "name": "制定平面配置電路架構。"
+              },
+              {
+                "code": "T1.4",
+                "name": "使用EDA工具(SoCEncounter、Astro等)設計配置IC晶片上電晶體位置。"
+              },
+              {
+                "code": "T1.5",
+                "name": "使用EDA工具(SoCEncounter、Astro等)設計IC晶片上金屬導線連接電晶體。"
+              },
+              {
+                "code": "T1.6",
+                "name": "模擬驗證電晶體位置與繞線功能正確性。"
+              },
+              {
+                "code": "T1.7",
+                "name": "時脈分析特定工作頻率下佈局與繞線是否正確運作。"
+              },
+              {
+                "code": "T1.8",
+                "name": "驗證光罩圖形符合製程規格(DRC驗證)。"
+              },
+              {
+                "code": "T1.9",
+                "name": "使用EDA工具(Assura、Calibre等)驗證晶片上所有電晶體位置與連線"
+              },
+              {
+                "code": "T1.10",
+                "name": "光罩圖形tapeout追蹤、測試、分析、修改重製。"
+              },
+              {
+                "code": "T1.11",
+                "name": "管理與維護光罩圖形智慧財產權。"
+              },
+              {
+                "code": "T1.12",
+                "name": "使用與升級維護PDK(ProcessDesignKit)。"
+              },
+              {
+                "code": "T1.13",
+                "name": "協助IC設計軟體使用環境建置與管理。"
+              },
+              {
+                "code": "T1.14",
+                "name": "配合製程廠外包專案駐廠設計。"
+              },
+              {
+                "code": "T1.15",
+                "name": "配合專案計畫時程完成設計進度。"
+              },
+              {
+                "code": "T1.16",
+                "name": "配合設計需求支援與協調協同設計工作。之配置正確性（LVS驗證）。\nT1.10 光罩圖形tape out追\n蹤、測試、分析、修改重製。\nT1.11 管理與維護光罩圖形智\n慧財產權。\nT1.12 使用與升級維護PDK\n（Process Design Kit）。\nT1.13 協助IC設計軟體使用環\n境建置與管理。\nT1.14 配合製程廠外包專案駐\n廠設計。\nT1.15 配合專案計畫時程完成\n設計進度。\nT1.16 配合設計需求支援與協\n調協同設計工作。"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.1",
+                    "text": "能夠開發、設計、升級、使用、維護PDK(ProcessDesignKit)。"
+                  },
+                  {
+                    "code": "P1.2",
+                    "text": "能迅速完成電路設計並排除電路設計問題,探究原因。"
+                  },
+                  {
+                    "code": "P1.3",
+                    "text": "能有效率進行電路佈局與繞線設計工作。"
+                  },
+                  {
+                    "code": "P1.4",
+                    "text": "管理與維護光罩圖形。"
+                  },
+                  {
+                    "code": "P1.5",
+                    "text": "能夠依據專案時程,達成計畫需求。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.1",
+                    "name": "平面配置電路架構制定"
+                  },
+                  {
+                    "code": "O1.2",
+                    "name": "電路佈局與繞線圖"
+                  },
+                  {
+                    "code": "O1.3",
+                    "name": "時脈分析報告"
+                  },
+                  {
+                    "code": "O1.4",
+                    "name": "光罩圖形DRC驗證報告"
+                  },
+                  {
+                    "code": "O1.5",
+                    "name": "LVS驗證報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "積體電路知識"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "製程知識"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "電子電路設計應用"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "IC設計規格知識"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "IC佈局設計知識"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "數位邏輯分析"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "訊號完整性概念"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "VLSI知識"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "ESD、EMC知識"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "鎖相迴路知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "IC設計軟體使用與管 理"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "自動化佈局技術"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "HSPICE電路設計與模 擬分析技術"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "IC後佈局模擬分析技 術"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "類比電路佈局設計技術 ( Vertuoso、Leo, ...)"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "類比IC設計技術 (ADP、Laker..)"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "EDA佈局技術 ( SoC Encounter、Astro, ...)"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "DRC/LVS驗證技術 ( Assura、Calibre, ...)"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "英文能力"
+      },
+      {
+        "code": "A02",
+        "name": "簡報能力"
+      },
+      {
+        "code": "A03",
+        "name": "溝通協調"
+      },
+      {
+        "code": "A04",
+        "name": "時間管理"
+      },
+      {
+        "code": "A05",
+        "name": "協同工作"
+      },
+      {
+        "code": "A06",
+        "name": "主動積極負責"
+      },
+      {
+        "code": "A07",
+        "name": "歸納綜整能力"
+      },
+      {
+        "code": "A08",
+        "name": "設計分析能力"
+      },
+      {
+        "code": "A09",
+        "name": "團隊管理能力"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "學歷：大學",
+      "科系：電子電機相關系"
+    ],
+    "supplements": [
+      "根據彙收資料，此處之職能內涵A意指「能力（ability）」。"
+    ]
+  }
+}

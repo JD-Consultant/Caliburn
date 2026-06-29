@@ -1,0 +1,987 @@
+{
+  "version_info": {
+    "versions": [
+      {
+        "version": "V4",
+        "ocs_code": "通訊產業智慧手持裝置嵌入式系統韌體工程師",
+        "ocs_name": "通訊產業智慧手持裝置嵌入式系統韌體工程師",
+        "status": "最新版本",
+        "update_note": "因應產業需求，檢視更新職能內涵。",
+        "update_date": "2023/12/31"
+      },
+      {
+        "version": "V3",
+        "ocs_code": "通訊產業智慧手持裝置嵌入式系統韌體工程師",
+        "ocs_name": "通訊產業智慧手持裝置嵌入式系統韌體工程師",
+        "status": "歷史版本",
+        "update_note": "已被《ISD2152-003v4》取代",
+        "update_date": "2021/01/18"
+      },
+      {
+        "version": "V2",
+        "ocs_code": "通訊產業智慧手持裝置嵌入式系統韌體工程師",
+        "ocs_name": "通訊產業智慧手持裝置嵌入式系統韌體工程師",
+        "status": "歷史版本",
+        "update_note": "已被《ISD2152-003v3》取代",
+        "update_date": "2017/12/31"
+      },
+      {
+        "version": "V1",
+        "ocs_code": "通訊產業智慧手持裝置嵌入式系統韌體工程師",
+        "ocs_name": "通訊產業智慧手持裝置嵌入式系統韌體工程師",
+        "status": "歷史版本",
+        "update_note": "已被《ISD2152-003v2》取代",
+        "update_date": "201512/31"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "ocs_code": "通訊產業智慧手持裝置嵌入式系統韌體工程師",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "通訊產業智慧手持裝置嵌入式系統韌體工程師"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "資訊科技/軟體開發及程式設計",
+          "code": "ISD"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "通訊產業智慧手持裝置嵌入式系統韌體工程師",
+          "code": "2152"
+        }
+      ],
+      "industries": [
+        {
+          "name": "製造業/電腦、電子產品及光學製品製造業",
+          "code": "C2729"
+        }
+      ]
+    },
+    "job_description": "1. 依據硬體產品應用設定韌體基本需求。\n2. 依照標準規範分析歸納硬體、系統與介面規格。\n3. 撰寫韌體程式，測試與改善韌體問題。\n4. 負責裝置控制、驅動、系統軟體等組譯，更新、升級、測試BIOS。\n5. 管控與發佈產品工程變更。\n6. 撰寫產品規格說明手冊。\n7. 制定產品標準作業程序。\n8. 維護韌體程式與版本控制管理。\n9. 管控韌體設計進度、品質與成本評估。\n10. 依時程進度完成專案計畫。\n11. 配合設計任務需求落實協同工作。\n12. 協助部門規劃執行教育訓練。",
+    "ocs_level": 3
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "評估與確認產品規格需求",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "評估客戶、市場需求及標準規範並確認產品規格"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "能夠將新技術、產品、市場、標準規範等資訊,轉換為產品開發參考依據,並確認符合客戶需求的產品規格。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.1.1",
+                    "name": "產品規格說明書"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K08",
+                    "name": "計算機結構"
+                  },
+                  {
+                    "code": "K18",
+                    "name": "資料蒐集與分析"
+                  },
+                  {
+                    "code": "K19",
+                    "name": "電子學"
+                  },
+                  {
+                    "code": "K20",
+                    "name": "電路學"
+                  },
+                  {
+                    "code": "K22",
+                    "name": "數位邏輯電路"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S04",
+                    "name": "技術內涵分析能力"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "技術文件撰寫能力"
+                  },
+                  {
+                    "code": "S31",
+                    "name": "瞭解判讀產品標準規範能力"
+                  },
+                  {
+                    "code": "S32",
+                    "name": "瞭解技術原理與技術未來發 展能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.2",
+                "name": "進行BSP(boardsupportpackage)分析及技術可行性評估"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.2.1",
+                    "text": "有效掌握公司自我技術能力,以及零組件供應廠商及其它合作技術廠商資訊,進行可行性評估以訂定合理開發目標,選用最佳開發方案。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.2.1",
+                    "name": "可行性評估報告(如:零組件規格供應商評估、風險評估等)"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K02",
+                    "name": "元件與零組件功能及規格"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "作業系統原理"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "計算機結構"
+                  },
+                  {
+                    "code": "K15",
+                    "name": "產品開發流程"
+                  },
+                  {
+                    "code": "K17",
+                    "name": "程式語言"
+                  },
+                  {
+                    "code": "K24",
+                    "name": "驅動程式設計開發流程"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "成本分析能力"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "技術內涵分析能力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "技術實現可行性評估"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "供應商或合作廠商技術評估 能力"
+                  },
+                  {
+                    "code": "S17",
+                    "name": "理解零件規格書的能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.3",
+                "name": "製作原型品(雛型)"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.3.1",
+                    "text": "確立裝置周邊所需之硬體功能能夠運作,並符合客戶所需之功能規格。"
+                  },
+                  {
+                    "code": "P1.3.2",
+                    "text": "定義軟體程式的目的與功能並製作雛型,開發程序及測試結果與改善需作成書面資料。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.3.1",
+                    "name": "零組件清單表(BOM)"
+                  },
+                  {
+                    "code": "O1.3.2",
+                    "name": "原型品"
+                  },
+                  {
+                    "code": "O1.3.3",
+                    "name": "功能評估報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "介面規格技術與標準知識"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "作業系統原理"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "系統程式分析(system programing)"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "計算機結構"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "訊號量測知識(如:示波 器、訊號產生器、邏輯分析儀 等)"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "訊號與系統"
+                  },
+                  {
+                    "code": "K15",
+                    "name": "產品開發流程"
+                  },
+                  {
+                    "code": "K24",
+                    "name": "驅動程式設計開發流程"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S10",
+                    "name": "原功能或架構轉換 (Porting)能力"
+                  },
+                  {
+                    "code": "S13",
+                    "name": "訊號量測及分析技術能力"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "偵錯(debuger)分析工具 能力(如:Trace32、realview ICE、FIDO等)"
+                  },
+                  {
+                    "code": "S18",
+                    "name": "產品開發能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "設計與開發系統程式",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "檢視及確認系統的硬體組成元件"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "根據研發計畫做驅動程式設計,元件定義需符合子系統功能需求,並考量系統觀點,適當選擇硬體能力。"
+                  },
+                  {
+                    "code": "P2.1.2",
+                    "text": "對驅動程式設計進行審查並將其結果做成書面資料。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.1.1",
+                    "name": "軟體功能方塊圖"
+                  },
+                  {
+                    "code": "O2.1.2",
+                    "name": "功能概算評估報告"
+                  },
+                  {
+                    "code": "O2.1.3",
+                    "name": "硬體組成元件驗證報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K04",
+                    "name": "各類作業系統驅動程式的介 面規格及開發知識"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "系統程式原理(如:編譯 器、組譯器、及連結程式)"
+                  },
+                  {
+                    "code": "K19",
+                    "name": "電子學"
+                  },
+                  {
+                    "code": "K20",
+                    "name": "電路學"
+                  },
+                  {
+                    "code": "K22",
+                    "name": "數位邏輯電路"
+                  },
+                  {
+                    "code": "K23",
+                    "name": "驅動程式設計基本概念"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "三用電表使用能力"
+                  },
+                  {
+                    "code": "S16",
+                    "name": "基礎配電與焊接技能"
+                  },
+                  {
+                    "code": "S20",
+                    "name": "軟硬體共同開發能力"
+                  },
+                  {
+                    "code": "S30",
+                    "name": "選擇適當元件能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.2",
+                "name": "規劃硬體(元件及線路)與軟體控制訊號資源"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.2.1",
+                    "text": "適當考量系統功能、穩定性、安全性及管理性等需求的品質標準,以決定系統的硬體架構。"
+                  },
+                  {
+                    "code": "P2.2.2",
+                    "text": "將系統需求的功能適當分配至各元件及線路,以評量分配的適當性。"
+                  },
+                  {
+                    "code": "P2.2.3",
+                    "text": "確認硬體規格可否支援,並依參數、流程、新功能做調整與修改。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.2.1",
+                    "name": "輸入輸出介面分配報告(I/Ointerface)"
+                  },
+                  {
+                    "code": "O2.2.2",
+                    "name": "驅動程式設計書"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K04",
+                    "name": "各類作業系統驅動程式的介 面規格及開發知識"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "系統程式原理(如:編譯 器、組譯器、及連結程式)"
+                  },
+                  {
+                    "code": "K19",
+                    "name": "電子學"
+                  },
+                  {
+                    "code": "K20",
+                    "name": "電路學"
+                  },
+                  {
+                    "code": "K22",
+                    "name": "數位邏輯電路"
+                  },
+                  {
+                    "code": "K23",
+                    "name": "驅動程式設計基本概念"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S13",
+                    "name": "訊號量測及分析技術能力"
+                  },
+                  {
+                    "code": "S21",
+                    "name": "嵌入式系統(如Linux或 RTOS)核心與系統程式撰寫及 開發能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.3",
+                "name": "架設系統(boardbring\nup）"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.3.1",
+                    "text": "確保作業系統可正常開啓,使每一個硬體元件功能正常且如期運作。"
+                  },
+                  {
+                    "code": "P2.3.2",
+                    "text": "確保產品功能正常且如期運作。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.3.1",
+                    "name": "系統資源測試報告"
+                  },
+                  {
+                    "code": "O2.3.2",
+                    "name": "驅動元件實作程式碼"
+                  },
+                  {
+                    "code": "O2.3.3",
+                    "name": "功能測試報告"
+                  },
+                  {
+                    "code": "O2.3.4",
+                    "name": "驅動程式驗證報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K04",
+                    "name": "各類作業系統驅動程式的介 面規格及開發知識"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "系統程式原理(如:編譯 器、組譯器、及連結程式)"
+                  },
+                  {
+                    "code": "K19",
+                    "name": "電子學"
+                  },
+                  {
+                    "code": "K20",
+                    "name": "電路學"
+                  },
+                  {
+                    "code": "K22",
+                    "name": "數位邏輯電路"
+                  },
+                  {
+                    "code": "K23",
+                    "name": "驅動程式設計基本概念"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S14",
+                    "name": "偵錯(debuger)分析工具 能力(如:Trace32、realview ICE、FIDO等)"
+                  },
+                  {
+                    "code": "S23",
+                    "name": "程式版本控制"
+                  },
+                  {
+                    "code": "S25",
+                    "name": "微控制器"
+                  },
+                  {
+                    "code": "S34",
+                    "name": "驅動程式撰寫及開發能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T3",
+        "ocu_name": "執行整合系統程式測試與驗證",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T3.1",
+                "name": "編輯系統測試程式"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.1.1",
+                    "text": "完成並通過測試項目之設定目標,如:穩定度測試、TA驗證、耗電流測試、效能測試等。"
+                  },
+                  {
+                    "code": "P3.1.2",
+                    "text": "確認驗證所有相關功能可使用,且符合當初規格書設定之目標。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.1.1",
+                    "name": "測試計劃(testplan)"
+                  },
+                  {
+                    "code": "O3.1.2",
+                    "name": "測試報告(如:驅動程式驗證報告、系統程式驗證報告等)"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K05",
+                    "name": "作業系統原理"
+                  },
+                  {
+                    "code": "K16",
+                    "name": "軟體工程"
+                  },
+                  {
+                    "code": "K17",
+                    "name": "程式語言"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S07",
+                    "name": "系統整合測試"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "偵錯(debuger)分析工具 能力(如:Trace32、realview ICE、FIDO等)"
+                  },
+                  {
+                    "code": "S22",
+                    "name": "測試儀器操作能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.2",
+                "name": "偵錯與除錯程式"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.2.1",
+                    "text": "準備程式測試環境,並即時修正程式測試計畫,以符合規格需求目標,提高效率。"
+                  },
+                  {
+                    "code": "P3.2.2",
+                    "text": "分析不確定因素,提出例外狀況、異常狀況、障礙發生時的因應對策,並明確做出適當的處理方式。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.2.1",
+                    "name": "除錯程式記錄(bugtrackingsystem)"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K05",
+                    "name": "作業系統原理"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "訊號與系統"
+                  },
+                  {
+                    "code": "K16",
+                    "name": "軟體工程"
+                  },
+                  {
+                    "code": "K17",
+                    "name": "程式語言"
+                  },
+                  {
+                    "code": "K19",
+                    "name": "電子學"
+                  },
+                  {
+                    "code": "K20",
+                    "name": "電路學"
+                  },
+                  {
+                    "code": "K21",
+                    "name": "數位訊號處理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S13",
+                    "name": "訊號量測及分析技術能力"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "偵錯(debuger)分析工具 能力(如:Trace32、realview ICE、FIDO等)"
+                  },
+                  {
+                    "code": "S15",
+                    "name": "問題分析能力"
+                  },
+                  {
+                    "code": "S23",
+                    "name": "程式版本控制"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.3",
+                "name": "調校系統效能"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.3.1",
+                    "text": "分析測試結果以達成系統要求品質,並將系統規格與元件規格進行比對與改善,完成規格要求。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.3.1",
+                    "name": "系統效能報告書"
+                  },
+                  {
+                    "code": "O3.3.2",
+                    "name": "問題分析與改善報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K05",
+                    "name": "作業系統原理"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "計算機結構"
+                  },
+                  {
+                    "code": "K17",
+                    "name": "程式語言"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S11",
+                    "name": "效能分析(profiling tool)"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "壓力測試(stress test tool)"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "偵錯(debuger)分析工具 能力(如:Trace32、realview ICE、FIDO等)"
+                  },
+                  {
+                    "code": "S26",
+                    "name": "裝置驅動發展與整合能力"
+                  },
+                  {
+                    "code": "S29",
+                    "name": "調整優化驅動性能的能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T4",
+        "ocu_name": "協助產品通過認證與試量產之導入",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T4.1",
+                "name": "協助產品驗證申請"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.1.1",
+                    "text": "了解國際認證組織,如:CE/GCF/FCC/PTCRB等之測試項目要求與認證流程,得以使產品順利量產上市。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.1.1",
+                    "name": "測試報告及認證證書"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K03",
+                    "name": "各國產品認證申請程序"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "產品技術知識(如:OSI七 層參考模式、TCP/IP協定、 WLAN、Bluetooth、GSM、 3G、LTE等)"
+                  },
+                  {
+                    "code": "K14",
+                    "name": "產品規範基礎概念"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S19",
+                    "name": "產品驗證之檢測技術能力"
+                  },
+                  {
+                    "code": "S28",
+                    "name": "資料蒐集及分析能力"
+                  },
+                  {
+                    "code": "S31",
+                    "name": "瞭解判讀產品標準規範能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T4.2",
+                "name": "支援試量產測試需求"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.2.1",
+                    "text": "依據試量產規格書擬定相關之試量產測試流程及對應之產測程式。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.2.1",
+                    "name": "產測程式"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K05",
+                    "name": "作業系統原理"
+                  },
+                  {
+                    "code": "K16",
+                    "name": "軟體工程"
+                  },
+                  {
+                    "code": "K17",
+                    "name": "程式語言"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S24",
+                    "name": "進度掌握能力"
+                  },
+                  {
+                    "code": "S33",
+                    "name": "瞭解試量產流程"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T4.3",
+                "name": "分析評估及改善試量產良率"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.3.1",
+                    "text": "分析試量產報告,以確認符合試量產規格書之目標需求。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.3.1",
+                    "name": "試量產報告書"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K11",
+                    "name": "專案管理"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "產品生產流程"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S15",
+                    "name": "問題分析能力"
+                  },
+                  {
+                    "code": "S27",
+                    "name": "解讀報告能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T4.4",
+                "name": "提出品質改善對策"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.4.1",
+                    "text": "針對試量產效率、良率的問題以及品質的穩定性,提出改善建議。"
+                  },
+                  {
+                    "code": "P4.4.2",
+                    "text": "協助建立量產測試良率分析模式,以提高生產良率。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.4.1",
+                    "name": "品質改善建議書"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K11",
+                    "name": "專案管理"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "產品生產流程"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S03",
+                    "name": "成本評估能力"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "技術文件撰寫能力"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "品質成本改善能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "自我管理"
+      },
+      {
+        "code": "A02",
+        "name": "謹慎細心"
+      },
+      {
+        "code": "A03",
+        "name": "追求卓越"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "學歷：大學（含）以上，研究所尤佳。",
+      "科系：資工與電子相關系所。"
+    ],
+    "supplements": []
+  }
+}

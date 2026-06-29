@@ -1,0 +1,429 @@
+{
+  "version_info": {
+    "versions": [
+      {
+        "version": "V4",
+        "ocs_code": "KRM2421-001v4",
+        "ocs_name": "商業營運行政人員",
+        "status": "最新版本",
+        "update_note": "略",
+        "update_date": "2025/12/15"
+      },
+      {
+        "version": "V3",
+        "ocs_code": "KRM2421-001v3",
+        "ocs_name": "商業營運行政人員",
+        "status": "歷史版本",
+        "update_note": "已被《KRM2421-001v4》取代",
+        "update_date": "2022/12/13"
+      },
+      {
+        "version": "V2",
+        "ocs_code": "KRM2421-001v2",
+        "ocs_name": "商業營運行政人員",
+        "status": "歷史版本",
+        "update_note": "已被《KRM2421-001v3》取代",
+        "update_date": "2020/10/31"
+      },
+      {
+        "version": "V1",
+        "ocs_code": "KRM2421-001v1",
+        "ocs_name": "商業營運人員",
+        "status": "歷史版本",
+        "update_note": "已被《KRM2421-001v2》取代",
+        "update_date": "2017/10/31"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "ocs_code": "KRM2421-001v4",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "商業營運行政人員"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "行銷與銷售/零售與通路管理",
+          "code": "KRM"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "商業營運行政人員",
+          "code": "2421"
+        }
+      ],
+      "industries": [
+        {
+          "name": "支援服務業/行政支援服務業",
+          "code": "N8202"
+        }
+      ]
+    },
+    "job_description": "運用管理系統，執行庫存管理及文書行政相關業務。",
+    "ocs_level": 2
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "彙整營運事務相關資訊與系統紀錄",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "維護行政作業流程"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "根據組織檔案管理規定和作業流程規定進行監控,記錄和訂購辦公用品。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "組織檔案管理規定和作業流 程"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "辦公設備相關知識"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "職業安全衛生相關規範"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "報告撰寫能力"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "溝通協調能力"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "文書處理能力"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "資訊科技應用能力"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "分析解讀資訊能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.2",
+                "name": "操作系統以提供營運事務相關數據或資料"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.2.1",
+                    "text": "根據組織檔案管理規定,辨別相關的外部訊息源,並運用系統取得所需資訊。"
+                  },
+                  {
+                    "code": "P1.2.2",
+                    "text": "適當更新記錄,以保持資訊內容的安全性和保密性。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "組織檔案管理規定和作業流 程"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "辦公設備相關知識"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "職業安全衛生相關規範"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "報告撰寫能力"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "溝通協調能力"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "文書處理能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.3",
+                "name": "撰寫文件報告"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.3.1",
+                    "text": "根據組織檔案管理規定,撰寫文書報告,並發送給相關人員。"
+                  },
+                  {
+                    "code": "P1.3.2",
+                    "text": "備份並根據組織檔案管理規定,儲存文件的最終版報告。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.3.1",
+                    "name": "編輯報告及文件"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "組織檔案管理規定和作業流 程"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "辦公設備相關知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "報告撰寫能力"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "溝通協調能力"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "文書處理能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.4",
+                "name": "維護現有的記錄和檔案系統"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.4.1",
+                    "text": "根據組織檔案管理規定,維護記錄和歸檔以確保系統的完整性。"
+                  },
+                  {
+                    "code": "P1.4.2",
+                    "text": "根據組織規章制度與流程,正確的使用軟體以維護儲存多媒體檔案。"
+                  },
+                  {
+                    "code": "P1.4.3",
+                    "text": "確認文件歸檔要求,創立備份,以進行安全檢查,按要求進行檔案文件命名系統化。"
+                  },
+                  {
+                    "code": "P1.4.4",
+                    "text": "依據電腦軟體的提示,進行相關數據的保存,並且透過系統定期刪除、更新文件編排或存檔。"
+                  },
+                  {
+                    "code": "P1.4.5",
+                    "text": "定期於系統上執行病毒檢查。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.4.1",
+                    "name": "備份文件"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "組織檔案管理規定和作業流 程"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "辦公設備相關知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "報告撰寫能力"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "溝通協調能力"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "文書處理能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "支援商業營運相關工作",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "蒐集商業營運相關資訊"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "依據組織或主管交辦的任務、需求與目的,確認相關利益關係人並取得所需商業營運相關資訊。"
+                  },
+                  {
+                    "code": "P2.1.2",
+                    "text": "能正確使用網路或資訊設備,以獲取所需的相關營運資訊。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K04",
+                    "name": "工作場所資訊系統"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "業務計畫和預算"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "溝通協調能力"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "資訊科技應用能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.2",
+                "name": "提供商業營運資訊"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.2.1",
+                    "text": "依據蒐集所需的相關業務資訊,並呈報主管或相關利益關係人,提供作為決策參考。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K03",
+                    "name": "職業安全衛生相關規範"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "工作場所資訊系統"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "業務計畫和預算"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "溝通協調能力"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "資訊科技應用能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "主動積極：不需他人指示或要求能自動自發做事，面臨問題立即採取行動加以解決，且為達目標願意主動承擔額外責任。"
+      },
+      {
+        "code": "A02",
+        "name": "正直誠實：展現高道德標準及值得信賴的行為，且能以維持組織誠信為行事原則，瞭解違反組織、自己及他人的道德標準之影響。"
+      },
+      {
+        "code": "A03",
+        "name": "自我提升：能夠展現持續學習的企圖心，利用且積極參與各種機會，學習任務所需的新知識與能力，並能有效應用在特定任務。"
+      },
+      {
+        "code": "A04",
+        "name": "自信心：在表達意見、做決定、面對挑戰或挫折時，相信自己有足夠的能力去應付；面對他人反對意見時，能獨自站穩自己的立場。"
+      },
+      {
+        "code": "A05",
+        "name": "謹慎細心：對於任務的執行過程，能謹慎考量及處理所有細節，精確地檢視每個程序，並持續對其保持高度關注。"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "高中職以上畢業。"
+    ],
+    "supplements": [
+      "無"
+    ]
+  }
+}

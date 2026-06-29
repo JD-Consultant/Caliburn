@@ -1,0 +1,481 @@
+{
+  "version_info": {
+    "versions": [
+      {
+        "version": "V2",
+        "ocs_code": "FBF2529-001v2",
+        "ocs_name": "銀行─資訊安全人員",
+        "status": "最新版本",
+        "update_note": "略",
+        "update_date": "2023/01/06"
+      },
+      {
+        "version": "V1",
+        "ocs_code": "FBF2529-001v1",
+        "ocs_name": "銀行─資訊安全人員",
+        "status": "歷史版本",
+        "update_note": "已被《FBF2529-001v2》取代",
+        "update_date": "2020/02/14"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "ocs_code": "FBF2529-001v2",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "銀行─資訊安全人員"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "金融財務/銀行金融業務",
+          "code": "FBF"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "其他資料庫及網路專業人員",
+          "code": "2529"
+        }
+      ],
+      "industries": [
+        {
+          "name": "金融及保險業/金融服務業(銀行業)",
+          "code": "K6412"
+        }
+      ]
+    },
+    "job_description": "配合全行資訊系統，完成資訊安全架構規劃、安全數據分析及外部入侵阻隔，確保整體營運相關資訊安全。",
+    "ocs_level": 4
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "從事總行資訊安全策略規劃與評估",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "規劃總行整體資訊安全執行方向與相關安全分析報告"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 4,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "提升資訊系統安全。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.1.1",
+                    "name": "總行資訊安全發展計畫"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K04",
+                    "name": "金融市場"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "法律法規"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "企業管理"
+                  },
+                  {
+                    "code": "K15",
+                    "name": "科技發展"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S03",
+                    "name": "策略性思考"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "品質導向"
+                  },
+                  {
+                    "code": "S13",
+                    "name": "問題分析"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "問題解決"
+                  },
+                  {
+                    "code": "S29",
+                    "name": "領導管理"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.2",
+                "name": "對潛在資安問題進行發掘及影響評估"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 4,
+                "indicators": [
+                  {
+                    "code": "P1.2.1",
+                    "text": "評估現有資訊安全執行方式之合理性、有效性及必要性。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.2.1",
+                    "name": "總行資訊安全評估報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K04",
+                    "name": "金融市場"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "金融商品"
+                  },
+                  {
+                    "code": "K14",
+                    "name": "統計"
+                  },
+                  {
+                    "code": "K15",
+                    "name": "科技發展"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S03",
+                    "name": "策略性思考"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "有效連結"
+                  },
+                  {
+                    "code": "S24",
+                    "name": "資訊科技應用能力"
+                  },
+                  {
+                    "code": "S25",
+                    "name": "績效管理"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "依據總行資訊安全策略,執行專案管理、建置相關系統(設備)或採取應對措施",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "擬定各部門強化資訊安全之策略與措施,擬定管控方向及資安路徑地圖"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 4,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "各部門資訊安全意識及防範行為之具體落實。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.1.1",
+                    "name": "各部門資訊安全強化策略與措施"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K04",
+                    "name": "金融市場"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "產業分析"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "風險管理"
+                  },
+                  {
+                    "code": "K15",
+                    "name": "科技發展"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "外部環境認知與評估"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "成果導向"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "規劃與組織能力"
+                  },
+                  {
+                    "code": "S19",
+                    "name": "協調能力"
+                  },
+                  {
+                    "code": "S24",
+                    "name": "資訊科技應用能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.2",
+                "name": "評估改善資訊安全所需投入之資源(人員、設備)與效用評估"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 4,
+                "indicators": [
+                  {
+                    "code": "P2.2.1",
+                    "text": "資訊安全投資資源之有效性評估。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.2.1",
+                    "name": "資訊安全投入資源分析與效用評估"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K02",
+                    "name": "財務分析"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "產業分析"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "人力資源"
+                  },
+                  {
+                    "code": "K15",
+                    "name": "科技發展"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S07",
+                    "name": "品質導向"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "成果導向"
+                  },
+                  {
+                    "code": "S13",
+                    "name": "問題分析"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "問題解決"
+                  },
+                  {
+                    "code": "S27",
+                    "name": "預算編制"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T3",
+        "ocu_name": "執行特殊資安事件之危機處理、風險控制及事後改進",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T3.1",
+                "name": "迅速辨識特殊資安事件,即時採取阻止措施避免損害擴大"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 4,
+                "indicators": [
+                  {
+                    "code": "P3.1.1",
+                    "text": "特殊資安事件覺察時間及阻止措施之適當性。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.1.1",
+                    "name": "特殊資安事件及應變措施即時通報"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K05",
+                    "name": "法律法規"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "企業管理"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "風險管理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S08",
+                    "name": "成果導向"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "分析與解讀能力"
+                  },
+                  {
+                    "code": "S24",
+                    "name": "資訊科技應用能力"
+                  },
+                  {
+                    "code": "S30",
+                    "name": "決斷力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.2",
+                "name": "檢討資安事件,提出風險控制及事後改進措施"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 4,
+                "indicators": [
+                  {
+                    "code": "P3.2.1",
+                    "text": "資安事件發生頻率、趨勢之減緩程度。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.2.1",
+                    "name": "資料事件定期檢討報告及改進措施"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K05",
+                    "name": "法律法規"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "企業管理"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "風險管理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S10",
+                    "name": "分析與解讀能力"
+                  },
+                  {
+                    "code": "S19",
+                    "name": "協調能力"
+                  },
+                  {
+                    "code": "S24",
+                    "name": "資訊科技應用能力"
+                  },
+                  {
+                    "code": "S29",
+                    "name": "領導管理"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "主動積極"
+      },
+      {
+        "code": "A02",
+        "name": "正直誠實"
+      },
+      {
+        "code": "A04",
+        "name": "持續學習"
+      },
+      {
+        "code": "A08",
+        "name": "團隊意識"
+      },
+      {
+        "code": "A10",
+        "name": "壓力容忍"
+      },
+      {
+        "code": "A11",
+        "name": "應對不確定性"
+      },
+      {
+        "code": "A14",
+        "name": "謹慎細心"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "對銀行管理及科技應用有充分瞭解，並具備相當程度管理經驗者。"
+    ],
+    "supplements": []
+  }
+}

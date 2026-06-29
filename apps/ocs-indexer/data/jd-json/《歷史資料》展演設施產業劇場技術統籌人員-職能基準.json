@@ -1,0 +1,1882 @@
+{
+  "version_info": {
+    "versions": [
+      {
+        "version": "V3",
+        "ocs_code": "APA3439-003v3",
+        "ocs_name": "展演設施產業劇場技術統籌人員",
+        "status": "最新版本",
+        "update_note": "經發展單位檢視評估結果；維持原內容",
+        "update_date": "2021/04/06"
+      },
+      {
+        "version": "V2",
+        "ocs_code": "APA3439-003v2",
+        "ocs_name": "展演設施產業劇場技術統籌人員",
+        "status": "歷史版本",
+        "update_note": "已被《APA3439-003v3》取代",
+        "update_date": "2017/12/31"
+      },
+      {
+        "version": "V1",
+        "ocs_code": "APA3439-003",
+        "ocs_name": "展演設施產業劇場技術統籌人員",
+        "status": "歷史版本",
+        "update_note": "已被《APA3439-003v2》取代",
+        "update_date": "2014/12/04"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "ocs_code": "APA3439-003v3",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "展演設施產業劇場技術統籌人員"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "藝文與影音傳播/表演藝術",
+          "code": "APA"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "展演設施產業劇場技術統籌人員",
+          "code": "3439"
+        }
+      ],
+      "industries": [
+        {
+          "name": "藝術、娛樂及休閒服務業/創作及藝術表演業",
+          "code": "R9010"
+        }
+      ]
+    },
+    "job_description": "於表演藝術展演設施中，能夠不斷充實劇場技術，有效運用劇場設施與設備，並統籌暨執行技術需求，同時確保劇場安全及維護劇場設施與設\n備，以達到服務演出之目的。",
+    "ocs_level": 4
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "統籌劇場技術",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "瞭解演出團隊藝術及技術需求"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "在演出團隊確定演出時間後,召集演出團隊進行技術需求會議,以瞭解演出團隊之藝術與技術需求。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.1.1",
+                    "name": "技術會議通知、演職人員名錄、工作時間表、各項圖面資料(例如:舞台平面圖、懸吊配置表、音響配置圖、燈光平面圖等)"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "藝術概論"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "基礎電學"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "基礎視聽"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "基礎力學"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "劇場實務"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "節目製作流程"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "劇場圖學"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "電腦文書處理"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "懸吊系統"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "機械常識"
+                  },
+                  {
+                    "code": "K24",
+                    "name": "基礎燈光"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "分析推理"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "正確傾聽"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "成果導向"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "問題分析"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "溝通"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "彈性思考"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "顧客導向"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "閱讀能力"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "資訊科技能力"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "英語能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.2",
+                "name": "評估演出團隊技術需求方案"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.2.1",
+                    "text": "在團體進場裝台前,完成評估及對團體告知建議方案或評估結果,以求順利裝台演出。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.2.1",
+                    "name": "演出技術需求表。"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "藝術概論"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "劇場實務"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "節目製作流程"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "劇場圖學"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "劇場技術與設計"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "安全管理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "分析推理"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "問題分析"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "溝通"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "彈性思考"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "顧客導向"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "合作協調"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "有效聯結"
+                  },
+                  {
+                    "code": "S13",
+                    "name": "表達訊息"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "問題解決"
+                  },
+                  {
+                    "code": "S15",
+                    "name": "組織計畫"
+                  },
+                  {
+                    "code": "S16",
+                    "name": "創新導向"
+                  },
+                  {
+                    "code": "S17",
+                    "name": "技術統籌與管理"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.3",
+                "name": "規劃劇場相關技術人員之配合作業"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.3.1",
+                    "text": "在開完技術協調會議後,針對演出團體需求,協調人員排班及器材配置,以達到節目之需求。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.3.1",
+                    "name": "劇場相關技術人員排班表、器材需求表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K05",
+                    "name": "劇場實務"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "節目製作流程"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "電腦文書處理"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "安全管理"
+                  },
+                  {
+                    "code": "K14",
+                    "name": "專案管理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S03",
+                    "name": "成果導向"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "溝通"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "資訊科技能力"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "合作協調"
+                  },
+                  {
+                    "code": "S15",
+                    "name": "組織計畫"
+                  },
+                  {
+                    "code": "S18",
+                    "name": "人脈建立"
+                  },
+                  {
+                    "code": "S19",
+                    "name": "時間管理"
+                  },
+                  {
+                    "code": "S20",
+                    "name": "策略性思考"
+                  },
+                  {
+                    "code": "S21",
+                    "name": "衝突管理"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.4",
+                "name": "協調及確保技術有效執行"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.4.1",
+                    "text": "在演出團體進場裝台時,協調現場執行人員與演出單位的執行配合,確保演出計畫有效執行。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.4.1",
+                    "name": "演出技術協調會議"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K05",
+                    "name": "劇場實務"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "節目製作流程"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "電腦文書處理"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "懸吊系統"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "機械常識"
+                  },
+                  {
+                    "code": "K14",
+                    "name": "專案管理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "分析推理"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "正確傾聽"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "成果導向"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "問題分析"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "溝通"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "彈性思考"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "顧客導向"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "合作協調"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "有效聯結"
+                  },
+                  {
+                    "code": "S13",
+                    "name": "表達訊息"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "問題解決"
+                  },
+                  {
+                    "code": "S15",
+                    "name": "組織計畫"
+                  },
+                  {
+                    "code": "S16",
+                    "name": "創新導向"
+                  },
+                  {
+                    "code": "S19",
+                    "name": "時間管理"
+                  },
+                  {
+                    "code": "S21",
+                    "name": "衝突管理"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "執行劇場技術",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "協助演出團隊裝設演出設備"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "裝台期間配合演出單位進行舞台裝置、燈光、影音設備的組裝與架設,及技術排練與彩排之配合,以能夠在裝台時限內完成演出配置與藝術畫面的構成。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.1.1",
+                    "name": "準時交台"
+                  },
+                  {
+                    "code": "O2.1.2",
+                    "name": "演出設備就緒"
+                  },
+                  {
+                    "code": "O2.1.3",
+                    "name": "技術排練與彩排"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K02",
+                    "name": "基礎電學"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "基礎視聽"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "基礎力學"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "劇場實務"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "劇場圖學"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "懸吊系統"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "機械常識"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "安全管理"
+                  },
+                  {
+                    "code": "K15",
+                    "name": "專業設備知識"
+                  },
+                  {
+                    "code": "K23",
+                    "name": "網路訊號傳輸運用"
+                  },
+                  {
+                    "code": "K24",
+                    "name": "基礎燈光"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "分析推理"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "正確傾聽"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "問題分析"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "溝通"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "彈性思考"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "顧客導向"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "有效聯結"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "問題解決"
+                  },
+                  {
+                    "code": "S21",
+                    "name": "衝突管理"
+                  },
+                  {
+                    "code": "S22",
+                    "name": "品質導向"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.2",
+                "name": "配合演出內容需求完成技術執行"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.2.1",
+                    "text": "在演出期間內,配合演出單位,進行各項技術畫面之測試與排練,以達成正式演出之技術要求。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.2.1",
+                    "name": "燈光畫面記錄檔"
+                  },
+                  {
+                    "code": "O2.2.2",
+                    "name": "音響及音效之迴路與音量紀錄表"
+                  },
+                  {
+                    "code": "O2.2.3",
+                    "name": "懸吊紀錄表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K02",
+                    "name": "基礎電學"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "基礎視聽"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "基礎力學"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "劇場實務"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "懸吊系統"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "機械常識"
+                  },
+                  {
+                    "code": "K15",
+                    "name": "專業設備知識"
+                  },
+                  {
+                    "code": "K23",
+                    "name": "網路訊號傳輸運用"
+                  },
+                  {
+                    "code": "K24",
+                    "name": "基礎燈光"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "正確傾聽"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "成果導向"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "溝通"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "顧客導向"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "問題解決"
+                  },
+                  {
+                    "code": "S22",
+                    "name": "品質導向"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.3",
+                "name": "協助演出後團隊設備拆除及場地復歸"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.3.1",
+                    "text": "在拆台期間,協助演出單位,進行舞台裝置、燈光以及影音設備之拆除及撤離,並復原場地基本之配置。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.3.1",
+                    "name": "工作日誌"
+                  },
+                  {
+                    "code": "O2.3.2",
+                    "name": "器材使用紀錄表"
+                  },
+                  {
+                    "code": "O2.3.3",
+                    "name": "團體場地使用時間記錄表"
+                  },
+                  {
+                    "code": "O2.3.4",
+                    "name": "團體使用意見調查表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K02",
+                    "name": "基礎電學"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "基礎視聽"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "基礎力學"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "劇場實務"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "懸吊系統"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "機械常識"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "安全管理"
+                  },
+                  {
+                    "code": "K15",
+                    "name": "專業設備知識"
+                  },
+                  {
+                    "code": "K23",
+                    "name": "網路訊號傳輸運用"
+                  },
+                  {
+                    "code": "K24",
+                    "name": "基礎燈光"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "正確傾聽"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "溝通"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "顧客導向"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "合作協調"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "問題解決"
+                  },
+                  {
+                    "code": "S19",
+                    "name": "時間管理"
+                  },
+                  {
+                    "code": "S21",
+                    "name": "衝突管理"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.4",
+                "name": "提出演出後結案報告"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.4.1",
+                    "text": "在演出結束後,彙整所有演出相關資料,以進行結案及檢討評估報告。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.4.1",
+                    "name": "結案報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K05",
+                    "name": "劇場實務"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "電腦文書處理"
+                  },
+                  {
+                    "code": "K14",
+                    "name": "專案管理"
+                  },
+                  {
+                    "code": "K23",
+                    "name": "網路訊號傳輸運用"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "分析推理"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "閱讀能力"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "資訊科技能力"
+                  },
+                  {
+                    "code": "S23",
+                    "name": "價值判斷"
+                  },
+                  {
+                    "code": "S24",
+                    "name": "詞彙編撰能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T3",
+        "ocu_name": "充實劇場技術",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T3.1",
+                "name": "訓練技術人員技能"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.1.1",
+                    "text": "定期提升技術人員技能,參與研習訓練課程,確保演出技術品質及安全。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.1.1",
+                    "name": "研習訓練課程"
+                  },
+                  {
+                    "code": "O3.1.2",
+                    "name": "訓練考核"
+                  },
+                  {
+                    "code": "O3.1.3",
+                    "name": "技能評鑑"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "藝術概論"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "基礎電學"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "基礎視聽"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "基礎力學"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "劇場圖學"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "電腦文書處理"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "懸吊系統"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "機械常識"
+                  },
+                  {
+                    "code": "K16",
+                    "name": "基礎材料學"
+                  },
+                  {
+                    "code": "K17",
+                    "name": "基礎木工"
+                  },
+                  {
+                    "code": "K18",
+                    "name": "基礎繩結"
+                  },
+                  {
+                    "code": "K24",
+                    "name": "基礎燈光"
+                  },
+                  {
+                    "code": "K23",
+                    "name": "網路訊號傳輸運用"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "正確傾聽"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "成果導向"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "溝通"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "有效連結"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "閱讀能力"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "資訊科技能力"
+                  },
+                  {
+                    "code": "S19",
+                    "name": "時間管理"
+                  },
+                  {
+                    "code": "S22",
+                    "name": "品質導向"
+                  },
+                  {
+                    "code": "S24",
+                    "name": "詞彙編撰能力"
+                  },
+                  {
+                    "code": "S25",
+                    "name": "表達說服"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.2",
+                "name": "獲取專業證照"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.2.1",
+                    "text": "主動學習技能,參加各項專業認證訓練,獲取證照。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.2.1",
+                    "name": "各式專業證照"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K13",
+                    "name": "安全管理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S03",
+                    "name": "成果導向"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "有效聯結"
+                  },
+                  {
+                    "code": "S26",
+                    "name": "外部意識"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.3",
+                "name": "演練劇場實務"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.3.1",
+                    "text": "定期加強劇場工作人員技術熟練度,舉辦劇場設備設施操作演練,確保演出技術品質及安全。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.3.1",
+                    "name": "演練計畫"
+                  },
+                  {
+                    "code": "O3.3.2",
+                    "name": "演練評鑑"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K05",
+                    "name": "劇場實務"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "節目製作流程"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "分析推理"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "正確傾聽"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "問題分析"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "溝通"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "合作協調"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "有效聯結"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "問題解決"
+                  },
+                  {
+                    "code": "S19",
+                    "name": "時間管理"
+                  },
+                  {
+                    "code": "S20",
+                    "name": "策略性思考"
+                  },
+                  {
+                    "code": "S21",
+                    "name": "衝突管理"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.4",
+                "name": "觀摩及交流劇場技術"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.4.1",
+                    "text": "為擴大技術人員視野,不定期觀摩國內外相關展演設施產業及展覽,提升劇場技術水準。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.4.1",
+                    "name": "技術觀摩交流報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K05",
+                    "name": "劇場實務"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "節目製作流程"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "安全管理"
+                  },
+                  {
+                    "code": "K21",
+                    "name": "消防防災知識"
+                  },
+                  {
+                    "code": "K22",
+                    "name": "急救知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S07",
+                    "name": "顧客導向"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "合作協調"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "有效聯結"
+                  },
+                  {
+                    "code": "S15",
+                    "name": "組織計畫"
+                  },
+                  {
+                    "code": "S16",
+                    "name": "創新導向"
+                  },
+                  {
+                    "code": "S18",
+                    "name": "人脈建立"
+                  },
+                  {
+                    "code": "S26",
+                    "name": "外部意識"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T4",
+        "ocu_name": "確保劇場安全管理",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T4.1",
+                "name": "參與擬定及執行緊急狀況應變計畫"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.1.1",
+                    "text": "為因應劇場各種不可預期之緊急狀況,參與制定及執行並不斷檢討緊急狀況應變計畫,提供劇場技術人員緊急狀況應變之依據。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.1.1",
+                    "name": "緊急狀況作業程序表"
+                  },
+                  {
+                    "code": "O4.1.2",
+                    "name": "人員任務執行分配"
+                  },
+                  {
+                    "code": "O4.1.3",
+                    "name": "緊急疏散"
+                  },
+                  {
+                    "code": "O4.1.4",
+                    "name": "急難聯絡表"
+                  },
+                  {
+                    "code": "O4.1.5",
+                    "name": "緊急狀況演練"
+                  },
+                  {
+                    "code": "O4.1.6",
+                    "name": "檢討報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K02",
+                    "name": "基礎電學"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "基礎視聽"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "基礎力學"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "機械常識"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "安全管理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "分析推理"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "正確傾聽"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "問題分析"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "彈性思考"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "顧客導向"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "問題解決"
+                  },
+                  {
+                    "code": "S15",
+                    "name": "組織計畫"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T4.2",
+                "name": "確保劇場機具操作安全"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.2.1",
+                    "text": "為確保劇場機具正常運作,提供操作人員各式手冊圖說及制定安全維護人員表,建立劇場機具安全操作機制。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.2.1",
+                    "name": "技術操作手冊"
+                  },
+                  {
+                    "code": "O4.2.2",
+                    "name": "技術圖說"
+                  },
+                  {
+                    "code": "O4.2.3",
+                    "name": "安全維護人員表"
+                  },
+                  {
+                    "code": "O4.2.4",
+                    "name": "專業器材定期檢點表"
+                  }
+                ],
+                "knowledge": [],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "分析推理"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "正確傾聽"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "問題分析"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "合作協調"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "有效聯結"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "問題解決"
+                  },
+                  {
+                    "code": "S19",
+                    "name": "時間管理"
+                  },
+                  {
+                    "code": "S21",
+                    "name": "衝突管理"
+                  },
+                  {
+                    "code": "S22",
+                    "name": "品質導向"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T4.3",
+                "name": "辦理勞工安全衛生訓練"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.3.1",
+                    "text": "提升劇場工作人員安全衛生環境,定期舉辦訓練講習,並協助人員獲取相關安全證照,確保勞工安全衛生。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.3.1",
+                    "name": "定期訓練講習"
+                  },
+                  {
+                    "code": "O4.3.2",
+                    "name": "獲取安全證照"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K13",
+                    "name": "安全管理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "正確傾聽"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "問題分析"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "有效聯結"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "問題解決"
+                  },
+                  {
+                    "code": "S15",
+                    "name": "組織計畫"
+                  },
+                  {
+                    "code": "S18",
+                    "name": "人脈建立"
+                  },
+                  {
+                    "code": "S22",
+                    "name": "品質導向"
+                  },
+                  {
+                    "code": "S26",
+                    "name": "外部意識"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T5",
+        "ocu_name": "維護劇場設施與設備",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T5.1",
+                "name": "參與規劃劇場設施設備"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P5.1.1",
+                    "text": "為改善或提升劇場設施及設備,參與制定劇場設備改善建議,健全劇場功能及安全。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O5.1.1",
+                    "name": "劇場設施設備規劃建議"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "藝術概論"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "劇場實務"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "節目製作流程"
+                  },
+                  {
+                    "code": "K15",
+                    "name": "專業設備知識"
+                  },
+                  {
+                    "code": "K23",
+                    "name": "網路訊號傳輸運用"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "分析推理"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "成果導向"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "彈性思考"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "顧客導向"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "資訊科技能力"
+                  },
+                  {
+                    "code": "S16",
+                    "name": "創新導向"
+                  },
+                  {
+                    "code": "S18",
+                    "name": "人脈建立"
+                  },
+                  {
+                    "code": "S22",
+                    "name": "品質導向"
+                  },
+                  {
+                    "code": "S23",
+                    "name": "價值判斷"
+                  },
+                  {
+                    "code": "S25",
+                    "name": "表達說服"
+                  },
+                  {
+                    "code": "S26",
+                    "name": "外部意識"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T5.2",
+                "name": "維護劇場設施設備"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P5.2.1",
+                    "text": "為確保演出順利進行,定期檢查、維修劇場設施設備,保持最佳妥善狀況。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O5.2.1",
+                    "name": "維修計畫"
+                  },
+                  {
+                    "code": "O5.2.2",
+                    "name": "設備檢查表"
+                  },
+                  {
+                    "code": "O5.2.3",
+                    "name": "設備故障通報"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K02",
+                    "name": "基礎電學"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "基礎視聽"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "基礎力學"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "劇場圖學"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "懸吊系統"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "機械常識"
+                  },
+                  {
+                    "code": "K15",
+                    "name": "專業設備知識"
+                  },
+                  {
+                    "code": "K16",
+                    "name": "基礎材料學"
+                  },
+                  {
+                    "code": "K23",
+                    "name": "網路訊號傳輸運用"
+                  },
+                  {
+                    "code": "K24",
+                    "name": "基礎燈光"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "正確傾聽"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "成果導向"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "問題分析"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "合作協調"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "有效聯結"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "問題解決"
+                  },
+                  {
+                    "code": "S15",
+                    "name": "組織計畫"
+                  },
+                  {
+                    "code": "S18",
+                    "name": "人脈建立"
+                  },
+                  {
+                    "code": "S19",
+                    "name": "時間管理"
+                  },
+                  {
+                    "code": "S20",
+                    "name": "策略性思考"
+                  },
+                  {
+                    "code": "S22",
+                    "name": "品質導向"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T5.3",
+                "name": "演出緊急修\n護"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P5.3.1",
+                    "text": "為因應演出期間,設施設備突發緊急狀況處理需要,預先研擬緊急修護及替代方案,確保演出品質及安全。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O5.3.1",
+                    "name": "緊急修護"
+                  },
+                  {
+                    "code": "O5.3.2",
+                    "name": "演出替代方案"
+                  },
+                  {
+                    "code": "O5.3.3",
+                    "name": "檢查報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K02",
+                    "name": "基礎電學"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "基礎視聽"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "基礎力學"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "劇場實務"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "節目製作流程"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "懸吊系統"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "機械常識"
+                  },
+                  {
+                    "code": "K15",
+                    "name": "專業設備知識"
+                  },
+                  {
+                    "code": "K23",
+                    "name": "網路訊號傳輸運用"
+                  },
+                  {
+                    "code": "K24",
+                    "name": "基礎燈光"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "分析推理"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "成果導向"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "問題分析"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "彈性思考"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "顧客導向"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "資訊科技能力"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "有效聯結"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "問題解決"
+                  },
+                  {
+                    "code": "S18",
+                    "name": "人脈建立"
+                  },
+                  {
+                    "code": "S19",
+                    "name": "時間管理"
+                  },
+                  {
+                    "code": "S20",
+                    "name": "策略性思考"
+                  },
+                  {
+                    "code": "S23",
+                    "name": "價值判斷"
+                  },
+                  {
+                    "code": "S26",
+                    "name": "外部意識"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "親和關係"
+      },
+      {
+        "code": "A02",
+        "name": "主動積極"
+      },
+      {
+        "code": "A03",
+        "name": "謹慎細心"
+      },
+      {
+        "code": "A04",
+        "name": "團隊意識"
+      },
+      {
+        "code": "A05",
+        "name": "應對不明狀況"
+      },
+      {
+        "code": "A06",
+        "name": "自信心"
+      },
+      {
+        "code": "A07",
+        "name": "壓力容忍"
+      },
+      {
+        "code": "A08",
+        "name": "彈性"
+      },
+      {
+        "code": "A09",
+        "name": "正直誠實"
+      },
+      {
+        "code": "A10",
+        "name": "自我管理"
+      },
+      {
+        "code": "A11",
+        "name": "自我提升"
+      },
+      {
+        "code": "A12",
+        "name": "追求卓越"
+      },
+      {
+        "code": "A13",
+        "name": "好奇開放"
+      },
+      {
+        "code": "A14",
+        "name": "冒險挑戰"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "高中職以上畢業或同等學力，具備劇場相關實務經驗4年以上；或大專相關科系以上畢業或同等學力，具備劇場相關實務經驗3年以上。",
+      "基準更新紀錄",
+      "件】。"
+    ],
+    "supplements": []
+  }
+}

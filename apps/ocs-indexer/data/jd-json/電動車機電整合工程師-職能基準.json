@@ -1,0 +1,1090 @@
+{
+  "version_info": {
+    "versions": [
+      {
+        "version": "V4",
+        "ocs_code": "MPD2151-002v4",
+        "ocs_name": "電動車機電整合工程師",
+        "status": "最新版本",
+        "update_note": "略",
+        "update_date": "2024/12/31"
+      },
+      {
+        "version": "V3",
+        "ocs_code": "MPD2151-002v3",
+        "ocs_name": "電動車機電整合工程師",
+        "status": "歷史版本",
+        "update_note": "已被《MPD2151-002v3》取代",
+        "update_date": "2022/04/06"
+      },
+      {
+        "version": "V2",
+        "ocs_code": "MPD2151-002v2",
+        "ocs_name": "電動車產業機電整合工程師",
+        "status": "歷史版本",
+        "update_note": "已被《MPD2151-002v3》取代",
+        "update_date": "2019/04/11"
+      },
+      {
+        "version": "V1",
+        "ocs_code": "MPD2151-002",
+        "ocs_name": "電動車產業機電整合工程師",
+        "status": "歷史版本",
+        "update_note": "已被《MPD2151-002v2》取代",
+        "update_date": "2016/01/20"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "ocs_code": "MPD2151-002v4",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "電動車機電整合工程師"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "製造/製程研發",
+          "code": "MPD"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "電動車機電整合工程師",
+          "code": "Unknown"
+        }
+      ],
+      "industries": [
+        {
+          "name": "製造業/汽車及其零件製造業",
+          "code": "C30"
+        },
+        {
+          "name": "製造業/其他運輸工具及其零件製造業",
+          "code": "C31"
+        }
+      ]
+    },
+    "job_description": "針對電動車的電控系統、電機與傳動系統、電源系統、通訊系統與其他附件系統，進行設計、分析、開發、整合、測試與驗證工作。",
+    "ocs_level": 5
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "專案規劃",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "規劃目標與建立專案"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "掌握客戶需求規格,並考量公司技術能力、功能安全及執行成本,規劃出合理的開發專案計畫書。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.1.1",
+                    "name": "開發專案計畫書"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "電動車發展現況及智慧化趨 勢:市場規模、市場發展現況、 車輛開發V-model等資訊"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "國內外電動車法規及標準規"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "計畫書撰寫能力"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "風險管理能力"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "專利檢索能力"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "成本估算能力"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "資料蒐集與分析能力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "研發時程分析能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.2",
+                "name": "規劃需求規格"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.2.1",
+                    "text": "依據開發計畫,展開詳細的需求規格,包含系統屬性、功能/非功能需求、系統響應、依賴性設計等。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.2.1",
+                    "name": "需求規格說明書"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K02",
+                    "name": "國內外電動車法規及標準規 範(車輛安全檢測基準、國際電 池法規、ECE、ISO、IEC、UL、 SAE、CNS等)"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "ISO/IATF16949"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "ISO26262"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "車輛結構及原理"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "電動車輛之電力電子技術"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S07",
+                    "name": "技術規格撰寫能力"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "軟體及硬體整合設計能力"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "功能安全設計與測試規範"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "系統規劃與分析",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "展開系統架構"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "掌握分層設計、無複雜設計、可維護性、可測性、可回收性之設計目標,完成系統設計。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.1.1",
+                    "name": "系統架構文件"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K05",
+                    "name": "車輛結構及原理"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "系統工程"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "電動車輛之電力電子原理"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "電動車輛性能分析"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S10",
+                    "name": "結構化系統分析"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "電動車動力性能及能耗分析"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.2",
+                "name": "進行各子系統分析與功能設計"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.2.1",
+                    "text": "依據專案計畫書之條件,考量現有機械、電子、電機、軟體組件之特性與規格,訂定最適之子系統模組。"
+                  },
+                  {
+                    "code": "P2.2.2",
+                    "text": "能協調各子系統設計部門,共同討論規劃各子系統軟硬功能需求表。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.2.1",
+                    "name": "各子系統軟硬體功能需求表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K10",
+                    "name": "電動車熱管理系統架構及原 理"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "工程統計與分析"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "電動車的電控系統"
+                  },
+                  {
+                    "code": "K14",
+                    "name": "電動車的動力系統"
+                  },
+                  {
+                    "code": "K15",
+                    "name": "電動車能源系統--含電源、 儲能系統、備載系統"
+                  },
+                  {
+                    "code": "K16",
+                    "name": "車載網路通訊系統(含 MOST、FlexRay、OTA)"
+                  },
+                  {
+                    "code": "K17",
+                    "name": "車載附件系統"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S12",
+                    "name": "系統分析與設計能力"
+                  },
+                  {
+                    "code": "S13",
+                    "name": "會議溝通技巧"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "車載網路系統應用能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.3",
+                "name": "規劃整合介面"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.3.1",
+                    "text": "依照各模組之規格,選用適當的元件,設計必要的介面模組,使各模組間溝通無礙。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.3.1",
+                    "name": "各子系統連結配置介面圖"
+                  },
+                  {
+                    "code": "O2.3.2",
+                    "name": "各子系統I/O訊號規劃表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K18",
+                    "name": "數位訊號處理"
+                  },
+                  {
+                    "code": "K19",
+                    "name": "微電腦通訊知識"
+                  },
+                  {
+                    "code": "K20",
+                    "name": "微處理機與介面設計"
+                  },
+                  {
+                    "code": "K21",
+                    "name": "人機介面與傳輸設計"
+                  },
+                  {
+                    "code": "K22",
+                    "name": "感測器訊號特性(含光達、 短/長距離雷達、無線充電等)"
+                  },
+                  {
+                    "code": "K23",
+                    "name": "致動器訊號特性"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S15",
+                    "name": "程式設計"
+                  },
+                  {
+                    "code": "S16",
+                    "name": "人機介面規劃"
+                  },
+                  {
+                    "code": "S17",
+                    "name": "訊號處理能力"
+                  },
+                  {
+                    "code": "S18",
+                    "name": "I/O控制功能軟體模組設計"
+                  },
+                  {
+                    "code": "S19",
+                    "name": "I/O介面軟體模組設計"
+                  },
+                  {
+                    "code": "S20",
+                    "name": "資料通訊協定設計能力"
+                  },
+                  {
+                    "code": "S21",
+                    "name": "控制邏輯規劃能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T3",
+        "ocu_name": "系統整合設計",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T3.1",
+                "name": "整合電控系統"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.1.1",
+                    "text": "按照開發計畫嵌入各項電子控制系統,例如:ABS(Anti-lockBrakingSystem)、TCS(TractionControlSystem)/ASR(AccelerationSlipRegulation)、4WS(4WheelSteering)、VSC(VehicleStabilityControl)/ESP(ElectronicStabilityProgram)、TPMS(TirePressureMonitorSystem)、BSD(BlindSpotDetection)、ACC(AdaptiveCruiseControl)、LDWS(LaneDepartureWarningS)等,以提高汽車"
+                  },
+                  {
+                    "code": "P3.1.2",
+                    "text": "運用控制器區域網路(ControllerAreaNetwork,CAN)匯流排協調各電子控制單元(ElectronicControlUnit,ECU)運作狀況,進而達成具備高位元速率、高抗電磁干擾性的電控系統。"
+                  },
+                  {
+                    "code": "P3.1.3",
+                    "text": "整合電子控制系統並使其提供高度容錯的機制與錯誤校正的能力。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.1.1",
+                    "name": "電子控制系統整合規劃報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K24",
+                    "name": "控制器區域網路 (Controller Area Network, CAN)"
+                  },
+                  {
+                    "code": "K25",
+                    "name": "串列通訊網路(Local Interconnect Network, LIN)"
+                  },
+                  {
+                    "code": "K26",
+                    "name": "X-By-Wire技術(車速自動 控制系統)"
+                  },
+                  {
+                    "code": "K27",
+                    "name": "程式語言設計知識"
+                  },
+                  {
+                    "code": "K28",
+                    "name": "ECU診斷功能測試與開發"
+                  },
+                  {
+                    "code": "K29",
+                    "name": "微處理機軟體及硬體整合設 計"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S08",
+                    "name": "軟體及硬體整合設計能力"
+                  },
+                  {
+                    "code": "S21",
+                    "name": "控制邏輯規劃能力"
+                  },
+                  {
+                    "code": "S22",
+                    "name": "CAN通訊功能設計/測試能 力"
+                  },
+                  {
+                    "code": "S23",
+                    "name": "ECU診斷功能測試與開發能 力"
+                  },
+                  {
+                    "code": "S24",
+                    "name": "電動車之系統開發與控制器 設計"
+                  },
+                  {
+                    "code": "S25",
+                    "name": "電動車電池管理系統設計開 發能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.2",
+                "name": "整合動力系統"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.2.1",
+                    "text": "整合動力馬達、馬達控制單元、電動車電池、電池管理系統、整車熱管理系統及能量管理系統,以達到高效率、高扭力、高功率密度。"
+                  },
+                  {
+                    "code": "P3.2.2",
+                    "text": "整合動力系統使其具備高度性能,並達到具有安全考量、失效模式和良好動態性能輸出之電力動力系統。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.2.1",
+                    "name": "動力系統整合規劃報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K14",
+                    "name": "電動車的動力系統"
+                  },
+                  {
+                    "code": "K16",
+                    "name": "車載網路通訊系統(含 MOST、FlexRay、OTA)"
+                  },
+                  {
+                    "code": "K30",
+                    "name": "微電腦控制"
+                  },
+                  {
+                    "code": "K31",
+                    "name": "馬達控制原理"
+                  },
+                  {
+                    "code": "K32",
+                    "name": "車輛動力學與控制"
+                  },
+                  {
+                    "code": "K33",
+                    "name": "電動車動力匹配模型"
+                  },
+                  {
+                    "code": "K34",
+                    "name": "電動車電池與管理系統"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S14",
+                    "name": "車載網路系統應用能力"
+                  },
+                  {
+                    "code": "S24",
+                    "name": "電動車之系統開發與控制器 設計"
+                  },
+                  {
+                    "code": "S25",
+                    "name": "電動車電池管理系統設計開 發能力"
+                  },
+                  {
+                    "code": "S26",
+                    "name": "馬達控制設計"
+                  },
+                  {
+                    "code": "S27",
+                    "name": "動力傳動系統設計"
+                  },
+                  {
+                    "code": "S28",
+                    "name": "高壓高電流系統應用設計"
+                  },
+                  {
+                    "code": "S29",
+                    "name": "電動車動力匹配設計"
+                  },
+                  {
+                    "code": "S30",
+                    "name": "電池模組應用能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.3",
+                "name": "整合電源系統"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.3.1",
+                    "text": "對電池進行安全監控和有效管理,提高電池的使用效率和可靠性,進而延長電池的使用壽命,達成整合電池管理系統(BatteryManagementSystem,BMS)"
+                  },
+                  {
+                    "code": "P3.3.2",
+                    "text": "透過適當的控制策略達成整車最佳的能源流管理,進而延長車輛的行駛里程,達成整合電能管理系統(EnergyManagementSystem,EMS)最佳化。"
+                  },
+                  {
+                    "code": "P3.3.3",
+                    "text": "運用通訊功能進行電池健康診斷與分析,並透過BMS系統將電池資訊傳送至EMS進行整車能量管理。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.3.1",
+                    "name": "電源供應與電池管理系統整合規劃報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K02",
+                    "name": "國內外電動車法規及標準規 範(車輛安全檢測基準、國際電 池法規、ECE、ISO、IEC、UL、 SAE、CNS等)"
+                  },
+                  {
+                    "code": "K16",
+                    "name": "車載網路通訊系統(含 MOST、FlexRay、OTA)"
+                  },
+                  {
+                    "code": "K35",
+                    "name": "電池管理系統(Battery Management System, BMS) (鋰離子電池、氫燃料電池、固 態電池特性)"
+                  },
+                  {
+                    "code": "K36",
+                    "name": "電能管理系統(Energy Management System, EMS) (含dc-2-dc)"
+                  },
+                  {
+                    "code": "K37",
+                    "name": "電池安全控制"
+                  },
+                  {
+                    "code": "K38",
+                    "name": "煞車回充(Regenerative braking)"
+                  },
+                  {
+                    "code": "K39",
+                    "name": "智慧型電能安全防護機制"
+                  },
+                  {
+                    "code": "K40",
+                    "name": "電池材料性能"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S14",
+                    "name": "車載網路系統應用能力"
+                  },
+                  {
+                    "code": "S25",
+                    "name": "電動車電池管理系統設計開 發能力"
+                  },
+                  {
+                    "code": "S31",
+                    "name": "電池狀態監控技術"
+                  },
+                  {
+                    "code": "S32",
+                    "name": "電池平衡管理技術"
+                  },
+                  {
+                    "code": "S33",
+                    "name": "電池殘電量估測方法"
+                  },
+                  {
+                    "code": "S34",
+                    "name": "電池老化、健康狀態預估技 術"
+                  },
+                  {
+                    "code": "S35",
+                    "name": "電動車充電系統整合技術"
+                  },
+                  {
+                    "code": "S36",
+                    "name": "電池安全管理技術"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.4",
+                "name": "整合其他附件系統"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.4.1",
+                    "text": "整合空調、輔助動力方向盤及其他電子裝置等低耗能高效率電動化附件系統,完成整車及零組件驗證標準規範。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.4.1",
+                    "name": "其他附件系統整合規劃報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K41",
+                    "name": "電動空調系統"
+                  },
+                  {
+                    "code": "K42",
+                    "name": "電控轉向系統(Electronic Stability Program, EPS)"
+                  },
+                  {
+                    "code": "K43",
+                    "name": "電控煞車系統(Electric Parking Brake, EPB)"
+                  },
+                  {
+                    "code": "K44",
+                    "name": "電源轉換元件"
+                  },
+                  {
+                    "code": "K45",
+                    "name": "車輛動態系統"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S37",
+                    "name": "車控系統整合能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T4",
+        "ocu_name": "協調開",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T4.1",
+                "name": "審核設計圖面"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.1.1",
+                    "text": "依據開發計畫書之零組件規格,確認設計圖面,以作為評選供應商技術能力之規格文件。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.1.1",
+                    "name": "設計圖面"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K46",
+                    "name": "電動車結構及原理"
+                  },
+                  {
+                    "code": "K47",
+                    "name": "車輛結構及單體零組件 能力"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S38",
+                    "name": "車輛靜態及動態分析與解析"
+                  },
+                  {
+                    "code": "S39",
+                    "name": "全車系統與元件之分析能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T4.2",
+                "name": "評估雛型製造者"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.2.1",
+                    "text": "評估各零件供應商之開發技術能力、交貨實績,擇定合作之雛形製造廠,確保其製造能符合產品特性的設計理念、重點性能要求、單體耐久測試、及組合件的基本性能水準。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.2.1",
+                    "name": "雛型製造者評估分析報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K47",
+                    "name": "車輛結構及單體零組件"
+                  },
+                  {
+                    "code": "K48",
+                    "name": "車輛供應鏈品質管理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S40",
+                    "name": "雛型製造評估分析能力"
+                  },
+                  {
+                    "code": "S41",
+                    "name": "品質規範驗證實務能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T4.3",
+                "name": "協調設計改良的推進"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.3.1",
+                    "text": "能夠掌握製造過程的任何問題並回饋設計檢討改進,提升產品製造性。"
+                  },
+                  {
+                    "code": "P4.3.2",
+                    "text": "協調設計與現實條件不符合的部分,於達成品質目標之前提,順利進行局部設計變更。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.3.1",
+                    "name": "零件製造問題回饋與對策管制表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K02",
+                    "name": "國內外電動車法規及標準規 範(車輛安全檢測基準、國際電 池法規、ECE、ISO、IEC、UL、 SAE、CNS等)"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "車輛結構及原理"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "電動車輛之電力電子技術"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S42",
+                    "name": "工程改善能力"
+                  },
+                  {
+                    "code": "S43",
+                    "name": "測試發展能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T5",
+        "ocu_name": "系統調校與驗證",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T5.1",
+                "name": "規劃與架設驗證平台"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P5.1.1",
+                    "text": "規劃各功能/性能項目之測試驗證流程、步驟與數據資料擷取內容,確保測試結果符合專案目標。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O5.1.1",
+                    "name": "測試驗證規劃書"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K02",
+                    "name": "國內外電動車法規及標準規 範(車輛安全檢測基準、國際電 池法規、ECE、ISO、IEC、UL、 SAE、CNS等)"
+                  },
+                  {
+                    "code": "K16",
+                    "name": "車載網路通訊系統(含 MOST、FlexRay、OTA)"
+                  },
+                  {
+                    "code": "K49",
+                    "name": "實驗設計"
+                  },
+                  {
+                    "code": "K50",
+                    "name": "元件及系統測試驗證"
+                  },
+                  {
+                    "code": "K51",
+                    "name": "整車測試,包含性能驗證"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S14",
+                    "name": "車載網路系統應用能力"
+                  },
+                  {
+                    "code": "S43",
+                    "name": "測試發展能力"
+                  },
+                  {
+                    "code": "S44",
+                    "name": "測試驗證規劃與撰寫能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T5.2",
+                "name": "執行系統整合驗證"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P5.2.1",
+                    "text": "測試時能考慮各種可能性,進行參數匹配與調校,針對應用環境找出參數的全域最佳化。"
+                  },
+                  {
+                    "code": "P5.2.2",
+                    "text": "根據測試結果分析問題,並提出解決對策,以達到開發計畫之需求規格。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O5.2.1",
+                    "name": "測試驗證報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K02",
+                    "name": "國內外電動車法規及標準規 範(車輛安全檢測基準、國際電 池法規、ECE、ISO、IEC、UL、 SAE、CNS等)"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "失效模式及效應分析 (FMEA)"
+                  },
+                  {
+                    "code": "K52",
+                    "name": "參數最佳化設計"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S21",
+                    "name": "控制邏輯規劃能力"
+                  },
+                  {
+                    "code": "S45",
+                    "name": "驗證結果解析能力"
+                  },
+                  {
+                    "code": "S46",
+                    "name": "失效模式及效應分析 (FMEA)應用能力"
+                  },
+                  {
+                    "code": "S47",
+                    "name": "問題分析與對策解決能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "團隊合作"
+      },
+      {
+        "code": "A02",
+        "name": "分析推理"
+      },
+      {
+        "code": "A03",
+        "name": "主動積極"
+      },
+      {
+        "code": "A04",
+        "name": "策略性思考"
+      },
+      {
+        "code": "A05",
+        "name": "問題解決"
+      },
+      {
+        "code": "A06",
+        "name": "時間管理"
+      },
+      {
+        "code": "A07",
+        "name": "溝通"
+      },
+      {
+        "code": "A08",
+        "name": "衝突管理"
+      },
+      {
+        "code": "A09",
+        "name": "謹慎細心"
+      },
+      {
+        "code": "A10",
+        "name": "工程倫理"
+      },
+      {
+        "code": "A14",
+        "name": "謹慎細心"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "大學以上學歷或非大學而有電動車相關實務經驗5年以上之經驗者",
+      "車輛、機械、電機、控制、電子、資訊、化工、材料、造船、航太、模具、工管等理工相關科系"
+    ],
+    "supplements": []
+  }
+}

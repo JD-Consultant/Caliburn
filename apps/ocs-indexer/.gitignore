@@ -219,7 +219,9 @@ __marimo__/
 
 # jd-ocs-indexer project-specific
 .data/
-/data/
+# index source (908 OCS JSON) — tracked so a fresh clone can build the index
+/data/*
+!/data/jd-json/
 output/
 # design records now tracked in the Caliburn monorepo (apps/ocs-indexer/docs/)
 manifest.json

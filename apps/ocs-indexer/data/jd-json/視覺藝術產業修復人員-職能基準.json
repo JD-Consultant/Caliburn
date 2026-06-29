@@ -1,0 +1,825 @@
+{
+  "version_info": {
+    "versions": [
+      {
+        "version": "V4",
+        "ocs_code": "AVA2651-002v4",
+        "ocs_name": "視覺藝術產業修復人員",
+        "status": "最新版本",
+        "update_note": "略",
+        "update_date": "2023/12/06"
+      },
+      {
+        "version": "V3",
+        "ocs_code": "AVA2651-002v3",
+        "ocs_name": "視覺藝術產業修復人才",
+        "status": "歷史版本",
+        "update_note": "已被《AVA2651-002v4》取代",
+        "update_date": "2021/04/06"
+      },
+      {
+        "version": "V2",
+        "ocs_code": "AVA2651-002v2",
+        "ocs_name": "視覺藝術產業修復人才",
+        "status": "歷史版本",
+        "update_note": "已被《AVA2651-002v3》取代",
+        "update_date": "2017/12/31"
+      },
+      {
+        "version": "V1",
+        "ocs_code": "AVA2651-002v1",
+        "ocs_name": "視覺藝術產業修復人才",
+        "status": "歷史版本",
+        "update_note": "已被《AVA2651-002v2》取代",
+        "update_date": "2014/12/15"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "ocs_code": "AVA2651-002v4",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "視覺藝術產業修復人員"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "藝文與影音傳播/視覺藝術",
+          "code": "AVA"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "視覺藝術產業修復人員",
+          "code": "2651"
+        }
+      ],
+      "industries": [
+        {
+          "name": "藝術、娛樂及休閒服務業/創作及藝術表演業",
+          "code": "R9010"
+        }
+      ]
+    },
+    "job_description": "視覺藝術產業中對視覺藝術作品進行保存及修復之活動或工作。",
+    "ocs_level": 3
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "視覺藝術品預防性保存",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "視覺藝術品環境控制(庫房)"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "清楚了解並控制藝術品在庫房中的保存狀況,包含溫度、濕度、空氣等會影響到作品保存的因素。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.1.1",
+                    "name": "庫房管理作業檢核表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "基礎、應用化學"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "材料學"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "生物病害之防範處理"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "世界藝術史"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "修復美學"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "監控庫房溫度"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "監控庫房濕度"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "監控庫房其他因素"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "了解環境檢測方法"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "了解環境檢測材料"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "了解環境檢測技術"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.2",
+                "name": "熟悉展示規範(展場)"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.2.1",
+                    "text": "熟悉並遵守藝術品在展場內展出的規範,包含環境(燈光、溫度、濕度)與設備等因素控制。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.2.1",
+                    "name": "展場規範手冊"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "基礎、應用化學"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "材料學"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "生物病害之防範處理"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "世界藝術史"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "修復美學"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "預防性維護"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S07",
+                    "name": "展場溫度控制技術"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "展場濕度控制技術"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "展場其它因素控制技術"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "展示用設備操作技術"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "展示用材質使用方式"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "絕氧除蟲操作方式"
+                  },
+                  {
+                    "code": "S13",
+                    "name": "展示照明操作技術"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.3",
+                "name": "包裝運輸"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.3.1",
+                    "text": "評估藝術品運輸途中的整體環境,使用正確的包裝材質與設備(含車輛)進行藝術品運輸。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.3.1",
+                    "name": "藝術品包裝運輸計畫"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K04",
+                    "name": "世界藝術史"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "修復美學"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "藝術品專用包裝運輸材質"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "藝術品運輸專用設備"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "藝術品運輸專業評估"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S14",
+                    "name": "熟悉包裝流程"
+                  },
+                  {
+                    "code": "S15",
+                    "name": "評估包裝材質"
+                  },
+                  {
+                    "code": "S16",
+                    "name": "執行專業藝術品運輸"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "視覺藝術品歷史調查與材料分析",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "視覺藝術品背景資料蒐集"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "調查藝術品創作者、年代背景、藝術品派別、製作手法等資訊。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.1.1",
+                    "name": "調查報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K04",
+                    "name": "世界藝術史"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "修復美學"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "創作理念"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "風格與圖像研究"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S17",
+                    "name": "蒐集藝術品相關資料"
+                  },
+                  {
+                    "code": "S18",
+                    "name": "藝術品年代背景分析能力"
+                  },
+                  {
+                    "code": "S19",
+                    "name": "藝術品年代背景彙整能力"
+                  },
+                  {
+                    "code": "S20",
+                    "name": "藝術品製作過程與手法分析 能力"
+                  },
+                  {
+                    "code": "S21",
+                    "name": "藝術品製作過程與手法彙整 能力"
+                  },
+                  {
+                    "code": "S22",
+                    "name": "分析藝術品派別"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.2",
+                "name": "分析藝術品製成材料與過程"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.2.1",
+                    "text": "調查並分析藝術品原料與其製成過程。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.2.1",
+                    "name": "調查報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K04",
+                    "name": "世界藝術史"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "修復美學"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "材料分析"
+                  },
+                  {
+                    "code": "K14",
+                    "name": "現代分析技術"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S23",
+                    "name": "色彩與材料分析"
+                  },
+                  {
+                    "code": "S24",
+                    "name": "使用儀器分析"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T3",
+        "ocu_name": "視覺藝術品檢視登錄",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T3.1",
+                "name": "確認藝術品受損原因與程度"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.1.1",
+                    "text": "檢視藝術品劣化狀況並詳加紀錄。紀錄內容包含各項編號、藝術品示意圖、基本資料、尺寸、現況、檢測分析、攝影檢測分析等。依據其狀況制定藝術品的修復優先順序,並完成部分檢視登錄表。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.1.1",
+                    "name": "狀況檢視表(部分檢視登錄表)"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K04",
+                    "name": "世界藝術史"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "修復美學"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "材料分析"
+                  },
+                  {
+                    "code": "K15",
+                    "name": "檢視登錄內容"
+                  },
+                  {
+                    "code": "K16",
+                    "name": "專有名詞知識"
+                  },
+                  {
+                    "code": "K17",
+                    "name": "數據判讀"
+                  },
+                  {
+                    "code": "K18",
+                    "name": "檢測設備知識"
+                  },
+                  {
+                    "code": "K19",
+                    "name": "檢測設備安全規範"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S23",
+                    "name": "色彩與材料分析"
+                  },
+                  {
+                    "code": "S24",
+                    "name": "使用儀器分析"
+                  },
+                  {
+                    "code": "S25",
+                    "name": "檢視藝術品"
+                  },
+                  {
+                    "code": "S26",
+                    "name": "評估受損"
+                  },
+                  {
+                    "code": "S27",
+                    "name": "登錄藝術品"
+                  },
+                  {
+                    "code": "S28",
+                    "name": "擬定修復建議"
+                  },
+                  {
+                    "code": "S29",
+                    "name": "填寫登錄表"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.2",
+                "name": "建立藝術品修復工序"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.2.1",
+                    "text": "撰寫計劃書,提出修復的方法、過程,以及預計修復程度。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.2.1",
+                    "name": "修復計畫書"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K04",
+                    "name": "世界藝術史"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "創作理念"
+                  },
+                  {
+                    "code": "K15",
+                    "name": "檢視登錄內容"
+                  },
+                  {
+                    "code": "K20",
+                    "name": "專業攝影"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S30",
+                    "name": "規劃修復時程"
+                  },
+                  {
+                    "code": "S31",
+                    "name": "規劃修復方法"
+                  },
+                  {
+                    "code": "S32",
+                    "name": "評估修復程度"
+                  },
+                  {
+                    "code": "S33",
+                    "name": "撰寫計畫書"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.3",
+                "name": "修復過程紀錄數位化"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.3.1",
+                    "text": "將藝術品修復前、中、後的狀況用數位化的方式紀錄。工作中從光源的打法,藝術品的擺位至整體視覺的美觀都須有一定水準。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.3.1",
+                    "name": "建檔記錄/圖錄"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K04",
+                    "name": "世界藝術史"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "修復美學"
+                  },
+                  {
+                    "code": "K20",
+                    "name": "專業攝影"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S34",
+                    "name": "色彩管理技術"
+                  },
+                  {
+                    "code": "S35",
+                    "name": "藝術品建檔編排"
+                  },
+                  {
+                    "code": "S36",
+                    "name": "影音資料檔案管理"
+                  },
+                  {
+                    "code": "S37",
+                    "name": "攝影技法"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T4",
+        "ocu_name": "視覺藝術品修復",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T4.1",
+                "name": "使用專門修復技術"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.1.1",
+                    "text": "使用專門修復技術完成藝術品修復。除使用技術進行修復之外,另應結合藝術品本身之特點與應被保留之價值。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.1.1",
+                    "name": "修復報告書"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K02",
+                    "name": "材料學"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "世界藝術史"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "修復美學"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "創作理念"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "風格與圖像研究"
+                  },
+                  {
+                    "code": "K15",
+                    "name": "檢視登錄內容"
+                  },
+                  {
+                    "code": "K21",
+                    "name": "傳統工藝技法"
+                  },
+                  {
+                    "code": "K22",
+                    "name": "藏品修復化學"
+                  },
+                  {
+                    "code": "K23",
+                    "name": "專門修復知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S38",
+                    "name": "專門修復技術"
+                  },
+                  {
+                    "code": "S39",
+                    "name": "緊急修復"
+                  },
+                  {
+                    "code": "S40",
+                    "name": "編寫修復紀錄"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T4.2",
+                "name": "編存修復紀錄"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.2.1",
+                    "text": "撰寫修復報告書(包含檢視登錄表)。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.2.1",
+                    "name": "修復報告書"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K04",
+                    "name": "世界藝術史"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "修復美學"
+                  },
+                  {
+                    "code": "K15",
+                    "name": "檢視登錄內容"
+                  },
+                  {
+                    "code": "K20",
+                    "name": "專業攝影"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S41",
+                    "name": "寫作技巧"
+                  },
+                  {
+                    "code": "S42",
+                    "name": "緊急修復狀況記錄"
+                  },
+                  {
+                    "code": "S43",
+                    "name": "撰寫報告書"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A02",
+        "name": "主動積極。"
+      },
+      {
+        "code": "A03",
+        "name": "正直誠實。"
+      },
+      {
+        "code": "A04",
+        "name": "自我管理。"
+      },
+      {
+        "code": "A07",
+        "name": "壓力容忍。"
+      },
+      {
+        "code": "A08",
+        "name": "謹慎細心。"
+      },
+      {
+        "code": "A12",
+        "name": "應對不明狀況。"
+      },
+      {
+        "code": "A14",
+        "name": "積極求知。"
+      },
+      {
+        "code": "A17",
+        "name": "溝通協調。"
+      },
+      {
+        "code": "A21",
+        "name": "耐心。"
+      },
+      {
+        "code": "A23",
+        "name": "專業倫理。"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "視覺藝術與文物保存相關科系畢業，或接受過修復課程、歷經師承制，擁有實務經驗三年以上者。",
+      "基準更新紀錄",
+      "件】。"
+    ],
+    "supplements": []
+  }
+}

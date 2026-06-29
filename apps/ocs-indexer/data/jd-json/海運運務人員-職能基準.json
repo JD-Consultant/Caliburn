@@ -1,0 +1,450 @@
+{
+  "version_info": {
+    "versions": []
+  },
+  "ocs_profile": {
+    "ocs_code": "RTM4323-004v1",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "海運運務人員"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "物流運輸/運輸規劃及管理",
+          "code": "RTM"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "海運運務人員",
+          "code": "4323"
+        }
+      ],
+      "industries": [
+        {
+          "name": "運輸及倉儲業/海洋貨運承攬業",
+          "code": "H5232"
+        }
+      ]
+    },
+    "job_description": "負責海運運務例行作業，包括文件處理、航線艙位協調、貨物追蹤、客戶服務及運務管理等。",
+    "ocs_level": 3
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "需求確認與文件處理",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "確認需求"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "依據業務人員攬貨文件,確認與貨主需求有關的利益關係人清單。"
+                  },
+                  {
+                    "code": "P1.1.2",
+                    "text": "協調相關利益關係人與貨主,確認所需求的艙位、航程時間等事項。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.1.1",
+                    "name": "艙位確認單"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "海運OP作業流程"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "海事相關法規"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "客戶需求類型"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "溝通協調能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.2",
+                "name": "處理訂艙單/提單文件"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.2.1",
+                    "text": "依照船期,根據組織標準作業流程,及時處理訂艙單和提單等進出口相關文件。"
+                  },
+                  {
+                    "code": "P1.2.2",
+                    "text": "遇到作業異常時,能及時與貨主聯繫,並將異常情形與聯繫結果回報主管。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.2.1",
+                    "name": "訂艙單"
+                  },
+                  {
+                    "code": "O1.2.2",
+                    "name": "提單文件"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K04",
+                    "name": "艙單文件處理流程"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "貨物通關實務"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "異常處理能力"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "回報能力"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "時間管理能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "確認航線及艙位",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "辦理訂艙作業"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "依據航線和航班的資訊,準確完成訂艙,以符合貨主的需求。"
+                  },
+                  {
+                    "code": "P2.1.2",
+                    "text": "當訂艙資訊被檢視出有差異時,能進行適當處理。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.1.1",
+                    "name": "訂艙資料"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K06",
+                    "name": "訂艙作業流程"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "異常處理能力"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "資料檢核能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.2",
+                "name": "國際航運聯絡與協調"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.2.1",
+                    "text": "以充份利用裝載空間的前提,規劃併櫃裝載圖,並提供給櫃場。"
+                  },
+                  {
+                    "code": "P2.2.2",
+                    "text": "將貨物清單、裝卸貨品艙單及併櫃裝載圖提供給代理行。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K07",
+                    "name": "國際貿易知識"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "貨櫃場作業實務"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "溝通協調能力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "規劃能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T3",
+        "ocu_name": "貨物追蹤及船期回報",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T3.1",
+                "name": "管理貨物進度"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.1.1",
+                    "text": "將完整船期資訊提供給貨主,包含船名、航次、預計開航時間(ETD)、預計抵達時間(ETA)等資料。"
+                  },
+                  {
+                    "code": "P3.1.2",
+                    "text": "能追蹤貨物進度,並於船期發生變動等異常狀況時,能即時更新船期資訊,並回報貨主和收貨人等利益關係人。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K09",
+                    "name": "貨運追蹤原則"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "異常處理能力"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "回報能力"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "時間管理能力"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "追蹤能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T4",
+        "ocu_name": "客戶貨品保險及客訴處理",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T4.1",
+                "name": "協助貨品保險"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.1.1",
+                    "text": "貨品運送前,能依據貨主之保險需求,提供保險相關建議。"
+                  },
+                  {
+                    "code": "P4.1.2",
+                    "text": "協助貨主辦理貨品保險等事宜。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K03",
+                    "name": "客戶需求類型"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "貨品保險規範"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S08",
+                    "name": "問題解決能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T4.2",
+                "name": "協助貨品理賠"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.2.1",
+                    "text": "發生貨損時,能協助貨主辦理貨品理賠事宜。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.2.1",
+                    "name": "貨品理賠文件"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K10",
+                    "name": "貨品保險規範"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S08",
+                    "name": "問題解決能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T4.3",
+                "name": "處理客訴"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.3.1",
+                    "text": "當發生客訴時,能協調相關人員進行有效處理及維護客戶關係。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K11",
+                    "name": "客訴類型"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "溝通協調能力"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "客訴處理能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "應對不確定性：當狀況不明或問題不夠具體的情況下，能在必要時採取行動，以有效釐清模糊不清的態勢。"
+      },
+      {
+        "code": "A02",
+        "name": "彈性：能夠敞開心胸，調整行為或工作方法以適應新資訊、變化的外在環境或突如其來的阻礙。"
+      },
+      {
+        "code": "A03",
+        "name": "謹慎細心：對於任務的執行過程，能謹慎考量及處理所有細節，精確地檢視每個程序，並持續對其保持高度關注。"
+      },
+      {
+        "code": "A04",
+        "name": "壓力容忍：冷靜且有效地應對及處理高度緊張的情況或壓力，如緊迫的時間、不友善的人、各類突發事件及危急狀況，並能以適當的方式紓解自身壓力。"
+      },
+      {
+        "code": "A05",
+        "name": "自我管理：設立定義明確且實際可行的個人目標；對於及時完成任務展現高度進取、努力、承諾及負責任的行為。"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "航運管理或商管相關科系專科(含)學歷以上。"
+    ],
+    "supplements": [
+      "本項職能基準適用於海運貨運承攬業及櫃場相關之運務人員。"
+    ]
+  }
+}

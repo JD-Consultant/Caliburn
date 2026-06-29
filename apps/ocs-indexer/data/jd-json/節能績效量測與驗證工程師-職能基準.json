@@ -1,0 +1,724 @@
+{
+  "version_info": {
+    "versions": [
+      {
+        "version": "V3",
+        "ocs_code": "SET2149-003v3",
+        "ocs_name": "節能績效量測與驗證工程師",
+        "status": "最新版本",
+        "update_note": "略",
+        "update_date": "2023/11/14"
+      },
+      {
+        "version": "V2",
+        "ocs_code": "SET2149-003v2",
+        "ocs_name": "節能績效量測與驗證工程師",
+        "status": "歷史版本",
+        "update_note": "已被《SET2149-003v3》取代",
+        "update_date": "2020/10/23"
+      },
+      {
+        "version": "V1",
+        "ocs_code": "SET2149-003v1",
+        "ocs_name": "節能績效量測與驗證工程師",
+        "status": "歷史版本",
+        "update_note": "已被《SET2149-003v2》取代",
+        "update_date": "2017/12/31"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "ocs_code": "SET2149-003v3",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "節能績效量測與驗證工程師"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "科學",
+          "code": "SET"
+        },
+        {
+          "name": "技術",
+          "code": "SET"
+        },
+        {
+          "name": "工程",
+          "code": "SET"
+        },
+        {
+          "name": "數學/工程及技術",
+          "code": "SET"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "節能績效量測與驗證工程師",
+          "code": "2149"
+        }
+      ],
+      "industries": [
+        {
+          "name": "專業、科學及技術服務業/工程服務及相關技術顧問業",
+          "code": "M711"
+        }
+      ]
+    },
+    "job_description": "依據客戶所確認節能範疇，進行節能績效保證或其他減碳計畫之量測與驗證規劃與執行，確認節能減碳成效。",
+    "ocs_level": 5
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "規劃評估量測與驗證程序",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "確定量測驗證的範疇及說明驗證程序的目\n標和目的"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "經由節能計畫書得知改善範圍評估效益、新舊設備規格、工程施作、時程規劃,促成量測與驗證構想。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.1.1",
+                    "name": "量測驗證範圍文件"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "工業配電相關知識"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "冷凍空調相關知識"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "鍋爐相關知識"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "蒸汽系統相關知識"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "空壓機與壓縮空氣系統相關 知識"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "照明相關知識"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "國際效能量測與驗證協定 (IPMVP)方法論"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "設備系統辨識能力"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "量測與驗證規劃能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.2",
+                "name": "蒐集與量測能源使用背景資料"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.2.1",
+                    "text": "蒐集或經由量測得知標的範圍使用能源種類與數量,促使能夠確認正確的系統耗能因子,促使驗證結果更趨於真實性。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.2.1",
+                    "name": "標的範圍能源使用狀況文件"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K08",
+                    "name": "統計相關知識"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "儀器概論"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "設備系統辨識能力"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "能源流向分析能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.3",
+                "name": "定義影響系統能量消耗或能源節能措施關鍵因子"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.3.1",
+                    "text": "藉由收集設備或系統使用紀錄,得知影響其能源消耗的重要因素,節能量推演時能夠納入常規與預期部份非常規變因。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.3.1",
+                    "name": "影響能耗與節能因素文件"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K07",
+                    "name": "國際效能量測與驗證協定 (IPMVP)方法論"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "ISO50001"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "量測與驗證規劃能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.4",
+                "name": "擇定量測驗證方法"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.4.1",
+                    "text": "依能源改善計畫書擇定適當量測驗證方法,能夠確認選用量測與驗證方法的充分理由。促使量測與驗證程序合理化。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.4.1",
+                    "name": "量測與驗證工作計畫書"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K07",
+                    "name": "國際效能量測與驗證協定 (IPMVP)方法論"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "量測與驗證規劃能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "執行量測與驗證",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "安裝改善前後現場量測儀表與既設儀表調校"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "依據選擇的量測與驗證方法,與節能標的物改善前後狀況,架設必要儀器,以收集改善前應有的耗能數據資料。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.1.1",
+                    "name": "儀器規格與安裝狀況文件"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K09",
+                    "name": "儀器概論"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S04",
+                    "name": "儀器安裝與調整能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.2",
+                "name": "檢視儀表安裝符合量測與驗證工作計畫書"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.2.1",
+                    "text": "依據量測與驗證計畫書,審核儀表檢驗有效期,確定安裝位置與數量正確,與功能正常。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.2.1",
+                    "name": "儀表安裝確認文件"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K09",
+                    "name": "儀器概論"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "國際效能量測與驗證協定 (IPMVP)方法論"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S04",
+                    "name": "儀器安裝與調整能力"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "量測與驗證規劃能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.3",
+                "name": "收集資料與數據建立設備系統改善前基準線"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.3.1",
+                    "text": "藉由收集的數據,依據選定的量測與驗證準則,確認比較基準線重要參數,推演出改善前耗能模式,作為改善後比較基準。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.3.1",
+                    "name": "基準線建立與結果報告書"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K07",
+                    "name": "國際效能量測與驗證協定 (IPMVP)方法論"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "統計相關知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S05",
+                    "name": "量測與驗證分析、歸納與推 演能力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "基準線解釋與說明能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.4",
+                "name": "依據量測與驗證計畫書及量測成果計算改\n善後節能\n成效"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.4.1",
+                    "text": "藉由收集的改善後耗能數據,依據選定的量測與驗證準則,推演出節能量,作為驗證依據。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.4.1",
+                    "name": "績效量測驗證報告書"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K07",
+                    "name": "國際效能量測與驗證協定 (IPMVP)方法論"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "統計相關知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S05",
+                    "name": "量測與驗證分析、歸納與推 演能力"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "效益解釋與說明能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T3",
+        "ocu_name": "確認量測驗證的作業",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T3.1",
+                "name": "確認節能改善措施符合工作計畫書"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.1.1",
+                    "text": "經由節能計畫書確認改善範圍在數與量、軟硬體、功能試俥、教育訓練、維護保養機制等全部完成,促使改善後的設施可被明確識別。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.1.1",
+                    "name": "改善措施確認文件"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K07",
+                    "name": "國際效能量測與驗證協定 (IPMVP)方法論"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "工程管理相關知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "設備系統辨識能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.2",
+                "name": "確認儀表安裝符合量測與驗證工作計畫書"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.2.1",
+                    "text": "依據量測與驗證計畫書,審核儀表檢驗有效期,確定安裝位置、數量正確與儀器功能正常運作。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.2.1",
+                    "name": "儀表安裝確認文件"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K09",
+                    "name": "儀器概論"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "國際效能量測與驗證協定 (IPMVP)方法論"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S04",
+                    "name": "儀器安裝與調整能力"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "量測與驗證規劃能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.3",
+                "name": "量測與驗證確效"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.3.1",
+                    "text": "依據量測與驗證計畫書確認節能效益,並清點各項執行上文件內容與報告書,稽核過程提出矯正事項與未來預防矯正事項,達到降低量測與驗證工作缺點,提高結果真實性與可信度的目的。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.3.1",
+                    "name": "績效量測與驗證確認文件"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K07",
+                    "name": "國際效能量測與驗證協定 (IPMVP)方法論"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "工程管理相關知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S08",
+                    "name": "工程管理稽核能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T4",
+        "ocu_name": "量測驗證管理",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T4.1",
+                "name": "撰寫年度重大事件報告"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.1.1",
+                    "text": "記錄年度所有事件、執行步驟、結果與處理重大影響事件對M&V結果的影響,促使調整量定性及量化。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.1.1",
+                    "name": "年度重大事件紀錄文件"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K07",
+                    "name": "國際效能量測與驗證協定 (IPMVP)方法論"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "工程管理相關知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S09",
+                    "name": "常規與非常規性變因辨識能 力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T4.2",
+                "name": "檢討與矯正事項"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.2.1",
+                    "text": "正確說明調整量源由,使其得到合理節能結果,促使驗證的結果不確定性降至最低與各關係人接受。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.2.1",
+                    "name": "量測驗證計畫矯正建議書"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K07",
+                    "name": "國際效能量測與驗證協定 (IPMVP)方法論"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "工程管理相關知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S10",
+                    "name": "IPMVP調整量處理能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "影響力"
+      },
+      {
+        "code": "A02",
+        "name": "壓力容忍"
+      },
+      {
+        "code": "A03",
+        "name": "謹慎細心"
+      },
+      {
+        "code": "A04",
+        "name": "分析推理"
+      },
+      {
+        "code": "A05",
+        "name": "溝通"
+      },
+      {
+        "code": "A06",
+        "name": "衝突管理"
+      },
+      {
+        "code": "A07",
+        "name": "問題解決"
+      },
+      {
+        "code": "A08",
+        "name": "顧客導向"
+      },
+      {
+        "code": "A09",
+        "name": "策略性思考"
+      },
+      {
+        "code": "A10",
+        "name": "彈性"
+      },
+      {
+        "code": "A11",
+        "name": "正直誠實"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "大專院校理工科系。",
+      "大專校院以上非理工科系，曾接受過相關節能、綠能、溫室氣體減量等研訓課程，並取得證書者。",
+      "高中職畢業且從事能源技術服務業具2年以上工作經驗，曾接受過相關節能、綠能、溫室氣體減量等研訓課程，並取得證書者。"
+    ],
+    "supplements": []
+  }
+}

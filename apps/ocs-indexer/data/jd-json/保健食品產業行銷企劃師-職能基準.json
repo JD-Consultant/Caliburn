@@ -1,0 +1,875 @@
+{
+  "version_info": {
+    "versions": [
+      {
+        "version": "V4",
+        "ocs_code": "HBR2431-001v4",
+        "ocs_name": "保健食品產業行銷企劃師",
+        "status": "最新版本",
+        "update_note": "因應產業需求，檢視更新職能基準內容。",
+        "update_date": "2023/12/31"
+      },
+      {
+        "version": "V3",
+        "ocs_code": "HBR2431-001v3",
+        "ocs_name": "保健食品產業行銷企劃師",
+        "status": "歷史版本",
+        "update_note": "已被《HBR2431-001v4》取代",
+        "update_date": "2021/01/18"
+      },
+      {
+        "version": "V2",
+        "ocs_code": "HBR2431-001v2",
+        "ocs_name": "保健食品產業行銷企劃師",
+        "status": "歷史版本",
+        "update_note": "已被《HBR2431-001v3》取代",
+        "update_date": "2017/12/31"
+      },
+      {
+        "version": "V1",
+        "ocs_code": "HBR2431-001v1",
+        "ocs_name": "保健食品產業行銷企劃師",
+        "status": "歷史版本",
+        "update_note": "已被《HBR2431-001v2》取代",
+        "update_date": "2012/06/30"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "ocs_code": "HBR2431-001v4",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "保健食品產業行銷企劃師"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "醫療保健/生技研發",
+          "code": "HBR"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "保健食品產業行銷企劃師",
+          "code": "2431"
+        }
+      ],
+      "industries": [
+        {
+          "name": "製造業/食品及飼品製造業",
+          "code": "C0899"
+        },
+        {
+          "name": "批發及零售業/零售業",
+          "code": "G4729"
+        }
+      ]
+    },
+    "job_description": "掌握保健食品市場與法規動態，對內根據下游顧客之需求，規劃新產品開發及擬定行銷策略，對外落實顧客關係管理並擴展業務市場。",
+    "ocs_level": 4
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "保健食品產品市場研究與開發企劃",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "收集保健食品產業動態資訊"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 4,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "能夠善用市場資訊,著重於目標市場資料的取得、分析與預測,剖析保健食品在原料、法規及市場等層面之概況,以提供公司相關人員作新產品開發或決策時之參考建議。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.1.1",
+                    "name": "保健食品產業分析資料"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "市場研究"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "保健食品產業市場分析"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "保健與營養相關新知"
+                  },
+                  {
+                    "code": "K29",
+                    "name": "機能性素材新知"
+                  },
+                  {
+                    "code": "K30",
+                    "name": "預防保健新知"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "分析與解讀能力"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "邏輯思考能力"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "SWOT分析"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "五力分析"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.2",
+                "name": "了解保健食品法規"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.2.1",
+                    "text": "能夠收集目標市場法令公告,與保健食品相關法規資料的取得,剖析保健食品法規之概況,提供公司相關人員之參考。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.2.1",
+                    "name": "保健食品相關法規資料"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K04",
+                    "name": "保健食品相關法規"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "保健營養食品GMP指引"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "分析與解讀能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.3",
+                "name": "產品開發企劃"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 4,
+                "indicators": [
+                  {
+                    "code": "P1.3.1",
+                    "text": "能夠善用目標市場資訊進行市場研究分析,剖析保健食品在原料、法規、品牌、商標及市場等層面之概況,以提供公司相關人員作新產品開發或決策時之參考建議。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.3.1",
+                    "name": "新產品開發建議書"
+                  },
+                  {
+                    "code": "O1.3.2",
+                    "name": "可行性評估報告"
+                  },
+                  {
+                    "code": "O1.3.3",
+                    "name": "保健食品產業市場競爭者分析報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K06",
+                    "name": "產品定位與策略"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "市場調查分析"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "商標法"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "食品科學概論"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "食品營養學概論"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S05",
+                    "name": "可行性分析與評估能力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "企劃簡報技巧"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "保健食品推廣策略規劃",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "規劃產品推動策略"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 5,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "規劃行銷策略專案,針對客戶進行適切的行銷方案與活動,可支援或執行業務部門企劃廣告相關活動。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.1.1",
+                    "name": "產品/品牌行銷策略資料"
+                  },
+                  {
+                    "code": "O2.1.2",
+                    "name": "消費者需求分析報告"
+                  },
+                  {
+                    "code": "O2.1.3",
+                    "name": "品牌定位分析報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K02",
+                    "name": "保健食品產業市場分析"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "保健與營養相關新知"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "企業管理學"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "產品規劃與提案"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "預算規劃與成本分析"
+                  },
+                  {
+                    "code": "K14",
+                    "name": "行銷策略管理"
+                  },
+                  {
+                    "code": "K15",
+                    "name": "專案規劃與管理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S06",
+                    "name": "企劃簡報技巧"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "文書撰寫能力"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "策略性思考"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.2",
+                "name": "推動保健食品行銷專案管理"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 5,
+                "indicators": [
+                  {
+                    "code": "P2.2.1",
+                    "text": "有效分配行銷專案資源,確實掌握執行進度與績效。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.2.1",
+                    "name": "年度行銷預算規劃書"
+                  },
+                  {
+                    "code": "O2.2.2",
+                    "name": "行銷專案規畫報告"
+                  },
+                  {
+                    "code": "O2.2.3",
+                    "name": "保健食品產品目標市場報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K03",
+                    "name": "保健與營養相關新知"
+                  },
+                  {
+                    "code": "K16",
+                    "name": "定價策略"
+                  },
+                  {
+                    "code": "K17",
+                    "name": "客戶價值分析"
+                  },
+                  {
+                    "code": "K18",
+                    "name": "銷售預測"
+                  },
+                  {
+                    "code": "K19",
+                    "name": "品牌學"
+                  },
+                  {
+                    "code": "K20",
+                    "name": "經營策略"
+                  },
+                  {
+                    "code": "K21",
+                    "name": "策略管理與規劃"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S06",
+                    "name": "企劃簡報技巧"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "文書撰寫能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T3",
+        "ocu_name": "保健食品產品及品牌教育",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T3.1",
+                "name": "協助(或執行)公司內部產品知識傳達推廣"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.1.1",
+                    "text": "能夠將產品資訊內容與推廣技巧系統化,有效傳達給公司受訓者,提升受訓者對產品的了解,以增進工作效能與目標。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.1.1",
+                    "name": "產品教育訓練課程"
+                  },
+                  {
+                    "code": "O3.1.2",
+                    "name": "教育訓練追蹤及檢核"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K04",
+                    "name": "保健食品相關法規"
+                  },
+                  {
+                    "code": "K22",
+                    "name": "行銷溝通與銷售技能"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S06",
+                    "name": "企劃簡報技巧"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "溝通能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.2",
+                "name": "協助(或執行)對外品牌溝通"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.2.1",
+                    "text": "能將公司理念與產品特色有效傳達致下游顧客,強化下游顧客對產品的認同感,以提升銷售金額與品牌形象。"
+                  },
+                  {
+                    "code": "P3.2.2",
+                    "text": "規劃有效的產品教育訓練課程與改善方案,以達成工作績效與產品發展目標。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.2.1",
+                    "name": "保健食品產品廣宣執行報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K03",
+                    "name": "保健與營養相關新知"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "食品科學概論"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "食品營養學概論"
+                  },
+                  {
+                    "code": "K23",
+                    "name": "品牌經營策略"
+                  },
+                  {
+                    "code": "K24",
+                    "name": "行銷學"
+                  },
+                  {
+                    "code": "K26",
+                    "name": "顧客心理學"
+                  },
+                  {
+                    "code": "K29",
+                    "name": "機能性素材新知"
+                  },
+                  {
+                    "code": "K30",
+                    "name": "預防保健新知"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S09",
+                    "name": "溝通能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T4",
+        "ocu_name": "保健食品行銷推廣",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T4.1",
+                "name": "協助(或經營)顧客關係"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 4,
+                "indicators": [
+                  {
+                    "code": "P4.1.1",
+                    "text": "能夠洞察顧客需求並掌握動態資訊,建立長期良好的顧客關係。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.1.1",
+                    "name": "顧客資料"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K25",
+                    "name": "客戶關係管理"
+                  },
+                  {
+                    "code": "K26",
+                    "name": "顧客心理學"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S10",
+                    "name": "客戶導向"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T4.2",
+                "name": "協助(或執行)業務推廣工作"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 4,
+                "indicators": [
+                  {
+                    "code": "P4.2.1",
+                    "text": "需具備一定程度之保健食品專業知識,能夠針對市場變化與顧客需求,訂定適切的產品行銷推廣方案,達成公司營業額目標。"
+                  },
+                  {
+                    "code": "P4.2.2",
+                    "text": "能夠瞭解保健食品相關法規,在符合科學證據下,能使行銷文案,不逾越規範受罰,能讓消費者瞭解產品價值。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.2.1",
+                    "name": "產品曝光企劃書"
+                  },
+                  {
+                    "code": "O4.2.2",
+                    "name": "活動目標表"
+                  },
+                  {
+                    "code": "O4.2.3",
+                    "name": "行銷活動計畫書"
+                  },
+                  {
+                    "code": "O4.2.4",
+                    "name": "廣告文案"
+                  },
+                  {
+                    "code": "O4.2.5",
+                    "name": "活動成果報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K03",
+                    "name": "保健與營養相關新知"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "保健食品相關法規"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "食品科學概論"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "食品營養學概論"
+                  },
+                  {
+                    "code": "K24",
+                    "name": "行銷學"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S09",
+                    "name": "溝通能力"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "人脈拓展"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "創意文案"
+                  },
+                  {
+                    "code": "S13",
+                    "name": "團隊合作"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T4.3",
+                "name": "協助(或執行)通路管理"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 4,
+                "indicators": [
+                  {
+                    "code": "P4.3.1",
+                    "text": "能夠結合評估結果和行銷通路之回饋反應,運用於規劃行銷策略與產品發展。"
+                  },
+                  {
+                    "code": "P4.3.2",
+                    "text": "能夠結合多方資源,靈活運用談判技巧爭取公司最大績效,有效掌握合作利基與成功機率。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.3.1",
+                    "name": "廣告投放與媒體曝光"
+                  },
+                  {
+                    "code": "O4.3.2",
+                    "name": "多媒體/社群廣告成果分析報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K27",
+                    "name": "供應鏈管理學"
+                  },
+                  {
+                    "code": "K28",
+                    "name": "通路管理學"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S11",
+                    "name": "人脈拓展"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "談判溝通技巧"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T4.4",
+                "name": "多媒體行銷"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 4,
+                "indicators": [
+                  {
+                    "code": "P4.4.1",
+                    "text": "運用目標市場區隔與社群媒體投放廣告,達到提升銷售目標。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.4.1",
+                    "name": "媒體文案"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K24",
+                    "name": "行銷學"
+                  },
+                  {
+                    "code": "K28",
+                    "name": "通路管理學"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S12",
+                    "name": "創意文案"
+                  }
+                ]
+              },
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.4.2",
+                    "text": "能夠運用行銷媒體通路,有效投遞行銷文案。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.4.1",
+                    "name": "媒體文案"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K31",
+                    "name": "媒體溝通"
+                  }
+                ],
+                "skills": []
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T4.5",
+                "name": "監控和評估行銷效益"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.5.1",
+                    "text": "能夠以數字量化行銷活動成本,反應活動衍生的公司品牌形象提升或增加營業績效的效益。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.5.1",
+                    "name": "業績達成報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K24",
+                    "name": "行銷學"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S15",
+                    "name": "規劃組織能力"
+                  },
+                  {
+                    "code": "S16",
+                    "name": "資訊科技運用能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "顧客導向"
+      },
+      {
+        "code": "A02",
+        "name": "策略性思考"
+      },
+      {
+        "code": "A03",
+        "name": "創新"
+      },
+      {
+        "code": "A04",
+        "name": "追求卓越"
+      },
+      {
+        "code": "A05",
+        "name": "分析推理"
+      },
+      {
+        "code": "A06",
+        "name": "彈性"
+      },
+      {
+        "code": "A07",
+        "name": "問題解決"
+      },
+      {
+        "code": "A08",
+        "name": "溝通"
+      },
+      {
+        "code": "A09",
+        "name": "自我學習發展"
+      },
+      {
+        "code": "A10",
+        "name": "主動積極"
+      },
+      {
+        "code": "A11",
+        "name": "團隊"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "大專（含）以上學歷:食品營養相關科系、生物醫學相關科系、商業或管理相關科系。"
+    ],
+    "supplements": []
+  }
+}

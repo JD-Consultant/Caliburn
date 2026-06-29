@@ -1,0 +1,513 @@
+{
+  "version_info": {
+    "versions": [
+      {
+        "version": "V3",
+        "ocs_code": "FBF1223-003v3",
+        "ocs_name": "銀行─系統設計人員",
+        "status": "最新版本",
+        "update_note": "略",
+        "update_date": "2023/01/06"
+      },
+      {
+        "version": "V2",
+        "ocs_code": "FBF1223-003v2",
+        "ocs_name": "銀行─系統設計人員",
+        "status": "歷史版本",
+        "update_note": "已被《FBF1223-003v3》取代",
+        "update_date": "2020/01/16"
+      },
+      {
+        "version": "V1",
+        "ocs_code": "FBF1223-003v1",
+        "ocs_name": "銀行─系統設計人員",
+        "status": "歷史版本",
+        "update_note": "已被《FBF1223-003v2》取代",
+        "update_date": "2016/12/31"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "ocs_code": "FBF1223-003v3",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "銀行─系統設計人員（屬金融科技*人才）"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "金融財務/銀行金融業務",
+          "code": "FBF"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "研究發展經理人員",
+          "code": "1223"
+        }
+      ],
+      "industries": [
+        {
+          "name": "金融及保險業/金融服務業(俗稱「銀行業」)",
+          "code": "K6412"
+        }
+      ]
+    },
+    "job_description": "評估銀行發展數位金融的設備需要，運用內部建置、外包及後續管理等方式，協助運用金融科技完成業務發展目標。",
+    "ocs_level": 3
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "從事網路平台規劃、建置、運行管理及優化",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "基於全行數位金融發展策略,規劃並執行相關之電子平台建置與管理T1.2.1管理數位金\n融平台，進行後續\n優化改良，確保平\n台運行的穩定性與\n可靠性"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "評量客戶對數位金融平台的使用度與協助分擔傳統通路客源之有效性。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.1.1",
+                    "name": "數位金融平台發展規劃"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K06",
+                    "name": "金融商品"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "產業分析"
+                  },
+                  {
+                    "code": "K15",
+                    "name": "科技發展"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S03",
+                    "name": "策略性思考"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "規劃與組織能力"
+                  },
+                  {
+                    "code": "S15",
+                    "name": "團隊合作"
+                  },
+                  {
+                    "code": "S18",
+                    "name": "溝通能力"
+                  },
+                  {
+                    "code": "S29",
+                    "name": "領導管理"
+                  }
+                ]
+              },
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.2.1",
+                    "text": "平台穩定性與客戶易用性(userfriendly)。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.2.1",
+                    "name": "平台日常管理程序與優化方向"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K06",
+                    "name": "金融商品"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "產業分析"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "風險管理"
+                  },
+                  {
+                    "code": "K15",
+                    "name": "科技發展"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S09",
+                    "name": "顧客導向"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "規劃與組織能力"
+                  },
+                  {
+                    "code": "S13",
+                    "name": "問題分析"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "問題解決"
+                  },
+                  {
+                    "code": "S24",
+                    "name": "資訊科技應用能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "運用現有",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "整建現有客戶及各種交易資\n料，導入資料庫進\n行運用"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "資料庫內資料品質與可用性。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.1.1",
+                    "name": "資料整理與資料導入"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "會計"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "金融市場"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "產業分析"
+                  },
+                  {
+                    "code": "K15",
+                    "name": "科技發展"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S04",
+                    "name": "有效連結"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "分析與解讀能力"
+                  },
+                  {
+                    "code": "S13",
+                    "name": "問題分析"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "問題解決"
+                  },
+                  {
+                    "code": "S24",
+                    "name": "資訊科技應用能力"
+                  },
+                  {
+                    "code": "S26",
+                    "name": "量化分析技術"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.2",
+                "name": "協助內部人員完成各種表單、程式設計,提升資料取得及分析效率"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.2.1",
+                    "text": "表單及程式對於資料分析取得之便利性。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.2.1",
+                    "name": "表單完成及程式開發數量"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "會計"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "金融市場"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "統計"
+                  },
+                  {
+                    "code": "K15",
+                    "name": "科技發展"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S04",
+                    "name": "有效連結"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "品質導向"
+                  },
+                  {
+                    "code": "S13",
+                    "name": "問題分析"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "問題解決"
+                  },
+                  {
+                    "code": "S24",
+                    "name": "資訊科技應用能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T3",
+        "ocu_name": "執行資訊安全保障程序與日常管理",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T3.1",
+                "name": "持續蒐集數位金融相關資安資訊,提出防範策略並執行"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.1.1",
+                    "text": "持續衡量、監控數位金融業務相關資訊風險,維持系統穩定並發現早期警訊。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.1.1",
+                    "name": "數位金融業務資訊安全分析報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K04",
+                    "name": "金融市場"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "法律/法規"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "產業分析"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "風險管理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "外部環境認知與評估"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "成果導向"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "時間管理"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "問題解決"
+                  },
+                  {
+                    "code": "S18",
+                    "name": "溝通能力"
+                  },
+                  {
+                    "code": "S24",
+                    "name": "資訊科技應用能力"
+                  },
+                  {
+                    "code": "S26",
+                    "name": "量化分析技術"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.2",
+                "name": "調整及改善主機系統,防範外部入侵或內部程序錯誤所致之資安風險"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.2.1",
+                    "text": "系統發生資安問題之頻率與影響性。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.2.1",
+                    "name": "系統改善工程報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K02",
+                    "name": "財務分析"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "經濟"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "產業分析"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "外部環境認知與評估"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "成果導向"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "時間管理"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "問題解決"
+                  },
+                  {
+                    "code": "S24",
+                    "name": "資訊科技應用能力"
+                  },
+                  {
+                    "code": "S26",
+                    "name": "量化分析技術"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "主動積極"
+      },
+      {
+        "code": "A02",
+        "name": "正直誠實"
+      },
+      {
+        "code": "A04",
+        "name": "持續學習"
+      },
+      {
+        "code": "A07",
+        "name": "追求卓越"
+      },
+      {
+        "code": "A08",
+        "name": "團隊意識"
+      },
+      {
+        "code": "A10",
+        "name": "壓力容忍"
+      },
+      {
+        "code": "A11",
+        "name": "應對不確定性"
+      },
+      {
+        "code": "A14",
+        "name": "謹慎細心"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "金融科技（Financial technology, 縮寫: FinTech）：企業（包括金融與非金融機構）運用各種科技型態，以增進金融服務管理、業務效率及風險控制所形成的一",
+      "種經濟模式。",
+      "對銀行商品及運作有充分瞭解，並具備相當程度資訊工程或系統設計、管理相關經驗者。"
+    ],
+    "supplements": []
+  }
+}

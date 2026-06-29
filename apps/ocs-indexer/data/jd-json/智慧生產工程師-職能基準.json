@@ -1,0 +1,998 @@
+{
+  "version_info": {
+    "versions": [
+      {
+        "version": "V3",
+        "ocs_code": "MPM3117-001v3",
+        "ocs_name": "智慧生產工程師",
+        "status": "最新版本",
+        "update_note": "略。",
+        "update_date": "2024/12/31"
+      },
+      {
+        "version": "V2",
+        "ocs_code": "MPM3117-001v2",
+        "ocs_name": "智慧生產工程師",
+        "status": "歷史版本",
+        "update_note": "已被《MPM3117-001v3》取代",
+        "update_date": "2021/01/18"
+      },
+      {
+        "version": "V1",
+        "ocs_code": "MPM3117-001v1",
+        "ocs_name": "智慧化生產工程師",
+        "status": "歷史版本",
+        "update_note": "已被《MPM3117-001v2》取代",
+        "update_date": "2019/03/07"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "ocs_code": "MPM3117-001v3",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "智慧生產工程師"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "製造/生產管理",
+          "code": "MPM"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "智慧生產工程師",
+          "code": "2141"
+        }
+      ],
+      "industries": [
+        {
+          "name": "製造業",
+          "code": "Unknown"
+        }
+      ]
+    },
+    "job_description": "依據訂單需求，落實智慧製造生產線的生產排程與流程管理，執行精實管理，以確保智慧生產線運作順暢，能快速處置智慧生產線異常及防止\n再發，以維持產線穩定度，有效提升產能，達成生產良率與效率目標，同時也配合新產品開發計畫進行試量產，以確認可進入量產階段及優化\n生產條件。",
+    "ocs_level": 4
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "落實生產規劃",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "確認人、機、料如期與其量並通\n過首件檢\n查（FAI）"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "有效掌握人、機、料等狀態,能夠彈性調配計畫,以如期生產。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.1.1",
+                    "name": "確認之生產排程"
+                  },
+                  {
+                    "code": "O1.1.2",
+                    "name": "首件檢查紀錄表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "生產管理知識"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "物料管理知識"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "產品知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "瞭解及執行生產計畫能力"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "跨部門溝通能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.2",
+                "name": "檢核標準工時合理性"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.2.1",
+                    "text": "能夠客觀檢核標準工時,以利前端規劃生產排程與生產效率檢討。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.2.1",
+                    "name": "標準工時表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "生產管理知識"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "物料管理知識"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "產品知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "跨部門溝通能力"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "檢核標準工時能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.3",
+                "name": "管理在製品(WIP)及現場倉"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.3.1",
+                    "text": "確實掌控在製品與現場倉的數量與品質。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.3.1",
+                    "name": "在製品及現場倉庫存表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "生產管理知識"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "物料管理知識"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "產品知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "跨部門溝通能力"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "庫存管理能力(如識別標 籤、數量管理)"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "執行智慧製造",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "檢核生產製造流程並製作文件"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "能夠檢核產品規格及製程參數,製作成可遵循的技術文件。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.1.1",
+                    "name": "生產機台操作作業指導書(如MPI)"
+                  },
+                  {
+                    "code": "O2.1.2",
+                    "name": "產品別之生產作業指導書"
+                  },
+                  {
+                    "code": "O2.1.3",
+                    "name": "生產機台之"
+                  },
+                  {
+                    "code": "O2.1.4",
+                    "name": "品質工程表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K03",
+                    "name": "產品知識"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "生產設備性能"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "機台操作"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "SOP文件製作"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "製造流程知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S05",
+                    "name": "機台規格參數與性能掌握能 力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "機台操作與測試能力"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "解讀與製作 SOP 與 MPI 能 力"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "生產規劃排程優化的能力"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "撰寫與修正相關生產製造文 件"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.2",
+                "name": "執行生產製程相關訓練計畫"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.2.1",
+                    "text": "能夠依據教育訓練計畫,達到全員參與訓練目標,以深化產線人員製程管理概念。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.2.1",
+                    "name": "生產線人員訓練或教導人次"
+                  },
+                  {
+                    "code": "O2.2.2",
+                    "name": "產線紀律規範"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K08",
+                    "name": "生產線製程管理概念"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "生產線人員管理概念"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "跨部門溝通能力"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "生產線製程管理能力"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "生產線人員管理能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.3",
+                "name": "定期檢測生產設備之重要參數"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.3.1",
+                    "text": "能夠依據機台操作步驟進行保養及簡易機台故障與問題排除,並遵循環境安全規定以及設備電氣安全要求。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.3.1",
+                    "name": "保養檢查記錄表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K10",
+                    "name": "機台功能及特性之基本知識"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "機台保養程序"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S12",
+                    "name": "機台清潔與保養能力"
+                  },
+                  {
+                    "code": "S13",
+                    "name": "簡易機台故障與問題排除能 力"
+                  },
+                  {
+                    "code": "S27",
+                    "name": "機台運轉參數及故障歷史之 預知保養能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.4",
+                "name": "調查並處理生產線的異常狀況"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.4.1",
+                    "text": "能夠依據公司製程規範,自我管理落實製程檢驗程序,並能夠對即時排除異常及做成矯正措施。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.4.1",
+                    "name": "製程查檢表"
+                  },
+                  {
+                    "code": "O2.4.2",
+                    "name": "矯正預防措施"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K03",
+                    "name": "產品知識"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "製造流程知識"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "機台功能及特性之進階知識"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "品質管理知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "跨部門溝通能力"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "分析能力"
+                  },
+                  {
+                    "code": "S15",
+                    "name": "問題解決能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.5",
+                "name": "瞭解與承接智慧製造的生產設備"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.5.1",
+                    "text": "通過研發評核操作能力或了解機台的操作性能。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.5.1",
+                    "name": "設備操作手冊"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K12",
+                    "name": "機台功能及特性之進階知識"
+                  },
+                  {
+                    "code": "K14",
+                    "name": "智慧製造概論(工業4.0)"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S16",
+                    "name": "瞭解智慧設備智慧化功能能 力"
+                  },
+                  {
+                    "code": "S28",
+                    "name": "熟悉機台對外通訊介面能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.6",
+                "name": "遠端管控與運營智慧製造生產線"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.6.1",
+                    "text": "在智慧製造環境下,能夠即時透過遠端方式管理生產線運作,以確保生產效率與良率達標。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.6.1",
+                    "name": "生產報告(含數位)"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K14",
+                    "name": "智慧製造概論(工業4.0)"
+                  },
+                  {
+                    "code": "K15",
+                    "name": "即時品質數據收集、分析與 應用"
+                  },
+                  {
+                    "code": "K16",
+                    "name": "智慧製造管控介面之使用知 識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S16",
+                    "name": "瞭解智慧設備智慧化功能能 力"
+                  },
+                  {
+                    "code": "S17",
+                    "name": "智慧製造管控介面操作能力"
+                  },
+                  {
+                    "code": "S18",
+                    "name": "資訊科技應用能力"
+                  },
+                  {
+                    "code": "S28",
+                    "name": "熟悉機台對外通訊介面能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.7",
+                "name": "蒐集/分析智慧製造數據,落實精實管理,及節能減碳管理"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.7.1",
+                    "text": "蒐集到生產數據,能夠被允收及運用,進行數據資料分析,做到資料可視化與問題透明化,還能為可預測與自適應做準備。"
+                  },
+                  {
+                    "code": "P2.7.2",
+                    "text": "提出方案可落實執行並提升生產效率及降低浪費。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.7.1",
+                    "name": "生產數據O.2.7.2製程分析改善建議O.2.7.3落實執行成效"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K03",
+                    "name": "產品知識"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "製造流程知識"
+                  },
+                  {
+                    "code": "K17",
+                    "name": "巨量資料蒐集方法及原理"
+                  },
+                  {
+                    "code": "K21",
+                    "name": "低碳化管理知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "跨部門溝通能力"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "分析能力"
+                  },
+                  {
+                    "code": "S18",
+                    "name": "資訊科技應用能力"
+                  },
+                  {
+                    "code": "S19",
+                    "name": "持續改善的能力"
+                  },
+                  {
+                    "code": "S20",
+                    "name": "長期蒐集重要資料能力"
+                  },
+                  {
+                    "code": "S21",
+                    "name": "製程改善建議"
+                  },
+                  {
+                    "code": "S29",
+                    "name": "低碳化改善能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T3",
+        "ocu_name": "促進品質管理",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T3.1",
+                "name": "確認技術文件有效性"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.1.1",
+                    "text": "即時確認技術文件有效性,避免版次變更造成損失。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.1.1",
+                    "name": "新版的技術文件"
+                  },
+                  {
+                    "code": "O3.1.2",
+                    "name": "進行中工程/製造變更通知(ECN/MCN)文件"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K18",
+                    "name": "文件管理知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S22",
+                    "name": "文件管理能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.2",
+                "name": "監控生產線之良率與故障返品(Fieldreturn)並收集及分析品質數據"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.2.1",
+                    "text": "確實執行品質檢驗,即時收集及分析品質數據,掌握生產線品質之領先指標,避免產生不良品。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.2.1",
+                    "name": "品質查檢表"
+                  },
+                  {
+                    "code": "O3.2.2",
+                    "name": "品質統計分析報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K13",
+                    "name": "品質管理知識"
+                  },
+                  {
+                    "code": "K15",
+                    "name": "即時品質數據收集、分析與 應用"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S20",
+                    "name": "長期蒐集重要資料能力"
+                  },
+                  {
+                    "code": "S23",
+                    "name": "產品規格判讀能力"
+                  },
+                  {
+                    "code": "S24",
+                    "name": "品管執行能力"
+                  },
+                  {
+                    "code": "S25",
+                    "name": "大批量品管的控制能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T4",
+        "ocu_name": "優化生產條件",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T4.1",
+                "name": "協助試量產將研發規格轉成量產規格"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.1.1",
+                    "text": "能夠確實執行研發的BOM表與製程參數。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.1.1",
+                    "name": "試產報告"
+                  },
+                  {
+                    "code": "O4.1.2",
+                    "name": "產品量產承認書"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K03",
+                    "name": "產品知識"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "製造流程知識"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "機台功能及特性之基本知識"
+                  },
+                  {
+                    "code": "K15",
+                    "name": "即時品質數據收集、分析與"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S06",
+                    "name": "機台操作與測試能力"
+                  },
+                  {
+                    "code": "S23",
+                    "name": "產品規格判讀能力"
+                  },
+                  {
+                    "code": "S26",
+                    "name": "機台參數調整能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T4.2",
+                "name": "主導生產線改善提案(生產條件不變)"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.2.1",
+                    "text": "提出方案可落實執行並提升生產效率、安全、品質或降低成本。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.2.1",
+                    "name": "改善提案建議"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K03",
+                    "name": "產品知識"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "製造流程知識"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "機台功能及特性之進階知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "跨部門溝通能力"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "分析能力"
+                  },
+                  {
+                    "code": "S19",
+                    "name": "持續改善的能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T4.3",
+                "name": "配合新產品、新材料與新機台導入之測試生產,協助設施規劃及流程優化(生產條件改變)"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.3.1",
+                    "text": "能夠因應材料批次與機台的不穩定度,重新調整製程參數以達成產品標準。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.3.1",
+                    "name": "生產機台之作業參數"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K03",
+                    "name": "產品知識"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "製造流程知識"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "機台功能及特性之基本知識"
+                  },
+                  {
+                    "code": "K19",
+                    "name": "價值工程知識"
+                  },
+                  {
+                    "code": "K20",
+                    "name": "人因工程知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "跨部門溝通能力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "機台操作與測試能力"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "分析能力"
+                  },
+                  {
+                    "code": "S15",
+                    "name": "問題解決能力"
+                  },
+                  {
+                    "code": "S19",
+                    "name": "持續改善的能力"
+                  },
+                  {
+                    "code": "S23",
+                    "name": "產品規格判讀能力"
+                  },
+                  {
+                    "code": "S26",
+                    "name": "機台參數調整能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "創新思維"
+      },
+      {
+        "code": "A02",
+        "name": "分析推理與解決問題"
+      },
+      {
+        "code": "A03",
+        "name": "持續自主學習"
+      },
+      {
+        "code": "A04",
+        "name": "成本意識"
+      },
+      {
+        "code": "A05",
+        "name": "安全意識"
+      },
+      {
+        "code": "A06",
+        "name": "品質意識"
+      },
+      {
+        "code": "A07",
+        "name": "人際關係與溝通協調"
+      },
+      {
+        "code": "A08",
+        "name": "團隊合作"
+      },
+      {
+        "code": "A09",
+        "name": "工程"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "大專以上畢業或同等學力。",
+      "具備基層生產線作業概念。",
+      "具備智慧製造應用知識與應用能力（含數感知技術、機聯網應用、據收集分析、智慧監控等）。"
+    ],
+    "supplements": []
+  }
+}

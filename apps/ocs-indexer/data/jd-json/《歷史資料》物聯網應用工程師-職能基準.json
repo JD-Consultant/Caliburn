@@ -1,0 +1,995 @@
+{
+  "version_info": {
+    "versions": [
+      {
+        "version": "V3",
+        "ocs_code": "INM2523-001v3",
+        "ocs_name": "物聯網應用工程師",
+        "status": "最新版本",
+        "update_note": "略",
+        "update_date": "2022/12/30"
+      },
+      {
+        "version": "V2",
+        "ocs_code": "INM2523",
+        "ocs_name": "物聯網應用工程師",
+        "status": "歷史版本",
+        "update_note": "已被《INM2523",
+        "update_date": "2020/02/07"
+      },
+      {
+        "version": "V1",
+        "ocs_code": "INM2523-001v1",
+        "ocs_name": "物聯網應用工程師",
+        "status": "歷史版本",
+        "update_note": "已被《INM2523",
+        "update_date": "2019/09/25"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "ocs_code": "INM2523-001v3",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "物聯網應用工程師"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "資訊科技/網路規劃與建置管理",
+          "code": "INM"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "物聯網應用工程師",
+          "code": "2523"
+        }
+      ],
+      "industries": [
+        {
+          "name": "出版影音及資通訊業/電腦程式設計、諮詢及相關服務業",
+          "code": "J62"
+        }
+      ]
+    },
+    "job_description": "以產業需求的思考角度出發，熟悉物聯網系統之組成架構與雲端服務模式，提出安全及可行之物聯網解決方案，並具備有效排解問題的能力以確\n保系統順利維運。",
+    "ocs_level": 4
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "物聯網標準與應用趨勢研究",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "蒐集國際及國內物聯網相關標準"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "能夠分析比較不同物聯網應用與所採用之產品(與其標準)優劣勢比較。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.1.1",
+                    "name": "物聯網相關軟硬體所具備之國際標準分析報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "物聯網系統基本架構"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "物聯網相關國際標準"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "基礎通訊原理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "資料蒐集與分析能力"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "英文閱讀能力"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "瞭解判讀產品規格書能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.2",
+                "name": "蒐集與分析物聯網應用發展趨勢"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.2.1",
+                    "text": "能夠深入了解物聯網現行應用領域,以及各種發展中技術可能帶來的改善,甚至是全新的應用領域。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.2.1",
+                    "name": "物聯網現行應用與未來發展趨勢評估報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K04",
+                    "name": "物聯網發展趨勢(如AIoT 人 工智慧物聯網、CIoT 消費物聯 網、IIoT 工業物聯網等)"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "物聯網實務案例(如智慧家 庭、智慧能源、智慧城市等)"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "資料蒐集與分析能力"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "英文閱讀能力"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "瞭解判讀產品規格書能力"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "論壇與相關發表研讀能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "物聯網系統需求分析",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "客戶作業模式與流程分析"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "系統導入前後之作業模式差異分析。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.1.1",
+                    "name": "系統導入前後作業流程比較表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K06",
+                    "name": "導入效益分析概念"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "作業原理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S05",
+                    "name": "作業流程問題分析能力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "流程最佳化"
+                  }
+                ]
+              },
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.1.2",
+                    "text": "能夠將新技術、產品、市場、物聯網標準規範等資訊,轉換為系統導入依據,並訂定出符合客戶需求的規格,或是制定全新的應用領域。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.1.2",
+                    "name": "系統需求規劃書(含設備需求與系統功能清單)"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K04",
+                    "name": "物聯網發展趨勢(如AIoT 人 工智慧物聯網、CIoT 消費物聯 網、IIoT 工業物聯網等)"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "物 聯網實務案例(如智慧家庭、智 慧能源、智慧城市等)"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "作業原理"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "五力分析"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S07",
+                    "name": "需求規格書撰寫能力"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "專案提案簡報及計畫書撰寫 能力"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "使用者操作介面設計能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.2",
+                "name": "提供客戶合適的物聯網解決方案"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.2.1",
+                    "text": "能夠依客戶實際需求提供較佳的物聯網解決方案,並估算導入效益與KPI。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.2.1",
+                    "name": "系統導入企劃書與效益分析報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K06",
+                    "name": "導入效益分析概念"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "專案風險評估觀念"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "專案管理知識"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "雲端技術與服務架構基礎"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "Dev-Ops相關知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S08",
+                    "name": "專案提案簡報及計畫書撰寫 能力"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "成本效益分析能力"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "專案風險分析能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T3",
+        "ocu_name": "物聯網",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T3.1",
+                "name": "物聯網雲端服\n務模式評\n估"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.1.1",
+                    "text": "有效掌握客戶軟體系統開發與維護能力協助客戶了解不同的雲端服務特性,選用較佳開發方案。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.1.1",
+                    "name": "雲端服務模式分析比較表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K06",
+                    "name": "導入效益分析概念"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "雲端技術與服務架構基礎"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "Dev-Ops相關知識"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "系統管理知識"
+                  },
+                  {
+                    "code": "K14",
+                    "name": "網路管理知識 力"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S12",
+                    "name": "雲端平台與中介軟體評估能"
+                  },
+                  {
+                    "code": "S13",
+                    "name": "應用層系統架構與導入策略"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "相關程式語言開發技能"
+                  }
+                ]
+              },
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.1.2",
+                    "text": "評估各系統元件採用加密、簽章、去識別化的程度與時機。"
+                  },
+                  {
+                    "code": "P3.1.3",
+                    "text": "確保物聯網資料不易遭受竄改,及提供資料不可否認性確認功能。"
+                  },
+                  {
+                    "code": "P3.1.4",
+                    "text": "企業導入安全認證(如ISO27001,Security+等)之評估。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.1.2",
+                    "name": "資訊安全風險評估報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K15",
+                    "name": "物聯網資訊安全對策"
+                  },
+                  {
+                    "code": "K16",
+                    "name": "網路安全概論"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S15",
+                    "name": "系統資訊安全評估與導入策 略"
+                  },
+                  {
+                    "code": "S16",
+                    "name": "營運衝擊分析能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.2",
+                "name": "制定物聯網資料交換格式"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.2.1",
+                    "text": "協助客戶了解EPCglobal之框架基礎與編碼規範。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.2.1",
+                    "name": "EPC編碼原則文件"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K17",
+                    "name": "EPCglobal 框架基礎觀念"
+                  },
+                  {
+                    "code": "K18",
+                    "name": "EPCgloabl 網路架構元件"
+                  },
+                  {
+                    "code": "K19",
+                    "name": "EPC編碼原則"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S17",
+                    "name": "應用層系統備援方案評估與 導入策略"
+                  },
+                  {
+                    "code": "S18",
+                    "name": "服務/產品導入EPC標準/規 範之能力"
+                  }
+                ]
+              },
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.2.2",
+                    "text": "制定物聯網各層級元件資料交換格式,與交換方式。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.2.2",
+                    "name": "物聯網資料交換格式報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K15",
+                    "name": "物聯網資訊安全對策"
+                  },
+                  {
+                    "code": "K20",
+                    "name": "物聯網資料交換格式"
+                  },
+                  {
+                    "code": "K21",
+                    "name": "網路及資料庫概論"
+                  },
+                  {
+                    "code": "K22",
+                    "name": "I/O通訊原理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S19",
+                    "name": "資料格式設計能力"
+                  },
+                  {
+                    "code": "S20",
+                    "name": "各式IPC(Inter-Process Communication)與Web Service技術"
+                  },
+                  {
+                    "code": "S21",
+                    "name": "RESTful API開發技能"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.3",
+                "name": "軟體評估與測試"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.3.1",
+                    "text": "訂定各種測試方案。"
+                  },
+                  {
+                    "code": "P3.3.2",
+                    "text": "評估各種軟體方案(含開源軟體)。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.3.1",
+                    "name": "物聯網系統功能評估與測試報告(如功能單元、負載、壓力與入侵等)"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K10",
+                    "name": "專案管理知識"
+                  },
+                  {
+                    "code": "K20",
+                    "name": "物聯網資料交換格式"
+                  },
+                  {
+                    "code": "K23",
+                    "name": "開源軟硬體與授權方式"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S14",
+                    "name": "相關程式語言開發技能"
+                  },
+                  {
+                    "code": "S22",
+                    "name": "測試程序與工具"
+                  },
+                  {
+                    "code": "S23",
+                    "name": "撰寫測試報告能力"
+                  },
+                  {
+                    "code": "S24",
+                    "name": "系統備援方案評估與導入策"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T4",
+        "ocu_name": "物聯網通訊及感測系統建置與測試",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T4.1",
+                "name": "物聯網無線通訊品質評估"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.1.1",
+                    "text": "了解電信主管機關(如NCC,FCC等)與認證組織(如CE,GCF,CTIA,PTCRB等)之要求,以及相關之測試方法。"
+                  },
+                  {
+                    "code": "P4.1.2",
+                    "text": "針對無線通訊產品效能測試結果進行讀取效能分析並提出優化方案。"
+                  },
+                  {
+                    "code": "P4.1.3",
+                    "text": "協助客戶選擇適合之設備佈建場域,排除環境干擾因素影響使物聯網系統之讀取效能達最佳化。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.1.1",
+                    "name": "無線通訊產品之讀取效能測試報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K24",
+                    "name": "無線通訊技術"
+                  },
+                  {
+                    "code": "K25",
+                    "name": "天線設計基本原理"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "基礎通訊原理"
+                  },
+                  {
+                    "code": "K26",
+                    "name": "電磁學知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S25",
+                    "name": "無線頻譜量測技術"
+                  },
+                  {
+                    "code": "S26",
+                    "name": "網路層系統備援方案評估與 導入策略"
+                  },
+                  {
+                    "code": "S27",
+                    "name": "網路層無線通訊實作能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T4.2",
+                "name": "電磁波安全評估與測試"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.2.1",
+                    "text": "確保導入場域之無線設備符合國家或國際規範。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.2.1",
+                    "name": "電磁波安全檢測報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K24",
+                    "name": "無線通訊技術"
+                  },
+                  {
+                    "code": "K27",
+                    "name": "電磁波輻射量(SAR)國際 標準規範"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S25",
+                    "name": "無線頻譜量測技術"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T4.3",
+                "name": "感測器與節能功能整合技術評估"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.3.1",
+                    "text": "能協助客戶選用適當的感測器,並有效利用節能裝置以增加感測器之電源續航力。"
+                  },
+                  {
+                    "code": "P4.3.2",
+                    "text": "根據應用與節能方案,調教感測器之資料回報週期。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.3.1",
+                    "name": "感測器與節能功能設計建議報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K23",
+                    "name": "開源軟硬體與授權方式"
+                  },
+                  {
+                    "code": "K28",
+                    "name": "電子電路學基礎知識"
+                  },
+                  {
+                    "code": "K29",
+                    "name": "嵌入式作業系統基礎知識"
+                  },
+                  {
+                    "code": "K30",
+                    "name": "自動辨識與感測技術基礎知 識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S14",
+                    "name": "相關程式語言開發技能"
+                  },
+                  {
+                    "code": "S21",
+                    "name": "RESTful API開發技能"
+                  },
+                  {
+                    "code": "S24",
+                    "name": "系統備援方案評估與導入策 略"
+                  },
+                  {
+                    "code": "S28",
+                    "name": "感知層感測器規格分析能力"
+                  },
+                  {
+                    "code": "S29",
+                    "name": "IOT輸出入裝置安裝與設定 技術"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T5",
+        "ocu_name": "物聯網系統更新與維護",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T5.1",
+                "name": "物聯網功能新增與系統升級"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P5.1.1",
+                    "text": "能於既有系統架構中增加物聯網新功能。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O5.1.1",
+                    "name": "新增功能規格書"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K08",
+                    "name": "專案風險評估觀念"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S07",
+                    "name": "需求規格書撰寫能力"
+                  }
+                ]
+              },
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P5.1.2",
+                    "text": "有效規劃物聯網系統導入與升級步驟,確保新舊系統能無縫接軌。"
+                  },
+                  {
+                    "code": "P5.1.3",
+                    "text": "評估與採用各式備援與高可靠性(HA)機制,定義系統服務層級協議(SLA)。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O5.1.2",
+                    "name": "系統導入與升級建置計畫書"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K08",
+                    "name": "專案風險評估觀念"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "專案管理知識"
+                  },
+                  {
+                    "code": "K31",
+                    "name": "雲端備援與HA機制"
+                  },
+                  {
+                    "code": "K32",
+                    "name": "雲端彈性擴展知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S08",
+                    "name": "專案提案簡報及計畫書撰寫 能力"
+                  },
+                  {
+                    "code": "S24",
+                    "name": "系統備援方案評估與導入策 略"
+                  },
+                  {
+                    "code": "S30",
+                    "name": "操作手冊撰寫能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T5.2",
+                "name": "物聯網系統維護"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P5.2.1",
+                    "text": "能夠迅速找出並排除系統故障因素,確保系統能順利運作。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O5.2.1",
+                    "name": "系統服務品質改善建議與維運計畫書"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K12",
+                    "name": "Dev-Ops相關知識"
+                  },
+                  {
+                    "code": "K23",
+                    "name": "開源軟硬體與授權方式"
+                  },
+                  {
+                    "code": "K25",
+                    "name": "天線設計基本原理"
+                  },
+                  {
+                    "code": "K28",
+                    "name": "電子電路學基礎知識"
+                  },
+                  {
+                    "code": "K29",
+                    "name": "嵌入式作業系統基礎知識"
+                  },
+                  {
+                    "code": "K30",
+                    "name": "自動辨識與感測技術基礎知 識"
+                  },
+                  {
+                    "code": "K33",
+                    "name": "程式設計基礎"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S30",
+                    "name": "操作手冊撰寫能力"
+                  },
+                  {
+                    "code": "S31",
+                    "name": "問題排除與系統維護規劃能 力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "多元思考"
+      },
+      {
+        "code": "A02",
+        "name": "溝通協調"
+      },
+      {
+        "code": "A03",
+        "name": "分析推理"
+      },
+      {
+        "code": "A04",
+        "name": "自主學習"
+      },
+      {
+        "code": "A05",
+        "name": "主動積極"
+      },
+      {
+        "code": "A06",
+        "name": "靈機應變"
+      },
+      {
+        "code": "A07",
+        "name": "團隊合作"
+      },
+      {
+        "code": "A08",
+        "name": "問題解決"
+      },
+      {
+        "code": "A09",
+        "name": "跨域學習"
+      },
+      {
+        "code": "A10",
+        "name": "目標導向"
+      },
+      {
+        "code": "A11",
+        "name": "職場倫理"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "電機、電子、電信、機械、資工、資管、工工等相關科系大學或專科以上畢業。"
+    ],
+    "supplements": []
+  }
+}

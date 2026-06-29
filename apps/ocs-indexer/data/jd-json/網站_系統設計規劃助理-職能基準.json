@@ -1,0 +1,688 @@
+{
+  "version_info": {
+    "versions": [
+      {
+        "version": "V3",
+        "ocs_code": "IIS3513-007v3",
+        "ocs_name": "網站/系統設計規劃助理",
+        "status": "最新版本",
+        "update_note": "略",
+        "update_date": "2023/12/15"
+      },
+      {
+        "version": "V2",
+        "ocs_code": "IIS3513-007v2",
+        "ocs_name": "網站/系統設計規劃助理",
+        "status": "歷史版本",
+        "update_note": "已被《IIS3513-007v3》取代",
+        "update_date": "2020/12/31"
+      },
+      {
+        "version": "V1",
+        "ocs_code": "IIS3513-007v1",
+        "ocs_name": "網站/系統設計規劃助理",
+        "status": "歷史版本",
+        "update_note": "已被《IIS3513-007v2》取代",
+        "update_date": "2017/12/31"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "ocs_code": "IIS3513-007v3",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "網站/系統設計規劃助理"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "資訊科技/資訊支援與服務",
+          "code": "IIS"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "網站/系統設計規劃助理",
+          "code": "3513"
+        }
+      ],
+      "industries": [
+        {
+          "name": "出版、影音製作、傳播及資通訊服務業/電腦程式設計、諮詢及相關服務業",
+          "code": "J6202"
+        }
+      ]
+    },
+    "job_description": "協助網路/系統之設計、開發及測試等相關工作。",
+    "ocs_level": 3
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "協助應用程式開發",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "協助建立應用程式"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "依據開發人員指示,在現有架構框架中撰寫程式碼。"
+                  },
+                  {
+                    "code": "P1.1.2",
+                    "text": "確保程式碼依循程式架構及編碼標準編寫。"
+                  },
+                  {
+                    "code": "P1.1.3",
+                    "text": "依指示撰寫副程式,以協助系統發展。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.1.1",
+                    "name": "程式碼、應用程式"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "網路應用開發框架"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "程序間通訊(IPC)的開發 運用"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "資料庫應用"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "軟體開發生命週期 (SDLC)"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "程式語言"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "閱讀與理解專業文件能力"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "規劃與組織能力"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "問題解決能力"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "程式撰寫與除錯能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.2",
+                "name": "程式碼除錯"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.2.1",
+                    "text": "使用除錯工具,檢查執行中的程式碼。"
+                  },
+                  {
+                    "code": "P1.2.2",
+                    "text": "追蹤程式碼並檢查變數內容,來偵測與修正錯誤。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "網路應用開發框架"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "程序間通訊(IPC)的開發 運用"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "系統測試流程及原則"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "資料庫應用"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "軟體開發生命週期 (SDLC)"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "程式語言"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S03",
+                    "name": "問題解決能力"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "程式撰寫與除錯能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.3",
+                "name": "測試應用程式"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.3.1",
+                    "text": "依據測試腳本,進行測試並以文件記錄測試結果。"
+                  },
+                  {
+                    "code": "P1.3.2",
+                    "text": "針對產出的程式碼進行需求規格測試,以確保符合程式規範。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.3.1",
+                    "name": "測試紀錄"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "網路應用開發框架"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "系統測試流程及原則"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "資料庫應用"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "軟體開發生命週期 (SDLC)"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "程式語言"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S03",
+                    "name": "問題解決能力"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "程式撰寫與除錯能力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "工作文件與紀錄製作及撰寫"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.4",
+                "name": "建立技術文件"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.4.1",
+                    "text": "建立程式碼與維護程式文件。"
+                  },
+                  {
+                    "code": "P1.4.2",
+                    "text": "線上協助使用者操作與建立維護管理文件。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.4.1",
+                    "name": "程式原始碼文件"
+                  },
+                  {
+                    "code": "O1.4.2",
+                    "name": "使用者操作與維護管理文件"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "網路應用開發框架"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "程序間通訊(IPC)的開發 運用"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "系統測試流程及原則"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "資料庫應用"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "程式語言"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "規劃與組織能力"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "問題解決能力"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "程式撰寫與除錯能力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "工作文件與紀錄製作及撰寫"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "協助佈署應用程式到正式環境中",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "佈署應用程式"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "協助在測試環境下測試安裝套件。"
+                  },
+                  {
+                    "code": "P2.1.2",
+                    "text": "將安裝套件佈署到正式環境中。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K05",
+                    "name": "軟體開發生命週期 (SDLC)"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "佈署應用程式之方法"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "IT軟硬體及安全協定與標準"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "組織IT政策"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "網站代管與網域名稱註冊"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "閱讀與理解專業文件能力"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "問題解決能力"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "程式撰寫與除錯能力"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "程式除錯能力"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "溝通協調能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.2",
+                "name": "測試應用程式的移除"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.2.1",
+                    "text": "在測試環境下,測試移除套件,檢視已安裝組件是否移除。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K04",
+                    "name": "資料庫應用"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "軟體開發生命週期 (SDLC)"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "IT軟硬體及安全協定與標準"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "組織IT政策"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "閱讀與理解專業文件能力"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "問題解決能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.3",
+                "name": "進行資料庫資料移轉"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.3.1",
+                    "text": "接收客戶數據資料,將資料佈署到正式資料庫。"
+                  },
+                  {
+                    "code": "P2.3.2",
+                    "text": "指定連接到資料庫的連線設定。"
+                  },
+                  {
+                    "code": "P2.3.3",
+                    "text": "協助與客戶接洽,進行資料轉移驗收。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K04",
+                    "name": "資料庫應用"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "IT軟硬體及安全協定與標準"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "組織IT政策"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "閱讀與理解專業文件能力"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "問題解決能力"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "溝通協調能力"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "資料庫安裝與應用能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T3",
+        "ocu_name": "提供客戶IT支援服務",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T3.1",
+                "name": "提供支援服務"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.1.1",
+                    "text": "與客戶的專案聯絡人確認支援需求,提供所需的支援服務。"
+                  },
+                  {
+                    "code": "P3.1.2",
+                    "text": "記錄與客戶聯繫的過程與所採取的行動方案。"
+                  },
+                  {
+                    "code": "P3.1.3",
+                    "text": "在支援服務期間,確認服務等級協議(SLA)的差異。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.1.1",
+                    "name": "支援行動紀錄"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K11",
+                    "name": "常見軟硬體產品相關知識"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "客戶端的服務流程"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "服務等級協議(SLA)"
+                  },
+                  {
+                    "code": "K14",
+                    "name": "客戶的利益關係人角色"
+                  },
+                  {
+                    "code": "K15",
+                    "name": "客戶的業務領域與系統功能"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "閱讀與理解專業文件能力"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "問題解決能力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "工作文件與紀錄製作及撰寫"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "溝通協調能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.2",
+                "name": "蒐集回饋"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.2.1",
+                    "text": "提交服務回饋文件給客戶的專案聯絡人,並確定是否滿意支援流程。"
+                  },
+                  {
+                    "code": "P3.2.2",
+                    "text": "提供客戶回饋意見給設計團隊參考,作為服務優化依據。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.2.1",
+                    "name": "服務回饋文件"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K12",
+                    "name": "客戶端的服務流程"
+                  },
+                  {
+                    "code": "K14",
+                    "name": "客戶的利益關係人角色"
+                  },
+                  {
+                    "code": "K15",
+                    "name": "客戶的業務領域與系統功能"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S06",
+                    "name": "工作文件與紀錄製作及撰寫"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "溝通協調能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "自我提升：能夠展現持續學習的企圖心，利用且積極參與各種機會，學習任務所需的新知識與技能，並能有效應用在特定任務。"
+      },
+      {
+        "code": "A02",
+        "name": "壓力容忍：冷靜且有效地應對及處理高度緊張的情況或壓力，如緊迫的時間、不友善的人、各類突發事件及危急狀況，並能以適當的方式紓解自身壓力。"
+      },
+      {
+        "code": "A03",
+        "name": "謹慎細心：對於任務的執行過程，能謹慎考量及處理所有細節，精確地檢視每個程序，並持續對其保持高度關注。"
+      },
+      {
+        "code": "A04",
+        "name": "彈性：能夠敞開心胸，調整行為或工作方法以適應新資訊、變化的外在環境或突如其來的阻礙。"
+      },
+      {
+        "code": "A05",
+        "name": "應對不明狀況：當狀況不明或問題不夠具體的情況下，能在必要時採取行動，以有效釐清模糊不清的態勢，完成任務。"
+      },
+      {
+        "code": "A06",
+        "name": "正直誠實：展現高道德標準及值得信賴的行為，且能以維持組織誠信為行事原則，瞭解違反組織、自己及他人的道德標準之影響。"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "高中職以上，資訊相關科系畢業或資訊相關工作經驗1年。"
+    ],
+    "supplements": []
+  }
+}

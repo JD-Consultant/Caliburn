@@ -1,0 +1,652 @@
+{
+  "version_info": {
+    "versions": [
+      {
+        "version": "V2",
+        "ocs_code": "SET2152-004v2",
+        "ocs_name": "感知系統整合應用工程師",
+        "status": "最新版本",
+        "update_note": "略",
+        "update_date": "2022/12/30"
+      },
+      {
+        "version": "V1",
+        "ocs_code": "SET2152-004v1",
+        "ocs_name": "感知系統整合應用工程師",
+        "status": "歷史版本",
+        "update_note": "已被《SET2152-004v2》取代",
+        "update_date": "2020/02/07"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "ocs_code": "SET2152-004v2",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "感知系統整合應用工程師"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "科學",
+          "code": "SET"
+        },
+        {
+          "name": "技術",
+          "code": "SET"
+        },
+        {
+          "name": "工程",
+          "code": "SET"
+        },
+        {
+          "name": "數學/工程及技術",
+          "code": "SET"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "感知系統整合應用工程師",
+          "code": "Unknown"
+        }
+      ],
+      "industries": [
+        {
+          "name": "製造業/機械設備製造業",
+          "code": "C29"
+        },
+        {
+          "name": "製造業/產業用機械設備維修及安裝業",
+          "code": "C3400"
+        }
+      ]
+    },
+    "job_description": "在智慧製造領域中，整合配置符合智慧應用的感測系統，透過處理調節信號轉換成適當傳輸、量測及儲存信號，將訊息傳輸到平台進行儲存（如\n控制器、本地或雲端伺服器、雲端平台…..等），蒐集目標正確資料，以供後續應用或分析之用。",
+    "ocs_level": 4
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "瞭解應用需求",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "瞭解使用者端的應用需求"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 4,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "掌握智慧應用概念及相關產業應用領域的\n4\n4\nK01感測器原理基本概念\nK02智慧應用發展產業趨勢\nK03感測器發展概況與趨勢\nK04感測器原理及特性\nK05最新感測元件及材料資訊\nK01感測器原理基本概念\nS01感測器介面電路設計\nS02跨部門/對外溝通能力\nS03資料收集及分析能力\nS04感測器評估與應用能力\nS05需求規格書撰寫能力\nS01感測器介面電路設計"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "感測器原理基本概念"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "智慧應用發展產業趨勢"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "感測器發展概況與趨勢"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "感測器原理及特性"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "感測器介面電路設計"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "跨部門/對外溝通能力"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "資料收集及分析能力"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "感測器評估與應用能力"
+                  }
+                ]
+              },
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.1.2",
+                    "text": "充分瞭解智慧應用情境與需求，以利決定\nK05最新感測元件及材料資訊\nS05需求規格書撰寫能力"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K05",
+                    "name": "最新感測元件及材料資訊"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S05",
+                    "name": "需求規格書撰寫能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.2",
+                "name": "提出客製化感測器系統整合設計方案"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.2.1",
+                    "text": "能夠依據智慧應用情境與需求,客製化最合適的感測系統整合設計方案及感測器安裝配置圖,以蒐集到目標與對的資訊。"
+                  },
+                  {
+                    "code": "P1.2.2",
+                    "text": "能夠先歸類物理量的類別,依據物理量需求層級提出單元規劃,進而完成整合設計方案"
+                  },
+                  {
+                    "code": "P1.2.1",
+                    "text": "能夠依據智慧應用情境與需求，客製化最"
+                  },
+                  {
+                    "code": "P1.2.2",
+                    "text": "能夠先歸類物理量的類別，依據物理量需"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K06",
+                    "name": "機電整合"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "感測器安裝設計知識"
+                  },
+                  {
+                    "code": "K24",
+                    "name": "多感測器同步擷取技術與資 料融合"
+                  },
+                  {
+                    "code": "K24",
+                    "name": "多感測器同步擷取技術與資"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S06",
+                    "name": "成本分析"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "提案能力"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "機電整合能力"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "感測器安裝設計能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "整合配置感測系統",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "整合評選合適感測器"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "掌握感測器與模組廠商的技術能力，並考\n4\nK04感測器原理及特性\nS04感測器評估與應用能力\nS06成本分析\nS10 感測器規格分析能力（含精\n度）"
+                  },
+                  {
+                    "code": "P2.1.2",
+                    "text": "理解感測融合與邊緣運算的概念，要求模\nK10邊緣運算概念"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.1.1",
+                    "name": "感測器清單"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K04",
+                    "name": "感測器原理及特性"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "最新感測器產業資訊"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "感測融合概念"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "邊緣運算概念"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "AI概念"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S04",
+                    "name": "感測器評估與應用能力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "成本分析"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "感測器規格分析能力(含精 度)"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.2",
+                "name": "整合測試性能"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.2.1",
+                    "text": "整合測試選用感測器之性能及功能，驗證\n4\nK04感測器原理及特性\nK12信號調節技術\nK04感測器原理及特性\nS11雜訊干擾防範處理"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.2.1",
+                    "name": "測試報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K04",
+                    "name": "感測器原理及特性"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "信號調節技術"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S11",
+                    "name": "雜訊干擾防範處理"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "感測器性能測試"
+                  },
+                  {
+                    "code": "S26",
+                    "name": "訊號量測結果判讀"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "感測器評估與應用能力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "成本分析"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "感測器規格分析能力(含精"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T3",
+        "ocu_name": "處理信號調節",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T3.1",
+                "name": "調節信號"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.1.1",
+                    "text": "善用適當的調節元件及方式,將各種感測器的信號進行類比數位轉換,確保轉換成適合傳輸、量測及儲存訊號。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.1.1",
+                    "name": "標準信號格式"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K04",
+                    "name": "感測器原理及特性"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "信號調節技術"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "資料擷取基本概念"
+                  },
+                  {
+                    "code": "K14",
+                    "name": "程式語言"
+                  },
+                  {
+                    "code": "K15",
+                    "name": "通訊介面"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S13",
+                    "name": "程式語言設計(如C/C++、FPGA、LabVIEW、MATLAB、Python、C#、CPLP...)"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "類比數位轉換"
+                  },
+                  {
+                    "code": "S27",
+                    "name": "信號濾波(filtering)"
+                  },
+                  {
+                    "code": "S28",
+                    "name": "信號放大"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.2",
+                "name": "處理雜訊"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.2.1",
+                    "text": "應用各種方法防止或消除雜訊的產生,並有效提升其可靠度及維護度。"
+                  },
+                  {
+                    "code": "P3.2.1",
+                    "text": "應用各種方法防止或消除雜訊的產生，並"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.2.1",
+                    "name": "類比數位轉換的解析度報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K10",
+                    "name": "邊緣運算概念"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "信號調節技術"
+                  },
+                  {
+                    "code": "K16",
+                    "name": "估測理論"
+                  },
+                  {
+                    "code": "K17",
+                    "name": "機率與統計"
+                  },
+                  {
+                    "code": "K18",
+                    "name": "統計製程管制"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S11",
+                    "name": "雜訊干擾防範處理"
+                  },
+                  {
+                    "code": "S18",
+                    "name": "量度儀表操作及校正"
+                  },
+                  {
+                    "code": "S19",
+                    "name": "統計製程管制應用(如SPC)"
+                  },
+                  {
+                    "code": "S20",
+                    "name": "邊緣運算應用"
+                  },
+                  {
+                    "code": "S27",
+                    "name": "信號濾波(filtering)"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T4",
+        "ocu_name": "整合通訊介面及儲存",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T4.1",
+                "name": "處理通訊介面"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.1.1",
+                    "text": "在網路通訊標準原則下,善用接收發送器同步或非同步之不同通訊介面,妥適處理數位輸出信號,執行安全性儲存並保護於專用裝置。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K19",
+                    "name": "網路通訊"
+                  },
+                  {
+                    "code": "K20",
+                    "name": "工業通訊(如EtherNet...)"
+                  },
+                  {
+                    "code": "K21",
+                    "name": "資訊安全"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S21",
+                    "name": "雙向信號傳輸"
+                  },
+                  {
+                    "code": "S22",
+                    "name": "I2C通訊介面"
+                  },
+                  {
+                    "code": "S23",
+                    "name": "SPI通訊介面"
+                  },
+                  {
+                    "code": "S24",
+                    "name": "通用非同步接收發送(UART)"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T4.2",
+                "name": "儲存資料"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.2.1",
+                    "text": "傳回的數據可以與正常運行的參考值進行\n4\nK19網路通訊\nS25感測器聯網輸出入裝置安裝\n與設定資料庫\nS25感測器聯網輸出入裝置安裝"
+                  },
+                  {
+                    "code": "P4.1.1",
+                    "text": "在網路通訊標準原則下，善用接收發送器"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K19",
+                    "name": "網路通訊"
+                  },
+                  {
+                    "code": "K21",
+                    "name": "資訊安全"
+                  },
+                  {
+                    "code": "K22",
+                    "name": "感測器聯網技術"
+                  },
+                  {
+                    "code": "K23",
+                    "name": "雲端技術"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S25",
+                    "name": "感測器聯網輸出入裝置安裝與設定資料庫"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "問題解決"
+      },
+      {
+        "code": "A02",
+        "name": "分析推理"
+      },
+      {
+        "code": "A03",
+        "name": "主動積極"
+      },
+      {
+        "code": "A04",
+        "name": "溝通與人際交往能力"
+      },
+      {
+        "code": "A05",
+        "name": "外部意識"
+      },
+      {
+        "code": "A06",
+        "name": "團隊合作"
+      },
+      {
+        "code": "A07",
+        "name": "顧客導向"
+      },
+      {
+        "code": "A08",
+        "name": "創新"
+      },
+      {
+        "code": "A09",
+        "name": "自我學習"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "數學、物理、電機、電子、機械、資訊等理工相關學科、大專以上（含）畢業",
+      "具備程式語言能力"
+    ],
+    "supplements": []
+  }
+}

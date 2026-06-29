@@ -1,0 +1,2177 @@
+{
+  "version_info": {
+    "versions": [
+      {
+        "version": "V5",
+        "ocs_code": "ACC2153-001v5",
+        "ocs_name": "RF研發工程師",
+        "status": "最新版本",
+        "update_note": "略",
+        "update_date": "2025/12/31"
+      },
+      {
+        "version": "V4",
+        "ocs_code": "ACC2153-001v4",
+        "ocs_name": "RF研發工程師",
+        "status": "最新版本",
+        "update_note": "已被《 ACC2153-001v5》取代",
+        "update_date": "2022/12/30"
+      },
+      {
+        "version": "V3",
+        "ocs_code": "ACC2153-001v3",
+        "ocs_name": "RF研發工程師",
+        "status": "歷史版本",
+        "update_note": "已被《 ACC2153-001v4》取代",
+        "update_date": "2020/02/07"
+      },
+      {
+        "version": "V2",
+        "ocs_code": "ACC2153-001v2",
+        "ocs_name": "RF研發工程師",
+        "status": "歷史版本",
+        "update_note": "已被《 ACC2153-001v3》取代",
+        "update_date": "2019/12/31"
+      },
+      {
+        "version": "V1",
+        "ocs_code": "ACC2153-001v1",
+        "ocs_name": "RF研發工程師",
+        "status": "歷史版本",
+        "update_note": "已被《 ACC2153-001v2》取代",
+        "update_date": "2012/12/31"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "ocs_code": "ACC2153-001v5",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "RF研發工程師"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "科學、技術、工程、數學 / 工程及技術",
+          "code": "SET"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "電信工程師",
+          "code": "2153"
+        }
+      ],
+      "industries": [
+        {
+          "name": "製造業/電腦、電子產品及光學製品製造業",
+          "code": "C2729"
+        }
+      ]
+    },
+    "job_description": "依據市場或客戶需求開立具競爭力之規格並符合產品驗證標準，掌握科技發展趨勢，主動提出創新建議或想法，規劃及設計RF通訊系統及相\n關介面，包含整合或設計RF IC、RF模組、以及天線與其它相關元件、整合系統之功能完善、訊號完整性以及收發效能良好，同時執行驗證元\n件特性及其可靠度分析，以導入產品量產。",
+    "ocs_level": 4
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "規劃及確認產品規格與標",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "評估客戶、市場需求及標準規範並訂定產\n品規格"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "能夠將新技術、產品、市場、標準規範等資訊,轉換為產品開發參考依據,並訂定出符合市場與客戶需求且具競爭力的產品規格。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.1.1",
+                    "name": "產品規格說明書"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "電磁學"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "傳輸線理論"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "電子電路學"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "微波工程"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "RF量測儀器原理與規格"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "通訊電子學"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "通訊系統"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "通訊原理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "瞭解判讀產品標準規範能 力"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "掌握科技與市場發展資訊能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.2",
+                "name": "進行技術分析及可行性評估"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 5,
+                "indicators": [
+                  {
+                    "code": "P1.2.1",
+                    "text": "有效掌握公司自我技術能力、以及零組件供應廠商及其它合作技術廠商資訊,進行可行性評估以訂定合理開發目標,選用最佳開發方案。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.2.1",
+                    "name": "可行性評估報告(如:零組件規格供應商評估、風險評估等)"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "電磁學"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "傳輸線理論"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "電子電路學"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "微波工程"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "通訊電子學"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "通訊系統"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "RF元件與零組件功能及規 格"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S03",
+                    "name": "技術內涵分析能力"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "供應商或合作廠商技術評估 能力"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "理解零件規格書的能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.3",
+                "name": "產品結構分析"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 5,
+                "indicators": [
+                  {
+                    "code": "P1.3.1",
+                    "text": "制定和建立開發流程,完成相應產品相關文擋(如原理圖、PCB板和BOM表和測試分析報告等)的擬製及評審,保證整個產品的相關目標按期實現有。"
+                  },
+                  {
+                    "code": "P1.3.2",
+                    "text": "制定測試方法(如耐腐蝕性試驗、落摔試驗等),保證產品在使用過程中,不會因為環境或使用者的行為因素,對產品造成結構性的損壞。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.3.1",
+                    "name": "產品配置圖(如:產品外觀圖、機構圖、Layout圖等)"
+                  },
+                  {
+                    "code": "O1.3.2",
+                    "name": "結構安全相關(如:耐腐蝕性、耐震性等)"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K02",
+                    "name": "傳輸線理論"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "電子電路學"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "微波工程"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "通訊電子學"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "RF元件與零組件功能及規 格"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "射頻電路設計"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "電磁相容設計"
+                  },
+                  {
+                    "code": "K45",
+                    "name": "基礎化學"
+                  },
+                  {
+                    "code": "K46",
+                    "name": "材料力學"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S04",
+                    "name": "供應商或合作廠商技術評估 能力"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "理解零件規格書的能力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "識圖能力"
+                  },
+                  {
+                    "code": "S22",
+                    "name": "成本分析"
+                  },
+                  {
+                    "code": "S23",
+                    "name": "RF品質判斷能力"
+                  },
+                  {
+                    "code": "S27",
+                    "name": "產品驗證之檢測技術能力"
+                  },
+                  {
+                    "code": "S28",
+                    "name": "模擬報告判讀能力"
+                  },
+                  {
+                    "code": "S29",
+                    "name": "問題分析能力"
+                  },
+                  {
+                    "code": "S35",
+                    "name": "測試報告分析能力"
+                  },
+                  {
+                    "code": "S36",
+                    "name": "設計改善能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "規劃電路設計與零組件效能分析",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "系統設計分析"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 4,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "能夠將確認之產品規格予以系統性分析,並訂定出各功能方塊之規格及介面。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.1.1",
+                    "name": "功能方塊圖"
+                  },
+                  {
+                    "code": "O2.1.2",
+                    "name": "概算評估報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K02",
+                    "name": "傳輸線理論"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "電子電路學"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "微波工程"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "通訊電子學"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "通訊原理"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "射頻電路設計"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "電磁相容設計"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S06",
+                    "name": "識圖能力"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "系統方塊功能概算及模擬能 力"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "分析報告撰寫與判讀能力"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "系統雜訊規劃能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.2",
+                "name": "零組件特性驗證與可靠度分析"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.2.1",
+                    "text": "進行電路設計所使用零組件之特性驗證,以確認符合零組件規格書及電路設計要求。"
+                  },
+                  {
+                    "code": "P2.2.2",
+                    "text": "可靠度模型、失效模型及效應分析。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.2.1",
+                    "name": "零件特性分析報告"
+                  },
+                  {
+                    "code": "O2.2.2",
+                    "name": "電子零件可靠度預估方法"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "電磁學"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "傳輸線理論"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "射頻分析與設計"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "預失真器原理與效能"
+                  },
+                  {
+                    "code": "K14",
+                    "name": "頻率合成器原理與效能"
+                  },
+                  {
+                    "code": "K15",
+                    "name": "信號收發性能知識(收發訊 機原理與效能)"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S10",
+                    "name": "射頻收發機系統設計能力"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "替代零組件評估能力"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "零組件(含 EMC 對策元 件)特性測試及驗證能力"
+                  },
+                  {
+                    "code": "S13",
+                    "name": "電路元件/零組件規格確認 能力(如:製程誤差、極限條 件)"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "電路組裝能力"
+                  },
+                  {
+                    "code": "S15",
+                    "name": "量測儀器操作使用能力(包 括網路分析儀、頻譜分析儀、 向量訊號分析儀、向量訊號產 生器、功率量測儀、雜訊指數"
+                  },
+                  {
+                    "code": "S54",
+                    "name": "評估功耗與散熱分析能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.3",
+                "name": "電路設計及佈局"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 4,
+                "indicators": [
+                  {
+                    "code": "P2.3.1",
+                    "text": "依照功能方塊設計適當的電路並進行繪製與模擬分析,以符合特性與規格需求。"
+                  },
+                  {
+                    "code": "P2.3.2",
+                    "text": "優化匹配線路以達到最適化,降低雜訊提高訊號接收靈敏度與符合規範之發射訊號,以確認收發訊息良好。"
+                  },
+                  {
+                    "code": "P2.3.3",
+                    "text": "選定參數利用模擬軟體量測線路匹配優化,以達到規格要求與最佳功能。"
+                  },
+                  {
+                    "code": "P2.3.4",
+                    "text": "能夠將繪製之線路圖轉成印刷電路版佈局圖(PCBlayout),並保證整體射頻電路設計指標的按期實現並滿足可靠性/一致性要求。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.3.1",
+                    "name": "電路設計圖"
+                  },
+                  {
+                    "code": "O2.3.2",
+                    "name": "電路佈局圖"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "電磁學"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "傳輸線理論"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "電子電路學"
+                  },
+                  {
+                    "code": "K16",
+                    "name": "RF IC基本原理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S16",
+                    "name": "電 路 設 計 能 力"
+                  },
+                  {
+                    "code": "S17",
+                    "name": "具RF IC 或 RF 相關設計與 Cadence、HP-MDS/ADS能力"
+                  },
+                  {
+                    "code": "S18",
+                    "name": "相關模擬軟體操作能力 (如:HFSS、ADS、AWR、 IE3D)"
+                  },
+                  {
+                    "code": "S19",
+                    "name": "量測儀器操作使用能力"
+                  },
+                  {
+                    "code": "S20",
+                    "name": "電路組裝能力"
+                  },
+                  {
+                    "code": "S56",
+                    "name": "電路圖繪製軟體能力(如 ORCAD , Protel , Power PCB, Allegro)"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.4",
+                "name": "硬體原型品製作"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 4,
+                "indicators": [
+                  {
+                    "code": "P2.4.1",
+                    "text": "能夠依據電路設計結果進行硬體原型品製作,以確認滿足產品需求,並能夠進行成本評估與分析,協助擬定符合成本效益之預算規劃。"
+                  },
+                  {
+                    "code": "P.2.4.2",
+                    "text": "製作程序書編訂。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.4.1",
+                    "name": "零組件清單表(BOM)"
+                  },
+                  {
+                    "code": "O2.4.2",
+                    "name": "原型品"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K09",
+                    "name": "RF元件與零組件功能及規 格"
+                  },
+                  {
+                    "code": "K17",
+                    "name": "微波電路原理"
+                  },
+                  {
+                    "code": "K18",
+                    "name": "微波量測試驗"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S21",
+                    "name": "焊接能力"
+                  },
+                  {
+                    "code": "S22",
+                    "name": "成本分析"
+                  },
+                  {
+                    "code": "S23",
+                    "name": "RF品質判斷能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.5",
+                "name": "產品效能評估"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 5,
+                "indicators": [
+                  {
+                    "code": "P2.5.1",
+                    "text": "能夠依據電路設計,利用模擬軟體來觀察電路參數變化後趨勢,並驗證實做量測結果的準確度,以縮短研發的時程。"
+                  },
+                  {
+                    "code": "P2.5.2",
+                    "text": "產品效能驗證方式。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.5.1",
+                    "name": "軟體模擬(如:ADS,MWO"
+                  },
+                  {
+                    "code": "O2.5.2",
+                    "name": "模擬成效報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K02",
+                    "name": "傳輸線理論"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "電子電路學"
+                  },
+                  {
+                    "code": "K16",
+                    "name": "RF IC基本原理"
+                  },
+                  {
+                    "code": "K42",
+                    "name": "數值電磁理論"
+                  },
+                  {
+                    "code": "K43",
+                    "name": "NCC PLMN ALL法規"
+                  },
+                  {
+                    "code": "K44",
+                    "name": "FCC662911法規"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S27",
+                    "name": "產品驗證之檢測技術能力"
+                  },
+                  {
+                    "code": "S28",
+                    "name": "模擬報告判讀能力"
+                  },
+                  {
+                    "code": "S29",
+                    "name": "問題分析能力"
+                  },
+                  {
+                    "code": "S30",
+                    "name": "電磁模擬軟體能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T3",
+        "ocu_name": "執行模組及系統整合測試與驗證",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T3.1",
+                "name": "RF電路之PCBA(PrintedCircuitBoardAssembly)驗證及除錯"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 4,
+                "indicators": [
+                  {
+                    "code": "P3.1.1",
+                    "text": "藉由改善技術提升各項RF參數特性及降低錯誤比例。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.1.1",
+                    "name": "RF測試報告書"
+                  },
+                  {
+                    "code": "O3.1.2",
+                    "name": "問題報告與改善方案"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K08",
+                    "name": "通訊原理"
+                  },
+                  {
+                    "code": "K19",
+                    "name": "基本RF電路理論"
+                  },
+                  {
+                    "code": "K20",
+                    "name": "電磁相容理論基礎"
+                  },
+                  {
+                    "code": "K21",
+                    "name": "射頻電路設計理論"
+                  },
+                  {
+                    "code": "K22",
+                    "name": "通訊系統架構理論"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S19",
+                    "name": "量測儀器操作使用能力"
+                  },
+                  {
+                    "code": "S21",
+                    "name": "焊接能力"
+                  },
+                  {
+                    "code": "S23",
+                    "name": "RF品質判斷能力"
+                  },
+                  {
+                    "code": "S24",
+                    "name": "熟悉基礎無線通訊法規 (如:3GPP、IEEE、ETSI)"
+                  },
+                  {
+                    "code": "S25",
+                    "name": "系統整合設計能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.2",
+                "name": "協助分析可靠度及環境測試與驗證"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.2.1",
+                    "text": "針對不同產品,製定不同的可靠度測試項目,以滿足客戶及法規需求。"
+                  },
+                  {
+                    "code": "P3.2.2",
+                    "text": "產品的可靠度模型、失效模型及效應分析。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.2.1",
+                    "name": "產品可靠度預估方法"
+                  },
+                  {
+                    "code": "O3.2.2",
+                    "name": "失效分析報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "電磁學"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "傳輸線理論"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "射頻分析與設計"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "預失真器原理與效能"
+                  },
+                  {
+                    "code": "K14",
+                    "name": "頻率合成器原理與效能"
+                  },
+                  {
+                    "code": "K15",
+                    "name": "信號收發性能知識(收發訊 機原理與效能"
+                  },
+                  {
+                    "code": "K19",
+                    "name": "基本RF電路理論"
+                  },
+                  {
+                    "code": "K20",
+                    "name": "電磁相容理論基礎"
+                  },
+                  {
+                    "code": "K21",
+                    "name": "射頻電路設計理論"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S26",
+                    "name": "射頻量測儀器操作與校正"
+                  },
+                  {
+                    "code": "S25",
+                    "name": "系統整合設計能力"
+                  },
+                  {
+                    "code": "S27",
+                    "name": "產品驗證之檢測技術能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.3",
+                "name": "支援客戶端整合測試問題分析"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 5,
+                "indicators": [
+                  {
+                    "code": "P3.3.1",
+                    "text": "依支援客戶進行整合測試之量測結果提出檢測報告,並對問題進行分析及提出產品設計修正方向。"
+                  },
+                  {
+                    "code": "P3.3.2",
+                    "text": "依據產品規格書及效能查檢表製定查核項目。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.3.1",
+                    "name": "測試報告書"
+                  },
+                  {
+                    "code": "O3.3.2",
+                    "name": "產品效能驗證查檢表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K06",
+                    "name": "通訊電子學"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "通訊系統"
+                  },
+                  {
+                    "code": "K17",
+                    "name": "微波電路原理"
+                  },
+                  {
+                    "code": "K43",
+                    "name": "NCC PLMN ALL法規"
+                  },
+                  {
+                    "code": "K44",
+                    "name": "FCC662911法規"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S28",
+                    "name": "模擬報告判讀能力"
+                  },
+                  {
+                    "code": "S29",
+                    "name": "問題分析能力"
+                  },
+                  {
+                    "code": "S53",
+                    "name": "現象結果表述能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.4",
+                "name": "模組及系統整合之驗證方法"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 5,
+                "indicators": [
+                  {
+                    "code": "P3.4.1",
+                    "text": "以科學的方法,協助無線產品的效能分析、偵錯、修改及驗證。"
+                  },
+                  {
+                    "code": "P3.4.2",
+                    "text": "規劃檢測驗證環境或建置第三方驗證機構的資料庫"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.4.1",
+                    "name": "驗證方法"
+                  },
+                  {
+                    "code": "O3.4.2",
+                    "name": "驗證系統(如:測試設備及系統)"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K06",
+                    "name": "通訊電子學"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "通訊系統"
+                  },
+                  {
+                    "code": "K17",
+                    "name": "微波電路原理"
+                  },
+                  {
+                    "code": "K25",
+                    "name": "常用天線設計與應用"
+                  },
+                  {
+                    "code": "K43",
+                    "name": "NCC PLMN ALL法規"
+                  },
+                  {
+                    "code": "K44",
+                    "name": "FCC662911法規"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S27",
+                    "name": "產品驗證之檢測技術能力"
+                  },
+                  {
+                    "code": "S29",
+                    "name": "問題分析能力"
+                  },
+                  {
+                    "code": "S53",
+                    "name": "現象結果表述能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T4",
+        "ocu_name": "執行天線設計規劃及驗證",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T4.1",
+                "name": "天線設計與製作"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 4,
+                "indicators": [
+                  {
+                    "code": "P4.1.1",
+                    "text": "習得使用HFSS、SEMCAD或XFDTD等電磁模擬工具,並能實機模擬操作,進行各種無線通訊裝置的天線設計,以利阻抗匹配、雜訊隔離與性能優化。"
+                  },
+                  {
+                    "code": "P4.1.2",
+                    "text": "了解Beamforming、massiveMIMO與陣列天線應用之要求,以提升通訊系統設計之效能。"
+                  },
+                  {
+                    "code": "P4.1.3",
+                    "text": "分析相關產品所使用之天線型式及效能,結合產品規格與法令規範,提出優劣分析。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.1.1",
+                    "name": "天線效能模擬報告"
+                  },
+                  {
+                    "code": "O4.1.2",
+                    "name": "天線結構與輻射特性規劃設計報告"
+                  },
+                  {
+                    "code": "O4.1.3",
+                    "name": "蒐集相關產品所使用之天線型式及效能"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K23",
+                    "name": "電磁波與天線設計理論"
+                  },
+                  {
+                    "code": "K24",
+                    "name": "天線基礎理論與概念"
+                  },
+                  {
+                    "code": "K25",
+                    "name": "常用天線設計與應用"
+                  },
+                  {
+                    "code": "K26",
+                    "name": "小型化行動通訊裝置天線設 計與應用"
+                  },
+                  {
+                    "code": "K27",
+                    "name": "MIMO 與陣列天線設計與 應用"
+                  },
+                  {
+                    "code": "K43",
+                    "name": "NCC PLMN ALL法規"
+                  },
+                  {
+                    "code": "K44",
+                    "name": "FCC662911法規"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S30",
+                    "name": "電磁模擬軟體能力"
+                  },
+                  {
+                    "code": "S31",
+                    "name": "天線 Mockup製作(包含 接地) 能力"
+                  },
+                  {
+                    "code": "S32",
+                    "name": "天線效能量測能力"
+                  },
+                  {
+                    "code": "S33",
+                    "name": "天線被動效率測試能力"
+                  },
+                  {
+                    "code": "S34",
+                    "name": "天線測試chamber之特性 查驗能力"
+                  },
+                  {
+                    "code": "S35",
+                    "name": "測試報告分析能力"
+                  },
+                  {
+                    "code": "S36",
+                    "name": "設計改善能力"
+                  },
+                  {
+                    "code": "S37",
+                    "name": "天線量測能力"
+                  },
+                  {
+                    "code": "S38",
+                    "name": "阻抗匹配(Smith chart)"
+                  },
+                  {
+                    "code": "S39",
+                    "name": "技術文件撰寫能力"
+                  },
+                  {
+                    "code": "S40",
+                    "name": "資料蒐集及分析能力"
+                  },
+                  {
+                    "code": "S55",
+                    "name": "AI協作能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T4.2",
+                "name": "天線功能測試"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 4,
+                "indicators": [
+                  {
+                    "code": "P4.2.1",
+                    "text": "依據量測法規,綜整天線效能的測試項目及測試方法。"
+                  },
+                  {
+                    "code": "P4.2.2",
+                    "text": "進行天線輻射效率及場型之量測分析,以確認符合規格要求及週邊效應分析。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.2.1",
+                    "name": "天線效能的測試項目規劃"
+                  },
+                  {
+                    "code": "O4.2.2",
+                    "name": "天線測試報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K23",
+                    "name": "電磁波與天線設計理論"
+                  },
+                  {
+                    "code": "K24",
+                    "name": "天線基礎理論與概念"
+                  },
+                  {
+                    "code": "K25",
+                    "name": "常用天線設計與應用"
+                  },
+                  {
+                    "code": "K26",
+                    "name": "小型化行動通訊裝置天線設 計與應用"
+                  },
+                  {
+                    "code": "K27",
+                    "name": "MIMO與陣列天線設計與 應用"
+                  },
+                  {
+                    "code": "K28",
+                    "name": "天線物理特性"
+                  },
+                  {
+                    "code": "K29",
+                    "name": "電磁理論"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S33",
+                    "name": "天線被動效率測試能力"
+                  },
+                  {
+                    "code": "S34",
+                    "name": "天線測試chamber之特性 查驗能力"
+                  },
+                  {
+                    "code": "S35",
+                    "name": "測試報告分析能力"
+                  },
+                  {
+                    "code": "S36",
+                    "name": "設計改善能力"
+                  },
+                  {
+                    "code": "S39",
+                    "name": "技術文件撰寫能力"
+                  },
+                  {
+                    "code": "S40",
+                    "name": "資料蒐集及分析能力"
+                  },
+                  {
+                    "code": "S55",
+                    "name": "AI協作能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T4.3",
+                "name": "天線整合系統效能測試"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 5,
+                "indicators": [
+                  {
+                    "code": "P4.3.1",
+                    "text": "了解電子硬體設計、電路板材料、天線的輻射、干擾頻率,使正在開發的設備獲得最佳性能表現,並能滿足認證組織對於無線收發機之要求。"
+                  },
+                  {
+                    "code": "P4.3.2",
+                    "text": "測試電磁波對人體的有害程度,需符合SAR之國際公定標準規範。"
+                  },
+                  {
+                    "code": "P4.3.3",
+                    "text": "改善系統接地設計,避免接地及機構影響天線輻射效率,以及解決數位元件之雜訊耦合效應,以使產品收發訊號效能提"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.3.1",
+                    "name": "TRP(TotalRadiatedPower)測試報告"
+                  },
+                  {
+                    "code": "O4.3.2",
+                    "name": "TIS(TotalIsotropicSensitivity)"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K15",
+                    "name": "信號收發性能知識(收發訊 機原理與效能)"
+                  },
+                  {
+                    "code": "K24",
+                    "name": "天線基礎理論與概念"
+                  },
+                  {
+                    "code": "K28",
+                    "name": "天線物理特性"
+                  },
+                  {
+                    "code": "K29",
+                    "name": "電磁理論"
+                  },
+                  {
+                    "code": "K30",
+                    "name": "基礎機械(構)圖學"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S19",
+                    "name": "量測儀器操作使用能力"
+                  },
+                  {
+                    "code": "S35",
+                    "name": "測試報告分析能力"
+                  },
+                  {
+                    "code": "S36",
+                    "name": "設計改善能力"
+                  },
+                  {
+                    "code": "S37",
+                    "name": "天線量測能力"
+                  },
+                  {
+                    "code": "S38",
+                    "name": "阻抗匹配(Smith chart) 設計能力"
+                  },
+                  {
+                    "code": "S39",
+                    "name": "技術文件撰寫能力"
+                  },
+                  {
+                    "code": "S40",
+                    "name": "資料蒐集及分析能力"
+                  },
+                  {
+                    "code": "S43",
+                    "name": "產品驗證要求及規範簡介能"
+                  }
+                ]
+              },
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.3.4",
+                    "text": "整合MIMO天線系統,以使產品傳輸效能提高。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.3.3",
+                    "name": "SAR(SpecificAbsorptionRate)測試報告"
+                  },
+                  {
+                    "code": "O4.3.4",
+                    "name": "MIMOthroughput測試報告"
+                  }
+                ],
+                "knowledge": [],
+                "skills": [
+                  {
+                    "code": "S44",
+                    "name": "產品驗證之檢測技術能力"
+                  },
+                  {
+                    "code": "S52",
+                    "name": "熟悉CTIA測試法規"
+                  },
+                  {
+                    "code": "S55",
+                    "name": "AI協作能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T4.4",
+                "name": "異質系統多天線組合效能評估"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 5,
+                "indicators": [
+                  {
+                    "code": "P4.4.1",
+                    "text": "了解異質系統多天線系統的位置配置、天線間的間距、多天線的輻射場型等,以獲得使正在開發的設備獲得最佳化異質系統多天線組合,並符合產業界對於無線收發性能之要求。"
+                  },
+                  {
+                    "code": "P4.4.2",
+                    "text": "符合法規所訂義之整合天線方向性增益(Directionalgain)的要求。"
+                  },
+                  {
+                    "code": "P4.4.3",
+                    "text": "以CTIA規範測試最佳化多天線異質系統的總輻射功率,並符合法令規範的功率限值。"
+                  },
+                  {
+                    "code": "P4.4.4",
+                    "text": "以CTIA規範測試最佳化多天線異質系統的總接收靈敏度,並符合無線模組的規格。"
+                  },
+                  {
+                    "code": "P4.4.5",
+                    "text": "測試電磁波對人體的有害程度,需符合SAR之國際公定標準規範。"
+                  },
+                  {
+                    "code": "P4.4.6",
+                    "text": "整合異質系統之MIMO天線,以使產品傳輸效能提高。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.4.1",
+                    "name": "異質系統多天線位置架構"
+                  },
+                  {
+                    "code": "O4.4.2",
+                    "name": "異質系統多天線組合之整合性增益(Combinegain)測試報告"
+                  },
+                  {
+                    "code": "O4.4.3",
+                    "name": "最佳化異質系統多天線組合"
+                  },
+                  {
+                    "code": "O4.4.4",
+                    "name": "最佳化異質系統多天線TIS(TotalIsotropicSensitivity)測試報告"
+                  },
+                  {
+                    "code": "O4.4.5",
+                    "name": "最佳化異質系統多天線SAR(SpecificAbsorptionRate)測試報告"
+                  },
+                  {
+                    "code": "O4.4.6",
+                    "name": "最佳化異質系統多天線MIMOthroughput測試報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K15",
+                    "name": "信號收發性能知識(收發訊 機原理與效能)"
+                  },
+                  {
+                    "code": "K24",
+                    "name": "天線基礎理論與概念"
+                  },
+                  {
+                    "code": "K28",
+                    "name": "天線物理特性"
+                  },
+                  {
+                    "code": "K29",
+                    "name": "電磁理論"
+                  },
+                  {
+                    "code": "K30",
+                    "name": "基礎機械(構)圖學"
+                  },
+                  {
+                    "code": "K43",
+                    "name": "NCC PLMN ALL法規"
+                  },
+                  {
+                    "code": "K44",
+                    "name": "FCC662911法規"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S19",
+                    "name": "量測儀器操作使用能力"
+                  },
+                  {
+                    "code": "S24",
+                    "name": "熟悉基礎無線通訊法規 (如:3GPP、IEEE、ETSI)"
+                  },
+                  {
+                    "code": "S35",
+                    "name": "測試報告分析能力"
+                  },
+                  {
+                    "code": "S36",
+                    "name": "設計改善能力"
+                  },
+                  {
+                    "code": "S37",
+                    "name": "天線量測能力"
+                  },
+                  {
+                    "code": "S38",
+                    "name": "阻抗匹配(Smith chart) 設計能力"
+                  },
+                  {
+                    "code": "S52",
+                    "name": "熟悉CTIA測試法規"
+                  },
+                  {
+                    "code": "S55",
+                    "name": "AI協作能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T5",
+        "ocu_name": "協助驗證產品電磁相容性及相關通訊法規之測試與認證申請",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T5.1",
+                "name": "建立各國EMC及通訊相關法規與標準資料庫並協助驗證申請"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 5,
+                "indicators": [
+                  {
+                    "code": "P5.1.1",
+                    "text": "了解國際認證組織,如:CE/GCF/FCC/PTCRB等之測試項目要求與認證流程,得以使產品順利量產上市。"
+                  },
+                  {
+                    "code": "P5.1.2",
+                    "text": "依據國際認證組織的測試法規,解讀測試報告,確認符合性。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O5.1.1",
+                    "name": "依據法規標準,建置EMC及RF通訊效能的測試能量或建置第三方測試驗證機構的資料庫"
+                  },
+                  {
+                    "code": "O5.1.2",
+                    "name": "認證及測試報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K20",
+                    "name": "電磁相容理論基礎"
+                  },
+                  {
+                    "code": "K31",
+                    "name": "高頻電波傳輸理論"
+                  },
+                  {
+                    "code": "K32",
+                    "name": "無線電波傳播特性理論"
+                  },
+                  {
+                    "code": "K33",
+                    "name": "PCB Layout 設計規範基礎 概念"
+                  },
+                  {
+                    "code": "K34",
+                    "name": "各國安規認證申請程序"
+                  },
+                  {
+                    "code": "K43",
+                    "name": "NCC PLMN ALL法規"
+                  },
+                  {
+                    "code": "K44",
+                    "name": "FCC662911法規"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S39",
+                    "name": "技術文件撰寫能力"
+                  },
+                  {
+                    "code": "S40",
+                    "name": "資料蒐集及分析能力"
+                  },
+                  {
+                    "code": "S41",
+                    "name": "溝通與協調能力"
+                  },
+                  {
+                    "code": "S42",
+                    "name": "進度掌握能力"
+                  },
+                  {
+                    "code": "S43",
+                    "name": "產品驗證要求及規範簡介能 力"
+                  },
+                  {
+                    "code": "S44",
+                    "name": "產品驗證之檢測技術能力"
+                  },
+                  {
+                    "code": "S52",
+                    "name": "熟悉CTIA測試法規"
+                  },
+                  {
+                    "code": "S55",
+                    "name": "AI協作能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T5.2",
+                "name": "產品EMC及安規測試"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P5.2.1",
+                    "text": "確認EMC或安規測試的測試環境與測試設備,是否符合法規的要求。"
+                  },
+                  {
+                    "code": "P5.2.2",
+                    "text": "依據相應之電磁相容性標準和規範,電磁干擾(EMI)及電磁耐受性測試(EMS)在不同頻率範圍內,採用不同之方式進行,測試前後要同時監測待測件功能是否正常,以判定是否合格,以及是否符合安全規範之要求。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O5.2.1",
+                    "name": "測試標準驗證規劃書"
+                  },
+                  {
+                    "code": "O5.2.2",
+                    "name": "產品測試報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "電磁學"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "傳輸線理論"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "電子電路學"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "微波工程"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "通訊電子學"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "通訊系統"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "通訊原理"
+                  },
+                  {
+                    "code": "K19",
+                    "name": "基本RF電路理論"
+                  },
+                  {
+                    "code": "K20",
+                    "name": "電磁相容理論基礎"
+                  },
+                  {
+                    "code": "K35",
+                    "name": "安全規範基礎概念"
+                  },
+                  {
+                    "code": "K47",
+                    "name": "電磁相容法規"
+                  },
+                  {
+                    "code": "K48",
+                    "name": "安全規範法規"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S15",
+                    "name": "量測儀器操作使用能力(包 括網路分析儀、頻譜分析儀、 向量訊號分析儀、向量訊號產 生器、功率量測儀、雜訊指數 分析儀)"
+                  },
+                  {
+                    "code": "S21",
+                    "name": "焊接能力"
+                  },
+                  {
+                    "code": "S26",
+                    "name": "射頻量測儀器操作與校正"
+                  },
+                  {
+                    "code": "S27",
+                    "name": "產品驗證之檢測技術能力"
+                  },
+                  {
+                    "code": "S29",
+                    "name": "問題分析能力"
+                  },
+                  {
+                    "code": "S45",
+                    "name": "EM-Pro/ADS 模擬軟體"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T5.3",
+                "name": "EMC設計與改善"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 4,
+                "indicators": [
+                  {
+                    "code": "P5.3.1",
+                    "text": "具有EMC測試設備的使用能力及設計概念,能夠依據測試結果進行偵錯。"
+                  },
+                  {
+                    "code": "P5.3.2",
+                    "text": "能有效使用模擬軟體進行分析及輔助設計,並且能加以優化。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O5.3.1",
+                    "name": "測試報告"
+                  },
+                  {
+                    "code": "O5.3.2",
+                    "name": "EMC分析報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "電磁學"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "傳輸線理論"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "電子電路學"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "電磁相容設計"
+                  },
+                  {
+                    "code": "K36",
+                    "name": "天線與射頻電路基礎概念"
+                  },
+                  {
+                    "code": "K37",
+                    "name": "訊號完整性"
+                  },
+                  {
+                    "code": "K38",
+                    "name": "電源完整性"
+                  },
+                  {
+                    "code": "K47",
+                    "name": "電磁相容法規"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S29",
+                    "name": "問題分析能力"
+                  },
+                  {
+                    "code": "S45",
+                    "name": "EM-Pro/ADS 模擬軟體"
+                  },
+                  {
+                    "code": "S46",
+                    "name": "數位與類比電路電源及其回 路之分析能力"
+                  },
+                  {
+                    "code": "S47",
+                    "name": "相關電磁模擬軟體之應用能 力"
+                  },
+                  {
+                    "code": "S48",
+                    "name": "對策元件穩定性之能力"
+                  },
+                  {
+                    "code": "S49",
+                    "name": "元件之高頻特性分析能力"
+                  },
+                  {
+                    "code": "S55",
+                    "name": "AI協作能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T6.1",
+                "name": "制訂試量產規格"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P6.1.1",
+                    "text": "依據原型品測試結果,進行重複性測試,並歸納結果。"
+                  },
+                  {
+                    "code": "P6.1.2",
+                    "text": "依據原型品測試結果及客戶需求定訂試量產規格。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O6.1.1",
+                    "name": "試量產規格書"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K10",
+                    "name": "射頻電路設計"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "電磁相容設計"
+                  },
+                  {
+                    "code": "K39",
+                    "name": "產品製作流程"
+                  },
+                  {
+                    "code": "K40",
+                    "name": "專案管理"
+                  },
+                  {
+                    "code": "K41",
+                    "name": "基礎統計學"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S39",
+                    "name": "技術文件撰寫能力"
+                  },
+                  {
+                    "code": "S40",
+                    "name": "資料蒐集及分析能力"
+                  },
+                  {
+                    "code": "S41",
+                    "name": "溝通與協調能力"
+                  },
+                  {
+                    "code": "S42",
+                    "name": "進度掌握能力"
+                  },
+                  {
+                    "code": "S43",
+                    "name": "產品驗證要求及規範簡介能 力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T6.2",
+                "name": "制訂試量產測試流程與方法"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P6.2.1",
+                    "text": "依據試量產規格書擬定相關之試量產測試流程及對應之查核點。"
+                  },
+                  {
+                    "code": "P6.2.2",
+                    "text": "依據試量產規格書,進行測試結果的一致性。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O6.1.2",
+                    "name": "試量產測試規劃書"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K10",
+                    "name": "射頻電路設計"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "電磁相容設計"
+                  },
+                  {
+                    "code": "K39",
+                    "name": "產品製作流程"
+                  },
+                  {
+                    "code": "K40",
+                    "name": "專案管理"
+                  },
+                  {
+                    "code": "K41",
+                    "name": "基礎統計學"
+                  },
+                  {
+                    "code": "K43",
+                    "name": "NCC PLMN ALL法規"
+                  },
+                  {
+                    "code": "K44",
+                    "name": "FCC662911法規"
+                  },
+                  {
+                    "code": "K45",
+                    "name": "基礎化學"
+                  },
+                  {
+                    "code": "K46",
+                    "name": "材料力學"
+                  },
+                  {
+                    "code": "K47",
+                    "name": "電磁相容法規"
+                  },
+                  {
+                    "code": "K48",
+                    "name": "安全規範法規"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S03",
+                    "name": "技術內涵分析能力"
+                  },
+                  {
+                    "code": "S39",
+                    "name": "技術文件撰寫能力"
+                  },
+                  {
+                    "code": "S40",
+                    "name": "資料蒐集及分析能力"
+                  },
+                  {
+                    "code": "S41",
+                    "name": "溝通與協調能力"
+                  },
+                  {
+                    "code": "S42",
+                    "name": "進度掌握能力"
+                  },
+                  {
+                    "code": "S55",
+                    "name": "AI協作能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T6.3",
+                "name": "觀測及分析試量產之效率與良率"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 4,
+                "indicators": [
+                  {
+                    "code": "P6.3.1",
+                    "text": "降低生產線整備與當線時間、及製程除錯時間,並符合技術性標準規範。"
+                  },
+                  {
+                    "code": "P6.3.2",
+                    "text": "判讀或分析試量產報告,以正確評估試量產的可行性。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O6.1.3",
+                    "name": "工程變更申請(ECR)"
+                  },
+                  {
+                    "code": "O6.1.4",
+                    "name": "工程變更通知(ECN)"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K39",
+                    "name": "產品製作流程"
+                  },
+                  {
+                    "code": "K40",
+                    "name": "專案管理"
+                  },
+                  {
+                    "code": "K41",
+                    "name": "基礎統計學"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S40",
+                    "name": "資料蒐集及分析能力"
+                  },
+                  {
+                    "code": "S42",
+                    "name": "進度掌握能力"
+                  },
+                  {
+                    "code": "S51",
+                    "name": "量產流程規劃能力"
+                  },
+                  {
+                    "code": "S55",
+                    "name": "AI協作能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T6.4",
+                "name": "提出品質成本改善對策"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 4,
+                "indicators": [
+                  {
+                    "code": "P6.4.1",
+                    "text": "針對試量產效率、良率的問題以及品質的穩定性,提出改善建議。"
+                  },
+                  {
+                    "code": "P6.4.2",
+                    "text": "協助建立量產測試良率分析模式,以提高生產良率。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O6.1.5",
+                    "name": "品質改善建議"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K41",
+                    "name": "基礎統計學"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S40",
+                    "name": "資料蒐集及分析能力"
+                  },
+                  {
+                    "code": "S46",
+                    "name": "數位與類比電路電源及其回 路之分析能力"
+                  },
+                  {
+                    "code": "S47",
+                    "name": "相關電磁模擬軟體之應用能 力"
+                  },
+                  {
+                    "code": "S48",
+                    "name": "對策元件穩定性之能力"
+                  },
+                  {
+                    "code": "S50",
+                    "name": "品質成本改善能力"
+                  },
+                  {
+                    "code": "S51",
+                    "name": "量產流程規劃能力"
+                  },
+                  {
+                    "code": "S55",
+                    "name": "AI協作能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "外部意識"
+      },
+      {
+        "code": "A02",
+        "name": "溝通協調能力"
+      },
+      {
+        "code": "A03",
+        "name": "成果導向"
+      },
+      {
+        "code": "A04",
+        "name": "策略性思考"
+      },
+      {
+        "code": "A05",
+        "name": "價值判斷"
+      },
+      {
+        "code": "A06",
+        "name": "合作協調"
+      },
+      {
+        "code": "A07",
+        "name": "好奇開放"
+      },
+      {
+        "code": "A08",
+        "name": "追求卓越"
+      },
+      {
+        "code": "A09",
+        "name": "主動積極"
+      },
+      {
+        "code": "A10",
+        "name": "自"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "電機、電子、光電、通訊，資訊等以及相關科系大學畢業。",
+      "英文能力達 TOEIC 多益測驗中高級以上（470 分以上）或其它相當之英文檢定能力。"
+    ],
+    "supplements": []
+  }
+}

@@ -1,0 +1,480 @@
+{
+  "version_info": {
+    "versions": [
+      {
+        "version": "V4",
+        "ocs_code": "BAS1219-002v4",
+        "ocs_name": "企劃人員",
+        "status": "最新版本",
+        "update_note": "略",
+        "update_date": "2024/12/15"
+      },
+      {
+        "version": "V3",
+        "ocs_code": "BAS1219-002v3",
+        "ocs_name": "企劃人員",
+        "status": "歷史版本",
+        "update_note": "已被《BAS1219-002v4》取代",
+        "update_date": "2020/12/21"
+      },
+      {
+        "version": "V2",
+        "ocs_code": "BAS1219-002v2",
+        "ocs_name": "企劃執行人員",
+        "status": "歷史版本",
+        "update_note": "已被《BAS1219-002v3》取代",
+        "update_date": "2018/12/20"
+      },
+      {
+        "version": "V1",
+        "ocs_code": "BAS1219-002",
+        "ocs_name": "企劃執行人員",
+        "status": "歷史版本",
+        "update_note": "已被《BAS1219-002v2》取代",
+        "update_date": "2015/12/31"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "ocs_code": "BAS1219-002v4",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "企劃人員"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "企業經營管理/行政支援",
+          "code": "BAS"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "企劃人員",
+          "code": "1219"
+        }
+      ],
+      "industries": [
+        {
+          "name": "專業、科學及技術服務業/企業總管理機構及管理顧問業",
+          "code": "M7010"
+        }
+      ]
+    },
+    "job_description": "依組織需求，規劃及執行企劃案。",
+    "ocs_level": 3
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "企劃案規劃",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "企劃需求分析"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "蒐集組織產業現況與發展趨勢。"
+                  },
+                  {
+                    "code": "P1.1.2",
+                    "text": "蒐集各類企劃類型、規範及注意事項與經費。"
+                  },
+                  {
+                    "code": "P1.1.3",
+                    "text": "依組織服務項目定位及需求,分析所需資源及資訊。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "產業現況與發展"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "組織政策與流程"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "組織規範與注意事項"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "成本概念"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "消費者行為"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "資料蒐集及判斷能力"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "資料分析能力"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "溝通協調能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.2",
+                "name": "企劃提案"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.2.1",
+                    "text": "依組織定位及需求,彙整並確認企劃案需求及預算。"
+                  },
+                  {
+                    "code": "P1.2.2",
+                    "text": "依組織服務項目定位及需求,進行企劃簡報。"
+                  },
+                  {
+                    "code": "P1.2.3",
+                    "text": "與組織相關人員溝通需求,並依權責核定結果,調整提案內容。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.2.1",
+                    "name": "企劃書"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "產業現況與發展"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "組織政策與流程"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "組織規範與注意事項"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "成本概念"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "消費者行為"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "企劃書撰寫"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "資料分析能力"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "溝通協調能力"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "企劃提案能力"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "資源盤點及分析能力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "預算規劃能力"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "科技工具應用能力"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "創新思考能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "企劃案執行",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "統籌及協調資源"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "依企劃書內容,盤點及協調所需資源及資訊。"
+                  },
+                  {
+                    "code": "P2.1.2",
+                    "text": "視企劃提案書需求,聯繫協調內外部相關單位。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.1.1",
+                    "name": "企劃資源清單"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K02",
+                    "name": "組織政策與流程"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "組織規範與注意事項"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "成本概念"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "企劃書撰寫"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "資料分析能力"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "溝通協調能力"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "企劃提案能力"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "資源盤點及分析能力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "預算規劃能力"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "科技工具應用能力"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "文案撰寫能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.2",
+                "name": "管控企劃案執行"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.2.1",
+                    "text": "依企劃資源清單,進行活動前置確認(含場地、設備、人員、流程及安全等行前說明)。"
+                  },
+                  {
+                    "code": "P2.2.2",
+                    "text": "管控企劃案執行,並處理突發狀況。"
+                  },
+                  {
+                    "code": "P2.2.3",
+                    "text": "依組織意見回饋機制,蒐集企劃案執行意見,以作為企劃案成效評估參考。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.2.1",
+                    "name": "執行紀錄表"
+                  },
+                  {
+                    "code": "O2.2.2",
+                    "name": "異常處理紀錄"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K03",
+                    "name": "組織規範與注意事項"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "成本概念"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "異常處理流程"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S03",
+                    "name": "溝通協調能力"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "資源盤點及分析能力"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "資源運用及分配能力"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "表達技巧"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "問題判別及解決能力"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "文書處理能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.3",
+                "name": "完成結案報告"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.3.1",
+                    "text": "依組織需求,企劃案執行情形及回饋意見,完成結案報告。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.3.1",
+                    "name": "企劃成效結案報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K07",
+                    "name": "異常處理流程"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "資料蒐集及判斷能力"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "資料分析能力"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "溝通協調能力"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "科技工具應用能力"
+                  },
+                  {
+                    "code": "S13",
+                    "name": "結案報告撰寫能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "謹慎細心：對於任務的執行過程，能謹慎考量及處理所有細節，精確地檢視每個程序，並持續對其保持高度關注。"
+      },
+      {
+        "code": "A02",
+        "name": "追求卓越：會為自己設定具挑戰性的工作目標並全力以赴，願意主動投注心力達成或超越既定目標，不斷尋求突破。"
+      },
+      {
+        "code": "A03",
+        "name": "彈性：能夠敞開心胸，調整行為或工作方法以適應新資訊、變化的外在環境或突如其來的阻礙。"
+      },
+      {
+        "code": "A04",
+        "name": "好奇開放：容易受到複雜新穎的事物吸引，且易於接受新觀念的傾向。"
+      },
+      {
+        "code": "A05",
+        "name": "應對不確定性：當狀況不明或問題不夠具體的情況下，能在必要時採取行動，以有效釐清模糊不清的態勢。"
+      },
+      {
+        "code": "A06",
+        "name": "團隊意識：積極參與並支持團隊，能彼此鼓勵共同達成團隊目標。"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "大專以上畢業。"
+    ],
+    "supplements": [
+      "企劃提案簡報：包含企劃目標、執行範圍、方式、期程、所需資源、預算編列與效益評估等。",
+      "規範與注意事項：包含相關法規、組織作業要求、企業文化依循等。"
+    ]
+  }
+}

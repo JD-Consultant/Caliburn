@@ -1,0 +1,898 @@
+{
+  "version_info": {
+    "versions": [
+      {
+        "version": "V5",
+        "ocs_code": "ISD2152-004v5",
+        "ocs_name": "行動裝置程式設計師",
+        "status": "最新版本",
+        "update_note": "略",
+        "update_date": "2025/12/22"
+      },
+      {
+        "version": "V4",
+        "ocs_code": "ISD2152-004v4",
+        "ocs_name": "行動裝置程式設計師",
+        "status": "歷史版本",
+        "update_note": "已被《ISD2152-004v5》取代",
+        "update_date": "2022/12/30"
+      },
+      {
+        "version": "V3",
+        "ocs_code": "ISD2152-004v3",
+        "ocs_name": "行動裝置程式設計師",
+        "status": "歷史版本",
+        "update_note": "已被《ISD2152-004v4》取代",
+        "update_date": "2020/02/07"
+      },
+      {
+        "version": "V2",
+        "ocs_code": "ISD2152-004v2",
+        "ocs_name": "智慧手持裝置應用軟體工程師",
+        "status": "歷史版本",
+        "update_note": "已被《ISD2152-004v3》取代",
+        "update_date": "2019/12/31"
+      },
+      {
+        "version": "V1",
+        "ocs_code": "ISD2152-004v1",
+        "ocs_name": "智慧手持裝置應用軟體工程師",
+        "status": "歷史版本",
+        "update_note": "已被《ISD2152-004v2》取代",
+        "update_date": "2014/12/31"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "ocs_code": "ISD2152-004v5",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "行動裝置程式設計師"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "資訊科技/軟體開發及程式設計",
+          "code": "ISD"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "行動裝置程式設計師",
+          "code": "2152"
+        }
+      ],
+      "industries": [
+        {
+          "name": "製造業/電腦、電子產品及光學製品製造業",
+          "code": "C2729"
+        }
+      ]
+    },
+    "job_description": "依客戶或組織目標，開發及維護行動裝置應用軟體功能或產品，並通過功能與品質可靠度測試。",
+    "ocs_level": 4
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "開發軟體",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "先期軟體開發評估"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 5,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "能夠依據組織發展目標,進行軟體開發可行性評估。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.1.1",
+                    "name": "評估報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "技術發展現況與未來趨勢"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "系統分析概念"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "開發所需之領域知識(包含基本UI/UX概念)"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "行動網路與資訊安全概念"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "相關法律規範與概念(如隱私權、個資法等)"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "蒐集整理分析推理"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "技術文件閱讀能力"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "技術可行性分析能力"
+                  }
+                ]
+              },
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.2.1",
+                    "text": "瞭解需求與工作團隊能量,準確擬定開發時程。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.2.1",
+                    "name": "開發時程進度表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K06",
+                    "name": "軟體工程概念"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "產品開發相關流程"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "風險管理概念"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S04",
+                    "name": "需求文件閱讀能力"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "工作量評估能力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "工作時程規劃能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.3",
+                "name": "撰寫程式碼"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.3.1",
+                    "text": "能夠在時程內完成有品質的程式碼。"
+                  },
+                  {
+                    "code": "P1.1.1",
+                    "text": "能夠依據組織發展目標，進行軟體開發可"
+                  },
+                  {
+                    "code": "P1.2.1",
+                    "text": "瞭解需求與工作團隊能量，準確擬定開發"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.3.1",
+                    "name": "符合功能規格的程式碼"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K04",
+                    "name": "行動網路與資訊安全概念"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "基本程式邏輯與行動裝置執行環境之限制"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "相關程式語言與開發平台"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "公司所訂的程式設計規範"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "規劃程式碼開發架構概念"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "資料結構、演算法與作業系統"
+                  },
+                  {
+                    "code": "K14",
+                    "name": "第三方軟體及套件使用授權概念(如GPL授權規範等)"
+                  },
+                  {
+                    "code": "K15",
+                    "name": "後端與雲端系統架構概念"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S07",
+                    "name": "開發時程管理"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "良好的程式撰寫習慣與風格"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "版本控制系統使用能力"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "開發環境使用能力"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "閱讀及撰寫規格與技術文件 技能"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "程式語言撰寫能力"
+                  },
+                  {
+                    "code": "S13",
+                    "name": "第三方軟體及套件選用的能 力"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "需求文件閱讀能力"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "工作量評估能力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "工作時程規劃能力"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "閱讀及撰寫規格與技術文件"
+                  },
+                  {
+                    "code": "S13",
+                    "name": "第三方軟體及套件選用的能"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.4",
+                "name": "功能測試"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.4.1",
+                    "text": "能夠定義所有的測試條件與項目,並順利進行測試。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K16",
+                    "name": "瞭解測試流程與工具"
+                  },
+                  {
+                    "code": "K17",
+                    "name": "程式測試與驗證概念(如:單元測試、迴歸測試等)"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S14",
+                    "name": "程式碼檢視技能"
+                  },
+                  {
+                    "code": "S15",
+                    "name": "使用測試工具技能(如:BugTrackingSystem、自動化測試等)"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.5",
+                "name": "除錯與驗證"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.5.1",
+                    "text": "能夠針對測試單位所發現的錯誤,修正程式碼以符合功能規格。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K18",
+                    "name": "程式錯誤的分析與解決方法"
+                  },
+                  {
+                    "code": "K19",
+                    "name": "除錯工具與流程"
+                  },
+                  {
+                    "code": "K20",
+                    "name": "系統整合測試與驗證概念"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S15",
+                    "name": "使用測試工具技能(如:BugTrackingSystem、自動化測試等)"
+                  },
+                  {
+                    "code": "S16",
+                    "name": "除錯技巧"
+                  },
+                  {
+                    "code": "S17",
+                    "name": "重建錯誤發生的能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.6",
+                "name": "佈署"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.6.1",
+                    "text": "完成符合功能規格的程式文件記錄。"
+                  },
+                  {
+                    "code": "P1.6.2",
+                    "text": "能夠佈署或通過審核並完成上架。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K21",
+                    "name": "相關平台審核程序與規範"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S11",
+                    "name": "閱讀及撰寫規格與技術文件技能"
+                  },
+                  {
+                    "code": "S18",
+                    "name": "系統佈署上架技能"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.7",
+                "name": "AI協作開發"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.7.1",
+                    "text": "能夠選擇適當AI平台與工具"
+                  },
+                  {
+                    "code": "P1.7.2",
+                    "text": "能夠提出適當提示詞"
+                  },
+                  {
+                    "code": "P1.7.3",
+                    "text": "能夠評估AI產出內容品質"
+                  },
+                  {
+                    "code": "P1.4.1",
+                    "text": "能夠定義所有的測試條件與項目，並順利"
+                  },
+                  {
+                    "code": "P1.5.1",
+                    "text": "能夠針對測試單位所發現的錯誤，修正程"
+                  },
+                  {
+                    "code": "P1.6.1",
+                    "text": "完成符合功能規格的程式文件記錄。"
+                  },
+                  {
+                    "code": "P1.6.2",
+                    "text": "能夠佈署或通過審核並完成上架。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K28",
+                    "name": "AI應用素養"
+                  },
+                  {
+                    "code": "K18",
+                    "name": "程式錯誤的分析與解決方法"
+                  },
+                  {
+                    "code": "K19",
+                    "name": "除錯工具與流程"
+                  },
+                  {
+                    "code": "K20",
+                    "name": "系統整合測試與驗證概念"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S25",
+                    "name": "AI 輔助需求分析與可行性評 估"
+                  },
+                  {
+                    "code": "S26",
+                    "name": "AI 輔助程式撰寫與自動測試"
+                  },
+                  {
+                    "code": "S27",
+                    "name": "AI 輔助錯誤分析與問題追蹤"
+                  },
+                  {
+                    "code": "S28",
+                    "name": "AI 輔助文件撰寫與系統佈署"
+                  },
+                  {
+                    "code": "S25",
+                    "name": "AI 輔助需求分析與可行性評"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "維護現有軟體",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "處理使用者反饋的建議"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "取得程式文件,能夠確實記錄使用者需求與問題,並提出解決方案。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K04",
+                    "name": "行動網路與資訊安全概念"
+                  },
+                  {
+                    "code": "K22",
+                    "name": "問題分析與解決方法"
+                  },
+                  {
+                    "code": "K23",
+                    "name": "熟悉既有軟體功能與程式碼"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S14",
+                    "name": "程式碼檢視技能"
+                  },
+                  {
+                    "code": "S19",
+                    "name": "相關語言程式開發能力"
+                  },
+                  {
+                    "code": "S20",
+                    "name": "程式文件閱讀能力"
+                  },
+                  {
+                    "code": "S21",
+                    "name": "界定與重現使用者發生問題的環境與條件能力"
+                  },
+                  {
+                    "code": "S22",
+                    "name": "問題追蹤管理能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.2",
+                "name": "除錯與驗證"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.2.1",
+                    "text": "能夠針對使用者所發現的錯誤,修正程式碼以符合功能規格。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K17",
+                    "name": "程式測試與驗證概念(如: 單元測試、迴歸測試等)"
+                  },
+                  {
+                    "code": "K18",
+                    "name": "程式錯誤的分析與解決方法"
+                  },
+                  {
+                    "code": "K19",
+                    "name": "除錯工具與流程"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S15",
+                    "name": "使用測試工具技能(如:BugTrackingSystem、自動化測試等)"
+                  },
+                  {
+                    "code": "S16",
+                    "name": "除錯技巧"
+                  },
+                  {
+                    "code": "S17",
+                    "name": "重建錯誤發生的能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.3",
+                "name": "功能維護"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.3.1",
+                    "text": "能夠依需求進行功能維護。"
+                  },
+                  {
+                    "code": "P2.1.1",
+                    "text": "取得程式文件，能夠確實記錄使用者需求"
+                  },
+                  {
+                    "code": "P2.2.1",
+                    "text": "能夠針對使用者所發現的錯誤，修正程式"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K04",
+                    "name": "行動網路與資訊安全概念"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "基本程式邏輯與行動裝置執行環境之限制"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "相關程式語言與開發平台"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "公司所訂的程式設計規範"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "規劃程式碼開發架構概念"
+                  },
+                  {
+                    "code": "K24",
+                    "name": "對需求暸解與可行性評估概念"
+                  },
+                  {
+                    "code": "K25",
+                    "name": "對既有軟體功能、架構、程"
+                  },
+                  {
+                    "code": "K22",
+                    "name": "問題分析與解決方法"
+                  },
+                  {
+                    "code": "K23",
+                    "name": "熟悉既有軟體功能與程式碼"
+                  },
+                  {
+                    "code": "K17",
+                    "name": "程式測試與驗證概念(如:"
+                  },
+                  {
+                    "code": "K18",
+                    "name": "程式錯誤的分析與解決方法"
+                  },
+                  {
+                    "code": "K19",
+                    "name": "除錯工具與流程式碼的了解"
+                  },
+                  {
+                    "code": "K26",
+                    "name": "副作用(Side effect)的觀念"
+                  },
+                  {
+                    "code": "K27",
+                    "name": "重構的觀念"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S08",
+                    "name": "良好的程式撰寫習慣與風格"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "版本控制系統使用能力"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "開發環境使用能力"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "程式碼檢視技能"
+                  },
+                  {
+                    "code": "S23",
+                    "name": "技術文件撰寫技能"
+                  },
+                  {
+                    "code": "S24",
+                    "name": "重構系統相關技能"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.4",
+                "name": "佈署"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.4.1",
+                    "text": "完成符合功能規格的程式文件記錄。"
+                  },
+                  {
+                    "code": "P2.4.2",
+                    "text": "能夠佈署或通過審核並完成上架。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K21",
+                    "name": "相關平台審核程序與規範"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S11",
+                    "name": "閱讀及撰寫規格與技術文件 技能"
+                  },
+                  {
+                    "code": "S18",
+                    "name": "系統佈署上架技能"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.5",
+                "name": "AI協作維護"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.5.1",
+                    "text": "能夠選擇適當AI平台與工具"
+                  },
+                  {
+                    "code": "P2.5.2",
+                    "text": "能夠提出適當提示詞"
+                  },
+                  {
+                    "code": "P2.5.3",
+                    "text": "能夠評估AI產出內容品質"
+                  },
+                  {
+                    "code": "P2.4.1",
+                    "text": "完成符合功能規格的程式文件記錄。"
+                  },
+                  {
+                    "code": "P2.4.2",
+                    "text": "能夠佈署或通過審核並完成上架。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K28",
+                    "name": "AI應用素養"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S25",
+                    "name": "AI 輔助需求分析與可行性評 估"
+                  },
+                  {
+                    "code": "S26",
+                    "name": "AI 輔助程式撰寫與自動測試"
+                  },
+                  {
+                    "code": "S27",
+                    "name": "AI 輔助錯誤分析與問題追蹤"
+                  },
+                  {
+                    "code": "S28",
+                    "name": "AI 輔助文件撰寫與系統佈署"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "閱讀及撰寫規格與技術文件"
+                  },
+                  {
+                    "code": "S18",
+                    "name": "系統佈署上架技能"
+                  },
+                  {
+                    "code": "S25",
+                    "name": "AI 輔助需求分析與可行性評"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "溝通協調能力"
+      },
+      {
+        "code": "A02",
+        "name": "成果導向"
+      },
+      {
+        "code": "A03",
+        "name": "策略性思考"
+      },
+      {
+        "code": "A04",
+        "name": "團隊合作"
+      },
+      {
+        "code": "A05",
+        "name": "跨領域學習"
+      },
+      {
+        "code": "A06",
+        "name": "主動積極"
+      },
+      {
+        "code": "A07",
+        "name": "謹慎細心"
+      },
+      {
+        "code": "A08",
+        "name": "應變能力"
+      },
+      {
+        "code": "A09",
+        "name": "壓力容忍"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "具有行動裝置軟體開發相關經驗。"
+    ],
+    "supplements": []
+  }
+}

@@ -1,0 +1,471 @@
+{
+  "version_info": {
+    "versions": [
+      {
+        "version": "V3",
+        "ocs_code": "花藝設計助理",
+        "ocs_name": "花藝設計助理",
+        "status": "最新版本",
+        "update_note": "略",
+        "update_date": "2025/12/15"
+      },
+      {
+        "version": "V2",
+        "ocs_code": "花藝設計助理",
+        "ocs_name": "花藝設計助理",
+        "status": "歷史版本",
+        "update_note": "已被《AVA7999-002v3》取代",
+        "update_date": "2022/12/13"
+      },
+      {
+        "version": "V1",
+        "ocs_code": "花藝設計助理",
+        "ocs_name": "花藝設計助理",
+        "status": "歷史版本",
+        "update_note": "已被《AVA7999-002v2》取代",
+        "update_date": "2019/12/19"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "ocs_code": "花藝設計助理",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "花藝設計助理"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "藝文與影音傳播/視覺藝術",
+          "code": "AVA"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "花藝設計助理",
+          "code": "7999"
+        }
+      ],
+      "industries": [
+        {
+          "name": "專業、科學及技術服務業/專門設計業",
+          "code": "M7409"
+        }
+      ]
+    },
+    "job_description": "整理花卉／盆栽，並協助設計人員製作花藝作品及管理訂單。",
+    "ocs_level": 2
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "花藝門市業務處理",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "接待顧客"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "接待客戶並主動說明門市花藝服務項目。"
+                  },
+                  {
+                    "code": "P1.1.2",
+                    "text": "銷售現成花藝作品/花卉/盆栽。"
+                  },
+                  {
+                    "code": "P1.1.3",
+                    "text": "視門市業務需求,提供客戶參考花藝作品。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "花卉與植物概念"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "花藝設計概念"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "顧客關係概念"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "表達能力"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "銷售能力"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "溝通協調能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.2",
+                "name": "門市環境維護及產品管理"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.2.1",
+                    "text": "選用合適的清潔用品,清潔公共區域/器具/櫥窗,維持門市整潔與美觀。"
+                  },
+                  {
+                    "code": "P1.2.2",
+                    "text": "依設計人員指示,針對門市擺放花卉/盆栽進行養護作業。"
+                  },
+                  {
+                    "code": "P1.2.3",
+                    "text": "定期盤點花卉/盆栽與包裝素材庫存量,依指示進貨。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.2.1",
+                    "name": "產品庫存紀錄"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "花卉與植物概念"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "花藝設計概念"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "花藝器具類型"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "花材/盆栽養護方法"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S04",
+                    "name": "環境與器具清潔能力"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "花材/盆栽養護技巧"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.3",
+                "name": "資料管理"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.3.1",
+                    "text": "協助蒐集花藝設計產業現況與流行趨勢,建檔以作為後續設計參考。"
+                  },
+                  {
+                    "code": "P1.3.2",
+                    "text": "協助歷史設計作品資料整理與歸檔。"
+                  },
+                  {
+                    "code": "P1.3.3",
+                    "text": "協助建立與管理客戶訂單。"
+                  },
+                  {
+                    "code": "P1.3.4",
+                    "text": "協助建立供應商資料。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.3.1",
+                    "name": "檔案清單"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "花卉與植物概念"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "花藝設計概念"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "花藝設計產業發展趨勢"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S03",
+                    "name": "溝通協調能力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "資訊蒐集能力"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "資料建檔能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "協助花藝製作",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "準備素材"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "依設計人員指示,準備花藝創作所需花材/盆栽與包裝素材。"
+                  },
+                  {
+                    "code": "P2.1.2",
+                    "text": "依設計人員指示,採購花卉/盆栽與包裝素材。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "花卉與植物概念"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "花藝設計包裝素材"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S08",
+                    "name": "素材準備能力"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "採購能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.2",
+                "name": "協助花藝製作"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.2.1",
+                    "text": "協助花藝設計人員完成花藝作品。"
+                  },
+                  {
+                    "code": "P2.2.2",
+                    "text": "視設計合約案件屬性,協助活動場地及空間花藝設計佈置工作及維護管理。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "花卉與植物概念"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "花藝設計概念"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "花藝設計包裝素材"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "美學概念"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "色彩學"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "產業專業術語"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "包裝方法"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "花藝設計手法"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "職業安全衛生與環境保護相 關法規"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S03",
+                    "name": "溝通協調能力"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "花卉包裝能力"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "花藝作品製作能力"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "花藝陳列能力"
+                  },
+                  {
+                    "code": "S13",
+                    "name": "會場佈置能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.3",
+                "name": "驗收"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.3.1",
+                    "text": "管理訂單,並視合約需求安排配送服務。"
+                  },
+                  {
+                    "code": "P2.3.2",
+                    "text": "協助拍照點驗花藝作品與收取正確款項。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K14",
+                    "name": "定型化契約概念"
+                  },
+                  {
+                    "code": "K15",
+                    "name": "驗收流程"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S03",
+                    "name": "溝通協調能力"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "計算能力"
+                  },
+                  {
+                    "code": "S15",
+                    "name": "驗收與收款能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "主動積極：不需他人指示或要求能自動自發做事，面臨問題立即採取行動加以解決，且為達目標願意主動承擔額外責任。"
+      },
+      {
+        "code": "A02",
+        "name": "正直誠實：展現高道德標準及值得信賴的行為，且能以維持組織誠信為行事原則，瞭解違反組織、自己及他人的道德標準之影響。"
+      },
+      {
+        "code": "A03",
+        "name": "親和力：對他人表現理解、友善、同理心、關心和禮貌，並能與不同背景的人發展及維持良好關係。"
+      },
+      {
+        "code": "A04",
+        "name": "持續學習：能夠展現自我提升的企圖心，利用且積極參與各種機會，學習任務所需的新知識與技能，並能有效應用在特定任務。"
+      },
+      {
+        "code": "A05",
+        "name": "自我管理：設立定義明確且實際可行的個人目標；對於及時完成任務展現高度進取、努力、承諾及負責任的行為。"
+      },
+      {
+        "code": "A06",
+        "name": "團隊意識：積極參與並支持團隊，能彼此鼓勵共同達成團隊目標。"
+      },
+      {
+        "code": "A07",
+        "name": "謹慎細心：對於任務的執行過程，能謹慎考量及處理所有細節，精確地檢視每個程序，並持續對其保持高度關注。"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "高中（職）以上畢業；或具1年以上工作經驗。"
+    ],
+    "supplements": []
+  }
+}

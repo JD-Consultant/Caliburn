@@ -1,0 +1,972 @@
+{
+  "version_info": {
+    "versions": [
+      {
+        "version": "V3",
+        "ocs_code": "KPS3322-003v3",
+        "ocs_name": "場地管理業業務人員",
+        "status": "最新版本",
+        "update_note": "略",
+        "update_date": "2023/12/29"
+      },
+      {
+        "version": "V2",
+        "ocs_code": "KPS3322-003v2",
+        "ocs_name": "場地管理業業務人員",
+        "status": "歷史版本",
+        "update_note": "已被《KPS3322-003v3》取代",
+        "update_date": "2021/01/14"
+      },
+      {
+        "version": "V1",
+        "ocs_code": "KPS3322-003v1",
+        "ocs_name": "場地管理業業務人員",
+        "status": "歷史版本",
+        "update_note": "已被《KPS3322-003v2》取代",
+        "update_date": "2017/12/31"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "ocs_code": "KPS3322-003v3",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "場地管理業業務人員"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "企業經營管理/行政支援",
+          "code": "BAS"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "場地管理業業務人員",
+          "code": "3322"
+        }
+      ],
+      "industries": [
+        {
+          "name": "支援服務業/行政支援服務業",
+          "code": "N8202"
+        }
+      ]
+    },
+    "job_description": "負責業務拓展，維繫舊客戶與開發新客戶，專案控管、專案執行、進度控管，及服務品質管理等，充分瞭解場館環境及客戶需求，說明場館使用規\n範，陪同場地會勘，預定檔期，並完成文書工作。",
+    "ocs_level": 5
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "行銷業務",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "熟悉場館環境"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "熟悉館內各場地資料與用途。"
+                  },
+                  {
+                    "code": "P1.1.2",
+                    "text": "熟悉場館推動永續會展政策之作法與設施。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.1.1",
+                    "name": "場館使用紀錄表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K05",
+                    "name": "溝通協調與人際關係"
+                  },
+                  {
+                    "code": "K19",
+                    "name": "會展科技應用"
+                  },
+                  {
+                    "code": "K35",
+                    "name": "顧客關係管理"
+                  },
+                  {
+                    "code": "K47",
+                    "name": "會議場地分析"
+                  },
+                  {
+                    "code": "K65",
+                    "name": "歐盟一般資料保護規則 (GDPR)相關規定"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S06",
+                    "name": "溝通"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "資訊科技應用能力"
+                  },
+                  {
+                    "code": "S13",
+                    "name": "外在環境感知力"
+                  },
+                  {
+                    "code": "S21",
+                    "name": "正確傾聽"
+                  },
+                  {
+                    "code": "S22",
+                    "name": "客戶服務與聯繫能力"
+                  },
+                  {
+                    "code": "S24",
+                    "name": "表達說服"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.2",
+                "name": "開發新客戶"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.2.1",
+                    "text": "依公司制定之標準建置系統、作客戶分類,行銷行動前後依分類登錄系統,便於內控系統查看或監督,達到即時有效控"
+                  },
+                  {
+                    "code": "P1.2.2",
+                    "text": "透過社交平台、網路媒體、通訊社交軟體、電話或email方式進行客戶開發,探詢場地需求。"
+                  },
+                  {
+                    "code": "P1.2.3",
+                    "text": "關注國際組織、社團、大型NGO活動現況或產業動態,拜訪與開發新客戶。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.2.1",
+                    "name": "客戶紀錄表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K66",
+                    "name": "永續會展"
+                  },
+                  {
+                    "code": "K69",
+                    "name": "行銷管理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S27",
+                    "name": "顧客導向"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.3",
+                "name": "維繫客戶關係"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.3.1",
+                    "text": "定期聯繫/拜訪舊客戶。"
+                  },
+                  {
+                    "code": "P1.3.2",
+                    "text": "記錄客戶的特殊需求。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.3.1",
+                    "name": "客戶拜訪紀錄表"
+                  }
+                ],
+                "knowledge": [],
+                "skills": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "場館行銷",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "廣告宣傳"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "利用生成式AI產生文案、企畫書。"
+                  },
+                  {
+                    "code": "P2.1.2",
+                    "text": "以生成式AI產生之文案對焦客戶需求,作分眾宣傳。"
+                  },
+                  {
+                    "code": "P2.1.3",
+                    "text": "塑造公司品牌與形象。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.1.1",
+                    "name": "電子報行銷信(ElectronicDirectMail,EDM)"
+                  },
+                  {
+                    "code": "O2.1.2",
+                    "name": "社群網路媒體宣傳文案"
+                  },
+                  {
+                    "code": "O2.1.3",
+                    "name": "製作之生成式AI文案、企畫書"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K12",
+                    "name": "數位行銷"
+                  },
+                  {
+                    "code": "K19",
+                    "name": "會展科技應用"
+                  },
+                  {
+                    "code": "K24",
+                    "name": "整合行銷策略"
+                  },
+                  {
+                    "code": "K28",
+                    "name": "品牌管理"
+                  },
+                  {
+                    "code": "K45",
+                    "name": "國際會展趨勢"
+                  },
+                  {
+                    "code": "K69",
+                    "name": "行銷管理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "創新導向"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "詞彙編撰能力"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "資訊科技應用能力"
+                  },
+                  {
+                    "code": "S13",
+                    "name": "外在環境感知力"
+                  },
+                  {
+                    "code": "S26",
+                    "name": "成果導向"
+                  },
+                  {
+                    "code": "S28",
+                    "name": "趨勢分析能力"
+                  },
+                  {
+                    "code": "S29",
+                    "name": "業務拓展與客戶開發"
+                  },
+                  {
+                    "code": "S37",
+                    "name": "網站維護更新能力"
+                  },
+                  {
+                    "code": "S47",
+                    "name": "生成式AI應用能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.2",
+                "name": "提供最新訊息"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.2.1",
+                    "text": "更新網路最新消息。"
+                  },
+                  {
+                    "code": "P2.2.2",
+                    "text": "提供場館資訊,例如:場地規格與數量、使用條件。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.2.1",
+                    "name": "網站廣告"
+                  },
+                  {
+                    "code": "O2.2.2",
+                    "name": "場館資訊"
+                  }
+                ],
+                "knowledge": [],
+                "skills": []
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.3",
+                "name": "開發新業務型態"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.3.1",
+                    "text": "提供場館數位化設施,便於辦理線上(online)、現場(onsite)、混合(hybrid)等會議,與實體(physical)、虛擬(virtual)及虛實整合(onlinemergeoffline,OMO)等展覽。"
+                  },
+                  {
+                    "code": "P2.3.2",
+                    "text": "提供虛擬場勘服務,以滿足遠距者需求,可引進機器人擔任導覽與現場服務工作。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.3.1",
+                    "name": "新型服務宣傳資訊"
+                  }
+                ],
+                "knowledge": [],
+                "skills": []
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.4",
+                "name": "接收客戶需求"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.4.1",
+                    "text": "收到客戶的詢問電話或email後,了解客戶的需求。"
+                  },
+                  {
+                    "code": "P2.4.2",
+                    "text": "按照客戶之需求,進行場地預定。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.4.1",
+                    "name": "客戶需求紀錄表"
+                  }
+                ],
+                "knowledge": [],
+                "skills": []
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.5",
+                "name": "檔期安排"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.5.1",
+                    "text": "協助客戶安排適當的檔期。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.5.1",
+                    "name": "檔期排程表"
+                  }
+                ],
+                "knowledge": [],
+                "skills": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T3",
+        "ocu_name": "場地規劃與管理",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T3.1",
+                "name": "場地規劃"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.1.1",
+                    "text": "提出按照客戶提案邀標書(RequestforProposal,RFP)之需求規劃場地。"
+                  },
+                  {
+                    "code": "P3.1.2",
+                    "text": "以混合(Hybrid)或立體(3D)影像提供海外客戶場地實況。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.1.1",
+                    "name": "場地規劃提案"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K05",
+                    "name": "溝通協調與人際關係"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "財務管理"
+                  },
+                  {
+                    "code": "K35",
+                    "name": "顧客關係管理"
+                  },
+                  {
+                    "code": "K61",
+                    "name": "競標實務"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S04",
+                    "name": "合作協調能力"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "活動企劃能力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "溝通"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "時間管理"
+                  },
+                  {
+                    "code": "S22",
+                    "name": "客戶服務與聯繫能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.2",
+                "name": "協助客戶場勘"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.2.1",
+                    "text": "於客戶場勘時,現場導覽服務。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.2.1",
+                    "name": "客戶需求紀錄表"
+                  }
+                ],
+                "knowledge": [],
+                "skills": [
+                  {
+                    "code": "S27",
+                    "name": "顧客導向"
+                  },
+                  {
+                    "code": "S32",
+                    "name": "規劃能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.3",
+                "name": "報價"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.3.1",
+                    "text": "提供客戶場地報價單。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.3.1",
+                    "name": "報價單"
+                  }
+                ],
+                "knowledge": [],
+                "skills": []
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.4",
+                "name": "簽訂合約"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.4.1",
+                    "text": "與客戶確認需求與價格。"
+                  },
+                  {
+                    "code": "P3.4.2",
+                    "text": "準備合約書。"
+                  },
+                  {
+                    "code": "P3.4.3",
+                    "text": "與客戶進行簽約。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.4.1",
+                    "name": "合約書"
+                  }
+                ],
+                "knowledge": [],
+                "skills": []
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.5",
+                "name": "預收訂金"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.5.1",
+                    "text": "完成簽約手續後,知會財務部門預收場地訂金、開立收據或發票。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.5.1",
+                    "name": "收據/發票"
+                  }
+                ],
+                "knowledge": [],
+                "skills": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T4",
+        "ocu_name": "現場執行",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T4.1",
+                "name": "確認客戶需求內容"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.1.1",
+                    "text": "根據邀標書(RFP)確認現場設備、規劃是否符合客戶洽談時需求,場館服務人員安排是否正確合適。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.1.1",
+                    "name": "客戶需求確認表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K05",
+                    "name": "溝通協調與人際關係"
+                  },
+                  {
+                    "code": "K35",
+                    "name": "顧客關係管理"
+                  },
+                  {
+                    "code": "K42",
+                    "name": "活動現場管理"
+                  },
+                  {
+                    "code": "K44",
+                    "name": "展覽現場管理"
+                  },
+                  {
+                    "code": "K59",
+                    "name": "會議現場管理"
+                  },
+                  {
+                    "code": "K60",
+                    "name": "公共安全"
+                  },
+                  {
+                    "code": "K66",
+                    "name": "永續會展"
+                  },
+                  {
+                    "code": "K73",
+                    "name": "公共衛生"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S04",
+                    "name": "合作協調能力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "溝通"
+                  },
+                  {
+                    "code": "S17",
+                    "name": "衝突管理"
+                  },
+                  {
+                    "code": "S19",
+                    "name": "問題解決"
+                  },
+                  {
+                    "code": "S20",
+                    "name": "緊急應變能力"
+                  },
+                  {
+                    "code": "S27",
+                    "name": "顧客導向"
+                  },
+                  {
+                    "code": "S46",
+                    "name": "團隊合作"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T4.2",
+                "name": "現場確認服務執行"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.2.1",
+                    "text": "活動現場恪守公共安全與衛生管理之相關規定。"
+                  },
+                  {
+                    "code": "P4.2.2",
+                    "text": "確認影音播放與場控秩序。"
+                  },
+                  {
+                    "code": "P4.2.3",
+                    "text": "活動期間客戶若有臨時性需求,立即處理。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.2.1",
+                    "name": "場地例行檢查表"
+                  },
+                  {
+                    "code": "O4.2.2",
+                    "name": "臨時需求紀錄表"
+                  }
+                ],
+                "knowledge": [],
+                "skills": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T5",
+        "ocu_name": "文書作業",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T5.1",
+                "name": "滿意度調查"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P5.1.1",
+                    "text": "活動結束後,執行滿意度調查。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O5.1.1",
+                    "name": "滿意度調查記錄"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K08",
+                    "name": "商業套裝軟體"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "財務管理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S07",
+                    "name": "文書處理能力"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "資訊科技應用能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T5.2",
+                "name": "確認各項活動費用、服\n務內容"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P5.2.1",
+                    "text": "活動結束,與客戶確認服務內容與活動費用。"
+                  },
+                  {
+                    "code": "P5.2.2",
+                    "text": "確認無誤後交由財務部門收取尾款。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O5.2.1",
+                    "name": "服務內容與活動費用確認表"
+                  }
+                ],
+                "knowledge": [],
+                "skills": []
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T5.3",
+                "name": "文件紀錄補充說明事項"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P5.3.1",
+                    "text": "整理活動現場發生的特殊事項,紀錄數位化存檔。"
+                  },
+                  {
+                    "code": "P5.3.2",
+                    "text": "將客戶往來之文件進行歸檔、數位化保存。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O5.3.1",
+                    "name": "結案記錄"
+                  }
+                ],
+                "knowledge": [],
+                "skills": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "壓力容忍"
+      },
+      {
+        "code": "A08",
+        "name": "情緒（EQ）管理"
+      },
+      {
+        "code": "A23",
+        "name": "喜愛與人接觸"
+      },
+      {
+        "code": "A02",
+        "name": "團隊意識"
+      },
+      {
+        "code": "A09",
+        "name": "對工作的熱忱"
+      },
+      {
+        "code": "A26",
+        "name": "彈性"
+      },
+      {
+        "code": "A03",
+        "name": "謹慎細心"
+      },
+      {
+        "code": "A13",
+        "name": "配合度高"
+      },
+      {
+        "code": "A28",
+        "name": "熱心服務"
+      },
+      {
+        "code": "A05",
+        "name": "主動積極"
+      },
+      {
+        "code": "A18",
+        "name": "應對不明狀況"
+      },
+      {
+        "code": "A29",
+        "name": "正直誠實"
+      },
+      {
+        "code": "A06",
+        "name": "自我管理"
+      },
+      {
+        "code": "A20",
+        "name": "親和力"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [],
+    "supplements": []
+  }
+}

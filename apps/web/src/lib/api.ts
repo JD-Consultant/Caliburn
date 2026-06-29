@@ -1,4 +1,4 @@
-// v3 API client. Talks to the live AG-UI app (copilotkit_live_app) on 8001,
+// API client. Talks to the live AG-UI app (copilotkit_live_app) on 8001,
 // which now mounts users + job_profiles CRUD under /api/v1. Legacy interview /
 // tasks / documents endpoints were removed with the old backend (Concern B).
 import type {

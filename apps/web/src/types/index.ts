@@ -1,6 +1,6 @@
-// v3 types. The old conversation-driven model (Stage union, GraphState,
+// types. The old conversation-driven model (Stage union, GraphState,
 // OcsDocument, Task, KsaItem, IcapCandidate, InterviewMessage, …) was retired
-// with the old backend (Concern B); the v3 interview state lives in the
+// with the old backend (Concern B); the interview state lives in the
 // LangGraph checkpointer and is surfaced via interrupt payloads, not here.
 
 export interface User {

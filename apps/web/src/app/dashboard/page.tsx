@@ -1,7 +1,7 @@
 "use client";
 
-// v3 dashboard. Lists the user's job profiles and creates new ones, then routes
-// into the v3 interview surface (/v3/[id]). No old conversation stages — v3
+// dashboard. Lists the user's job profiles and creates new ones, then routes
+// into the interview surface (/documents/[id]). No old conversation stages —
 // progress lives in the LangGraph checkpointer, not on the JobProfile row.
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -59,7 +59,7 @@ export default function DashboardPage() {
       department: department.trim() || undefined,
       job_summary: jobSummary.trim() || undefined,
     });
-    router.push(`/v3/${profile.id}`);
+    router.push(`/documents/${profile.id}`);
   };
 
   return (
@@ -79,7 +79,7 @@ export default function DashboardPage() {
         <div className="mb-6">
           <h1 className="text-2xl font-bold">職務檔案</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            建立職務後進入 v3 訪談：選職類 → 整理任務 → 深度訪談 → 產生 OCS 文件
+            建立職務後進入訪談：選職類 → 整理任務 → 深度訪談 → 產生 OCS 文件
           </p>
         </div>
 
@@ -129,7 +129,7 @@ export default function DashboardPage() {
           <div className="py-20 text-center">
             <BriefcaseIcon className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
             <h2 className="mb-2 text-lg font-medium">尚無職務檔案</h2>
-            <p className="mb-6 text-sm text-muted-foreground">建立第一個職務，開始 v3 訪談</p>
+            <p className="mb-6 text-sm text-muted-foreground">建立第一個職務，開始訪談</p>
             <Button className="gap-2" onClick={() => setShowForm(true)}>
               <Plus className="h-4 w-4" />
               新增職務
@@ -174,7 +174,7 @@ export default function DashboardPage() {
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="icon" onClick={() => router.push(`/v3/${profile.id}`)}>
+                  <Button variant="ghost" size="icon" onClick={() => router.push(`/documents/${profile.id}`)}>
                     <ChevronRight className="h-4 w-4" />
                   </Button>
                 </div>

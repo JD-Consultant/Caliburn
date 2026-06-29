@@ -4,9 +4,9 @@
 繞過 CopilotKit/前端（那只是傳輸層），直接驅動 graph + build_live_deps()。
 
 前置：
-  1) 起 indexer：  (S:\\jd-ocs-indexer)  uv run jd-ocs-indexer serve --host 127.0.0.1 --port 8000
-  2) Postgres 在跑；backend/.env 設好 DATABASE_URL / INDEXER_BASE_URL / OPENROUTER_API_KEY
-  3) 跑：           (s:\\jobintel-ai\\backend)  uv run python scripts/live_smoke.py
+  1) 起 indexer：  (apps/ocs-indexer)  uv run jd-ocs-indexer serve --host 127.0.0.1 --port 8000
+  2) Postgres 在跑；apps/api/.env 設好 DATABASE_URL / INDEXER_BASE_URL / OPENROUTER_API_KEY
+  3) 跑：           (apps/api)  uv run python scripts/live_smoke.py
 
 每個 interrupt 會在終端機問你，輸入答案後 Enter 繼續；最後印出組裝好的 OCS 文件。
 """

@@ -1,1 +1,1 @@
-"""HTTP query API for jd-ocs-indexer (consumed by jobintel-ai)."""
+"""HTTP query API for jd-ocs-indexer (consumed by the Caliburn api)."""

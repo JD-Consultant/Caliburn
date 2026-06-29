@@ -8,5 +8,19 @@ dist/
 .env
 uv.lock.bak
 
+# caches / generated output (api has no nested .gitignore — harden at root)
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+output/
+
+# editor / OS / local agent state
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+.claude/
+
 # local-only agent orientation (not version-controlled, per maintainer)
 CLAUDE.md

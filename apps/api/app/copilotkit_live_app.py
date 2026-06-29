@@ -36,7 +36,7 @@ async def lifespan(app: FastAPI):
             await deps.knowledge.aclose()   # 關 httpx client
 
 
-app = FastAPI(title="jobintel v3 (live)", lifespan=lifespan)
+app = FastAPI(title="Caliburn (live)", lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],

@@ -7,7 +7,7 @@ from ag_ui_langgraph import add_langgraph_fastapi_endpoint
 
 from app.graph_v3.serving import build_demo_agent
 
-app = FastAPI(title="jobintel v3 CopilotKit demo")
+app = FastAPI(title="Caliburn CopilotKit demo")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000"],

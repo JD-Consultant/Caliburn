@@ -67,8 +67,7 @@ export default function DashboardPage() {
       <header className="flex items-center justify-between border-b bg-background px-6 py-4">
         <div className="flex items-center gap-2">
           <BriefcaseIcon className="h-5 w-5 text-blue-600" />
-          <span className="text-lg font-semibold">JobIntel AI</span>
-          <Badge variant="outline" className="text-xs">v3</Badge>
+          <span className="text-lg font-semibold">Caliburn</span>
         </div>
         <Button size="sm" className="gap-2" onClick={() => setShowForm((v) => !v)}>
           <Plus className="h-4 w-4" />

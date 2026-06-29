@@ -81,7 +81,9 @@ Thumbs.db
 .DS_Store
 
 # Project specific
-data/
+# source PDFs for the ETL — tracked (repo self-contained); other data/ stays ignored
+data/*
+!data/pdfs/
 samples/
 raw_pdfs/
 converted_json/

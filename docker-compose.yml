@@ -6,11 +6,10 @@
 services:
   db:
     image: pgvector/pgvector:pg16
-    container_name: jobintel_db
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: jobintel
+      POSTGRES_DB: caliburn
     ports:
       - "5432:5432"
     volumes:
@@ -24,7 +23,6 @@ services:
 
   qdrant:
     image: qdrant/qdrant:v1.18.2          # pin；對齊 qdrant-client>=1.18（apps/ocs-indexer）
-    container_name: jobintel_qdrant
     ports:
       - "6333:6333"                        # REST（indexer 走這個，prefer_grpc=False）
       - "6334:6334"                        # gRPC
@@ -42,7 +40,6 @@ services:
   embedder:
     build: ./apps/embedder
     image: caliburn-embedder:local
-    container_name: jobintel_embedder
     gpus: all                              # RTX 4060 已驗證（Docker Desktop + WSL2 nvidia）
     ports:
       - "8082:80"                          # indexer EMBEDDER_URL=http://localhost:8082

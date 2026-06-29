@@ -82,3 +82,4 @@ feat(api): …   fix(web): …   chore(indexer): …   docs(contract): …
 - **api `reload` 已關(單一進程)**:停止用終端機 Ctrl-C 即乾淨;**改後端碼要手動重啟**。孤兒進程清理見 runbook。
 - **uv venv 沒有 pip**:列套件用 `uv pip list` / `uv pip freeze`,不是 `python -m pip`。
 - **依賴以 `pyproject.toml` 為準**:api 舊 `requirements.txt` 已過期(pydantic/dotenv/email-validator/greenlet 都對不上真實環境),勿再依賴它(Phase 3 退役)。新增依賴改 pyproject + `uv lock`。
+- **npm workspaces 只有一個 root `package-lock.json`**:子套件**不要**各自留 lockfile —— workspace 會忽略它,且 Next/Turbopack 會因多 lockfile **誤判 workspace root**(警告甚至效能問題,見 vercel/next.js#92978)。新增 JS 依賴一律在**根**跑 `npm install`。

@@ -1,4 +1,4 @@
-from app.graph_v3.serving import AGENT_NAME, build_demo_agent
+from app.authoring.serving import AGENT_NAME, build_demo_agent
 
 
 def test_demo_agent_builds_with_name():

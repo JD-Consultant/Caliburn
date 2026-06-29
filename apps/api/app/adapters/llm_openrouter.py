@@ -8,7 +8,7 @@ from langchain_core.messages import HumanMessage
 from langchain_openai import ChatOpenAI
 
 from app.config import settings
-from app.graph_v3.tracing import get_tracer
+from app.authoring.tracing import get_tracer
 from app.utils import safe_parse_json
 
 logger = logging.getLogger("caliburn")

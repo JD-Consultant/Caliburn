@@ -1,6 +1,6 @@
 from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
 
-from app.graph_v3.tracing import setup_tracing, get_tracer
+from app.authoring.tracing import setup_tracing, get_tracer
 
 
 def test_setup_tracing_exports_spans_to_injected_exporter():

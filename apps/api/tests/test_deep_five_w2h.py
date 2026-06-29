@@ -3,12 +3,12 @@ from langgraph.graph import StateGraph, START, END
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.types import Command
 
-from app.graph_v3.state import new_state, InterviewState
-from app.graph_v3.deep_nodes import five_w2h_node
-from app.graph_v3.deps import Deps
+from app.authoring.state import new_state, InterviewState
+from app.authoring.deep_nodes import five_w2h_node
+from app.authoring.deps import Deps
 from app.core.knowledge_dto import CompetencyPool, CitableItem, SourceRef
 from tests.conftest_graph import FakeKnowledge, SpyPersist, FakeLlm
-from app.graph_v3.constants import FIVE_W2H_REQUIRED
+from app.authoring.constants import FIVE_W2H_REQUIRED
 
 
 def _graph():

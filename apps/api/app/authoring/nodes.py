@@ -1,7 +1,7 @@
 from langgraph.types import interrupt
 
-from app.graph_v3.state import InterviewState
-from app.graph_v3.tracing import traced_node
+from app.authoring.state import InterviewState
+from app.authoring.tracing import traced_node
 
 
 @traced_node("pick_profile")

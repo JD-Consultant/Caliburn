@@ -21,6 +21,6 @@ def test_main_app_still_imports():
     assert app.main.app is not None
 
 
-def test_kept_pure_data_lives_in_graph_v3():
-    from app.graph_v3.constants import TASK_COMPLETENESS_FIELDS  # noqa: F401
-    import app.graph_v3.prompts.indicator  # noqa: F401
+def test_kept_pure_data_lives_in_authoring():
+    from app.authoring.constants import TASK_COMPLETENESS_FIELDS  # noqa: F401
+    import app.authoring.prompts.indicator  # noqa: F401

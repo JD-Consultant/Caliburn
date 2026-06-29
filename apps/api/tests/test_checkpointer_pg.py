@@ -4,7 +4,7 @@ import pytest
 from typing import TypedDict
 from langgraph.graph import StateGraph, START, END
 
-from app.graph_v3.checkpointer import open_pg_checkpointer
+from app.authoring.checkpointer import open_pg_checkpointer
 
 PG = os.getenv("TEST_DATABASE_URL", "")
 

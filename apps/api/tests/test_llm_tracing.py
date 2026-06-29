@@ -4,7 +4,7 @@ from langchain_core.messages import AIMessage
 
 from app.config import settings
 from app.adapters import llm_openrouter as llm_mod
-from app.graph_v3.tracing import setup_tracing
+from app.authoring.tracing import setup_tracing
 
 
 class _FakeChat:

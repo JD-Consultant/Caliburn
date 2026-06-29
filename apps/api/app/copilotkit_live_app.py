@@ -1,4 +1,4 @@
-"""Production v3 CopilotKit app：live deps + AsyncPostgresSaver（D15/D17）。
+"""Production CopilotKit app：live deps + AsyncPostgresSaver（D15/D17）。
 跑：uvicorn app.copilotkit_live_app:app --port 8000
 demo（無依賴）仍在 app.copilotkit_app。"""
 # Windows: psycopg async（AsyncPostgresSaver checkpointer）需 SelectorEventLoop，
@@ -18,9 +18,9 @@ from ag_ui_langgraph import add_langgraph_fastapi_endpoint
 
 from app.api.routes import ai, documents, job_profiles, users
 from app.config import settings
-from app.graph_v3.checkpointer import open_pg_checkpointer
-from app.graph_v3.serving import build_live_agent, build_live_deps
-from app.graph_v3.tracing import setup_tracing
+from app.authoring.checkpointer import open_pg_checkpointer
+from app.authoring.serving import build_live_agent, build_live_deps
+from app.authoring.tracing import setup_tracing
 
 
 @asynccontextmanager
@@ -44,7 +44,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# v3 CRUD（dashboard/新增職務用）+ D27 文件即工作台 REST（documents：
+# CRUD（dashboard/新增職務用）+ D27 文件即工作台 REST（documents：
 # GET/PATCH/finalize/seed/ksa-pool）。documents 為 D27 重寫版（非舊 graph_state 路由）。
 app.include_router(users.router, prefix="/api/v1")
 app.include_router(job_profiles.router, prefix="/api/v1")

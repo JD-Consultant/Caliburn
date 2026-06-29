@@ -1,7 +1,7 @@
 """Ports (hexagonal inside ring): Protocols the application/graph depend on.
 
 Adapters in app/adapters/ implement these; nothing here imports adapters,
-graph_v3, or fastapi. See docs/specs/2026-06-28-api-hexagonal-untangle-research.md.
+authoring, or fastapi. See docs/specs/2026-06-28-api-hexagonal-untangle-research.md.
 """
 from typing import Any, Protocol, runtime_checkable
 from uuid import UUID

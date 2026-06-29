@@ -1,4 +1,4 @@
-"""Launcher for the v3 live CopilotKit app.
+"""Launcher for the live CopilotKit app.
 
 On Windows, psycopg's async connection (used by AsyncPostgresSaver checkpointer)
 cannot run on the default ProactorEventLoop — it requires the SelectorEventLoop.

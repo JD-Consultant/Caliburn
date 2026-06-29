@@ -1,11 +1,11 @@
-"""v3 build_doc：deterministic 組裝 OCS 文件（D13）。
+"""build_doc：deterministic 組裝 OCS 文件（D13）。
 OCU 分組用 catalog unit 結構；編碼 T/P/O/K/S/A 全程式化；不用 LLM、不 import 舊 ocs_builder。"""
 import logging
 
 from langgraph.types import interrupt
 
-from app.graph_v3.state import InterviewState, task_key
-from app.graph_v3.tracing import traced_node
+from app.authoring.state import InterviewState, task_key
+from app.authoring.tracing import traced_node
 
 logger = logging.getLogger("caliburn")
 

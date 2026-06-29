@@ -1,12 +1,12 @@
-"""v3 收尾 curate 節點：fetch_ksa_pool / curate_ks（逐任務）/ curate_attitudes（全域）。
+"""收尾 curate 節點：fetch_ksa_pool / curate_ks（逐任務）/ curate_attitudes（全域）。
 deterministic、單一 node 內 interrupt for-loop（index-based resume）。pairs() 只在
 fetch_ksa_pool 打一次並快取進 state，curate_* 只讀池不重打（idempotency-on-resume）。"""
 import logging
 
 from langgraph.types import interrupt
 
-from app.graph_v3.state import InterviewState, task_key
-from app.graph_v3.tracing import traced_node
+from app.authoring.state import InterviewState, task_key
+from app.authoring.tracing import traced_node
 
 logger = logging.getLogger("caliburn")
 

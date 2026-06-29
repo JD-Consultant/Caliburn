@@ -11,7 +11,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from evals import checks  # noqa: E402
-from app.graph_v3.build_doc import _assemble  # noqa: E402
+from app.authoring.build_doc import _assemble  # noqa: E402
 
 _DATA = os.path.join(os.path.dirname(__file__), "datasets", "json_zhtw.json")
 
@@ -50,7 +50,7 @@ def _eval_doc_structure() -> dict:
 
 async def run_all(llm=None) -> tuple[bool, dict]:
     if llm is None:
-        from app.graph_v3.llm import OpenRouterLlm
+        from app.authoring.llm import OpenRouterLlm
         llm = OpenRouterLlm()
     report = {
         "json_zhtw": await _eval_json_zhtw(llm),

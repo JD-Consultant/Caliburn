@@ -1,4 +1,4 @@
-"""Live end-to-end smoke driver for graph_v3 (manual verification, not a test).
+"""Live end-to-end smoke driver for authoring (manual verification, not a test).
 
 跑一條真流程：真 indexer 檢索 + 真 OpenRouter 深問 + 真 Postgres 落庫 / checkpointer。
 繞過 CopilotKit/前端（那只是傳輸層），直接驅動 graph + build_live_deps()。
@@ -26,10 +26,10 @@ from langgraph.types import Command  # noqa: E402
 from app.config import settings  # noqa: E402
 from app.database import AsyncSessionLocal  # noqa: E402
 from app.models import JobProfile, User  # noqa: E402
-from app.graph_v3.checkpointer import open_pg_checkpointer  # noqa: E402
-from app.graph_v3.graph import build_graph_v3  # noqa: E402
-from app.graph_v3.serving import build_live_deps  # noqa: E402
-from app.graph_v3.state import new_state  # noqa: E402
+from app.authoring.checkpointer import open_pg_checkpointer  # noqa: E402
+from app.authoring.graph import build_graph  # noqa: E402
+from app.authoring.serving import build_live_deps  # noqa: E402
+from app.authoring.state import new_state  # noqa: E402
 
 
 def _ask(prompt: str) -> str:
@@ -134,7 +134,7 @@ async def main() -> None:
         return
 
     async with open_pg_checkpointer(settings.database_url) as saver:
-        graph = build_graph_v3(checkpointer=saver)
+        graph = build_graph(checkpointer=saver)
         cfg = {"configurable": {"thread_id": thread_id, "deps": deps}}
 
         out = await graph.ainvoke(new_state(job_profile_id=thread_id,

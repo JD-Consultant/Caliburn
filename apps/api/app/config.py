@@ -9,8 +9,8 @@ class Settings(BaseSettings):
     debug: bool = False
 
     # Database
-    database_url: str = "postgresql+asyncpg://postgres:password@localhost:5432/jobintel"
-    database_url_sync: str = "postgresql://postgres:password@localhost:5432/jobintel"
+    database_url: str = "postgresql+asyncpg://postgres:password@localhost:5432/caliburn"
+    database_url_sync: str = "postgresql://postgres:password@localhost:5432/caliburn"
 
     # jd-ocs-indexer query API
     indexer_base_url: str = "http://localhost:8000"

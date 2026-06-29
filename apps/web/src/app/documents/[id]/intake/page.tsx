@@ -38,7 +38,7 @@ function IntakeForm({
     return parts.join("\n");
   };
 
-  const goWorktable = () => router.push(`/v3/${id}`);
+  const goWorktable = () => router.push(`/documents/${id}`);
 
   const submit = async () => {
     const summary = composeSummary();

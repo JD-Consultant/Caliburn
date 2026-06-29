@@ -1,6 +1,6 @@
 "use client";
 
-// v3 HITL via CopilotKit v2 useInterrupt (D22). renderInChat:false → the hook
+// HITL via CopilotKit v2 useInterrupt (D22). renderInChat:false → the hook
 // returns a ReactElement we place in our own (no-chat) UI. Listens to the agent's
 // on_interrupt custom events. Wired: select_profile, edit_tasks, ask_human,
 // curate_ks (per-task K/S), curate_attitudes, preview.

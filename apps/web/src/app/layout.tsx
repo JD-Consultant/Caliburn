@@ -6,7 +6,7 @@ import { Providers } from "@/components/layout/Providers";
 const geist = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "JobIntel AI",
+  title: "Caliburn",
   description: "企業職能知識萃取系統",
 };
 

@@ -21,9 +21,8 @@ uv run python run_live.py          # :8001(Windows 用 SelectorEventLoop,已內�
 uv run pytest -q     # 無 DB 時 DB 相關測試會 skip
 ```
 
-## 結構(現況 → 目標)
+## 結構(六邊形,ADR 0008 已實作)
 
-現為 `app/{api/routes, services, graph_v3, models, schemas}`(layer-based)。
-**Phase 3 目標**:抽 `core/`(ports + domain)、解 `graph_v3↔services` 纏繞、layer→domain 垂直切片。見 spec §二.2。
+`app/{core(ports + domain)、adapters(DB/LLM/knowledge 等邊緣)、services(use-case)、authoring(LangGraph 編排,原 graph_v3)、api/routes、schemas}`。Phase 3a 已抽 `core/`、移除 graph↔services 反向邊。
 
 新增依賴:改 `pyproject.toml` + `uv lock`(舊 `requirements.txt` 已過期、待退役)。

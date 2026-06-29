@@ -1,4 +1,4 @@
-from app.graph_v3.state import new_state, task_key
+from app.authoring.state import new_state, task_key
 
 
 def test_new_state_has_per_task_ksa():

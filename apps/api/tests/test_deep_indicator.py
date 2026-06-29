@@ -2,9 +2,9 @@ import pytest
 from langgraph.graph import StateGraph, START, END
 from langgraph.checkpoint.memory import MemorySaver
 
-from app.graph_v3.state import new_state, InterviewState
-from app.graph_v3.deep_nodes import indicator_node
-from app.graph_v3.deps import Deps
+from app.authoring.state import new_state, InterviewState
+from app.authoring.deep_nodes import indicator_node
+from app.authoring.deps import Deps
 from tests.conftest_graph import FakeKnowledge, SpyPersist, FakeLlm
 
 

@@ -3,7 +3,7 @@ from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanE
 from opentelemetry.trace import StatusCode
 from langgraph.errors import GraphInterrupt
 
-from app.graph_v3.tracing import setup_tracing, traced_node
+from app.authoring.tracing import setup_tracing, traced_node
 
 
 def _exporter():
@@ -24,8 +24,8 @@ async def test_traced_node_records_normal_span():
     assert out == {"ok": True}
     s = exp.get_finished_spans()[0]
     assert s.name == "node.demo"
-    assert s.attributes["jobintel.node"] == "demo"
-    assert s.attributes["jobintel.current_step"] == "deep"
+    assert s.attributes["caliburn.node"] == "demo"
+    assert s.attributes["caliburn.current_step"] == "deep"
     assert s.status.status_code != StatusCode.ERROR
 
 

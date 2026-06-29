@@ -3,9 +3,9 @@ from langgraph.graph import StateGraph, START, END
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.types import Command
 
-from app.graph_v3.state import new_state, InterviewState
-from app.graph_v3.nodes import build_task_pool, _pool_to_tasks
-from app.graph_v3.deps import Deps
+from app.authoring.state import new_state, InterviewState
+from app.authoring.nodes import build_task_pool, _pool_to_tasks
+from app.authoring.deps import Deps
 from app.core.knowledge_dto import OccupationTasks, UnitTasks, TaskRef
 from tests.conftest_graph import FakeKnowledge, SpyPersist
 

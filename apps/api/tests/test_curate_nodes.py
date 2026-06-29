@@ -3,9 +3,9 @@ from langgraph.graph import StateGraph, START, END
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.types import Command
 
-from app.graph_v3.state import new_state, InterviewState
-from app.graph_v3.curate_nodes import fetch_ksa_pool, curate_ks, curate_attitudes
-from app.graph_v3.deps import Deps
+from app.authoring.state import new_state, InterviewState
+from app.authoring.curate_nodes import fetch_ksa_pool, curate_ks, curate_attitudes
+from app.authoring.deps import Deps
 from app.core.knowledge_dto import CompetencyPool, CitableItem, SourceRef
 from tests.conftest_graph import FakeKnowledge, SpyPersist
 

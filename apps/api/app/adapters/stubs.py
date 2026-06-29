@@ -1,4 +1,4 @@
-"""Demo 用 stub：不需真 indexer/Qdrant/DB，先證明 CopilotKit↔graph_v3 plumbing。
+"""Demo 用 stub：不需真 indexer/Qdrant/DB，先證明 CopilotKit↔authoring plumbing。
 仍走 KnowledgeClient / PersistPort 抽象（D6/D7）。真實作於後續 phase 接上。"""
 from uuid import UUID
 

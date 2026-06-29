@@ -2,9 +2,9 @@ import pytest
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.types import Command
 
-from app.graph_v3.graph import build_graph_v3
-from app.graph_v3.state import new_state
-from app.graph_v3.deps import Deps
+from app.authoring.graph import build_graph
+from app.authoring.state import new_state
+from app.authoring.deps import Deps
 from tests.conftest_graph import FakeKnowledge, SpyPersist, FakeLlm
 
 _GOOD = {"has_situation": True, "has_purpose": True, "has_collaborators": True,
@@ -21,7 +21,7 @@ async def test_two_task_deep_loop_reaches_fetch_ksa_pool():
         return star_refine if "STAR 四槽" in prompt else indicators
     llm = FakeLlm(json=_json)
     fake = FakeKnowledge()
-    graph = build_graph_v3(checkpointer=MemorySaver())
+    graph = build_graph(checkpointer=MemorySaver())
     cfg = {"configurable": {"thread_id": "t1",
                             "deps": Deps(knowledge=fake, persist=SpyPersist(), llm=llm)}}
 

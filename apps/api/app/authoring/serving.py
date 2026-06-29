@@ -1,4 +1,4 @@
-"""AG-UI serving for graph_v3 (D22).
+"""AG-UI serving for authoring (D22).
 
 Serves the graph over the AG-UI protocol via ag-ui-langgraph (replaces the
 legacy copilotkit CopilotKitRemoteEndpoint, which is incompatible with new
@@ -14,8 +14,8 @@ from langgraph.checkpoint.memory import MemorySaver
 from app.config import settings
 from app.database import AsyncSessionLocal
 from app.adapters.persistence import LiveDbPersist
-from app.graph_v3.deps import Deps
-from app.graph_v3.graph import build_graph_v3
+from app.authoring.deps import Deps
+from app.authoring.graph import build_graph
 from app.adapters.llm_openrouter import OpenRouterLlm
 from app.adapters.stubs import InMemoryPersist, StubKnowledge
 from app.adapters.knowledge_http import HttpIndexerClient
@@ -27,8 +27,8 @@ def build_demo_agent() -> LangGraphAgent:
     deps = Deps(knowledge=StubKnowledge(), persist=InMemoryPersist())
     return LangGraphAgent(
         name=AGENT_NAME,
-        description="JD 撰寫顧問（v3 stub demo）",
-        graph=build_graph_v3(checkpointer=MemorySaver()),
+        description="JD 撰寫顧問（stub demo）",
+        graph=build_graph(checkpointer=MemorySaver()),
         config={"configurable": {"deps": deps}},
     )
 
@@ -50,7 +50,7 @@ def build_live_deps() -> Deps:
 def build_live_agent(checkpointer, deps) -> LangGraphAgent:
     return LangGraphAgent(
         name=AGENT_NAME,
-        description="JD 撰寫顧問（v3 live）",
-        graph=build_graph_v3(checkpointer=checkpointer),
+        description="JD 撰寫顧問（live）",
+        graph=build_graph(checkpointer=checkpointer),
         config={"configurable": {"deps": deps}},
     )

@@ -3,9 +3,9 @@ from langgraph.graph import StateGraph, START, END
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.types import Command
 
-from app.graph_v3.state import new_state, InterviewState
-from app.graph_v3.build_doc import build_doc
-from app.graph_v3.deps import Deps
+from app.authoring.state import new_state, InterviewState
+from app.authoring.build_doc import build_doc
+from app.authoring.deps import Deps
 from tests.conftest_graph import FakeKnowledge, SpyPersist, FakeLlm
 
 

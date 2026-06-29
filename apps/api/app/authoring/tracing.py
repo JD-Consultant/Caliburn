@@ -17,7 +17,7 @@ def setup_tracing(exporter=None, *, force: bool = False) -> TracerProvider:
     global _PROVIDER
     if _PROVIDER is not None and not force:
         return _PROVIDER
-    provider = TracerProvider(resource=Resource.create({"service.name": "jobintel-v3"}))
+    provider = TracerProvider(resource=Resource.create({"service.name": "caliburn"}))
     if exporter is not None:
         provider.add_span_processor(SimpleSpanProcessor(exporter))
     elif os.getenv("OTEL_EXPORTER_OTLP_ENDPOINT"):
@@ -30,9 +30,9 @@ def setup_tracing(exporter=None, *, force: bool = False) -> TracerProvider:
 
 def get_tracer():
     if _PROVIDER is not None:
-        return _PROVIDER.get_tracer("jobintel.graph_v3")
+        return _PROVIDER.get_tracer("caliburn.authoring")
     from opentelemetry import trace
-    return trace.get_tracer("jobintel.graph_v3")
+    return trace.get_tracer("caliburn.authoring")
 
 
 def traced_node(name: str):
@@ -41,10 +41,10 @@ def traced_node(name: str):
         @functools.wraps(fn)
         async def wrapper(state, config):
             with get_tracer().start_as_current_span(f"node.{name}") as span:
-                span.set_attribute("jobintel.node", name)
+                span.set_attribute("caliburn.node", name)
                 step = state.get("current_step") if isinstance(state, dict) else None
                 if step:
-                    span.set_attribute("jobintel.current_step", step)
+                    span.set_attribute("caliburn.current_step", step)
                 exc_to_raise = None
                 try:
                     return await fn(state, config)

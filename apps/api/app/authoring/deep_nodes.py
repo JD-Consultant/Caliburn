@@ -1,14 +1,14 @@
-"""v3 深問三階段節點（interrupt 驅動）：star / five_w2h / indicator。
-重用 app.graph_v3.prompts.* 與 app.graph_v3.constants（純資料模組）；控制流為新寫。"""
+"""深問三階段節點（interrupt 驅動）：star / five_w2h / indicator。
+重用 app.authoring.prompts.* 與 app.authoring.constants（純資料模組）；控制流為新寫。"""
 import json
 import logging
 
 from langgraph.types import interrupt
 
-from app.graph_v3.state import InterviewState
-from app.graph_v3.constants import FIVE_W2H_REQUIRED, FIVE_W2H_LIST_FIELDS, INDICATOR_REQUIRED_FIELDS
-from app.graph_v3.tracing import traced_node
-import app.graph_v3.prompts.indicator as ind_prompts
+from app.authoring.state import InterviewState
+from app.authoring.constants import FIVE_W2H_REQUIRED, FIVE_W2H_LIST_FIELDS, INDICATOR_REQUIRED_FIELDS
+from app.authoring.tracing import traced_node
+import app.authoring.prompts.indicator as ind_prompts
 
 logger = logging.getLogger("caliburn")
 

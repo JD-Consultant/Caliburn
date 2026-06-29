@@ -1,11 +1,11 @@
 from langgraph.graph import StateGraph, START, END
 
-from app.graph_v3.state import InterviewState
-from app.graph_v3.nodes import pick_profile, build_task_pool
-from app.graph_v3.deep_nodes import (
+from app.authoring.state import InterviewState
+from app.authoring.nodes import pick_profile, build_task_pool
+from app.authoring.deep_nodes import (
     star_node, five_w2h_node, indicator_node, route_after_indicator)
-from app.graph_v3.curate_nodes import fetch_ksa_pool, curate_ks, curate_attitudes
-from app.graph_v3.build_doc import build_doc
+from app.authoring.curate_nodes import fetch_ksa_pool, curate_ks, curate_attitudes
+from app.authoring.build_doc import build_doc
 
 
 def route_deep(state: InterviewState) -> str:
@@ -35,8 +35,8 @@ def finish_deep(state: InterviewState) -> dict:
     return {"current_step": "fetch_ksa_pool"}
 
 
-def build_graph_v3(checkpointer=None):
-    """v3 骨幹 + 逐任務深問迴圈（單層 node loop，interrupt 驅動）。
+def build_graph(checkpointer=None):
+    """骨幹 + 逐任務深問迴圈（單層 node loop，interrupt 驅動）。
     finish_deep → fetch_ksa_pool → curate_ks → curate_attitudes → build_doc → END。"""
     g = StateGraph(InterviewState)
     g.add_node("pick_profile", pick_profile)

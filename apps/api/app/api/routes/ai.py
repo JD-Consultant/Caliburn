@@ -87,10 +87,10 @@ async def recommend_ks_ep(
     return result
 
 
-async def _catalog_op(knowledge: KnowledgeClient, ref: dict) -> tuple[list[str], list[str]]:
+async def _catalog_op(knowledge: KnowledgeClient, ref: dict) -> tuple[list[dict], list[dict]]:
     """Per-task official outputs + indicators from the v4 competency pool, sliced on
-    ``(ocs_code, task_code)`` from provenance. No ref or indexer down → empty lists
-    (caller degrades gracefully)."""
+    ``(ocs_code, task_code)`` from provenance. Items keep their source ``code`` so the
+    frontend can match by provenance identity (2b). No ref or indexer down → empty lists."""
     if not ref.get("ocs_code") or not ref.get("task_code"):
         return [], []
     try:
@@ -99,7 +99,7 @@ async def _catalog_op(knowledge: KnowledgeClient, ref: dict) -> tuple[list[str],
         logger.warning("ai: competencies failed", exc_info=True)
         return [], []
     detail = task_competencies(pool, ref["task_code"])
-    return [o["name"] for o in detail["outputs"]], [p["text"] for p in detail["indicators"]]
+    return detail["outputs"], detail["indicators"]
 
 
 @router.post("/draft-op")

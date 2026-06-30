@@ -29,7 +29,9 @@ export function useHeaderMeta(profileId: string, enabled: boolean) {
     queryFn: () => getHeaderMeta(profileId),
     enabled,
     staleTime: 5 * 60 * 1000,
+    gcTime: 1000 * 60 * 60 * 24, // ≥ persist maxAge(24h)
     refetchOnWindowFocus: false,
+    meta: { persist: true }, // 准予持久化（spec D-1d）
   });
 }
 

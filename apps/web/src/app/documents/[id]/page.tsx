@@ -8,6 +8,7 @@ import Link from "next/link";
 import { ChevronLeft, Download, FileCheck2, Layers, ListChecks } from "lucide-react";
 import { useProfile } from "@/hooks/useProfiles";
 import { useAutosaveDocument, useDocument, useFinalizeDocument } from "@/hooks/useDocument";
+import { useTaskCatalogs } from "@/hooks/useTaskCatalog";
 import { getDocumentExport } from "@/lib/api";
 import { downloadJson } from "@/lib/download";
 import { JobDocTable, type CellTarget } from "@/components/interview/JobDocTable";
@@ -32,6 +33,10 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
   const doc: OcsDocument | undefined = useMemo(() => ensureIds(envelope?.content), [envelope]);
   const status = envelope?.status ?? "none";
   const hasOccupations = !!doc?.ocs_profile?.ocs_code;
+
+  // 文件載入後背景抓批次 catalog,灌進各任務快取（開填格/級別下拉 0 等待；ADR 0016）。
+  const taskCount = doc?.ocs_content?.ocu_units?.reduce((n, u) => n + (u.tasks?.length ?? 0), 0) ?? 0;
+  useTaskCatalogs(id, taskCount > 0);
 
   const { status: saveStatus, commit, flush } = useAutosaveDocument(id);
   const finalize = useFinalizeDocument(id);

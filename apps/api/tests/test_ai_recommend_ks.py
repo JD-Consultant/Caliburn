@@ -165,7 +165,8 @@ async def test_recommend_ks_indexer_down_returns_empty(client):
     app.dependency_overrides[get_llm] = lambda: None
     r = await client.post("/api/v1/ai/recommend-ks", json={"profile_id": str(p.id), "task_key": "T1.1"})
     assert r.status_code == 200, r.text
-    assert r.json() == {"knowledge": [], "skills": []}
+    # recommend-ks 一律回 competency_level（indexer 掛時為 None）。
+    assert r.json() == {"knowledge": [], "skills": [], "competency_level": None}
 
 
 @pytest.mark.asyncio

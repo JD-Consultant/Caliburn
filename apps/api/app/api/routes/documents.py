@@ -17,6 +17,8 @@ from app.core.domain import header_meta, ocs_doc
 from app.core.ports import KnowledgeClient
 from app.adapters.knowledge_http import HttpIndexerClient
 from app.adapters.persistence import DocRepo, ProfileRepo
+from app.services.ai import tasks as ai_tasks
+from app.services.knowledge.task_detail import task_competencies
 
 logger = logging.getLogger("caliburn")
 
@@ -304,3 +306,39 @@ async def get_ksa_pool(
     except Exception:
         logger.warning("ksa-pool indexer query failed; returning empty pool", exc_info=True)
         return empty
+
+
+@router.get("/{profile_id}/task-catalogs")
+async def task_catalogs(
+    profile_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    knowledge: KnowledgeClient = Depends(get_knowledge),
+):
+    """批次:文件每任務的官方 catalog（K/S/O/P + level），每個不同 ocs_code 只撈一次池。
+    唯讀、note-less、不跑 LLM（ADR 0016）。indexer 某 code 掛 → 略過該 code 的任務（降級）。"""
+    await _require_profile(profile_id, db)
+    latest = await DocRepo(db).latest(profile_id)
+    content = (latest or {}).get("content") or {}
+    triples: list[tuple[str, str, str]] = []  # (task_key, ocs_code, task_code)
+    for unit in (content.get("ocs_content") or {}).get("ocu_units") or []:
+        for task in unit.get("tasks") or []:
+            tcs = task.get("task_codes") or []
+            tk = tcs[0].get("code") if tcs and isinstance(tcs[0], dict) else ""
+            ref = ai_tasks.catalog_ref(task)
+            if tk and ref["ocs_code"] and ref["task_code"]:
+                triples.append((tk, ref["ocs_code"], ref["task_code"]))
+    pools: dict[str, object | None] = {}
+    for _, ocs_code, _ in triples:
+        if ocs_code not in pools:
+            try:
+                pools[ocs_code] = await knowledge.competencies(ocs_code)
+            except Exception:
+                logger.warning("task-catalogs: competencies(%s) failed; skipping", ocs_code, exc_info=True)
+                pools[ocs_code] = None
+    catalogs: dict[str, dict] = {}
+    for tk, ocs_code, task_code in triples:
+        pool = pools.get(ocs_code)
+        if pool is None:
+            continue
+        catalogs[tk] = task_competencies(pool, task_code)
+    return {"catalogs": catalogs}

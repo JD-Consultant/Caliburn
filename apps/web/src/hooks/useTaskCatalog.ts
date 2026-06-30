@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { draftOP, getTaskCatalogs, recommendKS } from "@/lib/api";
 import type { OptionItem, TaskCatalogEntry } from "@/types";
 
-// 共用形狀:一份 per-task catalog（含 level）。O/P 暫不帶 code（階段2b 才消費）。
+// 共用形狀:一份 per-task catalog（含 level）。四種項目皆帶來源 code（2b provenance）。
 export interface TaskCatalogData {
   knowledge: OptionItem[];
   skills: OptionItem[];
@@ -24,19 +24,19 @@ async function fetchTaskCatalog(profileId: string, taskKey: string): Promise<Tas
   return {
     knowledge: ks.knowledge.map((k) => ({ code: k.code, name: k.name })),
     skills: ks.skills.map((s) => ({ code: s.code, name: s.name })),
-    outputs: op.outputs.map((o) => ({ code: "", name: o.name })),
-    indicators: op.indicators.map((i) => ({ code: "", text: i.text })),
+    outputs: op.outputs.map((o) => ({ code: o.code, name: o.name })),
+    indicators: op.indicators.map((i) => ({ code: i.code, text: i.text })),
     competency_level: ks.competency_level ?? null,
   };
 }
 
-// 批次回應 → 共用形狀（O/P 仍映 code:""，保留現行勾選判定行為）。
+// 批次回應 → 共用形狀（四種皆保留來源 code）。
 function fromEntry(e: TaskCatalogEntry): TaskCatalogData {
   return {
     knowledge: e.knowledge.map((k) => ({ code: k.code, name: k.name })),
     skills: e.skills.map((s) => ({ code: s.code, name: s.name })),
-    outputs: e.outputs.map((o) => ({ code: "", name: o.name })),
-    indicators: e.indicators.map((i) => ({ code: "", text: i.text })),
+    outputs: e.outputs.map((o) => ({ code: o.code, name: o.name })),
+    indicators: e.indicators.map((i) => ({ code: i.code, text: i.text })),
     competency_level: e.competency_level ?? null,
   };
 }

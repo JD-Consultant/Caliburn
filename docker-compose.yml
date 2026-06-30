@@ -1,11 +1,11 @@
-# Local infra for Caliburn dev: Postgres (pgvector) + Qdrant.
+# Local infra for Caliburn dev: Postgres + Qdrant.
 # Apps run on the host (api via apps/api/run_live.py:8001, web via next dev:3000,
 # indexer via `uv run jd-ocs-indexer serve`:8000) — only stateful infra is dockerized.
 # (Compose v2 ignores the legacy `version:` key, so it is omitted.)
 
 services:
   db:
-    image: pgvector/pgvector:pg16
+    image: postgres:16                     # stock Postgres；無 in-DB 向量（檢索走 Qdrant，ADR 0014 / D5）
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password

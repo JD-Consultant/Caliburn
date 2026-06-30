@@ -22,6 +22,7 @@ ADR 是「為什麼」層;搭配 `../specs/`(細節設計)與 `../runbook.md`(�
 | [0011](0011-web-ocs-types-generated.md) | 契約 #3 Part A：web 改吃 ocs-contract 生成的 TS 型別 | Accepted（契約 #3 Part A 已實作） |
 | [0012](0012-embedding-as-a-service.md) | 嵌入服務化：自建 BGE-M3 容器（保留 dense+sparse、torch 移出 app） | Accepted |
 | [0013](0013-naming-cleanup-caliburn.md) | 命名整理：web 改 Caliburn、內部去版號（graph_v3→authoring、/v3→/documents）、容器/DB 去 jobintel | Accepted |
+| [0014](0014-db-image-stock-postgres.md) | DB image 降回 stock `postgres:16`（移除未使用的 pgvector；D5 後檢索走 Qdrant） | Accepted |
 
 完整脈絡見 [`../specs/2026-06-27-system-architecture-design.md`](../specs/2026-06-27-system-architecture-design.md)。
 契約怎麼選/怎麼交付的規範見 [`../contract-strategy.md`](../contract-strategy.md)（ADR 0004/0010 的一般化、預答契約 #3）。

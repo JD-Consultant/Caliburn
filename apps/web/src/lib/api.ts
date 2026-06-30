@@ -14,6 +14,7 @@ import type {
   RecommendKsResult,
   StructureTaskResult,
   TaskCandidates,
+  TaskCatalogs,
   User,
 } from "@/types";
 
@@ -88,6 +89,10 @@ export const finalizeDocument = (profileId: string) =>
 // 唯讀匯出：乾淨合法的 OCS JSON（不寫 DB）。
 export const getDocumentExport = (profileId: string) =>
   request<OcsDocument>(`/job-profiles/${profileId}/document/export`);
+
+// 批次:文件所有任務的官方 catalog（每 ocs_code 撈一次池；ADR 0016）。
+export const getTaskCatalogs = (profileId: string) =>
+  request<TaskCatalogs>(`/job-profiles/${profileId}/task-catalogs`);
 
 // 選職類：設定 selected_ocs_codes（順序=優先度）。
 export const setOccupations = (profileId: string, ocsCodes: string[]) =>

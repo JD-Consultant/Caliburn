@@ -266,3 +266,15 @@ export interface OptionItem {
   sources?: string[];      // 既有：ocs_code 清單（向後相容）
   srcs?: SourceRef[];      // 新：完整來源（選單顯示用；首個 + 其餘）
 }
+
+// 批次 task-catalogs（階段1）：每任務官方 catalog（K/S/O/P + level）。
+export interface TaskCatalogEntry {
+  knowledge: { code: string; name: string }[];
+  skills: { code: string; name: string }[];
+  outputs: { code: string; name: string }[];
+  indicators: { code: string; text: string }[];
+  competency_level: number | null;
+}
+export interface TaskCatalogs {
+  catalogs: Record<string, TaskCatalogEntry>; // 鍵 = 文件任務碼（如 T1.1）
+}

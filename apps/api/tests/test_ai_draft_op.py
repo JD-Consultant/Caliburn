@@ -103,6 +103,8 @@ async def test_draft_op_no_note_returns_full_catalog(client):
     body = r.json()
     assert [o["name"] for o in body["outputs"]] == ["月報表", "分析摘要"]
     assert [i["text"] for i in body["indicators"]] == ["蒐集資料並彙整", "撰寫分析報告"]
+    assert [o["code"] for o in body["outputs"]] == ["O01", "O02"]
+    assert [i["code"] for i in body["indicators"]] == ["P01", "P02"]
     assert all(o["source"] == "catalog" for o in body["outputs"])
     assert all(i["source"] == "catalog" for i in body["indicators"])
 
@@ -123,6 +125,8 @@ async def test_draft_op_with_note_returns_ai_drafts(client):
     body = r.json()
     assert [o["name"] for o in body["outputs"]] == ["客製產出"]
     assert [i["text"] for i in body["indicators"]] == ["客製指標"]
+    assert all(o["code"] == "" for o in body["outputs"])  # AI 產出無來源碼
+    assert all(i["code"] == "" for i in body["indicators"])
     assert all(o["source"] == "ai" for o in body["outputs"])
     assert all(i["source"] == "ai" for i in body["indicators"])
 

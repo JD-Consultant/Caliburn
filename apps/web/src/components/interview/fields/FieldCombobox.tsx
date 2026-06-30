@@ -36,14 +36,21 @@ export function FieldCombobox({
   const [query, setQuery] = useState("");
   const sourcesOf = (k: string) => options.find((o) => keyOf(o) === k)?.sources ?? [];
 
-  // 勾選判定：用「官方來源 + 名稱」比對（code 已是位置序碼、與選單官方碼不同步）。
-  // 改過內容的項目 _src 變 custom → 自動視為未勾選；自訂項不勾任何官方。
-  const isOfficialSelected = (o: { name: string }) =>
-    value.some((v) => v._src === "official" && v.name === o.name);
+  // 勾選判定(DDD 實體 vs 值物件)：選項有來源身分(code)→ 比 provenance(ocs_code+code)；
+  // 無 code(值物件，如說明事項)→ 比 name。改過內容的項目 _src 變 custom → 自動視為未勾選。
+  const officialMatch = (v: Item, o: OptionItem) => {
+    const srcCode = o.srcs?.[0]?.code ?? o.code ?? "";
+    if (srcCode) {
+      return v._ref?.code === srcCode && (v._ref?.ocs_code ?? "") === (o.srcs?.[0]?.ocs_code ?? "");
+    }
+    return v.name === o.name;
+  };
+  const isOfficialSelected = (o: OptionItem) =>
+    value.some((v) => v._src === "official" && officialMatch(v, o));
 
   const toggle = (opt: OptionItem) => {
     if (isOfficialSelected(opt)) {
-      onCommit(value.filter((v) => !(v._src === "official" && v.name === opt.name)));
+      onCommit(value.filter((v) => !(v._src === "official" && officialMatch(v, opt))));
       return;
     }
     const ref: SourceRef = opt.srcs?.[0] ?? { ocs_code: "", occupation_name: "", code: opt.code };
@@ -73,7 +80,7 @@ export function FieldCombobox({
   const selectAllOfficial = () => {
     const next = [...value];
     for (const o of options) {
-      if (next.some((v) => v._src === "official" && v.name === o.name)) continue; // 已選官方→跳過
+      if (next.some((v) => v._src === "official" && officialMatch(v, o))) continue; // 已選官方→跳過
       const ref: SourceRef = o.srcs?.[0] ?? { ocs_code: "", occupation_name: "", code: o.code };
       next.push({ code: o.code, name: o.name, _id: newId(), _src: "official", _ref: ref });
     }

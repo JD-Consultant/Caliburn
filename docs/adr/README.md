@@ -23,6 +23,8 @@ ADR 是「為什麼」層;搭配 `../specs/`(細節設計)與 `../runbook.md`(�
 | [0012](0012-embedding-as-a-service.md) | 嵌入服務化：自建 BGE-M3 容器（保留 dense+sparse、torch 移出 app） | Accepted |
 | [0013](0013-naming-cleanup-caliburn.md) | 命名整理：web 改 Caliburn、內部去版號（graph_v3→authoring、/v3→/documents）、容器/DB 去 jobintel | Accepted |
 | [0014](0014-db-image-stock-postgres.md) | DB image 降回 stock `postgres:16`（移除未使用的 pgvector；D5 後檢索走 Qdrant） | Accepted |
+| [0015](0015-document-save-optimistic-concurrency.md) | 文件存檔採樂觀並發（version 守衛）；回合制協作不上 CRDT/OT；minimal 先、逐操作 full 延後 | Accepted |
+| [0016](0016-batch-task-catalog-endpoint.md) | 後端批次 task-catalog 端點（每 ocs_code 撈一次池）；前端 setQueryData 灌快取 | Accepted |
 
 完整脈絡見 [`../specs/2026-06-27-system-architecture-design.md`](../specs/2026-06-27-system-architecture-design.md)。
 契約怎麼選/怎麼交付的規範見 [`../contract-strategy.md`](../contract-strategy.md)（ADR 0004/0010 的一般化、預答契約 #3）。

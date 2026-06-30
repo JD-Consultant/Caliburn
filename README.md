@@ -32,7 +32,7 @@ npm run down    # 停 docker infra（named volume 資料保留）
 | **web** | http://localhost:3000 | Next.js 前端（著作工作台,入口 `/dashboard` → `/documents/[id]`) |
 | **api** | http://localhost:8001 | FastAPI + LangGraph 後端（健康檢查 `/healthz`） |
 | **ocs-indexer** | http://localhost:8000 | Qdrant 知識/查詢服務 |
-| **db** | localhost:5432 | Postgres（pgvector;容器 `caliburn-db-1`） |
+| **db** | localhost:5432 | Postgres（業務表;無 in-DB 向量,檢索走 Qdrant;容器 `caliburn-db-1`） |
 | **qdrant** | localhost:6333 | 向量庫（容器 `caliburn-qdrant-1`） |
 | **embedder** | http://localhost:8082 | BGE-M3 GPU 容器（dense+sparse;`caliburn-embedder-1`） |
 

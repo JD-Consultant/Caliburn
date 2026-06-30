@@ -49,7 +49,9 @@ export function useTaskCatalogs(profileId: string, enabled: boolean) {
     queryFn: () => getTaskCatalogs(profileId),
     enabled,
     staleTime: STALE,
+    gcTime: 1000 * 60 * 60 * 24, // ≥ persist maxAge(24h)，否則被 GC 早於還原期限
     refetchOnWindowFocus: false,
+    meta: { persist: true }, // 准予持久化（spec D-1d）；重載自 localStorage 還原後 seed 各任務
   });
   useEffect(() => {
     if (!q.data) return;

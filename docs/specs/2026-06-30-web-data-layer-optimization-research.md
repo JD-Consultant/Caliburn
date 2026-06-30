@@ -45,7 +45,13 @@
 - **D-1a 後端批次 catalog 端點**:新增端點(如 `GET /job-profiles/{id}/task-catalogs`),每個**不同 `ocs_code` 撈一次池**、切出**該文件所有任務**的 `{task_key → {knowledge,skills,outputs,indicators,competency_level}}`,一次回。→ N×2 整池重撈壓到「不同 ocs_code 數」次。
 - **D-1b 前端 seed**:用 `setQueryData` 把批次結果灌進各 `["task-catalog", profileId, taskKey]`;開填格 0 等待、不發請求(TkDodo push)。
 - **D-1c 合併重複 `recommendKS`**:`useTaskLevel` 不自抓,改 `select` 從同一份 catalog 衍生 `competency_level`。
-- **D-1d 持久化**:`createPersister` 只持久化「確定性、貴」的 query(`task-catalog`、`header-meta`),**不**持久化 `document`(of-record、要即時);`buster` 綁 ocs-contract 版本。
+- **D-1d 持久化**(2026-06-30 修正:改採**穩定版** API,非 experimental):用 `PersistQueryClientProvider`
+  + `createSyncStoragePersister`(localStorage),以 `dehydrateOptions.shouldDehydrateQuery` +
+  query `meta:{persist:true}` **選擇性**只持久化「確定性、貴」的 query(`task-catalog`/`task-catalogs`、
+  `header-meta`),**不**持久化 `document`(of-record、要即時);`maxAge`(預設 24h)+ `buster`(綁 schema 版本);
+  被持久化的 query `gcTime ≥ maxAge`。
+  > 原本選 `experimental_createQueryPersister`(per-query),但其 API 掛 `experimental_`、無 mutation 支援;
+  > 為求主流穩定改用 `persistQueryClient` 家族(v5 已穩定、~170 萬週下載)。階段 1b plan 詳述。
 
 ---
 

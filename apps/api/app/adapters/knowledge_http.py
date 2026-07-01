@@ -21,12 +21,12 @@ class HttpIndexerClient:
         await self._client.aclose()
 
     async def search_occupations(self, query: str, *, top_k: int = 10) -> OccupationSearchResponse:
-        resp = await self._client.post("/occupations/search", json={"query": query, "top_k": top_k})
+        resp = await self._client.post("/occupations:search", json={"query": query, "top_k": top_k})
         resp.raise_for_status()
         return OccupationSearchResponse.model_validate(resp.json())
 
     async def search_tasks(self, query: str, *, top_k: int = 10) -> TaskSearchResponse:
-        resp = await self._client.post("/tasks/search", json={"query": query, "top_k": top_k})
+        resp = await self._client.post("/tasks:search", json={"query": query, "top_k": top_k})
         resp.raise_for_status()
         return TaskSearchResponse.model_validate(resp.json())
 

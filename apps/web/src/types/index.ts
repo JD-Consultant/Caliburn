@@ -257,11 +257,6 @@ export interface StructureTaskResult {
   unit_suggestion: string;
 }
 
-// clarify：太薄時回一個追問；否則 null。
-export interface ClarifyResult {
-  question: string | null;
-}
-
 export interface OptionItem {
   code: string;
   name: string;

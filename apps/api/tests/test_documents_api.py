@@ -298,6 +298,7 @@ async def test_header_meta_aggregates_multi_ocs(client):
     assert body["industries"][0]["sources"] == ["OC1", "OC2"]
     assert [x["code"] for x in body["job_categories"]] == ["BHR"]
     assert [o["ocs_code"] for o in body["primary_options"]] == ["OC1", "OC2"]
+    assert body["meta"]["partial"] is False  # 全成功，非降級（ADR 0018）
 
 
 @pytest.mark.asyncio
@@ -312,6 +313,7 @@ async def test_header_meta_skips_failed_code(client):
     r = await client.get(f"/api/v1/job-profiles/{p.id}/header-meta")
     assert r.status_code == 200, r.text  # degrades, no crash
     assert r.json()["industries"] == []
+    assert r.json()["meta"]["partial"] is True  # 降級標記（ADR 0018）
 
 
 @pytest.mark.asyncio

@@ -159,7 +159,8 @@ async def task_candidates(
     db: AsyncSession = Depends(get_db),
     knowledge: KnowledgeClient = Depends(get_knowledge),
 ):
-    """選任務候選：已選職類的所有任務，依職類→職責(unit)分組（含來源），供勾選。"""
+    """選任務候選：已選職類的所有任務，依職類→職責(unit)分組（含來源），供勾選。
+    **critical 端點**（ADR 0018）：沒有候選清單就選不了任務，主流程斷 → indexer 掛回 502 快錯。"""
     profile = await _require_profile(profile_id, db)
     codes = profile.selected_ocs_codes or []
     if not codes:
@@ -229,7 +230,8 @@ async def ocs_search(
     db: AsyncSession = Depends(get_db),
     knowledge: KnowledgeClient = Depends(get_knowledge),
 ):
-    """職類層搜尋（seed 用）：回 [{ocs_code, ocs_name}]，依 ocs_code 去重保序。"""
+    """職類層搜尋（seed 用）：回 [{ocs_code, ocs_name}]，依 ocs_code 去重保序。
+    **critical 端點**（ADR 0018）：空搜尋結果會被誤解成「查無此職類」→ indexer 掛回 502 快錯。"""
     await _require_profile(profile_id, db)
     if not q.strip():
         return {"hits": []}
@@ -253,16 +255,22 @@ async def get_header_meta(
 ):
     """表頭候選池（D29）：逐已選職類取官方 metadata，聯集去重成所屬職類/職業/行業 +
     態度 + notes 候選，並回主基準單值（預設第一順位）。唯讀、不寫文件——前端勾選後
-    自行 PATCH 寫入，故重選職類不會洗掉使用者編輯。indexer 掛或某 code 失敗則略過該 code。"""
+    自行 PATCH 寫入，故重選職類不會洗掉使用者編輯。
+    **enrichment 端點**（ADR 0018）：indexer 掛/某 code 失敗則略過該 code 並回
+    ``meta.partial=true``（缺了仍可手動編輯，不快錯）。"""
     profile = await _require_profile(profile_id, db)
     codes = profile.selected_ocs_codes or []
     metas = []
+    partial = False
     for code in codes:
         try:
             metas.append(await knowledge.occupation(code))
         except Exception:
+            partial = True
             logger.warning("header-meta: occupation(%s) failed; skipping", code, exc_info=True)
-    return header_meta.aggregate(metas, primary_code=codes[0] if codes else "")
+    result = header_meta.aggregate(metas, primary_code=codes[0] if codes else "")
+    result["meta"] = {"partial": partial}
+    return result
 
 
 @router.get("/{profile_id}/task-catalogs")
@@ -272,7 +280,9 @@ async def task_catalogs(
     knowledge: KnowledgeClient = Depends(get_knowledge),
 ):
     """批次:文件每任務的官方 catalog（K/S/O/P + level），每個不同 ocs_code 只撈一次池。
-    唯讀、note-less、不跑 LLM（ADR 0016）。indexer 某 code 掛 → 略過該 code 的任務（降級）。"""
+    唯讀、note-less、不跑 LLM（ADR 0016）。
+    **enrichment 端點**（ADR 0018）：indexer 某 code 掛 → 略過該 code 的任務並回
+    ``meta.partial=true``（缺了仍可手動編輯，不快錯）。"""
     await _require_profile(profile_id, db)
     latest = await DocRepo(db).latest(profile_id)
     content = (latest or {}).get("content") or {}
@@ -298,4 +308,5 @@ async def task_catalogs(
         if pool is None:
             continue
         catalogs[tk] = task_competencies(pool, task_code)
-    return {"catalogs": catalogs}
+    partial = any(pool is None for pool in pools.values())
+    return {"catalogs": catalogs, "meta": {"partial": partial}}

@@ -1,6 +1,6 @@
 """Production CopilotKit app：live deps + AsyncPostgresSaver（D15/D17）。
-跑：uvicorn app.copilotkit_live_app:app --port 8000
-demo（無依賴）仍在 app.copilotkit_app。"""
+跑：run_live.py（:8001）。REST wiring 走 app_factory.configure；本模組只加
+需要 DB 的部分（PG checkpointer + /copilotkit）。tests/docker 用 app.main（ADR 0017）。"""
 # Windows: psycopg async（AsyncPostgresSaver checkpointer）需 SelectorEventLoop，
 # 不可用預設 ProactorEventLoop。在「模組 import 時」設好 loop policy，這樣不論
 # 經由 run_live.py 或 uvicorn --reload 的 worker 子進程（會 import 本模組）都生效。

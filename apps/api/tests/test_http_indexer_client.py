@@ -14,7 +14,7 @@ def client():
 
 @respx.mock
 async def test_search_occupations_calls_endpoint(client):
-    route = respx.post(f"{BASE}/occupations/search").mock(return_value=httpx.Response(
+    route = respx.post(f"{BASE}/occupations:search").mock(return_value=httpx.Response(
         200, json={"hits": [{"ocs_code": "OC1", "urn": "ocs:OC1", "ocs_name": "JT",
                              "job_description": "d", "ocs_level": 4, "score": 0.8}]}))
     r = await client.search_occupations("hello", top_k=5)
@@ -23,7 +23,7 @@ async def test_search_occupations_calls_endpoint(client):
 
 @respx.mock
 async def test_search_tasks_calls_endpoint(client):
-    route = respx.post(f"{BASE}/tasks/search").mock(return_value=httpx.Response(
+    route = respx.post(f"{BASE}/tasks:search").mock(return_value=httpx.Response(
         200, json={"hits": [{"ocs_code": "OC1", "ocs_name": "JT", "ocu_code": "U1",
                              "ocu_name": "單元一", "task_code": "T1.1", "task_name": "任務一",
                              "urn": "ocs:OC1:T:T1.1", "score": 0.9}]}))

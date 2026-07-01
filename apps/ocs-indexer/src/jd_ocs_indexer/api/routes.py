@@ -26,7 +26,7 @@ from jd_ocs_indexer.api.schemas import (
 router = APIRouter()
 
 
-@router.post("/occupations/search", response_model=OccupationSearchResponse)
+@router.post("/occupations:search", response_model=OccupationSearchResponse)
 async def search_occupations(req: SearchRequest, request: Request):
     app = request.app
     def _run():
@@ -37,7 +37,7 @@ async def search_occupations(req: SearchRequest, request: Request):
     return await run_in_threadpool(_run)
 
 
-@router.post("/tasks/search", response_model=TaskSearchResponse)
+@router.post("/tasks:search", response_model=TaskSearchResponse)
 async def search_tasks(req: SearchRequest, request: Request):
     app = request.app
     def _run():
@@ -48,7 +48,10 @@ async def search_tasks(req: SearchRequest, request: Request):
     return await run_in_threadpool(_run)
 
 
-@router.post("/tasks/batchGet", response_model=TasksResponse)
+# AIP-136 custom method (`:verb`). 刻意偏離嚴格 AIP-231:POST body {ids}
+# (URN 長且可多 — AIP-136 的 URL 上限例外)、缺失 id 靜默略過(producer
+# 去重流程需要容忍)。ADR 0019。
+@router.post("/tasks:batchGet", response_model=TasksResponse)
 async def batch_get_tasks(req: TaskBatchGetRequest, request: Request):
     app = request.app
     return await run_in_threadpool(
@@ -56,7 +59,7 @@ async def batch_get_tasks(req: TaskBatchGetRequest, request: Request):
         app.state.settings.qdrant_collection, ids=req.ids)
 
 
-@router.post("/tasks/findSimilar", response_model=FindSimilarResponse)
+@router.post("/tasks:findSimilar", response_model=FindSimilarResponse)
 async def find_similar_tasks(req: FindSimilarRequest, request: Request):
     app = request.app
     return await run_in_threadpool(

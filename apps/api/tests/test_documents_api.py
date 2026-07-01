@@ -1,4 +1,4 @@
-"""REST document endpoints (D27 T3): GET/PATCH/finalize + ksa-pool + list doc_status.
+"""REST document endpoints (D27 T3): GET/PATCH/finalize + task-candidates + list doc_status.
 
 Transaction isolation: override get_db to yield the test's transaction-bound
 db_session WITHOUT committing, so every ASGI request shares one rolled-back tx.
@@ -15,7 +15,6 @@ from app.main import app
 from app.models import JobProfile, User
 from app.core.domain import ocs_doc
 from app.core.knowledge_dto import (
-    CitableItem,
     CodeName,
     CompetencyPool,
     OccupationDetail,
@@ -23,7 +22,6 @@ from app.core.knowledge_dto import (
     OccupationSearchResponse,
     OccupationTasks,
     OcsName,
-    SourceRef,
     TaskRef,
     UnitTasks,
 )
@@ -237,32 +235,6 @@ async def test_export_no_document_returns_400(client):
 
 
 @pytest.mark.asyncio
-async def test_ksa_pool_happy(client):
-    p = await _mk_profile(client._db, codes=["OC1"])
-    app.dependency_overrides[get_knowledge] = lambda: StubKnowledge(
-        comp_map={
-            "OC1": CompetencyPool(
-                ocs_code="OC1",
-                knowledge=[CitableItem(code="K01", name="a",
-                                       sources=[SourceRef(task_code="T1.1")])],
-                skills=[CitableItem(code="S01", name="b",
-                                    sources=[SourceRef(task_code="T1.2")])],
-                attitudes=[CitableItem(code="A01", name="c", sources=[])],
-            )
-        }
-    )
-    r = await client.get(f"/api/v1/job-profiles/{p.id}/ksa-pool")
-    assert r.status_code == 200, r.text
-    body = r.json()
-    assert body["knowledge"][0]["code"] == "K01"
-    assert body["knowledge"][0]["sources"] == ["T1.1"]
-    assert body["skills"][0]["code"] == "S01"
-    assert body["skills"][0]["sources"] == ["T1.2"]
-    assert body["attitudes"][0]["code"] == "A01"
-    assert body["attitudes"][0]["sources"] == []
-
-
-@pytest.mark.asyncio
 async def test_ocs_search_dedupes_by_code(client):
     p = await _mk_profile(client._db)
     app.dependency_overrides[get_knowledge] = lambda: StubKnowledge(
@@ -296,18 +268,6 @@ async def test_ocs_search_indexer_down_502(client):
     app.dependency_overrides[get_knowledge] = lambda: StubKnowledge(fail=True)
     r = await client.get(f"/api/v1/job-profiles/{p.id}/ocs-search?q=AIoT")
     assert r.status_code == 502, r.text
-
-
-@pytest.mark.asyncio
-async def test_ksa_pool_indexer_down(client):
-    p = await _mk_profile(client._db, codes=["OC1"])
-    app.dependency_overrides[get_knowledge] = lambda: StubKnowledge(fail=True)
-    r = await client.get(f"/api/v1/job-profiles/{p.id}/ksa-pool")
-    assert r.status_code == 200, r.text
-    body = r.json()
-    assert body["knowledge"] == []
-    assert body["skills"] == []
-    assert body["attitudes"] == []
 
 
 @pytest.mark.asyncio

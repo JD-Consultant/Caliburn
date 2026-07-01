@@ -45,7 +45,7 @@ app.add_middleware(
 )
 
 # CRUD（dashboard/新增職務用）+ D27 文件即工作台 REST（documents：
-# GET/PATCH/finalize/seed/ksa-pool）。documents 為 D27 重寫版（非舊 graph_state 路由）。
+# GET/PATCH/finalize/task-candidates/task-catalogs）。documents 為 D27 重寫版（非舊 graph_state 路由）。
 app.include_router(users.router, prefix="/api/v1")
 app.include_router(job_profiles.router, prefix="/api/v1")
 app.include_router(documents.router, prefix="/api/v1")

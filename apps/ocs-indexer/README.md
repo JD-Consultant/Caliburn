@@ -180,109 +180,40 @@ uv run jd-ocs-indexer serve --host 127.0.0.1 --port 8000
 
 ## Query API（給 jobintel-ai）
 
-Qdrant 之上的 **無狀態 HTTP read 層**。查詢文字在 **server 端用 BGE-M3 embed**，caller 只送純文字。不做對話 / LLM / state。
+Qdrant 之上的 **無狀態 HTTP read 層**。查詢文字在 **server 端 embed**（走 `apps/embedder` GPU 容器，ADR 0012），caller 只送純文字。不做對話 / LLM / state。
 
-- 啟動時 lifespan **載入一次 BGE-M3** 並連 Qdrant，單一 worker。
 - 預設綁 `127.0.0.1`（loopback、**無 auth**；對外請加反向代理 / middleware，`create_app()` 是擴充點）。
 - 互動式 OpenAPI：`http://127.0.0.1:8000/docs`。
+- **request/response schema 的權威 = [`packages/indexer-contract`](../../packages/indexer-contract/)**（共用 pydantic，ADR 0010）；本表只列面。
+- 自訂方法用 **AIP-136 `:verb`**（ADR 0019）；資源讀取用資源式 GET。
 
 | Method | Path | 用途 |
 |---|---|---|
-| POST | `/search` | 自然語言 → profile / task hits（server 端 embed） |
-| POST | `/task-pool` | 合併多 OCS 的 unit→task 選單 |
-| POST | `/tasks/by-id` | 用 point id 批次取回完整 task（K/S/output + 活動 + level） |
-| GET | `/profile/{ocs_code}/pairs` | 該 OCS 的 K/S/A/output 詞彙池 + 建議條件/補充 |
-| GET | `/healthz` | 模型 + Qdrant 就緒狀態 |
-| GET | `/stats` | collection 各層點數 |
-
-### `POST /search`
-
-Request：`{ "query": str, "level": "profile"|"task"|null, "hybrid": bool=true, "top_k": int=10, "filters": { "ocs_code"?: str, "is_current"?: bool } }`
-
-Response：`{ "mode": "hybrid"|"dense", "level": <level>, "hits": [Hit, …] }`。每個 `Hit` 帶 Qdrant **point id** + payload 投影：
-
-```jsonc
-{
-  "id": "f1e2…",                  // Qdrant point id（供 by-id 取回）
-  "chunk_level": "task",          // profile | task
-  "ocs_code": "SMS2521-001v3", "score": 0.83,
-  // profile 命中才有：
-  "job_title": "...", "job_description": "...", "version": "v3",
-  "is_current": true, "ocs_level": 5, "industry_names": [...], "occupation_names": [...],
-  // task 命中才有：
-  "unit_id": "U1", "unit_title": "...", "task_id": "T1.1", "task_title": "...",
-  "competency_level": 3, "activity_examples": ["..."],
-  "k_pairs": [{"code":"K01","name":"..."}], "s_pairs": [...], "output_pairs": [...],
-  "source_file": "jd-ocs/.../SMS2521-001v3.json"
-}
-```
+| POST | `/occupations:search` | 自然語言 → 職類 hits（`{query, top_k}` → `{hits:[OccupationHit]}`） |
+| POST | `/tasks:search` | 自然語言 → 任務 hits（只回身分 + score） |
+| POST | `/tasks:batchGet` | point id 批次取回任務細節（`{ids}` → `{tasks:[TaskDetail]}`;缺失 id 靜默略過 — 刻意偏離 AIP-231，見 ADR 0019） |
+| POST | `/tasks:findSimilar` | 去重候選對（`{ocs_codes, score_threshold}`;producer 流程用） |
+| GET | `/occupations/{ocs_code}` | 職類官方 metadata（名稱/行業/態度/建議條件…） |
+| GET | `/occupations/{ocs_code}/tasks` | 該職類 unit→task 結構 |
+| GET | `/occupations/{ocs_code}/competencies` | 該職類 K/S/O/P/A 能力池（多來源 CitableItem） |
+| GET | `/healthz` | 就緒狀態（degraded 回 503;含 `index_model`） |
+| GET | `/stats` | collection 點數統計 |
 
 ```bash
-# 找候選職務
-curl -s localhost:8000/search -H 'content-type: application/json' \
-  -d '{"query":"資料分析 Python SQL 機器學習","level":"profile","hybrid":true,"top_k":5}'
-# 改過/自訂任務找對應標準任務（拿 K/S）
-curl -s localhost:8000/search -H 'content-type: application/json' \
-  -d '{"query":"LLM 模型微調與部署","level":"task","filters":{"is_current":true}}'
-```
-
-### `POST /task-pool`
-
-給一組 `ocs_codes`，回每個 OCS 的 unit→task 結構（直接從 task points 取，一個 task point = 一筆任務）。
-
-Request：`{ "ocs_codes": [str, …], "activity_examples": int=1 }`
-
-```jsonc
-{ "groups": [ {
-  "ocs_code": "SMS2521-001v3", "job_title": "...",
-  "units": [ { "unit_id": "U1", "unit_title": "...",
-    "tasks": [ {"id": "f1e2…", "task_id": "T1.1", "task_title": "...", "activity_examples": ["..."]} ] } ]
-} ] }
-```
-`groups` 依 request 的 `ocs_codes` 順序；`units` 依 `unit_id`、`tasks` 依 `task_id`。`job_title` 取自 profile。
-
-### `POST /tasks/by-id`
-
-用 `/search` / `/task-pool` 回傳的 point id 批次取回完整 task payload——供「內容沒改的任務」走 by-id 捷徑拿 K/S（含 `/task-pool` 沒帶的 `output_pairs`）。不存在的 id 靜默略過。
-
-Request：`{ "ids": [str, …] }`（≥1）
-
-```jsonc
-{ "tasks": [ {
-  "id": "f1e2…", "ocs_code": "SMS2521-001v3",
-  "unit_id": "U1", "unit_title": "...", "task_id": "T1.1", "task_title": "...",
-  "competency_level": 3, "activity_examples": ["..."],
-  "k_pairs": [{"code":"K01","name":"..."}], "s_pairs": [...], "output_pairs": [...]
-} ] }
-```
-
-### `GET /profile/{ocs_code}/pairs`
-
-該 OCS 全部的 K/S/output 詞彙池（**task points 的聯集，依 code 去重**）+ attitudes / 建議條件 / 補充（取自 profile）。查無 → **404**。
-
-```jsonc
-{ "ocs_code": "SMS2521-001v3", "job_title": "...",
-  "all_k_pairs": [{"code":"K01","name":"..."}], "all_s_pairs": [...],
-  "all_a_pairs": [...], "all_output_pairs": [...],
-  "prerequisites": ["建議學歷/經驗/能力條件…"], "supplements": ["其他補充說明…"] }
-```
-
-### `GET /healthz` ／ `GET /stats`
-
-```bash
+curl -s localhost:8000/occupations:search -H 'content-type: application/json' \
+  -d '{"query":"資料分析 機器學習","top_k":5}'
 curl -s localhost:8000/healthz
-# {"status":"ok","model_loaded":true,"qdrant":"reachable","collection":"ocs_v3"}
-curl -s localhost:8000/stats
-# {"collection":"ocs_v3","total_points":9200,"by_level":{"profile":904,"task":8296}}
+# {"status":"ok","model_loaded":true,"qdrant":"reachable","collection":"ocs_v4","index_model":"bge-m3/BAAI/bge-m3/1024"}
 ```
 
 ### 錯誤碼
 
 | 情境 | HTTP |
 |---|---|
-| request schema 違規（空 `query` / 未知 `level` / `top_k` 超界） | 422 |
-| `/pairs` 未知 `ocs_code` | 404 |
-| Qdrant upstream 回錯 / 連不上 | 502 / 503 |
+| request schema 違規（空 `query` / `top_k` 超界 / 空 `ids`） | 422 |
+| `/occupations/{ocs_code}` 未知 code | 404 |
+| 索引 embedding 版本與查詢端不相容（ADR 0009） | 409 |
+| Qdrant / embedder upstream 回錯、連不上 | 502 / 503 |
 
 ---
 
@@ -313,7 +244,7 @@ src/jd_ocs_indexer/
     search.py             # build_filter + dense / hybrid(RRF)（CLI query + API 共用）
   api/                    # 查詢 API（optional extra：uv sync --extra api）
     schemas.py            # Pydantic request / response
-    service.py            # 無狀態編排：search / task_pool / pairs / stats / health
+    service.py            # 無狀態編排：search / batch_get / find_similar / detail / stats / health
     routes.py             # FastAPI router（threadpool + embed lock + 502/503）
     app.py                # create_app() factory + lifespan
 ```

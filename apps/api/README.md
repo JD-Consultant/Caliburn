@@ -1,6 +1,6 @@
 # api — Caliburn 後端(FastAPI + LangGraph)
 
-「著作」bounded context 的後端。提供 REST `/api/v1/*`(users / job-profiles / documents / ai)與 AG-UI agent 端點 `/copilotkit`。擁有 **Postgres**(使用者文件、LangGraph checkpoints)。透過 HTTP 消費 `ocs-indexer` 取知識。
+「著作」bounded context 的後端。提供 REST `/api/v1/*`(users / job-profiles / documents / **occupations**(根層職類目錄搜尋)/ ai)與 AG-UI agent 端點 `/copilotkit`。自訂方法用 AIP `:verb`(`document:finalize`、`document:buildTasks`,ADR 0019)。擁有 **Postgres**(使用者文件、LangGraph checkpoints)。透過 HTTP 消費 `ocs-indexer` 取知識。
 
 - **import 套件名**:`app`(Phase 3 才改 `caliburn_api`;現由 `pytest.ini` 的 `pythonpath=.` 提供)。
 - **uv application 模式**(無 build-system,見 [ADR 0005](../../docs/adr/0005-per-app-uv-defer-workspace.md))。

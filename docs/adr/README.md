@@ -27,6 +27,7 @@ ADR 是「為什麼」層;搭配 `../specs/`(細節設計)與 `../runbook.md`(�
 | [0016](0016-batch-task-catalog-endpoint.md) | 後端批次 task-catalog 端點（每 ocs_code 撈一次池）；前端 setQueryData 灌快取 | Accepted |
 | [0017](0017-app-entry-single-composition-root.md) | 後端 app 入口收斂:單一組裝點 + `/healthz` 統一 + 移除 demo app（livez/readyz 待容器化） | Accepted |
 | [0018](0018-indexer-dependency-degradation-policy.md) | indexer 依賴降級政策:critical fail-fast vs enrichment 降級 + `meta.partial`（circuit breaker 延後） | Accepted |
+| [0019](0019-api-naming-alignment.md) | API 命名對齊:自訂方法 `:verb`、根層 `GET /occupations?q=`、`PUT occupations`（monorepo 原子改名、偏離 AIP-231/132 白紙黑字） | Accepted |
 
 完整脈絡見 [`../specs/2026-06-27-system-architecture-design.md`](../specs/2026-06-27-system-architecture-design.md)。
 契約怎麼選/怎麼交付的規範見 [`../contract-strategy.md`](../contract-strategy.md)（ADR 0004/0010 的一般化、預答契約 #3）。

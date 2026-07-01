@@ -13,10 +13,9 @@ if sys.platform == "win32":
 from contextlib import AsyncExitStack, asynccontextmanager  # noqa: E402
 
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
 from ag_ui_langgraph import add_langgraph_fastapi_endpoint
 
-from app.api.routes import ai, documents, job_profiles, users
+from app.app_factory import configure
 from app.config import settings
 from app.authoring.checkpointer import open_pg_checkpointer
 from app.authoring.serving import build_live_agent, build_live_deps
@@ -36,22 +35,7 @@ async def lifespan(app: FastAPI):
             await deps.knowledge.aclose()   # 關 httpx client
 
 
-app = FastAPI(title="Caliburn (live)", lifespan=lifespan)
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# CRUD（dashboard/新增職務用）+ D27 文件即工作台 REST（documents：
-# GET/PATCH/finalize/task-candidates/task-catalogs）。documents 為 D27 重寫版（非舊 graph_state 路由）。
-app.include_router(users.router, prefix="/api/v1")
-app.include_router(job_profiles.router, prefix="/api/v1")
-app.include_router(documents.router, prefix="/api/v1")
-app.include_router(ai.router, prefix="/api/v1")
-
-
-@app.get("/healthz")
-def healthz():
-    return {"status": "ok"}
+# Production entry. REST wiring (routers + CORS + /healthz) comes from the single
+# composition root; this module only adds what needs the DB: the PG checkpointer
+# and the /copilotkit AG-UI endpoint (mounted in lifespan above). (ADR 0017)
+app = configure(FastAPI(title="Caliburn (live)", lifespan=lifespan))

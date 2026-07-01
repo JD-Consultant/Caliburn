@@ -19,7 +19,7 @@ docker compose up -d db                       # 1. DB(等 healthy)
 cd apps/ocs-indexer && uv run jd-ocs-indexer serve --port 8000 &   # 2. indexer(冷啟載 BGE-M3 ~3s;要知識查詢才需要)
 cd /s/caliburn && npx turbo dev               # 3. api(:8001) + web(:3000)
 ```
-驗:`curl 127.0.0.1:8001/healthz`(api 活的 live app 是 `/healthz`,**不是** `/health`)、瀏覽器開 `localhost:3000`。
+驗:`curl 127.0.0.1:8001/healthz`(api 統一 `/healthz`,含 DB readiness;ADR 0017)、瀏覽器開 `localhost:3000`。
 
 ## 停 / 重啟
 

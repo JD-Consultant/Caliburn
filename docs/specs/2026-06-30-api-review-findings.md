@@ -158,6 +158,17 @@
 
 ---
 
+## F8 — 新增 / 刪除端點盤點(已與維護者拍板)
+
+**刪除(已查證無其他消費者,維護者核准刪)**:
+- **`GET /job-profiles/{id}/ksa-pool`**(REST 端點,[documents.py:267](../../apps/api/app/api/routes/documents.py))——web **零引用**,功能已被 `task-catalogs`(逐任務)+ `header-meta` 取代(呼應 F7)。連同其測試(`test_ksa_pool_happy`/`test_ksa_pool_indexer_down`)一併刪。
+  > 保留 `fetch_ksa_pool`(`app/authoring/curate_nodes.py` 的 **LangGraph 節點**,autopilot 流程用)——與 REST 端點是**不同東西**,仍活著。
+- **前端 `clarify` wrapper**([api.ts:157](../../apps/web/src/lib/api.ts))+ 孤兒型別 `ClarifyResult`——phase 0 刪 `AiTaskPanel` 後無元件呼叫。**後端 `/ai/clarify` 端點保留**(未來自主 agent 用,有測試)。
+
+**暫緩評估**:`copilotkit_app.py`(第三個「無依賴 demo」app)——非死碼(有測試),併入 F2 app 收斂時評估。
+
+**新增**:目前**無業務端點缺口**;唯一新增性質是 F2 的 `/readyz`(若走 K8s 現代慣例),屬 health 對齊。
+
 ## 建議落實順序(各自 ADR/plan、bite-size、move-only)
 
 1. **F1 降級政策一致化** + **F2 app 工廠收斂/health 統一** — 低風險、高清晰度,**先做**(且 F2 收斂讓「測試打到正式 app」,提升後續安全網)。

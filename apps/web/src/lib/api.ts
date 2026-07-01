@@ -81,7 +81,7 @@ export const patchDocument = (profileId: string, content: OcsDocument) =>
   });
 
 export const finalizeDocument = (profileId: string) =>
-  request<DocumentEnvelope>(`/job-profiles/${profileId}/document/finalize`, {
+  request<DocumentEnvelope>(`/job-profiles/${profileId}/document:finalize`, {
     method: "POST",
   });
 
@@ -93,10 +93,10 @@ export const getDocumentExport = (profileId: string) =>
 export const getTaskCatalogs = (profileId: string) =>
   request<TaskCatalogs>(`/job-profiles/${profileId}/task-catalogs`);
 
-// 選職類：設定 selected_ocs_codes（順序=優先度）。
+// 選職類：整批取代 selected_ocs_codes（順序=優先度）→ 冪等 PUT（ADR 0019）。
 export const setOccupations = (profileId: string, ocsCodes: string[]) =>
   request<{ ocs_codes: string[] }>(`/job-profiles/${profileId}/occupations`, {
-    method: "POST",
+    method: "PUT",
     body: JSON.stringify({ ocs_codes: ocsCodes }),
   });
 
@@ -106,7 +106,7 @@ export const getTaskCandidates = (profileId: string) =>
 
 // 用勾選的任務建/更新文件（遞進重編、保留已填）。
 export const buildTasks = (profileId: string, picked: PickedTask[]) =>
-  request<DocumentEnvelope>(`/job-profiles/${profileId}/build-tasks`, {
+  request<DocumentEnvelope>(`/job-profiles/${profileId}/document:buildTasks`, {
     method: "POST",
     body: JSON.stringify({ picked }),
   });
@@ -115,9 +115,10 @@ export const buildTasks = (profileId: string, picked: PickedTask[]) =>
 export const getHeaderMeta = (profileId: string) =>
   request<HeaderMeta>(`/job-profiles/${profileId}/header-meta`);
 
-export const ocsSearch = (profileId: string, q: string) =>
-  request<{ hits: OcsSearchHit[] }>(
-    `/job-profiles/${profileId}/ocs-search?q=${encodeURIComponent(q)}`,
+// 職類目錄搜尋:全域集合、根層（ADR 0019）。回應欄位 = 複數資源名（AIP-132）。
+export const ocsSearch = (q: string) =>
+  request<{ occupations: OcsSearchHit[] }>(
+    `/occupations?q=${encodeURIComponent(q)}`,
   );
 
 // ── AI 提議端點（D28 /ai/*）─────────────────────────────────────────────────

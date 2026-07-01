@@ -18,4 +18,5 @@ def test_configure_mounts_all_rest_routers_and_health():
     assert "/api/v1/users/" in paths
     assert "/api/v1/job-profiles/" in paths
     assert any(p == "/api/v1/job-profiles/{profile_id}/document" for p in paths)
+    assert "/api/v1/occupations" in paths  # root catalog search (ADR 0019)
     assert any(p.startswith("/api/v1/ai/") for p in paths)

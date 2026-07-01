@@ -26,8 +26,8 @@ export function OccupationPicker({
   const [picked, setPicked] = useState<string[]>([]);
 
   const search = useMutation({
-    mutationFn: () => ocsSearch(profileId, q),
-    onSuccess: (r) => setHits(r.hits),
+    mutationFn: () => ocsSearch(q), // 根層全域目錄搜尋，不吃 profileId（ADR 0019）
+    onSuccess: (r) => setHits(r.occupations),
     onError: (e: unknown) => onError(e instanceof Error ? e.message : "搜尋失敗"),
   });
   const setOcc = useSetOccupations(profileId);

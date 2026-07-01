@@ -11,12 +11,11 @@ from uuid import UUID
 from fastapi import APIRouter, Body, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.config import settings
+from app.api.deps import get_knowledge  # noqa: F401  (re-export; tests override via this name)
 from app.database import get_db
 from app.models import JobProfile
 from app.core.domain import header_meta, ocs_doc
 from app.core.ports import KnowledgeClient
-from app.adapters.knowledge_http import HttpIndexerClient
 from app.adapters.persistence import DocRepo, ProfileRepo
 from app.services.ai import tasks as ai_tasks
 from app.services.knowledge.task_detail import task_competencies
@@ -24,16 +23,6 @@ from app.services.knowledge.task_detail import task_competencies
 logger = logging.getLogger("caliburn")
 
 router = APIRouter(prefix="/job-profiles", tags=["documents"])
-
-
-async def get_knowledge():
-    client = HttpIndexerClient(
-        settings.indexer_base_url, settings.indexer_api_key, settings.indexer_timeout_s
-    )
-    try:
-        yield client
-    finally:
-        await client.aclose()
 
 
 async def _require_profile(profile_id: UUID, db: AsyncSession) -> JobProfile:
@@ -73,7 +62,7 @@ async def patch_document(
     return await DocRepo(db).upsert_draft(profile_id, body)
 
 
-@router.post("/{profile_id}/document/finalize")
+@router.post("/{profile_id}/document:finalize")
 async def finalize_document(profile_id: UUID, db: AsyncSession = Depends(get_db)):
     await _require_profile(profile_id, db)
     repo = DocRepo(db)
@@ -118,7 +107,7 @@ async def export_document(profile_id: UUID, db: AsyncSession = Depends(get_db)):
     return ocs_doc.assemble_final(latest["content"])
 
 
-@router.post("/{profile_id}/occupations")
+@router.put("/{profile_id}/occupations")
 async def set_occupations(
     profile_id: UUID,
     body: dict = Body(...),
@@ -190,7 +179,7 @@ async def task_candidates(
     return {"groups": groups}
 
 
-@router.post("/{profile_id}/build-tasks")
+@router.post("/{profile_id}/document:buildTasks")
 async def build_tasks(
     profile_id: UUID,
     body: dict = Body(...),
@@ -221,30 +210,6 @@ async def build_tasks(
     doc = ocs_doc.build_from_picked(profile_dict, units_tasks, prev["content"] if prev else None)
     _refresh_header(doc, profile, codes[0] if codes else "")
     return await DocRepo(db).upsert_draft(profile_id, doc)
-
-
-@router.get("/{profile_id}/ocs-search")
-async def ocs_search(
-    profile_id: UUID,
-    q: str,
-    db: AsyncSession = Depends(get_db),
-    knowledge: KnowledgeClient = Depends(get_knowledge),
-):
-    """職類層搜尋（seed 用）：回 [{ocs_code, ocs_name}]，依 ocs_code 去重保序。
-    **critical 端點**（ADR 0018）：空搜尋結果會被誤解成「查無此職類」→ indexer 掛回 502 快錯。"""
-    await _require_profile(profile_id, db)
-    if not q.strip():
-        return {"hits": []}
-    try:
-        res = await knowledge.search_occupations(q, top_k=8)
-    except Exception:
-        logger.warning("ocs-search indexer query failed", exc_info=True)
-        raise HTTPException(status_code=502, detail="indexer unavailable")
-    seen: dict[str, dict] = {}
-    for h in res.hits:
-        if h.ocs_code and h.ocs_code not in seen:
-            seen[h.ocs_code] = {"ocs_code": h.ocs_code, "ocs_name": h.ocs_name or h.ocs_code}
-    return {"hits": list(seen.values())}
 
 
 @router.get("/{profile_id}/header-meta")

@@ -118,7 +118,8 @@ async def test_task_catalogs_indexer_down_degrades_empty(client):
     app.dependency_overrides[get_knowledge] = lambda: StubKnowledge(fail=True)
     r = await client.get(f"/api/v1/job-profiles/{p.id}/task-catalogs")
     assert r.status_code == 200, r.text
-    assert r.json() == {"catalogs": {}}
+    # enrichment 降級：仍 200 但標 meta.partial=true（ADR 0018）
+    assert r.json() == {"catalogs": {}, "meta": {"partial": True}}
 
 
 @pytest.mark.asyncio
@@ -127,4 +128,5 @@ async def test_task_catalogs_no_document_empty(client):
     app.dependency_overrides[get_knowledge] = lambda: StubKnowledge(_pool_two_tasks())
     r = await client.get(f"/api/v1/job-profiles/{p.id}/task-catalogs")
     assert r.status_code == 200, r.text
-    assert r.json() == {"catalogs": {}}
+    # 沒任務 → 沒撈池 → 非降級
+    assert r.json() == {"catalogs": {}, "meta": {"partial": False}}

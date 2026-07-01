@@ -196,7 +196,14 @@ export interface HeaderMetaPrimaryOption {
   job_description: string;
   ocs_level: number | null;
 }
+// 降級旗標（ADR 0018）：enrichment 端點在 indexer 掛時回 partial=true，
+// 前端可提示「部分資料暫缺」；缺席或 false 視為完整。
+export interface DegradeMeta {
+  partial: boolean;
+}
+
 export interface HeaderMeta {
+  meta?: DegradeMeta;
   primary: {
     ocs_code: string;
     occupation_name: string;
@@ -274,4 +281,5 @@ export interface TaskCatalogEntry {
 }
 export interface TaskCatalogs {
   catalogs: Record<string, TaskCatalogEntry>; // 鍵 = 文件任務碼（如 T1.1）
+  meta?: DegradeMeta; // ADR 0018：indexer 某 code 掛 → partial=true
 }

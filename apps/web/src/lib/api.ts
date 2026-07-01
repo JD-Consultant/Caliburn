@@ -2,7 +2,6 @@
 // which now mounts users + job_profiles CRUD under /api/v1. Legacy interview /
 // tasks / documents endpoints were removed with the old backend (Concern B).
 import type {
-  ClarifyResult,
   DocumentEnvelope,
   DraftOpResult,
   ExtractTasksResult,
@@ -149,13 +148,6 @@ export const extractTasks = (body: { intake: string; ocs_codes: string[] }) =>
 // 一句描述 → 任務名 + 職責建議（自訂任務用）。
 export const structureTask = (body: { description: string; ocs_codes?: string[] }) =>
   request<StructureTaskResult>("/ai/structure-task", {
-    method: "POST",
-    body: JSON.stringify(body),
-  });
-
-// 太薄的任務 note → 一個追問字串或 null。
-export const clarify = (body: { task: string; note: string }) =>
-  request<ClarifyResult>("/ai/clarify", {
     method: "POST",
     body: JSON.stringify(body),
   });

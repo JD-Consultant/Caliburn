@@ -73,9 +73,35 @@
 - **遷移**:單一 ADR「API 命名對齊」+ 逐端點 atomic commit(indexer 一組、api+web 一組),green-before==green-after;**不版本化**。
 - **待決策**:①F4b 走 `?q=` 標準 List 還是 `:search`;②producer-only 的 F3b 要不要順手一起改(改動極小、但動到目前沒人用的端點——一致性 vs YAGNI)。
 
-## 7. 來源(全權威:規範 / 大廠 / 官方 / 本機實證)
+## 7. 追加研究(第二輪:F4b 根層設計細節 + 動詞/偏離查核)
 
-- **命名**:[Google AIP-136 自訂方法](https://google.aip.dev/136) · [AIP-231 BatchGet](https://google.aip.dev/231) · [Microsoft Azure REST Guidelines](https://github.com/microsoft/api-guidelines/blob/vNext/azure/Guidelines.md) · [Zalando RESTful API Guidelines](https://opensource.zalando.com/restful-api-guidelines/)
+> 維護者拍板 F4b 走**根層 `GET /occupations?q=`**後,對設計細節再抓規範原文查核(AIP-132/136/231、Zalando 原文)。
+
+### 8.1 為什麼不能是 `GET …/job-profiles/{id}/occupations?q=`(重要修正)
+
+F5 之後 `PUT …/occupations` = 「**此檔案已選職類**」(整批取代)。HTTP 語意(RFC 9110)同一 URI 的 GET/PUT 必須指**同一資源**;但搜尋搜的是**全域 OCS 目錄**,不是已選清單 → 同 URI 兩義,比現況更糟。且 `ocs_search` 實際只拿 profile 做存在檢查、搜的是全域知識庫——呼應 ARCHITECTURE「多租戶隔離只在 api;**知識服務全域共享**」→ 全域集合就該是**根層集合**。
+
+### 8.2 規範查核(原文)
+
+| 規範 | 原文要點 | 對我們的意義 |
+|---|---|---|
+| **AIP-132(List)** | verb **must** GET;回應 repeated 欄位 = **複數資源名**;`page_size`/`page_token` **must** | `GET /occupations?q=` ✓;回應欄位應 `occupations`(非 `hits`);**分頁我們刻意偏離**(bounded 目錄、去重 ≤8 hits、F6 YAGNI)→ 記錄 |
+| **Zalando #137/#129/#141** | **`q` 是官方慣例查詢參數**;path kebab;URL verb-free | 參數名 `q` 有規範背書;根層 List+filter 正中 Zalando 風格 |
+| **AIP-136(custom)** | 取數 **must** GET,**但 payload 超 URL 限制可 POST**;有副作用 must POST;`:verb` 冒號 | indexer `:search`(POST body,向量查詢)有例外背書;`document:finalize`/`:buildTasks`(mutation)POST ✓ |
+| **AIP-231(BatchGet)** | verb **must** GET、ids 走 query param、**must 全成全敗(原子)**、保序 | 我們的 `batchGet` = POST body `{ids}` + **缺失靜默略過** → **三處刻意偏離**(ids 長/多 = 136 的 URL 限制例外;drop-missing 是 producer 需求)。改名 `:batchGet` 不改行為,**偏離寫進 ADR** |
+
+### 8.3 細節定案(提案)
+
+- 新 router `app/api/routes/occupations.py`(`GET /api/v1/occupations?q=`);`get_knowledge` 依賴從 documents.py 搬到共用 `app/api/deps.py`(fastapi-best-practices 的 dependencies 模組慣例);舊 `…/ocs-search` **原子刪除**(§4)。
+- **回應欄位 `hits` → `occupations`**(AIP-132 複數資源名)——既已破壞路徑,一次到位;web 影響 3 行(api.ts + OccupationPicker + 型別欄位)。**待維護者確認**。
+- **F4c 修正提案**:`build-tasks` → `document:buildTasks`——它與 finalize 同為 document 上的 custom method,只改一個是半套;成本相同(1 字串)。**待維護者確認**(推翻 §5 的「傾向保留」)。
+- 空 `q` → 回空陣列(維持現行為;indexer 無 list-all 能力,此端點實為 search-only collection,記錄於 docstring)。
+- 多租戶備註:根層端點無 profile 檢查——知識全域共享;未來登入落地時只需 authn、不需 tenant scoping(ARCHITECTURE 一致)。
+
+## 8. 來源(全權威:規範 / 大廠 / 官方 / 本機實證)
+
+- **命名**:[Google AIP-132 List](https://google.aip.dev/132) · [AIP-136 自訂方法](https://google.aip.dev/136) · [AIP-231 BatchGet](https://google.aip.dev/231) · [Microsoft Azure REST Guidelines](https://github.com/microsoft/api-guidelines/blob/vNext/azure/Guidelines.md) · [Zalando RESTful API Guidelines](https://opensource.zalando.com/restful-api-guidelines/)(#137 `q` 慣例參數、#129 kebab、#141 verb-free URL;§7 皆為原文查核)
+- **HTTP 語意**(同 URI 同資源、PUT 冪等):RFC 9110(HTTP Semantics)
 - **遷移**:[Snellman — monorepo atomic cross-project commits](https://www.snellman.net/blog/archive/2021-07-21-monorepo-atomic/)(Google monorepo / trunk-based 慣例)
 - **技術可行性**:FastAPI/Starlette 字面冒號路由——**本機 TestClient 實測**(§2)
 - **REST 方法語意**(F5 PUT):冪等整體取代用 PUT(HTTP 語意 / MDN / RFC 9110)

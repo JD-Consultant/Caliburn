@@ -1,8 +1,9 @@
 """REST document endpoints (D27 T3): the OCS document-of-record worktable.
 
-GET/PATCH/finalize over ``document_versions`` (via ``DocRepo``) plus a
-read-only ``ksa-pool`` aggregation from the knowledge indexer. The PATCH body
-is the whole OCS document dict (loose; no strict validation on draft).
+GET/PATCH/finalize over ``document_versions`` (via ``DocRepo``) plus read-only
+task-candidates / header-meta / task-catalogs aggregations from the knowledge
+indexer. The PATCH body is the whole OCS document dict (loose; no strict
+validation on draft).
 """
 import logging
 from uuid import UUID
@@ -262,50 +263,6 @@ async def get_header_meta(
         except Exception:
             logger.warning("header-meta: occupation(%s) failed; skipping", code, exc_info=True)
     return header_meta.aggregate(metas, primary_code=codes[0] if codes else "")
-
-
-@router.get("/{profile_id}/ksa-pool")
-async def get_ksa_pool(
-    profile_id: UUID,
-    db: AsyncSession = Depends(get_db),
-    knowledge: KnowledgeClient = Depends(get_knowledge),
-):
-    profile = await _require_profile(profile_id, db)
-    empty = {"knowledge": [], "skills": [], "attitudes": []}
-    codes = profile.selected_ocs_codes or []
-    if not codes:
-        return empty
-    try:
-        buckets: dict[str, dict[str, dict]] = {
-            "knowledge": {},
-            "skills": {},
-            "attitudes": {},
-        }
-        loose: dict[str, list[dict]] = {"knowledge": [], "skills": [], "attitudes": []}
-        for code in codes:
-            comp = await knowledge.competencies(code)
-            for bucket, items in (
-                ("knowledge", comp.knowledge),
-                ("skills", comp.skills),
-                ("attitudes", comp.attitudes),
-            ):
-                for it in items:
-                    entry = {
-                        "code": it.code,
-                        "name": it.name or "",
-                        "sources": [s.task_code for s in it.sources if s.task_code],
-                    }
-                    if it.code:
-                        buckets[bucket].setdefault(it.code, entry)
-                    else:
-                        loose[bucket].append(entry)
-        return {
-            bucket: list(buckets[bucket].values()) + loose[bucket]
-            for bucket in ("knowledge", "skills", "attitudes")
-        }
-    except Exception:
-        logger.warning("ksa-pool indexer query failed; returning empty pool", exc_info=True)
-        return empty
 
 
 @router.get("/{profile_id}/task-catalogs")

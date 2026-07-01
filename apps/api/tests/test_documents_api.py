@@ -18,8 +18,6 @@ from app.core.knowledge_dto import (
     CodeName,
     CompetencyPool,
     OccupationDetail,
-    OccupationHit,
-    OccupationSearchResponse,
     OccupationTasks,
     OcsName,
     TaskRef,
@@ -28,10 +26,9 @@ from app.core.knowledge_dto import (
 
 
 class StubKnowledge:
-    def __init__(self, comp_map=None, fail=False, tasks_map=None, hits=None, occupations=None):
+    def __init__(self, comp_map=None, fail=False, tasks_map=None, occupations=None):
         self.comp_map, self.fail = comp_map or {}, fail
         self.tasks_map = tasks_map or {}
-        self.hits = hits or []
         self.occupations = occupations or {}
 
     async def competencies(self, ocs_code):
@@ -48,11 +45,6 @@ class StubKnowledge:
         if self.fail:
             raise RuntimeError("indexer down")
         return self.tasks_map[ocs_code]  # KeyError surfaces missing test setup
-
-    async def search_occupations(self, query, *, top_k=10):
-        if self.fail:
-            raise RuntimeError("indexer down")
-        return OccupationSearchResponse(hits=self.hits)
 
 
 def _mk_tasks():
@@ -167,7 +159,7 @@ async def test_finalize_success(client):
     )
     r1 = await client.patch(f"/api/v1/job-profiles/{p.id}/document", json=skel)
     assert r1.json()["version"] == 1
-    r = await client.post(f"/api/v1/job-profiles/{p.id}/document/finalize")
+    r = await client.post(f"/api/v1/job-profiles/{p.id}/document:finalize")
     assert r.status_code == 200, r.text
     body = r.json()
     assert body["status"] == "final"
@@ -195,7 +187,7 @@ async def test_finalize_invalid_returns_422(client):
         "ocs_attitude": {"attitudes": []},
     }
     await client.patch(f"/api/v1/job-profiles/{p.id}/document", json=doc)
-    r = await client.post(f"/api/v1/job-profiles/{p.id}/document/finalize")
+    r = await client.post(f"/api/v1/job-profiles/{p.id}/document:finalize")
     assert r.status_code == 422, r.text
     detail = r.json()["detail"]
     assert detail["errors"]
@@ -204,7 +196,7 @@ async def test_finalize_invalid_returns_422(client):
 @pytest.mark.asyncio
 async def test_finalize_no_document_returns_400(client):
     p = await _mk_profile(client._db)
-    r = await client.post(f"/api/v1/job-profiles/{p.id}/document/finalize")
+    r = await client.post(f"/api/v1/job-profiles/{p.id}/document:finalize")
     assert r.status_code == 400, r.text
 
 
@@ -234,40 +226,7 @@ async def test_export_no_document_returns_400(client):
     assert r.status_code == 400, r.text
 
 
-@pytest.mark.asyncio
-async def test_ocs_search_dedupes_by_code(client):
-    p = await _mk_profile(client._db)
-    app.dependency_overrides[get_knowledge] = lambda: StubKnowledge(
-        hits=[
-            OccupationHit(ocs_code="OC1", ocs_name="AIoT 應用工程師"),
-            OccupationHit(ocs_code="OC1", ocs_name="dup chunk"),
-            OccupationHit(ocs_code="OC2", ocs_name="資料工程師"),
-        ]
-    )
-    r = await client.get(f"/api/v1/job-profiles/{p.id}/ocs-search?q=AIoT")
-    assert r.status_code == 200, r.text
-    hits = r.json()["hits"]
-    assert [h["ocs_code"] for h in hits] == ["OC1", "OC2"]
-    assert hits[0]["ocs_name"] == "AIoT 應用工程師"
-
-
-@pytest.mark.asyncio
-async def test_ocs_search_blank_query_empty(client):
-    p = await _mk_profile(client._db)
-    app.dependency_overrides[get_knowledge] = lambda: StubKnowledge(
-        hits=[OccupationHit(ocs_code="OC1", ocs_name="x")]
-    )
-    r = await client.get(f"/api/v1/job-profiles/{p.id}/ocs-search?q=   ")
-    assert r.status_code == 200, r.text
-    assert r.json()["hits"] == []
-
-
-@pytest.mark.asyncio
-async def test_ocs_search_indexer_down_502(client):
-    p = await _mk_profile(client._db)
-    app.dependency_overrides[get_knowledge] = lambda: StubKnowledge(fail=True)
-    r = await client.get(f"/api/v1/job-profiles/{p.id}/ocs-search?q=AIoT")
-    assert r.status_code == 502, r.text
+# ocs-search 測試已隨端點搬家:根層 GET /occupations?q= → tests/test_occupations_api.py(ADR 0019)。
 
 
 @pytest.mark.asyncio
@@ -382,7 +341,7 @@ async def test_set_occupations(client, db_session):
             )
         }
     )
-    r = await client.post(
+    r = await client.put(
         f"/api/v1/job-profiles/{p.id}/occupations", json={"ocs_codes": ["OC1", "OC2"]}
     )
     assert r.status_code == 200, r.text
@@ -413,7 +372,7 @@ async def test_set_occupations_refreshes_stale_draft_header(client):
         f"/api/v1/job-profiles/{p.id}/document",
         json={"ocs_content": {"ocu_units": []}, "ocs_profile": {"ocs_code": ""}},
     )
-    r = await client.post(
+    r = await client.put(
         f"/api/v1/job-profiles/{p.id}/occupations", json={"ocs_codes": ["OC1"]}
     )
     assert r.status_code == 200, r.text
@@ -426,7 +385,7 @@ async def test_set_occupations_refreshes_stale_draft_header(client):
 @pytest.mark.asyncio
 async def test_set_occupations_empty_400(client):
     p = await _mk_profile(client._db)
-    r = await client.post(
+    r = await client.put(
         f"/api/v1/job-profiles/{p.id}/occupations", json={"ocs_codes": []}
     )
     assert r.status_code == 400, r.text
@@ -469,7 +428,7 @@ async def test_task_candidates_indexer_down_502(client):
 async def test_build_tasks_happy(client):
     p = await _mk_profile(client._db, codes=["OC1"])
     r = await client.post(
-        f"/api/v1/job-profiles/{p.id}/build-tasks", json={"picked": _picked()}
+        f"/api/v1/job-profiles/{p.id}/document:buildTasks", json={"picked": _picked()}
     )
     assert r.status_code == 200, r.text
     body = r.json()
@@ -487,7 +446,7 @@ async def test_build_tasks_happy(client):
 async def test_build_tasks_cherry_pick_blank_unit_name(client):
     p = await _mk_profile(client._db, codes=["OC1"])
     r = await client.post(
-        f"/api/v1/job-profiles/{p.id}/build-tasks", json={"picked": _picked(ocu_name="")}
+        f"/api/v1/job-profiles/{p.id}/document:buildTasks", json={"picked": _picked(ocu_name="")}
     )
     assert r.status_code == 200, r.text
     units = r.json()["content"]["ocs_content"]["ocu_units"]
@@ -498,7 +457,7 @@ async def test_build_tasks_cherry_pick_blank_unit_name(client):
 async def test_build_tasks_preserves_filled_on_rebuild(client):
     p = await _mk_profile(client._db, codes=["OC1"])
     await client.post(
-        f"/api/v1/job-profiles/{p.id}/build-tasks", json={"picked": _picked()}
+        f"/api/v1/job-profiles/{p.id}/document:buildTasks", json={"picked": _picked()}
     )
     # fill T1.1's knowledge via PATCH
     g = await client.get(f"/api/v1/job-profiles/{p.id}/document")
@@ -509,7 +468,7 @@ async def test_build_tasks_preserves_filled_on_rebuild(client):
     await client.patch(f"/api/v1/job-profiles/{p.id}/document", json=doc)
     # rebuild with same picks → filled cell preserved by provenance
     r = await client.post(
-        f"/api/v1/job-profiles/{p.id}/build-tasks", json={"picked": _picked()}
+        f"/api/v1/job-profiles/{p.id}/document:buildTasks", json={"picked": _picked()}
     )
     tasks = r.json()["content"]["ocs_content"]["ocu_units"][0]["tasks"]
     assert tasks[0]["competency_blocks"][0]["knowledge"] == [{"code": "K1", "name": "k"}]
@@ -520,13 +479,13 @@ async def test_build_tasks_additive_adds_without_removing(client):
     p = await _mk_profile(client._db, codes=["OC1"])
     # first build: only T1.1
     r1 = await client.post(
-        f"/api/v1/job-profiles/{p.id}/build-tasks", json={"picked": [_picked()[0]]}
+        f"/api/v1/job-profiles/{p.id}/document:buildTasks", json={"picked": [_picked()[0]]}
     )
     u1 = r1.json()["content"]["ocs_content"]["ocu_units"]
     assert [t["task_codes"][0]["code"] for t in u1[0]["tasks"]] == ["T1.1"]
     # second build: only T1.2 → additive: keeps T1.1, adds T1.2 into same unit
     r2 = await client.post(
-        f"/api/v1/job-profiles/{p.id}/build-tasks", json={"picked": [_picked()[1]]}
+        f"/api/v1/job-profiles/{p.id}/document:buildTasks", json={"picked": [_picked()[1]]}
     )
     units = r2.json()["content"]["ocs_content"]["ocu_units"]
     assert len(units) == 1  # merged into the same 職責 (same ocs_code+unit_id)
@@ -536,6 +495,6 @@ async def test_build_tasks_additive_adds_without_removing(client):
 @pytest.mark.asyncio
 async def test_build_tasks_missing_profile_404(client):
     r = await client.post(
-        f"/api/v1/job-profiles/{uuid4()}/build-tasks", json={"picked": _picked()}
+        f"/api/v1/job-profiles/{uuid4()}/document:buildTasks", json={"picked": _picked()}
     )
     assert r.status_code == 404, r.text

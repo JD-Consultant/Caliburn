@@ -7,6 +7,9 @@ so the same logic is reusable by a future autonomous interview agent (design §I
 
 No ``OPENROUTER_API_KEY`` → ``get_llm`` yields ``None`` and endpoints degrade to
 catalog-only (no LLM calls, no failing retries).
+
+Naming: verb paths (``/ai/recommend-ks`` …) are INTENTIONAL action-style — these
+are stateless RPC proposals over no resource, not resources (ADR 0019 keeps them).
 """
 import logging
 from uuid import UUID

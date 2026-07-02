@@ -183,6 +183,137 @@ async def test_concurrent_stale_update_raises_stale_data_error(db_session):
     await db_session.rollback()
 
 
+# --- upsert_draft optimistic-concurrency guard: expected_version/expected_revision
+# (2a Task B, ADR 0015) ---
+
+
+@pytest.mark.asyncio
+async def test_upsert_draft_guard_matching_expected_succeeds(db_session):
+    """兩者皆給且與最新列相符 → 正常就地更新，revision 照常 +1。"""
+    p = await _seed_profile(db_session)
+    repo = DocRepo(db_session)
+    r1 = await repo.upsert_draft(p.id, {"k": 1})
+    r2 = await repo.upsert_draft(
+        p.id, {"k": 2}, expected_version=r1["version"], expected_revision=r1["revision"]
+    )
+    assert r2["version"] == r1["version"]
+    assert r2["revision"] == r1["revision"] + 1
+
+
+@pytest.mark.asyncio
+async def test_upsert_draft_guard_no_row_expects_zero_zero_succeeds(db_session):
+    """無列視為 (0, 0)：首存 expected_version=0, expected_revision=0 → 成功建立 draft。"""
+    p = await _seed_profile(db_session)
+    repo = DocRepo(db_session)
+    r1 = await repo.upsert_draft(p.id, {"k": 1}, expected_version=0, expected_revision=0)
+    assert r1["version"] == 1 and r1["revision"] == 1
+
+
+@pytest.mark.asyncio
+async def test_upsert_draft_guard_mismatch_raises_doc_conflict_error(db_session):
+    """不符 → raise DocConflictError(current_version, current_revision)（無列視為 (0,0)）。"""
+    from app.adapters.persistence import DocConflictError
+
+    p = await _seed_profile(db_session)
+    repo = DocRepo(db_session)
+
+    # no row yet, but caller claims to expect (1, 1) → conflict against the "no row" (0, 0) baseline
+    with pytest.raises(DocConflictError) as exc_info:
+        await repo.upsert_draft(p.id, {"k": 1}, expected_version=1, expected_revision=1)
+    assert exc_info.value.current_version == 0
+    assert exc_info.value.current_revision == 0
+
+    # now seed a row and try a stale token against it
+    r1 = await repo.upsert_draft(p.id, {"k": 1})
+    with pytest.raises(DocConflictError) as exc_info2:
+        await repo.upsert_draft(
+            p.id, {"k": 2}, expected_version=r1["version"], expected_revision=r1["revision"] + 1
+        )
+    assert exc_info2.value.current_version == r1["version"]
+    assert exc_info2.value.current_revision == r1["revision"]
+
+
+@pytest.mark.asyncio
+async def test_upsert_draft_guard_only_one_of_pair_given_is_unguarded(db_session):
+    """spec：兩者皆給時才檢查；只給一個視為不守衛（legacy 相容，非本任務要收緊的範圍）。"""
+    p = await _seed_profile(db_session)
+    repo = DocRepo(db_session)
+    r1 = await repo.upsert_draft(p.id, {"k": 1})
+    # wrong expected_version alone, expected_revision omitted → guard not engaged, still succeeds
+    r2 = await repo.upsert_draft(p.id, {"k": 2}, expected_version=999)
+    assert r2["version"] == r1["version"]
+    assert r2["revision"] == r1["revision"] + 1
+
+
+@pytest.mark.asyncio
+@pytest.mark.filterwarnings(
+    "ignore:transaction already deassociated from connection:sqlalchemy.exc.SAWarning"
+)
+async def test_upsert_draft_guard_passes_app_check_but_cas_race_still_raises_stale_data_error(
+    db_session,
+):
+    """CAS 競態視窗：expected_version/expected_revision 與**這個 session 記憶中**的舊值相符
+    （通過 upsert_draft 的應用層 DocConflictError 檢查），但另一個 writer 已經在 DB 層把
+    revision 推進過去（本測試同 Task A 的 test_concurrent_stale_update_raises_stale_data_error
+    手法，用 Core UPDATE + synchronize_session=False 模擬）→ flush 時 version_id_col 的 CAS
+    UPDATE 撞到 DB 實際值、0 rows 命中 → StaleDataError（不是 DocConflictError；兩者是不同
+    的防線——前者是應用層先檢查、後者是 flush 期的最終 DB 層 CAS 兜底）。
+
+    route（app/api/routes/documents.py::patch_document）的 except StaleDataError 分支即是
+    為了兜住這個窗口而寫；此處在 repo 層直接證明「通過 upsert_draft 的守衛檢查」與
+    「仍然可能在 flush 觸發 StaleDataError」兩者並不互斥——這正是 route 需要兩個獨立
+    except 子句（DocConflictError 和 StaleDataError）的原因。
+
+    注意：此手法依賴同一個 in-memory ORM 物件在 Core UPDATE 前後被同一個 session 的 identity
+    map 保留（未經 GC、未跨 request 邊界重新查詢）——已驗證這**無法**簡單地跨兩個獨立 HTTP
+    PATCH request 重現（route 每次請求都是全新 `_latest_row()` 查詢，前一 request 的 ORM 物件
+    只是弱引用、對下一個 request 不可見），因此本測試特意留在 repo 層、在單一未中斷的 await
+    鏈中完成（同 Task A 的既有測試手法）。
+
+    filterwarnings 理由同 Task A：db_session fixture 用「join 外部 conn.begin()」模式，flush
+    失敗需要的 rollback 會把 fixture 外層那條 trans 一併結束，導致 fixture teardown 印出一個
+    無害但吵的 SAWarning（非本測試邏輯有誤）。
+    """
+    from sqlalchemy import update
+    from sqlalchemy.orm.exc import StaleDataError
+    from app.models import DocumentVersion
+
+    p = await _seed_profile(db_session)
+    repo = DocRepo(db_session)
+    r1 = await repo.upsert_draft(p.id, {"k": 1})
+    assert (r1["version"], r1["revision"]) == (1, 1)
+
+    # Keep the same repo (and thus the same session/identity-map) alive across the "other
+    # writer" simulation, matching Task A's proven approach.
+    row = await repo._latest_row(p.id)
+    assert row.revision == 1
+
+    # Another writer lands first: bump the DB row's revision via raw Core UPDATE, bypassing
+    # this session's identity map/unit-of-work (synchronize_session=False is essential — see
+    # Task A's note in test_concurrent_stale_update_raises_stale_data_error).
+    await db_session.execute(
+        update(DocumentVersion)
+        .where(DocumentVersion.id == row.id)
+        .values(revision=2, content={"k": "other-writer"})
+        .execution_options(synchronize_session=False)
+    )
+    await db_session.flush()
+    assert row.revision == 1  # still stale in this session's memory
+
+    # expected_version/expected_revision match the *stale* in-memory value → passes the
+    # app-layer DocConflictError check inside upsert_draft — but the flush's CAS UPDATE
+    # (WHERE ... AND revision=1) now hits 0 rows in the DB (which is at revision=2) →
+    # StaleDataError, not DocConflictError.
+    with pytest.raises(StaleDataError):
+        await repo.upsert_draft(
+            p.id, {"k": "this-session-too-late"}, expected_version=1, expected_revision=1
+        )
+
+    # A failed flush leaves the Session inactive until rolled back (SQLAlchemy requirement;
+    # mirrors what the route's except StaleDataError branch does via `await db.rollback()`).
+    await db_session.rollback()
+
+
 @pytest.mark.asyncio
 async def test_finalize_no_document_raises(db_session):
     p = await _seed_profile(db_session)

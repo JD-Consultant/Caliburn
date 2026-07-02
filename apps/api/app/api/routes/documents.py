@@ -10,13 +10,14 @@ from uuid import UUID
 
 from fastapi import APIRouter, Body, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm.exc import StaleDataError
 
 from app.api.deps import get_knowledge  # noqa: F401  (re-export; tests override via this name)
 from app.database import get_db
 from app.models import JobProfile
 from app.core.domain import header_meta, ocs_doc
 from app.core.ports import KnowledgeClient
-from app.adapters.persistence import DocRepo, ProfileRepo
+from app.adapters.persistence import DocConflictError, DocRepo, ProfileRepo
 from app.services.ai import tasks as ai_tasks
 from app.services.knowledge.task_detail import task_competencies
 
@@ -47,6 +48,7 @@ async def get_document(profile_id: UUID, db: AsyncSession = Depends(get_db)):
     return {
         "id": None,
         "version": 0,
+        "revision": 0,
         "status": "none",
         "content": ocs_doc.skeleton(profile_dict, []),
     }
@@ -56,10 +58,39 @@ async def get_document(profile_id: UUID, db: AsyncSession = Depends(get_db)):
 async def patch_document(
     profile_id: UUID,
     body: dict = Body(...),
+    expect_version: int | None = None,
+    expect_revision: int | None = None,
     db: AsyncSession = Depends(get_db),
 ):
+    """PATCH 整份 OCS 文件（存草稿）。
+
+    樂觀鎖為 **opt-in**：帶 expect_version + expect_revision 兩者、且與最新列不符 → 409
+    ``{"detail": {"code": "version_conflict", "current_version": ..., "current_revision": ...}}``
+    （帶當前 token，前端「覆蓋」路徑免多打一次 GET）。**不帶（或只帶一個）= 不守衛**（legacy
+    相容現況；web 前端一律帶，未來可能收緊為必帶——ADR 0015 / 2a-minimal spec §2.3）。
+    """
     await _require_profile(profile_id, db)
-    return await DocRepo(db).upsert_draft(profile_id, body)
+    try:
+        return await DocRepo(db).upsert_draft(
+            profile_id, body,
+            expected_version=expect_version, expected_revision=expect_revision,
+        )
+    except DocConflictError as e:
+        raise HTTPException(status_code=409, detail={
+            "code": "version_conflict",
+            "current_version": e.current_version,
+            "current_revision": e.current_revision,
+        })
+    except StaleDataError:
+        # 應用層檢查通過後、flush 前被搶先的同毫秒競態（version_id_col 的 CAS 兜底）。
+        # flush 失敗會讓 session 進入需要 rollback 才能再用的狀態（SQLAlchemy 官方要求）。
+        await db.rollback()
+        row = await DocRepo(db)._latest_row(profile_id)
+        raise HTTPException(status_code=409, detail={
+            "code": "version_conflict",
+            "current_version": row.version if row else 0,
+            "current_revision": row.revision if row else 0,
+        })
 
 
 @router.post("/{profile_id}/document:finalize")

@@ -25,6 +25,15 @@ class ProfileRepo:
         await self.s.flush()
 
 
+class DocConflictError(Exception):
+    """樂觀鎖衝突：client 送出的 expected (version, revision) 與最新列不符（ADR 0015）。"""
+
+    def __init__(self, current_version: int, current_revision: int):
+        self.current_version = current_version
+        self.current_revision = current_revision
+        super().__init__(f"document changed: v{current_version} r{current_revision}")
+
+
 class DocRepo:
     """document_versions：每次 save 版本遞增；content 為 OCS 文件 JSONB。"""
 
@@ -58,9 +67,26 @@ class DocRepo:
             .order_by(DocumentVersion.version.desc())
         )).scalars().first()
 
-    async def upsert_draft(self, job_profile_id: UUID, content: dict) -> dict:
-        """最新列若為 draft → 原地更新 content（版本不變）；否則 INSERT 新 draft。"""
+    async def upsert_draft(
+        self,
+        job_profile_id: UUID,
+        content: dict,
+        *,
+        expected_version: int | None = None,
+        expected_revision: int | None = None,
+    ) -> dict:
+        """最新列若為 draft → 原地更新 content（版本不變，revision 由 version_id_col 自動 +1）；
+        否則 INSERT 新 draft。
+
+        expected_version/expected_revision **兩者皆給**時做樂觀鎖檢查：與最新列的
+        (version, revision) 不完全相等 → raise DocConflictError(current_version, current_revision)
+        （無列視為 (0, 0)）。只給一個或都不給 → 不守衛（legacy 相容，opt-in）。
+        """
         row = await self._latest_row(job_profile_id)
+        if expected_version is not None and expected_revision is not None:
+            current = (row.version, row.revision) if row is not None else (0, 0)
+            if (expected_version, expected_revision) != current:
+                raise DocConflictError(*current)
         if row is not None and row.status == "draft":
             row.content = content
         else:

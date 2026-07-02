@@ -105,6 +105,7 @@ async def test_get_document_no_doc_returns_skeleton(client):
     body = r.json()
     assert body["status"] == "none"
     assert body["version"] == 0
+    assert body["revision"] == 0  # empty-skeleton envelope must carry revision too (2a Task B)
     assert body["content"]["ocs_content"]["ocu_units"] == []
 
 
@@ -147,6 +148,186 @@ async def test_patch_twice_no_version_bump(client):
     assert r1.json()["version"] == 1
     r2 = await client.patch(f"/api/v1/job-profiles/{p.id}/document", json=doc)
     assert r2.json()["version"] == 1
+
+
+# --- optimistic-concurrency guard: expect_version/expect_revision (2a Task B, ADR 0015) ---
+
+
+@pytest.mark.asyncio
+async def test_patch_no_expect_params_is_legacy_unguarded(client):
+    """不帶 expect_* → 200，行為同現況（opt-in，legacy 相容）。"""
+    p = await _mk_profile(client._db)
+    doc = {"ocs_content": {"ocu_units": []}, "ocs_attitude": {"attitudes": []}}
+    r1 = await client.patch(f"/api/v1/job-profiles/{p.id}/document", json=doc)
+    assert r1.status_code == 200, r1.text
+    # a second PATCH with no expect params still overwrites unconditionally
+    r2 = await client.patch(f"/api/v1/job-profiles/{p.id}/document", json={**doc, "k": 2})
+    assert r2.status_code == 200, r2.text
+    assert r2.json()["revision"] == 2
+
+
+@pytest.mark.asyncio
+async def test_patch_first_save_expect_zero_zero_succeeds(client):
+    """無文件首存：expect (0,0) → 200，建 draft(version 1, revision 1)。"""
+    p = await _mk_profile(client._db)
+    doc = {"ocs_content": {"ocu_units": []}, "ocs_attitude": {"attitudes": []}}
+    r = await client.patch(
+        f"/api/v1/job-profiles/{p.id}/document?expect_version=0&expect_revision=0", json=doc
+    )
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert body["version"] == 1
+    assert body["revision"] == 1
+
+
+@pytest.mark.asyncio
+async def test_patch_first_save_expect_zero_zero_but_already_exists_409(client):
+    """無文件但 expect (0,0) 且已被別人建立 → 409。"""
+    p = await _mk_profile(client._db)
+    doc = {"ocs_content": {"ocu_units": []}, "ocs_attitude": {"attitudes": []}}
+    r1 = await client.patch(f"/api/v1/job-profiles/{p.id}/document", json=doc)
+    assert r1.status_code == 200, r1.text
+    assert r1.json()["version"] == 1 and r1.json()["revision"] == 1
+
+    r2 = await client.patch(
+        f"/api/v1/job-profiles/{p.id}/document?expect_version=0&expect_revision=0",
+        json={**doc, "k": 2},
+    )
+    assert r2.status_code == 409, r2.text
+    detail = r2.json()["detail"]
+    assert detail == {"code": "version_conflict", "current_version": 1, "current_revision": 1}
+
+
+@pytest.mark.asyncio
+async def test_patch_matching_expect_succeeds_and_bumps_revision(client):
+    """帶 expect、token 相符 → 200；回應 revision = 原 +1。"""
+    p = await _mk_profile(client._db)
+    doc = {"ocs_content": {"ocu_units": []}, "ocs_attitude": {"attitudes": []}}
+    r1 = await client.patch(f"/api/v1/job-profiles/{p.id}/document", json=doc)
+    v, rev = r1.json()["version"], r1.json()["revision"]
+
+    r2 = await client.patch(
+        f"/api/v1/job-profiles/{p.id}/document?expect_version={v}&expect_revision={rev}",
+        json={**doc, "k": 2},
+    )
+    assert r2.status_code == 200, r2.text
+    assert r2.json()["version"] == v
+    assert r2.json()["revision"] == rev + 1
+
+
+@pytest.mark.asyncio
+async def test_patch_stale_revision_409_with_current_token(client):
+    """expect_revision 過期（另一「分頁」先存）→ 409 + current_version/current_revision 正確。"""
+    p = await _mk_profile(client._db)
+    doc = {"ocs_content": {"ocu_units": []}, "ocs_attitude": {"attitudes": []}}
+    r1 = await client.patch(f"/api/v1/job-profiles/{p.id}/document", json=doc)
+    v, rev = r1.json()["version"], r1.json()["revision"]
+
+    # "another tab" saves first, using the correct current token → revision advances
+    other_tab = await client.patch(
+        f"/api/v1/job-profiles/{p.id}/document?expect_version={v}&expect_revision={rev}",
+        json={**doc, "k": "other-tab"},
+    )
+    assert other_tab.status_code == 200, other_tab.text
+    assert other_tab.json()["revision"] == rev + 1
+
+    # this tab retries with its now-stale token → 409, carrying the actual current token
+    stale = await client.patch(
+        f"/api/v1/job-profiles/{p.id}/document?expect_version={v}&expect_revision={rev}",
+        json={**doc, "k": "this-tab-too-late"},
+    )
+    assert stale.status_code == 409, stale.text
+    detail = stale.json()["detail"]
+    assert detail == {
+        "code": "version_conflict",
+        "current_version": v,
+        "current_revision": rev + 1,
+    }
+
+
+@pytest.mark.asyncio
+async def test_patch_stale_version_after_finalize_409(client):
+    """expect_version 過期（finalize 後 / 舊分頁）→ 409。"""
+    p = await _mk_profile(client._db)
+    skel = ocs_doc.skeleton(
+        {"ocs_code": "OC1", "job_title": "x"},
+        [{"task_name": "t", "unit_id": "T1", "unit_title": "u",
+          "indexer_ref": {"task_code": "T1.1"}}],
+    )
+    r1 = await client.patch(f"/api/v1/job-profiles/{p.id}/document", json=skel)
+    v, rev = r1.json()["version"], r1.json()["revision"]
+    assert v == 1
+
+    fin = await client.post(f"/api/v1/job-profiles/{p.id}/document:finalize")
+    assert fin.status_code == 200, fin.text
+    assert fin.json()["version"] == 2 and fin.json()["revision"] == 1
+
+    # old tab still holds the pre-finalize (version=1, revision=rev) token
+    stale = await client.patch(
+        f"/api/v1/job-profiles/{p.id}/document?expect_version={v}&expect_revision={rev}",
+        json=skel,
+    )
+    assert stale.status_code == 409, stale.text
+    detail = stale.json()["detail"]
+    assert detail == {
+        "code": "version_conflict",
+        "current_version": 2,
+        "current_revision": 1,
+    }
+
+
+@pytest.mark.asyncio
+async def test_patch_concurrent_writer_via_core_update_still_409s_with_current_token(client):
+    """另一 writer 繞過 ORM（Core UPDATE）直接推進 DB 列的 revision（代表任何非本 session 的
+    寫入者，例如另一 worker process）→ 這個 session 下一次 PATCH 的 _latest_row() 是全新
+    SELECT（route 每次請求都重新查詢，不持有跨請求的 ORM 物件），如實讀到 DB 最新值 → 落在
+    DocConflictError（應用層 expected_* 檢查）而非 StaleDataError（flush 期 CAS）→ 409 +
+    當前 token。
+
+    （StaleDataError 本身——同一 flush 呼叫前一刻被搶先的窄視窗 CAS——與 route 的
+    except StaleDataError 復原邏輯，由 tests/test_persistence_doc.py 的
+    test_upsert_draft_guard_passes_app_check_but_cas_race_still_raises_stale_data_error 在
+    repo 層驗證，其手法比照 Task A 的 test_concurrent_stale_update_raises_stale_data_error：
+    在同一個未跨 request 邊界的 Python scope 內，靠 session identity map 保留一個仍記著舊
+    revision 的 in-memory ORM 物件。經驗證：那個手法**無法**跨兩個獨立 HTTP request 重現——
+    route 每次請求都用全新查詢，前一個 request 回應後其 ORM 物件在 session 的 identity map
+    裡只是弱引用，物件已被回收，所以第二個 request 必然讀到 DB 的當下實際值，永遠不會落在
+    "in-memory 仍是舊值但 DB 已變" 的窄縫。這才是本測試改用 DocConflictError 而非
+    StaleDataError 案例的原因；本測試仍然驗證了一個真實情境：非本 session 的並發寫入者。）
+    """
+    from sqlalchemy import update
+    from app.models import DocumentVersion
+
+    p = await _mk_profile(client._db)
+    doc = {"ocs_content": {"ocu_units": []}, "ocs_attitude": {"attitudes": []}}
+    r1 = await client.patch(f"/api/v1/job-profiles/{p.id}/document", json=doc)
+    v, rev = r1.json()["version"], r1.json()["revision"]
+    assert (v, rev) == (1, 1)
+
+    # Simulate a concurrent writer (e.g. another process/worker) landing between this
+    # session's two requests: bump the DB row's revision via raw Core UPDATE.
+    await client._db.execute(
+        update(DocumentVersion)
+        .where(DocumentVersion.job_profile_id == p.id)
+        .values(revision=2, content={"k": "other-writer"})
+        .execution_options(synchronize_session=False)
+    )
+    await client._db.flush()
+
+    # This PATCH's expect_version/expect_revision still hold the pre-conflict token (1, 1).
+    # The route's _latest_row() re-queries fresh and sees revision=2 → DocConflictError → 409
+    # with the actual current token.
+    r2 = await client.patch(
+        f"/api/v1/job-profiles/{p.id}/document?expect_version={v}&expect_revision={rev}",
+        json={**doc, "k": "this-request-too-late"},
+    )
+    assert r2.status_code == 409, r2.text
+    detail = r2.json()["detail"]
+    assert detail == {
+        "code": "version_conflict",
+        "current_version": 1,
+        "current_revision": 2,
+    }
 
 
 @pytest.mark.asyncio

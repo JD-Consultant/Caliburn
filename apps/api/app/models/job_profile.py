@@ -50,6 +50,14 @@ class DocumentVersion(Base):
     content = Column(JSONB)
     status = Column(Text, default="draft")
 
+    # revision：單一列的編輯回合計數（與 version 的「文件世系」語意分開，ADR 0015 精化）。
+    # SQLAlchemy version_id_col：每次 ORM UPDATE 自動 SET revision=n+1 WHERE … AND revision=n（CAS）；
+    # 0 rows（同毫秒競態）→ StaleDataError。INSERT 新列 revision 從 1 起。
+    # https://docs.sqlalchemy.org/en/20/orm/versioning.html
+    revision = Column(Integer, nullable=False, default=1, server_default=text("1"))
+
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     job_profile = relationship("JobProfile", back_populates="document_versions")
+
+    __mapper_args__ = {"version_id_col": revision}

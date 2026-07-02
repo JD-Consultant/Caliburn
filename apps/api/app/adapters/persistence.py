@@ -92,7 +92,7 @@ class DocRepo:
 
     @staticmethod
     def _to_dict(r: DocumentVersion) -> dict:
-        return {"id": str(r.id), "version": r.version,
+        return {"id": str(r.id), "version": r.version, "revision": r.revision,
                 "content": r.content, "status": r.status}
 
 

@@ -207,7 +207,35 @@ LLM 直寫也應以「新版本 + 可 diff 審閱 + 可回溯」呈現——`Doc
 ④的任務命名用**動詞+受詞+條件**;⑥品質關的 rubric 從 **21 條審核指標**起草;
 藍圖末端加 **⑦重要度確認回合**(7.6)。
 
-## 6. 來源(權威分類)
+## 8. 訪談 UX 載體研究(聊天 vs 精靈 vs 混合)
+
+> 2026-07-02 深研。問題:訪談的 UI 載體——純聊天面板?工作台內嵌逐步精靈?混合?
+
+### 8.1 證據
+
+| 來源(權威) | 發現 | 對本案的意義 |
+|---|---|---|
+| [NN/g《Wizards》](https://www.nngroup.com/articles/wizards/) | 精靈最適合**低領域知識者做不熟流程**;但**重複使用者會嫌煩**;聊天機器人在使用者**偏離線性流程時會失效** | 員工(一次性、小白)適合精靈式引導;顧問(重複使用者)要能跳過;純聊天有「空白框不知打什麼」問題 |
+| [CHI 2019 Kim et al.《Comparing Data from Chatbot and Web Surveys》](https://dl.acm.org/doi/fullHtml/10.1145/3290605.3300316) + [Frontiers 醫療資料蒐集對照](https://pmc.ncbi.nlm.nih.gov/articles/PMC9606606/) | 對話式蒐集**開放性資料品質更高**(少敷衍 satisficing、更 nuanced)、偏好度顯著較高(NPS 24 vs 13、69.9% 偏好);代價是**較慢** | 開放敘事(STAR/5W2H)用**對話**;結構化選擇(選職類/勾任務)用 **widget**(快、準) |
+| [Intuit/TurboTax](https://www.intuit.com/blog/innovative-thinking/tech-innovation/how-intuit-transformed-tax-filing-experiences/) + [MIT SMR](https://sloanreview.mit.edu/article/turbotax-meets-turbo-innovation-ai-at-intuit/) | 「小白產專業文件」的經典先例 = **interview-style 引導步驟**;2025–26 疊 **Intuit Assist**(個人化清單 + 即時檢查 + 隨問隨答) | 引導軌道(而非自由聊天)是驗證過的主模式;AI 是軌道上的加速器 |
+| Canvas(OpenAI)/ Artifacts(Anthropic)並排模式 + CopilotKit 生態(我們已用) | 2025–26 人機共創的標準形:**聊天在側、文件常駐可編**;CopilotKit 的 generative UI/HITL 即此模式的開源對應 | 「人隨時直接改文件」的需求 → 文件必須常駐主畫面;訪談掛側邊 |
+
+### 8.2 三方案比對
+
+| 方案 | 優 | 劣 |
+|---|---|---|
+| (a) 純聊天面板 | 建置最少(CopilotKit 既有) | 空白框問題;偏離即失效(NN/g);結構化選擇靠打字易錯;文件變化不透明 |
+| (b) 全螢幕精靈(TurboTax 式) | 對一次性小白最友善 | **蓋住文件** → 違反「人隨時直接改」;顧問(重複用)嫌煩;深問的開放敘事塞進表單品質差 |
+| **(c) 混合:文件常駐 + 側邊「精靈化訪談面板」(推薦)** | 兼得:面板內是**腳本軌道**(五面向進度 ①定位…⑥重要度 = wizard scaffolding),**結構化決策用內嵌卡片**(pick_profile 彈選單模式已有),**開放敘事用自由輸入**(CHI 品質優勢);文件在旁**即時長出**(Canvas/Artifacts 形)且可直接改(混合主導權);agent 寫入走 staged/版本(軸 3) | 建置比 (a) 多(面板內進度/卡片);需設計「員工模式預設開面板、顧問可收」 |
+
+### 8.3 結論(推薦 c)
+
+**混合:工作台文件常駐 + 側邊精靈化訪談面板。** 關鍵不是「聊天 vs 精靈」二選一,而是
+**把 wizard 的軌道紀律放進對話載體裡**:腳本推進(官方五面向)+ 進度可見 + 結構化選擇 widget 化 +
+開放敘事對話化 + 文件即時可見可改。與現有資產 1:1 對映(CopilotKit 面板 + LangGraph interrupt 彈選單 +
+工作台),**幾乎不需要發明新東西**。雙 persona:員工(一次性)預設進面板引導;顧問(重複)可收面板直接編。
+
+## 9. 來源(權威分類)
 
 **域內主管機關**:勞動部勞動力發展署《職能基準發展指引》(iCAP 官方)。
 **大廠官方**:[Anthropic Building Effective Agents](https://www.anthropic.com/engineering/building-effective-agents) · [Microsoft Word Copilot 官方文件](https://support.microsoft.com/en-us/office/welcome-to-copilot-in-word-2135e85f-a467-463b-b2f0-c51a46d625d1) · Google PAIR Wordcraft · [Datadog LLM guardrails](https://www.datadoghq.com/blog/llm-guardrails-best-practices/)。

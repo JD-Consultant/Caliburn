@@ -86,6 +86,48 @@ K/S/O/P 逐格候選(`task-catalogs` / CellFillerPanel)**不混池**——每任
   假設全都一樣、要嘛為微小差異糾結;正解是把「差異」顯性標出**。→ 對近重複不是只有「刪」:
   **標差異(來源職類、用詞差異)讓使用者能選**,與 ESCO contextualisation 的警示互相印證。
 
+### 2.5 大廠生產系統:技能圖譜的共識資料模型(第二輪研究)
+
+- **LinkedIn Skills Graph**(官方工程部落格):**~39K 正典技能 + 374K 別名**(26 語系)、
+  20 萬+ 技能間關聯;由**人類分類學家 + ML(KGBert 關係推斷)混合維護**;抽取後的技能一律
+  **正規化到正典表示**(「data analytics」=「data analysis」)。
+- **Workday Skills Cloud**(官方):**~50K 正典技能 + 200K 已認同義詞**;ML+圖技術維護關聯;
+  排程背景工作把與正典完全相同的眾包技能「吃掉」只留正典版;曾把 **100 萬條使用者輸入技能
+  收斂到 5.5 萬**。
+- 與 ESCO(§2.1)三方互證:**業界對技能/任務類短文本重複的正解收斂於「正典實體 + 別名集 +
+  非破壞性連結」**——沒有人放任重複,也沒有人無家可歸地硬刪。但三者都養著分類學家團隊——
+  正典化是長期工程,不是一個 endpoint;我們的量級適合**查詢時分群起步、人工確認逐步固化**。
+
+### 2.6 判定管線:Entity Resolution / MDM 的企業定式(第二輪研究)
+
+- **AWS Entity Resolution**(官方服務):rule-based(瀑布規則)與 ML matching 兩式;產出
+  **match group + confidence 0.0–1.0**。ER 管線的標準形:blocking → 兩兩比對 → 分群。
+- **Informatica MDM**(官方):golden record = **match(exact/fuzzy)→ merge → survivorship**;
+  survivorship 規則 = 來源階層(trust/precedence)/最新/最完整。→「**群裡誰當代表**」有企業
+  標準答案:規則驅動——對我們即「主基準優先,次以文字完整度」的正式化。
+- **LLM 當比對器**(Peeters & Bizer, EDBT 2025;arXiv:2310.11244、2405.16884):LLM zero-shot
+  entity matching 比最佳 PLM 高 8–68% F1、對未見實體泛化強;「Match/Compare/**Select**」框架中
+  從候選集**選擇**的形式表現佳。→ 邊界案例(cosine 落在灰區)可用 LLM 判定,學術已驗證;
+  也直接背書未來訪談引擎彙整節點的 LLM 合併判斷。
+
+### 2.7 關係語意標準:W3C SKOS 的一個關鍵設計警告(第二輪研究)
+
+- **SKOS**(W3C Recommendation)mapping 屬性:`skos:exactMatch`(廣泛場景可互換,**遞移**)
+  vs `skos:closeMatch`(僅部分場景可互換,**刻意不遞移**——避免跨體系鏈接時的「複合誤差」)。
+- → 演算法直接推論:**鬆門檻下不可用連通分量分群**(A≈B、B≈C 鏈成 A≈C 正是 SKOS 禁止的
+  複合誤差);近似級(closeMatch)分群應以**代表為中心的星型**、或只在 exactMatch 級門檻
+  (≥0.9 級)允許傳遞。若日後固化人工確認的等價對,SKOS 兩級語意就是現成的儲存詞彙。
+
+### 2.8 呈現與 LLM 上下文:大廠 UX 定式與模型商官方指引(第二輪研究)
+
+- **Amazon parent-child variations**(Vendor Central 官方指南):近似商品收在**不可購買的
+  parent** 下,顧客在單一頁面內選 child 變體——世界最大目錄對「近重複呈現」的答案就是
+  **分組+變體內選**。且 **2026 新政策**:「功能差異顯著」的 child 不再共享評論——連 Amazon
+  都在管制**過度合併**,與 ESCO contextualisation 警示(§2.1)互證:分組門檻寧嚴勿鬆。
+- **Anthropic 官方**(Effective context engineering for AI agents):context 是**有限資源、
+  邊際效益遞減**;token 增加導致 **context rot**(n² 注意力被稀釋);「每一步推理都是策展
+  決策」。→ grounding 清單的近重複是純粹的上下文污染;S3 的收斂由模型商官方指引直接背書。
+
 ## 3. 解法選項空間 × 表面適用
 
 | 選項 | 機制 | 優 | 劣 | 適用 |
@@ -96,23 +138,31 @@ K/S/O/P 逐格候選(`task-catalogs` / CellFillerPanel)**不混池**——每任
 | D. MMR 排序 | 不刪不併,重排讓近重複不相鄰、沉底 | 零風險、實作最小 | 沒解決「還是會看到兩條像的」 | 搜尋結果類(occupations `q=`)|
 | E. 僅溯源標示 | 原樣列出+標來源職類 | 已half存在(sources) | 未收斂,choice overload 仍在 | 作為 B 的展開層 |
 
-## 4. 建議(待討論)
+## 4. 兩輪研究後的共識綜合(待與維護者詳細討論)
 
-**分層混和,B 為主幹、非破壞性**:
+跨標準組織(W3C、歐盟)、大廠生產系統(LinkedIn、Workday、Amazon、AWS、Informatica)、
+學術(Meta SemDeDup、Peeters & Bizer EDBT、MMR 原典)、模型商(Anthropic、NVIDIA)、
+UX 權威(NN/g)、本土權威(MOL)的**共識五點**:
 
-1. **先修撞碼**(§1.3,獨立 bug):grounding id 與勾選鍵改 `ocs_code::task_code` 命名空間。
-2. **S1/S2/S3 共用一個「池內語意分群」服務**(api 服務層,查詢時計算):
-   池項目 → embedder(BGE-M3 dense,批次一次呼叫)→ 兩兩 cosine → 門檻連通分量 →
-   `[{representative, members: [{text, sources}]}]`。門檻先跑真實池的分布再定(BGE 官方做法);
-   分群結果**只改呈現與 grounding,不改底層資料**(隨時可關,回滾=關開關)。
-   - S1 UI:近重複任務跨組收斂成一列「代表 + 來源徽章 ×n,可展開」;勾代表=挑其中一個
-     來源(預設主基準優先,可展開改選)——差異顯性化,對齊 NN/g。
-   - S2:態度/職類池同機制(sources 型別已備)。
-   - S3:LLM 拿分群後代表清單(帶 namespaced id),重複建議自然消失。
-3. **S4 留給訪談引擎立項**(ADR 0020 的⑤彙整節點):LLM 語意合併敘述文字,staged 審閱把關
-   ——與目錄類分群是兩件事,不混做。
-4. **不做**(YAGNI):索引時全域正典化(ESCO 式重建分類學——量級不符)、reranker 加掛
-  (先驗 dense 夠不夠)、Qdrant payload cluster_id(等分群邏輯穩定再考慮下沉)。
+1. **根治靠正典化**(canonical + aliases;ESCO/LinkedIn/Workday 三方一致),但那是養分類學的
+   長期工程 → 我們適合「查詢時分群」起步,把人工確認過的等價對逐步固化(儲存語意用 SKOS
+   exactMatch/closeMatch 兩級)。
+2. **判定管線有定式**(ER/MDM):相似度打分(BGE-M3 已有)→ 灰區用更強判定器(reranker 或
+   LLM——LLM zero-shot 已被學術驗證)→ match group → **survivorship 規則選代表**
+   (主基準優先、次以完整度——MDM 標準做法)。
+3. **分群演算法有紅線**(SKOS):近似級關係不遞移 → **不可鬆門檻連通分量**;星型(以代表
+   為中心)或僅高門檻允許傳遞。
+4. **呈現有大廠範本**(Amazon parent-child + NN/g):**分組+代表+變體內選+差異顯性**;
+   同時 Amazon 2026 政策與 ESCO contextualisation 都警告**過度合併**——寧嚴勿鬆、非破壞、可展開。
+5. **LLM 端同一份工作雙倍回報**(Anthropic context rot):grounding 清單收斂 = UX 改善 + agent
+   品質改善;未來訪談引擎的彙整節點(北極星⑤)可用 LLM 當合併判定,staged 審閱把關。
+
+**時序注意**(維護者 2026-07-02:主要架構之後會重寫):§1.3 撞碼 bug 維護者裁示**不先修、
+併入重寫**;據此,dedup 能力應定位為 **api 知識/策展層的獨立服務**(重寫前後都能接),
+現行 UI 是否先接一版輕量分群屬時序決策,待討論。
+
+**明確不做**(YAGNI):索引時全域正典化(ESCO 式重建分類學——量級不符)、reranker 先不掛
+(先驗 dense 夠不夠)、Qdrant payload cluster_id(等分群邏輯穩定再考慮下沉)。
 
 ## 5. 來源
 
@@ -131,6 +181,17 @@ K/S/O/P 逐格候選(`task-catalogs` / CellFillerPanel)**不混池**——每任
 - Qdrant 官方:[Query point groups API](https://api.qdrant.tech/api-reference/search/query-points-groups)
 - NN/g:[Choice Overload Impedes User Decision-Making](https://www.nngroup.com/videos/choice-overload/) ·
   [Explicitly State the Difference Between Options](https://www.nngroup.com/articles/explicit-differences/)
-- 上下文冗餘:[AdaGReS(arXiv:2512.25052)](https://arxiv.org/pdf/2512.25052)
+- 上下文冗餘:[AdaGReS(arXiv:2512.25052)](https://arxiv.org/pdf/2512.25052) ·
+  [Anthropic — Effective context engineering for AI agents(官方)](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)
+- 大廠技能圖譜:[LinkedIn — Building and maintaining the skills taxonomy(官方工程部落格)](https://www.linkedin.com/blog/engineering/data/building-maintaining-the-skills-taxonomy-that-powers-linkedins-skills-graph) ·
+  [LinkedIn — Extracting skills from content](https://engineering.linkedin.com/blog/2023/extracting-skills-from-content-to-fuel-the-linkedin-skills-graph) ·
+  [Workday — The Foundation of the Workday Skills Cloud(官方)](https://blog.workday.com/en-us/foundation-workday-skills-cloud.html) ·
+  [Workday Skills Cloud Datasheet(官方)](https://www.workday.com/content/dam/web/en-us/documents/datasheets/workday-skills-cloud-datasheet-enus.pdf)
+- Entity Resolution / MDM:[AWS Entity Resolution(官方文件)](https://docs.aws.amazon.com/entityresolution/latest/userguide/what-is-service.html) ·
+  [Informatica — What is a Golden Record(官方)](https://www.informatica.com/blogs/golden-record.html) ·
+  [Peeters & Bizer — Entity Matching using LLMs(EDBT 2025)](https://openproceedings.org/2025/conf/edbt/paper-81.pdf) ·
+  [Match, Compare, or Select?(arXiv:2405.16884)](https://arxiv.org/pdf/2405.16884)
+- 標準:[W3C SKOS Reference(Recommendation;exactMatch/closeMatch 遞移性)](https://www.w3.org/TR/skos-reference/)
+- 呈現範本:[Amazon — Product Variations Relationship User Guide(Vendor Central 官方)](https://vendorcentral.s3.amazonaws.com/Resource+Center/vendor-central/GLOBAL_Selling/Product_Variations_Relationship_User_Guide.pdf)
 - 本 repo:[北極星研究 §7 MOL 指引(共通/專業職能)](2026-07-02-llm-interview-authoring-research.md) ·
   ADR 0012(embedder 服務)· ADR 0016(task-catalogs 批次)· ADR 0020(訪談互動模式)

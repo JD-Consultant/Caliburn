@@ -1,5 +1,9 @@
 # Plan — 2a-minimal:存檔樂觀鎖(revision token + 409)+ no-op skip
 
+> **交接**:細節設計 + 參考實作(含程式碼)見
+> [spec `2026-07-02-2a-minimal-save-concurrency-spec.md`](../specs/2026-07-02-2a-minimal-save-concurrency-spec.md)。
+> 新 session 讀 CLAUDE.md + 該 spec + 本 plan 即可獨立開工。
+
 - 依據:[ADR 0015](../adr/0015-document-save-optimistic-concurrency.md)(決策不變)·
   研究 [`../specs/2026-06-30-web-data-layer-optimization-research.md`](../specs/2026-06-30-web-data-layer-optimization-research.md) §2 ·
   [`../specs/2026-07-02-llm-interview-authoring-research.md`](../specs/2026-07-02-llm-interview-authoring-research.md)(軸 3/4:回合制 + staged 審閱背書)。

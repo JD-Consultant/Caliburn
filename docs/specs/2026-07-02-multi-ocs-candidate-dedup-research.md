@@ -266,6 +266,17 @@ items: [{id, text, kind, source}]            # kind: task|output|indicator|knowl
 | **訪談 agent(ADR 0020)** | 同 endpoint 做 agent tool:灰區對 → LLM 產生**鑑別提問**(clarifying questions 系譜)或彙整期合併提案(staged 審閱) | 重寫時 |
 | 記憶(可選,後期) | 人工確認的等價/不等價對持久化(SKOS exactMatch/closeMatch 語意)→ 下次直接命中,越用越準 | 後期 |
 
+### 7.2.1 維護者拍板與新增需求(2026-07-02)
+
+- **架構方向同意**(「架構應該是你說的這樣」)。
+- **語料分區**:未來公司版職說書會切進同一索引,但要**分群**——API 須支援「只搜公版 /
+  只搜私版 / 都搜」(Qdrant payload 分區 + 過濾;多租戶隔離對齊 ADR 0006 精神,實作時
+  另研究 Qdrant 官方 multitenancy 模式)。curation 工具的 `source` 欄位已容納公/私標記。
+- **本專案核心 = 人與 LLM 共同編輯**:「主要以 LLM 為主,使用者也可自行編輯——先做工具
+  就是共同編輯的意思」。共編協定(LLM 怎麼寫入、staged 提案 vs 直改、回合語意與 2a token
+  的關係)是訪談引擎立項的核心設計題,**另開研究**;本工具是該體系中 LLM 的 tool 之一。
+- **時序**:先把 curation 工具做成功能(LLM 一定用得到);訪談/共編設計隨後專題研究。
+
 ### 7.3 LLM 與工具的關係(回維護者問)
 
 - **工具本體不放 LLM**:分帶是確定性契約(可測、便宜、毫秒級、離線可跑)——符合 Anthropic

@@ -98,6 +98,8 @@
 
 **刻意不做(未來縫,一行記)**:gzip/ETag/immutable 等 HTTP 加固、server 端 per-code 快取、
 indexer `view=FULL`、missing-codes 清單/重試機制。pack 內部 per-code 組裝即未來拆分縫。
+理由(維護者):**目前全本地部署、只有 LLM API 走雲端**——網路不是問題域;設計預算投向
+LLM 核心(去重工具、訪談/共編),那裡的深度不算過度設計。
 
 ## §6 落地順序(各自 plan,bite-size,green-before==green-after)
 

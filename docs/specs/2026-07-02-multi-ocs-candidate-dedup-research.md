@@ -324,6 +324,28 @@ record linkage 框架(LLM 判模糊對 + Bayesian 與先驗融合 + **人工抽�
 - **D12 版本一致性**:inline 嵌入 fresh-vs-fresh 自洽,無 manifest 相容問題;存量向量路徑
   (tasks:findSimilar)既有 manifest 檢查不動。
 
+### 7.5 前置發現:來源資料的代碼污染是系統性問題(2026-07-02 全量掃描)
+
+維護者指示「先處理 api/web 顯示:候選文字不帶代碼、代碼顯示在引用、文件內部 OPKSA 代碼照舊」。
+全量掃描 908 份來源 JSON 的量化結果:
+
+| 污染類型 | 規模 | 性質 |
+|---|---|---|
+| K/S/O name 內嵌【T*】適用性標記 | **113 檔 / 335 項** | **不是垃圾,是資料**——多任務共用 block(§6.3 的 0.6% 案例)裡「這條 K 適用哪個任務」的標記;應**剝離成結構化欄位**(如 `applies_to`)而非丟棄 |
+| 任務名吞入 PDF 表格殘片(如「確認顧客或市場需求T1.1.1確認客戶需求T1.1.2…」) | **88 筆** | **pdf-to-json 解析缺陷**(子任務版面未處理);ingest 層無法真正修,需回 parser(另一 bounded context,golden 紀律,獨立排程) |
+| CJK 詞中斷行空白(「能 力」「特性需求 」) | **6,493 項** | PDF 換行 artifact,ingest 層可修 |
+| 任務名【註N】腳註標記 | **69 筆** | 對應 `notes` 欄位;ingest 層可剝離 |
+
+**污染同時傷顯示與 embedding**(§5 實驗:同名技能因【T*】只得 0.788)。→ 修層決策:
+
+1. **indexer ingest 清洗(Task 0,與顯示同波)**:normalize 時剝【T*】→payload `applies_to`、
+   剝【註N】、併詞中空白/換行;**re-index 一次**(既有指令)。顯示與向量同時變乾淨;
+   `applies_to` 未來還能讓 task_competencies 對多任務 block 精準過濾(資料升級,非只清洗)。
+2. **api/web 顯示**:候選 option 只顯示乾淨 name;K01/T1.1 等代碼與來源移到「引用/出處」
+   顯示;**著作文件內部的 OPKSA 代碼(ocs-schema)完全不動**。
+3. **pdf-to-json 修 88 筆吞名 bug**:獨立 plan(re-parse + re-index),不擋 Task 0。
+4. match 工具的 D4 前處理降級為**防禦性**(同規則、冪等)——源頭乾淨後它只是保險。
+
 ## 8. 來源
 
 - ESCO(歐盟官方):[Skills pillar](https://esco.ec.europa.eu/en/about-esco/escopedia/escopedia/skills-pillar) ·

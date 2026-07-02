@@ -369,6 +369,24 @@ name 標【T1.1】,但因所在 block 的 task_codes 涵蓋 T1.1–T1.5,K01 最�
 3. **pdf-to-json 修 88 筆吞名 bug**:獨立 plan(re-parse + re-index),不擋 Task 0。
 4. match 工具的 D4 前處理降級為**防禦性**(同規則、冪等)——源頭乾淨後它只是保險。
 
+### 7.5.1 維護者定調(2026-07-03):dedup 只需 name,不處理 T 標記,兩件事解耦
+
+維護者釐清:**dedup(items:match)只需要乾淨的 `name`**。【T*】是「來源/引用」(provenance),
+對「兩個 K/S 名稱算不算近重複」毫無作用——「問題解決能力」vs「問題解決能力」重不重複,
+跟它們各自被哪個任務引用無關。故 dedup 工具 = **拿 name → 剝【T*】/【註N】→ 比對**,
+**不解析、不結構化** T 標記。
+
+由此把上面 §7.5 的兩件事**明確解耦**(先前把它們混在一起是過度耦合):
+
+- **Concern D(dedup,本工具)**:唯一需求 = 乾淨 `name`。**在讀取當下**(D4 前處理)剝標記
+  取 name 即可,來源【T*】原樣保留當引用。→ **dedup 功能零 ingest / 零 re-index 改動**;
+  items:match 輸入乾脆為 `{id, text=name, kind, source=ocs_code}`。
+- **Concern A(逐任務 K/S 歸屬,如工具機五分特例)**:上面「【T*】非冗餘、應結構化成
+  `applies_to`」的分析**只對這件事成立**——它是顯示 / 資料品質的**獨立議題**,**不在 dedup
+  關鍵路徑上**。dedup 不必等它、不擁有它;要不要做、何時做,與 dedup 無依賴。
+- 故 §7.5 的「修層決策 1」(ingest 清洗 + 結構化 Task 0)**不再是 dedup 的前置**:dedup 直接
+  用讀取時 D4;Concern A 的 ingest 清洗/結構化(以及 88 筆吞名 parser bug)各自獨立排程。
+
 ## 8. 來源
 
 - ESCO(歐盟官方):[Skills pillar](https://esco.ec.europa.eu/en/about-esco/escopedia/escopedia/skills-pillar) ·

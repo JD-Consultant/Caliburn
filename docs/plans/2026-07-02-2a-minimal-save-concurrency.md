@@ -70,3 +70,32 @@
 ## 回滾
 
 - Task A migration 為加欄,revert = drop column(無資料遷移);B/C 各自 revert commit 即可。
+
+## 實作結果(2026-07-02,已 FF 併入 main,tag `2a-minimal-save-concurrency`)
+
+- 4 commits(Task A/B/C/D 各一):`3ffbc22` / `a600fe5` / `a506407` / `920af14`。
+- 測試:api **164 passed**(baseline 149 + 新 15:A 3、B repo 層 5 + route 層 7);web tsc + lint 乾淨。
+  whole-branch review 0 Critical/Important;**手動雙分頁瀏覽器驗證通過**(維護者:①衝突→載入最新版
+  ②衝突→以我的版本覆蓋 ③Network 確認 no-op 不發 PATCH)。
+- 實作對 spec 的兩個正確補強:GET 空文件骨架補 `revision: 0`(首存 (0,0) 邊界自洽);web 加 `ownWrite`
+  旗標——防「外部變化 effect」把自己 PATCH 造成的 token 變化誤判成外部更新、用 cache 內容重設 baseline
+  (spec §6.3 漏存陷阱的第二個入口)。
+- StaleDataError CAS 競態經實證**無法跨兩個獨立 HTTP request 重現**(route 每請求全新查詢;前請求的
+  ORM 物件在 identity map 只是弱引用)→ 釘在 repo 層測試;route 的兩個 except(DocConflictError /
+  StaleDataError)由 `test_upsert_draft_guard_passes_app_check_but_cas_race_still_raises_stale_data_error`
+  證明是兩道不同防線。
+
+### 驗證途中的環境發現(非本 branch 缺陷)
+
+- CORS 白名單寫死 `:3000`(`app_factory.py`)→ 臨時埠(:3011)驗證需外掛 CORS 層;curl 演練繞過瀏覽器
+  CORS 測不到這類問題——瀏覽器手動驗證有其不可替代性。
+- API 改名(ADR 0019)前啟動的舊 indexer 進程對新 `:search` 路徑 404 → api 502「indexer unavailable」。
+  dev 進程 reload 皆關,改路徑/契約後要重啟整套 dev stack。
+
+### 留待後續(review triage,均不影響正確性、不丟資料)
+
+1. route 直呼 `DocRepo._latest_row`(私有方法)→ 可公開化(low)。
+2. ConflictDialog「載入最新版」refetch 期間 `conflictBusy` 未蓋住兩顆按鈕(短窗、收斂安全)。
+3. `ownWrite` 為布林非計數器(自癒)→ 建議補 interleaving 回歸測試。
+4. route 的 `except StaleDataError` 分支無直接測試(可 monkeypatch `upsert_draft` 補)。
+5. status 推導的 `"error"` 幾乎不可達(非 409 失敗後 dirty 恆真 → 顯示「尚未儲存」且不自動重試)→ UX 觀察。

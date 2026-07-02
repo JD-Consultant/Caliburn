@@ -17,7 +17,7 @@
 - [`contract-strategy.md`](contract-strategy.md) —— 替 seam 選契約機制的判準（#1 JSON-schema、#2 共用 pydantic、預答 #3）。
 - [`service-split-framework.md`](service-split-framework.md) —— 何時拆「服務」vs 拆「repo」vs 留成模組的判準。
 - [`product-notes.md`](product-notes.md) —— 產品 / UX 決策與延後項（如 autofill on selection）。
-- [`adr/`](adr/) —— Architecture Decision Records（決策的「為什麼」+ 取捨;0001–0019）。
+- [`adr/`](adr/) —— Architecture Decision Records（決策的「為什麼」+ 取捨;0001–0020）。
 - [`runbook.md`](runbook.md) —— 維運操作:起停、重啟紀律、故障排除、部署。
 - 開發上手見根目錄 [`../CONTRIBUTING.md`](../CONTRIBUTING.md)。
 

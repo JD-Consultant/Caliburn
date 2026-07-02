@@ -1,30 +1,123 @@
 # api — Caliburn 後端(FastAPI + LangGraph)
 
-「著作」bounded context 的後端。提供 REST `/api/v1/*`(users / job-profiles / documents / **occupations**(根層職類目錄搜尋)/ ai)與 AG-UI agent 端點 `/copilotkit`。自訂方法用 AIP `:verb`(`document:finalize`、`document:buildTasks`,ADR 0019)。PATCH `documents` 端點支援樂觀鎖(query param `expect_version`、`expect_revision`,衝突時返 409;ADR 0015)。擁有 **Postgres**(使用者文件、LangGraph checkpoints)。透過 HTTP 消費 `ocs-indexer` 取知識。
+「著作」bounded context 的後端。提供 REST `/api/v1/*` 與 AG-UI agent 端點 `/copilotkit`。
+擁有 **Postgres**(users/job_profiles/document_versions + LangGraph checkpoints);知識一律
+透過 HTTP 消費 `ocs-indexer`,**不碰 Qdrant**(資料主權,見根 [`ARCHITECTURE.md`](../../ARCHITECTURE.md))。
 
 - **import 套件名**:`app`(Phase 3 才改 `caliburn_api`;現由 `pytest.ini` 的 `pythonpath=.` 提供)。
-- **uv application 模式**(無 build-system,見 [ADR 0005](../../docs/adr/0005-per-app-uv-defer-workspace.md))。
+- **uv application 模式**(無 build-system,[ADR 0005](../../docs/adr/0005-per-app-uv-defer-workspace.md))。
 
-## 跑
+## 跑 / 測試
 
 ```bash
 uv sync
 docker compose up -d db            # 需 Postgres(:5432)
-uv run python run_live.py          # :8001(Windows 用 SelectorEventLoop,已內建)
+uv run python run_live.py          # :8001(Windows 用 SelectorEventLoop,已內建;reload 已關)
 # 或從 monorepo 根:npx turbo dev
-```
-健康檢查:`GET /healthz`(main 與 live app 統一,含 DB readiness;ADR 0017)。知識查詢需另起 indexer(見 [`../../docs/runbook.md`](../../docs/runbook.md))。
-
-**兩個 app 入口,一個組裝點**:`app.main`(REST-only,給 tests/docker)與 `app.copilotkit_live_app`(生產,額外掛 PG checkpointer + `/copilotkit`)都經 `app_factory.configure()` 這個**單一 composition root** 掛 router/CORS/health,故 wiring 不會漂移(ADR 0017)。
-
-## 測試
-
-```bash
-uv run pytest -q     # 無 DB 時 DB 相關測試會 skip
+uv run pytest -q                   # 無 DB 時 DB 相關測試自動 skip
 ```
 
-## 結構(六邊形,ADR 0008 已實作)
+健康檢查:`GET /healthz`(含 DB readiness;ADR 0017)。知識查詢需另起 indexer + embedder
+(見 [`docs/runbook.md`](../../docs/runbook.md))。新增依賴:改 `pyproject.toml` + `uv lock`。
 
-`app/{core(ports + domain)、adapters(DB/LLM/knowledge 等邊緣)、services(use-case)、authoring(LangGraph 編排,原 graph_v3)、api/routes(+ `api/router.py` 聚合)、app_factory.py(composition root:`configure()`)、schemas}`。Phase 3a 已抽 `core/`、移除 graph↔services 反向邊;ADR 0017 收斂 app 入口為單一組裝點。
+**兩個 app 入口,一個組裝點**:`app.main`(REST-only,給 tests/docker)與
+`app.copilotkit_live_app`(生產,額外掛 PG checkpointer + `/copilotkit`)都經
+`app_factory.configure()` 這個**單一 composition root** 掛 router/CORS/health,wiring 不會漂移(ADR 0017)。
 
-新增依賴:改 `pyproject.toml` + `uv lock`(舊 `requirements.txt` 已過期、待退役)。
+## Codemap(六邊形,ADR 0008)
+
+| 路徑 | 是什麼 | 依賴方向 |
+|---|---|---|
+| `app/core/` | **純內圈**:`ports.py`(KnowledgePort/PersistPort/LlmPort Protocol)、`domain/ocs_doc.py`(OCS 文件純函式:skeleton/build_from_picked/assemble_final/validate/completion)、`domain/header_meta.py`(表頭池聯集去重)、`knowledge_dto.py`(re-export [`packages/indexer-contract`](../../packages/indexer-contract/)) | 不 import 任何外圈 |
+| `app/adapters/` | 邊緣實作:`knowledge_http.py`(indexer typed client)、`persistence.py`(ProfileRepo/DocRepo/LiveDbPersist)、`llm_openrouter.py`(per-role LLM + JSON 重試)、`stubs.py`(測試/demo 假件) | 實作 ports |
+| `app/services/` | use-case 純函式:`ai/`(recommend_ks/draft_op/extract_tasks/structure_task/clarify + prompts)、`knowledge/task_detail.py`(池→單任務切片) | 只吃 ports/DTO |
+| `app/authoring/` | LangGraph 訪談編排(原 graph_v3):`graph.py` 骨幹 + 逐任務深問**單層 loop(刻意,勿重構)**、`serving.py`(AG-UI agent)、`checkpointer.py` | deps 注入 ports |
+| `app/api/` | HTTP 面:`routes/{users,job_profiles,documents,occupations,ai}.py`、`router.py`(唯一聚合點)、`deps.py`(get_knowledge) | 薄轉接,邏輯下沉 |
+| `app/app_factory.py` | composition root:`configure()` 掛 router/CORS/healthz | — |
+| `app/{config,database,models,schemas}.py` | Settings(.env)/engine/ORM 三表/pydantic in-out | — |
+
+## 資料模型(Postgres,Alembic 管 schema)
+
+```
+users ─1:N─ job_profiles ─1:N─ document_versions
+```
+
+- `job_profiles.selected_ocs_codes`(ARRAY):已選職類,順序=優先度。
+- `document_versions`:**version = 文件世系**(finalize/重建才 +1,INSERT 新列)、
+  **revision = 同一列的編輯回合**(SQLAlchemy `version_id_col`,每次 UPDATE 自動 CAS +1)。
+  雙 token 構成 PATCH 樂觀鎖(ADR 0015)。`content` = 整份 OCS JSON(JSONB,draft 含 `_` UI 欄位)。
+
+## REST 端點 reference(`/api/v1`)
+
+依賴降級政策(ADR 0018):**critical** = indexer 掛 → 502 快錯;**enrichment** = 略過壞的部分
+→ 200 + `meta.partial=true`。
+
+| Method Path | 用途 | indexer |
+|---|---|---|
+| `POST/GET /users…`、CRUD `/job-profiles…` | 匿名使用者 + 職務檔案(list 附 doc_status/completion) | — |
+| `GET /job-profiles/{id}/document` | of-record 信封;無文件回 `status:"none"` 空殼 | — |
+| `PATCH …/document?expect_version=&expect_revision=` | 存草稿(整份文件);token 不符 → **409** + current token;不帶=不守衛(legacy) | — |
+| `POST …/document:finalize` | 組裝+驗 schema(失敗 422)→ INSERT 新 final 列 | — |
+| `POST …/document:buildTasks` | 勾選任務建/更新文件(加法、依 provenance 去重、遞進重編) | — |
+| `GET …/document/export` | 唯讀匯出乾淨契約 JSON(剝 `_` 欄位,不寫 DB) | — |
+| `PUT …/occupations` | 整批取代已選職類 + 刷新文件表頭為官方主基準 | 表頭名(掛→留空) |
+| `GET …/task-candidates` | 已選職類全部任務(職類→職責分組) | **critical** |
+| `GET …/header-meta` | 表頭候選池(聯集去重+sources 溯源)+ 主基準 | enrichment |
+| `GET …/task-catalogs` | 批次每任務官方 K/S/O/P+level(每 ocs_code 撈一次池;ADR 0016) | enrichment |
+| `GET /occupations?q=` | 根層職類目錄搜尋(全域知識,不掛 profile 下;ADR 0019) | **critical** |
+| `POST /ai/{recommend-ks,draft-op,extract-tasks,structure-task,clarify}` | **只提議、不寫 DB**;無金鑰→降級回 catalog/空 | enrichment |
+| `GET /healthz`;`/copilotkit`(AG-UI) | 就緒(含 DB);訪談 agent(live app 才掛) | — |
+
+## 關鍵流程
+
+### 1. 文件 of-record 生命週期
+
+```
+GET(無文件)→ status:"none" 空殼(version 0, revision 0)
+PATCH / PUT occupations / buildTasks → upsert_draft:
+   最新列是 draft → 原地更新 content(version 不變,revision 自動 +1)
+   否則           → INSERT 新 draft(version+1,revision 從 1 起)
+finalize → assemble_final(補全+剝 `_`)→ validate → INSERT 新 final 列(version+1)
+```
+
+樂觀鎖:應用層先比 (expect_version, expect_revision),不符 raise → 409;同毫秒競態由
+`version_id_col` 的 CAS 兜底(StaleDataError → rollback → 409)。
+
+### 2. 選職類(PUT occupations)
+
+存 `selected_ocs_codes` → 問 indexer 第一順位的官方名(掛→表頭名**留空,絕不退回 job_title**)
+→ 刷新既有 draft 表頭或建只有表頭的 draft。任務不動,待 buildTasks。
+
+### 3. task-catalogs 批次聚合(ADR 0016)
+
+讀最新文件 → 收集每任務 `(文件任務碼, provenance.ocs_code, provenance.task_code)` →
+**每個不同 ocs_code 只打一次** `GET /occupations/{code}/competencies` → 依 task_code 切片
+(`services/knowledge/task_detail.py`)→ `{catalogs: {T1.1: {...}}}`。某 code 掛 → 略過該池
+的任務 + `meta.partial=true`。
+
+### 4. AI 提議降級鏈(D28)
+
+`有 note + 有金鑰 → LLM 篩選/草擬(錯誤/空回 → fallback)→ 官方 catalog → 空`。
+路由層薄:載文件→定位任務(provenance)→委派 `services/ai/` 純函式,同邏輯供未來訪談 agent 重用。
+
+## 不變量
+
+- **core 不 import 外圈**(adapters/authoring/fastapi);違反=架構回歸(ADR 0008)。
+- **`/ai/*` 永不寫 DB**:提議由前端套用後走 PATCH。
+- **文件寫入只有三條路**:PATCH(使用者編輯)、PUT occupations / buildTasks(結構重建)、
+  finalize(產正式版)。header-meta/task-catalogs 等池端點**唯讀**,重選職類不會洗掉使用者編輯。
+- **表頭官方名絕不退回使用者 job_title**(indexer 掛就留空)。
+- **draft 寬鬆、final 嚴格**:PATCH 不驗 schema,finalize 才 assemble+validate(422)。
+- LLM 無金鑰 → `llm=None` 全鏈優雅降級,不發注定失敗的呼叫。
+
+## 指路
+
+ADR [0008](../../docs/adr/0008-api-hexagonal-layering.md)(六邊形)·
+[0015](../../docs/adr/0015-document-save-optimistic-concurrency.md)(樂觀鎖)·
+[0016](../../docs/adr/0016-batch-task-catalog-endpoint.md)·
+[0017](../../docs/adr/0017-app-entry-single-composition-root.md)(組裝點)·
+[0018](../../docs/adr/0018-indexer-dependency-degradation-policy.md)(降級)·
+[0019](../../docs/adr/0019-api-naming-alignment.md)(命名)·
+契約:[`packages/indexer-contract`](../../packages/indexer-contract/)(indexer DTO 權威)、
+[`docs/ocs-schema.md`](../../docs/ocs-schema.md)(OCS 文件結構)。前端消費視角見
+[`apps/web/README.md`](../web/README.md)。

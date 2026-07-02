@@ -286,6 +286,44 @@ items: [{id, text, kind, source}]            # kind: task|output|indicator|knowl
   應做成**可選批次增強**(離線/彙整時,預設關),線上路徑保持確定性。升級順位:
   前處理 → reranker(確定性)→ LLM 判定(批次)——每級先驗證是否已夠。
 
+**「灰區用 LLM」的證據狀態(2026-07-02 查證,回維護者「是業內共識嗎?」)**:
+**不是既定共識,是「新興且有據的實踐」**。分帶三區是共識(FS 1969 至今);灰區送「人」
+複核是經典共識;灰區給 LLM 的現狀——(a) **官方統計界研究中**:ISI 提出 LLM-assisted
+record linkage 框架(LLM 判模糊對 + Bayesian 與先驗融合 + **人工抽驗兜底不可省**);
+(b) **ER 龍頭 Senzing 的定位**:LLM 不宜當主比對器(一致性/可解釋性/成本 100–1000× 六維
+限制),適位角色之一是「**取代 edge-case 複核中的人**」;(c) 學術驗證強(Peeters & Bizer)。
+→ 一句話:LLM 判灰區「有據可循、方向正確、尚未共識、必須帶評估與人工兜底」。
+**本設計不賭它**:v1 灰區→人(UI 顯差異=產品化 clerical review);訪談情境→LLM 只是
+「幫忙問問題」的角色,最終判斷者是員工本人(比 clerical review 更好——問到唯一知道
+真相的人);LLM 批次判定=後期可選、評估把關。
+
+### 7.4 v1 設計細節(2026-07-02 定,維護者授權命名重設計)
+
+- **D1 命名**:`POST /items:match`(取代草案 findSimilar)——對齊 ER/FS 標準詞彙
+  (AWS「matching workflow」、Splink、FS 三區即 match / possible match / non-match),
+  回應欄位與理論端到端同名。既有 `tasks:findSimilar`(Qdrant 存量向量特化版,零消費者)
+  暫保留,分帶邏輯穩定後再評估統一。
+- **D2 Request**:`{kind, items: [{id, text, source?}], config?: {theta_high?, theta_low?}}`
+  ——池同質故 kind 放 request 層;config 覆寫僅供校準實驗,線上走 server 端 per-kind 預設。
+- **D3 Response**:`{groups: [{medoid, members: [{id, score}]}], possible_matches: [{a, b,
+  score}], config: {kind, theta_high, theta_low, model}}`——distinct 隱含不回傳(token
+  效率,Anthropic 工具指引);回 config 供重現(對齊 ADR 0009 版本紀律)。
+- **D4 前處理**:去【…】註記、併換行/連續空白、trim;完全同字先收斂(免嵌入)。NFKC 不做。
+- **D5 分群**:θ_high 邊按分數降序**貪婪星型**——雙方皆未入群→開新群;一方在群→僅當
+  「與該群中心分數 ≥θ_high」才併入(**成員與中心直連是硬條件**,SKOS 非遞移紅線 §2.7)。
+- **D6 兩種「代表」分離**:indexer 回 **medoid**(幾何中心,與群內平均相似度最高);
+  **survivorship(顯示代表:主基準優先→文字最完整)在 api 層**(領域知識歸 api)。
+- **D7 門檻**:indexer settings per-kind 預設(att 0.90/0.70 · k/s 0.85/0.65 · task
+  0.95/0.70);**校準腳本進 repo**,用真實共選組合輸出分布與建議值;改門檻=config change
+  +校準紀錄。
+- **D8 上限**:items ≤500/call(超回 413);O(n²) 毫秒級;embedder 單次批呼。
+- **D9** dense-only;sparse 混合與 reranker 留槽(§5.1)。
+- **D10 api 接法(additive、零破壞)**:header-meta 增 `attitude_groups`(平面 `attitudes`
+  保留);match 呼叫失敗→池原樣+`meta.partial`(enrichment 語意,ADR 0018)。
+- **D11** task-candidates 增 `similar_pairs`(跨組灰區對),同 enrichment 語意。
+- **D12 版本一致性**:inline 嵌入 fresh-vs-fresh 自洽,無 manifest 相容問題;存量向量路徑
+  (tasks:findSimilar)既有 manifest 檢查不動。
+
 ## 8. 來源
 
 - ESCO(歐盟官方):[Skills pillar](https://esco.ec.europa.eu/en/about-esco/escopedia/escopedia/skills-pillar) ·
@@ -319,6 +357,8 @@ items: [{id, text, kind, source}]            # kind: task|output|indicator|knowl
   [GOV.UK — MoJ Data First (Splink) 演算法透明紀錄](https://www.gov.uk/algorithmic-transparency-records/moj-data-first-splink) ·
   [Winkler — Machine Learning and Record Linkage(美國普查局)](https://isi-web.org/sites/default/files/import/files-2011/450070.pdf)
 - Agent 工具設計:[Anthropic — Writing effective tools for agents(官方)](https://www.anthropic.com/engineering/writing-tools-for-agents)
+- 灰區 LLM 證據狀態:[ISI — LLM-Assisted Record Linkage: Framework for Official Statistics(官方統計界)](https://www.isi-next.org/abstracts/submission/3897/view/) ·
+  [Senzing — Future of Entity Resolution in the Age of Generative AI(ER 龍頭)](https://senzing.com/entity-resolution-generative-ai/)
 - 引導式選擇(任務層):[Baymard — Product Lists & Thematic Browsing/Finders(電商 UX 權威)](https://baymard.com/research/ecommerce-product-lists) ·
   Aliannejadi et al. — Asking Clarifying Questions in Open-Domain Information-Seeking Conversations(SIGIR '19,奠基作)·
   [ClariQ(EMNLP 2020 SCAI 挑戰)](https://github.com/aliannejadi/ClariQ) ·

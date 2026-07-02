@@ -187,6 +187,25 @@ UX 權威(NN/g)、本土權威(MOL)的**共識五點**:
   跨基準同文異碼會漏合(實驗中 1.000 那對正是如此才雙雙出現在池裡)、同碼異文會誤併。
   現行 exact 去重本身有瑕疵。
 
+### 5.1 補充實驗:同職位兩版本(模擬多公司/同職位重選情境,2026-07-02)
+
+維護者指出未來會有多公司/同職位重選 → 用索引裡現成的**同職業雙版本**測(904 個職業中
+~170 個家族有多代碼,其中 MQM2141-001 v2+v4、MPD2151-002 v2+v4、LPS5404-001 v1+v3 為
+同職業異版本):
+
+- MQM2141-001(品管)v2×v4:95 對 ≥0.5,**0.9+ 零對**;最高 0.806 =「負責檢驗與測試
+  原物料、半製品、成品」vs「依規格檢驗原物料、半成品與成品」——**這是真重複(同任務改寫)**。
+- MPD2151-002(機構設計)v2×v4:最高 0.820 =「規劃目標與建立專案」vs「確認設計需求」
+  ——**這是不同任務**。
+- LPS5404-001(保全)v1×v3:最高 0.872(CCTV 維護 vs CCTV 監控記錄,相關而非同一);
+  任務名同樣有【註1】【註2】註記與 PDF 換行噪音 → 前處理(去註記、併空白)是全層通用需求。
+- **關鍵結論:任務層的「真重複改寫」(0.806)與「同領域不同任務」(0.820)分數帶完全重疊**
+  ——任何全域門檻要嘛漏掉真重複、要嘛誤殺不同任務。**任務層不可自動合併**;真重複落在
+  Fellegi-Sunter 的灰區,正確處置是「標出待確認」(UI 顯差異 / 未來 LLM 判定或澄清提問),
+  不是機器擅自決定。態度層(斷崖分布)不受此限,0.9 自動分組安全。
+- 升級槽位:cross-encoder(bge-reranker-v2-m3,部署進既有 embedder 容器,仍是確定性元件)
+  對「同一 vs 相關」的鑑別力遠高於 bi-encoder cosine,是灰區收窄的第一選項(先不做,留槽)。
+
 ## 6. 問題重構:三層資料、三種病、三種主流解法(第三輪)
 
 實驗證實維護者最初的直覺(「不一定要用去重」):
@@ -204,7 +223,59 @@ UX 權威(NN/g)、本土權威(MOL)的**共識五點**:
 服務**(池進、群出),重寫前後都能接。文件層 QA 是**同一能力的第三個消費者**(編輯器動作
 + agent 工具)。
 
-## 7. 來源
+## 7. 架構設計提案:統一「分帶策展」工具(第四輪,2026-07-02,待維護者拍板)
+
+維護者方向(2026-07-02):**所有層統一一個機制**、分數分帶路由;**先不接 LLM,做成未來
+訪談 LLM 的工具**。此方向與 record linkage 奠基模型 **Fellegi-Sunter(1969)三區決策**
+完全同構(≥上門檻自動連結 / 兩門檻間送人工複核 / <下門檻視為不同;Splink=英國司法部
+開源實作、GOV.UK 演算法透明登記在案),與 Anthropic 官方工具設計指引(「工具是**確定性
+系統與非確定性 agent 之間的契約**」;consolidated、meaningful context、token-efficient)
+互相印證。
+
+### 7.1 設計
+
+**一個確定性(LLM-free)相似度策展能力,四層(T/O·P/K·S/A)共用管線、per-kind 只差 config:**
+
+```
+items: [{id, text, kind, source}]            # kind: task|output|indicator|knowledge|skill|attitude
+  → ① 前處理(全層同款):去【註*】/【T*.*】註記、併換行空白、trim
+  → ② 打分:BGE-M3 dense cosine(embedder 既有;升級槽:cross-encoder reranker,仍確定性)
+  → ③ 分帶(Fellegi-Sunter;per-kind {θ_high, θ_low} 為 config):
+       ≥θ_high        → duplicate groups(星型聚代表,SKOS 非遞移紅線 §2.7;
+                         survivorship 選代表:主基準優先→文字最完整,§2.6)
+       [θ_low,θ_high) → similar_pairs(灰區:回「對+分數」,交上層處置)
+       <θ_low         → distinct
+  → 輸出 {groups, similar_pairs}(緊湊、可直接餵 UI 或 agent;不回原始矩陣)
+```
+
+- **實驗校準起點**(§5/§5.1;上線前按分布再校):attitudes {0.90, 0.70} · skills/knowledge
+  {0.85(清洗後), 0.65} · **tasks {0.95, 0.70}**——任務層 θ_high 刻意高到幾乎只攔逐字級,
+  因為實驗證明其真重複與相關任務同帶(§5.1),**灰區才是任務層的主場**。
+- **落點**:泛用 `items:findSimilar`(texts 進、帶出)放 **ocs-indexer**(相似度的 bounded
+  context;已有 embedder client 與 `tasks:findSimilar` 先例);契約走 `packages/indexer-contract`
+  (ADR 0010)。api 端薄服務做 survivorship、文件形狀對應、供 REST 與(未來)agent tool。
+  既有 `tasks:findSimilar`(Qdrant 存量向量版)保留,texts 版共用分帶邏輯。
+
+### 7.2 消費者(現在 → 未來)
+
+| 消費者 | 用法 | 時機 |
+|---|---|---|
+| 表頭態度池(header-meta) | groups 取代 exact-by-code 去重(順帶修 §5 附帶發現的 bug) | 現在即可 |
+| 任務勾選(TaskCuratePanel) | similar_pairs → 相似徽章 + 差異並排(NN/g explicit differences) | 現在即可(純顯示) |
+| 編輯器動作「檢查相似項目」 | 對文件現有 items 跑同 endpoint → 面板列 groups/pairs,人工處置 | 可排 |
+| **訪談 agent(ADR 0020)** | 同 endpoint 做 agent tool:灰區對 → LLM 產生**鑑別提問**(clarifying questions 系譜)或彙整期合併提案(staged 審閱) | 重寫時 |
+| 記憶(可選,後期) | 人工確認的等價/不等價對持久化(SKOS exactMatch/closeMatch 語意)→ 下次直接命中,越用越準 | 後期 |
+
+### 7.3 LLM 與工具的關係(回維護者問)
+
+- **工具本體不放 LLM**:分帶是確定性契約(可測、便宜、毫秒級、離線可跑)——符合 Anthropic
+  「tools = deterministic contracts」定義;LLM 是**上層消費者**(agent 拿 similar_pairs 去
+  提問/提案)。
+- 「工具帶 LLM 功能」不是禁忌(業界有 LLM-as-judge 工具),但對本能力:灰區的 LLM 判定
+  應做成**可選批次增強**(離線/彙整時,預設關),線上路徑保持確定性。升級順位:
+  前處理 → reranker(確定性)→ LLM 判定(批次)——每級先驗證是否已夠。
+
+## 8. 來源
 
 - ESCO(歐盟官方):[Skills pillar](https://esco.ec.europa.eu/en/about-esco/escopedia/escopedia/skills-pillar) ·
   [Skill reusability level](https://esco.ec.europa.eu/en/about-esco/escopedia/escopedia/skill-reusability-level) ·
@@ -233,6 +304,10 @@ UX 權威(NN/g)、本土權威(MOL)的**共識五點**:
   [Match, Compare, or Select?(arXiv:2405.16884)](https://arxiv.org/pdf/2405.16884)
 - 標準:[W3C SKOS Reference(Recommendation;exactMatch/closeMatch 遞移性)](https://www.w3.org/TR/skos-reference/)
 - 呈現範本:[Amazon — Product Variations Relationship User Guide(Vendor Central 官方)](https://vendorcentral.s3.amazonaws.com/Resource+Center/vendor-central/GLOBAL_Selling/Product_Variations_Relationship_User_Guide.pdf)
+- Fellegi-Sunter / 三區決策:[Splink — The Fellegi-Sunter Model(英國司法部官方文件)](https://moj-analytical-services.github.io/splink/topic_guides/theory/fellegi_sunter.html) ·
+  [GOV.UK — MoJ Data First (Splink) 演算法透明紀錄](https://www.gov.uk/algorithmic-transparency-records/moj-data-first-splink) ·
+  [Winkler — Machine Learning and Record Linkage(美國普查局)](https://isi-web.org/sites/default/files/import/files-2011/450070.pdf)
+- Agent 工具設計:[Anthropic — Writing effective tools for agents(官方)](https://www.anthropic.com/engineering/writing-tools-for-agents)
 - 引導式選擇(任務層):[Baymard — Product Lists & Thematic Browsing/Finders(電商 UX 權威)](https://baymard.com/research/ecommerce-product-lists) ·
   Aliannejadi et al. — Asking Clarifying Questions in Open-Domain Information-Seeking Conversations(SIGIR '19,奠基作)·
   [ClariQ(EMNLP 2020 SCAI 挑戰)](https://github.com/aliannejadi/ClariQ) ·

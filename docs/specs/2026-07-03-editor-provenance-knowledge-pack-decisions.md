@@ -52,6 +52,8 @@
 | A1 | per-task catalog 快取鍵=位置碼,結構性編輯後錯位(顯示別的任務的候選;違反 2b「位置不當身分」) | **修:鍵改 URN**(api 批次回應鍵 + web 快取鍵 + PERSIST_BUSTER bump)。先行做,pack 原生鍵沿用 |
 | A2 | `ai.py::_task_candidates` grounding-id 跨職類撞號 | 已知,併未來重寫(維護者先前拍板) |
 | A3 | NOTE 勾選判定壞(string[] round-trip 丟 `_src` → 勾不亮、重點重複加、全列標自訂) | **廢除勾選語意**,改 §1.2 素材庫模式(修法即設計) |
+| A4 | 編輯器 K/S 編號 per-task(`renumberCoded("K")`),違反 ocs-schema「**文件層級去重**:name 為 key、同名共碼、所有任務引用同一代碼」——同碼不同物/同物不同碼,匯出不合官方格式 | **修:K/S 改文件層級重編**(name→碼對照表,首現給號、同名共碼;O/P 維持任務範圍、A 維持全域)。代碼共用、身分(`_ref`)各自 |
+| A5 | `header_meta._merge_pairs` 全池用 code 優先 key——**態度的碼是文件自編(A01…),跨職類必撞**:X 的 A01 與 Y 的 A01(不同名)被錯誤合併、來源張冠李戴 | **修:per-pool 去重 key 明文化**(§5.1 key 表);態度改 name key |
 | B3 | `InterruptHandlers.tsx` 無頁面掛載 | 保留(ADR 0020:候選材料,訪談引擎立項時重評) |
 | B4 | `_levelSrc` 無人寫入 | **翻案:接線**(來源必標原則)——選官方級別時寫入 |
 | B5 | ocsDoc 7 個死 export(updateCategory/addCategory/addNote/updateNote/deleteNote/moveUnit/moveTask) | 刪 |
@@ -73,16 +75,42 @@
 (⚠ 現有 header-meta/task-candidates 是循序 for-await,pack 不得複製);單 code 失敗 → 略過 +
 `meta.partial=true`(ADR 0018 原封沿用);**全部失敗** → 5xx(critical,沒有 knowledge 走不下去)。
 
-**形狀**(web 直讀零轉換;每個官方項後端已帶 `srcs: SourceRef[]`):
+**形狀 v2(2026-07-03 定稿:池+引用,正規化)**——統一機制「合併 + 去重 + srcs 累積」
+(header-meta 的「來源+N」一般化到所有池;維護者:「每個區塊都先合併簡單去重」):
 
 ```
-{ occupations: [主基準選項],
-  header_pools: {job_categories/occupations/industries/attitudes: [{code,name,srcs}]},
-  note_pools:   {prerequisites/supplements: [{text,srcs}]},
-  task_tree:    [職類→職責→任務,各帶 SourceRef],
-  catalogs:     {"ocs:{code}:T:{task_code}": {knowledge/skills/outputs/indicators:[{code,name,srcs}], level}},
+{ occupations: [主基準選項(代碼/名稱/描述/級別)],
+  pools: {                      ← 每型別一張表,項目 byId(Redux 樣式);id = 該池的去重 key
+    knowledge:  {name: {srcs:[SourceRef×N]}},   skills: 同,
+    attitudes:  {name: {code?, srcs}},          job_categories/occupations/industries: {code: {name, srcs}},
+    prerequisites/supplements: {text: {srcs}} },
+  task_tree: [職類→職責→任務節點:
+    {urn, task_code, task_name, src,
+     k_refs/s_refs: [池 key…],   ← 引用=穩定 key(Redux「引用存 ID」/JSON:API resource id),
+     outputs/indicators: [...內嵌(任務範圍)], level}],      **禁用陣列索引**(位置≠身分,同 A1 教訓)
   meta: {partial: bool} }
 ```
+
+**§5.1 per-pool 去重 key 表**(A5 的修法本體):
+
+| 池 | key | 理由 |
+|---|---|---|
+| knowledge / skills | **name** | ocs-schema 官方規則「以 name 為 key」 |
+| attitudes | **name** | 值語意;碼為文件自編,code key 跨職類必撞(A5) |
+| 職類別/職業別/行業別 | **code** | 國家分類碼,同碼=真同物 |
+| notes | **text** | 值物件 |
+| O/P | 不去重 | 任務範圍,內嵌任務節點 |
+
+同名合併=精確去重;**近似重複**(團隊合作 vs 團隊意識)不在此層,屬未來 `items:match`
+(分群結果掛池項上;分層同 2026-07-02 dedup 研究)。
+
+**選單顯示補充(W1 的 K/S 特例,維護者拍板)**:K/S 選單**不顯示來源碼也不用序號**——
+名字(=身分)+ 引用行 + **同名已在文件 → 標文件碼**(如 `[K02]`,「選它=沿用既有 K02」;
+查 A4 的 name→碼表)。T/O/P/A 選單照序號。
+
+**LLM 連接(核心)**:池項 srcs 為 machine-resolvable(URN)→ 未來訪談 agent 提議值時直接附
+引用、UI 渲染引用行、人可驗——同一套來源軌道,人用選單、LLM 用 citation
+(vendor 標準形:Anthropic Citations「文件進、引用出」)。
 
 **web**:單一 query `["knowledge", profileId]`,persisted、staleTime 長;PUT occupations 成功後
 **背景 prefetch**(不鎖 UI);重選職類 invalidate。既有 header-meta/task-candidates/task-catalogs
@@ -115,5 +143,13 @@ LLM 核心(去重工具、訪談/共編),那裡的深度不算過度設計。
 - NN/g Drop-Down Menus 指南(誠實記:未針對代碼顯示給規範)
 - TanStack Query 官方 Prefetching guide(庫官方)· Next.js 官方 Fetching Data(框架官方,16.2)
 - Google web.dev Lazy Loading(大廠指引)
+- **pack v2 正規化研究(2026-07-03 第二輪)**:
+  - Redux 官方 Normalizing State Shape(每型別一張表、byId、**引用存 ID**、陣列僅表排序)
+  - JSON:API 規範 Compound Documents(included 單一 canonical 物件 MUST NOT 重複;引用=type+id)
+  - W3C PROV Overview(來源標記的標準地基:entity–derivation–source,「評估品質與可信度」;
+    僅取原則,不採本體結構)
+  - Anthropic Citations 官方文檔(LLM grounding vendor 標準形:文件進、引用出+精確位置)
+  - 反方誠實記:TkDodo(React Query 維護者)— client 正規化快取常過度;本案正規化在**回應形狀**
+    (不可變一包),非可變實體快取,不衝突
 - 前情:`2026-06-30-api-review-findings.md`(F1–F8 方法)· `2026-06-30-web-data-layer-optimization-research.md`
   (D-1 系列)· web-opt phase2b plan(實體/值物件身分原則)· ADR 0016/0018/0019/0020

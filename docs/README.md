@@ -23,9 +23,14 @@
 
 ## 各 app 自帶文檔（colocated）
 
-- `apps/api/` —— FastAPI + LangGraph 後端。
-- `apps/web/` —— Next.js 前端（見 `apps/web/README.md` / `AGENTS.md`）。
-- `apps/ocs-indexer/` —— Qdrant + BGE-M3 知識/查詢服務（見 `apps/ocs-indexer/README.md`）。
+每個 app 的 README 統一含:定位一句話 / 跑・測試 / codemap / 關鍵流程(runtime view)/
+不變量 / 介面 reference / 指路(寫法依據見
+[`specs/2026-07-03-app-developer-docs-research.md`](specs/2026-07-03-app-developer-docs-research.md)）。
+
+- [`apps/api/README.md`](../apps/api/README.md) —— FastAPI + LangGraph 後端:六邊形 codemap、REST 端點面（critical/enrichment）、文件 of-record 生命週期。
+- [`apps/web/README.md`](../apps/web/README.md) —— Next.js 前端:五個 query 的資料層、autosave/409 流程、選擇性持久化。
+- [`apps/ocs-indexer/README.md`](../apps/ocs-indexer/README.md) —— Qdrant 知識/查詢服務:v4 payload、index/查詢流程、查詢 API 面。
+- [`apps/embedder/README.md`](../apps/embedder/README.md) —— BGE-M3 GPU 嵌入容器（ADR 0012）。
 - `apps/pdf-to-json/` —— OCS PDF→JSON ETL（見 `apps/pdf-to-json/README.md`、`ARCHITECTURE.md`、`docs/`）。
 
 ## 歷史

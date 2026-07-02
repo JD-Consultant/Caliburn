@@ -15,12 +15,16 @@ PDF ──▶ pdf-to-json ──(OCS JSON)──▶ ocs-indexer ──(HTTP 查�
 
 | 路徑 | 是什麼 | 內部風格 |
 |---|---|---|
-| `apps/pdf-to-json/` | PDF→OCS JSON 的 ETL(CLI) | Pipes-and-Filters(parser→transformer→writer) |
-| `apps/ocs-indexer/` | Qdrant+BGE-M3 知識/查詢服務(:8000) | ingest 管線 + 查詢 API;embeddings port/adapter |
-| `apps/api/` | FastAPI + LangGraph 後端(:8001) | 領域模組 + agent;目標 Hexagonal(core/ports + adapters,見 spec Phase 3) |
-| `apps/web/` | Next.js 16 前端(:3000) | feature 化、server/client 邊界 |
-| `packages/` | 共用套件 | Phase 2:`ocs-contract`(契約優先) |
-| `docs/` | 系統文檔 / ADR / runbook | 見 `docs/README.md` |
+| [`apps/pdf-to-json/`](apps/pdf-to-json/README.md) | PDF→OCS JSON 的 ETL(CLI) | Pipes-and-Filters(parser→transformer→writer) |
+| [`apps/ocs-indexer/`](apps/ocs-indexer/README.md) | Qdrant 知識/查詢服務(:8000) | ingest 管線 + 無狀態查詢 API;嵌入走 embedder 服務 |
+| [`apps/embedder/`](apps/embedder/README.md) | BGE-M3 GPU 嵌入容器(:8082) | FastAPI + FlagEmbedding(torch 只住這裡,ADR 0012) |
+| [`apps/api/`](apps/api/README.md) | FastAPI + LangGraph 後端(:8001) | Hexagonal(core/ports + adapters + services + authoring,ADR 0008) |
+| [`apps/web/`](apps/web/README.md) | Next.js 16 前端(:3000) | React Query cache-as-state + 選擇性持久化;文件工作台 |
+| `packages/` | 共用契約套件 | `ocs-contract`(#1/#3)、`indexer-contract`(#2) |
+| `docs/` | 系統文檔 / ADR / runbook | 見 `docs/README.md`(文檔分層原則也在那) |
+
+**文檔分層(monorepo)**:本檔管**跨 app** 鳥瞰;各 app 內部地圖/流程/不變量在
+**該 app 的 `README.md`**(colocation);「為什麼」在 `docs/adr/`。互連不互抄。
 
 ## 跨切原則(不常變的)
 

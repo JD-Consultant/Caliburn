@@ -164,7 +164,47 @@ UX 權威(NN/g)、本土權威(MOL)的**共識五點**:
 **明確不做**(YAGNI):索引時全域正典化(ESCO 式重建分類學——量級不符)、reranker 先不掛
 (先驗 dense 夠不夠)、Qdrant payload cluster_id(等分群邏輯穩定再考慮下沉)。
 
-## 5. 來源
+## 5. 實驗(第三輪:用真實 OCS 資料驗證,2026-07-02)
+
+- **方法**:三個會被一起選的軟體職類(SET3115-001v5 工具機軟體人機介面 / ISD2152-001v4
+  半導體軟體設計 / ISD2519-002v2 軟體測試),任務層用 indexer 既有 `tasks:findSimilar`
+  (Qdrant 已存 BGE-M3 dense 向量,兩兩 cosine);態度/知識/技能層抓官方 metadata 過
+  embedder `/embed` 算跨職類兩兩相似度。
+- **任務層(524 對 ≥0.5)**:**沒有任何 ≥0.9 的真重複**。最高帶 0.80–0.82 全是「同領域、
+  不同任務」(「製作雛形開發程序與測試分析評估」vs「制定測試方法與程序」0.823);直方圖
+  0.8 帶 105 對、0.7 帶 342 對——dense 把「同領域」壓在 0.7–0.85 窄帶,**單一門檻切不開
+  「同任務異措辭」與「同領域異任務」**。連測試專職 vs 軟體設計的最高對也只有 0.787
+  (「測試分析與設計」vs「制定測試方法與程序」——相關、不重複)。
+- **態度層(119 對)**:**真重複實錘**——「主動積極」跨基準**逐字相同**(1.000;官方態度
+  多出自共通職能字典)、「團隊合作 vs 團隊意識」定義全同僅標籤異(0.930),然後**斷崖**
+  到 0.742(不同態度)。→ **0.9 門檻乾淨可切,dense-only 足夠**。
+- **技能層(605 對)**:真近重複存在(「技術文件蒐集與閱讀分析能力 vs 技術文件閱讀與撰寫
+  技能」0.790)但被**【T1.1】類註記污染**——「問題解決能力【T1.1】【T1.2】 vs 問題解決
+  能力」只得 0.788,清洗註記後真重複會浮上 0.85+ 帶。→ 需前處理(strip 【】註記)再嵌入。
+- **知識層(601 對)**:最高 0.702(物件導向分析知識 vs 物件導向程式設計)——多為相關而
+  非重複,問題較輕。
+- **附帶發現**:`header_meta` 現行 exact 去重以 code 為主鍵,但態度碼是**基準內局部碼**——
+  跨基準同文異碼會漏合(實驗中 1.000 那對正是如此才雙雙出現在池裡)、同碼異文會誤併。
+  現行 exact 去重本身有瑕疵。
+
+## 6. 問題重構:三層資料、三種病、三種主流解法(第三輪)
+
+實驗證實維護者最初的直覺(「不一定要用去重」):
+
+| 層 | 病 | 主流正解 | 依據 |
+|---|---|---|---|
+| **任務** | 不是重複,是**相關任務對外行人難分辨**(選擇混淆) | **引導式選擇**:澄清式提問縮小範圍 + 差異顯性化;去重無藥可醫 | Baymard:product finder/guide 是「給非領域專家」的主流工具;SIGIR '19 Aliannejadi 起的 clarifying-questions 系譜(ClariQ、SIGIR '22 生成、2024 RAG 式);NN/g explicit differences;**正好就是北極星訪談②③的職責**(ADR 0020) |
+| **態度**(今天就混池) | **真重複**(共通字典逐字/近字) | 高門檻(≈0.9)嵌入分群 + 代表 + 溯源;dense-only 足夠、斷崖分布安全 | 本實驗 §5;SemDeDup;survivorship(§2.6) |
+| **技能/知識**(未來彙整時混) | 真近重複 + 註記噪音 | 前處理(去【】註記)後同態度機制;灰區小 | 本實驗 §5 |
+| **文件層**(彙整品質) | 多來源任務各帶 K/S 進文件 → 成品重複冗長 | LLM 彙整/合併 + staged 審閱(可做成編輯器動作**與** agent 工具同源)| Peeters & Bizer(LLM 比對已驗證);Word Copilot staging(北極星研究);Anthropic context 策展 |
+
+**設計含義**:任務層的解法**不是新功能,是訪談引擎(ADR 0020)本來就要做的事**——
+候選任務落在相似窄帶時,agent 問一個鑑別性問題(「你做的是規劃測試方法,還是實際執行測試?」),
+以兩任務的**差異**為 grounding;UI 同步把差異顯性化。態度/技能層的分群是**獨立的小型策展
+服務**(池進、群出),重寫前後都能接。文件層 QA 是**同一能力的第三個消費者**(編輯器動作
++ agent 工具)。
+
+## 7. 來源
 
 - ESCO(歐盟官方):[Skills pillar](https://esco.ec.europa.eu/en/about-esco/escopedia/escopedia/skills-pillar) ·
   [Skill reusability level](https://esco.ec.europa.eu/en/about-esco/escopedia/escopedia/skill-reusability-level) ·
@@ -193,5 +233,11 @@ UX 權威(NN/g)、本土權威(MOL)的**共識五點**:
   [Match, Compare, or Select?(arXiv:2405.16884)](https://arxiv.org/pdf/2405.16884)
 - 標準:[W3C SKOS Reference(Recommendation;exactMatch/closeMatch 遞移性)](https://www.w3.org/TR/skos-reference/)
 - 呈現範本:[Amazon — Product Variations Relationship User Guide(Vendor Central 官方)](https://vendorcentral.s3.amazonaws.com/Resource+Center/vendor-central/GLOBAL_Selling/Product_Variations_Relationship_User_Guide.pdf)
+- 引導式選擇(任務層):[Baymard — Product Lists & Thematic Browsing/Finders(電商 UX 權威)](https://baymard.com/research/ecommerce-product-lists) ·
+  Aliannejadi et al. — Asking Clarifying Questions in Open-Domain Information-Seeking Conversations(SIGIR '19,奠基作)·
+  [ClariQ(EMNLP 2020 SCAI 挑戰)](https://github.com/aliannejadi/ClariQ) ·
+  [Generating Clarifying Questions with Web Search Results(SIGIR '22)](https://dl.acm.org/doi/10.1145/3477495.3531981) ·
+  [Corpus-informed RAG of Clarifying Questions(arXiv:2409.18575)](https://arxiv.org/pdf/2409.18575) ·
+  [Users Meet Clarifying Questions(ACM TOIS)](https://dl.acm.org/doi/10.1145/3524110)
 - 本 repo:[北極星研究 §7 MOL 指引(共通/專業職能)](2026-07-02-llm-interview-authoring-research.md) ·
   ADR 0012(embedder 服務)· ADR 0016(task-catalogs 批次)· ADR 0020(訪談互動模式)

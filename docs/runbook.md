@@ -44,6 +44,7 @@ Get-NetTCPConnection -State Listen -LocalPort 8001,3000   # 驗證已空
 | api 某端點 500「No module named 'greenlet'」類 | 執行期缺依賴(測試 skip DB 沒測到) | 比對真實環境補進 `pyproject.toml` + `uv lock`;async DB 要 `sqlalchemy[asyncio]` |
 | `uv run pytest` 說 pytest not found | 該 app 的測試依賴在 extra 裡 | 用對的指令:`--all-extras`(indexer)/`--extra dev`(pdf-to-json) |
 | 埠被占 | 舊服務(或別 repo)還在跑 | 用埠位圖查 PID,`taskkill /F /T` |
+| 存檔顯示版本衝突 | 另一分頁/進程已先儲存更新版本 | 預期的樂觀鎖行為(ADR 0015);使用者選 ConflictDialog 的兩選項之一 |
 | db 一直噴 `collation version mismatch`(2.36 vs 2.41) | 換過 Postgres image 基底 OS(如舊 `pgvector/pgvector:pg16` → 官方 `postgres:16`,glibc 不同),既有 `caliburn_pgdata` volume 的 collation 元資料對不上;嚴重時 `CREATE DATABASE`(template1)直接 ERROR(ADR 0014 換 image 後遇到) | dev 無重要資料 → **重建 pgdata**:`docker compose -p caliburn down` → `docker volume rm caliburn_pgdata`(**勿動** `caliburn_qdrant_storage`/`caliburn_hf_cache`)→ `up -d db` → `npm run db:migrate`。要保資料則 `ALTER DATABASE <db> REFRESH COLLATION VERSION;`(template1/postgres/該庫)+ 必要時 `REINDEX` |
 
 ## 跑後端 DB 整合測試（pytest）

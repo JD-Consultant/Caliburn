@@ -15,6 +15,7 @@ import { JobDocTable, type CellTarget } from "@/components/interview/JobDocTable
 import { CellFillerPanel } from "@/components/interview/CellFillerPanel";
 import { OccupationPicker } from "@/components/interview/OccupationPicker";
 import { TaskCuratePanel } from "@/components/interview/TaskCuratePanel";
+import { ConflictDialog } from "@/components/interview/ConflictDialog";
 import { completion, ensureIds } from "@/lib/ocsDoc";
 import type { OcsDocument } from "@/types";
 import { Button } from "@/components/ui/button";
@@ -38,7 +39,14 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
   const taskCount = doc?.ocs_content?.ocu_units?.reduce((n, u) => n + (u.tasks?.length ?? 0), 0) ?? 0;
   useTaskCatalogs(id, taskCount > 0);
 
-  const { status: saveStatus, commit, flush } = useAutosaveDocument(id);
+  const {
+    status: saveStatus,
+    commit,
+    flush,
+    loadLatest,
+    overwriteWithLocal,
+    conflictBusy,
+  } = useAutosaveDocument(id);
   const finalize = useFinalizeDocument(id);
 
   // flush on unmount (lint-clean: update ref in effect, cleanup calls it)
@@ -96,6 +104,10 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
             <span className="text-xs text-muted-foreground">儲存中…</span>
           ) : saveStatus === "saved" ? (
             <span className="text-xs text-muted-foreground">✓ 已自動儲存</span>
+          ) : saveStatus === "unsaved" ? (
+            <span className="text-xs text-muted-foreground">尚未儲存</span>
+          ) : saveStatus === "conflict" ? (
+            <span className="text-xs text-destructive">⚠ 存檔衝突</span>
           ) : null}
           <Button size="sm" variant="outline" className="gap-1" onClick={() => setShowOcc(true)}>
             <Layers className="h-4 w-4" />
@@ -180,6 +192,14 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
           intake={profile?.job_summary || ""}
           onClose={() => setShowTasks(false)}
           onError={setError}
+        />
+      ) : null}
+
+      {saveStatus === "conflict" ? (
+        <ConflictDialog
+          busy={conflictBusy}
+          onLoadLatest={() => void loadLatest()}
+          onOverwrite={overwriteWithLocal}
         />
       ) : null}
 

@@ -136,9 +136,12 @@ export type OcsDocument = Omit<
 };
 
 // GET/PATCH/finalize/seed 的回傳信封（DocRepo._to_dict / no-doc 空殼）。
+// revision（2a, ADR 0015）：單一列的編輯回合計數，PATCH 樂觀鎖 token 之一
+// （另一為既有 version）；無文件的空殼固定 0。
 export interface DocumentEnvelope {
   id: string | null;
   version: number;
+  revision: number;
   status: DocStatus;
   content: OcsDocument;
 }

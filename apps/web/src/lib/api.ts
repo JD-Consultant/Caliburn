@@ -19,6 +19,20 @@ import type {
 
 const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8001";
 
+// 2a（ADR 0015）：帶 HTTP status（+ 已解析的 body，409 conflict body 含
+// current_version/current_revision）的 Error 子類，供 409 偵測用。
+// 既有呼叫端 catch (e: Error) 不受影響：ApiError instanceof Error 恆真。
+export class ApiError extends Error {
+  status: number;
+  body?: unknown;
+  constructor(status: number, message: string, body?: unknown) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+    this.body = body;
+  }
+}
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE}/api/v1${path}`, {
     headers: { "Content-Type": "application/json" },
@@ -26,7 +40,13 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   });
   if (!res.ok) {
     const text = await res.text().catch(() => res.statusText);
-    throw new Error(`${res.status} ${text}`);
+    let body: unknown;
+    try {
+      body = JSON.parse(text);
+    } catch {
+      body = undefined;
+    }
+    throw new ApiError(res.status, `${res.status} ${text}`, body);
   }
   // 204 No Content (delete) has no body.
   if (res.status === 204) return undefined as T;
@@ -74,11 +94,19 @@ export const deleteProfile = (profileId: string) =>
 export const getDocument = (profileId: string) =>
   request<DocumentEnvelope>(`/job-profiles/${profileId}/document`);
 
-export const patchDocument = (profileId: string, content: OcsDocument) =>
-  request<DocumentEnvelope>(`/job-profiles/${profileId}/document`, {
-    method: "PATCH",
-    body: JSON.stringify(content),
-  });
+// expect（2a, ADR 0015，optional）：{version, revision} 樂觀鎖 token。兩者皆帶
+// 且與伺服器最新列不符 → 409 {code: "version_conflict", current_version, current_revision}。
+// 不帶 = 不守衛（legacy 相容）。
+export const patchDocument = (
+  profileId: string,
+  content: OcsDocument,
+  expect?: { version: number; revision: number },
+) =>
+  request<DocumentEnvelope>(
+    `/job-profiles/${profileId}/document` +
+      (expect ? `?expect_version=${expect.version}&expect_revision=${expect.revision}` : ""),
+    { method: "PATCH", body: JSON.stringify(content) },
+  );
 
 export const finalizeDocument = (profileId: string) =>
   request<DocumentEnvelope>(`/job-profiles/${profileId}/document:finalize`, {

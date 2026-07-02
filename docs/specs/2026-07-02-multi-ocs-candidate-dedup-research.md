@@ -336,13 +336,36 @@ record linkage 框架(LLM 判模糊對 + Bayesian 與先驗融合 + **人工抽�
 | CJK 詞中斷行空白(「能 力」「特性需求 」) | **6,493 項** | PDF 換行 artifact,ingest 層可修 |
 | 任務名【註N】腳註標記 | **69 筆** | 對應 `notes` 欄位;ingest 層可剝離 |
 
-**污染同時傷顯示與 embedding**(§5 實驗:同名技能因【T*】只得 0.788)。→ 修層決策:
+**污染同時傷顯示與 embedding**(§5 實驗:同名技能因【T*】只得 0.788)。
 
-1. **indexer ingest 清洗(Task 0,與顯示同波)**:normalize 時剝【T*】→payload `applies_to`、
-   剝【註N】、併詞中空白/換行;**re-index 一次**(既有指令)。顯示與向量同時變乾淨;
-   `applies_to` 未來還能讓 task_competencies 對多任務 block 精準過濾(資料升級,非只清洗)。
-2. **api/web 顯示**:候選 option 只顯示乾淨 name;K01/T1.1 等代碼與來源移到「引用/出處」
-   顯示;**著作文件內部的 OPKSA 代碼(ocs-schema)完全不動**。
+**2026-07-03 澄清(維護者)**:「代碼與名稱分離」(K01/T1.1 等目錄代碼不混進候選文字、
+另作引用顯示)**已經做好、已上線,不用動**——`task_detail.py::task_competencies` 回
+`{code, name}` 分離欄位、`CellFillerPanel.withSrc` 把 `code` 包進 `srcs` 引用物件、
+`FieldCombobox` 用 `name` 顯示候選文字。**著作文件內部的 OPKSA 代碼(ocs-schema,可自訂
+順序)也本來就完整保留、不受影響**——那是另一套代碼空間(著作文件自己的),與來源代碼
+無關。以上兩點是既有正確設計,以下只針對**內嵌在 `name` 文字裡的【T1.1】標記**(與代碼
+欄位分離無關的另一個問題)。
+
+**追加查證(2026-07-03,逐層追到 Qdrant 攝入):是否冗餘?——實測結果是「不冗餘、且現有
+`sources` 結構丟失了它」**。追蹤 `apps/ocs-indexer/src/jd_ocs_indexer/ingestion/builder.py`
+(docstring:「`task` record **per task_code**,攜帶該任務群組**整組** competency_blocks」)
++ `api/service.py::get_competencies`:同一 block 若 `task_codes=[T1.1..T1.5]`(§6.3 的
+0.6% 多任務共用案例),indexer **展開成 5 個獨立 Qdrant task point**、**每個各自攜帶整組
+K/S/O 清單的完整複本**;`get_competencies` 逐 point 收集、依 `(ocs_code, type, code)` 去重
+合併 `sources`。**實測**(工具機軟體人機介面工程師,T1.1–T1.5 共用一 block):K01 的
+name 標【T1.1】,但因所在 block 的 task_codes 涵蓋 T1.1–T1.5,K01 最終合併出的
+`sources` 會是 **[T1.1,T1.2,T1.3,T1.4,T1.5] 全五個**——**跟 K15(標【T1.1~T1.6全部】,
+真的適用全部)混不出差別**。→ **`sources` 現況只到「block 群組」精度,【T1.1】文字
+標記帶的是「群組內哪一項該精確歸哪個/哪些任務」——這一層目前無處存放,唯一存在的地方
+就是這段文字**。故非冗餘;應解析進結構化欄位(暫名 `applies_to: [task_code]`,精度細於
+現有 `sources`),而不是丟棄。→ 修層決策:
+
+1. **indexer ingest 清洗 + 結構化(Task 0)**:normalize/攝入時,把【T*】解析進新結構化
+   欄位(細粒度,獨立於現有 block 級 `sources`),同時把【T*】/【註N】文字與詞中空白/
+   換行從 `name` 剝除;**re-index 一次**(既有指令)。顯示與向量同時變乾淨,細粒度任務
+   歸屬資料被保留而非丟失。
+2. **api/web 顯示**:不需改動(既有分離設計已正確);清洗後 `name` 本身變乾淨,顯示層
+   零改動即受益。
 3. **pdf-to-json 修 88 筆吞名 bug**:獨立 plan(re-parse + re-index),不擋 Task 0。
 4. match 工具的 D4 前處理降級為**防禦性**(同規則、冪等)——源頭乾淨後它只是保險。
 

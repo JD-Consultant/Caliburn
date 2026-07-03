@@ -70,9 +70,11 @@ baseline = 最後已知 server 狀態快照,是 dirty 判定 / no-op skip / 樂�
 
 ### 3. 選任務
 
-`TaskCuratePanel` → `GET task-candidates` →(有自述時 `POST /ai/extract-tasks` AI 預勾、
-`POST /ai/structure-task` 補自訂)→ `POST document:buildTasks`(加法:已在文件的任務依
-provenance 跳過)→ setQueryData(document) + invalidate profiles。
+`TaskCuratePanel` → 讀**知識包**(units/tasks 池 + source_tasks;遞迴兩選單:職責清單全池
+→ 展開職責見任務**全池**,自己的預勾、其餘可勾=借用;預勾=主基準職責+其任務聯集,
+「自動勾選」鈕重套;已在文件標「已加入」)→(有自述時 `POST /ai/extract-tasks` AI 預勾、
+`POST /ai/structure-task` 補自訂)→ 確認=**前端文件編輯** `addFromPool`(職責同名併入、
+任務帶 provenance+`_refs` 多來源)→ commit(回到流程 1 的 autosave PATCH;buildTasks 不再使用)。
 
 ### 4. 填格(O/P/K/S)
 

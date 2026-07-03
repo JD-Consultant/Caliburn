@@ -185,6 +185,7 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
           profileId={id}
           currentDoc={doc}
           intake={profile?.job_summary || ""}
+          onApply={(d) => persist(d)}
           onClose={() => setShowTasks(false)}
           onError={setError}
         />

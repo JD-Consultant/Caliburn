@@ -1,15 +1,17 @@
 "use client";
 import type { OcsDocument } from "@/types";
-import { useHeaderMeta } from "@/hooks/useDocument";
-import { noteOptions } from "@/lib/headerMeta";
+import { useKnowledge } from "@/hooks/useKnowledge";
+import { valuePoolOptions } from "@/lib/pack";
 import { setNotes, type NoteField } from "@/lib/ocsDoc";
 import { FieldCombobox } from "./fields/FieldCombobox";
 
+// NOTE 候選＝知識包 prerequisites/supplements 池（key=text，序號顯示+引用行；ADR 0021）。
+// 勾選互動改素材庫模式（點一下即加純文字）屬 Plan UX（spec §1.2/A3），此處只換資料源。
 function NoteCombo({ doc, profileId, field, title, onChange }: {
   doc: OcsDocument; profileId: string; field: NoteField; title: string; onChange: (d: OcsDocument) => void;
 }) {
-  const { data: meta } = useHeaderMeta(profileId, !!doc.ocs_profile.ocs_code);
-  const options = (meta ? noteOptions(meta, field) : []).map((t) => ({ code: "", name: t }));
+  const { data: pack } = useKnowledge(profileId, !!doc.ocs_profile.ocs_code);
+  const options = pack ? valuePoolOptions(pack.pools[field]) : [];
   const value = (doc.notes?.[field] ?? []).map((t) => ({ code: "", name: t }));
   return (
     <div>

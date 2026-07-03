@@ -17,11 +17,9 @@ import {
   setAttitudes,
   setTaskLevel,
 } from "@/lib/ocsDoc";
-import { useHeaderMeta } from "@/hooks/useDocument";
 import { useKnowledge } from "@/hooks/useKnowledge";
-import { ownTaskRefs } from "@/lib/pack";
+import { ownTaskRefs, valuePoolOptions } from "@/lib/pack";
 import { taskUrns } from "@/lib/urn";
-import { attitudeOptions } from "@/lib/headerMeta";
 import { FieldCombobox } from "./fields/FieldCombobox";
 import { OfficialMenu } from "./fields/OfficialMenu";
 import {
@@ -275,14 +273,14 @@ function UnitRow({
 
 function AttitudeBlock({
   document: doc,
-  profileId,
+  pack,
   onChange,
 }: {
   document: OcsDocument;
-  profileId: string;
+  pack?: KnowledgePack;
   onChange: (d: OcsDocument) => void;
 }) {
-  const { data: meta } = useHeaderMeta(profileId, !!doc.ocs_profile.ocs_code);
+  // 態度池 key=name（A5：文件自編碼跨職類必撞，不當 key）；選單序號顯示+引用行。
   return (
     <div className="rounded-lg border bg-background p-4">
       <FieldCombobox
@@ -292,7 +290,7 @@ function AttitudeBlock({
         customMode="footer"
         autoCode="A"
         value={doc.ocs_attitude?.attitudes ?? []}
-        options={meta ? attitudeOptions(meta) : []}
+        options={pack ? valuePoolOptions(pack.pools.attitudes) : []}
         onCommit={(items) => onChange(setAttitudes(doc, items))}
       />
     </div>
@@ -393,7 +391,7 @@ export function JobDocTable({
       </button>
 
       {/* 職能內涵（A=attitude 態度） */}
-      <AttitudeBlock document={document} profileId={profileId} onChange={onChange} />
+      <AttitudeBlock document={document} pack={pack} onChange={onChange} />
 
       {/* 說明與補充事項（可編輯） */}
       <DocNotes document={document} profileId={profileId} onChange={onChange} />

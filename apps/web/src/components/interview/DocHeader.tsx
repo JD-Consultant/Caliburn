@@ -6,8 +6,8 @@
 import { useState } from "react";
 import { Check, ChevronDown, Plus, X } from "lucide-react";
 import type { CodeName, OcsDocument, OptionItem } from "@/types";
-import { useHeaderMeta } from "@/hooks/useDocument";
-import { categoryOptions, primaryOptions } from "@/lib/headerMeta";
+import { useKnowledge } from "@/hooks/useKnowledge";
+import { codedPoolOptions, primaryBasisOptions } from "@/lib/pack";
 import {
   deleteCategory,
   setCategory,
@@ -96,10 +96,11 @@ export function DocHeader({ document: doc, profileId, onChange }: {
   onChange: (d: OcsDocument) => void;
 }) {
   const p = doc.ocs_profile;
-  const { data: meta } = useHeaderMeta(profileId, !!p.ocs_code);
-  const opts = meta ? primaryOptions(meta) : [];
+  // 知識包（ADR 0021）：主基準選項＝occupation_details、三類選單＝coded 池（顯真實分類碼）。
+  const { data: pack } = useKnowledge(profileId, !!p.ocs_code);
+  const opts = pack ? primaryBasisOptions(pack) : [];
   const isOfficialBasis = !!p.ocs_code && opts.some((o) => o.ocs_code === p.ocs_code);
-  const catOptions = (kind: CatKind): OptionItem[] => (meta ? categoryOptions(meta, kind) : []);
+  const catOptions = (kind: CatKind): OptionItem[] => (pack ? codedPoolOptions(pack.pools[kind]) : []);
   const catStatus = (e: { _src?: "official" | "custom" }): "official" | "custom" =>
     e._src === "custom" ? "custom" : e._src === "official" ? "official" : "custom";
 

@@ -1,6 +1,11 @@
-# jd-pdf-to-json
+# pdf-to-json — OCS PDF → 結構化 JSON(ETL)
 
-OCS/iCAP PDF 轉換成結構化 JSON 的資料規範文件。
+「解析」bounded context:把官方職能基準(OCS/iCAP)**PDF** 轉成結構化 **JSON**(CLI 工具),
+供 [`apps/ocs-indexer`](../ocs-indexer/) 索引。純離線批次、無伺服器、無狀態。
+
+> **這份 README 一檔兩用**:上半是 **app 指南**(跑 / 架構 / codemap);
+> **下半 §1–10 是權威的 OCS 來源 JSON 契約**——[`docs/ocs-source-json.md`](../../docs/ocs-source-json.md)
+> 指向此為準;動 indexer/api 的 OCS 欄位前先讀(尤其 §6.3)。
 
 ## Quick Start
 
@@ -63,6 +68,45 @@ uv run python -m jd_pdf_to_json.cli validate <json_path>
 參數：
 
 - `json_path`：待驗證的 JSON 檔案路徑。
+
+## 架構 / 流程(Pipes-and-Filters)
+
+```
+PDF ─▶ parse ─▶ transform ─▶ [validate] ─▶ write JSON
+      PDFPlumber   section 拆解    schema      JSONWriter
+      (→ pages)    → OCSDocument   (可停用)
+```
+
+`convert` 照 **4 階段**跑;`batch` 對整個資料夾逐檔跑(**單檔失敗不中斷**,收尾寫 summary log)。
+`transform` 是**薄編排**:re-open PDF,依序委派五個 section extractor 組成 `OCSDocument`——
+
+`version → profile → content → attitude → notes`
+
+其中 **`content_extractor` 最難**(§6.3 的區塊分界 / 跨頁 / 同格多 T code 規則都在它)。
+**驗證不擋輸出**:schema 失敗仍寫 JSON(方便人工檢查)但 `exit 1`。
+
+## Codemap
+
+```
+src/jd_pdf_to_json/
+  cli.py                 # typer CLI:convert / batch / validate(4 階段編排 + log)
+  parsers/               # base(port)+ pdf_parser(PDFPlumberParser:PDF → {metadata, pages})
+  transformers/
+    ocs_transformer.py   # 薄編排:依序呼叫 sections/*,組 OCSDocument
+    sections/            # 五個 section extractor(version / profile / content / attitude / notes)
+    support/             # 無狀態共用:text / tables / items / dedupe / scanning
+  validators/schema.py   # OCSSchemaValidator → (is_valid, errors)
+  writers/json_writer.py # JSONWriter(UTF-8 落檔)
+  core/models.py         # OCSDocument 等 pydantic 模型(五大區塊)
+  utils/                 # exceptions / logger
+```
+
+## 不變量
+
+- **Pipes-and-Filters,單向**:parse → transform → validate → write;各階段可獨立測。
+- **transformer 只編排、不解析**:每個 PDF section 的邏輯住自己的 extractor(Phase 3b 拆解;
+  **別把規則塞回 orchestrator**)。
+- **契約在下半(§1–10)且權威**:改欄位語意 = 改契約,牽動 indexer / api / `packages/ocs-contract`。
 
 ## 1. Purpose
 本專案定義可重複、可驗證、可擴充的 JSON 輸出格式，用於將職能基準（OCS）PDF 轉為結構化資料，支援：
@@ -448,3 +492,10 @@ PDF 末頁「說明與補充事項」分為兩個子區塊：
 - 編碼：UTF-8
 - 鍵名：`snake_case`
 - 語系：內容可為繁中，鍵名統一英文
+
+## 指路
+
+- 架構鳥瞰:根 [`ARCHITECTURE.md`](../../ARCHITECTURE.md)(Code map:pdf-to-json = Pipes-and-Filters)。
+- 來源契約取用注意事項:[`docs/ocs-source-json.md`](../../docs/ocs-source-json.md)(指向本 §6.3 為權威)。
+- transformer 拆解研究:[`docs/specs/2026-06-28-pdf-to-json-transformer-decomposition-research.md`](../../docs/specs/2026-06-28-pdf-to-json-transformer-decomposition-research.md)。
+- 下游:[`apps/ocs-indexer/README.md`](../ocs-indexer/README.md)(索引消費本輸出);著作端 schema 見 [`docs/ocs-schema.md`](../../docs/ocs-schema.md)。

@@ -4,6 +4,7 @@
 // Each cell commits immediately via onSave(nextDoc); no Save button.
 import type { OcsDocument } from "@/types";
 import { getBlock, setKS, setOp } from "@/lib/ocsDoc";
+import { taskUrn } from "@/lib/urn";
 import { useTaskCatalog } from "@/hooks/useTaskCatalog";
 import { FieldCombobox } from "./fields/FieldCombobox";
 import type { CellTarget } from "./JobDocTable";
@@ -40,7 +41,9 @@ export function CellFillerPanel({
 }) {
   const { unitIdx, taskIdx } = target;
   const tk = taskKey(document, unitIdx, taskIdx);
-  const cat = useTaskCatalog(profileId, tk, true);
+  // 快取鍵用身分 URN(A1);自訂任務無 provenance → urn=""、query 停用(候選本來就空)。
+  const urn = taskUrn(document.ocs_content?.ocu_units?.[unitIdx]?.tasks?.[taskIdx]?.provenance);
+  const cat = useTaskCatalog(profileId, urn, tk, true);
   const block = getBlock(document, unitIdx, taskIdx);
   const tn = taskName(document, unitIdx, taskIdx);
   const title = `${tn}：${TITLES[target.kind]}`;

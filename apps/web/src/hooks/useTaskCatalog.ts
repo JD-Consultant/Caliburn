@@ -13,7 +13,8 @@ export interface TaskCatalogData {
 }
 
 const STALE = 5 * 60 * 1000;
-const catalogKey = (profileId: string, taskKey: string) => ["task-catalog", profileId, taskKey];
+// 鍵 = 任務身分 URN(A1):結構性編輯重編位置碼不影響鍵;批次回應的鍵已是 URN,seeding 直灌。
+const catalogKey = (profileId: string, urn: string) => ["task-catalog", profileId, urn];
 
 // 後備（快取未命中）：per-task 兩端點。批次 seeding 命中時不會跑到這裡。
 async function fetchTaskCatalog(profileId: string, taskKey: string): Promise<TaskCatalogData> {
@@ -62,10 +63,11 @@ export function useTaskCatalogs(profileId: string, enabled: boolean) {
   return q;
 }
 
-export function useTaskLevel(profileId: string, taskKey: string, enabled: boolean): number | null {
+// urn = 快取鍵(身分);taskKey = 位置碼,僅供 fallback 打 /ai/*(即時定位語意,不快取)。
+export function useTaskLevel(profileId: string, urn: string, taskKey: string, enabled: boolean): number | null {
   const q = useQuery({
-    queryKey: catalogKey(profileId, taskKey),
-    enabled: enabled && !!taskKey,
+    queryKey: catalogKey(profileId, urn),
+    enabled: enabled && !!urn && !!taskKey,
     staleTime: STALE,
     queryFn: () => fetchTaskCatalog(profileId, taskKey),
     select: (d: TaskCatalogData) => d.competency_level,
@@ -73,10 +75,10 @@ export function useTaskLevel(profileId: string, taskKey: string, enabled: boolea
   return q.data ?? null;
 }
 
-export function useTaskCatalog(profileId: string, taskKey: string, enabled: boolean) {
+export function useTaskCatalog(profileId: string, urn: string, taskKey: string, enabled: boolean) {
   const q = useQuery({
-    queryKey: catalogKey(profileId, taskKey),
-    enabled: enabled && !!taskKey,
+    queryKey: catalogKey(profileId, urn),
+    enabled: enabled && !!urn && !!taskKey,
     staleTime: STALE,
     queryFn: () => fetchTaskCatalog(profileId, taskKey),
   });

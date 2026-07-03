@@ -5,5 +5,6 @@
 
 - [`knowledge-pack-assembly.md`](knowledge-pack-assembly.md) — **`build_pack`**:indexer DTO → `GET /knowledge` 那一包(12 池 / 去重 key / `source_tasks` 反掛 refs)。
 - [`document-of-record.md`](document-of-record.md) — **`ocs_doc`**:`skeleton` / `assemble_final` / `validate` / 完成度(**finalize 的 gate**、`_` 欄剝除)。
+- [`persistence.md`](persistence.md) — **`DocRepo` / 樂觀鎖**:document_versions 兩 token(version=世系 / revision=回合)、`version_id_col` CAS、409、write-through。
 - [`authoring.md`](authoring.md) — **LangGraph 訪談引擎**:逐任務深問**單層 loop「別重構」**、interrupt HITL(待 ADR 0020 重設計)。
 - [`ai-suggestions.md`](ai-suggestions.md) — **`services/ai`** 提議鏈:catalog-first / grounded / 降級(**web 目前零呼叫**)。

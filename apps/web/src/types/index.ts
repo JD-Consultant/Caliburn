@@ -93,6 +93,7 @@ export type OcsTask = Omit<GenTask, "task_codes" | "competency_blocks"> & {
   _tid?: string; // 前端穩定 id（拖拉用；隨項目移動）
   _notes?: string; // D28 工作筆記（5W2H/CIT 原文，餵 AI＋給顧問）；非契約欄，finalize/export 剝除
   _levelSrc?: SourceRef & { level: number }; // 帶官方時記下「官方級別 + 來源（含任務）」；export 剝除
+  _refs?: SourceRef[]; // 多來源（合併列選入）：全部來源；provenance 取首個（相容單來源讀者）
 };
 
 export type OcuUnit = Omit<GenUnit, "ocu_code" | "ocu_name" | "tasks"> & {
@@ -100,6 +101,7 @@ export type OcuUnit = Omit<GenUnit, "ocu_code" | "ocu_name" | "tasks"> & {
   ocu_name: string;
   source?: { ocs_code: string; occupation_name: string };
   tasks: OcsTask[];
+  _refs?: SourceRef[]; // 多來源（合併職責列選入）
   _uid?: string; // 前端穩定 id（拖拉用）
 };
 

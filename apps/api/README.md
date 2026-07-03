@@ -111,8 +111,8 @@ competencies)→ `core/domain/knowledge_pack.build_pack` 純函式**照優先序
 
 ## 指路
 
-**authoring / LangGraph 訪談引擎內部:[`docs/authoring.md`](docs/authoring.md)** —— 逐任務深問單層 loop
-「別重構」的緣由 + interrupt HITL + 狀態(當前 web 用知識包編輯器,本引擎待 ADR 0020 重設計)。
+**內部深文檔(改對應子系統前先讀)→ [`docs/`](docs/)**:`build_pack` 組包、`ocs_doc`(finalize gate)、
+authoring(LangGraph 單層 loop「別重構」)、AI 提議鏈。
 
 ADR [0008](../../docs/adr/0008-api-hexagonal-layering.md)(六邊形)·
 [0015](../../docs/adr/0015-document-save-optimistic-concurrency.md)(樂觀鎖)·

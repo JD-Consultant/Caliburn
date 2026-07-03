@@ -3,16 +3,13 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useDebouncedCallback } from "use-debounce";
 import {
   ApiError,
-  buildTasks,
   finalizeDocument,
   getDocument,
-  getHeaderMeta,
   getKnowledge,
-  getTaskCandidates,
   patchDocument,
   setOccupations,
 } from "@/lib/api";
-import type { DocumentEnvelope, OcsDocument, PickedTask } from "@/types";
+import type { DocumentEnvelope, OcsDocument } from "@/types";
 
 // D27 工作台資料層。document = of-record（draft/final/none 空殼）；mutation 成功後
 // 直接 setQueryData 更新快取（即時反映），finalize/seed 另 invalidate profiles（dashboard 狀態）。
@@ -22,18 +19,6 @@ export function useDocument(profileId: string) {
     queryKey: ["document", profileId],
     queryFn: () => getDocument(profileId),
     refetchOnWindowFocus: false,
-  });
-}
-
-export function useHeaderMeta(profileId: string, enabled: boolean) {
-  return useQuery({
-    queryKey: ["header-meta", profileId],
-    queryFn: () => getHeaderMeta(profileId),
-    enabled,
-    staleTime: 5 * 60 * 1000,
-    gcTime: 1000 * 60 * 60 * 24, // ≥ persist maxAge(24h)
-    refetchOnWindowFocus: false,
-    meta: { persist: true }, // 准予持久化（spec D-1d）
   });
 }
 
@@ -78,40 +63,15 @@ export function useSetOccupations(profileId: string) {
   return useMutation({
     mutationFn: (ocsCodes: string[]) => setOccupations(profileId, ocsCodes),
     onSuccess: () => {
-      // 重抓 document（GET 空殼會用新 selected codes 帶表頭）+ 候選池/候選任務。
+      // 重抓 document（GET 空殼會用新 selected codes 帶表頭）。
       qc.invalidateQueries({ queryKey: ["document", profileId] });
-      qc.invalidateQueries({ queryKey: ["task-candidates", profileId] });
-      // header-meta（職能基準代碼選單/所屬類別/態度候選）也要隨選的職類更新，否則
-      // 第二次選職類時主基準下拉不會刷新。
-      qc.invalidateQueries({ queryKey: ["header-meta", profileId] });
       // 知識包(ADR 0021):選職類=唯一同步點 → 作廢舊包 + 背景預載新包
-      // (不鎖 UI;失敗交給消費端 query 自行重抓)。
+      // (不鎖 UI;失敗交給消費端 query 自行重抓)。所有選單資料都吃這一包。
       qc.invalidateQueries({ queryKey: ["knowledge", profileId] });
       void qc.prefetchQuery({
         queryKey: ["knowledge", profileId],
         queryFn: () => getKnowledge(profileId),
       });
-    },
-  });
-}
-
-export function useTaskCandidates(profileId: string, enabled: boolean) {
-  return useQuery({
-    queryKey: ["task-candidates", profileId],
-    queryFn: () => getTaskCandidates(profileId),
-    enabled,
-    staleTime: 5 * 60 * 1000,
-    refetchOnWindowFocus: false,
-  });
-}
-
-export function useBuildTasks(profileId: string) {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: (picked: PickedTask[]) => buildTasks(profileId, picked),
-    onSuccess: (env: DocumentEnvelope) => {
-      qc.setQueryData(["document", profileId], env);
-      qc.invalidateQueries({ queryKey: ["profiles"] });
     },
   });
 }
@@ -197,7 +157,7 @@ export function useAutosaveDocument(profileId: string) {
     );
   }, 500);
 
-  // 外部變化（GET 首載之後的 invalidate/refetch、buildTasks/setOccupations/finalize 成功、
+  // 外部變化（GET 首載之後的 invalidate/refetch、setOccupations/finalize 成功、
   // ConflictDialog「載入最新版」）→ envelope 的 version/revision 改變，且不是本 hook 的 PATCH
   // 寫回 → baseline 用新 envelope 整包重設（此時 cache 的 content 才是新的 server 真相）。
   useEffect(() => {

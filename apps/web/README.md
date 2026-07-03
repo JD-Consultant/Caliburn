@@ -24,22 +24,21 @@ npm run lint
 |---|---|
 | `src/app/` | 路由:`/`(→dashboard)、`/dashboard`(職務檔案清單)、`/documents/[id]`(**工作台**,主畫面)、`/documents/[id]/intake`(3 題小訪談,選用)、`/api/copilotkit`(AG-UI runtime 轉接到後端 `/copilotkit`) |
 | `src/components/interview/` | 工作台元件:`JobDocTable`(主表格,dnd 排序)、`DocHeader`(官方表頭 5 欄)、`CellFillerPanel`(O/P/K/S 填格側欄)、`OccupationPicker`(選職類 modal)、`TaskCuratePanel`(選任務 modal + AI 預勾)、`ConflictDialog`(409 衝突二選一)、`DocNotes`、`fields/*`(FieldCombobox/OfficialMenu/FieldText/SourceLine 共用選單元件)、`InterruptHandlers`(LangGraph 訪談 HITL 面板;**目前無頁面掛載**,待訪談引擎重寫,ADR 0020) |
-| `src/hooks/` | 資料層 hooks:`useDocument`(文件 + autosave + header-meta + task-candidates)、`useTaskCatalog`(批次 catalog + per-task 快取)、`useProfiles`、`useHydrated` |
+| `src/hooks/` | 資料層 hooks:`useDocument`(文件 + autosave + 選職類)、`useKnowledge`(知識包 query,ADR 0021)、`useProfiles`、`useHydrated` |
 | `src/lib/` | `api.ts`(唯一 fetch client,`/api/v1/*` + `ApiError`)、`ocsDoc.ts`(**純函式**文件編輯:clone→改→回傳 + 位置重編碼 + A4 文件級 K/S 重編)、`pack.ts`(**知識包→選單選項**純函式:池→OptionItem、own-first srcs、預勾集;ADR 0021)、`urn.ts`、`download.ts` |
 | `src/store/user.ts` | zustand + persist:匿名 userId(localStorage `caliburn-user`;404 時自動重建) |
 | `src/types/index.ts` | 契約型別(生成底 + UI 欄位)+ 各端點回應型別 |
 | `src/components/layout/Providers.tsx` | QueryClient + **選擇性持久化** + CopilotKitProvider |
 
-## 資料層:五個 query、兩種性質
+## 資料層:兩個 query、兩種性質(P3 收斂,ADR 0021)
 
 | queryKey | 內容 | staleTime | 持久化 |
 |---|---|---|---|
 | `["document", id]` | of-record 信封 `{id, version, revision, status, content}` | 0 | **否(刻意)** |
-| `["header-meta", id]` | 表頭候選池(職類/職業/行業/態度/notes,server 端已聯集去重+溯源) | 5min | **是** |
-| `["task-candidates", id]` | 任務候選(依職類→職責分組) | 5min | 否 |
-| `["task-catalogs", id]` | 批次每任務官方 K/S/O/P+level(鍵=任務 URN;ADR 0016)——**填格已改吃 knowledge,本 query 已無掛載,P3 Task 7 退役** | 5min | **是** |
-| `["knowledge", id]` | **知識包**(occupation_details+12 池+source_tasks,每官方值帶 srcs;ADR 0021)——選職類後背景預載,P3 起逐面取代上面三個池 query | 24h | **是** |
-| `["task-catalog", id, taskKey]` | 單任務 catalog(由批次 seed;cache miss 才 fallback 打 `/ai/*`) | 5min | 否 |
+| `["knowledge", id]` | **知識包**(occupation_details+12 池+source_tasks,每官方值帶 srcs)——**所有選單的唯一資料源**(表頭/態度/NOTE/選任務/填格/級別);選職類後背景預載 | 24h | **是** |
+
+(另有 `["profiles"]`/`["profile", id]` CRUD 清單。header-meta/task-candidates/task-catalogs
+三個池 query 已隨 pack 切換退役——P3。)
 
 **核心不變量:document 是「可寫的工作狀態」,其餘全是「唯讀參考池」。** 這條線決定一切:
 誰能持久化(只有唯讀池)、誰走 invalidate 重抓、誰的 cache 允許本地先寫。
@@ -86,9 +85,8 @@ baseline = 最後已知 server 狀態快照,是 dirty 判定 / no-op skip / 樂�
 
 ### 5. 重載還原(持久化)
 
-`PersistQueryClientProvider`(localStorage `caliburn-rq-cache`,buster `ocs-v4-2`,maxAge 24h)
-只還原標了 `meta.persist === true` 的 query(= header-meta、task-catalogs)。task-catalogs 還原後
-由 effect 重新 seed 各 `["task-catalog", id, taskKey]`。document 永遠重新 GET(of-record 即時)。
+`PersistQueryClientProvider`(localStorage `caliburn-rq-cache`,buster `ocs-v4-3`,maxAge 24h)
+只還原標了 `meta.persist === true` 的 query(= knowledge)。document 永遠重新 GET(of-record 即時)。
 
 ## 不變量(從代碼讀不出來的規則)
 
@@ -96,8 +94,10 @@ baseline = 最後已知 server 狀態快照,是 dirty 判定 / no-op skip / 樂�
   `envelope.content`,不另設 local state;`useAutosaveDocument` 依賴同頁掛著的 `useDocument`
   訂閱來驅動重繪。
 - **document 刻意不持久化**:localStorage 還原舊文件會蓋掉 server 真相。
-- **代碼是位置、身分是 `_id`**:O/P/K/S/態度的 `code` 隨陣列位置重編(`renumberCoded`),
+- **代碼是位置、身分是 `_id`**:O/P/態度的 `code` 隨陣列位置重編(`renumberCoded`),
   來源/自訂判定看 `_id`/`_src`/`_ref`,不看 code。
+- **K/S 碼是文件層級**(A4,ocs-schema):name 為 key、首現給號、**同名共碼**(跨任務共用
+  同一代碼);任何 K/S 內容或結構變動都全文件重編(`renumberDocKS`)。碼共用、身分各自。
 - **UI-only 欄位一律 `_` 前綴**(`_id/_uid/_tid/_src/_ref/_notes/_levelSrc`):draft 會存進 DB,
   但 finalize/export 在後端 `_strip_underscore` 全剝,正式 OCS JSON 契約純淨。
 - **官方項改了內容就變自訂**:編輯官方帶入項 → `_src="custom"`、`_ref` 清空(選單勾選判定
@@ -106,10 +106,10 @@ baseline = 最後已知 server 狀態快照,是 dirty 判定 / no-op skip / 樂�
 
 ## API 消費面(全部經 `lib/api.ts` → `/api/v1`)
 
-文件:`GET/PATCH …/document`、`POST …/document:finalize`、`POST …/document:buildTasks`、
-`GET …/document/export`。池:`GET …/header-meta`、`GET …/task-candidates`、`GET …/task-catalogs`。
-職類:`GET /occupations?q=`、`PUT …/occupations`。AI 提議(只提議不寫 DB):`POST /ai/recommend-ks`、
-`/ai/draft-op`、`/ai/extract-tasks`、`/ai/structure-task`。CRUD:`/users`、`/job-profiles`。
+文件:`GET/PATCH …/document`、`POST …/document:finalize`、`GET …/document/export`。
+知識:`GET …/knowledge`(唯一池端點,ADR 0021)。職類:`GET /occupations?q=`、`PUT …/occupations`。
+AI 提議(只提議不寫 DB):`POST /ai/extract-tasks`、`/ai/structure-task`(recommend-ks/draft-op
+server 端仍在,web 已不呼叫)。CRUD:`/users`、`/job-profiles`。
 端點語意與錯誤碼見 [`apps/api/README.md`](../api/README.md)。
 
 ## 指路

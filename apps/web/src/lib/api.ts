@@ -3,18 +3,12 @@
 // tasks / documents endpoints were removed with the old backend (Concern B).
 import type {
   DocumentEnvelope,
-  DraftOpResult,
   ExtractTasksResult,
-  HeaderMeta,
   JobProfile,
   KnowledgePack,
   OcsDocument,
   OcsSearchHit,
-  PickedTask,
-  RecommendKsResult,
   StructureTaskResult,
-  TaskCandidates,
-  TaskCatalogs,
   User,
 } from "@/types";
 
@@ -118,10 +112,6 @@ export const finalizeDocument = (profileId: string) =>
 export const getDocumentExport = (profileId: string) =>
   request<OcsDocument>(`/job-profiles/${profileId}/document/export`);
 
-// 批次:文件所有任務的官方 catalog（每 ocs_code 撈一次池；ADR 0016）。
-export const getTaskCatalogs = (profileId: string) =>
-  request<TaskCatalogs>(`/job-profiles/${profileId}/task-catalogs`);
-
 // 選職類：整批取代 selected_ocs_codes（順序=優先度）→ 冪等 PUT（ADR 0019）。
 export const setOccupations = (profileId: string, ocsCodes: string[]) =>
   request<{ ocs_codes: string[] }>(`/job-profiles/${profileId}/occupations`, {
@@ -129,22 +119,8 @@ export const setOccupations = (profileId: string, ocsCodes: string[]) =>
     body: JSON.stringify({ ocs_codes: ocsCodes }),
   });
 
-// 選任務候選（已選職類的所有任務，依職責分組）。
-export const getTaskCandidates = (profileId: string) =>
-  request<TaskCandidates>(`/job-profiles/${profileId}/task-candidates`);
-
-// 用勾選的任務建/更新文件（遞進重編、保留已填）。
-export const buildTasks = (profileId: string, picked: PickedTask[]) =>
-  request<DocumentEnvelope>(`/job-profiles/${profileId}/document:buildTasks`, {
-    method: "POST",
-    body: JSON.stringify({ picked }),
-  });
-
-// 表頭候選池（D29）：多 OCS 官方 metadata 聯集（職類/職業/行業/態度/notes）+ 主基準。
-export const getHeaderMeta = (profileId: string) =>
-  request<HeaderMeta>(`/job-profiles/${profileId}/header-meta`);
-
-// 知識包(ADR 0021):選職類後一次抓齊(occupation_details + 12 池 + source_tasks)。
+// 知識包(ADR 0021):選職類後一次抓齊(occupation_details + 12 池 + source_tasks),
+// 表頭/態度/NOTE/選任務/填格所有選單的唯一資料源(選職類=唯一同步點)。
 export const getKnowledge = (profileId: string) =>
   request<KnowledgePack>(`/job-profiles/${profileId}/knowledge`);
 
@@ -156,21 +132,8 @@ export const ocsSearch = (q: string) =>
 
 // ── AI 提議端點（D28 /ai/*）─────────────────────────────────────────────────
 // 全部「只提議、不寫 DB」：回結構化提議，前端暫存→使用者套用才走 PATCH。
-// 沒設後端金鑰時降級成只回 catalog（recommend-ks/draft-op）或空（extract/clarify）。
-
-// 每任務 K/S 推薦：有 note→LLM 篩選+理由；無 note/無金鑰→回 catalog 全部（source=catalog）。
-export const recommendKS = (body: { profile_id: string; task_key: string; note?: string }) =>
-  request<RecommendKsResult>("/ai/recommend-ks", {
-    method: "POST",
-    body: JSON.stringify(body),
-  });
-
-// 每任務 產出/指標 草擬：有 note→LLM 個人化（source=ai）；無 note/無金鑰→catalog 官方。
-export const draftOP = (body: { profile_id: string; task_key: string; note?: string }) =>
-  request<DraftOpResult>("/ai/draft-op", {
-    method: "POST",
-    body: JSON.stringify(body),
-  });
+// 沒設後端金鑰時降級成空提議。（recommend-ks/draft-op server 端仍在——訪談引擎/agent
+// 主線用（ADR 0020）；web 填格已改吃知識包，不再呼叫。）
 
 // intake 自述 → 預勾 catalog 任務 UUID + 候選自訂任務。
 export const extractTasks = (body: { intake: string; ocs_codes: string[] }) =>

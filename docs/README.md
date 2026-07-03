@@ -86,14 +86,14 @@ Caliburn = 給顧問用的多租戶 B2B SaaS(職能基準 OCS → 職務說明�
 
 ### 各 app 自帶文檔(colocated)
 
-每個 app 的 README 統一含:定位一句 / 跑・測試 / codemap / 關鍵流程(runtime view)/ 不變量 /
-介面 reference / 指路。寫法依據見 [`specs/2026-07-03-app-developer-docs-research.md`](specs/2026-07-03-app-developer-docs-research.md)。
+各 app 的 README 含:定位一句 / 跑・測試 / codemap / 關鍵流程(runtime view)/ 不變量 /
+介面 reference / 指路(embedder 服務簡單,README 亦精簡)。寫法依據見 [`specs/2026-07-03-app-developer-docs-research.md`](specs/2026-07-03-app-developer-docs-research.md)。
 
 - [`apps/api/README.md`](../apps/api/README.md) — FastAPI + LangGraph:六邊形 codemap、REST 端點面、文件 of-record 生命週期。
 - [`apps/web/README.md`](../apps/web/README.md) — Next.js:query 資料層、autosave/409 流程、選擇性持久化。
 - [`apps/ocs-indexer/README.md`](../apps/ocs-indexer/README.md) — Qdrant 知識/查詢服務:v4 payload、index/查詢流程、查詢 API 面。
 - [`apps/embedder/README.md`](../apps/embedder/README.md) — BGE-M3 GPU 嵌入容器(ADR 0012)。
-- `apps/pdf-to-json/` — OCS PDF→JSON ETL(見其 `README.md` / `ARCHITECTURE.md`)。
+- [`apps/pdf-to-json/README.md`](../apps/pdf-to-json/README.md) — OCS PDF→JSON ETL(Pipes-and-Filters);其 §1–10 亦為**權威 OCS 來源 JSON 契約**。
 
 ### 歷史
 

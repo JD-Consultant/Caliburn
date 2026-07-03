@@ -102,6 +102,9 @@ UI 動作 → 請求   對照表:點 X → GET/PATCH Y
 - **本 repo 關鍵限定**:我們的 design 文檔是**指標→整檔 JIT 載入**(非 RAG 分塊),故「每節自足」比重較低、
   **明講+精確名+不變量+不 fossilize** 比重最高;**日後若把文檔餵進嵌入/RAG,再把自足與原子化拉滿**。
 
+> **落地**:操作總則(taxonomy / 擺放 / 寫作 / 維護)= [`../README.md`](../README.md);
+> design 文檔 how-to = [`../design/README.md`](../design/README.md)。本 spec 只管「為什麼」(研究/來源)。
+
 ## 4. 待決(留給討論)
 
 1. **要不要開 ADR 記這個慣例?**

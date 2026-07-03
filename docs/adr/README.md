@@ -24,12 +24,12 @@ ADR 是「為什麼」層;搭配 `../specs/`(細節設計)與 `../runbook.md`(�
 | [0013](0013-naming-cleanup-caliburn.md) | 命名整理：web 改 Caliburn、內部去版號（graph_v3→authoring、/v3→/documents）、容器/DB 去 jobintel | Accepted |
 | [0014](0014-db-image-stock-postgres.md) | DB image 降回 stock `postgres:16`（移除未使用的 pgvector；D5 後檢索走 Qdrant） | Accepted |
 | [0015](0015-document-save-optimistic-concurrency.md) | 文件存檔採樂觀並發（version 守衛）；回合制協作不上 CRDT/OT；minimal 先、逐操作 full 延後 | Accepted（2a-minimal 已實作：雙 token version+revision、409 + ConflictDialog；full 延後） |
-| [0016](0016-batch-task-catalog-endpoint.md) | 後端批次 task-catalog 端點（每 ocs_code 撈一次池）；前端 setQueryData 灌快取 | Accepted |
+| [0016](0016-batch-task-catalog-endpoint.md) | 後端批次 task-catalog 端點（每 ocs_code 撈一次池）；前端 setQueryData 灌快取 | Accepted（模式由 0021 一般化；task-catalogs 端點與前端 seeding 已於 P3 退役） |
 | [0017](0017-app-entry-single-composition-root.md) | 後端 app 入口收斂:單一組裝點 + `/healthz` 統一 + 移除 demo app（livez/readyz 待容器化） | Accepted |
 | [0018](0018-indexer-dependency-degradation-policy.md) | indexer 依賴降級政策:critical fail-fast vs enrichment 降級 + `meta.partial`（circuit breaker 延後） | Accepted |
 | [0019](0019-api-naming-alignment.md) | API 命名對齊:自訂方法 `:verb`、根層 `GET /occupations?q=`、`PUT occupations`（monorepo 原子改名、偏離 AIP-231/132 白紙黑字） | Accepted |
 | [0020](0020-interview-authoring-interaction-model.md) | 訪談式撰寫互動模式:混合載體（文件常駐 + 精靈化訪談面板）；實作可重新設計、不受既有資產約束 | Accepted |
-| [0021](0021-knowledge-pack-single-sync-point.md) | 知識包：選職類=唯一 knowledge 同步點；indexer 給資料/api 處理/web 讀寫；來源必標的資料基座 | Accepted |
+| [0021](0021-knowledge-pack-single-sync-point.md) | 知識包：選職類=唯一 knowledge 同步點；indexer 給資料/api 處理/web 讀寫；來源必標的資料基座 | Accepted（P1–P3 已實作：`/knowledge` 端點＋web 全選單切換＋舊四端點退役） |
 
 完整脈絡見 [`../specs/2026-06-27-system-architecture-design.md`](../specs/2026-06-27-system-architecture-design.md)。
 契約怎麼選/怎麼交付的規範見 [`../contract-strategy.md`](../contract-strategy.md)（ADR 0004/0010 的一般化、預答契約 #3）。

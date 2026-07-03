@@ -115,6 +115,9 @@ server 端仍在,web 已不呼叫)。CRUD:`/users`、`/job-profiles`。
 
 ## 指路
 
+**內部深文檔:[`docs/data-layer.md`](docs/data-layer.md)**(cache-as-state + autosave 狀態機)· 編輯器端到端
+[`docs/design/editor-knowledge-pack.md`](../../docs/design/editor-knowledge-pack.md)。
+
 ADR [0011](../../docs/adr/0011-web-ocs-types-generated.md)(契約 #3)·
 [0015](../../docs/adr/0015-document-save-optimistic-concurrency.md)(樂觀並發)·
 [0016](../../docs/adr/0016-batch-task-catalog-endpoint.md)(批次 catalog)·

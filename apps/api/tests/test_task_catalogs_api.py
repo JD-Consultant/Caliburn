@@ -84,13 +84,15 @@ async def test_task_catalogs_batches_pool_once_per_ocs_code(client):
     r = await client.get(f"/api/v1/job-profiles/{p.id}/task-catalogs")
     assert r.status_code == 200, r.text
     cats = r.json()["catalogs"]
-    assert set(cats) == {"T1.1", "T1.2"}
-    assert [k["code"] for k in cats["T1.1"]["knowledge"]] == ["K01"]
-    assert [s["code"] for s in cats["T1.1"]["skills"]] == ["S01"]
-    assert [o["code"] for o in cats["T1.1"]["outputs"]] == ["O1"]
-    assert [i["code"] for i in cats["T1.1"]["indicators"]] == ["P1"]
-    assert cats["T1.1"]["competency_level"] == 3
-    assert [k["code"] for k in cats["T1.2"]["knowledge"]] == ["K02"]
+    # 鍵 = 任務身分 URN(provenance 組出),非文件位置碼——結構性編輯重編位置碼不影響(A1)
+    assert set(cats) == {"ocs:OC1:T:T1.1", "ocs:OC1:T:T1.2"}
+    t11 = cats["ocs:OC1:T:T1.1"]
+    assert [k["code"] for k in t11["knowledge"]] == ["K01"]
+    assert [s["code"] for s in t11["skills"]] == ["S01"]
+    assert [o["code"] for o in t11["outputs"]] == ["O1"]
+    assert [i["code"] for i in t11["indicators"]] == ["P1"]
+    assert t11["competency_level"] == 3
+    assert [k["code"] for k in cats["ocs:OC1:T:T1.2"]["knowledge"]] == ["K02"]
     # 核心:同一 ocs_code 的池只撈一次(兩任務不重撈)
     assert stub.calls == ["OC1"]
 
@@ -108,7 +110,8 @@ async def test_task_catalogs_skips_custom_tasks(client):
     app.dependency_overrides[get_knowledge] = lambda: StubKnowledge(_pool_two_tasks())
     r = await client.get(f"/api/v1/job-profiles/{p.id}/task-catalogs")
     assert r.status_code == 200, r.text
-    assert "T1.3" not in r.json()["catalogs"]
+    # 自訂任務無 provenance → 不在批次(鍵為 URN,不含 T1.3 位置碼)
+    assert not any("T1.3" in k for k in r.json()["catalogs"])
 
 
 @pytest.mark.asyncio

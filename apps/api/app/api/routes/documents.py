@@ -277,21 +277,21 @@ async def task_catalogs(
 ):
     """批次:文件每任務的官方 catalog（K/S/O/P + level），每個不同 ocs_code 只撈一次池。
     唯讀、note-less、不跑 LLM（ADR 0016）。
+    **鍵 = 任務身分 URN**（``ocs:{ocs_code}:T:{task_code}``，scheme 同 indexer api/urn.py，
+    由 provenance 組出）——非文件位置碼：結構性編輯（刪/拖/重編）不影響鍵（A1）。
     **enrichment 端點**（ADR 0018）：indexer 某 code 掛 → 略過該 code 的任務並回
     ``meta.partial=true``（缺了仍可手動編輯，不快錯）。"""
     await _require_profile(profile_id, db)
     latest = await DocRepo(db).latest(profile_id)
     content = (latest or {}).get("content") or {}
-    triples: list[tuple[str, str, str]] = []  # (task_key, ocs_code, task_code)
+    pairs: list[tuple[str, str]] = []  # (ocs_code, task_code) — 鍵由 provenance 組，不用位置碼
     for unit in (content.get("ocs_content") or {}).get("ocu_units") or []:
         for task in unit.get("tasks") or []:
-            tcs = task.get("task_codes") or []
-            tk = tcs[0].get("code") if tcs and isinstance(tcs[0], dict) else ""
             ref = ai_tasks.catalog_ref(task)
-            if tk and ref["ocs_code"] and ref["task_code"]:
-                triples.append((tk, ref["ocs_code"], ref["task_code"]))
+            if ref["ocs_code"] and ref["task_code"]:
+                pairs.append((ref["ocs_code"], ref["task_code"]))
     pools: dict[str, object | None] = {}
-    for _, ocs_code, _ in triples:
+    for ocs_code, _ in pairs:
         if ocs_code not in pools:
             try:
                 pools[ocs_code] = await knowledge.competencies(ocs_code)
@@ -299,10 +299,10 @@ async def task_catalogs(
                 logger.warning("task-catalogs: competencies(%s) failed; skipping", ocs_code, exc_info=True)
                 pools[ocs_code] = None
     catalogs: dict[str, dict] = {}
-    for tk, ocs_code, task_code in triples:
+    for ocs_code, task_code in pairs:
         pool = pools.get(ocs_code)
         if pool is None:
             continue
-        catalogs[tk] = task_competencies(pool, task_code)
+        catalogs[f"ocs:{ocs_code}:T:{task_code}"] = task_competencies(pool, task_code)
     partial = any(pool is None for pool in pools.values())
     return {"catalogs": catalogs, "meta": {"partial": partial}}

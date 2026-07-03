@@ -7,6 +7,7 @@ import {
   finalizeDocument,
   getDocument,
   getHeaderMeta,
+  getKnowledge,
   getTaskCandidates,
   patchDocument,
   setOccupations,
@@ -83,6 +84,13 @@ export function useSetOccupations(profileId: string) {
       // header-meta（職能基準代碼選單/所屬類別/態度候選）也要隨選的職類更新，否則
       // 第二次選職類時主基準下拉不會刷新。
       qc.invalidateQueries({ queryKey: ["header-meta", profileId] });
+      // 知識包(ADR 0021):選職類=唯一同步點 → 作廢舊包 + 背景預載新包
+      // (不鎖 UI;失敗交給消費端 query 自行重抓)。
+      qc.invalidateQueries({ queryKey: ["knowledge", profileId] });
+      void qc.prefetchQuery({
+        queryKey: ["knowledge", profileId],
+        queryFn: () => getKnowledge(profileId),
+      });
     },
   });
 }

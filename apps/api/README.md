@@ -63,7 +63,8 @@ users ─1:N─ job_profiles ─1:N─ document_versions
 | `PUT …/occupations` | 整批取代已選職類 + 刷新文件表頭為官方主基準 | 表頭名(掛→留空) |
 | `GET …/task-candidates` | 已選職類全部任務(職類→職責分組) | **critical** |
 | `GET …/header-meta` | 表頭候選池(聯集去重+sources 溯源)+ 主基準 | enrichment |
-| `GET …/task-catalogs` | 批次每任務官方 K/S/O/P+level(每 ocs_code 撈一次池;ADR 0016) | enrichment |
+| `GET …/task-catalogs` | 批次每任務官方 K/S/O/P+level(鍵=任務 URN;ADR 0016,P3 後退役) | enrichment |
+| `GET …/knowledge` | **知識包**(ADR 0021):occupation_details + 12 池 + source_tasks,每官方值帶 srcs | 單掛 partial/**全掛 502** |
 | `GET /occupations?q=` | 根層職類目錄搜尋(全域知識,不掛 profile 下;ADR 0019) | **critical** |
 | `POST /ai/{recommend-ks,draft-op,extract-tasks,structure-task,clarify}` | **只提議、不寫 DB**;無金鑰→降級回 catalog/空 | enrichment |
 | `GET /healthz`;`/copilotkit`(AG-UI) | 就緒(含 DB);訪談 agent(live app 才掛) | — |
@@ -94,6 +95,14 @@ finalize → assemble_final(補全+剝 `_`)→ validate → INSERT 新 final 列
 **每個不同 ocs_code 只打一次** `GET /occupations/{code}/competencies` → 依 task_code 切片
 (`services/knowledge/task_detail.py`)→ `{catalogs: {T1.1: {...}}}`。某 code 掛 → 略過該池
 的任務 + `meta.partial=true`。
+
+### 3½. 知識包組裝(ADR 0021)
+
+選職類後 web 抓一次 `GET …/knowledge`:per-code **並行**抓 indexer 三資源(detail/tasks/
+competencies)→ `core/domain/knowledge_pack.build_pack` 純函式**照優先序組裝**——池(append 序
++ key 去重 + srcs 累積;key 表見 spec §5.1)+ `source_tasks`(任務 URN byId,掛 o/p/k/s_refs)。
+此後 web 對 knowledge 零請求(特殊功能除外)。三個投影端點(header-meta/task-candidates/
+task-catalogs)過渡期保留,web 逐面切換完成後退役。
 
 ### 4. AI 提議降級鏈(D28)
 

@@ -37,7 +37,7 @@ npm run lint
 | `["document", id]` | of-record 信封 `{id, version, revision, status, content}` | 0 | **否(刻意)** |
 | `["header-meta", id]` | 表頭候選池(職類/職業/行業/態度/notes,server 端已聯集去重+溯源) | 5min | **是** |
 | `["task-candidates", id]` | 任務候選(依職類→職責分組) | 5min | 否 |
-| `["task-catalogs", id]` | 批次每任務官方 K/S/O/P+level(鍵=任務 URN;ADR 0016,P3 後退役) | 5min | **是** |
+| `["task-catalogs", id]` | 批次每任務官方 K/S/O/P+level(鍵=任務 URN;ADR 0016)——**填格已改吃 knowledge,本 query 已無掛載,P3 Task 7 退役** | 5min | **是** |
 | `["knowledge", id]` | **知識包**(occupation_details+12 池+source_tasks,每官方值帶 srcs;ADR 0021)——選職類後背景預載,P3 起逐面取代上面三個池 query | 24h | **是** |
 | `["task-catalog", id, taskKey]` | 單任務 catalog(由批次 seed;cache miss 才 fallback 打 `/ai/*`) | 5min | 否 |
 
@@ -76,9 +76,10 @@ provenance 跳過)→ setQueryData(document) + invalidate profiles。
 
 ### 4. 填格(O/P/K/S)
 
-點格 → `CellFillerPanel` → `useTaskCatalog(taskKey)` 讀 per-task 快取(文件載入後
-`useTaskCatalogs` 已批次抓好並 seed,開面板 0 等待)→ 勾官方(帶 `_ref` 溯源)/加自訂 →
-`setKS`/`setOp` → commit(回到流程 1)。
+點格 → `CellFillerPanel` → 讀**知識包大池**(`useKnowledge`;選單=全池可跨職類借用,
+序號顯示+每列引用行)→ 空格首開自動帶入該任務官方配套(source_tasks 的 o/p/k/s_refs 聯集;
+「自動勾選」鈕重套)→ 勾官方(帶 `_ref` 溯源,own-first:引用對到本任務)/加自訂 →
+`setKS`/`setOp` → commit(回到流程 1)。任務級別下拉同源(官方值帶引用,選中存 `_levelSrc`)。
 
 ### 5. 重載還原(持久化)
 

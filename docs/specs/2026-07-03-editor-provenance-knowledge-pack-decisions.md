@@ -171,6 +171,13 @@ indexer `view=FULL`、missing-codes 清單/重試機制。pack 內部 per-code �
 理由(維護者):**目前全本地部署、只有 LLM API 走雲端**——網路不是問題域;設計預算投向
 LLM 核心(去重工具、訪談/共編),那裡的深度不算過度設計。
 
+**資料流三決策(2026-07-03 拍板)**:
+1. **寫入路徑收斂**:職責/任務選用改走**前端文件編輯 + autosave PATCH**(單一寫入路徑,
+   與共編/LLM 模型一致——LLM 也是改文件);`document:buildTasks` 端點於 web 切換完成後退役。
+2. **抓包時機**:PUT occupations 成功 → web 背景 GET `/knowledge`(mutation 回應保持薄)。
+3. **過渡**:pack 端點先上,web **逐面切換**(五選單→職責/任務選單→表頭),每面切完刪對應
+   舊 query;三個舊投影端點(header-meta/task-candidates/task-catalogs)等全切完再退。
+
 ## §6 落地順序(各自 plan,bite-size,green-before==green-after)
 
 1. **Plan A1**:URN 快取鍵(api 回應鍵 + web 鍵 + buster bump)——止血錯資料 bug,pack 前置。

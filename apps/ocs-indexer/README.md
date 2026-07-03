@@ -146,6 +146,9 @@ src/jd_ocs_indexer/
 
 ## 指路
 
+**內部管線深文檔(改 ingest / 查詢邏輯前先讀):[`docs/pipeline.md`](docs/pipeline.md)** —— normalizer lockstep、
+builder embed 字串、RRF hybrid、competencies 去重、manifest 相容的「內部怎麼跑 + 為什麼」。
+
 ADR [0003](../../docs/adr/0003-indexer-stays-separate-service.md)(獨立服務)·
 [0009](../../docs/adr/0009-embedding-version-manifest.md)(manifest)·
 [0010](../../docs/adr/0010-indexer-contract-shared-package.md)(契約 #2)·

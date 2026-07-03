@@ -11,8 +11,9 @@ import { useState } from "react";
 // referenced per-hook by agentId ("jd_authoring"); the runtime route registers it.
 
 // 持久化版本印記:schema/契約破壞性變更時 bump → 自動失效舊快取（spec D-1d）。
-// v4-2:task-catalogs 鍵改任務身分 URN(A1),舊位置碼鍵的持久化快取作廢。
-const PERSIST_BUSTER = "ocs-v4-2";
+// v4-3:task-catalogs/header-meta 退役（P3,ADR 0021）,舊持久化條目作廢;
+// 現在唯一持久化的是 knowledge。
+const PERSIST_BUSTER = "ocs-v4-3";
 const MAX_AGE = 1000 * 60 * 60 * 24; // 24h；被持久化 query 的 gcTime 需 ≥ 此值。
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -31,7 +32,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
         persister,
         maxAge: MAX_AGE,
         buster: PERSIST_BUSTER,
-        // 只持久化標了 meta.persist 的 query（task-catalogs/header-meta）；document 不存。
+        // 只持久化標了 meta.persist 的 query（knowledge）；document 不存。
         dehydrateOptions: {
           shouldDehydrateQuery: (q) =>
             defaultShouldDehydrateQuery(q) && q.meta?.persist === true,

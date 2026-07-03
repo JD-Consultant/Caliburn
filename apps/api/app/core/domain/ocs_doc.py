@@ -133,65 +133,8 @@ def skeleton(profile: dict, units_tasks: list[dict]) -> dict:
     }
 
 
-def _renumber(doc: dict) -> dict:
-    """Resequence 職責 T1,T2… and 任務 T{u}.{t}; names/blocks/provenance untouched."""
-    for u, unit in enumerate(doc["ocs_content"]["ocu_units"], start=1):
-        unit["ocu_code"] = f"T{u}"
-        for t, task in enumerate(unit.get("tasks") or [], start=1):
-            tcs = task.get("task_codes") or [{"code": "", "name": ""}]
-            tcs[0]["code"] = f"T{u}.{t}"
-            task["task_codes"] = tcs
-    return doc
-
-
-def build_from_picked(profile: dict, picked: list[dict], prev: dict | None = None) -> dict:
-    """ADDITIVE 選任務：保留 prev 全部任務（含已填/自訂/使用者編輯），只「加」picked
-    中尚未存在（依 provenance ocs_code+task_code）的任務。新任務若來源職責
-    (ocs_code+unit_id) 已在文件 → 併入該職責；否則新增職責（名稱依 adopt：
-    picked.unit_title 有值＝採用整組保留名，留白＝cherry-pick）。"""
-    if not prev or not ((prev.get("ocs_content") or {}).get("ocu_units")):
-        return skeleton(profile, picked)
-
-    doc = copy.deepcopy(prev)
-    units = doc["ocs_content"]["ocu_units"]
-
-    existing: set[tuple] = set()
-    for unit in units:
-        for task in unit.get("tasks") or []:
-            p = task.get("provenance") or {}
-            existing.add((p.get("ocs_code") or "", p.get("task_code") or ""))
-
-    for it in picked:
-        ref = it.get("indexer_ref") or {}
-        oc = ref.get("ocs_code") or ""
-        tcode = ref.get("task_code") or ""
-        key = (oc, tcode)
-        if key in existing:
-            continue
-        existing.add(key)
-        uid = it.get("unit_id") or ""
-        target = None
-        for unit in units:
-            src = unit.get("source") or {}
-            if uid and src.get("ocs_code") == oc and src.get("unit_id") == uid:
-                target = unit
-                break
-        if target is None:
-            target = {
-                "ocu_code": "",
-                "ocu_name": it.get("unit_title") or "",  # blank = cherry-pick
-                "source": {"ocs_code": oc, "unit_id": uid,
-                           "occupation_name": it.get("occupation_name") or ""},
-                "tasks": [],
-            }
-            units.append(target)
-        target["tasks"].append({
-            "task_codes": [{"code": "", "name": it.get("task_name", "")}],
-            "competency_blocks": [_empty_block()],
-            "provenance": {"ocs_code": oc, "task_code": tcode, "urn": ref.get("urn") or ""},
-        })
-
-    return _renumber(doc)
+# build_from_picked / _renumber 已隨 document:buildTasks 端點退役(P3,ADR 0021):
+# 任務選用改由 web 前端文件編輯(addFromPool)+ PATCH 寫入,單一寫入路徑。
 
 
 def _strip_underscore(node) -> None:

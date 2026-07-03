@@ -28,7 +28,7 @@ uv run pytest -q                   # 無 DB 時 DB 相關測試自動 skip
 
 | 路徑 | 是什麼 | 依賴方向 |
 |---|---|---|
-| `app/core/` | **純內圈**:`ports.py`(KnowledgePort/PersistPort/LlmPort Protocol)、`domain/ocs_doc.py`(OCS 文件純函式:skeleton/build_from_picked/assemble_final/validate/completion)、`domain/header_meta.py`(表頭池聯集去重)、`knowledge_dto.py`(re-export [`packages/indexer-contract`](../../packages/indexer-contract/)) | 不 import 任何外圈 |
+| `app/core/` | **純內圈**:`ports.py`(KnowledgePort/PersistPort/LlmPort Protocol)、`domain/ocs_doc.py`(OCS 文件純函式:skeleton/assemble_final/validate/completion)、`domain/knowledge_pack.py`(知識包組裝,ADR 0021)、`knowledge_dto.py`(re-export [`packages/indexer-contract`](../../packages/indexer-contract/)) | 不 import 任何外圈 |
 | `app/adapters/` | 邊緣實作:`knowledge_http.py`(indexer typed client)、`persistence.py`(ProfileRepo/DocRepo/LiveDbPersist)、`llm_openrouter.py`(per-role LLM + JSON 重試)、`stubs.py`(測試/demo 假件) | 實作 ports |
 | `app/services/` | use-case 純函式:`ai/`(recommend_ks/draft_op/extract_tasks/structure_task/clarify + prompts)、`knowledge/task_detail.py`(池→單任務切片) | 只吃 ports/DTO |
 | `app/authoring/` | LangGraph 訪談編排(原 graph_v3):`graph.py` 骨幹 + 逐任務深問**單層 loop(刻意,勿重構)**、`serving.py`(AG-UI agent)、`checkpointer.py` | deps 注入 ports |
@@ -58,13 +58,9 @@ users ─1:N─ job_profiles ─1:N─ document_versions
 | `GET /job-profiles/{id}/document` | of-record 信封;無文件回 `status:"none"` 空殼 | — |
 | `PATCH …/document?expect_version=&expect_revision=` | 存草稿(整份文件);token 不符 → **409** + current token;不帶=不守衛(legacy) | — |
 | `POST …/document:finalize` | 組裝+驗 schema(失敗 422)→ INSERT 新 final 列 | — |
-| `POST …/document:buildTasks` | 勾選任務建/更新文件(加法、依 provenance 去重、遞進重編) | — |
 | `GET …/document/export` | 唯讀匯出乾淨契約 JSON(剝 `_` 欄位,不寫 DB) | — |
 | `PUT …/occupations` | 整批取代已選職類 + 刷新文件表頭為官方主基準 | 表頭名(掛→留空) |
-| `GET …/task-candidates` | 已選職類全部任務(職類→職責分組) | **critical** |
-| `GET …/header-meta` | 表頭候選池(聯集去重+sources 溯源)+ 主基準 | enrichment |
-| `GET …/task-catalogs` | 批次每任務官方 K/S/O/P+level(鍵=任務 URN;ADR 0016,P3 後退役) | enrichment |
-| `GET …/knowledge` | **知識包**(ADR 0021):occupation_details + 12 池 + source_tasks,每官方值帶 srcs | 單掛 partial/**全掛 502** |
+| `GET …/knowledge` | **知識包**(ADR 0021):occupation_details + 12 池 + source_tasks,每官方值帶 srcs——web 所有選單的唯一資料源 | 單掛 partial/**全掛 502** |
 | `GET /occupations?q=` | 根層職類目錄搜尋(全域知識,不掛 profile 下;ADR 0019) | **critical** |
 | `POST /ai/{recommend-ks,draft-op,extract-tasks,structure-task,clarify}` | **只提議、不寫 DB**;無金鑰→降級回 catalog/空 | enrichment |
 | `GET /healthz`;`/copilotkit`(AG-UI) | 就緒(含 DB);訪談 agent(live app 才掛) | — |
@@ -75,7 +71,7 @@ users ─1:N─ job_profiles ─1:N─ document_versions
 
 ```
 GET(無文件)→ status:"none" 空殼(version 0, revision 0)
-PATCH / PUT occupations / buildTasks → upsert_draft:
+PATCH / PUT occupations → upsert_draft:
    最新列是 draft → 原地更新 content(version 不變,revision 自動 +1)
    否則           → INSERT 新 draft(version+1,revision 從 1 起)
 finalize → assemble_final(補全+剝 `_`)→ validate → INSERT 新 final 列(version+1)
@@ -87,22 +83,16 @@ finalize → assemble_final(補全+剝 `_`)→ validate → INSERT 新 final 列
 ### 2. 選職類(PUT occupations)
 
 存 `selected_ocs_codes` → 問 indexer 第一順位的官方名(掛→表頭名**留空,絕不退回 job_title**)
-→ 刷新既有 draft 表頭或建只有表頭的 draft。任務不動,待 buildTasks。
+→ 刷新既有 draft 表頭或建只有表頭的 draft。任務不動,待前端選任務(編輯文件 + PATCH)。
 
-### 3. task-catalogs 批次聚合(ADR 0016)
-
-讀最新文件 → 收集每任務 `(文件任務碼, provenance.ocs_code, provenance.task_code)` →
-**每個不同 ocs_code 只打一次** `GET /occupations/{code}/competencies` → 依 task_code 切片
-(`services/knowledge/task_detail.py`)→ `{catalogs: {T1.1: {...}}}`。某 code 掛 → 略過該池
-的任務 + `meta.partial=true`。
-
-### 3½. 知識包組裝(ADR 0021)
+### 3. 知識包組裝(ADR 0021)
 
 選職類後 web 抓一次 `GET …/knowledge`:per-code **並行**抓 indexer 三資源(detail/tasks/
 competencies)→ `core/domain/knowledge_pack.build_pack` 純函式**照優先序組裝**——池(append 序
 + key 去重 + srcs 累積;key 表見 spec §5.1)+ `source_tasks`(任務 URN byId,掛 o/p/k/s_refs)。
-此後 web 對 knowledge 零請求(特殊功能除外)。三個投影端點(header-meta/task-candidates/
-task-catalogs)過渡期保留,web 逐面切換完成後退役。
+此後 web 對 knowledge 零請求(特殊功能除外:`/occupations?q=`、`/ai/*`)。舊三投影端點
+(header-meta/task-candidates/task-catalogs)與 `document:buildTasks` **已隨 web 切換完成退役**
+(P3):web 讀包、寫入一律走 PATCH。
 
 ### 4. AI 提議降級鏈(D28)
 
@@ -113,8 +103,8 @@ task-catalogs)過渡期保留,web 逐面切換完成後退役。
 
 - **core 不 import 外圈**(adapters/authoring/fastapi);違反=架構回歸(ADR 0008)。
 - **`/ai/*` 永不寫 DB**:提議由前端套用後走 PATCH。
-- **文件寫入只有三條路**:PATCH(使用者編輯)、PUT occupations / buildTasks(結構重建)、
-  finalize(產正式版)。header-meta/task-catalogs 等池端點**唯讀**,重選職類不會洗掉使用者編輯。
+- **文件寫入只有三條路**:PATCH(使用者編輯,含前端選任務/填格)、PUT occupations(表頭刷新)、
+  finalize(產正式版)。knowledge 池端點**唯讀**,重選職類不會洗掉使用者編輯。
 - **表頭官方名絕不退回使用者 job_title**(indexer 掛就留空)。
 - **draft 寬鬆、final 嚴格**:PATCH 不驗 schema,finalize 才 assemble+validate(422)。
 - LLM 無金鑰 → `llm=None` 全鏈優雅降級,不發注定失敗的呼叫。

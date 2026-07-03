@@ -153,109 +153,15 @@ export interface OcsSearchHit {
   ocs_name: string;
 }
 
-// 選任務候選（task-candidates）：依職類 → 職責(unit) 分組。
-export interface CandidateTask {
-  task_code: string;
-  task_name: string;
-  urn: string;
-}
-export interface CandidateUnit {
-  ocu_code: string;
-  ocu_name: string;
-  tasks: CandidateTask[];
-}
-export interface CandidateGroup {
-  ocs_code: string;
-  ocs_name: string;
-  units: CandidateUnit[];
-}
-export interface TaskCandidates {
-  groups: CandidateGroup[];
-}
-
-// build-tasks 送出的一筆勾選任務。ocu_name 留白＝cherry-pick（職責名讓使用者填）。
-export interface PickedTask {
-  ocs_code: string;
-  ocu_code: string;
-  ocu_name: string;
-  ocs_name: string;
-  task_code: string;
-  task_name: string;
-}
-
-// ── 表頭候選池（D29 /header-meta）：多 OCS 聯集去重；勾選後 PATCH 寫文件表頭 ──
-// 每候選帶 sources（哪些 ocs_code 帶入），供「最後一個來源移除才下架」。
-export interface HeaderMetaCandidate {
-  code: string;
-  name: string;
-  sources: string[];
-}
-export interface HeaderMetaText {
-  text: string;
-  sources: string[];
-}
-export interface HeaderMetaPrimaryOption {
-  ocs_code: string;
-  occupation_name: string;
-  job_category_name: string;
-  job_description: string;
-  ocs_level: number | null;
-}
 // 降級旗標（ADR 0018）：enrichment 端點在 indexer 掛時回 partial=true，
 // 前端可提示「部分資料暫缺」；缺席或 false 視為完整。
 export interface DegradeMeta {
   partial: boolean;
 }
 
-export interface HeaderMeta {
-  meta?: DegradeMeta;
-  primary: {
-    ocs_code: string;
-    occupation_name: string;
-    job_category_name: string;
-    job_description: string;
-    ocs_level: number | null;
-  };
-  primary_options: HeaderMetaPrimaryOption[];
-  job_categories: HeaderMetaCandidate[];
-  occupations: HeaderMetaCandidate[];
-  industries: HeaderMetaCandidate[];
-  attitudes: HeaderMetaCandidate[];
-  prerequisites: HeaderMetaText[];
-  supplements: HeaderMetaText[];
-}
-
 // ── AI 提議（D28 /ai/*）：結構化提議、不寫 DB；前端暫存→使用者套用→走現有 PATCH ──
-export type AiSource = "catalog" | "ai";
-
-// recommend-ks：每項標來源；K/S 帶一句理由（catalog 篩選/AI 生成）。
-export interface KsSuggestion {
-  code: string;
-  name: string;
-  source: AiSource;
-  reason?: string;
-}
-export interface RecommendKsResult {
-  knowledge: KsSuggestion[];
-  skills: KsSuggestion[];
-  competency_level?: number | null; // 該任務的官方級別（從來源 competency_level 取）
-}
-
-// draft-op：產出(O)/指標(P) 提議，帶來源 + 來源碼(2b provenance；AI 草擬為 "")。
-export interface OutputSuggestion {
-  code: string;
-  name: string;
-  source: AiSource;
-}
-export interface IndicatorSuggestion {
-  code: string;
-  text: string;
-  source: AiSource;
-}
-export interface DraftOpResult {
-  outputs: OutputSuggestion[];
-  indicators: IndicatorSuggestion[];
-}
+// （recommend-ks/draft-op server 端仍在（ADR 0020 訪談引擎/agent 用）；web 填格改吃
+// 知識包後不再呼叫，對應型別已退役。）
 
 // extract-tasks：預勾的 catalog 任務 UUID + 候選自訂任務（名）。
 export interface ExtractTasksResult {
@@ -276,7 +182,6 @@ export interface OptionItem {
   srcs?: SourceRef[];      // 新：完整來源（選單顯示用；首個 + 其餘）
 }
 
-// 批次 task-catalogs（階段1）：每任務官方 catalog（K/S/O/P + level）。
 // ── 知識包(ADR 0021):選職類後一次抓齊,所有選單的資料源;每官方值帶 srcs ──
 // 鍵語意:值池 key=name/text、三類池 key=分類碼;tasks 池 srcs=source_tasks 的 URN;
 // source_tasks 鍵=任務 URN。欄位名照 indexer-contract(手寫型別,ADR 0021 契約裁決)。
@@ -315,14 +220,3 @@ export interface KnowledgePack {
   meta?: DegradeMeta;
 }
 
-export interface TaskCatalogEntry {
-  knowledge: { code: string; name: string }[];
-  skills: { code: string; name: string }[];
-  outputs: { code: string; name: string }[];
-  indicators: { code: string; text: string }[];
-  competency_level: number | null;
-}
-export interface TaskCatalogs {
-  catalogs: Record<string, TaskCatalogEntry>; // 鍵 = 文件任務碼（如 T1.1）
-  meta?: DegradeMeta; // ADR 0018：indexer 某 code 掛 → partial=true
-}

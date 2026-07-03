@@ -1,9 +1,11 @@
 """REST document endpoints (D27 T3): the OCS document-of-record worktable.
 
-GET/PATCH/finalize over ``document_versions`` (via ``DocRepo``) plus read-only
-task-candidates / header-meta / task-catalogs aggregations from the knowledge
-indexer. The PATCH body is the whole OCS document dict (loose; no strict
-validation on draft).
+GET/PATCH/finalize over ``document_versions`` (via ``DocRepo``) plus the
+knowledge pack aggregation from the knowledge indexer (ADR 0021; the former
+task-candidates / header-meta / task-catalogs / document:buildTasks endpoints
+were retired with it — web reads the pack and writes via PATCH only). The
+PATCH body is the whole OCS document dict (loose; no strict validation on
+draft).
 """
 import asyncio
 import logging
@@ -16,11 +18,9 @@ from sqlalchemy.orm.exc import StaleDataError
 from app.api.deps import get_knowledge  # noqa: F401  (re-export; tests override via this name)
 from app.database import get_db
 from app.models import JobProfile
-from app.core.domain import header_meta, knowledge_pack, ocs_doc
+from app.core.domain import knowledge_pack, ocs_doc
 from app.core.ports import KnowledgeClient
 from app.adapters.persistence import DocConflictError, DocRepo, ProfileRepo
-from app.services.ai import tasks as ai_tasks
-from app.services.knowledge.task_detail import task_competencies
 
 logger = logging.getLogger("caliburn")
 
@@ -174,102 +174,6 @@ async def set_occupations(
     return {"ocs_codes": codes}
 
 
-@router.get("/{profile_id}/task-candidates")
-async def task_candidates(
-    profile_id: UUID,
-    db: AsyncSession = Depends(get_db),
-    knowledge: KnowledgeClient = Depends(get_knowledge),
-):
-    """選任務候選：已選職類的所有任務，依職類→職責(unit)分組（含來源），供勾選。
-    **critical 端點**（ADR 0018）：沒有候選清單就選不了任務，主流程斷 → indexer 掛回 502 快錯。"""
-    profile = await _require_profile(profile_id, db)
-    codes = profile.selected_ocs_codes or []
-    if not codes:
-        return {"groups": []}
-    groups = []
-    for code in codes:
-        try:
-            occ = await knowledge.occupation_tasks(code)
-        except Exception:
-            logger.warning("task-candidates: occupation_tasks(%s) failed", code, exc_info=True)
-            raise HTTPException(status_code=502, detail="indexer unavailable")
-        groups.append({
-            "ocs_code": occ.ocs_code,
-            "ocs_name": occ.ocs_name,
-            "units": [
-                {
-                    "ocu_code": u.ocu_code,
-                    "ocu_name": u.ocu_name,
-                    "tasks": [
-                        {"task_code": t.task_code, "task_name": t.task_name, "urn": t.urn}
-                        for t in u.tasks
-                    ],
-                }
-                for u in occ.units
-            ],
-        })
-    return {"groups": groups}
-
-
-@router.post("/{profile_id}/document:buildTasks")
-async def build_tasks(
-    profile_id: UUID,
-    body: dict = Body(...),
-    db: AsyncSession = Depends(get_db),
-):
-    """用勾選的任務建/更新文件（遞進重編、保留已填）。picked 每筆（v4 PickedTask）：
-    {ocs_code, ocu_code, ocu_name, ocs_name, task_code, task_name}。
-    ocu_name 留白＝cherry-pick（職責名讓使用者自填）。"""
-    profile = await _require_profile(profile_id, db)
-    picked = body.get("picked") or []
-    units_tasks = [
-        {
-            "task_name": p.get("task_name", ""),
-            "unit_id": p.get("ocu_code") or "",
-            "unit_title": p.get("ocu_name") or "",
-            "occupation_name": p.get("ocs_name") or "",
-            "indexer_ref": {"ocs_code": p.get("ocs_code") or "", "task_code": p.get("task_code") or ""},
-        }
-        for p in picked
-    ]
-    codes = profile.selected_ocs_codes or []
-    profile_dict = {
-        "ocs_code": codes[0] if codes else "",
-        "job_title": profile.job_title,
-        "job_summary": profile.job_summary,
-    }
-    prev = await DocRepo(db).latest(profile_id)
-    doc = ocs_doc.build_from_picked(profile_dict, units_tasks, prev["content"] if prev else None)
-    _refresh_header(doc, profile, codes[0] if codes else "")
-    return await DocRepo(db).upsert_draft(profile_id, doc)
-
-
-@router.get("/{profile_id}/header-meta")
-async def get_header_meta(
-    profile_id: UUID,
-    db: AsyncSession = Depends(get_db),
-    knowledge: KnowledgeClient = Depends(get_knowledge),
-):
-    """表頭候選池（D29）：逐已選職類取官方 metadata，聯集去重成所屬職類/職業/行業 +
-    態度 + notes 候選，並回主基準單值（預設第一順位）。唯讀、不寫文件——前端勾選後
-    自行 PATCH 寫入，故重選職類不會洗掉使用者編輯。
-    **enrichment 端點**（ADR 0018）：indexer 掛/某 code 失敗則略過該 code 並回
-    ``meta.partial=true``（缺了仍可手動編輯，不快錯）。"""
-    profile = await _require_profile(profile_id, db)
-    codes = profile.selected_ocs_codes or []
-    metas = []
-    partial = False
-    for code in codes:
-        try:
-            metas.append(await knowledge.occupation(code))
-        except Exception:
-            partial = True
-            logger.warning("header-meta: occupation(%s) failed; skipping", code, exc_info=True)
-    result = header_meta.aggregate(metas, primary_code=codes[0] if codes else "")
-    result["meta"] = {"partial": partial}
-    return result
-
-
 @router.get("/{profile_id}/knowledge")
 async def get_knowledge_pack(
     profile_id: UUID,
@@ -305,42 +209,3 @@ async def get_knowledge_pack(
     pack = knowledge_pack.build_pack(ok, details, tasks_by, pools_by)
     pack["meta"] = {"partial": len(ok) < len(codes)}
     return pack
-
-
-@router.get("/{profile_id}/task-catalogs")
-async def task_catalogs(
-    profile_id: UUID,
-    db: AsyncSession = Depends(get_db),
-    knowledge: KnowledgeClient = Depends(get_knowledge),
-):
-    """批次:文件每任務的官方 catalog（K/S/O/P + level），每個不同 ocs_code 只撈一次池。
-    唯讀、note-less、不跑 LLM（ADR 0016）。
-    **鍵 = 任務身分 URN**（``ocs:{ocs_code}:T:{task_code}``，scheme 同 indexer api/urn.py，
-    由 provenance 組出）——非文件位置碼：結構性編輯（刪/拖/重編）不影響鍵（A1）。
-    **enrichment 端點**（ADR 0018）：indexer 某 code 掛 → 略過該 code 的任務並回
-    ``meta.partial=true``（缺了仍可手動編輯，不快錯）。"""
-    await _require_profile(profile_id, db)
-    latest = await DocRepo(db).latest(profile_id)
-    content = (latest or {}).get("content") or {}
-    pairs: list[tuple[str, str]] = []  # (ocs_code, task_code) — 鍵由 provenance 組，不用位置碼
-    for unit in (content.get("ocs_content") or {}).get("ocu_units") or []:
-        for task in unit.get("tasks") or []:
-            ref = ai_tasks.catalog_ref(task)
-            if ref["ocs_code"] and ref["task_code"]:
-                pairs.append((ref["ocs_code"], ref["task_code"]))
-    pools: dict[str, object | None] = {}
-    for ocs_code, _ in pairs:
-        if ocs_code not in pools:
-            try:
-                pools[ocs_code] = await knowledge.competencies(ocs_code)
-            except Exception:
-                logger.warning("task-catalogs: competencies(%s) failed; skipping", ocs_code, exc_info=True)
-                pools[ocs_code] = None
-    catalogs: dict[str, dict] = {}
-    for ocs_code, task_code in pairs:
-        pool = pools.get(ocs_code)
-        if pool is None:
-            continue
-        catalogs[f"ocs:{ocs_code}:T:{task_code}"] = task_competencies(pool, task_code)
-    partial = any(pool is None for pool in pools.values())
-    return {"catalogs": catalogs, "meta": {"partial": partial}}

@@ -25,7 +25,7 @@ npm run lint
 | `src/app/` | 路由:`/`(→dashboard)、`/dashboard`(職務檔案清單)、`/documents/[id]`(**工作台**,主畫面)、`/documents/[id]/intake`(3 題小訪談,選用)、`/api/copilotkit`(AG-UI runtime 轉接到後端 `/copilotkit`) |
 | `src/components/interview/` | 工作台元件:`JobDocTable`(主表格,dnd 排序)、`DocHeader`(官方表頭 5 欄)、`CellFillerPanel`(O/P/K/S 填格側欄)、`OccupationPicker`(選職類 modal)、`TaskCuratePanel`(選任務 modal + AI 預勾)、`ConflictDialog`(409 衝突二選一)、`DocNotes`、`fields/*`(FieldCombobox/OfficialMenu/FieldText/SourceLine 共用選單元件)、`InterruptHandlers`(LangGraph 訪談 HITL 面板;**目前無頁面掛載**,待訪談引擎重寫,ADR 0020) |
 | `src/hooks/` | 資料層 hooks:`useDocument`(文件 + autosave + header-meta + task-candidates)、`useTaskCatalog`(批次 catalog + per-task 快取)、`useProfiles`、`useHydrated` |
-| `src/lib/` | `api.ts`(唯一 fetch client,`/api/v1/*` + `ApiError`)、`ocsDoc.ts`(**純函式**文件編輯:clone→改→回傳 + 位置重編碼)、`headerMeta.ts`(候選池→選單 options)、`download.ts` |
+| `src/lib/` | `api.ts`(唯一 fetch client,`/api/v1/*` + `ApiError`)、`ocsDoc.ts`(**純函式**文件編輯:clone→改→回傳 + 位置重編碼 + A4 文件級 K/S 重編)、`pack.ts`(**知識包→選單選項**純函式:池→OptionItem、own-first srcs、預勾集;ADR 0021)、`urn.ts`、`download.ts` |
 | `src/store/user.ts` | zustand + persist:匿名 userId(localStorage `caliburn-user`;404 時自動重建) |
 | `src/types/index.ts` | 契約型別(生成底 + UI 欄位)+ 各端點回應型別 |
 | `src/components/layout/Providers.tsx` | QueryClient + **選擇性持久化** + CopilotKitProvider |
@@ -65,8 +65,9 @@ baseline = 最後已知 server 狀態快照,是 dirty 判定 / no-op skip / 樂�
 ### 2. 選職類
 
 `OccupationPicker` → `GET /occupations?q=`(根層目錄搜尋)→ 勾選(順序=優先度)→
-`PUT /job-profiles/{id}/occupations` → invalidate **document + task-candidates + header-meta**
-(server 已把表頭刷成第一順位官方基準,三個池全部重抓)。
+`PUT /job-profiles/{id}/occupations` → invalidate **document + knowledge** + 背景 prefetch
+新知識包(server 已把表頭刷成第一順位官方基準;表頭/態度/NOTE/選任務/填格選單全部
+吃這一包,選職類=唯一同步點)。
 
 ### 3. 選任務
 

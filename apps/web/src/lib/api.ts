@@ -3,12 +3,10 @@
 // tasks / documents endpoints were removed with the old backend (Concern B).
 import type {
   DocumentEnvelope,
-  ExtractTasksResult,
   JobProfile,
   KnowledgePack,
   OcsDocument,
   OcsSearchHit,
-  StructureTaskResult,
   User,
 } from "@/types";
 
@@ -131,20 +129,6 @@ export const ocsSearch = (q: string) =>
   );
 
 // ── AI 提議端點（D28 /ai/*）─────────────────────────────────────────────────
-// 全部「只提議、不寫 DB」：回結構化提議，前端暫存→使用者套用才走 PATCH。
-// 沒設後端金鑰時降級成空提議。（recommend-ks/draft-op server 端仍在——訪談引擎/agent
-// 主線用（ADR 0020）；web 填格已改吃知識包，不再呼叫。）
-
-// intake 自述 → 預勾 catalog 任務 UUID + 候選自訂任務。
-export const extractTasks = (body: { intake: string; ocs_codes: string[] }) =>
-  request<ExtractTasksResult>("/ai/extract-tasks", {
-    method: "POST",
-    body: JSON.stringify(body),
-  });
-
-// 一句描述 → 任務名 + 職責建議（自訂任務用）。
-export const structureTask = (body: { description: string; ocs_codes?: string[] }) =>
-  request<StructureTaskResult>("/ai/structure-task", {
-    method: "POST",
-    body: JSON.stringify(body),
-  });
+// server 端點全數保留（訪談引擎/agent 主線用，ADR 0020），但 web 目前零呼叫：
+// 填格/選任務改吃知識包（ADR 0021）後，recommend-ks/draft-op/extract-tasks/
+// structure-task 的 client 函式已退役（P3 UI 修訂：AI 預勾與自訂助手等引擎回歸）。

@@ -324,6 +324,17 @@ export interface PoolPick {
   tasks: { name: string; srcs: SourceRef[]; provenance: { ocs_code: string; task_code: string } }[];
 }
 
+function taskFromPool(t: PoolPick["tasks"][number]): OcsTask {
+  const task: OcsTask = {
+    task_codes: [{ code: "", name: t.name }],
+    competency_blocks: [emptyBlock()],
+    provenance: { ocs_code: t.provenance.ocs_code, task_code: t.provenance.task_code },
+    _tid: uid(),
+  };
+  if (t.srcs.length) task._refs = t.srcs;
+  return task;
+}
+
 export function addFromPool(doc: OcsDocument, picks: PoolPick[]): OcsDocument {
   const next = clone(doc);
   for (const pick of picks) {
@@ -340,18 +351,30 @@ export function addFromPool(doc: OcsDocument, picks: PoolPick[]): OcsDocument {
       if (pick.unit.srcs.length) unit._refs = pick.unit.srcs;
       next.ocs_content.ocu_units.push(unit);
     }
-    for (const t of pick.tasks) {
-      const task: OcsTask = {
-        task_codes: [{ code: "", name: t.name }],
-        competency_blocks: [emptyBlock()],
-        provenance: { ocs_code: t.provenance.ocs_code, task_code: t.provenance.task_code },
-        _tid: uid(),
-      };
-      if (t.srcs.length) task._refs = t.srcs;
-      unit.tasks.push(task);
-    }
+    for (const t of pick.tasks) unit.tasks.push(taskFromPool(t));
   }
   return renumber(next);
+}
+
+// 往既有職責(by index)加池任務——每職責列「選任務 ▾」(P3 UI 修訂:表格中心,
+// 職責先入表格、任務再從列上挑;不走名字對位,避免改過名的職責被誤判)。
+export function addTasksToUnit(doc: OcsDocument, ui: number, tasks: PoolPick["tasks"]): OcsDocument {
+  const next = clone(doc);
+  const unit = next.ocs_content.ocu_units[ui];
+  if (!unit) return next;
+  for (const t of tasks) unit.tasks.push(taskFromPool(t));
+  return renumber(next);
+}
+
+// 任務是否已有內容(四格/級別/筆記)——選單「取消勾選=移除」的鎖定判定:
+// 有內容的任務不能從選單移除,只能在表格刪(防誤刪已填資料)。
+export function taskHasContent(task: OcsTask): boolean {
+  const b = task.competency_blocks?.[0];
+  return !!(
+    (b?.outputs?.length ?? 0) || (b?.indicators?.length ?? 0) ||
+    (b?.knowledge?.length ?? 0) || (b?.skills?.length ?? 0) ||
+    b?.competency_level != null || task._notes
+  );
 }
 
 function ensureBlock(doc: OcsDocument, unitIdx: number, taskIdx: number): CompetencyBlock {

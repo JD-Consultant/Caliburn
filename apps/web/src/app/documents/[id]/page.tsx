@@ -5,15 +5,16 @@
 // draft（自動儲存）。續做＝重開自動載 draft。finalize 產正式版本。不碰 CopilotKit。
 import { use, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { ChevronLeft, Download, FileCheck2, Layers, ListChecks } from "lucide-react";
+import { ChevronLeft, Download, FileCheck2, Layers } from "lucide-react";
 import { useProfile } from "@/hooks/useProfiles";
 import { useAutosaveDocument, useDocument, useFinalizeDocument } from "@/hooks/useDocument";
+import { useKnowledge } from "@/hooks/useKnowledge";
 import { getDocumentExport } from "@/lib/api";
 import { downloadJson } from "@/lib/download";
 import { JobDocTable, type CellTarget } from "@/components/interview/JobDocTable";
 import { CellFillerPanel } from "@/components/interview/CellFillerPanel";
 import { OccupationPicker } from "@/components/interview/OccupationPicker";
-import { TaskCuratePanel } from "@/components/interview/TaskCuratePanel";
+import { UnitPickerMenu } from "@/components/interview/UnitPickerMenu";
 import { ConflictDialog } from "@/components/interview/ConflictDialog";
 import { completion, ensureIds } from "@/lib/ocsDoc";
 import type { OcsDocument } from "@/types";
@@ -33,6 +34,8 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
   const doc: OcsDocument | undefined = useMemo(() => ensureIds(envelope?.content), [envelope]);
   const status = envelope?.status ?? "none";
   const hasOccupations = !!doc?.ocs_profile?.ocs_code;
+  // 知識包(ADR 0021):選職責下拉的資料源(表格內選單各自訂閱同一 query)。
+  const { data: pack } = useKnowledge(id, hasOccupations);
 
   const {
     status: saveStatus,
@@ -51,7 +54,6 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
 
   const [target, setTarget] = useState<CellTarget | null>(null);
   const [showOcc, setShowOcc] = useState(false);
-  const [showTasks, setShowTasks] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const persist = (next: OcsDocument, after?: () => void) => {
@@ -108,10 +110,8 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
             <Layers className="h-4 w-4" />
             選職類
           </Button>
-          <Button size="sm" variant="outline" className="gap-1" disabled={!hasOccupations} onClick={() => setShowTasks(true)}>
-            <ListChecks className="h-4 w-4" />
-            選任務
-          </Button>
+          {/* 選職責 ▾（P3 UI 修訂）：勾＝空職責入表格，任務再從職責列「選任務 ▾」挑 */}
+          <UnitPickerMenu document={doc} pack={pack} disabled={!hasOccupations || !doc} onChange={(d) => persist(d)} />
           <Button size="sm" variant="outline" className="gap-1" onClick={exportJson} disabled={status === "none"}>
             <Download className="h-4 w-4" />
             匯出 JSON
@@ -176,17 +176,6 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
           profileId={id}
           defaultQuery={profile?.job_summary || profile?.job_title || ""}
           onClose={() => setShowOcc(false)}
-          onError={setError}
-        />
-      ) : null}
-
-      {showTasks ? (
-        <TaskCuratePanel
-          profileId={id}
-          currentDoc={doc}
-          intake={profile?.job_summary || ""}
-          onApply={(d) => persist(d)}
-          onClose={() => setShowTasks(false)}
           onError={setError}
         />
       ) : null}

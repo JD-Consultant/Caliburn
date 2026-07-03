@@ -35,6 +35,28 @@ function renumberCoded<T extends { code: string }>(items: T[], prefix: string): 
   items.forEach((it, i) => { it.code = positionalCode(prefix, i); });
 }
 
+// A4（ocs-schema「文件層級去重」）：K/S 碼以 name 為 key 全文件共用——首現給號、
+// 同名共碼、空名各給新號；身分仍看 _id/_ref（碼共用、身分各自）。O/P 維持任務範圍、
+// A 維持全域（renumberCoded）。任何 K/S 內容變動與結構變動（renumber）都要重跑。
+function renumberDocKS(doc: OcsDocument): void {
+  for (const [field, prefix] of [["knowledge", "K"], ["skills", "S"]] as const) {
+    const codeByName = new Map<string, string>();
+    let n = 0;
+    for (const u of doc.ocs_content?.ocu_units ?? []) {
+      for (const t of u.tasks ?? []) {
+        for (const it of t.competency_blocks?.[0]?.[field] ?? []) {
+          let code = it.name ? codeByName.get(it.name) : undefined;
+          if (!code) {
+            code = positionalCode(prefix, n++);
+            if (it.name) codeByName.set(it.name, code);
+          }
+          it.code = code;
+        }
+      }
+    }
+  }
+}
+
 // 補上缺少的穩定 id（dnd 用）。新載入的文件（seed/build 來的）沒有 id → 在此補。
 export function ensureIds(doc: OcsDocument | undefined): OcsDocument | undefined {
   if (!doc) return doc;
@@ -69,6 +91,7 @@ function renumber(doc: OcsDocument): OcsDocument {
       t.task_codes = [tc, ...(t.task_codes ?? []).slice(1)];
     });
   });
+  renumberDocKS(doc); // K/S 首現序隨任務順序變，結構變動一併重編
   return doc;
 }
 
@@ -338,7 +361,7 @@ export function setKS(
   const next = clone(doc);
   const block = ensureBlock(next, unitIdx, taskIdx);
   block[field] = [...items];
-  renumberCoded(block[field], field === "knowledge" ? "K" : "S");
+  renumberDocKS(next);
   return next;
 }
 

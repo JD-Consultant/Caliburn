@@ -75,21 +75,30 @@
 (⚠ 現有 header-meta/task-candidates 是循序 for-await,pack 不得複製);單 code 失敗 → 略過 +
 `meta.partial=true`(ADR 0018 原封沿用);**全部失敗** → 5xx(critical,沒有 knowledge 走不下去)。
 
-**形狀 v2(2026-07-03 定稿:池+引用,正規化)**——統一機制「合併 + 去重 + srcs 累積」
-(header-meta 的「來源+N」一般化到所有池;維護者:「每個區塊都先合併簡單去重」):
+**形狀(定稿;命名全照 packages 既有名,不發明)**——統一機制「append + 同 key 併列 + srcs 累積」:
 
 ```
-{ occupations: [主基準選項(代碼/名稱/描述/級別)],
-  pools: {                      ← 每型別一張表,項目 byId(Redux 樣式);id = 該池的去重 key
-    knowledge:  {name: {srcs:[SourceRef×N]}},   skills: 同,
-    attitudes:  {name: {code?, srcs}},          job_categories/occupations/industries: {code: {name, srcs}},
+GET /job-profiles/{id}/knowledge
+{ occupation_details: [OccupationDetail 原樣,per 職位],      ← 合併前:表頭層(契約型別名)
+  pools: {                        ← 合併後:每型別一桶,項目 byId;id = 該池的去重 key
+    units:  {name: {srcs}},  tasks: {name: {srcs: [任務URN…]}},
+    knowledge/skills/outputs: {name: {srcs}},  indicators: {text: {srcs}},
+    attitudes: {name: {srcs}},  job_categories/occupations/industries: {code: {name, srcs}},
     prerequisites/supplements: {text: {srcs}} },
-  task_tree: [職類→職責→任務節點:
-    {urn, task_code, task_name, src,
-     k_refs/s_refs: [池 key…],   ← 引用=穩定 key(Redux「引用存 ID」/JSON:API resource id),
-     outputs/indicators: [...內嵌(任務範圍)], level}],      **禁用陣列索引**(位置≠身分,同 A1 教訓)
+  source_tasks: {                 ← 合併前:任務層原料,鍵=任務 URN(byId)
+    "ocs:{code}:T:{t}": {ocs_code, ocs_name, ocu_code, ocu_name, task_code, task_name,
+                         competency_level, o_refs/p_refs/k_refs/s_refs: [池 key…]} },
   meta: {partial: bool} }
 ```
+
+- **建池順序=append 順序,零計算**:照職位優先序處理(A 全部→B…);同 key → 併入既有列
+  (位置不動、srcs+1),新 key → append。顯示=桶序原樣,**無搜尋、無排序**。
+- **合併列只出現一次**,位置=首次 append 處;跨來源關係看引用行(來源:A、B)。
+- 引用(refs)一律存**池 key**,禁用陣列索引(Redux「引用存 ID」;位置≠身分,A1 教訓)。
+- 名字**不做正規化**(維護者:先不用做)——key=原始名精確比對;「問題解決能力【T1.1】」與
+  「問題解決能力」是兩列,帶註記者為特例文件,後議。
+- `srcs` 欄位名照 indexer-contract 借:`{ocs_code, ocs_name, ocu_code?, ocu_name?,
+  task_code?, task_name?, code?, competency_level?}`(CitableItem+SourceRef 聯集,零新名)。
 
 **§5.1 per-pool 去重 key 表**(A5 的修法本體;2026-07-03 二修:職責/任務也進池):
 
@@ -103,7 +112,7 @@
 | **任務** | **name**(同上) | 預勾已勾職責底下全部任務(含聯集) |
 | knowledge / skills | **name**(ocs-schema 官方規則) | 開格時預勾該任務官方配套(聯集) |
 | attitudes | **name**(值語意;code key 跨職類必撞=A5) | 預勾主基準帶的 |
-| O / P | 不去重(任務範圍,掛任務節點) | 預勾該任務本身的 |
+| **O(outputs)/ P(indicators)** | **O=name、P=text**(2026-07-03 三修:統一去重,維護者 OK) | 預勾該任務本身的(聯集) |
 
 **合併實體的聯集語意(維護者拍板)**——同一條規則遞迴到底:
 - 職責同名合併 → 一列、srcs=A+B;勾它 → 任務清單 = 兩來源職責任務**聯集**,各標來源、全預勾。
@@ -113,15 +122,32 @@
 - 同名假合併風險:實驗證明跨職類罕見(524 對最高 0.823、無全同名),且全程可拆可改、來源可見;
   「像但不同名」歸未來 `items:match`,不在此層。
 
-**預勾統一規則**:預設=主基準(順序 1)的官方集合;單值欄=預選其值;初次/按「自動勾」按鈕時
-套用(既有「帶官方」一般化),之後以使用者動過的為準(文件是真相)。
+**預勾統一規則**:預設=主基準(順序 1)的官方集合;單值欄=預選其值;初次/按「**自動勾選**」
+按鈕時套用(既有「帶官方」改名——選單裡本就全是官方,語義重複),之後以使用者動過的為準
+(文件是真相)。
 
-**選任務流程改兩步**:先職責池、再任務池(**按職責分組列**,不平鋪);歸屬照舊
-(任務回源職責,未採用職責的 cherry-pick 留白)。
+**選擇流程(定稿:遞迴選單模式,維護者拍板)**——每層同一句話:
+「**開誰的選單,就給全池、預勾它自己的、其餘隨你勾(借用,`_ref` 照記)**」:
 
-**選單顯示(W1 定稿)**:全部**序號 `1. 2. 3.`**+名稱+引用行(維護者撤銷 K/S 標文件碼 `[K02]`
-的提案;A4 同名沿用文件碼照常在背後發生,不上選單)。類別選單例外顯示真實分類碼。
-O/P/K/S 開大池(可跨任務/跨職類借用,`_ref` 照記):本任務官方配套排最前+預勾,其餘靠搜尋。
+```
+職責選單 = 職責大池(預勾含主基準來源的職責列)→ 勾中職責進文件
+每個職責 → 開它的任務選單 = 任務大池(全部,不過濾不分組;
+    預勾=該職責官方帶的任務,職責為合併列→兩來源職責的任務聯集;
+    已在文件(任何職責下)的任務標「已加入」不可再勾——沿現行規則)
+每個任務 → 開它的 O/P/K/S/L 五個選單 = 各自大池
+    (預勾=該任務的 o/p/k/s_refs 聯集——合併任務背後有幾筆 source_tasks 就聯幾筆;
+     L=級別 1–6,衝突取順序 1 的值)
+```
+
+**選單顯示(W1 定稿)**:全部**序號 `1. 2. 3.`**+名稱+**引用行(每列必有)**(維護者撤銷
+K/S 標文件碼 `[K02]` 的提案;A4 同名沿用文件碼照常在背後發生,不上選單)。類別選單例外顯示
+真實分類碼。**無搜尋、無排序**(桶序原樣)。
+
+**srcs / `_ref` / URN 三者(同一種資訊的三個崗位)**:
+- `srcs`:**池列上的完整來源清單**(wire,pack 內;欄位名照 indexer-contract)。
+- `_ref`:使用者選用後**抄進文件那一筆**(web UI 欄位,`_` 前綴,export 剝;非 packages 契約)。
+- URN:**身分座標的字串格式**(`ocs:{code}:T:{t}` / `:U:{u}`,indexer scheme)——當
+  `source_tasks` 的鍵與任務池 srcs 的指標;池的鍵不是它(池 key=name/text/code)。
 
 **LLM 連接(核心)**:池項 srcs 為 machine-resolvable(URN)→ 未來訪談 agent 提議值時直接附
 引用、UI 渲染引用行、人可驗——同一套來源軌道,人用選單、LLM 用 citation

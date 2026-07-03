@@ -17,9 +17,9 @@ Monorepo。維護者用**繁體中文**,請用繁中回應。
    **green-before == green-after**;**一個 task 一個 commit**,綠了才 commit;收尾打 git tag。
 5. **新 seam(API/共用格式)選契約機制** —— 照 `docs/contract-strategy.md` 的判準(已預答 #3)。
 6. **不要 push、不做對外動作**,除非使用者明確要求。先研究、不懂就問。
-7. **改子系統就更文檔** —— 跨 app/seam 的端到端說明住 `docs/design/`(單一 app 的住該 app 底下);
-   **動到那條線的碼 → 同 commit 更新該文檔**(fossilization 是頭號壞味道)。寫法照
-   `docs/design/README.md` 的 dual-audience 清單(動作→請求、真名、不變量、退役禁令)。
+7. **改子系統就更文檔** —— 文檔架構/擺放/寫作/維護的**權威總則見 `docs/README.md`**。跨 app/seam 的
+   端到端說明住 `docs/design/`(單一 app 的住該 app 底下);**動到那條線的碼 → 同 commit 更新該文檔**
+   (fossilization 是頭號壞味道);寫法照 dual-audience 清單(動作→請求、真名、不變量、退役禁令)。
 
 ## 架構(權威:`ARCHITECTURE.md` + `docs/adr/README.md`)
 
@@ -44,18 +44,17 @@ Monorepo。維護者用**繁體中文**,請用繁中回應。
 - **測試**:`npx turbo test`。各 app:api `uv run pytest`、ocs-indexer `uv run --all-extras pytest`、
   pdf-to-json `uv run --extra dev pytest`;web `npx tsc --noEmit` + `npm run lint`。
 
-## Windows 踩雷(重要)
+## Windows / 環境踩雷(重要)
 
-- **PowerShell/Bash 工具的預設 cwd 可能是封存的舊 repo `s:\jobintel-ai`**。對 caliburn 下 docker compose 要
-  `docker compose -p caliburn -f S:\caliburn\docker-compose.yml …`,或先 `cd /s/caliburn`;Bash 工具每次會 reset cwd。
-- **在 git worktree 開發時,子代理/Bash 的 cwd 也可能落回主 checkout `s:\caliburn`(main)**——結果似是而非
-  (grep 找不到明明存在的欄位之類)。動 worktree 前先 `pwd` + `git branch --show-current` 驗證。
-- GPU-in-Docker 已驗證可用(RTX 4060,Docker Desktop + WSL2,`nvidia` runtime);embedder 容器用 `gpus: all`。
-- `run_live.py` 的 reload 已關(改後端碼要手動重啟);git autocrlf(比對 codegen 用 `git diff` 不要用原始 diff);
-  uv venv 沒有 pip,用 `uv pip`;CJK 用 `PYTHONUTF8=1`。
-- **舊三 repo 已封存**(`s:\jobintel-ai` / `s:\jd-ocs-indexer` / `s:\jd-pdf-to-json`),別在那開發。
+- **Bash/PowerShell 工具的 cwd 未必是你以為的 repo**——Bash 工具每次 reset cwd,且可能落在別的
+  checkout(封存的舊 repo,或 worktree 開發時落回主 checkout `main`);徵狀似是而非(grep 找不到明明
+  存在的欄位)。**動手前 `pwd` + `git branch --show-current` 驗證**;docker compose 用 `-p caliburn`
+  並從 repo 根跑。**本機絕對路徑 / 封存舊 repo 位置 / GPU 型號見 `CLAUDE.local.md`。**
+- GPU-in-Docker 已驗證可用(Docker Desktop + WSL2、`nvidia` runtime);embedder 容器用 `gpus: all`。
+- `run_live.py` 的 reload 已關(改後端碼要手動重啟);git autocrlf(比對 codegen 用 `git diff` 不要用
+  原始 diff);uv venv 沒有 pip,用 `uv pip`;CJK 用 `PYTHONUTF8=1`。
 
 ## 指路
-`ARCHITECTURE.md` · `docs/adr/README.md`(0001–0021)· `docs/contract-strategy.md` ·
-`CONTRIBUTING.md` · `docs/runbook.md` · `docs/specs/`(研究紀錄)· `docs/plans/` ·
-**`docs/design/`(子系統端到端設計,給 agent;首份 `editor-knowledge-pack.md`)**。
+**`docs/README.md`(文檔系統:架構/規則/索引)** · `ARCHITECTURE.md` · `docs/adr/README.md`(0001–0021)·
+`docs/contract-strategy.md` · `CONTRIBUTING.md` · `docs/runbook.md` · `docs/specs/`(研究紀錄)·
+`docs/plans/` · `docs/design/`(子系統端到端設計,給 agent)。

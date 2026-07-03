@@ -1,38 +1,105 @@
-# Caliburn — 文件索引
+# Caliburn — 文檔系統(架構・規則・索引)
 
-給顧問用的多租戶 B2B SaaS（職能基準 → 職務說明書）。Monorepo：Turborepo + uv（per-app）。
+> **關於文檔的文檔**:哪種文檔幹嘛、住哪、怎麼寫、怎麼維護,加現行索引。**給人也給 agent**。
+> 動到文檔慣例時**同 commit 更新本檔**。為什麼這樣設計 → 兩份研究紀錄(§6)。
 
-## 文件擺放原則（hybrid + colocation）
+Caliburn = 給顧問用的多租戶 B2B SaaS(職能基準 OCS → 職務說明書)。Monorepo:Turborepo + per-app uv。
 
-- **中央 `docs/`** —— 跨專案 / 系統級 / 活的設計文檔（本資料夾）。
-- **各 app 旁邊 `apps/<app>/`** —— 該 app 自己的 README / ARCHITECTURE / 指南（colocation，就近維護）。
-- **`docs/archive/`** —— 歷史記錄（不再現行維護，僅供追溯）。
+---
 
-## 中央系統文檔（現行）
+## 1. 文檔類型 taxonomy(先問「我要回答哪種需求」)
 
-- [`specs/2026-06-27-system-architecture-design.md`](specs/2026-06-27-system-architecture-design.md) —— Caliburn 大框架架構設計（monorepo / 契約優先 / 3 bounded context / Hexagonal+DDD / 多租戶）。
-- [`plans/2026-06-27-phase1-monorepo-consolidation.md`](plans/2026-06-27-phase1-monorepo-consolidation.md) —— Phase 1（三 repo 併入 monorepo）實作計畫，已執行（tag `phase1-monorepo`）。
-- [`ocs-schema.md`](ocs-schema.md) —— OCS **著作產出文件** JSON 結構與代碼規則（T/P/O/K/S/A）；`packages/ocs-contract` 的依據。
-- [`ocs-source-json.md`](ocs-source-json.md) —— OCS **來源**（職能基準 PDF→JSON）契約注意事項:權威 README、欄位基數（多值/單值）、indexer 取用。
-- [`contract-strategy.md`](contract-strategy.md) —— 替 seam 選契約機制的判準（#1 JSON-schema、#2 共用 pydantic、預答 #3）。
-- [`service-split-framework.md`](service-split-framework.md) —— 何時拆「服務」vs 拆「repo」vs 留成模組的判準。
-- [`product-notes.md`](product-notes.md) —— 產品 / UX 決策與延後項（如 autofill on selection）。
-- [`adr/`](adr/) —— Architecture Decision Records（決策的「為什麼」+ 取捨;0001–0020）。
-- [`runbook.md`](runbook.md) —— 維運操作:起停、重啟紀律、故障排除、部署。
-- 開發上手見根目錄 [`../CONTRIBUTING.md`](../CONTRIBUTING.md)。
+**Diátaxis**(Daniele Procida;Django/Cloudflare 等採用)把文檔按**讀者需求**分四型,兩軸交叉:
+**習得↔應用**(learning vs working)× **實作↔認知**(action vs cognition)。
+**核心鐵律:四型分開,別混在一份**——混型是文檔失敗的頭號主因。套到本 repo:
 
-## 各 app 自帶文檔（colocated）
+| 類型 | 回答什麼問題 | 主讀者 | 住哪 | Diátaxis |
+|---|---|---|---|---|
+| **ADR** | 為什麼這樣**決策**(脈絡 + 取捨) | 人 | `docs/adr/00NN-*.md` | explanation(決策) |
+| **spec(研究紀錄)** | 為什麼這樣做(研究/診斷/選項/比對) | 人 | `docs/specs/<date>-*.md` | explanation(研究) |
+| **plan** | 怎麼**建**(bite-size 實作步驟) | 人/agent | `docs/plans/<date>-*.md` | how-to(建置) |
+| **design** | 這東西**怎麼運作**(端到端、click→request) | **agent**(也人) | `docs/design/`(跨 app)或該 app 底下 | reference + explanation |
+| **README(索引)** | 這裡**有什麼、住哪**(地圖) | 人/agent | 各資料夾 / 各 app | reference(導引) |
+| **runbook** | 怎麼**操作**(起停/排錯/部署) | 人 | `docs/runbook.md` | how-to(維運) |
+| **判準文檔** | **何時選什麼**的判準 | 人 | `docs/contract-strategy.md`、`docs/service-split-framework.md` | explanation(決策輔助) |
+| **契約 / schema** | 資料**長什麼樣、什麼規則** | 人/agent | `docs/ocs-schema.md`、`docs/ocs-source-json.md` + `packages/*` | reference |
+| **CLAUDE.md / AGENTS.md** | agent **怎麼做事**(orientation + 規則) | **agent** | repo 根 + 各 app | agent instructions |
+| **ARCHITECTURE.md** | 跨 app **鳥瞰** | 人/agent | repo 根 | reference/explanation |
+| **product-notes** | 產品/UX **決策與延後項** | 人 | `docs/product-notes.md` | explanation |
+| **CONTRIBUTING.md** | 新人**上手**(裝、跑、測) | 人 | repo 根 | how-to(onboarding) |
 
-每個 app 的 README 統一含:定位一句話 / 跑・測試 / codemap / 關鍵流程(runtime view)/
-不變量 / 介面 reference / 指路(寫法依據見
-[`specs/2026-07-03-app-developer-docs-research.md`](specs/2026-07-03-app-developer-docs-research.md)）。
+> 沒有「tutorial」型(內部 repo,無教學需求);onboarding 由 CONTRIBUTING.md 兼。
 
-- [`apps/api/README.md`](../apps/api/README.md) —— FastAPI + LangGraph 後端:六邊形 codemap、REST 端點面（critical/enrichment）、文件 of-record 生命週期。
-- [`apps/web/README.md`](../apps/web/README.md) —— Next.js 前端:五個 query 的資料層、autosave/409 流程、選擇性持久化。
-- [`apps/ocs-indexer/README.md`](../apps/ocs-indexer/README.md) —— Qdrant 知識/查詢服務:v4 payload、index/查詢流程、查詢 API 面。
-- [`apps/embedder/README.md`](../apps/embedder/README.md) —— BGE-M3 GPU 嵌入容器（ADR 0012）。
-- `apps/pdf-to-json/` —— OCS PDF→JSON ETL（見 `apps/pdf-to-json/README.md`、`ARCHITECTURE.md`、`docs/`）。
+## 2. 擺放規則(blast radius + colocation)
 
-## 歷史
+| 文檔涵蓋範圍 | 放哪 |
+|---|---|
+| 跨 app / seam / 系統級 / 活的設計 | **中央 `docs/`** |
+| 單一 app 內部 | **該 app 底下**(`apps/<app>/README.md`、`AGENTS.md`) |
+| 歷史(不再維護,僅追溯) | **`docs/archive/`** |
 
-- [`archive/jobintel-v3/`](archive/jobintel-v3/) —— 併入 monorepo 前的 jobintel-ai v3 時代設計/決策/計畫文件（2026-06-14～06-27），保留供追溯。
+- **monorepo 讓「放哪」只剩整潔問題**:中央 `docs/` 與 `apps/*` 同一棵樹、同一個 commit 就能一起改;
+  「不漂」靠 §4 的 living 鐵律,不是資料夾距離(那是 polyrepo 的痛)。
+- **可發現性 ≠ 位置**:文檔存在 ≠ 會被讀。跨 app 從根 `CLAUDE.md` 指路;app 內從該 app `AGENTS.md` 指。
+  **沒被指到 = 白寫**(agent 不會自己逛到)。
+
+## 3. 寫作規則(一份給人也給 LLM)
+
+- **一份來源,不分叉**:別為 LLM 另寫一份或改寫措辭——那會同時害人也 poison the AI well。
+  把 LLM 當**新通路,不是新讀者**。
+- **內容寫給人,結構服從機器**:agent 會分塊檢索、會截斷、看不到視覺排版。
+- **別把 Diátaxis 四型混在一份**(§1):要「為什麼」連去 ADR/spec,別把決策脈絡塞進 reference。
+- **過關清單**(結構層,dual-audience)——完整版與爛/好對照見
+  [`design/README.md`](design/README.md):
+  - [ ] 每節自足(front-load context) [ ] 明講不靠推論(前提/真名/預設值)
+  - [ ] 語意化階層(標題達意、清單優先) [ ] 表格 row-atomic(每列自成一句)
+  - [ ] 關鍵資訊別藏(不只圖/摺疊/tab;附可複製範例)
+- **自檢一問**:一個沒看過 code 的 LLM 讀完這段,會不會去**發明一個不存在的端點/欄位**?會 → 還不夠具體。
+
+## 4. 維護規則(living / docs-as-code)
+
+- **跟碼同 commit**:結構性改動就更新對應文檔,**放進同一個 PR**,當作 code review 的正式檢查點
+  (docs-as-code:文檔跟碼同工作流、同 review)。
+- **fossilization 是頭號壞味道**:沒跟碼走的文檔 → agent 拿舊資訊亂做/救回退役路徑。
+  **過時的段落直接刪或修**;壞文檔比沒文檔糟。
+- **owner = 動那條線的人**:「大家的事 = 沒人的事」;改子系統的人負責更新它的文檔。
+- **能生成就別手寫**:codegen 擁有的別手維護(如 `packages/ocs-contract` 的 JSON-schema → TS 型別,
+  比對用 `git diff`)。
+- **定期審查**:高頻/關鍵文檔隨碼審;其餘偶爾巡,別等到明顯過時。
+
+## 5. 索引(現行)
+
+### 中央系統文檔
+
+- [`specs/2026-06-27-system-architecture-design.md`](specs/2026-06-27-system-architecture-design.md) — 大框架(monorepo / 契約優先 / 3 bounded context / Hexagonal+DDD / 多租戶)。
+- [`design/`](design/) — **子系統端到端設計(agent-facing)**;首份 [`editor-knowledge-pack.md`](design/editor-knowledge-pack.md)(編輯器 × 知識包)。寫法見 [`design/README.md`](design/README.md)。
+- [`adr/`](adr/) — Architecture Decision Records(決策的「為什麼」+ 取捨;**0001–0021**)。
+- [`specs/`](specs/) — 研究紀錄(研究/診斷/選項/比對)。
+- [`plans/`](plans/) — bite-size 實作計畫。
+- [`ocs-schema.md`](ocs-schema.md) — OCS **著作產出**文件 JSON 結構與代碼規則(T/P/O/K/S/A);`packages/ocs-contract` 依據。
+- [`ocs-source-json.md`](ocs-source-json.md) — OCS **來源**(PDF→JSON)契約注意事項:欄位基數、indexer 取用。
+- [`contract-strategy.md`](contract-strategy.md) — 替 seam 選契約機制的判準(#1 JSON-schema、#2 共用 pydantic、預答 #3)。
+- [`service-split-framework.md`](service-split-framework.md) — 何時拆「服務」vs 拆「repo」vs 留模組。
+- [`product-notes.md`](product-notes.md) — 產品/UX 決策與延後項。
+- [`runbook.md`](runbook.md) — 維運:起停、重啟紀律、故障排除、部署。
+- 根目錄 [`../ARCHITECTURE.md`](../ARCHITECTURE.md)(跨 app 鳥瞰)· [`../CONTRIBUTING.md`](../CONTRIBUTING.md)(上手)· [`../CLAUDE.md`](../CLAUDE.md)(agent orientation,含指路)。
+
+### 各 app 自帶文檔(colocated)
+
+每個 app 的 README 統一含:定位一句 / 跑・測試 / codemap / 關鍵流程(runtime view)/ 不變量 /
+介面 reference / 指路。寫法依據見 [`specs/2026-07-03-app-developer-docs-research.md`](specs/2026-07-03-app-developer-docs-research.md)。
+
+- [`apps/api/README.md`](../apps/api/README.md) — FastAPI + LangGraph:六邊形 codemap、REST 端點面、文件 of-record 生命週期。
+- [`apps/web/README.md`](../apps/web/README.md) — Next.js:query 資料層、autosave/409 流程、選擇性持久化。
+- [`apps/ocs-indexer/README.md`](../apps/ocs-indexer/README.md) — Qdrant 知識/查詢服務:v4 payload、index/查詢流程、查詢 API 面。
+- [`apps/embedder/README.md`](../apps/embedder/README.md) — BGE-M3 GPU 嵌入容器(ADR 0012)。
+- `apps/pdf-to-json/` — OCS PDF→JSON ETL(見其 `README.md` / `ARCHITECTURE.md`)。
+
+### 歷史
+
+- [`archive/jobintel-v3/`](archive/jobintel-v3/) — 併入 monorepo 前的 jobintel-ai v3 設計/決策/計畫(2026-06-14～06-27),供追溯。
+
+## 6. 為什麼這樣設計(研究來源)
+
+- [`specs/2026-07-03-agent-facing-docs-research.md`](specs/2026-07-03-agent-facing-docs-research.md) — agent-facing + dual-audience(Anthropic context engineering / AGENTS.md / llms.txt / config-smells / Mintlify / passo.uno / kapa / State of Docs / Diátaxis)。
+- [`specs/2026-07-03-app-developer-docs-research.md`](specs/2026-07-03-app-developer-docs-research.md) — 人向 per-app README(matklad / Diátaxis / arc42 / Google)。

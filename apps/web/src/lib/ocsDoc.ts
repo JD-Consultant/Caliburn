@@ -316,6 +316,44 @@ export function relocateTask(
   return renumber(next);
 }
 
+// ── 批次入文件（P3 前端寫入路徑；spec 資料流決策①：單一寫入路徑＝前端編輯+PATCH）──
+// 職責以 ocu_name 併入既有列（同 key 不重建），任務 append；provenance＝首個來源、
+// _refs＝全部來源（合併列雙來源引用）；最後 renumber（位置碼 + A4 文件級 K/S）。
+export interface PoolPick {
+  unit: { name: string; srcs: SourceRef[] };
+  tasks: { name: string; srcs: SourceRef[]; provenance: { ocs_code: string; task_code: string } }[];
+}
+
+export function addFromPool(doc: OcsDocument, picks: PoolPick[]): OcsDocument {
+  const next = clone(doc);
+  for (const pick of picks) {
+    let unit = next.ocs_content.ocu_units.find((u) => u.ocu_name === pick.unit.name);
+    if (!unit) {
+      const first = pick.unit.srcs[0];
+      unit = {
+        ocu_code: "",
+        ocu_name: pick.unit.name,
+        source: { ocs_code: first?.ocs_code ?? "", occupation_name: first?.occupation_name ?? "" },
+        tasks: [],
+        _uid: uid(),
+      } as OcuUnit;
+      if (pick.unit.srcs.length) unit._refs = pick.unit.srcs;
+      next.ocs_content.ocu_units.push(unit);
+    }
+    for (const t of pick.tasks) {
+      const task: OcsTask = {
+        task_codes: [{ code: "", name: t.name }],
+        competency_blocks: [emptyBlock()],
+        provenance: { ocs_code: t.provenance.ocs_code, task_code: t.provenance.task_code },
+        _tid: uid(),
+      };
+      if (t.srcs.length) task._refs = t.srcs;
+      unit.tasks.push(task);
+    }
+  }
+  return renumber(next);
+}
+
 function ensureBlock(doc: OcsDocument, unitIdx: number, taskIdx: number): CompetencyBlock {
   const task = doc.ocs_content.ocu_units[unitIdx].tasks[taskIdx];
   if (!task.competency_blocks || task.competency_blocks.length === 0) {

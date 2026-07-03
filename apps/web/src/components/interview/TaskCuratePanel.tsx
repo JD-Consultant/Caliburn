@@ -1,29 +1,29 @@
 "use client";
 
-// D27〔選任務〕modal（加法/全保留）：列出已選職類所有任務（職類→職責分組）。
-// 職責有獨立勾選框＝「採用整個職責」→ 勾才保留職責名稱、不勾留白（即使逐一勾完）。
-// 已在文件的任務顯示「已加入」(disabled)；本面板只「加」新任務，刪除走表格。
+// D27〔選任務〕modal——遞迴選單模式（ADR 0021 / spec §5）：
+// 職責選單＝units 池全部（序號＋引用行；預勾＝含主基準來源的職責＋其官方任務聯集）；
+// 展開職責 → 任務選單＝tasks 池**全部**（不過濾不分組；自己的預勾、其餘可勾＝借用）；
+// 已在文件（任何職責下）的任務標「已加入」不可再勾。確認＝前端文件編輯（addFromPool）
+// → autosave PATCH（資料流決策①：單一寫入路徑；document:buildTasks 不再使用）。
 import { useEffect, useMemo, useState } from "react";
-import { Loader2, Plus, Sparkles, Trash2 } from "lucide-react";
-import { useBuildTasks, useTaskCandidates } from "@/hooks/useDocument";
+import { ChevronDown, Loader2, Plus, Sparkles, Trash2 } from "lucide-react";
+import { useKnowledge } from "@/hooks/useKnowledge";
+import { taskRows, unitRows, type TaskRowVM, type UnitRowVM } from "@/lib/pack";
+import { addFromPool, type PoolPick } from "@/lib/ocsDoc";
+import { taskUrns } from "@/lib/urn";
 import { extractTasks, structureTask } from "@/lib/api";
-import type { OcsDocument, PickedTask } from "@/types";
+import type { OcsDocument } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Modal } from "./OccupationPicker";
-
-const tkey = (oc: string, tid: string) => `${oc}__${tid}`;
-const ukey = (oc: string, uid: string) => `${oc}__${uid}`;
-
-function newUid(): string {
-  return globalThis.crypto?.randomUUID?.() ?? `id-${Math.random().toString(36).slice(2)}`;
-}
+import { SourceLine } from "./fields/SourceLine";
 
 export function TaskCuratePanel({
   profileId,
   currentDoc,
   intake = "",
   autoExtract = false,
+  onApply,
   onClose,
   onError,
 }: {
@@ -32,55 +32,118 @@ export function TaskCuratePanel({
   // D28 T11：員工自述（job_summary）餵 extract-tasks 預勾；intake 流程進來時 autoExtract。
   intake?: string;
   autoExtract?: boolean;
+  onApply: (d: OcsDocument) => void;
   onClose: () => void;
   onError: (msg: string) => void;
 }) {
-  const { data, isLoading, isError } = useTaskCandidates(profileId, true);
-  const build = useBuildTasks(profileId);
-  const groups = useMemo(() => data?.groups ?? [], [data]);
+  const { data: pack, isLoading, isError } = useKnowledge(profileId, true);
+  const units = useMemo(() => (pack ? unitRows(pack) : []), [pack]);
+  const tasks = useMemo(() => (pack ? taskRows(pack) : []), [pack]);
+  const taskByKey = useMemo(() => new Map(tasks.map((t) => [t.name, t])), [tasks]);
+  const primary = pack?.occupation_details[0]?.ocs_code ?? "";
+  const ocsCodes = useMemo(() => (pack?.occupation_details ?? []).map((d) => d.ocs_code), [pack]);
 
-  // 已在文件的任務（依 provenance）→ 顯示為「已加入」不可勾。
+  // 已在文件（任何職責下）的任務：provenance/_refs URN 命中池列 → 標「已加入」不可再勾。
   const alreadyIn = useMemo(() => {
     const s = new Set<string>();
-    for (const u of currentDoc?.ocs_content?.ocu_units ?? []) {
-      for (const t of u.tasks ?? []) {
-        const p = t.provenance;
-        if (p?.ocs_code && p?.task_code) s.add(tkey(p.ocs_code, p.task_code));
-      }
-    }
+    for (const u of currentDoc?.ocs_content?.ocu_units ?? [])
+      for (const t of u.tasks ?? []) for (const urn of taskUrns(t)) s.add(urn);
     return s;
   }, [currentDoc]);
+  const rowInDoc = (row: TaskRowVM) => row.urns.some((u) => alreadyIn.has(u));
 
-  const [picked, setPicked] = useState<Set<string>>(new Set());
-  const [adopted, setAdopted] = useState<Set<string>>(new Set()); // 採用的職責（保留名稱）
+  // 預勾（spec 預勾統一規則：主基準(順序1)來源的職責列＋其官方任務聯集）。
+  const defaults = useMemo(() => {
+    const m = new Map<string, Set<string>>();
+    if (!primary) return m;
+    for (const u of units) {
+      if (!u.srcs.some((s) => s.ocs_code === primary)) continue;
+      const picks = new Set(u.ownTaskKeys.filter((k) => {
+        const row = taskByKey.get(k);
+        return row && !rowInDoc(row);
+      }));
+      if (picks.size) m.set(u.name, picks);
+    }
+    return m;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [units, taskByKey, primary, alreadyIn]);
+
+  // 暫存勾選：職責 key → 該職責底下勾的任務 key（derived state：null＝未動過＝顯示預勾；
+  // 「自動勾選」鈕＝setStaged(null) 回預設）。同一任務列勾在別職責 → 他處 disabled
+  // （選單開在誰底下就進誰；勾任務＝職責自動採用）。
+  const [stagedState, setStaged] = useState<Map<string, Set<string>> | null>(null);
+  const staged = stagedState ?? defaults;
+  const [openUnit, setOpenUnit] = useState<string | null>(null);
+  const stagedUnitOf = (taskKey: string): string | null => {
+    for (const [uk, set] of staged) if (set.has(taskKey)) return uk;
+    return null;
+  };
+  // updater 內以「當下暫存(或預設)」為底深拷貝（defaults 是 memo，不可就地改）。
+  const copyOf = (base: Map<string, Set<string>>) =>
+    new Map([...base].map(([k, v]) => [k, new Set(v)] as const));
+
+  const toggleUnit = (u: UnitRowVM, on: boolean) =>
+    setStaged((prev) => {
+      const next = copyOf(prev ?? defaults);
+      if (!on) {
+        next.delete(u.name);
+        return next;
+      }
+      const stagedElsewhere = (k: string) => {
+        for (const [uk, set] of next) if (uk !== u.name && set.has(k)) return true;
+        return false;
+      };
+      const set = next.get(u.name) ?? new Set<string>();
+      for (const k of u.ownTaskKeys) {
+        const row = taskByKey.get(k);
+        if (row && !rowInDoc(row) && !stagedElsewhere(k)) set.add(k);
+      }
+      next.set(u.name, set);
+      return next;
+    });
+
+  const toggleTask = (unitName: string, taskKey: string) =>
+    setStaged((prev) => {
+      const next = copyOf(prev ?? defaults);
+      const set = next.get(unitName) ?? new Set<string>();
+      if (set.has(taskKey)) set.delete(taskKey);
+      else set.add(taskKey); // 勾任務＝職責自動採用
+      if (set.size === 0) next.delete(unitName);
+      else next.set(unitName, set);
+      return next;
+    });
 
   // D28 T11：extract-tasks 預勾 + CIT 補漏自訂任務。
   const [aiBusy, setAiBusy] = useState(false);
   const [extracted, setExtracted] = useState(false);
   const [aiCustoms, setAiCustoms] = useState<{ name: string }[]>([]); // 候選自訂（AI 列）
-  const [customPicks, setCustomPicks] = useState<PickedTask[]>([]); // 已加入的自訂任務（送 build）
+  const [customPicks, setCustomPicks] = useState<{ ocu_name: string; task_name: string }[]>([]);
   const [citDesc, setCitDesc] = useState("");
   const [citBusy, setCitBusy] = useState(false);
   const [citProposal, setCitProposal] = useState<{ task_name: string; unit_suggestion: string } | null>(null);
 
-  const ocsCodes = useMemo(() => groups.map((g) => g.ocs_code), [groups]);
-
   const runExtract = async () => {
-    if (!intake.trim() || groups.length === 0) return;
+    if (!intake.trim() || !pack || ocsCodes.length === 0) return;
     setAiBusy(true);
     setExtracted(true);
     try {
       const res = await extractTasks({ intake, ocs_codes: ocsCodes });
-      const byCode = new Map<string, { oc: string; tc: string }>();
-      for (const g of groups) for (const u of g.units) for (const t of u.tasks)
-        byCode.set(`${g.ocs_code}__${t.task_code}`, { oc: g.ocs_code, tc: t.task_code });
-      setPicked((prev) => {
-        const next = new Set(prev);
-        // suggested_task_ids are task_codes scoped per OCS: try each group
+      // suggested_task_ids＝各 OCS 的 task_code → URN → 池列，放回它自己的職責（自動採用）。
+      setStaged((prev) => {
+        const next = copyOf(prev ?? defaults);
+        const stagedSomewhere = (k: string) => {
+          for (const set of next.values()) if (set.has(k)) return true;
+          return false;
+        };
         for (const id of res.suggested_task_ids) {
-          for (const g of groups) {
-            const m = byCode.get(`${g.ocs_code}__${id}`);
-            if (m && !alreadyIn.has(tkey(m.oc, m.tc))) next.add(tkey(m.oc, m.tc));
+          for (const oc of ocsCodes) {
+            const st = pack.source_tasks[`ocs:${oc}:T:${id}`];
+            if (!st?.task_name || !st.ocu_name) continue;
+            const row = taskByKey.get(st.task_name);
+            if (!row || rowInDoc(row) || stagedSomewhere(st.task_name)) continue;
+            const set = new Set(next.get(st.ocu_name) ?? []);
+            set.add(st.task_name);
+            next.set(st.ocu_name, set);
           }
         }
         return next;
@@ -93,29 +156,18 @@ export function TaskCuratePanel({
     }
   };
 
-  // intake 流程進來：候選載入後自動跑一次 extract（setTimeout 推離 effect 同步階段）。
+  // intake 流程進來：知識包載入後自動跑一次 extract（setTimeout 推離 effect 同步階段）。
   useEffect(() => {
-    if (!autoExtract || extracted || groups.length === 0 || !intake.trim()) return;
+    if (!autoExtract || extracted || !pack || !intake.trim()) return;
     const t = setTimeout(() => void runExtract(), 0);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [autoExtract, groups.length, intake]);
+  }, [autoExtract, pack, intake]);
 
   const addCustom = (name: string, unit: string) => {
     const n = name.trim();
     if (!n) return;
-    const u = unit.trim() || "自訂任務";
-    setCustomPicks((prev) => [
-      ...prev,
-      {
-        ocs_code: "",
-        ocu_code: u, // 同建議職責名 → build_from_picked 併入同一自訂職責
-        ocu_name: u,
-        ocs_name: "",
-        task_code: `custom:${newUid()}`, // 唯一假碼，避免 provenance dedup 撞（catalog 用真 task_code）
-        task_name: n,
-      },
-    ]);
+    setCustomPicks((prev) => [...prev, { ocu_name: unit.trim() || "自訂任務", task_name: n }]);
   };
 
   const proposeCustom = async () => {
@@ -131,141 +183,141 @@ export function TaskCuratePanel({
     }
   };
 
-  const toggleTask = (k: string) =>
-    setPicked((prev) => {
-      const next = new Set(prev);
-      if (next.has(k)) next.delete(k);
-      else next.add(k);
-      return next;
-    });
-
-  const toggleUnit = (oc: string, uid: string, taskIds: string[], on: boolean) => {
-    const uk = ukey(oc, uid);
-    setAdopted((prev) => {
-      const next = new Set(prev);
-      if (on) next.add(uk);
-      else next.delete(uk);
-      return next;
-    });
-    setPicked((prev) => {
-      const next = new Set(prev);
-      for (const tid of taskIds) {
-        const k = tkey(oc, tid);
-        if (alreadyIn.has(k)) continue; // 已加入的不動
-        if (on) next.add(k);
-        else next.delete(k);
-      }
-      return next;
-    });
-  };
-
+  // 確認＝前端文件編輯：職責/任務照池序 append；provenance 優先取「與本職責同職業」的來源。
   const confirm = () => {
-    const out: PickedTask[] = [];
-    for (const g of groups) {
-      for (const u of g.units) {
-        const adopt = adopted.has(ukey(g.ocs_code, u.ocu_code));
-        for (const t of u.tasks) {
-          const k = tkey(g.ocs_code, t.task_code);
-          if (alreadyIn.has(k) || !picked.has(k)) continue;
-          out.push({
-            ocs_code: g.ocs_code,
-            ocu_code: u.ocu_code,
-            ocu_name: adopt ? u.ocu_name : "", // 不採用 → 職責名留白
-            ocs_name: g.ocs_name,
-            task_code: t.task_code,
-            task_name: t.task_name,
-          });
-        }
+    const picks: PoolPick[] = [];
+    for (const u of units) {
+      const set = staged.get(u.name);
+      if (!set?.size) continue;
+      const unitCodes = new Set(u.srcs.map((s) => s.ocs_code));
+      const pickTasks: PoolPick["tasks"] = [];
+      for (const t of tasks) {
+        if (!set.has(t.name)) continue;
+        const pref = t.srcs.find((s) => unitCodes.has(s.ocs_code)) ?? t.srcs[0];
+        pickTasks.push({
+          name: t.name,
+          srcs: t.srcs,
+          provenance: { ocs_code: pref?.ocs_code ?? "", task_code: pref?.task_code ?? "" },
+        });
       }
+      picks.push({ unit: { name: u.name, srcs: u.srcs }, tasks: pickTasks });
     }
-    out.push(...customPicks);
-    if (out.length === 0) {
+    for (const c of customPicks) {
+      picks.push({
+        unit: { name: c.ocu_name, srcs: [] },
+        tasks: [{ name: c.task_name, srcs: [], provenance: { ocs_code: "", task_code: "" } }],
+      });
+    }
+    if (picks.length === 0) {
       onClose();
       return;
     }
-    build.mutate(out, {
-      onSuccess: onClose,
-      onError: (e: unknown) => onError(e instanceof Error ? e.message : "建立任務失敗"),
-    });
+    if (!currentDoc) {
+      onError("文件尚未載入");
+      return;
+    }
+    onApply(addFromPool(currentDoc, picks));
+    onClose();
   };
 
+  const stagedCount = [...staged.values()].reduce((a, s) => a + s.size, 0);
+
   return (
-    <Modal title="選擇任務（勾職責＝採用整組保留名稱；只勾任務＝職責名留白）" onClose={onClose}>
+    <Modal title="選擇任務（勾職責＝帶入其官方任務；展開可跨職責借用）" onClose={onClose}>
       {isLoading ? (
         <div className="h-32 animate-pulse rounded bg-muted" />
       ) : isError ? (
-        <p className="text-sm text-destructive">候選載入失敗（indexer 未連線？）。</p>
-      ) : groups.length === 0 ? (
+        <p className="text-sm text-destructive">知識包載入失敗（indexer 未連線？）。</p>
+      ) : units.length === 0 ? (
         <p className="text-sm text-muted-foreground">沒有候選任務。請先〔選職類〕。</p>
       ) : (
-        <div className="max-h-[60vh] space-y-4 overflow-y-auto">
-          {/* T11：依員工自述 AI 預勾建議任務 */}
-          {intake.trim() ? (
-            <div className="flex items-center justify-between gap-2 rounded-md border border-violet-200 bg-violet-50 px-3 py-2">
-              <span className="text-xs text-violet-800">依你的自述自動預勾可能負責的任務。</span>
-              <Button size="sm" variant="outline" className="gap-1.5" disabled={aiBusy} onClick={runExtract}>
-                {aiBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-                {extracted ? "重新預勾" : "AI 預勾"}
-              </Button>
-            </div>
-          ) : null}
+        <>
+          <div className="mb-2 flex items-center justify-between gap-2">
+            {/* T11：依員工自述 AI 預勾建議任務 */}
+            {intake.trim() ? (
+              <div className="flex min-w-0 flex-1 items-center justify-between gap-2 rounded-md border border-violet-200 bg-violet-50 px-3 py-2">
+                <span className="truncate text-xs text-violet-800">依你的自述自動預勾可能負責的任務。</span>
+                <Button size="sm" variant="outline" className="shrink-0 gap-1.5" disabled={aiBusy} onClick={runExtract}>
+                  {aiBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                  {extracted ? "重新預勾" : "AI 預勾"}
+                </Button>
+              </div>
+            ) : <span />}
+            <Button size="sm" variant="outline" className="shrink-0"
+              title="重套預設：主基準（順序1）的職責與任務"
+              onClick={() => setStaged(null)}>
+              自動勾選
+            </Button>
+          </div>
 
-          {groups.map((g) => (
-            <div key={g.ocs_code}>
-              <div className="mb-1 flex items-center gap-2">
-                <Badge variant="outline" className="text-xs">{g.ocs_name}</Badge>
-                <span className="font-mono text-xs text-muted-foreground">{g.ocs_code}</span>
-              </div>
-              <div className="space-y-2">
-                {g.units.map((u) => {
-                  const ids = u.tasks.map((t) => t.task_code);
-                  const addable = ids.filter((id) => !alreadyIn.has(tkey(g.ocs_code, id)));
-                  const unitDone = addable.length === 0;
-                  return (
-                    <div key={u.ocu_code} className="rounded-md border">
-                      <label className="flex cursor-pointer items-center gap-2 border-b bg-muted/40 px-2 py-1.5 text-sm font-medium">
-                        <input
-                          type="checkbox"
-                          disabled={unitDone}
-                          checked={adopted.has(ukey(g.ocs_code, u.ocu_code))}
-                          onChange={(e) => toggleUnit(g.ocs_code, u.ocu_code, ids, e.target.checked)}
-                        />
-                        <span className="font-mono text-xs text-muted-foreground">{u.ocu_code}</span>
-                        <span>{u.ocu_name}</span>
-                        {unitDone ? <Badge variant="secondary" className="ml-auto text-[10px]">已加入</Badge> : null}
-                      </label>
-                      <div className="space-y-0.5 p-1.5">
-                        {u.tasks.map((t) => {
-                          const k = tkey(g.ocs_code, t.task_code);
-                          const inDoc = alreadyIn.has(k);
-                          return (
-                            <label
-                              key={t.task_code}
-                              className={
-                                "flex items-center gap-2 rounded px-2 py-1 text-sm " +
-                                (inDoc ? "opacity-50" : "cursor-pointer hover:bg-muted/50")
-                              }
-                            >
-                              <input
-                                type="checkbox"
-                                disabled={inDoc}
-                                checked={inDoc || picked.has(k)}
-                                onChange={() => toggleTask(k)}
-                              />
-                              <span className="font-mono text-xs text-muted-foreground">{t.task_code}</span>
-                              <span>{t.task_name}</span>
-                              {inDoc ? <span className="ml-auto text-[10px] text-muted-foreground">已加入</span> : null}
-                            </label>
-                          );
-                        })}
+          <div className="max-h-[60vh] space-y-2 overflow-y-auto">
+            {units.map((u, ui) => {
+              const set = staged.get(u.name);
+              const isOpen = openUnit === u.name;
+              return (
+                <div key={u.name} className="rounded-md border">
+                  <div className="flex items-start gap-2 border-b bg-muted/40 px-2 py-1.5 text-sm font-medium">
+                    <input
+                      type="checkbox"
+                      className="mt-1"
+                      checked={!!set?.size}
+                      onChange={(e) => toggleUnit(u, e.target.checked)}
+                    />
+                    <button type="button" className="min-w-0 flex-1 text-left" onClick={() => setOpenUnit(isOpen ? null : u.name)}>
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-mono text-xs text-muted-foreground">{ui + 1}.</span>
+                        <span>{u.name}</span>
+                        {set?.size ? <Badge variant="secondary" className="ml-1 text-[10px]">已勾 {set.size}</Badge> : null}
+                        <ChevronDown className={"ml-auto h-3.5 w-3.5 shrink-0 transition-transform " + (isOpen ? "rotate-180" : "")} />
                       </div>
+                      <SourceLine srcs={u.srcs} />
+                    </button>
+                  </div>
+                  {isOpen ? (
+                    <div className="space-y-0.5 p-1.5">
+                      {tasks.map((t, ti) => {
+                        const inDoc = rowInDoc(t);
+                        const elsewhere = stagedUnitOf(t.name);
+                        const here = !!set?.has(t.name);
+                        const disabled = inDoc || (!!elsewhere && elsewhere !== u.name);
+                        const isOwn = u.ownTaskKeys.includes(t.name);
+                        return (
+                          <label
+                            key={t.name}
+                            className={
+                              "flex items-start gap-2 rounded px-2 py-1 text-sm " +
+                              (disabled ? "opacity-50" : "cursor-pointer hover:bg-muted/50")
+                            }
+                          >
+                            <input
+                              type="checkbox"
+                              className="mt-1"
+                              disabled={disabled}
+                              checked={inDoc || here}
+                              onChange={() => toggleTask(u.name, t.name)}
+                            />
+                            <span className="mt-0.5 font-mono text-xs text-muted-foreground">{ti + 1}.</span>
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center gap-1.5">
+                                <span>{t.name}</span>
+                                {isOwn ? null : <Badge variant="outline" className="text-[10px]">借用</Badge>}
+                                {inDoc ? <span className="ml-auto text-[10px] text-muted-foreground">已加入</span> : null}
+                                {!inDoc && elsewhere && elsewhere !== u.name ? (
+                                  <span className="ml-auto text-[10px] text-muted-foreground">已勾於「{elsewhere}」</span>
+                                ) : null}
+                              </div>
+                              <SourceLine srcs={t.srcs} />
+                            </div>
+                          </label>
+                        );
+                      })}
                     </div>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
-        </div>
+                  ) : null}
+                </div>
+              );
+            })}
+          </div>
+        </>
       )}
 
       {/* T11：CIT 補漏 — 清單外的關鍵/棘手任務，一句描述 → structure-task → 新增自訂 */}
@@ -334,7 +386,7 @@ export function TaskCuratePanel({
           {customPicks.length > 0 ? (
             <ul className="space-y-1">
               {customPicks.map((c, i) => (
-                <li key={c.task_code} className="flex items-center gap-2 text-sm">
+                <li key={`${c.task_name}-${i}`} className="flex items-center gap-2 text-sm">
                   <Badge variant="secondary" className="text-[10px]">自訂</Badge>
                   <span className="flex-1">{c.task_name}</span>
                   <button
@@ -352,12 +404,10 @@ export function TaskCuratePanel({
       ) : null}
 
       <div className="mt-4 flex items-center justify-between">
-        <span className="text-xs text-muted-foreground">將新增 {picked.size + customPicks.length} 個任務</span>
+        <span className="text-xs text-muted-foreground">將新增 {stagedCount + customPicks.length} 個任務</span>
         <div className="flex gap-2">
           <Button variant="ghost" onClick={onClose}>取消</Button>
-          <Button onClick={confirm} disabled={build.isPending}>
-            {build.isPending ? "新增中…" : "加入文件"}
-          </Button>
+          <Button onClick={confirm}>加入文件</Button>
         </div>
       </div>
     </Modal>

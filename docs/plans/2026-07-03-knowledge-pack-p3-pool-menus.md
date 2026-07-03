@@ -770,6 +770,22 @@ git commit -m "refactor: retire header-meta/task-candidates/task-catalogs/buildT
 
 ---
 
+### Task 8: UI 修訂——選任務 modal 拆掉,改「選職責下拉 + 職責列選任務」(2026-07-03 維護者驗收回饋)
+
+**決策(維護者)**:不要大 modal;**表格為中心**:工具列「選職責 ▾」下拉 → 勾=空職責立即入
+表格、再點取消=移除空職責、含任務鎖定(表格刪);每職責列「選任務 ▾」→ 任務大池選單
+(語意照舊:全池、預勾自己的、借用、已在他職責 disabled;空職責首開自動帶官方任務、
+「自動勾選」重套;取消勾選=移除**空**任務,有內容鎖定)。**AI 預勾(extract-tasks)與 CIT
+自訂助手(structure-task)先拿掉**(等訪談引擎 ADR 0020;server `/ai/*` 保留)。
+
+**Files:** Create `components/interview/UnitPickerMenu.tsx`、`TaskPickerMenu.tsx`;Modify
+`lib/ocsDoc.ts`(`addTasksToUnit`/`taskHasContent`/`taskFromPool` 抽共用)、`JobDocTable.tsx`
+(UnitRow 掛選單+空狀態文案)、`app/documents/[id]/page.tsx`(工具列換下拉、掛 useKnowledge);
+Delete `TaskCuratePanel.tsx`;Modify `lib/api.ts`+`types/index.ts`(退 extractTasks/structureTask);
+`apps/web/README.md` 同 commit。
+
+- [ ] 三道綠 + commit(一個 commit:同一個 UI 切換)。
+
 ## Self-Review
 
 - **Spec coverage:** §5 遞迴選單流程(職責→任務→五選單,全池+預勾+借用)=Task 4/5;預勾統一規則(初次+自動勾選鈕)=Task 3/4/5;W1 序號+引用行(類別例外)=Task 3/6;§5.1 預勾欄(級別衝突取順序1)=Task 4;聯集語意(職責/任務 srcs、`_refs` 多筆 provenance)=Task 2/5;資料流決策①(buildTasks 退役、前端寫入)=Task 5/7、③(逐面切、切完才退)=任務順序本身;A4=Task 1;B4 `_levelSrc`=Task 4;A5 已在 P1 修(態度池 name key,Task 6 只消費)。

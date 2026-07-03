@@ -159,21 +159,8 @@ export interface DegradeMeta {
   partial: boolean;
 }
 
-// ── AI 提議（D28 /ai/*）：結構化提議、不寫 DB；前端暫存→使用者套用→走現有 PATCH ──
-// （recommend-ks/draft-op server 端仍在（ADR 0020 訪談引擎/agent 用）；web 填格改吃
-// 知識包後不再呼叫，對應型別已退役。）
-
-// extract-tasks：預勾的 catalog 任務 UUID + 候選自訂任務（名）。
-export interface ExtractTasksResult {
-  suggested_task_ids: string[];
-  custom_candidates: { name: string }[];
-}
-
-// structure-task：自訂任務一句描述 → 任務名 + 職責建議。
-export interface StructureTaskResult {
-  task_name: string;
-  unit_suggestion: string;
-}
+// ── AI 提議（D28 /ai/*）：server 端點保留（ADR 0020 訪談引擎/agent 用），web 目前
+// 零呼叫——選單全改吃知識包（ADR 0021）後，對應 client 型別已全數退役（P3）。
 
 export interface OptionItem {
   code: string;

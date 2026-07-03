@@ -39,6 +39,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { Badge } from "@/components/ui/badge";
 import { DocHeader } from "./DocHeader";
 import { DocNotes } from "./DocNotes";
+import { TaskPickerMenu } from "./TaskPickerMenu";
 import { Check, ChevronDown, GripVertical, Pencil, Plus, Trash2 } from "lucide-react";
 
 export type CellKind = "o" | "p" | "k" | "s";
@@ -258,14 +259,18 @@ function UnitRow({
             />
           ))}
         </SortableContext>
-        <button
-          type="button"
-          className="inline-flex items-center gap-1 rounded-md border border-dashed px-2.5 py-1.5 text-xs text-muted-foreground hover:text-foreground"
-          onClick={() => onChange(addTask(doc, unitIdx))}
-        >
-          <Plus className="h-3.5 w-3.5" />
-          新增任務
-        </button>
+        <div className="flex items-center gap-1.5">
+          {/* 選任務 ▾＝任務大池（預勾自己的、可借用；P3 UI 修訂）；＋＝手動空白任務 */}
+          <TaskPickerMenu document={doc} pack={pack} unitIdx={unitIdx} onChange={onChange} />
+          <button
+            type="button"
+            className="inline-flex items-center gap-1 rounded-md border border-dashed px-2.5 py-1.5 text-xs text-muted-foreground hover:text-foreground"
+            onClick={() => onChange(addTask(doc, unitIdx))}
+          >
+            <Plus className="h-3.5 w-3.5" />
+            新增任務
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -358,7 +363,7 @@ export function JobDocTable({
       {/* 單元 → 任務（可拖拉） */}
       {units.length === 0 ? (
         <div className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
-          尚無任務。上方〔選職類〕→〔選任務〕帶入，或〔＋新增職責〕手動建立。
+          尚無任務。上方〔選職類〕→〔選職責〕帶入職責，再從職責列〔選任務〕挑任務；或〔＋新增職責〕手動建立。
         </div>
       ) : (
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>

@@ -4,7 +4,7 @@
 // 拖拉排序；任務可跨職責拖拉。每任務 4 格（產出O/指標P/K/S）點擊開 filler。
 // 純呈現+結構編輯：所有變更經 onChange(newDoc) 交回上層 PATCH。不碰 CopilotKit。
 import { useEffect, useRef, useState } from "react";
-import type { CompetencyBlock, OcsDocument, OcsTask, SourceRef } from "@/types";
+import type { CompetencyBlock, KnowledgePack, OcsDocument, OcsTask } from "@/types";
 import {
   addTask,
   addUnit,
@@ -18,8 +18,9 @@ import {
   setTaskLevel,
 } from "@/lib/ocsDoc";
 import { useHeaderMeta } from "@/hooks/useDocument";
-import { useTaskLevel } from "@/hooks/useTaskCatalog";
-import { taskUrn } from "@/lib/urn";
+import { useKnowledge } from "@/hooks/useKnowledge";
+import { ownTaskRefs } from "@/lib/pack";
+import { taskUrns } from "@/lib/urn";
 import { attitudeOptions } from "@/lib/headerMeta";
 import { FieldCombobox } from "./fields/FieldCombobox";
 import { OfficialMenu } from "./fields/OfficialMenu";
@@ -124,8 +125,7 @@ function TaskRow({
   task,
   unitIdx,
   taskIdx,
-  profileId,
-  unitSource,
+  pack,
   onCell,
   onChange,
   doc,
@@ -134,8 +134,7 @@ function TaskRow({
   task: OcsTask;
   unitIdx: number;
   taskIdx: number;
-  profileId: string;
-  unitSource?: { ocs_code: string; occupation_name: string };
+  pack?: KnowledgePack;
   onCell: (t: CellTarget) => void;
   onChange: (d: OcsDocument) => void;
   doc: OcsDocument;
@@ -145,18 +144,11 @@ function TaskRow({
   const block = firstBlock(task);
   const level = block?.competency_level;
   const tc = task.task_codes?.[0];
-  // 級別來源：打開下拉時即時查該任務的官方級別（fallback 用帶官方時記下的 _levelSrc）。
-  // 快取鍵用身分 URN(A1);位置碼僅供 fallback 打 /ai/*。
-  const [levelOpen, setLevelOpen] = useState(false);
-  const fetchedLevel = useTaskLevel(profileId, taskUrn(task.provenance), tc?.code ?? "", levelOpen);
-  const officialLevel = fetchedLevel ?? task._levelSrc?.level ?? null;
-  const levelSrc: SourceRef = {
-    ocs_code: unitSource?.ocs_code ?? task._levelSrc?.ocs_code ?? "",
-    occupation_name: unitSource?.occupation_name ?? task._levelSrc?.occupation_name ?? "",
-    code: "",
-    task_code: tc?.code ?? "",
-    task_name: tc?.name ?? "",
-  };
+  // 級別：官方值來自知識包 source_tasks（聯集取第一個非空＝順序1）；
+  // fallback 帶官方時記下的 _levelSrc。選中官方值 → 存 _levelSrc（B4，來源必標）。
+  const own = pack ? ownTaskRefs(pack, taskUrns(task)) : null;
+  const officialLevel = own?.level ?? task._levelSrc?.level ?? null;
+  const levelSrc = own?.levelSrc ?? task._levelSrc ?? null;
 
   return (
     <div ref={setNodeRef} style={style} className="rounded-md border bg-background px-3 py-2">
@@ -185,11 +177,12 @@ function TaskRow({
           options={[1, 2, 3, 4, 5, 6].map((n) => ({
             value: String(n),
             label: `級別 ${n}`,
-            srcs: officialLevel === n ? [levelSrc] : [],
+            srcs: officialLevel === n && levelSrc ? [levelSrc] : [],
           }))}
           selected={level != null ? String(level) : ""}
-          onOpenChange={setLevelOpen}
-          onPick={(v) => onChange(setTaskLevel(doc, unitIdx, taskIdx, v))}
+          onPick={(v) => onChange(setTaskLevel(doc, unitIdx, taskIdx, v,
+            officialLevel != null && Number(v) === officialLevel && levelSrc
+              ? { ...levelSrc, level: officialLevel } : undefined))}
         />
         <button
           type="button"
@@ -213,7 +206,7 @@ function UnitRow({
   id,
   unit,
   unitIdx,
-  profileId,
+  pack,
   onCell,
   onChange,
   doc,
@@ -221,7 +214,7 @@ function UnitRow({
   id: string;
   unit: OcsDocument["ocs_content"]["ocu_units"][number];
   unitIdx: number;
-  profileId: string;
+  pack?: KnowledgePack;
   onCell: (t: CellTarget) => void;
   onChange: (d: OcsDocument) => void;
   doc: OcsDocument;
@@ -260,8 +253,7 @@ function UnitRow({
               task={task}
               unitIdx={unitIdx}
               taskIdx={ti}
-              profileId={profileId}
-              unitSource={unit.source}
+              pack={pack}
               onCell={onCell}
               onChange={onChange}
               doc={doc}
@@ -320,6 +312,8 @@ export function JobDocTable({
 }) {
   const units = document.ocs_content?.ocu_units ?? [];
   const unitIds = units.map((u) => `u:${u._uid}`);
+  // 知識包（ADR 0021）：任務級別官方值/來源（TaskRow）。選過職類才有資料。
+  const { data: pack } = useKnowledge(profileId, !!document.ocs_profile?.ocs_code);
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
 
@@ -378,7 +372,7 @@ export function JobDocTable({
                   id={`u:${unit._uid}`}
                   unit={unit}
                   unitIdx={ui}
-                  profileId={profileId}
+                  pack={pack}
                   onCell={onCell}
                   onChange={onChange}
                   doc={document}

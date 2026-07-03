@@ -5,6 +5,7 @@ task-candidates / header-meta / task-catalogs aggregations from the knowledge
 indexer. The PATCH body is the whole OCS document dict (loose; no strict
 validation on draft).
 """
+import asyncio
 import logging
 from uuid import UUID
 
@@ -15,7 +16,7 @@ from sqlalchemy.orm.exc import StaleDataError
 from app.api.deps import get_knowledge  # noqa: F401  (re-export; tests override via this name)
 from app.database import get_db
 from app.models import JobProfile
-from app.core.domain import header_meta, ocs_doc
+from app.core.domain import header_meta, knowledge_pack, ocs_doc
 from app.core.ports import KnowledgeClient
 from app.adapters.persistence import DocConflictError, DocRepo, ProfileRepo
 from app.services.ai import tasks as ai_tasks
@@ -267,6 +268,43 @@ async def get_header_meta(
     result = header_meta.aggregate(metas, primary_code=codes[0] if codes else "")
     result["meta"] = {"partial": partial}
     return result
+
+
+@router.get("/{profile_id}/knowledge")
+async def get_knowledge_pack(
+    profile_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    knowledge: KnowledgeClient = Depends(get_knowledge),
+):
+    """知識包(ADR 0021):選職類後一次抓齊——``occupation_details + 12 池 + source_tasks``,
+    每個官方值帶 srcs(來源必標)。per-code **並行**抓三資源、**組裝照優先序**(append 序);
+    單 code 掛 → 略過 + ``meta.partial=true``(ADR 0018);**全掛 → 502**(沒有 knowledge
+    選不了職責/任務,critical)。"""
+    profile = await _require_profile(profile_id, db)
+    codes = profile.selected_ocs_codes or []
+    if not codes:
+        pack = knowledge_pack.build_pack([], {}, {}, {})
+        pack["meta"] = {"partial": False}
+        return pack
+
+    async def fetch_one(code: str):
+        return (await knowledge.occupation(code),
+                await knowledge.occupation_tasks(code),
+                await knowledge.competencies(code))
+
+    results = await asyncio.gather(*(fetch_one(c) for c in codes), return_exceptions=True)
+    details, tasks_by, pools_by, ok = {}, {}, {}, []
+    for code, r in zip(codes, results):
+        if isinstance(r, BaseException):
+            logger.warning("knowledge: fetch(%s) failed; skipping", code, exc_info=r)
+            continue
+        details[code], tasks_by[code], pools_by[code] = r
+        ok.append(code)
+    if not ok:
+        raise HTTPException(status_code=502, detail="indexer unavailable")
+    pack = knowledge_pack.build_pack(ok, details, tasks_by, pools_by)
+    pack["meta"] = {"partial": len(ok) < len(codes)}
+    return pack
 
 
 @router.get("/{profile_id}/task-catalogs")

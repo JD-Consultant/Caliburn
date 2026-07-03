@@ -22,5 +22,5 @@ output/
 Thumbs.db
 .claude/
 
-# local-only agent orientation (not version-controlled, per maintainer)
-CLAUDE.md
+# personal, local-only agent notes (shared orientation lives in the tracked CLAUDE.md)
+CLAUDE.local.md

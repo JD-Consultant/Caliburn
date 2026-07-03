@@ -15,6 +15,7 @@ const newId = () => (globalThis.crypto?.randomUUID?.() ?? `id-${Math.random().to
 export function FieldCombobox({
   label, value, options, allowCustom = false, onCommit, pillSources = false,
   layout = "pills", title, customMode = "search", autoCode, editMultiline = false,
+  defaults,
 }: {
   label: string;
   value: Item[];
@@ -31,17 +32,22 @@ export function FieldCombobox({
   autoCode?: string;
   // list 模式名稱欄是否多行（長文字如補充說明）。
   editMultiline?: boolean;
+  // 「自動勾選」的目標集（該實體自己的官方配套）；未給 = 全部 options。
+  defaults?: OptionItem[];
 }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const sourcesOf = (k: string) => options.find((o) => keyOf(o) === k)?.sources ?? [];
 
-  // 勾選判定(DDD 實體 vs 值物件)：選項有來源身分(code)→ 比 provenance(ocs_code+code)；
-  // 無 code(值物件，如說明事項)→ 比 name。改過內容的項目 _src 變 custom → 自動視為未勾選。
+  // 勾選判定(DDD 實體 vs 值物件)：選項帶來源身分（srcs 任一 {ocs_code, code} 命中 _ref）
+  // → 官方同物（池的合併列 srcs 多筆、own-first 重排後 srcs[0] 未必是 _ref 那筆，必須掃全部）；
+  // 無 code 來源(值物件，如說明事項)→ 比 name。改過內容的項目 _src 變 custom → 自動視為未勾選。
   const officialMatch = (v: Item, o: OptionItem) => {
-    const srcCode = o.srcs?.[0]?.code ?? o.code ?? "";
-    if (srcCode) {
-      return v._ref?.code === srcCode && (v._ref?.ocs_code ?? "") === (o.srcs?.[0]?.ocs_code ?? "");
+    const coded = (o.srcs ?? []).filter((s) => s.code);
+    if (coded.length > 0 || o.code) {
+      if (v._ref && coded.some((s) => s.code === v._ref!.code && s.ocs_code === v._ref!.ocs_code)) return true;
+      if (!coded.length && o.code) return v._ref?.code === o.code; // 無 srcs 的舊路徑（自訂候選）
+      return false;
     }
     return v.name === o.name;
   };
@@ -77,9 +83,10 @@ export function FieldCombobox({
   };
   // 「+」直接加一列空白自訂（就地編輯）。OPKS/態度由 setter 依位置重編碼，故給暫定碼即可。
   const addBlank = () => onCommit([...value, { code: autoCode ? nextCode(autoCode) : "", name: "", _id: newId(), _src: "custom" }]);
-  const selectAllOfficial = () => {
+  // 自動勾選：套用 defaults（該實體自己的官方配套）；未給 defaults = 全部 options（舊「帶官方」行為）。
+  const applyDefaults = () => {
     const next = [...value];
-    for (const o of options) {
+    for (const o of defaults ?? options) {
       if (next.some((v) => v._src === "official" && officialMatch(v, o))) continue; // 已選官方→跳過
       const ref: SourceRef = o.srcs?.[0] ?? { ocs_code: "", occupation_name: "", code: o.code };
       next.push({ code: o.code, name: o.name, _id: newId(), _src: "official", _ref: ref });
@@ -89,14 +96,15 @@ export function FieldCombobox({
 
   const toggleList = (
     <CommandGroup>
-      {options.map((o) => {
+      {options.map((o, i) => {
         const k = keyOf(o);
         return (
           <CommandItem key={k} value={`${o.code} ${o.name}`} onSelect={() => toggle(o)} className="items-start">
             <Check className={"mt-0.5 h-3.5 w-3.5 " + (isOfficialSelected(o) ? "opacity-100" : "opacity-0")} />
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-1">
-                {o.code ? <span className="font-mono text-xs text-muted-foreground">{o.code}</span> : null}
+                {/* W1：系統碼不上選單——無碼（池選項）顯序號；類別選單有真實分類碼照顯 */}
+                <span className="font-mono text-xs text-muted-foreground">{o.code || `${i + 1}.`}</span>
                 <span className="flex-1">{o.name}</span>
               </div>
               <SourceLine srcs={o.srcs} />
@@ -189,7 +197,7 @@ export function FieldCombobox({
             <button type="button" className="inline-flex items-center text-muted-foreground hover:text-foreground" title="加自訂（空白列）" onClick={addBlank}>
               <Plus className="h-4 w-4" />
             </button>
-            <button type="button" className="text-xs text-muted-foreground hover:text-foreground" onClick={selectAllOfficial}>帶官方</button>
+            <button type="button" className="text-xs text-muted-foreground hover:text-foreground" onClick={applyDefaults}>自動勾選</button>
           </div>
         </div>
         {selectedView}
@@ -213,7 +221,7 @@ export function FieldCombobox({
         <Button type="button" variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground" title="加自訂（空白列）" onClick={addBlank}>
           <Plus className="h-4 w-4" />
         </Button>
-        <Button type="button" variant="ghost" size="sm" className="text-xs text-muted-foreground" onClick={selectAllOfficial}>帶官方</Button>
+        <Button type="button" variant="ghost" size="sm" className="text-xs text-muted-foreground" onClick={applyDefaults}>自動勾選</Button>
       </div>
     </div>
   );

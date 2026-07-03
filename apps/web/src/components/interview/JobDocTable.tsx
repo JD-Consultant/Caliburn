@@ -19,6 +19,7 @@ import {
 } from "@/lib/ocsDoc";
 import { useHeaderMeta } from "@/hooks/useDocument";
 import { useTaskLevel } from "@/hooks/useTaskCatalog";
+import { taskUrn } from "@/lib/urn";
 import { attitudeOptions } from "@/lib/headerMeta";
 import { FieldCombobox } from "./fields/FieldCombobox";
 import { OfficialMenu } from "./fields/OfficialMenu";
@@ -145,8 +146,9 @@ function TaskRow({
   const level = block?.competency_level;
   const tc = task.task_codes?.[0];
   // 級別來源：打開下拉時即時查該任務的官方級別（fallback 用帶官方時記下的 _levelSrc）。
+  // 快取鍵用身分 URN(A1);位置碼僅供 fallback 打 /ai/*。
   const [levelOpen, setLevelOpen] = useState(false);
-  const fetchedLevel = useTaskLevel(profileId, tc?.code ?? "", levelOpen);
+  const fetchedLevel = useTaskLevel(profileId, taskUrn(task.provenance), tc?.code ?? "", levelOpen);
   const officialLevel = fetchedLevel ?? task._levelSrc?.level ?? null;
   const levelSrc: SourceRef = {
     ocs_code: unitSource?.ocs_code ?? task._levelSrc?.ocs_code ?? "",

@@ -11,7 +11,8 @@ import { useState } from "react";
 // referenced per-hook by agentId ("jd_authoring"); the runtime route registers it.
 
 // 持久化版本印記:schema/契約破壞性變更時 bump → 自動失效舊快取（spec D-1d）。
-const PERSIST_BUSTER = "ocs-v4-1";
+// v4-2:task-catalogs 鍵改任務身分 URN(A1),舊位置碼鍵的持久化快取作廢。
+const PERSIST_BUSTER = "ocs-v4-2";
 const MAX_AGE = 1000 * 60 * 60 * 24; // 24h；被持久化 query 的 gcTime 需 ≥ 此值。
 
 export function Providers({ children }: { children: React.ReactNode }) {

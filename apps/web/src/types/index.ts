@@ -275,6 +275,44 @@ export interface OptionItem {
 }
 
 // 批次 task-catalogs（階段1）：每任務官方 catalog（K/S/O/P + level）。
+// ── 知識包(ADR 0021):選職類後一次抓齊,所有選單的資料源;每官方值帶 srcs ──
+// 鍵語意:值池 key=name/text、三類池 key=分類碼;tasks 池 srcs=source_tasks 的 URN;
+// source_tasks 鍵=任務 URN。欄位名照 indexer-contract(手寫型別,ADR 0021 契約裁決)。
+export interface PackSrc {
+  ocs_code: string; ocs_name: string;
+  ocu_code?: string | null; ocu_name?: string | null;
+  task_code?: string | null; task_name?: string | null;
+  code?: string | null; competency_level?: number | null;
+}
+export interface PoolRow { srcs: PackSrc[] }
+export interface CodedPoolRow extends PoolRow { name: string }   // 三類池(key=國家分類碼)
+export interface SourceTask {
+  ocs_code: string; ocs_name: string;
+  ocu_code?: string | null; ocu_name?: string | null;
+  task_code: string; task_name: string;
+  competency_level: number | null;
+  o_refs: string[]; p_refs: string[]; k_refs: string[]; s_refs: string[];
+}
+export interface KnowledgePack {
+  occupation_details: {
+    ocs_code: string;
+    ocs_name: { job_category_name?: string | null; occupation_name?: string | null };
+    job_description: string; ocs_level: number | null;
+  }[];
+  pools: {
+    units: Record<string, PoolRow>;
+    tasks: Record<string, { srcs: string[] }>;
+    knowledge: Record<string, PoolRow>; skills: Record<string, PoolRow>;
+    outputs: Record<string, PoolRow>; indicators: Record<string, PoolRow>;
+    attitudes: Record<string, PoolRow>;
+    job_categories: Record<string, CodedPoolRow>;
+    occupations: Record<string, CodedPoolRow>; industries: Record<string, CodedPoolRow>;
+    prerequisites: Record<string, PoolRow>; supplements: Record<string, PoolRow>;
+  };
+  source_tasks: Record<string, SourceTask>;
+  meta?: DegradeMeta;
+}
+
 export interface TaskCatalogEntry {
   knowledge: { code: string; name: string }[];
   skills: { code: string; name: string }[];

@@ -37,7 +37,8 @@ npm run lint
 | `["document", id]` | of-record 信封 `{id, version, revision, status, content}` | 0 | **否(刻意)** |
 | `["header-meta", id]` | 表頭候選池(職類/職業/行業/態度/notes,server 端已聯集去重+溯源) | 5min | **是** |
 | `["task-candidates", id]` | 任務候選(依職類→職責分組) | 5min | 否 |
-| `["task-catalogs", id]` | 批次每任務官方 K/S/O/P+level(ADR 0016) | 5min | **是** |
+| `["task-catalogs", id]` | 批次每任務官方 K/S/O/P+level(鍵=任務 URN;ADR 0016,P3 後退役) | 5min | **是** |
+| `["knowledge", id]` | **知識包**(occupation_details+12 池+source_tasks,每官方值帶 srcs;ADR 0021)——選職類後背景預載,P3 起逐面取代上面三個池 query | 24h | **是** |
 | `["task-catalog", id, taskKey]` | 單任務 catalog(由批次 seed;cache miss 才 fallback 打 `/ai/*`) | 5min | 否 |
 
 **核心不變量:document 是「可寫的工作狀態」,其餘全是「唯讀參考池」。** 這條線決定一切:
@@ -81,7 +82,7 @@ provenance 跳過)→ setQueryData(document) + invalidate profiles。
 
 ### 5. 重載還原(持久化)
 
-`PersistQueryClientProvider`(localStorage `caliburn-rq-cache`,buster `ocs-v4-1`,maxAge 24h)
+`PersistQueryClientProvider`(localStorage `caliburn-rq-cache`,buster `ocs-v4-2`,maxAge 24h)
 只還原標了 `meta.persist === true` 的 query(= header-meta、task-catalogs)。task-catalogs 還原後
 由 effect 重新 seed 各 `["task-catalog", id, taskKey]`。document 永遠重新 GET(of-record 即時)。
 

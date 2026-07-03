@@ -7,6 +7,7 @@ import type {
   ExtractTasksResult,
   HeaderMeta,
   JobProfile,
+  KnowledgePack,
   OcsDocument,
   OcsSearchHit,
   PickedTask,
@@ -142,6 +143,10 @@ export const buildTasks = (profileId: string, picked: PickedTask[]) =>
 // 表頭候選池（D29）：多 OCS 官方 metadata 聯集（職類/職業/行業/態度/notes）+ 主基準。
 export const getHeaderMeta = (profileId: string) =>
   request<HeaderMeta>(`/job-profiles/${profileId}/header-meta`);
+
+// 知識包(ADR 0021):選職類後一次抓齊(occupation_details + 12 池 + source_tasks)。
+export const getKnowledge = (profileId: string) =>
+  request<KnowledgePack>(`/job-profiles/${profileId}/knowledge`);
 
 // 職類目錄搜尋:全域集合、根層（ADR 0019）。回應欄位 = 複數資源名（AIP-132）。
 export const ocsSearch = (q: string) =>

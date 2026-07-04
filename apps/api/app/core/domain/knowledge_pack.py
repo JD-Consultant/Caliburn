@@ -106,3 +106,13 @@ def build_pack(order: list[str], details: dict[str, OccupationDetail],
                     if node["competency_level"] is None and s.competency_level is not None:
                         node["competency_level"] = s.competency_level
     return pack
+
+
+def similarity_items(pack: dict) -> dict[str, list[dict]]:
+    """v1 兩表面的 items:match 輸入(ADR 0022,spec §3)。sources 排序去重 → 決定論。
+    態度池 srcs = dict(取 ocs_code);任務池 srcs = URN "ocs:{ocs_code}:T:{code}"(取第 2 段)。"""
+    att = [{"id": k, "text": k, "sources": sorted({s["ocs_code"] for s in row["srcs"]})}
+           for k, row in pack["pools"]["attitudes"].items()]
+    task = [{"id": k, "text": k, "sources": sorted({u.split(":")[1] for u in row["srcs"]})}
+            for k, row in pack["pools"]["tasks"].items()]
+    return {"attitude": att, "task": task}

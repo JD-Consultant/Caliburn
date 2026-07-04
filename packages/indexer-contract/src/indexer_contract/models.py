@@ -25,11 +25,6 @@ class TaskBatchGetRequest(_Base):
     ids: list[str] = Field(min_length=1)
 
 
-class FindSimilarRequest(_Base):
-    ocs_codes: list[str] = Field(min_length=1)
-    score_threshold: float = Field(0.85, ge=0.0, le=1.0)
-
-
 class MatchItem(_Base):
     id: str
     text: str
@@ -159,23 +154,6 @@ class TaskDetail(_Base):
 
 class TasksResponse(_Base):
     tasks: list[TaskDetail] = Field(default_factory=list)
-
-
-class SimilarTaskRef(_Base):
-    urn: str = ""
-    ocs_code: str = ""
-    task_code: str = ""
-    task_name: str = ""
-
-
-class SimilarPair(_Base):
-    left: SimilarTaskRef
-    right: SimilarTaskRef
-    score: float
-
-
-class FindSimilarResponse(_Base):
-    candidates: list[SimilarPair] = Field(default_factory=list)
 
 
 # ── items:match 相似比對(ADR 0022)。pair 命名照 Splink left/right 慣例(禁用 a/b)──

@@ -11,8 +11,6 @@ from fastapi.responses import JSONResponse
 from jd_ocs_indexer.api import service
 from jd_ocs_indexer.api.schemas import (
     CompetencyPool,
-    FindSimilarRequest,
-    FindSimilarResponse,
     HealthResponse,
     MatchRequest,
     MatchResponse,
@@ -62,15 +60,6 @@ async def batch_get_tasks(req: TaskBatchGetRequest, request: Request):
     return await run_in_threadpool(
         service.batch_get_tasks, app.state.client,
         app.state.settings.qdrant_collection, ids=req.ids)
-
-
-@router.post("/tasks:findSimilar", response_model=FindSimilarResponse)
-async def find_similar_tasks(req: FindSimilarRequest, request: Request):
-    app = request.app
-    return await run_in_threadpool(
-        service.find_similar_tasks, app.state.client,
-        app.state.settings.qdrant_collection,
-        ocs_codes=req.ocs_codes, score_threshold=req.score_threshold)
 
 
 # 相似比對(ADR 0022):池進 → {真重複群, 灰區對} 出。確定性、非破壞;

@@ -188,7 +188,49 @@ ADR 0020 混合主導權=「人隨時直接改文件」。場景:訪談到第 3 
   適用輪廓=長時運算、外呼鏈重、一個邏輯交易跨多脆弱步驟。我們的回合=短請求
   (讀 DB→≤2 次 LLM→寫 DB),等待都是**人速**、狀態靜置 DB → 不需要 durable-execution 引擎。
 
-## 5. 待決 / 下輪
+## 5. 輪 5 — 2026 編排框架版圖(維護者指示:LangGraph 是舊決策,重新選;2026-07-05)
+
+### 5.1 版圖掃描(權威比較文)
+
+([Speakeasy 框架比較](https://www.speakeasy.com/blog/ai-agent-framework-comparison/)、
+[AliceLabs 2026 production-tested 排名](https://alicelabs.ai/en/insights/best-ai-agent-frameworks-2026)、
+[open-techstack LangGraph vs OpenAI SDK vs PydanticAI](https://open-techstack.com/blog/langgraph-vs-openai-agents-sdk-vs-pydanticai-2026/)、
+[AWS Builder 選型指南](https://builder.aws.com/content/3AzsgG6TreTO3uLRqpWNxfEyUhe/picking-an-ai-agent-framework-in-2026))
+
+| 候選 | 2026 定位 | 對本案 |
+|---|---|---|
+| LangGraph | 「複雜**有狀態** workflow 首選」;persistence/HITL 最成熟;學習曲線最陡 | 強項(私有 durable 圖狀態)被我們的判別場景(人隨時改文件→單一真相)**判定為反特性**(輪 3) |
+| Claude Agent SDK | Anthropic-native 自主 agent harness(subagent/hooks/MCP) | 我們是 workflow 不是自主 agent;YAGNI |
+| OpenAI Agents SDK | GPT 中心輕量 harness;2026-04 加沙箱/子代理 | provider 傾斜;同上 |
+| CrewAI / AutoGen | 多 agent 角色協作 | 用不到 |
+| **Pydantic AI** | 「type-safe Python + FastAPI 人體工學首選」;~17k stars;structured output 內建於 run loop | **與 repo 天然契合**(契約全 pydantic、FastAPI);見 5.2 |
+| 無框架(own loop) | 2026 趨勢明言:「**less framework, more model**——好框架在變薄不變厚」 | 12-factor + Anthropic 雙背書;骨幹本就簡單 |
+
+### 5.2 Pydantic AI 承重細節驗證(官方文件)
+
+- **三種輸出模式**([官方](https://pydantic.dev/docs/ai/core-concepts/output/)):`ToolOutput`(預設,tool call)/
+  **`NativeOutput` = provider 原生 structured output(受限解碼:「model is forced to only output
+  text matching the provided JSON schema」)** / `PromptedOutput`(提示層降級)——
+  **正好是輪 2 判準表的三層,現成的降級鏈**。
+- **OpenRouter 有專屬 provider 類**(`OpenRouterProvider`,[官方](https://pydantic.dev/docs/ai/models/openai/))
+  ——現有接線直接用。
+- HITL deferred tools / durable 整合([Restate](https://pydantic.dev/articles/restate-durable-execution-pydanticai))
+  都有但**我們不買**——只當 **typed client library** 用,不當編排框架用。
+
+### 5.3 關鍵洞見:骨幹選 (B) 之後,「框架題」拆成兩個小題
+
+1. **編排(骨幹)用什麼?** → **自己的碼**(FastAPI route + service + DB 進度列)。
+   六階段軌道是顯式 Python,不需要編排框架。(12-factor own control flow;
+   2026 趨勢「less framework」;Temporal/LangGraph 都是為我們沒有的問題設計的。)
+2. **回合內 LLM 呼叫用什麼庫?** → 框架唯一真正幫得上忙的地方:typed structured output +
+   retries + provider 切換。候選:現狀 `langchain_openai`(只當 HTTP client,無 structured
+   output 人體工學)vs **Pydantic AI 當 `LlmPort` adapter 內裝**(NativeOutput 兌現
+   `select_schema`;六邊形不破——domain 只認 port,adapter 內裝可換)。
+
+**誠實記錄**:LangGraph 在 2026 泛用排名仍是「stateful workflow 安全牌」;我們偏離的理由
+**不是它爛,是本案的共編需求使其核心價值變成反特性**(場景特定,非泛用判斷)。
+
+## 6. 待決 / 下輪
 
 1. **引擎骨幹定案**(輪 3+4 證據齊,待維護者裁示:(B)無狀態回合服務?)
 2. **tool 協定**:indexer 工具(檢索 / items:match)進引擎是「LLM function-calling tools」
@@ -197,7 +239,7 @@ ADR 0020 混合主導權=「人隨時直接改文件」。場景:訪談到第 3 
 4. **最小實作切片**收斂:候選 = `extract_tasks` 升 `select_schema`(受限解碼版,接現行編輯器,
    不碰訪談 loop)——待骨幹定案後定。
 
-## 6. 來源
+## 7. 來源
 
 **大廠官方**:[Anthropic Building Effective Agents](https://www.anthropic.com/research/building-effective-agents) ·
 [Writing tools for agents](https://www.anthropic.com/engineering/writing-tools-for-agents) ·

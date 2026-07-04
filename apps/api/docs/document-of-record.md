@@ -42,8 +42,10 @@ deep copy(draft)
 ```
 
 **`_strip_underscore`**:遞迴走 dict/list,`pop` 掉任何 `_` 開頭的鍵——涵蓋 unit/task 的 `_uid/_tid/_notes`、
-葉節點 O/P/K/S/態度/類別的 `_id/_src/_ref/_levelSrc`,以及**任何未來新增的 `_` 欄**。draft 存進 DB **會**帶 `_` 欄
-(前端 UI 用),但 finalize / export 後**契約 JSON 純淨**。
+葉節點 O/P/K/S/態度/類別的 `_id/_src/_ref/_levelSrc`、`ocs_profile._levelSrc`(表頭基準級別來源)、
+`notes._prerequisites`/`_supplements`(NoteItem 影子列——**notes 的唯一真相**;契約欄 `notes.prerequisites`/
+`supplements` 是前端由影子列導出的 `string[]`,剝殼後留),以及**任何未來新增的 `_` 欄**。draft 存進 DB
+**會**帶 `_` 欄(前端 UI 用),但 finalize / export 後**契約 JSON 純淨**。
 
 ## 4. `validate` — 嚴格檢查(回字串,不丟例外)
 

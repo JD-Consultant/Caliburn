@@ -290,7 +290,19 @@ Harvey 2026 [推出自主 agent 端到端起草](https://mlq.ai/news/harvey-a-la
 我們的輸入是**人腦裡的隱性知識**——訪談本質上必須互動。結論:不推翻 workflow-first,
 但佐證「葉子 agentic 可漸進擴權」是對的升級形狀(骨幹不變,葉子隨信任加深放權)。
 
-## 7. 待決 / 下輪
+## 7. 輪 7 — 需求訪談(維護者;2026-07-05)
+
+| 需求題 | 維護者裁示 | 架構意涵 |
+|---|---|---|
+| 黃金範本 | **沒有現成 → 研究合成**(工作分析方法論+實務範本→樣板給維護者審) | 樣板反推槽位表+rubric |
+| 寫入節奏 | **靈活,無固定回合**——顧問問到一定程度先寫任務;或先列職責→深問→中途發現漏職責回頭補;寫了還會改 | **六階段=軟進度(宏觀),微觀導航=LLM 從有限指令集選**(`DraftSection`/`AskFollowUp`/`AddDuty`/`ReviseSection`/`AdvancePhase`…)=CALM Command 模式;靈活在指令選擇,安全在指令集枚舉+覆蓋率/飽和確定性檢查 |
+| 修正權限 | **AI 提議+寫;人編輯/確認/取消**;對話中可彈選單讓人選/改(要研究) | staged proposal-apply(ADR 0015 對齊);+「對話中結構化 widget」研究題 |
+| v1 對談者 | **員工**;做完後顧問看文件+訪談內容(審閱者) | 員工語氣/防呆;**溯源到原話=顧問稽核依據**,權重再升 |
+
+**確立的研究議程**:R1 黃金範本合成(最優先,是其他一切的尺)· R2 指令詞彙表+覆蓋率/飽和設計
+(mixed-initiative 訪談編排)· R3 提議+寫的 UX(staged 提議+對話中 widget)。
+
+## 8. 待決 / 下輪
 
 1. **引擎骨幹定案**(輪 3+4 證據齊,待維護者裁示:(B)無狀態回合服務?)
 2. **tool 協定**:indexer 工具(檢索 / items:match)進引擎是「LLM function-calling tools」
@@ -299,7 +311,7 @@ Harvey 2026 [推出自主 agent 端到端起草](https://mlq.ai/news/harvey-a-la
 4. **最小實作切片**收斂:候選 = `extract_tasks` 升 `select_schema`(受限解碼版,接現行編輯器,
    不碰訪談 loop)——待骨幹定案後定。
 
-## 8. 來源
+## 9. 來源
 
 **大廠官方**:[Anthropic Building Effective Agents](https://www.anthropic.com/research/building-effective-agents) ·
 [Writing tools for agents](https://www.anthropic.com/engineering/writing-tools-for-agents) ·

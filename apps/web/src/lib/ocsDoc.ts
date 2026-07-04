@@ -80,7 +80,9 @@ export function ensureIds(doc: OcsDocument | undefined): OcsDocument | undefined
   return next;
 }
 
-// 結構變動後重新遞進編號：職責 T1,T2…；任務 T{u}.{t}。名稱/區塊/provenance 不動。
+// 唯一重編點:所有位置碼(職責 T#、任務 T#.#、O/P 任務範圍、態度 A、文件級 K/S)
+// 都在這裡依當前位置重寫;冪等,結構變動與內容編輯的 setter 收尾都走這裡,
+// 「漏重編」類 bug 結構上不可能發生。名稱/區塊/provenance/_id 不動。
 function renumber(doc: OcsDocument): OcsDocument {
   const units = doc.ocs_content?.ocu_units ?? [];
   units.forEach((u, ui) => {
@@ -91,13 +93,14 @@ function renumber(doc: OcsDocument): OcsDocument {
       t.task_codes = [tc, ...(t.task_codes ?? []).slice(1)];
       const b = t.competency_blocks?.[0];
       if (b) {
-        // O/P 是任務範圍位置碼:任務位置變了要跟著重編(同 setOp;身分由 _id 維持)
+        // O/P 是任務範圍位置碼:任務位置變了要跟著重編(身分由 _id 維持)
         renumberCoded(b.outputs ?? [], `O${ui + 1}.${ti + 1}.`);
         renumberCoded(b.indicators ?? [], `P${ui + 1}.${ti + 1}.`);
       }
     });
   });
-  renumberDocKS(doc); // K/S 首現序隨任務順序變，結構變動一併重編
+  renumberCoded(doc.ocs_attitude?.attitudes ?? [], "A"); // 態度全域位置碼(A01…)
+  renumberDocKS(doc); // K/S 首現序隨任務順序變，一併重編
   return doc;
 }
 
@@ -410,12 +413,10 @@ export function setOp(
 ): OcsDocument {
   const next = clone(doc);
   const block = ensureBlock(next, unitIdx, taskIdx);
-  const taskNum = (next.ocs_content.ocu_units[unitIdx].tasks[taskIdx].task_codes?.[0]?.code ?? "").replace(/^T/i, "");
-  block.outputs = [...outputs];
-  block.indicators = [...indicators];
-  renumberCoded(block.outputs, `O${taskNum}.`);
-  renumberCoded(block.indicators, `P${taskNum}.`);
-  return next;
+  // 淺拷貝每個 item:renumber 就地改 code,不可污染呼叫端(cache 舊快照)的物件。
+  block.outputs = outputs.map((o) => ({ ...o }));
+  block.indicators = indicators.map((i) => ({ ...i }));
+  return renumber(next);
 }
 
 export function setKS(
@@ -427,9 +428,8 @@ export function setKS(
 ): OcsDocument {
   const next = clone(doc);
   const block = ensureBlock(next, unitIdx, taskIdx);
-  block[field] = [...items];
-  renumberDocKS(next);
-  return next;
+  block[field] = items.map((it) => ({ ...it }));
+  return renumber(next);
 }
 
 // ── 工作筆記 _notes（D28，非契約欄；finalize/export 後端剝除） ────────────────
@@ -474,10 +474,8 @@ export function setTaskLevel(
 
 export function setAttitudes(doc: OcsDocument, items: CodeName[]): OcsDocument {
   const next = clone(doc);
-  const list = [...items];
-  renumberCoded(list, "A"); // 位置序碼即遞增（A01、A02…）；身分由 _id 維持。
-  next.ocs_attitude = { attitudes: list };
-  return next;
+  next.ocs_attitude = { attitudes: items.map((it) => ({ ...it })) }; // 拷貝再交給 renumber 給碼
+  return renumber(next);
 }
 
 export function completion(doc: OcsDocument): number {

@@ -129,7 +129,12 @@ src/jd_ocs_indexer/
   validation/             # stats、smoke_query、search(build_filter + dense/hybrid RRF,CLI+API 共用)
   api/                    # 查詢 API(extra):schemas、service(無狀態編排,可 fake 測)、
                           #   routes(threadpool + embed lock)、app(create_app factory)、urn.py
+  matching/               # 相似比對(ADR 0022):core.py(純規則:門檻/清洗/分帶/星型)、
+                          #   service.py(管線:collapse→embed→score→組回應;不碰 Qdrant)
 ```
+
+另有 `scripts/calibrate_match.py`(app 根):門檻校準,與生產共用 `matching` 的
+collapse/score_pairs(校準即生產);輸出留 `docs/specs/` 當校準紀錄。
 
 ## CLI reference
 

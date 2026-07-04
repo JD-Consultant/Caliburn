@@ -45,7 +45,7 @@ cd apps/ocs-indexer && uv run jd-ocs-indexer index ./data/jd-json   # 建 Qdrant
 
 ### 測試 / Lint(提交前)
 ```bash
-npx turbo test                  # 三個 Python app（api / ocs-indexer / pdf-to-json）
+npx turbo test                  # api / ocs-indexer / pdf-to-json（pytest）+ web（vitest）
 cd apps/web && npx tsc --noEmit && npm run lint
 ```
 

@@ -17,8 +17,10 @@ from collections import defaultdict
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
+from jd_ocs_indexer.api.schemas import MatchItem  # noqa: E402
 from jd_ocs_indexer.embeddings.http_embedder import HttpEmbedder  # noqa: E402
 from jd_ocs_indexer.matching import core  # noqa: E402
+from jd_ocs_indexer.matching import service as matching  # noqa: E402
 
 DATA = os.path.join(os.path.dirname(__file__), "..", "data", "jd-json")
 EMBEDDER_URL = os.getenv("EMBEDDER_URL", "http://localhost:8082")
@@ -69,44 +71,30 @@ def run_combo(embedder: HttpEmbedder, name: str, codes: list[str]) -> dict:
     report = {}
     for kind in sorted(pools):
         th_hi, th_lo = core.THRESHOLDS[kind]
-        # ①② 清洗 + NFKC exact-collapse(與生產同碼)
-        seen: dict[str, tuple[str, str, set[str]]] = {}
-        order: list[str] = []
-        exact = 0
-        for id_, raw, src in pools[kind]:
-            text = core.preprocess(raw)
-            if not text:
-                continue
-            k = core.collapse_key(text)
-            if k in seen:
-                exact += 1
-                seen[k][2].add(src)
-            else:
-                seen[k] = (id_, text, {src})
-                order.append(k)
-        uniq = [seen[k] for k in order]
-        # ③④ 嵌入 + 跨來源兩兩
-        vecs = [v.dense for v in embedder.embed_texts([t for _, t, _ in uniq])]
+        # ①②④ 走生產同一套管線(matching.service:collapse + score_pairs)——校準即生產。
+        # id 加序號保唯一(髒資料同代碼可掛異名;生產的池 key 天然唯一,校準得自己保)。
+        items = [MatchItem(id=f"{i}#{n}", text=t, sources=[s])
+                 for n, (i, t, s) in enumerate(pools[kind])]
+        pool = matching.collapse(items)
+        exact = len(items) - len(pool.ids) - sum(1 for i, t, s in pools[kind] if not core.preprocess(t))
+        vectors = [v.dense for v in embedder.embed_texts(pool.texts)]   # ③
+        scores = matching.score_pairs(pool, vectors)
+        text_of = dict(zip(pool.ids, pool.texts))
         hist: dict[float, int] = defaultdict(int)
-        pairs: list[tuple[float, int, int]] = []
-        for x in range(len(uniq)):
-            for y in range(x + 1, len(uniq)):
-                if uniq[x][2] & uniq[y][2]:
-                    continue
-                s = core.cosine(vecs[x], vecs[y])
-                hist[round(s, 1)] += 1
-                pairs.append((s, x, y))
+        for s in scores.values():
+            hist[round(s, 1)] += 1
+        pairs = [(s, *sorted(p)) for p, s in scores.items()]
         dup, gray = core.band(pairs, th_hi, th_lo)
-        n_cross = sum(hist.values())
-        print(f"\n[{kind}] 池 {len(pools[kind])} → 唯一 {len(uniq)}(exact 收斂 {exact})"
+        n_cross = len(scores)
+        print(f"\n[{kind}] 池 {len(pools[kind])} → 唯一 {len(pool.ids)}(exact 收斂 {exact})"
               f" | 跨來源對 {n_cross} | ≥{th_hi}: {len(dup)} 對 | 灰區 [{th_lo},{th_hi}): {len(gray)} 對")
         top = sorted(hist.items(), reverse=True)[:6]
         print(f"  分布(高分帶):{['%.1f:%d' % (b, c) for b, c in top]}")
-        for s, x, y in sorted(dup, reverse=True)[:5]:
-            print(f"    DUP  {s:.3f}{uniq[x][1][:26]}{uniq[y][1][:26]}")
-        for s, x, y in sorted(gray, reverse=True)[:10]:
-            print(f"    GRAY {s:.3f}{uniq[x][1][:26]}{uniq[y][1][:26]}")
-        report[kind] = {"pool": len(pools[kind]), "uniq": len(uniq), "exact": exact,
+        for s, i, j in sorted(dup, reverse=True)[:5]:
+            print(f"    DUP  {s:.3f}{text_of[i][:26]}{text_of[j][:26]}")
+        for s, i, j in sorted(gray, reverse=True)[:10]:
+            print(f"    GRAY {s:.3f}{text_of[i][:26]}{text_of[j][:26]}")
+        report[kind] = {"pool": len(pools[kind]), "uniq": len(pool.ids), "exact": exact,
                         "cross": n_cross, "dup": len(dup), "gray": len(gray)}
     return report
 

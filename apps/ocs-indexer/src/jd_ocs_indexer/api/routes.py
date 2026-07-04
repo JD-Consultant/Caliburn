@@ -82,6 +82,9 @@ async def match_items(req: MatchRequest, request: Request):
         raise HTTPException(status_code=413, detail={"code": "too_many_items", "max": 500})
     if req.kind not in core.THRESHOLDS:
         raise HTTPException(status_code=422, detail={"code": "unknown_kind", "kind": req.kind})
+    if len({it.id for it in req.items}) != len(req.items):
+        # id 唯一是管線前置條件(collapse/score 以 id 為鍵;撞號會靜默吃掉配對)
+        raise HTTPException(status_code=422, detail={"code": "duplicate_item_ids"})
 
     def _run():
         with app.state.embed_lock:

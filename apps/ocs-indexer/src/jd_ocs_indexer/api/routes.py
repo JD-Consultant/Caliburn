@@ -26,6 +26,7 @@ from jd_ocs_indexer.api.schemas import (
     TasksResponse,
 )
 from jd_ocs_indexer.matching import core
+from jd_ocs_indexer.matching import service as matching_service
 
 router = APIRouter()
 
@@ -84,7 +85,7 @@ async def match_items(req: MatchRequest, request: Request):
 
     def _run():
         with app.state.embed_lock:
-            return service.match_items(app.state.embedder, kind=req.kind, items=req.items)
+            return matching_service.match_items(app.state.embedder, kind=req.kind, items=req.items)
 
     try:
         return await run_in_threadpool(_run)

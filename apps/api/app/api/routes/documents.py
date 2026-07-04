@@ -208,4 +208,18 @@ async def get_knowledge_pack(
         raise HTTPException(status_code=502, detail="indexer unavailable")
     pack = knowledge_pack.build_pack(ok, details, tasks_by, pools_by)
     pack["meta"] = {"partial": len(ok) < len(codes)}
+    # 相似比對(ADR 0022,enrichment):失敗不擋池;降級顯式標 meta.similarity。
+    sim: dict = {}
+    items_by_kind = knowledge_pack.similarity_items(pack)
+    results = await asyncio.gather(
+        *(knowledge.match(kind, items) for kind, items in items_by_kind.items()),
+        return_exceptions=True)
+    for kind, r in zip(items_by_kind.keys(), results):
+        if isinstance(r, BaseException):
+            logger.warning("knowledge: match(%s) failed; degrading", kind, exc_info=r)
+        else:
+            sim[kind] = r.model_dump()
+    pack["similarity"] = sim
+    pack["meta"]["similarity"] = (
+        "ok" if len(sim) == len(items_by_kind) else ("partial" if sim else "unavailable"))
     return pack

@@ -124,3 +124,14 @@ def test_empty_input_gives_empty_shape():
         "indicators", "attitudes", "job_categories", "occupations", "industries",
         "prerequisites", "supplements"}
     assert all(v == {} for v in p["pools"].values())
+
+
+def test_similarity_items_from_pools():
+    pack = {"pools": {
+        "attitudes": {"主動積極": {"srcs": [{"ocs_code": "OC1", "ocs_name": "n", "code": "A1"},
+                                            {"ocs_code": "OC2", "ocs_name": "n", "code": "A2"}]}},
+        "tasks": {"巡檢": {"srcs": ["ocs:OC1:T:T1.1", "ocs:OC2:T:T2.2"]}},
+    }}
+    items = kp.similarity_items(pack)
+    assert items["attitude"] == [{"id": "主動積極", "text": "主動積極", "sources": ["OC1", "OC2"]}]
+    assert items["task"] == [{"id": "巡檢", "text": "巡檢", "sources": ["OC1", "OC2"]}]

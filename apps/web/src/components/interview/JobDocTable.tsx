@@ -18,7 +18,7 @@ import {
   setTaskLevel,
 } from "@/lib/ocsDoc";
 import { useKnowledge } from "@/hooks/useKnowledge";
-import { isOfficialBasis, ownTaskRefs, primaryDefaults, valuePoolOptions } from "@/lib/pack";
+import { groupedValueOptions, isOfficialBasis, ownTaskRefs, primaryDefaults, valuePoolOptions } from "@/lib/pack";
 import { taskUrns } from "@/lib/urn";
 import { FieldCombobox } from "./fields/FieldCombobox";
 import { OfficialMenu } from "./fields/OfficialMenu";
@@ -294,9 +294,11 @@ function AttitudeBlock({
 }) {
   // 態度池 key=name（A5：文件自編碼跨職類必撞，不當 key）；選單序號顯示+引用行。
   // defaults=主基準來源(spec 2026-07-04 §4;主基準空白/自訂不套)。
+  // 相似比對(ADR 0022):defaults/自動套跑在**平選項**(鐵律);分群只變顯示清單。
   const primary = doc.ocs_profile?.ocs_code ?? "";
-  const options = pack ? valuePoolOptions(pack.pools.attitudes) : [];
-  const defaults = pack && isOfficialBasis(pack, primary) ? primaryDefaults(options, primary) : [];
+  const flat = pack ? valuePoolOptions(pack.pools.attitudes) : [];
+  const options = pack ? groupedValueOptions(flat, pack.similarity?.attitude, primary) : [];
+  const defaults = pack && isOfficialBasis(pack, primary) ? primaryDefaults(flat, primary) : [];
   return (
     <div className="rounded-lg border bg-background p-4">
       <FieldCombobox

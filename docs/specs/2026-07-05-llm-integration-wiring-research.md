@@ -362,7 +362,57 @@ inventory);等多久=work context;準備什麼材料=inputs+Tools & Technology�
 2. **schema 擴充問題更清晰**:8.2 的 ⊕ 項與 8.3 槽位是 OCS shape 沒有的
    → 契約題(進 ocs-contract 正式欄位 vs 敘述文字)現在有了具體清單可對著裁。
 
-## 9. 待決 / 下輪
+## 9. 輪 9 — R2 指令詞彙表 + 覆蓋率/飽和設計草案(2026-07-05)
+
+> 樣張(§8.4)維護者暫定通過(v0,實作驗證中修)。
+
+### 9.1 依據
+
+- **CALM 實戰指令集只有 ~6 個**([官方參考](https://rasa.com/docs/reference/config/components/llm-command-generators/)):
+  `start flow` / `set slot` / `disambiguate` / `search and reply` / `cancel flow` / `repeat`——
+  **小詞彙表足以撐住銀行級對話**;詞彙表小=受限解碼 enum 小=可靠。
+- **追問停止無標準判準**(2026 現況):[Nature 2026](https://www.nature.com/articles/s41598-026-46517-7)
+  每回合判斷「要不要追問」;評準含 **justified skip**(該跳而跳=品質);
+  [SparkMe](https://arxiv.org/pdf/2602.21136)、[LLM-as-an-Interviewer](https://arxiv.org/abs/2412.10424)
+  無停止規則時得靠 72 回合硬上限(反面教材);evidence-based termination
+  ([2604.14170](https://arxiv.org/pdf/2604.14170))=證據足夠即停。
+  → **三重保險**:硬上限(cap)+ 覆蓋率門檻(確定性)+ LLM 飽和信號(判斷)。
+
+### 9.2 訪談顧問指令詞彙表草案(每回合 LLM 輸出 1..n 指令;enum+參數 schema=受限解碼)
+
+| 類 | 指令 | 語意 | 信任機制 |
+|---|---|---|---|
+| 理解 | `set_slot(task, slot, value, quote)` | 填槽;**quote=員工原話必填(溯源內建於指令)** | value 自由文字;quote 必須是逐字稿子串(可程式驗證)|
+| 理解 | `correct_slot(…)` | 員工更正先前答案(CALM correction pattern)| 同上 |
+| 理解 | `add_duty / add_task(name, quote)` | **抓漏升格**:發現公版外職責/任務 | 同上 |
+| 推進 | `ask(question, target_slot)` | 追問(adaptive follow-up)| 受 9.3 三重保險節流 |
+| 推進 | `ask_choice(question, options[])` | 彈選單 widget(結構化決策)| options 來自池=目錄類 enum |
+| 推進 | `skip(target_slot, reason)` | justified skip(顯式記理由)| reason 落 trace 供稽核 |
+| 推進 | `advance(next_focus)` | 換任務/階段(軟階段推進)| **覆蓋率門檻放行才生效**(確定性)|
+| 寫入 | `draft_section(ref, content, sources[])` | 草擬文件段(標 AI 草稿)| **提議+寫**(staged;維護者裁示)|
+| 寫入 | `revise_section(ref, content, reason, sources[])` | 回頭優化 | 同上;人改過的段 → 只提議 |
+| 其他 | `clarify(options)` / `smalltalk_reply(text)` | 消歧 / 離題拉回(CALM patterns)| — |
+
+### 9.3 停止/覆蓋 guard(確定性,掛在指令外——LLM 不能繞過)
+
+1. **硬上限**:每槽追問 ≤2 次;每任務回合預算;全訪談軟預算(前端顯示進度)。
+2. **覆蓋率門檻**:core 任務 12 槽、淺掃 4 槽(樣張附錄雛形);`advance` 未達門檻
+   → 引擎拒絕並回缺口清單(LLM 只能續問或 justified skip)。
+3. **飽和信號**:LLM 每回合帶 `saturation` 判斷(再問無新資訊);三者綜合決定放行。
+
+### 9.4 一回合 trace 示例
+
+```
+員工:「上線前那兩天都在跑回歸,大概三百多條吧,自動的佔三分之二。」
+LLM 指令輸出(受限解碼):
+  set_slot(T2.2, volume, "回歸約300條;自動化200/手動100", quote="大概三百多條…自動的佔三分之二")
+  set_slot(T2.2, frequency, "每雙週上線前密集2天", quote="上線前那兩天都在跑回歸")
+  ask("自動化那部分的腳本是你自己維護嗎?大概多久要修一次?", target=T2.1.frequency)
+引擎(確定性):驗 quote 為逐字稿子串 → 寫進度列 → T2.2 覆蓋 9/12 → 未達門檻,不放行 advance
+  → 面板渲染下一題;文件側 T2.2 細項表即時長出兩格(標 AI 草稿)
+```
+
+## 10. 待決 / 下輪
 
 1. **引擎骨幹定案**(輪 3+4 證據齊,待維護者裁示:(B)無狀態回合服務?)
 2. **tool 協定**:indexer 工具(檢索 / items:match)進引擎是「LLM function-calling tools」
@@ -371,7 +421,7 @@ inventory);等多久=work context;準備什麼材料=inputs+Tools & Technology�
 4. **最小實作切片**收斂:候選 = `extract_tasks` 升 `select_schema`(受限解碼版,接現行編輯器,
    不碰訪談 loop)——待骨幹定案後定。
 
-## 10. 來源
+## 11. 來源
 
 **大廠官方**:[Anthropic Building Effective Agents](https://www.anthropic.com/research/building-effective-agents) ·
 [Writing tools for agents](https://www.anthropic.com/engineering/writing-tools-for-agents) ·

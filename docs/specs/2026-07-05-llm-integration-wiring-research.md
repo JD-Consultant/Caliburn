@@ -412,7 +412,74 @@ LLM 指令輸出(受限解碼):
   → 面板渲染下一題;文件側 T2.2 細項表即時長出兩格(標 AI 草稿)
 ```
 
-## 10. 待決 / 下輪
+## 10. 輪 10 — 四線並行深研統整(維護者指示 subagent 多路收集;2026-07-05)
+
+> 執行紀錄:4 個研究 agent 並行;C(權限模型)完整回報,A/B/D 撞 session 上限由主線補研。
+
+### 10.1 C 線:「人改過的段落只能提議」重審(維護者點名商榷)——**建議改軸**
+
+**業界 2025–26 獨立收斂**(四家同構):Word Copilot(詞級 Track Changes)、Google Docs
+Gemini(suggested edits,與人類協作者同一建議機制)、Cursor(staged diff + checkpoints)、
+GitHub Copilot(PR suggestions)——**「AI 可以自由地寫,但寫進待審層,不直接覆蓋定稿」**。
+
+**學術實證**(CHI/CSCW 2024–26):territoriality 真實存在(「你不會去碰別人的邏輯區塊」;
+CHI 2026:「我真的很討厭它在我不在場時做事」);**手動整合 AI 建議比自動整合帶來顯著更高的
+所有權感**;接受度條件=改動可見可區分、人有輕量 final say、不打斷心流、可逆可稽核。
+確認疲勞是設計問題:「每一個不帶認知重量的核准,都在教育使用者核准只是形式」(Anthropic:
+逐動作核准製造摩擦不必然帶來安全)。
+
+**建議模型:「雙通道 + 風險分流 + 節點批審」**(取代「人改過=永久降級為提議」):
+
+1. AI 自己寫、人沒碰過的段 → **直改** + 輕量標記 + 一鍵 undo;
+2. 人碰過的段 → AI **照樣寫,但寫進建議層**(inline 新舊對照 badge)——不彈窗、不阻塞;
+3. 審閱在**自然邊界**批次(小節談完/訪談尾聲總審;Accept all/逐條兩檔);
+4. 低風險維度豁免(錯字/格式/術語一致性可直改+標記——實證「不影響我的聲音」);
+5. 不可逆動作(刪整節/覆蓋已口頭確認的事實)永遠阻斷確認;
+6. 全部落版本歷史;AI 寫入帶樂觀鎖,**衝突自動降級為建議**(「人正在編的段 AI 不直寫」
+   不用規則硬編,版本衝突自然湧現)。
+
+**軸的翻轉**:原設計把尊重主導權實作成「**限制 AI 寫入權**」;新模型實作成「**分流 AI
+寫入目的地**」——AI 產出力不減、人的字未核准前一字不動、確認批次化。
+反方誠實記錄:建議層實作比彈窗貴(緩解:與版本系統同構,v1 粗粒度=段落 badge+新舊對照
+即可);雙態文件困惑(緩解:建議量預算化+尾聲清零);信任漸進自動調權(e)判 YAGNI 記縫。
+
+### 10.2 A 線:專業顧問方法(主線補研)
+
+- **BEI 系譜**:McClelland BEI ← Flanagan CIT(1954 原始出處);問法=**調查記者模式**:
+  「當時情境?」「**具體是誰做**(probe the 'We')?」「確切做了什麼?」「結果?」「為何有效?」
+  ——追問句可直接進 prompt 腳本;「probe the We」= 歸屬與抓漏技巧
+  ([CIT 指南](https://www.hr-survey.com/Critical_Incident_Interview_Guide.htm)、
+  [JVER CIT 論文](https://scholar.lib.vt.edu/ejournals/JVER/v25n1/stitt.html))。
+- **Korn Ferry(Hay)三因子**:know-how / problem solving / accountability;
+  input→throughput→output 框架([官方 PDF](https://www.kornferry.com/content/dam/kornferry/docs/pdfs/job-evaluation.pdf))。
+  與勞動部 14 法工具箱互證(BEI/CIT 皆在列,上游研究 §7.4)。
+
+### 10.3 B 線:格式獨立驗證(主線補研)
+
+- **CIPD role profile** = purpose / principal accountabilities / K&E&S / context
+  ([CIPD 角色設計](https://www.cipd.org/uk/the-people-profession/the-profession-map/how-it-works/role-design/))
+  ——**8 章骨架通過獨立驗證,無重大缺漏**。
+- 職評用 JD(Hay 系)提示一個候選欄位:**職務量化維度**(管理人數/預算規模)
+  → 骨架加為**選填**欄位(職評超集項,v1 不強制)。
+
+### 10.4 D 線:實作細節(主線補研)
+
+- **quote 溯源有 2026 直接先例**:醫療領域 verbatim evidence 要求——
+  「**quote 必須是空白正規化後的精確子串**」硬約束 + 自動驗證
+  ([medRxiv 2026](https://www.medrxiv.org/content/10.64898/2026.03.03.26346690v1.full)、
+  [Deterministic Quoting](https://mattyyeung.github.io/deterministic-quoting))。
+  誠實風險:模型「定位 span」弱於「識別相關性」,傾向合成而非逐字
+  ([attribution 綜述](https://arxiv.org/html/2508.15396v1))→ **修復策略**:驗證失敗
+  retry 一次;仍失敗 → 槽值收下、quote 標「未驗證」降信任級,不阻塞訪談。
+- **一回合多指令**:CALM 生產環境本來就每回合輸出指令序列 → 可行;
+  結構可靠性由受限解碼保證,語義正確率進評測。
+- **模擬受訪者評測**:TOD user simulator 是標準做法
+  ([Reliable LLM User Simulator](https://arxiv.org/abs/2402.13374)),
+  但有幻覺/跨回合不一致/[Sim2Real gap](https://arxiv.org/pdf/2603.11245) 坑
+  → 模擬器要綁「員工 persona 卡+固定事實表」,量測槽位正確率/覆蓋率/追問品質;
+  模擬只當回歸網,上線前配真人試訪。
+
+## 11. 待決 / 下輪
 
 1. **引擎骨幹定案**(輪 3+4 證據齊,待維護者裁示:(B)無狀態回合服務?)
 2. **tool 協定**:indexer 工具(檢索 / items:match)進引擎是「LLM function-calling tools」
@@ -421,7 +488,7 @@ LLM 指令輸出(受限解碼):
 4. **最小實作切片**收斂:候選 = `extract_tasks` 升 `select_schema`(受限解碼版,接現行編輯器,
    不碰訪談 loop)——待骨幹定案後定。
 
-## 11. 來源
+## 12. 來源
 
 **大廠官方**:[Anthropic Building Effective Agents](https://www.anthropic.com/research/building-effective-agents) ·
 [Writing tools for agents](https://www.anthropic.com/engineering/writing-tools-for-agents) ·

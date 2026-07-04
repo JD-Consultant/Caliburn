@@ -230,7 +230,50 @@ ADR 0020 混合主導權=「人隨時直接改文件」。場景:訪談到第 3 
 **誠實記錄**:LangGraph 在 2026 泛用排名仍是「stateful workflow 安全牌」;我們偏離的理由
 **不是它爛,是本案的共編需求使其核心價值變成反特性**(場景特定,非泛用判斷)。
 
-## 6. 待決 / 下輪
+## 6. 輪 6 — 深研:以「本案要解決的問題」為尺重新校準(維護者要求;2026-07-05)
+
+### 6.0 問題定義重申(評判尺;維護者驗收中)
+
+> **「知道工作內容的人(員工)寫不出專業文件;寫得出專業文件的人(顧問)又貴又少。」**
+
+三個死結:①員工說不清楚/「有做但沒說」= **知識引出(elicitation)**問題 →訪談法/STAR/反推;
+②說的話要對上官方 OCS 目錄 = **標準化/對映**問題 →零幻覺+溯源;
+③只有資深顧問做得好、顧問不可規模化 →**LLM = 把顧問方法論規模化**,不是加聊天功能。
+**評判尺:哪個架構最能保證文件正確性、可稽核性、訪談品質、人的主導權——我們產的是承重文件,不是聊天紀錄。**
+
+### 6.1 五路權威獨立收斂到同一個分工(核心發現)
+
+| 權威(層級) | 原話/立場 |
+|---|---|
+| **Rasa CALM**(企業級對話 AI,N26 等受監管銀行在用;[官方](https://rasa.com/docs/learn/concepts/calm/)) | LLM 只做**理解**:「interpret the message in the context of the conversation」→ 產出**Commands**(小指令詞彙表);**確定性 Flows 掌全部業務邏輯**:「LLMs keep the conversation fluent but **don't guess your business logic**」;[2026 預測](https://rasa.com/blog/2026-conversational-ai-predictions):「LLM for understanding + Flows for decisions 將成 de facto 標準」 |
+| **Microsoft Azure 架構中心**([官方](https://learn.microsoft.com/en-us/azure/architecture/ai-ml/guide/ai-agent-design-patterns)) | 「**關鍵業務邏輯應強制用確定性 workflow**」;下一步走哪「deterministically defined…**isn't a choice given to agents**」 |
+| **Anthropic**(輪 1) | workflow 優先於自主 agent |
+| **Harvey**($11B 法律 AI=高風險承重文件的同構先例;[平台](https://www.harvey.ai/platform)) | 針對「幻覺引註」failure mode 打造 grounded reasoning;輸出=**帶精確引註的 memo**(≈我們的溯源);agent 全程 **HITL checkpoints 供律師審**(≈顧問審回合) |
+| **TOD 學術文獻**(任務導向對話,數十年積累;[ACM Computing Surveys 2026 綜述](https://dl.acm.org/doi/10.1145/3771090)、[E2E TOD 綜述](https://arxiv.org/pdf/2311.09008)) | 我們的訪談引擎=經典 TOD 管線:**NLU(理解)→ DST(對話狀態追蹤)→ Policy(下一步)→ NLG(措辭)**;LLM 時代=LLM 強化 NLU/DST,但**顯式狀態結構保留**;zero-shot DST 基本填槽可行、多輪易出問題 → 狀態放 LLM 外面 |
+
+**分工收斂**:LLM=理解+措辭;確定性碼=狀態/流程/業務規則;狀態=顯式、可稽核、存外面;
+高風險輸出=溯源+人審 checkpoint。**對映三死結**:①elicitation → LLM 正職(理解+追問);
+②對映官方 → 確定性把關(受限解碼+溯源=Harvey 引註的對應物);
+③方法論規模化 → **勞動部五面向腳本=CALM Flows 的字面對應**(方法論本身就是確定性流程)。
+
+### 6.2 本輪帶來的新設計輸入(不只驗證,還有可偷的)
+
+1. **Command 詞彙表模式**(CALM 實戰驗證):回合內 LLM 的輸出契約不是自由動作,而是
+   **小指令集**(如 `SetSlot` / `Correct` / `Clarify` / `SkipTask`)——受限解碼直接可枚舉;
+   這給了回合服務「LLM 輸出契約」的具體形狀。
+2. **離題/更正是命名過的已解問題**(CALM conversation patterns):員工訪談到一半跳話題、
+   改前面的答案——面板設計必須內建這兩個 pattern,不是邊角案例。
+3. **TOD 詞彙**:我們的「進度列」=DST 的 dialogue state;「階段機」=Policy;
+   直接繼承該文獻的評測方法(joint goal accuracy 等)當未來 eval 素材。
+
+### 6.3 誠實記錄反向證據
+
+Harvey 2026 [推出自主 agent 端到端起草](https://mlq.ai/news/harvey-a-launches-autonomous-agents-for-end-to-end-document-drafting/)——前沿確實在擴大自主性。但:
+(a)它建立在多年 grounded 基建**之上**、且保留律師審 checkpoint;(b)法律起草的輸入是文件,
+我們的輸入是**人腦裡的隱性知識**——訪談本質上必須互動。結論:不推翻 workflow-first,
+但佐證「葉子 agentic 可漸進擴權」是對的升級形狀(骨幹不變,葉子隨信任加深放權)。
+
+## 7. 待決 / 下輪
 
 1. **引擎骨幹定案**(輪 3+4 證據齊,待維護者裁示:(B)無狀態回合服務?)
 2. **tool 協定**:indexer 工具(檢索 / items:match)進引擎是「LLM function-calling tools」
@@ -239,7 +282,7 @@ ADR 0020 混合主導權=「人隨時直接改文件」。場景:訪談到第 3 
 4. **最小實作切片**收斂:候選 = `extract_tasks` 升 `select_schema`(受限解碼版,接現行編輯器,
    不碰訪談 loop)——待骨幹定案後定。
 
-## 7. 來源
+## 8. 來源
 
 **大廠官方**:[Anthropic Building Effective Agents](https://www.anthropic.com/research/building-effective-agents) ·
 [Writing tools for agents](https://www.anthropic.com/engineering/writing-tools-for-agents) ·

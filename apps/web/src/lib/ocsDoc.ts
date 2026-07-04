@@ -89,6 +89,12 @@ function renumber(doc: OcsDocument): OcsDocument {
       const tc = t.task_codes?.[0] ?? { code: "", name: "" };
       tc.code = `T${ui + 1}.${ti + 1}`;
       t.task_codes = [tc, ...(t.task_codes ?? []).slice(1)];
+      const b = t.competency_blocks?.[0];
+      if (b) {
+        // O/P 是任務範圍位置碼:任務位置變了要跟著重編(同 setOp;身分由 _id 維持)
+        renumberCoded(b.outputs ?? [], `O${ui + 1}.${ti + 1}.`);
+        renumberCoded(b.indicators ?? [], `P${ui + 1}.${ti + 1}.`);
+      }
     });
   });
   renumberDocKS(doc); // K/S 首現序隨任務順序變，結構變動一併重編

@@ -9,7 +9,7 @@ import { useRef, useState } from "react";
 import { Check, ChevronDown } from "lucide-react";
 import type { KnowledgePack, OcsDocument } from "@/types";
 import { addTasksToUnit, deleteTask, taskHasContent, type PoolPick } from "@/lib/ocsDoc";
-import { taskRows, unitRows, type TaskRowVM } from "@/lib/pack";
+import { taskRowsWithSimilar, unitRows, type TaskRowVM } from "@/lib/pack";
 import { taskUrns } from "@/lib/urn";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
@@ -24,7 +24,7 @@ export function TaskPickerMenu({ document: doc, pack, unitIdx, onChange }: {
 }) {
   const [open, setOpen] = useState(false);
   const applied = useRef(false); // 首開自動帶官方任務，一次為限（之後以使用者動過的為準）
-  const rows = pack ? taskRows(pack) : [];
+  const rows = pack ? taskRowsWithSimilar(pack) : []; // 灰區相似對掛 similarTo(純顯示,ADR 0022)
   const unit = doc.ocs_content?.ocu_units?.[unitIdx];
   // 本職責的官方任務集:以 unit._refs 的 (ocs_code, ocu_code) 對回 units 池列(身分對位,
   // spec 2026-07-04 §6;改過名的職責 _refs 已清 → 無 own=全借用,行為由身分導出)。
@@ -127,6 +127,29 @@ export function TaskPickerMenu({ document: doc, pack, unitIdx, onChange }: {
                         {isOwn ? null : <Badge variant="outline" className="text-[10px]">借用</Badge>}
                         {elsewhere ? <span className="text-[10px] text-muted-foreground">已加入</span> : null}
                         {here && loc.filled ? <Badge variant="secondary" className="text-[10px]" title="已填內容，請在表格刪除">已填</Badge> : null}
+                        {r.similarTo ? (
+                          // 相似徽章(ADR 0022):灰區對純顯示——不自動勾、不合併、不擋;
+                          // 點開並排全文由人判斷是否同一件事。
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <button type="button"
+                                className="shrink-0 rounded bg-amber-100 px-1 text-[10px] text-amber-700 hover:bg-amber-200"
+                                onClick={(e) => e.stopPropagation()}>
+                                ⚠ 與 {r.similarTo.length} 項相似
+                              </button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-80 text-xs" onClick={(e) => e.stopPropagation()}>
+                              <p className="mb-1 font-medium">相似任務(請確認是否為同一件事):</p>
+                              <p className="rounded bg-muted/50 p-1">{r.name}</p>
+                              {r.similarTo.map((s) => (
+                                <p key={s.name} className="mt-1 rounded border p-1">
+                                  {s.name}
+                                  <span className="ml-1 text-muted-foreground">{Math.round(s.score * 100)}%</span>
+                                </p>
+                              ))}
+                            </PopoverContent>
+                          </Popover>
+                        ) : null}
                       </div>
                       <SourceLine srcs={r.srcs} />
                     </div>

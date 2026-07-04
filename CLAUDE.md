@@ -38,7 +38,9 @@ Monorepo。維護者用**繁體中文**,請用繁中回應。
 ## 本地開發(`CONTRIBUTING.md` / `docs/runbook.md`)
 
 - **一鍵**:`npm run up` = `docker compose up -d`(db:5432 + qdrant:6333 + **embedder:8082(GPU)**)
-  `&& turbo dev`(api:8001 + web:3000 + indexer:8000)。`npm run down` 停 infra;Ctrl-C 停 dev server。
+  `&& turbo dev`(api:8001 + web:3000 + indexer:8000)。正常收 dev server 用 Ctrl-C;
+  `npm run down` = `docker compose down` + `kill-port 3000/8000/8001`(停 infra **且**補收 dev server 孤兒進程
+  ——視窗被硬關沒 Ctrl-C 時,uvicorn/next 會殘留占著 port,down 會清掉)。
 - 首次/改 schema:`npm run db:migrate`。Qdrant 空要建一次索引:
   `cd apps/ocs-indexer && uv run jd-ocs-indexer index ./data/jd-json`(走 embedder,**不需本機 torch**)。
 - **測試**:`npx turbo test`。各 app:api `uv run pytest`、ocs-indexer `uv run --all-extras pytest`、

@@ -430,3 +430,104 @@ name 標【T1.1】,但因所在 block 的 task_codes 涵蓋 T1.1–T1.5,K01 最�
   [Users Meet Clarifying Questions(ACM TOIS)](https://dl.acm.org/doi/10.1145/3524110)
 - 本 repo:[北極星研究 §7 MOL 指引(共通/專業職能)](2026-07-02-llm-interview-authoring-research.md) ·
   ADR 0012(embedder 服務)· ADR 0016(task-catalogs 批次)· ADR 0020(訪談互動模式)
+
+## 9. 第五輪(2026-07-04):v1 立項研究——查證、兩個實驗、與知識包整合設計
+
+> 脈絡:維護者定調「工具先行、LLM 後接、SaaS 暫緩」;中文正式名稱定案**「相似比對」**
+> (similarity matching;「去重」為棄用暫名——本工具不刪任何項目)。本輪關閉 §7.4 之後
+> 所有殘餘開放問題;產出正式設計 spec
+> [`2026-07-04-similarity-matching-v1-spec.md`](2026-07-04-similarity-matching-v1-spec.md) 與 ADR 0022。
+
+### 9.1 查證 B——SemDeDup/NeMo 的代表選法是**反面教材**(反而驗證 D6)
+
+[NeMo Curator 官方文件](https://docs.nvidia.com/nemo-framework/user-guide/24.09/datacuration/semdedup.html):
+SemDeDup 在重複群裡保留「與群中心 cosine **最低**」(=離中心最遠)的點——因為其目標是
+**訓練資料多樣性最大化**(刪重複時留最邊緣的點保資訊量)。我們的目標相反(給人看的可讀代表),
+故 D6 的 medoid(幾何,indexer)+ survivorship(顯示,web;見 9.5)不抄它,且有了明確理由。
+NeMo 示例 eps 0.01–0.001(≈cosine 0.99+)極端嚴格,與「寧嚴勿鬆」(§2.1/§2.8)三方互證。
+工程補充:貪婪星型須**決定論**——pair 按(分數降序、id 升序)排序處理,tie-break 固定。
+
+### 9.2 查證 C——reranker 可行性 + **實測鑑別力**(升級槽從假設變已驗證)
+
+- 資源:bge-reranker-v2-m3 約 4GB VRAM、單批 ~240ms([HF 討論](https://huggingface.co/BAAI/bge-reranker-v2-m3/discussions/39)、
+  [TEI 部署實測](https://www.spheron.network/blog/self-host-embedding-reranker-tei-gpu-cloud/));
+  RTX 4060(8GB)與 BGE-M3 同容器共存**實跑成功**,權重已入 hf_cache volume。
+- **鑑別力實測**(20 對人工標註的灰區對,embedder 容器內跑,批次 6.5s 含暖機):
+  - **底部大掃除**(真正強項):dense 因各向異性膨脹的假相似被壓到近零——
+    「檢驗分析能力↔統計分析能力」0.834→**0.276**、「風險分析↔統計分析」0.808→**0.156**、
+    「協助推廣品質觀念↔協助供應商完成品質管理」0.792→**0.193**。
+  - **頂部確認**:四對真重複全 ≥0.996。
+  - **中段誠實失敗**:「製程品質巡檢↔製程品質控管」(一字差、實為兩事)得 **0.988**——
+    表面重疊高、語意有別的任務名,cross-encoder 一樣被騙。
+- **結論**:reranker 的正確角色 = **灰區的過濾器與排序器**,永遠不是合併裁決者
+  (§5.1「任務層不可自動合併」對它同樣成立)。**v1 不部署**(D9 維持);觸發條件白紙黑字:
+  **K/S 混池表面上線前必開**(見 9.4 skill 層爆炸),或校準顯示徽章噪音過高。
+
+### 9.3 查證 D——窄帶是各向異性的教科書症狀;校準方法論修正
+
+§5 觀察到的 0.7–0.85 窄帶 = 嵌入**各向異性**(向量擠在窄錐、絕對 cosine 系統性偏高)的已知
+現象(原典 [Li et al., EMNLP 2020](https://arxiv.org/pdf/2011.05864);2026 綜述
+[arXiv:2504.16318](https://arxiv.org/html/2504.16318v2))。推論:(1) **絕對門檻跨模型/資料
+不可移植**——文獻門檻數字零參考價值,D7「用自己的池校準」是唯一正解且獲理論背書;
+(2) 排序不變、絕對值失真 → **校準腳本主產出 = 分布 + 斷崖位置**(門檻定在崖中間),
+不是套慣例數字。mean-centering/whitening 對數十~數百項的池過重,不做(未來縫,一行註記)。
+來源衛生:搜尋另撈到單作者未審 preprint(arXiv:2601.16907,被標記文字重疊)——**棄用**,
+結論全部改錨同儕審原典。
+
+### 9.4 實驗 A——灰區體積(三組真實組合 × 四 kind,完整管線)
+
+方法:真實共選組合(§5 軟體三職類 / 品管三職類 MQM2141-001v4+008v1+005v2 / 同職雙版本
+001v2×v4),完整管線(前處理→NFKC exact-collapse→嵌入→跨來源兩兩 cosine→分帶)。
+結果(自動群對/灰區對,D7 起點門檻):
+
+| 組合 | attitude | knowledge | skill | task(θ_low=0.70) |
+|---|---|---|---|---|
+| 軟體三職類 | 1 / 5 | 0 / 7 | 1 / **116** | 0 / **24** |
+| 品管三職類 | 1 / 2 | 0 / 6 | 2 / **186** | 1 / **39** |
+| 同職雙版本 | 0 / 0 | 0 / 1 | 3 / 67 | 0 / 3 |
+
+1. **態度層定案 {0.90, 0.70}**:斷崖第三次驗證(0.986 dup → 下一名 0.72),灰區 0–5 對。
+2. **任務層 θ_low 翻案 0.70→0.80**:0.7 帶塞 112 對(全是同領域不同任務),0.70 起算灰區
+   24–39 對 = 徽章噪音(choice overload 換位爆);真重複全在 0.83+(0.966/0.868/0.846),
+   提到 0.80 後灰區 5–10 對、真重複零漏。**任務層定案 {0.95, 0.80}**。
+3. **前處理是精度工程**:§5.1 真重複對(依規格檢驗原物料…)未清洗 0.806 → 清洗後 **0.868**。
+4. **exact-collapse 升為必要步驟**:knowledge 175→46、skill 209→48(同基準 K/S 跨 block
+   重複),嵌入呼叫省 ~70%。
+5. **skill 層灰區爆炸**(116–186 對;「○○能力」句式擠在 0.7 帶):v1 無感(K/S 池不混),
+   但成為 reranker 的明確觸發條件(9.2)。
+
+### 9.5 與知識包整合的設計定案(讀碼修正兩處)
+
+讀 [`knowledge_pack.py`](../../apps/api/app/core/domain/knowledge_pack.py) /
+[`documents.py::get_knowledge_pack`](../../apps/api/app/api/routes/documents.py) /
+[`pack.ts`](../../apps/web/src/lib/pack.ts) 後定案:
+
+1. **輸入 = pack 池 rows**(ADR 0021 已按 kind 分 12 池、key 去重、srcs 累積)——工具零抽取;
+   indexer 端 exact-collapse 降級為防禦性(只補 NFKC 級漏網)。
+2. **修正一(過時結論)**:§5 附帶發現的「態度 exact-by-code 漏合」是舊 header_meta 的 bug,
+   pack 態度池已改 **name key**(同文跨基準已合併);本工具對態度池的增量 = **近重複**層。
+3. **「同基準不比」泛化**:pack row 的 srcs 跨來源合併過 → **來源集合不相交才比對**
+   (共同基準的編輯意圖 = 刻意分開)。
+4. **修正二(D6 半翻案)**:survivorship **從 api 移到 web**——「主基準是誰」是文件層、
+   render 時才知道的狀態(`clearPrimaryBasis` 可隨時清),api 組 pack 時不知道;
+   pack.ts 本就是「唯一的 pack 讀取邏輯集中點、全純函式」(vitest 模式現成)。
+   indexer 回 medoid(幾何)不變。
+5. **api = 純搬運**(enrichment):build_pack 後對態度/任務池各打一通 items:match(並行),
+   原樣掛 `pack.similarity`(optional);失敗不掛,web 行為與現狀逐位元相同(ADR 0018 語意)。
+6. **自動勾選交互——一條規則消滅整族 bug**:選擇邏輯(primaryDefaults/首開自動套/勾選
+   狀態/寫入身分)**全跑在平的成員選項上,一行不改;分群只是 render 最後一步的顯示變換**。
+   兩個湧現不變量:(A) 來源不相交規則 ⇒ 一群內每基準最多一條 ⇒ 自動勾選不可能勾雙;
+   (B) survivorship 主基準優先 ⇒ 主基準成員在群內必為代表 ⇒ 勾代表=勾對身分。
+   收合列**就是代表成員本人**(群無可選身分;文件永遠只出現成員真身)。
+7. **v1 範圍**:indexer `POST /items:match` + 校準腳本(units 一起跑但不接線)+ api 搬運 +
+   web 態度池收合與任務相似徽章。契約沿用 `packages/indexer-contract`
+   (contract-strategy rubric row 3:internal、all-Python、單一 in-repo 消費者)。
+
+### 9.6 本輪新增來源
+
+[NeMo Curator SemDeDup(NVIDIA 官方)](https://docs.nvidia.com/nemo-framework/user-guide/24.09/datacuration/semdedup.html) ·
+[Li et al. — On the Sentence Embeddings from Pre-trained Language Models(EMNLP 2020,原典)](https://arxiv.org/pdf/2011.05864) ·
+[Semantics at an Angle(2026 綜述)](https://arxiv.org/html/2504.16318v2) ·
+[bge-reranker-v2-m3 GPU 需求(HF 官方討論)](https://huggingface.co/BAAI/bge-reranker-v2-m3/discussions/39) ·
+[TEI self-host 實測(2026)](https://www.spheron.network/blog/self-host-embedding-reranker-tei-gpu-cloud/)。
+實驗腳本:scratchpad `grayzone_experiment.py` / `rerank_test.py`(校準腳本雛形,實作時進 repo)。

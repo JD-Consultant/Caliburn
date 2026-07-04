@@ -23,6 +23,8 @@
 
 > 命名規範:pair 欄位 = `left_id`/`right_id`(Splink/記錄連結標準;**禁用 a/b**)。
 > 既有 `SimilarPair.a/b`(舊 tasks:findSimilar,零消費者)同步改名統一。
+> **後記(2026-07-04 實作後)**:`tasks:findSimilar` 已**整組退役**(維護者裁示;零消費者、
+> 功能被 items:match 涵蓋)——SimilarPair/SimilarTaskRef/FindSimilar* 模型已自契約刪除。
 
 ### Request — `POST /items:match`
 

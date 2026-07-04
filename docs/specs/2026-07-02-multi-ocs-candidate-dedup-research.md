@@ -523,7 +523,21 @@ NeMo 示例 eps 0.01–0.001(≈cosine 0.99+)極端嚴格,與「寧嚴勿鬆」(
    web 態度池收合與任務相似徽章。契約沿用 `packages/indexer-contract`
    (contract-strategy rubric row 3:internal、all-Python、單一 in-repo 消費者)。
 
-### 9.6 本輪新增來源
+### 9.6 v1 實作後記(2026-07-04)
+
+v1 依 spec 落地(tag `similarity-v1`)。實作期補充決策與發現:
+
+1. **`tasks:findSimilar` 退役**(維護者裁示,推翻 §7.4 D1 的「暫保留」):零消費者、
+   功能被 items:match 涵蓋;route/service/契約模型/測試全刪。
+2. **id 唯一性升為顯式契約**:校準腳本用「基準:代碼」組 id 時撞號(髒資料同代碼掛異名),
+   `collapse`/`score_pairs` 以 id 為鍵會**靜默吃掉配對**(680→560 對)——route 加
+   `duplicate_item_ids` 422 守門 + 測試;隱含前置條件不再靠慣例。
+3. **架構定案(照 service-split-framework 判準)**:matching 演算法**留 indexer 模組、不抽
+   packages**——單一消費者、同 bounded context,共享機制 = 既有 HTTP seam;wire 契約已在
+   indexer-contract。校準腳本與生產共用 collapse/score_pairs(校準即生產)。
+4. 出廠校準紀錄:[`2026-07-04-similarity-matching-calibration.md`](2026-07-04-similarity-matching-calibration.md)。
+
+### 9.7 本輪新增來源
 
 [NeMo Curator SemDeDup(NVIDIA 官方)](https://docs.nvidia.com/nemo-framework/user-guide/24.09/datacuration/semdedup.html) ·
 [Li et al. — On the Sentence Embeddings from Pre-trained Language Models(EMNLP 2020,原典)](https://arxiv.org/pdf/2011.05864) ·

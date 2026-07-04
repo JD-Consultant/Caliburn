@@ -348,7 +348,13 @@ inventory);等多久=work context;準備什麼材料=inputs+Tools & Technology�
 | standards 完成標準 | 怎樣算做完/做好 | SHRM 後果+勞動部④面向 |
 | outputs 產出 | (OCS O 既有) | 既有 |
 
-### 8.4 兩個設計紅利(合成時浮現)
+### 8.4 實品樣張
+
+骨架+槽位表已填成完整模擬樣張(軟體測試工程師,公版引用取自 repo 真資料 ISD2519-002v2):
+**[`2026-07-05-golden-sample-software-tester.md`](2026-07-05-golden-sample-software-tester.md)**
+——同時示範公版/客製兩層分野、抓漏實績、深問預算、覆蓋率自檢四機制。待維護者審。
+
+### 8.5 兩個設計紅利(合成時浮現)
 
 1. **深問預算分配有了原則**:借 O*NET core/supplemental 二分——先問到每任務的
    頻率+比重(便宜、快),**用重要度×比重決定哪些任務值得全套深問**;supplemental

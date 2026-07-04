@@ -42,7 +42,7 @@ indexer 回應攤成 **12 個池(key 去重 + `srcs` 累積)+ `source_tasks`(任
 | `tasks` | **task_name** | **URN 字串**(指向 `source_tasks`,非完整 srcs) |
 | `attitudes` | **name** | ocs_code, ocs_name, code |
 | `job_categories` / `occupations` / `industries` | **分類 code** | ocs_code, ocs_name(row 另存 `name`) |
-| `prerequisites` / `supplements` | **text** | ocs_code, ocs_name |
+| `prerequisites` / `supplements` | **text** | ocs_code, ocs_name, **code=`n{i}`(來源清單 1-based 位置碼,不補零;跳過空白不佔號。web 端 notes 官方判定/`_ref` 綁定靠它——spec [2026-07-04 field-identity](../../../docs/specs/2026-07-04-editor-field-identity-unification-spec.md) §3)** |
 
 > **為什麼態度 / K / S 用 name 當 key(A5)**:那些 code 是**文件自編**(A01、K01…),跨不同職類**必撞**;
 > name 才是穩定身分。三類池反而用**國家分類碼**(全國唯一)。

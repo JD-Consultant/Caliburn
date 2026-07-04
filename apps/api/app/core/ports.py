@@ -8,6 +8,7 @@ from uuid import UUID
 
 from app.core.knowledge_dto import (
     CompetencyPool,
+    MatchResponse,
     OccupationDetail,
     OccupationSearchResponse,
     OccupationTasks,
@@ -25,6 +26,9 @@ class KnowledgePort(Protocol):
     async def competencies(self, ocs_code: str) -> CompetencyPool: ...
 
     async def occupation_tasks(self, ocs_code: str) -> OccupationTasks: ...
+
+    # 相似比對(ADR 0022):items = [{id, text, sources}](池 rows 原樣,api 端不強型別化)
+    async def match(self, kind: str, items: list[dict]) -> MatchResponse: ...
 
     async def healthz(self) -> bool: ...
 

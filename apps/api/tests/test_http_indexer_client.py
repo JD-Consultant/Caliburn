@@ -62,3 +62,15 @@ async def test_occupation_tasks_uses_path(client):
              "tasks": [{"task_code": "T1.1", "task_name": "任務一", "urn": "ocs:OC1:T:T1.1"}]}]}))
     r = await client.occupation_tasks("OC1")
     assert r.units[0].tasks[0].task_code == "T1.1"
+
+
+@respx.mock
+async def test_match_posts_items_and_parses(client):
+    route = respx.post(f"{BASE}/items:match").mock(return_value=httpx.Response(
+        200, json={"groups": [], "possible_matches": [
+            {"left_id": "甲", "right_id": "乙", "score": 0.82}],
+            "config": {"kind": "task", "theta_high": 0.95, "theta_low": 0.8, "model": "bge-m3"}}))
+    r = await client.match("task", [{"id": "甲", "text": "甲", "sources": ["OC1"]}])
+    assert route.called
+    assert r.possible_matches[0].left_id == "甲" and r.possible_matches[0].score == 0.82
+    assert r.config.theta_low == 0.8

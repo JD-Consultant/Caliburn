@@ -5,6 +5,7 @@ from uuid import UUID
 from app.core.knowledge_dto import (
     CitableItem,
     CompetencyPool,
+    MatchResponse,
     OccupationHit,
     OccupationSearchResponse,
     OccupationTasks,
@@ -39,6 +40,9 @@ class StubKnowledge:
                                 ocs_code=ocs_code, ocs_name="設備維護工程師", sources=[SourceRef(task_code="T1.1")])],
             attitudes=[CitableItem(id=f"ocs:{ocs_code}:A:A01", type="A", code="A01", name="細心負責",
                                    ocs_code=ocs_code, ocs_name="設備維護工程師", sources=[])])
+
+    async def match(self, kind: str, items: list[dict]) -> MatchResponse:
+        return MatchResponse()   # demo:無分群(空 groups/possible_matches)
 
     async def healthz(self) -> bool:
         return True

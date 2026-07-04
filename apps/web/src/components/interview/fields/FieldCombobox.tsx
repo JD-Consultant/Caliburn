@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Check, ChevronsUpDown, ChevronDown, Plus, X } from "lucide-react";
 import type { OptionItem, SourceRef } from "@/types";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -15,7 +15,7 @@ const newId = () => (globalThis.crypto?.randomUUID?.() ?? `id-${Math.random().to
 export function FieldCombobox({
   label, value, options, allowCustom = false, onCommit, pillSources = false,
   layout = "pills", title, customMode = "search", autoCode, editMultiline = false,
-  defaults,
+  defaults, autoApplyOnFirstOpen = false,
 }: {
   label: string;
   value: Item[];
@@ -34,6 +34,8 @@ export function FieldCombobox({
   editMultiline?: boolean;
   // 「自動勾選」的目標集（該實體自己的官方配套）；未給 = 全部 options。
   defaults?: OptionItem[];
+  // 首次打開選單且欄位為空 → 自動套 defaults（spec 2026-07-04 §4；之後以使用者為準）。
+  autoApplyOnFirstOpen?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -115,6 +117,16 @@ export function FieldCombobox({
     </CommandGroup>
   );
 
+  // 選單頂列的「自動勾選」鈕(spec 2026-07-04 §4:鈕一律在選單內,外部按鈕列不再放)。
+  const menuHeader = (
+    <div className="mb-1 flex items-center justify-end px-1">
+      <button type="button" className="shrink-0 text-xs text-muted-foreground hover:text-foreground"
+        title="套用官方預設(勾上還沒選的)" onClick={applyDefaults}>
+        自動勾選
+      </button>
+    </div>
+  );
+
   const menu = customMode === "footer" ? (
     <Command>
       <CommandList>
@@ -177,7 +189,14 @@ export function FieldCombobox({
     </div>
   );
 
-  const onMenuOpenChange = (o: boolean) => setOpen(o);
+  const autoApplied = useRef(false);
+  const onMenuOpenChange = (o: boolean) => {
+    setOpen(o);
+    if (o && autoApplyOnFirstOpen && !autoApplied.current) {
+      autoApplied.current = true;
+      if (value.length === 0 && (defaults ?? []).length > 0) applyDefaults(); // 首開且空才套(spec §4)
+    }
+  };
 
   // 標題模式：標題 + ▾ + 帶官方 在右，清單在下（同所屬類別/基準級別）。
   if (title !== undefined) {
@@ -192,12 +211,11 @@ export function FieldCombobox({
                   <ChevronDown className="h-4 w-4" />
                 </button>
               </PopoverTrigger>
-              <PopoverContent className="w-72">{menu}</PopoverContent>
+              <PopoverContent className="w-72">{menuHeader}{menu}</PopoverContent>
             </Popover>
             <button type="button" className="inline-flex items-center text-muted-foreground hover:text-foreground" title="加自訂（空白列）" onClick={addBlank}>
               <Plus className="h-4 w-4" />
             </button>
-            <button type="button" className="text-xs text-muted-foreground hover:text-foreground" onClick={applyDefaults}>自動勾選</button>
           </div>
         </div>
         {selectedView}
@@ -216,12 +234,11 @@ export function FieldCombobox({
               {label} <ChevronsUpDown className="h-3.5 w-3.5 opacity-50" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-72">{menu}</PopoverContent>
+          <PopoverContent className="w-72">{menuHeader}{menu}</PopoverContent>
         </Popover>
         <Button type="button" variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground" title="加自訂（空白列）" onClick={addBlank}>
           <Plus className="h-4 w-4" />
         </Button>
-        <Button type="button" variant="ghost" size="sm" className="text-xs text-muted-foreground" onClick={applyDefaults}>自動勾選</Button>
       </div>
     </div>
   );

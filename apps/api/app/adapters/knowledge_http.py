@@ -4,6 +4,7 @@ import httpx
 
 from app.core.knowledge_dto import (
     CompetencyPool,
+    MatchResponse,
     OccupationDetail,
     OccupationSearchResponse,
     OccupationTasks,
@@ -44,6 +45,11 @@ class HttpIndexerClient:
         resp = await self._client.get(f"/occupations/{ocs_code}/tasks")
         resp.raise_for_status()
         return OccupationTasks.model_validate(resp.json())
+
+    async def match(self, kind: str, items: list[dict]) -> MatchResponse:
+        resp = await self._client.post("/items:match", json={"kind": kind, "items": items})
+        resp.raise_for_status()
+        return MatchResponse.model_validate(resp.json())
 
     async def healthz(self) -> bool:
         try:

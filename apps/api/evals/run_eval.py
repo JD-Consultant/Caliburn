@@ -50,7 +50,7 @@ def _eval_doc_structure() -> dict:
 
 async def run_all(llm=None) -> tuple[bool, dict]:
     if llm is None:
-        from app.authoring.llm import OpenRouterLlm
+        from app.adapters.llm_openrouter import OpenRouterLlm
         llm = OpenRouterLlm()
     report = {
         "json_zhtw": await _eval_json_zhtw(llm),

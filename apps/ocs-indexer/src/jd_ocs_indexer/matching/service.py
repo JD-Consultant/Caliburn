@@ -8,6 +8,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
+import numpy as np
+
 from jd_ocs_indexer.api.schemas import (
     GroupMember,
     MatchConfig,
@@ -52,7 +54,14 @@ def collapse(items: list[MatchItem]) -> CollapsedPool:
 
 
 def score_pairs(pool: CollapsedPool, vectors: list[list[float]]) -> dict[frozenset, float]:
-    """④ 跨來源兩兩 cosine(來源有交集 → 同基準刻意分開,不比)。"""
+    """④ 跨來源兩兩 cosine(來源有交集 → 同基準刻意分開,不比)。
+    numpy 向量化(同 api/service._pairwise_candidates 先例):500 項上限 = 12.5 萬對,
+    純 Python 迴圈會抱著 embed_lock 跑數十秒——矩陣一乘毫秒級。"""
+    mat = np.asarray(vectors, dtype=float)
+    norms = np.linalg.norm(mat, axis=1, keepdims=True)
+    norms[norms == 0] = 1.0
+    unit = mat / norms
+    sim = unit @ unit.T
     scores: dict[frozenset, float] = {}
     n = len(pool.ids)
     for x in range(n):
@@ -60,7 +69,7 @@ def score_pairs(pool: CollapsedPool, vectors: list[list[float]]) -> dict[frozens
             i, j = pool.ids[x], pool.ids[y]
             if pool.sources[i] & pool.sources[j]:
                 continue
-            scores[frozenset((i, j))] = core.cosine(vectors[x], vectors[y])
+            scores[frozenset((i, j))] = float(sim[x, y])
     return scores
 
 

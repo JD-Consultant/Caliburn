@@ -1,7 +1,8 @@
 // 知識包 → 選單選項（ADR 0021；spec §5）。唯一的 pack 讀取邏輯集中點，全部純函式。
 // 池序 = append 序（職位優先序），選單不排序不搜尋；選項無碼 → FieldCombobox 顯序號。
 import type {
-  CodeName, KnowledgePack, NoteItem, OptionItem, PackSrc, PoolRow, SourceRef,
+  CodeName, KnowledgePack, MatchGroup, MatchResult, NoteItem, OptionItem, PackSrc,
+  PoolRow, SourceRef,
 } from "@/types";
 
 const newId = () => (globalThis.crypto?.randomUUID?.() ?? `id-${Math.random().toString(36).slice(2)}`);
@@ -112,6 +113,7 @@ export interface TaskRowVM {
   name: string;                 // tasks 池 key
   urns: string[];               // 池列 srcs（source_tasks 的 URN）
   srcs: SourceRef[];            // 顯示用（URN → source_tasks 解出）
+  similarTo?: { name: string; score: number }[];  // 相似比對灰區對(ADR 0022,純顯示)
 }
 
 export function unitRows(pack: KnowledgePack): UnitRowVM[] {
@@ -157,4 +159,57 @@ export function primaryBasisOptions(pack: KnowledgePack): BasisOption[] {
     job_description: d.job_description,
     ocs_level: d.ocs_level,
   }));
+}
+
+// ── 相似比對(ADR 0022)。鐵律:選擇邏輯(primaryDefaults/自動套/勾選/寫入身分)跑在
+// 平選項上一行不改;以下只是 render 前最後一步的顯示變換(把分群搬進選擇邏輯 = 違規)。──
+
+// survivorship(顯示代表):主基準成員優先(不變量 B)→ 文字最長 → 名稱升序(決定論)。
+function survivor(members: OptionItem[], primaryCode: string): OptionItem {
+  const primary = members.find((o) => (o.srcs ?? []).some((s) => s.ocs_code === primaryCode));
+  if (primary) return primary;
+  return [...members].sort((a, b) => b.name.length - a.name.length || a.name.localeCompare(b.name))[0];
+}
+
+// 值池選項 → 顯示列:群成員收成一列(代表 = survivor,其餘進 variants)。代表列**就是
+// 成員本人**(群無可選身分,文件永遠只出現成員真身)。match 缺席 → 原樣返回(降級)。
+// 池序保持:群放在首個成員的位置;成員對不上池 → 不收合。
+export function groupedValueOptions(
+  options: OptionItem[], match: MatchResult | undefined, primaryCode: string,
+): OptionItem[] {
+  if (!match?.groups?.length) return options;
+  const byName = new Map(options.map((o) => [o.name, o]));
+  const groupOf = new Map<string, MatchGroup>();
+  for (const g of match.groups) for (const m of g.members) groupOf.set(m.id, g);
+  const emitted = new Set<MatchGroup>();
+  const out: OptionItem[] = [];
+  for (const o of options) {
+    const g = groupOf.get(o.name);
+    if (!g) { out.push(o); continue; }
+    if (emitted.has(g)) continue;
+    emitted.add(g);
+    const members = g.members.map((m) => byName.get(m.id)).filter((x): x is OptionItem => !!x);
+    if (members.length < 2) { out.push(o); continue; }   // 成員對不上池 → 不收合
+    const rep = survivor(members, primaryCode);
+    out.push({ ...rep, variants: members.filter((m) => m !== rep) });
+  }
+  return out;
+}
+
+// 任務列 + 灰區對(雙向)。similarity 缺席 → 原樣(降級)。純顯示:不勾、不併、不擋。
+export function taskRowsWithSimilar(pack: KnowledgePack): TaskRowVM[] {
+  const rows = taskRows(pack);
+  const pairs = pack.similarity?.task?.possible_matches ?? [];
+  if (!pairs.length) return rows;
+  const map = new Map<string, { name: string; score: number }[]>();
+  const push = (k: string, v: { name: string; score: number }) => {
+    const arr = map.get(k) ?? [];
+    arr.push(v);
+    map.set(k, arr);
+  };
+  for (const p of pairs) {
+    push(p.left_id, { name: p.right_id, score: p.score });
+    push(p.right_id, { name: p.left_id, score: p.score });
+  }
+  return rows.map((r) => (map.has(r.name) ? { ...r, similarTo: map.get(r.name)! } : r));
 }

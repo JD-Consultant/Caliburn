@@ -176,6 +176,7 @@ export interface OptionItem {
   name: string;
   sources?: string[];      // 既有：ocs_code 清單（向後相容）
   srcs?: SourceRef[];      // 新：完整來源（選單顯示用；首個 + 其餘）
+  variants?: OptionItem[]; // 相似比對群成員(ADR 0022,收合展示用);沒有 = 普通選項
 }
 
 // ── 知識包(ADR 0021):選職類後一次抓齊,所有選單的資料源;每官方值帶 srcs ──
@@ -213,6 +214,17 @@ export interface KnowledgePack {
     prerequisites: Record<string, PoolRow>; supplements: Record<string, PoolRow>;
   };
   source_tasks: Record<string, SourceTask>;
-  meta?: DegradeMeta;
+  similarity?: { attitude?: MatchResult; task?: MatchResult };  // 相似比對(ADR 0022;缺席=降級)
+  meta?: DegradeMeta & { similarity?: "ok" | "partial" | "unavailable" };
+}
+
+// ── 相似比對(ADR 0022;欄位名照 indexer-contract,left/right 家族,禁用 a/b)──
+export interface MatchGroupMember { id: string; score: number }
+export interface MatchGroup { medoid: string; members: MatchGroupMember[] }
+export interface PossibleMatch { left_id: string; right_id: string; score: number }
+export interface MatchResult {
+  groups: MatchGroup[];
+  possible_matches: PossibleMatch[];
+  config: { kind: string; theta_high: number; theta_low: number; model: string };
 }
 

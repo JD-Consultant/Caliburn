@@ -41,13 +41,6 @@ def collapse_key(text: str) -> str:
     return unicodedata.normalize("NFKC", text)
 
 
-def cosine(a: list[float], b: list[float]) -> float:
-    dot = sum(x * y for x, y in zip(a, b))
-    na = sum(x * x for x in a) ** 0.5
-    nb = sum(x * x for x in b) ** 0.5
-    return dot / (na * nb) if na and nb else 0.0
-
-
 def band(scored_pairs, theta_high, theta_low):
     """FS 三區:(≥θ_high, [θ_low,θ_high)) 兩桶;<θ_low 丟棄(token 效率)。"""
     dup = [(s, i, j) for s, i, j in scored_pairs if s >= theta_high]

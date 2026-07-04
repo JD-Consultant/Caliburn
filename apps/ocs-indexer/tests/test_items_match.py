@@ -76,6 +76,10 @@ def test_limits_and_unknown_kind_and_short_circuit():
     too_many = {"kind": "task", "items": [{"id": str(i), "text": str(i), "sources": []} for i in range(501)]}
     assert c.post("/items:match", json=too_many).status_code == 413
     assert c.post("/items:match", json={"kind": "nope", "items": []}).status_code == 422
+    # id 唯一是管線前置條件(collapse/score 以 id 為鍵;撞號會靜默吃掉配對)
+    dup_ids = {"kind": "task", "items": _items(("同id", ["OC1"]), ("同id", ["OC2"]))}
+    r = c.post("/items:match", json=dup_ids)
+    assert r.status_code == 422 and r.json()["detail"]["code"] == "duplicate_item_ids"
     # <2 條:短路回空,不打 embedder(FakeEmbedder 空表也不會炸)
     ok = c.post("/items:match", json={"kind": "task", "items": _items(("唯一", ["OC1"]))})
     assert ok.status_code == 200 and ok.json()["groups"] == []

@@ -130,10 +130,16 @@ export function setProfileField(
   return next;
 }
 
-export function setOcsLevel(doc: OcsDocument, value: string): OcsDocument {
+export function setOcsLevel(
+  doc: OcsDocument,
+  value: string,
+  src?: SourceRef & { level: number },
+): OcsDocument {
   const next = clone(doc);
   const n = parseInt(value, 10);
   next.ocs_profile.ocs_level = Number.isFinite(n) ? n : null;
+  if (src) next.ocs_profile._levelSrc = src; // 值==官方值即官方(spec §9 決策 6)
+  else delete next.ocs_profile._levelSrc;
   return next;
 }
 
@@ -195,6 +201,16 @@ export function setPrimaryBasis(
   return next;
 }
 
+// 再點已選基準=整組清空(spec 2026-07-04 §9 決策 4):代碼↔名稱綁定一起進出;
+// 級別/描述/類別不動(_levelSrc 保留=歷史來源)。
+export function clearPrimaryBasis(doc: OcsDocument): OcsDocument {
+  const next = clone(doc);
+  next.ocs_profile.ocs_code = "";
+  next.ocs_profile.ocs_name.occupation_name = "";
+  next.ocs_profile.ocs_name.job_category_name = "";
+  return next;
+}
+
 export function addCategory(doc: OcsDocument, kind: CatKind): OcsDocument {
   const next = clone(doc);
   next.ocs_profile.category[kind].push({ name: "", code: "" });
@@ -240,7 +256,12 @@ export function deleteUnit(doc: OcsDocument, ui: number): OcsDocument {
 
 export function renameUnit(doc: OcsDocument, ui: number, name: string): OcsDocument {
   const next = clone(doc);
-  next.ocs_content.ocu_units[ui].ocu_name = name;
+  const unit = next.ocs_content.ocu_units[ui];
+  if (unit.ocu_name === name) return next;
+  unit.ocu_name = name;
+  // 改名=斷鏈變自訂(spec 2026-07-04 §5;與 OPKS「改內容→自訂」一致;底下任務身分不受影響)
+  delete unit._refs;
+  unit.source = { ocs_code: "", occupation_name: "" };
   return next;
 }
 
@@ -265,9 +286,14 @@ export function deleteTask(doc: OcsDocument, ui: number, ti: number): OcsDocumen
 
 export function renameTask(doc: OcsDocument, ui: number, ti: number, name: string): OcsDocument {
   const next = clone(doc);
-  const tc = next.ocs_content.ocu_units[ui].tasks[ti].task_codes?.[0] ?? { code: "", name: "" };
+  const t = next.ocs_content.ocu_units[ui].tasks[ti];
+  const tc = t.task_codes?.[0] ?? { code: "", name: "" };
+  if (tc.name === name) return next;
   tc.name = name;
-  next.ocs_content.ocu_units[ui].tasks[ti].task_codes = [tc];
+  t.task_codes = [tc];
+  delete t._refs;          // 改名=斷鏈變自訂(spec §5;own-refs 自動帶入/官方級別隨之失效)
+  delete t._levelSrc;
+  t.provenance = { ocs_code: "", task_code: "" };
   return next;
 }
 
@@ -449,7 +475,9 @@ export function setTaskLevel(
     const n = typeof value === "number" ? value : parseInt(value, 10);
     block.competency_level = Number.isFinite(n) ? n : null;
   }
-  if (src) next.ocs_content.ocu_units[unitIdx].tasks[taskIdx]._levelSrc = src;
+  const t = next.ocs_content.ocu_units[unitIdx].tasks[taskIdx];
+  if (src) t._levelSrc = src;
+  else delete t._levelSrc; // 值≠官方 → 來源清掉(spec §2:不留殘留)
   return next;
 }
 

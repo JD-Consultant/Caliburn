@@ -5,10 +5,15 @@ import {
   deleteTask,
   relocateTask,
   reorderUnits,
+  clearPrimaryBasis,
+  renameTask,
+  renameUnit,
   setAttitudes,
   setKS,
   setNoteItems,
+  setOcsLevel,
   setOp,
+  setTaskLevel,
 } from "./ocsDoc";
 
 // 最小 fixture:只鋪 recode 路徑會摸到的欄位。「代碼是位置、身分是 _id」是這組
@@ -129,6 +134,51 @@ describe("setOp / setKS(內容編輯的重編)", () => {
     const [t1, t2] = next.ocs_content.ocu_units[0].tasks;
     expect(t1.competency_blocks![0].knowledge!.map((k) => k.code)).toEqual(["K01"]); // 網路
     expect(t2.competency_blocks![0].knowledge!.map((k) => k.code)).toEqual(["K02"]); // 資料庫
+  });
+});
+
+describe("改名斷鏈 + 級別來源(spec 2026-07-04 §2/§5)", () => {
+  it("renameTask:清 provenance/_refs/_levelSrc → 變自訂", () => {
+    const doc = docWith([{ name: "U1", tasks: [task("T1.1", "甲")] }]);
+    doc.ocs_content.ocu_units[0].tasks[0]._refs = [{ ocs_code: "OC1", occupation_name: "甲職", code: "" }];
+    doc.ocs_content.ocu_units[0].tasks[0]._levelSrc = { ocs_code: "OC1", occupation_name: "甲職", code: "", level: 3 };
+    const next = renameTask(doc, 0, 0, "改過的名字");
+    const t = next.ocs_content.ocu_units[0].tasks[0];
+    expect(t.provenance).toEqual({ ocs_code: "", task_code: "" });
+    expect(t._refs).toBeUndefined();
+    expect(t._levelSrc).toBeUndefined();
+    expect(t.task_codes![0].name).toBe("改過的名字");
+  });
+  it("renameUnit:清 source/_refs", () => {
+    const doc = docWith([{ name: "U1", tasks: [] }]);
+    doc.ocs_content.ocu_units[0]._refs = [{ ocs_code: "OC1", occupation_name: "甲職", code: "", ocu_code: "T1" }];
+    const next = renameUnit(doc, 0, "新名");
+    expect(next.ocs_content.ocu_units[0]._refs).toBeUndefined();
+    expect(next.ocs_content.ocu_units[0].source).toEqual({ ocs_code: "", occupation_name: "" });
+  });
+  it("setTaskLevel 無 src → 清舊 _levelSrc(修殘留)", () => {
+    const doc = docWith([{ name: "U1", tasks: [task("T1.1", "甲")] }]);
+    const d1 = setTaskLevel(doc, 0, 0, 3, { ocs_code: "OC1", occupation_name: "甲職", code: "", level: 3 });
+    expect(d1.ocs_content.ocu_units[0].tasks[0]._levelSrc?.level).toBe(3);
+    const d2 = setTaskLevel(d1, 0, 0, 5);
+    expect(d2.ocs_content.ocu_units[0].tasks[0]._levelSrc).toBeUndefined();
+  });
+  it("setOcsLevel:src 給→寫 ocs_profile._levelSrc,未給→清", () => {
+    const doc = docWith([{ name: "U1", tasks: [] }]);
+    const d1 = setOcsLevel(doc, "4", { ocs_code: "OC1", occupation_name: "甲職", code: "", level: 4 });
+    expect(d1.ocs_profile._levelSrc?.level).toBe(4);
+    const d2 = setOcsLevel(d1, "5");
+    expect(d2.ocs_profile._levelSrc).toBeUndefined();
+  });
+  it("clearPrimaryBasis:整組清 code+兩名,其他欄不動", () => {
+    const doc = docWith([{ name: "U1", tasks: [] }]);
+    doc.ocs_profile.ocs_name = { job_category_name: "職類名", occupation_name: "職業名" };
+    doc.ocs_profile.job_description = "描述留著";
+    const next = clearPrimaryBasis(doc);
+    expect(next.ocs_profile.ocs_code).toBe("");
+    expect(next.ocs_profile.ocs_name.occupation_name).toBe("");
+    expect(next.ocs_profile.ocs_name.job_category_name).toBe("");
+    expect(next.ocs_profile.job_description).toBe("描述留著");
   });
 });
 

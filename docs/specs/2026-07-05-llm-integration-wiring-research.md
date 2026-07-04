@@ -126,17 +126,78 @@ domain 只表達意圖(「給我池內 id」);打給誰是 adapter/config,隨時
 - Escalation triggers:①驗收抓到池外 id、連換兩模型仍失敗 → Anthropic 直連;
   ②訪談引擎立項需 thinking+tool loop 中樞 → 只升中樞那一路;③資料主權要求 → 自架(另開研究)。
 
-## 3. 待決 / 下輪
+## 3. 輪 3 — 引擎骨幹岔路:有狀態圖 vs 無狀態回合服務(2026-07-05)
 
-1. **引擎骨幹**:workflow 骨幹的載體——沿用/修對齊既有 LangGraph 圖 vs 重寫輕量編排?
-   (ADR 0007 保留 LangGraph;ADR 0020 §4 又解綁;需權衡 checkpointer/interrupt 資產 vs 舊 shape 債)
+### 3.1 兩個權威
+
+- **12-factor agents**(ADR 0007 既有原則;[Factor 12 原文](https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-12-stateless-reducer.md)、
+  [2026 生產經驗](https://starlog.is/articles/ai-agents/humanlayer-12-factor-agents/)):
+  **own your control flow + agent = 無狀態 reducer**(純函式:進狀態→出狀態,狀態存外面);
+  框架藏 retry/暫停/終止是生產卡關主因。
+- **LangGraph 2026**([官方 durable execution](https://docs.langchain.com/oss/python/langgraph/durable-execution)、
+  [2026 評測](https://toolbrain.net/blog/langgraph-review-2026/)):interrupt/HITL 同類最強、採用廣;
+  公認學習曲線最陡、框架接管控制流。
+
+### 3.2 判別場景(本案特有,權重最大)
+
+ADR 0020 混合主導權=「人隨時直接改文件」。場景:訪談到第 3 任務,員工中途在工作台改名/刪任務,回面板續訪。
+
+| | (A)有狀態圖(LangGraph) | (B)無狀態回合服務 |
+|---|---|---|
+| 進度存哪 | checkpointer 圖狀態 blob | DB 一列(phase/task_index/slots)+ **文件本身** |
+| 人中途改文件 | 圖狀態**過期**=雙真相 ⚠️ | 下回合**現讀文件**,自動生效 ✅ |
+| 回合形狀 | resume 圖(AG-UI 協定) | 普通 REST(與編輯器 autosave/proposal-apply 同形)|
+| 縫 2 | 仍在 | **自然消失**(走同一條文件 seam)|
+| 12-factor | ✗ | ✓ Factor 12 字面實作 |
+
+**洞見:「人隨時可改文件」天然懲罰引擎私有的長壽命狀態。** 訪談軌道本身簡單
+(六階段+每任務幾槽),DB 一列裝得下。
+
+## 4. 輪 4 — 三疑慮驗證(維護者要求再研一輪;2026-07-05)
+
+### 4.1 疑慮①:adaptive 多輪追問在無狀態設計下會不會失控?——不會,反而是推薦形
+
+- **LLM 呼叫本來就無狀態**([Atlan 2026](https://atlan.com/know/are-llms-stateless/)):
+  連 LangGraph 每次也是把 context 重組進 prompt。差別只在「回合之間狀態存哪」(圖 blob vs DB 列)。
+- 2026 記憶體研究([memory 控制](https://arxiv.org/pdf/2601.00821) 等):
+  **「結構化、受治理的 context」優於「原始逐字稿重播」**(raw replay 放大 context 崩壞)。
+  → 我們的槽位重建(phase + task_index + slots jsonb + 每槽有界追問 Q&A)正是推薦形,不是妥協。
+- 追問受**資料飽和停止準則**約束(官方,上游研究 §7.3)→ 狀態成長有界。
+
+### 4.2 疑慮②:與 2a 樂觀鎖並發怎麼接?——(B)直插,(A)要架橋
+
+(B)回合服務走同一條文件 seam:agent 回合帶 revision token 寫入,衝突→409→現讀重試/上浮;
+「agent 回合=version+1、人編輯=revision+1」(上游研究 §4 預埋)直接可用。
+(A)的圖不知道文件變了,衝突不可見,需另造橋。
+
+### 4.3 疑慮③:LangGraph 退役成本盤點(讀碼實測)——有足跡但有界,且**不必現在退**
+
+| 端 | 足跡 |
+|---|---|
+| api 依賴 | `langgraph==1.2.5`、`langgraph-checkpoint-postgres`、`ag-ui-langgraph`(3 個套件)|
+| api 碼 | `app/authoring/` 14 檔 + `copilotkit_live_app.py` + main/app_factory/router 接線 |
+| api 測試 | 8/46 檔(test_graph_* 等)|
+| web | `CopilotKitProvider` 全域掛載 + `/api/copilotkit` route + `InterruptHandlers` + 3-4 元件引用 |
+
+- **重要事實**:intake 頁已是純表單、註解明言「不碰 CopilotKit」——產品實際已往表單/REST 回合漂移。
+- **處置 = Strangler Fig**(對齊維護者 service-split-framework 原則):(B)引擎旁路蓋起,
+  **深問純邏輯(STAR/5W2H 槽定義、prefill、indicator 品質分、prompts)move-only 抬進回合服務**;
+  圖/AG-UI/checkpointer 等**編排層**待新引擎覆蓋後再退役(屆時一併清 web 端 provider)。
+- **Temporal 反查**(durable execution 何時才需要;[官方](https://temporal.io/blog/temporal-replaces-state-machines-for-distributed-applications)、
+  [2026 指南](https://devstarsj.github.io/2026/03/24/temporal-durable-execution-workflows-microservices-guide-2026/)):
+  適用輪廓=長時運算、外呼鏈重、一個邏輯交易跨多脆弱步驟。我們的回合=短請求
+  (讀 DB→≤2 次 LLM→寫 DB),等待都是**人速**、狀態靜置 DB → 不需要 durable-execution 引擎。
+
+## 5. 待決 / 下輪
+
+1. **引擎骨幹定案**(輪 3+4 證據齊,待維護者裁示:(B)無狀態回合服務?)
 2. **tool 協定**:indexer 工具(檢索 / items:match)進引擎是「LLM function-calling tools」
    還是「workflow 確定性步驟」?(Anthropic workflow-first 傾向後者,LLM 只填槽)
-3. **兩條寫入路收斂**(縫 2)+ adaptive 判斷器具體設計(縫 3)。
+3. adaptive 判斷器具體設計(縫 3;Nature 2026 per-response 決策 + 飽和停止)。
 4. **最小實作切片**收斂:候選 = `extract_tasks` 升 `select_schema`(受限解碼版,接現行編輯器,
-   不碰訪談 loop)——待引擎骨幹討論後定。
+   不碰訪談 loop)——待骨幹定案後定。
 
-## 4. 來源
+## 6. 來源
 
 **大廠官方**:[Anthropic Building Effective Agents](https://www.anthropic.com/research/building-effective-agents) ·
 [Writing tools for agents](https://www.anthropic.com/engineering/writing-tools-for-agents) ·
@@ -148,5 +209,13 @@ domain 只表達意圖(「給我池內 id」);打給誰是 adapter/config,隨時
 **2026 技術文**:[Collin Wilkins — Structured Outputs](https://collinwilkins.com/articles/structured-output) ·
 [Pockit — LLM Structured Output 2026](https://pockit.tools/blog/llm-structured-output-complete-guide/) ·
 [Mervin Praison — Anthropic playbook 整理](https://mer.vin/2026/05/when-not-to-build-ai-agents-anthropics-workflow-vs-agent-playbook/)。
-**論文**:[Draft-Conditioned Constrained Decoding(2026)](https://arxiv.org/pdf/2603.03305)。
+**論文**:[Draft-Conditioned Constrained Decoding(2026)](https://arxiv.org/pdf/2603.03305) ·
+[Memory 表徵對照(2026)](https://arxiv.org/pdf/2601.00821)。
+**輪 3-4 增補**:[12-factor agents(HumanLayer 原文)](https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-12-stateless-reducer.md) ·
+[Starlog 12-factor 生產經驗](https://starlog.is/articles/ai-agents/humanlayer-12-factor-agents/) ·
+[LangGraph durable execution 官方](https://docs.langchain.com/oss/python/langgraph/durable-execution) ·
+[LangGraph 2026 評測](https://toolbrain.net/blog/langgraph-review-2026/) ·
+[Temporal 官方 — beyond state machines](https://temporal.io/blog/temporal-replaces-state-machines-for-distributed-applications) ·
+[Temporal 2026 指南](https://devstarsj.github.io/2026/03/24/temporal-durable-execution-workflows-microservices-guide-2026/) ·
+[Atlan — Are LLMs stateless?](https://atlan.com/know/are-llms-stateless/)。
 **Repo 內**:上游研究 2026-07-02 · ADR 0007/0008/0015/0020/0022 · `docs/contract-strategy.md`。

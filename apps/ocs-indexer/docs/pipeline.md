@@ -80,7 +80,7 @@ hybrid_search(level="profile"|"task", limit=top_k)
 | `get_occupation_tasks` | scroll task 點 → 聚成 `units{ocu_code → {ocu_name, urn, tasks[]}}` 樹,排序 |
 | `get_competencies` | scroll task 點 → 每 block 的 K/S/O/P 項**按 `item_urn(code,type,code)` 去重**成 bucket;每項 `sources[]` **累積**(哪個 unit/task 帶入、各自 level);A 從 profile 點取 |
 | `batch_get_tasks` | `client.retrieve(ids)` → 投影;**缺失 id 靜默略過**(刻意,ADR 0019) |
-| `find_similar_tasks` | scroll 選定 ocs_codes 的 task 點(**帶向量**)→ numpy **brute-force cosine** 兩兩配對 ≥ threshold |
+| `matching.service.match_items` | 相似比對(ADR 0022,`POST /items:match`):不碰 Qdrant,吃呼叫端送來的池 → 清洗/NFKC 收斂 → embedder 嵌入 → 跨來源 numpy cosine → FS 分帶 → 星型分群(舊 `tasks:findSimilar` 已退役,零消費者、功能被涵蓋) |
 
 > `get_competencies` 的 **CitableItem** 就是 api `/knowledge` 能力池的原料:同一 K/S 跨多任務出現時,
 > 去重成一項、`sources[]` 記全部出處(api 據此堆 `srcs`,web 選單顯示引用行)。

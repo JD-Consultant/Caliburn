@@ -18,7 +18,7 @@ import {
   setTaskLevel,
 } from "@/lib/ocsDoc";
 import { useKnowledge } from "@/hooks/useKnowledge";
-import { ownTaskRefs, valuePoolOptions } from "@/lib/pack";
+import { isOfficialBasis, ownTaskRefs, primaryDefaults, valuePoolOptions } from "@/lib/pack";
 import { taskUrns } from "@/lib/urn";
 import { FieldCombobox } from "./fields/FieldCombobox";
 import { OfficialMenu } from "./fields/OfficialMenu";
@@ -286,6 +286,10 @@ function AttitudeBlock({
   onChange: (d: OcsDocument) => void;
 }) {
   // 態度池 key=name（A5：文件自編碼跨職類必撞，不當 key）；選單序號顯示+引用行。
+  // defaults=主基準來源(spec 2026-07-04 §4;主基準空白/自訂不套)。
+  const primary = doc.ocs_profile?.ocs_code ?? "";
+  const options = pack ? valuePoolOptions(pack.pools.attitudes) : [];
+  const defaults = pack && isOfficialBasis(pack, primary) ? primaryDefaults(options, primary) : [];
   return (
     <div className="rounded-lg border bg-background p-4">
       <FieldCombobox
@@ -294,8 +298,10 @@ function AttitudeBlock({
         layout="list"
         customMode="footer"
         autoCode="A"
+        autoApplyOnFirstOpen
         value={doc.ocs_attitude?.attitudes ?? []}
-        options={pack ? valuePoolOptions(pack.pools.attitudes) : []}
+        options={options}
+        defaults={defaults}
         onCommit={(items) => onChange(setAttitudes(doc, items))}
       />
     </div>

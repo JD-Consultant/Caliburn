@@ -73,7 +73,7 @@ Caliburn = 給顧問用的多租戶 B2B SaaS(職能基準 OCS → 職務說明�
 
 - [`specs/2026-06-27-system-architecture-design.md`](specs/2026-06-27-system-architecture-design.md) — 大框架(monorepo / 契約優先 / 3 bounded context / Hexagonal+DDD / 多租戶)。
 - [`design/`](design/) — **子系統端到端設計(agent-facing)**;首份 [`editor-knowledge-pack.md`](design/editor-knowledge-pack.md)(編輯器 × 知識包)。寫法見 [`design/README.md`](design/README.md)。
-- [`adr/`](adr/) — Architecture Decision Records(決策的「為什麼」+ 取捨;**0001–0021**)。
+- [`adr/`](adr/) — Architecture Decision Records(決策的「為什麼」+ 取捨;**0001–0022**)。
 - [`specs/`](specs/) — 研究紀錄(研究/診斷/選項/比對)。
 - [`plans/`](plans/) — bite-size 實作計畫。
 - [`ocs-schema.md`](ocs-schema.md) — OCS **著作產出**文件 JSON 結構與代碼規則(T/P/O/K/S/A);`packages/ocs-contract` 依據。

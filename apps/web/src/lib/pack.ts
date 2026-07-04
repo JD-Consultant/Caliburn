@@ -11,6 +11,7 @@ export function packSrcToRef(s: PackSrc): SourceRef {
     ocs_code: s.ocs_code,
     occupation_name: s.ocs_name,
     code: s.code ?? "",
+    ocu_code: s.ocu_code ?? undefined,
     task_code: s.task_code ?? undefined,
     task_name: s.task_name ?? undefined,
   };

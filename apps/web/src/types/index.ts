@@ -51,7 +51,8 @@ export type ItemSource = "official" | "custom";
 export interface SourceRef {
   ocs_code: string;        // 來源官方基準碼，如 INM3513-009v1
   occupation_name: string; // 來源職業名，如 AIoT應用工程師
-  code: string;            // 該項在來源文件的原始碼（O1.1.1 / K01 / INM；O/P 暫為 ""）
+  code: string;            // 該項在來源文件的原始碼（O1.1.1 / K01 / INM / n1；O/P 暫為 ""）
+  ocu_code?: string;       // 來源職責碼（職責身分對位用，如 T2；spec 2026-07-04 §6）
   task_code?: string;      // 來源任務碼（任務範圍項目才有，如 T1.1）
   task_name?: string;      // 來源任務名
 }
@@ -65,6 +66,10 @@ export type CodeName = Omit<GenCodeName, "code" | "name"> & {
   _src?: ItemSource;       // 來源；加入當下即定
   _ref?: SourceRef;        // 官方來源；改內容→清空（轉自訂）
 };
+
+// notes 影子列（spec 2026-07-04 §3）：契約欄恆 string[]，物件列（唯一真相）存
+// notes._prerequisites/_supplements；finalize/export 剝 `_` 後契約乾淨。
+export type NoteItem = { code: string; text: string; _id?: string; _src?: ItemSource; _ref?: SourceRef };
 
 export type Indicator = Omit<GenCodeText, "code" | "text"> & {
   code: string;
@@ -124,6 +129,7 @@ export type OcsProfile = Omit<
   category: OcsCategory;
   job_description: string;
   ocs_level: number | null;
+  _levelSrc?: SourceRef & { level: number }; // 基準級別官方來源（值==官方值時寫；spec 2026-07-04 §2）
 };
 
 export type OcsDocument = Omit<
@@ -134,7 +140,10 @@ export type OcsDocument = Omit<
   ocs_profile: OcsProfile;
   ocs_content: { ocu_units: OcuUnit[] };
   ocs_attitude: { attitudes: CodeName[] };
-  notes: { prerequisites: string[]; supplements: string[] };
+  notes: {
+    prerequisites: string[]; supplements: string[];
+    _prerequisites?: NoteItem[]; _supplements?: NoteItem[]; // 唯一真相；setter 同步導出 string[]
+  };
 };
 
 // GET/PATCH/finalize/seed 的回傳信封（DocRepo._to_dict / no-doc 空殼）。

@@ -148,6 +148,7 @@ function TaskRow({
   const own = pack ? ownTaskRefs(pack, taskUrns(task)) : null;
   const officialLevel = own?.level ?? task._levelSrc?.level ?? null;
   const levelSrc = own?.levelSrc ?? task._levelSrc ?? null;
+  const isCustomTask = taskUrns(task).length === 0; // 無官方身分=自訂(手動新增/改過名;spec §2)
 
   return (
     <div ref={setNodeRef} style={style} className="rounded-md border bg-background px-3 py-2">
@@ -167,6 +168,7 @@ function TaskRow({
           onCommit={(v) => onChange(renameTask(doc, unitIdx, taskIdx, v))}
           className="flex-1 text-sm font-medium"
         />
+        {isCustomTask ? <span className="shrink-0 rounded bg-amber-100 px-1 text-[10px] text-amber-700" title="自訂任務(無官方來源)">自訂</span> : null}
         <OfficialMenu
           trigger={
             <button type="button" className="inline-flex items-center gap-0.5 rounded border px-1.5 py-0.5 text-xs text-muted-foreground hover:text-foreground" title="任務級別（可改；下拉顯示官方來源）">
@@ -179,6 +181,9 @@ function TaskRow({
             srcs: officialLevel === n && levelSrc ? [levelSrc] : [],
           }))}
           selected={level != null ? String(level) : ""}
+          onAutoApply={officialLevel != null && levelSrc
+            ? () => onChange(setTaskLevel(doc, unitIdx, taskIdx, officialLevel, { ...levelSrc, level: officialLevel }))
+            : undefined}
           onPick={(v) => onChange(setTaskLevel(doc, unitIdx, taskIdx, v,
             officialLevel != null && Number(v) === officialLevel && levelSrc
               ? { ...levelSrc, level: officialLevel } : undefined))}
@@ -222,6 +227,7 @@ function UnitRow({
   const style = { transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.5 : 1 };
   const tasks = unit.tasks ?? [];
   const taskIds = tasks.map((t) => `t:${t._tid}`);
+  const isCustomUnit = !(unit._refs?.length) && !unit.source?.ocs_code; // 無官方來源=自訂(spec §2)
 
   return (
     <div ref={setNodeRef} style={style} className="rounded-lg border bg-background">
@@ -236,6 +242,7 @@ function UnitRow({
           onCommit={(v) => onChange(renameUnit(doc, unitIdx, v))}
           className="flex-1 text-sm font-medium"
         />
+        {isCustomUnit ? <span className="shrink-0 rounded bg-amber-100 px-1 text-[10px] text-amber-700" title="自訂職責(無官方來源)">自訂</span> : null}
         {unit.source?.occupation_name ? (
           <span className="text-xs text-muted-foreground">來源：{unit.source.occupation_name}</span>
         ) : null}

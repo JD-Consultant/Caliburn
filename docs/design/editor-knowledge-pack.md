@@ -105,7 +105,7 @@ updated: 2026-07-04
 | Method Path | 用途 | 降級/錯誤 |
 |---|---|---|
 | `PUT …/occupations` | 設 selected_ocs_codes(序=優先) + 刷表頭 + 建/更新 draft | indexer 掛→表頭名留空(不退回 job_title) |
-| `GET …/knowledge` | 知識包(選職類後一次抓齊) | 單 code 掛→partial;**全掛→502**(critical) |
+| `GET …/knowledge` | 知識包(選職類後一次抓齊);**含 `similarity`**(態度/任務兩池的相似比對結果,ADR 0022,api 原樣搬運 indexer `items:match`) | 單 code 掛→partial;**全掛→502**(critical);match 掛→`similarity` 缺該 kind + `meta.similarity: ok\|partial\|unavailable`(enrichment) |
 | `GET …/document` | 最新 draft/final;無→空殼(status none, v0) | — |
 | `PATCH …/document` | 存整份 draft(loose,不 strict 驗) | 帶雙 token 且不符→**409**(ADR 0015) |
 | `POST …/document:finalize` | 組裝+驗 schema→正式版本 | schema 錯→**422** |
@@ -134,6 +134,12 @@ updated: 2026-07-04
     TaskPickerMenu 的 own 任務以 `unit._refs` 的 `(ocs_code, ocu_code)` 身分對位,**不比名字**。
 11. **級別「值==官方值即官方」**(spec §9 決策 6):選中值等於官方級別→寫 `_levelSrc`,不等→清;
     不區分使用者選的還是自動帶的。基準代碼**再點已選項=整組清空**(code+兩名一起)。
+12. **相似比對分群 = render-only 顯示變換**(ADR 0022):選擇邏輯(`primaryDefaults`/首開自動套/
+    勾選判定/寫入身分)**永遠跑在平選項上,一行不改**;`groupedValueOptions`/`taskRowsWithSimilar`
+    只在 render 前折疊顯示列。**把分群搬進選擇邏輯 = 違規**。收合列**就是代表成員本人**
+    (群無可選身分,文件永遠只出現成員真身);任務灰區對**純顯示徽章**(不自動勾、不合併、不擋)。
+    兩個湧現不變量:(A) 來源不相交才比 ⇒ 一群內每基準最多一條 ⇒ 自動勾選不可能勾雙;
+    (B) survivorship 主基準優先 ⇒ 主基準成員在群內必為代表 ⇒ 自動套勾到的就是主基準身分。
 
 ## 7. 已退役 / 別做(anti-patterns)
 

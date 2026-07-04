@@ -106,6 +106,7 @@ embed 字串只放 ChunkRecord.text) → HTTP embed(batch) → QdrantWriter.upse
 | POST | `/tasks:search` | 自然語言 → 任務 hits |
 | POST | `/tasks:batchGet` | point id 批次取回(缺失 id 靜默略過——刻意偏離 AIP-231,ADR 0019) |
 | POST | `/tasks:findSimilar` | 跨職類相近任務對(`{ocs_codes, score_threshold}`;brute-force cosine) |
+| POST | `/items:match` | **相似比對**(ADR 0022):池進(`{kind, items:[{id,text,sources}]}`)→ `{groups, possible_matches, config}` 出。六步確定性管線(清洗→NFKC 收斂→嵌入→跨來源 cosine→FS 三區分帶→星型分群);per-kind 門檻在 [`matching/core.py`](src/jd_ocs_indexer/matching/core.py) `THRESHOLDS`(改門檻=跑 [`scripts/calibrate_match.py`](scripts/calibrate_match.py) 留紀錄)。錯誤:>500 項→413、kind 不認得→422、embedder 掛→503(body 含 `code`) |
 | GET | `/occupations/{ocs_code}` | 職類官方 metadata(表頭池原料) |
 | GET | `/occupations/{ocs_code}/tasks` | unit→task 結構(任務候選原料) |
 | GET | `/occupations/{ocs_code}/competencies` | K/S/O/P/A 能力池(多來源 CitableItem) |

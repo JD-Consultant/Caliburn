@@ -60,7 +60,7 @@ users ─1:N─ job_profiles ─1:N─ document_versions
 | `POST …/document:finalize` | 組裝+驗 schema(失敗 422)→ INSERT 新 final 列 | — |
 | `GET …/document/export` | 唯讀匯出乾淨契約 JSON(剝 `_` 欄位,不寫 DB) | — |
 | `PUT …/occupations` | 整批取代已選職類 + 刷新文件表頭為官方主基準 | 表頭名(掛→留空) |
-| `GET …/knowledge` | **知識包**(ADR 0021):occupation_details + 12 池 + source_tasks,每官方值帶 srcs——web 所有選單的唯一資料源 | 單掛 partial/**全掛 502** |
+| `GET …/knowledge` | **知識包**(ADR 0021):occupation_details + 12 池 + source_tasks,每官方值帶 srcs——web 所有選單的唯一資料源。**含 `similarity`**(ADR 0022:態度/任務兩池丟 indexer `items:match`,回應**原樣掛上**,api 不拆包不選代表;輸入由 `knowledge_pack.similarity_items` 純函式組) | 單掛 partial/**全掛 502**;match 掛→缺該 kind + `meta.similarity: ok\|partial\|unavailable`(enrichment) |
 | `GET /occupations?q=` | 根層職類目錄搜尋(全域知識,不掛 profile 下;ADR 0019) | **critical** |
 | `POST /ai/{recommend-ks,draft-op,extract-tasks,structure-task,clarify}` | **只提議、不寫 DB**;無金鑰→降級回 catalog/空 | enrichment |
 | `GET /healthz`;`/copilotkit`(AG-UI) | 就緒(含 DB);訪談 agent(live app 才掛) | — |

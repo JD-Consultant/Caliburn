@@ -12,7 +12,8 @@
 
 ```bash
 npm run dev            # :3000(或 monorepo 根 npx turbo dev)
-npx tsc --noEmit       # 型別檢查(web 無單元測試,以 tsc + lint 為 gate)
+npm run test           # vitest,只測 src/lib 純函式(ocsDoc/pack/urn)
+npx tsc --noEmit       # 型別檢查(UI 無單元測試,以 tsc + lint 為 gate)
 npm run lint
 ```
 

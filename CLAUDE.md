@@ -42,7 +42,7 @@ Monorepo。維護者用**繁體中文**,請用繁中回應。
 - 首次/改 schema:`npm run db:migrate`。Qdrant 空要建一次索引:
   `cd apps/ocs-indexer && uv run jd-ocs-indexer index ./data/jd-json`(走 embedder,**不需本機 torch**)。
 - **測試**:`npx turbo test`。各 app:api `uv run pytest`、ocs-indexer `uv run --all-extras pytest`、
-  pdf-to-json `uv run --extra dev pytest`;web `npx tsc --noEmit` + `npm run lint`。
+  pdf-to-json `uv run --extra dev pytest`;web `npm run test`(vitest,src/lib)+ `npx tsc --noEmit` + `npm run lint`。
 
 ## Windows / 環境踩雷(重要)
 

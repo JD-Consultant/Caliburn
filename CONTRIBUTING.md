@@ -65,7 +65,7 @@ npx turbo lint         # web eslint(Python ruff 待 Phase 3 清理)
 cd apps/api          && uv run pytest -q
 cd apps/ocs-indexer  && uv run --all-extras pytest -q
 cd apps/pdf-to-json  && uv run --extra dev pytest -q
-cd apps/web          && npx tsc --noEmit && npm run lint
+cd apps/web          && npm run test && npx tsc --noEmit && npm run lint
 ```
 
 ## 提交規範

@@ -55,10 +55,12 @@ def build_pack(order: list[str], details: dict[str, OccupationDetail],
                 row["srcs"].append({"ocs_code": code, "ocs_name": name})
         for pool_name, texts in (("prerequisites", d.prerequisites),
                                  ("supplements", d.supplements)):
+            i = 0  # 來源位置碼 n{i}(1-based、不補零;spec 2026-07-04 §3):跳過空白不佔號
             for t in texts:
                 if t.strip():
+                    i += 1
                     _row(pools[pool_name], t)["srcs"].append(
-                        {"ocs_code": code, "ocs_name": name})
+                        {"ocs_code": code, "ocs_name": name, "code": f"n{i}"})
         # 結構層:units/tasks 池(name key)+ source_tasks 骨架(URN byId)。
         occ_tasks = tasks_by_code.get(code)
         for u in (occ_tasks.units if occ_tasks else []):

@@ -85,6 +85,19 @@ def test_categories_dedup_by_code_and_notes_by_text():
     assert [s["ocs_code"] for s in p["pools"]["prerequisites"]["大學以上"]["srcs"]] == ["OC1", "OC2"]
 
 
+def test_notes_srcs_carry_positional_n_codes():
+    """spec 2026-07-04 §3:notes 來源位置碼 n{i}(1-based、不補零、per-source 清單順序)。"""
+    details = {
+        "OC1": _detail("OC1", "甲職業", prereqs=["大學以上", "二年經驗"]),
+        "OC2": _detail("OC2", "乙職業", prereqs=["大學以上"]),
+    }
+    p = kp.build_pack(["OC1", "OC2"], details, {}, {})
+    srcs = p["pools"]["prerequisites"]["大學以上"]["srcs"]
+    assert [(s["ocs_code"], s["code"]) for s in srcs] == [("OC1", "n1"), ("OC2", "n1")]
+    srcs2 = p["pools"]["prerequisites"]["二年經驗"]["srcs"]
+    assert [(s["ocs_code"], s["code"]) for s in srcs2] == [("OC1", "n2")]
+
+
 def test_units_and_tasks_merge_by_name_with_urn_srcs():
     p = _two_code_pack()
     assert [s["ocs_code"] for s in p["pools"]["units"]["維護"]["srcs"]] == ["OC1", "OC2"]

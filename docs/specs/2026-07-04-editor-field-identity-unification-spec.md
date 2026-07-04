@@ -1,7 +1,7 @@
 # 2026-07-04 編輯器全欄位身分統一 + 自動勾選規則(spec)
 
-> 狀態:spec(與維護者逐點討論拍板,決策紀錄見 §9)。實作 plan 見
-> `docs/plans/2026-07-04-editor-field-identity.md`(出 plan 後補連結)。
+> 狀態:spec(與維護者逐點討論拍板,決策紀錄見 §9)。實作 plan =
+> [`docs/plans/2026-07-04-editor-field-identity.md`](../plans/2026-07-04-editor-field-identity.md)(12 task 已全數落地)。
 > 相關深文檔:`docs/design/editor-knowledge-pack.md`(§2 三分法)、`apps/web/docs/data-layer.md`、
 > `apps/api/docs/knowledge-pack-assembly.md`。實作落地後**同 commit 更新**上述 living 文檔。
 

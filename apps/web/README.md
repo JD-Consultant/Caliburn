@@ -100,8 +100,12 @@ baseline = 最後已知 server 狀態快照,是 dirty 判定 / no-op skip / 樂�
   來源/自訂判定看 `_id`/`_src`/`_ref`,不看 code。
 - **K/S 碼是文件層級**(A4,ocs-schema):name 為 key、首現給號、**同名共碼**(跨任務共用
   同一代碼);任何 K/S 內容或結構變動都全文件重編(`renumberDocKS`)。碼共用、身分各自。
-- **UI-only 欄位一律 `_` 前綴**(`_id/_uid/_tid/_src/_ref/_notes/_levelSrc`):draft 會存進 DB,
-  但 finalize/export 在後端 `_strip_underscore` 全剝,正式 OCS JSON 契約純淨。
+- **UI-only 欄位一律 `_` 前綴**(`_id/_uid/_tid/_src/_ref/_notes/_levelSrc` + `notes._prerequisites/_supplements`):
+  draft 會存進 DB,但 finalize/export 在後端 `_strip_underscore` 全剝,正式 OCS JSON 契約純淨。
+- **notes 影子列是唯一真相**(spec 2026-07-04 §3):`notes._<field>` 存 `{code,text,_id,_src,_ref}`,
+  契約欄 `string[]` 由 `renumber()` 導出;來源 n 碼(`_ref.code`)由 api build_pack 蓋在池 srcs。
+- **改名=斷鏈變自訂**(spec §5):職責/任務改名清官方綁定 → 標「自訂」、選單取消勾選;
+  自動勾選統一「首開且空→套主基準來源」(任務層維持 own refs 規則)。
 - **官方項改了內容就變自訂**:編輯官方帶入項 → `_src="custom"`、`_ref` 清空(選單勾選判定
   採 DDD 實體/值物件:有來源 code 比 provenance,無 code 比 name)。
 - 兩把 localStorage 鑰匙:`caliburn-rq-cache`(React Query)、`caliburn-user`(zustand userId)。

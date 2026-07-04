@@ -40,7 +40,12 @@ updated: 2026-07-04
 | URN | 任務**身分座標** `ocs:{code}:T:{task_code}` | source_tasks 的 key、tasks 池 srcs 指標 | **現組不落庫**([urn.ts](../../apps/web/src/lib/urn.ts)) |
 
 `_` 前綴一律 **UI-only、finalize/export 後端剝除**:`_ref` `_refs`(合併列多來源聯集,provenance 取首個)、
-`_levelSrc`(帶官方級別的來源,B4)、`_notes`(工作筆記 D28)、`_id`/`_uid`/`_tid`(dnd 穩定鍵)。
+`_levelSrc`(帶官方級別的來源,B4;任務級 + 表頭級 `ocs_profile._levelSrc`)、`_notes`(工作筆記 D28)、
+`_id`/`_uid`/`_tid`(dnd 穩定鍵)、**`notes._prerequisites`/`_supplements`(NoteItem 影子列=notes 唯一真相,
+契約欄 string[] 由 renumber 導出;來源 n 碼由 api build_pack 蓋在池 srcs.code)**。
+
+**每列三件套**(spec 2026-07-04 §1):UUID 列身分(`_id` 系,永不變)+ 位置顯示碼(`code`,renumber 重編)
++ 官方綁定(`_ref`=URN 成分,勾選當下凍結)。單值欄(級別/基準代碼)只有官方綁定。
 
 ## 3. 端到端資料流(runtime 場景)
 
@@ -58,7 +63,7 @@ updated: 2026-07-04
 ③ 各選單讀池  (pack.ts 純函式層,唯一 pack 讀取點)
    表頭主基準   DocHeader     primaryBasisOptions(pack)          → setPrimaryBasis
    表頭三類     DocHeader     codedPoolOptions(pack.pools[kind]) → setCategory
-   NOTE 前提/補充 DocNotes    valuePoolOptions(pack.pools[field])→ setNotes
+   NOTE 前提/補充 DocNotes    valuePoolOptions(pack.pools[field])→ setNoteItems(影子列)
    態度 A       AttitudeBlock valuePoolOptions(pack.pools.attitudes) → setAttitudes
    選職責 ▾     UnitPickerMenu unitRows(pack)                    → addFromPool / deleteUnit
    選任務 ▾     TaskPickerMenu taskRows(pack)+ownTaskKeys        → addTasksToUnit / deleteTask
@@ -73,9 +78,9 @@ updated: 2026-07-04
         產生正式版本 POST /document:finalize(assemble + 驗 schema,失敗 422)
 ```
 
-**純函式改文件**都在 [ocsDoc.ts](../../apps/web/src/lib/ocsDoc.ts):結構變動(增刪職責/任務、拖拉)收尾跑
-`renumber()`(職責 `T1`、任務 `T1.1` 位置碼)**內含 `renumberDocKS`**(A4 文件級 K/S 重編);
-`setKS`/`setOp` 也各自重編。
+**純函式改文件**都在 [ocsDoc.ts](../../apps/web/src/lib/ocsDoc.ts):`renumber()` 是**唯一重編點**
+(職責 `T#`、任務 `T#.#`、任務範圍 O/P、態度 `A##`、notes `n#`、A4 文件級 K/S),冪等;
+結構變動與 `setOp`/`setKS`/`setAttitudes`/`setNoteItems` 收尾都走它——「漏重編」類 bug 結構上不可能。
 
 ## 4. UI 動作 → 請求對照
 
@@ -86,7 +91,7 @@ updated: 2026-07-04
 | 選任務 ▾ 勾/取消 | TaskPickerMenu | addTasksToUnit / deleteTask | `PATCH /document` |
 | 點空格填 O/P/K/S | CellFillerPanel | setOp / setKS | `PATCH /document` |
 | 改主基準/三類 | DocHeader | setPrimaryBasis / setCategory | `PATCH /document` |
-| 改 NOTE / 態度 / 級別 | DocNotes / AttitudeBlock / TaskRow | setNotes / setAttitudes / setTaskLevel | `PATCH /document` |
+| 改 NOTE / 態度 / 級別 | DocNotes / AttitudeBlock / TaskRow | setNoteItems / setAttitudes / setTaskLevel | `PATCH /document` |
 | 匯出 JSON | 工具列 | — | `GET /document/export` |
 | 產生正式版本 | 工具列 | — | `POST /document:finalize` |
 
@@ -117,11 +122,18 @@ updated: 2026-07-04
 4. **池序 = append 序**(職位優先序);**選單不排序、不搜尋**;無碼選項顯序號 `1. 2. 3.`(三類池例外顯真分類碼)。
 5. **A4 K/S 文件級去重**:碼以 **name 為 key 全文件共用**(首現給號、同名共碼);O/P 任務範圍、A 全域。
    `renumberDocKS` 在每次 K/S 內容或結構變動時跑。
-6. **預勾統一規則**:「開誰的選單 → 給全池、預勾它自己的官方配套、其餘可勾=借用」。
-   空職責/空格**首開自動帶官方**(`applied` ref 一次為限);之後**以使用者動過的為準(文件是真相)**。
+6. **預勾/自動勾選統一規則**(spec 2026-07-04 §4):「開誰的選單 → 給全池、預勾它自己的官方配套、
+   其餘可勾=借用」。**任務層**(OPKS 格/任務級別)defaults=該任務 own refs;**表頭層**(三類/基準級別/
+   態度/notes)defaults=**主基準來源**,主基準空白/自訂→不套。一律**首開且欄位空**才自動套(一次為限),
+   之後**以使用者動過的為準(文件是真相)**;「自動勾選」鈕一律在**選單頂列**。
 7. **取消勾選=移除**,但**有內容/含任務/在他職責 → 鎖定**(只能在表格刪;防誤刪已填資料)。
 8. **降級**(ADR 0018):部分 code 掛→`meta.partial=true`(前端提示部分暫缺);全掛→502(沒 knowledge 選不了)。
 9. **樂觀鎖 opt-in**(ADR 0015):web 一律帶 `expect_version+expect_revision`;409 **不回滾本地編輯**(使用者的字留著)→ ConflictDialog。
+10. **改名=斷鏈變自訂**(spec 2026-07-04 §5):職責/任務改名即清官方綁定(`_refs`/`source`/
+    `provenance`/`_levelSrc`)→ 列標「自訂」、選單取消勾選;職責改名**不**影響底下任務身分。
+    TaskPickerMenu 的 own 任務以 `unit._refs` 的 `(ocs_code, ocu_code)` 身分對位,**不比名字**。
+11. **級別「值==官方值即官方」**(spec §9 決策 6):選中值等於官方級別→寫 `_levelSrc`,不等→清;
+    不區分使用者選的還是自動帶的。基準代碼**再點已選項=整組清空**(code+兩名一起)。
 
 ## 7. 已退役 / 別做(anti-patterns)
 
@@ -139,6 +151,7 @@ updated: 2026-07-04
   [0018 降級](../adr/0018-indexer-dependency-degradation-policy.md)、
   [0015 樂觀鎖](../adr/0015-document-save-optimistic-concurrency.md)、
   [0019 命名](../adr/0019-api-naming-alignment.md)、[0011 生成型別](../adr/0011-web-ocs-types-generated.md)。
-- **spec**:[editor-provenance-knowledge-pack-decisions](../specs/2026-07-03-editor-provenance-knowledge-pack-decisions.md)(逐項決策:三分/A4/B4/預勾/借用)。
+- **spec**:[editor-provenance-knowledge-pack-decisions](../specs/2026-07-03-editor-provenance-knowledge-pack-decisions.md)(逐項決策:三分/A4/B4/預勾/借用)、
+  [editor-field-identity-unification](../specs/2026-07-04-editor-field-identity-unification-spec.md)(全欄位身分表/n 碼/改名斷鏈/自動勾選)。
 - **契約 schema**:`packages/ocs-contract`(OCS 文件單一真相,生 TS)。
 - **README**:[apps/web](../../apps/web/README.md)、[apps/api](../../apps/api/README.md)。

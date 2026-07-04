@@ -39,6 +39,15 @@ export function FieldCombobox({
 }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
+  // 相似比對群(ADR 0022):展開狀態(key = 代表列 keyOf)。分群是 render-only 顯示變換
+  // ——勾選/自動套/身分寫入全跑在平選項(defaults 由呼叫端以平選項計),此處只管畫。
+  const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const toggleExpand = (k: string) =>
+    setExpanded((prev) => {
+      const next = new Set(prev);
+      if (next.has(k)) next.delete(k); else next.add(k);
+      return next;
+    });
   const sourcesOf = (k: string) => options.find((o) => keyOf(o) === k)?.sources ?? [];
 
   // 勾選判定(DDD 實體 vs 值物件)：選項帶來源身分（srcs 任一 {ocs_code, code} 命中 _ref）
@@ -100,18 +109,42 @@ export function FieldCombobox({
     <CommandGroup>
       {options.map((o, i) => {
         const k = keyOf(o);
+        // 群列 checked = 任一成員 checked(代表列就是代表成員本人;點列 = 勾代表真身)
+        const groupChecked = isOfficialSelected(o) || (o.variants ?? []).some(isOfficialSelected);
         return (
-          <CommandItem key={k} value={`${o.code} ${o.name}`} onSelect={() => toggle(o)} className="items-start">
-            <Check className={"mt-0.5 h-3.5 w-3.5 " + (isOfficialSelected(o) ? "opacity-100" : "opacity-0")} />
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-1">
-                {/* W1：系統碼不上選單——無碼（池選項）顯序號；類別選單有真實分類碼照顯 */}
-                <span className="font-mono text-xs text-muted-foreground">{o.code || `${i + 1}.`}</span>
-                <span className="flex-1">{o.name}</span>
+          <div key={k}>
+            <CommandItem value={`${o.code} ${o.name}`} onSelect={() => toggle(o)} className="items-start">
+              <Check className={"mt-0.5 h-3.5 w-3.5 " + (groupChecked ? "opacity-100" : "opacity-0")} />
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-1">
+                  {/* W1：系統碼不上選單——無碼（池選項）顯序號；類別選單有真實分類碼照顯 */}
+                  <span className="font-mono text-xs text-muted-foreground">{o.code || `${i + 1}.`}</span>
+                  <span className="flex-1">{o.name}</span>
+                  {(o.variants?.length ?? 0) > 0 ? (
+                    <button type="button"
+                      className="shrink-0 rounded bg-sky-100 px-1 text-[10px] text-sky-700 hover:bg-sky-200"
+                      title="相似版本(不同基準的近似措辭),展開可改選"
+                      onClick={(e) => { e.stopPropagation(); toggleExpand(k); }}>
+                      {(o.variants!.length + 1)} 個版本 {expanded.has(k) ? "▴" : "▾"}
+                    </button>
+                  ) : null}
+                </div>
+                <SourceLine srcs={o.srcs} />
               </div>
-              <SourceLine srcs={o.srcs} />
-            </div>
-          </CommandItem>
+            </CommandItem>
+            {expanded.has(k)
+              ? (o.variants ?? []).map((v) => (
+                  <CommandItem key={keyOf(v) + "-variant"} value={`${v.code} ${v.name}`}
+                    onSelect={() => toggle(v)} className="items-start pl-8">
+                    <Check className={"mt-0.5 h-3.5 w-3.5 " + (isOfficialSelected(v) ? "opacity-100" : "opacity-0")} />
+                    <div className="min-w-0 flex-1">
+                      <span>{v.name}</span>
+                      <SourceLine srcs={v.srcs} />
+                    </div>
+                  </CommandItem>
+                ))
+              : null}
+          </div>
         );
       })}
     </CommandGroup>

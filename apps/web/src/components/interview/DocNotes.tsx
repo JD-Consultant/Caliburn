@@ -2,7 +2,7 @@
 import type { OcsDocument } from "@/types";
 import { useKnowledge } from "@/hooks/useKnowledge";
 import { valuePoolOptions } from "@/lib/pack";
-import { setNotes, type NoteField } from "@/lib/ocsDoc";
+import { setNoteItems, type NoteField } from "@/lib/ocsDoc";
 import { FieldCombobox } from "./fields/FieldCombobox";
 
 // NOTE 候選＝知識包 prerequisites/supplements 池（key=text，序號顯示+引用行；ADR 0021）。
@@ -17,7 +17,8 @@ function NoteCombo({ doc, profileId, field, title, onChange }: {
     <div>
       <FieldCombobox label="選/輸入" title={title} layout="list" customMode="footer" editMultiline
         value={value} options={options}
-        onCommit={(items) => onChange(setNotes(doc, field, items.map((i) => i.name).filter(Boolean)))} />
+        onCommit={(items) => onChange(setNoteItems(doc, field,
+          items.map((i) => ({ code: i.code, text: i.name, _id: i._id, _src: i._src, _ref: i._ref }))))} />
     </div>
   );
 }

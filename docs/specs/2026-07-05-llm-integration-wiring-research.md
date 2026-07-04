@@ -302,7 +302,61 @@ Harvey 2026 [推出自主 agent 端到端起草](https://mlq.ai/news/harvey-a-la
 **確立的研究議程**:R1 黃金範本合成(最優先,是其他一切的尺)· R2 指令詞彙表+覆蓋率/飽和設計
 (mixed-initiative 訪談編排)· R3 提議+寫的 UX(staged 提議+對話中 widget)。
 
-## 8. 待決 / 下輪
+## 8. 輪 8 — R1 黃金範本合成第一稿(2026-07-05)
+
+### 8.1 三路權威(互相印證)
+
+- **O*NET 內容模型**(美國勞動部,取代 DOT 的國際最高權威;[量表](https://www.onetonline.org/help/online/scales)、[資料字典](https://www.onetcenter.org/dl_files/DataDictionary20_0.pdf)):
+  任務逐條評 **Importance / Relevance / Frequency**;**core 任務判準 = relevance ≥67% 且
+  importance ≥3.0**,其餘為 supplemental;Work Context 問卷=頻率/時間占比量表;
+  Tools & Technology 獨立分類。
+- **SHRM**(全球最大 HR 專業協會;[JD 指南](https://www.shrm.org/topics-tools/tools/job-descriptions)、[essential functions](https://www.shrm.org/topics-tools/tools/express-requests/job-descriptions-essential-functions)):
+  essential functions 要寫**任務頻率、不做的後果、替代做法**;**時間占比加總 100%**;
+  reporting relationships、working conditions;先做 job analysis(訪談現任者)。
+- **中文圈實務**([104 人資工具包](https://blog.104.com.tw/hr-form-example-statement-of-work/)、公部門 DGPA 範例、MBA智库):
+  七部分結構=工作識別/工作摘要/職責與任務/職權/績效標準/工作條件/工作規範;
+  **工作比重**、督導與會報、溝通協作向上關係;1–3 頁。
+
+**維護者直覺的細項全部有正式名分**:多久一次=O*NET task frequency;做幾次=volume(task
+inventory);等多久=work context;準備什麼材料=inputs+Tools & Technology。
+
+### 8.2 黃金範本骨架草案(章節層;⊕=OCS 之外的客製擴充)
+
+1. 職務識別(職稱/部門/直屬主管/任職者/日期/版本)
+2. 工作摘要(2–4 句存在目的;≈OCS job_description)
+3. 職責→任務清單(⊕**每任務:工作比重%,加總100** + 頻率)
+4. 每任務深描(OCS T/P/O/K/S 既有 + ⊕細項槽位表 8.3)
+5. ⊕協作與從屬(向上報告/督導/跨部門協作/會報)
+6. ⊕績效標準(每職責怎麼評)
+7. ⊕工作條件(環境/工時型態/體力/出差)
+8. 任職資格(學經歷/證照/態度;≈OCS A+prerequisites)
+
+### 8.3 每任務細項槽位表草案(= 訪談深問的靶;各槽附值域與出處)
+
+| 槽位 | 值域 | 出處 |
+|---|---|---|
+| frequency 頻率 | enum:每日/每週/每月/每季/每年/事件驅動(遇X才做) | O*NET |
+| time_share 工作比重 | %(全任務加總=100) | SHRM/中文實務 |
+| duration 單次耗時 | 時/天 | O*NET work context |
+| volume 數量批次 | 一次處理幾件/多少量 | task inventory |
+| trigger 觸發 | 排程/指派/事件 | FJA 條件(勞動部 FA 同源) |
+| inputs 準備材料 | 材料/文件/資料來源 | 維護者原話+FJA |
+| tools 工具系統 | 設備/軟體 | O*NET Tools & Tech |
+| collaborators 協作對象 | 誰給輸入/誰收產出/會簽誰 | SHRM+中文實務 |
+| wait_points 等待瓶頸 | 等誰/等多久 | 維護者原話+work context |
+| exceptions 例外處理 | 常見困難+處置 | 勞動部指引③面向 |
+| standards 完成標準 | 怎樣算做完/做好 | SHRM 後果+勞動部④面向 |
+| outputs 產出 | (OCS O 既有) | 既有 |
+
+### 8.4 兩個設計紅利(合成時浮現)
+
+1. **深問預算分配有了原則**:借 O*NET core/supplemental 二分——先問到每任務的
+   頻率+比重(便宜、快),**用重要度×比重決定哪些任務值得全套深問**;supplemental
+   任務淺掃即可 → 訪談時長可控,員工不會被問到煩。
+2. **schema 擴充問題更清晰**:8.2 的 ⊕ 項與 8.3 槽位是 OCS shape 沒有的
+   → 契約題(進 ocs-contract 正式欄位 vs 敘述文字)現在有了具體清單可對著裁。
+
+## 9. 待決 / 下輪
 
 1. **引擎骨幹定案**(輪 3+4 證據齊,待維護者裁示:(B)無狀態回合服務?)
 2. **tool 協定**:indexer 工具(檢索 / items:match)進引擎是「LLM function-calling tools」
@@ -311,7 +365,7 @@ Harvey 2026 [推出自主 agent 端到端起草](https://mlq.ai/news/harvey-a-la
 4. **最小實作切片**收斂:候選 = `extract_tasks` 升 `select_schema`(受限解碼版,接現行編輯器,
    不碰訪談 loop)——待骨幹定案後定。
 
-## 9. 來源
+## 10. 來源
 
 **大廠官方**:[Anthropic Building Effective Agents](https://www.anthropic.com/research/building-effective-agents) ·
 [Writing tools for agents](https://www.anthropic.com/engineering/writing-tools-for-agents) ·

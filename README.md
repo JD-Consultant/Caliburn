@@ -23,8 +23,8 @@ docker compose up -d --build embedder         # 首次 build 嵌入容器（~15G
 ### 一鍵啟動 / 關閉
 ```bash
 npm run up      # = docker compose up -d（db + qdrant + embedder）&& turbo dev（api + web + indexer）
-# Ctrl-C 收掉 dev server；
-npm run down    # 停 docker infra（named volume 資料保留）
+# Ctrl-C 收掉 dev server；若視窗被硬關留下孤兒進程，改用下面的 down 全清
+npm run down    # = docker compose down + kill-port 3000/8000/8001（停 infra + 收掉 dev server；named volume 資料保留）
 ```
 
 | 服務 | 埠 | 說明 |

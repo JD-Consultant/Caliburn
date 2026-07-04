@@ -39,7 +39,8 @@ cd apps/pdf-to-json  && uv sync --extra dev
 ```bash
 npm run up      # = docker compose up -d (db:5432 + qdrant:6333 + embedder:8082) && turbo dev (api:8001 + web:3000 + indexer:8000)
 # Ctrl-C 收掉三個 dev server；
-npm run down    # = docker compose down（停 infra；named volume 資料保留）
+npm run down    # = docker compose down + kill-port 3000/8000/8001（停 infra + 收掉 dev server；named volume 資料保留）
+                # docker compose down 只停容器，不碰跑在 host 的 dev server；kill-port 補收孤兒進程（視窗被硬關時）
 ```
 
 **嵌入服務**:BGE-M3(dense+sparse)跑在 `apps/embedder` 容器(GPU,ADR 0012),indexer 用 HTTP 呼叫它(無 in-process torch)。首次需 build 映像(~15GB,含 CUDA torch):`docker compose up -d --build embedder`(需 NVIDIA GPU + Docker Desktop WSL2)。

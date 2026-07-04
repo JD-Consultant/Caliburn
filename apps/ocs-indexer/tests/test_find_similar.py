@@ -11,8 +11,8 @@ def test_pairwise_candidates_above_threshold_only():
     pairs = service._pairwise_candidates([a, b, c], threshold=0.85)
     assert len(pairs) == 1
     p = pairs[0]
-    assert {p["a"]["task_code"], p["b"]["task_code"]} == {"T1.1", "T2.2"}
-    assert p["a"]["urn"].startswith("ocs:") and p["score"] >= 0.85
+    assert {p["left"]["task_code"], p["right"]["task_code"]} == {"T1.1", "T2.2"}
+    assert p["left"]["urn"].startswith("ocs:") and p["score"] >= 0.85
 
 def test_pairwise_excludes_self_and_dedups_direction():
     a = _t("idA", "T1.1", "x", [1.0, 0.0])

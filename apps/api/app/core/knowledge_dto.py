@@ -8,6 +8,8 @@ from indexer_contract.models import (  # noqa: F401
     CitableItem,
     CodeName,
     CompetencyPool,
+    MatchItem,
+    MatchResponse,
     OccupationDetail,
     OccupationHit,
     OccupationSearchResponse,

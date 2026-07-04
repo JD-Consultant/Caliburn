@@ -9,7 +9,16 @@ from __future__ import annotations
 import numpy as np
 
 from jd_ocs_indexer.api import urn
+from jd_ocs_indexer.api.schemas import (
+    GroupMember,
+    MatchConfig,
+    MatchGroup,
+    MatchItem,
+    MatchResponse,
+    PossibleMatch,
+)
 from jd_ocs_indexer.embeddings.base import assert_compatible
+from jd_ocs_indexer.matching import core
 from jd_ocs_indexer.store.manifest import read_manifest
 from jd_ocs_indexer.validation import search as search_mod
 from jd_ocs_indexer.validation import stats as stats_mod
@@ -267,3 +276,74 @@ def find_similar_tasks(client, collection: str, *, ocs_codes: list[str],
         if offset is None:
             break
     return {"candidates": _pairwise_candidates(tasks, score_threshold)}
+
+
+def match_items(embedder, *, kind: str, items: list[MatchItem]) -> MatchResponse:
+    """相似比對(ADR 0022):①清洗 ②NFKC 同字收斂 ③嵌入(唯一 I/O)④跨來源兩兩
+    cosine ⑤FS 分帶 ⑥星型分群+medoid。純輸入輸出,不碰 Qdrant。"""
+    th_hi, th_lo = core.THRESHOLDS[kind]
+    cfg = MatchConfig(kind=kind, theta_high=th_hi, theta_low=th_lo,
+                      model=getattr(embedder, "provider", "bge-m3"))
+
+    # ① 清洗(空文字丟);② NFKC key 收斂:rep = 池序第一個,exact dup 記在 rep 名下
+    rep_text: dict[str, str] = {}                    # key -> 清洗後文字(rep 的)
+    rep_id: dict[str, str] = {}                      # key -> rep id
+    rep_sources: dict[str, set[str]] = {}            # key -> 來源聯集(跨來源跳過規則用)
+    exact_dups: dict[str, list[str]] = {}            # rep id -> 其餘同字 id
+    order: list[str] = []
+    for it in items:
+        text = core.preprocess(it.text)
+        if not text:
+            continue
+        k = core.collapse_key(text)
+        if k not in rep_id:
+            rep_id[k], rep_text[k], rep_sources[k] = it.id, text, set(it.sources)
+            exact_dups[it.id] = []
+            order.append(k)
+        else:
+            exact_dups[rep_id[k]].append(it.id)
+            rep_sources[k] |= set(it.sources)
+
+    ids = [rep_id[k] for k in order]
+    scores: dict[frozenset, float] = {}
+    if len(ids) >= 2:
+        # ③ 一批嵌入;④ 跨來源兩兩(來源有交集 → 同基準刻意分開,不比)
+        vecs = {rep_id[k]: v.dense
+                for k, v in zip(order, embedder.embed_texts([rep_text[k] for k in order]))}
+        srcs = {rep_id[k]: rep_sources[k] for k in order}
+        for x in range(len(ids)):
+            for y in range(x + 1, len(ids)):
+                i, j = ids[x], ids[y]
+                if srcs[i] & srcs[j]:
+                    continue
+                scores[frozenset((i, j))] = core.cosine(vecs[i], vecs[j])
+
+    def score_of(i, j):
+        return scores.get(frozenset((i, j)))
+
+    # ⑤⑥ 分帶 → 星型 → medoid
+    pairs = [(s, *sorted(p)) for p, s in scores.items()]
+    dup, gray = core.band(pairs, th_hi, th_lo)
+    clusters = core.star_clusters(dup, score_of, th_hi)
+
+    # 組回應:exact dup(score 1.0)併入所屬群;純 exact 群(未進嵌入群)單獨成群
+    groups: list[MatchGroup] = []
+    clustered_reps: set[str] = set()
+    for center, mems in clusters:
+        all_ids = [center, *mems.keys()]
+        clustered_reps.update(all_ids)
+        member_rows = [GroupMember(id=center, score=1.0)]
+        member_rows += [GroupMember(id=m, score=round(s, 4)) for m, s in sorted(mems.items())]
+        for rep in all_ids:
+            member_rows += [GroupMember(id=d, score=1.0) for d in exact_dups.get(rep, [])]
+        groups.append(MatchGroup(medoid=core.medoid_of(all_ids, score_of), members=member_rows))
+    for rep, dups in exact_dups.items():
+        if dups and rep not in clustered_reps:
+            groups.append(MatchGroup(medoid=rep, members=[
+                GroupMember(id=rep, score=1.0),
+                *[GroupMember(id=d, score=1.0) for d in dups]]))
+    groups.sort(key=lambda g: g.medoid)
+
+    matches = [PossibleMatch(left_id=i, right_id=j, score=round(s, 4)) for s, i, j in gray]
+    matches.sort(key=lambda m: (-m.score, m.left_id, m.right_id))
+    return MatchResponse(groups=groups, possible_matches=matches, config=cfg)

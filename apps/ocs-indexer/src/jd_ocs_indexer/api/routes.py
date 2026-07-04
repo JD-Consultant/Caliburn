@@ -3,6 +3,7 @@ lock serializes BGE-M3 calls (FlagEmbedding is not guaranteed thread-safe)."""
 
 from __future__ import annotations
 
+import httpx
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import JSONResponse
@@ -13,6 +14,8 @@ from jd_ocs_indexer.api.schemas import (
     FindSimilarRequest,
     FindSimilarResponse,
     HealthResponse,
+    MatchRequest,
+    MatchResponse,
     OccupationDetail,
     OccupationSearchResponse,
     OccupationTasks,
@@ -22,6 +25,7 @@ from jd_ocs_indexer.api.schemas import (
     TaskSearchResponse,
     TasksResponse,
 )
+from jd_ocs_indexer.matching import core
 
 router = APIRouter()
 
@@ -66,6 +70,26 @@ async def find_similar_tasks(req: FindSimilarRequest, request: Request):
         service.find_similar_tasks, app.state.client,
         app.state.settings.qdrant_collection,
         ocs_codes=req.ocs_codes, score_threshold=req.score_threshold)
+
+
+# 相似比對(ADR 0022):池進 → {真重複群, 灰區對} 出。確定性、非破壞;
+# 錯誤 body = detail dict 含 code(version_conflict 先例)。
+@router.post("/items:match", response_model=MatchResponse)
+async def match_items(req: MatchRequest, request: Request):
+    app = request.app
+    if len(req.items) > 500:
+        raise HTTPException(status_code=413, detail={"code": "too_many_items", "max": 500})
+    if req.kind not in core.THRESHOLDS:
+        raise HTTPException(status_code=422, detail={"code": "unknown_kind", "kind": req.kind})
+
+    def _run():
+        with app.state.embed_lock:
+            return service.match_items(app.state.embedder, kind=req.kind, items=req.items)
+
+    try:
+        return await run_in_threadpool(_run)
+    except httpx.HTTPError as exc:   # embedder 掛/超時 → 503(api 端據此降級)
+        raise HTTPException(status_code=503, detail={"code": "embedder_unavailable"}) from exc
 
 
 @router.get("/occupations/{ocs_code}", response_model=OccupationDetail)

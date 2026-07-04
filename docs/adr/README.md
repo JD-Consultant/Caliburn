@@ -30,6 +30,7 @@ ADR 是「為什麼」層;搭配 `../specs/`(細節設計)與 `../runbook.md`(�
 | [0019](0019-api-naming-alignment.md) | API 命名對齊:自訂方法 `:verb`、根層 `GET /occupations?q=`、`PUT occupations`（monorepo 原子改名、偏離 AIP-231/132 白紙黑字） | Accepted |
 | [0020](0020-interview-authoring-interaction-model.md) | 訪談式撰寫互動模式:混合載體（文件常駐 + 精靈化訪談面板）；實作可重新設計、不受既有資產約束 | Accepted |
 | [0021](0021-knowledge-pack-single-sync-point.md) | 知識包：選職類=唯一 knowledge 同步點；indexer 給資料/api 處理/web 讀寫；來源必標的資料基座 | Accepted（P1–P3 已實作：`/knowledge` 端點＋web 全選單切換＋舊四端點退役） |
+| [0022](0022-similarity-matching-items-match.md) | 相似比對 `items:match`：indexer 確定性能力、FS 三區分帶、星型非遞移、非破壞呈現；survivorship 在 web；api 純搬運 | Accepted（v1 規劃中） |
 
 完整脈絡見 [`../specs/2026-06-27-system-architecture-design.md`](../specs/2026-06-27-system-architecture-design.md)。
 契約怎麼選/怎麼交付的規範見 [`../contract-strategy.md`](../contract-strategy.md)（ADR 0004/0010 的一般化、預答契約 #3）。

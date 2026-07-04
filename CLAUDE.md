@@ -57,6 +57,6 @@ Monorepo。維護者用**繁體中文**,請用繁中回應。
   原始 diff);uv venv 沒有 pip,用 `uv pip`;CJK 用 `PYTHONUTF8=1`。
 
 ## 指路
-**`docs/README.md`(文檔系統:架構/規則/索引)** · `ARCHITECTURE.md` · `docs/adr/README.md`(0001–0021)·
+**`docs/README.md`(文檔系統:架構/規則/索引)** · `ARCHITECTURE.md` · `docs/adr/README.md`(0001–0022)·
 `docs/contract-strategy.md` · `CONTRIBUTING.md` · `docs/runbook.md` · `docs/specs/`(研究紀錄)·
 `docs/plans/` · `docs/design/`(子系統端到端設計,給 agent)。

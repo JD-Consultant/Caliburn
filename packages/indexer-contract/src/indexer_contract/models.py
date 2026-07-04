@@ -30,6 +30,17 @@ class FindSimilarRequest(_Base):
     score_threshold: float = Field(0.85, ge=0.0, le=1.0)
 
 
+class MatchItem(_Base):
+    id: str
+    text: str
+    sources: list[str] = Field(default_factory=list)
+
+
+class MatchRequest(_Base):
+    kind: str
+    items: list[MatchItem] = Field(default_factory=list)
+
+
 # ── leaves ────────────────────────────────────────────────────────────────────
 class CodeName(_Base):
     code: str = ""
@@ -158,13 +169,43 @@ class SimilarTaskRef(_Base):
 
 
 class SimilarPair(_Base):
-    a: SimilarTaskRef
-    b: SimilarTaskRef
+    left: SimilarTaskRef
+    right: SimilarTaskRef
     score: float
 
 
 class FindSimilarResponse(_Base):
     candidates: list[SimilarPair] = Field(default_factory=list)
+
+
+# ── items:match 相似比對(ADR 0022)。pair 命名照 Splink left/right 慣例(禁用 a/b)──
+class GroupMember(_Base):
+    id: str = ""
+    score: float = 0.0          # 與群中心的分數;中心自身 = 1.0
+
+
+class MatchGroup(_Base):
+    medoid: str = ""            # 幾何代表(群內平均相似度最高的成員 id)
+    members: list[GroupMember] = Field(default_factory=list)
+
+
+class PossibleMatch(_Base):
+    left_id: str = ""
+    right_id: str = ""          # 恆 left_id < right_id(決定論)
+    score: float = 0.0
+
+
+class MatchConfig(_Base):
+    kind: str = ""
+    theta_high: float = 0.0
+    theta_low: float = 0.0
+    model: str = "bge-m3"
+
+
+class MatchResponse(_Base):
+    groups: list[MatchGroup] = Field(default_factory=list)
+    possible_matches: list[PossibleMatch] = Field(default_factory=list)
+    config: MatchConfig = Field(default_factory=MatchConfig)
 
 
 class HealthResponse(_Base):

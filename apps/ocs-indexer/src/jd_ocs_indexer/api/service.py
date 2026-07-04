@@ -232,12 +232,12 @@ def _pairwise_candidates(tasks: list[dict], threshold: float) -> list[dict]:
             score = float(sim[i, j])
             if score >= threshold:
                 out.append({
-                    "a": {"urn": urn.task_urn(tasks[i]["ocs_code"], tasks[i]["task_code"]),
-                          "ocs_code": tasks[i]["ocs_code"], "task_code": tasks[i]["task_code"],
-                          "task_name": tasks[i]["task_name"]},
-                    "b": {"urn": urn.task_urn(tasks[j]["ocs_code"], tasks[j]["task_code"]),
-                          "ocs_code": tasks[j]["ocs_code"], "task_code": tasks[j]["task_code"],
-                          "task_name": tasks[j]["task_name"]},
+                    "left": {"urn": urn.task_urn(tasks[i]["ocs_code"], tasks[i]["task_code"]),
+                             "ocs_code": tasks[i]["ocs_code"], "task_code": tasks[i]["task_code"],
+                             "task_name": tasks[i]["task_name"]},
+                    "right": {"urn": urn.task_urn(tasks[j]["ocs_code"], tasks[j]["task_code"]),
+                              "ocs_code": tasks[j]["ocs_code"], "task_code": tasks[j]["task_code"],
+                              "task_name": tasks[j]["task_name"]},
                     "score": round(score, 4)})
     return out
 

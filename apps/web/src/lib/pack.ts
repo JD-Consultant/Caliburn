@@ -1,7 +1,7 @@
 // 知識包 → 選單選項（ADR 0021；spec §5）。唯一的 pack 讀取邏輯集中點，全部純函式。
 // 池序 = append 序（職位優先序），選單不排序不搜尋；選項無碼 → FieldCombobox 顯序號。
 import type {
-  CodeName, KnowledgePack, OptionItem, PackSrc, PoolRow, SourceRef,
+  CodeName, KnowledgePack, NoteItem, OptionItem, PackSrc, PoolRow, SourceRef,
 } from "@/types";
 
 const newId = () => (globalThis.crypto?.randomUUID?.() ?? `id-${Math.random().toString(36).slice(2)}`);
@@ -35,6 +35,27 @@ export function valuePoolOptions(
 }
 
 // 三類池（職類別/職業別/行業別）：key = 國家分類碼（選單例外顯真實碼）。
+// 主基準是否官方(spec 2026-07-04 §4:主基準空白/自訂 → 自動勾選不套)。
+export function isOfficialBasis(pack: KnowledgePack, ocsCode: string): boolean {
+  return !!ocsCode && pack.occupation_details.some((d) => d.ocs_code === ocsCode);
+}
+
+// 表頭層自動勾選 defaults:srcs 含主基準碼的選項(順序照池序,不重排)。
+export function primaryDefaults(options: OptionItem[], primaryCode: string): OptionItem[] {
+  return options.filter((o) => (o.srcs ?? []).some((s) => s.ocs_code === primaryCode));
+}
+
+// 舊 draft notes 遷移(spec 2026-07-04 §3):string[] → 影子列;文字對池命中=official
+// (來源凍結為池列首來源),未命中=custom;顯示碼照序 n{i}(不補零)。
+export function noteRowsFromStrings(texts: string[], pool: Record<string, PoolRow>): NoteItem[] {
+  return texts.map((t, i) => {
+    const src = pool[t]?.srcs?.[0];
+    return src
+      ? { code: `n${i + 1}`, text: t, _id: newId(), _src: "official" as const, _ref: packSrcToRef(src) }
+      : { code: `n${i + 1}`, text: t, _id: newId(), _src: "custom" as const };
+  });
+}
+
 export function codedPoolOptions(
   pool: Record<string, { name: string; srcs: PackSrc[] }>,
 ): OptionItem[] {

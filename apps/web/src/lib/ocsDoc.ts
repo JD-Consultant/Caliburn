@@ -1,7 +1,7 @@
 // D27 OCS 文件的就地（immutable）更新與完成度計算。每任務一個 competency_block
 // → 都讀寫 competency_blocks[0]。完成度公式對齊後端 compute_completion：
 // filled = 1(表頭) + (A?1:0) + Σ_task[(O>0)+(P>0)+(K>0)+(S>0)]；total = 4*任務數 + 2。
-import type { CodeName, CompetencyBlock, Indicator, OcsDocument, OcsTask, OcuUnit, SourceRef } from "@/types";
+import type { CodeName, CompetencyBlock, Indicator, NoteItem, OcsDocument, OcsTask, OcuUnit, SourceRef } from "@/types";
 
 function clone(doc: OcsDocument): OcsDocument {
   return structuredClone(doc);
@@ -100,6 +100,13 @@ function renumber(doc: OcsDocument): OcsDocument {
     });
   });
   renumberCoded(doc.ocs_attitude?.attitudes ?? [], "A"); // 態度全域位置碼(A01…)
+  for (const f of ["prerequisites", "supplements"] as const) {
+    const rows = doc.notes?.[`_${f}`];
+    if (rows) {
+      rows.forEach((r, i) => { r.code = `n${i + 1}`; }); // n 碼不補零(spec 2026-07-04)
+      doc.notes[f] = rows.map((r) => r.text).filter(Boolean); // 契約欄 string[] = 影子列投影
+    }
+  }
   renumberDocKS(doc); // K/S 首現序隨任務順序變，一併重編
   return doc;
 }
@@ -200,42 +207,16 @@ export function deleteCategory(doc: OcsDocument, kind: CatKind, idx: number): Oc
   return next;
 }
 
-// ── 說明與補充事項（notes）編輯 ──────────────────────────────────────────────
+// ── 說明與補充事項（notes）編輯──影子列為唯一真相（spec 2026-07-04 §3）:
+// notes._<field> 存 NoteItem 物件列,契約欄 string[] 由 renumber 導出;
+// finalize/export 剝 `_` 後契約乾淨(後端零改動)。
 export type NoteField = "prerequisites" | "supplements";
 
-function ensureNotes(doc: OcsDocument) {
-  if (!doc.notes) doc.notes = { prerequisites: [], supplements: [] };
-  if (!doc.notes.prerequisites) doc.notes.prerequisites = [];
-  if (!doc.notes.supplements) doc.notes.supplements = [];
-}
-
-// 整欄取代（D29 表頭選單套用 prerequisites/supplements）。
-export function setNotes(doc: OcsDocument, field: NoteField, items: string[]): OcsDocument {
+export function setNoteItems(doc: OcsDocument, field: NoteField, items: NoteItem[]): OcsDocument {
   const next = clone(doc);
-  ensureNotes(next);
-  next.notes[field] = [...items];
-  return next;
-}
-
-export function addNote(doc: OcsDocument, field: NoteField): OcsDocument {
-  const next = clone(doc);
-  ensureNotes(next);
-  next.notes[field].push("");
-  return next;
-}
-
-export function updateNote(doc: OcsDocument, field: NoteField, idx: number, value: string): OcsDocument {
-  const next = clone(doc);
-  ensureNotes(next);
-  next.notes[field][idx] = value;
-  return next;
-}
-
-export function deleteNote(doc: OcsDocument, field: NoteField, idx: number): OcsDocument {
-  const next = clone(doc);
-  ensureNotes(next);
-  next.notes[field].splice(idx, 1);
-  return next;
+  if (!next.notes) next.notes = { prerequisites: [], supplements: [] };
+  next.notes[`_${field}`] = items.map((it) => ({ ...it })); // 拷貝:不污染呼叫端(cache 舊快照)
+  return renumber(next); // n 碼重編 + 契約欄導出都在 renumber(單一重編點)
 }
 
 // ── 職責(unit) 層編輯 ─────────────────────────────────────────────────────────

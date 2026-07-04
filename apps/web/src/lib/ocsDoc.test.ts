@@ -7,6 +7,7 @@ import {
   reorderUnits,
   setAttitudes,
   setKS,
+  setNoteItems,
   setOp,
 } from "./ocsDoc";
 
@@ -34,6 +35,7 @@ function docWith(units: { name: string; tasks: OcsTask[] }[]): OcsDocument {
       ocs_code: "OCS1", job_description: "", ocs_level: null,
       ocs_name: {}, category: { job_categories: [], occupations: [], industries: [] },
     },
+    notes: { prerequisites: [], supplements: [] },
     ocs_content: {
       ocu_units: units.map((u, i) => ({
         ocu_code: `T${i + 1}`, ocu_name: u.name,
@@ -127,6 +129,40 @@ describe("setOp / setKS(內容編輯的重編)", () => {
     const [t1, t2] = next.ocs_content.ocu_units[0].tasks;
     expect(t1.competency_blocks![0].knowledge!.map((k) => k.code)).toEqual(["K01"]); // 網路
     expect(t2.competency_blocks![0].knowledge!.map((k) => k.code)).toEqual(["K02"]); // 資料庫
+  });
+});
+
+describe("setNoteItems(notes 影子列,spec 2026-07-04 §3)", () => {
+  const base = () => docWith([{ name: "U1", tasks: [] }]);
+  it("寫影子列+同步導出契約 string[],顯示碼 n1,n2(不補零)", () => {
+    const next = setNoteItems(base(), "prerequisites", [
+      { code: "", text: "大學以上", _id: "a", _src: "official",
+        _ref: { ocs_code: "OC1", occupation_name: "甲", code: "n1" } },
+      { code: "", text: "二年經驗", _id: "b", _src: "custom" },
+    ]);
+    expect(next.notes.prerequisites).toEqual(["大學以上", "二年經驗"]);
+    expect(next.notes._prerequisites!.map((r) => r.code)).toEqual(["n1", "n2"]);
+    expect(next.notes._prerequisites![0]._ref!.code).toBe("n1"); // 身分不隨顯示碼動
+  });
+  it("拖動換序:顯示碼重編、_ref 凍結", () => {
+    const d1 = setNoteItems(base(), "supplements", [
+      { code: "", text: "甲", _id: "a", _src: "official",
+        _ref: { ocs_code: "OC1", occupation_name: "甲", code: "n1" } },
+      { code: "", text: "乙", _id: "b", _src: "official",
+        _ref: { ocs_code: "OC1", occupation_name: "甲", code: "n2" } },
+    ]);
+    const rows = d1.notes._supplements!;
+    const d2 = setNoteItems(d1, "supplements", [rows[1], rows[0]]);
+    expect(d2.notes._supplements!.map((r) => [r.code, r._ref!.code])).toEqual(
+      [["n1", "n2"], ["n2", "n1"]]);
+    expect(d2.notes.supplements).toEqual(["乙", "甲"]);
+  });
+  it("純函式:不污染呼叫端 items;空白 text 不進契約欄", () => {
+    const items = [{ code: "", text: "", _id: "x" }, { code: "", text: "有值", _id: "y" }];
+    const next = setNoteItems(base(), "prerequisites", items);
+    expect(items[0].code).toBe("");
+    expect(next.notes.prerequisites).toEqual(["有值"]);
+    expect(next.notes._prerequisites!.length).toBe(2); // 影子列保留空白列(就地編輯中)
   });
 });
 

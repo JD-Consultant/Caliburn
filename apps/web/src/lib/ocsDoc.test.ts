@@ -139,6 +139,16 @@ describe("setAttitudes / addTasksToUnit", () => {
     expect(next.ocs_attitude!.attitudes!.map((a) => a.code)).toEqual(["A01", "A02"]);
   });
 
+  it("setter 是純函式:不就地改動呼叫端傳入的 items(cache 舊快照不可被污染)", () => {
+    const doc = docWith([{ name: "U1", tasks: [task("T1.1", "甲")] }]);
+    const outputs = [{ code: "", name: "x", _id: "x" }];
+    const atts = [{ code: "", name: "細心", _id: "a1" }];
+    setOp(doc, 0, 0, outputs, []);
+    setAttitudes(doc, atts);
+    expect(outputs[0].code).toBe(""); // 不能被 renumber 就地寫成 O1.1.1
+    expect(atts[0].code).toBe("");
+  });
+
   it("池任務入職責:接尾端並照位置給碼", () => {
     const doc = docWith([{ name: "U1", tasks: [task("T1.1", "甲")] }]);
     const next = addTasksToUnit(doc, 0, [

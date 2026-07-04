@@ -21,6 +21,9 @@
 
 ## 1. 契約(`packages/indexer-contract`;rubric row 3,ADR 0010 機制沿用)
 
+> 命名規範:pair 欄位 = `left_id`/`right_id`(Splink/記錄連結標準;**禁用 a/b**)。
+> 既有 `SimilarPair.a/b`(舊 tasks:findSimilar,零消費者)同步改名統一。
+
 ### Request — `POST /items:match`
 
 ```jsonc
@@ -42,9 +45,9 @@
     { "medoid": "團隊合作:積極參與…",          // 幾何代表(群內平均相似度最高)
       "members": [ { "id": "...", "score": 1.0 }, { "id": "...", "score": 0.93 } ] }
   ],
-  "possible_matches": [          // 灰區對([θ_low, θ_high))
-    { "a": "...", "b": "...", "score": 0.72 }
-  ],
+  "possible_matches": [          // 灰區對([θ_low, θ_high));命名照 Splink 的
+    { "left_id": "...", "right_id": "...", "score": 0.72 }   // left/right 慣例
+  ],                             // (unique_id_l/_r;不用 a/b)
   "config": { "kind": "attitude", "theta_high": 0.9, "theta_low": 0.7, "model": "bge-m3" }
 }                                // config 供重現(對齊 ADR 0009 版本紀律);distinct 不回傳
 ```
@@ -87,8 +90,10 @@
    ocs_code、任務池從 URN `ocs:{ocs_code}:T:{code}` 取 ocs_code)。
 2. `KnowledgeClient` 加 `match(kind, items)` 方法;兩 kind **並行**呼叫。
 3. 成功 → 原樣掛 `pack["similarity"] = {"attitude": resp, "task": resp}`;
-   任一失敗 → 該 kind 不掛(**enrichment 語意**,ADR 0018;不動 `meta.partial`
-   ——那是池本體的旗標)。api **不拆包、不選代表、不改池**。
+   任一失敗 → 該 kind 不掛,**且降級顯式標狀態**(用既有 meta 統一位,不默默消失):
+   `pack["meta"]["similarity"] = "ok" | "partial" | "unavailable"`(對齊 ADR 0018 的
+   `meta.partial` 模式;`partial` = 兩 kind 掛上一個)。`meta.partial` 本身不動
+   (那是池本體的旗標)。api **不拆包、不選代表、不改池**。
 
 ## 4. web 整合(pack.ts 純函式 + 兩個小 UI)
 
@@ -119,14 +124,19 @@ TaskRowVM.similarTo?: { name: string; score: number }[]  // 灰區對
 - **B**:survivorship 主基準優先 ⇒ 主基準成員在群內必為代表 ⇒ 首開自動套勾到的
   就是主基準身分。主基準清空(`clearPrimaryBasis`)→ 自動套本就不跑(`isOfficialBasis`)。
 
-## 5. 錯誤處理與限制
+## 5. 錯誤處理與限制(**沿用既有統一模型,不發明新機制**)
 
 | 情況 | 行為 |
 |---|---|
-| embedder 掛/超時 | indexer 回錯 → api 不掛該 kind → web 當沒這功能(池原樣) |
-| items > 500 | indexer 413(n² 上限保護) |
-| kind 不認得 | indexer 422 |
+| embedder 掛/超時 | indexer 回 503 → api 不掛該 kind + `meta.similarity` 標狀態 → web 當沒這功能(池原樣) |
+| items > 500 | indexer 413(n² 上限保護),body 照 FastAPI `detail` + `code` 欄位(`version_conflict` 先例) |
+| kind 不認得 | indexer 422,同上格式 |
 | 池 < 2 條 | 直接回空 groups/pairs(不打 embedder) |
+
+- **web 端零新機制**:similarity 是 pack 的一部分,走既有 `request()` → 失敗一律
+  `ApiError(status, message, body)`([api.ts](../../apps/web/src/lib/api.ts));
+  降級可見性看 `pack.meta.similarity`,不另設錯誤通道。
+- **api⇄indexer**:`KnowledgeClient.match` 失敗 → log warning + 降級(同 `fetch_one` 模式)。
 
 ## 6. 測試策略
 

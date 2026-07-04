@@ -9,12 +9,13 @@ import { SourceLine } from "./SourceLine";
 export type OfficialMenuOption = { value: string; label: string; hint?: string; srcs?: SourceRef[] };
 
 // 單值「選官方」選單：列官方候選 + 來源行；selected 時打勾。基準級別/職能基準代碼/任務級別共用。
-export function OfficialMenu({ trigger, options, onPick, selected, onOpenChange }: {
+export function OfficialMenu({ trigger, options, onPick, selected, onOpenChange, onAutoApply }: {
   trigger: ReactNode;
   options: OfficialMenuOption[];
   onPick: (value: string) => void;
   selected?: string; // 目前選中值（單選時打勾）；不傳＝不顯示勾（如 append 用途）
   onOpenChange?: (open: boolean) => void; // 開關通知（讓父層在開啟時才 lazy 取資料）
+  onAutoApply?: () => void; // 給了→選單頂列顯「自動勾選」鈕（spec 2026-07-04 §4）
 }) {
   const [open, setOpen] = useState(false);
   const setOpenAnd = (o: boolean) => { setOpen(o); onOpenChange?.(o); };
@@ -22,6 +23,14 @@ export function OfficialMenu({ trigger, options, onPick, selected, onOpenChange 
     <Popover open={open} onOpenChange={setOpenAnd}>
       <PopoverTrigger asChild>{trigger}</PopoverTrigger>
       <PopoverContent className="w-72">
+        {onAutoApply ? (
+          <div className="mb-1 flex items-center justify-end px-1">
+            <button type="button" className="shrink-0 text-xs text-muted-foreground hover:text-foreground"
+              onClick={() => { onAutoApply(); setOpenAnd(false); }}>
+              自動勾選
+            </button>
+          </div>
+        ) : null}
         <Command>
           <CommandList>
             <CommandEmpty>無官方候選</CommandEmpty>

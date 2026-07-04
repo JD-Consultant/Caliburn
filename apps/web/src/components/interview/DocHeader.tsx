@@ -3,12 +3,13 @@
 // D27 官方職能基準「表頭」版型（5 欄對齊官方表格，可編輯/可自訂）。
 // 代碼↔名稱綁定（選官方基準下拉）；所屬類別三類各列為 名稱|代碼（可手打自訂、加列刪列），
 // 並提供「選官方▾」下拉把官方 {code,name} 綁定帶入；工作描述/級別預填可改+帶官方。
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Check, ChevronDown, Plus, X } from "lucide-react";
 import type { CodeName, OcsDocument, OptionItem } from "@/types";
 import { useKnowledge } from "@/hooks/useKnowledge";
-import { codedPoolOptions, primaryBasisOptions } from "@/lib/pack";
+import { codedPoolOptions, primaryBasisOptions, primaryDefaults, type BasisOption } from "@/lib/pack";
 import {
+  clearPrimaryBasis,
   deleteCategory,
   setCategory,
   setOcsLevel,
@@ -37,23 +38,41 @@ const ekey = (i: { code: string; name: string }) => i.code || "name:" + i.name;
 const newId = () => (globalThis.crypto?.randomUUID?.() ?? `id-${Math.random().toString(36).slice(2)}`);
 
 // 每類別的「選 ▾」下拉（官方候選勾選/取消）＋ 右側「+」直接加一列空白自訂。
-function CategoryPicker({ options, existing, onToggle, onAddBlank }: {
+// 自動勾選=主基準來源(spec 2026-07-04 §4):首開且該類空→自動套;選單頂列鈕可重套。
+function CategoryPicker({ options, existing, onToggle, onAddBlank, onAutoApply }: {
   options: OptionItem[];
   existing: { code: string; name: string }[];
   onToggle: (o: OptionItem) => void;
   onAddBlank: () => void;
+  onAutoApply?: () => void;
 }) {
   const [open, setOpen] = useState(false);
+  const autoApplied = useRef(false);
   const has = (o: OptionItem) => existing.some((e) => ekey(e) === ekey(o));
+  const handleOpen = (o: boolean) => {
+    setOpen(o);
+    if (o && !autoApplied.current) {
+      autoApplied.current = true;
+      if (existing.length === 0) onAutoApply?.(); // 首開且空才套
+    }
+  };
   return (
     <div className="flex items-center gap-0.5">
-      <Popover open={open} onOpenChange={setOpen}>
+      <Popover open={open} onOpenChange={handleOpen}>
         <PopoverTrigger asChild>
           <button type="button" className="inline-flex items-center text-muted-foreground hover:text-foreground" title="選官方">
             <ChevronDown className="h-3.5 w-3.5" />
           </button>
         </PopoverTrigger>
         <PopoverContent className="w-72">
+          {onAutoApply ? (
+            <div className="mb-1 flex items-center justify-end px-1">
+              <button type="button" className="shrink-0 text-xs text-muted-foreground hover:text-foreground"
+                title="補上主基準來源的官方項" onClick={onAutoApply}>
+                自動勾選
+              </button>
+            </div>
+          ) : null}
           <Command>
             <CommandList>
               <CommandEmpty>無候選</CommandEmpty>
@@ -104,6 +123,21 @@ export function DocHeader({ document: doc, profileId, onChange }: {
   const catStatus = (e: { _src?: "official" | "custom" }): "official" | "custom" =>
     e._src === "custom" ? "custom" : e._src === "official" ? "official" : "custom";
 
+  // 主基準(表頭層)自動勾選規則(spec 2026-07-04 §4):主基準空白/自訂 → 不套。
+  const levelAuto = useRef(false);
+  const primaryBasis = () => (isOfficialBasis ? opts.find((o) => o.ocs_code === p.ocs_code) : undefined);
+  const levelSrcOf = (b: BasisOption) => ({
+    ocs_code: b.ocs_code, occupation_name: b.occupation_name, code: "", level: b.ocs_level as number });
+  const applyCatDefaults = (kind: CatKind) => {
+    if (!isOfficialBasis) return;
+    const existing = p.category?.[kind] ?? [];
+    const picks = primaryDefaults(catOptions(kind), p.ocs_code)
+      .filter((o) => !existing.some((e) => ekey(e) === ekey(o)))
+      .map((o) => ({ code: o.code, name: o.name, _id: newId(), _src: "official" as const,
+                     _ref: o.srcs?.[0] ?? { ocs_code: "", occupation_name: "", code: o.code } }));
+    if (picks.length) onChange(setCategory(doc, kind, [...existing, ...picks]));
+  };
+
   // 下拉勾選：官方項已在→取消（移除），不在→加入（綁定 name+code + 來源 meta）。
   const toggleOfficial = (kind: CatKind, o: OptionItem) => {
     const existing = p.category?.[kind] ?? [];
@@ -146,6 +180,7 @@ export function DocHeader({ document: doc, profileId, onChange }: {
                 options={opts.map((o) => ({ value: o.ocs_code, label: `${o.ocs_code}　${o.occupation_name}` }))}
                 selected={p.ocs_code}
                 onPick={(code) => {
+                  if (code === p.ocs_code) { onChange(clearPrimaryBasis(doc)); return; } // 再點=整組清空(spec §9 決策 4)
                   const o = opts.find((x) => x.ocs_code === code);
                   if (o) onChange(setPrimaryBasis(doc, { ocs_code: o.ocs_code, occupation_name: o.occupation_name, job_category_name: o.job_category_name || "" }));
                 }}
@@ -198,6 +233,7 @@ export function DocHeader({ document: doc, profileId, onChange }: {
                     existing={p.category?.[r.key] ?? []}
                     onToggle={(o) => toggleOfficial(r.key, o)}
                     onAddBlank={() => addBlankCategory(r.key)}
+                    onAutoApply={isOfficialBasis ? () => applyCatDefaults(r.key) : undefined}
                   />
                 </div>
               </th>
@@ -266,7 +302,15 @@ export function DocHeader({ document: doc, profileId, onChange }: {
                   srcs: opts.filter((o) => o.ocs_level === n).map((o) => ({ ocs_code: o.ocs_code, occupation_name: o.occupation_name, code: "" })),
                 }))}
                 selected={p.ocs_level != null ? String(p.ocs_level) : ""}
-                onPick={(v) => onChange(setOcsLevel(doc, v))}
+                onAutoApply={(() => { const b = primaryBasis(); return b?.ocs_level != null
+                  ? () => onChange(setOcsLevel(doc, String(b.ocs_level), levelSrcOf(b))) : undefined; })()}
+                onOpenChange={(o) => { if (o && !levelAuto.current) { levelAuto.current = true;
+                  const b = primaryBasis(); // 首開且空→帶主基準級別(spec §4)
+                  if (p.ocs_level == null && b?.ocs_level != null)
+                    onChange(setOcsLevel(doc, String(b.ocs_level), levelSrcOf(b))); } }}
+                onPick={(v) => { const b = primaryBasis(); // 值==官方值即官方(spec §9 決策 6)
+                  const official = b?.ocs_level != null && Number(v) === b.ocs_level;
+                  onChange(setOcsLevel(doc, v, official ? levelSrcOf(b!) : undefined)); }}
               />
             </div>
           </th>

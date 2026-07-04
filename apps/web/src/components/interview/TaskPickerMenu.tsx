@@ -26,9 +26,15 @@ export function TaskPickerMenu({ document: doc, pack, unitIdx, onChange }: {
   const applied = useRef(false); // 首開自動帶官方任務，一次為限（之後以使用者動過的為準）
   const rows = pack ? taskRows(pack) : [];
   const unit = doc.ocs_content?.ocu_units?.[unitIdx];
-  // 本職責的官方任務集：以職責名對回 units 池列（使用者改過職責名 → 視為全借用）。
-  const ownKeys = pack && unit
-    ? (unitRows(pack).find((u) => u.name === unit.ocu_name)?.ownTaskKeys ?? [])
+  // 本職責的官方任務集:以 unit._refs 的 (ocs_code, ocu_code) 對回 units 池列(身分對位,
+  // spec 2026-07-04 §6;改過名的職責 _refs 已清 → 無 own=全借用,行為由身分導出)。
+  const unitPairs = new Set((unit?._refs ?? [])
+    .filter((r) => r.ocu_code)
+    .map((r) => `${r.ocs_code}__${r.ocu_code}`));
+  const ownKeys = pack && unit && unitPairs.size
+    ? unitRows(pack)
+        .filter((u) => u.srcs.some((s) => s.ocu_code && unitPairs.has(`${s.ocs_code}__${s.ocu_code}`)))
+        .flatMap((u) => u.ownTaskKeys)
     : [];
   const unitOcc = unit?._refs?.[0]?.ocs_code || unit?.source?.ocs_code || "";
 

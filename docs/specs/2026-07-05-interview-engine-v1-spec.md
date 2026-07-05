@@ -1,6 +1,7 @@
-# 訪談引擎 v1 — 設計 spec(草稿,待維護者逐段審)
+# 訪談引擎 v1 — 設計 spec
 
-> **類型**:設計 spec。**決策依據**:ADR [0023](../adr/0023-interview-engine-stateless-turns.md)(骨幹)
+> **類型**:設計 spec(**定稿 2026-07-05;維護者授權自審**——維護者指示「不用問我,自己研究
+> 自己查文檔自己找資料」,北極星=顧問等級職務說明書;自審紀錄見 §11)。**決策依據**:ADR [0023](../adr/0023-interview-engine-stateless-turns.md)(骨幹)
 > / [0024](../adr/0024-llm-wiring-select-schema.md)(接線)/ [0025](../adr/0025-coedit-authority-dual-channel.md)(共編權限)
 > / [0020](../adr/0020-interview-authoring-interaction-model.md)(載體)/ [0015](../adr/0015-document-save-optimistic-concurrency.md)(樂觀鎖)。
 > **研究依據**:[接線研究](2026-07-05-llm-integration-wiring-research.md)(輪 1–10)·
@@ -24,10 +25,13 @@
   文件級新章節(協作/績效/工作條件/任職資格——黃金範本完整版,v2)、語音、多語、
   舊 authoring graph 退役(另開 task,新引擎可用後一次清,ADR 0023 決定 6)。
 
-## 1. 契約裁決:任務細項槽位進 `ocs-contract`(**待維護者確認**)
+## 1. 契約裁決:任務細項槽位進 `ocs-contract`(**已裁決——維護者授權自審**)
 
-**主張**:`task["details"]` 以 **additive optional** 欄位進 ocs-contract(JSON-schema SSOT →
-codegen pydantic+TS;contract-strategy row 2,交付照其生命週期)。
+**裁決**:`task["details"]` 以 **additive optional** 欄位進 ocs-contract(JSON-schema SSOT =
+[`packages/ocs-contract/schema/ocs-document.schema.json`](../../packages/ocs-contract/schema/ocs-document.schema.json)
+的 task $def → codegen pydantic+TS,`check-codegen.sh` 守;contract-strategy row 2 生命週期)。
+依據:細項是承重產出、必須活過 finalize/export 的 `_strip_underscore`(document-of-record §3),
+且 web/TS 要渲染——三個約束只有正式欄位同時滿足。
 
 ```jsonc
 "details": {                      // 全部 optional;v1 = 黃金範本 §8.3 的 11 槽(outputs 已有 O 欄)
@@ -78,9 +82,11 @@ codegen pydantic+TS;contract-strategy row 2,交付照其生命週期)。
 ```
 ① 載入   draft 文件 + session(slots/counters/human_touched)+ 近窗逐字稿
 ② 組脈絡 結構化狀態優先(當前任務+缺槽+追問預算+黃金範本槽位定義+官方問法片段)
-         + 近 N 回合對話;**不整卷重播**(記憶體研究:結構化 context > raw replay)
+         + 近窗對話(v1 預設近 12 回合,可調)+ 當前任務相關 evidence;
+         **不整卷重播**(記憶體研究:結構化 context > raw replay)
 ③ 一呼   LlmPort.select_schema(role=deep) → TurnOutput{commands[], saturation}
-④ 驗證   quote 必須=逐字稿正規化子串;失敗 retry 1 次;仍失敗→值收下、evidence 標 unverified
+④ 驗證   quote 必須=逐字稿正規化子串(NFKC+空白摺疊,與 matching.core.preprocess 同族);
+         失敗 retry 1 次;仍失敗→值收下、evidence 標 unverified
 ⑤ 執行   確定性 executor:
          · 寫入通道分流(0025):目標 path ∈ human_touched → suggestions;否則直改 draft
            (低風險維度豁免;刪除類永遠阻斷=只能建議)
@@ -150,3 +156,13 @@ reranker 觸發條件不變 · MCP 曝露 tools(ADR 0007 沿用)。
 - `apps/api/README.md`(interview 端點面)· `apps/web/README.md`(面板)·
   [`editor-knowledge-pack.md`](../design/editor-knowledge-pack.md)(單一寫入路徑不變量補 engine 分句);
 - ocs-contract 變更走 [`contract-strategy`](../contract-strategy.md) §4 交付生命週期。
+
+## 11. 自審紀錄(2026-07-05,維護者授權)
+
+照 brainstorming spec self-review 清單跑過:無占位詞;§0/§4/§5 指令數一致(9);
+機制驗證——契約 SSOT 檔與 task $def 位置、`check-codegen.sh`、alembic(`apps/api/alembic/`
++ `npm run db:migrate`)、`_strip_underscore` 剝欄行為、單一寫入路徑教義(editor-knowledge-pack
+不變量 2)皆讀碼/讀文檔確認;strict schema 子集向 OpenAI 官方文件查證(enum ✓、
+additionalProperties:false ✓、required 全列 ✓,完整清單以官方 supported-schemas 頁+首呼驗證為準)。
+模糊點修正:quote 正規化定義、近窗預設值。§1 契約裁決由「待確認」轉「已裁決」(北極星:
+細項=產品承重價值)。

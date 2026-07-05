@@ -63,6 +63,10 @@ users ─1:N─ job_profiles ─1:N─ document_versions
 | `GET …/knowledge` | **知識包**(ADR 0021):occupation_details + 12 池 + source_tasks,每官方值帶 srcs——web 所有選單的唯一資料源。**含 `similarity`**(ADR 0022:態度/任務兩池丟 indexer `items:match`,回應**原樣掛上**,api 不拆包不選代表;輸入由 `knowledge_pack.similarity_items` 純函式組) | 單掛 partial/**全掛 502**;match 掛→缺該 kind + `meta.similarity: ok\|partial\|unavailable`(enrichment) |
 | `GET /occupations?q=` | 根層職類目錄搜尋(全域知識,不掛 profile 下;ADR 0019) | **critical** |
 | `POST /ai/{recommend-ks,draft-op,extract-tasks,structure-task,clarify}` | **只提議、不寫 DB**;無金鑰→降級回 catalog/空 | enrichment |
+| `POST …/interview:start` | 訪談 session 建/續(**冪等**;文件無任務→409 `no_tasks`);init 焦點=第一個任務(ADR 0023) | — |
+| `POST …/interview:turn` `{text}` | 一回合:受限解碼指令→executor 分流/守門→寫回同一條 draft seam(409 重放→建議化)。無 LLM→503;輸出兩度違規→**502**(0024 保險絲) | — |
+| `GET …/interview` | session 全貌:逐字稿+證據(槽值↔原話)+建議歷史——續談與**顧問稽核視圖** | — |
+| `POST …/interview:review` `{accept,reject}` | 批審**只轉建議狀態**;套用由前端以既有 ocsDoc+PATCH 執行(ai-suggestions 不變量 1;renumber 是前端職權) | — |
 | `GET /healthz`;`/copilotkit`(AG-UI) | 就緒(含 DB);訪談 agent(live app 才掛) | — |
 
 ## 關鍵流程

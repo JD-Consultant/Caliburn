@@ -49,6 +49,14 @@ class InterviewRepo:
     async def get(self, session_id: UUID) -> InterviewSession | None:
         return await self.session.get(InterviewSession, session_id)
 
+    async def latest_session(self, job_profile_id: UUID) -> InterviewSession | None:
+        """最近一個 session(不限 status;顧問視圖/續談入口用)。"""
+        stmt = (select(InterviewSession)
+                .where(InterviewSession.job_profile_id == job_profile_id)
+                .order_by(InterviewSession.created_at.desc())
+                .limit(1))
+        return (await self.session.execute(stmt)).scalar_one_or_none()
+
     async def update_session(self, session_id: UUID, **fields) -> InterviewSession:
         row = await self.session.get(InterviewSession, session_id)
         for k, v in fields.items():
@@ -115,6 +123,13 @@ class InterviewRepo:
         await self.session.flush()
         await self.session.refresh(row)   # 取 server_default(status)
         return row
+
+    async def list_suggestions(self, session_id: UUID) -> list[InterviewSuggestion]:
+        """全部建議(含已裁決;顧問視圖)。"""
+        stmt = (select(InterviewSuggestion)
+                .where(InterviewSuggestion.session_id == session_id)
+                .order_by(InterviewSuggestion.created_at))
+        return list((await self.session.execute(stmt)).scalars())
 
     async def list_pending(self, session_id: UUID) -> list[InterviewSuggestion]:
         stmt = (select(InterviewSuggestion)

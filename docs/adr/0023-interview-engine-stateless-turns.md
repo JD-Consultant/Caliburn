@@ -37,14 +37,17 @@
    (core 任務 12 槽/淺掃 4 槽;`advance` 未達門檻 → 拒絕並回缺口)+ LLM 飽和信號。
 5. **深問預算**:先便宜問完每任務「頻率+比重」,以 O*NET core/supplemental 判準分配
    全套深問(黃金範本 v0:[`../specs/2026-07-05-golden-sample-software-tester.md`](../specs/2026-07-05-golden-sample-software-tester.md))。
-6. **既有 authoring graph 處置 = Strangler Fig**:深問純邏輯(STAR/5W2H 槽定義、prefill、
-   指標品質分、prompts)move-only 抬入回合服務;圖/AG-UI/checkpointer 編排殼待新引擎
-   覆蓋後退役(屆時一併清 web CopilotKit provider 與 3 個 python 依賴),不搶拆。
+6. **全新實作,不整合舊碼**(維護者 2026-07-05 定調):新引擎按本 ADR 重新設計實作,
+   **不承諾搬移既有 graph 任何程式碼**;既有圖(含 STAR/5W2H 槽定義、prompts、指標品質分)
+   僅為**參考材料**,設計時可借鑑其領域知識、不受其形狀約束。退役時機照 Strangler Fig:
+   舊圖/AG-UI/checkpointer/web CopilotKit provider 與 3 個 python 依賴,**在新引擎可用後
+   一次清除**,期間互不干擾(舊圖本就無前端驅動)。
 
 ## 後果
 
 - ✅ 人中途改文件自動被尊重(單一真相);兩條寫入路收斂成一條(縫 2 消失);
-  每回合純函式可 fake 測;斷點續談免費(狀態靜置 DB);與 0015 樂觀鎖直插。
+  每回合純函式可 fake 測;斷點續談免費(狀態靜置 DB);與 0015 樂觀鎖直插;
+  全新實作不背舊 shape 債。
 - ⚠️ 需新建:進度列 schema、指令執行器、覆蓋率門檻表;指令**語義**正確率要靠評測
   (模擬受訪者綁 persona 卡當回歸網 + 上線前真人試訪),結構正確率由受限解碼保證(0024)。
 - ⚠️ 槽位表/門檻數字以黃金範本 v0 起算,實作驗證中修(維護者暫定通過)。

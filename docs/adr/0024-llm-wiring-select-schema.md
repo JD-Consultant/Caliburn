@@ -29,9 +29,10 @@
    保險絲——理論上永不觸發,**觸發即 log error**(= 底層模型未兌現受限解碼)並觸發
    escalation 評估。選定底層模型須跑**對抗性驗收腳本**(誘導池外 id,零池外=過),
    紀錄留 `docs/specs/`;換模型 = 重跑驗收,不改碼。
-4. **adapter 內裝**:實作時 spike 評估 Pydantic AI 作為 adapter 內部實作
-   (`NativeOutput/ToolOutput/PromptedOutput` 現成降級鏈 + `OpenRouterProvider`;
-   只當 typed client library,不當編排框架)vs 直用 openai SDK 指 OpenRouter。
+4. **adapter 內裝:首選 Pydantic AI**(2026 type-safe Python 主流,與 repo pydantic
+   契約同血統;`NativeOutput/ToolOutput/PromptedOutput` 現成降級鏈 + `OpenRouterProvider`;
+   **只當 typed client library,不當編排框架**),實作 spike 確認後**順勢汰換
+   `langchain_openai` 舊依賴**(全新設計、減層);備選=直用 openai SDK 指 OpenRouter。
    六邊形保證此選擇不外漏:domain 只認 port。
 
 ## 後果

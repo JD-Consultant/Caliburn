@@ -77,6 +77,11 @@
 | `GET …/interview` | session 全貌(續談;**顧問視圖**:turns+evidence+suggestions) | — |
 | `POST …/interview:review` `{accept_ids, reject_ids}` | 批審套用(走文件 seam,帶樂觀鎖) | 409 同文件 PATCH 語意 |
 
+> **後記(T9 實作裁決,2026-07-05)**:`:review` 改為**只轉建議狀態**,套用由**前端**以既有
+> ocsDoc 純函式 + autosave PATCH 執行——對齊 ai-suggestions 深文檔不變量 1(「提議由前端
+> 套用後走 PATCH」),且 add_task/add_duty 的重編碼(renumber)本是前端職權;server 端
+> 套用會造成第二個重編點。單一寫入路徑因此更乾淨(人核准的變更=人的寫入)。
+
 ## 4. 回合管線(engine service;核心純函式、可 fake 測)
 
 ```

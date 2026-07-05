@@ -28,6 +28,7 @@ dependencies = [
   "opentelemetry-sdk==1.42.1",
   "opentelemetry-exporter-otlp-proto-http==1.42.1",
   "indexer-contract",
+  "openai>=2.44.0",
 ]
 
 [tool.uv.sources]

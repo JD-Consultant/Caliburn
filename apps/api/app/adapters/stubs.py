@@ -15,6 +15,32 @@ from app.core.knowledge_dto import (
 )
 
 
+class StubLlm:
+    """假 LlmPort(測試/demo):三句話型皆可程控;呼叫紀錄留 calls 供斷言。"""
+
+    def __init__(self, *, text: str = "", json_result=None, select_result=None):
+        self._text = text
+        self._json = json_result
+        self._select = select_result   # dict 或 callable(prompt, schema) -> dict
+        self.calls: list[dict] = []
+
+    async def complete_text(self, prompt: str, *, role: str = "cheap") -> str:
+        self.calls.append({"kind": "text", "role": role, "prompt": prompt})
+        return self._text
+
+    async def complete_json(self, prompt: str, *, role: str = "cheap", default=None):
+        self.calls.append({"kind": "json", "role": role, "prompt": prompt})
+        return self._json if self._json is not None else default
+
+    async def select_schema(self, prompt: str, schema: dict, *,
+                            role: str = "select", schema_name: str = "output"):
+        self.calls.append({"kind": "select", "role": role, "prompt": prompt,
+                           "schema": schema, "schema_name": schema_name})
+        if callable(self._select):
+            return self._select(prompt, schema)
+        return self._select if self._select is not None else {"commands": [], "saturation": False}
+
+
 class StubKnowledge:
     """假 KnowledgeClient（canned 資料）。"""
 

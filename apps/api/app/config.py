@@ -23,6 +23,9 @@ class Settings(BaseSettings):
     model_deep: str = "deepseek/deepseek-chat"       # 強階：STAR 整理（OpenRouter slug，可改）
     model_indicator: str = "deepseek/deepseek-chat"  # 中階：行為指標生成
     model_cheap: str = "deepseek/deepseek-chat"      # 便宜：措辭/雜項
+    # 受限解碼(ADR 0024):底層必須原生支援 json_schema strict(OpenAI/Gemini 系);
+    # 換模型 = 改這裡 + 重跑 scripts/validate_select_schema.py 留紀錄,不改碼。
+    model_select: str = "openai/gpt-4o-mini"
 
     # Document output
     document_output_dir: str = "./output/documents"

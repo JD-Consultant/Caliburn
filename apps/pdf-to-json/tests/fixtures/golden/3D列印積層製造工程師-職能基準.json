@@ -110,6 +110,7 @@
                 ]
               }
             ],
+            "details": null,
             "task_codes": [
               {
                 "code": "T1.1",
@@ -175,6 +176,7 @@
                 ]
               }
             ],
+            "details": null,
             "task_codes": [
               {
                 "code": "T1.2",
@@ -220,6 +222,7 @@
                 ]
               }
             ],
+            "details": null,
             "task_codes": [
               {
                 "code": "T1.3",
@@ -263,6 +266,7 @@
                 ]
               }
             ],
+            "details": null,
             "task_codes": [
               {
                 "code": "T2.1",
@@ -304,6 +308,7 @@
                 ]
               }
             ],
+            "details": null,
             "task_codes": [
               {
                 "code": "T2.2",
@@ -355,6 +360,7 @@
                 ]
               }
             ],
+            "details": null,
             "task_codes": [
               {
                 "code": "T3.1",
@@ -408,6 +414,7 @@
                 ]
               }
             ],
+            "details": null,
             "task_codes": [
               {
                 "code": "T3.2",
@@ -471,6 +478,7 @@
                 ]
               }
             ],
+            "details": null,
             "task_codes": [
               {
                 "code": "T4.1",
@@ -511,6 +519,7 @@
                 ]
               }
             ],
+            "details": null,
             "task_codes": [
               {
                 "code": "T4.2",
@@ -570,6 +579,7 @@
                 ]
               }
             ],
+            "details": null,
             "task_codes": [
               {
                 "code": "T5.1",
@@ -619,6 +629,7 @@
                 ]
               }
             ],
+            "details": null,
             "task_codes": [
               {
                 "code": "T5.2",

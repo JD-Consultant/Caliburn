@@ -3,7 +3,7 @@
 
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict, Field, conint
+from pydantic import BaseModel, ConfigDict, Field, confloat, conint
 
 
 class CodeName(BaseModel):
@@ -84,12 +84,34 @@ class CompetencyBlock(BaseModel):
     skills: list[CodeName] | None = Field([], validate_default=True)
 
 
+class TaskDetails(BaseModel):
+    """
+    任務客製細項(訪談引擎 v1,ADR 0023/spec 2026-07-05;OCS 官方來源沒有——由訪談產生,全部 optional。溯源(quote)不落文件,住訪談 session。
+    """
+
+    model_config = ConfigDict(
+        extra='allow',
+    )
+    frequency: str | None = None
+    time_share_pct: confloat(ge=0.0, le=100.0) | None = None
+    duration: str | None = None
+    volume: str | None = None
+    trigger: str | None = None
+    inputs: str | None = None
+    tools: str | None = None
+    collaborators: str | None = None
+    wait_points: str | None = None
+    exceptions: str | None = None
+    standards: str | None = None
+
+
 class TaskGroup(BaseModel):
     model_config = ConfigDict(
         extra='allow',
     )
     task_codes: list[CodeName] | None = Field([], validate_default=True)
     competency_blocks: list[CompetencyBlock] | None = Field([], validate_default=True)
+    details: TaskDetails | None = None
 
 
 class OcuUnit(BaseModel):

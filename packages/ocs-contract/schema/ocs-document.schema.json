@@ -82,12 +82,31 @@
         "skills": { "type": "array", "default": [], "items": { "$ref": "#/$defs/CodeName" } }
       }
     },
+    "TaskDetails": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "任務客製細項(訪談引擎 v1,ADR 0023/spec 2026-07-05;OCS 官方來源沒有——由訪談產生,全部 optional。溯源(quote)不落文件,住訪談 session。",
+      "properties": {
+        "frequency": { "type": ["string", "null"] },
+        "time_share_pct": { "type": ["number", "null"], "minimum": 0, "maximum": 100 },
+        "duration": { "type": ["string", "null"] },
+        "volume": { "type": ["string", "null"] },
+        "trigger": { "type": ["string", "null"] },
+        "inputs": { "type": ["string", "null"] },
+        "tools": { "type": ["string", "null"] },
+        "collaborators": { "type": ["string", "null"] },
+        "wait_points": { "type": ["string", "null"] },
+        "exceptions": { "type": ["string", "null"] },
+        "standards": { "type": ["string", "null"] }
+      }
+    },
     "TaskGroup": {
       "type": "object",
       "additionalProperties": true,
       "properties": {
         "task_codes": { "type": "array", "default": [], "items": { "$ref": "#/$defs/CodeName" } },
-        "competency_blocks": { "type": "array", "default": [], "items": { "$ref": "#/$defs/CompetencyBlock" } }
+        "competency_blocks": { "type": "array", "default": [], "items": { "$ref": "#/$defs/CompetencyBlock" } },
+        "details": { "anyOf": [{ "$ref": "#/$defs/TaskDetails" }, { "type": "null" }], "default": null }
       }
     },
     "OcuUnit": {

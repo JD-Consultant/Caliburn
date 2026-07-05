@@ -128,6 +128,16 @@ OCU 主要職責優先使用使用者確認過的 `graph_state.responsibility_gr
 | `icap_official` | iCAP 官方標準內容，含 `icap_ref` 代碼 |
 | `company_defined` | 企業自定義，無 `icap_ref` |
 
+### `tasks[].details` — 任務客製細項(2026-07-05 新增;訪談引擎 v1)
+
+每個 task 物件可帶 optional `details`(**權威 = `packages/ocs-contract/schema/ocs-document.schema.json`
+的 `TaskDetails`**;ADR 0023、spec `2026-07-05-interview-engine-v1-spec.md` §1):11 欄全 optional——
+`frequency`(頻率)、`time_share_pct`(工作比重 %,0–100)、`duration`(單次耗時)、`volume`(數量批次)、
+`trigger`(觸發)、`inputs`(準備材料)、`tools`(工具系統)、`collaborators`(協作對象)、
+`wait_points`(等待瓶頸)、`exceptions`(例外處理)、`standards`(完成標準)。
+**OCS 官方來源沒有這些**——由訪談引擎產生(pdf-to-json 產出一律無/`null`);
+溯源(員工原話 quote)不落文件,住訪談 session(稽核用)。
+
 ---
 
 ## `ocs_attitude`

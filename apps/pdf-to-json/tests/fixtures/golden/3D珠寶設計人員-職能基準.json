@@ -108,6 +108,7 @@
                 ]
               }
             ],
+            "details": null,
             "task_codes": [
               {
                 "code": "T1.1",
@@ -174,6 +175,7 @@
                 ]
               }
             ],
+            "details": null,
             "task_codes": [
               {
                 "code": "T2.1",
@@ -247,6 +249,7 @@
                 ]
               }
             ],
+            "details": null,
             "task_codes": [
               {
                 "code": "T2.2",
@@ -320,6 +323,7 @@
                 ]
               }
             ],
+            "details": null,
             "task_codes": [
               {
                 "code": "T2.3",
@@ -390,6 +394,7 @@
                 ]
               }
             ],
+            "details": null,
             "task_codes": [
               {
                 "code": "T3.1",
@@ -471,6 +476,7 @@
                 ]
               }
             ],
+            "details": null,
             "task_codes": [
               {
                 "code": "T3.2",

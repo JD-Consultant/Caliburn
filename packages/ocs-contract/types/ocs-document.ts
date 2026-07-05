@@ -60,6 +60,7 @@ export interface OcuUnit {
 export interface TaskGroup {
   task_codes?: CodeName[];
   competency_blocks?: CompetencyBlock[];
+  details?: TaskDetails | null;
 }
 export interface CompetencyBlock {
   competency_level?: number | null;
@@ -71,6 +72,22 @@ export interface CompetencyBlock {
 export interface CodeText {
   code?: string | null;
   text?: string | null;
+}
+/**
+ * 任務客製細項(訪談引擎 v1,ADR 0023/spec 2026-07-05;OCS 官方來源沒有——由訪談產生,全部 optional。溯源(quote)不落文件,住訪談 session。
+ */
+export interface TaskDetails {
+  frequency?: string | null;
+  time_share_pct?: number | null;
+  duration?: string | null;
+  volume?: string | null;
+  trigger?: string | null;
+  inputs?: string | null;
+  tools?: string | null;
+  collaborators?: string | null;
+  wait_points?: string | null;
+  exceptions?: string | null;
+  standards?: string | null;
 }
 export interface OcsAttitude {
   attitudes?: CodeName[];

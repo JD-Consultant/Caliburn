@@ -21,6 +21,8 @@ from app.models import JobProfile
 from app.core.domain import knowledge_pack, ocs_doc
 from app.core.ports import KnowledgeClient
 from app.adapters.persistence import DocConflictError, DocRepo, ProfileRepo
+from app.adapters.interview_repo import InterviewRepo
+from app.interview.diff import doc_paths_changed
 
 logger = logging.getLogger("caliburn")
 
@@ -71,11 +73,23 @@ async def patch_document(
     相容現況；web 前端一律帶，未來可能收緊為必帶——ADR 0015 / 2a-minimal spec §2.3）。
     """
     await _require_profile(profile_id, db)
+    # 訪談中的人工存檔 → 變動 path 記入 session.human_touched(ADR 0025 provenance;
+    # 引擎寫入走內部 repo 不經本 route,故此鉤子天然只記「人」)
+    active = await InterviewRepo(db).get_active(profile_id)
+    old_content = None
+    if active is not None:
+        prev = await DocRepo(db).latest(profile_id)
+        old_content = (prev or {}).get("content")
     try:
-        return await DocRepo(db).upsert_draft(
+        result = await DocRepo(db).upsert_draft(
             profile_id, body,
             expected_version=expect_version, expected_revision=expect_revision,
         )
+        if active is not None:
+            paths = doc_paths_changed(old_content, body)
+            if paths:
+                await InterviewRepo(db).merge_human_touched(active.id, paths)
+        return result
     except DocConflictError as e:
         raise HTTPException(status_code=409, detail={
             "code": "version_conflict",

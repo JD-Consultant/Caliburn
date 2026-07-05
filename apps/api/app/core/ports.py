@@ -41,9 +41,16 @@ class PersistPort(Protocol):
 
 @runtime_checkable
 class LlmPort(Protocol):
-    """per-role LLM 介面（D10）。role ∈ {"deep","indicator","cheap"}。"""
+    """per-role LLM 介面（D10）。role ∈ {"deep","indicator","cheap","select"}。
+
+    三句話型(ADR 0024):complete_text=自由文字(best-effort)、complete_json=提示層
+    JSON(事後 parse)、select_schema=**輸出必須符合 schema/enum**(adapter 以 provider
+    原生受限解碼兌現;值承重的目錄類/指令詞彙表一律走這條)。
+    """
     async def complete_text(self, prompt: str, *, role: str = "cheap") -> str: ...
     async def complete_json(self, prompt: str, *, role: str = "cheap", default: Any = None) -> Any: ...
+    async def select_schema(self, prompt: str, schema: dict, *,
+                            role: str = "select", schema_name: str = "output") -> Any: ...
 
 
 KnowledgeClient = KnowledgePort  # back-compat alias (node call sites unchanged)

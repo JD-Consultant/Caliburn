@@ -125,6 +125,9 @@ class OpenRouterLlm:
                         messages=[{"role": "user", "content": prompt}],
                         response_format=schema_response_format(schema_name, schema),
                         temperature=0,
+                        # 驗收發現:被誘導輸出非法值時,受限解碼會逼出失控長輸出直到截斷
+                        # (fail-closed 無逃逸,但燒 token)——上限鎖住成本;截斷=非法 JSON=照樣炸。
+                        max_tokens=2048,
                     )
                 content = resp.choices[0].message.content or ""
                 return json.loads(content)

@@ -1,6 +1,6 @@
 # ADR 0025 — 人機共編權限:雙通道 + 風險分流 + 節點批審
 
-- **狀態**:Proposed(2026-07-05,草案待維護者核可)。
+- **狀態**:Accepted(2026-07-05)。
 - **研究依據**:[`../specs/2026-07-05-llm-integration-wiring-research.md`](../specs/2026-07-05-llm-integration-wiring-research.md)
   §10.1(C 線:四產品收斂、CHI/CSCW 實證、確認疲勞、與版本化的配合)。
 - **關聯**:樂觀並發=ADR 0015;互動模式=ADR 0020;訪談引擎=ADR 0023。

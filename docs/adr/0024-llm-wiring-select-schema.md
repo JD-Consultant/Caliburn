@@ -1,6 +1,6 @@
 # ADR 0024 — LLM 接線:LlmPort 增 select_schema + 受限解碼路徑判準
 
-- **狀態**:Proposed(2026-07-05,草案待維護者核可)。
+- **狀態**:Accepted(2026-07-05)。
 - **研究依據**:[`../specs/2026-07-05-llm-integration-wiring-research.md`](../specs/2026-07-05-llm-integration-wiring-research.md)
   (輪 1–2:受限解碼機制、OpenRouter 透傳查證、判準表;輪 5:Pydantic AI 承重驗證)。
 - **關聯**:六邊形分層=ADR 0008;訪談引擎(指令輸出的消費者)=ADR 0023。

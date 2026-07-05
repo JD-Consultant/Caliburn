@@ -489,12 +489,17 @@ ADR 0023/0024/0025 草案對研究結果逐條覆審(尺=最新/最主流/大廠
 
 ## 11. 待決 / 下輪
 
-1. **引擎骨幹定案**(輪 3+4 證據齊,待維護者裁示:(B)無狀態回合服務?)
-2. **tool 協定**:indexer 工具(檢索 / items:match)進引擎是「LLM function-calling tools」
-   還是「workflow 確定性步驟」?(Anthropic workflow-first 傾向後者,LLM 只填槽)
-3. adaptive 判斷器具體設計(縫 3;Nature 2026 per-response 決策 + 飽和停止)。
-4. **最小實作切片**收斂:候選 = `extract_tasks` 升 `select_schema`(受限解碼版,接現行編輯器,
-   不碰訪談 loop)——待骨幹定案後定。
+**決策已凍結(2026-07-05)**:ADR **0023**(引擎骨幹=無狀態回合+軟階段+指令詞彙表,
+原待決 1/2/3 皆由其涵蓋——tool=workflow 確定性步驟+回合內小呼叫;adaptive=指令+三重保險)
+· **0024**(LLM 接線)· **0025**(共編權限)全數 Accepted。
+
+剩餘(進 spec/plan 階段處理):
+
+1. **立項 spec**:訪談引擎 v1 範圍切片(哪幾個階段先上、槽位表定版、指令參數 schema、
+   面板 UI、進度列 DB schema、客製細項欄位 vs 敘述文字的契約裁決)。
+2. **最小實作切片**(可先行,0024 第一消費者):`extract_tasks` 升 `select_schema`
+   受限解碼版,接現行編輯器,不碰訪談 loop;同時建立對抗性驗收腳本與紀錄。
+3. 黃金範本 v0 → 訪談腳本/rubric 的轉譯(spec 內做)。
 
 ## 12. 來源
 

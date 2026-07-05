@@ -1,6 +1,6 @@
 # ADR 0023 — 訪談引擎骨幹:無狀態回合服務 + 軟階段 + 指令詞彙表
 
-- **狀態**:Proposed(2026-07-05,草案待維護者核可)。
+- **狀態**:Accepted(2026-07-05)。
 - **研究依據**:[`../specs/2026-07-05-llm-integration-wiring-research.md`](../specs/2026-07-05-llm-integration-wiring-research.md)
   (輪 1–10;判別場景、五路權威收斂、需求訪談、指令詞彙表)+ 上游
   [`../specs/2026-07-02-llm-interview-authoring-research.md`](../specs/2026-07-02-llm-interview-authoring-research.md)。

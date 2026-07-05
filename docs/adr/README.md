@@ -15,7 +15,7 @@ ADR 是「為什麼」層;搭配 `../specs/`(細節設計)與 `../runbook.md`(�
 | [0004](0004-contract-first-ocs-contract.md) | 契約優先 `packages/ocs-contract` | Accepted（Phase 2 規劃中） |
 | [0005](0005-per-app-uv-defer-workspace.md) | per-app uv 專案;uv workspace 延後 | Accepted（Phase 1） |
 | [0006](0006-multitenancy-pool-rls.md) | 多租戶 Pool + Postgres RLS | Accepted（登入時實作） |
-| [0007](0007-langgraph-retained-mcp-ready.md) | LangGraph 留用 + 12-factor + MCP-ready | Accepted |
+| [0007](0007-langgraph-retained-mcp-ready.md) | LangGraph 留用 + 12-factor + MCP-ready | Accepted（LangGraph 留用部分由 0023 翻案:新訪談引擎全新實作,舊圖待清;12-factor 原則沿用且強化） |
 | [0008](0008-api-hexagonal-layering.md) | api 六邊形分層:ports→core、adapters→edge、移除反向邊 | Accepted（Phase 3a 已實作） |
 | [0009](0009-embedding-version-manifest.md) | embedding 版本 manifest + 查詢前相容驗證;瘦 CLI | Accepted（Phase 3c 已實作） |
 | [0010](0010-indexer-contract-shared-package.md) | 契約 #2 indexer 查詢 API：共用 pydantic 套件（非 codegen/Pact） | Accepted（契約 #2 已實作） |
@@ -31,9 +31,9 @@ ADR 是「為什麼」層;搭配 `../specs/`(細節設計)與 `../runbook.md`(�
 | [0020](0020-interview-authoring-interaction-model.md) | 訪談式撰寫互動模式:混合載體（文件常駐 + 精靈化訪談面板）；實作可重新設計、不受既有資產約束 | Accepted |
 | [0021](0021-knowledge-pack-single-sync-point.md) | 知識包：選職類=唯一 knowledge 同步點；indexer 給資料/api 處理/web 讀寫；來源必標的資料基座 | Accepted（P1–P3 已實作：`/knowledge` 端點＋web 全選單切換＋舊四端點退役） |
 | [0022](0022-similarity-matching-items-match.md) | 相似比對 `items:match`：indexer 確定性能力、FS 三區分帶、星型非遞移、非破壞呈現；survivorship 在 web；api 純搬運 | Accepted（v1 已實作：端點＋校準＋pack 掛載＋態度收合/任務徽章） |
-| [0023](0023-interview-engine-stateless-turns.md) | 訪談引擎骨幹：無狀態回合服務＋軟階段＋指令詞彙表；quote 溯源；停止三重保險；既有 graph 走 Strangler Fig（接受後部分翻案 0007） | Proposed（草案待核） |
-| [0024](0024-llm-wiring-select-schema.md) | LLM 接線：`LlmPort.select_schema`＋受限解碼路徑判準（OpenRouter strict 起步、對抗性驗收、escalation 槽） | Proposed（草案待核） |
-| [0025](0025-coedit-authority-dual-channel.md) | 人機共編權限：雙通道＋風險分流＋節點批審（分流寫入目的地，取代「人改過只能提議」） | Proposed（草案待核） |
+| [0023](0023-interview-engine-stateless-turns.md) | 訪談引擎骨幹：無狀態回合服務＋軟階段＋指令詞彙表；quote 溯源；停止三重保險；全新實作不整合舊碼（部分翻案 0007） | Accepted（2026-07-05；spec/plan 待開） |
+| [0024](0024-llm-wiring-select-schema.md) | LLM 接線：`LlmPort.select_schema`＋受限解碼路徑判準（OpenRouter strict 起步、對抗性驗收、escalation 槽；內裝首選 Pydantic AI） | Accepted（2026-07-05；spec/plan 待開） |
+| [0025](0025-coedit-authority-dual-channel.md) | 人機共編權限：雙通道＋風險分流＋節點批審（分流寫入目的地，取代「人改過只能提議」） | Accepted（2026-07-05；spec/plan 待開） |
 
 完整脈絡見 [`../specs/2026-06-27-system-architecture-design.md`](../specs/2026-06-27-system-architecture-design.md)。
 契約怎麼選/怎麼交付的規範見 [`../contract-strategy.md`](../contract-strategy.md)（ADR 0004/0010 的一般化、預答契約 #3）。

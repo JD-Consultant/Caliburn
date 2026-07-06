@@ -46,6 +46,17 @@ def _slot_paths(focus: dict) -> list[str] | None:
     return [f"{tp}.details.{k}" for k in SLOT_DEFS] + ["ocs_profile.job_description"]
 
 
+def _pending_label(s) -> str:
+    """待核准建議的短標籤(給 context;員工可能問到卡片)。"""
+    dp = s.doc_path or ""
+    if dp.startswith("add_task:") or dp.startswith("add_duty:"):
+        name = (s.new_value or {}).get("name") if isinstance(s.new_value, dict) else None
+        kind = "新任務" if dp.startswith("add_task:") else "新職責"
+        return f"{kind}「{name or dp.split(':', 1)[1]}」"
+    leaf = dp.split(".")[-1]
+    return f"更新 {SLOT_DEFS[leaf].label if leaf in SLOT_DEFS else leaf}"
+
+
 async def _llm_turn(llm, prompt: str, schema: dict) -> TurnOutput:
     data = await llm.select_schema(prompt, schema, schema_name="turn_output")
     try:
@@ -76,9 +87,11 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm) -> TurnResult:
     recent = [(t.role, t.text) for t in prev_turns] + [("employee", user_text)]
     emp_turn = await repo.append_turn(session.id, role="employee", text=user_text)
 
+    pending_labels = [_pending_label(s) for s in await repo.list_pending(session.id)]
     prompt, choice_ids = build_prompt(
         doc=doc, phase=session.phase, focus=session.focus or {},
-        counters=session.counters or {}, recent_turns=recent, user_text=user_text)
+        counters=session.counters or {}, recent_turns=recent, user_text=user_text,
+        pending=pending_labels)
     turn = await _llm_turn(
         llm, prompt, turn_output_schema(choice_ids, slot_paths=_slot_paths(session.focus)))
 

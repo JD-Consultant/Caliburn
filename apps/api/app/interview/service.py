@@ -142,13 +142,14 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm) -> TurnResult:
             focus["task_path"] = res.advanced_to
     await repo.update_session(session.id, counters=counters, focus=focus, phase=phase)
 
-    # 顧問回合落逐字稿(say + 問題文字)
+    # 顧問回合恆落逐字稿(executor 保底輸出保證非空;or 為回歸保險——
+    # 靜默回合曾讓稽核軌跡消失+近窗對話殘缺,實戰死穴)
     consultant_text = "\n".join(x for x in [
         res.say, (res.question or {}).get("text"), (res.widget or {}).get("question"),
     ] if x)
-    if consultant_text:
-        await repo.append_turn(session.id, role="consultant", text=consultant_text,
-                               commands=[c.model_dump() for c in turn.commands])
+    await repo.append_turn(session.id, role="consultant",
+                           text=consultant_text or "(整理中)",
+                           commands=[c.model_dump() for c in turn.commands])
 
     pending = await repo.list_pending(session.id)
     return TurnResult(say=res.say, question=res.question, widget=res.widget,

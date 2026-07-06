@@ -170,3 +170,13 @@ def test_advance_turn_says_transition_not_old_task_question():
                 focus={"task_path": TASK_PATH}, employee_texts=EMP)
     assert res.advanced_to and res.say                     # 過場語
     assert res.question is None                            # 不回頭問舊任務
+
+
+def test_reply_without_ask_still_gets_forward_question():
+    # 校準#2:模型給了 reply/set 卻漏 ask → 保底補下一缺口題,不讓對話停在原地
+    doc = _doc()
+    res = apply(_turn(_set(), {"type": "reply", "text": "了解,每雙週一次。"}),
+                doc=doc, human_touched=[], counters={},
+                focus={"task_path": TASK_PATH}, employee_texts=EMP)
+    assert res.say == "了解,每雙週一次。"                    # 尊重模型的話,不覆寫
+    assert res.question["target_path"].endswith("time_share_pct")   # 但仍補前進

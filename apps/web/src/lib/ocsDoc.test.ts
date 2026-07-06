@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import type { OcsDocument, OcsTask } from "@/types";
 import {
+  addCustomDuty,
+  addCustomTask,
   addTasksToUnit,
   deleteTask,
   relocateTask,
@@ -242,5 +244,40 @@ describe("setAttitudes / addTasksToUnit", () => {
     ]);
     const t = next.ocs_content.ocu_units[0].tasks[1];
     expect(t.task_codes?.[0]).toEqual({ code: "T1.2", name: "新任務" });
+  });
+});
+
+describe("addCustomTask / addCustomDuty(訪談抓漏核准落地,RC4)", () => {
+  it("addCustomTask:掛到現有職責(by _uid)、位置碼、自訂無來源", () => {
+    const doc = docWith([{ name: "U1", tasks: [task("T1.1", "甲")] }]);
+    const next = addCustomTask(doc, "uid-U1", "處理床位滿");
+    const tasks = next.ocs_content.ocu_units[0].tasks;
+    expect(tasks).toHaveLength(2);
+    expect(tasks[1].task_codes?.[0]).toEqual({ code: "T1.2", name: "處理床位滿" });
+    expect(tasks[1]._tid).toBeTruthy();                              // 有身分
+    expect(tasks[1].provenance).toEqual({ ocs_code: "", task_code: "" });  // 公版外
+  });
+
+  it("addCustomTask:unit_ref 對不上 → 開自訂職責掛上(核准的任務不消失)", () => {
+    const doc = docWith([{ name: "U1", tasks: [] }]);
+    const next = addCustomTask(doc, "床位管理", "處理床位滿");
+    expect(next.ocs_content.ocu_units).toHaveLength(2);
+    const u2 = next.ocs_content.ocu_units[1];
+    expect(u2.ocu_name).toBe("床位管理");
+    expect(u2.tasks[0].task_codes?.[0]).toEqual({ code: "T2.1", name: "處理床位滿" });
+    expect(u2.source).toEqual({ ocs_code: "", occupation_name: "" });  // 自訂職責
+  });
+
+  it("addCustomDuty:開新自訂職責、位置碼 T2", () => {
+    const doc = docWith([{ name: "U1", tasks: [] }]);
+    const next = addCustomDuty(doc, "客戶問題支援");
+    expect(next.ocs_content.ocu_units[1].ocu_name).toBe("客戶問題支援");
+    expect(next.ocs_content.ocu_units[1].ocu_code).toBe("T2");
+  });
+
+  it("純函式:不就地改動原件", () => {
+    const doc = docWith([{ name: "U1", tasks: [] }]);
+    addCustomTask(doc, "uid-U1", "x");
+    expect(doc.ocs_content.ocu_units[0].tasks).toHaveLength(0);
   });
 });

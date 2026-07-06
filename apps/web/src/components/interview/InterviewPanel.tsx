@@ -82,7 +82,6 @@ export function InterviewPanel({ profileId, doc, onApplyDoc }: {
   const turn = useInterviewTurn(profileId);
   const review = useReviewInterview(profileId);
   const [input, setInput] = useState("");
-  const [manualHint, setManualHint] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const turns = view.data?.turns ?? [];
@@ -125,19 +124,14 @@ export function InterviewPanel({ profileId, doc, onApplyDoc }: {
     );
   }
 
-  // 批審(ADR 0025 節點批審):轉狀態 → 前端 applyAccepted → 頁面 persist(既有寫入路徑)
+  // 批審(ADR 0025 節點批審):轉狀態 → 前端 applyAccepted(含 add_task/add_duty 落地)
+  // → 頁面 persist(既有寫入路徑)。renumber 由 ocsDoc 處理(前端職權)。
   const decide = (accept: string[], reject: string[]) => {
     review.mutate({ accept, reject }, {
       onSuccess: (res) => {
         if (!doc || !onApplyDoc || res.accepted.length === 0) return;
         const out = applyAccepted(doc, res.accepted);
         if (out.applied.length > 0) onApplyDoc(out.doc);
-        if (out.manual.length > 0) {
-          const names = out.manual
-            .map((m) => (m.new_value as { name?: string })?.name ?? m.doc_path)
-            .join("、");
-          setManualHint(`已核准的新任務/職責請用「選任務 ▾」加入:${names}`);
-        }
       },
     });
   };
@@ -152,11 +146,6 @@ export function InterviewPanel({ profileId, doc, onApplyDoc }: {
             busy={review.isPending}
             onDecide={decide}
           />
-        )}
-        {manualHint && (
-          <p className="rounded-md border border-amber-300 bg-amber-50 p-2 text-xs">
-            {manualHint}
-          </p>
         )}
         {turns.length === 0 && start.data && (
           <p className="rounded-md bg-muted/40 p-2">{start.data.greeting}</p>

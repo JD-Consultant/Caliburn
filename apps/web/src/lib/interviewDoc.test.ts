@@ -40,15 +40,21 @@ describe("setAtPath / getAtPath", () => {
 });
 
 describe("applyAccepted", () => {
-  it("slot 建議套用、add_* 分流 manual、壞 path 進 failed", () => {
+  it("slot 套用、add_task/add_duty 核准即落地、壞 path 進 failed", () => {
     const out = applyAccepted(doc(), [
       { doc_path: FREQ, new_value: "每雙週" },
       { doc_path: "add_task:客戶問題單重現", new_value: { unit_ref: "u1", name: "客戶問題單重現" } },
+      { doc_path: "add_duty:客戶支援", new_value: { name: "客戶支援" } },
       { doc_path: "ocs_content.ocu_units.u9.tasks.t9.details.x", new_value: "?" },
     ]);
-    expect(out.applied).toEqual([FREQ]);
-    expect(out.manual[0].doc_path).toContain("add_task");
+    expect(out.applied).toContain(FREQ);
+    expect(out.applied).toContain("add_task:客戶問題單重現");
+    expect(out.applied).toContain("add_duty:客戶支援");
     expect(out.failed).toHaveLength(1);
     expect(getAtPath(out.doc, FREQ)).toBe("每雙週");
+    // 核准的新任務/職責真的進了文件(RC4:不再叫使用者自己加)
+    const u1 = out.doc.ocs_content.ocu_units.find((u) => u._uid === "u1")!;
+    expect(u1.tasks.some((t) => t.task_codes?.[0]?.name === "客戶問題單重現")).toBe(true);
+    expect(out.doc.ocs_content.ocu_units.some((u) => u.ocu_name === "客戶支援")).toBe(true);
   });
 });

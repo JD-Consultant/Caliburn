@@ -382,6 +382,39 @@ export function addTasksToUnit(doc: OcsDocument, ui: number, tasks: PoolPick["ta
   return renumber(next);
 }
 
+// 訪談抓漏核准 → 前端落地(ADR 0025 不變量2:人核准的建議=人的寫入,由前端套用;
+// 重編碼是前端 renumber 職權)。RC4:原本核准後丟 manual 叫使用者自己去「選任務▾」加,
+// 找不到=體驗斷裂;現在核准即落地。unit_ref 是 LLM 給的參照(_uid/顯示碼/職責名任一),
+// 對不上就開一個自訂職責掛上,核准的任務絕不消失。
+export function addCustomTask(doc: OcsDocument, unitRef: string, name: string): OcsDocument {
+  const next = clone(doc);
+  const units = next.ocs_content.ocu_units;
+  let unit = units.find(
+    (u) => u._uid === unitRef || u.ocu_code === unitRef || u.ocu_name === unitRef,
+  );
+  if (!unit) {
+    unit = {
+      ocu_code: "", ocu_name: unitRef || "公司自訂職責",
+      source: { ocs_code: "", occupation_name: "" }, tasks: [], _uid: uid(),
+    } as OcuUnit;
+    units.push(unit);
+  }
+  const t = emptyTask();
+  t.task_codes = [{ code: "", name }];   // 自訂任務(provenance 留空;renumber 給位置碼)
+  unit.tasks.push(t);
+  return renumber(next);
+}
+
+// 訪談抓漏的新職責:一律開自訂職責(公版外;renumber 給 T{n} 位置碼)。
+export function addCustomDuty(doc: OcsDocument, name: string): OcsDocument {
+  const next = clone(doc);
+  next.ocs_content.ocu_units.push({
+    ocu_code: "", ocu_name: name || "公司自訂職責",
+    source: { ocs_code: "", occupation_name: "" }, tasks: [], _uid: uid(),
+  } as OcuUnit);
+  return renumber(next);
+}
+
 // 任務是否已有內容(四格/級別/筆記)——選單「取消勾選=移除」的鎖定判定:
 // 有內容的任務不能從選單移除,只能在表格刪(防誤刪已填資料)。
 export function taskHasContent(task: OcsTask): boolean {

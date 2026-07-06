@@ -5,7 +5,7 @@
 // draft（自動儲存）。續做＝重開自動載 draft。finalize 產正式版本。不碰 CopilotKit。
 import { use, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { ChevronLeft, Download, FileCheck2, Layers } from "lucide-react";
+import { ChevronLeft, Download, FileCheck2, Layers, MessageCircle, X } from "lucide-react";
 import { useProfile } from "@/hooks/useProfiles";
 import { useAutosaveDocument, useDocument, useFinalizeDocument } from "@/hooks/useDocument";
 import { useKnowledge } from "@/hooks/useKnowledge";
@@ -16,6 +16,7 @@ import { CellFillerPanel } from "@/components/interview/CellFillerPanel";
 import { OccupationPicker } from "@/components/interview/OccupationPicker";
 import { UnitPickerMenu } from "@/components/interview/UnitPickerMenu";
 import { ConflictDialog } from "@/components/interview/ConflictDialog";
+import { InterviewPanel } from "@/components/interview/InterviewPanel";
 import { completion, ensureIds } from "@/lib/ocsDoc";
 import type { OcsDocument } from "@/types";
 import { Button } from "@/components/ui/button";
@@ -54,6 +55,7 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
 
   const [target, setTarget] = useState<CellTarget | null>(null);
   const [showOcc, setShowOcc] = useState(false);
+  const [showInterview, setShowInterview] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const persist = (next: OcsDocument, after?: () => void) => {
@@ -109,6 +111,17 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
           <Button size="sm" variant="outline" className="gap-1" onClick={() => setShowOcc(true)}>
             <Layers className="h-4 w-4" />
             選職類
+          </Button>
+          {/* 訪談面板(ADR 0020 混合載體:文件常駐、面板在側;引擎 ADR 0023) */}
+          <Button
+            size="sm"
+            variant={showInterview ? "default" : "outline"}
+            className="gap-1"
+            onClick={() => setShowInterview((v) => !v)}
+            disabled={status === "none" && !hasOccupations}
+          >
+            <MessageCircle className="h-4 w-4" />
+            AI 訪談
           </Button>
           {/* 選職責 ▾（P3 UI 修訂）：勾＝空職責入表格，任務再從職責列「選任務 ▾」挑 */}
           <UnitPickerMenu document={doc} pack={pack} disabled={!hasOccupations || !doc} onChange={(d) => persist(d)} />
@@ -186,6 +199,33 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
           onLoadLatest={() => void loadLatest()}
           onOverwrite={overwriteWithLocal}
         />
+      ) : null}
+
+      {/* 訪談側欄:文件常駐主畫面、面板疊右側(可收);寫入全走 persist 同一條 PATCH */}
+      {showInterview ? (
+        <aside className="fixed inset-y-0 right-0 z-40 flex w-full max-w-md flex-col border-l bg-background shadow-xl">
+          <div className="flex items-center justify-between border-b px-3 py-2">
+            <span className="text-sm font-medium">AI 訪談顧問</span>
+            <div className="flex items-center gap-2">
+              <Link
+                href={`/documents/${id}/interview`}
+                className="text-xs text-muted-foreground underline hover:text-foreground"
+              >
+                訪談紀錄
+              </Link>
+              <Button size="icon" variant="ghost" onClick={() => setShowInterview(false)}>
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+          <div className="min-h-0 flex-1">
+            <InterviewPanel
+              profileId={id}
+              doc={doc}
+              onApplyDoc={(next) => persist(next)}
+            />
+          </div>
+        </aside>
       ) : null}
 
     </div>

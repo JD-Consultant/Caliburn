@@ -493,13 +493,17 @@ ADR 0023/0024/0025 草案對研究結果逐條覆審(尺=最新/最主流/大廠
 原待決 1/2/3 皆由其涵蓋——tool=workflow 確定性步驟+回合內小呼叫;adaptive=指令+三重保險)
 · **0024**(LLM 接線)· **0025**(共編權限)全數 Accepted。
 
-剩餘(進 spec/plan 階段處理):
+**實作後記(2026-07-05,v1 完成)**:spec([`interview-engine-v1-spec`](2026-07-05-interview-engine-v1-spec.md))
+→ plan 15 task → **全數實作**(契約 details/四表/human_touched/槽位門檻/指令詞彙表/executor/
+select_schema+對抗驗收 PASS/回合服務/4 端點/web 面板+批審+稽核頁/模擬受訪者校準 #1 PASS
+(關鍵字 0.91、quote 驗證 1.0))。端到端設計=[`design/interview-engine.md`](../design/interview-engine.md);
+tag `interview-v1`。spike 修正:adapter 用 openai SDK 直傳(非 Pydantic AI,理由=動態 raw
+schema,見驗收紀錄);`:review` 只轉狀態、前端套用(ai-suggestions 不變量 1)。
 
-1. **立項 spec**:訪談引擎 v1 範圍切片(哪幾個階段先上、槽位表定版、指令參數 schema、
-   面板 UI、進度列 DB schema、客製細項欄位 vs 敘述文字的契約裁決)。
-2. **最小實作切片**(可先行,0024 第一消費者):`extract_tasks` 升 `select_schema`
-   受限解碼版,接現行編輯器,不碰訪談 loop;同時建立對抗性驗收腳本與紀錄。
-3. 黃金範本 v0 → 訪談腳本/rubric 的轉譯(spec 內做)。
+**backlog(記縫,不預建)**:trigger 過度抽象的 prompt 修正(校準 #1 發現)· 盤點段
+ask_choice 接知識包池 · 多 persona/對抗版模擬 · 文件級章節補全(黃金範本 8 章完整版)·
+重要度回合 · rubric 品質分 · 舊 graph+CopilotKit 退役清理(0023 決定 6,可獨立 task)·
+`extract_tasks` 升 select_schema(0024 第二消費者)。
 
 ## 12. 來源
 

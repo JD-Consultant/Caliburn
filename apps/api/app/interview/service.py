@@ -17,6 +17,7 @@ from app.adapters.persistence import DocConflictError, DocRepo
 from app.interview import executor as ex
 from app.interview.commands import TurnOutput, turn_output_schema
 from app.interview.context import build_prompt
+from app.interview.slots import SLOT_DEFS
 
 logger = logging.getLogger("caliburn")
 
@@ -35,6 +36,14 @@ class TurnResult:
     phase: str = "deep"
     focus: dict = field(default_factory=dict)
     guard_log: list[str] = field(default_factory=list)
+
+
+def _slot_paths(focus: dict) -> list[str] | None:
+    """deep 段寫入 path enum:焦點任務 11 槽 + 工作摘要(與 executor 白名單同源)。"""
+    tp = (focus or {}).get("task_path")
+    if not tp:
+        return None
+    return [f"{tp}.details.{k}" for k in SLOT_DEFS] + ["ocs_profile.job_description"]
 
 
 async def _llm_turn(llm, prompt: str, schema: dict) -> TurnOutput:
@@ -70,7 +79,8 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm) -> TurnResult:
     prompt, choice_ids = build_prompt(
         doc=doc, phase=session.phase, focus=session.focus or {},
         counters=session.counters or {}, recent_turns=recent, user_text=user_text)
-    turn = await _llm_turn(llm, prompt, turn_output_schema(choice_ids))
+    turn = await _llm_turn(
+        llm, prompt, turn_output_schema(choice_ids, slot_paths=_slot_paths(session.focus)))
 
     res = ex.apply(turn, doc=doc, human_touched=list(session.human_touched or []),
                    counters=dict(session.counters or {}), focus=dict(session.focus or {}),

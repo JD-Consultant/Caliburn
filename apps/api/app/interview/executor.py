@@ -19,9 +19,20 @@ from dataclasses import dataclass, field
 
 from app.interview.commands import TurnOutput
 from app.interview.diff import STABLE_ID_KEYS
-from app.interview.slots import gate_missing
+from app.interview.slots import SLOT_DEFS, gate_missing
 
 ASK_BUDGET_PER_SLOT = 2   # v0 出廠值(校準後修)
+
+# set/correct 可寫的非槽位路徑(其餘一律 <task>.details.<SLOT_DEFS key>)
+WRITE_WHITELIST = ("ocs_profile.job_description",)
+
+
+def writable_path(path: str) -> bool:
+    """寫入白名單(defense-in-depth:schema enum 之外的第二道)。"""
+    if path in WRITE_WHITELIST:
+        return True
+    segs = path.split(".")
+    return len(segs) >= 3 and segs[-2] == "details" and segs[-1] in SLOT_DEFS
 
 _WS = re.compile(r"\s+")
 
@@ -134,6 +145,9 @@ def apply(turn: TurnOutput, *, doc: dict, human_touched: list[str],
             verified = quote_verified(cmd.quote, employee_texts)
             res.evidence.append({"doc_path": cmd.path, "quote": cmd.quote,
                                  "verified": verified})
+            if not writable_path(cmd.path):
+                res.guard_log.append(f"drop:{cmd.path}(未知槽,白名單擋下)")
+                continue
             if cmd.path in touched:
                 res.suggestions.append({
                     "doc_path": cmd.path, "old_value": get_at(doc, cmd.path),

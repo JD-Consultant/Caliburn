@@ -74,14 +74,17 @@ def test_add_task_always_suggestion():
 
 
 def test_ask_budget_enforced():
+    # RC2 行為變更(2026-07-06 真人試訪):預算擋下不再靜默死路——
+    # 自動 justified-skip 該槽 + 確定性改問下一缺口(訪談持續前進)。
     doc = _doc()
     ask = {"type": "ask", "question": "多久一次?", "target_path": FREQ}
     res = apply(_turn(ask), doc=doc, human_touched=[],
                 counters={FREQ: ASK_BUDGET_PER_SLOT},
                 focus={"task_path": TASK_PATH}, employee_texts=EMP)
-    assert res.question is None
     assert any("budget" in g for g in res.guard_log)
-    # 預算內 → 出題並記 delta
+    assert FREQ in res.skipped_add                     # 預算耗盡=自動跳過
+    assert res.question["target_path"].endswith("time_share_pct")   # 改問下一缺口
+    # 預算內 → 照模型的題出並記 delta
     res2 = apply(_turn(ask), doc=doc, human_touched=[], counters={FREQ: 1},
                  focus={"task_path": TASK_PATH}, employee_texts=EMP)
     assert res2.question["target_path"] == FREQ and res2.counters_delta[FREQ] == 2
@@ -130,3 +133,40 @@ def test_job_description_whitelisted_writable():
                 doc=doc, human_touched=[], counters={},
                 focus={"task_path": TASK_PATH}, employee_texts=EMP)
     assert res.new_doc["ocs_profile"]["job_description"] == "負責回歸測試"
+
+
+# --- 保底輸出(RC2:回合恆有可見輸出;實戰三次靜默回合的回歸網) ---
+
+def test_silent_set_slot_synthesizes_confirmation_and_next_question():
+    doc = _doc()
+    res = apply(_turn(_set()), doc=doc, human_touched=[], counters={},
+                focus={"task_path": TASK_PATH}, employee_texts=EMP)
+    # 模型只發 set_slot、漏 reply/ask → 保底:確認語 + 下一缺口模板題
+    assert "頻率" in res.say and "每雙週" in res.say
+    assert res.question["target_path"].endswith("time_share_pct")
+    assert res.counters_delta[f"{TASK_PATH}.details.time_share_pct"] == 1
+
+
+def test_silent_add_task_mentions_suggestion_card():
+    doc = _doc()
+    res = apply(_turn({"type": "add_task", "unit_ref": "u1", "name": "處理床位滿",
+                       "quote": "大概三百多條"}),
+                doc=doc, human_touched=[], counters={},
+                focus={"task_path": TASK_PATH}, employee_texts=EMP)
+    assert "建議" in res.say and "處理床位滿" in res.say    # 指引核准卡片,別讓員工猜
+    assert res.question is not None                        # 不冷場,繼續問
+
+def test_empty_commands_still_visible_output():
+    doc = _doc(details={"frequency": "每季", "time_share_pct": 5, "standards": "主管確認"})
+    res = apply(_turn(), doc=doc, human_touched=[], counters={},
+                focus={"task_path": TASK_PATH}, employee_texts=EMP)
+    assert res.say                                         # light 全齊 → 收尾語,仍有輸出
+
+
+def test_advance_turn_says_transition_not_old_task_question():
+    doc = _doc(details={"frequency": "每季", "time_share_pct": 5, "standards": "主管確認"})
+    res = apply(_turn({"type": "advance", "next_focus": "ocs_content.ocu_units.u1.tasks.t2"}),
+                doc=doc, human_touched=[], counters={},
+                focus={"task_path": TASK_PATH}, employee_texts=EMP)
+    assert res.advanced_to and res.say                     # 過場語
+    assert res.question is None                            # 不回頭問舊任務

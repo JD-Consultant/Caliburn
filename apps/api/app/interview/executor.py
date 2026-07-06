@@ -6,8 +6,10 @@
   server 不重編——人核准後由前端套用,走同一條 PATCH)。
 - **quote 驗證**:NFKC+空白摺疊後必須是「員工發言逐字稿」子串;失敗標 unverified
   (retry 由回合服務層負責,executor 只判定)。
-- **三重保險**:ask 超每槽預算 → 擋下記 guard;advance 未過覆蓋門檻(扣除 justified
-  skip)→ 拒絕回缺口。
+- **三重保險**:ask 超每槽預算 → 自動 justified-skip 該槽(政策的確定性收尾);
+  advance 未過覆蓋門檻(扣除 justified skip)→ 拒絕回缺口。
+- **保底輸出**:回合恆有 say/question/widget——模型漏 reply/ask 或 ask 被擋時,
+  確定性補確認語+下一缺口模板題(真人試訪 2026-07-06:靜默回合=頭號死穴)。
 
 Path 文法與 diff.py 同族:段以 `.` 連接;list 段用穩定 id(_tid/_uid/_id)或 index。
 純函式:輸入 doc 不變,回新 doc(deep copy)。
@@ -129,6 +131,7 @@ def apply(turn: TurnOutput, *, doc: dict, human_touched: list[str],
     touched = set(human_touched or [])
     skipped = set((focus or {}).get("skipped") or [])
     says: list[str] = []
+    written: list[tuple[str, object]] = []   # 保底確認語素材
 
     def _doc() -> dict:
         nonlocal work
@@ -158,6 +161,7 @@ def apply(turn: TurnOutput, *, doc: dict, human_touched: list[str],
             else:
                 if set_at(_doc(), cmd.path, cmd.value):
                     wrote_any = True
+                    written.append((cmd.path, cmd.value))
                     res.guard_log.append(f"write:{cmd.path}")
                 else:
                     res.guard_log.append(f"drop:{cmd.path}(path 不存在)")
@@ -178,7 +182,11 @@ def apply(turn: TurnOutput, *, doc: dict, human_touched: list[str],
             key = cmd.target_path or "_open"
             used = int((counters or {}).get(key, 0))
             if cmd.target_path and used >= ASK_BUDGET_PER_SLOT:
-                res.guard_log.append(f"budget:{key}(≥{ASK_BUDGET_PER_SLOT},ask 擋下)")
+                res.guard_log.append(
+                    f"budget:{key}(≥{ASK_BUDGET_PER_SLOT},ask 擋下→自動 skip)")
+                if cmd.target_path not in skipped:      # 政策收尾:問到頂=跳過往前走
+                    res.skipped_add.append(cmd.target_path)
+                    skipped.add(cmd.target_path)
                 continue
             if res.question is None:      # 一回合只出一題(多的丟 guard_log)
                 res.question = {"text": cmd.question, "target_path": cmd.target_path}
@@ -213,4 +221,64 @@ def apply(turn: TurnOutput, *, doc: dict, human_touched: list[str],
 
     res.say = "\n".join(says)
     res.new_doc = work if wrote_any else None
+    _ensure_visible(res, doc=work or doc, focus=focus, counters=counters,
+                    skipped=skipped, written=written)
     return res
+
+
+# --- 保底輸出(回合恆有可見產出;純函式的最後一道) ---
+
+def _leaf_label(path: str) -> str:
+    leaf = path.split(".")[-1]
+    return SLOT_DEFS[leaf].label if leaf in SLOT_DEFS else leaf
+
+
+def _next_gap_question(task: dict, task_path: str, skipped: set,
+                       counters: dict, delta: dict) -> tuple[str, str | None]:
+    """(題目, path) 或 (收尾語, None)。缺口依 gate_missing 序,跳過 skipped/預算耗盡。"""
+    remaining = []
+    for k in gate_missing(task):
+        p = f"{task_path}.outputs" if k == "outputs" else f"{task_path}.details.{k}"
+        if p not in skipped:
+            remaining.append((k, p))
+    for k, p in remaining:
+        used = max(int((counters or {}).get(p, 0)), int((delta or {}).get(p, 0)))
+        if used >= ASK_BUDGET_PER_SLOT:
+            continue
+        text = ("做完這個任務會產出什麼?(報表、文件或成品之類)" if k == "outputs"
+                else SLOT_DEFS[k].hint)
+        return text, p
+    return ("這個任務的缺口都補齊了,可以往下一個任務走。" if not remaining
+            else "剩下的先跳過,我們繼續。"), None
+
+
+def _ensure_visible(res: ExecResult, *, doc: dict, focus: dict, counters: dict,
+                    skipped: set, written: list[tuple[str, object]]) -> None:
+    if res.say or res.question is not None or res.widget is not None:
+        return
+    bits: list[str] = []
+    if written:
+        bits.append("已記下:" + "、".join(f"{_leaf_label(p)}={v}" for p, v in written))
+    if res.suggestions:
+        names = "、".join(
+            (s["new_value"].get("name") if isinstance(s["new_value"], dict)
+             else f"{_leaf_label(s['doc_path'])}={s['new_value']}")
+            for s in res.suggestions)
+        bits.append(f"「{names}」我先放進上方的建議卡片,你核准後才會寫進文件。")
+    task_path = (focus or {}).get("task_path")
+    task = _task_at(doc, task_path) if task_path else None
+    if res.advanced_to:
+        bits.append("這個任務先到這裡,我們繼續下一個。")
+    elif task is not None:
+        text, qpath = _next_gap_question(task, task_path, skipped,
+                                         counters, res.counters_delta)
+        if qpath:
+            used = max(int((counters or {}).get(qpath, 0)),
+                       int(res.counters_delta.get(qpath, 0)))
+            res.question = {"text": text, "target_path": qpath}
+            res.counters_delta[qpath] = used + 1
+        else:
+            bits.append(text)
+    if not bits and res.question is None:
+        bits.append("收到。")   # 最後保險(無焦點任務等極端情況)
+    res.say = "\n".join(bits)

@@ -102,6 +102,20 @@ async def test_no_active_session_raises(db_session):
 
 
 @pytest.mark.asyncio
+async def test_silent_llm_output_still_records_consultant_turn(db_session):
+    """RC2:模型漏 reply/ask 也要有可見回應+逐字稿落盤(實戰「沒反應」回歸網)。"""
+    p, s, repo = await _setup(db_session)
+    only_set = {"commands": [{"type": "set_slot", "path": FREQ, "value": "每雙週",
+                              "quote": "每兩週跑一次"}], "saturation": False}
+    out = await run_turn(p.id, "我們每兩週跑一次", db=db_session,
+                         llm=StubLlm(select_result=only_set))
+    assert out.say and out.question is not None
+    turns = await repo.list_turns(s.id)
+    assert [t.role for t in turns] == ["employee", "consultant"]
+    assert turns[1].text                                   # 稽核軌跡不再消失
+
+
+@pytest.mark.asyncio
 async def test_turn_schema_locks_slot_paths(db_session):
     """接線驗證:deep 段丟給 LLM 的 schema,寫入 path 已用焦點任務槽位 enum 鎖死。"""
     p, s, repo = await _setup(db_session)

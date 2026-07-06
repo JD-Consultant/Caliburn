@@ -58,14 +58,15 @@ def _pending_label(s) -> str:
 
 
 async def _llm_turn(llm, prompt: str, schema: dict) -> TurnOutput:
-    data = await llm.select_schema(prompt, schema, schema_name="turn_output")
+    data = await llm.select_schema(prompt, schema, role="interview",
+                                   schema_name="turn_output")
     try:
         return TurnOutput.model_validate(data)
     except ValidationError as e:
         logger.warning("turn output 語義違規,重問一次:%s", str(e)[:200])
         data2 = await llm.select_schema(
             prompt + f"\n(上次輸出不合法:{str(e)[:150]}——請修正後重出)", schema,
-            schema_name="turn_output")
+            role="interview", schema_name="turn_output")
         try:
             return TurnOutput.model_validate(data2)
         except ValidationError as e2:

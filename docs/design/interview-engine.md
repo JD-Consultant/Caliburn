@@ -37,8 +37,9 @@ seam** 即時長出細項;人碰過的內容走建議層批審;顧問事後開�
   ① 載入 draft + session + 逐字稿;append 員工 turn
   ② context.build_prompt:結構化狀態優先(焦點任務現況/缺口+SLOT_DEFS 問法/預算/已跳)
      + 近 12 回合窗——不整卷重播
-  ③ LlmPort.select_schema(turn_output_schema(choice_ids)) ← 受限解碼(0024;
-     ask_choice 變體只在有池 id 時存在;model_select 須過對抗驗收)
+  ③ LlmPort.select_schema(turn_output_schema(choice_ids, slot_paths), role="interview")
+     ← 受限解碼(0024;ask_choice 變體只在有池 id 時存在;寫入 path 也鎖 enum;
+     訪談走 model_interview=gpt-4.1-mini 非 select 的 4o-mini,ADR 0026;須過對抗驗收)
   ④ TurnOutput 語義驗證;違規→帶錯誤重問 1 次→仍壞 LlmSchemaError→route 502
   ⑤ executor.apply(確定性,LLM 繞不過):
        set/correct:path∈human_touched→建議層;否則直改(details 缺殼自動建)
@@ -75,7 +76,9 @@ web:doc_changed → invalidate ["document"] → data-layer 外部變化 effect �
 5. **覆蓋門檻/預算/core 判準數字 = v0 出廠值**(`slots.py`/`executor.py` 常數):
    改數字=跑校準(`evals/interview_sim.py`)留紀錄 `docs/specs/`,不改碼形。
 6. **select_schema 失敗必須顯式**(`LlmSchemaError`→502/503),不准靜默降級成提示層;
-   換 `model_select`=重跑 `scripts/validate_select_schema.py` 留紀錄(0024 驗收紀律)。
+   換 `model_select`/`model_interview`=重跑 `scripts/validate_select_schema.py [--role interview]`
+   +(訪談另跑)`evals/interview_sim.py` 留紀錄(0024/0026 驗收紀律)。訪談回合走
+   `role="interview"`(gpt-4.1-mini)——推理強一階但沿用同套 strict 零逃逸;`select` 仍 4o-mini。
 7. **舊 authoring graph(LangGraph)= 退役待清**:新引擎全新實作不整合舊碼(0023 決定 6);
    舊圖/AG-UI/checkpointer/CopilotKit provider 在新引擎可用後一次清除,期間互不干擾。
 

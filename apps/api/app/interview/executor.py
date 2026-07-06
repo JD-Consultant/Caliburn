@@ -254,22 +254,15 @@ def _next_gap_question(task: dict, task_path: str, skipped: set,
 
 def _ensure_visible(res: ExecResult, *, doc: dict, focus: dict, counters: dict,
                     skipped: set, written: list[tuple[str, object]]) -> None:
-    if res.say or res.question is not None or res.widget is not None:
+    """回合恆有『可見 say』+『前進動作』。模型漏 ask(只 set+reply)也補下一缺口題,
+    避免側欄只回話卻不問、對話停在原地(校準#2 dump 實證)。"""
+    # 已有問題/選單 = 前進動作齊備,不動
+    if res.question is not None or res.widget is not None:
         return
-    bits: list[str] = []
-    if written:
-        bits.append("已記下:" + "、".join(f"{_leaf_label(p)}={v}" for p, v in written))
-    if res.suggestions:
-        names = "、".join(
-            (s["new_value"].get("name") if isinstance(s["new_value"], dict)
-             else f"{_leaf_label(s['doc_path'])}={s['new_value']}")
-            for s in res.suggestions)
-        bits.append(f"「{names}」我先放進上方的建議卡片,你核准後才會寫進文件。")
     task_path = (focus or {}).get("task_path")
     task = _task_at(doc, task_path) if task_path else None
-    if res.advanced_to:
-        bits.append("這個任務先到這裡,我們繼續下一個。")
-    elif task is not None:
+    # 補前進問題:非 advance 收尾、有焦點任務、還有缺口 → 問下一個
+    if not res.advanced_to and task is not None:
         text, qpath = _next_gap_question(task, task_path, skipped,
                                          counters, res.counters_delta)
         if qpath:
@@ -277,8 +270,19 @@ def _ensure_visible(res: ExecResult, *, doc: dict, focus: dict, counters: dict,
                        int(res.counters_delta.get(qpath, 0)))
             res.question = {"text": text, "target_path": qpath}
             res.counters_delta[qpath] = used + 1
-        else:
-            bits.append(text)
-    if not bits and res.question is None:
-        bits.append("收到。")   # 最後保險(無焦點任務等極端情況)
-    res.say = "\n".join(bits)
+    # 補確認語:模型連 reply 都沒給時(有 reply 就尊重模型的話,不疊加)
+    if not res.say:
+        bits: list[str] = []
+        if written:
+            bits.append("已記下:" + "、".join(f"{_leaf_label(p)}={v}" for p, v in written))
+        if res.suggestions:
+            names = "、".join(
+                (s["new_value"].get("name") if isinstance(s["new_value"], dict)
+                 else f"{_leaf_label(s['doc_path'])}={s['new_value']}")
+                for s in res.suggestions)
+            bits.append(f"「{names}」我先放進上方的建議卡片,你核准後才會寫進文件。")
+        if res.advanced_to:
+            bits.append("這個任務先到這裡,我們繼續下一個。")
+        elif res.question is None:
+            bits.append("這個任務的細節都補齊了,我們可以往下一個任務走。")
+        res.say = "\n".join(bits) or "收到。"

@@ -34,6 +34,7 @@ def model_for_role(role: str) -> str:
         "indicator": settings.model_indicator,
         "cheap": settings.model_cheap,
         "select": settings.model_select,
+        "interview": settings.model_interview,
     }.get(role, settings.model_cheap)
 
 

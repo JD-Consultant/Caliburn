@@ -102,6 +102,16 @@ async def test_no_active_session_raises(db_session):
 
 
 @pytest.mark.asyncio
+async def test_turn_uses_interview_model_role(db_session):
+    """RC5:訪談回合走 role='interview'(強模型),不再搭 select 的 gpt-4o-mini。"""
+    p, s, repo = await _setup(db_session)
+    llm = StubLlm(select_result=GOOD)
+    await run_turn(p.id, "每兩週跑一次", db=db_session, llm=llm)
+    select_calls = [c for c in llm.calls if c["kind"] == "select"]
+    assert select_calls and all(c["role"] == "interview" for c in select_calls)
+
+
+@pytest.mark.asyncio
 async def test_silent_llm_output_still_records_consultant_turn(db_session):
     """RC2:模型漏 reply/ask 也要有可見回應+逐字稿落盤(實戰「沒反應」回歸網)。"""
     p, s, repo = await _setup(db_session)

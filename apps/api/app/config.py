@@ -25,7 +25,11 @@ class Settings(BaseSettings):
     model_cheap: str = "deepseek/deepseek-chat"      # 便宜：措辭/雜項
     # 受限解碼(ADR 0024):底層必須原生支援 json_schema strict(OpenAI/Gemini 系);
     # 換模型 = 改這裡 + 重跑 scripts/validate_select_schema.py 留紀錄,不改碼。
-    model_select: str = "openai/gpt-4o-mini"
+    model_select: str = "openai/gpt-4o-mini"        # 純受限 SELECT(survey 池選單等)
+    # 訪談回合(role="interview"):同時扛顧問推理+strict 輸出——4o-mini 太弱、變異大
+    # (校準#2 實證:同 prompt 0.91↔0.45)。用同一套 OpenAI strict 實作的更強模型,
+    # 沿用 0024 零逃逸保證;換模型 = 重跑 validate_select_schema + interview_sim 留紀錄。
+    model_interview: str = "openai/gpt-4.1-mini"
 
     # Document output
     document_output_dir: str = "./output/documents"

@@ -22,9 +22,11 @@ from app.adapters.llm_openrouter import OpenRouterLlm  # noqa: E402
 from app.interview import executor as ex  # noqa: E402
 from app.interview.commands import TurnOutput, turn_output_schema  # noqa: E402
 from app.interview.context import build_prompt  # noqa: E402
-from app.interview.slots import gate_missing  # noqa: E402
+from app.interview.slots import SLOT_DEFS, gate_missing  # noqa: E402
 
 TASK_PATH = "ocs_content.ocu_units.u1.tasks.t1"
+# 忠實鏡像 production:寫入 path 鎖 enum(RC1 2026-07-06),sim 才驗得到同一條受限解碼路
+SLOT_PATHS = [f"{TASK_PATH}.details.{k}" for k in SLOT_DEFS] + ["ocs_profile.job_description"]
 
 # 事實表 = 黃金範本樣張 §4.2(王OO,任務 2.2 手動測試+版本回歸)
 FACTS = {
@@ -72,7 +74,7 @@ def _score_slots(details: dict) -> tuple[int, int, list[str]]:
     return hit, len(FACTS), miss
 
 
-async def simulate(max_turns: int) -> dict:
+async def simulate(max_turns: int, dump: bool = False) -> dict:
     llm = OpenRouterLlm()
     doc = _doc()
     focus = {"task_path": TASK_PATH}
@@ -99,11 +101,16 @@ async def simulate(max_turns: int) -> dict:
         prompt, choice_ids = build_prompt(
             doc=doc, phase="deep", focus=focus, counters=counters,
             recent_turns=transcript, user_text=answer)
-        data = await llm.select_schema(prompt, turn_output_schema(choice_ids),
-                                       schema_name="turn_output")
+        data = await llm.select_schema(
+            prompt, turn_output_schema(choice_ids, slot_paths=SLOT_PATHS),
+            role="interview", schema_name="turn_output")   # 忠實鏡像 production 模型分層
         turn = TurnOutput.model_validate(data)
         res = ex.apply(turn, doc=doc, human_touched=[], counters=counters,
                        focus=focus, employee_texts=employee_texts)
+        if dump:
+            cmds = ",".join(c.type for c in turn.commands) or "(空)"
+            print(f"--- turn {turns_used} ---\n  員工:{answer}\n  顧問問:{question}\n"
+                  f"  指令:[{cmds}]  guard:{res.guard_log}", file=sys.stderr)
         if res.new_doc is not None:
             doc = res.new_doc
         for ev in res.evidence:
@@ -143,11 +150,12 @@ async def simulate(max_turns: int) -> dict:
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--max-turns", type=int, default=16)
+    ap.add_argument("--dump", action="store_true", help="逐回合 stderr 印指令/guard(蒐證)")
     args = ap.parse_args()
     if not os.getenv("OPENROUTER_API_KEY"):
         # .env 由 app.config 讀;這裡只提示 shell 環境沒有時的情況
         pass
-    report = asyncio.run(simulate(args.max_turns))
+    report = asyncio.run(simulate(args.max_turns, dump=args.dump))
     print(json.dumps(report, ensure_ascii=False, indent=2))
     # v0 閘門(校準紀錄 #1 後修數字):覆蓋達標 + 關鍵字正確率 ≥0.6 + 驗證率 ≥0.7
     passed = (report["coverage_cleared"]

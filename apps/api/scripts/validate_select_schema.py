@@ -16,7 +16,7 @@ sys.path.insert(0, ".")
 
 from pydantic import ValidationError                       # noqa: E402
 
-from app.adapters.llm_openrouter import OpenRouterLlm      # noqa: E402
+from app.adapters.llm_openrouter import OpenRouterLlm, model_for_role  # noqa: E402
 from app.config import settings                            # noqa: E402
 from app.interview.commands import TurnOutput, turn_output_schema  # noqa: E402
 
@@ -53,7 +53,7 @@ def violations(data) -> list[str]:
     return out
 
 
-async def main(n: int) -> int:
+async def main(n: int, role: str) -> int:
     if not settings.openrouter_api_key:
         print("SKIP:OPENROUTER_API_KEY 未設")
         return 2
@@ -67,7 +67,7 @@ async def main(n: int) -> int:
         try:
             data = await llm.select_schema(
                 f"你是訪談引擎。可用任務池:{POOL}。使用者訊息:{p}",
-                schema, schema_name="turn_output")
+                schema, role=role, schema_name="turn_output")
         except Exception as exc:  # noqa: BLE001
             # provider 拒絕/報錯 = 沒有逃逸(fail-closed),記錄但不算 escape
             print(f"[{i}] provider error(fail-closed): {str(exc)[:100]}")
@@ -80,7 +80,7 @@ async def main(n: int) -> int:
         else:
             kinds = [c.get("type") for c in data.get("commands", [])]
             print(f"[{i}] ok({time.perf_counter()-t0:.1f}s) commands={kinds}")
-    print(f"\nmodel={settings.model_select}  n={n}  escapes={escapes}  "
+    print(f"\nrole={role}  model={model_for_role(role)}  n={n}  escapes={escapes}  "
           f"avg_latency={sum(lat)/len(lat):.2f}s" if lat else "no successful calls")
     print("PASS" if escapes == 0 else "FAIL")
     return 0 if escapes == 0 else 1
@@ -89,4 +89,6 @@ async def main(n: int) -> int:
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--n", type=int, default=8)
-    raise SystemExit(asyncio.run(main(ap.parse_args().n)))
+    ap.add_argument("--role", default="select", help="select(gpt-4o-mini)/interview(gpt-4.1-mini)")
+    args = ap.parse_args()
+    raise SystemExit(asyncio.run(main(args.n, args.role)))

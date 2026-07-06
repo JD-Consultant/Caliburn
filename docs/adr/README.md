@@ -34,6 +34,7 @@ ADR 是「為什麼」層;搭配 `../specs/`(細節設計)與 `../runbook.md`(�
 | [0023](0023-interview-engine-stateless-turns.md) | 訪談引擎骨幹：無狀態回合服務＋軟階段＋指令詞彙表；quote 溯源；停止三重保險；全新實作不整合舊碼（部分翻案 0007） | Accepted（2026-07-05；spec/plan 待開） |
 | [0024](0024-llm-wiring-select-schema.md) | LLM 接線：`LlmPort.select_schema`＋受限解碼路徑判準（OpenRouter strict 起步、對抗性驗收、escalation 槽；內裝首選 Pydantic AI） | Accepted（2026-07-05；spec/plan 待開） |
 | [0025](0025-coedit-authority-dual-channel.md) | 人機共編權限：雙通道＋風險分流＋節點批審（分流寫入目的地，取代「人改過只能提議」） | Accepted（2026-07-05；spec/plan 待開） |
+| [0026](0026-interview-turn-model-role.md) | 訪談回合獨立模型 role（`model_interview`=gpt-4.1-mini，強推理＋沿用 strict 零逃逸）；延伸 0024 | Accepted（2026-07-06；真人試訪+校準#2 驅動） |
 
 完整脈絡見 [`../specs/2026-06-27-system-architecture-design.md`](../specs/2026-06-27-system-architecture-design.md)。
 契約怎麼選/怎麼交付的規範見 [`../contract-strategy.md`](../contract-strategy.md)（ADR 0004/0010 的一般化、預答契約 #3）。

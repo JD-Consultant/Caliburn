@@ -228,3 +228,29 @@ export interface MatchResult {
   config: { kind: string; theta_high: number; theta_low: number; model: string };
 }
 
+
+// ── 訪談引擎(ADR 0023;spec 2026-07-05;端點 interview:start/:turn/GET/:review)──
+export interface InterviewProgress { phase: string; task_index: number; task_total: number }
+export interface InterviewQuestion { text: string; target_path: string | null }
+export interface InterviewWidget { question: string; options: string[]; target_path: string | null }
+export interface InterviewSuggestion {
+  id: string; doc_path: string;
+  old_value: unknown; new_value: unknown;
+  reason: string; status: "pending" | "accepted" | "rejected";
+}
+export interface InterviewStartResponse {
+  session_id: string; status: string; phase: string;
+  focus: { task_path?: string; skipped?: string[] };
+  greeting: string; progress: InterviewProgress; pending_suggestions: number;
+}
+export interface InterviewTurnResponse {
+  say: string; question: InterviewQuestion | null; widget: InterviewWidget | null;
+  doc_changed: boolean; pending_suggestions: number; progress: InterviewProgress;
+}
+export interface InterviewView {
+  session_id: string; status: string; phase: string;
+  focus: { task_path?: string; skipped?: string[] };
+  turns: { seq: number; role: "employee" | "consultant"; text: string }[];
+  evidence: { doc_path: string; quote: string; turn_seq: number; verified: boolean }[];
+  suggestions: InterviewSuggestion[];
+}

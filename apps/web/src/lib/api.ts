@@ -2,6 +2,9 @@
 // which now mounts users + job_profiles CRUD under /api/v1. Legacy interview /
 // tasks / documents endpoints were removed with the old backend (Concern B).
 import type {
+  InterviewStartResponse,
+  InterviewTurnResponse,
+  InterviewView,
   DocumentEnvelope,
   JobProfile,
   KnowledgePack,
@@ -132,3 +135,30 @@ export const ocsSearch = (q: string) =>
 // server 端點全數保留（訪談引擎/agent 主線用，ADR 0020），但 web 目前零呼叫：
 // 填格/選任務改吃知識包（ADR 0021）後，recommend-ks/draft-op/extract-tasks/
 // structure-task 的 client 函式已退役（P3 UI 修訂：AI 預勾與自訂助手等引擎回歸）。
+
+// ── 訪談引擎(ADR 0023;AIP-136 :verb)──────────────────────────────────────
+// :turn 後文件可能被 server 端引擎改動 → 呼叫端(useInterview)負責 invalidate
+// ["document"],讓 data-layer 的「外部變化 effect」重設 baseline(零新機制)。
+export const startInterview = (profileId: string) =>
+  request<InterviewStartResponse>(`/job-profiles/${profileId}/interview:start`, {
+    method: "POST",
+  });
+
+export const interviewTurn = (profileId: string, text: string) =>
+  request<InterviewTurnResponse>(`/job-profiles/${profileId}/interview:turn`, {
+    method: "POST",
+    body: JSON.stringify({ text }),
+  });
+
+export const getInterview = (profileId: string) =>
+  request<InterviewView>(`/job-profiles/${profileId}/interview`);
+
+export const reviewInterview = (
+  profileId: string,
+  body: { accept?: string[]; reject?: string[] },
+) =>
+  request<{ accepted: { id: string; doc_path: string; new_value: unknown }[];
+            rejected: number; pending: number }>(
+    `/job-profiles/${profileId}/interview:review`,
+    { method: "POST", body: JSON.stringify(body) },
+  );

@@ -1,0 +1,166 @@
+"use client";
+
+// 訪談面板(T11;ADR 0020 混合載體:文件常駐、面板在側;ADR 0023 回合制)。
+// 逐字稿以 server 為真相(useInterview view;每回合後 invalidate 重抓)——
+// 面板不自設對話 state,對齊 cache-as-state 心法。結構化決策(ask_choice)用
+// 卡片勾選,開放敘事用自由輸入(上游研究 §8:decision=widget、narrative=對話)。
+import { useEffect, useRef, useState } from "react";
+import { Loader2, MessageCircle, Send } from "lucide-react";
+
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import {
+  useInterview,
+  useInterviewTurn,
+  useStartInterview,
+} from "@/hooks/useInterview";
+import type { InterviewProgress, InterviewWidget } from "@/types";
+
+const PHASE_LABEL: Record<string, string> = {
+  survey: "盤點", deep: "深掘", review: "總審",
+};
+
+function ProgressHeader({ progress }: { progress: InterviewProgress | null }) {
+  if (!progress) return null;
+  const pct = progress.task_total
+    ? Math.round((progress.task_index / progress.task_total) * 100) : 0;
+  return (
+    <div className="space-y-1 border-b p-3">
+      <div className="flex items-center justify-between text-xs text-muted-foreground">
+        <span>
+          {PHASE_LABEL[progress.phase] ?? progress.phase}
+          {progress.phase === "deep" &&
+            ` · 任務 ${progress.task_index}/${progress.task_total}`}
+        </span>
+      </div>
+      <Progress value={progress.phase === "review" ? 100 : pct} className="h-1.5" />
+    </div>
+  );
+}
+
+function ChoiceCard({ widget, onSubmit, busy }: {
+  widget: InterviewWidget; onSubmit: (text: string) => void; busy: boolean;
+}) {
+  const [picked, setPicked] = useState<string[]>([]);
+  return (
+    <div className="rounded-md border bg-muted/40 p-3 text-sm">
+      <p className="mb-2">{widget.question}</p>
+      <div className="flex flex-wrap gap-2">
+        {widget.options.map((o) => (
+          <Badge
+            key={o}
+            variant={picked.includes(o) ? "default" : "outline"}
+            className="cursor-pointer select-none"
+            onClick={() =>
+              setPicked((p) => (p.includes(o) ? p.filter((x) => x !== o) : [...p, o]))}
+          >
+            {o}
+          </Badge>
+        ))}
+      </div>
+      <Button
+        size="sm" className="mt-2" disabled={busy || picked.length === 0}
+        onClick={() => onSubmit(`我選:${picked.join("、")}`)}
+      >
+        送出選擇
+      </Button>
+    </div>
+  );
+}
+
+export function InterviewPanel({ profileId }: { profileId: string }) {
+  const view = useInterview(profileId);
+  const start = useStartInterview(profileId);
+  const turn = useInterviewTurn(profileId);
+  const [input, setInput] = useState("");
+  const bottomRef = useRef<HTMLDivElement>(null);
+
+  const turns = view.data?.turns ?? [];
+  const progress: InterviewProgress | null =
+    turn.data?.progress ?? (start.data ? start.data.progress : null)
+    ?? (view.data ? { phase: view.data.phase, task_index: 0, task_total: 0 } : null);
+  const widget = turn.data?.widget ?? null;
+  const busy = turn.isPending || start.isPending;
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [turns.length, busy]);
+
+  const send = (text: string) => {
+    const t = text.trim();
+    if (!t || busy) return;
+    setInput("");
+    turn.mutate(t);
+  };
+
+  // 尚無 session(GET 404)→ 開始畫面
+  const notStarted = view.isError || (!view.data && !view.isLoading);
+  if (notStarted && !start.data) {
+    return (
+      <div className="flex h-full flex-col items-center justify-center gap-3 p-6 text-center">
+        <MessageCircle className="h-8 w-8 text-muted-foreground" />
+        <p className="text-sm text-muted-foreground">
+          讓 AI 顧問陪你把每個任務的細節問出來——文件會邊談邊長。
+        </p>
+        <Button onClick={() => start.mutate()} disabled={start.isPending}>
+          {start.isPending && <Loader2 className="mr-1 h-4 w-4 animate-spin" />}
+          開始訪談
+        </Button>
+        {start.isError && (
+          <p className="text-xs text-destructive">
+            無法開始:請先在編輯器選好職類與任務。
+          </p>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex h-full flex-col">
+      <ProgressHeader progress={progress} />
+      <div className="flex-1 space-y-3 overflow-y-auto p-3 text-sm">
+        {turns.length === 0 && start.data && (
+          <p className="rounded-md bg-muted/40 p-2">{start.data.greeting}</p>
+        )}
+        {turns.map((t) => (
+          <div
+            key={t.seq}
+            className={t.role === "employee"
+              ? "ml-6 rounded-md bg-primary/10 p-2"
+              : "mr-6 rounded-md bg-muted/40 p-2 whitespace-pre-line"}
+          >
+            {t.text}
+          </div>
+        ))}
+        {busy && (
+          <div className="mr-6 flex items-center gap-2 p-2 text-muted-foreground">
+            <Loader2 className="h-3.5 w-3.5 animate-spin" /> 顧問思考中…
+          </div>
+        )}
+        {widget && !busy && (
+          <ChoiceCard widget={widget} onSubmit={send} busy={busy} />
+        )}
+        {turn.isError && (
+          <p className="text-xs text-destructive">這回合出了點問題,再送一次即可。</p>
+        )}
+        <div ref={bottomRef} />
+      </div>
+      <form
+        className="flex gap-2 border-t p-3"
+        onSubmit={(e) => { e.preventDefault(); send(input); }}
+      >
+        <input
+          className="flex-1 rounded-md border bg-background px-3 py-2 text-sm"
+          placeholder="想到什麼說什麼…"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          disabled={busy}
+        />
+        <Button type="submit" size="icon" disabled={busy || !input.trim()}>
+          <Send className="h-4 w-4" />
+        </Button>
+      </form>
+    </div>
+  );
+}

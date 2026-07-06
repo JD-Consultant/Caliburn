@@ -117,7 +117,7 @@ updated: 2026-07-04
 1. **選職類 = 唯一 knowledge 同步點**。只有 `useSetOccupations` 會 invalidate+prefetch `["knowledge",id]`;
    其餘一切從這一包讀,不各自打 indexer。
 2. **單一寫入路徑**:所有 curation(選職責/任務/填格/表頭)= 前端純函式改 doc + autosave `PATCH`;
-   **沒有 curation 專用端點**(刻意,與 LLM 共編一致)。
+   **沒有 curation 專用端點**(刻意,與 LLM 共編一致)。訪談引擎(ADR 0023)不破此律:server 端寫入走同一條 `upsert_draft` seam;**人核准的建議由前端套用**再走 PATCH(端到端見 [`interview-engine.md`](interview-engine.md))。
 3. **來源三分**:`srcs`(全來源,線材)/ `_ref`(使用者選的那個,export 剝除)/ URN(身分,現組不落庫)。§2。
 4. **池序 = append 序**(職位優先序);**選單不排序、不搜尋**;無碼選項顯序號 `1. 2. 3.`(三類池例外顯真分類碼)。
 5. **A4 K/S 文件級去重**:碼以 **name 為 key 全文件共用**(首現給號、同名共碼);O/P 任務範圍、A 全域。

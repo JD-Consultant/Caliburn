@@ -106,17 +106,21 @@ def _variant(tag: str, **props) -> dict:
     return _obj({"type": {"enum": [tag]}, **props})
 
 
-def turn_output_schema(choice_ids: list[str] | None = None) -> dict:
+def turn_output_schema(choice_ids: list[str] | None = None,
+                       slot_paths: list[str] | None = None) -> dict:
+    """slot_paths 給了就把寫入類 path(set/correct/skip)鎖成 enum——槽位是目錄類值,
+    LLM 結構上發不出幽靈槽(實戰教訓:曾發明 details.process/tool/exception)。"""
     nullable_str = _s(["string", "null"])
     str_or_num = _s(["string", "number"])
+    path_s = {"enum": list(slot_paths)} if slot_paths else _s("string")
     variants = [
         _variant("reply", text=_s("string")),
         _variant("ask", question=_s("string"), target_path=nullable_str),
-        _variant("set_slot", path=_s("string"), value=str_or_num, quote=_s("string")),
-        _variant("correct_slot", path=_s("string"), value=str_or_num, quote=_s("string")),
+        _variant("set_slot", path=path_s, value=str_or_num, quote=_s("string")),
+        _variant("correct_slot", path=path_s, value=str_or_num, quote=_s("string")),
         _variant("add_task", unit_ref=_s("string"), name=_s("string"), quote=_s("string")),
         _variant("add_duty", name=_s("string"), quote=_s("string")),
-        _variant("skip", path=_s("string"), reason=_s("string")),
+        _variant("skip", path=path_s, reason=_s("string")),
         _variant("advance", next_focus=_s("string")),
     ]
     if choice_ids:

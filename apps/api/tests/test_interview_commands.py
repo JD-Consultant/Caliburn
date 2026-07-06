@@ -73,3 +73,23 @@ def test_schema_choice_variant_gating():
     assert "ask_choice" not in s_no                 # 沒池 id → LLM 發不出選單
     assert "ask_choice" in s_yes
     assert "'enum': ['A', 'B']" in s_yes            # 池 id 鎖進 enum
+
+
+def _variants_by_tag(schema):
+    variants = schema["properties"]["commands"]["items"]["anyOf"]
+    return {v["properties"]["type"]["enum"][0]: v for v in variants}
+
+
+def test_schema_slot_paths_lock_write_paths():
+    """槽位 path 是目錄類值:給了 slot_paths 就用 enum 鎖死(LLM 發不出幽靈槽)。"""
+    paths = ["u1.t1.details.frequency", "ocs_profile.job_description"]
+    by_tag = _variants_by_tag(turn_output_schema(None, slot_paths=paths))
+    for tag in ("set_slot", "correct_slot", "skip"):
+        assert by_tag[tag]["properties"]["path"] == {"enum": paths}, tag
+    # ask.target_path 不鎖(允許 None 開放問)
+    assert by_tag["ask"]["properties"]["target_path"] == {"type": ["string", "null"]}
+
+
+def test_schema_no_slot_paths_keeps_string_paths():
+    by_tag = _variants_by_tag(turn_output_schema(None))
+    assert by_tag["set_slot"]["properties"]["path"] == {"type": "string"}

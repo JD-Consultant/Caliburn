@@ -109,3 +109,24 @@ def test_unknown_path_dropped_not_crash():
                 doc=doc, human_touched=[], counters={},
                 focus={"task_path": TASK_PATH}, employee_texts=EMP)
     assert res.new_doc is None and any(g.startswith("drop:") for g in res.guard_log)
+
+
+def test_unknown_slot_key_dropped_fail_closed():
+    # 實戰回歸:gpt-4o-mini 發明過 details.process/tool/exception(2026-07-06 訪談)
+    # → 寫進垃圾 key、真槽永遠缺 → 重問迴圈。白名單擋下(evidence 照記供稽核)。
+    doc = _doc()
+    res = apply(_turn(_set(path=f"{TASK_PATH}.details.process", value="打電話登記")),
+                doc=doc, human_touched=[], counters={},
+                focus={"task_path": TASK_PATH}, employee_texts=EMP)
+    assert res.new_doc is None
+    assert any("未知槽" in g for g in res.guard_log)
+    assert len(res.evidence) == 1                     # 模型宣稱過什麼要留稽核軌跡
+    assert res.suggestions == []                      # 垃圾 path 連建議層也不進
+
+
+def test_job_description_whitelisted_writable():
+    doc = _doc()
+    res = apply(_turn(_set(path="ocs_profile.job_description", value="負責回歸測試")),
+                doc=doc, human_touched=[], counters={},
+                focus={"task_path": TASK_PATH}, employee_texts=EMP)
+    assert res.new_doc["ocs_profile"]["job_description"] == "負責回歸測試"

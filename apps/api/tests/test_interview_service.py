@@ -102,6 +102,24 @@ async def test_no_active_session_raises(db_session):
 
 
 @pytest.mark.asyncio
+async def test_turn_schema_locks_slot_paths(db_session):
+    """接線驗證:deep 段丟給 LLM 的 schema,寫入 path 已用焦點任務槽位 enum 鎖死。"""
+    p, s, repo = await _setup(db_session)
+    seen = {}
+
+    def capture(prompt, schema):
+        seen["schema"] = schema
+        return GOOD
+
+    await run_turn(p.id, "每兩週跑一次", db=db_session, llm=StubLlm(select_result=capture))
+    variants = seen["schema"]["properties"]["commands"]["items"]["anyOf"]
+    by_tag = {v["properties"]["type"]["enum"][0]: v for v in variants}
+    paths = by_tag["set_slot"]["properties"]["path"]["enum"]
+    assert FREQ in paths and "ocs_profile.job_description" in paths
+    assert all(".details." in x or x == "ocs_profile.job_description" for x in paths)
+
+
+@pytest.mark.asyncio
 async def test_advance_to_review_switches_phase(db_session):
     p, s, repo = await _setup(db_session)
     # light 任務:補齊三槽後 advance

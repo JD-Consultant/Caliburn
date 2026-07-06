@@ -9,16 +9,33 @@ from app.interview.slots import SLOT_DEFS, gate_missing, is_core
 
 RECENT_TURNS = 12   # v1 近窗(spec §4②)
 
-ROLE_HEADER = """你是 iCAP 職能顧問,正在訪談一位不熟專業術語的員工,幫他完成職務說明書。
-語氣友善、一次只問一件事、用員工的話追細節(頻率/數量/工具/等待/例外)。
-規則:
-- 填槽(set_slot/correct_slot)必附 quote=員工「這次對話中逐字說過」的原話片段。
-- 員工提到清單外的工作 → add_task/add_duty(一樣附 quote),不要硬塞進現有槽。
-- 對同一槽最多追問 2 次;員工答不出 → skip(附理由)。
+# 資深顧問操作守則(對話品質研究 2026-07-06:CTA/CDM + LLM 訪談員實證 + 對話修復)。
+# 這是 LLM 的那條線(理解+措辭);填哪槽/能否 advance/quote 驗證仍全在 executor。
+ROLE_HEADER = """你是資深 iCAP 職能顧問,正在訪談一位不熟術語的員工,要把他「實際怎麼做、
+卻未必說得出口」的工作細節問出來,寫成職務說明書。像頂尖訪談員那樣做四件事:
+
+1. 先接話再問(先確認):每次先用**員工自己的話**一句話回述你聽到的重點,再問下一題;
+   不要跳過確認、連丟問題。
+2. 爛答案往下追一層(具體化):答案很短或含糊(「還好」「就用電腦」「1 吧」)時,先追問把它
+   變具體(「你說的電腦是哪個系統?」「一天大概幾次?」)再收進槽;寧可多追一層,別把含糊當完成。
+3. 卡住就修復、不要重問:員工說「剛剛就說了/你沒在聽/為什麼不回我」時,是你漏接了——
+   先承認,用他**已經說過的話**回填確認,**不要**再問一次一樣的問題。
+4. 錨在具體事件問(問出漏說的):與其抽象問「你的流程?」,不如問最近一次的實例
+   (「上次遇到 X 你當下怎麼處理?」),頻率/數量/工具/等待/例外自然浮現。
+
+填槽規則(硬規則,不可違反):
+- set_slot/correct_slot 必附 quote=員工「這次對話中逐字說過」的原話片段。
+- 員工提到清單外的工作 → add_task/add_duty(一樣附 quote),不要硬塞進現有槽;這會進上方
+  「建議卡片」,員工核准後才寫入文件——員工若問「要不要套用/這是什麼」,說明那是待核准的建議。
+- 對同一槽最多追問 2 次;員工真的答不出 → skip(附理由)。
 - 該任務缺口都處理完才 advance。saturation=true 表示「當前焦點再問也無新資訊」。"""
 
 
-def _fmt_task_state(doc: dict, task_path: str) -> str:
+def _slot_path(task_path: str, key: str) -> str:
+    return f"{task_path}.outputs" if key == "outputs" else f"{task_path}.details.{key}"
+
+
+def _fmt_task_state(doc: dict, task_path: str, skipped: set[str]) -> str:
     task = get_at(doc, task_path)
     if not isinstance(task, dict):
         return "(找不到焦點任務)"
@@ -29,22 +46,25 @@ def _fmt_task_state(doc: dict, task_path: str) -> str:
     details = task.get("details") or {}
     filled = [f"  - {SLOT_DEFS[k].label}({k})= {v!r}"
               for k, v in details.items() if k in SLOT_DEFS and v not in (None, "")]
-    missing = gate_missing(task)
+    # 缺口扣除已 skip(與 executor _next_gap_question 同源)——不再重問已跳過的槽
+    missing = [k for k in gate_missing(task) if _slot_path(task_path, k) not in skipped]
     lvl = {True: "core(全套細項)", False: "light(淺掃)", None: "未分級(先問頻率+比重)"}[is_core(task)]
     hints = [f"  - {k}:{SLOT_DEFS[k].label}——{SLOT_DEFS[k].hint}"
              for k in missing if k in SLOT_DEFS]
     return (f"焦點任務:{name}(path={task_path};深問級別:{lvl})\n"
-            f"已填:\n" + ("\n".join(filled) or "  (無)") + "\n"
-            f"缺口(依序處理):\n" + ("\n".join(hints) or "  (無)") +
+            f"已填(回述時用員工原本的說法):\n" + ("\n".join(filled) or "  (無)") + "\n"
+            f"缺口(依序處理;已跳過的不再問):\n" + ("\n".join(hints) or "  (無)") +
             ("\n  - outputs:此任務尚無產出(用 ask 問「做完會產出什麼?」,"
              "產出項走 add 建議)" if "outputs" in missing else ""))
 
 
 def build_prompt(*, doc: dict, phase: str, focus: dict, counters: dict,
-                 recent_turns: list[tuple[str, str]], user_text: str) -> tuple[str, list[str] | None]:
-    """回 (prompt, choice_ids)。choice_ids 非 None 才會開放 ask_choice。"""
+                 recent_turns: list[tuple[str, str]], user_text: str,
+                 pending: list[str] | None = None) -> tuple[str, list[str] | None]:
+    """回 (prompt, choice_ids)。choice_ids 非 None 才會開放 ask_choice。
+    pending=待核准建議的短標籤(員工可能問到卡片;RC3 2026-07-06)。"""
     task_path = (focus or {}).get("task_path") or ""
-    skipped = (focus or {}).get("skipped") or []
+    skipped = set((focus or {}).get("skipped") or [])
     budget_lines = [f"  - {k}:已問 {v} 次" for k, v in (counters or {}).items() if v]
     convo = "\n".join(f"{'員工' if r == 'employee' else '顧問'}:{t}"
                       for r, t in recent_turns[-RECENT_TURNS:])
@@ -53,12 +73,14 @@ def build_prompt(*, doc: dict, phase: str, focus: dict, counters: dict,
     parts = [
         ROLE_HEADER,
         f"\n【階段】{phase}",
-        f"\n【任務現況】\n{_fmt_task_state(doc, task_path)}" if task_path else "",
+        f"\n【任務現況】\n{_fmt_task_state(doc, task_path, skipped)}" if task_path else "",
         f"\n【追問預算已用】\n" + "\n".join(budget_lines) if budget_lines else "",
-        f"\n【已 skip】{skipped}" if skipped else "",
+        f"\n【待核准建議(員工可能會問到,別重問;向他說明是待核准)】\n  - "
+        + "\n  - ".join(pending) if pending else "",
         f"\n【{slot_paths}】" if slot_paths else "",
         f"\n【近期對話】\n{convo}" if convo else "",
         f"\n【員工剛說】{user_text}",
-        "\n請輸出這一回合的指令(填得到就填,附原話 quote;然後問下一個缺口)。",
+        "\n請輸出這一回合的指令(先用員工原話回述確認,填得到就填、附 quote;"
+        "答案含糊先追一層;然後問下一個缺口)。",
     ]
     return "".join(p for p in parts if p), None   # v1 deep 階段不開 ask_choice

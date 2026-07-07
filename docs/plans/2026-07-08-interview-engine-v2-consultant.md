@@ -1,8 +1,16 @@
 # 訪談引擎 v2(顧問 agent)— 實作計畫
 
 > **依據**:ADR [0027](../adr/0027-interview-engine-v2-consultant-agent.md)(四組件+門檻 v1)+
+> **詳細 spec**[`2026-07-08-interview-engine-v2-spec.md`](../specs/2026-07-08-interview-engine-v2-spec.md)
+> (含參考實作碼,套用時語意不得偏離)+
 > 研究紀錄 [`2026-07-06-consultant-not-formfiller-redesign-research.md`](../specs/2026-07-06-consultant-not-formfiller-redesign-research.md)
-> §7–§14(定稿)。黃金範本=品質尺(`2026-07-05-golden-sample-software-tester.md`)。
+> §7–§15(定稿)。黃金範本=品質尺(`2026-07-05-golden-sample-software-tester.md`)。
+>
+> **⛔ 碼庫凍結(2026-07-08 維護者指示)**:先完成全部文檔研究與撰寫;各 task 的
+> 「檔(apps/**、packages/**)/測/驗」步驟**待維護者解凍後**才執行。凍結期已完成的
+> 研究關卡:**T1 研**(slots.py 12 槽已對齊、outputs=虛擬 key,不需改契約→spec §0)、
+> **T3 研**(strict 構型以內部對抗驗收為準→spec §3.1)、**T8 研**(問句庫=研究紀錄 §15)、
+> **T6 研**(Anthropic 工具檢核已過→spec §4.1)。
 > **紀律**:一 task 一 commit、綠了才 commit、TDD、**不 push**;收尾 tag `interview-v2`。
 > **驗證環境**:api `cd apps/api && uv run pytest -q`;web `npm run test` + `npx tsc --noEmit`;
 > sim `uv run python evals/interview_sim.py`(CJK 記得 `PYTHONUTF8=1`)。

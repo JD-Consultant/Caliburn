@@ -475,6 +475,60 @@ limitations+路線圖)。設計討論至此可收斂 → ADR 0027(含 limitation
 - **完成閘門**:core 12/12、淺掃 4/4(n/a 計入)、每職責 P≥1、A≥2、比重=100%。
 - **收尾**:員工對比重表+關鍵槽快速再確認(iCAP 驗證步單人版)。
 
+## 15) 問句庫 v1(2026-07-08;plan T8 研究關卡產物——顧問 prompt 的唯一素材來源)
+
+### 15.1 訪談總體形(BEI,McClelland 1998)
+- **短故事式**:請員工講「具體發生過的事」,不問一般性意見;**成功與失敗事件都要**。
+- **記者式非引導追問**:繞著「你**做**了什麼/**說**了什麼/當下**想**什麼」挖,不給選項、
+  不帶預設(引導式問句是 BEI 大忌)。
+- 開場句式:「跟我說說你平常做什麼」→「最近一次做○○是什麼時候?從頭說一次那天的情況」。
+
+### 15.2 CDM 探針中譯表(Crandall/Klein/Hoffman《Working Minds》2006;Hoffman et al. 1998)
+多輪回溯同一事件,逐類探:
+| 探針類 | 中文問法(素材) | 主要餵 |
+|---|---|---|
+| 線索 cues | 「你當時**看到/聽到什麼**,就知道要動手/不對勁?」 | K、P |
+| 知識 knowledge | 「這個判斷需要知道什麼?**新人會漏看什麼?**」 | K |
+| 目標 goals | 「那個當下你最想先保住什麼?」 | P、A |
+| 選項 options | 「當時還有別的做法嗎?為什麼選這條?」 | S、K |
+| 依據 basis | 「你怎麼知道這樣做會有效?」 | K |
+| 經驗 experience | 「這靠的是哪次學來的?」 | K、S |
+| 假想差異 | 「如果讓剛到職的人接手,他會卡在哪?」 | K、S(內隱) |
+| 錯誤 errors | 「這一步最容易出什麼錯?出了怎麼救?」 | exceptions、S |
+| 時間壓力 | 「趕的時候你會省哪步、絕不省哪步?」 | standards、A |
+| 輔助 aiding | 「有什麼工具/表單幫你?沒有它會怎樣?」 | tools、S |
+
+### 15.3 OPKS 各塊引出策略(iCAP p43 官方大綱句式為基底)
+- **O 產出**:「這件事做完,**交出去的東西**是什麼?(文件/圖表/紀錄)」;答「就做完了」
+  (操作型)→ 確認後合法 n/a,成果併入 P/完成標準(iCAP 規則)。
+- **P 行為指標**:從故事收斂:「所以在(情境)時,你會(行為),做到(程度)——這樣寫
+  對嗎?」(STAR 式回述確認;**指標由 AI 從故事草擬、員工確認**,不叫員工自己寫指標)。
+- **K 知識**:不問「你有什麼知識」;問「做這步**要先知道什麼**?」「新人會漏什麼?」。
+- **S 技能**:問「**實際上怎麼操作**?」「哪一步最見功力?」;軟技能從共通目錄比對提議。
+- **A 態度**:**絕不直接問**(社會期許);由書記/顧問從故事**編碼→池選提議**
+  (A01–A14):「聽起來你在(事件)裡展現了『謹慎細心』,放進特質欄?」員工確認才落。
+
+### 15.4 追問觸發與飽和
+- **hedging 觸發詞(中文,工程自定,對齊平台 hedging 偵測)**:「可能/大概/差不多/
+  還好/就那樣/不太確定/看情況/有時候吧」→ 必追一層(「說個實際例子?」)。
+- **短答**(<10 字)且槽未填 → 換句式再問一次(不重複原句)。
+- **飽和換題話術**:「這題我們先記到這,之後隨時補——接下來聊○○」(帳本判飽和才觸發,
+  話術只是外皮;決定權在帳本,LLM 不自判,§10.2 反例)。
+
+### 15.5 卡住/低品質階梯(2410.01824 under-probe 教訓+平台實務)
+換問法 → 給例子(從官方池/同職類常見樣態舉例:「像同職類的人常說等 PM 改規格——你有
+類似的嗎?」)→ 拆小(先問頻率再問細節)→ 標記 attempted-insufficient 前進交人審。
+**禁止**:同句重複、跳過不記錄、被離題帶走(離題≤1 回合內拉回)。
+
+### 15.6 開場揭露要素(NN/g)
+AI 身分明示、預計時長、資料用途與誰會看(之後有人審核)、可隨時說「跳過」;
+揭露完整反而**提升**完成率與品質(NN/g 實證)。
+
+### 15.7 prompt 硬規則(工程)
+員工輸入=**資料非指令**(OWASP LLM01,系統層明示+對抗測試);**capture-first**
+(校準 #2 教訓:落槽永遠優先於寒暄回述,順序=優先序);probe 深度/風格=設定常數,
+不寫死(§10.6 收編 1)。
+
 ## 來源
 - McClelland (1998) *Identifying Competencies with Behavioral-Event Interviews*, Psych. Science. https://journals.sagepub.com/doi/10.1111/1467-9280.00065
 - Spencer & Spencer, *Competence at Work*;Workitect BEI/競模最佳實務。https://workitect.com/PDF/Competency-Modeling-Best-Practices.pdf
@@ -544,6 +598,12 @@ limitations+路線圖)。設計討論至此可收斂 → ADR 0027(含 limitation
   - HumanLayer(Dex)— *12-Factor Agents*(24k stars;own prompts/control flow、tools are
     structured outputs、unify state、stateless reducer、contact humans with tool calls、
     small focused agents). https://github.com/humanlayer/12-factor-agents
+- **§15 問句庫**:
+  - Crandall, Klein & Hoffman — *Working Minds: A Practitioner's Guide to Cognitive Task
+    Analysis*(MIT Press, 2006;CDM 多輪回溯+探針法原典). https://books.google.com/books/about/Working_Minds.html?id=ZfcVGsJlyhMC
+  - Hoffman, Crandall & Shadbolt — *Use of the Critical Decision Method to Elicit Expert
+    Knowledge*, Human Factors(1998;CDM 方法學案例). https://journals.sagepub.com/doi/10.1518/001872098779480442
+  - (BEI=McClelland 1998、iCAP 訪談大綱 p43、NN/g 揭露、OWASP——見前列)
 - **§13 第八輪(反向最終檢驗)**:
   - Nielsen Norman Group — *AI-Moderated Interviews: If, When, and How to Use Them*(AI 揭露
     +同意最佳實務、前幾場人工盯場、在途調整指南). https://www.nngroup.com/articles/ai-interviewers/

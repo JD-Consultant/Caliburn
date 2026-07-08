@@ -565,7 +565,16 @@ attitudes)完全沒有寫入路徑**,且 apply 消費 TurnOutput(回合指令),�
   knowledge.match)→ select_schema → apply_scribe → 守衛拒絕精簡錯誤重試 1→backstop 佇列。
 - 另註:evidence.review 欄(spec §11.3)T2 未加(T2 只加 ledger_state);併入 T5。
 
-> §16.4+ 留給後續 task 的發現與校準 #3(sim v2 數據;T14 產出)。
+### 16.4 T4b 研究關卡:官方能力池來源 = knowledge.competencies(2026-07-08)
+設計點裁決:文件的 `competency_blocks` 預設空(`ocs_doc._empty_block`;官方池不存文件),
+故書記 schema 的池**來自 `KnowledgePort.competencies(ocs_code)` → CompetencyPool**
+(CitableItem 帶 `code`+`name`)。scribe_pass:①從 doc 收 ocs_code(ocs_profile+version_info)
+→ ②union competencies → pools{kind:[code]} + pool_items{code:name} → ③task_keys/unit_keys/
+slot_paths 由 doc 導出(跨任務:所有任務×11 槽)→ ④select_schema(role=select)→ ⑤pydantic
+失敗精簡錯誤重試 1 → ⑥apply_scribe。interview service **原不持 knowledge port**,route(T9)注入;
+T4b 測試用 fake。**backstop 佇列**=收尾 pass(T12);T4b 只在重試仍敗時回空結果不擋回合。
+
+> §16.5+ 留給後續 task 的發現與校準 #3(sim v2 數據;T14 產出)。
 
 ## 17) 路線圖彙整(刻意不進 v2 的,一處收攏;各有出處,防遺忘)
 

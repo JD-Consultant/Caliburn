@@ -108,3 +108,24 @@ class InterviewSuggestion(Base):
     __table_args__ = (
         Index("ix_interview_suggestions_session_status", "session_id", "status"),
     )
+
+
+class InterviewLlmCall(Base):
+    """稽核:每回合每次 LLM 呼叫一列(ADR 0027 T13;§13 收編5 多租戶 observability)。"""
+    __tablename__ = "interview_llm_calls"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    session_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("interview_sessions.id", ondelete="CASCADE"),
+        nullable=False, index=True,
+    )
+    turn_seq = Column(Integer, nullable=False)
+    role = Column(Text, nullable=False)              # interview/select/backstop
+    model = Column(Text, nullable=False)
+    duration_ms = Column(Integer, nullable=False)
+    prompt_tokens = Column(Integer)
+    completion_tokens = Column(Integer)
+    tool_calls = Column(JSONB, nullable=False, server_default=sa_text("'[]'::jsonb"))
+    guard_verdicts = Column(JSONB, nullable=False, server_default=sa_text("'[]'::jsonb"))
+    created_at = Column(DateTime(timezone=True), server_default=func.now())

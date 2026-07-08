@@ -638,7 +638,19 @@ scribe→帳本→consultant。DI:`get_knowledge` 在 `app/api/deps.py`(乾淨,�
 **直接反轉 §1 診斷的「填表機器人/不思考」**:一句話多事實抽取 + 官方對應 + 回述追問。
 T9 keystone 整合驗收成立;v2 第一次端到端跑起來。
 
-> §16.11+ 留給後續 task 的發現與校準 #3(sim v2 數據;T14 產出)。
+### 16.11 T10 前端 v2 相容(2026-07-08)
+本輪做「v2 wire 相容 + 建議套用正確性」(un-break UI + 正確落地):
+- InterviewProgress 型別 task_index/total → **coverage{filled,required}**;ProgressHeader 改渲染
+  覆蓋率;route start 也回覆覆蓋率(與 turn 一致)。
+- **applyAccepted 修正**:v2 自訂 K/S/O/態度是 **append 到陣列**(非 setAtPath 覆蓋)——新增
+  `appendAtPath`,doc_path 末段∈{knowledge,skills,outputs,indicators,attitudes}走 append。
+  (沒修的話,接受一筆自訂能力建議會用單一物件覆蓋整個陣列=資料損毀。)
+- tsc/lint/vitest(40)+ api route(5)綠。InterruptHandlers(舊 graph interrupt UI)用自有
+  task_index 型別,與 InterviewProgress 無關,不動。
+**延後到後續**:pending-evidence 批次審 UI(低風險直寫的「本段一次收」+undo,需 view 露
+evidence.review + accept/revert 端點)、onboarding 預勾選單 widget(T11)。
+
+> §16.12+ 留給後續 task 的發現與校準 #3(sim v2 數據;T14 產出)。
 
 ## 17) 路線圖彙整(刻意不進 v2 的,一處收攏;各有出處,防遺忘)
 

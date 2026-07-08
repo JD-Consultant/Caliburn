@@ -1,7 +1,7 @@
 // T12:建議套用純函式(path 文法與後端 executor 同族)。
 import { describe, expect, it } from "vitest";
 
-import { applyAccepted, getAtPath, setAtPath } from "./interviewDoc";
+import { appendAtPath, applyAccepted, getAtPath, setAtPath } from "./interviewDoc";
 import type { OcsDocument } from "@/types";
 
 const FREQ = "ocs_content.ocu_units.u1.tasks.t1.details.frequency";
@@ -56,5 +56,32 @@ describe("applyAccepted", () => {
     const u1 = out.doc.ocs_content.ocu_units.find((u) => u._uid === "u1")!;
     expect(u1.tasks.some((t) => t.task_codes?.[0]?.name === "客戶問題單重現")).toBe(true);
     expect(out.doc.ocs_content.ocu_units.some((u) => u.ocu_name === "客戶支援")).toBe(true);
+  });
+
+  it("v2:自訂能力項 append 到能力區塊陣列(非覆蓋)", () => {
+    const KPATH = "ocs_content.ocu_units.u1.tasks.t1.competency_blocks.0.knowledge";
+    const d = setAtPath(doc(), "ocs_content.ocu_units.u1.tasks.t1.competency_blocks",
+                        [{ knowledge: [{ code: "K01", name: "既有" }] }])!;
+    const out = applyAccepted(d, [{ doc_path: KPATH, new_value: { code: null, name: "自家 ERP" } }]);
+    expect(out.applied).toContain(KPATH);
+    const arr = getAtPath(out.doc, KPATH) as unknown[];
+    expect(arr).toHaveLength(2);                          // append 不覆蓋既有
+    expect((arr[1] as { name: string }).name).toBe("自家 ERP");
+  });
+
+  it("v2:態度 append 到文件層 ocs_attitude.attitudes", () => {
+    const APATH = "ocs_attitude.attitudes";
+    const d = { ...doc(), ocs_attitude: { attitudes: [] } } as unknown as OcsDocument;
+    const out = applyAccepted(d, [{ doc_path: APATH, new_value: { code: "A03", name: "謹慎細心" } }]);
+    expect((getAtPath(out.doc, APATH) as unknown[])).toHaveLength(1);
+  });
+});
+
+describe("appendAtPath", () => {
+  it("陣列缺殼自動建 + 不可變", () => {
+    const APATH = "ocs_attitude.attitudes";
+    const d = { ...doc(), ocs_attitude: {} } as unknown as OcsDocument;
+    const next = appendAtPath(d, APATH, { code: "A01", name: "主動積極" });
+    expect((getAtPath(next!, APATH) as unknown[])).toHaveLength(1);
   });
 });

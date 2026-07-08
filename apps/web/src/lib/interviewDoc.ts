@@ -36,6 +36,28 @@ export function getAtPath(doc: OcsDocument, path: string): unknown {
   return node;
 }
 
+// v2 書記自訂項落點:能力區塊 K/S/O/P 與文件層態度=**append 到陣列**(非覆蓋)
+const ARRAY_FIELDS = ["knowledge", "skills", "outputs", "indicators", "attitudes"] as const;
+
+/** append 到陣列型欄位(競能區塊/態度);陣列缺殼自動建。回新文件;parent 無效回 null。 */
+export function appendAtPath(doc: OcsDocument, path: string, item: unknown): OcsDocument | null {
+  const next = structuredClone(doc);
+  const segs = path.split(".");
+  let node: Node = next as unknown as Node;
+  for (let i = 0; i < segs.length - 1; i++) {
+    node = stepInto(node, segs[i]);
+    if (node === undefined) return null;
+  }
+  if (!node || typeof node !== "object") return null;
+  const rec = node as Record<string, unknown>;
+  const last = segs[segs.length - 1];
+  const arr = rec[last];
+  if (Array.isArray(arr)) arr.push(item);
+  else if (arr === undefined) rec[last] = [item];
+  else return null;
+  return next;
+}
+
 /** 葉寫入;`…<task>.details.<slot>` 的 details 缺殼自動建。回新文件;path 無效回 null。 */
 export function setAtPath(doc: OcsDocument, path: string, value: unknown): OcsDocument | null {
   const next = structuredClone(doc);
@@ -87,7 +109,12 @@ export function applyAccepted(
       applied.push(s.doc_path);
       continue;
     }
-    const next = setAtPath(cur, s.doc_path, s.new_value);
+    // v2:自訂能力項/態度 → append 到陣列(doc_path 末段是陣列型欄位);其餘=葉寫入
+    const last = s.doc_path.split(".").pop() ?? "";
+    const isArrayField = (ARRAY_FIELDS as readonly string[]).includes(last);
+    const next = isArrayField
+      ? appendAtPath(cur, s.doc_path, s.new_value)
+      : setAtPath(cur, s.doc_path, s.new_value);
     if (next === null) failed.push(s.doc_path);
     else { cur = next; applied.push(s.doc_path); }
   }

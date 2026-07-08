@@ -17,10 +17,11 @@ MIN_A, MAX_A = 2, 4                # 文件層 attitudes 2–4(iCAP A01–A14 �
 SOUL_SLOTS = ("wait_points", "exceptions", "standards")   # 顧問味靈魂槽,next_gap 優先
 BLOCK_KEYS = ("outputs", "indicators", "knowledge", "skills")   # 能力區塊族(gap kind=blocks)
 
-# onboarding 縫(§16.16):文件還沒任務時,先引導選職類/挑任務,**不掉態度**。
-# 這兩個縫**不受 is_stalled 影響**(選職類前不論追問幾次,都不許 fall through 到態度)。
+# onboarding/curation 縫(§16.16、0028 D6):文件還沒任務時先引導,**不掉態度**。
+# 無任務時這兩縫**不受 is_stalled 影響**(選職類/挑任務前不許 fall through 到態度);
+# 有任務後的 curation(檢查表成組反問)**尊重 STALL_K**(問兩輪無進帳讓路 deep,避免審訊)。
 ONBOARD_OCCUPATION = "onboarding:occupation"   # 無 ocs_code:先問他做什麼→查職類→請他選
-ONBOARD_TASKS = "onboarding:tasks"             # 有 ocs_code、無任務:引導挑任務
+CURATION_TASKS = "curation:tasks"              # 有 ocs_code:AI 預勾裁剪/官方檢查表反問
 
 
 def _seg(item, idx: int) -> str:            # 沿 diff._seg:_tid/_uid/_id 或 index
@@ -85,6 +86,44 @@ def has_occupation(doc: dict) -> bool:
     return bool((doc.get("ocs_profile") or {}).get("ocs_code"))
 
 
+def checklist(doc: dict, state: dict, pool_tasks: list[dict]) -> dict[str, list[dict]]:
+    """官方任務檢查表三態(0028 D6):covered/declined/unasked。
+    pool_tasks=[{key,name,unit,ocs_code,task_code}](service 由 knowledge 組;純函式吃參數)。
+    身分對位:doc 任務 task_codes[].code == task_code(主)、名稱相等(備援,編輯器改碼場景)。
+    declined 住 ledger_state["declined"](員工明說不做;文件無此任務、不可重算)。"""
+    declined = set(state.get("declined") or [])
+    doc_codes: set[str] = set()
+    doc_names: set[str] = set()
+    for _, t, _ in iter_tasks(doc):
+        for tc in (t.get("task_codes") or []):
+            if tc.get("code"):
+                doc_codes.add(str(tc["code"]))
+            if tc.get("name"):
+                doc_names.add(tc["name"])
+    out: dict[str, list[dict]] = {"covered": [], "declined": [], "unasked": []}
+    for pt in pool_tasks:
+        if pt.get("key") in declined:
+            out["declined"].append(pt)
+        elif str(pt.get("task_code") or "") in doc_codes or pt.get("name") in doc_names:
+            out["covered"].append(pt)
+        else:
+            out["unasked"].append(pt)
+    return out
+
+
+def derive_phase(doc: dict, state: dict) -> str:
+    """議程階段(0028 D2;顯示/引導用,非 gate——由 doc 推導、不落庫,12-Factor F5)。
+    onboarding_occupation → task_curation → opks_deep → attitudes_wrapup。"""
+    if not has_occupation(doc):
+        return "onboarding_occupation"
+    rows = list(iter_tasks(doc))
+    if not rows:
+        return "task_curation"
+    if any(task_missing(t, tp, state, set()) for _, t, tp in rows):
+        return "opks_deep"
+    return "attitudes_wrapup"
+
+
 def attitudes_missing(doc: dict) -> bool:
     return len((doc.get("ocs_attitude") or {}).get("attitudes") or []) < MIN_A
 
@@ -94,9 +133,11 @@ def _gap(task_path: str, name: str) -> str:
     return f"{task_path}.{kind}.{name}"     # 文件層態度固定字串 "ocs_attitude"
 
 
-def next_gap(doc: dict, state: dict, skips_by_task: dict[str, set[str]]) -> str | None:
+def next_gap(doc: dict, state: dict, skips_by_task: dict[str, set[str]],
+             pool_tasks: list[dict] | None = None) -> str | None:
     """下一個該問的縫隙(給顧問的提示,非命令)。優先序:
-    ⓪還沒任務→onboarding(選職類/挑任務,不掉態度;§16.16)
+    ⓪還沒任務→onboarding/curation(選職類/AI 預勾裁剪,不掉態度;§16.16、0028)
+    ⓪′有任務但官方檢查表還有 unasked → curation 成組反問(尊重 STALL_K,飽和讓路;D6)
     ①未分級任務的預算槽 ②core 靈魂槽 ③core 其餘細項槽 ④core 能力區塊(O+P/K/S)
     ⑤淺掃殘槽 ⑥文件層態度。已飽和(is_stalled)或已 n/a(skips)的縫隙跳過。"""
     def open_(tp: str, name: str, skips: set[str]) -> str | None:
@@ -104,8 +145,12 @@ def next_gap(doc: dict, state: dict, skips_by_task: dict[str, set[str]]) -> str 
         return None if name in skips or is_stalled(state, g) else g
 
     rows = [(tp, t, skips_by_task.get(tp, set())) for u, t, tp in iter_tasks(doc)]
-    if not rows:                                                  # ⓪ onboarding:還沒任務
-        return ONBOARD_OCCUPATION if not has_occupation(doc) else ONBOARD_TASKS
+    if not rows:                                                  # ⓪ 還沒任務(不受 stall)
+        return ONBOARD_OCCUPATION if not has_occupation(doc) else CURATION_TASKS
+    if (pool_tasks and has_occupation(doc)                        # ⓪′ 檢查表殘項(受 stall)
+            and not is_stalled(state, CURATION_TASKS)
+            and checklist(doc, state, pool_tasks)["unasked"]):
+        return CURATION_TASKS
     for tp, t, sk in rows:                                        # ① 預算槽(分級前提)
         if tier(t, tp, state) is None:
             for k in BUDGET_SLOTS:

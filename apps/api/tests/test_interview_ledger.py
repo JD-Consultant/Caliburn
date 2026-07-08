@@ -152,11 +152,11 @@ def test_next_gap_onboarding_occupation_when_blank():
     assert L.next_gap(doc, {}, {}) == L.ONBOARD_OCCUPATION
 
 
-def test_next_gap_onboarding_tasks_when_occupation_but_no_tasks():
-    """有職類、還沒挑任務 → onboarding:tasks。"""
+def test_next_gap_curation_when_occupation_but_no_tasks():
+    """有職類、還沒挑任務 → curation:tasks(0028:AI 預勾裁剪,升級原 onboarding:tasks)。"""
     doc = _doc([])
     doc["ocs_profile"] = {"ocs_code": "ISD2519-002v2"}
-    assert L.next_gap(doc, {}, {}) == L.ONBOARD_TASKS
+    assert L.next_gap(doc, {}, {}) == L.CURATION_TASKS
 
 
 def test_next_gap_blank_never_asks_attitude():
@@ -166,6 +166,71 @@ def test_next_gap_blank_never_asks_attitude():
     # 即使 onboarding 縫被記為「飽和」,也不許掉進態度(onboarding 不受 is_stalled 影響)
     state = {"attempts": {L.ONBOARD_OCCUPATION: L.STALL_K + 5}}
     assert L.next_gap(doc, state, {}) != "ocs_attitude"
+
+
+# ---- 檢查表三態 / phase 推導 / curation 縫(0028 T1;D2/D6) ----
+
+def _pool():
+    return [
+        {"key": "ISD:T1", "name": "需求訪談", "unit": "規劃", "ocs_code": "ISD", "task_code": "T1"},
+        {"key": "ISD:T2", "name": "介面設計", "unit": "規劃", "ocs_code": "ISD", "task_code": "T2"},
+        {"key": "ISD:T3", "name": "上線部署", "unit": "維運", "ocs_code": "ISD", "task_code": "T3"},
+    ]
+
+
+def _doc_with_codes(codes_or_names):
+    """一個任務,task_codes 指定(供身分對位測試)。"""
+    t = _core_task(tid="X")
+    t["task_codes"] = codes_or_names
+    doc = _doc([_unit([t], uid="U1")])
+    doc["ocs_profile"] = {"ocs_code": "ISD"}
+    return doc
+
+
+def test_checklist_three_states():
+    doc = _doc_with_codes([{"code": "T1", "name": "需求訪談"}])
+    cl = L.checklist(doc, {"declined": ["ISD:T3"]}, _pool())
+    assert [t["key"] for t in cl["covered"]] == ["ISD:T1"]
+    assert [t["key"] for t in cl["declined"]] == ["ISD:T3"]
+    assert [t["key"] for t in cl["unasked"]] == ["ISD:T2"]
+
+
+def test_checklist_name_fallback():
+    """改過碼的任務用名稱備援對位(編輯器改名場景)。"""
+    doc = _doc_with_codes([{"code": "X9", "name": "介面設計"}])
+    cl = L.checklist(doc, {}, _pool())
+    assert "ISD:T2" in [t["key"] for t in cl["covered"]]
+
+
+def test_derive_phase_progression():
+    blank = _doc([])
+    assert L.derive_phase(blank, {}) == "onboarding_occupation"
+    blank["ocs_profile"] = {"ocs_code": "ISD"}
+    assert L.derive_phase(blank, {}) == "task_curation"
+    gaps = _doc([_unit([_task({"frequency": "每週"}, tid="X")], uid="U1")])
+    gaps["ocs_profile"] = {"ocs_code": "ISD"}
+    assert L.derive_phase(gaps, {}) == "opks_deep"
+    done = _finishable()
+    done["ocs_profile"] = {"ocs_code": "ISD"}
+    assert L.derive_phase(done, {}) == "attitudes_wrapup"
+
+
+def test_next_gap_curation_before_budget_and_stall_fallthrough():
+    """有任務但官方池還有 unasked → curation 縫優先(在預算槽前);飽和後讓路 deep。"""
+    doc = _doc_with_codes([{"code": "T1", "name": "需求訪談"}])
+    doc["ocs_content"]["ocu_units"][0]["tasks"][0]["details"] = {"frequency": "每週"}  # 缺比重
+    gap = L.next_gap(doc, {}, {}, pool_tasks=_pool())
+    assert gap == L.CURATION_TASKS
+    stalled = {"attempts": {L.CURATION_TASKS: L.STALL_K}}
+    gap2 = L.next_gap(doc, stalled, {}, pool_tasks=_pool())
+    assert gap2.endswith("details.time_share_pct")           # 讓路預算槽
+
+
+def test_next_gap_no_pool_keeps_v2_behavior():
+    """不帶 pool(舊呼叫端)→ 行為同 §16.16(有任務直接走任務縫)。"""
+    doc = _doc([_unit([_task({"frequency": "每週"}, tid="X")], uid="U1")])
+    doc["ocs_profile"] = {"ocs_code": "ISD"}
+    assert L.next_gap(doc, {}, {}).endswith("details.time_share_pct")
 
 
 # ---- note_attempt / is_stalled ----

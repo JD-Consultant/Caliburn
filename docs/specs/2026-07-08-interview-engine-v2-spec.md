@@ -43,35 +43,57 @@ MIN_A, MAX_A = 2, 4                # 文件層 attitudes 2–4(iCAP A01–A14 �
 SOUL_SLOTS = ("wait_points", "exceptions", "standards")   # 顧問味靈魂槽,next_gap 優先
 
 
+BLOCK_KEYS = ("outputs", "indicators", "knowledge", "skills")   # 能力區塊族(gap kind=blocks)
+
+
+def _seg(item, idx: int) -> str:            # 沿 diff._seg:_tid/_uid/_id 或 index
+    if isinstance(item, dict):
+        for k in ("_tid", "_uid", "_id"):
+            if item.get(k):
+                return str(item[k])
+    return str(idx)
+
+
 def iter_tasks(doc: dict):
-    """(unit, task) 走訪;path 段落規約沿 executor/diff(_uid/_tid 或 index)。"""
-    for u in (doc.get("ocs_content") or {}).get("ocu_units") or []:
-        for t in u.get("tasks") or []:
-            yield u, t
+    """yield (unit, task, task_path);task_path = executor 可解析的全路徑
+    (ocs_content.ocu_units.<seg>.tasks.<seg>,與 v1 focus.task_path 同源)。"""
+    units = (doc.get("ocs_content") or {}).get("ocu_units") or []
+    for ui, u in enumerate(units):
+        for ti, t in enumerate(u.get("tasks") or []):
+            yield u, t, f"ocs_content.ocu_units.{_seg(u, ui)}.tasks.{_seg(t, ti)}"
+
+
+def tier(task: dict, task_path: str, state: dict) -> bool | None:
+    """深問級別:人工覆寫(ledger_state.tier_override)優先,否則 v1 is_core 啟發。
+    回 True(core)/False(light)/None(預算槽未齊,未定)。§16.1:is_core 是否改
+    比重×頻率複合判準 = T14 校準,T1 不動 v1。"""
+    ov = (state.get("tier_override") or {}).get(task_path)
+    if ov in ("core", "light"):
+        return ov == "core"
+    return is_core(task)
 
 
 def share_sum(doc: dict) -> float:
     return sum((t.get("details") or {}).get("time_share_pct") or 0
-               for _, t in iter_tasks(doc))
+               for _, t, _ in iter_tasks(doc))
 
 
 def blocks_missing(task: dict) -> list[str]:
-    """core 任務 OPKS 門檻缺口(O 由 gate_missing 的 outputs 虛擬 key 承載,不重複)。"""
+    """core P/K/S 缺口(O 由 gate_missing 的 outputs 虛擬 key 承載,不在此重複)。"""
     blocks = task.get("competency_blocks") or []
-    p = sum(len(b.get("indicators") or []) for b in blocks)
-    k = sum(len(b.get("knowledge") or []) for b in blocks)
-    s = sum(len(b.get("skills") or []) for b in blocks)
+    n = lambda f: sum(len(b.get(f) or []) for b in blocks)   # noqa: E731
     out = []
-    if p < MIN_P: out.append("indicators")
-    if k < MIN_K: out.append("knowledge")
-    if s < MIN_S: out.append("skills")
+    if n("indicators") < MIN_P: out.append("indicators")
+    if n("knowledge") < MIN_K: out.append("knowledge")
+    if n("skills") < MIN_S: out.append("skills")
     return out
 
 
-def task_missing(task: dict, skips: set[str]) -> list[str]:
-    """單任務全部缺口=槽(gate_missing)+ OPKS 區塊(core 才要);skips=合法 n/a。"""
+def task_missing(task: dict, task_path: str, state: dict, skips: set[str]) -> list[str]:
+    """單任務全部缺口=槽(gate_missing,含 outputs 虛擬 key)+ P/K/S(core 才要);
+    skips=合法 n/a。"""
     miss = [m for m in gate_missing(task) if m not in skips]
-    if is_core(task):
+    if tier(task, task_path, state):
         miss += [m for m in blocks_missing(task) if m not in skips]
     return miss
 
@@ -80,39 +102,42 @@ def attitudes_missing(doc: dict) -> bool:
     return len((doc.get("ocs_attitude") or {}).get("attitudes") or []) < MIN_A
 
 
-def _gap(key: str, kind: str, name: str) -> str:
-    return f"{key}.{kind}.{name}"          # kind ∈ details|blocks;文件層固定 "ocs_attitude"
+def _gap(task_path: str, name: str) -> str:
+    kind = "blocks" if name in BLOCK_KEYS else "details"
+    return f"{task_path}.{kind}.{name}"     # 文件層態度固定字串 "ocs_attitude"
 
 
 def next_gap(doc: dict, state: dict, skips_by_task: dict[str, set[str]]) -> str | None:
     """下一個該問的縫隙(給顧問的提示,非命令)。優先序:
-    ①未分級任務的預算槽 ②core 靈魂槽 ③core 其餘槽 ④core OPKS 區塊
-    ⑤淺掃槽 ⑥文件層態度。已飽和(is_stalled)或已 n/a(skips)的縫隙跳過。"""
-    def open_(key: str, kind: str, name: str, skips: set[str]) -> str | None:
-        g = _gap(key, kind, name)
+    ①未分級任務的預算槽 ②core 靈魂槽 ③core 其餘細項槽 ④core 能力區塊(O+P/K/S)
+    ⑤淺掃殘槽 ⑥文件層態度。已飽和(is_stalled)或已 n/a(skips)的縫隙跳過。"""
+    def open_(tp: str, name: str, skips: set[str]) -> str | None:
+        g = _gap(tp, name)
         return None if name in skips or is_stalled(state, g) else g
 
-    tasks = [(task_key(u, t), t, skips_by_task.get(task_key(u, t), set()))
-             for u, t in iter_tasks(doc)]
-    for key, t, sk in tasks:                                     # ① 預算槽(分級前提)
-        if is_core(t) is None:
+    rows = [(tp, t, skips_by_task.get(tp, set())) for u, t, tp in iter_tasks(doc)]
+    for tp, t, sk in rows:                                        # ① 預算槽(分級前提)
+        if tier(t, tp, state) is None:
             for k in BUDGET_SLOTS:
-                if not slot_filled(t.get("details"), k) and (g := open_(key, "details", k, sk)):
+                if not slot_filled(t.get("details"), k) and (g := open_(tp, k, sk)):
                     return g
-    cores = [(key, t, sk) for key, t, sk in tasks if is_core(t)]
-    for phase_keys in (SOUL_SLOTS, tuple(k for k in SLOT_DEFS if k not in SOUL_SLOTS)):
-        for key, t, sk in cores:                                 # ②③ core 槽(靈魂優先)
-            for k in phase_keys:
-                if k in gate_missing(t) and (g := open_(key, "details", k, sk)):
+    cores = [(tp, t, sk) for tp, t, sk in rows if tier(t, tp, state)]
+    rest = tuple(k for k in SLOT_DEFS if k not in SOUL_SLOTS)
+    for phase in (SOUL_SLOTS, rest):                              # ②③ core 細項(靈魂優先)
+        for tp, t, sk in cores:
+            gm = gate_missing(t)
+            for k in phase:
+                if k in gm and (g := open_(tp, k, sk)):
                     return g
-    for key, t, sk in cores:                                     # ④ core OPKS 區塊
-        for kind in blocks_missing(t):
-            if (g := open_(key, "blocks", kind, sk)):
+    for tp, t, sk in cores:                                       # ④ core 能力區塊
+        block_gaps = [m for m in gate_missing(t) if m == "outputs"] + blocks_missing(t)
+        for name in block_gaps:
+            if (g := open_(tp, name, sk)):
                 return g
-    for key, t, sk in tasks:                                     # ⑤ 淺掃殘槽
-        if not is_core(t):
+    for tp, t, sk in rows:                                        # ⑤ 淺掃殘槽
+        if tier(t, tp, state) is False:
             for k in gate_missing(t):
-                if (g := open_(key, "details", k, sk)):
+                if (g := open_(tp, k, sk)):
                     return g
     if attitudes_missing(doc) and not is_stalled(state, "ocs_attitude"):   # ⑥ 態度
         return "ocs_attitude"
@@ -134,25 +159,17 @@ def is_stalled(state: dict, gap: str) -> bool:
 
 def can_finish(doc: dict, state: dict, skips_by_task: dict[str, set[str]]) -> tuple[bool, list[str]]:
     """完成閘門。blockers 全空才放行(飽和縫隙=attempted-insufficient,不擋收工但
-    必入 backstop/人審佇列——「放行≠合格」,標記留痕)。"""
+    必入人審佇列——「放行≠合格」,標記留痕)。§16.1:P 由每個 core 任務的
+    blocks_missing 承載,**不設職責層 P gate**(否則拒絕黃金範本全淺掃的 R3)。"""
     blockers: list[str] = []
     if abs(share_sum(doc) - 100) > SHARE_TOL:
-        blockers.append(f"share_sum={share_sum(doc)}(需 100±{SHARE_TOL})")
-    for u, t in iter_tasks(doc):
-        key = task_key(u, t)
-        sk = skips_by_task.get(key, set())
-        for m in task_missing(t, sk):
-            if not is_stalled(state, _gap(key, "details" if m in SLOT_DEFS or m == "outputs"
-                                          else "blocks", m)):
-                blockers.append(_gap(key, "gap", m))
-    for u in (doc.get("ocs_content") or {}).get("ocu_units") or []:      # 每職責 P+目標值
-        ok = any(is_core(t)
-                 and sum(len(b.get("indicators") or []) for b in t.get("competency_blocks") or [])
-                 >= MIN_P
-                 and slot_filled(t.get("details"), "standards")
-                 for t in u.get("tasks") or [])
-        if not ok:
-            blockers.append(f"{u.get('ocu_code') or u.get('ocu_name')}.P")
+        blockers.append(f"share_sum={share_sum(doc):g}(需 100±{SHARE_TOL})")
+    for u, t, tp in iter_tasks(doc):
+        sk = skips_by_task.get(tp, set())
+        for m in task_missing(t, tp, state, sk):
+            g = _gap(tp, m)
+            if not is_stalled(state, g):
+                blockers.append(g)
     if attitudes_missing(doc):
         blockers.append("ocs_attitude")
     return (not blockers, blockers)

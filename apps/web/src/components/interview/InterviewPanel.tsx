@@ -117,7 +117,7 @@ export function InterviewPanel({ profileId, doc, onApplyDoc }: {
         </Button>
         {start.isError && (
           <p className="text-xs text-destructive">
-            無法開始:請先在編輯器選好職類與任務。
+            無法開始訪談,請稍後再試。
           </p>
         )}
       </div>

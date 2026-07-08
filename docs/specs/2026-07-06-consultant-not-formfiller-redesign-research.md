@@ -666,6 +666,13 @@ backstop_pass:收尾一呼、便宜模型(role=select)、只答兩題(misses 漏
 →轉 review 階段;backstop 是加分項(llm 無/失敗仍可收尾)。6 純函式 + finish 整合測綠。
 **至此 ADR 0027 四組件(顧問/書記/帳本/backstop)全部實作完畢。**
 
+### 16.15 T11 前端漏拆的職類鎖(2026-07-08;真人試用抓到)
+真人試 v2 時卡在「AI 訪談按鈕鎖住、要先選職類才能開」。根因:T11 只放寬**後端** start,
+**前端** `documents/[id]/page.tsx` 的 AI 訪談按鈕仍 `disabled={status==="none" && !hasOccupations}`
+(v1 假設:先選職類才能訪談)——與 v2「空白起跑、顧問引導選職類」矛盾。修:改
+`disabled={status==="final"}`(none/draft 都可開,只禁已定稿;手動〔選職類〕平行保留)。
+教訓:T11「前端文案更新」不夠,漏了這道 button gate;跨層改動要連前端 gating 一起盤。
+
 ## 16.14 校準 #3(T14;2026-07-08;sim v2 活體跑,誠實記錄)
 
 v2 sim 全管線活體跑(真書記+帳本+顧問,模擬員工照黃金範本事實表)。**FAIL,但拆解後

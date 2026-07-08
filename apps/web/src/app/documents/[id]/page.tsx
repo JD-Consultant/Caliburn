@@ -118,7 +118,9 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
             variant={showInterview ? "default" : "outline"}
             className="gap-1"
             onClick={() => setShowInterview((v) => !v)}
-            disabled={status === "none" && !hasOccupations}
+            // v2(ADR 0027 §9.3):空白也可起跑——顧問開場引導選職類,不再要求先選職類;
+            // 只禁已定稿(final)。手動〔選職類〕仍在(平行路徑)。
+            disabled={status === "final"}
           >
             <MessageCircle className="h-4 w-4" />
             AI 訪談

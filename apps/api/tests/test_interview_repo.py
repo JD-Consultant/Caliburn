@@ -68,6 +68,25 @@ async def test_update_session_fields(db_session):
 
 
 @pytest.mark.asyncio
+async def test_ledger_state_defaults_and_roundtrip(db_session):
+    """T2:ledger_state 預設 {} + 往返 + 重算一致性(存回的 attempts 餵 ledger 同結果)。"""
+    from app.interview import ledger as L
+    p = await _profile(db_session)
+    repo = InterviewRepo(db_session)
+    s = await repo.create(p.id)
+    assert s.ledger_state == {}                                   # server_default
+    state = {"attempts": {"ocs_content.ocu_units.U1.tasks.C.details.wait_points": L.STALL_K},
+             "tier_override": {"ocs_content.ocu_units.U1.tasks.C": "light"},
+             "probe": {"depth": "deep", "style": "warm"}}
+    await repo.update_session(s.id, ledger_state=state)
+    got = await repo.get_active(p.id)
+    assert got.ledger_state == state                             # JSONB 往返無損
+    # 重算一致性:存回的狀態餵純函式 → 確定性同結果
+    assert L.is_stalled(got.ledger_state,
+                        "ocs_content.ocu_units.U1.tasks.C.details.wait_points")
+
+
+@pytest.mark.asyncio
 async def test_merge_human_touched_dedupes(db_session):
     p = await _profile(db_session)
     repo = InterviewRepo(db_session)

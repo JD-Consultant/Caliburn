@@ -38,7 +38,7 @@ updated: 2026-07-08
 |---|---|---|
 | 任務細項 `details`(11 槽) | 文件 `task["details"]`;契約 `TaskDetails` | 正式欄位;OCS 官方來源永遠無/`null` |
 | 能力區塊 `competency_blocks[0]` | 文件;`outputs/knowledge/skills`(CodeName)、`indicators`(CodeText) | 書記兩通道寫:官方碼(池)/自訂(name+quote) |
-| 態度 `ocs_attitude.attitudes` | 文件層(非逐任務;iCAP 合併呈現) | 書記**只提建議**(§15.3 員工確認才落) |
+| 態度 `ocs_attitude.attitudes` | 文件層(非逐任務;iCAP 合併呈現) | **收尾 attitudes_pass 整體編碼提建議**(0028 D3;書記池通道退場,僅剩自訂通道機會性提議;員工確認才落) |
 | 進度列 `interview_sessions` | DB | status/phase/focus/**`ledger_state`**(attempts/tier_override/probe/last_gap;僅存不可重算態) |
 | 逐字稿 `interview_turns` | DB | (session,seq) 唯一;quote 驗證真相來源 |
 | 證據 `interview_evidence` | DB | doc_path↔quote↔verified↔**`review`**(auto/pending/accepted/reverted);不落文件 |

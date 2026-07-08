@@ -25,7 +25,7 @@ def _variant(schema: dict, tag: str) -> dict:
 def test_full_inputs_produce_all_channels():
     s = scribe_schema(slot_paths=SLOTS, pools=POOLS, task_keys=TASKS, unit_keys=UNITS)
     tags = _variant_tags(s)
-    assert {"set_slot", "record_task_pool", "record_attitude_pool", "record_task_custom",
+    assert {"set_slot", "record_task_pool", "record_task_custom",
             "record_attitude_custom", "draft_indicator", "add_custom_task", "none"} == tags
 
 
@@ -46,8 +46,18 @@ def test_pool_enums_locked_to_given_ids():
     tp = _variant(s, "record_task_pool")
     assert set(tp["properties"]["pool_id"]["enum"]) == {"K01", "K02", "S01"}   # task 池聯集
     assert set(tp["properties"]["kind"]["enum"]) == {"knowledge", "skills"}    # 有池的 task-kind
-    ap = _variant(s, "record_attitude_pool")
-    assert set(ap["properties"]["pool_id"]["enum"]) == {"A01", "A03"}
+
+
+def test_attitude_pool_variant_retired():
+    """0028 D3 回歸守衛:態度池通道退場——即使 A 池非空也**不生變體**、pydantic 拒收
+    (39 條逐句態度轟炸的機制根;態度改收尾 attitudes_pass 整體編碼)。"""
+    import pytest
+    from pydantic import ValidationError
+    s = scribe_schema(slot_paths=SLOTS, pools=POOLS, task_keys=TASKS, unit_keys=UNITS)
+    assert "record_attitude_pool" not in _variant_tags(s)
+    with pytest.raises(ValidationError):
+        ScribeOutput.model_validate({"records": [
+            {"type": "record_attitude_pool", "pool_id": "A01", "quote": "x"}]})
 
 
 def test_task_and_slot_enums_locked():

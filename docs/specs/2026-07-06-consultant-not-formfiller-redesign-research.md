@@ -543,7 +543,14 @@ AI 身分明示、預計時長、資料用途與誰會看(之後有人審核)、
 - 已驗證一致:MIN_P/K/S=1/2/2、MIN_A=2 對範本核心任務 1.2(K=3、S=2、P≥1、O=1)與
   §8 態度(3 項)皆通過。
 
-> §16.2+ 留給後續 task 的發現與校準 #3(sim v2 數據;T14 產出)。
+### 16.2 T3 書記兩通道 schema 對抗驗收(2026-07-08;gpt-4o-mini/OpenRouter)
+`validate_select_schema.py --target scribe --role select --n 8`:**escapes=0 PASS**
+(avg 2.34s)。8 條敵意樣本(誘池外碼 K99、清單外 task、中文當碼、注入 delete_all/admin 欄、
+混合合法+非法)全擋。關鍵活證:誘記中文「溝通能力」→ 模型**自動走 record_task_custom
+自訂通道**(而非硬編假官方碼)= 兩通道「官方=參考」設計如預期運作。schema 建構器另有
+8 個純函式單元測試(fail-closed:池空→無池變體、無 task→只剩 none)。
+
+> §16.3+ 留給後續 task 的發現與校準 #3(sim v2 數據;T14 產出)。
 
 ## 17) 路線圖彙整(刻意不進 v2 的,一處收攏;各有出處,防遺忘)
 

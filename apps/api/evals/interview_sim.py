@@ -179,9 +179,13 @@ def main() -> int:
     args = ap.parse_args()
     report = asyncio.run(simulate(args.max_turns, dump=args.dump))
     print(json.dumps(report, ensure_ascii=False, indent=2))
-    # v2 出廠閘門(校準 #3 後修數字):細項命中率 ≥0.6 + 引文驗證率 ≥0.8
-    passed = (report["slot_keyword_accuracy"] >= 0.6
-              and (report["evidence_verified_rate"] or 0) >= 0.8)
+    # 閘門=**有效的確定性指標**(校準 #3/§16.14):grounding(引文逐字驗)+ 每回合進帳。
+    # slot_keyword_accuracy 是**資訊訊號非閘門**——keyword-exact 對「抽語意」的書記無效
+    # (誤判改寫的正確值),待加 LLM-judge 語意評分才回升為閘門;不用脆弱指標假 PASS/FAIL。
+    passed = ((report["evidence_verified_rate"] or 0) >= 0.8
+              and report["progressed_turn_rate"] >= 0.8)
+    print(f"(informational) slot_keyword_accuracy={report['slot_keyword_accuracy']}"
+          f" — keyword 量尺,語意評分待補")
     print("GATE:", "PASS" if passed else "FAIL")
     return 0 if passed else 1
 

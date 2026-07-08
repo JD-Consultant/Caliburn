@@ -30,6 +30,9 @@ class InterviewSession(Base):
     focus = Column(JSONB, nullable=False, server_default=sa_text("'{}'::jsonb"))
     counters = Column(JSONB, nullable=False, server_default=sa_text("'{}'::jsonb"))
     human_touched = Column(JSONB, nullable=False, server_default=sa_text("'[]'::jsonb"))
+    # v2(ADR 0027;T2):覆蓋帳本不可重算的狀態(attempts/tier_override/probe);
+    # 其餘一律由 doc 重算(12-Factor F5/F12)。
+    ledger_state = Column(JSONB, nullable=False, server_default=sa_text("'{}'::jsonb"))
 
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())

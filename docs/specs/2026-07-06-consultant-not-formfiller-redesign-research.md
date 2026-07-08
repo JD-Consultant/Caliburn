@@ -604,7 +604,15 @@ bug」→ LLM **自主呼叫 knowledge_search_occupations**(口語自動精簡�
 職能?」**(=下一個 occupation_brief 工具)。stopped=natural、單次 tool call。顧問 agent
 如設計運作:不確定先查、引官方、提下一步。**T7 驗收成立。**
 
-> §16.8+ 留給後續 task 的發現與校準 #3(sim v2 數據;T14 產出)。
+### 16.8 T8 顧問 prompt:新建 consultant.py(不改 v1 context.py)(2026-07-08)
+關鍵:**v2 顧問無寫入權**(沒有 set_slot;書記另外寫)——v1 `context.py::build_prompt` 是
+給「邊聊邊落槽」的舊 turn-output 模型用的,語義相反。plan 原述「context.py 改版」會破 v1
+綠底(test_interview_context)。決策:**新建 `app/interview/consultant.py`**(顧問 prompt +
+帳本摘要 + 開場揭露 + messages 組裝),v1 context.py 留作 characterization net 到 T9 管線切換,
+屆時一併退役。probe 深度/風格=consultant.py 模組常數(§10.6 收編 1「設定常數不寫死」)。
+顧問 prompt 全文素材=prompts spec §1 + §15 問句庫(BEI/CDM/OPKS/hedging/揭露/注入硬化)。
+
+> §16.9+ 留給後續 task 的發現與校準 #3(sim v2 數據;T14 產出)。
 
 ## 17) 路線圖彙整(刻意不進 v2 的,一處收攏;各有出處,防遺忘)
 

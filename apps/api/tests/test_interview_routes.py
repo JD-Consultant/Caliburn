@@ -43,11 +43,25 @@ K = StubKnowledge()
 
 
 @pytest.mark.asyncio
-async def test_start_requires_tasks(db_session):
+async def test_start_allows_blank_doc(db_session):
+    # v2(§16.12):空白 doc 也可起跑(survey 階段,顧問開場引導選職類)
     p = await _profile(db_session, with_doc=False)
-    with pytest.raises(HTTPException) as e:
-        await start_interview(p.id, db=db_session)
-    assert e.value.status_code == 409 and e.value.detail["code"] == "no_tasks"
+    out = await start_interview(p.id, db=db_session)
+    assert out["status"] == "active" and out["phase"] == "survey"
+    assert out["progress"]["coverage"]["required"] >= 1
+    assert "職類" in out["greeting"]
+
+
+@pytest.mark.asyncio
+async def test_blank_doc_turn_does_not_crash(db_session):
+    # 空白 doc 一回合:無任務→書記 no-op、顧問照樣開場引導(不炸)
+    p = await _profile(db_session, with_doc=False)
+    await start_interview(p.id, db=db_session)
+    out = await interview_turn(
+        p.id, {"text": "我幫公司修設備"}, db=db_session,
+        llm=StubLlm(select_result={"records": []}, chat_text="好,你主要修哪類設備?"),
+        knowledge=K)
+    assert out["say"] == "好,你主要修哪類設備?" and out["doc_changed"] is False
 
 
 @pytest.mark.asyncio

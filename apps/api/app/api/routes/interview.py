@@ -63,10 +63,6 @@ async def start_interview(profile_id: UUID, db: AsyncSession = Depends(get_db)):
     latest = await DocRepo(db).latest(profile_id)
     doc = (latest or {}).get("content") or {}
     paths = _task_paths(doc)
-    if not paths:
-        raise HTTPException(status_code=409, detail={
-            "code": "no_tasks",
-            "message": "文件尚無任務——請先在編輯器選職類與任務,再開始訪談。"})
     repo = InterviewRepo(db)
     session = await repo.get_active(profile_id)
     if session is None:
@@ -74,12 +70,19 @@ async def start_interview(profile_id: UUID, db: AsyncSession = Depends(get_db)):
             session = await repo.create(profile_id)
         except ActiveInterviewExists as e:   # 同毫秒競態(partial unique 兜底)
             session = await repo.get(e.session_id)
-    if not (session.focus or {}).get("task_path"):
+    # v2(§16.12):空白 doc 也可起跑——有任務就 deep+焦點,無任務走 survey 讓顧問開場引導
+    # 選職類(手動 picker/知識包同步平行保留 ADR 0021);拿掉舊 409 no_tasks 硬阻。
+    if paths and not (session.focus or {}).get("task_path"):
         session = await repo.update_session(
             session.id, phase="deep",
             focus={**(session.focus or {}), "task_path": paths[0]})
+    elif not paths and session.phase == "survey":
+        session = await repo.update_session(session.id, phase="survey")
     pending = await repo.list_pending(session.id)
-    return {**_session_out(session), "greeting": GREETING,
+    greeting = GREETING if paths else (
+        "你好!我是你的職務說明書顧問。我們先聊聊你平常做什麼工作,我幫你找到對應的官方"
+        "職類、把細節補齊——想到什麼說什麼就好。")
+    return {**_session_out(session), "greeting": greeting,
             "progress": _progress(doc, session, session.phase),
             "pending_suggestions": len(pending)}
 

@@ -51,6 +51,10 @@ class LlmPort(Protocol):
     async def complete_json(self, prompt: str, *, role: str = "cheap", default: Any = None) -> Any: ...
     async def select_schema(self, prompt: str, schema: dict, *,
                             role: str = "select", schema_name: str = "output") -> Any: ...
+    # 顧問 agent 手刻工具迴圈(ADR 0027 §4.2)：dispatch(name,args)->dict 執行 READ 工具；
+    # 回 agent_loop.ChatResult。迴圈邏輯可測(run_tool_loop),adapter 提供真實呼叫。
+    async def chat_with_tools(self, *, role: str, messages: list[dict], tools: list[dict],
+                              dispatch: Any, max_tool_iterations: int = 5) -> Any: ...
 
 
 KnowledgeClient = KnowledgePort  # back-compat alias (node call sites unchanged)

@@ -110,6 +110,34 @@ class OpenRouterLlm:
                 await asyncio.sleep(0.3)
         return default
 
+    async def chat_with_tools(self, *, role: str, messages: list[dict], tools: list[dict],
+                              dispatch, max_tool_iterations: int = 5):
+        """顧問 agent 手刻工具迴圈(ADR 0027 §4.2)。tools=OpenAI 工具定義;
+        dispatch(name,args)->dict 執行 READ 工具。迴圈邏輯在 agent_loop.run_tool_loop
+        (可測);此處只提供真實 OpenAI 呼叫(tool_choice=auto)。回 ChatResult。"""
+        from app.interview.agent_loop import run_tool_loop
+
+        model = model_for_role(role)
+
+        async def call_once(msgs: list[dict], with_tools: bool) -> dict:
+            kwargs: dict = {"model": model, "messages": msgs,
+                            "temperature": 0.4, "max_tokens": 1024}
+            if with_tools:
+                kwargs["tools"] = tools
+                kwargs["tool_choice"] = "auto"      # 不強制(§8.5:強制會虛構輸入)
+            with get_tracer().start_as_current_span("gen_ai.chat_tools") as span:
+                span.set_attribute("gen_ai.system", "openrouter")
+                span.set_attribute("gen_ai.request.model", model)
+                resp = await _async_client().chat.completions.create(**kwargs)
+            m = resp.choices[0].message
+            return {"content": m.content, "tool_calls": [
+                {"id": tc.id, "type": "function",
+                 "function": {"name": tc.function.name, "arguments": tc.function.arguments}}
+                for tc in (m.tool_calls or [])]}
+
+        return await run_tool_loop(call_once=call_once, dispatch=dispatch,
+                                   messages=messages, max_tool_iterations=max_tool_iterations)
+
     async def select_schema(self, prompt: str, schema: dict, *,
                             role: str = "select", schema_name: str = "output"):
         """受限解碼:輸出必須符合 schema(ADR 0024)。失敗重試後 raise LlmSchemaError

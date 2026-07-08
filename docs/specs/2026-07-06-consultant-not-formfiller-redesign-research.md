@@ -596,7 +596,15 @@ competencies 一呼帶齊),knowledge_match_items **延後**(需要「片語→�
 非硬套 dedup 的 match)。Anthropic 檢核逐條過:search>list ✓、回語意名(code+name)✓、
 合併呼 ✓、可操作錯誤 ✓、top_k/截斷預設 ✓。
 
-> §16.7+ 留給後續 task 的發現與校準 #3(sim v2 數據;T14 產出)。
+### 16.7 T7 手刻工具迴圈活體 smoke(2026-07-08;gpt-4.1-mini/OpenRouter)
+迴圈邏輯抽成注入 call_once 的 `run_tool_loop`(離線 5 測綠:tool_call_id 對回、壞 JSON args
+防禦、上限補問)。**活體端到端 smoke**(真 LLM + fake knowledge):給「我幫公司測軟體找
+bug」→ LLM **自主呼叫 knowledge_search_occupations**(口語自動精簡成查詢詞)→ 迴圈餵回 →
+產出引用官方碼(ISD2519-002v2)+分數的連貫回答,**並主動提議「要不要查這職類的任務和
+職能?」**(=下一個 occupation_brief 工具)。stopped=natural、單次 tool call。顧問 agent
+如設計運作:不確定先查、引官方、提下一步。**T7 驗收成立。**
+
+> §16.8+ 留給後續 task 的發現與校準 #3(sim v2 數據;T14 產出)。
 
 ## 17) 路線圖彙整(刻意不進 v2 的,一處收攏;各有出處,防遺忘)
 

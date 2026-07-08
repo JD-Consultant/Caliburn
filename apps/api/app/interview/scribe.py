@@ -86,27 +86,38 @@ def apply_scribe(records: list[dict], *, doc: dict, pool_items: dict[str, str],
         quote = rec.get("quote", "")
         verified = quote_verified(quote, employee_texts)
 
-        if t in ("record_task_pool", "record_attitude_pool"):
-            kind = "attitudes" if t == "record_attitude_pool" else rec["kind"]
+        if t == "record_attitude_pool":
+            # 態度=池選但**走建議層**(§15.3/§16.5:社會期許偏誤,員工確認才落)
+            pid = rec["pool_id"]
+            if pid not in (pools.get("attitudes") or []):
+                res.guard_log.append(f"drop:pool_id {pid} 不屬 attitudes 池")
+                continue
+            res.evidence.append({"doc_path": "ocs_attitude.attitudes", "quote": quote,
+                                 "verified": verified, "review": "auto"})
+            res.suggestions.append({
+                "doc_path": "ocs_attitude.attitudes", "old_value": None,
+                "new_value": {"code": pid, "name": pool_items.get(pid)},
+                "reason": f"態度(池選,待員工確認;quote:{quote[:30]})"})
+            res.guard_log.append(f"suggest:ocs_attitude.attitudes={pid}(態度需確認)")
+
+        elif t == "record_task_pool":
+            kind = rec["kind"]
             pid = rec["pool_id"]
             if pid not in (pools.get(kind) or []):        # 語義守衛:kind↔pool_id 一致
                 res.guard_log.append(f"drop:pool_id {pid} 不屬 {kind} 池")
                 continue
-            item = {"code": pid, "name": pool_items.get(pid)}
-            path = ("ocs_attitude.attitudes" if kind == "attitudes"
-                    else f"{rec['task']}.competency_blocks.0.{kind}")
-            res.evidence.append({"doc_path": path, "quote": quote, "verified": verified})
+            path = f"{rec['task']}.competency_blocks.0.{kind}"
+            ev = {"doc_path": path, "quote": quote, "verified": verified, "review": "auto"}
+            res.evidence.append(ev)
             if not verified:
                 res.guard_log.append(f"drop:{path}(quote 未驗證)")
                 continue
-            if kind == "attitudes":
-                (_doc().setdefault("ocs_attitude", {}).setdefault("attitudes", [])).append(item)
-            else:
-                task = _task_node(rec["task"])
-                if task is None:
-                    res.guard_log.append(f"drop:{path}(task 解析不到)")
-                    continue
-                _append_item(_first_block(task), kind, item)
+            task = _task_node(rec["task"])
+            if task is None:
+                res.guard_log.append(f"drop:{path}(task 解析不到)")
+                continue
+            _append_item(_first_block(task), kind, {"code": pid, "name": pool_items.get(pid)})
+            ev["review"] = "pending"                       # 低風險直寫→待批次審(T5)
             res.guard_log.append(f"write:{path}={pid}")
 
         elif t in ("record_task_custom", "record_attitude_custom"):
@@ -145,7 +156,8 @@ def apply_scribe(records: list[dict], *, doc: dict, pool_items: dict[str, str],
 
         elif t == "set_slot":
             path = rec["path"]
-            res.evidence.append({"doc_path": path, "quote": quote, "verified": verified})
+            ev = {"doc_path": path, "quote": quote, "verified": verified, "review": "auto"}
+            res.evidence.append(ev)
             if not writable_path(path):
                 res.guard_log.append(f"drop:{path}(未知槽)")
                 continue
@@ -157,6 +169,7 @@ def apply_scribe(records: list[dict], *, doc: dict, pool_items: dict[str, str],
             elif not verified:
                 res.guard_log.append(f"drop:{path}(quote 未驗證)")
             elif set_at(_doc(), path, rec["value"]):
+                ev["review"] = "pending"                   # 低風險直寫→待批次審(T5)
                 res.guard_log.append(f"write:{path}")
             else:
                 res.guard_log.append(f"drop:{path}(path 不存在)")

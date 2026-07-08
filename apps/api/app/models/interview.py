@@ -82,6 +82,8 @@ class InterviewEvidence(Base):
     quote = Column(Text, nullable=False)
     turn_seq = Column(Integer, nullable=False)
     verified = Column(Boolean, nullable=False, server_default=sa_text("true"))
+    # v2 風險分流(ADR 0027 T5):auto(v1/建議路由)/pending(低風險直寫待批)/accepted/reverted
+    review = Column(Text, nullable=False, server_default=sa_text("'auto'"))
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
 

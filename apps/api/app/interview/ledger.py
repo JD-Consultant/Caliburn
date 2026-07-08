@@ -135,6 +135,25 @@ def is_stalled(state: dict, gap: str) -> bool:
     return (state.get("attempts") or {}).get(gap, 0) >= STALL_K
 
 
+def coverage(doc: dict, state: dict,
+             skips_by_task: dict[str, set[str]] | None = None) -> dict:
+    """進度=覆蓋率 {filled, required}(spec §11.1)。required 依 tier 定該任務應填數,
+    filled=required−當前缺口;文件層態度計 MIN_A。純顯示用,非閘門。"""
+    skips_by_task = skips_by_task or {}
+    core_req = len(SLOT_DEFS) + 1 + 3          # 11 細項 + outputs + P/K/S
+    filled = required = 0
+    for _, t, tp in iter_tasks(doc):
+        tr = tier(t, tp, state)
+        req = 2 if tr is None else (core_req if tr else len(("frequency",
+              "time_share_pct", "standards")) + 1)
+        required += req
+        filled += req - len(task_missing(t, tp, state, skips_by_task.get(tp, set())))
+    n_att = len((doc.get("ocs_attitude") or {}).get("attitudes") or [])
+    required += MIN_A
+    filled += min(n_att, MIN_A)
+    return {"filled": max(0, filled), "required": max(1, required)}
+
+
 def can_finish(doc: dict, state: dict,
                skips_by_task: dict[str, set[str]]) -> tuple[bool, list[str]]:
     """完成閘門。blockers 全空才放行(飽和縫隙=attempted-insufficient,不擋收工但

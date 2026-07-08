@@ -44,6 +44,11 @@ class ScribeResult:
     suggestions: list[dict] = field(default_factory=list)
     guard_log: list[str] = field(default_factory=list)
     records_failed: bool = False           # 抽取重試仍敗(交 backstop/T12,不擋回合)
+    progressed: bool = False               # 本回合有新寫入/建議(帳本 note_attempt 用)
+    # 供衝突重放(T9;樂觀並發 409→重讀重放 apply_scribe 同 records,不重呼 LLM)
+    records: list[dict] = field(default_factory=list)
+    pools: dict = field(default_factory=dict)
+    pool_items: dict = field(default_factory=dict)
 
 
 def _first_block(task: dict) -> dict:
@@ -175,6 +180,7 @@ def apply_scribe(records: list[dict], *, doc: dict, pool_items: dict[str, str],
                 res.guard_log.append(f"drop:{path}(path 不存在)")
 
     res.new_doc = work
+    res.progressed = work is not None or bool(res.suggestions)   # 帳本 note_attempt 用
     return res
 
 
@@ -242,6 +248,9 @@ async def scribe_pass(llm, knowledge, *, doc: dict, employee_texts: list[str],
     if records is None:
         r = ScribeResult()
         r.records_failed = True                # 交 backstop(T12);不擋回合
+        r.pools, r.pool_items = pools, pool_items
         return r
-    return apply_scribe(records, doc=doc, pool_items=pool_items, pools=pools,
-                        employee_texts=employee_texts, human_touched=human_touched)
+    res = apply_scribe(records, doc=doc, pool_items=pool_items, pools=pools,
+                       employee_texts=employee_texts, human_touched=human_touched)
+    res.records, res.pools, res.pool_items = records, pools, pool_items   # 供衝突重放
+    return res

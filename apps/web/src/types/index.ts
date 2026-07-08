@@ -234,7 +234,17 @@ export interface MatchResult {
 export interface InterviewCoverage { filled: number; required: number }
 export interface InterviewProgress { phase: string; coverage: InterviewCoverage }
 export interface InterviewQuestion { text: string; target_path: string | null }
-export interface InterviewWidget { question: string; options: string[]; target_path: string | null }
+// widget 判別聯集(0028 D1/D5):choice=舊卡片;open_picker=引擎指令「開哪個 picker、
+// 預填/預勾什麼」——前端開**同一批編輯器 pickers**(同 UI,入口不同)。
+export interface ChoiceWidget { kind?: "choice"; question: string; options: string[]; target_path: string | null }
+export interface PickerPrecheckItem { key: string; name: string; unit: string | null; quote: string }
+export interface OpenPickerWidget {
+  kind: "open_picker";
+  picker: "occupation" | "task";
+  query?: string;                       // occupation:預填搜尋詞(顧問實際用過的)
+  precheck?: PickerPrecheckItem[];      // task:AI 預勾清單(每項附引文理由)
+}
+export type InterviewWidget = ChoiceWidget | OpenPickerWidget
 export interface InterviewSuggestion {
   id: string; doc_path: string;
   old_value: unknown; new_value: unknown;
@@ -253,6 +263,8 @@ export interface InterviewView {
   session_id: string; status: string; phase: string;
   focus: { task_path?: string; skipped?: string[] };
   turns: { seq: number; role: "employee" | "consultant"; text: string }[];
-  evidence: { doc_path: string; quote: string; turn_seq: number; verified: boolean }[];
+  // review(0028 D7):auto/pending/accepted/reverted——文件格追蹤修訂渲染的資料源
+  evidence: { doc_path: string; quote: string; turn_seq: number; verified: boolean;
+              review: string }[];
   suggestions: InterviewSuggestion[];
 }

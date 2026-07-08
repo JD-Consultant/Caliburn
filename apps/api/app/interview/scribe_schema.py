@@ -20,9 +20,9 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from app.interview.commands import _obj, _s, _variant
 
-# 能力區塊 kind(task-scoped 三類 + doc-level 態度)
+# 能力區塊 kind(task-scoped 三類;態度池通道 0028 D3 退場——收尾 attitudes_pass 整體編碼,
+# 逐回合僅剩 record_attitude_custom 機會性提議)
 TASK_KINDS = ("outputs", "knowledge", "skills")
-ATTITUDE_KIND = "attitudes"
 
 
 # --- strict-subset schema 建構器 ---
@@ -48,10 +48,6 @@ def scribe_schema(*, slot_paths: list[str], pools: dict[str, list[str]],
         variants.append(_variant(
             "record_task_pool", kind={"enum": task_pool_kinds},
             task={"enum": list(task_keys)}, pool_id={"enum": task_pool_ids},
-            quote=_s("string")))
-    if pools.get(ATTITUDE_KIND):
-        variants.append(_variant(
-            "record_attitude_pool", pool_id={"enum": list(pools[ATTITUDE_KIND])},
             quote=_s("string")))
 
     if task_keys:
@@ -84,12 +80,6 @@ class RecordTaskPool(_Rec):
     type: Literal["record_task_pool"]
     kind: Literal["outputs", "knowledge", "skills"]
     task: str
-    pool_id: str
-    quote: str
-
-
-class RecordAttitudePool(_Rec):
-    type: Literal["record_attitude_pool"]
     pool_id: str
     quote: str
 
@@ -134,7 +124,7 @@ class NoRecord(_Rec):
 
 
 ScribeRecord = Annotated[
-    Union[SetSlot, RecordTaskPool, RecordAttitudePool, RecordTaskCustom,
+    Union[SetSlot, RecordTaskPool, RecordTaskCustom,
           RecordAttitudeCustom, DraftIndicator, AddCustomTask, NoRecord],
     Field(discriminator="type"),
 ]

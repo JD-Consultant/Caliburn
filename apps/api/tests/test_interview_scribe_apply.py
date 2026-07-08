@@ -39,13 +39,12 @@ def test_pool_knowledge_written_to_block():
     assert res.evidence[0]["verified"] is True
 
 
-def test_pool_attitude_goes_to_suggestion_not_direct():
-    # §16.5:態度池選走建議層(員工確認才落),不直寫
+def test_pool_attitude_channel_retired():
+    # 0028 D3:態度池通道退場——這種 record 一律忽略(不寫、不提議、留守衛痕)
     r = [{"type": "record_attitude_pool", "pool_id": "A01", "quote": "設計案例再設計"}]
     res = _apply(r, employee_texts=["設計案例再設計，很細心"])
-    assert res.new_doc is None
-    assert res.suggestions[0]["doc_path"] == "ocs_attitude.attitudes"
-    assert res.suggestions[0]["new_value"] == {"code": "A01", "name": "謹慎細心"}
+    assert res.new_doc is None and res.suggestions == []
+    assert any("未知" in g for g in res.guard_log)
 
 
 def test_direct_writes_marked_pending_suggestions_stay_auto():

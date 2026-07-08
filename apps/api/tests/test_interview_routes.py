@@ -8,7 +8,7 @@ from app.adapters.interview_repo import InterviewRepo
 from app.adapters.persistence import DocRepo
 from app.adapters.stubs import StubKnowledge, StubLlm
 from app.api.routes.interview import (
-    get_interview, interview_turn, review_interview, start_interview,
+    finish_interview, get_interview, interview_turn, review_interview, start_interview,
 )
 from app.models import JobProfile, User
 
@@ -106,6 +106,30 @@ async def test_get_interview_full_view(db_session):
     assert [t["role"] for t in view["turns"]] == ["employee", "consultant"]
     assert view["evidence"][0]["verified"] is True
     assert view["status"] == "active"
+
+
+@pytest.mark.asyncio
+async def test_finish_runs_backstop_and_transitions_review(db_session):
+    p = await _profile(db_session)
+    await start_interview(p.id, db=db_session)
+    await interview_turn(p.id, {"text": "我們每兩週跑一次回歸"},
+                         db=db_session, llm=StubLlm(select_result=GOOD), knowledge=K)
+    # backstop 回一筆漏記:gap 須在「仍空必填欄」內(任務未分級→time_share_pct 缺)、quote 逐字
+    gap = f"{TASK_PATH}.details.time_share_pct"
+    bs = StubLlm(select_result={"misses": [{"gap": gap, "quote": "每兩週跑一次回歸"}],
+                                "misattributed": []})
+    out = await finish_interview(p.id, db=db_session, llm=bs)
+    assert out["phase"] == "review"
+    view = await get_interview(p.id, db=db_session)
+    assert any("補漏" in s["reason"] for s in view["suggestions"])   # backstop 補漏建議落庫
+
+
+@pytest.mark.asyncio
+async def test_finish_without_llm_still_transitions(db_session):
+    p = await _profile(db_session)
+    await start_interview(p.id, db=db_session)
+    out = await finish_interview(p.id, db=db_session, llm=None)   # backstop 略過,仍收尾
+    assert out["phase"] == "review"
 
 
 @pytest.mark.asyncio

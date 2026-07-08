@@ -659,7 +659,14 @@ evidence.review + accept/revert 端點)、onboarding 預勾選單 widget(T11)。
 什麼」+文字引導;**選職類仍走既有手動 picker/知識包流程**(§9.3 平行保留)。widget 驅動
 自動選職類記為後續 polish。既有「先選好才開」路徑改為「可選好也可空白開」,不破壞。
 
-> §16.13+ 留給後續 task 的發現與校準 #3(sim v2 數據;T14 產出)。
+### 16.13 T12 backstop 收尾複查(2026-07-08;ADR 0027 第4組件到齊)
+backstop_pass:收尾一呼、便宜模型(role=select)、只答兩題(misses 漏記/misattributed 出處)、
+**只產建議**。schema 自由字串 + **確定性後驗**(gap∈空縫、path∈已寫、quote 逐字驗)——
+只提案人審,不必生成期 enum,後驗擋幻覺即可。`interview:finish` 端點:收尾跑 backstop→建議化
+→轉 review 階段;backstop 是加分項(llm 無/失敗仍可收尾)。6 純函式 + finish 整合測綠。
+**至此 ADR 0027 四組件(顧問/書記/帳本/backstop)全部實作完畢。**
+
+> §16.14+ 留給後續 task 的發現與校準 #3(sim v2 數據;T14 產出)。
 
 ## 17) 路線圖彙整(刻意不進 v2 的,一處收攏;各有出處,防遺忘)
 

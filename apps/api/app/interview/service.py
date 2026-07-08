@@ -16,7 +16,10 @@ from app.adapters.llm_openrouter import model_for_role
 from app.adapters.persistence import DocConflictError, DocRepo
 from app.interview import consultant as C
 from app.interview import ledger as L
-from app.interview.scribe import apply_scribe, scribe_pass
+from app.interview.attitudes import attitudes_pass
+from app.interview.backstop import backstop_pass
+from app.interview.curation import curation_pass
+from app.interview.scribe import _doc_ocs_codes, apply_scribe, build_pool_inputs, scribe_pass
 from app.interview.slots import SLOT_DEFS
 from app.interview.tools import CONSULTANT_TOOLS, dispatch_tool
 
@@ -49,6 +52,28 @@ def _pending_label(s) -> str:
         return f"{kind}「{name or dp.split(':', 1)[1]}」"
     leaf = dp.split(".")[-1]
     return f"更新 {SLOT_DEFS[leaf].label if leaf in SLOT_DEFS else leaf}"
+
+
+async def build_task_pool(knowledge, doc: dict) -> list[dict]:
+    """官方任務池(聯集;0028 D6 檢查表/裁剪的候選盤)。key=`ocs_code:task_code`。
+    fail-open:knowledge 掛 → 空池 → curation/檢查表縫自然不開,對話照走。"""
+    out: list[dict] = []
+    seen: set[str] = set()
+    for code in _doc_ocs_codes(doc):
+        try:
+            ot = await knowledge.occupation_tasks(code)
+        except Exception as exc:  # noqa: BLE001
+            logger.warning("build_task_pool:occupation_tasks(%s) 失敗:%s", code, str(exc)[:120])
+            continue
+        for u in (getattr(ot, "units", None) or []):
+            for t in (u.tasks or []):
+                key = f"{code}:{t.task_code}"
+                if key in seen:
+                    continue
+                seen.add(key)
+                out.append({"key": key, "name": t.task_name, "unit": u.ocu_name,
+                            "ocs_code": code, "task_code": t.task_code})
+    return out
 
 
 async def _persist_scribe_doc(doc_repo, profile_id, latest, scribe_res, *,
@@ -115,21 +140,57 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> T
 
     work_doc = (await doc_repo.latest(profile_id) or {}).get("content") or doc
 
+    # ①½ 官方任務池(0028 D6:檢查表/裁剪候選盤;fail-open,掛了縫不開)
+    pool_tasks = await build_task_pool(knowledge, work_doc)
+
     # ② 帳本:先評上一輪 gap 是否進帳(飽和偵測),再算本輪 next_gap(給顧問當提示)
     state = dict(session.ledger_state or {})
     state = L.note_attempt(state, state.get("last_gap"), scribe_res.progressed)
-    state["last_gap"] = L.next_gap(work_doc, state, {})
+    state["last_gap"] = L.next_gap(work_doc, state, {}, pool_tasks)
+
+    # ②½ 裁剪 pass(0028 D1/D4):curation 縫 → AI 對 unasked 官方任務預勾/排除;
+    #    precheck → widget 指令(picker 人確認才落文件);declined → ledger_state(不再反問)
+    widget: dict | None = None
+    curation_guard: list[str] = []
+    if state["last_gap"] == L.CURATION_TASKS and pool_tasks:
+        unasked = L.checklist(work_doc, state, pool_tasks)["unasked"]
+        if unasked:
+            t_cur = time.perf_counter()
+            cur = await curation_pass(llm, pool_tasks=unasked, employee_texts=employee_texts)
+            cur_ms = int((time.perf_counter() - t_cur) * 1000)
+            curation_guard = list(cur.guard_log)
+            if cur.declined:
+                state["declined"] = list(dict.fromkeys(
+                    (state.get("declined") or []) + [d["key"] for d in cur.declined]))
+            if cur.precheck:
+                widget = {"kind": "open_picker", "picker": "task", "precheck": cur.precheck}
+            await repo.add_llm_call(session.id, turn_seq=emp_turn.seq, role="select",
+                                    model=model_for_role("select"), duration_ms=cur_ms,
+                                    guard_verdicts=curation_guard[:30])
 
     # ③ 顧問 chat_with_tools(說話 + READ 工具;無寫入權)
     pending_labels = [_pending_label(s) for s in await repo.list_pending(session.id)]
     messages = C.build_consultant_messages(
         doc=work_doc, ledger_state=state, recent_turns=recent,
-        pending=pending_labels, employee_text=user_text)
+        pending=pending_labels, employee_text=user_text, pool_tasks=pool_tasks)
+    # write-in 抓漏只吐一次(0028 D6):摘要已含探測句 → 消費 flag
+    if (pool_tasks and not state.get("writein_asked")
+            and not L.checklist(work_doc, state, pool_tasks)["unasked"]):
+        state["writein_asked"] = True
     dispatch = partial(dispatch_tool, knowledge=knowledge)
     t_chat = time.perf_counter()
     chat = await llm.chat_with_tools(role="interview", messages=messages,
                                      tools=CONSULTANT_TOOLS, dispatch=dispatch)
     chat_ms = int((time.perf_counter() - t_chat) * 1000)
+
+    # ③½ onboarding widget(0028 D1):顧問這回合真的搜過職類 → 開 occupation picker
+    #    預填它用的 query(確定性觸發=tool_trace,不猜)
+    if widget is None and state.get("last_gap") == L.ONBOARD_OCCUPATION:
+        q = next((t.get("args", {}).get("query") for t in (chat.tool_trace or [])
+                  if t.get("name") == "knowledge_search_occupations"
+                  and (t.get("args") or {}).get("query")), None)
+        if q:
+            widget = {"kind": "open_picker", "picker": "occupation", "query": str(q)[:120]}
 
     # ④ 保底:顧問恆有可見回覆 + 往前的問題(靜默回合=實戰死穴)
     say = (chat.text or "").strip()
@@ -151,10 +212,58 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> T
                             tool_calls=chat.tool_trace)
 
     pending = await repo.list_pending(session.id)
-    guard = list(scribe_res.guard_log) + extra_guard
+    guard = list(scribe_res.guard_log) + extra_guard + curation_guard
     if scribe_res.records_failed:
         guard.append("scribe:抽取重試仍敗(交 backstop)")
-    return TurnResult(say=say, question=None, widget=None, doc_changed=doc_changed,
-                      pending_suggestions=len(pending), phase=session.phase,
+    return TurnResult(say=say, question=None, widget=widget, doc_changed=doc_changed,
+                      pending_suggestions=len(pending),
+                      phase=L.derive_phase(work_doc, state),
                       focus=dict(session.focus or {}), guard_log=guard,
                       coverage=L.coverage(work_doc, state))
+
+
+async def run_finish(profile_id: UUID, *, db, llm, knowledge) -> dict:
+    """收尾(0027 backstop + 0028 D3 態度收尾 pass)→ 建議化 → phase=review。
+    fail-open:llm 缺仍可收尾(只是不複查/不編態度);knowledge 掛 → 略過態度。"""
+    repo = InterviewRepo(db)
+    session = await repo.get_active(profile_id)
+    if session is None:
+        raise NoActiveInterview(str(profile_id))
+    latest = await DocRepo(db).latest(profile_id)
+    doc = (latest or {}).get("content") or {}
+    state = session.ledger_state or {}
+    _, blockers = L.can_finish(doc, state, {})
+    gap_paths = [b for b in blockers if not b.startswith("share_sum")]
+
+    if llm is not None:
+        turns = await repo.list_turns(session.id)
+        emp = [t.text for t in turns if t.role == "employee"]
+        evidence = await repo.list_evidence(session.id)
+        empty_gaps = [{"gap": g, "label": C.gap_label(doc, g)} for g in gap_paths]
+        recorded = [{"path": e.doc_path, "quote": e.quote} for e in evidence]
+        res = await backstop_pass(llm, employee_texts=emp, empty_gaps=empty_gaps,
+                                  recorded=recorded)
+        for sug in res.to_suggestions():
+            await repo.add_suggestion(session.id, doc_path=sug["doc_path"],
+                                      old_value=sug["old_value"], new_value=sug["new_value"],
+                                      reason=sug["reason"], turn_seq=len(turns))
+        # 態度收尾整體編碼(0028 D3;取代書記逐回合池通道)
+        try:
+            pools, pool_items = await build_pool_inputs(knowledge, doc)
+        except Exception as exc:  # noqa: BLE001
+            logger.warning("run_finish:態度池組建失敗(略過):%s", str(exc)[:120])
+            pools, pool_items = {}, {}
+        existing = [a.get("code") for a in
+                    ((doc.get("ocs_attitude") or {}).get("attitudes") or []) if a.get("code")]
+        att = await attitudes_pass(llm, pool=pools.get("attitudes") or [],
+                                   pool_items=pool_items, employee_texts=emp,
+                                   existing=existing)
+        for sug in att.to_suggestions():
+            await repo.add_suggestion(session.id, doc_path=sug["doc_path"],
+                                      old_value=sug["old_value"], new_value=sug["new_value"],
+                                      reason=sug["reason"], turn_seq=len(turns))
+
+    await repo.update_session(session.id, phase="review")
+    pending = await repo.list_pending(session.id)
+    return {"phase": "review", "blockers": len(blockers),
+            "pending_suggestions": len(pending)}

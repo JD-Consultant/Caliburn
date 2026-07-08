@@ -1,12 +1,15 @@
 """T9:回合服務 v2 整合(真 DB + StubLlm + StubKnowledge)。
-管線:書記 pass(set_slot 直寫/建議)→ 帳本 → 顧問 chat_with_tools → 保底。"""
+管線:書記 pass(set_slot 直寫/建議)→ 帳本 → 顧問 chat_with_tools → 保底。
+0028 T5:裁剪 widget/declined/occupation widget/finish 態度收尾。"""
+import json
+
 import pytest
 from uuid import uuid4
 
 from app.adapters.interview_repo import InterviewRepo
 from app.adapters.persistence import DocRepo
 from app.adapters.stubs import StubKnowledge, StubLlm
-from app.interview.service import NoActiveInterview, run_turn
+from app.interview.service import NoActiveInterview, run_finish, run_turn
 from app.models import JobProfile, User
 
 TASK_PATH = "ocs_content.ocu_units.u1.tasks.t1"
@@ -25,13 +28,14 @@ def _doc():
     }
 
 
-async def _setup(db, *, human_touched=None):
+async def _setup(db, *, doc=None, human_touched=None):
     u = User(email=f"{uuid4()}@x.com", name="n"); db.add(u); await db.flush()
     p = JobProfile(user_id=u.id, job_title="工程師"); db.add(p); await db.flush()
-    await DocRepo(db).save(p.id, _doc())
+    await DocRepo(db).save(p.id, doc if doc is not None else _doc())
     repo = InterviewRepo(db)
     s = await repo.create(p.id)
-    await repo.update_session(s.id, phase="deep", focus={"task_path": TASK_PATH})
+    if doc is None:                                   # 預設情境=既有 deep 焦點
+        await repo.update_session(s.id, phase="deep", focus={"task_path": TASK_PATH})
     if human_touched:
         await repo.merge_human_touched(s.id, human_touched)
     return p, s, repo
@@ -109,3 +113,82 @@ async def test_roles_scribe_select_consultant_interview(db_session):
     chats = [c for c in llm.calls if c["kind"] == "chat"]
     assert selects and all(c["role"] == "select" for c in selects)       # 書記=便宜模型
     assert chats and all(c["role"] == "interview" for c in chats)        # 顧問=強模型
+
+
+# ---- 0028 T5:裁剪 widget / declined / occupation widget / finish 態度 ----
+
+def _doc_occ_only():
+    """有職類、零任務(=task_curation 死區,v2.1 要接上的斷棒)。"""
+    return {"ocs_profile": {"ocs_code": "KRM2421-001v4", "job_description": ""},
+            "ocs_content": {"ocu_units": []}, "ocs_attitude": {"attitudes": []}}
+
+
+def _curation_select(records):
+    """callable select stub:裁剪 schema(含 precheck 變體)回 records,其餘回空。"""
+    def sel(prompt, schema):
+        if '"precheck"' in json.dumps(schema):
+            return {"records": records}
+        return {"records": []}
+    return sel
+
+
+@pytest.mark.asyncio
+async def test_curation_widget_prechecks_official_tasks(db_session):
+    p, s, repo = await _setup(db_session, doc=_doc_occ_only())
+    llm = StubLlm(select_result=_curation_select(
+        [{"type": "precheck", "key": "KRM2421-001v4:T1.1", "quote": "例行設備巡檢"}]))
+    out = await run_turn(p.id, "我每天做例行設備巡檢", db=db_session, llm=llm,
+                         knowledge=StubKnowledge())
+    assert out.widget == {"kind": "open_picker", "picker": "task", "precheck": [
+        {"key": "KRM2421-001v4:T1.1", "name": "例行設備巡檢", "unit": "預防保養",
+         "quote": "例行設備巡檢"}]}
+
+
+@pytest.mark.asyncio
+async def test_curation_declined_persists_and_shrinks_checklist(db_session):
+    p, s, repo = await _setup(db_session, doc=_doc_occ_only())
+    llm = StubLlm(select_result=_curation_select(
+        [{"type": "decline", "key": "KRM2421-001v4:T1.2", "quote": "保養排程管理我沒有做"}]))
+    out = await run_turn(p.id, "保養排程管理我沒有做", db=db_session, llm=llm,
+                         knowledge=StubKnowledge())
+    assert out.widget is None                                  # 無預勾就不開窗
+    sess = await repo.get_active(p.id)
+    assert sess.ledger_state.get("declined") == ["KRM2421-001v4:T1.2"]
+
+
+@pytest.mark.asyncio
+async def test_onboarding_occupation_widget_from_consultant_search(db_session):
+    """顧問這回合真的搜過職類 → 才開 occupation picker(預填它用的 query)。"""
+    blank = {"ocs_profile": {}, "ocs_content": {"ocu_units": []},
+             "ocs_attitude": {"attitudes": []}}
+    p, s, repo = await _setup(db_session, doc=blank)
+    llm = StubLlm(select_result={"records": []},
+                  chat_text="你做的像「設備維護工程師」,請從右上〔選職類〕確認?",
+                  chat_trace=[{"name": "knowledge_search_occupations",
+                               "args": {"query": "設備 巡檢 維護", "top_k": 3},
+                               "result_digest": "x"}])
+    out = await run_turn(p.id, "我在工廠顧機台", db=db_session, llm=llm,
+                         knowledge=StubKnowledge())
+    assert out.widget == {"kind": "open_picker", "picker": "occupation",
+                          "query": "設備 巡檢 維護"}
+
+
+@pytest.mark.asyncio
+async def test_finish_runs_attitudes_pass(db_session):
+    p, s, repo = await _setup(db_session)                      # 既有 doc(有任務)
+    await repo.append_turn(s.id, role="employee", text="回歸沒跑完我絕不放行")
+
+    def sel(prompt, schema):
+        sj = json.dumps(schema)
+        if '"pool_id"' in sj:                                  # 態度收尾 schema
+            return {"attitudes": [{"pool_id": "A01", "quote": "回歸沒跑完我絕不放行",
+                                   "rationale": "堅守放行標準"}]}
+        return {"misses": [], "misattributed": []}             # backstop schema
+
+    out = await run_finish(p.id, db=db_session, llm=StubLlm(select_result=sel),
+                           knowledge=StubKnowledge())
+    assert out["phase"] == "review"
+    sugs = await repo.list_suggestions(s.id)
+    att = [x for x in sugs if x.doc_path == "ocs_attitude.attitudes"]
+    assert len(att) == 1 and att[0].new_value["code"] == "A01"
+    assert "回歸沒跑完" in att[0].reason                        # 引文入 reason

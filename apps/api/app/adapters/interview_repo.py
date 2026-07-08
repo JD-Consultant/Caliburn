@@ -99,9 +99,10 @@ class InterviewRepo:
     # --- evidence(槽值↔原話) ---
 
     async def add_evidence(self, session_id: UUID, *, doc_path: str, quote: str,
-                           turn_seq: int, verified: bool) -> InterviewEvidence:
-        row = InterviewEvidence(session_id=session_id, doc_path=doc_path,
-                                quote=quote, turn_seq=turn_seq, verified=verified)
+                           turn_seq: int, verified: bool,
+                           review: str = "auto") -> InterviewEvidence:
+        row = InterviewEvidence(session_id=session_id, doc_path=doc_path, quote=quote,
+                                turn_seq=turn_seq, verified=verified, review=review)
         self.session.add(row)
         await self.session.flush()
         return row
@@ -109,6 +110,20 @@ class InterviewRepo:
     async def list_evidence(self, session_id: UUID) -> list[InterviewEvidence]:
         stmt = (select(InterviewEvidence)
                 .where(InterviewEvidence.session_id == session_id)
+                .order_by(InterviewEvidence.created_at))
+        return list((await self.session.execute(stmt)).scalars())
+
+    async def set_evidence_review(self, evidence_id: UUID, review: str) -> InterviewEvidence:
+        """批次審裁決(T5/T10):pending → accepted/reverted。"""
+        row = await self.session.get(InterviewEvidence, evidence_id)
+        row.review = review
+        await self.session.flush()
+        return row
+
+    async def list_pending_evidence(self, session_id: UUID) -> list[InterviewEvidence]:
+        stmt = (select(InterviewEvidence)
+                .where(InterviewEvidence.session_id == session_id,
+                       InterviewEvidence.review == "pending")
                 .order_by(InterviewEvidence.created_at))
         return list((await self.session.execute(stmt)).scalars())
 

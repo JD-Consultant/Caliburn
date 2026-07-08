@@ -123,6 +123,21 @@ async def test_evidence_roundtrip(db_session):
 
 
 @pytest.mark.asyncio
+async def test_evidence_review_roundtrip(db_session):
+    """T5:evidence.review 預設 auto、可標 pending、批次審裁決 + pending 查詢。"""
+    p = await _profile(db_session)
+    repo = InterviewRepo(db_session)
+    s = await repo.create(p.id)
+    auto = await repo.add_evidence(s.id, doc_path="a.b.c", quote="x", turn_seq=1, verified=True)
+    pend = await repo.add_evidence(s.id, doc_path="d.e.f", quote="y", turn_seq=1,
+                                   verified=True, review="pending")
+    assert auto.review == "auto" and pend.review == "pending"
+    assert [e.id for e in await repo.list_pending_evidence(s.id)] == [pend.id]
+    await repo.set_evidence_review(pend.id, "accepted")
+    assert await repo.list_pending_evidence(s.id) == []
+
+
+@pytest.mark.asyncio
 async def test_suggestions_pending_flow(db_session):
     p = await _profile(db_session)
     repo = InterviewRepo(db_session)

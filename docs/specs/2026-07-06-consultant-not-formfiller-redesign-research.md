@@ -574,7 +574,18 @@ slot_paths 由 doc 導出(跨任務:所有任務×11 槽)→ ④select_schema(ro
 失敗精簡錯誤重試 1 → ⑥apply_scribe。interview service **原不持 knowledge port**,route(T9)注入;
 T4b 測試用 fake。**backstop 佇列**=收尾 pass(T12);T4b 只在重試仍敗時回空結果不擋回合。
 
-> §16.5+ 留給後續 task 的發現與校準 #3(sim v2 數據;T14 產出)。
+### 16.5 T5 風險分流:態度改走建議層 + evidence.review pending(2026-07-08)
+T4a 施作器把 `record_attitude_pool` 寫成直寫,**與風險矩陣(spec §3.3)+§15.3 牴觸**——態度
+要「員工確認才落」(社會期許偏誤,§10.5;「放進特質欄?」)。T5 修正路由(施作器建寫入
+機制、T5 定風險政策):
+- **態度池選 → 建議層**(record_attitude_pool 改產 suggestion,不直寫)。
+- **直寫(池 K/S/O verified、set_slot 直改)→ evidence.review='pending'**(低風險自動落地待
+  批次審;spec §11.3)。migration 0005 加 evidence.review(auto/pending/accepted/reverted;
+  §16.3 記過 T2 未加、併 T5)。suggestion 路由的 evidence 保持 review='auto'(靠 suggestion
+  表追蹤)。accept/revert 端點=T10;undo=既有版本機制。
+- 更新 test_pool_attitude_written_to_doc_level → 改斷言態度=suggestion(非回歸,是政策修正)。
+
+> §16.6+ 留給後續 task 的發現與校準 #3(sim v2 數據;T14 產出)。
 
 ## 17) 路線圖彙整(刻意不進 v2 的,一處收攏;各有出處,防遺忘)
 

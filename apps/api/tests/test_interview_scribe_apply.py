@@ -39,10 +39,24 @@ def test_pool_knowledge_written_to_block():
     assert res.evidence[0]["verified"] is True
 
 
-def test_pool_attitude_written_to_doc_level():
+def test_pool_attitude_goes_to_suggestion_not_direct():
+    # §16.5:態度池選走建議層(員工確認才落),不直寫
     r = [{"type": "record_attitude_pool", "pool_id": "A01", "quote": "設計案例再設計"}]
     res = _apply(r, employee_texts=["設計案例再設計，很細心"])
-    assert res.new_doc["ocs_attitude"]["attitudes"] == [{"code": "A01", "name": "謹慎細心"}]
+    assert res.new_doc is None
+    assert res.suggestions[0]["doc_path"] == "ocs_attitude.attitudes"
+    assert res.suggestions[0]["new_value"] == {"code": "A01", "name": "謹慎細心"}
+
+
+def test_direct_writes_marked_pending_suggestions_stay_auto():
+    # 低風險直寫(池 K/S/O、set_slot)→ evidence.review='pending';自訂/態度→無 pending
+    pool = _apply([{"type": "record_task_pool", "kind": "knowledge", "task": TASK,
+                    "pool_id": "K01", "quote": "我要先讀懂需求規格"}])
+    assert pool.evidence[0]["review"] == "pending"
+    custom = _apply([{"type": "record_task_custom", "kind": "knowledge", "task": TASK,
+                      "name": "ERP 知識", "quote": "要懂我們自己的 ERP"}],
+                    employee_texts=["要懂我們自己的 ERP"])
+    assert custom.evidence[0].get("review", "auto") == "auto"   # 建議路由不標 pending
 
 
 # ---- 語義守衛:pool_id 必須屬 pools[kind] ----

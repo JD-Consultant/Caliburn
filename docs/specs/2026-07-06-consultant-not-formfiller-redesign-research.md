@@ -612,7 +612,33 @@ bug」→ LLM **自主呼叫 knowledge_search_occupations**(口語自動精簡�
 屆時一併退役。probe 深度/風格=consultant.py 模組常數(§10.6 收編 1「設定常數不寫死」)。
 顧問 prompt 全文素材=prompts spec §1 + §15 問句庫(BEI/CDM/OPKS/hedging/揭露/注入硬化)。
 
-> §16.9+ 留給後續 task 的發現與校準 #3(sim v2 數據;T14 產出)。
+### 16.9 T9 管線改組計畫(2026-07-08;keystone 整合)
+研究關卡:v1 `run_turn`=build_prompt→select_schema→executor.apply(單 LLM 落槽);v2 改成
+scribe→帳本→consultant。DI:`get_knowledge` 在 `app/api/deps.py`(乾淨,測試 override)。
+改組:
+- `run_turn(profile_id, text, *, db, llm, knowledge)`:①append 員工 turn ②scribe_pass
+  (書記寫入+risk 分流)③持久化 doc(雙 token 衝突→重放 apply_scribe 同 records,故
+  ScribeResult 加 records/pools/pool_items 供重放)④帳本 note_attempt+ledger_state 存回
+  ⑤build_consultant_messages→chat_with_tools(role=interview,tools=CONSULTANT_TOOLS,
+  dispatch=partial(dispatch_tool,knowledge))⑥保底:consultant text 空→next_gap 合成問題
+  ⑦append 顧問 turn。
+- evidence 帶 review(T5);progress→coverage(帳本;route `_progress` 改 ledger.can_finish)。
+- route interview:turn 注入 knowledge;v1 `_llm_turn`/build_prompt/turn_output_schema 路徑退役
+  (context.py 留檔待 T15 清)。**test_interview_service 改寫 v2**(fake llm+knowledge);
+  green-before==green-after 對 v2 行為(v1 落槽測試汰換,非回歸)。⑧活體全回合 smoke。
+
+### 16.10 T9 全回合活體 smoke:v2 管線端到端成立(2026-07-08)
+真 gpt-4o-mini 書記 + 真 gpt-4.1-mini 顧問 + 真 DB + StubKnowledge。輸入**一句自然話**
+「我每天早上巡檢產線設備,大概花兩小時,用點檢表一台一台看,發現異常就開維修單」→
+- 書記**一次抽 4 細項**(frequency=每天、duration=2、inputs=點檢表、exceptions=開維修單)全溯源;
+- **自動對應官方**:skills=[S01 點檢操作]、knowledge=[K01 設備保養原理](真官方碼,零幻覺);
+- 6 筆 evidence 全 review=pending(低風險直寫待批);
+- 顧問**回述+CDM 線索追問**「你通常會特別注意哪些設備或項目?」;
+- coverage={filled:1,required:4}(未說工時佔比→任務未分級,顧問將問——邏輯正確)。
+**直接反轉 §1 診斷的「填表機器人/不思考」**:一句話多事實抽取 + 官方對應 + 回述追問。
+T9 keystone 整合驗收成立;v2 第一次端到端跑起來。
+
+> §16.11+ 留給後續 task 的發現與校準 #3(sim v2 數據;T14 產出)。
 
 ## 17) 路線圖彙整(刻意不進 v2 的,一處收攏;各有出處,防遺忘)
 

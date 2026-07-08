@@ -1,23 +1,22 @@
-"""回合服務(T8;spec §4 ①–⑦):載入 → 組脈絡 → 一呼 → 驗 → 執 → 寫回 → 回應。
+"""回合服務 v2(ADR 0027 §5;spec §5):載入 → **書記 pass** → 帳本 → **顧問 chat_with_tools**
+→ 保底 → 寫回。書記與顧問是兩次獨立呼叫(顧問說話零格式負擔、書記受限抽取,兩邊都安全)。
 
-寫回走 DocRepo.upsert_draft 帶雙 token(編輯器同一條 seam,ADR 0015/0023):
-409 → 重讀最新重放一次;再衝突 → **建議化降級**(把本回合直改路由成建議,零覆蓋人)。
-LLM 輸出結構由受限解碼保證;語義違規(pydantic 拒)→ 帶錯誤重問一次 → 仍壞 raise
-LlmSchemaError(route 轉 502;session 不毀)。
+寫回走 DocRepo.upsert_draft 帶雙 token(ADR 0015/0023):409 → 重讀重放 apply_scribe 同
+records(不重呼 LLM)一次;再衝突 → 直改降級(零覆蓋人)。書記失敗不擋顧問回覆
+(fail-open 對話、fail-closed 寫入)。
 """
 import logging
 from dataclasses import dataclass, field
+from functools import partial
 from uuid import UUID
 
-from pydantic import ValidationError
-
 from app.adapters.interview_repo import InterviewRepo
-from app.adapters.llm_openrouter import LlmSchemaError
 from app.adapters.persistence import DocConflictError, DocRepo
-from app.interview import executor as ex
-from app.interview.commands import TurnOutput, turn_output_schema
-from app.interview.context import build_prompt
+from app.interview import consultant as C
+from app.interview import ledger as L
+from app.interview.scribe import apply_scribe, scribe_pass
 from app.interview.slots import SLOT_DEFS
+from app.interview.tools import CONSULTANT_TOOLS, dispatch_tool
 
 logger = logging.getLogger("caliburn")
 
@@ -36,18 +35,11 @@ class TurnResult:
     phase: str = "deep"
     focus: dict = field(default_factory=dict)
     guard_log: list[str] = field(default_factory=list)
-
-
-def _slot_paths(focus: dict) -> list[str] | None:
-    """deep 段寫入 path enum:焦點任務 11 槽 + 工作摘要(與 executor 白名單同源)。"""
-    tp = (focus or {}).get("task_path")
-    if not tp:
-        return None
-    return [f"{tp}.details.{k}" for k in SLOT_DEFS] + ["ocs_profile.job_description"]
+    coverage: dict = field(default_factory=dict)   # {filled,required}(進度=覆蓋率)
 
 
 def _pending_label(s) -> str:
-    """待核准建議的短標籤(給 context;員工可能問到卡片)。"""
+    """待核准建議的短標籤(給顧問 context;員工可能問到卡片)。"""
     dp = s.doc_path or ""
     if dp.startswith("add_task:") or dp.startswith("add_duty:"):
         name = (s.new_value or {}).get("name") if isinstance(s.new_value, dict) else None
@@ -57,23 +49,36 @@ def _pending_label(s) -> str:
     return f"更新 {SLOT_DEFS[leaf].label if leaf in SLOT_DEFS else leaf}"
 
 
-async def _llm_turn(llm, prompt: str, schema: dict) -> TurnOutput:
-    data = await llm.select_schema(prompt, schema, role="interview",
-                                   schema_name="turn_output")
+async def _persist_scribe_doc(doc_repo, profile_id, latest, scribe_res, *,
+                              employee_texts, human_touched) -> tuple[bool, list[str]]:
+    """書記直改寫回(雙 token;409→重讀重放同 records 一次;再衝突→放棄直改,保留
+    evidence/suggestions,人的編輯優先 ADR 0025)。回 (doc_changed, extra_guard)。"""
+    if scribe_res.new_doc is None:
+        return False, []
     try:
-        return TurnOutput.model_validate(data)
-    except ValidationError as e:
-        logger.warning("turn output 語義違規,重問一次:%s", str(e)[:200])
-        data2 = await llm.select_schema(
-            prompt + f"\n(上次輸出不合法:{str(e)[:150]}——請修正後重出)", schema,
-            role="interview", schema_name="turn_output")
+        await doc_repo.upsert_draft(profile_id, scribe_res.new_doc,
+                                    expected_version=(latest or {}).get("version"),
+                                    expected_revision=(latest or {}).get("revision"))
+        return True, []
+    except DocConflictError:
+        fresh = await doc_repo.latest(profile_id)
+        fdoc = (fresh or {}).get("content") or {}
+        replay = apply_scribe(scribe_res.records, doc=fdoc,
+                              pool_items=scribe_res.pool_items, pools=scribe_res.pools,
+                              employee_texts=employee_texts, human_touched=human_touched)
+        if replay.new_doc is None:
+            return False, ["conflict:重放後無直改"]
         try:
-            return TurnOutput.model_validate(data2)
-        except ValidationError as e2:
-            raise LlmSchemaError(f"turn output invalid twice: {e2}") from e2
+            await doc_repo.upsert_draft(profile_id, replay.new_doc,
+                                        expected_version=fresh.get("version"),
+                                        expected_revision=fresh.get("revision"))
+            return True, ["conflict:重放成功"]
+        except DocConflictError:
+            return False, ["conflict×2:放棄直改(人的編輯優先)"]
 
 
-async def run_turn(profile_id: UUID, user_text: str, *, db, llm) -> TurnResult:
+async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> TurnResult:
+    """v2 一回合(ADR 0027 §5)。knowledge=KnowledgePort(書記建池 + 顧問工具)。"""
     repo = InterviewRepo(db)
     doc_repo = DocRepo(db)
 
@@ -85,87 +90,57 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm) -> TurnResult:
     doc = (latest or {}).get("content") or {}
     prev_turns = await repo.list_turns(session.id)
     employee_texts = [t.text for t in prev_turns if t.role == "employee"] + [user_text]
-    recent = [(t.role, t.text) for t in prev_turns] + [("employee", user_text)]
+    recent = [(t.role, t.text) for t in prev_turns]
+    human_touched = list(session.human_touched or [])
     emp_turn = await repo.append_turn(session.id, role="employee", text=user_text)
 
-    pending_labels = [_pending_label(s) for s in await repo.list_pending(session.id)]
-    prompt, choice_ids = build_prompt(
-        doc=doc, phase=session.phase, focus=session.focus or {},
-        counters=session.counters or {}, recent_turns=recent, user_text=user_text,
-        pending=pending_labels)
-    turn = await _llm_turn(
-        llm, prompt, turn_output_schema(choice_ids, slot_paths=_slot_paths(session.focus)))
-
-    res = ex.apply(turn, doc=doc, human_touched=list(session.human_touched or []),
-                   counters=dict(session.counters or {}), focus=dict(session.focus or {}),
-                   employee_texts=employee_texts)
-
-    # 寫回文件(同一條 seam,雙 token;409 → 重讀重放一次;再衝突 → 建議化)
-    doc_changed = False
-    if res.new_doc is not None:
-        try:
-            await doc_repo.upsert_draft(
-                profile_id, res.new_doc,
-                expected_version=(latest or {}).get("version"),
-                expected_revision=(latest or {}).get("revision"))
-            doc_changed = True
-        except DocConflictError:
-            fresh = await doc_repo.latest(profile_id)
-            fdoc = (fresh or {}).get("content") or {}
-            res = ex.apply(turn, doc=fdoc, human_touched=list(session.human_touched or []),
-                           counters=dict(session.counters or {}),
-                           focus=dict(session.focus or {}), employee_texts=employee_texts)
-            if res.new_doc is not None:
-                try:
-                    await doc_repo.upsert_draft(
-                        profile_id, res.new_doc,
-                        expected_version=fresh.get("version"),
-                        expected_revision=fresh.get("revision"))
-                    doc_changed = True
-                except DocConflictError:
-                    # 二度衝突:全部直改降級為建議(零覆蓋人;ADR 0025)
-                    write_paths = [c.path for c in turn.commands
-                                   if c.type in ("set_slot", "correct_slot")]
-                    res = ex.apply(turn, doc=fdoc,
-                                   human_touched=list(session.human_touched or []) + write_paths,
-                                   counters=dict(session.counters or {}),
-                                   focus=dict(session.focus or {}),
-                                   employee_texts=employee_texts)
-                    res.guard_log.append("conflict×2:直改全數建議化")
-
-    # 持久化副作用(evidence/suggestions/counters/skips/advance)
-    for ev in res.evidence:
+    # ① 書記 pass(便宜、序列先行;失敗不擋顧問——fail-open 對話、fail-closed 寫入)
+    scribe_res = await scribe_pass(llm, knowledge, doc=doc, employee_texts=employee_texts,
+                                   human_touched=human_touched)
+    doc_changed, extra_guard = await _persist_scribe_doc(
+        doc_repo, profile_id, latest, scribe_res,
+        employee_texts=employee_texts, human_touched=human_touched)
+    for ev in scribe_res.evidence:
         await repo.add_evidence(session.id, doc_path=ev["doc_path"], quote=ev["quote"],
-                                turn_seq=emp_turn.seq, verified=ev["verified"])
-    for sug in res.suggestions:
+                                turn_seq=emp_turn.seq, verified=ev["verified"],
+                                review=ev.get("review", "auto"))
+    for sug in scribe_res.suggestions:
         await repo.add_suggestion(session.id, doc_path=sug["doc_path"],
                                   old_value=sug["old_value"], new_value=sug["new_value"],
                                   reason=sug["reason"], turn_seq=emp_turn.seq)
 
-    counters = dict(session.counters or {})
-    for k, v in res.counters_delta.items():
-        counters[k] = v
-    focus = dict(session.focus or {})
-    if res.skipped_add:
-        focus["skipped"] = list(dict.fromkeys((focus.get("skipped") or []) + res.skipped_add))
-    phase = session.phase
-    if res.advanced_to:
-        if res.advanced_to == "review":
-            phase = "review"
-        else:
-            focus["task_path"] = res.advanced_to
-    await repo.update_session(session.id, counters=counters, focus=focus, phase=phase)
+    work_doc = (await doc_repo.latest(profile_id) or {}).get("content") or doc
 
-    # 顧問回合恆落逐字稿(executor 保底輸出保證非空;or 為回歸保險——
-    # 靜默回合曾讓稽核軌跡消失+近窗對話殘缺,實戰死穴)
-    consultant_text = "\n".join(x for x in [
-        res.say, (res.question or {}).get("text"), (res.widget or {}).get("question"),
-    ] if x)
-    await repo.append_turn(session.id, role="consultant",
-                           text=consultant_text or "(整理中)",
-                           commands=[c.model_dump() for c in turn.commands])
+    # ② 帳本:先評上一輪 gap 是否進帳(飽和偵測),再算本輪 next_gap(給顧問當提示)
+    state = dict(session.ledger_state or {})
+    state = L.note_attempt(state, state.get("last_gap"), scribe_res.progressed)
+    state["last_gap"] = L.next_gap(work_doc, state, {})
+
+    # ③ 顧問 chat_with_tools(說話 + READ 工具;無寫入權)
+    pending_labels = [_pending_label(s) for s in await repo.list_pending(session.id)]
+    messages = C.build_consultant_messages(
+        doc=work_doc, ledger_state=state, recent_turns=recent,
+        pending=pending_labels, employee_text=user_text)
+    dispatch = partial(dispatch_tool, knowledge=knowledge)
+    chat = await llm.chat_with_tools(role="interview", messages=messages,
+                                     tools=CONSULTANT_TOOLS, dispatch=dispatch)
+
+    # ④ 保底:顧問恆有可見回覆 + 往前的問題(靜默回合=實戰死穴)
+    say = (chat.text or "").strip()
+    if not say:
+        nxt = state.get("last_gap")
+        say = (f"我們接著聊「{C.gap_label(work_doc, nxt)}」吧?" if nxt
+               else "謝謝你,我這邊先整理一下——還有想補充的嗎?")
+
+    await repo.update_session(session.id, ledger_state=state)
+    await repo.append_turn(session.id, role="consultant", text=say,
+                           commands=[{"tool_trace": chat.tool_trace, "stopped": chat.stopped}])
 
     pending = await repo.list_pending(session.id)
-    return TurnResult(say=res.say, question=res.question, widget=res.widget,
-                      doc_changed=doc_changed, pending_suggestions=len(pending),
-                      phase=phase, focus=focus, guard_log=res.guard_log)
+    guard = list(scribe_res.guard_log) + extra_guard
+    if scribe_res.records_failed:
+        guard.append("scribe:抽取重試仍敗(交 backstop)")
+    return TurnResult(say=say, question=None, widget=None, doc_changed=doc_changed,
+                      pending_suggestions=len(pending), phase=session.phase,
+                      focus=dict(session.focus or {}), guard_log=guard,
+                      coverage=L.coverage(work_doc, state))

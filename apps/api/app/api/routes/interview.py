@@ -15,9 +15,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.adapters.interview_repo import ActiveInterviewExists, InterviewRepo
 from app.adapters.llm_openrouter import LlmSchemaError
 from app.adapters.persistence import DocRepo
+from app.api.deps import get_knowledge
 from app.api.routes.ai import get_llm
 from app.api.routes.documents import _require_profile
-from app.core.ports import LlmPort
+from app.core.ports import KnowledgePort, LlmPort
 from app.database import get_db
 from app.interview.diff import STABLE_ID_KEYS
 from app.interview.service import NoActiveInterview, run_turn
@@ -89,6 +90,7 @@ async def interview_turn(
     body: dict = Body(...),
     db: AsyncSession = Depends(get_db),
     llm: LlmPort | None = Depends(get_llm),
+    knowledge: KnowledgePort = Depends(get_knowledge),
 ):
     await _require_profile(profile_id, db)
     if llm is None:
@@ -98,18 +100,17 @@ async def interview_turn(
     if not text:
         raise HTTPException(status_code=422, detail={"code": "empty_text"})
     try:
-        out = await run_turn(profile_id, text, db=db, llm=llm)
+        out = await run_turn(profile_id, text, db=db, llm=llm, knowledge=knowledge)
     except NoActiveInterview:
         raise HTTPException(status_code=409, detail={"code": "no_active_interview"})
     except LlmSchemaError as e:
-        # 受限解碼失效/輸出兩度違規(0024 保險絲):顯式 502,session 完好可重試
+        # 受限解碼失效(0024 保險絲):顯式 502,session 完好可重試
         raise HTTPException(status_code=502, detail={
             "code": "llm_schema_error", "message": str(e)[:200]})
-    latest = await DocRepo(db).latest(profile_id)
-    doc = (latest or {}).get("content") or {}
+    # 進度=覆蓋率(spec §11.1;帳本 filled/required),取代 v1 task_index/total
     return {"say": out.say, "question": out.question, "widget": out.widget,
             "doc_changed": out.doc_changed, "pending_suggestions": out.pending_suggestions,
-            "progress": _progress(doc, out.focus, out.phase)}
+            "progress": {"phase": out.phase, "coverage": out.coverage}}
 
 
 @router.get("/{profile_id}/interview")

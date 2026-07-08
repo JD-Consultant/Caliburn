@@ -6,7 +6,7 @@ from fastapi import HTTPException
 
 from app.adapters.interview_repo import InterviewRepo
 from app.adapters.persistence import DocRepo
-from app.adapters.stubs import StubLlm
+from app.adapters.stubs import StubKnowledge, StubLlm
 from app.api.routes.interview import (
     get_interview, interview_turn, review_interview, start_interview,
 )
@@ -36,10 +36,10 @@ async def _profile(db, *, with_doc=True):
     return p
 
 
-GOOD = {"commands": [
-    {"type": "set_slot", "path": FREQ, "value": "每雙週", "quote": "每兩週跑一次"},
-    {"type": "ask", "question": "一次跑多久?", "target_path": f"{TASK_PATH}.details.duration"},
-], "saturation": False}
+# v2:書記 records(非 v1 turn commands)
+GOOD = {"records": [
+    {"type": "set_slot", "path": FREQ, "value": "每雙週", "quote": "每兩週跑一次"}]}
+K = StubKnowledge()
 
 
 @pytest.mark.asyncio
@@ -66,18 +66,19 @@ async def test_turn_full_loop_and_errors(db_session):
     p = await _profile(db_session)
     # 未 start → 409
     with pytest.raises(HTTPException) as e:
-        await interview_turn(p.id, {"text": "hi"}, db=db_session, llm=StubLlm(select_result=GOOD))
+        await interview_turn(p.id, {"text": "hi"}, db=db_session,
+                             llm=StubLlm(select_result=GOOD), knowledge=K)
     assert e.value.status_code == 409
     # llm 未配置 → 503
     await start_interview(p.id, db=db_session)
     with pytest.raises(HTTPException) as e2:
-        await interview_turn(p.id, {"text": "hi"}, db=db_session, llm=None)
+        await interview_turn(p.id, {"text": "hi"}, db=db_session, llm=None, knowledge=K)
     assert e2.value.status_code == 503
-    # happy path
+    # happy path:書記寫槽 + 顧問回覆 + 覆蓋率進度
     out = await interview_turn(p.id, {"text": "我們每兩週跑一次回歸"},
-                               db=db_session, llm=StubLlm(select_result=GOOD))
-    assert out["doc_changed"] is True and out["question"]["text"] == "一次跑多久?"
-    assert out["progress"]["task_index"] == 1
+                               db=db_session, llm=StubLlm(select_result=GOOD), knowledge=K)
+    assert out["doc_changed"] is True and out["say"].strip()
+    assert out["progress"]["coverage"]["required"] > 0
 
 
 @pytest.mark.asyncio
@@ -85,7 +86,7 @@ async def test_get_interview_full_view(db_session):
     p = await _profile(db_session)
     await start_interview(p.id, db=db_session)
     await interview_turn(p.id, {"text": "我們每兩週跑一次回歸"},
-                         db=db_session, llm=StubLlm(select_result=GOOD))
+                         db=db_session, llm=StubLlm(select_result=GOOD), knowledge=K)
     view = await get_interview(p.id, db=db_session)
     assert [t["role"] for t in view["turns"]] == ["employee", "consultant"]
     assert view["evidence"][0]["verified"] is True
@@ -100,7 +101,7 @@ async def test_review_status_only(db_session):
     s = await repo.get_active(p.id)
     await repo.merge_human_touched(s.id, [FREQ])   # 逼建議
     await interview_turn(p.id, {"text": "每兩週跑一次"},
-                         db=db_session, llm=StubLlm(select_result=GOOD))
+                         db=db_session, llm=StubLlm(select_result=GOOD), knowledge=K)
     view = await get_interview(p.id, db=db_session)
     sug_id = view["suggestions"][0]["id"]
     out = await review_interview(p.id, {"accept": [sug_id]}, db=db_session)

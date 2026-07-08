@@ -189,6 +189,16 @@ def test_can_finish_all_light_duty_ok():
     assert ok, blk
 
 
+def test_coverage_ratio():
+    empty = _doc([_unit([_core_task(pct=100, tid="C")], uid="U1")], attitudes=0)
+    cov = L.coverage(empty, {})
+    assert cov["required"] == (len(SLOT_DEFS) + 1 + 3) + L.MIN_A   # core 15 + 態度 2
+    # 全填任務 + 態度足 → filled == required
+    full = _finishable()
+    fc = L.coverage(full, {})
+    assert fc["filled"] == fc["required"]
+
+
 def test_can_finish_stalled_gap_does_not_block():
     doc = _doc([_unit([_task({k: "x" for k in SLOT_DEFS if k != "exceptions"}
                              | {"time_share_pct": 100}, outputs=1, p=1, k=2, s=2, tid="C")],

@@ -20,7 +20,8 @@ from app.api.routes.ai import get_llm
 from app.api.routes.documents import _require_profile
 from app.core.ports import KnowledgePort, LlmPort
 from app.database import get_db
-from app.interview import ledger as L
+from app.interview import consultant, ledger as L
+from app.interview.backstop import backstop_pass
 from app.interview.diff import STABLE_ID_KEYS
 from app.interview.service import NoActiveInterview, run_turn
 
@@ -114,6 +115,42 @@ async def interview_turn(
     return {"say": out.say, "question": out.question, "widget": out.widget,
             "doc_changed": out.doc_changed, "pending_suggestions": out.pending_suggestions,
             "progress": {"phase": out.phase, "coverage": out.coverage}}
+
+
+@router.post("/{profile_id}/interview:finish")
+async def finish_interview(
+    profile_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    llm: LlmPort | None = Depends(get_llm),
+):
+    """收尾:backstop 複查(漏記/出處)→ 建議化 → 轉 review 階段(spec §6/§10.1)。
+    backstop 是加分項:llm 未配置或失敗時仍可收尾(只是不複查)。"""
+    await _require_profile(profile_id, db)
+    repo = InterviewRepo(db)
+    session = await repo.get_active(profile_id)
+    if session is None:
+        raise HTTPException(status_code=409, detail={"code": "no_active_interview"})
+    latest = await DocRepo(db).latest(profile_id)
+    doc = (latest or {}).get("content") or {}
+    state = session.ledger_state or {}
+    _, blockers = L.can_finish(doc, state, {})
+    gap_paths = [b for b in blockers if not b.startswith("share_sum")]
+    if llm is not None:
+        turns = await repo.list_turns(session.id)
+        emp = [t.text for t in turns if t.role == "employee"]
+        evidence = await repo.list_evidence(session.id)
+        empty_gaps = [{"gap": g, "label": consultant.gap_label(doc, g)} for g in gap_paths]
+        recorded = [{"path": e.doc_path, "quote": e.quote} for e in evidence]
+        res = await backstop_pass(llm, employee_texts=emp, empty_gaps=empty_gaps,
+                                  recorded=recorded)
+        for sug in res.to_suggestions():
+            await repo.add_suggestion(session.id, doc_path=sug["doc_path"],
+                                      old_value=sug["old_value"], new_value=sug["new_value"],
+                                      reason=sug["reason"], turn_seq=len(turns))
+    await repo.update_session(session.id, phase="review")
+    pending = await repo.list_pending(session.id)
+    return {"phase": "review", "blockers": len(blockers),
+            "pending_suggestions": len(pending)}
 
 
 @router.get("/{profile_id}/interview")

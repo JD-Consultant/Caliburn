@@ -666,7 +666,27 @@ backstop_pass:收尾一呼、便宜模型(role=select)、只答兩題(misses 漏
 →轉 review 階段;backstop 是加分項(llm 無/失敗仍可收尾)。6 純函式 + finish 整合測綠。
 **至此 ADR 0027 四組件(顧問/書記/帳本/backstop)全部實作完畢。**
 
-> §16.14+ 留給後續 task 的發現與校準 #3(sim v2 數據;T14 產出)。
+## 16.14 校準 #3(T14;2026-07-08;sim v2 活體跑,誠實記錄)
+
+v2 sim 全管線活體跑(真書記+帳本+顧問,模擬員工照黃金範本事實表)。**FAIL,但拆解後
+是混合原因,管線本身健康**:
+- **grounding 好**:evidence_verified_rate=**0.94**、avg_quote_len≈34、progressed_turn_rate=1.0、
+  outputs 對應官方碼 O2.2 正確。核心不變量(引文逐字、進度確定)成立。
+- **slot_keyword_accuracy=0.27–0.36(不可信為閘門)**:三個原因——
+  (1) **模擬員工漂移**(便宜模型即興編事實表外細節,Sim2Real;原 sim 註解早警告);
+  (2) **關鍵字精確匹配對「會改寫語意的抽取器」無效**:如 wait_points='DevOps在Slack通知
+      環境空出來' 語意正確卻不含硬編關鍵字「等/排隊/小時」→ 誤判為錯(**量尺問題**);
+  (3) **書記少量誤填**(真問題):inputs='transaction_id'(員工是說「檢查」該欄,被當「準備
+      材料」);volume 偶爾抓錯數字。
+- **判定**:keyword-exact-match 不是 v2 的有效品質量尺(v2 抽語意非關鍵字)。**閘門改為有效
+  的確定性指標**:evidence_verified_rate≥0.8 + progressed_turn_rate≥0.8(grounding=核心不變量,
+  本輪 0.94/1.0 PASS);slot_keyword_accuracy 降為**資訊訊號**(非硬閘門),待加 LLM-judge
+  語意評分才回升為閘門。**不調產品門檻去假裝過關**(避免 gaming)。
+- **follow-up**(記路線圖 §17):① sim 加 **LLM-judge 語意 slot 評分**(取代脆弱關鍵字);
+  ② sim 用**更強/更受限的模擬員工**(降漂移);③ 書記 prompt **收斂過填**(只填「明確在描述
+  該面向」的內容,非旁枝細節)——各需自身校準,不在 T14 內硬改。
+- **最強品質證據仍是 §16.10 live smoke**(單句自然話→4 正確細項+官方碼+回述追問),因其員工
+  輸入連貫;sim 的弱點=漂移員工+脆弱評分,非產品。
 
 ## 17) 路線圖彙整(刻意不進 v2 的,一處收攏;各有出處,防遺忘)
 
@@ -681,6 +701,9 @@ backstop_pass:收尾一呼、便宜模型(role=select)、只答兩題(misses 漏
 | self-consistency | 高價值低信心欄位 N 次投票 | §8.4 延後項 |
 | Pydantic AI 遷移 | 唯一有原則的框架升級門(prepare/prepare_tools) | §8.5;ADR 0024 |
 | 信任漸進調權 | 依接受率放寬自動放行範圍 | ADR 0025 未來縫 |
+| sim LLM-judge 評分 | 語意 slot 評分取代脆弱 keyword-exact(才是有效品質閘門) | §16.14 校準#3 |
+| sim 更強模擬員工 | 降 Sim2Real 漂移(便宜模型即興編表外細節) | §16.14 |
+| 書記收斂過填 | prompt 只填「明確描述該面向」的內容,非旁枝細節 | §16.14(inputs='transaction_id' 誤填) |
 
 ## 來源
 - McClelland (1998) *Identifying Competencies with Behavioral-Event Interviews*, Psych. Science. https://journals.sagepub.com/doi/10.1111/1467-9280.00065

@@ -18,7 +18,7 @@ import {
   useStartInterview,
 } from "@/hooks/useInterview";
 import { applyAccepted } from "@/lib/interviewDoc";
-import type { InterviewProgress, InterviewWidget, OcsDocument } from "@/types";
+import type { ChoiceWidget, InterviewProgress, OcsDocument } from "@/types";
 
 const PHASE_LABEL: Record<string, string> = {
   survey: "盤點", deep: "深掘", review: "總審",
@@ -43,7 +43,7 @@ function ProgressHeader({ progress }: { progress: InterviewProgress | null }) {
 }
 
 function ChoiceCard({ widget, onSubmit, busy }: {
-  widget: InterviewWidget; onSubmit: (text: string) => void; busy: boolean;
+  widget: ChoiceWidget; onSubmit: (text: string) => void; busy: boolean;
 }) {
   const [picked, setPicked] = useState<string[]>([]);
   return (
@@ -165,7 +165,7 @@ export function InterviewPanel({ profileId, doc, onApplyDoc }: {
             <Loader2 className="h-3.5 w-3.5 animate-spin" /> 顧問思考中…
           </div>
         )}
-        {widget && !busy && (
+        {widget && widget.kind !== "open_picker" && !busy && (
           <ChoiceCard widget={widget} onSubmit={send} busy={busy} />
         )}
         {turn.isError && (

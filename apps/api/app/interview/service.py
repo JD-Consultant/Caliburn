@@ -6,11 +6,13 @@ records(不重呼 LLM)一次;再衝突 → 直改降級(零覆蓋人)。書記�
 (fail-open 對話、fail-closed 寫入)。
 """
 import logging
+import time
 from dataclasses import dataclass, field
 from functools import partial
 from uuid import UUID
 
 from app.adapters.interview_repo import InterviewRepo
+from app.adapters.llm_openrouter import model_for_role
 from app.adapters.persistence import DocConflictError, DocRepo
 from app.interview import consultant as C
 from app.interview import ledger as L
@@ -95,8 +97,10 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> T
     emp_turn = await repo.append_turn(session.id, role="employee", text=user_text)
 
     # ① 書記 pass(便宜、序列先行;失敗不擋顧問——fail-open 對話、fail-closed 寫入)
+    t_scribe = time.perf_counter()
     scribe_res = await scribe_pass(llm, knowledge, doc=doc, employee_texts=employee_texts,
                                    human_touched=human_touched)
+    scribe_ms = int((time.perf_counter() - t_scribe) * 1000)
     doc_changed, extra_guard = await _persist_scribe_doc(
         doc_repo, profile_id, latest, scribe_res,
         employee_texts=employee_texts, human_touched=human_touched)
@@ -122,8 +126,10 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> T
         doc=work_doc, ledger_state=state, recent_turns=recent,
         pending=pending_labels, employee_text=user_text)
     dispatch = partial(dispatch_tool, knowledge=knowledge)
+    t_chat = time.perf_counter()
     chat = await llm.chat_with_tools(role="interview", messages=messages,
                                      tools=CONSULTANT_TOOLS, dispatch=dispatch)
+    chat_ms = int((time.perf_counter() - t_chat) * 1000)
 
     # ④ 保底:顧問恆有可見回覆 + 往前的問題(靜默回合=實戰死穴)
     say = (chat.text or "").strip()
@@ -135,6 +141,14 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> T
     await repo.update_session(session.id, ledger_state=state)
     await repo.append_turn(session.id, role="consultant", text=say,
                            commands=[{"tool_trace": chat.tool_trace, "stopped": chat.stopped}])
+
+    # 稽核落庫(T13;每回合書記+顧問各一列;§13 收編5 多租戶 observability)
+    await repo.add_llm_call(session.id, turn_seq=emp_turn.seq, role="select",
+                            model=model_for_role("select"), duration_ms=scribe_ms,
+                            guard_verdicts=list(scribe_res.guard_log)[:30])
+    await repo.add_llm_call(session.id, turn_seq=emp_turn.seq, role="interview",
+                            model=model_for_role("interview"), duration_ms=chat_ms,
+                            tool_calls=chat.tool_trace)
 
     pending = await repo.list_pending(session.id)
     guard = list(scribe_res.guard_log) + extra_guard

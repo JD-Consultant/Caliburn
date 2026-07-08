@@ -63,6 +63,8 @@ async def test_scribe_writes_slot_and_consultant_replies(db_session):
     assert [t.role for t in turns] == ["employee", "consultant"]
     assert out.say and turns[1].text == out.say                    # 顧問回覆落逐字稿
     assert out.coverage["required"] > 0                            # 覆蓋率進度
+    calls = await repo.list_llm_calls(s.id)                        # T13:稽核落庫(書記+顧問各一)
+    assert {c.role for c in calls} == {"select", "interview"} and all(c.model for c in calls)
 
 
 @pytest.mark.asyncio

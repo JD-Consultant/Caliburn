@@ -9,6 +9,7 @@ from sqlalchemy import func, select
 
 from app.models import (
     InterviewEvidence,
+    InterviewLlmCall,
     InterviewSession,
     InterviewSuggestion,
     InterviewTurn,
@@ -158,3 +159,24 @@ class InterviewRepo:
         row.status = status
         await self.session.flush()
         return row
+
+    # --- LLM 呼叫稽核(T13;每回合每次呼叫一列) ---
+
+    async def add_llm_call(self, session_id: UUID, *, turn_seq: int, role: str, model: str,
+                           duration_ms: int, tool_calls: list | None = None,
+                           guard_verdicts: list | None = None,
+                           prompt_tokens: int | None = None,
+                           completion_tokens: int | None = None) -> InterviewLlmCall:
+        row = InterviewLlmCall(session_id=session_id, turn_seq=turn_seq, role=role, model=model,
+                               duration_ms=duration_ms, tool_calls=tool_calls or [],
+                               guard_verdicts=guard_verdicts or [],
+                               prompt_tokens=prompt_tokens, completion_tokens=completion_tokens)
+        self.session.add(row)
+        await self.session.flush()
+        return row
+
+    async def list_llm_calls(self, session_id: UUID) -> list[InterviewLlmCall]:
+        stmt = (select(InterviewLlmCall)
+                .where(InterviewLlmCall.session_id == session_id)
+                .order_by(InterviewLlmCall.created_at))
+        return list((await self.session.execute(stmt)).scalars())

@@ -100,16 +100,28 @@ def gap_label(doc: dict, gap: str) -> str:
     return f"任務「{name}」的{label}" if name else label
 
 
-def ledger_summary(doc: dict, state: dict) -> str:
+def ledger_summary(doc: dict, state: dict, pool_tasks: list[dict] | None = None) -> str:
     """帳本摘要:覆蓋率 + 建議下一個問什麼(next_gap 人話化)。顧問據以決定問向;
-    非命令——顧問可因對話脈絡先問別的,帳本會繼續盯。"""
-    nxt = L.next_gap(doc, state, {})
+    非命令——顧問可因對話脈絡先問別的,帳本會繼續盯。
+    0028 D6:pool_tasks(官方任務池)給了 → curation 縫吐**成組反問**(unasked 名單 ≤5);
+    檢查表全處置且還沒抓漏 → 吐一次 write-in 探測(flag 由 service 消費)。"""
+    nxt = L.next_gap(doc, state, {}, pool_tasks)
+    if nxt == L.CURATION_TASKS and pool_tasks:
+        names = [t["name"] for t in L.checklist(doc, state, pool_tasks)["unasked"]][:5]
+        if names:
+            return ("官方任務清單還有未確認項:" + "、".join(names) + "。這一輪**成組**問他"
+                    "「這幾項你有做哪些?」(沒做的請他直說沒做;系統會依他的話預勾、"
+                    "他在畫面上確認)。別逐項審訊。**還不要問工作態度。**")
     if nxt in _ONBOARD_STEER:                       # onboarding:給引導語,不報「還缺幾項」
         return _ONBOARD_STEER[nxt]
     ok, blockers = L.can_finish(doc, state, {})
     lines = [f"覆蓋:{'已達完成門檻' if ok else f'還缺 {len(blockers)} 項'}"]
     if nxt:
         lines.append(f"建議接下來問:{gap_label(doc, nxt)}")
+    if (pool_tasks and not state.get("writein_asked")
+            and not L.checklist(doc, state, pool_tasks)["unasked"]):
+        lines.append("官方任務清單已全數確認。順帶問一次抓漏:「官方沒列、但你平常常做的"
+                     "任務還有嗎?」(有的話之後會當自訂任務提議)")
     return "\n".join(lines)
 
 
@@ -127,7 +139,8 @@ def _doc_excerpt(doc: dict) -> str:
 def build_consultant_messages(*, doc: dict, ledger_state: dict,
                               recent_turns: list[tuple[str, str]], pending: list[str],
                               employee_text: str, est_minutes: int = 15,
-                              probe: dict | None = None) -> list[dict]:
+                              probe: dict | None = None,
+                              pool_tasks: list[dict] | None = None) -> list[dict]:
     """組 chat_with_tools 的 messages。空對話 → 開場揭露;否則 system 人格 + 脈絡注入
     (帳本摘要/文件/待核准)+ 近窗對話 + 員工最新發言(GPT-4.1:關鍵首尾、脈絡定界)。"""
     msgs: list[dict] = [{"role": "system", "content": CONSULTANT_SYSTEM}]
@@ -137,7 +150,7 @@ def build_consultant_messages(*, doc: dict, ledger_state: dict,
                      "語氣但要含揭露要素):\n" + opening_disclosure(est_minutes)})
         return msgs
 
-    ctx = (f"<進度>\n{ledger_summary(doc, ledger_state)}\n</進度>\n"
+    ctx = (f"<進度>\n{ledger_summary(doc, ledger_state, pool_tasks)}\n</進度>\n"
            f"<文件現況>\n{_doc_excerpt(doc)}\n</文件現況>")
     if pending:
         ctx += "\n<待核准建議(員工可能問到,別重問;向他說明是待他確認)>\n  - " + \

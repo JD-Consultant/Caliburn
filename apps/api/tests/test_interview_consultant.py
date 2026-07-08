@@ -104,3 +104,29 @@ def test_system_prompt_has_onboarding_guard():
     """顧問 system prompt 要含『選職類前不問態度、不硬猜職類』的硬規則。"""
     sys = C.CONSULTANT_SYSTEM
     assert "選職類" in sys
+
+
+# ---- 檢查表成組反問 + write-in 抓漏(0028 T5) ----
+
+_POOL = [
+    {"key": "X:T1", "name": "測試案例設計", "unit": "規劃", "ocs_code": "X", "task_code": "T1"},
+    {"key": "X:T9", "name": "自動化腳本維護", "unit": "維運", "ocs_code": "X", "task_code": "T9"},
+]
+
+
+def test_ledger_summary_checklist_group_probe():
+    """官方池還有 unasked → 帳本摘要列名成組反問,且不問態度。"""
+    doc = _doc()                                            # 只含 T1(測試案例設計)
+    summary = C.ledger_summary(doc, {}, pool_tasks=_POOL)
+    assert "自動化腳本維護" in summary and "有做" in summary
+    assert "還不要問工作態度" in summary
+
+
+def test_ledger_summary_writein_probe_once():
+    """檢查表全處置(covered/declined)→ 吐一次 write-in 抓漏;flag 設了就不再吐。"""
+    doc = _doc()
+    state = {"declined": ["X:T9"]}                          # T1 covered、T9 declined
+    s1 = C.ledger_summary(doc, state, pool_tasks=_POOL)
+    assert "官方沒列" in s1                                  # 抓漏探測句
+    s2 = C.ledger_summary(doc, {**state, "writein_asked": True}, pool_tasks=_POOL)
+    assert "官方沒列" not in s2

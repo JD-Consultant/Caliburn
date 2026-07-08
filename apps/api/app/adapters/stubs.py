@@ -19,11 +19,13 @@ class StubLlm:
     """假 LlmPort(測試/demo):三句話型皆可程控;呼叫紀錄留 calls 供斷言。"""
 
     def __init__(self, *, text: str = "", json_result=None, select_result=None,
-                 chat_text: str = "我了解了,想再多聊聊你這件事的細節,方便說個最近的例子嗎?"):
+                 chat_text: str = "我了解了,想再多聊聊你這件事的細節,方便說個最近的例子嗎?",
+                 chat_trace: list | None = None):
         self._text = text
         self._json = json_result
         self._select = select_result   # dict 或 callable(prompt, schema) -> dict
         self._chat_text = chat_text
+        self._chat_trace = list(chat_trace or [])   # 模擬顧問工具軌跡(0028 widget 測試)
         self.calls: list[dict] = []
 
     async def complete_text(self, prompt: str, *, role: str = "cheap") -> str:
@@ -47,7 +49,8 @@ class StubLlm:
         """假顧問迴圈:回 canned 文字(ChatResult),不呼工具。role/messages 記 calls。"""
         from app.interview.agent_loop import ChatResult
         self.calls.append({"kind": "chat", "role": role, "messages": messages})
-        return ChatResult(text=self._chat_text, tool_trace=[], stopped="natural")
+        return ChatResult(text=self._chat_text, tool_trace=list(self._chat_trace),
+                          stopped="natural")
 
 
 class StubKnowledge:

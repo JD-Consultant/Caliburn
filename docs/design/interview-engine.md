@@ -54,15 +54,25 @@ updated: 2026-07-08
        build_pool_inputs←knowledge.competencies(官方池;文件 block 預設空)
        select_schema(scribe_schema:兩通道 strict enum;role=select)→重試1
        apply_scribe(確定性守衛:quote 逐字驗、pool_id∈pools[kind]、跨任務歸位)
-         池 K/S/O verified→直寫+evidence.review=pending;自訂/draft/態度/add_task→建議層
+         池 K/S/O verified→直寫+evidence.review=pending;自訂/draft/add_task→建議層
+         (態度池通道已退場 0028 D3;僅剩 record_attitude_custom 機會性提議)
   ③ 寫回 upsert_draft(雙 token)→409 重讀重放同 records 一次→再衝突放棄直改(人優先)
        evidence(帶 review)/suggestions 落庫
-  ④ 帳本:note_attempt(上一輪 last_gap 是否進帳→飽和計數)→ next_gap(本輪提示)→ ledger_state 存回
-  ⑤ 顧問 chat_with_tools(role=interview;messages=帳本摘要+文件+待核准+近窗對話;
-       手刻迴圈 run_tool_loop:READ 工具 dispatch、tool_call_id 對回、max_iter 補問)
-  ⑥ 保底:say 空→next_gap 合成問題(靜默回合=實戰死穴);append 顧問 turn
-  ⑦ 稽核落庫(書記+顧問各一列);回 {say, doc_changed, pending_suggestions, progress:{phase,coverage}}
-收尾 POST …/interview:finish:backstop_pass→建議化→phase=review
+  ③½ build_task_pool←knowledge.occupation_tasks 聯集(0028 檢查表候選盤;fail-open)
+  ④ 帳本:note_attempt(飽和計數)→ next_gap(doc,state,{},pool_tasks)→ ledger_state 存回
+       (ledger_state 增 declined[]/writein_asked;0028)
+  ④½ 裁剪 pass(0028;last_gap=curation:tasks 且有 unasked):curation_pass(便宜模型)
+       → precheck→**widget 指令** {kind:open_picker,picker:task,precheck:[{key,name,unit,quote}]}
+       → declined→ledger_state(檢查表不再反問);稽核落庫一列
+  ⑤ 顧問 chat_with_tools(role=interview;messages=帳本摘要(含檢查表成組反問/write-in 抓漏)
+       +文件+待核准+近窗對話;手刻迴圈 run_tool_loop)
+  ⑤½ onboarding widget(0028):last_gap=onboarding:occupation 且顧問本回合搜過職類
+       → {kind:open_picker,picker:occupation,query:<顧問的搜尋詞>}(tool_trace 確定性觸發)
+  ⑥ 保底:say 空→next_gap 合成問題;append 顧問 turn
+  ⑦ 稽核落庫;回 {say, widget, doc_changed, pending_suggestions,
+       progress:{phase=derive_phase(議程推導), coverage}}
+收尾 POST …/interview:finish → service.run_finish:backstop_pass + **attitudes_pass**
+  (0028 D3:全逐字稿→2–4 條態度建議、每條綁最強引文、MAX_A 硬上限)→建議化→phase=review
 ```
 
 ## 5. UI 動作 → 請求對照

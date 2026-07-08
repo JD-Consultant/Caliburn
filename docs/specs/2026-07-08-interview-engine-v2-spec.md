@@ -365,3 +365,70 @@ v2 擴充為**五類待辦佇列**(全清才可定稿;逐項動作=核准/退回
 **職務說明書 renderer(黃金範本 §1–§8 格式)=v2 範圍外**——v2 的職責是把資料
 「問對、問全、可稽核」;渲染是獨立子系統(吃定稿文件+訪談 evidence),
 待資料層穩定後另開 spec/plan(研究紀錄 §17 路線圖)。
+
+## 11. api↔web 接縫差異(wire format v2;T9/T10/T11 依此,不現場發明)
+
+v1 型別現況=`apps/web/src/types/index.ts`(InterviewProgress/Widget/TurnResponse/View)。
+interview 端點是 api↔web 內部縫(同 repo 兩端,同 commit 原子換版=ADR 0019 慣例;
+不走 packages 契約——contract-strategy 判準 #2 已預答)。**v2 差異全列於此**:
+
+### 11.1 progress(覆蓋率取代任務計數)
+
+```ts
+export interface InterviewProgress {
+  phase: string;                                   // deep | review(survey 併入 deep 開場)
+  coverage: { filled: number; required: number };  // 帳本 coverage 加總;進度條=filled/required
+  gaps_stalled: number;                            // attempted-insufficient 數(審核徽章用)
+}
+```
+
+### 11.2 widget(程式組裝;LLM 不產——spec §7 不變量)
+
+```ts
+export interface InterviewWidget {
+  kind: "checklist" | "confirm_table";
+  question: string;
+  multi: boolean;                                   // 職類=false;任務=true
+  options: { id: string; label: string; hint?: string; checked: boolean }[];
+                                                    // checked=AI 預勾;排序=檢索分數
+  target: "occupation" | "tasks" | "suggestion";    // 送出後路由(見 11.4)
+  suggestion_ids?: string[];                        // target=suggestion 時對應建議
+}
+```
+`confirm_table` 給 §10.1 員工快檢(rows=比重表+core 關鍵槽;options.id=doc_path,
+label=「欄名:值」;全勾=確認,取消勾=「這格不對」→ 顧問下一輪追問該格)。
+
+### 11.3 evidence 的 pending 標記(低風險自動落地的資料模型)
+
+evidence 表加欄 `review`(additive,migration 併入 plan T2):
+`"auto"`(v1 既有列 default)| `"pending"`(v2 低風險落地待批)| `"accepted"` | `"reverted"`。
+- 批次收=`POST …/interview:review` 沿用,body 擴充 `{evidence_accept: [id], evidence_revert: [id]}`;
+  revert=以既有版本機制回寫舊值+標 reverted(undo 的落點)。
+- 文件色標=web 以 view.evidence(review=pending)的 doc_path 集合渲染;**不在 doc 裡放狀態**
+  (ADR 0025:provenance 從版本/evidence 推導,不建獨立鎖)。
+
+### 11.4 onboarding 與 ADR 0021 不變量(知識包同步)
+
+「**選職類=唯一 knowledge 同步點**」不因入口而變:訪談 widget(target=occupation)送出後,
+web 呼叫**既有**選職類/知識包流程(與手動 picker 同一條 mutation),不開新路;api 只回
+widget、不代辦同步。target=tasks 同理走既有任務套用路徑;target=suggestion 走 review 端點。
+
+### 11.5 view 擴充(人審佇列=前端推導,不加新端點)
+
+```ts
+export interface InterviewView {  // 既有欄位不動,追加:
+  evidence: { …v1 欄位; review: "auto"|"pending"|"accepted"|"reverted" }[];
+  ledger: { stalled: { gap: string; label: string }[] };   // attempted-insufficient 清單
+  backstop: { misses: {gap: string; quote: string}[];
+              misattributed: {path: string; reason: string}[] } | null;  // 收尾後才有
+}
+```
+五類佇列(§10.2)=稽核頁由 view 推導(pending=evidence.review、unverified=verified=false、
+insufficient=ledger.stalled、ambiguous=suggestions.reason 帶標、backstop=backstop 欄),
+**不加查詢端點**(避免過度設計;量大再說)。
+
+### 11.6 雜項釘死
+
+- 書記輸入窗=**本回合員工發言 + 上一則顧問訊息**(脈絡);跨回合事實靠 backstop 撈。
+- 稽核 digest=canonical JSON 的 sha256 前 12 hex(args_digest/result_digest 同規)。
+- start 放寬:無職類/任務也 200(v1 的 412 前置檢查移除);首回合固定文案(§4 開場)。

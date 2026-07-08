@@ -76,9 +76,9 @@ _ONBOARD_STEER = {
         "具體做過的事,再用 knowledge_search_occupations 查官方職類,挑**最貼近的具體職類**"
         "提議,請他從畫面右上〔選職類〕確認選入(選了才會帶出官方任務)。"
         "**選職類前不要問工作態度、不要拿模糊描述硬猜職類名硬套。**"),
-    L.ONBOARD_TASKS: (
-        "已選職類、還沒挑任務。這一輪引導他從〔選任務〕把平常做的主要幾項任務挑進來,"
-        "或先說說他日常做哪幾件事、我們再對應。**還不要問工作態度。**"),
+    L.CURATION_TASKS: (
+        "已選職類、任務清單還沒確認。這一輪先請他說說平常主要做哪幾件事(系統會依他的話"
+        "預勾官方任務給他確認),或引導他從〔選任務〕挑進來。**還不要問工作態度。**"),
 }
 
 
@@ -86,7 +86,7 @@ def gap_label(doc: dict, gap: str) -> str:
     """把帳本 gap path 轉成人話標籤(給顧問當「接下來問這個」的提示)。"""
     if gap == L.ONBOARD_OCCUPATION:
         return "你對應的官方職類"
-    if gap == L.ONBOARD_TASKS:
+    if gap == L.CURATION_TASKS:
         return "你平常做的主要任務"
     if gap == "ocs_attitude":
         return "工作態度"

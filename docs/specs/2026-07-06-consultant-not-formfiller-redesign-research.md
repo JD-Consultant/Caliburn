@@ -529,6 +529,22 @@ AI 身分明示、預計時長、資料用途與誰會看(之後有人審核)、
 (校準 #2 教訓:落槽永遠優先於寒暄回述,順序=優先序);probe 深度/風格=設定常數,
 不寫死(§10.6 收編 1)。
 
+> §16 保留給校準 #3(sim v2 跑完的數據與門檻調整紀錄;解凍後 T14 產出)。
+
+## 17) 路線圖彙整(刻意不進 v2 的,一處收攏;各有出處,防遺忘)
+
+| 項 | 內容 | 出處/依據 |
+|---|---|---|
+| 職務說明書 renderer | 定稿文件+evidence → 黃金範本 §1–§8 格式輸出(現況只有職能基準 JSON 匯出) | spec §10.3;黃金範本 |
+| 主管確認 pass | 員工版定稿後給直屬主管快檢(第二信息源) | §13 缺口 4(O*NET/BEI/iCAP 三角檢核) |
+| 多員工合併 | 同職務多份訪談聚合(聚合本義=O*NET ≥15 人) | §13 缺口 4;ADR 0027 limitations |
+| B 端監看/在途調整 | 顧問使用者看進行中訪談、調重點(前幾場盯場) | §13 缺口 3(NN/g/平台實務) |
+| 語音/情緒訊號 | 語音訪談、情緒偵測(Ekman) | §10.1(Listen Labs);文字先行 |
+| 書記並行化 | 抽取與對話並行(降延遲) | §12 誠實殘留;T14 延遲數據裁決 |
+| self-consistency | 高價值低信心欄位 N 次投票 | §8.4 延後項 |
+| Pydantic AI 遷移 | 唯一有原則的框架升級門(prepare/prepare_tools) | §8.5;ADR 0024 |
+| 信任漸進調權 | 依接受率放寬自動放行範圍 | ADR 0025 未來縫 |
+
 ## 來源
 - McClelland (1998) *Identifying Competencies with Behavioral-Event Interviews*, Psych. Science. https://journals.sagepub.com/doi/10.1111/1467-9280.00065
 - Spencer & Spencer, *Competence at Work*;Workitect BEI/競模最佳實務。https://workitect.com/PDF/Competency-Modeling-Best-Practices.pdf

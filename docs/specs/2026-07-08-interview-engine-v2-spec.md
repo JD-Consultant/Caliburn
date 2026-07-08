@@ -334,3 +334,34 @@ async def turn(profile_id, employee_text):
    OPKS 有引出、收工被閘門把關、全程有出處。
 2. sim v2 四軸達標;0 守衛違規。
 3. 產出文件與黃金範本**同構**(分層 core/淺掃、📘/🗣/✏️ 三標記、態度池選、比重=100%)。
+
+## 10. 收尾與人審工作流(plan T12 邊界;人審=單信息源的第二來源最小版,ADR 0027 limitations)
+
+### 10.1 收尾序列(訪談側)
+
+①`can_finish` blockers 清空(飽和縫隙以 attempted-insufficient 標記放行,**放行≠合格**,
+必入人審佇列)→ ②**員工快檢**(固定文案+一張表:比重總表與各 core 任務關鍵槽,
+一分鐘點頭/口頭修正;修正=普通發言,走書記重入=iCAP 驗證步單人版)→
+③**backstop 一呼**(spec §6;產 suggestions)→ ④session `phase="review"`,
+訪談面板收起、顯示「已送交審核」。
+
+### 10.2 人審佇列(顧問 B 端;v1 稽核頁唯讀基礎上擴充)
+
+v1 已有:逐字稿、證據對照(path↔quote↔verified)、建議史(`documents/[id]/interview`)。
+v2 擴充為**五類待辦佇列**(全清才可定稿;逐項動作=核准/退回/改寫):
+
+| 佇列 | 來源 | 預設呈現 |
+|---|---|---|
+| pending 批次 | 低風險自動落地未收項 | 依任務分組、diff 展開(0025 批審) |
+| unverified 引文 | quote 驗證失敗但落格項 | 紅標;必人工裁 |
+| attempted-insufficient | 帳本飽和縫隙 | 顯示已試問法;顧問可補問或改 n/a |
+| ambiguous 歸類 | 書記低分帶掛靠 | 顯示候選任務與分帶 |
+| backstop 發現 | misses / misattributed | 附原句與縫隙 path |
+
+### 10.3 定稿與匯出
+
+全佇列清空 → **定稿**:文件版本標記 finalized(走既有版本機制;之後修改=一般編輯,
+與訪談脫鉤)。匯出現況=**職能基準 JSON**(documents 頁已有 Download)。
+**職務說明書 renderer(黃金範本 §1–§8 格式)=v2 範圍外**——v2 的職責是把資料
+「問對、問全、可稽核」;渲染是獨立子系統(吃定稿文件+訪談 evidence),
+待資料層穩定後另開 spec/plan(研究紀錄 §17 路線圖)。

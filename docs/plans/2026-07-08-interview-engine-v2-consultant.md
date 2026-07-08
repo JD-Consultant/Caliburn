@@ -161,7 +161,8 @@
 
 ### T12 backstop 複查 pass
 
-- **研**:§8.4(收窄:兩題、只提案、便宜模型、單 writer)。
+- **研**:§8.4(收窄:兩題、只提案、便宜模型、單 writer)+ **spec §10 收尾工作流**
+  (員工快檢→backstop→phase=review→五類人審佇列;凍結期已寫定)。
 - **檔**:`app/interview/backstop.py`(新)+ service 收尾接線(finish 前跑;產 suggestions)。
 - **測**:fake——漏記偵測、出處違規偵測、只提案不直寫。
 - **驗**:pytest 綠。**commit**:`feat(api): backstop 收尾複查(兩題、只提案;0027)`

@@ -585,7 +585,18 @@ T4a 施作器把 `record_attitude_pool` 寫成直寫,**與風險矩陣(spec §3.
   表追蹤)。accept/revert 端點=T10;undo=既有版本機制。
 - 更新 test_pool_attitude_written_to_doc_level → 改斷言態度=suggestion(非回歸,是政策修正)。
 
-> §16.6+ 留給後續 task 的發現與校準 #3(sim v2 數據;T14 產出)。
+### 16.6 T6 研究關卡:match_items 延後,READ 工具收斂為 2 個(2026-07-08)
+spec §4.1 列 3 個顧問工具,但研究關卡發現 `KnowledgePort.match` 是 **ADR 0022 候選去重**
+功能(MatchResponse=groups/possible_matches/config),**不是乾淨的「白話片語→官方項目」
+映射器**。顧問真實需求=①找職類 ②提議官方任務/職能(「你也做這個嗎?」),由
+search_occupations + occupation_brief 滿足;片語→項目歸位已由**書記**(schema enum +
+build_pool_inputs←competencies)處理。照 Anthropic《Writing tools》「別過度給工具、用高影響力
+工具、合併工作流」→ **T6 收斂 2 工具**(search_occupations、occupation_brief 合併 tasks+
+competencies 一呼帶齊),knowledge_match_items **延後**(需要「片語→官方項目」時再設計對的 API,
+非硬套 dedup 的 match)。Anthropic 檢核逐條過:search>list ✓、回語意名(code+name)✓、
+合併呼 ✓、可操作錯誤 ✓、top_k/截斷預設 ✓。
+
+> §16.7+ 留給後續 task 的發現與校準 #3(sim v2 數據;T14 產出)。
 
 ## 17) 路線圖彙整(刻意不進 v2 的,一處收攏;各有出處,防遺忘)
 

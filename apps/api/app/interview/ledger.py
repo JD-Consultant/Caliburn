@@ -17,6 +17,11 @@ MIN_A, MAX_A = 2, 4                # 文件層 attitudes 2–4(iCAP A01–A14 �
 SOUL_SLOTS = ("wait_points", "exceptions", "standards")   # 顧問味靈魂槽,next_gap 優先
 BLOCK_KEYS = ("outputs", "indicators", "knowledge", "skills")   # 能力區塊族(gap kind=blocks)
 
+# onboarding 縫(§16.16):文件還沒任務時,先引導選職類/挑任務,**不掉態度**。
+# 這兩個縫**不受 is_stalled 影響**(選職類前不論追問幾次,都不許 fall through 到態度)。
+ONBOARD_OCCUPATION = "onboarding:occupation"   # 無 ocs_code:先問他做什麼→查職類→請他選
+ONBOARD_TASKS = "onboarding:tasks"             # 有 ocs_code、無任務:引導挑任務
+
 
 def _seg(item, idx: int) -> str:            # 沿 diff._seg:_tid/_uid/_id 或 index
     if isinstance(item, dict):
@@ -76,6 +81,10 @@ def task_missing(task: dict, task_path: str, state: dict, skips: set[str]) -> li
     return miss
 
 
+def has_occupation(doc: dict) -> bool:
+    return bool((doc.get("ocs_profile") or {}).get("ocs_code"))
+
+
 def attitudes_missing(doc: dict) -> bool:
     return len((doc.get("ocs_attitude") or {}).get("attitudes") or []) < MIN_A
 
@@ -87,6 +96,7 @@ def _gap(task_path: str, name: str) -> str:
 
 def next_gap(doc: dict, state: dict, skips_by_task: dict[str, set[str]]) -> str | None:
     """下一個該問的縫隙(給顧問的提示,非命令)。優先序:
+    ⓪還沒任務→onboarding(選職類/挑任務,不掉態度;§16.16)
     ①未分級任務的預算槽 ②core 靈魂槽 ③core 其餘細項槽 ④core 能力區塊(O+P/K/S)
     ⑤淺掃殘槽 ⑥文件層態度。已飽和(is_stalled)或已 n/a(skips)的縫隙跳過。"""
     def open_(tp: str, name: str, skips: set[str]) -> str | None:
@@ -94,6 +104,8 @@ def next_gap(doc: dict, state: dict, skips_by_task: dict[str, set[str]]) -> str 
         return None if name in skips or is_stalled(state, g) else g
 
     rows = [(tp, t, skips_by_task.get(tp, set())) for u, t, tp in iter_tasks(doc)]
+    if not rows:                                                  # ⓪ onboarding:還沒任務
+        return ONBOARD_OCCUPATION if not has_occupation(doc) else ONBOARD_TASKS
     for tp, t, sk in rows:                                        # ① 預算槽(分級前提)
         if tier(t, tp, state) is None:
             for k in BUDGET_SLOTS:

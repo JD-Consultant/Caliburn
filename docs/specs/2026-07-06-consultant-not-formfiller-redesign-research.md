@@ -673,6 +673,39 @@ backstop_pass:收尾一呼、便宜模型(role=select)、只答兩題(misses 漏
 `disabled={status==="final"}`(none/draft 都可開,只禁已定稿;手動〔選職類〕平行保留)。
 教訓:T11「前端文案更新」不夠,漏了這道 button gate;跨層改動要連前端 gating 一起盤。
 
+### 16.16 空白起跑掉進態度→幻覺職類(2026-07-08;真人試用抓到;T11 後端更大的漏拆)
+
+真人解鎖按鈕後實試 v2,顧問**一開場就問工作態度**,員工說「沒啥想法/沒有ㄟ」後,顧問
+**憑空猜職類「貨運處理/調度人員」**並加碼堅持,員工「這不太對吧」。systematic-debugging 蒐證:
+
+- **production 鐵證**:`interview_sessions.ledger_state = {"attempts": {"ocs_attitude": 2}, ...}`
+  ——帳本對空白文件**連問態度兩次**達 STALL_K 飽和。`interview_llm_calls.tool_calls`:turn 5
+  顧問用**態度衍生 query**「工作中需要特別注意或小心處理的狀況」搜職類 → 語意搜尋回「貨運
+  調度」;turn 7 加碼搜「貨運處理 調度」錨定。
+- **根因(單一)**:`ledger.next_gap` 無「還沒選職類」狀態。空白文件(無任務)穿過 ①預算槽~
+  ⑤淺掃(全空)→ 掉進 **⑥ 態度**(空文件當然缺)→ `ledger_summary` 指使顧問「建議接下來問:
+  工作態度」→ 顧問問態度 → 態度框架的模糊 query 餵語意搜尋 → 回垃圾職類 → 錨定。而書記
+  **無權設 `ocs_profile.ocs_code`**(只寫 details/blocks/attitudes),對話根本無法轉成選職類。
+  `phase="survey"` 存在卻是**空殼**——v2 無任何分支看它;`TurnResult.widget` 永遠 None。
+- **這是 T11 沒做完**:plan T11 明訂「顧問開場走選職類流程:search→**清單 widget**」「測:空白
+  doc 起跑→第一輪出**職類清單 widget**」;ADR 0027「onboarding 併入對話;選職類=高風險→
+  **選單阻斷確認**、AI 預勾」。實際只做了 start 放寬那半,onboarding 帳本狀態/顧問引導/widget
+  全沒接線(§16.15 的按鈕鎖只是這洞的冰山一角)。
+- **修(Tier 1;純後端 ledger+consultant,完成 T11 正確層)**:`next_gap` 文件無任務時**先回
+  onboarding 縫**(未選職類→`ONBOARD_OCCUPATION`、已選未挑任務→`ONBOARD_TASKS`),**不受
+  is_stalled 影響**(選職類前追問幾次都不許 fall through 態度);態度天然被擋在「有任務」之後。
+  `ledger_summary`/`gap_label` 對 onboarding 吐引導語(先問實際做什麼→查官方職類→提**具體**
+  職類請他從〔選職類〕確認);顧問 system prompt 加硬規則「選職類前不問態度、不拿模糊描述
+  硬猜職類硬套、被否認就換方向別加碼」。靠**既有〔選職類〕按鈕**收尾(已解鎖、本就拉官方
+  任務),零新前端。
+- **驗**:帳本/顧問 32 tests 綠、api 全套 207 passed 零回歸;**blank-doc 三回合 live 跑**——顧問
+  問「最近具體做過的事」(非態度)→ 員工裝傻時舉例幫想(不硬猜)→ 員工說「測軟體抓 bug」→
+  顧問用**真實工作 query** 搜→提議「軟體測試工程人員」→請點〔選職類〕。貨運調度鏈從源頭斷。
+- **Tier 2(follow-up,§17)**:做成 ADR 說的「選單阻斷確認」——職類清單 widget 內嵌面板、AI
+  預勾、一鍵確認→接既有 `setOccupations`(動 `TurnResult.widget` 契約+前端,獨立一輪)。
+- **教訓**:「commit 說 T11 done」≠ 做完;widget/帳本狀態這種**看不見的接線**最容易被漏,
+  且純函式測試不會抓(要 blank-doc 整合測 + 真人跑)。next_gap 的 tier 表要有「零任務」入口。
+
 ## 16.14 校準 #3(T14;2026-07-08;sim v2 活體跑,誠實記錄)
 
 v2 sim 全管線活體跑(真書記+帳本+顧問,模擬員工照黃金範本事實表)。**FAIL,但拆解後
@@ -711,6 +744,8 @@ v2 sim 全管線活體跑(真書記+帳本+顧問,模擬員工照黃金範本事
 | sim LLM-judge 評分 | 語意 slot 評分取代脆弱 keyword-exact(才是有效品質閘門) | §16.14 校準#3 |
 | sim 更強模擬員工 | 降 Sim2Real 漂移(便宜模型即興編表外細節) | §16.14 |
 | 書記收斂過填 | prompt 只填「明確描述該面向」的內容,非旁枝細節 | §16.14(inputs='transaction_id' 誤填) |
+| onboarding 職類 widget(Tier 2) | 職類清單內嵌面板+AI 預勾+一鍵確認→接既有 `setOccupations`(ADR 0027「選單阻斷確認」);Tier 1 已把後端引導接好 | §16.16;plan T11 未竟半 |
+| 開場揭露未觸發 | 面板首回合直接送員工文字→跳過 `opening_disclosure`(NN/g 揭露沒顯示);需 start 或面板 seed 開場 | §16.16 蒐證旁見 |
 
 ## 來源
 - McClelland (1998) *Identifying Competencies with Behavioral-Event Interviews*, Psych. Science. https://journals.sagepub.com/doi/10.1111/1467-9280.00065

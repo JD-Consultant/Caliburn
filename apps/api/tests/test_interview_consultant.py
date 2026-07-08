@@ -71,3 +71,36 @@ def test_first_turn_uses_disclosure():
                                        pending=[], employee_text="")
     joined = "\n".join(m["content"] for m in msgs)
     assert "AI" in joined and "開始" in joined               # 空對話 → 開場揭露
+
+
+# ---- onboarding 引導(空白文件不問態度、引導選職類;§16.16) ----
+
+def _blank_doc():
+    return {"ocs_profile": {}, "ocs_content": {"ocu_units": []},
+            "ocs_attitude": {"attitudes": []}}
+
+
+def test_ledger_summary_onboarding_steers_occupation_not_attitude():
+    """空白文件:帳本摘要要引導顧問去『選職類』,且明示選職類前不問態度。"""
+    summary = C.ledger_summary(_blank_doc(), {})
+    assert "選職類" in summary
+    assert "態度" in summary and "不" in summary             # 明示選職類前不問態度
+    assert "接下來問:工作態度" not in summary                # 不得指使顧問問態度(舊 bug)
+
+
+def test_ledger_summary_onboarding_tasks_when_occupation_set():
+    doc = _blank_doc()
+    doc["ocs_profile"] = {"ocs_code": "ISD2519-002v2"}
+    summary = C.ledger_summary(doc, {})
+    assert "任務" in summary                                  # 引導挑任務
+
+
+def test_gap_label_onboarding_human_readable():
+    doc = _blank_doc()
+    assert "職類" in C.gap_label(doc, "onboarding:occupation")
+
+
+def test_system_prompt_has_onboarding_guard():
+    """顧問 system prompt 要含『選職類前不問態度、不硬猜職類』的硬規則。"""
+    sys = C.CONSULTANT_SYSTEM
+    assert "選職類" in sys

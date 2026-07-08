@@ -97,6 +97,13 @@ updated: 2026-07-08
    無對外動作、max iterations——注入天生緩解。
 9. **舊 authoring graph(LangGraph)+ v1 單 LLM 路徑(context.build_prompt/turn_output_schema)
    = 退役待清**:v2 全新實作;v1 `context.py`/`commands.py` 待 v2 穩定後一次清除。
+10. **空白文件先 onboarding、不掉態度**(§16.16):`next_gap` 文件無任務時回 `ONBOARD_OCCUPATION`
+    (無 ocs_code)/`ONBOARD_TASKS`(有碼無任務),**不受 is_stalled 影響**(選職類前不許
+    fall through 到態度);`ledger_summary` 對 onboarding 吐引導語(問實際做什麼→查職類→提
+    具體職類請他從〔選職類〕確認),顧問 prompt 硬規則「選職類前不問態度、不硬猜職類硬套」。
+    反例=空白文件掉進態度縫→顧問問態度→模糊 query 語意搜尋→幻覺職類(production bug 8ba32711)。
+    **書記無權設 `ocs_code`**;選職類靠既有〔選職類〕按鈕(Tier 1)。職類清單 widget(ADR「選單
+    阻斷確認」)=Tier 2 待做,屆時接 `TurnResult.widget`(現恆 None)。
 
 ## 7. Limitations(ADR 0027;誠實記載)
 

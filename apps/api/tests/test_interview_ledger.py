@@ -144,6 +144,30 @@ def test_next_gap_attitudes_last():
     assert L.next_gap(doc2, {}, {}) is None                  # 全滿
 
 
+# ---- onboarding(空白文件先引導選職類,不掉態度;§16.16 production bug 8ba32711) ----
+
+def test_next_gap_onboarding_occupation_when_blank():
+    """無任務、無職類 → onboarding:occupation(不是態度)。"""
+    doc = _doc([])
+    assert L.next_gap(doc, {}, {}) == L.ONBOARD_OCCUPATION
+
+
+def test_next_gap_onboarding_tasks_when_occupation_but_no_tasks():
+    """有職類、還沒挑任務 → onboarding:tasks。"""
+    doc = _doc([])
+    doc["ocs_profile"] = {"ocs_code": "ISD2519-002v2"}
+    assert L.next_gap(doc, {}, {}) == L.ONBOARD_TASKS
+
+
+def test_next_gap_blank_never_asks_attitude():
+    """回歸守衛:空白文件即使態度不足,也**絕不**回態度(否則顧問開場問態度→幻覺職類)。"""
+    doc = _doc([], attitudes=0)
+    assert L.next_gap(doc, {}, {}) != "ocs_attitude"
+    # 即使 onboarding 縫被記為「飽和」,也不許掉進態度(onboarding 不受 is_stalled 影響)
+    state = {"attempts": {L.ONBOARD_OCCUPATION: L.STALL_K + 5}}
+    assert L.next_gap(doc, state, {}) != "ocs_attitude"
+
+
 # ---- note_attempt / is_stalled ----
 
 def test_note_attempt_increments_and_resets():

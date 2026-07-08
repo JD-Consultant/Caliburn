@@ -46,6 +46,12 @@ CONSULTANT_SYSTEM = """# 你是誰
 - knowledge_occupation_brief:一次拿某職類的官方任務+職能(提議「你也做這個嗎?」)。
 呼叫前先想:要查什麼、查到怎麼用。查詢次數用完就依已知直接回覆。
 
+# 還沒選職類時(文件空白=onboarding)
+先把「他實際做什麼」問清楚(1–2 件最近具體做過的事)→ 用 knowledge_search_occupations
+查 → 挑**最貼近的具體職類**提議,請他從畫面〔選職類〕確認選入(選了才帶出官方任務)。
+**選職類前絕不問工作態度、不拿一句模糊描述硬猜職類名硬套**(猜錯會整場歪掉);他否認你
+提的職類就換方向重問他做什麼,別在同一個錯職類上加碼。
+
 # 說話規則
 繁體中文、口語、溫和;每回合至多三句話 + 一個問題;不重複自己的句式;不假裝人類——
 被問到就大方說你是 AI 顧問;離題最多陪一句,下一句拉回。
@@ -63,8 +69,25 @@ def opening_disclosure(est_minutes: int = 15) -> str:
             f"大概長什麼樣?")
 
 
+# onboarding 引導語(§16.16;空白文件不問態度,先帶到選職類/挑任務)
+_ONBOARD_STEER = {
+    L.ONBOARD_OCCUPATION: (
+        "目前還沒選職類(文件空白)。這一輪先弄清楚他實際做什麼——請他講 1–2 件最近"
+        "具體做過的事,再用 knowledge_search_occupations 查官方職類,挑**最貼近的具體職類**"
+        "提議,請他從畫面右上〔選職類〕確認選入(選了才會帶出官方任務)。"
+        "**選職類前不要問工作態度、不要拿模糊描述硬猜職類名硬套。**"),
+    L.ONBOARD_TASKS: (
+        "已選職類、還沒挑任務。這一輪引導他從〔選任務〕把平常做的主要幾項任務挑進來,"
+        "或先說說他日常做哪幾件事、我們再對應。**還不要問工作態度。**"),
+}
+
+
 def gap_label(doc: dict, gap: str) -> str:
     """把帳本 gap path 轉成人話標籤(給顧問當「接下來問這個」的提示)。"""
+    if gap == L.ONBOARD_OCCUPATION:
+        return "你對應的官方職類"
+    if gap == L.ONBOARD_TASKS:
+        return "你平常做的主要任務"
     if gap == "ocs_attitude":
         return "工作態度"
     name, slot = "", gap.rsplit(".", 1)[-1]
@@ -80,8 +103,10 @@ def gap_label(doc: dict, gap: str) -> str:
 def ledger_summary(doc: dict, state: dict) -> str:
     """帳本摘要:覆蓋率 + 建議下一個問什麼(next_gap 人話化)。顧問據以決定問向;
     非命令——顧問可因對話脈絡先問別的,帳本會繼續盯。"""
-    ok, blockers = L.can_finish(doc, state, {})
     nxt = L.next_gap(doc, state, {})
+    if nxt in _ONBOARD_STEER:                       # onboarding:給引導語,不報「還缺幾項」
+        return _ONBOARD_STEER[nxt]
+    ok, blockers = L.can_finish(doc, state, {})
     lines = [f"覆蓋:{'已達完成門檻' if ok else f'還缺 {len(blockers)} 項'}"]
     if nxt:
         lines.append(f"建議接下來問:{gap_label(doc, nxt)}")

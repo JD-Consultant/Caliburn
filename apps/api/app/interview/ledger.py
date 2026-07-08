@@ -1,0 +1,154 @@
+"""覆蓋帳本(v2;ADR 0027、spec 2026-07-08 §1)。單任務判準沿用 slots.gate_missing;
+本模組補文件層:OPKS 門檻、比重加總、態度、next_gap 優先序、飽和、完成閘門。
+
+純函式、零 I/O。不可重算的狀態(attempts 計數、tier 覆寫、probe 設定)住
+sessions.ledger_state(T2),其餘一律由 doc 重算(12-Factor F5/F12)。
+
+門檻常數=ADR 0027 門檻 v1;§16.1:數字可校準(T14),碼形不變。
+"""
+from app.interview.slots import (
+    BUDGET_SLOTS, SLOT_DEFS, gate_missing, is_core, slot_filled,
+)
+
+SHARE_TOL = 5          # 比重加總 100±5(§14;T14 校準)
+STALL_K = 2            # 同一縫隙連續 K 次追問無進帳 → 飽和(iCAP 資料飽和)
+MIN_P, MIN_K, MIN_S = 1, 2, 2      # core 任務 indicators/knowledge/skills 下限
+MIN_A, MAX_A = 2, 4                # 文件層 attitudes 2–4(iCAP A01–A14 池)
+SOUL_SLOTS = ("wait_points", "exceptions", "standards")   # 顧問味靈魂槽,next_gap 優先
+BLOCK_KEYS = ("outputs", "indicators", "knowledge", "skills")   # 能力區塊族(gap kind=blocks)
+
+
+def _seg(item, idx: int) -> str:            # 沿 diff._seg:_tid/_uid/_id 或 index
+    if isinstance(item, dict):
+        for k in ("_tid", "_uid", "_id"):
+            if item.get(k):
+                return str(item[k])
+    return str(idx)
+
+
+def iter_tasks(doc: dict):
+    """yield (unit, task, task_path);task_path = executor 可解析的全路徑
+    (ocs_content.ocu_units.<seg>.tasks.<seg>,與 v1 focus.task_path 同源)。"""
+    units = (doc.get("ocs_content") or {}).get("ocu_units") or []
+    for ui, u in enumerate(units):
+        for ti, t in enumerate(u.get("tasks") or []):
+            yield u, t, f"ocs_content.ocu_units.{_seg(u, ui)}.tasks.{_seg(t, ti)}"
+
+
+def tier(task: dict, task_path: str, state: dict) -> bool | None:
+    """深問級別:人工覆寫(ledger_state.tier_override)優先,否則 v1 is_core 啟發。
+    回 True(core)/False(light)/None(預算槽未齊,未定)。§16.1:is_core 是否改
+    比重×頻率複合判準 = T14 校準,T1 不動 v1。"""
+    ov = (state.get("tier_override") or {}).get(task_path)
+    if ov in ("core", "light"):
+        return ov == "core"
+    return is_core(task)
+
+
+def share_sum(doc: dict) -> float:
+    return sum((t.get("details") or {}).get("time_share_pct") or 0
+               for _, t, _ in iter_tasks(doc))
+
+
+def blocks_missing(task: dict) -> list[str]:
+    """core P/K/S 缺口(O 由 gate_missing 的 outputs 虛擬 key 承載,不在此重複)。"""
+    blocks = task.get("competency_blocks") or []
+
+    def n(field: str) -> int:
+        return sum(len(b.get(field) or []) for b in blocks)
+
+    out = []
+    if n("indicators") < MIN_P:
+        out.append("indicators")
+    if n("knowledge") < MIN_K:
+        out.append("knowledge")
+    if n("skills") < MIN_S:
+        out.append("skills")
+    return out
+
+
+def task_missing(task: dict, task_path: str, state: dict, skips: set[str]) -> list[str]:
+    """單任務全部缺口=槽(gate_missing,含 outputs 虛擬 key)+ P/K/S(core 才要);
+    skips=合法 n/a。"""
+    miss = [m for m in gate_missing(task) if m not in skips]
+    if tier(task, task_path, state):
+        miss += [m for m in blocks_missing(task) if m not in skips]
+    return miss
+
+
+def attitudes_missing(doc: dict) -> bool:
+    return len((doc.get("ocs_attitude") or {}).get("attitudes") or []) < MIN_A
+
+
+def _gap(task_path: str, name: str) -> str:
+    kind = "blocks" if name in BLOCK_KEYS else "details"
+    return f"{task_path}.{kind}.{name}"     # 文件層態度固定字串 "ocs_attitude"
+
+
+def next_gap(doc: dict, state: dict, skips_by_task: dict[str, set[str]]) -> str | None:
+    """下一個該問的縫隙(給顧問的提示,非命令)。優先序:
+    ①未分級任務的預算槽 ②core 靈魂槽 ③core 其餘細項槽 ④core 能力區塊(O+P/K/S)
+    ⑤淺掃殘槽 ⑥文件層態度。已飽和(is_stalled)或已 n/a(skips)的縫隙跳過。"""
+    def open_(tp: str, name: str, skips: set[str]) -> str | None:
+        g = _gap(tp, name)
+        return None if name in skips or is_stalled(state, g) else g
+
+    rows = [(tp, t, skips_by_task.get(tp, set())) for u, t, tp in iter_tasks(doc)]
+    for tp, t, sk in rows:                                        # ① 預算槽(分級前提)
+        if tier(t, tp, state) is None:
+            for k in BUDGET_SLOTS:
+                if not slot_filled(t.get("details"), k) and (g := open_(tp, k, sk)):
+                    return g
+    cores = [(tp, t, sk) for tp, t, sk in rows if tier(t, tp, state)]
+    rest = tuple(k for k in SLOT_DEFS if k not in SOUL_SLOTS)
+    for phase in (SOUL_SLOTS, rest):                              # ②③ core 細項(靈魂優先)
+        for tp, t, sk in cores:
+            gm = gate_missing(t)
+            for k in phase:
+                if k in gm and (g := open_(tp, k, sk)):
+                    return g
+    for tp, t, sk in cores:                                       # ④ core 能力區塊
+        block_gaps = [m for m in gate_missing(t) if m == "outputs"] + blocks_missing(t)
+        for name in block_gaps:
+            if (g := open_(tp, name, sk)):
+                return g
+    for tp, t, sk in rows:                                        # ⑤ 淺掃殘槽
+        if tier(t, tp, state) is False:
+            for k in gate_missing(t):
+                if (g := open_(tp, k, sk)):
+                    return g
+    if attitudes_missing(doc) and not is_stalled(state, "ocs_attitude"):   # ⑥ 態度
+        return "ocs_attitude"
+    return None
+
+
+def note_attempt(state: dict, gap: str | None, progressed: bool) -> dict:
+    """回新 state(不就地改):progressed=歸零;否則 +1(供 is_stalled)。"""
+    if gap is None:
+        return state
+    attempts = dict(state.get("attempts") or {})
+    attempts[gap] = 0 if progressed else attempts.get(gap, 0) + 1
+    return {**state, "attempts": attempts}
+
+
+def is_stalled(state: dict, gap: str) -> bool:
+    return (state.get("attempts") or {}).get(gap, 0) >= STALL_K
+
+
+def can_finish(doc: dict, state: dict,
+               skips_by_task: dict[str, set[str]]) -> tuple[bool, list[str]]:
+    """完成閘門。blockers 全空才放行(飽和縫隙=attempted-insufficient,不擋收工但
+    必入人審佇列——「放行≠合格」,標記留痕)。§16.1:P 由每個 core 任務的
+    blocks_missing 承載,不設職責層 P gate(否則拒絕黃金範本全淺掃的 R3)。"""
+    blockers: list[str] = []
+    if abs(share_sum(doc) - 100) > SHARE_TOL:
+        blockers.append(f"share_sum={share_sum(doc):g}(需 100±{SHARE_TOL})")
+    for _, t, tp in iter_tasks(doc):
+        sk = skips_by_task.get(tp, set())
+        for m in task_missing(t, tp, state, sk):
+            g = _gap(tp, m)
+            if not is_stalled(state, g):
+                blockers.append(g)
+    if attitudes_missing(doc):
+        blockers.append("ocs_attitude")
+    return (not blockers, blockers)

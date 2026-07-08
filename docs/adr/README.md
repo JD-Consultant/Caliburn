@@ -36,6 +36,7 @@ ADR 是「為什麼」層;搭配 `../specs/`(細節設計)與 `../runbook.md`(�
 | [0025](0025-coedit-authority-dual-channel.md) | 人機共編權限：雙通道＋風險分流＋節點批審（分流寫入目的地，取代「人改過只能提議」） | Accepted（2026-07-05；spec/plan 待開） |
 | [0026](0026-interview-turn-model-role.md) | 訪談回合獨立模型 role（`model_interview`=gpt-4.1-mini，強推理＋沿用 strict 零逃逸）；延伸 0024 | Accepted（2026-07-06；真人試訪+校準#2 驅動） |
 | [0027](0027-interview-engine-v2-consultant-agent.md) | 訪談引擎 v2 四組件：顧問 agent（READ 工具、無寫入權）＋書記（兩通道 strict/quote、跨任務）＋確定性覆蓋帳本（門檻/飽和/閘門）＋backstop；風險分層核准（修正 0025 #1）；單信息源/純文字列 limitations | Accepted（2026-07-08；八輪研究收斂） |
+| [0028](0028-interview-flow-shared-ui-curation.md) | 訪談流程 v2.1：AI 驅動既有編輯器 pickers（同 UI、追蹤修訂呈現）＋議程化彈性流程＋官方檢查表缺項探測（實際為準）＋態度收尾 pass（修正 0027 態度通道與 0025 批審載體） | Accepted（2026-07-09；真人實測 eb2af457 驅動） |
 
 完整脈絡見 [`../specs/2026-06-27-system-architecture-design.md`](../specs/2026-06-27-system-architecture-design.md)。
 契約怎麼選/怎麼交付的規範見 [`../contract-strategy.md`](../contract-strategy.md)（ADR 0004/0010 的一般化、預答契約 #3）。

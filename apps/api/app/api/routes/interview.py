@@ -20,6 +20,7 @@ from app.api.routes.ai import get_llm
 from app.api.routes.documents import _require_profile
 from app.core.ports import KnowledgePort, LlmPort
 from app.database import get_db
+from app.interview import ledger as L
 from app.interview.diff import STABLE_ID_KEYS
 from app.interview.service import NoActiveInterview, run_turn
 
@@ -45,11 +46,10 @@ def _task_paths(doc: dict) -> list[str]:
     return out
 
 
-def _progress(doc: dict, focus: dict, phase: str) -> dict:
-    paths = _task_paths(doc)
-    cur = focus.get("task_path")
-    idx = paths.index(cur) + 1 if cur in paths else 0
-    return {"phase": phase, "task_index": idx, "task_total": len(paths)}
+def _progress(doc: dict, session, phase: str) -> dict:
+    # v2:進度=覆蓋率(帳本 filled/required;spec §11.1)
+    state = getattr(session, "ledger_state", None) or {}
+    return {"phase": phase, "coverage": L.coverage(doc, state)}
 
 
 def _session_out(s) -> dict:
@@ -80,7 +80,7 @@ async def start_interview(profile_id: UUID, db: AsyncSession = Depends(get_db)):
             focus={**(session.focus or {}), "task_path": paths[0]})
     pending = await repo.list_pending(session.id)
     return {**_session_out(session), "greeting": GREETING,
-            "progress": _progress(doc, session.focus or {}, session.phase),
+            "progress": _progress(doc, session, session.phase),
             "pending_suggestions": len(pending)}
 
 

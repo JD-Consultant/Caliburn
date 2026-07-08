@@ -26,15 +26,15 @@ const PHASE_LABEL: Record<string, string> = {
 
 function ProgressHeader({ progress }: { progress: InterviewProgress | null }) {
   if (!progress) return null;
-  const pct = progress.task_total
-    ? Math.round((progress.task_index / progress.task_total) * 100) : 0;
+  // v2:進度=覆蓋率(帳本 filled/required),取代 v1 task_index/total
+  const { filled = 0, required = 0 } = progress.coverage ?? {};
+  const pct = required ? Math.round((filled / required) * 100) : 0;
   return (
     <div className="space-y-1 border-b p-3">
       <div className="flex items-center justify-between text-xs text-muted-foreground">
         <span>
           {PHASE_LABEL[progress.phase] ?? progress.phase}
-          {progress.phase === "deep" &&
-            ` · 任務 ${progress.task_index}/${progress.task_total}`}
+          {progress.phase !== "review" && required > 0 && ` · 已補 ${filled}/${required}`}
         </span>
       </div>
       <Progress value={progress.phase === "review" ? 100 : pct} className="h-1.5" />
@@ -87,7 +87,7 @@ export function InterviewPanel({ profileId, doc, onApplyDoc }: {
   const turns = view.data?.turns ?? [];
   const progress: InterviewProgress | null =
     turn.data?.progress ?? (start.data ? start.data.progress : null)
-    ?? (view.data ? { phase: view.data.phase, task_index: 0, task_total: 0 } : null);
+    ?? (view.data ? { phase: view.data.phase, coverage: { filled: 0, required: 0 } } : null);
   const widget = turn.data?.widget ?? null;
   const busy = turn.isPending || start.isPending;
 

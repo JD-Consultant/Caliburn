@@ -57,7 +57,8 @@ async def test_start_idempotent_and_inits_focus(db_session):
     out2 = await start_interview(p.id, db=db_session)
     assert out1["session_id"] == out2["session_id"]
     assert out1["focus"]["task_path"] == TASK_PATH
-    assert out1["progress"] == {"phase": "deep", "task_index": 1, "task_total": 1}
+    assert out1["progress"]["phase"] == "deep"
+    assert out1["progress"]["coverage"]["required"] > 0        # v2 覆蓋率進度
     assert "顧問" in out1["greeting"]
 
 

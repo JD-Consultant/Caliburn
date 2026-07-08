@@ -230,7 +230,9 @@ export interface MatchResult {
 
 
 // ── 訪談引擎(ADR 0023;spec 2026-07-05;端點 interview:start/:turn/GET/:review)──
-export interface InterviewProgress { phase: string; task_index: number; task_total: number }
+// v2(ADR 0027 §11.1):進度=覆蓋率(帳本 filled/required),取代 v1 task_index/total
+export interface InterviewCoverage { filled: number; required: number }
+export interface InterviewProgress { phase: string; coverage: InterviewCoverage }
 export interface InterviewQuestion { text: string; target_path: string | null }
 export interface InterviewWidget { question: string; options: string[]; target_path: string | null }
 export interface InterviewSuggestion {

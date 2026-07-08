@@ -550,7 +550,22 @@ AI 身分明示、預計時長、資料用途與誰會看(之後有人審核)、
 自訂通道**(而非硬編假官方碼)= 兩通道「官方=參考」設計如預期運作。schema 建構器另有
 8 個純函式單元測試(fail-closed:池空→無池變體、無 task→只剩 none)。
 
-> §16.3+ 留給後續 task 的發現與校準 #3(sim v2 數據;T14 產出)。
+### 16.3 T4 研究關卡發現:executor 不覆蓋 OPKS/態度寫入,T4 拆為 T4a/T4b(2026-07-08)
+plan 原述「executor 整個留用」樂觀了。現況 `executor.apply` 只寫**細項槽**(details.<slot>)
++ job_description;**能力區塊(outputs/knowledge/skills/indicators)與態度(ocs_attitude.
+attitudes)完全沒有寫入路徑**,且 apply 消費 TurnOutput(回合指令),與書記的 ScribeRecord
+不同族。決策(不動 executor.apply 的回合語義,保持解耦 ADR 0027):
+- **T4a 書記施作器**(`scribe.apply_scribe`,純函式):重用 executor 的 `quote_verified/
+  normalize/resolve/set_at`;新增能力區塊/態度 append(寫 CodeName{code,name}/CodeText
+  {code,text};缺 competency_blocks 自動建一塊)。守衛:quote 驗證、**pool_id∈pools[kind]
+  語義檢查**(schema enum 只保證 ∈ 池聯集,kind↔pool_id 一致在此)、task/unit 解析。
+  產 ExecResult 同族(new_doc/evidence/suggestions/guard_log)。**風險分層(pending 標記
+  /tier)= T5**;T4a 預設:池項 verified→直寫、自訂/draft/add_task→建議。
+- **T4b 書記服務**(`scribe.scribe_pass`,async):建 schema 輸入(task/unit/slot/pools←
+  knowledge.match)→ select_schema → apply_scribe → 守衛拒絕精簡錯誤重試 1→backstop 佇列。
+- 另註:evidence.review 欄(spec §11.3)T2 未加(T2 只加 ledger_state);併入 T5。
+
+> §16.4+ 留給後續 task 的發現與校準 #3(sim v2 數據;T14 產出)。
 
 ## 17) 路線圖彙整(刻意不進 v2 的,一處收攏;各有出處,防遺忘)
 

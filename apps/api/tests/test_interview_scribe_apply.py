@@ -39,6 +39,14 @@ def test_pool_knowledge_written_to_block():
     assert res.evidence[0]["verified"] is True
 
 
+def test_scribe_prompt_has_d8_rules():
+    """D8 P5(實測 65b9aa3d):①不硬塞不相關任務(改提新任務)②K/S 判準 ③玩笑不記。"""
+    from app.interview.scribe import SCRIBE_SYS
+    assert "add_custom_task" in SCRIBE_SYS and "硬塞" in SCRIBE_SYS   # ① 歸位
+    assert "會操作" in SCRIBE_SYS                                      # ② S=會操作(vs K=知道)
+    assert "玩笑" in SCRIBE_SYS                                        # ③ 玩笑/比喻不記
+
+
 def test_pool_attitude_channel_retired():
     # 0028 D3:態度池通道退場——這種 record 一律忽略(不寫、不提議、留守衛痕)
     r = [{"type": "record_attitude_pool", "pool_id": "A01", "quote": "設計案例再設計"}]

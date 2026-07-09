@@ -147,6 +147,32 @@ DACUM 面板從「標準任務清單出發再裁剪」、O*NET Core Task 門檻�
   - **資料縫**:pending/新增標記的真相來源=`interview_evidence(review=pending)`+`interview_suggestions
     (doc_path)`;web 需一個 path→狀態/引文 的映射查詢(實作時定形,plan 處理)。
 
+- **D8 結構=點選、深度=對話(v2.2;真人實測 65b9aa3d 驅動;0028 D1/D5 範圍內細化,不另開 ADR)**。
+  維護者假設「少打字、直接彈職責/任務選單、先選大概再修」→ **權威全面驗證成立**:
+  - **打字負擔實證**(survey methodology):答一題開放題時間=4–6 題選擇題;開放題無回應率
+    平均 18%(選擇題 1–2%),高負擔開放題達 50%+(Pew);最佳比例=每 10–15 選擇配 1 開放。
+  - **Anthropic《Building Effective Agents》(正典)**:「workflow 給**可預測**的建結構、agent 探索
+    **不可預測**的」;先選最簡單方案。→ 職類/職責/任務=可預測(官方清單存在)→ 選單 workflow;
+    內隱知識故事=不可預測 → 顧問 agent 對話。
+  - **2026 混合式共識**:結構化 UI 處理已知決策、對話處理開放探索(Notion/Linear/Copilot 形);
+    對話式收集完成率 85% vs 表單 22%、快 30–45%;Hybrid-Trap 警告=混合要有原則非隨機。
+  - **Google 對話設計**:chips 能點就別打;**PAIR Guidebook**:借用既有心智模型(=復用編輯器
+    pickers)、回饋要可見其效果;**arXiv 2606.20630**:自主權移轉——開局 agent 主導、迭代人主導。
+  - **DACUM**:duty→task 兩層=標準結構(維護者「先職責再任務」即此)。
+  - 落地(P 系列):
+    - **P1 選完職類立刻主動彈**(不等打字):新 `interview:curation` 隨叫端點(拿至今發言預勾;
+      沒把握不勾但**全檢查表照列**)→ `CurationDialog` 升級**一窗兩步**(步1 職責勾選 →
+      步2 所選職責的任務,AI 預勾+引文)→ 帶入。零打字即可鋪滿任務盤。
+    - **P2 中途加選職類回路**(真人實測:顧問三度搜到「網站系統設計人員 1.0」卻無機制驅動加選,
+      全端後半內容無家可歸 → 18 個 K 硬塞錯任務):widget 觸發放寬=顧問本回合搜過職類**且**
+      top hit ∉ 現有 codes → 彈 occupation picker;顧問 prompt 補「工作明顯超出現有職類 →
+      明講建議加選(可多選)」。
+    - **P4 chips 僅限 meta 動作**(跳過/沒有/先記到這);**深聊不選單化**(BEI 故事=開放題
+      不可取代的那一題;開放額度全留給深聊)。
+    - **P5 書記三行修正**(實測 65b9aa3d):①內容不屬任何現有任務→`add_custom_task` 提議,
+      不硬塞;②K/S 判準(知道=K、會操作=S;實測 K=18/S=0 全偏 K);③玩笑/比喻不當事實記
+      (「AI 馴獸師」進了 outputs)。
+
 ## 5. 對 ADR 0027 的修訂點(開新 ADR 0028;0027 Accepted 不改內容)
 
 - 0027「onboarding 併入對話 + AI 預勾清單」**補實作**(0028 定 widget 契約 + 帳本 phase 推導 +
@@ -189,6 +215,12 @@ DACUM 面板從「標準任務清單出發再裁剪」、O*NET Core Task 門檻�
 - Anthropic — Claude Code auto mode(93% 核准率 → 邊界內自由,非逐動作提示) — https://www.anthropic.com/engineering/claude-code-auto-mode
 - Mixed-initiative 迭代精修 / 可編輯計畫(AIPOM)— AI Agentic Programming Survey — https://arxiv.org/html/2508.11126v1
 - Feedback by Design: 對話代理的使用者回饋障礙(arXiv 2026) — https://arxiv.org/html/2602.01405v1
+- Anthropic — Building Effective Agents(workflow=可預測/agent=不可預測;最簡先行) — https://www.anthropic.com/engineering/building-effective-agents
+- Google PAIR — People + AI Guidebook(Mental Models / Feedback+Control) — https://pair.withgoogle.com/
+- Design Principles for Human-Agent Interaction(自主權移轉;arXiv 2606.20630, 2026)
+- 開放 vs 選擇題負擔實證 — https://www.nngroup.com/articles/open-ended-questions/ 、 https://www.surveymonkey.com/learn/survey-best-practices/comparing-closed-ended-and-open-ended-questions/
+- Google 對話設計 chips — https://developers.google.com/assistant/conversation-design/chips
+- 2026 混合式共識/完成率 — https://www.aiuxdesign.guide/patterns/conversational-ui 、 https://gnosari.com/blog/conversational-data-collection 、 https://markswebb.com/insights/conversational-ui-ai-agents-hybrid-trap/
 - Shape of AI — AI 互動 UX 模式庫 — https://www.shapeof.ai/
 - assistant-ui — Form-Filling AI Copilot / Generative UI(AI 填現成表單、人調整) — https://www.assistant-ui.com/examples/form-demo
 - 混合式:AI 起草 + 引導式人審(降全自動風險)— arXiv 2312.09198

@@ -2,7 +2,7 @@
 title: 訪談引擎 × 文件工作台 — 端到端設計(v2 顧問 agent)
 audience: agent-primary(也給人)
 scope: apps/api app/interview/* + routes/interview + apps/web 面板/稽核頁(引擎 v2)
-updated: 2026-07-08
+updated: 2026-07-09
 ---
 
 # 訪談引擎 × 文件工作台 — 端到端設計(v2:顧問 agent + 書記 + 帳本 + backstop)
@@ -62,17 +62,23 @@ updated: 2026-07-08
   ④ 帳本:note_attempt(飽和計數)→ next_gap(doc,state,{},pool_tasks)→ ledger_state 存回
        (ledger_state 增 declined[]/writein_asked;0028)
   ④½ 裁剪 pass(0028;last_gap=curation:tasks 且有 unasked):curation_pass(便宜模型)
-       → precheck→**widget 指令** {kind:open_picker,picker:task,precheck:[{key,name,unit,quote}]}
-       → declined→ledger_state(檢查表不再反問);稽核落庫一列
+       → precheck→**widget 指令** {kind:open_picker,picker:task,precheck:[{key,name,unit,quote}],
+       others:[{key,name,unit}]}(D8 **全檢查表**:沒把握的照列未勾=recognition over recall)
+       → declined→ledger_state(檢查表不再反問;others 重算不含剛排除的);稽核落庫一列
   ⑤ 顧問 chat_with_tools(role=interview;messages=帳本摘要(含檢查表成組反問/write-in 抓漏)
        +文件+待核准+近窗對話;手刻迴圈 run_tool_loop)
-  ⑤½ onboarding widget(0028):last_gap=onboarding:occupation 且顧問本回合搜過職類
-       → {kind:open_picker,picker:occupation,query:<顧問的搜尋詞>}(tool_trace 確定性觸發)
+  ⑤½ occupation widget(0028+D8 P2 統一):顧問本回合搜過職類且**首個 top-1 ∉ 現有 codes**
+       → {kind:open_picker,picker:occupation,query:<顧問的搜尋詞>}(dispatch closure 截命中,
+       確定性觸發)。涵蓋開場(codes 空)與**中途加選**(聊到超出現有職類的工作);
+       查參考(top-1=已選)不彈不騷擾;顧問 prompt 同步明講建議「加選」
   ⑥ 保底:say 空→next_gap 合成問題;append 顧問 turn
   ⑦ 稽核落庫;回 {say, widget, doc_changed, pending_suggestions,
        progress:{phase=derive_phase(議程推導), coverage}}
 收尾 POST …/interview:finish → service.run_finish:backstop_pass + **attitudes_pass**
   (0028 D3:全逐字稿→2–4 條態度建議、每條綁最強引文、MAX_A 硬上限)→建議化→phase=review
+隨叫 POST …/interview:curation → service.run_curation(D8 P1a):選完職類**立刻**鋪任務盤
+  (零打字)——pool→unasked→curation_pass→回全檢查表 {precheck,others};declined 落
+  ledger_state;llm 缺/無發言→precheck 空、others 照列(fail-open:清單本身就有價值)
 ```
 
 ## 5. UI 動作 → 請求對照
@@ -81,8 +87,10 @@ updated: 2026-07-08
 |---|---|---|
 | 開始/續談 | InterviewPanel | `POST …/interview:start`(冪等;**空白 doc 也可起跑**=顧問引導選職類,§9.3) |
 | 回答 | InterviewPanel | `POST …/interview:turn {text}` → 回 `progress.coverage` + **`widget`**(0028) |
-| **AI 開職類 picker** | 面板 `onWidget` → page 開 `OccupationPicker(autoSearch)` | (無;widget 指令=`{kind:open_picker,picker:occupation,query}`,開窗即搜顧問用過的 query) |
-| **AI 預勾任務確認** | `CurationDialog`(每列引文理由+SourceLine;可剔) | (無;`{picker:task,precheck:[…]}`;套用=前端 `addFromPool`→persist 同一寫入路徑) |
+| **深聊 meta 快速回覆** | 面板輸入框上 chips(跳過這題/沒有/先記到這)——**僅流程動作**(D8 P4) | (無;純 send 轉發走 turn;後端 skips 語彙認得「跳過」) |
+| **AI 開職類 picker** | 面板 `onWidget` → page 開 `OccupationPicker(autoSearch)` | (無;widget 指令=`{kind:open_picker,picker:occupation,query}`,開窗即搜顧問用過的 query;開場+**中途加選**同一條 D8 P2) |
+| **AI 預勾任務確認** | `CurationDialog` **一窗兩步**(D8 P1b:步1 勾職責(AI 預勾職責 defaultOn)→步2 該職責任務(預勾+引文/others 未勾/已加入鎖定);職責是閘門) | (無;`{picker:task,precheck:[…],others:[…]}`=全檢查表;套用=前端 `addFromPool`→persist 同一寫入路徑) |
+| **選完職類自動鋪盤** | `OccupationPicker.onApplied` → page 呼端點 → 開 `CurationDialog`(訪談開著才觸發) | `POST …/interview:curation` → `{precheck,others}`(D8 P1a 零打字) |
 | 收尾 | (收尾流程) | `POST …/interview:finish` → `service.run_finish`(backstop+**態度收尾**+轉 review) |
 | 批審套用 | **面板底部「N 項待審」計數鈕**(0028 D5:置頂看不見 bug 修正)→ SuggestionReview → decide | `POST …/interview:review {accept,reject}` → **前端** `applyAccepted`(自訂能力/態度=**append 陣列**;`appendAtPath`)→ persist |
 | AI 直寫檢視 | **JobDocTable 同格追蹤修訂**(0028 D7):O/P/K/S 格 AI 徽章+hover 引文;**details 11 槽 chips 呈現**(`reviewMap.ts`;evidence.review=pending 為資料源) | `GET …/interview`(evidence 帶 `review` 欄) |
@@ -121,9 +129,15 @@ updated: 2026-07-08
     的指令(`open_picker`),前端開**同一批編輯器 pickers**(同 UI、入口不同)——別在聊天室
     另做一套 UI、別復活 CopilotKit interrupt。高風險(職類/任務)=picker 阻斷確認;
     預勾**保守**且每列附引文理由(反 rubber-stamp:Claude Code 93% 盲簽教訓)。
+    前端派發=**事件**(mutation onSuccess 一次),別存 state 用 effect 派發(§16.18 重彈迴圈)。
 12. **態度=收尾整體編碼**(0028 D3):`attitudes_pass` 讀全逐字稿提 2–4 條(MAX_A 硬上限、
     引文逐字、只建議);**別把逐回合態度抽取加回書記**(反例=39 條逐句轟炸,session eb2af457)。
     檢查表(covered/declined/unasked)身分對位=**provenance**,別用 task_codes.code(位置碼)。
+13. **結構=點選、深度=對話**(D8 鐵律;研究 §14):可枚舉的結構決策(職類/職責/任務的
+    有無)→ 選單勾選,官方清單**全檢查表**照列(precheck+others;recognition over recall,
+    開放題答題負擔 4–6 倍/漏答 18% 的實證);裁剪窗照 DACUM **職責→任務兩步**,職責是閘門。
+    個人化深度(怎麼做/標準/眉角的 BEI 故事)→ **只能用說的**;chips 僅 meta 流程動作
+    (跳過/沒有/下一題),**別把內容答案做成 chips**——選單化深聊=把顧問降級成問卷。
 
 ## 7. Limitations(ADR 0027;誠實記載)
 

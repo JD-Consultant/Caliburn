@@ -744,6 +744,28 @@ occupation picker 每次重開 remount → autoSearch 再搜一次;CurationDialo
 教訓:**指令型 payload(開窗/導航)必須走事件語義(mutation callback),不可存 state 用
 effect 派發**;凡 append 寫入的確認 UI,守衛要對「當前文件」算,不能信 payload 新鮮。
 
+### 16.19 v2.2 實作驗收(2026-07-09;D8「結構=點選、深度=對話」T1–T5 落地)
+
+依 [07-09 研究紀錄 D8](2026-07-09-interview-flow-task-curation-and-flexibility-research.md)
+與 v2.2 plan 完成,全綠(api 331 passed、web 54 tests + tsc + eslint):
+
+- **T1(P5)書記三行**:歸位不硬塞(內容無家→`add_custom_task` 提議)、K/S 判準
+  (知道=K、會操作=S)、玩笑/比喻不當事實記——修 §16.14/實測的 K=18/S=0 與
+  「AI 馴獸師」入格。
+- **T2(P2)中途加選職類回路**:dispatch closure 截 `knowledge_search_occupations` 命中,
+  **top-1 ∉ 現有 codes → occupation widget**(統一取代原 onboarding 條件,空白 doc 天然
+  涵蓋);查參考(top-1=已選)不彈。修實測「三度搜到網站系統設計 1.0 卻沒下文」。
+- **T3(P1a)`interview:curation` 隨叫**:選完職類(OccupationPicker.onApplied)**立刻**
+  鋪任務盤,零打字;回**全檢查表** `{precheck(引文),others(照列未勾)}`;llm 缺 →
+  others 照列(fail-open)。
+- **T4(P1b)一窗兩步**:turn widget 補 `others`(declined 落帳後重算;兩入口同資料形);
+  CurationDialog 步1 職責(AI 預勾職責 defaultOn、計數 badge)→ 步2 該職責任務
+  (預勾+引文/others 可勾/已加入鎖定)。**職責是閘門**:未選職責的預勾任務不套用。
+- **T5(P4)meta chips**:跳過這題/沒有/先記到這——純 send 轉發;**內容答案不做 chips**。
+
+殘留(→§17 roadmap,不擋 tag):步2 列樣式與編輯器 TaskPickerMenu 雙份未收斂;
+選職類→鋪盤的 llm 延遲無 loading 提示(端點靜默失敗=手動路徑仍在)。
+
 ## 16.14 校準 #3(T14;2026-07-08;sim v2 活體跑,誠實記錄)
 
 v2 sim 全管線活體跑(真書記+帳本+顧問,模擬員工照黃金範本事實表)。**FAIL,但拆解後

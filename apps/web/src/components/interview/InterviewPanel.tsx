@@ -18,7 +18,7 @@ import {
   useStartInterview,
 } from "@/hooks/useInterview";
 import { applyAccepted } from "@/lib/interviewDoc";
-import type { ChoiceWidget, InterviewProgress, OcsDocument } from "@/types";
+import type { ChoiceWidget, InterviewProgress, OcsDocument, OpenPickerWidget } from "@/types";
 
 const PHASE_LABEL: Record<string, string> = {
   survey: "盤點", deep: "深掘", review: "總審",
@@ -72,10 +72,11 @@ function ChoiceCard({ widget, onSubmit, busy }: {
   );
 }
 
-export function InterviewPanel({ profileId, doc, onApplyDoc }: {
+export function InterviewPanel({ profileId, doc, onApplyDoc, onWidget }: {
   profileId: string;
   doc?: OcsDocument;                     // 套用建議用(頁面的即時文件)
   onApplyDoc?: (next: OcsDocument) => void;   // = 頁面 persist(走 autosave PATCH)
+  onWidget?: (w: OpenPickerWidget) => void;   // 0028:引擎 widget 指令 → 頁面開對應 picker
 }) {
   const view = useInterview(profileId);
   const start = useStartInterview(profileId);
@@ -94,6 +95,11 @@ export function InterviewPanel({ profileId, doc, onApplyDoc }: {
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [turns.length, busy]);
+
+  // 0028 D1:open_picker 指令交給頁面(開同一批編輯器 pickers;同 UI、入口不同)
+  useEffect(() => {
+    if (widget && widget.kind === "open_picker") onWidget?.(widget);
+  }, [widget, onWidget]);
 
   const send = (text: string) => {
     const t = text.trim();

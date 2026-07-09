@@ -1,7 +1,8 @@
 "use client";
 
 // D27〔選職類〕modal：搜尋 + 複選 OCS（順序=優先度）→ setOccupations。
-import { useState } from "react";
+// 0028 D1:訪談引擎可程式化開啟(autoSearch=true 掛載即搜)——同一元件、入口不同。
+import { useEffect, useRef, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { ocsSearch } from "@/lib/api";
 import { useSetOccupations } from "@/hooks/useDocument";
@@ -13,11 +14,13 @@ import { Search, X } from "lucide-react";
 export function OccupationPicker({
   profileId,
   defaultQuery,
+  autoSearch = false,
   onClose,
   onError,
 }: {
   profileId: string;
   defaultQuery: string;
+  autoSearch?: boolean;
   onClose: () => void;
   onError: (msg: string) => void;
 }) {
@@ -31,6 +34,15 @@ export function OccupationPicker({
     onError: (e: unknown) => onError(e instanceof Error ? e.message : "搜尋失敗"),
   });
   const setOcc = useSetOccupations(profileId);
+
+  // AI 開窗即帶查(0028):顧問剛用這個 query 搜過職類 → 開窗直接出結果
+  const autoRan = useRef(false);
+  useEffect(() => {
+    if (autoSearch && !autoRan.current && q.trim()) {
+      autoRan.current = true;
+      search.mutate();
+    }
+  }, [autoSearch, q, search]);
 
   const toggle = (code: string) =>
     setPicked((p) => (p.includes(code) ? p.filter((c) => c !== code) : [...p, code]));

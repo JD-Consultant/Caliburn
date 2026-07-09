@@ -725,6 +725,25 @@ sim v3 三段(--max-turns 12;模型沿 0026:interview=gpt-4.1-mini、select=gpt-
   閘門新增 curation precision≥0.8 + declined_all_correct(確定性)。與 session eb2af457
   (39 條垃圾態度、0 任務)對照=v2.1 修復的直接證據。
 
+### 16.18 widget 重彈迴圈 + 重複添加(2026-07-09;真人試用抓到;T7 設計錯誤)
+
+真人實測 v2.1:職類 picker「關不掉、點什麼都彈新的、一直重搜」;CurationDialog「帶入後
+不關、可以一直點、文件一直加同樣的任務」。根因(單一):**把 widget 指令當「狀態」而非
+「事件」**——`turn.data.widget` 回合後常駐 + `onWidget` 每 render 新身分 → `useEffect([widget,
+onWidget])` 在**頁面任何重渲染**都重派發 → 關窗 setState 本身就觸發重開(自我維持迴圈);
+occupation picker 每次重開 remount → autoSearch 再搜一次;CurationDialog 的 onClose 立刻被
+重開蓋掉 → 重複點「帶入」→ `addFromPool` 無去重 → 官方任務重複進文件。
+
+修(兩層):
+1. **事件派發**:刪 effect,改 `turn.mutate(t, { onSuccess: res => …onWidget(res.widget) })`
+   ——一個回應派發恰好一次,重渲染無關。
+2. **重複添加守衛**:`markAlreadyInDoc`(provenance `ocs:task_code` 對位,改過名也認得;
+   名稱備援)→ 已在文件的列鎖「已加入」不可再套(對齊編輯器 TaskPickerMenu 行為;
+   維護者原則:官方不可重複、自訂才可重複)。
+
+教訓:**指令型 payload(開窗/導航)必須走事件語義(mutation callback),不可存 state 用
+effect 派發**;凡 append 寫入的確認 UI,守衛要對「當前文件」算,不能信 payload 新鮮。
+
 ## 16.14 校準 #3(T14;2026-07-08;sim v2 活體跑,誠實記錄)
 
 v2 sim 全管線活體跑(真書記+帳本+顧問,模擬員工照黃金範本事實表)。**FAIL,但拆解後

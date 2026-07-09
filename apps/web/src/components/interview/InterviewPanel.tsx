@@ -100,16 +100,19 @@ export function InterviewPanel({ profileId, doc, onApplyDoc, onWidget }: {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [turns.length, busy]);
 
-  // 0028 D1:open_picker 指令交給頁面(開同一批編輯器 pickers;同 UI、入口不同)
-  useEffect(() => {
-    if (widget && widget.kind === "open_picker") onWidget?.(widget);
-  }, [widget, onWidget]);
-
   const send = (text: string) => {
     const t = text.trim();
     if (!t || busy) return;
     setInput("");
-    turn.mutate(t);
+    // 0028 D1(§16.18):open_picker 指令=**事件**,在 mutation onSuccess 派發一次。
+    // 反例=存進 state 用 effect 派發:turn.data 回合後常駐+onWidget 每 render 新身分
+    // → 頁面任何重渲染都重派發 → 關不掉的重彈迴圈(真人實測抓到)。
+    turn.mutate(t, {
+      onSuccess: (res) => {
+        const w = res.widget;
+        if (w && w.kind === "open_picker") onWidget?.(w);
+      },
+    });
   };
 
   // 尚無 session(GET 404)→ 開始畫面

@@ -9,7 +9,7 @@ import { Check } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { buildCurationRows, picksFromRows } from "@/lib/curation";
+import { buildCurationRows, markAlreadyInDoc, picksFromRows } from "@/lib/curation";
 import { addFromPool } from "@/lib/ocsDoc";
 import type { KnowledgePack, OcsDocument, PickerPrecheckItem } from "@/types";
 import { Modal } from "./OccupationPicker";
@@ -22,7 +22,10 @@ export function CurationDialog({ items, document: doc, pack, onApply, onClose }:
   onApply: (next: OcsDocument) => void;   // = 頁面 persist(autosave PATCH)
   onClose: () => void;
 }) {
-  const rows = useMemo(() => buildCurationRows(items, pack), [items, pack]);
+  // already=已在文件(provenance/名稱對位)→ 鎖定「已加入」不可再套(重複添加守衛;
+  // 官方任務同編輯器 TaskPickerMenu 行為:重複要加隻能走自訂)
+  const rows = useMemo(
+    () => markAlreadyInDoc(buildCurationRows(items, pack), doc), [items, pack, doc]);
   const [unchecked, setUnchecked] = useState<Set<string>>(new Set());
   const toggle = (key: string) =>
     setUnchecked((prev) => {
@@ -30,7 +33,7 @@ export function CurationDialog({ items, document: doc, pack, onApply, onClose }:
       if (next.has(key)) next.delete(key); else next.add(key);
       return next;
     });
-  const selected = rows.filter((r) => r.found && !unchecked.has(r.key));
+  const selected = rows.filter((r) => r.found && !r.already && !unchecked.has(r.key));
 
   const apply = () => {
     if (!pack || selected.length === 0) return;
@@ -45,17 +48,23 @@ export function CurationDialog({ items, document: doc, pack, onApply, onClose }:
       </p>
       <div className="max-h-80 space-y-1 overflow-y-auto rounded-lg border p-2">
         {rows.map((r) => {
-          const on = r.found && !unchecked.has(r.key);
+          const locked = !r.found || !!r.already;
+          const on = r.already ? true : r.found && !unchecked.has(r.key);
           return (
             <label key={r.key}
               className={"flex cursor-pointer items-start gap-2 rounded px-2 py-1.5 text-sm hover:bg-muted/50 "
-                + (r.found ? "" : "opacity-60")}>
+                + (locked ? "opacity-60" : "")}>
               <input type="checkbox" className="mt-1" checked={on}
-                     disabled={!r.found} onChange={() => toggle(r.key)} />
+                     disabled={locked} onChange={() => toggle(r.key)} />
               <span className="min-w-0 flex-1">
                 <span className="flex items-center gap-1.5">
                   <span className="flex-1">{r.name}</span>
                   {r.unit ? <Badge variant="outline" className="text-[10px]">{r.unit}</Badge> : null}
+                  {r.already ? (
+                    <Badge variant="secondary" className="text-[10px]" title="此官方任務已在文件,不可重複帶入">
+                      已加入
+                    </Badge>
+                  ) : null}
                   {!r.found ? (
                     <Badge variant="secondary" className="text-[10px]" title="知識包載入中或來源缺失">
                       來源未對位

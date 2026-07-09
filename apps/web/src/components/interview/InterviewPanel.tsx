@@ -209,21 +209,40 @@ export function InterviewPanel({ profileId, doc, onApplyDoc, onWidget }: {
           ) : null}
         </div>
       ) : null}
-      <form
-        className="flex gap-2 border-t p-3"
-        onSubmit={(e) => { e.preventDefault(); send(input); }}
-      >
-        <input
-          className="flex-1 rounded-md border bg-background px-3 py-2 text-sm"
-          placeholder="想到什麼說什麼…"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          disabled={busy}
-        />
-        <Button type="submit" size="icon" disabled={busy || !input.trim()}>
-          <Send className="h-4 w-4" />
-        </Button>
-      </form>
+      <div className="border-t">
+        {/* D8 P4:meta 快速回覆——**僅流程動作**(跳過/沒有/下一題),不做內容答案 chips
+            (BEI 開放故事是深度來源,內容用說的;後端 skips 語彙認得「跳過」) */}
+        {turns.length > 0 ? (
+          <div className="flex flex-wrap gap-1.5 px-3 pt-2">
+            {["跳過這題", "沒有/不適用", "先記到這,下一題"].map((c) => (
+              <Badge
+                key={c}
+                variant="outline"
+                className={"cursor-pointer select-none "
+                  + (busy ? "pointer-events-none opacity-50" : "hover:bg-muted")}
+                onClick={() => send(c)}
+              >
+                {c}
+              </Badge>
+            ))}
+          </div>
+        ) : null}
+        <form
+          className="flex gap-2 p-3"
+          onSubmit={(e) => { e.preventDefault(); send(input); }}
+        >
+          <input
+            className="flex-1 rounded-md border bg-background px-3 py-2 text-sm"
+            placeholder="想到什麼說什麼…"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            disabled={busy}
+          />
+          <Button type="submit" size="icon" disabled={busy || !input.trim()}>
+            <Send className="h-4 w-4" />
+          </Button>
+        </form>
+      </div>
     </div>
   );
 }

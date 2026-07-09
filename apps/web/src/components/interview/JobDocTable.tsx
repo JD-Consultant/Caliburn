@@ -3,7 +3,9 @@
 // D27 工作台主表（兩層、可編輯、可拖拉）。職責(unit)→任務(task)，皆可改名/增/刪/
 // 拖拉排序；任務可跨職責拖拉。每任務 4 格（產出O/指標P/K/S）點擊開 filler。
 // 純呈現+結構編輯：所有變更經 onChange(newDoc) 交回上層 PATCH。不碰 CopilotKit。
-import { useEffect, useRef, useState } from "react";
+// 0028 D7(追蹤修訂):AI 直寫(evidence.review=pending)在**同格**標記——O/P/K/S 格
+// 加 AI 徽章+hover 引文;訪談細節(details 11 槽)以 chips 呈現(原本無呈現位=隱形)。
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { CompetencyBlock, KnowledgePack, OcsDocument, OcsTask } from "@/types";
 import {
   addTask,
@@ -17,8 +19,10 @@ import {
   setAttitudes,
   setTaskLevel,
 } from "@/lib/ocsDoc";
+import { useInterview } from "@/hooks/useInterview";
 import { useKnowledge } from "@/hooks/useKnowledge";
 import { groupedValueOptions, isOfficialBasis, ownTaskRefs, primaryDefaults, valuePoolOptions } from "@/lib/pack";
+import { buildReviewMap, DETAIL_SLOT_LABELS, taskMarks, type ReviewMark } from "@/lib/reviewMap";
 import { taskUrns } from "@/lib/urn";
 import { FieldCombobox } from "./fields/FieldCombobox";
 import { OfficialMenu } from "./fields/OfficialMenu";
@@ -95,26 +99,32 @@ function Cell({
   filled,
   n,
   onClick,
+  mark,
 }: {
   label: string;
   filled: boolean;
   n: number;
   onClick: () => void;
+  mark?: ReviewMark;      // 0028 D7:AI 直寫待審 → 同格標記(徽章+hover 引文)
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
+      title={mark ? `AI 依你的話寫入(待確認):「${mark.quote}」` : undefined}
       className={
         "flex items-center gap-1.5 rounded-md border px-2 py-1 text-xs transition-colors " +
         (filled
-          ? "border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+          ? (mark
+              ? "border-sky-300 bg-sky-50 text-sky-800 ring-1 ring-sky-200 hover:bg-sky-100"
+              : "border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100")
           : "border-dashed border-muted-foreground/30 text-muted-foreground hover:border-foreground/40 hover:text-foreground")
       }
     >
       {filled ? <Check className="h-3 w-3" /> : <Pencil className="h-3 w-3" />}
       <span className="font-medium">{label}</span>
       {filled ? <span className="tabular-nums opacity-70">{n}</span> : <span>點此填</span>}
+      {mark ? <span className="rounded bg-sky-600 px-1 text-[9px] leading-4 text-white">AI</span> : null}
     </button>
   );
 }
@@ -124,6 +134,8 @@ function TaskRow({
   task,
   unitIdx,
   taskIdx,
+  unitUid,
+  reviewMap,
   pack,
   onCell,
   onChange,
@@ -133,6 +145,8 @@ function TaskRow({
   task: OcsTask;
   unitIdx: number;
   taskIdx: number;
+  unitUid?: string;
+  reviewMap: Map<string, ReviewMark>;
   pack?: KnowledgePack;
   onCell: (t: CellTarget) => void;
   onChange: (d: OcsDocument) => void;
@@ -143,6 +157,15 @@ function TaskRow({
   const block = firstBlock(task);
   const level = block?.competency_level;
   const tc = task.task_codes?.[0];
+  // 0028 D7:此任務的待審標記(path 文法鏡像後端:uid 形優先、index 形後援)
+  const marks = taskMarks(reviewMap, [
+    `ocs_content.ocu_units.${unitUid ?? unitIdx}.tasks.${task._tid ?? taskIdx}`,
+    `ocs_content.ocu_units.${unitIdx}.tasks.${taskIdx}`,
+  ]);
+  const details = (task as OcsTask & { details?: Record<string, unknown> }).details ?? {};
+  const detailRows = Object.keys(DETAIL_SLOT_LABELS)
+    .map((k) => ({ k, v: details[k], mark: marks.details[k] }))
+    .filter((r) => r.v !== undefined && r.v !== null && r.v !== "");
   // 級別：官方值來自知識包 source_tasks（聯集取第一個非空＝順序1）；
   // fallback 帶官方時記下的 _levelSrc。選中官方值 → 存 _levelSrc（B4，來源必標）。
   const own = pack ? ownTaskRefs(pack, taskUrns(task)) : null;
@@ -197,11 +220,31 @@ function TaskRow({
         </button>
       </div>
       <div className="flex flex-wrap gap-2 pl-6">
-        <Cell label="產出 O" filled={count(block?.outputs) > 0} n={count(block?.outputs)} onClick={() => onCell({ kind: "o", unitIdx, taskIdx })} />
-        <Cell label="指標 P" filled={count(block?.indicators) > 0} n={count(block?.indicators)} onClick={() => onCell({ kind: "p", unitIdx, taskIdx })} />
-        <Cell label="知識 K" filled={count(block?.knowledge) > 0} n={count(block?.knowledge)} onClick={() => onCell({ kind: "k", unitIdx, taskIdx })} />
-        <Cell label="技能 S" filled={count(block?.skills) > 0} n={count(block?.skills)} onClick={() => onCell({ kind: "s", unitIdx, taskIdx })} />
+        <Cell label="產出 O" filled={count(block?.outputs) > 0} n={count(block?.outputs)} mark={marks.cells.outputs} onClick={() => onCell({ kind: "o", unitIdx, taskIdx })} />
+        <Cell label="指標 P" filled={count(block?.indicators) > 0} n={count(block?.indicators)} mark={marks.cells.indicators} onClick={() => onCell({ kind: "p", unitIdx, taskIdx })} />
+        <Cell label="知識 K" filled={count(block?.knowledge) > 0} n={count(block?.knowledge)} mark={marks.cells.knowledge} onClick={() => onCell({ kind: "k", unitIdx, taskIdx })} />
+        <Cell label="技能 S" filled={count(block?.skills) > 0} n={count(block?.skills)} mark={marks.cells.skills} onClick={() => onCell({ kind: "s", unitIdx, taskIdx })} />
       </div>
+      {/* 訪談細節(details 11 槽;0028 D7):書記寫入的主要內容,原本在表格**沒有呈現位**
+          =隱形。chips 呈現;AI 待審=藍框+徽章+hover 引文,人可見可查。 */}
+      {detailRows.length > 0 ? (
+        <div className="mt-2 flex flex-wrap gap-1.5 pl-6">
+          {detailRows.map(({ k, v, mark }) => (
+            <span
+              key={k}
+              title={mark ? `AI 依你的話寫入(待確認):「${mark.quote}」` : undefined}
+              className={
+                "inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[11px] " +
+                (mark ? "bg-sky-50 text-sky-800 ring-1 ring-sky-200" : "bg-muted text-muted-foreground")
+              }
+            >
+              <span className="font-medium">{DETAIL_SLOT_LABELS[k]}</span>
+              <span className="max-w-48 truncate">{String(v)}</span>
+              {mark ? <span className="rounded bg-sky-600 px-1 text-[9px] leading-4 text-white">AI</span> : null}
+            </span>
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -210,6 +253,7 @@ function UnitRow({
   id,
   unit,
   unitIdx,
+  reviewMap,
   pack,
   onCell,
   onChange,
@@ -218,6 +262,7 @@ function UnitRow({
   id: string;
   unit: OcsDocument["ocs_content"]["ocu_units"][number];
   unitIdx: number;
+  reviewMap: Map<string, ReviewMark>;
   pack?: KnowledgePack;
   onCell: (t: CellTarget) => void;
   onChange: (d: OcsDocument) => void;
@@ -259,6 +304,8 @@ function UnitRow({
               task={task}
               unitIdx={unitIdx}
               taskIdx={ti}
+              unitUid={unit._uid}
+              reviewMap={reviewMap}
               pack={pack}
               onCell={onCell}
               onChange={onChange}
@@ -332,6 +379,9 @@ export function JobDocTable({
   const unitIds = units.map((u) => `u:${u._uid}`);
   // 知識包（ADR 0021）：任務級別官方值/來源（TaskRow）。選過職類才有資料。
   const { data: pack } = useKnowledge(profileId, !!document.ocs_profile?.ocs_code);
+  // 0028 D7:訪談 evidence(review=pending)→ 同格追蹤修訂標記(404=尚無訪談,無標記)
+  const { data: iview } = useInterview(profileId);
+  const reviewMap = useMemo(() => buildReviewMap(iview?.evidence ?? []), [iview]);
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
 
@@ -390,6 +440,7 @@ export function JobDocTable({
                   id={`u:${unit._uid}`}
                   unit={unit}
                   unitIdx={ui}
+                  reviewMap={reviewMap}
                   pack={pack}
                   onCell={onCell}
                   onChange={onChange}

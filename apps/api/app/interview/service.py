@@ -75,6 +75,14 @@ async def build_task_pool(knowledge, doc: dict) -> list[dict]:
     return out
 
 
+def _checklist_others(unasked: list[dict], precheck: list[dict]) -> list[dict]:
+    """全檢查表的 others 段(D8):unasked 扣掉 precheck——沒把握的照列未勾,
+    recognition over recall。turn widget 與 run_curation 兩入口同資料形。"""
+    pre = {p["key"] for p in precheck}
+    return [{"key": t["key"], "name": t["name"], "unit": t.get("unit")}
+            for t in unasked if t["key"] not in pre]
+
+
 async def _persist_scribe_doc(doc_repo, profile_id, latest, scribe_res, *,
                               employee_texts, human_touched) -> tuple[bool, list[str]]:
     """書記直改寫回(雙 token;409→重讀重放同 records 一次;再衝突→放棄直改,保留
@@ -162,7 +170,11 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> T
                 state["declined"] = list(dict.fromkeys(
                     (state.get("declined") or []) + [d["key"] for d in cur.declined]))
             if cur.precheck:
-                widget = {"kind": "open_picker", "picker": "task", "precheck": cur.precheck}
+                # declined 落帳後重算 unasked → others 不含剛排除的(不騷擾)
+                remaining = L.checklist(work_doc, state, pool_tasks)["unasked"]
+                widget = {"kind": "open_picker", "picker": "task",
+                          "precheck": cur.precheck,
+                          "others": _checklist_others(remaining, cur.precheck)}
             await repo.add_llm_call(session.id, turn_seq=emp_turn.seq, role="select",
                                     model=model_for_role("select"), duration_ms=cur_ms,
                                     guard_verdicts=curation_guard[:30])
@@ -260,10 +272,7 @@ async def run_curation(profile_id: UUID, *, db, llm, knowledge) -> dict:
                 await repo.update_session(session.id, ledger_state=state)
                 unasked = L.checklist(doc, state, pool_tasks)["unasked"]
 
-    pre_keys = {p["key"] for p in precheck}
-    others = [{"key": t["key"], "name": t["name"], "unit": t.get("unit")}
-              for t in unasked if t["key"] not in pre_keys]
-    return {"precheck": precheck, "others": others}
+    return {"precheck": precheck, "others": _checklist_others(unasked, precheck)}
 
 
 async def run_finish(profile_id: UUID, *, db, llm, knowledge) -> dict:

@@ -79,10 +79,13 @@ updated: 2026-07-08
 
 | 動作 | 元件 | 網路 |
 |---|---|---|
-| 開始/續談 | InterviewPanel | `POST …/interview:start`(冪等;**空白 doc 也可起跑**=survey 引導選職類,§9.3) |
-| 回答 | InterviewPanel | `POST …/interview:turn {text}` → 回 `progress.coverage{filled,required}` |
-| 收尾 | (收尾流程) | `POST …/interview:finish`(backstop+轉 review) |
-| 批審套用 | SuggestionReview → 面板 decide | `POST …/interview:review {accept,reject}` → **前端** `applyAccepted`(自訂能力/態度=**append 陣列**;`appendAtPath`)→ persist |
+| 開始/續談 | InterviewPanel | `POST …/interview:start`(冪等;**空白 doc 也可起跑**=顧問引導選職類,§9.3) |
+| 回答 | InterviewPanel | `POST …/interview:turn {text}` → 回 `progress.coverage` + **`widget`**(0028) |
+| **AI 開職類 picker** | 面板 `onWidget` → page 開 `OccupationPicker(autoSearch)` | (無;widget 指令=`{kind:open_picker,picker:occupation,query}`,開窗即搜顧問用過的 query) |
+| **AI 預勾任務確認** | `CurationDialog`(每列引文理由+SourceLine;可剔) | (無;`{picker:task,precheck:[…]}`;套用=前端 `addFromPool`→persist 同一寫入路徑) |
+| 收尾 | (收尾流程) | `POST …/interview:finish` → `service.run_finish`(backstop+**態度收尾**+轉 review) |
+| 批審套用 | **面板底部「N 項待審」計數鈕**(0028 D5:置頂看不見 bug 修正)→ SuggestionReview → decide | `POST …/interview:review {accept,reject}` → **前端** `applyAccepted`(自訂能力/態度=**append 陣列**;`appendAtPath`)→ persist |
+| AI 直寫檢視 | **JobDocTable 同格追蹤修訂**(0028 D7):O/P/K/S 格 AI 徽章+hover 引文;**details 11 槽 chips 呈現**(`reviewMap.ts`;evidence.review=pending 為資料源) | `GET …/interview`(evidence 帶 `review` 欄) |
 | 顧問稽核 | `/documents/[id]/interview` 頁 | `GET …/interview`(逐字稿+證據+建議) |
 | 人直接改文件 | 既有編輯器 | PATCH(diff 記入 human_touched) |
 
@@ -113,8 +116,14 @@ updated: 2026-07-08
     尊重 STALL_K(成組問兩輪無進帳讓路 deep);`derive_phase`=議程顯示用(doc 推導不落庫);`ledger_summary` 對 onboarding 吐引導語(問實際做什麼→查職類→提
     具體職類請他從〔選職類〕確認),顧問 prompt 硬規則「選職類前不問態度、不硬猜職類硬套」。
     反例=空白文件掉進態度縫→顧問問態度→模糊 query 語意搜尋→幻覺職類(production bug 8ba32711)。
-    **書記無權設 `ocs_code`**;選職類靠既有〔選職類〕按鈕(Tier 1)。職類清單 widget(ADR「選單
-    阻斷確認」)=Tier 2 待做,屆時接 `TurnResult.widget`(現恆 None)。
+    **書記無權設 `ocs_code`**;選職類靠既有〔選職類〕按鈕 + widget 指令自動開窗(0028)。
+11. **widget=指令、非渲染**(0028 D1/D5):`TurnResult.widget` 是「開哪個 picker、預填/預勾什麼」
+    的指令(`open_picker`),前端開**同一批編輯器 pickers**(同 UI、入口不同)——別在聊天室
+    另做一套 UI、別復活 CopilotKit interrupt。高風險(職類/任務)=picker 阻斷確認;
+    預勾**保守**且每列附引文理由(反 rubber-stamp:Claude Code 93% 盲簽教訓)。
+12. **態度=收尾整體編碼**(0028 D3):`attitudes_pass` 讀全逐字稿提 2–4 條(MAX_A 硬上限、
+    引文逐字、只建議);**別把逐回合態度抽取加回書記**(反例=39 條逐句轟炸,session eb2af457)。
+    檢查表(covered/declined/unasked)身分對位=**provenance**,別用 task_codes.code(位置碼)。
 
 ## 7. Limitations(ADR 0027;誠實記載)
 
@@ -124,9 +133,12 @@ updated: 2026-07-08
 
 ## 8. 指路
 
-- 碼:`apps/api/app/interview/`(ledger/slots/scribe_schema/scribe/tools/agent_loop/consultant/
-  backstop/executor/commands/context/service/diff)+ `routes/interview.py` + `adapters/interview_repo.py`。
-- web:`components/interview/InterviewPanel|SuggestionReview` + `lib/interviewDoc.ts` + `hooks/useInterview.ts`。
+- 碼:`apps/api/app/interview/`(ledger/slots/scribe_schema/scribe/**curation**/**attitudes**/
+  tools/agent_loop/consultant/backstop/executor/commands/context/service/diff)
+  + `routes/interview.py` + `adapters/interview_repo.py`。
+- web:`components/interview/InterviewPanel|SuggestionReview|**CurationDialog**|JobDocTable(追蹤修訂)`
+  + `lib/interviewDoc.ts|**curation.ts**|**reviewMap.ts**` + `hooks/useInterview.ts`。
+- sim:`evals/interview_sim.py`(v3:裁剪 precision/recall + grounding + 態度收尾)。
 - 黃金範本(品質尺):[`../specs/2026-07-05-golden-sample-software-tester.md`](../specs/2026-07-05-golden-sample-software-tester.md);
   問句庫=研究紀錄 §15;prompt 全文+sim 劇本=[`../specs/2026-07-08-interview-v2-prompts-and-scenarios.md`](../specs/2026-07-08-interview-v2-prompts-and-scenarios.md);
   驗收/校準紀錄=研究紀錄 §16(§16.1–§16.14)。

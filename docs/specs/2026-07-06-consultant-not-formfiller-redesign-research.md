@@ -706,6 +706,25 @@ backstop_pass:收尾一呼、便宜模型(role=select)、只答兩題(misses 漏
 - **教訓**:「commit 說 T11 done」≠ 做完;widget/帳本狀態這種**看不見的接線**最容易被漏,
   且純函式測試不會抓(要 blank-doc 整合測 + 真人跑)。next_gap 的 tier 表要有「零任務」入口。
 
+### 16.17 校準 #4(0028 T10;2026-07-09;sim v3 活體跑:裁剪+深聊+態度收尾)
+
+sim v3 三段(--max-turns 12;模型沿 0026:interview=gpt-4.1-mini、select=gpt-4o-mini)。
+**GATE: PASS**(確定性閘門全過):
+- **裁剪段(新;劇本化述職直測抽取器,消掉 §16.14 的模擬員工漂移混淆)**:
+  precheck=T2.1/T3.1(**precision 1.0,零誤勾**);declined=T4.1/T5.1(**全對**,員工明說
+  不做的兩項);**ambiguous T1.1 兩邊都沒標**(未提及→留給顧問成組反問,正確);guard 零丟棄。
+  recall 0.67(漏勾 T2.2:員工說「跑測試執行**跟**版本回歸」vs 池名「測試執行**與**版本回歸」
+  ——保守抽取寧漏勿錯,**by design**:漏勾落 unasked → 顧問成組反問接住;資訊訊號非閘門)。
+- **深聊段(v2 原樣)**:evidence_verified_rate **0.92**、progressed_turn_rate **1.0**、
+  avg_quote_len 36.7——grounding 不變量持續成立。slot_keyword_accuracy 0.09=已知無效量尺
+  (§16.14);模擬員工(cheap LLM)再度重度漂移(自編支付閘道/節慶壓測劇情),管線照實記錄
+  ——漂移是 sim 員工問題非產品(roadmap:更強受限模擬員工)。
+- **態度收尾段(新)**:**3 條**(≤MAX_A ✓)A03 謹慎細心/A04 壓力容忍/A06 自我提升,各綁
+  逐字引文、guard 零丟棄;**干擾項 A01 親和關係沒被撿**(v2 那個 21 條 A01 轟炸的反面)。
+- **判定**:0028 的三個新機制(保守預勾/檢查表三態/收尾態度編碼)首輪校準全過;
+  閘門新增 curation precision≥0.8 + declined_all_correct(確定性)。與 session eb2af457
+  (39 條垃圾態度、0 任務)對照=v2.1 修復的直接證據。
+
 ## 16.14 校準 #3(T14;2026-07-08;sim v2 活體跑,誠實記錄)
 
 v2 sim 全管線活體跑(真書記+帳本+顧問,模擬員工照黃金範本事實表)。**FAIL,但拆解後
@@ -744,8 +763,9 @@ v2 sim 全管線活體跑(真書記+帳本+顧問,模擬員工照黃金範本事
 | sim LLM-judge 評分 | 語意 slot 評分取代脆弱 keyword-exact(才是有效品質閘門) | §16.14 校準#3 |
 | sim 更強模擬員工 | 降 Sim2Real 漂移(便宜模型即興編表外細節) | §16.14 |
 | 書記收斂過填 | prompt 只填「明確描述該面向」的內容,非旁枝細節 | §16.14(inputs='transaction_id' 誤填) |
-| onboarding 職類 widget(Tier 2) | 職類清單內嵌面板+AI 預勾+一鍵確認→接既有 `setOccupations`(ADR 0027「選單阻斷確認」);Tier 1 已把後端引導接好 | §16.16;plan T11 未竟半 |
+| ~~onboarding 職類 widget(Tier 2)~~ | **已完成(ADR 0028/T5+T7,2026-07-09)**:widget 指令 `open_picker` → 自動開 `OccupationPicker`(預填顧問 query 即搜)/`CurationDialog`(AI 預勾+引文理由) | §16.16→0028 |
 | 開場揭露未觸發 | 面板首回合直接送員工文字→跳過 `opening_disclosure`(NN/g 揭露沒顯示);需 start 或面板 seed 開場 | §16.16 蒐證旁見 |
+| evidence 待審批收(直寫層) | 文件格 pending 標記已有(0028 T8);「格旁 ✓/✗ / 本段一次收」需 evidence 審核端點+undo(revert)語義,獨立一輪 | 0028 T8 scope 修正 |
 
 ## 來源
 - McClelland (1998) *Identifying Competencies with Behavioral-Event Interviews*, Psych. Science. https://journals.sagepub.com/doi/10.1111/1467-9280.00065

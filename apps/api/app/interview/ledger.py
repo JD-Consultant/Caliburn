@@ -89,22 +89,26 @@ def has_occupation(doc: dict) -> bool:
 def checklist(doc: dict, state: dict, pool_tasks: list[dict]) -> dict[str, list[dict]]:
     """官方任務檢查表三態(0028 D6):covered/declined/unasked。
     pool_tasks=[{key,name,unit,ocs_code,task_code}](service 由 knowledge 組;純函式吃參數)。
-    身分對位:doc 任務 task_codes[].code == task_code(主)、名稱相等(備援,編輯器改碼場景)。
+    身分對位:doc 任務 **provenance{ocs_code,task_code}**(taskFromPool 寫入的官方身分,主)
+    、名稱相等(備援,自訂/舊資料)。**不用 task_codes.code**——web renumber 會把它重寫成
+    位置碼(T1.1),與官方碼撞格式會誤判 covered。
     declined 住 ledger_state["declined"](員工明說不做;文件無此任務、不可重算)。"""
     declined = set(state.get("declined") or [])
-    doc_codes: set[str] = set()
+    doc_prov: set[tuple[str, str]] = set()
     doc_names: set[str] = set()
     for _, t, _ in iter_tasks(doc):
+        pv = t.get("provenance") or {}
+        if pv.get("ocs_code") and pv.get("task_code"):
+            doc_prov.add((str(pv["ocs_code"]), str(pv["task_code"])))
         for tc in (t.get("task_codes") or []):
-            if tc.get("code"):
-                doc_codes.add(str(tc["code"]))
             if tc.get("name"):
                 doc_names.add(tc["name"])
     out: dict[str, list[dict]] = {"covered": [], "declined": [], "unasked": []}
     for pt in pool_tasks:
         if pt.get("key") in declined:
             out["declined"].append(pt)
-        elif str(pt.get("task_code") or "") in doc_codes or pt.get("name") in doc_names:
+        elif ((str(pt.get("ocs_code") or ""), str(pt.get("task_code") or "")) in doc_prov
+              or pt.get("name") in doc_names):
             out["covered"].append(pt)
         else:
             out["unasked"].append(pt)

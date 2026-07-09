@@ -11,12 +11,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { buildCurationRows, markAlreadyInDoc, picksFromRows } from "@/lib/curation";
 import { addFromPool } from "@/lib/ocsDoc";
-import type { KnowledgePack, OcsDocument, PickerPrecheckItem } from "@/types";
+import type { CurationChecklist, KnowledgePack, OcsDocument } from "@/types";
 import { Modal } from "./OccupationPicker";
 import { SourceLine } from "./fields/SourceLine";
 
-export function CurationDialog({ items, document: doc, pack, onApply, onClose }: {
-  items: PickerPrecheckItem[];
+export function CurationDialog({ input, document: doc, pack, onApply, onClose }: {
+  input: CurationChecklist;               // 全檢查表(D8):precheck=AI 預勾、others=照列未勾
   document: OcsDocument;
   pack?: KnowledgePack;
   onApply: (next: OcsDocument) => void;   // = 頁面 persist(autosave PATCH)
@@ -25,15 +25,14 @@ export function CurationDialog({ items, document: doc, pack, onApply, onClose }:
   // already=已在文件(provenance/名稱對位)→ 鎖定「已加入」不可再套(重複添加守衛;
   // 官方任務同編輯器 TaskPickerMenu 行為:重複要加隻能走自訂)
   const rows = useMemo(
-    () => markAlreadyInDoc(buildCurationRows(items, pack), doc), [items, pack, doc]);
-  const [unchecked, setUnchecked] = useState<Set<string>>(new Set());
-  const toggle = (key: string) =>
-    setUnchecked((prev) => {
-      const next = new Set(prev);
-      if (next.has(key)) next.delete(key); else next.add(key);
-      return next;
-    });
-  const selected = rows.filter((r) => r.found && !r.already && !unchecked.has(r.key));
+    () => markAlreadyInDoc(buildCurationRows(input, pack), doc), [input, pack, doc]);
+  // 勾選=衍生狀態:預設(AI 預勾且可寫;others 未勾)+ 使用者覆寫表(不用 effect 同步)
+  const [overrides, setOverrides] = useState<Map<string, boolean>>(new Map());
+  const isOn = (r: (typeof rows)[number]) =>
+    r.already ? true : (overrides.get(r.key) ?? (r.prechecked && r.found));
+  const toggle = (key: string, current: boolean) =>
+    setOverrides((prev) => new Map(prev).set(key, !current));
+  const selected = rows.filter((r) => r.found && !r.already && isOn(r));
 
   const apply = () => {
     if (!pack || selected.length === 0) return;
@@ -49,13 +48,13 @@ export function CurationDialog({ items, document: doc, pack, onApply, onClose }:
       <div className="max-h-80 space-y-1 overflow-y-auto rounded-lg border p-2">
         {rows.map((r) => {
           const locked = !r.found || !!r.already;
-          const on = r.already ? true : r.found && !unchecked.has(r.key);
+          const on = isOn(r);
           return (
             <label key={r.key}
               className={"flex cursor-pointer items-start gap-2 rounded px-2 py-1.5 text-sm hover:bg-muted/50 "
                 + (locked ? "opacity-60" : "")}>
               <input type="checkbox" className="mt-1" checked={on}
-                     disabled={locked} onChange={() => toggle(r.key)} />
+                     disabled={locked} onChange={() => toggle(r.key, on)} />
               <span className="min-w-0 flex-1">
                 <span className="flex items-center gap-1.5">
                   <span className="flex-1">{r.name}</span>
@@ -71,10 +70,12 @@ export function CurationDialog({ items, document: doc, pack, onApply, onClose }:
                     </Badge>
                   ) : null}
                 </span>
-                {/* 引文理由(D4 反盲簽):AI 是憑這句預勾的 */}
-                <span className="block truncate text-xs text-muted-foreground">
-                  你說:「{r.quote}」
-                </span>
+                {/* 引文理由(D4 反盲簽):AI 是憑這句預勾的;others 無引文不顯示 */}
+                {r.quote ? (
+                  <span className="block truncate text-xs text-muted-foreground">
+                    你說:「{r.quote}」
+                  </span>
+                ) : null}
                 <SourceLine srcs={r.srcs} />
               </span>
               {on ? <Check className="mt-1 h-3.5 w-3.5 text-muted-foreground" /> : null}

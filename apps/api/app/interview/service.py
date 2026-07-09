@@ -233,6 +233,39 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> T
                       coverage=L.coverage(work_doc, state))
 
 
+async def run_curation(profile_id: UUID, *, db, llm, knowledge) -> dict:
+    """隨叫裁剪(D8 P1a):選完職類**立刻**鋪任務盤,零打字。
+    回**全檢查表**:precheck(AI 依至今發言預勾+引文)+ others(其餘 unasked,未勾照列
+    ——recognition over recall,人掃一眼勾)。declined 落 ledger_state(同 turn 路徑);
+    llm 缺/敗或無發言 → precheck 空、others 照列(fail-open:清單本身就有價值)。"""
+    repo = InterviewRepo(db)
+    session = await repo.get_active(profile_id)
+    if session is None:
+        raise NoActiveInterview(str(profile_id))
+    doc = ((await DocRepo(db).latest(profile_id)) or {}).get("content") or {}
+    pool_tasks = await build_task_pool(knowledge, doc)
+    state = dict(session.ledger_state or {})
+    unasked = L.checklist(doc, state, pool_tasks)["unasked"]
+
+    precheck: list[dict] = []
+    if unasked and llm is not None:
+        turns = await repo.list_turns(session.id)
+        emp = [t.text for t in turns if t.role == "employee"]
+        if emp:
+            cur = await curation_pass(llm, pool_tasks=unasked, employee_texts=emp)
+            precheck = cur.precheck
+            if cur.declined:
+                state["declined"] = list(dict.fromkeys(
+                    (state.get("declined") or []) + [d["key"] for d in cur.declined]))
+                await repo.update_session(session.id, ledger_state=state)
+                unasked = L.checklist(doc, state, pool_tasks)["unasked"]
+
+    pre_keys = {p["key"] for p in precheck}
+    others = [{"key": t["key"], "name": t["name"], "unit": t.get("unit")}
+              for t in unasked if t["key"] not in pre_keys]
+    return {"precheck": precheck, "others": others}
+
+
 async def run_finish(profile_id: UUID, *, db, llm, knowledge) -> dict:
     """收尾(0027 backstop + 0028 D3 態度收尾 pass)→ 建議化 → phase=review。
     fail-open:llm 缺仍可收尾(只是不複查/不編態度);knowledge 掛 → 略過態度。"""

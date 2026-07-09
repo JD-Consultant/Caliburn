@@ -15,12 +15,14 @@ export function OccupationPicker({
   profileId,
   defaultQuery,
   autoSearch = false,
+  onApplied,
   onClose,
   onError,
 }: {
   profileId: string;
   defaultQuery: string;
   autoSearch?: boolean;
+  onApplied?: () => void;   // 職類設定成功後(D8 P1a:訪談開著→立即鋪任務盤)
   onClose: () => void;
   onError: (msg: string) => void;
 }) {
@@ -50,7 +52,10 @@ export function OccupationPicker({
   const confirm = () => {
     if (picked.length === 0) return;
     setOcc.mutate(picked, {
-      onSuccess: onClose,
+      onSuccess: () => {
+        onApplied?.();     // D8 P1a:選完職類立即觸發任務盤鋪設(訪談開著時)
+        onClose();
+      },
       onError: (e: unknown) => onError(e instanceof Error ? e.message : "設定職類失敗"),
     });
   };

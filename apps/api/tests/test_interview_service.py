@@ -9,7 +9,7 @@ from uuid import uuid4
 from app.adapters.interview_repo import InterviewRepo
 from app.adapters.persistence import DocRepo
 from app.adapters.stubs import StubKnowledge, StubLlm
-from app.interview.service import NoActiveInterview, run_finish, run_turn
+from app.interview.service import NoActiveInterview, run_curation, run_finish, run_turn
 from app.models import JobProfile, User
 
 TASK_PATH = "ocs_content.ocu_units.u1.tasks.t1"
@@ -203,6 +203,28 @@ async def test_no_picker_when_top_hit_already_selected(db_session):
     out = await run_turn(p.id, "就是設備維護的工作", db=db_session, llm=llm,
                          knowledge=StubKnowledge())
     assert out.widget is None
+
+
+@pytest.mark.asyncio
+async def test_run_curation_full_checklist_with_precheck_and_declined(db_session):
+    """D8 P1a:隨叫裁剪回全檢查表(precheck 帶引文 + others 照列);declined 落 ledger。"""
+    p, s, repo = await _setup(db_session, doc=_doc_occ_only())
+    await repo.append_turn(s.id, role="employee", text="我每天做例行設備巡檢")
+    llm = StubLlm(select_result=_curation_select([
+        {"type": "precheck", "key": "KRM2421-001v4:T1.1", "quote": "例行設備巡檢"}]))
+    out = await run_curation(p.id, db=db_session, llm=llm, knowledge=StubKnowledge())
+    assert [x["key"] for x in out["precheck"]] == ["KRM2421-001v4:T1.1"]
+    assert out["precheck"][0]["quote"] == "例行設備巡檢"
+    assert [x["key"] for x in out["others"]] == ["KRM2421-001v4:T1.2"]   # 沒把握的照列未勾
+
+
+@pytest.mark.asyncio
+async def test_run_curation_fail_open_without_llm(db_session):
+    """llm 缺 → precheck 空、others 全列(清單本身就有價值;零打字仍可勾)。"""
+    p, s, repo = await _setup(db_session, doc=_doc_occ_only())
+    out = await run_curation(p.id, db=db_session, llm=None, knowledge=StubKnowledge())
+    assert out["precheck"] == []
+    assert {x["key"] for x in out["others"]} == {"KRM2421-001v4:T1.1", "KRM2421-001v4:T1.2"}
 
 
 @pytest.mark.asyncio

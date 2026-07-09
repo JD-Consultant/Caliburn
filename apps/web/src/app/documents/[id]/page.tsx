@@ -19,7 +19,8 @@ import { ConflictDialog } from "@/components/interview/ConflictDialog";
 import { CurationDialog } from "@/components/interview/CurationDialog";
 import { InterviewPanel } from "@/components/interview/InterviewPanel";
 import { completion, ensureIds } from "@/lib/ocsDoc";
-import type { OcsDocument, OpenPickerWidget, PickerPrecheckItem } from "@/types";
+import { interviewCuration } from "@/lib/api";
+import type { CurationChecklist, OcsDocument, OpenPickerWidget } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -60,14 +61,22 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
   const [error, setError] = useState<string | null>(null);
   // 0028 D1:訪談引擎 widget 指令 → 開**同一批**編輯器 pickers(同 UI、入口不同)
   const [aiOccQuery, setAiOccQuery] = useState<string | null>(null);
-  const [curation, setCuration] = useState<PickerPrecheckItem[] | null>(null);
+  const [curation, setCuration] = useState<CurationChecklist | null>(null);
   const onWidget = (w: OpenPickerWidget) => {
     if (w.picker === "occupation") {
       setAiOccQuery(w.query ?? "");
       setShowOcc(true);
-    } else if (w.picker === "task" && w.precheck?.length) {
-      setCuration(w.precheck);
+    } else if (w.picker === "task" && ((w.precheck?.length ?? 0) + (w.others?.length ?? 0)) > 0) {
+      setCuration({ precheck: w.precheck ?? [], others: w.others ?? [] });
     }
+  };
+  // D8 P1a:選完職類**立刻**鋪任務盤(零打字)——訪談開著才觸發;無 active/失敗靜默
+  const onOccupationsApplied = async () => {
+    if (!showInterview) return;
+    try {
+      const res = await interviewCuration(id);
+      if (res.precheck.length + res.others.length > 0) setCuration(res);
+    } catch { /* 無 active 訪談或 llm 缺:略過,手動〔選職責/任務〕仍在 */ }
   };
 
   const persist = (next: OcsDocument, after?: () => void) => {
@@ -203,6 +212,7 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
           profileId={id}
           defaultQuery={aiOccQuery ?? (profile?.job_summary || profile?.job_title || "")}
           autoSearch={aiOccQuery != null}
+          onApplied={onOccupationsApplied}
           onClose={() => { setShowOcc(false); setAiOccQuery(null); }}
           onError={setError}
         />
@@ -211,7 +221,8 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
       {/* 0028 D1/D4:AI 預勾任務確認(每列附引文理由;寫入走 addFromPool→persist 同一路) */}
       {curation && doc ? (
         <CurationDialog
-          items={curation}
+          key={[...curation.precheck, ...curation.others].map((x) => x.key).join("|")}
+          input={curation}
           document={doc}
           pack={pack}
           onApply={(next) => persist(next)}

@@ -40,6 +40,31 @@ export function buildCurationRows(
   ];
 }
 
+// 一窗兩步的步1(D8 P1b;DACUM duty→task):由檢查表列推導職責集合。
+// 有 AI 預勾任務的職責 defaultOn(步1 預勾);全部職責照列(recognition over recall)。
+export interface DutyRow {
+  unit: string;         // 職責名(分組 key)
+  total: number;        // 檢查表任務數
+  prechecked: number;   // 其中 AI 預勾數
+  defaultOn: boolean;   // 步1 預設勾(= prechecked > 0)
+}
+
+export function dutyRows(rows: CurationRow[]): DutyRow[] {
+  const by = new Map<string, DutyRow>();
+  for (const r of rows) {
+    const d = by.get(r.unit) ?? { unit: r.unit, total: 0, prechecked: 0, defaultOn: false };
+    d.total += 1;
+    if (r.prechecked) { d.prechecked += 1; d.defaultOn = true; }
+    by.set(r.unit, d);
+  }
+  return [...by.values()];
+}
+
+// 步2:只列所選職責的任務(職責是閘門——未選職責的 AI 預勾任務也不套用)。
+export function filterByDuties(rows: CurationRow[], units: ReadonlySet<string>): CurationRow[] {
+  return rows.filter((r) => units.has(r.unit));
+}
+
 // 已在文件的列標 already(重複添加守衛;對齊編輯器 TaskPickerMenu「已加入」鎖定):
 // provenance(ocs_code:task_code,改過名也認得)或任務名相同 → 鎖。
 export function markAlreadyInDoc(rows: CurationRow[], doc: OcsDocument): CurationRow[] {

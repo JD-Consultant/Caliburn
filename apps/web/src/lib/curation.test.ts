@@ -1,7 +1,9 @@
 // T7(0028 D1):AI 預勾清單 ↔ 知識包對位 + PoolPick 組裝(純函式;元件保持薄)。
 import { describe, expect, it } from "vitest";
 
-import { buildCurationRows, markAlreadyInDoc, picksFromRows } from "@/lib/curation";
+import {
+  buildCurationRows, dutyRows, filterByDuties, markAlreadyInDoc, picksFromRows,
+} from "@/lib/curation";
 import type { KnowledgePack, OcsDocument, PickerPrecheckItem } from "@/types";
 
 // 最小 pack:units/tasks 池 + source_tasks(unitRows/taskRows 只吃這三處)
@@ -69,6 +71,37 @@ describe("picksFromRows", () => {
       { key: "ISD:T2", name: "介面設計", unit: "後端亂給的名字", quote: "q" }];
     const picks = picksFromRows(buildCurationRows(IN(items), PACK), PACK);
     expect(picks[0].unit.name).toBe("規劃");          // 由任務反查回官方職責
+  });
+});
+
+describe("dutyRows(D8 P1b 步1:職責集合推導——DACUM duty→task)", () => {
+  it("按 unit 分組保序;計 total/prechecked;有 AI 預勾任務的職責 defaultOn", () => {
+    const rows = buildCurationRows(IN(
+      [{ key: "ISD:T1", name: "需求訪談", unit: "規劃", quote: "q" }],
+      [{ key: "ISD:T2", name: "介面設計", unit: "規劃" },
+       { key: "ISD:T5", name: "上線部署", unit: "維運" }]), PACK);
+    expect(dutyRows(rows)).toEqual([
+      { unit: "規劃", total: 2, prechecked: 1, defaultOn: true },
+      { unit: "維運", total: 1, prechecked: 0, defaultOn: false },
+    ]);
+  });
+
+  it("全 others(fail-open 清單)→ 全職責 defaultOn:false,照列可勾", () => {
+    const rows = buildCurationRows(IN([],
+      [{ key: "ISD:T2", name: "介面設計", unit: "規劃" }]), PACK);
+    expect(dutyRows(rows)).toEqual([
+      { unit: "規劃", total: 1, prechecked: 0, defaultOn: false }]);
+  });
+});
+
+describe("filterByDuties(D8 P1b 步2:只列所選職責的任務)", () => {
+  it("unit ∈ 所選 → 留;未選職責的 AI 預勾任務也被擋(職責是閘門)", () => {
+    const rows = buildCurationRows(IN(
+      [{ key: "ISD:T1", name: "需求訪談", unit: "規劃", quote: "q" }],
+      [{ key: "ISD:T5", name: "上線部署", unit: "維運" }]), PACK);
+    expect(filterByDuties(rows, new Set(["維運"])).map((r) => r.key))
+      .toEqual(["ISD:T5"]);
+    expect(filterByDuties(rows, new Set())).toEqual([]);
   });
 });
 

@@ -785,6 +785,7 @@ v2 sim 全管線活體跑(真書記+帳本+顧問,模擬員工照黃金範本事
 | ~~onboarding 職類 widget(Tier 2)~~ | **已完成(ADR 0028/T5+T7,2026-07-09)**:widget 指令 `open_picker` → 自動開 `OccupationPicker`(預填顧問 query 即搜)/`CurationDialog`(AI 預勾+引文理由) | §16.16→0028 |
 | 開場揭露未觸發 | 面板首回合直接送員工文字→跳過 `opening_disclosure`(NN/g 揭露沒顯示);需 start 或面板 seed 開場 | §16.16 蒐證旁見 |
 | evidence 待審批收(直寫層) | 文件格 pending 標記已有(0028 T8);「格旁 ✓/✗ / 本段一次收」需 evidence 審核端點+undo(revert)語義,獨立一輪 | 0028 T8 scope 修正 |
+| 任務挑選 UI 收斂 | 人=TaskPickerMenu(逐職責下拉)/AI=CurationDialog(彙總確認)容器不同;資料源/寫入路/鎖定規則已共用,「列樣式」與「已在文件判定」(locOf-URN vs markAlreadyInDoc-provenance)各兩份——語義略異暫不硬併,列樣式可抽共用列元件 | 維護者提問 2026-07-09(雙重維護成本) |
 
 ## 來源
 - McClelland (1998) *Identifying Competencies with Behavioral-Event Interviews*, Psych. Science. https://journals.sagepub.com/doi/10.1111/1467-9280.00065

@@ -178,17 +178,21 @@ def _pool():
     ]
 
 
-def _doc_with_codes(codes_or_names):
-    """一個任務,task_codes 指定(供身分對位測試)。"""
+def _doc_with_codes(codes_or_names, provenance=None):
+    """一個任務,task_codes/provenance 指定(供身分對位測試)。"""
     t = _core_task(tid="X")
     t["task_codes"] = codes_or_names
+    if provenance:
+        t["provenance"] = provenance
     doc = _doc([_unit([t], uid="U1")])
     doc["ocs_profile"] = {"ocs_code": "ISD"}
     return doc
 
 
 def test_checklist_three_states():
-    doc = _doc_with_codes([{"code": "T1", "name": "需求訪談"}])
+    """身分=provenance(taskFromPool 寫入的官方身分),非 task_codes.code(位置碼)。"""
+    doc = _doc_with_codes([{"code": "T1.1", "name": "客戶需求討論會"}],   # 改過名
+                          provenance={"ocs_code": "ISD", "task_code": "T1"})
     cl = L.checklist(doc, {"declined": ["ISD:T3"]}, _pool())
     assert [t["key"] for t in cl["covered"]] == ["ISD:T1"]
     assert [t["key"] for t in cl["declined"]] == ["ISD:T3"]
@@ -196,10 +200,18 @@ def test_checklist_three_states():
 
 
 def test_checklist_name_fallback():
-    """改過碼的任務用名稱備援對位(編輯器改名場景)。"""
+    """無 provenance(自訂/舊資料)用名稱備援對位。"""
     doc = _doc_with_codes([{"code": "X9", "name": "介面設計"}])
     cl = L.checklist(doc, {}, _pool())
     assert "ISD:T2" in [t["key"] for t in cl["covered"]]
+
+
+def test_checklist_positional_code_not_mistaken_for_official():
+    """回歸守衛:web renumber 的位置碼(T1)撞官方碼格式,**不得**誤判 covered
+    (§T7 發現:task_codes.code=位置碼非官方身分)。"""
+    doc = _doc_with_codes([{"code": "T1", "name": "完全不同的自訂任務"}])
+    cl = L.checklist(doc, {}, _pool())
+    assert [t["key"] for t in cl["unasked"]] == [p["key"] for p in _pool()]
 
 
 def test_derive_phase_progression():

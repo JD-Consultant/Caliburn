@@ -89,7 +89,7 @@ updated: 2026-07-09
 | 回答 | InterviewPanel | `POST …/interview:turn {text}` → 回 `progress.coverage` + **`widget`**(0028) |
 | **深聊 meta 快速回覆** | 面板輸入框上 chips(跳過這題/沒有/先記到這)——**僅流程動作**(D8 P4) | (無;純 send 轉發走 turn;後端 skips 語彙認得「跳過」) |
 | **AI 開職類 picker** | 面板 `onWidget` → page 開 `OccupationPicker(autoSearch)` | (無;widget 指令=`{kind:open_picker,picker:occupation,query}`,開窗即搜顧問用過的 query;開場+**中途加選**同一條 D8 P2) |
-| **AI 任務盤確認** | `CurationDialog` **一窗兩步**(D8 P1b:步1 勾職責 → 步2 該職責任務;職責是閘門)。**盤=編輯器知識包全量**(D9 `buildBoard`:unitRows/taskRows 同宇宙;任務鎖=URN、職責身分=名稱,同 Unit/TaskPickerMenu),AI 只疊 precheck+引文 | (無;widget `{picker:task,precheck:[…]}`=AI 疊加層;套用=前端 `addFromPool`→persist 同一寫入路徑) |
+| **AI 任務盤確認** | `CurationDialog` **一窗兩步**(D8 P1b:步1 勾職責 → 步2 該職責任務;職責是閘門)。**盤=編輯器知識包全量**(D9 `buildBoard`:unitRows/taskRows 同宇宙;任務鎖=URN、職責身分=名稱),**列=編輯器選單同款**(Command 列:✓+序號+SourceLine,同 Unit/TaskPickerMenu 形式),AI 只疊 precheck+引文 | (無;widget `{picker:task,precheck:[…]}`=AI 疊加層;套用=前端 `addFromPool`→persist 同一寫入路徑) |
 | **選完職類自動鋪盤** | `OccupationPicker.onApplied` → page 呼端點 → 開 `CurationDialog`(訪談開著才觸發;端點失敗盤照開=fail-open) | `POST …/interview:curation` → `{precheck}`(D8 P1a 零打字;D9 清單在前端) |
 | 收尾 | (收尾流程) | `POST …/interview:finish` → `service.run_finish`(backstop+**態度收尾**+轉 review) |
 | 批審套用 | **面板底部「N 項待審」計數鈕**(0028 D5:置頂看不見 bug 修正)→ SuggestionReview → decide | `POST …/interview:review {accept,reject}` → **前端** `applyAccepted`(自訂能力/態度=**append 陣列**;`appendAtPath`)→ persist |

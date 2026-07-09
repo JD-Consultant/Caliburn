@@ -174,6 +174,38 @@ async def test_onboarding_occupation_widget_from_consultant_search(db_session):
 
 
 @pytest.mark.asyncio
+async def test_midway_new_occupation_hit_triggers_picker(db_session):
+    """D8 P2:已選職類,顧問搜到**不同的** top-1 職類(如全端聊到後端)→ 彈加選 picker。
+    (實測 65b9aa3d:三度搜到系統設計 1.0 卻無回路 → 內容無家 18K 硬塞錯任務。)"""
+    doc = _doc_occ_only()
+    doc["ocs_profile"]["ocs_code"] = "X-OTHER"        # 現有職類 ≠ Stub 搜尋 top-1
+    p, s, repo = await _setup(db_session, doc=doc)
+    llm = StubLlm(select_result={"records": []},
+                  chat_text="你也做維護?建議把「設備維護工程師」加選進來。",
+                  chat_trace=[{"name": "knowledge_search_occupations",
+                               "args": {"query": "設備維護 保養 巡檢", "top_k": 3},
+                               "result_digest": "x"}])
+    out = await run_turn(p.id, "我也會做設備保養那塊", db=db_session, llm=llm,
+                         knowledge=StubKnowledge())
+    assert out.widget == {"kind": "open_picker", "picker": "occupation",
+                          "query": "設備維護 保養 巡檢"}
+
+
+@pytest.mark.asyncio
+async def test_no_picker_when_top_hit_already_selected(db_session):
+    """top-1 = 已選職類(顧問只是查參考)→ 不彈,不騷擾。"""
+    doc = _doc_occ_only()                              # ocs_code=KRM2421-001v4=Stub top-1
+    p, s, repo = await _setup(db_session, doc=doc)
+    llm = StubLlm(select_result={"records": []},
+                  chat_trace=[{"name": "knowledge_search_occupations",
+                               "args": {"query": "設備維護", "top_k": 3},
+                               "result_digest": "x"}])
+    out = await run_turn(p.id, "就是設備維護的工作", db=db_session, llm=llm,
+                         knowledge=StubKnowledge())
+    assert out.widget is None
+
+
+@pytest.mark.asyncio
 async def test_finish_runs_attitudes_pass(db_session):
     p, s, repo = await _setup(db_session)                      # 既有 doc(有任務)
     await repo.append_turn(s.id, role="employee", text="回歸沒跑完我絕不放行")

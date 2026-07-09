@@ -314,7 +314,7 @@ function UnitRow({
           ))}
         </SortableContext>
         <div className="flex items-center gap-1.5">
-          {/* 選任務 ▾＝任務大池（預勾自己的、可借用；P3 UI 修訂）；＋＝手動空白任務 */}
+          {/* 選任務(獨立選單窗)＝任務大池（預勾自己的、可借用）；＋＝手動空白任務 */}
           <TaskPickerMenu document={doc} pack={pack} unitIdx={unitIdx} onChange={onChange} />
           <button
             type="button"

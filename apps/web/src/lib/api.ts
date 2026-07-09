@@ -2,6 +2,7 @@
 // which now mounts users + job_profiles CRUD under /api/v1. Legacy interview /
 // tasks / documents endpoints were removed with the old backend (Concern B).
 import type {
+  CurationChecklist,
   InterviewStartResponse,
   InterviewTurnResponse,
   InterviewView,
@@ -148,6 +149,12 @@ export const interviewTurn = (profileId: string, text: string) =>
   request<InterviewTurnResponse>(`/job-profiles/${profileId}/interview:turn`, {
     method: "POST",
     body: JSON.stringify({ text }),
+  });
+
+// 隨叫裁剪(D8 P1a):選完職類立即取全檢查表(precheck+others)開 CurationDialog
+export const interviewCuration = (profileId: string) =>
+  request<CurationChecklist>(`/job-profiles/${profileId}/interview:curation`, {
+    method: "POST",
   });
 
 export const getInterview = (profileId: string) =>

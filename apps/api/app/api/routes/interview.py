@@ -22,7 +22,7 @@ from app.core.ports import KnowledgePort, LlmPort
 from app.database import get_db
 from app.interview import ledger as L
 from app.interview.diff import STABLE_ID_KEYS
-from app.interview.service import NoActiveInterview, run_finish, run_turn
+from app.interview.service import NoActiveInterview, run_curation, run_finish, run_turn
 
 router = APIRouter(prefix="/job-profiles", tags=["interview"])
 
@@ -114,6 +114,22 @@ async def interview_turn(
     return {"say": out.say, "question": out.question, "widget": out.widget,
             "doc_changed": out.doc_changed, "pending_suggestions": out.pending_suggestions,
             "progress": {"phase": out.phase, "coverage": out.coverage}}
+
+
+@router.post("/{profile_id}/interview:curation")
+async def interview_curation(
+    profile_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    llm: LlmPort | None = Depends(get_llm),
+    knowledge: KnowledgePort = Depends(get_knowledge),
+):
+    """隨叫裁剪(D8 P1a):選完職類前端立即呼叫 → 回全檢查表(precheck+others)開
+    CurationDialog,零打字鋪任務盤。llm 缺 → precheck 空、清單照回(fail-open)。"""
+    await _require_profile(profile_id, db)
+    try:
+        return await run_curation(profile_id, db=db, llm=llm, knowledge=knowledge)
+    except NoActiveInterview:
+        raise HTTPException(status_code=409, detail={"code": "no_active_interview"})
 
 
 @router.post("/{profile_id}/interview:finish")

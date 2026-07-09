@@ -4,13 +4,15 @@
 // (與 UnitPicker/TaskPickerMenu 同宇宙、同身分機制),**AI 只疊 precheck+引文**。
 // 步1 勾職責(全部官方職責照列;有 AI 預勾任務的預勾)→ 步2 該職責全部官方任務
 // (AI 預勾=勾+引文;已在文件=鎖「已加入/已填」;其餘未勾可勾)。職責是閘門:
-// 未選職責的預勾任務不套用。寫入走既有 addFromPool→persist(單一寫入路徑);
+// 未選職責的預勾任務不套用。**列=編輯器選單同款**(Command 列:✓+序號+SourceLine,
+// 同 Unit/TaskPickerMenu 形式)。寫入走既有 addFromPool→persist(單一寫入路徑);
 // 要「討論」直接在對話裡跟顧問說。
 import { useMemo, useState } from "react";
 import { Check } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Command, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
 import { buildBoard, picksFromBoard, type BoardTaskRow } from "@/lib/curation";
 import { addFromPool } from "@/lib/ocsDoc";
 import type { KnowledgePack, OcsDocument, PickerPrecheckItem } from "@/types";
@@ -61,16 +63,16 @@ export function CurationDialog({ precheck, document: doc, pack, onApply, onClose
     );
   }
 
-  const taskRow = (r: BoardTaskRow) => {
+  const taskItem = (r: BoardTaskRow, i: number) => {
     const on = isOn(r);
     return (
-      <label key={r.name}
-        className={"flex cursor-pointer items-start gap-2 rounded px-2 py-1.5 text-sm hover:bg-muted/50 "
-          + (r.already ? "opacity-60" : "")}>
-        <input type="checkbox" className="mt-1" checked={on}
-               disabled={r.already} onChange={() => toggle(r.name, on)} />
-        <span className="min-w-0 flex-1">
-          <span className="flex items-center gap-1.5">
+      <CommandItem key={r.name} value={`${r.unit} ${i} ${r.name}`}
+        onSelect={() => { if (!r.already) toggle(r.name, on); }}
+        className={"items-start " + (r.already ? "opacity-60" : "")}>
+        <Check className={"mt-0.5 h-3.5 w-3.5 " + (on ? "opacity-100" : "opacity-0")} />
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-1.5">
+            <span className="font-mono text-xs text-muted-foreground">{i + 1}.</span>
             <span className="flex-1">{r.name}</span>
             {r.already ? (
               <Badge variant="secondary" className="text-[10px]"
@@ -78,7 +80,7 @@ export function CurationDialog({ precheck, document: doc, pack, onApply, onClose
                 {r.filled ? "已填" : "已加入"}
               </Badge>
             ) : null}
-          </span>
+          </div>
           {/* 引文理由(D4 反盲簽):AI 是憑這句預勾的;無引文不顯示 */}
           {r.quote ? (
             <span className="block truncate text-xs text-muted-foreground">
@@ -86,9 +88,8 @@ export function CurationDialog({ precheck, document: doc, pack, onApply, onClose
             </span>
           ) : null}
           <SourceLine srcs={r.srcs} />
-        </span>
-        {on ? <Check className="mt-1 h-3.5 w-3.5 text-muted-foreground" /> : null}
-      </label>
+        </div>
+      </CommandItem>
     );
   };
 
@@ -98,26 +99,37 @@ export function CurationDialog({ precheck, document: doc, pack, onApply, onClose
         <p className="mb-2 text-xs text-muted-foreground">
           先勾這份工作<strong>有的職責</strong>(AI 依你說的預勾了部分),下一步再挑各職責底下的任務。
         </p>
-        <div className="max-h-80 space-y-1 overflow-y-auto rounded-lg border p-2">
-          {board.duties.map((d) => {
-            const on = dutyOn(d);
-            return (
-              <label key={d.unit}
-                className="flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-sm hover:bg-muted/50">
-                <input type="checkbox" checked={on}
-                       onChange={() => toggleDuty(d.unit, on)} />
-                <span className="flex-1">{d.unit}</span>
-                <Badge variant="outline" className="text-[10px]">{d.total} 項任務</Badge>
-                {d.prechecked > 0 ? (
-                  <Badge variant="secondary" className="text-[10px]">AI 預勾 {d.prechecked}</Badge>
-                ) : null}
-                {d.inDoc ? (
-                  <Badge variant="secondary" className="text-[10px]"
-                         title="此職責已在文件;可再進去補任務">已加入</Badge>
-                ) : null}
-              </label>
-            );
-          })}
+        <div className="rounded-lg border">
+          <Command className="bg-transparent">
+            <CommandList className="max-h-80">
+              <CommandGroup>
+                {board.duties.map((d, i) => {
+                  const on = dutyOn(d);
+                  return (
+                    <CommandItem key={d.unit} value={`${i} ${d.unit}`}
+                      onSelect={() => toggleDuty(d.unit, on)} className="items-start">
+                      <Check className={"mt-0.5 h-3.5 w-3.5 " + (on ? "opacity-100" : "opacity-0")} />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-mono text-xs text-muted-foreground">{i + 1}.</span>
+                          <span className="flex-1">{d.unit}</span>
+                          <Badge variant="outline" className="text-[10px]">{d.total} 項任務</Badge>
+                          {d.prechecked > 0 ? (
+                            <Badge variant="secondary" className="text-[10px]">AI 預勾 {d.prechecked}</Badge>
+                          ) : null}
+                          {d.inDoc ? (
+                            <Badge variant="secondary" className="text-[10px]"
+                                   title="此職責已在文件;可再進去補任務">已加入</Badge>
+                          ) : null}
+                        </div>
+                        <SourceLine srcs={d.srcs} />
+                      </div>
+                    </CommandItem>
+                  );
+                })}
+              </CommandGroup>
+            </CommandList>
+          </Command>
         </div>
         <div className="mt-4 flex justify-end gap-2">
           <Button variant="ghost" onClick={onClose}>之後再說</Button>
@@ -134,15 +146,17 @@ export function CurationDialog({ precheck, document: doc, pack, onApply, onClose
       <p className="mb-2 text-xs text-muted-foreground">
         AI 可能看錯——掃一眼再套用;不對的取消勾選,或直接在對話裡跟顧問說。
       </p>
-      <div className="max-h-80 space-y-2 overflow-y-auto rounded-lg border p-2">
-        {pickedDuties.map((d) => (
-          <div key={d.unit}>
-            <p className="px-2 py-1 text-xs font-medium text-muted-foreground">{d.unit}</p>
-            <div className="space-y-1">
-              {board.tasks.filter((r) => r.unit === d.unit).map(taskRow)}
-            </div>
-          </div>
-        ))}
+      <div className="rounded-lg border">
+        <Command className="bg-transparent">
+          <CommandList className="max-h-80">
+            {pickedDuties.map((d) => (
+              <CommandGroup key={d.unit}>
+                <p className="px-2 py-1 text-xs font-medium text-muted-foreground">{d.unit}</p>
+                {board.tasks.filter((r) => r.unit === d.unit).map(taskItem)}
+              </CommandGroup>
+            ))}
+          </CommandList>
+        </Command>
       </div>
       <div className="mt-4 flex justify-end gap-2">
         <Button variant="ghost" onClick={() => setStep(1)}>上一步</Button>

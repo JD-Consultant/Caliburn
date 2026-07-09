@@ -150,7 +150,7 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
             <MessageCircle className="h-4 w-4" />
             AI 訪談
           </Button>
-          {/* 選職責 ▾（P3 UI 修訂）：勾＝空職責入表格，任務再從職責列「選任務 ▾」挑 */}
+          {/* 選職責(獨立選單窗)：勾＝空職責入表格，任務再從職責列「選任務」挑 */}
           <UnitPickerMenu document={doc} pack={pack} disabled={!hasOccupations || !doc} onChange={(d) => persist(d)} />
           <Button size="sm" variant="outline" className="gap-1" onClick={exportJson} disabled={status === "none"}>
             <Download className="h-4 w-4" />

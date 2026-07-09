@@ -1,18 +1,19 @@
 "use client";
 
-// 「選職責 ▾」工具列下拉（P3 UI 修訂：表格中心）：職責大池全列（序號＋引用行）。
-// 勾＝空職責立即入表格（任務再從職責列「選任務 ▾」挑）；再點取消＝移除空職責；
-// 含任務的鎖定（表格刪）。「自動勾選」＝補上主基準（順序1）來源的職責。
-// commit-per-click，走 autosave（單一寫入路徑）。
+// 「選職責」工具列按鈕 → **獨立選單窗**(Modal;原下拉 Popover 太擠——職責多+每列
+// 來源行,東西太多):職責大池全列(✓+序號+引用行,Command 選單列)。
+// 勾＝空職責立即入表格(任務再從職責列「選任務」挑);再點取消＝移除空職責;
+// 含任務的鎖定(表格刪)。「自動勾選」＝補上主基準(順序1)來源的職責。
+// commit-per-click,走 autosave(單一寫入路徑)。與選職類/AI 任務盤同 Modal 家族。
 import { useState } from "react";
-import { Check, ChevronDown, ListChecks } from "lucide-react";
+import { Check, ListChecks } from "lucide-react";
 import type { KnowledgePack, OcsDocument } from "@/types";
 import { addFromPool, deleteUnit } from "@/lib/ocsDoc";
 import { unitRows, type UnitRowVM } from "@/lib/pack";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Modal } from "./OccupationPicker";
 import { SourceLine } from "./fields/SourceLine";
 
 export function UnitPickerMenu({ document: doc, pack, disabled, onChange }: {
@@ -48,49 +49,51 @@ export function UnitPickerMenu({ document: doc, pack, disabled, onChange }: {
   };
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button size="sm" variant="outline" className="gap-1" disabled={disabled}>
-          <ListChecks className="h-4 w-4" />
-          選職責
-          <ChevronDown className="h-3.5 w-3.5 opacity-50" />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-80" align="end">
-        <div className="mb-1 flex items-center justify-between gap-2 px-1">
-          <span className="text-xs text-muted-foreground">勾選入表格；任務從職責列挑</span>
-          <button type="button" className="shrink-0 text-xs text-muted-foreground hover:text-foreground"
-            title="補上主基準（順序1）來源的職責" onClick={applyDefaults}>
-            自動勾選
-          </button>
-        </div>
-        <Command>
-          <CommandList>
-            <CommandEmpty>沒有候選職責。請先〔選職類〕。</CommandEmpty>
-            <CommandGroup>
-              {rows.map((r, i) => {
-                const idx = idxOf(r.name);
-                const inDoc = idx >= 0;
-                const locked = inDoc && (units[idx].tasks?.length ?? 0) > 0;
-                return (
-                  <CommandItem key={r.name} value={`${i} ${r.name}`} onSelect={() => toggle(r)}
-                    className={"items-start " + (locked ? "opacity-60" : "")}>
-                    <Check className={"mt-0.5 h-3.5 w-3.5 " + (inDoc ? "opacity-100" : "opacity-0")} />
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-1">
-                        <span className="font-mono text-xs text-muted-foreground">{i + 1}.</span>
-                        <span className="flex-1">{r.name}</span>
-                        {locked ? <Badge variant="secondary" className="text-[10px]" title="含任務，請在表格刪除">含任務</Badge> : null}
-                      </div>
-                      <SourceLine srcs={r.srcs} />
-                    </div>
-                  </CommandItem>
-                );
-              })}
-            </CommandGroup>
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </Popover>
+    <>
+      <Button size="sm" variant="outline" className="gap-1" disabled={disabled}
+              onClick={() => setOpen(true)}>
+        <ListChecks className="h-4 w-4" />
+        選職責
+      </Button>
+      {open ? (
+        <Modal title="選職責" onClose={() => setOpen(false)}>
+          <div className="mb-2 flex items-center justify-between gap-2 px-1">
+            <span className="text-xs text-muted-foreground">勾選入表格；任務從職責列挑</span>
+            <button type="button" className="shrink-0 text-xs text-muted-foreground hover:text-foreground"
+              title="補上主基準（順序1）來源的職責" onClick={applyDefaults}>
+              自動勾選
+            </button>
+          </div>
+          <div className="rounded-lg border">
+            <Command className="bg-transparent">
+              <CommandList className="max-h-96">
+                <CommandEmpty>沒有候選職責。請先〔選職類〕。</CommandEmpty>
+                <CommandGroup>
+                  {rows.map((r, i) => {
+                    const idx = idxOf(r.name);
+                    const inDoc = idx >= 0;
+                    const locked = inDoc && (units[idx].tasks?.length ?? 0) > 0;
+                    return (
+                      <CommandItem key={r.name} value={`${i} ${r.name}`} onSelect={() => toggle(r)}
+                        className={"items-start " + (locked ? "opacity-60" : "")}>
+                        <Check className={"mt-0.5 h-3.5 w-3.5 " + (inDoc ? "opacity-100" : "opacity-0")} />
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-1">
+                            <span className="font-mono text-xs text-muted-foreground">{i + 1}.</span>
+                            <span className="flex-1">{r.name}</span>
+                            {locked ? <Badge variant="secondary" className="text-[10px]" title="含任務，請在表格刪除">含任務</Badge> : null}
+                          </div>
+                          <SourceLine srcs={r.srcs} />
+                        </div>
+                      </CommandItem>
+                    );
+                  })}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </div>
+        </Modal>
+      ) : null}
+    </>
   );
 }

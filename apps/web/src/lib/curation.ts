@@ -1,20 +1,35 @@
-// AI 任務裁剪 ↔ 知識包對位(0028 D1;T7)。純函式:CurationDialog 保持薄。
-// 引擎 widget 給 {key:"ocs:task_code", name, unit, quote};這裡對回 pack 的
-// tasks/units 池列,組出既有 addFromPool 吃的 PoolPick(同一寫入路徑)。
+// AI 任務盤(0028 D1;D9 資料源收斂)。純函式:CurationDialog 保持薄。
+// **盤=編輯器知識包**(unitRows/taskRows 全量,同 UnitPicker/TaskPickerMenu 的宇宙),
+// **後端只送 AI 疊加層**(precheck:{key:"ocs:task_code", quote});清單不再由後端組
+// (ADR 0021:知識包=所有選單的資料源)。身分機制全借編輯器:任務=URN(taskUrns,
+// 改過名也認得)、職責=名稱、寫入=addFromPool(單一寫入路徑)。
 import type { PoolPick } from "@/lib/ocsDoc";
-import { taskRows, unitRows } from "@/lib/pack";
-import type { CurationChecklist, KnowledgePack, OcsDocument, SourceRef } from "@/types";
+import { taskHasContent } from "@/lib/ocsDoc";
+import { taskRows, unitRows, type TaskRowVM } from "@/lib/pack";
+import { taskUrns } from "@/lib/urn";
+import type { KnowledgePack, OcsDocument, PickerPrecheckItem, SourceRef } from "@/types";
 
-export interface CurationRow {
-  key: string;            // "ocs_code:task_code"(引擎的檢查表 key)
-  name: string;           // 任務名(pack 池 key;找不到時用引擎給的)
-  unit: string;           // 職責名(顯示分組)
-  quote: string;          // 引文理由(反盲簽 D4;others 無引文=空字串不顯示)
-  srcs: SourceRef[];      // 溯源(SourceLine 顯示;pack 對位而來)
-  found: boolean;         // pack 對位成功=可寫入;false=只顯示不可套用
-  already?: boolean;      // 已在文件(provenance/名稱對位)→「已加入」鎖定,不可再套
-  prechecked: boolean;    // AI 預勾(D8:全檢查表——others 照列未勾,recognition over recall)
+export interface BoardTaskRow {
+  name: string;            // tasks 池 key(與 TaskPickerMenu 同列)
+  unit: string;            // 所屬職責(own;合併列跨職責只列首個 own 職責下一次)
+  srcs: SourceRef[];
+  prechecked: boolean;     // AI 預勾
+  quote: string;           // AI 引文理由(反盲簽 D4;空字串=不顯示)
+  already: boolean;        // 已在文件(URN 對位)→ 鎖「已加入」不可再套
+  filled: boolean;         // 已在文件且已填內容(顯示用)
 }
+
+export interface BoardDutyRow {
+  unit: string;
+  srcs: SourceRef[];       // 職責來源(addFromPool 的 unit srcs)
+  total: number;           // 官方任務數
+  prechecked: number;      // 其中 AI 預勾數
+  already: number;         // 其中已在文件數
+  inDoc: boolean;          // 職責本身已在文件(名稱對位=UnitPickerMenu 同機制)
+  defaultOn: boolean;      // 步1 預設勾(=有 AI 預勾任務)
+}
+
+export interface CurationBoard { duties: BoardDutyRow[]; tasks: BoardTaskRow[] }
 
 function splitKey(key: string): { ocs: string; taskCode: string } {
   const i = key.indexOf(":");
@@ -22,82 +37,73 @@ function splitKey(key: string): { ocs: string; taskCode: string } {
                : { ocs: key.slice(0, i), taskCode: key.slice(i + 1) };
 }
 
-export function buildCurationRows(
-  input: CurationChecklist, pack?: KnowledgePack,
-): CurationRow[] {
-  const rows = pack ? taskRows(pack) : [];
-  const mk = (key: string, name: string, unit: string | null, quote: string,
-              prechecked: boolean): CurationRow => {
-    const { ocs, taskCode } = splitKey(key);
-    const row = rows.find((r) =>
-      r.srcs.some((s) => s.ocs_code === ocs && s.task_code === taskCode));
-    return { key, name: row?.name ?? name, unit: unit ?? "", quote,
-             srcs: row?.srcs ?? [], found: !!row, prechecked };
-  };
-  return [
-    ...(input.precheck ?? []).map((it) => mk(it.key, it.name, it.unit, it.quote, true)),
-    ...(input.others ?? []).map((it) => mk(it.key, it.name, it.unit, "", false)),
-  ];
-}
-
-// 一窗兩步的步1(D8 P1b;DACUM duty→task):由檢查表列推導職責集合。
-// 有 AI 預勾任務的職責 defaultOn(步1 預勾);全部職責照列(recognition over recall)。
-export interface DutyRow {
-  unit: string;         // 職責名(分組 key)
-  total: number;        // 檢查表任務數
-  prechecked: number;   // 其中 AI 預勾數
-  defaultOn: boolean;   // 步1 預設勾(= prechecked > 0)
-}
-
-export function dutyRows(rows: CurationRow[]): DutyRow[] {
-  const by = new Map<string, DutyRow>();
-  for (const r of rows) {
-    const d = by.get(r.unit) ?? { unit: r.unit, total: 0, prechecked: 0, defaultOn: false };
-    d.total += 1;
-    if (r.prechecked) { d.prechecked += 1; d.defaultOn = true; }
-    by.set(r.unit, d);
-  }
-  return [...by.values()];
-}
-
-// 步2:只列所選職責的任務(職責是閘門——未選職責的 AI 預勾任務也不套用)。
-export function filterByDuties(rows: CurationRow[], units: ReadonlySet<string>): CurationRow[] {
-  return rows.filter((r) => units.has(r.unit));
-}
-
-// 已在文件的列標 already(重複添加守衛;對齊編輯器 TaskPickerMenu「已加入」鎖定):
-// provenance(ocs_code:task_code,改過名也認得)或任務名相同 → 鎖。
-export function markAlreadyInDoc(rows: CurationRow[], doc: OcsDocument): CurationRow[] {
-  const prov = new Set<string>();
-  const names = new Set<string>();
+// 全盤組裝:pack 全部職責(池序=職位優先序)→ 各職責自己的官方任務;precheck 以 key
+// 對位疊加(pack 未載/過舊對不上的項忽略——pack 是 memo 依賴,重抓到後自然浮現)。
+export function buildBoard(
+  precheck: PickerPrecheckItem[], pack: KnowledgePack | undefined, doc: OcsDocument,
+): CurationBoard {
+  if (!pack) return { duties: [], tasks: [] };
+  const byName = new Map(taskRows(pack).map((r) => [r.name, r]));
+  // 文件內任務 URN → 已填?(TaskPickerMenu urnLoc 同機制;守衛對「當前文件」算 §16.18)
+  const urnFilled = new Map<string, boolean>();
   for (const u of doc.ocs_content?.ocu_units ?? []) {
     for (const t of u.tasks ?? []) {
-      if (t.provenance?.ocs_code && t.provenance?.task_code) {
-        prov.add(`${t.provenance.ocs_code}:${t.provenance.task_code}`);
-      }
-      const nm = t.task_codes?.[0]?.name;
-      if (nm) names.add(nm);
+      const filled = taskHasContent(t);
+      for (const urn of taskUrns(t)) urnFilled.set(urn, filled);
     }
   }
-  return rows.map((r) =>
-    prov.has(r.key) || names.has(r.name) ? { ...r, already: true } : r);
+  const preOf = (row: TaskRowVM) =>
+    precheck.find((p) => {
+      const { ocs, taskCode } = splitKey(p.key);
+      return row.srcs.some((s) => s.ocs_code === ocs && s.task_code === taskCode);
+    });
+  const docUnitNames = new Set(
+    (doc.ocs_content?.ocu_units ?? []).map((u) => u.ocu_name));
+
+  const duties: BoardDutyRow[] = [];
+  const tasks: BoardTaskRow[] = [];
+  const seen = new Set<string>();
+  for (const u of unitRows(pack)) {
+    const duty: BoardDutyRow = {
+      unit: u.name, srcs: u.srcs, total: 0, prechecked: 0, already: 0,
+      inDoc: docUnitNames.has(u.name), defaultOn: false,
+    };
+    for (const key of u.ownTaskKeys) {
+      if (seen.has(key)) continue;
+      const row = byName.get(key);
+      if (!row) continue;
+      seen.add(key);
+      const hit = row.urns.map((urn) => urnFilled.get(urn)).find((v) => v !== undefined);
+      const pre = preOf(row);
+      duty.total += 1;
+      if (pre) { duty.prechecked += 1; duty.defaultOn = true; }
+      if (hit !== undefined) duty.already += 1;
+      tasks.push({ name: row.name, unit: u.name, srcs: row.srcs,
+                   prechecked: !!pre, quote: pre?.quote ?? "",
+                   already: hit !== undefined, filled: hit === true });
+    }
+    duties.push(duty);
+  }
+  return { duties, tasks };
 }
 
-// 勾選列 → PoolPick[](按職責分組;職責 srcs 由 unit 池對位,對不上以 ownTaskKeys 反查)。
-export function picksFromRows(rows: CurationRow[], pack: KnowledgePack): PoolPick[] {
-  const units = unitRows(pack);
+// 勾選列 → PoolPick[](addFromPool 吃;按職責分組)。provenance 規則同 TaskPickerMenu
+// pickOf:優先取「與本職責同職業」的來源;already 列跳過(重複添加守衛)。
+export function picksFromBoard(rows: BoardTaskRow[], board: CurationBoard): PoolPick[] {
+  const dutyOf = new Map(board.duties.map((d) => [d.unit, d]));
   const byUnit = new Map<string, PoolPick>();
   for (const r of rows) {
-    if (!r.found || r.already) continue;
-    const unitRow = units.find((u) => u.name === r.unit)
-      ?? units.find((u) => u.ownTaskKeys.includes(r.name));
-    const uname = unitRow?.name ?? (r.unit || "公司自訂職責");
-    const pick = byUnit.get(uname)
-      ?? { unit: { name: uname, srcs: unitRow?.srcs ?? [] }, tasks: [] };
-    const { ocs, taskCode } = splitKey(r.key);
-    pick.tasks.push({ name: r.name, srcs: r.srcs,
-                      provenance: { ocs_code: ocs, task_code: taskCode } });
-    byUnit.set(uname, pick);
+    if (r.already) continue;
+    const duty = dutyOf.get(r.unit);
+    const unitOcc = duty?.srcs?.[0]?.ocs_code ?? "";
+    const pref = r.srcs.find((s) => s.ocs_code === unitOcc) ?? r.srcs[0];
+    const pick = byUnit.get(r.unit)
+      ?? { unit: { name: r.unit, srcs: duty?.srcs ?? [] }, tasks: [] };
+    pick.tasks.push({
+      name: r.name, srcs: r.srcs,
+      provenance: { ocs_code: pref?.ocs_code ?? "", task_code: pref?.task_code ?? "" },
+    });
+    byUnit.set(r.unit, pick);
   }
   return [...byUnit.values()];
 }

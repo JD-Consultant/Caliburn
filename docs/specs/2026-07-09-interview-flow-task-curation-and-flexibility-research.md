@@ -173,6 +173,21 @@ DACUM 面板從「標準任務清單出發再裁剪」、O*NET Core Task 門檻�
       不硬塞;②K/S 判準(知道=K、會操作=S;實測 K=18/S=0 全偏 K);③玩笑/比喻不當事實記
       (「AI 馴獸師」進了 outputs)。
 
+- **D9 任務盤資料源收斂:盤=編輯器知識包、後端只送 AI 疊加層(v2.2 後維護者回饋:
+  「編輯器早就抓了所選職位的全部任務/職責,AI 彈的選單為什麼不用」——成立,照辦)**。
+  v2.2 出廠形:widget/`interview:curation` 由後端回**清單本身**(unasked 殘表=pool−covered
+  −declined),前端再對回 pack 找 srcs——同一份官方清單**兩條供應線**。問題:
+  - 違反 ADR 0021 精神(知識包=選職類唯一同步點、**所有選單的資料源**)與 0028 D1
+    (同 UI 同機制,只是入口不同):清單不是 AI 判斷、是官方資料,前端本來就有全量。
+  - 行為劣化:已在文件的任務在 AI 彈窗**直接消失**(編輯器=鎖「已加入」,透明);職責只列
+    殘餘(UnitPickerMenu=全宇宙照列);鎖定機制第三套(markAlreadyInDoc provenance/名稱
+    vs 編輯器 URN 對位)。
+  - **收斂**:清單=前端 pack(`unitRows`/`taskRows`;任務身分=URN `taskUrns`、職責身分=名稱、
+    寫入=`addFromPool`——四個機制全借編輯器,不再自創);後端 widget/端點**只回 `precheck`
+    (key+quote)**=AI 判斷本身;`others` 退場。declined 照落 ledger(那是「顧問別再問」的
+    對話層事實;盤照列全量由人勾)。fail-open 更好:llm 缺/端點失敗,盤照開(pack 在前端);
+    選職類後 pack 由 `useSetOccupations` invalidate+prefetch(ADR 0021 既有),彈窗顯示載入態。
+
 ## 5. 對 ADR 0027 的修訂點(開新 ADR 0028;0027 Accepted 不改內容)
 
 - 0027「onboarding 併入對話 + AI 預勾清單」**補實作**(0028 定 widget 契約 + 帳本 phase 推導 +

@@ -75,14 +75,6 @@ async def build_task_pool(knowledge, doc: dict) -> list[dict]:
     return out
 
 
-def _checklist_others(unasked: list[dict], precheck: list[dict]) -> list[dict]:
-    """全檢查表的 others 段(D8):unasked 扣掉 precheck——沒把握的照列未勾,
-    recognition over recall。turn widget 與 run_curation 兩入口同資料形。"""
-    pre = {p["key"] for p in precheck}
-    return [{"key": t["key"], "name": t["name"], "unit": t.get("unit")}
-            for t in unasked if t["key"] not in pre]
-
-
 async def _persist_scribe_doc(doc_repo, profile_id, latest, scribe_res, *,
                               employee_texts, human_touched) -> tuple[bool, list[str]]:
     """書記直改寫回(雙 token;409→重讀重放同 records 一次;再衝突→放棄直改,保留
@@ -170,11 +162,9 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> T
                 state["declined"] = list(dict.fromkeys(
                     (state.get("declined") or []) + [d["key"] for d in cur.declined]))
             if cur.precheck:
-                # declined 落帳後重算 unasked → others 不含剛排除的(不騷擾)
-                remaining = L.checklist(work_doc, state, pool_tasks)["unasked"]
+                # D9:widget 只帶 AI 疊加層(precheck);清單本身=前端知識包(ADR 0021)
                 widget = {"kind": "open_picker", "picker": "task",
-                          "precheck": cur.precheck,
-                          "others": _checklist_others(remaining, cur.precheck)}
+                          "precheck": cur.precheck}
             await repo.add_llm_call(session.id, turn_seq=emp_turn.seq, role="select",
                                     model=model_for_role("select"), duration_ms=cur_ms,
                                     guard_verdicts=curation_guard[:30])
@@ -246,10 +236,11 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> T
 
 
 async def run_curation(profile_id: UUID, *, db, llm, knowledge) -> dict:
-    """隨叫裁剪(D8 P1a):選完職類**立刻**鋪任務盤,零打字。
-    回**全檢查表**:precheck(AI 依至今發言預勾+引文)+ others(其餘 unasked,未勾照列
-    ——recognition over recall,人掃一眼勾)。declined 落 ledger_state(同 turn 路徑);
-    llm 缺/敗或無發言 → precheck 空、others 照列(fail-open:清單本身就有價值)。"""
+    """隨叫裁剪(D8 P1a;D9):選完職類**立刻**鋪任務盤,零打字。
+    只回 **AI 疊加層** precheck(依至今發言預勾+引文)——清單本身由前端知識包組
+    (ADR 0021:pack=所有選單的資料源;已加入/全量照列都在前端)。
+    declined 落 ledger_state(顧問不再反問;同 turn 路徑);
+    llm 缺/敗或無發言 → precheck 空(fail-open:前端盤照開)。"""
     repo = InterviewRepo(db)
     session = await repo.get_active(profile_id)
     if session is None:
@@ -270,9 +261,8 @@ async def run_curation(profile_id: UUID, *, db, llm, knowledge) -> dict:
                 state["declined"] = list(dict.fromkeys(
                     (state.get("declined") or []) + [d["key"] for d in cur.declined]))
                 await repo.update_session(session.id, ledger_state=state)
-                unasked = L.checklist(doc, state, pool_tasks)["unasked"]
 
-    return {"precheck": precheck, "others": _checklist_others(unasked, precheck)}
+    return {"precheck": precheck}
 
 
 async def run_finish(profile_id: UUID, *, db, llm, knowledge) -> dict:

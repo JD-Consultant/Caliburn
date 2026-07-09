@@ -1,136 +1,95 @@
-// T7(0028 D1):AI 預勾清單 ↔ 知識包對位 + PoolPick 組裝(純函式;元件保持薄)。
+// AI 任務盤(0028 D1 + D9 資料源收斂):盤=編輯器知識包全量(unitRows/taskRows),
+// 後端只送 AI 疊加層(precheck:key+quote)。身分機制全借編輯器:任務=URN、職責=名稱。
 import { describe, expect, it } from "vitest";
 
-import {
-  buildCurationRows, dutyRows, filterByDuties, markAlreadyInDoc, picksFromRows,
-} from "@/lib/curation";
+import { buildBoard, picksFromBoard } from "@/lib/curation";
 import type { KnowledgePack, OcsDocument, PickerPrecheckItem } from "@/types";
 
-// 最小 pack:units/tasks 池 + source_tasks(unitRows/taskRows 只吃這三處)
+// 最小 pack:兩職責(規劃 U1×2 任務、維運 U2×1 任務)。URN=真格式 ocs:{code}:T:{tcode}
+// (taskUrns 對位靠它;pools.tasks srcs=source_tasks 的 key)。
 const PACK = {
   occupation_details: [],
   source_tasks: {
-    "urn:t1": { ocs_code: "ISD", ocs_name: "軟體測試工程人員", ocu_code: "U1",
-                task_code: "T1", task_name: "需求訪談",
-                k_refs: [], s_refs: [], o_refs: [], p_refs: [], competency_level: null },
-    "urn:t2": { ocs_code: "ISD", ocs_name: "軟體測試工程人員", ocu_code: "U1",
-                task_code: "T2", task_name: "介面設計",
-                k_refs: [], s_refs: [], o_refs: [], p_refs: [], competency_level: null },
+    "ocs:ISD:T:T1": { ocs_code: "ISD", ocs_name: "軟體測試工程人員", ocu_code: "U1",
+                      task_code: "T1", task_name: "需求訪談",
+                      k_refs: [], s_refs: [], o_refs: [], p_refs: [], competency_level: null },
+    "ocs:ISD:T:T2": { ocs_code: "ISD", ocs_name: "軟體測試工程人員", ocu_code: "U1",
+                      task_code: "T2", task_name: "介面設計",
+                      k_refs: [], s_refs: [], o_refs: [], p_refs: [], competency_level: null },
+    "ocs:ISD:T:T5": { ocs_code: "ISD", ocs_name: "軟體測試工程人員", ocu_code: "U2",
+                      task_code: "T5", task_name: "上線部署",
+                      k_refs: [], s_refs: [], o_refs: [], p_refs: [], competency_level: null },
   },
   pools: {
-    units: { "規劃": { srcs: [{ ocs_code: "ISD", ocs_name: "軟體測試工程人員", ocu_code: "U1" }] } },
-    tasks: { "需求訪談": { srcs: ["urn:t1"] }, "介面設計": { srcs: ["urn:t2"] } },
+    units: {
+      "規劃": { srcs: [{ ocs_code: "ISD", ocs_name: "軟體測試工程人員", ocu_code: "U1" }] },
+      "維運": { srcs: [{ ocs_code: "ISD", ocs_name: "軟體測試工程人員", ocu_code: "U2" }] },
+    },
+    tasks: {
+      "需求訪談": { srcs: ["ocs:ISD:T:T1"] },
+      "介面設計": { srcs: ["ocs:ISD:T:T2"] },
+      "上線部署": { srcs: ["ocs:ISD:T:T5"] },
+    },
   },
 } as unknown as KnowledgePack;
 
-const ITEMS: PickerPrecheckItem[] = [
-  { key: "ISD:T1", name: "需求訪談", unit: "規劃", quote: "我會跟客戶開需求訪談" },
-  { key: "ISD:T9", name: "不存在的任務", unit: "規劃", quote: "隨便" },
-];
-const IN = (precheck: PickerPrecheckItem[], others: { key: string; name: string;
-  unit: string | null }[] = []) => ({ precheck, others });
+const EMPTY_DOC = { ocs_content: { ocu_units: [] } } as unknown as OcsDocument;
+const PRE: PickerPrecheckItem[] = [
+  { key: "ISD:T1", name: "需求訪談", unit: "規劃", quote: "我會跟客戶開需求訪談" }];
 
-describe("buildCurationRows", () => {
-  it("以 key(ocs:task_code)對位 pack 列;找得到=found+srcs,找不到=found:false", () => {
-    const rows = buildCurationRows(IN(ITEMS), PACK);
-    expect(rows[0]).toMatchObject({ key: "ISD:T1", name: "需求訪談", found: true,
-                                    prechecked: true });
-    expect(rows[0].srcs[0]).toMatchObject({ ocs_code: "ISD", task_code: "T1" });
-    expect(rows[1].found).toBe(false);
+describe("buildBoard(D9:盤=pack 全量、AI=疊加層)", () => {
+  it("職責/任務=pack 全宇宙照列(池序);precheck 以 key 對位疊 prechecked+quote", () => {
+    const b = buildBoard(PRE, PACK, EMPTY_DOC);
+    expect(b.duties.map((d) => d.unit)).toEqual(["規劃", "維運"]);
+    expect(b.duties[0]).toMatchObject({ total: 2, prechecked: 1, defaultOn: true, inDoc: false });
+    expect(b.duties[1]).toMatchObject({ total: 1, prechecked: 0, defaultOn: false });
+    expect(b.tasks.map((t) => t.name)).toEqual(["需求訪談", "介面設計", "上線部署"]);
+    expect(b.tasks[0]).toMatchObject({ unit: "規劃", prechecked: true,
+                                       quote: "我會跟客戶開需求訪談", already: false });
+    expect(b.tasks[1]).toMatchObject({ prechecked: false, quote: "" });
   });
 
-  it("無 pack → 全列 found:false(引文仍在,可顯示不可寫)", () => {
-    const rows = buildCurationRows(IN(ITEMS), undefined);
-    expect(rows.every((r) => !r.found)).toBe(true);
-    expect(rows[0].quote).toBe("我會跟客戶開需求訪談");
+  it("無 pack → 空盤(彈窗顯示載入態);precheck 對不上 pack 的項忽略", () => {
+    expect(buildBoard(PRE, undefined, EMPTY_DOC)).toEqual({ duties: [], tasks: [] });
+    const b = buildBoard([{ key: "XX:T9", name: "幽靈", unit: "無", quote: "q" }], PACK, EMPTY_DOC);
+    expect(b.tasks.every((t) => !t.prechecked)).toBe(true);
   });
 
-  it("others 照列(D8 全檢查表):prechecked:false、無引文", () => {
-    const rows = buildCurationRows(
-      IN([], [{ key: "ISD:T2", name: "介面設計", unit: "規劃" }]), PACK);
-    expect(rows[0]).toMatchObject({ key: "ISD:T2", found: true,
-                                    prechecked: false, quote: "" });
+  it("已在文件=URN 對位鎖 already(編輯器 TaskPickerMenu 同機制;改過名也認得);職責名稱對位 inDoc", () => {
+    const doc = {
+      ocs_content: { ocu_units: [{ ocu_name: "規劃", tasks: [
+        { task_codes: [{ code: "T1.1", name: "改過名的需求訪談" }],
+          provenance: { ocs_code: "ISD", task_code: "T1" }, competency_blocks: [{}] },
+      ] }] },
+    } as unknown as OcsDocument;
+    const b = buildBoard([], PACK, doc);
+    expect(b.tasks.find((t) => t.name === "需求訪談")).toMatchObject({ already: true });
+    expect(b.tasks.find((t) => t.name === "介面設計")).toMatchObject({ already: false });
+    expect(b.duties[0]).toMatchObject({ inDoc: true, already: 1 });
   });
 });
 
-describe("picksFromRows", () => {
-  it("按職責分組出 PoolPick;provenance 由 key 拆出;未對位列跳過", () => {
-    const rows = buildCurationRows(IN(ITEMS), PACK);
-    const picks = picksFromRows(rows, PACK);
-    expect(picks).toHaveLength(1);
+describe("picksFromBoard(寫入=addFromPool 同一路;provenance 規則同 TaskPickerMenu)", () => {
+  it("按職責分組;provenance 取與職責同職業的來源;already 列跳過", () => {
+    const b = buildBoard(PRE, PACK, EMPTY_DOC);
+    const picks = picksFromBoard(
+      b.tasks.filter((t) => t.name !== "介面設計"), b);
+    expect(picks).toHaveLength(2);
     expect(picks[0].unit.name).toBe("規劃");
-    expect(picks[0].unit.srcs[0].ocs_code).toBe("ISD");
-    expect(picks[0].tasks).toHaveLength(1);           // 未對位的 ISD:T9 被跳過
+    expect(picks[0].unit.srcs[0]).toMatchObject({ ocs_code: "ISD", ocu_code: "U1" });
     expect(picks[0].tasks[0]).toMatchObject({
-      name: "需求訪談", provenance: { ocs_code: "ISD", task_code: "T1" },
-    });
+      name: "需求訪談", provenance: { ocs_code: "ISD", task_code: "T1" } });
+    expect(picks[1].unit.name).toBe("維運");
   });
 
-  it("item.unit 對不上 unit 池 → 以 ownTaskKeys 反查職責", () => {
-    const items: PickerPrecheckItem[] = [
-      { key: "ISD:T2", name: "介面設計", unit: "後端亂給的名字", quote: "q" }];
-    const picks = picksFromRows(buildCurationRows(IN(items), PACK), PACK);
-    expect(picks[0].unit.name).toBe("規劃");          // 由任務反查回官方職責
-  });
-});
-
-describe("dutyRows(D8 P1b 步1:職責集合推導——DACUM duty→task)", () => {
-  it("按 unit 分組保序;計 total/prechecked;有 AI 預勾任務的職責 defaultOn", () => {
-    const rows = buildCurationRows(IN(
-      [{ key: "ISD:T1", name: "需求訪談", unit: "規劃", quote: "q" }],
-      [{ key: "ISD:T2", name: "介面設計", unit: "規劃" },
-       { key: "ISD:T5", name: "上線部署", unit: "維運" }]), PACK);
-    expect(dutyRows(rows)).toEqual([
-      { unit: "規劃", total: 2, prechecked: 1, defaultOn: true },
-      { unit: "維運", total: 1, prechecked: 0, defaultOn: false },
-    ]);
-  });
-
-  it("全 others(fail-open 清單)→ 全職責 defaultOn:false,照列可勾", () => {
-    const rows = buildCurationRows(IN([],
-      [{ key: "ISD:T2", name: "介面設計", unit: "規劃" }]), PACK);
-    expect(dutyRows(rows)).toEqual([
-      { unit: "規劃", total: 1, prechecked: 0, defaultOn: false }]);
-  });
-});
-
-describe("filterByDuties(D8 P1b 步2:只列所選職責的任務)", () => {
-  it("unit ∈ 所選 → 留;未選職責的 AI 預勾任務也被擋(職責是閘門)", () => {
-    const rows = buildCurationRows(IN(
-      [{ key: "ISD:T1", name: "需求訪談", unit: "規劃", quote: "q" }],
-      [{ key: "ISD:T5", name: "上線部署", unit: "維運" }]), PACK);
-    expect(filterByDuties(rows, new Set(["維運"])).map((r) => r.key))
-      .toEqual(["ISD:T5"]);
-    expect(filterByDuties(rows, new Set())).toEqual([]);
-  });
-});
-
-describe("markAlreadyInDoc(重複添加守衛;對齊編輯器 TaskPickerMenu 鎖定)", () => {
-  const doc = {
-    ocs_content: { ocu_units: [{ ocu_name: "規劃", tasks: [
-      { task_codes: [{ code: "T1.1", name: "改過名的需求訪談" }],
-        provenance: { ocs_code: "ISD", task_code: "T1" }, competency_blocks: [{}] },
-      { task_codes: [{ code: "T1.2", name: "介面設計" }],
-        provenance: { ocs_code: "", task_code: "" }, competency_blocks: [{}] },
-    ] }] },
-  } as unknown as OcsDocument;
-
-  it("provenance 對上(即使改過名)→ already;名稱對上(自訂/斷鏈)→ already", () => {
-    const rows = markAlreadyInDoc(buildCurationRows(IN([
-      { key: "ISD:T1", name: "需求訪談", unit: "規劃", quote: "q1" },   // provenance 命中
-      { key: "ISD:T2", name: "介面設計", unit: "規劃", quote: "q2" },   // 名稱命中
-    ]), PACK), doc);
-    expect(rows.map((r) => !!r.already)).toEqual([true, true]);
-  });
-
-  it("不在文件 → 不標 already;picksFromRows 跳過 already 列", () => {
-    const rows = markAlreadyInDoc(buildCurationRows(IN([
-      { key: "ISD:T1", name: "需求訪談", unit: "規劃", quote: "q1" },
-    ]), PACK), { ocs_content: { ocu_units: [] } } as unknown as OcsDocument);
-    expect(rows[0].already).toBeFalsy();
-    const inDoc = markAlreadyInDoc(buildCurationRows(IN([
-      { key: "ISD:T1", name: "需求訪談", unit: "規劃", quote: "q1" },
-    ]), PACK), doc);
-    expect(picksFromRows(inDoc, PACK)).toHaveLength(0);   // already 不再產 pick
+  it("already 列不產 pick(重複添加守衛)", () => {
+    const doc = {
+      ocs_content: { ocu_units: [{ ocu_name: "規劃", tasks: [
+        { task_codes: [{ code: "T1.1", name: "需求訪談" }],
+          provenance: { ocs_code: "ISD", task_code: "T1" }, competency_blocks: [{}] },
+      ] }] },
+    } as unknown as OcsDocument;
+    const b = buildBoard([], PACK, doc);
+    expect(picksFromBoard(b.tasks.filter((t) => t.name === "需求訪談"), b)).toHaveLength(0);
   });
 });

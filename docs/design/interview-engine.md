@@ -62,9 +62,9 @@ updated: 2026-07-09
   ④ 帳本:note_attempt(飽和計數)→ next_gap(doc,state,{},pool_tasks)→ ledger_state 存回
        (ledger_state 增 declined[]/writein_asked;0028)
   ④½ 裁剪 pass(0028;last_gap=curation:tasks 且有 unasked):curation_pass(便宜模型)
-       → precheck→**widget 指令** {kind:open_picker,picker:task,precheck:[{key,name,unit,quote}],
-       others:[{key,name,unit}]}(D8 **全檢查表**:沒把握的照列未勾=recognition over recall)
-       → declined→ledger_state(檢查表不再反問;others 重算不含剛排除的);稽核落庫一列
+       → precheck→**widget 指令** {kind:open_picker,picker:task,precheck:[{key,name,unit,quote}]}
+       (D9:widget 只帶 **AI 疊加層**;任務盤清單=前端知識包組,ADR 0021)
+       → declined→ledger_state(檢查表不再反問);稽核落庫一列
   ⑤ 顧問 chat_with_tools(role=interview;messages=帳本摘要(含檢查表成組反問/write-in 抓漏)
        +文件+待核准+近窗對話;手刻迴圈 run_tool_loop)
   ⑤½ occupation widget(0028+D8 P2 統一):顧問本回合搜過職類且**首個 top-1 ∉ 現有 codes**
@@ -76,9 +76,9 @@ updated: 2026-07-09
        progress:{phase=derive_phase(議程推導), coverage}}
 收尾 POST …/interview:finish → service.run_finish:backstop_pass + **attitudes_pass**
   (0028 D3:全逐字稿→2–4 條態度建議、每條綁最強引文、MAX_A 硬上限)→建議化→phase=review
-隨叫 POST …/interview:curation → service.run_curation(D8 P1a):選完職類**立刻**鋪任務盤
-  (零打字)——pool→unasked→curation_pass→回全檢查表 {precheck,others};declined 落
-  ledger_state;llm 缺/無發言→precheck 空、others 照列(fail-open:清單本身就有價值)
+隨叫 POST …/interview:curation → service.run_curation(D8 P1a;D9):選完職類**立刻**
+  鋪任務盤(零打字)——pool→unasked→curation_pass→**只回 {precheck}**(AI 疊加層);
+  declined 落 ledger_state;llm 缺/無發言→precheck 空(fail-open:前端盤照開)
 ```
 
 ## 5. UI 動作 → 請求對照
@@ -89,8 +89,8 @@ updated: 2026-07-09
 | 回答 | InterviewPanel | `POST …/interview:turn {text}` → 回 `progress.coverage` + **`widget`**(0028) |
 | **深聊 meta 快速回覆** | 面板輸入框上 chips(跳過這題/沒有/先記到這)——**僅流程動作**(D8 P4) | (無;純 send 轉發走 turn;後端 skips 語彙認得「跳過」) |
 | **AI 開職類 picker** | 面板 `onWidget` → page 開 `OccupationPicker(autoSearch)` | (無;widget 指令=`{kind:open_picker,picker:occupation,query}`,開窗即搜顧問用過的 query;開場+**中途加選**同一條 D8 P2) |
-| **AI 預勾任務確認** | `CurationDialog` **一窗兩步**(D8 P1b:步1 勾職責(AI 預勾職責 defaultOn)→步2 該職責任務(預勾+引文/others 未勾/已加入鎖定);職責是閘門) | (無;`{picker:task,precheck:[…],others:[…]}`=全檢查表;套用=前端 `addFromPool`→persist 同一寫入路徑) |
-| **選完職類自動鋪盤** | `OccupationPicker.onApplied` → page 呼端點 → 開 `CurationDialog`(訪談開著才觸發) | `POST …/interview:curation` → `{precheck,others}`(D8 P1a 零打字) |
+| **AI 任務盤確認** | `CurationDialog` **一窗兩步**(D8 P1b:步1 勾職責 → 步2 該職責任務;職責是閘門)。**盤=編輯器知識包全量**(D9 `buildBoard`:unitRows/taskRows 同宇宙;任務鎖=URN、職責身分=名稱,同 Unit/TaskPickerMenu),AI 只疊 precheck+引文 | (無;widget `{picker:task,precheck:[…]}`=AI 疊加層;套用=前端 `addFromPool`→persist 同一寫入路徑) |
+| **選完職類自動鋪盤** | `OccupationPicker.onApplied` → page 呼端點 → 開 `CurationDialog`(訪談開著才觸發;端點失敗盤照開=fail-open) | `POST …/interview:curation` → `{precheck}`(D8 P1a 零打字;D9 清單在前端) |
 | 收尾 | (收尾流程) | `POST …/interview:finish` → `service.run_finish`(backstop+**態度收尾**+轉 review) |
 | 批審套用 | **面板底部「N 項待審」計數鈕**(0028 D5:置頂看不見 bug 修正)→ SuggestionReview → decide | `POST …/interview:review {accept,reject}` → **前端** `applyAccepted`(自訂能力/態度=**append 陣列**;`appendAtPath`)→ persist |
 | AI 直寫檢視 | **JobDocTable 同格追蹤修訂**(0028 D7):O/P/K/S 格 AI 徽章+hover 引文;**details 11 槽 chips 呈現**(`reviewMap.ts`;evidence.review=pending 為資料源) | `GET …/interview`(evidence 帶 `review` 欄) |
@@ -133,11 +133,16 @@ updated: 2026-07-09
 12. **態度=收尾整體編碼**(0028 D3):`attitudes_pass` 讀全逐字稿提 2–4 條(MAX_A 硬上限、
     引文逐字、只建議);**別把逐回合態度抽取加回書記**(反例=39 條逐句轟炸,session eb2af457)。
     檢查表(covered/declined/unasked)身分對位=**provenance**,別用 task_codes.code(位置碼)。
-13. **結構=點選、深度=對話**(D8 鐵律;研究 §14):可枚舉的結構決策(職類/職責/任務的
-    有無)→ 選單勾選,官方清單**全檢查表**照列(precheck+others;recognition over recall,
-    開放題答題負擔 4–6 倍/漏答 18% 的實證);裁剪窗照 DACUM **職責→任務兩步**,職責是閘門。
-    個人化深度(怎麼做/標準/眉角的 BEI 故事)→ **只能用說的**;chips 僅 meta 流程動作
+13. **結構=點選、深度=對話**(D8 鐵律):可枚舉的結構決策(職類/職責/任務的有無)→
+    選單勾選,官方清單**全量照列**(recognition over recall,開放題答題負擔 4–6 倍/
+    漏答 18% 的實證);裁剪窗照 DACUM **職責→任務兩步**,職責是閘門。個人化深度
+    (怎麼做/標準/眉角的 BEI 故事)→ **只能用說的**;chips 僅 meta 流程動作
     (跳過/沒有/下一題),**別把內容答案做成 chips**——選單化深聊=把顧問降級成問卷。
+14. **任務盤清單=前端知識包、後端只送 AI 疊加層**(D9;ADR 0021):`CurationDialog` 的
+    職責/任務宇宙由 pack 組(`buildBoard`;身分機制同編輯器——任務=URN `taskUrns`、
+    職責=名稱、寫入=`addFromPool`),widget/`interview:curation` 只回 `precheck(key+quote)`。
+    **別讓後端回清單本身**(反例=v2.2 出廠的 unasked 殘表:已加入的任務在 AI 彈窗直接
+    消失、職責只列殘餘、鎖定機制第三套——維護者實測抓到)。
 
 ## 7. Limitations(ADR 0027;誠實記載)
 

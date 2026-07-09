@@ -123,8 +123,8 @@ async def interview_curation(
     llm: LlmPort | None = Depends(get_llm),
     knowledge: KnowledgePort = Depends(get_knowledge),
 ):
-    """隨叫裁剪(D8 P1a):選完職類前端立即呼叫 → 回全檢查表(precheck+others)開
-    CurationDialog,零打字鋪任務盤。llm 缺 → precheck 空、清單照回(fail-open)。"""
+    """隨叫裁剪(D8 P1a;D9):選完職類前端立即呼叫 → 只回 AI 疊加層(precheck)
+    ——任務盤清單由前端知識包組(ADR 0021)。llm 缺 → precheck 空(前端盤照開)。"""
     await _require_profile(profile_id, db)
     try:
         return await run_curation(profile_id, db=db, llm=llm, knowledge=knowledge)

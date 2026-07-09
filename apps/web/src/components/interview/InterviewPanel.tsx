@@ -5,7 +5,7 @@
 // 面板不自設對話 state,對齊 cache-as-state 心法。結構化決策(ask_choice)用
 // 卡片勾選,開放敘事用自由輸入(上游研究 §8:decision=widget、narrative=對話)。
 import { useEffect, useRef, useState } from "react";
-import { Loader2, MessageCircle, Send } from "lucide-react";
+import { ChevronDown, ChevronUp, Loader2, MessageCircle, Send } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,9 @@ import type { ChoiceWidget, InterviewProgress, OcsDocument, OpenPickerWidget } f
 
 const PHASE_LABEL: Record<string, string> = {
   survey: "盤點", deep: "深掘", review: "總審",
+  // 0028 D2 議程推導 phase(derive_phase)
+  onboarding_occupation: "選職類", task_curation: "任務盤點",
+  opks_deep: "深掘", attitudes_wrapup: "態度收尾",
 };
 
 function ProgressHeader({ progress }: { progress: InterviewProgress | null }) {
@@ -83,6 +86,7 @@ export function InterviewPanel({ profileId, doc, onApplyDoc, onWidget }: {
   const turn = useInterviewTurn(profileId);
   const review = useReviewInterview(profileId);
   const [input, setInput] = useState("");
+  const [showReview, setShowReview] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const turns = view.data?.turns ?? [];
@@ -142,17 +146,13 @@ export function InterviewPanel({ profileId, doc, onApplyDoc, onWidget }: {
     });
   };
 
+  const pendingCount =
+    view.data?.suggestions?.filter((s) => s.status === "pending").length ?? 0;
+
   return (
     <div className="flex h-full flex-col">
       <ProgressHeader progress={progress} />
       <div className="flex-1 space-y-3 overflow-y-auto p-3 text-sm">
-        {(view.data?.suggestions?.some((s) => s.status === "pending") ?? false) && (
-          <SuggestionReview
-            suggestions={view.data!.suggestions}
-            busy={review.isPending}
-            onDecide={decide}
-          />
-        )}
         {turns.length === 0 && start.data && (
           <p className="rounded-md bg-muted/40 p-2">{start.data.greeting}</p>
         )}
@@ -179,6 +179,33 @@ export function InterviewPanel({ profileId, doc, onApplyDoc, onWidget }: {
         )}
         <div ref={bottomRef} />
       </div>
+      {/* 0028 D5/D7 載體修正:待審清單原在滾動串**頂端**、對話自動捲到底 → 清單一長
+          就被推出視線(真人實測「要拉到最上面才看得到」)。改**底部常駐計數鈕**
+          (輸入框上、決策當下視線內),點開才展開。 */}
+      {pendingCount > 0 ? (
+        <div className="border-t">
+          <button
+            type="button"
+            onClick={() => setShowReview((v) => !v)}
+            className="flex w-full items-center justify-between px-3 py-2 text-sm hover:bg-muted/50"
+          >
+            <span className="flex items-center gap-2">
+              <Badge variant="secondary">{pendingCount}</Badge>
+              項 AI 建議待審
+            </span>
+            {showReview ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
+          </button>
+          {showReview ? (
+            <div className="max-h-64 overflow-y-auto border-t p-3">
+              <SuggestionReview
+                suggestions={view.data?.suggestions ?? []}
+                busy={review.isPending}
+                onDecide={decide}
+              />
+            </div>
+          ) : null}
+        </div>
+      ) : null}
       <form
         className="flex gap-2 border-t p-3"
         onSubmit={(e) => { e.preventDefault(); send(input); }}

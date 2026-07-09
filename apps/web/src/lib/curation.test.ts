@@ -1,8 +1,8 @@
 // T7(0028 D1):AI 預勾清單 ↔ 知識包對位 + PoolPick 組裝(純函式;元件保持薄)。
 import { describe, expect, it } from "vitest";
 
-import { buildCurationRows, picksFromRows } from "@/lib/curation";
-import type { KnowledgePack, PickerPrecheckItem } from "@/types";
+import { buildCurationRows, markAlreadyInDoc, picksFromRows } from "@/lib/curation";
+import type { KnowledgePack, OcsDocument, PickerPrecheckItem } from "@/types";
 
 // 最小 pack:units/tasks 池 + source_tasks(unitRows/taskRows 只吃這三處)
 const PACK = {
@@ -59,5 +59,35 @@ describe("picksFromRows", () => {
       { key: "ISD:T2", name: "介面設計", unit: "後端亂給的名字", quote: "q" }];
     const picks = picksFromRows(buildCurationRows(items, PACK), PACK);
     expect(picks[0].unit.name).toBe("規劃");          // 由任務反查回官方職責
+  });
+});
+
+describe("markAlreadyInDoc(重複添加守衛;對齊編輯器 TaskPickerMenu 鎖定)", () => {
+  const doc = {
+    ocs_content: { ocu_units: [{ ocu_name: "規劃", tasks: [
+      { task_codes: [{ code: "T1.1", name: "改過名的需求訪談" }],
+        provenance: { ocs_code: "ISD", task_code: "T1" }, competency_blocks: [{}] },
+      { task_codes: [{ code: "T1.2", name: "介面設計" }],
+        provenance: { ocs_code: "", task_code: "" }, competency_blocks: [{}] },
+    ] }] },
+  } as unknown as OcsDocument;
+
+  it("provenance 對上(即使改過名)→ already;名稱對上(自訂/斷鏈)→ already", () => {
+    const rows = markAlreadyInDoc(buildCurationRows([
+      { key: "ISD:T1", name: "需求訪談", unit: "規劃", quote: "q1" },   // provenance 命中
+      { key: "ISD:T2", name: "介面設計", unit: "規劃", quote: "q2" },   // 名稱命中
+    ], PACK), doc);
+    expect(rows.map((r) => !!r.already)).toEqual([true, true]);
+  });
+
+  it("不在文件 → 不標 already;picksFromRows 跳過 already 列", () => {
+    const rows = markAlreadyInDoc(buildCurationRows([
+      { key: "ISD:T1", name: "需求訪談", unit: "規劃", quote: "q1" },
+    ], PACK), { ocs_content: { ocu_units: [] } } as unknown as OcsDocument);
+    expect(rows[0].already).toBeFalsy();
+    const inDoc = markAlreadyInDoc(buildCurationRows([
+      { key: "ISD:T1", name: "需求訪談", unit: "規劃", quote: "q1" },
+    ], PACK), doc);
+    expect(picksFromRows(inDoc, PACK)).toHaveLength(0);   // already 不再產 pick
   });
 });

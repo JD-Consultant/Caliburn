@@ -104,6 +104,7 @@ def test_system_prompt_has_onboarding_guard():
     """顧問 system prompt 要含『選職類前不問態度、不硬猜職類』的硬規則。"""
     sys = C.CONSULTANT_SYSTEM
     assert "選職類" in sys
+    assert "加選" in sys                                   # D8 P2:超出現有職類→明講建議加選
 
 
 # ---- 檢查表成組反問 + write-in 抓漏(0028 T5) ----

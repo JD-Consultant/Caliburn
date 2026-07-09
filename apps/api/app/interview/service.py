@@ -8,7 +8,6 @@ records(不重呼 LLM)一次;再衝突 → 直改降級(零覆蓋人)。書記�
 import logging
 import time
 from dataclasses import dataclass, field
-from functools import partial
 from uuid import UUID
 
 from app.adapters.interview_repo import InterviewRepo
@@ -177,20 +176,32 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> T
     if (pool_tasks and not state.get("writein_asked")
             and not L.checklist(work_doc, state, pool_tasks)["unasked"]):
         state["writein_asked"] = True
-    dispatch = partial(dispatch_tool, knowledge=knowledge)
+    # dispatch 包一層截職類搜尋命中(D8 P2:中途加選回路的確定性訊號)
+    occ_searches: list[dict] = []
+
+    async def dispatch(name: str, arguments: dict):
+        res = await dispatch_tool(name, arguments, knowledge=knowledge)
+        if name == "knowledge_search_occupations" and isinstance(res, dict):
+            occ_searches.append({"query": (arguments or {}).get("query") or "",
+                                 "hits": res.get("occupations") or []})
+        return res
+
     t_chat = time.perf_counter()
     chat = await llm.chat_with_tools(role="interview", messages=messages,
                                      tools=CONSULTANT_TOOLS, dispatch=dispatch)
     chat_ms = int((time.perf_counter() - t_chat) * 1000)
 
-    # ③½ onboarding widget(0028 D1):顧問這回合真的搜過職類 → 開 occupation picker
-    #    預填它用的 query(確定性觸發=tool_trace,不猜)
-    if widget is None and state.get("last_gap") == L.ONBOARD_OCCUPATION:
-        q = next((t.get("args", {}).get("query") for t in (chat.tool_trace or [])
-                  if t.get("name") == "knowledge_search_occupations"
-                  and (t.get("args") or {}).get("query")), None)
-        if q:
-            widget = {"kind": "open_picker", "picker": "occupation", "query": str(q)[:120]}
+    # ③½ occupation widget(0028 D1 + D8 P2 統一):顧問本回合搜過職類且 **top-1 不在
+    #    現有 codes** → 開 picker 預填該搜尋詞。涵蓋開場(codes 空)與中途加選
+    #    (全端聊到後端:top-1=互補職類 ∉ codes → 彈;查參考 top-1=已選 → 不彈不騷擾)。
+    if widget is None and occ_searches:
+        codes = set(_doc_ocs_codes(work_doc))
+        for s_ in occ_searches:
+            top = (s_["hits"] or [{}])[0]
+            if top.get("ocs_code") and top["ocs_code"] not in codes and s_["query"]:
+                widget = {"kind": "open_picker", "picker": "occupation",
+                          "query": str(s_["query"])[:120]}
+                break
 
     # ④ 保底:顧問恆有可見回覆 + 往前的問題(靜默回合=實戰死穴)
     say = (chat.text or "").strip()

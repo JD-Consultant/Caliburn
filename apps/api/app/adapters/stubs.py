@@ -49,6 +49,11 @@ class StubLlm:
         """假顧問迴圈:回 canned 文字(ChatResult),不呼工具。role/messages 記 calls。"""
         from app.interview.agent_loop import ChatResult
         self.calls.append({"kind": "chat", "role": role, "messages": messages})
+        for t in self._chat_trace:            # 忠實模擬:trace 裡的工具真的 dispatch 一次
+            try:
+                await dispatch(t["name"], t.get("args") or {})
+            except Exception:  # noqa: BLE001,S110  (stub:dispatch 失敗不擋 canned 回覆)
+                pass
         return ChatResult(text=self._chat_text, tool_trace=list(self._chat_trace),
                           stopped="natural")
 

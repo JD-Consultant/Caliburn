@@ -1,12 +1,15 @@
-"""模擬受訪者回歸 v2(T14;ADR 0027;pre-testing 制度化 §10 收編3)。
+"""模擬受訪者回歸 v3(T10;ADR 0028;承 v2/T14 校準 #3 教訓 §16.14)。
 
     cd apps/api && PYTHONUTF8=1 uv run python evals/interview_sim.py [--max-turns 20] [--dump]
 
-形狀:**純智力迴圈,不碰 DB**(記憶體 doc + 真 v2 管線:書記 scribe_pass + 帳本 ledger +
-顧問 chat_with_tools)——DB/route 由 tests/ 蓋;這裡量「問得好不好 + 抽得全不全」。
-模擬員工 = cheap LLM 綁**事實表**(黃金範本樣張王OO;只准照表答,表外說不知道)。
-量兩軸(spec §8):coverage(帳本缺口清空率、細項命中率)+ depth(引文驗證率、每回合進帳、
-hedging 追問)。結果留 docs/specs 校準紀錄;門檻改=重跑,不改碼。
+形狀:**純智力迴圈,不碰 DB**。三段:
+① 裁剪段(0028 D1/D6):**劇本化員工述職**(消掉 §16.14 的模擬員工漂移混淆因子)
+   → curation_pass → 量預勾 precision/recall(vs 事實表 DOES)+ declined 正確率(⊆DOESNT)。
+② 深聊段(v2 原樣):模擬員工(cheap LLM 綁事實表)× 真管線(書記+帳本+顧問)
+   → grounding(引文驗證率、每回合進帳)。
+③ 態度收尾段(0028 D3):深聊全逐字稿 → attitudes_pass → 條數 ≤MAX_A、守衛丟棄數。
+閘門=**確定性指標**(§16.14:引文驗證率+進帳率+裁剪 precision);recall/態度=資訊訊號。
+結果留 docs/specs 校準紀錄;門檻改=重跑,不改碼。
 """
 from __future__ import annotations
 
@@ -22,6 +25,8 @@ from app.adapters.llm_openrouter import OpenRouterLlm  # noqa: E402
 from app.core.knowledge_dto import CitableItem, CompetencyPool  # noqa: E402
 from app.interview import consultant as C  # noqa: E402
 from app.interview import ledger as L  # noqa: E402
+from app.interview.attitudes import attitudes_pass  # noqa: E402
+from app.interview.curation import curation_pass  # noqa: E402
 from app.interview.scribe import scribe_pass  # noqa: E402
 from app.interview.tools import CONSULTANT_TOOLS, dispatch_tool  # noqa: E402
 from functools import partial  # noqa: E402
@@ -49,6 +54,35 @@ EMPLOYEE_SYSTEM = """你在扮演軟體測試工程師「王OO」接受職務說
 
 事實表(任務「手動測試+版本回歸」):
 """ + "\n".join(f"- {k}:{v[0]}" for k, v in FACTS.items())
+
+
+# ── ① 裁剪段 ground truth(0028 D6;黃金範本職類的官方任務盤)──────────────
+# 劇本化述職(非 LLM 員工):消掉 §16.14 的 Sim2Real 漂移,單測抽取器。
+OFFICIAL_POOL = [
+    {"key": "ISD:T2.1", "name": "測試案例設計", "unit": "測試設計",
+     "ocs_code": "ISD", "task_code": "T2.1"},
+    {"key": "ISD:T2.2", "name": "測試執行與版本回歸", "unit": "測試實作",
+     "ocs_code": "ISD", "task_code": "T2.2"},
+    {"key": "ISD:T3.1", "name": "缺陷通報與追蹤", "unit": "測試實作",
+     "ocs_code": "ISD", "task_code": "T3.1"},
+    {"key": "ISD:T4.1", "name": "自動化測試框架開發", "unit": "測試工程",
+     "ocs_code": "ISD", "task_code": "T4.1"},
+    {"key": "ISD:T5.1", "name": "性能與壓力測試", "unit": "測試工程",
+     "ocs_code": "ISD", "task_code": "T5.1"},
+    {"key": "ISD:T1.1", "name": "測試環境建置", "unit": "測試規劃",
+     "ocs_code": "ISD", "task_code": "T1.1"},          # 未提及=ambiguous,兩邊都不該標
+]
+DOES = {"ISD:T2.1", "ISD:T2.2", "ISD:T3.1"}
+DOESNT = {"ISD:T4.1", "ISD:T5.1"}
+CURATION_SAID = [
+    "我平常主要在寫測試案例,然後每版上線前跑測試執行跟版本回歸",
+    "有 bug 我就開單做缺陷通報,追蹤到開發修完我再驗一次",
+    "自動化測試框架開發不是我,那是 SDET 團隊在做;性能與壓力測試我們公司沒有做",
+]
+
+# ── ③ 態度收尾段官方 A 池(含干擾項;正解=A03 謹慎細心 / A04 壓力容忍 有故事佐證)──
+A_POOL = ["A01", "A03", "A04", "A06"]
+A_ITEMS = {"A01": "親和關係", "A03": "謹慎細心", "A04": "壓力容忍", "A06": "自我提升"}
 
 
 def _knowledge():
@@ -97,6 +131,32 @@ def _score_slots(details: dict) -> tuple[int, list[str]]:
         elif v:
             miss.append(f"{key}={v!r}(未含關鍵字)")
     return hit, miss
+
+
+async def curation_segment(llm) -> dict:
+    """① 裁剪段:劇本述職 → curation_pass → precision/recall/declined 正確率。"""
+    res = await curation_pass(llm, pool_tasks=OFFICIAL_POOL, employee_texts=CURATION_SAID)
+    pre = {p["key"] for p in res.precheck}
+    dec = {d["key"] for d in res.declined}
+    tp = len(pre & DOES)
+    return {
+        "precheck": sorted(pre), "declined": sorted(dec),
+        "precision": round(tp / len(pre), 2) if pre else 0.0,
+        "recall": round(tp / len(DOES), 2),
+        "declined_all_correct": dec <= DOESNT and not (dec & DOES),
+        "ambiguous_untouched": "ISD:T1.1" not in (pre | dec),
+        "guard_drops": len(res.guard_log),
+    }
+
+
+async def attitudes_segment(llm, employee_texts: list[str]) -> dict:
+    """③ 態度收尾段:全逐字稿 → attitudes_pass。條數/守衛丟棄=資訊訊號(非閘門)。"""
+    res = await attitudes_pass(llm, pool=A_POOL, pool_items=A_ITEMS,
+                               employee_texts=employee_texts, existing=[])
+    return {"proposals": [{"code": p["pool_id"], "quote": p["quote"][:30]}
+                          for p in res.proposals],
+            "count": len(res.proposals), "cap_ok": len(res.proposals) <= L.MAX_A,
+            "guard_drops": len(res.guard_log), "failed": res.failed}
 
 
 async def simulate(max_turns: int, dump: bool = False) -> dict:
@@ -158,6 +218,11 @@ async def simulate(max_turns: int, dump: bool = False) -> dict:
     hit, mismatches = _score_slots(details)
     ok, blockers = L.can_finish(doc, state, {})
     cov = L.coverage(doc, state)
+
+    # ①/③ v3 段(0028):裁剪(劇本述職)+ 態度收尾(深聊全逐字稿)
+    curation = await curation_segment(llm)
+    attitudes = await attitudes_segment(llm, employee_texts)
+
     return {
         "turns_used": turns_used,
         "coverage": cov,
@@ -169,6 +234,8 @@ async def simulate(max_turns: int, dump: bool = False) -> dict:
         "avg_quote_len": round(sum(quote_lens) / len(quote_lens), 1) if quote_lens else 0,
         "progressed_turn_rate": round(progressed_turns / turns_used, 2) if turns_used else 0,
         "details_filled": {k: details.get(k) for k in FACTS if details.get(k)},
+        "curation": curation,
+        "attitudes": attitudes,
     }
 
 
@@ -179,13 +246,18 @@ def main() -> int:
     args = ap.parse_args()
     report = asyncio.run(simulate(args.max_turns, dump=args.dump))
     print(json.dumps(report, ensure_ascii=False, indent=2))
-    # 閘門=**有效的確定性指標**(校準 #3/§16.14):grounding(引文逐字驗)+ 每回合進帳。
-    # slot_keyword_accuracy 是**資訊訊號非閘門**——keyword-exact 對「抽語意」的書記無效
-    # (誤判改寫的正確值),待加 LLM-judge 語意評分才回升為閘門;不用脆弱指標假 PASS/FAIL。
+    # 閘門=**有效的確定性指標**(校準 #3/§16.14):grounding(引文逐字驗)+ 每回合進帳
+    # + 裁剪 precision(0028 T10;保守預勾的品質底線)。recall/態度條數=資訊訊號
+    # (保守預勾天然犧牲 recall——漏勾由顧問成組反問接住;不用脆弱指標假 PASS/FAIL)。
+    cur = report["curation"]
     passed = ((report["evidence_verified_rate"] or 0) >= 0.8
-              and report["progressed_turn_rate"] >= 0.8)
+              and report["progressed_turn_rate"] >= 0.8
+              and cur["precision"] >= 0.8 and cur["declined_all_correct"])
     print(f"(informational) slot_keyword_accuracy={report['slot_keyword_accuracy']}"
           f" — keyword 量尺,語意評分待補")
+    print(f"(informational) curation_recall={cur['recall']}"
+          f" ambiguous_untouched={cur['ambiguous_untouched']}"
+          f" attitudes_count={report['attitudes']['count']}")
     print("GATE:", "PASS" if passed else "FAIL")
     return 0 if passed else 1
 

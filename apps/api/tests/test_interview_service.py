@@ -139,23 +139,10 @@ async def test_curation_widget_prechecks_official_tasks(db_session):
         [{"type": "precheck", "key": "KRM2421-001v4:T1.1", "quote": "例行設備巡檢"}]))
     out = await run_turn(p.id, "我每天做例行設備巡檢", db=db_session, llm=llm,
                          knowledge=StubKnowledge())
-    # D8 全檢查表:precheck(預勾+引文)+ others(其餘 unasked 照列未勾)——兩入口同資料形
+    # D9:widget 只帶 AI 疊加層(precheck+引文);清單本身=前端知識包(ADR 0021)
     assert out.widget == {"kind": "open_picker", "picker": "task", "precheck": [
         {"key": "KRM2421-001v4:T1.1", "name": "例行設備巡檢", "unit": "預防保養",
-         "quote": "例行設備巡檢"}],
-        "others": [{"key": "KRM2421-001v4:T1.2", "name": "保養排程管理", "unit": "預防保養"}]}
-
-
-@pytest.mark.asyncio
-async def test_curation_widget_others_excludes_declined(db_session):
-    """同回合 precheck+decline:declined 不得再出現在 others(帳本已記、不騷擾)。"""
-    p, s, repo = await _setup(db_session, doc=_doc_occ_only())
-    llm = StubLlm(select_result=_curation_select(
-        [{"type": "precheck", "key": "KRM2421-001v4:T1.1", "quote": "例行設備巡檢"},
-         {"type": "decline", "key": "KRM2421-001v4:T1.2", "quote": "保養排程管理我沒有做"}]))
-    out = await run_turn(p.id, "我做例行設備巡檢,保養排程管理我沒有做", db=db_session,
-                         llm=llm, knowledge=StubKnowledge())
-    assert out.widget is not None and out.widget["others"] == []
+         "quote": "例行設備巡檢"}]}
 
 
 @pytest.mark.asyncio
@@ -220,25 +207,27 @@ async def test_no_picker_when_top_hit_already_selected(db_session):
 
 
 @pytest.mark.asyncio
-async def test_run_curation_full_checklist_with_precheck_and_declined(db_session):
-    """D8 P1a:隨叫裁剪回全檢查表(precheck 帶引文 + others 照列);declined 落 ledger。"""
+async def test_run_curation_returns_precheck_and_persists_declined(db_session):
+    """D8 P1a + D9:隨叫裁剪只回 AI 疊加層(precheck+引文;清單=前端 pack);
+    declined 落 ledger_state(顧問不再反問)。"""
     p, s, repo = await _setup(db_session, doc=_doc_occ_only())
-    await repo.append_turn(s.id, role="employee", text="我每天做例行設備巡檢")
+    await repo.append_turn(s.id, role="employee", text="我每天做例行設備巡檢,排程管理沒做")
     llm = StubLlm(select_result=_curation_select([
-        {"type": "precheck", "key": "KRM2421-001v4:T1.1", "quote": "例行設備巡檢"}]))
+        {"type": "precheck", "key": "KRM2421-001v4:T1.1", "quote": "例行設備巡檢"},
+        {"type": "decline", "key": "KRM2421-001v4:T1.2", "quote": "排程管理沒做"}]))
     out = await run_curation(p.id, db=db_session, llm=llm, knowledge=StubKnowledge())
-    assert [x["key"] for x in out["precheck"]] == ["KRM2421-001v4:T1.1"]
-    assert out["precheck"][0]["quote"] == "例行設備巡檢"
-    assert [x["key"] for x in out["others"]] == ["KRM2421-001v4:T1.2"]   # 沒把握的照列未勾
+    assert out == {"precheck": [{"key": "KRM2421-001v4:T1.1", "name": "例行設備巡檢",
+                                 "unit": "預防保養", "quote": "例行設備巡檢"}]}
+    sess = await repo.get_active(p.id)
+    assert sess.ledger_state.get("declined") == ["KRM2421-001v4:T1.2"]
 
 
 @pytest.mark.asyncio
 async def test_run_curation_fail_open_without_llm(db_session):
-    """llm 缺 → precheck 空、others 全列(清單本身就有價值;零打字仍可勾)。"""
+    """llm 缺 → precheck 空(前端盤照開:清單在 pack,零打字仍可勾)。"""
     p, s, repo = await _setup(db_session, doc=_doc_occ_only())
     out = await run_curation(p.id, db=db_session, llm=None, knowledge=StubKnowledge())
-    assert out["precheck"] == []
-    assert {x["key"] for x in out["others"]} == {"KRM2421-001v4:T1.1", "KRM2421-001v4:T1.2"}
+    assert out == {"precheck": []}
 
 
 @pytest.mark.asyncio

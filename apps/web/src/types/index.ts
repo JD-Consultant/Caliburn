@@ -238,17 +238,15 @@ export interface InterviewQuestion { text: string; target_path: string | null }
 // 預填/預勾什麼」——前端開**同一批編輯器 pickers**(同 UI,入口不同)。
 export interface ChoiceWidget { kind?: "choice"; question: string; options: string[]; target_path: string | null }
 export interface PickerPrecheckItem { key: string; name: string; unit: string | null; quote: string }
-export interface PickerOtherItem { key: string; name: string; unit: string | null }
 export interface OpenPickerWidget {
   kind: "open_picker";
   picker: "occupation" | "task";
   query?: string;                       // occupation:預填搜尋詞(顧問實際用過的)
-  precheck?: PickerPrecheckItem[];      // task:AI 預勾清單(每項附引文理由)
-  others?: PickerOtherItem[];           // task:其餘 unasked(未勾照列;D8 全檢查表)
+  precheck?: PickerPrecheckItem[];      // task:AI 預勾+引文(D9:清單本身=前端 pack,這只是疊加層)
 }
 export type InterviewWidget = ChoiceWidget | OpenPickerWidget
-// 隨叫裁剪(D8 P1a;POST interview:curation):選完職類立即鋪任務盤
-export interface CurationChecklist { precheck: PickerPrecheckItem[]; others: PickerOtherItem[] }
+// 隨叫裁剪(D8 P1a;POST interview:curation):選完職類立即鋪任務盤(D9:只回 AI 疊加層)
+export interface CurationChecklist { precheck: PickerPrecheckItem[] }
 export interface InterviewSuggestion {
   id: string; doc_path: string;
   old_value: unknown; new_value: unknown;

@@ -11,10 +11,9 @@ import { useAutosaveDocument, useDocument, useFinalizeDocument } from "@/hooks/u
 import { useKnowledge } from "@/hooks/useKnowledge";
 import { getDocumentExport } from "@/lib/api";
 import { downloadJson } from "@/lib/download";
-import { JobDocTable, type CellTarget } from "@/components/interview/JobDocTable";
-import { CellFillerPanel } from "@/components/interview/CellFillerPanel";
+import { JobDocTable } from "@/components/interview/JobDocTable";
 import { OccupationPicker } from "@/components/interview/OccupationPicker";
-import { UnitPickerMenu } from "@/components/interview/UnitPickerMenu";
+import { GlobalTaskPickerMenu } from "@/components/interview/GlobalTaskPickerMenu";
 import { ConflictDialog } from "@/components/interview/ConflictDialog";
 import { CurationDialog } from "@/components/interview/CurationDialog";
 import { InterviewPanel } from "@/components/interview/InterviewPanel";
@@ -24,10 +23,6 @@ import type { OcsDocument, OpenPickerWidget, PickerPrecheckItem } from "@/types"
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-
-function targetKey(t: CellTarget): string {
-  return `${t.kind}-${t.unitIdx}-${t.taskIdx}`;
-}
 
 export default function V3Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -57,7 +52,6 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
   useEffect(() => { flushRef.current = flush; });
   useEffect(() => () => { flushRef.current(); }, []);
 
-  const [target, setTarget] = useState<CellTarget | null>(null);
   const [showOcc, setShowOcc] = useState(false);
   const [showInterview, setShowInterview] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -152,8 +146,8 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
             <MessageCircle className="h-4 w-4" />
             AI 訪談
           </Button>
-          {/* 選職責(獨立選單窗)：勾＝空職責入表格，任務再從職責列「選任務」挑 */}
-          <UnitPickerMenu document={doc} pack={pack} disabled={!hasReferences || !doc} onChange={(d) => persist(d)} />
+          {/* 全域〔選工作任務〕(ADR 0029)：勾一筆自動掛到來源職責；〔選主要職責〕已搬到表格底部 */}
+          <GlobalTaskPickerMenu document={doc} pack={pack} disabled={!hasReferences || !doc} onChange={(d) => persist(d)} />
           <Button size="sm" variant="outline" className="gap-1" onClick={exportJson} disabled={status === "none"}>
             <Download className="h-4 w-4" />
             匯出 JSON
@@ -192,7 +186,6 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
               <JobDocTable
                 document={doc}
                 profileId={id}
-                onCell={setTarget}
                 onChange={(d) => persist(d)}
               />
             </div>
@@ -200,18 +193,6 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
           </div>
         )}
       </main>
-
-      {target && doc ? (
-        <CellFillerPanel
-          key={targetKey(target)}
-          document={doc}
-          target={target}
-          profileId={id}
-          onSave={(next) => persist(next)}
-          onClose={() => setTarget(null)}
-        />
-      ) : null}
-
 
       {showOcc ? (
         <OccupationPicker

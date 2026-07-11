@@ -1,9 +1,10 @@
 // 知識包 → 選單選項（ADR 0021；spec §5）。唯一的 pack 讀取邏輯集中點，全部純函式。
 // 池序 = append 序（職位優先序），選單不排序不搜尋；選項無碼 → FieldCombobox 顯序號。
 import type {
-  CodeName, ItemSource, KnowledgePack, MatchGroup, MatchResult, NoteItem, OptionItem, PackSrc,
-  PoolRow, SourceRef,
+  CodeName, ItemSource, KnowledgePack, MatchGroup, MatchResult, NoteItem, OcsDocument, OptionItem,
+  PackSrc, PoolRow, SourceRef, SourceTask,
 } from "@/types";
+import type { PoolPick } from "./ocsDoc";
 
 const newId = () => (globalThis.crypto?.randomUUID?.() ?? `id-${Math.random().toString(36).slice(2)}`);
 
@@ -102,6 +103,43 @@ export function originalNameNote(value: RefItem[], o: OptionItem): string | null
 // 改名不斷根:換文字、轉 custom,但**保留 _ref**(來源身分不掉 → 勾選仍命中、可顯原名副行)。
 export function renamedRefItem<T extends RefItem>(item: T, name: string): T {
   return { ...item, name, _src: "custom" };
+}
+
+// ── 全域選任務:來源職責解析(spec §6) ────────────────────────────────────────
+// 任務列 → 它的「來源職責」(該掛入哪個職責)。多來源取與主基準同 ocs_code 者優先(同 pickOf)。
+export interface HomeUnit {
+  ocuName: string;      // 副行「將掛入:○○」
+  unitSrc: SourceRef;   // 建職責用(含 ocu_code 身分)
+  existingIdx: number;  // 文件已有該職責的 index;-1=不在(需先建再掛)
+}
+export function resolveHomeUnit(row: TaskRowVM, doc: OcsDocument, pack: KnowledgePack, primary: string): HomeUnit | null {
+  const sts = row.urns.map((u) => pack.source_tasks[u]).filter((s): s is SourceTask => !!s);
+  if (!sts.length) return null;
+  const st = sts.find((s) => s.ocs_code === primary) ?? sts[0];
+  const unitSrc: SourceRef = {
+    ocs_code: st.ocs_code, occupation_name: st.ocs_name, code: "",
+    ocu_code: st.ocu_code ?? undefined,
+  };
+  const key = `${st.ocs_code}__${st.ocu_code ?? ""}`;
+  const existingIdx = doc.ocs_content.ocu_units.findIndex((u) =>
+    (u._refs ?? []).some((r) => r.ocu_code && `${r.ocs_code}__${r.ocu_code}` === key));
+  return { ocuName: st.ocu_name || "職責", unitSrc, existingIdx };
+}
+
+// 任務列 → PoolPick 任務(provenance 取主基準優先來源;同 TaskPickerMenu pickOf)。
+export function taskPickFromRow(row: TaskRowVM, primary: string): PoolPick["tasks"][number] {
+  const pref = row.srcs.find((s) => s.ocs_code === primary) ?? row.srcs[0];
+  return { name: row.name, srcs: row.srcs, provenance: { ocs_code: pref?.ocs_code ?? "", task_code: pref?.task_code ?? "" } };
+}
+
+// 「選同職能基準」整組帶入:主基準的全部職責 + 各自官方任務(一鍵鋪官方骨架)。
+export function primarySkeletonPicks(pack: KnowledgePack, primary: string): PoolPick[] {
+  const uRows = unitRows(pack).filter((u) => u.srcs.some((s) => s.ocs_code === primary));
+  const tRows = taskRows(pack);
+  return uRows.map((u) => ({
+    unit: { name: u.name, srcs: u.srcs },
+    tasks: tRows.filter((t) => u.ownTaskKeys.includes(t.name)).map((t) => taskPickFromRow(t, primary)),
+  }));
 }
 
 // 選項 → 官方文件項（勾選/預勾共用形狀；_ref = srcs[0]，即 own-first 重排後的本任務來源）。

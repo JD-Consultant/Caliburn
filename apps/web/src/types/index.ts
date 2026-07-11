@@ -19,6 +19,9 @@ export interface JobProfile {
   job_title: string;
   department?: string | null;
   job_summary?: string | null;
+  // ADR 0029:所選職能基準參考(codes)。文件身分脫鉤後，選單/知識包 gate 吃這個，
+  // 不再吃文件表頭 ocs_code(表頭改由職類視窗單選帶入)。
+  selected_ocs_codes?: string[];
   created_at: string;
   updated_at: string;
   // D27: list 端點補的文件狀態（單筆 GET 用 schema 預設 none/0）。

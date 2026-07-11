@@ -36,9 +36,11 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
   // 補上穩定 id（拖拉用）；memo 讓 id 在重繪間穩定，編輯時 clone 會保留。
   const doc: OcsDocument | undefined = useMemo(() => ensureIds(envelope?.content), [envelope]);
   const status = envelope?.status ?? "none";
-  const hasOccupations = !!doc?.ocs_profile?.ocs_code;
+  // ADR 0029 脫鉤:選單/知識包 gate = **有參考**(profile 的 selected_ocs_codes),
+  // 不再看文件表頭 ocs_code。只選參考、不動表頭時,文件仍空但選單有料。
+  const hasReferences = (profile?.selected_ocs_codes?.length ?? 0) > 0;
   // 知識包(ADR 0021):選職責下拉的資料源(表格內選單各自訂閱同一 query)。
-  const { data: pack } = useKnowledge(id, hasOccupations);
+  const { data: pack } = useKnowledge(id, hasReferences);
 
   const {
     status: saveStatus,
@@ -135,7 +137,7 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
           ) : null}
           <Button size="sm" variant="outline" className="gap-1" onClick={() => setShowOcc(true)}>
             <Layers className="h-4 w-4" />
-            選職類
+            選職能基準參考
           </Button>
           {/* 訪談面板(ADR 0020 混合載體:文件常駐、面板在側;引擎 ADR 0023) */}
           <Button
@@ -151,7 +153,7 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
             AI 訪談
           </Button>
           {/* 選職責(獨立選單窗)：勾＝空職責入表格，任務再從職責列「選任務」挑 */}
-          <UnitPickerMenu document={doc} pack={pack} disabled={!hasOccupations || !doc} onChange={(d) => persist(d)} />
+          <UnitPickerMenu document={doc} pack={pack} disabled={!hasReferences || !doc} onChange={(d) => persist(d)} />
           <Button size="sm" variant="outline" className="gap-1" onClick={exportJson} disabled={status === "none"}>
             <Download className="h-4 w-4" />
             匯出 JSON

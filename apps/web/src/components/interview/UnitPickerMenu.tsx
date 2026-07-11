@@ -9,7 +9,7 @@ import { useState } from "react";
 import { Check, ListChecks } from "lucide-react";
 import type { KnowledgePack, OcsDocument } from "@/types";
 import { addFromPool, deleteUnit } from "@/lib/ocsDoc";
-import { unitRows, type UnitRowVM } from "@/lib/pack";
+import { isOfficialBasis, unitRows, type UnitRowVM } from "@/lib/pack";
 import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -24,7 +24,10 @@ export function UnitPickerMenu({ document: doc, pack, disabled, onChange }: {
 }) {
   const [open, setOpen] = useState(false);
   const rows = pack ? unitRows(pack) : [];
-  const primary = pack?.occupation_details[0]?.ocs_code ?? "";
+  // ADR 0029:主基準＝**文件表頭所選**(職類視窗單選帶入),不再取 pack 第一順位。
+  // 未選或非官方身分 → 「選同職能基準」批次鈕停用(比照 isOfficialBasis)。
+  const primary = doc?.ocs_profile?.ocs_code ?? "";
+  const canApplyDefaults = !!pack && isOfficialBasis(pack, primary);
   const units = doc?.ocs_content?.ocu_units ?? [];
   const idxOf = (name: string) => units.findIndex((u) => u.ocu_name === name);
 
@@ -59,8 +62,9 @@ export function UnitPickerMenu({ document: doc, pack, disabled, onChange }: {
         <Modal title="選職責" onClose={() => setOpen(false)}>
           <div className="mb-2 flex items-center justify-between gap-2 px-1">
             <span className="text-xs text-muted-foreground">勾選入表格；任務從職責列挑</span>
-            <button type="button" className="shrink-0 text-xs text-muted-foreground hover:text-foreground"
-              title="補上主基準（順序1）來源的職責" onClick={applyDefaults}>
+            <button type="button" disabled={!canApplyDefaults}
+              className="shrink-0 text-xs text-muted-foreground hover:text-foreground disabled:opacity-40"
+              title="補上主基準來源的職責" onClick={applyDefaults}>
               自動勾選
             </button>
           </div>

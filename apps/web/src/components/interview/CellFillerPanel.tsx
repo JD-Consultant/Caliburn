@@ -98,7 +98,7 @@ export function CellFillerPanel({
         value={block?.knowledge ?? []}
         options={options}
         defaults={defaults}
-        customMode="footer"
+        autoApplyLabel="選同工作任務"
         autoCode="K"
         onCommit={(items) => onSave(setKS(document, unitIdx, taskIdx, "knowledge", items))}
       />
@@ -111,7 +111,7 @@ export function CellFillerPanel({
         value={block?.skills ?? []}
         options={options}
         defaults={defaults}
-        customMode="footer"
+        autoApplyLabel="選同工作任務"
         autoCode="S"
         onCommit={(items) => onSave(setKS(document, unitIdx, taskIdx, "skills", items))}
       />
@@ -124,7 +124,7 @@ export function CellFillerPanel({
         value={block?.outputs ?? []}
         options={options}
         defaults={defaults}
-        customMode="footer"
+        autoApplyLabel="選同工作任務"
         autoCode={`O${taskNum}.`}
         onCommit={(items) => onSave(setOp(document, unitIdx, taskIdx, items, block?.indicators ?? []))}
       />
@@ -138,7 +138,7 @@ export function CellFillerPanel({
         value={(block?.indicators ?? []).map((i) => ({ code: i.code, name: i.text, _id: i._id, _src: i._src, _ref: i._ref }))}
         options={options}
         defaults={defaults}
-        customMode="footer"
+        autoApplyLabel="選同工作任務"
         autoCode={`P${taskNum}.`}
         onCommit={(items) =>
           onSave(

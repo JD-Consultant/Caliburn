@@ -1,7 +1,7 @@
 // 知識包 → 選單選項（ADR 0021；spec §5）。唯一的 pack 讀取邏輯集中點，全部純函式。
 // 池序 = append 序（職位優先序），選單不排序不搜尋；選項無碼 → FieldCombobox 顯序號。
 import type {
-  CodeName, KnowledgePack, MatchGroup, MatchResult, NoteItem, OptionItem, PackSrc,
+  CodeName, ItemSource, KnowledgePack, MatchGroup, MatchResult, NoteItem, OptionItem, PackSrc,
   PoolRow, SourceRef,
 } from "@/types";
 
@@ -65,6 +65,43 @@ export function codedPoolOptions(
     name: row.name,
     srcs: row.srcs.map((s) => ({ ...packSrcToRef(s), code })),
   }));
+}
+
+// ── 參考選單身分對位(ADR 0029:改字不斷根) ──────────────────────────────────────
+// 文件筆 v ↔ 池選項 o 的身分比對:靠 _ref(來源碼)對位,**不看 _src、不看現名**——
+// 改過名(_src 轉 custom、現名≠原名)仍算同一項,故選單勾選不掉。無碼來源(值物件)退回比名。
+type RefItem = { name: string; _src?: ItemSource; _ref?: SourceRef };
+
+export function itemMatchesOption(v: RefItem, o: OptionItem): boolean {
+  const coded = (o.srcs ?? []).filter((s) => s.code);
+  if (coded.length > 0 || o.code) {
+    if (v._ref && coded.some((s) => s.code === v._ref!.code && s.ocs_code === v._ref!.ocs_code)) return true;
+    if (!coded.length && o.code) return v._ref?.code === o.code; // 無 srcs 的舊路徑（自訂候選）
+    return false;
+  }
+  return v.name === o.name; // 值物件(無碼來源,如態度/說明)→ 比名
+}
+
+// 選項是否已在文件(身分對位;含相似群 variants 任一命中——群列代表成員本人)。
+export function optionInDoc(value: RefItem[], o: OptionItem): boolean {
+  return value.some((v) => itemMatchesOption(v, o))
+    || (o.variants ?? []).some((vr) => value.some((v) => itemMatchesOption(v, vr)));
+}
+
+// 文件裡對到此選項的那一筆(給改名/原名副行用);未在=undefined → UI 據此判「無改名入口」。
+export function docItemForOption<T extends RefItem>(value: T[], o: OptionItem): T | undefined {
+  return value.find((v) => itemMatchesOption(v, o));
+}
+
+// 原名副行:文件筆現名≠池選項官方名且身分同 → 回官方原名;否則 null。
+export function originalNameNote(value: RefItem[], o: OptionItem): string | null {
+  const v = value.find((x) => itemMatchesOption(x, o));
+  return v && v.name !== o.name ? o.name : null;
+}
+
+// 改名不斷根:換文字、轉 custom,但**保留 _ref**(來源身分不掉 → 勾選仍命中、可顯原名副行)。
+export function renamedRefItem<T extends RefItem>(item: T, name: string): T {
+  return { ...item, name, _src: "custom" };
 }
 
 // 選項 → 官方文件項（勾選/預勾共用形狀；_ref = srcs[0]，即 own-first 重排後的本任務來源）。

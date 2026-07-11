@@ -259,9 +259,8 @@ export function renameUnit(doc: OcsDocument, ui: number, name: string): OcsDocum
   const unit = next.ocs_content.ocu_units[ui];
   if (unit.ocu_name === name) return next;
   unit.ocu_name = name;
-  // 改名=斷鏈變自訂(spec 2026-07-04 §5;與 OPKS「改內容→自訂」一致;底下任務身分不受影響)
-  delete unit._refs;
-  unit.source = { ocs_code: "", occupation_name: "" };
+  // 改名不斷根(ADR 0029:全層統一):保留 _refs/source 身分——參考選單勾選按身分不掉,
+  // 原名靠 pack 對位顯示副行。來源=出身紀錄,不因改字而抹除。
   return next;
 }
 
@@ -291,9 +290,8 @@ export function renameTask(doc: OcsDocument, ui: number, ti: number, name: strin
   if (tc.name === name) return next;
   tc.name = name;
   t.task_codes = [tc];
-  delete t._refs;          // 改名=斷鏈變自訂(spec §5;own-refs 自動帶入/官方級別隨之失效)
-  delete t._levelSrc;
-  t.provenance = { ocs_code: "", task_code: "" };
+  // 改名不斷根(ADR 0029:全層統一):保留 _refs/_levelSrc/provenance 身分——勾選不掉、
+  // 官方級別仍連動,原名靠 pack 對位顯示副行。
   return next;
 }
 

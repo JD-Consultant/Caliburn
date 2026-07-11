@@ -3,8 +3,8 @@
 // D27 官方職能基準「表頭」版型（5 欄對齊官方表格，可編輯/可自訂）。
 // 代碼↔名稱綁定（選官方基準下拉）；所屬類別三類各列為 名稱|代碼（可手打自訂、加列刪列），
 // 並提供「選官方▾」下拉把官方 {code,name} 綁定帶入；工作描述/級別預填可改+帶官方。
-import { useRef, useState } from "react";
-import { Check, ChevronDown, Plus, X } from "lucide-react";
+import { useState } from "react";
+import { Check, ChevronDown, X } from "lucide-react";
 import type { CodeName, OcsDocument, OptionItem } from "@/types";
 import { useKnowledge } from "@/hooks/useKnowledge";
 import { codedPoolOptions, primaryBasisOptions, primaryDefaults, type BasisOption } from "@/lib/pack";
@@ -15,14 +15,12 @@ import {
   setOcsLevel,
   setPrimaryBasis,
   setProfileField,
-  upsertCategory,
   type CatKind,
 } from "@/lib/ocsDoc";
 import { FieldText } from "./fields/FieldText";
 import { OfficialMenu } from "./fields/OfficialMenu";
 import { SourceLine } from "./fields/SourceLine";
 import { Modal } from "./OccupationPicker";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
 
 const TH = "border bg-muted/50 px-3 py-2 text-left align-middle font-medium whitespace-nowrap";
@@ -37,67 +35,56 @@ const KINDS: { key: CatKind; label: string; codeLabel: string }[] = [
 const ekey = (i: { code: string; name: string }) => i.code || "name:" + i.name;
 const newId = () => (globalThis.crypto?.randomUUID?.() ?? `id-${Math.random().toString(36).slice(2)}`);
 
-// 每類別的「選 ▾」下拉（官方候選勾選/取消）＋ 右側「+」直接加一列空白自訂。
-// 自動勾選=主基準來源(spec 2026-07-04 §4):首開且該類空→自動套;選單頂列鈕可重套。
-function CategoryPicker({ options, existing, onToggle, onAddBlank, onAutoApply }: {
+// 每類別的「選 ▾」**獨立選單窗**(ADR 0029:純工具、官方候選勾選/取消、無自訂入口、無首開自動套)。
+// 「選同職能基準」＝補上主基準來源的官方項(批次;主基準空/自訂則不給此鈕)。
+function CategoryPicker({ title, options, existing, onToggle, onAutoApply }: {
+  title: string;
   options: OptionItem[];
   existing: { code: string; name: string }[];
   onToggle: (o: OptionItem) => void;
-  onAddBlank: () => void;
   onAutoApply?: () => void;
 }) {
   const [open, setOpen] = useState(false);
-  const autoApplied = useRef(false);
   const has = (o: OptionItem) => existing.some((e) => ekey(e) === ekey(o));
-  const handleOpen = (o: boolean) => {
-    setOpen(o);
-    if (o && !autoApplied.current) {
-      autoApplied.current = true;
-      if (existing.length === 0) onAutoApply?.(); // 首開且空才套
-    }
-  };
   return (
-    <div className="flex items-center gap-0.5">
-      <Popover open={open} onOpenChange={handleOpen}>
-        <PopoverTrigger asChild>
-          <button type="button" className="inline-flex items-center text-muted-foreground hover:text-foreground" title="選官方">
-            <ChevronDown className="h-3.5 w-3.5" />
-          </button>
-        </PopoverTrigger>
-        <PopoverContent className="w-72">
+    <>
+      <button type="button" className="inline-flex items-center text-muted-foreground hover:text-foreground" title="選官方" onClick={() => setOpen(true)}>
+        <ChevronDown className="h-3.5 w-3.5" />
+      </button>
+      {open ? (
+        <Modal title={title} onClose={() => setOpen(false)}>
           {onAutoApply ? (
-            <div className="mb-1 flex items-center justify-end px-1">
+            <div className="mb-2 flex items-center justify-end px-1">
               <button type="button" className="shrink-0 text-xs text-muted-foreground hover:text-foreground"
-                title="補上主基準來源的官方項" onClick={onAutoApply}>
-                自動勾選
+                onClick={() => { onAutoApply(); setOpen(false); }}>
+                選同職能基準
               </button>
             </div>
           ) : null}
-          <Command>
-            <CommandList>
-              <CommandEmpty>無候選</CommandEmpty>
-              <CommandGroup>
-                {options.map((o) => (
-                  <CommandItem key={ekey(o)} value={`${o.code} ${o.name}`} onSelect={() => onToggle(o)} className="items-start">
-                    <Check className={"mt-0.5 h-3.5 w-3.5 " + (has(o) ? "opacity-100" : "opacity-0")} />
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-1">
-                        {o.code ? <span className="font-mono text-xs text-muted-foreground">{o.code}</span> : null}
-                        <span className="flex-1">{o.name}</span>
+          <div className="rounded-lg border">
+            <Command className="bg-transparent">
+              <CommandList className="max-h-96">
+                <CommandEmpty>無候選</CommandEmpty>
+                <CommandGroup>
+                  {options.map((o) => (
+                    <CommandItem key={ekey(o)} value={`${o.code} ${o.name}`} onSelect={() => onToggle(o)} className="items-start">
+                      <Check className={"mt-0.5 h-3.5 w-3.5 " + (has(o) ? "opacity-100" : "opacity-0")} />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1">
+                          {o.code ? <span className="font-mono text-xs text-muted-foreground">{o.code}</span> : null}
+                          <span className="flex-1">{o.name}</span>
+                        </div>
+                        <SourceLine srcs={o.srcs} />
                       </div>
-                      <SourceLine srcs={o.srcs} />
-                    </div>
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </CommandList>
-          </Command>
-        </PopoverContent>
-      </Popover>
-      <button type="button" className="inline-flex items-center text-muted-foreground hover:text-foreground" title="加自訂（空白列）" onClick={onAddBlank}>
-        <Plus className="h-3.5 w-3.5" />
-      </button>
-    </div>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </div>
+        </Modal>
+      ) : null}
+    </>
   );
 }
 
@@ -168,8 +155,7 @@ export function DocHeader({ document: doc, profileId, onChange }: {
   const catStatus = (e: { _src?: "official" | "custom" }): "official" | "custom" =>
     e._src === "custom" ? "custom" : e._src === "official" ? "official" : "custom";
 
-  // 主基準(表頭層)自動勾選規則(spec 2026-07-04 §4):主基準空白/自訂 → 不套。
-  const levelAuto = useRef(false);
+  // 主基準(表頭層):「選同職能基準」批次帶入用(主基準空白/自訂 → 不給批次鈕)。ADR 0029 取消首開自動帶。
   const primaryBasis = () => (isOfficialBasis ? opts.find((o) => o.ocs_code === p.ocs_code) : undefined);
   const levelSrcOf = (b: BasisOption) => ({
     ocs_code: b.ocs_code, occupation_name: b.occupation_name, code: "", level: b.ocs_level as number });
@@ -193,12 +179,6 @@ export function DocHeader({ document: doc, profileId, onChange }: {
       onChange(setCategory(doc, kind, [...existing, { code: o.code, name: o.name, _id: newId(), _src: "official", _ref: ref }]));
     }
   };
-  // 右側「+」：直接加一列空白自訂（名稱/代碼就地編輯）。
-  const addBlankCategory = (kind: CatKind) => {
-    const existing = p.category?.[kind] ?? [];
-    onChange(setCategory(doc, kind, [...existing, { code: "", name: "", _id: newId(), _src: "custom" }]));
-  };
-
   // 攤平成多列：每類至少一列（空則一列可填的虛擬列）；子類別/代碼標籤只在該類第一列 rowSpan。
   const catRows = KINDS.flatMap((k) => {
     const entries = p.category?.[k.key] ?? [];
@@ -263,24 +243,20 @@ export function DocHeader({ document: doc, profileId, onChange }: {
                 <div className="flex items-center gap-1">
                   <span>{r.label}</span>
                   <CategoryPicker
+                    title={`選${r.label}`}
                     options={catOptions(r.key)}
                     existing={p.category?.[r.key] ?? []}
                     onToggle={(o) => toggleOfficial(r.key, o)}
-                    onAddBlank={() => addBlankCategory(r.key)}
                     onAutoApply={isOfficialBasis ? () => applyCatDefaults(r.key) : undefined}
                   />
                 </div>
               </th>
             ) : null}
             <td className={TD}>
+              {/* ADR 0029:控制欄一律唯讀顯示——格內不可能出現非官方值;既存 custom 列照顯示 */}
               <div className="flex items-center gap-1.5">
                 <div className="min-w-0 flex-1">
-                  {r.real && r.src === "official" ? (
-                    <span className="block px-1.5 py-1">{r.name}</span>
-                  ) : (
-                    <FieldText value={r.name} placeholder="名稱（可自訂）"
-                      onCommit={(v) => onChange(upsertCategory(doc, r.key, r.idx, "name", v))} />
-                  )}
+                  <span className="block px-1.5 py-1">{r.name || (r.real ? "" : "—")}</span>
                 </div>
                 {r.real ? <Marker status={catStatus({ _src: r.src })} /> : null}
               </div>
@@ -289,12 +265,7 @@ export function DocHeader({ document: doc, profileId, onChange }: {
             <td className={TD}>
               <div className="flex items-center gap-1">
                 <div className="flex-1">
-                  {r.real && r.src === "official" ? (
-                    <span className="block px-1.5 py-1 font-mono">{r.code}</span>
-                  ) : (
-                    <FieldText value={r.code} placeholder="代碼"
-                      onCommit={(v) => onChange(upsertCategory(doc, r.key, r.idx, "code", v))} />
-                  )}
+                  <span className="block px-1.5 py-1 font-mono">{r.code}</span>
                 </div>
                 {r.real ? (
                   <button type="button" className="shrink-0 text-muted-foreground hover:text-destructive" title="刪除此列" onClick={() => onChange(deleteCategory(doc, r.key, r.idx))}>
@@ -312,6 +283,7 @@ export function DocHeader({ document: doc, profileId, onChange }: {
             <div className="flex items-center justify-between gap-1">
               <span>工作描述</span>
               <OfficialMenu
+                title="加入官方工作描述"
                 trigger={<button type="button" className="inline-flex items-center text-muted-foreground hover:text-foreground" title="加入官方描述（加到下一行）"><ChevronDown className="h-3.5 w-3.5" /></button>}
                 options={opts.filter((o) => o.job_description).map((o) => ({ value: o.job_description, label: `${o.ocs_code}　${o.occupation_name}` }))}
                 onPick={(v) => { const curDesc = p.job_description ?? ""; onChange(setProfileField(doc, "job_description", curDesc.trim() ? `${curDesc}\n\n${v}` : v)); }}
@@ -330,6 +302,8 @@ export function DocHeader({ document: doc, profileId, onChange }: {
             <div className="flex items-center justify-between gap-1">
               <span>基準級別</span>
               <OfficialMenu
+                title="選基準級別"
+                autoApplyLabel="選同職能基準"
                 trigger={<button type="button" className="inline-flex items-center text-muted-foreground hover:text-foreground" title="選級別"><ChevronDown className="h-3.5 w-3.5" /></button>}
                 options={[1, 2, 3, 4, 5, 6].map((n) => ({
                   value: String(n), label: `級別 ${n}`,
@@ -338,10 +312,6 @@ export function DocHeader({ document: doc, profileId, onChange }: {
                 selected={p.ocs_level != null ? String(p.ocs_level) : ""}
                 onAutoApply={(() => { const b = primaryBasis(); return b?.ocs_level != null
                   ? () => onChange(setOcsLevel(doc, String(b.ocs_level), levelSrcOf(b))) : undefined; })()}
-                onOpenChange={(o) => { if (o && !levelAuto.current) { levelAuto.current = true;
-                  const b = primaryBasis(); // 首開且空→帶主基準級別(spec §4)
-                  if (p.ocs_level == null && b?.ocs_level != null)
-                    onChange(setOcsLevel(doc, String(b.ocs_level), levelSrcOf(b))); } }}
                 onPick={(v) => { const b = primaryBasis(); // 值==官方值即官方(spec §9 決策 6)
                   const official = b?.ocs_level != null && Number(v) === b.ocs_level;
                   onChange(setOcsLevel(doc, v, official ? levelSrcOf(b!) : undefined)); }}

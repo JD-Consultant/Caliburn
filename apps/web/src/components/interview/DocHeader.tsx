@@ -13,7 +13,6 @@ import {
   deleteCategory,
   setCategory,
   setOcsLevel,
-  setOcsName,
   setPrimaryBasis,
   setProfileField,
   upsertCategory,
@@ -22,6 +21,7 @@ import {
 import { FieldText } from "./fields/FieldText";
 import { OfficialMenu } from "./fields/OfficialMenu";
 import { SourceLine } from "./fields/SourceLine";
+import { Modal } from "./OccupationPicker";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
 
@@ -101,6 +101,51 @@ function CategoryPicker({ options, existing, onToggle, onAddBlank, onAutoApply }
   );
 }
 
+// 職能基準（文件身分）獨立選單窗（ADR 0029）：從**已選參考**單選一個當文件主基準
+// （控制單選、不可自訂）；再點同項＝整組清空。樣式同〔選職責〕窗（序號＋來源行）。
+function PrimaryBasisMenu({ options, selected, onPick }: {
+  options: BasisOption[];
+  selected: string;
+  onPick: (code: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <button type="button" className="inline-flex items-center text-muted-foreground hover:text-foreground"
+              title="選職能基準（從已選參考單選）" onClick={() => setOpen(true)}>
+        <ChevronDown className="h-3.5 w-3.5" />
+      </button>
+      {open ? (
+        <Modal title="選職能基準（文件身分）" onClose={() => setOpen(false)}>
+          <p className="mb-2 px-1 text-xs text-muted-foreground">從已選參考單選為文件主基準；再點同項＝清空。</p>
+          <div className="rounded-lg border">
+            <Command className="bg-transparent">
+              <CommandList className="max-h-96">
+                <CommandEmpty>沒有參考。請先〔選職能基準參考〕。</CommandEmpty>
+                <CommandGroup>
+                  {options.map((o, i) => (
+                    <CommandItem key={o.ocs_code} value={`${i} ${o.ocs_code} ${o.occupation_name}`}
+                      onSelect={() => { onPick(o.ocs_code); setOpen(false); }} className="items-start">
+                      <Check className={"mt-0.5 h-3.5 w-3.5 " + (o.ocs_code === selected ? "opacity-100" : "opacity-0")} />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1">
+                          <span className="font-mono text-xs text-muted-foreground">{i + 1}.</span>
+                          <span className="flex-1">{o.occupation_name || o.ocs_code}</span>
+                        </div>
+                        <SourceLine srcs={[{ ocs_code: o.ocs_code, occupation_name: o.occupation_name, code: "" }]} />
+                      </div>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </div>
+        </Modal>
+      ) : null}
+    </>
+  );
+}
+
 // 來源標記（只標非官方）：官方→不標（乾淨像官方表）；custom→「自訂」。
 function Marker({ status }: { status: "official" | "custom" }) {
   if (status === "official") return null;
@@ -175,9 +220,8 @@ export function DocHeader({ document: doc, profileId, onChange }: {
           <th className={TH} colSpan={2}>
             <div className="flex items-center justify-between gap-1">
               <span>職能基準代碼</span>
-              <OfficialMenu
-                trigger={<button type="button" className="inline-flex items-center text-muted-foreground hover:text-foreground" title="選職能基準"><ChevronDown className="h-3.5 w-3.5" /></button>}
-                options={opts.map((o) => ({ value: o.ocs_code, label: `${o.ocs_code}　${o.occupation_name}` }))}
+              <PrimaryBasisMenu
+                options={opts}
                 selected={p.ocs_code}
                 onPick={(code) => {
                   if (code === p.ocs_code) { onChange(clearPrimaryBasis(doc)); return; } // 再點=整組清空(spec §9 決策 4)
@@ -192,31 +236,21 @@ export function DocHeader({ document: doc, profileId, onChange }: {
           </td>
         </tr>
 
-        {/* 職能基準名稱（職類/職業，擇一填寫；可改） */}
+        {/* 職能基準名稱（職類/職業）：一律唯讀顯示——名稱綁定於單選的職能基準，不可自由填 */}
         <tr>
           <th className={TH} rowSpan={2}>
             職能基準名稱
-            <div className="text-xs font-normal text-muted-foreground">（擇一填寫）</div>
+            <div className="text-xs font-normal text-muted-foreground">（隨基準帶入）</div>
           </th>
           <th className={TH}>職類</th>
           <td className={TD} colSpan={3}>
-            {isOfficialBasis ? (
-              <span className="block px-1.5 py-1">{p.ocs_name?.job_category_name || "—"}</span>
-            ) : (
-              <FieldText value={p.ocs_name?.job_category_name ?? ""} placeholder="職類名稱"
-                onCommit={(v) => onChange(setOcsName(doc, "job_category_name", v))} />
-            )}
+            <span className="block px-1.5 py-1">{p.ocs_name?.job_category_name || "—"}</span>
           </td>
         </tr>
         <tr>
           <th className={TH}>職業</th>
           <td className={TD} colSpan={3}>
-            {isOfficialBasis ? (
-              <span className="block px-1.5 py-1">{p.ocs_name?.occupation_name || "—"}</span>
-            ) : (
-              <FieldText value={p.ocs_name?.occupation_name ?? ""} placeholder="職業名稱"
-                onCommit={(v) => onChange(setOcsName(doc, "occupation_name", v))} />
-            )}
+            <span className="block px-1.5 py-1">{p.ocs_name?.occupation_name || "—"}</span>
           </td>
         </tr>
 

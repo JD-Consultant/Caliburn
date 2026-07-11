@@ -193,6 +193,8 @@ function TaskRow({
         />
         {isCustomTask ? <span className="shrink-0 rounded bg-amber-100 px-1 text-[10px] text-amber-700" title="自訂任務(無官方來源)">自訂</span> : null}
         <OfficialMenu
+          title="選任務級別"
+          autoApplyLabel="選同官方級別"
           trigger={
             <button type="button" className="inline-flex items-center gap-0.5 rounded border px-1.5 py-0.5 text-xs text-muted-foreground hover:text-foreground" title="任務級別（可改；下拉顯示官方來源）">
               級別 {level != null ? level : "—"}<ChevronDown className="h-3 w-3" />

@@ -1,6 +1,8 @@
 "use client";
 
-// D27〔選職類〕modal：搜尋 + 複選 OCS（順序=優先度）→ setOccupations。
+// D27〔選職能基準參考〕modal：搜尋 + 複選 OCS 參考 → setOccupations。
+// ADR 0029:純參考集合、**無順序語義**(不再是優先度);只寫 selected_ocs_codes,
+// 不動文件表頭(主基準由職類視窗單選帶入)。
 // 0028 D1:訪談引擎可程式化開啟(autoSearch=true 掛載即搜)——同一元件、入口不同。
 import { useEffect, useRef, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
@@ -8,7 +10,6 @@ import { ocsSearch } from "@/lib/api";
 import { useSetOccupations } from "@/hooks/useDocument";
 import type { OcsSearchHit } from "@/types";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Search, X } from "lucide-react";
 
 export function OccupationPicker({
@@ -61,11 +62,11 @@ export function OccupationPicker({
   };
 
   return (
-    <Modal title="選擇職類（順序＝優先度）" onClose={onClose}>
+    <Modal title="選職能基準參考" onClose={onClose}>
       <div className="flex gap-2">
         <input
           className="w-full rounded-lg border px-3 py-2 text-sm"
-          placeholder="搜尋職類（例：AIoT 應用工程師）"
+          placeholder="搜尋職能基準（例：AIoT 應用工程師）"
           value={q}
           onChange={(e) => setQ(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && search.mutate()}
@@ -80,18 +81,13 @@ export function OccupationPicker({
       {hits.length > 0 ? (
         <div className="mt-3 max-h-72 space-y-1 overflow-y-auto rounded-lg border p-2">
           {hits.map((h) => {
-            const order = picked.indexOf(h.ocs_code);
+            const checked = picked.includes(h.ocs_code);
             return (
               <label
                 key={h.ocs_code}
                 className="flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-sm hover:bg-muted/50"
               >
-                <input type="checkbox" checked={order >= 0} onChange={() => toggle(h.ocs_code)} />
-                {order >= 0 ? (
-                  <Badge variant="secondary" className="h-5 w-5 justify-center p-0 text-xs">
-                    {order + 1}
-                  </Badge>
-                ) : null}
+                <input type="checkbox" checked={checked} onChange={() => toggle(h.ocs_code)} />
                 <span className="flex-1">{h.ocs_name}</span>
                 <span className="font-mono text-xs text-muted-foreground">{h.ocs_code}</span>
               </label>
@@ -105,7 +101,7 @@ export function OccupationPicker({
       <div className="mt-4 flex justify-end gap-2">
         <Button variant="ghost" onClick={onClose}>取消</Button>
         <Button onClick={confirm} disabled={picked.length === 0 || setOcc.isPending}>
-          {setOcc.isPending ? "設定中…" : `確定（${picked.length} 個職類）`}
+          {setOcc.isPending ? "設定中…" : `確定（${picked.length} 個參考）`}
         </Button>
       </div>
     </Modal>

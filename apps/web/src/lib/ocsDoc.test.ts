@@ -104,6 +104,29 @@ describe("reorderUnits / deleteTask(其他結構變動)", () => {
   });
 });
 
+describe("位置碼:custom 與官方一視同仁(ADR 0029;spec §7)", () => {
+  it("自訂任務/項目與官方一樣依位置連號(T/O/P);身分(_src/provenance)不影響顯示碼", () => {
+    const custom = {
+      task_codes: [{ code: "", name: "自訂任務" }],
+      competency_blocks: [{
+        competency_level: null,
+        outputs: [{ code: "", name: "自訂產出", _id: "co", _src: "custom" }],
+        indicators: [{ code: "", text: "自訂指標", _id: "cp", _src: "custom" }],
+        knowledge: [], skills: [],
+      }],
+      provenance: { ocs_code: "", task_code: "" }, _tid: "tid-custom",
+    } as unknown as OcsTask;
+    const doc = docWith([
+      { name: "U1", tasks: [task("T1.1", "甲")] },   // 官方
+      { name: "U2", tasks: [custom] },               // 自訂(無 provenance、items custom)
+    ]);
+    const next = reorderUnits(doc, 1, 0); // 自訂職責換到最前
+    expect(next.ocs_content.ocu_units[0].ocu_code).toBe("T1");
+    expect(codesOf(next, 0)).toEqual([{ task: "T1.1", o: ["O1.1.1"], p: ["P1.1.1"] }]); // 自訂照拿位置碼
+    expect(codesOf(next, 1)).toEqual([{ task: "T2.1", o: ["O2.1.1"], p: ["P2.1.1"] }]); // 官方隨位置重編
+  });
+});
+
 describe("setOp / setKS(內容編輯的重編)", () => {
   it("setOp:O/P 依任務位置重編", () => {
     const doc = docWith([{ name: "U1", tasks: [task("T1.1", "甲")] }]);

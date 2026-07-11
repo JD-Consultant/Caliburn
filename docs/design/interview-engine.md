@@ -83,6 +83,13 @@ updated: 2026-07-09
 
 ## 5. UI 動作 → 請求對照
 
+> **⚠ ADR 0029(2026-07-11)動了共用編輯器 UI,本節的 AI 載體尚未重設計。** 編輯器選單已收斂成
+> **三型(控制/參考/素材庫)、一律獨立視窗**(見 [`editor-knowledge-pack.md`](editor-knowledge-pack.md) 的 ADR 0029 段);
+> 〔選職類〕改名〔選職能基準參考〕(只記參考、不寫表頭);任務 O/P/K/S 四格「點此填」+ CellFillerPanel **退役** →
+> TaskRow 內 **OPLKS 全展開區**。**本輪 AI 元件(CurationDialog、`interview:curation`/precheck、D7 reviewMap 徽章、
+> InterviewPanel)刻意不重設計**——只做維持編譯+測試綠的最小適配(D7 徽章改掛新格區對應列);AI 共編載體
+> (直寫表格+顏色標記、逐筆確認/拒絕)之後另開研究+ADR(spec §11)。下表元件名/流程仍照舊,細節以碼為準。
+
 | 動作 | 元件 | 網路 |
 |---|---|---|
 | 開始/續談 | InterviewPanel | `POST …/interview:start`(冪等;**空白 doc 也可起跑**=顧問引導選職類,§9.3) |

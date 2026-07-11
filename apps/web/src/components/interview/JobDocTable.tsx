@@ -6,7 +6,7 @@
 // 0028 D7(追蹤修訂):AI 直寫(evidence.review=pending)在**同格**標記——O/P/K/S 格
 // 加 AI 徽章+hover 引文;訪談細節(details 11 槽)以 chips 呈現(原本無呈現位=隱形)。
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { CompetencyBlock, KnowledgePack, OcsDocument, OcsTask } from "@/types";
+import type { CompetencyBlock, KnowledgePack, OcsDocument, OcsTask, OptionItem } from "@/types";
 import {
   addTask,
   addUnit,
@@ -17,6 +17,8 @@ import {
   renameUnit,
   reorderUnits,
   setAttitudes,
+  setKS,
+  setOp,
   setTaskLevel,
 } from "@/lib/ocsDoc";
 import { useInterview } from "@/hooks/useInterview";
@@ -42,19 +44,16 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { Badge } from "@/components/ui/badge";
 import { DocHeader } from "./DocHeader";
+import { UnitPickerMenu } from "./UnitPickerMenu";
 import { DocNotes } from "./DocNotes";
 import { TaskPickerMenu } from "./TaskPickerMenu";
-import { Check, ChevronDown, GripVertical, Pencil, Plus, Trash2 } from "lucide-react";
+import { ChevronDown, GripVertical, Plus, Trash2 } from "lucide-react";
 
+// OPLKS 值格種類（O/P/K/S）。CellTarget/CellFillerPanel 開板流已退役（ADR 0029 §8）。
 export type CellKind = "o" | "p" | "k" | "s";
-export type CellTarget = { kind: CellKind; unitIdx: number; taskIdx: number };
 
 export function firstBlock(task: OcsTask): CompetencyBlock | undefined {
   return task.competency_blocks?.[0];
-}
-
-function count(arr: unknown[] | undefined): number {
-  return Array.isArray(arr) ? arr.length : 0;
 }
 
 function EditableText({
@@ -94,41 +93,6 @@ function EditableText({
   );
 }
 
-function Cell({
-  label,
-  filled,
-  n,
-  onClick,
-  mark,
-}: {
-  label: string;
-  filled: boolean;
-  n: number;
-  onClick: () => void;
-  mark?: ReviewMark;      // 0028 D7:AI 直寫待審 → 同格標記(徽章+hover 引文)
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      title={mark ? `AI 依你的話寫入(待確認):「${mark.quote}」` : undefined}
-      className={
-        "flex items-center gap-1.5 rounded-md border px-2 py-1 text-xs transition-colors " +
-        (filled
-          ? (mark
-              ? "border-sky-300 bg-sky-50 text-sky-800 ring-1 ring-sky-200 hover:bg-sky-100"
-              : "border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100")
-          : "border-dashed border-muted-foreground/30 text-muted-foreground hover:border-foreground/40 hover:text-foreground")
-      }
-    >
-      {filled ? <Check className="h-3 w-3" /> : <Pencil className="h-3 w-3" />}
-      <span className="font-medium">{label}</span>
-      {filled ? <span className="tabular-nums opacity-70">{n}</span> : <span>點此填</span>}
-      {mark ? <span className="rounded bg-sky-600 px-1 text-[9px] leading-4 text-white">AI</span> : null}
-    </button>
-  );
-}
-
 function TaskRow({
   id,
   task,
@@ -137,7 +101,6 @@ function TaskRow({
   unitUid,
   reviewMap,
   pack,
-  onCell,
   onChange,
   doc,
 }: {
@@ -148,7 +111,6 @@ function TaskRow({
   unitUid?: string;
   reviewMap: Map<string, ReviewMark>;
   pack?: KnowledgePack;
-  onCell: (t: CellTarget) => void;
   onChange: (d: OcsDocument) => void;
   doc: OcsDocument;
 }) {
@@ -157,6 +119,7 @@ function TaskRow({
   const block = firstBlock(task);
   const level = block?.competency_level;
   const tc = task.task_codes?.[0];
+  const taskNum = (tc?.code ?? "").replace(/^T/i, ""); // O/P 任務範圍碼前綴（O1.1.…）
   // 0028 D7:此任務的待審標記(path 文法鏡像後端:uid 形優先、index 形後援)
   const marks = taskMarks(reviewMap, [
     `ocs_content.ocu_units.${unitUid ?? unitIdx}.tasks.${task._tid ?? taskIdx}`,
@@ -173,12 +136,25 @@ function TaskRow({
   const levelSrc = own?.levelSrc ?? task._levelSrc ?? null;
   const isCustomTask = taskUrns(task).length === 0; // 無官方身分=自訂(手動新增/改過名;spec §2)
 
+  // 各值格(O/P/K/S)的池選項＋官方配套(「選同工作任務」用);own-first 重排對到本任務。
+  const forKind = (kind: CellKind): { options: OptionItem[]; defaults: OptionItem[] } => {
+    if (!pack || !own) return { options: [], defaults: [] };
+    const pool = { o: pack.pools.outputs, p: pack.pools.indicators, k: pack.pools.knowledge, s: pack.pools.skills }[kind];
+    const ownKeys = new Set({ o: own.o, p: own.p, k: own.k, s: own.s }[kind]);
+    const options = valuePoolOptions(pool, own.pairs);
+    return { options, defaults: options.filter((op) => ownKeys.has(op.name)) };
+  };
+  const oK = forKind("o"), pK = forKind("p"), kK = forKind("k"), sK = forKind("s");
+  const aiBadge = (mark?: ReviewMark) => mark
+    ? <span title={`AI 依你的話寫入(待確認):「${mark.quote}」`} className="rounded bg-sky-600 px-1 text-[9px] leading-4 text-white">AI</span>
+    : null;
+
   return (
-    <div ref={setNodeRef} style={style} className="rounded-md border bg-background px-3 py-2">
+    <div ref={setNodeRef} style={style} className="group/task rounded-md border bg-background px-3 py-2">
       <div className="mb-2 flex items-center gap-1.5">
         <button
           type="button"
-          className="cursor-grab text-muted-foreground/60 hover:text-foreground"
+          className="cursor-grab text-muted-foreground/60 opacity-0 hover:text-foreground group-hover/task:opacity-100"
           {...attributes}
           {...listeners}
         >
@@ -189,43 +165,57 @@ function TaskRow({
           value={tc?.name ?? ""}
           placeholder="任務名稱"
           onCommit={(v) => onChange(renameTask(doc, unitIdx, taskIdx, v))}
-          className="flex-1 text-sm font-medium"
+          className="flex-1 text-sm font-semibold"
         />
         {isCustomTask ? <span className="shrink-0 rounded bg-amber-100 px-1 text-[10px] text-amber-700" title="自訂任務(無官方來源)">自訂</span> : null}
-        <OfficialMenu
-          title="選任務級別"
-          autoApplyLabel="選同官方級別"
-          trigger={
-            <button type="button" className="inline-flex items-center gap-0.5 rounded border px-1.5 py-0.5 text-xs text-muted-foreground hover:text-foreground" title="任務級別（可改；下拉顯示官方來源）">
-              級別 {level != null ? level : "—"}<ChevronDown className="h-3 w-3" />
-            </button>
-          }
-          options={[1, 2, 3, 4, 5, 6].map((n) => ({
-            value: String(n),
-            label: `級別 ${n}`,
-            srcs: officialLevel === n && levelSrc ? [levelSrc] : [],
-          }))}
-          selected={level != null ? String(level) : ""}
-          onAutoApply={officialLevel != null && levelSrc
-            ? () => onChange(setTaskLevel(doc, unitIdx, taskIdx, officialLevel, { ...levelSrc, level: officialLevel }))
-            : undefined}
-          onPick={(v) => onChange(setTaskLevel(doc, unitIdx, taskIdx, v,
-            officialLevel != null && Number(v) === officialLevel && levelSrc
-              ? { ...levelSrc, level: officialLevel } : undefined))}
-        />
         <button
           type="button"
-          className="text-muted-foreground hover:text-destructive"
+          className="text-muted-foreground opacity-0 hover:text-destructive group-hover/task:opacity-100"
+          title="刪除此任務"
           onClick={() => onChange(deleteTask(doc, unitIdx, taskIdx))}
         >
           <Trash2 className="h-3.5 w-3.5" />
         </button>
       </div>
-      <div className="flex flex-wrap gap-2 pl-6">
-        <Cell label="產出 O" filled={count(block?.outputs) > 0} n={count(block?.outputs)} mark={marks.cells.outputs} onClick={() => onCell({ kind: "o", unitIdx, taskIdx })} />
-        <Cell label="指標 P" filled={count(block?.indicators) > 0} n={count(block?.indicators)} mark={marks.cells.indicators} onClick={() => onCell({ kind: "p", unitIdx, taskIdx })} />
-        <Cell label="知識 K" filled={count(block?.knowledge) > 0} n={count(block?.knowledge)} mark={marks.cells.knowledge} onClick={() => onCell({ kind: "k", unitIdx, taskIdx })} />
-        <Cell label="技能 S" filled={count(block?.skills) > 0} n={count(block?.skills)} mark={marks.cells.skills} onClick={() => onCell({ kind: "s", unitIdx, taskIdx })} />
+      {/* OPLKS 全展開區(spec §7):列序 O→P→L→K→S;▾ 在左欄標籤旁開格選單窗;hover 才見工具 */}
+      <div className="space-y-1 pl-6">
+        <FieldCombobox gridLayout title="工作產出(O)" layout="list" autoApplyLabel="選同工作任務"
+          autoCode={`O${taskNum}.`} value={block?.outputs ?? []}
+          options={oK.options} defaults={oK.defaults} badge={aiBadge(marks.cells.outputs)}
+          onCommit={(items) => onChange(setOp(doc, unitIdx, taskIdx, items, block?.indicators ?? []))} />
+        <FieldCombobox gridLayout title="行為指標(P)" layout="list" autoApplyLabel="選同工作任務"
+          autoCode={`P${taskNum}.`}
+          value={(block?.indicators ?? []).map((i) => ({ code: i.code, name: i.text, _id: i._id, _src: i._src, _ref: i._ref }))}
+          options={pK.options} defaults={pK.defaults} badge={aiBadge(marks.cells.indicators)}
+          onCommit={(items) => onChange(setOp(doc, unitIdx, taskIdx, block?.outputs ?? [],
+            items.map((i) => ({ code: i.code, text: i.name, _id: i._id, _src: i._src, _ref: i._ref }))))} />
+        {/* L 職能級別(每任務;控制單選) */}
+        <div className="flex items-start gap-3">
+          <div className="flex w-40 shrink-0 items-center gap-1 pt-1">
+            <span className="text-sm font-medium">職能級別(L)</span>
+            <OfficialMenu
+              title="選任務級別"
+              autoApplyLabel="選同官方級別"
+              trigger={<button type="button" className="inline-flex items-center text-muted-foreground hover:text-foreground" title="選級別"><ChevronDown className="h-4 w-4" /></button>}
+              options={[1, 2, 3, 4, 5, 6].map((n) => ({ value: String(n), label: `級別 ${n}`, srcs: officialLevel === n && levelSrc ? [levelSrc] : [] }))}
+              selected={level != null ? String(level) : ""}
+              onAutoApply={officialLevel != null && levelSrc
+                ? () => onChange(setTaskLevel(doc, unitIdx, taskIdx, officialLevel, { ...levelSrc, level: officialLevel }))
+                : undefined}
+              onPick={(v) => onChange(setTaskLevel(doc, unitIdx, taskIdx, v,
+                officialLevel != null && Number(v) === officialLevel && levelSrc ? { ...levelSrc, level: officialLevel } : undefined))}
+            />
+          </div>
+          <div className="min-w-0 flex-1 pt-1 text-sm">{level != null ? level : "—"}</div>
+        </div>
+        <FieldCombobox gridLayout title="職能內涵(K)" layout="list" autoApplyLabel="選同工作任務"
+          autoCode="K" value={block?.knowledge ?? []}
+          options={kK.options} defaults={kK.defaults} badge={aiBadge(marks.cells.knowledge)}
+          onCommit={(items) => onChange(setKS(doc, unitIdx, taskIdx, "knowledge", items))} />
+        <FieldCombobox gridLayout title="職能內涵(S)" layout="list" autoApplyLabel="選同工作任務"
+          autoCode="S" value={block?.skills ?? []}
+          options={sK.options} defaults={sK.defaults} badge={aiBadge(marks.cells.skills)}
+          onCommit={(items) => onChange(setKS(doc, unitIdx, taskIdx, "skills", items))} />
       </div>
       {/* 訪談細節(details 11 槽;0028 D7):書記寫入的主要內容,原本在表格**沒有呈現位**
           =隱形。chips 呈現;AI 待審=藍框+徽章+hover 引文,人可見可查。 */}
@@ -257,7 +247,6 @@ function UnitRow({
   unitIdx,
   reviewMap,
   pack,
-  onCell,
   onChange,
   doc,
 }: {
@@ -266,7 +255,6 @@ function UnitRow({
   unitIdx: number;
   reviewMap: Map<string, ReviewMark>;
   pack?: KnowledgePack;
-  onCell: (t: CellTarget) => void;
   onChange: (d: OcsDocument) => void;
   doc: OcsDocument;
 }) {
@@ -309,7 +297,6 @@ function UnitRow({
               unitUid={unit._uid}
               reviewMap={reviewMap}
               pack={pack}
-              onCell={onCell}
               onChange={onChange}
               doc={doc}
             />
@@ -368,12 +355,10 @@ function AttitudeBlock({
 export function JobDocTable({
   document,
   profileId,
-  onCell,
   onChange,
 }: {
   document: OcsDocument;
   profileId: string;
-  onCell: (target: CellTarget) => void;
   onChange: (d: OcsDocument) => void;
 }) {
   const units = document.ocs_content?.ocu_units ?? [];
@@ -443,7 +428,6 @@ export function JobDocTable({
                   unitIdx={ui}
                   reviewMap={reviewMap}
                   pack={pack}
-                  onCell={onCell}
                   onChange={onChange}
                   doc={document}
                 />
@@ -453,14 +437,18 @@ export function JobDocTable({
         </DndContext>
       )}
 
-      <button
-        type="button"
-        className="inline-flex items-center gap-1 rounded-md border border-dashed px-3 py-2 text-sm text-muted-foreground hover:text-foreground"
-        onClick={() => onChange(addUnit(document))}
-      >
-        <Plus className="h-4 w-4" />
-        新增職責
-      </button>
+      {/* 表格底部:〔選主要職責〕(參考;搬自頂欄,ADR 0029 §6)與〔＋新增職責〕(自訂)並排 */}
+      <div className="flex flex-wrap items-center gap-2">
+        <UnitPickerMenu document={document} pack={pack} disabled={!pack} onChange={onChange} />
+        <button
+          type="button"
+          className="inline-flex items-center gap-1 rounded-md border border-dashed px-3 py-2 text-sm text-muted-foreground hover:text-foreground"
+          onClick={() => onChange(addUnit(document))}
+        >
+          <Plus className="h-4 w-4" />
+          新增職責
+        </button>
+      </div>
 
       {/* 職能內涵（A=attitude 態度） */}
       <AttitudeBlock document={document} pack={pack} onChange={onChange} />

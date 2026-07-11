@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { Check, ChevronsUpDown, ChevronDown, Pencil, Plus, X } from "lucide-react";
 import type { OptionItem, SourceRef } from "@/types";
 import { docItemForOption, itemMatchesOption, optionInDoc, originalNameNote, renamedRefItem } from "@/lib/pack";
@@ -16,11 +16,11 @@ const newId = () => (globalThis.crypto?.randomUUID?.() ?? `id-${Math.random().to
 // 參考選單(ADR 0029):多選、列內改名(僅已勾列、改字不斷根=保留 _ref)、改名後顯原名副行;
 // 無自訂 footer(自訂回表格加列走「＋」)、無首開自動寫;窗頂搜尋框;批次帶入鈕＝「選同X」。
 export function FieldCombobox({
-  label, value, options, onCommit, pillSources = false,
+  label = "選/加", value, options, onCommit, pillSources = false,
   layout = "pills", title, autoCode, editMultiline = false,
-  defaults, autoApplyLabel = "選同職能基準",
+  defaults, autoApplyLabel = "選同職能基準", gridLayout = false, badge,
 }: {
-  label: string;
+  label?: string;
   value: Item[];
   options: OptionItem[];
   onCommit: (next: Item[]) => void;
@@ -36,6 +36,10 @@ export function FieldCombobox({
   defaults?: OptionItem[];
   // 批次帶入鈕文案（選同工作任務／選同職能基準…；ADR 0029 取代舊「自動勾選」）。
   autoApplyLabel?: string;
+  // OPLKS 版式(spec §7):左欄=標籤+▾、右欄=內容全列+格底＋自訂(需 title)。
+  gridLayout?: boolean;
+  // 標籤旁徽章(如 D7 AI 待審標記;最小適配)。
+  badge?: ReactNode;
 }) {
   const [open, setOpen] = useState(false);
   const [renaming, setRenaming] = useState<string | null>(null);
@@ -219,21 +223,44 @@ export function FieldCombobox({
 
   const onMenuOpenChange = (o: boolean) => { setOpen(o); if (!o) setRenaming(null); };
 
+  const menuTrigger = (
+    <Popover open={open} onOpenChange={onMenuOpenChange}>
+      <PopoverTrigger asChild>
+        <button type="button" className="inline-flex items-center text-muted-foreground hover:text-foreground" title="選/加">
+          <ChevronDown className="h-4 w-4" />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent className="w-72">{menuHeader}{menu}</PopoverContent>
+    </Popover>
+  );
+
+  // OPLKS 版式(spec §7):左欄=標籤+▾、右欄=內容全列+格底＋自訂。逐層縮排、hover 才見工具。
+  if (title !== undefined && gridLayout) {
+    return (
+      <div className="flex items-start gap-3">
+        <div className="flex w-40 shrink-0 items-center gap-1 pt-1">
+          <span className="text-sm font-medium">{title}</span>
+          {badge}
+          {menuTrigger}
+        </div>
+        <div className="min-w-0 flex-1">
+          {selectedView}
+          <button type="button" className="mt-1 inline-flex items-center gap-1 text-xs text-muted-foreground opacity-60 hover:text-foreground hover:opacity-100" onClick={addBlank}>
+            <Plus className="h-3 w-3" /> 加自訂
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   // 標題模式：標題 + ▾ + 帶官方 在右，清單在下（同所屬類別/基準級別）。
   if (title !== undefined) {
     return (
       <div className="space-y-1.5">
         <div className="flex items-center justify-between gap-2">
-          <span className="text-sm font-medium">{title}</span>
+          <span className="text-sm font-medium">{title}{badge}</span>
           <div className="flex items-center gap-1.5">
-            <Popover open={open} onOpenChange={onMenuOpenChange}>
-              <PopoverTrigger asChild>
-                <button type="button" className="inline-flex items-center text-muted-foreground hover:text-foreground" title="選/加">
-                  <ChevronDown className="h-4 w-4" />
-                </button>
-              </PopoverTrigger>
-              <PopoverContent className="w-72">{menuHeader}{menu}</PopoverContent>
-            </Popover>
+            {menuTrigger}
             <button type="button" className="inline-flex items-center text-muted-foreground hover:text-foreground" title="加自訂（空白列）" onClick={addBlank}>
               <Plus className="h-4 w-4" />
             </button>

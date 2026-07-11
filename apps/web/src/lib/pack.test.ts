@@ -96,6 +96,55 @@ describe("groupedValueOptions(spec §4)", () => {
   });
 });
 
+// ── 全域選任務:來源職責解析(spec §6) ────────────────────────────────────────
+import { primarySkeletonPicks, resolveHomeUnit, taskPickFromRow, taskRows } from "./pack";
+import type { OcsDocument } from "@/types";
+
+describe("全域選任務:來源職責解析(spec §6)", () => {
+  const pack = {
+    pools: {
+      units: {
+        職責甲: { srcs: [{ ocs_code: "OC1", ocs_name: "甲", ocu_code: "T1" }] },
+        職責乙: { srcs: [{ ocs_code: "OC2", ocs_name: "乙", ocu_code: "U1" }] },
+      },
+      tasks: { 巡檢: { srcs: ["u1", "u2"] } },
+      outputs: {}, indicators: {}, knowledge: {}, skills: {}, attitudes: {},
+      job_categories: {}, occupations: {}, industries: {}, prerequisites: {}, supplements: {},
+    },
+    source_tasks: {
+      u1: { ocs_code: "OC1", ocs_name: "甲", ocu_code: "T1", ocu_name: "職責甲", task_code: "T1.1", task_name: "巡檢", competency_level: null },
+      u2: { ocs_code: "OC2", ocs_name: "乙", ocu_code: "U1", ocu_name: "職責乙", task_code: "U1.1", task_name: "巡檢", competency_level: null },
+    },
+    occupation_details: [],
+  } as unknown as KnowledgePack;
+  const row = taskRows(pack)[0]; // 巡檢, urns=[u1,u2]
+  const emptyDoc = { ocs_content: { ocu_units: [] } } as unknown as OcsDocument;
+
+  it("多來源取與主基準同 ocs_code 者優先;職責不在文件 → existingIdx=-1", () => {
+    const home = resolveHomeUnit(row, emptyDoc, pack, "OC2")!;
+    expect(home.ocuName).toBe("職責乙");
+    expect(home.unitSrc.ocu_code).toBe("U1");
+    expect(home.existingIdx).toBe(-1);
+  });
+
+  it("職責已在文件(改過名)→ existingIdx 靠 _refs 身分命中", () => {
+    const doc = { ocs_content: { ocu_units: [
+      { ocu_name: "職責乙(改過)", _refs: [{ ocs_code: "OC2", occupation_name: "乙", code: "", ocu_code: "U1" }], tasks: [] },
+    ] } } as unknown as OcsDocument;
+    expect(resolveHomeUnit(row, doc, pack, "OC2")!.existingIdx).toBe(0);
+  });
+
+  it("taskPickFromRow:provenance 取主基準來源", () => {
+    expect(taskPickFromRow(row, "OC2").provenance).toEqual({ ocs_code: "OC2", task_code: "U1.1" });
+  });
+
+  it("primarySkeletonPicks:主基準全部職責+官方任務整組", () => {
+    const picks = primarySkeletonPicks(pack, "OC2");
+    expect(picks.map((p) => p.unit.name)).toEqual(["職責乙"]);
+    expect(picks[0].tasks.map((t) => t.name)).toEqual(["巡檢"]);
+  });
+});
+
 // ── 參考選單身分對位:改字不斷根(ADR 0029) ──────────────────────────────────
 import { docItemForOption, optionInDoc, originalNameNote, renamedRefItem } from "./pack";
 

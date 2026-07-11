@@ -139,24 +139,25 @@ describe("setOp / setKS(內容編輯的重編)", () => {
   });
 });
 
-describe("改名斷鏈 + 級別來源(spec 2026-07-04 §2/§5)", () => {
-  it("renameTask:清 provenance/_refs/_levelSrc → 變自訂", () => {
+describe("改名不斷根 + 級別來源(ADR 0029;spec 2026-07-11 §2.4/§4)", () => {
+  it("renameTask:保留 provenance/_refs/_levelSrc(身分不斷根;原名靠 pack 對位顯示)", () => {
     const doc = docWith([{ name: "U1", tasks: [task("T1.1", "甲")] }]);
     doc.ocs_content.ocu_units[0].tasks[0]._refs = [{ ocs_code: "OC1", occupation_name: "甲職", code: "" }];
     doc.ocs_content.ocu_units[0].tasks[0]._levelSrc = { ocs_code: "OC1", occupation_name: "甲職", code: "", level: 3 };
     const next = renameTask(doc, 0, 0, "改過的名字");
     const t = next.ocs_content.ocu_units[0].tasks[0];
-    expect(t.provenance).toEqual({ ocs_code: "", task_code: "" });
-    expect(t._refs).toBeUndefined();
-    expect(t._levelSrc).toBeUndefined();
+    expect(t._refs).toEqual([{ ocs_code: "OC1", occupation_name: "甲職", code: "" }]);
+    expect(t._levelSrc).toMatchObject({ level: 3 });
     expect(t.task_codes![0].name).toBe("改過的名字");
   });
-  it("renameUnit:清 source/_refs", () => {
+  it("renameUnit:保留 source/_refs(身分不斷根)", () => {
     const doc = docWith([{ name: "U1", tasks: [] }]);
     doc.ocs_content.ocu_units[0]._refs = [{ ocs_code: "OC1", occupation_name: "甲職", code: "", ocu_code: "T1" }];
+    doc.ocs_content.ocu_units[0].source = { ocs_code: "OC1", occupation_name: "甲職" };
     const next = renameUnit(doc, 0, "新名");
-    expect(next.ocs_content.ocu_units[0]._refs).toBeUndefined();
-    expect(next.ocs_content.ocu_units[0].source).toEqual({ ocs_code: "", occupation_name: "" });
+    expect(next.ocs_content.ocu_units[0]._refs).toEqual([{ ocs_code: "OC1", occupation_name: "甲職", code: "", ocu_code: "T1" }]);
+    expect(next.ocs_content.ocu_units[0].source).toEqual({ ocs_code: "OC1", occupation_name: "甲職" });
+    expect(next.ocs_content.ocu_units[0].ocu_name).toBe("新名");
   });
   it("setTaskLevel 無 src → 清舊 _levelSrc(修殘留)", () => {
     const doc = docWith([{ name: "U1", tasks: [task("T1.1", "甲")] }]);

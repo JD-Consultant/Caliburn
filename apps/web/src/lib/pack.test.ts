@@ -96,6 +96,40 @@ describe("groupedValueOptions(spec §4)", () => {
   });
 });
 
+// ── 參考選單身分對位:改字不斷根(ADR 0029) ──────────────────────────────────
+import { docItemForOption, optionInDoc, originalNameNote, renamedRefItem } from "./pack";
+
+describe("參考選單身分對位(ADR 0029:改字不斷根)", () => {
+  const ref = { ocs_code: "OC1", occupation_name: "職業A", code: "O1.1.1" };
+  const option: OptionItem = { code: "", name: "官方產出A", srcs: [ref] };
+
+  it("改名後:身分仍命中(勾選不掉)、副行出原名、_ref 仍在、_src 轉 custom", () => {
+    const renamed = renamedRefItem(
+      { name: "官方產出A", _id: "x", _src: "official" as const, _ref: ref }, "我改的說法");
+    expect(renamed._ref).toEqual(ref);                    // _ref 仍在(不斷根)
+    expect(renamed._src).toBe("custom");
+    expect(renamed.name).toBe("我改的說法");
+    expect(optionInDoc([renamed], option)).toBe(true);     // 勾選仍 ✓(按身分)
+    expect(originalNameNote([renamed], option)).toBe("官方產出A"); // 副行出原名
+  });
+
+  it("未改名:命中但無原名副行", () => {
+    const v = { name: "官方產出A", _src: "official" as const, _ref: ref };
+    expect(optionInDoc([v], option)).toBe(true);
+    expect(originalNameNote([v], option)).toBeNull();
+  });
+
+  it("未勾列:docItemForOption=undefined(UI 據此隱藏改名入口)", () => {
+    expect(docItemForOption([], option)).toBeUndefined();
+    expect(optionInDoc([], option)).toBe(false);
+  });
+
+  it("同名但無來源身分的自訂項 → 不誤判為官方選項(判定按身分不按名)", () => {
+    const custom = { name: "官方產出A", _src: "custom" as const };
+    expect(optionInDoc([custom], option)).toBe(false);
+  });
+});
+
 describe("taskRowsWithSimilar(spec §4)", () => {
   it("灰區對雙向掛 similarTo;無 similarity → 原樣", () => {
     const pack = {

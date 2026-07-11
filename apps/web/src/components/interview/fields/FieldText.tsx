@@ -3,8 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import { Layers } from "lucide-react";
 
 export function FieldText({
-  value, placeholder, multiline = false, official, onCommit,
-}: { value: string; placeholder?: string; multiline?: boolean; official?: string; onCommit: (v: string) => void }) {
+  value, placeholder, multiline = false, official, autoFocus = false, onCommit,
+}: { value: string; placeholder?: string; multiline?: boolean; official?: string; autoFocus?: boolean; onCommit: (v: string) => void }) {
   const [draft, setDraft] = useState(value);
   const focused = useRef(false);
   const taRef = useRef<HTMLTextAreaElement>(null);
@@ -23,11 +23,11 @@ export function FieldText({
   return (
     <div className="space-y-1">
       {multiline ? (
-        <textarea ref={taRef} className={cls + " resize-none overflow-hidden"} rows={2} placeholder={placeholder} value={draft}
+        <textarea ref={taRef} autoFocus={autoFocus} className={cls + " resize-none overflow-hidden"} rows={2} placeholder={placeholder} value={draft}
           onFocus={() => (focused.current = true)} onBlur={() => { focused.current = false; commit(); }}
           onChange={(e) => setDraft(e.target.value)} />
       ) : (
-        <input className={cls} placeholder={placeholder} value={draft}
+        <input autoFocus={autoFocus} className={cls} placeholder={placeholder} value={draft}
           onFocus={() => (focused.current = true)}
           onBlur={() => { focused.current = false; commit(); }}
           onKeyDown={(e) => { if (e.key === "Enter" && !multiline) e.currentTarget.blur(); }}

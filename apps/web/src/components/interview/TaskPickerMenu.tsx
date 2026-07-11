@@ -6,16 +6,17 @@
 // 自動帶入該職責官方任務(預勾統一規則:初次/按「自動勾選」時套用)。勾＝加入本職責;
 // 取消勾選＝移除該任務(四格/級別/筆記皆空才可,有內容鎖定 → 表格刪)。
 // commit-per-click;與選職類/選職責/AI 任務盤同 Modal 家族。
-import { useRef, useState } from "react";
-import { Check } from "lucide-react";
+import { useState } from "react";
+import { Check, Pencil } from "lucide-react";
 import type { KnowledgePack, OcsDocument } from "@/types";
-import { addTasksToUnit, deleteTask, taskHasContent, type PoolPick } from "@/lib/ocsDoc";
+import { addTasksToUnit, deleteTask, renameTask, taskHasContent, type PoolPick } from "@/lib/ocsDoc";
 import { taskRowsWithSimilar, unitRows, type TaskRowVM } from "@/lib/pack";
 import { taskUrns } from "@/lib/urn";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Badge } from "@/components/ui/badge";
 import { Modal } from "./OccupationPicker";
+import { FieldText } from "./fields/FieldText";
 import { SourceLine } from "./fields/SourceLine";
 
 export function TaskPickerMenu({ document: doc, pack, unitIdx, onChange }: {
@@ -25,7 +26,7 @@ export function TaskPickerMenu({ document: doc, pack, unitIdx, onChange }: {
   onChange: (d: OcsDocument) => void;
 }) {
   const [open, setOpen] = useState(false);
-  const applied = useRef(false); // 首開自動帶官方任務，一次為限（之後以使用者動過的為準）
+  const [renaming, setRenaming] = useState<string | null>(null);
   const rows = pack ? taskRowsWithSimilar(pack) : []; // 灰區相似對掛 similarTo(純顯示,ADR 0022)
   const unit = doc.ocs_content?.ocu_units?.[unitIdx];
   // 本職責的官方任務集:以 unit._refs 的 (ocs_code, ocu_code) 對回 units 池列(身分對位,
@@ -75,40 +76,33 @@ export function TaskPickerMenu({ document: doc, pack, unitIdx, onChange }: {
     onChange(deleteTask(doc, loc.u, loc.t));
   };
 
-  // 自動勾選：補上本職責官方任務中還不在文件的（借用列不動）。
+  // 選同主要職責：補上本職責官方任務中還不在文件的（借用列不動）。ADR 0029 不再首開自動觸發。
   const applyDefaults = () => {
     const picks = rows.filter((r) => ownKeys.includes(r.name) && !locOf(r)).map(pickOf);
     if (picks.length) onChange(addTasksToUnit(doc, unitIdx, picks));
-  };
-
-  const openModal = () => {
-    setOpen(true);
-    if (!applied.current) {
-      applied.current = true;
-      if ((unit?.tasks?.length ?? 0) === 0) applyDefaults(); // 空職責首開＝套官方配套
-    }
   };
 
   return (
     <>
       <button
         type="button"
-        onClick={openModal}
+        onClick={() => setOpen(true)}
         className="inline-flex items-center gap-1 rounded-md border border-dashed px-2.5 py-1.5 text-xs text-muted-foreground hover:text-foreground"
       >
         選任務
       </button>
       {open ? (
-        <Modal title={`選任務——${unit?.ocu_name || "職責"}`} onClose={() => setOpen(false)}>
+        <Modal title={`選任務——${unit?.ocu_name || "職責"}`} onClose={() => { setOpen(false); setRenaming(null); }}>
           <div className="mb-2 flex items-center justify-between gap-2 px-1">
             <span className="text-xs text-muted-foreground">全部任務可選；他職責的＝借用</span>
             <button type="button" className="shrink-0 text-xs text-muted-foreground hover:text-foreground"
               title="補上本職責的官方任務" onClick={applyDefaults}>
-              自動勾選
+              選同主要職責
             </button>
           </div>
           <div className="rounded-lg border">
             <Command className="bg-transparent">
+              <CommandInput placeholder="搜尋任務…" />
               <CommandList className="max-h-96">
                 <CommandEmpty>沒有候選任務。請先〔選職類〕。</CommandEmpty>
                 <CommandGroup>
@@ -118,14 +112,36 @@ export function TaskPickerMenu({ document: doc, pack, unitIdx, onChange }: {
                     const elsewhere = !!loc && !here;
                     const locked = elsewhere || (here && loc.filled);
                     const isOwn = ownKeys.includes(r.name);
+                    const curName = here ? (doc.ocs_content.ocu_units[loc!.u].tasks[loc!.t].task_codes?.[0]?.name ?? r.name) : r.name;
+                    const renamed = here && curName !== r.name;
+                    if (here && renaming === r.name) {
+                      return (
+                        <div key={r.name} className="flex items-start gap-2 px-2 py-1.5">
+                          <Check className="mt-0.5 h-3.5 w-3.5 opacity-100" />
+                          <div className="min-w-0 flex-1">
+                            <FieldText value={curName} autoFocus
+                              onCommit={(v) => { onChange(renameTask(doc, loc!.u, loc!.t, v)); setRenaming(null); }} />
+                            {renamed ? <div className="mt-0.5 text-[10px] text-muted-foreground">原名:{r.name}</div> : null}
+                            <SourceLine srcs={r.srcs} />
+                          </div>
+                        </div>
+                      );
+                    }
                     return (
                       <CommandItem key={r.name} value={`${i} ${r.name}`} onSelect={() => toggle(r)}
-                        className={"items-start " + (locked ? "opacity-60" : "")}>
+                        className={"group items-start " + (locked ? "opacity-60" : "")}>
                         <Check className={"mt-0.5 h-3.5 w-3.5 " + (loc ? "opacity-100" : "opacity-0")} />
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-1.5">
                             <span className="font-mono text-xs text-muted-foreground">{i + 1}.</span>
-                            <span className="flex-1">{r.name}</span>
+                            <span className="flex-1">{renamed ? curName : r.name}</span>
+                            {here ? (
+                              <button type="button" title="改名（保留來源）"
+                                className="shrink-0 text-muted-foreground opacity-0 hover:text-foreground group-hover:opacity-100"
+                                onClick={(e) => { e.stopPropagation(); setRenaming(r.name); }}>
+                                <Pencil className="h-3 w-3" />
+                              </button>
+                            ) : null}
                             {isOwn ? null : <Badge variant="outline" className="text-[10px]">借用</Badge>}
                             {elsewhere ? <span className="text-[10px] text-muted-foreground">已加入</span> : null}
                             {here && loc.filled ? <Badge variant="secondary" className="text-[10px]" title="已填內容，請在表格刪除">已填</Badge> : null}
@@ -153,6 +169,7 @@ export function TaskPickerMenu({ document: doc, pack, unitIdx, onChange }: {
                               </Popover>
                             ) : null}
                           </div>
+                          {renamed ? <div className="mt-0.5 text-[10px] text-muted-foreground">原名:{r.name}</div> : null}
                           <SourceLine srcs={r.srcs} />
                         </div>
                       </CommandItem>

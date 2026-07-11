@@ -354,9 +354,8 @@ function AttitudeBlock({
         label="選態度"
         title="職能內涵（A=態度，全職類共用）"
         layout="list"
-        customMode="footer"
         autoCode="A"
-        autoApplyOnFirstOpen
+        autoApplyLabel="選同職能基準"
         value={doc.ocs_attitude?.attitudes ?? []}
         options={options}
         defaults={defaults}

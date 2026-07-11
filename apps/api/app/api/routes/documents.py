@@ -124,25 +124,6 @@ async def finalize_document(profile_id: UUID, db: AsyncSession = Depends(get_db)
     return await repo.finalize(profile_id, content=assembled)
 
 
-def _refresh_header(content: dict, profile, code: str, primary=None) -> dict:
-    """Update the document header (ocs_profile) to reflect current occupation.
-    With ``primary`` (indexer OccupationDetail) fill the OFFICIAL 職業名/職類名
-    (same as the 職能基準代碼 picker / setPrimaryBasis). Without it (indexer down)
-    leave the name EMPTY — never fall back to the user's job_title."""
-    content.setdefault("ocs_profile", {})
-    p = content["ocs_profile"]
-    p["ocs_code"] = code
-    name = p.setdefault("ocs_name", {"job_category_name": None, "occupation_name": ""})
-    if primary is not None:
-        name["occupation_name"] = primary.ocs_name.occupation_name or ""
-        name["job_category_name"] = primary.ocs_name.job_category_name
-    else:
-        name["occupation_name"] = ""
-        name["job_category_name"] = None
-    p.setdefault("job_description", profile.job_summary or "")
-    return content
-
-
 @router.get("/{profile_id}/document/export")
 async def export_document(profile_id: UUID, db: AsyncSession = Depends(get_db)):
     """唯讀匯出：把最新文件（draft 或 final）組裝成乾淨合法的 OCS JSON（不寫 DB）。"""
@@ -158,33 +139,15 @@ async def set_occupations(
     profile_id: UUID,
     body: dict = Body(...),
     db: AsyncSession = Depends(get_db),
-    knowledge: KnowledgeClient = Depends(get_knowledge),
 ):
-    """選職類：設定 selected_ocs_codes（順序=優先度），並把文件表頭刷新成該職類的
-    官方主基準（職業名/職類名）。已有 draft 則就地更新表頭，否則建一個只有表頭的
-    draft。indexer 掛則表頭名稱留空（不退回 job_title）。任務待 curate。"""
-    profile = await _require_profile(profile_id, db)
+    """選職能基準參考：設定 selected_ocs_codes（參考集合；順序僅供知識包排序）。
+    **脫鉤後(ADR 0029)只寫 profile，絕不動文件表頭**——文件身分（職類/主基準）
+    唯一寫入口＝前端職類視窗（PATCH document）。任務/職責待 curate。"""
+    await _require_profile(profile_id, db)
     codes = body.get("ocs_codes") or []
     if not codes:
         raise HTTPException(status_code=400, detail="no ocs_codes provided")
     await ProfileRepo(db).set_selected_ocs(profile_id, codes)
-    # 官方主基準（第一順位）→ 表頭職業名/職類名填官方值（同 setPrimaryBasis）。
-    primary = None
-    try:
-        primary = await knowledge.occupation(codes[0])
-    except Exception:
-        logger.warning("set_occupations: occupation(%s) failed; header name left blank", codes[0], exc_info=True)
-    repo = DocRepo(db)
-    prev = await repo.latest(profile_id)
-    if prev:
-        content = _refresh_header(prev["content"], profile, codes[0], primary)
-    else:
-        content = ocs_doc.skeleton(
-            {"ocs_code": codes[0], "job_title": profile.job_title, "job_summary": profile.job_summary},
-            [],
-        )
-        content = _refresh_header(content, profile, codes[0], primary)
-    await repo.upsert_draft(profile_id, content)
     return {"ocs_codes": codes}
 
 

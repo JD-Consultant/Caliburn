@@ -427,16 +427,10 @@ async def test_list_doc_status(client):
 
 
 @pytest.mark.asyncio
-async def test_set_occupations(client, db_session):
+async def test_set_occupations_writes_profile_only(client, db_session):
+    # 脫鉤後(ADR 0029)：PUT /occupations 只寫 profile.selected_ocs_codes，
+    # 絕不觸碰文件表頭（不需 knowledge、不建 draft）。
     p = await _mk_profile(client._db)
-    app.dependency_overrides[get_knowledge] = lambda: StubKnowledge(
-        occupations={
-            "OC1": OccupationDetail(
-                ocs_code="OC1",
-                ocs_name=OcsName(occupation_name="官方職業A", job_category_name="類別A"),
-            )
-        }
-    )
     r = await client.put(
         f"/api/v1/job-profiles/{p.id}/occupations", json={"ocs_codes": ["OC1", "OC2"]}
     )
@@ -444,26 +438,19 @@ async def test_set_occupations(client, db_session):
     assert r.json()["ocs_codes"] == ["OC1", "OC2"]
     await db_session.refresh(p)
     assert p.selected_ocs_codes == ["OC1", "OC2"]
+    # 沒有 draft 被建立 → GET 回空 skeleton；表頭職業名留空（未被 set 寫入官方名）。
     g = await client.get(f"/api/v1/job-profiles/{p.id}/document")
+    assert g.json()["status"] == "none"
     name = g.json()["content"]["ocs_profile"]["ocs_name"]
-    # 官方名/職類名填入；絕不用 job_title（_mk_profile 的職稱）。
-    assert name["occupation_name"] == "官方職業A"
-    assert name["job_category_name"] == "類別A"
+    assert name["occupation_name"] == ""
+    assert name["job_category_name"] is None
 
 
 @pytest.mark.asyncio
-async def test_set_occupations_refreshes_stale_draft_header(client):
-    # repro: an empty draft (no ocs_code) exists before 選職類 → occupations must
-    # refresh the draft header so 選任務 (FE gates on ocs_code) becomes enabled.
+async def test_set_occupations_leaves_draft_header_untouched(client):
+    # 脫鉤後：既有 draft 的表頭在 set_occupations 後**原值不動**（不再被回寫刷新）。
+    # 表頭唯一寫入口＝前端職類視窗（PATCH document）。
     p = await _mk_profile(client._db)
-    app.dependency_overrides[get_knowledge] = lambda: StubKnowledge(
-        occupations={
-            "OC1": OccupationDetail(
-                ocs_code="OC1",
-                ocs_name=OcsName(occupation_name="官方職業A", job_category_name="類別A"),
-            )
-        }
-    )
     await client.patch(
         f"/api/v1/job-profiles/{p.id}/document",
         json={"ocs_content": {"ocu_units": []}, "ocs_profile": {"ocs_code": ""}},
@@ -474,8 +461,7 @@ async def test_set_occupations_refreshes_stale_draft_header(client):
     assert r.status_code == 200, r.text
     g = await client.get(f"/api/v1/job-profiles/{p.id}/document")
     prof = g.json()["content"]["ocs_profile"]
-    assert prof["ocs_code"] == "OC1"
-    assert prof["ocs_name"]["occupation_name"] == "官方職業A"
+    assert prof["ocs_code"] == ""  # 原值不動：set 沒有把 OC1 寫進表頭
 
 
 @pytest.mark.asyncio

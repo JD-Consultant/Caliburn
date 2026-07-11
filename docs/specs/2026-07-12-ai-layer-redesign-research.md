@@ -9,12 +9,26 @@
 每條發現標 URL+發布日期,優先 2025 下半–2026 材料;二手來源一律標註且僅作趨勢佐證,
 無法核實的數字明確標記不採用。原始報告(含全部引文與來源總表,共 42 條一手來源):
 
+**第一輪(原則與趨勢)**:
+
 1. [Agent 架構線](2026-07-12-ai-redesign-raw-agent-architecture.md) —— 單/多 agent、編排、
    context engineering、工具設計、狀態、anti-pattern、2026 新方向。
 2. [人機共編 UX 線](2026-07-12-ai-redesign-raw-coediting-ux.md) —— 直寫 vs 建議層、修訂呈現、
    審批與自主度、對話擺位、溯源、失敗模式、結構化欄位範式。
 3. [可靠性工程線](2026-07-12-ai-redesign-raw-llm-reliability.md) —— structured outputs、
    elicitation、溯源、evals、guardrails、多輪一致性、anti-pattern。
+
+**第二輪(別人實際怎麼蓋;維護者指示「看別人怎麼做 AI 應用」後加開)**:
+
+4. [實戰案例線](2026-07-12-ai-redesign-raw-case-architectures.md) —— 7 家一手案例
+   (Anthropic/Cognition/Cursor/Intercom/Sierra/GitHub/Notion):分層、寫入路徑、狀態、
+   模型編排、生產品質管線、演進教訓;無一手資料者誠實標未取得。
+5. [官方參考架構線](2026-07-12-ai-redesign-raw-reference-architectures.md) —— 模型廠 SDK
+   (Anthropic/OpenAI/Google ADK)與雲廠架構中心(AWS GenAI Lens/Azure Foundry 基線/
+   Secure Multitenant RAG)的標準分層、雙載體做法、檢索定位、守門/觀測、框架邊界、多租戶。
+6. [專業文件生成線](2026-07-12-ai-redesign-raw-professional-docgen.md) —— Harvey/CoCounsel/
+   Hebbia/Ironclad/Writer 等「錯了有代價」領域:品質管線、引用防幻覺、SME 在迴路、
+   evals 與信任、Mata v. Avianca 等演進教訓。
 
 ## 1. 跨線最強共識
 
@@ -106,6 +120,52 @@ HAX 準則對應:G8 易於忽略、G9 易於修正、G11 說明為何這樣改�
 | evals | ❌ 整套缺席:無 golden set、無 capability/regression 雙 suite |
 | 舊 LangGraph authoring 圖(0007/0023 已裁待清) | ⚠️ 處置未執行 |
 
-## 4. 後續
+## 4. 第二輪:別人實際怎麼蓋(跨案例/官方藍圖/專業 docgen 綜合)
+
+### 4.1 真實系統的共同骨架(7 家一手案例歸納)
+
+> **自建 harness 迴圈(gather→act→verify)+ tool/MCP 當執行層 + context 外部化 +
+> 寫入單一 writer 且過守門關 + 生產 tracing/eval。**
+
+- **寫入單線程是最強共識**:Cognition「writes stay single-threaded」;Cursor shadow workspace
+  先驗證再落地;GitHub 一律 draft PR→CI→人審;Intercom 三段管線的 Validate 關;Sierra
+  supervisor 疊加(90%×90%→99%)。讀取/研究可扇出,寫入不可並行。
+- **可靠性來自架構不寄望模型**;**把 AI 縫進既有工作流的守門結構**(GitHub 復用 PR/CI、
+  Cursor 復用 LSP),不另造信任機制。
+- **沒有一家把核心編排外包給重框架**;Notion harness 重寫 5 次的領悟=「為 LLM 已懂的介面
+  設計」(SQLite/Markdown),非為內部工程方便。
+- 分歧(多 agent 與否/模型分工/隔離粒度)由「任務可否並行拆解+寫入是否連續」決定;
+  Anthropic 量化:agent ~4×、多 agent ~15× token。
+
+### 4.2 官方參考架構(分層藍圖)
+
+- **洋蔥分層收斂**:UI/對話 → orchestration → 工具(含 MCP)→ 知識/檢索 → 守門 →
+  狀態/記憶 → 觀測(雲廠再加網路隔離)。守門與觀測是**橫切層**;tracing 預設開。
+- **chat+持久工作品=雙 state 分離**(Canvas/Artifacts/Foundry conversation object):
+  工作品可定址、有版本;模型的寫=**受權限把關的工具動作**,「定點編輯 vs 整篇重寫」
+  是模型核心行為;對話歷史另存。
+- **檢索=工具呼叫**(agentic/JIT);要不要預建索引看語料規模;「do the simplest thing
+  that works」。
+- **框架 vs 自建**:全體官方一致「先 API 直寫最簡方案;用框架必須讀懂底層」。
+- **多租戶鐵律**:gatekeeper API 封裝租戶資料存取+檢索時 security trimming+身分流穿+
+  audit log;B2B 少租戶傾向 store-per-tenant 或共用+強過濾;模型路由(輕/重模型分工)降本。
+
+### 4.3 專業文件生成(與本專案領域最對口)
+
+- **品質=六件事疊加**:權威內容 grounding+檢索優化(metadata/feature/LLM-based retrieval)
+  +多步 agent 分解+引用強制+SME rubric+人審。Stanford HAI 實證「RAG 非萬靈丹」
+  (Westlaw 34%/Lexis 17% 幻覺率,打臉 hallucination-free 宣稱)。
+- **結構程式定、內容模型生**(Ironclad);**檢索與輸出格式化拆開**近乎消除 tool-use 幻覺
+  (Hebbia orchestrator+專職 subagent);單發生成整份文件已被放棄,主流=分解→逐步→合成。
+- **引用防幻覺做進管線**:trace 驗證、幻覺引用**自動拒收**(Harvey Data Factory),
+  非事後檢查;起點是 Mata v. Avianca(虛構判例被罰,全球 1,000+ 起裁定)。
+- **evals 配方**:任務取自**真實工作成品**+SME 建 ideal-answer 金鑰+**雙指標分開計**
+  (Answer Score=補完專家級成品的 %,幻覺扣負分;Source Score=主張有據的 %)+
+  spot-check 驗證評估器本身+接受第三方稽核;廠商自評數字打折看。
+  (Harvey BigLaw Bench、TR Scorecard——與「黃金範本當尺」同構。)
+- **人審設計成可負擔的驗證**:逐句引用可點回原文、redline 可逐條裁決、trace 可展開,
+  專家審「有疑處」而非重讀全文;專家最大槓桿在**建置期建 rubric/金鑰**。
+
+## 5. 後續
 
 按層討論鎖定(架構→載體→對話→舊件),決策另立 ADR;本檔為共識與來源的單一參照點。

@@ -177,3 +177,33 @@ AI 改文件不彈窗、直寫表格+顏色標記(綠=新增/修改、紅=刪除
 - 官方職能基準表格版型(維護者提供之樣張:主要職責|工作任務|工作產出|行為指標|職能級別|K|S)。
 - 參考+裁縫為常態的國際佐證(O*NET 任務句不逐字複用、ESCO 概念字典、iCAP=公共參考依據):
   見 2026-07-09 研究紀錄。
+
+## 13. 驗收紀錄(2026-07-11 實作)
+
+依 [plan](../plans/2026-07-11-editor-menus-redesign.md) T1–T10 逐 task 實作,慣例:TDD、
+green-before==green-after、一 task 一 commit、綠了才 commit。
+
+**綠色狀態(收尾全跑)**
+- `npx turbo test`:**5/5 tasks successful**(pdf-to-json 14 passed、web 58 passed、api 231 passed
+  +99 skipped〔turbo 未帶 `TEST_DATABASE_URL` → DB 測跳過,非失敗〕)。
+- api 直跑(DB 起):`uv run pytest` **330 passed**(含 DB 測;確認〔選職類停寫表頭〕脫鉤斷言、
+  persistence/knowledge 全綠)。
+- web:`vitest` **58 passed**、`tsc --noEmit` 乾淨、`eslint` 乾淨。
+- 新增/改寫測試:pack.test.ts(參考選單身分對位「改字不斷根」×4、全域選任務來源職責解析 ×4);
+  ocsDoc.test.ts(改名不斷根 renameUnit/renameTask、位置碼 custom 與官方一視同仁);
+  documents 測(set_occupations 只寫 profile/表頭不動)。
+
+**提交(branch `research/llm-interview-integration`)**
+- T1 後端脫鉤(api)、T2 選職能基準參考+主基準=表頭所選、T3 職類視窗獨立窗+基準名唯讀、
+  T4 控制選單三型/兩處級別、T5 素材庫、T6 參考選單改名不斷根+原名副行+搜尋+選同X、
+  T9 位置碼(見下)、T10 文檔同步——各自獨立 commit。
+- **T7+T8 合併為單一 commit**:環境 LLM 安全分類器一度中斷、無法逐 task 驗證/提交,兩者在共用檔
+  (JobDocTable/page.tsx)交織開發;合併時全綠。歷史誠實反映當下無法獨立驗證的事實。
+
+**維護者裁決(實作期)**
+- **T9 位置碼採最小方案**:spec §7 的可見需求(顯示/匯出位置碼、拖拉自動重編、身分靠來源)
+  由既有 `renumber`(單一重編點)**已達成**;不另建平行 `displayCode` 純函式、不改寫 ~15 個 renumber
+  測試(避免零行為變更的過度工程)。僅補「custom 與官方一視同仁」characterization 測 + `SourceLine`
+  補顯原始官方碼(spec §7「原碼收在來源行」唯一缺口)。
+
+**tag**:`editor-menus-v1`。

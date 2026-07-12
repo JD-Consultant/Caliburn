@@ -7,8 +7,8 @@ evidence(槽值↔原話對照,顧問稽核)/ suggestions(建議層,ADR 0025)。
 import uuid
 
 from sqlalchemy import (
-    Boolean, Column, DateTime, ForeignKey,
-    Index, Integer, Text, UniqueConstraint, func,
+    BigInteger, Boolean, Column, DateTime, ForeignKey,
+    Identity, Index, Integer, Text, UniqueConstraint, func,
 )
 from sqlalchemy import text as sa_text   # 別名:InterviewTurn.text 欄位會遮蔽同名函式
 from sqlalchemy.dialects.postgresql import JSONB, UUID
@@ -107,6 +107,32 @@ class InterviewSuggestion(Base):
 
     __table_args__ = (
         Index("ix_interview_suggestions_session_status", "session_id", "status"),
+    )
+
+
+class InterviewReviewEvent(Base):
+    """審閱事件(ADR 0030 T2):✓/✗/批量拒絕的無聲記帳。
+
+    §6.3 語意:UI 端安靜(不觸發 AI);事件供(a)ledger 讀成「上輪被拒清單」
+    下回合利用(不重提、可追問)、(b)trace/evals 分析(改寫率、拒絕率)。
+    decision ∈ accepted | rejected | batch_rejected。
+    """
+    __tablename__ = "interview_review_events"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    seq = Column(BigInteger, Identity(), nullable=False)  # 批量同刻的穩定序
+    session_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("interview_sessions.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    doc_path = Column(Text, nullable=False)
+    decision = Column(Text, nullable=False)
+    op_meta = Column(JSONB, nullable=False, server_default=sa_text("'{}'::jsonb"))
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    __table_args__ = (
+        Index("ix_interview_review_events_session", "session_id", "created_at"),
     )
 
 

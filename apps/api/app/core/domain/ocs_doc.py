@@ -137,6 +137,30 @@ def skeleton(profile: dict, units_tasks: list[dict]) -> dict:
 # 任務選用改由 web 前端文件編輯(addFromPool)+ PATCH 寫入,單一寫入路徑。
 
 
+def count_pending(doc: dict) -> int:
+    """數整份文件的待審修訂標記(ADR 0030)。
+
+    inline 標記(`_pending` 為帶 "op" 的 dict)算 1;集合式(TaskDetails/OcsProfile 的
+    `_pending: {槽名: mark}`)逐槽算非空 mark。標記內容不遞迴(防 prev 夾帶巢狀誤計)。
+    """
+    def _count(node) -> int:
+        n = 0
+        if isinstance(node, dict):
+            mark = node.get("_pending")
+            if isinstance(mark, dict):
+                if "op" in mark:
+                    n += 1
+                else:  # 集合式:槽名 → mark
+                    n += sum(1 for v in mark.values()
+                             if isinstance(v, dict) and "op" in v)
+            n += sum(_count(v) for k, v in node.items() if k != "_pending")
+        elif isinstance(node, list):
+            n += sum(_count(v) for v in node)
+        return n
+
+    return _count(doc or {})
+
+
 def _strip_underscore(node) -> None:
     """Recursively remove any dict key starting with '_' (front-end-only fields)."""
     if isinstance(node, dict):

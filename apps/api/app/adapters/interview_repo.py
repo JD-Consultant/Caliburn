@@ -10,6 +10,7 @@ from sqlalchemy import func, select
 from app.models import (
     InterviewEvidence,
     InterviewLlmCall,
+    InterviewReviewEvent,
     InterviewSession,
     InterviewSuggestion,
     InterviewTurn,
@@ -179,4 +180,28 @@ class InterviewRepo:
         stmt = (select(InterviewLlmCall)
                 .where(InterviewLlmCall.session_id == session_id)
                 .order_by(InterviewLlmCall.created_at))
+        return list((await self.session.execute(stmt)).scalars())
+
+    # --- 審閱事件(ADR 0030 T2:✓/✗/批量的無聲記帳) ---
+
+    async def add_review_events(self, session_id: UUID, events: list[dict]) -> int:
+        """批量落審閱事件;event = {doc_path, decision, op_meta?}。回寫入筆數。"""
+        for e in events:
+            self.session.add(InterviewReviewEvent(
+                session_id=session_id,
+                doc_path=e["doc_path"],
+                decision=e["decision"],
+                op_meta=e.get("op_meta") or {},
+            ))
+        await self.session.flush()
+        return len(events)
+
+    async def list_review_events(
+        self, session_id: UUID, *, decision: str | None = None
+    ) -> list[InterviewReviewEvent]:
+        stmt = (select(InterviewReviewEvent)
+                .where(InterviewReviewEvent.session_id == session_id)
+                .order_by(InterviewReviewEvent.seq))
+        if decision is not None:
+            stmt = stmt.where(InterviewReviewEvent.decision == decision)
         return list((await self.session.execute(stmt)).scalars())

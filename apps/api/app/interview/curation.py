@@ -12,8 +12,8 @@ from typing import Annotated, Literal, Union
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from app.interview.commands import _obj, _s, _variant
-from app.interview.executor import quote_verified
+from app.interview.schema_utils import _obj, _s, _variant
+from app.interview.verify import quote_verified
 
 logger = logging.getLogger(__name__)
 

@@ -18,7 +18,7 @@ from typing import Annotated, Literal, Union
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from app.interview.commands import _obj, _s, _variant
+from app.interview.schema_utils import _obj, _s, _variant
 
 # 能力區塊 kind(task-scoped 三類;態度池通道 0028 D3 退場——收尾 attitudes_pass 整體編碼,
 # 逐回合僅剩 record_attitude_custom 機會性提議)

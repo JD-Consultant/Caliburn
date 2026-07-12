@@ -86,24 +86,9 @@ class TurnOutput(BaseModel):
     saturation: bool = False         # 對當前焦點「再問也無新資訊」信號(三重保險之一)
 
 
-# --- strict-subset schema 建構器(給 LlmPort.select_schema 用) ---
-
-def _s(t: str | list[str]) -> dict:
-    return {"type": t}
-
-
-def _obj(props: dict) -> dict:
-    """strict 規則:required = 全部欄位、additionalProperties=false。"""
-    return {
-        "type": "object",
-        "properties": props,
-        "required": list(props),
-        "additionalProperties": False,
-    }
-
-
-def _variant(tag: str, **props) -> dict:
-    return _obj({"type": {"enum": [tag]}, **props})
+# --- strict-subset schema 建構器:已搬 schema_utils(ADR 0030 T3)——
+# 轉口供本檔與 v1 測試沿用;本檔其餘為 v1 死碼,T12 隨檔退場。
+from app.interview.schema_utils import _obj, _s, _variant  # noqa: E402,F401
 
 
 def turn_output_schema(choice_ids: list[str] | None = None,

@@ -11,8 +11,8 @@ schema 用自由字串 + **確定性後驗**(gap∈空縫、path∈已寫、quot
 import logging
 from dataclasses import dataclass, field
 
-from app.interview.commands import _obj, _s
-from app.interview.executor import quote_verified
+from app.interview.schema_utils import _obj, _s
+from app.interview.verify import quote_verified
 
 logger = logging.getLogger(__name__)
 

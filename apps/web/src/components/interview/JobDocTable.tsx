@@ -2,30 +2,37 @@
 
 // D27 工作台主表（兩層、可編輯、可拖拉）。職責(unit)→任務(task)，皆可改名/增/刪/
 // 拖拉排序；任務可跨職責拖拉。每任務 4 格（產出O/指標P/K/S）點擊開 filler。
-// 純呈現+結構編輯：所有變更經 onChange(newDoc) 交回上層 PATCH。不碰 CopilotKit。
-// 0028 D7(追蹤修訂):AI 直寫(evidence.review=pending)在**同格**標記——O/P/K/S 格
-// 加 AI 徽章+hover 引文;訪談細節(details 11 槽)以 chips 呈現(原本無呈現位=隱形)。
+// 純呈現+結構編輯：所有變更經 onChange(newDoc) 交回上層 PATCH。
+// T8(ADR 0030 追蹤修訂):AI 寫入=文件內 `_pending` 四態(取代 0028 D7 reviewMap/
+// evidence 徽章)——條目級綠字/紅刪除線+hover ✓✗?出處卡;✓✗=前端改 doc→PATCH,
+// 並無聲記帳 review-events(不觸發 AI)。工具列批量「接受全部(N)/拒絕全部」。
 import { useEffect, useMemo, useRef, useState } from "react";
+import type { PendingMark } from "@caliburn/ocs-contract";
 import type { CompetencyBlock, KnowledgePack, OcsDocument, OcsTask, OptionItem } from "@/types";
 import {
+  acceptPending,
   addTask,
   addUnit,
   deleteTask,
   deleteUnit,
+  listPending,
+  rejectPending,
   relocateTask,
   renameTask,
   renameUnit,
   reorderUnits,
+  resolveAllPending,
   setAttitudes,
   setKS,
   setOp,
   setTaskLevel,
 } from "@/lib/ocsDoc";
-import { useInterview } from "@/hooks/useInterview";
+import { postReviewEvents } from "@/lib/api";
 import { useKnowledge } from "@/hooks/useKnowledge";
 import { groupedValueOptions, isOfficialBasis, ownTaskRefs, primaryDefaults, valuePoolOptions } from "@/lib/pack";
-import { buildReviewMap, DETAIL_SLOT_LABELS, taskMarks, type ReviewMark } from "@/lib/reviewMap";
+import { DETAIL_SLOT_LABELS, HEADER_SLOT_LABELS } from "@/lib/slots";
 import { taskUrns } from "@/lib/urn";
+import { PendingActions, PrevLine, pendingTextClass, type ReviewDecision } from "./PendingMark";
 import { FieldCombobox } from "./fields/FieldCombobox";
 import { OfficialMenu } from "./fields/OfficialMenu";
 import {
@@ -99,7 +106,7 @@ function TaskRow({
   unitIdx,
   taskIdx,
   unitUid,
-  reviewMap,
+  onReview,
   pack,
   onChange,
   doc,
@@ -109,7 +116,7 @@ function TaskRow({
   unitIdx: number;
   taskIdx: number;
   unitUid?: string;
-  reviewMap: Map<string, ReviewMark>;
+  onReview: (path: string, decision: ReviewDecision) => void;
   pack?: KnowledgePack;
   onChange: (d: OcsDocument) => void;
   doc: OcsDocument;
@@ -120,15 +127,20 @@ function TaskRow({
   const level = block?.competency_level;
   const tc = task.task_codes?.[0];
   const taskNum = (tc?.code ?? "").replace(/^T/i, ""); // O/P 任務範圍碼前綴（O1.1.…）
-  // 0028 D7:此任務的待審標記(path 文法鏡像後端:uid 形優先、index 形後援)
-  const marks = taskMarks(reviewMap, [
-    `ocs_content.ocu_units.${unitUid ?? unitIdx}.tasks.${task._tid ?? taskIdx}`,
-    `ocs_content.ocu_units.${unitIdx}.tasks.${taskIdx}`,
-  ]);
+  // T8:path 文法鏡像後端 docpath(穩定 id 段優先、index 後援)
+  const taskPath = `ocs_content.ocu_units.${unitUid ?? unitIdx}.tasks.${task._tid ?? taskIdx}`;
+  const taskMark = (task as { _pending?: PendingMark | null })._pending ?? null;
   const details = (task as OcsTask & { details?: Record<string, unknown> }).details ?? {};
+  const detailPending =
+    (details as { _pending?: Record<string, PendingMark | undefined> })._pending ?? {};
   const detailRows = Object.keys(DETAIL_SLOT_LABELS)
-    .map((k) => ({ k, v: details[k], mark: marks.details[k] }))
-    .filter((r) => r.v !== undefined && r.v !== null && r.v !== "");
+    .map((k) => ({ k, v: details[k], mark: detailPending[k] }))
+    .filter((r) => (r.v !== undefined && r.v !== null && r.v !== "") || r.mark);
+  const levelMark = (block as { _pending?: { competency_level?: PendingMark | null } } | undefined)
+    ?._pending?.competency_level ?? null;
+  const reviewItemAt = (kind: "outputs" | "indicators" | "knowledge" | "skills") =>
+    (item: { _id?: string }, idx: number, d: ReviewDecision) =>
+      onReview(`${taskPath}.competency_blocks.0.${kind}.${item._id ?? idx}`, d);
   // 級別：官方值來自知識包 source_tasks（聯集取第一個非空＝順序1）；
   // fallback 帶官方時記下的 _levelSrc。選中官方值 → 存 _levelSrc（B4，來源必標）。
   const own = pack ? ownTaskRefs(pack, taskUrns(task)) : null;
@@ -145,13 +157,15 @@ function TaskRow({
     return { options, defaults: options.filter((op) => ownKeys.has(op.name)) };
   };
   const oK = forKind("o"), pK = forKind("p"), kK = forKind("k"), sK = forKind("s");
-  const aiBadge = (mark?: ReviewMark) => mark
-    ? <span title={`AI 依你的話寫入(待確認):「${mark.quote}」`} className="rounded bg-sky-600 px-1 text-[9px] leading-4 text-white">AI</span>
-    : null;
 
   return (
-    <div ref={setNodeRef} style={style} className="group/task rounded-md border bg-background px-3 py-2">
-      <div className="mb-2 flex items-center gap-1.5">
+    <div ref={setNodeRef} style={style} className={
+      "group/task rounded-md border bg-background px-3 py-2" +
+      (taskMark ? (taskMark.op === "del"
+        ? " animate-in fade-in border-red-200 bg-red-50/40 duration-500"
+        : " animate-in fade-in border-emerald-200 bg-emerald-50/40 duration-500") : "")
+    }>
+      <div className="group/pending mb-2 flex items-center gap-1.5">
         <button
           type="button"
           className="cursor-grab text-muted-foreground/60 opacity-0 hover:text-foreground group-hover/task:opacity-100"
@@ -161,12 +175,20 @@ function TaskRow({
           <GripVertical className="h-4 w-4" />
         </button>
         <span className="font-mono text-xs text-muted-foreground">{tc?.code}</span>
+        {taskMark ? (
+          // 整任務待審(add=綠/del=紅刪除線):任務名唯讀+✓✗?(去標/還原是筆級決策)
+          <span className={"flex-1 text-sm font-semibold " + pendingTextClass(taskMark.op)}>
+            {tc?.name ?? ""}
+          </span>
+        ) : (
         <EditableText
           value={tc?.name ?? ""}
           placeholder="任務名稱"
           onCommit={(v) => onChange(renameTask(doc, unitIdx, taskIdx, v))}
           className="flex-1 text-sm font-semibold"
         />
+        )}
+        {taskMark ? <PendingActions mark={taskMark} onDecide={(d) => onReview(taskPath, d)} /> : null}
         {isCustomTask ? <span className="shrink-0 rounded bg-amber-100 px-1 text-[10px] text-amber-700" title="自訂任務(無官方來源)">自訂</span> : null}
         <button
           type="button"
@@ -181,12 +203,12 @@ function TaskRow({
       <div className="space-y-1 pl-6">
         <FieldCombobox gridLayout title="工作產出(O)" layout="list" autoApplyLabel="選同工作任務"
           autoCode={`O${taskNum}.`} value={block?.outputs ?? []}
-          options={oK.options} defaults={oK.defaults} badge={aiBadge(marks.cells.outputs)}
+          options={oK.options} defaults={oK.defaults} onReviewItem={reviewItemAt("outputs")}
           onCommit={(items) => onChange(setOp(doc, unitIdx, taskIdx, items, block?.indicators ?? []))} />
         <FieldCombobox gridLayout title="行為指標(P)" layout="list" autoApplyLabel="選同工作任務"
           autoCode={`P${taskNum}.`}
-          value={(block?.indicators ?? []).map((i) => ({ code: i.code, name: i.text, _id: i._id, _src: i._src, _ref: i._ref }))}
-          options={pK.options} defaults={pK.defaults} badge={aiBadge(marks.cells.indicators)}
+          value={(block?.indicators ?? []).map((i) => ({ code: i.code, name: i.text, _id: i._id, _src: i._src, _ref: i._ref, _pending: i._pending }))}
+          options={pK.options} defaults={pK.defaults} onReviewItem={reviewItemAt("indicators")}
           onCommit={(items) => onChange(setOp(doc, unitIdx, taskIdx, block?.outputs ?? [],
             items.map((i) => ({ code: i.code, text: i.name, _id: i._id, _src: i._src, _ref: i._ref }))))} />
         {/* L 職能級別(每任務;控制單選) */}
@@ -206,33 +228,50 @@ function TaskRow({
                 officialLevel != null && Number(v) === officialLevel && levelSrc ? { ...levelSrc, level: officialLevel } : undefined))}
             />
           </div>
-          <div className="min-w-0 flex-1 pt-1 text-sm">{level != null ? level : "—"}</div>
+          <div className="group/pending flex min-w-0 flex-1 items-center gap-1.5 pt-1 text-sm">
+            {levelMark ? (
+              <>
+                <span className={pendingTextClass(levelMark.op)}>{level != null ? level : "—"}</span>
+                <PrevLine mark={levelMark} />
+                <PendingActions mark={levelMark}
+                  onDecide={(d) => onReview(`${taskPath}.competency_blocks.0.competency_level`, d)} />
+              </>
+            ) : (level != null ? level : "—")}
+          </div>
         </div>
         <FieldCombobox gridLayout title="職能內涵(K)" layout="list" autoApplyLabel="選同工作任務"
           autoCode="K" value={block?.knowledge ?? []}
-          options={kK.options} defaults={kK.defaults} badge={aiBadge(marks.cells.knowledge)}
+          options={kK.options} defaults={kK.defaults} onReviewItem={reviewItemAt("knowledge")}
           onCommit={(items) => onChange(setKS(doc, unitIdx, taskIdx, "knowledge", items))} />
         <FieldCombobox gridLayout title="職能內涵(S)" layout="list" autoApplyLabel="選同工作任務"
           autoCode="S" value={block?.skills ?? []}
-          options={sK.options} defaults={sK.defaults} badge={aiBadge(marks.cells.skills)}
+          options={sK.options} defaults={sK.defaults} onReviewItem={reviewItemAt("skills")}
           onCommit={(items) => onChange(setKS(doc, unitIdx, taskIdx, "skills", items))} />
       </div>
-      {/* 訪談細節(details 11 槽;0028 D7):書記寫入的主要內容,原本在表格**沒有呈現位**
-          =隱形。chips 呈現;AI 待審=藍框+徽章+hover 引文,人可見可查。 */}
+      {/* 訪談細節(details 11 槽):書記寫入的主要內容。chips 呈現;T8 待審=
+          `_pending` 四態(綠=add/mod、紅刪除線=del)+舊值副行+hover ✓✗?。 */}
       {detailRows.length > 0 ? (
         <div className="mt-2 flex flex-wrap gap-1.5 pl-6">
           {detailRows.map(({ k, v, mark }) => (
             <span
               key={k}
-              title={mark ? `AI 依你的話寫入(待確認):「${mark.quote}」` : undefined}
               className={
-                "inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[11px] " +
-                (mark ? "bg-sky-50 text-sky-800 ring-1 ring-sky-200" : "bg-muted text-muted-foreground")
+                "group/pending inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[11px] " +
+                (mark
+                  ? (mark.op === "del"
+                    ? "animate-in fade-in bg-red-50 text-red-600 ring-1 ring-red-200 duration-500"
+                    : "animate-in fade-in bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200 duration-500")
+                  : "bg-muted text-muted-foreground")
               }
             >
               <span className="font-medium">{DETAIL_SLOT_LABELS[k]}</span>
-              <span className="max-w-48 truncate">{String(v)}</span>
-              {mark ? <span className="rounded bg-sky-600 px-1 text-[9px] leading-4 text-white">AI</span> : null}
+              <span className={"max-w-48 truncate" + (mark?.op === "del" ? " line-through decoration-red-400" : "")}>
+                {String(v ?? "")}
+              </span>
+              {mark ? <PrevLine mark={mark} /> : null}
+              {mark ? (
+                <PendingActions mark={mark} onDecide={(d) => onReview(`${taskPath}.details.${k}`, d)} />
+              ) : null}
             </span>
           ))}
         </div>
@@ -245,7 +284,7 @@ function UnitRow({
   id,
   unit,
   unitIdx,
-  reviewMap,
+  onReview,
   pack,
   onChange,
   doc,
@@ -253,7 +292,7 @@ function UnitRow({
   id: string;
   unit: OcsDocument["ocs_content"]["ocu_units"][number];
   unitIdx: number;
-  reviewMap: Map<string, ReviewMark>;
+  onReview: (path: string, decision: ReviewDecision) => void;
   pack?: KnowledgePack;
   onChange: (d: OcsDocument) => void;
   doc: OcsDocument;
@@ -263,20 +302,34 @@ function UnitRow({
   const tasks = unit.tasks ?? [];
   const taskIds = tasks.map((t) => `t:${t._tid}`);
   const isCustomUnit = !(unit._refs?.length) && !unit.source?.ocs_code; // 無官方來源=自訂(spec §2)
+  const unitPath = `ocs_content.ocu_units.${unit._uid ?? unitIdx}`;
+  const unitMark = (unit as { _pending?: PendingMark | null })._pending ?? null;
 
   return (
-    <div ref={setNodeRef} style={style} className="rounded-lg border bg-background">
-      <div className="flex items-center gap-1.5 border-b bg-muted/40 px-3 py-2">
+    <div ref={setNodeRef} style={style} className={
+      "rounded-lg border bg-background" +
+      (unitMark ? (unitMark.op === "del"
+        ? " animate-in fade-in border-red-200 duration-500"
+        : " animate-in fade-in border-emerald-200 duration-500") : "")
+    }>
+      <div className="group/pending flex items-center gap-1.5 border-b bg-muted/40 px-3 py-2">
         <button type="button" className="cursor-grab text-muted-foreground/60 hover:text-foreground" {...attributes} {...listeners}>
           <GripVertical className="h-4 w-4" />
         </button>
         <Badge variant="outline" className="font-mono text-xs">{unit.ocu_code}</Badge>
+        {unitMark ? (
+          <span className={"flex-1 text-sm font-medium " + pendingTextClass(unitMark.op)}>
+            {unit.ocu_name ?? ""}
+          </span>
+        ) : (
         <EditableText
           value={unit.ocu_name ?? ""}
           placeholder="職責名稱（點擊命名）"
           onCommit={(v) => onChange(renameUnit(doc, unitIdx, v))}
           className="flex-1 text-sm font-medium"
         />
+        )}
+        {unitMark ? <PendingActions mark={unitMark} onDecide={(d) => onReview(unitPath, d)} /> : null}
         {isCustomUnit ? <span className="shrink-0 rounded bg-amber-100 px-1 text-[10px] text-amber-700" title="自訂職責(無官方來源)">自訂</span> : null}
         {unit.source?.occupation_name ? (
           <span className="text-xs text-muted-foreground">來源：{unit.source.occupation_name}</span>
@@ -295,7 +348,7 @@ function UnitRow({
               unitIdx={unitIdx}
               taskIdx={ti}
               unitUid={unit._uid}
-              reviewMap={reviewMap}
+              onReview={onReview}
               pack={pack}
               onChange={onChange}
               doc={doc}
@@ -323,10 +376,12 @@ function AttitudeBlock({
   document: doc,
   pack,
   onChange,
+  onReview,
 }: {
   document: OcsDocument;
   pack?: KnowledgePack;
   onChange: (d: OcsDocument) => void;
+  onReview: (path: string, decision: ReviewDecision) => void;
 }) {
   // 態度池 key=name（A5：文件自編碼跨職類必撞，不當 key）；選單序號顯示+引用行。
   // defaults=主基準來源(spec 2026-07-04 §4;主基準空白/自訂不套)。
@@ -346,6 +401,7 @@ function AttitudeBlock({
         value={doc.ocs_attitude?.attitudes ?? []}
         options={options}
         defaults={defaults}
+        onReviewItem={(it, idx, d) => onReview(`ocs_attitude.attitudes.${it._id ?? idx}`, d)}
         onCommit={(items) => onChange(setAttitudes(doc, items))}
       />
     </div>
@@ -365,9 +421,23 @@ export function JobDocTable({
   const unitIds = units.map((u) => `u:${u._uid}`);
   // 知識包（ADR 0021）：任務級別官方值/來源（TaskRow）。選過職類才有資料。
   const { data: pack } = useKnowledge(profileId, !!document.ocs_profile?.ocs_code);
-  // 0028 D7:訪談 evidence(review=pending)→ 同格追蹤修訂標記(404=尚無訪談,無標記)
-  const { data: iview } = useInterview(profileId);
-  const reviewMap = useMemo(() => buildReviewMap(iview?.evidence ?? []), [iview]);
+  // T8(ADR 0030):AI 待審=文件內 `_pending`(取代 evidence/reviewMap 資料流)。
+  const pendingEntries = useMemo(() => listPending(document), [document]);
+  const headerPendings = pendingEntries.filter((e) => e.path.startsWith("ocs_profile."));
+
+  // ✓/✗:前端改 doc(去標/還原+renumber)→ onChange 走既有 PATCH;
+  // 並無聲記帳 review-events(§6.3:記錄不觸發 AI;失敗不擋編輯)。
+  const review = (path: string, decision: ReviewDecision) => {
+    onChange(decision === "accepted" ? acceptPending(document, path) : rejectPending(document, path));
+    postReviewEvents(profileId, [{ doc_path: path, decision }]).catch(() => {});
+  };
+  const reviewAll = (decision: "accepted" | "rejected") => {
+    onChange(resolveAllPending(document, decision === "accepted" ? "accept" : "reject"));
+    postReviewEvents(profileId, pendingEntries.map((e) => ({
+      doc_path: e.path,
+      decision: decision === "accepted" ? ("accepted" as const) : ("batch_rejected" as const),
+    }))).catch(() => {});
+  };
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
 
@@ -408,6 +478,40 @@ export function JobDocTable({
 
   return (
     <div className="space-y-5">
+      {/* T8 工具列:待審計數+批量「接受全部(N)/拒絕全部」常駐(待審>0);
+          表頭槽(主基準/工作描述/級別)的待審在此以 chips 呈現(✓✗?)。 */}
+      {pendingEntries.length > 0 ? (
+        <div className="flex flex-wrap items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50/50 px-3 py-2 text-sm">
+          <span className="font-medium text-emerald-800">AI 待審 {pendingEntries.length} 筆</span>
+          {headerPendings.map((e) => {
+            const slot = e.path.split(".").pop() ?? "";
+            const shown = e.mark.value ?? e.mark.prev;
+            return (
+              <span key={e.path}
+                className="group/pending inline-flex items-center gap-1 rounded bg-background px-1.5 py-0.5 text-[11px] ring-1 ring-emerald-200">
+                <span className="font-medium">{HEADER_SLOT_LABELS[slot] ?? slot}</span>
+                <span className={"max-w-40 truncate " + pendingTextClass(e.op)}>
+                  {shown != null ? String(shown) : e.op}
+                </span>
+                <PendingActions mark={e.mark} onDecide={(d) => review(e.path, d)} />
+              </span>
+            );
+          })}
+          <div className="ml-auto flex items-center gap-2">
+            <button type="button"
+              className="rounded border border-emerald-600 bg-emerald-600 px-2 py-1 text-xs text-white hover:bg-emerald-700"
+              onClick={() => reviewAll("accepted")}>
+              接受全部({pendingEntries.length})
+            </button>
+            <button type="button"
+              className="rounded border px-2 py-1 text-xs text-muted-foreground hover:text-destructive"
+              onClick={() => reviewAll("rejected")}>
+              拒絕全部
+            </button>
+          </div>
+        </div>
+      ) : null}
+
       {/* 官方職能基準表頭（可編輯） */}
       <DocHeader document={document} profileId={profileId} onChange={onChange} />
 
@@ -426,7 +530,7 @@ export function JobDocTable({
                   id={`u:${unit._uid}`}
                   unit={unit}
                   unitIdx={ui}
-                  reviewMap={reviewMap}
+                  onReview={review}
                   pack={pack}
                   onChange={onChange}
                   doc={document}
@@ -451,7 +555,7 @@ export function JobDocTable({
       </div>
 
       {/* 職能內涵（A=attitude 態度） */}
-      <AttitudeBlock document={document} pack={pack} onChange={onChange} />
+      <AttitudeBlock document={document} pack={pack} onChange={onChange} onReview={review} />
 
       {/* 說明與補充事項（可編輯） */}
       <DocNotes document={document} profileId={profileId} onChange={onChange} />

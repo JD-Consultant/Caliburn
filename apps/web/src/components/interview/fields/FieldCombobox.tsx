@@ -1,6 +1,7 @@
 "use client";
 import { useState, type ReactNode } from "react";
 import { Check, ChevronsUpDown, ChevronDown, Pencil, Plus, X } from "lucide-react";
+import type { PendingMark } from "@caliburn/ocs-contract";
 import type { OptionItem, SourceRef } from "@/types";
 import { docItemForOption, itemMatchesOption, optionInDoc, originalNameNote, renamedRefItem } from "@/lib/pack";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -8,8 +9,12 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Button } from "@/components/ui/button";
 import { FieldText } from "./FieldText";
 import { SourceLine } from "./SourceLine";
+import { PendingActions, PrevLine, pendingTextClass, type ReviewDecision } from "../PendingMark";
 
-type Item = { code: string; name: string; _id?: string; _src?: "official" | "custom"; _ref?: SourceRef };
+type Item = {
+  code: string; name: string; _id?: string; _src?: "official" | "custom"; _ref?: SourceRef;
+  _pending?: PendingMark | null;   // 追蹤修訂標記(ADR 0030 T8;list 版式四態呈現)
+};
 const keyOf = (i: { code: string; name: string }) => i.code || "name:" + i.name;
 const newId = () => (globalThis.crypto?.randomUUID?.() ?? `id-${Math.random().toString(36).slice(2)}`);
 
@@ -19,6 +24,7 @@ export function FieldCombobox({
   label = "選/加", value, options, onCommit, pillSources = false,
   layout = "pills", title, autoCode, editMultiline = false,
   defaults, autoApplyLabel = "選同職能基準", gridLayout = false, badge,
+  onReviewItem,
 }: {
   label?: string;
   value: Item[];
@@ -38,8 +44,10 @@ export function FieldCombobox({
   autoApplyLabel?: string;
   // OPLKS 版式(spec §7):左欄=標籤+▾、右欄=內容全列+格底＋自訂(需 title)。
   gridLayout?: boolean;
-  // 標籤旁徽章(如 D7 AI 待審標記;最小適配)。
+  // 標籤旁徽章(最小適配)。
   badge?: ReactNode;
+  // T8:條目帶 `_pending` 時的 ✓/✗ 決策回呼(item, 值列 index, 決策)。
+  onReviewItem?: (item: Item, idx: number, decision: ReviewDecision) => void;
 }) {
   const [open, setOpen] = useState(false);
   const [renaming, setRenaming] = useState<string | null>(null);
@@ -188,6 +196,21 @@ export function FieldCombobox({
   const selectedView = layout === "list" ? (
     <div className="space-y-1">
       {value.map((v, idx) => {
+        // T8 追蹤修訂:待審條目=綠字淡綠底/紅刪除線+hover ✓✗?(唯讀,不進改名/刪除流)
+        if (v._pending && onReviewItem) {
+          const m = v._pending;
+          return (
+            <div key={v._id ?? `${keyOf(v)}-${idx}`}
+              className="group/pending flex animate-in fade-in items-start gap-2 duration-500">
+              {v.code ? <span className="mt-0.5 shrink-0 font-mono text-xs text-muted-foreground">{v.code}</span> : null}
+              <div className={"min-w-0 flex-1 text-sm " + pendingTextClass(m.op)}>
+                {v.name}
+                <PrevLine mark={m} />
+              </div>
+              <PendingActions mark={m} onDecide={(d) => onReviewItem(v, idx, d)} />
+            </div>
+          );
+        }
         const status = statusOf(v);
         return (
           <div key={v._id ?? `${keyOf(v)}-${idx}`} className="flex items-start gap-2">

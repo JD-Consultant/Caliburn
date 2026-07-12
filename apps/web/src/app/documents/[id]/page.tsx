@@ -17,7 +17,7 @@ import { GlobalTaskPickerMenu } from "@/components/interview/GlobalTaskPickerMen
 import { ConflictDialog } from "@/components/interview/ConflictDialog";
 import { CurationDialog } from "@/components/interview/CurationDialog";
 import { InterviewPanel } from "@/components/interview/InterviewPanel";
-import { completion, ensureIds } from "@/lib/ocsDoc";
+import { completion, ensureIds, listPending } from "@/lib/ocsDoc";
 import { interviewCuration } from "@/lib/api";
 import type { OcsDocument, OpenPickerWidget, PickerPrecheckItem } from "@/types";
 import { Button } from "@/components/ui/button";
@@ -94,6 +94,11 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
 
   const exportJson = async () => {
     setError(null);
+    // T8(§6.6 未清不擋事):匯出自動剝未審項(後端 _strip_underscore);待審>0 先提示。
+    const nPending = doc ? listPending(doc).length : 0;
+    if (nPending > 0 && !window.confirm(`還有 ${nPending} 筆 AI 待審項,匯出將不含未審項。仍要匯出?`)) {
+      return;
+    }
     try {
       const data = await getDocumentExport(id);
       const occ = data.ocs_profile?.ocs_name?.occupation_name || profile?.job_title || "職務說明書";

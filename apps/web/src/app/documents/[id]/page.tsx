@@ -252,7 +252,6 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
             <InterviewPanel
               profileId={id}
               doc={doc}
-              onApplyDoc={(next) => persist(next)}
               onWidget={onWidget}
             />
           </div>

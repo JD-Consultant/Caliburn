@@ -107,6 +107,10 @@ async def test_get_interview_full_view(db_session):
     assert view["pending_count"] == 1                 # v3:寫入=文件內 _pending(evidence 退場)
     assert view["evidence"] == []
     assert view["status"] == "active"
+    # T9 議程三態:任務缺口未清=in_progress(next_gap 落此)或 pending;末列=態度
+    agenda = view["agenda"]
+    assert agenda[0]["label"] == "回歸測試" and agenda[0]["state"] == "in_progress"
+    assert agenda[-1] == {"key": "ocs_attitude", "label": "工作態度", "state": "pending"}
 
 
 @pytest.mark.asyncio

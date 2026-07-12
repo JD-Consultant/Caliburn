@@ -481,7 +481,7 @@ export function JobDocTable({
       {/* T8 工具列:待審計數+批量「接受全部(N)/拒絕全部」常駐(待審>0);
           表頭槽(主基準/工作描述/級別)的待審在此以 chips 呈現(✓✗?)。 */}
       {pendingEntries.length > 0 ? (
-        <div className="flex flex-wrap items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50/50 px-3 py-2 text-sm">
+        <div id="ai-pending-bar" className="flex flex-wrap items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50/50 px-3 py-2 text-sm">
           <span className="font-medium text-emerald-800">AI 待審 {pendingEntries.length} 筆</span>
           {headerPendings.map((e) => {
             const slot = e.path.split(".").pop() ?? "";

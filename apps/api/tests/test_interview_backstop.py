@@ -1,74 +1,62 @@
-"""T12:backstop 收尾複查(spec §6;ADR 0027 第4組件)。
-只答兩題(漏記/出處違規)、只產建議、確定性後驗(gap∈空縫、path∈已寫、quote 逐字)。
-fake llm;無真 LLM。"""
-import pytest
+"""backstop v3(ADR 0030 T5)= 確定性撿漏 sweep。零 LLM(§6.4 禁令)。
 
-from app.interview.backstop import BackstopResult, backstop_pass
+命中規則:員工提過(正規化子串)、且文件(含待審)沒有 → 產 held 追問。
+"""
+from app.interview.backstop import SWEEP_EVERY, backstop_sweep
 
-
-class FakeLlm:
-    def __init__(self, result):
-        self._r = result
-        self.calls = []
-
-    async def select_schema(self, prompt, schema, *, role="select", schema_name="output"):
-        self.calls.append({"role": role, "prompt": prompt})
-        return self._r
+POOL_ITEMS = {"K01": "測試設計技術", "S01": "測試工具使用"}
+UNASKED = [{"key": "X:T1", "name": "測試環境建置", "unit": "測試", "ocs_code": "X",
+            "task_code": "T1"}]
 
 
-EMPLOYEE = ["我每天巡檢設備", "遇到異常就開維修單,通常要等主管簽核才能停機"]
-GAPS = [{"gap": "T.details.wait_points", "label": "等待瓶頸"},
-        {"gap": "T.details.exceptions", "label": "例外處理"}]
-RECORDED = [{"path": "T.details.frequency", "quote": "我每天巡檢設備"}]
+def _doc(with_env_task=False):
+    tasks = [{"_tid": "C", "task_codes": [{"code": None, "name": "設計測試案例"}],
+              "competency_blocks": [{}], "details": {}}]
+    if with_env_task:
+        tasks.append({"_tid": "E",
+                      "task_codes": [{"code": None, "name": "測試環境建置"}],
+                      "competency_blocks": [], "details": None})
+    return {"ocs_content": {"ocu_units": [{"_uid": "U1", "tasks": tasks}]},
+            "ocs_attitude": {"attitudes": []}}
 
 
-@pytest.mark.asyncio
-async def test_valid_miss_and_misattribution_kept():
-    llm = FakeLlm({
-        "misses": [{"gap": "T.details.wait_points", "quote": "要等主管簽核才能停機"}],
-        "misattributed": [{"path": "T.details.frequency", "reason": "引文其實在講停機不是頻率"}]})
-    res = await backstop_pass(llm, employee_texts=EMPLOYEE, empty_gaps=GAPS, recorded=RECORDED)
-    assert isinstance(res, BackstopResult)
-    assert res.misses[0]["gap"] == "T.details.wait_points"
-    assert res.misattributed[0]["path"] == "T.details.frequency"
-    assert llm.calls[0]["role"] == "select"           # 便宜模型
+def test_unasked_task_mentioned_becomes_held_question():
+    held = backstop_sweep(doc=_doc(),
+                          texts_since=["我上週還在弄測試環境建置,搞了三天"],
+                          unasked_tasks=UNASKED, pool_items={})
+    assert len(held) == 1 and "測試環境建置" in held[0]
 
 
-@pytest.mark.asyncio
-async def test_miss_with_hallucinated_gap_dropped():
-    llm = FakeLlm({"misses": [{"gap": "T.details.NONEXISTENT", "quote": "要等主管簽核才能停機"}],
-                   "misattributed": []})
-    res = await backstop_pass(llm, employee_texts=EMPLOYEE, empty_gaps=GAPS, recorded=RECORDED)
-    assert res.misses == []                            # gap 不在空縫清單 → 丟
+def test_already_in_doc_not_re_asked():
+    held = backstop_sweep(doc=_doc(with_env_task=True),
+                          texts_since=["測試環境建置那些"],
+                          unasked_tasks=UNASKED, pool_items={})
+    assert held == []
 
 
-@pytest.mark.asyncio
-async def test_miss_with_fabricated_quote_dropped():
-    llm = FakeLlm({"misses": [{"gap": "T.details.exceptions", "quote": "我每天寫一萬行程式"}],
-                   "misattributed": []})
-    res = await backstop_pass(llm, employee_texts=EMPLOYEE, empty_gaps=GAPS, recorded=RECORDED)
-    assert res.misses == []                            # quote 不在逐字稿 → 丟
+def test_pool_item_mentioned_becomes_held():
+    held = backstop_sweep(doc=_doc(), texts_since=["其實測試工具使用我很熟"],
+                          unasked_tasks=[], pool_items=POOL_ITEMS)
+    assert len(held) == 1 and "測試工具使用" in held[0]
 
 
-@pytest.mark.asyncio
-async def test_misattribution_with_unknown_path_dropped():
-    llm = FakeLlm({"misses": [],
-                   "misattributed": [{"path": "T.details.GHOST", "reason": "x"}]})
-    res = await backstop_pass(llm, employee_texts=EMPLOYEE, empty_gaps=GAPS, recorded=RECORDED)
-    assert res.misattributed == []                     # path 不在已寫清單 → 丟
+def test_no_mention_no_noise():
+    held = backstop_sweep(doc=_doc(), texts_since=["今天天氣不錯"],
+                          unasked_tasks=UNASKED, pool_items=POOL_ITEMS)
+    assert held == []
 
 
-@pytest.mark.asyncio
-async def test_nothing_to_check_skips_llm():
-    llm = FakeLlm({"misses": [], "misattributed": []})
-    res = await backstop_pass(llm, employee_texts=EMPLOYEE, empty_gaps=[], recorded=[])
-    assert res.misses == [] and res.misattributed == [] and llm.calls == []   # 無縫無寫→不呼
+def test_normalization_tolerates_spacing():
+    held = backstop_sweep(doc=_doc(), texts_since=["測試 環境 建置也歸我管"],
+                          unasked_tasks=UNASKED, pool_items={})
+    assert len(held) == 1
 
 
-def test_to_suggestions_shape():
-    res = BackstopResult(
-        misses=[{"gap": "T.details.wait_points", "quote": "要等主管簽核"}],
-        misattributed=[{"path": "T.details.frequency", "reason": "引文離題"}])
-    sugs = res.to_suggestions()
-    assert any(s["doc_path"] == "T.details.wait_points" and "補漏" in s["reason"] for s in sugs)
-    assert any(s["doc_path"] == "T.details.frequency" and "出處" in s["reason"] for s in sugs)
+def test_no_llm_in_module():
+    """§6.4 禁令斷言:backstop 模組零 LLM 依賴(select_schema/async 不得出現)。"""
+    import inspect
+    import app.interview.backstop as B
+    src = inspect.getsource(B)
+    assert "select_schema" not in src
+    assert "async def" not in src            # 純同步純函式
+    assert isinstance(SWEEP_EVERY, int) and SWEEP_EVERY >= 1

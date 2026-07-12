@@ -110,19 +110,17 @@ async def test_get_interview_full_view(db_session):
 
 
 @pytest.mark.asyncio
-async def test_finish_runs_backstop_and_transitions_review(db_session):
+async def test_finish_no_llm_backstop_still_transitions_review(db_session):
+    """v3(ADR 0030 T5):LLM 收尾複查退場(撿漏=每 N 回合確定性 sweep);
+    finish 不再吃 backstop 結果,照樣轉 review、零補漏建議。"""
     p = await _profile(db_session)
     await start_interview(p.id, db=db_session)
     await interview_turn(p.id, {"text": "我們每兩週跑一次回歸"},
                          db=db_session, llm=StubLlm(select_result=GOOD), knowledge=K)
-    # backstop 回一筆漏記:gap 須在「仍空必填欄」內(任務未分級→time_share_pct 缺)、quote 逐字
-    gap = f"{TASK_PATH}.details.time_share_pct"
-    bs = StubLlm(select_result={"misses": [{"gap": gap, "quote": "每兩週跑一次回歸"}],
-                                "misattributed": []})
-    out = await finish_interview(p.id, db=db_session, llm=bs)
+    out = await finish_interview(p.id, db=db_session, llm=None)
     assert out["phase"] == "review"
     view = await get_interview(p.id, db=db_session)
-    assert any("補漏" in s["reason"] for s in view["suggestions"])   # backstop 補漏建議落庫
+    assert not any("補漏" in s["reason"] for s in view["suggestions"])
 
 
 @pytest.mark.asyncio

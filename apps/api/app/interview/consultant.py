@@ -144,9 +144,10 @@ def build_consultant_messages(*, doc: dict, ledger_state: dict,
                               recent_turns: list[tuple[str, str]], pending: list[str],
                               employee_text: str, est_minutes: int = 15,
                               probe: dict | None = None,
-                              pool_tasks: list[dict] | None = None) -> list[dict]:
+                              pool_tasks: list[dict] | None = None,
+                              rejected: list[str] | None = None) -> list[dict]:
     """組 chat_with_tools 的 messages。空對話 → 開場揭露;否則 system 人格 + 脈絡注入
-    (帳本摘要/文件/待核准)+ 近窗對話 + 員工最新發言(GPT-4.1:關鍵首尾、脈絡定界)。"""
+    (帳本摘要/文件/待核准/被拒/待問)+ 近窗對話 + 員工最新發言(GPT-4.1:關鍵首尾、脈絡定界)。"""
     msgs: list[dict] = [{"role": "system", "content": CONSULTANT_SYSTEM}]
 
     if not recent_turns and not employee_text:
@@ -159,6 +160,18 @@ def build_consultant_messages(*, doc: dict, ledger_state: dict,
     if pending:
         ctx += "\n<待核准建議(員工可能問到,別重問;向他說明是待他確認)>\n  - " + \
                "\n  - ".join(pending) + "\n</待核准建議>"
+    if rejected:
+        ctx += ("\n<他剛拒絕的內容(§6.3:**不要重提同一條**;可自然追問一句原因——"
+                "是說法不對還是根本沒這件事,問完就放下)>\n  - "
+                + "\n  - ".join(rejected) + "\n</他剛拒絕的內容>")
+    held = [h.get("q") for h in (ledger_state.get("held") or []) if h.get("q")]
+    if held:
+        ctx += ("\n<待問清單(時機合適時挑一條問;不急,別打斷當下話題)>\n  - "
+                + "\n  - ".join(held[:3]) + "\n</待問清單>")
+    boundary = [b.get("topic") for b in (ledger_state.get("boundary") or [])]
+    if boundary:
+        ctx += ("\n<他劃線不談的(**絕不主動再提**,除非他自己開口)>\n  - "
+                + "\n  - ".join(str(b) for b in boundary) + "\n</他劃線不談的>")
     msgs.append({"role": "system", "content": ctx})
 
     for role, text in recent_turns[-RECENT_TURNS:]:

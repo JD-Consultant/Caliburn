@@ -16,7 +16,7 @@ from langchain_openai import ChatOpenAI
 from openai import AsyncOpenAI
 
 from app.config import settings
-from app.authoring.tracing import get_tracer
+from app.observability import GEN_AI_PROVIDER_ATTR, get_tracer
 from app.utils import safe_parse_json
 
 logger = logging.getLogger("caliburn")
@@ -80,8 +80,9 @@ class OpenRouterLlm:
         model = model_for_role(role)
         for attempt in range(self._retries):
             try:
-                with get_tracer().start_as_current_span("gen_ai.chat") as span:
-                    span.set_attribute("gen_ai.system", "openrouter")
+                # span 名照 semconv:`{operation} {model}`(spec: gen-ai-spans.md)
+                with get_tracer().start_as_current_span(f"chat {model}") as span:
+                    span.set_attribute(GEN_AI_PROVIDER_ATTR, "openrouter")
                     span.set_attribute("gen_ai.operation.name", "chat")
                     span.set_attribute("gen_ai.request.model", model)
                     resp = await llm.ainvoke([HumanMessage(content=prompt)])
@@ -90,6 +91,12 @@ class OpenRouterLlm:
                         span.set_attribute("gen_ai.usage.input_tokens", um["input_tokens"])
                     if um.get("output_tokens") is not None:
                         span.set_attribute("gen_ai.usage.output_tokens", um["output_tokens"])
+                    meta = getattr(resp, "response_metadata", None) or {}
+                    if meta.get("model_name"):
+                        span.set_attribute("gen_ai.response.model", meta["model_name"])
+                    if meta.get("finish_reason"):
+                        span.set_attribute("gen_ai.response.finish_reasons",
+                                           [meta["finish_reason"]])
                 content = resp.content
                 return content if isinstance(content, str) else str(content)
             except Exception as exc:  # noqa: BLE001
@@ -125,10 +132,20 @@ class OpenRouterLlm:
             if with_tools:
                 kwargs["tools"] = tools
                 kwargs["tool_choice"] = "auto"      # 不強制(§8.5:強制會虛構輸入)
-            with get_tracer().start_as_current_span("gen_ai.chat_tools") as span:
-                span.set_attribute("gen_ai.system", "openrouter")
+            with get_tracer().start_as_current_span(f"chat {model}") as span:
+                span.set_attribute(GEN_AI_PROVIDER_ATTR, "openrouter")
+                span.set_attribute("gen_ai.operation.name", "chat")
                 span.set_attribute("gen_ai.request.model", model)
                 resp = await _async_client().chat.completions.create(**kwargs)
+                if getattr(resp, "model", None):
+                    span.set_attribute("gen_ai.response.model", resp.model)
+                usage = getattr(resp, "usage", None)
+                if usage is not None:
+                    span.set_attribute("gen_ai.usage.input_tokens", usage.prompt_tokens)
+                    span.set_attribute("gen_ai.usage.output_tokens", usage.completion_tokens)
+                fr = resp.choices[0].finish_reason
+                if fr:
+                    span.set_attribute("gen_ai.response.finish_reasons", [fr])
             m = resp.choices[0].message
             return {"content": m.content, "tool_calls": [
                 {"id": tc.id, "type": "function",
@@ -146,8 +163,9 @@ class OpenRouterLlm:
         last_err: Exception | None = None
         for attempt in range(self._retries):
             try:
-                with get_tracer().start_as_current_span("gen_ai.select_schema") as span:
-                    span.set_attribute("gen_ai.system", "openrouter")
+                with get_tracer().start_as_current_span(f"chat {model}") as span:
+                    span.set_attribute(GEN_AI_PROVIDER_ATTR, "openrouter")
+                    span.set_attribute("gen_ai.operation.name", "chat")
                     span.set_attribute("gen_ai.request.model", model)
                     resp = await _async_client().chat.completions.create(
                         model=model,
@@ -158,6 +176,16 @@ class OpenRouterLlm:
                         # (fail-closed 無逃逸,但燒 token)——上限鎖住成本;截斷=非法 JSON=照樣炸。
                         max_tokens=2048,
                     )
+                    if getattr(resp, "model", None):
+                        span.set_attribute("gen_ai.response.model", resp.model)
+                    usage = getattr(resp, "usage", None)
+                    if usage is not None:
+                        span.set_attribute("gen_ai.usage.input_tokens", usage.prompt_tokens)
+                        span.set_attribute("gen_ai.usage.output_tokens",
+                                           usage.completion_tokens)
+                    fr = resp.choices[0].finish_reason
+                    if fr:
+                        span.set_attribute("gen_ai.response.finish_reasons", [fr])
                 content = resp.choices[0].message.content or ""
                 return json.loads(content)
             except Exception as exc:  # noqa: BLE001

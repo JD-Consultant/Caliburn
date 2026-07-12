@@ -14,9 +14,11 @@ from sqlalchemy import text
 from app.api.router import api_router
 from app.config import settings
 from app.database import AsyncSessionLocal
+from app.observability import setup_tracing
 
 
 def configure(app: FastAPI) -> FastAPI:
+    setup_tracing()   # 冪等;T12 後 live app 不再自呼,tracing 起點統一在此(ADR 0030 T6)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],

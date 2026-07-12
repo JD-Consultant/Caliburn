@@ -24,6 +24,7 @@ from app.database import get_db
 from app.interview import ledger as L
 from app.interview.diff import STABLE_ID_KEYS
 from app.interview.service import NoActiveInterview, run_curation, run_finish, run_turn
+from app.observability import record_review_events
 
 router = APIRouter(prefix="/job-profiles", tags=["interview"])
 
@@ -225,4 +226,5 @@ async def add_review_events(
         if not e.get("doc_path") or e.get("decision") not in _REVIEW_DECISIONS:
             raise HTTPException(status_code=422, detail={"code": "bad_event", "event": e})
     n = await repo.add_review_events(session.id, events)
+    record_review_events(events)
     return {"recorded": n}

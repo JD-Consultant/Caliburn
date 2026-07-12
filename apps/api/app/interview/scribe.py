@@ -47,6 +47,22 @@ SCRIBE_SYS = (
 _BLOCK_FIELDS = {"outputs": "name", "knowledge": "name", "skills": "name",
                  "indicators": "text"}
 
+# 按需喚醒的確定性前濾(ADR 0030 §6.2 改處2 的落地):只跳過**明顯無素材**的
+# 寒暄/meta 回合;寧可多跑一次書記,不可漏記(漏接由 backstop sweep 兜底)。
+# 註:鎖定設計寫「consultant 訊號位」;v3 先以零成本的確定性閘實現同一目的
+# (LLM 訊號位需動 chat 介面,留縫待 chat 結構化輸出就緒)。
+_META_PHRASES = {"跳過", "沒有", "下一題", "好", "嗯", "ok", "okay", "沒了", "對",
+                 "是", "不是", "謝謝", "hi", "hello", "嗨", "你好"}
+
+
+def worth_scribing(text: str) -> bool:
+    t = (text or "").strip().lower()
+    if not t:
+        return False
+    if t in _META_PHRASES:
+        return False
+    return len(t) >= 6 or any(ch.isdigit() for ch in t)
+
 
 @dataclass
 class ScribeResult:

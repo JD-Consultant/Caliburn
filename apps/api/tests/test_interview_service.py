@@ -88,8 +88,9 @@ async def test_human_touched_no_longer_diverts_pending_is_universal(db_session):
 
 @pytest.mark.asyncio
 async def test_scribe_failure_does_not_block_consultant(db_session):
-    bad = {"records": [{"type": "set_slot"}]}                      # 缺欄→pydantic 兩度拒
-    p, s, repo, out, _ = await _run(db_session, "隨便講講", select_result=bad,
+    bad = {"records": [{"type": "set_slot"}]}                      # 缺欄→pydantic 反覆拒
+    p, s, repo, out, _ = await _run(db_session, "隨便講講一些很長但沒重點的內容",
+                                    select_result=bad,
                                     chat_text="沒關係,再多說一點?")
     assert out.doc_changed is False
     assert out.say == "沒關係,再多說一點?"                        # 顧問仍回應(fail-open)

@@ -16,12 +16,14 @@ from app.adapters.persistence import DocConflictError, DocRepo
 from app.interview import consultant as C
 from app.interview import ledger as L
 from app.interview.attitudes import attitudes_pass
-from app.interview.backstop import backstop_pass
+from app.interview.backstop import SWEEP_EVERY, backstop_sweep
 from app.interview.curation import curation_pass
-from app.interview.scribe import _doc_ocs_codes, build_pool_inputs, land_ops, scribe_pass
+from app.interview.scribe import (
+    _doc_ocs_codes, build_pool_inputs, land_ops, scribe_pass, worth_scribing,
+)
 from app.models import JobProfile
 from app.interview.slots import SLOT_DEFS
-from app.interview.tools import CONSULTANT_TOOLS, dispatch_tool
+from app.interview.tools import CONSULTANT_TOOLS, dispatch_tool, document_view
 
 logger = logging.getLogger("caliburn")
 
@@ -122,27 +124,19 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> T
     human_touched = list(session.human_touched or [])
     emp_turn = await repo.append_turn(session.id, role="employee", text=user_text)
 
-    # ① 書記 pass(v3:op→verify→_pending;失敗不擋顧問——fail-open 對話、fail-closed 寫入)
+    # v3 回合序(ADR 0030 T5):顧問先說話 → 確定性喚醒閘 → 書記 op→verify→_pending
+    # → backstop sweep → 帳本更新。顧問吃**回合前**的文件/帳本(綠字自己會浮現,不用等)。
     turns_map = {t.seq: t.text for t in prev_turns if t.role == "employee"}
     turns_map[emp_turn.seq] = user_text
     profile = await db.get(JobProfile, profile_id)
     header_codes = set(getattr(profile, "selected_ocs_codes", None) or [])
-    t_scribe = time.perf_counter()
-    scribe_res = await scribe_pass(llm, knowledge, doc=doc, turns=turns_map,
-                                   turn_id=emp_turn.seq, header_codes=header_codes)
-    scribe_ms = int((time.perf_counter() - t_scribe) * 1000)
-    doc_changed, extra_guard = await _persist_scribe_doc(
-        doc_repo, profile_id, latest, scribe_res,
-        turns=turns_map, header_codes=header_codes)
-
-    work_doc = (await doc_repo.latest(profile_id) or {}).get("content") or doc
+    work_doc = doc
 
     # ①½ 官方任務池(0028 D6:檢查表/裁剪候選盤;fail-open,掛了縫不開)
     pool_tasks = await build_task_pool(knowledge, work_doc)
 
-    # ② 帳本:先評上一輪 gap 是否進帳(飽和偵測),再算本輪 next_gap(給顧問當提示)
+    # ② 帳本(回合前視角):上一輪 gap 是否進帳的評定移到書記跑完後
     state = dict(session.ledger_state or {})
-    state = L.note_attempt(state, state.get("last_gap"), scribe_res.progressed)
     state["last_gap"] = L.next_gap(work_doc, state, {}, pool_tasks)
 
     # ②½ 裁剪 pass(0028 D1/D4):curation 縫 → AI 對 unasked 官方任務預勾/排除;
@@ -167,19 +161,25 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> T
                                     model=model_for_role("select"), duration_ms=cur_ms,
                                     guard_verdicts=curation_guard[:30])
 
-    # ③ 顧問 chat_with_tools(說話 + READ 工具;無寫入權)
+    # ③ 顧問 chat_with_tools(說話 + READ 工具;無寫入權)——v3:顧問先於書記
     pending_labels = [_pending_label(s) for s in await repo.list_pending(session.id)]
+    rejected_labels = [e.doc_path.split(".")[-1] if "." in e.doc_path else e.doc_path
+                       for e in await repo.list_review_events(session.id,
+                                                              decision="rejected")][-10:]
     messages = C.build_consultant_messages(
         doc=work_doc, ledger_state=state, recent_turns=recent,
-        pending=pending_labels, employee_text=user_text, pool_tasks=pool_tasks)
+        pending=pending_labels, employee_text=user_text, pool_tasks=pool_tasks,
+        rejected=rejected_labels)
     # write-in 抓漏只吐一次(0028 D6):摘要已含探測句 → 消費 flag
     if (pool_tasks and not state.get("writein_asked")
             and not L.checklist(work_doc, state, pool_tasks)["unasked"]):
         state["writein_asked"] = True
-    # dispatch 包一層截職類搜尋命中(D8 P2:中途加選回路的確定性訊號)
+    # dispatch 包一層截職類搜尋命中(D8 P2)+ read_document 四態視圖(doc 在此層)
     occ_searches: list[dict] = []
 
     async def dispatch(name: str, arguments: dict):
+        if name == "read_document":
+            return document_view(work_doc)
         res = await dispatch_tool(name, arguments, knowledge=knowledge)
         if name == "knowledge_search_occupations" and isinstance(res, dict):
             occ_searches.append({"query": (arguments or {}).get("query") or "",
@@ -190,6 +190,38 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> T
     chat = await llm.chat_with_tools(role="interview", messages=messages,
                                      tools=CONSULTANT_TOOLS, dispatch=dispatch)
     chat_ms = int((time.perf_counter() - t_chat) * 1000)
+
+    # ③¾ 書記(v3:顧問後、確定性喚醒閘;fail-open 對話、fail-closed 寫入)
+    scribe_ms = 0
+    doc_changed, extra_guard = False, []
+    from app.interview.scribe import ScribeResult as _SR
+    scribe_res = _SR()
+    if worth_scribing(user_text):
+        t_scribe = time.perf_counter()
+        scribe_res = await scribe_pass(llm, knowledge, doc=doc, turns=turns_map,
+                                       turn_id=emp_turn.seq, header_codes=header_codes)
+        scribe_ms = int((time.perf_counter() - t_scribe) * 1000)
+        doc_changed, extra_guard = await _persist_scribe_doc(
+            doc_repo, profile_id, latest, scribe_res,
+            turns=turns_map, header_codes=header_codes)
+    else:
+        extra_guard = ["scribe:skip(meta/寒暄回合,喚醒閘)"]
+
+    # ③⅞ backstop sweep(每 N 員工回合;確定性撿漏 → held 待問;§6.4 禁 LLM)
+    last_swept = int(state.get("backstop_last_seq") or 0)
+    if emp_turn.seq - last_swept >= SWEEP_EVERY:
+        texts_since = [t for s_, t in sorted(turns_map.items()) if s_ > last_swept]
+        unasked_now = (L.checklist(work_doc, state, pool_tasks)["unasked"]
+                       if pool_tasks else [])
+        for q in backstop_sweep(doc=work_doc, texts_since=texts_since,
+                                unasked_tasks=unasked_now,
+                                pool_items=scribe_res.pool_items):
+            state = L.push_held(state, q, emp_turn.seq)
+        state["backstop_last_seq"] = emp_turn.seq
+
+    # ④′ 帳本收帳:上一輪 gap 進帳評定(飽和偵測)+ 疲勞訊號(收尾三訊號之一,T10 用)
+    state = L.note_attempt(state, state.get("last_gap"), scribe_res.progressed)
+    state["fatigued"] = L.is_fatigued([t for _, t in sorted(turns_map.items())])
 
     # ③½ occupation widget(0028 D1 + D8 P2 統一):顧問本回合搜過職類且 **top-1 不在
     #    現有 codes** → 開 picker 預填該搜尋詞。涵蓋開場(codes 空)與中途加選
@@ -274,20 +306,12 @@ async def run_finish(profile_id: UUID, *, db, llm, knowledge) -> dict:
     doc = (latest or {}).get("content") or {}
     state = session.ledger_state or {}
     _, blockers = L.can_finish(doc, state, {})
-    gap_paths = [b for b in blockers if not b.startswith("share_sum")]
+    # v3(ADR 0030 T5):LLM 收尾複查退場——撿漏由每 N 回合的確定性 backstop sweep
+    # 承擔(§6.4 禁令:backstop 禁 LLM 化);收尾對帳流程在 T10 重寫。
 
     if llm is not None:
         turns = await repo.list_turns(session.id)
         emp = [t.text for t in turns if t.role == "employee"]
-        evidence = await repo.list_evidence(session.id)
-        empty_gaps = [{"gap": g, "label": C.gap_label(doc, g)} for g in gap_paths]
-        recorded = [{"path": e.doc_path, "quote": e.quote} for e in evidence]
-        res = await backstop_pass(llm, employee_texts=emp, empty_gaps=empty_gaps,
-                                  recorded=recorded)
-        for sug in res.to_suggestions():
-            await repo.add_suggestion(session.id, doc_path=sug["doc_path"],
-                                      old_value=sug["old_value"], new_value=sug["new_value"],
-                                      reason=sug["reason"], turn_seq=len(turns))
         # 態度收尾整體編碼(0028 D3;取代書記逐回合池通道)
         try:
             pools, pool_items = await build_pool_inputs(knowledge, doc)

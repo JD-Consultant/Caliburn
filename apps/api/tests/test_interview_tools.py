@@ -54,7 +54,8 @@ class FakeKnowledge:
 
 def test_tools_are_openai_shaped_and_namespaced():
     names = {t["function"]["name"] for t in CONSULTANT_TOOLS}
-    assert names == {"knowledge_search_occupations", "knowledge_occupation_brief"}
+    assert names == {"knowledge_search_occupations", "knowledge_occupation_brief",
+                     "read_document"}   # v3(ADR 0030 T5):四態視圖工具
     for t in CONSULTANT_TOOLS:
         assert t["type"] == "function"
         assert "description" in t["function"] and "parameters" in t["function"]

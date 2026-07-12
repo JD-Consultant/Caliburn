@@ -31,6 +31,13 @@ CONSULTANT_TOOLS = [
         },
     }},
     {"type": "function", "function": {
+        "name": "read_document",
+        "description": "讀職務說明書現況(四態視圖):每個任務/條目標明 confirmed(已確認)/"
+                       "pending_add(AI 新增待審)/pending_mod(AI 修改待審)/pending_del"
+                       "(AI 建議刪待審)。想確認「已經記了什麼、哪些還沒被使用者核可」時用。",
+        "parameters": {"type": "object", "properties": {}, "required": []},
+    }},
+    {"type": "function", "function": {
         "name": "knowledge_occupation_brief",
         "description": "取某官方職類的簡報:工作任務清單 + 各類職能(知識/技能/產出/行為指標/"
                        "態度,含代碼與名稱)。提議『你也做這個嗎?』或對照官方標準時用。",
@@ -100,3 +107,47 @@ async def dispatch_tool(name: str, arguments: dict, knowledge) -> dict:
     except Exception as exc:  # noqa: BLE001  (知識庫故障 → 可操作訊息,不外洩 traceback)
         logger.warning("READ 工具 %s 失敗:%s", name, str(exc)[:160])
         return {"error": f"{name} 查詢失敗:{str(exc)[:120]}"}
+
+
+def _entry_status(entry: dict) -> str:
+    mark = entry.get("_pending")
+    if isinstance(mark, dict) and mark.get("op"):
+        return f"pending_{mark['op']}"
+    return "confirmed"
+
+
+def document_view(doc: dict) -> dict:
+    """四態視圖(ADR 0030 T5):給顧問的文件現況——精簡、含待審狀態,不整卷重播。
+    純函式;由 service 的 dispatch 供給(doc 不在 knowledge 內)。"""
+    from app.interview import ledger as L  # 局部匯入避免循環
+
+    units_out = []
+    for u, t, tp in L.iter_tasks(doc):
+        codes = t.get("task_codes") or []
+        name = codes[0].get("name") if codes else "(未命名)"
+        row = {"path": tp, "task": name, "status": _entry_status(t)}
+        pend = []
+        for b in (t.get("competency_blocks") or []):
+            for kind in ("outputs", "indicators", "knowledge", "skills"):
+                for it in (b.get(kind) or []):
+                    st = _entry_status(it)
+                    if st != "confirmed":
+                        pend.append({"kind": kind,
+                                     "value": it.get("name") or it.get("text"),
+                                     "status": st})
+        d = t.get("details") or {}
+        for slot, mark in (d.get("_pending") or {}).items():
+            if isinstance(mark, dict) and mark.get("op"):
+                pend.append({"kind": f"details.{slot}", "value": d.get(slot),
+                             "status": f"pending_{mark['op']}"})
+        if pend:
+            row["pending_items"] = pend
+        units_out.append(row)
+    atts = [{"value": a.get("name"), "status": _entry_status(a)}
+            for a in ((doc.get("ocs_attitude") or {}).get("attitudes") or [])]
+    prof_pend = ((doc.get("ocs_profile") or {}).get("_pending") or {})
+    return {"tasks": units_out, "attitudes": atts,
+            "header_pending": {k: {"status": f"pending_{v['op']}",
+                                   "proposed": v.get("value")}
+                               for k, v in prof_pend.items()
+                               if isinstance(v, dict) and v.get("op")}}

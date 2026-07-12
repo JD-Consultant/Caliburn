@@ -13,7 +13,9 @@ import logging
 from dataclasses import dataclass, field
 
 from app.interview import ledger as L
-from app.interview.executor import get_at, quote_verified, set_at, writable_path
+from app.interview.docpath import get_at, set_at
+from app.interview.executor import writable_path
+from app.interview.verify import quote_verified
 from app.interview.scribe_schema import ScribeOutput, scribe_schema
 from app.interview.slots import SLOT_DEFS
 

@@ -4,7 +4,7 @@
 組出:顧問角色 + 焦點任務現況(已填/缺口/預算/已跳過)+ 槽位問法提示 + 可用 path 清單
 + 指令使用規則 + 近 N 回合對話。純函式。
 """
-from app.interview.executor import get_at
+from app.interview.docpath import get_at
 from app.interview.slots import SLOT_DEFS, gate_missing, is_core
 
 RECENT_TURNS = 12   # v1 近窗(spec §4②)

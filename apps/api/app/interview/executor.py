@@ -15,13 +15,14 @@ Path 文法與 diff.py 同族:段以 `.` 連接;list 段用穩定 id(_tid/_uid/_
 純函式:輸入 doc 不變,回新 doc(deep copy)。
 """
 import copy
-import re
-import unicodedata
 from dataclasses import dataclass, field
 
 from app.interview.commands import TurnOutput
-from app.interview.diff import STABLE_ID_KEYS
+# 螺絲已搬家(ADR 0030 T3):path 解析住 docpath、quote 驗證住 verify。
+# 此處轉口 re-export 供 v1 測試沿用;本檔其餘為 v1 死碼,T12 隨檔退場。
+from app.interview.docpath import get_at, resolve, set_at, step as _step  # noqa: F401
 from app.interview.slots import SLOT_DEFS, gate_missing
+from app.interview.verify import normalize, quote_verified  # noqa: F401
 
 ASK_BUDGET_PER_SLOT = 2   # v0 出廠值(校準後修)
 
@@ -35,70 +36,6 @@ def writable_path(path: str) -> bool:
         return True
     segs = path.split(".")
     return len(segs) >= 3 and segs[-2] == "details" and segs[-1] in SLOT_DEFS
-
-_WS = re.compile(r"\s+")
-
-
-def normalize(s: str) -> str:
-    return _WS.sub("", unicodedata.normalize("NFKC", s or ""))
-
-
-def quote_verified(quote: str, employee_texts: list[str]) -> bool:
-    q = normalize(quote)
-    if not q:
-        return False
-    hay = normalize("\n".join(employee_texts))
-    return q in hay
-
-
-# --- path 解析(與 diff.py 同文法) ---
-
-def _step(node, seg: str):
-    if isinstance(node, dict):
-        return node.get(seg)
-    if isinstance(node, list):
-        for i, item in enumerate(node):
-            if isinstance(item, dict) and any(str(item.get(k)) == seg for k in STABLE_ID_KEYS):
-                return item
-        if seg.isdigit() and int(seg) < len(node):
-            return node[int(seg)]
-    return None
-
-
-def resolve(doc: dict, path: str):
-    """回 (parent, last_seg) 供讀寫;走不到 → (None, None)。"""
-    segs = path.split(".")
-    node = doc
-    for seg in segs[:-1]:
-        node = _step(node, seg)
-        if node is None:
-            return None, None
-    return node, segs[-1]
-
-
-def get_at(doc: dict, path: str):
-    parent, last = resolve(doc, path)
-    if parent is None:
-        return None
-    return _step(parent, last) if not isinstance(parent, dict) else parent.get(last)
-
-
-def set_at(doc: dict, path: str, value) -> bool:
-    """葉寫入;task 段存在但 `details` 尚無 → 自動建殼。成功回 True。"""
-    parent, last = resolve(doc, path)
-    if parent is None:
-        # 容許 …<task>.details.<slot> 的 details 缺殼:找 task(= "details" 的 parent)建殼
-        segs = path.split(".")
-        if len(segs) >= 2 and segs[-2] == "details":
-            tparent, tlast = resolve(doc, ".".join(segs[:-1]))
-            if isinstance(tparent, dict) and tlast == "details":
-                tparent.setdefault("details", {})[segs[-1]] = value
-                return True
-        return False
-    if isinstance(parent, dict):
-        parent[last] = value
-        return True
-    return False
 
 
 # --- 執行結果 ---

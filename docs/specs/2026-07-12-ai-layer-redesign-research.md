@@ -74,6 +74,17 @@
     transversal 六類;負面發現:「產出」無獨立國際欄位、duty/task 數量無官方區間;
     附八欄位原料對照表。
 
+**第六輪(實作對接;2026-07-13)**:
+
+17. [現況碼對接附錄](2026-07-13-ai-layer-v3-code-annex.md) —— T1–T14 逐 task 檔:行盤點;
+    五交叉實錘(scribe 現況直寫/溯源住 DB 表/`_pending` 零碰撞且匯出剝除免費/backstop 現為
+    LLM 版/回合順序相反);executor/commands/context 死碼處置表;**intake 頁裁決=保留**
+    (純表單零 CopilotKit,活功能)。
+18. [實作技術驗證](2026-07-13-ai-redesign-raw-impl-verification.md) —— OpenRouter 快取透傳
+    成立但 Anthropic 系必帶 `cache_control`;strict/tools 透傳+`require_parameters:true`;
+    promptfoo Python provider+**Simulated User provider**(多輪訪談評測官方姿勢);OTel
+    `gen_ai.*` 仍 Development、`gen_ai.system`→`gen_ai.provider.name`、建議手埋 span。
+
 ## 1. 跨線最強共識
 
 ### 1.1 共編載體:直寫 + 修訂標記 + accept/reject(產業四家收斂)
@@ -370,7 +381,8 @@ Predicted Outputs(限「編輯既有文件」高重疊場景)· 租戶偏好 DB(
   reviewMap+D7 徽章(被 `_pending` 取代)。
 - **保留改造**:`app/interview/`(五改處)、InterviewPanel(對話+議程三態+進度+狀態指示);
   深聊 chips 概念併入新側欄。**保留不動**:`/ai/*`(read-only 純函數)、0029 編輯器全套。
-- **待查**:`documents/[id]/intake/` 頁(純 CopilotKit 入口→退役;有活功能→拆遷)。
+- ~~**待查**:`documents/[id]/intake/` 頁~~ → **已查定案(2026-07-13 盤碼):保留**——純 3 題
+  表單存 job_summary、零 CopilotKit(檔頭自證),是〔選職類〕預填的活功能。
 - **退場紀律**:新載體先上舊件後拆、文件功能測試保留當網、拆時全綠才 commit、
   docs/design 同 commit 更新。
 

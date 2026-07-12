@@ -21,6 +21,7 @@ from app.interview.docpath import get_at
 from app.interview.scribe_schema import ScribeOutput, scribe_schema
 from app.interview.slots import SLOT_DEFS
 from app.interview.verify import VerifyResult, verify_ops
+from app.observability import record_verify_rejects
 
 logger = logging.getLogger(__name__)
 
@@ -279,6 +280,7 @@ def land_ops(ops: list[dict], *, doc: dict, turns: dict[int, str],
     首落與 409 重放共用同一條路(重放對 fresh doc 重新 verify,防重複/漂移)。"""
     vr: VerifyResult = verify_ops(ops, doc=doc, turns=turns,
                                   ref_codes=ref_codes, header_codes=header_codes)
+    record_verify_rejects(vr.errors)
     guard = [f"verify-reject:op[{e.op_index}] {e.check}:{e.message[:80]}"
              for e in vr.errors]
     bad = {e.op_index for e in vr.errors}

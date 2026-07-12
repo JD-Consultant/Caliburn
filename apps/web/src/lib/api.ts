@@ -151,6 +151,15 @@ export const interviewTurn = (profileId: string, text: string) =>
     body: JSON.stringify({ text }),
   });
 
+// 收尾對帳(T10;ADR 0030):態度綠標落地+結構化總結回讀 → phase=review。
+export interface FinishSummary { lines: string[]; pending_count: number; accepted_count: number }
+export const finishInterview = (profileId: string) =>
+  request<{ phase: string; blockers: number; pending_suggestions: number;
+            summary?: FinishSummary }>(
+    `/job-profiles/${profileId}/interview:finish`,
+    { method: "POST" },
+  );
+
 // 隨叫裁剪(D8 P1a):選完職類立即取全檢查表(precheck+others)開 CurationDialog
 export const interviewCuration = (profileId: string) =>
   request<CurationChecklist>(`/job-profiles/${profileId}/interview:curation`, {

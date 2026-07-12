@@ -266,6 +266,7 @@ export interface InterviewStartResponse {
 export interface InterviewTurnResponse {
   say: string; question: InterviewQuestion | null; widget: InterviewWidget | null;
   doc_changed: boolean; pending_suggestions: number; progress: InterviewProgress;
+  suggest_finish?: boolean;   // T10 收尾三訊號任一成立(側欄顯示收尾鈕,不強制)
 }
 export interface InterviewView {
   session_id: string; status: string; phase: string;

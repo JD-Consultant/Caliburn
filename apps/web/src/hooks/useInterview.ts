@@ -5,6 +5,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
+  finishInterview,
   getInterview,
   interviewTurn,
   reviewInterview,
@@ -47,6 +48,18 @@ export function useInterviewTurn(profileId: string) {
         // 引擎寫了文件 → 讓 document cache 重抓,autosave baseline 由外部變化路徑重設
         void qc.invalidateQueries({ queryKey: ["document", profileId] });
       }
+    },
+  });
+}
+
+// 收尾對帳(T10):態度綠標可能落文件 → 一併 invalidate document。
+export function useFinishInterview(profileId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: () => finishInterview(profileId),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: interviewKey(profileId) });
+      void qc.invalidateQueries({ queryKey: ["document", profileId] });
     },
   });
 }

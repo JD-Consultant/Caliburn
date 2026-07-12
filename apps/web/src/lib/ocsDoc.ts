@@ -2,6 +2,7 @@
 // → 都讀寫 competency_blocks[0]。完成度公式對齊後端 compute_completion：
 // filled = 1(表頭) + (A?1:0) + Σ_task[(O>0)+(P>0)+(K>0)+(S>0)]；total = 4*任務數 + 2。
 import type { CodeName, CompetencyBlock, Indicator, NoteItem, OcsDocument, OcsTask, OcuUnit, SourceRef } from "@/types";
+import type { PendingMark } from "@caliburn/ocs-contract";
 
 function clone(doc: OcsDocument): OcsDocument {
   return structuredClone(doc);
@@ -516,6 +517,180 @@ export function setAttitudes(doc: OcsDocument, items: CodeName[]): OcsDocument {
   const next = clone(doc);
   next.ocs_attitude = { attitudes: items.map((it) => ({ ...it })) }; // 拷貝再交給 renumber 給碼
   return renumber(next);
+}
+
+// ── 追蹤修訂 _pending(ADR 0030 T8)────────────────────────────────────────────
+// AI 寫入一律以 `_pending` 落文件;✓=去標(accept)、✗=還原(reject),文件變換
+// 由前端執行(0025 不變量:提議由前端套用後走 PATCH)。兩種載形:
+// 1) 行內:條目/任務/職責節點自帶 `_pending: PendingMark`;
+// 2) 集合:scalar 槽的容器帶 `_pending: {槽名: PendingMark}`(details/表頭/區塊級別)。
+// path 文法鏡像後端 docpath.py:段以 `.` 連接;list 段用穩定 id(_tid/_uid/_id)或 index。
+
+export type PendingStatus = "confirmed" | "pending_add" | "pending_mod" | "pending_del";
+export type { PendingMark };
+
+export function markStatus(mark: PendingMark | null | undefined): PendingStatus {
+  return mark && mark.op ? (`pending_${mark.op}` as PendingStatus) : "confirmed";
+}
+
+export function pendingStatus(
+  node: { _pending?: PendingMark | null } | null | undefined,
+): PendingStatus {
+  return markStatus(node?._pending ?? null);
+}
+
+type AnyNode = Record<string, unknown>;
+const PENDING_ID_KEYS = ["_tid", "_uid", "_id"] as const;
+
+function pstep(node: unknown, seg: string): unknown {
+  if (Array.isArray(node)) {
+    for (const item of node) {
+      if (item && typeof item === "object"
+          && PENDING_ID_KEYS.some((k) => String((item as AnyNode)[k]) === seg)) return item;
+    }
+    const i = Number(seg);
+    return Number.isInteger(i) && i >= 0 && i < node.length ? node[i] : undefined;
+  }
+  if (node && typeof node === "object") return (node as AnyNode)[seg];
+  return undefined;
+}
+
+function presolve(doc: OcsDocument, path: string): { parent: unknown; last: string } | null {
+  const segs = path.split(".");
+  let node: unknown = doc;
+  for (const seg of segs.slice(0, -1)) {
+    node = pstep(node, seg);
+    if (node == null) return null;
+  }
+  return { parent: node, last: segs[segs.length - 1] };
+}
+
+function inlineMark(node: unknown): PendingMark | null {
+  const m = node && typeof node === "object" ? (node as AnyNode)._pending : null;
+  return m && typeof m === "object" && "op" in (m as AnyNode) ? (m as PendingMark) : null;
+}
+
+function spliceOut(parent: unknown, last: string, node: unknown): void {
+  if (Array.isArray(parent)) {
+    const i = parent.indexOf(node);
+    if (i >= 0) parent.splice(i, 1);
+  } else if (parent && typeof parent === "object") {
+    delete (parent as AnyNode)[last];
+  }
+}
+
+// 行內 mod 只發生在文字葉:單位=ocu_name、指標=text、其餘=name(鏡像書記 op 形)。
+function modLeaf(node: AnyNode): string {
+  if ("ocu_name" in node) return "ocu_name";
+  if ("text" in node) return "text";
+  return "name";
+}
+
+function decidePending(doc: OcsDocument, path: string, accept: boolean): OcsDocument {
+  const next = clone(doc);
+  const r = presolve(next, path);
+  if (!r) return doc;
+  const node = pstep(r.parent, r.last);
+  const im = inlineMark(node);
+
+  if (im) {                                             // 行內(條目/任務/職責)
+    const n = node as AnyNode;
+    if (accept) {
+      if (im.op === "del") spliceOut(r.parent, r.last, node);
+      else delete n._pending;
+    } else {
+      if (im.op === "add") spliceOut(r.parent, r.last, node);
+      else {
+        if (im.op === "mod") n[modLeaf(n)] = im.prev ?? "";
+        delete n._pending;
+      }
+    }
+    return renumber(next);
+  }
+
+  // 集合式(details 槽/表頭/區塊級別):parent._pending[last]
+  if (r.parent && typeof r.parent === "object" && !Array.isArray(r.parent)) {
+    const p = r.parent as AnyNode;
+    const pend = p._pending as Record<string, PendingMark | undefined> | undefined;
+    const mark = pend?.[r.last];
+    if (!mark) return doc;
+    if (accept) {
+      if (mark.op === "del") delete p[r.last];
+      else if (mark.value !== undefined) p[r.last] = mark.value;  // 延遲生效(表頭主基準)
+    } else if (mark.op === "mod" && mark.value === undefined) {
+      // 已套用的 mod:還原舊值(prev 缺=槽原不存在→移除)
+      if (mark.prev === undefined || mark.prev === null) delete p[r.last];
+      else p[r.last] = mark.prev;
+    }                                                    // del/延遲生效:✗=只去標
+    delete pend![r.last];
+    if (pend && Object.keys(pend).length === 0) delete p._pending;
+    return renumber(next);
+  }
+  return doc;
+}
+
+export function acceptPending(doc: OcsDocument, path: string): OcsDocument {
+  return decidePending(doc, path, true);
+}
+
+export function rejectPending(doc: OcsDocument, path: string): OcsDocument {
+  return decidePending(doc, path, false);
+}
+
+export interface PendingEntry { path: string; op: "add" | "mod" | "del"; mark: PendingMark }
+
+// 全文件待審清單(批量鈕 N/匯出提示/表頭 strip 的資料源)。path 用穩定 id 段。
+export function listPending(doc: OcsDocument): PendingEntry[] {
+  const out: PendingEntry[] = [];
+  const seg = (o: AnyNode, i: number) => String(o._tid ?? o._uid ?? o._id ?? i);
+  const inline = (node: unknown, path: string) => {
+    const m = inlineMark(node);
+    if (m) out.push({ path, op: m.op, mark: m });
+  };
+  const map = (holder: unknown, base: string) => {
+    const pend = holder && typeof holder === "object"
+      ? ((holder as AnyNode)._pending as Record<string, PendingMark | undefined> | undefined)
+      : undefined;
+    for (const [k, m] of Object.entries(pend ?? {})) {
+      if (m && m.op) out.push({ path: `${base}.${k}`, op: m.op, mark: m });
+    }
+  };
+  map(doc.ocs_profile, "ocs_profile");
+  (doc.ocs_content?.ocu_units ?? []).forEach((u, ui) => {
+    const upath = `ocs_content.ocu_units.${seg(u as AnyNode, ui)}`;
+    inline(u, upath);
+    (u.tasks ?? []).forEach((t, ti) => {
+      const tpath = `${upath}.tasks.${seg(t as AnyNode, ti)}`;
+      inline(t, tpath);
+      (t.task_codes ?? []).forEach((c, ci) =>
+        inline(c, `${tpath}.task_codes.${seg(c as AnyNode, ci)}`));
+      const b = t.competency_blocks?.[0];
+      if (b) {
+        map(b, `${tpath}.competency_blocks.0`);
+        for (const kind of ["outputs", "indicators", "knowledge", "skills"] as const) {
+          (b[kind] ?? []).forEach((it, i) =>
+            inline(it, `${tpath}.competency_blocks.0.${kind}.${seg(it as AnyNode, i)}`));
+        }
+      }
+      map(t.details, `${tpath}.details`);
+    });
+  });
+  (doc.ocs_attitude?.attitudes ?? []).forEach((a, i) =>
+    inline(a, `ocs_attitude.attitudes.${seg(a as AnyNode, i)}`));
+  return out;
+}
+
+// 批量:逐筆處理並在每步後重掃(del/add 會動陣列;id 段使 path 對位穩定,
+// 重掃防禦 index 形 path 漂移)。長度沒縮=有筆無法處理,break 防死循環。
+export function resolveAllPending(doc: OcsDocument, decision: "accept" | "reject"): OcsDocument {
+  let d = doc;
+  for (let entries = listPending(d); entries.length > 0; entries = listPending(d)) {
+    const before = entries.length;
+    d = decision === "accept" ? acceptPending(d, entries[0].path)
+      : rejectPending(d, entries[0].path);
+    if (listPending(d).length >= before) break;
+  }
+  return d;
 }
 
 export function completion(doc: OcsDocument): number {

@@ -2,6 +2,7 @@ from app.models.base import Base
 from app.models.interview import (
     InterviewEvidence,
     InterviewLlmCall,
+    InterviewReviewEvent,
     InterviewSession,
     InterviewSuggestion,
     InterviewTurn,
@@ -22,4 +23,5 @@ __all__ = [
     "InterviewEvidence",
     "InterviewSuggestion",
     "InterviewLlmCall",
+    "InterviewReviewEvent",
 ]

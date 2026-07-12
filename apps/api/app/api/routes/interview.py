@@ -18,6 +18,7 @@ from app.adapters.persistence import DocRepo
 from app.api.deps import get_knowledge
 from app.api.routes.ai import get_llm
 from app.api.routes.documents import _require_profile
+from app.core.domain.ocs_doc import count_pending
 from app.core.ports import KnowledgePort, LlmPort
 from app.database import get_db
 from app.interview import ledger as L
@@ -159,8 +160,10 @@ async def get_interview(profile_id: UUID, db: AsyncSession = Depends(get_db)):
     turns = await repo.list_turns(session.id)
     evidence = await repo.list_evidence(session.id)
     suggestions = await repo.list_suggestions(session.id)
+    draft = await DocRepo(db).latest(profile_id)
     return {
         **_session_out(session),
+        "pending_count": count_pending(draft or {}),  # _pending 待審筆數(ADR 0030)
         "turns": [{"seq": t.seq, "role": t.role, "text": t.text} for t in turns],
         "evidence": [{"doc_path": e.doc_path, "quote": e.quote, "turn_seq": e.turn_seq,
                       "verified": e.verified, "review": e.review} for e in evidence],
@@ -193,3 +196,33 @@ async def review_interview(
         await repo.set_suggestion_status(sid, "rejected")
     pending = await repo.list_pending(session.id)
     return {"accepted": accepted, "rejected": len(reject_ids), "pending": len(pending)}
+
+
+_REVIEW_DECISIONS = {"accepted", "rejected", "batch_rejected"}
+
+
+@router.post("/{profile_id}/interview:review-events")
+async def add_review_events(
+    profile_id: UUID,
+    body: dict = Body(...),
+    db: AsyncSession = Depends(get_db),
+):
+    """審閱事件無聲記帳(ADR 0030 §6.3):✓/✗/批量拒絕只記不觸發 AI。
+
+    文件變換(去標/還原/renumber/PATCH)由前端執行(0025 不變量);
+    本端點僅落 `interview_review_events`,供 ledger 下回合讀「被拒清單」。
+    body = {"events": [{"doc_path", "decision", "op_meta"?}, ...]}
+    """
+    await _require_profile(profile_id, db)
+    repo = InterviewRepo(db)
+    session = await repo.latest_session(profile_id)
+    if session is None:
+        raise HTTPException(status_code=404, detail={"code": "no_interview"})
+    events = body.get("events") or []
+    if not events:
+        raise HTTPException(status_code=422, detail={"code": "empty_events"})
+    for e in events:
+        if not e.get("doc_path") or e.get("decision") not in _REVIEW_DECISIONS:
+            raise HTTPException(status_code=422, detail={"code": "bad_event", "event": e})
+    n = await repo.add_review_events(session.id, events)
+    return {"recorded": n}

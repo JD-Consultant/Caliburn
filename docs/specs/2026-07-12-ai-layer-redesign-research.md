@@ -55,6 +55,24 @@
     命名對照表、標準 turn 生命週期、UI 事件=event log+state injection(AG-UI/ADK)、
     2026 新模式(write-ahead verifier/成本感知分層驗證);B 段:本引擎與主流同構無重大
     偏差、命名保留+文檔對映、七條可抄優化。
+13. [訪談對話設計](2026-07-12-ai-redesign-raw-interview-conversation-design.md) —— 9 題
+    (提問/追問/覆述/議程/離題/節奏/收尾/AI vs 人實證/受訪者感受)+10 條可操作規則。
+14. [Claude Code/Codex 互動驗證](2026-07-12-ai-redesign-raw-claudecode-codex-interaction.md)
+    —— 兩家官方的提問門檻/審批模式/進度/打斷/收尾/常設指示+11 條可抄清單。
+
+**第五輪(skill 內容原料;2026-07-13)**:
+
+15. [iCAP 全欄位官方標準](2026-07-13-ai-redesign-raw-icap-field-standards.md) —— 《職能基準
+    發展指引》(111.10 版,80 頁)逐欄位逐字核實:級別 1–6 原文+四判定軸、行為指標
+    STAR/ABCD、工作產出句式、功能陳述「動詞+受詞+條件」、**共通技能 S01–S24 與態度
+    A01–A14 官方目錄逐字**(填 0029「官方態度清單入池」縫)、品質認證三構面 9 指標
+    21 要求條件、分析方法四類;誠實列 4 項查不到。
+16. [國際職能框架撰寫標準](2026-07-13-ai-redesign-raw-intl-competency-standards.md) ——
+    O*NET Task Writing Guidelines 全文(Action>Object>Purpose 三段式+禁則)、NOS Quality
+    Criteria(2023)、Bloom 修訂版官方壞動詞清單與 19 可觀察動詞、ESCO「knowledge=
+    名詞化/skill=動作短語」句式、SFIA 四軸逐級措辭、O*NET Work Styles 16 項+ESCO
+    transversal 六類;負面發現:「產出」無獨立國際欄位、duty/task 數量無官方區間;
+    附八欄位原料對照表。
 
 ## 1. 跨線最強共識
 

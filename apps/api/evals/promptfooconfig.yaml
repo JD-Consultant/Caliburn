@@ -1,0 +1,88 @@
+# 訪談引擎 v3 考卷(T11;ADR 0030;實作驗證報告 H3)。
+# 跑法:npm run up(api:8001 起)→ cd apps/api/evals → npx promptfoo eval
+# 佈局:deterministic assertions 先行;llm-rubric(golden/*/rubric.yaml)留 Phase 2。
+description: Caliburn 訪談引擎 v3——單回合斷言+模擬受訪者端到端
+
+prompts:
+  - "{{message}}"
+
+providers:
+  - id: file://provider_turn.py
+    label: interview-engine
+    config:
+      base_url: http://127.0.0.1:8001/api/v1
+      # profile_id 由各 test vars 給(每 persona 一個測試 profile,避免逐字稿互染)
+
+# H3a:Python provider 是 persistent worker;多輪保狀態 → 單 worker
+evaluateOptions:
+  maxConcurrency: 1
+
+tests:
+  # ── 單回合斷言(deterministic) ─────────────────────────────────────────────
+  - description: 有素材回合:顧問一問收尾+結構不變量+Source Score
+    vars:
+      message: 我們每兩週上線前會密集跑兩天回歸,套件三百多條,自動化兩百、手動一百
+      profile_id: "{{env.EVAL_PROFILE_ID}}"
+    assert:
+      - { type: python, value: "file://assertions/deterministic.py:consultant_asks_forward" }
+      - { type: python, value: "file://assertions/deterministic.py:no_position_codes_written" }
+      - { type: python, value: "file://assertions/deterministic.py:doc_structure_intact" }
+      - { type: python, value: "file://assertions/deterministic.py:source_score_min80" }
+
+  # ── 端到端:模擬受訪者(H3c;§6 evals 鎖的四種不合作 persona)────────────────
+  - description: 話少型受訪者(短答,要被追問才展開)
+    provider:
+      id: "promptfoo:simulated-user"
+      config: { maxTurns: 8 }
+    vars:
+      profile_id: "{{env.EVAL_PROFILE_ID_1}}"
+      instructions: |
+        你是話少的資深作業員接受職務說明書訪談。每次只回一句、常說「還好」「差不多」;
+        顧問追問到具體事例才展開一小段真話(自訂一致的事實,不要自相矛盾)。
+    assert:
+      - { type: python, value: "file://assertions/deterministic.py:doc_structure_intact" }
+      - { type: python, value: "file://assertions/deterministic.py:source_score_min80" }
+
+  - description: 跑題型受訪者(愛聊別的,要被溫和拉回)
+    provider:
+      id: "promptfoo:simulated-user"
+      config: { maxTurns: 8 }
+    vars:
+      profile_id: "{{env.EVAL_PROFILE_ID_2}}"
+      instructions: |
+        你是健談的業務,常把話題帶去公司八卦與抱怨;被拉回主題會配合講一點工作內容,
+        兩輪後又跑題。工作事實自訂但保持一致。
+    assert:
+      - { type: python, value: "file://assertions/deterministic.py:doc_structure_intact" }
+      - { type: python, value: "file://assertions/deterministic.py:source_score_min80" }
+
+  - description: 自誇灌水型受訪者(形容詞多、事實少)
+    provider:
+      id: "promptfoo:simulated-user"
+      config: { maxTurns: 8 }
+    vars:
+      profile_id: "{{env.EVAL_PROFILE_ID_3}}"
+      instructions: |
+        你習慣自我吹捧:「這整個部門都靠我」「我一個人扛全部」。被要求講具體事例時
+        才給出普通而真實的細節。引導者不該把你的自誇當事實記錄。
+    assert:
+      - { type: python, value: "file://assertions/deterministic.py:doc_structure_intact" }
+      - { type: python, value: "file://assertions/deterministic.py:source_score_min80" }
+
+  - description: 矛盾型受訪者(前後說法不一,該被澄清)
+    provider:
+      id: "promptfoo:simulated-user"
+      config: { maxTurns: 8 }
+    vars:
+      profile_id: "{{env.EVAL_PROFILE_ID_4}}"
+      instructions: |
+        你先說「每週跑一次盤點」,幾輪後改口「其實一個月才一次」。顧問若指出矛盾,
+        就承認是一個月一次。其他事實自訂並保持一致。
+    assert:
+      - { type: python, value: "file://assertions/deterministic.py:doc_structure_intact" }
+      - { type: python, value: "file://assertions/deterministic.py:source_score_min80" }
+
+# Phase 2(骨架已建,先不啟用):
+# - llm-rubric:golden/<case>/rubric.yaml 逐維度 pointwise-against-reference,
+#   cross-model-family judge、temp=0、負分規則;reference 過 rubric 必須滿分(驗 grader)。
+# - 校準集 100+:TPR/TNR+Cohen's κ 對 SME(維護者)標註。

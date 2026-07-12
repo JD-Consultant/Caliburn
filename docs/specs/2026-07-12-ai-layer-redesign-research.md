@@ -311,10 +311,28 @@ Predicted Outputs(限「編輯既有文件」高重疊場景)· 租戶偏好 DB(
   拆分(Task/Progress)、input guardrail(刻意不做:consultant 唯讀無副作用、門在寫入端)、
   類別級抑制。
 
-### 6.5 待討論
+### 6.5 C″ 對話層(已鎖;來源:對話設計研究 §0-13 + Claude Code/Codex 驗證 §0-14)
 
-C″ 對話層(訪談節奏/議程/深聊收束)、B″ 載體 UI 細節(綠紅標長相/按鈕/streaming)、
-D″ 舊件退場清單、skill 內容撰寫方法。
+- **六條 prompt 規則**(收進 consultant 總則/追問 skill):一 turn 一題禁複合題、短 turn
+  (2–3 句)問完閉嘴、開放題開場→封閉題定錨、追問只在訊號觸發(短/模糊/hedging/矛盾/
+  高價值線索)+laddering 2–3 層即止+**反 under-probe 觸發清單**(實測 AI 該追沒追佔違規
+  88%)、離題三步(承接→有料就記→溫和橋接;連續 2 輪才積極拉回)、顯性覆述只在三時機
+  (核心事實入文件/矛盾澄清/轉題小結),其餘靠**綠字即覆述**+「你剛提到 X…」隱性織入。
+- **四個新設計(進引擎)**:①議程狀態機四狀態(covered/refused/held/**boundary**)——
+  held=好問題時機不對先存待問清單;boundary=受訪者劃線(「這塊不談」)AI 不得自行解除;
+  每輪回答先跑 coverage 分類,命中勾銷絕不重問;②疲勞偵測(確定性:回答長度滑動平均
+  連降+敷衍短語);③收尾=coverage 全勾銷/疲勞/輪數預算三選一先到即收,**必做結構化
+  總結回讀**(指著表格對帳)並與態度收尾 pass 合併;④進度三態清單(pending/in_progress/
+  completed,資料源=ledger)。
+- **三個借鏡(Claude Code/Codex 官方)**:開場議程預覽(=Plan Mode 訪談版,審一次議程
+  之後不逐題徵求)、封閉題用選項 chips+推薦標記+Other(=AskUserQuestion 樣式)、
+  開場透明揭露 AI 身分與產出用途。
+- **記縫**:AI 主動程度旋鈕(授權分級訪談版)、對話 rewind/checkpoint、介面可靠度=
+  一級需求(技術摩擦對滿意度殺傷大於追問品質)。
+
+### 6.6 待討論
+
+B″ 載體 UI 細節(綠紅標長相/按鈕/streaming)、D″ 舊件退場清單、skill 內容撰寫方法。
 
 ## 7. 後續
 

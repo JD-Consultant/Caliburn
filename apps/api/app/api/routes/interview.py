@@ -150,9 +150,33 @@ async def finish_interview(
         raise HTTPException(status_code=409, detail={"code": "no_active_interview"})
 
 
+def _agenda(doc: dict, state: dict) -> list[dict]:
+    """議程三態清單(T9;ADR 0030 §6.5 設計④):資料源=ledger,由 doc 推導不落庫。
+    state:completed(缺口清空)/in_progress(next_gap 落在此)/pending;boundary=劃線不談。"""
+    gap = L.next_gap(doc, state, {})
+    rows: list[dict] = []
+    for _, t, tp in L.iter_tasks(doc):
+        codes = t.get("task_codes") or []
+        name = (codes[0].get("name") if codes else "") or "(未命名任務)"
+        if L.in_boundary(state, tp):
+            st = "boundary"
+        elif not L.task_missing(t, tp, state, set()):
+            st = "completed"
+        elif gap and gap.startswith(tp):
+            st = "in_progress"
+        else:
+            st = "pending"
+        rows.append({"key": tp, "label": name, "state": st})
+    att = ("boundary" if L.in_boundary(state, "ocs_attitude")
+           else "completed" if not L.attitudes_missing(doc)
+           else "in_progress" if gap == "ocs_attitude" else "pending")
+    rows.append({"key": "ocs_attitude", "label": "工作態度", "state": att})
+    return rows
+
+
 @router.get("/{profile_id}/interview")
 async def get_interview(profile_id: UUID, db: AsyncSession = Depends(get_db)):
-    """session 全貌:續談入口 + 顧問稽核視圖(逐字稿/證據/建議歷史)。"""
+    """session 全貌:續談入口 + 顧問稽核視圖(逐字稿/證據/建議歷史)+議程三態。"""
     await _require_profile(profile_id, db)
     repo = InterviewRepo(db)
     session = await repo.latest_session(profile_id)
@@ -162,9 +186,11 @@ async def get_interview(profile_id: UUID, db: AsyncSession = Depends(get_db)):
     evidence = await repo.list_evidence(session.id)
     suggestions = await repo.list_suggestions(session.id)
     draft = await DocRepo(db).latest(profile_id)
+    doc = (draft or {}).get("content") or {}
     return {
         **_session_out(session),
         "pending_count": count_pending(draft or {}),  # _pending 待審筆數(ADR 0030)
+        "agenda": _agenda(doc, dict(session.ledger_state or {})),
         "turns": [{"seq": t.seq, "role": t.role, "text": t.text} for t in turns],
         "evidence": [{"doc_path": e.doc_path, "quote": e.quote, "turn_seq": e.turn_seq,
                       "verified": e.verified, "review": e.review} for e in evidence],

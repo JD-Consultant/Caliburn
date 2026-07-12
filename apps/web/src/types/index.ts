@@ -239,7 +239,10 @@ export interface InterviewProgress { phase: string; coverage: InterviewCoverage 
 export interface InterviewQuestion { text: string; target_path: string | null }
 // widget 判別聯集(0028 D1/D5):choice=舊卡片;open_picker=引擎指令「開哪個 picker、
 // 預填/預勾什麼」——前端開**同一批編輯器 pickers**(同 UI,入口不同)。
-export interface ChoiceWidget { kind?: "choice"; question: string; options: string[]; target_path: string | null }
+export interface ChoiceWidget {
+  kind?: "choice"; question: string; options: string[]; target_path: string | null;
+  recommended?: string | null;   // T9(AskUserQuestion 樣式):推薦選項標記
+}
 export interface PickerPrecheckItem { key: string; name: string; unit: string | null; quote: string }
 export interface OpenPickerWidget {
   kind: "open_picker";
@@ -267,6 +270,10 @@ export interface InterviewTurnResponse {
 export interface InterviewView {
   session_id: string; status: string; phase: string;
   focus: { task_path?: string; skipped?: string[] };
+  pending_count?: number;   // 文件內 _pending 待審筆數(ADR 0030)
+  // T9 議程三態(+boundary 劃線;ledger 推導)
+  agenda?: { key: string; label: string;
+             state: "pending" | "in_progress" | "completed" | "boundary" }[];
   turns: { seq: number; role: "employee" | "consultant"; text: string }[];
   // review(0028 D7):auto/pending/accepted/reverted——文件格追蹤修訂渲染的資料源
   evidence: { doc_path: string; quote: string; turn_seq: number; verified: boolean;

@@ -1,23 +1,19 @@
 "use client";
 
-// 訪談面板(T11;ADR 0020 混合載體:文件常駐、面板在側;ADR 0023 回合制)。
-// 逐字稿以 server 為真相(useInterview view;每回合後 invalidate 重抓)——
-// 面板不自設對話 state,對齊 cache-as-state 心法。結構化決策(ask_choice)用
-// 卡片勾選,開放敘事用自由輸入(上游研究 §8:decision=widget、narrative=對話)。
+// 訪談面板(T9 改造;ADR 0030 §6.5/§6.6):對話(打字機動畫)+議程三態+進度+
+// 「正在整理…」狀態指示。AI 寫入的審閱=表格內 `_pending` ✓/✗(T8)——
+// 側欄只保留待審計數鈕(點擊捲動到表格工具列);SuggestionReview 掛點已拆(T12 刪檔)。
+// 逐字稿以 server 為真相(useInterview view;每回合後 invalidate 重抓)。
 import { useEffect, useRef, useState } from "react";
-import { ChevronDown, ChevronUp, Loader2, MessageCircle, Send } from "lucide-react";
+import { Loader2, MessageCircle, Send } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { SuggestionReview } from "@/components/interview/SuggestionReview";
-import {
-  useInterview,
-  useInterviewTurn,
-  useReviewInterview,
-  useStartInterview,
-} from "@/hooks/useInterview";
-import { applyAccepted } from "@/lib/interviewDoc";
+import { AgendaList } from "@/components/interview/AgendaList";
+import { useInterview, useInterviewTurn, useStartInterview } from "@/hooks/useInterview";
+import { chipOptions, hasMaterial, typewriterDone, typewriterSlice } from "@/lib/interviewUi";
+import { listPending } from "@/lib/ocsDoc";
 import type { ChoiceWidget, InterviewProgress, OcsDocument, OpenPickerWidget } from "@/types";
 
 const PHASE_LABEL: Record<string, string> = {
@@ -45,49 +41,86 @@ function ProgressHeader({ progress }: { progress: InterviewProgress | null }) {
   );
 }
 
-function ChoiceCard({ widget, onSubmit, busy }: {
-  widget: ChoiceWidget; onSubmit: (text: string) => void; busy: boolean;
-}) {
-  const [picked, setPicked] = useState<string[]>([]);
+// 打字機泡泡(§6.6 呈現節奏):前端逐字顯示已回全文(體感字元級 streaming,
+// 零後端改動;真 SSE 記縫)。點擊即全顯。
+function TypewriterBubble({ text }: { text: string }) {
+  const [tick, setTick] = useState(0);
+  const done = typewriterDone(text, tick);
+  useEffect(() => {
+    if (done) return;
+    const id = setInterval(() => setTick((t) => t + 1), 30);
+    return () => clearInterval(id);
+  }, [done]);
   return (
-    <div className="rounded-md border bg-muted/40 p-3 text-sm">
-      <p className="mb-2">{widget.question}</p>
-      <div className="flex flex-wrap gap-2">
-        {widget.options.map((o) => (
-          <Badge
-            key={o}
-            variant={picked.includes(o) ? "default" : "outline"}
-            className="cursor-pointer select-none"
-            onClick={() =>
-              setPicked((p) => (p.includes(o) ? p.filter((x) => x !== o) : [...p, o]))}
-          >
-            {o}
-          </Badge>
-        ))}
-      </div>
-      <Button
-        size="sm" className="mt-2" disabled={busy || picked.length === 0}
-        onClick={() => onSubmit(`我選:${picked.join("、")}`)}
-      >
-        送出選擇
-      </Button>
+    <div
+      className="mr-6 cursor-pointer whitespace-pre-line rounded-md bg-muted/40 p-2"
+      title={done ? undefined : "點擊顯示全文"}
+      onClick={() => setTick(Math.ceil(text.length))}
+    >
+      {typewriterSlice(text, tick)}
+      {!done ? <span className="animate-pulse">▍</span> : null}
     </div>
   );
 }
 
-export function InterviewPanel({ profileId, doc, onApplyDoc, onWidget }: {
+// 封閉題卡(AskUserQuestion 樣式):單選 chips+推薦標記+永遠附「其他(自由輸入)」;
+function ChoiceCard({ widget, onSubmit, busy }: {
+  widget: ChoiceWidget; onSubmit: (text: string) => void; busy: boolean;
+}) {
+  const [other, setOther] = useState("");
+  const chips = chipOptions(widget.options, widget.recommended);
+  return (
+    <div className="rounded-md border bg-muted/40 p-3 text-sm">
+      <p className="mb-2">{widget.question}</p>
+      <div className="flex flex-wrap gap-2">
+        {chips.map((c) => (
+          <Badge
+            key={c.label}
+            variant="outline"
+            className={"cursor-pointer select-none hover:bg-muted "
+              + (busy ? "pointer-events-none opacity-50" : "")}
+            onClick={() => onSubmit(c.label)}
+          >
+            {c.label}
+            {c.recommended ? (
+              <span className="ml-1 rounded bg-emerald-100 px-1 text-[9px] text-emerald-700">推薦</span>
+            ) : null}
+          </Badge>
+        ))}
+      </div>
+      <form
+        className="mt-2 flex gap-2"
+        onSubmit={(e) => { e.preventDefault(); if (other.trim()) onSubmit(other.trim()); }}
+      >
+        <input
+          className="flex-1 rounded-md border bg-background px-2 py-1 text-xs"
+          placeholder="其他(自由輸入)…"
+          value={other}
+          onChange={(e) => setOther(e.target.value)}
+          disabled={busy}
+        />
+        <Button type="submit" size="sm" variant="outline" disabled={busy || !other.trim()}>
+          送出
+        </Button>
+      </form>
+    </div>
+  );
+}
+
+export function InterviewPanel({ profileId, doc, onWidget }: {
   profileId: string;
-  doc?: OcsDocument;                     // 套用建議用(頁面的即時文件)
-  onApplyDoc?: (next: OcsDocument) => void;   // = 頁面 persist(走 autosave PATCH)
+  doc?: OcsDocument;                          // 待審計數(文件內 _pending)資料源
   onWidget?: (w: OpenPickerWidget) => void;   // 0028:引擎 widget 指令 → 頁面開對應 picker
 }) {
   const view = useInterview(profileId);
   const start = useStartInterview(profileId);
   const turn = useInterviewTurn(profileId);
-  const review = useReviewInterview(profileId);
   const [input, setInput] = useState("");
-  const [showReview, setShowReview] = useState(false);
+  const [lastSent, setLastSent] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
+  // 打字機只給「送出後新到的」顧問回合(基準線在 send 事件設定);
+  // 歷史逐字稿與重載直接全顯,不重播動畫。
+  const [animateAfter, setAnimateAfter] = useState<number | null>(null);
 
   const turns = view.data?.turns ?? [];
   const progress: InterviewProgress | null =
@@ -104,9 +137,9 @@ export function InterviewPanel({ profileId, doc, onApplyDoc, onWidget }: {
     const t = text.trim();
     if (!t || busy) return;
     setInput("");
+    setLastSent(t);
+    setAnimateAfter(turns.length > 0 ? turns[turns.length - 1].seq : 0);
     // 0028 D1(§16.18):open_picker 指令=**事件**,在 mutation onSuccess 派發一次。
-    // 反例=存進 state 用 effect 派發:turn.data 回合後常駐+onWidget 每 render 新身分
-    // → 頁面任何重渲染都重派發 → 關不掉的重彈迴圈(真人實測抓到)。
     turn.mutate(t, {
       onSuccess: (res) => {
         const w = res.widget;
@@ -137,41 +170,36 @@ export function InterviewPanel({ profileId, doc, onApplyDoc, onWidget }: {
     );
   }
 
-  // 批審(ADR 0025 節點批審):轉狀態 → 前端 applyAccepted(含 add_task/add_duty 落地)
-  // → 頁面 persist(既有寫入路徑)。renumber 由 ocsDoc 處理(前端職權)。
-  const decide = (accept: string[], reject: string[]) => {
-    review.mutate({ accept, reject }, {
-      onSuccess: (res) => {
-        if (!doc || !onApplyDoc || res.accepted.length === 0) return;
-        const out = applyAccepted(doc, res.accepted);
-        if (out.applied.length > 0) onApplyDoc(out.doc);
-      },
-    });
-  };
-
-  const pendingCount =
-    view.data?.suggestions?.filter((s) => s.status === "pending").length ?? 0;
+  // T8/T9:待審=文件內 _pending;計數鈕捲動定位到表格工具列(建議層已拆)。
+  const pendingCount = doc ? listPending(doc).length : 0;
 
   return (
     <div className="flex h-full flex-col">
       <ProgressHeader progress={progress} />
+      <AgendaList items={view.data?.agenda ?? []} />
       <div className="flex-1 space-y-3 overflow-y-auto p-3 text-sm">
         {turns.length === 0 && start.data && (
-          <p className="rounded-md bg-muted/40 p-2">{start.data.greeting}</p>
+          <p className="rounded-md bg-muted/40 p-2 whitespace-pre-line">{start.data.greeting}</p>
         )}
-        {turns.map((t) => (
-          <div
-            key={t.seq}
-            className={t.role === "employee"
-              ? "ml-6 rounded-md bg-primary/10 p-2"
-              : "mr-6 rounded-md bg-muted/40 p-2 whitespace-pre-line"}
-          >
-            {t.text}
-          </div>
-        ))}
+        {turns.map((t) =>
+          t.role === "employee" ? (
+            <div key={t.seq} className="ml-6 rounded-md bg-primary/10 p-2">{t.text}</div>
+          ) : t.seq > (animateAfter ?? Number.POSITIVE_INFINITY) ? (
+            <TypewriterBubble key={t.seq} text={t.text} />
+          ) : (
+            <div key={t.seq} className="mr-6 whitespace-pre-line rounded-md bg-muted/40 p-2">
+              {t.text}
+            </div>
+          ),
+        )}
         {busy && (
-          <div className="mr-6 flex items-center gap-2 p-2 text-muted-foreground">
-            <Loader2 className="h-3.5 w-3.5 animate-spin" /> 顧問思考中…
+          <div className="mr-6 space-y-1 p-2 text-muted-foreground">
+            <div className="flex items-center gap-2">
+              <Loader2 className="h-3.5 w-3.5 animate-spin" /> 顧問思考中…
+            </div>
+            {hasMaterial(lastSent) ? (
+              <div className="pl-5 text-xs">正在整理你剛說的內容…</div>
+            ) : null}
           </div>
         )}
         {widget && widget.kind !== "open_picker" && !busy && (
@@ -182,31 +210,18 @@ export function InterviewPanel({ profileId, doc, onApplyDoc, onWidget }: {
         )}
         <div ref={bottomRef} />
       </div>
-      {/* 0028 D5/D7 載體修正:待審清單原在滾動串**頂端**、對話自動捲到底 → 清單一長
-          就被推出視線(真人實測「要拉到最上面才看得到」)。改**底部常駐計數鈕**
-          (輸入框上、決策當下視線內),點開才展開。 */}
+      {/* 待審計數(決策在表格內 ✓✗;此鈕只做捲動定位到工具列) */}
       {pendingCount > 0 ? (
         <div className="border-t">
           <button
             type="button"
-            onClick={() => setShowReview((v) => !v)}
-            className="flex w-full items-center justify-between px-3 py-2 text-sm hover:bg-muted/50"
+            onClick={() => window.document.getElementById("ai-pending-bar")
+              ?.scrollIntoView({ behavior: "smooth", block: "center" })}
+            className="flex w-full items-center gap-2 px-3 py-2 text-sm hover:bg-muted/50"
           >
-            <span className="flex items-center gap-2">
-              <Badge variant="secondary">{pendingCount}</Badge>
-              項 AI 建議待審
-            </span>
-            {showReview ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
+            <Badge variant="secondary">{pendingCount}</Badge>
+            筆 AI 待審(綠字)——點我到表格逐筆 ✓/✗
           </button>
-          {showReview ? (
-            <div className="max-h-64 overflow-y-auto border-t p-3">
-              <SuggestionReview
-                suggestions={view.data?.suggestions ?? []}
-                busy={review.isPending}
-                onDecide={decide}
-              />
-            </div>
-          ) : null}
         </div>
       ) : null}
       <div className="border-t">

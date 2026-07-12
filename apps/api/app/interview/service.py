@@ -32,6 +32,10 @@ class NoActiveInterview(Exception):
     """無 active session(route 轉 409/404)。"""
 
 
+# 收尾三訊號之三:輪數預算(§6.5 設計③;coverage 全綠/疲勞/預算,先到即建議收尾)
+TURN_BUDGET = 40
+
+
 @dataclass
 class TurnResult:
     say: str = ""
@@ -43,6 +47,7 @@ class TurnResult:
     focus: dict = field(default_factory=dict)
     guard_log: list[str] = field(default_factory=list)
     coverage: dict = field(default_factory=dict)   # {filled,required}(進度=覆蓋率)
+    suggest_finish: bool = False                   # T10 三訊號任一成立(不強制)
 
 
 def _pending_label(s) -> str:
@@ -219,9 +224,14 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> T
             state = L.push_held(state, q, emp_turn.seq)
         state["backstop_last_seq"] = emp_turn.seq
 
-    # ④′ 帳本收帳:上一輪 gap 進帳評定(飽和偵測)+ 疲勞訊號(收尾三訊號之一,T10 用)
+    # ④′ 帳本收帳:上一輪 gap 進帳評定(飽和偵測)+ 疲勞訊號
     state = L.note_attempt(state, state.get("last_gap"), scribe_res.progressed)
     state["fatigued"] = L.is_fatigued([t for _, t in sorted(turns_map.items())])
+
+    # ④″ 收尾三訊號(T10;任一成立→建議收尾,不強制):coverage 全綠/疲勞/輪數預算
+    ok_finish, _ = L.can_finish(work_doc, state, {})
+    suggest_finish = bool(ok_finish or state.get("fatigued")
+                          or len(employee_texts) >= TURN_BUDGET)
 
     # ③½ occupation widget(0028 D1 + D8 P2 統一):顧問本回合搜過職類且 **top-1 不在
     #    現有 codes** → 開 picker 預填該搜尋詞。涵蓋開場(codes 空)與中途加選
@@ -262,7 +272,8 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> T
                       pending_suggestions=len(pending),
                       phase=L.derive_phase(work_doc, state),
                       focus=dict(session.focus or {}), guard_log=guard,
-                      coverage=L.coverage(work_doc, state))
+                      coverage=L.coverage(work_doc, state),
+                      suggest_finish=suggest_finish)
 
 
 async def run_curation(profile_id: UUID, *, db, llm, knowledge) -> dict:
@@ -295,24 +306,67 @@ async def run_curation(profile_id: UUID, *, db, llm, knowledge) -> dict:
     return {"precheck": precheck}
 
 
+def _finish_summary(doc: dict, accepted_paths: list[str]) -> dict:
+    """結構化總結回讀(T10;§6.5 設計③):本場寫入清單=文件 `_pending`(綠字未審)
+    ∪已 accept 事件;按任務條列,指著表格對帳。純函式,零 LLM。"""
+    view = document_view(doc)
+    lines: list[str] = []
+    n_pending = 0
+    kind_label = {"outputs": "產出", "indicators": "指標", "knowledge": "知識",
+                  "skills": "技能"}
+    for row in view["tasks"]:
+        for p in (row.get("pending_items") or []):
+            n_pending += 1
+            k = p["kind"]
+            label = kind_label.get(k, SLOT_DEFS[k.split(".")[-1]].label
+                                   if k.startswith("details.")
+                                   and k.split(".")[-1] in SLOT_DEFS else k)
+            lines.append(f"「{row['task']}」{label}:{p.get('value') or ''}(待審)")
+        if row.get("status") != "confirmed":
+            n_pending += 1
+            lines.append(f"任務「{row['task']}」(待審)")
+    for a in view["attitudes"]:
+        if a.get("status") != "confirmed":
+            n_pending += 1
+            lines.append(f"態度「{a.get('value') or ''}」(待審)")
+    for slot, info in (view.get("header_pending") or {}).items():
+        n_pending += 1
+        lines.append(f"表頭 {slot}:{info.get('proposed') or ''}(待審)")
+    return {"lines": lines, "pending_count": n_pending,
+            "accepted_count": len(accepted_paths)}
+
+
+def _quote_turn(quote: str, turns_map: dict[int, str]) -> int:
+    """quote 所在回合(verify 同款正規化;attitudes_pass 已驗過,必有解;保底 0)。"""
+    from app.interview.verify import normalize
+    q = normalize(quote)
+    for seq, text in sorted(turns_map.items()):
+        if q and q in normalize(text):
+            return seq
+    return 0
+
+
 async def run_finish(profile_id: UUID, *, db, llm, knowledge) -> dict:
-    """收尾(0027 backstop + 0028 D3 態度收尾 pass)→ 建議化 → phase=review。
-    fail-open:llm 缺仍可收尾(只是不複查/不編態度);knowledge 掛 → 略過態度。"""
+    """收尾對帳(T10;ADR 0030):態度收尾 pass 走 **op→verify→`_pending`**(態度綠標,
+    與書記同軌;建議層退場)→ 結構化總結回讀 → phase=review。
+    fail-open:llm 缺仍可收尾(不編態度);knowledge 掛 → 略過態度。"""
     repo = InterviewRepo(db)
+    doc_repo = DocRepo(db)
     session = await repo.get_active(profile_id)
     if session is None:
         raise NoActiveInterview(str(profile_id))
-    latest = await DocRepo(db).latest(profile_id)
+    latest = await doc_repo.latest(profile_id)
     doc = (latest or {}).get("content") or {}
     state = session.ledger_state or {}
     _, blockers = L.can_finish(doc, state, {})
-    # v3(ADR 0030 T5):LLM 收尾複查退場——撿漏由每 N 回合的確定性 backstop sweep
-    # 承擔(§6.4 禁令:backstop 禁 LLM 化);收尾對帳流程在 T10 重寫。
+    guard: list[str] = []
 
     if llm is not None:
         turns = await repo.list_turns(session.id)
-        emp = [t.text for t in turns if t.role == "employee"]
-        # 態度收尾整體編碼(0028 D3;取代書記逐回合池通道)
+        emp_rows = [(t.seq, t.text) for t in turns if t.role == "employee"]
+        emp = [t for _, t in emp_rows]
+        turns_map = dict(emp_rows)
+        # 態度收尾整體編碼(0028 D3;一呼、跨故事主題編碼)
         try:
             pools, pool_items = await build_pool_inputs(knowledge, doc)
         except Exception as exc:  # noqa: BLE001
@@ -323,12 +377,36 @@ async def run_finish(profile_id: UUID, *, db, llm, knowledge) -> dict:
         att = await attitudes_pass(llm, pool=pools.get("attitudes") or [],
                                    pool_items=pool_items, employee_texts=emp,
                                    existing=existing)
-        for sug in att.to_suggestions():
-            await repo.add_suggestion(session.id, doc_path=sug["doc_path"],
-                                      old_value=sug["old_value"], new_value=sug["new_value"],
-                                      reason=sug["reason"], turn_seq=len(turns))
+        guard.extend(att.guard_log)
+        if att.proposals:
+            import copy
+            base = copy.deepcopy(doc)
+            base.setdefault("ocs_attitude", {}).setdefault("attitudes", [])
+            ops = [{"target_path": "ocs_attitude.attitudes", "op": "add",
+                    "value": p["name"],
+                    "src": {"ref_urn": p["pool_id"],
+                            "quote": {"turn_id": _quote_turn(p["quote"], turns_map),
+                                      "text": p["quote"]}}}
+                   for p in att.proposals]
+            new_doc, land_guard, landed = land_ops(
+                ops, doc=base, turns=turns_map, ref_codes=set(pool_items),
+                header_codes=set(), pool_items=pool_items)
+            guard.extend(land_guard)
+            if new_doc is not None and landed:
+                try:
+                    await doc_repo.upsert_draft(
+                        profile_id, new_doc,
+                        expected_version=(latest or {}).get("version"),
+                        expected_revision=(latest or {}).get("revision"))
+                    doc = new_doc
+                except DocConflictError:
+                    guard.append("conflict:態度落地放棄(人的編輯優先)")
 
+    accepted = [e.doc_path for e in
+                await repo.list_review_events(session.id, decision="accepted")]
+    summary = _finish_summary(doc, accepted)
     await repo.update_session(session.id, phase="review")
     pending = await repo.list_pending(session.id)
     return {"phase": "review", "blockers": len(blockers),
-            "pending_suggestions": len(pending)}
+            "pending_suggestions": len(pending),
+            "summary": summary, "guard_log": guard[:30]}

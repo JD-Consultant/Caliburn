@@ -251,8 +251,12 @@ async def test_finish_runs_attitudes_pass(db_session):
 
     out = await run_finish(p.id, db=db_session, llm=StubLlm(select_result=sel),
                            knowledge=StubKnowledge())
+    # T10(ADR 0030):態度收尾走 op→verify→`_pending`(綠標落文件),不再建議化
     assert out["phase"] == "review"
-    sugs = await repo.list_suggestions(s.id)
-    att = [x for x in sugs if x.doc_path == "ocs_attitude.attitudes"]
-    assert len(att) == 1 and att[0].new_value["code"] == "A01"
-    assert "回歸沒跑完" in att[0].reason                        # 引文入 reason
+    atts = ((await DocRepo(db_session).latest(p.id))["content"]
+            .get("ocs_attitude", {}).get("attitudes", []))
+    assert atts and atts[-1]["code"] == "A01"
+    assert atts[-1]["_pending"]["op"] == "add"                 # 綠標,✓ 才轉已確認
+    assert atts[-1]["_pending"]["src"]["quote"]["text"] == "回歸沒跑完我絕不放行"
+    assert await repo.list_suggestions(s.id) == []             # 建議層退場
+    assert any("細心負責" in ln for ln in out["summary"]["lines"])

@@ -11,7 +11,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { AgendaList } from "@/components/interview/AgendaList";
-import { useInterview, useInterviewTurn, useStartInterview } from "@/hooks/useInterview";
+import {
+  useFinishInterview, useInterview, useInterviewTurn, useStartInterview,
+} from "@/hooks/useInterview";
 import { chipOptions, hasMaterial, typewriterDone, typewriterSlice } from "@/lib/interviewUi";
 import { listPending } from "@/lib/ocsDoc";
 import type { ChoiceWidget, InterviewProgress, OcsDocument, OpenPickerWidget } from "@/types";
@@ -115,8 +117,10 @@ export function InterviewPanel({ profileId, doc, onWidget }: {
   const view = useInterview(profileId);
   const start = useStartInterview(profileId);
   const turn = useInterviewTurn(profileId);
+  const finish = useFinishInterview(profileId);
   const [input, setInput] = useState("");
   const [lastSent, setLastSent] = useState("");
+  const [finishDismissed, setFinishDismissed] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   // 打字機只給「送出後新到的」顧問回合(基準線在 send 事件設定);
   // 歷史逐字稿與重載直接全顯,不重播動畫。
@@ -205,6 +209,33 @@ export function InterviewPanel({ profileId, doc, onWidget }: {
         {widget && widget.kind !== "open_picker" && !busy && (
           <ChoiceCard widget={widget} onSubmit={send} busy={busy} />
         )}
+        {/* T10 收尾三訊號 → 建議收尾(不強制;coverage 全綠/疲勞/輪數預算任一) */}
+        {turn.data?.suggest_finish && !finish.data && !busy ? (
+          <div className="rounded-md border border-emerald-200 bg-emerald-50/50 p-3 text-sm">
+            <p className="mb-2 text-emerald-800">差不多了——要不要進入收尾對帳?我會把這場記到的內容唸一遍給你核對。</p>
+            <Button size="sm" onClick={() => finish.mutate()} disabled={finish.isPending}>
+              {finish.isPending && <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />}
+              進入收尾對帳
+            </Button>
+          </div>
+        ) : null}
+        {/* 收尾卡(§6.5 設計③):結構化總結回讀,指著表格對帳;可補充/更正(回 run_turn) */}
+        {finish.data?.summary && !finishDismissed ? (
+          <div className="rounded-md border bg-muted/40 p-3 text-sm">
+            <p className="mb-1 font-medium">收尾對帳——這場我記下了:</p>
+            <ul className="mb-2 list-disc space-y-0.5 pl-5 text-xs">
+              {finish.data.summary.lines.map((ln, i) => <li key={i}>{ln}</li>)}
+              {finish.data.summary.lines.length === 0 ? <li>(本場無新增紀錄)</li> : null}
+            </ul>
+            <p className="mb-2 text-xs text-muted-foreground">
+              其中 {finish.data.summary.pending_count} 筆綠字未審——到表格逐筆 ✓/✗,或用上方「接受全部」。
+              有要補充或更正的,直接打在下面輸入框。
+            </p>
+            <Button size="sm" variant="outline" onClick={() => setFinishDismissed(true)}>
+              完成
+            </Button>
+          </div>
+        ) : null}
         {turn.isError && (
           <p className="text-xs text-destructive">這回合出了點問題,再送一次即可。</p>
         )}

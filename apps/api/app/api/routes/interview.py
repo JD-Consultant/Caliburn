@@ -115,7 +115,8 @@ async def interview_turn(
     # 進度=覆蓋率(spec §11.1;帳本 filled/required),取代 v1 task_index/total
     return {"say": out.say, "question": out.question, "widget": out.widget,
             "doc_changed": out.doc_changed, "pending_suggestions": out.pending_suggestions,
-            "progress": {"phase": out.phase, "coverage": out.coverage}}
+            "progress": {"phase": out.phase, "coverage": out.coverage},
+            "suggest_finish": out.suggest_finish}   # T10 三訊號(側欄顯示收尾鈕,不強制)
 
 
 @router.post("/{profile_id}/interview:curation")
@@ -141,8 +142,8 @@ async def finish_interview(
     llm: LlmPort | None = Depends(get_llm),
     knowledge: KnowledgePort = Depends(get_knowledge),
 ):
-    """收尾:backstop 複查 + 態度收尾 pass(0028 D3)→ 建議化 → 轉 review。
-    編排在 service.run_finish(use-case 層);兩個 pass 皆加分項,fail-open。"""
+    """收尾對帳(T10):態度收尾 pass 走 op→verify→`_pending` + 結構化總結回讀
+    → 轉 review。編排在 service.run_finish(use-case 層);fail-open。"""
     await _require_profile(profile_id, db)
     try:
         return await run_finish(profile_id, db=db, llm=llm, knowledge=knowledge)

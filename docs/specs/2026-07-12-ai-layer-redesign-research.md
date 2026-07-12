@@ -342,9 +342,23 @@ Predicted Outputs(限「編輯既有文件」高重疊場景)· 租戶偏好 DB(
 - **未清不擋事**:pending 隨存檔/重開完整保留;**匯出=自動剝掉未審項**(成品只含已確認),
   匯出鈕提示「還有 N 筆待審」可選先清完。
 
-### 6.7 待討論
+### 6.7 D″ 舊件退場清單(已鎖)
 
-D″ 舊件退場清單、skill 內容撰寫方法。
+- **後端退役**:`app/authoring/` 整包(tracing.py 先搬成 api 橫切層再刪)、
+  `copilotkit_live_app.py`(run_live 改直跑 app_factory)、test_copilotkit_live_app.py;
+  test_app_wiring.py 改斷言新入口。
+- **前端退役**:CopilotKit 全家(route.ts/Providers wiring/InterruptHandlers/頁面引用/
+  npm 依賴)、CurationDialog(檢查表職能歸議程狀態機)、SuggestionReview、
+  reviewMap+D7 徽章(被 `_pending` 取代)。
+- **保留改造**:`app/interview/`(五改處)、InterviewPanel(對話+議程三態+進度+狀態指示);
+  深聊 chips 概念併入新側欄。**保留不動**:`/ai/*`(read-only 純函數)、0029 編輯器全套。
+- **待查**:`documents/[id]/intake/` 頁(純 CopilotKit 入口→退役;有活功能→拆遷)。
+- **退場紀律**:新載體先上舊件後拆、文件功能測試保留當網、拆時全綠才 commit、
+  docs/design 同 commit 更新。
+
+### 6.8 待討論
+
+skill 內容撰寫方法(格式/清單/撰寫原則/維護閉環)。
 
 ## 7. 後續
 

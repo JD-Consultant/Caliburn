@@ -42,6 +42,20 @@
    prompt 版本化+CI 回歸、prompt injection 架構防禦、VLM 文件解析、語意快取、降延遲、
    OpenRouter 容錯、記憶/個人化;每項含判定。
 
+**第四輪(設計細節定案;逐題深挖)**:
+
+10. [evals/裁判設計深挖](2026-07-12-ai-redesign-raw-evals-design.md) —— rubric 二元化+負分、
+    judge 工程(CoT 後丟棄/pointwise-against-reference/temp=0)、校準(TPR/TNR+κ、
+    grade-then-refine)、偏誤對策表、考題數量門檻、模擬受訪者防坑、meta-eval、
+    五大失敗模式;附可抄 rubric YAML 與 judge prompt 骨架。
+11. [審閱事件語意](2026-07-12-ai-redesign-raw-review-event-semantics.md) —— 逐產品查
+    accept/reject 之後的行為:文件寫作類全為無聲 UI;Claude Agent SDK 的 deny-message
+    是唯一官方 in-session 回饋先例;Grammarly 分層抑制;HAX G9/G15 主張記帳後用。
+12. [agent 命名與管線健檢](2026-07-12-ai-redesign-raw-agent-naming-pipeline.md) —— 各家組件
+    命名對照表、標準 turn 生命週期、UI 事件=event log+state injection(AG-UI/ADK)、
+    2026 新模式(write-ahead verifier/成本感知分層驗證);B 段:本引擎與主流同構無重大
+    偏差、命名保留+文檔對映、七條可抄優化。
+
 ## 1. 跨線最強共識
 
 ### 1.1 共編載體:直寫 + 修訂標記 + accept/reject(產業四家收斂)

@@ -37,7 +37,7 @@ class Op(Enum):
 
 class PendingMark(BaseModel):
     """
-    追蹤修訂標記(ADR 0030):AI 寫入一律以 pending 落文件,✓=去標、✗=還原;匯出/定稿由 _strip_underscore 剝除。mod 必帶 prev(舊值)。
+    追蹤修訂標記(ADR 0030):AI 寫入一律以 pending 落文件,✓=去標、✗=還原;匯出/定稿由 _strip_underscore 剝除。mod 必帶 prev(舊值)。value 僅「延遲生效」欄位用(表頭主基準:欄位不動、提案值放標記,✓ 才寫入+觸發重算)。
     """
 
     model_config = ConfigDict(
@@ -47,6 +47,7 @@ class PendingMark(BaseModel):
     by: Literal['ai']
     turn_id: int
     prev: Any | None = None
+    value: Any | None = None
     src: PendingSrc | None = None
 
 
@@ -137,18 +138,34 @@ class OcsProfile(BaseModel):
     )
 
 
+class FieldPending1(BaseModel):
+    """
+    區塊 scalar 欄的修訂標記集合(ADR 0030;目前僅 competency_level)。
+    """
+
+    model_config = ConfigDict(
+        extra='allow',
+    )
+    competency_level: PendingMark | None = None
+
+
 class CompetencyBlock(BaseModel):
     model_config = ConfigDict(
         extra='allow',
     )
     competency_level: conint(ge=1, le=5) | None = None
+    field_pending: FieldPending1 | None = Field(
+        None,
+        alias='_pending',
+        description='區塊 scalar 欄的修訂標記集合(ADR 0030;目前僅 competency_level)。',
+    )
     indicators: list[CodeText] | None = Field([], validate_default=True)
     outputs: list[CodeName] | None = Field([], validate_default=True)
     knowledge: list[CodeName] | None = Field([], validate_default=True)
     skills: list[CodeName] | None = Field([], validate_default=True)
 
 
-class FieldPending1(BaseModel):
+class FieldPending2(BaseModel):
     """
     細項 scalar 槽的修訂標記集合(槽名→PendingMark;ADR 0030)。
     """
@@ -188,7 +205,7 @@ class TaskDetails(BaseModel):
     wait_points: str | None = None
     exceptions: str | None = None
     standards: str | None = None
-    field_pending: FieldPending1 | None = Field(
+    field_pending: FieldPending2 | None = Field(
         None,
         alias='_pending',
         description='細項 scalar 槽的修訂標記集合(槽名→PendingMark;ADR 0030)。',

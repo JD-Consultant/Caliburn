@@ -55,14 +55,17 @@ async def _run(db, text, *, select_result, human_touched=None, chat_text=None):
 
 
 @pytest.mark.asyncio
-async def test_scribe_writes_slot_and_consultant_replies(db_session):
+async def test_scribe_lands_slot_as_pending_and_consultant_replies(db_session):
+    """v3(ADR 0030):寫入=值上綠字+集合式 _pending(prev/src),不再有 evidence 路。"""
     p, s, repo, out, _ = await _run(db_session, "我們每兩週跑一次回歸", select_result=SCRIBE_SLOT)
     assert out.doc_changed is True
     latest = await DocRepo(db_session).latest(p.id)
     task = latest["content"]["ocs_content"]["ocu_units"][0]["tasks"][0]
     assert task["details"]["frequency"] == "每雙週"
-    ev = await repo.list_evidence(s.id)
-    assert len(ev) == 1 and ev[0].verified is True and ev[0].review == "pending"   # 直寫標 pending
+    mark = task["details"]["_pending"]["frequency"]
+    assert mark["op"] == "mod" and mark["by"] == "ai"
+    assert mark["src"]["quote"]["text"] == "每兩週跑一次"
+    assert await repo.list_evidence(s.id) == []                    # 溯源住 _pending,不再落表
     turns = await repo.list_turns(s.id)
     assert [t.role for t in turns] == ["employee", "consultant"]
     assert out.say and turns[1].text == out.say                    # 顧問回覆落逐字稿
@@ -72,12 +75,15 @@ async def test_scribe_writes_slot_and_consultant_replies(db_session):
 
 
 @pytest.mark.asyncio
-async def test_human_touched_routes_to_suggestion(db_session):
+async def test_human_touched_no_longer_diverts_pending_is_universal(db_session):
+    """v3:AI 可對任何內容(含人碰過的)發**提議**;唯一禁令=無聲改。
+    pending 本身就是提議載體 → human_touched 不再分流建議表。"""
     p, s, repo, out, _ = await _run(db_session, "每兩週跑一次",
                                     select_result=SCRIBE_SLOT, human_touched=[FREQ])
-    assert out.doc_changed is False and out.pending_suggestions == 1
+    assert out.doc_changed is True and out.pending_suggestions == 0
     latest = await DocRepo(db_session).latest(p.id)
-    assert "details" not in latest["content"]["ocs_content"]["ocu_units"][0]["tasks"][0]
+    details = latest["content"]["ocs_content"]["ocu_units"][0]["tasks"][0]["details"]
+    assert details["frequency"] == "每雙週" and details["_pending"]["frequency"]["op"] == "mod"
 
 
 @pytest.mark.asyncio

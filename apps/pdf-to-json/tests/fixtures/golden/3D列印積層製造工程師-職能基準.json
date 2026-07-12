@@ -68,6 +68,7 @@
             "competency_blocks": [
               {
                 "competency_level": 4,
+                "field_pending": null,
                 "indicators": [
                   {
                     "code": "P1.1.1",
@@ -142,6 +143,7 @@
             "competency_blocks": [
               {
                 "competency_level": 3,
+                "field_pending": null,
                 "indicators": [
                   {
                     "code": "P1.2.1",
@@ -221,6 +223,7 @@
             "competency_blocks": [
               {
                 "competency_level": 3,
+                "field_pending": null,
                 "indicators": [
                   {
                     "code": "P1.3.1",
@@ -282,6 +285,7 @@
             "competency_blocks": [
               {
                 "competency_level": 4,
+                "field_pending": null,
                 "indicators": [
                   {
                     "code": "P2.1.1",
@@ -326,6 +330,7 @@
             "competency_blocks": [
               {
                 "competency_level": 3,
+                "field_pending": null,
                 "indicators": [
                   {
                     "code": "P2.2.1",
@@ -382,6 +387,7 @@
             "competency_blocks": [
               {
                 "competency_level": 3,
+                "field_pending": null,
                 "indicators": [
                   {
                     "code": "P3.1.1",
@@ -436,6 +442,7 @@
             "competency_blocks": [
               {
                 "competency_level": 3,
+                "field_pending": null,
                 "indicators": [
                   {
                     "code": "P3.2.1",
@@ -507,6 +514,7 @@
             "competency_blocks": [
               {
                 "competency_level": 3,
+                "field_pending": null,
                 "indicators": [
                   {
                     "code": "P4.1.1",
@@ -576,6 +584,7 @@
             "competency_blocks": [
               {
                 "competency_level": 4,
+                "field_pending": null,
                 "indicators": [
                   {
                     "code": "P4.2.1",
@@ -631,6 +640,7 @@
             "competency_blocks": [
               {
                 "competency_level": 3,
+                "field_pending": null,
                 "indicators": [
                   {
                     "code": "P5.1.1",
@@ -695,6 +705,7 @@
             "competency_blocks": [
               {
                 "competency_level": 3,
+                "field_pending": null,
                 "indicators": [
                   {
                     "code": "P5.2.1",

@@ -37,13 +37,14 @@
     "PendingMark": {
       "type": "object",
       "additionalProperties": true,
-      "description": "追蹤修訂標記(ADR 0030):AI 寫入一律以 pending 落文件,✓=去標、✗=還原;匯出/定稿由 _strip_underscore 剝除。mod 必帶 prev(舊值)。",
+      "description": "追蹤修訂標記(ADR 0030):AI 寫入一律以 pending 落文件,✓=去標、✗=還原;匯出/定稿由 _strip_underscore 剝除。mod 必帶 prev(舊值)。value 僅「延遲生效」欄位用(表頭主基準:欄位不動、提案值放標記,✓ 才寫入+觸發重算)。",
       "required": ["op", "by", "turn_id"],
       "properties": {
         "op": { "enum": ["add", "mod", "del"] },
         "by": { "const": "ai" },
         "turn_id": { "type": "integer" },
         "prev": {},
+        "value": {},
         "src": { "anyOf": [{ "$ref": "#/$defs/PendingSrc" }, { "type": "null" }], "default": null }
       }
     },
@@ -127,6 +128,14 @@
       "additionalProperties": true,
       "properties": {
         "competency_level": { "type": ["integer", "null"], "minimum": 1, "maximum": 5 },
+        "_pending": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "區塊 scalar 欄的修訂標記集合(ADR 0030;目前僅 competency_level)。",
+          "properties": {
+            "competency_level": { "anyOf": [{ "$ref": "#/$defs/PendingMark" }, { "type": "null" }], "default": null }
+          }
+        },
         "indicators": { "type": "array", "default": [], "items": { "$ref": "#/$defs/CodeText" } },
         "outputs": { "type": "array", "default": [], "items": { "$ref": "#/$defs/CodeName" } },
         "knowledge": { "type": "array", "default": [], "items": { "$ref": "#/$defs/CodeName" } },

@@ -32,6 +32,14 @@ export interface OcsProfile {
   category?: Category;
   job_description?: string;
   ocs_level?: number | null;
+  /**
+   * 表頭 scalar 欄位的修訂標記集合(槽名→PendingMark;ADR 0030)。
+   */
+  _pending?: {
+    ocs_code?: PendingMark | null;
+    job_description?: PendingMark | null;
+    ocs_level?: PendingMark | null;
+  };
 }
 export interface OcsName {
   job_category_name?: string | null;
@@ -48,6 +56,27 @@ export interface Category {
 export interface CodeName {
   code?: string | null;
   name?: string | null;
+  _pending?: PendingMark | null;
+}
+/**
+ * 追蹤修訂標記(ADR 0030):AI 寫入一律以 pending 落文件,✓=去標、✗=還原;匯出/定稿由 _strip_underscore 剝除。mod 必帶 prev(舊值)。
+ */
+export interface PendingMark {
+  op: "add" | "mod" | "del";
+  by: "ai";
+  turn_id: number;
+  prev?: unknown;
+  src?: PendingSrc | null;
+}
+/**
+ * 修訂出處:ref_urn(官方來源)與 quote(訪談原話)可並存;「至少一」由 verify 層強制(ADR 0030)。
+ */
+export interface PendingSrc {
+  ref_urn?: string | null;
+  quote?: {
+    turn_id: number;
+    text: string;
+  } | null;
 }
 export interface OcsContent {
   ocu_units?: OcuUnit[];
@@ -56,11 +85,13 @@ export interface OcuUnit {
   ocu_code?: string;
   ocu_name?: string;
   tasks?: TaskGroup[];
+  _pending?: PendingMark | null;
 }
 export interface TaskGroup {
   task_codes?: CodeName[];
   competency_blocks?: CompetencyBlock[];
   details?: TaskDetails | null;
+  _pending?: PendingMark | null;
 }
 export interface CompetencyBlock {
   competency_level?: number | null;
@@ -72,9 +103,10 @@ export interface CompetencyBlock {
 export interface CodeText {
   code?: string | null;
   text?: string | null;
+  _pending?: PendingMark | null;
 }
 /**
- * 任務客製細項(訪談引擎 v1,ADR 0023/spec 2026-07-05;OCS 官方來源沒有——由訪談產生,全部 optional。溯源(quote)不落文件,住訪談 session。
+ * 任務客製細項(訪談引擎 v1,ADR 0023/spec 2026-07-05;OCS 官方來源沒有——由訪談產生,全部 optional。v3 起(ADR 0030)溯源住各槽 _pending.src;已確認值不帶溯源。
  */
 export interface TaskDetails {
   frequency?: string | null;
@@ -88,6 +120,22 @@ export interface TaskDetails {
   wait_points?: string | null;
   exceptions?: string | null;
   standards?: string | null;
+  /**
+   * 細項 scalar 槽的修訂標記集合(槽名→PendingMark;ADR 0030)。
+   */
+  _pending?: {
+    frequency?: PendingMark | null;
+    time_share_pct?: PendingMark | null;
+    duration?: PendingMark | null;
+    volume?: PendingMark | null;
+    trigger?: PendingMark | null;
+    inputs?: PendingMark | null;
+    tools?: PendingMark | null;
+    collaborators?: PendingMark | null;
+    wait_points?: PendingMark | null;
+    exceptions?: PendingMark | null;
+    standards?: PendingMark | null;
+  };
 }
 export interface OcsAttitude {
   attitudes?: CodeName[];

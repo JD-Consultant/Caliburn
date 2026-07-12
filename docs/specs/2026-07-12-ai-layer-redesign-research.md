@@ -356,9 +356,21 @@ Predicted Outputs(限「編輯既有文件」高重疊場景)· 租戶偏好 DB(
 - **退場紀律**:新載體先上舊件後拆、文件功能測試保留當網、拆時全綠才 commit、
   docs/design 同 commit 更新。
 
-### 6.8 待討論
+### 6.8 Skill 內容撰寫(方法論已鎖;內容原料研究進行中)
 
-skill 內容撰寫方法(格式/清單/撰寫原則/維護閉環)。
+- **初版八檔**:consultant-principles(常駐)、duty-task-structure、output-writing、
+  behavior-indicator、ks-distinction、level-judgment、attitude-writing、probing——
+  載入時機=按欄位/階段確定性對應(§6.2 改處)。
+- **格式**:SKILL.md 標準格式(frontmatter name/description+一句話判準+判別規則+
+  好壞例成對附為什麼+邊界案例+禁令)。
+- **撰寫五原則**:判準二元可獨立判定(兩位專家同結果)、好壞例成對、對的海拔
+  (不綁死不空泛)、一檔一事 30–60 行、全繁中台灣職場用語。
+- **維護閉環**:skill 檔進 repo git 版本化;**改 skill=CI 自動跑 regression**(promptfoo);
+  調教 AI 首選改 skill 不改碼。
+- **冷啟動**:初版由 agent 起草(原料=iCAP 官方欄位標準+國際框架撰寫規範+既有 prompts
+  +黃金範本),維護者(SME)審改。**內容原料研究兩線進行中**:iCAP 全欄位官方定義/
+  撰寫標準/品質認證檢核;國際體系(O*NET task statement 規範/ESCO K-S 二分/SFIA 級別
+  判準/NOS performance criteria/Bloom 動詞表/官方態度清單)。
 
 ## 7. 後續
 

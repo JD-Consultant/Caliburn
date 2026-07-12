@@ -237,6 +237,85 @@ Predicted Outputs(限「編輯既有文件」高重疊場景)· 租戶偏好 DB(
 | Full CaMeL / Dual-LLM | 我們缺 lethal trifecta 第三邊(輸入變文件內容,不觸發危險副作用);出現該路徑再升級 |
 | Anthropic memory tool | 先用結構化租戶偏好 DB;出現「難枚舉、要自動學」的偏好再議 |
 
-## 6. 後續
+## 6. 已鎖決策清單(逐層討論收斂;持續更新,最終入 ADR)
+
+### 6.1 範圍與架構(議題 1–6)
+
+- **範圍=丙(整包)**:載體、對話層、舊件、引擎骨幹全進圈。
+- **一條腦**:訪談引擎=唯一 AI 腦;**scribe=全系統唯一寫入口**;隨叫 AI 小服務(/ai/*)
+  降格為 read-only 純函數工具(產出只進 UI 供人挑);**舊 LangGraph(app/authoring)+
+  CopilotKit(web 六檔)整包退役**(清 0023 欠債)。
+- **技術選型**:不上 agent 框架;agent 只在對話層(其餘 workflow/純程式);不引 MCP
+  runtime(記縫:Caliburn-as-MCP-server);**Skill 借概念**——SKILL.md 格式照抄、載入
+  機制自寫(按欄位確定性載入);其餘技術判定見 §5 三檔表。
+- **修訂層=甲案(內嵌)**:文件節點加選填 `_pending`(op 種類/舊值/出處);四態=
+  已確認/待審-新增/待審-修改/待審-刪除;接受=去標、拒絕=還原、匯出一律剝 `_pending`;
+  ocs-contract 加選填欄位(走契約 #1 流程)。
+- **verify 關(= output guardrail,blocking)**:寫入通道上的唯一門,scribe 無繞行路徑;
+  六查=①契約合法(enum 正規化、必填)②引用存在性(quote 正規化後逐字比對,查無
+  →整筆拒收)③來源一致(ref∈參考集合;custom 必附 quote;**ref+quote 可並存,至少一**)
+  ④寫入權限(禁無聲觸碰已確認內容)⑤結構不變量(位置碼不受理、任務必掛職責、A 只在
+  文件層、重複告知)⑥尺寸衛生。失敗路徑:可行動錯誤→**retry×2 回灌具體失敗條目**→
+  丟棄記 trace+帳本,不打擾使用者;絕不先寫再說。人類寫入只過①(人有主權)。
+- **欄位對照**:全欄位(D/T/O/P/K/S/A/L/三分類/兩自由文欄)一律走綠紅標+六查;
+  控制欄值必須∈官方枚舉;自由文欄=綜合寫作+至少一條支撐 quote;**表頭主基準 AI 可寫**
+  (綠標提議、值∈已掛參考集合、**接受後才觸發 rematch/視角重算**);位置碼誰寫都拒收。
+- **Evals**:考題=(逐字稿+參考)→顧問級 JD 金鑰;**few-shot 池與考題池分離**(防洩題);
+  雙指標=Source Score(程式算:AI 寫的條目中有真實出處的比例;人寫的不計)+
+  Answer Score(rubric 裁判);雙 suite(capability 推能力/regression 防退步近 100%)+
+  畢業制;promptfoo 進 CI(改 prompt/引擎/模型必重考);裁判照 §0-10 深挖報告設計
+  (rubric 二元+負分、pointwise-against-reference、跨模型家族、temp=0、校準集 100+ 筆
+  看 TPR/TNR+κ、held-out 防過擬合、pass^k 發版、全繁中、模擬受訪者注入不合作人格);
+  冷啟動=維護者(SME)手造 1–3 題+真實使用飛輪回填。
+- **Tracing**:搬出 authoring 成 api 橫切層;`gen_ai.*` 命名(OTel);記 LLM 呼叫/工具/
+  scribe op/verify 拒收(含原因)/審閱事件/fallback/快取命中;預設開。縫:per-tenant
+  隔離與保存期限。
+
+### 6.2 大腦(引擎)五改處
+
+1. **scribe 輸出=寫入 op**:`{目標 URN/新增位置, add|mod|del, 欄位, 值, 出處(ref_urn
+   和/或 turn_id+原話)}`;strict 保形狀、verify 保內容;原 strict/quote 兩通道合併。
+2. **scribe 按需喚醒**:consultant 輸出帶「本回合有無素材」訊號位,有才跑 scribe;
+   backstop 升級為每 N 回合確定性掃逐字稿撿漏(晚幾回合落表可接受)。
+3. **文件讀取工具回四態視圖**+帳本內含拒絕事件。
+4. **context 快取分層**:前綴 1(系統提示+skill 總則+few-shot 範本,全域凍結)→前綴 2
+   (本文件參考基準摘要,per 文件凍結)→動態區(四態文件+帳本摘要+對話近況);
+   近 10 輪全文、更舊摘要;**摘要只影響 prompt,DB 永存全文**(verify 對 DB 查)。
+   Write-as-you-go 使舊輪次價值已固化,摘要無損失。
+5. **模型分工**:consultant=強模型中高推理;scribe=便宜模型低 effort+strict;
+   judge=中檔另一家(僅測試時);backstop=便宜模型。
+
+### 6.3 審閱事件語意(第四輪研究定案)
+
+- **✓/✗ =無聲 UI 事件**:不觸發 AI 說話/重生成/回合(四家文件寫作產品共識);
+  靜默記入帳本與 trace,**下一次自然回合**才被 AI 利用(HAX G9/G15+Claude Code
+  deny-message 先例)。
+- **再提防制**:被拒項不重提(帳本);類別級抑制記縫。
+- **整批拒絕**:純還原,不觸發 AI;帳本記為較強方向性訊號。
+- **改寫歸屬(承 Claude Code approve-with-changes 先例)**:人改綠字=視同接受定稿;
+  **不告知模型**(下回合讀文件見最終版,當事實接受);改寫事件只記 trace(供 evals)。
+- **AI 對已確認內容**:~~永不動人寫的~~ 修正為 **可對任何已確認內容(不分作者)發
+  綠/紅標提議;唯一禁令=無聲改動**。已確認=單一等級,verify 第④查不分作者。
+- **AI 自己的綠字**:可自由修改/收回(草稿主權)。
+
+### 6.4 命名與健檢(第四輪研究定案)
+
+- **命名全保留**,文檔加對映:consultant=主對話 agent(read-only)、scribe=
+  structured-write channel(extraction agent)、verify=output guardrail(blocking,
+  有寫入副作用不可 parallel)、ledger=Task/Progress Ledger(Magentic-One 先例)、
+  backstop=periodic reconciliation sweep;UI 事件線用 AG-UI 詞彙(event/StateDelta/
+  interrupt)描述。
+- **健檢**:與主流管線同構、無重大偏差;「不放 LLM 進 verify」「狀態外置無狀態回合」
+  被點名為優點。採納:retry 回灌具體錯誤、每欄位驗收準則明確化(write-ahead typed
+  verifier)、AG-UI+blocking 理由文檔固化、backstop 純確定性寫成禁令。記縫:雙帳本
+  拆分(Task/Progress)、input guardrail(刻意不做:consultant 唯讀無副作用、門在寫入端)、
+  類別級抑制。
+
+### 6.5 待討論
+
+C″ 對話層(訪談節奏/議程/深聊收束)、B″ 載體 UI 細節(綠紅標長相/按鈕/streaming)、
+D″ 舊件退場清單、skill 內容撰寫方法。
+
+## 7. 後續
 
 按層討論鎖定(架構→載體→對話→舊件),決策另立 ADR;本檔為共識與來源的單一參照點。

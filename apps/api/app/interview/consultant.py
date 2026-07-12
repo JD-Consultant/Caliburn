@@ -7,6 +7,7 @@ v2 顧問**無寫入權**:只說話 + 呼 READ 工具;書記(scribe)另外抽取
 GPT-4.1 指南:關鍵規則首尾各一份、markdown 分段、脈絡用定界。probe=模組常數(不寫死)。
 """
 from app.interview import ledger as L
+from app.interview.skill_loader import load_skill, skills_for
 from app.interview.slots import SLOT_DEFS
 
 RECENT_TURNS = 12
@@ -26,20 +27,12 @@ CONSULTANT_SYSTEM = """# 你是誰
 3. 你**不負責記錄**(背景有書記系統在記),你負責把話問出來。所以永遠不用趕著總結,
    把注意力放在「讓他多說一段具體的事」。
 
-# 訪談方法(BEI/CDM;照這個問,別發明別的)
-- **要故事,不要形容詞**:請他講「最近一次實際發生的事」,成功和失敗的都要;繞著
-  「你做了什麼/說了什麼/當下想什麼」追,不給選項、不帶預設答案。
-- **探針(挑最合適一種)**:「你當時看到/聽到什麼就知道要動手?」(線索)/「新人會漏看
-  什麼?」(內隱知識)/「當時還有別的做法嗎?為什麼選這條?」(選項)/「這一步最容易
-  出什麼錯?出了怎麼救?」(例外)/「趕的時候你會省哪步、絕不省哪步?」(標準+態度)。
+# 訪談方法(底線三條;細則照〈判準教材〉區塊,別發明別的)
+- **要故事,不要形容詞**:請他講「最近一次實際發生的事」,繞著「你做了什麼/說了什麼/
+  當下想什麼」追,不給選項、不帶預設答案。
 - **問到細**:一件事的多久做一次、佔多少時間、要什麼材料工具、跟誰協作、卡在哪、
   怎樣算做好——從他的故事裡自然帶出來,別像填表逐欄唸。
-- **能力**:知識問「做這步要先知道什麼?」;技能問「實際上怎麼操作?哪一步最見功力?」;
-  **態度絕不直接問**,從故事聽出來後提議(「聽起來你很謹慎細心」),他點頭才算。
-- **猶豫就追**:他說「可能/大概/差不多/還好/不太確定/看情況」→ 必追一層(「說個實際
-  例子?」)。回答太短又沒講清楚 → 換個問法再問一次,別重複同一句。
-- **卡住階梯**:換問法 → 舉例(可用工具查同職類常見樣態當例子)→ 拆小 → 還不行就說
-  「這個先記到這」往下走。**別**重複同句、別連問兩個問題、別審訊語氣。
+- **態度絕不直接問**,從故事聽出來後提議(「聽起來你很謹慎細心」),他點頭才算。
 
 # 工具(不確定就查,查完才說)
 - knowledge_search_occupations:白話搜官方職類(開場選職位)。
@@ -140,15 +133,34 @@ def _doc_excerpt(doc: dict) -> str:
     return "\n".join(rows) or "  (尚無任務)"
 
 
+def _reference_block(doc: dict, pool_tasks: list[dict] | None) -> str:
+    """前綴 2(per-doc):參考基準摘要。只放 session 內穩定的官方事實
+    (**禁時間戳/UUID**——前綴 byte 級穩定才吃得到 provider 快取,T13)。"""
+    prof = (doc.get("ocs_profile") or {}).get("ocs_code") or "(尚未選職類)"
+    lines = [f"職類碼:{prof}"]
+    names = [t.get("name", "") for t in (pool_tasks or []) if t.get("name")]
+    if names:
+        lines.append("官方任務池:" + "、".join(names))
+    return "<參考基準(官方,唯讀)>\n" + "\n".join(lines) + "\n</參考基準>"
+
+
 def build_consultant_messages(*, doc: dict, ledger_state: dict,
                               recent_turns: list[tuple[str, str]], pending: list[str],
                               employee_text: str, est_minutes: int = 15,
                               probe: dict | None = None,
                               pool_tasks: list[dict] | None = None,
                               rejected: list[str] | None = None) -> list[dict]:
-    """組 chat_with_tools 的 messages。空對話 → 開場揭露;否則 system 人格 + 脈絡注入
-    (帳本摘要/文件/待核准/被拒/待問)+ 近窗對話 + 員工最新發言(GPT-4.1:關鍵首尾、脈絡定界)。"""
-    msgs: list[dict] = [{"role": "system", "content": CONSULTANT_SYSTEM}]
+    """組 chat_with_tools 的 messages,context 三層(T7):
+    前綴 1(全域凍結)=system 人格+常駐判準教材 → 前綴 2(per-doc)=參考基準摘要
+    → 動態區=帳本/文件四態/被拒/待問+本回合欄位判準教材+近窗對話。
+    空對話 → 追加開場揭露指示(GPT-4.1:關鍵首尾、脈絡定界)。"""
+    msgs: list[dict] = [
+        {"role": "system", "content": CONSULTANT_SYSTEM},
+        {"role": "system",
+         "content": "<判準教材:總則>\n" + load_skill("consultant-principles")
+                    + "\n</判準教材:總則>"},
+        {"role": "system", "content": _reference_block(doc, pool_tasks)},
+    ]
 
     if not recent_turns and not employee_text:
         msgs.append({"role": "system", "content": "這是第一回合,請用以下開場白開場(可自然改寫"
@@ -157,6 +169,13 @@ def build_consultant_messages(*, doc: dict, ledger_state: dict,
 
     ctx = (f"<進度>\n{ledger_summary(doc, ledger_state, pool_tasks)}\n</進度>\n"
            f"<文件現況>\n{_doc_excerpt(doc)}\n</文件現況>")
+    gap_skills = [n for n in skills_for(L.derive_phase(doc, ledger_state),
+                                        L.next_gap(doc, ledger_state, {}, pool_tasks))
+                  if n != "consultant-principles"]
+    if gap_skills:
+        ctx += ("\n<判準教材(本回合欄位適用)>\n"
+                + "\n\n".join(load_skill(n) for n in gap_skills)
+                + "\n</判準教材>")
     if pending:
         ctx += "\n<待核准建議(員工可能問到,別重問;向他說明是待他確認)>\n  - " + \
                "\n  - ".join(pending) + "\n</待核准建議>"

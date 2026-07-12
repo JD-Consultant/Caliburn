@@ -30,6 +30,18 @@
    Hebbia/Ironclad/Writer 等「錯了有代價」領域:品質管線、引用防幻覺、SME 在迴路、
    evals 與信任、Mata v. Avianca 等演進教訓。
 
+**第三輪(還有什麼技術可用/可優化;維護者指示後加開)**:
+
+7. [生成品質增強線](2026-07-12-ai-redesign-raw-quality-techniques.md) —— reasoning/test-time
+   compute、Best-of-N/verifier、self-refine 定論、few-shot 黃金範本、fine-tune 時機、
+   prompt caching、synthetic data、streaming;每項含判定。
+8. [檢索前沿線](2026-07-12-ai-redesign-raw-retrieval-frontier.md) —— contextual retrieval、
+   reranker、嵌入 SOTA(Qwen3 vs BGE-M3)、GraphRAG、query 端技術、CJK 分詞、
+   metadata filtering、retrieval evals;含落地順序。
+9. [工程營運線](2026-07-12-ai-redesign-raw-engineering-optimizations.md) —— OTel GenAI 標準、
+   prompt 版本化+CI 回歸、prompt injection 架構防禦、VLM 文件解析、語意快取、降延遲、
+   OpenRouter 容錯、記憶/個人化;每項含判定。
+
 ## 1. 跨線最強共識
 
 ### 1.1 共編載體:直寫 + 修訂標記 + accept/reject(產業四家收斂)
@@ -166,6 +178,51 @@ HAX 準則對應:G8 易於忽略、G9 易於修正、G11 說明為何這樣改�
 - **人審設計成可負擔的驗證**:逐句引用可點回原文、redline 可逐條裁決、trace 可展開,
   專家審「有疑處」而非重讀全文;專家最大槓桿在**建置期建 rubric/金鑰**。
 
-## 5. 後續
+## 5. 第三輪:可用/可優化技術判定總表
+
+三線報告對每項技術給了判定(建議用/可試/不用+理由);彙整如下,細節與出處見原始報告 7–9。
+
+### 5.1 建議用(排入設計)
+
+| 技術 | 一句話 | 出處線 |
+|---|---|---|
+| Reasoning effort 分級路由 | 起草/綜合/自評走高推理,抽取/格式化走低;別全域開高(overthinking) | 品質 |
+| Few-shot 黃金範本 | 3–5 份多樣、標籤化的顧問級範本當 in-context 範例;官方首選 steering,優先於 fine-tune | 品質 |
+| Prompt caching | 穩定前綴(系統提示+rubric+範本)在前、易變在後;cache read ≈0.1×,黃金範本幾乎免費 | 品質+工程 |
+| Rubric-grounded LLM-as-judge | 每維度獨立 judge+明確 rubric+跨模型家族(防同源偏袒);是 Best-of-N/refine/evals 共用地基 | 品質 |
+| Rubric-grounded self-refine | 定論:無外部訊號的自評無效(ICLR 2024);有 rubric=有外部訊號→有效(+20%);限 2–3 輪 | 品質 |
+| Streaming + partial outputs | 長文件生成 UX 關鍵+大輸出防 timeout;不改品質,是基礎設施 | 品質+工程 |
+| Retrieval eval 集 | 50–200 條 query→正解+Recall@10/20+NDCG@10;**所有檢索升級的前提,無此免談** | 檢索 |
+| Metadata filtering+payload index+RRF | 結構化語料最直接槓桿;先 filter 再向量;融合用 RRF 別調 alpha | 檢索 |
+| 中文 sparse 分詞+繁中術語詞典+繁簡對齊 | sparse 品質=分詞品質;政府術語要自訂詞典;BGE-M3/Qwen3 訓練偏簡體要測繁中 | 檢索 |
+| 自架 reranker | bge-reranker-v2-m3 / Qwen3-Reranker-4B 掛 GPU 容器;Anthropic 數字:失敗率 2.9%→1.9%;單項 CP 值最高 | 檢索 |
+| OTel `gen_ai.*` 命名對齊 | tracing 埋點照標準命名(client 層已穩),後端(Langfuse 等)當可插拔 OTLP,不綁 SDK | 工程 |
+| promptfoo 進 CI | 改 prompt 自動跑 before/after 回歸,對齊 green-before==green-after;prompt 存 repo 用 git 版本化 | 工程 |
+| OpenRouter 顯式 fallback | `models` 清單+`provider.allow_fallbacks`;每個 fallback model 必須過 eval(降級不能靜默傷品質) | 工程 |
+| Parallel tool calls | 多個獨立工具呼叫平行打;SDK 內建近乎免費 | 工程 |
+| 精確 hash 去重 | 同輸入必同輸出的昂貴子步驟(PDF 解析、逐字稿抽取)用內容 hash 快取;非語意快取、零誤命中 | 工程 |
+
+### 5.2 可試(單項、評測把關)
+
+Best-of-N(限關鍵段落+跨家 verifier)· synthetic data 補 eval 長尾(真人優先、跨家生成、逐筆過濾)·
+citations 機制強化 quote 溯源 · Qwen3-Embedding 換裝/雙跑(MTEB 70.58 超 BGE-M3,但 dense-only,
+sparse 要另配;用自有評測集 A/B)· HyDE(對付白話 vs 公文語彙落差)· schema-as-context 嵌入
+(用既有 schema 當情境,零 LLM 成本)· late interaction(BGE-M3 內建,reranker 之後再議)·
+prompt injection 輕量 pattern(Context-Minimization/Map-Reduce:逐字稿走無工具權的抽取步)·
+VLM 當 PDF fallback+關鍵欄位交叉驗證(parser 為主不拆;掃描件多再評 Mistral OCR)·
+Predicted Outputs(限「編輯既有文件」高重疊場景)· 租戶偏好 DB(結構化存每公司用語/格式慣例)。
+
+### 5.3 暫不用(記縫,含觸發條件)
+
+| 技術 | 觸發條件 |
+|---|---|
+| Fine-tune / distillation | eval 到頂、數百份標註後,語氣一致性(SFT)或降本(蒸餾)才議;<100 樣本官方明說別碰;ToS 雷 |
+| GraphRAG | 職能基準本身就是知識圖,別讓 LLM 重抽;除非未來要「全庫宏觀彙總」分析 |
+| Agentic retrieval | 點檢索單發能解;出現真正多跳分析問句再議 |
+| Semantic caching | 核心生成路徑永不用(false hit 傷品質+跨租戶誤命中) |
+| Full CaMeL / Dual-LLM | 我們缺 lethal trifecta 第三邊(輸入變文件內容,不觸發危險副作用);出現該路徑再升級 |
+| Anthropic memory tool | 先用結構化租戶偏好 DB;出現「難枚舉、要自動學」的偏好再議 |
+
+## 6. 後續
 
 按層討論鎖定(架構→載體→對話→舊件),決策另立 ADR;本檔為共識與來源的單一參照點。

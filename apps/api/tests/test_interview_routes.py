@@ -104,7 +104,8 @@ async def test_get_interview_full_view(db_session):
                          db=db_session, llm=StubLlm(select_result=GOOD), knowledge=K)
     view = await get_interview(p.id, db=db_session)
     assert [t["role"] for t in view["turns"]] == ["employee", "consultant"]
-    assert view["evidence"][0]["verified"] is True
+    assert view["pending_count"] == 1                 # v3:寫入=文件內 _pending(evidence 退場)
+    assert view["evidence"] == []
     assert view["status"] == "active"
 
 
@@ -134,13 +135,14 @@ async def test_finish_without_llm_still_transitions(db_session):
 
 @pytest.mark.asyncio
 async def test_review_status_only(db_session):
+    """v3:scribe 不再產建議;review 端點仍服務 curation/backstop 的建議層。
+    直接種一筆建議驗證「只轉狀態、不寫文件」不變量。"""
     p = await _profile(db_session)
     await start_interview(p.id, db=db_session)
     repo = InterviewRepo(db_session)
     s = await repo.get_active(p.id)
-    await repo.merge_human_touched(s.id, [FREQ])   # 逼建議
-    await interview_turn(p.id, {"text": "每兩週跑一次"},
-                         db=db_session, llm=StubLlm(select_result=GOOD), knowledge=K)
+    await repo.add_suggestion(s.id, doc_path=FREQ, old_value=None, new_value="每雙週",
+                              reason="補漏(backstop)", turn_seq=1)
     view = await get_interview(p.id, db=db_session)
     sug_id = view["suggestions"][0]["id"]
     out = await review_interview(p.id, {"accept": [sug_id]}, db=db_session)

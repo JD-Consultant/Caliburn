@@ -1,23 +1,26 @@
-"""書記施作器 + 服務(v2;ADR 0027 §3、spec 2026-07-08 §3.2、§16.3)。
+"""書記(v3;ADR 0030 T4):唯一寫入口——record → op → verify 六查 → `_pending` 落文件。
 
-- apply_scribe(T4a,純函式):把驗證過的 ScribeRecord 確定性落文件。
-  重用 executor 守衛(quote_verified/resolve/set_at);新增能力區塊/態度 append。
-  兩通道:池項(pool_id∈pools[kind] 語義守衛 → 直寫官方碼+名)/ 自訂(→建議層,附 quote)。
-- scribe_pass(T4b):LLM 編排(建 schema 輸入→select_schema→apply_scribe→重試/backstop)。
+寫入模型(§6.2 改處 1):
+- LLM 端仍走 **enum 鎖死的變體 schema**(零幻覺:池碼/任務 path/槽 path 全枚舉,
+  結構上編不出來)——這是生成期的第一道門。
+- 變體經 `records_to_ops` **確定性映射**成單一 op 形
+  `{target_path, op: add|mod|del, value, src:{ref_urn?, quote?}}`——寫入通道的唯一貨幣。
+- 每筆 op 過 `verify.verify_ops` 六查(blocking;retry 回灌具體失敗條目),
+  過關才由 `apply_pending_ops` 落成 `_pending` 標記(綠/紅標)。
+- **絕無直改路徑**:v2 的三路落地(直寫/建議表/證據表)已退場;
+  官方碼(K01 等)由程式從 ref_urn 導出,不是 LLM 寫的。
 
-信任機制:LLM 選通道靠 schema(T3),值落地靠這裡的確定性守衛——一件繞不過。
-風險分層(pending 標記/tier)= T5;本層預設池項直寫、自訂/draft/add_task 建議。
+信任機制:schema(生成期)→ verify(寫入期)→ 人的 ✓/✗(生效期),一件繞不過。
 """
 import copy
 import logging
 from dataclasses import dataclass, field
 
 from app.interview import ledger as L
-from app.interview.docpath import get_at, set_at
-from app.interview.executor import writable_path
-from app.interview.verify import quote_verified
+from app.interview.docpath import get_at
 from app.interview.scribe_schema import ScribeOutput, scribe_schema
 from app.interview.slots import SLOT_DEFS
+from app.interview.verify import VerifyResult, verify_ops
 
 logger = logging.getLogger(__name__)
 
@@ -37,46 +40,115 @@ SCRIBE_SYS = (
     "8) 態度**不逐句記**:僅當他講出一段具體行為故事才以自訂通道提議(整體編碼在收尾另跑),"
     "客套/短答絕不算態度。"
     "能記就記(再讀一次):寧可多記待審,不可漏記;但 quote 必逐字、事實必他說過、歸位必對任務。"
+    "你寫下的一切都會以「待審綠字」進文件,由使用者逐筆核可——大膽記錄、誠實引用。"
 )
 
-# 能力區塊 kind → 條目形狀(CodeName{code,name} / CodeText{code,text})
+# 能力區塊 kind → 條目文字欄(CodeName{code,name} / CodeText{code,text})
 _BLOCK_FIELDS = {"outputs": "name", "knowledge": "name", "skills": "name",
                  "indicators": "text"}
 
 
 @dataclass
 class ScribeResult:
-    new_doc: dict | None = None            # None = 無直改
-    evidence: list[dict] = field(default_factory=list)
-    suggestions: list[dict] = field(default_factory=list)
+    new_doc: dict | None = None            # None = 本回合無落地
     guard_log: list[str] = field(default_factory=list)
-    records_failed: bool = False           # 抽取重試仍敗(交 backstop/T12,不擋回合)
-    progressed: bool = False               # 本回合有新寫入/建議(帳本 note_attempt 用)
-    # 供衝突重放(T9;樂觀並發 409→重讀重放 apply_scribe 同 records,不重呼 LLM)
-    records: list[dict] = field(default_factory=list)
+    records_failed: bool = False           # 抽取/驗證重試仍全敗(交 backstop,不擋回合)
+    progressed: bool = False               # 本回合有 op 落地(帳本 note_attempt 用)
+    # 供衝突重放(樂觀並發 409→重讀後 land_ops 同 ops,不重呼 LLM)
+    ops: list[dict] = field(default_factory=list)
     pools: dict = field(default_factory=dict)
     pool_items: dict = field(default_factory=dict)
 
 
-def _first_block(task: dict) -> dict:
-    """回任務第一個能力區塊(缺則建一塊)。呼叫端須已在 work(deep copy)上操作。"""
-    blocks = task.setdefault("competency_blocks", [])
-    if not blocks:
-        blocks.append({})
-    return blocks[0]
+def _mark(op: str, turn_id: int, *, src: dict | None = None,
+          prev=None, value=None) -> dict:
+    m: dict = {"op": op, "by": "ai", "turn_id": turn_id}
+    if prev is not None:
+        m["prev"] = prev
+    if value is not None:
+        m["value"] = value
+    if src:
+        clean = {k: v for k, v in src.items() if v is not None}
+        if clean:
+            m["src"] = clean
+    return m
 
 
-def _append_item(block: dict, kind: str, item: dict) -> None:
-    block.setdefault(kind, []).append(item)
+def records_to_ops(records: list[dict], *, turn_id: int, pools: dict[str, list[str]],
+                   pool_items: dict[str, str]) -> tuple[list[dict], list[str]]:
+    """變體 record → 單一 op 形(確定性映射;§6.2 映射表)。
+    kind↔pool_id 語義守衛在此(schema 只鎖池聯集,跨 kind 由這裡擋)。"""
+    ops: list[dict] = []
+    guard: list[str] = []
+
+    def _q(quote: str | None) -> dict | None:
+        return {"turn_id": turn_id, "text": quote} if quote else None
+
+    for rec in records:
+        t = rec.get("type")
+        if t == "none":
+            continue
+        if t == "set_slot":
+            ops.append({"target_path": rec["path"], "op": "mod", "value": rec["value"],
+                        "src": {"quote": _q(rec.get("quote"))}})
+        elif t == "record_task_pool":
+            pid = rec["pool_id"]
+            if pid not in (pools.get(rec["kind"]) or []):
+                guard.append(f"drop:pool_id {pid} 不屬 {rec['kind']} 池")
+                continue
+            name = pool_items.get(pid)
+            if not name:
+                guard.append(f"drop:pool_id {pid} 不在池目錄(無官方名)")
+                continue
+            ops.append({"target_path": f"{rec['task']}.competency_blocks.0.{rec['kind']}",
+                        "op": "add", "value": name,
+                        "src": {"ref_urn": pid, "quote": _q(rec.get("quote"))}})
+        elif t == "record_task_custom":
+            ops.append({"target_path": f"{rec['task']}.competency_blocks.0.{rec['kind']}",
+                        "op": "add", "value": rec["name"],
+                        "src": {"quote": _q(rec.get("quote"))}})
+        elif t == "draft_indicator":
+            ops.append({"target_path": f"{rec['task']}.competency_blocks.0.indicators",
+                        "op": "add", "value": rec["text"],
+                        "src": {"quote": _q(rec.get("quote"))}})
+        elif t == "record_attitude_custom":
+            ops.append({"target_path": "ocs_attitude.attitudes",
+                        "op": "add", "value": rec["name"],
+                        "src": {"quote": _q(rec.get("quote"))}})
+        elif t == "add_custom_task":
+            ops.append({"target_path": f"{rec['unit_ref']}.tasks",
+                        "op": "add", "value": rec["name"],
+                        "src": {"quote": _q(rec.get("quote"))}})
+        else:
+            guard.append(f"drop:未知 record type {t}")
+    return ops, guard
 
 
-def apply_scribe(records: list[dict], *, doc: dict, pool_items: dict[str, str],
-                 pools: dict[str, list[str]], employee_texts: list[str],
-                 human_touched: list[str]) -> ScribeResult:
-    """records=已過 pydantic 的 ScribeRecord dict 列表。輸入 doc 不變;有直改才回 new_doc。"""
-    res = ScribeResult()
+def _ensure_block_container(work: dict, path: str) -> list | None:
+    """add 目標 `…competency_blocks.0.<kind>` 缺殼時建殼(task 存在才建)。回容器 list。"""
+    container = get_at(work, path)
+    if isinstance(container, list):
+        return container
+    segs = path.split(".")
+    if len(segs) >= 3 and segs[-3] == "competency_blocks" and segs[-2] == "0":
+        task = get_at(work, ".".join(segs[:-3]))
+        if isinstance(task, dict):
+            blocks = task.setdefault("competency_blocks", [])
+            if not blocks:
+                blocks.append({})
+            return blocks[0].setdefault(segs[-1], [])
+    return None
+
+
+def apply_pending_ops(ops: list[dict], *, doc: dict,
+                      pool_items: dict[str, str]) -> tuple[dict | None, list[str]]:
+    """已過 verify 的 op 落成 `_pending`(綠/紅標)。輸入 doc 不變;有落地才回 new_doc。
+
+    官方碼導出:add 的 src.ref_urn ∈ pool_items → 條目 code=ref_urn(程式導出,非 LLM 寫)。
+    表頭主基準(ocs_profile.ocs_code)延遲生效:欄位不動、提案值放標記(✓ 才寫入+重算)。
+    """
     work: dict | None = None
-    touched = set(human_touched or [])
+    guard: list[str] = []
 
     def _doc() -> dict:
         nonlocal work
@@ -84,104 +156,124 @@ def apply_scribe(records: list[dict], *, doc: dict, pool_items: dict[str, str],
             work = copy.deepcopy(doc)
         return work
 
-    def _task_node(task_path: str) -> dict | None:
-        node = get_at(_doc(), task_path)
-        return node if isinstance(node, dict) else None
+    for op in ops:
+        path = op["target_path"]
+        kind = op["op"]
+        value = op.get("value")
+        src = op.get("src") or {}
+        turn_id = ((src.get("quote") or {}).get("turn_id")
+                   or op.get("turn_id") or 0)
+        last = path.split(".")[-1]
 
-    for rec in records:
-        t = rec.get("type")
-
-        if t == "none":
-            continue
-
-        # 引文守衛(所有寫入類都要;none 除外)
-        quote = rec.get("quote", "")
-        verified = quote_verified(quote, employee_texts)
-
-        if t == "record_task_pool":
-            kind = rec["kind"]
-            pid = rec["pool_id"]
-            if pid not in (pools.get(kind) or []):        # 語義守衛:kind↔pool_id 一致
-                res.guard_log.append(f"drop:pool_id {pid} 不屬 {kind} 池")
-                continue
-            path = f"{rec['task']}.competency_blocks.0.{kind}"
-            ev = {"doc_path": path, "quote": quote, "verified": verified, "review": "auto"}
-            res.evidence.append(ev)
-            if not verified:
-                res.guard_log.append(f"drop:{path}(quote 未驗證)")
-                continue
-            task = _task_node(rec["task"])
-            if task is None:
-                res.guard_log.append(f"drop:{path}(task 解析不到)")
-                continue
-            _append_item(_first_block(task), kind, {"code": pid, "name": pool_items.get(pid)})
-            ev["review"] = "pending"                       # 低風險直寫→待批次審(T5)
-            res.guard_log.append(f"write:{path}={pid}")
-
-        elif t in ("record_task_custom", "record_attitude_custom"):
-            kind = "attitudes" if t == "record_attitude_custom" else rec["kind"]
-            name = rec["name"]
-            path = ("ocs_attitude.attitudes" if kind == "attitudes"
-                    else f"{rec.get('task', '')}.competency_blocks.0.{kind}")
-            res.evidence.append({"doc_path": path, "quote": quote, "verified": verified})
-            res.suggestions.append({                       # 自訂一律建議層(人核准)
-                "doc_path": path, "old_value": None,
-                "new_value": {"code": None, "name": name},
-                "reason": f"自訂{kind}(公版外;quote:{quote[:30]})",
-            })
-            res.guard_log.append(f"suggest:{path}(custom:{name})")
-
-        elif t == "draft_indicator":
-            path = f"{rec['task']}.competency_blocks.0.indicators"
-            res.evidence.append({"doc_path": path, "quote": quote, "verified": verified})
-            res.suggestions.append({                       # 指標=AI 草擬→人確認(§15.3)
-                "doc_path": path, "old_value": None,
-                "new_value": {"code": None, "text": rec["text"]},
-                "reason": f"AI 草擬指標(待確認;quote:{quote[:30]})",
-            })
-            res.guard_log.append(f"suggest:{path}(draft_indicator)")
-
-        elif t == "add_custom_task":
-            name = rec["name"]
-            res.evidence.append({"doc_path": f"add_task:{name}", "quote": quote,
-                                 "verified": verified})
-            res.suggestions.append({
-                "doc_path": f"add_task:{name}", "old_value": None,
-                "new_value": {"unit_ref": rec["unit_ref"], "name": name},
-                "reason": "抓漏(公版外任務,一律人核准)",
-            })
-            res.guard_log.append(f"suggest:add_task:{name}")
-
-        elif t == "set_slot":
-            path = rec["path"]
-            ev = {"doc_path": path, "quote": quote, "verified": verified, "review": "auto"}
-            res.evidence.append(ev)
-            if not writable_path(path):
-                res.guard_log.append(f"drop:{path}(未知槽)")
-                continue
-            if path in touched:                            # 通道分流(ADR 0025)
-                res.suggestions.append({
-                    "doc_path": path, "old_value": get_at(doc, path),
-                    "new_value": rec["value"], "reason": f"訪談(quote:{quote[:30]})"})
-                res.guard_log.append(f"suggest:{path}(human_touched)")
-            elif not verified:
-                res.guard_log.append(f"drop:{path}(quote 未驗證)")
-            elif set_at(_doc(), path, rec["value"]):
-                ev["review"] = "pending"                   # 低風險直寫→待批次審(T5)
-                res.guard_log.append(f"write:{path}")
+        if kind == "add":
+            if last == "tasks":
+                container = get_at(_doc(), path)
+                if not isinstance(container, list):
+                    guard.append(f"drop:{path}(容器不存在)")
+                    continue
+                container.append({
+                    "task_codes": [{"code": None, "name": value}],
+                    "competency_blocks": [], "details": None,
+                    "_pending": _mark("add", turn_id, src=src),
+                })
+                guard.append(f"pending-add:{path}(task:{value})")
             else:
-                res.guard_log.append(f"drop:{path}(path 不存在)")
+                container = _ensure_block_container(_doc(), path) \
+                    if ".competency_blocks." in path else get_at(_doc(), path)
+                if not isinstance(container, list):
+                    guard.append(f"drop:{path}(容器不存在)")
+                    continue
+                text_field = _BLOCK_FIELDS.get(last, "name")
+                code = src.get("ref_urn") if src.get("ref_urn") in pool_items else None
+                container.append({"code": code, text_field: value,
+                                  "_pending": _mark("add", turn_id, src=src)})
+                guard.append(f"pending-add:{path}={value}")
 
-        else:
-            # 未知/已退場 type(如 record_attitude_pool,0028 D3)→ 忽略留痕
-            res.guard_log.append(f"drop:未知 record type {t}")
+        elif kind == "mod":
+            segs = path.split(".")
+            if len(segs) >= 2 and segs[-2] == "details" and last in SLOT_DEFS:
+                task = get_at(_doc(), ".".join(segs[:-2]))
+                if not isinstance(task, dict):
+                    guard.append(f"drop:{path}(task 不存在)")
+                    continue
+                details = task.setdefault("details", None) or {}
+                task["details"] = details
+                prev = details.get(last)
+                details[last] = value
+                details.setdefault("_pending", {})[last] = _mark(
+                    "mod", turn_id, src=src, prev=prev)
+                guard.append(f"pending-mod:{path}")
+            elif path == "ocs_profile.ocs_code":
+                prof = _doc().setdefault("ocs_profile", {})
+                prof.setdefault("_pending", {})["ocs_code"] = _mark(
+                    "mod", turn_id, src=src, prev=prof.get("ocs_code"), value=value)
+                guard.append("pending-mod:ocs_profile.ocs_code(延遲生效,✓才重算)")
+            elif path in ("ocs_profile.job_description", "ocs_profile.ocs_level"):
+                prof = _doc().setdefault("ocs_profile", {})
+                prev = prof.get(last)
+                prof[last] = value
+                prof.setdefault("_pending", {})[last] = _mark(
+                    "mod", turn_id, src=src, prev=prev)
+                guard.append(f"pending-mod:{path}")
+            elif last == "competency_level":
+                block = get_at(_doc(), ".".join(segs[:-1]))
+                if not isinstance(block, dict):
+                    guard.append(f"drop:{path}(block 不存在)")
+                    continue
+                prev = block.get(last)
+                block[last] = int(str(value).rstrip("級").strip()) \
+                    if not isinstance(value, int) else value
+                block.setdefault("_pending", {})[last] = _mark(
+                    "mod", turn_id, src=src, prev=prev)
+                guard.append(f"pending-mod:{path}")
+            else:  # 條目葉欄(name/text)
+                entry = get_at(_doc(), ".".join(segs[:-1]))
+                if not isinstance(entry, dict):
+                    guard.append(f"drop:{path}(條目不存在)")
+                    continue
+                prev = entry.get(last)
+                entry[last] = value
+                entry["_pending"] = _mark("mod", turn_id, src=src, prev=prev)
+                guard.append(f"pending-mod:{path}")
 
-    res.new_doc = work
-    res.progressed = work is not None or bool(res.suggestions)   # 帳本 note_attempt 用
-    return res
+        elif kind == "del":
+            target = get_at(_doc(), path)
+            if isinstance(target, dict):
+                target["_pending"] = _mark("del", turn_id, src=src)
+                guard.append(f"pending-del:{path}")
+            else:
+                segs = path.split(".")
+                if len(segs) >= 2 and segs[-2] == "details" and last in SLOT_DEFS:
+                    task = get_at(_doc(), ".".join(segs[:-2]))
+                    if isinstance(task, dict) and isinstance(task.get("details"), dict):
+                        d = task["details"]
+                        d.setdefault("_pending", {})[last] = _mark(
+                            "del", turn_id, src=src, prev=d.get(last))
+                        guard.append(f"pending-del:{path}")
+                        continue
+                guard.append(f"drop:{path}(del 目標不存在)")
+
+    return work, guard
 
 
-# --- T4b:書記服務(LLM 編排) ---
+def land_ops(ops: list[dict], *, doc: dict, turns: dict[int, str],
+             ref_codes: set[str], header_codes: set[str],
+             pool_items: dict[str, str]) -> tuple[dict | None, list[str], list[dict]]:
+    """verify → 落地(過的落、敗的丟並留痕)。回 (new_doc, guard, landed_ops)。
+    首落與 409 重放共用同一條路(重放對 fresh doc 重新 verify,防重複/漂移)。"""
+    vr: VerifyResult = verify_ops(ops, doc=doc, turns=turns,
+                                  ref_codes=ref_codes, header_codes=header_codes)
+    guard = [f"verify-reject:op[{e.op_index}] {e.check}:{e.message[:80]}"
+             for e in vr.errors]
+    bad = {e.op_index for e in vr.errors}
+    passing = [op for i, op in enumerate(ops) if i not in bad]
+    if not passing:
+        return None, guard, []
+    new_doc, apply_guard = apply_pending_ops(passing, doc=doc, pool_items=pool_items)
+    return new_doc, guard + apply_guard, passing
+
+
+# --- 書記服務(LLM 編排) ---
 
 def _doc_ocs_codes(doc: dict) -> list[str]:
     """從 doc 收官方職類碼(ocs_profile + version_info;去重保序)。"""
@@ -217,37 +309,59 @@ def _unit_keys(doc: dict) -> list[str]:
     return [f"ocs_content.ocu_units.{L._seg(u, i)}" for i, u in enumerate(units)]
 
 
-async def scribe_pass(llm, knowledge, *, doc: dict, employee_texts: list[str],
-                      human_touched: list[str], max_retry: int = 1) -> ScribeResult:
-    """一次書記抽取(§3.2)。輸入不變;有直改回 new_doc。守衛拒絕(pydantic)精簡錯誤
-    重試 max_retry 次,仍敗回空結果 + records_failed=True(不擋回合,交 backstop/T12)。"""
+async def scribe_pass(llm, knowledge, *, doc: dict, turns: dict[int, str],
+                      turn_id: int, header_codes: set[str],
+                      max_retry: int = 2) -> ScribeResult:
+    """一次書記抽取(v3):select_schema → pydantic → op 化 → verify 六查
+    → 全過即落 `_pending`;有敗筆則把**具體失敗條目**回灌重試(共 max_retry 次),
+    重試耗盡丟壞筆、落好筆。抽取全敗回 records_failed=True(不擋回合,交 backstop)。"""
     task_keys = [tp for _, _, tp in L.iter_tasks(doc)]
     unit_keys = _unit_keys(doc)
     slot_paths = [f"{tp}.details.{k}" for tp in task_keys for k in SLOT_DEFS]
     pools, pool_items = await build_pool_inputs(knowledge, doc)
     schema = scribe_schema(slot_paths=slot_paths, pools=pools,
                            task_keys=task_keys, unit_keys=unit_keys)
+    ref_codes = set(pool_items)
 
-    latest = employee_texts[-1] if employee_texts else ""
+    latest = turns.get(turn_id, "")
     prompt = f"{SCRIBE_SYS}\n\n任務清單:{task_keys}\n合法官方池:{pools}\n員工最新發言:{latest}"
-    records: list[dict] | None = None
+
+    res = ScribeResult(pools=pools, pool_items=pool_items)
+    ops: list[dict] | None = None
     for attempt in range(max_retry + 1):
         try:
             data = await llm.select_schema(prompt, schema, role="select",
                                            schema_name="scribe_output")
             records = [r.model_dump() for r in ScribeOutput.model_validate(data).records]
-            break
         except Exception as exc:  # noqa: BLE001  (pydantic/provider 皆 fail-closed)
             logger.warning("scribe 抽取不合法(attempt %d):%s", attempt, str(exc)[:160])
             prompt = (f"{prompt}\n(上次輸出不合法:{str(exc)[:120]}——請修正後重出;"
                       f"真的無可記就回 records=[{{\"type\":\"none\"}}])")
+            continue
 
-    if records is None:
-        r = ScribeResult()
-        r.records_failed = True                # 交 backstop(T12);不擋回合
-        r.pools, r.pool_items = pools, pool_items
-        return r
-    res = apply_scribe(records, doc=doc, pool_items=pool_items, pools=pools,
-                       employee_texts=employee_texts, human_touched=human_touched)
-    res.records, res.pools, res.pool_items = records, pools, pool_items   # 供衝突重放
+        ops, map_guard = records_to_ops(records, turn_id=turn_id, pools=pools,
+                                        pool_items=pool_items)
+        res.guard_log.extend(map_guard)
+        if not ops:                                   # 全 none = 本句無可記,合法收場
+            return res
+        vr = verify_ops(ops, doc=doc, turns=turns,
+                        ref_codes=ref_codes, header_codes=header_codes)
+        if vr.ok or attempt == max_retry:
+            break
+        feedback = ";".join(f"op[{e.op_index}] {e.check}:{e.message}"
+                            + (f"(提示:{e.hint})" if e.hint else "")
+                            for e in vr.errors)
+        prompt = f"{prompt}\n(上次有 {len(vr.errors)} 筆沒過驗證——{feedback[:600]}——請只修正這些筆後重出)"
+        logger.info("scribe verify 未全過(attempt %d):%s", attempt, feedback[:200])
+
+    if ops is None:
+        res.records_failed = True                     # 抽取全敗(交 backstop);不擋回合
+        return res
+
+    new_doc, guard, landed = land_ops(ops, doc=doc, turns=turns, ref_codes=ref_codes,
+                                      header_codes=header_codes, pool_items=pool_items)
+    res.new_doc = new_doc
+    res.guard_log.extend(guard)
+    res.ops = landed
+    res.progressed = bool(landed)
     return res

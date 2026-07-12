@@ -59,13 +59,14 @@ export interface CodeName {
   _pending?: PendingMark | null;
 }
 /**
- * 追蹤修訂標記(ADR 0030):AI 寫入一律以 pending 落文件,✓=去標、✗=還原;匯出/定稿由 _strip_underscore 剝除。mod 必帶 prev(舊值)。
+ * 追蹤修訂標記(ADR 0030):AI 寫入一律以 pending 落文件,✓=去標、✗=還原;匯出/定稿由 _strip_underscore 剝除。mod 必帶 prev(舊值)。value 僅「延遲生效」欄位用(表頭主基準:欄位不動、提案值放標記,✓ 才寫入+觸發重算)。
  */
 export interface PendingMark {
   op: "add" | "mod" | "del";
   by: "ai";
   turn_id: number;
   prev?: unknown;
+  value?: unknown;
   src?: PendingSrc | null;
 }
 /**
@@ -95,6 +96,12 @@ export interface TaskGroup {
 }
 export interface CompetencyBlock {
   competency_level?: number | null;
+  /**
+   * 區塊 scalar 欄的修訂標記集合(ADR 0030;目前僅 competency_level)。
+   */
+  _pending?: {
+    competency_level?: PendingMark | null;
+  };
   indicators?: CodeText[];
   outputs?: CodeName[];
   knowledge?: CodeName[];

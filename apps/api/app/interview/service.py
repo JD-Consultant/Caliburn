@@ -18,7 +18,8 @@ from app.interview import ledger as L
 from app.interview.attitudes import attitudes_pass
 from app.interview.backstop import backstop_pass
 from app.interview.curation import curation_pass
-from app.interview.scribe import _doc_ocs_codes, apply_scribe, build_pool_inputs, scribe_pass
+from app.interview.scribe import _doc_ocs_codes, build_pool_inputs, land_ops, scribe_pass
+from app.models import JobProfile
 from app.interview.slots import SLOT_DEFS
 from app.interview.tools import CONSULTANT_TOOLS, dispatch_tool
 
@@ -76,9 +77,9 @@ async def build_task_pool(knowledge, doc: dict) -> list[dict]:
 
 
 async def _persist_scribe_doc(doc_repo, profile_id, latest, scribe_res, *,
-                              employee_texts, human_touched) -> tuple[bool, list[str]]:
-    """書記直改寫回(雙 token;409→重讀重放同 records 一次;再衝突→放棄直改,保留
-    evidence/suggestions,人的編輯優先 ADR 0025)。回 (doc_changed, extra_guard)。"""
+                              turns, header_codes) -> tuple[bool, list[str]]:
+    """書記 pending 寫回(雙 token;409→重讀後 land_ops 重放同 ops 一次——對 fresh doc
+    **重新 verify**,防重複/漂移;再衝突→放棄,人的編輯優先 ADR 0025)。"""
     if scribe_res.new_doc is None:
         return False, []
     try:
@@ -89,18 +90,19 @@ async def _persist_scribe_doc(doc_repo, profile_id, latest, scribe_res, *,
     except DocConflictError:
         fresh = await doc_repo.latest(profile_id)
         fdoc = (fresh or {}).get("content") or {}
-        replay = apply_scribe(scribe_res.records, doc=fdoc,
-                              pool_items=scribe_res.pool_items, pools=scribe_res.pools,
-                              employee_texts=employee_texts, human_touched=human_touched)
-        if replay.new_doc is None:
-            return False, ["conflict:重放後無直改"]
+        new_doc, guard, _ = land_ops(scribe_res.ops, doc=fdoc, turns=turns,
+                                     ref_codes=set(scribe_res.pool_items),
+                                     header_codes=header_codes,
+                                     pool_items=scribe_res.pool_items)
+        if new_doc is None:
+            return False, ["conflict:重放後無落地"] + guard
         try:
-            await doc_repo.upsert_draft(profile_id, replay.new_doc,
+            await doc_repo.upsert_draft(profile_id, new_doc,
                                         expected_version=fresh.get("version"),
                                         expected_revision=fresh.get("revision"))
             return True, ["conflict:重放成功"]
         except DocConflictError:
-            return False, ["conflict×2:放棄直改(人的編輯優先)"]
+            return False, ["conflict×2:放棄落地(人的編輯優先)"]
 
 
 async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> TurnResult:
@@ -120,22 +122,18 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> T
     human_touched = list(session.human_touched or [])
     emp_turn = await repo.append_turn(session.id, role="employee", text=user_text)
 
-    # ① 書記 pass(便宜、序列先行;失敗不擋顧問——fail-open 對話、fail-closed 寫入)
+    # ① 書記 pass(v3:op→verify→_pending;失敗不擋顧問——fail-open 對話、fail-closed 寫入)
+    turns_map = {t.seq: t.text for t in prev_turns if t.role == "employee"}
+    turns_map[emp_turn.seq] = user_text
+    profile = await db.get(JobProfile, profile_id)
+    header_codes = set(getattr(profile, "selected_ocs_codes", None) or [])
     t_scribe = time.perf_counter()
-    scribe_res = await scribe_pass(llm, knowledge, doc=doc, employee_texts=employee_texts,
-                                   human_touched=human_touched)
+    scribe_res = await scribe_pass(llm, knowledge, doc=doc, turns=turns_map,
+                                   turn_id=emp_turn.seq, header_codes=header_codes)
     scribe_ms = int((time.perf_counter() - t_scribe) * 1000)
     doc_changed, extra_guard = await _persist_scribe_doc(
         doc_repo, profile_id, latest, scribe_res,
-        employee_texts=employee_texts, human_touched=human_touched)
-    for ev in scribe_res.evidence:
-        await repo.add_evidence(session.id, doc_path=ev["doc_path"], quote=ev["quote"],
-                                turn_seq=emp_turn.seq, verified=ev["verified"],
-                                review=ev.get("review", "auto"))
-    for sug in scribe_res.suggestions:
-        await repo.add_suggestion(session.id, doc_path=sug["doc_path"],
-                                  old_value=sug["old_value"], new_value=sug["new_value"],
-                                  reason=sug["reason"], turn_seq=emp_turn.seq)
+        turns=turns_map, header_codes=header_codes)
 
     work_doc = (await doc_repo.latest(profile_id) or {}).get("content") or doc
 

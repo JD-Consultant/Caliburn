@@ -26,8 +26,9 @@ _WS = re.compile(r"\s+")
 _CTRL = re.compile(r"[\x00-\x1f\x7f]")
 
 # add 容器白名單(最後一段);⑤ 結構不變量
+# tasks = 整個 TaskGroup(加新任務);task_codes = 既有任務組內的名目條目
 _ADD_CONTAINERS = {"task_codes", "indicators", "outputs", "knowledge", "skills",
-                   "ocu_units", "attitudes"}
+                   "ocu_units", "attitudes", "tasks"}
 # mod 葉欄白名單(最後一段);details.<槽> 與表頭另判
 _MOD_LEAVES = {"name", "text", "job_description", "ocs_code", "ocs_level",
                "competency_level"}
@@ -83,7 +84,12 @@ def _entry_texts(container: list) -> list[str]:
     out = []
     for it in container:
         if isinstance(it, dict):
-            out.append(normalize(it.get("name") or it.get("text") or ""))
+            name = it.get("name") or it.get("text") or ""
+            if not name and isinstance(it.get("task_codes"), list):
+                # TaskGroup:名目住 task_codes[0].name
+                first = next((c for c in it["task_codes"] if isinstance(c, dict)), {})
+                name = first.get("name") or ""
+            out.append(normalize(name))
     return out
 
 
@@ -125,10 +131,19 @@ def verify_ops(ops: list[dict], *, doc: dict, turns: dict[int, str],
                 continue
             container = get_at(doc, path)
             if not isinstance(container, list):
-                err(i, "permission",
-                    f"op[{i}] add 目標 {path} 在文件中不存在——任務必掛在已存在的職責下;"
-                    "請先確認父節點,或改用現有容器路徑。")
-                continue
+                # 容器缺殼但父節點在(能力區塊懶建;落地端建殼)→ 視為空容器
+                parent, leaf = resolve(doc, path)
+                segs = path.split(".")
+                if isinstance(parent, dict) and leaf == last:
+                    container = parent.get(last) if isinstance(parent.get(last), list) else []
+                elif (len(segs) >= 3 and segs[-3] == "competency_blocks"
+                      and isinstance(get_at(doc, ".".join(segs[:-3])), dict)):
+                    container = []   # blocks 整列缺殼但 task 在(落地端建殼)
+                else:
+                    err(i, "permission",
+                        f"op[{i}] add 目標 {path} 在文件中不存在——任務必掛在已存在的"
+                        "職責下;請先確認父節點,或改用現有容器路徑。")
+                    continue
             if not isinstance(value, str) or not value.strip():
                 err(i, "contract", f"op[{i}] add 需要非空字串 value(新條目名稱/文字)。")
                 continue
@@ -138,10 +153,15 @@ def verify_ops(ops: list[dict], *, doc: dict, turns: dict[int, str],
                     "若要修改請對既有條目發 mod。")
                 continue
         elif kind in ("mod", "del"):
-            parent, leaf = resolve(doc, path)
-            exists = parent is not None and (
-                step(parent, leaf) is not None
-                if not isinstance(parent, dict) else leaf in parent or _is_slot_path(path))
+            if _is_slot_path(path):
+                # details 殼懶建:task 節點在即視為可寫(落地端建殼)
+                task_node = get_at(doc, ".".join(path.split(".")[:-2]))
+                exists = isinstance(task_node, dict)
+            else:
+                parent, leaf = resolve(doc, path)
+                exists = parent is not None and (
+                    step(parent, leaf) is not None
+                    if not isinstance(parent, dict) else leaf in parent)
             if not exists:
                 err(i, "permission",
                     f"op[{i}] {kind} 目標 {path} 在文件中不存在——"

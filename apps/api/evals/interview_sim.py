@@ -1,14 +1,15 @@
-"""模擬受訪者回歸 v3(T10;ADR 0028;承 v2/T14 校準 #3 教訓 §16.14)。
+"""模擬受訪者回歸 v3(T10;ADR 0028/0030;承 v2/T14 校準 #3 教訓 §16.14)。
 
     cd apps/api && PYTHONUTF8=1 uv run python evals/interview_sim.py [--max-turns 20] [--dump]
+    換模 A/B:MODEL_INTERVIEW=<slug> uv run python evals/interview_sim.py
 
 形狀:**純智力迴圈,不碰 DB**。三段:
 ① 裁剪段(0028 D1/D6):**劇本化員工述職**(消掉 §16.14 的模擬員工漂移混淆因子)
    → curation_pass → 量預勾 precision/recall(vs 事實表 DOES)+ declined 正確率(⊆DOESNT)。
-② 深聊段(v2 原樣):模擬員工(cheap LLM 綁事實表)× 真管線(書記+帳本+顧問)
-   → grounding(引文驗證率、每回合進帳)。
+② 深聊段(v3):模擬員工(cheap LLM 綁事實表)× 真管線(書記 op→verify→`_pending`
+   +帳本+顧問)→ grounding(verify 通過率=落地/(落地+拒收)、每回合進帳)。
 ③ 態度收尾段(0028 D3):深聊全逐字稿 → attitudes_pass → 條數 ≤MAX_A、守衛丟棄數。
-閘門=**確定性指標**(§16.14:引文驗證率+進帳率+裁剪 precision);recall/態度=資訊訊號。
+閘門=**確定性指標**(§16.14:verify 通過率+進帳率+裁剪 precision);recall/態度=資訊訊號。
 結果留 docs/specs 校準紀錄;門檻改=重跑,不改碼。
 """
 from __future__ import annotations
@@ -167,6 +168,7 @@ async def simulate(max_turns: int, dump: bool = False) -> dict:
     state: dict = {}
     transcript: list[tuple[str, str]] = []
     employee_texts: list[str] = []
+    turns_map: dict[int, str] = {}
     ev_total = ev_verified = 0
     quote_lens: list[int] = []
     progressed_turns = 0
@@ -181,17 +183,21 @@ async def simulate(max_turns: int, dump: bool = False) -> dict:
             role="cheap") or "嗯…這我不確定").strip()
         transcript.append(("consultant", question))
         employee_texts.append(answer)
+        turns_map[turns_used] = answer
 
-        # ① 書記 pass(v2)
-        scribe_res = await scribe_pass(llm, knowledge, doc=doc,
-                                       employee_texts=employee_texts, human_touched=[])
+        # ① 書記 pass(v3:op→verify→`_pending`;grounding=verify 通過率)
+        scribe_res = await scribe_pass(llm, knowledge, doc=doc, turns=turns_map,
+                                       turn_id=turns_used, header_codes=set())
         if scribe_res.new_doc is not None:
             doc = scribe_res.new_doc
-        for e in scribe_res.evidence:
-            ev_total += 1
-            ev_verified += 1 if e["verified"] else 0
-            if e["verified"]:
-                quote_lens.append(len(e.get("quote", "")))
+        rejects = sum(1 for g in scribe_res.guard_log if g.startswith("verify-reject"))
+        landed = len(scribe_res.ops)
+        ev_total += landed + rejects
+        ev_verified += landed
+        for op in scribe_res.ops:
+            q = ((op.get("src") or {}).get("quote") or {}).get("text") or ""
+            if q:
+                quote_lens.append(len(q))
         if scribe_res.progressed:
             progressed_turns += 1
 
@@ -230,7 +236,7 @@ async def simulate(max_turns: int, dump: bool = False) -> dict:
         "blockers_remaining": len(blockers),
         "slot_keyword_accuracy": round(hit / len(FACTS), 2),
         "slot_mismatches": mismatches,
-        "evidence_verified_rate": round(ev_verified / ev_total, 2) if ev_total else None,
+        "verify_pass_rate": round(ev_verified / ev_total, 2) if ev_total else None,
         "avg_quote_len": round(sum(quote_lens) / len(quote_lens), 1) if quote_lens else 0,
         "progressed_turn_rate": round(progressed_turns / turns_used, 2) if turns_used else 0,
         "details_filled": {k: details.get(k) for k in FACTS if details.get(k)},
@@ -250,7 +256,7 @@ def main() -> int:
     # + 裁剪 precision(0028 T10;保守預勾的品質底線)。recall/態度條數=資訊訊號
     # (保守預勾天然犧牲 recall——漏勾由顧問成組反問接住;不用脆弱指標假 PASS/FAIL)。
     cur = report["curation"]
-    passed = ((report["evidence_verified_rate"] or 0) >= 0.8
+    passed = ((report["verify_pass_rate"] or 0) >= 0.8
               and report["progressed_turn_rate"] >= 0.8
               and cur["precision"] >= 0.8 and cur["declined_all_correct"])
     print(f"(informational) slot_keyword_accuracy={report['slot_keyword_accuracy']}"

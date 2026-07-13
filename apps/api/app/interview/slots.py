@@ -39,6 +39,19 @@ LIGHT_SLOTS = ("frequency", "time_share_pct", "standards")
 CORE_TIME_SHARE_PCT = 15          # 比重 ≥15% → core
 HIGH_FREQ_MARKERS = ("每日", "每天", "每週", "每周")   # 高頻 → core
 
+# 數值槽(契約上是數;書記 schema 允許 string|number → 寫入前必經 coerce_slot_value)
+_PCT_RE = __import__("re").compile(r"(\d+(?:\.\d+)?)")
+
+
+def coerce_slot_value(key: str, value):
+    """槽值正規化(寫入路徑唯一入口):time_share_pct「25%」/「約 25」→ 25.0;
+    抽不出數字就保留原值(slot_filled 仍視為已答;數值消費端各自防禦跳過)。"""
+    if key == "time_share_pct" and isinstance(value, str):
+        m = _PCT_RE.search(value)
+        if m:
+            return float(m.group(1))
+    return value
+
 
 def slot_filled(details: dict | None, key: str) -> bool:
     v = (details or {}).get(key)

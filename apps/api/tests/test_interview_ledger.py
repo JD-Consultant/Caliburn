@@ -86,6 +86,12 @@ def test_share_sum():
     assert L.share_sum(doc) == 100
 
 
+def test_share_sum_skips_non_numeric():
+    """舊資料/手填字串(「25%」)防禦跳過——不 crash、不亂算(2026-07-13 sim 抓漏)。"""
+    doc = _doc([_unit([_core_task(pct=60), _light_task(pct="40%")])])
+    assert L.share_sum(doc) == 60
+
+
 # ---- blocks_missing / task_missing ----
 
 def test_blocks_missing_thresholds():

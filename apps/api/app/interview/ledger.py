@@ -52,8 +52,13 @@ def tier(task: dict, task_path: str, state: dict) -> bool | None:
 
 
 def share_sum(doc: dict) -> float:
-    return sum((t.get("details") or {}).get("time_share_pct") or 0
-               for _, t, _ in iter_tasks(doc))
+    """比重加總。非數值(舊資料/使用者手填「25%」字串)防禦跳過——crash 比漏算糟。"""
+    total = 0.0
+    for _, t, _ in iter_tasks(doc):
+        v = (t.get("details") or {}).get("time_share_pct")
+        if isinstance(v, (int, float)):
+            total += v
+    return total
 
 
 def blocks_missing(task: dict) -> list[str]:

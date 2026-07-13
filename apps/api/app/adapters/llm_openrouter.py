@@ -152,6 +152,9 @@ class OpenRouterLlm:
                         span.set_attribute("gen_ai.usage.input_tokens", um["input_tokens"])
                     if um.get("output_tokens") is not None:
                         span.set_attribute("gen_ai.usage.output_tokens", um["output_tokens"])
+                    cached = (um.get("input_token_details") or {}).get("cache_read")
+                    if cached is not None:
+                        span.set_attribute("gen_ai.usage.cache_read.input_tokens", cached)
                     meta = getattr(resp, "response_metadata", None) or {}
                     if meta.get("model_name"):
                         span.set_attribute("gen_ai.response.model", meta["model_name"])

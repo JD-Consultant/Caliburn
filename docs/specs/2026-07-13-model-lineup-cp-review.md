@@ -89,6 +89,29 @@ source_discipline: 只收官方一手定價頁 + OpenRouter 模型頁;二手聚�
   (當非事實不記),1/8 只記合法池碼、丟非法碼。行為優於 4o-mini 基線。
 - turn 靶已移除(v1 commands.py 隨 v3 顧問改 chat+tools 退役;受限解碼只剩書記一路)。
 
+## 5.1 快取確認(2026-07-13 實證)
+
+**規則(官方)**:OpenAI 經 OpenRouter **自動快取**(≥1024 tokens,前綴逐位元相同,
+hash 涵蓋 messages+tools 定義+structured output schema;讀 0.25–0.5x);DeepSeek 自動
+(讀 0.1x);Anthropic 要 `cache_control` 才有(現陣容已無 Anthropic,註記留 adapter)。
+回報統一在 `usage.prompt_tokens_details.cached_tokens`(OpenRouter prompt-caching 文件+
+OpenAI prompt-caching 指南)。
+
+**實證探針(真實前綴 1=CONSULTANT_SYSTEM+總則教材,同前綴兩發)**:
+- `gpt-4.1-mini`(interview 現役):第二發 **cached=1792/1919(93%)** ✅
+- `gpt-5.4-mini`(select 新役):第二發 **cached=1792/1918** ✅
+- `deepseek-v4-flash`:cached=0——OpenRouter 定價 $0.077(官方半價)表明路由到第三方
+  託管,不走 DeepSeek 官方快取。cheap/deep/indicator 是一次性 read-only 提議、無重複
+  前綴,**影響趨近零**;未來縫:要快取可 `provider.order=["deepseek"]` pin 官方(一行)。
+- v4-flash 預設**未開 reasoning**(completion_tokens=6),行為同舊 deepseek-chat
+  非思考模式——`/ai/*` JSON 解析路不受影響。
+
+**碼側核對**:consultant 三層(前綴1 常數+前綴2 禁時間戳+動態在後)與 CONSULTANT_TOOLS
+(模組常數)符合「靜態在前、變動在後」;`_record_usage`(openai SDK 路)與 `complete_text`
+(langchain 路,本輪補)都記 `gen_ai.usage.cache_read.input_tokens`,快取命中率上線後
+可直接從 trace 讀。未來縫(一行):動態區塊現排在對話窗**之前**,對話 tokens 永遠不進
+快取;若把動態塊移到對話窗後可加深命中,屬 prompt 結構變更,須過考卷再動。
+
 ## 6. 未決/待確認
 
 - gpt-5.6-luna 待生態穩定後可重評(cached in $0.10 對前綴穩定的 context 三層很有利)。

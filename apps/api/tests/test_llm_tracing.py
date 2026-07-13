@@ -13,7 +13,8 @@ class _FakeChat:
     async def ainvoke(self, msgs):
         return AIMessage(
             content="嗨",
-            usage_metadata={"input_tokens": 11, "output_tokens": 7, "total_tokens": 18},
+            usage_metadata={"input_tokens": 11, "output_tokens": 7, "total_tokens": 18,
+                            "input_token_details": {"cache_read": 8}},
             response_metadata={"model_name": "vendor/mid-2026", "finish_reason": "stop"},
         )
 
@@ -34,4 +35,5 @@ def test_complete_text_emits_gen_ai_span(monkeypatch):
     assert span.attributes["gen_ai.response.model"] == "vendor/mid-2026"
     assert span.attributes["gen_ai.usage.input_tokens"] == 11
     assert span.attributes["gen_ai.usage.output_tokens"] == 7
+    assert span.attributes["gen_ai.usage.cache_read.input_tokens"] == 8
     assert list(span.attributes["gen_ai.response.finish_reasons"]) == ["stop"]

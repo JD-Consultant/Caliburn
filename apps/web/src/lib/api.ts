@@ -166,7 +166,8 @@ export const getInterview = (profileId: string) =>
 
 // 審閱事件無聲記帳(ADR 0030 §6.3):✓/✗/批量只記錄不觸發 AI;文件變換
 // (去標/還原/renumber/PATCH)由前端執行(0025 不變量)。ledger 下回合讀被拒清單。
-export type ReviewDecision = "accepted" | "rejected" | "batch_rejected";
+// occupation_dismissed:關掉職類建議卡(0031)——記帳供顧問下回合換話術
+export type ReviewDecision = "accepted" | "rejected" | "batch_rejected" | "occupation_dismissed";
 export const postReviewEvents = (
   profileId: string,
   events: { doc_path: string; decision: ReviewDecision; op_meta?: unknown }[],

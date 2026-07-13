@@ -224,6 +224,8 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
               profileId={id}
               doc={doc}
               onWidget={onWidget}
+              referenceEmpty={!(profile?.selected_ocs_codes?.length)}
+              onOpenReference={() => { setAiOccQuery(null); setShowOcc(true); }}
             />
           </div>
         </aside>

@@ -98,7 +98,7 @@ updated: 2026-07-14
 | 內容有家+有逐字證據(quote 過 verify ②) | 表格綠字 `_pending`,✓/✗ 就地審 | 書記 op;**官方任務**=裁剪 quote-backed→確定性 op(家職責不在→官方殼,殼必帶池 URN) | 已實作 |
 | 參考集合建議(無家,住 profile) | 聊天建議卡 | 0031 職類卡(precheck=本回合搜尋真實命中;人按=PUT) | 已實作 |
 | AI 不確定(無 quote;候選 ≤3) | 聊天卡片點頭 | 確認=前端 confirmed 直落(0028 D9) | plan T5d |
-| 開場 intake / 收尾補漏 / 隨時自報 | 盤(全域任務窗)——**永遠人開** | intake 邀請卡(確定性三布林:參考非空∧文件無任務∧未 dismiss)/尾聲 offer/工具列自取;`task_board_dismissed` 記帳 | intake 卡=已實作;尾聲 offer=plan T5e;工具列=已實作 |
+| 開場 intake / 收尾補漏 / 隨時自報 | 盤(全域任務窗)——**永遠人開** | intake 邀請卡(確定性三布林:參考非空∧文件無任務∧未 dismiss)/收尾兩卡「開盤掃補漏」鈕/工具列自取;`task_board_dismissed` 記帳 | 已實作(不確定候選卡=plan T5d 待金鑰) |
 
 盤=乾淨自取:**無 AI 預勾疊加層**(`interview:curation`+web `lib/curation.ts` **已退役**)。
 

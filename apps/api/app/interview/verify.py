@@ -27,10 +27,11 @@ _CTRL = re.compile(r"[\x00-\x1f\x7f]")
 
 # add 容器白名單(最後一段);⑤ 結構不變量
 # tasks = 整個 TaskGroup(加新任務);task_codes = 既有任務組內的名目條目。
-# ocu_units 刻意不在名單:沒有生成端會發、落地端也沒有 unit 節點建構——
-# 要開放「AI 加職責」須同時補 scribe 變體+apply 建殼,fail-closed 先擋。
+# ocu_units(ADR 0032):**只有裁剪確定性落地**會發(官方殼;apply 建殼)——
+# 書記 schema 無對應變體,生成端仍編不出「AI 自由加職責」;守衛=src 檢查(殼名/任務
+# 皆池內官方)+ 落地端 provenance 由 ref_urn 程式導出。
 _ADD_CONTAINERS = {"task_codes", "indicators", "outputs", "knowledge", "skills",
-                   "attitudes", "tasks"}
+                   "attitudes", "tasks", "ocu_units"}
 # mod 葉欄白名單(最後一段);details.<槽> 與表頭另判
 _MOD_LEAVES = {"name", "text", "job_description", "ocs_code", "ocs_level",
                "competency_level"}
@@ -86,7 +87,7 @@ def _entry_texts(container: list) -> list[str]:
     out = []
     for it in container:
         if isinstance(it, dict):
-            name = it.get("name") or it.get("text") or ""
+            name = it.get("name") or it.get("text") or it.get("ocu_name") or ""
             if not name and isinstance(it.get("task_codes"), list):
                 # TaskGroup:名目住 task_codes[0].name
                 first = next((c for c in it["task_codes"] if isinstance(c, dict)), {})
@@ -200,6 +201,11 @@ def verify_ops(ops: list[dict], *, doc: dict, turns: dict[int, str],
                 continue
 
         # --- ③ 來源一致 ---
+        if kind == "add" and last == "ocu_units" and ref_urn is None:
+            err(i, "src",
+                f"op[{i}] 職責殼必須帶官方出處 ref_urn(0032:殼只允許池內官方職責,"
+                "自由新增職責不受理——內容請掛既有職責或走 add_custom_task)。")
+            continue
         if ref_urn is not None and str(ref_urn) not in ref_codes:
             err(i, "src",
                 f"op[{i}] ref_urn「{ref_urn}」不在參考集合——只能引用本文件掛的參考基準。")

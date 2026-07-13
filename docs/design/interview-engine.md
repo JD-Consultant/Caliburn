@@ -56,6 +56,9 @@ updated: 2026-07-14
 面板 send(text) → POST …/interview:turn {text}
   ① 載入 draft+session+逐字稿;append 員工 turn;官方任務池 build_task_pool(fail-open)
   ② 帳本回合前視角:last_gap=next_gap(帳本尊重 held/boundary);curation 縫→curation_pass
+     → quote-backed precheck 經 curation_ops **確定性映射**成 add op(官方殼+任務,
+       ref=池 URN)→ 同 verify/land 路直落 `_pending`(0032;409→放棄,下回合縫自癒);
+       declined→ledger_state。文件變了 → 顧問/書記/帳本後續全吃落地後文件
   ③ 顧問 chat_with_tools(role=interview;**先於書記**,吃回合前文件):
        context 三層(T7):前綴1=system+consultant-principles(全域凍結,byte 級穩定)
        → 前綴2=參考基準摘要(per-doc) → 動態區=進度/四態文件/被拒/待問/本回合欄位 skill
@@ -92,12 +95,12 @@ updated: 2026-07-14
 
 | 情境 | 載體 | 機制 | 狀態 |
 |---|---|---|---|
-| 內容有家+有逐字證據(quote 過 verify ②) | 表格綠字 `_pending`,✓/✗ 就地審 | 書記 op;**官方任務**=裁剪 quote-backed→確定性 op(家職責不在→官方殼) | 書記=已實作;官方任務直落=plan T5c |
+| 內容有家+有逐字證據(quote 過 verify ②) | 表格綠字 `_pending`,✓/✗ 就地審 | 書記 op;**官方任務**=裁剪 quote-backed→確定性 op(家職責不在→官方殼,殼必帶池 URN) | 已實作 |
 | 參考集合建議(無家,住 profile) | 聊天建議卡 | 0031 職類卡(precheck=本回合搜尋真實命中;人按=PUT) | 已實作 |
 | AI 不確定(無 quote;候選 ≤3) | 聊天卡片點頭 | 確認=前端 confirmed 直落(0028 D9) | plan T5d |
 | 開場 intake / 收尾補漏 / 隨時自報 | 盤(全域任務窗)——**永遠人開** | intake 邀請卡(確定性三布林:參考非空∧文件無任務∧未 dismiss)/尾聲 offer/工具列自取;`task_board_dismissed` 記帳 | intake 卡=已實作;尾聲 offer=plan T5e;工具列=已實作 |
 
-盤=乾淨自取:**無 AI 預勾疊加層**(`interview:curation`+web `lib/curation.ts` 退役,T5c)。
+盤=乾淨自取:**無 AI 預勾疊加層**(`interview:curation`+web `lib/curation.ts` **已退役**)。
 
 ## 6. 不變量(code 讀不出的規則;違反=repo 級 bug)
 
@@ -135,6 +138,9 @@ updated: 2026-07-14
 - v1 `executor.py`/`commands.py`/`context.py`(set_slot 命令流)——**已刪**;勿回收其語彙。
 - web `reviewMap.ts`/`SuggestionReview`/`CurationDialog`——**已刪**;四態渲染=`_pending`
   (`PendingMark.tsx`+`ocsDoc.ts` 輔助);任務檢查表=議程狀態機+側欄成組反問。
+- `interview:curation` 端點/`run_curation`/web `lib/curation.ts`(盤預勾疊加層)、
+  run_turn 的 `picker:"task"` widget——**已刪(0032)**;盤=乾淨自取,quote-backed
+  判斷在裁剪縫直落綠字,別再蓋「AI 疊加層等人來盤裡確認」。
 - `/ai/*` 端點=read-only 純函數,保留但**不是**共編路徑。
 
 ## 8. Evals(品質迴圈;apps/api/evals/)

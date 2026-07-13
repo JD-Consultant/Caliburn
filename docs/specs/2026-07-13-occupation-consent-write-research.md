@@ -96,6 +96,11 @@ header_codes,`_pending` 延遲生效,✓ 才寫+重算)——參考集合落地�
 
 ## 7. 載體判準(卡片/彈窗/落文件;2026-07-13 大廠指南複核)
 
+> **2026-07-14 更審**:本節裁決①③的「任務=AI 彈盤(consent-triggered)+盤帶預勾」段
+> 已翻案——維護者質疑後重研,定案=有 quote→綠字直落、盤=人拉(intake/自取)、
+> 不確定→卡片。見 [`2026-07-14-task-carrier-routing-research.md`](2026-07-14-task-carrier-routing-research.md)
+> + ADR 0032。②(盤上確認=confirmed)與 focal-ask 單槽原則維持。
+
 - **Microsoft HAX**(microsoft.com/haxtoolkit,MSR 2019 Amershi et al. 18 條):
   「依使用者當下任務與注意力決定何時行動/打斷」;Copilot 實證=心流中被建議打斷
   →生產力損失,**打斷要挑時機**。→ 彈窗只在 consent-triggered 時機(他剛口頭同意、

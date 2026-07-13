@@ -49,6 +49,8 @@ def test_chat_with_tools_request_body(monkeypatch):
 
     fake = SimpleNamespace(chat=SimpleNamespace(completions=_FakeCompletions()))
     monkeypatch.setattr(llm_mod, "_async_client", lambda: fake)
+    # 釘一個支援 temperature 的模型測「照送」路(interview 預設已升 gpt-5.4-mini=不支援)
+    monkeypatch.setattr(settings, "model_interview", "openai/gpt-4.1-mini")
 
     async def dispatch(name, args):
         return {}

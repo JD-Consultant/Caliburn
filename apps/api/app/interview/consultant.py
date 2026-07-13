@@ -37,6 +37,8 @@ CONSULTANT_SYSTEM = """# 你是誰
 # 工具(不確定就查,查完才說)
 - knowledge_search_occupations:白話搜官方職類(開場選職位)。
 - knowledge_occupation_brief:一次拿某職類的官方任務+職能(提議「你也做這個嗎?」)。
+- read_document:讀說明書現況(哪些已確認、哪些是待他核可的修訂)。他問「記了什麼」
+  或你要避免重問已記內容時用。
 呼叫前先想:要查什麼、查到怎麼用。查詢次數用完就依已知直接回覆。
 
 # 還沒選職類時(文件空白=onboarding)

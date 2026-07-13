@@ -87,8 +87,10 @@ def task_missing(task: dict, task_path: str, state: dict, skips: set[str]) -> li
     return miss
 
 
-def has_occupation(doc: dict) -> bool:
-    return bool((doc.get("ocs_profile") or {}).get("ocs_code"))
+def has_occupation(doc: dict, ref_codes: set[str] | frozenset = frozenset()) -> bool:
+    """有沒有可用的官方基準:文件主基準 **或** 參考集合(profile.selected_ocs_codes)。
+    0029 脫鉤後選職類只寫 profile——只看文件會鬼打牆(session 6f807f1e 事故)。"""
+    return bool((doc.get("ocs_profile") or {}).get("ocs_code") or ref_codes)
 
 
 def checklist(doc: dict, state: dict, pool_tasks: list[dict]) -> dict[str, list[dict]]:
@@ -120,10 +122,11 @@ def checklist(doc: dict, state: dict, pool_tasks: list[dict]) -> dict[str, list[
     return out
 
 
-def derive_phase(doc: dict, state: dict) -> str:
+def derive_phase(doc: dict, state: dict,
+                 ref_codes: set[str] | frozenset = frozenset()) -> str:
     """議程階段(0028 D2;顯示/引導用,非 gate——由 doc 推導、不落庫,12-Factor F5)。
     onboarding_occupation → task_curation → opks_deep → attitudes_wrapup。"""
-    if not has_occupation(doc):
+    if not has_occupation(doc, ref_codes):
         return "onboarding_occupation"
     rows = list(iter_tasks(doc))
     if not rows:
@@ -143,7 +146,8 @@ def _gap(task_path: str, name: str) -> str:
 
 
 def next_gap(doc: dict, state: dict, skips_by_task: dict[str, set[str]],
-             pool_tasks: list[dict] | None = None) -> str | None:
+             pool_tasks: list[dict] | None = None,
+             ref_codes: set[str] | frozenset = frozenset()) -> str | None:
     """下一個該問的縫隙(給顧問的提示,非命令)。優先序:
     ⓪還沒任務→onboarding/curation(選職類/AI 預勾裁剪,不掉態度;§16.16、0028)
     ⓪′有任務但官方檢查表還有 unasked → curation 成組反問(尊重 STALL_K,飽和讓路;D6)
@@ -156,8 +160,8 @@ def next_gap(doc: dict, state: dict, skips_by_task: dict[str, set[str]],
 
     rows = [(tp, t, skips_by_task.get(tp, set())) for u, t, tp in iter_tasks(doc)]
     if not rows:                                                  # ⓪ 還沒任務(不受 stall)
-        return ONBOARD_OCCUPATION if not has_occupation(doc) else CURATION_TASKS
-    if (pool_tasks and has_occupation(doc)                        # ⓪′ 檢查表殘項(受 stall)
+        return ONBOARD_OCCUPATION if not has_occupation(doc, ref_codes) else CURATION_TASKS
+    if (pool_tasks and has_occupation(doc, ref_codes)             # ⓪′ 檢查表殘項(受 stall)
             and not is_stalled(state, CURATION_TASKS)
             and checklist(doc, state, pool_tasks)["unasked"]):
         return CURATION_TASKS

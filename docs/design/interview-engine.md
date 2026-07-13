@@ -97,6 +97,11 @@ updated: 2026-07-13
    =verify ⑤ 拒收。後端永不重編碼。
 6. **人改=直改**,不打標記;human rewrite **不告知模型**(Claude Code 先例);
    AI 可對任何已確認內容發提議(`_pending` 即提議載體),唯一禁令=無聲修改。
+7. **引擎有效參考碼=`profile.selected_ocs_codes ∪ 文件碼`**(ADR 0031):0029 脫鉤後
+   選參考只寫 profile——帳本/任務池/書記官方池/顧問前綴 2 全吃聯集,只看文件=鬼打牆
+   回歸(session 6f807f1e)。職類建議走**聊天建議卡**(widget `precheck` 只含本回合
+   搜尋真實命中碼;確認=前端 PUT 參考集合=人選,**AI 不代寫**);✕=
+   `occupation_dismissed` 記帳→下回合知情換話術;參考集合空時前端常駐「待選」chip。
 7. **態度只在文件層**;任務必掛職責;官方碼必來自參考集合(池)。
 8. **boundary(劃線不談)無自動解除路徑**;held=FIFO 待問。
 9. **前綴穩定**:consultant context 前綴 1/2 同 session byte 級穩定(禁時間戳/UUID 進前綴)

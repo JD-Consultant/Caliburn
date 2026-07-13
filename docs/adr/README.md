@@ -39,6 +39,7 @@ ADR 是「為什麼」層;搭配 `../specs/`(細節設計)與 `../runbook.md`(�
 | [0028](0028-interview-flow-shared-ui-curation.md) | 訪談流程 v2.1：AI 驅動既有編輯器 pickers（同 UI、追蹤修訂呈現）＋議程化彈性流程＋官方檢查表缺項探測（實際為準）＋態度收尾 pass（修正 0027 態度通道與 0025 批審載體） | Accepted（2026-07-09；真人實測 eb2af457 驅動） |
 | [0029](0029-editor-menus-three-types-decoupling.md) | 編輯器選單三型（控制/參考/素材庫）＝純工具（無自動寫/自訂入口/AI 標記、一律獨立視窗）＋參考集合與文件身分脫鉤（主基準＝表頭職類視窗所選）＋OPLKS 全展開位置碼版式；AI 共編載體延後另裁 | Accepted（2026-07-11；七層設計討論收斂；AI 載體由 0030 定案） |
 | [0030](0030-ai-coedit-tracked-changes-one-brain.md) | AI 層 v3：追蹤修訂直寫載體（`_pending` 四態＋條目級綠紅標＋無聲審閱記帳後用）＋一條腦（scribe 唯一寫入、舊 LangGraph/CopilotKit 退役）＋verify 六查＋對話層規則＋品質迴路（黃金範本/雙 suite/promptfoo CI）；部分修正 0025 批審載體與 0028 彈窗載體 | Accepted（2026-07-13；六輪研究＋逐層討論收斂） |
+| [0031](0031-occupation-suggest-card-refset-source.md) | 職類建議卡進對話流（推翻 0028 D1 職類段；預勾＋理由＋三出口）＋引擎參考碼＝profile∪doc 不變量（修 0029×0030 盲區鬼打牆）＋參考集合維持人選（否決 AI 代寫，記重啟條件）＋dismissed 知情話術；反騷擾緩做 | Accepted（2026-07-13；新手 persona 手測驗屍＋先例研究） |
 
 完整脈絡見 [`../specs/2026-06-27-system-architecture-design.md`](../specs/2026-06-27-system-architecture-design.md)。
 契約怎麼選/怎麼交付的規範見 [`../contract-strategy.md`](../contract-strategy.md)（ADR 0004/0010 的一般化、預答契約 #3）。

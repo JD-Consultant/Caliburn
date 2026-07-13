@@ -2,7 +2,7 @@
 title: 訪談引擎 × 文件工作台 — 端到端設計(v3 追蹤修訂/一個大腦)
 audience: agent-primary(也給人)
 scope: apps/api app/interview/* + skills/* + observability + routes/interview + apps/web 表格四態/側欄
-updated: 2026-07-13
+updated: 2026-07-14
 ---
 
 # 訪談引擎 × 文件工作台 — 端到端設計(v3:一個大腦 + op→verify→`_pending`)
@@ -10,7 +10,8 @@ updated: 2026-07-13
 > **主讀者 = coding agent。** 目的:不看 code 也能改對這條線——不亂發明端點、不把信任
 > 機制交給 LLM、不繞過唯一寫入路徑。**living:動到這條線的碼,同 commit 更新本檔。**
 > 決策:ADR [0030](../adr/0030-ai-coedit-tracked-changes-one-brain.md)(v3 六裁決;部分翻案
-> 0025/0028)、[0027](../adr/0027-interview-engine-v2-consultant-agent.md)(四組件,留用)、
+> 0025/0028)、[0032](../adr/0032-task-carrier-routing.md)(任務載體路由,§5.1)、
+> [0027](../adr/0027-interview-engine-v2-consultant-agent.md)(四組件,留用)、
 > [0023](../adr/0023-interview-engine-stateless-turns.md)(無狀態回合)、
 > [0024](../adr/0024-llm-wiring-select-schema.md)(受限解碼)。
 > 研究(單一參照點):[`2026-07-12-ai-layer-redesign-research.md`](../specs/2026-07-12-ai-layer-redesign-research.md) §6;
@@ -86,6 +87,17 @@ updated: 2026-07-13
 | 議程清單 | `GET …/interview` 的 `agenda[]`(三態+boundary;ledger 推導) |
 | 匯出 JSON | `GET …/document/export`(後端 `_strip_underscore` 自動剝 `_pending`);待審>0 前端先 confirm |
 
+### 5.1 AI→人 載體判準(ADR 0032;「狀態」欄隨實作 commit 更新)
+
+| 情境 | 載體 | 機制 | 狀態 |
+|---|---|---|---|
+| 內容有家+有逐字證據(quote 過 verify ②) | 表格綠字 `_pending`,✓/✗ 就地審 | 書記 op;**官方任務**=裁剪 quote-backed→確定性 op(家職責不在→官方殼) | 書記=已實作;官方任務直落=plan T5c |
+| 參考集合建議(無家,住 profile) | 聊天建議卡 | 0031 職類卡(precheck=本回合搜尋真實命中;人按=PUT) | 已實作 |
+| AI 不確定(無 quote;候選 ≤3) | 聊天卡片點頭 | 確認=前端 confirmed 直落(0028 D9) | plan T5d |
+| 開場 intake / 收尾補漏 / 隨時自報 | 盤(全域任務窗)——**永遠人開** | intake 邀請卡(確定性三布林:參考非空∧文件無任務∧未 dismiss)/尾聲 offer/工具列自取;`task_board_dismissed` 記帳 | intake 卡=plan T5a/b;工具列=已實作 |
+
+盤=乾淨自取:**無 AI 預勾疊加層**(`interview:curation`+web `lib/curation.ts` 退役,T5c)。
+
 ## 6. 不變量(code 讀不出的規則;違反=repo 級 bug)
 
 1. **AI 寫入唯一路徑=op→verify→`_pending`**。任何繞過 verify 直寫文件的 AI 路徑都是回歸。
@@ -102,11 +114,15 @@ updated: 2026-07-13
    回歸(session 6f807f1e)。職類建議走**聊天建議卡**(widget `precheck` 只含本回合
    搜尋真實命中碼;確認=前端 PUT 參考集合=人選,**AI 不代寫**);✕=
    `occupation_dismissed` 記帳→下回合知情換話術;參考集合空時前端常駐「待選」chip。
-7. **態度只在文件層**;任務必掛職責;官方碼必來自參考集合(池)。
-8. **boundary(劃線不談)無自動解除路徑**;held=FIFO 待問。
-9. **前綴穩定**:consultant context 前綴 1/2 同 session byte 級穩定(禁時間戳/UUID 進前綴)
+8. **態度只在文件層**;任務必掛職責;官方碼必來自參考集合(池)。
+9. **boundary(劃線不談)無自動解除路徑**;held=FIFO 待問。
+10. **前綴穩定**:consultant context 前綴 1/2 同 session byte 級穩定(禁時間戳/UUID 進前綴)
    ——provider 快取的前提(Anthropic 系路由須另帶 `cache_control`,見 llm_openrouter.py)。
-10. **調教閉環**:改判準先改 `skills/*/SKILL.md`(SME 審)→ evals regression;不改碼。
+11. **調教閉環**:改判準先改 `skills/*/SKILL.md`(SME 審)→ evals regression;不改碼。
+12. **任務載體路由(ADR 0032,§5.1)**:官方任務**有逐字證據才直落綠字**(無 quote
+    不落,留口頭/卡片);盤永遠人開——AI 只遞邀請(intake 卡/尾聲 offer),
+    `task_board_dismissed` 後知情不重推;盤上勾=confirmed 不套綠(0028 D9);
+    AI 程式化開 picker / 盤預勾疊加層=回歸。
 
 ## 7. 退役禁令(別把這些救回來)
 

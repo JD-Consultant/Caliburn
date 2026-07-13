@@ -54,9 +54,9 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
   const [showInterview, setShowInterview] = useState(false);
   const [error, setError] = useState<string | null>(null);
   // 0028 D1:訪談引擎 widget 指令 → 開**同一批**編輯器 pickers(同 UI、入口不同)。
-  // T12(ADR 0030):CurationDialog 退場——任務檢查表職能歸議程狀態機+側欄成組反問;
-  // task widget 不再開彈窗(挑任務走表格〔選任務〕/全域選任務窗)。
+  // 0032:AI 不彈盤——盤只由人開(intake 卡按鈕/工具列);taskBoardOpen=受控開窗。
   const [aiOccQuery, setAiOccQuery] = useState<string | null>(null);
+  const [taskBoardOpen, setTaskBoardOpen] = useState(false);
   const onWidget = (w: OpenPickerWidget) => {
     if (w.picker === "occupation") {
       setAiOccQuery(w.query ?? "");
@@ -136,8 +136,10 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
             <MessageCircle className="h-4 w-4" />
             AI 訪談
           </Button>
-          {/* 全域〔選工作任務〕(ADR 0029)：勾一筆自動掛到來源職責；〔選主要職責〕已搬到表格底部 */}
-          <GlobalTaskPickerMenu document={doc} pack={pack} disabled={!hasReferences || !doc} onChange={(d) => persist(d)} />
+          {/* 全域〔選工作任務〕(ADR 0029)：勾一筆自動掛到來源職責；〔選主要職責〕已搬到表格底部；
+              受控開窗(0032):intake 邀請卡「開任務盤」也開這一個窗 */}
+          <GlobalTaskPickerMenu document={doc} pack={pack} disabled={!hasReferences || !doc}
+            onChange={(d) => persist(d)} open={taskBoardOpen} onOpenChange={setTaskBoardOpen} />
           <Button size="sm" variant="outline" className="gap-1" onClick={exportJson} disabled={status === "none"}>
             <Download className="h-4 w-4" />
             匯出 JSON
@@ -226,6 +228,7 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
               onWidget={onWidget}
               referenceEmpty={!(profile?.selected_ocs_codes?.length)}
               onOpenReference={() => { setAiOccQuery(null); setShowOcc(true); }}
+              onOpenTaskBoard={() => setTaskBoardOpen(true)}
             />
           </div>
         </aside>

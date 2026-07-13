@@ -16,8 +16,10 @@ import {
   useFinishInterview, useInterview, useInterviewTurn, useStartInterview,
 } from "@/hooks/useInterview";
 import {
-  chipOptions, hasMaterial, occSuggestions, typewriterDone, typewriterSlice,
+  chipOptions, docHasTasks, hasMaterial, isIntakeInvite, occSuggestions,
+  typewriterDone, typewriterSlice,
 } from "@/lib/interviewUi";
+import { postReviewEvents } from "@/lib/api";
 import { listPending } from "@/lib/ocsDoc";
 import type {
   ChoiceWidget, InterviewProgress, OccPrecheckItem, OcsDocument, OpenPickerWidget,
@@ -70,6 +72,28 @@ function TypewriterBubble({ text }: { text: string }) {
   );
 }
 
+// intake 邀請卡(0032):開盤的手永遠是人——兩出口:開任務盤(頁面開全域盤)/
+// 用聊的就好(task_board_dismissed 無聲記帳 → 顧問下回合改口頭盤點,不再邀請)。
+function IntakeInviteCard({ onOpen, onDecline }: {
+  onOpen: () => void; onDecline: () => void;
+}) {
+  return (
+    <div className="rounded-md border border-sky-200 bg-sky-50/50 p-3 text-sm dark:border-sky-900 dark:bg-sky-950/30">
+      <p className="mb-2">
+        想快一點的話,可以先打開任務盤,勾一下你大概有做哪些(約 2 分鐘)——
+        我再逐條跟你聊細節;想直接用聊的也行。
+      </p>
+      <div className="flex items-center gap-2">
+        <Button size="sm" onClick={onOpen}>開任務盤(約 2 分鐘)</Button>
+        <Button size="sm" variant="ghost" onClick={onDecline}>用聊的就好</Button>
+      </div>
+      <p className="mt-1.5 text-xs text-muted-foreground">
+        之後隨時可從上方工具列「選工作任務」自己開。
+      </p>
+    </div>
+  );
+}
+
 // 封閉題卡(AskUserQuestion 樣式):單選 chips+推薦標記+永遠附「其他(自由輸入)」;
 function ChoiceCard({ widget, onSubmit, busy }: {
   widget: ChoiceWidget; onSubmit: (text: string) => void; busy: boolean;
@@ -114,12 +138,15 @@ function ChoiceCard({ widget, onSubmit, busy }: {
   );
 }
 
-export function InterviewPanel({ profileId, doc, onWidget, referenceEmpty, onOpenReference }: {
+export function InterviewPanel({
+  profileId, doc, onWidget, referenceEmpty, onOpenReference, onOpenTaskBoard,
+}: {
   profileId: string;
   doc?: OcsDocument;                          // 待審計數(文件內 _pending)資料源
   onWidget?: (w: OpenPickerWidget) => void;   // 0028:引擎 widget 指令 → 頁面開對應 picker
   referenceEmpty?: boolean;                   // 0031:參考集合空 → 顯示常駐〔待選〕chip
   onOpenReference?: () => void;               // chip 重入口 → 頁面開〔選參考〕modal
+  onOpenTaskBoard?: () => void;               // 0032 intake 卡「開任務盤」→ 頁面開全域盤
 }) {
   const view = useInterview(profileId);
   const start = useStartInterview(profileId);
@@ -128,8 +155,9 @@ export function InterviewPanel({ profileId, doc, onWidget, referenceEmpty, onOpe
   const [input, setInput] = useState("");
   const [lastSent, setLastSent] = useState("");
   const [finishDismissed, setFinishDismissed] = useState(false);
-  // 0031 A 案:職類建議卡進對話流(不彈窗);task widget 照舊走 onWidget
+  // 0031 A 案:職類建議卡進對話流(不彈窗);0032:intake 邀請卡同款(AI 不彈盤)
   const [occCard, setOccCard] = useState<OccPrecheckItem[] | null>(null);
+  const [intakeCard, setIntakeCard] = useState(false);
   const [cardError, setCardError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -155,13 +183,15 @@ export function InterviewPanel({ profileId, doc, onWidget, referenceEmpty, onOpe
     setLastSent(t);
     setAnimateAfter(turns.length > 0 ? turns[turns.length - 1].seq : 0);
     // 0028 D1(§16.18):open_picker 指令=**事件**,在 mutation onSuccess 派發一次。
-    // 0031:occupation 有建議 → 卡片進對話流(不彈窗);無建議或 task → 照舊 onWidget。
+    // 0031:occupation 有建議 → 職類卡;0032:task_board_intake → 邀請卡(不彈盤);
+    // 其餘照舊 onWidget(頁面開 picker)。
     turn.mutate(t, {
       onSuccess: (res) => {
         const w = res.widget;
         if (!w || w.kind !== "open_picker") return;
         const sugg = occSuggestions(w);
         if (sugg.length > 0) setOccCard(sugg);
+        else if (isIntakeInvite(w)) setIntakeCard(true);
         else onWidget?.(w);
       },
     });
@@ -245,6 +275,19 @@ export function InterviewPanel({ profileId, doc, onWidget, referenceEmpty, onOpe
           />
         ) : null}
         {cardError ? <p className="text-xs text-destructive">{cardError}</p> : null}
+        {/* 0032 intake 邀請卡:文件一有任務即自癒不再渲染(docHasTasks 雙保險) */}
+        {intakeCard && !docHasTasks(doc) && !busy ? (
+          <IntakeInviteCard
+            onOpen={() => { setIntakeCard(false); onOpenTaskBoard?.(); }}
+            onDecline={() => {
+              // 無聲記帳(失敗不擋 UI;§6.3 同款)——顧問下回合知情改口頭盤點
+              postReviewEvents(profileId, [
+                { doc_path: "board:tasks", decision: "task_board_dismissed" },
+              ]).catch(() => {});
+              setIntakeCard(false);
+            }}
+          />
+        ) : null}
         {/* T10 收尾三訊號 → 建議收尾(不強制;coverage 全綠/疲勞/輪數預算任一) */}
         {turn.data?.suggest_finish && !finish.data && !busy ? (
           <div className="rounded-md border border-emerald-200 bg-emerald-50/50 p-3 text-sm">

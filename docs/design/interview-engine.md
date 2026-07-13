@@ -85,6 +85,7 @@ updated: 2026-07-14
 | 「?」出處卡 | **不發請求**:讀該筆 `_pending.src`(官方來源行+「第 N 輪:『原話』」) |
 | 側欄「進入收尾對帳」 | `POST …/interview:finish` → 側欄收尾卡(總結條列+補充輸入回 turn) |
 | 議程清單 | `GET …/interview` 的 `agenda[]`(三態+boundary;ledger 推導) |
+| intake 邀請卡「開任務盤」/「用聊的就好」 | **不發 AI 請求**:開全域任務盤(受控 open,勾選走流程 1 PATCH)/ `POST …/interview:review-events`(decision=`task_board_dismissed` 無聲記帳) |
 | 匯出 JSON | `GET …/document/export`(後端 `_strip_underscore` 自動剝 `_pending`);待審>0 前端先 confirm |
 
 ### 5.1 AI→人 載體判準(ADR 0032;「狀態」欄隨實作 commit 更新)
@@ -94,7 +95,7 @@ updated: 2026-07-14
 | 內容有家+有逐字證據(quote 過 verify ②) | 表格綠字 `_pending`,✓/✗ 就地審 | 書記 op;**官方任務**=裁剪 quote-backed→確定性 op(家職責不在→官方殼) | 書記=已實作;官方任務直落=plan T5c |
 | 參考集合建議(無家,住 profile) | 聊天建議卡 | 0031 職類卡(precheck=本回合搜尋真實命中;人按=PUT) | 已實作 |
 | AI 不確定(無 quote;候選 ≤3) | 聊天卡片點頭 | 確認=前端 confirmed 直落(0028 D9) | plan T5d |
-| 開場 intake / 收尾補漏 / 隨時自報 | 盤(全域任務窗)——**永遠人開** | intake 邀請卡(確定性三布林:參考非空∧文件無任務∧未 dismiss)/尾聲 offer/工具列自取;`task_board_dismissed` 記帳 | intake 卡=plan T5a/b;工具列=已實作 |
+| 開場 intake / 收尾補漏 / 隨時自報 | 盤(全域任務窗)——**永遠人開** | intake 邀請卡(確定性三布林:參考非空∧文件無任務∧未 dismiss)/尾聲 offer/工具列自取;`task_board_dismissed` 記帳 | intake 卡=已實作;尾聲 offer=plan T5e;工具列=已實作 |
 
 盤=乾淨自取:**無 AI 預勾疊加層**(`interview:curation`+web `lib/curation.ts` 退役,T5c)。
 

@@ -36,7 +36,7 @@ export function hasMaterial(text: string): boolean {
 }
 
 // ── 職類建議卡(0031 A 案):widget→卡片項的窄化(空/畸形項過濾) ──────────────
-import type { OccPrecheckItem, OpenPickerWidget } from "@/types";
+import type { OccPrecheckItem, OcsDocument, OpenPickerWidget } from "@/types";
 
 export function occSuggestions(w: OpenPickerWidget | null | undefined): OccPrecheckItem[] {
   if (!w || w.kind !== "open_picker" || w.picker !== "occupation") return [];
@@ -44,6 +44,17 @@ export function occSuggestions(w: OpenPickerWidget | null | undefined): OccPrech
     (p): p is OccPrecheckItem =>
       typeof (p as OccPrecheckItem).code === "string" && !!(p as OccPrecheckItem).code,
   );
+}
+
+// ── intake 邀請卡(0032):有參考、文件還沒任務 → 引擎遞「開盤自勾」邀請;
+//    開盤的手永遠是人(卡上兩出口:開任務盤/用聊的=task_board_dismissed 記帳)──
+export function isIntakeInvite(w: OpenPickerWidget | null | undefined): boolean {
+  return !!w && w.kind === "open_picker" && w.picker === "task_board_intake";
+}
+
+// 前端雙保險(條件自癒鏡像):文件一有任務就不再渲染邀請卡
+export function docHasTasks(doc: OcsDocument | null | undefined): boolean {
+  return (doc?.ocs_content?.ocu_units ?? []).some((u) => (u.tasks ?? []).length > 0);
 }
 
 // ── 打字機動畫(體感字元級 streaming;點擊即全顯) ────────────────────────────

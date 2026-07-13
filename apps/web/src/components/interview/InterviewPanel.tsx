@@ -288,14 +288,20 @@ export function InterviewPanel({
             }}
           />
         ) : null}
-        {/* T10 收尾三訊號 → 建議收尾(不強制;coverage 全綠/疲勞/輪數預算任一) */}
+        {/* T10 收尾三訊號 → 建議收尾(不強制;coverage 全綠/疲勞/輪數預算任一)
+            +0032 T5e 補漏 offer:尾聲開盤掃官方清單(盤=人開,checklist 補回憶缺口) */}
         {turn.data?.suggest_finish && !finish.data && !busy ? (
           <div className="rounded-md border border-emerald-200 bg-emerald-50/50 p-3 text-sm">
             <p className="mb-2 text-emerald-800">差不多了——要不要進入收尾對帳?我會把這場記到的內容唸一遍給你核對。</p>
-            <Button size="sm" onClick={() => finish.mutate()} disabled={finish.isPending}>
-              {finish.isPending && <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />}
-              進入收尾對帳
-            </Button>
+            <div className="flex flex-wrap items-center gap-2">
+              <Button size="sm" onClick={() => finish.mutate()} disabled={finish.isPending}>
+                {finish.isPending && <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />}
+                進入收尾對帳
+              </Button>
+              <Button size="sm" variant="outline" onClick={() => onOpenTaskBoard?.()}>
+                先開盤掃一遍補漏
+              </Button>
+            </div>
           </div>
         ) : null}
         {/* 收尾卡(§6.5 設計③):結構化總結回讀,指著表格對帳;可補充/更正(回 run_turn) */}
@@ -310,9 +316,15 @@ export function InterviewPanel({
               其中 {finish.data.summary.pending_count} 筆綠字未審——到表格逐筆 ✓/✗,或用上方「接受全部」。
               有要補充或更正的,直接打在下面輸入框。
             </p>
-            <Button size="sm" variant="outline" onClick={() => setFinishDismissed(true)}>
-              完成
-            </Button>
+            <div className="flex flex-wrap items-center gap-2">
+              <Button size="sm" variant="outline" onClick={() => setFinishDismissed(true)}>
+                完成
+              </Button>
+              {/* 0032 T5e:補漏掃描——盤當 checklist,補訪談的回憶缺口(人拉取) */}
+              <Button size="sm" variant="ghost" onClick={() => onOpenTaskBoard?.()}>
+                開盤掃一遍,看有沒有漏的
+              </Button>
+            </div>
           </div>
         ) : null}
         {turn.isError && (

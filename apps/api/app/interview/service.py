@@ -82,6 +82,13 @@ async def build_task_pool(knowledge, codes: list[str]) -> list[dict]:
     return out
 
 
+def _doc_has_tasks(doc: dict) -> bool:
+    """文件是否已有任何任務——intake 邀請的自癒條件(ADR 0032):
+    人自己勾過/AI 落過任務,邀請卡就永不再出,零防重複邏輯。"""
+    return any((u.get("tasks") or [])
+               for u in ((doc.get("ocs_content") or {}).get("ocu_units") or []))
+
+
 async def _persist_scribe_doc(doc_repo, profile_id, latest, scribe_res, *,
                               turns, header_codes) -> tuple[bool, list[str]]:
     """書記 pending 寫回(雙 token;409→重讀後 land_ops 重放同 ops 一次——對 fresh doc
@@ -160,10 +167,8 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> T
             if cur.declined:
                 state["declined"] = list(dict.fromkeys(
                     (state.get("declined") or []) + [d["key"] for d in cur.declined]))
-            if cur.precheck:
-                # D9:widget 只帶 AI 疊加層(precheck);清單本身=前端知識包(ADR 0021)
-                widget = {"kind": "open_picker", "picker": "task",
-                          "precheck": cur.precheck}
+            # 0032:precheck 不再出 widget(AI 不彈盤)——quote-backed 直落綠字=T5c;
+            # declined 照記(顧問不再反問)。
             await repo.add_llm_call(session.id, turn_seq=emp_turn.seq, role="select",
                                     model=model_for_role("select"), duration_ms=cur_ms,
                                     guard_verdicts=curation_guard[:30])
@@ -176,10 +181,17 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> T
     # 0031:他關過職類建議卡 → 知情換話術(白話說明+安撫,不複讀建議)
     occ_dismissed = bool(await repo.list_review_events(
         session.id, decision="occupation_dismissed"))
+    # 0032 intake 三布林(確定性;LLM 只配話術):參考非空 ∧ 文件無任務 ∧ 未婉拒過盤
+    no_tasks_yet = bool(ref_ocs) and not _doc_has_tasks(work_doc)
+    board_dismissed = bool(await repo.list_review_events(
+        session.id, decision="task_board_dismissed"))
+    intake_eligible = no_tasks_yet and not board_dismissed
     messages = C.build_consultant_messages(
         doc=work_doc, ledger_state=state, recent_turns=recent,
         employee_text=user_text, pool_tasks=pool_tasks,
-        rejected=rejected_labels, ref_codes=ref_ocs, occ_dismissed=occ_dismissed)
+        rejected=rejected_labels, ref_codes=ref_ocs, occ_dismissed=occ_dismissed,
+        intake_invite=intake_eligible,
+        board_declined=no_tasks_yet and board_dismissed)
     # write-in 抓漏只吐一次(0028 D6):摘要已含探測句 → 消費 flag
     if (pool_tasks and not state.get("writein_asked")
             and not L.checklist(work_doc, state, pool_tasks)["unasked"]):
@@ -258,6 +270,11 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> T
                 widget = {"kind": "open_picker", "picker": "occupation",
                           "query": str(s_["query"])[:120], "precheck": sugg}
                 break
+
+    # ③⅝ intake 邀請卡(ADR 0032):開盤的手永遠是人——AI 只遞邀請,單槽職類卡優先;
+    #    前端渲染兩出口(開任務盤/用聊的=task_board_dismissed 記帳)。
+    if widget is None and intake_eligible:
+        widget = {"kind": "open_picker", "picker": "task_board_intake"}
 
     # ④ 保底:顧問恆有可見回覆 + 往前的問題(靜默回合=實戰死穴)
     say = (chat.text or "").strip()

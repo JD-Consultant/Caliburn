@@ -160,7 +160,9 @@ def build_consultant_messages(*, doc: dict, ledger_state: dict,
                               pool_tasks: list[dict] | None = None,
                               rejected: list[str] | None = None,
                               ref_codes: set[str] | frozenset = frozenset(),
-                              occ_dismissed: bool = False) -> list[dict]:
+                              occ_dismissed: bool = False,
+                              intake_invite: bool = False,
+                              board_declined: bool = False) -> list[dict]:
     """組 chat_with_tools 的 messages,context 三層(T7):
     前綴 1(全域凍結)=system 人格+常駐判準教材 → 前綴 2(per-doc)=參考基準摘要
     → 動態區=帳本/文件四態/被拒/待問+本回合欄位判準教材+近窗對話。
@@ -193,6 +195,15 @@ def build_consultant_messages(*, doc: dict, ledger_state: dict,
                 "他可能不確定這步在幹嘛。下回合:用一句白話說明「選了參考基準,我才拿得到"
                 "官方任務清單當底稿幫你逐項確認」+安撫「先聊沒關係,想選時點面板上的"
                 "〔待選〕就行」。**不要複讀上一批建議**,聊出新內容再提。\n</他關掉了職類建議卡>")
+    if intake_invite:
+        ctx += ("\n<面板附了任務盤邀請卡(0032 intake)>\n"
+                "口頭自然配一句:想快的話,可以開「任務盤」勾一下你大概做哪些"
+                "(約 2 分鐘),想直接用聊的也行。**只提一次、別推銷**;"
+                "他不理就照常訪談。\n</面板附了任務盤邀請卡>")
+    elif board_declined:
+        ctx += ("\n<他選了「用聊的就好」(0032 知情)>\n"
+                "改口頭盤點:成組問官方任務有沒有做;**別再提任務盤**"
+                "(他想用時隨時可從工具列自己開)。\n</他選了「用聊的就好」>")
     if rejected:
         ctx += ("\n<他剛拒絕的內容(§6.3:**不要重提同一條**;可自然追問一句原因——"
                 "是說法不對還是根本沒這件事,問完就放下)>\n  - "

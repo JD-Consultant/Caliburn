@@ -1,6 +1,6 @@
 """T9:回合服務 v2 整合(真 DB + StubLlm + StubKnowledge)。
 管線:書記 pass(set_slot 直寫/建議)→ 帳本 → 顧問 chat_with_tools → 保底。
-0028 T5:裁剪 widget/declined/occupation widget/finish 態度收尾。"""
+0028 T5:裁剪 declined/occupation widget/finish 態度收尾;0032 T5a:intake 邀請卡。"""
 import json
 
 import pytest
@@ -139,16 +139,15 @@ def _curation_select(records):
 
 
 @pytest.mark.asyncio
-async def test_curation_widget_prechecks_official_tasks(db_session):
+async def test_curation_precheck_no_longer_emits_task_widget(db_session):
+    """0032:AI 不彈盤——precheck 不再出 `picker:"task"` widget(quote-backed 直落
+    綠字=T5c);參考非空∧文件無任務∧未 dismiss → intake 邀請卡(人按才開盤)。"""
     p, s, repo = await _setup(db_session, doc=_doc_occ_only())
     llm = StubLlm(select_result=_curation_select(
         [{"type": "precheck", "key": "KRM2421-001v4:T1.1", "quote": "例行設備巡檢"}]))
     out = await run_turn(p.id, "我每天做例行設備巡檢", db=db_session, llm=llm,
                          knowledge=StubKnowledge())
-    # D9:widget 只帶 AI 疊加層(precheck+引文);清單本身=前端知識包(ADR 0021)
-    assert out.widget == {"kind": "open_picker", "picker": "task", "precheck": [
-        {"key": "KRM2421-001v4:T1.1", "name": "例行設備巡檢", "unit": "預防保養",
-         "quote": "例行設備巡檢"}]}
+    assert out.widget == {"kind": "open_picker", "picker": "task_board_intake"}
 
 
 @pytest.mark.asyncio
@@ -158,9 +157,48 @@ async def test_curation_declined_persists_and_shrinks_checklist(db_session):
         [{"type": "decline", "key": "KRM2421-001v4:T1.2", "quote": "保養排程管理我沒有做"}]))
     out = await run_turn(p.id, "保養排程管理我沒有做", db=db_session, llm=llm,
                          knowledge=StubKnowledge())
-    assert out.widget is None                                  # 無預勾就不開窗
+    # declined 照記;文件仍無任務 → intake 邀請照出(0032)
+    assert out.widget == {"kind": "open_picker", "picker": "task_board_intake"}
     sess = await repo.get_active(p.id)
     assert sess.ledger_state.get("declined") == ["KRM2421-001v4:T1.2"]
+
+
+# ---- 0032 T5a:intake 邀請卡三布林+dismissed 知情 ----
+
+@pytest.mark.asyncio
+async def test_intake_not_reoffered_after_board_dismissed(db_session):
+    """他按過「用聊的就好」→ 不再邀請;顧問 context 得知情指示。"""
+    p, s, repo = await _setup(db_session, doc=_doc_occ_only())
+    await repo.add_review_events(s.id, [
+        {"doc_path": "*", "decision": "task_board_dismissed"}])
+    llm = StubLlm(select_result={"records": []})
+    out = await run_turn(p.id, "我做設備巡檢的工作", db=db_session, llm=llm,
+                         knowledge=StubKnowledge())
+    assert out.widget is None
+    chat = [c for c in llm.calls if c["kind"] == "chat"][-1]
+    joined = "\n".join(m["content"] for m in chat["messages"]
+                       if isinstance(m.get("content"), str))
+    assert "用聊的就好" in joined and "別再提任務盤" in joined
+
+
+@pytest.mark.asyncio
+async def test_no_intake_when_doc_has_tasks(db_session):
+    """條件自癒:文件一有任務(人勾的/AI 落的)→ 邀請卡永不再出。"""
+    p, s, repo, out, _ = await _run(db_session, "我們每兩週跑一次回歸",
+                                    select_result=SCRIBE_SLOT)
+    assert out.widget is None
+
+
+@pytest.mark.asyncio
+async def test_no_intake_without_references(db_session):
+    """參考集合空 → 盤是空的,不邀請(先走職類卡的路)。"""
+    blank = {"ocs_profile": {}, "ocs_content": {"ocu_units": []},
+             "ocs_attitude": {"attitudes": []}}
+    p, s, repo = await _setup(db_session, doc=blank)
+    out = await run_turn(p.id, "嗨你好", db=db_session,
+                         llm=StubLlm(select_result={"records": []}),
+                         knowledge=StubKnowledge())
+    assert out.widget is None
 
 
 @pytest.mark.asyncio
@@ -215,7 +253,8 @@ async def test_no_picker_when_top_hit_already_selected(db_session):
                                "result_digest": "x"}])
     out = await run_turn(p.id, "就是設備維護的工作", db=db_session, llm=llm,
                          knowledge=StubKnowledge())
-    assert out.widget is None
+    # 職類卡正確不出(top-1 已選);同狀態(有參考、無任務)intake 邀請照出(0032)
+    assert out.widget == {"kind": "open_picker", "picker": "task_board_intake"}
 
 
 @pytest.mark.asyncio

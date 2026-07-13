@@ -112,6 +112,26 @@ OpenAI prompt-caching 指南)。
 可直接從 trace 讀。未來縫(一行):動態區塊現排在對話窗**之前**,對話 tokens 永遠不進
 快取;若把動態塊移到對話窗後可加深命中,屬 prompt 結構變更,須過考卷再動。
 
+## 5.2 interview A/B 定案(2026-07-13 實跑)
+
+`evals/interview_sim.py`(20 回合 × 純智力迴圈;GATE=verify_pass≥0.8 ∧ progress≥0.8
+∧ curation_prec≥0.8)。**方法學誠實:此 headless sim 對 interview 角色是弱區辨器**
+——GATE 的 verify_pass 是**書記(select 角色,三跑固定=gpt-5.4-mini)**的落地率,
+interview 模型只透過「顧問問得好→員工講得可引用→書記抽得乾淨」間接影響,且單跑高變異。
+
+| interview 模型 | verify_pass | progress | GATE | 備註 |
+|---|---|---|---|---|
+| gpt-4.1-mini(現役,n=1) | 0.90 | 1.0 | PASS | 單跑,可能幸運 |
+| **gpt-5.4-mini(n=3)** | 0.81/0.89/0.85(μ0.85) | 0.9/0.75/0.95(μ0.87) | 2/3 PASS | 唯一 FAIL 敗在 progress 雜訊非品質 |
+| deepseek-v4-flash(n=1) | 0.67 | 0.9 | **FAIL** | 明顯落後 + OpenRouter 路無快取 |
+
+**結論**:兩個 OpenAI 模型差異落在雜訊帶內(sim 無法乾淨區辨);但 sim **明確淘汰
+v4-flash**(verify 0.67 墊底)。interview 升 **gpt-5.4-mini**,決策依非雜訊的 tie-breaker:
+①強制升級(4.1 太舊)②與 select 同家=統一 config+單一 fallback 家族 ③實證 prompt cache
+命中 ~93% ④tools 生態成熟。**真正直接評顧問行為(一問收尾/追問/不幻覺)的是 promptfoo
+Simulated User 考卷,需 live server(=維護者 npm run up 手測那輪)**——那才是行為面終判。
+fallback 欄暫空(紀律:先過考卷才填)。
+
 ## 6. 未決/待確認
 
 - gpt-5.6-luna 待生態穩定後可重評(cached in $0.10 對前綴穩定的 context 三層很有利)。

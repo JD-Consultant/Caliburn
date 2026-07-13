@@ -27,10 +27,12 @@ class Settings(BaseSettings):
     # 受限解碼(ADR 0024):底層必須原生支援 json_schema strict(OpenAI/Gemini 系);
     # 換模型 = 改這裡 + 重跑 scripts/validate_select_schema.py 留紀錄,不改碼。
     model_select: str = "openai/gpt-5.4-mini"       # 純受限 SELECT(survey 池選單等)
-    # 訪談回合(role="interview"):同時扛顧問推理+strict 輸出——4o-mini 太弱、變異大
-    # (校準#2 實證:同 prompt 0.91↔0.45)。用同一套 OpenAI strict 實作的更強模型,
-    # 沿用 0024 零逃逸保證;換模型 = 重跑 validate_select_schema + interview_sim 留紀錄。
-    model_interview: str = "openai/gpt-4.1-mini"
+    # 訪談回合(role="interview"):顧問 chat+tools。gpt-4.1-mini(2025-04)已退役——
+    # 2026-07-13 A/B(interview_sim ×3 replicate + v4-flash 對照)定案升 gpt-5.4-mini:
+    # 與 select 同家(統一 config/fallback)、實證 prompt cache 命中 ~93%、tools 生態成熟;
+    # v4-flash 對照 verify 0.67 明顯落後且 OpenRouter 路無快取,淘汰。紀錄:
+    # specs/2026-07-13-model-lineup-cp-review.md。換模 = 改此處 + 重跑 sim/考卷留紀錄。
+    model_interview: str = "openai/gpt-5.4-mini"
     # T13(ADR 0030):OpenRouter models=[主,備] 顯式備援——**備援模型須先過 T11 考卷**
     # (promptfoo)才填;空字串=不帶 models(單模型)。provider 物件恆帶
     # require_parameters(只路由到支援 strict/tools 的 provider)。

@@ -35,6 +35,17 @@ export function hasMaterial(text: string): boolean {
   return t.length >= 6 || /\d/.test(t);
 }
 
+// ── 職類建議卡(0031 A 案):widget→卡片項的窄化(空/畸形項過濾) ──────────────
+import type { OccPrecheckItem, OpenPickerWidget } from "@/types";
+
+export function occSuggestions(w: OpenPickerWidget | null | undefined): OccPrecheckItem[] {
+  if (!w || w.kind !== "open_picker" || w.picker !== "occupation") return [];
+  return (w.precheck ?? []).filter(
+    (p): p is OccPrecheckItem =>
+      typeof (p as OccPrecheckItem).code === "string" && !!(p as OccPrecheckItem).code,
+  );
+}
+
 // ── 打字機動畫(體感字元級 streaming;點擊即全顯) ────────────────────────────
 export const TYPEWRITER_CHARS_PER_TICK = 3;
 

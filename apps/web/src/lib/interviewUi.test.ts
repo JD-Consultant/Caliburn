@@ -1,9 +1,23 @@
-// T9:側欄純邏輯——議程三態、chips 推薦排序、正在整理判定、打字機切片。
+// T9:側欄純邏輯——議程三態、chips 推薦排序、正在整理判定、打字機切片、職類建議卡窄化。
 import { describe, expect, it } from "vitest";
 import {
-  AGENDA_GLYPH, agendaCounts, chipOptions, hasMaterial,
+  AGENDA_GLYPH, agendaCounts, chipOptions, hasMaterial, occSuggestions,
   typewriterDone, typewriterSlice, type AgendaItem,
 } from "./interviewUi";
+import type { OpenPickerWidget } from "@/types";
+
+describe("職類建議卡窄化(0031)", () => {
+  it("occupation+precheck → 項目;task/畸形項 → 空", () => {
+    const w: OpenPickerWidget = {
+      kind: "open_picker", picker: "occupation", query: "全端",
+      precheck: [{ code: "INM3514-001v4", name: "網站前端開發人員", reason: "依你描述" }],
+    };
+    expect(occSuggestions(w)).toHaveLength(1);
+    expect(occSuggestions({ ...w, picker: "task" })).toEqual([]);
+    expect(occSuggestions({ ...w, precheck: undefined })).toEqual([]);
+    expect(occSuggestions(null)).toEqual([]);
+  });
+});
 
 const ITEMS: AgendaItem[] = [
   { key: "t1", label: "回歸測試", state: "completed" },

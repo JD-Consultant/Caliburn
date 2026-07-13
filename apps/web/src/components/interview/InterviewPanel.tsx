@@ -11,12 +11,17 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { AgendaList } from "@/components/interview/AgendaList";
+import { OccupationSuggestCard } from "@/components/interview/OccupationSuggestCard";
 import {
   useFinishInterview, useInterview, useInterviewTurn, useStartInterview,
 } from "@/hooks/useInterview";
-import { chipOptions, hasMaterial, typewriterDone, typewriterSlice } from "@/lib/interviewUi";
+import {
+  chipOptions, hasMaterial, occSuggestions, typewriterDone, typewriterSlice,
+} from "@/lib/interviewUi";
 import { listPending } from "@/lib/ocsDoc";
-import type { ChoiceWidget, InterviewProgress, OcsDocument, OpenPickerWidget } from "@/types";
+import type {
+  ChoiceWidget, InterviewProgress, OccPrecheckItem, OcsDocument, OpenPickerWidget,
+} from "@/types";
 
 const PHASE_LABEL: Record<string, string> = {
   survey: "盤點", deep: "深掘", review: "總審",
@@ -109,10 +114,12 @@ function ChoiceCard({ widget, onSubmit, busy }: {
   );
 }
 
-export function InterviewPanel({ profileId, doc, onWidget }: {
+export function InterviewPanel({ profileId, doc, onWidget, referenceEmpty, onOpenReference }: {
   profileId: string;
   doc?: OcsDocument;                          // 待審計數(文件內 _pending)資料源
   onWidget?: (w: OpenPickerWidget) => void;   // 0028:引擎 widget 指令 → 頁面開對應 picker
+  referenceEmpty?: boolean;                   // 0031:參考集合空 → 顯示常駐〔待選〕chip
+  onOpenReference?: () => void;               // chip 重入口 → 頁面開〔選參考〕modal
 }) {
   const view = useInterview(profileId);
   const start = useStartInterview(profileId);
@@ -121,6 +128,10 @@ export function InterviewPanel({ profileId, doc, onWidget }: {
   const [input, setInput] = useState("");
   const [lastSent, setLastSent] = useState("");
   const [finishDismissed, setFinishDismissed] = useState(false);
+  // 0031 A 案:職類建議卡進對話流(不彈窗);task widget 照舊走 onWidget
+  const [occCard, setOccCard] = useState<OccPrecheckItem[] | null>(null);
+  const [cardError, setCardError] = useState<string | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   // 打字機只給「送出後新到的」顧問回合(基準線在 send 事件設定);
   // 歷史逐字稿與重載直接全顯,不重播動畫。
@@ -144,10 +155,14 @@ export function InterviewPanel({ profileId, doc, onWidget }: {
     setLastSent(t);
     setAnimateAfter(turns.length > 0 ? turns[turns.length - 1].seq : 0);
     // 0028 D1(§16.18):open_picker 指令=**事件**,在 mutation onSuccess 派發一次。
+    // 0031:occupation 有建議 → 卡片進對話流(不彈窗);無建議或 task → 照舊 onWidget。
     turn.mutate(t, {
       onSuccess: (res) => {
         const w = res.widget;
-        if (w && w.kind === "open_picker") onWidget?.(w);
+        if (!w || w.kind !== "open_picker") return;
+        const sugg = occSuggestions(w);
+        if (sugg.length > 0) setOccCard(sugg);
+        else onWidget?.(w);
       },
     });
   };
@@ -180,6 +195,16 @@ export function InterviewPanel({ profileId, doc, onWidget }: {
   return (
     <div className="flex h-full flex-col">
       <ProgressHeader progress={progress} />
+      {/* 0031 常駐 chip:參考集合空=結構化鏈路還沒起跑;關卡片後這裡是唯一重入口 */}
+      {referenceEmpty && !occCard ? (
+        <button
+          type="button"
+          onClick={() => onOpenReference?.()}
+          className="flex items-center gap-1.5 border-b bg-amber-50/60 px-3 py-1.5 text-left text-xs text-amber-800 hover:bg-amber-100/60 dark:bg-amber-950/30 dark:text-amber-200"
+        >
+          📌 待選:職能基準參考——選了才有官方任務清單當底稿〔開啟〕
+        </button>
+      ) : null}
       <AgendaList items={view.data?.agenda ?? []} />
       <div className="flex-1 space-y-3 overflow-y-auto p-3 text-sm">
         {turns.length === 0 && start.data && (
@@ -209,6 +234,17 @@ export function InterviewPanel({ profileId, doc, onWidget }: {
         {widget && widget.kind !== "open_picker" && !busy && (
           <ChoiceCard widget={widget} onSubmit={send} busy={busy} />
         )}
+        {/* 0031 職類建議卡:確認=寫參考集合/其他=回聊天/✕=收合+dismissed 記帳 */}
+        {occCard && !busy ? (
+          <OccupationSuggestCard
+            profileId={profileId}
+            items={occCard}
+            onDone={() => { setOccCard(null); setCardError(null); }}
+            onOther={() => { setOccCard(null); inputRef.current?.focus(); }}
+            onError={setCardError}
+          />
+        ) : null}
+        {cardError ? <p className="text-xs text-destructive">{cardError}</p> : null}
         {/* T10 收尾三訊號 → 建議收尾(不強制;coverage 全綠/疲勞/輪數預算任一) */}
         {turn.data?.suggest_finish && !finish.data && !busy ? (
           <div className="rounded-md border border-emerald-200 bg-emerald-50/50 p-3 text-sm">
@@ -278,6 +314,7 @@ export function InterviewPanel({ profileId, doc, onWidget }: {
           onSubmit={(e) => { e.preventDefault(); send(input); }}
         >
           <input
+            ref={inputRef}
             className="flex-1 rounded-md border bg-background px-3 py-2 text-sm"
             placeholder="想到什麼說什麼…"
             value={input}

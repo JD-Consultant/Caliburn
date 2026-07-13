@@ -244,11 +244,14 @@ export interface ChoiceWidget {
   recommended?: string | null;   // T9(AskUserQuestion 樣式):推薦選項標記
 }
 export interface PickerPrecheckItem { key: string; name: string; unit: string | null; quote: string }
+// 0031:職類建議卡項(A 案)——引擎只給本回合搜尋真實命中的碼(確定性,不虛構)
+export interface OccPrecheckItem { code: string; name: string; reason: string }
 export interface OpenPickerWidget {
   kind: "open_picker";
   picker: "occupation" | "task";
   query?: string;                       // occupation:預填搜尋詞(顧問實際用過的)
-  precheck?: PickerPrecheckItem[];      // task:AI 預勾+引文(D9:清單本身=前端 pack,這只是疊加層)
+  // task:{key,name,unit,quote}(D9 疊加層);occupation:{code,name,reason}(0031 建議卡)
+  precheck?: PickerPrecheckItem[] | OccPrecheckItem[];
 }
 export type InterviewWidget = ChoiceWidget | OpenPickerWidget
 // CurationChecklist / InterviewSuggestion(建議層)已退場(T12;ADR 0030)。

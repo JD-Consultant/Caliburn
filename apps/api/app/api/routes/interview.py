@@ -196,7 +196,8 @@ async def get_interview(profile_id: UUID, db: AsyncSession = Depends(get_db)):
 # interview:review(建議層批審)已退場(T12):✓/✗ 走前端 acceptPending/rejectPending
 # + PATCH + interview:review-events(無聲記帳)。
 
-_REVIEW_DECISIONS = {"accepted", "rejected", "batch_rejected"}
+# occupation_dismissed:他關掉職類建議卡(0031)——只記帳;下回合顧問換話術
+_REVIEW_DECISIONS = {"accepted", "rejected", "batch_rejected", "occupation_dismissed"}
 
 
 @router.post("/{profile_id}/interview:review-events")

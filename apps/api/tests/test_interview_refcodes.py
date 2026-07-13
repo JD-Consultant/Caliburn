@@ -37,6 +37,19 @@ def test_reference_block_shows_reference_set():
     assert "空" in empty
 
 
+def test_consultant_ctx_occ_dismissed_line():
+    msgs = C.build_consultant_messages(
+        doc=EMPTY_DOC, ledger_state={}, recent_turns=[("employee", "hi")],
+        employee_text="我做網站", occ_dismissed=True)
+    joined = "\n".join(m["content"] for m in msgs)
+    assert "關掉了職類建議卡" in joined and "不要複讀" in joined
+    # 已有參考集合 → 話術不再出現(卡片已無意義)
+    msgs2 = C.build_consultant_messages(
+        doc=EMPTY_DOC, ledger_state={}, recent_turns=[("employee", "hi")],
+        employee_text="我做網站", occ_dismissed=True, ref_codes=REF)
+    assert "關掉了職類建議卡" not in "\n".join(m["content"] for m in msgs2)
+
+
 def test_build_pool_inputs_unions_extra_codes():
     class _K:
         async def competencies(self, code):

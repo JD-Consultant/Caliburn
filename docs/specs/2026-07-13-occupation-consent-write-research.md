@@ -94,6 +94,21 @@ header_codes,`_pending` 延遲生效,✓ 才寫+重算)——參考集合落地�
 - 不做 O1 的代價:新手流斷頭(本次 22 回合全損,$0.2 花在鬼打牆),與產品「取代顧問」
   定位直接衝突(真顧問不會叫受訪者自己去點選單)。
 
+## 7. 載體判準(卡片/彈窗/落文件;2026-07-13 大廠指南複核)
+
+- **Microsoft HAX**(microsoft.com/haxtoolkit,MSR 2019 Amershi et al. 18 條):
+  「依使用者當下任務與注意力決定何時行動/打斷」;Copilot 實證=心流中被建議打斷
+  →生產力損失,**打斷要挑時機**。→ 彈窗只在 consent-triggered 時機(他剛口頭同意、
+  正期待動作)彈;同回合一個 focal ask。
+- **Google PAIR**(pair.withgoogle.com patterns):小而低風險→**inline 建議/預設**
+  (=我們的綠字/卡片);要瀏覽比較多方向→**比較型大面**(=任務大盤);
+  「**手動確認建議**能建立熟悉與信任」+「自動化必附 undo」→ 盤上人工勾選確認
+  本身就是審查,確認後**直接 confirmed 不再套綠字**(雙重審查=多餘摩擦);
+  mixed-initiative:act/suggest/defer/ask 分時機。
+- **裁決**(維護者選 b+本節佐證):①任務=盤(彈窗)帶預勾+引文,consent-triggered;
+  ②盤上確認→confirmed(0028 D9 原意);③widget 改清單、**前端一次只呈現最高優先**
+  (職類卡>任務盤,依賴序),未呈現者入待辦 chip;④判準表落 interview-engine.md。
+
 ## 來源
 
 - Anthropic《Our framework for developing safe and trustworthy agents》/《Trustworthy

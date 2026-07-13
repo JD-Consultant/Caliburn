@@ -2,7 +2,8 @@
 # 規則:每 item 獨立二元判定(pass/fail/unknown;資訊不足=unknown 不猜;partial=fail 從嚴);
 # Answer Score = (Σ正分 − Σ負分) ÷ Σ總正分;裁判=cross-model-family、temp=0、
 # pointwise-against-reference(judge prompt 骨架見附錄 B)。
-# SME gate:items 由維護者審定;reference 過本 rubric 必須滿分(驗 grader)。
+# SME gate(2026-07-13 改制):items 由 agent 以權威來源自審定案(紀錄:
+# specs/2026-07-13-skill-golden-sme-review.md);reference 過本 rubric 必須滿分(驗 grader)。
 task_id: JD-golden-001
 reference: ./reference.md
 transcript: ./transcript.txt

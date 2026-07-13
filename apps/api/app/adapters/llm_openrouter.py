@@ -46,6 +46,18 @@ def schema_response_format(schema_name: str, schema: dict) -> dict:
     }
 
 
+# GPT-5/o 系 reasoning 模型不支援 temperature(OpenRouter supported_parameters 無此項;
+# 配 require_parameters 送了=整路 404)。探針紀錄:specs/2026-07-13-model-lineup-cp-review.md。
+_NO_TEMPERATURE_PREFIXES = ("openai/gpt-5", "openai/o")
+
+
+def sampling_params(model: str, temperature: float) -> dict:
+    """回該模型合法的 sampling kwargs(不支援的參數不送——require_parameters 紀律)。"""
+    if model.startswith(_NO_TEMPERATURE_PREFIXES):
+        return {}
+    return {"temperature": temperature}
+
+
 def openrouter_extra_body(role: str) -> dict:
     """OpenRouter 顯式路由(T13;驗證報告 H2):
     - `provider.require_parameters=True`:**只路由到支援本請求全部參數(strict/tools)
@@ -178,12 +190,14 @@ class OpenRouterLlm:
 
         async def call_once(msgs: list[dict], with_tools: bool) -> dict:
             kwargs: dict = {"model": model, "messages": msgs,
-                            "temperature": 0.4, "max_tokens": 1024,
+                            "max_tokens": 1024,
+                            **sampling_params(model, 0.4),
                             "extra_body": openrouter_extra_body(role)}
             if with_tools:
                 kwargs["tools"] = tools
                 kwargs["tool_choice"] = "auto"      # 不強制(§8.5:強制會虛構輸入)
-                kwargs["parallel_tool_calls"] = True   # T13:同輪多 tool_call(loop 成對回填)
+                # 並行 tool_call 是 OpenAI 預設(loop 已成對回填);**不顯式送**
+                # parallel_tool_calls——供應商參數表沒列它,配 require_parameters 會 404
             with get_tracer().start_as_current_span(f"chat {model}") as span:
                 span.set_attribute(GEN_AI_PROVIDER_ATTR, "openrouter")
                 span.set_attribute("gen_ai.operation.name", "chat")
@@ -215,7 +229,8 @@ class OpenRouterLlm:
                         model=model,
                         messages=[{"role": "user", "content": prompt}],
                         response_format=schema_response_format(schema_name, schema),
-                        temperature=0,
+                        # temp=0 求穩定;GPT-5/o 系不支援 temperature → 濾掉不送
+                        **sampling_params(model, 0),
                         # 驗收發現:被誘導輸出非法值時,受限解碼會逼出失控長輸出直到截斷
                         # (fail-closed 無逃逸,但燒 token)——上限鎖住成本;截斷=非法 JSON=照樣炸。
                         max_tokens=2048,

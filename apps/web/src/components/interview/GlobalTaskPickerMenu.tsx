@@ -18,13 +18,19 @@ import { Badge } from "@/components/ui/badge";
 import { Modal } from "./OccupationPicker";
 import { SourceLine } from "./fields/SourceLine";
 
-export function GlobalTaskPickerMenu({ document: doc, pack, disabled, onChange }: {
+export function GlobalTaskPickerMenu({
+  document: doc, pack, disabled, onChange, open: openProp, onOpenChange,
+}: {
   document: OcsDocument | undefined;
   pack?: KnowledgePack;
   disabled?: boolean;
   onChange: (d: OcsDocument) => void;
+  open?: boolean;                       // 受控開窗(0032 intake 卡程式化開;省略=內部 state)
+  onOpenChange?: (v: boolean) => void;
 }) {
-  const [open, setOpen] = useState(false);
+  const [openState, setOpenState] = useState(false);
+  const open = openProp ?? openState;
+  const setOpen = (v: boolean) => { setOpenState(v); onOpenChange?.(v); };
   const rows = pack ? taskRows(pack) : [];
   const primary = doc?.ocs_profile?.ocs_code ?? "";
   const canApplyDefaults = !!pack && isOfficialBasis(pack, primary);

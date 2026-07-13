@@ -248,10 +248,11 @@ export interface PickerPrecheckItem { key: string; name: string; unit: string | 
 export interface OccPrecheckItem { code: string; name: string; reason: string }
 export interface OpenPickerWidget {
   kind: "open_picker";
-  picker: "occupation" | "task";
+  // occupation=職類建議卡;task_board_intake=任務盤邀請卡(0032:AI 不彈盤,人按才開;
+  // 舊 `task` 預勾 widget 已停發)
+  picker: "occupation" | "task_board_intake";
   query?: string;                       // occupation:預填搜尋詞(顧問實際用過的)
-  // task:{key,name,unit,quote}(D9 疊加層);occupation:{code,name,reason}(0031 建議卡)
-  precheck?: PickerPrecheckItem[] | OccPrecheckItem[];
+  precheck?: PickerPrecheckItem[] | OccPrecheckItem[];   // occupation:{code,name,reason}
 }
 export type InterviewWidget = ChoiceWidget | OpenPickerWidget
 // CurationChecklist / InterviewSuggestion(建議層)已退場(T12;ADR 0030)。

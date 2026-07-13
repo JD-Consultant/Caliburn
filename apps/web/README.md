@@ -78,7 +78,8 @@ baseline = 最後已知 server 狀態快照,是 dirty 判定 / no-op skip / 樂�
 每職責列「**選任務 ▾**」(`TaskPickerMenu`,任務**全池**不過濾:自己的預勾、其餘可勾=借用,
 已在他職責標「已加入」;空職責首開自動帶官方任務;取消勾選=移除空任務,已填鎖定)→
 每一勾=**前端文件編輯**(`addTasksToUnit`,任務帶 provenance+`_refs` 多來源)→ commit
-(回到流程 1 的 autosave PATCH)。AI 預勾/自訂助手已拆,等訪談引擎(ADR 0020)。
+(回到流程 1 的 autosave PATCH)。**盤永遠人開**(ADR 0032):AI 不彈窗、不預勾——
+訪談 intake 邀請卡「開任務盤」一鍵開全域盤(受控 open),婉拒=`task_board_dismissed` 記帳。
 
 ### 4. 填格(O/P/K/S)
 

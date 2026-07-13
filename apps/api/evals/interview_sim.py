@@ -201,7 +201,7 @@ async def simulate(max_turns: int, dump: bool = False) -> dict:
 
         # ③ 顧問 chat_with_tools
         msgs = C.build_consultant_messages(doc=doc, ledger_state=state, recent_turns=transcript,
-                                           pending=[], employee_text=answer)
+                                           employee_text=answer)
         chat = await llm.chat_with_tools(role="interview", messages=msgs,
                                          tools=CONSULTANT_TOOLS, dispatch=dispatch)
         question = (chat.text or "還有想補充的嗎?").strip()

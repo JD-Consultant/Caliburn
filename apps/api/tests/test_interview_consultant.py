@@ -53,22 +53,21 @@ def test_build_messages_shape_and_injection():
     doc = _doc()
     msgs = C.build_consultant_messages(
         doc=doc, ledger_state={}, recent_turns=[("consultant", "你好"), ("employee", "我做測試")],
-        pending=["新任務「客戶問題重現」"], employee_text="每雙週寫一次案例")
+        employee_text="每雙週寫一次案例")
     assert msgs[0]["role"] == "system" and "顧問" in msgs[0]["content"]
     # 對話映射:employee→user、consultant→assistant
     roles = [m["role"] for m in msgs]
     assert "assistant" in roles and "user" in roles
     assert msgs[-1]["role"] == "user" and "每雙週寫一次案例" in msgs[-1]["content"]
-    # 帳本摘要 + 待核准注入(context block)
+    # 帳本摘要注入(context block;待審綠字改由 read_document 四態視圖供給,T12)
     joined = "\n".join(m["content"] for m in msgs)
-    assert "客戶問題重現" in joined                          # pending 注入
     assert "測試案例設計" in joined                          # 帳本缺口注入
 
 
 def test_first_turn_uses_disclosure():
     doc = _doc()
     msgs = C.build_consultant_messages(doc=doc, ledger_state={}, recent_turns=[],
-                                       pending=[], employee_text="")
+                                       employee_text="")
     joined = "\n".join(m["content"] for m in msgs)
     assert "AI" in joined and "開始" in joined               # 空對話 → 開場揭露
 

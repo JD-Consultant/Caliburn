@@ -147,7 +147,7 @@ def _reference_block(doc: dict, pool_tasks: list[dict] | None) -> str:
 
 
 def build_consultant_messages(*, doc: dict, ledger_state: dict,
-                              recent_turns: list[tuple[str, str]], pending: list[str],
+                              recent_turns: list[tuple[str, str]],
                               employee_text: str, est_minutes: int = 15,
                               probe: dict | None = None,
                               pool_tasks: list[dict] | None = None,
@@ -178,9 +178,6 @@ def build_consultant_messages(*, doc: dict, ledger_state: dict,
         ctx += ("\n<判準教材(本回合欄位適用)>\n"
                 + "\n\n".join(load_skill(n) for n in gap_skills)
                 + "\n</判準教材>")
-    if pending:
-        ctx += "\n<待核准建議(員工可能問到,別重問;向他說明是待他確認)>\n  - " + \
-               "\n  - ".join(pending) + "\n</待核准建議>"
     if rejected:
         ctx += ("\n<他剛拒絕的內容(§6.3:**不要重提同一條**;可自然追問一句原因——"
                 "是說法不對還是根本沒這件事,問完就放下)>\n  - "

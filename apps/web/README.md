@@ -64,10 +64,12 @@ baseline = 最後已知 server 狀態快照,是 dirty 判定 / no-op skip / 樂�
 
 ### 2. 選職類
 
-`OccupationPicker` → `GET /occupations?q=`(根層目錄搜尋)→ 勾選(順序=優先度)→
-`PUT /job-profiles/{id}/occupations` → invalidate **document + knowledge** + 背景 prefetch
-新知識包(server 已把表頭刷成第一順位官方基準;表頭/態度/NOTE/選任務/填格選單全部
-吃這一包,選職類=唯一同步點)。
+`OccupationPicker`(modal)或**訪談建議卡** `OccupationSuggestCard`(0031:顧問提議
+→卡片進對話流,預勾+理由,一鍵加入;✕=`occupation_dismissed` 記帳)→
+`PUT /job-profiles/{id}/occupations`(0029:只寫 profile 參考集合,**不動文件表頭**;
+主基準由職類視窗 PATCH)→ invalidate **document + knowledge** + 背景 prefetch 新知識包
+(表頭/態度/NOTE/選任務/填格選單全部吃這一包,選參考=唯一同步點)。參考集合空時
+訪談面板頂常駐「📌 待選」chip 重入口。
 
 ### 3. 選職責 → 選任務(表格中心,遞迴選單)
 

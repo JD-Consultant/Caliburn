@@ -50,6 +50,20 @@ def test_consultant_ctx_occ_dismissed_line():
     assert "關掉了職類建議卡" not in "\n".join(m["content"] for m in msgs2)
 
 
+def test_consultant_ctx_intake_and_board_declined_lines():
+    """0032:intake 邀請話術/婉拒後知情話術(擇一注入,intake 優先)。"""
+    msgs = C.build_consultant_messages(
+        doc=EMPTY_DOC, ledger_state={}, recent_turns=[("employee", "hi")],
+        employee_text="我做設備維護", ref_codes=REF, intake_invite=True)
+    joined = "\n".join(m["content"] for m in msgs)
+    assert "任務盤邀請卡" in joined and "別推銷" in joined
+    msgs2 = C.build_consultant_messages(
+        doc=EMPTY_DOC, ledger_state={}, recent_turns=[("employee", "hi")],
+        employee_text="我做設備維護", ref_codes=REF, board_declined=True)
+    joined2 = "\n".join(m["content"] for m in msgs2)
+    assert "用聊的就好" in joined2 and "別再提任務盤" in joined2
+
+
 def test_build_pool_inputs_unions_extra_codes():
     class _K:
         async def competencies(self, code):

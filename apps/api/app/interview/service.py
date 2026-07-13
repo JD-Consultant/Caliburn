@@ -173,10 +173,13 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> T
     rejected_labels = [e.doc_path.split(".")[-1] if "." in e.doc_path else e.doc_path
                        for e in await repo.list_review_events(session.id,
                                                               decision="rejected")][-10:]
+    # 0031:他關過職類建議卡 → 知情換話術(白話說明+安撫,不複讀建議)
+    occ_dismissed = bool(await repo.list_review_events(
+        session.id, decision="occupation_dismissed"))
     messages = C.build_consultant_messages(
         doc=work_doc, ledger_state=state, recent_turns=recent,
         employee_text=user_text, pool_tasks=pool_tasks,
-        rejected=rejected_labels, ref_codes=ref_ocs)
+        rejected=rejected_labels, ref_codes=ref_ocs, occ_dismissed=occ_dismissed)
     # write-in 抓漏只吐一次(0028 D6):摘要已含探測句 → 消費 flag
     if (pool_tasks and not state.get("writein_asked")
             and not L.checklist(work_doc, state, pool_tasks)["unasked"]):
@@ -243,10 +246,14 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> T
     if widget is None and occ_searches:
         codes = set(ref_ocs)
         for s_ in occ_searches:
-            top = (s_["hits"] or [{}])[0]
-            if top.get("ocs_code") and top["ocs_code"] not in codes and s_["query"]:
+            # 0031 A 案:建議卡帶 precheck(top-2 命中+確定性理由)——新手一鍵確認
+            sugg = [{"code": h["ocs_code"], "name": h.get("name") or "",
+                     "reason": f"依你描述:「{str(s_['query'])[:40]}」"}
+                    for h in (s_["hits"] or [])[:2]
+                    if h.get("ocs_code") and h["ocs_code"] not in codes]
+            if sugg and s_["query"]:
                 widget = {"kind": "open_picker", "picker": "occupation",
-                          "query": str(s_["query"])[:120]}
+                          "query": str(s_["query"])[:120], "precheck": sugg}
                 break
 
     # ④ 保底:顧問恆有可見回覆 + 往前的問題(靜默回合=實戰死穴)

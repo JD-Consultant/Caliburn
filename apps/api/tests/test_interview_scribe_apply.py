@@ -128,6 +128,15 @@ def test_set_slot_lands_value_with_collection_pending():
     assert mark["op"] == "mod" and mark["prev"] == "每月"
 
 
+def test_set_slot_coerces_numeric_pct():
+    """time_share_pct「25%」→ 25.0(share_sum/is_core 吃數;2026-07-13 sim 抓漏)。"""
+    slot = f"{TASK}.details.time_share_pct"
+    new_doc, _, _ = _land([{"type": "set_slot", "path": slot, "value": "25%",
+                            "quote": "每天都做這件事"}], doc=_doc())
+    details = new_doc["ocs_content"]["ocu_units"][0]["tasks"][0]["details"]
+    assert details["time_share_pct"] == 25.0
+
+
 # ---- 跨任務:多筆各落各的 ----
 
 def test_multi_records_land_on_their_tasks():

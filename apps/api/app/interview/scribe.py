@@ -19,7 +19,7 @@ from dataclasses import dataclass, field
 from app.interview import ledger as L
 from app.interview.docpath import get_at
 from app.interview.scribe_schema import ScribeOutput, scribe_schema
-from app.interview.slots import SLOT_DEFS
+from app.interview.slots import SLOT_DEFS, coerce_slot_value
 from app.interview.verify import VerifyResult, verify_ops
 from app.observability import record_verify_rejects
 
@@ -216,7 +216,8 @@ def apply_pending_ops(ops: list[dict], *, doc: dict,
                 details = task.setdefault("details", None) or {}
                 task["details"] = details
                 prev = details.get(last)
-                details[last] = value
+                # 數值槽正規化(「25%」→25.0):share_sum/is_core 吃數,字串會炸/誤級
+                details[last] = coerce_slot_value(last, value)
                 details.setdefault("_pending", {})[last] = _mark(
                     "mod", turn_id, src=src, prev=prev)
                 guard.append(f"pending-mod:{path}")

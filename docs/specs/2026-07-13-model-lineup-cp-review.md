@@ -71,7 +71,25 @@ source_discipline: 只收官方一手定價頁 + OpenRouter 模型頁;二手聚�
 3. interview:gpt-5.4-mini vs deepseek-v4-flash 各跑一輪 T11 考卷(deterministic 斷言+Simulated User 四 persona)+`interview_sim`,分數+人工試聊定案。
 4. 勝者進 config、敗者(若分數可接受)進 fallback 欄。
 
-## 5. 未決/待確認
+## 5. 換模驗收紀錄(2026-07-13 實跑)
+
+**探針發現(scratchpad probe,4 發實測)**:
+- `openai/gpt-5.4-mini` **不支援 `temperature`**(reasoning 系;OpenRouter
+  `supported_parameters` 無此項)——配 `require_parameters:true` 送了=404「No endpoints
+  found」。去掉 temperature 即 200。
+- **現役 bug**:`gpt-4.1-mini` 的參數表也沒列 `parallel_tool_calls`,T13 在
+  `chat_with_tools` 顯式送它+require_parameters → **interview 回合整路 404**。
+  OpenAI 官方(function-calling 指南):Chat Completions **預設即並行**,顯式送是冗餘。
+- 修法(adapter):`sampling_params(model, t)` 濾掉 GPT-5/o 系的 temperature;
+  `parallel_tool_calls` 不再顯式送(語義不變)。這是 require_parameters 的紀律:
+  **只送關鍵參數(strict/tools),可選參數不送**(OpenRouter provider-selection 文件)。
+
+**validate_select_schema(--target scribe,n=8,對抗性)**:
+- `openai/gpt-5.4-mini`:**PASS,0 逃逸**,avg 1.15s;7/8 對抗誘導直接回 `none`
+  (當非事實不記),1/8 只記合法池碼、丟非法碼。行為優於 4o-mini 基線。
+- turn 靶已移除(v1 commands.py 隨 v3 顧問改 chat+tools 退役;受限解碼只剩書記一路)。
+
+## 6. 未決/待確認
 
 - gpt-5.6-luna 待生態穩定後可重評(cached in $0.10 對前綴穩定的 context 三層很有利)。
 - deepseek-v4-flash 若 A/B 拿下 interview:確認 OpenRouter 路由商 tools/strict 支援面(T13 的 `require_parameters:true` 會自動過濾,但要看剩餘路由容量)。

@@ -23,7 +23,7 @@ from app.core.ports import KnowledgePort, LlmPort
 from app.database import get_db
 from app.interview import ledger as L
 from app.interview.diff import STABLE_ID_KEYS
-from app.interview.service import NoActiveInterview, run_curation, run_finish, run_turn
+from app.interview.service import NoActiveInterview, run_finish, run_turn
 from app.observability import record_review_events
 
 router = APIRouter(prefix="/job-profiles", tags=["interview"])
@@ -117,20 +117,8 @@ async def interview_turn(
             "suggest_finish": out.suggest_finish}   # T10 三訊號(側欄顯示收尾鈕,不強制)
 
 
-@router.post("/{profile_id}/interview:curation")
-async def interview_curation(
-    profile_id: UUID,
-    db: AsyncSession = Depends(get_db),
-    llm: LlmPort | None = Depends(get_llm),
-    knowledge: KnowledgePort = Depends(get_knowledge),
-):
-    """隨叫裁剪(D8 P1a;D9):選完職類前端立即呼叫 → 只回 AI 疊加層(precheck)
-    ——任務盤清單由前端知識包組(ADR 0021)。llm 缺 → precheck 空(前端盤照開)。"""
-    await _require_profile(profile_id, db)
-    try:
-        return await run_curation(profile_id, db=db, llm=llm, knowledge=knowledge)
-    except NoActiveInterview:
-        raise HTTPException(status_code=409, detail={"code": "no_active_interview"})
+# interview:curation(隨叫裁剪,盤預勾疊加層)已退役(ADR 0032):盤=乾淨自取;
+# quote-backed 判斷改在 run_turn 裁剪縫直落 `_pending` 綠字(web 從未接上此端點)。
 
 
 @router.post("/{profile_id}/interview:finish")

@@ -243,16 +243,15 @@ export interface ChoiceWidget {
   kind?: "choice"; question: string; options: string[]; target_path: string | null;
   recommended?: string | null;   // T9(AskUserQuestion 樣式):推薦選項標記
 }
-export interface PickerPrecheckItem { key: string; name: string; unit: string | null; quote: string }
 // 0031:職類建議卡項(A 案)——引擎只給本回合搜尋真實命中的碼(確定性,不虛構)
 export interface OccPrecheckItem { code: string; name: string; reason: string }
 export interface OpenPickerWidget {
   kind: "open_picker";
   // occupation=職類建議卡;task_board_intake=任務盤邀請卡(0032:AI 不彈盤,人按才開;
-  // 舊 `task` 預勾 widget 已停發)
+  // 舊 `task` 預勾 widget/PickerPrecheckItem 已隨 curation 疊加層退役)
   picker: "occupation" | "task_board_intake";
   query?: string;                       // occupation:預填搜尋詞(顧問實際用過的)
-  precheck?: PickerPrecheckItem[] | OccPrecheckItem[];   // occupation:{code,name,reason}
+  precheck?: OccPrecheckItem[];         // occupation:{code,name,reason}
 }
 export type InterviewWidget = ChoiceWidget | OpenPickerWidget
 // CurationChecklist / InterviewSuggestion(建議層)已退場(T12;ADR 0030)。

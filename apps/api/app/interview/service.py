@@ -17,7 +17,7 @@ from app.interview import consultant as C
 from app.interview import ledger as L
 from app.interview.attitudes import attitudes_pass
 from app.interview.backstop import SWEEP_EVERY, backstop_sweep
-from app.interview.curation import curation_pass
+from app.interview.curation import curation_ops, curation_pass
 from app.interview.scribe import (
     ScribeResult, _doc_ocs_codes, build_pool_inputs, land_ops, scribe_pass,
     worth_scribing,
@@ -77,8 +77,11 @@ async def build_task_pool(knowledge, codes: list[str]) -> list[dict]:
                 if key in seen:
                     continue
                 seen.add(key)
+                # task_urn/unit_urn:0032 綠字直落的官方出處(apply 據此導出 provenance)
                 out.append({"key": key, "name": t.task_name, "unit": u.ocu_name,
-                            "ocs_code": code, "task_code": t.task_code})
+                            "ocs_code": code, "task_code": t.task_code,
+                            "task_urn": getattr(t, "urn", "") or f"ocs:{code}:T:{t.task_code}",
+                            "unit_urn": getattr(u, "urn", "") or ""})
     return out
 
 
@@ -153,10 +156,12 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> T
     state = dict(session.ledger_state or {})
     state["last_gap"] = L.next_gap(work_doc, state, {}, pool_tasks, ref_ocs)
 
-    # ②½ 裁剪 pass(0028 D1/D4):curation 縫 → AI 對 unasked 官方任務預勾/排除;
-    #    precheck → widget 指令(picker 人確認才落文件);declined → ledger_state(不再反問)
+    # ②½ 裁剪 pass(0028 D1/D4 + 0032 T5c):curation 縫 → AI 對 unasked 官方任務
+    #    判斷;quote-backed precheck → **確定性 op → verify → `_pending` 綠字直落**
+    #    (兩相:官方殼先落,任務對含殼文件再驗);declined → ledger_state(不再反問)。
     widget: dict | None = None
     curation_guard: list[str] = []
+    curation_landed = False
     if state["last_gap"] == L.CURATION_TASKS and pool_tasks:
         unasked = L.checklist(work_doc, state, pool_tasks)["unasked"]
         if unasked:
@@ -167,8 +172,35 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> T
             if cur.declined:
                 state["declined"] = list(dict.fromkeys(
                     (state.get("declined") or []) + [d["key"] for d in cur.declined]))
-            # 0032:precheck 不再出 widget(AI 不彈盤)——quote-backed 直落綠字=T5c;
-            # declined 照記(顧問不再反問)。
+            if cur.precheck:
+                u_ops, t_ops, g0 = curation_ops(
+                    cur.precheck, doc=work_doc, turns=turns_map,
+                    pool_by_key={p["key"]: p for p in pool_tasks})
+                curation_guard += g0
+                land_refs = {u for p in pool_tasks
+                             for u in (p.get("task_urn"), p.get("unit_urn")) if u}
+                landed_doc = work_doc
+                for phase_ops in (u_ops, t_ops):
+                    if not phase_ops:
+                        continue
+                    nd, g, _landed = land_ops(
+                        phase_ops, doc=landed_doc, turns=turns_map,
+                        ref_codes=land_refs, header_codes=header_codes, pool_items={})
+                    curation_guard += g
+                    if nd is not None:
+                        landed_doc = nd
+                if landed_doc is not work_doc:
+                    try:
+                        await doc_repo.upsert_draft(
+                            profile_id, landed_doc,
+                            expected_version=(latest or {}).get("version"),
+                            expected_revision=(latest or {}).get("revision"))
+                        latest = await doc_repo.latest(profile_id)
+                        doc = work_doc = landed_doc   # 後續(顧問/書記/帳本)吃落地後文件
+                        curation_landed = True
+                    except DocConflictError:
+                        # 人的編輯優先(ADR 0025);unasked 還在,下回合裁剪縫自癒
+                        curation_guard.append("curation-land:409 放棄(下回合自癒)")
             await repo.add_llm_call(session.id, turn_seq=emp_turn.seq, role="select",
                                     model=model_for_role("select"), duration_ms=cur_ms,
                                     guard_verdicts=curation_guard[:30])
@@ -298,43 +330,16 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> T
     guard = list(scribe_res.guard_log) + extra_guard + curation_guard
     if scribe_res.records_failed:
         guard.append("scribe:抽取重試仍敗(交 backstop)")
-    return TurnResult(say=say, question=None, widget=widget, doc_changed=doc_changed,
+    return TurnResult(say=say, question=None, widget=widget,
+                      doc_changed=doc_changed or curation_landed,
                       phase=L.derive_phase(work_doc, state, ref_ocs),
                       focus=dict(session.focus or {}), guard_log=guard,
                       coverage=L.coverage(work_doc, state),
                       suggest_finish=suggest_finish)
 
 
-async def run_curation(profile_id: UUID, *, db, llm, knowledge) -> dict:
-    """隨叫裁剪(D8 P1a;D9):選完職類**立刻**鋪任務盤,零打字。
-    只回 **AI 疊加層** precheck(依至今發言預勾+引文)——清單本身由前端知識包組
-    (ADR 0021:pack=所有選單的資料源;已加入/全量照列都在前端)。
-    declined 落 ledger_state(顧問不再反問;同 turn 路徑);
-    llm 缺/敗或無發言 → precheck 空(fail-open:前端盤照開)。"""
-    repo = InterviewRepo(db)
-    session = await repo.get_active(profile_id)
-    if session is None:
-        raise NoActiveInterview(str(profile_id))
-    doc = ((await DocRepo(db).latest(profile_id)) or {}).get("content") or {}
-    profile = await db.get(JobProfile, profile_id)
-    pool_tasks = await build_task_pool(
-        knowledge, _ref_codes_ordered(doc, getattr(profile, "selected_ocs_codes", None)))
-    state = dict(session.ledger_state or {})
-    unasked = L.checklist(doc, state, pool_tasks)["unasked"]
-
-    precheck: list[dict] = []
-    if unasked and llm is not None:
-        turns = await repo.list_turns(session.id)
-        emp = [t.text for t in turns if t.role == "employee"]
-        if emp:
-            cur = await curation_pass(llm, pool_tasks=unasked, employee_texts=emp)
-            precheck = cur.precheck
-            if cur.declined:
-                state["declined"] = list(dict.fromkeys(
-                    (state.get("declined") or []) + [d["key"] for d in cur.declined]))
-                await repo.update_session(session.id, ledger_state=state)
-
-    return {"precheck": precheck}
+# run_curation(隨叫裁剪端點的服務函式)已退役(ADR 0032):盤=乾淨自取無 AI 疊加層;
+# quote-backed 判斷在 run_turn 的裁剪縫直落綠字。
 
 
 def _finish_summary(doc: dict, accepted_paths: list[str]) -> dict:

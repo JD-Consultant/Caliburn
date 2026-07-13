@@ -93,11 +93,18 @@ def test_add_to_missing_container_rejected():
     assert not r.ok and r.errors[0].check == "permission"
 
 
-def test_add_unit_rejected_fail_closed():
-    """ocu_units 無生成端也無落地建殼——白名單刻意不含,擋在 contract 查。"""
+def test_add_unit_shell_official_only():
+    """0032:官方殼開放但 fail-closed 精神不變——quote-only(自由新增職責)拒收;
+    池內官方 URN 才放行(落地端建殼;書記 schema 仍無此變體,生成端編不出)。"""
     r = run([{"target_path": "ocs_content.ocu_units", "op": "add", "value": "新職責",
               "src": {"quote": _q()}}])
-    assert not r.ok and r.errors[0].check == "contract"
+    assert not r.ok and r.errors[0].check == "src"
+    r2 = run([{"target_path": "ocs_content.ocu_units", "op": "add", "value": "設備保養",
+               "src": {"ref_urn": "ocs:unit:ABC1234:t2", "quote": _q()}}])
+    assert r2.ok, r2.errors
+    r3 = run([{"target_path": "ocs_content.ocu_units", "op": "add", "value": "生產排程",
+               "src": {"ref_urn": "ocs:unit:ABC1234:t2", "quote": _q()}}])
+    assert not r3.ok and r3.errors[0].check == "invariant"   # 同名殼(ocu_name)防重複
 
 
 def test_mod_missing_target_rejected():

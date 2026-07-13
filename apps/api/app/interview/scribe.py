@@ -14,6 +14,7 @@
 """
 import copy
 import logging
+import re
 from dataclasses import dataclass, field
 
 from app.interview import ledger as L
@@ -47,6 +48,11 @@ SCRIBE_SYS = (
 # 能力區塊 kind → 條目文字欄(CodeName{code,name} / CodeText{code,text})
 _BLOCK_FIELDS = {"outputs": "name", "knowledge": "name", "skills": "name",
                  "indicators": "text"}
+
+# 官方 URN(indexer api/urn.py 同 scheme)→ provenance 程式導出(ADR 0032:
+# 官方碼不是 LLM 寫的;web 選單/盤據 provenance 對位勾選狀態)
+_TASK_URN = re.compile(r"^ocs:([^:]+):T:(.+)$")
+_UNIT_URN = re.compile(r"^ocs:([^:]+):U:(.+)$")
 
 # 按需喚醒的確定性前濾(ADR 0030 §6.2 改處2 的落地):只跳過**明顯無素材**的
 # 寒暄/meta 回合;寧可多跑一次書記,不可漏記(漏接由 backstop sweep 兜底)。
@@ -183,16 +189,40 @@ def apply_pending_ops(ops: list[dict], *, doc: dict,
         last = path.split(".")[-1]
 
         if kind == "add":
-            if last == "tasks":
+            if last == "ocu_units":
+                # 0032:官方職責殼(裁剪確定性落地;書記無此變體)。provenance 由
+                # ref_urn 導出;occupation_name 留空(web 家職責對位吃 ocs__ocu 碼)。
+                container = _doc().setdefault("ocs_content", {}).setdefault("ocu_units", [])
+                if not isinstance(container, list):
+                    guard.append(f"drop:{path}(容器不是清單)")
+                    continue
+                shell: dict = {"ocu_code": "", "ocu_name": value, "tasks": [],
+                               "_pending": _mark("add", turn_id, src=src)}
+                m = _UNIT_URN.match(str(src.get("ref_urn") or ""))
+                if m:
+                    shell["source"] = {"ocs_code": m.group(1), "occupation_name": ""}
+                    shell["_refs"] = [{"ocs_code": m.group(1), "occupation_name": "",
+                                       "code": "", "ocu_code": m.group(2)}]
+                container.append(shell)
+                guard.append(f"pending-add:{path}(unit:{value})")
+            elif last == "tasks":
                 container = get_at(_doc(), path)
                 if not isinstance(container, list):
                     guard.append(f"drop:{path}(容器不存在)")
                     continue
-                container.append({
+                entry: dict = {
                     "task_codes": [{"code": None, "name": value}],
                     "competency_blocks": [], "details": None,
                     "_pending": _mark("add", turn_id, src=src),
-                })
+                }
+                tm = _TASK_URN.match(str(src.get("ref_urn") or ""))
+                if tm:
+                    # 官方任務綠字直落(0032):provenance/_refs 程式導出
+                    entry["provenance"] = {"ocs_code": tm.group(1),
+                                           "task_code": tm.group(2)}
+                    entry["_refs"] = [{"ocs_code": tm.group(1), "occupation_name": "",
+                                       "task_code": tm.group(2)}]
+                container.append(entry)
                 guard.append(f"pending-add:{path}(task:{value})")
             else:
                 container = _ensure_block_container(_doc(), path) \

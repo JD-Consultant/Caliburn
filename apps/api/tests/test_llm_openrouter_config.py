@@ -1,5 +1,5 @@
 """T13(ADR 0030):OpenRouter 顯式設定——require_parameters 請求體、models 備援、
-parallel_tool_calls、fallback 觸發記 trace、Retry-After 尊重。"""
+fallback 觸發記 trace、Retry-After 尊重、sampling 參數過濾(2026-07-13 換模探針)。"""
 import asyncio
 from types import SimpleNamespace
 
@@ -7,7 +7,7 @@ from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanE
 
 from app.adapters import llm_openrouter as llm_mod
 from app.adapters.llm_openrouter import (
-    _record_usage, _retry_after_seconds, openrouter_extra_body,
+    _record_usage, _retry_after_seconds, openrouter_extra_body, sampling_params,
 )
 from app.config import settings
 from app.observability import get_tracer, setup_tracing
@@ -19,6 +19,15 @@ def test_extra_body_always_requires_parameters():
     assert "models" not in body                      # 無備援=不帶 models
 
 
+def test_sampling_params_filters_temperature_for_reasoning_models():
+    """GPT-5/o 系不支援 temperature(supported_parameters 無此參數);
+    配 require_parameters 送了=整路 404——必須過濾(探針:specs/2026-07-13)。"""
+    assert sampling_params("openai/gpt-5.4-mini", 0) == {}
+    assert sampling_params("openai/o4-mini", 0.4) == {}
+    assert sampling_params("openai/gpt-4.1-mini", 0.4) == {"temperature": 0.4}
+    assert sampling_params("deepseek/deepseek-v4-flash", 0.2) == {"temperature": 0.2}
+
+
 def test_extra_body_models_fallback_when_configured(monkeypatch):
     monkeypatch.setattr(settings, "model_interview_fallback", "openai/gpt-4.1")
     body = openrouter_extra_body("interview")
@@ -26,7 +35,8 @@ def test_extra_body_models_fallback_when_configured(monkeypatch):
 
 
 def test_chat_with_tools_request_body(monkeypatch):
-    """請求體斷言:parallel_tool_calls=True + extra_body(provider/require_parameters)。"""
+    """請求體斷言:extra_body(provider/require_parameters);**不送** parallel_tool_calls
+    (OpenAI 預設即並行;顯式送+require_parameters 會 404——探針證實 4.1-mini 中招)。"""
     captured: dict = {}
 
     class _FakeCompletions:
@@ -48,8 +58,35 @@ def test_chat_with_tools_request_body(monkeypatch):
         tools=[{"type": "function", "function": {"name": "t", "parameters": {}}}],
         dispatch=dispatch))
     assert out.text == "好的?"
-    assert captured["parallel_tool_calls"] is True
+    assert "parallel_tool_calls" not in captured
     assert captured["extra_body"]["provider"]["require_parameters"] is True
+    assert captured["temperature"] == 0.4            # 4.1-mini 支援 → 照送
+
+
+def test_chat_with_tools_omits_temperature_for_gpt5(monkeypatch):
+    """interview 若換 GPT-5 系:temperature 必須被濾掉,否則 require_parameters 404。"""
+    captured: dict = {}
+
+    class _FakeCompletions:
+        async def create(self, **kwargs):
+            captured.update(kwargs)
+            msg = SimpleNamespace(content="ok", tool_calls=None)
+            return SimpleNamespace(
+                choices=[SimpleNamespace(message=msg, finish_reason="stop")],
+                model=kwargs["model"], usage=None)
+
+    fake = SimpleNamespace(chat=SimpleNamespace(completions=_FakeCompletions()))
+    monkeypatch.setattr(llm_mod, "_async_client", lambda: fake)
+    monkeypatch.setattr(settings, "model_interview", "openai/gpt-5.4-mini")
+
+    async def dispatch(name, args):
+        return {}
+
+    asyncio.run(llm_mod.OpenRouterLlm().chat_with_tools(
+        role="interview", messages=[{"role": "user", "content": "hi"}],
+        tools=[{"type": "function", "function": {"name": "t", "parameters": {}}}],
+        dispatch=dispatch))
+    assert "temperature" not in captured
 
 
 def test_record_usage_marks_fallback_and_cache():

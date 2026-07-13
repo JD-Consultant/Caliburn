@@ -4,11 +4,10 @@ from uuid import uuid4
 
 from fastapi import HTTPException
 
-from app.adapters.interview_repo import InterviewRepo
 from app.adapters.persistence import DocRepo
 from app.adapters.stubs import StubKnowledge, StubLlm
 from app.api.routes.interview import (
-    finish_interview, get_interview, interview_turn, review_interview, start_interview,
+    finish_interview, get_interview, interview_turn, start_interview,
 )
 from app.models import JobProfile, User
 
@@ -105,7 +104,7 @@ async def test_get_interview_full_view(db_session):
     view = await get_interview(p.id, db=db_session)
     assert [t["role"] for t in view["turns"]] == ["employee", "consultant"]
     assert view["pending_count"] == 1                 # v3:寫入=文件內 _pending(evidence 退場)
-    assert view["evidence"] == []
+    assert "evidence" not in view and "suggestions" not in view   # T12:兩層退場
     assert view["status"] == "active"
     # T9 議程三態:任務缺口未清=in_progress(next_gap 落此)或 pending;末列=態度
     agenda = view["agenda"]
@@ -116,15 +115,13 @@ async def test_get_interview_full_view(db_session):
 @pytest.mark.asyncio
 async def test_finish_no_llm_backstop_still_transitions_review(db_session):
     """v3(ADR 0030 T5):LLM 收尾複查退場(撿漏=每 N 回合確定性 sweep);
-    finish 不再吃 backstop 結果,照樣轉 review、零補漏建議。"""
+    finish 不再吃 backstop 結果,照樣轉 review、附結構化總結。"""
     p = await _profile(db_session)
     await start_interview(p.id, db=db_session)
     await interview_turn(p.id, {"text": "我們每兩週跑一次回歸"},
                          db=db_session, llm=StubLlm(select_result=GOOD), knowledge=K)
     out = await finish_interview(p.id, db=db_session, llm=None)
-    assert out["phase"] == "review"
-    view = await get_interview(p.id, db=db_session)
-    assert not any("補漏" in s["reason"] for s in view["suggestions"])
+    assert out["phase"] == "review" and "summary" in out
 
 
 @pytest.mark.asyncio
@@ -135,20 +132,5 @@ async def test_finish_without_llm_still_transitions(db_session):
     assert out["phase"] == "review"
 
 
-@pytest.mark.asyncio
-async def test_review_status_only(db_session):
-    """v3:scribe 不再產建議;review 端點仍服務 curation/backstop 的建議層。
-    直接種一筆建議驗證「只轉狀態、不寫文件」不變量。"""
-    p = await _profile(db_session)
-    await start_interview(p.id, db=db_session)
-    repo = InterviewRepo(db_session)
-    s = await repo.get_active(p.id)
-    await repo.add_suggestion(s.id, doc_path=FREQ, old_value=None, new_value="每雙週",
-                              reason="補漏(backstop)", turn_seq=1)
-    view = await get_interview(p.id, db=db_session)
-    sug_id = view["suggestions"][0]["id"]
-    out = await review_interview(p.id, {"accept": [sug_id]}, db=db_session)
-    assert out["accepted"][0]["doc_path"] == FREQ and out["pending"] == 0
-    # 只轉狀態,不寫文件(套用是前端的事)
-    latest = await DocRepo(db_session).latest(p.id)
-    assert "details" not in latest["content"]["ocs_content"]["ocu_units"][0]["tasks"][0]
+# interview:review(建議層批審)已退場(T12):✓/✗ 走前端 acceptPending/rejectPending
+# + PATCH + review-events;端點測試見 test_interview_review_events.py。

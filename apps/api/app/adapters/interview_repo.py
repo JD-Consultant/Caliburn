@@ -1,4 +1,4 @@
-"""InterviewRepo(訪談引擎 v1,T2):sessions/turns/evidence/suggestions 的薄資料層。
+"""InterviewRepo(訪談引擎):sessions/turns/審閱事件/LLM 稽核的薄資料層。
 
 家規對齊 persistence.py:repo 吃 session、只 raise 不決定 HTTP;
 「同 profile 最多一個 active」= 應用層先查 + DB partial unique 兜底(雙保險)。
@@ -8,11 +8,9 @@ from uuid import UUID
 from sqlalchemy import func, select
 
 from app.models import (
-    InterviewEvidence,
     InterviewLlmCall,
     InterviewReviewEvent,
     InterviewSession,
-    InterviewSuggestion,
     InterviewTurn,
 )
 
@@ -98,68 +96,8 @@ class InterviewRepo:
         rows = list((await self.session.execute(stmt)).scalars())
         return rows[-last_n:] if last_n else rows
 
-    # --- evidence(槽值↔原話) ---
-
-    async def add_evidence(self, session_id: UUID, *, doc_path: str, quote: str,
-                           turn_seq: int, verified: bool,
-                           review: str = "auto") -> InterviewEvidence:
-        row = InterviewEvidence(session_id=session_id, doc_path=doc_path, quote=quote,
-                                turn_seq=turn_seq, verified=verified, review=review)
-        self.session.add(row)
-        await self.session.flush()
-        return row
-
-    async def list_evidence(self, session_id: UUID) -> list[InterviewEvidence]:
-        stmt = (select(InterviewEvidence)
-                .where(InterviewEvidence.session_id == session_id)
-                .order_by(InterviewEvidence.created_at))
-        return list((await self.session.execute(stmt)).scalars())
-
-    async def set_evidence_review(self, evidence_id: UUID, review: str) -> InterviewEvidence:
-        """批次審裁決(T5/T10):pending → accepted/reverted。"""
-        row = await self.session.get(InterviewEvidence, evidence_id)
-        row.review = review
-        await self.session.flush()
-        return row
-
-    async def list_pending_evidence(self, session_id: UUID) -> list[InterviewEvidence]:
-        stmt = (select(InterviewEvidence)
-                .where(InterviewEvidence.session_id == session_id,
-                       InterviewEvidence.review == "pending")
-                .order_by(InterviewEvidence.created_at))
-        return list((await self.session.execute(stmt)).scalars())
-
-    # --- suggestions(建議層) ---
-
-    async def add_suggestion(self, session_id: UUID, *, doc_path: str, old_value,
-                             new_value, reason: str, turn_seq: int) -> InterviewSuggestion:
-        row = InterviewSuggestion(session_id=session_id, doc_path=doc_path,
-                                  old_value=old_value, new_value=new_value,
-                                  reason=reason, turn_seq=turn_seq)
-        self.session.add(row)
-        await self.session.flush()
-        await self.session.refresh(row)   # 取 server_default(status)
-        return row
-
-    async def list_suggestions(self, session_id: UUID) -> list[InterviewSuggestion]:
-        """全部建議(含已裁決;顧問視圖)。"""
-        stmt = (select(InterviewSuggestion)
-                .where(InterviewSuggestion.session_id == session_id)
-                .order_by(InterviewSuggestion.created_at))
-        return list((await self.session.execute(stmt)).scalars())
-
-    async def list_pending(self, session_id: UUID) -> list[InterviewSuggestion]:
-        stmt = (select(InterviewSuggestion)
-                .where(InterviewSuggestion.session_id == session_id,
-                       InterviewSuggestion.status == "pending")
-                .order_by(InterviewSuggestion.created_at))
-        return list((await self.session.execute(stmt)).scalars())
-
-    async def set_suggestion_status(self, suggestion_id: UUID, status: str) -> InterviewSuggestion:
-        row = await self.session.get(InterviewSuggestion, suggestion_id)
-        row.status = status
-        await self.session.flush()
-        return row
+    # evidence/suggestions 層已退場(T12;ADR 0030):溯源住文件 `_pending.src`、
+    # 審閱住 interview_review_events;migration 0008 落表。
 
     # --- LLM 呼叫稽核(T13;每回合每次呼叫一列) ---
 

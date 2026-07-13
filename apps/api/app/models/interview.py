@@ -1,13 +1,13 @@
-"""訪談引擎 v1 資料模型(ADR 0023;spec 2026-07-05 §2)。
+"""訪談引擎資料模型(ADR 0023/0030)。
 
 四張表:sessions(進度列=引擎唯一狀態)/ turns(逐字稿=溯源真相)/
-evidence(槽值↔原話對照,顧問稽核)/ suggestions(建議層,ADR 0025)。
+review_events(✓✗ 無聲記帳)/ llm_calls(稽核)。
 守則:同 profile 同時最多一個 active session——應用層檢查 + DB partial unique 雙保險。
 """
 import uuid
 
 from sqlalchemy import (
-    BigInteger, Boolean, Column, DateTime, ForeignKey,
+    BigInteger, Column, DateTime, ForeignKey,
     Identity, Index, Integer, Text, UniqueConstraint, func,
 )
 from sqlalchemy import text as sa_text   # 別名:InterviewTurn.text 欄位會遮蔽同名函式
@@ -68,46 +68,8 @@ class InterviewTurn(Base):
     )
 
 
-class InterviewEvidence(Base):
-    __tablename__ = "interview_evidence"
-
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    session_id = Column(
-        UUID(as_uuid=True),
-        ForeignKey("interview_sessions.id", ondelete="CASCADE"),
-        nullable=False,
-        index=True,
-    )
-    doc_path = Column(Text, nullable=False)
-    quote = Column(Text, nullable=False)
-    turn_seq = Column(Integer, nullable=False)
-    verified = Column(Boolean, nullable=False, server_default=sa_text("true"))
-    # v2 風險分流(ADR 0027 T5):auto(v1/建議路由)/pending(低風險直寫待批)/accepted/reverted
-    review = Column(Text, nullable=False, server_default=sa_text("'auto'"))
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-
-
-class InterviewSuggestion(Base):
-    __tablename__ = "interview_suggestions"
-
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    session_id = Column(
-        UUID(as_uuid=True),
-        ForeignKey("interview_sessions.id", ondelete="CASCADE"),
-        nullable=False,
-    )
-    doc_path = Column(Text, nullable=False)
-    old_value = Column(JSONB)
-    new_value = Column(JSONB, nullable=False)
-    reason = Column(Text, nullable=False, server_default=sa_text("''"))
-    status = Column(Text, nullable=False, server_default=sa_text("'pending'"))  # pending/accepted/rejected
-    turn_seq = Column(Integer, nullable=False)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
-
-    __table_args__ = (
-        Index("ix_interview_suggestions_session_status", "session_id", "status"),
-    )
+# interview_evidence / interview_suggestions 已退場(T12;ADR 0030):
+# 溯源住文件 `_pending.src`、審閱住 interview_review_events(migration 0008 落表)。
 
 
 class InterviewReviewEvent(Base):

@@ -1,17 +1,14 @@
 "use client";
 
-// 顧問稽核視圖(T13;spec §7):員工做完後,顧問看逐字稿 + 槽值↔原話對照(證據)
-// + 建議歷史。唯讀;文件本體回工作台看。
+// 顧問稽核視圖:訪談逐字稿(唯讀;文件本體回工作台看)。
+// T12(ADR 0030):evidence/建議層退場——溯源住文件 `_pending.src`(表格「?」出處卡),
+// 審閱紀錄住 review-events(後台/trace 用);本頁保留逐字稿=溯源真相。
 import { use } from "react";
 import Link from "next/link";
-import { ChevronLeft, ShieldAlert, ShieldCheck } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { useInterview } from "@/hooks/useInterview";
-
-const STATUS_BADGE: Record<string, "default" | "secondary" | "outline"> = {
-  pending: "outline", accepted: "default", rejected: "secondary",
-};
 
 export default function InterviewAuditPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -47,60 +44,9 @@ export default function InterviewAuditPage({ params }: { params: Promise<{ id: s
                 </div>
               ))}
             </div>
-          </section>
-
-          <section>
-            <h2 className="mb-2 text-sm font-medium">
-              證據對照(槽值 ↔ 員工原話)
-              <Badge variant="secondary" className="ml-1">{data.evidence.length}</Badge>
-            </h2>
-            <div className="overflow-x-auto rounded-md border">
-              <table className="w-full text-xs">
-                <thead className="bg-muted/40 text-left">
-                  <tr>
-                    <th className="p-2">欄位 path</th>
-                    <th className="p-2">員工原話</th>
-                    <th className="p-2">驗證</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {data.evidence.map((e, i) => (
-                    <tr key={i} className="border-t align-top">
-                      <td className="p-2 font-mono">{e.doc_path}</td>
-                      <td className="p-2">「{e.quote}」</td>
-                      <td className="p-2">
-                        {e.verified ? (
-                          <span className="inline-flex items-center gap-1 text-emerald-600">
-                            <ShieldCheck className="h-3.5 w-3.5" /> 逐字稿相符
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center gap-1 text-amber-600">
-                            <ShieldAlert className="h-3.5 w-3.5" /> 未驗證
-                          </span>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </section>
-
-          <section>
-            <h2 className="mb-2 text-sm font-medium">
-              建議歷史 <Badge variant="secondary">{data.suggestions.length}</Badge>
-            </h2>
-            <ul className="space-y-2 text-xs">
-              {data.suggestions.map((s) => (
-                <li key={s.id} className="rounded-md border p-2">
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono">{s.doc_path}</span>
-                    <Badge variant={STATUS_BADGE[s.status] ?? "outline"}>{s.status}</Badge>
-                  </div>
-                  <div className="mt-1 text-muted-foreground">{s.reason}</div>
-                </li>
-              ))}
-            </ul>
+            <p className="mt-2 text-xs text-muted-foreground">
+              AI 寫入的出處(官方來源/原話)在工作台表格各筆的「?」出處卡查看。
+            </p>
           </section>
         </div>
       )}

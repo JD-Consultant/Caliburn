@@ -15,11 +15,9 @@ import { JobDocTable } from "@/components/interview/JobDocTable";
 import { OccupationPicker } from "@/components/interview/OccupationPicker";
 import { GlobalTaskPickerMenu } from "@/components/interview/GlobalTaskPickerMenu";
 import { ConflictDialog } from "@/components/interview/ConflictDialog";
-import { CurationDialog } from "@/components/interview/CurationDialog";
 import { InterviewPanel } from "@/components/interview/InterviewPanel";
 import { completion, ensureIds, listPending } from "@/lib/ocsDoc";
-import { interviewCuration } from "@/lib/api";
-import type { OcsDocument, OpenPickerWidget, PickerPrecheckItem } from "@/types";
+import type { OcsDocument, OpenPickerWidget } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -55,27 +53,14 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
   const [showOcc, setShowOcc] = useState(false);
   const [showInterview, setShowInterview] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  // 0028 D1:訪談引擎 widget 指令 → 開**同一批**編輯器 pickers(同 UI、入口不同)
-  // D9:任務盤清單=前端 pack;後端只給 AI 疊加層(precheck)
+  // 0028 D1:訪談引擎 widget 指令 → 開**同一批**編輯器 pickers(同 UI、入口不同)。
+  // T12(ADR 0030):CurationDialog 退場——任務檢查表職能歸議程狀態機+側欄成組反問;
+  // task widget 不再開彈窗(挑任務走表格〔選任務〕/全域選任務窗)。
   const [aiOccQuery, setAiOccQuery] = useState<string | null>(null);
-  const [curation, setCuration] = useState<PickerPrecheckItem[] | null>(null);
   const onWidget = (w: OpenPickerWidget) => {
     if (w.picker === "occupation") {
       setAiOccQuery(w.query ?? "");
       setShowOcc(true);
-    } else if (w.picker === "task") {
-      setCuration(w.precheck ?? []);
-    }
-  };
-  // D8 P1a:選完職類**立刻**鋪任務盤(零打字)——訪談開著才觸發;
-  // 盤在前端(D9),端點只拿 AI 預勾:失敗/無 active 也照開全盤(fail-open)
-  const onOccupationsApplied = async () => {
-    if (!showInterview) return;
-    try {
-      const res = await interviewCuration(id);
-      setCuration(res.precheck);
-    } catch {
-      setCuration([]);
     }
   };
 
@@ -204,22 +189,8 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
           profileId={id}
           defaultQuery={aiOccQuery ?? (profile?.job_summary || profile?.job_title || "")}
           autoSearch={aiOccQuery != null}
-          onApplied={onOccupationsApplied}
           onClose={() => { setShowOcc(false); setAiOccQuery(null); }}
           onError={setError}
-        />
-      ) : null}
-
-      {/* 0028 D1/D4 + D9:AI 任務盤(盤=pack 全量、AI 疊 precheck+引文;
-          寫入走 addFromPool→persist 同一路);key=payload 換 → 重掛重置勾選 */}
-      {curation && doc ? (
-        <CurationDialog
-          key={curation.map((x) => x.key).join("|")}
-          precheck={curation}
-          document={doc}
-          pack={pack}
-          onApply={(next) => persist(next)}
-          onClose={() => setCuration(null)}
         />
       ) : null}
 

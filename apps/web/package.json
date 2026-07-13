@@ -12,9 +12,6 @@
   "dependencies": {
     "@base-ui/react": "^1.4.1",
     "@caliburn/ocs-contract": "*",
-    "@copilotkit/react-core": "^1.61.0",
-    "@copilotkit/react-ui": "^1.61.0",
-    "@copilotkit/runtime": "^1.61.0",
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",

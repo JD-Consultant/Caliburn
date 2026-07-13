@@ -8,7 +8,7 @@ Caliburn 是給顧問用的**多租戶 B2B SaaS**:把官方 OCS 職能基準 →
 
 ```
 PDF ──▶ pdf-to-json ──(OCS JSON)──▶ ocs-indexer ──(HTTP 查詢)──▶ api ──▶ web ──▶ 使用者
-        解析(ETL)                  檢索(Qdrant+ML)            著作(FastAPI+LangGraph)  (Next.js)
+        解析(ETL)                  檢索(Qdrant+ML)            著作(FastAPI+訪談引擎)   (Next.js)
 ```
 
 ## Code map
@@ -32,7 +32,8 @@ PDF ──▶ pdf-to-json ──(OCS JSON)──▶ ocs-indexer ──(HTTP 查�
 - **資料主權**:Postgres 屬 api、Qdrant 屬 indexer;別的服務只經其 API 取資料,不直接碰倉庫。
 - **契約優先**(Phase 2):OCS 結構由 `packages/ocs-contract` 的 JSON-Schema 單一定義。
 - **多租戶**:租戶隔離只在 api(Pool + Postgres RLS);知識服務全域共享。
-- **Agent**:LangGraph + 12-factor;indexer 縫 MCP-ready。
+- **Agent**:自研訪談引擎(`apps/api/app/interview/`,唯一 AI 大腦;op→verify→`_pending`
+  追蹤修訂,ADR 0030;舊 LangGraph/CopilotKit 已退場勿救回);indexer 縫 MCP-ready。
 - **依賴降級**:對 indexer 等外部依賴**逐端點分類**——critical(掛→快錯 5xx)vs enrichment(掛→回部分資料 + `meta.partial`,不擋主流程)。見 [ADR 0018](docs/adr/0018-indexer-dependency-degradation-policy.md)。
 
 決策史與取捨:[`docs/adr/`](docs/adr/)。維運:[`docs/runbook.md`](docs/runbook.md)。上手:[`CONTRIBUTING.md`](CONTRIBUTING.md)。

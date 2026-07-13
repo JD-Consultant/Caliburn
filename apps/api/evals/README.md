@@ -11,8 +11,8 @@
   分子=出處過 verify ②③ 者。單測:`tests/test_source_score.py`。
 - `golden/<case_id>/` — 黃金題:`transcript.txt` + `reference.md`(顧問級成品)+
   `rubric.yaml`(二元 item+負分;Phase 2 llm-rubric 用)。
-  **SME gate:第一題 JD-golden-001 由 agent 起草,維護者審改後才算定案;
-  reference 過 rubric 必須滿分(驗 grader)。**
+  **SME gate(2026-07-13 改制:維護者非 JD 領域專家):由 agent 以權威來源
+  自審定案,審查紀錄留 docs/specs/;reference 過 rubric 必須滿分(驗 grader)。**
 - CI:`.github/workflows/evals.yml`(promptfoo-action;引擎/評測檔變更觸發,紅燈擋 merge)。
 
 ## 跑法

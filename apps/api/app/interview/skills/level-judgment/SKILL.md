@@ -20,7 +20,8 @@ description: 職能級別(1–6)怎麼判——四判定軸+iCAP 級別表+SFIA 
 # 判別規則
 - 判定資料=工作任務+其**行為指標**(iCAP p49);逐任務定級,任務會跨級別,不鎖單級。
 - 基準級別=**最主要或最多數**任務的級別(iCAP p37/p73)。
-- 佐證語言(SFIA 9 四軸升階措辭):autonomy(密切監督→一般指示→廣泛方向→自主)、
+- 佐證語言(SFIA 9 通用屬性共五項:autonomy/influence/complexity/knowledge/
+  business skills;借前四項的升階措辭):autonomy(密切監督→一般指示→廣泛方向→自主)、
   influence(團隊→領域→組織)、complexity(常規→非常規→不可預測情境)、
   knowledge(角色內既定→深度專精→策略)。
 

@@ -99,12 +99,13 @@ def gap_label(doc: dict, gap: str) -> str:
     return f"任務「{name}」的{label}" if name else label
 
 
-def ledger_summary(doc: dict, state: dict, pool_tasks: list[dict] | None = None) -> str:
+def ledger_summary(doc: dict, state: dict, pool_tasks: list[dict] | None = None,
+                   ref_codes: set[str] | frozenset = frozenset()) -> str:
     """帳本摘要:覆蓋率 + 建議下一個問什麼(next_gap 人話化)。顧問據以決定問向;
     非命令——顧問可因對話脈絡先問別的,帳本會繼續盯。
     0028 D6:pool_tasks(官方任務池)給了 → curation 縫吐**成組反問**(unasked 名單 ≤5);
     檢查表全處置且還沒抓漏 → 吐一次 write-in 探測(flag 由 service 消費)。"""
-    nxt = L.next_gap(doc, state, {}, pool_tasks)
+    nxt = L.next_gap(doc, state, {}, pool_tasks, ref_codes)
     if nxt == L.CURATION_TASKS and pool_tasks:
         names = [t["name"] for t in L.checklist(doc, state, pool_tasks)["unasked"]][:5]
         if names:
@@ -135,11 +136,17 @@ def _doc_excerpt(doc: dict) -> str:
     return "\n".join(rows) or "  (尚無任務)"
 
 
-def _reference_block(doc: dict, pool_tasks: list[dict] | None) -> str:
+def _reference_block(doc: dict, pool_tasks: list[dict] | None,
+                     ref_codes: set[str] | frozenset = frozenset()) -> str:
     """前綴 2(per-doc):參考基準摘要。只放 session 內穩定的官方事實
-    (**禁時間戳/UUID**——前綴 byte 級穩定才吃得到 provider 快取,T13)。"""
-    prof = (doc.get("ocs_profile") or {}).get("ocs_code") or "(尚未選職類)"
-    lines = [f"職類碼:{prof}"]
+    (**禁時間戳/UUID**——前綴 byte 級穩定才吃得到 provider 快取,T13)。
+    參考集合(0029 住 profile)也要進來——顧問不能把「已選參考」誤判成空白。"""
+    prof = (doc.get("ocs_profile") or {}).get("ocs_code") or "(尚未選主基準)"
+    lines = [f"主基準碼:{prof}"]
+    if ref_codes:
+        lines.append("參考集合(已選,選單/任務盤資料源):" + "、".join(sorted(ref_codes)))
+    else:
+        lines.append("參考集合:(空——請他從建議卡或〔選參考〕加入)")
     names = [t.get("name", "") for t in (pool_tasks or []) if t.get("name")]
     if names:
         lines.append("官方任務池:" + "、".join(names))
@@ -151,7 +158,8 @@ def build_consultant_messages(*, doc: dict, ledger_state: dict,
                               employee_text: str, est_minutes: int = 15,
                               probe: dict | None = None,
                               pool_tasks: list[dict] | None = None,
-                              rejected: list[str] | None = None) -> list[dict]:
+                              rejected: list[str] | None = None,
+                              ref_codes: set[str] | frozenset = frozenset()) -> list[dict]:
     """組 chat_with_tools 的 messages,context 三層(T7):
     前綴 1(全域凍結)=system 人格+常駐判準教材 → 前綴 2(per-doc)=參考基準摘要
     → 動態區=帳本/文件四態/被拒/待問+本回合欄位判準教材+近窗對話。
@@ -161,7 +169,7 @@ def build_consultant_messages(*, doc: dict, ledger_state: dict,
         {"role": "system",
          "content": "<判準教材:總則>\n" + load_skill("consultant-principles")
                     + "\n</判準教材:總則>"},
-        {"role": "system", "content": _reference_block(doc, pool_tasks)},
+        {"role": "system", "content": _reference_block(doc, pool_tasks, ref_codes)},
     ]
 
     if not recent_turns and not employee_text:
@@ -169,10 +177,11 @@ def build_consultant_messages(*, doc: dict, ledger_state: dict,
                      "語氣但要含揭露要素):\n" + opening_disclosure(est_minutes)})
         return msgs
 
-    ctx = (f"<進度>\n{ledger_summary(doc, ledger_state, pool_tasks)}\n</進度>\n"
+    ctx = (f"<進度>\n{ledger_summary(doc, ledger_state, pool_tasks, ref_codes)}\n</進度>\n"
            f"<文件現況>\n{_doc_excerpt(doc)}\n</文件現況>")
-    gap_skills = [n for n in skills_for(L.derive_phase(doc, ledger_state),
-                                        L.next_gap(doc, ledger_state, {}, pool_tasks))
+    gap_skills = [n for n in skills_for(L.derive_phase(doc, ledger_state, ref_codes),
+                                        L.next_gap(doc, ledger_state, {}, pool_tasks,
+                                                   ref_codes))
                   if n != "consultant-principles"]
     if gap_skills:
         ctx += ("\n<判準教材(本回合欄位適用)>\n"

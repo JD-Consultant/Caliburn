@@ -307,12 +307,18 @@ def _doc_ocs_codes(doc: dict) -> list[str]:
     return codes
 
 
-async def build_pool_inputs(knowledge, doc: dict) -> tuple[dict[str, list[str]], dict[str, str]]:
+async def build_pool_inputs(knowledge, doc: dict,
+                            extra_codes: tuple[str, ...] = ()) -> tuple[dict[str, list[str]], dict[str, str]]:
     """union competencies(code) → pools{kind:[code]} + pool_items{code:name}。
-    官方池權威來源(§16.4);文件 competency_blocks 預設空,不當池。"""
+    官方池權威來源(§16.4);文件 competency_blocks 預設空,不當池。
+    extra_codes=profile 參考集合(0029 住 profile;只看文件會漏,session 6f807f1e)。"""
     pools: dict[str, list[str]] = {}
     items: dict[str, str] = {}
-    for code in _doc_ocs_codes(doc):
+    codes = list(_doc_ocs_codes(doc))
+    for c in extra_codes:
+        if c and c not in codes:
+            codes.append(c)
+    for code in codes:
         pool = await knowledge.competencies(code)
         for kind in _POOL_KINDS:
             for it in (getattr(pool, kind, None) or []):
@@ -330,6 +336,7 @@ def _unit_keys(doc: dict) -> list[str]:
 
 async def scribe_pass(llm, knowledge, *, doc: dict, turns: dict[int, str],
                       turn_id: int, header_codes: set[str],
+                      ref_ocs_codes: tuple[str, ...] = (),
                       max_retry: int = 2) -> ScribeResult:
     """一次書記抽取(v3):select_schema → pydantic → op 化 → verify 六查
     → 全過即落 `_pending`;有敗筆則把**具體失敗條目**回灌重試(共 max_retry 次),
@@ -337,7 +344,7 @@ async def scribe_pass(llm, knowledge, *, doc: dict, turns: dict[int, str],
     task_keys = [tp for _, _, tp in L.iter_tasks(doc)]
     unit_keys = _unit_keys(doc)
     slot_paths = [f"{tp}.details.{k}" for tp in task_keys for k in SLOT_DEFS]
-    pools, pool_items = await build_pool_inputs(knowledge, doc)
+    pools, pool_items = await build_pool_inputs(knowledge, doc, ref_ocs_codes)
     schema = scribe_schema(slot_paths=slot_paths, pools=pools,
                            task_keys=task_keys, unit_keys=unit_keys)
     ref_codes = set(pool_items)

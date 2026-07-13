@@ -50,12 +50,22 @@ class TurnResult:
     suggest_finish: bool = False                   # T10 三訊號任一成立(不強制)
 
 
-async def build_task_pool(knowledge, doc: dict) -> list[dict]:
+def _ref_codes_ordered(doc: dict, profile_codes: list[str] | None) -> list[str]:
+    """有效參考碼(0029:參考集合住 profile;文件主基準優先、profile 補齊、去重保序)。"""
+    codes = list(_doc_ocs_codes(doc))
+    for c in (profile_codes or []):
+        if c and c not in codes:
+            codes.append(c)
+    return codes
+
+
+async def build_task_pool(knowledge, codes: list[str]) -> list[dict]:
     """官方任務池(聯集;0028 D6 檢查表/裁剪的候選盤)。key=`ocs_code:task_code`。
-    fail-open:knowledge 掛 → 空池 → curation/檢查表縫自然不開,對話照走。"""
+    codes=_ref_codes_ordered(profile∪doc);fail-open:knowledge 掛 → 空池 →
+    curation/檢查表縫自然不開,對話照走。"""
     out: list[dict] = []
     seen: set[str] = set()
-    for code in _doc_ocs_codes(doc):
+    for code in codes:
         try:
             ot = await knowledge.occupation_tasks(code)
         except Exception as exc:  # noqa: BLE001
@@ -125,13 +135,16 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> T
     profile = await db.get(JobProfile, profile_id)
     header_codes = set(getattr(profile, "selected_ocs_codes", None) or [])
     work_doc = doc
+    # 0031:有效參考碼=文件主基準 ∪ profile 參考集合(0029 脫鉤後只看文件會鬼打牆)
+    ref_list = _ref_codes_ordered(work_doc, list(header_codes))
+    ref_ocs = frozenset(ref_list)
 
     # ①½ 官方任務池(0028 D6:檢查表/裁剪候選盤;fail-open,掛了縫不開)
-    pool_tasks = await build_task_pool(knowledge, work_doc)
+    pool_tasks = await build_task_pool(knowledge, ref_list)
 
     # ② 帳本(回合前視角):上一輪 gap 是否進帳的評定移到書記跑完後
     state = dict(session.ledger_state or {})
-    state["last_gap"] = L.next_gap(work_doc, state, {}, pool_tasks)
+    state["last_gap"] = L.next_gap(work_doc, state, {}, pool_tasks, ref_ocs)
 
     # ②½ 裁剪 pass(0028 D1/D4):curation 縫 → AI 對 unasked 官方任務預勾/排除;
     #    precheck → widget 指令(picker 人確認才落文件);declined → ledger_state(不再反問)
@@ -163,7 +176,7 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> T
     messages = C.build_consultant_messages(
         doc=work_doc, ledger_state=state, recent_turns=recent,
         employee_text=user_text, pool_tasks=pool_tasks,
-        rejected=rejected_labels)
+        rejected=rejected_labels, ref_codes=ref_ocs)
     # write-in 抓漏只吐一次(0028 D6):摘要已含探測句 → 消費 flag
     if (pool_tasks and not state.get("writein_asked")
             and not L.checklist(work_doc, state, pool_tasks)["unasked"]):
@@ -192,7 +205,8 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> T
     if worth_scribing(user_text):
         t_scribe = time.perf_counter()
         scribe_res = await scribe_pass(llm, knowledge, doc=doc, turns=turns_map,
-                                       turn_id=emp_turn.seq, header_codes=header_codes)
+                                       turn_id=emp_turn.seq, header_codes=header_codes,
+                                       ref_ocs_codes=tuple(ref_list))
         scribe_ms = int((time.perf_counter() - t_scribe) * 1000)
         doc_changed, extra_guard = await _persist_scribe_doc(
             doc_repo, profile_id, latest, scribe_res,
@@ -227,7 +241,7 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> T
     #    現有 codes** → 開 picker 預填該搜尋詞。涵蓋開場(codes 空)與中途加選
     #    (全端聊到後端:top-1=互補職類 ∉ codes → 彈;查參考 top-1=已選 → 不彈不騷擾)。
     if widget is None and occ_searches:
-        codes = set(_doc_ocs_codes(work_doc))
+        codes = set(ref_ocs)
         for s_ in occ_searches:
             top = (s_["hits"] or [{}])[0]
             if top.get("ocs_code") and top["ocs_code"] not in codes and s_["query"]:
@@ -258,7 +272,7 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> T
     if scribe_res.records_failed:
         guard.append("scribe:抽取重試仍敗(交 backstop)")
     return TurnResult(say=say, question=None, widget=widget, doc_changed=doc_changed,
-                      phase=L.derive_phase(work_doc, state),
+                      phase=L.derive_phase(work_doc, state, ref_ocs),
                       focus=dict(session.focus or {}), guard_log=guard,
                       coverage=L.coverage(work_doc, state),
                       suggest_finish=suggest_finish)
@@ -275,7 +289,9 @@ async def run_curation(profile_id: UUID, *, db, llm, knowledge) -> dict:
     if session is None:
         raise NoActiveInterview(str(profile_id))
     doc = ((await DocRepo(db).latest(profile_id)) or {}).get("content") or {}
-    pool_tasks = await build_task_pool(knowledge, doc)
+    profile = await db.get(JobProfile, profile_id)
+    pool_tasks = await build_task_pool(
+        knowledge, _ref_codes_ordered(doc, getattr(profile, "selected_ocs_codes", None)))
     state = dict(session.ledger_state or {})
     unasked = L.checklist(doc, state, pool_tasks)["unasked"]
 
@@ -354,9 +370,12 @@ async def run_finish(profile_id: UUID, *, db, llm, knowledge) -> dict:
         emp_rows = [(t.seq, t.text) for t in turns if t.role == "employee"]
         emp = [t for _, t in emp_rows]
         turns_map = dict(emp_rows)
-        # 態度收尾整體編碼(0028 D3;一呼、跨故事主題編碼)
+        # 態度收尾整體編碼(0028 D3;一呼、跨故事主題編碼);池吃 profile∪doc(0031)
+        profile = await db.get(JobProfile, profile_id)
         try:
-            pools, pool_items = await build_pool_inputs(knowledge, doc)
+            pools, pool_items = await build_pool_inputs(
+                knowledge, doc,
+                tuple(getattr(profile, "selected_ocs_codes", None) or []))
         except Exception as exc:  # noqa: BLE001
             logger.warning("run_finish:態度池組建失敗(略過):%s", str(exc)[:120])
             pools, pool_items = {}, {}

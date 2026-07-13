@@ -251,21 +251,15 @@ export interface OpenPickerWidget {
   precheck?: PickerPrecheckItem[];      // task:AI 預勾+引文(D9:清單本身=前端 pack,這只是疊加層)
 }
 export type InterviewWidget = ChoiceWidget | OpenPickerWidget
-// 隨叫裁剪(D8 P1a;POST interview:curation):選完職類立即鋪任務盤(D9:只回 AI 疊加層)
-export interface CurationChecklist { precheck: PickerPrecheckItem[] }
-export interface InterviewSuggestion {
-  id: string; doc_path: string;
-  old_value: unknown; new_value: unknown;
-  reason: string; status: "pending" | "accepted" | "rejected";
-}
+// CurationChecklist / InterviewSuggestion(建議層)已退場(T12;ADR 0030)。
 export interface InterviewStartResponse {
   session_id: string; status: string; phase: string;
   focus: { task_path?: string; skipped?: string[] };
-  greeting: string; progress: InterviewProgress; pending_suggestions: number;
+  greeting: string; progress: InterviewProgress;
 }
 export interface InterviewTurnResponse {
   say: string; question: InterviewQuestion | null; widget: InterviewWidget | null;
-  doc_changed: boolean; pending_suggestions: number; progress: InterviewProgress;
+  doc_changed: boolean; progress: InterviewProgress;
   suggest_finish?: boolean;   // T10 收尾三訊號任一成立(側欄顯示收尾鈕,不強制)
 }
 export interface InterviewView {
@@ -276,8 +270,5 @@ export interface InterviewView {
   agenda?: { key: string; label: string;
              state: "pending" | "in_progress" | "completed" | "boundary" }[];
   turns: { seq: number; role: "employee" | "consultant"; text: string }[];
-  // review(0028 D7):auto/pending/accepted/reverted——文件格追蹤修訂渲染的資料源
-  evidence: { doc_path: string; quote: string; turn_seq: number; verified: boolean;
-              review: string }[];
-  suggestions: InterviewSuggestion[];
+  // evidence/suggestions 已退場(T12):溯源住 `_pending.src`、審閱住 review-events。
 }

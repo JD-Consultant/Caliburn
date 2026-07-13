@@ -1,10 +1,8 @@
 from app.models.base import Base
 from app.models.interview import (
-    InterviewEvidence,
     InterviewLlmCall,
     InterviewReviewEvent,
     InterviewSession,
-    InterviewSuggestion,
     InterviewTurn,
 )
 from app.models.job_profile import (
@@ -20,8 +18,6 @@ __all__ = [
     "DocumentVersion",
     "InterviewSession",
     "InterviewTurn",
-    "InterviewEvidence",
-    "InterviewSuggestion",
     "InterviewLlmCall",
     "InterviewReviewEvent",
 ]

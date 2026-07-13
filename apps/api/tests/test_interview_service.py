@@ -65,7 +65,6 @@ async def test_scribe_lands_slot_as_pending_and_consultant_replies(db_session):
     mark = task["details"]["_pending"]["frequency"]
     assert mark["op"] == "mod" and mark["by"] == "ai"
     assert mark["src"]["quote"]["text"] == "每兩週跑一次"
-    assert await repo.list_evidence(s.id) == []                    # 溯源住 _pending,不再落表
     turns = await repo.list_turns(s.id)
     assert [t.role for t in turns] == ["employee", "consultant"]
     assert out.say and turns[1].text == out.say                    # 顧問回覆落逐字稿
@@ -80,7 +79,7 @@ async def test_human_touched_no_longer_diverts_pending_is_universal(db_session):
     pending 本身就是提議載體 → human_touched 不再分流建議表。"""
     p, s, repo, out, _ = await _run(db_session, "每兩週跑一次",
                                     select_result=SCRIBE_SLOT, human_touched=[FREQ])
-    assert out.doc_changed is True and out.pending_suggestions == 0
+    assert out.doc_changed is True
     latest = await DocRepo(db_session).latest(p.id)
     details = latest["content"]["ocs_content"]["ocu_units"][0]["tasks"][0]["details"]
     assert details["frequency"] == "每雙週" and details["_pending"]["frequency"]["op"] == "mod"
@@ -258,5 +257,4 @@ async def test_finish_runs_attitudes_pass(db_session):
     assert atts and atts[-1]["code"] == "A01"
     assert atts[-1]["_pending"]["op"] == "add"                 # 綠標,✓ 才轉已確認
     assert atts[-1]["_pending"]["src"]["quote"]["text"] == "回歸沒跑完我絕不放行"
-    assert await repo.list_suggestions(s.id) == []             # 建議層退場
     assert any("細心負責" in ln for ln in out["summary"]["lines"])

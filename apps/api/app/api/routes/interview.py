@@ -80,13 +80,11 @@ async def start_interview(profile_id: UUID, db: AsyncSession = Depends(get_db)):
             focus={**(session.focus or {}), "task_path": paths[0]})
     elif not paths and session.phase == "survey":
         session = await repo.update_session(session.id, phase="survey")
-    pending = await repo.list_pending(session.id)
     greeting = GREETING if paths else (
         "你好!我是你的職務說明書顧問。我們先聊聊你平常做什麼工作,我幫你找到對應的官方"
         "職類、把細節補齊——想到什麼說什麼就好。")
     return {**_session_out(session), "greeting": greeting,
-            "progress": _progress(doc, session, session.phase),
-            "pending_suggestions": len(pending)}
+            "progress": _progress(doc, session, session.phase)}
 
 
 @router.post("/{profile_id}/interview:turn")
@@ -114,7 +112,7 @@ async def interview_turn(
             "code": "llm_schema_error", "message": str(e)[:200]})
     # 進度=覆蓋率(spec §11.1;帳本 filled/required),取代 v1 task_index/total
     return {"say": out.say, "question": out.question, "widget": out.widget,
-            "doc_changed": out.doc_changed, "pending_suggestions": out.pending_suggestions,
+            "doc_changed": out.doc_changed,
             "progress": {"phase": out.phase, "coverage": out.coverage},
             "suggest_finish": out.suggest_finish}   # T10 三訊號(側欄顯示收尾鈕,不強制)
 
@@ -177,15 +175,14 @@ def _agenda(doc: dict, state: dict) -> list[dict]:
 
 @router.get("/{profile_id}/interview")
 async def get_interview(profile_id: UUID, db: AsyncSession = Depends(get_db)):
-    """session 全貌:續談入口 + 顧問稽核視圖(逐字稿/證據/建議歷史)+議程三態。"""
+    """session 全貌:續談入口 + 顧問稽核視圖(逐字稿)+議程三態+待審計數。
+    v3(T12):evidence/suggestions 層退場——溯源住 `_pending.src`、審閱住 review-events。"""
     await _require_profile(profile_id, db)
     repo = InterviewRepo(db)
     session = await repo.latest_session(profile_id)
     if session is None:
         raise HTTPException(status_code=404, detail={"code": "no_interview"})
     turns = await repo.list_turns(session.id)
-    evidence = await repo.list_evidence(session.id)
-    suggestions = await repo.list_suggestions(session.id)
     draft = await DocRepo(db).latest(profile_id)
     doc = (draft or {}).get("content") or {}
     return {
@@ -193,38 +190,11 @@ async def get_interview(profile_id: UUID, db: AsyncSession = Depends(get_db)):
         "pending_count": count_pending(draft or {}),  # _pending 待審筆數(ADR 0030)
         "agenda": _agenda(doc, dict(session.ledger_state or {})),
         "turns": [{"seq": t.seq, "role": t.role, "text": t.text} for t in turns],
-        "evidence": [{"doc_path": e.doc_path, "quote": e.quote, "turn_seq": e.turn_seq,
-                      "verified": e.verified, "review": e.review} for e in evidence],
-        "suggestions": [{"id": str(x.id), "doc_path": x.doc_path, "old_value": x.old_value,
-                         "new_value": x.new_value, "reason": x.reason, "status": x.status}
-                        for x in suggestions],
     }
 
 
-@router.post("/{profile_id}/interview:review")
-async def review_interview(
-    profile_id: UUID,
-    body: dict = Body(...),
-    db: AsyncSession = Depends(get_db),
-):
-    """批審:只轉狀態(accepted/rejected);**套用由前端**以既有 ocsDoc+PATCH 執行。"""
-    await _require_profile(profile_id, db)
-    repo = InterviewRepo(db)
-    session = await repo.latest_session(profile_id)
-    if session is None:
-        raise HTTPException(status_code=404, detail={"code": "no_interview"})
-    accept_ids = [UUID(x) for x in (body.get("accept") or [])]
-    reject_ids = [UUID(x) for x in (body.get("reject") or [])]
-    accepted = []
-    for sid in accept_ids:
-        row = await repo.set_suggestion_status(sid, "accepted")
-        accepted.append({"id": str(row.id), "doc_path": row.doc_path,
-                         "new_value": row.new_value})
-    for sid in reject_ids:
-        await repo.set_suggestion_status(sid, "rejected")
-    pending = await repo.list_pending(session.id)
-    return {"accepted": accepted, "rejected": len(reject_ids), "pending": len(pending)}
-
+# interview:review(建議層批審)已退場(T12):✓/✗ 走前端 acceptPending/rejectPending
+# + PATCH + interview:review-events(無聲記帳)。
 
 _REVIEW_DECISIONS = {"accepted", "rejected", "batch_rejected"}
 

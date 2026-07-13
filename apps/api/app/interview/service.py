@@ -42,23 +42,11 @@ class TurnResult:
     question: dict | None = None
     widget: dict | None = None
     doc_changed: bool = False
-    pending_suggestions: int = 0
     phase: str = "deep"
     focus: dict = field(default_factory=dict)
     guard_log: list[str] = field(default_factory=list)
     coverage: dict = field(default_factory=dict)   # {filled,required}(進度=覆蓋率)
     suggest_finish: bool = False                   # T10 三訊號任一成立(不強制)
-
-
-def _pending_label(s) -> str:
-    """待核准建議的短標籤(給顧問 context;員工可能問到卡片)。"""
-    dp = s.doc_path or ""
-    if dp.startswith("add_task:") or dp.startswith("add_duty:"):
-        name = (s.new_value or {}).get("name") if isinstance(s.new_value, dict) else None
-        kind = "新任務" if dp.startswith("add_task:") else "新職責"
-        return f"{kind}「{name or dp.split(':', 1)[1]}」"
-    leaf = dp.split(".")[-1]
-    return f"更新 {SLOT_DEFS[leaf].label if leaf in SLOT_DEFS else leaf}"
 
 
 async def build_task_pool(knowledge, doc: dict) -> list[dict]:
@@ -166,14 +154,14 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> T
                                     model=model_for_role("select"), duration_ms=cur_ms,
                                     guard_verdicts=curation_guard[:30])
 
-    # ③ 顧問 chat_with_tools(說話 + READ 工具;無寫入權)——v3:顧問先於書記
-    pending_labels = [_pending_label(s) for s in await repo.list_pending(session.id)]
+    # ③ 顧問 chat_with_tools(說話 + READ 工具;無寫入權)——v3:顧問先於書記。
+    # 待審綠字由 read_document 四態視圖供給(建議層已退場,T12);被拒清單照 §6.3 注入。
     rejected_labels = [e.doc_path.split(".")[-1] if "." in e.doc_path else e.doc_path
                        for e in await repo.list_review_events(session.id,
                                                               decision="rejected")][-10:]
     messages = C.build_consultant_messages(
         doc=work_doc, ledger_state=state, recent_turns=recent,
-        pending=pending_labels, employee_text=user_text, pool_tasks=pool_tasks,
+        pending=[], employee_text=user_text, pool_tasks=pool_tasks,
         rejected=rejected_labels)
     # write-in 抓漏只吐一次(0028 D6):摘要已含探測句 → 消費 flag
     if (pool_tasks and not state.get("writein_asked")
@@ -264,12 +252,10 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> T
                             model=model_for_role("interview"), duration_ms=chat_ms,
                             tool_calls=chat.tool_trace)
 
-    pending = await repo.list_pending(session.id)
     guard = list(scribe_res.guard_log) + extra_guard + curation_guard
     if scribe_res.records_failed:
         guard.append("scribe:抽取重試仍敗(交 backstop)")
     return TurnResult(say=say, question=None, widget=widget, doc_changed=doc_changed,
-                      pending_suggestions=len(pending),
                       phase=L.derive_phase(work_doc, state),
                       focus=dict(session.focus or {}), guard_log=guard,
                       coverage=L.coverage(work_doc, state),
@@ -406,7 +392,5 @@ async def run_finish(profile_id: UUID, *, db, llm, knowledge) -> dict:
                 await repo.list_review_events(session.id, decision="accepted")]
     summary = _finish_summary(doc, accepted)
     await repo.update_session(session.id, phase="review")
-    pending = await repo.list_pending(session.id)
     return {"phase": "review", "blockers": len(blockers),
-            "pending_suggestions": len(pending),
             "summary": summary, "guard_log": guard[:30]}

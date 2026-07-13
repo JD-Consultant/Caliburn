@@ -1,6 +1,6 @@
 """ADR 0017: configure() is the single composition root. Assert it mounts every
-REST router + /healthz, so the route set can't silently drift between the app
-tests hit (main) and the app production runs (copilotkit_live_app)."""
+REST router + /healthz. T12 後測試與 production 同一入口(app.main;
+run_live.py 直起 app.main:app,copilotkit_live_app 已退場)。"""
 from fastapi import FastAPI
 
 from app.app_factory import configure

@@ -1,4 +1,4 @@
-"""InterviewRepo(T2):sessions/turns/evidence/suggestions CRUD 與守則。
+"""InterviewRepo:sessions/turns CRUD 與守則(evidence/suggestions 已退場,T12)。
 
 家規:db_session fixture(真 PG,無 TEST_DATABASE_URL 即 skip、交易回滾)。
 守則:同 profile 同時最多一個 active session(應用層檢查 + DB partial unique 雙保險,
@@ -110,42 +110,5 @@ async def test_turns_seq_monotonic(db_session):
     assert t2.commands[0]["type"] == "reply"
 
 
-@pytest.mark.asyncio
-async def test_evidence_roundtrip(db_session):
-    p = await _profile(db_session)
-    repo = InterviewRepo(db_session)
-    s = await repo.create(p.id)
-    await repo.add_evidence(s.id, doc_path="units.0.tasks.0.details.frequency",
-                            quote="上線前那兩天都在跑回歸", turn_seq=2, verified=True)
-    rows = await repo.list_evidence(s.id)
-    assert len(rows) == 1 and rows[0].verified is True
-    assert rows[0].quote.startswith("上線前")
-
-
-@pytest.mark.asyncio
-async def test_evidence_review_roundtrip(db_session):
-    """T5:evidence.review 預設 auto、可標 pending、批次審裁決 + pending 查詢。"""
-    p = await _profile(db_session)
-    repo = InterviewRepo(db_session)
-    s = await repo.create(p.id)
-    auto = await repo.add_evidence(s.id, doc_path="a.b.c", quote="x", turn_seq=1, verified=True)
-    pend = await repo.add_evidence(s.id, doc_path="d.e.f", quote="y", turn_seq=1,
-                                   verified=True, review="pending")
-    assert auto.review == "auto" and pend.review == "pending"
-    assert [e.id for e in await repo.list_pending_evidence(s.id)] == [pend.id]
-    await repo.set_evidence_review(pend.id, "accepted")
-    assert await repo.list_pending_evidence(s.id) == []
-
-
-@pytest.mark.asyncio
-async def test_suggestions_pending_flow(db_session):
-    p = await _profile(db_session)
-    repo = InterviewRepo(db_session)
-    s = await repo.create(p.id)
-    sug = await repo.add_suggestion(s.id, doc_path="units.0.tasks.0.details.standards",
-                                    old_value="組長口頭確認", new_value="組長審查通過並簽核",
-                                    reason="後續訪談提到簽核流程", turn_seq=9)
-    pending = await repo.list_pending(s.id)
-    assert [x.id for x in pending] == [sug.id]
-    await repo.set_suggestion_status(sug.id, "accepted")
-    assert await repo.list_pending(s.id) == []
+# evidence/suggestions 層測試已隨表退場(T12;ADR 0030):
+# 溯源=文件 `_pending.src`(test_interview_scribe_v3)、審閱=test_interview_review_events。

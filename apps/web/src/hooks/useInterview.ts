@@ -8,7 +8,6 @@ import {
   finishInterview,
   getInterview,
   interviewTurn,
-  reviewInterview,
   startInterview,
 } from "@/lib/api";
 
@@ -64,13 +63,5 @@ export function useFinishInterview(profileId: string) {
   });
 }
 
-export function useReviewInterview(profileId: string) {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: (body: { accept?: string[]; reject?: string[] }) =>
-      reviewInterview(profileId, body),
-    onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: interviewKey(profileId) });
-    },
-  });
-}
+// useReviewInterview(建議層批審)已退場(T12;ADR 0030):
+// ✓/✗ 走 JobDocTable 的 acceptPending/rejectPending + PATCH + review-events。

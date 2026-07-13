@@ -1,4 +1,5 @@
-"""Launcher for the live CopilotKit app.
+"""Launcher for the live REST app(T12 後:入口=app.main,composition root=app_factory;
+CopilotKit/LangGraph 已退場,8001 續服全 REST)。
 
 On Windows, psycopg's async connection (used by AsyncPostgresSaver checkpointer)
 cannot run on the default ProactorEventLoop — it requires the SelectorEventLoop.
@@ -18,7 +19,7 @@ import uvicorn  # noqa: E402  (must import after the policy is set)
 
 if __name__ == "__main__":
     uvicorn.run(
-        "app.copilotkit_live_app:app",
+        "app.main:app",
         host="127.0.0.1",
         port=int(os.getenv("PORT", "8001")),
         log_level="info",

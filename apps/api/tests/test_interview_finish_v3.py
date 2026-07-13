@@ -3,7 +3,6 @@
 import pytest
 from uuid import uuid4
 
-from app.adapters.interview_repo import InterviewRepo
 from app.adapters.persistence import DocRepo
 from app.adapters.stubs import StubKnowledge, StubLlm
 from app.api.routes.interview import finish_interview, interview_turn, start_interview
@@ -88,10 +87,6 @@ async def test_finish_lands_attitudes_as_pending(db_session):
     mark = atts[-1]["_pending"]
     assert mark["op"] == "add" and mark["src"]["ref_urn"] == "A01"
     assert mark["src"]["quote"]["text"] == quote
-    # 不建議化(建議層退場)
-    repo = InterviewRepo(db_session)
-    sess = await repo.latest_session(p.id)
-    assert await repo.list_suggestions(sess.id) == []
     # 總結回讀含態度綠字
     assert out["summary"]["pending_count"] >= 1
     assert any("細心負責" in ln for ln in out["summary"]["lines"])

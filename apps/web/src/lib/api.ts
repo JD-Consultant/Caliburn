@@ -2,7 +2,6 @@
 // which now mounts users + job_profiles CRUD under /api/v1. Legacy interview /
 // tasks / documents endpoints were removed with the old backend (Concern B).
 import type {
-  CurationChecklist,
   InterviewStartResponse,
   InterviewTurnResponse,
   InterviewView,
@@ -154,30 +153,16 @@ export const interviewTurn = (profileId: string, text: string) =>
 // 收尾對帳(T10;ADR 0030):態度綠標落地+結構化總結回讀 → phase=review。
 export interface FinishSummary { lines: string[]; pending_count: number; accepted_count: number }
 export const finishInterview = (profileId: string) =>
-  request<{ phase: string; blockers: number; pending_suggestions: number;
-            summary?: FinishSummary }>(
+  request<{ phase: string; blockers: number; summary?: FinishSummary }>(
     `/job-profiles/${profileId}/interview:finish`,
     { method: "POST" },
   );
 
-// 隨叫裁剪(D8 P1a):選完職類立即取全檢查表(precheck+others)開 CurationDialog
-export const interviewCuration = (profileId: string) =>
-  request<CurationChecklist>(`/job-profiles/${profileId}/interview:curation`, {
-    method: "POST",
-  });
-
 export const getInterview = (profileId: string) =>
   request<InterviewView>(`/job-profiles/${profileId}/interview`);
 
-export const reviewInterview = (
-  profileId: string,
-  body: { accept?: string[]; reject?: string[] },
-) =>
-  request<{ accepted: { id: string; doc_path: string; new_value: unknown }[];
-            rejected: number; pending: number }>(
-    `/job-profiles/${profileId}/interview:review`,
-    { method: "POST", body: JSON.stringify(body) },
-  );
+// interviewCuration / reviewInterview 已退場(T12;ADR 0030):任務檢查表歸議程
+// 狀態機+側欄成組反問;✓/✗ 走 acceptPending/rejectPending + PATCH + review-events。
 
 // 審閱事件無聲記帳(ADR 0030 §6.3):✓/✗/批量只記錄不觸發 AI;文件變換
 // (去標/還原/renumber/PATCH)由前端執行(0025 不變量)。ledger 下回合讀被拒清單。

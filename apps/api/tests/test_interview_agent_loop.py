@@ -49,6 +49,24 @@ async def test_dispatches_tool_then_returns_text():
 
 
 @pytest.mark.asyncio
+async def test_parallel_tool_calls_paired_backfill():
+    """T13:同輪多 tool_call(parallel_tool_calls)——逐一成對回填,id 各自對回。"""
+    call = Scripted([
+        {"content": None, "tool_calls": [
+            _tc("c1", "knowledge_search_occupations", {"query": "測試"}),
+            _tc("c2", "knowledge_occupation_brief", {"ocs_code": "X"})]},
+        {"content": "查完了?", "tool_calls": []}])
+    res = await run_tool_loop(call_once=call, dispatch=_dispatch_ok, messages=[])
+    assert [t["name"] for t in res.tool_trace] == [
+        "knowledge_search_occupations", "knowledge_occupation_brief"]
+    second_msgs = call.seen[1][0]
+    tool_ids = [m["tool_call_id"] for m in second_msgs if m.get("role") == "tool"]
+    assert tool_ids == ["c1", "c2"]                    # 成對且保序
+    assistant = [m for m in second_msgs if m.get("role") == "assistant"][0]
+    assert len(assistant["tool_calls"]) == 2
+
+
+@pytest.mark.asyncio
 async def test_tool_result_appended_with_matching_id():
     call = Scripted([
         {"content": None, "tool_calls": [_tc("call_abc", "knowledge_occupation_brief", {"ocs_code": "X"})]},

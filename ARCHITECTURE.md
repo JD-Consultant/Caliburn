@@ -18,7 +18,7 @@ PDF ──▶ pdf-to-json ──(OCS JSON)──▶ ocs-indexer ──(HTTP 查�
 | [`apps/pdf-to-json/`](apps/pdf-to-json/README.md) | PDF→OCS JSON 的 ETL(CLI) | Pipes-and-Filters(parser→transformer→writer) |
 | [`apps/ocs-indexer/`](apps/ocs-indexer/README.md) | Qdrant 知識/查詢服務(:8000) | ingest 管線 + 無狀態查詢 API;嵌入走 embedder 服務 |
 | [`apps/embedder/`](apps/embedder/README.md) | BGE-M3 GPU 嵌入容器(:8082) | FastAPI + FlagEmbedding(torch 只住這裡,ADR 0012) |
-| [`apps/api/`](apps/api/README.md) | FastAPI + LangGraph 後端(:8001) | Hexagonal(core/ports + adapters + services + authoring,ADR 0008) |
+| [`apps/api/`](apps/api/README.md) | FastAPI 後端+訪談引擎(:8001) | Hexagonal(core/ports + adapters + services + interview,ADR 0008/0030) |
 | [`apps/web/`](apps/web/README.md) | Next.js 16 前端(:3000) | React Query cache-as-state + 選擇性持久化;文件工作台 |
 | `packages/` | 共用契約套件 | `ocs-contract`(#1/#3)、`indexer-contract`(#2) |
 | `docs/` | 系統文檔 / ADR / runbook | 見 `docs/README.md`(文檔分層原則也在那) |

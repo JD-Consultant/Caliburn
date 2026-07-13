@@ -23,13 +23,13 @@ npm run lint
 
 | 路徑 | 是什麼 |
 |---|---|
-| `src/app/` | 路由:`/`(→dashboard)、`/dashboard`(職務檔案清單)、`/documents/[id]`(**工作台**,主畫面)、`/documents/[id]/intake`(3 題小訪談,選用)、`/api/copilotkit`(AG-UI runtime 轉接到後端 `/copilotkit`) |
-| `src/components/interview/` | 工作台元件:`JobDocTable`(主表格,dnd 排序)、`DocHeader`(官方表頭 5 欄)、`CellFillerPanel`(O/P/K/S 填格側欄)、`OccupationPicker`(選職類 modal)、`UnitPickerMenu`(工具列「選職責 ▾」下拉)、`TaskPickerMenu`(每職責列「選任務 ▾」大池選單)、`ConflictDialog`(409 衝突二選一)、`DocNotes`、`fields/*`(FieldCombobox/OfficialMenu/FieldText/SourceLine 共用選單元件)、`InterviewPanel`(**AI 訪談側欄**:軌道進度+對話+choice 卡片+批審整合;ADR 0023)、`SuggestionReview`(建議總審清單,ADR 0025)、`InterruptHandlers`(舊 LangGraph HITL;**退役待清**,ADR 0023 決定 6) |
-| `src/hooks/` | 資料層 hooks:`useDocument`(文件 + autosave + 選職類)、`useKnowledge`(知識包 query,ADR 0021)、`useInterview`(訪談 4 hooks;turn 後 invalidate document→外部變化路徑重設 baseline)、`useProfiles`、`useHydrated` |
-| `src/lib/` | `api.ts`(唯一 fetch client,`/api/v1/*` + `ApiError`)、`ocsDoc.ts`(**純函式**文件編輯:clone→改→回傳 + 位置重編碼 + A4 文件級 K/S 重編)、`pack.ts`(**知識包→選單選項**純函式:池→OptionItem、own-first srcs、預勾集;ADR 0021。相似比對 ADR 0022:`groupedValueOptions`(態度池收合,survivorship=主基準優先→文字最長)/`taskRowsWithSimilar`(任務灰區徽章)——**render-only 顯示變換,選擇/自動勾選永遠跑在平選項**,`similarity` 缺席=行為同現狀)、`interviewDoc.ts`(建議套用純函式:path 文法鏡像後端,applyAccepted 三分流)、`urn.ts`、`download.ts` |
+| `src/app/` | 路由:`/`(→dashboard)、`/dashboard`(職務檔案清單)、`/documents/[id]`(**工作台**,主畫面)、`/documents/[id]/intake`(3 題小表單,存 job_summary 供選職類預填)、`/documents/[id]/interview`(逐字稿稽核視圖) |
+| `src/components/interview/` | 工作台元件:`JobDocTable`(主表格,dnd 排序;**T8 `_pending` 四態渲染+✓✗?+批量工具列**)、`PendingMark`(追蹤修訂 UI:綠字/紅刪除線+出處卡;ADR 0030)、`AgendaList`(議程三態)、`DocHeader`(官方表頭)、`OccupationPicker`、`UnitPickerMenu`、`TaskPickerMenu`、`GlobalTaskPickerMenu`、`ConflictDialog`、`DocNotes`、`fields/*`(FieldCombobox/OfficialMenu/FieldText/SourceLine)、`InterviewPanel`(**AI 訪談側欄**:打字機對話+議程+收尾卡;ADR 0030) |
+| `src/hooks/` | 資料層 hooks:`useDocument`(文件 + autosave + 選職類)、`useKnowledge`(知識包 query,ADR 0021)、`useInterview`(start/turn/finish/view;turn 後 invalidate document→外部變化路徑重設 baseline)、`useProfiles`、`useHydrated` |
+| `src/lib/` | `api.ts`(唯一 fetch client,`/api/v1/*` + `ApiError`)、`ocsDoc.ts`(**純函式**文件編輯:clone→改→回傳 + 位置重編碼 + A4 文件級 K/S 重編 + **`_pending` 四態輔助 accept/reject/listPending**;ADR 0030)、`pack.ts`(知識包→選單選項純函式;ADR 0021/0022)、`interviewUi.ts`(側欄純邏輯:議程/chips/打字機)、`slots.ts`(槽標籤)、`urn.ts`、`download.ts` |
 | `src/store/user.ts` | zustand + persist:匿名 userId(localStorage `caliburn-user`;404 時自動重建) |
 | `src/types/index.ts` | 契約型別(生成底 + UI 欄位)+ 各端點回應型別 |
-| `src/components/layout/Providers.tsx` | QueryClient + **選擇性持久化** + CopilotKitProvider |
+| `src/components/layout/Providers.tsx` | QueryClient + **選擇性持久化**(CopilotKitProvider 已退場,T12) |
 
 ## 資料層:兩個 query、兩種性質(P3 收斂,ADR 0021)
 

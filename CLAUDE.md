@@ -27,7 +27,10 @@ Monorepo。維護者用**繁體中文**,請用繁中回應。
 - **3 個 bounded context**:`apps/pdf-to-json`(PDF→OCS JSON 解析)/ `apps/ocs-indexer`(檢索,Qdrant)/
   `apps/api` + `apps/web`(著作)。語言在這三處切換(對齊 DDD)。
 - **api = 六邊形**:`app/core`(ports + domain,純)、`app/adapters`(DB/LLM/knowledge 等邊緣)、
-  `app/services`(use-case)、`app/authoring`(LangGraph 編排,原 graph_v3;深問是**刻意單層 loop**,別重構)。ADR 0008。
+  `app/services`(use-case)、`app/interview`(**唯一 AI 大腦**:顧問+書記 op→verify→`_pending`
+  追蹤修訂;判準教材在 `app/interview/skills/`,調教首選改 skill 不改碼)、`app/observability.py`
+  (OTel 橫切)。ADR 0008 / **0030**(舊 LangGraph/CopilotKit 已退場,勿救回;端到端見
+  `docs/design/interview-engine.md`)。
 - **契約**:#1 `packages/ocs-contract`(OCS 文件,JSON-schema→Pydantic+TS)、
   #2 `packages/indexer-contract`(indexer⇄api,共用 pydantic)、#3 web 吃 ocs-contract 生成的 TS。
   ADR 0004 / 0010 / 0011。
@@ -57,6 +60,6 @@ Monorepo。維護者用**繁體中文**,請用繁中回應。
   原始 diff);uv venv 沒有 pip,用 `uv pip`;CJK 用 `PYTHONUTF8=1`。
 
 ## 指路
-**`docs/README.md`(文檔系統:架構/規則/索引)** · `ARCHITECTURE.md` · `docs/adr/README.md`(0001–0028)·
+**`docs/README.md`(文檔系統:架構/規則/索引)** · `ARCHITECTURE.md` · `docs/adr/README.md`(0001–0030)·
 `docs/contract-strategy.md` · `CONTRIBUTING.md` · `docs/runbook.md` · `docs/specs/`(研究紀錄)·
 `docs/plans/` · `docs/design/`(子系統端到端設計,給 agent)。

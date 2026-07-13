@@ -26,9 +26,11 @@ _WS = re.compile(r"\s+")
 _CTRL = re.compile(r"[\x00-\x1f\x7f]")
 
 # add 容器白名單(最後一段);⑤ 結構不變量
-# tasks = 整個 TaskGroup(加新任務);task_codes = 既有任務組內的名目條目
+# tasks = 整個 TaskGroup(加新任務);task_codes = 既有任務組內的名目條目。
+# ocu_units 刻意不在名單:沒有生成端會發、落地端也沒有 unit 節點建構——
+# 要開放「AI 加職責」須同時補 scribe 變體+apply 建殼,fail-closed 先擋。
 _ADD_CONTAINERS = {"task_codes", "indicators", "outputs", "knowledge", "skills",
-                   "ocu_units", "attitudes", "tasks"}
+                   "attitudes", "tasks"}
 # mod 葉欄白名單(最後一段);details.<槽> 與表頭另判
 _MOD_LEAVES = {"name", "text", "job_description", "ocs_code", "ocs_level",
                "competency_level"}

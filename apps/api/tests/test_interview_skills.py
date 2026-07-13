@@ -48,7 +48,7 @@ _DOC = {"ocs_profile": {"ocs_code": "X"},
 
 
 def test_prefix_stable_across_turns():
-    kw = dict(doc=_DOC, ledger_state={}, pending=[])
+    kw = dict(doc=_DOC, ledger_state={})
     m1 = C.build_consultant_messages(recent_turns=[("employee", "hi")],
                                      employee_text="第一回合的話", **kw)
     m2 = C.build_consultant_messages(recent_turns=[("employee", "hi"), ("consultant", "好")],
@@ -61,16 +61,16 @@ def test_prefix_stable_across_turns():
 
 def test_first_turn_keeps_same_prefix():
     m0 = C.build_consultant_messages(doc=_DOC, ledger_state={}, recent_turns=[],
-                                     pending=[], employee_text="")
+                                     employee_text="")
     m1 = C.build_consultant_messages(doc=_DOC, ledger_state={}, recent_turns=[("employee", "hi")],
-                                     pending=[], employee_text="x")
+                                     employee_text="x")
     assert [m["content"] for m in m0[:3]] == [m["content"] for m in m1[:3]]
 
 
 def test_gap_skill_injected_in_dynamic_zone():
     # _DOC 的任務缺 outputs/P/K/S → next_gap 落在該任務;動態區應含對應判準教材
     msgs = C.build_consultant_messages(doc=_DOC, ledger_state={}, recent_turns=[("employee", "hi")],
-                                       pending=[], employee_text="我都用 Python 寫自動化")
+                                       employee_text="我都用 Python 寫自動化")
     dyn = msgs[3]["content"]
     assert "判準教材(本回合欄位適用)" in dyn
     # 前綴不得混入動態教材(快取分層)

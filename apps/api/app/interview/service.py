@@ -19,7 +19,8 @@ from app.interview.attitudes import attitudes_pass
 from app.interview.backstop import SWEEP_EVERY, backstop_sweep
 from app.interview.curation import curation_pass
 from app.interview.scribe import (
-    _doc_ocs_codes, build_pool_inputs, land_ops, scribe_pass, worth_scribing,
+    ScribeResult, _doc_ocs_codes, build_pool_inputs, land_ops, scribe_pass,
+    worth_scribing,
 )
 from app.models import JobProfile
 from app.interview.slots import SLOT_DEFS
@@ -161,7 +162,7 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> T
                                                               decision="rejected")][-10:]
     messages = C.build_consultant_messages(
         doc=work_doc, ledger_state=state, recent_turns=recent,
-        pending=[], employee_text=user_text, pool_tasks=pool_tasks,
+        employee_text=user_text, pool_tasks=pool_tasks,
         rejected=rejected_labels)
     # write-in 抓漏只吐一次(0028 D6):摘要已含探測句 → 消費 flag
     if (pool_tasks and not state.get("writein_asked")
@@ -187,8 +188,7 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> T
     # ③¾ 書記(v3:顧問後、確定性喚醒閘;fail-open 對話、fail-closed 寫入)
     scribe_ms = 0
     doc_changed, extra_guard = False, []
-    from app.interview.scribe import ScribeResult as _SR
-    scribe_res = _SR()
+    scribe_res = ScribeResult()
     if worth_scribing(user_text):
         t_scribe = time.perf_counter()
         scribe_res = await scribe_pass(llm, knowledge, doc=doc, turns=turns_map,
@@ -201,12 +201,14 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> T
         extra_guard = ["scribe:skip(meta/寒暄回合,喚醒閘)"]
 
     # ③⅞ backstop sweep(每 N 員工回合;確定性撿漏 → held 待問;§6.4 禁 LLM)
+    # 判重要吃**書記落地後**的 doc——本回合剛落的綠字才算「已在文件」,否則重複追問
+    swept_doc = scribe_res.new_doc if doc_changed and scribe_res.new_doc else work_doc
     last_swept = int(state.get("backstop_last_seq") or 0)
     if emp_turn.seq - last_swept >= SWEEP_EVERY:
         texts_since = [t for s_, t in sorted(turns_map.items()) if s_ > last_swept]
-        unasked_now = (L.checklist(work_doc, state, pool_tasks)["unasked"]
+        unasked_now = (L.checklist(swept_doc, state, pool_tasks)["unasked"]
                        if pool_tasks else [])
-        for q in backstop_sweep(doc=work_doc, texts_since=texts_since,
+        for q in backstop_sweep(doc=swept_doc, texts_since=texts_since,
                                 unasked_tasks=unasked_now,
                                 pool_items=scribe_res.pool_items):
             state = L.push_held(state, q, emp_turn.seq)

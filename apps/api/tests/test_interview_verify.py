@@ -93,6 +93,13 @@ def test_add_to_missing_container_rejected():
     assert not r.ok and r.errors[0].check == "permission"
 
 
+def test_add_unit_rejected_fail_closed():
+    """ocu_units 無生成端也無落地建殼——白名單刻意不含,擋在 contract 查。"""
+    r = run([{"target_path": "ocs_content.ocu_units", "op": "add", "value": "新職責",
+              "src": {"quote": _q()}}])
+    assert not r.ok and r.errors[0].check == "contract"
+
+
 def test_mod_missing_target_rejected():
     r = run([{"target_path": f"{SLOT_PATH.rsplit('.', 1)[0]}.ghost_slot",
               "op": "mod", "value": "X", "src": {"quote": _q()}}])

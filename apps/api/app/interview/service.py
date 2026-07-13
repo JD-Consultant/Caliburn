@@ -246,11 +246,14 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> T
     if widget is None and occ_searches:
         codes = set(ref_ocs)
         for s_ in occ_searches:
+            hits = [h for h in (s_["hits"] or []) if h.get("ocs_code")]
+            # top-1=已選(顧問只是查參考)→ 這次搜尋不建議,不騷擾(D8 P2 閘)
+            if not hits or hits[0]["ocs_code"] in codes:
+                continue
             # 0031 A 案:建議卡帶 precheck(top-2 命中+確定性理由)——新手一鍵確認
             sugg = [{"code": h["ocs_code"], "name": h.get("name") or "",
                      "reason": f"依你描述:「{str(s_['query'])[:40]}」"}
-                    for h in (s_["hits"] or [])[:2]
-                    if h.get("ocs_code") and h["ocs_code"] not in codes]
+                    for h in hits[:2] if h["ocs_code"] not in codes]
             if sugg and s_["query"]:
                 widget = {"kind": "open_picker", "picker": "occupation",
                           "query": str(s_["query"])[:120], "precheck": sugg}

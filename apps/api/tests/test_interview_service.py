@@ -176,8 +176,11 @@ async def test_onboarding_occupation_widget_from_consultant_search(db_session):
                                "result_digest": "x"}])
     out = await run_turn(p.id, "我在工廠顧機台", db=db_session, llm=llm,
                          knowledge=StubKnowledge())
+    # 0031 A 案(T2):widget 帶 precheck(top-2 真實命中+確定性理由)→ 前端建議卡
     assert out.widget == {"kind": "open_picker", "picker": "occupation",
-                          "query": "設備 巡檢 維護"}
+                          "query": "設備 巡檢 維護", "precheck": [
+        {"code": "KRM2421-001v4", "name": "設備維護工程師", "reason": "依你描述:「設備 巡檢 維護」"},
+        {"code": "KRM2422-001v4", "name": "生產線技術員", "reason": "依你描述:「設備 巡檢 維護」"}]}
 
 
 @pytest.mark.asyncio
@@ -194,8 +197,11 @@ async def test_midway_new_occupation_hit_triggers_picker(db_session):
                                "result_digest": "x"}])
     out = await run_turn(p.id, "我也會做設備保養那塊", db=db_session, llm=llm,
                          knowledge=StubKnowledge())
+    # top-1 是新職類 → 出卡(帶 precheck);同回合 intake 條件也成立 → 職類卡優先佔槽(0032)
     assert out.widget == {"kind": "open_picker", "picker": "occupation",
-                          "query": "設備維護 保養 巡檢"}
+                          "query": "設備維護 保養 巡檢", "precheck": [
+        {"code": "KRM2421-001v4", "name": "設備維護工程師", "reason": "依你描述:「設備維護 保養 巡檢」"},
+        {"code": "KRM2422-001v4", "name": "生產線技術員", "reason": "依你描述:「設備維護 保養 巡檢」"}]}
 
 
 @pytest.mark.asyncio

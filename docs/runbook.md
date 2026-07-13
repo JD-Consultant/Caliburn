@@ -9,7 +9,7 @@
 |---|---|---|---|
 | 5432 | Postgres(`caliburn-db-1`,docker) | `docker compose up -d db` | — |
 | 8000 | ocs-indexer(知識/查詢) | `cd apps/ocs-indexer && uv run jd-ocs-indexer serve --port 8000` | Qdrant |
-| 8001 | api(FastAPI+LangGraph,`run_live.py`) | `npx turbo dev`(或 `cd apps/api && uv run python run_live.py`) | Postgres(+indexer 供知識) |
+| 8001 | api(FastAPI+訪談引擎,`run_live.py`) | `npx turbo dev`(或 `cd apps/api && uv run python run_live.py`) | Postgres(+indexer 供知識) |
 | 3000 | web(Next.js) | `npx turbo dev` | api |
 
 ## 起整套(順序)

@@ -30,6 +30,11 @@ class Settings(BaseSettings):
     # (校準#2 實證:同 prompt 0.91↔0.45)。用同一套 OpenAI strict 實作的更強模型,
     # 沿用 0024 零逃逸保證;換模型 = 重跑 validate_select_schema + interview_sim 留紀錄。
     model_interview: str = "openai/gpt-4.1-mini"
+    # T13(ADR 0030):OpenRouter models=[主,備] 顯式備援——**備援模型須先過 T11 考卷**
+    # (promptfoo)才填;空字串=不帶 models(單模型)。provider 物件恆帶
+    # require_parameters(只路由到支援 strict/tools 的 provider)。
+    model_interview_fallback: str = ""
+    model_select_fallback: str = ""
 
     # Document output
     document_output_dir: str = "./output/documents"

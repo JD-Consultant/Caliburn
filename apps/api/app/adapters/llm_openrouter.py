@@ -46,6 +46,53 @@ def schema_response_format(schema_name: str, schema: dict) -> dict:
     }
 
 
+def openrouter_extra_body(role: str) -> dict:
+    """OpenRouter 顯式路由(T13;驗證報告 H2):
+    - `provider.require_parameters=True`:**只路由到支援本請求全部參數(strict/tools)
+      的 provider**——沒有它,strict 可能被靜默丟棄(H2 頭號雷)。
+    - `provider.allow_fallbacks=True`:provider 級容錯(同模型換供應商)。
+    - `models=[主,備]`:模型級備援;備援先過 T11 考卷才填(settings *_fallback)。
+    快取註記(H1):OpenAI 系自動 prompt cache;**若 role 改路由到 Anthropic 系,
+    必須在前綴 content block 帶 `cache_control`,否則完全不快取**。"""
+    body: dict = {"provider": {"allow_fallbacks": True, "require_parameters": True}}
+    fb = {"interview": settings.model_interview_fallback,
+          "select": settings.model_select_fallback}.get(role, "")
+    if fb:
+        body["models"] = [model_for_role(role), fb]
+    return body
+
+
+def _retry_after_seconds(exc) -> float | None:
+    """429/5xx 的 Retry-After(秒);拿不到回 None(退避用指數)。"""
+    headers = getattr(getattr(exc, "response", None), "headers", None)
+    val = headers.get("Retry-After") if headers else None
+    try:
+        return float(val) if val is not None else None
+    except (TypeError, ValueError):
+        return None
+
+
+def _record_usage(span, model: str, resp) -> None:
+    """回應側 span 屬性:實際模型(≠請求模型=fallback 觸發,另記)、tokens、
+    快取命中(semconv `gen_ai.usage.cache_read.input_tokens`)、finish_reasons。"""
+    used = getattr(resp, "model", None)
+    if used:
+        span.set_attribute("gen_ai.response.model", used)
+        if used != model:
+            span.set_attribute("caliburn.llm.fallback_triggered", True)
+    usage = getattr(resp, "usage", None)
+    if usage is not None:
+        span.set_attribute("gen_ai.usage.input_tokens", usage.prompt_tokens)
+        span.set_attribute("gen_ai.usage.output_tokens", usage.completion_tokens)
+        ptd = getattr(usage, "prompt_tokens_details", None)
+        cached = getattr(ptd, "cached_tokens", None)
+        if cached is not None:
+            span.set_attribute("gen_ai.usage.cache_read.input_tokens", cached)
+    fr = resp.choices[0].finish_reason if getattr(resp, "choices", None) else None
+    if fr:
+        span.set_attribute("gen_ai.response.finish_reasons", [fr])
+
+
 @lru_cache(maxsize=1)
 def _async_client() -> AsyncOpenAI:
     return AsyncOpenAI(api_key=settings.openrouter_api_key,
@@ -59,6 +106,8 @@ def _build_chat(model: str, temperature: float) -> ChatOpenAI:
         api_key=settings.openrouter_api_key,
         base_url=settings.openrouter_base_url,
         temperature=temperature,
+        # T13:provider 級容錯+參數保證(models 備援只在 interview/select 路,見 extra_body)
+        extra_body={"provider": {"allow_fallbacks": True, "require_parameters": True}},
     )
 
 
@@ -102,7 +151,8 @@ class OpenRouterLlm:
             except Exception as exc:  # noqa: BLE001
                 if attempt < self._retries - 1:
                     logger.warning("OpenRouterLlm text attempt %d failed: %s", attempt + 1, exc)
-                    await asyncio.sleep(0.5 * (attempt + 1))
+                    # 指數退避;429/5xx 帶 Retry-After 則尊重之(T13)
+                    await asyncio.sleep(_retry_after_seconds(exc) or 0.5 * (attempt + 1))
                 else:
                     logger.error("OpenRouterLlm text exhausted: %s", exc)
         return ""
@@ -128,24 +178,18 @@ class OpenRouterLlm:
 
         async def call_once(msgs: list[dict], with_tools: bool) -> dict:
             kwargs: dict = {"model": model, "messages": msgs,
-                            "temperature": 0.4, "max_tokens": 1024}
+                            "temperature": 0.4, "max_tokens": 1024,
+                            "extra_body": openrouter_extra_body(role)}
             if with_tools:
                 kwargs["tools"] = tools
                 kwargs["tool_choice"] = "auto"      # 不強制(§8.5:強制會虛構輸入)
+                kwargs["parallel_tool_calls"] = True   # T13:同輪多 tool_call(loop 成對回填)
             with get_tracer().start_as_current_span(f"chat {model}") as span:
                 span.set_attribute(GEN_AI_PROVIDER_ATTR, "openrouter")
                 span.set_attribute("gen_ai.operation.name", "chat")
                 span.set_attribute("gen_ai.request.model", model)
                 resp = await _async_client().chat.completions.create(**kwargs)
-                if getattr(resp, "model", None):
-                    span.set_attribute("gen_ai.response.model", resp.model)
-                usage = getattr(resp, "usage", None)
-                if usage is not None:
-                    span.set_attribute("gen_ai.usage.input_tokens", usage.prompt_tokens)
-                    span.set_attribute("gen_ai.usage.output_tokens", usage.completion_tokens)
-                fr = resp.choices[0].finish_reason
-                if fr:
-                    span.set_attribute("gen_ai.response.finish_reasons", [fr])
+                _record_usage(span, model, resp)
             m = resp.choices[0].message
             return {"content": m.content, "tool_calls": [
                 {"id": tc.id, "type": "function",
@@ -175,23 +219,16 @@ class OpenRouterLlm:
                         # 驗收發現:被誘導輸出非法值時,受限解碼會逼出失控長輸出直到截斷
                         # (fail-closed 無逃逸,但燒 token)——上限鎖住成本;截斷=非法 JSON=照樣炸。
                         max_tokens=2048,
+                        extra_body=openrouter_extra_body(role),
                     )
-                    if getattr(resp, "model", None):
-                        span.set_attribute("gen_ai.response.model", resp.model)
-                    usage = getattr(resp, "usage", None)
-                    if usage is not None:
-                        span.set_attribute("gen_ai.usage.input_tokens", usage.prompt_tokens)
-                        span.set_attribute("gen_ai.usage.output_tokens",
-                                           usage.completion_tokens)
-                    fr = resp.choices[0].finish_reason
-                    if fr:
-                        span.set_attribute("gen_ai.response.finish_reasons", [fr])
+                    _record_usage(span, model, resp)
                 content = resp.choices[0].message.content or ""
                 return json.loads(content)
             except Exception as exc:  # noqa: BLE001
                 last_err = exc
                 if attempt < self._retries - 1:
                     logger.warning("select_schema attempt %d failed: %s", attempt + 1, exc)
-                    await asyncio.sleep(0.5 * (attempt + 1))
+                    # 指數退避;429/5xx 帶 Retry-After 則尊重之(T13)
+                    await asyncio.sleep(_retry_after_seconds(exc) or 0.5 * (attempt + 1))
         logger.error("select_schema exhausted: %s", last_err)
         raise LlmSchemaError(str(last_err))

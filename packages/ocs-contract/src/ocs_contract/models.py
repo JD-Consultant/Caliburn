@@ -3,7 +3,52 @@
 
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict, Field, conint
+from enum import Enum
+from typing import Any, Literal
+
+from pydantic import BaseModel, ConfigDict, Field, confloat, conint
+
+
+class Quote(BaseModel):
+    model_config = ConfigDict(
+        extra='allow',
+    )
+    turn_id: int
+    text: str
+
+
+class PendingSrc(BaseModel):
+    """
+    修訂出處:ref_urn(官方來源)與 quote(訪談原話)可並存;「至少一」由 verify 層強制(ADR 0030)。
+    """
+
+    model_config = ConfigDict(
+        extra='allow',
+    )
+    ref_urn: str | None = None
+    quote: Quote | None = None
+
+
+class Op(Enum):
+    add = 'add'
+    mod = 'mod'
+    del_ = 'del'
+
+
+class PendingMark(BaseModel):
+    """
+    追蹤修訂標記(ADR 0030):AI 寫入一律以 pending 落文件,✓=去標、✗=還原;匯出/定稿由 _strip_underscore 剝除。mod 必帶 prev(舊值)。value 僅「延遲生效」欄位用(表頭主基準:欄位不動、提案值放標記,✓ 才寫入+觸發重算)。
+    """
+
+    model_config = ConfigDict(
+        extra='allow',
+    )
+    op: Op
+    by: Literal['ai']
+    turn_id: int
+    prev: Any | None = None
+    value: Any | None = None
+    src: PendingSrc | None = None
 
 
 class CodeName(BaseModel):
@@ -16,6 +61,7 @@ class CodeName(BaseModel):
     )
     code: str | None = None
     name: str | None = None
+    field_pending: PendingMark | None = Field(None, alias='_pending')
 
 
 class CodeText(BaseModel):
@@ -24,6 +70,7 @@ class CodeText(BaseModel):
     )
     code: str | None = None
     text: str | None = None
+    field_pending: PendingMark | None = Field(None, alias='_pending')
 
 
 class VersionEntry(BaseModel):
@@ -62,6 +109,19 @@ class Category(BaseModel):
     industries: list[CodeName] | None = Field([], validate_default=True)
 
 
+class FieldPending(BaseModel):
+    """
+    表頭 scalar 欄位的修訂標記集合(槽名→PendingMark;ADR 0030)。
+    """
+
+    model_config = ConfigDict(
+        extra='allow',
+    )
+    ocs_code: PendingMark | None = None
+    job_description: PendingMark | None = None
+    ocs_level: PendingMark | None = None
+
+
 class OcsProfile(BaseModel):
     model_config = ConfigDict(
         extra='allow',
@@ -71,6 +131,22 @@ class OcsProfile(BaseModel):
     category: Category | None = Field({}, validate_default=True)
     job_description: str | None = None
     ocs_level: conint(ge=1, le=5) | None = None
+    field_pending: FieldPending | None = Field(
+        None,
+        alias='_pending',
+        description='表頭 scalar 欄位的修訂標記集合(槽名→PendingMark;ADR 0030)。',
+    )
+
+
+class FieldPending1(BaseModel):
+    """
+    區塊 scalar 欄的修訂標記集合(ADR 0030;目前僅 competency_level)。
+    """
+
+    model_config = ConfigDict(
+        extra='allow',
+    )
+    competency_level: PendingMark | None = None
 
 
 class CompetencyBlock(BaseModel):
@@ -78,10 +154,62 @@ class CompetencyBlock(BaseModel):
         extra='allow',
     )
     competency_level: conint(ge=1, le=5) | None = None
+    field_pending: FieldPending1 | None = Field(
+        None,
+        alias='_pending',
+        description='區塊 scalar 欄的修訂標記集合(ADR 0030;目前僅 competency_level)。',
+    )
     indicators: list[CodeText] | None = Field([], validate_default=True)
     outputs: list[CodeName] | None = Field([], validate_default=True)
     knowledge: list[CodeName] | None = Field([], validate_default=True)
     skills: list[CodeName] | None = Field([], validate_default=True)
+
+
+class FieldPending2(BaseModel):
+    """
+    細項 scalar 槽的修訂標記集合(槽名→PendingMark;ADR 0030)。
+    """
+
+    model_config = ConfigDict(
+        extra='allow',
+    )
+    frequency: PendingMark | None = None
+    time_share_pct: PendingMark | None = None
+    duration: PendingMark | None = None
+    volume: PendingMark | None = None
+    trigger: PendingMark | None = None
+    inputs: PendingMark | None = None
+    tools: PendingMark | None = None
+    collaborators: PendingMark | None = None
+    wait_points: PendingMark | None = None
+    exceptions: PendingMark | None = None
+    standards: PendingMark | None = None
+
+
+class TaskDetails(BaseModel):
+    """
+    任務客製細項(訪談引擎 v1,ADR 0023/spec 2026-07-05;OCS 官方來源沒有——由訪談產生,全部 optional。v3 起(ADR 0030)溯源住各槽 _pending.src;已確認值不帶溯源。
+    """
+
+    model_config = ConfigDict(
+        extra='allow',
+    )
+    frequency: str | None = None
+    time_share_pct: confloat(ge=0.0, le=100.0) | None = None
+    duration: str | None = None
+    volume: str | None = None
+    trigger: str | None = None
+    inputs: str | None = None
+    tools: str | None = None
+    collaborators: str | None = None
+    wait_points: str | None = None
+    exceptions: str | None = None
+    standards: str | None = None
+    field_pending: FieldPending2 | None = Field(
+        None,
+        alias='_pending',
+        description='細項 scalar 槽的修訂標記集合(槽名→PendingMark;ADR 0030)。',
+    )
 
 
 class TaskGroup(BaseModel):
@@ -90,6 +218,8 @@ class TaskGroup(BaseModel):
     )
     task_codes: list[CodeName] | None = Field([], validate_default=True)
     competency_blocks: list[CompetencyBlock] | None = Field([], validate_default=True)
+    details: TaskDetails | None = None
+    field_pending: PendingMark | None = Field(None, alias='_pending')
 
 
 class OcuUnit(BaseModel):
@@ -99,6 +229,7 @@ class OcuUnit(BaseModel):
     ocu_code: str | None = None
     ocu_name: str | None = None
     tasks: list[TaskGroup] | None = Field([], validate_default=True)
+    field_pending: PendingMark | None = Field(None, alias='_pending')
 
 
 class OcsContent(BaseModel):

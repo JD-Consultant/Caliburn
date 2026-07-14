@@ -21,6 +21,8 @@ from app.models import JobProfile
 from app.core.domain import knowledge_pack, ocs_doc
 from app.core.ports import KnowledgeClient
 from app.adapters.persistence import DocConflictError, DocRepo, ProfileRepo
+from app.adapters.interview_repo import InterviewRepo
+from app.interview.diff import doc_paths_changed
 
 logger = logging.getLogger("caliburn")
 
@@ -71,11 +73,23 @@ async def patch_document(
     相容現況；web 前端一律帶，未來可能收緊為必帶——ADR 0015 / 2a-minimal spec §2.3）。
     """
     await _require_profile(profile_id, db)
+    # 訪談中的人工存檔 → 變動 path 記入 session.human_touched(ADR 0025 provenance;
+    # 引擎寫入走內部 repo 不經本 route,故此鉤子天然只記「人」)
+    active = await InterviewRepo(db).get_active(profile_id)
+    old_content = None
+    if active is not None:
+        prev = await DocRepo(db).latest(profile_id)
+        old_content = (prev or {}).get("content")
     try:
-        return await DocRepo(db).upsert_draft(
+        result = await DocRepo(db).upsert_draft(
             profile_id, body,
             expected_version=expect_version, expected_revision=expect_revision,
         )
+        if active is not None:
+            paths = doc_paths_changed(old_content, body)
+            if paths:
+                await InterviewRepo(db).merge_human_touched(active.id, paths)
+        return result
     except DocConflictError as e:
         raise HTTPException(status_code=409, detail={
             "code": "version_conflict",
@@ -110,25 +124,6 @@ async def finalize_document(profile_id: UUID, db: AsyncSession = Depends(get_db)
     return await repo.finalize(profile_id, content=assembled)
 
 
-def _refresh_header(content: dict, profile, code: str, primary=None) -> dict:
-    """Update the document header (ocs_profile) to reflect current occupation.
-    With ``primary`` (indexer OccupationDetail) fill the OFFICIAL 職業名/職類名
-    (same as the 職能基準代碼 picker / setPrimaryBasis). Without it (indexer down)
-    leave the name EMPTY — never fall back to the user's job_title."""
-    content.setdefault("ocs_profile", {})
-    p = content["ocs_profile"]
-    p["ocs_code"] = code
-    name = p.setdefault("ocs_name", {"job_category_name": None, "occupation_name": ""})
-    if primary is not None:
-        name["occupation_name"] = primary.ocs_name.occupation_name or ""
-        name["job_category_name"] = primary.ocs_name.job_category_name
-    else:
-        name["occupation_name"] = ""
-        name["job_category_name"] = None
-    p.setdefault("job_description", profile.job_summary or "")
-    return content
-
-
 @router.get("/{profile_id}/document/export")
 async def export_document(profile_id: UUID, db: AsyncSession = Depends(get_db)):
     """唯讀匯出：把最新文件（draft 或 final）組裝成乾淨合法的 OCS JSON（不寫 DB）。"""
@@ -144,34 +139,34 @@ async def set_occupations(
     profile_id: UUID,
     body: dict = Body(...),
     db: AsyncSession = Depends(get_db),
-    knowledge: KnowledgeClient = Depends(get_knowledge),
 ):
-    """選職類：設定 selected_ocs_codes（順序=優先度），並把文件表頭刷新成該職類的
-    官方主基準（職業名/職類名）。已有 draft 則就地更新表頭，否則建一個只有表頭的
-    draft。indexer 掛則表頭名稱留空（不退回 job_title）。任務待 curate。"""
-    profile = await _require_profile(profile_id, db)
+    """選職能基準參考：設定 selected_ocs_codes（參考集合；順序僅供知識包排序）。
+    **脫鉤後(ADR 0029)只寫 profile，絕不動文件表頭**——文件身分（職類/主基準）
+    唯一寫入口＝前端職類視窗（PATCH document）。任務/職責待 curate。"""
+    await _require_profile(profile_id, db)
     codes = body.get("ocs_codes") or []
     if not codes:
         raise HTTPException(status_code=400, detail="no ocs_codes provided")
     await ProfileRepo(db).set_selected_ocs(profile_id, codes)
-    # 官方主基準（第一順位）→ 表頭職業名/職類名填官方值（同 setPrimaryBasis）。
-    primary = None
-    try:
-        primary = await knowledge.occupation(codes[0])
-    except Exception:
-        logger.warning("set_occupations: occupation(%s) failed; header name left blank", codes[0], exc_info=True)
-    repo = DocRepo(db)
-    prev = await repo.latest(profile_id)
-    if prev:
-        content = _refresh_header(prev["content"], profile, codes[0], primary)
-    else:
-        content = ocs_doc.skeleton(
-            {"ocs_code": codes[0], "job_title": profile.job_title, "job_summary": profile.job_summary},
-            [],
-        )
-        content = _refresh_header(content, profile, codes[0], primary)
-    await repo.upsert_draft(profile_id, content)
     return {"ocs_codes": codes}
+
+
+async def _attach_similarity(pack: dict, knowledge: KnowledgeClient) -> None:
+    """相似比對(ADR 0022,enrichment):態度/任務兩池丟 items:match,回應原樣掛
+    ``pack.similarity``;失敗不擋池、不丟例外,降級顯式標 ``meta.similarity``。"""
+    sim: dict = {}
+    items_by_kind = knowledge_pack.similarity_items(pack)
+    results = await asyncio.gather(
+        *(knowledge.match(kind, items) for kind, items in items_by_kind.items()),
+        return_exceptions=True)
+    for kind, r in zip(items_by_kind.keys(), results):
+        if isinstance(r, BaseException):
+            logger.warning("knowledge: match(%s) failed; degrading", kind, exc_info=r)
+        else:
+            sim[kind] = r.model_dump()
+    pack["similarity"] = sim
+    pack["meta"]["similarity"] = (
+        "ok" if len(sim) == len(items_by_kind) else ("partial" if sim else "unavailable"))
 
 
 @router.get("/{profile_id}/knowledge")
@@ -208,4 +203,5 @@ async def get_knowledge_pack(
         raise HTTPException(status_code=502, detail="indexer unavailable")
     pack = knowledge_pack.build_pack(ok, details, tasks_by, pools_by)
     pack["meta"] = {"partial": len(ok) < len(codes)}
+    await _attach_similarity(pack, knowledge)
     return pack

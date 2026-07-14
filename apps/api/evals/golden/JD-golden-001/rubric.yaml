@@ -1,0 +1,30 @@
+# Answer Score rubric(Phase 2 骨架;evals 深挖報告附錄 A 樣式)。
+# 規則:每 item 獨立二元判定(pass/fail/unknown;資訊不足=unknown 不猜;partial=fail 從嚴);
+# Answer Score = (Σ正分 − Σ負分) ÷ Σ總正分;裁判=cross-model-family、temp=0、
+# pointwise-against-reference(judge prompt 骨架見附錄 B)。
+# SME gate(2026-07-13 改制):items 由 agent 以權威來源自審定案(紀錄:
+# specs/2026-07-13-skill-golden-sme-review.md);reference 過本 rubric 必須滿分(驗 grader)。
+task_id: JD-golden-001
+reference: ./reference.md
+transcript: ./transcript.txt
+
+dimensions:
+  core_details:                     # 維度1:任務細節覆蓋(11 槽對照 reference)
+    items:
+      - {id: R1, assertion: "頻率含「每天零星+每兩週密集」雙節奏", points: +2}
+      - {id: R2, assertion: "完成標準含 100% 執行、無未解 blocker、簽核放行三要素", points: +2}
+      - {id: R3, assertion: "等待瓶頸講到環境單套排隊與等待時長", points: +2}
+      - {id: R4, assertion: "例外處理含通報對象(組長+開發 Lead)與當日修復重測", points: +2}
+  competencies:                     # 維度2:O/P/K/S 歸位與句式
+    items:
+      - {id: Q1, assertion: "K 為名詞化概念、S 為動作短語(ESCO 句式),無互串", points: +2}
+      - {id: Q2, assertion: "行為指標動詞可觀察(無「了解/熟悉」類),含情境與標準", points: +2}
+  faithfulness:                     # 維度3:忠實度(含負分;Harvey hallucination 罰則)
+    items:
+      - {id: F1, assertion: "未出現逐字稿未提及的證照/年資/數字", points: +2}
+      - {id: F2, assertion: "臆造具體事實(工具名、KPI、流程)", points: -4}
+      - {id: F3, assertion: "把口語自誇當客觀事實寫入", points: -2}
+  register_style:                   # 維度4:專業語域(繁中)
+    items:
+      - {id: S1, assertion: "全篇書面繁中職場用語,無口語殘留", points: +1}
+      - {id: S2, assertion: "冗長、離題或重複段落", points: -1}

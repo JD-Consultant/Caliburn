@@ -19,6 +19,9 @@ export interface JobProfile {
   job_title: string;
   department?: string | null;
   job_summary?: string | null;
+  // ADR 0029:所選職能基準參考(codes)。文件身分脫鉤後，選單/知識包 gate 吃這個，
+  // 不再吃文件表頭 ocs_code(表頭改由職類視窗單選帶入)。
+  selected_ocs_codes?: string[];
   created_at: string;
   updated_at: string;
   // D27: list 端點補的文件狀態（單筆 GET 用 schema 預設 none/0）。
@@ -176,6 +179,7 @@ export interface OptionItem {
   name: string;
   sources?: string[];      // 既有：ocs_code 清單（向後相容）
   srcs?: SourceRef[];      // 新：完整來源（選單顯示用；首個 + 其餘）
+  variants?: OptionItem[]; // 相似比對群成員(ADR 0022,收合展示用);沒有 = 普通選項
 }
 
 // ── 知識包(ADR 0021):選職類後一次抓齊,所有選單的資料源;每官方值帶 srcs ──
@@ -213,6 +217,61 @@ export interface KnowledgePack {
     prerequisites: Record<string, PoolRow>; supplements: Record<string, PoolRow>;
   };
   source_tasks: Record<string, SourceTask>;
-  meta?: DegradeMeta;
+  similarity?: { attitude?: MatchResult; task?: MatchResult };  // 相似比對(ADR 0022;缺席=降級)
+  meta?: DegradeMeta & { similarity?: "ok" | "partial" | "unavailable" };
 }
 
+// ── 相似比對(ADR 0022;欄位名照 indexer-contract,left/right 家族,禁用 a/b)──
+export interface MatchGroupMember { id: string; score: number }
+export interface MatchGroup { medoid: string; members: MatchGroupMember[] }
+export interface PossibleMatch { left_id: string; right_id: string; score: number }
+export interface MatchResult {
+  groups: MatchGroup[];
+  possible_matches: PossibleMatch[];
+  config: { kind: string; theta_high: number; theta_low: number; model: string };
+}
+
+
+// ── 訪談引擎(ADR 0023;spec 2026-07-05;端點 interview:start/:turn/GET/:review)──
+// v2(ADR 0027 §11.1):進度=覆蓋率(帳本 filled/required),取代 v1 task_index/total
+export interface InterviewCoverage { filled: number; required: number }
+export interface InterviewProgress { phase: string; coverage: InterviewCoverage }
+export interface InterviewQuestion { text: string; target_path: string | null }
+// widget 判別聯集(0028 D1/D5):choice=舊卡片;open_picker=引擎指令「開哪個 picker、
+// 預填/預勾什麼」——前端開**同一批編輯器 pickers**(同 UI,入口不同)。
+export interface ChoiceWidget {
+  kind?: "choice"; question: string; options: string[]; target_path: string | null;
+  recommended?: string | null;   // T9(AskUserQuestion 樣式):推薦選項標記
+}
+// 0031:職類建議卡項(A 案)——引擎只給本回合搜尋真實命中的碼(確定性,不虛構)
+export interface OccPrecheckItem { code: string; name: string; reason: string }
+export interface OpenPickerWidget {
+  kind: "open_picker";
+  // occupation=職類建議卡;task_board_intake=任務盤邀請卡(0032:AI 不彈盤,人按才開;
+  // 舊 `task` 預勾 widget/PickerPrecheckItem 已隨 curation 疊加層退役)
+  picker: "occupation" | "task_board_intake";
+  query?: string;                       // occupation:預填搜尋詞(顧問實際用過的)
+  precheck?: OccPrecheckItem[];         // occupation:{code,name,reason}
+}
+export type InterviewWidget = ChoiceWidget | OpenPickerWidget
+// CurationChecklist / InterviewSuggestion(建議層)已退場(T12;ADR 0030)。
+export interface InterviewStartResponse {
+  session_id: string; status: string; phase: string;
+  focus: { task_path?: string; skipped?: string[] };
+  greeting: string; progress: InterviewProgress;
+}
+export interface InterviewTurnResponse {
+  say: string; question: InterviewQuestion | null; widget: InterviewWidget | null;
+  doc_changed: boolean; progress: InterviewProgress;
+  suggest_finish?: boolean;   // T10 收尾三訊號任一成立(側欄顯示收尾鈕,不強制)
+}
+export interface InterviewView {
+  session_id: string; status: string; phase: string;
+  focus: { task_path?: string; skipped?: string[] };
+  pending_count?: number;   // 文件內 _pending 待審筆數(ADR 0030)
+  // T9 議程三態(+boundary 劃線;ledger 推導)
+  agenda?: { key: string; label: string;
+             state: "pending" | "in_progress" | "completed" | "boundary" }[];
+  turns: { seq: number; role: "employee" | "consultant"; text: string }[];
+  // evidence/suggestions 已退場(T12):溯源住 `_pending.src`、審閱住 review-events。
+}

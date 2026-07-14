@@ -26,7 +26,8 @@ updated: 2026-07-04
 
 - **依 `(ocs_code, unit_id)` 分組**:不同職類即使都把職責編成「T1」也**不會合併**(key 含 ocs_code)。
 - **全文件重編**:職責 `T1, T2…`、任務 `T{u}.{t}`;來源留在 `unit["source"]` / `task["provenance"]`(顯示 + recurate 合併)。
-- **`occupation_name` 絕不退回 `job_title`**:未選職類時留空,待〔選職類〕帶入官方名(與 route `_refresh_header` 一致)。
+- **`occupation_name` 絕不退回 `job_title`**:未選職類時留空,待前端職類視窗(PATCH document)帶入官方名。
+  ADR 0029 脫鉤後 `PUT /occupations` 只寫 `selected_ocs_codes`、**不再回寫表頭**(文件身分唯一寫入口=職類視窗)。
 
 > `build_from_picked` / `_renumber` **已隨 `document:buildTasks` 端點退役(P3,ADR 0021)**:
 > 任務選用改由 web 前端文件編輯(`addFromPool`)+ PATCH,**單一寫入路徑**。別把它們加回來。

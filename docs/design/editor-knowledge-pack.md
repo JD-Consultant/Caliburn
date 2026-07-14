@@ -2,7 +2,7 @@
 title: 編輯器 × 知識包 — 端到端設計
 audience: agent-primary(也給人)
 scope: apps/web 著作 UI + apps/api knowledge/document 端點
-updated: 2026-07-04
+updated: 2026-07-11
 ---
 
 # 編輯器 × 知識包 — 端到端設計(職能基準著作面)
@@ -11,11 +11,19 @@ updated: 2026-07-04
 > 不誤動刻意設計。**living:動到這條線的碼,同一個 commit 更新本檔**(fossilization 是頭號壞味道;
 > 見 [`../specs/2026-07-03-agent-facing-docs-research.md`](../specs/2026-07-03-agent-facing-docs-research.md))。
 > 範圍:`apps/web` 著作 UI + `apps/api` 的 `knowledge` / `document` 端點。權威決策在 ADR 0021(見 §8)。
+>
+> **⚠ ADR 0029(2026-07-11)大改本線,以下已更新**:①〔選職類〕改名〔選職能基準參考〕、**只記參考不寫表頭**;
+> 文件身分(主基準)改由**職類視窗**單選(選項=已選參考)。②選單三型=**控制/參考/素材庫**,一律獨立視窗(Modal)、
+> **無首開自動寫、無選單內自訂 footer、無 AI 標記**;批次帶入鈕「自動勾選」→「**選同X**」。③**改名不斷根**
+> (改字保留 `_ref`/身分、勾選不掉、顯原名副行)——取代舊「改名=斷鏈變自訂」。④任務卡 O/P/K/S 四格「點此填」+
+> **CellFillerPanel 退役** → **OPLKS 全展開區**(標籤旁 ▾ 開格窗);位置碼、匯出照舊(renumber)。
+> **AI 共編載體(CurationDialog/precheck/D7 徽章/InterviewPanel)本輪不重設計**,僅維持編譯+測試綠(spec §11)。
 
 ## 1. 一句話
 
-**選職類**抓一份「**知識包**」(occupation_details + 12 池 + source_tasks);web **所有選單**都從這包讀;
-使用者勾選/填寫 → **純函式改文件** → **autosave PATCH** 存草稿。沒有任何 curation 專用端點。
+**選職能基準參考**(原〔選職類〕)抓一份「**知識包**」(occupation_details + 12 池 + source_tasks);
+web **所有選單**都從這包讀;使用者勾選/填寫 → **純函式改文件** → **autosave PATCH** 存草稿。
+沒有任何 curation 專用端點。**參考集合(selected_ocs_codes)只住 profile;文件身分(主基準)另由職類視窗單選(ADR 0029)。**
 
 ## 2. 角色與資料模型
 
@@ -23,7 +31,7 @@ updated: 2026-07-04
 
 | 部位 | 形狀 | 用途 |
 |---|---|---|
-| `occupation_details[]` | `{ocs_code, ocs_name, job_description, ocs_level}`(**保序**=優先序) | 表頭主基準選單 |
+| `occupation_details[]` | `{ocs_code, ocs_name, job_description, ocs_level}`(=**已選參考集合**;順序僅供池 append 排序,**非優先度**) | 職類視窗(表頭主基準單選)選項來源 |
 | `pools.{units,tasks,knowledge,skills,outputs,indicators,attitudes,prerequisites,supplements}` | `Record<key, {srcs}>` | 各選單池;**key=去重鍵**(見下) |
 | `pools.{job_categories,occupations,industries}` | `Record<分類碼, {name, srcs}>` | 表頭三類(顯真實碼) |
 | `source_tasks` | `Record<URN, {…, o_refs,p_refs,k_refs,s_refs, competency_level}>` | 任務→自己的官方 O/P/K/S 配套 |
@@ -50,12 +58,15 @@ updated: 2026-07-04
 ## 3. 端到端資料流(runtime 場景)
 
 ```
-① 選職類  OccupationPicker → useSetOccupations
+① 選職能基準參考  OccupationPicker(無序複選)→ useSetOccupations
           └ PUT /occupations {ocs_codes}      ← 唯一同步點
-            server: 設 selected_ocs_codes + 用 knowledge.occupation(codes[0]) 刷表頭名 + upsert draft
+            server: **只**設 selected_ocs_codes(ADR 0029 脫鉤:不刷表頭、不建 draft)
           └ onSuccess: invalidate ["document",id] + invalidate&prefetch ["knowledge",id]
+   (文件身分)職類視窗  DocHeader PrimaryBasisMenu(選項=已選參考,單選)→ setPrimaryBasis(前端 PATCH)
+            ← 表頭 ocs_code/名稱**唯一寫入口**;再點同項=整組清空
 
-② 抓知識包  useKnowledge(id, hasOccupations) → GET /knowledge          (staleTime 24h, persist)
+② 抓知識包  useKnowledge(id, hasReferences) → GET /knowledge          (staleTime 24h, persist)
+            gate=**有參考**(profile.selected_ocs_codes),非表頭 ocs_code(ADR 0029)
           server: 對每個 code 並行抓 indexer 三資源(occupation / occupation_tasks / competencies)
                   → knowledge_pack.build_pack(照優先序 append) → 12 池 + source_tasks + meta.partial
                   單 code 掛→略過+partial=true;全掛→502
@@ -65,9 +76,11 @@ updated: 2026-07-04
    表頭三類     DocHeader     codedPoolOptions(pack.pools[kind]) → setCategory
    NOTE 前提/補充 DocNotes    valuePoolOptions(pack.pools[field])→ setNoteItems(影子列)
    態度 A       AttitudeBlock valuePoolOptions(pack.pools.attitudes) → setAttitudes
-   選職責 ▾     UnitPickerMenu unitRows(pack)                    → addFromPool / deleteUnit
-   選任務 ▾     TaskPickerMenu taskRows(pack)+ownTaskKeys        → addTasksToUnit / deleteTask
-   填格 O/P/K/S CellFillerPanel valuePoolOptions + ownTaskRefs(預勾) → setOp / setKS
+   選主要職責   UnitPickerMenu(**表格底部**,與〔＋新增職責〕並排) unitRows(pack) → addFromPool / deleteUnit
+   選工作任務   TaskPickerMenu(職責內) / GlobalTaskPickerMenu(頂欄;勾→resolveHomeUnit 自動掛來源職責)
+                taskRows(pack)+ownTaskKeys → addTasksToUnit / addFromPool / deleteTask
+   OPLKS 全展開 TaskRow 每格 FieldCombobox(gridLayout;標籤旁 ▾ 開格窗) valuePoolOptions + ownTaskRefs → setOp / setKS
+                (**CellFillerPanel/四格「點此填」已退役**;ADR 0029 §8)
 
 ④ 勾選/填寫  onChange/onSave(nextDoc) → page.persist → useAutosaveDocument.commit(next)
           └ setQueryData(["document",id]) 即時反映 + debounce 500ms
@@ -86,17 +99,17 @@ updated: 2026-07-04
 
 | 動作 | 元件 | 純函式(ocsDoc) | 網路 |
 |---|---|---|---|
-| 搜/勾/套用職類 | OccupationPicker | — | **`PUT /occupations`** → prefetch `GET /knowledge` |
-| 選職責 ▾ 勾/取消 | UnitPickerMenu | addFromPool / deleteUnit | `PATCH /document`(autosave) |
-| 選任務 ▾ 勾/取消 | TaskPickerMenu | addTasksToUnit / deleteTask | `PATCH /document` |
-| 點空格填 O/P/K/S | CellFillerPanel | setOp / setKS | `PATCH /document` |
-| 改主基準/三類 | DocHeader | setPrimaryBasis / setCategory | `PATCH /document` |
+| 搜/勾/套用職能基準參考 | OccupationPicker | — | **`PUT /occupations`**(只寫 codes)→ prefetch `GET /knowledge` |
+| 選主要職責 勾/取消 | UnitPickerMenu(表格底部) | addFromPool / deleteUnit | `PATCH /document`(autosave) |
+| 選工作任務(職責內/全域) | TaskPickerMenu / GlobalTaskPickerMenu | addTasksToUnit / addFromPool / deleteTask | `PATCH /document` |
+| 填 O/P/K/S(OPLKS 展開) | TaskRow FieldCombobox(格窗) | setOp / setKS | `PATCH /document` |
+| 選主基準(職類視窗)/三類 | DocHeader | setPrimaryBasis / setCategory | `PATCH /document`（表頭身分唯一寫入口） |
 | 改 NOTE / 態度 / 級別 | DocNotes / AttitudeBlock / TaskRow | setNoteItems / setAttitudes / setTaskLevel | `PATCH /document` |
 | 匯出 JSON | 工具列 | — | `GET /document/export` |
 | 產生正式版本 | 工具列 | — | `POST /document:finalize` |
 
 > **關鍵**:選職責/選任務/填格/改表頭 **一律不打自己的端點**——全部漏斗進**同一條 autosave `PATCH`**
-> (與 LLM 共編同一條寫入路徑)。唯一會主動打網路的著作動作是**選職類**(換同步點)。
+> (與 LLM 共編同一條寫入路徑)。唯一會主動打網路的著作動作是**選職能基準參考**(換同步點)。
 
 ## 5. 端點 reference
 
@@ -104,8 +117,8 @@ updated: 2026-07-04
 
 | Method Path | 用途 | 降級/錯誤 |
 |---|---|---|
-| `PUT …/occupations` | 設 selected_ocs_codes(序=優先) + 刷表頭 + 建/更新 draft | indexer 掛→表頭名留空(不退回 job_title) |
-| `GET …/knowledge` | 知識包(選職類後一次抓齊) | 單 code 掛→partial;**全掛→502**(critical) |
+| `PUT …/occupations` | **只**設 selected_ocs_codes(ADR 0029 脫鉤:不刷表頭、不建 draft;無序) | 無 codes→400 |
+| `GET …/knowledge` | 知識包(選職類後一次抓齊);**含 `similarity`**(態度/任務兩池的相似比對結果,ADR 0022,api 原樣搬運 indexer `items:match`) | 單 code 掛→partial;**全掛→502**(critical);match 掛→`similarity` 缺該 kind + `meta.similarity: ok\|partial\|unavailable`(enrichment) |
 | `GET …/document` | 最新 draft/final;無→空殼(status none, v0) | — |
 | `PATCH …/document` | 存整份 draft(loose,不 strict 驗) | 帶雙 token 且不符→**409**(ADR 0015) |
 | `POST …/document:finalize` | 組裝+驗 schema→正式版本 | schema 錯→**422** |
@@ -114,33 +127,49 @@ updated: 2026-07-04
 
 ## 6. 不變量(code 裡讀不出的規則)
 
-1. **選職類 = 唯一 knowledge 同步點**。只有 `useSetOccupations` 會 invalidate+prefetch `["knowledge",id]`;
-   其餘一切從這一包讀,不各自打 indexer。
+1. **選職能基準參考 = 唯一 knowledge 同步點**。只有 `useSetOccupations` 會 invalidate+prefetch `["knowledge",id]`;
+   其餘一切從這一包讀,不各自打 indexer。**參考/文件身分脫鉤(ADR 0029)**:PUT occupations 只記參考集合、
+   不寫表頭;主基準=職類視窗所選那本(選單/預設/「選同職能基準」全以它為視角,換選=視角重算);
+   選單啟用條件=**有參考**(非有身分)。移除的參考正好是文件身分→值留著、視角失效(選同鈕暗)、可換選。
 2. **單一寫入路徑**:所有 curation(選職責/任務/填格/表頭)= 前端純函式改 doc + autosave `PATCH`;
-   **沒有 curation 專用端點**(刻意,與 LLM 共編一致)。
+   **沒有 curation 專用端點**(刻意,與 LLM 共編一致)。訪談引擎(ADR 0023)不破此律:server 端寫入走同一條 `upsert_draft` seam;**人核准的建議由前端套用**再走 PATCH(端到端見 [`interview-engine.md`](interview-engine.md))。
 3. **來源三分**:`srcs`(全來源,線材)/ `_ref`(使用者選的那個,export 剝除)/ URN(身分,現組不落庫)。§2。
 4. **池序 = append 序**(職位優先序);**選單不排序、不搜尋**;無碼選項顯序號 `1. 2. 3.`(三類池例外顯真分類碼)。
 5. **A4 K/S 文件級去重**:碼以 **name 為 key 全文件共用**(首現給號、同名共碼);O/P 任務範圍、A 全域。
    `renumberDocKS` 在每次 K/S 內容或結構變動時跑。
-6. **預勾/自動勾選統一規則**(spec 2026-07-04 §4):「開誰的選單 → 給全池、預勾它自己的官方配套、
-   其餘可勾=借用」。**任務層**(OPKS 格/任務級別)defaults=該任務 own refs;**表頭層**(三類/基準級別/
-   態度/notes)defaults=**主基準來源**,主基準空白/自訂→不套。一律**首開且欄位空**才自動套(一次為限),
-   之後**以使用者動過的為準(文件是真相)**;「自動勾選」鈕一律在**選單頂列**。
+6. **「選同X」批次帶入**(ADR 0029 取代舊「首開自動套/自動勾選」):**首開自動寫全面退場**——
+   選單打開**不寫入**,只由明確點擊(選項本身,或窗頂「選同X」鈕)觸發。鈕文案分場景:職責/A/三類/
+   基準級別=**選同職能基準**(補主基準來源、還不在文件的項);任務窗(職責內)=**選同主要職責**;
+   O/P/K/S 格窗=**選同工作任務**(補來源任務官方配套);全域任務窗=選同職能基準(鋪官方骨架)。
+   **職類視窗未選(無主基準)→ 所有「選同職能基準」鈕 disabled**。defaults 集算法沿用(任務層=own refs、
+   表頭層=主基準來源;`primaryDefaults`)。素材庫欄(工作描述/說明)**無勾選狀態**,點=插入一列/附加段落。
 7. **取消勾選=移除**,但**有內容/含任務/在他職責 → 鎖定**(只能在表格刪;防誤刪已填資料)。
 8. **降級**(ADR 0018):部分 code 掛→`meta.partial=true`(前端提示部分暫缺);全掛→502(沒 knowledge 選不了)。
 9. **樂觀鎖 opt-in**(ADR 0015):web 一律帶 `expect_version+expect_revision`;409 **不回滾本地編輯**(使用者的字留著)→ ConflictDialog。
-10. **改名=斷鏈變自訂**(spec 2026-07-04 §5):職責/任務改名即清官方綁定(`_refs`/`source`/
-    `provenance`/`_levelSrc`)→ 列標「自訂」、選單取消勾選;職責改名**不**影響底下任務身分。
-    TaskPickerMenu 的 own 任務以 `unit._refs` 的 `(ocs_code, ocu_code)` 身分對位,**不比名字**。
+10. **改名不斷根**(ADR 0029:全層統一,取代舊「改名=斷鏈變自訂」):改字**保留**來源身分
+    (`_ref`/`_refs`/`source`/`provenance`/`_levelSrc`)——參考選單勾選判定**按身分不看 `_src`**、勾不掉,
+    列上顯**原名副行**(「原名:○○」);官方級別仍連動。O/P/K/S 值物件改字→`_src:custom` 但留 `_ref`
+    (`renamedRefItem`);職責/任務 `renameUnit`/`renameTask` 留 `_refs`(顯示碼=位置碼、原碼在來源行)。
+    身分對位:任務靠 URN、職責靠 `unit._refs` 的 `(ocs_code, ocu_code)`,**皆不比名字**(pack.ts `itemMatchesOption`)。
 11. **級別「值==官方值即官方」**(spec §9 決策 6):選中值等於官方級別→寫 `_levelSrc`,不等→清;
     不區分使用者選的還是自動帶的。基準代碼**再點已選項=整組清空**(code+兩名一起)。
+12. **相似比對分群 = render-only 顯示變換**(ADR 0022):選擇邏輯(`primaryDefaults`/首開自動套/
+    勾選判定/寫入身分)**永遠跑在平選項上,一行不改**;`groupedValueOptions`/`taskRowsWithSimilar`
+    只在 render 前折疊顯示列。**把分群搬進選擇邏輯 = 違規**。收合列**就是代表成員本人**
+    (群無可選身分,文件永遠只出現成員真身);任務灰區對**純顯示徽章**(不自動勾、不合併、不擋)。
+    兩個湧現不變量:(A) 來源不相交才比 ⇒ 一群內每基準最多一條 ⇒ 自動勾選不可能勾雙;
+    (B) survivorship 主基準優先 ⇒ 主基準成員在群內必為代表 ⇒ 自動套勾到的就是主基準身分。
 
 ## 7. 已退役 / 別做(anti-patterns)
 
 - **別叫這四個端點**(P3 已刪,web 已無對應 client):`…/document/task-candidates`、`…/document:buildTasks`、
   `…/header-meta`、`…/task-catalogs`。任務入文件只走 `addFromPool`/`addTasksToUnit` + `PATCH`。
 - **別為 curation 新開端點**——見不變量 2(單一寫入路徑)。
-- **別在選單排序/搜尋池**——append 序是刻意的(不變量 4)。
+- **CellFillerPanel / 任務四格「點此填」/ `CellTarget` 開板流已退役**(ADR 0029 §8)——O/P/K/S 走 TaskRow 內
+  OPLKS 全展開區,別救回底板。**FieldCombobox `customMode`(選單內自訂 footer)與 `autoApplyOnFirstOpen`
+  (首開自動寫)已移除**;自訂一律回表格「＋」加列,批次帶入走「選同X」鈕。
+- **別把 PUT /occupations 寫回表頭**——參考/身分脫鉤(ADR 0029);表頭身分唯一寫入口=職類視窗(前端 PATCH)。
+- **別在選單排序/搜尋池**——append 序是刻意的(不變量 4)。大池窗頂搜尋框只**過濾顯示**(全列照舊,ADR 0029)。
 - **別把 `_` 前綴欄當契約欄**——UI-only,finalize/export 剝除(§2)。
 - **`/ai/*` server 端點還在**(訪談引擎 ADR 0020),但 **web 目前零呼叫**;別以為 AI 預勾/自訂助手在跑
   ——P3 UI 修訂已拿掉,等引擎回歸(ADR 0020)。
@@ -148,6 +177,9 @@ updated: 2026-07-04
 ## 8. 指路(不複製內容,連過去)
 
 - **ADR**:[0021 知識包](../adr/0021-knowledge-pack-single-sync-point.md)(權威)、
+  [**0029 選單三型＋脫鉤＋OPLKS**](../adr/0029-editor-menus-three-types-decoupling.md)(本輪大改;
+  spec [`2026-07-11-editor-menus-redesign-research`](../specs/2026-07-11-editor-menus-redesign-research.md)、
+  plan [`2026-07-11-editor-menus-redesign`](../plans/2026-07-11-editor-menus-redesign.md))、
   [0018 降級](../adr/0018-indexer-dependency-degradation-policy.md)、
   [0015 樂觀鎖](../adr/0015-document-save-optimistic-concurrency.md)、
   [0019 命名](../adr/0019-api-naming-alignment.md)、[0011 生成型別](../adr/0011-web-ocs-types-generated.md)。

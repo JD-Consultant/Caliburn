@@ -2,6 +2,9 @@
 // which now mounts users + job_profiles CRUD under /api/v1. Legacy interview /
 // tasks / documents endpoints were removed with the old backend (Concern B).
 import type {
+  InterviewStartResponse,
+  InterviewTurnResponse,
+  InterviewView,
   DocumentEnvelope,
   JobProfile,
   KnowledgePack,
@@ -132,3 +135,46 @@ export const ocsSearch = (q: string) =>
 // server 端點全數保留（訪談引擎/agent 主線用，ADR 0020），但 web 目前零呼叫：
 // 填格/選任務改吃知識包（ADR 0021）後，recommend-ks/draft-op/extract-tasks/
 // structure-task 的 client 函式已退役（P3 UI 修訂：AI 預勾與自訂助手等引擎回歸）。
+
+// ── 訪談引擎(ADR 0023;AIP-136 :verb)──────────────────────────────────────
+// :turn 後文件可能被 server 端引擎改動 → 呼叫端(useInterview)負責 invalidate
+// ["document"],讓 data-layer 的「外部變化 effect」重設 baseline(零新機制)。
+export const startInterview = (profileId: string) =>
+  request<InterviewStartResponse>(`/job-profiles/${profileId}/interview:start`, {
+    method: "POST",
+  });
+
+export const interviewTurn = (profileId: string, text: string) =>
+  request<InterviewTurnResponse>(`/job-profiles/${profileId}/interview:turn`, {
+    method: "POST",
+    body: JSON.stringify({ text }),
+  });
+
+// 收尾對帳(T10;ADR 0030):態度綠標落地+結構化總結回讀 → phase=review。
+export interface FinishSummary { lines: string[]; pending_count: number; accepted_count: number }
+export const finishInterview = (profileId: string) =>
+  request<{ phase: string; blockers: number; summary?: FinishSummary }>(
+    `/job-profiles/${profileId}/interview:finish`,
+    { method: "POST" },
+  );
+
+export const getInterview = (profileId: string) =>
+  request<InterviewView>(`/job-profiles/${profileId}/interview`);
+
+// interviewCuration / reviewInterview 已退場(T12;ADR 0030):任務檢查表歸議程
+// 狀態機+側欄成組反問;✓/✗ 走 acceptPending/rejectPending + PATCH + review-events。
+
+// 審閱事件無聲記帳(ADR 0030 §6.3):✓/✗/批量只記錄不觸發 AI;文件變換
+// (去標/還原/renumber/PATCH)由前端執行(0025 不變量)。ledger 下回合讀被拒清單。
+// occupation_dismissed:關掉職類建議卡(0031)/task_board_dismissed:婉拒任務盤
+// 邀請卡「用聊的就好」(0032)——記帳供顧問下回合換話術
+export type ReviewDecision =
+  "accepted" | "rejected" | "batch_rejected" | "occupation_dismissed" | "task_board_dismissed";
+export const postReviewEvents = (
+  profileId: string,
+  events: { doc_path: string; decision: ReviewDecision; op_meta?: unknown }[],
+) =>
+  request<{ recorded: number }>(`/job-profiles/${profileId}/interview:review-events`, {
+    method: "POST",
+    body: JSON.stringify({ events }),
+  });

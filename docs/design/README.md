@@ -69,3 +69,4 @@ UI 動作 → 請求   點 X → GET/PATCH Y
 ## 現有文檔
 
 - [`editor-knowledge-pack.md`](./editor-knowledge-pack.md) — 編輯器 × 知識包(apps/web 著作 UI + apps/api knowledge/document 端點)
+- [`interview-engine.md`](./interview-engine.md) — 訪談引擎 × 文件工作台(v3 一個大腦/追蹤修訂;apps/api interview + apps/web 四態表格/側欄;ADR 0030)

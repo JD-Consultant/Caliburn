@@ -1,0 +1,119 @@
+"""訪談引擎資料模型(ADR 0023/0030)。
+
+四張表:sessions(進度列=引擎唯一狀態)/ turns(逐字稿=溯源真相)/
+review_events(✓✗ 無聲記帳)/ llm_calls(稽核)。
+守則:同 profile 同時最多一個 active session——應用層檢查 + DB partial unique 雙保險。
+"""
+import uuid
+
+from sqlalchemy import (
+    BigInteger, Column, DateTime, ForeignKey,
+    Identity, Index, Integer, Text, UniqueConstraint, func,
+)
+from sqlalchemy import text as sa_text   # 別名:InterviewTurn.text 欄位會遮蔽同名函式
+from sqlalchemy.dialects.postgresql import JSONB, UUID
+
+from app.models.base import Base
+
+
+class InterviewSession(Base):
+    __tablename__ = "interview_sessions"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    job_profile_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("job_profiles.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    status = Column(Text, nullable=False, server_default=sa_text("'active'"))   # active/review/done
+    phase = Column(Text, nullable=False, server_default=sa_text("'survey'"))    # survey/deep/review
+    focus = Column(JSONB, nullable=False, server_default=sa_text("'{}'::jsonb"))
+    counters = Column(JSONB, nullable=False, server_default=sa_text("'{}'::jsonb"))
+    human_touched = Column(JSONB, nullable=False, server_default=sa_text("'[]'::jsonb"))
+    # v2(ADR 0027;T2):覆蓋帳本不可重算的狀態(attempts/tier_override/probe);
+    # 其餘一律由 doc 重算(12-Factor F5/F12)。
+    ledger_state = Column(JSONB, nullable=False, server_default=sa_text("'{}'::jsonb"))
+
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+    __table_args__ = (
+        # 同 profile 最多一個 active(部分唯一索引;應用層先查,這裡兜同毫秒競態)
+        Index(
+            "uq_interview_sessions_one_active",
+            "job_profile_id",
+            unique=True,
+            postgresql_where=sa_text("status = 'active'"),
+        ),
+    )
+
+
+class InterviewTurn(Base):
+    __tablename__ = "interview_turns"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    session_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("interview_sessions.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    seq = Column(Integer, nullable=False)
+    role = Column(Text, nullable=False)          # employee/consultant
+    text = Column(Text, nullable=False)
+    commands = Column(JSONB, nullable=False, server_default=sa_text("'[]'::jsonb"))
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    __table_args__ = (
+        UniqueConstraint("session_id", "seq", name="uq_interview_turns_session_seq"),
+    )
+
+
+# interview_evidence / interview_suggestions 已退場(T12;ADR 0030):
+# 溯源住文件 `_pending.src`、審閱住 interview_review_events(migration 0008 落表)。
+
+
+class InterviewReviewEvent(Base):
+    """審閱事件(ADR 0030 T2):✓/✗/批量拒絕的無聲記帳。
+
+    §6.3 語意:UI 端安靜(不觸發 AI);事件供(a)ledger 讀成「上輪被拒清單」
+    下回合利用(不重提、可追問)、(b)trace/evals 分析(改寫率、拒絕率)。
+    decision ∈ accepted | rejected | batch_rejected。
+    """
+    __tablename__ = "interview_review_events"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    seq = Column(BigInteger, Identity(), nullable=False)  # 批量同刻的穩定序
+    session_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("interview_sessions.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    doc_path = Column(Text, nullable=False)
+    decision = Column(Text, nullable=False)
+    op_meta = Column(JSONB, nullable=False, server_default=sa_text("'{}'::jsonb"))
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    __table_args__ = (
+        Index("ix_interview_review_events_session", "session_id", "created_at"),
+    )
+
+
+class InterviewLlmCall(Base):
+    """稽核:每回合每次 LLM 呼叫一列(ADR 0027 T13;§13 收編5 多租戶 observability)。"""
+    __tablename__ = "interview_llm_calls"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    session_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("interview_sessions.id", ondelete="CASCADE"),
+        nullable=False, index=True,
+    )
+    turn_seq = Column(Integer, nullable=False)
+    role = Column(Text, nullable=False)              # interview/select/backstop
+    model = Column(Text, nullable=False)
+    duration_ms = Column(Integer, nullable=False)
+    prompt_tokens = Column(Integer)
+    completion_tokens = Column(Integer)
+    tool_calls = Column(JSONB, nullable=False, server_default=sa_text("'[]'::jsonb"))
+    guard_verdicts = Column(JSONB, nullable=False, server_default=sa_text("'[]'::jsonb"))
+    created_at = Column(DateTime(timezone=True), server_default=func.now())

@@ -7,7 +7,7 @@ Caliburn 是一個 monorepo:**Turborepo**(任務編排)+ **npm workspaces**(JS)+
 
 ```
 apps/
-  api/          Python·uv   FastAPI + LangGraph 後端(:8001)   import 名 = app
+  api/          Python·uv   FastAPI + 訪談引擎後端(:8001)     import 名 = app
   web/          Next.js     前端(:3000)
   ocs-indexer/  Python·uv   Qdrant + BGE-M3 知識服務(:8000)
   pdf-to-json/  Python·uv   PDF → OCS JSON ETL(CLI,非常駐)

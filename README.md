@@ -30,7 +30,7 @@ npm run down    # = docker compose down + kill-port 3000/8000/8001（停 infra +
 | 服務 | 埠 | 說明 |
 |---|---|---|
 | **web** | http://localhost:3000 | Next.js 前端（著作工作台,入口 `/dashboard` → `/documents/[id]`) |
-| **api** | http://localhost:8001 | FastAPI + LangGraph 後端（健康檢查 `/healthz`） |
+| **api** | http://localhost:8001 | FastAPI + 訪談引擎後端（健康檢查 `/healthz`） |
 | **ocs-indexer** | http://localhost:8000 | Qdrant 知識/查詢服務 |
 | **db** | localhost:5432 | Postgres（業務表;無 in-DB 向量,檢索走 Qdrant;容器 `caliburn-db-1`） |
 | **qdrant** | localhost:6333 | 向量庫（容器 `caliburn-qdrant-1`） |

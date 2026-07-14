@@ -13,6 +13,7 @@ from app.core.knowledge_dto import (
     CitableItem,
     CodeName,
     CompetencyPool,
+    MatchResponse,
     OccupationDetail,
     OccupationTasks,
     OcsName,
@@ -23,10 +24,17 @@ from app.core.knowledge_dto import (
 
 
 class StubKnowledge:
-    """兩個 code 的完整三資源 stub;fail_codes 內的 code 任一資源丟例外。"""
+    """兩個 code 的完整三資源 stub;fail_codes 內的 code 任一資源丟例外;
+    fail_match=True → match 丟例外(similarity 降級路徑)。"""
 
-    def __init__(self, fail_codes=()):
+    def __init__(self, fail_codes=(), fail_match=False):
         self.fail = set(fail_codes)
+        self.fail_match = fail_match
+
+    async def match(self, kind, items):
+        if self.fail_match:
+            raise RuntimeError("indexer down")
+        return MatchResponse()
 
     def _check(self, code):
         if code in self.fail:
@@ -86,7 +94,8 @@ async def test_knowledge_happy_two_codes(client):
     assert [s["ocs_code"] for s in pack["pools"]["knowledge"]["統計"]["srcs"]] == ["OC1", "OC2"]
     assert pack["pools"]["tasks"]["保養"]["srcs"] == ["ocs:OC1:T:T1.1", "ocs:OC2:T:T1.1"]
     assert pack["source_tasks"]["ocs:OC1:T:T1.1"]["k_refs"] == ["統計"]
-    assert pack["meta"] == {"partial": False}
+    assert pack["meta"] == {"partial": False, "similarity": "ok"}
+    assert set(pack["similarity"].keys()) == {"attitude", "task"}   # 原樣掛(空結果也掛)
 
 
 @pytest.mark.asyncio
@@ -97,7 +106,20 @@ async def test_knowledge_one_code_down_degrades_partial(client):
     assert r.status_code == 200, r.text
     pack = r.json()
     assert [d["ocs_code"] for d in pack["occupation_details"]] == ["OC1"]
-    assert pack["meta"] == {"partial": True}
+    assert pack["meta"] == {"partial": True, "similarity": "ok"}
+
+
+@pytest.mark.asyncio
+async def test_knowledge_match_down_degrades_similarity_only(client):
+    p = await _mk_profile(client._db, ["OC1", "OC2"])
+    app.dependency_overrides[get_knowledge] = lambda: StubKnowledge(fail_match=True)
+    r = await client.get(f"/api/v1/job-profiles/{p.id}/knowledge")
+    assert r.status_code == 200, r.text
+    pack = r.json()
+    # 池本體完好(enrichment 語意);similarity 空、meta 顯式標 unavailable
+    assert pack["pools"]["tasks"]["保養"]["srcs"] == ["ocs:OC1:T:T1.1", "ocs:OC2:T:T1.1"]
+    assert pack["similarity"] == {}
+    assert pack["meta"] == {"partial": False, "similarity": "unavailable"}
 
 
 @pytest.mark.asyncio

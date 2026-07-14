@@ -11,22 +11,12 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from evals import checks  # noqa: E402
-from app.authoring.build_doc import _assemble  # noqa: E402
+
 
 _DATA = os.path.join(os.path.dirname(__file__), "datasets", "json_zhtw.json")
 
-# 文件正確性用的固定 state（deterministic，不需模型）
-_DOC_STATE = {
-    "job_title": "設備維護工程師", "job_summary": "維護產線設備",
-    "profile": {"selected_ocs_code": "OC1"},
-    "tasks": [{"task_name": "巡檢", "unit_id": "U1", "unit_title": "預防保養",
-               "situation": "晨班巡檢產線", "purpose": "確保設備可用",
-               "workflow_steps": ["逐台檢查"], "outputs": ["點檢表"],
-               "behavior_indicators": [{"output_name": "點檢表", "indicator_5w2h": "每日晨班完成點檢表",
-                                        "quality_score": 0.8}]}],
-    "ksa": {"knowledge": [{"content": "設備原理", "source": "catalog", "icap_ref": "K01"}],
-            "skills": [], "attitudes": []},
-}
+# doc_structure 類已隨 app/authoring 退場(T12;ADR 0030)——結構驗證改由
+# 契約 schema + verify 六查 + promptfoo 確定性斷言承擔。
 
 
 async def _eval_json_zhtw(llm) -> dict:
@@ -41,20 +31,12 @@ async def _eval_json_zhtw(llm) -> dict:
     return {"passed": all(r["ok"] for r in results), "cases": results}
 
 
-def _eval_doc_structure() -> dict:
-    doc = _assemble(_DOC_STATE)
-    ok, reasons = checks.doc_structure_ok(doc)
-    ok = ok and checks.deep_quality_ok(_DOC_STATE["tasks"][0])
-    return {"passed": ok, "reasons": reasons}
-
-
 async def run_all(llm=None) -> tuple[bool, dict]:
     if llm is None:
         from app.adapters.llm_openrouter import OpenRouterLlm
         llm = OpenRouterLlm()
     report = {
         "json_zhtw": await _eval_json_zhtw(llm),
-        "doc_structure": _eval_doc_structure(),
     }
     passed = all(section["passed"] for section in report.values())
     return passed, report

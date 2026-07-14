@@ -1,8 +1,11 @@
 import { describe, expect, it } from "vitest";
 import type { OcsDocument, OcsTask } from "@/types";
 import {
+  addCustomDuty,
+  addCustomTask,
   addTasksToUnit,
   deleteTask,
+  ensureIds,
   relocateTask,
   reorderUnits,
   clearPrimaryBasis,
@@ -58,6 +61,35 @@ const codesOf = (d: OcsDocument, ui: number) =>
     p: t.competency_blocks?.[0]?.indicators?.map((x) => x.code),
   }));
 
+describe("ensureIds(補足 virgin/部分草稿骨架)", () => {
+  // 真實崩因:ADR 0029 選職類只寫 profile,AI 訪談 curation 把官方任務落進 {} doc →
+  // 存下的草稿有 ocs_content、卻從沒 seed ocs_profile;GET 原樣回 → DocHeader 讀 p.ocs_code 爆。
+  it("草稿缺 ocs_profile(訪談先寫 ocs_content)→ 補足骨架,DocHeader 讀 p.ocs_code 不爆", () => {
+    const raw = { ocs_content: { ocu_units: [] } } as unknown as OcsDocument;
+    const doc = ensureIds(raw)!;
+    expect(doc.ocs_profile).toBeDefined();
+    expect(doc.ocs_profile.ocs_code).toBe("");                  // !!p.ocs_code 安全
+    expect(doc.ocs_profile.ocs_name).toBeDefined();             // setOcsName/setPrimaryBasis 安全
+    expect(doc.ocs_profile.category.occupations).toEqual([]);   // setCategory/加列 安全
+  });
+
+  it("不覆蓋既有 ocs_profile 欄位、只補缺的子結構", () => {
+    const raw = { ocs_profile: { ocs_code: "ISD2519" } } as unknown as OcsDocument;
+    const doc = ensureIds(raw)!;
+    expect(doc.ocs_profile.ocs_code).toBe("ISD2519");           // 保留既有
+    expect(doc.ocs_profile.ocs_name).toBeDefined();             // 補上缺的子結構
+    expect(doc.ocs_profile.category).toBeDefined();
+  });
+
+  it("空文件 {} → 五頂層鍵齊全(型別承諾的 OcsDocument 不變量)", () => {
+    const doc = ensureIds({} as unknown as OcsDocument)!;
+    expect(doc.ocs_content.ocu_units).toEqual([]);
+    expect(doc.ocs_attitude.attitudes).toEqual([]);
+    expect(doc.notes.prerequisites).toEqual([]);
+    expect(doc.version_info.versions).toEqual([]);
+  });
+});
+
 describe("relocateTask(拖拉換序)", () => {
   it("同職責內換序:任務碼與 O/P 位置碼都跟著新位置(ccdfbde 回歸)", () => {
     const doc = docWith([{ name: "U1", tasks: [task("T1.1", "甲"), task("T1.2", "乙")] }]);
@@ -102,6 +134,29 @@ describe("reorderUnits / deleteTask(其他結構變動)", () => {
   });
 });
 
+describe("位置碼:custom 與官方一視同仁(ADR 0029;spec §7)", () => {
+  it("自訂任務/項目與官方一樣依位置連號(T/O/P);身分(_src/provenance)不影響顯示碼", () => {
+    const custom = {
+      task_codes: [{ code: "", name: "自訂任務" }],
+      competency_blocks: [{
+        competency_level: null,
+        outputs: [{ code: "", name: "自訂產出", _id: "co", _src: "custom" }],
+        indicators: [{ code: "", text: "自訂指標", _id: "cp", _src: "custom" }],
+        knowledge: [], skills: [],
+      }],
+      provenance: { ocs_code: "", task_code: "" }, _tid: "tid-custom",
+    } as unknown as OcsTask;
+    const doc = docWith([
+      { name: "U1", tasks: [task("T1.1", "甲")] },   // 官方
+      { name: "U2", tasks: [custom] },               // 自訂(無 provenance、items custom)
+    ]);
+    const next = reorderUnits(doc, 1, 0); // 自訂職責換到最前
+    expect(next.ocs_content.ocu_units[0].ocu_code).toBe("T1");
+    expect(codesOf(next, 0)).toEqual([{ task: "T1.1", o: ["O1.1.1"], p: ["P1.1.1"] }]); // 自訂照拿位置碼
+    expect(codesOf(next, 1)).toEqual([{ task: "T2.1", o: ["O2.1.1"], p: ["P2.1.1"] }]); // 官方隨位置重編
+  });
+});
+
 describe("setOp / setKS(內容編輯的重編)", () => {
   it("setOp:O/P 依任務位置重編", () => {
     const doc = docWith([{ name: "U1", tasks: [task("T1.1", "甲")] }]);
@@ -137,24 +192,25 @@ describe("setOp / setKS(內容編輯的重編)", () => {
   });
 });
 
-describe("改名斷鏈 + 級別來源(spec 2026-07-04 §2/§5)", () => {
-  it("renameTask:清 provenance/_refs/_levelSrc → 變自訂", () => {
+describe("改名不斷根 + 級別來源(ADR 0029;spec 2026-07-11 §2.4/§4)", () => {
+  it("renameTask:保留 provenance/_refs/_levelSrc(身分不斷根;原名靠 pack 對位顯示)", () => {
     const doc = docWith([{ name: "U1", tasks: [task("T1.1", "甲")] }]);
     doc.ocs_content.ocu_units[0].tasks[0]._refs = [{ ocs_code: "OC1", occupation_name: "甲職", code: "" }];
     doc.ocs_content.ocu_units[0].tasks[0]._levelSrc = { ocs_code: "OC1", occupation_name: "甲職", code: "", level: 3 };
     const next = renameTask(doc, 0, 0, "改過的名字");
     const t = next.ocs_content.ocu_units[0].tasks[0];
-    expect(t.provenance).toEqual({ ocs_code: "", task_code: "" });
-    expect(t._refs).toBeUndefined();
-    expect(t._levelSrc).toBeUndefined();
+    expect(t._refs).toEqual([{ ocs_code: "OC1", occupation_name: "甲職", code: "" }]);
+    expect(t._levelSrc).toMatchObject({ level: 3 });
     expect(t.task_codes![0].name).toBe("改過的名字");
   });
-  it("renameUnit:清 source/_refs", () => {
+  it("renameUnit:保留 source/_refs(身分不斷根)", () => {
     const doc = docWith([{ name: "U1", tasks: [] }]);
     doc.ocs_content.ocu_units[0]._refs = [{ ocs_code: "OC1", occupation_name: "甲職", code: "", ocu_code: "T1" }];
+    doc.ocs_content.ocu_units[0].source = { ocs_code: "OC1", occupation_name: "甲職" };
     const next = renameUnit(doc, 0, "新名");
-    expect(next.ocs_content.ocu_units[0]._refs).toBeUndefined();
-    expect(next.ocs_content.ocu_units[0].source).toEqual({ ocs_code: "", occupation_name: "" });
+    expect(next.ocs_content.ocu_units[0]._refs).toEqual([{ ocs_code: "OC1", occupation_name: "甲職", code: "", ocu_code: "T1" }]);
+    expect(next.ocs_content.ocu_units[0].source).toEqual({ ocs_code: "OC1", occupation_name: "甲職" });
+    expect(next.ocs_content.ocu_units[0].ocu_name).toBe("新名");
   });
   it("setTaskLevel 無 src → 清舊 _levelSrc(修殘留)", () => {
     const doc = docWith([{ name: "U1", tasks: [task("T1.1", "甲")] }]);
@@ -242,5 +298,40 @@ describe("setAttitudes / addTasksToUnit", () => {
     ]);
     const t = next.ocs_content.ocu_units[0].tasks[1];
     expect(t.task_codes?.[0]).toEqual({ code: "T1.2", name: "新任務" });
+  });
+});
+
+describe("addCustomTask / addCustomDuty(訪談抓漏核准落地,RC4)", () => {
+  it("addCustomTask:掛到現有職責(by _uid)、位置碼、自訂無來源", () => {
+    const doc = docWith([{ name: "U1", tasks: [task("T1.1", "甲")] }]);
+    const next = addCustomTask(doc, "uid-U1", "處理床位滿");
+    const tasks = next.ocs_content.ocu_units[0].tasks;
+    expect(tasks).toHaveLength(2);
+    expect(tasks[1].task_codes?.[0]).toEqual({ code: "T1.2", name: "處理床位滿" });
+    expect(tasks[1]._tid).toBeTruthy();                              // 有身分
+    expect(tasks[1].provenance).toEqual({ ocs_code: "", task_code: "" });  // 公版外
+  });
+
+  it("addCustomTask:unit_ref 對不上 → 開自訂職責掛上(核准的任務不消失)", () => {
+    const doc = docWith([{ name: "U1", tasks: [] }]);
+    const next = addCustomTask(doc, "床位管理", "處理床位滿");
+    expect(next.ocs_content.ocu_units).toHaveLength(2);
+    const u2 = next.ocs_content.ocu_units[1];
+    expect(u2.ocu_name).toBe("床位管理");
+    expect(u2.tasks[0].task_codes?.[0]).toEqual({ code: "T2.1", name: "處理床位滿" });
+    expect(u2.source).toEqual({ ocs_code: "", occupation_name: "" });  // 自訂職責
+  });
+
+  it("addCustomDuty:開新自訂職責、位置碼 T2", () => {
+    const doc = docWith([{ name: "U1", tasks: [] }]);
+    const next = addCustomDuty(doc, "客戶問題支援");
+    expect(next.ocs_content.ocu_units[1].ocu_name).toBe("客戶問題支援");
+    expect(next.ocs_content.ocu_units[1].ocu_code).toBe("T2");
+  });
+
+  it("純函式:不就地改動原件", () => {
+    const doc = docWith([{ name: "U1", tasks: [] }]);
+    addCustomTask(doc, "uid-U1", "x");
+    expect(doc.ocs_content.ocu_units[0].tasks).toHaveLength(0);
   });
 });

@@ -18,7 +18,7 @@ async def lifespan(app: FastAPI):
 
 
 # REST-only entry (tests / docker). Wiring comes from the single composition
-# root in app_factory.configure; the live app adds /copilotkit on top (ADR 0017).
+# root in app_factory.configure(T12 後唯一入口;run_live.py 直起本 app,ADR 0017/0030).
 app = configure(
     FastAPI(
         title=settings.app_name,

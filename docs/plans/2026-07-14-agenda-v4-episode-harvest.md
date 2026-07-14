@@ -135,25 +135,45 @@
   釘「教材真的被載入 prompt」,正是這次驗屍中斷掉沒人發現的那條線。
 - 驗:新套件綠;既有全綠。
 
-### T8|service 回合序 v4+guardrail+梯子退役(+design 文檔同 commit)
+### T8|service 回合序 v4(拆三子步:先加新軌綠→再拆舊軌;green-before==green-after)
 
-- 改:`service.py` 依 spec §3.2 重排:agenda_view 注入顧問 context;
-  close/auto-close 觸發 `harvest_pass`+`_persist`(409 同書記重放);
-  attempts 改 episode 粒度(T2 止血版讓位);`signals` 驅動提示/auto-close。
-- 刪:`ledger.next_gap` 梯子+`ledger_summary`/`_ONBOARD_STEER` 中被 artifact
-  取代的部分;`ledger.py` 剩餘狀態函式併入 agenda.py 後**整檔退役**
-  (re-export 清掉,import 全改 coverage/agenda)。
-- onboarding/curation 縫判定(原⓪/⓪′)搬 agenda(條件不變:無參考→選職類;
-  無任務→intake/curation)。
-- 測:service 套件改寫斷言(黃金流程:開場→open→深挖 2 輪→飽和提示→
-  close→收割落 P→換事件);梯子測試刪除。
-- 測【接縫】:(a)build_consultant_messages 輸出含 `<議程>` 區塊(artifact
-  真的注入);(b)close_episode → harvest_pass 被呼(mock 斷言,「收了真的
-  有收割」);(c)第 3 輪零收益 → auto-close 觸發收割;(d)repo 內 grep 無
-  `next_gap` 殘留引用。
-- 文檔:**同 commit** 更新 `docs/design/interview-engine.md`(§4 回合序 v4、
-  §5 載體表加收割、不變量 13=議程決策唯一路=顧問工具+guardrail、
-  退役禁令加 next_gap 梯子)。
+**拆分理由**:原 T8 把「啟用新架構+刪舊梯子」擠一個 commit=最高風險。改雙軌:
+T8a/T8b 增量加新行為(舊梯子仍在跑,不刪),各自綠;T8c 才拆舊梯子。任何子步可停。
+
+#### T8a|收割接線:close/auto-close → harvest_pass(新架構第一次真的產 P)
+
+- 改:`service.py` run_turn——書記 pass 後加收割段:
+  `sig = AG.signals(state, emp_turn.seq)`;auto-close(sig["auto_close"] 且事件開著)
+  先 `AG.close_episode(reason="auto")`+設 pending_harvest;
+  `pending_harvest` → 取 `episodes[-1]` 為收割對象 → `harvest_pass(doc=收割前最新doc,
+  turns=turns_map, episode=harvest_ep, ...)` → `_persist`(復用書記 409 重放路) → 清 flag。
+  收割吃**書記落地後**的 doc(避免蓋掉本回合綠字);doc_changed |= 收割落地。
+- 測【接縫】:(a)手動 close(chat_trace)+ fake 收割 select → P 落 `_pending`、
+  pending_harvest 清;(b)auto-close(state 預置 dry_streak=3)→ episode 歸檔 reason=auto
+  +收割被呼。
+- 驗:api 全綠(舊梯子/next_gap 仍在,行為疊加不衝突)。
+
+#### T8b|artifact 注入 + episode 進帳(顧問看得到議程;飽和訊號活過來)
+
+- 改:`consultant.build_consultant_messages` 加 `agenda_view: str = ""` 參數,
+  非空則注入 `<議程>` 區塊(**加**在 ctx,暫不刪 ledger_summary——雙軌並存驗證);
+  `service` 算 `AG.agenda_view(work_doc, state, ..., turns_n=emp_turn.seq)` 傳入。
+- 改:收帳 `state = AG.bump_streaks(state, has_episode=..., progressed=episode_yield(...))`
+  (episode 粒度;與舊 note_attempt 並存,T8c 拆舊)。
+- 測【接縫】:(a)messages 含 `<議程>`;(b)開著事件連 2 輪零落地 → signals
+  stalled_episode True;(c)auto_close 在第 3 輪。
+- 驗:api 全綠。
+
+#### T8c|梯子退役(拆舊軌;確定性收斂完成)
+
+- 刪:`ledger.next_gap`+`ledger_summary`/`_ONBOARD_STEER` 被 artifact 取代部分;
+  onboarding/curation 縫判定搬 `agenda`(條件不變:無參考→選職類;無任務→intake/
+  curation);`ledger.py` 剩餘狀態函式(held/boundary/fatigue/note_attempt)併入
+  `agenda.py`,`ledger.py` 整檔退役(re-export 清、import 全改 coverage/agenda)。
+- 刪:`test_interview_ledger.py` 梯子測試;service 舊 last_gap/note_attempt 斷言改寫。
+- 測【接縫】:repo grep 無 `next_gap`/`ledger_summary` 殘留;`ledger` import 歸零。
+- 文檔:**同 commit** 更新 `docs/design/interview-engine.md`(§4 回合序 v4、§5 載體
+  表加收割、不變量 13=議程決策唯一路=顧問工具+guardrail、退役禁令加 next_gap 梯子)。
 - 驗:api 全綠+`npx turbo test` 全綠。
 
 ### T9|consultant prompt v4+GPT-5.6 紀律(spec §2.8)

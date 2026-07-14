@@ -19,6 +19,7 @@ from app.interview import ledger as L
 from app.interview.attitudes import attitudes_pass
 from app.interview.backstop import SWEEP_EVERY, backstop_sweep
 from app.interview.curation import curation_ops, curation_pass
+from app.interview.harvest import harvest_pass
 from app.interview.scribe import (
     ScribeResult, _doc_ocs_codes, build_pool_inputs, land_ops, scribe_pass,
     worth_scribing,
@@ -283,6 +284,33 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> T
             turns=turns_map, header_codes=header_codes)
     else:
         extra_guard = ["scribe:skip(meta/寒暄回合,喚醒閘)"]
+
+    # ③⅝ 收割 pass(0033 T8a:close/auto-close → 對事件逐字稿 BEI 編碼,P 的家)。
+    # auto-close guardrail=後衛(連 3 輪零收益顧問沒收,系統替他收);吃書記落地後的 doc。
+    harvest_ms = 0
+    sig = AG.signals(state, emp_turn.seq)
+    if sig["auto_close"] and AG.episode_state(state) is not None:
+        state = AG.close_episode(state, reason="auto", seq=emp_turn.seq)
+        state["pending_harvest"] = True
+    if state.get("pending_harvest"):
+        harvest_ep = (state.get("episodes") or [None])[-1]
+        if harvest_ep:
+            h_latest = await doc_repo.latest(profile_id)     # 書記落地後最新
+            t_h = time.perf_counter()
+            h_res = await harvest_pass(
+                llm, knowledge, doc=(h_latest or {}).get("content") or {},
+                turns=turns_map, episode=harvest_ep, header_codes=header_codes,
+                ref_ocs_codes=tuple(ref_list))
+            harvest_ms = int((time.perf_counter() - t_h) * 1000)
+            h_changed, h_guard = await _persist_scribe_doc(
+                doc_repo, profile_id, h_latest, h_res,
+                turns=turns_map, header_codes=header_codes)
+            doc_changed = doc_changed or h_changed
+            extra_guard += ["harvest:" + g for g in h_guard]
+            await repo.add_llm_call(session.id, turn_seq=emp_turn.seq, role="select",
+                                    model=model_for_role("select"), duration_ms=harvest_ms,
+                                    guard_verdicts=list(h_res.guard_log)[:30])
+        state = {k: v for k, v in state.items() if k != "pending_harvest"}
 
     # ③⅞ backstop sweep(每 N 員工回合;確定性撿漏 → held 待問;§6.4 禁 LLM)
     # 判重要吃**書記落地後**的 doc——本回合剛落的綠字才算「已在文件」,否則重複追問

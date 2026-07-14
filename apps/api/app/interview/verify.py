@@ -142,6 +142,11 @@ def verify_ops(ops: list[dict], *, doc: dict, turns: dict[int, str],
                 elif (len(segs) >= 3 and segs[-3] == "competency_blocks"
                       and isinstance(get_at(doc, ".".join(segs[:-3])), dict)):
                     container = []   # blocks 整列缺殼但 task 在(落地端建殼)
+                elif path == "ocs_content.ocu_units":
+                    # 處女文件:ocs_content 整鍵缺席/None(0033 BUG-1)——頂層鏈
+                    # 視為空容器;apply 端 setdefault 鏈建骨架。守門仍在下方 src 查
+                    # (殼必帶官方 ref_urn),不因此開放自由建職責。
+                    container = []
                 else:
                     err(i, "permission",
                         f"op[{i}] add 目標 {path} 在文件中不存在——任務必掛在已存在的"

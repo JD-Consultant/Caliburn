@@ -93,6 +93,22 @@ def test_add_to_missing_container_rejected():
     assert not r.ok and r.errors[0].check == "permission"
 
 
+def test_add_unit_shell_on_virgin_doc():
+    """0033 T1(BUG-1):處女文件(ocs_content 缺席/None/{}/空列)官方殼一律放行
+    (apply 端 setdefault 鏈會建骨架;session 330a0bed 第 3 輪全滅的根因);
+    quote-only 自由職責照樣 src 拒——fail-closed 不因此鬆動。"""
+    op = [{"target_path": "ocs_content.ocu_units", "op": "add", "value": "設備保養",
+           "src": {"ref_urn": "ocs:unit:ABC1234:t2", "quote": _q()}}]
+    for doc in ({}, {"ocs_content": None}, {"ocs_content": {}},
+                {"ocs_content": {"ocu_units": []}}):
+        r = verify_ops(op, doc=doc, turns=TURNS, ref_codes=REFS, header_codes=HEADERS)
+        assert r.ok, (doc, r.errors)
+    bad = [{"target_path": "ocs_content.ocu_units", "op": "add", "value": "自由職責",
+            "src": {"quote": _q()}}]
+    r2 = verify_ops(bad, doc={}, turns=TURNS, ref_codes=REFS, header_codes=HEADERS)
+    assert not r2.ok and r2.errors[0].check == "src"
+
+
 def test_add_unit_shell_official_only():
     """0032:官方殼開放但 fail-closed 精神不變——quote-only(自由新增職責)拒收;
     池內官方 URN 才放行(落地端建殼;書記 schema 仍無此變體,生成端編不出)。"""

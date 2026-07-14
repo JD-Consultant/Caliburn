@@ -98,3 +98,34 @@ def test_pydantic_rejects_unknown_type():
     from pydantic import ValidationError
     with pytest.raises(ValidationError):
         CurationOutput.model_validate({"records": [{"type": "delete_all"}]})
+
+
+def test_curation_ops_two_phase_lands_on_virgin_doc():
+    """0033 T1【接縫,BUG-1】:**空文件**+quote-backed precheck → 官方殼+任務
+    兩相直落成功(= session 330a0bed 第 3 輪 14 筆全滅的場景轉綠)。
+    復刻 service ②½ 的兩相迴圈:u_ops 先落、t_ops 對含殼文件再驗。"""
+    from app.interview.curation import curation_ops
+    from app.interview.scribe import land_ops
+
+    pool_by_key = {"ISD:T1": {"key": "ISD:T1", "name": "需求訪談", "unit": "規劃",
+                              "ocs_code": "ISD", "task_code": "T1",
+                              "task_urn": "ocs:ISD:T:T1", "unit_urn": "ocs:ISD:U:U1"}}
+    turns = {3: "我平常主要跟客戶開需求訪談"}
+    precheck = [{"key": "ISD:T1", "name": "需求訪談", "unit": "規劃",
+                 "quote": "跟客戶開需求訪談"}]
+    u_ops, t_ops, guard = curation_ops(precheck, doc={}, turns=turns,
+                                       pool_by_key=pool_by_key)
+    assert u_ops and t_ops, guard
+    doc: dict = {}
+    for phase_ops in (u_ops, t_ops):
+        nd, g, landed = land_ops(phase_ops, doc=doc, turns=turns,
+                                 ref_codes={"ocs:ISD:T:T1", "ocs:ISD:U:U1"},
+                                 header_codes=set(), pool_items={})
+        assert nd is not None and landed, g
+        doc = nd
+    unit = doc["ocs_content"]["ocu_units"][0]
+    assert unit["ocu_name"] == "規劃" and unit["_pending"]["op"] == "add"
+    task = unit["tasks"][0]
+    assert task["task_codes"][0]["name"] == "需求訪談"
+    assert task["provenance"] == {"ocs_code": "ISD", "task_code": "T1"}
+    assert task["_pending"]["op"] == "add"

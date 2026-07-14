@@ -18,9 +18,19 @@ def _task(name, details=None, p=0, k=0, s=0, o=0, tid=None):
 
 
 def _doc(tasks):
-    return {"ocs_content": {"ocu_units": [{"_uid": "U1", "ocu_name": "規劃",
+    return {"ocs_profile": {"ocs_code": "X"},                # 有職類 → 走正常議程視圖
+            "ocs_content": {"ocu_units": [{"_uid": "U1", "ocu_name": "規劃",
                                            "tasks": tasks}]},
             "ocs_attitude": {"attitudes": []}}
+
+
+def _blank_doc():                                            # 無職類 → onboarding 分支
+    return {"ocs_profile": {}, "ocs_content": {"ocu_units": []},
+            "ocs_attitude": {"attitudes": []}}
+
+
+_POOL = [{"key": "X:T1", "name": "需求訪談", "ocs_code": "X", "task_code": "T1"},
+         {"key": "X:T9", "name": "自動化腳本維護", "ocs_code": "X", "task_code": "T9"}]
 
 
 # ---- episode 狀態機 ----
@@ -117,3 +127,32 @@ def test_agenda_view_no_uuid_leak():
     doc = _doc([_task("需求訪談", tid="abc-123-uuid")])
     view = A.agenda_view(doc, {}, pool_tasks=[], ref_codes=frozenset())
     assert "abc-123-uuid" not in view
+
+
+# ---- artifact onboarding/curation/writein 分支(T8c-A:吸收退役的 ledger_summary/_ONBOARD_STEER) ----
+
+def test_agenda_view_onboarding_steers_occupation():
+    """無職類(文件空白)→ artifact 引導選職類,且明示選職類前不問態度(取代 _ONBOARD_STEER)。"""
+    view = A.agenda_view(_blank_doc(), {}, pool_tasks=[], ref_codes=frozenset())
+    assert "選職類" in view
+    assert "態度" in view                                    # 明示選職類前不問態度
+    assert "接下來問:工作態度" not in view                   # 不得指使問態度(BUG-3 舊病)
+
+
+def test_agenda_view_curation_group_probe():
+    """有職類、官方池仍有 unasked → artifact 列名成組反問,且不問態度(取代 ledger_summary curation)。"""
+    doc = _doc([_task("需求訪談", tid="C")])                  # 覆蓋 X:T1(名稱對位)
+    view = A.agenda_view(doc, {}, pool_tasks=_POOL, ref_codes=frozenset({"X"}))
+    assert "自動化腳本維護" in view and "有做" in view          # unasked=X:T9 成組反問
+    assert "態度" in view
+
+
+def test_agenda_view_writein_probe_once():
+    """檢查表全處置 → artifact 吐一次 write-in 抓漏;writein_asked 設了就不吐(取代 ledger_summary writein)。"""
+    doc = _doc([_task("需求訪談", tid="C")])                  # 覆蓋 X:T1
+    state = {"declined": ["X:T9"]}                           # X:T9 declined → 無 unasked
+    s1 = A.agenda_view(doc, state, pool_tasks=_POOL, ref_codes=frozenset({"X"}))
+    assert "官方沒列" in s1
+    s2 = A.agenda_view(doc, {**state, "writein_asked": True},
+                       pool_tasks=_POOL, ref_codes=frozenset({"X"}))
+    assert "官方沒列" not in s2

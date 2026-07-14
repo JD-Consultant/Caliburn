@@ -1,4 +1,5 @@
 """T5(v3;ADR 0030):議程四態(held/boundary)+疲勞偵測+喚醒閘+四態視圖。純函式。"""
+from app.interview import agenda as AG
 from app.interview import ledger as L
 from app.interview.scribe import worth_scribing
 from app.interview.tools import document_view
@@ -22,11 +23,11 @@ DOC = {"ocs_content": {"ocu_units": [
 # ---- held(待問清單:FIFO、去重) ----
 
 def test_held_push_dedupe_and_fifo_pop():
-    s = L.push_held({}, "問題A?", 3)
-    s = L.push_held(s, "問題A?", 4)          # 去重
-    s = L.push_held(s, "問題B?", 5)
+    s = AG.push_held({}, "問題A?", 3)
+    s = AG.push_held(s, "問題A?", 4)          # 去重
+    s = AG.push_held(s, "問題B?", 5)
     assert [h["q"] for h in s["held"]] == ["問題A?", "問題B?"]
-    q, s2 = L.pop_held(s)
+    q, s2 = AG.pop_held(s)
     assert q == "問題A?" and [h["q"] for h in s2["held"]] == ["問題B?"]
 
 
@@ -34,11 +35,11 @@ def test_held_push_dedupe_and_fifo_pop():
 
 def test_boundary_masks_next_gap_and_never_auto_clears():
     task_gap_prefix = "ocs_content.ocu_units.u1.tasks.t1"
-    s = L.add_boundary({}, task_gap_prefix, quote="這塊先不談", since_turn=2)
-    assert L.in_boundary(s, f"{task_gap_prefix}.details.tools")
-    assert not L.in_boundary(s, "ocs_attitude")
+    s = AG.add_boundary({}, task_gap_prefix, quote="這塊先不談", since_turn=2)
+    assert AG.in_boundary(s, f"{task_gap_prefix}.details.tools")
+    assert not AG.in_boundary(s, "ocs_attitude")
     # 硬遮罩:note_attempt/pop_held 等任何狀態演化都不得移除 boundary
-    s2 = L.note_attempt(s, "ocs_attitude", True)
+    s2 = AG.note_attempt(s, "ocs_attitude", True)
     assert s2.get("boundary") == s["boundary"]
 
 
@@ -57,24 +58,24 @@ def test_boundary_on_attitudes_suppresses_gap():
                                        "skills": [{"name": "s"}, {"name": "s2"}]}]}]}]},
         "ocs_profile": {"ocs_code": "X"}, "ocs_attitude": {"attitudes": []}}
     assert L.next_gap(doc, {}, {}) == "ocs_attitude"
-    s = L.add_boundary({}, "ocs_attitude")
+    s = AG.add_boundary({}, "ocs_attitude")
     assert L.next_gap(doc, s, {}) != "ocs_attitude"
 
 
 # ---- 疲勞(確定性:敷衍短語 / 長度銳減) ----
 
 def test_fatigue_on_dismissive_phrases():
-    assert L.is_fatigued(["我們每天要對三條產線做首件檢查……(長回答)", "就這樣"])
+    assert AG.is_fatigued(["我們每天要對三條產線做首件檢查……(長回答)", "就這樣"])
 
 
 def test_fatigue_on_shrinking_answers():
     long = "這是一段很長的回答" * 8
-    assert L.is_fatigued([long, long, long, "嗯", "喔", "好"])
+    assert AG.is_fatigued([long, long, long, "嗯", "喔", "好"])
 
 
 def test_no_fatigue_on_healthy_conversation():
     healthy = ["第一段完整回答的內容說明", "第二段也講得很多細節喔", "第三段繼續補充說明流程"]
-    assert not L.is_fatigued(healthy)
+    assert not AG.is_fatigued(healthy)
 
 
 # ---- 喚醒閘(確定性前濾:只擋明顯無素材) ----

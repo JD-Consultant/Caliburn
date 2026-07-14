@@ -65,6 +65,73 @@ def bump_streaks(state: dict, *, has_episode: bool, progressed: bool) -> dict:
     return new
 
 
+# ---- 議程狀態(held/boundary/疲勞/attempts;T8c 自退役的 ledger move-only 搬入) ----
+# refused 沿用既有 state["declined"](鍵名不動,語意=受訪者明說不做/不答)。
+
+def push_held(state: dict, question: str, since_turn: int) -> dict:
+    """好問題時機不對→存待問清單(去重;backstop 撿漏也走這)。回新 state。"""
+    held = list(state.get("held") or [])
+    if not any(h.get("q") == question for h in held):
+        held.append({"q": question, "since": since_turn})
+    return {**state, "held": held}
+
+
+def pop_held(state: dict) -> tuple[str | None, dict]:
+    """取出最早的待問題(FIFO)。回 (question|None, 新 state)。"""
+    held = list(state.get("held") or [])
+    if not held:
+        return None, state
+    first = held.pop(0)
+    return first.get("q"), {**state, "held": held}
+
+
+def add_boundary(state: dict, topic: str, *, quote: str = "", since_turn: int = 0) -> dict:
+    """受訪者劃線(「這塊不談」)→ 硬遮罩。**無任何程式路徑自動解除**(§6.5):
+    只有使用者自己重提該話題、由人/前端明確移除。回新 state。"""
+    boundary = list(state.get("boundary") or [])
+    if not any(b.get("topic") == topic for b in boundary):
+        boundary.append({"topic": topic, "quote": quote, "since": since_turn})
+    return {**state, "boundary": boundary}
+
+
+def in_boundary(state: dict, gap: str | None) -> bool:
+    """gap 是否落在劃線區(path 前綴比對;ocs_attitude/curation 等固定串同樣適用)。"""
+    if not gap:
+        return False
+    return any(gap.startswith(str(b.get("topic") or "\x00"))
+               for b in (state.get("boundary") or []))
+
+
+# 疲勞偵測(確定性,收尾三訊號之一)
+FATIGUE_WINDOW = 3          # 滑動視窗:最近 N 則員工回答
+FATIGUE_RATIO = 0.4         # 視窗均長 < 前段均長 × ratio → 疲勞
+FATIGUE_PHRASES = ("就這樣", "沒了", "沒有了", "差不多", "就醬", "大概就這些", "先這樣")
+
+
+def is_fatigued(employee_texts: list[str]) -> bool:
+    """回答長度滑動平均連降+敷衍短語(任一成立)。純函式,不用 LLM 判。"""
+    if not employee_texts:
+        return False
+    tail = employee_texts[-FATIGUE_WINDOW:]
+    if any(p in (t or "") for p in FATIGUE_PHRASES for t in tail[-2:]):
+        return True
+    if len(employee_texts) < FATIGUE_WINDOW * 2:
+        return False
+    head = employee_texts[:-FATIGUE_WINDOW]
+    avg = lambda xs: sum(len(x or "") for x in xs) / max(1, len(xs))  # noqa: E731
+    return avg(tail) < avg(head) * FATIGUE_RATIO
+
+
+def note_attempt(state: dict, gap: str | None, progressed: bool) -> dict:
+    """回新 state(不就地改):progressed=歸零;否則 +1(供 coverage.is_stalled)。
+    【T8c 過渡:仍供 curation 縫 stall;梯子退役後改由裁剪縫落地與否驅動(§3.6)。】"""
+    if gap is None:
+        return state
+    attempts = dict(state.get("attempts") or {})
+    attempts[gap] = 0 if progressed else attempts.get(gap, 0) + 1
+    return {**state, "attempts": attempts}
+
+
 # ---- 訊號(確定性;guardrail 後衛,spec §3.6) ----
 
 def signals(state: dict, turns_n: int) -> dict:

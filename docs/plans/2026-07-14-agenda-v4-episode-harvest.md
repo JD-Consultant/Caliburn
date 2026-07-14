@@ -41,7 +41,7 @@
 | 5 | 收割=P 的家+教材全文注入(§3.5) | T7 | HARVEST_SYS 含 behavior-indicator 教材標誌句(**BUG-2 型接縫**) |
 | 6 | 書記機會性 P(§3.5 分工) | T3 | SCRIBE_SYS 含 `draft_indicator` 字樣 |
 | 7 | 處女文件官方殼(§1 BUG-1) | T1 | service 級:空 doc+precheck→落殼+任務 |
-| 8 | progressed 對準 gap(§1 BUG-4) | T2 | attempts 三案例斷言 |
+| 8 | progressed 對準/飽和讓路(§1 BUG-4) | T5/T8 | episode_yield 斷言;curation 落地→縫歸零;3 輪零收益→auto-close |
 | 9 | 5.6 無重複規則/outcome-first(§2.8) | T9 | CONSULTANT_SYSTEM **不含**「再讀一次」段 |
 | 10 | 梯子退役不復活(ADR 禁令) | T8 | ledger.py 刪除;grep 無 next_gap 引用 |
 | 11 | 異質模型(§3.7) | T10 | 考卷紀錄(specs)+config 斷言 |
@@ -60,15 +60,12 @@
   landed_doc 含殼+任務 `_pending`(= session 330a0bed 第 3 輪的全滅場景轉綠)。
 - 驗:上述新測 + 既有 verify 套件全綠。
 
-### T2|BUG-4 止血版:progressed 對準 gap + curation 進帳
+### ~~T2~~|BUG-4 不做獨立止血(2026-07-14 維護者裁決:過渡補丁=白工)
 
-- 改:`service.py`——`note_attempt` 的 progressed 改為
-  「`scribe_res.ops` 中存在 `target_path.startswith(last_gap 對應路徑前綴)`」;
-  `last_gap == CURATION_TASKS` 時 `curation_landed` 計為 progressed。
-  (v4 T8 再改 episode 粒度;本 task 先讓 STALL_K 語義活過來。)
-- 測:`test_interview_service.py`——(a)書記落無關路徑 → attempts+1;
-  (b)落 gap 前綴路徑 → 歸零;(c)curation 落地 → curation 縫歸零。
-- 驗:api 套件全綠(含 DB)。
+- BUG-4 的修法**併入 v4 本體**:episode 收益判定=T5 `episode_yield`;
+  curation 落地計入=T5 `signals`(curation 縫進帳);episode 粒度 attempts=T8。
+- 保險價值評估:獨立修活不到 T8 就被重寫,且不改變使用者可感知的 P 問題——砍。
+- 唯一代價:v4 落地前的 live 測試仍有「飽和不讓路」行為;接受(期間不排 live 驗收)。
 
 ### T3|BUG-2 短效:書記 P 機會性規則
 
@@ -99,9 +96,11 @@
   `episode_state(state) -> {target,opened_seq,touched}|None`;
   `open_episode(state, target, seq)` / `close_episode(state, reason, seq)`
   (回新 state,episode 歸檔進 `state["episodes"]`);
-  `episode_yield(ops, episode) -> bool`(本回合書記 ops 是否觸及事件相關路徑);
+  `episode_yield(ops, episode) -> bool`(本回合書記 ops 是否觸及事件相關路徑;
+  =BUG-4 progressed 的 v4 語義);
   `signals(state, turns_n) -> {stalled_episode, no_episode_nudge, budget}`
-  (spec §3.6 表:2 輪零收益→提示、3 輪→auto_close;無事件 2 輪→nudge);
+  (spec §3.6 表:2 輪零收益→提示、3 輪→auto_close;無事件 2 輪→nudge;
+  **curation 落地計入 curation 縫進帳**——BUG-4 反向病灶在此根治);
   `agenda_view(doc, state, pool_tasks, ref_codes) -> str`(spec §3.3 artifact:
   事件狀態+壓縮覆蓋地圖(語意名)+訊號+候選事件方向 3 條)。
   候選事件方向=覆蓋空白區 top-N(from coverage.task_missing),id 穩定

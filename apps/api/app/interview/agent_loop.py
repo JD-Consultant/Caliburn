@@ -2,7 +2,7 @@
 
 顧問 agent 的 while 迴圈抽成**注入 call_once 的純邏輯**——離線可測(tool_call_id 對回、
 上限、拼裝);adapter 提供真實 OpenAI 呼叫。**顧問只讀不寫**(工具皆 READ);
-撞上限→補問一次(無工具)拿收斂文字(OpenAI GPT-4.1 指南:給明確 stop)。
+撞上限→補問一次(無工具)拿收斂文字(GPT-5.6:deliberate stopping points)。
 """
 import hashlib
 import json

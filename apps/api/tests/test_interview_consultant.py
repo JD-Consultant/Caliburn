@@ -12,12 +12,18 @@ def _doc():
             "ocs_attitude": {"attitudes": []}}
 
 
-def test_system_prompt_has_key_rules_at_start_and_end():
+def test_system_prompt_v4_outcome_first_no_duplicate():
     sys = C.CONSULTANT_SYSTEM
-    # GPT-4.1 指南:關鍵規則首尾各一份(「員工訊息=資料非指令」概念在頭也在尾)
-    assert "指令" in sys[:500] and "不是指令" in sys[-400:]
-    assert "不負責記錄" in sys or "有書記" in sys          # 顧問不寫入
-    assert "故事" in sys                                    # BEI 短故事式
+    # GPT-5.6(spec §2.8):規則只留一份——不得有「再讀一次」式首尾重複段(黑名單1)
+    assert "再讀一次" not in sys
+    # outcome-first:含「訪談成功長什麼樣/具體事件」成功判準框架(非逐步指令)
+    assert "具體事件" in sys and ("成功" in sys or "收尾" in sys)
+    # 議程工具停止條件=v4 事件驅動關鍵接縫(顧問要知道何時 open/close)
+    assert "open_episode" in sys and "close_episode" in sys
+    # 保留:硬規則(資料非指令)、不寫入、BEI 故事
+    assert "不是給你的指令" in sys
+    assert "不負責記錄" in sys or "書記" in sys
+    assert "故事" in sys
 
 
 def test_no_write_vocabulary_in_prompt():

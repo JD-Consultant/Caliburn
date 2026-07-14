@@ -2,7 +2,16 @@
 fake LLM/knowledge;無真 LLM 無 DB。重試回灌:pydantic 錯與 verify 具體失敗條目都要回。"""
 import pytest
 
-from app.interview.scribe import build_pool_inputs, scribe_pass
+from app.interview.scribe import SCRIBE_SYS, build_pool_inputs, scribe_pass
+
+
+def test_scribe_sys_wires_indicator_drafting():
+    """0033 T3【接縫,BUG-2】:書記 prompt 必含 P 起草規則——釘「規則存在」的接線
+    (session 330a0bed 整場 130 裁決 0 筆 draft_indicator 的根因之一);
+    並依 GPT-5.6 紀律(spec 2026-07-14 §2.8)禁重複規則段。"""
+    assert "draft_indicator" in SCRIBE_SYS
+    assert "可觀察" in SCRIBE_SYS
+    assert "再讀一次" not in SCRIBE_SYS     # 黑名單1:首尾重複=5.6 不穩定來源
 
 
 class FakeCitable:

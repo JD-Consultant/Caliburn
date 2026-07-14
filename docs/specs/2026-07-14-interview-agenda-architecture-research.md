@@ -361,8 +361,12 @@ planner 每次換場對**更新後**的覆蓋地圖重規劃,順帶填掉的不�
 
 ### 3.4 議程工具(2 顆;掛進 CONSULTANT_TOOLS 同一迴圈)
 
-- `open_episode(target: enum<候選事件方向 id>, note?: str)`
+- `open_episode(target: enum<候選事件方向 id | "free">, note?: str)`
   「開始深挖一個具體事件。當你要請員工講『最近一次實際發生的事』時呼叫。」
+  **target 含 `free`(T5 裁決③,依據 HierTOD mixed-initiative)**:員工自發
+  講起的故事(不在候選空白區)也要能登記——這是最常見形態(330a0bed 第 7 輪
+  盲測故事即自發),缺 `free` 則 episode 追蹤對主流情況破功;`free` 用 note
+  起名,**只寫議程狀態不寫文件**,零幻覺不受影響。
   service:記 `agenda_state.episode={target, opened_seq}`;回確認+該方向空缺摘要。
 - `close_episode(reason: enum<saturated|covered|user_shifted>)`
   「當這個事件已問透(細節/標準/驗收都有了)或員工明顯換話題時呼叫;系統會把
@@ -387,11 +391,15 @@ planner 每次換場對**更新後**的覆蓋地圖重規劃,順帶填掉的不�
 
 | 訊號 | 條件(碼算) | 動作 |
 |---|---|---|
-| 事件飽和 | episode 開著、連 2 輪書記對 episode 相關路徑零新值 | artifact 注入「該收了」;第 3 輪 **auto-close+收割** |
+| 事件飽和 | episode 開著、連 2 輪**任何**落地零新值 | artifact 注入「該收了」;第 3 輪 **auto-close+收割** |
+| 事件過長(軟) | episode 開著 ≥6 輪(T5 裁決②) | artifact 注入「考慮收割換場」;**不強制**(T10 驗收:單事件 ≤6 輪) |
 | 該開沒開 | 無 episode、連 2 輪顧問未 open | artifact 強化提示(附候選) |
 | 硬預算 | 輪數 ≥ TURN_BUDGET | suggest_finish(既有) |
 | 寫入 | 全部 op | verify 六查(不變) |
 
+**收益定義(T5 裁決①)**:episode「收益」=本回合**任何**書記/裁剪落地,
+**不限**事件目標任務——跨任務落地是 feature(330a0bed 第 25 輪一句分掛兩任務),
+只算目標任務會懲罰合法敘事、重蹈 BUG-4 反面。
 STALL_K/is_stalled 概念保留但**掛到 episode 粒度**;attempts 舊語義隨梯子退役。
 
 ### 3.7 模型配置(異質,§2.5)

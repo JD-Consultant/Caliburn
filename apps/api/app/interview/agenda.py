@@ -153,3 +153,38 @@ def _episode_target_label(doc: dict, target: str) -> str:
         if tp == target:
             return _task_label(t)
     return "(某任務)"
+
+
+# ---- 議程工具(T6;掛進顧問 chat_with_tools 同一迴圈;決策=tool call,§2.4 骨架②) ----
+
+def agenda_tools(candidates: list[dict]) -> list[dict]:
+    """本回合議程工具定義(target enum 動態=候選 ref+free;書記 schema 同款動態組)。
+    描述 1–2 句(GPT-5.6/Anthropic Writing tools 紀律)。"""
+    targets = [c["ref"] for c in candidates] + ["free"]
+    return [
+        {"type": "function", "function": {
+            "name": "open_episode",
+            "description": "開始深挖一個具體事件——請員工講一件最近實際發生的事。"
+                           "target 從議程候選 ref 挑;員工自己起頭的話題用 free。",
+            "parameters": {"type": "object", "properties": {
+                "target": {"type": "string", "enum": targets,
+                           "description": "候選事件 ref(如 c1)或 free(自發話題)"},
+                "note": {"type": "string", "description": "free 時給這個事件起個短名"}},
+                "required": ["target"]}}},
+        {"type": "function", "function": {
+            "name": "close_episode",
+            "description": "這個事件已問透(細節、完成標準、驗收方式都有了)或員工明顯換"
+                           "話題時呼叫;系統會把事件內容編碼進文件。",
+            "parameters": {"type": "object", "properties": {
+                "reason": {"type": "string",
+                           "enum": ["saturated", "covered", "user_shifted"],
+                           "description": "問不出新東西/已覆蓋足夠/員工換話題"}},
+                "required": ["reason"]}}},
+    ]
+
+
+def resolve_target(candidates: list[dict], ref: str) -> str | None:
+    """議程工具的 ref → task_path(free 原樣回;未知 ref 回 None)。"""
+    if ref == "free":
+        return "free"
+    return next((c["id"] for c in candidates if c["ref"] == ref), None)

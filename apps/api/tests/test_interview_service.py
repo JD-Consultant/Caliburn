@@ -9,6 +9,7 @@ from uuid import uuid4
 from app.adapters.interview_repo import InterviewRepo
 from app.adapters.persistence import DocRepo
 from app.adapters.stubs import StubKnowledge, StubLlm
+from app.interview import agenda as AG
 from app.interview.service import NoActiveInterview, run_finish, run_turn
 from app.models import JobProfile, User
 
@@ -291,6 +292,35 @@ async def test_no_picker_when_top_hit_already_selected(db_session):
 
 # run_curation(隨叫裁剪端點)已退役(ADR 0032):盤=乾淨自取,無 AI 疊加層;
 # precheck+declined 行為由 run_turn 裁剪縫測試覆蓋(上方 T5c 測試)。
+
+
+@pytest.mark.asyncio
+async def test_agenda_tools_open_close_update_episode_state(db_session):
+    """0033 T6【接縫】:顧問呼 open_episode/close_episode(chat_trace 模擬)→
+    dispatch 攔記、run_turn 確定性 apply 到 session 議程狀態。決策=tool call 可稽核。"""
+    p, s, repo = await _setup(db_session)                      # 既有 doc(有任務 t1)
+    tp = "ocs_content.ocu_units.u1.tasks.t1"
+    # 先 open(free 自發話題):驗進行中事件登記
+    llm_open = StubLlm(select_result={"records": []}, chat_text="好,你多說說那次。",
+                       chat_trace=[{"name": "open_episode",
+                                    "args": {"target": "free", "note": "回歸把關那次"},
+                                    "result_digest": "x"}])
+    await run_turn(p.id, "上次回歸沒跑完我擋下上線", db=db_session, llm=llm_open,
+                   knowledge=StubKnowledge())
+    sess = await repo.get_active(p.id)
+    ep = AG.episode_state(sess.ledger_state)
+    assert ep is not None and ep["target"] == "free" and ep["note"] == "回歸把關那次"
+    # 再 close:驗歸檔+清進行中+pending_harvest flag(T8 收割消費)
+    llm_close = StubLlm(select_result={"records": []}, chat_text="了解,換個主題。",
+                        chat_trace=[{"name": "close_episode",
+                                     "args": {"reason": "covered"},
+                                     "result_digest": "x"}])
+    await run_turn(p.id, "差不多就這樣", db=db_session, llm=llm_close,
+                   knowledge=StubKnowledge())
+    sess2 = await repo.get_active(p.id)
+    assert AG.episode_state(sess2.ledger_state) is None
+    assert sess2.ledger_state["episodes"][-1]["reason"] == "covered"
+    assert sess2.ledger_state.get("pending_harvest") is True
 
 
 @pytest.mark.asyncio

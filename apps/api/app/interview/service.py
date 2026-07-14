@@ -13,6 +13,7 @@ from uuid import UUID
 from app.adapters.interview_repo import InterviewRepo
 from app.adapters.llm_openrouter import model_for_role
 from app.adapters.persistence import DocConflictError, DocRepo
+from app.interview import agenda as AG
 from app.interview import consultant as C
 from app.interview import ledger as L
 from app.interview.attitudes import attitudes_pass
@@ -229,11 +230,20 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> T
             and not L.checklist(work_doc, state, pool_tasks)["unasked"]):
         state["writein_asked"] = True
     # dispatch 包一層截職類搜尋命中(D8 P2)+ read_document 四態視圖(doc 在此層)
+    # + 議程工具(0033 T6:決策=tool call,dispatch 攔記,chat 後確定性 apply)
     occ_searches: list[dict] = []
+    agenda_actions: list[tuple[str, dict]] = []
+    candidates = AG.blank_candidates(work_doc, state, ref_ocs)
 
     async def dispatch(name: str, arguments: dict):
         if name == "read_document":
             return document_view(work_doc)
+        if name == "open_episode":
+            agenda_actions.append(("open", arguments or {}))
+            return {"ok": True, "note": "已開始這個事件——請往細節、完成標準、驗收方式追問。"}
+        if name == "close_episode":
+            agenda_actions.append(("close", arguments or {}))
+            return {"ok": True, "note": "已記錄,事件內容會編碼進文件。"}
         res = await dispatch_tool(name, arguments, knowledge=knowledge)
         if name == "knowledge_search_occupations" and isinstance(res, dict):
             occ_searches.append({"query": (arguments or {}).get("query") or "",
@@ -242,8 +252,21 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> T
 
     t_chat = time.perf_counter()
     chat = await llm.chat_with_tools(role="interview", messages=messages,
-                                     tools=CONSULTANT_TOOLS, dispatch=dispatch)
+                                     tools=CONSULTANT_TOOLS + AG.agenda_tools(candidates),
+                                     dispatch=dispatch)
     chat_ms = int((time.perf_counter() - t_chat) * 1000)
+
+    # ③⅛ 議程動作確定性 apply(T6:記 episode 狀態;收割在 T8 接 close→harvest)
+    for kind, args in agenda_actions:
+        if kind == "open":
+            real = AG.resolve_target(candidates, str(args.get("target") or ""))
+            if real:
+                state = AG.open_episode(state, target=real, seq=emp_turn.seq,
+                                        note=str(args.get("note") or ""))
+        elif kind == "close" and AG.episode_state(state) is not None:
+            state = AG.close_episode(state, reason=str(args.get("reason") or "covered"),
+                                     seq=emp_turn.seq)
+            state["pending_harvest"] = True     # T8 收割 pass 消費後清
 
     # ③¾ 書記(v3:顧問後、確定性喚醒閘;fail-open 對話、fail-closed 寫入)
     scribe_ms = 0

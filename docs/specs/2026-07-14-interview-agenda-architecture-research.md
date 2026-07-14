@@ -218,11 +218,28 @@ precedent 是職能訪談方法論而非流行架構。兩者獨立成立、互�
 ### 2.8 「不用過時方法」終查:模型世代紀律 + Agent Skills + 本專案適用判定(2026-07 補)
 
 **抓到的真實過時點**:本 repo 全部 prompt 紀律註記「GPT-4.1 指南」,但模型已是
-gpt-5.4-mini。OpenAI 官方 GPT-5 世代指南已出到 **GPT-5.2**
-([GPT-5](https://developers.openai.com/cookbook/examples/gpt-5/gpt-5_prompting_guide) /
-[5.1](https://developers.openai.com/cookbook/examples/gpt-5/gpt-5-1_prompting_guide) /
-[5.2](https://developers.openai.com/cookbook/examples/gpt-5/gpt-5-2_prompting_guide)),
-與 4.1 世代的關鍵差異(重構時全面換參照):
+gpt-5.4-mini。OpenAI 官方 GPT-5 世代指南 5/5.1/5.2 之後,**最新為 GPT-5.6 Sol
+官方 prompting guidance(2026-07-09 發布;維護者指正後補查)**:
+[官方指南](https://developers.openai.com/api/docs/guides/prompt-guidance-gpt-5p6)。
+
+**GPT-5.6 關鍵主張(對本案有直接影響,T9 依此)**:
+- **Outcome-first**:「Describe the destination rather than prescribing every
+  step…states **what good looks like**」——prompt 給成功判準+停止條件+約束,
+  路徑讓模型選。內部 eval:精簡 system prompt 分數 +10–15%、token −41–66%。
+  → 議程設計天然同構:artifact 給覆蓋判準、close_episode 給停止機制;
+  顧問 prompt 改寫成「成功判準式」而非「步驟指令式」。
+- **刪重複規則**:「repeated statements of the same rule」「examples that do
+  not change behavior」要刪;「**conflicting rules can create more instability
+  than missing detail**」→ 本 repo「關鍵規則首尾各一份」(GPT-4.1 紀律)
+  在 5.6 世代是**反模式**,CONSULTANT_SYSTEM 首尾重複段必須合併成一份。
+- **預設更簡潔**:粗放的「至多三句」類指令可能過剪;長度用 `text.verbosity`
+  參數當底、任務特定要求寫 prompt。
+- 多輪 agentic:「short visible preamble before the first tool call, then
+  sparse outcome-based updates…Do not ask the model to narrate routine calls」。
+- 模型陣容:5.6 家族為 T10 升級候選(interview 升 5.6 級;select 家族對應
+  mini 過考卷再定)。
+
+沿用仍成立的 5.x 通則(5/5.1/5.2 累積,5.6 未推翻):
 - **Agentic eagerness 校準**:5 系預設更主動,要「controlled scope and deliberate
   stopping points」「Do not expand the task beyond what the user asked」
   → 顧問 prompt 的「每回合恰一個問題」「離題拉回」紀律要以 5 系語彙重寫;

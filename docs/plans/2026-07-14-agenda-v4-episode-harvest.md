@@ -109,12 +109,15 @@
   退役禁令加 next_gap 梯子)。
 - 驗:api 全綠+`npx turbo test` 全綠。
 
-### T9|consultant prompt v4+GPT-5 世代紀律
+### T9|consultant prompt v4+GPT-5.6 紀律(spec §2.8)
 
-- 改:`consultant.py` `CONSULTANT_SYSTEM`——加「議程三條」(開場先弄清他做什麼
-  →open_episode;一次一事件,STAR 深挖;問透或他換話題→close_episode);
-  eagerness 校準語彙(GPT-5.2:controlled scope、deliberate stopping);
-  「每回合恰一問」保留。全 repo 碼註「GPT-4.1 指南」參照改「GPT-5 世代」。
+- 改:`consultant.py` `CONSULTANT_SYSTEM` 依 GPT-5.6 outcome-first 重寫:
+  (a)**刪首尾重複段**(「最重要三條再讀一次」整段刪——5.6:重複規則=
+  不穩定來源),規則只留一份;(b)主體改「成功判準式」:訪談成功=每個 core
+  任務有具體事件佐證(細節+可觀察指標),配議程工具的停止條件(open/close);
+  (c)「至多三句」改用任務特定描述,避免 5.6 預設簡潔下過剪;
+  (d)全 prompt 審一遍矛盾規則(5.6:conflicting rules>missing detail)。
+  全 repo 碼註「GPT-4.1 指南」參照改「GPT-5.6 指南」(連結 spec §2.8)。
 - 測:prompt 建構測試(artifact 區塊在、教材掛載照 skills_for)。
 - 驗:api 全綠。
 

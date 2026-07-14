@@ -12,7 +12,7 @@ from dataclasses import dataclass, field
 
 from app.interview.schema_utils import _obj, _s
 from app.interview.verify import quote_verified
-from app.interview.ledger import MAX_A
+from app.interview.coverage import MAX_A
 
 logger = logging.getLogger(__name__)
 

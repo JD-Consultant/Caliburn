@@ -3,7 +3,7 @@ strict 池 enum+確定性守衛(quote 逐字、去重、含 existing 的 MAX_A �
 fake LLM,無 DB。"""
 import pytest
 
-from app.interview import ledger as L
+from app.interview import coverage as L
 from app.interview.attitudes import attitudes_pass, attitudes_schema
 
 POOL = ["A01", "A03", "A04", "A05", "A06"]

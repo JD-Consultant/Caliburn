@@ -216,6 +216,12 @@ push_held/pop_held/add_boundary/in_boundary/is_fatigued/is_stalled → agenda.py
   `derive_phase==task_curation`——後者不含 ⓪′「有任務∧unasked∧未 stalled」分支,會讓
   「有任務但官方清單沒問完」的裁剪靜默失效(回到 BUG 前的斷棒)。回歸靠 service
   `test_curation_*` + 新增「有任務但 unasked→仍裁剪」測試釘住雙觸發。
+- **遺留縫(T8c-A 盤查發現,記錄不擴 scope)**:顧問改「principles+階段(duty-task/probing)」
+  掛載後,`output-writing`/`level-judgment` 兩份教材**現在載入無門**(v3 靠顧問 next_gap
+  指到該槽才載,BUG-3 下極少觸發)。`behavior-indicator`/`ks-distinction` 已由收割固定掛
+  (spec §3.5)、`attitude-writing` 由 `attitudes_pass` 自帶判準(ATTITUDES_SYS)不需外掛。
+  spec §2.8 的「書記按回合場景掛精簡版」從未實作(scribe 無 load_skill)——此縫留給
+  該 intent 落地時一併補(harvest/scribe 按落點欄位掛 output/level 教材),非 T8c 職責。
 
 ### T9|consultant prompt v4+GPT-5.6 紀律(spec §2.8)
 

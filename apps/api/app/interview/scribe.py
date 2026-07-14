@@ -17,7 +17,7 @@ import logging
 import re
 from dataclasses import dataclass, field
 
-from app.interview import ledger as L
+from app.interview import coverage as CO
 from app.interview.docpath import get_at
 from app.interview.scribe_schema import ScribeOutput, scribe_schema
 from app.interview.slots import SLOT_DEFS, coerce_slot_value
@@ -365,7 +365,7 @@ async def build_pool_inputs(knowledge, doc: dict,
 
 def _unit_keys(doc: dict) -> list[str]:
     units = (doc.get("ocs_content") or {}).get("ocu_units") or []
-    return [f"ocs_content.ocu_units.{L._seg(u, i)}" for i, u in enumerate(units)]
+    return [f"ocs_content.ocu_units.{CO._seg(u, i)}" for i, u in enumerate(units)]
 
 
 async def scribe_pass(llm, knowledge, *, doc: dict, turns: dict[int, str],
@@ -375,7 +375,7 @@ async def scribe_pass(llm, knowledge, *, doc: dict, turns: dict[int, str],
     """一次書記抽取(v3):select_schema → pydantic → op 化 → verify 六查
     → 全過即落 `_pending`;有敗筆則把**具體失敗條目**回灌重試(共 max_retry 次),
     重試耗盡丟壞筆、落好筆。抽取全敗回 records_failed=True(不擋回合,交 backstop)。"""
-    task_keys = [tp for _, _, tp in L.iter_tasks(doc)]
+    task_keys = [tp for _, _, tp in CO.iter_tasks(doc)]
     unit_keys = _unit_keys(doc)
     slot_paths = [f"{tp}.details.{k}" for tp in task_keys for k in SLOT_DEFS]
     pools, pool_items = await build_pool_inputs(knowledge, doc, ref_ocs_codes)

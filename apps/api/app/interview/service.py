@@ -15,7 +15,7 @@ from app.adapters.llm_openrouter import model_for_role
 from app.adapters.persistence import DocConflictError, DocRepo
 from app.interview import agenda as AG
 from app.interview import consultant as C
-from app.interview import ledger as L
+from app.interview import coverage as CO
 from app.interview.attitudes import attitudes_pass
 from app.interview.backstop import SWEEP_EVERY, backstop_sweep
 from app.interview.curation import curation_ops, curation_pass
@@ -154,9 +154,8 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> T
     # ①½ 官方任務池(0028 D6:檢查表/裁剪候選盤;fail-open,掛了縫不開)
     pool_tasks = await build_task_pool(knowledge, ref_list)
 
-    # ② 帳本(回合前視角):上一輪 gap 是否進帳的評定移到書記跑完後
+    # ② 帳本(回合前視角):議程 artifact/裁剪縫由 coverage/agenda 純函式即算,不再預存 last_gap
     state = dict(session.ledger_state or {})
-    state["last_gap"] = L.next_gap(work_doc, state, {}, pool_tasks, ref_ocs)
 
     # ②½ 裁剪 pass(0028 D1/D4 + 0032 T5c):curation 縫 → AI 對 unasked 官方任務
     #    判斷;quote-backed precheck → **確定性 op → verify → `_pending` 綠字直落**
@@ -164,8 +163,9 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> T
     widget: dict | None = None
     curation_guard: list[str] = []
     curation_landed = False
-    if L.should_curate(work_doc, state, pool_tasks, ref_ocs):
-        unasked = L.checklist(work_doc, state, pool_tasks)["unasked"]
+    curation_fired = CO.should_curate(work_doc, state, pool_tasks, ref_ocs)
+    if curation_fired:
+        unasked = CO.checklist(work_doc, state, pool_tasks)["unasked"]
         if unasked:
             t_cur = time.perf_counter()
             cur = await curation_pass(llm, pool_tasks=unasked, employee_texts=employee_texts)
@@ -206,6 +206,10 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> T
             await repo.add_llm_call(session.id, turn_seq=emp_turn.seq, role="select",
                                     model=model_for_role("select"), duration_ms=cur_ms,
                                     guard_verdicts=curation_guard[:30])
+    # 裁剪縫進帳(0033 §3.6 BUG-4 反向根治):裁剪**落地→歸零、空手→+1**(供 is_stalled
+    #   讓路);取代舊 note_attempt 用 scribe_progressed 誤判裁剪進度的病灶。
+    if curation_fired:
+        state = AG.note_attempt(state, CO.CURATION_TASKS, curation_landed)
 
     # ③ 顧問 chat_with_tools(說話 + READ 工具;無寫入權)——v3:顧問先於書記。
     # 待審綠字由 read_document 四態視圖供給(建議層已退場,T12);被拒清單照 §6.3 注入。
@@ -232,7 +236,7 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> T
         agenda_view=agenda_view)
     # write-in 抓漏只吐一次(0028 D6):摘要已含探測句 → 消費 flag
     if (pool_tasks and not state.get("writein_asked")
-            and not L.checklist(work_doc, state, pool_tasks)["unasked"]):
+            and not CO.checklist(work_doc, state, pool_tasks)["unasked"]):
         state["writein_asked"] = True
     # dispatch 包一層截職類搜尋命中(D8 P2)+ read_document 四態視圖(doc 在此層)
     # + 議程工具(0033 T6:決策=tool call,dispatch 攔記,chat 後確定性 apply)
@@ -322,24 +326,23 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> T
     last_swept = int(state.get("backstop_last_seq") or 0)
     if emp_turn.seq - last_swept >= SWEEP_EVERY:
         texts_since = [t for s_, t in sorted(turns_map.items()) if s_ > last_swept]
-        unasked_now = (L.checklist(swept_doc, state, pool_tasks)["unasked"]
+        unasked_now = (CO.checklist(swept_doc, state, pool_tasks)["unasked"]
                        if pool_tasks else [])
         for q in backstop_sweep(doc=swept_doc, texts_since=texts_since,
                                 unasked_tasks=unasked_now,
                                 pool_items=scribe_res.pool_items):
-            state = L.push_held(state, q, emp_turn.seq)
+            state = AG.push_held(state, q, emp_turn.seq)
         state["backstop_last_seq"] = emp_turn.seq
 
-    # ④′ 帳本收帳:上一輪 gap 進帳評定(飽和偵測)+ 疲勞訊號
-    state = L.note_attempt(state, state.get("last_gap"), scribe_res.progressed)
-    state["fatigued"] = L.is_fatigued([t for _, t in sorted(turns_map.items())])
-    # 0033 T8b:episode 粒度進帳(BUG-4 根治)——本回合任何落地=收益(裁決①);
-    #   開著事件零收益 → dry_streak+1,下回合 signals 偵測飽和。舊 note_attempt 雙軌暫留(T8c 拆)。
+    # ④′ 帳本收帳:疲勞訊號 + episode 粒度進帳(BUG-4 根治;裁決①:本回合任何落地=收益)。
+    #   舊 note_attempt(last_gap, scribe_progressed)梯子語義已退役(T8c-A);curation 縫 stall
+    #   改由裁剪縫落地驅動(見 ②½ 後),飽和改 episode dry_streak。
+    state["fatigued"] = AG.is_fatigued([t for _, t in sorted(turns_map.items())])
     state = AG.bump_streaks(state, has_episode=AG.episode_state(state) is not None,
                             progressed=doc_changed)
 
     # ④″ 收尾三訊號(T10;任一成立→建議收尾,不強制):coverage 全綠/疲勞/輪數預算
-    ok_finish, _ = L.can_finish(work_doc, state, {})
+    ok_finish, _ = CO.can_finish(work_doc, state, {})
     suggest_finish = bool(ok_finish or state.get("fatigued")
                           or len(employee_texts) >= TURN_BUDGET)
 
@@ -370,8 +373,7 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> T
     # ④ 保底:顧問恆有可見回覆 + 往前的問題(靜默回合=實戰死穴)
     say = (chat.text or "").strip()
     if not say:
-        nxt = state.get("last_gap")
-        say = (f"我們接著聊「{C.gap_label(work_doc, nxt)}」吧?" if nxt
+        say = ("謝謝你。我們接著挑一件你最近實際做過的事聊聊好嗎?" if candidates
                else "謝謝你,我這邊先整理一下——還有想補充的嗎?")
 
     await repo.update_session(session.id, ledger_state=state)
@@ -391,9 +393,9 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> T
         guard.append("scribe:抽取重試仍敗(交 backstop)")
     return TurnResult(say=say, question=None, widget=widget,
                       doc_changed=doc_changed or curation_landed,
-                      phase=L.derive_phase(work_doc, state, ref_ocs),
+                      phase=CO.derive_phase(work_doc, state, ref_ocs),
                       focus=dict(session.focus or {}), guard_log=guard,
-                      coverage=L.coverage(work_doc, state),
+                      coverage=CO.coverage(work_doc, state),
                       suggest_finish=suggest_finish)
 
 
@@ -453,7 +455,7 @@ async def run_finish(profile_id: UUID, *, db, llm, knowledge) -> dict:
     latest = await doc_repo.latest(profile_id)
     doc = (latest or {}).get("content") or {}
     state = session.ledger_state or {}
-    _, blockers = L.can_finish(doc, state, {})
+    _, blockers = CO.can_finish(doc, state, {})
     guard: list[str] = []
 
     if llm is not None:

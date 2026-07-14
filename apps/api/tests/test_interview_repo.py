@@ -70,7 +70,7 @@ async def test_update_session_fields(db_session):
 @pytest.mark.asyncio
 async def test_ledger_state_defaults_and_roundtrip(db_session):
     """T2:ledger_state 預設 {} + 往返 + 重算一致性(存回的 attempts 餵 ledger 同結果)。"""
-    from app.interview import ledger as L
+    from app.interview import coverage as L
     p = await _profile(db_session)
     repo = InterviewRepo(db_session)
     s = await repo.create(p.id)

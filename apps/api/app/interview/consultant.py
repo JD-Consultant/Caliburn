@@ -6,9 +6,8 @@ v2 顧問**無寫入權**:只說話 + 呼 READ 工具;書記(scribe)另外抽取
 
 GPT-4.1 指南:關鍵規則首尾各一份、markdown 分段、脈絡用定界。probe=模組常數(不寫死)。
 """
-from app.interview import ledger as L
+from app.interview import coverage
 from app.interview.skill_loader import load_skill, skills_for
-from app.interview.slots import SLOT_DEFS
 
 RECENT_TURNS = 12
 PROBE_DEFAULT = {"depth": "standard", "style": "warm"}   # §10.6 收編1:設定常數,不寫死
@@ -68,67 +67,11 @@ def opening_disclosure(est_minutes: int = 15) -> str:
             f"大概長什麼樣?")
 
 
-# onboarding 引導語(§16.16;空白文件不問態度,先帶到選職類/挑任務)
-_ONBOARD_STEER = {
-    L.ONBOARD_OCCUPATION: (
-        "目前還沒選職類(文件空白)。這一輪先弄清楚他實際做什麼——請他講 1–2 件最近"
-        "具體做過的事,再用 knowledge_search_occupations 查官方職類,挑**最貼近的具體職類**"
-        "提議,請他從畫面右上〔選職類〕確認選入(選了才會帶出官方任務)。"
-        "**選職類前不要問工作態度、不要拿模糊描述硬猜職類名硬套。**"),
-    L.CURATION_TASKS: (
-        "已選職類、任務清單還沒確認。這一輪先請他說說平常主要做哪幾件事(系統會依他的話"
-        "預勾官方任務給他確認),或引導他從〔選任務〕挑進來。**還不要問工作態度。**"),
-}
-
-
-def gap_label(doc: dict, gap: str) -> str:
-    """把帳本 gap path 轉成人話標籤(給顧問當「接下來問這個」的提示)。"""
-    if gap == L.ONBOARD_OCCUPATION:
-        return "你對應的官方職類"
-    if gap == L.CURATION_TASKS:
-        return "你平常做的主要任務"
-    if gap == "ocs_attitude":
-        return "工作態度"
-    name, slot = "", gap.rsplit(".", 1)[-1]
-    for _, t, tp in L.iter_tasks(doc):
-        if gap.startswith(tp):
-            codes = t.get("task_codes") or []
-            name = codes[0].get("name", "") if codes else ""
-            break
-    label = SLOT_DEFS[slot].label if slot in SLOT_DEFS else slot
-    return f"任務「{name}」的{label}" if name else label
-
-
-def ledger_summary(doc: dict, state: dict, pool_tasks: list[dict] | None = None,
-                   ref_codes: set[str] | frozenset = frozenset()) -> str:
-    """帳本摘要:覆蓋率 + 建議下一個問什麼(next_gap 人話化)。顧問據以決定問向;
-    非命令——顧問可因對話脈絡先問別的,帳本會繼續盯。
-    0028 D6:pool_tasks(官方任務池)給了 → curation 縫吐**成組反問**(unasked 名單 ≤5);
-    檢查表全處置且還沒抓漏 → 吐一次 write-in 探測(flag 由 service 消費)。"""
-    nxt = L.next_gap(doc, state, {}, pool_tasks, ref_codes)
-    if nxt == L.CURATION_TASKS and pool_tasks:
-        names = [t["name"] for t in L.checklist(doc, state, pool_tasks)["unasked"]][:5]
-        if names:
-            return ("官方任務清單還有未確認項:" + "、".join(names) + "。這一輪**成組**問他"
-                    "「這幾項你有做哪些?」(沒做的請他直說沒做;系統會依他的話預勾、"
-                    "他在畫面上確認)。別逐項審訊。**還不要問工作態度。**")
-    if nxt in _ONBOARD_STEER:                       # onboarding:給引導語,不報「還缺幾項」
-        return _ONBOARD_STEER[nxt]
-    ok, blockers = L.can_finish(doc, state, {})
-    lines = [f"覆蓋:{'已達完成門檻' if ok else f'還缺 {len(blockers)} 項'}"]
-    if nxt:
-        lines.append(f"建議接下來問:{gap_label(doc, nxt)}")
-    if (pool_tasks and not state.get("writein_asked")
-            and not L.checklist(doc, state, pool_tasks)["unasked"]):
-        lines.append("官方任務清單已全數確認。順帶問一次抓漏:「官方沒列、但你平常常做的"
-                     "任務還有嗎?」(有的話之後會當自訂任務提議)")
-    return "\n".join(lines)
-
-
 def _doc_excerpt(doc: dict) -> str:
-    """文件現況精簡(任務清單 + 已填細項數;不整卷重播,§context engineering)。"""
+    """文件現況精簡(任務清單 + 已填細項數;不整卷重播,§context engineering)。
+    onboarding/curation/writein 引導已移至議程 artifact(agenda.agenda_view;T8c-A)。"""
     rows = []
-    for u, t, _ in L.iter_tasks(doc):
+    for u, t, _ in coverage.iter_tasks(doc):
         codes = t.get("task_codes") or []
         nm = codes[0].get("name", "") if codes else "(未命名)"
         n = len([v for v in (t.get("details") or {}).values() if v not in (None, "")])
@@ -181,13 +124,15 @@ def build_consultant_messages(*, doc: dict, ledger_state: dict,
                      "語氣但要含揭露要素):\n" + opening_disclosure(est_minutes)})
         return msgs
 
-    # 0033 T8b:議程 artifact(事件驅動主軸)注入最前;ledger_summary 雙軌暫留(T8c 拆)
+    # 0033 T8c-A:議程 artifact(事件驅動主軸;覆蓋/onboarding/curation/writein 引導內含)
+    #   注入最前,取代退役的 ledger_summary 單行 hint。判準教材由階段掛載(欄位級教材已移
+    #   收割 pass;顧問只需 principles + onboarding/curation 的 duty-task + 深聊的 probing)。
     ctx = (agenda_view + "\n" if agenda_view else "")
-    ctx += (f"<進度>\n{ledger_summary(doc, ledger_state, pool_tasks, ref_codes)}\n</進度>\n"
-            f"<文件現況>\n{_doc_excerpt(doc)}\n</文件現況>")
-    gap_skills = [n for n in skills_for(L.derive_phase(doc, ledger_state, ref_codes),
-                                        L.next_gap(doc, ledger_state, {}, pool_tasks,
-                                                   ref_codes))
+    ctx += f"<文件現況>\n{_doc_excerpt(doc)}\n</文件現況>"
+    phase = coverage.derive_phase(doc, ledger_state, ref_codes)
+    gap_hint = {"onboarding_occupation": coverage.ONBOARD_OCCUPATION,
+                "task_curation": coverage.CURATION_TASKS}.get(phase)
+    gap_skills = [n for n in skills_for(phase, gap_hint)
                   if n != "consultant-principles"]
     if gap_skills:
         ctx += ("\n<判準教材(本回合欄位適用)>\n"

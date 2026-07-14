@@ -1,4 +1,4 @@
-"""模擬受訪者回歸 v3(T10;ADR 0028/0030;承 v2/T14 校準 #3 教訓 §16.14)。
+"""模擬受訪者回歸 v4(T10;ADR 0028/0030/**0033**;承 v2/T14 校準 #3 教訓 §16.14)。
 
     cd apps/api && PYTHONUTF8=1 uv run python evals/interview_sim.py [--max-turns 20] [--dump]
     換模 A/B:MODEL_INTERVIEW=<slug> uv run python evals/interview_sim.py
@@ -6,11 +6,13 @@
 形狀:**純智力迴圈,不碰 DB**。三段:
 ① 裁剪段(0028 D1/D6):**劇本化員工述職**(消掉 §16.14 的模擬員工漂移混淆因子)
    → curation_pass → 量預勾 precision/recall(vs 事實表 DOES)+ declined 正確率(⊆DOESNT)。
-② 深聊段(v3):模擬員工(cheap LLM 綁事實表)× 真管線(書記 op→verify→`_pending`
-   +帳本+顧問)→ grounding(verify 通過率=落地/(落地+拒收)、每回合進帳)。
+② 深聊段(v4;ADR 0033):模擬員工(cheap LLM 綁事實表)× 真管線(書記 op→verify→
+   `_pending` + **議程事件工具 open/close_episode** + **收割 harvest→P** + 顧問)→
+   grounding(verify 通過率)+ **P 產出量**(indicators_total;收割是行為指標的家)。
+   鏡射 service.run_turn 的 episode→harvest 接線(in-memory,無 DB/持久化)。
 ③ 態度收尾段(0028 D3):深聊全逐字稿 → attitudes_pass → 條數 ≤MAX_A、守衛丟棄數。
-閘門=**確定性指標**(§16.14:verify 通過率+進帳率+裁剪 precision);recall/態度=資訊訊號。
-結果留 docs/specs 校準紀錄;門檻改=重跑,不改碼。
+閘門=**確定性指標**(§16.14:verify 通過率+進帳率+裁剪 precision + **P≥1**);
+recall/態度=資訊訊號。結果留 docs/specs 校準紀錄;門檻改=重跑,不改碼。
 """
 from __future__ import annotations
 
@@ -24,13 +26,14 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.adapters.llm_openrouter import OpenRouterLlm  # noqa: E402
 from app.core.knowledge_dto import CitableItem, CompetencyPool  # noqa: E402
+from app.interview import agenda as AG  # noqa: E402
 from app.interview import consultant as C  # noqa: E402
 from app.interview import coverage as CO  # noqa: E402
 from app.interview.attitudes import attitudes_pass  # noqa: E402
 from app.interview.curation import curation_pass  # noqa: E402
+from app.interview.harvest import harvest_pass  # noqa: E402
 from app.interview.scribe import scribe_pass  # noqa: E402
 from app.interview.tools import CONSULTANT_TOOLS, dispatch_tool  # noqa: E402
-from functools import partial  # noqa: E402
 
 TASK_PATH = "ocs_content.ocu_units.u1.tasks.t1"
 
@@ -123,6 +126,13 @@ def _doc() -> dict:
     }
 
 
+def _count_indicators(doc: dict) -> int:
+    """全文件行為指標(P)條數——收割是 P 的家,這是 v4「真的產 P」的主量尺。"""
+    return sum(len(b.get("indicators") or [])
+               for _, t, _ in CO.iter_tasks(doc)
+               for b in (t.get("competency_blocks") or []))
+
+
 def _score_slots(details: dict) -> tuple[int, list[str]]:
     hit, miss = 0, []
     for key, (_, keywords) in FACTS.items():
@@ -163,17 +173,32 @@ async def attitudes_segment(llm, employee_texts: list[str]) -> dict:
 async def simulate(max_turns: int, dump: bool = False) -> dict:
     llm = OpenRouterLlm()
     knowledge = _knowledge()
-    dispatch = partial(dispatch_tool, knowledge=knowledge)
     doc = _doc()
     state: dict = {}
+    ref_ocs = frozenset()      # has_occupation 由 doc.ocs_profile 撐;pool 由 build_pool_inputs 抓 doc 碼
     transcript: list[tuple[str, str]] = []
     employee_texts: list[str] = []
     turns_map: dict[int, str] = {}
     ev_total = ev_verified = 0
     quote_lens: list[int] = []
     progressed_turns = 0
+    ep_opened = ep_closed = harvest_runs = harvest_landed = 0
     question = C.opening_disclosure()
     turns_used = 0
+
+    async def run_harvest() -> None:
+        """收割最近歸檔事件一次(鏡射 service ③⅝:episode→BEI 編碼→P)。"""
+        nonlocal doc, harvest_runs, harvest_landed
+        ep = (state.get("episodes") or [None])[-1]
+        if not ep:
+            return
+        h_res = await harvest_pass(llm, knowledge, doc=doc, turns=turns_map,
+                                   episode=ep, header_codes=set())
+        harvest_runs += 1
+        if h_res.new_doc is not None:
+            doc = h_res.new_doc
+        if h_res.progressed:
+            harvest_landed += 1
 
     for i in range(max_turns):
         turns_used = i + 1
@@ -201,21 +226,68 @@ async def simulate(max_turns: int, dump: bool = False) -> dict:
         if scribe_res.progressed:
             progressed_turns += 1
 
-        # ② 議程進帳(0033:梯子退役,收益改 episode/裁剪縫粒度;sim 只跑深聊主軸)
-
-        # ③ 顧問 chat_with_tools
+        # ② 顧問 chat_with_tools(含議程工具+artifact;鏡射 service.run_turn ③/③⅛)
+        candidates = AG.blank_candidates(doc, state, ref_ocs)
+        agenda_view = AG.agenda_view(doc, state, pool_tasks=[], ref_codes=ref_ocs,
+                                     turns_n=turns_used)
         msgs = C.build_consultant_messages(doc=doc, ledger_state=state, recent_turns=transcript,
-                                           employee_text=answer)
-        chat = await llm.chat_with_tools(role="interview", messages=msgs,
-                                         tools=CONSULTANT_TOOLS, dispatch=dispatch)
+                                           employee_text=answer, agenda_view=agenda_view)
+        agenda_actions: list[tuple[str, dict]] = []
+
+        async def _dispatch(name: str, arguments: dict):
+            if name == "open_episode":
+                agenda_actions.append(("open", arguments or {}))
+                return {"ok": True, "note": "已開始這個事件——請往細節、完成標準、驗收方式追問。"}
+            if name == "close_episode":
+                agenda_actions.append(("close", arguments or {}))
+                return {"ok": True, "note": "已記錄,事件內容會編碼進文件。"}
+            return await dispatch_tool(name, arguments, knowledge=knowledge)
+
+        chat = await llm.chat_with_tools(
+            role="interview", messages=msgs,
+            tools=CONSULTANT_TOOLS + AG.agenda_tools(candidates), dispatch=_dispatch)
         question = (chat.text or "還有想補充的嗎?").strip()
         transcript.append(("employee", answer))
 
+        # ②⅛ 議程動作確定性 apply(鏡射 service 269-278)
+        for kind, args in agenda_actions:
+            if kind == "open":
+                real = AG.resolve_target(candidates, str(args.get("target") or ""))
+                if real:
+                    state = AG.open_episode(state, target=real, seq=turns_used,
+                                            note=str(args.get("note") or ""))
+                    ep_opened += 1
+            elif kind == "close" and AG.episode_state(state) is not None:
+                state = AG.close_episode(state, reason=str(args.get("reason") or "covered"),
+                                         seq=turns_used)
+                state["pending_harvest"] = True
+
+        # ②⅜ 收割(鏡射 service 296-321:auto-close 後衛 + pending_harvest → harvest→P)
+        if AG.signals(state, turns_used)["auto_close"] and AG.episode_state(state) is not None:
+            state = AG.close_episode(state, reason="auto", seq=turns_used)
+            state["pending_harvest"] = True
+        if state.get("pending_harvest"):
+            await run_harvest()
+            ep_closed += 1
+            state = {k: v for k, v in state.items() if k != "pending_harvest"}
+
+        # ②½ 帳本收帳(鏡射 service 340-342;dry_streak 累計供 auto-close)
+        state = AG.bump_streaks(state, has_episode=AG.episode_state(state) is not None,
+                                progressed=scribe_res.progressed)
+
         if dump:
+            ep = AG.episode_state(state)
             print(f"--- turn {turns_used} ---\n  員工:{answer}\n  書記:{scribe_res.guard_log}\n"
-                  f"  顧問:{question[:80]}", file=sys.stderr)
+                  f"  事件:{('開→' + str(ep.get('target'))) if ep else '無'}"
+                  f" P={_count_indicators(doc)}\n  顧問:{question[:80]}", file=sys.stderr)
         if CO.can_finish(doc, state, {})[0]:
             break
+
+    # 收尾:仍有開著的事件 → 強制收割一次(sim 量 P;真管線靠 close/auto-close/後續回合接)
+    if AG.episode_state(state) is not None:
+        state = AG.close_episode(state, reason="covered", seq=turns_used)
+        await run_harvest()
+        ep_closed += 1
 
     task = next((t for _, t, tp in CO.iter_tasks(doc) if tp.endswith("tasks.t1")), {})
     details = task.get("details") or {}
@@ -232,6 +304,11 @@ async def simulate(max_turns: int, dump: bool = False) -> dict:
         "coverage": cov,
         "coverage_cleared": ok,
         "blockers_remaining": len(blockers),
+        "indicators_total": _count_indicators(doc),        # v4:收割產出的 P 總數
+        "episodes_opened": ep_opened,
+        "episodes_closed": ep_closed,
+        "harvest_runs": harvest_runs,
+        "harvest_landed": harvest_landed,
         "slot_keyword_accuracy": round(hit / len(FACTS), 2),
         "slot_mismatches": mismatches,
         "verify_pass_rate": round(ev_verified / ev_total, 2) if ev_total else None,
@@ -256,9 +333,13 @@ def main() -> int:
     cur = report["curation"]
     passed = ((report["verify_pass_rate"] or 0) >= 0.8
               and report["progressed_turn_rate"] >= 0.8
+              and report["indicators_total"] >= 1        # v4:收割是 P 的家,產不出 P=架構失效
               and cur["precision"] >= 0.8 and cur["declined_all_correct"])
     print(f"(informational) slot_keyword_accuracy={report['slot_keyword_accuracy']}"
           f" — keyword 量尺,語意評分待補")
+    print(f"(v4 harvest) indicators_total={report['indicators_total']}"
+          f" episodes={report['episodes_opened']}→{report['episodes_closed']}"
+          f" harvest_landed={report['harvest_landed']}/{report['harvest_runs']}")
     print(f"(informational) curation_recall={cur['recall']}"
           f" ambiguous_untouched={cur['ambiguous_untouched']}"
           f" attitudes_count={report['attitudes']['count']}")

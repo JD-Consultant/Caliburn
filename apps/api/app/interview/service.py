@@ -220,12 +220,16 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> T
     board_dismissed = bool(await repo.list_review_events(
         session.id, decision="task_board_dismissed"))
     intake_eligible = no_tasks_yet and not board_dismissed
+    # 0033 T8b:議程 artifact 注入顧問 context(事件狀態+覆蓋地圖+候選+訊號)
+    agenda_view = AG.agenda_view(work_doc, state, pool_tasks=pool_tasks,
+                                 ref_codes=ref_ocs, turns_n=emp_turn.seq)
     messages = C.build_consultant_messages(
         doc=work_doc, ledger_state=state, recent_turns=recent,
         employee_text=user_text, pool_tasks=pool_tasks,
         rejected=rejected_labels, ref_codes=ref_ocs, occ_dismissed=occ_dismissed,
         intake_invite=intake_eligible,
-        board_declined=no_tasks_yet and board_dismissed)
+        board_declined=no_tasks_yet and board_dismissed,
+        agenda_view=agenda_view)
     # write-in 抓漏只吐一次(0028 D6):摘要已含探測句 → 消費 flag
     if (pool_tasks and not state.get("writein_asked")
             and not L.checklist(work_doc, state, pool_tasks)["unasked"]):
@@ -329,6 +333,10 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> T
     # ④′ 帳本收帳:上一輪 gap 進帳評定(飽和偵測)+ 疲勞訊號
     state = L.note_attempt(state, state.get("last_gap"), scribe_res.progressed)
     state["fatigued"] = L.is_fatigued([t for _, t in sorted(turns_map.items())])
+    # 0033 T8b:episode 粒度進帳(BUG-4 根治)——本回合任何落地=收益(裁決①);
+    #   開著事件零收益 → dry_streak+1,下回合 signals 偵測飽和。舊 note_attempt 雙軌暫留(T8c 拆)。
+    state = AG.bump_streaks(state, has_episode=AG.episode_state(state) is not None,
+                            progressed=doc_changed)
 
     # ④″ 收尾三訊號(T10;任一成立→建議收尾,不強制):coverage 全綠/疲勞/輪數預算
     ok_finish, _ = L.can_finish(work_doc, state, {})

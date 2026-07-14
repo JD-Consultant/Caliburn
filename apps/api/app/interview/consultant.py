@@ -162,7 +162,8 @@ def build_consultant_messages(*, doc: dict, ledger_state: dict,
                               ref_codes: set[str] | frozenset = frozenset(),
                               occ_dismissed: bool = False,
                               intake_invite: bool = False,
-                              board_declined: bool = False) -> list[dict]:
+                              board_declined: bool = False,
+                              agenda_view: str = "") -> list[dict]:
     """組 chat_with_tools 的 messages,context 三層(T7):
     前綴 1(全域凍結)=system 人格+常駐判準教材 → 前綴 2(per-doc)=參考基準摘要
     → 動態區=帳本/文件四態/被拒/待問+本回合欄位判準教材+近窗對話。
@@ -180,8 +181,10 @@ def build_consultant_messages(*, doc: dict, ledger_state: dict,
                      "語氣但要含揭露要素):\n" + opening_disclosure(est_minutes)})
         return msgs
 
-    ctx = (f"<進度>\n{ledger_summary(doc, ledger_state, pool_tasks, ref_codes)}\n</進度>\n"
-           f"<文件現況>\n{_doc_excerpt(doc)}\n</文件現況>")
+    # 0033 T8b:議程 artifact(事件驅動主軸)注入最前;ledger_summary 雙軌暫留(T8c 拆)
+    ctx = (agenda_view + "\n" if agenda_view else "")
+    ctx += (f"<進度>\n{ledger_summary(doc, ledger_state, pool_tasks, ref_codes)}\n</進度>\n"
+            f"<文件現況>\n{_doc_excerpt(doc)}\n</文件現況>")
     gap_skills = [n for n in skills_for(L.derive_phase(doc, ledger_state, ref_codes),
                                         L.next_gap(doc, ledger_state, {}, pool_tasks,
                                                    ref_codes))

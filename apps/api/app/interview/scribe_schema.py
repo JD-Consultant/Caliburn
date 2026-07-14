@@ -9,7 +9,7 @@
 
 設計(T3):**分離變體、每個 enum 全鎖死、不賭 nullable-enum**——最強零幻覺保證。
 池空/無 task → 不生該變體(fail-closed;§7.3);永遠保留 `none` 逃生口
-(OpenAI GPT-4.1 指南:強迫工具呼叫會虛構輸入,給「無可記」出口)。
+(GPT-5.6/§2.8:強迫工具呼叫會虛構輸入,schema 給「無可記」出口、寧 null 不猜)。
 
 kind↔pool_id 的語義一致(pool_id 確屬 pools[kind])= executor(T4)持 knowledge 驗;
 本層只保證 pool_id ∈ 合法池聯集(生成期)+ 結構(pydantic)。LLM 不選通道、不繞 guard。

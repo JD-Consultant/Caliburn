@@ -325,6 +325,34 @@ async def test_agenda_tools_open_close_update_episode_state(db_session):
 
 
 @pytest.mark.asyncio
+async def test_agenda_artifact_injected_into_consultant_context(db_session):
+    """0033 T8b【接縫】:議程 artifact(`<議程>` 區塊)真的注入顧問 messages
+    ——事件狀態+覆蓋地圖讓顧問看得到議程(取代退役的單行 hint)。"""
+    p, s, repo, out, llm = await _run(db_session, "我們每兩週跑一次回歸",
+                                      select_result=SCRIBE_SLOT)
+    chat = [c for c in llm.calls if c["kind"] == "chat"][-1]
+    joined = "\n".join(m["content"] for m in chat["messages"]
+                       if isinstance(m.get("content"), str))
+    assert "<議程>" in joined and "</議程>" in joined
+    assert "回歸測試" in joined                                # 覆蓋地圖用任務語意名
+
+
+@pytest.mark.asyncio
+async def test_episode_dry_streak_accrues_when_no_yield(db_session):
+    """0033 T8b【接縫,BUG-4 根治】:開著事件、本回合零落地 → dry_streak 累加
+    (episode 粒度進帳;舊 note_attempt 的全域 progressed 病灶不再)。"""
+    p, s, repo = await _setup(db_session)
+    tp = "ocs_content.ocu_units.u1.tasks.t1"
+    await repo.update_session(s.id, ledger_state={
+        "episode": {"target": tp, "opened_seq": 1, "dry_streak": 0}})
+    # 純寒暄(worth_scribing=False)→ 書記不跑、無落地 → dry_streak 應 +1
+    llm = StubLlm(select_result={"records": []}, chat_text="嗯,再多說點?")
+    await run_turn(p.id, "嗯", db=db_session, llm=llm, knowledge=StubKnowledge())
+    sess = await repo.get_active(p.id)
+    assert sess.ledger_state["episode"]["dry_streak"] == 1
+
+
+@pytest.mark.asyncio
 async def test_close_episode_triggers_harvest_lands_indicator(db_session):
     """0033 T8a【接縫】:顧問 close_episode → 收割 pass 對事件逐字稿 BEI 編碼 →
     P(行為指標)落 `_pending`、pending_harvest 清。新架構第一次真的產出 P。"""

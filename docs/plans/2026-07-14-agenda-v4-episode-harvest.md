@@ -164,17 +164,51 @@ T8a/T8b 增量加新行為(舊梯子仍在跑,不刪),各自綠;T8c 才拆舊梯
   stalled_episode True;(c)auto_close 在第 3 輪。
 - 驗:api 全綠。
 
-#### T8c|梯子退役(拆舊軌;確定性收斂完成)
+#### T8c|梯子退役(拆舊軌;**盤點後細化——耦合比原估廣,分三類**)
 
-- 刪:`ledger.next_gap`+`ledger_summary`/`_ONBOARD_STEER` 被 artifact 取代部分;
-  onboarding/curation 縫判定搬 `agenda`(條件不變:無參考→選職類;無任務→intake/
-  curation);`ledger.py` 剩餘狀態函式(held/boundary/fatigue/note_attempt)併入
-  `agenda.py`,`ledger.py` 整檔退役(re-export 清、import 全改 coverage/agenda)。
-- 刪:`test_interview_ledger.py` 梯子測試;service 舊 last_gap/note_attempt 斷言改寫。
-- 測【接縫】:repo grep 無 `next_gap`/`ledger_summary` 殘留;`ledger` import 歸零。
+**2026-07-14 盤點發現**(grep next_gap/CURATION_TASKS/ONBOARD_OCCUPATION):
+舊 ledger 的東西**不是一坨梯子**,要拆三類、去向不同——混為一談會破壞裁剪縫:
+
+**A 類=梯子槽優先序(確定刪)**:`next_gap` 的 ①預算槽→②③細項槽→④P/K/S→⑤⑥
+排序邏輯。被議程取代。使用點:`service.py:159 last_gap`、`consultant.ledger_summary`
+的槽排序段、`gap_label` 的槽名。
+
+**B 類=議程階段判定(保留!搬 coverage,不可刪)**:`ONBOARD_OCCUPATION`/
+`CURATION_TASKS` 常數 + 判定。**v4 仍需**,被三處依賴:(a)`service.py:167` 裁剪縫
+`if last_gap==CURATION_TASKS`(新手核心流程!)、(b)`skill_loader.py:26` 教材掛載、
+(c)`consultant._ONBOARD_STEER` onboarding 話術。
+
+**⚠️ 等價性陷阱(2026-07-14 追查發現,勿踩)**:`CURATION_TASKS` 是**雙觸發**——
+next_gap ⓪「有職類 ∧ 無任務」**OR** ⓪′「有任務 ∧ 檢查表 unasked ∧ 未 stalled」。
+`derive_phase` 對「有任務」一律回 `opks_deep`,**不含** ⓪′ 分支 → **兩者不等價**!
+若把裁剪縫判定簡化成 `derive_phase==task_curation`,「有任務但官方清單沒問完」的
+裁剪會**靜默失效**(正是本次驗屍要根治的靜默斷)。
+**正解**:抽一個獨立純函式 `coverage.should_curate(doc, state, pool_tasks, ref_codes)
+-> bool`,原樣搬 next_gap 的 ⓪+⓪′ 判定(含 is_stalled(CURATION_TASKS)),
+service 裁剪縫改呼它;兩常數搬 coverage,三處 import 改。回歸靠 service 的
+test_curation_* + 新增「有任務但 unasked→仍裁剪」測試。
+
+**C 類=狀態函式(move-only 搬 agenda)**:held/boundary/fatigue/note_attempt/
+push_held/pop_held/add_boundary/in_boundary/is_fatigued/is_stalled → agenda.py。
+
+**步驟(每步綠了才下一步)**:
+1. B 類常數搬 coverage + 裁剪縫判定改 derive_phase;三處 import 改。驗全綠(行為不變)。
+2. C 類狀態函式 move-only 搬 agenda;import 改。驗全綠。
+3. 刪 A 類:`next_gap` 整函式 + `consultant.ledger_summary`/`gap_label`/`_ONBOARD_STEER`
+   被 artifact 取代部分(onboarding 話術改進 artifact 或保留精簡版);
+   `service.py:159 last_gap` 刪。`ledger.py` 空了→整檔退役,re-export 清。
+4. 改測試:`test_interview_ledger.py` 刪;`test_interview_consultant`(ledger_summary)、
+   `test_interview_refcodes`(next_gap)、`test_interview_skills`(常數)、
+   `test_interview_agenda_v3`(boundary)、`api/routes/interview.py:143`+
+   `test_interview_routes`(議程三態 API)、`evals/interview_sim.py:206` 全改。
+- 測【接縫】:grep 無 `next_gap`/`ledger_summary`;`import ledger` 歸零;
+  **裁剪縫回歸**(新手選職類→官方任務綠字直落 = service T5c 測試仍綠)。
 - 文檔:**同 commit** 更新 `docs/design/interview-engine.md`(§4 回合序 v4、§5 載體
-  表加收割、不變量 13=議程決策唯一路=顧問工具+guardrail、退役禁令加 next_gap 梯子)。
+  表加收割、不變量 13=議程決策唯一路、退役禁令加 next_gap 梯子)。
 - 驗:api 全綠+`npx turbo test` 全綠。
+- **風險提示**:B 類判定改寫若破壞 `derive_phase==task_curation` 等價性,裁剪縫會
+  靜默失效(新手流回到 BUG-1 前的斷棒)。改前先確認 derive_phase 對「有職類無任務」
+  回 task_curation(coverage 測試已覆蓋 test_derive_phase_progression)。
 
 ### T9|consultant prompt v4+GPT-5.6 紀律(spec §2.8)
 

@@ -3,12 +3,10 @@
 import { QueryClient, defaultShouldDehydrateQuery } from "@tanstack/react-query";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
-import { CopilotKitProvider } from "@copilotkit/react-core/v2";
 import { useState } from "react";
 
-// v2 provider (D22): v2 supports custom-UI/headless interrupt rendering without a
-// chat component (v1 useCoAgent/useLangGraphInterrupt is chat-centric). Agent is
-// referenced per-hook by agentId ("jd_authoring"); the runtime route registers it.
+// T12(ADR 0030):CopilotKitProvider 退場——AI 共編走訪談引擎 REST+`_pending`;
+// react-query persist(knowledge)保留原結構,勿連根拔。
 
 // 持久化版本印記:schema/契約破壞性變更時 bump → 自動失效舊快取（spec D-1d）。
 // v4-3:task-catalogs/header-meta 退役（P3,ADR 0021）,舊持久化條目作廢;
@@ -39,7 +37,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
         },
       }}
     >
-      <CopilotKitProvider runtimeUrl="/api/copilotkit">{children}</CopilotKitProvider>
+      {children}
     </PersistQueryClientProvider>
   );
 }

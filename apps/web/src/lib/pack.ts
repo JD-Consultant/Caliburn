@@ -1,8 +1,10 @@
 // 知識包 → 選單選項（ADR 0021；spec §5）。唯一的 pack 讀取邏輯集中點，全部純函式。
 // 池序 = append 序（職位優先序），選單不排序不搜尋；選項無碼 → FieldCombobox 顯序號。
 import type {
-  CodeName, KnowledgePack, NoteItem, OptionItem, PackSrc, PoolRow, SourceRef,
+  CodeName, ItemSource, KnowledgePack, MatchGroup, MatchResult, NoteItem, OcsDocument, OptionItem,
+  PackSrc, PoolRow, SourceRef, SourceTask,
 } from "@/types";
+import type { PoolPick } from "./ocsDoc";
 
 const newId = () => (globalThis.crypto?.randomUUID?.() ?? `id-${Math.random().toString(36).slice(2)}`);
 
@@ -66,6 +68,80 @@ export function codedPoolOptions(
   }));
 }
 
+// ── 參考選單身分對位(ADR 0029:改字不斷根) ──────────────────────────────────────
+// 文件筆 v ↔ 池選項 o 的身分比對:靠 _ref(來源碼)對位,**不看 _src、不看現名**——
+// 改過名(_src 轉 custom、現名≠原名)仍算同一項,故選單勾選不掉。無碼來源(值物件)退回比名。
+type RefItem = { name: string; _src?: ItemSource; _ref?: SourceRef };
+
+export function itemMatchesOption(v: RefItem, o: OptionItem): boolean {
+  const coded = (o.srcs ?? []).filter((s) => s.code);
+  if (coded.length > 0 || o.code) {
+    if (v._ref && coded.some((s) => s.code === v._ref!.code && s.ocs_code === v._ref!.ocs_code)) return true;
+    if (!coded.length && o.code) return v._ref?.code === o.code; // 無 srcs 的舊路徑（自訂候選）
+    return false;
+  }
+  return v.name === o.name; // 值物件(無碼來源,如態度/說明)→ 比名
+}
+
+// 選項是否已在文件(身分對位;含相似群 variants 任一命中——群列代表成員本人)。
+export function optionInDoc(value: RefItem[], o: OptionItem): boolean {
+  return value.some((v) => itemMatchesOption(v, o))
+    || (o.variants ?? []).some((vr) => value.some((v) => itemMatchesOption(v, vr)));
+}
+
+// 文件裡對到此選項的那一筆(給改名/原名副行用);未在=undefined → UI 據此判「無改名入口」。
+export function docItemForOption<T extends RefItem>(value: T[], o: OptionItem): T | undefined {
+  return value.find((v) => itemMatchesOption(v, o));
+}
+
+// 原名副行:文件筆現名≠池選項官方名且身分同 → 回官方原名;否則 null。
+export function originalNameNote(value: RefItem[], o: OptionItem): string | null {
+  const v = value.find((x) => itemMatchesOption(x, o));
+  return v && v.name !== o.name ? o.name : null;
+}
+
+// 改名不斷根:換文字、轉 custom,但**保留 _ref**(來源身分不掉 → 勾選仍命中、可顯原名副行)。
+export function renamedRefItem<T extends RefItem>(item: T, name: string): T {
+  return { ...item, name, _src: "custom" };
+}
+
+// ── 全域選任務:來源職責解析(spec §6) ────────────────────────────────────────
+// 任務列 → 它的「來源職責」(該掛入哪個職責)。多來源取與主基準同 ocs_code 者優先(同 pickOf)。
+export interface HomeUnit {
+  ocuName: string;      // 副行「將掛入:○○」
+  unitSrc: SourceRef;   // 建職責用(含 ocu_code 身分)
+  existingIdx: number;  // 文件已有該職責的 index;-1=不在(需先建再掛)
+}
+export function resolveHomeUnit(row: TaskRowVM, doc: OcsDocument, pack: KnowledgePack, primary: string): HomeUnit | null {
+  const sts = row.urns.map((u) => pack.source_tasks[u]).filter((s): s is SourceTask => !!s);
+  if (!sts.length) return null;
+  const st = sts.find((s) => s.ocs_code === primary) ?? sts[0];
+  const unitSrc: SourceRef = {
+    ocs_code: st.ocs_code, occupation_name: st.ocs_name, code: "",
+    ocu_code: st.ocu_code ?? undefined,
+  };
+  const key = `${st.ocs_code}__${st.ocu_code ?? ""}`;
+  const existingIdx = doc.ocs_content.ocu_units.findIndex((u) =>
+    (u._refs ?? []).some((r) => r.ocu_code && `${r.ocs_code}__${r.ocu_code}` === key));
+  return { ocuName: st.ocu_name || "職責", unitSrc, existingIdx };
+}
+
+// 任務列 → PoolPick 任務(provenance 取主基準優先來源;同 TaskPickerMenu pickOf)。
+export function taskPickFromRow(row: TaskRowVM, primary: string): PoolPick["tasks"][number] {
+  const pref = row.srcs.find((s) => s.ocs_code === primary) ?? row.srcs[0];
+  return { name: row.name, srcs: row.srcs, provenance: { ocs_code: pref?.ocs_code ?? "", task_code: pref?.task_code ?? "" } };
+}
+
+// 「選同職能基準」整組帶入:主基準的全部職責 + 各自官方任務(一鍵鋪官方骨架)。
+export function primarySkeletonPicks(pack: KnowledgePack, primary: string): PoolPick[] {
+  const uRows = unitRows(pack).filter((u) => u.srcs.some((s) => s.ocs_code === primary));
+  const tRows = taskRows(pack);
+  return uRows.map((u) => ({
+    unit: { name: u.name, srcs: u.srcs },
+    tasks: tRows.filter((t) => u.ownTaskKeys.includes(t.name)).map((t) => taskPickFromRow(t, primary)),
+  }));
+}
+
 // 選項 → 官方文件項（勾選/預勾共用形狀；_ref = srcs[0]，即 own-first 重排後的本任務來源）。
 export function toItems(options: OptionItem[]): CodeName[] {
   return options.map((o) => ({
@@ -112,6 +188,7 @@ export interface TaskRowVM {
   name: string;                 // tasks 池 key
   urns: string[];               // 池列 srcs（source_tasks 的 URN）
   srcs: SourceRef[];            // 顯示用（URN → source_tasks 解出）
+  similarTo?: { name: string; score: number }[];  // 相似比對灰區對(ADR 0022,純顯示)
 }
 
 export function unitRows(pack: KnowledgePack): UnitRowVM[] {
@@ -157,4 +234,57 @@ export function primaryBasisOptions(pack: KnowledgePack): BasisOption[] {
     job_description: d.job_description,
     ocs_level: d.ocs_level,
   }));
+}
+
+// ── 相似比對(ADR 0022)。鐵律:選擇邏輯(primaryDefaults/自動套/勾選/寫入身分)跑在
+// 平選項上一行不改;以下只是 render 前最後一步的顯示變換(把分群搬進選擇邏輯 = 違規)。──
+
+// survivorship(顯示代表):主基準成員優先(不變量 B)→ 文字最長 → 名稱升序(決定論)。
+function survivor(members: OptionItem[], primaryCode: string): OptionItem {
+  const primary = members.find((o) => (o.srcs ?? []).some((s) => s.ocs_code === primaryCode));
+  if (primary) return primary;
+  return [...members].sort((a, b) => b.name.length - a.name.length || a.name.localeCompare(b.name))[0];
+}
+
+// 值池選項 → 顯示列:群成員收成一列(代表 = survivor,其餘進 variants)。代表列**就是
+// 成員本人**(群無可選身分,文件永遠只出現成員真身)。match 缺席 → 原樣返回(降級)。
+// 池序保持:群放在首個成員的位置;成員對不上池 → 不收合。
+export function groupedValueOptions(
+  options: OptionItem[], match: MatchResult | undefined, primaryCode: string,
+): OptionItem[] {
+  if (!match?.groups?.length) return options;
+  const byName = new Map(options.map((o) => [o.name, o]));
+  const groupOf = new Map<string, MatchGroup>();
+  for (const g of match.groups) for (const m of g.members) groupOf.set(m.id, g);
+  const emitted = new Set<MatchGroup>();
+  const out: OptionItem[] = [];
+  for (const o of options) {
+    const g = groupOf.get(o.name);
+    if (!g) { out.push(o); continue; }
+    if (emitted.has(g)) continue;
+    emitted.add(g);
+    const members = g.members.map((m) => byName.get(m.id)).filter((x): x is OptionItem => !!x);
+    if (members.length < 2) { out.push(o); continue; }   // 成員對不上池 → 不收合
+    const rep = survivor(members, primaryCode);
+    out.push({ ...rep, variants: members.filter((m) => m !== rep) });
+  }
+  return out;
+}
+
+// 任務列 + 灰區對(雙向)。similarity 缺席 → 原樣(降級)。純顯示:不勾、不併、不擋。
+export function taskRowsWithSimilar(pack: KnowledgePack): TaskRowVM[] {
+  const rows = taskRows(pack);
+  const pairs = pack.similarity?.task?.possible_matches ?? [];
+  if (!pairs.length) return rows;
+  const map = new Map<string, { name: string; score: number }[]>();
+  const push = (k: string, v: { name: string; score: number }) => {
+    const arr = map.get(k) ?? [];
+    arr.push(v);
+    map.set(k, arr);
+  };
+  for (const p of pairs) {
+    push(p.left_id, { name: p.right_id, score: p.score });
+    push(p.right_id, { name: p.left_id, score: p.score });
+  }
+  return rows.map((r) => (map.has(r.name) ? { ...r, similarTo: map.get(r.name)! } : r));
 }

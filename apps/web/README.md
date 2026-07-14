@@ -23,13 +23,13 @@ npm run lint
 
 | 路徑 | 是什麼 |
 |---|---|
-| `src/app/` | 路由:`/`(→dashboard)、`/dashboard`(職務檔案清單)、`/documents/[id]`(**工作台**,主畫面)、`/documents/[id]/intake`(3 題小訪談,選用)、`/api/copilotkit`(AG-UI runtime 轉接到後端 `/copilotkit`) |
-| `src/components/interview/` | 工作台元件:`JobDocTable`(主表格,dnd 排序)、`DocHeader`(官方表頭 5 欄)、`CellFillerPanel`(O/P/K/S 填格側欄)、`OccupationPicker`(選職類 modal)、`UnitPickerMenu`(工具列「選職責 ▾」下拉)、`TaskPickerMenu`(每職責列「選任務 ▾」大池選單)、`ConflictDialog`(409 衝突二選一)、`DocNotes`、`fields/*`(FieldCombobox/OfficialMenu/FieldText/SourceLine 共用選單元件)、`InterruptHandlers`(LangGraph 訪談 HITL 面板;**目前無頁面掛載**,待訪談引擎重寫,ADR 0020) |
-| `src/hooks/` | 資料層 hooks:`useDocument`(文件 + autosave + 選職類)、`useKnowledge`(知識包 query,ADR 0021)、`useProfiles`、`useHydrated` |
-| `src/lib/` | `api.ts`(唯一 fetch client,`/api/v1/*` + `ApiError`)、`ocsDoc.ts`(**純函式**文件編輯:clone→改→回傳 + 位置重編碼 + A4 文件級 K/S 重編)、`pack.ts`(**知識包→選單選項**純函式:池→OptionItem、own-first srcs、預勾集;ADR 0021)、`urn.ts`、`download.ts` |
+| `src/app/` | 路由:`/`(→dashboard)、`/dashboard`(職務檔案清單)、`/documents/[id]`(**工作台**,主畫面)、`/documents/[id]/intake`(3 題小表單,存 job_summary 供選職類預填)、`/documents/[id]/interview`(逐字稿稽核視圖) |
+| `src/components/interview/` | 工作台元件:`JobDocTable`(主表格,dnd 排序;**T8 `_pending` 四態渲染+✓✗?+批量工具列**)、`PendingMark`(追蹤修訂 UI:綠字/紅刪除線+出處卡;ADR 0030)、`AgendaList`(議程三態)、`DocHeader`(官方表頭)、`OccupationPicker`、`UnitPickerMenu`、`TaskPickerMenu`、`GlobalTaskPickerMenu`、`ConflictDialog`、`DocNotes`、`fields/*`(FieldCombobox/OfficialMenu/FieldText/SourceLine)、`InterviewPanel`(**AI 訪談側欄**:打字機對話+議程+收尾卡;ADR 0030) |
+| `src/hooks/` | 資料層 hooks:`useDocument`(文件 + autosave + 選職類)、`useKnowledge`(知識包 query,ADR 0021)、`useInterview`(start/turn/finish/view;turn 後 invalidate document→外部變化路徑重設 baseline)、`useProfiles`、`useHydrated` |
+| `src/lib/` | `api.ts`(唯一 fetch client,`/api/v1/*` + `ApiError`)、`ocsDoc.ts`(**純函式**文件編輯:clone→改→回傳 + 位置重編碼 + A4 文件級 K/S 重編 + **`_pending` 四態輔助 accept/reject/listPending**;ADR 0030)、`pack.ts`(知識包→選單選項純函式;ADR 0021/0022)、`interviewUi.ts`(側欄純邏輯:議程/chips/打字機)、`slots.ts`(槽標籤)、`urn.ts`、`download.ts` |
 | `src/store/user.ts` | zustand + persist:匿名 userId(localStorage `caliburn-user`;404 時自動重建) |
 | `src/types/index.ts` | 契約型別(生成底 + UI 欄位)+ 各端點回應型別 |
-| `src/components/layout/Providers.tsx` | QueryClient + **選擇性持久化** + CopilotKitProvider |
+| `src/components/layout/Providers.tsx` | QueryClient + **選擇性持久化**(CopilotKitProvider 已退場,T12) |
 
 ## 資料層:兩個 query、兩種性質(P3 收斂,ADR 0021)
 
@@ -64,10 +64,12 @@ baseline = 最後已知 server 狀態快照,是 dirty 判定 / no-op skip / 樂�
 
 ### 2. 選職類
 
-`OccupationPicker` → `GET /occupations?q=`(根層目錄搜尋)→ 勾選(順序=優先度)→
-`PUT /job-profiles/{id}/occupations` → invalidate **document + knowledge** + 背景 prefetch
-新知識包(server 已把表頭刷成第一順位官方基準;表頭/態度/NOTE/選任務/填格選單全部
-吃這一包,選職類=唯一同步點)。
+`OccupationPicker`(modal)或**訪談建議卡** `OccupationSuggestCard`(0031:顧問提議
+→卡片進對話流,預勾+理由,一鍵加入;✕=`occupation_dismissed` 記帳)→
+`PUT /job-profiles/{id}/occupations`(0029:只寫 profile 參考集合,**不動文件表頭**;
+主基準由職類視窗 PATCH)→ invalidate **document + knowledge** + 背景 prefetch 新知識包
+(表頭/態度/NOTE/選任務/填格選單全部吃這一包,選參考=唯一同步點)。參考集合空時
+訪談面板頂常駐「📌 待選」chip 重入口。
 
 ### 3. 選職責 → 選任務(表格中心,遞迴選單)
 
@@ -76,7 +78,8 @@ baseline = 最後已知 server 狀態快照,是 dirty 判定 / no-op skip / 樂�
 每職責列「**選任務 ▾**」(`TaskPickerMenu`,任務**全池**不過濾:自己的預勾、其餘可勾=借用,
 已在他職責標「已加入」;空職責首開自動帶官方任務;取消勾選=移除空任務,已填鎖定)→
 每一勾=**前端文件編輯**(`addTasksToUnit`,任務帶 provenance+`_refs` 多來源)→ commit
-(回到流程 1 的 autosave PATCH)。AI 預勾/自訂助手已拆,等訪談引擎(ADR 0020)。
+(回到流程 1 的 autosave PATCH)。**盤永遠人開**(ADR 0032):AI 不彈窗、不預勾——
+訪談 intake 邀請卡「開任務盤」一鍵開全域盤(受控 open),婉拒=`task_board_dismissed` 記帳。
 
 ### 4. 填格(O/P/K/S)
 

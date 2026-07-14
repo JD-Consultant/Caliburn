@@ -17,7 +17,7 @@ updated: 2026-07-04
 - **catalog-first**:標準項一律來自 indexer(該 `task_code` 的 `competencies`);**LLM 只個人化 / 篩選 / 草擬**。
 - **降級**:無 LLM(無金鑰)或無 note → catalog-only / fallback / 空;**不崩、catalog 有就不留空**。
 - **每項標 `source: "catalog" | "ai"`**(K/S 另帶一句 `reason`);LLM **grounded**——AI 發明的 code/id **丟掉**。
-- 統一 `role="cheap"`(便宜模型;對比 authoring 的 `deep`/`indicator`)。
+- 統一 `role="cheap"`(便宜模型;對比訪談引擎的 `interview`/`select`)。
 
 ## 2. 五個服務([`services/ai/*`](../../app/services/ai/))
 
@@ -43,6 +43,6 @@ updated: 2026-07-04
 ## 4. 指路
 
 - 端點面 / 降級分級:[`../README.md`](../README.md)(§4 AI 提議降級鏈、端點表 `POST /ai/*`)。
-- 未來訪談 agent(會重用這些):[`authoring.md`](authoring.md) + ADR [0020](../../../docs/adr/0020-interview-authoring-interaction-model.md)。
+- 訪談引擎(重用這些純函式):[`docs/design/interview-engine.md`](../../../docs/design/interview-engine.md)(ADR 0030)。
 - catalog 從哪來:[`../../ocs-indexer/docs/pipeline.md`](../../ocs-indexer/docs/pipeline.md)(competencies)+ [`knowledge-pack-assembly.md`](knowledge-pack-assembly.md)。
 - ports(`LlmPort`):`app/core/ports.py`;LLM adapter:`app/adapters/llm_openrouter.py`(per-role + JSON 重試)。

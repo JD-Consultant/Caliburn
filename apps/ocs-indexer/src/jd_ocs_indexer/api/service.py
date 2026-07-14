@@ -6,8 +6,6 @@ imports here so the layer stays unit-testable with fakes.
 
 from __future__ import annotations
 
-import numpy as np
-
 from jd_ocs_indexer.api import urn
 from jd_ocs_indexer.embeddings.base import assert_compatible
 from jd_ocs_indexer.store.manifest import read_manifest
@@ -213,57 +211,3 @@ def healthcheck(client, embedder, collection: str) -> dict:
         "collection": collection,
         "index_model": index_model,
     }
-
-
-def _pairwise_candidates(tasks: list[dict], threshold: float) -> list[dict]:
-    """Brute-force cosine over task vectors → undirected candidate pairs >= threshold.
-    `tasks`: [{id, ocs_code, task_code, task_name, vector}]. Small set (selected OCS)."""
-    if len(tasks) < 2:
-        return []
-    mat = np.asarray([t["vector"] for t in tasks], dtype=float)
-    norms = np.linalg.norm(mat, axis=1, keepdims=True)
-    norms[norms == 0] = 1.0
-    unit = mat / norms
-    sim = unit @ unit.T
-    out: list[dict] = []
-    n = len(tasks)
-    for i in range(n):
-        for j in range(i + 1, n):
-            score = float(sim[i, j])
-            if score >= threshold:
-                out.append({
-                    "a": {"urn": urn.task_urn(tasks[i]["ocs_code"], tasks[i]["task_code"]),
-                          "ocs_code": tasks[i]["ocs_code"], "task_code": tasks[i]["task_code"],
-                          "task_name": tasks[i]["task_name"]},
-                    "b": {"urn": urn.task_urn(tasks[j]["ocs_code"], tasks[j]["task_code"]),
-                          "ocs_code": tasks[j]["ocs_code"], "task_code": tasks[j]["task_code"],
-                          "task_name": tasks[j]["task_name"]},
-                    "score": round(score, 4)})
-    return out
-
-
-def find_similar_tasks(client, collection: str, *, ocs_codes: list[str],
-                       score_threshold: float = 0.85) -> dict:
-    flt = models.Filter(must=[
-        models.FieldCondition(key="chunk_level", match=models.MatchValue(value="task")),
-        models.FieldCondition(key="ocs_code", match=models.MatchAny(any=list(ocs_codes))),
-    ])
-    tasks: list[dict] = []
-    offset = None
-    while True:
-        records, offset = client.scroll(
-            collection_name=collection, scroll_filter=flt,
-            with_payload=True, with_vectors=True, limit=256, offset=offset)
-        for r in records:
-            p = r.payload or {}
-            vec = r.vector
-            if isinstance(vec, dict):           # named vectors → take dense
-                vec = vec.get("dense") or next(iter(vec.values()), None)
-            if vec is None:
-                continue
-            tasks.append({"id": str(getattr(r, "id", "")), "ocs_code": p.get("ocs_code", ""),
-                          "task_code": p.get("task_code") or "", "task_name": p.get("task_name") or "",
-                          "vector": vec})
-        if offset is None:
-            break
-    return {"candidates": _pairwise_candidates(tasks, score_threshold)}

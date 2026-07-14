@@ -5,26 +5,22 @@
 // draft（自動儲存）。續做＝重開自動載 draft。finalize 產正式版本。不碰 CopilotKit。
 import { use, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { ChevronLeft, Download, FileCheck2, Layers } from "lucide-react";
+import { ChevronLeft, Download, FileCheck2, Layers, MessageCircle, X } from "lucide-react";
 import { useProfile } from "@/hooks/useProfiles";
 import { useAutosaveDocument, useDocument, useFinalizeDocument } from "@/hooks/useDocument";
 import { useKnowledge } from "@/hooks/useKnowledge";
 import { getDocumentExport } from "@/lib/api";
 import { downloadJson } from "@/lib/download";
-import { JobDocTable, type CellTarget } from "@/components/interview/JobDocTable";
-import { CellFillerPanel } from "@/components/interview/CellFillerPanel";
+import { JobDocTable } from "@/components/interview/JobDocTable";
 import { OccupationPicker } from "@/components/interview/OccupationPicker";
-import { UnitPickerMenu } from "@/components/interview/UnitPickerMenu";
+import { GlobalTaskPickerMenu } from "@/components/interview/GlobalTaskPickerMenu";
 import { ConflictDialog } from "@/components/interview/ConflictDialog";
-import { completion, ensureIds } from "@/lib/ocsDoc";
-import type { OcsDocument } from "@/types";
+import { InterviewPanel } from "@/components/interview/InterviewPanel";
+import { completion, ensureIds, listPending } from "@/lib/ocsDoc";
+import type { OcsDocument, OpenPickerWidget } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-
-function targetKey(t: CellTarget): string {
-  return `${t.kind}-${t.unitIdx}-${t.taskIdx}`;
-}
 
 export default function V3Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -33,9 +29,11 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
   // 補上穩定 id（拖拉用）；memo 讓 id 在重繪間穩定，編輯時 clone 會保留。
   const doc: OcsDocument | undefined = useMemo(() => ensureIds(envelope?.content), [envelope]);
   const status = envelope?.status ?? "none";
-  const hasOccupations = !!doc?.ocs_profile?.ocs_code;
+  // ADR 0029 脫鉤:選單/知識包 gate = **有參考**(profile 的 selected_ocs_codes),
+  // 不再看文件表頭 ocs_code。只選參考、不動表頭時,文件仍空但選單有料。
+  const hasReferences = (profile?.selected_ocs_codes?.length ?? 0) > 0;
   // 知識包(ADR 0021):選職責下拉的資料源(表格內選單各自訂閱同一 query)。
-  const { data: pack } = useKnowledge(id, hasOccupations);
+  const { data: pack } = useKnowledge(id, hasReferences);
 
   const {
     status: saveStatus,
@@ -52,9 +50,19 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
   useEffect(() => { flushRef.current = flush; });
   useEffect(() => () => { flushRef.current(); }, []);
 
-  const [target, setTarget] = useState<CellTarget | null>(null);
   const [showOcc, setShowOcc] = useState(false);
+  const [showInterview, setShowInterview] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // 0028 D1:訪談引擎 widget 指令 → 開**同一批**編輯器 pickers(同 UI、入口不同)。
+  // 0032:AI 不彈盤——盤只由人開(intake 卡按鈕/工具列);taskBoardOpen=受控開窗。
+  const [aiOccQuery, setAiOccQuery] = useState<string | null>(null);
+  const [taskBoardOpen, setTaskBoardOpen] = useState(false);
+  const onWidget = (w: OpenPickerWidget) => {
+    if (w.picker === "occupation") {
+      setAiOccQuery(w.query ?? "");
+      setShowOcc(true);
+    }
+  };
 
   const persist = (next: OcsDocument, after?: () => void) => {
     setError(null);
@@ -71,6 +79,11 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
 
   const exportJson = async () => {
     setError(null);
+    // T8(§6.6 未清不擋事):匯出自動剝未審項(後端 _strip_underscore);待審>0 先提示。
+    const nPending = doc ? listPending(doc).length : 0;
+    if (nPending > 0 && !window.confirm(`還有 ${nPending} 筆 AI 待審項,匯出將不含未審項。仍要匯出?`)) {
+      return;
+    }
     try {
       const data = await getDocumentExport(id);
       const occ = data.ocs_profile?.ocs_name?.occupation_name || profile?.job_title || "職務說明書";
@@ -108,10 +121,25 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
           ) : null}
           <Button size="sm" variant="outline" className="gap-1" onClick={() => setShowOcc(true)}>
             <Layers className="h-4 w-4" />
-            選職類
+            選職能基準參考
           </Button>
-          {/* 選職責 ▾（P3 UI 修訂）：勾＝空職責入表格，任務再從職責列「選任務 ▾」挑 */}
-          <UnitPickerMenu document={doc} pack={pack} disabled={!hasOccupations || !doc} onChange={(d) => persist(d)} />
+          {/* 訪談面板(ADR 0020 混合載體:文件常駐、面板在側;引擎 ADR 0023) */}
+          <Button
+            size="sm"
+            variant={showInterview ? "default" : "outline"}
+            className="gap-1"
+            onClick={() => setShowInterview((v) => !v)}
+            // v2(ADR 0027 §9.3):空白也可起跑——顧問開場引導選職類,不再要求先選職類;
+            // 只禁已定稿(final)。手動〔選職類〕仍在(平行路徑)。
+            disabled={status === "final"}
+          >
+            <MessageCircle className="h-4 w-4" />
+            AI 訪談
+          </Button>
+          {/* 全域〔選工作任務〕(ADR 0029)：勾一筆自動掛到來源職責；〔選主要職責〕已搬到表格底部；
+              受控開窗(0032):intake 邀請卡「開任務盤」也開這一個窗 */}
+          <GlobalTaskPickerMenu document={doc} pack={pack} disabled={!hasReferences || !doc}
+            onChange={(d) => persist(d)} open={taskBoardOpen} onOpenChange={setTaskBoardOpen} />
           <Button size="sm" variant="outline" className="gap-1" onClick={exportJson} disabled={status === "none"}>
             <Download className="h-4 w-4" />
             匯出 JSON
@@ -150,7 +178,6 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
               <JobDocTable
                 document={doc}
                 profileId={id}
-                onCell={setTarget}
                 onChange={(d) => persist(d)}
               />
             </div>
@@ -159,23 +186,12 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
         )}
       </main>
 
-      {target && doc ? (
-        <CellFillerPanel
-          key={targetKey(target)}
-          document={doc}
-          target={target}
-          profileId={id}
-          onSave={(next) => persist(next)}
-          onClose={() => setTarget(null)}
-        />
-      ) : null}
-
-
       {showOcc ? (
         <OccupationPicker
           profileId={id}
-          defaultQuery={profile?.job_summary || profile?.job_title || ""}
-          onClose={() => setShowOcc(false)}
+          defaultQuery={aiOccQuery ?? (profile?.job_summary || profile?.job_title || "")}
+          autoSearch={aiOccQuery != null}
+          onClose={() => { setShowOcc(false); setAiOccQuery(null); }}
           onError={setError}
         />
       ) : null}
@@ -186,6 +202,36 @@ export default function V3Page({ params }: { params: Promise<{ id: string }> }) 
           onLoadLatest={() => void loadLatest()}
           onOverwrite={overwriteWithLocal}
         />
+      ) : null}
+
+      {/* 訪談側欄:文件常駐主畫面、面板疊右側(可收);寫入全走 persist 同一條 PATCH */}
+      {showInterview ? (
+        <aside className="fixed inset-y-0 right-0 z-40 flex w-full max-w-md flex-col border-l bg-background shadow-xl">
+          <div className="flex items-center justify-between border-b px-3 py-2">
+            <span className="text-sm font-medium">AI 訪談顧問</span>
+            <div className="flex items-center gap-2">
+              <Link
+                href={`/documents/${id}/interview`}
+                className="text-xs text-muted-foreground underline hover:text-foreground"
+              >
+                訪談紀錄
+              </Link>
+              <Button size="icon" variant="ghost" onClick={() => setShowInterview(false)}>
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+          <div className="min-h-0 flex-1">
+            <InterviewPanel
+              profileId={id}
+              doc={doc}
+              onWidget={onWidget}
+              referenceEmpty={!(profile?.selected_ocs_codes?.length)}
+              onOpenReference={() => { setAiOccQuery(null); setShowOcc(true); }}
+              onOpenTaskBoard={() => setTaskBoardOpen(true)}
+            />
+          </div>
+        </aside>
       ) : null}
 
     </div>

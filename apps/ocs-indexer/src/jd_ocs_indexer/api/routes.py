@@ -3,6 +3,7 @@ lock serializes BGE-M3 calls (FlagEmbedding is not guaranteed thread-safe)."""
 
 from __future__ import annotations
 
+import httpx
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import JSONResponse
@@ -10,9 +11,9 @@ from fastapi.responses import JSONResponse
 from jd_ocs_indexer.api import service
 from jd_ocs_indexer.api.schemas import (
     CompetencyPool,
-    FindSimilarRequest,
-    FindSimilarResponse,
     HealthResponse,
+    MatchRequest,
+    MatchResponse,
     OccupationDetail,
     OccupationSearchResponse,
     OccupationTasks,
@@ -22,6 +23,8 @@ from jd_ocs_indexer.api.schemas import (
     TaskSearchResponse,
     TasksResponse,
 )
+from jd_ocs_indexer.matching import core
+from jd_ocs_indexer.matching import service as matching_service
 
 router = APIRouter()
 
@@ -59,13 +62,27 @@ async def batch_get_tasks(req: TaskBatchGetRequest, request: Request):
         app.state.settings.qdrant_collection, ids=req.ids)
 
 
-@router.post("/tasks:findSimilar", response_model=FindSimilarResponse)
-async def find_similar_tasks(req: FindSimilarRequest, request: Request):
+# 相似比對(ADR 0022):池進 → {真重複群, 灰區對} 出。確定性、非破壞;
+# 錯誤 body = detail dict 含 code(version_conflict 先例)。
+@router.post("/items:match", response_model=MatchResponse)
+async def match_items(req: MatchRequest, request: Request):
     app = request.app
-    return await run_in_threadpool(
-        service.find_similar_tasks, app.state.client,
-        app.state.settings.qdrant_collection,
-        ocs_codes=req.ocs_codes, score_threshold=req.score_threshold)
+    if len(req.items) > 500:
+        raise HTTPException(status_code=413, detail={"code": "too_many_items", "max": 500})
+    if req.kind not in core.THRESHOLDS:
+        raise HTTPException(status_code=422, detail={"code": "unknown_kind", "kind": req.kind})
+    if len({it.id for it in req.items}) != len(req.items):
+        # id 唯一是管線前置條件(collapse/score 以 id 為鍵;撞號會靜默吃掉配對)
+        raise HTTPException(status_code=422, detail={"code": "duplicate_item_ids"})
+
+    def _run():
+        with app.state.embed_lock:
+            return matching_service.match_items(app.state.embedder, kind=req.kind, items=req.items)
+
+    try:
+        return await run_in_threadpool(_run)
+    except httpx.HTTPError as exc:   # embedder 掛/超時 → 503(api 端據此降級)
+        raise HTTPException(status_code=503, detail={"code": "embedder_unavailable"}) from exc
 
 
 @router.get("/occupations/{ocs_code}", response_model=OccupationDetail)

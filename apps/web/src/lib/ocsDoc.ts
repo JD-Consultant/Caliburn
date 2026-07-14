@@ -1,7 +1,8 @@
 // D27 OCS 文件的就地（immutable）更新與完成度計算。每任務一個 competency_block
 // → 都讀寫 competency_blocks[0]。完成度公式對齊後端 compute_completion：
 // filled = 1(表頭) + (A?1:0) + Σ_task[(O>0)+(P>0)+(K>0)+(S>0)]；total = 4*任務數 + 2。
-import type { CodeName, CompetencyBlock, Indicator, NoteItem, OcsDocument, OcsTask, OcuUnit, SourceRef } from "@/types";
+import type { CodeName, CompetencyBlock, Indicator, NoteItem, OcsCategory, OcsDocument, OcsName, OcsProfile, OcsTask, OcuUnit, SourceRef } from "@/types";
+import type { PendingMark } from "@caliburn/ocs-contract";
 
 function clone(doc: OcsDocument): OcsDocument {
   return structuredClone(doc);
@@ -57,10 +58,42 @@ function renumberDocKS(doc: OcsDocument): void {
   }
 }
 
+// raw content 可能是 virgin/部分草稿:後端刻意允許 top-level 鍵缺席(verify.py「處女文件」),
+// 且 ADR 0029 選職類只寫 profile,AI 訪談會在未定表頭時就把官方任務寫進 ocs_content →
+// 存下無 ocs_profile 的草稿。前端 OcsDocument 型別承諾五頂層鍵齊全,此處=唯一正規化縫,
+// 補足骨架讓 DocHeader 與所有 profile setter 對空/部分文件都安全(單點修,免每 consumer 各自防)。
+type PartialDoc = {
+  version_info?: { versions?: unknown[] };
+  ocs_profile?: Partial<OcsProfile> & { ocs_name?: Partial<OcsName>; category?: Partial<OcsCategory> };
+  ocs_content?: { ocu_units?: OcuUnit[] };
+  ocs_attitude?: { attitudes?: CodeName[] };
+  notes?: { prerequisites?: string[]; supplements?: string[] };
+};
+
+function fillSkeleton(doc: OcsDocument): void {
+  const d = doc as PartialDoc;
+  d.version_info ??= { versions: [] };
+  d.version_info.versions ??= [];
+  const p = (d.ocs_profile ??= {});
+  p.ocs_code ??= "";
+  p.ocs_name ??= { job_category_name: null, occupation_name: "" };
+  p.category ??= { job_categories: [], occupations: [], industries: [] };
+  p.job_description ??= "";
+  p.ocs_level ??= null;
+  d.ocs_content ??= { ocu_units: [] };
+  d.ocs_content.ocu_units ??= [];
+  d.ocs_attitude ??= { attitudes: [] };
+  d.ocs_attitude.attitudes ??= [];
+  d.notes ??= { prerequisites: [], supplements: [] };
+  d.notes.prerequisites ??= [];
+  d.notes.supplements ??= [];
+}
+
 // 補上缺少的穩定 id（dnd 用）。新載入的文件（seed/build 來的）沒有 id → 在此補。
 export function ensureIds(doc: OcsDocument | undefined): OcsDocument | undefined {
   if (!doc) return doc;
   const next = clone(doc);
+  fillSkeleton(next);   // virgin/部分草稿 → 補足型別承諾的完整骨架(見上)
   for (const u of next.ocs_content?.ocu_units ?? []) {
     if (!u._uid) u._uid = uid();
     for (const t of u.tasks ?? []) {
@@ -259,9 +292,8 @@ export function renameUnit(doc: OcsDocument, ui: number, name: string): OcsDocum
   const unit = next.ocs_content.ocu_units[ui];
   if (unit.ocu_name === name) return next;
   unit.ocu_name = name;
-  // 改名=斷鏈變自訂(spec 2026-07-04 §5;與 OPKS「改內容→自訂」一致;底下任務身分不受影響)
-  delete unit._refs;
-  unit.source = { ocs_code: "", occupation_name: "" };
+  // 改名不斷根(ADR 0029:全層統一):保留 _refs/source 身分——參考選單勾選按身分不掉,
+  // 原名靠 pack 對位顯示副行。來源=出身紀錄,不因改字而抹除。
   return next;
 }
 
@@ -291,9 +323,8 @@ export function renameTask(doc: OcsDocument, ui: number, ti: number, name: strin
   if (tc.name === name) return next;
   tc.name = name;
   t.task_codes = [tc];
-  delete t._refs;          // 改名=斷鏈變自訂(spec §5;own-refs 自動帶入/官方級別隨之失效)
-  delete t._levelSrc;
-  t.provenance = { ocs_code: "", task_code: "" };
+  // 改名不斷根(ADR 0029:全層統一):保留 _refs/_levelSrc/provenance 身分——勾選不掉、
+  // 官方級別仍連動,原名靠 pack 對位顯示副行。
   return next;
 }
 
@@ -379,6 +410,39 @@ export function addTasksToUnit(doc: OcsDocument, ui: number, tasks: PoolPick["ta
   const unit = next.ocs_content.ocu_units[ui];
   if (!unit) return next;
   for (const t of tasks) unit.tasks.push(taskFromPool(t));
+  return renumber(next);
+}
+
+// 訪談抓漏核准 → 前端落地(ADR 0025 不變量2:人核准的建議=人的寫入,由前端套用;
+// 重編碼是前端 renumber 職權)。RC4:原本核准後丟 manual 叫使用者自己去「選任務▾」加,
+// 找不到=體驗斷裂;現在核准即落地。unit_ref 是 LLM 給的參照(_uid/顯示碼/職責名任一),
+// 對不上就開一個自訂職責掛上,核准的任務絕不消失。
+export function addCustomTask(doc: OcsDocument, unitRef: string, name: string): OcsDocument {
+  const next = clone(doc);
+  const units = next.ocs_content.ocu_units;
+  let unit = units.find(
+    (u) => u._uid === unitRef || u.ocu_code === unitRef || u.ocu_name === unitRef,
+  );
+  if (!unit) {
+    unit = {
+      ocu_code: "", ocu_name: unitRef || "公司自訂職責",
+      source: { ocs_code: "", occupation_name: "" }, tasks: [], _uid: uid(),
+    } as OcuUnit;
+    units.push(unit);
+  }
+  const t = emptyTask();
+  t.task_codes = [{ code: "", name }];   // 自訂任務(provenance 留空;renumber 給位置碼)
+  unit.tasks.push(t);
+  return renumber(next);
+}
+
+// 訪談抓漏的新職責:一律開自訂職責(公版外;renumber 給 T{n} 位置碼)。
+export function addCustomDuty(doc: OcsDocument, name: string): OcsDocument {
+  const next = clone(doc);
+  next.ocs_content.ocu_units.push({
+    ocu_code: "", ocu_name: name || "公司自訂職責",
+    source: { ocs_code: "", occupation_name: "" }, tasks: [], _uid: uid(),
+  } as OcuUnit);
   return renumber(next);
 }
 
@@ -485,6 +549,180 @@ export function setAttitudes(doc: OcsDocument, items: CodeName[]): OcsDocument {
   const next = clone(doc);
   next.ocs_attitude = { attitudes: items.map((it) => ({ ...it })) }; // 拷貝再交給 renumber 給碼
   return renumber(next);
+}
+
+// ── 追蹤修訂 _pending(ADR 0030 T8)────────────────────────────────────────────
+// AI 寫入一律以 `_pending` 落文件;✓=去標(accept)、✗=還原(reject),文件變換
+// 由前端執行(0025 不變量:提議由前端套用後走 PATCH)。兩種載形:
+// 1) 行內:條目/任務/職責節點自帶 `_pending: PendingMark`;
+// 2) 集合:scalar 槽的容器帶 `_pending: {槽名: PendingMark}`(details/表頭/區塊級別)。
+// path 文法鏡像後端 docpath.py:段以 `.` 連接;list 段用穩定 id(_tid/_uid/_id)或 index。
+
+export type PendingStatus = "confirmed" | "pending_add" | "pending_mod" | "pending_del";
+export type { PendingMark };
+
+export function markStatus(mark: PendingMark | null | undefined): PendingStatus {
+  return mark && mark.op ? (`pending_${mark.op}` as PendingStatus) : "confirmed";
+}
+
+export function pendingStatus(
+  node: { _pending?: PendingMark | null } | null | undefined,
+): PendingStatus {
+  return markStatus(node?._pending ?? null);
+}
+
+type AnyNode = Record<string, unknown>;
+const PENDING_ID_KEYS = ["_tid", "_uid", "_id"] as const;
+
+function pstep(node: unknown, seg: string): unknown {
+  if (Array.isArray(node)) {
+    for (const item of node) {
+      if (item && typeof item === "object"
+          && PENDING_ID_KEYS.some((k) => String((item as AnyNode)[k]) === seg)) return item;
+    }
+    const i = Number(seg);
+    return Number.isInteger(i) && i >= 0 && i < node.length ? node[i] : undefined;
+  }
+  if (node && typeof node === "object") return (node as AnyNode)[seg];
+  return undefined;
+}
+
+function presolve(doc: OcsDocument, path: string): { parent: unknown; last: string } | null {
+  const segs = path.split(".");
+  let node: unknown = doc;
+  for (const seg of segs.slice(0, -1)) {
+    node = pstep(node, seg);
+    if (node == null) return null;
+  }
+  return { parent: node, last: segs[segs.length - 1] };
+}
+
+function inlineMark(node: unknown): PendingMark | null {
+  const m = node && typeof node === "object" ? (node as AnyNode)._pending : null;
+  return m && typeof m === "object" && "op" in (m as AnyNode) ? (m as PendingMark) : null;
+}
+
+function spliceOut(parent: unknown, last: string, node: unknown): void {
+  if (Array.isArray(parent)) {
+    const i = parent.indexOf(node);
+    if (i >= 0) parent.splice(i, 1);
+  } else if (parent && typeof parent === "object") {
+    delete (parent as AnyNode)[last];
+  }
+}
+
+// 行內 mod 只發生在文字葉:單位=ocu_name、指標=text、其餘=name(鏡像書記 op 形)。
+function modLeaf(node: AnyNode): string {
+  if ("ocu_name" in node) return "ocu_name";
+  if ("text" in node) return "text";
+  return "name";
+}
+
+function decidePending(doc: OcsDocument, path: string, accept: boolean): OcsDocument {
+  const next = clone(doc);
+  const r = presolve(next, path);
+  if (!r) return doc;
+  const node = pstep(r.parent, r.last);
+  const im = inlineMark(node);
+
+  if (im) {                                             // 行內(條目/任務/職責)
+    const n = node as AnyNode;
+    if (accept) {
+      if (im.op === "del") spliceOut(r.parent, r.last, node);
+      else delete n._pending;
+    } else {
+      if (im.op === "add") spliceOut(r.parent, r.last, node);
+      else {
+        if (im.op === "mod") n[modLeaf(n)] = im.prev ?? "";
+        delete n._pending;
+      }
+    }
+    return renumber(next);
+  }
+
+  // 集合式(details 槽/表頭/區塊級別):parent._pending[last]
+  if (r.parent && typeof r.parent === "object" && !Array.isArray(r.parent)) {
+    const p = r.parent as AnyNode;
+    const pend = p._pending as Record<string, PendingMark | undefined> | undefined;
+    const mark = pend?.[r.last];
+    if (!mark) return doc;
+    if (accept) {
+      if (mark.op === "del") delete p[r.last];
+      else if (mark.value !== undefined) p[r.last] = mark.value;  // 延遲生效(表頭主基準)
+    } else if (mark.op === "mod" && mark.value === undefined) {
+      // 已套用的 mod:還原舊值(prev 缺=槽原不存在→移除)
+      if (mark.prev === undefined || mark.prev === null) delete p[r.last];
+      else p[r.last] = mark.prev;
+    }                                                    // del/延遲生效:✗=只去標
+    delete pend![r.last];
+    if (pend && Object.keys(pend).length === 0) delete p._pending;
+    return renumber(next);
+  }
+  return doc;
+}
+
+export function acceptPending(doc: OcsDocument, path: string): OcsDocument {
+  return decidePending(doc, path, true);
+}
+
+export function rejectPending(doc: OcsDocument, path: string): OcsDocument {
+  return decidePending(doc, path, false);
+}
+
+export interface PendingEntry { path: string; op: "add" | "mod" | "del"; mark: PendingMark }
+
+// 全文件待審清單(批量鈕 N/匯出提示/表頭 strip 的資料源)。path 用穩定 id 段。
+export function listPending(doc: OcsDocument): PendingEntry[] {
+  const out: PendingEntry[] = [];
+  const seg = (o: AnyNode, i: number) => String(o._tid ?? o._uid ?? o._id ?? i);
+  const inline = (node: unknown, path: string) => {
+    const m = inlineMark(node);
+    if (m) out.push({ path, op: m.op, mark: m });
+  };
+  const map = (holder: unknown, base: string) => {
+    const pend = holder && typeof holder === "object"
+      ? ((holder as AnyNode)._pending as Record<string, PendingMark | undefined> | undefined)
+      : undefined;
+    for (const [k, m] of Object.entries(pend ?? {})) {
+      if (m && m.op) out.push({ path: `${base}.${k}`, op: m.op, mark: m });
+    }
+  };
+  map(doc.ocs_profile, "ocs_profile");
+  (doc.ocs_content?.ocu_units ?? []).forEach((u, ui) => {
+    const upath = `ocs_content.ocu_units.${seg(u as AnyNode, ui)}`;
+    inline(u, upath);
+    (u.tasks ?? []).forEach((t, ti) => {
+      const tpath = `${upath}.tasks.${seg(t as AnyNode, ti)}`;
+      inline(t, tpath);
+      (t.task_codes ?? []).forEach((c, ci) =>
+        inline(c, `${tpath}.task_codes.${seg(c as AnyNode, ci)}`));
+      const b = t.competency_blocks?.[0];
+      if (b) {
+        map(b, `${tpath}.competency_blocks.0`);
+        for (const kind of ["outputs", "indicators", "knowledge", "skills"] as const) {
+          (b[kind] ?? []).forEach((it, i) =>
+            inline(it, `${tpath}.competency_blocks.0.${kind}.${seg(it as AnyNode, i)}`));
+        }
+      }
+      map(t.details, `${tpath}.details`);
+    });
+  });
+  (doc.ocs_attitude?.attitudes ?? []).forEach((a, i) =>
+    inline(a, `ocs_attitude.attitudes.${seg(a as AnyNode, i)}`));
+  return out;
+}
+
+// 批量:逐筆處理並在每步後重掃(del/add 會動陣列;id 段使 path 對位穩定,
+// 重掃防禦 index 形 path 漂移)。長度沒縮=有筆無法處理,break 防死循環。
+export function resolveAllPending(doc: OcsDocument, decision: "accept" | "reject"): OcsDocument {
+  let d = doc;
+  for (let entries = listPending(d); entries.length > 0; entries = listPending(d)) {
+    const before = entries.length;
+    d = decision === "accept" ? acceptPending(d, entries[0].path)
+      : rejectPending(d, entries[0].path);
+    if (listPending(d).length >= before) break;
+  }
+  return d;
 }
 
 export function completion(doc: OcsDocument): number {

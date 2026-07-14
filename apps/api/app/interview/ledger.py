@@ -7,19 +7,16 @@ T8 隨梯子退役時清掉);本檔暫留:
 - session 狀態寫入:attempts(note_attempt)/held(待問)/boundary(劃線)/
   疲勞偵測——T8 改造進 agenda.py(episode 粒度)。
 """
-from app.interview.coverage import (  # noqa: F401 —— T4 相容 re-export(T8 清)
-    BLOCK_KEYS, MAX_A, MIN_A, MIN_K, MIN_P, MIN_S, SHARE_TOL, STALL_K,
+from app.interview.coverage import (  # noqa: F401 —— T4 相容 re-export(T8c 清)
+    BLOCK_KEYS, CURATION_TASKS, MAX_A, MIN_A, MIN_K, MIN_P, MIN_S,
+    ONBOARD_OCCUPATION, SHARE_TOL, STALL_K,
     _gap, _seg, attitudes_missing, blocks_missing, can_finish, checklist,
     coverage, derive_phase, has_occupation, is_stalled, iter_tasks,
-    share_sum, task_missing, tier,
+    share_sum, should_curate, task_missing, tier,
 )
 from app.interview.slots import BUDGET_SLOTS, SLOT_DEFS, gate_missing, slot_filled
 
 SOUL_SLOTS = ("wait_points", "exceptions", "standards")   # 顧問味靈魂槽,next_gap 優先
-
-# onboarding/curation 縫(§16.16、0028 D6):文件還沒任務時先引導,**不掉態度**。
-ONBOARD_OCCUPATION = "onboarding:occupation"   # 無 ocs_code:先問他做什麼→查職類→請他選
-CURATION_TASKS = "curation:tasks"              # 有 ocs_code:AI 裁剪/官方檢查表反問
 
 
 def next_gap(doc: dict, state: dict, skips_by_task: dict[str, set[str]],

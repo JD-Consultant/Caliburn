@@ -192,11 +192,17 @@ test_curation_* + 新增「有任務但 unasked→仍裁剪」測試。
 push_held/pop_held/add_boundary/in_boundary/is_fatigued/is_stalled → agenda.py。
 
 **步驟(每步綠了才下一步)**:
-1. B 類常數搬 coverage + 裁剪縫判定改 derive_phase;三處 import 改。驗全綠(行為不變)。
+1. B 類:抽 `coverage.should_curate(doc, state, pool_tasks, ref_codes)`(原樣搬 ⓪+⓪′
+   雙觸發,**不是** derive_phase——見上陷阱)+ 兩常數搬 coverage;`service.py:167`
+   裁剪縫改呼 `should_curate`;`skill_loader.py:26`/`consultant._ONBOARD_STEER`/`gap_label`
+   三處常數 import 改指 coverage。驗全綠(行為不變)。
 2. C 類狀態函式 move-only 搬 agenda;import 改。驗全綠。
-3. 刪 A 類:`next_gap` 整函式 + `consultant.ledger_summary`/`gap_label`/`_ONBOARD_STEER`
-   被 artifact 取代部分(onboarding 話術改進 artifact 或保留精簡版);
-   `service.py:159 last_gap` 刪。`ledger.py` 空了→整檔退役,re-export 清。
+3. 刪 A 類:`next_gap` 整函式退役。**注意 A 類非純刪除**——§3.8 要求
+   `ledger_summary`/`_ONBOARD_STEER` 的 onboarding/curation/write-in 引導**重寫進
+   agenda artifact**:`agenda_view` 現在只處理「有任務」態,要新增 onboarding(無職類)
+   /curation(有 unasked)分支後才可拆 `ledger_summary`。`routes/_agenda` 的 `in_progress`
+   由 `next_gap` 改**當前 episode target**。`service.py:159 last_gap` 刪、:374 保底句改
+   議程候選。`ledger.py` 空了→整檔退役,re-export 清。
 4. 改測試:`test_interview_ledger.py` 刪;`test_interview_consultant`(ledger_summary)、
    `test_interview_refcodes`(next_gap)、`test_interview_skills`(常數)、
    `test_interview_agenda_v3`(boundary)、`api/routes/interview.py:143`+
@@ -206,9 +212,10 @@ push_held/pop_held/add_boundary/in_boundary/is_fatigued/is_stalled → agenda.py
 - 文檔:**同 commit** 更新 `docs/design/interview-engine.md`(§4 回合序 v4、§5 載體
   表加收割、不變量 13=議程決策唯一路、退役禁令加 next_gap 梯子)。
 - 驗:api 全綠+`npx turbo test` 全綠。
-- **風險提示**:B 類判定改寫若破壞 `derive_phase==task_curation` 等價性,裁剪縫會
-  靜默失效(新手流回到 BUG-1 前的斷棒)。改前先確認 derive_phase 對「有職類無任務」
-  回 task_curation(coverage 測試已覆蓋 test_derive_phase_progression)。
+- **風險提示**:裁剪縫判定務必用 `should_curate`(保留 ⓪+⓪′ 雙觸發),**切勿**簡化成
+  `derive_phase==task_curation`——後者不含 ⓪′「有任務∧unasked∧未 stalled」分支,會讓
+  「有任務但官方清單沒問完」的裁剪靜默失效(回到 BUG 前的斷棒)。回歸靠 service
+  `test_curation_*` + 新增「有任務但 unasked→仍裁剪」測試釘住雙觸發。
 
 ### T9|consultant prompt v4+GPT-5.6 紀律(spec §2.8)
 

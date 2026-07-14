@@ -13,6 +13,10 @@ MIN_P, MIN_K, MIN_S = 1, 2, 2      # core 任務 indicators/knowledge/skills 下
 MIN_A, MAX_A = 2, 4                # 文件層 attitudes 2–4(iCAP A01–A14 池)
 BLOCK_KEYS = ("outputs", "indicators", "knowledge", "skills")   # 能力區塊族
 
+# onboarding/curation 議程階段常數(§16.16、0028 D6;T8c 自退役的 ledger 搬入)。
+ONBOARD_OCCUPATION = "onboarding:occupation"   # 無 ocs_code:先問他做什麼→查職類→請他選
+CURATION_TASKS = "curation:tasks"              # 有 ocs_code:AI 裁剪/官方檢查表反問
+
 
 def _seg(item, idx: int) -> str:            # 沿 diff._seg:_tid/_uid/_id 或 index
     if isinstance(item, dict):
@@ -134,6 +138,22 @@ def _gap(task_path: str, name: str) -> str:
 
 def is_stalled(state: dict, gap: str) -> bool:
     return (state.get("attempts") or {}).get(gap, 0) >= STALL_K
+
+
+def should_curate(doc: dict, state: dict, pool_tasks: list[dict] | None,
+                  ref_codes: set[str] | frozenset = frozenset()) -> bool:
+    """裁剪縫是否該觸發(0033 T8c;原樣保 next_gap 的 ⓪+⓪′ 雙觸發判定)。
+    ⓪ 有職類 ∧ 還沒任務 → 該裁剪(官方殼/任務直落);
+    ⓪′ 有職類 ∧ 有任務 ∧ 官方檢查表仍有 unasked ∧ 該縫未 stalled → 續裁剪。
+    無職類(onboarding)或無官方池一律 False。
+    **不可簡化成 `derive_phase==task_curation`**——derive_phase 對「有任務」一律回
+    opks_deep,不含 ⓪′ 分支,會讓「有任務但清單沒問完」的裁剪靜默失效(0033 陷阱)。"""
+    if not (pool_tasks and has_occupation(doc, ref_codes)):
+        return False
+    if not list(iter_tasks(doc)):                              # ⓪ 有職類、還沒任務
+        return True
+    return bool(not is_stalled(state, CURATION_TASKS)          # ⓪′ 檢查表殘項(受 stall)
+                and checklist(doc, state, pool_tasks)["unasked"])
 
 
 def coverage(doc: dict, state: dict,

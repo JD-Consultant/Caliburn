@@ -164,7 +164,7 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> T
     widget: dict | None = None
     curation_guard: list[str] = []
     curation_landed = False
-    if state["last_gap"] == L.CURATION_TASKS and pool_tasks:
+    if L.should_curate(work_doc, state, pool_tasks, ref_ocs):
         unasked = L.checklist(work_doc, state, pool_tasks)["unasked"]
         if unasked:
             t_cur = time.perf_counter()

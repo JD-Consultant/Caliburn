@@ -162,6 +162,43 @@ def test_checklist_positional_code_not_mistaken_for_official():
     assert [t["key"] for t in cl["unasked"]] == [p["key"] for p in _pool()]
 
 
+def test_should_curate_false_without_occupation():
+    """onboarding(無職類)→ 不裁剪(先選職類)。"""
+    assert C.should_curate(_doc([]), {}, _pool()) is False
+
+
+def test_should_curate_true_when_occupation_but_no_tasks():
+    """⓪ 有職類、還沒任務、有池 → 裁剪(官方殼/任務直落)。無池 → 縫不開。"""
+    blank = _doc([])
+    blank["ocs_profile"] = {"ocs_code": "ISD"}
+    assert C.should_curate(blank, {}, _pool()) is True
+    assert C.should_curate(blank, {}, []) is False
+
+
+def test_should_curate_true_when_unasked_checklist_remains():
+    """⓪′ 有任務但官方清單仍有 unasked → 續裁剪。
+    **這是 derive_phase 不含的分支(等價性陷阱):有任務時 derive_phase 回 opks_deep,
+    絕不能拿它當裁剪縫判定,否則此情境靜默失效。**"""
+    doc = _doc_with_codes([{"code": "T1.1", "name": "客戶需求討論會"}],
+                          provenance={"ocs_code": "ISD", "task_code": "T1"})
+    assert C.should_curate(doc, {}, _pool()) is True         # 有任務、unasked=T2,T3
+
+
+def test_should_curate_false_when_stalled():
+    """⓪′ 受 STALL_K:連問無果達門檻 → 讓路(不再反問)。"""
+    doc = _doc_with_codes([{"code": "T1.1", "name": "客戶需求討論會"}],
+                          provenance={"ocs_code": "ISD", "task_code": "T1"})
+    stalled = {"attempts": {C.CURATION_TASKS: C.STALL_K}}
+    assert C.should_curate(doc, stalled, _pool()) is False
+
+
+def test_should_curate_false_when_no_unasked_remains():
+    """⓪′ 無 unasked(全 covered/declined)→ 不裁剪。"""
+    doc = _doc_with_codes([{"code": "T1.1", "name": "客戶需求討論會"}],
+                          provenance={"ocs_code": "ISD", "task_code": "T1"})
+    assert C.should_curate(doc, {"declined": ["ISD:T2", "ISD:T3"]}, _pool()) is False
+
+
 def test_derive_phase_progression():
     blank = _doc([])
     assert C.derive_phase(blank, {}) == "onboarding_occupation"

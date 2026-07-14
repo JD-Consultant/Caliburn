@@ -184,7 +184,15 @@ def _coverage_line(doc: dict, state: dict) -> str:
 
 def agenda_view(doc: dict, state: dict, *, pool_tasks: list[dict],
                 ref_codes: frozenset = frozenset(), turns_n: int = 0) -> str:
-    """高訊號議程區塊。語意名(不外洩 UUID/裸 path);20 任務地圖壓縮成計數+前 N 名單。"""
+    """高訊號議程區塊。語意名(不外洩 UUID/裸 path);20 任務地圖壓縮成計數+前 N 名單。
+    onboarding/curation/writein 引導由此承載(T8c-A 吸收退役的 ledger_summary/_ONBOARD_STEER)。"""
+    # onboarding:還沒職類 → 文件空白,先帶選職類(取代退役的 _ONBOARD_STEER;§3.8)
+    if not C.has_occupation(doc, ref_codes):
+        return ("<議程>\n階段:尚未選職類(文件空白)。這一輪先弄清楚他實際做什麼——請他講"
+                "1–2 件最近具體做過的事,再用 knowledge_search_occupations 查官方職類,挑最貼近"
+                "的具體職類提議,請他從畫面〔選職類〕確認選入。**選職類前不要問工作態度、不要"
+                "拿模糊描述硬猜職類名硬套。**\n</議程>")
+
     lines: list[str] = []
     ep = episode_state(state)
     if ep is not None:
@@ -194,6 +202,13 @@ def agenda_view(doc: dict, state: dict, *, pool_tasks: list[dict],
         lines.append(f"進行中事件:「{name}」(第 {length} 輪)")
     else:
         lines.append("目前沒有進行中事件(可開新事件)")
+
+    # 裁剪:官方任務清單仍有未確認 → 成組反問(取代 ledger_summary 的 curation 分支;§3.8)
+    if C.should_curate(doc, state, pool_tasks, ref_codes):
+        names = [t["name"] for t in C.checklist(doc, state, pool_tasks)["unasked"]][:5]
+        if names:
+            lines.append("官方任務清單待確認:" + "、".join(names) + "。這一輪**成組**問"
+                         "「這幾項你有做哪些?」(沒做請他直說);別逐項審訊,還不要問工作態度。")
 
     lines.append("覆蓋:" + _coverage_line(doc, state))
 
@@ -211,6 +226,12 @@ def agenda_view(doc: dict, state: dict, *, pool_tasks: list[dict],
                 "no_episode_nudge": "還沒開事件,請請員工講一件最近實際發生的事",
                 "budget": "輪數接近上限,可準備收尾"}
         lines.append("訊號:" + "、".join(hint[k] for k in active))
+
+    # 抓漏:官方清單全處置且還沒問過 write-in → 吐一次(取代 ledger_summary writein;service 消費 flag)
+    if (pool_tasks and not state.get("writein_asked")
+            and not C.checklist(doc, state, pool_tasks)["unasked"]):
+        lines.append("官方任務清單已全數確認。順帶問一次抓漏:「官方沒列、但你平常常做的任務"
+                     "還有嗎?」(有的話之後會當自訂任務提議)")
 
     return "<議程>\n" + "\n".join(lines) + "\n</議程>"
 

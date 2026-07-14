@@ -15,7 +15,7 @@ from typing import Annotated, Literal, Union
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from app.interview import ledger as L
+from app.interview import coverage as CO
 from app.interview.schema_utils import _obj, _s, _variant
 from app.interview.verify import normalize, quote_verified
 
@@ -123,7 +123,7 @@ def curation_ops(precheck: list[dict], *, doc: dict, turns: dict[int, str],
     for i, u in enumerate(units):
         n = normalize(u.get("ocu_name") or "")
         if n and n not in seg_by_norm:
-            seg_by_norm[n] = L._seg(u, i)
+            seg_by_norm[n] = CO._seg(u, i)
     new_idx: dict[str, int] = {}                      # 本批新殼:正規化名 → 落位 index
     for it in precheck:
         key = it.get("key") or ""

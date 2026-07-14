@@ -119,10 +119,10 @@ def _entry_status(entry: dict) -> str:
 def document_view(doc: dict) -> dict:
     """四態視圖(ADR 0030 T5):給顧問的文件現況——精簡、含待審狀態,不整卷重播。
     純函式;由 service 的 dispatch 供給(doc 不在 knowledge 內)。"""
-    from app.interview import ledger as L  # 局部匯入避免循環
+    from app.interview import coverage as CO  # 局部匯入避免循環
 
     units_out = []
-    for u, t, tp in L.iter_tasks(doc):
+    for u, t, tp in CO.iter_tasks(doc):
         codes = t.get("task_codes") or []
         name = codes[0].get("name") if codes else "(未命名)"
         row = {"path": tp, "task": name, "status": _entry_status(t)}

@@ -1,6 +1,6 @@
 """T5(v3;ADR 0030):議程四態(held/boundary)+疲勞偵測+喚醒閘+四態視圖。純函式。"""
 from app.interview import agenda as AG
-from app.interview import ledger as L
+from app.interview import coverage as CO
 from app.interview.scribe import worth_scribing
 from app.interview.tools import document_view
 
@@ -33,7 +33,7 @@ def test_held_push_dedupe_and_fifo_pop():
 
 # ---- boundary(劃線:硬遮罩、無自動解除路徑) ----
 
-def test_boundary_masks_next_gap_and_never_auto_clears():
+def test_boundary_masks_gap_and_never_auto_clears():
     task_gap_prefix = "ocs_content.ocu_units.u1.tasks.t1"
     s = AG.add_boundary({}, task_gap_prefix, quote="這塊先不談", since_turn=2)
     assert AG.in_boundary(s, f"{task_gap_prefix}.details.tools")
@@ -43,23 +43,22 @@ def test_boundary_masks_next_gap_and_never_auto_clears():
     assert s2.get("boundary") == s["boundary"]
 
 
-def test_boundary_on_attitudes_suppresses_gap():
-    doc = {"ocs_content": {"ocu_units": [
-        {"_uid": "u1", "tasks": [{"_tid": "t1", "task_codes": [{"name": "x"}],
-                                  "details": {"frequency": "每週", "time_share_pct": 50,
-                                              "standards": "s", "duration": "d",
-                                              "volume": "v", "trigger": "t", "inputs": "i",
-                                              "tools": "o", "collaborators": "c",
-                                              "wait_points": "w", "exceptions": "e"},
-                                  "competency_blocks": [
-                                      {"outputs": [{"name": "o"}],
-                                       "indicators": [{"text": "p"}],
-                                       "knowledge": [{"name": "k"}, {"name": "k2"}],
-                                       "skills": [{"name": "s"}, {"name": "s2"}]}]}]}]},
-        "ocs_profile": {"ocs_code": "X"}, "ocs_attitude": {"attitudes": []}}
-    assert L.next_gap(doc, {}, {}) == "ocs_attitude"
+def test_boundary_on_attitudes_flags_in_boundary():
+    """態度劃線 → in_boundary 認得(routes 議程三態據此標 boundary;梯子退役後不再測 next_gap 抑制)。"""
     s = AG.add_boundary({}, "ocs_attitude")
-    assert L.next_gap(doc, s, {}) != "ocs_attitude"
+    assert AG.in_boundary(s, "ocs_attitude")
+
+
+# ---- attempts:note_attempt 增減 + is_stalled(自 test_interview_ledger 遷入;T8c) ----
+
+def test_note_attempt_increments_and_resets():
+    s0 = {}
+    s1 = AG.note_attempt(s0, "g", progressed=False)
+    s2 = AG.note_attempt(s1, "g", progressed=False)
+    assert s2["attempts"]["g"] == 2 and CO.is_stalled(s2, "g")
+    s3 = AG.note_attempt(s2, "g", progressed=True)
+    assert s3["attempts"]["g"] == 0 and not CO.is_stalled(s3, "g")
+    assert AG.note_attempt(s2, None, False) is s2            # gap None = 原樣
 
 
 # ---- 疲勞(確定性:敷衍短語 / 長度銳減) ----

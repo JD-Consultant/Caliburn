@@ -106,10 +106,23 @@ async def test_get_interview_full_view(db_session):
     assert view["pending_count"] == 1                 # v3:寫入=文件內 _pending(evidence 退場)
     assert "evidence" not in view and "suggestions" not in view   # T12:兩層退場
     assert view["status"] == "active"
-    # T9 議程三態:任務缺口未清=in_progress(next_gap 落此)或 pending;末列=態度
+    # 0033 T8c 議程三態:in_progress=當前 episode target(梯子退役);stub 未開事件→任務缺口未清=pending
     agenda = view["agenda"]
-    assert agenda[0]["label"] == "回歸測試" and agenda[0]["state"] == "in_progress"
+    assert agenda[0]["label"] == "回歸測試" and agenda[0]["state"] == "pending"
     assert agenda[-1] == {"key": "ocs_attitude", "label": "工作態度", "state": "pending"}
+
+
+def test_agenda_marks_episode_target_in_progress():
+    """0033 T8c:議程三態的 in_progress 由**當前 episode target** 標記(取代退役的 next_gap)。"""
+    from app.api.routes.interview import _agenda
+    doc = {"ocs_profile": {"ocs_code": "X"}, "ocs_attitude": {"attitudes": []},
+           "ocs_content": {"ocu_units": [{"_uid": "U1", "tasks": [
+               {"_tid": "t1", "task_codes": [{"name": "回歸測試"}], "details": {},
+                "competency_blocks": [{}]}]}]}}
+    tp = "ocs_content.ocu_units.U1.tasks.t1"
+    rows = _agenda(doc, {"episode": {"target": tp, "opened_seq": 3}})
+    assert rows[0]["state"] == "in_progress"                 # 事件盯著此任務
+    assert _agenda(doc, {})[0]["state"] == "pending"         # 無事件 → 退回 pending
 
 
 @pytest.mark.asyncio

@@ -25,7 +25,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from app.adapters.llm_openrouter import OpenRouterLlm  # noqa: E402
 from app.core.knowledge_dto import CitableItem, CompetencyPool  # noqa: E402
 from app.interview import consultant as C  # noqa: E402
-from app.interview import ledger as L  # noqa: E402
+from app.interview import coverage as CO  # noqa: E402
 from app.interview.attitudes import attitudes_pass  # noqa: E402
 from app.interview.curation import curation_pass  # noqa: E402
 from app.interview.scribe import scribe_pass  # noqa: E402
@@ -156,7 +156,7 @@ async def attitudes_segment(llm, employee_texts: list[str]) -> dict:
                                employee_texts=employee_texts, existing=[])
     return {"proposals": [{"code": p["pool_id"], "quote": p["quote"][:30]}
                           for p in res.proposals],
-            "count": len(res.proposals), "cap_ok": len(res.proposals) <= L.MAX_A,
+            "count": len(res.proposals), "cap_ok": len(res.proposals) <= CO.MAX_A,
             "guard_drops": len(res.guard_log), "failed": res.failed}
 
 
@@ -201,9 +201,7 @@ async def simulate(max_turns: int, dump: bool = False) -> dict:
         if scribe_res.progressed:
             progressed_turns += 1
 
-        # ② 帳本
-        state = L.note_attempt(state, state.get("last_gap"), scribe_res.progressed)
-        state["last_gap"] = L.next_gap(doc, state, {})
+        # ② 議程進帳(0033:梯子退役,收益改 episode/裁剪縫粒度;sim 只跑深聊主軸)
 
         # ③ 顧問 chat_with_tools
         msgs = C.build_consultant_messages(doc=doc, ledger_state=state, recent_turns=transcript,
@@ -215,15 +213,15 @@ async def simulate(max_turns: int, dump: bool = False) -> dict:
 
         if dump:
             print(f"--- turn {turns_used} ---\n  員工:{answer}\n  書記:{scribe_res.guard_log}\n"
-                  f"  下一縫:{state.get('last_gap')}\n  顧問:{question[:80]}", file=sys.stderr)
-        if L.can_finish(doc, state, {})[0]:
+                  f"  顧問:{question[:80]}", file=sys.stderr)
+        if CO.can_finish(doc, state, {})[0]:
             break
 
-    task = next((t for _, t, tp in L.iter_tasks(doc) if tp.endswith("tasks.t1")), {})
+    task = next((t for _, t, tp in CO.iter_tasks(doc) if tp.endswith("tasks.t1")), {})
     details = task.get("details") or {}
     hit, mismatches = _score_slots(details)
-    ok, blockers = L.can_finish(doc, state, {})
-    cov = L.coverage(doc, state)
+    ok, blockers = CO.can_finish(doc, state, {})
+    cov = CO.coverage(doc, state)
 
     # ①/③ v3 段(0028):裁剪(劇本述職)+ 態度收尾(深聊全逐字稿)
     curation = await curation_segment(llm)

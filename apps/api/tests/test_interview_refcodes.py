@@ -4,7 +4,7 @@ import asyncio
 
 from app.core.knowledge_dto import CitableItem, CompetencyPool
 from app.interview import consultant as C
-from app.interview import ledger as L
+from app.interview import coverage as L
 from app.interview.scribe import build_pool_inputs
 from app.interview.service import _ref_codes_ordered
 
@@ -13,9 +13,12 @@ EMPTY_DOC = {"ocs_profile": {}, "ocs_content": {"ocu_units": []},
 REF = frozenset({"INM3514-001v4"})
 
 
-def test_next_gap_moves_past_onboarding_with_profile_codes():
-    assert L.next_gap(EMPTY_DOC, {}, {}) == L.ONBOARD_OCCUPATION      # 舊行為保留
-    assert L.next_gap(EMPTY_DOC, {}, {}, None, REF) == L.CURATION_TASKS   # 事故修復
+def test_curation_seam_needs_profile_codes_past_onboarding():
+    """profile 有碼(文件空)→ 不停在 onboarding,裁剪縫該開(釘死事故 6f807f1e)。
+    梯子退役後改測 should_curate(v4 裁剪縫實際判準);需官方池才觸發。"""
+    pool = [{"key": "K1", "name": "任務A", "ocs_code": "INM3514-001v4", "task_code": "T1"}]
+    assert L.should_curate(EMPTY_DOC, {}, pool) is False              # 無 ref → onboarding,不裁剪
+    assert L.should_curate(EMPTY_DOC, {}, pool, REF) is True          # 有 ref → 裁剪(事故修復)
 
 
 def test_derive_phase_with_ref_codes():

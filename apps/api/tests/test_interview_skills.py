@@ -1,6 +1,6 @@
 """T7(ADR 0030 §6.8):skill 八檔+確定性載入+context 三層前綴穩定。純函式。"""
 from app.interview import consultant as C
-from app.interview import ledger as L
+from app.interview import coverage as CO
 from app.interview.skill_loader import (
     ALL_SKILLS, load_skill, parse_frontmatter, skills_for, _SKILLS_DIR,
 )
@@ -10,8 +10,8 @@ from app.interview.skill_loader import (
 
 def test_skills_for_mapping_per_kind():
     P = "consultant-principles"
-    assert skills_for("onboarding_occupation", L.ONBOARD_OCCUPATION) == [P, "duty-task-structure"]
-    assert skills_for("task_curation", L.CURATION_TASKS) == [P, "duty-task-structure"]
+    assert skills_for("onboarding_occupation", CO.ONBOARD_OCCUPATION) == [P, "duty-task-structure"]
+    assert skills_for("task_curation", CO.CURATION_TASKS) == [P, "duty-task-structure"]
     tp = "ocs_content.ocu_units.u1.tasks.t1"
     assert skills_for("opks_deep", f"{tp}.outputs") == [P, "output-writing", "probing"]
     assert skills_for("opks_deep", f"{tp}.indicators") == [P, "behavior-indicator", "probing"]
@@ -68,7 +68,7 @@ def test_first_turn_keeps_same_prefix():
 
 
 def test_gap_skill_injected_in_dynamic_zone():
-    # _DOC 的任務缺 outputs/P/K/S → next_gap 落在該任務;動態區應含對應判準教材
+    # _DOC 有職類+任務有缺口 → phase=opks_deep → 動態區帶追問術教材(probing)
     msgs = C.build_consultant_messages(doc=_DOC, ledger_state={}, recent_turns=[("employee", "hi")],
                                        employee_text="我都用 Python 寫自動化")
     dyn = msgs[3]["content"]

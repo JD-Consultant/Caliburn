@@ -21,7 +21,8 @@ from app.api.routes.documents import _require_profile
 from app.core.domain.ocs_doc import count_pending
 from app.core.ports import KnowledgePort, LlmPort
 from app.database import get_db
-from app.interview import ledger as L
+from app.interview import agenda as AG
+from app.interview import coverage as CO
 from app.interview.diff import STABLE_ID_KEYS
 from app.interview.service import NoActiveInterview, run_finish, run_turn
 from app.observability import record_review_events
@@ -51,7 +52,7 @@ def _task_paths(doc: dict) -> list[str]:
 def _progress(doc: dict, session, phase: str) -> dict:
     # v2:進度=覆蓋率(帳本 filled/required;spec §11.1)
     state = getattr(session, "ledger_state", None) or {}
-    return {"phase": phase, "coverage": L.coverage(doc, state)}
+    return {"phase": phase, "coverage": CO.coverage(doc, state)}
 
 
 def _session_out(s) -> dict:
@@ -138,25 +139,26 @@ async def finish_interview(
 
 
 def _agenda(doc: dict, state: dict) -> list[dict]:
-    """議程三態清單(T9;ADR 0030 §6.5 設計④):資料源=ledger,由 doc 推導不落庫。
-    state:completed(缺口清空)/in_progress(next_gap 落在此)/pending;boundary=劃線不談。"""
-    gap = L.next_gap(doc, state, {})
+    """議程三態清單(0033 T8c;由 doc/agenda 狀態推導不落庫):
+    completed(缺口清空)/in_progress(=當前進行中事件的目標任務)/pending;boundary=劃線不談。
+    in_progress 由 `next_gap` 梯子改為**當前 episode target**(v4 事件驅動;梯子已退役)。"""
+    ep = AG.episode_state(state)
+    target = ep["target"] if ep and ep.get("target") != "free" else None
     rows: list[dict] = []
-    for _, t, tp in L.iter_tasks(doc):
+    for _, t, tp in CO.iter_tasks(doc):
         codes = t.get("task_codes") or []
         name = (codes[0].get("name") if codes else "") or "(未命名任務)"
-        if L.in_boundary(state, tp):
+        if AG.in_boundary(state, tp):
             st = "boundary"
-        elif not L.task_missing(t, tp, state, set()):
+        elif not CO.task_missing(t, tp, state, set()):
             st = "completed"
-        elif gap and gap.startswith(tp):
+        elif target == tp:
             st = "in_progress"
         else:
             st = "pending"
         rows.append({"key": tp, "label": name, "state": st})
-    att = ("boundary" if L.in_boundary(state, "ocs_attitude")
-           else "completed" if not L.attitudes_missing(doc)
-           else "in_progress" if gap == "ocs_attitude" else "pending")
+    att = ("boundary" if AG.in_boundary(state, "ocs_attitude")
+           else "completed" if not CO.attitudes_missing(doc) else "pending")
     rows.append({"key": "ocs_attitude", "label": "工作態度", "state": att})
     return rows
 

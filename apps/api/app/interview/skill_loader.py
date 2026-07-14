@@ -9,7 +9,7 @@
 from functools import lru_cache
 from pathlib import Path
 
-from app.interview import ledger as L
+from app.interview import coverage as CO
 
 _SKILLS_DIR = Path(__file__).parent / "skills"
 
@@ -23,7 +23,7 @@ def skills_for(phase: str, gap: str | None) -> list[str]:
     names = ["consultant-principles"]
     g = gap or ""
     last = g.rsplit(".", 1)[-1]
-    if g in (L.ONBOARD_OCCUPATION, L.CURATION_TASKS):
+    if g in (CO.ONBOARD_OCCUPATION, CO.CURATION_TASKS):
         names.append("duty-task-structure")
     elif last == "outputs":
         names.append("output-writing")

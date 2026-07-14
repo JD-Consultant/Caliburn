@@ -9,8 +9,10 @@ updated: 2026-07-14
 
 > **主讀者 = coding agent。** 目的:不看 code 也能改對這條線——不亂發明端點、不把信任
 > 機制交給 LLM、不繞過唯一寫入路徑。**living:動到這條線的碼,同 commit 更新本檔。**
-> 決策:ADR [0030](../adr/0030-ai-coedit-tracked-changes-one-brain.md)(v3 六裁決;部分翻案
-> 0025/0028)、[0032](../adr/0032-task-carrier-routing.md)(任務載體路由,§5.1)、
+> 決策:**ADR [0033](../adr/0033-episode-agenda-consultant-tools.md)(事件驅動議程:顧問
+> 議程工具 open/close_episode + coverage/agenda 純函式 artifact + harvest 收割 pass;
+> 退役 next_gap 梯子)**、[0030](../adr/0030-ai-coedit-tracked-changes-one-brain.md)(v3 六裁決;
+> 部分翻案 0025/0028)、[0032](../adr/0032-task-carrier-routing.md)(任務載體路由,§5.1)、
 > [0027](../adr/0027-interview-engine-v2-consultant-agent.md)(四組件,留用)、
 > [0023](../adr/0023-interview-engine-stateless-turns.md)(無狀態回合)、
 > [0024](../adr/0024-llm-wiring-select-schema.md)(受限解碼)。
@@ -28,12 +30,14 @@ updated: 2026-07-14
 
 | 組件 | 是什麼 | 碼 | 權力 |
 |---|---|---|---|
-| 🧠 顧問 | LLM 對話主導 + READ 工具 | `consultant.py`+`tools.py`+`agent_loop.py` | **無寫入權**;說話+查(含 `read_document` 四態視圖) |
-| ✍️ 書記 | LLM 受限抽取 → op 化 | `scribe_schema.py`+`scribe.py` | **唯一寫入路徑**;產 op,落 `_pending` |
+| 🧠 顧問 | LLM 對話主導 + READ 工具 + **議程工具** | `consultant.py`+`tools.py`+`agent_loop.py` | **無寫入權**;說話+查(`read_document` 四態視圖)+ `open_episode`/`close_episode`(決策=tool call) |
+| ✍️ 書記 | LLM 受限抽取 → op 化(逐回合機會性) | `scribe_schema.py`+`scribe.py` | **唯一寫入路徑**;產 op,落 `_pending` |
+| 🌾 收割 | LLM 事件級編碼(BEI 即時版) | `harvest.py` | close_episode/auto-close 觸發;自敘事起草 P(STAR)+補 K/S,**同走 op→verify→`_pending`**;P 的結構性的家 |
 | 🛡 verify | **純函式六查(零 LLM),blocking** | `verify.py`(+`docpath.py`) | 沒過的 op 一筆都不落 |
-| 📋 帳本 | 純程式:覆蓋/閘門/議程四態/疲勞 | `ledger.py` | 決定「問完沒/該問啥」;held/boundary |
+| 📊 覆蓋 | **純函式(零 I/O 零決策)**:覆蓋/閘門/檢查表/`should_curate` | `coverage.py` | 回答「覆蓋到哪、缺什麼、能不能收工」——**不決定下一步** |
+| 🗺 議程 | **純函式事實層**:episode 狀態機+訊號(飽和/疲勞/預算)+artifact 組裝+held/boundary | `agenda.py` | 事件狀態確定性;決策不在此(=顧問議程工具+guardrail) |
 | 🔍 backstop | **確定性 sweep(零 LLM)**,每 5 員工回合 | `backstop.py` | 只產 held 待問問題,不寫文件 |
-| 📖 skills | 判準教材 8 檔(iCAP/O*NET/ESCO/SFIA/Bloom) | `skills/<name>/SKILL.md`+`skill_loader.py` | 確定性按 phase/gap 載入;**調教首選改 skill 不改碼** |
+| 📖 skills | 判準教材 8 檔(iCAP/O*NET/ESCO/SFIA/Bloom) | `skills/<name>/SKILL.md`+`skill_loader.py` | 顧問按 phase 掛 principles/duty-task/probing;**behavior-indicator+ks-distinction 固定掛在收割**;調教改 skill 不改碼 |
 | 📈 tracing | OTel 手埋(gen_ai.* 現行 semconv) | `app/observability.py` | verify 拒收/審閱事件各一 span |
 
 ## 3. 資料模型(真名)
@@ -44,9 +48,9 @@ updated: 2026-07-14
 | 出處 `_pending.src` | 標記內(契約 `PendingSrc`) | `ref_urn`(官方)與 `quote:{turn_id,text}`(逐字原話)可並存、**至少一**(verify ③ 強制) |
 | 任務細項 `details`(11 槽) | 文件 `task["details"]` | scalar 槽;標記集合式 `details._pending.<槽>` |
 | 態度 `ocs_attitude.attitudes` | 文件層(非逐任務) | 收尾 `attitudes_pass` 整體編碼 → **同軌 op→verify→`_pending`** |
-| 進度列 `interview_sessions` | DB | status/phase/focus/`ledger_state`(attempts/held/boundary/declined/fatigued/backstop_last_seq…僅存不可重算態) |
+| 進度列 `interview_sessions` | DB | status/phase/focus/`ledger_state`(**episode/episodes/dry_streak/no_episode_streak**/attempts/held/boundary/declined/fatigued/writein_asked/backstop_last_seq…僅存不可重算態) |
 | 逐字稿 `interview_turns` | DB | (session,seq) 唯一;quote 驗證的真相來源 |
-| 審閱事件 `interview_review_events` | DB | ✓/✗/批量的**無聲記帳**(`decision∈accepted/rejected/batch_rejected`,`seq` Identity 穩定序);ledger 下回合讀「被拒清單」 |
+| 審閱事件 `interview_review_events` | DB | ✓/✗/批量的**無聲記帳**(`decision∈accepted/rejected/batch_rejected`,`seq` Identity 穩定序);顧問下回合經 context 讀「被拒清單」 |
 | LLM 稽核 `interview_llm_calls` | DB | 每回合每次呼叫一列 |
 | ~~interview_evidence / interview_suggestions~~ | **已退場(migration 0008)** | 溯源住 `_pending.src`;建議層由 `_pending` 本身取代 |
 
@@ -55,22 +59,32 @@ updated: 2026-07-14
 ```
 面板 send(text) → POST …/interview:turn {text}
   ① 載入 draft+session+逐字稿;append 員工 turn;官方任務池 build_task_pool(fail-open)
-  ② 帳本回合前視角:last_gap=next_gap(帳本尊重 held/boundary);curation 縫→curation_pass
-     → quote-backed precheck 經 curation_ops **確定性映射**成 add op(官方殼+任務,
-       ref=池 URN)→ 同 verify/land 路直落 `_pending`(0032;409→放棄,下回合縫自癒);
-       declined→ledger_state。文件變了 → 顧問/書記/帳本後續全吃落地後文件
+  ② coverage 重算 + 議程 artifact 組裝(agenda.agenda_view:episode 狀態+覆蓋地圖+訊號+
+     候選事件方向;onboarding/curation/writein 引導內含,取代退役的 ledger_summary)。
+     裁剪縫=coverage.should_curate(⓪ 有職類無任務 OR ⓪′ 官方清單仍 unasked 且未 stalled)
+     → curation_pass → quote-backed precheck 經 curation_ops **確定性映射**成 add op(官方殼+
+       任務,ref=池 URN)→ 同 verify/land 路直落 `_pending`(0032;409→放棄,下回合自癒);
+       declined→ledger_state;**裁剪落地→attempts 歸零、空手→+1**(供 should_curate 讓路,
+       §3.6 BUG-4 反向根治)。文件變了 → 後續全吃落地後文件
   ③ 顧問 chat_with_tools(role=interview;**先於書記**,吃回合前文件):
        context 三層(T7):前綴1=system+consultant-principles(全域凍結,byte 級穩定)
-       → 前綴2=參考基準摘要(per-doc) → 動態區=進度/四態文件/被拒/待問/本回合欄位 skill
+       → 前綴2=參考基準摘要(per-doc) → 動態區=**議程 artifact**/四態文件/被拒/待問/階段 skill
        工具:knowledge_search_occupations / knowledge_occupation_brief / read_document(四態視圖)
-  ④ 喚醒閘 worth_scribing(確定性前濾:meta/寒暄跳過)→ 書記 scribe_pass:
+         + **open_episode(target∈候選 ref|free)/ close_episode(reason)**——決策=tool call,
+           service 攔記 agenda_actions、chat 後確定性 apply(close→排本回合收割)
+  ④ 喚醒閘 worth_scribing(確定性前濾:meta/寒暄跳過)→ 書記 scribe_pass(逐回合機會性):
        select_schema(strict)→ records_to_ops(確定性映射+kind↔pool 守衛)
        → verify_ops 六查:①契約 ②quote 逐字 ③來源(ref∈池;custom 必附 quote)
          ④寫入權限(禁無聲改) ⑤結構不變量(位置碼拒收/任務掛職責/態度文件層/重複)⑥尺寸
        → 敗筆帶具體錯誤回灌重試(≤2);過的 apply_pending_ops 落 `_pending`
   ⑤ 寫回 upsert_draft(雙 token)→409 重讀後 land_ops 重放同 ops 一次(重 verify)→再衝突放棄(人優先)
-  ⑥ backstop_sweep(每 5 員工回合;確定性)→ held 待問;note_attempt+疲勞偵測
-  ⑦ 三訊號(coverage 全綠/疲勞/輪數≥40)→ 回應帶 suggest_finish
+  ⑥ 收割 pass(僅當本回合 close_episode 或 guardrail auto-close=連 3 輪零收益):
+       取 episode 逐字稿範圍+被觸及任務 → harvest_pass(HARVEST_SYS=BEI 編碼員,固定掛
+       behavior-indicator+ks-distinction 教材全文)→ 起草 P(STAR,quote 逐字)+補 K/S
+       → 同 op→verify→land 路落 `_pending`;fail-open(掛了不擋回合,漏的下事件/收尾再收)
+  ⑦ backstop_sweep(每 5 員工回合;確定性)→ held 待問;議程收帳:episode 進帳
+     (agenda.bump_streaks:本回合任何落地=收益,裁決①;開著事件零收益→dry_streak+1)+ 疲勞偵測
+  ⑧ 三訊號(coverage 全綠/疲勞/輪數≥40)→ 回應帶 suggest_finish
   → 回 {say, widget, doc_changed, progress, suggest_finish}
 ```
 
@@ -87,7 +101,7 @@ updated: 2026-07-14
 | 工具列「接受全部(N)/拒絕全部」 | 同上批量(`resolveAllPending`);拒絕批量事件 decision=`batch_rejected` |
 | 「?」出處卡 | **不發請求**:讀該筆 `_pending.src`(官方來源行+「第 N 輪:『原話』」) |
 | 側欄「進入收尾對帳」 | `POST …/interview:finish` → 側欄收尾卡(總結條列+補充輸入回 turn) |
-| 議程清單 | `GET …/interview` 的 `agenda[]`(三態+boundary;ledger 推導) |
+| 議程清單 | `GET …/interview` 的 `agenda[]`(三態+boundary;coverage/agenda 推導,`in_progress`=當前 episode target) |
 | intake 邀請卡「開任務盤」/「用聊的就好」 | **不發 AI 請求**:開全域任務盤(受控 open,勾選走流程 1 PATCH)/ `POST …/interview:review-events`(decision=`task_board_dismissed` 無聲記帳) |
 | 匯出 JSON | `GET …/document/export`(後端 `_strip_underscore` 自動剝 `_pending`);待審>0 前端先 confirm |
 
@@ -127,6 +141,13 @@ updated: 2026-07-14
     不落,留口頭/卡片);盤永遠人開——AI 只遞邀請(intake 卡/尾聲 offer),
     `task_board_dismissed` 後知情不重推;盤上勾=confirmed 不套綠(0028 D9);
     AI 程式化開 picker / 盤預勾疊加層=回歸。
+13. **議程決策唯一路=顧問議程工具 + 確定性 guardrail**(ADR 0033):覆蓋/事件狀態/飽和/
+    疲勞/預算由 `coverage`+`agenda` 純函式算好、當**議程 artifact 注入 context**;顧問在既有
+    chat_with_tools 迴圈內呼 `open_episode`/`close_episode` 決策(主路徑**零新增 LLM 呼叫**);
+    確定性 auto-close(連 3 輪零收益)當**後衛不是駕駛**。散落 service 的 if-else 驅動、
+    獨立 planner LLM 呼叫、或把「下一步問啥」寫回線性梯子=回歸(§7 next_gap 禁令)。
+    **議程單位=事件(episode/BEI),非任務、非槽**:一事件天然橫跨多任務=效率來源;
+    收益(裁決①)=本回合**任何**落地(跨任務=feature,不限事件目標)。
 
 ## 7. 退役禁令(別把這些救回來)
 
@@ -141,6 +162,10 @@ updated: 2026-07-14
 - `interview:curation` 端點/`run_curation`/web `lib/curation.ts`(盤預勾疊加層)、
   run_turn 的 `picker:"task"` widget——**已刪(0032)**;盤=乾淨自取,quote-backed
   判斷在裁剪縫直落綠字,別再蓋「AI 疊加層等人來盤裡確認」。
+- `next_gap` 線性梯子 / `ledger.py` / `ledger_summary` / `_ONBOARD_STEER` / `gap_label`
+  (ADR 0033)——**已刪**;議程改事件驅動(`agenda.py`+`harvest.py`),覆蓋純函式住
+  `coverage.py`,狀態機(held/boundary/疲勞/attempts)住 `agenda.py`。別把「逐槽線性優先序」
+  救回來——P 排在數十槽之後,盤 bulk 勾 20 任務後數學上不可達(=BUG-3,零 P 事故根因)。
 - `/ai/*` 端點=read-only 純函數,保留但**不是**共編路徑。
 
 ## 8. Evals(品質迴圈;apps/api/evals/)
@@ -152,7 +177,7 @@ Answer Score(rubric 裁判,Phase 2)。promptfoo:Python provider 包引擎回合+
 
 ## 9. 指路
 
-引擎碼:`apps/api/app/interview/`(scribe/verify/ledger/consultant/skills/…)·
+引擎碼:`apps/api/app/interview/`(scribe/verify/**coverage/agenda/harvest**/consultant/skills/…)·
 横切:`apps/api/app/observability.py` · web:`apps/web/src/lib/ocsDoc.ts`(pending 輔助)+
 `components/interview/{PendingMark,AgendaList,InterviewPanel,JobDocTable}.tsx` ·
 契約:`packages/ocs-contract/schema/ocs-document.schema.json`(PendingMark/PendingSrc)·

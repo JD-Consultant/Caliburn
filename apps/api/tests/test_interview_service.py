@@ -320,7 +320,59 @@ async def test_agenda_tools_open_close_update_episode_state(db_session):
     sess2 = await repo.get_active(p.id)
     assert AG.episode_state(sess2.ledger_state) is None
     assert sess2.ledger_state["episodes"][-1]["reason"] == "covered"
-    assert sess2.ledger_state.get("pending_harvest") is True
+    # T8a:收割 pass 已消費 pending_harvest(此測試 select 回空 → 收割無落地但 flag 清掉)
+    assert "pending_harvest" not in sess2.ledger_state
+
+
+@pytest.mark.asyncio
+async def test_close_episode_triggers_harvest_lands_indicator(db_session):
+    """0033 T8a【接縫】:顧問 close_episode → 收割 pass 對事件逐字稿 BEI 編碼 →
+    P(行為指標)落 `_pending`、pending_harvest 清。新架構第一次真的產出 P。"""
+    p, s, repo = await _setup(db_session)                      # doc 有 u1.tasks.t1
+    tp = "ocs_content.ocu_units.u1.tasks.t1"
+
+    def sel(prompt, schema):
+        if "行為事件編碼員" in prompt:                          # 收割 prompt(HARVEST_SYS)
+            return {"records": [{"type": "draft_indicator", "task": tp,
+                "text": "放開滑鼠後畫面即時顯示狀態,使用者不再重複點擊",
+                "quote": "放開滑鼠後手沒再亂點就算過關"}]}
+        return {"records": []}                                  # 書記空
+
+    llm = StubLlm(select_result=sel, chat_text="好,換個主題。", chat_trace=[
+        {"name": "open_episode", "args": {"target": "free", "note": "驗收"},
+         "result_digest": "x"},
+        {"name": "close_episode", "args": {"reason": "covered"}, "result_digest": "x"}])
+    await run_turn(p.id, "驗收就是放開滑鼠後手沒再亂點就算過關", db=db_session,
+                   llm=llm, knowledge=StubKnowledge())
+    task = ((await DocRepo(db_session).latest(p.id))["content"]
+            ["ocs_content"]["ocu_units"][0]["tasks"][0])
+    inds = task["competency_blocks"][0].get("indicators") or []
+    assert inds and inds[0]["_pending"]["op"] == "add"         # P 落地(收割產出)
+    assert "重複點擊" in inds[0]["text"]
+    sess = await repo.get_active(p.id)
+    assert "pending_harvest" not in sess.ledger_state          # flag 消費清掉
+    assert AG.episode_state(sess.ledger_state) is None         # 事件已歸檔
+
+
+@pytest.mark.asyncio
+async def test_autoclose_guardrail_harvests_after_dry_streak(db_session):
+    """0033 T8a【接縫】:事件連 3 輪零收益 → guardrail auto-close(顧問沒收系統替他收)
+    → 歸檔 reason=auto + 觸發收割。後衛不是駕駛。"""
+    p, s, repo = await _setup(db_session)
+    tp = "ocs_content.ocu_units.u1.tasks.t1"
+    await repo.update_session(s.id, ledger_state={
+        "episode": {"target": tp, "opened_seq": 1, "dry_streak": 3}})
+
+    def sel(prompt, schema):
+        return {"records": [{"type": "none"}]} if "行為事件編碼員" in prompt \
+            else {"records": []}
+
+    llm = StubLlm(select_result=sel, chat_text="嗯,我懂了。")
+    await run_turn(p.id, "沒什麼好說的了", db=db_session, llm=llm,
+                   knowledge=StubKnowledge())
+    sess = await repo.get_active(p.id)
+    assert AG.episode_state(sess.ledger_state) is None
+    assert sess.ledger_state["episodes"][-1]["reason"] == "auto"
 
 
 @pytest.mark.asyncio

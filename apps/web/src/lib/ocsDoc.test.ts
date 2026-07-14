@@ -5,6 +5,7 @@ import {
   addCustomTask,
   addTasksToUnit,
   deleteTask,
+  ensureIds,
   relocateTask,
   reorderUnits,
   clearPrimaryBasis,
@@ -59,6 +60,35 @@ const codesOf = (d: OcsDocument, ui: number) =>
     o: t.competency_blocks?.[0]?.outputs?.map((x) => x.code),
     p: t.competency_blocks?.[0]?.indicators?.map((x) => x.code),
   }));
+
+describe("ensureIds(補足 virgin/部分草稿骨架)", () => {
+  // 真實崩因:ADR 0029 選職類只寫 profile,AI 訪談 curation 把官方任務落進 {} doc →
+  // 存下的草稿有 ocs_content、卻從沒 seed ocs_profile;GET 原樣回 → DocHeader 讀 p.ocs_code 爆。
+  it("草稿缺 ocs_profile(訪談先寫 ocs_content)→ 補足骨架,DocHeader 讀 p.ocs_code 不爆", () => {
+    const raw = { ocs_content: { ocu_units: [] } } as unknown as OcsDocument;
+    const doc = ensureIds(raw)!;
+    expect(doc.ocs_profile).toBeDefined();
+    expect(doc.ocs_profile.ocs_code).toBe("");                  // !!p.ocs_code 安全
+    expect(doc.ocs_profile.ocs_name).toBeDefined();             // setOcsName/setPrimaryBasis 安全
+    expect(doc.ocs_profile.category.occupations).toEqual([]);   // setCategory/加列 安全
+  });
+
+  it("不覆蓋既有 ocs_profile 欄位、只補缺的子結構", () => {
+    const raw = { ocs_profile: { ocs_code: "ISD2519" } } as unknown as OcsDocument;
+    const doc = ensureIds(raw)!;
+    expect(doc.ocs_profile.ocs_code).toBe("ISD2519");           // 保留既有
+    expect(doc.ocs_profile.ocs_name).toBeDefined();             // 補上缺的子結構
+    expect(doc.ocs_profile.category).toBeDefined();
+  });
+
+  it("空文件 {} → 五頂層鍵齊全(型別承諾的 OcsDocument 不變量)", () => {
+    const doc = ensureIds({} as unknown as OcsDocument)!;
+    expect(doc.ocs_content.ocu_units).toEqual([]);
+    expect(doc.ocs_attitude.attitudes).toEqual([]);
+    expect(doc.notes.prerequisites).toEqual([]);
+    expect(doc.version_info.versions).toEqual([]);
+  });
+});
 
 describe("relocateTask(拖拉換序)", () => {
   it("同職責內換序:任務碼與 O/P 位置碼都跟著新位置(ccdfbde 回歸)", () => {

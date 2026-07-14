@@ -1,7 +1,7 @@
 // D27 OCS 文件的就地（immutable）更新與完成度計算。每任務一個 competency_block
 // → 都讀寫 competency_blocks[0]。完成度公式對齊後端 compute_completion：
 // filled = 1(表頭) + (A?1:0) + Σ_task[(O>0)+(P>0)+(K>0)+(S>0)]；total = 4*任務數 + 2。
-import type { CodeName, CompetencyBlock, Indicator, NoteItem, OcsDocument, OcsTask, OcuUnit, SourceRef } from "@/types";
+import type { CodeName, CompetencyBlock, Indicator, NoteItem, OcsCategory, OcsDocument, OcsName, OcsProfile, OcsTask, OcuUnit, SourceRef } from "@/types";
 import type { PendingMark } from "@caliburn/ocs-contract";
 
 function clone(doc: OcsDocument): OcsDocument {
@@ -58,10 +58,42 @@ function renumberDocKS(doc: OcsDocument): void {
   }
 }
 
+// raw content 可能是 virgin/部分草稿:後端刻意允許 top-level 鍵缺席(verify.py「處女文件」),
+// 且 ADR 0029 選職類只寫 profile,AI 訪談會在未定表頭時就把官方任務寫進 ocs_content →
+// 存下無 ocs_profile 的草稿。前端 OcsDocument 型別承諾五頂層鍵齊全,此處=唯一正規化縫,
+// 補足骨架讓 DocHeader 與所有 profile setter 對空/部分文件都安全(單點修,免每 consumer 各自防)。
+type PartialDoc = {
+  version_info?: { versions?: unknown[] };
+  ocs_profile?: Partial<OcsProfile> & { ocs_name?: Partial<OcsName>; category?: Partial<OcsCategory> };
+  ocs_content?: { ocu_units?: OcuUnit[] };
+  ocs_attitude?: { attitudes?: CodeName[] };
+  notes?: { prerequisites?: string[]; supplements?: string[] };
+};
+
+function fillSkeleton(doc: OcsDocument): void {
+  const d = doc as PartialDoc;
+  d.version_info ??= { versions: [] };
+  d.version_info.versions ??= [];
+  const p = (d.ocs_profile ??= {});
+  p.ocs_code ??= "";
+  p.ocs_name ??= { job_category_name: null, occupation_name: "" };
+  p.category ??= { job_categories: [], occupations: [], industries: [] };
+  p.job_description ??= "";
+  p.ocs_level ??= null;
+  d.ocs_content ??= { ocu_units: [] };
+  d.ocs_content.ocu_units ??= [];
+  d.ocs_attitude ??= { attitudes: [] };
+  d.ocs_attitude.attitudes ??= [];
+  d.notes ??= { prerequisites: [], supplements: [] };
+  d.notes.prerequisites ??= [];
+  d.notes.supplements ??= [];
+}
+
 // 補上缺少的穩定 id（dnd 用）。新載入的文件（seed/build 來的）沒有 id → 在此補。
 export function ensureIds(doc: OcsDocument | undefined): OcsDocument | undefined {
   if (!doc) return doc;
   const next = clone(doc);
+  fillSkeleton(next);   // virgin/部分草稿 → 補足型別承諾的完整骨架(見上)
   for (const u of next.ocs_content?.ocu_units ?? []) {
     if (!u._uid) u._uid = uid();
     for (const t of u.tasks ?? []) {

@@ -18,6 +18,8 @@ from app.core.knowledge_dto import (
 class StubLlm:
     """假 LlmPort(測試/demo):三句話型皆可程控;呼叫紀錄留 calls 供斷言。"""
 
+    provider_id = "stub"
+
     def __init__(self, *, text: str = "", json_result=None, select_result=None,
                  chat_text: str = "我了解了,想再多聊聊你這件事的細節,方便說個最近的例子嗎?",
                  chat_trace: list | None = None):

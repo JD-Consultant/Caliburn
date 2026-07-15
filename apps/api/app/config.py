@@ -45,5 +45,11 @@ class Settings(BaseSettings):
     # CJK font for PDF/XLSX export (empty = auto-detect platform default)
     font_path: str = ""
 
+    # Explicitly consented interview eval capture. Disabled by default so normal
+    # product sessions do not duplicate restricted replay artifacts.
+    interview_eval_capture_enabled: bool = False
+    interview_eval_capture_git_sha: str = ""
+    interview_eval_capture_dirty_worktree: bool = True
+
 
 settings = Settings()

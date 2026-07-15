@@ -1,0 +1,1160 @@
+{
+  "notes": {
+    "supplements": [],
+    "prerequisites": []
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "_uid": "[UUID_1]",
+        "_refs": [
+          {
+            "code": "",
+            "ocs_code": "INM3514-001v4",
+            "ocu_code": "T1",
+            "occupation_name": ""
+          }
+        ],
+        "tasks": [
+          {
+            "_tid": "[UUID_3]",
+            "_refs": [
+              {
+                "ocs_code": "INM3514-001v4",
+                "task_code": "T1.1",
+                "occupation_name": ""
+              }
+            ],
+            "details": null,
+            "provenance": {
+              "ocs_code": "INM3514-001v4",
+              "task_code": "T1.1"
+            },
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "進行需求分析與編寫開發文件"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "skills": [
+                  {
+                    "_id": "[UUID_81]",
+                    "code": "S01",
+                    "name": "計畫撰寫能力"
+                  },
+                  {
+                    "_id": "[UUID_9]",
+                    "code": "S02",
+                    "name": "處理拖放後的 Loading 狀態"
+                  },
+                  {
+                    "_id": "[UUID_33]",
+                    "code": "S03",
+                    "name": "溝通協調能力"
+                  },
+                  {
+                    "_id": "[UUID_34]",
+                    "code": "S04",
+                    "name": "問題解決能力"
+                  },
+                  {
+                    "_id": "[UUID_35]",
+                    "code": "S05",
+                    "name": "技術文件讀寫能力"
+                  },
+                  {
+                    "_id": "[UUID_36]",
+                    "code": "S06",
+                    "name": "程式撰寫能力"
+                  },
+                  {
+                    "_id": "[UUID_64]",
+                    "code": "S07",
+                    "name": "串 LINE Notify 的 API"
+                  },
+                  {
+                    "_id": "[UUID_65]",
+                    "code": "S08",
+                    "name": "在後端 FastAPI 寫 OAuth2 callback 路由拿 access_token"
+                  },
+                  {
+                    "_id": "[UUID_66]",
+                    "code": "S09",
+                    "name": "把 token 存進 PostgreSQL 的使用者資料表"
+                  },
+                  {
+                    "_id": "[UUID_67]",
+                    "code": "S10",
+                    "name": "審核過關後起背景工作送 POST 請求給 LINE API"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "_id": "[UUID_82]",
+                    "code": "O1.1.1",
+                    "name": "使用者介面雛型"
+                  },
+                  {
+                    "_id": "[UUID_8]",
+                    "code": "O1.1.2",
+                    "name": "Figma 介面更新"
+                  },
+                  {
+                    "_id": "[UUID_24]",
+                    "code": "O1.1.3",
+                    "name": "除錯紀錄"
+                  },
+                  {
+                    "_id": "[UUID_25]",
+                    "code": "O1.1.4",
+                    "name": "應用程式安裝手冊"
+                  },
+                  {
+                    "_id": "[UUID_26]",
+                    "code": "O1.1.5",
+                    "name": "版本控制紀錄"
+                  },
+                  {
+                    "_id": "[UUID_27]",
+                    "code": "O1.1.6",
+                    "name": "技術文件(註記程式碼之變更)"
+                  },
+                  {
+                    "_id": "[UUID_28]",
+                    "code": "O1.1.7",
+                    "name": "測試報告"
+                  },
+                  {
+                    "_id": "[UUID_29]",
+                    "code": "O1.1.8",
+                    "name": "佈署配置紀錄"
+                  },
+                  {
+                    "_id": "[UUID_30]",
+                    "code": "O1.1.9",
+                    "name": "功能變更紀錄"
+                  },
+                  {
+                    "_id": "[UUID_31]",
+                    "code": "O1.1.10",
+                    "name": "功能需求紀錄"
+                  },
+                  {
+                    "_id": "[UUID_32]",
+                    "code": "O1.1.11",
+                    "name": "程式碼"
+                  },
+                  {
+                    "_id": "[UUID_62]",
+                    "code": "O1.1.12",
+                    "name": "LINE 自動推播通知"
+                  },
+                  {
+                    "_id": "[UUID_63]",
+                    "code": "O1.1.13",
+                    "name": "新的職能文件審核通過就自動發通知到使用者的 LINE"
+                  },
+                  {
+                    "_id": "[UUID_72]",
+                    "code": "O1.1.14",
+                    "name": "IT系統與應用程式安全計畫"
+                  },
+                  {
+                    "_id": "[UUID_73]",
+                    "code": "O1.1.15",
+                    "name": "IT系統與應用程式安全計畫"
+                  },
+                  {
+                    "_id": "[UUID_74]",
+                    "code": "O1.1.16",
+                    "name": "IT系統與應用程式安全計畫"
+                  },
+                  {
+                    "_id": "[UUID_75]",
+                    "code": "O1.1.17",
+                    "name": "IT系統與應用程式安全計畫"
+                  },
+                  {
+                    "_id": "[UUID_76]",
+                    "code": "O1.1.18",
+                    "name": "IT系統與應用程式安全計畫"
+                  },
+                  {
+                    "_id": "[UUID_77]",
+                    "code": "O1.1.19",
+                    "name": "IT系統與應用程式安全計畫"
+                  },
+                  {
+                    "_id": "[UUID_78]",
+                    "code": "O1.1.20",
+                    "name": "IT系統與應用程式安全計畫"
+                  },
+                  {
+                    "_id": "[UUID_79]",
+                    "code": "O1.1.21",
+                    "name": "IT系統與應用程式安全計畫"
+                  },
+                  {
+                    "_id": "[UUID_80]",
+                    "code": "O1.1.22",
+                    "name": "LINE Notify API 錯誤分流處理"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "_id": "[UUID_6]",
+                    "code": "K01",
+                    "name": "資料庫設計的基本知識"
+                  },
+                  {
+                    "_id": "[UUID_7]",
+                    "code": "K02",
+                    "name": "目前的軟體開發方法"
+                  },
+                  {
+                    "_id": "[UUID_22]",
+                    "code": "K03",
+                    "name": "品質保證實務"
+                  },
+                  {
+                    "_id": "[UUID_23]",
+                    "code": "K04",
+                    "name": "程式語言最佳實踐資料結構 的語法規則應用"
+                  }
+                ],
+                "indicators": [
+                  {
+                    "_id": "[UUID_4]",
+                    "code": "P1.1.1",
+                    "text": "情境：使用者拖放 PDF 後等待後端解析時；可觀察行為：前端在 onDrop 放開的瞬間立即顯示 Loading 狀態；標準：避免畫面呈現空白並降低使用者重複點擊。"
+                  },
+                  {
+                    "_id": "[UUID_5]",
+                    "code": "P1.1.2",
+                    "text": "情境：使用者看到畫面空白可能誤以為壞掉；可觀察行為：介面需顯示處理中的回饋；標準：讓使用者知道系統仍在運作並停止連點。"
+                  },
+                  {
+                    "_id": "[UUID_19]",
+                    "code": "P1.1.3",
+                    "text": "上線後檢核 HTTPS 是否通了：開 Chrome 無痕輸入 https:// 開頭的 domain，確認左上角顯示灰色安全鎖頭且點開顯示憑證有效。"
+                  },
+                  {
+                    "_id": "[UUID_20]",
+                    "code": "P1.1.4",
+                    "text": "上線後檢核 SSL 憑證是否正常：確認瀏覽器安全鎖頭點開後顯示憑證有效。"
+                  },
+                  {
+                    "_id": "[UUID_21]",
+                    "code": "P1.1.5",
+                    "text": "在本機使用 Chrome DevTools 測試上傳流程時，將 Network 調成 Slow 3G，丟入 8MB PDF 後，應可觀察到灰框在 0.1 秒內變藍框、轉圈圈出現、滑鼠移入拖曳區時顯示 Not-allowed 游標，且在後端回傳 200 後轉圈圈消失。"
+                  },
+                  {
+                    "_id": "[UUID_61]",
+                    "code": "P1.1.6",
+                    "text": "情境：LINE 通知整合；可觀察行為：處理 token 過期與拋錯，當 LINE 伺服器回傳 401 時在 log 噴警示並通知使用者重新連動；標準：能及時發現 401 並完成警示與重連動提醒。"
+                  },
+                  {
+                    "_id": "[UUID_71]",
+                    "code": "P1.1.7",
+                    "text": "當 LINE Notify API 回傳 HTTP 狀態碼時，能依狀況執行分流處理：401 時判定 token 失效並處理綁定解除；5xx 時啟動重試；其他錯誤時記錄 log。"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "_tid": "[UUID_83]",
+            "_refs": [
+              {
+                "ocs_code": "INM3514-001v4",
+                "task_code": "T1.2",
+                "occupation_name": ""
+              }
+            ],
+            "details": null,
+            "provenance": {
+              "ocs_code": "INM3514-001v4",
+              "task_code": "T1.2"
+            },
+            "task_codes": [
+              {
+                "code": "T1.2",
+                "name": "確認需求與開發網站"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "skills": [
+                  {
+                    "_id": "[UUID_84]",
+                    "code": "S01",
+                    "name": "計畫撰寫能力"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "_id": "[UUID_85]",
+                    "code": "O1.2.1",
+                    "name": "除錯紀錄"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "source": {
+          "ocs_code": "INM3514-001v4",
+          "occupation_name": ""
+        },
+        "ocu_code": "T1",
+        "ocu_name": "網頁前端程式開發"
+      },
+      {
+        "_uid": "[UUID_2]",
+        "_refs": [
+          {
+            "code": "",
+            "ocs_code": "INM3514-001v4",
+            "ocu_code": "T2",
+            "occupation_name": ""
+          }
+        ],
+        "tasks": [
+          {
+            "_tid": "[UUID_37]",
+            "_refs": [
+              {
+                "ocs_code": "INM3514-001v4",
+                "task_code": "T2.1",
+                "occupation_name": ""
+              }
+            ],
+            "details": null,
+            "provenance": {
+              "ocs_code": "INM3514-001v4",
+              "task_code": "T2.1"
+            },
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "撰寫測試文件"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "indicators": [
+                  {
+                    "_id": "[UUID_38]",
+                    "code": "P2.1.1",
+                    "text": "上線後檢核拖曳上傳的 API 路由：在 F12 開發者工具的 Network 點拖曳上傳，確認 Request URL 走同一個網址的 /api/upload。"
+                  },
+                  {
+                    "_id": "[UUID_39]",
+                    "code": "P2.1.2",
+                    "text": "上線後檢核 reverse proxy 是否成功轉送流量：確認拖曳上傳沒有 CORS 錯誤且 Response 為 200 OK。"
+                  },
+                  {
+                    "_id": "[UUID_40]",
+                    "code": "P2.1.3",
+                    "text": "上線後判定後端 8000 port 是否已被 Nginx reverse proxy 成功轉發：以沒有 CORS 錯誤且 Response 200 OK 為標準。"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "_tid": "[UUID_86]",
+            "_refs": [
+              {
+                "ocs_code": "INM3514-001v4",
+                "task_code": "T2.2",
+                "occupation_name": ""
+              }
+            ],
+            "details": null,
+            "provenance": {
+              "ocs_code": "INM3514-001v4",
+              "task_code": "T2.2"
+            },
+            "task_codes": [
+              {
+                "code": "T2.2",
+                "name": "確認驗收"
+              }
+            ],
+            "competency_blocks": []
+          }
+        ],
+        "source": {
+          "ocs_code": "INM3514-001v4",
+          "occupation_name": ""
+        },
+        "ocu_code": "T2",
+        "ocu_name": "測試與確認驗收"
+      },
+      {
+        "_uid": "[UUID_10]",
+        "_refs": [
+          {
+            "code": "",
+            "ocs_code": "IIS3513-003v4",
+            "ocu_code": "T1",
+            "occupation_name": ""
+          }
+        ],
+        "tasks": [
+          {
+            "_tid": "[UUID_87]",
+            "_refs": [
+              {
+                "ocs_code": "IIS3513-003v4",
+                "task_code": "T1.1",
+                "occupation_name": ""
+              }
+            ],
+            "details": null,
+            "provenance": {
+              "ocs_code": "IIS3513-003v4",
+              "task_code": "T1.1"
+            },
+            "task_codes": [
+              {
+                "code": "T3.1",
+                "name": "蒐集並確認系統架構需求"
+              }
+            ],
+            "competency_blocks": []
+          },
+          {
+            "_tid": "[UUID_13]",
+            "_refs": [
+              {
+                "ocs_code": "IIS3513-003v4",
+                "task_code": "T1.2",
+                "occupation_name": ""
+              }
+            ],
+            "details": null,
+            "provenance": {
+              "ocs_code": "IIS3513-003v4",
+              "task_code": "T1.2"
+            },
+            "task_codes": [
+              {
+                "code": "T3.2",
+                "name": "建立軟體設計規格"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "skills": [
+                  {
+                    "_id": "[UUID_88]",
+                    "code": "S03",
+                    "name": "溝通協調能力"
+                  },
+                  {
+                    "_id": "[UUID_42]",
+                    "code": "S11",
+                    "name": "找出軟體結構與現有系統中潛 在須改善項目的積極進取能力"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "_id": "[UUID_89]",
+                    "code": "O3.2.1",
+                    "name": "使用者介面雛型"
+                  },
+                  {
+                    "_id": "[UUID_90]",
+                    "code": "O3.2.2",
+                    "name": "應用程式安裝手冊"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "_id": "[UUID_41]",
+                    "code": "K05",
+                    "name": "版本控管相關知識"
+                  }
+                ],
+                "indicators": [
+                  {
+                    "_id": "[UUID_91]",
+                    "code": "P3.2.1",
+                    "text": "在上傳流程中，當 Loading 出現時，執行欄位鎖定與拖曳區 Disabled，阻止連續觸發 POST 請求；驗收標準是滑鼠點擊無法作用、拖曳區立即不可操作。"
+                  },
+                  {
+                    "_id": "[UUID_92]",
+                    "code": "P3.2.2",
+                    "text": "在上傳檔案前，執行檔案類型與大小檢核，只允許 10MB 以內的 PDF；驗收標準是非 PDF 或超過 10MB 的檔案無法通過前端檢查。"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "_tid": "[UUID_68]",
+            "_refs": [
+              {
+                "ocs_code": "IIS3513-003v4",
+                "task_code": "T1.3",
+                "occupation_name": ""
+              }
+            ],
+            "details": null,
+            "provenance": {
+              "ocs_code": "IIS3513-003v4",
+              "task_code": "T1.3"
+            },
+            "task_codes": [
+              {
+                "code": "T3.3",
+                "name": "設計分層架構"
+              }
+            ],
+            "competency_blocks": []
+          },
+          {
+            "_tid": "[UUID_69]",
+            "_refs": [
+              {
+                "ocs_code": "IIS3513-003v4",
+                "task_code": "T1.4",
+                "occupation_name": ""
+              }
+            ],
+            "details": null,
+            "provenance": {
+              "ocs_code": "IIS3513-003v4",
+              "task_code": "T1.4"
+            },
+            "task_codes": [
+              {
+                "code": "T3.4",
+                "name": "針對全球化與在地化作設計"
+              }
+            ],
+            "competency_blocks": []
+          }
+        ],
+        "source": {
+          "ocs_code": "IIS3513-003v4",
+          "occupation_name": ""
+        },
+        "ocu_code": "T3",
+        "ocu_name": "系統需求分析與規劃"
+      },
+      {
+        "_uid": "[UUID_11]",
+        "_refs": [
+          {
+            "code": "",
+            "ocs_code": "IIS3513-003v4",
+            "ocu_code": "T3",
+            "occupation_name": ""
+          }
+        ],
+        "tasks": [
+          {
+            "_tid": "[UUID_93]",
+            "_refs": [
+              {
+                "ocs_code": "IIS3513-003v4",
+                "task_code": "T3.2",
+                "occupation_name": ""
+              }
+            ],
+            "details": null,
+            "provenance": {
+              "ocs_code": "IIS3513-003v4",
+              "task_code": "T3.2"
+            },
+            "task_codes": [
+              {
+                "code": "T4.1",
+                "name": "第三方服務與系統整合"
+              }
+            ],
+            "competency_blocks": []
+          },
+          {
+            "_tid": "[UUID_94]",
+            "_refs": [
+              {
+                "ocs_code": "IIS3513-003v4",
+                "task_code": "T3.4",
+                "occupation_name": ""
+              }
+            ],
+            "details": null,
+            "provenance": {
+              "ocs_code": "IIS3513-003v4",
+              "task_code": "T3.4"
+            },
+            "task_codes": [
+              {
+                "code": "T4.2",
+                "name": "測試應用程式"
+              }
+            ],
+            "competency_blocks": []
+          },
+          {
+            "_tid": "[UUID_14]",
+            "_refs": [
+              {
+                "ocs_code": "IIS3513-003v4",
+                "task_code": "T3.5",
+                "occupation_name": ""
+              }
+            ],
+            "details": null,
+            "provenance": {
+              "ocs_code": "IIS3513-003v4",
+              "task_code": "T3.5"
+            },
+            "task_codes": [
+              {
+                "code": "T4.3",
+                "name": "執行系統與應用程式安全"
+              }
+            ],
+            "competency_blocks": []
+          },
+          {
+            "_tid": "[UUID_15]",
+            "_refs": [
+              {
+                "ocs_code": "IIS3513-003v4",
+                "task_code": "T3.6",
+                "occupation_name": ""
+              }
+            ],
+            "details": null,
+            "provenance": {
+              "ocs_code": "IIS3513-003v4",
+              "task_code": "T3.6"
+            },
+            "task_codes": [
+              {
+                "code": "T4.4",
+                "name": "檔案記錄系統"
+              }
+            ],
+            "competency_blocks": []
+          },
+          {
+            "_tid": "[UUID_52]",
+            "_refs": [
+              {
+                "ocs_code": "IIS3513-003v4",
+                "task_code": "T3.3",
+                "occupation_name": ""
+              }
+            ],
+            "details": null,
+            "provenance": {
+              "ocs_code": "IIS3513-003v4",
+              "task_code": "T3.3"
+            },
+            "task_codes": [
+              {
+                "code": "T4.5",
+                "name": "程式碼除錯"
+              }
+            ],
+            "competency_blocks": []
+          }
+        ],
+        "source": {
+          "ocs_code": "IIS3513-003v4",
+          "occupation_name": ""
+        },
+        "ocu_code": "T4",
+        "ocu_name": "進行應用程式"
+      },
+      {
+        "_uid": "[UUID_12]",
+        "_refs": [
+          {
+            "code": "",
+            "ocs_code": "IIS3513-003v4",
+            "ocu_code": "T4",
+            "occupation_name": ""
+          }
+        ],
+        "tasks": [
+          {
+            "_tid": "[UUID_95]",
+            "_refs": [
+              {
+                "ocs_code": "IIS3513-003v4",
+                "task_code": "T4.1",
+                "occupation_name": ""
+              }
+            ],
+            "details": null,
+            "provenance": {
+              "ocs_code": "IIS3513-003v4",
+              "task_code": "T4.1"
+            },
+            "task_codes": [
+              {
+                "code": "T5.1",
+                "name": "進行軟體安裝"
+              }
+            ],
+            "competency_blocks": []
+          },
+          {
+            "_tid": "[UUID_16]",
+            "_refs": [
+              {
+                "ocs_code": "IIS3513-003v4",
+                "task_code": "T4.2",
+                "occupation_name": ""
+              }
+            ],
+            "details": null,
+            "provenance": {
+              "ocs_code": "IIS3513-003v4",
+              "task_code": "T4.2"
+            },
+            "task_codes": [
+              {
+                "code": "T5.2",
+                "name": "進行資料庫安裝"
+              }
+            ],
+            "competency_blocks": []
+          },
+          {
+            "_tid": "[UUID_17]",
+            "_refs": [
+              {
+                "ocs_code": "IIS3513-003v4",
+                "task_code": "T4.3",
+                "occupation_name": ""
+              }
+            ],
+            "details": null,
+            "provenance": {
+              "ocs_code": "IIS3513-003v4",
+              "task_code": "T4.3"
+            },
+            "task_codes": [
+              {
+                "code": "T5.3",
+                "name": "管理應用程式設定"
+              }
+            ],
+            "competency_blocks": []
+          }
+        ],
+        "source": {
+          "ocs_code": "IIS3513-003v4",
+          "occupation_name": ""
+        },
+        "ocu_code": "T5",
+        "ocu_name": "佈署應用程式到正式環境"
+      },
+      {
+        "_uid": "[UUID_18]",
+        "_refs": [
+          {
+            "code": "",
+            "ocs_code": "IIS3513-003v4",
+            "ocu_code": "T2",
+            "occupation_name": ""
+          }
+        ],
+        "tasks": [
+          {
+            "_tid": "[UUID_43]",
+            "_refs": [
+              {
+                "ocs_code": "IIS3513-003v4",
+                "task_code": "T2.4",
+                "occupation_name": ""
+              }
+            ],
+            "details": null,
+            "provenance": {
+              "ocs_code": "IIS3513-003v4",
+              "task_code": "T2.4"
+            },
+            "task_codes": [
+              {
+                "code": "T6.1",
+                "name": "準備開發環境"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "skills": [
+                  {
+                    "_id": "[UUID_45]",
+                    "code": "S04",
+                    "name": "問題解決能力"
+                  },
+                  {
+                    "_id": "[UUID_46]",
+                    "code": "S04",
+                    "name": "問題解決能力"
+                  },
+                  {
+                    "_id": "[UUID_47]",
+                    "code": "S04",
+                    "name": "問題解決能力"
+                  },
+                  {
+                    "_id": "[UUID_48]",
+                    "code": "S04",
+                    "name": "問題解決能力"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "_id": "[UUID_96]",
+                    "code": "O6.1.1",
+                    "name": "應用程式安裝手冊"
+                  },
+                  {
+                    "_id": "[UUID_97]",
+                    "code": "O6.1.2",
+                    "name": "應用程式的安裝套件"
+                  },
+                  {
+                    "_id": "[UUID_98]",
+                    "code": "O6.1.3",
+                    "name": "IT系統與應用程式安全計畫"
+                  },
+                  {
+                    "_id": "[UUID_56]",
+                    "code": "O6.1.4",
+                    "name": "程式碼"
+                  },
+                  {
+                    "_id": "[UUID_57]",
+                    "code": "O6.1.5",
+                    "name": "程式原始碼"
+                  },
+                  {
+                    "_id": "[UUID_58]",
+                    "code": "O6.1.6",
+                    "name": "支援需求單"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "_id": "[UUID_44]",
+                    "code": "K06",
+                    "name": "客戶的業務領域"
+                  },
+                  {
+                    "_id": "[UUID_54]",
+                    "code": "K07",
+                    "name": "網路應用開發架構"
+                  },
+                  {
+                    "_id": "[UUID_55]",
+                    "code": "K07",
+                    "name": "網路應用開發架構"
+                  }
+                ],
+                "indicators": [
+                  {
+                    "_id": "[UUID_99]",
+                    "code": "P6.1.1",
+                    "text": "在前端呼叫後端 API 出現 CORS 問題時，執行 Nginx reverse proxy，將 /api 流量轉發到後端 8000 port，並掛載 SSL 憑證強制 HTTPS，確保請求可正常通過且瀏覽器顯示安全連線。"
+                  },
+                  {
+                    "_id": "[UUID_53]",
+                    "code": "P6.1.2",
+                    "text": "當需求從只能上傳 PDF 擴展到 JPG、PNG 圖片時，執行後端處理前先檢核是否需要新增 OCR 服務與資料庫欄位調整，並判定是否屬於大改且需重開 ticket、排入下個 sprint"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "_tid": "[UUID_49]",
+            "_refs": [
+              {
+                "ocs_code": "IIS3513-003v4",
+                "task_code": "T2.1",
+                "occupation_name": ""
+              }
+            ],
+            "details": null,
+            "provenance": {
+              "ocs_code": "IIS3513-003v4",
+              "task_code": "T2.1"
+            },
+            "task_codes": [
+              {
+                "code": "T6.2",
+                "name": "規劃系統與應用程式安全"
+              }
+            ],
+            "competency_blocks": []
+          },
+          {
+            "_tid": "[UUID_59]",
+            "_refs": [
+              {
+                "ocs_code": "IIS3513-003v4",
+                "task_code": "T2.3",
+                "occupation_name": ""
+              }
+            ],
+            "details": null,
+            "provenance": {
+              "ocs_code": "IIS3513-003v4",
+              "task_code": "T2.3"
+            },
+            "task_codes": [
+              {
+                "code": "T6.3",
+                "name": "找出最適合專案的開發工具"
+              }
+            ],
+            "competency_blocks": []
+          },
+          {
+            "_tid": "[UUID_60]",
+            "details": null,
+            "task_codes": [
+              {
+                "code": "T6.4",
+                "name": "PDF 上傳功能支援 JPG 和 PNG 圖片"
+              }
+            ],
+            "competency_blocks": []
+          },
+          {
+            "_tid": "[UUID_70]",
+            "_refs": [
+              {
+                "ocs_code": "IIS3513-003v4",
+                "task_code": "T2.2",
+                "occupation_name": ""
+              }
+            ],
+            "details": null,
+            "provenance": {
+              "ocs_code": "IIS3513-003v4",
+              "task_code": "T2.2"
+            },
+            "task_codes": [
+              {
+                "code": "T6.5",
+                "name": "找出最適合專案的開發平台"
+              }
+            ],
+            "competency_blocks": []
+          }
+        ],
+        "source": {
+          "ocs_code": "IIS3513-003v4",
+          "occupation_name": ""
+        },
+        "ocu_code": "T6",
+        "ocu_name": "系統建置規劃"
+      },
+      {
+        "_uid": "[UUID_50]",
+        "_refs": [
+          {
+            "code": "",
+            "ocs_code": "IIS3513-003v4",
+            "ocu_code": "T5",
+            "occupation_name": ""
+          }
+        ],
+        "tasks": [
+          {
+            "_tid": "[UUID_100]",
+            "_refs": [
+              {
+                "ocs_code": "IIS3513-003v4",
+                "task_code": "T5.1",
+                "occupation_name": ""
+              }
+            ],
+            "details": null,
+            "provenance": {
+              "ocs_code": "IIS3513-003v4",
+              "task_code": "T5.1"
+            },
+            "task_codes": [
+              {
+                "code": "T7.1",
+                "name": "確認支援程序"
+              }
+            ],
+            "competency_blocks": []
+          },
+          {
+            "_tid": "[UUID_101]",
+            "_refs": [
+              {
+                "ocs_code": "IIS3513-003v4",
+                "task_code": "T5.2",
+                "occupation_name": ""
+              }
+            ],
+            "details": null,
+            "provenance": {
+              "ocs_code": "IIS3513-003v4",
+              "task_code": "T5.2"
+            },
+            "task_codes": [
+              {
+                "code": "T7.2",
+                "name": "進行支援"
+              }
+            ],
+            "competency_blocks": []
+          }
+        ],
+        "source": {
+          "ocs_code": "IIS3513-003v4",
+          "occupation_name": ""
+        },
+        "ocu_code": "T7",
+        "ocu_name": "提供客戶IT支援服務"
+      },
+      {
+        "_uid": "[UUID_51]",
+        "_refs": [
+          {
+            "code": "",
+            "ocs_code": "INM3514-001v4",
+            "ocu_code": "T3",
+            "occupation_name": ""
+          }
+        ],
+        "tasks": [
+          {
+            "_tid": "[UUID_102]",
+            "_refs": [
+              {
+                "ocs_code": "INM3514-001v4",
+                "task_code": "T3.1",
+                "occupation_name": ""
+              }
+            ],
+            "details": null,
+            "provenance": {
+              "ocs_code": "INM3514-001v4",
+              "task_code": "T3.1"
+            },
+            "task_codes": [
+              {
+                "code": "T8.1",
+                "name": "確認功能改變的需求"
+              }
+            ],
+            "competency_blocks": []
+          },
+          {
+            "_tid": "[UUID_103]",
+            "_refs": [
+              {
+                "ocs_code": "INM3514-001v4",
+                "task_code": "T3.2",
+                "occupation_name": ""
+              }
+            ],
+            "details": null,
+            "provenance": {
+              "ocs_code": "INM3514-001v4",
+              "task_code": "T3.2"
+            },
+            "task_codes": [
+              {
+                "code": "T8.2",
+                "name": "優化程式碼"
+              }
+            ],
+            "competency_blocks": []
+          },
+          {
+            "_tid": "[UUID_104]",
+            "_refs": [
+              {
+                "ocs_code": "INM3514-001v4",
+                "task_code": "T3.3",
+                "occupation_name": ""
+              }
+            ],
+            "details": null,
+            "provenance": {
+              "ocs_code": "INM3514-001v4",
+              "task_code": "T3.3"
+            },
+            "task_codes": [
+              {
+                "code": "T8.3",
+                "name": "確認架構變更"
+              }
+            ],
+            "competency_blocks": []
+          },
+          {
+            "_tid": "[UUID_105]",
+            "_refs": [
+              {
+                "ocs_code": "INM3514-001v4",
+                "task_code": "T3.4",
+                "occupation_name": ""
+              }
+            ],
+            "details": null,
+            "provenance": {
+              "ocs_code": "INM3514-001v4",
+              "task_code": "T3.4"
+            },
+            "task_codes": [
+              {
+                "code": "T8.4",
+                "name": "系統歸檔"
+              }
+            ],
+            "competency_blocks": []
+          }
+        ],
+        "source": {
+          "ocs_code": "INM3514-001v4",
+          "occupation_name": ""
+        },
+        "ocu_code": "T8",
+        "ocu_name": "維護網站"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "category": {
+      "industries": [],
+      "occupations": [],
+      "job_categories": []
+    },
+    "ocs_code": "",
+    "ocs_name": {
+      "occupation_name": "",
+      "job_category_name": null
+    },
+    "ocs_level": null,
+    "job_description": ""
+  },
+  "ocs_attitude": {
+    "attitudes": []
+  },
+  "version_info": {
+    "versions": []
+  }
+}

@@ -1,0 +1,395 @@
+{
+  "$defs": {
+    "GoldEvidence": {
+      "additionalProperties": false,
+      "properties": {
+        "label_id": {
+          "minLength": 1,
+          "title": "Label Id",
+          "type": "string"
+        },
+        "kind": {
+          "minLength": 1,
+          "title": "Kind",
+          "type": "string"
+        },
+        "claim": {
+          "minLength": 1,
+          "title": "Claim",
+          "type": "string"
+        },
+        "subject": {
+          "default": "employee",
+          "enum": [
+            "employee",
+            "team",
+            "other",
+            "unclear"
+          ],
+          "title": "Subject",
+          "type": "string"
+        },
+        "polarity": {
+          "default": "affirmed",
+          "enum": [
+            "affirmed",
+            "denied",
+            "uncertain",
+            "corrected"
+          ],
+          "title": "Polarity",
+          "type": "string"
+        },
+        "time_scope": {
+          "default": "current",
+          "enum": [
+            "current",
+            "past",
+            "future",
+            "hypothetical",
+            "unclear"
+          ],
+          "title": "Time Scope",
+          "type": "string"
+        },
+        "typicality": {
+          "default": "unclear",
+          "enum": [
+            "usual",
+            "recurring",
+            "one_off",
+            "exception",
+            "example_only",
+            "unclear"
+          ],
+          "title": "Typicality",
+          "type": "string"
+        },
+        "qualifies_label_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Qualifies Label Id"
+        },
+        "source": {
+          "$ref": "#/$defs/GoldSource"
+        },
+        "requirement": {
+          "enum": [
+            "required",
+            "optional",
+            "forbidden"
+          ],
+          "title": "Requirement",
+          "type": "string"
+        },
+        "notes": {
+          "default": "",
+          "title": "Notes",
+          "type": "string"
+        }
+      },
+      "required": [
+        "label_id",
+        "kind",
+        "claim",
+        "source",
+        "requirement"
+      ],
+      "title": "GoldEvidence",
+      "type": "object"
+    },
+    "GoldInference": {
+      "additionalProperties": false,
+      "properties": {
+        "label_id": {
+          "minLength": 1,
+          "title": "Label Id",
+          "type": "string"
+        },
+        "kind": {
+          "minLength": 1,
+          "title": "Kind",
+          "type": "string"
+        },
+        "semantic_claim": {
+          "minLength": 1,
+          "title": "Semantic Claim",
+          "type": "string"
+        },
+        "supported_by": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Supported By",
+          "type": "array"
+        },
+        "allowed_status": {
+          "items": {
+            "enum": [
+              "candidate",
+              "needs_confirmation",
+              "corroborated",
+              "confirmed"
+            ],
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Allowed Status",
+          "type": "array"
+        },
+        "must_not_add": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Must Not Add",
+          "type": "array"
+        },
+        "alternatives": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Alternatives",
+          "type": "array"
+        },
+        "notes": {
+          "default": "",
+          "title": "Notes",
+          "type": "string"
+        }
+      },
+      "required": [
+        "label_id",
+        "kind",
+        "semantic_claim",
+        "supported_by",
+        "allowed_status"
+      ],
+      "title": "GoldInference",
+      "type": "object"
+    },
+    "GoldSource": {
+      "additionalProperties": false,
+      "properties": {
+        "turn_seq": {
+          "minimum": 1,
+          "title": "Turn Seq",
+          "type": "integer"
+        },
+        "quote": {
+          "minLength": 1,
+          "title": "Quote",
+          "type": "string"
+        }
+      },
+      "required": [
+        "turn_seq",
+        "quote"
+      ],
+      "title": "GoldSource",
+      "type": "object"
+    },
+    "GoldStateExpectation": {
+      "additionalProperties": false,
+      "properties": {
+        "expectation_id": {
+          "minLength": 1,
+          "title": "Expectation Id",
+          "type": "string"
+        },
+        "assertion": {
+          "minLength": 1,
+          "title": "Assertion",
+          "type": "string"
+        },
+        "severity": {
+          "enum": [
+            "critical",
+            "major",
+            "minor",
+            "diagnostic"
+          ],
+          "title": "Severity",
+          "type": "string"
+        },
+        "notes": {
+          "default": "",
+          "title": "Notes",
+          "type": "string"
+        }
+      },
+      "required": [
+        "expectation_id",
+        "assertion",
+        "severity"
+      ],
+      "title": "GoldStateExpectation",
+      "type": "object"
+    },
+    "ProjectionClaim": {
+      "additionalProperties": false,
+      "properties": {
+        "label_id": {
+          "minLength": 1,
+          "title": "Label Id",
+          "type": "string"
+        },
+        "kind": {
+          "minLength": 1,
+          "title": "Kind",
+          "type": "string"
+        },
+        "semantic_claim": {
+          "minLength": 1,
+          "title": "Semantic Claim",
+          "type": "string"
+        },
+        "supported_by": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Supported By",
+          "type": "array"
+        },
+        "target_hint": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Target Hint"
+        },
+        "notes": {
+          "default": "",
+          "title": "Notes",
+          "type": "string"
+        }
+      },
+      "required": [
+        "label_id",
+        "kind",
+        "semantic_claim"
+      ],
+      "title": "ProjectionClaim",
+      "type": "object"
+    }
+  },
+  "$id": "https://caliburn.local/schemas/interview-eval-gold.v0.1.json",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "interview_eval_gold.v0.1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "case_id": {
+      "minLength": 1,
+      "title": "Case Id",
+      "type": "string"
+    },
+    "expected_no_projection": {
+      "default": false,
+      "title": "Expected No Projection",
+      "type": "boolean"
+    },
+    "required_evidence": {
+      "items": {
+        "$ref": "#/$defs/GoldEvidence"
+      },
+      "title": "Required Evidence",
+      "type": "array"
+    },
+    "optional_evidence": {
+      "items": {
+        "$ref": "#/$defs/GoldEvidence"
+      },
+      "title": "Optional Evidence",
+      "type": "array"
+    },
+    "forbidden_evidence": {
+      "items": {
+        "$ref": "#/$defs/GoldEvidence"
+      },
+      "title": "Forbidden Evidence",
+      "type": "array"
+    },
+    "acceptable_inferences": {
+      "items": {
+        "$ref": "#/$defs/GoldInference"
+      },
+      "title": "Acceptable Inferences",
+      "type": "array"
+    },
+    "inferences_requiring_confirmation": {
+      "items": {
+        "$ref": "#/$defs/GoldInference"
+      },
+      "title": "Inferences Requiring Confirmation",
+      "type": "array"
+    },
+    "forbidden_inferences": {
+      "items": {
+        "$ref": "#/$defs/GoldInference"
+      },
+      "title": "Forbidden Inferences",
+      "type": "array"
+    },
+    "required_projection_claims": {
+      "items": {
+        "$ref": "#/$defs/ProjectionClaim"
+      },
+      "title": "Required Projection Claims",
+      "type": "array"
+    },
+    "acceptable_projection_variants": {
+      "items": {
+        "$ref": "#/$defs/ProjectionClaim"
+      },
+      "title": "Acceptable Projection Variants",
+      "type": "array"
+    },
+    "forbidden_projection_claims": {
+      "items": {
+        "$ref": "#/$defs/ProjectionClaim"
+      },
+      "title": "Forbidden Projection Claims",
+      "type": "array"
+    },
+    "unresolved_gaps": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Unresolved Gaps",
+      "type": "array"
+    },
+    "state_expectations": {
+      "items": {
+        "$ref": "#/$defs/GoldStateExpectation"
+      },
+      "title": "State Expectations",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "case_id"
+  ],
+  "title": "Caliburn interview evaluation gold v0.1",
+  "type": "object"
+}

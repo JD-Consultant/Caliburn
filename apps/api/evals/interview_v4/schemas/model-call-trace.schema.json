@@ -1,0 +1,134 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "interview_model_call_trace.v0.2",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "turn_seq": {
+      "minimum": 0,
+      "title": "Turn Seq",
+      "type": "integer"
+    },
+    "stage": {
+      "enum": [
+        "consultant",
+        "curation",
+        "scribe",
+        "harvest",
+        "attitudes",
+        "backstop"
+      ],
+      "title": "Stage",
+      "type": "string"
+    },
+    "provider": {
+      "minLength": 1,
+      "title": "Provider",
+      "type": "string"
+    },
+    "requested_model": {
+      "minLength": 1,
+      "title": "Requested Model",
+      "type": "string"
+    },
+    "resolved_model": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Resolved Model"
+    },
+    "attempt_count": {
+      "minimum": 1,
+      "title": "Attempt Count",
+      "type": "integer"
+    },
+    "prompt_hash": {
+      "anyOf": [
+        {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Prompt Hash"
+    },
+    "tool_schema_hash": {
+      "anyOf": [
+        {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Tool Schema Hash"
+    },
+    "input_tokens": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Input Tokens"
+    },
+    "output_tokens": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Output Tokens"
+    },
+    "latency_ms": {
+      "minimum": 0,
+      "title": "Latency Ms",
+      "type": "integer"
+    },
+    "outcome": {
+      "enum": [
+        "success",
+        "timeout",
+        "parse_failure",
+        "provider_failure",
+        "fallback"
+      ],
+      "title": "Outcome",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "turn_seq",
+    "stage",
+    "provider",
+    "requested_model",
+    "attempt_count",
+    "latency_ms",
+    "outcome"
+  ],
+  "title": "ModelCallTrace",
+  "type": "object"
+}

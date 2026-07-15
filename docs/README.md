@@ -72,6 +72,8 @@ Caliburn = 給顧問用的多租戶 B2B SaaS(職能基準 OCS → 職務說明�
 ### 中央系統文檔
 
 - [`specs/2026-06-27-system-architecture-design.md`](specs/2026-06-27-system-architecture-design.md) — 大框架(monorepo / 契約優先 / 3 bounded context / Hexagonal+DDD / 多租戶)。
+- [`specs/2026-07-15-evidence-first-stateful-workflow-reconstruction-research.md`](specs/2026-07-15-evidence-first-stateful-workflow-reconstruction-research.md) — **研究持續中／架構未定案**：比較 C0、Evidence-first C1、Sufficiency Agenda C1A、條件式 Workflow Graph C2 與 planner C2P；含 2025–2026 一手來源、Anthropic Interviewer、資料契約、三層 eval、一人團隊淘汰門檻，以及第 24 節 owner-confirmed synthetic session 稽核、22 個 claim labels、migration 0009、runtime capture 實作與剩餘 provider trace gate。
+- [`specs/2026-07-15-c0-c1-interview-eval-experiment-plan.md`](specs/2026-07-15-c0-c1-interview-eval-experiment-plan.md) — **下一步實驗規格**：先建立完整-case dataset、claim-level gold、隔離 C0 replay 與 immutable trajectory，再以盲測 paired cases 決定 C1 Evidence-first 應晉級、修正或淘汰；第 22 節狀態為 `CAPTURE_FOUNDATION_IMPLEMENTED_NEW_PILOT_REQUIRED`，並列出 replay-ready 的十項驗收。
 - [`design/`](design/) — **子系統端到端設計(agent-facing)**;現有 [`editor-knowledge-pack.md`](design/editor-knowledge-pack.md)(編輯器 × 知識包)、[`interview-engine.md`](design/interview-engine.md)(訪談引擎)。寫法見 [`design/README.md`](design/README.md)。
 - [`adr/`](adr/) — Architecture Decision Records(決策的「為什麼」+ 取捨;**0001–0025**)。
 - [`specs/`](specs/) — 研究紀錄(研究/診斷/選項/比對)。

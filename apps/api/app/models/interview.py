@@ -7,7 +7,7 @@ review_events(✓✗ 無聲記帳)/ llm_calls(稽核)。
 import uuid
 
 from sqlalchemy import (
-    BigInteger, Column, DateTime, ForeignKey,
+    BigInteger, Boolean, Column, DateTime, ForeignKey,
     Identity, Index, Integer, Text, UniqueConstraint, func,
 )
 from sqlalchemy import text as sa_text   # 別名:InterviewTurn.text 欄位會遮蔽同名函式
@@ -111,9 +111,69 @@ class InterviewLlmCall(Base):
     turn_seq = Column(Integer, nullable=False)
     role = Column(Text, nullable=False)              # interview/select/backstop
     model = Column(Text, nullable=False)
+    stage = Column(Text, nullable=False)
+    provider = Column(Text, nullable=False, server_default=sa_text("'unknown'"))
+    requested_model = Column(Text, nullable=False)
+    resolved_model = Column(Text)
+    attempt_count = Column(Integer, nullable=False, server_default=sa_text("1"))
+    outcome = Column(Text, nullable=False, server_default=sa_text("'legacy_unknown'"))
+    prompt_hash = Column(Text)
+    tool_schema_hash = Column(Text)
     duration_ms = Column(Integer, nullable=False)
     prompt_tokens = Column(Integer)
     completion_tokens = Column(Integer)
     tool_calls = Column(JSONB, nullable=False, server_default=sa_text("'[]'::jsonb"))
     guard_verdicts = Column(JSONB, nullable=False, server_default=sa_text("'[]'::jsonb"))
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+class InterviewEvalCapture(Base):
+    """Explicitly consented eval capture metadata; one immutable start record/session."""
+
+    __tablename__ = "interview_eval_captures"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    session_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("interview_sessions.id", ondelete="CASCADE"),
+        nullable=False,
+        unique=True,
+    )
+    schema_version = Column(Text, nullable=False)
+    status = Column(Text, nullable=False, server_default=sa_text("'capturing'"))
+    consent_policy_version = Column(Text, nullable=False)
+    locale = Column(Text, nullable=False)
+    initial_document_hash = Column(Text, nullable=False)
+    initial_state_hash = Column(Text, nullable=False)
+    reference_snapshot_hash = Column(Text, nullable=False)
+    prompt_bundle_hash = Column(Text, nullable=False)
+    tool_schema_hash = Column(Text, nullable=False)
+    code_git_sha = Column(Text, nullable=False)
+    dirty_worktree = Column(Boolean, nullable=False)
+    limitations = Column(JSONB, nullable=False, server_default=sa_text("'[]'::jsonb"))
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+class InterviewEvalArtifact(Base):
+    """Restricted JSON artifact. Rows are append-only; UPDATE is blocked by DB trigger."""
+
+    __tablename__ = "interview_eval_artifacts"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    capture_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("interview_eval_captures.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    kind = Column(Text, nullable=False)
+    sequence = Column(Integer, nullable=False, server_default=sa_text("0"))
+    content = Column(JSONB, nullable=False)
+    content_hash = Column(Text, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    __table_args__ = (
+        UniqueConstraint(
+            "capture_id", "kind", "sequence", name="uq_interview_eval_artifact_kind_seq"
+        ),
+        Index("ix_interview_eval_artifacts_capture", "capture_id", "created_at"),
+    )

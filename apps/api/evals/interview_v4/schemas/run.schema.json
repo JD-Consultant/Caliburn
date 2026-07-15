@@ -1,0 +1,316 @@
+{
+  "$defs": {
+    "FinalArtifactRefs": {
+      "additionalProperties": false,
+      "properties": {
+        "state": {
+          "minLength": 1,
+          "title": "State",
+          "type": "string"
+        },
+        "document": {
+          "minLength": 1,
+          "title": "Document",
+          "type": "string"
+        },
+        "grader_results": {
+          "minLength": 1,
+          "title": "Grader Results",
+          "type": "string"
+        }
+      },
+      "required": [
+        "state",
+        "document",
+        "grader_results"
+      ],
+      "title": "FinalArtifactRefs",
+      "type": "object"
+    },
+    "ModelCallArtifact": {
+      "additionalProperties": false,
+      "properties": {
+        "role": {
+          "minLength": 1,
+          "title": "Role",
+          "type": "string"
+        },
+        "provider": {
+          "minLength": 1,
+          "title": "Provider",
+          "type": "string"
+        },
+        "requested_model": {
+          "minLength": 1,
+          "title": "Requested Model",
+          "type": "string"
+        },
+        "resolved_model": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Resolved Model"
+        },
+        "temperature": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Temperature"
+        },
+        "seed": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Seed"
+        },
+        "prompt_hash": {
+          "minLength": 1,
+          "title": "Prompt Hash",
+          "type": "string"
+        },
+        "tool_schema_hash": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Tool Schema Hash"
+        },
+        "input_tokens": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Input Tokens"
+        },
+        "output_tokens": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Output Tokens"
+        },
+        "latency_ms": {
+          "minimum": 0,
+          "title": "Latency Ms",
+          "type": "integer"
+        },
+        "raw_response_artifact": {
+          "minLength": 1,
+          "title": "Raw Response Artifact",
+          "type": "string"
+        },
+        "parsed_output_artifact": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Parsed Output Artifact"
+        },
+        "outcome": {
+          "enum": [
+            "success",
+            "timeout",
+            "parse_failure",
+            "provider_failure",
+            "fallback"
+          ],
+          "title": "Outcome",
+          "type": "string"
+        }
+      },
+      "required": [
+        "role",
+        "provider",
+        "requested_model",
+        "prompt_hash",
+        "latency_ms",
+        "raw_response_artifact",
+        "outcome"
+      ],
+      "title": "ModelCallArtifact",
+      "type": "object"
+    },
+    "TrajectoryStep": {
+      "additionalProperties": false,
+      "properties": {
+        "turn_seq": {
+          "minimum": 1,
+          "title": "Turn Seq",
+          "type": "integer"
+        },
+        "state_before": {
+          "minLength": 1,
+          "title": "State Before",
+          "type": "string"
+        },
+        "candidate_output": {
+          "minLength": 1,
+          "title": "Candidate Output",
+          "type": "string"
+        },
+        "verifier_result": {
+          "minLength": 1,
+          "title": "Verifier Result",
+          "type": "string"
+        },
+        "state_delta": {
+          "minLength": 1,
+          "title": "State Delta",
+          "type": "string"
+        },
+        "projection_delta": {
+          "minLength": 1,
+          "title": "Projection Delta",
+          "type": "string"
+        }
+      },
+      "required": [
+        "turn_seq",
+        "state_before",
+        "candidate_output",
+        "verifier_result",
+        "state_delta",
+        "projection_delta"
+      ],
+      "title": "TrajectoryStep",
+      "type": "object"
+    }
+  },
+  "$id": "https://caliburn.local/schemas/interview-eval-run.v0.1.json",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "interview_eval_run.v0.1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "run_id": {
+      "minLength": 1,
+      "title": "Run Id",
+      "type": "string"
+    },
+    "case_id": {
+      "minLength": 1,
+      "title": "Case Id",
+      "type": "string"
+    },
+    "case_content_hash": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Case Content Hash",
+      "type": "string"
+    },
+    "candidate": {
+      "enum": [
+        "C0",
+        "C0R",
+        "C1"
+      ],
+      "title": "Candidate",
+      "type": "string"
+    },
+    "trial_index": {
+      "minimum": 1,
+      "title": "Trial Index",
+      "type": "integer"
+    },
+    "git_sha": {
+      "minLength": 1,
+      "title": "Git Sha",
+      "type": "string"
+    },
+    "dirty_worktree": {
+      "title": "Dirty Worktree",
+      "type": "boolean"
+    },
+    "started_at": {
+      "minLength": 1,
+      "title": "Started At",
+      "type": "string"
+    },
+    "runner_version": {
+      "minLength": 1,
+      "title": "Runner Version",
+      "type": "string"
+    },
+    "model_calls": {
+      "items": {
+        "$ref": "#/$defs/ModelCallArtifact"
+      },
+      "title": "Model Calls",
+      "type": "array"
+    },
+    "trajectory": {
+      "items": {
+        "$ref": "#/$defs/TrajectoryStep"
+      },
+      "title": "Trajectory",
+      "type": "array"
+    },
+    "final": {
+      "$ref": "#/$defs/FinalArtifactRefs"
+    },
+    "limitations": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Limitations",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "run_id",
+    "case_id",
+    "case_content_hash",
+    "candidate",
+    "trial_index",
+    "git_sha",
+    "dirty_worktree",
+    "started_at",
+    "runner_version",
+    "final"
+  ],
+  "title": "Caliburn interview evaluation run v0.1",
+  "type": "object"
+}

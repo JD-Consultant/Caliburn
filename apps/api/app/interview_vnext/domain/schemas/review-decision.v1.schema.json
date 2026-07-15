@@ -1,5 +1,43 @@
 {
   "$defs": {
+    "QuantitativeThreshold": {
+      "additionalProperties": false,
+      "properties": {
+        "expression": {
+          "minLength": 1,
+          "title": "Expression",
+          "type": "string"
+        },
+        "source_type": {
+          "$ref": "#/$defs/ThresholdSourceType"
+        },
+        "source_id": {
+          "minLength": 1,
+          "title": "Source Id",
+          "type": "string"
+        },
+        "evidence_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Evidence Id"
+        }
+      },
+      "required": [
+        "expression",
+        "source_type",
+        "source_id"
+      ],
+      "title": "QuantitativeThreshold",
+      "type": "object"
+    },
     "ReviewAction": {
       "enum": [
         "accept",
@@ -7,6 +45,15 @@
         "reject"
       ],
       "title": "ReviewAction",
+      "type": "string"
+    },
+    "ThresholdSourceType": {
+      "enum": [
+        "employee_evidence",
+        "approved_policy",
+        "human"
+      ],
+      "title": "ThresholdSourceType",
       "type": "string"
     }
   },
@@ -52,6 +99,14 @@
       ],
       "default": null,
       "title": "Edited Statement"
+    },
+    "edited_thresholds": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/QuantitativeThreshold"
+      },
+      "title": "Edited Thresholds",
+      "type": "array"
     },
     "reason": {
       "anyOf": [

@@ -1,0 +1,52 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "command_id": {
+      "format": "uuid",
+      "title": "Command Id",
+      "type": "string"
+    },
+    "expected_state_version": {
+      "minimum": 0,
+      "title": "Expected State Version",
+      "type": "integer"
+    },
+    "occurred_at": {
+      "format": "date-time",
+      "title": "Occurred At",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "open_episode_command.v1",
+      "default": "open_episode_command.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "episode_id": {
+      "format": "uuid",
+      "title": "Episode Id",
+      "type": "string"
+    },
+    "target": {
+      "minLength": 1,
+      "title": "Target",
+      "type": "string"
+    },
+    "opened_turn_id": {
+      "format": "uuid",
+      "title": "Opened Turn Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "command_id",
+    "expected_state_version",
+    "occurred_at",
+    "episode_id",
+    "target",
+    "opened_turn_id"
+  ],
+  "title": "Caliburn interview vNext open episode command v1",
+  "type": "object",
+  "$id": "https://caliburn.local/schemas/open-episode-command.v1.schema.json"
+}

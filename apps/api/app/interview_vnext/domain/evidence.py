@@ -10,7 +10,7 @@ from uuid import UUID
 from pydantic import Field, field_validator, model_validator
 
 from .base import DomainModel
-from .identifiers import NonEmptyText, ReferenceUrn, StableName
+from .identifiers import NonEmptyText, ReferenceUrn, Sha256, StableName
 
 
 class EvidenceSubject(StrEnum):
@@ -136,7 +136,7 @@ class EvidenceStatus(StrEnum):
 
 
 class Evidence(DomainModel):
-    schema_version: Literal["evidence.v1"] = "evidence.v1"
+    schema_version: Literal["evidence.v2"] = "evidence.v2"
     evidence_id: UUID
     session_id: UUID
     turn_id: UUID
@@ -152,6 +152,8 @@ class Evidence(DomainModel):
     status: EvidenceStatus = EvidenceStatus.ACTIVE
     supersedes: tuple[UUID, ...] = ()
     superseded_by: UUID | None = None
+    withdrawn_reason: str | None = None
+    withdrawn_by_turn_id: UUID | None = None
     correction_target_unknown: bool = False
     extractor_operation_id: UUID
 
@@ -172,6 +174,13 @@ class Evidence(DomainModel):
             raise ValueError("superseded evidence requires superseded_by")
         if self.status != EvidenceStatus.SUPERSEDED and self.superseded_by is not None:
             raise ValueError("only superseded evidence may set superseded_by")
+        if self.status == EvidenceStatus.WITHDRAWN:
+            if self.withdrawn_reason is None or not self.withdrawn_reason.strip():
+                raise ValueError("withdrawn evidence requires withdrawn_reason")
+            if self.withdrawn_by_turn_id is None:
+                raise ValueError("withdrawn evidence requires withdrawn_by_turn_id")
+        elif self.withdrawn_reason is not None or self.withdrawn_by_turn_id is not None:
+            raise ValueError("only withdrawn evidence may set withdrawal fields")
         if self.quote_match == QuoteMatch.NORMALIZED and self.normalization_version is None:
             raise ValueError("normalized quotes require normalization_version")
         if self.quote_match == QuoteMatch.EXACT and self.normalization_version is not None:
@@ -200,7 +209,7 @@ class InferenceMethod(StrEnum):
 
 
 class Inference(DomainModel):
-    schema_version: Literal["inference.v1"] = "inference.v1"
+    schema_version: Literal["inference.v2"] = "inference.v2"
     inference_id: UUID
     session_id: UUID
     type: StableName
@@ -211,7 +220,10 @@ class Inference(DomainModel):
     status: InferenceStatus = InferenceStatus.CANDIDATE
     method: InferenceMethod
     operation_name: StableName
-    prompt_version: NonEmptyText
+    operation_definition_hash: Sha256
+    supersedes: tuple[UUID, ...] = ()
+    superseded_by: UUID | None = None
+    decision_evidence_id: UUID | None = None
     uncertainty_reason: str | None = None
 
     @model_validator(mode="after")
@@ -222,6 +234,32 @@ class Inference(DomainModel):
             raise ValueError("contradicting evidence IDs must be unique")
         if set(self.supporting_evidence_ids) & set(self.contradicting_evidence_ids):
             raise ValueError("supporting and contradicting evidence must be disjoint")
+        if len(self.supersedes) != len(set(self.supersedes)):
+            raise ValueError("superseded inference IDs must be unique")
+        if self.inference_id in self.supersedes:
+            raise ValueError("inference cannot supersede itself")
+        if self.status == InferenceStatus.SUPERSEDED and self.superseded_by is None:
+            raise ValueError("superseded inference requires superseded_by")
+        if self.status != InferenceStatus.SUPERSEDED and self.superseded_by is not None:
+            raise ValueError("only superseded inference may set superseded_by")
+        human_decided = self.status in {
+            InferenceStatus.CONFIRMED_BY_EMPLOYEE,
+            InferenceStatus.REJECTED,
+        }
+        if human_decided and self.decision_evidence_id is None:
+            raise ValueError("employee-decided inference requires decision_evidence_id")
+        if not human_decided and self.decision_evidence_id is not None:
+            raise ValueError("only employee-decided inference may set decision_evidence_id")
+        if (
+            self.status == InferenceStatus.CONFIRMED_BY_EMPLOYEE
+            and self.decision_evidence_id not in self.supporting_evidence_ids
+        ):
+            raise ValueError("confirmation evidence must support the inference")
+        if (
+            self.status == InferenceStatus.REJECTED
+            and self.decision_evidence_id not in self.contradicting_evidence_ids
+        ):
+            raise ValueError("rejection evidence must contradict the inference")
         if self.uncertainty_reason is not None and not self.uncertainty_reason.strip():
             raise ValueError("uncertainty_reason cannot be blank")
         return self

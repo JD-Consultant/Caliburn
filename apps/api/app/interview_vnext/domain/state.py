@@ -9,11 +9,12 @@ from pydantic import model_validator
 
 from .base import DomainModel
 from .episode import EpisodeState, EpisodeStatus, Gap
-from .evidence import Evidence, EvidenceStatus, Inference
+from .evidence import Evidence, EvidenceStatus, Inference, InferenceStatus
+from .invariants import assert_candidate_projectable
 from .job_model import CandidateJobItem, CandidateStatus
 from .review import ReviewAction, ReviewDecision
 from .session import InterviewSession
-from .transcript import TranscriptTurn
+from .transcript import TranscriptRole, TranscriptTurn
 
 
 def _assert_unique(values: tuple[UUID, ...], label: str) -> None:
@@ -22,7 +23,7 @@ def _assert_unique(values: tuple[UUID, ...], label: str) -> None:
 
 
 class InterviewState(DomainModel):
-    schema_version: Literal["interview_state.v1"] = "interview_state.v1"
+    schema_version: Literal["interview_state.v2"] = "interview_state.v2"
     session: InterviewSession
     turns: tuple[TranscriptTurn, ...] = ()
     evidence: tuple[Evidence, ...] = ()
@@ -132,6 +133,10 @@ class InterviewState(DomainModel):
                 replacement = evidence_by_id.get(item.superseded_by)
                 if replacement is None or item.evidence_id not in replacement.supersedes:
                     raise ValueError("superseded evidence lineage is not bidirectional")
+            if item.status == EvidenceStatus.WITHDRAWN:
+                withdrawal_turn = turn_by_id.get(item.withdrawn_by_turn_id)
+                if withdrawal_turn is None or withdrawal_turn.role != TranscriptRole.EMPLOYEE:
+                    raise ValueError("withdrawn evidence requires an employee source turn")
             for target_id in item.supersedes:
                 target = evidence_by_id.get(target_id)
                 if target is None or target.superseded_by != item.evidence_id:
@@ -157,6 +162,39 @@ class InterviewState(DomainModel):
                 raise ValueError("inference references missing supporting evidence")
             if not set(item.contradicting_evidence_ids) <= evidence_by_id.keys():
                 raise ValueError("inference references missing contradicting evidence")
+            if item.decision_evidence_id is not None:
+                decision_evidence = evidence_by_id.get(item.decision_evidence_id)
+                if decision_evidence is None or decision_evidence.status != EvidenceStatus.ACTIVE:
+                    raise ValueError("inference decision evidence must be active")
+                decision_turn = turn_by_id[decision_evidence.turn_id]
+                if decision_turn.role != TranscriptRole.EMPLOYEE:
+                    raise ValueError("inference decision evidence must come from employee")
+            if (
+                item.status in {InferenceStatus.CANDIDATE, InferenceStatus.INSUFFICIENT}
+                and item.decision_evidence_id is not None
+            ):
+                raise ValueError("model-owned inference cannot retain human decision evidence")
+            if item.status == InferenceStatus.SUPERSEDED:
+                replacement = inference_by_id.get(item.superseded_by)
+                if replacement is None or item.inference_id not in replacement.supersedes:
+                    raise ValueError("superseded inference lineage is not bidirectional")
+            for target_id in item.supersedes:
+                target = inference_by_id.get(target_id)
+                if target is None or target.superseded_by != item.inference_id:
+                    raise ValueError("replacement inference lineage is not bidirectional")
+
+        for item in self.inferences:
+            lineage_path: set[UUID] = set()
+            cursor: Inference | None = item
+            while cursor is not None:
+                if cursor.inference_id in lineage_path:
+                    raise ValueError("inference supersede lineage cannot contain a cycle")
+                lineage_path.add(cursor.inference_id)
+                cursor = (
+                    inference_by_id.get(cursor.superseded_by)
+                    if cursor.superseded_by is not None
+                    else None
+                )
 
         for gap in self.gaps:
             if gap.session_id != session_id:
@@ -169,6 +207,26 @@ class InterviewState(DomainModel):
                 raise ValueError("gap references missing evidence")
             if not set(gap.asked_turn_ids) <= turn_by_id.keys():
                 raise ValueError("gap references missing asked turns")
+            if any(
+                turn_by_id[turn_id].role != TranscriptRole.CONSULTANT
+                for turn_id in gap.asked_turn_ids
+            ):
+                raise ValueError("gap asked_turn_ids must reference consultant turns")
+            if gap.resolution_turn_id is not None:
+                resolution_turn = turn_by_id.get(gap.resolution_turn_id)
+                if resolution_turn is None or resolution_turn.role != TranscriptRole.EMPLOYEE:
+                    raise ValueError("gap resolution_turn_id must reference an employee turn")
+            if not set(gap.resolution_evidence_ids) <= evidence_by_id.keys():
+                raise ValueError("gap references missing resolution evidence")
+            for evidence_id in gap.resolution_evidence_ids:
+                resolution_evidence = evidence_by_id[evidence_id]
+                if (
+                    resolution_evidence.status != EvidenceStatus.ACTIVE
+                    or resolution_evidence.turn_id != gap.resolution_turn_id
+                ):
+                    raise ValueError(
+                        "gap resolution evidence must be active and match resolution turn"
+                    )
 
         for item in self.candidates:
             if item.session_id != session_id:
@@ -177,10 +235,20 @@ class InterviewState(DomainModel):
                 raise ValueError("candidate references missing evidence")
             if not set(item.inference_ids) <= inference_by_id.keys():
                 raise ValueError("candidate references missing inference")
+            for threshold in item.thresholds:
+                if threshold.evidence_id is not None:
+                    threshold_evidence = evidence_by_id.get(threshold.evidence_id)
+                    if (
+                        threshold_evidence is None
+                        or threshold.evidence_id not in item.evidence_ids
+                    ):
+                        raise ValueError("candidate threshold evidence must close over lineage")
             if item.review_decision_id is not None:
                 review = review_by_id.get(item.review_decision_id)
                 if review is None or review.candidate_id != item.candidate_id:
                     raise ValueError("candidate review decision does not exist")
+            if item.status in {CandidateStatus.VERIFIED, CandidateStatus.PROJECTED}:
+                assert_candidate_projectable(item, evidence_by_id)
 
         for review in self.reviews:
             if review.session_id != session_id:

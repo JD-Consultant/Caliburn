@@ -3,7 +3,7 @@
 「著作」bounded context 的後端。提供 REST `/api/v1/*`(含訪談引擎 `interview:*`)。
 擁有 **Postgres**(users/job_profiles/document_versions + interview_*);知識一律
 透過 HTTP 消費 `ocs-indexer`,**不碰 Qdrant**(資料主權,見根 [`ARCHITECTURE.md`](../../ARCHITECTURE.md))。
-現行 production AI 共編端到端（v3，一個大腦／追蹤修訂）見 [`docs/design/interview-engine.md`](../../docs/design/interview-engine.md)。greenfield vNext 正在隔離實作 domain foundation，尚未接 route；狀態與邊界見 [`app/interview_vnext/README.md`](app/interview_vnext/README.md)。
+現行 production AI 共編端到端（v3，一個大腦／追蹤修訂）見 [`docs/design/interview-engine.md`](../../docs/design/interview-engine.md)。greenfield vNext 已在隔離區完成 V1 domain foundation，尚未接 route；狀態與邊界見 [`app/interview_vnext/README.md`](app/interview_vnext/README.md)。
 
 - **import 套件名**:`app`(Phase 3 才改 `caliburn_api`;現由 `pytest.ini` 的 `pythonpath=.` 提供)。
 - **uv application 模式**(無 build-system,[ADR 0005](../../docs/adr/0005-per-app-uv-defer-workspace.md))。
@@ -33,7 +33,7 @@ uv run pytest -q                   # 無 DB 時 DB 相關測試自動 skip
 | `app/adapters/` | 邊緣實作:`knowledge_http.py`(indexer typed client)、`persistence.py`(ProfileRepo/DocRepo/LiveDbPersist)、`llm_openrouter.py`(per-role LLM + JSON 重試)、`stubs.py`(測試/demo 假件) | 實作 ports |
 | `app/services/` | use-case 純函式:`ai/`(recommend_ks/draft_op/extract_tasks/structure_task/clarify + prompts)、`knowledge/task_detail.py`(池→單任務切片) | 只吃 ports/DTO |
 | `app/interview/` | **現行 production 訪談引擎／唯一 AI 大腦**(ADR 0030):`consultant.py`(對話+READ 工具)、`scribe.py`(op 化+落 `_pending`)、`verify.py`(六查,blocking)、`ledger.py`(覆蓋帳本)、`backstop.py`(確定性 sweep)、`skills/`(判準教材 8 檔+`skill_loader.py`)、`service.py`(回合編排) | 吃 ports;寫入唯一路徑 op→verify→`_pending` |
-| `app/interview_vnext/` | **隔離開發中的 greenfield vNext**（ADR 0034）：目前只有 provider-neutral domain contracts/reducers/invariants/schemas；無 route、DB、LLM | 不 import v3 internals；production composition root 不 import此 package |
+| `app/interview_vnext/` | **隔離開發中的 greenfield vNext**（ADR 0034）：V1 provider-neutral domain contracts/lifecycle reducers/invariants/24 schemas 已完成；無 route、DB、LLM | 不 import v3 internals；production composition root 不 import此 package |
 | `app/observability.py` | OTel tracing 橫切(gen_ai.* 手埋;verify 拒收/審閱事件 span) | — |
 | `app/api/` | HTTP 面:`routes/{users,job_profiles,documents,occupations,ai}.py`、`router.py`(唯一聚合點)、`deps.py`(get_knowledge) | 薄轉接,邏輯下沉 |
 | `app/app_factory.py` | composition root:`configure()` 掛 router/CORS/healthz | — |

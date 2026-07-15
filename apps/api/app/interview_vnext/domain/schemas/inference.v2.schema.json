@@ -24,8 +24,8 @@
   "additionalProperties": false,
   "properties": {
     "schema_version": {
-      "const": "inference.v1",
-      "default": "inference.v1",
+      "const": "inference.v2",
+      "default": "inference.v2",
       "title": "Schema Version",
       "type": "string"
     },
@@ -93,10 +93,45 @@
       "title": "Operation Name",
       "type": "string"
     },
-    "prompt_version": {
-      "minLength": 1,
-      "title": "Prompt Version",
+    "operation_definition_hash": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Operation Definition Hash",
       "type": "string"
+    },
+    "supersedes": {
+      "default": [],
+      "items": {
+        "format": "uuid",
+        "type": "string"
+      },
+      "title": "Supersedes",
+      "type": "array"
+    },
+    "superseded_by": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Superseded By"
+    },
+    "decision_evidence_id": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Decision Evidence Id"
     },
     "uncertainty_reason": {
       "anyOf": [
@@ -119,9 +154,9 @@
     "supporting_evidence_ids",
     "method",
     "operation_name",
-    "prompt_version"
+    "operation_definition_hash"
   ],
-  "title": "Caliburn interview vNext inference v1",
+  "title": "Caliburn interview vNext inference v2",
   "type": "object",
-  "$id": "https://caliburn.local/schemas/inference.v1.schema.json"
+  "$id": "https://caliburn.local/schemas/inference.v2.schema.json"
 }

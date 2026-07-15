@@ -83,8 +83,8 @@
   "additionalProperties": false,
   "properties": {
     "schema_version": {
-      "const": "gap.v1",
-      "default": "gap.v1",
+      "const": "gap.v2",
+      "default": "gap.v2",
       "title": "Schema Version",
       "type": "string"
     },
@@ -136,6 +136,28 @@
       "title": "Asked Turn Ids",
       "type": "array"
     },
+    "resolution_turn_id": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Resolution Turn Id"
+    },
+    "resolution_evidence_ids": {
+      "default": [],
+      "items": {
+        "format": "uuid",
+        "type": "string"
+      },
+      "title": "Resolution Evidence Ids",
+      "type": "array"
+    },
     "unresolved_reason": {
       "anyOf": [
         {
@@ -157,7 +179,7 @@
     "question_goal",
     "priority_features"
   ],
-  "title": "Caliburn interview vNext gap v1",
+  "title": "Caliburn interview vNext gap v2",
   "type": "object",
-  "$id": "https://caliburn.local/schemas/gap.v1.schema.json"
+  "$id": "https://caliburn.local/schemas/gap.v2.schema.json"
 }

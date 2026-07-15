@@ -1,7 +1,7 @@
 # Interview AI vNext Greenfield 實作計畫
 
 - 日期：2026-07-16
-- 狀態：**執行中；V0 + V1-A domain foundation 已完成，尚未接 runtime route**
+- 狀態：**執行中；V0 + V1 domain foundation 已完成，下一步 V2；尚未接 runtime route**
 - 目標架構：[`../specs/2026-07-16-interview-ai-vnext-greenfield-architecture.md`](../specs/2026-07-16-interview-ai-vnext-greenfield-architecture.md)
 - 團隊：一人開發；每個工作包必須可獨立 review、測試、保留或刪除
 - 核心限制：不 import、包裝或雙寫 v3 LLM internals；v3 只作黑箱 baseline/fallback
@@ -38,10 +38,13 @@ V8  刪除 v3 internals 與更新現行 design
 |---|---|---|---|
 | V0 | 完成 | `interview_vnext` 隔離 package、package 規則、AST dependency tests、production 零接線 | v3 刪除與 route 切換屬 V7/V8 |
 | V1-A | 完成 | session/transcript/evidence/inference/episode/gap/candidate/review/state contracts；append/session/evidence reducers；stable reason codes/hash；13 份 committed schema；unit/property-like/schema tests | 不代表可上線，也不代表已完成全 event replay protocol |
-| V1-B | 下一步 | — | episode/gap/inference/candidate/withdraw/review reducers 與 command/event/schema；完整 mutation closure |
-| V2+ | 未開始 | — | LLM port、Capture、ContextBuilder、persistence、workflow、model/prompt eval、Web seam |
+| V1-B | 完成 | episode/gap/inference/candidate/withdraw/review lifecycle reducers；Evidence/Inference 雙向 correction lineage；Gap resolution evidence；deterministic invalidation；human review；共 24 份 schema | 不含 provider、DB、route 或正式 prompt |
+| V2 | 下一步 | — | provider-neutral LLM port、operation registry、Capture artifact/event/outbox、fake contract 與 crash-recovery protocol |
+| V3+ | 未開始 | — | persistence、offline workflow、ContextBuilder、model/prompt eval、Web seam |
 
-V1-A 的 event 是 domain change notification／artifact index，payload 只有 object ID；目前可重現的是相同初始 state + command stream 的 state/hash。完整「只靠 durable records 重建」要在 V2 定義 event + artifact/checkpoint transaction 後才算完成，不得提前宣稱 event sourcing 已完成。實作細節見 [`../../apps/api/app/interview_vnext/README.md`](../../apps/api/app/interview_vnext/README.md)。
+V1 的 event 是 domain change notification／artifact index，payload 只有 object ID；目前可重現的是相同初始 state + command stream 的 state/hash。完整「只靠 durable records 重建」要在 V2 定義 event + artifact/checkpoint transaction 後才算完成，不得提前宣稱 event sourcing 已完成。實作細節與完整 lifecycle matrix 見 [`../../apps/api/app/interview_vnext/README.md`](../../apps/api/app/interview_vnext/README.md)。
+
+V1-B 的 breaking semantic changes 已依版本規則把 Evidence、Inference、Gap、InterviewState、ApplyEvidenceCommand 升為 v2。因 vNext 尚未接 route／DB，V1-A v1 只存在 Git history，不新增 runtime backward reader；從 V2 durable persistence 開始，major upgrade 必須有 migration／dual reader／explicit rejection 三者之一。
 
 ---
 

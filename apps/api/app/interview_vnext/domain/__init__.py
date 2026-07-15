@@ -1,10 +1,41 @@
 """Pure, immutable domain contracts for interview vNext."""
 
-from .commands import ApplyEvidenceCommand, AppendTranscriptTurnCommand, TransitionSessionCommand
+from .commands import (
+    ApplyCandidateProposalsCommand,
+    ApplyEvidenceCommand,
+    ApplyGapProposalsCommand,
+    ApplyInferenceProposalsCommand,
+    ApplyReviewDecisionCommand,
+    AppendTranscriptTurnCommand,
+    DecideInferenceCommand,
+    OpenEpisodeCommand,
+    SupersedeInferenceCommand,
+    TransitionCandidateCommand,
+    TransitionEpisodeCommand,
+    TransitionGapCommand,
+    TransitionSessionCommand,
+    WithdrawEvidenceCommand,
+)
 from .evidence import Evidence, EvidenceQualifiers, Inference, QuoteSpan
 from .episode import EpisodeState, Gap
 from .job_model import CandidateJobItem
-from .reducers import ReductionResult, apply_evidence, append_transcript_turn, transition_session
+from .reducers import (
+    ReductionResult,
+    apply_candidate_proposals,
+    apply_evidence,
+    apply_gap_proposals,
+    apply_inference_proposals,
+    apply_review_decision,
+    append_transcript_turn,
+    decide_inference,
+    open_episode,
+    supersede_inference,
+    transition_candidate,
+    transition_episode,
+    transition_gap,
+    transition_session,
+    withdraw_evidence,
+)
 from .review import ReviewDecision
 from .session import InterviewSession
 from .state import InterviewState
@@ -12,6 +43,10 @@ from .transcript import TranscriptTurn
 
 __all__ = [
     "ApplyEvidenceCommand",
+    "ApplyCandidateProposalsCommand",
+    "ApplyGapProposalsCommand",
+    "ApplyInferenceProposalsCommand",
+    "ApplyReviewDecisionCommand",
     "AppendTranscriptTurnCommand",
     "CandidateJobItem",
     "EpisodeState",
@@ -26,7 +61,25 @@ __all__ = [
     "ReviewDecision",
     "TranscriptTurn",
     "TransitionSessionCommand",
+    "DecideInferenceCommand",
+    "OpenEpisodeCommand",
+    "SupersedeInferenceCommand",
+    "TransitionCandidateCommand",
+    "TransitionEpisodeCommand",
+    "TransitionGapCommand",
+    "WithdrawEvidenceCommand",
+    "apply_candidate_proposals",
     "apply_evidence",
+    "apply_gap_proposals",
+    "apply_inference_proposals",
+    "apply_review_decision",
     "append_transcript_turn",
+    "decide_inference",
+    "open_episode",
+    "supersede_inference",
+    "transition_candidate",
+    "transition_episode",
+    "transition_gap",
     "transition_session",
+    "withdraw_evidence",
 ]

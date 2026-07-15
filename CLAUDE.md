@@ -31,7 +31,7 @@ Monorepo。維護者用**繁體中文**,請用繁中回應。
   追蹤修訂;判準教材在 `app/interview/skills/`,調教首選改 skill 不改碼)、`app/observability.py`
   (OTel 橫切)。ADR 0008 / **0030**(舊 LangGraph/CopilotKit 已退場,勿救回;端到端見
   `docs/design/interview-engine.md`)。
-- **AI vNext 隔離中**：`app/interview_vnext` 依 ADR **0034** greenfield 實作；目前只有 domain foundation，
+- **AI vNext 隔離中**：`app/interview_vnext` 依 ADR **0034** greenfield 實作；V1 domain foundation 已完成，
   無 route/DB/LLM，production 不 import。禁止 import/wrap v3 consultant/scribe/harvest/select；細節先讀
   `app/interview_vnext/README.md`、其 `AGENTS.md` 與 `docs/plans/2026-07-16-interview-ai-vnext-implementation-plan.md`。
 - **契約**:#1 `packages/ocs-contract`(OCS 文件,JSON-schema→Pydantic+TS)、

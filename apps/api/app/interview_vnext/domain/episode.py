@@ -91,7 +91,7 @@ class GapPriorityFeatures(DomainModel):
 
 
 class Gap(DomainModel):
-    schema_version: Literal["gap.v1"] = "gap.v1"
+    schema_version: Literal["gap.v2"] = "gap.v2"
     gap_id: UUID
     session_id: UUID
     episode_id: UUID
@@ -101,6 +101,8 @@ class Gap(DomainModel):
     status: GapStatus = GapStatus.OPEN
     priority_features: GapPriorityFeatures
     asked_turn_ids: tuple[UUID, ...] = ()
+    resolution_turn_id: UUID | None = None
+    resolution_evidence_ids: tuple[UUID, ...] = ()
     unresolved_reason: str | None = None
 
     @model_validator(mode="after")
@@ -109,6 +111,47 @@ class Gap(DomainModel):
             raise ValueError("gap supporting evidence IDs must be unique")
         if len(self.asked_turn_ids) != len(set(self.asked_turn_ids)):
             raise ValueError("gap asked turn IDs must be unique")
+        if len(self.resolution_evidence_ids) != len(set(self.resolution_evidence_ids)):
+            raise ValueError("gap resolution evidence IDs must be unique")
         if self.unresolved_reason is not None and not self.unresolved_reason.strip():
             raise ValueError("unresolved_reason cannot be blank")
+        if self.status == GapStatus.OPEN:
+            if (
+                self.asked_turn_ids
+                or self.resolution_turn_id
+                or self.resolution_evidence_ids
+                or self.unresolved_reason
+            ):
+                raise ValueError("open gap cannot contain question or resolution fields")
+        elif self.status == GapStatus.ASKED:
+            if not self.asked_turn_ids:
+                raise ValueError("asked gap requires asked_turn_ids")
+            if (
+                self.resolution_turn_id is not None
+                or self.resolution_evidence_ids
+                or self.unresolved_reason is not None
+            ):
+                raise ValueError("asked gap cannot contain resolution fields")
+        elif self.status == GapStatus.ANSWERED:
+            if (
+                not self.asked_turn_ids
+                or self.resolution_turn_id is None
+                or not self.resolution_evidence_ids
+            ):
+                raise ValueError("answered gap requires question, turn, and evidence")
+            if self.unresolved_reason is not None:
+                raise ValueError("answered gap cannot contain unresolved_reason")
+        elif self.status in {GapStatus.DECLINED, GapStatus.NOT_APPLICABLE}:
+            if self.resolution_turn_id is None or self.unresolved_reason is None:
+                raise ValueError("declined/not_applicable gap requires source turn and reason")
+            if self.status == GapStatus.DECLINED and not self.asked_turn_ids:
+                raise ValueError("declined gap must have been asked")
+            if self.status == GapStatus.NOT_APPLICABLE and not self.resolution_evidence_ids:
+                raise ValueError("not_applicable gap requires resolution evidence")
+            if self.status == GapStatus.DECLINED and self.resolution_evidence_ids:
+                raise ValueError("declined gap cannot claim resolution evidence")
+        elif self.status == GapStatus.DEFERRED and self.unresolved_reason is None:
+            raise ValueError("deferred gap requires unresolved_reason")
+        if self.status == GapStatus.DEFERRED and self.resolution_evidence_ids:
+            raise ValueError("deferred gap cannot claim resolution evidence")
         return self

@@ -1,7 +1,7 @@
 # Interview AI vNext Greenfield Architecture——專業顧問 LLM 層定案規格
 
 - 日期：2026-07-16
-- 狀態：**greenfield 方向已核准；V0 + V1-A domain foundation 已實作，runtime route/LLM 尚未接線；本文件是 vNext 的目標架構規格**
+- 狀態：**greenfield 方向已核准；V0 + V1 domain foundation 已實作，runtime route/LLM 尚未接線；本文件是 vNext 的目標架構規格**
 - 決策：不把 v3 `consultant/scribe/harvest/select` 內部流程整合、包裝或逐步演化成新版
 - 適用團隊：一人開發團隊
 - 產品前提：現有手動 JD Web、OCS 文件契約與人工審閱流程可用；重做範圍是 LLM 分析與訪談 runtime

@@ -227,8 +227,8 @@
       "additionalProperties": false,
       "properties": {
         "schema_version": {
-          "const": "evidence.v1",
-          "default": "evidence.v1",
+          "const": "evidence.v2",
+          "default": "evidence.v2",
           "title": "Schema Version",
           "type": "string"
         },
@@ -324,6 +324,31 @@
           ],
           "default": null,
           "title": "Superseded By"
+        },
+        "withdrawn_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Withdrawn Reason"
+        },
+        "withdrawn_by_turn_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Withdrawn By Turn Id"
         },
         "correction_target_unknown": {
           "default": false,
@@ -479,8 +504,8 @@
       "additionalProperties": false,
       "properties": {
         "schema_version": {
-          "const": "gap.v1",
-          "default": "gap.v1",
+          "const": "gap.v2",
+          "default": "gap.v2",
           "title": "Schema Version",
           "type": "string"
         },
@@ -530,6 +555,28 @@
             "type": "string"
           },
           "title": "Asked Turn Ids",
+          "type": "array"
+        },
+        "resolution_turn_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Resolution Turn Id"
+        },
+        "resolution_evidence_ids": {
+          "default": [],
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Resolution Evidence Ids",
           "type": "array"
         },
         "unresolved_reason": {
@@ -629,8 +676,8 @@
       "additionalProperties": false,
       "properties": {
         "schema_version": {
-          "const": "inference.v1",
-          "default": "inference.v1",
+          "const": "inference.v2",
+          "default": "inference.v2",
           "title": "Schema Version",
           "type": "string"
         },
@@ -698,10 +745,45 @@
           "title": "Operation Name",
           "type": "string"
         },
-        "prompt_version": {
-          "minLength": 1,
-          "title": "Prompt Version",
+        "operation_definition_hash": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Operation Definition Hash",
           "type": "string"
+        },
+        "supersedes": {
+          "default": [],
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Supersedes",
+          "type": "array"
+        },
+        "superseded_by": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Superseded By"
+        },
+        "decision_evidence_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Decision Evidence Id"
         },
         "uncertainty_reason": {
           "anyOf": [
@@ -724,7 +806,7 @@
         "supporting_evidence_ids",
         "method",
         "operation_name",
-        "prompt_version"
+        "operation_definition_hash"
       ],
       "title": "Inference",
       "type": "object"
@@ -1000,6 +1082,14 @@
           "default": null,
           "title": "Edited Statement"
         },
+        "edited_thresholds": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/QuantitativeThreshold"
+          },
+          "title": "Edited Thresholds",
+          "type": "array"
+        },
         "reason": {
           "anyOf": [
             {
@@ -1183,8 +1273,8 @@
   "additionalProperties": false,
   "properties": {
     "schema_version": {
-      "const": "interview_state.v1",
-      "default": "interview_state.v1",
+      "const": "interview_state.v2",
+      "default": "interview_state.v2",
       "title": "Schema Version",
       "type": "string"
     },
@@ -1260,7 +1350,7 @@
   "required": [
     "session"
   ],
-  "title": "Caliburn interview vNext materialized state v1",
+  "title": "Caliburn interview vNext materialized state v2",
   "type": "object",
-  "$id": "https://caliburn.local/schemas/interview-state.v1.schema.json"
+  "$id": "https://caliburn.local/schemas/interview-state.v2.schema.json"
 }

@@ -215,8 +215,8 @@
   "additionalProperties": false,
   "properties": {
     "schema_version": {
-      "const": "evidence.v1",
-      "default": "evidence.v1",
+      "const": "evidence.v2",
+      "default": "evidence.v2",
       "title": "Schema Version",
       "type": "string"
     },
@@ -313,6 +313,31 @@
       "default": null,
       "title": "Superseded By"
     },
+    "withdrawn_reason": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Withdrawn Reason"
+    },
+    "withdrawn_by_turn_id": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Withdrawn By Turn Id"
+    },
     "correction_target_unknown": {
       "default": false,
       "title": "Correction Target Unknown",
@@ -335,7 +360,7 @@
     "span",
     "extractor_operation_id"
   ],
-  "title": "Caliburn interview vNext evidence v1",
+  "title": "Caliburn interview vNext evidence v2",
   "type": "object",
-  "$id": "https://caliburn.local/schemas/evidence.v1.schema.json"
+  "$id": "https://caliburn.local/schemas/evidence.v2.schema.json"
 }

@@ -85,27 +85,7 @@ def assert_candidate_projectable(
     candidate: CandidateJobItem,
     evidence_by_id: Mapping[UUID, Evidence],
 ) -> None:
-    linked: list[Evidence] = []
-    for evidence_id in candidate.evidence_ids:
-        item = evidence_by_id.get(evidence_id)
-        if item is None:
-            raise DomainViolation(
-                ReasonCode.REFERENCE_ONLY_CANDIDATE,
-                "candidate has no employee evidence closure",
-                details={"candidate_id": str(candidate.candidate_id)},
-            )
-        linked.append(item)
-
-    if not linked:
-        raise DomainViolation(
-            ReasonCode.REFERENCE_ONLY_CANDIDATE,
-            "candidate has no employee evidence",
-        )
-    if any(item.status != EvidenceStatus.ACTIVE for item in linked):
-        raise DomainViolation(
-            ReasonCode.CANDIDATE_EVIDENCE_INACTIVE,
-            "candidate references superseded or withdrawn evidence",
-        )
+    linked = assert_candidate_lineage(candidate, evidence_by_id)
 
     has_current_employee_support = any(
         item.subject in {EvidenceSubject.EMPLOYEE, EvidenceSubject.EMPLOYEE_TEAM}
@@ -140,6 +120,34 @@ def assert_candidate_projectable(
             ReasonCode.NUMERIC_THRESHOLD_SOURCE_REQUIRED,
             "quantitative behavior threshold requires an explicit source",
         )
+
+
+def assert_candidate_lineage(
+    candidate: CandidateJobItem,
+    evidence_by_id: Mapping[UUID, Evidence],
+) -> list[Evidence]:
+    linked: list[Evidence] = []
+    for evidence_id in candidate.evidence_ids:
+        item = evidence_by_id.get(evidence_id)
+        if item is None:
+            raise DomainViolation(
+                ReasonCode.REFERENCE_ONLY_CANDIDATE,
+                "candidate has no employee evidence closure",
+                details={"candidate_id": str(candidate.candidate_id)},
+            )
+        linked.append(item)
+
+    if not linked:
+        raise DomainViolation(
+            ReasonCode.REFERENCE_ONLY_CANDIDATE,
+            "candidate has no employee evidence",
+        )
+    if any(item.status != EvidenceStatus.ACTIVE for item in linked):
+        raise DomainViolation(
+            ReasonCode.CANDIDATE_EVIDENCE_INACTIVE,
+            "candidate references superseded or withdrawn evidence",
+        )
+
     for threshold in candidate.thresholds:
         if threshold.evidence_id is not None:
             source = evidence_by_id.get(threshold.evidence_id)
@@ -153,6 +161,7 @@ def assert_candidate_projectable(
                     "threshold evidence must be active and linked by the candidate",
                     details={"source_id": threshold.source_id},
                 )
+    return linked
 
 
 def active_evidence(items: Iterable[Evidence]) -> dict[UUID, Evidence]:

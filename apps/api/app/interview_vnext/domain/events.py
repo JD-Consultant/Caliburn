@@ -5,10 +5,14 @@ from __future__ import annotations
 from typing import Annotated, Literal, TypeAlias
 from uuid import UUID
 
-from pydantic import Field
+from pydantic import Field, model_validator
 
 from .base import DomainModel
-from .identifiers import UtcDatetime
+from .episode import EpisodeStatus, GapStatus
+from .evidence import InferenceStatus
+from .identifiers import NonEmptyText, UtcDatetime
+from .job_model import CandidateStatus
+from .review import ReviewAction
 from .session import SessionStatus
 
 
@@ -54,10 +58,143 @@ class EvidenceSupersededEvent(EventBase):
     replacement_evidence_id: UUID
 
 
+class EvidenceWithdrawnEvent(EventBase):
+    schema_version: Literal["evidence_withdrawn_event.v1"] = "evidence_withdrawn_event.v1"
+    event_type: Literal["evidence.withdrawn"] = "evidence.withdrawn"
+    evidence_id: UUID
+    source_turn_id: UUID
+    reason: NonEmptyText
+
+
+class EpisodeOpenedEvent(EventBase):
+    schema_version: Literal["episode_opened_event.v1"] = "episode_opened_event.v1"
+    event_type: Literal["episode.opened"] = "episode.opened"
+    episode_id: UUID
+    opened_turn_id: UUID
+
+
+class EpisodeTransitionedEvent(EventBase):
+    schema_version: Literal["episode_transitioned_event.v1"] = (
+        "episode_transitioned_event.v1"
+    )
+    event_type: Literal["episode.transitioned"] = "episode.transitioned"
+    episode_id: UUID
+    previous_status: EpisodeStatus
+    target_status: EpisodeStatus
+    closed_turn_id: UUID | None = None
+
+    @model_validator(mode="after")
+    def close_turn_matches_target(self) -> "EpisodeTransitionedEvent":
+        if self.target_status == EpisodeStatus.CLOSED and self.closed_turn_id is None:
+            raise ValueError("closed episode event requires closed_turn_id")
+        if self.target_status != EpisodeStatus.CLOSED and self.closed_turn_id is not None:
+            raise ValueError("only closed episode event may set closed_turn_id")
+        return self
+
+
+class GapProposedEvent(EventBase):
+    schema_version: Literal["gap_proposed_event.v1"] = "gap_proposed_event.v1"
+    event_type: Literal["gap.proposed"] = "gap.proposed"
+    gap_id: UUID
+    episode_id: UUID
+
+
+class GapTransitionedEvent(EventBase):
+    schema_version: Literal["gap_transitioned_event.v1"] = "gap_transitioned_event.v1"
+    event_type: Literal["gap.transitioned"] = "gap.transitioned"
+    gap_id: UUID
+    previous_status: GapStatus
+    target_status: GapStatus
+    source_turn_id: UUID | None = None
+    cause: Literal["command", "evidence_withdrawn"] = "command"
+
+
+class InferenceAppliedEvent(EventBase):
+    schema_version: Literal["inference_applied_event.v1"] = "inference_applied_event.v1"
+    event_type: Literal["inference.applied"] = "inference.applied"
+    inference_id: UUID
+    previous_status: InferenceStatus | None = None
+    target_status: InferenceStatus
+
+
+class InferenceTransitionedEvent(EventBase):
+    schema_version: Literal["inference_transitioned_event.v1"] = (
+        "inference_transitioned_event.v1"
+    )
+    event_type: Literal["inference.transitioned"] = "inference.transitioned"
+    inference_id: UUID
+    previous_status: InferenceStatus
+    target_status: InferenceStatus
+    cause: Literal["employee_decision", "evidence_withdrawn"]
+    decision_evidence_id: UUID | None = None
+
+    @model_validator(mode="after")
+    def decision_source_matches_cause(self) -> "InferenceTransitionedEvent":
+        if self.cause == "employee_decision" and self.decision_evidence_id is None:
+            raise ValueError("employee decision event requires decision_evidence_id")
+        if self.cause != "employee_decision" and self.decision_evidence_id is not None:
+            raise ValueError("only employee decision event may set decision_evidence_id")
+        return self
+
+
+class InferenceSupersededEvent(EventBase):
+    schema_version: Literal["inference_superseded_event.v1"] = (
+        "inference_superseded_event.v1"
+    )
+    event_type: Literal["inference.superseded"] = "inference.superseded"
+    previous_inference_id: UUID
+    replacement_inference_id: UUID
+
+
+class CandidateAppliedEvent(EventBase):
+    schema_version: Literal["candidate_applied_event.v1"] = "candidate_applied_event.v1"
+    event_type: Literal["candidate.applied"] = "candidate.applied"
+    candidate_id: UUID
+    previous_status: CandidateStatus | None = None
+    target_status: CandidateStatus
+
+
+class CandidateTransitionedEvent(EventBase):
+    schema_version: Literal["candidate_transitioned_event.v1"] = (
+        "candidate_transitioned_event.v1"
+    )
+    event_type: Literal["candidate.transitioned"] = "candidate.transitioned"
+    candidate_id: UUID
+    previous_status: CandidateStatus
+    target_status: CandidateStatus
+    cause: Literal[
+        "verifier",
+        "evidence_withdrawn",
+        "inference_rejected",
+        "inference_superseded",
+    ]
+
+
+class ReviewDecisionAppliedEvent(EventBase):
+    schema_version: Literal["review_decision_applied_event.v1"] = (
+        "review_decision_applied_event.v1"
+    )
+    event_type: Literal["review.applied"] = "review.applied"
+    review_id: UUID
+    candidate_id: UUID
+    action: ReviewAction
+
+
 DomainEvent: TypeAlias = Annotated[
     SessionTransitionedEvent
     | TranscriptTurnAppendedEvent
     | EvidenceObservedEvent
-    | EvidenceSupersededEvent,
+    | EvidenceSupersededEvent
+    | EvidenceWithdrawnEvent
+    | EpisodeOpenedEvent
+    | EpisodeTransitionedEvent
+    | GapProposedEvent
+    | GapTransitionedEvent
+    | InferenceAppliedEvent
+    | InferenceTransitionedEvent
+    | InferenceSupersededEvent
+    | CandidateAppliedEvent
+    | CandidateTransitionedEvent
+    | ReviewDecisionAppliedEvent,
     Field(discriminator="event_type"),
 ]

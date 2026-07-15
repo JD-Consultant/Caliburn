@@ -1,0 +1,44 @@
+from __future__ import annotations
+
+import ast
+import sys
+from pathlib import Path
+
+
+ROOT = Path(__file__).parents[1] / "app" / "interview_vnext"
+DOMAIN_ROOT = ROOT / "domain"
+
+
+def _imports(path: Path) -> list[tuple[int, str]]:
+    tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+    found: list[tuple[int, str]] = []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            found.extend((node.lineno, alias.name) for alias in node.names)
+        elif isinstance(node, ast.ImportFrom) and node.level == 0 and node.module:
+            found.append((node.lineno, node.module))
+    return found
+
+
+def test_vnext_never_imports_v3_interview_internals():
+    violations: list[str] = []
+    for path in ROOT.rglob("*.py"):
+        for line, module in _imports(path):
+            if module == "app.interview" or module.startswith("app.interview."):
+                violations.append(f"{path.relative_to(ROOT)}:{line} imports {module}")
+    assert violations == []
+
+def test_domain_imports_only_stdlib_pydantic_or_itself():
+    violations: list[str] = []
+    for path in DOMAIN_ROOT.rglob("*.py"):
+        for line, module in _imports(path):
+            root = module.split(".", 1)[0]
+            allowed = (
+                root in sys.stdlib_module_names
+                or root == "pydantic"
+                or module == "app.interview_vnext.domain"
+                or module.startswith("app.interview_vnext.domain.")
+            )
+            if not allowed:
+                violations.append(f"{path.relative_to(DOMAIN_ROOT)}:{line} imports {module}")
+    assert violations == []

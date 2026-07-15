@@ -27,10 +27,13 @@ Monorepo。維護者用**繁體中文**,請用繁中回應。
 - **3 個 bounded context**:`apps/pdf-to-json`(PDF→OCS JSON 解析)/ `apps/ocs-indexer`(檢索,Qdrant)/
   `apps/api` + `apps/web`(著作)。語言在這三處切換(對齊 DDD)。
 - **api = 六邊形**:`app/core`(ports + domain,純)、`app/adapters`(DB/LLM/knowledge 等邊緣)、
-  `app/services`(use-case)、`app/interview`(**唯一 AI 大腦**:顧問+書記 op→verify→`_pending`
+  `app/services`(use-case)、`app/interview`(**現行 production 唯一 AI 大腦**:顧問+書記 op→verify→`_pending`
   追蹤修訂;判準教材在 `app/interview/skills/`,調教首選改 skill 不改碼)、`app/observability.py`
   (OTel 橫切)。ADR 0008 / **0030**(舊 LangGraph/CopilotKit 已退場,勿救回;端到端見
   `docs/design/interview-engine.md`)。
+- **AI vNext 隔離中**：`app/interview_vnext` 依 ADR **0034** greenfield 實作；目前只有 domain foundation，
+  無 route/DB/LLM，production 不 import。禁止 import/wrap v3 consultant/scribe/harvest/select；細節先讀
+  `app/interview_vnext/README.md`、其 `AGENTS.md` 與 `docs/plans/2026-07-16-interview-ai-vnext-implementation-plan.md`。
 - **契約**:#1 `packages/ocs-contract`(OCS 文件,JSON-schema→Pydantic+TS)、
   #2 `packages/indexer-contract`(indexer⇄api,共用 pydantic)、#3 web 吃 ocs-contract 生成的 TS。
   ADR 0004 / 0010 / 0011。
@@ -60,6 +63,6 @@ Monorepo。維護者用**繁體中文**,請用繁中回應。
   原始 diff);uv venv 沒有 pip,用 `uv pip`;CJK 用 `PYTHONUTF8=1`。
 
 ## 指路
-**`docs/README.md`(文檔系統:架構/規則/索引)** · `ARCHITECTURE.md` · `docs/adr/README.md`(0001–0030)·
+**`docs/README.md`(文檔系統:架構/規則/索引)** · `ARCHITECTURE.md` · `docs/adr/README.md`(0001–0034)·
 `docs/contract-strategy.md` · `CONTRIBUTING.md` · `docs/runbook.md` · `docs/specs/`(研究紀錄)·
 `docs/plans/` · `docs/design/`(子系統端到端設計,給 agent)。

@@ -1,0 +1,325 @@
+{
+  "$defs": {
+    "EvidenceObservedEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "event_id": {
+          "format": "uuid",
+          "title": "Event Id",
+          "type": "string"
+        },
+        "session_id": {
+          "format": "uuid",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "command_id": {
+          "format": "uuid",
+          "title": "Command Id",
+          "type": "string"
+        },
+        "ordinal": {
+          "minimum": 0,
+          "title": "Ordinal",
+          "type": "integer"
+        },
+        "state_version": {
+          "minimum": 1,
+          "title": "State Version",
+          "type": "integer"
+        },
+        "occurred_at": {
+          "format": "date-time",
+          "title": "Occurred At",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "evidence_observed_event.v1",
+          "default": "evidence_observed_event.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "event_type": {
+          "const": "evidence.observed",
+          "default": "evidence.observed",
+          "title": "Event Type",
+          "type": "string"
+        },
+        "evidence_id": {
+          "format": "uuid",
+          "title": "Evidence Id",
+          "type": "string"
+        },
+        "turn_id": {
+          "format": "uuid",
+          "title": "Turn Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "event_id",
+        "session_id",
+        "command_id",
+        "ordinal",
+        "state_version",
+        "occurred_at",
+        "evidence_id",
+        "turn_id"
+      ],
+      "title": "EvidenceObservedEvent",
+      "type": "object"
+    },
+    "EvidenceSupersededEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "event_id": {
+          "format": "uuid",
+          "title": "Event Id",
+          "type": "string"
+        },
+        "session_id": {
+          "format": "uuid",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "command_id": {
+          "format": "uuid",
+          "title": "Command Id",
+          "type": "string"
+        },
+        "ordinal": {
+          "minimum": 0,
+          "title": "Ordinal",
+          "type": "integer"
+        },
+        "state_version": {
+          "minimum": 1,
+          "title": "State Version",
+          "type": "integer"
+        },
+        "occurred_at": {
+          "format": "date-time",
+          "title": "Occurred At",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "evidence_superseded_event.v1",
+          "default": "evidence_superseded_event.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "event_type": {
+          "const": "evidence.superseded",
+          "default": "evidence.superseded",
+          "title": "Event Type",
+          "type": "string"
+        },
+        "previous_evidence_id": {
+          "format": "uuid",
+          "title": "Previous Evidence Id",
+          "type": "string"
+        },
+        "replacement_evidence_id": {
+          "format": "uuid",
+          "title": "Replacement Evidence Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "event_id",
+        "session_id",
+        "command_id",
+        "ordinal",
+        "state_version",
+        "occurred_at",
+        "previous_evidence_id",
+        "replacement_evidence_id"
+      ],
+      "title": "EvidenceSupersededEvent",
+      "type": "object"
+    },
+    "SessionStatus": {
+      "enum": [
+        "planned",
+        "active",
+        "paused",
+        "finishing",
+        "completed",
+        "failed"
+      ],
+      "title": "SessionStatus",
+      "type": "string"
+    },
+    "SessionTransitionedEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "event_id": {
+          "format": "uuid",
+          "title": "Event Id",
+          "type": "string"
+        },
+        "session_id": {
+          "format": "uuid",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "command_id": {
+          "format": "uuid",
+          "title": "Command Id",
+          "type": "string"
+        },
+        "ordinal": {
+          "minimum": 0,
+          "title": "Ordinal",
+          "type": "integer"
+        },
+        "state_version": {
+          "minimum": 1,
+          "title": "State Version",
+          "type": "integer"
+        },
+        "occurred_at": {
+          "format": "date-time",
+          "title": "Occurred At",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "session_transitioned_event.v1",
+          "default": "session_transitioned_event.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "event_type": {
+          "const": "session.transitioned",
+          "default": "session.transitioned",
+          "title": "Event Type",
+          "type": "string"
+        },
+        "previous_status": {
+          "$ref": "#/$defs/SessionStatus"
+        },
+        "target_status": {
+          "$ref": "#/$defs/SessionStatus"
+        },
+        "stop_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Stop Reason"
+        }
+      },
+      "required": [
+        "event_id",
+        "session_id",
+        "command_id",
+        "ordinal",
+        "state_version",
+        "occurred_at",
+        "previous_status",
+        "target_status"
+      ],
+      "title": "SessionTransitionedEvent",
+      "type": "object"
+    },
+    "TranscriptTurnAppendedEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "event_id": {
+          "format": "uuid",
+          "title": "Event Id",
+          "type": "string"
+        },
+        "session_id": {
+          "format": "uuid",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "command_id": {
+          "format": "uuid",
+          "title": "Command Id",
+          "type": "string"
+        },
+        "ordinal": {
+          "minimum": 0,
+          "title": "Ordinal",
+          "type": "integer"
+        },
+        "state_version": {
+          "minimum": 1,
+          "title": "State Version",
+          "type": "integer"
+        },
+        "occurred_at": {
+          "format": "date-time",
+          "title": "Occurred At",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "transcript_turn_appended_event.v1",
+          "default": "transcript_turn_appended_event.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "event_type": {
+          "const": "transcript.turn_appended",
+          "default": "transcript.turn_appended",
+          "title": "Event Type",
+          "type": "string"
+        },
+        "turn_id": {
+          "format": "uuid",
+          "title": "Turn Id",
+          "type": "string"
+        },
+        "turn_sequence": {
+          "minimum": 1,
+          "title": "Turn Sequence",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "event_id",
+        "session_id",
+        "command_id",
+        "ordinal",
+        "state_version",
+        "occurred_at",
+        "turn_id",
+        "turn_sequence"
+      ],
+      "title": "TranscriptTurnAppendedEvent",
+      "type": "object"
+    }
+  },
+  "discriminator": {
+    "mapping": {
+      "evidence.observed": "#/$defs/EvidenceObservedEvent",
+      "evidence.superseded": "#/$defs/EvidenceSupersededEvent",
+      "session.transitioned": "#/$defs/SessionTransitionedEvent",
+      "transcript.turn_appended": "#/$defs/TranscriptTurnAppendedEvent"
+    },
+    "propertyName": "event_type"
+  },
+  "oneOf": [
+    {
+      "$ref": "#/$defs/SessionTransitionedEvent"
+    },
+    {
+      "$ref": "#/$defs/TranscriptTurnAppendedEvent"
+    },
+    {
+      "$ref": "#/$defs/EvidenceObservedEvent"
+    },
+    {
+      "$ref": "#/$defs/EvidenceSupersededEvent"
+    }
+  ],
+  "$id": "https://caliburn.local/schemas/domain-event.v1.schema.json",
+  "title": "Caliburn interview vNext domain event v1"
+}

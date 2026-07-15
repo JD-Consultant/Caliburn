@@ -1,7 +1,7 @@
 # Interview AI vNext Greenfield 實作計畫
 
 - 日期：2026-07-16
-- 狀態：**可執行計畫；尚未開始 runtime 實作**
+- 狀態：**執行中；V0 + V1-A domain foundation 已完成，尚未接 runtime route**
 - 目標架構：[`../specs/2026-07-16-interview-ai-vnext-greenfield-architecture.md`](../specs/2026-07-16-interview-ai-vnext-greenfield-architecture.md)
 - 團隊：一人開發；每個工作包必須可獨立 review、測試、保留或刪除
 - 核心限制：不 import、包裝或雙寫 v3 LLM internals；v3 只作黑箱 baseline/fallback
@@ -31,6 +31,17 @@ V8  刪除 v3 internals 與更新現行 design
 ```
 
 不可跳過 V1/V2 直接寫一個聊天 prompt，也不可在 V3 fixed replay 尚未達 hard gate 前進入 production route。
+
+### 1.1 2026-07-16 實作進度
+
+| Slice | 狀態 | 已完成 | 明確未完成 |
+|---|---|---|---|
+| V0 | 完成 | `interview_vnext` 隔離 package、package 規則、AST dependency tests、production 零接線 | v3 刪除與 route 切換屬 V7/V8 |
+| V1-A | 完成 | session/transcript/evidence/inference/episode/gap/candidate/review/state contracts；append/session/evidence reducers；stable reason codes/hash；13 份 committed schema；unit/property-like/schema tests | 不代表可上線，也不代表已完成全 event replay protocol |
+| V1-B | 下一步 | — | episode/gap/inference/candidate/withdraw/review reducers 與 command/event/schema；完整 mutation closure |
+| V2+ | 未開始 | — | LLM port、Capture、ContextBuilder、persistence、workflow、model/prompt eval、Web seam |
+
+V1-A 的 event 是 domain change notification／artifact index，payload 只有 object ID；目前可重現的是相同初始 state + command stream 的 state/hash。完整「只靠 durable records 重建」要在 V2 定義 event + artifact/checkpoint transaction 後才算完成，不得提前宣稱 event sourcing 已完成。實作細節見 [`../../apps/api/app/interview_vnext/README.md`](../../apps/api/app/interview_vnext/README.md)。
 
 ---
 
@@ -158,7 +169,7 @@ interview_vnext/domain/
 
 ### 4.4 Property tests
 
-- 同一 event stream 重播永遠得到同一 state/hash；
+- 同一 initial state + ordered command fixture 重播永遠得到同一 state/hash；V2 再以 durable command/result artifact + checkpoint 驗證 crash recovery；
 - duplicate command 不增加 item 數；
 - supersede 不造成 active lineage cycle；
 -任何 projected candidate 的 evidence closure 都存在；
@@ -634,7 +645,7 @@ ProjectionProposal 至少含 path/op/value、candidate IDs、evidence IDs、refe
 7. 加 unit/property/schema tests。
 8. 不加 route、不加 migration、不改 v3 runtime、不選模型。
 
-完成條件：domain object 不靠任何 v3/provider/ORM class 即可從 fixture 建立、序列化、replay、correct 並得到穩定 state hash。這是後續所有 LLM 品質工作的地基；若這層語意不穩，後面的 prompt 再強也無法可靠累積工作事實。
+完成條件：domain object 不靠任何 v3/provider/ORM class 即可從 fixture 建立、序列化、以相同 command fixture replay、correct 並得到穩定 state hash。這是後續所有 LLM 品質工作的地基；若這層語意不穩，後面的 prompt 再強也無法可靠累積工作事實。
 
 ---
 

@@ -1,0 +1,85 @@
+{
+  "$defs": {
+    "ReviewAction": {
+      "enum": [
+        "accept",
+        "edit",
+        "reject"
+      ],
+      "title": "ReviewAction",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "review_decision.v1",
+      "default": "review_decision.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "review_id": {
+      "format": "uuid",
+      "title": "Review Id",
+      "type": "string"
+    },
+    "session_id": {
+      "format": "uuid",
+      "title": "Session Id",
+      "type": "string"
+    },
+    "candidate_id": {
+      "format": "uuid",
+      "title": "Candidate Id",
+      "type": "string"
+    },
+    "reviewer_id": {
+      "format": "uuid",
+      "title": "Reviewer Id",
+      "type": "string"
+    },
+    "action": {
+      "$ref": "#/$defs/ReviewAction"
+    },
+    "edited_statement": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Edited Statement"
+    },
+    "reason": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Reason"
+    },
+    "decided_at": {
+      "format": "date-time",
+      "title": "Decided At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "review_id",
+    "session_id",
+    "candidate_id",
+    "reviewer_id",
+    "action",
+    "decided_at"
+  ],
+  "title": "Caliburn interview vNext review decision v1",
+  "type": "object",
+  "$id": "https://caliburn.local/schemas/review-decision.v1.schema.json"
+}

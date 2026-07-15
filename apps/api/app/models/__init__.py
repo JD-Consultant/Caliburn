@@ -1,5 +1,7 @@
 from app.models.base import Base
 from app.models.interview import (
+    InterviewEvalArtifact,
+    InterviewEvalCapture,
     InterviewLlmCall,
     InterviewReviewEvent,
     InterviewSession,
@@ -17,6 +19,8 @@ __all__ = [
     "JobProfile",
     "DocumentVersion",
     "InterviewSession",
+    "InterviewEvalCapture",
+    "InterviewEvalArtifact",
     "InterviewTurn",
     "InterviewLlmCall",
     "InterviewReviewEvent",

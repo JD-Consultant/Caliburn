@@ -101,12 +101,33 @@ class InterviewRepo:
 
     # --- LLM 呼叫稽核(T13;每回合每次呼叫一列) ---
 
-    async def add_llm_call(self, session_id: UUID, *, turn_seq: int, role: str, model: str,
-                           duration_ms: int, tool_calls: list | None = None,
-                           guard_verdicts: list | None = None,
-                           prompt_tokens: int | None = None,
-                           completion_tokens: int | None = None) -> InterviewLlmCall:
+    async def add_llm_call(
+        self,
+        session_id: UUID,
+        *,
+        turn_seq: int,
+        role: str,
+        stage: str,
+        provider: str,
+        model: str,
+        duration_ms: int,
+        requested_model: str | None = None,
+        resolved_model: str | None = None,
+        attempt_count: int = 1,
+        outcome: str = "success",
+        prompt_hash: str | None = None,
+        tool_schema_hash: str | None = None,
+        tool_calls: list | None = None,
+        guard_verdicts: list | None = None,
+        prompt_tokens: int | None = None,
+        completion_tokens: int | None = None,
+    ) -> InterviewLlmCall:
         row = InterviewLlmCall(session_id=session_id, turn_seq=turn_seq, role=role, model=model,
+                               stage=stage, provider=provider,
+                               requested_model=requested_model or model,
+                               resolved_model=resolved_model,
+                               attempt_count=attempt_count, outcome=outcome,
+                               prompt_hash=prompt_hash, tool_schema_hash=tool_schema_hash,
                                duration_ms=duration_ms, tool_calls=tool_calls or [],
                                guard_verdicts=guard_verdicts or [],
                                prompt_tokens=prompt_tokens, completion_tokens=completion_tokens)

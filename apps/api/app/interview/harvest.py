@@ -21,6 +21,7 @@ from app.interview.scribe import (
 from app.interview.scribe_schema import ScribeOutput, scribe_schema
 from app.interview.skill_loader import load_skill
 from app.interview.slots import SLOT_DEFS
+from app.interview.trace_utils import canonical_hash
 from app.interview.verify import normalize
 
 logger = logging.getLogger(__name__)
@@ -82,9 +83,13 @@ async def harvest_pass(llm, knowledge, *, doc: dict, turns: dict[int, str],
     story = "\n".join(f"[第{s}輪] {t}" for s, t in sorted(ep_turns.items()))
     prompt = (f"{HARVEST_SYS}\n\n{materials}\n\n任務清單:{task_keys}\n合法官方池:{pools}\n"
               f"<事件逐字稿>\n{story}\n</事件逐字稿>")
+    res.llm_called = True
+    res.prompt_hash = canonical_hash(prompt)
+    res.tool_schema_hash = canonical_hash(schema)
 
     records = None
     for attempt in range(max_retry + 1):
+        res.attempt_count = attempt + 1
         try:
             data = await llm.select_schema(prompt, schema, role="select",
                                            schema_name="harvest_output")
@@ -94,6 +99,7 @@ async def harvest_pass(llm, knowledge, *, doc: dict, turns: dict[int, str],
             logger.warning("harvest 抽取不合法(attempt %d):%s", attempt, str(exc)[:160])
     if records is None:
         res.records_failed = True
+        res.outcome = "parse_failure"
         return res
 
     # 每筆 record 的 quote 跨多輪定位 → 用該輪 turn_id 建 op(書記單輪故不共用其 turn_id)

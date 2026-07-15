@@ -133,6 +133,8 @@ class OpenRouterLlm:
     ``complete_json`` call performs up to ``retries * retries`` underlying
     network attempts (e.g. 4 with the default ``retries=2``)."""
 
+    provider_id = "openrouter"
+
     def __init__(self, retries: int = 2):
         self._retries = retries
 

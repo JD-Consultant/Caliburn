@@ -11,6 +11,7 @@ from dataclasses import dataclass, field
 from uuid import UUID
 
 from app.adapters.interview_repo import InterviewRepo
+from app.adapters.eval_capture_repo import EvalCaptureRepo
 from app.adapters.llm_openrouter import model_for_role
 from app.adapters.persistence import DocConflictError, DocRepo
 from app.interview import agenda as AG
@@ -27,6 +28,8 @@ from app.interview.scribe import (
 from app.models import JobProfile
 from app.interview.slots import SLOT_DEFS
 from app.interview.tools import CONSULTANT_TOOLS, dispatch_tool, document_view
+from app.interview.trace_utils import canonical_hash
+from app.interview.eval_capture import TurnTrajectory
 
 logger = logging.getLogger("caliburn")
 
@@ -127,6 +130,8 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> T
     """v2 一回合(ADR 0027 §5)。knowledge=KnowledgePort(書記建池 + 顧問工具)。"""
     repo = InterviewRepo(db)
     doc_repo = DocRepo(db)
+    capture_repo = EvalCaptureRepo(db)
+    provider = str(getattr(llm, "provider_id", "unknown"))
 
     session = await repo.get_active(profile_id)
     if session is None:
@@ -134,11 +139,34 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> T
 
     latest = await doc_repo.latest(profile_id)
     doc = (latest or {}).get("content") or {}
+    document_before = doc
+    capture = await capture_repo.get_for_session(session.id)
+    state_before = {
+        "status": session.status,
+        "phase": session.phase,
+        "focus": session.focus or {},
+        "counters": session.counters or {},
+        "human_touched": session.human_touched or [],
+        "ledger_state": session.ledger_state or {},
+    }
     prev_turns = await repo.list_turns(session.id)
     employee_texts = [t.text for t in prev_turns if t.role == "employee"] + [user_text]
     recent = [(t.role, t.text) for t in prev_turns]
     human_touched = list(session.human_touched or [])
     emp_turn = await repo.append_turn(session.id, role="employee", text=user_text)
+    if capture is not None:
+        await capture_repo.append_artifact(
+            capture_id=capture.id,
+            kind="turn_state_before",
+            sequence=emp_turn.seq,
+            content=state_before,
+        )
+        await capture_repo.append_artifact(
+            capture_id=capture.id,
+            kind="turn_document_before",
+            sequence=emp_turn.seq,
+            content=document_before,
+        )
 
     # v3 回合序(ADR 0030 T5):顧問先說話 → 確定性喚醒閘 → 書記 op→verify→_pending
     # → backstop sweep → 帳本更新。顧問吃**回合前**的文件/帳本(綠字自己會浮現,不用等)。
@@ -163,6 +191,13 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> T
     widget: dict | None = None
     curation_guard: list[str] = []
     curation_landed = False
+    cur = None
+    h_res = None
+    # DB rows are persisted after their stage-specific work succeeds, which is not
+    # necessarily execution order (the consultant audit row is written near the
+    # end of the transaction).  Keep the stage alongside the id so trajectory
+    # consumers can replay the semantic order explicitly.
+    model_call_refs: list[tuple[str, str]] = []
     curation_fired = CO.should_curate(work_doc, state, pool_tasks, ref_ocs)
     if curation_fired:
         unasked = CO.checklist(work_doc, state, pool_tasks)["unasked"]
@@ -203,9 +238,21 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> T
                     except DocConflictError:
                         # 人的編輯優先(ADR 0025);unasked 還在,下回合裁剪縫自癒
                         curation_guard.append("curation-land:409 放棄(下回合自癒)")
-            await repo.add_llm_call(session.id, turn_seq=emp_turn.seq, role="select",
-                                    model=model_for_role("select"), duration_ms=cur_ms,
-                                    guard_verdicts=curation_guard[:30])
+            call_row = await repo.add_llm_call(
+                session.id,
+                turn_seq=emp_turn.seq,
+                role="select",
+                stage="curation",
+                provider=provider,
+                model=model_for_role("select"),
+                duration_ms=cur_ms,
+                attempt_count=max(1, cur.attempt_count),
+                outcome=cur.outcome,
+                prompt_hash=cur.prompt_hash,
+                tool_schema_hash=cur.tool_schema_hash,
+                guard_verdicts=curation_guard[:30],
+            )
+            model_call_refs.append(("curation", str(call_row.id)))
     # 裁剪縫進帳(0033 §3.6 BUG-4 反向根治):裁剪**落地→歸零、空手→+1**(供 is_stalled
     #   讓路);取代舊 note_attempt 用 scribe_progressed 誤判裁剪進度的病灶。
     if curation_fired:
@@ -242,26 +289,35 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> T
     # + 議程工具(0033 T6:決策=tool call,dispatch 攔記,chat 後確定性 apply)
     occ_searches: list[dict] = []
     agenda_actions: list[tuple[str, dict]] = []
+    captured_tool_results: list[dict] = []
     candidates = AG.blank_candidates(work_doc, state, ref_ocs)
 
     async def dispatch(name: str, arguments: dict):
         if name == "read_document":
-            return document_view(work_doc)
-        if name == "open_episode":
+            res = document_view(work_doc)
+        elif name == "open_episode":
             agenda_actions.append(("open", arguments or {}))
-            return {"ok": True, "note": "已開始這個事件——請往細節、完成標準、驗收方式追問。"}
-        if name == "close_episode":
+            res = {"ok": True, "note": "已開始這個事件——請往細節、完成標準、驗收方式追問。"}
+        elif name == "close_episode":
             agenda_actions.append(("close", arguments or {}))
-            return {"ok": True, "note": "已記錄,事件內容會編碼進文件。"}
-        res = await dispatch_tool(name, arguments, knowledge=knowledge)
+            res = {"ok": True, "note": "已記錄,事件內容會編碼進文件。"}
+        else:
+            res = await dispatch_tool(name, arguments, knowledge=knowledge)
+        if capture is not None:
+            captured_tool_results.append({
+                "name": name,
+                "arguments": arguments or {},
+                "result": res,
+            })
         if name == "knowledge_search_occupations" and isinstance(res, dict):
             occ_searches.append({"query": (arguments or {}).get("query") or "",
                                  "hits": res.get("occupations") or []})
         return res
 
+    consultant_tools = CONSULTANT_TOOLS + AG.agenda_tools(candidates)
     t_chat = time.perf_counter()
     chat = await llm.chat_with_tools(role="interview", messages=messages,
-                                     tools=CONSULTANT_TOOLS + AG.agenda_tools(candidates),
+                                     tools=consultant_tools,
                                      dispatch=dispatch)
     chat_ms = int((time.perf_counter() - t_chat) * 1000)
 
@@ -315,9 +371,22 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> T
                 turns=turns_map, header_codes=header_codes)
             doc_changed = doc_changed or h_changed
             extra_guard += ["harvest:" + g for g in h_guard]
-            await repo.add_llm_call(session.id, turn_seq=emp_turn.seq, role="select",
-                                    model=model_for_role("select"), duration_ms=harvest_ms,
-                                    guard_verdicts=list(h_res.guard_log)[:30])
+            if h_res.llm_called:
+                call_row = await repo.add_llm_call(
+                    session.id,
+                    turn_seq=emp_turn.seq,
+                    role="select",
+                    stage="harvest",
+                    provider=provider,
+                    model=model_for_role("select"),
+                    duration_ms=harvest_ms,
+                    attempt_count=max(1, h_res.attempt_count),
+                    outcome=h_res.outcome,
+                    prompt_hash=h_res.prompt_hash,
+                    tool_schema_hash=h_res.tool_schema_hash,
+                    guard_verdicts=list(h_res.guard_log)[:30],
+                )
+                model_call_refs.append(("harvest", str(call_row.id)))
         state = {k: v for k, v in state.items() if k != "pending_harvest"}
 
     # ③⅞ backstop sweep(每 N 員工回合;確定性撿漏 → held 待問;§6.4 禁 LLM)
@@ -381,12 +450,121 @@ async def run_turn(profile_id: UUID, user_text: str, *, db, llm, knowledge) -> T
                            commands=[{"tool_trace": chat.tool_trace, "stopped": chat.stopped}])
 
     # 稽核落庫(T13;每回合書記+顧問各一列;§13 收編5 多租戶 observability)
-    await repo.add_llm_call(session.id, turn_seq=emp_turn.seq, role="select",
-                            model=model_for_role("select"), duration_ms=scribe_ms,
-                            guard_verdicts=list(scribe_res.guard_log)[:30])
-    await repo.add_llm_call(session.id, turn_seq=emp_turn.seq, role="interview",
-                            model=model_for_role("interview"), duration_ms=chat_ms,
-                            tool_calls=chat.tool_trace)
+    if scribe_res.llm_called:
+        call_row = await repo.add_llm_call(
+            session.id,
+            turn_seq=emp_turn.seq,
+            role="select",
+            stage="scribe",
+            provider=provider,
+            model=model_for_role("select"),
+            duration_ms=scribe_ms,
+            attempt_count=max(1, scribe_res.attempt_count),
+            outcome=scribe_res.outcome,
+            prompt_hash=scribe_res.prompt_hash,
+            tool_schema_hash=scribe_res.tool_schema_hash,
+            guard_verdicts=list(scribe_res.guard_log)[:30],
+        )
+        model_call_refs.append(("scribe", str(call_row.id)))
+    call_row = await repo.add_llm_call(
+        session.id,
+        turn_seq=emp_turn.seq,
+        role="interview",
+        stage="consultant",
+        provider=provider,
+        model=model_for_role("interview"),
+        duration_ms=chat_ms,
+        attempt_count=1,
+        outcome="success" if (chat.text or "").strip() else "fallback",
+        prompt_hash=canonical_hash(messages),
+        tool_schema_hash=canonical_hash(consultant_tools),
+        tool_calls=chat.tool_trace,
+    )
+    model_call_refs.append(("consultant", str(call_row.id)))
+
+    if capture is not None:
+        final_latest = await doc_repo.latest(profile_id)
+        final_doc = (final_latest or {}).get("content") or {}
+        final_phase = CO.derive_phase(final_doc, state, ref_ocs)
+        state_after = {
+            "status": session.status,
+            "phase": session.phase,
+            "derived_phase": final_phase,
+            "focus": session.focus or {},
+            "counters": session.counters or {},
+            "human_touched": session.human_touched or [],
+            "ledger_state": state,
+        }
+        await capture_repo.append_artifact(
+            capture_id=capture.id,
+            kind="turn_state_after",
+            sequence=emp_turn.seq,
+            content=state_after,
+        )
+        await capture_repo.append_artifact(
+            capture_id=capture.id,
+            kind="turn_document_after",
+            sequence=emp_turn.seq,
+            content=final_doc,
+        )
+        await capture_repo.append_artifact(
+            capture_id=capture.id,
+            kind="turn_tool_results",
+            sequence=emp_turn.seq,
+            content=captured_tool_results,
+        )
+        await capture_repo.append_artifact(
+            capture_id=capture.id,
+            kind="turn_stage_outputs",
+            sequence=emp_turn.seq,
+            content={
+                "curation": None if cur is None else {
+                    "precheck": cur.precheck,
+                    "declined": cur.declined,
+                    "guard_log": cur.guard_log,
+                    "outcome": cur.outcome,
+                },
+                "consultant": {
+                    "text": chat.text,
+                    "tool_trace": chat.tool_trace,
+                    "stopped": chat.stopped,
+                },
+                "scribe": {
+                    "ops": scribe_res.ops,
+                    "guard_log": scribe_res.guard_log,
+                    "outcome": scribe_res.outcome if scribe_res.llm_called else "not_called",
+                },
+                "harvest": None if h_res is None else {
+                    "ops": h_res.ops,
+                    "guard_log": h_res.guard_log,
+                    "outcome": h_res.outcome if h_res.llm_called else "not_called",
+                },
+            },
+        )
+        trajectory = TurnTrajectory(
+            schema_version="interview_turn_trajectory.v0.1",
+            turn_seq=emp_turn.seq,
+            state_before_hash=canonical_hash(state_before),
+            document_before_hash=canonical_hash(document_before),
+            state_after_hash=canonical_hash(state_after),
+            document_after_hash=canonical_hash(final_doc),
+            model_call_ids=[
+                call_id
+                for stage in ("curation", "consultant", "scribe", "harvest")
+                for recorded_stage, call_id in model_call_refs
+                if recorded_stage == stage
+            ],
+            stop_or_transition_reason="suggest_finish" if suggest_finish else "continue",
+            limitations=[
+                "Provider retries, resolved model, raw response and token usage remain unavailable through LlmPort."
+            ],
+        )
+        await capture_repo.append_artifact(
+            capture_id=capture.id,
+            kind="turn_trajectory",
+            sequence=emp_turn.seq,
+            content=trajectory.model_dump(mode="json"),
+        )
 
     guard = list(scribe_res.guard_log) + extra_guard + curation_guard
     if scribe_res.records_failed:
@@ -449,11 +627,26 @@ async def run_finish(profile_id: UUID, *, db, llm, knowledge) -> dict:
     fail-open:llm 缺仍可收尾(不編態度);knowledge 掛 → 略過態度。"""
     repo = InterviewRepo(db)
     doc_repo = DocRepo(db)
+    capture_repo = EvalCaptureRepo(db)
     session = await repo.get_active(profile_id)
     if session is None:
         raise NoActiveInterview(str(profile_id))
     latest = await doc_repo.latest(profile_id)
     doc = (latest or {}).get("content") or {}
+    capture = await capture_repo.get_for_session(session.id)
+    if capture is not None and capture.status == "completed":
+        artifacts = await capture_repo.list_artifacts(capture.id)
+        finish = next((row.content for row in artifacts
+                       if row.kind == "session_finish" and row.sequence == 0), None)
+        if not isinstance(finish, dict):
+            raise RuntimeError("completed eval capture is missing session_finish artifact")
+        return {
+            "phase": "review",
+            "blockers": int(finish.get("blocker_count") or 0),
+            "summary": finish.get("summary") or {},
+            "guard_log": list(finish.get("guard_log") or [])[:30],
+        }
+    finish_model_call_ids: list[str] = []
     state = session.ledger_state or {}
     _, blockers = CO.can_finish(doc, state, {})
     guard: list[str] = []
@@ -474,9 +667,27 @@ async def run_finish(profile_id: UUID, *, db, llm, knowledge) -> dict:
             pools, pool_items = {}, {}
         existing = [a.get("code") for a in
                     ((doc.get("ocs_attitude") or {}).get("attitudes") or []) if a.get("code")]
+        t_att = time.perf_counter()
         att = await attitudes_pass(llm, pool=pools.get("attitudes") or [],
                                    pool_items=pool_items, employee_texts=emp,
                                    existing=existing)
+        att_ms = int((time.perf_counter() - t_att) * 1000)
+        if att.llm_called:
+            call_row = await repo.add_llm_call(
+                session.id,
+                turn_seq=emp_rows[-1][0] if emp_rows else 0,
+                role="select",
+                stage="attitudes",
+                provider=str(getattr(llm, "provider_id", "unknown")),
+                model=model_for_role("select"),
+                duration_ms=att_ms,
+                attempt_count=max(1, att.attempt_count),
+                outcome=att.outcome,
+                prompt_hash=att.prompt_hash,
+                tool_schema_hash=att.tool_schema_hash,
+                guard_verdicts=list(att.guard_log)[:30],
+            )
+            finish_model_call_ids.append(str(call_row.id))
         guard.extend(att.guard_log)
         if att.proposals:
             import copy
@@ -506,5 +717,41 @@ async def run_finish(profile_id: UUID, *, db, llm, knowledge) -> dict:
                 await repo.list_review_events(session.id, decision="accepted")]
     summary = _finish_summary(doc, accepted)
     await repo.update_session(session.id, phase="review")
+    if capture is not None:
+        final_latest = await doc_repo.latest(profile_id)
+        final_doc = (final_latest or {}).get("content") or {}
+        final_state = {
+            "status": session.status,
+            "phase": "review",
+            "focus": session.focus or {},
+            "counters": session.counters or {},
+            "human_touched": session.human_touched or [],
+            "ledger_state": session.ledger_state or {},
+        }
+        await capture_repo.append_artifact(
+            capture_id=capture.id,
+            kind="session_final_document",
+            sequence=0,
+            content=final_doc,
+        )
+        await capture_repo.append_artifact(
+            capture_id=capture.id,
+            kind="session_final_state",
+            sequence=0,
+            content=final_state,
+        )
+        await capture_repo.append_artifact(
+            capture_id=capture.id,
+            kind="session_finish",
+            sequence=0,
+            content={
+                "summary": summary,
+                "blocker_count": len(blockers),
+                "guard_log": guard,
+                "model_call_ids": finish_model_call_ids,
+                "stop_reason": "user_requested_finish",
+            },
+        )
+        await capture_repo.mark_completed(capture.id)
     return {"phase": "review", "blockers": len(blockers),
             "summary": summary, "guard_log": guard[:30]}

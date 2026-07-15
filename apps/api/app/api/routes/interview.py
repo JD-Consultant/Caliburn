@@ -13,6 +13,7 @@ from fastapi import APIRouter, Body, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.adapters.interview_repo import ActiveInterviewExists, InterviewRepo
+from app.adapters.eval_capture_repo import EvalCaptureRepo
 from app.adapters.llm_openrouter import LlmSchemaError
 from app.adapters.persistence import DocRepo
 from app.api.deps import get_knowledge
@@ -20,9 +21,18 @@ from app.api.routes.ai import get_llm
 from app.api.routes.documents import _require_profile
 from app.core.domain.ocs_doc import count_pending
 from app.core.ports import KnowledgePort, LlmPort
+from app.config import settings
 from app.database import get_db
 from app.interview import agenda as AG
 from app.interview import coverage as CO
+from app.interview.eval_capture import (
+    EvalSessionStart,
+    build_reference_snapshot,
+    canonical_hash,
+    prompt_bundle_hash,
+    reference_codes,
+    static_tool_schema_hash,
+)
 from app.interview.diff import STABLE_ID_KEYS
 from app.interview.service import NoActiveInterview, run_finish, run_turn
 from app.observability import record_review_events
@@ -61,13 +71,57 @@ def _session_out(s) -> dict:
 
 
 @router.post("/{profile_id}/interview:start")
-async def start_interview(profile_id: UUID, db: AsyncSession = Depends(get_db)):
-    await _require_profile(profile_id, db)
+async def start_interview(
+    profile_id: UUID,
+    body: dict | None = Body(default=None),
+    db: AsyncSession = Depends(get_db),
+    knowledge: KnowledgePort = Depends(get_knowledge),
+):
+    profile = await _require_profile(profile_id, db)
     latest = await DocRepo(db).latest(profile_id)
     doc = (latest or {}).get("content") or {}
     paths = _task_paths(doc)
     repo = InterviewRepo(db)
     session = await repo.get_active(profile_id)
+    body_data = body if isinstance(body, dict) else {}
+    capture_request = body_data.get("eval_capture")
+    capture_requested = isinstance(capture_request, dict) and bool(
+        capture_request.get("enabled")
+    )
+    capture_repo = EvalCaptureRepo(db)
+    existing_capture = (
+        await capture_repo.get_for_session(session.id) if session is not None else None
+    )
+    reference_snapshot = None
+    if capture_requested:
+        if not settings.interview_eval_capture_enabled:
+            raise HTTPException(status_code=409, detail={"code": "eval_capture_disabled"})
+        consent_version = str(capture_request.get("consent_policy_version") or "").strip()
+        if not consent_version:
+            raise HTTPException(
+                status_code=422,
+                detail={"code": "eval_capture_consent_policy_required"},
+            )
+        if not settings.interview_eval_capture_git_sha:
+            raise HTTPException(
+                status_code=503,
+                detail={"code": "eval_capture_git_sha_unconfigured"},
+            )
+        if session is not None and existing_capture is None:
+            if await repo.list_turns(session.id):
+                raise HTTPException(
+                    status_code=409,
+                    detail={"code": "eval_capture_not_turn_zero"},
+                )
+        if existing_capture is None:
+            codes = reference_codes(doc, list(profile.selected_ocs_codes or []))
+            try:
+                reference_snapshot = await build_reference_snapshot(knowledge, codes)
+            except Exception as exc:  # noqa: BLE001 - explicit eval capture fails closed
+                raise HTTPException(
+                    status_code=502,
+                    detail={"code": "eval_reference_snapshot_failed"},
+                ) from exc
     if session is None:
         try:
             session = await repo.create(profile_id)
@@ -81,11 +135,52 @@ async def start_interview(profile_id: UUID, db: AsyncSession = Depends(get_db)):
             focus={**(session.focus or {}), "task_path": paths[0]})
     elif not paths and session.phase == "survey":
         session = await repo.update_session(session.id, phase="survey")
+
+    if capture_requested and existing_capture is None:
+        initial_state = {
+            "status": session.status,
+            "phase": session.phase,
+            "focus": session.focus or {},
+            "counters": session.counters or {},
+            "human_touched": session.human_touched or [],
+            "ledger_state": session.ledger_state or {},
+        }
+        contract = EvalSessionStart(
+            schema_version="interview_eval_session_start.v0.1",
+            consent_policy_version=str(capture_request["consent_policy_version"]).strip(),
+            locale=str(capture_request.get("locale") or "zh-TW"),
+            initial_document_hash=canonical_hash(doc),
+            initial_state_hash=canonical_hash(initial_state),
+            reference_snapshot_hash=canonical_hash(reference_snapshot),
+            prompt_bundle_hash=prompt_bundle_hash(),
+            tool_schema_hash=static_tool_schema_hash(),
+            code_git_sha=settings.interview_eval_capture_git_sha,
+            dirty_worktree=settings.interview_eval_capture_dirty_worktree,
+            limitations=[
+                "Reference snapshot contains selected occupation tasks and competencies at turn zero.",
+                "Dynamic knowledge search/tool results require per-turn capture before replay-ready promotion.",
+                "Provider raw responses, resolved model and token usage are not yet available through LlmPort.",
+            ],
+        )
+        existing_capture = await capture_repo.create_start(
+            session_id=session.id,
+            contract=contract,
+            initial_document=doc,
+            initial_state=initial_state,
+            reference_snapshot=reference_snapshot,
+        )
     greeting = GREETING if paths else (
         "你好!我是你的職務說明書顧問。我們先聊聊你平常做什麼工作,我幫你找到對應的官方"
         "職類、把細節補齊——想到什麼說什麼就好。")
-    return {**_session_out(session), "greeting": greeting,
-            "progress": _progress(doc, session, session.phase)}
+    result = {**_session_out(session), "greeting": greeting,
+              "progress": _progress(doc, session, session.phase)}
+    if capture_requested:
+        result["eval_capture"] = {
+            "schema_version": existing_capture.schema_version,
+            "status": existing_capture.status,
+            "replay_ready": False,
+        }
+    return result
 
 
 @router.post("/{profile_id}/interview:turn")

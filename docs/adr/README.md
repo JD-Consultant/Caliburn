@@ -31,17 +31,18 @@ ADR 是「為什麼」層;搭配 `../specs/`(細節設計)與 `../runbook.md`(�
 | [0020](0020-interview-authoring-interaction-model.md) | 訪談式撰寫互動模式:混合載體（文件常駐 + 精靈化訪談面板）；實作可重新設計、不受既有資產約束 | Accepted |
 | [0021](0021-knowledge-pack-single-sync-point.md) | 知識包：選職類=唯一 knowledge 同步點；indexer 給資料/api 處理/web 讀寫；來源必標的資料基座 | Accepted（P1–P3 已實作：`/knowledge` 端點＋web 全選單切換＋舊四端點退役） |
 | [0022](0022-similarity-matching-items-match.md) | 相似比對 `items:match`：indexer 確定性能力、FS 三區分帶、星型非遞移、非破壞呈現；survivorship 在 web；api 純搬運 | Accepted（v1 已實作：端點＋校準＋pack 掛載＋態度收合/任務徽章） |
-| [0023](0023-interview-engine-stateless-turns.md) | 訪談引擎骨幹：無狀態回合服務＋軟階段＋指令詞彙表；quote 溯源；停止三重保險；全新實作不整合舊碼（部分翻案 0007） | Accepted（2026-07-05；spec/plan 待開） |
-| [0024](0024-llm-wiring-select-schema.md) | LLM 接線：`LlmPort.select_schema`＋受限解碼路徑判準（OpenRouter strict 起步、對抗性驗收、escalation 槽；內裝首選 Pydantic AI） | Accepted（2026-07-05；spec/plan 待開） |
+| [0023](0023-interview-engine-stateless-turns.md) | 訪談引擎骨幹：無狀態回合服務＋軟階段＋指令詞彙表；quote 溯源；停止三重保險；全新實作不整合舊碼（部分翻案 0007） | Partially superseded by 0034（保留 provenance/全新實作原則） |
+| [0024](0024-llm-wiring-select-schema.md) | LLM 接線：`LlmPort.select_schema`＋受限解碼路徑判準（OpenRouter strict 起步、對抗性驗收、escalation 槽；內裝首選 Pydantic AI） | Superseded by 0034 |
 | [0025](0025-coedit-authority-dual-channel.md) | 人機共編權限：雙通道＋風險分流＋節點批審（分流寫入目的地，取代「人改過只能提議」） | Accepted（2026-07-05；spec/plan 待開） |
-| [0026](0026-interview-turn-model-role.md) | 訪談回合獨立模型 role（`model_interview`=gpt-4.1-mini，強推理＋沿用 strict 零逃逸）；延伸 0024 | Accepted（2026-07-06；真人試訪+校準#2 驅動） |
-| [0027](0027-interview-engine-v2-consultant-agent.md) | 訪談引擎 v2 四組件：顧問 agent（READ 工具、無寫入權）＋書記（兩通道 strict/quote、跨任務）＋確定性覆蓋帳本（門檻/飽和/閘門）＋backstop；風險分層核准（修正 0025 #1）；單信息源/純文字列 limitations | Accepted（2026-07-08；八輪研究收斂） |
+| [0026](0026-interview-turn-model-role.md) | 訪談回合獨立模型 role（`model_interview`=gpt-4.1-mini，強推理＋沿用 strict 零逃逸）；延伸 0024 | Superseded by 0034 |
+| [0027](0027-interview-engine-v2-consultant-agent.md) | 訪談引擎 v2 四組件：顧問 agent（READ 工具、無寫入權）＋書記（兩通道 strict/quote、跨任務）＋確定性覆蓋帳本（門檻/飽和/閘門）＋backstop；風險分層核准（修正 0025 #1）；單信息源/純文字列 limitations | Superseded by 0034 |
 | [0028](0028-interview-flow-shared-ui-curation.md) | 訪談流程 v2.1：AI 驅動既有編輯器 pickers（同 UI、追蹤修訂呈現）＋議程化彈性流程＋官方檢查表缺項探測（實際為準）＋態度收尾 pass（修正 0027 態度通道與 0025 批審載體） | Accepted（2026-07-09；真人實測 eb2af457 驅動） |
 | [0029](0029-editor-menus-three-types-decoupling.md) | 編輯器選單三型（控制/參考/素材庫）＝純工具（無自動寫/自訂入口/AI 標記、一律獨立視窗）＋參考集合與文件身分脫鉤（主基準＝表頭職類視窗所選）＋OPLKS 全展開位置碼版式；AI 共編載體延後另裁 | Accepted（2026-07-11；七層設計討論收斂；AI 載體由 0030 定案） |
-| [0030](0030-ai-coedit-tracked-changes-one-brain.md) | AI 層 v3：追蹤修訂直寫載體（`_pending` 四態＋條目級綠紅標＋無聲審閱記帳後用）＋一條腦（scribe 唯一寫入、舊 LangGraph/CopilotKit 退役）＋verify 六查＋對話層規則＋品質迴路（黃金範本/雙 suite/promptfoo CI）；部分修正 0025 批審載體與 0028 彈窗載體 | Accepted（2026-07-13；六輪研究＋逐層討論收斂） |
+| [0030](0030-ai-coedit-tracked-changes-one-brain.md) | AI 層 v3：追蹤修訂直寫載體（`_pending` 四態＋條目級綠紅標＋無聲審閱記帳後用）＋一條腦（scribe 唯一寫入、舊 LangGraph/CopilotKit 退役）＋verify 六查＋對話層規則＋品質迴路（黃金範本/雙 suite/promptfoo CI）；部分修正 0025 批審載體與 0028 彈窗載體 | Partially superseded by 0034（保留 Web review/authority/eval 原則） |
 | [0031](0031-occupation-suggest-card-refset-source.md) | 職類建議卡進對話流（推翻 0028 D1 職類段；預勾＋理由＋三出口）＋引擎參考碼＝profile∪doc 不變量（修 0029×0030 盲區鬼打牆）＋參考集合維持人選（否決 AI 代寫，記重啟條件）＋dismissed 知情話術；反騷擾緩做 | Accepted（2026-07-13；新手 persona 手測驗屍＋先例研究） |
 | [0032](0032-task-carrier-routing.md) | 任務載體路由：有逐字證據→綠字直落（含官方殼）＋盤永遠人開（intake 邀請卡/收尾 offer/自取，AI 彈窗全退役）＋盤無預勾疊加層（curation 端點退役）＋不確定 ≤3→聊天卡；修正 0028 D1 任務段 | Accepted（2026-07-14；維護者質疑 b 案＋Copilot/PAIR/TurboTax/冷啟動先例） |
-| [0033](0033-episode-agenda-consultant-tools.md) | 訪談議程 v4：事件（episode）驅動議程＝顧問議程工具（open/close_episode）＋覆蓋 artifact＋事件收割 pass（P 的家）＋guardrail 兜底＋異質模型（顧問升級）；退役 next_gap 梯子；修正 0027 帳本駕駛地位與 0028 議程載體 | Accepted（2026-07-14；live 驗屍 330a0bed＋BEI/大廠先例八方研究） |
+| [0033](0033-episode-agenda-consultant-tools.md) | 訪談議程 v4：事件（episode）驅動議程＝顧問議程工具（open/close_episode）＋覆蓋 artifact＋事件收割 pass（P 的家）＋guardrail 兜底＋異質模型（顧問升級）；退役 next_gap 梯子；修正 0027 帳本駕駛地位與 0028 議程載體 | Partially superseded by 0034（只保留 episode 概念） |
+| [0034](0034-interview-ai-vnext-greenfield-evidence-workflow.md) | Interview AI vNext：greenfield evidence workflow＋單一 adaptive conversation owner＋app-owned state＋provider-neutral Capture/eval；不整合 v3 internals，達 gate 後刪舊 | Accepted（2026-07-16；runtime 待實作） |
 
 完整脈絡見 [`../specs/2026-06-27-system-architecture-design.md`](../specs/2026-06-27-system-architecture-design.md)。
 契約怎麼選/怎麼交付的規範見 [`../contract-strategy.md`](../contract-strategy.md)（ADR 0004/0010 的一般化、預答契約 #3）。

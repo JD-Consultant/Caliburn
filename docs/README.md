@@ -72,10 +72,12 @@ Caliburn = 給顧問用的多租戶 B2B SaaS(職能基準 OCS → 職務說明�
 ### 中央系統文檔
 
 - [`specs/2026-06-27-system-architecture-design.md`](specs/2026-06-27-system-architecture-design.md) — 大框架(monorepo / 契約優先 / 3 bounded context / Hexagonal+DDD / 多租戶)。
-- [`specs/2026-07-15-evidence-first-stateful-workflow-reconstruction-research.md`](specs/2026-07-15-evidence-first-stateful-workflow-reconstruction-research.md) — **研究持續中／架構未定案**：比較 C0、Evidence-first C1、Sufficiency Agenda C1A、條件式 Workflow Graph C2 與 planner C2P；含 2025–2026 一手來源、Anthropic Interviewer、資料契約、三層 eval、一人團隊淘汰門檻，以及第 24 節 owner-confirmed synthetic session 稽核、22 個 claim labels、migration 0009、runtime capture 實作與剩餘 provider trace gate。
-- [`specs/2026-07-15-c0-c1-interview-eval-experiment-plan.md`](specs/2026-07-15-c0-c1-interview-eval-experiment-plan.md) — **下一步實驗規格**：先建立完整-case dataset、claim-level gold、隔離 C0 replay 與 immutable trajectory，再以盲測 paired cases 決定 C1 Evidence-first 應晉級、修正或淘汰；第 22 節狀態為 `CAPTURE_FOUNDATION_IMPLEMENTED_NEW_PILOT_REQUIRED`，並列出 replay-ready 的十項驗收。
+- [`specs/2026-07-16-interview-ai-vnext-greenfield-architecture.md`](specs/2026-07-16-interview-ai-vnext-greenfield-architecture.md) — **vNext 目標架構**：不整合／保留 v3 LLM internals；依 OpenAI、Anthropic、Google、Microsoft 2026 官方方向，採 Evidence-first durable workflow、單一 adaptive conversation owner、typed LLM operations、app-owned state、deterministic reducers/verifiers/projector、provider-neutral Capture/eval；含完整 runtime、資料契約、context、provider、評測與切換／刪舊規格。
+- [`plans/2026-07-16-interview-ai-vnext-implementation-plan.md`](plans/2026-07-16-interview-ai-vnext-implementation-plan.md) — **vNext 實作順序**：V0–V8 工作包，逐檔案、schema、migration、測試、hard gate、provider bake-off、pilot、rollback 與 v3 刪除條件；第一個 PR 只做全新 domain contracts/reducers，不碰 live LLM。
+- [`specs/2026-07-15-evidence-first-stateful-workflow-reconstruction-research.md`](specs/2026-07-15-evidence-first-stateful-workflow-reconstruction-research.md) — **上游研究紀錄／舊漸進路線已被取代**：保留 2025–2026 一手來源、Anthropic Interviewer、職務分析、Evidence/Agenda、eval 與 database audit 證據；不得再依其 C0→C1 指示改 v3 runtime。
+- [`specs/2026-07-15-c0-c1-interview-eval-experiment-plan.md`](specs/2026-07-15-c0-c1-interview-eval-experiment-plan.md) — **eval 方法保留／C1 實作路線被取代**：balanced cases、claim gold、fixed/branching eval、多 trial、hard gate 與 v3 black-box baseline 仍有效；不再授權在 v3 內實作 C1 或補深度 provider trace。
 - [`design/`](design/) — **子系統端到端設計(agent-facing)**;現有 [`editor-knowledge-pack.md`](design/editor-knowledge-pack.md)(編輯器 × 知識包)、[`interview-engine.md`](design/interview-engine.md)(訪談引擎)。寫法見 [`design/README.md`](design/README.md)。
-- [`adr/`](adr/) — Architecture Decision Records(決策的「為什麼」+ 取捨;**0001–0025**)。
+- [`adr/`](adr/) — Architecture Decision Records(決策的「為什麼」+ 取捨;**0001–0034**)；訪談 AI 最新決策為 [ADR 0034](adr/0034-interview-ai-vnext-greenfield-evidence-workflow.md)。
 - [`specs/`](specs/) — 研究紀錄(研究/診斷/選項/比對)。
 - [`plans/`](plans/) — bite-size 實作計畫。
 - [`ocs-schema.md`](ocs-schema.md) — OCS **著作產出**文件 JSON 結構與代碼規則(T/P/O/K/S/A);`packages/ocs-contract` 依據。

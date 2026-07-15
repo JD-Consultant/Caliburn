@@ -1,10 +1,19 @@
 # Evidence-first Stateful Interview Architecture——專業顧問 LLM 層研究與候選架構
 
 - 日期：2026-07-15
-- 狀態：**研究持續中／架構尚未定案**。本檔不是現行 runtime 的描述；現行 v3 仍以 [`../design/interview-engine.md`](../design/interview-engine.md) 為準。文中的 C0/C1/C1A/C2 都是待比較候選，不是已核准設計。
+- 狀態：**研究紀錄／2026-07-16 起不再是實作目標**。本檔不是現行 runtime 的描述；現行 v3 仍以 [`../design/interview-engine.md`](../design/interview-engine.md) 為準。文中的 C0/C1/C1A/C2 保留為研究假設與歷史推導，不再代表新版的漸進實作順序。
 - 範圍：Caliburn「訪談式工作分析 → OCS/JD 草稿」的 LLM 層、狀態、工具、驗證與評估。
 - 非範圍：Web 文件編輯／`_pending` 審閱 UX、OCS 公版契約、租戶與權限架構重做。
 - 來源政策：優先採用 OpenAI、Anthropic、Google、O*NET、ESCO、ILO 等一手資料；研究論文僅使用 ACL 等可追溯學術來源。來源截至 2026-07-15 可取得版本。
+
+> **2026-07-16 取代通知**：產品已決定直接建立 greenfield vNext，不整合或保留 v3
+> `consultant/scribe/harvest/select` 內部架構。本文的 evidence、context、訪談、職務元素與 eval
+> 研究仍有效，但第 4、12、21–24 節中任何「在 v3 上逐步做 C1」或「先補 v3 provider trace」的
+> 實作指示都已被
+> [`2026-07-16-interview-ai-vnext-greenfield-architecture.md`](2026-07-16-interview-ai-vnext-greenfield-architecture.md)
+> 與
+> [`../plans/2026-07-16-interview-ai-vnext-implementation-plan.md`](../plans/2026-07-16-interview-ai-vnext-implementation-plan.md)
+> 取代。v3 只作黑箱 baseline／暫時 fallback；portable eval/capture 資產繼續使用。
 
 ---
 
@@ -618,7 +627,7 @@ LLM judge 可幫助評分開放式項目，但不得成為唯一真相。使用�
 - [O3] OpenAI, [Working with Evals](https://developers.openai.com/api/docs/guides/evals)。以明確 task、test input 與結果迭代 LLM 應用。
 - [O4] OpenAI, [Conversation State](https://developers.openai.com/api/docs/guides/conversation-state)。持久 conversation 與 response chaining。
 - [O5] OpenAI, [Compaction](https://developers.openai.com/api/docs/guides/compaction)。長對話 context 壓縮；compaction item 為模型延續而設。
-- [O6] OpenAI, [Evaluation best practices](https://developers.openai.com/api/docs/guides/evaluation-best-practices)，存取於 2026-07-15。task-specific eval、production/historical/human-curated datasets、持續評估、pairwise/pass-fail 與人工校準；同頁亦公告舊 Evals platform 將於 2026-10-31 唯讀、2026-11-30 關閉，因此本架構只依賴可攜的 dataset/grader/trace 契約，不綁定該平台。
+- [O6] OpenAI, [Evaluation best practices](https://developers.openai.com/api/docs/guides/evaluation-best-practices) 與 [Deprecations：2026-06-03 Evals platform](https://developers.openai.com/api/docs/deprecations#2026-06-03-evals-platform)，存取於 2026-07-16。前者支持 task-specific eval、production/historical/human-curated datasets、持續評估、pairwise/pass-fail 與人工校準；後者公告舊 Evals platform 將於 2026-10-31 唯讀、2026-11-30 關閉，並指向 Promptfoo migration，因此本架構只依賴可攜的 dataset/grader/trace 契約，不綁定該平台。
 - [G1] Google, [Gemini Structured Outputs](https://ai.google.dev/gemini-api/docs/structured-output?lang=rest), last updated 2026-07-07。JSON schema 與 function calling 的區別；應用程式仍須驗證 schema-compliant 但語意錯誤的輸出。
 
 ### 職務／技能標準（一手）
@@ -2028,22 +2037,20 @@ Owner 已確認資料為 synthetic，故已提交
 | Claim-level gold | PARTIAL PASS | 22 evidence 與 inference/state labels 已 maintainer-check；domain review 未完成。 |
 | Immutable initial fixture | FAIL | document/state/reference 均缺。 |
 | Historical C0 replay | BLOCKED | `replay.ready=false`；不得假造起點。 |
-| C1 production implementation | NOT AUTHORIZED | 尚無可信 baseline 與 promotion set。 |
+| C1 production implementation | CANCELLED | 2026-07-16 決定不在 v3 內漸進整合；改作 greenfield vNext。 |
 | Eval/trace foundation | PASS | exporter、schemas、loader、graders、isolated runner、capture migration 與 runtime instrumentation 已建立。 |
 | Provider-level trace | PARTIAL | resolved model/tokens/raw response/per-attempt/failure outbox 尚缺。 |
 
-本輪的實際下一步不是繼續擴大架構圖，而是：
+本節在 2026-07-15 原本提出的 C0 → C1 路徑已被取代；2026-07-16 的實際順序是：
 
 ```text
-完成 synthetic claim annotation
-→ 完成 immutable eval-session capture foundation
-→ 補 provider-level trace 與 failure outbox
-→ 從 turn zero 跑新的 captured synthetic pilot
-→ 驗證 hash chain 後產生 replay-ready session
-→ 擴充 incidents/successes 與 role-family 樣本
-→ C0 baseline
-→ C1 isolated vertical slice
-→ blind paired decision
+凍結 v3，只保留黑箱 baseline/fallback
+→ 建立 vNext domain contracts/reducers
+→ 建立 provider-neutral LLM port + Capture vNext/failure outbox
+→ 從 turn zero 跑新的 vNext synthetic pilot
+→ 擴充 balanced cases、claim gold 與 role-family 樣本
+→ vNext fixed replay + v3 black-box outcome baseline
+→ branching conversation + blind paired decision
 ```
 
 這個 gate 對「一人團隊」尤其重要：先讓每次新增的 schema/pass/call 都有可歸因證據；否則架構越完整，越可能只是把未知問題變成更多維護面。

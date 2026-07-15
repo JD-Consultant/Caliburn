@@ -1,7 +1,7 @@
 # C0 → C1 訪談 LLM 實驗計畫——先證明 Evidence-first，再決定架構
 
 - 日期：2026-07-15
-- 狀態：**eval foundation 已實作／真實 C0 baseline 與 C1 尚未開始／不構成架構 ADR**
+- 狀態：**部分保留、部分被取代**。case/gold/runner/capture/eval 方法繼續有效；C1 在 v3 內增量實作與「先補 v3 provider trace」已於 2026-07-16 取消。
 - 上游研究：[`2026-07-15-evidence-first-stateful-workflow-reconstruction-research.md`](2026-07-15-evidence-first-stateful-workflow-reconstruction-research.md)
 - 比較對象：C0（現行 v3 可重播基線）與 C1（Thin Evidence-first）
 - 本文件不評定：C1A Sufficiency Agenda、C2 Workflow Graph、C2P planner、多 agent、fine-tuning
@@ -9,9 +9,16 @@
 
 2026-07-15 實作進度：已建立 `apps/api/evals/interview_v4/` 的 case/gold/run 契約與 JSON Schema、完整 case loader、只讀去識別 exporter、deterministic graders、isolated C0 runner、現行 scribe/harvest adapter、provisional legacy case 與測試。尚無真實 promotion-ready dataset，因此不得把 foundation 完成解讀為 C1 已通過。
 
+> **2026-07-16 路線更新**：不再實作「C0 + Thin Evidence-first」作為 v3 的相容升級。新候選是
+> [`Interview AI vNext greenfield architecture`](2026-07-16-interview-ai-vnext-greenfield-architecture.md)，
+> 以新的 domain state、workflow、provider port 和 Capture vNext 從零建立。本文後續提到 C1
+> implementation/promotion 的地方只保留為歷史實驗設計；可繼續採用的是 balanced cases、claim-level
+> gold、fixed replay 與 branching eval、deterministic/model/human graders、多 trial、hard gates、
+> provider-neutral artifacts，以及把 v3 當黑箱 baseline 的方法。不得再據本文替 v3 增加新架構功能。
+
 ---
 
-## 1. 決策先行
+## 1. 原 C0 → C1 決策（已被 greenfield vNext 路線取代）
 
 下一步不是直接重構 production runtime，而是完成一個能回答下列問題的配對實驗：
 
@@ -897,13 +904,15 @@ next experiment authorization
 - report 可逐 claim 回到 employee quote。
 - 現有 v3 測試保持不變；新 eval 不把舊 promptfoo 分數假裝成新 gate。
 
-完成此工作包後，才開始 C1 Evidence extractor/reducer PR。
+原計畫是完成此工作包後開始 C1 Evidence extractor/reducer PR；此步驟已取消。現在由全新的
+`interview_vnext/domain` contracts/reducers PR 接續，細節以 2026-07-16 vNext plan 為準。
 
-目前 gate 狀態：程式與 capture foundation 已通過；promotion data gate 未通過。現有 owner-confirmed
-synthetic case 已可做靜態 claim eval，但缺 historical initial fixtures。下一步不是立刻寫 C1，而是先
-補 provider-level trace，從 turn zero 產生新的 replay-ready synthetic pilots，再依第 15 節 E2 擴充
-3–5 個 incidents 與 3–5 個 successes、補 role-family diversity 與 domain-reviewed gold，最後執行
-E3 C0 baseline。若未來納入 production data，仍須另走 consent/deidentification gate。
+目前 gate 狀態：程式與 portable capture foundation 已通過；promotion data gate 未通過。現有
+owner-confirmed synthetic case 已可做靜態 claim eval，但缺 historical initial fixtures。新版不再補
+v3 provider-level trace；先實作 vNext domain/LLM port/Capture envelope，再從 turn zero 產生新的
+replay-ready synthetic pilots。資料仍需擴充 incidents/successes、role-family diversity 與
+domain-reviewed gold；v3 只在共同 case/outcome 層作黑箱 baseline。若未來納入 production data，仍須
+另走 consent/deidentification gate。
 
 ---
 
@@ -926,18 +935,19 @@ E3 C0 baseline。若未來納入 production data，仍須另走 consent/deidenti
 
 Caliburn 已經有 transcript、review event、verify、`_pending`、LLM-call metadata、promptfoo 與模擬器等基礎，但目前的 eval 還不能證明哪個 LLM 架構最好：單一 agent 自審 golden、自由生成 simulated facts、Source Score 0.8、空輸出滿分與「每回合必問」都可能導致錯誤結論。
 
-因此下一步的正確產出不是完整 v4，而是：
+2026-07-15 當時規劃的產出順序是 C0 → C1；2026-07-16 已改為：
 
 ```text
-可信的完整-case dataset
-→ claim-level gold
-→ isolated C0 replay
-→ immutable trajectory artifacts
-→ C1 offline vertical slice
-→ blind paired decision
+greenfield vNext domain contracts/reducers
+→ provider-neutral LLM port + Capture vNext
+→ 可信的完整-case dataset + claim-level gold
+→ vNext fixed replay vertical slice
+→ v3 black-box outcome baseline
+→ branching conversation + blind paired decision
 ```
 
-這套基礎建好後，C1 若失敗，可以知道是 Evidence schema、extractor、reducer、inference 還是 projection；C1 若成功，也能證明收益不是模型、prompt、資料洩漏或平均分造成的錯覺。
+這套基礎建好後，vNext 若失敗，可以知道是 Evidence schema、interpreter、reducer、question policy、
+coder 還是 projection；若成功，也能證明收益不是模型、prompt、資料洩漏或平均分造成的錯覺。
 
 ---
 
@@ -945,7 +955,7 @@ Caliburn 已經有 transcript、review event、verify、`_pending`、LLM-call me
 
 本文件的 eval 方法與限制以以下一手／可追溯來源為依據；詳細解讀與來源分級見上游研究：
 
-- OpenAI, [Evaluation best practices](https://developers.openai.com/api/docs/guides/evaluation-best-practices)，存取於 2026-07-15：task-specific eval、production/historical data、人工校準、pairwise/pass-fail、持續評估與舊 Evals platform 退場資訊。
+- OpenAI, [Evaluation best practices](https://developers.openai.com/api/docs/guides/evaluation-best-practices) 與 [Deprecations：2026-06-03 Evals platform](https://developers.openai.com/api/docs/deprecations#2026-06-03-evals-platform)，存取於 2026-07-16：前者支持 task-specific eval、production/historical data、人工校準、pairwise/pass-fail 與持續評估；後者提供舊 Evals platform 的退場時程與 Promptfoo migration。
 - Anthropic, [Demystifying Evals for AI Agents](https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents)，2026-01-09：trial、trajectory、outcome、grader、harness、capability/regression 與多次 trial。
 - Anthropic, [Introducing Anthropic Interviewer](https://www.anthropic.com/research/anthropic-interviewer)，2025-12-04：planning、adaptive interviewing、analysis、quote 與 human collaboration。
 - Anthropic, [What 81,000 people want from AI](https://www.anthropic.com/features/81k-interviews) 及 [Methods Appendix](https://cdn.sanity.io/files/4zrzovbb/website/99156863ed4a812569fe00a2adfb1c93f7e5a911.pdf)，2026-03：80,508 份合格訪談、品質篩選、分類器人工 agreement、unknown/exclusion 與研究限制。
@@ -983,21 +993,22 @@ C1 production implementation: NOT AUTHORIZED
 synthetic static claim evaluation: READY
 claim annotation: MAINTAINER_CHECKED_DOMAIN_REVIEW_PENDING
 immutable eval-session capture foundation: IMPLEMENTED_DEFAULT_OFF
-provider-level trace/failure outbox: NEXT IMPLEMENTATION PACKAGE
+provider-level trace/failure outbox: MOVED_TO_VNEXT_CAPTURE
 ```
 
 observed export-time document/state 只可作 failure audit，不可冒充 initial fixture；以目前 reference
-重建歷史 snapshot 會造成 temporal leakage。下一個 consented pilot 必須在 turn 0 保存 initial
+重建歷史 snapshot 會造成 temporal leakage。下一個 vNext pilot 必須在 turn 0 保存 initial
 document/state、reference hash、prompt/tool schema hash，並逐 call 保存 stage、resolved model、tokens、
-outcome、latency 與 parsed artifact。Migration `0009` 與 runtime 已保存 turn-zero snapshot、每回合
+outcome、latency 與 parsed artifact。Migration `0009` 與 v3 runtime 已保存 turn-zero snapshot、每回合
 before/after state/document、tool results、stage outputs、trajectory hash chain 與 session-final snapshot；
 歷史 audit rows 以 `legacy_unknown` 保留未知。
 
-目前仍缺 provider resolved model、tokens、raw response、逐 attempt trace，以及 request exception 的
-獨立 failure outbox，所以所有新 capture 仍回 `replay_ready=false`。只有新 case 通過 fixture hash
-chain + provider trace + gold gate（production data 再加 privacy/consent gate），才執行 E3 C0。
+目前 v3 capture 仍缺 provider resolved model、tokens、raw response、逐 attempt trace，以及 request
+exception 的獨立 failure outbox，所以固定回 `replay_ready=false`；不再擴充它。vNext Capture 直接完成
+這些欄位。只有新 case 通過 fixture hash chain + provider trace + gold gate（production data 再加
+privacy/consent gate），才可比較 vNext 與 v3 black-box outcome。
 
-### 22.3 下一個 synthetic pilot 的逐項驗收
+### 22.3 下一個 vNext synthetic pilot 的逐項驗收
 
 不得只看「資料表有 rows」。一個新 pilot 要晉升 replay-ready，必須逐項通過：
 

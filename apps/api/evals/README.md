@@ -1,13 +1,15 @@
 # 訪談引擎 evals(T11;ADR 0030)
 
-> **2026-07-15 邊界說明**：本目錄目前是 v3 的 regression／smoke 資產，不能單獨證明
-> C1 Evidence-first 或任何新架構較好。現有單一 golden、simulated user、Source Score 0.8、
+> **2026-07-16 邊界說明**：本目錄包含 v3 regression／smoke 與 provider-neutral eval foundation，
+> 不能單獨證明 greenfield vNext 或任何新架構較好。現有單一 golden、simulated user、Source Score 0.8、
 > 空輸出計分與「每回合恰好一問」的適用限制及修正計畫，見
 > [`../../../docs/specs/2026-07-15-c0-c1-interview-eval-experiment-plan.md`](../../../docs/specs/2026-07-15-c0-c1-interview-eval-experiment-plan.md)。
 
-新架構實驗的 vendor-neutral foundation 位於 [`interview_v4/`](interview_v4/)：case/gold/run
+新架構實驗的 vendor-neutral foundation 位於歷史命名的 [`interview_v4/`](interview_v4/)：case/gold/run
 contracts、只讀 session inventory/export、隱私預篩、content-free candidate metrics、deterministic
-graders 與 isolated C0 runner。第一個 database session（資料擁有者已確認為測試資料）稽核見
+graders 與 isolated v3/C0 black-box runner。2026-07-16 已決定 vNext 不整合 v3 internals；新版架構與
+Capture 規格見
+[`../../../docs/specs/2026-07-16-interview-ai-vnext-greenfield-architecture.md`](../../../docs/specs/2026-07-16-interview-ai-vnext-greenfield-architecture.md)。第一個 database session（資料擁有者已確認為測試資料）稽核見
 [`interview_v4/reports/real-candidate-audit-2026-07-15.md`](interview_v4/reports/real-candidate-audit-2026-07-15.md)；
 已提交的 `TEST-SYNTHETIC-SESSION-001` 可做靜態 claim eval；historical replay 仍缺 initial
 fixtures，不能假造 C0 baseline。新 session 的 opt-in immutable capture 操作與限制見

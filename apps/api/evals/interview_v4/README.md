@@ -1,11 +1,14 @@
-# Interview eval v4 foundation
+# Interview eval portable foundation（legacy path：`interview_v4`）
 
-這是 C0/C1 架構實驗的可攜式基礎，不取代 `evals/promptfooconfig.yaml` 的 v3
-regression／smoke。Runner 與 case tools 不介入 production 對話；只有明確標示的 opt-in capture
-instrumentation 接入現行 runtime，而且預設關閉。
+這個目錄名稱因歷史原因仍是 `interview_v4`，但內容是 provider/architecture-neutral 的 case、gold、
+run、grader 與 immutable artifact 基礎，不是 v4 runtime contract。2026-07-16 起，新 runtime 改採
+greenfield vNext；C0 runner 與現有 opt-in capture 只供 v3 黑箱 baseline/failure audit，不再作為新
+架構的 stage 或 state 模板。Runner 與 case tools 不介入 production 對話，現有 capture 預設關閉。
 
 設計與 gate 來源：
 [`docs/specs/2026-07-15-c0-c1-interview-eval-experiment-plan.md`](../../../../docs/specs/2026-07-15-c0-c1-interview-eval-experiment-plan.md)。
+新版架構與 Capture 契約：
+[`docs/specs/2026-07-16-interview-ai-vnext-greenfield-architecture.md`](../../../../docs/specs/2026-07-16-interview-ai-vnext-greenfield-architecture.md)。
 
 ## 目錄
 
@@ -212,9 +215,10 @@ artifact 的 `content_hash`。模型 call 順序明確使用
 
 目前 `attempt_count` 是應用 pass 層重試數，`prompt_hash` 對應 pass 記錄的 prompt；不能解讀為
 provider 的每次嘗試。整個 turn 使用同一 DB transaction，若 provider exception 使 request 失敗，
-該 transaction 內的 capture 也會 rollback。下一個 instrumentation slice 應讓 provider 回傳
-`resolved_model/tokens/raw artifact/attempt traces`，並以獨立 transaction 或 outbox 保存失敗事件。
-在這些缺口驗證前，API 回應固定 `replay_ready=false`。
+該 transaction 內的 capture 也會 rollback。2026-07-16 決定不再為 v3 補這個 provider-level
+instrumentation slice；`resolved_model/tokens/raw artifact/attempt traces`、failure outbox 與 open-string
+stage taxonomy 直接在 vNext Capture 實作。現有 v3 capture 仍固定 `replay_ready=false`，除非未來有
+一個獨立、經核准且不改 v3 runtime 語意的 baseline capture 工作包。
 
 ## 執行 C0 replay
 

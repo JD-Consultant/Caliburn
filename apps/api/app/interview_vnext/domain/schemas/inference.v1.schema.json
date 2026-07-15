@@ -1,0 +1,127 @@
+{
+  "$defs": {
+    "InferenceMethod": {
+      "enum": [
+        "llm",
+        "rule",
+        "human"
+      ],
+      "title": "InferenceMethod",
+      "type": "string"
+    },
+    "InferenceStatus": {
+      "enum": [
+        "candidate",
+        "confirmed_by_employee",
+        "rejected",
+        "superseded",
+        "insufficient"
+      ],
+      "title": "InferenceStatus",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "inference.v1",
+      "default": "inference.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "inference_id": {
+      "format": "uuid",
+      "title": "Inference Id",
+      "type": "string"
+    },
+    "session_id": {
+      "format": "uuid",
+      "title": "Session Id",
+      "type": "string"
+    },
+    "type": {
+      "maxLength": 128,
+      "minLength": 1,
+      "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+      "title": "Type",
+      "type": "string"
+    },
+    "statement": {
+      "minLength": 1,
+      "title": "Statement",
+      "type": "string"
+    },
+    "supporting_evidence_ids": {
+      "items": {
+        "format": "uuid",
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Supporting Evidence Ids",
+      "type": "array"
+    },
+    "contradicting_evidence_ids": {
+      "default": [],
+      "items": {
+        "format": "uuid",
+        "type": "string"
+      },
+      "title": "Contradicting Evidence Ids",
+      "type": "array"
+    },
+    "reference_urns": {
+      "default": [],
+      "items": {
+        "maxLength": 512,
+        "minLength": 3,
+        "type": "string"
+      },
+      "title": "Reference Urns",
+      "type": "array"
+    },
+    "status": {
+      "$ref": "#/$defs/InferenceStatus",
+      "default": "candidate"
+    },
+    "method": {
+      "$ref": "#/$defs/InferenceMethod"
+    },
+    "operation_name": {
+      "maxLength": 128,
+      "minLength": 1,
+      "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+      "title": "Operation Name",
+      "type": "string"
+    },
+    "prompt_version": {
+      "minLength": 1,
+      "title": "Prompt Version",
+      "type": "string"
+    },
+    "uncertainty_reason": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Uncertainty Reason"
+    }
+  },
+  "required": [
+    "inference_id",
+    "session_id",
+    "type",
+    "statement",
+    "supporting_evidence_ids",
+    "method",
+    "operation_name",
+    "prompt_version"
+  ],
+  "title": "Caliburn interview vNext inference v1",
+  "type": "object",
+  "$id": "https://caliburn.local/schemas/inference.v1.schema.json"
+}

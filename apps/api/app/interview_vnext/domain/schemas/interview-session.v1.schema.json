@@ -1,0 +1,119 @@
+{
+  "$defs": {
+    "SessionStatus": {
+      "enum": [
+        "planned",
+        "active",
+        "paused",
+        "finishing",
+        "completed",
+        "failed"
+      ],
+      "title": "SessionStatus",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "interview_session.v1",
+      "default": "interview_session.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "session_id": {
+      "format": "uuid",
+      "title": "Session Id",
+      "type": "string"
+    },
+    "profile_id": {
+      "format": "uuid",
+      "title": "Profile Id",
+      "type": "string"
+    },
+    "tenant_id": {
+      "format": "uuid",
+      "title": "Tenant Id",
+      "type": "string"
+    },
+    "architecture_id": {
+      "const": "interview-vnext-evidence-workflow",
+      "default": "interview-vnext-evidence-workflow",
+      "title": "Architecture Id",
+      "type": "string"
+    },
+    "workflow_version": {
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(?:-[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?(?:\\+[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?$",
+      "title": "Workflow Version",
+      "type": "string"
+    },
+    "status": {
+      "$ref": "#/$defs/SessionStatus",
+      "default": "planned"
+    },
+    "state_version": {
+      "default": 0,
+      "minimum": 0,
+      "title": "State Version",
+      "type": "integer"
+    },
+    "active_episode_id": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Active Episode Id"
+    },
+    "turn_count": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Turn Count",
+      "type": "integer"
+    },
+    "stop_reason": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Stop Reason"
+    },
+    "reference_snapshot_id": {
+      "minLength": 1,
+      "title": "Reference Snapshot Id",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "updated_at": {
+      "format": "date-time",
+      "title": "Updated At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "session_id",
+    "profile_id",
+    "tenant_id",
+    "workflow_version",
+    "reference_snapshot_id",
+    "created_at",
+    "updated_at"
+  ],
+  "title": "Caliburn interview vNext session v1",
+  "type": "object",
+  "$id": "https://caliburn.local/schemas/interview-session.v1.schema.json"
+}

@@ -1,7 +1,7 @@
 # Interview AI vNext Greenfield Architecture——專業顧問 LLM 層定案規格
 
 - 日期：2026-07-16
-- 狀態：**greenfield 方向已核准；V0 + V1 domain foundation 已實作，runtime route/LLM 尚未接線；本文件是 vNext 的目標架構規格**
+- 狀態：**greenfield 方向已核准；V0 + V1 + V2-A neutral LLM/Capture contracts 已實作，DB/runtime route/live LLM 尚未接線；本文件是 vNext 的目標架構規格**
 - 決策：不把 v3 `consultant/scribe/harvest/select` 內部流程整合、包裝或逐步演化成新版
 - 適用團隊：一人開發團隊
 - 產品前提：現有手動 JD Web、OCS 文件契約與人工審閱流程可用；重做範圍是 LLM 分析與訪談 runtime
@@ -109,6 +109,7 @@ OpenAI 目前把 agent 基礎拆為 models、tools、state/memory 與 orchestrat
 - 以自有 workflow 掌握資料與狀態，provider adapter 可使用 Responses API；不把整個產品核心綁在 Agents SDK。
 - 使用 strict structured output 表達 pass contract，但仍由 domain verifier 檢查 quote、語意與狀態不變量；schema 合格不等於內容真實。[OpenAI Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs)
 - provider conversation state 可用來減少傳輸，但 Caliburn 自有 session/event/evidence 才是可移植、可回放的來源。[OpenAI Conversation state](https://developers.openai.com/api/docs/guides/conversation-state)
+- Responses 的 server-side／standalone compaction 只產生供後續 inference round-trip 的 opaque context item；background mode 是可 poll/cancel 的 transport job；prompt caching 依 exact prefix運作。三者都只作 adapter/context optimization，不取代 Evidence、checkpoint或 durable record。[OpenAI Compaction](https://developers.openai.com/api/docs/guides/compaction)、[Background mode](https://developers.openai.com/api/docs/guides/background)、[Prompt caching](https://developers.openai.com/api/docs/guides/prompt-caching)
 - 每個 workflow step 都可獨立評測；持續從真實 failure 擴充 task-specific eval，優先使用可判別的 pass/fail、classification 或 pairwise，再以人工標註校準 model grader。[OpenAI Evaluation best practices](https://developers.openai.com/api/docs/guides/evaluation-best-practices)
 - trace 必須能定位 model、tool、guardrail、handoff／step 的錯誤，不只留最後答案。[OpenAI Trace grading](https://developers.openai.com/api/docs/guides/trace-grading)
 
@@ -129,6 +130,10 @@ Claude 官方 Messages API 可用於 stateless multi-turn conversation，而目�
 `output_config.format` 或 strict tool schema 提供可驗證 JSON 邊界。這支持 vNext 由應用程式重建
 context、由 adapter 使用 provider 的 strict schema，但同樣不能取代 domain semantic verifier。
 [Claude Messages API](https://platform.claude.com/docs/en/api/messages/create)、[Claude Structured outputs](https://platform.claude.com/docs/en/build-with-claude/structured-outputs)
+
+Messages 的 `end_turn|max_tokens|pause_turn|refusal|model_context_window_exceeded` 是不同 completion semantics，refusal 也可能是正常 HTTP response；adapter 必須正規化 outcome/finish reason，workflow 不可只看 HTTP 2xx 或解析到 JSON 就接受。[Claude stop reasons](https://platform.claude.com/docs/en/build-with-claude/handling-stop-reasons)
+
+Anthropic 目前建議 server-side compaction，SDK client-side `compaction_control` 已標記 deprecated；prompt caching同樣依 exact prefix且只改成本/延遲。因此 vNext 不新增 client compaction dependency，也不把 cache視為記憶。[Claude Context editing](https://platform.claude.com/docs/en/build-with-claude/context-editing)、[Claude Prompt caching](https://platform.claude.com/docs/en/build-with-claude/prompt-caching)
 
 其 Managed Agents 架構更直接把 session log 放在 model context window 之外，讓 harness crash 後能從 durable event log 恢復，並明確區分「可恢復的 context storage」與「當次送入模型的 context selection」。[Scaling Managed Agents](https://www.anthropic.com/engineering/managed-agents)
 
@@ -635,6 +640,8 @@ Global Consolidator 不可增加沒有 evidence 的新 task；它的每一項輸
 - summary 需列 source evidence IDs、版本與產生 operation。
 - extraction、verification、projection 不得只讀 summary；關鍵 claim 回到原始 evidence/quote。
 - compaction 失敗只影響 model context，不得破壞 durable session。
+- OpenAI opaque compaction item／Anthropic server-side compaction block可以由 adapter round-trip，但不可轉成 Evidence、Inference或 audit truth；原始 input/output artifact仍需保存。
+- 不使用 Anthropic 已 deprecated 的 SDK client `compaction_control`；未來 provider API變更只改 adapter/context profile。
 
 ### 10.4 Retrieval 策略
 
@@ -657,16 +664,13 @@ prompt、schema 和 verifier 都保留此區分，防止來源洗白。
 class LlmPort(Protocol):
     async def generate_structured(
         self,
-        *,
-        operation: OperationSpec,
-        context: ContextPacket,
-        output_schema: type[BaseModel],
-        config: ModelExecutionConfig,
-        idempotency_key: str,
+        request: ModelCallRequest,
     ) -> ModelCallResult: ...
 ```
 
-`ModelCallResult` 至少包含：provider、requested/resolved model、request id、visible raw response artifact、parsed output、input/output/cached/reasoning token usage（provider 有提供時）、latency、attempts、finish/outcome、provider conversation/response ID（metadata only）、prompt/schema/context hashes。
+`ModelCallRequest` 表示單一 attempt，包含跨 retry不變的 operation ID、唯一 attempt ID、definition/idempotency identity、portable instructions/messages、output schema identity，以及 prompt/schema/context/selection-manifest artifact refs。provider beta header、cache/reasoning/sampling knob停在 adapter profile。
+
+`ModelCallResult` 至少包含：`succeeded|refused|incomplete|failed` outcome、normalized/provider finish reason、provider、requested/resolved model、request id、visible raw response artifact、canonical parsed output、input/output/cache-read/cache-write/reasoning token usage（provider 有提供時）、latency、provider conversation/response ID（metadata only）、prompt/schema/context hashes。任何 null usage必須附 limitation，不得當 0。
 
 Domain code 只看 parsed output 和 normalized failure，不看 OpenAI/Anthropic SDK object。
 
@@ -711,30 +715,40 @@ Capture 是可重播的實驗／稽核事件資料，不只是用來找 exceptio
 
 ```json
 {
-  "event_schema_version": "execution-event.v1",
+  "event_schema_version": "execution_event.v1",
   "event_id": "uuid",
   "occurred_at": "timestamp",
   "architecture_id": "interview-vnext-evidence-workflow",
   "workflow_version": "1.0.0",
+  "taxonomy_id": "interview.vnext.execution",
+  "taxonomy_version": "1.0.0",
+  "taxonomy_hash": "sha256:...",
   "run_id": "uuid",
   "session_id": "uuid",
   "turn_id": "uuid|null",
   "operation_id": "uuid|null",
   "parent_operation_id": "uuid|null",
+  "attempt_id": "uuid|null",
   "event_type": "model.call.completed",
   "stage": "turn.interpret",
-  "stage_taxonomy_version": "interview-vnext-stages.v1",
   "attempt": 1,
   "status": "ok|partial|failed|skipped",
-  "input_artifact_refs": [],
-  "output_artifact_refs": [],
+  "sequence": 17,
+  "previous_event_hash": "sha256:...",
+  "input_artifacts": [],
+  "output_artifacts": [],
   "state_before_hash": "sha256|null",
   "state_after_hash": "sha256|null",
-  "metadata": {}
+  "metadata_json": "{\"outcome\":\"succeeded\"}",
+  "event_hash": "sha256:..."
 }
 ```
 
-`stage` 是符合命名規範的 registry string，不是封閉 Pydantic `Literal`。已發出的名稱不改語意；新增 stage 只更新 taxonomy 文件。domain event 與 execution event 分開：前者描述業務事實，後者描述程式執行。
+`stage` 是符合命名規範的 registry string，不是封閉 Pydantic `Literal`。已發出的名稱不改語意；新增 stage只新增 taxonomy semver/registry/document，不改 event envelope schema，也不覆寫歷史 taxonomy。domain event 與 execution event 分開：前者描述業務事實，後者描述程式執行。
+
+event只放小型 metadata與 artifact refs；request、visible response、parsed proposal、verification、state/command result與 context selection manifest都存 immutable artifact。每個 run以 sequence + previous hash形成 canonical hash chain，完成時產 RunManifest；hash chain偵測缺漏／改寫，不冒充外部簽章或 WORM storage。
+
+operation checkpoint使用 `prepared → calling → provider_completed → verified → committed`，任何非 terminal執行可在留下 failure artifact後進 `failed`。有限 retry在 `calling` 內先 append前一 attempt result artifact，再以新 attempt ID與遞增序號啟動下一次；舊 attempt不覆寫。recovery看到 `provider_completed` 後不得再打 provider，看到 `committed` 直接重用 outcome。outbox使用 event ID idempotent enqueue、lease/expiry/retry/dead-letter；外部 exporter失敗不回滾 domain transaction。
 
 ### 12.2 最低 event set
 

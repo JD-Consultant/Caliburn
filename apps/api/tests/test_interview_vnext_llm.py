@@ -1,0 +1,322 @@
+from __future__ import annotations
+
+from datetime import UTC, datetime, timedelta
+from uuid import NAMESPACE_URL, UUID, uuid5
+
+import pytest
+from pydantic import ValidationError
+
+from app.interview_vnext.domain.hashing import canonical_hash
+from app.interview_vnext.llm.operation import ContractIdentity, define_operation
+from app.interview_vnext.llm.port import MessageRole, ModelCallRequest, ModelMessage
+from app.interview_vnext.llm.registry import (
+    OperationNotFound,
+    OperationRegistrationConflict,
+    OperationRegistry,
+)
+from app.interview_vnext.llm.result import (
+    FailureKind,
+    FinishReason,
+    ModelCallResult,
+    ModelFailure,
+    ModelOutcome,
+    ModelRefusal,
+    TokenUsage,
+    build_structured_payload,
+)
+from app.interview_vnext.llm.testing import ScriptedLlmPort, ScriptedStep
+from app.interview_vnext.observability.artifacts import build_inline_artifact
+
+
+NOW = datetime(2026, 7, 16, 1, 0, tzinfo=UTC)
+
+
+def uid(name: str) -> UUID:
+    return uuid5(NAMESPACE_URL, f"caliburn-vnext-llm:{name}")
+
+
+def identity(name: str) -> ContractIdentity:
+    return ContractIdentity(
+        name=name,
+        version="1.0.0",
+        content_hash=canonical_hash({"identity": name, "version": 1}),
+    )
+
+
+def operation(name: str = "turn.interpret"):
+    return define_operation(
+        name=name,
+        version="1.0.0",
+        input_contract=identity(f"{name}.input"),
+        output_contract=identity(f"{name}.output"),
+        prompt_template=identity(f"{name}.prompt"),
+        context_policy=identity(f"{name}.context"),
+        quality_profile="high.precision",
+        timeout_ms=45_000,
+        max_attempts=2,
+        max_output_tokens=4_096,
+        allowed_tools=(),
+        safety_policy_flags=("employee.evidence.only",),
+    )
+
+
+def artifact(kind: str, payload) -> object:
+    return build_inline_artifact(
+        artifact_id=uid(f"artifact:{kind}"),
+        kind=kind,
+        media_type="application/json",
+        payload=payload,
+        run_id=uid("run"),
+        session_id=uid("session"),
+        created_at=NOW,
+    ).ref
+
+
+def request(*, attempt: int, attempt_name: str) -> ModelCallRequest:
+    spec = operation()
+    return ModelCallRequest(
+        run_id=uid("run"),
+        session_id=uid("session"),
+        turn_id=uid("turn"),
+        operation_id=uid("operation"),
+        attempt_id=uid(f"attempt:{attempt_name}"),
+        attempt=attempt,
+        operation_name=spec.name,
+        operation_definition_hash=spec.definition_hash,
+        idempotency_key="turn-7:turn.interpret",
+        provider="fake",
+        requested_model="quality-ceiling",
+        quality_profile=spec.quality_profile,
+        instructions="Extract only employee-supported work evidence.",
+        messages=(ModelMessage(role=MessageRole.USER, text="我每週整理測試結果。"),),
+        prompt_artifact=artifact("prompt.template", {"prompt": "v1"}),
+        output_schema_id="turn_interpret.v1",
+        output_schema_artifact=artifact("schema.output", {"type": "object"}),
+        context_artifact=artifact("context.packet", {"turn": 7}),
+        selection_manifest_artifact=artifact("context.selection", {"selected": [7]}),
+        created_at=NOW + timedelta(seconds=attempt),
+        deadline_at=NOW + timedelta(seconds=attempt + 45),
+        max_output_tokens=spec.max_output_tokens,
+    )
+
+
+def complete_usage() -> TokenUsage:
+    return TokenUsage(
+        input_tokens=100,
+        output_tokens=20,
+        cache_read_tokens=0,
+        cache_write_tokens=0,
+        reasoning_tokens=0,
+    )
+
+
+def test_operation_definition_is_hash_addressed_and_registry_is_deterministic():
+    first = operation("episode.code")
+    second = operation("turn.interpret")
+    registry = OperationRegistry((second, first))
+
+    assert registry.specs == (first, second)
+    assert registry.resolve(first.name, definition_hash=first.definition_hash) == first
+    assert registry.register(first) == first
+    assert registry.manifest_hash == canonical_hash(
+        [item.model_dump(mode="json") for item in (first, second)]
+    )
+
+    changed = define_operation(
+        **first.model_dump(exclude={"definition_hash", "max_output_tokens"}),
+        max_output_tokens=8_192,
+    )
+    with pytest.raises(OperationRegistrationConflict):
+        registry.register(changed)
+    with pytest.raises(OperationRegistrationConflict):
+        registry.resolve(first.name, definition_hash=changed.definition_hash)
+    with pytest.raises(OperationNotFound):
+        registry.resolve("missing.operation")
+
+
+def test_operation_hash_and_ordered_policy_fields_cannot_be_forged():
+    spec = operation()
+    with pytest.raises(ValidationError, match="definition hash mismatch"):
+        type(spec).model_validate(
+            {
+                **spec.model_dump(),
+                "definition_hash": canonical_hash({"forged": True}),
+            }
+        )
+
+    values = spec.model_dump(exclude={"definition_hash"})
+    values["safety_policy_flags"] = ("z.last", "a.first")
+    with pytest.raises(ValidationError, match="lexicographically sorted"):
+        define_operation(**values)
+
+
+def test_structured_payload_is_canonical_and_returns_fresh_values():
+    payload = build_structured_payload(
+        schema_id="turn_interpret.v1",
+        value={"evidence": [{"claim": "整理測試結果"}]},
+    )
+    loaded = payload.load()
+    loaded["evidence"][0]["claim"] = "mutated"
+
+    assert payload.load()["evidence"][0]["claim"] == "整理測試結果"
+    with pytest.raises(ValidationError, match="canonical JSON"):
+        type(payload).model_validate(
+            {**payload.model_dump(), "canonical_json": '{"z": 1, "a": 2}'}
+        )
+
+
+def test_result_outcomes_are_explicit_and_mutually_exclusive():
+    req = request(attempt=1, attempt_name="success")
+    parsed = build_structured_payload(schema_id="turn_interpret.v1", value={"evidence": []})
+    base = dict(
+        run_id=req.run_id,
+        session_id=req.session_id,
+        turn_id=req.turn_id,
+        operation_id=req.operation_id,
+        attempt_id=req.attempt_id,
+        attempt=req.attempt,
+        operation_name=req.operation_name,
+        operation_definition_hash=req.operation_definition_hash,
+        provider=req.provider,
+        requested_model=req.requested_model,
+        resolved_model=req.requested_model,
+        usage=complete_usage(),
+        latency_ms=5,
+        started_at=req.created_at,
+        completed_at=req.created_at + timedelta(milliseconds=5),
+        prompt_hash=req.prompt_hash,
+        output_schema_id=req.output_schema_id,
+        output_schema_hash=req.output_schema_hash,
+        context_hash=req.context_hash,
+        visible_response_artifact=artifact("model.visible_response", {"response": "visible"}),
+    )
+
+    succeeded = ModelCallResult(
+        **base,
+        outcome=ModelOutcome.SUCCEEDED,
+        finish_reason=FinishReason.COMPLETED,
+        parsed_output=parsed,
+    )
+    refused = ModelCallResult(
+        **base,
+        outcome=ModelOutcome.REFUSED,
+        finish_reason=FinishReason.SAFETY_REFUSAL,
+        refusal=ModelRefusal(reason_code="safety.refusal", safe_message="Request declined."),
+    )
+    incomplete = ModelCallResult(
+        **base,
+        outcome=ModelOutcome.INCOMPLETE,
+        finish_reason=FinishReason.MAX_OUTPUT_TOKENS,
+    )
+    failed = ModelCallResult(
+        **base,
+        outcome=ModelOutcome.FAILED,
+        finish_reason=FinishReason.PROVIDER_ERROR,
+        failure=ModelFailure(
+            kind=FailureKind.RATE_LIMITED,
+            reason_code="provider.rate_limited",
+            retryable=True,
+            safe_message="Provider is busy.",
+        ),
+    )
+
+    assert {succeeded.outcome, refused.outcome, incomplete.outcome, failed.outcome} == set(
+        ModelOutcome
+    )
+    with pytest.raises(ValidationError, match="succeeded result requires only parsed_output"):
+        ModelCallResult(
+            **base,
+            outcome=ModelOutcome.SUCCEEDED,
+            finish_reason=FinishReason.COMPLETED,
+            parsed_output=parsed,
+            refusal=refused.refusal,
+        )
+
+
+def test_unknown_usage_is_null_with_an_explicit_limitation():
+    usage = TokenUsage(limitations=("provider did not report token details",))
+    assert usage.input_tokens is None
+    assert usage.cache_read_tokens is None
+    with pytest.raises(ValidationError, match="null token usage"):
+        TokenUsage()
+
+
+def test_portable_message_history_is_cross_provider_alternating():
+    valid = request(attempt=1, attempt_name="message-order")
+    values = valid.model_dump()
+    values["messages"] = (
+        ModelMessage(role=MessageRole.USER, text="first"),
+        ModelMessage(role=MessageRole.USER, text="second"),
+    )
+    with pytest.raises(ValidationError, match="must alternate"):
+        ModelCallRequest.model_validate(values)
+
+
+@pytest.mark.asyncio
+async def test_scripted_port_exposes_retry_attempts_without_changing_operation_identity():
+    failure = ModelFailure(
+        kind=FailureKind.TRANSPORT_TIMEOUT,
+        reason_code="provider.timeout",
+        retryable=True,
+        safe_message="Provider timed out.",
+    )
+    parsed = build_structured_payload(
+        schema_id="turn_interpret.v1",
+        value={"evidence": [{"claim": "整理測試結果"}]},
+    )
+    port = ScriptedLlmPort(
+        {
+            "turn.interpret": (
+                ScriptedStep(
+                    expected_attempt=1,
+                    outcome=ModelOutcome.FAILED,
+                    finish_reason=FinishReason.PROVIDER_ERROR,
+                    failure=failure,
+                    usage=TokenUsage(limitations=("request failed before usage",)),
+                ),
+                ScriptedStep(
+                    expected_attempt=2,
+                    outcome=ModelOutcome.SUCCEEDED,
+                    finish_reason=FinishReason.COMPLETED,
+                    parsed_output=parsed,
+                    visible_response_artifact=artifact(
+                        "model.visible_response", {"response": "visible"}
+                    ),
+                    usage=complete_usage(),
+                    resolved_model="quality-ceiling-2026-07-01",
+                ),
+            )
+        }
+    )
+    first_request = request(attempt=1, attempt_name="retry-1")
+    second_request = request(attempt=2, attempt_name="retry-2")
+
+    first = await port.generate_structured(first_request)
+    second = await port.generate_structured(second_request)
+
+    assert first.outcome == ModelOutcome.FAILED
+    assert second.outcome == ModelOutcome.SUCCEEDED
+    assert first.operation_id == second.operation_id
+    assert first.attempt_id != second.attempt_id
+    assert first_request.idempotency_key == second_request.idempotency_key
+    assert first.context_hash == second.context_hash
+    assert port.requests == (first_request, second_request)
+    port.assert_exhausted()
+
+
+@pytest.mark.asyncio
+async def test_scripted_port_fails_fast_on_unexpected_order_or_exhaustion():
+    port = ScriptedLlmPort(
+        {
+            "turn.interpret": (
+                ScriptedStep(
+                    expected_attempt=2,
+                    outcome=ModelOutcome.INCOMPLETE,
+                    finish_reason=FinishReason.CONTEXT_WINDOW_EXCEEDED,
+                    usage=TokenUsage(limitations=("cache details unavailable",)),
+                ),
+            )
+        }
+    )
+    with pytest.raises(AssertionError, match="expected attempt 2"):
+        await port.generate_structured(request(attempt=1, attempt_name="wrong"))

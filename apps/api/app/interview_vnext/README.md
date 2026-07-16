@@ -6,6 +6,8 @@
 
 - 目標架構：[`../../../../docs/specs/2026-07-16-interview-ai-vnext-greenfield-architecture.md`](../../../../docs/specs/2026-07-16-interview-ai-vnext-greenfield-architecture.md)
 - V2 研究：[`../../../../docs/specs/2026-07-16-interview-vnext-v2-provider-capture-research.md`](../../../../docs/specs/2026-07-16-interview-vnext-v2-provider-capture-research.md)
+- V2-B persistence reference：[`../../../../docs/specs/2026-07-16-interview-vnext-v2b-durable-persistence-research.md`](../../../../docs/specs/2026-07-16-interview-vnext-v2b-durable-persistence-research.md)
+- V2-B 實作交接：[`../../../../docs/plans/2026-07-16-interview-vnext-v2b-durable-persistence-plan.md`](../../../../docs/plans/2026-07-16-interview-vnext-v2b-durable-persistence-plan.md)
 - 實作順序：[`../../../../docs/plans/2026-07-16-interview-ai-vnext-implementation-plan.md`](../../../../docs/plans/2026-07-16-interview-ai-vnext-implementation-plan.md)
 - 決策：[`../../../../docs/adr/0034-interview-ai-vnext-greenfield-evidence-workflow.md`](../../../../docs/adr/0034-interview-ai-vnext-greenfield-evidence-workflow.md)
 - package 禁令：[`AGENTS.md`](AGENTS.md)
@@ -226,7 +228,7 @@ cd apps/api
 
 2026-07-16 最新驗證：V2 focused suite `22 passed`；完整 `apps/api` suite `337 passed, 111 skipped`。本切片沒有新增 skip。
 
-下一步是 **V2-B durable persistence**：在全新 vNext tables實作 repository/unit-of-work，使 domain state、command/result artifact、checkpoint與 outbox可在同一 transaction提交，再做 rollback、lease expiry與 process-crash recovery整合測試。migration不共用或刪改 v3 rows。
+下一步是 **V2-B durable persistence**。交接規格已裁決為八張全新 vNext tables、canonical aggregate TEXT + immutable artifacts、async repository/UoW、explicit state/checkpoint CAS、transactional outbox `SKIP LOCKED` lease與 checkpoint crash recovery；不先建第二套 evidence/candidate權威表。實作者必須依上方 V2-B reference/plan完成 0010 migration與22個最低 Postgres integration cases，不能只把 in-memory fake換成 ORM。migration不共用或刪改 v3 rows。
 
 ContextBuilder 在 V3 fixed replay operation 開始時實作，輸入只能來自已持久化 state/artifact/reference snapshot。現在先做 Capture 的原因是：沒有可重播 execution record，就無法判斷未來品質差是模型、context selection、verifier 還是 reducer 所造成。
 

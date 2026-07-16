@@ -19,3 +19,5 @@ This package implements ADR 0034 and the 2026-07-16 greenfield architecture.
 - Architecture: `docs/specs/2026-07-16-interview-ai-vnext-greenfield-architecture.md`
 - Decision: `docs/adr/0034-interview-ai-vnext-greenfield-evidence-workflow.md`
 - Build order: `docs/plans/2026-07-16-interview-ai-vnext-implementation-plan.md`
+- V2-B persistence reference: `docs/specs/2026-07-16-interview-vnext-v2b-durable-persistence-research.md`
+- V2-B implementation handoff: `docs/plans/2026-07-16-interview-vnext-v2b-durable-persistence-plan.md`

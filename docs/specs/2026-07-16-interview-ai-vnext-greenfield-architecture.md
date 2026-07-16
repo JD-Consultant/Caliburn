@@ -592,7 +592,7 @@ Global Consolidator 不可增加沒有 evidence 的新 task；它的每一項輸
 
 - completed step 讀既有 artifact，不重跑；
 - started 但無 completion 的 provider call 依 idempotency/timeout policy判斷 retry；
-- reducer 由事件重建 materialized state 並驗 hash；
+- reducer 由 immutable initial-state snapshot + ordered typed command artifacts重播，逐步比對 reduction/state hash；domain/execution event只作變更通知、索引與 trajectory，不冒充完整 replay payload；
 - 已送給使用者的 response 不重新生成；
 - provider session 遺失時用自有 ContextBuilder 重新組 context，不中止整個訪談。
 
@@ -604,7 +604,7 @@ Global Consolidator 不可增加沒有 evidence 的新 task；它的每一項輸
 
 | 層 | 內容 | 保存方式 | 進 prompt 的方式 |
 |---|---|---|---|
-| Record | full transcript、events、raw artifacts | append-only durable store | 只按 operation 需要取片段 |
+| Record | initial state、typed command/reduction artifacts、full transcript、events、raw artifacts | append-only durable store | 只按 operation 需要取片段 |
 | Working state | evidence、episode、gap、candidate、review | typed DB/materialized view | ContextBuilder 產生精簡 view |
 | Model context | 當次 inference token packet | 不作 business source of truth | call 完即可丟棄；capture 留 hash/artifact |
 

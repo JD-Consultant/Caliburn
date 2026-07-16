@@ -3,6 +3,8 @@
 - 日期：2026-07-16
 - 狀態：**執行中；V0 + V1 + V2-A contracts 已完成，下一步 V2-B durable persistence；尚未接 runtime route**
 - 目標架構：[`../specs/2026-07-16-interview-ai-vnext-greenfield-architecture.md`](../specs/2026-07-16-interview-ai-vnext-greenfield-architecture.md)
+- V2-B persistence reference：[`../specs/2026-07-16-interview-vnext-v2b-durable-persistence-research.md`](../specs/2026-07-16-interview-vnext-v2b-durable-persistence-research.md)
+- V2-B 可執行交接：[`2026-07-16-interview-vnext-v2b-durable-persistence-plan.md`](2026-07-16-interview-vnext-v2b-durable-persistence-plan.md)
 - 團隊：一人開發；每個工作包必須可獨立 review、測試、保留或刪除
 - 核心限制：不 import、包裝或雙寫 v3 LLM internals；v3 只作黑箱 baseline/fallback
 
@@ -40,7 +42,7 @@ V8  刪除 v3 internals 與更新現行 design
 | V1-A | 完成 | session/transcript/evidence/inference/episode/gap/candidate/review/state contracts；append/session/evidence reducers；stable reason codes/hash；13 份 committed schema；unit/property-like/schema tests | 不代表可上線，也不代表已完成全 event replay protocol |
 | V1-B | 完成 | episode/gap/inference/candidate/withdraw/review lifecycle reducers；Evidence/Inference 雙向 correction lineage；Gap resolution evidence；deterministic invalidation；human review；共 24 份 schema | 不含 provider、DB、route 或正式 prompt |
 | V2-A | 完成 | provider-neutral request/result/failure、hash-addressed operation registry、strict scripted fake；immutable artifact、version-addressed execution taxonomy/event/hash chain/manifest、outbox 與 multi-attempt operation checkpoint contracts；9 份 committed schema、1 份 taxonomy document、22 個 focused tests | 只有 in-memory contract fake；沒有 DB transaction、外部 exporter、live provider、正式 prompt 或 route |
-| V2-B | 下一步 | — | 新表 migration、repository/unit-of-work、durable outbox lease、checkpoint recovery integration 與 process-crash tests |
+| V2-B | 下一步；交接規格完成 | 八表 schema、canonical serialization、async UoW/repository、atomic transaction、outbox lease SQL、recovery matrix 與 22 個最低 Postgres cases 已寫成 reference/plan | 程式、0010 migration與 Postgres integration tests均尚未實作 |
 | V3+ | 未開始 | — | offline workflow、ContextBuilder、model/prompt eval、Web seam |
 
 V1 的 event 是 domain change notification／artifact index，payload 只有 object ID；目前可重現的是相同初始 state + command stream 的 state/hash。V2-A 已定義 execution event + immutable artifact + outbox + checkpoint protocol，但尚未接資料庫 transaction，因此仍不得宣稱跨 process crash recovery 或完整 event sourcing 已完成。實作細節與完整 lifecycle matrix 見 [`../../apps/api/app/interview_vnext/README.md`](../../apps/api/app/interview_vnext/README.md)。
@@ -255,18 +257,18 @@ interview_vnext/observability/
 
 ### 5.5 persistence migration
 
-在確認 domain/event schema 後才寫 migration。建議新表，不共用 v3 mutable row：
+在確認 domain/event schema 後才寫 migration。V2-B 已完成 persistence 研究與交接裁決：使用全新八表，不共用 v3 mutable row：
 
-- `interview_vnext_sessions`；
-- `interview_vnext_events`；
+- `interview_vnext_sessions`（canonical materialized aggregate）；
+- `interview_vnext_runs`；
 - `interview_vnext_artifacts`；
-- `interview_vnext_evidence`；
-- `interview_vnext_inferences`；
-- `interview_vnext_episodes`；
-- `interview_vnext_candidates`；
-- `interview_vnext_outbox`。
+- `interview_vnext_commands`；
+- `interview_vnext_execution_events`；
+- `interview_vnext_outbox`；
+- `interview_vnext_operation_checkpoints`；
+- `interview_vnext_operation_attempts`。
 
-實際正規化程度可依查詢需求調整，但 immutable event/artifact 和 materialized domain state 要分開。migration 不刪 v3 表。
+V2-B 不先建立 evidence/inference/episode/candidate 的第二套權威表；完整歷史由 immutable command/reduction artifact保存，當前 graph由 session aggregate保存。V5 有實際 read query時才加可由 state hash重建的 projection tables。精確欄位、constraints/indexes、transaction順序、lease SQL與 recovery matrix以 [`../specs/2026-07-16-interview-vnext-v2b-durable-persistence-research.md`](../specs/2026-07-16-interview-vnext-v2b-durable-persistence-research.md) 為準；逐 commit實作順序見 [`2026-07-16-interview-vnext-v2b-durable-persistence-plan.md`](2026-07-16-interview-vnext-v2b-durable-persistence-plan.md)。migration 不刪 v3 表。
 
 ### 5.6 驗收
 
@@ -283,7 +285,7 @@ V2-A 已完成純 contract 與 in-memory fake：可以驗證 operation definitio
 
 2026-07-16 驗證結果：V2 focused suite `22 passed`；完整 API regression `337 passed, 111 skipped`。skipped項目是既有環境／optional tests，不是 V2 新增 skip。
 
-V2-B 才實作 5.5 的 migration、repository/unit-of-work 與 process-crash recovery。至少加入以下整合測試後，5.6 的「capture service 故障補送」與「completed step 讀既有 artifact」才可升為 durable 宣稱：
+V2-B 才實作 5.5 的 migration、repository/unit-of-work 與 process-crash recovery。交接 reference列有22個最低 cases；以下六項是摘要 hard gate。全部 Postgres cases必須實際執行、不得以未設定 `TEST_DATABASE_URL` 的 skip當通過：
 
 1. domain state + command/result artifact + checkpoint + outbox 在同一 DB transaction commit；
 2. transaction rollback 不留下半套 artifact/event；

@@ -1,1 +1,1 @@
-"""Provider-neutral LLM operation boundary (implemented in V2)."""
+"""Provider-neutral LLM operation boundary (V2-A contracts; no live adapter)."""

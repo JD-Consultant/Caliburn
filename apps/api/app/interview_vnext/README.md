@@ -1,10 +1,11 @@
 # Interview AI vNext（隔離開發中）
 
-本 package 是 ADR 0034 的 greenfield 實作區。目前已完成 **V0 + V1 domain foundation**，沒有 route、DB migration、provider call，也沒有被 production composition root import。現行使用者流量仍走 `app/interview/` v3。
+本 package 是 ADR 0034 的 greenfield 實作區。目前已完成 **V0 + V1 domain foundation + V2-A provider/Capture contracts**，沒有 route、DB migration、live provider call，也沒有被 production composition root import。現行使用者流量仍走 `app/interview/` v3。
 
 權威文件：
 
 - 目標架構：[`../../../../docs/specs/2026-07-16-interview-ai-vnext-greenfield-architecture.md`](../../../../docs/specs/2026-07-16-interview-ai-vnext-greenfield-architecture.md)
+- V2 研究：[`../../../../docs/specs/2026-07-16-interview-vnext-v2-provider-capture-research.md`](../../../../docs/specs/2026-07-16-interview-vnext-v2-provider-capture-research.md)
 - 實作順序：[`../../../../docs/plans/2026-07-16-interview-ai-vnext-implementation-plan.md`](../../../../docs/plans/2026-07-16-interview-ai-vnext-implementation-plan.md)
 - 決策：[`../../../../docs/adr/0034-interview-ai-vnext-greenfield-evidence-workflow.md`](../../../../docs/adr/0034-interview-ai-vnext-greenfield-evidence-workflow.md)
 - package 禁令：[`AGENTS.md`](AGENTS.md)
@@ -12,15 +13,18 @@
 ## 目前的程式邊界
 
 ```text
-domain/                 已實作：純 Pydantic contracts、validators、reducers、events、schemas
+domain/                 已實作：純 Pydantic contracts、validators、reducers、domain events、schemas
 application/            空殼：尚未實作 workflow/use case
-llm/ providers/         空殼：尚未選模型、SDK 或 prompt
+llm/                    已實作：neutral operation/request/result/failure、registry、scripted fake、schemas
+providers/              空殼：尚未接 OpenAI/Anthropic SDK、模型或正式 prompt
 knowledge/ persistence/ 空殼：尚未接 reference snapshot 或資料庫
 projection/             空殼：尚未投影到現有 OCS/Web contract
-observability/          空殼：Capture vNext 留到 V2
+observability/          已實作：artifact/event/hash-chain/outbox/checkpoint contracts 與 in-memory fake
 ```
 
 `domain/` 只能依賴 Python 標準庫、Pydantic 和同一 domain package。AST dependency test 會阻止 vNext import v3 internals，也會阻止 domain 偷接 FastAPI、ORM 或 provider SDK。
+
+`llm/` 與 `observability/` 也有 provider dependency guard，不得 import OpenAI、Anthropic、LangChain、LangGraph 或 Pydantic AI。未來 SDK object 只能存在 `providers/` adapter，轉成 neutral result 後就停止向內傳遞。
 
 ## V1 已落實的契約
 
@@ -128,14 +132,83 @@ old immutable state + typed command
 
 這個區分是刻意的：audit event 和完整 event-sourcing payload 是兩種契約，不能因為都叫 event 就混用。
 
+## V2-A Provider-neutral LLM contract
+
+### Operation registry
+
+`OperationSpec` 由 input/output contract、prompt template、context policy、quality profile、deadline/attempt/output budget、allowed tools、repair 與 safety policy 的 canonical content 產生 `definition_hash`。registry 以 stable operation name 查找，拒絕同名不同 definition。provider/model 不在 operation 內；部署與 V6 bake-off 才把 operation definition 綁到 resolved provider/model profile。
+
+`ModelCallRequest` 表示單一 attempt：
+
+- `operation_id` 跨 retry 不變；`attempt_id` 每次唯一、`attempt` 從 1 開始；
+- `idempotency_key` 是 workflow identity，不是假裝 provider exactly-once；
+- prompt、output schema、context packet、selection manifest 都用 artifact ref + canonical hash；
+- instructions/messages 是 portable text contract；messages固定從 user開始、user/assistant交替並以 user結尾，使 Responses與 stateless Messages adapter都能明確投影；provider beta header、cache breakpoint、reasoning/sampling knob不進此模型；
+- request 明列 `output_schema_id`，result 的 parsed payload 必須與它一致。
+
+`ModelCallResult.outcome` 不用含糊的 boolean：
+
+| Outcome | 必要內容 | 不可當成 |
+|---|---|---|
+| `succeeded` | parsed structured payload + visible response artifact + `finish_reason=completed` | domain 已接受；仍需 semantic verifier/reducer |
+| `refused` | normalized refusal + visible response artifact | transport error或可 parser fallback 的 JSON |
+| `incomplete` | non-complete finish reason + visible partial artifact | 可 commit 的 proposal |
+| `failed` | normalized typed failure；output-related failure另需 visible artifact | 一律可 retry；是否 retry 看 `retryable` 與 deadline |
+
+token usage 的每一欄可為 null；有 null 時必須附 limitation，不能把 provider 未回報誤記成 0。visible response只包含 provider 可見輸出，不要求也不保存 hidden chain-of-thought。
+
+`ScriptedLlmPort` 依 operation 消耗明確 script，會檢查 attempt順序、unexpected operation與 script exhaustion。application tests可重現 valid、refusal、incomplete、typed failure與 first-fail-second-success，不必打 live API。
+
+## V2-A Capture contract
+
+### Artifact、execution event與 manifest
+
+`ArtifactRecord` 是 immutable payload：ID、kind、media/schema、canonical content hash、byte size、run/session/turn/operation/attempt與 retention/redaction/test metadata。相同 ID + 相同完整 record可重送；相同 ID + 不同內容是 conflict。
+
+`ExecutionEvent` 與 V1 `DomainEvent` 分開。它記錄 workflow/model/verification 執行，不宣稱自己是員工事實。`event_type` 和 `stage` 是 open `StableName`，由 version-addressed `ExecutionTaxonomy` allowlist驗證；目前 registry與完整名稱在 `observability/taxonomy.py`，committed document在 `observability/taxonomies/interview-vnext-execution.1.0.0.json`。新增 stage不改 event envelope schema，但要新增 taxonomy semver/document，舊版本不可覆寫。每個 run依 `sequence`、`previous_event_hash`、`event_hash` 形成 canonical hash chain；`RunManifest` 保存 event count、首尾 hash與 root artifact refs。
+
+hash chain能偵測缺漏／改寫，但目前不是外部數位簽章或 WORM storage。in-memory `CaptureRecorder` 會先驗 artifact ref、enqueue outbox再加入 run chain；同 event ID重送相同內容為 idempotent，不同內容為 conflict。
+
+### Outbox
+
+`InMemoryOutbox` 的 contract狀態是：
+
+```text
+pending -> leased -> delivered
+             └----> retry_wait -> leased
+             └----> dead_letter
+expired lease -----------------> leased by another worker
+```
+
+lease有 owner/expiry，每次 delivery attempt 可見；retry需明確 next-attempt time與 error code。這只驗證 state machine，尚未代表 PostgreSQL row lock、跨 process lease或外部 exporter 已完成。
+
+### Operation checkpoint與 recovery
+
+```text
+prepared -> calling -> provider_completed -> verified -> committed
+                 └------------- failure/policy reject ------------> failed
+```
+
+- `prepared` 已有 request artifact與 state-before hash；
+- `calling` 已有唯一 active attempt；每次 retry前先把前一個 attempt result artifact append到 checkpoint，再以新 attempt ID與遞增序號啟動下一次；crash後可 reconcile provider job或依 deadline policy續行；
+- `provider_completed` 已有 normalized result artifact，recovery不得重打 provider；
+- `verified` 已有 verification artifact，accepted才執行 idempotent reducer command；
+- `committed` 已有 domain result、response artifact與 state-after hash，可直接重用；
+- `failed` 保存 terminal failure artifact/reason；不做無上限 retry。
+
+transition會拒絕跳步、時間倒退或 terminal改寫；重送相同 artifact的同一 transition為 idempotent。
+
 ## JSON Schema
 
-committed schema 位於 `domain/schemas/`，目前共 24 份，涵蓋 9 個 materialized object、1 個 event union 與 14 個 command seam；檔名與 `$id` 都有 major version。修改 Pydantic contract 後執行：
+committed schema 目前共 33 份：`domain/schemas/` 24 份、`llm/schemas/` 3 份、`observability/schemas/` 6 份。檔名與 `$id` 都有 major version。修改 Pydantic contract 後執行：
 
 ```powershell
 cd apps/api
 .venv\Scripts\python.exe -m app.interview_vnext.domain.write_schemas
-.venv\Scripts\python.exe -m pytest tests/test_interview_vnext_schemas.py -q
+.venv\Scripts\python.exe -m app.interview_vnext.llm.write_schemas
+.venv\Scripts\python.exe -m app.interview_vnext.observability.write_schemas
+.venv\Scripts\python.exe -m app.interview_vnext.observability.write_taxonomies
+.venv\Scripts\python.exe -m pytest tests/test_interview_vnext_schemas.py tests/test_interview_vnext_execution_schemas.py -q
 ```
 
 Schema golden test 會比較 committed JSON 與當前 Pydantic codegen；未知欄位採 strict reject。runtime validator 的跨物件不變量（例如 quote 對 transcript、lineage cycle）無法只靠 JSON Schema 表達，consumer 仍必須走 domain verifier。
@@ -148,11 +221,13 @@ V1-B 沒有靜默覆寫破壞性契約：`Evidence`（withdraw authority）、`I
 
 ```powershell
 cd apps/api
-.venv\Scripts\python.exe -m pytest tests/test_interview_vnext_domain.py tests/test_interview_vnext_workflow_reducers.py tests/test_interview_vnext_dependencies.py tests/test_interview_vnext_schemas.py -q
+.venv\Scripts\python.exe -m pytest tests/test_interview_vnext_domain.py tests/test_interview_vnext_workflow_reducers.py tests/test_interview_vnext_llm.py tests/test_interview_vnext_capture.py tests/test_interview_vnext_dependencies.py tests/test_interview_vnext_schemas.py tests/test_interview_vnext_execution_schemas.py -q
 ```
 
-下一步是 **V2 provider-neutral LLM port + Capture vNext**。先定義 operation registry、typed result/error、fake provider、execution artifact/event、outbox 與 crash-recovery contract；仍不接 production route，也不先寫正式訪談 Prompt。OpenAI／Anthropic adapter 只能依賴 neutral port，不能讓 SDK object 進入 domain。
+2026-07-16 最新驗證：V2 focused suite `22 passed`；完整 `apps/api` suite `337 passed, 111 skipped`。本切片沒有新增 skip。
+
+下一步是 **V2-B durable persistence**：在全新 vNext tables實作 repository/unit-of-work，使 domain state、command/result artifact、checkpoint與 outbox可在同一 transaction提交，再做 rollback、lease expiry與 process-crash recovery整合測試。migration不共用或刪改 v3 rows。
 
 ContextBuilder 在 V3 fixed replay operation 開始時實作，輸入只能來自已持久化 state/artifact/reference snapshot。現在先做 Capture 的原因是：沒有可重播 execution record，就無法判斷未來品質差是模型、context selection、verifier 還是 reducer 所造成。
 
-本階段明確未做 route、migration、Web seam、模型 bake-off、ContextBuilder 或正式 Prompt；production 行為仍為零變化。
+本階段明確未做 route、migration、外部 Capture exporter、live OpenAI/Anthropic adapter、Web seam、模型 bake-off、ContextBuilder 或正式 Prompt；production 行為仍為零變化。只有完成 V2-B DB tests後才能宣稱 durable outbox/checkpoint；只有 V3 fixed replay與 V6 bake-off通過後才能談模型品質或上線。

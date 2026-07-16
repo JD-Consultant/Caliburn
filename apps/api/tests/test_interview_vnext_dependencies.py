@@ -42,3 +42,20 @@ def test_domain_imports_only_stdlib_pydantic_or_itself():
             if not allowed:
                 violations.append(f"{path.relative_to(DOMAIN_ROOT)}:{line} imports {module}")
     assert violations == []
+
+
+def test_neutral_llm_and_capture_contracts_do_not_import_provider_or_agent_sdks():
+    forbidden_roots = {
+        "anthropic",
+        "openai",
+        "langchain",
+        "langgraph",
+        "pydantic_ai",
+    }
+    violations: list[str] = []
+    for relative_root in ("llm", "observability"):
+        for path in (ROOT / relative_root).rglob("*.py"):
+            for line, module in _imports(path):
+                if module.split(".", 1)[0] in forbidden_roots:
+                    violations.append(f"{path.relative_to(ROOT)}:{line} imports {module}")
+    assert violations == []

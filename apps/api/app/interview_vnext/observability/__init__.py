@@ -1,1 +1,1 @@
-"""Architecture-neutral execution events and capture outbox (implemented in V2)."""
+"""Execution/Capture V2-A contracts; durable persistence arrives in V2-B."""

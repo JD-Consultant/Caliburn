@@ -11,9 +11,9 @@ from pydantic import Field
 
 from app.interview_vnext.domain.base import DomainModel
 from app.interview_vnext.domain.identifiers import NonEmptyText
-from app.interview_vnext.observability.artifacts import ArtifactRef
+from app.interview_vnext.observability.artifacts import ArtifactRecord, ArtifactRef
 
-from .port import LlmPort, ModelCallRequest
+from .port import LlmPort, ModelCallEnvelope, ModelCallRequest
 from .result import (
     FinishReason,
     ModelCallResult,
@@ -35,6 +35,7 @@ class ScriptedStep(DomainModel):
     provider_finish_reason: str | None = None
     parsed_output: StructuredPayload | None = None
     visible_response_artifact: ArtifactRef | None = None
+    supporting_artifacts: tuple[ArtifactRecord, ...] = ()
     refusal: ModelRefusal | None = None
     failure: ModelFailure | None = None
     usage: TokenUsage
@@ -67,7 +68,7 @@ class ScriptedLlmPort(LlmPort):
         if remaining:
             raise AssertionError(f"scripted LLM responses remain: {remaining}")
 
-    async def generate_structured(self, request: ModelCallRequest) -> ModelCallResult:
+    async def generate_structured(self, request: ModelCallRequest) -> ModelCallEnvelope:
         with self._lock:
             try:
                 steps = self._scripts[request.operation_name]
@@ -89,7 +90,7 @@ class ScriptedLlmPort(LlmPort):
             self._requests.append(request)
 
         completed_at = request.created_at + timedelta(milliseconds=step.latency_ms)
-        return ModelCallResult(
+        result = ModelCallResult(
             run_id=request.run_id,
             session_id=request.session_id,
             turn_id=request.turn_id,
@@ -118,4 +119,8 @@ class ScriptedLlmPort(LlmPort):
             output_schema_id=request.output_schema_id,
             output_schema_hash=request.output_schema_hash,
             context_hash=request.context_hash,
+        )
+        return ModelCallEnvelope(
+            result=result,
+            supporting_artifacts=step.supporting_artifacts,
         )

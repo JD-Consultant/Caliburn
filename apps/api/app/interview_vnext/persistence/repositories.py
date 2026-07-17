@@ -94,6 +94,10 @@ def translate_integrity_error(exc: IntegrityError) -> PersistenceError | None:
          lambda: CheckpointConflict("operation idempotency key raced another writer")),
         ("uq_ivn_attempts_operation_attempt",
          lambda: CheckpointConflict("attempt number raced another writer")),
+        ("uq_ivn_attempts_tenant_attempt",
+         lambda: CheckpointConflict("attempt id raced another writer")),
+        ("interview_vnext_operation_attempts_pkey",
+         lambda: CheckpointConflict("attempt id raced another writer")),
     ):
         if fragment in message:
             return factory()

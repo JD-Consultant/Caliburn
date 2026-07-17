@@ -57,7 +57,7 @@ def turn_interpret_operation() -> OperationSpec:
         allowed_tools=(),
         repair_policy=RepairPolicy(
             schema_repair_attempts=1,
-            semantic_repair_attempts=1,
+            semantic_repair_attempts=0,
         ),
         safety_policy_flags=("no-chain-of-thought", "untrusted-input-boundary"),
     )

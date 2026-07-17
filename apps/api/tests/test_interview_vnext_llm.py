@@ -8,7 +8,12 @@ from pydantic import ValidationError
 
 from app.interview_vnext.domain.hashing import canonical_hash
 from app.interview_vnext.llm.operation import ContractIdentity, define_operation
-from app.interview_vnext.llm.port import MessageRole, ModelCallRequest, ModelMessage
+from app.interview_vnext.llm.port import (
+    MessageRole,
+    ModelCallEnvelope,
+    ModelCallRequest,
+    ModelMessage,
+)
 from app.interview_vnext.llm.registry import (
     OperationNotFound,
     OperationRegistrationConflict,
@@ -70,6 +75,65 @@ def artifact(kind: str, payload) -> object:
         session_id=uid("session"),
         created_at=NOW,
     ).ref
+
+
+def attempt_artifact(request: ModelCallRequest, kind: str, payload):
+    return build_inline_artifact(
+        artifact_id=uid(f"artifact:{kind}:{request.attempt_id}"),
+        kind=kind,
+        media_type="application/json",
+        payload=payload,
+        run_id=request.run_id,
+        session_id=request.session_id,
+        turn_id=request.turn_id,
+        operation_id=request.operation_id,
+        attempt_id=request.attempt_id,
+        created_at=request.created_at,
+    )
+
+
+def test_model_envelope_rejects_dangling_visible_response_ref() -> None:
+    model_request = request(attempt=1, attempt_name="dangling-envelope")
+    visible = attempt_artifact(
+        model_request, "model.visible_response", {"response": "visible"}
+    )
+    result = ModelCallResult(
+        run_id=model_request.run_id,
+        session_id=model_request.session_id,
+        turn_id=model_request.turn_id,
+        operation_id=model_request.operation_id,
+        attempt_id=model_request.attempt_id,
+        attempt=model_request.attempt,
+        operation_name=model_request.operation_name,
+        operation_definition_hash=model_request.operation_definition_hash,
+        provider=model_request.provider,
+        requested_model=model_request.requested_model,
+        resolved_model=model_request.requested_model,
+        outcome=ModelOutcome.SUCCEEDED,
+        finish_reason=FinishReason.COMPLETED,
+        parsed_output=build_structured_payload(
+            schema_id=model_request.output_schema_id,
+            value={"observations": []},
+        ),
+        visible_response_artifact=visible.ref,
+        usage=TokenUsage(
+            input_tokens=1,
+            output_tokens=1,
+            cache_read_tokens=0,
+            cache_write_tokens=0,
+            reasoning_tokens=0,
+        ),
+        latency_ms=1,
+        started_at=model_request.created_at,
+        completed_at=model_request.created_at + timedelta(milliseconds=1),
+        prompt_hash=model_request.prompt_hash,
+        output_schema_id=model_request.output_schema_id,
+        output_schema_hash=model_request.output_schema_hash,
+        context_hash=model_request.context_hash,
+    )
+
+    with pytest.raises(ValidationError, match="missing a referenced"):
+        ModelCallEnvelope(result=result, supporting_artifacts=())
 
 
 def request(*, attempt: int, attempt_name: str) -> ModelCallRequest:
@@ -264,6 +328,11 @@ async def test_scripted_port_exposes_retry_attempts_without_changing_operation_i
         schema_id="turn_interpret.v1",
         value={"evidence": [{"claim": "整理測試結果"}]},
     )
+    first_request = request(attempt=1, attempt_name="retry-1")
+    second_request = request(attempt=2, attempt_name="retry-2")
+    visible = attempt_artifact(
+        second_request, "model.visible_response", {"response": "visible"}
+    )
     port = ScriptedLlmPort(
         {
             "turn.interpret": (
@@ -279,20 +348,18 @@ async def test_scripted_port_exposes_retry_attempts_without_changing_operation_i
                     outcome=ModelOutcome.SUCCEEDED,
                     finish_reason=FinishReason.COMPLETED,
                     parsed_output=parsed,
-                    visible_response_artifact=artifact(
-                        "model.visible_response", {"response": "visible"}
-                    ),
+                    visible_response_artifact=visible.ref,
+                    supporting_artifacts=(visible,),
                     usage=complete_usage(),
                     resolved_model="quality-ceiling-2026-07-01",
                 ),
             )
         }
     )
-    first_request = request(attempt=1, attempt_name="retry-1")
-    second_request = request(attempt=2, attempt_name="retry-2")
-
-    first = await port.generate_structured(first_request)
-    second = await port.generate_structured(second_request)
+    first_envelope = await port.generate_structured(first_request)
+    second_envelope = await port.generate_structured(second_request)
+    first = first_envelope.result
+    second = second_envelope.result
 
     assert first.outcome == ModelOutcome.FAILED
     assert second.outcome == ModelOutcome.SUCCEEDED
@@ -300,6 +367,7 @@ async def test_scripted_port_exposes_retry_attempts_without_changing_operation_i
     assert first.attempt_id != second.attempt_id
     assert first_request.idempotency_key == second_request.idempotency_key
     assert first.context_hash == second.context_hash
+    assert second_envelope.supporting_artifacts == (visible,)
     assert port.requests == (first_request, second_request)
     port.assert_exhausted()
 

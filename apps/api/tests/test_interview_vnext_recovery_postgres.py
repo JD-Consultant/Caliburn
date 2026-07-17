@@ -19,6 +19,7 @@ import sqlalchemy as sa
 from app.interview_vnext.application.durable_commands import apply_durable_command
 from app.interview_vnext.application.durable_operations import (
     AttemptOutcome,
+    claim_attempt_for_provider,
     commit_verified_noop_operation,
     commit_verified_operation,
     fail_operation,
@@ -78,12 +79,13 @@ def op_id(ids) -> UUID:
     return uuid5(NAMESPACE_URL, f"caliburn-recovery-op:{ids.session_id}")
 
 
-def artifact(ids, name: str, payload) -> object:
+def artifact(ids, name: str, payload, *, attempt_id: UUID | None = None) -> object:
     return build_inline_artifact(
         artifact_id=uuid5(NAMESPACE_URL, f"caliburn-recovery-art:{ids.session_id}:{name}"),
         kind="model.call_result" if "result" in name else "model.request",
         media_type="application/json", payload=payload, run_id=ids.run_id,
         session_id=ids.session_id, operation_id=op_id(ids),
+        attempt_id=attempt_id,
         created_at=NOW, contains_test_data=True)
 
 
@@ -134,7 +136,12 @@ async def record(factory, ids, *, attempt_id: UUID, name: str, outcome: AttemptO
     return await record_attempt_result(
         uow_factory(factory), tenant_id=ids.tenant_id, operation_id=op_id(ids),
         attempt_id=attempt_id,
-        result_artifact=artifact(ids, name, {"outcome": outcome.value, "n": name}),
+        result_artifact=artifact(
+            ids,
+            name,
+            {"outcome": outcome.value, "n": name},
+            attempt_id=attempt_id,
+        ),
         outcome=outcome, max_attempts=MAX_ATTEMPTS, event_id=uuid4(),
         occurred_at=at or NOW + timedelta(seconds=3))
 
@@ -249,6 +256,33 @@ async def test_two_recovery_workers_only_one_wins_cas(postgres_session_factory,
     losers = [r for r in results if isinstance(r, Exception)]
     assert len(winners) == 1 and len(losers) == 1
     assert isinstance(losers[0], CheckpointConflict)
+    assert len(await _attempt_rows(postgres_session_factory, ids)) == 1
+
+
+async def test_same_attempt_claim_race_grants_exactly_one_provider_owner(
+        postgres_session_factory, vnext_profile):
+    ids = vnext_profile
+    await bootstrap(postgres_session_factory, ids)
+    await prepare(postgres_session_factory, ids)
+    attempt_id = uuid4()
+
+    async def claim():
+        return await claim_attempt_for_provider(
+            uow_factory(postgres_session_factory),
+            tenant_id=ids.tenant_id,
+            operation_id=op_id(ids),
+            attempt_id=attempt_id,
+            provider="scripted",
+            requested_model="fake-model",
+            deadline_at=DEADLINE,
+            max_attempts=MAX_ATTEMPTS,
+            call_event_id=uuid5(attempt_id, "call-started"),
+            occurred_at=NOW + timedelta(seconds=2),
+        )
+
+    first, second = await asyncio.gather(claim(), claim())
+    assert sorted((first[2], second[2])) == [False, True]
+    assert first[1] == second[1]
     assert len(await _attempt_rows(postgres_session_factory, ids)) == 1
 
 

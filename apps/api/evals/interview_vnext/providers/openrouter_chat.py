@@ -1375,7 +1375,8 @@ class OpenRouterChatEvalAdapter(LlmPort):
             "region": _json_safe(routing.region),
             "generation_id": generation_id,
             "http_request_id": request_id,
-            "cost": str(cost) if cost is not None else None,
+            "cost": _decimal_str(cost),
+            "usage_total_mismatch": _usage_total_mismatch(usage),
             "conformance": routing_conformance(routing),
         }
         return self._supporting_artifact(
@@ -1471,6 +1472,35 @@ def routing_conformance(routing: _RoutingCheck) -> dict[str, Any]:
         "single_upstream_attempt": routing.single_upstream_attempt,
         "pipeline_clean": routing.pipeline_clean,
     }
+
+
+def _decimal_str(cost: Any) -> str | None:
+    """Canonicalize cost as a decimal string; never recompute with binary float."""
+
+    if cost is None:
+        return None
+    if isinstance(cost, bool):
+        return None
+    if isinstance(cost, str):
+        return cost
+    if isinstance(cost, int):
+        return str(cost)
+    if isinstance(cost, float):
+        # `repr` round-trips the exact float without adding precision noise.
+        return repr(cost)
+    return None
+
+
+def _usage_total_mismatch(usage: dict[str, Any]) -> bool:
+    prompt = usage.get("prompt_tokens")
+    completion = usage.get("completion_tokens")
+    total = usage.get("total_tokens")
+    if not all(
+        isinstance(value, int) and not isinstance(value, bool)
+        for value in (prompt, completion, total)
+    ):
+        return False
+    return prompt + completion != total
 
 
 def _error_fields(error: dict[str, Any]) -> tuple[str | None, str | None, int | None]:

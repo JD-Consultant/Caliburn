@@ -709,3 +709,430 @@ class TestErrorMatrix:
         assert record.attempt_id == request.attempt_id
         assert record.retention_class == "eval"
         assert "sk-or" not in record.inline_content
+
+
+# ============================ R4: success / routing / usage ==================
+
+EXPECTED_SUCCESS_OUTPUT = {
+    "schema_version": "turn_interpret_output.v1",
+    "observations": [],
+    "user_signal": "answer",
+    "episode_signal": "continue",
+    "emergent_topics": [],
+    "insufficiencies": [],
+}
+
+
+def clean_metadata(**overrides: Any) -> dict[str, Any]:
+    metadata: dict[str, Any] = {
+        "requested": REQUESTED_MODEL,
+        "strategy": "direct",
+        "attempt": 1,
+        "endpoints": [
+            {"provider": "TestHost", "model": REQUESTED_MODEL, "selected": True}
+        ],
+        "attempts": [{"provider": "TestHost", "model": REQUESTED_MODEL, "status": 200}],
+        "pipeline": [],
+    }
+    metadata.update(overrides)
+    return metadata
+
+
+def success_body(**overrides: Any) -> dict[str, Any]:
+    body = fixture_json("success.json")
+    metadata_overrides = overrides.pop("metadata", None)
+    body.update(overrides)
+    if metadata_overrides is not None:
+        body["openrouter_metadata"] = metadata_overrides
+    return body
+
+
+def respond(body: dict[str, Any], *, status: int = 200, headers: dict | None = None):
+    return httpx.Response(
+        status, json=body, headers=headers or {"x-request-id": "req_fx_success"}
+    )
+
+
+class TestSuccessPath:
+    async def test_success_parses_single_object_with_full_capture(self):
+        adapter, calls = make_adapter(lambda request: fixture_response("success.json"))
+        envelope = await adapter.generate_structured(make_request())
+        result = envelope.result
+        assert len(calls) == 1
+        assert result.outcome == ModelOutcome.SUCCEEDED
+        assert result.finish_reason == FinishReason.COMPLETED
+        assert result.provider_finish_reason == "chat:stop|native:end_turn"
+        assert result.resolved_model == REQUESTED_MODEL
+        assert result.provider_request_id == "req_fx_success"
+        assert result.provider_conversation_id is None
+        assert result.parsed_output is not None
+        assert result.parsed_output.load() == EXPECTED_SUCCESS_OUTPUT
+
+        usage = result.usage
+        assert usage.input_tokens == 1200
+        assert usage.output_tokens == 350
+        assert usage.cache_read_tokens == 0
+        assert usage.cache_write_tokens == 256
+        assert usage.reasoning_tokens == 128
+        assert usage.limitations == ()
+
+        raw = artifact_by_label(envelope, RAW_ARTIFACT_LABEL)
+        assert raw["schema_version"] == "openrouter_chat_raw.v1"
+        assert raw["gateway"] == "openrouter"
+        assert raw["http"]["status_code"] == 200
+        assert raw["redactions"] == []
+
+        routing = artifact_by_label(envelope, ROUTING_ARTIFACT_LABEL)
+        assert routing["resolved_model"] == REQUESTED_MODEL
+        assert routing["configured_endpoint_slug"] == ENDPOINT_SLUG
+        assert routing["expected_provider_name"] == "TestHost"
+        assert routing["selected_provider_name"] == "TestHost"
+        assert routing["selected_model"] == REQUESTED_MODEL
+        assert routing["strategy"] == "direct"
+        assert routing["router_attempt"] == 1
+        assert routing["generation_id"] == "gen-fx-success"
+        assert isinstance(routing["cost"], str)
+        assert float(routing["cost"]) == pytest.approx(0.00123)
+        assert routing["usage_total_mismatch"] is False
+        assert routing["conformance"] == {
+            "metadata_present": True,
+            "model_match": True,
+            "provider_model_match": True,
+            "single_upstream_attempt": True,
+            "pipeline_clean": True,
+        }
+
+        visible = artifact_by_label(envelope, VISIBLE_ARTIFACT_LABEL)
+        assert visible["schema_version"] == "provider_visible_response.v1"
+        assert visible["items"][0]["type"] == "output_text"
+        assert visible["items"][0]["choice_index"] == 0
+        assert_no_secret_anywhere(envelope)
+
+    async def test_unknown_additive_fields_still_succeed(self):
+        body = success_body(
+            system_fingerprint="fp_fx",
+            some_future_field={"new": True},
+            metadata=clean_metadata(future_router_field="ignored"),
+        )
+        adapter, _ = make_adapter(lambda request: respond(body))
+        envelope = await adapter.generate_structured(make_request())
+        assert envelope.result.outcome == ModelOutcome.SUCCEEDED
+        raw = artifact_by_label(envelope, RAW_ARTIFACT_LABEL)
+        assert raw["body"]["system_fingerprint"] == "fp_fx"
+
+    async def test_length_is_incomplete_and_partial_preserved(self):
+        adapter, _ = make_adapter(lambda request: fixture_response("length.json"))
+        envelope = await adapter.generate_structured(make_request())
+        result = envelope.result
+        assert result.outcome == ModelOutcome.INCOMPLETE
+        assert result.finish_reason == FinishReason.MAX_OUTPUT_TOKENS
+        assert result.provider_finish_reason == "chat:length|native:max_tokens"
+        assert result.parsed_output is None
+        assert result.failure is None
+        assert result.refusal is None
+        assert result.usage.reasoning_tokens == 2048
+        assert result.visible_response_artifact is not None
+
+    async def test_content_filter_is_refusal(self):
+        adapter, _ = make_adapter(
+            lambda request: fixture_response("content-filter.json")
+        )
+        envelope = await adapter.generate_structured(make_request())
+        result = envelope.result
+        assert result.outcome == ModelOutcome.REFUSED
+        assert result.finish_reason == FinishReason.SAFETY_REFUSAL
+        assert result.parsed_output is None
+        assert result.refusal is not None
+        assert result.refusal.safe_message == "The model declined this request."
+        assert result.refusal.provider_category == "content_filter"
+        visible = artifact_by_label(envelope, VISIBLE_ARTIFACT_LABEL)
+        assert visible["items"][0]["text"] == "I cannot continue with this request."
+
+    async def test_tool_calls_are_not_executed(self):
+        adapter, calls = make_adapter(lambda request: fixture_response("tool-calls.json"))
+        envelope = await adapter.generate_structured(make_request())
+        assert len(calls) == 1
+        assert_failure(
+            envelope,
+            kind=FailureKind.OUTPUT_PARSE_FAILED,
+            reason_code="openrouter.unexpected_tool_calls",
+            retryable=False,
+            finish_reason=FinishReason.TOOL_USE,
+        )
+
+    async def test_empty_content_is_retryable_provider_error(self):
+        adapter, _ = make_adapter(lambda request: fixture_response("empty-content.json"))
+        envelope = await adapter.generate_structured(make_request())
+        assert_failure(
+            envelope,
+            kind=FailureKind.OUTPUT_PARSE_FAILED,
+            reason_code="openrouter.empty_content",
+            retryable=True,
+        )
+
+    async def test_invalid_json_is_not_repaired(self):
+        adapter, _ = make_adapter(lambda request: fixture_response("invalid-json.json"))
+        envelope = await adapter.generate_structured(make_request())
+        assert_failure(
+            envelope,
+            kind=FailureKind.OUTPUT_PARSE_FAILED,
+            reason_code="openrouter.output_parse_failed",
+            retryable=False,
+        )
+        assert envelope.result.parsed_output is None
+        visible = artifact_by_label(envelope, VISIBLE_ARTIFACT_LABEL)
+        assert visible["items"][0]["text"].startswith("```json")
+
+    async def test_non_object_root_is_schema_invalid(self):
+        adapter, _ = make_adapter(
+            lambda request: fixture_response("non-object-root.json")
+        )
+        envelope = await adapter.generate_structured(make_request())
+        assert_failure(
+            envelope,
+            kind=FailureKind.OUTPUT_SCHEMA_INVALID,
+            reason_code="openrouter.output_schema_invalid",
+            retryable=False,
+        )
+
+    async def test_resolved_model_mismatch_fails_closed(self):
+        adapter, _ = make_adapter(
+            lambda request: fixture_response("resolved-model-mismatch.json")
+        )
+        envelope = await adapter.generate_structured(make_request())
+        assert_failure(
+            envelope,
+            kind=FailureKind.RESOLVED_MODEL_MISMATCH,
+            reason_code="openrouter.resolved_model_mismatch",
+            retryable=False,
+        )
+        assert envelope.result.resolved_model == "testlab/analyst-mini"
+
+    async def test_prefix_model_is_not_accepted(self):
+        body = success_body(model="testlab/analyst-large-2026")
+        adapter, _ = make_adapter(lambda request: respond(body))
+        envelope = await adapter.generate_structured(make_request())
+        assert_failure(
+            envelope,
+            kind=FailureKind.RESOLVED_MODEL_MISMATCH,
+            reason_code="openrouter.resolved_model_mismatch",
+            retryable=False,
+        )
+
+    async def test_multiple_choices_is_cardinality_failure(self):
+        adapter, _ = make_adapter(
+            lambda request: fixture_response("multiple-choices.json")
+        )
+        envelope = await adapter.generate_structured(make_request())
+        assert_failure(
+            envelope,
+            kind=FailureKind.OUTPUT_PARSE_FAILED,
+            reason_code="openrouter.choice_cardinality_invalid",
+            retryable=False,
+        )
+        visible = artifact_by_label(envelope, VISIBLE_ARTIFACT_LABEL)
+        assert len(visible["items"]) == 2
+
+    async def test_native_finish_reason_is_preserved_losslessly(self):
+        body = success_body()
+        body["choices"][0]["native_finish_reason"] = "stop_sequence_x"
+        adapter, _ = make_adapter(lambda request: respond(body))
+        envelope = await adapter.generate_structured(make_request())
+        assert envelope.result.provider_finish_reason == "chat:stop|native:stop_sequence_x"
+
+
+class TestReasoningRedaction:
+    async def test_reasoning_text_is_redacted_and_never_visible(self):
+        adapter, _ = make_adapter(
+            lambda request: fixture_response("success-with-reasoning.json")
+        )
+        envelope = await adapter.generate_structured(make_request())
+        result = envelope.result
+        assert result.outcome == ModelOutcome.SUCCEEDED
+        assert result.usage.reasoning_tokens == 256
+
+        raw = artifact_by_label(envelope, RAW_ARTIFACT_LABEL)
+        assert raw["redaction_status"] == "redacted"
+        assert "reasoning" in raw["redactions"]
+        message = raw["body"]["choices"][0]["message"]
+        assert message["reasoning"]["redacted"] is True
+        assert message["reasoning"]["present"] is True
+        assert "sha256:" in message["reasoning"]["sha256"]
+
+        blob = canonical_json(envelope.result) + "".join(
+            record.inline_content for record in envelope.supporting_artifacts
+        )
+        assert "SECRET CHAIN OF THOUGHT" not in blob
+        assert "step one secret" not in blob
+
+        visible = artifact_by_label(envelope, VISIBLE_ARTIFACT_LABEL)
+        for item in visible["items"]:
+            assert "SECRET" not in item["text"]
+
+
+class TestUsageMapping:
+    async def test_usage_missing_is_all_null_with_limitation(self):
+        adapter, _ = make_adapter(lambda request: fixture_response("usage-missing.json"))
+        envelope = await adapter.generate_structured(make_request())
+        usage = envelope.result.usage
+        assert envelope.result.outcome == ModelOutcome.SUCCEEDED
+        assert usage.input_tokens is None
+        assert usage.output_tokens is None
+        assert usage.reasoning_tokens is None
+        assert usage.limitations == ("openrouter response did not include usage",)
+
+    async def test_usage_zeros_are_preserved(self):
+        adapter, _ = make_adapter(lambda request: fixture_response("usage-zeros.json"))
+        envelope = await adapter.generate_structured(make_request())
+        usage = envelope.result.usage
+        assert usage.input_tokens == 0
+        assert usage.output_tokens == 0
+        assert usage.cache_read_tokens == 0
+        assert usage.cache_write_tokens == 0
+        assert usage.reasoning_tokens == 0
+        assert usage.limitations == ()
+        routing = artifact_by_label(envelope, ROUTING_ARTIFACT_LABEL)
+        assert routing["cost"] == "0"
+
+    async def test_nested_usage_details_missing_adds_sorted_limitations(self):
+        body = success_body()
+        body["usage"] = {"prompt_tokens": 100, "completion_tokens": 50, "total_tokens": 150}
+        adapter, _ = make_adapter(lambda request: respond(body))
+        envelope = await adapter.generate_structured(make_request())
+        usage = envelope.result.usage
+        assert usage.input_tokens == 100
+        assert usage.output_tokens == 50
+        assert usage.cache_read_tokens is None
+        assert usage.reasoning_tokens is None
+        assert list(usage.limitations) == sorted(usage.limitations)
+        assert len(set(usage.limitations)) == len(usage.limitations)
+
+    async def test_usage_total_mismatch_is_flagged_without_changing_values(self):
+        body = success_body()
+        body["usage"] = {
+            "prompt_tokens": 100,
+            "completion_tokens": 50,
+            "total_tokens": 999,
+        }
+        adapter, _ = make_adapter(lambda request: respond(body))
+        envelope = await adapter.generate_structured(make_request())
+        assert envelope.result.usage.input_tokens == 100
+        routing = artifact_by_label(envelope, ROUTING_ARTIFACT_LABEL)
+        assert routing["usage_total_mismatch"] is True
+
+    async def test_decimal_cost_is_not_recomputed_as_float(self):
+        body = success_body()
+        body["usage"]["cost"] = "0.0001234567890123"
+        adapter, _ = make_adapter(lambda request: respond(body))
+        envelope = await adapter.generate_structured(make_request())
+        routing = artifact_by_label(envelope, ROUTING_ARTIFACT_LABEL)
+        assert routing["cost"] == "0.0001234567890123"
+
+
+class TestRoutingContamination:
+    async def _run(self, metadata):
+        body = success_body(metadata=metadata)
+        adapter, _ = make_adapter(lambda request: respond(body))
+        return await adapter.generate_structured(make_request())
+
+    async def test_metadata_missing_is_contaminated(self):
+        body = success_body()
+        del body["openrouter_metadata"]
+        adapter, _ = make_adapter(lambda request: respond(body))
+        envelope = await adapter.generate_structured(make_request())
+        assert_failure(
+            envelope,
+            kind=FailureKind.UNKNOWN_PROVIDER_FAILURE,
+            reason_code="openrouter.route_contaminated",
+            retryable=False,
+        )
+
+    async def test_requested_model_mismatch_is_contaminated(self):
+        envelope = await self._run(clean_metadata(requested="testlab/other"))
+        assert_failure(
+            envelope,
+            kind=FailureKind.UNKNOWN_PROVIDER_FAILURE,
+            reason_code="openrouter.route_contaminated",
+            retryable=False,
+        )
+
+    @pytest.mark.parametrize("strategy", ["auto", "latest", "fallback", "pareto", "fusion"])
+    async def test_non_direct_strategy_is_contaminated(self, strategy):
+        envelope = await self._run(clean_metadata(strategy=strategy))
+        assert envelope.result.failure.reason_code == "openrouter.route_contaminated"
+
+    async def test_router_attempt_gt_one_is_contaminated(self):
+        envelope = await self._run(clean_metadata(attempt=2))
+        assert envelope.result.failure.reason_code == "openrouter.route_contaminated"
+
+    async def test_selected_provider_mismatch_is_contaminated(self):
+        envelope = await self._run(
+            clean_metadata(
+                endpoints=[
+                    {"provider": "OtherHost", "model": REQUESTED_MODEL, "selected": True}
+                ]
+            )
+        )
+        assert envelope.result.failure.reason_code == "openrouter.route_contaminated"
+
+    async def test_multiple_selected_endpoints_is_contaminated(self):
+        envelope = await self._run(
+            clean_metadata(
+                endpoints=[
+                    {"provider": "TestHost", "model": REQUESTED_MODEL, "selected": True},
+                    {"provider": "OtherHost", "model": REQUESTED_MODEL, "selected": True},
+                ]
+            )
+        )
+        assert envelope.result.failure.reason_code == "openrouter.route_contaminated"
+
+    async def test_attempts_show_earlier_provider_failure(self):
+        envelope = await self._run(
+            clean_metadata(
+                attempts=[
+                    {"provider": "OtherHost", "model": REQUESTED_MODEL, "status": 503},
+                    {"provider": "TestHost", "model": REQUESTED_MODEL, "status": 200},
+                ]
+            )
+        )
+        assert envelope.result.failure.reason_code == "openrouter.route_contaminated"
+
+    @pytest.mark.parametrize(
+        "stage",
+        [
+            {"type": "context_compression", "name": "middle-out"},
+            {"type": "response_healing", "name": "json-heal"},
+            {"type": "server_tool", "name": "web"},
+            {"type": "unknown_future_stage", "name": "x"},
+        ],
+    )
+    async def test_any_pipeline_stage_fails_closed(self, stage):
+        envelope = await self._run(clean_metadata(pipeline=[stage]))
+        assert_failure(
+            envelope,
+            kind=FailureKind.UNKNOWN_PROVIDER_FAILURE,
+            reason_code="openrouter.route_contaminated",
+            retryable=False,
+        )
+
+    async def test_general_unknown_metadata_field_is_ignored(self):
+        envelope = await self._run(
+            clean_metadata(unexpected_router_field={"anything": True})
+        )
+        assert envelope.result.outcome == ModelOutcome.SUCCEEDED
+
+    async def test_cache_like_response_is_not_success(self):
+        # cache hit: metadata absent + zero usage -> must not be a quality trial.
+        body = success_body()
+        del body["openrouter_metadata"]
+        body["usage"] = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
+        adapter, _ = make_adapter(lambda request: respond(body))
+        envelope = await adapter.generate_structured(make_request())
+        assert envelope.result.outcome == ModelOutcome.FAILED
+        assert envelope.result.failure.reason_code == "openrouter.route_contaminated"
+
+    async def test_contaminated_route_still_captures_routing_artifact(self):
+        envelope = await self._run(clean_metadata(strategy="auto"))
+        routing = artifact_by_label(envelope, ROUTING_ARTIFACT_LABEL)
+        assert routing["strategy"] == "auto"
+        assert routing["conformance"]["metadata_present"] is True

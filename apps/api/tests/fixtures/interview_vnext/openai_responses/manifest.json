@@ -50,6 +50,102 @@
       "status": 500,
       "headers": {"x-request-id": "req_fx_500"},
       "purpose": "server error is retryable PROVIDER_UNAVAILABLE; also reused at status 503 by tests"
+    },
+    "success_reasoning_then_message.json": {
+      "kind": "response",
+      "status": 200,
+      "headers": {"x-request-id": "req_fx_success"},
+      "purpose": "completed response with a reasoning item before the unique final message; proves no output[0] assumption; full usage incl. cache_write and reasoning tokens; resolved model is the alias target gpt-5.6-sol"
+    },
+    "refusal.json": {
+      "kind": "response",
+      "status": 200,
+      "headers": {"x-request-id": "req_fx_refusal"},
+      "purpose": "completed response whose only content is a refusal item; REFUSED, never JSON-parsed"
+    },
+    "incomplete_max_output_no_visible.json": {
+      "kind": "response",
+      "status": 200,
+      "headers": {"x-request-id": "req_fx_incomplete_max"},
+      "purpose": "incomplete due to max_output_tokens with zero visible text; empty visible artifact is required, not a parser bug"
+    },
+    "incomplete_content_filter_partial.json": {
+      "kind": "response",
+      "status": 200,
+      "headers": {"x-request-id": "req_fx_incomplete_filter"},
+      "purpose": "incomplete due to content_filter with a partial JSON fragment; must stay INCOMPLETE, never upgraded to success"
+    },
+    "failed_server_error.json": {
+      "kind": "response",
+      "status": 200,
+      "headers": {"x-request-id": "req_fx_failed"},
+      "purpose": "top-level failed response with error.code=server_error; retryable PROVIDER_UNAVAILABLE with raw kept"
+    },
+    "cancelled.json": {
+      "kind": "response",
+      "status": 200,
+      "headers": {"x-request-id": "req_fx_cancelled"},
+      "purpose": "top-level cancelled response; FAILED/CANCELLED, non-retryable"
+    },
+    "nonterminal_in_progress.json": {
+      "kind": "response",
+      "status": 200,
+      "headers": {"x-request-id": "req_fx_in_progress"},
+      "purpose": "unexpected non-terminal status on a synchronous call; FAILED unknown provider failure"
+    },
+    "completed_no_message.json": {
+      "kind": "response",
+      "status": 200,
+      "headers": {"x-request-id": "req_fx_no_message"},
+      "purpose": "completed with only a reasoning item; missing structured output is a parse failure"
+    },
+    "completed_multiple_output_text.json": {
+      "kind": "response",
+      "status": 200,
+      "headers": {"x-request-id": "req_fx_multi_text"},
+      "purpose": "two output_text items; must fail closed instead of output_text concatenation"
+    },
+    "completed_commentary_then_final.json": {
+      "kind": "response",
+      "status": 200,
+      "headers": {"x-request-id": "req_fx_commentary"},
+      "purpose": "visible commentary phase message before final_answer; commentary is an unexpected item, never concatenated"
+    },
+    "completed_invalid_json.json": {
+      "kind": "response",
+      "status": 200,
+      "headers": {"x-request-id": "req_fx_invalid_json"},
+      "purpose": "markdown-fenced truncated output; no fence stripping or regex repair, OUTPUT_PARSE_FAILED"
+    },
+    "completed_json_array_root.json": {
+      "kind": "response",
+      "status": 200,
+      "headers": {"x-request-id": "req_fx_array_root"},
+      "purpose": "valid JSON with non-object root; OUTPUT_SCHEMA_INVALID"
+    },
+    "unexpected_tool_call.json": {
+      "kind": "response",
+      "status": 200,
+      "headers": {"x-request-id": "req_fx_tool_call"},
+      "purpose": "function_call item on a tool-less request; protocol failure and the tool is never executed"
+    },
+    "resolved_model_mismatch.json": {
+      "kind": "response",
+      "status": 200,
+      "headers": {"x-request-id": "req_fx_model_drift"},
+      "purpose": "resolved model outside the allowlist; fails closed before content normalization, raw/visible kept"
+    },
+    "usage_unavailable.json": {
+      "kind": "response",
+      "status": 200,
+      "headers": {"x-request-id": "req_fx_no_usage"},
+      "purpose": "usage missing entirely; nulls plus sorted limitation, never fabricated zeros"
+    },
+    "success_local_constraint_violation.json": {
+      "kind": "response",
+      "status": 200,
+      "headers": {"x-request-id": "req_fx_local_violation"},
+      "purpose": "portable-schema-valid JSON that violates a local-only Pydantic constraint; adapter must return SUCCEEDED and leave rejection to the executor's local validation (spec §15.3)"
     }
   }
 }

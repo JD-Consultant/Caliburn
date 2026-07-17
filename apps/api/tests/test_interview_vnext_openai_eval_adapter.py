@@ -580,3 +580,404 @@ class TestAdapterHttpErrorMapping:
         envelope = await adapter.generate_structured(make_request())
         assert calls[0].headers["authorization"] == f"Bearer {API_KEY}"
         assert_no_secret_anywhere(envelope)
+
+
+EXPECTED_SUCCESS_OUTPUT = {
+    "schema_version": "turn_interpret_output.v1",
+    "observations": [],
+    "user_signal": "answer",
+    "episode_signal": "continue",
+    "emergent_topics": [],
+    "insufficiencies": [],
+}
+
+
+def artifact_by_label(envelope: ModelCallEnvelope, label: str) -> dict[str, Any]:
+    attempt_id = envelope.result.attempt_id
+    stored = {record.ref.artifact_id: record for record in envelope.supporting_artifacts}
+    record = stored[uuid5(attempt_id, label)]
+    return json.loads(record.inline_content)
+
+
+class TestAdapterRequestProjection:
+    async def test_request_body_uses_exact_schema_and_stateless_hard_invariants(self):
+        adapter, calls = make_adapter(
+            lambda request: fixture_response("success_reasoning_then_message.json")
+        )
+        request = make_request()
+        envelope = await adapter.generate_structured(request)
+        assert envelope.result.outcome == ModelOutcome.SUCCEEDED
+        assert len(calls) == 1
+        assert str(calls[0].url) == "https://api.openai.com/v1/responses"
+        assert "idempotency-key" not in {name.lower() for name in calls[0].headers}
+        body = json.loads(calls[0].content)
+
+        text_format = body["text"]["format"]
+        assert text_format["type"] == "json_schema"
+        assert text_format["name"] == "turn_interpret_output_v1"
+        assert text_format["strict"] is True
+        assert canonical_hash(text_format["schema"]) == request.output_schema_hash
+        assert text_format["schema"] == published_schema(
+            "turn-interpret-output.v1.schema.json"
+        )
+
+        assert body["model"] == "gpt-5.6"
+        assert body["instructions"] == request.instructions
+        assert body["input"] == [
+            {"role": "user", "content": "synthetic employee turn (test)"}
+        ]
+        assert body["max_output_tokens"] == request.max_output_tokens
+        assert body["reasoning"] == {"mode": "standard", "effort": "medium"}
+        assert body["service_tier"] == "default"
+        assert body["store"] is False
+        assert body["background"] is False
+        assert body["stream"] is False
+        assert body["truncation"] == "disabled"
+
+        for forbidden in (
+            "conversation",
+            "previous_response_id",
+            "tools",
+            "tool_choice",
+            "parallel_tool_calls",
+            "context_management",
+            "include",
+            "prompt",
+            "prompt_cache_key",
+            "prompt_cache_options",
+            "prompt_cache_retention",
+            "temperature",
+            "top_p",
+            "verbosity",
+            "metadata",
+            "moderation",
+            "safety_identifier",
+            "user",
+        ):
+            assert forbidden not in body, forbidden
+
+
+class TestAdapterResponseMatrix:
+    async def test_success_ignores_reasoning_item_and_parses_unique_message(self):
+        adapter, calls = make_adapter(
+            lambda request: fixture_response("success_reasoning_then_message.json")
+        )
+        request = make_request()
+        envelope = await adapter.generate_structured(request)
+        result = envelope.result
+        assert result.outcome == ModelOutcome.SUCCEEDED
+        assert result.finish_reason == FinishReason.COMPLETED
+        assert result.provider_finish_reason == "completed"
+        assert result.resolved_model == "gpt-5.6-sol"
+        assert result.provider_request_id == "req_fx_success"
+        assert result.provider_conversation_id is None
+        assert result.parsed_output is not None
+        assert result.parsed_output.load() == EXPECTED_SUCCESS_OUTPUT
+        assert result.parsed_output.schema_id == TURN_INTERPRET_OUTPUT_SCHEMA_ID
+
+        usage = result.usage
+        assert usage.input_tokens == 1200
+        assert usage.output_tokens == 350
+        assert usage.cache_read_tokens == 0
+        assert usage.cache_write_tokens == 256
+        assert usage.reasoning_tokens == 128
+        assert usage.limitations == ()
+
+        raw = artifact_by_label(envelope, RAW_ARTIFACT_LABEL)
+        assert raw["http_request_id"] == "req_fx_success"
+        assert raw["sdk"] == "openai-python"
+        assert raw["sdk_version"] == "2.46.0"
+        assert raw["response"]["id"] == "resp_fx_success"
+        assert raw["response"]["output"][0]["type"] == "reasoning"
+
+        visible = artifact_by_label(envelope, VISIBLE_ARTIFACT_LABEL)
+        assert visible["schema_version"] == "provider_visible_response.v1"
+        assert len(visible["items"]) == 1
+        item = visible["items"][0]
+        assert item["output_index"] == 1
+        assert item["message_id"] == "msg_fx_1"
+        assert item["type"] == "output_text"
+        assert_no_secret_anywhere(envelope)
+
+    async def test_adapter_never_uses_output_text_concatenation(self):
+        adapter, _ = make_adapter(
+            lambda request: fixture_response("completed_multiple_output_text.json")
+        )
+        envelope = await adapter.generate_structured(make_request())
+        assert_failure(
+            envelope,
+            kind=FailureKind.OUTPUT_PARSE_FAILED,
+            reason_code="openai.multiple_structured_outputs",
+            retryable=False,
+        )
+        assert envelope.result.parsed_output is None
+        visible = artifact_by_label(envelope, VISIBLE_ARTIFACT_LABEL)
+        assert len(visible["items"]) == 2
+
+    async def test_refusal_is_not_parsed_as_json_or_retried(self):
+        adapter, calls = make_adapter(
+            lambda request: fixture_response("refusal.json")
+        )
+        envelope = await adapter.generate_structured(make_request())
+        result = envelope.result
+        assert len(calls) == 1
+        assert result.outcome == ModelOutcome.REFUSED
+        assert result.finish_reason == FinishReason.SAFETY_REFUSAL
+        assert result.parsed_output is None
+        assert result.failure is None
+        refusal = result.refusal
+        assert refusal is not None
+        assert refusal.reason_code == "openai.refusal"
+        assert refusal.safe_message == "The model declined this request."
+        assert refusal.provider_category == "refusal"
+        assert "I can't help" not in refusal.safe_message
+        visible = artifact_by_label(envelope, VISIBLE_ARTIFACT_LABEL)
+        assert visible["items"][0]["type"] == "refusal"
+        assert visible["items"][0]["text"] == "I can't help with that request."
+
+    async def test_incomplete_max_tokens_without_visible_text_is_preserved(self):
+        adapter, _ = make_adapter(
+            lambda request: fixture_response("incomplete_max_output_no_visible.json")
+        )
+        envelope = await adapter.generate_structured(make_request())
+        result = envelope.result
+        assert result.outcome == ModelOutcome.INCOMPLETE
+        assert result.finish_reason == FinishReason.MAX_OUTPUT_TOKENS
+        assert result.provider_finish_reason == "incomplete:max_output_tokens"
+        assert result.parsed_output is None
+        assert result.failure is None
+        assert result.refusal is None
+        assert result.usage.reasoning_tokens == 2048
+        visible = artifact_by_label(envelope, VISIBLE_ARTIFACT_LABEL)
+        assert visible["items"] == []
+        assert result.visible_response_artifact is not None
+
+    async def test_incomplete_content_filter_with_partial_text_is_not_success(self):
+        adapter, _ = make_adapter(
+            lambda request: fixture_response("incomplete_content_filter_partial.json")
+        )
+        envelope = await adapter.generate_structured(make_request())
+        result = envelope.result
+        assert result.outcome == ModelOutcome.INCOMPLETE
+        assert result.finish_reason == FinishReason.UNKNOWN
+        assert result.provider_finish_reason == "incomplete:content_filter"
+        assert result.parsed_output is None
+        visible = artifact_by_label(envelope, VISIBLE_ARTIFACT_LABEL)
+        assert len(visible["items"]) == 1
+        assert visible["items"][0]["message_status"] == "incomplete"
+
+    async def test_failed_response_error_is_normalized_and_raw_is_kept(self):
+        adapter, _ = make_adapter(
+            lambda request: fixture_response("failed_server_error.json")
+        )
+        envelope = await adapter.generate_structured(make_request())
+        assert_failure(
+            envelope,
+            kind=FailureKind.PROVIDER_UNAVAILABLE,
+            reason_code="openai.response_server_error",
+            retryable=True,
+        )
+        result = envelope.result
+        assert result.provider_finish_reason == "failed:server_error"
+        assert result.failure.provider_error_code == "server_error"
+        raw = artifact_by_label(envelope, RAW_ARTIFACT_LABEL)
+        assert raw["response"]["status"] == "failed"
+        assert raw["response"]["error"]["code"] == "server_error"
+        error = artifact_by_label(envelope, ERROR_ARTIFACT_LABEL)
+        assert error["classification"]["reason_code"] == "openai.response_server_error"
+
+    async def test_cancelled_response_is_nonretryable_cancelled(self):
+        adapter, _ = make_adapter(lambda request: fixture_response("cancelled.json"))
+        envelope = await adapter.generate_structured(make_request())
+        assert_failure(
+            envelope,
+            kind=FailureKind.CANCELLED,
+            reason_code="openai.cancelled",
+            retryable=False,
+            finish_reason=FinishReason.CANCELLED,
+        )
+        assert envelope.result.provider_finish_reason == "cancelled"
+
+    async def test_nonterminal_status_is_unknown_provider_failure(self):
+        adapter, _ = make_adapter(
+            lambda request: fixture_response("nonterminal_in_progress.json")
+        )
+        envelope = await adapter.generate_structured(make_request())
+        assert_failure(
+            envelope,
+            kind=FailureKind.UNKNOWN_PROVIDER_FAILURE,
+            reason_code="openai.unexpected_nonterminal_status",
+            retryable=False,
+            finish_reason=FinishReason.UNKNOWN,
+        )
+        assert envelope.result.provider_finish_reason == "unexpected:in_progress"
+
+    async def test_completed_without_output_is_parse_failure(self):
+        adapter, _ = make_adapter(
+            lambda request: fixture_response("completed_no_message.json")
+        )
+        envelope = await adapter.generate_structured(make_request())
+        assert_failure(
+            envelope,
+            kind=FailureKind.OUTPUT_PARSE_FAILED,
+            reason_code="openai.missing_structured_output",
+            retryable=False,
+        )
+
+    async def test_invalid_json_has_visible_and_error_artifacts(self):
+        adapter, _ = make_adapter(
+            lambda request: fixture_response("completed_invalid_json.json")
+        )
+        envelope = await adapter.generate_structured(make_request())
+        assert_failure(
+            envelope,
+            kind=FailureKind.OUTPUT_PARSE_FAILED,
+            reason_code="openai.output_parse_failed",
+            retryable=False,
+        )
+        assert envelope.result.visible_response_artifact is not None
+        visible = artifact_by_label(envelope, VISIBLE_ARTIFACT_LABEL)
+        assert visible["items"][0]["text"].startswith("```json")
+        assert envelope.result.parsed_output is None
+
+    async def test_json_array_root_is_output_schema_invalid(self):
+        adapter, _ = make_adapter(
+            lambda request: fixture_response("completed_json_array_root.json")
+        )
+        envelope = await adapter.generate_structured(make_request())
+        assert_failure(
+            envelope,
+            kind=FailureKind.OUTPUT_SCHEMA_INVALID,
+            reason_code="openai.output_schema_invalid",
+            retryable=False,
+        )
+
+    async def test_unexpected_tool_call_is_not_executed(self):
+        adapter, calls = make_adapter(
+            lambda request: fixture_response("unexpected_tool_call.json")
+        )
+        envelope = await adapter.generate_structured(make_request())
+        assert len(calls) == 1
+        assert_failure(
+            envelope,
+            kind=FailureKind.OUTPUT_PARSE_FAILED,
+            reason_code="openai.unexpected_output_item",
+            retryable=False,
+        )
+        error = artifact_by_label(envelope, ERROR_ARTIFACT_LABEL)
+        assert "function_call" in error["detail"]
+
+    async def test_commentary_message_is_not_concatenated_with_final_answer(self):
+        adapter, _ = make_adapter(
+            lambda request: fixture_response("completed_commentary_then_final.json")
+        )
+        envelope = await adapter.generate_structured(make_request())
+        assert_failure(
+            envelope,
+            kind=FailureKind.OUTPUT_PARSE_FAILED,
+            reason_code="openai.unexpected_output_item",
+            retryable=False,
+        )
+        assert envelope.result.parsed_output is None
+        visible = artifact_by_label(envelope, VISIBLE_ARTIFACT_LABEL)
+        assert len(visible["items"]) == 2
+
+    async def test_resolved_model_mismatch_fails_closed(self):
+        adapter, _ = make_adapter(
+            lambda request: fixture_response("resolved_model_mismatch.json")
+        )
+        envelope = await adapter.generate_structured(make_request())
+        assert_failure(
+            envelope,
+            kind=FailureKind.RESOLVED_MODEL_MISMATCH,
+            reason_code="openai.resolved_model_mismatch",
+            retryable=False,
+        )
+        result = envelope.result
+        assert result.resolved_model == "gpt-5.7-mini"
+        assert result.provider_finish_reason == "completed"
+        assert result.parsed_output is None
+        raw = artifact_by_label(envelope, RAW_ARTIFACT_LABEL)
+        assert raw["response"]["model"] == "gpt-5.7-mini"
+        visible = artifact_by_label(envelope, VISIBLE_ARTIFACT_LABEL)
+        assert len(visible["items"]) == 1
+
+    async def test_no_prefix_or_family_auto_acceptance_for_models(self):
+        adapter, _ = make_adapter(
+            lambda request: fixture_response("resolved_model_mismatch.json"),
+            config=OpenAIResponsesEvalConfig(
+                accepted_resolved_models=("gpt-5.6", "gpt-5.6-sol", "gpt-5.7"),
+            ),
+        )
+        envelope = await adapter.generate_structured(make_request())
+        assert_failure(
+            envelope,
+            kind=FailureKind.RESOLVED_MODEL_MISMATCH,
+            reason_code="openai.resolved_model_mismatch",
+            retryable=False,
+        )
+
+    async def test_usage_none_uses_nulls_and_sorted_limitations(self):
+        adapter, _ = make_adapter(
+            lambda request: fixture_response("usage_unavailable.json")
+        )
+        envelope = await adapter.generate_structured(make_request())
+        result = envelope.result
+        assert result.outcome == ModelOutcome.SUCCEEDED
+        usage = result.usage
+        assert usage.input_tokens is None
+        assert usage.output_tokens is None
+        assert usage.cache_read_tokens is None
+        assert usage.cache_write_tokens is None
+        assert usage.reasoning_tokens is None
+        assert usage.limitations == ("openai response did not include usage",)
+
+    async def test_local_constraint_violation_is_success_at_adapter_boundary(self):
+        from app.interview_vnext.llm.turn_interpret import TurnInterpretOutput
+
+        adapter, _ = make_adapter(
+            lambda request: fixture_response("success_local_constraint_violation.json")
+        )
+        envelope = await adapter.generate_structured(make_request())
+        result = envelope.result
+        assert result.outcome == ModelOutcome.SUCCEEDED
+        assert result.parsed_output is not None
+        with pytest.raises(ValidationError):
+            TurnInterpretOutput.model_validate(result.parsed_output.load())
+
+    async def test_envelope_artifact_ids_are_deterministic_and_scoped(self):
+        attempt_id = uuid4()
+        request = make_request(attempt_id=attempt_id)
+        adapter_one, _ = make_adapter(
+            lambda request: fixture_response("success_reasoning_then_message.json")
+        )
+        adapter_two, _ = make_adapter(
+            lambda request: fixture_response("success_reasoning_then_message.json")
+        )
+        first = await adapter_one.generate_structured(request)
+        second = await adapter_two.generate_structured(request)
+        first_ids = sorted(
+            str(record.ref.artifact_id) for record in first.supporting_artifacts
+        )
+        second_ids = sorted(
+            str(record.ref.artifact_id) for record in second.supporting_artifacts
+        )
+        assert first_ids == second_ids
+        assert first_ids == sorted(
+            str(uuid5(attempt_id, label))
+            for label in (RAW_ARTIFACT_LABEL, VISIBLE_ARTIFACT_LABEL)
+        )
+        for record in first.supporting_artifacts:
+            assert record.ref.artifact_id == uuid5(
+                attempt_id,
+                RAW_ARTIFACT_LABEL
+                if record.ref.kind == "provider.openai.response.raw"
+                else VISIBLE_ARTIFACT_LABEL,
+            )
+            assert record.run_id == request.run_id
+            assert record.session_id == request.session_id
+            assert record.turn_id == request.turn_id
+            assert record.operation_id == request.operation_id
+            assert record.attempt_id == request.attempt_id
+            assert record.retention_class == "eval"
+            assert record.contains_test_data is True

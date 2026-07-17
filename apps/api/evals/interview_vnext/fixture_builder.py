@@ -204,7 +204,7 @@ def setup_commands(
                         target=fixture.open_episode.target,
                         opened_turn_id=turn_id,
                     ),
-                    stage="episode.lifecycle",
+                    stage="episode.code",
                 )
             )
             version += 1

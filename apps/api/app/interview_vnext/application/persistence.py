@@ -319,6 +319,23 @@ class CaptureWriter(Protocol):
         """以 transaction 內完整 chain 建/驗 RunManifest 並存為 artifact(§7.3)。"""
         ...
 
+    async def finalize_run(
+        self,
+        *,
+        tenant_id: UUID,
+        run_id: UUID,
+        final_status: RunStatus,
+        terminal_event_id: UUID,
+        manifest_artifact_id: UUID,
+        completed_at: datetime,
+        root_artifacts: tuple[ArtifactRef, ...] = (),
+        limitations: tuple[str, ...] = (),
+        event_status: ExecutionStatus = ExecutionStatus.OK,
+    ) -> tuple[WorkflowRun, ArtifactRef]:
+        """§7.3:append terminal event → 以完整 chain 建/驗 manifest → run
+        open→terminal 一次性轉換;三者同一 transaction,冪等回既有 manifest。"""
+        ...
+
 
 class VNextUnitOfWork(Protocol):
     """一個 instance = 一個 AsyncSession/transaction,單一 task 使用,不可重入。

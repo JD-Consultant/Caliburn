@@ -9,6 +9,7 @@ Scripted provider 只是計數器:`provider_completed|verified|committed|failed`
 from __future__ import annotations
 
 import asyncio
+import json
 from datetime import UTC, datetime, timedelta
 from uuid import UUID, uuid4, uuid5, NAMESPACE_URL
 
@@ -18,6 +19,7 @@ import sqlalchemy as sa
 from app.interview_vnext.application.durable_commands import apply_durable_command
 from app.interview_vnext.application.durable_operations import (
     AttemptOutcome,
+    commit_verified_noop_operation,
     commit_verified_operation,
     fail_operation,
     prepare_operation,
@@ -43,7 +45,10 @@ from app.interview_vnext.domain.state import InterviewState
 from app.interview_vnext.observability.artifacts import build_inline_artifact
 from app.interview_vnext.observability.checkpoint import CheckpointStatus
 from app.interview_vnext.observability.taxonomy import INTERVIEW_VNEXT_EXECUTION_V1
-from app.interview_vnext.persistence.errors import CheckpointConflict
+from app.interview_vnext.persistence.errors import (
+    CheckpointConflict,
+    ExecutionEventConflict,
+)
 from app.interview_vnext.persistence.unit_of_work import SqlAlchemyVNextUnitOfWork
 
 
@@ -147,6 +152,69 @@ async def _attempt_rows(factory, ids) -> list:
             "SELECT attempt, status FROM interview_vnext_operation_attempts "
             "WHERE tenant_id = :t ORDER BY attempt"),
             {"t": str(ids.tenant_id)})).all()
+
+
+async def verify_noop_operation(factory, ids):
+    await prepare(factory, ids)
+    attempt_id = uuid4()
+    await start(factory, ids, attempt_id=attempt_id)
+    await record(
+        factory,
+        ids,
+        attempt_id=attempt_id,
+        name="result-noop",
+        outcome=AttemptOutcome.SUCCEEDED,
+    )
+    verification = artifact(
+        ids,
+        "verification-noop",
+        {"accepted": [], "dropped": [{"reason": "off_topic"}]},
+    )
+    await record_verification(
+        uow_factory(factory),
+        tenant_id=ids.tenant_id,
+        operation_id=op_id(ids),
+        verification_artifact=verification,
+        accepted=True,
+        event_id=uuid4(),
+        occurred_at=NOW + timedelta(seconds=6),
+    )
+    return verification
+
+
+def noop_response(ids, *, payload=None, artifact_id=None, at=None):
+    return build_inline_artifact(
+        artifact_id=artifact_id
+        or uuid5(NAMESPACE_URL, f"noop-response:{ids.session_id}"),
+        kind="operation.response",
+        media_type="application/json",
+        payload=(
+            payload
+            if payload is not None
+            else {"say": "這一回合沒有可寫入的工作事實。"}
+        ),
+        run_id=ids.run_id,
+        session_id=ids.session_id,
+        operation_id=op_id(ids),
+        created_at=at or NOW + timedelta(seconds=8),
+        contains_test_data=True,
+    )
+
+
+def noop_commit_kwargs(ids, verification, *, response=None, step_event_id=None):
+    return {
+        "tenant_id": ids.tenant_id,
+        "operation_id": op_id(ids),
+        "response_artifact": response or noop_response(ids),
+        "verification_artifact": verification,
+        "noop_result_artifact_id": uuid5(
+            NAMESPACE_URL, f"noop-result:{ids.session_id}"
+        ),
+        "step_event_id": step_event_id
+        or uuid5(NAMESPACE_URL, f"noop-step:{ids.session_id}"),
+        "committed_at": NOW + timedelta(seconds=8),
+        "dropped_count": 1,
+    }
 
 
 # ── case 15/17:prepared recovery 只建一次 attempt 1;兩 workers 一個 CAS 贏 ──────
@@ -297,6 +365,239 @@ async def test_late_phases_never_call_provider_and_committed_replays(
     assert replay_cp.domain_result_artifact == first_cp.domain_result_artifact
     assert replay_result.state_hash == first_result.state_hash
     assert provider.calls == 1                               # 全程恰一次 generate
+
+
+async def test_verified_noop_is_atomic_idempotent_and_has_no_command(
+        postgres_session_factory, vnext_profile):
+    ids = vnext_profile
+    await bootstrap(postgres_session_factory, ids)
+    verification = await verify_noop_operation(postgres_session_factory, ids)
+    kwargs = noop_commit_kwargs(ids, verification)
+
+    first_checkpoint, first_result = await commit_verified_noop_operation(
+        uow_factory(postgres_session_factory), **kwargs
+    )
+    replay_checkpoint, replay_result = await commit_verified_noop_operation(
+        uow_factory(postgres_session_factory), **kwargs
+    )
+
+    assert first_checkpoint.status == CheckpointStatus.COMMITTED
+    assert first_checkpoint.state_after_hash == first_checkpoint.state_before_hash
+    assert replay_checkpoint == first_checkpoint
+    assert replay_result == first_result
+    assert first_result.accepted_count == 0
+    assert first_result.dropped_count == 1
+
+    async with postgres_session_factory() as session:
+        state_version = (await session.execute(sa.text(
+            "SELECT state_version FROM interview_vnext_sessions "
+            "WHERE tenant_id = :tenant_id AND session_id = :session_id"
+        ), {"tenant_id": str(ids.tenant_id),
+            "session_id": str(ids.session_id)})).scalar_one()
+        command_count = (await session.execute(sa.text(
+            "SELECT count(*) FROM interview_vnext_commands "
+            "WHERE tenant_id = :tenant_id"
+        ), {"tenant_id": str(ids.tenant_id)})).scalar_one()
+        artifact_row = (await session.execute(sa.text(
+            "SELECT kind, schema_id FROM interview_vnext_artifacts "
+            "WHERE tenant_id = :tenant_id AND artifact_id = :artifact_id"
+        ), {"tenant_id": str(ids.tenant_id),
+            "artifact_id": str(kwargs["noop_result_artifact_id"])})).one()
+        event_json = (await session.execute(sa.text(
+            "SELECT event_json FROM interview_vnext_execution_events "
+            "WHERE tenant_id = :tenant_id AND event_id = :event_id"
+        ), {"tenant_id": str(ids.tenant_id),
+            "event_id": str(kwargs["step_event_id"])})).scalar_one()
+        outbox_count = (await session.execute(sa.text(
+            "SELECT count(*) FROM interview_vnext_outbox "
+            "WHERE tenant_id = :tenant_id AND message_id = :message_id"
+        ), {"tenant_id": str(ids.tenant_id),
+            "message_id": str(kwargs["step_event_id"])})).scalar_one()
+
+    event = json.loads(event_json)
+    assert state_version == 0
+    assert command_count == 0
+    assert tuple(artifact_row) == (
+        "operation.noop_result",
+        "https://caliburn.local/schemas/operation-noop-result.v1.schema.json",
+    )
+    assert json.loads(event["metadata_json"]) == {
+        "accepted_count": 0,
+        "dropped_count": 1,
+        "reason": "no_domain_mutation",
+    }
+    assert event["state_before_hash"] == event["state_after_hash"]
+    assert outbox_count == 1
+
+    changed_response = noop_response(
+        ids,
+        artifact_id=kwargs["response_artifact"].ref.artifact_id,
+        payload={"say": "這是不同內容，不得冒充冪等重送。"},
+    )
+    with pytest.raises(CheckpointConflict, match="different no-op outcome"):
+        await commit_verified_noop_operation(
+            uow_factory(postgres_session_factory),
+            **{**kwargs, "response_artifact": changed_response},
+        )
+
+    changed_verification = artifact(
+        ids,
+        "verification-noop-changed",
+        {"accepted": [], "dropped": [{"reason": "declined"}]},
+    )
+    with pytest.raises(CheckpointConflict, match="different no-op outcome"):
+        await commit_verified_noop_operation(
+            uow_factory(postgres_session_factory),
+            **{**kwargs, "verification_artifact": changed_verification},
+        )
+
+    with pytest.raises(CheckpointConflict, match="different no-op outcome"):
+        await commit_verified_noop_operation(
+            uow_factory(postgres_session_factory),
+            **{**kwargs, "step_event_id": uuid4()},
+        )
+
+
+async def test_verified_noop_rolls_back_everything_when_event_conflicts(
+        postgres_session_factory, vnext_profile):
+    ids = vnext_profile
+    await bootstrap(postgres_session_factory, ids)
+    verification = await verify_noop_operation(postgres_session_factory, ids)
+    response = noop_response(ids)
+    noop_id = uuid5(NAMESPACE_URL, f"noop-result:{ids.session_id}")
+    async with postgres_session_factory() as session:
+        conflicting_event_id = (await session.execute(sa.text(
+            "SELECT event_id FROM interview_vnext_execution_events "
+            "WHERE tenant_id = :tenant_id ORDER BY sequence LIMIT 1"
+        ), {"tenant_id": str(ids.tenant_id)})).scalar_one()
+        event_count_before = (await session.execute(sa.text(
+            "SELECT count(*) FROM interview_vnext_execution_events "
+            "WHERE tenant_id = :tenant_id"
+        ), {"tenant_id": str(ids.tenant_id)})).scalar_one()
+        outbox_count_before = (await session.execute(sa.text(
+            "SELECT count(*) FROM interview_vnext_outbox "
+            "WHERE tenant_id = :tenant_id"
+        ), {"tenant_id": str(ids.tenant_id)})).scalar_one()
+
+    with pytest.raises(ExecutionEventConflict):
+        await commit_verified_noop_operation(
+            uow_factory(postgres_session_factory),
+            **noop_commit_kwargs(
+                ids,
+                verification,
+                response=response,
+                step_event_id=conflicting_event_id,
+            ),
+        )
+
+    async with postgres_session_factory() as session:
+        checkpoint_status = (await session.execute(sa.text(
+            "SELECT status FROM interview_vnext_operation_checkpoints "
+            "WHERE tenant_id = :tenant_id AND operation_id = :operation_id"
+        ), {"tenant_id": str(ids.tenant_id),
+            "operation_id": str(op_id(ids))})).scalar_one()
+        new_artifact_count = (await session.execute(sa.text(
+            "SELECT count(*) FROM interview_vnext_artifacts "
+            "WHERE tenant_id = :tenant_id AND artifact_id IN (:response_id, :noop_id)"
+        ), {"tenant_id": str(ids.tenant_id),
+            "response_id": str(response.ref.artifact_id),
+            "noop_id": str(noop_id)})).scalar_one()
+        event_count_after = (await session.execute(sa.text(
+            "SELECT count(*) FROM interview_vnext_execution_events "
+            "WHERE tenant_id = :tenant_id"
+        ), {"tenant_id": str(ids.tenant_id)})).scalar_one()
+        outbox_count_after = (await session.execute(sa.text(
+            "SELECT count(*) FROM interview_vnext_outbox "
+            "WHERE tenant_id = :tenant_id"
+        ), {"tenant_id": str(ids.tenant_id)})).scalar_one()
+
+    assert checkpoint_status == "verified"
+    assert new_artifact_count == 0
+    assert event_count_after == event_count_before
+    assert outbox_count_after == outbox_count_before
+
+
+async def test_two_identical_noop_committers_create_one_completion(
+        postgres_session_factory, vnext_profile):
+    ids = vnext_profile
+    await bootstrap(postgres_session_factory, ids)
+    verification = await verify_noop_operation(postgres_session_factory, ids)
+    kwargs = noop_commit_kwargs(ids, verification)
+
+    outcomes = await asyncio.gather(
+        commit_verified_noop_operation(
+            uow_factory(postgres_session_factory), **kwargs
+        ),
+        commit_verified_noop_operation(
+            uow_factory(postgres_session_factory), **kwargs
+        ),
+        return_exceptions=True,
+    )
+    successes = [item for item in outcomes if isinstance(item, tuple)]
+    failures = [item for item in outcomes if isinstance(item, Exception)]
+    assert len(successes) >= 1
+    assert all(isinstance(item, CheckpointConflict) for item in failures)
+
+    async with postgres_session_factory() as session:
+        completions = (await session.execute(sa.text(
+            "SELECT count(*) FROM interview_vnext_execution_events "
+            "WHERE tenant_id = :tenant_id AND event_id = :event_id"
+        ), {"tenant_id": str(ids.tenant_id),
+            "event_id": str(kwargs["step_event_id"])})).scalar_one()
+        commands = (await session.execute(sa.text(
+            "SELECT count(*) FROM interview_vnext_commands "
+            "WHERE tenant_id = :tenant_id"
+        ), {"tenant_id": str(ids.tenant_id)})).scalar_one()
+    assert completions == 1
+    assert commands == 0
+
+
+async def test_stale_state_blocks_verified_noop_without_new_artifacts(
+        postgres_session_factory, vnext_profile):
+    ids = vnext_profile
+    await bootstrap(postgres_session_factory, ids)
+    verification = await verify_noop_operation(postgres_session_factory, ids)
+    response = noop_response(ids)
+    noop_id = uuid5(NAMESPACE_URL, f"noop-result:{ids.session_id}")
+
+    await apply_durable_command(
+        uow_factory(postgres_session_factory),
+        tenant_id=ids.tenant_id,
+        session_id=ids.session_id,
+        run_id=ids.run_id,
+        command=TransitionSessionCommand(
+            command_id=uuid4(),
+            expected_state_version=0,
+            occurred_at=NOW + timedelta(seconds=7),
+            target_status=SessionStatus.ACTIVE,
+        ),
+        stage="session.plan",
+        event_id=uuid4(),
+        command_artifact_id=uuid4(),
+        reduction_artifact_id=uuid4(),
+        committed_at=NOW + timedelta(seconds=8),
+    )
+
+    with pytest.raises(CheckpointConflict, match="re-prepare"):
+        await commit_verified_noop_operation(
+            uow_factory(postgres_session_factory),
+            **noop_commit_kwargs(ids, verification, response=response),
+        )
+
+    async with postgres_session_factory() as session:
+        checkpoint_status = (await session.execute(sa.text(
+            "SELECT status FROM interview_vnext_operation_checkpoints "
+            "WHERE tenant_id = :tenant_id AND operation_id = :operation_id"
+        ), {"tenant_id": str(ids.tenant_id),
+            "operation_id": str(op_id(ids))})).scalar_one()
+        new_artifact_count = (await session.execute(sa.text(
+            "SELECT count(*) FROM interview_vnext_artifacts "
+            "WHERE tenant_id = :tenant_id AND artifact_id IN (:response_id, :noop_id)"
+        ), {"tenant_id": str(ids.tenant_id),
+            "response_id": str(response.ref.artifact_id),
+            "noop_id": str(noop_id)})).scalar_one()
+    assert checkpoint_status == "verified"
+    assert new_artifact_count == 0
 
 
 async def test_verification_rejection_fails_without_touching_state(

@@ -88,12 +88,15 @@ apps/api/uv.lock
 
 ```text
 apps/api/app/interview_vnext/application/noop_result.py
+apps/api/app/interview_vnext/application/schema_exports.py
+apps/api/app/interview_vnext/application/write_schemas.py
+apps/api/app/interview_vnext/application/schemas/operation-noop-result.v1.schema.json
 apps/api/app/interview_vnext/application/durable_operations.py
 apps/api/tests/test_interview_vnext_noop_result.py
 apps/api/tests/test_interview_vnext_recovery_postgres.py
 ```
 
-`OperationNoopResult.v1`至少包含 `schema_version`、`operation_id`、`reason_code`、`state_before_hash`、`state_after_hash`、accepted/dropped counts與verification artifact ref；validator強制before/after相同、accepted count為0、reason code非空。它是domain outcome artifact，不是假command/reducer結果。
+`OperationNoopResult.v1`至少包含 `schema_version`、`operation_id`、`completion_event_id`、`reason_code`、`state_before_hash`、`state_after_hash`、accepted/dropped counts與verification artifact ref；validator強制before/after相同、accepted count為0、reason code非空。completion event ID進入artifact content hash，換ID不得冒充相同重送。它是domain outcome artifact，不是假command/reducer結果。
 
 ### 3.4 API
 
@@ -105,13 +108,15 @@ async def commit_verified_noop_operation(
     operation_id: UUID,
     response_artifact: ArtifactRecord,
     verification_artifact: ArtifactRecord,
+    noop_result_artifact_id: UUID,
     step_event_id: UUID,
     committed_at: datetime,
+    dropped_count: int,
     reason_code: str = "no_domain_mutation",
-) -> OperationCheckpoint: ...
+) -> tuple[OperationCheckpoint, OperationNoopResult]: ...
 ```
 
-同 transaction驗 state hash、保存 artifacts、CAS checkpoint、append event/outbox、commit。不得寫 command row或 fake ReductionResult。
+同 transaction驗 artifact scope/state hash、保存 artifacts、CAS checkpoint、append event/outbox、commit。先取得run row lock，鎖序與command commit一致。完全相同的IDs、timestamp、response、verification與no-op語意才是冪等重送；任一不同皆conflict。不得寫 command row或 fake ReductionResult。
 
 ### 3.5 Gate
 

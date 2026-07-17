@@ -1,10 +1,12 @@
 # Interview AI vNext Greenfield 實作計畫
 
 - 日期：2026-07-16
-- 狀態：**執行中；V0 + V1 + V2-A + V2-B durable persistence 已完成(2026-07-17),下一步 V3 fixed replay;尚未接 runtime route**
+- 狀態：**執行中；V0 + V1 + V2-A + V2-B與V3-0已完成(2026-07-17)，下一步V3-1 ContextBuilder；尚未接 runtime route**
 - 目標架構：[`../specs/2026-07-16-interview-ai-vnext-greenfield-architecture.md`](../specs/2026-07-16-interview-ai-vnext-greenfield-architecture.md)
 - V2-B persistence reference：[`../specs/2026-07-16-interview-vnext-v2b-durable-persistence-research.md`](../specs/2026-07-16-interview-vnext-v2b-durable-persistence-research.md)
 - V2-B 可執行交接：[`2026-07-16-interview-vnext-v2b-durable-persistence-plan.md`](2026-07-16-interview-vnext-v2b-durable-persistence-plan.md)
+- V3 fixed replay reference：[`../specs/2026-07-17-interview-vnext-v3-fixed-replay-research.md`](../specs/2026-07-17-interview-vnext-v3-fixed-replay-research.md)
+- V3 可執行計畫：[`2026-07-17-interview-vnext-v3-fixed-replay-plan.md`](2026-07-17-interview-vnext-v3-fixed-replay-plan.md)
 - 團隊：一人開發；每個工作包必須可獨立 review、測試、保留或刪除
 - 核心限制：不 import、包裝或雙寫 v3 LLM internals；v3 只作黑箱 baseline/fallback
 
@@ -43,7 +45,8 @@ V8  刪除 v3 internals 與更新現行 design
 | V1-B | 完成 | episode/gap/inference/candidate/withdraw/review lifecycle reducers；Evidence/Inference 雙向 correction lineage；Gap resolution evidence；deterministic invalidation；human review；共 24 份 schema | 不含 provider、DB、route 或正式 prompt |
 | V2-A | 完成 | provider-neutral request/result/failure、hash-addressed operation registry、strict scripted fake；immutable artifact、version-addressed execution taxonomy/event/hash chain/manifest、outbox 與 multi-attempt operation checkpoint contracts；9 份 committed schema、1 份 taxonomy document、22 個 focused tests | 只有 in-memory contract fake；沒有 DB transaction、外部 exporter、live provider、正式 prompt 或 route |
 | V2-B | 完成(2026-07-17) | migration 0010 八張 `interview_vnext_*` 表(introspection test 逐 constraint 驗)、canonical TEXT serialization + corruption 檢查、async repositories/UoW、atomic command commit(run-lock 鎖序)、durable capture(create_run/append/finalize/manifest)、outbox lease CTE、checkpoint crash recovery;focused Postgres suite 50 passed/0 skip、完整 suite 含 DB 499 passed;commit SHA 與差異註記見 V2-B plan §11 | 無 live provider/route/ContextBuilder;typed `ModelCallResult` 接線屬 V3;tenant/auth seam 屬 V5 |
-| V3+ | 未開始 | — | offline workflow、ContextBuilder、model/prompt eval、Web seam |
+| V3 | 執行中（V3-0完成） | 官方OpenAI SDK固定2.46.0並有typed Responses surface contract test；`operation_noop_result.v1` + committed application schema；verified no-op以run-lock一致鎖序，在同transaction保存result/response、CAS checkpoint、append event/outbox，不寫command、不改state；durable focused 54 passed、完整含DB 506 passed | V3-1 ContextBuilder、turn/episode contracts與verifier、workflow executor、eval-only live adapter、20-case多trial gate均尚未完成 |
+| V4+ | 未開始 | — | adaptive workflow、Web seam、雙provider bake-off、pilot與切換 |
 
 V1 的 event 是 domain change notification／artifact index，payload 只有 object ID；目前可重現的是相同初始 state + command stream 的 state/hash。V2-B 已把 execution event + immutable artifact + outbox + checkpoint protocol 接上 PostgreSQL transaction:跨 process crash recovery 由「commit → 丟棄所有 in-memory objects → fresh session 重讀 committed rows」的 integration tests 證明。完整 event sourcing 仍**不**宣稱——execution event 只帶 ID/hash,完整重播 payload 在 command/reduction artifacts(§4.1 資料角色不得混用)。實作細節與完整 lifecycle matrix 見 [`../../apps/api/app/interview_vnext/README.md`](../../apps/api/app/interview_vnext/README.md)。
 

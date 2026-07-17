@@ -21,7 +21,7 @@ from typing import Any, Callable
 from uuid import UUID
 
 from app.interview_vnext.domain.commands import CommandBase
-from app.interview_vnext.domain.hashing import canonical_hash
+from app.interview_vnext.domain.hashing import canonical_hash, canonical_json
 from app.interview_vnext.domain.reducers import ReductionResult
 from app.interview_vnext.observability.artifacts import (
     ArtifactRecord,
@@ -45,6 +45,7 @@ from app.interview_vnext.persistence.errors import (
 )
 
 from .durable_commands import DurableCommandOutcome, _commit_command_core
+from .noop_result import OPERATION_NOOP_RESULT_SCHEMA_ID, OperationNoopResult
 from .persistence import (
     AttemptStatus,
     ExecutionEventDraft,
@@ -431,6 +432,311 @@ async def commit_verified_operation(
                 output_artifacts=(reduction_ref, response.ref),
                 state_before_hash=checkpoint.state_before_hash,
                 state_after_hash=result.state_hash))
+        await uow.commit()
+        return next_checkpoint, result
+
+
+def _require_operation_artifact_scope(
+    record: ArtifactRecord,
+    *,
+    checkpoint: OperationCheckpoint,
+    role: str,
+) -> None:
+    if (
+        record.run_id != checkpoint.run_id
+        or record.session_id != checkpoint.session_id
+        or record.turn_id != checkpoint.turn_id
+        or record.operation_id != checkpoint.operation_id
+        or record.attempt_id is not None
+    ):
+        raise CheckpointConflict(
+            f"{role} artifact scope does not match operation checkpoint",
+            operation_id=checkpoint.operation_id,
+            artifact_id=record.ref.artifact_id,
+        )
+
+
+def _build_noop_artifact(
+    *,
+    checkpoint: OperationCheckpoint,
+    verification_artifact: ArtifactRecord,
+    response_artifact: ArtifactRecord,
+    noop_result_artifact_id: UUID,
+    step_event_id: UUID,
+    reason_code: str,
+    dropped_count: int,
+    committed_at: datetime,
+) -> tuple[OperationNoopResult, ArtifactRecord]:
+    result = OperationNoopResult(
+        operation_id=checkpoint.operation_id,
+        completion_event_id=step_event_id,
+        reason_code=reason_code,
+        state_before_hash=checkpoint.state_before_hash,
+        state_after_hash=checkpoint.state_before_hash,
+        dropped_count=dropped_count,
+        verification_artifact=verification_artifact.ref,
+    )
+    artifact = build_inline_artifact(
+        artifact_id=noop_result_artifact_id,
+        kind="operation.noop_result",
+        media_type="application/json",
+        payload=result,
+        schema_id=OPERATION_NOOP_RESULT_SCHEMA_ID,
+        run_id=checkpoint.run_id,
+        session_id=checkpoint.session_id,
+        turn_id=checkpoint.turn_id,
+        operation_id=checkpoint.operation_id,
+        created_at=committed_at,
+        contains_test_data=(
+            verification_artifact.contains_test_data
+            or response_artifact.contains_test_data
+        ),
+    )
+    return result, artifact
+
+
+async def _replay_committed_noop(
+    uow: VNextUnitOfWork,
+    *,
+    tenant_id: UUID,
+    checkpoint: OperationCheckpoint,
+    verification_artifact: ArtifactRecord,
+    response_artifact: ArtifactRecord,
+    noop_result_artifact_id: UUID,
+    step_event_id: UUID,
+    reason_code: str,
+    dropped_count: int,
+    committed_at: datetime,
+) -> tuple[OperationCheckpoint, OperationNoopResult]:
+    assert checkpoint.status == CheckpointStatus.COMMITTED
+    assert checkpoint.verification_artifact is not None
+    assert checkpoint.domain_result_artifact is not None
+    assert checkpoint.response_artifact is not None
+
+    expected_result, expected_noop = _build_noop_artifact(
+        checkpoint=checkpoint,
+        verification_artifact=verification_artifact,
+        response_artifact=response_artifact,
+        noop_result_artifact_id=noop_result_artifact_id,
+        step_event_id=step_event_id,
+        reason_code=reason_code,
+        dropped_count=dropped_count,
+        committed_at=committed_at,
+    )
+    if (
+        checkpoint.verification_artifact != verification_artifact.ref
+        or checkpoint.domain_result_artifact != expected_noop.ref
+        or checkpoint.response_artifact != response_artifact.ref
+        or checkpoint.state_after_hash != checkpoint.state_before_hash
+    ):
+        raise CheckpointConflict(
+            "committed checkpoint has a different no-op outcome",
+            operation_id=checkpoint.operation_id,
+        )
+
+    stored_verification, stored_noop, stored_response = await uow.artifacts.get_many(
+        tenant_id=tenant_id,
+        refs=(
+            checkpoint.verification_artifact,
+            checkpoint.domain_result_artifact,
+            checkpoint.response_artifact,
+        ),
+    )
+    if (
+        stored_verification != verification_artifact
+        or stored_noop != expected_noop
+        or stored_response != response_artifact
+    ):
+        raise CheckpointConflict(
+            "committed no-op artifacts differ from the replay request",
+            operation_id=checkpoint.operation_id,
+        )
+    persisted_result = OperationNoopResult.model_validate_json(
+        stored_noop.inline_content or ""
+    )
+    if persisted_result != expected_result:
+        raise CheckpointConflict(
+            "committed no-op result differs from the replay request",
+            operation_id=checkpoint.operation_id,
+        )
+    return checkpoint, persisted_result
+
+
+async def commit_verified_noop_operation(
+    uow_factory: Callable[[], VNextUnitOfWork],
+    *,
+    tenant_id: UUID,
+    operation_id: UUID,
+    response_artifact: ArtifactRecord,
+    verification_artifact: ArtifactRecord,
+    noop_result_artifact_id: UUID,
+    step_event_id: UUID,
+    committed_at: datetime,
+    dropped_count: int,
+    reason_code: str = "no_domain_mutation",
+    stage: str = "turn.interpret",
+) -> tuple[OperationCheckpoint, OperationNoopResult]:
+    """Commit a successful verified operation without a command or state write.
+
+    The typed no-op outcome, response, checkpoint transition, completion event and
+    outbox message are atomic. Exact replay is idempotent; any changed artifact or
+    semantic input is an explicit checkpoint conflict.
+    """
+    async with uow_factory() as uow:
+        checkpoint = await _require_checkpoint(
+            uow, tenant_id=tenant_id, operation_id=operation_id
+        )
+        _require_operation_artifact_scope(
+            verification_artifact, checkpoint=checkpoint, role="verification"
+        )
+        _require_operation_artifact_scope(
+            response_artifact, checkpoint=checkpoint, role="response"
+        )
+        if response_artifact.ref.kind != "operation.response":
+            raise CheckpointConflict(
+                "response artifact has an unexpected kind",
+                operation_id=operation_id,
+                artifact_id=response_artifact.ref.artifact_id,
+            )
+        if response_artifact.ref.media_type != "application/json":
+            raise CheckpointConflict(
+                "response artifact must be application/json",
+                operation_id=operation_id,
+                artifact_id=response_artifact.ref.artifact_id,
+            )
+        if response_artifact.created_at != committed_at:
+            raise CheckpointConflict(
+                "response artifact timestamp must equal committed_at",
+                operation_id=operation_id,
+                artifact_id=response_artifact.ref.artifact_id,
+            )
+        if noop_result_artifact_id in {
+            verification_artifact.ref.artifact_id,
+            response_artifact.ref.artifact_id,
+        }:
+            raise CheckpointConflict(
+                "no-op result artifact ID must be distinct",
+                operation_id=operation_id,
+                artifact_id=noop_result_artifact_id,
+            )
+
+        if checkpoint.status == CheckpointStatus.COMMITTED:
+            return await _replay_committed_noop(
+                uow,
+                tenant_id=tenant_id,
+                checkpoint=checkpoint,
+                verification_artifact=verification_artifact,
+                response_artifact=response_artifact,
+                noop_result_artifact_id=noop_result_artifact_id,
+                step_event_id=step_event_id,
+                reason_code=reason_code,
+                dropped_count=dropped_count,
+                committed_at=committed_at,
+            )
+        if checkpoint.status != CheckpointStatus.VERIFIED:
+            raise CheckpointConflict(
+                f"no-op commit requires a verified checkpoint, got {checkpoint.status.value}",
+                operation_id=operation_id,
+            )
+        if checkpoint.verification_artifact != verification_artifact.ref:
+            raise CheckpointConflict(
+                "verification artifact does not match the verified checkpoint",
+                operation_id=operation_id,
+                artifact_id=verification_artifact.ref.artifact_id,
+            )
+
+        # Match the command path lock order: run -> state/artifacts -> event.
+        await uow.runs.lock(tenant_id=tenant_id, run_id=checkpoint.run_id)
+        checkpoint = await _require_checkpoint(
+            uow, tenant_id=tenant_id, operation_id=operation_id
+        )
+        if checkpoint.status == CheckpointStatus.COMMITTED:
+            return await _replay_committed_noop(
+                uow,
+                tenant_id=tenant_id,
+                checkpoint=checkpoint,
+                verification_artifact=verification_artifact,
+                response_artifact=response_artifact,
+                noop_result_artifact_id=noop_result_artifact_id,
+                step_event_id=step_event_id,
+                reason_code=reason_code,
+                dropped_count=dropped_count,
+                committed_at=committed_at,
+            )
+        if (
+            checkpoint.status != CheckpointStatus.VERIFIED
+            or checkpoint.verification_artifact != verification_artifact.ref
+        ):
+            raise CheckpointConflict(
+                "checkpoint moved before no-op commit",
+                operation_id=operation_id,
+            )
+
+        state = await uow.sessions.get(
+            tenant_id=tenant_id, session_id=checkpoint.session_id
+        )
+        if canonical_hash(state) != checkpoint.state_before_hash:
+            raise CheckpointConflict(
+                "session state moved since prepare; re-prepare the operation",
+                operation_id=operation_id,
+                session_id=checkpoint.session_id,
+            )
+
+        result, noop_artifact = _build_noop_artifact(
+            checkpoint=checkpoint,
+            verification_artifact=verification_artifact,
+            response_artifact=response_artifact,
+            noop_result_artifact_id=noop_result_artifact_id,
+            step_event_id=step_event_id,
+            reason_code=reason_code,
+            dropped_count=dropped_count,
+            committed_at=committed_at,
+        )
+        await uow.artifacts.put(tenant_id=tenant_id, record=verification_artifact)
+        stored_noop = await uow.artifacts.put(
+            tenant_id=tenant_id, record=noop_artifact
+        )
+        stored_response = await uow.artifacts.put(
+            tenant_id=tenant_id, record=response_artifact
+        )
+        next_checkpoint = mark_committed(
+            checkpoint,
+            domain_result_artifact=stored_noop.ref,
+            response_artifact=stored_response.ref,
+            state_after_hash=checkpoint.state_before_hash,
+            occurred_at=committed_at,
+        )
+        await _cas_or_conflict(
+            uow,
+            tenant_id=tenant_id,
+            expected_revision=checkpoint.revision,
+            checkpoint=next_checkpoint,
+        )
+        await uow.capture.append_event(
+            tenant_id=tenant_id,
+            run_id=checkpoint.run_id,
+            draft=ExecutionEventDraft(
+                event_id=step_event_id,
+                occurred_at=committed_at,
+                session_id=checkpoint.session_id,
+                turn_id=checkpoint.turn_id,
+                operation_id=operation_id,
+                event_type="workflow.step.completed",
+                stage=stage,
+                status=ExecutionStatus.OK,
+                input_artifacts=(verification_artifact.ref,),
+                output_artifacts=(stored_noop.ref, stored_response.ref),
+                state_before_hash=checkpoint.state_before_hash,
+                state_after_hash=checkpoint.state_before_hash,
+                metadata_json=canonical_json(
+                    {
+                        "accepted_count": 0,
+                        "dropped_count": dropped_count,
+                        "reason": reason_code,
+                    }
+                ),
+            ),
+        )
         await uow.commit()
         return next_checkpoint, result
 

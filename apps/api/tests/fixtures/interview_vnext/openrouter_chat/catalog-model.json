@@ -1,7 +1,7 @@
 {
   "data": {
     "id": "testlab/analyst-large",
-    "canonical_slug": "testlab/analyst-large",
+    "canonical_slug": "testlab/analyst-large-20260717",
     "name": "TestLab: Analyst Large",
     "created": 1780000000,
     "description": "Synthetic test-only model document.",

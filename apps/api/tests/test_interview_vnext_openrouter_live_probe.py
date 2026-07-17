@@ -46,6 +46,7 @@ def make_handler(
     model: str = "catalog-model.json",
     endpoints: str = "catalog-endpoints.json",
     model_status: int = 200,
+    chat_headers: dict[str, str] | None = None,
 ):
     manifest = json.loads((FIXTURES / "manifest.json").read_text("utf-8"))
 
@@ -66,7 +67,11 @@ def make_handler(
             return httpx.Response(
                 meta.get("status", 200),
                 json=fixture_json(chat),
-                headers=meta.get("headers", {}),
+                headers=(
+                    meta.get("headers", {})
+                    if chat_headers is None
+                    else chat_headers
+                ),
             )
         return httpx.Response(404, json={"error": {"code": 404}})
 
@@ -188,6 +193,8 @@ class TestSuccessBundle:
         assert report["final_config_created"] is True
         assert report["local_output_validation_passed"] is True
         assert report["resolved_model"] == MODEL
+        assert report["catalog_model_id"] == MODEL
+        assert report["catalog_canonical_slug"] == "testlab/analyst-large-20260717"
         assert report["selected_provider_name"] == "TestHost"
         assert report["router_strategy"] == "direct"
         assert report["router_attempt"] == 1
@@ -205,6 +212,17 @@ class TestSuccessBundle:
             assert API_KEY not in content, name
             assert "Authorization" not in content, name
             assert "sk-or-eval" not in content, name
+
+    async def test_missing_provider_request_id_is_an_explicit_limitation(
+        self, tmp_path
+    ):
+        exit_code, bundle = await run_mocked(
+            tmp_path, make_handler(chat_headers={})
+        )
+        assert exit_code == 0
+        report = json.loads((bundle / "probe-report.json").read_text("utf-8"))
+        assert report["provider_request_id"] is None
+        assert "provider HTTP request ID was not returned" in report["limitations"]
 
 
 class TestFailureBundles:

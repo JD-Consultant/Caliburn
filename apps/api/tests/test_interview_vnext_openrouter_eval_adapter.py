@@ -57,6 +57,7 @@ API_KEY = "sk-or-eval-test-not-a-real-key"
 RUN_ID = uuid5(uuid4(), "run")
 CREATED_AT = datetime(2026, 7, 17, 3, 0, 0, tzinfo=UTC)
 REQUESTED_MODEL = "testlab/analyst-large"
+CANONICAL_MODEL = "testlab/analyst-large-20260717"
 ENDPOINT_SLUG = "testhost"
 
 
@@ -784,6 +785,7 @@ class TestSuccessPath:
 
         routing = artifact_by_label(envelope, ROUTING_ARTIFACT_LABEL)
         assert routing["resolved_model"] == REQUESTED_MODEL
+        assert routing["catalog_canonical_model"] == CANONICAL_MODEL
         assert routing["configured_endpoint_slug"] == ENDPOINT_SLUG
         assert routing["expected_provider_name"] == "TestHost"
         assert routing["selected_provider_name"] == "TestHost"
@@ -1120,6 +1122,40 @@ class TestRoutingContamination:
             clean_metadata(unexpected_router_field={"anything": True})
         )
         assert envelope.result.outcome == ModelOutcome.SUCCEEDED
+
+    async def test_snapshot_canonical_model_in_selected_route_is_accepted(self):
+        envelope = await self._run(
+            clean_metadata(
+                endpoints=[
+                    {
+                        "provider": "TestHost",
+                        "model": CANONICAL_MODEL,
+                        "selected": True,
+                    }
+                ],
+                attempts=[
+                    {"provider": "TestHost", "model": CANONICAL_MODEL, "status": 200}
+                ],
+            )
+        )
+        assert envelope.result.outcome == ModelOutcome.SUCCEEDED
+        routing = artifact_by_label(envelope, ROUTING_ARTIFACT_LABEL)
+        assert routing["selected_model"] == CANONICAL_MODEL
+        assert routing["conformance"]["provider_model_match"] is True
+
+    async def test_unbound_selected_model_is_contaminated(self):
+        envelope = await self._run(
+            clean_metadata(
+                endpoints=[
+                    {
+                        "provider": "TestHost",
+                        "model": "testlab/unbound-model",
+                        "selected": True,
+                    }
+                ]
+            )
+        )
+        assert envelope.result.failure.reason_code == "openrouter.route_contaminated"
 
     async def test_cache_like_response_is_not_success(self):
         # cache hit: metadata absent + zero usage -> must not be a quality trial.

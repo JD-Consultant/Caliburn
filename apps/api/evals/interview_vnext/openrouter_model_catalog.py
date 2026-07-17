@@ -214,11 +214,10 @@ def preflight(
             f"model lookup returned id {model_id!r} for {requested_model!r}",
         )
     canonical_slug = data.get("canonical_slug")
-    if canonical_slug != requested_model:
+    if not isinstance(canonical_slug, str) or not canonical_slug.strip():
         raise PreflightError(
-            "openrouter.preflight.alias_resolution_rejected",
-            "requested slug resolved to a different canonical slug "
-            f"{canonical_slug!r}; benchmark requires the exact canonical model",
+            "openrouter.preflight.canonical_slug_missing",
+            "model lookup did not expose a non-empty permanent canonical_slug",
         )
     expiration = _expiration(data.get("expiration_date"))
     if data.get("expiration_date") is not None and expiration is None:

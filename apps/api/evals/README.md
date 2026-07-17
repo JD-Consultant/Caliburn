@@ -15,8 +15,11 @@ Capture 規格見
 fixtures，不能假造 C0 baseline。新 session 的 opt-in immutable capture 操作與限制見
 [`interview_v4/README.md`](interview_v4/README.md)。
 
-尚未實作的vNext V3-4 eval-only OpenAI Responses adapter已有可直接交接規格：
-[`../../../docs/plans/2026-07-17-interview-vnext-v3-4-openai-responses-adapter-plan.md`](../../../docs/plans/2026-07-17-interview-vnext-v3-4-openai-responses-adapter-plan.md)。它只驗provider mapping與Capture完整性；12-case turn模型品質gate仍屬V3-5。
+vNext provider conformance adapters位於[`interview_vnext/`](interview_vnext/)：direct OpenAI
+Responses保留為mocked reference，OpenRouter-first Chat adapter已於2026-07-18以真Claude Sonnet 5／
+Anthropic endpoint通過single-call、exact routing、strict schema與Capture/hash-chain gate。完整規格與live
+evidence見
+[`../../../docs/plans/2026-07-17-interview-vnext-v3-4r-openrouter-first-adapter-plan.md`](../../../docs/plans/2026-07-17-interview-vnext-v3-4r-openrouter-first-adapter-plan.md)。它只證明provider mapping與Capture完整性；12-case turn模型品質gate仍屬V3-5。
 
 雙指標(Harvey 式):**Source Score(程式算)** + **Answer Score(rubric 裁判,Phase 2)**。
 

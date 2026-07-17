@@ -1046,7 +1046,7 @@ class OpenRouterChatEvalAdapter(LlmPort):
             created_at=completed_at,
         )
 
-        # §9.4/§9.6: resolved model must be the exact requested canonical model.
+        # §9.4/§9.6: resolved model must be the exact requested catalog model ID.
         if resolved_model not in self._config.accepted_resolved_models:
             visible = self._visible_artifact(request, body, created_at=completed_at)
             failure = _Failure(
@@ -1304,6 +1304,10 @@ class OpenRouterChatEvalAdapter(LlmPort):
             check.failures.append(f"strategy {check.strategy!r} not approved")
 
         provider_ok = selected_count == 1
+        accepted_metadata_models = {
+            self._config.requested_model,
+            self._config.catalog_canonical_model,
+        }
         if selected_count != 1:
             check.failures.append(
                 f"expected exactly one selected endpoint, found {selected_count}"
@@ -1315,10 +1319,11 @@ class OpenRouterChatEvalAdapter(LlmPort):
                     f"selected provider {provider_name!r} != "
                     f"{self._config.expected_upstream_provider_name!r}"
                 )
-            if selected_model != resolved_model:
+            if selected_model not in accepted_metadata_models:
                 provider_ok = False
                 check.failures.append(
-                    f"selected model {selected_model!r} != resolved {resolved_model!r}"
+                    f"selected model {selected_model!r} is not one of the "
+                    "snapshot-bound request/canonical model identities"
                 )
         check.provider_model_match = provider_ok
 
@@ -1330,7 +1335,9 @@ class OpenRouterChatEvalAdapter(LlmPort):
                 if (
                     provider is not None
                     and provider != self._config.expected_upstream_provider_name
-                ) or (model is not None and model != resolved_model):
+                ) or (
+                    model is not None and model not in accepted_metadata_models
+                ):
                     attempt_conflict = True
                     break
         check.single_upstream_attempt = check.router_attempt == 1 and not attempt_conflict
@@ -1363,6 +1370,7 @@ class OpenRouterChatEvalAdapter(LlmPort):
             "schema_version": ROUTING_SCHEMA_VERSION,
             "requested_model": request.requested_model,
             "resolved_model": resolved_model,
+            "catalog_canonical_model": self._config.catalog_canonical_model,
             "configured_endpoint_slug": self._config.upstream_endpoint_slug,
             "expected_provider_name": self._config.expected_upstream_provider_name,
             "selected_provider_name": routing.selected_provider_name,

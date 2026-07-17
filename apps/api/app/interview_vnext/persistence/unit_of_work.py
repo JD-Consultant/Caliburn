@@ -45,7 +45,8 @@ class SqlAlchemyVNextUnitOfWork:
         self.runs = SqlAlchemyRunRepository(self._session)
         self.checkpoints = SqlAlchemyCheckpointRepository(self._session)
         self.attempts = SqlAlchemyAttemptRepository(self._session)
-        self.capture = DurableCaptureWriter(self._session, artifacts=self.artifacts)
+        self.capture = DurableCaptureWriter(self._session, artifacts=self.artifacts,
+                                            runs=self.runs, sessions=self.sessions)
         return self
 
     async def __aexit__(self, exc_type, exc, tb) -> None:

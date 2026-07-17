@@ -1,7 +1,8 @@
 # Interview AI vNext V3-4R——OpenRouter-first adapter、routing conformance與 live gate交接規格
 
 - 日期：2026-07-17
-- 狀態：**研究定稿、已核准實作；尚未寫 code、尚未執行 OpenRouter live gate**
+- 狀態：**R1–R5 實作完成、mocked conformance 全綠、full API+PostgreSQL regression 全綠(756 passed)；
+  R6 OpenRouter live gate 待真 `OPENROUTER_API_KEY` 執行(`mocked complete, OpenRouter live gate pending`)**
 - 決策：[`../adr/0035-interview-vnext-openrouter-first-provider-boundary.md`](../adr/0035-interview-vnext-openrouter-first-provider-boundary.md)
 - 上游 contract：[`../specs/2026-07-17-interview-vnext-v3-fixed-replay-research.md`](../specs/2026-07-17-interview-vnext-v3-fixed-replay-research.md)
 - direct OpenAI reference：[`2026-07-17-interview-vnext-v3-4-openai-responses-adapter-plan.md`](2026-07-17-interview-vnext-v3-4-openai-responses-adapter-plan.md)

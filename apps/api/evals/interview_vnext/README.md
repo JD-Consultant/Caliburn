@@ -1,6 +1,6 @@
 # Interview vNext — eval-only provider adapters
 
-**Status（2026-07-18）：OpenRouter-first V3-4R live-verified complete；V3-5 engineering unblocked**
+**Status（2026-07-18）：OpenRouter-first V3-4R live-verified complete；V3-5 detailed handoff ready、implementation pending**
 
 - OpenRouter focused mocked suite:`model_catalog`(51)+`eval_adapter`(88)+`live_probe`(9)=
   **148 passed**；OpenAI direct reference regression **66 passed**；neutral/import/fixed-replay PostgreSQL
@@ -27,6 +27,8 @@ V2/V3 已發布的 provider-neutral contract(`app.interview_vnext.llm`)」。
   `docs/plans/2026-07-17-interview-vnext-v3-4r-openrouter-first-adapter-plan.md`。
 - OpenAI direct reference規格：
   `docs/plans/2026-07-17-interview-vnext-v3-4-openai-responses-adapter-plan.md`。
+- V3-5 turn品質評測唯一實作規格：
+  `docs/plans/2026-07-18-interview-vnext-v3-5-turn-eval-harness-plan.md`（harness/cases尚未落地）。
 - **production `apps/api/app/` 不得 import 本目錄**;dependency guard 測試強制。
 - 這裡沒有品質評測:V3-4 只做 adapter conformance;12-case 品質/多 trial 是 V3-5。
 

@@ -3,7 +3,7 @@
 - 日期：2026-07-17
 - 狀態：**已核准執行；研究定稿，實作進行中**
 - 權威規格：[`../specs/2026-07-17-interview-vnext-v3-fixed-replay-research.md`](../specs/2026-07-17-interview-vnext-v3-fixed-replay-research.md)
-- 前置完成：V0、V1、V2-A、V2-B、V3-0、V3-1、V3-2、V3-3與V3-4R；目前 head含 migration 0010、durable UoW/Capture/outbox/recovery、pure ContextBuilder、turn proposal verifier、顯式fixed-replay executor與live-verified OpenRouter adapter。Direct OpenAI V3-4保留為mocked reference；ADR 0035已取消其官方live gate的主線阻擋地位。**2026-07-18真OpenRouter probe已通過；下一步是V3-5 deterministic harness與12-case multi-trial品質gate。**
+- 前置完成：V0、V1、V2-A、V2-B、V3-0、V3-1、V3-2、V3-3與V3-4R；目前 head含 migration 0010、durable UoW/Capture/outbox/recovery、pure ContextBuilder、turn proposal verifier、顯式fixed-replay executor與live-verified OpenRouter adapter。Direct OpenAI V3-4保留為mocked reference；ADR 0035已取消其官方live gate的主線阻擋地位。**2026-07-18真OpenRouter probe已通過，V3-5詳細實作交接規格已完成；下一步由實作者依該規格建立deterministic harness與12-case multi-trial品質gate。**
 
 ---
 
@@ -458,6 +458,11 @@ Probe必須實際寫 Capture run/artifacts/report，確認 resolved model、requ
 
 ## 8. V3-5——Turn component eval
 
+> 本節是早期摘要。逐檔contract、12個固定case文字、trial/attempt disposition、gold隔離、Capture
+> bundle、blind review、CLI、測試與E0～E8 commit authority見
+> [`2026-07-18-interview-vnext-v3-5-turn-eval-harness-plan.md`](2026-07-18-interview-vnext-v3-5-turn-eval-harness-plan.md)；
+> 實作者不得只依本摘要自行補語意。
+
 ### 8.1 新增結構
 
 ```text
@@ -483,6 +488,7 @@ transcript.jsonl
 initial_state.json
 reference_snapshot.json       # turn case可為明確空 snapshot
 gold.json
+reference_output.json
 adjudication.md
 ```
 

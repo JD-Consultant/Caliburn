@@ -14,6 +14,7 @@
 - 決策：[`../../../../docs/adr/0034-interview-ai-vnext-greenfield-evidence-workflow.md`](../../../../docs/adr/0034-interview-ai-vnext-greenfield-evidence-workflow.md)
 - OpenRouter-first決策：[`../../../../docs/adr/0035-interview-vnext-openrouter-first-provider-boundary.md`](../../../../docs/adr/0035-interview-vnext-openrouter-first-provider-boundary.md)
 - V3-4R交接：[`../../../../docs/plans/2026-07-17-interview-vnext-v3-4r-openrouter-first-adapter-plan.md`](../../../../docs/plans/2026-07-17-interview-vnext-v3-4r-openrouter-first-adapter-plan.md)
+- V3-5 turn eval交接（實作pending）：[`../../../../docs/plans/2026-07-18-interview-vnext-v3-5-turn-eval-harness-plan.md`](../../../../docs/plans/2026-07-18-interview-vnext-v3-5-turn-eval-harness-plan.md)
 - package 禁令：[`AGENTS.md`](AGENTS.md)
 
 ## 目前的程式邊界
@@ -404,8 +405,10 @@ tokens為0、strict schema/local output/hash-chain/secret scan皆通過。OpenRo
 OpenAI regression `66 passed`，neutral/import/fixed-replay PostgreSQL `23 passed`，完整API+real
 PostgreSQL `762 passed, 0 skipped`。完整hash、usage、cost與第一次diagnostic failure的identity修正見
 [`V3-4R OpenRouter-first規格 §15.6`](../../../../docs/plans/2026-07-17-interview-vnext-v3-4r-openrouter-first-adapter-plan.md)。
-下一步是V3-5：以12個turn component tasks、每case多trial量測模型品質；開始付費batch前owner仍須確認
-OpenRouter dashboard未套preset／account-wide override。
+下一步是V3-5：詳細交接規格已完成、程式與case尚未實作；將以12個turn component tasks、每case三個
+quality trials量測模型品質，並以deterministic graders、盲化人工claim裁決與`pass^3` gate驗收。開始
+付費batch前owner仍須確認OpenRouter dashboard未套preset／account-wide override。實作不得只依README摘要，
+必須遵守[`V3-5 turn eval規格`](../../../../docs/plans/2026-07-18-interview-vnext-v3-5-turn-eval-harness-plan.md)。
 先做Capture/persistence、Context Engine與durable executor的原因是：
 沒有可重播 execution record,就無法判斷未來品質差是模型、context selection、
 verifier 還是 reducer 所造成。V5 前必須完成 authenticated principal → tenant

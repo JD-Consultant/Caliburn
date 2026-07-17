@@ -375,17 +375,31 @@ apps/api/tests/test_interview_vnext_llm.py
 
 ## 7. V3-4——Eval-only OpenAI Responses adapter
 
+本節只保留切片摘要。已研究SDK 2.46.0實際surface並裁決schema resolver、single-call retry ownership、status/error/usage mapping、artifact格式、mocked HTTP matrix與live Capture bundle的逐步實作權威是：
+
+[`2026-07-17-interview-vnext-v3-4-openai-responses-adapter-plan.md`](2026-07-17-interview-vnext-v3-4-openai-responses-adapter-plan.md)
+
+實作者必須完整閱讀該文件；不得只按下列舊摘要自行補決策。
+
 ### 7.1 新增檔案
 
 ```text
+apps/api/evals/interview_vnext/__init__.py
+apps/api/evals/interview_vnext/README.md
 apps/api/evals/interview_vnext/providers/__init__.py
 apps/api/evals/interview_vnext/providers/openai_responses.py
 apps/api/evals/interview_vnext/provider_config.py
+apps/api/evals/interview_vnext/schema_catalog.py
+apps/api/evals/interview_vnext/live_probe.py
+apps/api/evals/interview_vnext/probes/turn-interpret-smoke.v1.json
 apps/api/tests/test_interview_vnext_openai_eval_adapter.py
+apps/api/tests/test_interview_vnext_openai_live_probe.py
 apps/api/tests/fixtures/interview_vnext/openai_responses/*.json
 ```
 
 直接使用官方 `openai` SDK，不經 LangChain/OpenRouter。`langchain-openai`仍可能被 v3使用，本切片不移除。
+
+Adapter使用`responses.create(text.format=...)`送出與request artifact hash一致的portable schema，不使用`responses.parse`重生完整Pydantic schema。client固定`max_retries=0`；一個durable attempt只做一個HTTP call。
 
 ### 7.2 Config
 
@@ -396,10 +410,13 @@ reasoning_effort=medium
 reasoning_mode=standard
 store=false                  # hard invariant，不可覆寫
 truncation=disabled           # hard invariant
-request_timeout_seconds=...
+connect_timeout_seconds=10.0 # 不得超過request剩餘deadline
+sdk_max_retries=0             # hard invariant
 ```
 
 模型設定寫入 eval run artifact與 config hash；不得修改 operation definition hash來換模型。
+
+`request.deadline_at`是總wall-clock timeout的authority，不另設可漂移的operation timeout。config只保留connect timeout；hard invariants與`max_retries=0`也必須進secret-free config dump/hash。
 
 ### 7.3 Mocked matrix
 
@@ -407,7 +424,7 @@ request_timeout_seconds=...
 - output array前面有非 message item；
 - refusal；
 - max output incomplete；
-- context length incomplete/error；
+- content-filter incomplete與context-length 400 error；
 - 400 invalid schema；
 - 401 auth；
 - 429 rate limit；

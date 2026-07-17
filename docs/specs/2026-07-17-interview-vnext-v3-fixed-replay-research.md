@@ -4,6 +4,7 @@
 - 狀態：**研究定稿、已核准執行；V3-0/V3-1/V3-2/V3-3已完成，下一步V3-4**
 - 上游：[`2026-07-16-interview-ai-vnext-greenfield-architecture.md`](2026-07-16-interview-ai-vnext-greenfield-architecture.md)、[`2026-07-16-interview-vnext-v2b-durable-persistence-research.md`](2026-07-16-interview-vnext-v2b-durable-persistence-research.md)
 - 實作計畫：[`../plans/2026-07-17-interview-vnext-v3-fixed-replay-plan.md`](../plans/2026-07-17-interview-vnext-v3-fixed-replay-plan.md)
+- V3-4 adapter交接：[`../plans/2026-07-17-interview-vnext-v3-4-openai-responses-adapter-plan.md`](../plans/2026-07-17-interview-vnext-v3-4-openai-responses-adapter-plan.md)
 - 裁決權：本文件優先於總實作計畫 §6 的概略描述；若要改本文件的 contract、gate 或 transaction boundary，先更新文件再寫 code。
 
 ---
@@ -522,9 +523,12 @@ V3-3只啟用**最多一次schema repair**：它只適用於provider回`SUCCEEDE
 
 ## 9. Eval-only OpenAI Responses adapter
 
+本節是architecture摘要；request/response逐欄映射、schema authority、SDK 2.46.0 retry/timeout、artifact shape、mocked matrix與live Capture bundle的實作權威為
+[`2026-07-17-interview-vnext-v3-4-openai-responses-adapter-plan.md`](../plans/2026-07-17-interview-vnext-v3-4-openai-responses-adapter-plan.md)。摘要與交接規格衝突時，以交接規格為準。
+
 ### 9.1 邊界
 
-Adapter放在 `apps/api/evals/interview_vnext/providers/`，實作既有 `LlmPort`，但 production `app` composition root不得 import。CI使用 mocked HTTP/recorded provider-shape fixtures；live command只有明確設定 `OPENAI_API_KEY`才執行，沒有 key就 fail-fast，不標成測試通過。
+Adapter放在 `apps/api/evals/interview_vnext/providers/`，實作既有 `LlmPort`，但 production `app` composition root不得 import。CI使用mocked HTTP與依官方OpenAPI/SDK shape建立的synthetic fixtures；fixture sidecar記錄來源日期與版本。live command只有明確設定 `OPENAI_API_KEY`才執行，沒有key就fail-fast，不標成測試通過。
 
 ### 9.2 request mapping
 
@@ -534,8 +538,10 @@ Adapter放在 `apps/api/evals/interview_vnext/providers/`，實作既有 `LlmPor
 - 不傳 `previous_response_id`；
 - 無 tools；
 - `text.format = json_schema + strict`；
+- 使用`responses.create(text.format=...)`送出與persisted artifact hash完全相同的portable schema；不使用會從完整Pydantic model重生另一份schema的`responses.parse(text_format=TurnInterpretOutput)`；
 - instructions與messages由 `ModelCallRequest`映射；
 - deadline映射到 client timeout；
+- OpenAI SDK client固定`max_retries=0`，一個durable attempt只允許一個HTTP call，所有retry由V3-3 executor建立新attempt；
 - model與 reasoning profile來自 eval config，不寫入 operation/domain；
 -保存 requested model與 provider回傳 resolved model。
 
@@ -547,13 +553,13 @@ Adapter遍歷全部 typed output items：
 
 - completed + parsed schema -> `SUCCEEDED`；
 - refusal item -> `REFUSED/SAFETY_REFUSAL`；
-- incomplete status/details -> `INCOMPLETE`與對應 finish reason；
+- incomplete status/details（目前SDK reason為`max_output_tokens | content_filter`）-> `INCOMPLETE`與對應 finish reason；context window超限按400 error正規化，不杜撰incomplete reason；
 - HTTP/auth/rate/timeout -> typed `ModelFailure`；
 - completed但無唯一 parsed message -> `OUTPUT_PARSE_FAILED`；
 - resolved model違反 eval config pin policy -> `RESOLVED_MODEL_MISMATCH`；
 - usage保存 input/output/cache/reasoning token，缺值附 limitation。
 
-原始 provider response、可見 response與 parsed canonical payload分開存 artifact。不得只存 Pydantic parsed object而丟失 provider failure細節。
+原始provider response與可見response各自存supporting artifact；parsed canonical payload由既有`model.result` artifact內的`ModelCallResult.parsed_output`承載，normalized failure另有error artifact。不得只存Pydantic parsed object而丟失provider status、output item或failure細節。
 
 ### 9.4 為何 V3不先做 Anthropic live adapter
 

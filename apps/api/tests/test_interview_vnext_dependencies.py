@@ -57,6 +57,18 @@ def test_application_and_domain_never_import_persistence_frameworks():
     assert violations == []
 
 
+def test_production_app_does_not_import_eval_adapter():
+    """V3-4 §4:provider eval adapter 只住 `apps/api/evals/`;production `app/`
+    (含 composition root、route、interview_vnext)不得 import `evals` 任何子模組。"""
+    app_root = Path(__file__).parents[1] / "app"
+    violations: list[str] = []
+    for path in app_root.rglob("*.py"):
+        for line, module in _imports(path):
+            if module == "evals" or module.startswith("evals."):
+                violations.append(f"{path.relative_to(app_root)}:{line} imports {module}")
+    assert violations == []
+
+
 def test_neutral_llm_and_capture_contracts_do_not_import_provider_or_agent_sdks():
     forbidden_roots = {
         "anthropic",

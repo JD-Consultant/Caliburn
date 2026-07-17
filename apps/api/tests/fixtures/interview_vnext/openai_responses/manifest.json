@@ -1,0 +1,55 @@
+{
+  "schema_version": "openai_responses_fixture_manifest.v1",
+  "source": {
+    "openapi": "https://api.openai.com/v1/responses (official OpenAPI shape)",
+    "reference": "https://developers.openai.com/api/reference/resources/responses/methods/create",
+    "sdk": "openai-python 2.46.0",
+    "checked": "2026-07-17",
+    "synthetic": true,
+    "contains_test_data": true
+  },
+  "fixtures": {
+    "invalid_schema_400.json": {
+      "kind": "http_error",
+      "status": 400,
+      "headers": {"x-request-id": "req_fx_400_schema"},
+      "purpose": "provider rejects the exact published schema; must be non-retryable INVALID_REQUEST and stop the line per spec §6.4"
+    },
+    "context_length_400.json": {
+      "kind": "http_error",
+      "status": 400,
+      "headers": {"x-request-id": "req_fx_400_context"},
+      "purpose": "context window exceeded under truncation=disabled; finish_reason=context_window_exceeded, non-retryable"
+    },
+    "authentication_401.json": {
+      "kind": "http_error",
+      "status": 401,
+      "headers": {"x-request-id": "req_fx_401"},
+      "purpose": "authentication failure is non-retryable"
+    },
+    "permission_403.json": {
+      "kind": "http_error",
+      "status": 403,
+      "headers": {"x-request-id": "req_fx_403"},
+      "purpose": "permission denial is non-retryable AUTHENTICATION_FAILED"
+    },
+    "rate_limit_429.json": {
+      "kind": "http_error",
+      "status": 429,
+      "headers": {"x-request-id": "req_fx_429_rate"},
+      "purpose": "retryable rate limit; adapter must not retry itself (single HTTP call)"
+    },
+    "quota_429.json": {
+      "kind": "http_error",
+      "status": 429,
+      "headers": {"x-request-id": "req_fx_429_quota"},
+      "purpose": "insufficient_quota is RATE_LIMITED but non-retryable"
+    },
+    "server_500.json": {
+      "kind": "http_error",
+      "status": 500,
+      "headers": {"x-request-id": "req_fx_500"},
+      "purpose": "server error is retryable PROVIDER_UNAVAILABLE; also reused at status 503 by tests"
+    }
+  }
+}

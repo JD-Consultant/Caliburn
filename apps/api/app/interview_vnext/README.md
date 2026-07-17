@@ -385,7 +385,9 @@ focused suite為`36 passed`，完整API + PostgreSQL regression為
 下一步是 **V3-4 eval-only OpenAI Responses adapter**。它只放在
 `apps/api/evals/interview_vnext/providers/`，用mocked provider-shape fixtures與
 opt-in live probe驗證目前Responses API mapping，不得被production composition
-root import。接著V3-5才用12個turn component tasks、每case多trial量測模型品質。
+root import。可直接交給實作者的schema/retry/status/error/artifact/test逐項規格見
+[`../../../../docs/plans/2026-07-17-interview-vnext-v3-4-openai-responses-adapter-plan.md`](../../../../docs/plans/2026-07-17-interview-vnext-v3-4-openai-responses-adapter-plan.md)。
+接著V3-5才用12個turn component tasks、每case多trial量測模型品質。
 先做Capture/persistence、Context Engine與durable executor的原因是：
 沒有可重播 execution record,就無法判斷未來品質差是模型、context selection、
 verifier 還是 reducer 所造成。V5 前必須完成 authenticated principal → tenant

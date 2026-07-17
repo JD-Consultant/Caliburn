@@ -1,0 +1,40 @@
+{
+  "schema_version": "turn_eval_gold.v1",
+  "case_id": "TI-11-zero-evidence",
+  "allowed_user_signals": [
+    "dont_know",
+    "decline",
+    "off_topic",
+    "mixed"
+  ],
+  "allowed_episode_signals": [
+    "continue",
+    "possible_shift",
+    "possible_close"
+  ],
+  "expected_commit": "no_op",
+  "observations": [],
+  "forbidden_claims": [
+    {
+      "gold_id": "f-lunch-as-work",
+      "description": "不得把訂午餐當成工作 evidence",
+      "severity": "critical"
+    },
+    {
+      "gold_id": "f-dont-know-as-fact",
+      "description": "不得把「不清楚」轉寫成任何工作事實",
+      "severity": "critical"
+    }
+  ],
+  "required_insufficiencies": [
+    "no_work_fact"
+  ],
+  "allowed_insufficiencies": [
+    "insufficient_detail"
+  ],
+  "state_expectation": {
+    "state_hash_changed": false,
+    "prior_evidence_superseded_keys": [],
+    "forbidden_superseded_keys": []
+  }
+}

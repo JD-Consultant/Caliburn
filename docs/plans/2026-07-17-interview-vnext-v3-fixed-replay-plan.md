@@ -3,7 +3,7 @@
 - 日期：2026-07-17
 - 狀態：**已核准執行；研究定稿，實作進行中**
 - 權威規格：[`../specs/2026-07-17-interview-vnext-v3-fixed-replay-research.md`](../specs/2026-07-17-interview-vnext-v3-fixed-replay-research.md)
-- 前置完成：V0、V1、V2-A、V2-B、V3-0、V3-1、V3-2與V3-3；目前 head含 migration 0010、durable UoW/Capture/outbox/recovery、pure ContextBuilder、turn proposal verifier與顯式fixed-replay executor。下一步V3-4。
+- 前置完成：V0、V1、V2-A、V2-B、V3-0、V3-1、V3-2與V3-3；目前 head含 migration 0010、durable UoW/Capture/outbox/recovery、pure ContextBuilder、turn proposal verifier與顯式fixed-replay executor。V3-4 已實作（mocked complete, live gate pending，見 V3-4 交接規格狀態列）；下一步：取得官方 `OPENAI_API_KEY` 補跑 live gate，然後 V3-5。
 
 ---
 

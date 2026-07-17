@@ -1,7 +1,9 @@
 # Interview AI vNext V3-4——OpenAI Responses eval-only adapter 實作交接規格
 
 - 日期：2026-07-17
-- 狀態：**研究與實作規格定稿；尚未實作**
+- 狀態：**已實作——mocked complete, live gate pending**（2026-07-17：mocked adapter/live-probe
+  suite 66 passed、完整 API + PostgreSQL 614 passed, 0 skipped；§16.5 live gate 因本機無官方
+  `OPENAI_API_KEY` 尚未執行——本機僅有 OpenRouter key，§7.4 禁止代打——故不得標 V3-4 完成）
 - 適用切片：V3-4 only
 - 上游架構：[`../specs/2026-07-17-interview-vnext-v3-fixed-replay-research.md`](../specs/2026-07-17-interview-vnext-v3-fixed-replay-research.md)
 - 總實作計畫：[`2026-07-17-interview-vnext-v3-fixed-replay-plan.md`](2026-07-17-interview-vnext-v3-fixed-replay-plan.md)

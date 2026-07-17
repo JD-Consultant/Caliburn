@@ -1,6 +1,12 @@
 # Interview vNext — eval-only provider adapters(V3-4)
 
-**Status: in progress(mocked suite 實作中;live gate pending)**
+**Status: mocked complete, live gate pending(2026-07-17)**
+
+- mocked suite:`test_interview_vnext_openai_eval_adapter.py` + `test_interview_vnext_openai_live_probe.py`
+  共 **66 passed, 0 skipped**;完整 API + PostgreSQL regression **614 passed, 0 skipped**。
+- live gate(§16.5)**尚未執行**:本機只有 `OPENROUTER_API_KEY`,規格 §7.4 禁止以
+  OpenAI-compatible relay 代打官方 endpoint。取得官方 `OPENAI_API_KEY` 後跑下方 live probe
+  一次並人工檢查 bundle,才可宣稱 V3-4 完成。
 
 本目錄是 ADR 0034 vNext 的 **eval-only** 邊界:驗證「官方 provider API 真實 shape 能否無損映射到
 V2/V3 已發布的 provider-neutral contract(`app.interview_vnext.llm`)」。

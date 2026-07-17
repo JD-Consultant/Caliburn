@@ -1,7 +1,7 @@
 # Interview AI vNext V3——Fixed Replay、ContextBuilder 與 Evidence Extraction 規格
 
 - 日期：2026-07-17
-- 狀態：**研究定稿、已核准執行；V3-0/V3-1已完成，下一步V3-2**
+- 狀態：**研究定稿、已核准執行；V3-0/V3-1/V3-2已完成，下一步V3-3**
 - 上游：[`2026-07-16-interview-ai-vnext-greenfield-architecture.md`](2026-07-16-interview-ai-vnext-greenfield-architecture.md)、[`2026-07-16-interview-vnext-v2b-durable-persistence-research.md`](2026-07-16-interview-vnext-v2b-durable-persistence-research.md)
 - 實作計畫：[`../plans/2026-07-17-interview-vnext-v3-fixed-replay-plan.md`](../plans/2026-07-17-interview-vnext-v3-fixed-replay-plan.md)
 - 裁決權：本文件優先於總實作計畫 §6 的概略描述；若要改本文件的 contract、gate 或 transaction boundary，先更新文件再寫 code。
@@ -86,14 +86,14 @@ OpenAI persisted reasoning、server compaction、prompt cache，以及 Anthropic
 - V2-B：migration 0010、八張 vNext table、async repositories/UoW、atomic durable command、durable Capture/outbox、attempt/checkpoint crash recovery。
 - 舊 `evals/interview_v4` 的 synthetic source fixture、gold概念、quote與 source graders可當資料來源或演算法參考，但不可把 `C0/C1`、v3 state或 candidate命名帶入 vNext runtime。
 
-### 3.2 已確認缺口
+### 3.2 研究時確認的缺口與目前狀態
 
-1. 沒有 `TurnInterpretInput/Output`、`EpisodeCodeInput/Output` committed schema。
-2. 沒有 ContextPolicy、ContextPacket、SelectionManifest 或正式 ContextBuilder。
-3. 沒有 prompt artifact、operation document與 schema compatibility lint。
-4. 沒有把 typed `ModelCallResult` 接到 V2-B `record_attempt_result()` 的 workflow executor。
-5. `commit_verified_operation()`目前要求一定有 domain command；拒答、離題、純 signal等零 Evidence結果缺少 application use case。已審核 `OperationCheckpoint.v1`：`domain_result_artifact`型別是通用 `ArtifactRef`，並未限定為 `ReductionResult`，所以可用明確 no-op result artifact補路徑，不需改 checkpoint major或 migration。
-6. 沒有 partial-accept verification report與 deterministic proposal-ID規則。
+1. `TurnInterpretInput/Output`已由V3-2補齊；`EpisodeCodeInput/Output`仍屬V3-6。
+2. ContextPolicy、ContextPacket、SelectionManifest、BudgetReport與正式ContextBuilder已由V3-1補齊。
+3. turn prompt artifact、operation document與schema portability lint已由V3-2補齊；episode版本仍屬V3-6。
+4. typed `ModelCallResult`尚未接到V2-B `record_attempt_result()` workflow executor；這是下一個V3-3切片。
+5. 零Evidence application use case已由V3-0以typed no-op result與atomic commit補齊，未修改checkpoint major或migration。
+6. partial-accept verification report與deterministic proposal-ID規則已由V3-2補齊；durable commit接線屬V3-3。
 7. 沒有 vNext fixed replay dataset/runner/operation graders。
 8. 總計畫把 live adapter放 V6，卻在 V3要求真模型多 trial；本文件以 eval-only adapter解除矛盾。
 9. 目前只有少量完整 session fixture，還不是 20個平衡 component tasks。
@@ -354,6 +354,28 @@ Verifier不可「順手修正」quote、claim或 qualifier。可接受與拒絕�
 - refusal/provider failure不是 no-op success；checkpoint按 failure處理。
 
 不得把空 observations包進現有 `ApplyEvidenceCommand`，也不得建立「off_topic Evidence」來滿足 command min length。
+
+### 6.6 V3-2落地契約（2026-07-17）
+
+V3-2已落地為三層，不把structured output誤當semantic truth：
+
+1. `TurnInterpretOutput.v1`只含operation-local proposals/signals，模型無權產domain UUID、span、status或DB action；
+2. provider schema投影/lint只允許OpenAI與Anthropic現行strict交集；
+3. 本地Pydantic + hash-addressed semantic verifier policy逐筆接受/拒絕並產typed report。
+
+[OpenAI Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs)要求strict schema採明確required欄位與`additionalProperties=false`；[Anthropic Structured Outputs](https://platform.claude.com/docs/en/build-with-claude/structured-outputs)同樣採`output_config.format`，官方SDK會移除`minimum`／`minLength`等不支援constraint，再用原始schema做本地驗證，且提醒optional/union增加grammar複雜度。因此committed `turn-interpret-output.v1`每個object所有欄位required、unknown用null/empty表示，只有frequency的`value`與`verbatim`兩個nullable union；provider schema不帶`pattern/minLength/minimum/format/default`，完整key/UUID/decimal/domain限制仍由本地驗證。lint會遞迴檢查nested object，不只看root。
+
+Operation/policy identity固定為：
+
+- prompt：`turn-interpret/1.0.0`，raw UTF-8 bytes hash；
+- context：`turn-interpret/1.0.0` policy hash；
+- input/output：committed schema canonical hash；
+- operation：`turn.interpret/1.0.0` definition hash；
+- verifier：`turn-interpret-verifier/1.0.0` policy hash，寫入每份verification report。
+
+Verifier以exact substring + 1-based occurrence計算Python Unicode code-point span；不做NFKC、trim、模糊比對或quote repair。Correction targets只接受context correction candidates；inactive/foreign/unknown flags不一致會drop。同批多個correction指向同一target時全部標`incoherent_correction`，避免任意選一筆後讓reducer才失敗。accepted proposal以固定UUIDv5映射；partial acceptance保留所有drop reason。Emergent topic也有獨立quote decision，不會因V3暫不寫domain就被當成已驗證。
+
+具體限制也已明示：numeric/reference/non-atomic檢查是versioned deterministic hard rule，不是完整自然語言蘊含模型。沒有數字/reference marker/明確分句的unsupported claim仍可能通過這層，所以V3-5必須以precision/recall、unsupported-claim grader與人工failure review判定模型品質；不得把V3-2 contract tests宣稱為AI效果證據。
 
 ---
 

@@ -3,7 +3,7 @@
 - 日期：2026-07-17
 - 狀態：**已核准執行；研究定稿，實作進行中**
 - 權威規格：[`../specs/2026-07-17-interview-vnext-v3-fixed-replay-research.md`](../specs/2026-07-17-interview-vnext-v3-fixed-replay-research.md)
-- 前置完成：V0、V1、V2-A、V2-B、V3-0與V3-1；目前 head含 migration 0010、durable UoW/Capture/outbox/recovery與pure ContextBuilder。下一步V3-2。
+- 前置完成：V0、V1、V2-A、V2-B、V3-0、V3-1與V3-2；目前 head含 migration 0010、durable UoW/Capture/outbox/recovery、pure ContextBuilder與turn proposal verifier。下一步V3-3。
 
 ---
 
@@ -35,7 +35,7 @@ fixed transcript
 | V3-0A（完成） | OpenAI SDK freshness lock（2.44.0 -> 2.46.0） | 否 | dependency diff + full API regression |
 | V3-0B（完成） | typed no-op result與durable commit use case | 否 | v1 schema不變 + DB round trip/crash/idempotency |
 | V3-1（完成） | Context contracts、policy documents與 ContextBuilder | 否 | 15 focused + 515 full API/PostgreSQL passed |
-| V3-2 | turn_interpret contracts、prompt、proposal mapping與 verifier | 否 | pure contract/adversarial tests |
+| V3-2（完成） | turn_interpret contracts、prompt、proposal mapping與 verifier | 否 | focused 36 + full API/PostgreSQL 536 passed |
 | V3-3 | durable operation executor、partial/no-op commit | 否 | PostgreSQL crash/idempotency tests |
 | V3-4 | eval-only OpenAI Responses adapter | 是，opt-in | mocked API matrix + one live probe |
 | V3-5 | vNext eval harness + 12 turn tasks + 3-trial turn gate | 是 | turn report通過才繼續 |
@@ -225,8 +225,13 @@ Builder是 pure function/service，不查 DB、不呼 provider、不讀環境變
 
 ```text
 apps/api/app/interview_vnext/llm/turn_interpret.py
+apps/api/app/interview_vnext/llm/portable_schema.py
 apps/api/app/interview_vnext/llm/prompts/turn-interpret.1.0.0.md
 apps/api/app/interview_vnext/llm/operations/turn-interpret.1.0.0.json
+apps/api/app/interview_vnext/llm/verifier_policies/turn-interpret-verifier.1.0.0.json
+apps/api/app/interview_vnext/llm/operation_documents.py
+apps/api/app/interview_vnext/llm/write_operation_documents.py
+apps/api/app/interview_vnext/llm/write_verifier_policies.py
 apps/api/app/interview_vnext/llm/schemas/
   turn-interpret-input.v1.schema.json
   turn-interpret-output.v1.schema.json
@@ -248,6 +253,8 @@ apps/api/tests/test_interview_vnext_turn_interpret.py
 
 完整 constraint仍由本地 Pydantic執行。所有可為空欄位盡量 required並用空 array/null表達，降低 optional grammar複雜度。
 
+V3-2實際provider-facing output只有兩個nullable union（frequency value/verbatim），所有object properties皆required + `additionalProperties=false`；portable projection移除local-only`pattern/minLength/minimum/format/default`，遞迴lint nested `$defs`。Schema通過不代表proposal可寫domain，仍必須走verifier。
+
 ### 5.3 Prompt
 
 依 reference §8建立最小 prompt，先寫3–5個 canonical examples：
@@ -259,6 +266,8 @@ apps/api/tests/test_interview_vnext_turn_interpret.py
 -工具名稱不升 skill。
 
 Prompt fixture test確認不含 OCS/reference、JD欄位、gold label或 chain-of-thought要求。
+
+V3-2 prompt提供5個semantic shorthand examples（atomic action、action/output拆分、correction、dont-know零observations、tool不升skill），不複製完整schema。Prompt raw bytes、input/output schema、context policy都進committed operation definition hash。
 
 ### 5.4 Proposal mapper/verifier
 
@@ -277,6 +286,8 @@ def accepted_evidence(
 ```
 
 Quote span只能由 exact substring + occurrence計算。UUIDv5固定 test vectors寫進 test。Verifier回 accepted/dropped，不 mutation input。
+
+Verification report另保存`turn-interpret-verifier/1.0.0` policy hash；policy document固定number/non-atomic regex、reference markers、reject order與duplicate correction target=`reject_all`。Emergent topics同樣驗exact quote/occurrence。Deterministic hard rules不宣稱能證明完整自然語言entailment，unsupported-claim品質留給V3-5 dataset grader與human review。
 
 ### 5.5 測試
 

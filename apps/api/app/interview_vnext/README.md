@@ -1,6 +1,6 @@
 # Interview AI vNext（隔離開發中）
 
-本 package 是 ADR 0034 的 greenfield 實作區。目前已完成 **V0 + V1 domain foundation + V2-A provider/Capture contracts**，沒有 route、DB migration、live provider call，也沒有被 production composition root import。現行使用者流量仍走 `app/interview/` v3。
+本 package 是 ADR 0034 的 greenfield 實作區。目前已完成 **V0 + V1 domain foundation + V2-A provider/Capture contracts + V2-B durable persistence**（migration 0010 八張 `interview_vnext_*` 表、async repositories/UoW、transactional outbox、checkpoint crash recovery，全部以 PostgreSQL 16 integration tests 實跑證明）。仍然**沒有 route、live provider call**，也沒有被 production composition root import。現行使用者流量仍走 `app/interview/` v3。
 
 權威文件：
 
@@ -16,10 +16,13 @@
 
 ```text
 domain/                 已實作：純 Pydantic contracts、validators、reducers、domain events、schemas
-application/            空殼：尚未實作 workflow/use case
+application/            已實作(V2-B)：async persistence ports、apply_durable_command、
+                        durable operations(prepare/attempt/verify/commit/fail)、crash recovery
 llm/                    已實作：neutral operation/request/result/failure、registry、scripted fake、schemas
 providers/              空殼：尚未接 OpenAI/Anthropic SDK、模型或正式 prompt
-knowledge/ persistence/ 空殼：尚未接 reference snapshot 或資料庫
+knowledge/              空殼：尚未接 reference snapshot
+persistence/            已實作(V2-B)：ORM rows、migration 0010、serialization、repositories、
+                        UoW、durable capture(run/event/outbox)、Postgres outbox lease adapter
 projection/             空殼：尚未投影到現有 OCS/Web contract
 observability/          已實作：artifact/event/hash-chain/outbox/checkpoint contracts 與 in-memory fake
 ```
@@ -217,19 +220,64 @@ Schema golden test 會比較 committed JSON 與當前 Pydantic codegen；未知�
 
 V1-B 沒有靜默覆寫破壞性契約：`Evidence`（withdraw authority）、`Inference`（operation hash + lineage）、`Gap`（resolution evidence）、`InterviewState` 與 `ApplyEvidenceCommand` 已升到 `v2`；純新增 command/event 或向後相容欄位維持 `v1`。這些 v1 prototype 從未接 route 或寫入 DB，因此目前不實作 runtime backward reader；V2 一旦開始 durable persistence，任何 major 升級都必須同時提供 migration／dual reader 或明確拒絕策略，不可再直接移除 persisted version。
 
+## V2-B durable persistence(已完成,2026-07-17)
+
+八張全新 `interview_vnext_*` 表(sessions/runs/artifacts/commands/
+execution_events/outbox/operation_checkpoints/operation_attempts;migration
+`0010`,不共用、不刪改 v3 rows;downgrade 只移除 vNext objects):
+
+- canonical aggregate/event/checkpoint 存 exact TEXT + hash,read 重跑 strict
+  validation,任何 text/hash/normalized identity 不符 → `PersistedDataCorruption`;
+- 一次 command commit = state CAS + command/reduction immutable artifacts +
+  hash-chained event + pending outbox **同一 transaction**(reference §7.3;
+  先鎖 run row 建立一致鎖序,防 FK KEY SHARE 死鎖);
+- transactional outbox:§8.1 lease CTE(`FOR UPDATE SKIP LOCKED` 只用在 queue、
+  同 run 只放最早 non-terminal message)、lease commit 後才呼叫 exporter、
+  at-least-once(consumer 以 event_id 冪等)、delivered/dead_letter terminal 留稽核;
+- checkpoint crash recovery:prepared→calling→provider_completed→verified→
+  committed|failed,revision CAS;`application/recovery.py` 的 `decide_recovery`
+  純函式照 §9 決策表;`provider_completed` 之後 recovery 的 provider generate
+  次數=0,committed 重呼叫回同一 response/domain result artifact;
+- provider/exporter network call 一律在 DB transaction 外;LLM outcome 分類
+  (retryable 與否)由 caller/adapter 提供,typed `ModelCallResult` 正規化屬 V3/V6。
+
+Postgres integration tests(需 `TEST_DATABASE_URL`;CI 由 `api-tests.yml` 以
+postgres:16 service 必跑,`require_postgres` 讓 skip 不可能被當通過):
+
+```powershell
+cd apps/api
+$env:TEST_DATABASE_URL='postgresql+asyncpg://postgres:password@localhost:5432/caliburn'
+uv run alembic upgrade head
+uv run pytest tests/test_interview_vnext_persistence_serialization.py `
+  tests/test_interview_vnext_migration.py `
+  tests/test_interview_vnext_persistence.py `
+  tests/test_interview_vnext_outbox_postgres.py `
+  tests/test_interview_vnext_recovery_postgres.py `
+  tests/test_interview_vnext_pg_fixtures.py -q     # 50 passed, 0 skipped
+```
+
 ## 測試與下一個切片
 
-目前測試：
+目前測試（V2-A contracts,無 DB）：
 
 ```powershell
 cd apps/api
 .venv\Scripts\python.exe -m pytest tests/test_interview_vnext_domain.py tests/test_interview_vnext_workflow_reducers.py tests/test_interview_vnext_llm.py tests/test_interview_vnext_capture.py tests/test_interview_vnext_dependencies.py tests/test_interview_vnext_schemas.py tests/test_interview_vnext_execution_schemas.py -q
 ```
 
-2026-07-16 最新驗證：V2 focused suite `22 passed`；完整 `apps/api` suite `337 passed, 111 skipped`。本切片沒有新增 skip。
+2026-07-17 最新驗證：V2-B focused Postgres suite `50 passed, 0 skipped`;完整
+`apps/api` suite(含 DB)`499 passed, 0 skipped`。commit SHA、gate 數字與
+與 reference 的差異註記(run-lock 鎖序、outbox DB 時鐘、outcome 分類邊界)
+見 V2-B plan §11。
 
-下一步是 **V2-B durable persistence**。交接規格已裁決為八張全新 vNext tables、canonical aggregate TEXT + immutable artifacts、async repository/UoW、explicit state/checkpoint CAS、transactional outbox `SKIP LOCKED` lease與 checkpoint crash recovery；不先建第二套 evidence/candidate權威表。實作者必須依上方 V2-B reference/plan完成 0010 migration與22個最低 Postgres integration cases，不能只把 in-memory fake換成 ORM。migration不共用或刪改 v3 rows。
+下一步是 **V3 fixed replay operation**。ContextBuilder 在 V3 開始時實作,輸入
+只能來自已持久化 state/artifact/reference snapshot;typed `ModelCallResult`
+在 V3 接上 `record_attempt_result`。現在先做 Capture/persistence 的原因是:
+沒有可重播 execution record,就無法判斷未來品質差是模型、context selection、
+verifier 還是 reducer 所造成。V5 前必須完成 authenticated principal → tenant
+→ profile ownership 驗證(reference §2.3),否則 production gate 不得通過。
 
-ContextBuilder 在 V3 fixed replay operation 開始時實作，輸入只能來自已持久化 state/artifact/reference snapshot。現在先做 Capture 的原因是：沒有可重播 execution record，就無法判斷未來品質差是模型、context selection、verifier 還是 reducer 所造成。
-
-本階段明確未做 route、migration、外部 Capture exporter、live OpenAI/Anthropic adapter、Web seam、模型 bake-off、ContextBuilder 或正式 Prompt；production 行為仍為零變化。只有完成 V2-B DB tests後才能宣稱 durable outbox/checkpoint；只有 V3 fixed replay與 V6 bake-off通過後才能談模型品質或上線。
+本階段明確未做 route、外部 Capture exporter、live OpenAI/Anthropic adapter、
+Web seam、模型 bake-off、ContextBuilder 或正式 Prompt;production 行為仍為
+零變化(composition root 不 import vNext)。durable outbox/checkpoint 已由
+V2-B DB tests 證明;只有 V3 fixed replay與 V6 bake-off通過後才能談模型品質或上線。

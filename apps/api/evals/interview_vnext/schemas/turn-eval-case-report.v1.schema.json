@@ -1,0 +1,336 @@
+{
+  "$defs": {
+    "CaseDecision": {
+      "enum": [
+        "pass",
+        "fail",
+        "review_incomplete"
+      ],
+      "title": "CaseDecision",
+      "type": "string"
+    },
+    "CaseSlotReport": {
+      "additionalProperties": false,
+      "properties": {
+        "slot_index": {
+          "maximum": 3,
+          "minimum": 1,
+          "title": "Slot Index",
+          "type": "integer"
+        },
+        "trial_id": {
+          "format": "uuid",
+          "title": "Trial Id",
+          "type": "string"
+        },
+        "disposition": {
+          "$ref": "#/$defs/TrialDisposition"
+        },
+        "hard_gate_passed": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Hard Gate Passed"
+        },
+        "raw_precision": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MetricResult"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "committed_precision": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MetricResult"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "recall": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MetricResult"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "qualifier_exactness": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MetricResult"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "expected_no_evidence_passed": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expected No Evidence Passed"
+        },
+        "critical_count": {
+          "minimum": 0,
+          "title": "Critical Count",
+          "type": "integer"
+        },
+        "major_count": {
+          "minimum": 0,
+          "title": "Major Count",
+          "type": "integer"
+        },
+        "minor_count": {
+          "minimum": 0,
+          "title": "Minor Count",
+          "type": "integer"
+        },
+        "review_complete": {
+          "title": "Review Complete",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "slot_index",
+        "trial_id",
+        "disposition",
+        "critical_count",
+        "major_count",
+        "minor_count",
+        "review_complete"
+      ],
+      "title": "CaseSlotReport",
+      "type": "object"
+    },
+    "CaseSplit": {
+      "enum": [
+        "development",
+        "challenge"
+      ],
+      "title": "CaseSplit",
+      "type": "string"
+    },
+    "MetricResult": {
+      "additionalProperties": false,
+      "properties": {
+        "numerator": {
+          "minimum": 0,
+          "title": "Numerator",
+          "type": "integer"
+        },
+        "denominator": {
+          "minimum": 0,
+          "title": "Denominator",
+          "type": "integer"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Value"
+        }
+      },
+      "required": [
+        "numerator",
+        "denominator"
+      ],
+      "title": "MetricResult",
+      "type": "object"
+    },
+    "MetricSummary": {
+      "additionalProperties": false,
+      "description": "Per-slot raw values plus median/worst;不可把 not-applicable 填成 0/1。",
+      "properties": {
+        "values": {
+          "items": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "minItems": 1,
+          "title": "Values",
+          "type": "array"
+        },
+        "median": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Median"
+        },
+        "worst": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Worst"
+        }
+      },
+      "required": [
+        "values"
+      ],
+      "title": "MetricSummary",
+      "type": "object"
+    },
+    "TrialDisposition": {
+      "enum": [
+        "quality_scored",
+        "infrastructure_invalid",
+        "harness_invalid",
+        "cancelled"
+      ],
+      "title": "TrialDisposition",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "turn_eval_case_report.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "case_id": {
+      "maxLength": 64,
+      "pattern": "^TI-[0-9]{2}-[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "title": "Case Id",
+      "type": "string"
+    },
+    "split": {
+      "$ref": "#/$defs/CaseSplit"
+    },
+    "slots": {
+      "items": {
+        "$ref": "#/$defs/CaseSlotReport"
+      },
+      "minItems": 1,
+      "title": "Slots",
+      "type": "array"
+    },
+    "pass_pow_3": {
+      "title": "Pass Pow 3",
+      "type": "boolean"
+    },
+    "raw_precision_summary": {
+      "$ref": "#/$defs/MetricSummary"
+    },
+    "committed_precision_summary": {
+      "$ref": "#/$defs/MetricSummary"
+    },
+    "recall_summary": {
+      "$ref": "#/$defs/MetricSummary"
+    },
+    "qualifier_exactness_summary": {
+      "$ref": "#/$defs/MetricSummary"
+    },
+    "trials_with_critical": {
+      "minimum": 0,
+      "title": "Trials With Critical",
+      "type": "integer"
+    },
+    "trials_with_major": {
+      "minimum": 0,
+      "title": "Trials With Major",
+      "type": "integer"
+    },
+    "trials_with_minor": {
+      "minimum": 0,
+      "title": "Trials With Minor",
+      "type": "integer"
+    },
+    "case_specific_gate_passed": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Case Specific Gate Passed"
+    },
+    "case_decision": {
+      "$ref": "#/$defs/CaseDecision"
+    }
+  },
+  "required": [
+    "schema_version",
+    "case_id",
+    "split",
+    "slots",
+    "pass_pow_3",
+    "raw_precision_summary",
+    "committed_precision_summary",
+    "recall_summary",
+    "qualifier_exactness_summary",
+    "trials_with_critical",
+    "trials_with_major",
+    "trials_with_minor",
+    "case_decision"
+  ],
+  "title": "Caliburn interview vNext turn eval case report v1",
+  "type": "object",
+  "$id": "https://caliburn.local/schemas/turn-eval-case-report.v1.schema.json"
+}

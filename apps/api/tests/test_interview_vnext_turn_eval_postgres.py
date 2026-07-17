@@ -1,0 +1,347 @@
+"""V3-5 E4:12 reference cases 走 real PostgreSQL production stack(§18.6)。
+
+每 trial 全新 user/profile/session/run/tenant;setup 只經公開 durable
+commands;ScriptedLlmPort 回放 materialized reference output;production
+executor/verifier/reducer/Capture/finalize 全程真跑。CI 缺
+``TEST_DATABASE_URL`` 會 fail(見 conftest ``require_postgres``),不允許 skip。
+"""
+
+from __future__ import annotations
+
+from datetime import UTC, datetime
+from pathlib import Path
+from uuid import NAMESPACE_URL, uuid5
+
+import pytest
+import pytest_asyncio
+import sqlalchemy as sa
+
+from app.interview_vnext.application.operation_executor import (
+    TurnExecutionStatus,
+    TurnInterpretProviderProfile,
+)
+from app.interview_vnext.application.persistence import RunStatus
+from app.interview_vnext.domain.evidence import EvidenceStatus
+from app.interview_vnext.llm.result import (
+    FinishReason,
+    ModelOutcome,
+    ModelRefusal,
+    TokenUsage,
+    build_structured_payload,
+)
+from app.interview_vnext.llm.testing import ScriptedLlmPort, ScriptedStep
+from app.interview_vnext.observability.artifacts import build_inline_artifact
+from app.interview_vnext.observability.events import RunManifest
+from app.interview_vnext.persistence import serialization as ser
+from evals.interview_vnext.contracts import ExpectedCommit
+from evals.interview_vnext.fixture_builder import materialize_reference_output
+from evals.interview_vnext.identities import (
+    prior_evidence_uuid,
+    trial_scoped_ids,
+    turn_uuid,
+)
+from evals.interview_vnext.loader import load_suite
+from evals.interview_vnext.turn_eval_runner import (
+    cleanup_trial_rows,
+    run_trial,
+)
+
+CASES_ROOT = Path(__file__).resolve().parents[1] / "evals/interview_vnext/cases"
+TRIAL_STARTED_AT = datetime(2026, 7, 18, 9, 0, tzinfo=UTC)
+OUTPUT_SCHEMA_ID = (
+    "https://caliburn.local/schemas/turn-interpret-output.v1.schema.json"
+)
+PROFILE = TurnInterpretProviderProfile(
+    provider="scripted", requested_model="scripted-reference"
+)
+
+
+def trial_uuid_for(case_id: str, salt: str = "pg") -> object:
+    return uuid5(NAMESPACE_URL, f"caliburn:turn-eval:pg-test:{salt}:{case_id}")
+
+
+@pytest.fixture(scope="module")
+def suite():
+    return load_suite(CASES_ROOT, suite_version="turn-interpret-pilot.v1")
+
+
+@pytest_asyncio.fixture
+async def tracked_cleanup(postgres_session_factory):
+    created = []
+    yield created
+    await cleanup_trial_rows(postgres_session_factory, created)
+
+
+def usage() -> TokenUsage:
+    return TokenUsage(
+        input_tokens=800,
+        output_tokens=120,
+        cache_read_tokens=0,
+        cache_write_tokens=0,
+        reasoning_tokens=0,
+    )
+
+
+def scripted_reference_llm(inputs, evaluation, trial_id) -> ScriptedLlmPort:
+    output = materialize_reference_output(
+        inputs, evaluation.reference_output, trial_id=trial_id
+    )
+    ids = trial_scoped_ids(trial_id)
+    attempt_id = uuid5(ids.operation_id, "attempt/1")
+    visible = build_inline_artifact(
+        artifact_id=uuid5(attempt_id, "visible-response"),
+        kind="model.visible_response",
+        media_type="application/json",
+        payload=output.model_dump(mode="json"),
+        run_id=ids.run_id,
+        session_id=ids.session_id,
+        turn_id=turn_uuid(trial_id, inputs.case.target_turn_key),
+        operation_id=ids.operation_id,
+        attempt_id=attempt_id,
+        created_at=TRIAL_STARTED_AT,
+        contains_test_data=True,
+    )
+    return ScriptedLlmPort(
+        {
+            "turn.interpret": [
+                ScriptedStep(
+                    expected_attempt=1,
+                    outcome=ModelOutcome.SUCCEEDED,
+                    finish_reason=FinishReason.COMPLETED,
+                    parsed_output=build_structured_payload(
+                        schema_id=OUTPUT_SCHEMA_ID, value=output
+                    ),
+                    visible_response_artifact=visible.ref,
+                    supporting_artifacts=(visible,),
+                    usage=usage(),
+                )
+            ]
+        }
+    )
+
+
+async def execute_reference_trial(
+    postgres_session_factory, suite, case_id: str, *, salt: str = "pg", cleanup=None
+):
+    index = [c.case.case_id for c in suite.runtime_inputs].index(case_id)
+    inputs = suite.runtime_inputs[index]
+    evaluation = suite.evaluation_contracts[index]
+    trial_id = trial_uuid_for(case_id, salt)
+    if cleanup is not None:
+        # 失敗的 trial 也要清:deterministic ID 會讓殘留列撞下一次執行
+        cleanup.append(trial_scoped_ids(trial_id))
+    llm = scripted_reference_llm(inputs, evaluation, trial_id)
+    execution = await run_trial(
+        inputs,
+        session_factory=postgres_session_factory,
+        llm=llm,
+        profile=PROFILE,
+        trial_id=trial_id,
+        trial_started_at=TRIAL_STARTED_AT,
+    )
+    llm.assert_exhausted()
+    return inputs, evaluation, execution
+
+
+async def test_all_reference_cases_commit_on_real_postgres(
+    postgres_session_factory, suite, tracked_cleanup
+):
+    for inputs, evaluation in zip(
+        suite.runtime_inputs, suite.evaluation_contracts, strict=True
+    ):
+        case_id = inputs.case.case_id
+        _, _, execution = await execute_reference_trial(
+            postgres_session_factory, suite, case_id, cleanup=tracked_cleanup
+        )
+
+        assert execution.outcome.status == TurnExecutionStatus.COMMITTED, case_id
+        assert execution.run.status == RunStatus.COMPLETED, case_id
+        assert execution.run.manifest_artifact_id is not None, case_id
+        report = execution.outcome.verification_report
+        assert report is not None and report.dropped_count == 0, case_id
+
+        if evaluation.gold.expected_commit == ExpectedCommit.EVIDENCE:
+            assert execution.outcome.reduction_result is not None, case_id
+            assert execution.state_after_hash != execution.state_before_hash, case_id
+        else:
+            assert execution.outcome.noop_result is not None, case_id
+            assert execution.state_after_hash == execution.state_before_hash, case_id
+
+        expectation = evaluation.gold.state_expectation
+        status_by_id = {
+            e.evidence_id: e.status for e in execution.state_after.evidence
+        }
+        for key in expectation.prior_evidence_superseded_keys:
+            assert (
+                status_by_id[prior_evidence_uuid(execution.ids.trial_id, key)]
+                == EvidenceStatus.SUPERSEDED
+            ), (case_id, key)
+        for key in expectation.forbidden_superseded_keys:
+            assert (
+                status_by_id[prior_evidence_uuid(execution.ids.trial_id, key)]
+                == EvidenceStatus.ACTIVE
+            ), (case_id, key)
+
+
+async def test_terminal_run_manifest_matches_event_chain(
+    postgres_session_factory, suite, tracked_cleanup
+):
+    _, _, execution = await execute_reference_trial(
+        postgres_session_factory, suite, "TI-01-single-action", salt="manifest",
+        cleanup=tracked_cleanup,
+    )
+    ids = execution.ids
+    async with postgres_session_factory() as session:
+        manifest_row = (
+            await session.execute(
+                sa.text(
+                    "SELECT inline_content FROM interview_vnext_artifacts "
+                    "WHERE tenant_id = :tenant_id AND artifact_id = :artifact_id"
+                ),
+                {
+                    "tenant_id": str(ids.tenant_id),
+                    "artifact_id": str(execution.run.manifest_artifact_id),
+                },
+            )
+        ).one()
+        event_rows = (
+            await session.execute(
+                sa.text(
+                    "SELECT event_hash, sequence FROM interview_vnext_execution_events "
+                    "WHERE tenant_id = :tenant_id AND run_id = :run_id "
+                    "ORDER BY sequence"
+                ),
+                {"tenant_id": str(ids.tenant_id), "run_id": str(ids.run_id)},
+            )
+        ).all()
+    manifest = RunManifest.model_validate_json(manifest_row.inline_content)
+    assert manifest.event_count == len(event_rows) == execution.run.event_count
+    assert manifest.first_event_hash == event_rows[0].event_hash
+    assert manifest.last_event_hash == event_rows[-1].event_hash
+    assert manifest.root_artifacts, "terminal run must carry root artifacts"
+    kinds = set()
+    async with postgres_session_factory() as session:
+        for ref in manifest.root_artifacts:
+            row = (
+                await session.execute(
+                    sa.text(
+                        "SELECT kind FROM interview_vnext_artifacts "
+                        "WHERE tenant_id = :tenant_id AND artifact_id = :artifact_id"
+                    ),
+                    {
+                        "tenant_id": str(ids.tenant_id),
+                        "artifact_id": str(ref.artifact_id),
+                    },
+                )
+            ).one()
+            kinds.add(row.kind)
+    assert "model.request" in kinds
+    assert "operation.verification" in kinds
+
+
+async def test_two_trials_share_no_state(
+    postgres_session_factory, suite, tracked_cleanup
+):
+    _, _, first = await execute_reference_trial(
+        postgres_session_factory, suite, "TI-09-known-correction", salt="a",
+        cleanup=tracked_cleanup,
+    )
+    _, _, second = await execute_reference_trial(
+        postgres_session_factory, suite, "TI-09-known-correction", salt="b",
+        cleanup=tracked_cleanup,
+    )
+    first_ids = set(first.ids.model_dump(mode="json").values())
+    second_ids = set(second.ids.model_dump(mode="json").values())
+    assert not (first_ids & second_ids)
+    assert first.state_after_hash != second.state_after_hash  # 不同 session/turn UUIDs
+    assert first.outcome.status == second.outcome.status == TurnExecutionStatus.COMMITTED
+
+
+async def test_refusal_finalizes_a_failed_run_without_state_change(
+    postgres_session_factory, suite, tracked_cleanup
+):
+    index = [c.case.case_id for c in suite.runtime_inputs].index(
+        "TI-01-single-action"
+    )
+    inputs = suite.runtime_inputs[index]
+    trial_id = trial_uuid_for("TI-01-single-action", "refusal")
+    ids = trial_scoped_ids(trial_id)
+    tracked_cleanup.append(ids)
+    attempt_id = uuid5(ids.operation_id, "attempt/1")
+    visible = build_inline_artifact(
+        artifact_id=uuid5(attempt_id, "visible-refusal"),
+        kind="model.visible_response",
+        media_type="application/json",
+        payload={"refusal": "The model declined this request."},
+        run_id=ids.run_id,
+        session_id=ids.session_id,
+        turn_id=turn_uuid(trial_id, inputs.case.target_turn_key),
+        operation_id=ids.operation_id,
+        attempt_id=attempt_id,
+        created_at=TRIAL_STARTED_AT,
+        contains_test_data=True,
+    )
+    llm = ScriptedLlmPort(
+        {
+            "turn.interpret": [
+                ScriptedStep(
+                    expected_attempt=1,
+                    outcome=ModelOutcome.REFUSED,
+                    finish_reason=FinishReason.SAFETY_REFUSAL,
+                    refusal=ModelRefusal(
+                        reason_code="provider_refused",
+                        safe_message="The model declined this request.",
+                    ),
+                    visible_response_artifact=visible.ref,
+                    supporting_artifacts=(visible,),
+                    usage=usage(),
+                )
+            ]
+        }
+    )
+    execution = await run_trial(
+        inputs,
+        session_factory=postgres_session_factory,
+        llm=llm,
+        profile=PROFILE,
+        trial_id=trial_id,
+        trial_started_at=TRIAL_STARTED_AT,
+    )
+    assert execution.outcome.status == TurnExecutionStatus.FAILED
+    assert execution.run.status == RunStatus.FAILED
+    assert execution.run.manifest_artifact_id is not None
+    assert execution.state_after_hash == execution.state_before_hash
+
+
+async def test_cleanup_removes_only_the_given_tenant(
+    postgres_session_factory, suite, tracked_cleanup
+):
+    _, _, keep = await execute_reference_trial(
+        postgres_session_factory, suite, "TI-11-zero-evidence", salt="keep",
+        cleanup=tracked_cleanup,
+    )
+    _, _, drop = await execute_reference_trial(
+        postgres_session_factory, suite, "TI-11-zero-evidence", salt="drop",
+        cleanup=tracked_cleanup,
+    )
+    await cleanup_trial_rows(postgres_session_factory, [drop.ids])
+    async with postgres_session_factory() as session:
+        kept = (
+            await session.execute(
+                sa.text(
+                    "SELECT count(*) FROM interview_vnext_sessions "
+                    "WHERE tenant_id = :tenant_id"
+                ),
+                {"tenant_id": str(keep.ids.tenant_id)},
+            )
+        ).scalar_one()
+        dropped = (
+            await session.execute(
+                sa.text(
+                    "SELECT count(*) FROM interview_vnext_sessions "
+                    "WHERE tenant_id = :tenant_id"
+                ),
+                {"tenant_id": str(drop.ids.tenant_id)},
+            )
+        ).scalar_one()
+    assert kept == 1 and dropped == 0

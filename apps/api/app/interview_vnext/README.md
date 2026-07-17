@@ -1,6 +1,6 @@
 # Interview AI vNext（隔離開發中）
 
-本 package 是 ADR 0034 的 greenfield 實作區。目前已完成 **V0 + V1 domain foundation + V2-A provider/Capture contracts + V2-B durable persistence + V3-0 readiness + V3-1 Context Engine**。V3-0固定官方OpenAI SDK 2.46.0並補上verified zero-Evidence operation的typed no-op result與atomic commit；V3-1加入deterministic ContextBuilder、hash-addressed policies、selection manifest、budget report與reference snapshot。migration仍為0010八張 `interview_vnext_*` 表。仍然**沒有 route、live provider call**，也沒有被 production composition root import。現行使用者流量仍走 `app/interview/` v3。
+本 package 是 ADR 0034 的 greenfield 實作區。目前已完成 **V0 + V1 domain foundation + V2-A provider/Capture contracts + V2-B durable persistence + V3-0 readiness + V3-1 Context Engine + V3-2 Turn Interpreter contracts/verifier**。V3-0固定官方OpenAI SDK 2.46.0並補上verified zero-Evidence atomic commit；V3-1加入deterministic ContextBuilder；V3-2加入portable structured output、versioned prompt/operation/verifier policy與pure proposal verification。migration仍為0010八張 `interview_vnext_*` 表。仍然**沒有 route、live provider call**，也沒有被 production composition root import。現行使用者流量仍走 `app/interview/` v3。
 
 權威文件：
 
@@ -18,12 +18,14 @@
 
 ```text
 domain/                 已實作：純 Pydantic contracts、validators、reducers、domain events、schemas
-application/            已實作(V2-B/V3-0/V3-1)：async persistence ports、apply_durable_command、
+application/            已實作(V2-B/V3-0/V3-1/V3-2)：async persistence ports、apply_durable_command、
                         durable operations(prepare/attempt/verify/commit/fail/no-op)、
-                        typed no-op result/application schema、crash recovery、pure ContextBuilder
+                        typed no-op result/application schema、crash recovery、pure ContextBuilder、
+                        turn input projection/proposal verifier/Evidence mapping
 llm/                    已實作：neutral operation/request/result/failure、registry、scripted fake、
-                        V3-1 context contracts/hash-addressed policies、schemas
-providers/              空殼：尚未接 OpenAI/Anthropic SDK、模型或正式 prompt
+                        V3-1 context contracts/policies、V3-2 turn contracts/portable schema/
+                        prompt/operation/verifier policy、schemas
+providers/              空殼：尚未接 OpenAI/Anthropic SDK或模型
 knowledge/              空殼：尚未接 reference snapshot
 persistence/            已實作(V2-B)：ORM rows、migration 0010、serialization、repositories、
                         UoW、durable capture(run/event/outbox)、Postgres outbox lease adapter
@@ -230,9 +232,36 @@ transition會拒絕跳步、時間倒退或 terminal改寫；重送相同 artifa
 
 超過hard byte/item cap時不做first-N、摘要或文字截斷；`ContextBudgetExceeded`帶回完整未截斷packet/manifest與failing budget，且不得呼叫模型。修改policy必須建立新semver文件並以eval/ablation證明，不能原地覆寫`1.0.0`。
 
+## V3-2 Turn Interpreter contract與verifier（已完成，2026-07-17）
+
+`llm/turn_interpret.py`把模型權限限制為proposal。模型可輸出atomic observation、user/episode signal、emergent topic與insufficiency；不可輸出`evidence_id`、session/turn ID、span、status、extractor ID或DB action。`proposal_key`只在單次operation內有效，application固定用：
+
+```text
+evidence_id = UUIDv5(operation_id, "observation/" + proposal_key)
+```
+
+`turn_interpret_output.v1`所有欄位required；沒有內容用空array，frequency未知值使用explicit null。provider-facing schema由Pydantic schema投影成OpenAI/Anthropic現行strict structured-output交集：每個object都`additionalProperties=false`且所有properties required；只保留object/array/string/integer/boolean/null、enum、local `$ref`與兩個nullable `anyOf`。`minLength`、`pattern`、`minimum`、`format`等local-only constraints從送provider版本移除，但原始Pydantic validator仍在本地完整執行。`portable_schema.py`的lint會讓不符合交集的schema在CI先失敗。
+
+`application/turn_interpret.py`是pure deterministic verifier，不修模型文字：
+
+1. exact quote存在且1-based occurrence合法；
+2. Python Unicode code-point index計算`QuoteSpan`，不採byte/UTF-16 offset；
+3. qualifier與decimal frequency可轉成domain contract，verbatim必須在quote；
+4. correction target只能來自ContextBuilder的candidate且為active；同批兩個correction搶同一target時兩者都拒絕，不任選贏家；
+5. claim中的數字必須以相同字面值存在quote；
+6. reference/職務文案marker、明確多子句claim與domain invariant逐層拒絕；
+7. 每筆可partial accept；全部被drop或員工decline/dont-know造成零Evidence仍是可稽核結果，V3-3再接typed no-op commit；
+8. emergent topic另外做exact quote/occurrence驗證，不因它不寫domain就放棄provenance。
+
+duplicate `proposal_key`是整份output contract error；其他proposal-level錯誤以固定順序reason codes寫入`TurnInterpretVerificationReport.v1`。report綁定operation/context/output hash、accepted Evidence與`turn-interpret-verifier/1.0.0` policy hash。Verifier的number regex、non-atomic marker、reference marker、reject order與duplicate correction policy都有committed hash-addressed policy；改規則要新semver，不能讓同名舊report改變意義。
+
+prompt `turn-interpret.1.0.0.md`固定authority/input/extraction/unknown/injection段落與5個canonical examples，不複製整份JSON Schema、不要求hidden reasoning，也不展示職業taxonomy。`turn-interpret.1.0.0.json`把input/output/prompt/context hashes、repair上限、timeout/output budget與verifier profile綁成operation definition hash。
+
+Deterministic verifier只能證明provenance、格式與明確hard rules，不能單靠字串規則證明自然語言claim完整蘊含於quote；semantic precision/recall仍必須由V3-5多case、多trial graders與人工failure review量測。V3-2通過不等於模型品質已通過。
+
 ## JSON Schema
 
-committed schema 目前共 38 份：`domain/schemas/` 24 份、`application/schemas/` 1 份、`llm/schemas/` 7 份、`observability/schemas/` 6 份。檔名與 `$id` 都有 major version。修改 Pydantic contract 後執行：
+committed schema 目前共 42 份：`domain/schemas/` 25 份、`application/schemas/` 1 份、`llm/schemas/` 10 份、`observability/schemas/` 6 份。檔名與 `$id` 都有 major version。V1-B完成時是24份domain schema，V2-B為durable command result新增`reduction-result.v1`後成為25份；這裡記的是目前實際檔案數。修改 Pydantic contract 後執行：
 
 ```powershell
 cd apps/api
@@ -240,6 +269,8 @@ cd apps/api
 .venv\Scripts\python.exe -m app.interview_vnext.application.write_schemas
 .venv\Scripts\python.exe -m app.interview_vnext.llm.write_schemas
 .venv\Scripts\python.exe -m app.interview_vnext.llm.write_context_policies
+.venv\Scripts\python.exe -m app.interview_vnext.llm.write_verifier_policies
+.venv\Scripts\python.exe -m app.interview_vnext.llm.write_operation_documents
 .venv\Scripts\python.exe -m app.interview_vnext.observability.write_schemas
 .venv\Scripts\python.exe -m app.interview_vnext.observability.write_taxonomies
 .venv\Scripts\python.exe -m pytest tests/test_interview_vnext_schemas.py tests/test_interview_vnext_execution_schemas.py -q
@@ -301,9 +332,11 @@ V2-B完成點的歷史基線是focused Postgres `50 passed, 0 skipped`、完整A
 conflict、stale state、event failure全transaction rollback與兩個concurrent
 committer只產生一個completion；沒有新增migration或command row。V3-1聚焦
 Context/schema/dependency suite為`15 passed`，完整API + PostgreSQL regression為
-`515 passed, 0 skipped`。
+`515 passed, 0 skipped`。V3-2的Context/turn adversarial/schema/dependency
+focused suite為`36 passed`，完整API + PostgreSQL regression為
+`536 passed, 0 skipped`。
 
-下一步是 **V3-2 `turn_interpret` contracts、prompt、proposal mapper與verifier**。
+下一步是 **V3-3 durable operation executor與partial/no-op commit接線**。
 Context輸入只能來自已持久化state/artifact/reference snapshot；typed
 `ModelCallResult`在後續V3 executor接上`record_attempt_result`。先做
 Capture/persistence與Context Engine的原因是：
@@ -312,6 +345,6 @@ verifier 還是 reducer 所造成。V5 前必須完成 authenticated principal �
 → profile ownership 驗證(reference §2.3),否則 production gate 不得通過。
 
 本階段明確未做 route、外部 Capture exporter、live OpenAI/Anthropic adapter、
-Web seam、模型 bake-off或正式 Prompt；production 行為仍為
+Web seam或模型 bake-off；production 行為仍為
 零變化(composition root 不 import vNext)。durable outbox/checkpoint 已由
 V2-B DB tests 證明;只有 V3 fixed replay與 V6 bake-off通過後才能談模型品質或上線。

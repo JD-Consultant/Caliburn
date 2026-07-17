@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import json
 
+import pytest
+
 from app.interview_vnext.application.schema_exports import (
     SCHEMA_EXPORTS as APPLICATION_SCHEMA_EXPORTS,
     published_schema as published_application_schema,
@@ -17,8 +19,24 @@ from app.interview_vnext.llm.context import (
     CONTEXT_POLICIES,
     context_policy_filename,
 )
+from app.interview_vnext.llm.operation_documents import (
+    OPERATION_DIR,
+    TURN_INTERPRET_PROMPT_PATH,
+    operation_documents,
+    raw_text_hash,
+)
+from app.interview_vnext.llm.portable_schema import (
+    ProviderSchemaPortabilityError,
+    assert_portable_strict_output_schema,
+)
+from app.interview_vnext.llm.turn_interpret import (
+    TURN_INTERPRET_VERIFIER_POLICY_V1,
+)
 from app.interview_vnext.llm.write_context_policies import POLICY_DIR
 from app.interview_vnext.llm.write_schemas import SCHEMA_DIR as LLM_SCHEMA_DIR
+from app.interview_vnext.llm.write_verifier_policies import (
+    POLICY_DIR as VERIFIER_POLICY_DIR,
+)
 from app.interview_vnext.observability.schema_exports import (
     SCHEMA_EXPORTS as CAPTURE_SCHEMA_EXPORTS,
     published_schema as published_capture_schema,
@@ -66,6 +84,57 @@ def test_committed_context_policies_match_hash_addressed_registry():
             mode="json"
         )
         assert policy.policy_hash.startswith("sha256:")
+
+
+def test_turn_output_schema_is_in_the_strict_provider_portable_subset():
+    schema = published_llm_schema("turn-interpret-output.v1.schema.json")
+    assert_portable_strict_output_schema(schema)
+    encoded = json.dumps(schema, ensure_ascii=False)
+    for forbidden in (
+        '"default"',
+        '"format"',
+        '"maximum"',
+        '"maxLength"',
+        '"minimum"',
+        '"minLength"',
+        '"pattern"',
+    ):
+        assert forbidden not in encoded
+
+    invalid = {
+        "type": "object",
+        "properties": {"value": {"type": "string"}},
+        "required": [],
+        "additionalProperties": False,
+    }
+    with pytest.raises(ProviderSchemaPortabilityError, match="every property"):
+        assert_portable_strict_output_schema(invalid)
+
+
+def test_committed_turn_verifier_policy_matches_hash_addressed_contract():
+    paths = tuple(VERIFIER_POLICY_DIR.glob("*.json"))
+    assert tuple(path.name for path in paths) == (
+        "turn-interpret-verifier.1.0.0.json",
+    )
+    committed = json.loads(paths[0].read_text(encoding="utf-8"))
+    assert committed == TURN_INTERPRET_VERIFIER_POLICY_V1.model_dump(mode="json")
+    assert TURN_INTERPRET_VERIFIER_POLICY_V1.policy_hash.startswith("sha256:")
+
+
+def test_committed_operation_document_and_prompt_match_current_contracts():
+    expected = operation_documents()
+    assert {path.name for path in OPERATION_DIR.glob("*.json")} == set(expected)
+    for filename, operation in expected.items():
+        committed = json.loads((OPERATION_DIR / filename).read_text(encoding="utf-8"))
+        assert committed == operation.model_dump(mode="json")
+        assert operation.definition_hash.startswith("sha256:")
+    prompt = TURN_INTERPRET_PROMPT_PATH.read_text(encoding="utf-8")
+    assert expected["turn-interpret.1.0.0.json"].prompt_template.content_hash == (
+        raw_text_hash(prompt)
+    )
+    folded = prompt.casefold()
+    for forbidden in ("o*net", "ocs", "職務說明書", "chain-of-thought"):
+        assert forbidden not in folded
 
 
 def test_committed_execution_taxonomies_match_versioned_registry():

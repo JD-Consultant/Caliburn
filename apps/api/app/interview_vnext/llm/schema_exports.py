@@ -13,10 +13,20 @@ from .context import (
 )
 from .operation import OperationSpec
 from .port import ModelCallRequest
+from .portable_schema import portable_strict_output_schema
 from .result import ModelCallResult
+from .turn_interpret import (
+    TurnInterpretInput,
+    TurnInterpretOutput,
+    TurnInterpretVerificationReport,
+)
 
 
 SchemaFactory = Callable[[], dict[str, Any]]
+
+
+def _turn_interpret_output_schema() -> dict[str, Any]:
+    return portable_strict_output_schema(TurnInterpretOutput.model_json_schema())
 
 
 SCHEMA_EXPORTS: dict[str, tuple[str, str, SchemaFactory]] = {
@@ -54,6 +64,21 @@ SCHEMA_EXPORTS: dict[str, tuple[str, str, SchemaFactory]] = {
         "https://caliburn.local/schemas/reference-snapshot.v1.schema.json",
         "Caliburn interview vNext immutable reference snapshot v1",
         ReferenceSnapshot.model_json_schema,
+    ),
+    "turn-interpret-input.v1.schema.json": (
+        "https://caliburn.local/schemas/turn-interpret-input.v1.schema.json",
+        "Caliburn interview vNext turn interpretation input v1",
+        TurnInterpretInput.model_json_schema,
+    ),
+    "turn-interpret-output.v1.schema.json": (
+        "https://caliburn.local/schemas/turn-interpret-output.v1.schema.json",
+        "Caliburn interview vNext portable turn interpretation output v1",
+        _turn_interpret_output_schema,
+    ),
+    "turn-interpret-verification-report.v1.schema.json": (
+        "https://caliburn.local/schemas/turn-interpret-verification-report.v1.schema.json",
+        "Caliburn interview vNext turn interpretation verification report v1",
+        TurnInterpretVerificationReport.model_json_schema,
     ),
 }
 

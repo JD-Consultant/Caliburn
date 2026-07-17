@@ -20,7 +20,7 @@ from app.interview_vnext.domain.identifiers import (
     StableName,
 )
 from app.interview_vnext.domain.job_model import CandidateJobItem
-from app.interview_vnext.domain.transcript import TranscriptTurn
+from app.interview_vnext.domain.transcript import TranscriptRole, TranscriptTurn
 
 
 TURN_INTERPRET_SECTION_ORDER = (
@@ -514,6 +514,19 @@ class TurnInterpretContextPacket(ContextIdentity):
     def turn_packet_is_canonical(self) -> "TurnInterpretContextPacket":
         if self.section_order != TURN_INTERPRET_SECTION_ORDER:
             raise ValueError("turn packet section order does not match v1")
+        if (
+            self.current_employee_turn.turn_id != self.turn_id
+            or self.current_employee_turn.session_id != self.session_id
+            or self.current_employee_turn.role != TranscriptRole.EMPLOYEE
+        ):
+            raise ValueError("current employee turn does not match context identity")
+        if self.preceding_consultant_turn is not None and (
+            self.preceding_consultant_turn.session_id != self.session_id
+            or self.preceding_consultant_turn.role != TranscriptRole.CONSULTANT
+            or self.preceding_consultant_turn.sequence
+            >= self.current_employee_turn.sequence
+        ):
+            raise ValueError("preceding consultant turn does not match context identity")
         evidence_groups = (self.correction_candidates, self.recent_active_evidence)
         for values in evidence_groups:
             keys = tuple(
@@ -521,6 +534,12 @@ class TurnInterpretContextPacket(ContextIdentity):
             )
             if keys != tuple(sorted(keys)):
                 raise ValueError("turn packet evidence must be canonically ordered")
+            if any(
+                item.evidence.session_id != self.session_id
+                or item.source.state_hash != self.state_hash
+                for item in values
+            ):
+                raise ValueError("turn evidence does not match context identity")
         first = {item.evidence.evidence_id for item in self.correction_candidates}
         second = {item.evidence.evidence_id for item in self.recent_active_evidence}
         if first & second:
@@ -531,6 +550,22 @@ class TurnInterpretContextPacket(ContextIdentity):
         )
         if contradiction_keys != tuple(sorted(contradiction_keys)):
             raise ValueError("turn contradictions must be canonically ordered")
+        expected_episode = (
+            self.active_episode.episode_id if self.active_episode is not None else None
+        )
+        if any(
+            item.evidence.episode_id != expected_episode
+            for values in evidence_groups
+            for item in values
+        ):
+            raise ValueError("turn evidence does not match active episode")
+        if any(
+            item.gap.session_id != self.session_id
+            or item.gap.episode_id != expected_episode
+            or item.source.state_hash != self.state_hash
+            for item in self.contradictions
+        ):
+            raise ValueError("turn contradiction does not match context identity")
         return self
 
 
@@ -550,12 +585,21 @@ class EpisodeCodeContextPacket(ContextIdentity):
     def episode_packet_is_canonical(self) -> "EpisodeCodeContextPacket":
         if self.section_order != EPISODE_CODE_SECTION_ORDER:
             raise ValueError("episode packet section order does not match v1")
+        if self.reference_snapshot_hash is None:
+            raise ValueError("episode context requires a reference snapshot hash")
         for values in (self.positive_evidence, self.excluded_or_negative_evidence):
             keys = tuple(
                 (item.turn_sequence, str(item.evidence.evidence_id)) for item in values
             )
             if keys != tuple(sorted(keys)):
                 raise ValueError("episode evidence must be canonically ordered")
+            if any(
+                item.evidence.session_id != self.session_id
+                or item.evidence.episode_id != self.episode.episode_id
+                or item.source.state_hash != self.state_hash
+                for item in values
+            ):
+                raise ValueError("episode evidence does not match context identity")
         positive_ids = {item.evidence.evidence_id for item in self.positive_evidence}
         excluded_ids = {
             item.evidence.evidence_id for item in self.excluded_or_negative_evidence
@@ -568,9 +612,27 @@ class EpisodeCodeContextPacket(ContextIdentity):
         )
         if candidate_keys != tuple(sorted(candidate_keys)):
             raise ValueError("episode candidates must be canonically ordered")
+        if any(
+            item.candidate.session_id != self.session_id
+            or item.source.state_hash != self.state_hash
+            for item in self.existing_candidates
+        ):
+            raise ValueError("episode candidate does not match context identity")
         urns = tuple(item.snippet.urn for item in self.reference_snippets)
         if urns != tuple(sorted(urns)):
             raise ValueError("episode references must be canonically ordered")
+        if any(
+            item.source.reference_snapshot_hash != self.reference_snapshot_hash
+            for item in self.reference_snippets
+        ):
+            raise ValueError("episode reference does not match snapshot identity")
+        if any(
+            item.gap.session_id != self.session_id
+            or item.gap.episode_id != self.episode.episode_id
+            or item.source.state_hash != self.state_hash
+            for item in self.contradictions
+        ):
+            raise ValueError("episode contradiction does not match context identity")
         if self.authority_rules != EPISODE_AUTHORITY_RULES:
             raise ValueError("episode authority rules do not match v1")
         return self

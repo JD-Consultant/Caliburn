@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Literal
 from uuid import NAMESPACE_URL, UUID, uuid5
 
 from pydantic import Field
@@ -67,6 +67,10 @@ from .transcript import TranscriptRole
 
 
 class ReductionResult(DomainModel):
+    """Reducer output; persisted verbatim as the immutable command-result artifact
+    (V2-B §5.4),故需要固定 schema discriminator 與 committed JSON Schema。"""
+
+    schema_version: Literal["reduction_result.v1"] = "reduction_result.v1"
     state: InterviewState
     events: tuple[DomainEvent, ...] = ()
     reason_code: ReasonCode

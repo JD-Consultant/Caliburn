@@ -27,6 +27,7 @@ from .episode import EpisodeState, Gap
 from .events import DomainEvent
 from .evidence import Evidence, Inference
 from .job_model import CandidateJobItem
+from .reducers import ReductionResult
 from .review import ReviewDecision
 from .session import InterviewSession
 from .state import InterviewState
@@ -90,6 +91,11 @@ SCHEMA_EXPORTS: dict[str, tuple[str, str, SchemaFactory]] = {
         "https://caliburn.local/schemas/domain-event.v1.schema.json",
         "Caliburn interview vNext domain event v1",
         TypeAdapter(DomainEvent).json_schema,
+    ),
+    "reduction-result.v1.schema.json": (
+        "https://caliburn.local/schemas/reduction-result.v1.schema.json",
+        "Caliburn interview vNext reduction result v1",
+        _model_schema(ReductionResult),
     ),
     "transition-session-command.v1.schema.json": (
         "https://caliburn.local/schemas/transition-session-command.v1.schema.json",

@@ -1,0 +1,472 @@
+"""Durable operation use cases — prepare / attempt / verify / commit / fail (§7.4–§7.8).
+
+每個函式恰一個短 transaction;provider network call 只發生在 ``start_attempt``
+commit 之後、``record_attempt_result`` 之前,絕不在 UoW 內。checkpoint 寫入順序
+永遠是:hydrate → pure transition(observability.checkpoint 的函式)→ canonical
+serialize → revision CAS;不直接 patch JSON columns。
+
+V2-B 邊界:outcome 分類(succeeded / retryable / non-retryable)由呼叫端提供
+——typed ``ModelCallResult`` 的正規化屬 provider adapter(V6)與 workflow(V3),
+本層只保存 canonical result artifact 並依分類推進 checkpoint。關鍵不變量:
+attempt row 與 checkpoint 轉換同一 transaction,因此「calling + result_recorded」
+的 durable 組合**只可能**來自 retryable 結果(non-retryable/succeeded 會在同
+transaction 轉 failed/provider_completed)。
+"""
+
+from __future__ import annotations
+
+from datetime import datetime
+from enum import StrEnum
+from typing import Any, Callable
+from uuid import UUID
+
+from app.interview_vnext.domain.commands import CommandBase
+from app.interview_vnext.domain.hashing import canonical_hash
+from app.interview_vnext.domain.reducers import ReductionResult
+from app.interview_vnext.observability.artifacts import (
+    ArtifactRecord,
+    build_inline_artifact,
+)
+from app.interview_vnext.observability.checkpoint import (
+    CheckpointStatus,
+    OperationCheckpoint,
+    mark_calling,
+    mark_committed,
+    mark_failed,
+    mark_provider_completed,
+    mark_verified,
+    start_next_attempt,
+)
+from app.interview_vnext.observability.events import ExecutionStatus
+from app.interview_vnext.persistence.errors import (
+    CheckpointConflict,
+    PersistedDataCorruption,
+    StateVersionConflict,
+)
+
+from .durable_commands import DurableCommandOutcome, _commit_command_core
+from .persistence import (
+    AttemptStatus,
+    ExecutionEventDraft,
+    OperationAttempt,
+    VNextUnitOfWork,
+)
+
+
+class AttemptOutcome(StrEnum):
+    SUCCEEDED = "succeeded"
+    RETRYABLE_FAILURE = "retryable_failure"
+    NON_RETRYABLE_FAILURE = "non_retryable_failure"
+
+
+async def _require_checkpoint(uow: VNextUnitOfWork, *, tenant_id: UUID,
+                              operation_id: UUID) -> OperationCheckpoint:
+    checkpoint = await uow.checkpoints.get_by_operation(
+        tenant_id=tenant_id, operation_id=operation_id)
+    if checkpoint is None:
+        raise CheckpointConflict("operation checkpoint does not exist",
+                                 tenant_id=tenant_id, operation_id=operation_id)
+    return checkpoint
+
+
+async def _cas_or_conflict(uow: VNextUnitOfWork, *, tenant_id: UUID,
+                           expected_revision: int,
+                           checkpoint: OperationCheckpoint) -> None:
+    updated = await uow.checkpoints.save_cas(
+        tenant_id=tenant_id, expected_revision=expected_revision,
+        checkpoint=checkpoint)
+    if not updated:
+        await uow.rollback()
+        raise CheckpointConflict(
+            "checkpoint revision moved; reload and re-decide",
+            operation_id=checkpoint.operation_id,
+            expected_revision=expected_revision)
+
+
+async def prepare_operation(
+    uow_factory: Callable[[], VNextUnitOfWork],
+    *,
+    tenant_id: UUID,
+    run_id: UUID,
+    session_id: UUID,
+    checkpoint_id: UUID,
+    operation_id: UUID,
+    operation_name: str,
+    operation_definition_hash: str,
+    idempotency_key: str,
+    request_artifact: ArtifactRecord,
+    extra_request_artifacts: tuple[ArtifactRecord, ...] = (),
+    turn_id: UUID | None = None,
+    stage: str = "turn.interpret",
+    step_event_id: UUID,
+    occurred_at: datetime,
+) -> OperationCheckpoint:
+    """§7.4:load state → request artifacts → idempotency 查重 → prepared
+    checkpoint → ``workflow.step.started``。到此為止才允許啟動 attempt。"""
+    async with uow_factory() as uow:
+        state = await uow.sessions.get(tenant_id=tenant_id, session_id=session_id)
+        state_before_hash = canonical_hash(state)
+
+        existing = await uow.checkpoints.get_by_idempotency(
+            tenant_id=tenant_id, session_id=session_id,
+            operation_name=operation_name, idempotency_key=idempotency_key)
+        if existing is not None:
+            same = (existing.operation_id == operation_id
+                    and existing.operation_definition_hash == operation_definition_hash
+                    and existing.request_artifact == request_artifact.ref
+                    and existing.state_before_hash == state_before_hash)
+            if same:
+                return existing
+            raise CheckpointConflict(
+                "idempotency key already used with a different request/definition/state",
+                operation_id=operation_id, idempotency_key=idempotency_key)
+
+        for record in (request_artifact, *extra_request_artifacts):
+            await uow.artifacts.put(tenant_id=tenant_id, record=record)
+        checkpoint = OperationCheckpoint(
+            checkpoint_id=checkpoint_id, run_id=run_id, session_id=session_id,
+            turn_id=turn_id, operation_id=operation_id,
+            operation_name=operation_name,
+            operation_definition_hash=operation_definition_hash,
+            idempotency_key=idempotency_key,
+            request_artifact=request_artifact.ref,
+            state_before_hash=state_before_hash,
+            created_at=occurred_at, updated_at=occurred_at)
+        await uow.checkpoints.create(tenant_id=tenant_id, checkpoint=checkpoint)
+        await uow.capture.append_event(
+            tenant_id=tenant_id, run_id=run_id,
+            draft=ExecutionEventDraft(
+                event_id=step_event_id, occurred_at=occurred_at,
+                session_id=session_id, turn_id=turn_id,
+                operation_id=operation_id,
+                event_type="workflow.step.started", stage=stage,
+                status=ExecutionStatus.OK,
+                input_artifacts=(request_artifact.ref,),
+                state_before_hash=state_before_hash))
+        await uow.commit()
+        return checkpoint
+
+
+async def start_attempt(
+    uow_factory: Callable[[], VNextUnitOfWork],
+    *,
+    tenant_id: UUID,
+    operation_id: UUID,
+    attempt_id: UUID,
+    provider: str,
+    requested_model: str,
+    deadline_at: datetime,
+    max_attempts: int,
+    stage: str = "turn.interpret",
+    call_event_id: UUID,
+    occurred_at: datetime,
+) -> tuple[OperationCheckpoint, OperationAttempt]:
+    """§7.5:短 transaction 記 calling attempt;commit 後呼叫端才打 provider。
+    attempt 1 只能由 prepared 建立;retry 必須已保存前一 attempt result。"""
+    async with uow_factory() as uow:
+        checkpoint = await _require_checkpoint(uow, tenant_id=tenant_id,
+                                               operation_id=operation_id)
+        if (checkpoint.status == CheckpointStatus.CALLING
+                and checkpoint.active_attempt_id == attempt_id):
+            attempt = await uow.attempts.get(tenant_id=tenant_id,
+                                             attempt_id=attempt_id)
+            if attempt is None:
+                raise PersistedDataCorruption(
+                    "checkpoint references a missing attempt row",
+                    operation_id=operation_id, attempt_id=attempt_id)
+            return checkpoint, attempt          # crash-after-commit 冪等重入
+
+        if checkpoint.status == CheckpointStatus.PREPARED:
+            attempt_number = 1
+            next_checkpoint = mark_calling(
+                checkpoint, attempt_id=attempt_id, attempt=1,
+                occurred_at=occurred_at)
+        elif checkpoint.status == CheckpointStatus.CALLING:
+            assert checkpoint.active_attempt_id is not None
+            previous = await uow.attempts.get(
+                tenant_id=tenant_id, attempt_id=checkpoint.active_attempt_id)
+            if previous is None:
+                raise PersistedDataCorruption(
+                    "checkpoint references a missing attempt row",
+                    operation_id=operation_id,
+                    attempt_id=checkpoint.active_attempt_id)
+            if previous.status != AttemptStatus.RESULT_RECORDED:
+                raise CheckpointConflict(
+                    "retry requires the previous attempt result to be recorded",
+                    operation_id=operation_id,
+                    attempt_id=checkpoint.active_attempt_id)
+            assert previous.result_artifact_id is not None
+            previous_result = await uow.artifacts.get(
+                tenant_id=tenant_id, artifact_id=previous.result_artifact_id)
+            attempt_number = previous.attempt + 1
+            if attempt_number > max_attempts:
+                raise CheckpointConflict(
+                    "operation attempt budget is exhausted",
+                    operation_id=operation_id, attempt=attempt_number,
+                    max_attempts=max_attempts)
+            next_checkpoint = start_next_attempt(
+                checkpoint, previous_attempt_result=previous_result.ref,
+                attempt_id=attempt_id, attempt=attempt_number,
+                occurred_at=occurred_at)
+        else:
+            raise CheckpointConflict(
+                f"cannot start an attempt from status {checkpoint.status.value}",
+                operation_id=operation_id)
+
+        attempt = OperationAttempt(
+            attempt_id=attempt_id, run_id=checkpoint.run_id,
+            session_id=checkpoint.session_id, operation_id=operation_id,
+            attempt=attempt_number,
+            request_artifact_id=checkpoint.request_artifact.artifact_id,
+            provider=provider, requested_model=requested_model,
+            deadline_at=deadline_at, started_at=occurred_at,
+            updated_at=occurred_at)
+        await uow.attempts.start(tenant_id=tenant_id, attempt=attempt)
+        await _cas_or_conflict(uow, tenant_id=tenant_id,
+                               expected_revision=checkpoint.revision,
+                               checkpoint=next_checkpoint)
+        await uow.capture.append_event(
+            tenant_id=tenant_id, run_id=checkpoint.run_id,
+            draft=ExecutionEventDraft(
+                event_id=call_event_id, occurred_at=occurred_at,
+                session_id=checkpoint.session_id, turn_id=checkpoint.turn_id,
+                operation_id=operation_id, attempt_id=attempt_id,
+                attempt=attempt_number, event_type="model.call.started",
+                stage=stage, status=ExecutionStatus.OK))
+        await uow.commit()
+        return next_checkpoint, attempt
+
+
+async def record_attempt_result(
+    uow_factory: Callable[[], VNextUnitOfWork],
+    *,
+    tenant_id: UUID,
+    operation_id: UUID,
+    attempt_id: UUID,
+    result_artifact: ArtifactRecord,
+    outcome: AttemptOutcome,
+    max_attempts: int,
+    failure_reason_code: str = "provider_failure",
+    stage: str = "turn.interpret",
+    event_id: UUID,
+    occurred_at: datetime,
+) -> OperationCheckpoint:
+    """§7.6:provider 返回後的新 transaction。attempt calling→result_recorded
+    一次性;succeeded → provider_completed;retryable 且還有額度 → checkpoint
+    保留 calling(result 已在 attempt row);non-retryable/額度耗盡 → failed。"""
+    async with uow_factory() as uow:
+        checkpoint = await _require_checkpoint(uow, tenant_id=tenant_id,
+                                               operation_id=operation_id)
+        attempt = await uow.attempts.get(tenant_id=tenant_id, attempt_id=attempt_id)
+        if attempt is None or attempt.operation_id != operation_id:
+            raise CheckpointConflict("attempt does not belong to this operation",
+                                     operation_id=operation_id,
+                                     attempt_id=attempt_id)
+        stored = await uow.artifacts.put(tenant_id=tenant_id, record=result_artifact)
+        recorded = attempt.model_copy(update={
+            "status": AttemptStatus.RESULT_RECORDED,
+            "result_artifact_id": stored.ref.artifact_id,
+            "completed_at": occurred_at, "updated_at": occurred_at})
+        recorded = OperationAttempt.model_validate(recorded.model_dump())
+        await uow.attempts.record_result(tenant_id=tenant_id, attempt=recorded)
+
+        exhausted = attempt.attempt >= max_attempts
+        if outcome == AttemptOutcome.SUCCEEDED:
+            next_checkpoint = mark_provider_completed(
+                checkpoint, result_artifact=stored.ref, occurred_at=occurred_at)
+            event_type, event_status = "model.call.completed", ExecutionStatus.OK
+        elif outcome == AttemptOutcome.NON_RETRYABLE_FAILURE or exhausted:
+            next_checkpoint = mark_failed(
+                checkpoint, failure_artifact=stored.ref,
+                reason_code=failure_reason_code, occurred_at=occurred_at)
+            event_type, event_status = "model.call.failed", ExecutionStatus.FAILED
+        else:
+            next_checkpoint = None       # retryable、額度未盡:checkpoint 保留 calling
+            event_type, event_status = "model.call.failed", ExecutionStatus.FAILED
+
+        if next_checkpoint is not None:
+            await _cas_or_conflict(uow, tenant_id=tenant_id,
+                                   expected_revision=checkpoint.revision,
+                                   checkpoint=next_checkpoint)
+        await uow.capture.append_event(
+            tenant_id=tenant_id, run_id=checkpoint.run_id,
+            draft=ExecutionEventDraft(
+                event_id=event_id, occurred_at=occurred_at,
+                session_id=checkpoint.session_id, turn_id=checkpoint.turn_id,
+                operation_id=operation_id, attempt_id=attempt_id,
+                attempt=attempt.attempt, event_type=event_type, stage=stage,
+                status=event_status, output_artifacts=(stored.ref,)))
+        await uow.commit()
+        return next_checkpoint if next_checkpoint is not None else checkpoint
+
+
+async def record_verification(
+    uow_factory: Callable[[], VNextUnitOfWork],
+    *,
+    tenant_id: UUID,
+    operation_id: UUID,
+    verification_artifact: ArtifactRecord,
+    accepted: bool,
+    rejection_reason_code: str = "verification_rejected",
+    stage: str = "turn.interpret",
+    event_id: UUID,
+    occurred_at: datetime,
+) -> OperationCheckpoint:
+    """§7.7:schema valid ≠ semantic valid。rejected → failed,不執行 reducer。"""
+    async with uow_factory() as uow:
+        checkpoint = await _require_checkpoint(uow, tenant_id=tenant_id,
+                                               operation_id=operation_id)
+        stored = await uow.artifacts.put(tenant_id=tenant_id,
+                                         record=verification_artifact)
+        if accepted:
+            next_checkpoint = mark_verified(
+                checkpoint, verification_artifact=stored.ref,
+                occurred_at=occurred_at)
+            event_status = ExecutionStatus.OK
+        else:
+            next_checkpoint = mark_failed(
+                checkpoint, failure_artifact=stored.ref,
+                reason_code=rejection_reason_code, occurred_at=occurred_at)
+            event_status = ExecutionStatus.FAILED
+        await _cas_or_conflict(uow, tenant_id=tenant_id,
+                               expected_revision=checkpoint.revision,
+                               checkpoint=next_checkpoint)
+        await uow.capture.append_event(
+            tenant_id=tenant_id, run_id=checkpoint.run_id,
+            draft=ExecutionEventDraft(
+                event_id=event_id, occurred_at=occurred_at,
+                session_id=checkpoint.session_id, turn_id=checkpoint.turn_id,
+                operation_id=operation_id, event_type="verification.completed",
+                stage=stage, status=event_status,
+                output_artifacts=(stored.ref,)))
+        await uow.commit()
+        return next_checkpoint
+
+
+async def commit_verified_operation(
+    uow_factory: Callable[[], VNextUnitOfWork],
+    *,
+    tenant_id: UUID,
+    operation_id: UUID,
+    run_id: UUID,
+    command: CommandBase,
+    response_payload: Any,
+    response_artifact_id: UUID,
+    command_artifact_id: UUID,
+    reduction_artifact_id: UUID,
+    transition_event_id: UUID,
+    step_event_id: UUID,
+    committed_at: datetime,
+    stage: str = "turn.interpret",
+    request_idempotency_key: str | None = None,
+) -> tuple[OperationCheckpoint, ReductionResult]:
+    """§7.8:session、command、checkpoint、event、outbox 同生共死。
+    committed 後重呼叫回既有 domain result/response,不重跑 reducer。
+    state 已 stale(state_before_hash 不符)→ conflict,不把舊 proposal 硬套新 state。"""
+    async with uow_factory() as uow:
+        checkpoint = await _require_checkpoint(uow, tenant_id=tenant_id,
+                                               operation_id=operation_id)
+        if checkpoint.status == CheckpointStatus.COMMITTED:
+            assert checkpoint.domain_result_artifact is not None
+            stored = await uow.artifacts.get(
+                tenant_id=tenant_id,
+                artifact_id=checkpoint.domain_result_artifact.artifact_id)
+            result = ReductionResult.model_validate_json(stored.inline_content or "")
+            return checkpoint, result
+        if checkpoint.status != CheckpointStatus.VERIFIED:
+            raise CheckpointConflict(
+                f"commit requires a verified checkpoint, got {checkpoint.status.value}",
+                operation_id=operation_id)
+
+        state = await uow.sessions.get(tenant_id=tenant_id,
+                                       session_id=checkpoint.session_id)
+        if canonical_hash(state) != checkpoint.state_before_hash:
+            raise CheckpointConflict(
+                "session state moved since prepare; re-prepare the operation",
+                operation_id=operation_id, session_id=checkpoint.session_id)
+
+        core = await _commit_command_core(
+            uow, tenant_id=tenant_id, session_id=checkpoint.session_id,
+            run_id=run_id, command=command, stage=stage,
+            event_id=transition_event_id,
+            command_artifact_id=command_artifact_id,
+            reduction_artifact_id=reduction_artifact_id,
+            committed_at=committed_at,
+            request_idempotency_key=request_idempotency_key)
+        if core is None:
+            raise StateVersionConflict(
+                "session state moved during verified-operation commit",
+                operation_id=operation_id, session_id=checkpoint.session_id)
+        if isinstance(core, DurableCommandOutcome):
+            # command 已由別的路徑 commit(duplicate race)→ 沿用既有 reduction
+            result = core.result
+            stored_reduction = await uow.artifacts.get(
+                tenant_id=tenant_id,
+                artifact_id=core.record.reduction_artifact_id)
+            reduction_ref = stored_reduction.ref
+        else:
+            result, _record, _command_ref, reduction_ref = core
+
+        response = await uow.artifacts.put(
+            tenant_id=tenant_id,
+            record=build_inline_artifact(
+                artifact_id=response_artifact_id, kind="operation.response",
+                media_type="application/json", payload=response_payload,
+                run_id=run_id, session_id=checkpoint.session_id,
+                operation_id=operation_id, created_at=committed_at))
+        next_checkpoint = mark_committed(
+            checkpoint, domain_result_artifact=reduction_ref,
+            response_artifact=response.ref, state_after_hash=result.state_hash,
+            occurred_at=committed_at)
+        await _cas_or_conflict(uow, tenant_id=tenant_id,
+                               expected_revision=checkpoint.revision,
+                               checkpoint=next_checkpoint)
+        await uow.capture.append_event(
+            tenant_id=tenant_id, run_id=run_id,
+            draft=ExecutionEventDraft(
+                event_id=step_event_id, occurred_at=committed_at,
+                session_id=checkpoint.session_id, turn_id=checkpoint.turn_id,
+                operation_id=operation_id, event_type="workflow.step.completed",
+                stage=stage, status=ExecutionStatus.OK,
+                output_artifacts=(reduction_ref, response.ref),
+                state_before_hash=checkpoint.state_before_hash,
+                state_after_hash=result.state_hash))
+        await uow.commit()
+        return next_checkpoint, result
+
+
+async def fail_operation(
+    uow_factory: Callable[[], VNextUnitOfWork],
+    *,
+    tenant_id: UUID,
+    operation_id: UUID,
+    failure_artifact: ArtifactRecord,
+    reason_code: str,
+    stage: str = "turn.interpret",
+    event_id: UUID,
+    occurred_at: datetime,
+) -> OperationCheckpoint:
+    """終局失敗;committed 不可改寫、prepared 必須先有 attempt(contract 由
+    checkpoint transition 函式把關)。同 artifact/reason 重呼叫冪等。"""
+    async with uow_factory() as uow:
+        checkpoint = await _require_checkpoint(uow, tenant_id=tenant_id,
+                                               operation_id=operation_id)
+        stored = await uow.artifacts.put(tenant_id=tenant_id, record=failure_artifact)
+        next_checkpoint = mark_failed(
+            checkpoint, failure_artifact=stored.ref, reason_code=reason_code,
+            occurred_at=occurred_at)
+        if next_checkpoint == checkpoint:      # already failed with same outcome
+            return checkpoint
+        await _cas_or_conflict(uow, tenant_id=tenant_id,
+                               expected_revision=checkpoint.revision,
+                               checkpoint=next_checkpoint)
+        await uow.capture.append_event(
+            tenant_id=tenant_id, run_id=checkpoint.run_id,
+            draft=ExecutionEventDraft(
+                event_id=event_id, occurred_at=occurred_at,
+                session_id=checkpoint.session_id, turn_id=checkpoint.turn_id,
+                operation_id=operation_id, event_type="workflow.step.failed",
+                stage=stage, status=ExecutionStatus.FAILED,
+                output_artifacts=(stored.ref,)))
+        await uow.commit()
+        return next_checkpoint

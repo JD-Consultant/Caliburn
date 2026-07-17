@@ -59,6 +59,18 @@ from .models import (
 )
 
 
+async def _flush_translated(session: AsyncSession) -> None:
+    """flush 期的 named-constraint violation 也轉穩定錯誤——併發 INSERT race
+    在 flush 就爆,不會等到 commit,不能只在 UoW.commit 翻譯。"""
+    try:
+        await session.flush()
+    except IntegrityError as exc:
+        stable = translate_integrity_error(exc)
+        if stable is not None:
+            raise stable from exc
+        raise
+
+
 def translate_integrity_error(exc: IntegrityError) -> PersistenceError | None:
     """Named-constraint → stable error(application 不得斷言 SQLSTATE/英文訊息)。
     回 None = 不認得,呼叫端包成一般 PersistenceError。"""
@@ -111,7 +123,7 @@ class SqlAlchemySessionRepository:
             initial_state_artifact_id=None,
             created_at=s.created_at, updated_at=s.updated_at,
         ))
-        await self._s.flush()
+        await _flush_translated(self._s)
 
     async def _row(self, tenant_id: UUID, session_id: UUID) -> VNextSessionRow:
         row = (await self._s.execute(
@@ -357,7 +369,7 @@ class SqlAlchemyCommandRepository:
             result_reason_code=record.result_reason_code,
             occurred_at=record.occurred_at, committed_at=record.committed_at,
         ))
-        await self._s.flush()
+        await _flush_translated(self._s)
 
 
 # ── runs ──────────────────────────────────────────────────────────────────────
@@ -398,7 +410,7 @@ class SqlAlchemyRunRepository:
             manifest_artifact_id=run.manifest_artifact_id,
             started_at=run.started_at, completed_at=run.completed_at,
         ))
-        await self._s.flush()
+        await _flush_translated(self._s)
 
     async def get(self, *, tenant_id: UUID, run_id: UUID) -> WorkflowRun | None:
         row = (await self._s.execute(
@@ -408,6 +420,9 @@ class SqlAlchemyRunRepository:
         return None if row is None else _run_from_row(row)
 
     async def lock(self, *, tenant_id: UUID, run_id: UUID) -> None:
+        """run row 鎖(SELECT … FOR UPDATE):command commit 在任何寫入前先鎖
+        run 建立一致鎖序(run → session/artifacts),否則 FK KEY SHARE 與
+        CAS/append 的鎖會在併發下互等死鎖。transaction 必須短、無 network I/O。"""
         row = (await self._s.execute(
             sa.select(VNextRunRow.run_id)
             .where(VNextRunRow.tenant_id == tenant_id, VNextRunRow.run_id == run_id)
@@ -502,7 +517,7 @@ class SqlAlchemyCheckpointRepository:
         checkpoint = OperationCheckpoint.model_validate(checkpoint.model_dump())
         self._s.add(VNextCheckpointRow(
             **_checkpoint_columns(tenant_id, checkpoint.run_id, checkpoint)))
-        await self._s.flush()
+        await _flush_translated(self._s)
 
     async def get_by_operation(self, *, tenant_id: UUID,
                                operation_id: UUID) -> OperationCheckpoint | None:
@@ -585,7 +600,7 @@ class SqlAlchemyAttemptRepository:
             deadline_at=attempt.deadline_at, started_at=attempt.started_at,
             updated_at=attempt.updated_at, completed_at=None,
         ))
-        await self._s.flush()
+        await _flush_translated(self._s)
 
     async def get(self, *, tenant_id: UUID, attempt_id: UUID) -> OperationAttempt | None:
         row = (await self._s.execute(

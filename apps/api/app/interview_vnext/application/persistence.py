@@ -212,6 +212,20 @@ class SessionRepository(Protocol):
         duplicate command 或 stale conflict,不得在此層自行 commit/retry。"""
         ...
 
+    async def initial_state_artifact_id(
+        self, *, tenant_id: UUID, session_id: UUID
+    ) -> UUID | None:
+        """version-0 snapshot pointer(§5.1);任何 command 前 application 必須
+        確認非 null。"""
+        ...
+
+    async def set_initial_state_artifact(
+        self, *, tenant_id: UUID, session_id: UUID, artifact_id: UUID
+    ) -> bool:
+        """只允許在 state_version = 0 且 pointer 尚空時設定(§7.2 step 3);
+        回 False = 前置條件不成立(0 rows)。"""
+        ...
+
 
 class ArtifactRepository(Protocol):
     async def put(self, *, tenant_id: UUID, record: ArtifactRecord) -> ArtifactRecord: ...
@@ -242,6 +256,12 @@ class RunRepository(Protocol):
     async def create(self, *, tenant_id: UUID, run: WorkflowRun) -> None: ...
 
     async def get(self, *, tenant_id: UUID, run_id: UUID) -> WorkflowRun | None: ...
+
+    async def lock(self, *, tenant_id: UUID, run_id: UUID) -> None:
+        """取得 run row 鎖(SELECT … FOR UPDATE)。command commit 在寫入前先鎖
+        run,建立一致鎖序(run → session/artifacts)——否則 FK KEY SHARE 鎖與
+        CAS/append 的鎖會在併發下互等死鎖。transaction 必須短、無 network I/O。"""
+        ...
 
     async def finalize(self, *, tenant_id: UUID, run: WorkflowRun) -> None:
         """open → completed|failed 一次性轉換(含 completed_at/manifest ref)。"""

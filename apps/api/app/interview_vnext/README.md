@@ -1,6 +1,6 @@
 # Interview AI vNext（隔離開發中）
 
-本 package 是 ADR 0034 的 greenfield 實作區。目前已完成 **V0 + V1 domain foundation + V2-A provider/Capture contracts + V2-B durable persistence + V3-0 readiness + V3-1 Context Engine + V3-2 Turn Interpreter contracts/verifier**。V3-0固定官方OpenAI SDK 2.46.0並補上verified zero-Evidence atomic commit；V3-1加入deterministic ContextBuilder；V3-2加入portable structured output、versioned prompt/operation/verifier policy與pure proposal verification。migration仍為0010八張 `interview_vnext_*` 表。仍然**沒有 route、live provider call**，也沒有被 production composition root import。現行使用者流量仍走 `app/interview/` v3。
+本 package 是 ADR 0034 的 greenfield 實作區。目前已完成 **V0 + V1 domain foundation + V2-A provider/Capture contracts + V2-B durable persistence + V3-0 readiness + V3-1 Context Engine + V3-2 Turn Interpreter contracts/verifier + V3-3 fixed-replay executor**。V3-0固定官方OpenAI SDK 2.46.0並補上verified zero-Evidence atomic commit；V3-1加入deterministic ContextBuilder；V3-2加入portable structured output、versioned prompt/operation/verifier policy與pure proposal verification；V3-3把完整turn operation接到durable attempt/checkpoint、provider artifact envelope、partial Evidence/no-op commit與crash recovery。migration仍為0010八張 `interview_vnext_*` 表。仍然**沒有 route、live provider call**，也沒有被 production composition root import。現行使用者流量仍走 `app/interview/` v3。
 
 權威文件：
 
@@ -18,10 +18,10 @@
 
 ```text
 domain/                 已實作：純 Pydantic contracts、validators、reducers、domain events、schemas
-application/            已實作(V2-B/V3-0/V3-1/V3-2)：async persistence ports、apply_durable_command、
+application/            已實作(V2-B/V3-0/V3-1/V3-2/V3-3)：async persistence ports、apply_durable_command、
                         durable operations(prepare/attempt/verify/commit/fail/no-op)、
                         typed no-op result/application schema、crash recovery、pure ContextBuilder、
-                        turn input projection/proposal verifier/Evidence mapping
+                        turn input projection/proposal verifier/Evidence mapping、explicit turn executor
 llm/                    已實作：neutral operation/request/result/failure、registry、scripted fake、
                         V3-1 context contracts/policies、V3-2 turn contracts/portable schema/
                         prompt/operation/verifier policy、schemas
@@ -250,7 +250,7 @@ evidence_id = UUIDv5(operation_id, "observation/" + proposal_key)
 4. correction target只能來自ContextBuilder的candidate且為active；同批兩個correction搶同一target時兩者都拒絕，不任選贏家；
 5. claim中的數字必須以相同字面值存在quote；
 6. reference/職務文案marker、明確多子句claim與domain invariant逐層拒絕；
-7. 每筆可partial accept；全部被drop或員工decline/dont-know造成零Evidence仍是可稽核結果，V3-3再接typed no-op commit；
+7. 每筆可partial accept；全部被drop或員工decline/dont-know造成零Evidence仍是可稽核結果，V3-3已接typed no-op commit；
 8. emergent topic另外做exact quote/occurrence驗證，不因它不寫domain就放棄provenance。
 
 duplicate `proposal_key`是整份output contract error；其他proposal-level錯誤以固定順序reason codes寫入`TurnInterpretVerificationReport.v1`。report綁定operation/context/output hash、accepted Evidence與`turn-interpret-verifier/1.0.0` policy hash。Verifier的number regex、non-atomic marker、reference marker、reject order與duplicate correction policy都有committed hash-addressed policy；改規則要新semver，不能讓同名舊report改變意義。
@@ -258,6 +258,50 @@ duplicate `proposal_key`是整份output contract error；其他proposal-level錯
 prompt `turn-interpret.1.0.0.md`固定authority/input/extraction/unknown/injection段落與5個canonical examples，不複製整份JSON Schema、不要求hidden reasoning，也不展示職業taxonomy。`turn-interpret.1.0.0.json`把input/output/prompt/context hashes、repair上限、timeout/output budget與verifier profile綁成operation definition hash。
 
 Deterministic verifier只能證明provenance、格式與明確hard rules，不能單靠字串規則證明自然語言claim完整蘊含於quote；semantic precision/recall仍必須由V3-5多case、多trial graders與人工failure review量測。V3-2通過不等於模型品質已通過。
+
+## V3-3 Fixed-replay durable executor（已完成，2026-07-17）
+
+`application/operation_executor.py`實作單一顯式`execute_turn_interpret()`，不是萬用agent runner。固定順序為：hydrate persisted state → ContextBuilder → 保存prompt/schema/context/manifest/input/request artifacts → prepare checkpoint → claim attempt → transaction外呼叫`LlmPort` → 保存provider artifacts/result → parse/verify → Evidence或typed no-op atomic commit。Operation definition必須等於目前committed `turn.interpret/1.0.0`；hash不同不接手舊checkpoint。
+
+### Provider result不是只有一個ref
+
+`LlmPort.generate_structured()`現在回`ModelCallEnvelope(result, supporting_artifacts)`。其中`ModelCallResult.visible_response_artifact`與`failure.error_artifact`若存在，必須在supporting artifacts有完全相同的`ArtifactRef`；所有artifact的run/session/turn/operation/attempt scope也必須與result一致。Application在`record_attempt_result()`同一transaction保存supporting artifacts、canonical result artifact與execution event refs，避免checkpoint留下dangling provider內容。
+
+Request同樣是per-attempt：attempt 1 request在prepare保存，transport/schema retry會建立新的request artifact、deterministic attempt ID與`:attempt:N` idempotency suffix。Context artifact/ref/hash不變；repair不修改或覆蓋前次request/result。
+
+### Provider-call claim與兩個worker
+
+`start_attempt()`原本的「相同attempt ID冪等回既有row」不代表caller有權再次打provider。V3-3新增`claim_attempt_for_provider()`，回`(checkpoint, attempt, claimed)`：
+
+- transaction真正建立attempt row並推進checkpoint者得到`claimed=true`；
+- 另一worker對同一active attempt作冪等重入只得到`false`；
+- executor只有對本invocation取得`true`的attempt才呼叫provider；輸家回`PENDING`。
+
+因此保證不是虛構的跨網路exactly-once，而是：同一個本地attempt claim不被兩個workers主動呼叫、每次attempt/result append-only、domain commit冪等。若provider已收到request但process在result落庫前死亡，本地只能deadline前等待；deadline後保存typed timeout/lost result並以新attempt重試。
+
+### Fresh-process recovery matrix
+
+| DB狀態 | 行為 |
+|---|---|
+| `PREPARED` | claim attempt；只有贏家呼叫provider |
+| `CALLING` + 無result + deadline未到 | 回`PENDING`，不重打 |
+| `CALLING` + 無result + deadline已過 | 保存timeout result，再依budget fail/retry |
+| `CALLING` + `result_recorded` | 從request/result artifacts重建classification並開下一attempt |
+| `PROVIDER_COMPLETED` | 不打provider，直接parse/verify |
+| `VERIFIED` | 不打provider，進atomic Evidence/no-op commit |
+| `COMMITTED` | 回既有report/domain result/response |
+| `FAILED` | 回typed terminal outcome |
+
+`prepare_operation(expected_state_hash=...)`阻止ContextBuilder完成到prepare之間的stale context；Evidence與no-op commit原本的transaction內state-hash gate阻止provider call期間前進的state被舊結果覆蓋。後者會保留`VERIFIED` artifact供稽核並raise conflict；caller需用新operation ID從新state重建，不能repair舊context。
+
+### Retry／repair的正式範圍
+
+- typed retryable transport/provider failure依`max_attempts`有限重試；refusal、incomplete與non-retryable failure不進reducer；
+- schema repair只在provider回`succeeded`但完整本地Pydantic contract失敗時最多一次；下一request附canonical machine-readable validation errors；
+- `semantic_repair_attempts=0`。目前checkpoint v1沒有`VERIFIED -> CALLING`安全轉移，且尚無V3-5 eval證明self-repair值得增加confirmation bias與狀態複雜度；不能在executor中猜一條轉移；
+- proposal-level quote/span/domain rejection仍採partial acceptance，不是schema repair。零accepted Evidence走typed no-op success，provider refusal/failure不是no-op。
+
+V3-3 PostgreSQL tests涵蓋happy/partial/no-op、duplicate committed replay、雙worker claim、crash after start、deadline timeout retry、crash after result before retry start、bounded schema repair、refusal、provider transaction boundary與stale state conflict。這些測試證明執行語意與可恢復性；模型的自然語言precision/recall仍要等V3-5 live multi-trial gate，不能用DB綠燈宣稱AI效果好。
 
 ## JSON Schema
 
@@ -334,12 +378,15 @@ committer只產生一個completion；沒有新增migration或command row。V3-1�
 Context/schema/dependency suite為`15 passed`，完整API + PostgreSQL regression為
 `515 passed, 0 skipped`。V3-2的Context/turn adversarial/schema/dependency
 focused suite為`36 passed`，完整API + PostgreSQL regression為
-`536 passed, 0 skipped`。
+`536 passed, 0 skipped`。V3-3 focused `llm + fixed-replay` suite為
+`18 passed`；`recovery + fixed-replay` PostgreSQL suite為`22 passed`。
+完整API + PostgreSQL regression為`547 passed, 0 skipped`。
 
-下一步是 **V3-3 durable operation executor與partial/no-op commit接線**。
-Context輸入只能來自已持久化state/artifact/reference snapshot；typed
-`ModelCallResult`在後續V3 executor接上`record_attempt_result`。先做
-Capture/persistence與Context Engine的原因是：
+下一步是 **V3-4 eval-only OpenAI Responses adapter**。它只放在
+`apps/api/evals/interview_vnext/providers/`，用mocked provider-shape fixtures與
+opt-in live probe驗證目前Responses API mapping，不得被production composition
+root import。接著V3-5才用12個turn component tasks、每case多trial量測模型品質。
+先做Capture/persistence、Context Engine與durable executor的原因是：
 沒有可重播 execution record,就無法判斷未來品質差是模型、context selection、
 verifier 還是 reducer 所造成。V5 前必須完成 authenticated principal → tenant
 → profile ownership 驗證(reference §2.3),否則 production gate 不得通過。

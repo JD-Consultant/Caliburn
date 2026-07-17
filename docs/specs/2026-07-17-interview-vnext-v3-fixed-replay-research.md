@@ -1,7 +1,7 @@
 # Interview AI vNext V3——Fixed Replay、ContextBuilder 與 Evidence Extraction 規格
 
 - 日期：2026-07-17
-- 狀態：**研究定稿、已核准執行；V3-0/V3-1/V3-2已完成，下一步V3-3**
+- 狀態：**研究定稿、已核准執行；V3-0/V3-1/V3-2/V3-3已完成，下一步V3-4**
 - 上游：[`2026-07-16-interview-ai-vnext-greenfield-architecture.md`](2026-07-16-interview-ai-vnext-greenfield-architecture.md)、[`2026-07-16-interview-vnext-v2b-durable-persistence-research.md`](2026-07-16-interview-vnext-v2b-durable-persistence-research.md)
 - 實作計畫：[`../plans/2026-07-17-interview-vnext-v3-fixed-replay-plan.md`](../plans/2026-07-17-interview-vnext-v3-fixed-replay-plan.md)
 - 裁決權：本文件優先於總實作計畫 §6 的概略描述；若要改本文件的 contract、gate 或 transaction boundary，先更新文件再寫 code。
@@ -91,9 +91,9 @@ OpenAI persisted reasoning、server compaction、prompt cache，以及 Anthropic
 1. `TurnInterpretInput/Output`已由V3-2補齊；`EpisodeCodeInput/Output`仍屬V3-6。
 2. ContextPolicy、ContextPacket、SelectionManifest、BudgetReport與正式ContextBuilder已由V3-1補齊。
 3. turn prompt artifact、operation document與schema portability lint已由V3-2補齊；episode版本仍屬V3-6。
-4. typed `ModelCallResult`尚未接到V2-B `record_attempt_result()` workflow executor；這是下一個V3-3切片。
+4. typed `ModelCallResult`與其所有被引用artifact已由V3-3接到V2-B durable attempt/checkpoint；`ModelCallEnvelope`阻止dangling visible/error artifact ref。
 5. 零Evidence application use case已由V3-0以typed no-op result與atomic commit補齊，未修改checkpoint major或migration。
-6. partial-accept verification report與deterministic proposal-ID規則已由V3-2補齊；durable commit接線屬V3-3。
+6. partial-accept verification report與deterministic proposal-ID規則已由V3-2補齊；V3-3已接上Evidence/no-op atomic commit。
 7. 沒有 vNext fixed replay dataset/runner/operation graders。
 8. 總計畫把 live adapter放 V6，卻在 V3要求真模型多 trial；本文件以 eval-only adapter解除矛盾。
 9. 目前只有少量完整 session fixture，還不是 20個平衡 component tasks。
@@ -115,8 +115,8 @@ V3 的 prompt、context、selection manifest、provider result、verification re
 4. persist prompt/schema/context/selection-manifest/request artifacts
 5. prepare_operation() -> checkpoint prepared
 6. start_attempt() -> calling commit
-7. UoW外呼叫 LlmPort.generate_structured()
-8. persist canonical ModelCallResult artifact + record_attempt_result()
+7. UoW外呼叫 LlmPort.generate_structured()，取得ModelCallEnvelope
+8. 同transaction保存canonical ModelCallResult與所有visible/error supporting artifacts，再record_attempt_result()
 9. parse TurnInterpretOutput + semantic/provenance verify
 10. persist VerificationReport + record_verification()
 11a. accepted observations > 0 -> ApplyEvidenceCommand + commit_verified_operation()
@@ -142,6 +142,39 @@ V3 不測 Question Policy，因此 episode open/close由 fixture的 `episode_bou
 | 全部 proposal被 drop | 合法 no-op commit；保留 user/episode signals與 dropped reasons |
 | state在 model call期間前進 | 不套用舊結果；checkpoint conflict，重新從新 state prepare |
 | runner crash | 使用 V2-B recovery decision table恢復；不得重複已完成 command/event |
+
+### 4.3 V3-3已落地的 durable executor語意（2026-07-17）
+
+`execute_turn_interpret()`是單一operation的顯式orchestrator，不是接受任意callback/stage的agent framework。它只接受目前committed的`turn.interpret/1.0.0` operation definition；prompt、schema、context policy或repair policy hash不同就拒絕執行，避免舊checkpoint被新邏輯悄悄接手。
+
+Provider邊界現在回傳：
+
+```text
+ModelCallEnvelope
+  result: ModelCallResult
+  supporting_artifacts: tuple[ArtifactRecord, ...]
+```
+
+若`visible_response_artifact`或`failure.error_artifact`沒有出現在envelope，或artifact的run/session/turn/operation/attempt scope與result不一致，envelope在進入persistence前即拒絕。`record_attempt_result()`再於同一transaction保存supporting artifacts與result artifact，execution event索引全部refs；因此checkpoint不會指到不存在的provider內容。
+
+Provider-call ownership不是從「attempt ID相同」推測。`claim_attempt_for_provider()`在建立attempt row的transaction回傳`claimed=true`；同一attempt的冪等重入回`false`。只有`true` claimant可做network I/O。這處理兩個workers同時讀到`PREPARED`的race：兩者可使用同一deterministic attempt ID，但只有insert/CAS贏家呼叫provider，另一個回`PENDING`。
+
+每次executor invocation另維護只存在該process stack內的`callable_attempt_ids`。它不是權威state，只是限制「本次呼叫可以執行哪些剛取得claim的attempt」：
+
+| Persisted狀態 | Executor行為 | 是否呼叫provider |
+|---|---|---:|
+| `PREPARED` | claim attempt 1；贏家繼續，輸家回`PENDING` | 只有claim贏家 |
+| `CALLING`且attempt仍`calling`、deadline未到 | 視為未知in-flight；fresh process等待 | 否 |
+| `CALLING`且attempt仍`calling`、deadline已過 | 保存typed timeout result；依attempt budget fail或claim下一次 | 只呼叫新claim的attempt |
+| `CALLING`且舊attempt已`result_recorded` | 從persisted request/result重做deterministic classification，再claim下一次 | 不重打舊attempt |
+| `PROVIDER_COMPLETED` | 從result/context artifacts parse + verify | 否 |
+| `VERIFIED` | atomic Evidence或typed no-op commit | 否 |
+| `COMMITTED` | hydrate既有report/result/response並回傳 | 否 |
+| `FAILED` | 回typed terminal outcome | 否 |
+
+這個策略刻意不宣稱exactly-once network delivery。若process在provider已收 request、但result尚未durable保存時死亡，系統無法由本地DB證明外部結果；deadline前等待，deadline後把舊attempt記為timeout/lost並以新idempotency suffix開下一次。正確保證是「每個本地claim最多主動呼叫一次、所有已知attempt append-only、domain commit冪等」，不是虛構跨網路的exactly-once。
+
+State freshness有兩道gate：ContextBuilder完成後，`prepare_operation(expected_state_hash=...)`在短transaction重讀state，若context建立期間已前進就不建立checkpoint；provider返回後，Evidence與no-op兩條atomic commit都再次比較`checkpoint.state_before_hash`，若呼叫期間state前進則保留`VERIFIED` artifacts並拒絕stale commit，caller必須以新operation/state重新prepare。
 
 ---
 
@@ -479,7 +512,9 @@ Task描述「做什麼」，Output描述「交付什麼」。Tool Evidence不能
 
 ### 8.3 repair
 
-Schema repair最多一次，input只增加 machine-readable validation errors與前次 visible output artifact ref；semantic repair最多一次且必須由具體 verification codes觸發。Repair是新 attempt，不覆寫前次結果。
+V3-3只啟用**最多一次schema repair**：它只適用於provider回`SUCCEEDED`、但完整本地`TurnInterpretOutput` contract驗證失敗；refusal、incomplete與typed provider failure不得誤走schema repair。下一次request保存canonical machine-readable validation errors、沿用相同context refs/hash，並使用新的request artifact、attempt ID與idempotency suffix。前次visible output仍由前次`ModelCallResult` ref定位，不把未驗證JSON當作新事實塞回context。Repair是新attempt，不覆寫前次結果。
+
+`semantic_repair_attempts`在committed `turn.interpret/1.0.0`固定為`0`。原因是checkpoint v1的安全單向流程是`CALLING -> PROVIDER_COMPLETED -> VERIFIED -> terminal`，目前沒有「verification rejected後回CALLING」的已發布轉移；更重要的是，尚無V3-5多case/multi-trial證據證明semantic self-repair提升precision而不增加confirmation bias。若V3-5顯示特定stable verification codes可被repair，必須先提出新operation/checkpoint transition規格與eval結果，不能在executor內臨時跳狀態。
 
 若同一 failure需持續增加 prompt例外規則，先檢查是否應改 output schema、ContextBuilder、deterministic verifier或拆 operation。
 
@@ -642,6 +677,18 @@ V2-B checkpoint目前有單一 verification artifact ref，足以保存 report�
 - 因此 no-op以 `operation.noop_result.v1` artifact作為真實 domain outcome，`state_after_hash == state_before_hash`，完整符合既有v1 invariant。
 
 V3-0不得升 `operation_checkpoint` major、不得修改已發布v1 schema，也不得新增migration。要新增的是 typed `OperationNoopResult.v1` contract與 `commit_verified_noop_operation()` application use case。Response artifact仍保存完整 typed operation output；no-op artifact不得是假 `ReductionResult`，也不得以 null讓caller猜。
+
+### 11.3 V3-3 provider artifact與attempt claim（不新增migration）
+
+V3-3不增加資料表或checkpoint欄位。每次attempt已有自己的`request_artifact_id/result_artifact_id`；新語意落在application contract：
+
+1. attempt 1 request在prepare時保存，retry request由`start_attempt`同transaction保存並綁到新attempt row；
+2. `ModelCallEnvelope`攜帶result引用的immutable artifacts，避免adapter只交ref、executor卻沒有可保存內容；
+3. `record_attempt_result(extra_result_artifacts=...)`驗scope後同transaction寫supporting/result artifacts與event；
+4. `claim_attempt_for_provider()`回傳`claimed`，把「冪等重入」與「取得network call權」分開；既有`start_attempt()`保留原二元回傳，供recovery/use-case tests使用，但它不授予caller provider-call authority；
+5. retry request/result仍使用既有artifact表與attempt row；operation definition hash已因`semantic_repair_attempts: 1 -> 0`更新，舊hash不得混跑。
+
+這些是application-level protocol strengthening，沒有改`OperationCheckpoint.v1`或migration 0010，故不需要0011。
 
 ---
 

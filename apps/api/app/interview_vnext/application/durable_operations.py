@@ -97,6 +97,7 @@ async def prepare_operation(
     idempotency_key: str,
     request_artifact: ArtifactRecord,
     extra_request_artifacts: tuple[ArtifactRecord, ...] = (),
+    expected_state_hash: str | None = None,
     turn_id: UUID | None = None,
     stage: str = "turn.interpret",
     step_event_id: UUID,
@@ -107,6 +108,12 @@ async def prepare_operation(
     async with uow_factory() as uow:
         state = await uow.sessions.get(tenant_id=tenant_id, session_id=session_id)
         state_before_hash = canonical_hash(state)
+        if expected_state_hash is not None and state_before_hash != expected_state_hash:
+            raise CheckpointConflict(
+                "session state moved while context/request artifacts were built",
+                operation_id=operation_id,
+                session_id=session_id,
+            )
 
         existing = await uow.checkpoints.get_by_idempotency(
             tenant_id=tenant_id, session_id=session_id,
@@ -148,7 +155,7 @@ async def prepare_operation(
         return checkpoint
 
 
-async def start_attempt(
+async def _start_attempt(
     uow_factory: Callable[[], VNextUnitOfWork],
     *,
     tenant_id: UUID,
@@ -158,10 +165,11 @@ async def start_attempt(
     requested_model: str,
     deadline_at: datetime,
     max_attempts: int,
+    request_artifact: ArtifactRecord | None = None,
     stage: str = "turn.interpret",
     call_event_id: UUID,
     occurred_at: datetime,
-) -> tuple[OperationCheckpoint, OperationAttempt]:
+) -> tuple[OperationCheckpoint, OperationAttempt, bool]:
     """§7.5:短 transaction 記 calling attempt;commit 後呼叫端才打 provider。
     attempt 1 只能由 prepared 建立;retry 必須已保存前一 attempt result。"""
     async with uow_factory() as uow:
@@ -175,7 +183,16 @@ async def start_attempt(
                 raise PersistedDataCorruption(
                     "checkpoint references a missing attempt row",
                     operation_id=operation_id, attempt_id=attempt_id)
-            return checkpoint, attempt          # crash-after-commit 冪等重入
+            if (
+                request_artifact is not None
+                and attempt.request_artifact_id != request_artifact.ref.artifact_id
+            ):
+                raise CheckpointConflict(
+                    "attempt already uses a different request artifact",
+                    operation_id=operation_id,
+                    attempt_id=attempt_id,
+                )
+            return checkpoint, attempt, False   # crash-after-commit 冪等重入
 
         if checkpoint.status == CheckpointStatus.PREPARED:
             attempt_number = 1
@@ -214,11 +231,31 @@ async def start_attempt(
                 f"cannot start an attempt from status {checkpoint.status.value}",
                 operation_id=operation_id)
 
+        if request_artifact is not None:
+            if (
+                request_artifact.run_id != checkpoint.run_id
+                or request_artifact.session_id != checkpoint.session_id
+                or request_artifact.turn_id != checkpoint.turn_id
+                or request_artifact.operation_id != operation_id
+                or request_artifact.attempt_id != attempt_id
+            ):
+                raise CheckpointConflict(
+                    "attempt request artifact scope does not match attempt",
+                    operation_id=operation_id,
+                    attempt_id=attempt_id,
+                )
+            stored_request = await uow.artifacts.put(
+                tenant_id=tenant_id, record=request_artifact
+            )
+            request_artifact_id = stored_request.ref.artifact_id
+        else:
+            request_artifact_id = checkpoint.request_artifact.artifact_id
+
         attempt = OperationAttempt(
             attempt_id=attempt_id, run_id=checkpoint.run_id,
             session_id=checkpoint.session_id, operation_id=operation_id,
             attempt=attempt_number,
-            request_artifact_id=checkpoint.request_artifact.artifact_id,
+            request_artifact_id=request_artifact_id,
             provider=provider, requested_model=requested_model,
             deadline_at=deadline_at, started_at=occurred_at,
             updated_at=occurred_at)
@@ -235,7 +272,108 @@ async def start_attempt(
                 attempt=attempt_number, event_type="model.call.started",
                 stage=stage, status=ExecutionStatus.OK))
         await uow.commit()
-        return next_checkpoint, attempt
+        return next_checkpoint, attempt, True
+
+
+async def start_attempt(
+    uow_factory: Callable[[], VNextUnitOfWork],
+    *,
+    tenant_id: UUID,
+    operation_id: UUID,
+    attempt_id: UUID,
+    provider: str,
+    requested_model: str,
+    deadline_at: datetime,
+    max_attempts: int,
+    request_artifact: ArtifactRecord | None = None,
+    stage: str = "turn.interpret",
+    call_event_id: UUID,
+    occurred_at: datetime,
+) -> tuple[OperationCheckpoint, OperationAttempt]:
+    """Backward-compatible durable start without granting provider-call authority."""
+
+    checkpoint, attempt, _claimed = await _start_attempt(
+        uow_factory,
+        tenant_id=tenant_id,
+        operation_id=operation_id,
+        attempt_id=attempt_id,
+        provider=provider,
+        requested_model=requested_model,
+        deadline_at=deadline_at,
+        max_attempts=max_attempts,
+        request_artifact=request_artifact,
+        stage=stage,
+        call_event_id=call_event_id,
+        occurred_at=occurred_at,
+    )
+    return checkpoint, attempt
+
+
+async def claim_attempt_for_provider(
+    uow_factory: Callable[[], VNextUnitOfWork],
+    *,
+    tenant_id: UUID,
+    operation_id: UUID,
+    attempt_id: UUID,
+    provider: str,
+    requested_model: str,
+    deadline_at: datetime,
+    max_attempts: int,
+    request_artifact: ArtifactRecord | None = None,
+    stage: str = "turn.interpret",
+    call_event_id: UUID,
+    occurred_at: datetime,
+) -> tuple[OperationCheckpoint, OperationAttempt, bool]:
+    """Start an attempt and tell the caller if this transaction won the call claim.
+
+    Only a ``True`` claimant may perform provider I/O. An idempotent replay of an
+    already-calling attempt returns ``False`` even when it used the same attempt ID.
+    """
+
+    try:
+        return await _start_attempt(
+            uow_factory,
+            tenant_id=tenant_id,
+            operation_id=operation_id,
+            attempt_id=attempt_id,
+            provider=provider,
+            requested_model=requested_model,
+            deadline_at=deadline_at,
+            max_attempts=max_attempts,
+            request_artifact=request_artifact,
+            stage=stage,
+            call_event_id=call_event_id,
+            occurred_at=occurred_at,
+        )
+    except CheckpointConflict:
+        # A same-ID claimant can lose the INSERT/CAS before the winner commits.
+        # The failed UoW is gone; classify the race only from a fresh transaction.
+        async with uow_factory() as uow:
+            checkpoint = await _require_checkpoint(
+                uow, tenant_id=tenant_id, operation_id=operation_id
+            )
+            attempt = await uow.attempts.get(
+                tenant_id=tenant_id, attempt_id=attempt_id
+            )
+            expected_request_artifact_id = (
+                request_artifact.ref.artifact_id
+                if request_artifact is not None
+                else checkpoint.request_artifact.artifact_id
+            )
+            if (
+                checkpoint.status == CheckpointStatus.CALLING
+                and checkpoint.active_attempt_id == attempt_id
+                and attempt is not None
+                and attempt.operation_id == operation_id
+                and attempt.attempt == checkpoint.active_attempt
+                and attempt.status == AttemptStatus.CALLING
+                and attempt.request_artifact_id == expected_request_artifact_id
+                and attempt.provider == provider
+                and attempt.requested_model == requested_model
+                and attempt.deadline_at == deadline_at
+            ):
+                return checkpoint, attempt, False
+        raise
 
 
 async def record_attempt_result(
@@ -245,6 +383,7 @@ async def record_attempt_result(
     operation_id: UUID,
     attempt_id: UUID,
     result_artifact: ArtifactRecord,
+    extra_result_artifacts: tuple[ArtifactRecord, ...] = (),
     outcome: AttemptOutcome,
     max_attempts: int,
     failure_reason_code: str = "provider_failure",
@@ -263,6 +402,26 @@ async def record_attempt_result(
             raise CheckpointConflict("attempt does not belong to this operation",
                                      operation_id=operation_id,
                                      attempt_id=attempt_id)
+        for record in (result_artifact, *extra_result_artifacts):
+            if (
+                record.run_id != checkpoint.run_id
+                or record.session_id != checkpoint.session_id
+                or record.turn_id != checkpoint.turn_id
+                or record.operation_id != operation_id
+                or record.attempt_id != attempt_id
+            ):
+                raise CheckpointConflict(
+                    "attempt result artifact scope does not match attempt",
+                    operation_id=operation_id,
+                    attempt_id=attempt_id,
+                    artifact_id=record.ref.artifact_id,
+                )
+        stored_supporting = tuple(
+            [
+                await uow.artifacts.put(tenant_id=tenant_id, record=record)
+                for record in extra_result_artifacts
+            ]
+        )
         stored = await uow.artifacts.put(tenant_id=tenant_id, record=result_artifact)
         recorded = attempt.model_copy(update={
             "status": AttemptStatus.RESULT_RECORDED,
@@ -296,7 +455,10 @@ async def record_attempt_result(
                 session_id=checkpoint.session_id, turn_id=checkpoint.turn_id,
                 operation_id=operation_id, attempt_id=attempt_id,
                 attempt=attempt.attempt, event_type=event_type, stage=stage,
-                status=event_status, output_artifacts=(stored.ref,)))
+                status=event_status,
+                output_artifacts=tuple(
+                    item.ref for item in stored_supporting
+                ) + (stored.ref,)))
         await uow.commit()
         return next_checkpoint if next_checkpoint is not None else checkpoint
 

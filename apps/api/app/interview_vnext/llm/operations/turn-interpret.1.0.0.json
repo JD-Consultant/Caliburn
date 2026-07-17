@@ -29,11 +29,11 @@
   "allowed_tools": [],
   "repair_policy": {
     "schema_repair_attempts": 1,
-    "semantic_repair_attempts": 1
+    "semantic_repair_attempts": 0
   },
   "safety_policy_flags": [
     "no-chain-of-thought",
     "untrusted-input-boundary"
   ],
-  "definition_hash": "sha256:a569745392f2effff83cf883f7e958b9d462160b8506910f9caf0fb6221d983d"
+  "definition_hash": "sha256:9e86be181a4b3755f02f5c97a24690ba761fba5b4d6ab975c93e0e414ade86f8"
 }

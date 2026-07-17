@@ -10,7 +10,7 @@ from pydantic import Field, model_validator
 
 from app.interview_vnext.domain.base import DomainModel
 from app.interview_vnext.domain.identifiers import NonEmptyText, Sha256, StableName, UtcDatetime
-from app.interview_vnext.observability.artifacts import ArtifactRef
+from app.interview_vnext.observability.artifacts import ArtifactRecord, ArtifactRef
 
 from .result import ModelCallResult
 
@@ -80,5 +80,41 @@ class ModelCallRequest(DomainModel):
         return self.context_artifact.content_hash
 
 
+class ModelCallEnvelope(DomainModel):
+    """Normalized result plus every immutable artifact referenced by that result."""
+
+    result: ModelCallResult
+    supporting_artifacts: tuple[ArtifactRecord, ...]
+
+    @model_validator(mode="after")
+    def refs_exist_and_scope_matches_result(self) -> "ModelCallEnvelope":
+        artifact_ids = tuple(
+            item.ref.artifact_id for item in self.supporting_artifacts
+        )
+        if len(set(artifact_ids)) != len(artifact_ids):
+            raise ValueError("model envelope supporting artifact IDs must be unique")
+        by_ref = {item.ref: item for item in self.supporting_artifacts}
+        required = tuple(
+            ref
+            for ref in (
+                self.result.visible_response_artifact,
+                self.result.failure.error_artifact if self.result.failure else None,
+            )
+            if ref is not None
+        )
+        if any(ref not in by_ref for ref in required):
+            raise ValueError("model envelope is missing a referenced supporting artifact")
+        for record in self.supporting_artifacts:
+            if (
+                record.run_id != self.result.run_id
+                or record.session_id != self.result.session_id
+                or record.turn_id != self.result.turn_id
+                or record.operation_id != self.result.operation_id
+                or record.attempt_id != self.result.attempt_id
+            ):
+                raise ValueError("model envelope artifact scope does not match result")
+        return self
+
+
 class LlmPort(Protocol):
-    async def generate_structured(self, request: ModelCallRequest) -> ModelCallResult: ...
+    async def generate_structured(self, request: ModelCallRequest) -> ModelCallEnvelope: ...

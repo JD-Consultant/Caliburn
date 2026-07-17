@@ -1,7 +1,7 @@
 # Interview AI vNext Greenfield 實作計畫
 
 - 日期：2026-07-16
-- 狀態：**執行中；V0 + V1 + V2-A + V2-B與V3-0/V3-1/V3-2已完成(2026-07-17)，下一步V3-3 durable operation executor；尚未接 runtime route**
+- 狀態：**執行中；V0 + V1 + V2-A + V2-B與V3-0/V3-1/V3-2/V3-3已完成(2026-07-17)，下一步V3-4 eval-only OpenAI Responses adapter；尚未接 runtime route**
 - 目標架構：[`../specs/2026-07-16-interview-ai-vnext-greenfield-architecture.md`](../specs/2026-07-16-interview-ai-vnext-greenfield-architecture.md)
 - V2-B persistence reference：[`../specs/2026-07-16-interview-vnext-v2b-durable-persistence-research.md`](../specs/2026-07-16-interview-vnext-v2b-durable-persistence-research.md)
 - V2-B 可執行交接：[`2026-07-16-interview-vnext-v2b-durable-persistence-plan.md`](2026-07-16-interview-vnext-v2b-durable-persistence-plan.md)
@@ -45,7 +45,7 @@ V8  刪除 v3 internals 與更新現行 design
 | V1-B | 完成 | episode/gap/inference/candidate/withdraw/review lifecycle reducers；Evidence/Inference 雙向 correction lineage；Gap resolution evidence；deterministic invalidation；human review；共 24 份 schema | 不含 provider、DB、route 或正式 prompt |
 | V2-A | 完成 | provider-neutral request/result/failure、hash-addressed operation registry、strict scripted fake；immutable artifact、version-addressed execution taxonomy/event/hash chain/manifest、outbox 與 multi-attempt operation checkpoint contracts；9 份 committed schema、1 份 taxonomy document、22 個 focused tests | 只有 in-memory contract fake；沒有 DB transaction、外部 exporter、live provider、正式 prompt 或 route |
 | V2-B | 完成(2026-07-17) | migration 0010 八張 `interview_vnext_*` 表(introspection test 逐 constraint 驗)、canonical TEXT serialization + corruption 檢查、async repositories/UoW、atomic command commit(run-lock 鎖序)、durable capture(create_run/append/finalize/manifest)、outbox lease CTE、checkpoint crash recovery;focused Postgres suite 50 passed/0 skip、完整 suite 含 DB 499 passed;commit SHA 與差異註記見 V2-B plan §11 | 無 live provider/route/ContextBuilder;typed `ModelCallResult` 接線屬 V3;tenant/auth seam 屬 V5 |
-| V3 | 執行中（V3-0/V3-1/V3-2完成） | OpenAI SDK 2.46.0與typed no-op atomic commit；deterministic ContextBuilder；portable all-required turn output schema、5-example prompt、hash-addressed operation/verifier policy、exact quote/Unicode span/correction/numeric/partial-accept verifier與typed report；V3-2 focused 36 passed、完整含PostgreSQL 536 passed | V3-3 workflow executor、eval-only live adapter、episode coder與20-case多trial gate尚未完成 |
+| V3 | 執行中（V3-0/V3-1/V3-2/V3-3完成） | OpenAI SDK 2.46.0與typed no-op atomic commit；deterministic ContextBuilder；portable all-required turn output schema、5-example prompt、hash-addressed operation/verifier policy、exact quote/Unicode span/correction/numeric/partial-accept verifier與typed report；顯式durable turn executor、provider artifact envelope、attempt call claim、bounded schema repair、partial/no-op commit與fresh-process recovery；V3-3完整API/PostgreSQL regression 547 passed | eval-only live adapter、12-case turn gate、episode coder與20-case多trial gate尚未完成 |
 | V4+ | 未開始 | — | adaptive workflow、Web seam、雙provider bake-off、pilot與切換 |
 
 V1 的 event 是 domain change notification／artifact index，payload 只有 object ID；目前可重現的是相同初始 state + command stream 的 state/hash。V2-B 已把 execution event + immutable artifact + outbox + checkpoint protocol 接上 PostgreSQL transaction:跨 process crash recovery 由「commit → 丟棄所有 in-memory objects → fresh session 重讀 committed rows」的 integration tests 證明。完整 event sourcing 仍**不**宣稱——execution event 只帶 ID/hash,完整重播 payload 在 command/reduction artifacts(§4.1 資料角色不得混用)。實作細節與完整 lifecycle matrix 見 [`../../apps/api/app/interview_vnext/README.md`](../../apps/api/app/interview_vnext/README.md)。
@@ -356,6 +356,8 @@ turn_interpret
 - token count/budget artifact。
 
 V3-1已完成。正式固定值為：turn 65,536 UTF-8 bytes／8,192 output reserve／contradiction 4／correction 8或4／recent evidence 6；episode 262,144 bytes／12,288 reserve／evidence 256／contradiction 64／candidate 128／reference 8。每個build產生typed packet、所有source selected/excluded manifest與budget report；超限攜完整未截斷內容hard fail。`ReferenceSnapshot`以URN排序並獨立hash定址，不與working state混權威。估算公式與限制見V3 reference §5.5；改值要新policy semver與eval證據。
+
+V3-3已完成turn垂直切片的durable orchestration：每個provider call先以短transaction claim attempt，network I/O不持有UoW；result引用的visible/error artifacts透過`ModelCallEnvelope`同transaction保存；fresh process可從prepared/calling/result-recorded/provider-completed/verified/terminal續跑。雙worker只有claim贏家可打provider；state在context build或provider call期間前進時拒絕stale commit。Schema repair最多一次且附machine-readable local errors；semantic repair固定0，待V3-5 eval與新checkpoint transition證據。
 
 ### 6.5 Dataset
 

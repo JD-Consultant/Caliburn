@@ -3,7 +3,7 @@
 - 日期：2026-07-17
 - 狀態：**已核准執行；研究定稿，實作進行中**
 - 權威規格：[`../specs/2026-07-17-interview-vnext-v3-fixed-replay-research.md`](../specs/2026-07-17-interview-vnext-v3-fixed-replay-research.md)
-- 前置完成：V0、V1、V2-A、V2-B、V3-0、V3-1與V3-2；目前 head含 migration 0010、durable UoW/Capture/outbox/recovery、pure ContextBuilder與turn proposal verifier。下一步V3-3。
+- 前置完成：V0、V1、V2-A、V2-B、V3-0、V3-1、V3-2與V3-3；目前 head含 migration 0010、durable UoW/Capture/outbox/recovery、pure ContextBuilder、turn proposal verifier與顯式fixed-replay executor。下一步V3-4。
 
 ---
 
@@ -36,7 +36,7 @@ fixed transcript
 | V3-0B（完成） | typed no-op result與durable commit use case | 否 | v1 schema不變 + DB round trip/crash/idempotency |
 | V3-1（完成） | Context contracts、policy documents與 ContextBuilder | 否 | 15 focused + 515 full API/PostgreSQL passed |
 | V3-2（完成） | turn_interpret contracts、prompt、proposal mapping與 verifier | 否 | focused 36 + full API/PostgreSQL 536 passed |
-| V3-3 | durable operation executor、partial/no-op commit | 否 | PostgreSQL crash/idempotency tests |
+| V3-3（完成） | durable operation executor、partial/no-op commit | 否 | 9個fixed-replay PostgreSQL cases + recovery regression |
 | V3-4 | eval-only OpenAI Responses adapter | 是，opt-in | mocked API matrix + one live probe |
 | V3-5 | vNext eval harness + 12 turn tasks + 3-trial turn gate | 是 | turn report通過才繼續 |
 | V3-6 | episode_code、Job Model verifier/reducer、preview + 8 tasks | 是 | candidate hard gates |
@@ -311,8 +311,12 @@ Verification report另保存`turn-interpret-verifier/1.0.0` policy hash；policy
 ```text
 apps/api/app/interview_vnext/application/operation_executor.py
 apps/api/app/interview_vnext/application/durable_operations.py
-apps/api/app/interview_vnext/application/turn_interpret.py
+apps/api/app/interview_vnext/llm/port.py
+apps/api/app/interview_vnext/llm/testing.py
+apps/api/app/interview_vnext/llm/operation_documents.py
 apps/api/tests/test_interview_vnext_fixed_replay_postgres.py
+apps/api/tests/test_interview_vnext_recovery_postgres.py
+apps/api/tests/test_interview_vnext_llm.py
 ```
 
 ### 6.2 Executor責任
@@ -325,7 +329,7 @@ apps/api/tests/test_interview_vnext_fixed_replay_postgres.py
 4. prepare checkpoint；
 5. start attempt；
 6. transaction外呼叫 `LlmPort`；
-7.將完整 `ModelCallResult`建 artifact；
+7.驗`ModelCallEnvelope`並將完整`ModelCallResult`與visible/error supporting artifacts同transaction保存；
 8.由 outcome決定 retry/fail/provider_completed；
 9. parse + verify；
 10. accepted Evidence建立 command，否則 no-op；
@@ -338,7 +342,8 @@ apps/api/tests/test_interview_vnext_fixed_replay_postgres.py
 
 - max attempts讀 `OperationSpec`；
 - provider retry只針對 typed retryable failure；
-- schema repair與semantic repair各最多一次且總數不超 max attempts；
+- schema repair最多一次，且只處理provider succeeded但本地contract invalid；
+- semantic repair在`turn.interpret/1.0.0`固定為0，待V3-5證據與新transition規格；
 -每次 repair request有新 request artifact、attempt ID與 idempotency key suffix；
 -原始 context hash不變；若 state變了，整個 operation重 prepare，不 repair舊結果。
 
@@ -354,6 +359,17 @@ apps/api/tests/test_interview_vnext_fixed_replay_postgres.py
 - refusal/incomplete/nonretryable不進 reducer；
 - retry保存每次 result，不覆寫；
 - fresh process replay仍可完成。
+
+### 6.5 落地裁決與實際gate（完成，2026-07-17）
+
+- `claim_attempt_for_provider()`把attempt冪等重入與network-call ownership分開；雙worker只有CAS/insert贏家可呼叫provider。
+- fresh process看見未過deadline的既有`CALLING`只回`PENDING`；不以相同`started_at`或attempt ID作為重打依據。
+- deadline後先保存typed timeout/lost result，再以新request artifact/attempt ID/idempotency suffix重試。
+- crash發生在retryable result已保存、next attempt未建立時，executor從persisted request/result重做deterministic classification並續跑，不依賴記憶體旗標。
+- schema repair request包含canonical local validation errors；refusal不再被錯分為schema failure。
+- ContextBuilder到prepare之間、provider call到commit之間都各有state-hash gate；stale結果不寫Evidence/no-op。
+- `ModelCallEnvelope`要求所有result refs有實體artifact且scope完全相同；attempt result event索引supporting/result refs。
+- focused gate：`test_interview_vnext_llm.py + test_interview_vnext_fixed_replay_postgres.py`共18 passed；recovery + fixed-replay PostgreSQL共22 passed；完整API + PostgreSQL regression為547 passed、0 skipped。
 
 ---
 

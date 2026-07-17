@@ -1,7 +1,8 @@
 # Interview AI vNext Greenfield 實作計畫
 
 - 日期：2026-07-16
-- 狀態：**執行中；V0 + V1 + V2-A + V2-B與V3-0/V3-1/V3-2/V3-3已完成(2026-07-17)，下一步V3-4 eval-only OpenAI Responses adapter；尚未接 runtime route**
+- 狀態：**執行中；V0 + V1 + V2-A + V2-B與V3-0/V3-1/V3-2/V3-3已完成，direct
+  OpenAI V3-4 mocked reference已完成；下一步V3-4R OpenRouter-first adapter/live gate；尚未接runtime route**
 - 目標架構：[`../specs/2026-07-16-interview-ai-vnext-greenfield-architecture.md`](../specs/2026-07-16-interview-ai-vnext-greenfield-architecture.md)
 - V2-B persistence reference：[`../specs/2026-07-16-interview-vnext-v2b-durable-persistence-research.md`](../specs/2026-07-16-interview-vnext-v2b-durable-persistence-research.md)
 - V2-B 可執行交接：[`2026-07-16-interview-vnext-v2b-durable-persistence-plan.md`](2026-07-16-interview-vnext-v2b-durable-persistence-plan.md)
@@ -27,7 +28,7 @@ V4  Sufficiency Engine + adaptive Question Policy
  ↓
 V5  Finish/Consolidate/OCS Projector + 現有 Web seam
  ↓
-V6  OpenAI/Anthropic model bake-off + 三層 eval
+V6  OpenRouter model/endpoint bake-off + 必要的direct-vendor對照 + 三層 eval
  ↓
 V7  Pilot、切換、觀測、rollback window
  ↓
@@ -45,7 +46,7 @@ V8  刪除 v3 internals 與更新現行 design
 | V1-B | 完成 | episode/gap/inference/candidate/withdraw/review lifecycle reducers；Evidence/Inference 雙向 correction lineage；Gap resolution evidence；deterministic invalidation；human review；共 24 份 schema | 不含 provider、DB、route 或正式 prompt |
 | V2-A | 完成 | provider-neutral request/result/failure、hash-addressed operation registry、strict scripted fake；immutable artifact、version-addressed execution taxonomy/event/hash chain/manifest、outbox 與 multi-attempt operation checkpoint contracts；9 份 committed schema、1 份 taxonomy document、22 個 focused tests | 只有 in-memory contract fake；沒有 DB transaction、外部 exporter、live provider、正式 prompt 或 route |
 | V2-B | 完成(2026-07-17) | migration 0010 八張 `interview_vnext_*` 表(introspection test 逐 constraint 驗)、canonical TEXT serialization + corruption 檢查、async repositories/UoW、atomic command commit(run-lock 鎖序)、durable capture(create_run/append/finalize/manifest)、outbox lease CTE、checkpoint crash recovery;focused Postgres suite 50 passed/0 skip、完整 suite 含 DB 499 passed;commit SHA 與差異註記見 V2-B plan §11 | 無 live provider/route/ContextBuilder;typed `ModelCallResult` 接線屬 V3;tenant/auth seam 屬 V5 |
-| V3 | 執行中（V3-0/V3-1/V3-2/V3-3完成） | OpenAI SDK 2.46.0與typed no-op atomic commit；deterministic ContextBuilder；portable all-required turn output schema、5-example prompt、hash-addressed operation/verifier policy、exact quote/Unicode span/correction/numeric/partial-accept verifier與typed report；顯式durable turn executor、provider artifact envelope、attempt call claim、bounded schema repair、partial/no-op commit與fresh-process recovery；V3-3完整API/PostgreSQL regression 547 passed | eval-only live adapter、12-case turn gate、episode coder與20-case多trial gate尚未完成 |
+| V3 | 執行中（V3-0/V3-1/V3-2/V3-3完成；direct OpenAI mocked reference完成） | OpenAI SDK 2.46.0與typed no-op atomic commit；deterministic ContextBuilder；portable all-required turn output schema、5-example prompt、hash-addressed operation/verifier policy、exact quote/Unicode span/correction/numeric/partial-accept verifier與typed report；顯式durable turn executor、provider artifact envelope、attempt call claim、bounded schema repair、partial/no-op commit與fresh-process recovery；OpenAI Responses adapter mocked matrix | V3-4R OpenRouter adapter/live gate、12-case turn gate、episode coder與20-case多trial gate尚未完成 |
 | V4+ | 未開始 | — | adaptive workflow、Web seam、雙provider bake-off、pilot與切換 |
 
 V1 的 event 是 domain change notification／artifact index，payload 只有 object ID；目前可重現的是相同初始 state + command stream 的 state/hash。V2-B 已把 execution event + immutable artifact + outbox + checkpoint protocol 接上 PostgreSQL transaction:跨 process crash recovery 由「commit → 丟棄所有 in-memory objects → fresh session 重讀 committed rows」的 integration tests 證明。完整 event sourcing 仍**不**宣稱——execution event 只帶 ID/hash,完整重播 payload 在 command/reduction artifacts(§4.1 資料角色不得混用)。實作細節與完整 lifecycle matrix 見 [`../../apps/api/app/interview_vnext/README.md`](../../apps/api/app/interview_vnext/README.md)。
@@ -525,11 +526,21 @@ ProjectionProposal 至少含 path/op/value、candidate IDs、evidence IDs、refe
 
 ---
 
-## 9. V6——Provider/model bake-off 與 promotion eval
+## 9. V6——OpenRouter model/endpoint bake-off、direct對照與 promotion eval
 
-### 9.1 adapters
+### 9.1 Gateway與adapters
 
-#### OpenAI
+#### OpenRouter（主線）
+
+- 依ADR 0035以OpenRouter作第一個production provider boundary；
+- stable Chat Completions先作promotion authority；Responses Beta須有獨立parity/benefit證據才可替換；
+- benchmark固定exact canonical model與exact upstream endpoint、fallback/plugins/cache off；
+- Capture requested/resolved model、selected endpoint、router attempts/pipeline、generation/request IDs、
+  normalized/native finish reason、usage與cost；
+- 每個model/endpoint個別通過後才評估same-model provider fallback與multi-model fallback；
+- account/dashboard routing或plugin default不得無聲改production config。
+
+#### OpenAI direct（GPT comparison／備援候選）
 
 - 使用 Responses API；
 - strict structured outputs；
@@ -538,7 +549,7 @@ ProjectionProposal 至少含 path/op/value、candidate IDs、evidence IDs、refe
 - 不使用 Assistants API；
 - 捕捉 resolved model、usage、request/response IDs 與可見 output。
 
-#### Anthropic
+#### Anthropic direct（Claude comparison／備援候選）
 
 - 使用當前 Messages API/官方 SDK；
 - structured output/tool schema 由 adapter 映射到共同 contract；
@@ -548,12 +559,13 @@ ProjectionProposal 至少含 path/op/value、candidate IDs、evidence IDs、refe
 
 ### 9.2 bake-off 方法
 
-1. 先用各 provider 的最強合適模型跑 quality ceiling。
+1. 先在OpenRouter以各model的exact endpoint跑quality ceiling，不使用auto router或fallback。
 2. operation 分開比較，不把四個 operation 綁同一模型。
-3. 同 input/context/schema、固定 reasoning/generation config。
+3. 同 input/context/schema、固定 reasoning/generation/routing config。
 4. 每 case 多 trial；報 pass distribution、latency、tokens、cost。
 5. 先過 hard gates，再做 pairwise/weighted quality。
 6. 較快模型只有在該 operation 不造成顯著 regression 才晉級。
+7. 選出Claude/GPT等主模型後才跑對應direct vendor，量gateway effect與建立備援證據；不固定先OpenAI。
 
 ### 9.3 human calibration
 

@@ -42,7 +42,8 @@ ADR 是「為什麼」層;搭配 `../specs/`(細節設計)與 `../runbook.md`(�
 | [0031](0031-occupation-suggest-card-refset-source.md) | 職類建議卡進對話流（推翻 0028 D1 職類段；預勾＋理由＋三出口）＋引擎參考碼＝profile∪doc 不變量（修 0029×0030 盲區鬼打牆）＋參考集合維持人選（否決 AI 代寫，記重啟條件）＋dismissed 知情話術；反騷擾緩做 | Accepted（2026-07-13；新手 persona 手測驗屍＋先例研究） |
 | [0032](0032-task-carrier-routing.md) | 任務載體路由：有逐字證據→綠字直落（含官方殼）＋盤永遠人開（intake 邀請卡/收尾 offer/自取，AI 彈窗全退役）＋盤無預勾疊加層（curation 端點退役）＋不確定 ≤3→聊天卡；修正 0028 D1 任務段 | Accepted（2026-07-14；維護者質疑 b 案＋Copilot/PAIR/TurboTax/冷啟動先例） |
 | [0033](0033-episode-agenda-consultant-tools.md) | 訪談議程 v4：事件（episode）驅動議程＝顧問議程工具（open/close_episode）＋覆蓋 artifact＋事件收割 pass（P 的家）＋guardrail 兜底＋異質模型（顧問升級）；退役 next_gap 梯子；修正 0027 帳本駕駛地位與 0028 議程載體 | Partially superseded by 0034（只保留 episode 概念） |
-| [0034](0034-interview-ai-vnext-greenfield-evidence-workflow.md) | Interview AI vNext：greenfield evidence workflow＋單一 adaptive conversation owner＋app-owned state＋provider-neutral Capture/eval；不整合 v3 internals，達 gate 後刪舊 | Accepted（2026-07-16；runtime 待實作） |
+| [0034](0034-interview-ai-vnext-greenfield-evidence-workflow.md) | Interview AI vNext：greenfield evidence workflow＋單一 adaptive conversation owner＋app-owned state＋provider-neutral Capture/eval；不整合 v3 internals，達 gate 後刪舊 | Accepted（provider直連優先部分由0035修正） |
+| [0035](0035-interview-vnext-openrouter-first-provider-boundary.md) | Interview AI vNext provider主線改為OpenRouter-first；Chat Completions作穩定基準、exact routing Capture/eval，直連供應商降為比較與備援 | Accepted（2026-07-17；V3-4R adapter待實作） |
 
 完整脈絡見 [`../specs/2026-06-27-system-architecture-design.md`](../specs/2026-06-27-system-architecture-design.md)。
 契約怎麼選/怎麼交付的規範見 [`../contract-strategy.md`](../contract-strategy.md)（ADR 0004/0010 的一般化、預答契約 #3）。

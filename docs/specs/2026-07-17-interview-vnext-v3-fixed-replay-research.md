@@ -1,10 +1,12 @@
 # Interview AI vNext V3——Fixed Replay、ContextBuilder 與 Evidence Extraction 規格
 
 - 日期：2026-07-17
-- 狀態：**研究定稿、已核准執行；V3-0/V3-1/V3-2/V3-3已完成，下一步V3-4**
+- 狀態：**研究定稿、已核准執行；V3-0/V3-1/V3-2/V3-3與direct OpenAI V3-4 mocked
+  reference已完成，下一步V3-4R OpenRouter-first adapter**
 - 上游：[`2026-07-16-interview-ai-vnext-greenfield-architecture.md`](2026-07-16-interview-ai-vnext-greenfield-architecture.md)、[`2026-07-16-interview-vnext-v2b-durable-persistence-research.md`](2026-07-16-interview-vnext-v2b-durable-persistence-research.md)
 - 實作計畫：[`../plans/2026-07-17-interview-vnext-v3-fixed-replay-plan.md`](../plans/2026-07-17-interview-vnext-v3-fixed-replay-plan.md)
-- V3-4 adapter交接：[`../plans/2026-07-17-interview-vnext-v3-4-openai-responses-adapter-plan.md`](../plans/2026-07-17-interview-vnext-v3-4-openai-responses-adapter-plan.md)
+- V3-4R主線交接：[`../plans/2026-07-17-interview-vnext-v3-4r-openrouter-first-adapter-plan.md`](../plans/2026-07-17-interview-vnext-v3-4r-openrouter-first-adapter-plan.md)
+- Direct OpenAI reference：[`../plans/2026-07-17-interview-vnext-v3-4-openai-responses-adapter-plan.md`](../plans/2026-07-17-interview-vnext-v3-4-openai-responses-adapter-plan.md)
 - 裁決權：本文件優先於總實作計畫 §6 的概略描述；若要改本文件的 contract、gate 或 transaction boundary，先更新文件再寫 code。
 
 ---
@@ -36,7 +38,9 @@ persisted transcript/state
 6. **模型不計算 Unicode span**：模型回 exact quote 與 1-based occurrence；application 在原始 employee turn 上計算 Unicode code-point span。找不到或 occurrence 不合法就拒絕該 proposal，不做模糊修補。
 7. **Structured Output 只解決 syntax，不等於事實正確**：provider schema、Pydantic、provenance/domain verifier、eval grader 四層都保留。
 8. **允許部分接受，也允許合法零 Evidence**：每個 proposal 分別驗證；零筆通過時使用明確 no-op operation commit，不建立空的 `ApplyEvidenceCommand`，也不偽造 observation。
-9. **V3 增加一個 eval-only OpenAI Responses adapter**：用真模型取得分析品質證據；不被 production composition root import。正式雙 provider adapter、routing 與 bake-off 仍在 V6。
+9. **V3以OpenRouter-first eval adapter取得主線品質證據**：已完成的OpenAI Responses adapter保留為
+   direct reference；V3-4R新增獨立OpenRouter Chat adapter與exact routing Capture。兩者都不被
+   production composition root import；正式fallback/routing與direct-vendor bake-off仍在V6。
 10. **不依賴 OpenAI Evals 平台**：官方已公告 2026-10-31 唯讀、2026-11-30 關閉；Caliburn 以 repo 內 dataset、runner、graders、PostgreSQL Capture 與 committed report 為權威。
 11. **V3 先過 `turn_interpret` gate，再做 `episode_code`**：若原子 Evidence 都不可靠，不用更漂亮的 JD 文案掩蓋失敗。
 12. **V3 不接 Web/route，也不動 v3**：完成只代表 fixed replay 分析垂直切片成立，不代表 adaptive interview、專業領域品質或 production readiness。
@@ -521,12 +525,22 @@ V3-3只啟用**最多一次schema repair**：它只適用於provider回`SUCCEEDE
 
 ---
 
-## 9. Eval-only OpenAI Responses adapter
+## 9. Eval-only provider adapters（OpenRouter-first amendment）
 
-本節是architecture摘要；request/response逐欄映射、schema authority、SDK 2.46.0 retry/timeout、artifact shape、mocked matrix與live Capture bundle的實作權威為
+ADR 0035已把V3主線改為OpenRouter-first。主線的endpoint、exact routing、plugin/cache污染、
+error/usage/artifact與live gate權威為
+[`2026-07-17-interview-vnext-v3-4r-openrouter-first-adapter-plan.md`](../plans/2026-07-17-interview-vnext-v3-4r-openrouter-first-adapter-plan.md)。
+下列OpenAI內容保留為direct reference adapter的architecture摘要；request/response逐欄映射、schema authority、SDK 2.46.0 retry/timeout、artifact shape、mocked matrix與optional live Capture bundle的實作權威為
 [`2026-07-17-interview-vnext-v3-4-openai-responses-adapter-plan.md`](../plans/2026-07-17-interview-vnext-v3-4-openai-responses-adapter-plan.md)。摘要與交接規格衝突時，以交接規格為準。
 
-### 9.1 邊界
+### 9.0 Active V3-4R邊界
+
+OpenRouter adapter同樣只存在`apps/api/evals/interview_vnext/providers/`，實作既有`LlmPort`；
+production `app`不得import。第一條主線使用stable Chat Completions、exact canonical model與endpoint、
+fallback/plugins/cache off、router metadata hard gate。OpenRouter Responses/Python SDK仍為Beta，先不作唯一
+authority。V3-5正式live trials以前必須有至少一次真OpenRouter conformance bundle。
+
+### 9.1 Direct OpenAI reference邊界
 
 Adapter放在 `apps/api/evals/interview_vnext/providers/`，實作既有 `LlmPort`，但 production `app` composition root不得 import。CI使用mocked HTTP與依官方OpenAPI/SDK shape建立的synthetic fixtures；fixture sidecar記錄來源日期與版本。live command只有明確設定 `OPENAI_API_KEY`才執行，沒有key就fail-fast，不標成測試通過。
 
@@ -561,9 +575,11 @@ Adapter遍歷全部 typed output items：
 
 原始provider response與可見response各自存supporting artifact；parsed canonical payload由既有`model.result` artifact內的`ModelCallResult.parsed_output`承載，normalized failure另有error artifact。不得只存Pydantic parsed object而丟失provider status、output item或failure細節。
 
-### 9.4 為何 V3不先做 Anthropic live adapter
+### 9.4 Direct provider ordering（歷史說明）
 
-兩家同時做會把「架構是否有效」與「adapter差異」混在第一個實驗，也增加一人團隊的維護面。V3以兩家 schema交集設計並引用 Anthropic現行 API限制；V6再實作 Anthropic Messages `output_config.format`、做同 case bake-off。若 OpenAI服務不可用，才可用相同 `LlmPort`替換 eval adapter，不改 application workflow。
+原研究選擇只先做OpenAI direct，理由是避免同時維護兩套adapter。ADR 0035之後，V3主線改為
+OpenRouter一套gateway adapter；若V3-5選到Claude，V6才做Anthropic direct對照，若選到GPT則使用現有
+OpenAI direct reference。direct provider不再固定由OpenAI先行，application workflow仍不變。
 
 ---
 
@@ -722,7 +738,8 @@ V3-3不增加資料表或checkpoint欄位。每次attempt已有自己的`request
 -兩個 operation I/O、context、selection、verification與 eval case/run schema全部 committed且有 hash identity；
 - ContextBuilder deterministic/property tests通過；
 - no-op/partial acceptance、retry、state conflict與 crash recovery PostgreSQL integration tests通過；
-- eval-only Responses adapter有 mocked contract tests與至少一次真 API probe；
+- eval-only OpenRouter adapter有mocked contract tests與至少一次真OpenRouter API probe；direct OpenAI
+  adapter維持mocked reference，官方OpenAI live probe為optional comparison；
 - 20個 component tasks完整、無 gold leakage；
 -每 case至少3 live trials，報告包含所有結果、variance、tokens、latency與 failure trace；
 -第10.5節 hard/quality gates全過；

@@ -1,14 +1,16 @@
 # Interview AI vNext V3-4——OpenAI Responses eval-only adapter 實作交接規格
 
 - 日期：2026-07-17
-- 狀態：**已實作——mocked complete, live gate pending**（2026-07-17：mocked adapter/live-probe
-  suite 66 passed、完整 API + PostgreSQL 614 passed, 0 skipped；§16.5 live gate 因本機無官方
-  `OPENAI_API_KEY` 尚未執行——本機僅有 OpenRouter key，§7.4 禁止代打——故不得標 V3-4 完成）
+- 狀態：**direct OpenAI reference已實作——mocked complete；原live gate未執行且不再是主線
+  blocker**（2026-07-17：mocked adapter/live-probe suite 66 passed、完整 API + PostgreSQL
+  614 passed, 0 skipped；ADR 0035已把production/eval主線改為OpenRouter-first。本文件§16.5
+  保留為optional direct-GPT comparison gate，不得把未執行寫成passed，也不再阻擋V3-5）
 - 適用切片：V3-4 only
 - 上游架構：[`../specs/2026-07-17-interview-vnext-v3-fixed-replay-research.md`](../specs/2026-07-17-interview-vnext-v3-fixed-replay-research.md)
 - 總實作計畫：[`2026-07-17-interview-vnext-v3-fixed-replay-plan.md`](2026-07-17-interview-vnext-v3-fixed-replay-plan.md)
 - 現有中立合約：`app.interview_vnext.llm.port.LlmPort`、`ModelCallRequest`、`ModelCallEnvelope`、`ModelCallResult`
 - 裁決權：本文件優先於總計畫 §7 的摘要。若實作時需要改 request/result schema、retry ownership、artifact 語意或 production import boundary，必須先修訂本文件，不可自行猜測。
+- 主線後繼：[`2026-07-17-interview-vnext-v3-4r-openrouter-first-adapter-plan.md`](2026-07-17-interview-vnext-v3-4r-openrouter-first-adapter-plan.md)。OpenRouter不得以修改本adapter base URL實作。
 
 ---
 
@@ -992,6 +994,9 @@ limitations, source_versions
 
 ### 16.5 Live gate
 
+> **ADR 0035 amendment：**下列條件現在只決定direct OpenAI candidate是否可標為live-verified，
+> 不再決定V3主線是否可進V3-5。主線gate已改為V3-4R OpenRouter live conformance。
+
 V3-4可標完成必須同時：
 
 - probe process exit 0；
@@ -1006,7 +1011,9 @@ V3-4可標完成必須同時：
 - manifest/event chain validation通過；
 - output bundle不進Git。
 
-若API key當下不可用，mocked suite可以完成code review，但切片狀態必須寫「mocked complete, live gate pending」，不能宣稱V3-4完成。
+若API key當下不可用，mocked suite可以完成code review，但direct candidate狀態只能寫
+「mocked complete, official live not run」，不能宣稱direct OpenAI live-verified；依ADR 0035，這不影響
+V3-4R OpenRouter主線狀態。
 
 ---
 

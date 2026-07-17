@@ -7,6 +7,8 @@
 - 產品前提：現有手動 JD Web、OCS 文件契約與人工審閱流程可用；重做範圍是 LLM 分析與訪談 runtime
 - 上游研究：[`2026-07-15-evidence-first-stateful-workflow-reconstruction-research.md`](2026-07-15-evidence-first-stateful-workflow-reconstruction-research.md)
 - 實作順序：[`../plans/2026-07-16-interview-ai-vnext-implementation-plan.md`](../plans/2026-07-16-interview-ai-vnext-implementation-plan.md)
+- Provider 決策修正（2026-07-17）：[`../adr/0035-interview-vnext-openrouter-first-provider-boundary.md`](../adr/0035-interview-vnext-openrouter-first-provider-boundary.md) 已取代「正式主線優先直連 OpenAI／Anthropic」的舊假設；Evidence workflow、Context Engine、Reducer、Capture 與人工 authority boundary 不變
+- 現行 provider 交接規格：[`../plans/2026-07-17-interview-vnext-v3-4r-openrouter-first-adapter-plan.md`](../plans/2026-07-17-interview-vnext-v3-4r-openrouter-first-adapter-plan.md)
 
 ---
 
@@ -244,8 +246,9 @@ apps/api/app/interview_vnext/
 │  ├─ contracts.py           Pydantic operation input/output
 │  └─ prompts/               一 operation 一版本化 prompt
 ├─ providers/
-│  ├─ openai_responses.py    OpenAI Responses adapter
-│  └─ anthropic_messages.py  Anthropic Messages adapter
+│  ├─ openrouter_chat.py     正式主線：OpenRouter stable Chat adapter
+│  ├─ openai_responses.py    已有的 direct OpenAI comparison/reference adapter
+│  └─ anthropic_messages.py  入選 Claude 時才需要的 optional direct comparison adapter
 ├─ knowledge/
 │  ├─ port.py                immutable reference snapshot interface
 │  ├─ retrieval.py           metadata-first/hybrid retrieval
@@ -273,7 +276,7 @@ providers / persistence / projection adapters
               domain contracts
 ```
 
-`domain` 不 import OpenAI、Anthropic、FastAPI、SQLAlchemy 或現有 v3 module。`interview_vnext` 不 import `app.interview.scribe`、`harvest`、`consultant` 或其 prompt。
+`domain` 不 import OpenRouter、OpenAI、Anthropic、FastAPI、SQLAlchemy 或現有 v3 module。`interview_vnext` 不 import `app.interview.scribe`、`harvest`、`consultant` 或其 prompt。
 
 ### 5.2 不導入大型 agent framework 的理由
 
@@ -668,11 +671,41 @@ class LlmPort(Protocol):
     ) -> ModelCallResult: ...
 ```
 
+`LlmPort`就是Caliburn自己的provider抽象層，不由OpenRouter或任何SDK定義。這是刻意採用目前
+mixed-provider主流的port/adapter邊界：OpenAI官方把non-OpenAI或mixed-provider stack導向provider／adapter
+surface，[Models and providers](https://developers.openai.com/api/docs/guides/agents/models#providers-and-transport)；
+Microsoft Agent Framework則在共同model-client抽象下列出OpenAI、Anthropic、Gemini、Ollama等providers，
+[官方overview](https://learn.microsoft.com/en-us/agent-framework/overview/)。Caliburn不必依賴兩個framework，
+但採用相同的依賴反轉原則。
+
+```text
+application workflow / Context Engine / reducers
+                       │
+                       ▼
+               Caliburn LlmPort
+                 ┌─────┼──────────┐
+                 ▼     ▼          ▼
+        OpenRouter   OpenAI     Anthropic        （未來可加Google direct）
+        ChatAdapter  Responses  MessagesAdapter
+            │        Adapter
+            └─ Claude／GPT／Gemini等OpenRouter models共用同一wire adapter
+```
+
+composition root只需一個明確的`provider_id -> LlmPort`映射；operation/deployment profile選adapter，domain
+object不選provider。這個registry是普通typed mapping，不做動態plugin discovery、反射式auto-routing或大型
+provider framework。新增provider的條件是：實作同一port、提供自己的conformance fixtures/live gate、完整
+保存provider-specific facts，且不改domain/reducer。
+
 `ModelCallRequest` 表示單一 attempt，包含跨 retry不變的 operation ID、唯一 attempt ID、definition/idempotency identity、portable instructions/messages、output schema identity，以及 prompt/schema/context/selection-manifest artifact refs。provider beta header、cache/reasoning/sampling knob停在 adapter profile。
 
 `ModelCallResult` 至少包含：`succeeded|refused|incomplete|failed` outcome、normalized/provider finish reason、provider、requested/resolved model、request id、visible raw response artifact、canonical parsed output、input/output/cache-read/cache-write/reasoning token usage（provider 有提供時）、latency、provider conversation/response ID（metadata only）、prompt/schema/context hashes。任何 null usage必須附 limitation，不得當 0。
 
-Domain code 只看 parsed output 和 normalized failure，不看 OpenAI/Anthropic SDK object。
+Domain code 只看 parsed output 和 normalized failure，不看 OpenRouter／OpenAI／Anthropic 的 transport 或 SDK object。
+
+Adapter以外部wire boundary切分，不以模型名稱切分：Claude、GPT、Gemini若經OpenRouter，全部使用同一個
+`OpenRouterChatAdapter`搭配不同immutable model/endpoint profile；只有真的直連OpenAI、Anthropic或Google
+官方API時，才各自建立Responses／Messages／Gemini direct adapter。架構允許多provider，不代表在模型
+bake-off前先維護每一家直連實作。
 
 ### 11.2 operation registry，而不是到處硬編模型名
 
@@ -695,7 +728,7 @@ global_consolidate:
   output_schema: global_consolidate.v1
 ```
 
-實際 provider/model 由部署設定與 eval report 綁定。第一輪應用最強可用模型取得品質上限，再用相同 case 嘗試較快／較便宜模型；不可先為省成本把架構能力判成失敗。
+實際 provider/model/endpoint 由部署設定與 eval report 綁定。依 ADR 0035，正式主線先在 OpenRouter 以固定 canonical model、固定 exact endpoint、禁止 fallback 的 profile 逐一測量；第一輪應用最強可用模型取得品質上限，再用相同 case 嘗試較快／較便宜模型。不得用 OpenRouter `auto`、多模型 fallback 或混合 endpoint 的結果代表單一模型能力，也不可先為省成本把架構能力判成失敗。入選 GPT 時以 direct OpenAI、入選 Claude 時以 direct Anthropic 作必要的 matched-provider 對照；這些對照不是 production 必經前置。
 
 ### 11.3 retry 與 repair
 
@@ -950,7 +983,7 @@ vNext production gate 通過、rollback window 結束且沒有 active v3 session
 
 | 問題 | 現在的預設 | 裁決方法 |
 |---|---|---|
-| OpenAI 或 Anthropic 哪個最終模型？ | 不先鎖；兩個 provider adapter | 在相同 held-out cases 跑 operation-level bake-off。 |
+| OpenRouter 上哪個 model／exact endpoint？ | 不先鎖；逐一固定 model + endpoint、關閉 fallback 後測 | 在相同 held-out cases 跑 operation-level bake-off；先通過 adapter conformance，再比較品質。入選模型才做對應 direct-vendor matched comparison。 |
 | Question Policy 與 response composer 是否拆兩 call？ | 合併為一個 structured operation | 若自然度與 policy correctness 無法同時達標，再做拆分 ablation。 |
 | Episode Coder 每次何時跑？ | shift/close/budget/finish 時 | 比較漏失、延遲與下一題品質。 |
 | 是否需要 global LLM consolidation？ | 只在 finish 或跨 episode pattern 時 | 若 deterministic merge 已達標則刪除這個 call。 |
@@ -968,7 +1001,8 @@ vNext production gate 通過、rollback window 結束且沒有 active v3 session
 - 新 package 不 import v3 LLM internals；
 - 六個 domain object、operation I/O、events、provider port 全部有 versioned schema；
 - reducer/invariant/projector 有 deterministic unit/property tests；
-- OpenAI Responses 與 Anthropic Messages 至少各有一個可替換 adapter，或先完成一個、另一個有 contract test fake；
+- OpenRouter stable Chat adapter 通過完整 mocked conformance、exact-route hard gates與至少一次官方 OpenRouter live probe；
+- direct OpenAI reference regression持續通過；direct Anthropic只在Claude入選或matched comparison確有需要時實作，不以「兩家都先做」阻塞主線；
 - turn、episode、finish、retry、crash recovery、idempotency、correction、decline、stop 都有端到端測試；
 - Capture vNext 不以封閉 v3 stage enum 表達；
 - 20–50 個初始 tasks、balanced negatives、多 trial artifacts、human calibration subset 存在；

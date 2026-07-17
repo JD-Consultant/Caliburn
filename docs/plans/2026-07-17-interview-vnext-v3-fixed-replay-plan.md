@@ -3,7 +3,7 @@
 - 日期：2026-07-17
 - 狀態：**已核准執行；研究定稿，實作進行中**
 - 權威規格：[`../specs/2026-07-17-interview-vnext-v3-fixed-replay-research.md`](../specs/2026-07-17-interview-vnext-v3-fixed-replay-research.md)
-- 前置完成：V0、V1、V2-A、V2-B、V3-0、V3-1、V3-2與V3-3；目前 head含 migration 0010、durable UoW/Capture/outbox/recovery、pure ContextBuilder、turn proposal verifier與顯式fixed-replay executor。V3-4 已實作（mocked complete, live gate pending，見 V3-4 交接規格狀態列）；下一步：取得官方 `OPENAI_API_KEY` 補跑 live gate，然後 V3-5。
+- 前置完成：V0、V1、V2-A、V2-B、V3-0、V3-1、V3-2與V3-3；目前 head含 migration 0010、durable UoW/Capture/outbox/recovery、pure ContextBuilder、turn proposal verifier與顯式fixed-replay executor。Direct OpenAI V3-4已實作為mocked reference；ADR 0035已取消其官方live gate的主線阻擋地位。**下一步是V3-4R OpenRouter-first adapter與真OpenRouter probe，通過後才進V3-5。**
 
 ---
 
@@ -37,7 +37,8 @@ fixed transcript
 | V3-1（完成） | Context contracts、policy documents與 ContextBuilder | 否 | 15 focused + 515 full API/PostgreSQL passed |
 | V3-2（完成） | turn_interpret contracts、prompt、proposal mapping與 verifier | 否 | focused 36 + full API/PostgreSQL 536 passed |
 | V3-3（完成） | durable operation executor、partial/no-op commit | 否 | 9個fixed-replay PostgreSQL cases + recovery regression |
-| V3-4 | eval-only OpenAI Responses adapter | 是，opt-in | mocked API matrix + one live probe |
+| V3-4（reference） | eval-only OpenAI Responses adapter | mocked已完成；live optional | mocked API matrix；official live只作GPT direct comparison |
+| V3-4R | eval-only OpenRouter Chat adapter + exact routing gate | 是，opt-in | mocked API matrix + one true OpenRouter live probe |
 | V3-5 | vNext eval harness + 12 turn tasks + 3-trial turn gate | 是 | turn report通過才繼續 |
 | V3-6 | episode_code、Job Model verifier/reducer、preview + 8 tasks | 是 | candidate hard gates |
 | V3-7 | full 20-case experiment、failure review、decision report | 是 | V3 promotion gate |
@@ -373,7 +374,12 @@ apps/api/tests/test_interview_vnext_llm.py
 
 ---
 
-## 7. V3-4——Eval-only OpenAI Responses adapter
+## 7. V3-4——Eval-only OpenAI Responses adapter（direct reference）
+
+> **2026-07-17 amendment：**本節以下OpenAI內容保留為已完成direct reference的歷史交接摘要。
+> Active主線新增V3-4R，完整規格為
+> [`2026-07-17-interview-vnext-v3-4r-openrouter-first-adapter-plan.md`](2026-07-17-interview-vnext-v3-4r-openrouter-first-adapter-plan.md)。
+> 不得依下列OpenAI摘要實作OpenRouter，也不得只換base URL。V3-5使用V3-4R真probe作前置gate。
 
 本節只保留切片摘要。已研究SDK 2.46.0實際surface並裁決schema resolver、single-call retry ownership、status/error/usage mapping、artifact格式、mocked HTTP matrix與live Capture bundle的逐步實作權威是：
 

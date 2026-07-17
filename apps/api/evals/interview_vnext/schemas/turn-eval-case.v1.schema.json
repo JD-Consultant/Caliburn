@@ -1,0 +1,174 @@
+{
+  "$defs": {
+    "AnnotationStatus": {
+      "enum": [
+        "draft",
+        "self_checked",
+        "adjudicated_by_maintainer",
+        "domain_reviewed",
+        "disputed"
+      ],
+      "title": "AnnotationStatus",
+      "type": "string"
+    },
+    "CaseSourceType": {
+      "enum": [
+        "constructed_edge",
+        "real_incident",
+        "real_success"
+      ],
+      "title": "CaseSourceType",
+      "type": "string"
+    },
+    "CaseSplit": {
+      "enum": [
+        "development",
+        "challenge"
+      ],
+      "title": "CaseSplit",
+      "type": "string"
+    },
+    "DifficultyTag": {
+      "enum": [
+        "typical",
+        "edge",
+        "adversarial"
+      ],
+      "title": "DifficultyTag",
+      "type": "string"
+    },
+    "TurnEvalCaseFiles": {
+      "additionalProperties": false,
+      "description": "Fixed per-case artifact filenames; no symlink/abs-path/extra file (§6).",
+      "properties": {
+        "transcript": {
+          "const": "transcript.jsonl",
+          "default": "transcript.jsonl",
+          "title": "Transcript",
+          "type": "string"
+        },
+        "initial_state": {
+          "const": "initial_state.json",
+          "default": "initial_state.json",
+          "title": "Initial State",
+          "type": "string"
+        },
+        "reference_snapshot": {
+          "const": "reference_snapshot.json",
+          "default": "reference_snapshot.json",
+          "title": "Reference Snapshot",
+          "type": "string"
+        },
+        "gold": {
+          "const": "gold.json",
+          "default": "gold.json",
+          "title": "Gold",
+          "type": "string"
+        },
+        "reference_output": {
+          "const": "reference_output.json",
+          "default": "reference_output.json",
+          "title": "Reference Output",
+          "type": "string"
+        },
+        "adjudication": {
+          "const": "adjudication.md",
+          "default": "adjudication.md",
+          "title": "Adjudication",
+          "type": "string"
+        }
+      },
+      "title": "TurnEvalCaseFiles",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "turn_eval_case.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "case_id": {
+      "maxLength": 64,
+      "pattern": "^TI-[0-9]{2}-[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "title": "Case Id",
+      "type": "string"
+    },
+    "split": {
+      "$ref": "#/$defs/CaseSplit"
+    },
+    "locale": {
+      "pattern": "^[A-Za-z]{2,3}(?:-[A-Za-z0-9]{2,8})*$",
+      "title": "Locale",
+      "type": "string"
+    },
+    "task_type": {
+      "const": "turn_interpret",
+      "title": "Task Type",
+      "type": "string"
+    },
+    "failure_purpose": {
+      "maxLength": 64,
+      "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$",
+      "title": "Failure Purpose",
+      "type": "string"
+    },
+    "difficulty_tags": {
+      "items": {
+        "$ref": "#/$defs/DifficultyTag"
+      },
+      "minItems": 1,
+      "title": "Difficulty Tags",
+      "type": "array"
+    },
+    "target_turn_key": {
+      "maxLength": 64,
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$",
+      "title": "Target Turn Key",
+      "type": "string"
+    },
+    "source_type": {
+      "$ref": "#/$defs/CaseSourceType"
+    },
+    "annotation_status": {
+      "$ref": "#/$defs/AnnotationStatus"
+    },
+    "pilot_only": {
+      "title": "Pilot Only",
+      "type": "boolean"
+    },
+    "files": {
+      "$ref": "#/$defs/TurnEvalCaseFiles"
+    },
+    "applicable_graders": {
+      "items": {
+        "maxLength": 128,
+        "minLength": 1,
+        "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Applicable Graders",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "case_id",
+    "split",
+    "locale",
+    "task_type",
+    "failure_purpose",
+    "difficulty_tags",
+    "target_turn_key",
+    "source_type",
+    "annotation_status",
+    "pilot_only",
+    "files",
+    "applicable_graders"
+  ],
+  "title": "Caliburn interview vNext turn eval case descriptor v1",
+  "type": "object",
+  "$id": "https://caliburn.local/schemas/turn-eval-case.v1.schema.json"
+}

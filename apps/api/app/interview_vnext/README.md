@@ -382,11 +382,19 @@ focused suite為`36 passed`，完整API + PostgreSQL regression為
 `18 passed`；`recovery + fixed-replay` PostgreSQL suite為`22 passed`。
 完整API + PostgreSQL regression為`547 passed, 0 skipped`。
 
-下一步是 **V3-4 eval-only OpenAI Responses adapter**。它只放在
-`apps/api/evals/interview_vnext/providers/`，用mocked provider-shape fixtures與
-opt-in live probe驗證目前Responses API mapping，不得被production composition
-root import。可直接交給實作者的schema/retry/status/error/artifact/test逐項規格見
-[`../../../../docs/plans/2026-07-17-interview-vnext-v3-4-openai-responses-adapter-plan.md`](../../../../docs/plans/2026-07-17-interview-vnext-v3-4-openai-responses-adapter-plan.md)。
+**V3-4 eval-only OpenAI Responses adapter(2026-07-17，mocked complete、live gate
+pending)**：adapter/config/schema catalog/live probe 全部只住
+`apps/api/evals/interview_vnext/`，production `app/` 不得 import（dependency guard
+`test_production_app_does_not_import_eval_adapter` 強制）。官方 `openai==2.46.0`
+`responses.create()`、`max_retries=0`（429/500/timeout 各斷言 transport call
+count=1）、exact published schema（hash gate，不用 `responses.parse`）、typed output
+traversal 與 status/exception/usage 全表映射；fixtures 一律經 `httpx.MockTransport`
++ 官方 SDK deserialization。focused `openai_eval_adapter + openai_live_probe` suite
+為`66 passed`；完整API + PostgreSQL regression為`614 passed, 0 skipped`。
+live conformance probe（規格 §16.5 gate）因本機無官方 `OPENAI_API_KEY` 尚未執行，
+V3-4 不得標完成；逐項規格與 live 命令見
+[`../../../../docs/plans/2026-07-17-interview-vnext-v3-4-openai-responses-adapter-plan.md`](../../../../docs/plans/2026-07-17-interview-vnext-v3-4-openai-responses-adapter-plan.md)
+與 [`../../evals/interview_vnext/README.md`](../../evals/interview_vnext/README.md)。
 接著V3-5才用12個turn component tasks、每case多trial量測模型品質。
 先做Capture/persistence、Context Engine與durable executor的原因是：
 沒有可重播 execution record,就無法判斷未來品質差是模型、context selection、

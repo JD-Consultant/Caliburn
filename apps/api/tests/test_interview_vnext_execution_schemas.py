@@ -2,6 +2,13 @@ from __future__ import annotations
 
 import json
 
+from app.interview_vnext.application.schema_exports import (
+    SCHEMA_EXPORTS as APPLICATION_SCHEMA_EXPORTS,
+    published_schema as published_application_schema,
+)
+from app.interview_vnext.application.write_schemas import (
+    SCHEMA_DIR as APPLICATION_SCHEMA_DIR,
+)
 from app.interview_vnext.llm.schema_exports import (
     SCHEMA_EXPORTS as LLM_SCHEMA_EXPORTS,
     published_schema as published_llm_schema,
@@ -19,8 +26,13 @@ from app.interview_vnext.observability.write_taxonomies import (
 )
 
 
-def test_committed_llm_and_capture_schemas_match_pydantic_contracts():
+def test_committed_application_llm_and_capture_schemas_match_contracts():
     groups = (
+        (
+            APPLICATION_SCHEMA_DIR,
+            APPLICATION_SCHEMA_EXPORTS,
+            published_application_schema,
+        ),
         (LLM_SCHEMA_DIR, LLM_SCHEMA_EXPORTS, published_llm_schema),
         (CAPTURE_SCHEMA_DIR, CAPTURE_SCHEMA_EXPORTS, published_capture_schema),
     )

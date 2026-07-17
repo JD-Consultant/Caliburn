@@ -1,6 +1,6 @@
 # Interview AI vNext（隔離開發中）
 
-本 package 是 ADR 0034 的 greenfield 實作區。目前已完成 **V0 + V1 domain foundation + V2-A provider/Capture contracts + V2-B durable persistence**（migration 0010 八張 `interview_vnext_*` 表、async repositories/UoW、transactional outbox、checkpoint crash recovery，全部以 PostgreSQL 16 integration tests 實跑證明）。仍然**沒有 route、live provider call**，也沒有被 production composition root import。現行使用者流量仍走 `app/interview/` v3。
+本 package 是 ADR 0034 的 greenfield 實作區。目前已完成 **V0 + V1 domain foundation + V2-A provider/Capture contracts + V2-B durable persistence + V3-0 readiness**。V3-0已固定官方OpenAI SDK 2.46.0，並補上verified zero-Evidence operation的typed no-op result與atomic commit；migration仍為0010八張 `interview_vnext_*` 表。仍然**沒有 route、live provider call**，也沒有被 production composition root import。現行使用者流量仍走 `app/interview/` v3。
 
 權威文件：
 
@@ -8,6 +8,8 @@
 - V2 研究：[`../../../../docs/specs/2026-07-16-interview-vnext-v2-provider-capture-research.md`](../../../../docs/specs/2026-07-16-interview-vnext-v2-provider-capture-research.md)
 - V2-B persistence reference：[`../../../../docs/specs/2026-07-16-interview-vnext-v2b-durable-persistence-research.md`](../../../../docs/specs/2026-07-16-interview-vnext-v2b-durable-persistence-research.md)
 - V2-B 實作交接：[`../../../../docs/plans/2026-07-16-interview-vnext-v2b-durable-persistence-plan.md`](../../../../docs/plans/2026-07-16-interview-vnext-v2b-durable-persistence-plan.md)
+- V3 fixed replay reference：[`../../../../docs/specs/2026-07-17-interview-vnext-v3-fixed-replay-research.md`](../../../../docs/specs/2026-07-17-interview-vnext-v3-fixed-replay-research.md)
+- V3 實作計畫：[`../../../../docs/plans/2026-07-17-interview-vnext-v3-fixed-replay-plan.md`](../../../../docs/plans/2026-07-17-interview-vnext-v3-fixed-replay-plan.md)
 - 實作順序：[`../../../../docs/plans/2026-07-16-interview-ai-vnext-implementation-plan.md`](../../../../docs/plans/2026-07-16-interview-ai-vnext-implementation-plan.md)
 - 決策：[`../../../../docs/adr/0034-interview-ai-vnext-greenfield-evidence-workflow.md`](../../../../docs/adr/0034-interview-ai-vnext-greenfield-evidence-workflow.md)
 - package 禁令：[`AGENTS.md`](AGENTS.md)
@@ -16,8 +18,9 @@
 
 ```text
 domain/                 已實作：純 Pydantic contracts、validators、reducers、domain events、schemas
-application/            已實作(V2-B)：async persistence ports、apply_durable_command、
-                        durable operations(prepare/attempt/verify/commit/fail)、crash recovery
+application/            已實作(V2-B/V3-0)：async persistence ports、apply_durable_command、
+                        durable operations(prepare/attempt/verify/commit/fail/no-op)、
+                        typed no-op result/application schema、crash recovery
 llm/                    已實作：neutral operation/request/result/failure、registry、scripted fake、schemas
 providers/              空殼：尚未接 OpenAI/Anthropic SDK、模型或正式 prompt
 knowledge/              空殼：尚未接 reference snapshot
@@ -205,11 +208,12 @@ transition會拒絕跳步、時間倒退或 terminal改寫；重送相同 artifa
 
 ## JSON Schema
 
-committed schema 目前共 33 份：`domain/schemas/` 24 份、`llm/schemas/` 3 份、`observability/schemas/` 6 份。檔名與 `$id` 都有 major version。修改 Pydantic contract 後執行：
+committed schema 目前共 34 份：`domain/schemas/` 24 份、`application/schemas/` 1 份、`llm/schemas/` 3 份、`observability/schemas/` 6 份。檔名與 `$id` 都有 major version。修改 Pydantic contract 後執行：
 
 ```powershell
 cd apps/api
 .venv\Scripts\python.exe -m app.interview_vnext.domain.write_schemas
+.venv\Scripts\python.exe -m app.interview_vnext.application.write_schemas
 .venv\Scripts\python.exe -m app.interview_vnext.llm.write_schemas
 .venv\Scripts\python.exe -m app.interview_vnext.observability.write_schemas
 .venv\Scripts\python.exe -m app.interview_vnext.observability.write_taxonomies
@@ -265,14 +269,16 @@ cd apps/api
 .venv\Scripts\python.exe -m pytest tests/test_interview_vnext_domain.py tests/test_interview_vnext_workflow_reducers.py tests/test_interview_vnext_llm.py tests/test_interview_vnext_capture.py tests/test_interview_vnext_dependencies.py tests/test_interview_vnext_schemas.py tests/test_interview_vnext_execution_schemas.py -q
 ```
 
-2026-07-17 最新驗證：V2-B focused Postgres suite `50 passed, 0 skipped`;完整
-`apps/api` suite(含 DB)`499 passed, 0 skipped`。commit SHA、gate 數字與
-與 reference 的差異註記(run-lock 鎖序、outbox DB 時鐘、outcome 分類邊界)
-見 V2-B plan §11。
+V2-B完成點的歷史基線是focused Postgres `50 passed, 0 skipped`、完整API
+`499 passed, 0 skipped`。V3-0完成後（2026-07-17）durable focused suite為
+`54 passed, 0 skipped`，完整API suite以本機PostgreSQL 16實跑為
+`506 passed, 0 skipped`。no-op cases涵蓋exact replay、不同response/verification
+conflict、stale state、event failure全transaction rollback與兩個concurrent
+committer只產生一個completion；沒有新增migration或command row。
 
-下一步是 **V3 fixed replay operation**。ContextBuilder 在 V3 開始時實作,輸入
+下一步是 **V3-1 ContextBuilder**。輸入
 只能來自已持久化 state/artifact/reference snapshot;typed `ModelCallResult`
-在 V3 接上 `record_attempt_result`。現在先做 Capture/persistence 的原因是:
+在後續V3 executor接上 `record_attempt_result`。現在先做 Capture/persistence 的原因是:
 沒有可重播 execution record,就無法判斷未來品質差是模型、context selection、
 verifier 還是 reducer 所造成。V5 前必須完成 authenticated principal → tenant
 → profile ownership 驗證(reference §2.3),否則 production gate 不得通過。

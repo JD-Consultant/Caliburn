@@ -1,7 +1,7 @@
 # Interview AI vNext V2-B Durable Persistence 實作計畫
 
 - 日期：2026-07-16
-- 狀態：**可交接執行；尚未實作**
+- 狀態：**已完成(2026-07-17);七個 commits 全綠**——commit SHA 與實跑數字見 §11 實作結果
 - 適用讀者：接手 V2-B 的工程師或 coding agent
 - 精確 schema/transaction/recovery reference：[`../specs/2026-07-16-interview-vnext-v2b-durable-persistence-research.md`](../specs/2026-07-16-interview-vnext-v2b-durable-persistence-research.md)
 - 上層工作包：[`2026-07-16-interview-ai-vnext-implementation-plan.md`](2026-07-16-interview-ai-vnext-implementation-plan.md)
@@ -422,7 +422,8 @@ Scripted provider要計數；`provider_completed|verified|committed|failed` reco
 
 ### 9.1 Focused commands
 
-實作者完成後把實際可執行 command寫回此節；預期至少：
+實際可執行 command(2026-07-17 實跑,PostgreSQL 16、SQLAlchemy 2.0.51、
+alembic 1.18.5、asyncpg 0.31.0):
 
 ```powershell
 cd apps/api
@@ -432,7 +433,9 @@ uv run pytest tests/test_interview_vnext_persistence_serialization.py `
   tests/test_interview_vnext_migration.py `
   tests/test_interview_vnext_persistence.py `
   tests/test_interview_vnext_outbox_postgres.py `
-  tests/test_interview_vnext_recovery_postgres.py -q
+  tests/test_interview_vnext_recovery_postgres.py `
+  tests/test_interview_vnext_pg_fixtures.py -q
+# → 50 passed, 0 skipped(migration test 自建/自毀獨立資料庫,不碰共享 dev DB)
 ```
 
 再跑既有 vNext focused suite與完整 API suite。完整 suite在本 repo需 `$env:DEBUG='false'` 時照既有 runbook設定；不可因 DB tests較慢就從 merge gate移除。
@@ -490,3 +493,46 @@ uv run pytest tests/test_interview_vnext_persistence_serialization.py `
 - [ ] 是否接了 production route/live provider？
 
 任一項答案不符合時，V2-B不得標完成。
+
+## 11. 實作結果(2026-07-17 回寫)
+
+### 11.1 Commits(一 task 一 commit,全部綠了才 commit)
+
+| Commit | SHA | Gate 實跑 |
+|---|---|---|
+| V2-B-0 | `5bb72be` | 無 DB 337 passed/111 skipped(=基線);有 DB 450/0 skip;alembic 1.18.5 upgrade head OK |
+| V2-B-1 | `d73ea79` | 463 passed/0 skip;serialization round-trip/corruption 全綠 |
+| V2-B-2 | `5db1e43` | 465 passed;0009→0010→0009 循環 + introspection 全對,v3 byte 級不變 |
+| V2-B-3 | `11c4ada` | 478 passed;§12 cases 1–7 + failpoints + 裁決 corruption cases |
+| V2-B-4 | `73998a7` | 491 passed;cases 8–14 + finalize rollback + 100-run lease + EXPLAIN |
+| V2-B-5 | `4d8edbd` | 499 passed;cases 15–19 + §8.5 crash matrix,scripted provider 計數 0 |
+| V2-B-6 | (本回寫 commit) | focused 50 passed/0 skip;git diff --check 乾淨;單一 head=0010;production composition root 零 vNext import |
+
+### 11.2 與原文的差異(均已回寫 reference 對應章節)
+
+1. **§7.3 加 step 0:command commit 先鎖 run row(一致鎖序 run → session/artifacts)。**
+   實測(§12 case 6 併發)抓到 deadlock:兩 writer 的 artifact/command INSERT 各持
+   FK `KEY SHARE`,與對方的 session CAS/`run FOR UPDATE` 互等,PG 判 DeadlockDetected。
+   run row 本來就是 chain 的序列鎖,提早取得即結構性消滅死鎖;transaction 短、無
+   network I/O,可觀察契約不變。連帶:等鎖期間同 command 已被 commit 時,reducer 的
+   idempotent 結果照 command record 走 replay(合法 race),record 缺席才是 corruption。
+2. **`capture.py` 的 `append_event` 隨 V2-B-3 落地**(非 §2 表列的 V2-B-4):
+   §7.3 step 7 與 §12 case 2 都要求 command commit 同 transaction append event+outbox,
+   是計畫自身的依賴序;V2-B-4 補 create_run/finalize/manifest 與 lease adapter。
+3. **outbox/event 的 `created_at` 用 DB 時鐘(`now()`)**:enqueue time=持久化時間;
+   混用 domain `occurred_at` 會在 app/DB 時鐘差下撞 `updated_at >= created_at` CHECK。
+4. **`record_attempt_result` 收呼叫端分類好的 outcome**(succeeded/retryable/
+   non-retryable)+ canonical result artifact;typed `ModelCallResult` 正規化屬
+   V3 workflow/V6 provider adapter。derived 不變量:attempt row 與 checkpoint 轉換
+   同 transaction ⟹ durable「calling+result_recorded」組合必為 retryable。
+5. **Port 增補**(§4.2 是「至少定義」):`SessionRepository.initial_state_artifact_id`
+   /`set_initial_state_artifact`(§5.1/§7.2 pointer 協定)、`RunRepository.lock`(差異 1)。
+6. **repositories 在 flush 期也翻譯 named-constraint violation**(併發 INSERT race
+   在 flush 就爆,不會等到 commit);`alembic.ini` 補 `path_separator = os` 且必須
+   維持 ASCII(configparser 用 locale 編碼讀,CJK 註解會炸)。
+
+### 11.3 已知後續(不屬 V2-B)
+
+- V3 fixed replay:正式 ContextBuilder + typed `ModelCallResult` 接 `record_attempt_result`。
+- V5 前完成 authenticated principal → tenant → profile ownership(§2.3)。
+- outbox dead_letter 的 metric/alert 與管理重播(§8.3)維持未做。

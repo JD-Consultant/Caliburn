@@ -293,7 +293,7 @@ event sequence 不由 caller 猜。`append_event()` 先 lock run row，使用 `e
 | `next_attempt_at` | TIMESTAMPTZ | 是 | retry_wait only |
 | `delivered_at` | TIMESTAMPTZ | 是 | delivered only |
 | `last_error_code` | TEXT | 是 | retry_wait/dead_letter 必填 |
-| `created_at` | TIMESTAMPTZ | 否 | event enqueue time |
+| `created_at` | TIMESTAMPTZ | 否 | event enqueue time=**持久化時間,用 DB 時鐘 `now()`**(2026-07-17 註記:lease/mark 的 `updated_at` 用 `CURRENT_TIMESTAMP`,若 enqueue 用 domain `occurred_at`,app/DB 時鐘差會違反 `updated_at >= created_at` CHECK) |
 | `updated_at` | TIMESTAMPTZ | 否 | state transition time |
 
 Constraints/indexes：
@@ -472,6 +472,15 @@ session bootstrap 尚未呼叫 provider。第一個 workflow run另由 `create_r
 
 provider call 前必須完成以下 transaction：
 
+0. **先鎖 run row(`SELECT … FOR UPDATE`)——一致鎖序 run → session/artifacts**
+   (2026-07-17 實作註記):不先鎖時,兩個併發 command 的 artifact/command INSERT
+   會各自對 run/session row 持 FK `KEY SHARE` 鎖,與對方 step 6 的 session CAS 與
+   step 7 的 `run FOR UPDATE` 形成互等,PostgreSQL 以 DeadlockDetected 收場(整合
+   測試實測)。run row 本來就是 event chain 的序列鎖;提早取得讓同 run 寫入者
+   序列化、死鎖結構性消失。transaction 仍短(pure reducer、無 network I/O)。
+   連帶規則:等鎖期間同 command 已被別的 transaction commit → reducer 回
+   idempotent,此時**查 command record 走 replay**(合法 race);record 缺席才是
+   `PersistedDataCorruption`。
 1. 以 `(tenant_id, session_id)` 查 duplicate command/request key；存在則比 `command_hash`，相同回既有 reduction，不寫新 event；不同則 conflict。
 2. 讀 session row並 hydrate/重算 state hash。
 3. 在 transaction 內執行 pure reducer；它不做 I/O，transaction 不會因此變長。
@@ -511,7 +520,12 @@ commit 後才執行 `await llm.generate_structured(request)`。任何 provider n
 
 ### 7.6 Record provider result
 
-provider 返回後開新 transaction：
+provider 返回後開新 transaction。(2026-07-17 實作註記:V2-B 的
+`record_attempt_result` 收呼叫端已分類的 outcome——succeeded/retryable/
+non-retryable——與 canonical result artifact;typed `ModelCallResult` 的正規化
+屬 V3 workflow 與 V6 provider adapter。因 attempt row 與 checkpoint 轉換同一
+transaction,crash 後 durable 的「calling + result_recorded」組合**只可能**來自
+retryable 結果,§9 的 recovery decision 因此不需重新解析 result。)
 
 1. 保存 visible response/error與 canonical `ModelCallResult` artifacts；
 2. `operation_attempts calling → result_recorded`，result artifact不可換；

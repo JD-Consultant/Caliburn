@@ -1,0 +1,26 @@
+{
+  "schema_version": "openrouter_chat_fixture_manifest.v1",
+  "source": {
+    "openapi": "https://openrouter.ai/openapi.json",
+    "reference": "https://openrouter.ai/docs/api/reference/overview",
+    "models": "https://openrouter.ai/docs/guides/overview/models",
+    "endpoints": "https://openrouter.ai/docs/api/api-reference/endpoints/list-endpoints",
+    "checked": "2026-07-17",
+    "synthetic": true,
+    "contains_test_data": true
+  },
+  "fixtures": {
+    "catalog-model.json": {
+      "kind": "catalog",
+      "status": 200,
+      "headers": {"x-request-id": "req_fx_catalog_model"},
+      "purpose": "GET /model/{author}/{slug} snapshot: canonical slug, text modalities, structured outputs + reasoning capability, top provider budgets"
+    },
+    "catalog-endpoints.json": {
+      "kind": "catalog",
+      "status": 200,
+      "headers": {"x-request-id": "req_fx_catalog_endpoints"},
+      "purpose": "GET /models/{author}/{slug}/endpoints snapshot: unique 'testhost' endpoint, 'regionhost' base-slug ambiguity pair, EU variant missing structured_outputs for endpoint-level capability gate"
+    }
+  }
+}

@@ -153,7 +153,7 @@ Constraints/indexes：
 | `event_count` | BIGINT | 否 | 初始 0，由 append event transaction遞增 |
 | `first_event_hash` | TEXT | 是 | event_count=0 時必須 null |
 | `last_event_hash` | TEXT | 是 | event_count=0 時必須 null |
-| `manifest_artifact_id` | UUID FK | 是 | terminal run 必填；FK 在 artifacts 建好後加入 |
+| `manifest_artifact_id` | UUID FK | 是 | application-level terminal invariant；FK 在 artifacts 建好後加入，DB lifecycle CHECK 不要求 terminal 非 null |
 | `started_at` | TIMESTAMPTZ | 否 | run start |
 | `completed_at` | TIMESTAMPTZ | 是 | terminal run 必填 |
 
@@ -162,8 +162,17 @@ Constraints/indexes：
 - `uq_ivn_runs_tenant_run (tenant_id, run_id)`；
 - composite FK `(tenant_id, session_id)`；
 - `ix_ivn_runs_tenant_session_started (tenant_id, session_id, started_at, run_id)`；
-- event_count/hash coherence CHECK；open 不得有 completion/manifest，terminal 必須有；
+- event_count/hash coherence CHECK；open 必須同時沒有 completion/manifest；terminal 在 DB CHECK 只要求 `completed_at` 非 null、`event_count >= 1`、completion不早於 start；
 - finalize 必須先 append `workflow.run.completed|failed`，再以包含該 event 的 chain 建 manifest。
+
+`terminal → manifest_artifact_id IS NOT NULL` **刻意不放進 DB CHECK**。原因是 manifest pointer需要在測試清理、資料維護或未來受控刪除前暫時清空；若 row-local CHECK硬綁 terminal manifest，§12.1 的合法 FK cleanup就無法執行。完整性改由四層共同保證：
+
+1. `WorkflowRun` DTO validator拒絕 terminal + null manifest；
+2. `RunRepository.finalize()` 在同一 transaction一次設置 terminal status、`completed_at`與 manifest pointer；
+3. repository hydrate任何 terminal row時重跑 DTO validator，null manifest回 `PersistedDataCorruption`；
+4. finalize rollback/read-corruption integration tests。
+
+因此 DB 允許的是「管理/cleanup可暫時解除 pointer」，application runtime不允許把該狀態當合法 `WorkflowRun` 使用。不要改用 DEFERRABLE FK，也不要為 cleanup把 terminal run偽造回 open。
 
 ### 5.3 `interview_vnext_artifacts`
 
@@ -688,7 +697,7 @@ repository可依 named constraint/SQLSTATE轉換，但 application test只斷言
 11. exporter成功、mark-delivered前 crash，expiry後重送同 event ID；
 12. 同 run event 2在 event 1 non-terminal時不可 lease；不同 run可平行；
 13. event append併發仍得到連續 sequence/hash chain；
-14. event/artifact/outbox任一步失敗，run event_count/hash不前進；
+14. event/artifact/outbox/finalize任一步失敗，run event_count/hash或 terminal fields不得半套前進；terminal row被直接清成 null manifest時，DB cleanup可執行，但 repository hydrate必須回 corruption；
 15. prepared recovery只建立一次 attempt 1；
 16. calling未到 deadline不重打；deadline後先保存 lost result再 attempt 2；
 17. 兩 recovery workers中只有一個checkpoint CAS成功；

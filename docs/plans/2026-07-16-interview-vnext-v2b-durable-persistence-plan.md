@@ -189,6 +189,7 @@ apps/api/tests/test_interview_vnext_migration.py
 - artifact/event/command immutable UPDATE triggers；
 - outbox immutable payload guard；
 - run manifest circular FK在 artifacts後建立、downgrade前移除；
+- run lifecycle CHECK只硬保證 open無 completion/manifest，以及 terminal有 `completed_at`、至少一個 event、時間不倒退；**不得**加入 terminal必須有 manifest的 CHECK。terminal manifest由 `WorkflowRun` validator + atomic finalize + hydrate corruption check保證，讓 test cleanup可先清 pointer；
 - session initial-state artifact FK也在 artifacts後建立；第一個 command前必須已有 version-0 snapshot；
 -所有 vNext FK `ON DELETE RESTRICT`；
 - partial index predicate與 lease query status完全相同；
@@ -206,6 +207,8 @@ apps/api/tests/test_interview_vnext_migration.py
 5. 確認 v3 snapshot不變；
 6. downgrade0009；
 7. 確認只移除 vNext objects且 v3 snapshot不變。
+
+run lifecycle要另外做一組精確測試：DB接受 terminal + completed_at + null manifest，供受控 cleanup；但相同 row經 `RunRepository.get()` hydrate時必須是 `PersistedDataCorruption`。這不是放寬 runtime invariant，而是把跨列 artifact完整性放在能原子驗證它的 application/UoW邊界。
 
 Alembic autogenerate diff只能當輔助；官方已明列 CHECK等偵測限制，因此 introspection test是 gate。
 
@@ -321,7 +324,7 @@ apps/api/tests/test_interview_vnext_outbox_postgres.py
 4. update run status/completed_at/manifest ref；
 5. commit。
 
-terminal run拒絕後續 event。相同 finalize inputs可回 existing manifest；不同 completion/hash conflict。
+步驟1–4必須同一 transaction。terminal run拒絕後續 event；相同 finalize inputs可回 existing manifest，不同 completion/hash conflict。DB CHECK只要求 terminal completion/event count，不硬要求 manifest；`WorkflowRun` validator與 repository hydrate仍必須把 terminal + null manifest視為 corruption。測試要證明 finalize任一步 rollback後不會留下半套 terminal fields，也要證明 §3.3 cleanup可先清 manifest pointer而不偽造 run status。
 
 ### 7.4 Outbox adapter
 

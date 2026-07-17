@@ -1,0 +1,74 @@
+{
+  "$defs": {
+    "ReferenceSnippet": {
+      "additionalProperties": false,
+      "properties": {
+        "urn": {
+          "maxLength": 512,
+          "minLength": 3,
+          "title": "Urn",
+          "type": "string"
+        },
+        "kind": {
+          "maxLength": 128,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+          "title": "Kind",
+          "type": "string"
+        },
+        "text": {
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        },
+        "content_hash": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        }
+      },
+      "required": [
+        "urn",
+        "kind",
+        "text",
+        "content_hash"
+      ],
+      "title": "ReferenceSnippet",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "reference_snapshot.v1",
+      "default": "reference_snapshot.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "snapshot_id": {
+      "minLength": 1,
+      "title": "Snapshot Id",
+      "type": "string"
+    },
+    "snippets": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/ReferenceSnippet"
+      },
+      "title": "Snippets",
+      "type": "array"
+    },
+    "snapshot_hash": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Snapshot Hash",
+      "type": "string"
+    }
+  },
+  "required": [
+    "snapshot_id",
+    "snapshot_hash"
+  ],
+  "title": "Caliburn interview vNext immutable reference snapshot v1",
+  "type": "object",
+  "$id": "https://caliburn.local/schemas/reference-snapshot.v1.schema.json"
+}

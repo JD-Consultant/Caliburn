@@ -1,6 +1,6 @@
 # Interview AI vNext（隔離開發中）
 
-本 package 是 ADR 0034 的 greenfield 實作區。目前已完成 **V0 + V1 domain foundation + V2-A provider/Capture contracts + V2-B durable persistence + V3-0 readiness**。V3-0已固定官方OpenAI SDK 2.46.0，並補上verified zero-Evidence operation的typed no-op result與atomic commit；migration仍為0010八張 `interview_vnext_*` 表。仍然**沒有 route、live provider call**，也沒有被 production composition root import。現行使用者流量仍走 `app/interview/` v3。
+本 package 是 ADR 0034 的 greenfield 實作區。目前已完成 **V0 + V1 domain foundation + V2-A provider/Capture contracts + V2-B durable persistence + V3-0 readiness + V3-1 Context Engine**。V3-0固定官方OpenAI SDK 2.46.0並補上verified zero-Evidence operation的typed no-op result與atomic commit；V3-1加入deterministic ContextBuilder、hash-addressed policies、selection manifest、budget report與reference snapshot。migration仍為0010八張 `interview_vnext_*` 表。仍然**沒有 route、live provider call**，也沒有被 production composition root import。現行使用者流量仍走 `app/interview/` v3。
 
 權威文件：
 
@@ -18,10 +18,11 @@
 
 ```text
 domain/                 已實作：純 Pydantic contracts、validators、reducers、domain events、schemas
-application/            已實作(V2-B/V3-0)：async persistence ports、apply_durable_command、
+application/            已實作(V2-B/V3-0/V3-1)：async persistence ports、apply_durable_command、
                         durable operations(prepare/attempt/verify/commit/fail/no-op)、
-                        typed no-op result/application schema、crash recovery
-llm/                    已實作：neutral operation/request/result/failure、registry、scripted fake、schemas
+                        typed no-op result/application schema、crash recovery、pure ContextBuilder
+llm/                    已實作：neutral operation/request/result/failure、registry、scripted fake、
+                        V3-1 context contracts/hash-addressed policies、schemas
 providers/              空殼：尚未接 OpenAI/Anthropic SDK、模型或正式 prompt
 knowledge/              空殼：尚未接 reference snapshot
 persistence/            已實作(V2-B)：ORM rows、migration 0010、serialization、repositories、
@@ -206,15 +207,39 @@ prepared -> calling -> provider_completed -> verified -> committed
 
 transition會拒絕跳步、時間倒退或 terminal改寫；重送相同 artifact的同一 transition為 idempotent。
 
+## V3-1 Context Engine（已完成，2026-07-17）
+
+`application/context_builder.py`是provider-neutral pure service：輸入已hydrate、已驗證的`InterviewState`、versioned context policy、operation identity與選定的immutable `ReferenceSnapshot`；不查DB、不讀環境變數、不呼叫provider，也不使用provider conversation memory。相同輸入得到相同packet、manifest、budget與hash。
+
+每次成功build同時產生：
+
+- `ContextPacket`：實際可送模型的typed projection；
+- `ContextSelectionManifest`：state/reference中每個候選source的selected/excluded、stable reason、section、canonical ordinal、內容hash與大小；
+- `ContextBudgetReport`：完整packet bytes/code points、各section item count/cap、reserved output與versioned estimator限制；
+- `ContextBuildResult`：綁定三份內容hash與共同operation/policy/state/reference identity，identity不一致即拒絕。
+
+`turn.interpret`只看current employee turn、最近的preceding consultant turn、active episode identity、最多4個unresolved contradiction、8/4個correction candidates與最多6個去重後recent active evidence。它的型別根本沒有reference/candidate欄位，所有candidate/inference/review都只會在manifest顯示為禁止選入。current/preceding文字保留exact Unicode與CRLF，不做normalization或截斷。
+
+`episode.code`不帶raw transcript/current turn；只帶target episode的active evidence，並把current employee/team且非denied、非`NOT_RESPONSIBLE`分到positive，其餘past/future/hypothetical/other-role/denied/not-responsible分到excluded-or-negative。reference使用canonical URN與整份snapshot hash，和working-state hash分開；固定authority rules禁止reference替員工事實背書，也禁止單一工具名稱直接升為skill/ability。
+
+固定policy `1.0.0`：
+
+- turn：65,536 UTF-8 bytes、保留8,192 output tokens；item caps為4 contradictions、8/4 correction candidates、6 recent evidence；
+- episode：262,144 UTF-8 bytes、保留12,288 output tokens；hard caps為256 episode evidence、64 contradictions、128 candidates、8 references；
+- estimator：`utf8-codepoint-heuristic/1.0.0 = max(code_points, ceil(utf8_bytes/4))`，只作deterministic preflight，不冒充provider tokenizer。
+
+超過hard byte/item cap時不做first-N、摘要或文字截斷；`ContextBudgetExceeded`帶回完整未截斷packet/manifest與failing budget，且不得呼叫模型。修改policy必須建立新semver文件並以eval/ablation證明，不能原地覆寫`1.0.0`。
+
 ## JSON Schema
 
-committed schema 目前共 34 份：`domain/schemas/` 24 份、`application/schemas/` 1 份、`llm/schemas/` 3 份、`observability/schemas/` 6 份。檔名與 `$id` 都有 major version。修改 Pydantic contract 後執行：
+committed schema 目前共 38 份：`domain/schemas/` 24 份、`application/schemas/` 1 份、`llm/schemas/` 7 份、`observability/schemas/` 6 份。檔名與 `$id` 都有 major version。修改 Pydantic contract 後執行：
 
 ```powershell
 cd apps/api
 .venv\Scripts\python.exe -m app.interview_vnext.domain.write_schemas
 .venv\Scripts\python.exe -m app.interview_vnext.application.write_schemas
 .venv\Scripts\python.exe -m app.interview_vnext.llm.write_schemas
+.venv\Scripts\python.exe -m app.interview_vnext.llm.write_context_policies
 .venv\Scripts\python.exe -m app.interview_vnext.observability.write_schemas
 .venv\Scripts\python.exe -m app.interview_vnext.observability.write_taxonomies
 .venv\Scripts\python.exe -m pytest tests/test_interview_vnext_schemas.py tests/test_interview_vnext_execution_schemas.py -q
@@ -274,16 +299,19 @@ V2-B完成點的歷史基線是focused Postgres `50 passed, 0 skipped`、完整A
 `54 passed, 0 skipped`，完整API suite以本機PostgreSQL 16實跑為
 `506 passed, 0 skipped`。no-op cases涵蓋exact replay、不同response/verification
 conflict、stale state、event failure全transaction rollback與兩個concurrent
-committer只產生一個completion；沒有新增migration或command row。
+committer只產生一個completion；沒有新增migration或command row。V3-1聚焦
+Context/schema/dependency suite為`15 passed`，完整API + PostgreSQL regression為
+`515 passed, 0 skipped`。
 
-下一步是 **V3-1 ContextBuilder**。輸入
-只能來自已持久化 state/artifact/reference snapshot;typed `ModelCallResult`
-在後續V3 executor接上 `record_attempt_result`。現在先做 Capture/persistence 的原因是:
+下一步是 **V3-2 `turn_interpret` contracts、prompt、proposal mapper與verifier**。
+Context輸入只能來自已持久化state/artifact/reference snapshot；typed
+`ModelCallResult`在後續V3 executor接上`record_attempt_result`。先做
+Capture/persistence與Context Engine的原因是：
 沒有可重播 execution record,就無法判斷未來品質差是模型、context selection、
 verifier 還是 reducer 所造成。V5 前必須完成 authenticated principal → tenant
 → profile ownership 驗證(reference §2.3),否則 production gate 不得通過。
 
 本階段明確未做 route、外部 Capture exporter、live OpenAI/Anthropic adapter、
-Web seam、模型 bake-off、ContextBuilder 或正式 Prompt;production 行為仍為
+Web seam、模型 bake-off或正式 Prompt；production 行為仍為
 零變化(composition root 不 import vNext)。durable outbox/checkpoint 已由
 V2-B DB tests 證明;只有 V3 fixed replay與 V6 bake-off通過後才能談模型品質或上線。

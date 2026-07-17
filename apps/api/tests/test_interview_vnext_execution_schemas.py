@@ -13,6 +13,11 @@ from app.interview_vnext.llm.schema_exports import (
     SCHEMA_EXPORTS as LLM_SCHEMA_EXPORTS,
     published_schema as published_llm_schema,
 )
+from app.interview_vnext.llm.context import (
+    CONTEXT_POLICIES,
+    context_policy_filename,
+)
+from app.interview_vnext.llm.write_context_policies import POLICY_DIR
 from app.interview_vnext.llm.write_schemas import SCHEMA_DIR as LLM_SCHEMA_DIR
 from app.interview_vnext.observability.schema_exports import (
     SCHEMA_EXPORTS as CAPTURE_SCHEMA_EXPORTS,
@@ -42,7 +47,25 @@ def test_committed_application_llm_and_capture_schemas_match_contracts():
             committed = json.loads((directory / filename).read_text(encoding="utf-8"))
             assert committed == publisher(filename)
             assert committed["$id"] == f"https://caliburn.local/schemas/{filename}"
-            assert committed["additionalProperties"] is False
+            if committed.get("type") == "object":
+                assert committed["additionalProperties"] is False
+            for definition in committed.get("$defs", {}).values():
+                if definition.get("type") == "object":
+                    assert definition["additionalProperties"] is False
+
+
+def test_committed_context_policies_match_hash_addressed_registry():
+    expected_names = {
+        context_policy_filename(name, version)
+        for name, version in CONTEXT_POLICIES
+    }
+    assert {path.name for path in POLICY_DIR.glob("*.json")} == expected_names
+    for (name, version), policy in CONTEXT_POLICIES.items():
+        path = POLICY_DIR / context_policy_filename(name, version)
+        assert json.loads(path.read_text(encoding="utf-8")) == policy.model_dump(
+            mode="json"
+        )
+        assert policy.policy_hash.startswith("sha256:")
 
 
 def test_committed_execution_taxonomies_match_versioned_registry():

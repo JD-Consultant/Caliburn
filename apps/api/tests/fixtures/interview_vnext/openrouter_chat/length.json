@@ -1,0 +1,32 @@
+{
+  "id": "gen-fx-length",
+  "object": "chat.completion",
+  "created": 1780000120,
+  "model": "testlab/analyst-large",
+  "choices": [
+    {
+      "index": 0,
+      "finish_reason": "length",
+      "native_finish_reason": "max_tokens",
+      "message": {
+        "role": "assistant",
+        "content": "{\"schema_version\":\"turn_interpret_output.v1\",\"observations\":[{\"parti"
+      }
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 1200,
+    "completion_tokens": 4096,
+    "total_tokens": 5296,
+    "completion_tokens_details": {"reasoning_tokens": 2048}
+  },
+  "openrouter_metadata": {
+    "requested": "testlab/analyst-large",
+    "strategy": "direct",
+    "attempt": 1,
+    "endpoints": [
+      {"provider": "TestHost", "model": "testlab/analyst-large", "selected": true}
+    ],
+    "pipeline": []
+  }
+}

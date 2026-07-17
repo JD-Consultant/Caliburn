@@ -1,0 +1,7 @@
+{
+  "error": {
+    "code": 429,
+    "message": "temporarily rate limited",
+    "metadata": {"error_type": "rate_limit_exceeded", "retry_after": "7"}
+  }
+}

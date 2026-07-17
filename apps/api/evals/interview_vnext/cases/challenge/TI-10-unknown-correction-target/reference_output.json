@@ -1,0 +1,43 @@
+{
+  "schema_version": "turn_eval_reference_output.v1",
+  "case_id": "TI-10-unknown-correction-target",
+  "output": {
+    "schema_version": "turn_interpret_output.v1",
+    "observations": [
+      {
+        "proposal_key": "obs-correct-unknown-target",
+        "subject": "employee",
+        "kind": "correction",
+        "claim": "先前所述的某項報表頻率應更正為每季一次",
+        "quote": "前面那個頻率我講錯了,應該是每季一次。",
+        "quote_occurrence": 1,
+        "qualifiers": {
+          "time_scope": "current",
+          "typicality": "unknown",
+          "polarity": "affirmed",
+          "frequency": {
+            "value": null,
+            "unit": "per_quarter",
+            "verbatim": "每季"
+          },
+          "importance": "not_stated",
+          "ownership": "owner"
+        },
+        "correction_target_evidence_ids": [],
+        "correction_target_unknown": true
+      }
+    ],
+    "user_signal": "correction",
+    "episode_signal": "continue",
+    "emergent_topics": [],
+    "insufficiencies": [
+      {
+        "reason_code": "correction_target_unknown",
+        "observation_proposal_keys": [
+          "obs-correct-unknown-target"
+        ]
+      }
+    ]
+  },
+  "correction_target_bindings": {}
+}

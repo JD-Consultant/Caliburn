@@ -1,0 +1,2 @@
+{"schema_version": "turn_eval_transcript_turn.v1", "turn_key": "consultant-01", "sequence": 1, "role": "consultant", "locale": "zh-TW", "text": "盤點庫存的頻率是多少?", "occurred_offset_seconds": 2}
+{"schema_version": "turn_eval_transcript_turn.v1", "turn_key": "employee-target", "sequence": 2, "role": "employee", "locale": "zh-TW", "text": "我每月盤點庫存 2 次。", "occurred_offset_seconds": 4}

@@ -1,0 +1,36 @@
+{
+  "schema_version": "turn_eval_reference_output.v1",
+  "case_id": "TI-04-numeric-frequency",
+  "output": {
+    "schema_version": "turn_interpret_output.v1",
+    "observations": [
+      {
+        "proposal_key": "obs-monthly-inventory-count",
+        "subject": "employee",
+        "kind": "action",
+        "claim": "每月盤點庫存 2 次",
+        "quote": "我每月盤點庫存 2 次。",
+        "quote_occurrence": 1,
+        "qualifiers": {
+          "time_scope": "current",
+          "typicality": "typical",
+          "polarity": "affirmed",
+          "frequency": {
+            "value": "2",
+            "unit": "per_month",
+            "verbatim": "每月"
+          },
+          "importance": "not_stated",
+          "ownership": "owner"
+        },
+        "correction_target_evidence_ids": [],
+        "correction_target_unknown": false
+      }
+    ],
+    "user_signal": "answer",
+    "episode_signal": "continue",
+    "emergent_topics": [],
+    "insufficiencies": []
+  },
+  "correction_target_bindings": {}
+}

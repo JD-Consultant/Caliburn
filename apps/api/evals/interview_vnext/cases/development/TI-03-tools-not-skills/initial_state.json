@@ -1,0 +1,11 @@
+{
+  "schema_version": "turn_eval_initial_fixture.v1",
+  "session_status_before_replay": "planned",
+  "activate_before_transcript": true,
+  "open_episode": {
+    "episode_key": "episode-main",
+    "target": "工作工具盤點",
+    "opened_turn_key": "consultant-01"
+  },
+  "prior_evidence": []
+}

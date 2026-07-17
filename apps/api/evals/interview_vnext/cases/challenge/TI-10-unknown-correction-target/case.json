@@ -1,0 +1,37 @@
+{
+  "schema_version": "turn_eval_case.v1",
+  "case_id": "TI-10-unknown-correction-target",
+  "split": "challenge",
+  "locale": "zh-TW",
+  "task_type": "turn_interpret",
+  "failure_purpose": "unknown_correction_target",
+  "difficulty_tags": [
+    "edge"
+  ],
+  "target_turn_key": "employee-target",
+  "source_type": "constructed_edge",
+  "annotation_status": "adjudicated_by_maintainer",
+  "pilot_only": true,
+  "files": {
+    "transcript": "transcript.jsonl",
+    "initial_state": "initial_state.json",
+    "reference_snapshot": "reference_snapshot.json",
+    "gold": "gold.json",
+    "reference_output": "reference_output.json",
+    "adjudication": "adjudication.md"
+  },
+  "applicable_graders": [
+    "capture_integrity",
+    "output_schema",
+    "quote_span",
+    "source_subject",
+    "foreign_id",
+    "state_transition",
+    "unsupported_quantification",
+    "reference_leakage",
+    "attempt_trace",
+    "claim_matching",
+    "qualifier_exactness",
+    "correction_lineage"
+  ]
+}

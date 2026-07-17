@@ -55,12 +55,14 @@ def _validate_model_slug(value: str) -> None:
     if value.startswith("~"):
         raise ValueError("model slug cannot use a '~' alias prefix")
     if value in _FORBIDDEN_MODELS:
-        raise ValueError(f"model slug {value!r} is a router alias, not a canonical model")
+        raise ValueError(
+            f"model slug {value!r} is a router alias, not an exact catalog model ID"
+        )
     for suffix in _FORBIDDEN_VARIANT_SUFFIXES:
         if value.endswith(suffix):
             raise ValueError(
                 f"model slug cannot use the {suffix!r} variant shortcut; "
-                "use the exact canonical slug"
+                "use the exact Models API ID"
             )
     if ":" in value:
         raise ValueError("model slug cannot contain a ':' variant shortcut")
@@ -88,6 +90,7 @@ class OpenRouterChatEvalConfig(DomainModel):
     api_format: Literal["chat_completions"] = "chat_completions"
     base_url: Literal["https://openrouter.ai/api/v1"] = OPENROUTER_BASE_URL
     requested_model: NonEmptyText
+    catalog_canonical_model: NonEmptyText
     accepted_resolved_models: tuple[NonEmptyText, ...]
     upstream_endpoint_slug: NonEmptyText
     expected_upstream_provider_name: NonEmptyText
@@ -120,7 +123,7 @@ class OpenRouterChatEvalConfig(DomainModel):
         _validate_endpoint_slug(self.upstream_endpoint_slug)
         if self.accepted_resolved_models != (self.requested_model,):
             raise ValueError(
-                "accepted resolved models must be exactly the requested canonical model"
+                "accepted resolved models must be exactly the requested model ID"
             )
         if self.provider_order != (self.upstream_endpoint_slug,):
             raise ValueError(
@@ -192,6 +195,11 @@ def build_openrouter_eval_config(
         raise ConfigConstructionError(
             "endpoint snapshot does not belong to the requested model"
         )
+    canonical_model = model_snapshot.data.get("canonical_slug")
+    if not isinstance(canonical_model, str) or not canonical_model.strip():
+        raise ConfigConstructionError(
+            "model snapshot does not expose a permanent canonical_slug"
+        )
     matches = matched_endpoints(
         probe_inputs.upstream_endpoint_slug, endpoint_snapshot
     )
@@ -207,6 +215,7 @@ def build_openrouter_eval_config(
         )
     return OpenRouterChatEvalConfig(
         requested_model=probe_inputs.requested_model,
+        catalog_canonical_model=canonical_model,
         accepted_resolved_models=(probe_inputs.requested_model,),
         upstream_endpoint_slug=probe_inputs.upstream_endpoint_slug,
         expected_upstream_provider_name=endpoint.provider_name,

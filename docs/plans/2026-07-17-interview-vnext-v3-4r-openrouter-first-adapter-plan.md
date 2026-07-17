@@ -1,8 +1,8 @@
 # Interview AI vNext V3-4R——OpenRouter-first adapter、routing conformance與 live gate交接規格
 
 - 日期：2026-07-17
-- 狀態：**R1–R5 實作完成、mocked conformance 全綠、full API+PostgreSQL regression 全綠(756 passed)；
-  R6 OpenRouter live gate 待真 `OPENROUTER_API_KEY` 執行(`mocked complete, OpenRouter live gate pending`)**
+- 狀態：**R1–R6完成；OpenRouter真live conformance通過，focused 148、OpenAI regression 66、
+  neutral/import/fixed-replay 23、full API+PostgreSQL 762 passed（0 skipped）；V3-5 engineering unblocked**
 - 決策：[`../adr/0035-interview-vnext-openrouter-first-provider-boundary.md`](../adr/0035-interview-vnext-openrouter-first-provider-boundary.md)
 - 上游 contract：[`../specs/2026-07-17-interview-vnext-v3-fixed-replay-research.md`](../specs/2026-07-17-interview-vnext-v3-fixed-replay-research.md)
 - direct OpenAI reference：[`2026-07-17-interview-vnext-v3-4-openai-responses-adapter-plan.md`](2026-07-17-interview-vnext-v3-4-openai-responses-adapter-plan.md)
@@ -35,7 +35,8 @@ load balancing、fallback、plugin、response healing、context compression或 c
 2. 第一條可 promotion介面固定 `POST https://openrouter.ai/api/v1/chat/completions`。
 3. 使用專案既有 `httpx.AsyncClient`直接 HTTP；不新增目前仍為 Beta 的 OpenRouter Python SDK。
 4. 不共用／泛化現有 `OpenAIResponsesEvalAdapter`，也不接受任意 base URL。
-5. benchmark只接受 exact canonical model slug與 exact upstream endpoint slug。
+5. benchmark只接受 Models API `data.id`中的exact model ID與exact upstream endpoint slug；另保存
+   permanent `canonical_slug`及catalog hash，不把兩欄錯當成必須相等。
 6. `allow_fallbacks=false`、`require_parameters=true`、`stream=false`、單一 choice、無 tools。
 7. strict structured output使用已發布 portable schema；adapter不得重生或修改schema。
 8. `X-OpenRouter-Metadata: enabled`是 hard invariant；metadata缺失即 conformance failure。
@@ -58,7 +59,7 @@ multi-trial與 semantic failure review仍是 V3-5。
 | [API overview](https://openrouter.ai/docs/api/reference/overview) | Chat Completions是統一OpenAI-compatible schema；response含generation `id`、resolved `model`、normalized/native finish reason、usage與cost；non-streaming usage會回傳 | 主線採Chat；不可只抓content；generation/model/finish/usage/cost全部Capture |
 | [OpenAPI](https://openrouter.ai/openapi.json) | OpenRouter公開完整OpenAPI，欄位可能持續增加 | fixtures按核對日最小化；parser對未知一般欄位forward-compatible，但對未知會改內容的pipeline fail closed |
 | [Structured Outputs](https://openrouter.ai/docs/guides/features/structured-outputs) | `response_format.type=json_schema`、`strict=true`；只在相容model/provider支援；建議`require_parameters=true` | exact portable schema + local full validation；provider不支援時fail，不降級JSON mode |
-| [Models](https://openrouter.ai/docs/guides/overview/models) | Models API回`id`、permanent `canonical_slug`、context、expiration、supported parameters、reasoning capability等；alias會resolve | 每個run先建model snapshot；requested必須等於canonical slug；禁latest/auto/free shortcut |
+| [Models](https://openrouter.ai/docs/guides/overview/models) | Models API明定`id`是API request使用的unique model identifier，`canonical_slug`是另一個permanent slug；single-model lookup會resolve alias | 每個run先建model snapshot；requested必須exact等於lookup回傳的`data.id`，同時保存非空`canonical_slug`；禁latest/auto/free shortcut |
 | [List model endpoints](https://openrouter.ai/docs/api/api-reference/endpoints/list-endpoints) | 可查某model可用endpoints | live probe保存endpoint snapshot並建立exact slug到官方provider identity的對照；metadata只承諾selected provider/model，不假設它回完整slug |
 | [Provider routing](https://openrouter.ai/docs/guides/routing/provider-selection) | 預設load balance且`allow_fallbacks=true`；可用`only/order`、full endpoint suffix、`require_parameters`、`data_collection`、`zdr`控制；base slug會匹配同provider的多個variants | benchmark只接受snapshot中唯一匹配的slug，固定`only/order`且fallback false；privacy controls進config hash |
 | [Router metadata](https://openrouter.ai/docs/guides/features/router-metadata) | header opt-in後回requested、strategy、attempt、selected endpoints、attempts與pipeline；shape可additive；cache hit不回metadata | hard requirement；一般未知欄位忽略，未知pipeline不忽略；metadata缺失也可偵測cache／帳戶設定污染 |
@@ -81,6 +82,22 @@ Responses API的 typed items、reasoning與工具模型長期有價值，但本 
 一個strict JSON output、無tools、無provider state。使用Beta Responses不會自動提高工作分析品質，卻會
 增加一個breaking wire變因。先以stable Chat做可重播品質基準，再用相同case比較Responses；只有
 quality、reliability或cost有可重複收益才切換。
+
+### 2.1.1 2026-07-18 live catalog更正：`id`與`canonical_slug`是兩種身分
+
+真OpenRouter catalog證明目前主流模型常見`id != canonical_slug`。例如lookup可回
+`data.id=anthropic/claude-sonnet-5`與帶日期的permanent `canonical_slug`；前者是官方文件指定送進API
+request的unique identifier，後者用來永久辨識該catalog模型。日期canonical值不保證可由
+`GET /model/{slug}`單獨lookup，因此不能把「兩欄相等」當成conformance gate。
+
+本案改採三層證據，不降低可重現性：
+
+1. CLI model必須exact命中single-model lookup回傳的`data.id`；若傳入其他alias後被resolve成不同`id`，拒絕；
+2. `~latest`、auto/free與所有variant shortcut仍在本地先拒絕；
+3. permanent `canonical_slug`必須存在，並透過raw model snapshot、snapshot hash與live report保存。
+
+如此可使用當前主流模型，又不把動態latest router混進benchmark。這項更正來自真catalog evidence，不是
+為了讓測試通過而放寬resolved-model或endpoint gate。
 
 ### 2.2 為何直接HTTP，不用 OpenAI SDK指向OpenRouter
 
@@ -198,7 +215,7 @@ apps/api/tests/
 | 檔案 | 負責 | 不負責 |
 |---|---|---|
 | `openrouter_provider_config.py` | exact model/endpoint、routing/privacy/reasoning/plugin hard invariants與hash | API key、schema、env讀取 |
-| `openrouter_model_catalog.py` | GET model/endpoints、保存raw snapshot、檢查canonical slug/capabilities | 每次generate查network、替使用者選最佳模型 |
+| `openrouter_model_catalog.py` | GET model/endpoints、保存raw snapshot、檢查exact model ID、permanent canonical slug與capabilities | 每次generate查network、替使用者選最佳模型 |
 | `schema_catalog.py` | published schema ID/hash到exact schema與format name | OpenRouter model/routing |
 | `providers/openrouter_chat.py` | exact POST、deadline、normalize、supporting artifacts | DB、reducer、quality grader、retry scheduling |
 | `openrouter_live_probe.py` | CLI、catalog snapshot、single synthetic call、Capture/manifest/report | production service、V3-5多case |
@@ -253,6 +270,7 @@ provider = "openrouter"
 api_format = "chat_completions"
 base_url = "https://openrouter.ai/api/v1"
 requested_model: NonEmptyText                 # required，無default
+catalog_canonical_model: NonEmptyText         # builder從model snapshot canonical_slug派生
 accepted_resolved_models: tuple[NonEmptyText] # builder由requested_model派生，固定只能一個
 upstream_endpoint_slug: NonEmptyText          # required，依snapshot matching恰好命中一個endpoint
 expected_upstream_provider_name: NonEmptyText # 從endpoint snapshot取得，不由slug字串猜
@@ -285,7 +303,8 @@ Config structural validator：
 1. model與endpoint不得含前後空白；
 2. model必須為`author/slug`，禁止`~`開頭、`openrouter/auto`、`openrouter/free`、`:free`、`:nitro`、
    `:floor`、`:online`與`latest` alias；
-3. benchmark v1的accepted resolved models由builder派生，必須**恰好**等於`(requested_model,)`；不得讓CLI
+3. `catalog_canonical_model`只能由snapshot `canonical_slug`派生；benchmark v1的accepted resolved models
+   由builder派生，必須**恰好**等於`(requested_model,)`；不得讓CLI
    或一般caller傳入；也不得預先放入alias、
    fallback model或「可能回傳的近似名稱」來放寬resolved-model gate；
 4. provider order/only只能恰好包含同一個exact endpoint；
@@ -335,7 +354,7 @@ GET /api/v1/models/{author}/{slug}/endpoints
 呼叫inference前必須：
 
 1. model lookup `data.id == requested_model`；
-2. `data.canonical_slug == requested_model`；若API把alias resolve到別值，拒絕；
+2. `data.canonical_slug`必須為非空permanent slug並保存；它不必等於request使用的`data.id`；
 3. `expiration_date`為null或晚於run時間；
 4. input/output modalities包含text；
 5. `supported_parameters`至少含`structured_outputs`、`response_format`與`max_tokens`；
@@ -353,8 +372,10 @@ GET /api/v1/models/{author}/{slug}/endpoints
     `structured_outputs`與`max_tokens`；有reasoning時也必須支援對應欄位。model-level union不能代替
     endpoint-level能力證明；
 12. route成功的證明是三者合併：outbound `only/order`為exact且唯一匹配的slug、fallback false、metadata selected
-    provider/model符合snapshot、metadata attempt為1。官方metadata未承諾回完整endpoint slug，不得要求
-    不存在的欄位；
+    provider/model符合snapshot、metadata attempt為1。真live metadata顯示top-level `response.model`可使用request
+    model ID，而selected endpoint/attempt model使用permanent canonical slug；因此前者必須exact等於
+    `requested_model`，後者只能落在snapshot綁定的`{requested_model, catalog_canonical_model}`。官方metadata
+    未承諾回完整endpoint slug，不得要求不存在的欄位；
 13. snapshot/config/schema任一hash不符時在inference前fail。
 
 Endpoint OpenAPI允許未來增加欄位；catalog parser保存完整raw JSON，但只把已文件化、測試fixture覆蓋的欄位
@@ -376,7 +397,7 @@ Catalog call不算durable model attempt；其event/artifact必須與inference ca
 
 1. `request.provider == "openrouter"`；
 2. `request.requested_model == config.requested_model`；
-3. request requested model等於config唯一accepted canonical model；
+3. request requested model等於config唯一accepted exact catalog model ID；
 4. request operation name/definition hash/output contract hash符合closed catalog；
 5. output schema ID/hash解析為published schema且portable lint通過；
 6. prompt/context/schema/selection artifacts的scope與hash已由neutral request validator成立；
@@ -405,7 +426,7 @@ Mock test將outbound messages與request artifact逐字比較，包括中文、�
 
 ```json
 {
-  "model": "<exact canonical slug>",
+  "model": "<exact Models API id>",
   "messages": [
     {"role": "system", "content": "<request.instructions>"},
     {"role": "user", "content": "<exact text>"}
@@ -737,7 +758,7 @@ route: OpenRouter did not use the approved model routing profile.
 - response `id`／`X-Generation-Id`：OpenRouter generation ID，保存在raw/routing artifact；
 - upstream provider request ID：若generation/router metadata有，保存artifact；
 - `provider_conversation_id=None`；
-- `resolved_model=response.model`，必須exact等於requested canonical model；prefix/substring不放行。
+- `resolved_model=response.model`，必須exact等於requested model ID；prefix/substring不放行。
 
 Generation API的optional audit GET不在adapter內執行，也不回填／改寫已terminal result。若執行，新增
 `provider.openrouter.generation_audit` artifact與event，失敗只標enrichment failure。
@@ -866,10 +887,10 @@ Adapter成功只表示JSON object可建立`StructuredPayload`；不得在此impo
 
 1. config dump/hash無secret；
 2. alias/auto/free/latest/variant shortcuts拒絕；
-3. accepted models恰好只有requested canonical model，provider lists exact；
+3. accepted models恰好只有requested model ID，provider lists exact；
 4. reasoning effort/max tokens互斥；
 5. data_collection/zdr明示進hash；
-6. model id/canonical slug exact；
+6. model lookup `data.id` exact、permanent `canonical_slug`存在且兩者都進Capture；
 7. alias resolution拒絕；
 8. expired model拒絕；
 9. model-level structured outputs／response format/max tokens capability缺一拒絕；
@@ -962,7 +983,7 @@ cd apps/api
 $env:OPENROUTER_API_KEY='<secret>'
 uv run --locked python -m evals.interview_vnext.openrouter_live_probe `
   --probe turn-interpret-openrouter-smoke.v1 `
-  --model '<exact-canonical-model-slug>' `
+  --model '<exact-model-id-from-models-api>' `
   --upstream-endpoint '<exact-provider-endpoint-slug>' `
   --data-collection deny `
   --zdr-required false `
@@ -1036,7 +1057,7 @@ privacy/reasoning選擇，report明列`final_config_created=false`。成功或�
 run/probe/config/schema/model/endpoints hashes
 catalog HTTP counts/status
 inference HTTP count
-requested/resolved model
+requested/resolved model、catalog permanent canonical slug、selected/attempt採用哪一種snapshot-bound身分
 configured endpoint slug、expected/selected provider name與selected model
 router strategy/attempt/pipeline
 generation ID/request ID
@@ -1059,13 +1080,14 @@ V3-4R完成必須同時：
 1. mocked matrix全綠；
 2. neutral/fixed replay/dependency/full API+PostgreSQL regression全綠；
 3. 使用真`OPENROUTER_API_KEY`至少一次；
-4. model與endpoint catalog snapshot成功且canonical；configured slug依官方matching語意只匹配一個endpoint，
+4. model與endpoint catalog snapshot成功；requested exact命中catalog `data.id`、permanent
+   `canonical_slug`已Capture，configured slug依官方matching語意只匹配一個endpoint，
    該endpoint支援本request全部必要參數；
 5. inference POST恰好1次；
 6. route metadata存在、strategy direct、attempt 1；outbound exact endpoint限制成立，selected
    provider/model符合endpoint snapshot；
 7. pipeline clean、無cache跡象；
-8. resolved model恰好等於requested canonical model；
+8. resolved model恰好等於requested model ID；
 9. strict schema被接受；
 10. local full output validation通過；
 11. usage與cost合理，缺值有limitation；
@@ -1075,6 +1097,50 @@ V3-4R完成必須同時：
 
 只有mocked tests不算完成；沒有key時狀態寫`mocked complete, OpenRouter live gate pending`。原官方
 OpenAI live gate可以pending，不影響本slice完成。
+
+### 15.6 2026-07-18 R6真實執行證據
+
+通過run：
+
+```text
+run_id                    921f71a9-850c-48de-b8ab-4a98efd24134
+requested/resolved ID     anthropic/claude-sonnet-5
+permanent canonical       anthropic/claude-sonnet-5-20260630
+endpoint/provider         anthropic / Anthropic
+profile                   data_collection=deny, zdr=false, reasoning=medium, exclude=true
+config hash               sha256:563072ed2fba773d975cf7559f90844c30b9e29c644ff7513095784c5a728d7e
+model catalog hash        sha256:ccbba927cf3a264f12786b2295b920c5095a86cb0f92cd586bb14d75361aab58
+endpoint catalog hash     sha256:b1348f41bfe6ac799acaf617fe7da8397175a9a971df58161b254945d14b5819
+schema hash               sha256:3fd844ed53ee1e65cb115293790184d3b1fe6564c69d7787332c9b0bb3d93d05
+manifest hash             sha256:62505e4ced11fb15b6b8e2092e018fbd75368b89e1516237f54ab9d01d7e1512
+generation ID             gen-1784315093-nLdFIJX6K19E2NPv4oUY
+provider HTTP request ID  null（OpenRouter未回；後續report明列limitation）
+catalog/inference calls   2 / 1
+route                     strategy=direct, attempt=1, pipeline=[]
+usage                     input=5103, output=2430, reasoning=342, cache read/write=0/0
+cost                      0.034506 USD
+```
+
+重新驗證結果：5個event依序為run started、catalog artifact、call started、call completed、run completed；
+13個artifact與10個bundle檔案通過taxonomy、scope、manifest與hash-chain驗證；manifest hash與last event hash
+一致；`TurnInterpretOutput.model_validate()`通過；整包不含實際key、`Authorization`或`sk-or-`字首。provider
+因request設定`reasoning.exclude=true`而未回reasoning文字，但usage正確保存342 reasoning tokens。
+
+第一次diagnostic run `8a37f3ec-917f-4134-aa2c-1d748c79e645`正確fail closed，原因是舊實作錯把
+top-level response model ID與metadata selected permanent canonical視為必須相等。真catalog與官方Models
+欄位定義證明兩者是不同身份後，修成：
+
+1. request／top-level resolved只能exact等於catalog `data.id`；
+2. selected endpoint／attempt model只能是snapshot綁定的request ID或permanent canonical；
+3. 任意第三個model仍為`openrouter.route_contaminated`；
+4. config新增snapshot派生的`catalog_canonical_model`，兩個catalog hash仍是content-addressed evidence。
+
+修正後新增mocked regression並通過：OpenRouter focused 148、OpenAI direct 66、neutral/import/fixed-replay
+PostgreSQL 23、完整API+real PostgreSQL 762，全部0 skipped。live bundle位於gitignored `output/`，不進commit。
+
+尚有一項非API可自動證明的操作檢查：OpenRouter目前沒有單一endpoint可讀出所有dashboard preset、account-wide
+allowlist與Prevent Overrides。通過run的實際metadata已證明direct route、單次attempt、pipeline空、cache tokens
+為0；開始V3-5付費multi-trial前，owner仍須依§15.2人工確認dashboard checklist並記錄確認時間。
 
 ---
 
@@ -1095,7 +1161,7 @@ V3-4R mocked conformance
 
 每個V3-5 config固定：
 
-- one exact canonical model；
+- one exact catalog model ID + captured permanent canonical slug；
 - one exact endpoint；
 - one reasoning profile；
 - fallback off；
@@ -1261,7 +1327,7 @@ Live命令見§15.1。不得把無key exit 2記成passed或skip。
 
 - [ ] `provider=openrouter`，沒有把model author當provider？
 - [ ] stable Chat endpoint hardcoded且不follow redirect？
-- [ ] exact canonical model與endpoint snapshot/preflight？
+- [ ] exact catalog model ID、permanent canonical slug與endpoint snapshot/preflight？
 - [ ] exact published schema/hash、strict true、require parameters true？
 - [ ] body/headers forbidden fields tests完整？
 - [ ] system/messages逐字、不加prefill/gold？
@@ -1381,7 +1447,7 @@ V6/V7依eval決定exact endpoint、same-model fallback、multi-model fallback、
 
 1. commit SHA與實際修改檔案；
 2. HTTPX lock版本與是否新增dependency（預期沒有）；
-3. exact live model canonical slug與upstream endpoint slug；
+3. exact live model ID、catalog permanent canonical slug與upstream endpoint slug；
 4. data collection/ZDR/reasoning profile與config hash；
 5. model/endpoints snapshot hash；
 6. mocked focused、OpenAI regression、neutral/PostgreSQL/full suite數量；

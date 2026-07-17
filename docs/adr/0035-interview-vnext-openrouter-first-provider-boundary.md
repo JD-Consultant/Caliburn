@@ -2,7 +2,8 @@
 
 日期：2026-07-17
 
-狀態：Accepted（provider 主線已核准；OpenRouter adapter 尚未實作）
+狀態：Accepted（provider 主線已核准；V3-4R eval adapter與真live conformance已於2026-07-18完成；
+production promotion尚未進行）
 
 Supersedes：
 

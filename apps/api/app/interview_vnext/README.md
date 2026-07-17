@@ -1,6 +1,6 @@
 # Interview AI vNext（隔離開發中）
 
-本 package 是 ADR 0034 的 greenfield 實作區。目前已完成 **V0 + V1 domain foundation + V2-A provider/Capture contracts + V2-B durable persistence + V3-0 readiness + V3-1 Context Engine + V3-2 Turn Interpreter contracts/verifier + V3-3 fixed-replay executor**，另有隔離於`evals/`的direct OpenAI V3-4 mocked reference與 **V3-4R OpenRouter-first mocked-complete adapter**。V3-0固定官方OpenAI SDK 2.46.0並補上verified zero-Evidence atomic commit；V3-1加入deterministic ContextBuilder；V3-2加入portable structured output、versioned prompt/operation/verifier policy與pure proposal verification；V3-3把完整turn operation接到durable attempt/checkpoint、provider artifact envelope、partial Evidence/no-op commit與crash recovery。ADR 0035已把主線改為**OpenRouter-first**;V3-4R 的 config/catalog/adapter/live-probe 已 mocked 全綠(direct HTTP,無 SDK),**OpenRouter live gate 待真 `OPENROUTER_API_KEY` 執行**,通過後才進 V3-5。migration仍為0010八張 `interview_vnext_*` 表。仍然**沒有 route或production live provider call**，也沒有被 production composition root import(eval adapter 只住 `evals/`,dependency guard 強制)。現行使用者流量仍走 `app/interview/` v3。
+本 package 是 ADR 0034 的 greenfield 實作區。目前已完成 **V0 + V1 domain foundation + V2-A provider/Capture contracts + V2-B durable persistence + V3-0 readiness + V3-1 Context Engine + V3-2 Turn Interpreter contracts/verifier + V3-3 fixed-replay executor + V3-4R OpenRouter live conformance**，另有隔離於`evals/`的direct OpenAI V3-4 mocked reference。V3-0固定官方OpenAI SDK 2.46.0並補上verified zero-Evidence atomic commit；V3-1加入deterministic ContextBuilder；V3-2加入portable structured output、versioned prompt/operation/verifier policy與pure proposal verification；V3-3把完整turn operation接到durable attempt/checkpoint、provider artifact envelope、partial Evidence/no-op commit與crash recovery。ADR 0035已把主線改為**OpenRouter-first**；V3-4R已用真OpenRouter key、`anthropic/claude-sonnet-5`與exact `anthropic` endpoint通過single-call、routing metadata、strict schema、Capture/hash-chain與secret gate，下一步是V3-5 12-case多trial品質驗證。migration仍為0010八張 `interview_vnext_*` 表。仍然**沒有 route或production live provider call**，也沒有被production composition root import（eval adapter只住`evals/`，dependency guard強制）。現行使用者流量仍走 `app/interview/` v3。
 
 權威文件：
 
@@ -397,10 +397,15 @@ official live conformance probe因本機無`OPENAI_API_KEY`尚未執行；ADR 00
 comparison，不再阻擋主線。逐項規格與optional live命令見
 [`../../../../docs/plans/2026-07-17-interview-vnext-v3-4-openai-responses-adapter-plan.md`](../../../../docs/plans/2026-07-17-interview-vnext-v3-4-openai-responses-adapter-plan.md)
 與 [`../../evals/interview_vnext/README.md`](../../evals/interview_vnext/README.md)。
-下一步先依
-[`V3-4R OpenRouter-first規格`](../../../../docs/plans/2026-07-17-interview-vnext-v3-4r-openrouter-first-adapter-plan.md)
-新增獨立Chat adapter、exact routing metadata gate與真OpenRouter probe；通過後V3-5才用12個turn
-component tasks、每case多trial量測模型品質。不得只改現有OpenAI adapter的base URL。
+**V3-4R OpenRouter-first（2026-07-18，live-verified complete）**：真run
+`921f71a9-850c-48de-b8ab-4a98efd24134`以`anthropic/claude-sonnet-5`、permanent canonical
+`anthropic/claude-sonnet-5-20260630`與`anthropic` endpoint通過；direct/attempt 1、pipeline空、cache
+tokens為0、strict schema/local output/hash-chain/secret scan皆通過。OpenRouter focused為`148 passed`，
+OpenAI regression `66 passed`，neutral/import/fixed-replay PostgreSQL `23 passed`，完整API+real
+PostgreSQL `762 passed, 0 skipped`。完整hash、usage、cost與第一次diagnostic failure的identity修正見
+[`V3-4R OpenRouter-first規格 §15.6`](../../../../docs/plans/2026-07-17-interview-vnext-v3-4r-openrouter-first-adapter-plan.md)。
+下一步是V3-5：以12個turn component tasks、每case多trial量測模型品質；開始付費batch前owner仍須確認
+OpenRouter dashboard未套preset／account-wide override。
 先做Capture/persistence、Context Engine與durable executor的原因是：
 沒有可重播 execution record,就無法判斷未來品質差是模型、context selection、
 verifier 還是 reducer 所造成。V5 前必須完成 authenticated principal → tenant

@@ -102,7 +102,11 @@ def _parse_args(argv: list[str] | None) -> argparse.Namespace:
         description="Single-shot OpenRouter Chat conformance probe (eval-only).",
     )
     parser.add_argument("--probe", default="turn-interpret-openrouter-smoke.v1")
-    parser.add_argument("--model", required=True, help="exact canonical model slug")
+    parser.add_argument(
+        "--model",
+        required=True,
+        help="exact Models API id (dynamic aliases and variant shortcuts forbidden)",
+    )
     parser.add_argument(
         "--upstream-endpoint", required=True, help="exact provider endpoint slug"
     )
@@ -296,7 +300,7 @@ async def run_probe(
             )
             final_config_created = True
             bundle_files["config.json"] = canonical_json(config)
-            preflight(
+            preflight_facts = preflight(
                 model_snapshot=model_snapshot, endpoint_snapshot=endpoint_snapshot,
                 requested_model=probe_inputs.requested_model,
                 upstream_endpoint_slug=probe_inputs.upstream_endpoint_slug,
@@ -493,6 +497,8 @@ async def run_probe(
             probe_id=probe_id, run_id=run_id, config=config, probe_inputs=probe_inputs,
             model_snapshot_hash=model_snapshot.snapshot_hash,
             endpoint_snapshot_hash=endpoint_snapshot.snapshot_hash,
+            catalog_model_id=model_snapshot.data.get("id"),
+            catalog_canonical_slug=preflight_facts.canonical_slug,
             schema_hash=canonical_hash(schema),
             request_artifact=request_artifact, result_artifact=result_artifact,
             result=result, envelope_artifacts=envelope.supporting_artifacts,
@@ -545,6 +551,8 @@ def _build_report(
     probe_inputs: OpenRouterProbeInputs,
     model_snapshot_hash: str,
     endpoint_snapshot_hash: str,
+    catalog_model_id: str | None,
+    catalog_canonical_slug: str,
     schema_hash: str,
     request_artifact: ArtifactRecord,
     result_artifact: ArtifactRecord,
@@ -567,6 +575,10 @@ def _build_report(
         limitations = sorted(
             {*limitations, "data_collection=allow run is not production_promotable"}
         )
+    if result.provider_request_id is None:
+        limitations = sorted(
+            {*limitations, "provider HTTP request ID was not returned"}
+        )
     return {
         "schema_version": "openrouter_live_probe_report.v1",
         "run_id": str(run_id),
@@ -578,6 +590,8 @@ def _build_report(
         "schema_hash": schema_hash,
         "model_catalog_hash": model_snapshot_hash,
         "endpoint_catalog_hash": endpoint_snapshot_hash,
+        "catalog_model_id": catalog_model_id,
+        "catalog_canonical_slug": catalog_canonical_slug,
         "catalog_http_calls": catalog_http_calls,
         "catalog_statuses": catalog_statuses,
         "inference_http_calls": inference_http_calls,

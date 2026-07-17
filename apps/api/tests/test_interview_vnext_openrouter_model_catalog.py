@@ -114,6 +114,7 @@ class TestOpenRouterChatEvalConfig:
         assert config.api_format == "chat_completions"
         assert config.base_url == "https://openrouter.ai/api/v1"
         assert config.requested_model == REQUESTED_MODEL
+        assert config.catalog_canonical_model == "testlab/analyst-large-20260717"
         assert config.accepted_resolved_models == (REQUESTED_MODEL,)
         assert config.upstream_endpoint_slug == ENDPOINT_SLUG
         assert config.expected_upstream_provider_name == "TestHost"
@@ -260,6 +261,12 @@ class TestOpenRouterChatEvalConfig:
             build_openrouter_eval_config(
                 probe_inputs(), foreign_model, endpoint_snapshot()
             )
+        missing_canonical = deepcopy(fixture_json("catalog-model.json"))
+        missing_canonical["data"]["canonical_slug"] = None
+        with pytest.raises(ConfigConstructionError, match="canonical_slug"):
+            build_openrouter_eval_config(
+                probe_inputs(), model_snapshot(missing_canonical), endpoint_snapshot()
+            )
         with pytest.raises(ConfigConstructionError, match="exactly one endpoint"):
             build_openrouter_eval_config(
                 probe_inputs(upstream_endpoint_slug="regionhost"),
@@ -286,7 +293,7 @@ class TestOpenRouterChatEvalConfig:
 class TestPreflightGates:
     def test_valid_snapshots_pass_and_expose_endpoint_identity(self):
         facts = run_preflight()
-        assert facts.canonical_slug == REQUESTED_MODEL
+        assert facts.canonical_slug == "testlab/analyst-large-20260717"
         assert facts.endpoint.tag == ENDPOINT_SLUG
         assert facts.endpoint.provider_name == "TestHost"
         assert facts.model_context_length == 200000
@@ -299,10 +306,18 @@ class TestPreflightGates:
         with pytest.raises(PreflightError, match="model_id_mismatch"):
             run_preflight(model_snapshot=model_snapshot(raw))
 
-    def test_alias_resolution_rejected(self):
+    def test_distinct_permanent_canonical_slug_is_captured_not_rejected(self):
         raw = deepcopy(fixture_json("catalog-model.json"))
         raw["data"]["canonical_slug"] = "testlab/analyst-large-2026-07"
-        with pytest.raises(PreflightError, match="alias_resolution_rejected"):
+        facts = run_preflight(model_snapshot=model_snapshot(raw))
+        assert facts.requested_model == REQUESTED_MODEL
+        assert facts.canonical_slug == "testlab/analyst-large-2026-07"
+
+    @pytest.mark.parametrize("canonical_slug", [None, "", "   "])
+    def test_missing_permanent_canonical_slug_rejected(self, canonical_slug):
+        raw = deepcopy(fixture_json("catalog-model.json"))
+        raw["data"]["canonical_slug"] = canonical_slug
+        with pytest.raises(PreflightError, match="canonical_slug_missing"):
             run_preflight(model_snapshot=model_snapshot(raw))
 
     def test_expired_model_rejected(self):

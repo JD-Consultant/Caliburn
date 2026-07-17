@@ -199,7 +199,7 @@ class TestPublishedOutputSchemaCatalog:
         request = make_request()
         binding = PublishedOutputSchemaCatalog().resolve(request)
         assert binding.schema_id == TURN_INTERPRET_OUTPUT_SCHEMA_ID
-        assert binding.openai_format_name == "turn_interpret_output_v1"
+        assert binding.format_name == "turn_interpret_output_v1"
         assert binding.schema == published_schema("turn-interpret-output.v1.schema.json")
         assert binding.schema_hash == request.output_schema_hash
         assert canonical_hash(binding.schema) == request.output_schema_hash
@@ -238,7 +238,7 @@ class TestPublishedOutputSchemaCatalog:
             {
                 TURN_INTERPRET_OUTPUT_SCHEMA_ID: CatalogEntry(
                     filename="turn-interpret-input.v1.schema.json",
-                    openai_format_name="turn_interpret_output_v1",
+                    format_name="turn_interpret_output_v1",
                 )
             }
         )
@@ -254,7 +254,7 @@ class TestPublishedOutputSchemaCatalog:
             {
                 input_schema_id: CatalogEntry(
                     filename="turn-interpret-input.v1.schema.json",
-                    openai_format_name="turn_interpret_input_v1",
+                    format_name="turn_interpret_input_v1",
                 )
             }
         )

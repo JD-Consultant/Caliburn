@@ -455,7 +455,7 @@ class OpenAIResponsesEvalAdapter(LlmPort):
                     text={
                         "format": {
                             "type": "json_schema",
-                            "name": binding.openai_format_name,
+                            "name": binding.format_name,
                             "strict": True,
                             "schema": binding.schema,
                         }

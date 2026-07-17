@@ -34,13 +34,13 @@ class SchemaCatalogError(ValueError):
 @dataclass(frozen=True)
 class CatalogEntry:
     filename: str
-    openai_format_name: str
+    format_name: str
 
 
 @dataclass(frozen=True)
 class SchemaBinding:
     schema_id: str
-    openai_format_name: str
+    format_name: str
     schema_hash: str
     schema: dict[str, Any]
 
@@ -48,7 +48,7 @@ class SchemaBinding:
 _PUBLISHED_ENTRIES: dict[str, CatalogEntry] = {
     TURN_INTERPRET_OUTPUT_SCHEMA_ID: CatalogEntry(
         filename="turn-interpret-output.v1.schema.json",
-        openai_format_name="turn_interpret_output_v1",
+        format_name="turn_interpret_output_v1",
     ),
 }
 
@@ -94,7 +94,7 @@ class PublishedOutputSchemaCatalog:
             )
         return SchemaBinding(
             schema_id=request.output_schema_id,
-            openai_format_name=entry.openai_format_name,
+            format_name=entry.format_name,
             schema_hash=schema_hash,
             schema=deepcopy(schema),
         )

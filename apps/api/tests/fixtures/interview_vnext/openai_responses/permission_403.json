@@ -1,0 +1,8 @@
+{
+  "error": {
+    "message": "Project does not have access to model 'gpt-5.6'.",
+    "type": "invalid_request_error",
+    "param": null,
+    "code": "model_not_available"
+  }
+}

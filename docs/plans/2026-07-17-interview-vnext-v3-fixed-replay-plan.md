@@ -3,7 +3,7 @@
 - 日期：2026-07-17
 - 狀態：**已核准執行；研究定稿，實作進行中**
 - 權威規格：[`../specs/2026-07-17-interview-vnext-v3-fixed-replay-research.md`](../specs/2026-07-17-interview-vnext-v3-fixed-replay-research.md)
-- 前置完成：V0、V1、V2-A、V2-B；目前 head含 migration 0010、durable UoW/Capture/outbox/recovery。
+- 前置完成：V0、V1、V2-A、V2-B、V3-0與V3-1；目前 head含 migration 0010、durable UoW/Capture/outbox/recovery與pure ContextBuilder。下一步V3-2。
 
 ---
 
@@ -32,9 +32,9 @@ fixed transcript
 
 | 切片 | 內容 | 可接真模型 | Gate |
 |---|---|---:|---|
-| V3-0A | OpenAI SDK freshness lock（2.44.0 -> 2.46.0） | 否 | dependency diff + full API regression |
-| V3-0B | typed no-op result與durable commit use case | 否 | v1 schema不變 + DB round trip/crash/idempotency |
-| V3-1 | Context contracts、policy documents與 ContextBuilder | 否 | deterministic/property tests |
+| V3-0A（完成） | OpenAI SDK freshness lock（2.44.0 -> 2.46.0） | 否 | dependency diff + full API regression |
+| V3-0B（完成） | typed no-op result與durable commit use case | 否 | v1 schema不變 + DB round trip/crash/idempotency |
+| V3-1（完成） | Context contracts、policy documents與 ContextBuilder | 否 | 15 focused + 515 full API/PostgreSQL passed |
 | V3-2 | turn_interpret contracts、prompt、proposal mapping與 verifier | 否 | pure contract/adversarial tests |
 | V3-3 | durable operation executor、partial/no-op commit | 否 | PostgreSQL crash/idempotency tests |
 | V3-4 | eval-only OpenAI Responses adapter | 是，opt-in | mocked API matrix + one live probe |
@@ -139,10 +139,12 @@ apps/api/app/interview_vnext/llm/context.py
 apps/api/app/interview_vnext/llm/context_policies/
   turn-interpret.1.0.0.json
   episode-code.1.0.0.json
+apps/api/app/interview_vnext/llm/write_context_policies.py
 apps/api/app/interview_vnext/llm/schemas/
   context-packet.v1.schema.json
   context-selection-manifest.v1.schema.json
   context-budget-report.v1.schema.json
+  reference-snapshot.v1.schema.json
 apps/api/app/interview_vnext/application/context_builder.py
 apps/api/tests/test_interview_vnext_context_builder.py
 ```
@@ -174,6 +176,7 @@ class ContextBuilder:
         state: InterviewState,
         employee_turn_id: UUID,
         operation_id: UUID,
+        operation_definition_hash: Sha256,
         policy: TurnInterpretContextPolicy,
     ) -> ContextBuildResult: ...
 
@@ -184,11 +187,20 @@ class ContextBuilder:
         episode_id: UUID,
         reference_snapshot: ReferenceSnapshot,
         operation_id: UUID,
+        operation_definition_hash: Sha256,
         policy: EpisodeCodeContextPolicy,
     ) -> ContextBuildResult: ...
 ```
 
 Builder是 pure function/service，不查 DB、不呼 provider、不讀環境變數。Application先 hydrate後傳入。
+
+固定 policy `1.0.0`：
+
+- `turn_interpret`：65,536 UTF-8 bytes、保留8,192 output tokens；contradiction 4；correction candidates有cue 8、無cue 4；recent active evidence 6並跨區去重；
+- `episode_code`：262,144 UTF-8 bytes、保留12,288 output tokens；episode evidence 256、contradiction 64、candidate 128、reference 8；任何一項超限都完整失敗，不做 first-N或摘要；
+- estimator `utf8-codepoint-heuristic/1.0.0`：`max(code_points, ceil(utf8_bytes / 4))`，只作preflight；
+- `ReferenceSnapshot`按URN canonical排序並以整份內容hash定址；packet/source ref同時保存snapshot hash，禁止把reference冒充 working state；
+- `operation_definition_hash`由上游versioned operation document提供，Builder只保存與傳遞，不自行猜測或計算prompt identity。
 
 ### 4.4 測試矩陣
 

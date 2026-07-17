@@ -1,7 +1,7 @@
 # Interview AI vNext V3——Fixed Replay、ContextBuilder 與 Evidence Extraction 規格
 
 - 日期：2026-07-17
-- 狀態：**研究定稿、已核准執行；V3 實作進行中**
+- 狀態：**研究定稿、已核准執行；V3-0/V3-1已完成，下一步V3-2**
 - 上游：[`2026-07-16-interview-ai-vnext-greenfield-architecture.md`](2026-07-16-interview-ai-vnext-greenfield-architecture.md)、[`2026-07-16-interview-vnext-v2b-durable-persistence-research.md`](2026-07-16-interview-vnext-v2b-durable-persistence-research.md)
 - 實作計畫：[`../plans/2026-07-17-interview-vnext-v3-fixed-replay-plan.md`](../plans/2026-07-17-interview-vnext-v3-fixed-replay-plan.md)
 - 裁決權：本文件優先於總實作計畫 §6 的概略描述；若要改本文件的 contract、gate 或 transaction boundary，先更新文件再寫 code。
@@ -50,10 +50,12 @@ persisted transcript/state
 | [OpenAI Responses API OpenAPI](https://api.openai.com/v1/responses) | response `output` 可能包含多種 item，不可假設固定在第一個 content；有 resolved model、request ID、status、incomplete details 與 usage | adapter 必須遍歷 typed output item，正規化 refusal/incomplete/usage；不得只抓 `output[0]` |
 | [OpenAI Prompt Engineering](https://developers.openai.com/api/docs/guides/prompt-engineering) | prompt 要配合 model snapshot 做 eval；固定內容放前面有利 cache；生成具有變異性 | prompt、context policy、schema與 model config各自版本化；每 case 多 trial |
 | [OpenAI latest model guidance](https://developers.openai.com/api/docs/guides/latest-model) | 截至本文件日期，`gpt-5.6` 是通用 quality-first 起點；官方建議先用代表性 tasks 比較 reasoning effort，不假設最高 effort 必然最好；lean prompt 要用 eval 驗證 | V3 live reference 預設由外部 config 指向 `gpt-5.6`、standard/medium；失敗 subset 才比較 high，不把 model slug寫死在 domain contract |
+| [OpenAI GPT-5.6 model](https://developers.openai.com/api/docs/models/gpt-5.6-sol) | 官方模型頁列出約 1.05M context window與 128K max output；這是 provider capacity，不是每個 operation 都應填滿的品質目標 | Context policy保留遠低於模型上限的 operation-specific hard budget；容量增加不自動放寬 selection policy，必須由 ablation/eval證明 |
 | [OpenAI Evaluation Best Practices](https://developers.openai.com/api/docs/guides/evaluation-best-practices) | task-specific、持續 eval、log everything、human calibration；workflow 每個 model step可分開測；pairwise/pass-fail通常比開放式 judge可靠；Evals 平台將於 2026-11-30 關閉 | 自有 harness；operation-level grader；code-first、明確 pass/fail；不新增 OpenAI Evals API依賴 |
 | [OpenAI Python SDK v2.46.0](https://github.com/openai/openai-python/releases/tag/v2.46.0) | 本文件日期的官方最新 stable release；專案 lock仍是2.44.0，而 V3會直接使用 Responses SDK typed surface | V3-0先將直接 dependency與 lock固定到2.46.0並跑完整回歸；升級獨立 commit，不能和 adapter行為變更混在一起 |
 | [Anthropic Structured Outputs](https://platform.claude.com/docs/en/build-with-claude/structured-outputs) | 目前正式 API 是 `output_config.format`；constrained decoding保 schema，但 refusal/max_tokens可不符；SDK可能移除 provider不支援的 constraint，再以原始本地 schema驗證；複雜 schema會增加編譯成本 | neutral output schema使用兩家可攜交集；所有欄位盡量 required + explicit null/empty；本地完整 Pydantic validation不可省 |
 | [Anthropic Context Engineering](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents) | context 是有限 attention budget；目標是最小高訊號 token集合；從最強模型與最小 prompt起步，再依 failure加規則/範例 | ContextBuilder按 operation最小揭露；不把整份 transcript、全部 reference或歷史 model reasoning塞入 context |
+| [Anthropic Context Windows](https://platform.claude.com/docs/en/build-with-claude/context-windows) | 目前模型可提供最高 1M context，但官方同時提醒 context rot：context增加時，資訊回憶與精準度可能下降，更多內容不必然更好 | 長 context只作容量安全網；Caliburn仍以相關性、來源權威、固定排序與可量測budget控制品質 |
 | [Anthropic Building Effective Agents](https://www.anthropic.com/engineering/building-effective-agents) | 已知流程優先使用簡單、可組合 workflow；固定 subtasks適合 prompt chaining + programmatic gates；只在有證據時增加 agent複雜度 | V3維持 application-owned workflow與 deterministic gates，不導入 agent framework |
 | [Anthropic Evaluation](https://platform.claude.com/docs/en/test-and-evaluate/develop-tests) | 先定具體可量 success criteria；code-based grading最快最可靠，LLM grader要先校準；eval要反映 task與 edge cases | quote/span/IDs/schema用 code；semantic rubric採明確 pass/fail並抽樣人工校準 |
 | [O*NET 30.1 Content Model Reference](https://www.onetcenter.org/dictionary/30.1/text/content_model_reference.html) | task/work activity屬工作端描述；skill屬 worker requirement；ability是影響表現的持久個人屬性，三者不是同一層 | 先保存員工可支持的 task/output/activity Evidence，再做 candidate coding；單句行為不得直接等同 ability |
@@ -218,6 +220,28 @@ Provider tokenizer不是 domain authority。V3同時記：
 - provider回傳的實際 input/cache tokens。
 
 Estimator只能做 preflight與比較，不能宣稱與 provider billing完全相同。若 provider拒絕 context length，記 `CONTEXT_WINDOW_EXCEEDED`並視為 policy failure，不自動刪資料重試。
+
+V3-1 已固定下列 `1.0.0` policy；數值是可版本化的品質護欄，不是 provider 極限：
+
+| Operation | `max_utf8_bytes` | `reserved_output_tokens` | hard item policy |
+|---|---:|---:|---|
+| `turn_interpret` | 65,536 | 8,192 | contradiction最多4；有 correction cue時 correction candidates最多8、否則4；recent active evidence最多6且與 correction candidates去重 |
+| `episode_code` | 262,144 | 12,288 | 該 episode active evidence總數最多256；unresolved contradiction最多64；既有 candidate最多128；reference snippet最多8 |
+
+Estimator identity固定為 `utf8-codepoint-heuristic/1.0.0`，公式是：
+
+```text
+estimated_input_tokens = max(
+  unicode_code_points,
+  ceil(utf8_bytes / 4),
+)
+```
+
+這個估算刻意偏保守，尤其中文通常以 code point分支主導；它只供 deterministic preflight、版本比較與 regression，不代替 OpenAI／Anthropic tokenizer，也不作計費依據。實際 provider input/cache/output token只在 model result與 Capture中記錄。
+
+`turn_interpret`的 item cap是 selection policy：所有候選仍進 manifest，未選入者標明理由；current employee turn與 preceding consultant turn永不截斷。`episode_code`的 caps是完整性 hard gate：先建完整 packet與 manifest，任何 evidence/reference/candidate/contradiction超標即拋 `ContextBudgetExceeded`，錯誤物件帶完整未截斷 packet、manifest與 failing budget report，不進模型，也不可只取前 N 筆。
+
+即使目前 OpenAI GPT-5.6與 Claude具備約百萬 token等級context，V3也不把上限當目標。原因是工作分析需要的是可追溯的高訊號證據，不是最大的輸入；Anthropic官方亦明確指出 context rot。未來只有在固定 dataset ablation顯示「新增某類context提高 hard-gate品質，且沒有增加unsupported claim／anchoring」時，才建立新的 policy semver；不得原地覆寫 `1.0.0`或因模型升級直接放寬。
 
 ---
 

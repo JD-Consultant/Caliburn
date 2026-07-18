@@ -26,7 +26,6 @@ from app.interview_vnext.application.operation_executor import (
     TurnExecutionStatus,
     TurnInterpretProviderProfile,
 )
-from app.interview_vnext.domain.evidence import EvidenceStatus
 from app.interview_vnext.domain.hashing import canonical_json
 from app.interview_vnext.llm.port import LlmPort
 from app.interview_vnext.llm.turn_interpret import TurnInterpretOutput
@@ -245,17 +244,6 @@ def build_trial_record(
     )
 
 
-def committed_kind(execution: TrialExecution) -> str | None:
-    outcome = execution.outcome
-    if outcome.status != TurnExecutionStatus.COMMITTED:
-        return None
-    return "noop" if outcome.noop_result is not None else "evidence"
-
-
-def evidence_status_map(execution: TrialExecution) -> dict[UUID, EvidenceStatus]:
-    return {e.evidence_id: e.status for e in execution.state_after.evidence}
-
-
 def trial_output(execution: TrialExecution) -> TurnInterpretOutput | None:
     """The model output as a TurnInterpretOutput, or None for a failed trial."""
 
@@ -269,23 +257,6 @@ def trial_output(execution: TrialExecution) -> TurnInterpretOutput | None:
     if report is None:
         return None
     return None
-
-
-def verifier_reason_codes(execution: TrialExecution) -> dict[str, tuple[str, ...]]:
-    report = execution.outcome.verification_report
-    if report is None:
-        return {}
-    return {
-        d.proposal_key: tuple(code.value for code in d.reason_codes)
-        for d in report.decisions
-    }
-
-
-def accepted_proposal_keys(execution: TrialExecution) -> frozenset[str]:
-    report = execution.outcome.verification_report
-    if report is None:
-        return frozenset()
-    return frozenset(d.proposal_key for d in report.decisions if d.accepted)
 
 
 # ── Bundle writer(§12.2 atomic dir + integrity manifest)─────────────────────

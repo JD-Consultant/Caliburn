@@ -69,8 +69,9 @@ from .scheduler import (
 )
 from .turn_eval_runner import TrialExecution
 from .turn_graders import (
-    GradingContext,
+    accepted_proposal_keys_from_report,
     build_candidate_edges,
+    build_grading_context,
     compute_trial_metrics,
     run_deterministic_graders,
 )
@@ -349,13 +350,10 @@ async def orchestrate_live_batch(
                     inputs,
                     evaluation,
                     execution,
-                    slot_index=slot_index,
-                    split=inputs.case.split,
                     batch_id=batch_id,
+                    trial_record=trial,
                     decision_labels={},
                     review_complete=False,
-                    disposition=disposition,
-                    trial_record=trial,
                 )
                 if disposition == TrialDisposition.QUALITY_SCORED:
                     all_review_items.extend(graded.review_items)
@@ -493,12 +491,6 @@ def _load_imported_review(batch_dir: Path, queue: Sequence[ReviewItem]) -> Impor
     return import_review_decisions(queue, decisions)
 
 
-def _accepted_keys(report: TurnInterpretVerificationReport | None) -> frozenset[str]:
-    if report is None:
-        return frozenset()
-    return frozenset(item.proposal_key for item in report.decisions if item.accepted)
-
-
 def _score_trial(
     trial_dir: Path,
     *,
@@ -522,21 +514,13 @@ def _score_trial(
         if verification_json
         else None
     )
-    committed_kind = None
-    if trial.terminal_outcome == "committed":
-        committed_kind = "evidence" if verification and verification.accepted_count else "noop"
-    context = GradingContext(
+    context = build_grading_context(
+        trial=trial,
         inputs=inputs,
         gold=evaluation.gold,
-        trial_id=trial.trial_id,
-        case_id=trial.case_id,
         output=output,
         report=verification,
-        committed_kind=committed_kind,
-        state_before_hash=trial.state_before_hash,
-        state_after_hash=trial.state_after_hash,
-        evidence_status={item.evidence_id: item.status for item in final_state.evidence},
-        failure_reason_code=trial.terminal_reason_code,
+        final_state=final_state,
     )
     graders = run_deterministic_graders(context)
     stored_graders = tuple(
@@ -567,7 +551,7 @@ def _score_trial(
         output=output,
         edges=edges,
         decisions=decisions,
-        accepted_proposal_keys=_accepted_keys(verification),
+        accepted_proposal_keys=accepted_proposal_keys_from_report(verification),
     )
     missing = [
         item.review_item_id

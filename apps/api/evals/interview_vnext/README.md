@@ -1,10 +1,24 @@
 # Interview vNext — eval-only provider adapters
 
-**Status（2026-07-18）：OpenRouter-first V3-4R live-verified complete；V3-5 detailed handoff ready、implementation pending**
+**Status（2026-07-18）：V3-5 turn eval harness E0–E7 已落地並全綠;E8 true live batch 待 owner 觸發**
+
+- V3-5 turn eval harness(`contracts`/`loader`/`identities`/`fixture_builder`/`turn_eval_runner`/
+  `capture_export`/`turn_graders`/`review`/`turn_report`/`scheduler`/`batch_orchestrator`/`live_wiring`/
+  `turn_eval_cli`)已落地。focused 逐檔:contracts **32**、loader **62**、fixtures **9**、
+  graders/review **26**、PG reference harness **5**、runner/report/export **8**、OpenRouter CLI/wiring **14**。
+- 12 個繁中 pilot cases(8 dev + 4 challenge)已凍結;suite hash
+  `sha256:ed51167d64a9887f7a119568ad501ea71e1edd63eace6e44ccba222b5d763d5a`;12/12 reference output 通過
+  production ContextBuilder/verifier/reducer gate,mocked 12×3 batch 端到端在 real PostgreSQL 產出
+  `TURN_GATE_PASS_ENGINEERING`(harness 自測,**非** promotion-eligible)。
+- **E8 尚未執行**:true live 12×3 batch 需 owner 確認 OpenRouter account checklist(§10.2)並提供
+  `OPENROUTER_API_KEY`;harness 已備妥,但**尚未證明真模型品質**。V3-5 通過只代表可開始 V3-6 `episode_code`。
+- 完整 API + real PostgreSQL:**886 passed, 0 skipped**;`app/` 不 import `evals.*`(dependency guard 強制)。
+
+## V3-4R 既有里程碑(保留)
 
 - OpenRouter focused mocked suite:`model_catalog`(51)+`eval_adapter`(88)+`live_probe`(9)=
-  **148 passed**；OpenAI direct reference regression **66 passed**；neutral/import/fixed-replay PostgreSQL
-  **23 passed**；完整 API + real PostgreSQL **762 passed, 0 skipped**。
+  **148 passed**；OpenAI direct reference regression **66 passed**;neutral/import/fixed-replay PostgreSQL
+  **23 passed**。
 - **OpenRouter live gate(§15.5)已通過**：run `921f71a9-850c-48de-b8ab-4a98efd24134`，
   `anthropic/claude-sonnet-5`、permanent canonical
   `anthropic/claude-sonnet-5-20260630`、endpoint `anthropic`；direct/attempt 1、pipeline空、
@@ -32,7 +46,27 @@ V2/V3 已發布的 provider-neutral contract(`app.interview_vnext.llm`)」。
 - **production `apps/api/app/` 不得 import 本目錄**;dependency guard 測試強制。
 - 這裡沒有品質評測:V3-4 只做 adapter conformance;12-case 品質/多 trial 是 V3-5。
 
-## 檔案
+## V3-5 turn eval harness 檔案
+
+| 檔案 | 責任 |
+|---|---|
+| `contracts.py` | case/transcript/initial-fixture/gold/reference-output/suite-manifest/batch-plan/trial/grader-result/review-decision/case-report/batch-report 的 strict 契約 + hash-bound 定義 + N/A-preserving metrics |
+| `write_schemas.py` + `schemas/turn-eval-*.v1.schema.json` | 11 份可攜 JSON Schema 的 deterministic 匯出 + drift check |
+| `loader.py` | path/byte(UTF-8/LF/無 BOM/無 symlink/無未知檔)、transcript 結構、overlapping-occurrence quote、三層 runtime/evaluation/content hash、gold 隔離、suite balance |
+| `identities.py` | logical key → trial-scoped UUIDv5(tenant/user/profile/session/run/turn/episode/evidence/slot/trial) |
+| `fixture_builder.py` | case → 公開 durable command 序列 + 純函式 reference gate(production context/verifier/reducer) |
+| `turn_eval_runner.py` | 一個 trial 的 durable 執行(fresh session/run + 公開 command replay + `execute_turn_interpret` + 同-UoW finalize);tenant-scoped cleanup |
+| `capture_export.py` | read-only PostgreSQL Capture bundle 匯出 + re-validation + event chain + secret/reasoning scan |
+| `turn_graders.py` | 9 個 deterministic grader、candidate edges、一對一 maximum-cardinality matching、raw/committed precision/recall/qualifier metrics |
+| `review.py` | 盲化 review queue(per-edge item、隱藏 provider identity、seed 重排)+ import(hash/identity/revision gate) |
+| `turn_report.py` | per-case pass^3、batch hard/quality gate、decision enum、Markdown renderer |
+| `scheduler.py` | disposition 分類、infrastructure replacement、budget、atomic trial bundle + integrity manifest |
+| `batch_orchestrator.py` | run → export → grade → review → report 的完整 batch 組裝(mocked 自測 12×3) |
+| `live_wiring.py` | 每 batch 一次 catalog snapshot + config + preflight;eval DB 名稱安全(只接受 `_test`/`_eval`) |
+| `turn_eval_cli.py` | validate-suite / reference-gate / mocked-batch / live-batch / export-review / import-review / report;§17.2 exit codes |
+| `cases/{development,challenge}/TI-*/` | 12 個繁中 pilot cases(case/transcript/initial/reference-snapshot/gold/reference-output/adjudication) |
+
+## V3-4R adapter 檔案
 
 | 檔案 | 責任 |
 |---|---|
@@ -68,7 +102,54 @@ OpenAI direct(reference):
 - `openai==2.46.0`、`max_retries=0`;`store/background/stream=false`、`truncation=disabled`;
   typed traversal 全部 `response.output` items,禁 `output[0]`／`output_text` 串接。
 
-## 驗收命令
+## V3-5 turn eval CLI
+
+```powershell
+cd apps/api
+# 只驗 case/schema/hash/cross refs,不需 DB/key
+uv run --locked python -m evals.interview_vnext.turn_eval_cli validate-suite `
+  --suite-version turn-interpret-pilot.v1
+# known-good outputs 走純函式 production gate(不需 DB/key)
+uv run --locked python -m evals.interview_vnext.turn_eval_cli reference-gate `
+  --suite-version turn-interpret-pilot.v1
+# mocked 12×3 batch(需 eval DB;harness 自測,非 promotion)
+$env:INTERVIEW_VNEXT_EVAL_DATABASE_URL='postgresql+asyncpg://postgres:password@localhost:5432/caliburn_test'
+uv run --locked python -m evals.interview_vnext.turn_eval_cli mocked-batch `
+  --suite-version turn-interpret-pilot.v1 `
+  --database-url-env INTERVIEW_VNEXT_EVAL_DATABASE_URL `
+  --output-dir ../../output/interview_vnext/turn-eval
+# 讀回既有 batch 的 decision
+uv run --locked python -m evals.interview_vnext.turn_eval_cli report --batch-dir '<path>'
+```
+
+exit codes:`0` 通過、`1` gate fail/review incomplete/batch incomplete、`2` usage/缺
+key/env/checklist/budget、`3` preflight/catalog/config/harness integrity、`4` runner/DB/Capture 例外。
+
+### E8 true live batch(需 owner 授權,尚未執行)
+
+live batch 對真 OpenRouter Claude/Anthropic 路徑跑正式 12×3。**owner 必須先**確認 §10.2 account
+checklist(無 preset/allowlist/Prevent-Overrides、dedicated key 有 spend limit、`.env` 不進 Git),
+再提供 `OPENROUTER_API_KEY` 與 `_eval` 結尾的 eval DB。無 key → exit 2、不建 batch dir、不打 catalog、不碰 DB。
+
+```powershell
+cd apps/api
+$env:OPENROUTER_API_KEY='<secret>'
+$env:INTERVIEW_VNEXT_EVAL_DATABASE_URL='postgresql+asyncpg://.../<name>_eval'
+uv run --locked python -m evals.interview_vnext.turn_eval_cli live-batch `
+  --suite-version turn-interpret-pilot.v1 `
+  --database-url-env INTERVIEW_VNEXT_EVAL_DATABASE_URL `
+  --model anthropic/claude-sonnet-5 --upstream-endpoint anthropic `
+  --data-collection deny --zdr-required false --reasoning-effort medium `
+  --quality-slots 3 --max-trial-attempts-per-slot 3 --max-concurrency 1 `
+  --max-inference-calls 120 --max-observed-cost-usd 10.00 --max-wall-clock-minutes 180 `
+  --account-checklist-confirmed-at '<UTC>' --account-checklist-confirmed-by '<owner>' `
+  --output-dir ../../output/interview_vnext/turn-eval
+```
+
+live batch 完成後才做盲化人工裁決(export-review → import-review → report),並回寫真 batch ID/hash/
+模型/endpoint/trials/cost/gate。只有 `TURN_GATE_PASS_ENGINEERING` 或更高才可把 V3-6 標 unblocked。
+
+## V3-4R 驗收命令(保留)
 
 ```powershell
 cd apps/api

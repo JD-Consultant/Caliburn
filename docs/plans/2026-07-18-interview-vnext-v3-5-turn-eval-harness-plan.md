@@ -1,6 +1,8 @@
 # Interview AI vNext V3-5——Turn Interpreter 評測 harness、12-case multi-trial 與品質 gate 交接規格
 
-- 狀態：**implementation-ready；文件核准後由實作者落地，尚未開始寫 V3-5 code／cases**
+- 狀態：**E0–E7 已落地並全綠(886 passed / 0 skipped);E8 true live 12×3 batch 待 owner 確認 account checklist 並提供 `OPENROUTER_API_KEY` 後執行**
+  - suite hash(turn-interpret-pilot.v1):`sha256:ed51167d64a9887f7a119568ad501ea71e1edd63eace6e44ccba222b5d763d5a`
+  - commits:E0 `ce29bd9`、E1 `73813db`、E2 `991ba4e`、E3 `6a2c2d4`、E4 `ddd363e`、E5 `0d4f058`、E6 `2362682`、E7 `f3e55c2`
 - 日期：2026-07-18
 - 前置：V3-0～V3-3 完成；V3-4R OpenRouter mocked + true live conformance 已通過
 - 本切片：**V3-5 only**；建立 deterministic harness、12 個 `turn_interpret` component cases、每 case 三個可計分 trial、人工語意裁決與 batch report

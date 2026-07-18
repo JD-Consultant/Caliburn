@@ -274,7 +274,7 @@
       "type": "string"
     },
     "session_status_before_replay": {
-      "const": "draft",
+      "const": "planned",
       "title": "Session Status Before Replay",
       "type": "string"
     },

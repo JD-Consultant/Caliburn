@@ -524,7 +524,8 @@ async def test_reference_batch_reaches_engineering_pass(
         created_at=TRIAL_STARTED_AT,
     )
     assert report.decision == BatchDecision.TURN_GATE_PASS_ENGINEERING
-    assert report.promotion_eligible is True
+    # §8.3:mocked batch 永不 promotion-eligible(只有 live 可)
+    assert report.promotion_eligible is False
     assert all(entry.pass_pow_3 for entry in report.case_matrix)
     assert report.recall_micro.value == Decimal("1.000000")
 

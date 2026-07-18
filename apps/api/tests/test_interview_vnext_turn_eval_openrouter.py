@@ -1,8 +1,8 @@
-"""V3-5 E7:OpenRouter live wiring 與 CLI 的無 key / DB safety / contamination gate。
+"""V3-5 E7/E8:OpenRouter live wiring、CLI 與 executable batch gate。
 
-Live batch 不進一般 CI;此檔只驗「不需 key 的路徑」:CLI 參數 gate、無
-OPENROUTER_API_KEY 立即 exit 2 且零 network/DB/output、eval DB 名稱安全、
-以及 route contamination 由既有 adapter 判定的 disposition 分類。
+真外網 batch 不進一般 CI；此檔驗 CLI 參數 gate、無 key 零副作用、eval DB
+安全、route contamination 分流，並以 scripted reference + synthetic clean
+route 在 real PostgreSQL 跑完整 12×3/review/report，不冒充真模型品質。
 """
 
 from __future__ import annotations
@@ -163,16 +163,25 @@ def test_eval_db_only_from_env_and_rejects_production(monkeypatch):
 
 
 def test_route_contamination_is_harness_invalid():
-    """A DB/runner exception during a trial classifies as harness_invalid (§9.4)."""
+    """A route-invalid terminal result is never a model-quality failure (§9.4)."""
 
     from evals.interview_vnext.scheduler import classify_disposition
     from evals.interview_vnext.contracts import TrialDisposition
+    from app.interview_vnext.application.operation_executor import (
+        TurnExecutionStatus,
+    )
+    from types import SimpleNamespace
 
     disposition, reason = classify_disposition(
-        None, error=RuntimeError("route contaminated: resolved model mismatch")
+        SimpleNamespace(
+            outcome=SimpleNamespace(
+                status=TurnExecutionStatus.FAILED,
+                reason_code="openrouter.route_contaminated",
+            )
+        )
     )
     assert disposition == TrialDisposition.HARNESS_INVALID
-    assert reason == "RuntimeError"
+    assert reason == "openrouter.route_contaminated"
 
 
 def test_timeout_reason_is_infrastructure_invalid():
@@ -251,7 +260,7 @@ def test_no_key_makes_no_catalog_or_db_call(tmp_path, monkeypatch):
 async def test_mocked_batch_orchestrator_writes_bundle_and_report(
     postgres_session_factory, tmp_path
 ):
-    from uuid import uuid4
+    from uuid import uuid4, uuid5
 
     from evals.interview_vnext.batch_orchestrator import orchestrate_mocked_batch
     from evals.interview_vnext.contracts import TurnEvalBatchReport
@@ -281,5 +290,191 @@ async def test_mocked_batch_orchestrator_writes_bundle_and_report(
         assert (result.batch_dir / "batch-report.md").is_file()
         trial_dirs = list(result.batch_dir.glob("trials/*/slot-*/trial-attempt-*"))
         assert len(trial_dirs) == 36
+    finally:
+        await cleanup_trial_rows(postgres_session_factory, list(result.trial_ids))
+
+
+async def test_live_orchestrator_requires_unique_review_and_rebuilds_report(
+    postgres_session_factory, tmp_path
+):
+    """E8 path:durable 12×3 → unique blind queue → imported final report."""
+
+    import json
+    from uuid import uuid4, uuid5
+
+    from app.interview_vnext.application.operation_executor import (
+        TurnInterpretProviderProfile,
+    )
+    from app.interview_vnext.observability.artifacts import build_inline_artifact
+    from evals.interview_vnext.batch_orchestrator import _reference_llm_factory
+    from evals.interview_vnext.contracts import (
+        BatchDecision,
+        ReviewDecisionLabel,
+        TurnEvalReviewDecision,
+    )
+    from evals.interview_vnext.live_batch import (
+        apply_review_decisions,
+        load_review_queue,
+        orchestrate_live_batch,
+        rebuild_live_report,
+    )
+    from evals.interview_vnext.live_wiring import LiveBatchProfile
+    from evals.interview_vnext.loader import load_suite
+    from evals.interview_vnext.openrouter_model_catalog import (
+        OpenRouterEndpointSnapshot,
+        OpenRouterModelSnapshot,
+    )
+    from evals.interview_vnext.openrouter_provider_config import (
+        OpenRouterProbeInputs,
+        build_openrouter_eval_config,
+    )
+    from evals.interview_vnext.providers.openrouter_chat import (
+        ROUTING_ARTIFACT_KIND,
+        ROUTING_ARTIFACT_LABEL,
+    )
+    from evals.interview_vnext.scheduler import Budget
+    from evals.interview_vnext.turn_eval_runner import cleanup_trial_rows
+
+    fixtures = Path(__file__).parent / "fixtures/interview_vnext/openrouter_chat"
+    requested_model = "testlab/analyst-large"
+    fetched_at = datetime(2026, 7, 18, 9, 0, tzinfo=UTC)
+    model_snapshot = OpenRouterModelSnapshot(
+        requested_model=requested_model,
+        fetched_at=fetched_at,
+        url_path=f"/model/{requested_model}",
+        raw=json.loads((fixtures / "catalog-model.json").read_text("utf-8")),
+    )
+    endpoint_snapshot = OpenRouterEndpointSnapshot(
+        requested_model=requested_model,
+        fetched_at=fetched_at,
+        url_path=f"/models/{requested_model}/endpoints",
+        raw=json.loads((fixtures / "catalog-endpoints.json").read_text("utf-8")),
+    )
+    config = build_openrouter_eval_config(
+        OpenRouterProbeInputs(
+            requested_model=requested_model,
+            upstream_endpoint_slug="testhost",
+            data_collection="deny",
+            zdr_required=False,
+            reasoning_effort="medium",
+        ),
+        model_snapshot,
+        endpoint_snapshot,
+    )
+    profile = LiveBatchProfile(
+        config=config,
+        model_snapshot=model_snapshot,
+        endpoint_snapshot=endpoint_snapshot,
+        provider_profile=TurnInterpretProviderProfile(
+            provider="openrouter", requested_model=requested_model
+        ),
+    )
+    suite = load_suite(CASES_ROOT, suite_version="turn-interpret-pilot.v1")
+    reference_factory = _reference_llm_factory(suite)
+
+    class RouteDecoratingLlm:
+        def __init__(self, inner):
+            self.inner = inner
+
+        async def generate_structured(self, request):
+            envelope = await self.inner.generate_structured(request)
+            route = build_inline_artifact(
+                artifact_id=uuid5(request.attempt_id, ROUTING_ARTIFACT_LABEL),
+                kind=ROUTING_ARTIFACT_KIND,
+                media_type="application/json",
+                payload={
+                    "schema_version": "openrouter_routing.v1",
+                    "requested_model": requested_model,
+                    "resolved_model": requested_model,
+                    "selected_provider_name": "TestHost",
+                    "selected_model": config.catalog_canonical_model,
+                    "strategy": "direct",
+                    "router_attempt": 1,
+                    "attempts": [],
+                    "pipeline": [],
+                    "generation_id": f"gen-{request.attempt_id}",
+                    "cost": "0.001",
+                    "conformance": {
+                        "metadata_present": True,
+                        "model_match": True,
+                        "provider_model_match": True,
+                        "single_upstream_attempt": True,
+                        "pipeline_clean": True,
+                    },
+                },
+                run_id=request.run_id,
+                session_id=request.session_id,
+                turn_id=request.turn_id,
+                operation_id=request.operation_id,
+                attempt_id=request.attempt_id,
+                created_at=envelope.result.completed_at,
+                contains_test_data=True,
+            )
+            return envelope.model_copy(
+                update={
+                    "supporting_artifacts": (
+                        *envelope.supporting_artifacts,
+                        route,
+                    )
+                }
+            )
+
+    def llm_factory(inputs, trial_id):
+        return RouteDecoratingLlm(
+            reference_factory(inputs, trial_id, datetime.now(UTC))
+        )
+
+    batch_id = uuid4()
+    result = await orchestrate_live_batch(
+        suite,
+        session_factory=postgres_session_factory,
+        output_dir=tmp_path,
+        batch_id=batch_id,
+        live_profile=profile,
+        llm_factory=llm_factory,
+        budget=Budget(
+            max_inference_calls=120,
+            max_observed_cost_usd=Decimal("10.00"),
+            max_wall_clock_seconds=180 * 60,
+        ),
+        quality_slots=3,
+        max_trial_attempts=3,
+        max_concurrency=1,
+        git_sha="1" * 40,
+        dirty_worktree=False,
+        account_confirmed_at=fetched_at,
+        account_confirmed_by="owner",
+    )
+    try:
+        assert result.decision == BatchDecision.REVIEW_INCOMPLETE.value
+        queue = load_review_queue(result.batch_dir)
+        assert len(queue) == len({item.review_item_id for item in queue})
+        decisions = [
+            TurnEvalReviewDecision(
+                schema_version="turn_eval_review_decision.v1",
+                review_item_id=item.review_item_id,
+                review_item_hash=item.review_item_hash,
+                decision=(
+                    ReviewDecisionLabel.DIFFERENT
+                    if item.gold_id == "__unmatched__"
+                    else ReviewDecisionLabel.EQUIVALENT
+                ),
+                reason="語意與評測規格相符",
+                reviewer="maintainer",
+                reviewed_at=datetime.now(UTC),
+            )
+            for item in queue
+        ]
+        decision = apply_review_decisions(
+            result.batch_dir,
+            decisions,
+            failure_traces_read=0,
+            passing_trace_sample_read=8,
+        )
+        assert decision == BatchDecision.TURN_GATE_PASS_ENGINEERING.value
+        report = rebuild_live_report(result.batch_dir)
+        assert report.promotion_eligible is True
+        assert report.totals.quality_trials == 36
+        assert report.totals.observed_cost_total_usd == Decimal("0.036")
     finally:
         await cleanup_trial_rows(postgres_session_factory, list(result.trial_ids))

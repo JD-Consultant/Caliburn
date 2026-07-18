@@ -16,11 +16,13 @@ from __future__ import annotations
 
 import argparse
 import os
+import subprocess
 import sys
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
+from uuid import uuid4
 
 from .live_wiring import API_KEY_ENV, EvalDatabaseError, resolve_eval_database_url
 
@@ -177,6 +179,15 @@ def cmd_report(args) -> int:
         return EXIT_USAGE
     from .contracts import BatchDecision, TurnEvalBatchReport
 
+    if (batch_dir / "batch-plan.json").is_file():
+        from .live_batch import rebuild_live_report
+
+        try:
+            rebuild_live_report(batch_dir)
+        except Exception as exc:  # noqa: BLE001 - CLI integrity boundary
+            print(f"report rebuild error: {exc}", file=sys.stderr)
+            return EXIT_PREFLIGHT
+
     report = TurnEvalBatchReport.model_validate_json(report_path.read_text("utf-8"))
     print(f"decision={report.decision.value} promotion_eligible={report.promotion_eligible}")
     passing = {
@@ -244,18 +255,151 @@ def _parse_bool(value: str) -> bool:
 
 def cmd_live_batch(args) -> int:
     try:
-        validate_live_batch_args(args)
+        live_args = validate_live_batch_args(args)
     except UsageError as exc:
         print(f"usage error: {exc}", file=sys.stderr)
         return EXIT_USAGE
-    # 實際 live 執行由 E8 owner 觸發;此處確認參數 gate 通過後,
-    # 尚未實作 online orchestration,回報 preflight-pending 而非假裝跑完。
-    print(
-        "live-batch arguments validated; online orchestration is triggered by the "
-        "owner in E8 (see the V3-5 plan §19 E8).",
-        file=sys.stderr,
+    if args.quality_slots != 3:
+        print("usage error: formal live batch requires --quality-slots 3", file=sys.stderr)
+        return EXIT_USAGE
+    if args.max_trial_attempts_per_slot not in (1, 2, 3):
+        print(
+            "usage error: --max-trial-attempts-per-slot must be 1..3",
+            file=sys.stderr,
+        )
+        return EXIT_USAGE
+    if args.max_concurrency != 1:
+        print(
+            "usage error: first formal live batch requires --max-concurrency 1",
+            file=sys.stderr,
+        )
+        return EXIT_USAGE
+
+    from .loader import CaseLoadError, load_suite
+
+    try:
+        suite = load_suite(Path(args.cases_root), suite_version=args.suite_version)
+    except CaseLoadError as exc:
+        print(f"suite integrity error: {exc}", file=sys.stderr)
+        return EXIT_PREFLIGHT
+
+    try:
+        git_sha, dirty = _git_snapshot()
+    except RuntimeError as exc:
+        print(f"git preflight error: {exc}", file=sys.stderr)
+        return EXIT_PREFLIGHT
+    if dirty:
+        print("git preflight error: formal live batch requires a clean worktree", file=sys.stderr)
+        return EXIT_PREFLIGHT
+
+    import asyncio
+    import httpx
+    from sqlalchemy.ext.asyncio import (
+        AsyncSession,
+        async_sessionmaker,
+        create_async_engine,
     )
-    return EXIT_PREFLIGHT
+
+    from .live_batch import orchestrate_live_batch
+    from .live_wiring import (
+        LivePreflightError,
+        build_live_adapter,
+        build_live_batch_profile,
+    )
+    from .openrouter_model_catalog import CatalogProbeError
+    from .openrouter_provider_config import OpenRouterProbeInputs
+    from .scheduler import Budget as SchedulerBudget
+    from .turn_eval_runner import cleanup_trial_rows
+
+    async def run():
+        client = httpx.AsyncClient(follow_redirects=False)
+        engine = None
+        adapter = None
+        try:
+            probe_inputs = OpenRouterProbeInputs(
+                requested_model=live_args.model,
+                upstream_endpoint_slug=live_args.upstream_endpoint,
+                data_collection=live_args.data_collection,
+                zdr_required=live_args.zdr_required,
+                reasoning_effort=live_args.reasoning_effort,
+            )
+            profile = await build_live_batch_profile(
+                api_key=live_args.api_key,
+                probe_inputs=probe_inputs,
+                reasoning_effort=live_args.reasoning_effort,
+                http_client=client,
+            )
+            adapter = build_live_adapter(
+                profile, api_key=live_args.api_key, http_client=client
+            )
+            engine = create_async_engine(live_args.database_url)
+            factory = async_sessionmaker(
+                engine, expire_on_commit=False, class_=AsyncSession
+            )
+            result = await orchestrate_live_batch(
+                suite,
+                session_factory=factory,
+                output_dir=Path(args.output_dir),
+                batch_id=uuid4(),
+                live_profile=profile,
+                llm=adapter,
+                budget=SchedulerBudget(
+                    max_inference_calls=live_args.budget.max_inference_calls,
+                    max_observed_cost_usd=live_args.budget.max_observed_cost_usd,
+                    max_wall_clock_seconds=(
+                        live_args.budget.max_wall_clock_minutes * 60
+                    ),
+                ),
+                quality_slots=args.quality_slots,
+                max_trial_attempts=args.max_trial_attempts_per_slot,
+                max_concurrency=args.max_concurrency,
+                git_sha=git_sha,
+                dirty_worktree=dirty,
+                account_confirmed_at=live_args.checklist.confirmed_at,
+                account_confirmed_by=live_args.checklist.confirmed_by,
+            )
+            await cleanup_trial_rows(factory, list(result.trial_ids))
+            return result
+        finally:
+            if adapter is not None:
+                await adapter.aclose()
+            await client.aclose()
+            if engine is not None:
+                await engine.dispose()
+
+    try:
+        result = asyncio.run(run())
+    except (CatalogProbeError, LivePreflightError, ValueError) as exc:
+        print(f"live preflight error: {exc}", file=sys.stderr)
+        return EXIT_PREFLIGHT
+    except Exception as exc:  # noqa: BLE001 - preserve bundle, surface runner error
+        print(f"live runner error: {type(exc).__name__}: {exc}", file=sys.stderr)
+        return EXIT_RUNNER
+
+    print(f"live batch={result.batch_dir.name} decision={result.decision}")
+    print(f"bundle={result.batch_dir}")
+    print(f"review_queue={result.review_queue_path}")
+    return EXIT_GATE_FAIL
+
+
+def _git_snapshot() -> tuple[str, bool]:
+    def run(*argv: str) -> str:
+        completed = subprocess.run(
+            argv,
+            check=False,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+        )
+        if completed.returncode != 0:
+            raise RuntimeError(completed.stderr.strip() or "git command failed")
+        return completed.stdout.strip()
+
+    sha = run("git", "rev-parse", "HEAD")
+    if len(sha) != 40:
+        raise RuntimeError("git HEAD is not a 40-character SHA")
+    dirty = bool(run("git", "status", "--porcelain"))
+    return sha, dirty
 
 
 def cmd_mocked_batch(args) -> int:
@@ -312,13 +456,40 @@ def cmd_mocked_batch(args) -> int:
 
 
 def cmd_export_review(args) -> int:
-    print("export-review requires a completed batch bundle (E8).", file=sys.stderr)
-    return EXIT_PREFLIGHT
+    from .live_batch import LiveBatchError, load_review_queue
+
+    batch_dir = Path(args.batch_dir)
+    try:
+        queue = load_review_queue(batch_dir)
+    except (LiveBatchError, OSError, ValueError) as exc:
+        print(f"review export error: {exc}", file=sys.stderr)
+        return EXIT_PREFLIGHT
+    print(f"review_queue={batch_dir / 'review-queue.jsonl'} items={len(queue)}")
+    return EXIT_OK
 
 
 def cmd_import_review(args) -> int:
-    print("import-review requires a completed batch bundle (E8).", file=sys.stderr)
-    return EXIT_PREFLIGHT
+    from .contracts import BatchDecision, TurnEvalReviewDecision
+    from .live_batch import LiveBatchError, _read_jsonl, apply_review_decisions
+    from .review import ReviewImportError
+
+    try:
+        decisions = _read_jsonl(Path(args.decisions), TurnEvalReviewDecision)
+        decision = apply_review_decisions(
+            Path(args.batch_dir),
+            decisions,
+            failure_traces_read=args.failure_traces_read,
+            passing_trace_sample_read=args.passing_trace_sample_read,
+        )
+    except (LiveBatchError, ReviewImportError, OSError, ValueError) as exc:
+        print(f"review import error: {exc}", file=sys.stderr)
+        return EXIT_PREFLIGHT
+    print(f"decision={decision}")
+    passing = {
+        BatchDecision.TURN_GATE_PASS_ENGINEERING.value,
+        BatchDecision.TURN_GATE_PASS_DOMAIN_REVIEWED.value,
+    }
+    return EXIT_OK if decision in passing else EXIT_GATE_FAIL
 
 
 # ── argument parser ──────────────────────────────────────────────────────────
@@ -373,6 +544,8 @@ def build_parser() -> argparse.ArgumentParser:
     imp = sub.add_parser("import-review")
     imp.add_argument("--batch-dir", required=True)
     imp.add_argument("--decisions", required=True)
+    imp.add_argument("--failure-traces-read", type=int, default=0)
+    imp.add_argument("--passing-trace-sample-read", type=int, default=0)
     imp.set_defaults(func=cmd_import_review)
 
     report = sub.add_parser("report")

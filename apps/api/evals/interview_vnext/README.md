@@ -1,6 +1,6 @@
 # Interview vNext — eval-only provider adapters
 
-**Status（2026-07-18）：V3-5 turn eval harness E0–E7 已落地並全綠;E8 true live batch 待 owner 觸發**
+**Status（2026-07-18）：V3-5 E0–E8 executable harness 已落地並全綠；true live 12×3 待 clean-commit 執行、裁決與定案**
 
 - V3-5 turn eval harness(`contracts`/`loader`/`identities`/`fixture_builder`/`turn_eval_runner`/
   `capture_export`/`turn_graders`/`review`/`turn_report`/`scheduler`/`batch_orchestrator`/`live_wiring`/
@@ -10,9 +10,10 @@
   `sha256:ed51167d64a9887f7a119568ad501ea71e1edd63eace6e44ccba222b5d763d5a`;12/12 reference output 通過
   production ContextBuilder/verifier/reducer gate,mocked 12×3 batch 端到端在 real PostgreSQL 產出
   `TURN_GATE_PASS_ENGINEERING`(harness 自測,**非** promotion-eligible)。
-- **E8 尚未執行**:true live 12×3 batch 需 owner 確認 OpenRouter account checklist(§10.2)並提供
-  `OPENROUTER_API_KEY`;harness 已備妥,但**尚未證明真模型品質**。V3-5 通過只代表可開始 V3-6 `episode_code`。
-- 完整 API + real PostgreSQL:**886 passed, 0 skipped**;`app/` 不 import `evals.*`(dependency guard 強制)。
+- **E8 online orchestration 已實作、true live 尚未執行**：owner 已授權 gitignored `.env` key、US$1 hard
+  cap 與 Codex-assisted blind review；正式批次仍須在 clean commit 上產生真 bundle 才能證明模型品質。
+- E8 focused **125 passed**；adapter regression **229 passed**；完整 API + real PostgreSQL：
+  **887 passed, 0 skipped**；`app/` 不 import `evals.*`(dependency guard 強制)。
 
 ## V3-4R 既有里程碑(保留)
 
@@ -63,6 +64,7 @@ V2/V3 已發布的 provider-neutral contract(`app.interview_vnext.llm`)」。
 | `scheduler.py` | disposition 分類、infrastructure replacement、budget、atomic trial bundle + integrity manifest |
 | `batch_orchestrator.py` | run → export → grade → review → report 的完整 batch 組裝(mocked 自測 12×3) |
 | `live_wiring.py` | 每 batch 一次 catalog snapshot + config + preflight;eval DB 名稱安全(只接受 `_test`/`_eval`) |
+| `live_batch.py` | E8 真 12×3 orchestration、attempt route/cost ledger、blind review import、immutable trial regrade + final report |
 | `turn_eval_cli.py` | validate-suite / reference-gate / mocked-batch / live-batch / export-review / import-review / report;§17.2 exit codes |
 | `cases/{development,challenge}/TI-*/` | 12 個繁中 pilot cases(case/transcript/initial/reference-snapshot/gold/reference-output/adjudication) |
 
@@ -125,7 +127,7 @@ uv run --locked python -m evals.interview_vnext.turn_eval_cli report --batch-dir
 exit codes:`0` 通過、`1` gate fail/review incomplete/batch incomplete、`2` usage/缺
 key/env/checklist/budget、`3` preflight/catalog/config/harness integrity、`4` runner/DB/Capture 例外。
 
-### E8 true live batch(需 owner 授權,尚未執行)
+### E8 true live batch(owner 已授權 US$1，尚未執行)
 
 live batch 對真 OpenRouter Claude/Anthropic 路徑跑正式 12×3。**owner 必須先**確認 §10.2 account
 checklist(無 preset/allowlist/Prevent-Overrides、dedicated key 有 spend limit、`.env` 不進 Git),
@@ -146,8 +148,20 @@ uv run --locked python -m evals.interview_vnext.turn_eval_cli live-batch `
   --output-dir ../../output/interview_vnext/turn-eval
 ```
 
-live batch 完成後才做盲化人工裁決(export-review → import-review → report),並回寫真 batch ID/hash/
-模型/endpoint/trials/cost/gate。只有 `TURN_GATE_PASS_ENGINEERING` 或更高才可把 V3-6 標 unblocked。
+live batch 正常先回 `REVIEW_INCOMPLETE`；之後做盲化裁決(export-review → import-review → report)：
+
+```powershell
+uv run --locked python -m evals.interview_vnext.turn_eval_cli export-review `
+  --batch-dir '<batch-dir>'
+uv run --locked python -m evals.interview_vnext.turn_eval_cli import-review `
+  --batch-dir '<batch-dir>' --decisions '<decisions.jsonl>' `
+  --failure-traces-read '<count>' --passing-trace-sample-read '<count>'
+uv run --locked python -m evals.interview_vnext.turn_eval_cli report `
+  --batch-dir '<batch-dir>'
+```
+
+裁決完成後回寫真 batch ID/hash/模型/endpoint/trials/cost/gate。只有
+`TURN_GATE_PASS_ENGINEERING` 或更高才可把 V3-6 標 unblocked。
 
 ## V3-4R 驗收命令(保留)
 

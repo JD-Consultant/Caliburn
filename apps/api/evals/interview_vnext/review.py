@@ -138,6 +138,7 @@ def _gold_view(item: TurnEvalGoldObservation) -> ReviewGoldView:
 def build_review_items(
     *,
     batch_id: UUID,
+    trial_id: UUID,
     inputs: TurnEvalCaseInputs,
     gold: TurnEvalGold,
     output: TurnInterpretOutput,
@@ -168,7 +169,8 @@ def build_review_items(
         )
         rubric = _gold_view(gold_by_id[gold_id]) if gold_id != UNMATCHED_GOLD_ID else None
         review_item_id = uuid5(
-            batch_id, f"review/{inputs.case.case_id}/{gold_id}/{proposal_key}"
+            batch_id,
+            f"review/{trial_id}/{inputs.case.case_id}/{gold_id}/{proposal_key}",
         )
         body = {
             "case_id": inputs.case.case_id,

@@ -508,6 +508,7 @@ def build_reference_review(suite, case_id, batch_id):
     ]
     items = build_review_items(
         batch_id=batch_id,
+        trial_id=trial_id,
         inputs=inputs,
         gold=evaluation.gold,
         output=result.output,

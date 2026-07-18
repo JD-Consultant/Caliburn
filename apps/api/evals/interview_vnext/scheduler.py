@@ -51,6 +51,20 @@ _INFRASTRUCTURE_MARKERS = (
     "transport",
     "provider.5",
     "connect",
+    "provider_overloaded",
+    "server_error",
+)
+
+# These failures invalidate attribution/configuration rather than measuring
+# turn-interpret quality.  They must stop the batch instead of entering the
+# quality denominator (§9.4).
+_HARNESS_FAILURE_MARKERS = (
+    "route_contaminated",
+    "resolved_model_mismatch",
+    "binding_invalid",
+    "authentication_failed",
+    "permission_denied",
+    "credits_unavailable",
 )
 
 
@@ -95,6 +109,8 @@ def classify_disposition(
     if outcome.status == TurnExecutionStatus.PENDING:
         return TrialDisposition.HARNESS_INVALID, "pending_checkpoint"
     reason = (outcome.reason_code or "").lower()
+    if any(marker in reason for marker in _HARNESS_FAILURE_MARKERS):
+        return TrialDisposition.HARNESS_INVALID, outcome.reason_code
     if any(marker in reason for marker in _INFRASTRUCTURE_MARKERS):
         return TrialDisposition.INFRASTRUCTURE_INVALID, outcome.reason_code
     # refusal / max tokens / content filter / parse/schema fail on normal input
@@ -133,6 +149,10 @@ def build_trial_record(
     reason_code: str | None,
     requested_model: str,
     capture: CaptureBundle,
+    attempt_records: tuple[TrialAttemptRecord, ...] | None = None,
+    provider_config_hash: str | None = None,
+    model_catalog_hash: str | None = None,
+    endpoint_catalog_hash: str | None = None,
 ) -> TurnEvalTrial:
     ids = execution.ids
     outcome = execution.outcome
@@ -144,8 +164,22 @@ def build_trial_record(
     report = outcome.verification_report
     accepted_ids = tuple(report.accepted_evidence_ids) if report else ()
     result = outcome.provider_result
-    usage = result.usage if result else None
-    attempts = _attempt_records(execution)
+    attempts = attempt_records if attempt_records is not None else _attempt_records(execution)
+
+    def sum_usage(field_name: str) -> int | None:
+        values = [
+            getattr(item.usage, field_name)
+            for item in attempts
+            if getattr(item.usage, field_name) is not None
+        ]
+        return sum(values) if values else None
+
+    costs = [
+        item.observed_cost_usd
+        for item in attempts
+        if item.observed_cost_usd is not None
+    ]
+    observed_cost = sum(costs, Decimal(0)) if costs else None
     return TurnEvalTrial(
         schema_version="turn_eval_trial.v1",
         trial_id=ids.trial_id,
@@ -166,30 +200,45 @@ def build_trial_record(
         included_in_quality_denominator=(
             disposition == TrialDisposition.QUALITY_SCORED
         ),
+        had_infrastructure_retry=any(
+            item.retryable is True for item in attempts[:-1]
+        ),
         terminal_run_status=execution.run.status.value,
         terminal_checkpoint_status=outcome.checkpoint.status.value,
         terminal_outcome=terminal_outcome,
         terminal_reason_code=reason_code,
         attempts=attempts,
         requested_model=requested_model,
-        state_before_hash=(
-            execution.state_before_hash
-            if terminal_outcome == "committed"
-            else None
+        context_hash=result.context_hash if result else None,
+        prompt_hash=result.prompt_hash if result else None,
+        output_schema_hash=result.output_schema_hash if result else None,
+        operation_definition_hash=(
+            result.operation_definition_hash if result else None
         ),
-        state_after_hash=(
-            execution.state_after_hash if terminal_outcome == "committed" else None
-        ),
+        provider_config_hash=provider_config_hash,
+        model_catalog_hash=model_catalog_hash,
+        endpoint_catalog_hash=endpoint_catalog_hash,
+        state_before_hash=execution.state_before_hash,
+        state_after_hash=execution.state_after_hash,
         accepted_evidence_ids=accepted_ids,
         verifier_accepted_count=report.accepted_count if report else None,
         verifier_dropped_count=report.dropped_count if report else None,
-        usage_input_tokens=usage.input_tokens if usage else None,
-        usage_output_tokens=usage.output_tokens if usage else None,
-        usage_cache_read_tokens=usage.cache_read_tokens if usage else None,
-        usage_cache_write_tokens=usage.cache_write_tokens if usage else None,
-        usage_reasoning_tokens=usage.reasoning_tokens if usage else None,
-        observed_cost_total_usd=None,
-        latency_total_ms=result.latency_ms if result else None,
+        verifier_reason_codes=tuple(
+            sorted(
+                {
+                    code.value
+                    for decision in (report.decisions if report else ())
+                    for code in decision.reason_codes
+                }
+            )
+        ),
+        usage_input_tokens=sum_usage("input_tokens"),
+        usage_output_tokens=sum_usage("output_tokens"),
+        usage_cache_read_tokens=sum_usage("cache_read_tokens"),
+        usage_cache_write_tokens=sum_usage("cache_write_tokens"),
+        usage_reasoning_tokens=sum_usage("reasoning_tokens"),
+        observed_cost_total_usd=observed_cost,
+        latency_total_ms=(sum(item.latency_ms for item in attempts) if attempts else None),
         capture_manifest_artifact_id=execution.run.manifest_artifact_id,
         capture_event_count=capture.event_count,
         capture_last_event_hash=capture.last_event_hash,
@@ -366,6 +415,10 @@ async def schedule_slot(
     max_trial_attempts: int,
     budget: Budget,
     elapsed_seconds_factory: Callable[[], float],
+    account_execution: Callable[
+        [TrialExecution], Awaitable[tuple[int, Decimal | None]]
+    ]
+    | None = None,
     on_harness_invalid: Callable[[TrialExecution | None, Exception | None], None]
     | None = None,
 ) -> SlotResult:
@@ -383,6 +436,8 @@ async def schedule_slot(
         trial_id = trial_uuid(slot_id, attempt)
         error: Exception | None = None
         execution: TrialExecution | None = None
+        accounted_calls = 1
+        accounted_cost: Decimal | None = None
         try:
             execution = await run_trial(
                 inputs,
@@ -392,11 +447,15 @@ async def schedule_slot(
                 trial_id=trial_id,
                 trial_started_at=trial_started_at_factory(),
             )
+            if account_execution is not None:
+                accounted_calls, accounted_cost = await account_execution(execution)
+            else:
+                accounted_calls = len(_attempt_records(execution)) or 1
         except Exception as exc:  # noqa: BLE001 — classify below as harness_invalid
             error = exc
         disposition, reason = classify_disposition(execution, error=error)
         budget.charge(
-            calls=len(_attempt_records(execution)) if execution else 1, cost=None
+            calls=accounted_calls, cost=accounted_cost
         )
         result.executions.append((attempt, execution, disposition, reason))
         if disposition == TrialDisposition.HARNESS_INVALID:

@@ -76,6 +76,9 @@ class TrialScore:
     observed_cost_usd: Decimal | None = None
     usage_input_tokens: int | None = None
     usage_output_tokens: int | None = None
+    usage_cache_read_tokens: int | None = None
+    usage_cache_write_tokens: int | None = None
+    usage_reasoning_tokens: int | None = None
 
     @property
     def scored(self) -> bool:
@@ -271,6 +274,9 @@ def build_batch_report(
     route_clean: bool,
     capture_verified: bool,
     created_at,
+    batch_incomplete: bool = False,
+    harness_invalid: bool = False,
+    wall_clock_seconds: int | None = None,
     failures: Sequence[FailureRecord] = (),
     limitations: Sequence[str] = (),
 ) -> TurnEvalBatchReport:
@@ -282,7 +288,10 @@ def build_batch_report(
 
     case_reports = [
         build_case_report(
-            case_id, split_by_case[case_id], gold_by_case[case_id], case_scores
+            case_id,
+            split_by_case[case_id],
+            gold_by_case[case_id],
+            _slot_scores(case_scores),
         )
         for case_id, case_scores in sorted(by_case.items())
     ]
@@ -312,25 +321,35 @@ def build_batch_report(
     ]
     split_gap_within = None if None in gap_flags else all(gap_flags)
 
-    totals = _totals(scores)
+    totals = _totals(scores, wall_clock_seconds=wall_clock_seconds)
 
     # ── hard gates(§15.3)──────────────────────────────────────────────────
     all_scored_pass = all(
         trial_hard_gate(s, gold_by_case[s.case_id]) for s in quality_scores
     )
     every_case_three_slots = all(
-        len([s for s in by_case[c] if s.scored]) == 3 for c in by_case
+        len([s for s in by_case.get(c, ()) if s.scored]) == 3
+        for c in gold_by_case
     )
     no_critical = all(s.critical_count == 0 for s in scores)
+    reports_by_case = {report.case_id: report for report in case_reports}
     all_case_specific = all(
-        r.case_specific_gate_passed is not False for r in case_reports
+        case_id not in CASE_SPECIFIC_GATE_IDS
+        or (
+            case_id in reports_by_case
+            and reports_by_case[case_id].case_specific_gate_passed is True
+        )
+        for case_id in gold_by_case
     )
     hard_gates = (
         HardGateResult(gate_name="deterministic_invariants", passed=all_scored_pass),
         HardGateResult(gate_name="route_exact", passed=route_clean),
         HardGateResult(gate_name="capture_reproducible", passed=capture_verified),
         HardGateResult(gate_name="no_critical_failure", passed=no_critical),
-        HardGateResult(gate_name="review_complete", passed=review.complete),
+        HardGateResult(
+            gate_name="review_complete",
+            passed=review.complete and review.needs_sme_count == 0,
+        ),
         HardGateResult(
             gate_name="every_case_three_quality_trials", passed=every_case_three_slots
         ),
@@ -355,6 +374,8 @@ def build_batch_report(
         totals=totals,
         capture_verified=capture_verified,
         route_clean=route_clean,
+        batch_incomplete=batch_incomplete,
+        harness_invalid=harness_invalid,
     )
     # §8.3:只有 live batch 可能 promotion-eligible;mocked/reference 一律 false。
     promotion_eligible = (
@@ -369,12 +390,20 @@ def build_batch_report(
 
     case_matrix = tuple(
         CasePassEntry(
-            case_id=r.case_id,
-            split=r.split,
-            pass_pow_3=r.pass_pow_3,
-            case_decision=r.case_decision,
+            case_id=case_id,
+            split=split_by_case[case_id],
+            pass_pow_3=(
+                reports_by_case[case_id].pass_pow_3
+                if case_id in reports_by_case
+                else False
+            ),
+            case_decision=(
+                reports_by_case[case_id].case_decision
+                if case_id in reports_by_case
+                else CaseDecision.FAIL
+            ),
         )
-        for r in case_reports
+        for case_id in sorted(gold_by_case)
     )
 
     return TurnEvalBatchReport(
@@ -405,7 +434,25 @@ def build_batch_report(
     )
 
 
-def _totals(scores: Sequence[TrialScore]) -> BatchTotals:
+def _slot_scores(scores: Sequence[TrialScore]) -> list[TrialScore]:
+    """Select one report row per quality slot while retaining replacement
+    attempts in batch totals.  A quality-scored attempt wins; otherwise the
+    final infrastructure/harness attempt represents the unfilled slot."""
+
+    grouped: dict[int, list[TrialScore]] = {}
+    for score in scores:
+        grouped.setdefault(score.slot_index, []).append(score)
+    selected: list[TrialScore] = []
+    for slot_index in sorted(grouped):
+        attempts = grouped[slot_index]
+        quality = [score for score in attempts if score.scored]
+        selected.append(quality[-1] if quality else attempts[-1])
+    return selected
+
+
+def _totals(
+    scores: Sequence[TrialScore], *, wall_clock_seconds: int | None = None
+) -> BatchTotals:
     quality = sum(1 for s in scores if s.disposition == TrialDisposition.QUALITY_SCORED)
     infra = sum(
         1 for s in scores if s.disposition == TrialDisposition.INFRASTRUCTURE_INVALID
@@ -420,6 +467,9 @@ def _totals(scores: Sequence[TrialScore]) -> BatchTotals:
     observed_cost = sum(costs, Decimal(0)) if costs else None
     input_tokens = _sum_optional(s.usage_input_tokens for s in scores)
     output_tokens = _sum_optional(s.usage_output_tokens for s in scores)
+    cache_read_tokens = _sum_optional(s.usage_cache_read_tokens for s in scores)
+    cache_write_tokens = _sum_optional(s.usage_cache_write_tokens for s in scores)
+    reasoning_tokens = _sum_optional(s.usage_reasoning_tokens for s in scores)
     return BatchTotals(
         total_trials=len(scores),
         quality_trials=quality,
@@ -429,7 +479,11 @@ def _totals(scores: Sequence[TrialScore]) -> BatchTotals:
         inference_calls=inference_calls,
         usage_input_tokens=input_tokens,
         usage_output_tokens=output_tokens,
+        usage_cache_read_tokens=cache_read_tokens,
+        usage_cache_write_tokens=cache_write_tokens,
+        usage_reasoning_tokens=reasoning_tokens,
         observed_cost_total_usd=observed_cost,
+        wall_clock_seconds=wall_clock_seconds,
     )
 
 
@@ -447,17 +501,16 @@ def _decide(
     totals: BatchTotals,
     capture_verified: bool,
     route_clean: bool,
+    batch_incomplete: bool,
+    harness_invalid: bool,
 ) -> BatchDecision:
-    if not capture_verified or not route_clean:
+    if harness_invalid or not capture_verified or not route_clean:
         return BatchDecision.HARNESS_INVALID
-    # 任一 case 少於 3 quality trials(且非 harness)→ BATCH_INCOMPLETE
-    if totals.quality_trials < 3 * _case_count(totals):
-        # 只有在確定不是 harness 問題時才判 incomplete;此處以 quality < 期望值近似
-        pass
+    if batch_incomplete:
+        return BatchDecision.BATCH_INCOMPLETE
     if not review.complete or review.needs_sme_count > 0:
-        # review 未完成優先於 gate 結果
-        if not review.complete:
-            return BatchDecision.REVIEW_INCOMPLETE
+        # review 未完成或仍需 SME，都不可進品質裁決。
+        return BatchDecision.REVIEW_INCOMPLETE
     if split_gap_within is None:
         return BatchDecision.REVIEW_INCOMPLETE
     if not hard_ok:
@@ -465,12 +518,6 @@ def _decide(
     if not quality_ok:
         return BatchDecision.TURN_GATE_FAIL
     return BatchDecision.TURN_GATE_PASS_ENGINEERING
-
-
-def _case_count(totals: BatchTotals) -> int:
-    # 無法從 totals 反推 case 數;此函式僅供 BATCH_INCOMPLETE 佔位保留,
-    # 實際 incomplete 判定由 scheduler 在 build 前決定(見 §9.5)。
-    return 0
 
 
 # ── Markdown renderer(§12.2 去除 raw provider content 的 aggregate report)──

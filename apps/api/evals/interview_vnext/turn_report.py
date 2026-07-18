@@ -23,6 +23,7 @@ from .contracts import (
     CasePassEntry,
     CaseSlotReport,
     CaseSplit,
+    ExecutionMode,
     ExpectedCommit,
     FailureRecord,
     FailureSeverity,
@@ -355,8 +356,10 @@ def build_batch_report(
         capture_verified=capture_verified,
         route_clean=route_clean,
     )
+    # §8.3:只有 live batch 可能 promotion-eligible;mocked/reference 一律 false。
     promotion_eligible = (
-        decision
+        execution_mode == ExecutionMode.LIVE
+        and decision
         in {
             BatchDecision.TURN_GATE_PASS_ENGINEERING,
             BatchDecision.TURN_GATE_PASS_DOMAIN_REVIEWED,

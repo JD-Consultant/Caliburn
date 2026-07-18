@@ -292,7 +292,9 @@ class TurnEvalPriorEvidenceFixture(DomainModel):
 
 class TurnEvalInitialFixture(DomainModel):
     schema_version: Literal["turn_eval_initial_fixture.v1"]
-    session_status_before_replay: Literal["draft"]
+    # 計畫 §6.3 範例寫 "draft",但 domain SessionStatus 的初始值是 planned
+    # (planned -> active 才是 production 合法轉換);fixture 對映真實 enum。
+    session_status_before_replay: Literal["planned"]
     activate_before_transcript: bool
     open_episode: TurnEvalOpenEpisodeFixture | None = None
     prior_evidence: tuple[TurnEvalPriorEvidenceFixture, ...] = ()
@@ -1179,12 +1181,15 @@ class TurnEvalBatchReport(DomainModel):
             BatchDecision.TURN_GATE_PASS_DOMAIN_REVIEWED,
         }
         if self.decision in passing:
-            if not self.promotion_eligible:
-                raise ValueError("a passing decision requires promotion eligibility")
+            # 通過的門檻 = 所有 hard gate 綠且每 case pass^3;但通過不等於
+            # promotion-eligible(mocked/reference batch 通過卻永不 promotion,§8.3)。
             if not all(gate.passed for gate in self.hard_gates):
                 raise ValueError("a passing decision requires all hard gates green")
             if not all(entry.pass_pow_3 for entry in self.case_matrix):
                 raise ValueError("a passing decision requires pass^3 on every case")
+        # promotion-eligible 只能建立在通過的 decision 之上(反向不成立)。
+        if self.promotion_eligible and self.decision not in passing:
+            raise ValueError("promotion eligibility requires a passing decision")
         return self
 
 

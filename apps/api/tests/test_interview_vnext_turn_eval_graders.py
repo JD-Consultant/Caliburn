@@ -24,19 +24,29 @@ from app.interview_vnext.domain.evidence import (
     TimeScope,
     Typicality,
 )
+from app.interview_vnext.domain.session import InterviewSession
+from app.interview_vnext.domain.state import InterviewState
+from app.interview_vnext.llm.result import FinishReason, ModelOutcome, TokenUsage
 from app.interview_vnext.llm.turn_interpret import (
     EpisodeSignal,
     EvidenceQualifiersProposal,
     FrequencyQualifierProposal,
     ObservationProposal,
+    ObservationVerification,
+    TURN_INTERPRET_VERIFIER_POLICY_V1,
     TurnInterpretOutput,
+    TurnInterpretRejectCode,
+    TurnInterpretVerificationReport,
     UserSignal,
 )
 from evals.interview_vnext.contracts import (
     ExpectedCommit,
     GraderStatus,
     ReviewDecisionLabel,
+    TrialAttemptRecord,
+    TrialDisposition,
     TurnEvalReviewDecision,
+    TurnEvalTrial,
 )
 from evals.interview_vnext.fixture_builder import run_pure_reference_gate
 from evals.interview_vnext.identities import prior_evidence_uuid, trial_scoped_ids
@@ -53,10 +63,13 @@ from evals.interview_vnext.review import (
 from evals.interview_vnext.contracts import MetricResult
 from evals.interview_vnext.turn_graders import (
     GradingContext,
+    accepted_proposal_keys_from_report,
     build_candidate_edges,
+    build_grading_context,
     compute_trial_metrics,
     grade_correction_lineage,
     grade_no_op,
+    grade_output_schema,
     grade_quote_span,
     grade_reference_leakage,
     grade_source_subject,
@@ -642,3 +655,156 @@ def test_edge_decision_map_feeds_metrics(suite):
     )
     assert metrics.recall.value == Decimal("1.000000")
     assert metrics.review_incomplete is False
+
+
+# ── build_grading_context:唯一 canonical builder(§10.1)─────────────────────
+
+
+def minimal_trial(
+    *,
+    terminal_outcome: str,
+    terminal_reason_code: str | None = None,
+) -> TurnEvalTrial:
+    ns = uuid5(NAMESPACE_URL, "grading-context-trial")
+    return TurnEvalTrial(
+        schema_version="turn_eval_trial.v1",
+        trial_id=uuid5(ns, "trial"),
+        case_id="TI-01-single-action",
+        slot_index=1,
+        trial_attempt=1,
+        runtime_input_hash=SHA,
+        evaluation_contract_hash=SHA,
+        tenant_id=uuid5(ns, "tenant"),
+        user_id=uuid5(ns, "user"),
+        profile_id=uuid5(ns, "profile"),
+        session_id=uuid5(ns, "session"),
+        run_id=uuid5(ns, "run"),
+        operation_id=uuid5(ns, "operation"),
+        started_at=BASE_TIME,
+        completed_at=BASE_TIME,
+        disposition=TrialDisposition.QUALITY_SCORED,
+        included_in_quality_denominator=True,
+        terminal_outcome=terminal_outcome,
+        terminal_reason_code=terminal_reason_code,
+        attempts=(
+            TrialAttemptRecord(
+                attempt=1,
+                outcome=ModelOutcome.SUCCEEDED,
+                finish_reason=FinishReason.COMPLETED,
+                usage=TokenUsage(
+                    input_tokens=1, output_tokens=1, cache_read_tokens=0,
+                    cache_write_tokens=0, reasoning_tokens=0,
+                ),
+                latency_ms=1,
+            ),
+        ),
+        requested_model="scripted-reference",
+        state_before_hash="sha256:" + "a" * 64,
+        state_after_hash="sha256:" + "b" * 64,
+    )
+
+
+def minimal_final_state() -> InterviewState:
+    ns = uuid5(NAMESPACE_URL, "grading-context-state")
+    return InterviewState(
+        session=InterviewSession(
+            session_id=uuid5(ns, "session"),
+            profile_id=uuid5(ns, "profile"),
+            tenant_id=uuid5(ns, "tenant"),
+            workflow_version="1.0.0",
+            reference_snapshot_id="ref-snapshot-v1",
+            created_at=BASE_TIME,
+            updated_at=BASE_TIME,
+        )
+    )
+
+
+def rejected_only_report(trial: TurnEvalTrial) -> TurnInterpretVerificationReport:
+    policy = TURN_INTERPRET_VERIFIER_POLICY_V1
+    return TurnInterpretVerificationReport(
+        operation_id=trial.operation_id,
+        operation_definition_hash=SHA,
+        verifier_policy_name=policy.name,
+        verifier_policy_version=policy.version,
+        verifier_policy_hash=policy.policy_hash,
+        session_id=trial.session_id,
+        turn_id=uuid5(trial.trial_id, "turn"),
+        context_packet_hash=SHA,
+        output_hash=SHA,
+        user_signal=UserSignal("answer"),
+        episode_signal=EpisodeSignal("continue"),
+        decisions=(
+            ObservationVerification(
+                proposal_index=1,
+                proposal_key="obs-rejected",
+                accepted=False,
+                reason_codes=(TurnInterpretRejectCode.QUOTE_NOT_FOUND,),
+                computed_span=None,
+                evidence=None,
+            ),
+        ),
+        accepted_evidence_ids=(),
+        emergent_topic_decisions=(),
+        insufficiencies=(),
+        accepted_count=0,
+        dropped_count=1,
+    )
+
+
+def test_grading_context_failed_trial_takes_reason_from_trial_record(suite):
+    """§2.2.5 drift 根因:failure reason 只能來自 trial artifact,不能兩處各取。"""
+
+    inputs, evaluation = case_pair(suite, "TI-01-single-action")
+    trial = minimal_trial(
+        terminal_outcome="failed", terminal_reason_code="output_schema_invalid"
+    )
+    context = build_grading_context(
+        trial=trial,
+        inputs=inputs,
+        gold=evaluation.gold,
+        output=None,
+        report=None,
+        final_state=minimal_final_state(),
+    )
+    assert context.committed_kind is None
+    assert context.failure_reason_code == "output_schema_invalid"
+    assert context.trial_id == trial.trial_id
+    assert context.state_before_hash == trial.state_before_hash
+    assert context.state_after_hash == trial.state_after_hash
+    schema_result = grade_output_schema(context)
+    assert schema_result.status == GraderStatus.FAIL
+    assert schema_result.reason_code == "output_schema_invalid"
+
+
+def test_grading_context_committed_kind_comes_from_report_count(suite):
+    inputs, evaluation = case_pair(suite, "TI-01-single-action")
+    trial = minimal_trial(terminal_outcome="committed")
+    context = build_grading_context(
+        trial=trial,
+        inputs=inputs,
+        gold=evaluation.gold,
+        output=output(),
+        report=rejected_only_report(trial),
+        final_state=minimal_final_state(),
+    )
+    assert context.committed_kind == "noop"
+    assert context.evidence_status == {}
+    # report 缺席的 committed(理論上不會發生)也不得誤標 evidence
+    context_without_report = build_grading_context(
+        trial=trial,
+        inputs=inputs,
+        gold=evaluation.gold,
+        output=output(),
+        report=None,
+        final_state=minimal_final_state(),
+    )
+    assert context_without_report.committed_kind == "noop"
+
+
+def test_accepted_proposal_keys_come_only_from_report(suite):
+    trial = minimal_trial(terminal_outcome="committed")
+    assert accepted_proposal_keys_from_report(None) == frozenset()
+    assert (
+        accepted_proposal_keys_from_report(rejected_only_report(trial))
+        == frozenset()
+    )

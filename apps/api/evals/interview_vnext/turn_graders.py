@@ -17,6 +17,7 @@ from uuid import UUID
 
 from app.interview_vnext.domain.evidence import EvidenceStatus
 from app.interview_vnext.domain.hashing import canonical_json
+from app.interview_vnext.domain.state import InterviewState
 from app.interview_vnext.llm.turn_interpret import (
     ObservationProposal,
     TURN_INTERPRET_VERIFIER_POLICY_V1,
@@ -39,6 +40,7 @@ from .contracts import (
     TurnEvalGold,
     TurnEvalGoldObservation,
     TurnEvalGraderResult,
+    TurnEvalTrial,
 )
 from .identities import prior_evidence_uuid
 from .loader import TurnEvalCaseInputs, quote_occurrences
@@ -102,6 +104,57 @@ class GradingContext:
             item.evidence_key: prior_evidence_uuid(self.trial_id, item.evidence_key)
             for item in self.inputs.initial_fixture.prior_evidence
         }
+
+
+def accepted_proposal_keys_from_report(
+    report: TurnInterpretVerificationReport | None,
+) -> frozenset[str]:
+    """Accepted refs 只從 verification report artifact 派生(V3-5A §10.1)。"""
+
+    if report is None:
+        return frozenset()
+    return frozenset(
+        decision.proposal_key for decision in report.decisions if decision.accepted
+    )
+
+
+def build_grading_context(
+    *,
+    trial: TurnEvalTrial,
+    inputs: TurnEvalCaseInputs,
+    gold: TurnEvalGold,
+    output: TurnInterpretOutput | None,
+    report: TurnInterpretVerificationReport | None,
+    final_state: InterviewState,
+) -> GradingContext:
+    """唯一的 grading context builder;online/offline 都必須經過這裡(V3-5A §10.1)。
+
+    每個欄位只從這六個 argument 派生:failure reason 取
+    ``trial.terminal_reason_code``、committed kind 取 trial terminal outcome +
+    report accepted count、state hash 取 trial、evidence status 取
+    ``final_state``;不得再從 ``TrialExecution.outcome`` 另取一份相似值。
+    """
+
+    committed_kind: str | None = None
+    if trial.terminal_outcome == "committed":
+        committed_kind = (
+            "evidence" if report is not None and report.accepted_count else "noop"
+        )
+    return GradingContext(
+        inputs=inputs,
+        gold=gold,
+        trial_id=trial.trial_id,
+        case_id=trial.case_id,
+        output=output,
+        report=report,
+        committed_kind=committed_kind,
+        state_before_hash=trial.state_before_hash,
+        state_after_hash=trial.state_after_hash,
+        evidence_status={
+            item.evidence_id: item.status for item in final_state.evidence
+        },
+        failure_reason_code=trial.terminal_reason_code,
+    )
 
 
 def _result(

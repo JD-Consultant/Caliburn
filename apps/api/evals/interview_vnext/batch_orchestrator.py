@@ -26,7 +26,6 @@ from app.interview_vnext.domain.hashing import canonical_hash
 
 from .capture_export import export_run_bundle
 from .contracts import (
-    CaseSplit,
     ExecutionMode,
     ReviewCompleteness,
     ReviewDecisionLabel,
@@ -38,18 +37,15 @@ from .identities import trial_scoped_ids, turn_uuid
 from .loader import TurnEvalSuite
 from .review import build_review_items, edge_decision_map, import_review_decisions
 from .scheduler import (
-    accepted_proposal_keys,
     build_trial_record,
-    committed_kind,
-    evidence_status_map,
     trial_output,
-    verifier_reason_codes,
     write_trial_bundle,
 )
 from .turn_eval_runner import TrialExecution, run_trial
 from .turn_graders import (
-    GradingContext,
+    accepted_proposal_keys_from_report,
     build_candidate_edges,
+    build_grading_context,
     compute_trial_metrics,
     run_deterministic_graders,
 )
@@ -71,36 +67,36 @@ def grade_execution(
     evaluation,
     execution: TrialExecution,
     *,
-    slot_index: int,
-    split: CaseSplit,
     batch_id: UUID,
+    trial_record: TurnEvalTrial,
     decision_labels: dict[tuple[str, str], ReviewDecisionLabel] | None = None,
     review_complete: bool = True,
-    disposition: TrialDisposition = TrialDisposition.QUALITY_SCORED,
-    trial_record: TurnEvalTrial | None = None,
 ) -> GradedTrial:
-    """Grade one execution;mocked 自測時 ``decision_labels`` 省略 → 全 equivalent。"""
+    """Grade one execution;mocked 自測時 ``decision_labels`` 省略 → 全 equivalent。
+
+    先 ``build_trial_record()`` 再 grade(V3-5A §10.1):context 一律經
+    ``build_grading_context``、accepted keys 一律取自 verification report,
+    分數欄位取自 trial record;offline regrade 因此能 byte-equivalent 重現。
+    """
 
     output = trial_output(execution)
-    ctx = GradingContext(
+    report = execution.outcome.verification_report
+    ctx = build_grading_context(
+        trial=trial_record,
         inputs=inputs,
         gold=evaluation.gold,
-        trial_id=execution.ids.trial_id,
-        case_id=inputs.case.case_id,
         output=output,
-        report=execution.outcome.verification_report,
-        committed_kind=committed_kind(execution),
-        state_before_hash=execution.state_before_hash,
-        state_after_hash=execution.state_after_hash,
-        evidence_status=evidence_status_map(execution),
+        report=report,
+        final_state=execution.state_after,
     )
     grader_results = run_deterministic_graders(ctx)
+    accepted_keys = accepted_proposal_keys_from_report(report)
 
     edges = ()
     review_items = ()
     if output is not None:
         edges = build_candidate_edges(
-            inputs, evaluation.gold, output, trial_id=execution.ids.trial_id
+            inputs, evaluation.gold, output, trial_id=trial_record.trial_id
         )
         matched = {e.proposal_key for e in edges}
         unmatched = [
@@ -110,12 +106,21 @@ def grade_execution(
         ]
         review_items = build_review_items(
             batch_id=batch_id,
-            trial_id=execution.ids.trial_id,
+            trial_id=trial_record.trial_id,
             inputs=inputs,
             gold=evaluation.gold,
             output=output,
-            accepted_proposal_keys=accepted_proposal_keys(execution),
-            verifier_reason_codes=verifier_reason_codes(execution),
+            accepted_proposal_keys=accepted_keys,
+            verifier_reason_codes=(
+                {
+                    decision.proposal_key: tuple(
+                        code.value for code in decision.reason_codes
+                    )
+                    for decision in report.decisions
+                }
+                if report is not None
+                else {}
+            ),
             edges=edges,
             unmatched_proposal_keys=unmatched,
         )
@@ -132,7 +137,7 @@ def grade_execution(
             output=output,
             edges=edges,
             decisions=decision_labels,
-            accepted_proposal_keys=accepted_proposal_keys(execution),
+            accepted_proposal_keys=accepted_keys,
         )
     else:
         metrics = compute_trial_metrics(
@@ -143,48 +148,31 @@ def grade_execution(
             accepted_proposal_keys=frozenset(),
         )
 
-    result = execution.outcome.provider_result
     score = TrialScore(
-        trial_id=execution.ids.trial_id,
-        case_id=inputs.case.case_id,
-        split=split,
-        slot_index=slot_index,
-        disposition=disposition,
+        trial_id=trial_record.trial_id,
+        case_id=trial_record.case_id,
+        split=inputs.case.split,
+        slot_index=trial_record.slot_index,
+        disposition=trial_record.disposition,
         grader_results=grader_results,
         metrics=metrics,
         review_complete=review_complete,
-        inference_calls=(len(trial_record.attempts) if trial_record else 1),
-        observed_cost_usd=(
-            trial_record.observed_cost_total_usd if trial_record else None
-        ),
-        usage_input_tokens=(
-            trial_record.usage_input_tokens
-            if trial_record
-            else (result.usage.input_tokens if result else None)
-        ),
-        usage_output_tokens=(
-            trial_record.usage_output_tokens
-            if trial_record
-            else (result.usage.output_tokens if result else None)
-        ),
-        usage_cache_read_tokens=(
-            trial_record.usage_cache_read_tokens if trial_record else None
-        ),
-        usage_cache_write_tokens=(
-            trial_record.usage_cache_write_tokens if trial_record else None
-        ),
-        usage_reasoning_tokens=(
-            trial_record.usage_reasoning_tokens if trial_record else None
-        ),
+        had_infrastructure_retry=trial_record.had_infrastructure_retry,
+        inference_calls=len(trial_record.attempts),
+        observed_cost_usd=trial_record.observed_cost_total_usd,
+        usage_input_tokens=trial_record.usage_input_tokens,
+        usage_output_tokens=trial_record.usage_output_tokens,
+        usage_cache_read_tokens=trial_record.usage_cache_read_tokens,
+        usage_cache_write_tokens=trial_record.usage_cache_write_tokens,
+        usage_reasoning_tokens=trial_record.usage_reasoning_tokens,
     )
-    verification = execution.outcome.verification_report
     return GradedTrial(
         score=score,
         grader_results=grader_results,
         review_items=review_items,
         candidate_output_json=output.model_dump(mode="json") if output else None,
         verification_report_json=(
-            verification.model_dump(mode="json") if verification else None
+            report.model_dump(mode="json") if report else None
         ),
         final_state_json=execution.state_after.model_dump(mode="json"),
     )
@@ -310,13 +298,6 @@ async def orchestrate_mocked_batch(
                 tenant_id=execution.ids.tenant_id,
                 run_id=execution.ids.run_id,
             )
-            graded = grade_execution(
-                inputs, evaluation, execution,
-                slot_index=slot, split=inputs.case.split, batch_id=batch_id,
-            )
-            scores.append(graded.score)
-            all_review_items.extend(graded.review_items)
-            # 自動裁決:mocked 自測用 equivalent(harness 自證,非真人 adjudication)
             trial = build_trial_record(
                 execution,
                 case_id=inputs.case.case_id,
@@ -329,6 +310,13 @@ async def orchestrate_mocked_batch(
                 requested_model="scripted-reference",
                 capture=bundle,
             )
+            # 自動裁決:mocked 自測用 equivalent(harness 自證,非真人 adjudication)
+            graded = grade_execution(
+                inputs, evaluation, execution,
+                batch_id=batch_id, trial_record=trial,
+            )
+            scores.append(graded.score)
+            all_review_items.extend(graded.review_items)
             write_trial_bundle(
                 batch_dir,
                 trial=trial,

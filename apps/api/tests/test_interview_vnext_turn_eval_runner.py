@@ -8,6 +8,8 @@ manifest、case/batch report 與 pass^3、markdown 去 provider identity。
 
 from __future__ import annotations
 
+import hashlib
+import json
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
@@ -31,6 +33,8 @@ from app.interview_vnext.llm.result import (
 from app.interview_vnext.llm.port import LlmPort, ModelCallEnvelope
 from app.interview_vnext.llm.testing import ScriptedLlmPort, ScriptedStep
 from app.interview_vnext.observability.artifacts import build_inline_artifact
+from app.interview_vnext.domain.hashing import canonical_json
+from evals.interview_vnext.batch_orchestrator import grade_execution
 from evals.interview_vnext.capture_export import (
     SecretLeakError,
     export_run_bundle,
@@ -40,38 +44,27 @@ from evals.interview_vnext.contracts import (
     CaseDecision,
     CaseSplit,
     ReviewCompleteness,
-    ReviewDecisionLabel,
     TrialDisposition,
 )
 from evals.interview_vnext.fixture_builder import materialize_reference_output
 from evals.interview_vnext.identities import trial_scoped_ids, turn_uuid
-from evals.interview_vnext.loader import load_suite
-from evals.interview_vnext.review import (
-    build_review_items,
-    edge_decision_map,
-    import_review_decisions,
+from evals.interview_vnext.live_batch import (
+    LiveBatchError,
+    _score_trial,
+    _verify_trial_integrity,
 )
-from evals.interview_vnext.contracts import TurnEvalReviewDecision
+from evals.interview_vnext.live_wiring import openrouter_attempt_records
+from evals.interview_vnext.loader import load_suite
+from evals.interview_vnext.review import import_review_decisions
 from evals.interview_vnext.scheduler import (
     Budget,
     BudgetExceeded,
-    accepted_proposal_keys,
     build_trial_record,
     classify_disposition,
-    committed_kind,
-    evidence_status_map,
     schedule_slot,
-    trial_output,
-    verifier_reason_codes,
     write_trial_bundle,
 )
 from evals.interview_vnext.turn_eval_runner import cleanup_trial_rows, run_trial
-from evals.interview_vnext.turn_graders import (
-    GradingContext,
-    build_candidate_edges,
-    compute_trial_metrics,
-    run_deterministic_graders,
-)
 from evals.interview_vnext.turn_report import (
     TrialScore,
     build_batch_report,
@@ -423,50 +416,39 @@ async def test_trial_bundle_is_atomic_with_integrity_manifest(
 # ── report aggregation ───────────────────────────────────────────────────────
 
 
-def grade_execution(inputs, evaluation, execution, *, slot_index, split):
-    output = trial_output(execution)
-    ctx = GradingContext(
-        inputs=inputs,
-        gold=evaluation.gold,
-        trial_id=execution.ids.trial_id,
+async def grade_one_trial(
+    session_factory, inputs, evaluation, execution, *, batch_id, slot_index,
+    decision_labels=None, review_complete=True,
+):
+    """Online canonical path(§10.1):export → build_trial_record → grade。"""
+
+    bundle = await export_run_bundle(
+        session_factory,
+        tenant_id=execution.ids.tenant_id,
+        run_id=execution.ids.run_id,
+    )
+    disposition, reason = classify_disposition(execution)
+    trial = build_trial_record(
+        execution,
         case_id=inputs.case.case_id,
-        output=output,
-        report=execution.outcome.verification_report,
-        committed_kind=committed_kind(execution),
-        state_before_hash=execution.state_before_hash,
-        state_after_hash=execution.state_after_hash,
-        evidence_status=evidence_status_map(execution),
-    )
-    grader_results = run_deterministic_graders(ctx)
-    edges = build_candidate_edges(
-        inputs, evaluation.gold, output, trial_id=execution.ids.trial_id
-    )
-    decisions = {edge.edge_key: ReviewDecisionLabel.EQUIVALENT for edge in edges}
-    # unmatched proposals also need a decision
-    matched = {e.proposal_key for e in edges}
-    for p in output.observations:
-        if p.proposal_key not in matched:
-            decisions[("__unmatched__", p.proposal_key)] = (
-                ReviewDecisionLabel.DIFFERENT
-            )
-    metrics = compute_trial_metrics(
-        gold=evaluation.gold,
-        output=output,
-        edges=edges,
-        decisions=decisions,
-        accepted_proposal_keys=accepted_proposal_keys(execution),
-    )
-    return TrialScore(
-        trial_id=execution.ids.trial_id,
-        case_id=inputs.case.case_id,
-        split=split,
         slot_index=slot_index,
-        disposition=TrialDisposition.QUALITY_SCORED,
-        grader_results=grader_results,
-        metrics=metrics,
-        review_complete=True,
-        inference_calls=1,
+        trial_attempt=1,
+        runtime_input_hash=inputs.runtime_input_hash,
+        evaluation_contract_hash=evaluation.evaluation_contract_hash,
+        disposition=disposition,
+        reason_code=reason,
+        requested_model="scripted-reference",
+        capture=bundle,
+        attempt_records=openrouter_attempt_records(bundle),
     )
+    graded = grade_execution(
+        inputs, evaluation, execution,
+        batch_id=batch_id,
+        trial_record=trial,
+        decision_labels=decision_labels,
+        review_complete=review_complete,
+    )
+    return trial, bundle, graded
 
 
 async def test_reference_batch_reaches_engineering_pass(
@@ -475,6 +457,7 @@ async def test_reference_batch_reaches_engineering_pass(
     scores = []
     gold_by_case = {}
     split_by_case = {}
+    batch_id = uuid5(NAMESPACE_URL, "batch-pass")
     for inputs, evaluation in zip(
         suite.runtime_inputs, suite.evaluation_contracts, strict=True
     ):
@@ -492,12 +475,11 @@ async def test_reference_batch_reaches_engineering_pass(
                 trial_started_at=TRIAL_STARTED_AT,
             )
             tracked_cleanup.append(execution.ids)
-            scores.append(
-                grade_execution(
-                    inputs, evaluation, execution,
-                    slot_index=slot, split=inputs.case.split,
-                )
+            _trial, _bundle, graded = await grade_one_trial(
+                postgres_session_factory, inputs, evaluation, execution,
+                batch_id=batch_id, slot_index=slot,
             )
+            scores.append(graded.score)
 
     review = ReviewCompleteness(
         required_review_items=len(scores),
@@ -533,6 +515,225 @@ async def test_reference_batch_reaches_engineering_pass(
     for forbidden in ("openrouter", "anthropic", "claude", "sk-or"):
         assert forbidden not in md.lower()
     assert "pass^3" in md.lower() or "pass^3" in md
+
+
+# ── §10.2 grading determinism:online/offline 同一 builder、byte-equal ────────
+
+
+def invalid_output_llm(inputs, trial_id) -> ScriptedLlmPort:
+    """兩次 schema-invalid provider success → terminal ``output_schema_invalid``。"""
+
+    ids = trial_scoped_ids(trial_id)
+    payload = {"schema_version": "turn_interpret_output.v1", "unexpected": True}
+    steps = []
+    for attempt in (1, 2):
+        attempt_id = uuid5(ids.operation_id, f"attempt/{attempt}")
+        visible = build_inline_artifact(
+            artifact_id=uuid5(attempt_id, "visible-response"),
+            kind="model.visible_response",
+            media_type="application/json",
+            payload=payload,
+            run_id=ids.run_id,
+            session_id=ids.session_id,
+            turn_id=turn_uuid(trial_id, inputs.case.target_turn_key),
+            operation_id=ids.operation_id,
+            attempt_id=attempt_id,
+            created_at=TRIAL_STARTED_AT,
+            contains_test_data=True,
+        )
+        steps.append(
+            ScriptedStep(
+                expected_attempt=attempt,
+                outcome=ModelOutcome.SUCCEEDED,
+                finish_reason=FinishReason.COMPLETED,
+                parsed_output=build_structured_payload(
+                    schema_id=OUTPUT_SCHEMA_ID, value=payload
+                ),
+                visible_response_artifact=visible.ref,
+                supporting_artifacts=(visible,),
+                usage=usage(),
+            )
+        )
+    return ScriptedLlmPort({"turn.interpret": steps})
+
+
+async def run_golden_path(
+    postgres_session_factory, suite, output_dir, tracked_cleanup,
+    *, path_name, case_id, llm_kind,
+):
+    idx = [c.case.case_id for c in suite.runtime_inputs].index(case_id)
+    inputs = suite.runtime_inputs[idx]
+    evaluation = suite.evaluation_contracts[idx]
+    trial_id = uuid5(NAMESPACE_URL, f"determinism:{path_name}:{case_id}")
+    # 失敗也要能重跑:trial rows 一建立就登記 cleanup,不等測試主體
+    tracked_cleanup.append(trial_scoped_ids(trial_id))
+    if llm_kind == "reference":
+        llm = reference_llm_factory(suite)(inputs, trial_id)
+    else:
+        llm = invalid_output_llm(inputs, trial_id)
+    execution = await run_trial(
+        inputs,
+        session_factory=postgres_session_factory,
+        llm=llm,
+        profile=PROFILE,
+        trial_id=trial_id,
+        trial_started_at=TRIAL_STARTED_AT,
+    )
+    trial, bundle, graded = await grade_one_trial(
+        postgres_session_factory, inputs, evaluation, execution,
+        batch_id=uuid5(NAMESPACE_URL, f"determinism-batch:{path_name}"),
+        slot_index=1,
+        decision_labels={},
+        review_complete=False,
+    )
+    trial_dir = write_trial_bundle(
+        output_dir,
+        trial=trial,
+        capture=bundle,
+        grader_results_json=[
+            g.model_dump(mode="json") for g in graded.grader_results
+        ],
+        review_items_json=[
+            r.model_dump(mode="json") for r in graded.review_items
+        ],
+        final_state_json=graded.final_state_json,
+        candidate_output_json=graded.candidate_output_json,
+        verification_report_json=graded.verification_report_json,
+    )
+    return inputs, evaluation, execution, trial, graded, trial_dir
+
+
+def dir_file_hashes(trial_dir: Path) -> dict[str, str]:
+    return {
+        path.relative_to(trial_dir).as_posix(): hashlib.sha256(
+            path.read_bytes()
+        ).hexdigest()
+        for path in sorted(trial_dir.rglob("*"))
+        if path.is_file()
+    }
+
+
+def _rewrite_json(path: Path, mutate) -> None:
+    data = json.loads(path.read_text("utf-8"))
+    mutate(data)
+    path.write_text(
+        json.dumps(data, ensure_ascii=False, indent=2, default=str) + "\n",
+        encoding="utf-8",
+    )
+
+
+@pytest.mark.parametrize(
+    "path_name,case_id,llm_kind",
+    [
+        ("committed-evidence", "TI-01-single-action", "reference"),
+        ("committed-noop", "TI-11-zero-evidence", "reference"),
+        ("schema-invalid", "TI-01-single-action", "invalid"),
+    ],
+)
+async def test_grading_golden_paths_are_online_offline_byte_equal(
+    postgres_session_factory, suite, tracked_cleanup, tmp_path,
+    path_name, case_id, llm_kind,
+):
+    inputs, evaluation, execution, trial, graded, trial_dir = await run_golden_path(
+        postgres_session_factory, suite, tmp_path, tracked_cleanup,
+        path_name=path_name, case_id=case_id, llm_kind=llm_kind,
+    )
+
+    if path_name == "schema-invalid":
+        assert trial.terminal_outcome == "failed"
+        assert trial.terminal_reason_code == "output_schema_invalid"
+        assert len(trial.attempts) == 2  # 一次 schema repair 後 terminal
+        schema_grade = next(
+            g for g in graded.grader_results if g.grader_name == "output_schema"
+        )
+        assert schema_grade.reason_code == "output_schema_invalid"
+    elif path_name == "committed-noop":
+        assert trial.terminal_outcome == "committed"
+        assert trial.verifier_accepted_count == 0
+    else:
+        assert trial.terminal_outcome == "committed"
+        assert (trial.verifier_accepted_count or 0) > 0
+
+    before = dir_file_hashes(trial_dir)
+    imported = import_review_decisions((), ())
+    online_json = canonical_json(
+        [g.model_dump(mode="json") for g in graded.grader_results]
+    )
+    stored_json = canonical_json(
+        json.loads((trial_dir / "grader-results.json").read_text("utf-8"))
+    )
+    assert stored_json == online_json
+
+    score, _items = _score_trial(
+        trial_dir, inputs=inputs, evaluation=evaluation, imported=imported
+    )
+    offline_json = canonical_json(
+        [g.model_dump(mode="json") for g in score.grader_results]
+    )
+    assert offline_json == online_json
+    assert score.metrics == graded.score.metrics
+    assert score.disposition == graded.score.disposition
+    assert score.inference_calls == graded.score.inference_calls
+    assert score.observed_cost_usd == graded.score.observed_cost_usd
+
+    # 第二、三次 regrade 不得改動任何 bundle 檔案(§10.2)
+    _score_trial(trial_dir, inputs=inputs, evaluation=evaluation, imported=imported)
+    _score_trial(trial_dir, inputs=inputs, evaluation=evaluation, imported=imported)
+    assert dir_file_hashes(trial_dir) == before
+    assert _verify_trial_integrity(trial_dir) is True
+
+
+async def test_tampered_bundle_fails_integrity_or_grader_drift(
+    postgres_session_factory, suite, tracked_cleanup, tmp_path,
+):
+    imported = import_review_decisions((), ())
+
+    # 竄改 trial.json 的 terminal_reason_code(grader 輸入)→ drift
+    inputs, evaluation, execution, _trial, _graded, trial_dir = await run_golden_path(
+        postgres_session_factory, suite, tmp_path / "reason", tracked_cleanup,
+        path_name="tamper-reason", case_id="TI-01-single-action",
+        llm_kind="invalid",
+    )
+    _rewrite_json(
+        trial_dir / "trial.json",
+        lambda data: data.update(terminal_reason_code="tampered_reason"),
+    )
+    assert _verify_trial_integrity(trial_dir) is False
+    with pytest.raises(LiveBatchError, match="grader drift"):
+        _score_trial(
+            trial_dir, inputs=inputs, evaluation=evaluation, imported=imported
+        )
+
+    # 竄改 candidate-output.json(grader 輸入)→ drift
+    inputs2, evaluation2, execution2, _t2, _g2, dir2 = await run_golden_path(
+        postgres_session_factory, suite, tmp_path / "candidate", tracked_cleanup,
+        path_name="tamper-candidate", case_id="TI-01-single-action",
+        llm_kind="reference",
+    )
+
+    def poison_claim(data):
+        data["observations"][0]["claim"] = "每天 999 次竄改主張"
+
+    _rewrite_json(dir2 / "candidate-output.json", poison_claim)
+    assert _verify_trial_integrity(dir2) is False
+    with pytest.raises(LiveBatchError, match="grader drift"):
+        _score_trial(dir2, inputs=inputs2, evaluation=evaluation2, imported=imported)
+
+    # verification-report / final-state 竄改:integrity manifest 必須抓到
+    inputs3, evaluation3, execution3, _t3, _g3, dir3 = await run_golden_path(
+        postgres_session_factory, suite, tmp_path / "state", tracked_cleanup,
+        path_name="tamper-state", case_id="TI-11-zero-evidence",
+        llm_kind="reference",
+    )
+    _rewrite_json(
+        dir3 / "final-state.json",
+        lambda data: data["session"].update(reference_snapshot_id="tampered"),
+    )
+    _rewrite_json(
+        dir3 / "verification-report.json",
+        lambda data: data.update(output_hash="sha256:" + "f" * 64),
+    )
+    assert _verify_trial_integrity(dir3) is False
 
 
 def test_case_report_pass_pow_3_requires_three_scored(suite):

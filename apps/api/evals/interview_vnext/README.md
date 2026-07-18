@@ -1,6 +1,6 @@
 # Interview vNext — eval-only provider adapters
 
-**Status（2026-07-18）：V3-5 E0–E8 executable harness 已落地並全綠；true live 12×3 待 clean-commit 執行、裁決與定案**
+**Status（2026-07-18）：V3-5 E0–E8 executable harness 已落地並全綠；true live 已嘗試但因 route contamination／contract／grader drift 無品質裁決，V3-6 blocked**
 
 - V3-5 turn eval harness(`contracts`/`loader`/`identities`/`fixture_builder`/`turn_eval_runner`/
   `capture_export`/`turn_graders`/`review`/`turn_report`/`scheduler`/`batch_orchestrator`/`live_wiring`/
@@ -10,8 +10,9 @@
   `sha256:ed51167d64a9887f7a119568ad501ea71e1edd63eace6e44ccba222b5d763d5a`;12/12 reference output 通過
   production ContextBuilder/verifier/reducer gate,mocked 12×3 batch 端到端在 real PostgreSQL 產出
   `TURN_GATE_PASS_ENGINEERING`(harness 自測,**非** promotion-eligible)。
-- **E8 online orchestration 已實作、true live 尚未執行**：owner 已授權 gitignored `.env` key、US$1 hard
-  cap 與 Codex-assisted blind review；正式批次仍須在 clean commit 上產生真 bundle 才能證明模型品質。
+- **E8 online orchestration 已實作且已嘗試**：clean canary `58843af0-...`通過wire/Capture；formal batch
+  `5bad4e3f-...`在18 trials／27 inference calls後因`openrouter.route_contaminated`停線。另有model-generated
+  `proposal_key` contract與offline grader drift，故只有diagnostic value、不得promotion；observed cost `US$0.499882`。
 - E8 focused **125 passed**；adapter regression **229 passed**；完整 API + real PostgreSQL：
   **887 passed, 0 skipped**；`app/` 不 import `evals.*`(dependency guard 強制)。
 
@@ -127,11 +128,12 @@ uv run --locked python -m evals.interview_vnext.turn_eval_cli report --batch-dir
 exit codes:`0` 通過、`1` gate fail/review incomplete/batch incomplete、`2` usage/缺
 key/env/checklist/budget、`3` preflight/catalog/config/harness integrity、`4` runner/DB/Capture 例外。
 
-### E8 true live batch(owner 已授權 US$1，尚未執行)
+### E8 true live batch（已嘗試；暫停重跑）
 
-live batch 對真 OpenRouter Claude/Anthropic 路徑跑正式 12×3。**owner 必須先**確認 §10.2 account
-checklist(無 preset/allowlist/Prevent-Overrides、dedicated key 有 spend limit、`.env` 不進 Git),
-再提供 `OPENROUTER_API_KEY` 與 `_eval` 結尾的 eval DB。無 key → exit 2、不建 batch dir、不打 catalog、不碰 DB。
+下列命令保留作操作reference，但在
+[`2026-07-18 LLM runtime架構審查`](../../../../docs/specs/2026-07-18-interview-vnext-llm-runtime-architecture-review.md)
+的harness determinism、ProviderBinding/conformance與ID-less C1 contract完成前**不得重跑**。既有 incomplete batch 不得續跑、
+補trial或裁決成model verdict；新contract必須使用新operation/suite identity建立全新batch。
 
 ```powershell
 cd apps/api

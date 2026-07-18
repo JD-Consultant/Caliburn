@@ -1,10 +1,11 @@
 # Interview AI vNext（隔離開發中）
 
-本 package 是 ADR 0034 的 greenfield 實作區。目前已完成 **V0 + V1 domain foundation + V2-A provider/Capture contracts + V2-B durable persistence + V3-0 readiness + V3-1 Context Engine + V3-2 Turn Interpreter contracts/verifier + V3-3 fixed-replay executor + V3-4R OpenRouter live conformance**，另有隔離於`evals/`的direct OpenAI V3-4 mocked reference。V3-0固定官方OpenAI SDK 2.46.0並補上verified zero-Evidence atomic commit；V3-1加入deterministic ContextBuilder；V3-2加入portable structured output、versioned prompt/operation/verifier policy與pure proposal verification；V3-3把完整turn operation接到durable attempt/checkpoint、provider artifact envelope、partial Evidence/no-op commit與crash recovery。ADR 0035已把主線改為**OpenRouter-first**；V3-4R已用真OpenRouter key、`anthropic/claude-sonnet-5`與exact `anthropic` endpoint通過single-call、routing metadata、strict schema、Capture/hash-chain與secret gate。**V3-5 turn eval harness E0–E8 executable path 已落地並全綠**(12個繁中pilot cases、mocked 12×3、真 live orchestration/review/report、887 passed/0 skipped)；true live 12×3 品質批次仍待在clean commit上執行與裁決。migration仍為0010八張 `interview_vnext_*` 表。仍然**沒有 route或production live provider call**，也沒有被production composition root import（eval adapter只住`evals/`，dependency guard強制）。現行使用者流量仍走 `app/interview/` v3。
+本 package 是 ADR 0034 的 greenfield 實作區。目前已完成 **V0 + V1 domain foundation + V2-A provider/Capture contracts + V2-B durable persistence + V3-0 readiness + V3-1 Context Engine + V3-2 Turn Interpreter contracts/verifier + V3-3 fixed-replay executor + V3-4R OpenRouter live conformance**，另有隔離於`evals/`的direct OpenAI V3-4 mocked reference。V3-0固定官方OpenAI SDK 2.46.0並補上verified zero-Evidence atomic commit；V3-1加入deterministic ContextBuilder；V3-2加入portable structured output、versioned prompt/operation/verifier policy與pure proposal verification；V3-3把完整turn operation接到durable attempt/checkpoint、provider artifact envelope、partial Evidence/no-op commit與crash recovery。ADR 0035已把主線改為**OpenRouter-first**；V3-4R已用真OpenRouter key、`anthropic/claude-sonnet-5`與exact `anthropic` endpoint通過single-call、routing metadata、strict schema、Capture/hash-chain與secret gate。**V3-5 harness executable path 已落地並全綠**(887 passed/0 skipped)，true live亦已嘗試；但batch `5bad4e3f-...`因route contamination停線，並揭露model-generated proposal identity、unsupported qualifier與offline grader drift，故無模型品質裁決且V3-6 blocked。migration仍為0010八張 `interview_vnext_*` 表。仍然**沒有 route或production live provider call**，也沒有被production composition root import（eval adapter只住`evals/`，dependency guard強制）。現行使用者流量仍走 `app/interview/` v3。
 
 權威文件：
 
 - 目標架構：[`../../../../docs/specs/2026-07-16-interview-ai-vnext-greenfield-architecture.md`](../../../../docs/specs/2026-07-16-interview-ai-vnext-greenfield-architecture.md)
+- 2026 LLM runtime架構審查（下一版候選）：[`../../../../docs/specs/2026-07-18-interview-vnext-llm-runtime-architecture-review.md`](../../../../docs/specs/2026-07-18-interview-vnext-llm-runtime-architecture-review.md)
 - V2 研究：[`../../../../docs/specs/2026-07-16-interview-vnext-v2-provider-capture-research.md`](../../../../docs/specs/2026-07-16-interview-vnext-v2-provider-capture-research.md)
 - V2-B persistence reference：[`../../../../docs/specs/2026-07-16-interview-vnext-v2b-durable-persistence-research.md`](../../../../docs/specs/2026-07-16-interview-vnext-v2b-durable-persistence-research.md)
 - V2-B 實作交接：[`../../../../docs/plans/2026-07-16-interview-vnext-v2b-durable-persistence-plan.md`](../../../../docs/plans/2026-07-16-interview-vnext-v2b-durable-persistence-plan.md)
@@ -14,7 +15,7 @@
 - 決策：[`../../../../docs/adr/0034-interview-ai-vnext-greenfield-evidence-workflow.md`](../../../../docs/adr/0034-interview-ai-vnext-greenfield-evidence-workflow.md)
 - OpenRouter-first決策：[`../../../../docs/adr/0035-interview-vnext-openrouter-first-provider-boundary.md`](../../../../docs/adr/0035-interview-vnext-openrouter-first-provider-boundary.md)
 - V3-4R交接：[`../../../../docs/plans/2026-07-17-interview-vnext-v3-4r-openrouter-first-adapter-plan.md`](../../../../docs/plans/2026-07-17-interview-vnext-v3-4r-openrouter-first-adapter-plan.md)
-- V3-5 turn eval交接（E0–E8 executable全綠、true live待執行）：[`../../../../docs/plans/2026-07-18-interview-vnext-v3-5-turn-eval-harness-plan.md`](../../../../docs/plans/2026-07-18-interview-vnext-v3-5-turn-eval-harness-plan.md)
+- V3-5 turn eval交接（E0–E8 executable全綠、true live attempted/inconclusive）：[`../../../../docs/plans/2026-07-18-interview-vnext-v3-5-turn-eval-harness-plan.md`](../../../../docs/plans/2026-07-18-interview-vnext-v3-5-turn-eval-harness-plan.md)
 - package 禁令：[`AGENTS.md`](AGENTS.md)
 
 ## 目前的程式邊界
@@ -405,7 +406,7 @@ tokens為0、strict schema/local output/hash-chain/secret scan皆通過。OpenRo
 OpenAI regression `66 passed`，neutral/import/fixed-replay PostgreSQL `23 passed`，完整API+real
 PostgreSQL `762 passed, 0 skipped`。完整hash、usage、cost與第一次diagnostic failure的identity修正見
 [`V3-4R OpenRouter-first規格 §15.6`](../../../../docs/plans/2026-07-17-interview-vnext-v3-4r-openrouter-first-adapter-plan.md)。
-**V3-5 turn eval harness（2026-07-18，E0–E8 executable 落地全綠、true live 待執行）**：deterministic harness
+**V3-5 turn eval harness（2026-07-18，E0–E8 executable 落地全綠、true live attempted/inconclusive）**：deterministic harness
 已建於`evals/interview_vnext/`(contracts/loader/identities/fixture_builder/turn_eval_runner/
 capture_export/turn_graders/review/turn_report/scheduler/batch_orchestrator/live_wiring/live_batch/turn_eval_cli)，
 12個繁中pilot cases(8 dev + 4 challenge)已凍結(suite hash
@@ -413,8 +414,10 @@ capture_export/turn_graders/review/turn_report/scheduler/batch_orchestrator/live
 通過production ContextBuilder/verifier/reducer gate；mocked 12×3 batch在real PostgreSQL端到端產出
 `TURN_GATE_PASS_ENGINEERING`(harness自測，**非**promotion-eligible)。E8已補上真正online orchestration、
 attempt route/cost ledger、unique blind-review identity、attestation/import與offline regrade。完整API+real PostgreSQL
-`887 passed, 0 skipped`；`app/`不import`evals.*`。**true live 12×3 batch尚未執行**；owner已授權US$1 hard cap
-與Codex-assisted review，但仍須真bundle才能證明模型品質。V3-5通過
+`887 passed, 0 skipped`；`app/`不import`evals.*`。true live clean canary通過wire/Capture但顯示unsupported qualifier；正式batch
+`5bad4e3f-...`建立18 trials、27 inference calls後因route contamination停線，另發現proposal identity與offline grader drift，
+總cost `US$0.499882`。因此沒有模型品質verdict，V3-6保持blocked；後續依LLM runtime架構審查先修harness、ProviderBinding/
+conformance與ID-less C1 contract。V3-5通過
 (`TURN_GATE_PASS_ENGINEERING`或更高)只代表可開始V3-6 `episode_code`，不代表完整JD/顧問品質/production
 readiness。實作與後續改版不得只依README摘要，必須遵守
 [`V3-5 turn eval規格`](../../../../docs/plans/2026-07-18-interview-vnext-v3-5-turn-eval-harness-plan.md)。

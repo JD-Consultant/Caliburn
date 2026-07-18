@@ -1276,6 +1276,20 @@ case仍要求三個independent quality slots全通過（`pass^3`）。不得用r
 
 每一slice：先test紅 → 最小實作 → focused全綠 → `git diff --check` → 一步一commit。禁止累積到最後一次commit。
 
+**綠度標準（owner 2026-07-19 修訂，取代舊「focused 綠即可、整套可紅到 R7」）**：不得提交任何「已知整套
+suite 會紅」的 commit。每個 commit 前必須通過：受影響的 focused tests **加**完整 no-network API suite
+（`uv run --locked pytest -q`，無 `TEST_DATABASE_URL` 的 network-free 部分全綠、0 skipped 的前提下不得
+新增 fail）。動到 executor/persistence 的 slice（尤其 R3）另外跑 real PostgreSQL focused tests、0 skipped。
+故意讓 R3～R6 整套 suite 持續紅會破壞 git bisect、中途交接、commit 可驗證性、問題歸因與 revert 能力，
+一律禁止。R7 是最終「real PostgreSQL 全 suite + mocked 12×3 + dependency/hygiene」整合驗收，**不是**第一次
+修復前面累積的紅測試。
+
+**R3/R4 邊界（同上修訂）**：改 `LlmPort` 簽名的同一 commit（R3）必須同步完成所有 implementer 的「簽名機械
+遷移」——Scripted、OpenRouter、OpenAI reference 與相關 mocks——只搬介面與資料，不改 routing/conformance
+行為，因此 R3 結束時整套仍綠。provider evidence normalization、route policy 分離與 conformance 語意留到
+R4。不加入同時接受新舊 request 的相容 shim。若簽名與行為實在無法分離，才把 R3+R4 合成一個 atomic vertical
+slice，但仍不得提交紅色中間狀態。
+
 ### R0——Documentation/status lock
 
 文件：ADR 0036、本plan、README/AGENTS索引。不得改code。
@@ -1322,6 +1336,11 @@ case仍要求三個independent quality slots全通過（`pass^3`）。不得用r
 ### R3——Resolved LLM port、checkpoint v2與durable executor
 
 修改port/result/testing/checkpoint/taxonomy/durable operations/executor/persistence serialization與PG tests。
+**同一 commit 內機械遷移所有 port implementer 的簽名**（Scripted、OpenRouter eval adapter、OpenAI reference
+eval adapter、live_wiring/scheduler/batch_orchestrator 的 request/binding 建構、以及測試 mocks）：這些只搬
+介面與資料（產生 v2 result/envelope、由既有 parsed 資料建 execution evidence），**保留現行 routing/conformance
+行為**（例如 OpenRouter 仍以 `ModelFailure` fail-closed 於 route contamination）。因此 R3 結束時整套 no-network
+suite 仍綠；R4 才把 eligibility 從 adapter 搬到 conformance policy 並改 normalization 語意。
 
 驗收：
 
@@ -1331,13 +1350,17 @@ case仍要求三個independent quality slots全通過（`pass^3`）。不得用r
 - result/evidence/conformance同transaction與兩個events；
 - fresh-process provider_completed/verified/committed recovery；
 - tampered/missing binding/evidence/conformance corruption；
+- **所有 implementer 已遷移到新簽名，no-network API suite + real PostgreSQL focused 全綠、0 skipped**；
 - Alembic head仍0010，無migration file。
 
 建議commit：`feat(interview): execute resolved model calls with conformance gates`
 
 ### R4——Provider adapters v2
 
-先OpenRouter，再OpenAI reference；fixture matrix全綠才commit。
+先OpenRouter，再OpenAI reference；fixture matrix全綠才commit。R3 已把 adapter 機械遷移到新簽名並保留舊
+fail-closed 行為；R4 才把 eligibility 決策從 adapter 搬出（不再對 contamination 回 `ModelFailure`），改由
+executor 的 conformance gate 判定，並硬化 evidence normalization / pipeline stage 分類。每個 commit 前
+no-network API suite 仍須全綠。
 
 驗收：
 
@@ -1615,6 +1638,9 @@ uv run --locked pytest -q
 
 結果必須為完整API suite、real PostgreSQL、`0 skipped`；不得unset `TEST_DATABASE_URL`後把DB skip當通過，
 也不得只報focused數字。若總數因本切片新增測試而改變，回報實際pass總數，不鎖死為歷史887。
+
+**每個 commit（不只 R7）都必須先通過完整 no-network API suite（見 §13 綠度標準）**；動到 executor/persistence
+的 slice 另跑 §15.4 的 real PostgreSQL focused。R7 是最終整合驗收，不是第一次修復累積的紅測試。
 
 ### 15.7 Hygiene
 

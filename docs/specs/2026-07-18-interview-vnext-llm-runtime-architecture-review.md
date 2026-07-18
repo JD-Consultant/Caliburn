@@ -1,10 +1,12 @@
 # Interview AI vNext——2026 LLM Runtime、Provider 與評測架構審查
 
-- 狀態：**研究完成；建議架構待 owner 核准，未授權 production 實作**
+- 狀態：**研究完成；owner 已核准 D1–D8，決策已固化為 ADR 0036；V3-5A 實作尚未開始**
 - 日期：2026-07-18
 - 適用範圍：`apps/api/app/interview_vnext/`、`apps/api/evals/interview_vnext/`、後續顧問式訪談與文件共編
 - 上游目標架構：[`2026-07-16-interview-ai-vnext-greenfield-architecture.md`](2026-07-16-interview-ai-vnext-greenfield-architecture.md)
 - Provider 決策：[`../adr/0035-interview-vnext-openrouter-first-provider-boundary.md`](../adr/0035-interview-vnext-openrouter-first-provider-boundary.md)
+- Runtime決策：[`../adr/0036-interview-vnext-provider-binding-conformance-and-idless-turn-v2.md`](../adr/0036-interview-vnext-provider-binding-conformance-and-idless-turn-v2.md)
+- 實作計畫：[`../plans/2026-07-18-interview-vnext-v3-5a-runtime-contract-reconstruction-plan.md`](../plans/2026-07-18-interview-vnext-v3-5a-runtime-contract-reconstruction-plan.md)
 - 本次 live 診斷：[`../plans/2026-07-18-interview-vnext-v3-5-turn-eval-harness-plan.md`](../plans/2026-07-18-interview-vnext-v3-5-turn-eval-harness-plan.md)
 
 ---
@@ -1093,9 +1095,9 @@ Hard gate：只有完整 batch 才能裁決 C1。
 
 ---
 
-## 23. 待 owner 核准的架構決策
+## 23. Owner 已核准的架構決策
 
-| ID | 建議決策 | 預設 |
+| ID | 架構決策 | 狀態 |
 |---|---|---|
 | D1 | deterministic workflow + typed model nodes，不採 general autonomous/multi-agent core | 核准 |
 | D2 | 保留 own `LlmPort`，新增 `ProviderBinding`／resolver／capability／conformance | 核准 |
@@ -1106,7 +1108,7 @@ Hard gate：只有完整 batch 才能裁決 C1。
 | D7 | 修 harness determinism 是下一個 coding slice，V3-6 先停 | 核准 |
 | D8 | Capture 為 durable truth，OTel 僅作 export | 核准 |
 
-「預設核准」表示本研究的推薦，不代表已授權實作。owner 明確核准後，應建立 ADR 0036 與逐檔 executable plan，再交給實作者。
+D1–D8 已由owner於2026-07-18核准，並固化為[ADR 0036](../adr/0036-interview-vnext-provider-binding-conformance-and-idless-turn-v2.md)。逐檔案、逐測試與live gate由[V3-5A executable plan](../plans/2026-07-18-interview-vnext-v3-5a-runtime-contract-reconstruction-plan.md)管理；核准架構與撰寫plan不等於production route或付費live執行授權。
 
 ---
 

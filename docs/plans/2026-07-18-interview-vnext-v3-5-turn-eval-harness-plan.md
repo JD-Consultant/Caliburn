@@ -1473,7 +1473,7 @@ E8 不得把「CLI 名稱存在」誤報為「online orchestration 已完成」�
 目前實際 decision 是 `HARNESS_INVALID`，因此：
 
 1. **不得開始 V3-6**、route/Web 或 production adapter promotion；
-2. 先依 [2026-07-18 LLM runtime架構審查](../specs/2026-07-18-interview-vnext-llm-runtime-architecture-review.md)核准 ProviderBinding/conformance 與 ID-less turn contract；
+2. 架構已核准為[ADR 0036](../adr/0036-interview-vnext-provider-binding-conformance-and-idless-turn-v2.md)；下一步只依[V3-5A實作計畫](2026-07-18-interview-vnext-v3-5a-runtime-contract-reconstruction-plan.md)重建harness authority、ProviderBinding/conformance與ID-less C1 v2；
 3. coding 順序固定為 harness deterministic regrade → ProviderBinding/execution evidence/conformance → Turn Interpreter C1 v2 → 完整 clean live batch；
 4. 不得只放寬 `proposal_key` regex、忽略 gateway pipeline 或改 prompt 來掩蓋 harness defect；
 5. 只有新版本完整 12×3 batch 得到 `TURN_GATE_PASS_ENGINEERING` 或更高，才能恢復 V3-6。

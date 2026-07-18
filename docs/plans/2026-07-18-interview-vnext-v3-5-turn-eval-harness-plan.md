@@ -1,8 +1,9 @@
 # Interview AI vNext V3-5——Turn Interpreter 評測 harness、12-case multi-trial 與品質 gate 交接規格
 
-- 狀態：**E0–E7 與 E8 executable orchestration 已落地並全綠(887 passed / 0 skipped);true live 12×3 品質批次待在 clean commit 上執行、裁決與定案**
+- 狀態：**E0–E8 executable orchestration 已落地並全綠(887 passed / 0 skipped)；true live 已於 clean commit 嘗試，但 batch 因 route contamination 停線且另發現 contract/harness 缺口，無 model quality verdict，V3-6 blocked**
   - E8 focused：**125 passed**；provider adapter regression：**229 passed**；full API + real PostgreSQL：**887 passed / 0 skipped**。
-  - owner 已授權使用 gitignored `apps/api/.env` 的 key、US$1 hard cap，並將盲化語意裁決與最終 engineering verdict 委託 Codex；不得把此裁決宣稱為獨立 domain review。
+  - clean canary run：`58843af0-6237-4f11-8576-dd2c7d60834c`；incomplete formal batch：`5bad4e3f-5a5f-453e-8923-12a00a05cece`；本次 observed cost：`US$0.499882`。
+  - owner 已授權 US$1 hard cap 與 Codex-assisted blind review；因 batch 不完整且 harness-invalid，未進行語意 promotion 裁決，不得把 partial metrics 宣稱為模型品質。
   - suite hash(turn-interpret-pilot.v1):`sha256:ed51167d64a9887f7a119568ad501ea71e1edd63eace6e44ccba222b5d763d5a`
   - commits:E0 `ce29bd9`、E1 `73813db`、E2 `991ba4e`、E3 `6a2c2d4`、E4 `ddd363e`、E5 `0d4f058`、E6 `2362682`、E7 `f3e55c2`
 - 日期：2026-07-18
@@ -11,6 +12,7 @@
 - 上游架構：[`../specs/2026-07-17-interview-vnext-v3-fixed-replay-research.md`](../specs/2026-07-17-interview-vnext-v3-fixed-replay-research.md)
 - 總計畫：[`2026-07-17-interview-vnext-v3-fixed-replay-plan.md`](2026-07-17-interview-vnext-v3-fixed-replay-plan.md)
 - OpenRouter wire authority：[`2026-07-17-interview-vnext-v3-4r-openrouter-first-adapter-plan.md`](2026-07-17-interview-vnext-v3-4r-openrouter-first-adapter-plan.md)
+- 後續架構裁決：[`../specs/2026-07-18-interview-vnext-llm-runtime-architecture-review.md`](../specs/2026-07-18-interview-vnext-llm-runtime-architecture-review.md)
 - 裁決權：本文件將總計畫 §8 與 research §10.2～10.5 的摘要展開為唯一 V3-5 實作規格。若本文件和摘要在檔名、artifact shape、trial disposition 或執行順序上不同，以本文件為準；既有品質門檻沒有被放寬。
 
 ---
@@ -1466,11 +1468,43 @@ E8 不得把「CLI 名稱存在」誤報為「online orchestration 已完成」�
 
 ---
 
-## 22. 本階段完成後的唯一下一步
+## 22. 本階段完成後的唯一下一步（依真 live 結果更新）
 
-- `TURN_GATE_PASS_ENGINEERING`或更高：開始 V3-6 `episode_code` + 8 component tasks；
-- `TURN_GATE_FAIL`：依failure attribution一次只修一層，發布新version並重跑完整12-case batch；
-- `BATCH_INCOMPLETE/HARNESS_INVALID`：先修harness/provider/Capture，不改prompt來掩蓋；
-- `REVIEW_INCOMPLETE`：補裁決或取得domain review，不把unknown硬判pass。
+目前實際 decision 是 `HARNESS_INVALID`，因此：
 
-V3-5 的價值不是做一張漂亮分數表，而是讓下一次模型、prompt、Context Engine或provider改動，都能在同一把可回放、可追責的尺上比較。這是避免再次出現「架構文件看起來很好，實作後才發現效果很差」的核心防線。
+1. **不得開始 V3-6**、route/Web 或 production adapter promotion；
+2. 先依 [2026-07-18 LLM runtime架構審查](../specs/2026-07-18-interview-vnext-llm-runtime-architecture-review.md)核准 ProviderBinding/conformance 與 ID-less turn contract；
+3. coding 順序固定為 harness deterministic regrade → ProviderBinding/execution evidence/conformance → Turn Interpreter C1 v2 → 完整 clean live batch；
+4. 不得只放寬 `proposal_key` regex、忽略 gateway pipeline 或改 prompt 來掩蓋 harness defect；
+5. 只有新版本完整 12×3 batch 得到 `TURN_GATE_PASS_ENGINEERING` 或更高，才能恢復 V3-6。
+
+V3-5 的價值不是做一張漂亮分數表，而是讓下一次模型、prompt、Context Engine或provider改動，都能在同一把可回放、可追責的尺上比較。這次停線正是 gate 正常發揮作用。
+
+---
+
+## 23. 2026-07-18 true-live 診斷證據
+
+### 23.1 Clean canary
+
+- run ID：`58843af0-6237-4f11-8576-dd2c7d60834c`；
+- requested／canonical model：`anthropic/claude-sonnet-5`／`anthropic/claude-sonnet-5-20260630`；
+- endpoint／provider：`anthropic`／`Anthropic`；
+- direct、attempt 1、pipeline empty、cache absent；manifest/hash chain valid；
+- cost：`US$0.034884`；
+- schema/local contract 通過，但模型在沒有足夠明示證據時填入肯定的ownership/time/typicality/polarity，證明 schema-valid 不等於 evidence-supported。
+
+### 23.2 Incomplete formal batch
+
+- batch ID：`5bad4e3f-5a5f-453e-8923-12a00a05cece`；
+- final status／stop reason：`harness_invalid`／`openrouter.route_contaminated`；
+- 18 trial IDs、27 inference calls、cost `US$0.464998`；
+- 9 committed、8 output/local-schema invalid、1 route-contaminated；只涵蓋 TI-01、TI-02、TI-09～TI-12 的三個 slots，未完成12×3；
+- 失敗輸出多次以underscore產生`proposal_key`，而local contract要求kebab-case；portable provider schema無法保留`pattern`，這是model/application identity責任錯置，不是只改regex即可；
+- contaminated attempt雖為exact Anthropic、direct、attempt 1，routing pipeline仍出現OpenAI moderation guardrail；strict attribution profile依既有規格正確停線；
+- online grade與offline regrade建立`GradingContext`時對`failure_reason_code`不一致，造成deterministic grader drift；這是harness defect，不能算model failure。
+
+### 23.3 裁決
+
+- 本批次只有diagnostic value，沒有precision/recall/pass^3或promotion verdict；
+- 不再消耗付費call，直到contract與harness修正；
+- OpenRouter仍保留為第一個gateway adapter；finalist model必須再與其官方direct API作成對比較，依品質、route可歸因性、延遲、成本與維運複雜度選production primary。

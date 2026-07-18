@@ -2,6 +2,11 @@
 
 **Status（2026-07-18）：V3-5 E0–E8 executable harness 已落地並全綠；true live 已嘗試但因 route contamination／contract／grader drift 無品質裁決，V3-6 blocked**
 
+Owner已核准ADR 0036；下一個實作authority為
+[`V3-5A runtime contract reconstruction plan`](../../../../docs/plans/2026-07-18-interview-vnext-v3-5a-runtime-contract-reconstruction-plan.md)。
+尚未開始code；不得重跑舊v1 batch。active target是`turn.interpret/2.0.0`、ProviderBinding/execution evidence/
+conformance與canonical regrade；migration維持0010。
+
 - V3-5 turn eval harness(`contracts`/`loader`/`identities`/`fixture_builder`/`turn_eval_runner`/
   `capture_export`/`turn_graders`/`review`/`turn_report`/`scheduler`/`batch_orchestrator`/`live_wiring`/
   `turn_eval_cli`)已落地。focused 逐檔:contracts **32**、loader **62**、fixtures **9**、
@@ -131,8 +136,8 @@ key/env/checklist/budget、`3` preflight/catalog/config/harness integrity、`4` 
 ### E8 true live batch（已嘗試；暫停重跑）
 
 下列命令保留作操作reference，但在
-[`2026-07-18 LLM runtime架構審查`](../../../../docs/specs/2026-07-18-interview-vnext-llm-runtime-architecture-review.md)
-的harness determinism、ProviderBinding/conformance與ID-less C1 contract完成前**不得重跑**。既有 incomplete batch 不得續跑、
+[`V3-5A實作計畫`](../../../../docs/plans/2026-07-18-interview-vnext-v3-5a-runtime-contract-reconstruction-plan.md)
+的harness determinism、ProviderBinding/conformance與ID-less C1 v2完成前**不得重跑**。既有 incomplete batch 不得續跑、
 補trial或裁決成model verdict；新contract必須使用新operation/suite identity建立全新batch。
 
 ```powershell

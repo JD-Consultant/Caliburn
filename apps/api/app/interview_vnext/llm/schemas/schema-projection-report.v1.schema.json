@@ -1,0 +1,130 @@
+{
+  "$defs": {
+    "RemovedSchemaConstraint": {
+      "additionalProperties": false,
+      "properties": {
+        "json_pointer": {
+          "pattern": "^(?:/(?:[^~/]|~0|~1)*)*$",
+          "title": "Json Pointer",
+          "type": "string"
+        },
+        "keyword": {
+          "minLength": 1,
+          "title": "Keyword",
+          "type": "string"
+        },
+        "value_hash": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Value Hash",
+          "type": "string"
+        }
+      },
+      "required": [
+        "json_pointer",
+        "keyword",
+        "value_hash"
+      ],
+      "title": "RemovedSchemaConstraint",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "schema_projection_report.v1",
+      "default": "schema_projection_report.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "policy_name": {
+      "maxLength": 128,
+      "minLength": 1,
+      "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+      "title": "Policy Name",
+      "type": "string"
+    },
+    "policy_version": {
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(?:-[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?(?:\\+[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?$",
+      "title": "Policy Version",
+      "type": "string"
+    },
+    "policy_hash": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Policy Hash",
+      "type": "string"
+    },
+    "source_schema_id": {
+      "minLength": 1,
+      "title": "Source Schema Id",
+      "type": "string"
+    },
+    "source_schema_hash": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Source Schema Hash",
+      "type": "string"
+    },
+    "target_profile": {
+      "maxLength": 128,
+      "minLength": 1,
+      "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+      "title": "Target Profile",
+      "type": "string"
+    },
+    "projected_schema_id": {
+      "minLength": 1,
+      "title": "Projected Schema Id",
+      "type": "string"
+    },
+    "projected_schema_hash": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Projected Schema Hash",
+      "type": "string"
+    },
+    "removed_constraints": {
+      "items": {
+        "$ref": "#/$defs/RemovedSchemaConstraint"
+      },
+      "title": "Removed Constraints",
+      "type": "array"
+    },
+    "rewritten_constraints": {
+      "items": {
+        "$ref": "#/$defs/RemovedSchemaConstraint"
+      },
+      "title": "Rewritten Constraints",
+      "type": "array"
+    },
+    "prompt_obligations": {
+      "items": {
+        "maxLength": 128,
+        "minLength": 1,
+        "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+        "type": "string"
+      },
+      "title": "Prompt Obligations",
+      "type": "array"
+    },
+    "report_hash": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Report Hash",
+      "type": "string"
+    }
+  },
+  "required": [
+    "policy_name",
+    "policy_version",
+    "policy_hash",
+    "source_schema_id",
+    "source_schema_hash",
+    "target_profile",
+    "projected_schema_id",
+    "projected_schema_hash",
+    "removed_constraints",
+    "rewritten_constraints",
+    "prompt_obligations",
+    "report_hash"
+  ],
+  "title": "Caliburn interview vNext portable schema projection report v1",
+  "type": "object",
+  "$id": "https://caliburn.local/schemas/schema-projection-report.v1.schema.json"
+}

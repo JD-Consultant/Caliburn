@@ -5,15 +5,18 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Any
 
+from .binding import ProviderBinding
+from .conformance import ConformanceReport
 from .context import (
     CONTEXT_PACKET_ADAPTER,
     ContextBudgetReport,
     ContextSelectionManifest,
     ReferenceSnapshot,
 )
+from .execution import ProviderExecutionEvidence
 from .operation import OperationSpec
 from .port import ModelCallRequest
-from .portable_schema import portable_strict_output_schema
+from .portable_schema import SchemaProjectionReport, portable_strict_output_schema
 from .result import ModelCallResult
 from .turn_interpret import (
     TurnInterpretInput,
@@ -55,6 +58,21 @@ SCHEMA_EXPORTS: dict[str, tuple[str, str, SchemaFactory]] = {
         "Caliburn interview vNext provider-neutral model request v1",
         ModelCallRequest.model_json_schema,
     ),
+    "provider-binding.v1.schema.json": (
+        "https://caliburn.local/schemas/provider-binding.v1.schema.json",
+        "Caliburn interview vNext runtime provider binding v1",
+        ProviderBinding.model_json_schema,
+    ),
+    "provider-conformance-report.v1.schema.json": (
+        "https://caliburn.local/schemas/provider-conformance-report.v1.schema.json",
+        "Caliburn interview vNext provider conformance report v1",
+        ConformanceReport.model_json_schema,
+    ),
+    "provider-execution-evidence.v1.schema.json": (
+        "https://caliburn.local/schemas/provider-execution-evidence.v1.schema.json",
+        "Caliburn interview vNext normalized provider execution evidence v1",
+        ProviderExecutionEvidence.model_json_schema,
+    ),
     "model-call-result.v1.schema.json": (
         "https://caliburn.local/schemas/model-call-result.v1.schema.json",
         "Caliburn interview vNext provider-neutral model result v1",
@@ -64,6 +82,11 @@ SCHEMA_EXPORTS: dict[str, tuple[str, str, SchemaFactory]] = {
         "https://caliburn.local/schemas/reference-snapshot.v1.schema.json",
         "Caliburn interview vNext immutable reference snapshot v1",
         ReferenceSnapshot.model_json_schema,
+    ),
+    "schema-projection-report.v1.schema.json": (
+        "https://caliburn.local/schemas/schema-projection-report.v1.schema.json",
+        "Caliburn interview vNext portable schema projection report v1",
+        SchemaProjectionReport.model_json_schema,
     ),
     "turn-interpret-input.v1.schema.json": (
         "https://caliburn.local/schemas/turn-interpret-input.v1.schema.json",

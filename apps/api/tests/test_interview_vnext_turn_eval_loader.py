@@ -105,7 +105,7 @@ def proposal_qualifiers(unit: str = "per_day") -> dict:
 def initial_state_doc() -> dict:
     return {
         "schema_version": "turn_eval_initial_fixture.v1",
-        "session_status_before_replay": "draft",
+        "session_status_before_replay": "planned",
         "activate_before_transcript": True,
         "open_episode": {
             "episode_key": "episode-main",

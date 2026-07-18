@@ -353,7 +353,7 @@ def test_case_files_are_fixed_names():
 def test_fixture_requires_activation_and_episode_consistency():
     fixture = {
         "schema_version": "turn_eval_initial_fixture.v1",
-        "session_status_before_replay": "draft",
+        "session_status_before_replay": "planned",
         "activate_before_transcript": True,
         "open_episode": {
             "episode_key": "episode-main",

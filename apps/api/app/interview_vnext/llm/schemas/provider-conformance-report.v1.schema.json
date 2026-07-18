@@ -1,0 +1,125 @@
+{
+  "$defs": {
+    "ConformanceReasonCode": {
+      "enum": [
+        "conformance.adapter_mismatch",
+        "conformance.binding_mismatch",
+        "conformance.cache_ineligible",
+        "conformance.gateway_mismatch",
+        "conformance.gateway_model_mismatch",
+        "conformance.pipeline_not_empty",
+        "conformance.route_metadata_missing",
+        "conformance.route_strategy_mismatch",
+        "conformance.transformation_ineligible",
+        "conformance.upstream_attempt_mismatch",
+        "conformance.upstream_endpoint_mismatch",
+        "conformance.upstream_model_mismatch",
+        "conformance.upstream_provider_mismatch",
+        "conformance.wire_not_succeeded"
+      ],
+      "title": "ConformanceReasonCode",
+      "type": "string"
+    },
+    "ModelOutcome": {
+      "enum": [
+        "succeeded",
+        "refused",
+        "incomplete",
+        "failed"
+      ],
+      "title": "ModelOutcome",
+      "type": "string"
+    },
+    "TransformationStatus": {
+      "enum": [
+        "clean",
+        "inspected",
+        "mutated",
+        "unknown"
+      ],
+      "title": "TransformationStatus",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "provider_conformance_report.v1",
+      "default": "provider_conformance_report.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "policy_name": {
+      "maxLength": 128,
+      "minLength": 1,
+      "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+      "title": "Policy Name",
+      "type": "string"
+    },
+    "policy_version": {
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(?:-[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?(?:\\+[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?$",
+      "title": "Policy Version",
+      "type": "string"
+    },
+    "policy_hash": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Policy Hash",
+      "type": "string"
+    },
+    "binding_id": {
+      "maxLength": 128,
+      "minLength": 1,
+      "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+      "title": "Binding Id",
+      "type": "string"
+    },
+    "binding_hash": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Binding Hash",
+      "type": "string"
+    },
+    "execution_evidence_hash": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Execution Evidence Hash",
+      "type": "string"
+    },
+    "wire_outcome": {
+      "$ref": "#/$defs/ModelOutcome"
+    },
+    "eligible": {
+      "title": "Eligible",
+      "type": "boolean"
+    },
+    "reason_codes": {
+      "items": {
+        "$ref": "#/$defs/ConformanceReasonCode"
+      },
+      "title": "Reason Codes",
+      "type": "array"
+    },
+    "transformation_status": {
+      "$ref": "#/$defs/TransformationStatus"
+    },
+    "report_hash": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Report Hash",
+      "type": "string"
+    }
+  },
+  "required": [
+    "policy_name",
+    "policy_version",
+    "policy_hash",
+    "binding_id",
+    "binding_hash",
+    "execution_evidence_hash",
+    "wire_outcome",
+    "eligible",
+    "reason_codes",
+    "transformation_status",
+    "report_hash"
+  ],
+  "title": "Caliburn interview vNext provider conformance report v1",
+  "type": "object",
+  "$id": "https://caliburn.local/schemas/provider-conformance-report.v1.schema.json"
+}

@@ -1,6 +1,8 @@
 # Interview AI vNext V3-5——Turn Interpreter 評測 harness、12-case multi-trial 與品質 gate 交接規格
 
-- 狀態：**E0–E7 已落地並全綠(886 passed / 0 skipped);E8 true live 12×3 batch 待 owner 確認 account checklist 並提供 `OPENROUTER_API_KEY` 後執行**
+- 狀態：**E0–E7 與 E8 executable orchestration 已落地並全綠(887 passed / 0 skipped);true live 12×3 品質批次待在 clean commit 上執行、裁決與定案**
+  - E8 focused：**125 passed**；provider adapter regression：**229 passed**；full API + real PostgreSQL：**887 passed / 0 skipped**。
+  - owner 已授權使用 gitignored `apps/api/.env` 的 key、US$1 hard cap，並將盲化語意裁決與最終 engineering verdict 委託 Codex；不得把此裁決宣稱為獨立 domain review。
   - suite hash(turn-interpret-pilot.v1):`sha256:ed51167d64a9887f7a119568ad501ea71e1edd63eace6e44ccba222b5d763d5a`
   - commits:E0 `ce29bd9`、E1 `73813db`、E2 `991ba4e`、E3 `6a2c2d4`、E4 `ddd363e`、E5 `0d4f058`、E6 `2362682`、E7 `f3e55c2`
 - 日期：2026-07-18
@@ -1162,7 +1164,8 @@ uv run --locked python -m evals.interview_vnext.turn_eval_cli live-batch `
 # 匯出盲化review queue / 匯入裁決 / 產report
 uv run --locked python -m evals.interview_vnext.turn_eval_cli export-review --batch-dir '<path>'
 uv run --locked python -m evals.interview_vnext.turn_eval_cli import-review `
-  --batch-dir '<path>' --decisions '<path-to-jsonl>'
+  --batch-dir '<path>' --decisions '<path-to-jsonl>' `
+  --failure-traces-read '<count>' --passing-trace-sample-read '<count>'
 uv run --locked python -m evals.interview_vnext.turn_eval_cli report --batch-dir '<path>'
 ```
 
@@ -1361,6 +1364,32 @@ Gate：全部mocked + regression綠，尚不代表live pass。
 7. 若pass才把V3-6標unblocked。
 
 Live failure不改舊bundle；修正後另commit、另batch。
+
+#### E8 executable 補充（2026-07-18）
+
+E7 交付時的 `live-batch`、`export-review`、`import-review` 只有參數 gate/stub，不能發出正式品質批次；
+E8 不得把「CLI 名稱存在」誤報為「online orchestration 已完成」。目前已補成以下可執行生命週期：
+
+1. `live-batch` 先做 key/checklist/budget/安全 DB/suite/git-clean gate，再且只再抓一次 model/endpoints
+   catalog snapshot；preflight 通過後才建立 batch dir 與 PostgreSQL trial。
+2. [`../../apps/api/evals/interview_vnext/live_batch.py`](../../apps/api/evals/interview_vnext/live_batch.py)
+   將 production runner、scheduler、Capture exporter、OpenRouter adapter、grader 與 report 串成真正 12×3；
+   第一批固定 `quality_slots=3`、`max_concurrency=1`，不容許用縮小批次冒充 promotion batch。
+3. 每次 durable `model.result`（含 executor retry）都從 Capture 重建 attempt ledger；routing artifact 提供
+   generation ID、cost、selected provider/model、strategy、router attempt 與 pipeline conformance。預算在每個
+   fresh trial 前檢查，完成後立即以 provider 回傳 decimal cost 計費；超限只會得到
+   `BATCH_INCOMPLETE`，不會挑選較好的 trial。
+4. route contamination、resolved-model mismatch、binding/auth/permission/credits error 都是
+   `HARNESS_INVALID` 並停整批；timeout/429/5xx/provider unavailable 才可依 §9.4 開 fresh replacement。
+5. review item UUID 現在包含 opaque `trial_id`；三個 slot 即使輸出相同 proposal key 也不會共用一份裁決。
+   queue 仍不顯示 slot/attempt/provider identity。
+6. trial bundle 的 integrity manifest 在 review 前後都會重驗；offline report 重新執行 deterministic graders，
+   若 grader 結果與 immutable trial bundle 不同就 fail closed，不信任舊 aggregate report。
+7. `import-review` 驗證 item hash/revision/provider-neutral reason，另寫
+   `review-attestation.json` 的 failure trace 與 passing trace sample 數，再重算完整 batch report。
+8. `live-batch` 完成 inference 後正常回 `REVIEW_INCOMPLETE`/exit 1；這不是執行失敗，而是強制要求裁決。
+   只有匯入完整 decisions 並通過 hard/quality gate 後，`report` 才可能變成
+   `TURN_GATE_PASS_ENGINEERING`。
 
 ---
 

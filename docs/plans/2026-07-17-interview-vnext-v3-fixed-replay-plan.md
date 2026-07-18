@@ -3,7 +3,7 @@
 - 日期：2026-07-17
 - 狀態：**已核准執行；研究定稿，實作進行中**
 - 權威規格：[`../specs/2026-07-17-interview-vnext-v3-fixed-replay-research.md`](../specs/2026-07-17-interview-vnext-v3-fixed-replay-research.md)
-- 前置完成：V0、V1、V2-A、V2-B、V3-0、V3-1、V3-2、V3-3與V3-4R；目前 head含 migration 0010、durable UoW/Capture/outbox/recovery、pure ContextBuilder、turn proposal verifier、顯式fixed-replay executor與live-verified OpenRouter adapter。Direct OpenAI V3-4保留為mocked reference；ADR 0035已取消其官方live gate的主線阻擋地位。**2026-07-18真OpenRouter probe已通過；V3-5 turn eval harness E0–E7已落地並全綠(deterministic harness、12個繁中pilot cases凍結、mocked 12×3 batch端到端TURN_GATE_PASS_ENGINEERING、886 passed/0 skipped)。E8 true live 12×3 batch待owner確認OpenRouter account checklist並提供key後執行,通過才可開始V3-6。**
+- 前置完成：V0、V1、V2-A、V2-B、V3-0、V3-1、V3-2、V3-3與V3-4R；目前 head含 migration 0010、durable UoW/Capture/outbox/recovery、pure ContextBuilder、turn proposal verifier、顯式fixed-replay executor與live-verified OpenRouter adapter。Direct OpenAI V3-4保留為mocked reference；ADR 0035已取消其官方live gate的主線阻擋地位。**2026-07-18真OpenRouter probe已通過；V3-5 E0–E8 executable harness已落地並全綠(12個繁中pilot cases、mocked與live orchestration/review/report、887 passed/0 skipped)。true live 12×3 batch待在clean commit上執行與裁決，通過才可開始V3-6。**
 
 ---
 
@@ -39,7 +39,7 @@ fixed transcript
 | V3-3（完成） | durable operation executor、partial/no-op commit | 否 | 9個fixed-replay PostgreSQL cases + recovery regression |
 | V3-4（reference） | eval-only OpenAI Responses adapter | mocked已完成；live optional | mocked API matrix；official live只作GPT direct comparison |
 | V3-4R（完成） | eval-only OpenRouter Chat adapter + exact routing gate | 是，opt-in | 148 mocked + one true OpenRouter live probe passed |
-| V3-5（E0–E7完成、E8 true live待owner） | vNext eval harness + 12 turn tasks + 3-trial turn gate | 是 | harness全綠(886 passed)；true live 12×3 batch通過才繼續 |
+| V3-5（E0–E8 executable完成、true live待執行） | vNext eval harness + 12 turn tasks + 3-trial turn gate | 是 | harness全綠(887 passed)；true live 12×3 batch通過才繼續 |
 | V3-6 | episode_code、Job Model verifier/reducer、preview + 8 tasks | 是 | candidate hard gates |
 | V3-7 | full 20-case experiment、failure review、decision report | 是 | V3 promotion gate |
 | V3-8 | docs、full regression、scope/dependency audit | 否 | clean worktree + user review |

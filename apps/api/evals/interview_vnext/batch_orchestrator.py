@@ -31,6 +31,7 @@ from .contracts import (
     ReviewCompleteness,
     ReviewDecisionLabel,
     TrialDisposition,
+    TurnEvalTrial,
 )
 from .fixture_builder import materialize_reference_output
 from .identities import trial_scoped_ids, turn_uuid
@@ -75,6 +76,8 @@ def grade_execution(
     batch_id: UUID,
     decision_labels: dict[tuple[str, str], ReviewDecisionLabel] | None = None,
     review_complete: bool = True,
+    disposition: TrialDisposition = TrialDisposition.QUALITY_SCORED,
+    trial_record: TurnEvalTrial | None = None,
 ) -> GradedTrial:
     """Grade one execution;mocked 自測時 ``decision_labels`` 省略 → 全 equivalent。"""
 
@@ -107,6 +110,7 @@ def grade_execution(
         ]
         review_items = build_review_items(
             batch_id=batch_id,
+            trial_id=execution.ids.trial_id,
             inputs=inputs,
             gold=evaluation.gold,
             output=output,
@@ -145,13 +149,33 @@ def grade_execution(
         case_id=inputs.case.case_id,
         split=split,
         slot_index=slot_index,
-        disposition=TrialDisposition.QUALITY_SCORED,
+        disposition=disposition,
         grader_results=grader_results,
         metrics=metrics,
         review_complete=review_complete,
-        inference_calls=1,
-        usage_input_tokens=result.usage.input_tokens if result else None,
-        usage_output_tokens=result.usage.output_tokens if result else None,
+        inference_calls=(len(trial_record.attempts) if trial_record else 1),
+        observed_cost_usd=(
+            trial_record.observed_cost_total_usd if trial_record else None
+        ),
+        usage_input_tokens=(
+            trial_record.usage_input_tokens
+            if trial_record
+            else (result.usage.input_tokens if result else None)
+        ),
+        usage_output_tokens=(
+            trial_record.usage_output_tokens
+            if trial_record
+            else (result.usage.output_tokens if result else None)
+        ),
+        usage_cache_read_tokens=(
+            trial_record.usage_cache_read_tokens if trial_record else None
+        ),
+        usage_cache_write_tokens=(
+            trial_record.usage_cache_write_tokens if trial_record else None
+        ),
+        usage_reasoning_tokens=(
+            trial_record.usage_reasoning_tokens if trial_record else None
+        ),
     )
     verification = execution.outcome.verification_report
     return GradedTrial(

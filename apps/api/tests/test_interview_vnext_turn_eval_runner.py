@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from dataclasses import replace
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
@@ -40,8 +41,10 @@ from app.interview_vnext.observability.artifacts import build_inline_artifact
 from app.interview_vnext.domain.hashing import canonical_json
 from evals.interview_vnext.batch_orchestrator import grade_execution
 from evals.interview_vnext.capture_export import (
+    CaptureExportError,
     SecretLeakError,
     export_run_bundle,
+    validate_capture_bundle,
 )
 from evals.interview_vnext.contracts import (
     BatchDecision,
@@ -340,6 +343,67 @@ async def test_capture_export_validates_and_scans(
     assert "capture.run_manifest" in kinds
 
 
+async def test_capture_bundle_rejects_deleted_tampered_and_unrooted_authority(
+    postgres_session_factory, suite, tracked_cleanup
+):
+    _, _, execution = await run_one(
+        postgres_session_factory, suite, "TI-01-single-action", "capture-corruption"
+    )
+    tracked_cleanup.append(execution.ids)
+    bundle = await export_run_bundle(
+        postgres_session_factory,
+        tenant_id=execution.ids.tenant_id,
+        run_id=execution.ids.run_id,
+    )
+    config_root = next(
+        ref for ref in bundle.manifest.root_artifacts if ref.kind == "provider.config"
+    )
+
+    deleted = replace(
+        bundle,
+        artifacts=tuple(
+            record
+            for record in bundle.artifacts
+            if record.ref.artifact_id != config_root.artifact_id
+        ),
+    )
+    with pytest.raises(CaptureExportError, match="absent|missing"):
+        validate_capture_bundle(deleted)
+
+    forged_ref = config_root.model_copy(
+        update={"content_hash": "sha256:" + "f" * 64}
+    )
+    forged_roots = tuple(
+        forged_ref if ref == config_root else ref
+        for ref in bundle.manifest.root_artifacts
+    )
+    forged_manifest = type(bundle.manifest).model_validate(
+        {
+            **bundle.manifest.model_dump(),
+            "root_artifacts": forged_roots,
+        }
+    )
+    forged = replace(bundle, run=forged_manifest, manifest=forged_manifest)
+    with pytest.raises(CaptureExportError, match="root artifact reference mismatch"):
+        validate_capture_bundle(forged)
+
+    # The provider-config ref remains nested in model.request and the artifact
+    # remains present, but removing its direct root must still fail closure.
+    unrooted_manifest = type(bundle.manifest).model_validate(
+        {
+            **bundle.manifest.model_dump(),
+            "root_artifacts": tuple(
+                ref for ref in bundle.manifest.root_artifacts if ref != config_root
+            ),
+        }
+    )
+    unrooted = replace(
+        bundle, run=unrooted_manifest, manifest=unrooted_manifest
+    )
+    with pytest.raises(CaptureExportError, match="omits a request authority root"):
+        validate_capture_bundle(unrooted)
+
+
 async def test_capture_export_flags_secret(
     postgres_session_factory, suite, tracked_cleanup, monkeypatch
 ):
@@ -461,6 +525,43 @@ async def grade_one_trial(
         review_complete=review_complete,
     )
     return trial, bundle, graded
+
+
+async def test_reexport_and_regrade_preserve_capture_hashes(
+    postgres_session_factory, suite, tracked_cleanup
+):
+    inputs, evaluation, execution = await run_one(
+        postgres_session_factory, suite, "TI-01-single-action", "reexport-regrade"
+    )
+    tracked_cleanup.append(execution.ids)
+    batch_id = uuid5(NAMESPACE_URL, "capture-reexport-regrade")
+
+    first_trial, first_bundle, first_graded = await grade_one_trial(
+        postgres_session_factory,
+        inputs,
+        evaluation,
+        execution,
+        batch_id=batch_id,
+        slot_index=1,
+    )
+    second_trial, second_bundle, second_graded = await grade_one_trial(
+        postgres_session_factory,
+        inputs,
+        evaluation,
+        execution,
+        batch_id=batch_id,
+        slot_index=1,
+    )
+
+    assert second_trial == first_trial
+    assert second_graded == first_graded
+    assert second_bundle.manifest == first_bundle.manifest
+    assert tuple(event.event_hash for event in second_bundle.events) == tuple(
+        event.event_hash for event in first_bundle.events
+    )
+    assert tuple(ref.content_hash for ref in second_bundle.manifest.root_artifacts) == tuple(
+        ref.content_hash for ref in first_bundle.manifest.root_artifacts
+    )
 
 
 async def test_reference_batch_reaches_engineering_pass(

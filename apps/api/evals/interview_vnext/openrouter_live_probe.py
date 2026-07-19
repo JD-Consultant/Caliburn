@@ -32,6 +32,10 @@ import httpx
 from pydantic import ValidationError
 
 from app.interview_vnext.domain.hashing import canonical_hash, canonical_json
+from app.interview_vnext.llm.capture import (
+    model_call_input_artifacts,
+    validate_model_call_capture_closure,
+)
 from app.interview_vnext.llm.context import INJECTION_BOUNDARY
 from app.interview_vnext.llm.operation_documents import (
     TURN_INTERPRET_PROMPT_PATH,
@@ -476,13 +480,14 @@ async def run_probe(
             "attempt/1/request", kind="model.request", payload=request,
             schema_id=MODEL_REQUEST_SCHEMA_ID, attempt=True,
         )
+        call_inputs = model_call_input_artifacts(request_artifact.ref, request)
         bundle_files["request.json"] = canonical_json(request)
 
         record_event(
             "event/model-call-started", event_type="model.call.started",
             status=ExecutionStatus.OK, occurred_at=started_at, stage="turn.interpret",
             turn_id=turn_id, operation_id=operation_id, attempt_id=attempt_id, attempt=1,
-            input_artifacts=(request_artifact.ref,),
+            input_artifacts=call_inputs,
         )
 
         # ---- one inference POST ----------------------------------------------
@@ -512,7 +517,8 @@ async def run_probe(
             call_event[0], event_type=call_event[1], status=call_event[2],
             occurred_at=result.completed_at, stage="turn.interpret", turn_id=turn_id,
             operation_id=operation_id, attempt_id=attempt_id, attempt=1,
-            output_artifacts=(result_artifact.ref, *supporting_refs),
+            input_artifacts=call_inputs,
+            output_artifacts=(*supporting_refs, result_artifact.ref),
         )
 
         local_output_validation_passed = False
@@ -540,8 +546,11 @@ async def run_probe(
         manifest = recorder.build_manifest(
             run_id=run_id, completed_at=completed_at,
             root_artifacts=(
-                probe_inputs_artifact.ref, request_artifact.ref, result_artifact.ref
+                probe_inputs_artifact.ref, *call_inputs, result_artifact.ref
             ),
+        )
+        validate_model_call_capture_closure(
+            recorder.events(run_id), manifest=manifest, artifact_store=store
         )
         report = _build_report(
             probe_id=probe_id, run_id=run_id, config=config, probe_inputs=probe_inputs,

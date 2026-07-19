@@ -134,8 +134,9 @@ def uow_factory(factory):
 BINDING = scripted_turn_binding()
 
 
-def request_for(ids, attempt_id: UUID):
+def request_for(ids, attempt_id: UUID, *, attempt: int = 1):
     return scripted_model_request(
+        attempt=attempt,
         name=f"recovery:{ids.session_id}:{attempt_id}",
         run_id=ids.run_id,
         session_id=ids.session_id,
@@ -165,10 +166,12 @@ async def prepare(factory, ids):
         step_event_id=uuid4(), occurred_at=NOW + timedelta(seconds=1))
 
 
-async def start(factory, ids, *, attempt_id: UUID, at=None, deadline=None):
+async def start(
+    factory, ids, *, attempt_id: UUID, attempt: int = 1, at=None, deadline=None
+):
     # 每個 attempt 綁自己的 typed request artifact(binding/config/projection 的
     # persisted refs 由該 request 的 deterministic ids 引用)。
-    request = request_for(ids, attempt_id)
+    request = request_for(ids, attempt_id, attempt=attempt)
     request_record, binding_record, config_record, projection_record = (
         request_input_records(request, BINDING)
     )
@@ -186,12 +189,12 @@ async def start(factory, ids, *, attempt_id: UUID, at=None, deadline=None):
 
 
 async def record(factory, ids, *, attempt_id: UUID, name: str, outcome: AttemptOutcome,
-                 at=None):
+                 attempt: int = 1, at=None):
     # SUCCEEDED 是 clean wire success + eligible conformance;失敗 outcome 是
     # wire failure(unknown route、conformance=wire_not_succeeded)。三件 typed
     # artifact 與 request/binding 交叉一致,record_attempt_result 內的 provider
     # gate 全驗後才落盤。
-    request = request_for(ids, attempt_id)
+    request = request_for(ids, attempt_id, attempt=attempt)
     wire = (
         ModelOutcome.SUCCEEDED
         if outcome == AttemptOutcome.SUCCEEDED
@@ -223,6 +226,26 @@ async def _attempt_rows(factory, ids) -> list:
             "SELECT attempt, status FROM interview_vnext_operation_attempts "
             "WHERE tenant_id = :t ORDER BY attempt"),
             {"t": str(ids.tenant_id)})).all()
+
+
+async def _provider_event_payloads(factory, ids) -> list[dict]:
+    async with factory() as session:
+        rows = (
+            await session.execute(
+                sa.text(
+                    "SELECT event_json FROM interview_vnext_execution_events "
+                    "WHERE tenant_id = :tenant_id AND run_id = :run_id "
+                    "AND event_type IN ('model.call.started', 'model.call.completed', "
+                    "'model.call.failed', 'provider.conformance.completed') "
+                    "ORDER BY sequence"
+                ),
+                {
+                    "tenant_id": str(ids.tenant_id),
+                    "run_id": str(ids.run_id),
+                },
+            )
+        ).scalars().all()
+    return [json.loads(row) for row in rows]
 
 
 async def verify_noop_operation(factory, ids):
@@ -329,6 +352,14 @@ async def test_same_attempt_claim_race_grants_exactly_one_provider_owner(
     await bootstrap(postgres_session_factory, ids)
     await prepare(postgres_session_factory, ids)
     attempt_id = uuid4()
+    request = request_for(ids, attempt_id)
+    request_record, binding_record, config_record, projection_record = (
+        request_input_records(request, BINDING)
+    )
+    async with SqlAlchemyVNextUnitOfWork(postgres_session_factory) as uow:
+        for record_item in (binding_record, config_record, projection_record):
+            await uow.artifacts.put(tenant_id=ids.tenant_id, record=record_item)
+        await uow.commit()
 
     async def claim():
         return await claim_attempt_for_provider(
@@ -337,9 +368,10 @@ async def test_same_attempt_claim_race_grants_exactly_one_provider_owner(
             operation_id=op_id(ids),
             attempt_id=attempt_id,
             provider="scripted",
-            requested_model="fake-model",
+            requested_model=BINDING.requested_model,
             deadline_at=DEADLINE,
             max_attempts=MAX_ATTEMPTS,
+            request_artifact=request_record,
             call_event_id=uuid5(attempt_id, "call-started"),
             occurred_at=NOW + timedelta(seconds=2),
         )
@@ -376,6 +408,7 @@ async def test_calling_waits_before_deadline_and_retries_once_after(
                  outcome=AttemptOutcome.RETRYABLE_FAILURE, at=after)
     a2 = uuid4()
     await start(postgres_session_factory, ids, attempt_id=a2,
+                attempt=2,
                 at=after + timedelta(seconds=1),
                 deadline=after + timedelta(seconds=300))
     provider.generate()
@@ -387,6 +420,21 @@ async def test_calling_waits_before_deadline_and_retries_once_after(
                         now=after + timedelta(seconds=2)) == \
         RecoveryAction.WAIT_FOR_DEADLINE
     assert provider.calls == 2
+    events = await _provider_event_payloads(postgres_session_factory, ids)
+    assert [event["event_type"] for event in events] == [
+        "model.call.started",
+        "model.call.failed",
+        "provider.conformance.completed",
+        "model.call.started",
+    ]
+    assert [event["status"] for event in events] == [
+        "ok", "failed", "skipped", "ok"
+    ]
+    assert events[1]["input_artifacts"] == events[0]["input_artifacts"]
+    assert [ref["kind"] for ref in events[2]["input_artifacts"]] == [
+        "model.provider_binding",
+        "model.provider_execution_evidence",
+    ]
 
 
 async def test_attempt_budget_exhaustion_marks_failed(postgres_session_factory,
@@ -397,17 +445,26 @@ async def test_attempt_budget_exhaustion_marks_failed(postgres_session_factory,
     at = NOW + timedelta(seconds=2)
     for n in range(1, MAX_ATTEMPTS + 1):                      # 3 次全 retryable 失敗
         attempt_id = uuid4()
-        await start(postgres_session_factory, ids, attempt_id=attempt_id, at=at)
+        await start(
+            postgres_session_factory, ids, attempt_id=attempt_id, attempt=n, at=at
+        )
         at += timedelta(seconds=1)
         checkpoint = await record(postgres_session_factory, ids,
                                   attempt_id=attempt_id, name=f"result-{n}",
-                                  outcome=AttemptOutcome.RETRYABLE_FAILURE, at=at)
+                                  outcome=AttemptOutcome.RETRYABLE_FAILURE,
+                                  attempt=n, at=at)
         at += timedelta(seconds=1)
     # 第 3 次 retryable + 額度耗盡 → record 內轉 failed
     assert checkpoint.status == CheckpointStatus.FAILED
     assert await decide(postgres_session_factory, ids) == RecoveryAction.RETURN_FAILED
     with pytest.raises(CheckpointConflict):                   # 不可再開 attempt
         await start(postgres_session_factory, ids, attempt_id=uuid4(), at=at)
+    events = await _provider_event_payloads(postgres_session_factory, ids)
+    assert [event["status"] for event in events] == [
+        "ok", "failed", "skipped",
+        "ok", "failed", "skipped",
+        "ok", "failed", "skipped",
+    ]
 
 
 # ── case 18/19:provider_completed 之後零 provider call;committed 回同一結果 ─────
@@ -463,6 +520,18 @@ async def test_late_phases_never_call_provider_and_committed_replays(
     assert replay_cp.domain_result_artifact == first_cp.domain_result_artifact
     assert replay_result.state_hash == first_result.state_hash
     assert provider.calls == 1                               # 全程恰一次 generate
+    provider_events = await _provider_event_payloads(postgres_session_factory, ids)
+    assert [event["event_type"] for event in provider_events] == [
+        "model.call.started",
+        "model.call.completed",
+        "provider.conformance.completed",
+    ]
+    assert [event["status"] for event in provider_events] == ["ok", "ok", "ok"]
+    assert provider_events[1]["input_artifacts"] == provider_events[0]["input_artifacts"]
+    assert [ref["kind"] for ref in provider_events[1]["output_artifacts"][-2:]] == [
+        "model.result",
+        "model.provider_execution_evidence",
+    ]
 
 
 async def test_verified_noop_is_atomic_idempotent_and_has_no_command(
@@ -872,6 +941,15 @@ async def test_wire_succeeded_but_ineligible_fails_with_conformance_authority(
         checkpoint.provider_execution_evidence_artifact == gate.evidence_record.ref
     )
     assert checkpoint.provider_conformance_artifact == gate.conformance_record.ref
+    provider_events = await _provider_event_payloads(postgres_session_factory, ids)
+    assert [event["status"] for event in provider_events] == [
+        "ok", "failed", "failed"
+    ]
+    assert provider_events[1]["input_artifacts"] == provider_events[0]["input_artifacts"]
+    assert [ref["kind"] for ref in provider_events[2]["input_artifacts"]] == [
+        "model.provider_binding",
+        "model.provider_execution_evidence",
+    ]
 
 
 @pytest.mark.parametrize(

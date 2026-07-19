@@ -319,6 +319,9 @@ class DurableCaptureWriter:
         if not events:
             raise RunConflict("cannot build a manifest for a run without events",
                               run_id=run_id)
+        # Root refs are authoritative terminal pointers.  Reject a missing or
+        # hash-mismatched root before the manifest artifact can be persisted.
+        await self._artifacts.get_many(tenant_id=tenant_id, refs=root_artifacts)
         taxonomy = resolve_execution_taxonomy(run_row.taxonomy_id,
                                               run_row.taxonomy_version)
         manifest = RunManifest(

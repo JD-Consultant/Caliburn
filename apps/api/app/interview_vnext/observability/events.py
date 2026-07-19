@@ -215,3 +215,10 @@ def validate_event_chain(
             raise ValueError("run manifest last hash mismatch")
         if manifest.taxonomy_hash != taxonomy.content_hash:
             raise ValueError("run manifest taxonomy hash mismatch")
+        if artifact_store is not None:
+            for ref in manifest.root_artifacts:
+                stored = artifact_store.get(ref.artifact_id)
+                if stored.ref != ref:
+                    raise ValueError(
+                        f"root artifact reference mismatch: {ref.artifact_id}"
+                    )

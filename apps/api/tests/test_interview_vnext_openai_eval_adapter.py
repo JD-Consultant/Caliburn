@@ -1,7 +1,10 @@
-"""V3-4 OpenAI Responses eval adapter — mocked-HTTP conformance tests.
+"""V3-4/R4 OpenAI Responses eval adapter — mocked-HTTP wire/evidence tests.
 
-規格:docs/plans/2026-07-17-interview-vnext-v3-4-openai-responses-adapter-plan.md
 不打 live API;所有 provider 行為經 httpx mock + 官方 SDK deserialization。
+R4:reference adapter 只回 wire result + actual evidence;resolved-model
+mismatch 由 neutral conformance 判定(§9.2/§12.3)。
+
+規格:docs/plans/2026-07-19-interview-vnext-v3-5a-r4-provider-evidence-conformance-plan.md
 """
 
 from __future__ import annotations
@@ -20,6 +23,12 @@ from pydantic import ValidationError
 
 from app.interview_vnext.domain.hashing import canonical_hash, canonical_json
 from app.interview_vnext.llm.binding import ProviderBinding, define_provider_binding
+from app.interview_vnext.llm.conformance import (
+    ConformanceReasonCode,
+    evaluate_conformance,
+    resolve_conformance_policy,
+)
+from app.interview_vnext.llm.execution import CacheStatus, TransformationStatus
 from app.interview_vnext.llm.operation_documents import turn_interpret_operation
 from app.interview_vnext.llm.port import (
     MessageRole,
@@ -389,6 +398,19 @@ def assert_no_secret_anywhere(envelope: ModelCallEnvelope) -> None:
     for blob in blobs:
         assert API_KEY not in blob
         assert "Authorization" not in blob
+
+
+def conformance_report(envelope: ModelCallEnvelope, binding: ProviderBinding | None = None):
+    """R4 §9.2:同一 neutral pure evaluator 判 reference adapter 的 eligibility。"""
+
+    binding = binding or STANDARD_BINDING
+    policy = resolve_conformance_policy(binding.conformance_policy)
+    return evaluate_conformance(
+        policy=policy,
+        binding=binding,
+        evidence=envelope.execution_evidence,
+        wire_outcome=envelope.result.outcome,
+    )
 
 
 def assert_failure(
@@ -869,7 +891,48 @@ class TestAdapterResponseMatrix:
         assert item["output_index"] == 1
         assert item["message_id"] == "msg_fx_1"
         assert item["type"] == "output_text"
+
+        # R4 §9.2/§12.3:direct reference evidence 保存 actual response facts。
+        evidence = envelope.execution_evidence
+        assert evidence.gateway_resolved_model == "gpt-5.6-sol"
+        assert evidence.upstream_provider == "OpenAI"
+        assert evidence.upstream_model == "gpt-5.6-sol"
+        assert evidence.upstream_endpoint == "responses"
+        assert evidence.route_strategy == "direct"
+        assert evidence.upstream_attempt_count == 1
+        assert evidence.transformation_status == TransformationStatus.CLEAN
+        assert evidence.cache_status == CacheStatus.ABSENT
+        assert evidence.provider_request_id == "req_fx_success"
+        assert evidence.generation_id == "resp_fx_success"
+        # §4.5:direct provider 以 immutable raw Responses artifact 作 source。
+        raw_ref = evidence.raw_routing_artifact
+        assert raw_ref is not None
+        assert raw_ref.kind == "provider.openai.response.raw"
+        assert raw_ref in {r.ref for r in envelope.supporting_artifacts}
+
+        # clean exact response 通過同一 neutral attribution-strict evaluator。
+        report = conformance_report(envelope)
+        assert report.eligible is True
+        assert report.reason_codes == ()
         assert_no_secret_anywhere(envelope)
+
+    async def test_prompt_cached_tokens_are_usage_not_response_cache_hit(self):
+        """§12.3:input cached_tokens 只進 TokenUsage;cache_status 仍 ABSENT。"""
+
+        body = json.loads(
+            (FIXTURES / "success_reasoning_then_message.json").read_text("utf-8")
+        )
+        body["usage"]["input_tokens_details"]["cached_tokens"] = 512
+        adapter, _ = make_adapter(
+            lambda request: httpx.Response(
+                200, json=body, headers={"x-request-id": "req_fx_cached"}
+            )
+        )
+        envelope = await adapter.generate_structured(make_call())
+        assert envelope.result.outcome == ModelOutcome.SUCCEEDED
+        assert envelope.result.usage.cache_read_tokens == 512
+        assert envelope.execution_evidence.cache_status == CacheStatus.ABSENT
+        assert conformance_report(envelope).eligible is True
 
     async def test_adapter_never_uses_output_text_concatenation(self):
         adapter, _ = make_adapter(
@@ -1054,21 +1117,28 @@ class TestAdapterResponseMatrix:
         visible = artifact_by_label(envelope, VISIBLE_ARTIFACT_LABEL)
         assert len(visible["items"]) == 2
 
-    async def test_resolved_model_mismatch_fails_closed(self):
+    async def test_resolved_model_mismatch_is_wire_success_but_ineligible(self):
+        """R4 §9.2:mismatch 是 conformance verdict,不再是 wire failure。"""
+
         adapter, _ = make_adapter(
             lambda request: fixture_response("resolved_model_mismatch.json")
         )
         envelope = await adapter.generate_structured(make_call())
-        assert_failure(
-            envelope,
-            kind=FailureKind.RESOLVED_MODEL_MISMATCH,
-            reason_code="openai.resolved_model_mismatch",
-            retryable=False,
-        )
         result = envelope.result
+        assert result.outcome is ModelOutcome.SUCCEEDED
+        assert result.failure is None
+        assert result.parsed_output is not None
         assert result.resolved_model == "gpt-5.7-mini"
         assert result.provider_finish_reason == "completed"
-        assert result.parsed_output is None
+        evidence = envelope.execution_evidence
+        assert evidence.gateway_resolved_model == "gpt-5.7-mini"
+        assert evidence.upstream_model == "gpt-5.7-mini"
+        report = conformance_report(envelope)
+        assert report.eligible is False
+        assert report.reason_codes == (
+            ConformanceReasonCode.GATEWAY_MODEL_MISMATCH,
+            ConformanceReasonCode.UPSTREAM_MODEL_MISMATCH,
+        )
         raw = artifact_by_label(envelope, RAW_ARTIFACT_LABEL)
         assert raw["response"]["model"] == "gpt-5.7-mini"
         visible = artifact_by_label(envelope, VISIBLE_ARTIFACT_LABEL)
@@ -1076,21 +1146,25 @@ class TestAdapterResponseMatrix:
 
     async def test_no_prefix_or_family_auto_acceptance_for_models(self):
         # R3-C1:exact runtime preflight 下,變體 config 必須帶自己的 binding。
+        # R4:`gpt-5.7-mini` 不因 `gpt-5.7` 家族前綴而 eligible;由 conformance
+        # exact matching fail closed,不是 wire failure。
         variant = OpenAIResponsesEvalConfig(
             accepted_resolved_models=("gpt-5.6", "gpt-5.6-sol", "gpt-5.7"),
         )
+        variant_binding = build_openai_reference_binding(variant)
         adapter, _ = make_adapter(
             lambda request: fixture_response("resolved_model_mismatch.json"),
             config=variant,
         )
         envelope = await adapter.generate_structured(
-            make_call(binding=build_openai_reference_binding(variant), config=variant)
+            make_call(binding=variant_binding, config=variant)
         )
-        assert_failure(
-            envelope,
-            kind=FailureKind.RESOLVED_MODEL_MISMATCH,
-            reason_code="openai.resolved_model_mismatch",
-            retryable=False,
+        assert envelope.result.outcome is ModelOutcome.SUCCEEDED
+        report = conformance_report(envelope, binding=variant_binding)
+        assert report.eligible is False
+        assert report.reason_codes == (
+            ConformanceReasonCode.GATEWAY_MODEL_MISMATCH,
+            ConformanceReasonCode.UPSTREAM_MODEL_MISMATCH,
         )
 
     async def test_usage_none_uses_nulls_and_sorted_limitations(self):

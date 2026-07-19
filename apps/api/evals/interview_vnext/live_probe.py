@@ -1,13 +1,16 @@
-"""Opt-in single-shot OpenAI Responses live conformance probe (V3-4 §16).
+"""Opt-in single-shot OpenAI Responses reference conformance probe (V3-4 §16; R4 §10.3).
 
-Verifies that the official endpoint accepts the exact published portable schema
-and that the real SDK response shape survives the neutral normalizer, then
-writes an immutable Capture bundle. It never grades model quality: a refusal or
-incomplete outcome is a valid neutral result but still fails the conformance
-run because no verifiable structured payload was obtained.
+Verifies that the official request shape and the real SDK response shape survive
+the neutral normalizer, then writes an immutable Capture bundle. Since R4 the
+probe persists the full provider authority chain — wire result, execution
+evidence and the application conformance report — and only runs local output
+validation after the report is eligible. It never grades model quality, and in
+R4 it is exercised mocked-only (official OpenAI live runs are out of scope).
 
 Exit codes: 0 = conformance passed; 1 = probe ran but did not pass (bundle with
 failed events is still written); 2 = missing OPENAI_API_KEY (nothing created).
+
+規格:docs/plans/2026-07-19-interview-vnext-v3-5a-r4-provider-evidence-conformance-plan.md
 """
 
 from __future__ import annotations
@@ -31,6 +34,10 @@ from app.interview_vnext.llm.capture import (
     model_call_input_artifacts,
     validate_model_call_capture_closure,
 )
+from app.interview_vnext.llm.conformance import (
+    evaluate_conformance,
+    resolve_conformance_policy,
+)
 from app.interview_vnext.llm.context import INJECTION_BOUNDARY
 from app.interview_vnext.llm.operation_documents import (
     TURN_INTERPRET_PROMPT_PATH,
@@ -49,6 +56,8 @@ from app.interview_vnext.llm.portable_schema import (
 from app.interview_vnext.llm.result import ModelCallResult, ModelOutcome
 from app.interview_vnext.llm.schema_exports import SCHEMA_EXPORTS, published_schema
 from app.interview_vnext.llm.schema_ids import (
+    CONFORMANCE_SCHEMA_ID,
+    EXECUTION_EVIDENCE_SCHEMA_ID,
     MODEL_REQUEST_SCHEMA_ID,
     MODEL_RESULT_SCHEMA_ID,
     PROVIDER_BINDING_SCHEMA_ID,
@@ -68,7 +77,7 @@ from app.interview_vnext.observability.artifacts import (
 from app.interview_vnext.observability.capture import CaptureRecorder
 from app.interview_vnext.observability.events import ExecutionStatus, RunManifest
 from app.interview_vnext.observability.outbox import InMemoryOutbox
-from app.interview_vnext.observability.taxonomy import INTERVIEW_VNEXT_EXECUTION_V1
+from app.interview_vnext.observability.taxonomy import INTERVIEW_VNEXT_EXECUTION_V2
 
 from .provider_config import (
     DEFAULT_ACCEPTED_RESOLVED_MODELS,
@@ -333,9 +342,10 @@ async def run_probe(
     )
     call_inputs = model_call_input_artifacts(request_artifact.ref, request)
 
+    # R4 §10.3: same v2 taxonomy hard cut as the OpenRouter probe.
     store = InMemoryArtifactStore()
     recorder = CaptureRecorder(
-        taxonomy=INTERVIEW_VNEXT_EXECUTION_V1, artifacts=store, outbox=InMemoryOutbox()
+        taxonomy=INTERVIEW_VNEXT_EXECUTION_V2, artifacts=store, outbox=InMemoryOutbox()
     )
     for record in (
         config_artifact,
@@ -403,6 +413,7 @@ async def run_probe(
     finally:
         await adapter.aclose()
     result = envelope.result
+    evidence = envelope.execution_evidence
 
     for record in envelope.supporting_artifacts:
         store.put(record)
@@ -415,6 +426,20 @@ async def run_probe(
         created_at=result.completed_at,
     )
     store.put(result_artifact)
+
+    # R4 §10.3: persist evidence/conformance with the executor's deterministic
+    # attempt-scoped artifact identities.
+    evidence_artifact = build_inline_artifact(
+        artifact_id=uuid5(attempt_id, "provider-execution-evidence"),
+        kind="model.provider_execution_evidence",
+        media_type="application/json", payload=evidence,
+        schema_id=EXECUTION_EVIDENCE_SCHEMA_ID,
+        run_id=run_id, session_id=session_id, turn_id=turn_id,
+        operation_id=operation_id, attempt_id=attempt_id,
+        created_at=result.completed_at, retention_class="eval",
+        redaction_status=RedactionStatus.NOT_REQUIRED, contains_test_data=True,
+    )
+    store.put(evidence_artifact)
 
     supporting_refs = tuple(record.ref for record in envelope.supporting_artifacts)
     if result.outcome == ModelOutcome.FAILED:
@@ -431,12 +456,46 @@ async def run_probe(
         occurred_at=result.completed_at,
         with_attempt=True,
         input_artifacts=call_inputs,
-        output_artifacts=(*supporting_refs, result_artifact.ref),
+        output_artifacts=(*supporting_refs, result_artifact.ref, evidence_artifact.ref),
     )
 
+    policy = resolve_conformance_policy(binding.conformance_policy)
+    conformance = evaluate_conformance(
+        policy=policy, binding=binding, evidence=evidence,
+        wire_outcome=result.outcome,
+    )
+    conformance_artifact = build_inline_artifact(
+        artifact_id=uuid5(attempt_id, "provider-conformance"),
+        kind="model.provider_conformance",
+        media_type="application/json", payload=conformance,
+        schema_id=CONFORMANCE_SCHEMA_ID,
+        run_id=run_id, session_id=session_id, turn_id=turn_id,
+        operation_id=operation_id, attempt_id=attempt_id,
+        created_at=result.completed_at, retention_class="eval",
+        redaction_status=RedactionStatus.NOT_REQUIRED, contains_test_data=True,
+    )
+    store.put(conformance_artifact)
+    if conformance.eligible:
+        conformance_status = ExecutionStatus.OK
+    elif result.outcome == ModelOutcome.SUCCEEDED:
+        conformance_status = ExecutionStatus.FAILED
+    else:
+        conformance_status = ExecutionStatus.SKIPPED
+    record_event(
+        "event/provider-conformance",
+        event_type="provider.conformance.completed",
+        stage="turn.interpret",
+        status=conformance_status,
+        occurred_at=result.completed_at,
+        with_attempt=True,
+        input_artifacts=(binding_artifact.ref, evidence_artifact.ref),
+        output_artifacts=(conformance_artifact.ref,),
+    )
+
+    # §10.3: local output validation only on an eligible execution.
     local_output_validation_passed = False
     local_validation_error: str | None = None
-    if result.outcome == ModelOutcome.SUCCEEDED and result.parsed_output is not None:
+    if conformance.eligible and result.parsed_output is not None:
         try:
             TurnInterpretOutput.model_validate(result.parsed_output.load())
             local_output_validation_passed = True
@@ -447,7 +506,9 @@ async def run_probe(
     if completed_at < result.completed_at:
         completed_at = result.completed_at
     conformance_passed = (
-        result.outcome == ModelOutcome.SUCCEEDED and local_output_validation_passed
+        result.outcome == ModelOutcome.SUCCEEDED
+        and conformance.eligible
+        and local_output_validation_passed
     )
     record_event(
         "event/run-completed" if conformance_passed else "event/run-failed",
@@ -461,7 +522,10 @@ async def run_probe(
     manifest = recorder.build_manifest(
         run_id=run_id,
         completed_at=completed_at,
-        root_artifacts=(config_artifact.ref, *call_inputs, result_artifact.ref),
+        root_artifacts=(
+            config_artifact.ref, *call_inputs, result_artifact.ref,
+            evidence_artifact.ref, conformance_artifact.ref,
+        ),
     )
     validate_model_call_capture_closure(
         recorder.events(run_id), manifest=manifest, artifact_store=store
@@ -474,6 +538,12 @@ async def run_probe(
         request_artifact=request_artifact,
         result_artifact=result_artifact,
         result=result,
+        binding=binding,
+        policy=policy,
+        evidence=evidence,
+        conformance=conformance,
+        evidence_artifact=evidence_artifact,
+        conformance_artifact=conformance_artifact,
         manifest=manifest,
         local_output_validation_passed=local_output_validation_passed,
         local_validation_error=local_validation_error,
@@ -504,6 +574,12 @@ def _build_report(
     request_artifact: ArtifactRecord,
     result_artifact: ArtifactRecord,
     result: ModelCallResult,
+    binding,
+    policy,
+    evidence,
+    conformance,
+    evidence_artifact: ArtifactRecord,
+    conformance_artifact: ArtifactRecord,
     manifest: RunManifest,
     local_output_validation_passed: bool,
     local_validation_error: str | None,
@@ -512,7 +588,7 @@ def _build_report(
 ) -> dict[str, Any]:
     limitations = sorted({PROBE_LIMITATION, *result.usage.limitations})
     return {
-        "schema_version": "live_probe_report.v1",
+        "schema_version": "live_probe_report.v2",
         "run_id": str(run_id),
         "probe_id": probe_id,
         "started_at": started_at.isoformat(),
@@ -539,6 +615,21 @@ def _build_report(
         "resolved_model": result.resolved_model,
         "provider_request_id": result.provider_request_id,
         "usage": result.usage.model_dump(mode="json"),
+        "binding_id": binding.binding_id,
+        "binding_hash": binding.binding_hash,
+        "execution_evidence_hash": evidence.evidence_hash,
+        "transformation_status": evidence.transformation_status.value,
+        "cache_status": evidence.cache_status.value,
+        "conformance_policy_name": policy.name,
+        "conformance_policy_version": policy.version,
+        "conformance_policy_hash": policy.policy_hash,
+        "conformance_report_hash": conformance.report_hash,
+        "conformance_eligible": conformance.eligible,
+        "conformance_reason_codes": [
+            code.value for code in conformance.reason_codes
+        ],
+        "evidence_artifact_id": str(evidence_artifact.ref.artifact_id),
+        "conformance_artifact_id": str(conformance_artifact.ref.artifact_id),
         "local_output_validation_passed": local_output_validation_passed,
         "local_validation_error": local_validation_error,
         "manifest_hash": canonical_hash(manifest),

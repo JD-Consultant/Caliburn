@@ -43,6 +43,8 @@ from evals.interview_vnext.openrouter_model_catalog import (
     OpenRouterModelSnapshot,
 )
 from evals.interview_vnext.openrouter_provider_config import (
+    OPENROUTER_ADAPTER_ID,
+    OPENROUTER_ADAPTER_VERSION,
     OpenRouterProbeInputs,
     build_openrouter_eval_binding,
     build_openrouter_eval_config,
@@ -344,8 +346,6 @@ class TestAdapterFailsBeforeHttp:
     @pytest.mark.parametrize(
         "call_factory",
         [
-            # foreign gateway provider (binding identity, not a request field in v2)
-            lambda: make_call(binding=make_binding(gateway_provider="openai")),
             # requested model the adapter config does not accept
             lambda: make_call(
                 binding=make_binding(
@@ -361,7 +361,7 @@ class TestAdapterFailsBeforeHttp:
                 output_schema_id="https://caliburn.local/schemas/unknown.v1.schema.json"
             ),
         ],
-        ids=["gateway", "model", "operation_name", "operation_hash", "output_schema"],
+        ids=["model", "operation_name", "operation_hash", "output_schema"],
     )
     async def test_binding_mismatches_fail_before_http(self, call_factory):
         adapter, calls = make_adapter(lambda request: fixture_response("success.json"))
@@ -373,6 +373,94 @@ class TestAdapterFailsBeforeHttp:
             reason_code="openrouter.binding_invalid",
             retryable=False,
         )
+
+    # ---- R3-C1 runtime adapter/binding preflight(修正計畫 §5.1/§7.1)-------
+
+    @pytest.mark.parametrize(
+        "overrides",
+        [
+            {"adapter_id": "openai.responses"},
+            {"adapter_version": "1.0.0"},
+        ],
+        ids=["adapter_id", "adapter_version"],
+    )
+    async def test_adapter_identity_mismatch_fails_before_http(self, overrides):
+        adapter, calls = make_adapter(lambda request: fixture_response("success.json"))
+        envelope = await adapter.generate_structured(
+            make_call(binding=make_binding(**overrides))
+        )
+        assert calls == []
+        assert_failure(
+            envelope,
+            kind=FailureKind.RUNTIME_BINDING_MISMATCH,
+            reason_code="openrouter.binding_invalid",
+            retryable=False,
+        )
+        evidence = envelope.execution_evidence
+        # evidence 描述實際 runtime adapter,不從不相符的 binding 複製(§5.1.1)。
+        assert evidence.adapter_id == OPENROUTER_ADAPTER_ID
+        assert evidence.adapter_version == OPENROUTER_ADAPTER_VERSION
+        assert any("binding preflight" in item for item in evidence.limitations)
+
+    async def test_gateway_mismatch_records_runtime_adapter_facts(self):
+        """§7.1 gateway 向量:result/evidence 都記 runtime gateway,identity 保留 attempted。"""
+
+        adapter, calls = make_adapter(lambda request: fixture_response("success.json"))
+        attempted = make_binding(gateway_provider="openai")
+        envelope = await adapter.generate_structured(make_call(binding=attempted))
+        assert calls == []
+        assert_failure(
+            envelope,
+            kind=FailureKind.RUNTIME_BINDING_MISMATCH,
+            reason_code="openrouter.binding_invalid",
+            retryable=False,
+        )
+        result = envelope.result
+        assert result.gateway_provider == "openrouter"  # actual runtime gateway
+        assert result.binding_id == attempted.binding_id  # attempted identity
+        assert result.binding_hash == attempted.binding_hash
+        assert result.requested_model == attempted.requested_model
+        evidence = envelope.execution_evidence
+        assert evidence.gateway_provider == "openrouter"
+        assert evidence.adapter_id == OPENROUTER_ADAPTER_ID
+        assert evidence.adapter_version == OPENROUTER_ADAPTER_VERSION
+        assert evidence.binding_id == attempted.binding_id
+        assert evidence.binding_hash == attempted.binding_hash
+
+    @pytest.mark.parametrize(
+        "drift_overrides",
+        [
+            # §7.1.5:只有 reasoning field 不同。
+            {"reasoning_effort": "high"},
+            # §7.1.6:只有 data-collection routing/privacy field 不同。
+            {"data_collection": "allow"},
+        ],
+        ids=["reasoning", "data_collection"],
+    )
+    async def test_runtime_config_drift_fails_before_http(self, drift_overrides):
+        """§7.1.7:requested model 相同、只有 config hash 不同仍拒絕。"""
+
+        drifted = build_config(**drift_overrides)
+        adapter, calls = make_adapter(
+            lambda request: fixture_response("success.json"), config=drifted
+        )
+        call = make_call()  # standard binding + standard config
+        assert drifted.requested_model == call.binding.requested_model
+        assert drifted.config_hash != call.binding.provider_config_hash
+        envelope = await adapter.generate_structured(call)
+        assert calls == []
+        assert_failure(
+            envelope,
+            kind=FailureKind.RUNTIME_BINDING_MISMATCH,
+            reason_code="openrouter.binding_invalid",
+            retryable=False,
+        )
+        # §7.1.8:error artifact 只能含 hash,不得洩漏 config 欄位或值。
+        error = artifact_by_label(envelope, ERROR_ARTIFACT_LABEL)
+        blob = canonical_json(error)
+        assert "reasoning_effort" not in blob
+        assert "data_collection" not in blob
+        assert drifted.config_hash in blob or call.binding.provider_config_hash in blob
 
     async def test_schema_hash_mismatch_fails_before_http(self):
         adapter, calls = make_adapter(lambda request: fixture_response("success.json"))
@@ -408,12 +496,16 @@ class TestAdapterFailsBeforeHttp:
         )
 
     async def test_reasoning_budget_exceeding_output_fails_before_http(self):
+        # R3-C1:變體 config 帶自己的 binding,讓 runtime preflight 通過後
+        # 仍能命中既有的 reasoning-budget 檢查(INVALID_REQUEST,而非 preflight)。
+        variant = build_config(reasoning_effort=None, reasoning_max_tokens=8192)
         adapter, calls = make_adapter(
-            lambda request: fixture_response("success.json"),
-            config=build_config(reasoning_effort=None, reasoning_max_tokens=8192),
+            lambda request: fixture_response("success.json"), config=variant
         )
         # operation.max_output_tokens is 4096 < 8192 reasoning budget.
-        envelope = await adapter.generate_structured(make_call())
+        envelope = await adapter.generate_structured(
+            make_call(binding=build_openrouter_eval_binding(variant), config=variant)
+        )
         assert calls == []
         assert_failure(
             envelope,
@@ -491,30 +583,37 @@ class TestAdapterRequestProjection:
         await adapter.generate_structured(make_call())
         assert "zdr" not in json.loads(calls[0].content)["provider"]
 
+        # R3-C1:exact runtime preflight 下,變體 config 必須帶自己的 binding。
+        variant = build_config(zdr_required=True)
         adapter, calls = make_adapter(
-            lambda request: fixture_response("success.json"),
-            config=build_config(zdr_required=True),
+            lambda request: fixture_response("success.json"), config=variant
         )
-        await adapter.generate_structured(make_call())
+        await adapter.generate_structured(
+            make_call(binding=build_openrouter_eval_binding(variant), config=variant)
+        )
         assert json.loads(calls[0].content)["provider"]["zdr"] is True
 
     async def test_reasoning_max_tokens_variant_is_exclusive_form(self):
+        variant = build_config(reasoning_effort=None, reasoning_max_tokens=2048)
         adapter, calls = make_adapter(
-            lambda request: fixture_response("success.json"),
-            config=build_config(reasoning_effort=None, reasoning_max_tokens=2048),
+            lambda request: fixture_response("success.json"), config=variant
         )
-        await adapter.generate_structured(make_call())
+        await adapter.generate_structured(
+            make_call(binding=build_openrouter_eval_binding(variant), config=variant)
+        )
         assert json.loads(calls[0].content)["reasoning"] == {
             "max_tokens": 2048,
             "exclude": True,
         }
 
     async def test_no_reasoning_when_disabled(self):
+        variant = build_config(reasoning_effort=None)
         adapter, calls = make_adapter(
-            lambda request: fixture_response("success.json"),
-            config=build_config(reasoning_effort=None),
+            lambda request: fixture_response("success.json"), config=variant
         )
-        await adapter.generate_structured(make_call())
+        await adapter.generate_structured(
+            make_call(binding=build_openrouter_eval_binding(variant), config=variant)
+        )
         assert "reasoning" not in json.loads(calls[0].content)
 
     async def test_messages_are_mapped_verbatim_including_unicode(self):

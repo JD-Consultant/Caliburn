@@ -37,6 +37,8 @@ from app.interview_vnext.llm.schema_exports import published_schema
 from app.interview_vnext.observability.artifacts import ArtifactRef
 
 from evals.interview_vnext.provider_config import (
+    OPENAI_ADAPTER_ID,
+    OPENAI_ADAPTER_VERSION,
     OpenAIResponsesEvalConfig,
     build_openai_reference_binding,
 )
@@ -518,6 +520,104 @@ class TestAdapterFailsBeforeHttp:
             retryable=False,
         )
 
+    # ---- R3-C1 runtime adapter/binding preflight(修正計畫 §5.1/§7.1)-------
+
+    @pytest.mark.parametrize(
+        "overrides",
+        [
+            {"adapter_id": "openrouter.chat-completions"},
+            {"adapter_version": "1.0.0"},
+        ],
+        ids=["adapter_id", "adapter_version"],
+    )
+    async def test_adapter_identity_mismatch_fails_before_http(self, overrides):
+        adapter, calls = make_adapter(
+            lambda request: fixture_response("server_500.json")
+        )
+        envelope = await adapter.generate_structured(
+            make_call(binding=make_binding(**overrides))
+        )
+        assert calls == []
+        assert_failure(
+            envelope,
+            kind=FailureKind.RUNTIME_BINDING_MISMATCH,
+            reason_code="openai.request_binding_invalid",
+            retryable=False,
+        )
+        evidence = envelope.execution_evidence
+        # evidence 描述實際 runtime adapter,不從不相符的 binding 複製(§5.1.1)。
+        assert evidence.adapter_id == OPENAI_ADAPTER_ID
+        assert evidence.adapter_version == OPENAI_ADAPTER_VERSION
+        assert any("binding preflight" in item for item in evidence.limitations)
+
+    async def test_gateway_mismatch_records_runtime_adapter_facts(self):
+        """§7.1 gateway 向量:result/evidence 都記 runtime gateway,identity 保留 attempted。"""
+
+        adapter, calls = make_adapter(
+            lambda request: fixture_response("server_500.json")
+        )
+        attempted = make_binding(gateway_provider="openrouter")
+        envelope = await adapter.generate_structured(make_call(binding=attempted))
+        assert calls == []
+        assert_failure(
+            envelope,
+            kind=FailureKind.RUNTIME_BINDING_MISMATCH,
+            reason_code="openai.request_binding_invalid",
+            retryable=False,
+        )
+        result = envelope.result
+        assert result.gateway_provider == "openai"  # actual runtime gateway
+        assert result.binding_id == attempted.binding_id  # attempted identity
+        assert result.binding_hash == attempted.binding_hash
+        assert result.requested_model == attempted.requested_model
+        evidence = envelope.execution_evidence
+        assert evidence.gateway_provider == "openai"
+        assert evidence.adapter_id == OPENAI_ADAPTER_ID
+        assert evidence.adapter_version == OPENAI_ADAPTER_VERSION
+        assert evidence.binding_id == attempted.binding_id
+        assert evidence.binding_hash == attempted.binding_hash
+        # §5.1:preflight 失敗不建立假 routing metadata。
+        assert evidence.upstream_provider is None
+        assert evidence.route_strategy is None
+
+    @pytest.mark.parametrize(
+        "drift_config",
+        [
+            # §7.1.5:只有 reasoning field 不同。
+            OpenAIResponsesEvalConfig(reasoning_effort="high"),
+            # §7.1.6:OpenAI config 無可變 storage/cache/plugin 欄位(全 Literal),
+            # 以僅存的非 reasoning 可調欄位 connect timeout 作 drift 向量。
+            OpenAIResponsesEvalConfig(connect_timeout_seconds=30.0),
+        ],
+        ids=["reasoning", "connect_timeout"],
+    )
+    async def test_runtime_config_drift_fails_before_http(self, drift_config):
+        """§7.1.7:requested model 相同、只有 config hash 不同仍拒絕。"""
+
+        adapter, calls = make_adapter(
+            lambda request: fixture_response("server_500.json"), config=drift_config
+        )
+        call = make_call()  # standard binding + standard config
+        assert drift_config.requested_model == call.binding.requested_model
+        assert drift_config.config_hash != call.binding.provider_config_hash
+        envelope = await adapter.generate_structured(call)
+        assert calls == []
+        assert_failure(
+            envelope,
+            kind=FailureKind.RUNTIME_BINDING_MISMATCH,
+            reason_code="openai.request_binding_invalid",
+            retryable=False,
+        )
+        # §7.1.8:error artifact 只能含 hash,不得洩漏 config 欄位或值。
+        error = artifact_by_label(envelope, ERROR_ARTIFACT_LABEL)
+        blob = canonical_json(error)
+        assert "reasoning_effort" not in blob
+        assert "connect_timeout" not in blob
+        assert (
+            drift_config.config_hash in blob
+            or call.binding.provider_config_hash in blob
+        )
+
 
 class TestAdapterHttpErrorMapping:
     async def test_400_invalid_schema_is_nonretryable_invalid_request(self):
@@ -975,13 +1075,17 @@ class TestAdapterResponseMatrix:
         assert len(visible["items"]) == 1
 
     async def test_no_prefix_or_family_auto_acceptance_for_models(self):
+        # R3-C1:exact runtime preflight 下,變體 config 必須帶自己的 binding。
+        variant = OpenAIResponsesEvalConfig(
+            accepted_resolved_models=("gpt-5.6", "gpt-5.6-sol", "gpt-5.7"),
+        )
         adapter, _ = make_adapter(
             lambda request: fixture_response("resolved_model_mismatch.json"),
-            config=OpenAIResponsesEvalConfig(
-                accepted_resolved_models=("gpt-5.6", "gpt-5.6-sol", "gpt-5.7"),
-            ),
+            config=variant,
         )
-        envelope = await adapter.generate_structured(make_call())
+        envelope = await adapter.generate_structured(
+            make_call(binding=build_openai_reference_binding(variant), config=variant)
+        )
         assert_failure(
             envelope,
             kind=FailureKind.RESOLVED_MODEL_MISMATCH,

@@ -12,7 +12,8 @@
         "output_schema_invalid",
         "output_parse_failed",
         "resolved_model_mismatch",
-        "unknown_provider_failure"
+        "unknown_provider_failure",
+        "runtime_binding_mismatch"
       ],
       "title": "FailureKind",
       "type": "string"

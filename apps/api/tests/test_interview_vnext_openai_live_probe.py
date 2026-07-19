@@ -167,6 +167,25 @@ class TestMockedProbeBundle:
         assert request["binding_id"] == "turn-interpret-c1-openai-reference-attribution-strict"
         assert request["requested_model"] == "gpt-5.6"
 
+        # R3-C1(§7.6):provider.config artifact 不宣告不存在的 generic schema ID,
+        # 但 content hash 仍必須是 binding 引用的 config hash。
+        records = [
+            ArtifactRecord.model_validate_json(line)
+            for line in data["artifacts.jsonl"].strip().splitlines()
+        ]
+        config_refs = [
+            record.ref for record in records if record.ref.kind == "provider.config"
+        ]
+        assert len(config_refs) == 1
+        assert config_refs[0].schema_id is None
+        binding_records = [
+            record for record in records
+            if record.ref.kind == "model.provider_binding"
+        ]
+        assert len(binding_records) == 1
+        binding_payload = json.loads(binding_records[0].inline_content)
+        assert binding_payload["provider_config_hash"] == config_refs[0].content_hash
+
         for name in BUNDLE_FILES:
             assert API_KEY not in data[name], name
             assert "Authorization" not in data[name], name

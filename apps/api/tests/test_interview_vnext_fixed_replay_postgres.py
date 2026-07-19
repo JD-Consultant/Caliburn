@@ -497,6 +497,22 @@ async def test_executor_commits_verified_evidence_replays_without_provider_and_r
     assert [item.claim for item in state.evidence] == ["每天核對訂單"]
     rows = await attempt_rows(postgres_session_factory, ids)
     assert len(rows) == 1 and rows[0].result_artifact_id is not None
+    # R3-C1(§7.6):executor 的 provider.config artifact 不宣告不存在的 generic
+    # schema ID,content hash 仍等於 binding 引用的 config hash。
+    async with postgres_session_factory() as session:
+        config_rows = (
+            await session.execute(
+                sa.text(
+                    "SELECT schema_id, content_hash "
+                    "FROM interview_vnext_artifacts "
+                    "WHERE tenant_id = :tenant_id AND kind = 'provider.config'"
+                ),
+                {"tenant_id": str(ids.tenant_id)},
+            )
+        ).all()
+    assert len(config_rows) == 1
+    assert config_rows[0].schema_id is None
+    assert config_rows[0].content_hash == BINDING.provider_config_hash
 
 
 async def test_two_workers_only_claim_one_provider_call(

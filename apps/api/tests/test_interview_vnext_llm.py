@@ -13,6 +13,11 @@ from app.interview_vnext.llm.port import (
     ModelCallEnvelope,
     ModelCallRequest,
     ModelMessage,
+    ResolvedModelCall,
+)
+from app.interview_vnext.llm.portable_schema import (
+    SchemaProjectionReport,
+    SchemaProjectionReportDefinition,
 )
 from app.interview_vnext.llm.registry import (
     OperationNotFound,
@@ -44,6 +49,7 @@ from tests.interview_vnext_llm_fixtures import (
     output_schema_artifact_ref,
     projection_artifact_ref,
     resolved_call,
+    turn_output_projection,
     unknown_execution_evidence,
 )
 
@@ -425,3 +431,55 @@ async def test_scripted_port_fails_fast_on_unexpected_order_or_exhaustion():
         await port.generate_structured(
             resolved_call(request(attempt=1, attempt_name="wrong"), SCRIPTED_BINDING)
         )
+
+
+# ---- R3-C1 ResolvedModelCall exact projection identity(修正計畫 §5.3)------
+
+
+def forged_projection_report(**overrides) -> SchemaProjectionReport:
+    """Tamper the active turn projection report and recompute its self-hash."""
+
+    report = turn_output_projection().report
+    definition = SchemaProjectionReportDefinition.model_validate(
+        {**report.model_dump(exclude={"report_hash"}), **overrides}
+    )
+    return SchemaProjectionReport(
+        **definition.model_dump(), report_hash=canonical_hash(definition)
+    )
+
+
+@pytest.mark.parametrize(
+    "overrides",
+    [
+        # code review 回歸向量(§2.2):2.0.0 -> 9.9.9,report/artifact hash 完整重算。
+        {"policy_version": "9.9.9", "policy_hash": "sha256:" + "0" * 64},
+        {"policy_name": "portable-lenient-output"},
+        {"policy_version": "9.9.9"},
+        {"policy_hash": "sha256:" + "0" * 64},
+        {"target_profile": "portable-lenient"},
+    ],
+    ids=["review_vector", "name", "version", "hash", "target_profile"],
+)
+def test_resolved_call_rejects_forged_projection_policy_identity(overrides):
+    """§7.2.5/§7.2.6:report 與 artifact hash 皆正確重算,仍須被 exact policy 驗證拒絕。"""
+
+    forged = forged_projection_report(**overrides)
+    base = request(attempt=1, attempt_name="forged-projection")
+    tampered = base.model_copy(
+        update={"schema_projection_artifact": projection_artifact_ref(forged)}
+    )
+    with pytest.raises(ValidationError, match="projection"):
+        ResolvedModelCall(
+            request=tampered, binding=SCRIPTED_BINDING, schema_projection=forged
+        )
+
+
+def test_resolved_call_round_trip_uses_the_same_projection_validator():
+    """§7.2.9(pure 面):序列化載回的 resolved call 走同一 exact validator。"""
+
+    call = resolved_call(
+        request(attempt=1, attempt_name="round-trip"), SCRIPTED_BINDING
+    )
+    reloaded = ResolvedModelCall.model_validate(call.model_dump(mode="json"))
+    assert reloaded.schema_projection.report_hash == call.schema_projection.report_hash
+    assert reloaded.binding.binding_hash == SCRIPTED_BINDING.binding_hash

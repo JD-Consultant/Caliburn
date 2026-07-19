@@ -10,13 +10,17 @@ from __future__ import annotations
 import pytest
 
 from app.interview_vnext.domain.hashing import canonical_hash, canonical_json
+from app.interview_vnext.llm.operation import ContractIdentity
 from app.interview_vnext.llm.portable_schema import (
     PORTABLE_STRICT_OUTPUT_POLICY_V2,
     ProviderSchemaPortabilityError,
+    SchemaProjectionMismatch,
     SchemaProjectionReport,
     SchemaProjectionReportDefinition,
     portable_strict_output_schema,
     project_portable_strict_output_schema,
+    require_projection_report,
+    resolve_schema_projection_policy,
 )
 from app.interview_vnext.llm.turn_interpret import TurnInterpretOutput
 
@@ -177,3 +181,130 @@ def test_compat_wrapper_matches_projection_output():
     assert canonical_json(portable_strict_output_schema(source)) == canonical_json(
         projected.schema
     )
+
+
+# ---- R3-C1 exact projection policy identity(修正計畫 §5.3/§6.2)-----------
+
+
+ACTIVE_POLICY = PORTABLE_STRICT_OUTPUT_POLICY_V2
+
+
+def active_identity(**overrides) -> ContractIdentity:
+    values = dict(
+        name=ACTIVE_POLICY.name,
+        version=ACTIVE_POLICY.version,
+        content_hash=ACTIVE_POLICY.policy_hash,
+    )
+    values.update(overrides)
+    return ContractIdentity(**values)
+
+
+def active_report() -> SchemaProjectionReport:
+    return project_portable_strict_output_schema(
+        fixture_schema(), source_schema_id=SOURCE_ID, target_profile=TARGET
+    ).report
+
+
+def forged_report(**overrides) -> SchemaProjectionReport:
+    """A tampered report whose self-hash is nonetheless correctly recomputed.
+
+    重現 code review §2.2:report_hash 依竄改後 definition 正確重算,只有
+    exact policy validation 能擋。
+    """
+
+    report = active_report()
+    definition = SchemaProjectionReportDefinition.model_validate(
+        {**report.model_dump(exclude={"report_hash"}), **overrides}
+    )
+    return SchemaProjectionReport(
+        **definition.model_dump(), report_hash=canonical_hash(definition)
+    )
+
+
+class TestResolveSchemaProjectionPolicy:
+    def test_active_identity_resolves_to_the_registry_policy(self):
+        assert resolve_schema_projection_policy(active_identity()) is ACTIVE_POLICY
+
+    @pytest.mark.parametrize(
+        "overrides",
+        [
+            {"name": "portable-lenient-output"},
+            {"version": "9.9.9"},
+            {"content_hash": "sha256:" + "0" * 64},
+            {
+                "name": "unknown-policy",
+                "version": "0.0.1",
+                "content_hash": "sha256:" + "f" * 64,
+            },
+        ],
+        ids=["name", "version", "hash", "unknown"],
+    )
+    def test_unknown_or_partial_identity_fails_closed(self, overrides):
+        with pytest.raises(SchemaProjectionMismatch):
+            resolve_schema_projection_policy(active_identity(**overrides))
+
+
+class TestRequireProjectionReport:
+    def test_exact_active_report_passes(self):
+        report = active_report()
+        assert (
+            require_projection_report(
+                policy=ACTIVE_POLICY,
+                report=report,
+                projected_schema_hash=report.projected_schema_hash,
+            )
+            is None
+        )
+
+    def test_forged_policy_version_with_recomputed_hashes_is_rejected(self):
+        """回歸向量:`2.0.0 -> 9.9.9` 且 report hash 完整重算(§7.2)。"""
+
+        forged = forged_report(
+            policy_version="9.9.9", policy_hash="sha256:" + "0" * 64
+        )
+        with pytest.raises(SchemaProjectionMismatch, match="version|hash"):
+            require_projection_report(
+                policy=ACTIVE_POLICY,
+                report=forged,
+                projected_schema_hash=forged.projected_schema_hash,
+            )
+
+    @pytest.mark.parametrize(
+        "overrides,match",
+        [
+            ({"policy_name": "portable-lenient-output"}, "name"),
+            ({"policy_version": "9.9.9"}, "version"),
+            ({"policy_hash": "sha256:" + "0" * 64}, "hash"),
+            ({"target_profile": "portable-lenient"}, "target profile"),
+        ],
+        ids=["name", "version", "hash", "target_profile"],
+    )
+    def test_single_field_report_drift_is_rejected(self, overrides, match):
+        forged = forged_report(**overrides)
+        with pytest.raises(SchemaProjectionMismatch, match=match):
+            require_projection_report(
+                policy=ACTIVE_POLICY,
+                report=forged,
+                projected_schema_hash=forged.projected_schema_hash,
+            )
+
+    def test_projected_schema_hash_mismatch_is_rejected(self):
+        report = active_report()
+        with pytest.raises(SchemaProjectionMismatch, match="projected"):
+            require_projection_report(
+                policy=ACTIVE_POLICY,
+                report=report,
+                projected_schema_hash="sha256:" + "0" * 64,
+            )
+
+    def test_round_tripped_report_passes_the_same_validator(self):
+        """§7.2.9(pure 面):序列化後載回的 report 走同一 validator。"""
+
+        reloaded = SchemaProjectionReport.model_validate(
+            active_report().model_dump(mode="json")
+        )
+        require_projection_report(
+            policy=ACTIVE_POLICY,
+            report=reloaded,
+            projected_schema_hash=reloaded.projected_schema_hash,
+        )

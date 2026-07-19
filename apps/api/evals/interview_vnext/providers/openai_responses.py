@@ -38,7 +38,11 @@ from openai.types.responses import (
 )
 
 from app.interview_vnext.domain.hashing import canonical_json
-from app.interview_vnext.llm.binding import ProviderBinding
+from app.interview_vnext.llm.binding import (
+    ProviderBinding,
+    RuntimeBindingMismatch,
+    require_runtime_binding,
+)
 from app.interview_vnext.llm.execution import (
     CacheStatus,
     ProviderExecutionEvidence,
@@ -68,7 +72,11 @@ from app.interview_vnext.observability.artifacts import (
     build_inline_artifact,
 )
 
-from ..provider_config import OpenAIResponsesEvalConfig
+from ..provider_config import (
+    OPENAI_ADAPTER_ID,
+    OPENAI_ADAPTER_VERSION,
+    OpenAIResponsesEvalConfig,
+)
 from ..schema_catalog import (
     PublishedOutputSchemaCatalog,
     SchemaBinding,
@@ -419,6 +427,30 @@ class OpenAIResponsesEvalAdapter(LlmPort):
         provider_binding = call.binding
         started_at = self._now()
         started_mono = self._monotonic()
+        # R3-C1(修正計畫 §5.1/§6.7):neutral runtime binding preflight 先於既有
+        # schema/body validation;adapter ID/version/gateway/config hash 任一不符
+        # 即 fail closed,0 次 HTTP,neutral failure kind 固定 RUNTIME_BINDING_MISMATCH。
+        try:
+            require_runtime_binding(
+                provider_binding,
+                adapter_id=OPENAI_ADAPTER_ID,
+                adapter_version=OPENAI_ADAPTER_VERSION,
+                gateway_provider=self._config.provider,
+                provider_config_hash=self._config.config_hash,
+            )
+        except RuntimeBindingMismatch as exc:
+            failure = _Failure(
+                FailureKind.RUNTIME_BINDING_MISMATCH,
+                "openai.request_binding_invalid",
+                False,
+                SAFE_MESSAGES["binding"],
+            )
+            return self._failure_envelope(
+                request, provider_binding, failure,
+                started_at=started_at, started_mono=started_mono,
+                detail=str(exc),
+                preflight_mismatch=True,
+            )
         try:
             binding = self._validate_binding(request, provider_binding)
         except _LocalBindingError as exc:
@@ -548,6 +580,7 @@ class OpenAIResponsesEvalAdapter(LlmPort):
         status_code: int | None = None,
         request_id: str | None = None,
         body: Any = None,
+        preflight_mismatch: bool = False,
     ) -> ModelCallEnvelope:
         completed_at, latency_ms = self._timing(
             started_at=started_at, started_mono=started_mono
@@ -564,7 +597,7 @@ class OpenAIResponsesEvalAdapter(LlmPort):
         )
         usage = _usage_without_response()
         result = ModelCallResult(
-            **_identity_fields(request, binding),
+            **_identity_fields(request, gateway_provider=self._config.provider),
             resolved_model=request.requested_model,
             provider_request_id=request_id,
             provider_conversation_id=None,
@@ -587,9 +620,18 @@ class OpenAIResponsesEvalAdapter(LlmPort):
             started_at=started_at,
             completed_at=completed_at,
         )
-        evidence = _openai_execution_evidence(
-            binding, request, resolved_model=request.requested_model, usage=usage
-        )
+        if preflight_mismatch:
+            # §5.1:preflight 失敗不建立假 routing metadata;evidence 描述實際
+            # runtime adapter,route/cache/transformation 依 unknown failure 規則。
+            evidence = _preflight_mismatch_evidence(
+                binding, request,
+                gateway_provider=self._config.provider,
+                usage=usage,
+            )
+        else:
+            evidence = _openai_execution_evidence(
+                binding, request, resolved_model=request.requested_model, usage=usage
+            )
         return ModelCallEnvelope(
             result=result, execution_evidence=evidence, supporting_artifacts=(error,)
         )
@@ -620,7 +662,7 @@ class OpenAIResponsesEvalAdapter(LlmPort):
         resolved_raw = response.model
         resolved_model = resolved_raw or request.requested_model
         base = dict(
-            **_identity_fields(request, binding),
+            **_identity_fields(request, gateway_provider=self._config.provider),
             resolved_model=resolved_model,
             provider_request_id=request_id,
             provider_conversation_id=None,
@@ -844,8 +886,15 @@ class OpenAIResponsesEvalAdapter(LlmPort):
 
 
 def _identity_fields(
-    request: ModelCallRequest, binding: ProviderBinding
+    request: ModelCallRequest, *, gateway_provider: str
 ) -> dict[str, Any]:
+    """Result identity:attempted request/binding identity + actual runtime gateway.
+
+    §5.1.1 語意表:`binding_id/hash/requested_model` 保留被嘗試的 binding
+    identity;`gateway_provider` 記實際 runtime adapter gateway(preflight 通過時
+    兩者必然相等,唯一可見差異是 `runtime_binding_mismatch` failure)。
+    """
+
     return {
         "run_id": request.run_id,
         "session_id": request.session_id,
@@ -857,13 +906,54 @@ def _identity_fields(
         "operation_definition_hash": request.operation_definition_hash,
         "binding_id": request.binding_id,
         "binding_hash": request.binding_hash,
-        "gateway_provider": binding.gateway_provider,
+        "gateway_provider": gateway_provider,
         "requested_model": request.requested_model,
         "prompt_hash": request.prompt_hash,
         "output_schema_id": request.output_schema_id,
         "output_schema_hash": request.output_schema_hash,
         "context_hash": request.context_hash,
     }
+
+
+def _preflight_mismatch_evidence(
+    binding: ProviderBinding,
+    request: ModelCallRequest,
+    *,
+    gateway_provider: str,
+    usage: TokenUsage,
+) -> ProviderExecutionEvidence:
+    """Route-less evidence for a runtime binding preflight failure(§5.1.1)。
+
+    binding ID/hash 保留 attempted identity;adapter ID/version/gateway 描述實際
+    runtime adapter,不從不相符的 binding 複製;不記任何假 upstream/route facts。
+    """
+
+    return define_provider_execution_evidence(
+        binding_id=binding.binding_id,
+        binding_hash=binding.binding_hash,
+        adapter_id=OPENAI_ADAPTER_ID,
+        adapter_version=OPENAI_ADAPTER_VERSION,
+        gateway_provider=gateway_provider,
+        requested_model=request.requested_model,
+        gateway_resolved_model=None,
+        upstream_provider=None,
+        upstream_model=None,
+        upstream_endpoint=None,
+        route_strategy=None,
+        upstream_attempt_count=None,
+        transformation_status=TransformationStatus.UNKNOWN,
+        pipeline_stages=(),
+        cache_status=CacheStatus.UNKNOWN,
+        provider_request_id=None,
+        generation_id=None,
+        usage=usage,
+        cost_decimal=None,
+        limitations=(
+            "openai execution evidence unavailable for a failed attempt",
+            "openai runtime binding preflight failed before any provider call",
+        ),
+        raw_routing_artifact=None,
+    )
 
 
 def _openai_execution_evidence(

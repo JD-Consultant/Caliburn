@@ -21,7 +21,11 @@ from app.interview_vnext.observability.artifacts import ArtifactRecord, Artifact
 
 from .binding import ProviderBinding
 from .execution import ProviderExecutionEvidence
-from .portable_schema import SchemaProjectionReport
+from .portable_schema import (
+    SchemaProjectionReport,
+    require_projection_report,
+    resolve_schema_projection_policy,
+)
 from .result import ModelCallResult
 
 
@@ -128,12 +132,15 @@ class ResolvedModelCall(DomainModel):
             raise ValueError(
                 "provider config artifact content hash does not match the binding config hash"
             )
-        if projection.projected_schema_hash != request.output_schema_hash:
-            raise ValueError("projected schema hash does not match the request output schema")
-        if projection.target_profile != binding.schema_projection_policy.name and (
-            projection.policy_name != binding.schema_projection_policy.name
-        ):
-            raise ValueError("schema projection policy does not match the binding")
+        # R3-C1(修正計畫 §5.3):先把 binding 的 policy identity resolve 成已註冊
+        # 的 active policy(name/version/hash exact、unknown fail closed),再 exact
+        # 驗 report 的 policy identity/target profile 與 projected schema hash。
+        policy = resolve_schema_projection_policy(binding.schema_projection_policy)
+        require_projection_report(
+            policy=policy,
+            report=projection,
+            projected_schema_hash=request.output_schema_hash,
+        )
         return self
 
 

@@ -26,6 +26,8 @@ from app.interview_vnext.domain.identifiers import (
     StableName,
 )
 
+from .operation import ContractIdentity
+
 
 _ANNOTATION_KEYWORDS = frozenset({"$id", "$schema", "description", "title"})
 _STRUCTURAL_KEYWORDS = frozenset(
@@ -133,6 +135,73 @@ PORTABLE_STRICT_OUTPUT_POLICY_V2 = define_schema_projection_policy(
     base_prompt_obligations=("local_constraints_require_post_validation",),
     pattern_prompt_obligation="unsupported_pattern_not_enforced_by_provider",
 )
+
+
+# ── Exact policy resolution/validation(R3-C1;修正計畫 §5.3/§6.2)────────────
+
+
+class SchemaProjectionMismatch(ValueError):
+    """A projection policy identity or report does not exactly match the registry."""
+
+
+# 已核准的 projection policies;unknown identity 一律 fail closed。
+_PROJECTION_POLICY_REGISTRY: tuple[SchemaProjectionPolicy, ...] = (
+    PORTABLE_STRICT_OUTPUT_POLICY_V2,
+)
+
+
+def resolve_schema_projection_policy(identity: ContractIdentity) -> SchemaProjectionPolicy:
+    """Resolve a binding's ``ContractIdentity`` to the exact registered policy.
+
+    name/version/hash 三者 exact,不得只因 name 相同而接受(§5.3)。
+    ``ResolvedModelCall`` 與 executor 共用這一個 authority。
+    """
+
+    for policy in _PROJECTION_POLICY_REGISTRY:
+        if (
+            identity.name == policy.name
+            and identity.version == policy.version
+            and identity.content_hash == policy.policy_hash
+        ):
+            return policy
+    raise SchemaProjectionMismatch(
+        "schema projection policy identity is not a registered active policy: "
+        f"{identity.name}/{identity.version}/{identity.content_hash}"
+    )
+
+
+def require_projection_report(
+    *,
+    policy: SchemaProjectionPolicy,
+    report: SchemaProjectionReport,
+    projected_schema_hash: str,
+) -> None:
+    """Exact-validate a projection report against the resolved policy(§5.3)。"""
+
+    if report.policy_name != policy.name:
+        raise SchemaProjectionMismatch(
+            f"projection report policy name {report.policy_name!r} does not "
+            f"match the resolved policy {policy.name!r}"
+        )
+    if report.policy_version != policy.version:
+        raise SchemaProjectionMismatch(
+            f"projection report policy version {report.policy_version!r} does not "
+            f"match the resolved policy version {policy.version!r}"
+        )
+    if report.policy_hash != policy.policy_hash:
+        raise SchemaProjectionMismatch(
+            "projection report policy hash does not match the resolved policy hash"
+        )
+    if report.target_profile != policy.target_profile:
+        raise SchemaProjectionMismatch(
+            f"projection report target profile {report.target_profile!r} does not "
+            f"match the resolved policy target profile {policy.target_profile!r}"
+        )
+    if report.projected_schema_hash != projected_schema_hash:
+        raise SchemaProjectionMismatch(
+            "projection report projected schema hash does not match the "
+            "request output schema hash"
+        )
 
 
 # ── Projection report(§6.2)─────────────────────────────────────────────────

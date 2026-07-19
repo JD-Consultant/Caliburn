@@ -44,6 +44,12 @@ from app.interview_vnext.llm.portable_schema import (
 )
 from app.interview_vnext.llm.result import ModelCallResult, ModelOutcome
 from app.interview_vnext.llm.schema_exports import SCHEMA_EXPORTS, published_schema
+from app.interview_vnext.llm.schema_ids import (
+    MODEL_REQUEST_SCHEMA_ID,
+    MODEL_RESULT_SCHEMA_ID,
+    PROVIDER_BINDING_SCHEMA_ID,
+    SCHEMA_PROJECTION_SCHEMA_ID,
+)
 from app.interview_vnext.llm.turn_interpret import (
     TurnInputTurn,
     TurnInterpretInput,
@@ -75,21 +81,8 @@ WORKFLOW_VERSION = "1.0.0"
 PROBE_DIR = Path(__file__).with_name("probes")
 SPEC_PATH = "docs/plans/2026-07-17-interview-vnext-v3-4-openai-responses-adapter-plan.md"
 
-MODEL_REQUEST_SCHEMA_ID = (
-    "https://caliburn.local/schemas/model-call-request.v2.schema.json"
-)
-MODEL_RESULT_SCHEMA_ID = (
-    "https://caliburn.local/schemas/model-call-result.v2.schema.json"
-)
-PROVIDER_BINDING_SCHEMA_ID = (
-    "https://caliburn.local/schemas/provider-binding.v1.schema.json"
-)
-PROVIDER_CONFIG_SCHEMA_ID = (
-    "https://caliburn.local/schemas/provider-config.v1.schema.json"
-)
-SCHEMA_PROJECTION_SCHEMA_ID = (
-    "https://caliburn.local/schemas/schema-projection-report.v1.schema.json"
-)
+# 共用 LLM contract schema IDs 收斂在 llm/schema_ids.py(R3-C1 §6.1.1);
+# provider config artifact 刻意無 schema ID(§5.2)。
 TURN_INPUT_SCHEMA_ID = (
     "https://caliburn.local/schemas/turn-interpret-input.v1.schema.json"
 )
@@ -287,7 +280,6 @@ async def run_probe(
         "provider-config",
         kind="provider.config",
         payload=config,
-        schema_id=PROVIDER_CONFIG_SCHEMA_ID,
     )
     projection_artifact = artifact(
         "schema-projection",

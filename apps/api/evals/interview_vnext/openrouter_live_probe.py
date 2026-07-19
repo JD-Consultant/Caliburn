@@ -37,9 +37,18 @@ from app.interview_vnext.llm.operation_documents import (
     TURN_INTERPRET_PROMPT_PATH,
     turn_interpret_operation,
 )
-from app.interview_vnext.llm.port import MessageRole, ModelCallRequest, ModelMessage
+from app.interview_vnext.llm.port import (
+    MessageRole,
+    ModelCallRequest,
+    ModelMessage,
+    ResolvedModelCall,
+)
+from app.interview_vnext.llm.portable_schema import (
+    PORTABLE_STRICT_OUTPUT_POLICY_V2,
+    project_portable_strict_output_schema,
+)
 from app.interview_vnext.llm.result import ModelCallResult, ModelOutcome
-from app.interview_vnext.llm.schema_exports import published_schema
+from app.interview_vnext.llm.schema_exports import SCHEMA_EXPORTS, published_schema
 from app.interview_vnext.llm.turn_interpret import (
     TurnInputTurn,
     TurnInterpretInput,
@@ -66,6 +75,7 @@ from .openrouter_model_catalog import (
 from .openrouter_provider_config import (
     ConfigConstructionError,
     OpenRouterProbeInputs,
+    build_openrouter_eval_binding,
     build_openrouter_eval_config,
 )
 from .providers.openrouter_chat import (
@@ -80,8 +90,13 @@ WORKFLOW_VERSION = "1.0.0"
 PROBE_DIR = Path(__file__).with_name("probes")
 SPEC_PATH = "docs/plans/2026-07-17-interview-vnext-v3-4r-openrouter-first-adapter-plan.md"
 
-MODEL_REQUEST_SCHEMA_ID = "https://caliburn.local/schemas/model-call-request.v1.schema.json"
-MODEL_RESULT_SCHEMA_ID = "https://caliburn.local/schemas/model-call-result.v1.schema.json"
+MODEL_REQUEST_SCHEMA_ID = "https://caliburn.local/schemas/model-call-request.v2.schema.json"
+MODEL_RESULT_SCHEMA_ID = "https://caliburn.local/schemas/model-call-result.v2.schema.json"
+PROVIDER_BINDING_SCHEMA_ID = "https://caliburn.local/schemas/provider-binding.v1.schema.json"
+PROVIDER_CONFIG_SCHEMA_ID = "https://caliburn.local/schemas/provider-config.v1.schema.json"
+SCHEMA_PROJECTION_SCHEMA_ID = (
+    "https://caliburn.local/schemas/schema-projection-report.v1.schema.json"
+)
 TURN_INPUT_SCHEMA_ID = "https://caliburn.local/schemas/turn-interpret-input.v1.schema.json"
 
 PROBE_LIMITATION = (
@@ -125,6 +140,18 @@ def _parse_args(argv: list[str] | None) -> argparse.Namespace:
         default="../../output/interview_vnext/openrouter-live-probes",
     )
     return parser.parse_args(argv)
+
+
+def _turn_output_projection():
+    """The active turn output projection (byte-identical to the published schema)."""
+
+    schema_id, title, _factory = SCHEMA_EXPORTS["turn-interpret-output.v1.schema.json"]
+    source = {**TurnInterpretOutput.model_json_schema(), "$id": schema_id, "title": title}
+    return project_portable_strict_output_schema(
+        source,
+        source_schema_id=schema_id,
+        target_profile=PORTABLE_STRICT_OUTPUT_POLICY_V2.target_profile,
+    )
 
 
 def build_probe_inputs(args: argparse.Namespace) -> OpenRouterProbeInputs:
@@ -298,6 +325,7 @@ async def run_probe(
             config = build_openrouter_eval_config(
                 probe_inputs, model_snapshot, endpoint_snapshot
             )
+            binding = build_openrouter_eval_binding(config)
             final_config_created = True
             bundle_files["config.json"] = canonical_json(config)
             preflight_facts = preflight(
@@ -379,6 +407,7 @@ async def run_probe(
             store.put(record)
             return record
 
+        projection = _turn_output_projection()
         config_artifact = call_artifact(
             "eval-config", kind="eval.provider_config",
             payload=config.model_dump(mode="json"),
@@ -402,6 +431,21 @@ async def run_probe(
             "context-manifest", kind="probe.selection_manifest",
             payload={"schema_version": "probe_selection_manifest.v1", "items": []},
         )
+        # V3-5A: immutable binding/config/projection artifacts the resolved call
+        # (and fresh-process recovery) reads back; their content hashes bind the
+        # request to this exact runtime binding.
+        binding_artifact = call_artifact(
+            "provider-binding", kind="model.provider_binding", payload=binding,
+            schema_id=PROVIDER_BINDING_SCHEMA_ID,
+        )
+        binding_config_artifact = call_artifact(
+            "provider-config", kind="provider.config", payload=config,
+            schema_id=PROVIDER_CONFIG_SCHEMA_ID,
+        )
+        projection_artifact = call_artifact(
+            "schema-projection", kind="model.schema_projection",
+            payload=projection.report, schema_id=SCHEMA_PROJECTION_SCHEMA_ID,
+        )
 
         request = ModelCallRequest(
             run_id=run_id, session_id=session_id, turn_id=turn_id,
@@ -409,8 +453,8 @@ async def run_probe(
             operation_name=operation.name,
             operation_definition_hash=operation.definition_hash,
             idempotency_key=f"openrouter-live-probe:{run_id}:attempt:1",
-            provider=config.provider, requested_model=config.requested_model,
-            quality_profile=operation.quality_profile, instructions=prompt,
+            binding_id=binding.binding_id, binding_hash=binding.binding_hash,
+            requested_model=binding.requested_model, instructions=prompt,
             messages=(
                 ModelMessage(role=MessageRole.USER, text=canonical_json(input_value)),
             ),
@@ -419,8 +463,14 @@ async def run_probe(
             output_schema_artifact=schema_artifact.ref,
             context_artifact=context_artifact.ref,
             selection_manifest_artifact=manifest_artifact.ref,
+            binding_artifact=binding_artifact.ref,
+            provider_config_artifact=binding_config_artifact.ref,
+            schema_projection_artifact=projection_artifact.ref,
             deadline_at=started_at + timedelta(milliseconds=operation.timeout_ms),
             created_at=started_at, max_output_tokens=operation.max_output_tokens,
+        )
+        resolved_call = ResolvedModelCall(
+            request=request, binding=binding, schema_projection=projection.report
         )
         request_artifact = call_artifact(
             "attempt/1/request", kind="model.request", payload=request,
@@ -439,7 +489,7 @@ async def run_probe(
         adapter = OpenRouterChatEvalAdapter(
             api_key=api_key, config=config, http_client=client, now=clock
         )
-        envelope = await adapter.generate_structured(request)
+        envelope = await adapter.generate_structured(resolved_call)
         inference_http_calls = 1
         result = envelope.result
         for record in envelope.supporting_artifacts:

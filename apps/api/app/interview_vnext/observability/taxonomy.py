@@ -57,11 +57,27 @@ INTERVIEW_VNEXT_EXECUTION_V1 = ExecutionTaxonomy(
 )
 
 
+# V3-5A §7.2: v2 copies v1's meanings verbatim and adds the conformance-gate
+# event. Existing v1 meanings are never rewritten; new runs use v2.
+INTERVIEW_VNEXT_EXECUTION_V2 = ExecutionTaxonomy(
+    taxonomy_id="interview.vnext.execution",
+    version="2.0.0",
+    event_types=tuple(
+        sorted({*INTERVIEW_VNEXT_EXECUTION_V1.event_types, "provider.conformance.completed"})
+    ),
+    stages=INTERVIEW_VNEXT_EXECUTION_V1.stages,
+)
+
+
 EXECUTION_TAXONOMIES: dict[tuple[str, str], ExecutionTaxonomy] = {
     (
         INTERVIEW_VNEXT_EXECUTION_V1.taxonomy_id,
         INTERVIEW_VNEXT_EXECUTION_V1.version,
     ): INTERVIEW_VNEXT_EXECUTION_V1,
+    (
+        INTERVIEW_VNEXT_EXECUTION_V2.taxonomy_id,
+        INTERVIEW_VNEXT_EXECUTION_V2.version,
+    ): INTERVIEW_VNEXT_EXECUTION_V2,
 }
 
 

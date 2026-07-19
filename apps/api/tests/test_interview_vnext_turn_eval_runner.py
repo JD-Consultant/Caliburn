@@ -18,9 +18,6 @@ from uuid import NAMESPACE_URL, uuid4, uuid5
 import pytest
 import pytest_asyncio
 
-from app.interview_vnext.application.operation_executor import (
-    TurnInterpretProviderProfile,
-)
 from app.interview_vnext.llm.result import (
     FailureKind,
     FinishReason,
@@ -30,8 +27,15 @@ from app.interview_vnext.llm.result import (
     TokenUsage,
     build_structured_payload,
 )
-from app.interview_vnext.llm.port import LlmPort, ModelCallEnvelope
-from app.interview_vnext.llm.testing import ScriptedLlmPort, ScriptedStep
+from app.interview_vnext.llm.port import LlmPort, ModelCallEnvelope, ResolvedModelCall
+from app.interview_vnext.llm.testing import (
+    ScriptedLlmPort,
+    ScriptedStep,
+    scripted_provider_config,
+    scripted_turn_binding,
+)
+
+from tests.interview_vnext_llm_fixtures import unknown_execution_evidence
 from app.interview_vnext.observability.artifacts import build_inline_artifact
 from app.interview_vnext.domain.hashing import canonical_json
 from evals.interview_vnext.batch_orchestrator import grade_execution
@@ -77,9 +81,7 @@ TRIAL_STARTED_AT = datetime(2026, 7, 18, 9, 0, tzinfo=UTC)
 OUTPUT_SCHEMA_ID = (
     "https://caliburn.local/schemas/turn-interpret-output.v1.schema.json"
 )
-PROFILE = TurnInterpretProviderProfile(
-    provider="scripted", requested_model="scripted-reference"
-)
+BINDING = scripted_turn_binding()
 
 
 @pytest.fixture(scope="module")
@@ -149,7 +151,9 @@ def reference_llm_factory(suite):
 class TimeoutLlm(LlmPort):
     """Always returns a retryable transport timeout (infrastructure-invalid)."""
 
-    async def generate_structured(self, request) -> ModelCallEnvelope:
+    async def generate_structured(self, call: ResolvedModelCall) -> ModelCallEnvelope:
+        request = call.request
+        binding = call.binding
         completed = request.created_at + timedelta(milliseconds=1)
         result = ModelCallResult(
             run_id=request.run_id,
@@ -160,7 +164,9 @@ class TimeoutLlm(LlmPort):
             attempt=request.attempt,
             operation_name=request.operation_name,
             operation_definition_hash=request.operation_definition_hash,
-            provider=request.provider,
+            binding_id=binding.binding_id,
+            binding_hash=binding.binding_hash,
+            gateway_provider=binding.gateway_provider,
             requested_model=request.requested_model,
             resolved_model=request.requested_model,
             outcome=ModelOutcome.FAILED,
@@ -180,7 +186,13 @@ class TimeoutLlm(LlmPort):
             output_schema_hash=request.output_schema_hash,
             context_hash=request.context_hash,
         )
-        return ModelCallEnvelope(result=result, supporting_artifacts=())
+        return ModelCallEnvelope(
+            result=result,
+            execution_evidence=unknown_execution_evidence(
+                binding, usage=TokenUsage(limitations=("no usage after timeout",))
+            ),
+            supporting_artifacts=(),
+        )
 
 
 def elapsed_zero() -> float:
@@ -210,7 +222,7 @@ async def test_quality_slot_fills_on_first_success(
         slot_index=1,
         session_factory=postgres_session_factory,
         llm_factory=reference_llm_factory(suite),
-        profile=PROFILE,
+        binding=BINDING, provider_config=scripted_provider_config(),
         trial_started_at_factory=lambda: TRIAL_STARTED_AT,
         max_trial_attempts=3,
         budget=make_budget(),
@@ -236,7 +248,7 @@ async def test_infrastructure_replacement_keeps_original(
         slot_index=1,
         session_factory=postgres_session_factory,
         llm_factory=lambda inputs, trial_id: TimeoutLlm(),
-        profile=PROFILE,
+        binding=BINDING, provider_config=scripted_provider_config(),
         trial_started_at_factory=lambda: TRIAL_STARTED_AT,
         max_trial_attempts=3,
         budget=make_budget(),
@@ -273,7 +285,7 @@ async def test_budget_stops_new_trials(
             slot_index=1,
             session_factory=postgres_session_factory,
             llm_factory=lambda inputs, trial_id: TimeoutLlm(),
-            profile=PROFILE,
+            binding=BINDING, provider_config=scripted_provider_config(),
             trial_started_at_factory=lambda: TRIAL_STARTED_AT,
             max_trial_attempts=3,
             budget=budget,
@@ -302,7 +314,7 @@ async def run_one(postgres_session_factory, suite, case_id, salt):
         inputs,
         session_factory=postgres_session_factory,
         llm=llm,
-        profile=PROFILE,
+        binding=BINDING, provider_config=scripted_provider_config(),
         trial_id=trial_id,
         trial_started_at=TRIAL_STARTED_AT,
     )
@@ -470,7 +482,7 @@ async def test_reference_batch_reaches_engineering_pass(
                 inputs,
                 session_factory=postgres_session_factory,
                 llm=llm,
-                profile=PROFILE,
+                binding=BINDING, provider_config=scripted_provider_config(),
                 trial_id=trial_id,
                 trial_started_at=TRIAL_STARTED_AT,
             )
@@ -575,7 +587,7 @@ async def run_golden_path(
         inputs,
         session_factory=postgres_session_factory,
         llm=llm,
-        profile=PROFILE,
+        binding=BINDING, provider_config=scripted_provider_config(),
         trial_id=trial_id,
         trial_started_at=TRIAL_STARTED_AT,
     )

@@ -19,10 +19,11 @@ from uuid import UUID, uuid5
 
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
-from app.interview_vnext.application.operation_executor import (
-    TurnInterpretProviderProfile,
-)
 from app.interview_vnext.domain.hashing import canonical_hash
+from app.interview_vnext.llm.testing import (
+    scripted_provider_config,
+    scripted_turn_binding,
+)
 
 from .capture_export import export_run_bundle
 from .contracts import (
@@ -263,9 +264,8 @@ async def orchestrate_mocked_batch(
     Harness self-test:promotion is never eligible (mocked mode + auto-review).
     """
 
-    profile = TurnInterpretProviderProfile(
-        provider="scripted", requested_model="scripted-reference"
-    )
+    binding = scripted_turn_binding()
+    provider_config = scripted_provider_config()
     factory = _reference_llm_factory(suite)
     batch_dir = output_dir / str(batch_id)
     batch_dir.mkdir(parents=True, exist_ok=True)
@@ -288,7 +288,8 @@ async def orchestrate_mocked_batch(
                 inputs,
                 session_factory=session_factory,
                 llm=llm,
-                profile=profile,
+                binding=binding,
+                provider_config=provider_config,
                 trial_id=trial_id,
                 trial_started_at=trial_started_at,
             )

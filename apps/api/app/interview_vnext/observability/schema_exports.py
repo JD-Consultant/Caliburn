@@ -40,12 +40,18 @@ SCHEMA_EXPORTS: dict[str, tuple[str, str, SchemaFactory]] = {
         "Caliburn interview vNext Capture outbox record v1",
         OutboxRecord.model_json_schema,
     ),
-    "operation-checkpoint.v1.schema.json": (
-        "https://caliburn.local/schemas/operation-checkpoint.v1.schema.json",
-        "Caliburn interview vNext operation checkpoint v1",
+    "operation-checkpoint.v2.schema.json": (
+        "https://caliburn.local/schemas/operation-checkpoint.v2.schema.json",
+        "Caliburn interview vNext operation checkpoint v2",
         OperationCheckpoint.model_json_schema,
     ),
 }
+
+# The v1 checkpoint schema is superseded by v2 but never rewritten or deleted
+# (ADR 0036 §11). It stays on disk as a frozen historical artifact.
+HISTORICAL_SCHEMAS: frozenset[str] = frozenset(
+    {"operation-checkpoint.v1.schema.json"}
+)
 
 
 def published_schema(filename: str) -> dict[str, Any]:

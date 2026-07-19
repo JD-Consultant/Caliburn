@@ -19,18 +19,27 @@ import pytest
 from pydantic import ValidationError
 
 from app.interview_vnext.domain.hashing import canonical_hash, canonical_json
+from app.interview_vnext.llm.binding import ProviderBinding, define_provider_binding
 from app.interview_vnext.llm.operation_documents import turn_interpret_operation
 from app.interview_vnext.llm.port import (
     MessageRole,
     ModelCallEnvelope,
     ModelCallRequest,
     ModelMessage,
+    ResolvedModelCall,
+)
+from app.interview_vnext.llm.portable_schema import (
+    PORTABLE_STRICT_OUTPUT_POLICY_V2,
+    project_portable_strict_output_schema,
 )
 from app.interview_vnext.llm.result import FailureKind, FinishReason, ModelOutcome
 from app.interview_vnext.llm.schema_exports import published_schema
 from app.interview_vnext.observability.artifacts import ArtifactRef
 
-from evals.interview_vnext.provider_config import OpenAIResponsesEvalConfig
+from evals.interview_vnext.provider_config import (
+    OpenAIResponsesEvalConfig,
+    build_openai_reference_binding,
+)
 from evals.interview_vnext.providers.openai_responses import (
     ERROR_ARTIFACT_KIND,
     ERROR_ARTIFACT_LABEL,
@@ -43,6 +52,14 @@ from evals.interview_vnext.schema_catalog import (
     CatalogEntry,
     PublishedOutputSchemaCatalog,
     SchemaCatalogError,
+)
+
+from tests.interview_vnext_llm_fixtures import (
+    binding_artifact_ref,
+    config_artifact_ref,
+    projection_artifact_ref,
+    resolved_call,
+    turn_output_projection,
 )
 
 
@@ -73,7 +90,23 @@ def _json_ref(payload: Any, *, kind: str, schema_id: str | None = None) -> Artif
     )
 
 
-def make_request(**overrides: Any) -> ModelCallRequest:
+STANDARD_CONFIG = OpenAIResponsesEvalConfig()
+STANDARD_BINDING = build_openai_reference_binding(STANDARD_CONFIG)
+
+
+def make_binding(**overrides: Any) -> ProviderBinding:
+    """An OpenAI binding variant for pre-HTTP mismatch tests (V3-5A §6.1)."""
+
+    fields = STANDARD_BINDING.model_dump(exclude={"schema_version", "binding_hash"})
+    fields.update(overrides)
+    return define_provider_binding(**fields)
+
+
+def make_request(
+    *, binding: ProviderBinding | None = None, config: Any = None, **overrides: Any
+) -> ModelCallRequest:
+    binding = binding or STANDARD_BINDING
+    config = config if config is not None else STANDARD_CONFIG
     operation = turn_interpret_operation()
     schema = published_schema("turn-interpret-output.v1.schema.json")
     attempt_id = overrides.pop("attempt_id", uuid4())
@@ -84,12 +117,12 @@ def make_request(**overrides: Any) -> ModelCallRequest:
         "operation_id": uuid4(),
         "attempt_id": attempt_id,
         "attempt": 1,
-        "operation_name": operation.name,
+        "operation_name": binding.operation_name,
         "operation_definition_hash": operation.definition_hash,
         "idempotency_key": f"turn-interpret/{attempt_id}/1",
-        "provider": "openai",
-        "requested_model": "gpt-5.6",
-        "quality_profile": operation.quality_profile,
+        "binding_id": binding.binding_id,
+        "binding_hash": binding.binding_hash,
+        "requested_model": binding.requested_model,
         "instructions": "You are the Caliburn turn interpreter. Test-only instructions.",
         "messages": (
             ModelMessage(role=MessageRole.USER, text="synthetic employee turn (test)"),
@@ -103,12 +136,31 @@ def make_request(**overrides: Any) -> ModelCallRequest:
         "selection_manifest_artifact": _json_ref(
             {"selection": "synthetic"}, kind="model.selection_manifest"
         ),
+        "binding_artifact": binding_artifact_ref(binding),
+        "provider_config_artifact": config_artifact_ref(config),
+        "schema_projection_artifact": projection_artifact_ref(),
         "deadline_at": CREATED_AT + timedelta(seconds=60),
         "created_at": CREATED_AT,
         "max_output_tokens": operation.max_output_tokens,
     }
     values.update(overrides)
     return ModelCallRequest(**values)
+
+
+def make_call(
+    *,
+    binding: ProviderBinding | None = None,
+    config: Any = None,
+    request: ModelCallRequest | None = None,
+    projection: Any = None,
+    **overrides: Any,
+) -> ResolvedModelCall:
+    binding = binding or STANDARD_BINDING
+    config = config if config is not None else STANDARD_CONFIG
+    request = request or make_request(binding=binding, config=config, **overrides)
+    return resolved_call(
+        request, binding, projection=projection or turn_output_projection().report
+    )
 
 
 class TestOpenAIResponsesEvalConfig:
@@ -367,7 +419,7 @@ class TestAdapterFailsBeforeHttp:
         adapter, calls = make_adapter(
             lambda request: fixture_response("server_500.json"), clock=clock
         )
-        envelope = await adapter.generate_structured(make_request())
+        envelope = await adapter.generate_structured(make_call())
         assert calls == []
         assert_failure(
             envelope,
@@ -383,10 +435,11 @@ class TestAdapterFailsBeforeHttp:
         adapter, calls = make_adapter(
             lambda request: fixture_response("server_500.json")
         )
-        request = make_request(
-            output_schema_id="https://caliburn.local/schemas/unknown.v1.schema.json"
+        envelope = await adapter.generate_structured(
+            make_call(
+                output_schema_id="https://caliburn.local/schemas/unknown.v1.schema.json"
+            )
         )
-        envelope = await adapter.generate_structured(request)
         assert calls == []
         assert_failure(
             envelope,
@@ -399,16 +452,28 @@ class TestAdapterFailsBeforeHttp:
         adapter, calls = make_adapter(
             lambda request: fixture_response("server_500.json")
         )
+        # Portable-but-different output schema: the catalog compares the request's
+        # output-schema hash to the published schema and fails closed. In v2 the
+        # request/projection stay consistent, so the tampered schema is projected.
         tampered = published_schema("turn-interpret-output.v1.schema.json")
         tampered["properties"]["tampered"] = {"type": "string"}
+        tampered["required"] = [*tampered["required"], "tampered"]
+        projected = project_portable_strict_output_schema(
+            tampered,
+            source_schema_id=TURN_INTERPRET_OUTPUT_SCHEMA_ID,
+            target_profile=PORTABLE_STRICT_OUTPUT_POLICY_V2.target_profile,
+        )
         request = make_request(
             output_schema_artifact=_json_ref(
-                tampered,
+                projected.schema,
                 kind="model.output_schema",
                 schema_id=TURN_INTERPRET_OUTPUT_SCHEMA_ID,
-            )
+            ),
+            schema_projection_artifact=projection_artifact_ref(projected.report),
         )
-        envelope = await adapter.generate_structured(request)
+        envelope = await adapter.generate_structured(
+            make_call(request=request, projection=projected.report)
+        )
         assert calls == []
         assert_failure(
             envelope,
@@ -421,8 +486,9 @@ class TestAdapterFailsBeforeHttp:
         adapter, calls = make_adapter(
             lambda request: fixture_response("server_500.json")
         )
-        request = make_request(operation_definition_hash=f"sha256:{'0' * 64}")
-        envelope = await adapter.generate_structured(request)
+        envelope = await adapter.generate_structured(
+            make_call(operation_definition_hash=f"sha256:{'0' * 64}")
+        )
         assert calls == []
         assert_failure(
             envelope,
@@ -436,7 +502,13 @@ class TestAdapterFailsBeforeHttp:
             lambda request: fixture_response("server_500.json")
         )
         envelope = await adapter.generate_structured(
-            make_request(requested_model="gpt-5.5")
+            make_call(
+                binding=make_binding(
+                    requested_model="gpt-5.5",
+                    accepted_gateway_models=("gpt-5.5",),
+                    accepted_upstream_models=("gpt-5.5",),
+                )
+            )
         )
         assert calls == []
         assert_failure(
@@ -452,7 +524,7 @@ class TestAdapterHttpErrorMapping:
         adapter, calls = make_adapter(
             lambda request: fixture_response("invalid_schema_400.json")
         )
-        envelope = await adapter.generate_structured(make_request())
+        envelope = await adapter.generate_structured(make_call())
         assert len(calls) == 1
         assert_failure(
             envelope,
@@ -467,7 +539,7 @@ class TestAdapterHttpErrorMapping:
         adapter, calls = make_adapter(
             lambda request: fixture_response("context_length_400.json")
         )
-        envelope = await adapter.generate_structured(make_request())
+        envelope = await adapter.generate_structured(make_call())
         assert len(calls) == 1
         assert_failure(
             envelope,
@@ -485,7 +557,7 @@ class TestAdapterHttpErrorMapping:
             adapter, calls = make_adapter(
                 lambda request, fixture=fixture: fixture_response(fixture)
             )
-            envelope = await adapter.generate_structured(make_request())
+            envelope = await adapter.generate_structured(make_call())
             assert len(calls) == 1
             assert_failure(
                 envelope,
@@ -498,7 +570,7 @@ class TestAdapterHttpErrorMapping:
         adapter, calls = make_adapter(
             lambda request: fixture_response("rate_limit_429.json")
         )
-        envelope = await adapter.generate_structured(make_request())
+        envelope = await adapter.generate_structured(make_call())
         assert len(calls) == 1
         assert_failure(
             envelope,
@@ -510,7 +582,7 @@ class TestAdapterHttpErrorMapping:
         adapter, calls = make_adapter(
             lambda request: fixture_response("quota_429.json")
         )
-        envelope = await adapter.generate_structured(make_request())
+        envelope = await adapter.generate_structured(make_call())
         assert len(calls) == 1
         assert_failure(
             envelope,
@@ -548,7 +620,7 @@ class TestAdapterHttpErrorMapping:
         )
         for handler, kind, reason_code in cases:
             adapter, calls = make_adapter(handler)
-            envelope = await adapter.generate_structured(make_request())
+            envelope = await adapter.generate_structured(make_call())
             assert len(calls) == 1, reason_code
             assert_failure(
                 envelope, kind=kind, reason_code=reason_code, retryable=True
@@ -561,7 +633,7 @@ class TestAdapterHttpErrorMapping:
             lambda request: httpx.ReadTimeout("provider stalled"),
         ):
             adapter, calls = make_adapter(handler)
-            await adapter.generate_structured(make_request())
+            await adapter.generate_structured(make_call())
             assert len(calls) == 1
 
     async def test_cancelled_error_propagates(self):
@@ -570,14 +642,14 @@ class TestAdapterHttpErrorMapping:
 
         adapter, calls = make_adapter(handler)
         with pytest.raises(asyncio.CancelledError):
-            await adapter.generate_structured(make_request())
+            await adapter.generate_structured(make_call())
         assert len(calls) == 1
 
     async def test_api_key_and_authorization_never_enter_artifacts(self):
         adapter, calls = make_adapter(
             lambda request: fixture_response("authentication_401.json")
         )
-        envelope = await adapter.generate_structured(make_request())
+        envelope = await adapter.generate_structured(make_call())
         assert calls[0].headers["authorization"] == f"Bearer {API_KEY}"
         assert_no_secret_anywhere(envelope)
 
@@ -604,8 +676,9 @@ class TestAdapterRequestProjection:
         adapter, calls = make_adapter(
             lambda request: fixture_response("success_reasoning_then_message.json")
         )
-        request = make_request()
-        envelope = await adapter.generate_structured(request)
+        call = make_call()
+        request = call.request
+        envelope = await adapter.generate_structured(call)
         assert envelope.result.outcome == ModelOutcome.SUCCEEDED
         assert len(calls) == 1
         assert str(calls[0].url) == "https://api.openai.com/v1/responses"
@@ -662,8 +735,7 @@ class TestAdapterResponseMatrix:
         adapter, calls = make_adapter(
             lambda request: fixture_response("success_reasoning_then_message.json")
         )
-        request = make_request()
-        envelope = await adapter.generate_structured(request)
+        envelope = await adapter.generate_structured(make_call())
         result = envelope.result
         assert result.outcome == ModelOutcome.SUCCEEDED
         assert result.finish_reason == FinishReason.COMPLETED
@@ -703,7 +775,7 @@ class TestAdapterResponseMatrix:
         adapter, _ = make_adapter(
             lambda request: fixture_response("completed_multiple_output_text.json")
         )
-        envelope = await adapter.generate_structured(make_request())
+        envelope = await adapter.generate_structured(make_call())
         assert_failure(
             envelope,
             kind=FailureKind.OUTPUT_PARSE_FAILED,
@@ -718,7 +790,7 @@ class TestAdapterResponseMatrix:
         adapter, calls = make_adapter(
             lambda request: fixture_response("refusal.json")
         )
-        envelope = await adapter.generate_structured(make_request())
+        envelope = await adapter.generate_structured(make_call())
         result = envelope.result
         assert len(calls) == 1
         assert result.outcome == ModelOutcome.REFUSED
@@ -739,7 +811,7 @@ class TestAdapterResponseMatrix:
         adapter, _ = make_adapter(
             lambda request: fixture_response("incomplete_max_output_no_visible.json")
         )
-        envelope = await adapter.generate_structured(make_request())
+        envelope = await adapter.generate_structured(make_call())
         result = envelope.result
         assert result.outcome == ModelOutcome.INCOMPLETE
         assert result.finish_reason == FinishReason.MAX_OUTPUT_TOKENS
@@ -756,7 +828,7 @@ class TestAdapterResponseMatrix:
         adapter, _ = make_adapter(
             lambda request: fixture_response("incomplete_content_filter_partial.json")
         )
-        envelope = await adapter.generate_structured(make_request())
+        envelope = await adapter.generate_structured(make_call())
         result = envelope.result
         assert result.outcome == ModelOutcome.INCOMPLETE
         assert result.finish_reason == FinishReason.UNKNOWN
@@ -770,7 +842,7 @@ class TestAdapterResponseMatrix:
         adapter, _ = make_adapter(
             lambda request: fixture_response("failed_server_error.json")
         )
-        envelope = await adapter.generate_structured(make_request())
+        envelope = await adapter.generate_structured(make_call())
         assert_failure(
             envelope,
             kind=FailureKind.PROVIDER_UNAVAILABLE,
@@ -788,7 +860,7 @@ class TestAdapterResponseMatrix:
 
     async def test_cancelled_response_is_nonretryable_cancelled(self):
         adapter, _ = make_adapter(lambda request: fixture_response("cancelled.json"))
-        envelope = await adapter.generate_structured(make_request())
+        envelope = await adapter.generate_structured(make_call())
         assert_failure(
             envelope,
             kind=FailureKind.CANCELLED,
@@ -802,7 +874,7 @@ class TestAdapterResponseMatrix:
         adapter, _ = make_adapter(
             lambda request: fixture_response("nonterminal_in_progress.json")
         )
-        envelope = await adapter.generate_structured(make_request())
+        envelope = await adapter.generate_structured(make_call())
         assert_failure(
             envelope,
             kind=FailureKind.UNKNOWN_PROVIDER_FAILURE,
@@ -816,7 +888,7 @@ class TestAdapterResponseMatrix:
         adapter, _ = make_adapter(
             lambda request: fixture_response("completed_no_message.json")
         )
-        envelope = await adapter.generate_structured(make_request())
+        envelope = await adapter.generate_structured(make_call())
         assert_failure(
             envelope,
             kind=FailureKind.OUTPUT_PARSE_FAILED,
@@ -828,7 +900,7 @@ class TestAdapterResponseMatrix:
         adapter, _ = make_adapter(
             lambda request: fixture_response("completed_invalid_json.json")
         )
-        envelope = await adapter.generate_structured(make_request())
+        envelope = await adapter.generate_structured(make_call())
         assert_failure(
             envelope,
             kind=FailureKind.OUTPUT_PARSE_FAILED,
@@ -844,7 +916,7 @@ class TestAdapterResponseMatrix:
         adapter, _ = make_adapter(
             lambda request: fixture_response("completed_json_array_root.json")
         )
-        envelope = await adapter.generate_structured(make_request())
+        envelope = await adapter.generate_structured(make_call())
         assert_failure(
             envelope,
             kind=FailureKind.OUTPUT_SCHEMA_INVALID,
@@ -856,7 +928,7 @@ class TestAdapterResponseMatrix:
         adapter, calls = make_adapter(
             lambda request: fixture_response("unexpected_tool_call.json")
         )
-        envelope = await adapter.generate_structured(make_request())
+        envelope = await adapter.generate_structured(make_call())
         assert len(calls) == 1
         assert_failure(
             envelope,
@@ -871,7 +943,7 @@ class TestAdapterResponseMatrix:
         adapter, _ = make_adapter(
             lambda request: fixture_response("completed_commentary_then_final.json")
         )
-        envelope = await adapter.generate_structured(make_request())
+        envelope = await adapter.generate_structured(make_call())
         assert_failure(
             envelope,
             kind=FailureKind.OUTPUT_PARSE_FAILED,
@@ -886,7 +958,7 @@ class TestAdapterResponseMatrix:
         adapter, _ = make_adapter(
             lambda request: fixture_response("resolved_model_mismatch.json")
         )
-        envelope = await adapter.generate_structured(make_request())
+        envelope = await adapter.generate_structured(make_call())
         assert_failure(
             envelope,
             kind=FailureKind.RESOLVED_MODEL_MISMATCH,
@@ -909,7 +981,7 @@ class TestAdapterResponseMatrix:
                 accepted_resolved_models=("gpt-5.6", "gpt-5.6-sol", "gpt-5.7"),
             ),
         )
-        envelope = await adapter.generate_structured(make_request())
+        envelope = await adapter.generate_structured(make_call())
         assert_failure(
             envelope,
             kind=FailureKind.RESOLVED_MODEL_MISMATCH,
@@ -921,7 +993,7 @@ class TestAdapterResponseMatrix:
         adapter, _ = make_adapter(
             lambda request: fixture_response("usage_unavailable.json")
         )
-        envelope = await adapter.generate_structured(make_request())
+        envelope = await adapter.generate_structured(make_call())
         result = envelope.result
         assert result.outcome == ModelOutcome.SUCCEEDED
         usage = result.usage
@@ -938,7 +1010,7 @@ class TestAdapterResponseMatrix:
         adapter, _ = make_adapter(
             lambda request: fixture_response("success_local_constraint_violation.json")
         )
-        envelope = await adapter.generate_structured(make_request())
+        envelope = await adapter.generate_structured(make_call())
         result = envelope.result
         assert result.outcome == ModelOutcome.SUCCEEDED
         assert result.parsed_output is not None
@@ -947,15 +1019,16 @@ class TestAdapterResponseMatrix:
 
     async def test_envelope_artifact_ids_are_deterministic_and_scoped(self):
         attempt_id = uuid4()
-        request = make_request(attempt_id=attempt_id)
+        call = make_call(attempt_id=attempt_id)
+        request = call.request
         adapter_one, _ = make_adapter(
             lambda request: fixture_response("success_reasoning_then_message.json")
         )
         adapter_two, _ = make_adapter(
             lambda request: fixture_response("success_reasoning_then_message.json")
         )
-        first = await adapter_one.generate_structured(request)
-        second = await adapter_two.generate_structured(request)
+        first = await adapter_one.generate_structured(call)
+        second = await adapter_two.generate_structured(call)
         first_ids = sorted(
             str(record.ref.artifact_id) for record in first.supporting_artifacts
         )

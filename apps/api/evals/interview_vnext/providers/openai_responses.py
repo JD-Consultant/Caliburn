@@ -38,11 +38,19 @@ from openai.types.responses import (
 )
 
 from app.interview_vnext.domain.hashing import canonical_json
+from app.interview_vnext.llm.binding import ProviderBinding
+from app.interview_vnext.llm.execution import (
+    CacheStatus,
+    ProviderExecutionEvidence,
+    TransformationStatus,
+    define_provider_execution_evidence,
+)
 from app.interview_vnext.llm.port import (
     LlmPort,
     MessageRole,
     ModelCallEnvelope,
     ModelCallRequest,
+    ResolvedModelCall,
 )
 from app.interview_vnext.llm.result import (
     FailureKind,
@@ -406,11 +414,13 @@ class OpenAIResponsesEvalAdapter(LlmPort):
         if self._owns_http_client:
             await self._client.close()
 
-    async def generate_structured(self, request: ModelCallRequest) -> ModelCallEnvelope:
+    async def generate_structured(self, call: ResolvedModelCall) -> ModelCallEnvelope:
+        request = call.request
+        provider_binding = call.binding
         started_at = self._now()
         started_mono = self._monotonic()
         try:
-            binding = self._validate_binding(request)
+            binding = self._validate_binding(request, provider_binding)
         except _LocalBindingError as exc:
             failure = _Failure(
                 FailureKind.INVALID_REQUEST,
@@ -419,7 +429,7 @@ class OpenAIResponsesEvalAdapter(LlmPort):
                 SAFE_MESSAGES["binding"],
             )
             return self._failure_envelope(
-                request, failure,
+                request, provider_binding, failure,
                 started_at=started_at, started_mono=started_mono,
                 detail=exc.detail,
             )
@@ -431,7 +441,7 @@ class OpenAIResponsesEvalAdapter(LlmPort):
                 SAFE_MESSAGES["timeout"],
             )
             return self._failure_envelope(
-                request, failure,
+                request, provider_binding, failure,
                 started_at=started_at, started_mono=started_mono,
                 detail="attempt deadline expired before the provider call",
             )
@@ -472,7 +482,7 @@ class OpenAIResponsesEvalAdapter(LlmPort):
         except Exception as exc:  # noqa: BLE001 — closed typed table in _classify_exception
             failure = _classify_exception(exc)
             return self._failure_envelope(
-                request, failure,
+                request, provider_binding, failure,
                 started_at=started_at, started_mono=started_mono,
                 exception=exc,
                 status_code=getattr(exc, "status_code", None),
@@ -481,15 +491,19 @@ class OpenAIResponsesEvalAdapter(LlmPort):
                 detail="provider call raised before a Response was received",
             )
         return self._normalize_response(
-            request, response, started_at=started_at, started_mono=started_mono
+            request, provider_binding, response,
+            started_at=started_at, started_mono=started_mono,
         )
 
     # ---- pre-HTTP validation -------------------------------------------------
 
-    def _validate_binding(self, request: ModelCallRequest) -> SchemaBinding:
-        if request.provider != self._config.provider:
+    def _validate_binding(
+        self, request: ModelCallRequest, provider_binding: ProviderBinding
+    ) -> SchemaBinding:
+        if provider_binding.gateway_provider != self._config.provider:
             raise _LocalBindingError(
-                f"request provider {request.provider!r} is not approved for this adapter"
+                f"binding gateway provider {provider_binding.gateway_provider!r} "
+                "is not approved for this adapter"
             )
         if request.requested_model != self._config.requested_model:
             raise _LocalBindingError(
@@ -524,6 +538,7 @@ class OpenAIResponsesEvalAdapter(LlmPort):
     def _failure_envelope(
         self,
         request: ModelCallRequest,
+        binding: ProviderBinding,
         failure: _Failure,
         *,
         started_at: datetime,
@@ -547,8 +562,9 @@ class OpenAIResponsesEvalAdapter(LlmPort):
             request_id=request_id,
             body=body,
         )
+        usage = _usage_without_response()
         result = ModelCallResult(
-            **_identity_fields(request),
+            **_identity_fields(request, binding),
             resolved_model=request.requested_model,
             provider_request_id=request_id,
             provider_conversation_id=None,
@@ -566,18 +582,24 @@ class OpenAIResponsesEvalAdapter(LlmPort):
                 provider_error_code=failure.provider_error_code,
                 error_artifact=error.ref,
             ),
-            usage=_usage_without_response(),
+            usage=usage,
             latency_ms=latency_ms,
             started_at=started_at,
             completed_at=completed_at,
         )
-        return ModelCallEnvelope(result=result, supporting_artifacts=(error,))
+        evidence = _openai_execution_evidence(
+            binding, request, resolved_model=request.requested_model, usage=usage
+        )
+        return ModelCallEnvelope(
+            result=result, execution_evidence=evidence, supporting_artifacts=(error,)
+        )
 
     # ---- response normalization (§9/§10) ------------------------------------
 
     def _normalize_response(
         self,
         request: ModelCallRequest,
+        binding: ProviderBinding,
         response: Response,
         *,
         started_at: datetime,
@@ -598,7 +620,7 @@ class OpenAIResponsesEvalAdapter(LlmPort):
         resolved_raw = response.model
         resolved_model = resolved_raw or request.requested_model
         base = dict(
-            **_identity_fields(request),
+            **_identity_fields(request, binding),
             resolved_model=resolved_model,
             provider_request_id=request_id,
             provider_conversation_id=None,
@@ -608,6 +630,9 @@ class OpenAIResponsesEvalAdapter(LlmPort):
             completed_at=completed_at,
         )
         artifacts = (raw, visible)
+        evidence = _openai_execution_evidence(
+            binding, request, resolved_model=resolved_model, usage=usage
+        )
 
         def failed(
             failure: _Failure,
@@ -644,7 +669,8 @@ class OpenAIResponsesEvalAdapter(LlmPort):
                 ),
             )
             return ModelCallEnvelope(
-                result=result, supporting_artifacts=(*artifacts, error)
+                result=result, execution_evidence=evidence,
+                supporting_artifacts=(*artifacts, error),
             )
 
         status = response.status
@@ -683,7 +709,10 @@ class OpenAIResponsesEvalAdapter(LlmPort):
                 refusal=None,
                 failure=None,
             )
-            return ModelCallEnvelope(result=result, supporting_artifacts=artifacts)
+            return ModelCallEnvelope(
+                result=result, execution_evidence=evidence,
+                supporting_artifacts=artifacts,
+            )
 
         if status == "failed":
             error_code = response.error.code if response.error is not None else None
@@ -761,7 +790,10 @@ class OpenAIResponsesEvalAdapter(LlmPort):
                 ),
                 failure=None,
             )
-            return ModelCallEnvelope(result=result, supporting_artifacts=artifacts)
+            return ModelCallEnvelope(
+                result=result, execution_evidence=evidence,
+                supporting_artifacts=artifacts,
+            )
         if text_count == 0:
             return bad_output(
                 "openai.missing_structured_output",
@@ -805,10 +837,15 @@ class OpenAIResponsesEvalAdapter(LlmPort):
             refusal=None,
             failure=None,
         )
-        return ModelCallEnvelope(result=result, supporting_artifacts=artifacts)
+        return ModelCallEnvelope(
+                result=result, execution_evidence=evidence,
+                supporting_artifacts=artifacts,
+            )
 
 
-def _identity_fields(request: ModelCallRequest) -> dict[str, Any]:
+def _identity_fields(
+    request: ModelCallRequest, binding: ProviderBinding
+) -> dict[str, Any]:
     return {
         "run_id": request.run_id,
         "session_id": request.session_id,
@@ -818,13 +855,54 @@ def _identity_fields(request: ModelCallRequest) -> dict[str, Any]:
         "attempt": request.attempt,
         "operation_name": request.operation_name,
         "operation_definition_hash": request.operation_definition_hash,
-        "provider": request.provider,
+        "binding_id": request.binding_id,
+        "binding_hash": request.binding_hash,
+        "gateway_provider": binding.gateway_provider,
         "requested_model": request.requested_model,
         "prompt_hash": request.prompt_hash,
         "output_schema_id": request.output_schema_id,
         "output_schema_hash": request.output_schema_hash,
         "context_hash": request.context_hash,
     }
+
+
+def _openai_execution_evidence(
+    binding: ProviderBinding,
+    request: ModelCallRequest,
+    *,
+    resolved_model: str,
+    usage: TokenUsage,
+) -> ProviderExecutionEvidence:
+    """Direct OpenAI Responses execution evidence (reference adapter).
+
+    The reference adapter only proves the neutral contract holds across providers;
+    it is never run live and its conformance eligibility is not asserted. Cost is
+    not exposed by the Responses API, recorded as a limitation.
+    """
+
+    return define_provider_execution_evidence(
+        binding_id=binding.binding_id,
+        binding_hash=binding.binding_hash,
+        adapter_id=binding.adapter_id,
+        adapter_version=binding.adapter_version,
+        gateway_provider=binding.gateway_provider,
+        requested_model=request.requested_model,
+        gateway_resolved_model=resolved_model,
+        upstream_provider="OpenAI",
+        upstream_model=resolved_model,
+        upstream_endpoint="responses",
+        route_strategy="direct",
+        upstream_attempt_count=1,
+        transformation_status=TransformationStatus.CLEAN,
+        pipeline_stages=(),
+        cache_status=CacheStatus.ABSENT,
+        provider_request_id=None,
+        generation_id=None,
+        usage=usage,
+        cost_decimal=None,
+        limitations=("openai responses api does not expose per-call cost",),
+        raw_routing_artifact=None,
+    )
 
 
 def _provider_finish_reason(response: Response) -> str:

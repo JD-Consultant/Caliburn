@@ -21,12 +21,18 @@ import httpx
 import pytest
 
 from app.interview_vnext.domain.hashing import canonical_hash, canonical_json
+from app.interview_vnext.llm.binding import ProviderBinding, define_provider_binding
 from app.interview_vnext.llm.operation_documents import turn_interpret_operation
 from app.interview_vnext.llm.port import (
     MessageRole,
     ModelCallEnvelope,
     ModelCallRequest,
     ModelMessage,
+    ResolvedModelCall,
+)
+from app.interview_vnext.llm.portable_schema import (
+    PORTABLE_STRICT_OUTPUT_POLICY_V2,
+    project_portable_strict_output_schema,
 )
 from app.interview_vnext.llm.result import FailureKind, FinishReason, ModelOutcome
 from app.interview_vnext.llm.schema_exports import published_schema
@@ -38,6 +44,7 @@ from evals.interview_vnext.openrouter_model_catalog import (
 )
 from evals.interview_vnext.openrouter_provider_config import (
     OpenRouterProbeInputs,
+    build_openrouter_eval_binding,
     build_openrouter_eval_config,
 )
 from evals.interview_vnext.providers.openrouter_chat import (
@@ -48,6 +55,15 @@ from evals.interview_vnext.providers.openrouter_chat import (
     ROUTING_ARTIFACT_LABEL,
     VISIBLE_ARTIFACT_LABEL,
     OpenRouterChatEvalAdapter,
+)
+
+from tests.interview_vnext_llm_fixtures import (
+    TURN_OUTPUT_SCHEMA_ID,
+    binding_artifact_ref,
+    config_artifact_ref,
+    projection_artifact_ref,
+    resolved_call,
+    turn_output_projection,
 )
 
 
@@ -113,7 +129,28 @@ def _json_ref(payload: Any, *, kind: str, schema_id: str | None = None) -> Artif
     )
 
 
-def make_request(**overrides: Any) -> ModelCallRequest:
+STANDARD_CONFIG = build_config()
+STANDARD_BINDING = build_openrouter_eval_binding(STANDARD_CONFIG)
+
+
+def make_binding(**overrides: Any) -> ProviderBinding:
+    """A binding variant for pre-HTTP mismatch tests (V3-5A §6.1).
+
+    Rebuilds the standard OpenRouter binding with field overrides so a request can
+    carry a consistent binding whose identity nonetheless disagrees with the
+    adapter's config (e.g. a foreign gateway provider or requested model).
+    """
+
+    fields = STANDARD_BINDING.model_dump(exclude={"schema_version", "binding_hash"})
+    fields.update(overrides)
+    return define_provider_binding(**fields)
+
+
+def make_request(
+    *, binding: ProviderBinding | None = None, config: Any = None, **overrides: Any
+) -> ModelCallRequest:
+    binding = binding or STANDARD_BINDING
+    config = config if config is not None else STANDARD_CONFIG
     operation = turn_interpret_operation()
     schema = published_schema("turn-interpret-output.v1.schema.json")
     attempt_id = overrides.pop("attempt_id", uuid4())
@@ -124,35 +161,62 @@ def make_request(**overrides: Any) -> ModelCallRequest:
         "operation_id": uuid4(),
         "attempt_id": attempt_id,
         "attempt": 1,
-        "operation_name": operation.name,
+        "operation_name": binding.operation_name,
         "operation_definition_hash": operation.definition_hash,
         "idempotency_key": f"turn-interpret/{attempt_id}/1",
-        "provider": "openrouter",
-        "requested_model": REQUESTED_MODEL,
-        "quality_profile": operation.quality_profile,
+        "binding_id": binding.binding_id,
+        "binding_hash": binding.binding_hash,
+        "requested_model": binding.requested_model,
         "instructions": "You are the Caliburn turn interpreter. Test-only instructions.",
         "messages": (
             ModelMessage(role=MessageRole.USER, text="synthetic employee turn (test)"),
         ),
         "prompt_artifact": _text_ref("test-only prompt", kind="model.prompt"),
-        "output_schema_id": (
-            "https://caliburn.local/schemas/turn-interpret-output.v1.schema.json"
-        ),
+        "output_schema_id": TURN_OUTPUT_SCHEMA_ID,
         "output_schema_artifact": _json_ref(
             schema,
             kind="model.output_schema",
-            schema_id="https://caliburn.local/schemas/turn-interpret-output.v1.schema.json",
+            schema_id=TURN_OUTPUT_SCHEMA_ID,
         ),
         "context_artifact": _json_ref({"context": "synthetic"}, kind="model.context"),
         "selection_manifest_artifact": _json_ref(
             {"selection": "synthetic"}, kind="model.selection_manifest"
         ),
+        "binding_artifact": binding_artifact_ref(binding),
+        "provider_config_artifact": config_artifact_ref(config),
+        "schema_projection_artifact": projection_artifact_ref(),
         "deadline_at": CREATED_AT + timedelta(seconds=60),
         "created_at": CREATED_AT,
         "max_output_tokens": operation.max_output_tokens,
     }
     values.update(overrides)
     return ModelCallRequest(**values)
+
+
+def make_call(
+    *,
+    binding: ProviderBinding | None = None,
+    config: Any = None,
+    request: ModelCallRequest | None = None,
+    projection: Any = None,
+    **overrides: Any,
+) -> ResolvedModelCall:
+    """A resolved call the adapter executes: request + binding + schema projection.
+
+    The binding and config default to the standard OpenRouter pair (the resolved
+    call always models the binding's own config, independent of the adapter the
+    call is later handed to). ``projection`` defaults to the active turn output
+    projection.
+    """
+
+    binding = binding or STANDARD_BINDING
+    config = config if config is not None else STANDARD_CONFIG
+    request = request or make_request(binding=binding, config=config, **overrides)
+    return resolved_call(
+        request,
+        binding,
+        projection=projection or turn_output_projection().report,
+    )
 
 
 class FakeClock:
@@ -266,7 +330,7 @@ class TestAdapterFailsBeforeHttp:
         adapter, calls = make_adapter(
             lambda request: fixture_response("success.json"), clock=clock
         )
-        envelope = await adapter.generate_structured(make_request())
+        envelope = await adapter.generate_structured(make_call())
         assert calls == []
         assert_failure(
             envelope,
@@ -278,18 +342,30 @@ class TestAdapterFailsBeforeHttp:
         assert envelope.result.usage.limitations
 
     @pytest.mark.parametrize(
-        "overrides",
+        "call_factory",
         [
-            {"provider": "openai"},
-            {"requested_model": "testlab/analyst-mini"},
-            {"operation_name": "turn.receive"},
-            {"operation_definition_hash": f"sha256:{'0' * 64}"},
-            {"output_schema_id": "https://caliburn.local/schemas/unknown.v1.schema.json"},
+            # foreign gateway provider (binding identity, not a request field in v2)
+            lambda: make_call(binding=make_binding(gateway_provider="openai")),
+            # requested model the adapter config does not accept
+            lambda: make_call(
+                binding=make_binding(
+                    requested_model="testlab/analyst-mini",
+                    accepted_gateway_models=("testlab/analyst-mini",),
+                    accepted_upstream_models=("testlab/analyst-mini",),
+                )
+            ),
+            # operation the eval schema catalog does not publish
+            lambda: make_call(binding=make_binding(operation_name="turn.receive")),
+            lambda: make_call(operation_definition_hash=f"sha256:{'0' * 64}"),
+            lambda: make_call(
+                output_schema_id="https://caliburn.local/schemas/unknown.v1.schema.json"
+            ),
         ],
+        ids=["gateway", "model", "operation_name", "operation_hash", "output_schema"],
     )
-    async def test_binding_mismatches_fail_before_http(self, overrides):
+    async def test_binding_mismatches_fail_before_http(self, call_factory):
         adapter, calls = make_adapter(lambda request: fixture_response("success.json"))
-        envelope = await adapter.generate_structured(make_request(**overrides))
+        envelope = await adapter.generate_structured(call_factory())
         assert calls == []
         assert_failure(
             envelope,
@@ -300,16 +376,29 @@ class TestAdapterFailsBeforeHttp:
 
     async def test_schema_hash_mismatch_fails_before_http(self):
         adapter, calls = make_adapter(lambda request: fixture_response("success.json"))
+        # A portable-but-different output schema: the catalog compares the request's
+        # output-schema hash against the published schema and fails closed. In v2 the
+        # request and projection must stay internally consistent, so the tampered
+        # schema is projected and referenced by both.
         tampered = published_schema("turn-interpret-output.v1.schema.json")
         tampered["properties"]["tampered"] = {"type": "string"}
+        tampered["required"] = [*tampered["required"], "tampered"]
+        projected = project_portable_strict_output_schema(
+            tampered,
+            source_schema_id=TURN_OUTPUT_SCHEMA_ID,
+            target_profile=PORTABLE_STRICT_OUTPUT_POLICY_V2.target_profile,
+        )
         request = make_request(
             output_schema_artifact=_json_ref(
-                tampered,
+                projected.schema,
                 kind="model.output_schema",
-                schema_id="https://caliburn.local/schemas/turn-interpret-output.v1.schema.json",
-            )
+                schema_id=TURN_OUTPUT_SCHEMA_ID,
+            ),
+            schema_projection_artifact=projection_artifact_ref(projected.report),
         )
-        envelope = await adapter.generate_structured(request)
+        envelope = await adapter.generate_structured(
+            make_call(request=request, projection=projected.report)
+        )
         assert calls == []
         assert_failure(
             envelope,
@@ -324,7 +413,7 @@ class TestAdapterFailsBeforeHttp:
             config=build_config(reasoning_effort=None, reasoning_max_tokens=8192),
         )
         # operation.max_output_tokens is 4096 < 8192 reasoning budget.
-        envelope = await adapter.generate_structured(make_request())
+        envelope = await adapter.generate_structured(make_call())
         assert calls == []
         assert_failure(
             envelope,
@@ -340,8 +429,9 @@ class TestAdapterFailsBeforeHttp:
 class TestAdapterRequestProjection:
     async def test_exact_url_headers_body_and_forbidden_keys(self):
         adapter, calls = make_adapter(lambda request: fixture_response("success.json"))
-        request = make_request()
-        envelope = await adapter.generate_structured(request)
+        call = make_call()
+        request = call.request
+        envelope = await adapter.generate_structured(call)
         assert envelope.result.outcome == ModelOutcome.SUCCEEDED
         assert len(calls) == 1
         call = calls[0]
@@ -398,14 +488,14 @@ class TestAdapterRequestProjection:
 
     async def test_zdr_only_sent_when_required(self):
         adapter, calls = make_adapter(lambda request: fixture_response("success.json"))
-        await adapter.generate_structured(make_request())
+        await adapter.generate_structured(make_call())
         assert "zdr" not in json.loads(calls[0].content)["provider"]
 
         adapter, calls = make_adapter(
             lambda request: fixture_response("success.json"),
             config=build_config(zdr_required=True),
         )
-        await adapter.generate_structured(make_request())
+        await adapter.generate_structured(make_call())
         assert json.loads(calls[0].content)["provider"]["zdr"] is True
 
     async def test_reasoning_max_tokens_variant_is_exclusive_form(self):
@@ -413,7 +503,7 @@ class TestAdapterRequestProjection:
             lambda request: fixture_response("success.json"),
             config=build_config(reasoning_effort=None, reasoning_max_tokens=2048),
         )
-        await adapter.generate_structured(make_request())
+        await adapter.generate_structured(make_call())
         assert json.loads(calls[0].content)["reasoning"] == {
             "max_tokens": 2048,
             "exclude": True,
@@ -424,20 +514,23 @@ class TestAdapterRequestProjection:
             lambda request: fixture_response("success.json"),
             config=build_config(reasoning_effort=None),
         )
-        await adapter.generate_structured(make_request())
+        await adapter.generate_structured(make_call())
         assert "reasoning" not in json.loads(calls[0].content)
 
     async def test_messages_are_mapped_verbatim_including_unicode(self):
         adapter, calls = make_adapter(lambda request: fixture_response("success.json"))
-        request = make_request(
-            instructions="系統指示:嚴格輸出 JSON。\n第二行。",
-            messages=(
-                ModelMessage(role=MessageRole.USER, text="第一題:員工說了什麼?"),
-                ModelMessage(role=MessageRole.ASSISTANT, text="請描述你的日常。"),
-                ModelMessage(role=MessageRole.USER, text="我負責 API 設計與 code review。"),
-            ),
+        await adapter.generate_structured(
+            make_call(
+                instructions="系統指示:嚴格輸出 JSON。\n第二行。",
+                messages=(
+                    ModelMessage(role=MessageRole.USER, text="第一題:員工說了什麼?"),
+                    ModelMessage(role=MessageRole.ASSISTANT, text="請描述你的日常。"),
+                    ModelMessage(
+                        role=MessageRole.USER, text="我負責 API 設計與 code review。"
+                    ),
+                ),
+            )
         )
-        await adapter.generate_structured(request)
         body = json.loads(calls[0].content)
         assert body["messages"] == [
             {"role": "system", "content": "系統指示:嚴格輸出 JSON。\n第二行。"},
@@ -462,14 +555,14 @@ class TestSingleCallSemantics:
     )
     async def test_adapter_never_retries(self, handler):
         adapter, calls = make_adapter(handler)
-        await adapter.generate_structured(make_request())
+        await adapter.generate_structured(make_call())
         assert len(calls) == 1
 
     async def test_transport_timeout_is_typed(self):
         adapter, calls = make_adapter(
             lambda request: httpx.ReadTimeout("provider stalled")
         )
-        envelope = await adapter.generate_structured(make_request())
+        envelope = await adapter.generate_structured(make_call())
         assert len(calls) == 1
         assert_failure(
             envelope,
@@ -482,7 +575,7 @@ class TestSingleCallSemantics:
         adapter, calls = make_adapter(
             lambda request: httpx.ConnectError("refused")
         )
-        envelope = await adapter.generate_structured(make_request())
+        envelope = await adapter.generate_structured(make_call())
         assert len(calls) == 1
         assert_failure(
             envelope,
@@ -497,7 +590,7 @@ class TestSingleCallSemantics:
 
         adapter, calls = make_adapter(handler)
         with pytest.raises(asyncio.CancelledError):
-            await adapter.generate_structured(make_request())
+            await adapter.generate_structured(make_call())
         assert len(calls) == 1
 
     async def test_external_client_is_not_closed_by_adapter(self):
@@ -510,7 +603,7 @@ class TestSingleCallSemantics:
             api_key=API_KEY, config=build_config(), http_client=client,
             now=FakeClock().now,
         )
-        await adapter.generate_structured(make_request())
+        await adapter.generate_structured(make_call())
         await adapter.aclose()
         assert not client.is_closed
         await client.aclose()
@@ -572,7 +665,7 @@ class TestErrorMatrix:
                 headers={"x-request-id": f"req_{error_type}"},
             )
         )
-        envelope = await adapter.generate_structured(make_request())
+        envelope = await adapter.generate_structured(make_call())
         assert len(calls) == 1
         assert_failure(
             envelope, kind=kind, reason_code=reason_code,
@@ -589,7 +682,7 @@ class TestErrorMatrix:
                     403, json=error_body(et, code=403)
                 )
             )
-            envelope = await adapter.generate_structured(make_request())
+            envelope = await adapter.generate_structured(make_call())
             result = envelope.result
             assert result.outcome == ModelOutcome.REFUSED
             assert result.finish_reason == FinishReason.SAFETY_REFUSAL
@@ -600,7 +693,7 @@ class TestErrorMatrix:
 
     async def test_http_200_top_level_error_wins_over_status(self):
         adapter, _ = make_adapter(lambda request: fixture_response("top-error-200.json"))
-        envelope = await adapter.generate_structured(make_request())
+        envelope = await adapter.generate_structured(make_call())
         assert_failure(
             envelope,
             kind=FailureKind.RATE_LIMITED,
@@ -615,7 +708,7 @@ class TestErrorMatrix:
         adapter, _ = make_adapter(
             lambda request: fixture_response("choice-embedded-error.json")
         )
-        envelope = await adapter.generate_structured(make_request())
+        envelope = await adapter.generate_structured(make_call())
         assert_failure(
             envelope,
             kind=FailureKind.PROVIDER_UNAVAILABLE,
@@ -631,7 +724,7 @@ class TestErrorMatrix:
         adapter, _ = make_adapter(
             lambda request: httpx.Response(500, json={"foo": "bar"})
         )
-        envelope = await adapter.generate_structured(make_request())
+        envelope = await adapter.generate_structured(make_call())
         assert_failure(
             envelope,
             kind=FailureKind.PROVIDER_UNAVAILABLE,
@@ -643,7 +736,7 @@ class TestErrorMatrix:
         adapter, _ = make_adapter(
             lambda request: httpx.Response(503, text="<html>gateway</html>")
         )
-        envelope = await adapter.generate_structured(make_request())
+        envelope = await adapter.generate_structured(make_call())
         assert_failure(
             envelope,
             kind=FailureKind.PROVIDER_UNAVAILABLE,
@@ -657,7 +750,7 @@ class TestErrorMatrix:
         adapter, _ = make_adapter(
             lambda request: httpx.Response(200, text="not json at all")
         )
-        envelope = await adapter.generate_structured(make_request())
+        envelope = await adapter.generate_structured(make_call())
         assert_failure(
             envelope,
             kind=FailureKind.OUTPUT_PARSE_FAILED,
@@ -673,7 +766,7 @@ class TestErrorMatrix:
         adapter, _ = make_adapter(
             lambda request: httpx.Response(status, json={"unknown": True})
         )
-        envelope = await adapter.generate_structured(make_request())
+        envelope = await adapter.generate_structured(make_call())
         result = envelope.result
         assert result.outcome == ModelOutcome.FAILED
         assert result.failure.kind == FailureKind.UNKNOWN_PROVIDER_FAILURE
@@ -684,7 +777,7 @@ class TestErrorMatrix:
         adapter, _ = make_adapter(
             lambda request: httpx.Response(500, json=error_body("authentication"))
         )
-        envelope = await adapter.generate_structured(make_request())
+        envelope = await adapter.generate_structured(make_call())
         assert_failure(
             envelope,
             kind=FailureKind.AUTHENTICATION_FAILED,
@@ -699,8 +792,9 @@ class TestErrorMatrix:
         adapter, _ = make_adapter(
             lambda request: httpx.Response(401, json=error_body("authentication"))
         )
-        request = make_request()
-        envelope = await adapter.generate_structured(request)
+        call = make_call()
+        request = call.request
+        envelope = await adapter.generate_structured(call)
         error_ref = envelope.result.failure.error_artifact
         assert error_ref.artifact_id == uuid5(request.attempt_id, ERROR_ARTIFACT_LABEL)
         record = {r.ref.artifact_id: r for r in envelope.supporting_artifacts}[
@@ -757,7 +851,7 @@ def respond(body: dict[str, Any], *, status: int = 200, headers: dict | None = N
 class TestSuccessPath:
     async def test_success_parses_single_object_with_full_capture(self):
         adapter, calls = make_adapter(lambda request: fixture_response("success.json"))
-        envelope = await adapter.generate_structured(make_request())
+        envelope = await adapter.generate_structured(make_call())
         result = envelope.result
         assert len(calls) == 1
         assert result.outcome == ModelOutcome.SUCCEEDED
@@ -817,14 +911,14 @@ class TestSuccessPath:
             metadata=clean_metadata(future_router_field="ignored"),
         )
         adapter, _ = make_adapter(lambda request: respond(body))
-        envelope = await adapter.generate_structured(make_request())
+        envelope = await adapter.generate_structured(make_call())
         assert envelope.result.outcome == ModelOutcome.SUCCEEDED
         raw = artifact_by_label(envelope, RAW_ARTIFACT_LABEL)
         assert raw["body"]["system_fingerprint"] == "fp_fx"
 
     async def test_length_is_incomplete_and_partial_preserved(self):
         adapter, _ = make_adapter(lambda request: fixture_response("length.json"))
-        envelope = await adapter.generate_structured(make_request())
+        envelope = await adapter.generate_structured(make_call())
         result = envelope.result
         assert result.outcome == ModelOutcome.INCOMPLETE
         assert result.finish_reason == FinishReason.MAX_OUTPUT_TOKENS
@@ -839,7 +933,7 @@ class TestSuccessPath:
         adapter, _ = make_adapter(
             lambda request: fixture_response("content-filter.json")
         )
-        envelope = await adapter.generate_structured(make_request())
+        envelope = await adapter.generate_structured(make_call())
         result = envelope.result
         assert result.outcome == ModelOutcome.REFUSED
         assert result.finish_reason == FinishReason.SAFETY_REFUSAL
@@ -852,7 +946,7 @@ class TestSuccessPath:
 
     async def test_tool_calls_are_not_executed(self):
         adapter, calls = make_adapter(lambda request: fixture_response("tool-calls.json"))
-        envelope = await adapter.generate_structured(make_request())
+        envelope = await adapter.generate_structured(make_call())
         assert len(calls) == 1
         assert_failure(
             envelope,
@@ -864,7 +958,7 @@ class TestSuccessPath:
 
     async def test_empty_content_is_retryable_provider_error(self):
         adapter, _ = make_adapter(lambda request: fixture_response("empty-content.json"))
-        envelope = await adapter.generate_structured(make_request())
+        envelope = await adapter.generate_structured(make_call())
         assert_failure(
             envelope,
             kind=FailureKind.OUTPUT_PARSE_FAILED,
@@ -874,7 +968,7 @@ class TestSuccessPath:
 
     async def test_invalid_json_is_not_repaired(self):
         adapter, _ = make_adapter(lambda request: fixture_response("invalid-json.json"))
-        envelope = await adapter.generate_structured(make_request())
+        envelope = await adapter.generate_structured(make_call())
         assert_failure(
             envelope,
             kind=FailureKind.OUTPUT_PARSE_FAILED,
@@ -889,7 +983,7 @@ class TestSuccessPath:
         adapter, _ = make_adapter(
             lambda request: fixture_response("non-object-root.json")
         )
-        envelope = await adapter.generate_structured(make_request())
+        envelope = await adapter.generate_structured(make_call())
         assert_failure(
             envelope,
             kind=FailureKind.OUTPUT_SCHEMA_INVALID,
@@ -901,7 +995,7 @@ class TestSuccessPath:
         adapter, _ = make_adapter(
             lambda request: fixture_response("resolved-model-mismatch.json")
         )
-        envelope = await adapter.generate_structured(make_request())
+        envelope = await adapter.generate_structured(make_call())
         assert_failure(
             envelope,
             kind=FailureKind.RESOLVED_MODEL_MISMATCH,
@@ -913,7 +1007,7 @@ class TestSuccessPath:
     async def test_prefix_model_is_not_accepted(self):
         body = success_body(model="testlab/analyst-large-2026")
         adapter, _ = make_adapter(lambda request: respond(body))
-        envelope = await adapter.generate_structured(make_request())
+        envelope = await adapter.generate_structured(make_call())
         assert_failure(
             envelope,
             kind=FailureKind.RESOLVED_MODEL_MISMATCH,
@@ -925,7 +1019,7 @@ class TestSuccessPath:
         adapter, _ = make_adapter(
             lambda request: fixture_response("multiple-choices.json")
         )
-        envelope = await adapter.generate_structured(make_request())
+        envelope = await adapter.generate_structured(make_call())
         assert_failure(
             envelope,
             kind=FailureKind.OUTPUT_PARSE_FAILED,
@@ -939,7 +1033,7 @@ class TestSuccessPath:
         body = success_body()
         body["choices"][0]["native_finish_reason"] = "stop_sequence_x"
         adapter, _ = make_adapter(lambda request: respond(body))
-        envelope = await adapter.generate_structured(make_request())
+        envelope = await adapter.generate_structured(make_call())
         assert envelope.result.provider_finish_reason == "chat:stop|native:stop_sequence_x"
 
 
@@ -948,7 +1042,7 @@ class TestReasoningRedaction:
         adapter, _ = make_adapter(
             lambda request: fixture_response("success-with-reasoning.json")
         )
-        envelope = await adapter.generate_structured(make_request())
+        envelope = await adapter.generate_structured(make_call())
         result = envelope.result
         assert result.outcome == ModelOutcome.SUCCEEDED
         assert result.usage.reasoning_tokens == 256
@@ -975,7 +1069,7 @@ class TestReasoningRedaction:
 class TestUsageMapping:
     async def test_usage_missing_is_all_null_with_limitation(self):
         adapter, _ = make_adapter(lambda request: fixture_response("usage-missing.json"))
-        envelope = await adapter.generate_structured(make_request())
+        envelope = await adapter.generate_structured(make_call())
         usage = envelope.result.usage
         assert envelope.result.outcome == ModelOutcome.SUCCEEDED
         assert usage.input_tokens is None
@@ -985,7 +1079,7 @@ class TestUsageMapping:
 
     async def test_usage_zeros_are_preserved(self):
         adapter, _ = make_adapter(lambda request: fixture_response("usage-zeros.json"))
-        envelope = await adapter.generate_structured(make_request())
+        envelope = await adapter.generate_structured(make_call())
         usage = envelope.result.usage
         assert usage.input_tokens == 0
         assert usage.output_tokens == 0
@@ -1000,7 +1094,7 @@ class TestUsageMapping:
         body = success_body()
         body["usage"] = {"prompt_tokens": 100, "completion_tokens": 50, "total_tokens": 150}
         adapter, _ = make_adapter(lambda request: respond(body))
-        envelope = await adapter.generate_structured(make_request())
+        envelope = await adapter.generate_structured(make_call())
         usage = envelope.result.usage
         assert usage.input_tokens == 100
         assert usage.output_tokens == 50
@@ -1017,7 +1111,7 @@ class TestUsageMapping:
             "total_tokens": 999,
         }
         adapter, _ = make_adapter(lambda request: respond(body))
-        envelope = await adapter.generate_structured(make_request())
+        envelope = await adapter.generate_structured(make_call())
         assert envelope.result.usage.input_tokens == 100
         routing = artifact_by_label(envelope, ROUTING_ARTIFACT_LABEL)
         assert routing["usage_total_mismatch"] is True
@@ -1026,7 +1120,7 @@ class TestUsageMapping:
         body = success_body()
         body["usage"]["cost"] = "0.0001234567890123"
         adapter, _ = make_adapter(lambda request: respond(body))
-        envelope = await adapter.generate_structured(make_request())
+        envelope = await adapter.generate_structured(make_call())
         routing = artifact_by_label(envelope, ROUTING_ARTIFACT_LABEL)
         assert routing["cost"] == "0.0001234567890123"
 
@@ -1035,13 +1129,13 @@ class TestRoutingContamination:
     async def _run(self, metadata):
         body = success_body(metadata=metadata)
         adapter, _ = make_adapter(lambda request: respond(body))
-        return await adapter.generate_structured(make_request())
+        return await adapter.generate_structured(make_call())
 
     async def test_metadata_missing_is_contaminated(self):
         body = success_body()
         del body["openrouter_metadata"]
         adapter, _ = make_adapter(lambda request: respond(body))
-        envelope = await adapter.generate_structured(make_request())
+        envelope = await adapter.generate_structured(make_call())
         assert_failure(
             envelope,
             kind=FailureKind.UNKNOWN_PROVIDER_FAILURE,
@@ -1163,7 +1257,7 @@ class TestRoutingContamination:
         del body["openrouter_metadata"]
         body["usage"] = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
         adapter, _ = make_adapter(lambda request: respond(body))
-        envelope = await adapter.generate_structured(make_request())
+        envelope = await adapter.generate_structured(make_call())
         assert envelope.result.outcome == ModelOutcome.FAILED
         assert envelope.result.failure.reason_code == "openrouter.route_contaminated"
 

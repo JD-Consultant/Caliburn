@@ -18,7 +18,6 @@ import sqlalchemy as sa
 
 from app.interview_vnext.application.operation_executor import (
     TurnExecutionStatus,
-    TurnInterpretProviderProfile,
 )
 from app.interview_vnext.application.persistence import RunStatus
 from app.interview_vnext.domain.evidence import EvidenceStatus
@@ -29,7 +28,12 @@ from app.interview_vnext.llm.result import (
     TokenUsage,
     build_structured_payload,
 )
-from app.interview_vnext.llm.testing import ScriptedLlmPort, ScriptedStep
+from app.interview_vnext.llm.testing import (
+    ScriptedLlmPort,
+    ScriptedStep,
+    scripted_provider_config,
+    scripted_turn_binding,
+)
 from app.interview_vnext.observability.artifacts import build_inline_artifact
 from app.interview_vnext.observability.events import RunManifest
 from app.interview_vnext.persistence import serialization as ser
@@ -51,9 +55,7 @@ TRIAL_STARTED_AT = datetime(2026, 7, 18, 9, 0, tzinfo=UTC)
 OUTPUT_SCHEMA_ID = (
     "https://caliburn.local/schemas/turn-interpret-output.v1.schema.json"
 )
-PROFILE = TurnInterpretProviderProfile(
-    provider="scripted", requested_model="scripted-reference"
-)
+BINDING = scripted_turn_binding()
 
 
 def trial_uuid_for(case_id: str, salt: str = "pg") -> object:
@@ -135,7 +137,7 @@ async def execute_reference_trial(
         inputs,
         session_factory=postgres_session_factory,
         llm=llm,
-        profile=PROFILE,
+        binding=BINDING, provider_config=scripted_provider_config(),
         trial_id=trial_id,
         trial_started_at=TRIAL_STARTED_AT,
     )
@@ -303,7 +305,7 @@ async def test_refusal_finalizes_a_failed_run_without_state_change(
         inputs,
         session_factory=postgres_session_factory,
         llm=llm,
-        profile=PROFILE,
+        binding=BINDING, provider_config=scripted_provider_config(),
         trial_id=trial_id,
         trial_started_at=TRIAL_STARTED_AT,
     )

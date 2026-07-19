@@ -302,9 +302,6 @@ async def test_live_orchestrator_requires_unique_review_and_rebuilds_report(
     import json
     from uuid import uuid4, uuid5
 
-    from app.interview_vnext.application.operation_executor import (
-        TurnInterpretProviderProfile,
-    )
     from app.interview_vnext.observability.artifacts import build_inline_artifact
     from evals.interview_vnext.batch_orchestrator import _reference_llm_factory
     from evals.interview_vnext.contracts import (
@@ -326,6 +323,7 @@ async def test_live_orchestrator_requires_unique_review_and_rebuilds_report(
     )
     from evals.interview_vnext.openrouter_provider_config import (
         OpenRouterProbeInputs,
+        build_openrouter_eval_binding,
         build_openrouter_eval_config,
     )
     from evals.interview_vnext.providers.openrouter_chat import (
@@ -365,9 +363,7 @@ async def test_live_orchestrator_requires_unique_review_and_rebuilds_report(
         config=config,
         model_snapshot=model_snapshot,
         endpoint_snapshot=endpoint_snapshot,
-        provider_profile=TurnInterpretProviderProfile(
-            provider="openrouter", requested_model=requested_model
-        ),
+        binding=build_openrouter_eval_binding(config),
     )
     suite = load_suite(CASES_ROOT, suite_version="turn-interpret-pilot.v1")
     reference_factory = _reference_llm_factory(suite)
@@ -376,8 +372,9 @@ async def test_live_orchestrator_requires_unique_review_and_rebuilds_report(
         def __init__(self, inner):
             self.inner = inner
 
-        async def generate_structured(self, request):
-            envelope = await self.inner.generate_structured(request)
+        async def generate_structured(self, call):
+            request = call.request
+            envelope = await self.inner.generate_structured(call)
             route = build_inline_artifact(
                 artifact_id=uuid5(request.attempt_id, ROUTING_ARTIFACT_LABEL),
                 kind=ROUTING_ARTIFACT_KIND,

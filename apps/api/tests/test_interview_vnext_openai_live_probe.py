@@ -163,7 +163,9 @@ class TestMockedProbeBundle:
         result = json.loads(data["result.json"])
         assert result["outcome"] == "succeeded"
         request = json.loads(data["request.json"])
-        assert request["provider"] == "openai"
+        assert request["schema_version"] == "model_call_request.v2"
+        assert request["binding_id"] == "turn-interpret-c1-openai-reference-attribution-strict"
+        assert request["requested_model"] == "gpt-5.6"
 
         for name in BUNDLE_FILES:
             assert API_KEY not in data[name], name

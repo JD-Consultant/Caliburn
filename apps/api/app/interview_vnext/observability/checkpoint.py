@@ -24,7 +24,7 @@ class CheckpointStatus(StrEnum):
 
 
 class OperationCheckpoint(DomainModel):
-    schema_version: Literal["operation_checkpoint.v1"] = "operation_checkpoint.v1"
+    schema_version: Literal["operation_checkpoint.v2"] = "operation_checkpoint.v2"
     checkpoint_id: UUID
     run_id: UUID
     session_id: UUID
@@ -40,6 +40,8 @@ class OperationCheckpoint(DomainModel):
     active_attempt: int | None = Field(default=None, ge=1)
     attempt_result_artifacts: tuple[ArtifactRef, ...] = ()
     provider_result_artifact: ArtifactRef | None = None
+    provider_execution_evidence_artifact: ArtifactRef | None = None
+    provider_conformance_artifact: ArtifactRef | None = None
     verification_artifact: ArtifactRef | None = None
     domain_result_artifact: ArtifactRef | None = None
     response_artifact: ArtifactRef | None = None
@@ -81,6 +83,28 @@ class OperationCheckpoint(DomainModel):
         if self.status in {CheckpointStatus.PREPARED, CheckpointStatus.CALLING}:
             if self.provider_result_artifact is not None:
                 raise ValueError("checkpoint has provider result before provider completion")
+        # V3-5A §7.1: execution evidence and conformance travel together and only
+        # exist once a provider attempt terminated. prepared/calling carry neither
+        # (retryable prior attempts live in immutable artifacts/events); the three
+        # non-terminal-success statuses and any provider-attempt failure carry both.
+        if (self.provider_execution_evidence_artifact is None) != (
+            self.provider_conformance_artifact is None
+        ):
+            raise ValueError("execution evidence and conformance artifacts are paired")
+        if self.status in {CheckpointStatus.PREPARED, CheckpointStatus.CALLING}:
+            if self.provider_execution_evidence_artifact is not None:
+                raise ValueError(
+                    "checkpoint has execution evidence before a terminated attempt"
+                )
+        if self.status in {
+            CheckpointStatus.PROVIDER_COMPLETED,
+            CheckpointStatus.VERIFIED,
+            CheckpointStatus.COMMITTED,
+        } and self.provider_execution_evidence_artifact is None:
+            raise ValueError("checkpoint status requires execution evidence and conformance")
+        # A FAILED checkpoint MAY carry evidence/conformance (executor sets them on
+        # every provider-attempt failure) or not (a coordinator failure before any
+        # provider result); the executor — not this model — enforces the former.
         if self.provider_result_artifact is not None:
             if (
                 not self.attempt_result_artifacts
@@ -185,10 +209,17 @@ def mark_provider_completed(
     checkpoint: OperationCheckpoint,
     *,
     result_artifact: ArtifactRef,
+    execution_evidence_artifact: ArtifactRef,
+    conformance_artifact: ArtifactRef,
     occurred_at,
 ) -> OperationCheckpoint:
     if checkpoint.status == CheckpointStatus.PROVIDER_COMPLETED:
-        if checkpoint.provider_result_artifact == result_artifact:
+        if (
+            checkpoint.provider_result_artifact == result_artifact
+            and checkpoint.provider_execution_evidence_artifact
+            == execution_evidence_artifact
+            and checkpoint.provider_conformance_artifact == conformance_artifact
+        ):
             return checkpoint
         raise CheckpointTransitionError("checkpoint already has another provider result")
     _require_status(checkpoint, CheckpointStatus.CALLING)
@@ -201,6 +232,8 @@ def mark_provider_completed(
             result_artifact,
         ),
         provider_result_artifact=result_artifact,
+        provider_execution_evidence_artifact=execution_evidence_artifact,
+        provider_conformance_artifact=conformance_artifact,
     )
 
 
@@ -258,7 +291,21 @@ def mark_failed(
     failure_artifact: ArtifactRef,
     reason_code: str,
     occurred_at,
+    attempt_result_artifact: ArtifactRef | None = None,
+    execution_evidence_artifact: ArtifactRef | None = None,
+    conformance_artifact: ArtifactRef | None = None,
 ) -> OperationCheckpoint:
+    """Terminal failure.
+
+    ``failure_artifact`` is the authority for *why* the operation failed — a wire
+    result for a wire failure, or a conformance report for a wire-succeeded but
+    ineligible attempt (V3-5A §7.4). When failing at ``calling`` the attempt is
+    terminated by ``attempt_result_artifact`` (the wire result); it defaults to
+    ``failure_artifact`` so a plain wire failure keeps the v1 shape. Execution
+    evidence and conformance refs, when supplied, are recorded on the checkpoint;
+    otherwise any already-present refs are preserved.
+    """
+
     if checkpoint.status == CheckpointStatus.FAILED:
         if (
             checkpoint.failure_artifact == failure_artifact
@@ -274,7 +321,22 @@ def mark_failed(
         )
     attempt_results = checkpoint.attempt_result_artifacts
     if checkpoint.status == CheckpointStatus.CALLING:
-        attempt_results = (*attempt_results, failure_artifact)
+        terminator = (
+            attempt_result_artifact
+            if attempt_result_artifact is not None
+            else failure_artifact
+        )
+        attempt_results = (*attempt_results, terminator)
+    evidence = (
+        execution_evidence_artifact
+        if execution_evidence_artifact is not None
+        else checkpoint.provider_execution_evidence_artifact
+    )
+    conformance = (
+        conformance_artifact
+        if conformance_artifact is not None
+        else checkpoint.provider_conformance_artifact
+    )
     return _updated(
         checkpoint,
         occurred_at=occurred_at,
@@ -282,6 +344,8 @@ def mark_failed(
         attempt_result_artifacts=attempt_results,
         failure_artifact=failure_artifact,
         failure_reason_code=reason_code,
+        provider_execution_evidence_artifact=evidence,
+        provider_conformance_artifact=conformance,
     )
 
 

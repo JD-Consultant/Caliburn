@@ -17,9 +17,7 @@ from decimal import Decimal, InvalidOperation
 
 import httpx
 
-from app.interview_vnext.application.operation_executor import (
-    TurnInterpretProviderProfile,
-)
+from app.interview_vnext.llm.binding import ProviderBinding
 from app.interview_vnext.llm.operation_documents import turn_interpret_operation
 from app.interview_vnext.llm.result import ModelCallResult
 
@@ -32,6 +30,7 @@ from .openrouter_model_catalog import (
 from .openrouter_provider_config import (
     OpenRouterChatEvalConfig,
     OpenRouterProbeInputs,
+    build_openrouter_eval_binding,
     build_openrouter_eval_config,
 )
 from .providers.openrouter_chat import OpenRouterChatEvalAdapter
@@ -71,12 +70,12 @@ def resolve_eval_database_url(env_name: str) -> str:
 
 @dataclass(frozen=True)
 class LiveBatchProfile:
-    """Immutable per-batch route:snapshots + config + provider profile."""
+    """Immutable per-batch route: snapshots + config + resolved provider binding."""
 
     config: OpenRouterChatEvalConfig
     model_snapshot: OpenRouterModelSnapshot
     endpoint_snapshot: OpenRouterEndpointSnapshot
-    provider_profile: TurnInterpretProviderProfile
+    binding: ProviderBinding
 
 
 class LivePreflightError(RuntimeError):
@@ -121,10 +120,7 @@ async def build_live_batch_profile(
         config=config,
         model_snapshot=model_snapshot,
         endpoint_snapshot=endpoint_snapshot,
-        provider_profile=TurnInterpretProviderProfile(
-            provider="openrouter",
-            requested_model=probe_inputs.requested_model,
-        ),
+        binding=build_openrouter_eval_binding(config),
     )
 
 

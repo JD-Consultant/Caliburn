@@ -383,17 +383,28 @@ async def record_attempt_result(
     operation_id: UUID,
     attempt_id: UUID,
     result_artifact: ArtifactRecord,
+    execution_evidence_artifact: ArtifactRecord,
+    conformance_artifact: ArtifactRecord,
     extra_result_artifacts: tuple[ArtifactRecord, ...] = (),
     outcome: AttemptOutcome,
+    wire_succeeded: bool,
+    conformance_eligible: bool,
     max_attempts: int,
     failure_reason_code: str = "provider_failure",
     stage: str = "turn.interpret",
-    event_id: UUID,
+    result_event_id: UUID,
+    conformance_event_id: UUID,
     occurred_at: datetime,
 ) -> OperationCheckpoint:
-    """§7.6:provider 返回後的新 transaction。attempt calling→result_recorded
-    一次性;succeeded → provider_completed;retryable 且還有額度 → checkpoint
-    保留 calling(result 已在 attempt row);non-retryable/額度耗盡 → failed。"""
+    """§7.3/§7.6:provider 返回後的單一 transaction。
+
+    wire result、normalized execution evidence 與 conformance report 一起保存,
+    再依 classification 推進 checkpoint:succeeded(wire 成功+conformance 合格+
+    local schema 有效)→ provider_completed;retryable 且還有額度 → checkpoint
+    保留 calling(三個 artifact 只在 events/artifacts,不留 checkpoint 指標);
+    non-retryable/額度耗盡 → failed。wire 成功但 conformance 不合格時,failure
+    authority 是 conformance report,attempt 由 wire result 終結(§7.4)。兩個
+    event(model.call.* 與 provider.conformance.completed)同一 transaction。"""
     async with uow_factory() as uow:
         checkpoint = await _require_checkpoint(uow, tenant_id=tenant_id,
                                                operation_id=operation_id)
@@ -402,7 +413,13 @@ async def record_attempt_result(
             raise CheckpointConflict("attempt does not belong to this operation",
                                      operation_id=operation_id,
                                      attempt_id=attempt_id)
-        for record in (result_artifact, *extra_result_artifacts):
+        provider_records = (
+            result_artifact,
+            execution_evidence_artifact,
+            conformance_artifact,
+            *extra_result_artifacts,
+        )
+        for record in provider_records:
             if (
                 record.run_id != checkpoint.run_id
                 or record.session_id != checkpoint.session_id
@@ -423,6 +440,12 @@ async def record_attempt_result(
             ]
         )
         stored = await uow.artifacts.put(tenant_id=tenant_id, record=result_artifact)
+        stored_evidence = await uow.artifacts.put(
+            tenant_id=tenant_id, record=execution_evidence_artifact
+        )
+        stored_conformance = await uow.artifacts.put(
+            tenant_id=tenant_id, record=conformance_artifact
+        )
         recorded = attempt.model_copy(update={
             "status": AttemptStatus.RESULT_RECORDED,
             "result_artifact_id": stored.ref.artifact_id,
@@ -431,14 +454,24 @@ async def record_attempt_result(
         await uow.attempts.record_result(tenant_id=tenant_id, attempt=recorded)
 
         exhausted = attempt.attempt >= max_attempts
+        conformance_failure = wire_succeeded and not conformance_eligible
         if outcome == AttemptOutcome.SUCCEEDED:
             next_checkpoint = mark_provider_completed(
-                checkpoint, result_artifact=stored.ref, occurred_at=occurred_at)
+                checkpoint, result_artifact=stored.ref,
+                execution_evidence_artifact=stored_evidence.ref,
+                conformance_artifact=stored_conformance.ref,
+                occurred_at=occurred_at)
             event_type, event_status = "model.call.completed", ExecutionStatus.OK
         elif outcome == AttemptOutcome.NON_RETRYABLE_FAILURE or exhausted:
+            failure_ref = (
+                stored_conformance.ref if conformance_failure else stored.ref
+            )
             next_checkpoint = mark_failed(
-                checkpoint, failure_artifact=stored.ref,
-                reason_code=failure_reason_code, occurred_at=occurred_at)
+                checkpoint, failure_artifact=failure_ref,
+                reason_code=failure_reason_code, occurred_at=occurred_at,
+                attempt_result_artifact=stored.ref,
+                execution_evidence_artifact=stored_evidence.ref,
+                conformance_artifact=stored_conformance.ref)
             event_type, event_status = "model.call.failed", ExecutionStatus.FAILED
         else:
             next_checkpoint = None       # retryable、額度未盡:checkpoint 保留 calling
@@ -451,14 +484,31 @@ async def record_attempt_result(
         await uow.capture.append_event(
             tenant_id=tenant_id, run_id=checkpoint.run_id,
             draft=ExecutionEventDraft(
-                event_id=event_id, occurred_at=occurred_at,
+                event_id=result_event_id, occurred_at=occurred_at,
                 session_id=checkpoint.session_id, turn_id=checkpoint.turn_id,
                 operation_id=operation_id, attempt_id=attempt_id,
                 attempt=attempt.attempt, event_type=event_type, stage=stage,
                 status=event_status,
                 output_artifacts=tuple(
                     item.ref for item in stored_supporting
-                ) + (stored.ref,)))
+                ) + (stored.ref, stored_evidence.ref)))
+        if wire_succeeded:
+            conformance_status = (
+                ExecutionStatus.OK if conformance_eligible else ExecutionStatus.FAILED
+            )
+        else:
+            conformance_status = ExecutionStatus.SKIPPED
+        await uow.capture.append_event(
+            tenant_id=tenant_id, run_id=checkpoint.run_id,
+            draft=ExecutionEventDraft(
+                event_id=conformance_event_id, occurred_at=occurred_at,
+                session_id=checkpoint.session_id, turn_id=checkpoint.turn_id,
+                operation_id=operation_id, attempt_id=attempt_id,
+                attempt=attempt.attempt,
+                event_type="provider.conformance.completed", stage=stage,
+                status=conformance_status,
+                input_artifacts=(stored_evidence.ref,),
+                output_artifacts=(stored_conformance.ref,)))
         await uow.commit()
         return next_checkpoint if next_checkpoint is not None else checkpoint
 

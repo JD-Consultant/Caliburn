@@ -162,8 +162,9 @@ def test_eval_db_only_from_env_and_rejects_production(monkeypatch):
 # ── contamination → harness_invalid disposition ──────────────────────────────
 
 
-def test_route_contamination_is_harness_invalid():
-    """A route-invalid terminal result is never a model-quality failure (§9.4)."""
+def test_conformance_failure_is_harness_invalid():
+    """R4 §10.4:wire succeeded 但 attribution ineligible 的 neutral terminal
+    reason 是 `provider.conformance_failed`,必須停線而非進品質分母。"""
 
     from evals.interview_vnext.scheduler import classify_disposition
     from evals.interview_vnext.contracts import TrialDisposition
@@ -176,12 +177,38 @@ def test_route_contamination_is_harness_invalid():
         SimpleNamespace(
             outcome=SimpleNamespace(
                 status=TurnExecutionStatus.FAILED,
-                reason_code="openrouter.route_contaminated",
+                reason_code="provider.conformance_failed",
             )
         )
     )
     assert disposition == TrialDisposition.HARNESS_INVALID
-    assert reason == "openrouter.route_contaminated"
+    assert reason == "provider.conformance_failed"
+
+
+def test_historical_route_contamination_marker_stays_harness_invalid():
+    """歷史 v1 bundle 的 route-invalid reason 仍要能讀(§9.4;R4 不刪舊 marker)。"""
+
+    from evals.interview_vnext.scheduler import classify_disposition
+    from evals.interview_vnext.contracts import TrialDisposition
+    from app.interview_vnext.application.operation_executor import (
+        TurnExecutionStatus,
+    )
+    from types import SimpleNamespace
+
+    for historical_reason in (
+        "openrouter.route_contaminated",
+        "openrouter.resolved_model_mismatch",
+    ):
+        disposition, reason = classify_disposition(
+            SimpleNamespace(
+                outcome=SimpleNamespace(
+                    status=TurnExecutionStatus.FAILED,
+                    reason_code=historical_reason,
+                )
+            )
+        )
+        assert disposition == TrialDisposition.HARNESS_INVALID
+        assert reason == historical_reason
 
 
 def test_timeout_reason_is_infrastructure_invalid():

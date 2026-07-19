@@ -1,11 +1,14 @@
-"""Opt-in single-shot OpenRouter Chat live conformance probe (V3-4R §15).
+"""Opt-in single-shot OpenRouter Chat live conformance probe (V3-4R §15; R4 §10).
 
 Fetches immutable model/endpoints snapshots, constructs the snapshot-derived
 config, runs preflight, then performs exactly one inference POST through the
-neutral adapter and writes an immutable Capture bundle. It never grades model
-quality: a refusal, incomplete or contaminated route is a valid neutral result
-but still fails the conformance run because no verifiable structured payload was
-obtained on the approved route.
+neutral adapter and writes an immutable Capture bundle. Since R4 the probe
+persists the full provider authority chain — wire result, execution evidence
+and the application conformance report — and only runs local output validation
+after the report is eligible. It never grades model quality: a refusal,
+incomplete result or ineligible route is a valid neutral outcome that still
+fails the run, with the conformance report (not a synthetic model failure) as
+the failure authority.
 
 Catalog GETs are separate from the durable inference attempt: a catalog/preflight
 failure writes a bundle but never calls inference.
@@ -13,7 +16,7 @@ failure writes a bundle but never calls inference.
 Exit codes: 0 = conformance passed; 1 = probe ran but did not pass (a bundle with
 failed events is still written); 2 = missing OPENROUTER_API_KEY (nothing created).
 
-規格:docs/plans/2026-07-17-interview-vnext-v3-4r-openrouter-first-adapter-plan.md
+規格:docs/plans/2026-07-19-interview-vnext-v3-5a-r4-provider-evidence-conformance-plan.md
 """
 
 from __future__ import annotations
@@ -36,6 +39,11 @@ from app.interview_vnext.llm.capture import (
     model_call_input_artifacts,
     validate_model_call_capture_closure,
 )
+from app.interview_vnext.llm.conformance import (
+    ConformanceReport,
+    evaluate_conformance,
+    resolve_conformance_policy,
+)
 from app.interview_vnext.llm.context import INJECTION_BOUNDARY
 from app.interview_vnext.llm.operation_documents import (
     TURN_INTERPRET_PROMPT_PATH,
@@ -54,6 +62,8 @@ from app.interview_vnext.llm.portable_schema import (
 from app.interview_vnext.llm.result import ModelCallResult, ModelOutcome
 from app.interview_vnext.llm.schema_exports import SCHEMA_EXPORTS, published_schema
 from app.interview_vnext.llm.schema_ids import (
+    CONFORMANCE_SCHEMA_ID,
+    EXECUTION_EVIDENCE_SCHEMA_ID,
     MODEL_REQUEST_SCHEMA_ID,
     MODEL_RESULT_SCHEMA_ID,
     PROVIDER_BINDING_SCHEMA_ID,
@@ -73,7 +83,7 @@ from app.interview_vnext.observability.artifacts import (
 from app.interview_vnext.observability.capture import CaptureRecorder
 from app.interview_vnext.observability.events import ExecutionStatus, RunManifest
 from app.interview_vnext.observability.outbox import InMemoryOutbox
-from app.interview_vnext.observability.taxonomy import INTERVIEW_VNEXT_EXECUTION_V1
+from app.interview_vnext.observability.taxonomy import INTERVIEW_VNEXT_EXECUTION_V2
 
 from .openrouter_model_catalog import (
     CatalogProbeError,
@@ -209,9 +219,11 @@ async def run_probe(
     operation = turn_interpret_operation()
     started_at = clock()
 
+    # R4 §10.2: hard cut to the v2 taxonomy — the conformance-gate event is a
+    # v2 meaning; never retrofit it into v1.
     store = InMemoryArtifactStore()
     recorder = CaptureRecorder(
-        taxonomy=INTERVIEW_VNEXT_EXECUTION_V1, artifacts=store, outbox=InMemoryOutbox()
+        taxonomy=INTERVIEW_VNEXT_EXECUTION_V2, artifacts=store, outbox=InMemoryOutbox()
     )
 
     def run_artifact(
@@ -497,6 +509,7 @@ async def run_probe(
         envelope = await adapter.generate_structured(resolved_call)
         inference_http_calls = 1
         result = envelope.result
+        evidence = envelope.execution_evidence
         for record in envelope.supporting_artifacts:
             store.put(record)
         result_artifact = call_artifact(
@@ -505,6 +518,20 @@ async def run_probe(
             created_at=result.completed_at,
         )
         bundle_files["result.json"] = canonical_json(result)
+
+        # R4 §10.2: persist the execution evidence with the executor's
+        # deterministic attempt-scoped artifact identity.
+        evidence_artifact = build_inline_artifact(
+            artifact_id=uuid5(attempt_id, "provider-execution-evidence"),
+            kind="model.provider_execution_evidence",
+            media_type="application/json", payload=evidence,
+            schema_id=EXECUTION_EVIDENCE_SCHEMA_ID,
+            run_id=run_id, session_id=session_id, turn_id=turn_id,
+            operation_id=operation_id, attempt_id=attempt_id,
+            created_at=result.completed_at, retention_class="eval",
+            redaction_status=RedactionStatus.NOT_REQUIRED, contains_test_data=True,
+        )
+        store.put(evidence_artifact)
 
         supporting_refs = tuple(r.ref for r in envelope.supporting_artifacts)
         if result.outcome == ModelOutcome.FAILED:
@@ -518,12 +545,47 @@ async def run_probe(
             occurred_at=result.completed_at, stage="turn.interpret", turn_id=turn_id,
             operation_id=operation_id, attempt_id=attempt_id, attempt=1,
             input_artifacts=call_inputs,
-            output_artifacts=(*supporting_refs, result_artifact.ref),
+            output_artifacts=(*supporting_refs, result_artifact.ref, evidence_artifact.ref),
         )
 
+        # R4 §10.2: the application policy — the same pure evaluator the
+        # executor uses — decides eligibility from binding + evidence.
+        policy = resolve_conformance_policy(binding.conformance_policy)
+        conformance = evaluate_conformance(
+            policy=policy, binding=binding, evidence=evidence,
+            wire_outcome=result.outcome,
+        )
+        conformance_artifact = build_inline_artifact(
+            artifact_id=uuid5(attempt_id, "provider-conformance"),
+            kind="model.provider_conformance",
+            media_type="application/json", payload=conformance,
+            schema_id=CONFORMANCE_SCHEMA_ID,
+            run_id=run_id, session_id=session_id, turn_id=turn_id,
+            operation_id=operation_id, attempt_id=attempt_id,
+            created_at=result.completed_at, retention_class="eval",
+            redaction_status=RedactionStatus.NOT_REQUIRED, contains_test_data=True,
+        )
+        store.put(conformance_artifact)
+        if conformance.eligible:
+            conformance_status = ExecutionStatus.OK
+        elif result.outcome == ModelOutcome.SUCCEEDED:
+            conformance_status = ExecutionStatus.FAILED
+        else:
+            conformance_status = ExecutionStatus.SKIPPED
+        record_event(
+            "event/provider-conformance",
+            event_type="provider.conformance.completed",
+            status=conformance_status,
+            occurred_at=result.completed_at, stage="turn.interpret", turn_id=turn_id,
+            operation_id=operation_id, attempt_id=attempt_id, attempt=1,
+            input_artifacts=(binding_artifact.ref, evidence_artifact.ref),
+            output_artifacts=(conformance_artifact.ref,),
+        )
+
+        # §10.2 item 11: local output validation only on an eligible execution.
         local_output_validation_passed = False
         local_validation_error: str | None = None
-        if result.outcome == ModelOutcome.SUCCEEDED and result.parsed_output is not None:
+        if conformance.eligible and result.parsed_output is not None:
             try:
                 TurnInterpretOutput.model_validate(result.parsed_output.load())
                 local_output_validation_passed = True
@@ -534,7 +596,9 @@ async def run_probe(
         if completed_at < result.completed_at:
             completed_at = result.completed_at
         conformance_passed = (
-            result.outcome == ModelOutcome.SUCCEEDED and local_output_validation_passed
+            result.outcome == ModelOutcome.SUCCEEDED
+            and conformance.eligible
+            and local_output_validation_passed
         )
         record_event(
             "event/run-completed" if conformance_passed else "event/run-failed",
@@ -546,7 +610,8 @@ async def run_probe(
         manifest = recorder.build_manifest(
             run_id=run_id, completed_at=completed_at,
             root_artifacts=(
-                probe_inputs_artifact.ref, *call_inputs, result_artifact.ref
+                probe_inputs_artifact.ref, *call_inputs, result_artifact.ref,
+                evidence_artifact.ref, conformance_artifact.ref,
             ),
         )
         validate_model_call_capture_closure(
@@ -561,6 +626,10 @@ async def run_probe(
             schema_hash=canonical_hash(schema),
             request_artifact=request_artifact, result_artifact=result_artifact,
             result=result, envelope_artifacts=envelope.supporting_artifacts,
+            binding=binding, policy=policy, evidence=evidence,
+            conformance=conformance,
+            evidence_artifact=evidence_artifact,
+            conformance_artifact=conformance_artifact,
             manifest=manifest, local_output_validation_passed=local_output_validation_passed,
             local_validation_error=local_validation_error,
             catalog_http_calls=catalog_http_calls, catalog_statuses=catalog_statuses,
@@ -617,6 +686,12 @@ def _build_report(
     result_artifact: ArtifactRecord,
     result: ModelCallResult,
     envelope_artifacts: tuple[ArtifactRecord, ...],
+    binding,
+    policy,
+    evidence,
+    conformance: ConformanceReport,
+    evidence_artifact: ArtifactRecord,
+    conformance_artifact: ArtifactRecord,
     manifest: RunManifest,
     local_output_validation_passed: bool,
     local_validation_error: str | None,
@@ -639,7 +714,7 @@ def _build_report(
             {*limitations, "provider HTTP request ID was not returned"}
         )
     return {
-        "schema_version": "openrouter_live_probe_report.v1",
+        "schema_version": "openrouter_live_probe_report.v2",
         "run_id": str(run_id),
         "probe_id": probe_id,
         "final_config_created": True,
@@ -663,6 +738,9 @@ def _build_report(
         "router_strategy": routing.get("strategy"),
         "router_attempt": routing.get("router_attempt"),
         "router_pipeline": routing.get("pipeline"),
+        "pipeline_stage_summaries": routing.get("pipeline_stage_summaries"),
+        "transformation_status": evidence.transformation_status.value,
+        "cache_status": evidence.cache_status.value,
         "generation_id": routing.get("generation_id"),
         "provider_request_id": result.provider_request_id,
         "outcome": result.outcome.value,
@@ -681,7 +759,19 @@ def _build_report(
         "usage": result.usage.model_dump(mode="json"),
         "cost": routing.get("cost"),
         "usage_total_mismatch": routing.get("usage_total_mismatch"),
-        "route_conformance": routing.get("conformance"),
+        "binding_id": binding.binding_id,
+        "binding_hash": binding.binding_hash,
+        "execution_evidence_hash": evidence.evidence_hash,
+        "conformance_policy_name": policy.name,
+        "conformance_policy_version": policy.version,
+        "conformance_policy_hash": policy.policy_hash,
+        "conformance_report_hash": conformance.report_hash,
+        "conformance_eligible": conformance.eligible,
+        "conformance_reason_codes": [
+            code.value for code in conformance.reason_codes
+        ],
+        "evidence_artifact_id": str(evidence_artifact.ref.artifact_id),
+        "conformance_artifact_id": str(conformance_artifact.ref.artifact_id),
         "local_output_validation_passed": local_output_validation_passed,
         "local_validation_error": local_validation_error,
         "manifest_hash": canonical_hash(manifest),
@@ -709,7 +799,7 @@ def _catalog_failure_report(
     final_config_created: bool = False,
 ) -> dict[str, Any]:
     return {
-        "schema_version": "openrouter_live_probe_report.v1",
+        "schema_version": "openrouter_live_probe_report.v2",
         "run_id": str(run_id),
         "probe_id": probe_id,
         "final_config_created": final_config_created,

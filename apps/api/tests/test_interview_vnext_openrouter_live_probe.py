@@ -1,7 +1,10 @@
-"""V3-4R OpenRouter live probe — no-key preflight、mocked smoke 與 bundle 驗證。
+"""V3-4R/R4 OpenRouter live probe — no-key preflight、mocked smoke 與 bundle 驗證。
 
-規格 §15:真 live gate 需真 key 另行執行(R6);這裡只測 CLI 行為、catalog/
-inference 分離與 bundle 完整性,不打 live API,也絕不以 skip 冒充 live 成功。
+規格 §15/§10.2:真 live gate 需真 key 另行執行(R6);這裡只測 CLI 行為、catalog/
+inference 分離與 bundle 完整性(result/evidence/conformance closure),不打 live
+API,也絕不以 skip 冒充 live 成功。
+
+規格:docs/plans/2026-07-19-interview-vnext-v3-5a-r4-provider-evidence-conformance-plan.md
 """
 
 from __future__ import annotations
@@ -15,7 +18,10 @@ import httpx
 import pytest
 
 from app.interview_vnext.domain.hashing import canonical_hash
-from app.interview_vnext.llm.capture import validate_model_call_capture_closure
+from app.interview_vnext.llm.capture import (
+    ModelCallCaptureError,
+    validate_model_call_capture_closure,
+)
 from app.interview_vnext.observability.artifacts import (
     ArtifactRecord,
     InMemoryArtifactStore,
@@ -25,7 +31,7 @@ from app.interview_vnext.observability.events import (
     RunManifest,
     validate_event_chain,
 )
-from app.interview_vnext.observability.taxonomy import INTERVIEW_VNEXT_EXECUTION_V1
+from app.interview_vnext.observability.taxonomy import INTERVIEW_VNEXT_EXECUTION_V2
 
 from evals.interview_vnext.openrouter_live_probe import main, run_probe
 from evals.interview_vnext.openrouter_provider_config import OpenRouterProbeInputs
@@ -131,7 +137,7 @@ def validate_capture_chain(data: dict) -> tuple[list[ExecutionEvent], RunManifes
     store = InMemoryArtifactStore(records)
     validate_event_chain(
         tuple(events),
-        taxonomy=INTERVIEW_VNEXT_EXECUTION_V1,
+        taxonomy=INTERVIEW_VNEXT_EXECUTION_V2,
         artifact_store=store,
         manifest=manifest,
     )
@@ -187,13 +193,15 @@ class TestSuccessBundle:
             "artifact.created",
             "model.call.started",
             "model.call.completed",
+            "provider.conformance.completed",
             "workflow.run.completed",
         ]
         assert [event.status.value for event in events] == [
-            "ok", "ok", "ok", "ok", "ok",
+            "ok", "ok", "ok", "ok", "ok", "ok",
         ]
         call_started = events[2]
         call_completed = events[3]
+        conformance_event = events[4]
         assert [ref.kind for ref in call_started.input_artifacts] == [
             "model.request",
             "model.provider_binding",
@@ -201,7 +209,23 @@ class TestSuccessBundle:
             "model.schema_projection",
         ]
         assert call_completed.input_artifacts == call_started.input_artifacts
-        assert call_completed.output_artifacts[-1].kind == "model.result"
+        # R4 §10.2:result event 的 deterministic tail 是 result 再 evidence。
+        assert [ref.kind for ref in call_completed.output_artifacts[-2:]] == [
+            "model.result",
+            "model.provider_execution_evidence",
+        ]
+        # conformance event 的 input 是 binding、evidence;output 只有 report。
+        assert [ref.kind for ref in conformance_event.input_artifacts] == [
+            "model.provider_binding",
+            "model.provider_execution_evidence",
+        ]
+        assert conformance_event.input_artifacts[0] == call_started.input_artifacts[1]
+        assert conformance_event.input_artifacts[1] == (
+            call_completed.output_artifacts[-1]
+        )
+        assert [ref.kind for ref in conformance_event.output_artifacts] == [
+            "model.provider_conformance",
+        ]
         assert [ref.kind for ref in manifest.root_artifacts] == [
             "probe.inputs",
             "model.request",
@@ -209,6 +233,8 @@ class TestSuccessBundle:
             "provider.config",
             "model.schema_projection",
             "model.result",
+            "model.provider_execution_evidence",
+            "model.provider_conformance",
         ]
 
         # R3-C1(§7.6):provider.config artifact 不宣告不存在的 generic schema ID,
@@ -231,6 +257,7 @@ class TestSuccessBundle:
         assert binding_payload["provider_config_hash"] == config_refs[0].content_hash
 
         report = json.loads(data["probe-report.json"])
+        assert report["schema_version"] == "openrouter_live_probe_report.v2"
         assert report["outcome"] == "succeeded"
         assert report["final_config_created"] is True
         assert report["local_output_validation_passed"] is True
@@ -244,7 +271,24 @@ class TestSuccessBundle:
         assert report["provider_request_id"] == "req_fx_success"
         assert report["catalog_http_calls"] == 2
         assert report["inference_http_calls"] == 1
-        assert report["route_conformance"]["pipeline_clean"] is True
+        # R4 report v2:conformance authority 欄位;v1 route_conformance verdict 移除。
+        assert "route_conformance" not in report
+        assert report["conformance_eligible"] is True
+        assert report["conformance_reason_codes"] == []
+        assert report["conformance_policy_name"] == "attribution-strict"
+        assert report["conformance_policy_version"] == "1.0.0"
+        assert report["conformance_policy_hash"].startswith("sha256:")
+        assert report["conformance_report_hash"].startswith("sha256:")
+        assert report["execution_evidence_hash"].startswith("sha256:")
+        assert report["binding_id"] == (
+            "turn-interpret-c1-openrouter-attribution-strict"
+        )
+        assert report["binding_hash"].startswith("sha256:")
+        assert report["transformation_status"] == "clean"
+        assert report["cache_status"] == "absent"
+        assert report["pipeline_stage_summaries"] == []
+        assert report["evidence_artifact_id"]
+        assert report["conformance_artifact_id"]
         assert report["production_promotable"] is False
         assert report["usage"]["input_tokens"] == 1200
         assert report["manifest_hash"] == canonical_hash(manifest)
@@ -340,7 +384,11 @@ class TestFailureBundles:
         assert report["final_config_created"] is True
         assert "endpoint_parameters_missing" in report["failed_stage"]
 
-    async def test_route_contaminated_inference_is_failed_run(self, tmp_path):
+    async def test_contaminated_route_is_wire_success_but_conformance_failed(
+        self, tmp_path
+    ):
+        """R4 §10.2:污染 route 整體仍 fail,但 authority 是 conformance report。"""
+
         body = fixture_json("success.json")
         body["openrouter_metadata"]["strategy"] = "auto"
         exit_code, bundle = await run_mocked(
@@ -349,13 +397,116 @@ class TestFailureBundles:
         assert exit_code == 1
         data = load_bundle(bundle)
         report = json.loads(data["probe-report.json"])
-        assert report["outcome"] == "failed"
-        assert report["failure"]["reason_code"] == "openrouter.route_contaminated"
+        # wire result 仍是 succeeded;沒有偽造的 ModelFailure。
+        assert report["outcome"] == "succeeded"
+        assert report["failure"] is None
+        assert report["conformance_eligible"] is False
+        assert report["conformance_reason_codes"] == [
+            "conformance.route_strategy_mismatch"
+        ]
+        assert report["router_strategy"] == "auto"
         assert report["inference_http_calls"] == 1
+        # §10.2 item 11:ineligible 時不得執行 local output validation。
         assert report["local_output_validation_passed"] is False
+        assert report["local_validation_error"] is None
         events, _ = validate_capture_chain(data)
         assert events[-1].event_type == "workflow.run.failed"
-        assert "model.call.failed" in {event.event_type for event in events}
+        event_status = {
+            event.event_type: event.status.value for event in events
+        }
+        assert event_status["model.call.completed"] == "ok"
+        assert event_status["provider.conformance.completed"] == "failed"
+        assert "model.call.failed" not in event_status
+
+    async def test_wire_failure_conformance_event_is_skipped(self, tmp_path):
+        exit_code, bundle = await run_mocked(
+            tmp_path,
+            make_handler(
+                chat=httpx.Response(
+                    429,
+                    json={
+                        "error": {
+                            "code": 429,
+                            "message": "synthetic rate limit",
+                            "metadata": {"error_type": "rate_limit_exceeded"},
+                        }
+                    },
+                )
+            ),
+        )
+        assert exit_code == 1
+        data = load_bundle(bundle)
+        report = json.loads(data["probe-report.json"])
+        assert report["outcome"] == "failed"
+        assert report["failure"]["reason_code"] == "openrouter.rate_limited"
+        assert report["conformance_eligible"] is False
+        assert report["conformance_reason_codes"] == [
+            "conformance.wire_not_succeeded"
+        ]
+        events, _ = validate_capture_chain(data)
+        event_status = {
+            event.event_type: event.status.value for event in events
+        }
+        assert event_status["model.call.failed"] == "failed"
+        assert event_status["provider.conformance.completed"] == "skipped"
+
+    async def test_bundle_corruption_fails_validation(self, tmp_path):
+        exit_code, bundle = await run_mocked(tmp_path, make_handler())
+        assert exit_code == 0
+        data = load_bundle(bundle)
+        events = tuple(
+            ExecutionEvent.model_validate_json(line)
+            for line in data["events.jsonl"].strip().splitlines()
+        )
+        manifest = RunManifest.model_validate_json(data["manifest.json"])
+        records = {
+            record.ref.artifact_id: record
+            for record in (
+                ArtifactRecord.model_validate_json(line)
+                for line in data["artifacts.jsonl"].strip().splitlines()
+            )
+        }
+        store = InMemoryArtifactStore(records)
+
+        # 移除 conformance root → closure 驗證必須失敗。
+        pruned_roots = tuple(
+            ref for ref in manifest.root_artifacts
+            if ref.kind != "model.provider_conformance"
+        )
+        pruned = manifest.model_copy(update={"root_artifacts": pruned_roots})
+        with pytest.raises(ModelCallCaptureError):
+            validate_model_call_capture_closure(
+                events, manifest=pruned, artifact_store=store
+            )
+
+        # 移除 evidence root → 同樣失敗。
+        no_evidence_roots = tuple(
+            ref for ref in manifest.root_artifacts
+            if ref.kind != "model.provider_execution_evidence"
+        )
+        no_evidence = manifest.model_copy(
+            update={"root_artifacts": no_evidence_roots}
+        )
+        with pytest.raises(ModelCallCaptureError):
+            validate_model_call_capture_closure(
+                events, manifest=no_evidence, artifact_store=store
+            )
+
+        # 竄改 conformance event 的 input 順序 → 失敗。
+        tampered_events = tuple(
+            event.model_copy(
+                update={
+                    "input_artifacts": tuple(reversed(event.input_artifacts))
+                }
+            )
+            if event.event_type == "provider.conformance.completed"
+            else event
+            for event in events
+        )
+        with pytest.raises(ModelCallCaptureError):
+            validate_model_call_capture_closure(
+                tampered_events, manifest=manifest, artifact_store=store
+            )
 
     async def test_data_collection_allow_is_not_promotable(self, tmp_path):
         exit_code, bundle = await run_mocked(

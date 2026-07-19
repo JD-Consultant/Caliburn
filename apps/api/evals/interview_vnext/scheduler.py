@@ -56,8 +56,12 @@ _INFRASTRUCTURE_MARKERS = (
 
 # These failures invalidate attribution/configuration rather than measuring
 # turn-interpret quality.  They must stop the batch instead of entering the
-# quality denominator (§9.4).
+# quality denominator (§9.4).  `provider.conformance_failed` is the R4+ neutral
+# terminal reason for a wire-succeeded but attribution-ineligible attempt
+# (R4 §10.4 stop-gap until R6 carries full conformance refs in the trial
+# contract); the older markers stay readable for historical v1 bundles.
 _HARNESS_FAILURE_MARKERS = (
+    "provider.conformance_failed",
     "route_contaminated",
     "resolved_model_mismatch",
     "binding_invalid",

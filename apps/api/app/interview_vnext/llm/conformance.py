@@ -24,6 +24,7 @@ from .execution import (
     ProviderExecutionEvidence,
     TransformationStatus,
 )
+from .operation import ContractIdentity
 from .result import ModelOutcome
 
 
@@ -196,6 +197,76 @@ def _attribution_strict_reasons(
         reasons.add(ConformanceReasonCode.ROUTE_METADATA_MISSING)
 
     return sorted(reasons)
+
+
+class ConformanceMismatch(ValueError):
+    """A conformance policy identity or persisted report does not exactly match."""
+
+
+# 已核准的 conformance policies;unknown identity 一律 fail closed(§6.3)。
+_CONFORMANCE_POLICY_REGISTRY: tuple[ConformancePolicy, ...] = (
+    ATTRIBUTION_STRICT_POLICY_V1,
+)
+
+
+def resolve_conformance_policy(identity: ContractIdentity) -> ConformancePolicy:
+    """Resolve a binding's ``ContractIdentity`` to the exact registered policy."""
+
+    for policy in _CONFORMANCE_POLICY_REGISTRY:
+        if (
+            identity.name == policy.name
+            and identity.version == policy.version
+            and identity.content_hash == policy.policy_hash
+        ):
+            return policy
+    raise ConformanceMismatch(
+        "conformance policy identity is not a registered active policy: "
+        f"{identity.name}/{identity.version}/{identity.content_hash}"
+    )
+
+
+def require_conformance_report(
+    *,
+    policy: ConformancePolicy,
+    binding: ProviderBinding,
+    evidence: ProviderExecutionEvidence,
+    wire_outcome: ModelOutcome,
+    report: ConformanceReport,
+) -> None:
+    """Exact-validate a persisted report against a deterministic re-evaluation.
+
+    §5.4:binding ID/hash、evidence hash、wire outcome 逐項 exact,之後重新
+    `evaluate_conformance()` 並要求**完整 report equality**(Pydantic model
+    equality,不只 `eligible`);自我 hash 合法但非重新評估結果的 report 一律拒絕。
+    """
+
+    if report.binding_id != binding.binding_id or report.binding_hash != binding.binding_hash:
+        raise ConformanceMismatch(
+            "conformance report binding identity does not match the binding"
+        )
+    if report.execution_evidence_hash != evidence.evidence_hash:
+        raise ConformanceMismatch(
+            "conformance report evidence hash does not match the execution evidence"
+        )
+    if report.wire_outcome != wire_outcome:
+        raise ConformanceMismatch(
+            "conformance report wire outcome does not match the result outcome"
+        )
+    if (
+        report.policy_name != policy.name
+        or report.policy_version != policy.version
+        or report.policy_hash != policy.policy_hash
+    ):
+        raise ConformanceMismatch(
+            "conformance report policy identity does not match the resolved policy"
+        )
+    expected = evaluate_conformance(
+        policy=policy, binding=binding, evidence=evidence, wire_outcome=wire_outcome
+    )
+    if report != expected:
+        raise ConformanceMismatch(
+            "conformance report does not equal its deterministic re-evaluation"
+        )
 
 
 def evaluate_conformance(

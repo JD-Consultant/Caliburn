@@ -18,10 +18,11 @@ from app.interview_vnext.domain.identifiers import NonEmptyText, StableName
 from app.interview_vnext.domain.reducers import ReductionResult
 from app.interview_vnext.llm.binding import ProviderBinding
 from app.interview_vnext.llm.conformance import (
-    ATTRIBUTION_STRICT_POLICY_V1,
+    ConformanceMismatch,
     ConformancePolicy,
     ConformanceReport,
     evaluate_conformance,
+    resolve_conformance_policy,
 )
 from app.interview_vnext.llm.context import (
     CONTEXT_PACKET_ADAPTER,
@@ -84,7 +85,11 @@ from app.interview_vnext.observability.checkpoint import (
     CheckpointStatus,
     OperationCheckpoint,
 )
-from app.interview_vnext.persistence.errors import CheckpointConflict
+from app.interview_vnext.persistence.errors import (
+    ArtifactNotFound,
+    CheckpointConflict,
+    PersistedDataCorruption,
+)
 
 from .context_builder import ContextBuilder
 from .durable_operations import (
@@ -98,6 +103,11 @@ from .durable_operations import (
 )
 from .noop_result import OperationNoopResult
 from .persistence import AttemptStatus, OperationAttempt, VNextUnitOfWork
+from .provider_gate import (
+    RESULT_ARTIFACT_KIND,
+    ValidatedProviderGate,
+    validate_provider_gate_artifacts,
+)
 from .turn_interpret import (
     accepted_evidence,
     turn_interpret_input_from_context,
@@ -144,17 +154,12 @@ def _resolve_projection_policy(binding: ProviderBinding) -> SchemaProjectionPoli
 
 
 def _resolve_conformance_policy(binding: ProviderBinding) -> ConformancePolicy:
-    policy = ATTRIBUTION_STRICT_POLICY_V1
-    identity = binding.conformance_policy
-    if (
-        identity.name != policy.name
-        or identity.version != policy.version
-        or identity.content_hash != policy.policy_hash
-    ):
-        raise CheckpointConflict(
-            "binding conformance policy is not the active attribution-strict policy"
-        )
-    return policy
+    """Resolve via the shared exact authority(R3-C2 §6.3;不再維護第二份邏輯)。"""
+
+    try:
+        return resolve_conformance_policy(binding.conformance_policy)
+    except ConformanceMismatch as exc:
+        raise CheckpointConflict(str(exc)) from exc
 
 
 def _project_turn_output_schema(
@@ -277,6 +282,35 @@ async def _load_artifact(
         return await uow.artifacts.get(tenant_id=tenant_id, artifact_id=artifact_id)
 
 
+async def _load_exact_artifact(
+    uow_factory: Callable[[], VNextUnitOfWork],
+    *,
+    tenant_id: UUID,
+    ref: ArtifactRef,
+) -> ArtifactRecord:
+    """§5.6:checkpoint/request 有 ref 時必須載入該 exact ref 並比較完整 ArtifactRef。
+
+    ref 指向的 row 不存在同樣是 persisted-gate corruption(fail closed),不是
+    可重試的 not-found。
+    """
+
+    try:
+        record = await _load_artifact(
+            uow_factory, tenant_id=tenant_id, artifact_id=ref.artifact_id
+        )
+    except ArtifactNotFound as exc:
+        raise PersistedDataCorruption(
+            "persisted gate artifact reference points at a missing row",
+            artifact_id=ref.artifact_id,
+        ) from exc
+    if record.ref != ref:
+        raise PersistedDataCorruption(
+            "persisted artifact does not match its recorded reference",
+            artifact_id=ref.artifact_id,
+        )
+    return record
+
+
 async def _load_attempt(
     uow_factory: Callable[[], VNextUnitOfWork], *, tenant_id: UUID, attempt_id: UUID
 ) -> OperationAttempt:
@@ -332,61 +366,6 @@ def _request_artifact(
         created_at=request.created_at,
         contains_test_data=contains_test_data,
     )
-
-
-def _assert_result_identity(
-    request: ModelCallRequest,
-    result: ModelCallResult,
-    *,
-    binding: ProviderBinding,
-) -> None:
-    expected = (
-        request.run_id,
-        request.session_id,
-        request.turn_id,
-        request.operation_id,
-        request.attempt_id,
-        request.attempt,
-        request.operation_name,
-        request.operation_definition_hash,
-        request.binding_id,
-        request.binding_hash,
-        request.requested_model,
-        request.prompt_hash,
-        request.output_schema_id,
-        request.output_schema_hash,
-        request.context_hash,
-    )
-    actual = (
-        result.run_id,
-        result.session_id,
-        result.turn_id,
-        result.operation_id,
-        result.attempt_id,
-        result.attempt,
-        result.operation_name,
-        result.operation_definition_hash,
-        result.binding_id,
-        result.binding_hash,
-        result.requested_model,
-        result.prompt_hash,
-        result.output_schema_id,
-        result.output_schema_hash,
-        result.context_hash,
-    )
-    if actual != expected or result.started_at < request.created_at:
-        raise CheckpointConflict("model result identity does not match request")
-    if result.gateway_provider != binding.gateway_provider:
-        raise CheckpointConflict("model result gateway provider does not match binding")
-
-
-def _validate_result(
-    request: ModelCallRequest,
-    envelope: ModelCallEnvelope,
-    *,
-    binding: ProviderBinding,
-) -> None:
-    _assert_result_identity(request, envelope.result, binding=binding)
 
 
 def _attempt_classification(
@@ -835,24 +814,174 @@ async def _resolved_call_for_request(
 
     fresh-process recovery reads the binding and schema projection back from the
     persisted request; it never re-resolves a binding from current deployment
-    config (ADR 0036 §3). ResolvedModelCall's own validators re-check every hash.
+    config (ADR 0036 §3). R3-C2(§6.6):每個 ref 都以完整 ``ArtifactRef`` exact
+    比較載入,provider config artifact 必須存在且 content hash 等於 binding
+    (payload 不進 ``ResolvedModelCall``;adapter 用自己的 config hash 做第二道
+    preflight)。ResolvedModelCall's own validators re-check every hash。
     """
 
-    binding_record = await _load_artifact(
-        uow_factory, tenant_id=tenant_id,
-        artifact_id=request.binding_artifact.artifact_id,
+    binding_record = await _load_exact_artifact(
+        uow_factory, tenant_id=tenant_id, ref=request.binding_artifact
     )
-    projection_record = await _load_artifact(
-        uow_factory, tenant_id=tenant_id,
-        artifact_id=request.schema_projection_artifact.artifact_id,
+    projection_record = await _load_exact_artifact(
+        uow_factory, tenant_id=tenant_id, ref=request.schema_projection_artifact
     )
-    binding = ProviderBinding.model_validate_json(binding_record.inline_content or "")
-    projection = SchemaProjectionReport.model_validate_json(
-        projection_record.inline_content or ""
+    config_record = await _load_exact_artifact(
+        uow_factory, tenant_id=tenant_id, ref=request.provider_config_artifact
     )
+    try:
+        binding = ProviderBinding.model_validate_json(
+            binding_record.inline_content or ""
+        )
+        projection = SchemaProjectionReport.model_validate_json(
+            projection_record.inline_content or ""
+        )
+    except ValidationError as exc:
+        raise PersistedDataCorruption(
+            "persisted binding/projection artifact failed typed validation",
+            operation_id=request.operation_id,
+        ) from exc
+    if config_record.ref.content_hash != binding.provider_config_hash:
+        raise PersistedDataCorruption(
+            "persisted provider config artifact does not match the binding config hash",
+            operation_id=request.operation_id,
+        )
     return ResolvedModelCall(
         request=request, binding=binding, schema_projection=projection
     )
+
+
+async def _load_and_validate_provider_gate(
+    uow_factory: Callable[[], VNextUnitOfWork],
+    *,
+    tenant_id: UUID,
+    request: ModelCallRequest,
+    result_ref: ArtifactRef | None = None,
+    evidence_ref: ArtifactRef | None = None,
+    conformance_ref: ArtifactRef | None = None,
+    result_artifact_id: UUID | None = None,
+    require_eligible: bool | None,
+) -> tuple[ProviderBinding, ValidatedProviderGate]:
+    """§5.6:單一 recovery loader,所有 fresh-process 分支共用。
+
+    先以 exact refs 載回 binding/config/projection 並重驗(``ResolvedModelCall``
+    validators),再依 checkpoint refs 或 deterministic attempt IDs 載入
+    result/evidence/conformance,交給共用 ``validate_provider_gate_artifacts()``。
+    """
+
+    resolved = await _resolved_call_for_request(
+        uow_factory, tenant_id=tenant_id, request=request
+    )
+    binding = resolved.binding
+
+    async def load_gate_artifact(artifact_id: UUID) -> ArtifactRecord:
+        try:
+            return await _load_artifact(
+                uow_factory, tenant_id=tenant_id, artifact_id=artifact_id
+            )
+        except ArtifactNotFound as exc:
+            raise PersistedDataCorruption(
+                "persisted gate artifact is missing", artifact_id=artifact_id
+            ) from exc
+
+    if result_ref is not None:
+        result_record = await _load_exact_artifact(
+            uow_factory, tenant_id=tenant_id, ref=result_ref
+        )
+    else:
+        assert result_artifact_id is not None
+        result_record = await load_gate_artifact(result_artifact_id)
+    if evidence_ref is not None:
+        evidence_record = await _load_exact_artifact(
+            uow_factory, tenant_id=tenant_id, ref=evidence_ref
+        )
+    else:
+        evidence_record = await load_gate_artifact(
+            uuid5(request.attempt_id, "provider-execution-evidence")
+        )
+    if conformance_ref is not None:
+        conformance_record = await _load_exact_artifact(
+            uow_factory, tenant_id=tenant_id, ref=conformance_ref
+        )
+    else:
+        conformance_record = await load_gate_artifact(
+            uuid5(request.attempt_id, "provider-conformance")
+        )
+    gate = validate_provider_gate_artifacts(
+        request=request,
+        binding=binding,
+        result_artifact=result_record,
+        evidence_artifact=evidence_record,
+        conformance_artifact=conformance_record,
+        require_eligible=require_eligible,
+    )
+    return binding, gate
+
+
+async def _revalidate_failed_checkpoint(
+    uow_factory: Callable[[], VNextUnitOfWork],
+    *,
+    tenant_id: UUID,
+    checkpoint: OperationCheckpoint,
+    request: ModelCallRequest,
+) -> None:
+    """§5.6 failed 行:重驗 provider gate 與 failure authority 後才可回 failed。"""
+
+    assert checkpoint.failure_artifact is not None  # checkpoint model 保證
+    await _load_exact_artifact(
+        uow_factory, tenant_id=tenant_id, ref=checkpoint.failure_artifact
+    )
+    evidence_ref = checkpoint.provider_execution_evidence_artifact
+    conformance_ref = checkpoint.provider_conformance_artifact
+    if evidence_ref is None and conformance_ref is None:
+        # pre-provider/coordinator failure:不得宣稱任何 provider 成果。
+        if checkpoint.provider_result_artifact is not None:
+            raise PersistedDataCorruption(
+                "failed checkpoint without a provider gate cannot carry a provider result",
+                operation_id=checkpoint.operation_id,
+            )
+        return
+    result_ref = (
+        checkpoint.attempt_result_artifacts[-1]
+        if checkpoint.attempt_result_artifacts
+        else None
+    )
+    if result_ref is None:
+        raise PersistedDataCorruption(
+            "failed provider attempt is missing its terminating result artifact",
+            operation_id=checkpoint.operation_id,
+        )
+    # failure authority 決定 gate 的 eligibility 要求:conformance report 作
+    # authority(wire succeeded + ineligible)或 wire result 作 authority(wire
+    # failure)都要求 ineligible;其他 authority(verification rejection)代表
+    # provider gate 本身通過。
+    if checkpoint.failure_artifact in (conformance_ref, result_ref):
+        require_eligible = False
+    else:
+        require_eligible = True
+    _, gate = await _load_and_validate_provider_gate(
+        uow_factory,
+        tenant_id=tenant_id,
+        request=request,
+        result_ref=result_ref,
+        evidence_ref=evidence_ref,
+        conformance_ref=conformance_ref,
+        require_eligible=require_eligible,
+    )
+    if checkpoint.failure_artifact == conformance_ref and (
+        gate.result.outcome != ModelOutcome.SUCCEEDED
+    ):
+        raise PersistedDataCorruption(
+            "conformance failure authority requires a wire-succeeded result",
+            operation_id=checkpoint.operation_id,
+        )
+    if checkpoint.failure_artifact == result_ref and (
+        gate.result.outcome == ModelOutcome.SUCCEEDED
+    ):
+        raise PersistedDataCorruption(
+            "wire failure authority requires a non-succeeded result",
+            operation_id=checkpoint.operation_id,
+        )
 
 
 async def _context_for_request(
@@ -875,10 +1004,8 @@ async def _report_for_checkpoint(
     *, tenant_id: UUID, checkpoint: OperationCheckpoint,
 ) -> tuple[TurnInterpretVerificationReport, ArtifactRecord]:
     assert checkpoint.verification_artifact is not None
-    record = await _load_artifact(
-        uow_factory,
-        tenant_id=tenant_id,
-        artifact_id=checkpoint.verification_artifact.artifact_id,
+    record = await _load_exact_artifact(
+        uow_factory, tenant_id=tenant_id, ref=checkpoint.verification_artifact
     )
     return (
         TurnInterpretVerificationReport.model_validate_json(
@@ -897,10 +1024,12 @@ async def _committed_outcome(
     )
     assert checkpoint.domain_result_artifact is not None
     assert checkpoint.response_artifact is not None
-    domain_record = await _load_artifact(
-        uow_factory,
-        tenant_id=tenant_id,
-        artifact_id=checkpoint.domain_result_artifact.artifact_id,
+    # §5.6 committed 行:committed artifacts 也以 exact ref 載回。
+    await _load_exact_artifact(
+        uow_factory, tenant_id=tenant_id, ref=checkpoint.response_artifact
+    )
+    domain_record = await _load_exact_artifact(
+        uow_factory, tenant_id=tenant_id, ref=checkpoint.domain_result_artifact
     )
     reduction = None
     noop = None
@@ -1082,16 +1211,6 @@ async def execute_turn_interpret(
             or checkpoint.idempotency_key != idempotency_key
         ):
             raise CheckpointConflict("existing checkpoint scope/definition mismatch")
-        if checkpoint.status == CheckpointStatus.COMMITTED:
-            return await _committed_outcome(
-                uow_factory, tenant_id=tenant_id, checkpoint=checkpoint
-            )
-        if checkpoint.status == CheckpointStatus.FAILED:
-            return TurnInterpretExecutionOutcome(
-                status=TurnExecutionStatus.FAILED,
-                checkpoint=checkpoint,
-                reason_code=checkpoint.failure_reason_code,
-            )
         request = await _request_for_checkpoint(
             uow_factory, tenant_id=tenant_id, checkpoint=checkpoint
         )
@@ -1103,6 +1222,33 @@ async def execute_turn_interpret(
         ):
             raise CheckpointConflict(
                 "provider binding does not match the persisted model request"
+            )
+        # §5.6:every fresh-process terminal path 先重驗 persisted provider gate,
+        # 再回 idempotent outcome;不得以 refs 存在即視為正確。
+        if checkpoint.status == CheckpointStatus.COMMITTED:
+            await _load_and_validate_provider_gate(
+                uow_factory,
+                tenant_id=tenant_id,
+                request=request,
+                result_ref=checkpoint.provider_result_artifact,
+                evidence_ref=checkpoint.provider_execution_evidence_artifact,
+                conformance_ref=checkpoint.provider_conformance_artifact,
+                require_eligible=True,
+            )
+            return await _committed_outcome(
+                uow_factory, tenant_id=tenant_id, checkpoint=checkpoint
+            )
+        if checkpoint.status == CheckpointStatus.FAILED:
+            await _revalidate_failed_checkpoint(
+                uow_factory,
+                tenant_id=tenant_id,
+                checkpoint=checkpoint,
+                request=request,
+            )
+            return TurnInterpretExecutionOutcome(
+                status=TurnExecutionStatus.FAILED,
+                checkpoint=checkpoint,
+                reason_code=checkpoint.failure_reason_code,
             )
 
     while True:
@@ -1158,7 +1304,8 @@ async def execute_turn_interpret(
                         uow_factory, tenant_id=tenant_id, request=request
                     )
                     envelope = await llm.generate_structured(resolved_call)
-                _validate_result(request, envelope, binding=binding)
+                # identity/gateway/conformance 驗證統一由 record_attempt_result
+                # 內的 provider gate 執行(§6.5:單一 authority,不前後各做一次)。
                 result = envelope.result
                 conformance = evaluate_conformance(
                     policy=conformance_policy,
@@ -1215,8 +1362,6 @@ async def execute_turn_interpret(
                     conformance_artifact=conformance_artifact,
                     extra_result_artifacts=envelope.supporting_artifacts,
                     outcome=classification,
-                    wire_succeeded=wire_succeeded,
-                    conformance_eligible=conformance.eligible,
                     max_attempts=operation.max_attempts,
                     failure_reason_code=reason,
                     result_event_id=turn_execution_uuid(
@@ -1270,31 +1415,17 @@ async def execute_turn_interpret(
                     raise CheckpointConflict(
                         "recorded attempt is missing its result artifact"
                     )
-                result_record = await _load_artifact(
+                # §5.6 calling+result_recorded:重驗 prior result/evidence/
+                # conformance(deterministic attempt IDs)後才可建 next attempt。
+                _, recorded_gate = await _load_and_validate_provider_gate(
                     uow_factory,
                     tenant_id=tenant_id,
-                    artifact_id=attempt.result_artifact_id,
+                    request=request,
+                    result_artifact_id=attempt.result_artifact_id,
+                    require_eligible=None,
                 )
-                result = ModelCallResult.model_validate_json(
-                    result_record.inline_content or ""
-                )
-                _assert_result_identity(request, result, binding=binding)
-                evidence_record = await _load_artifact(
-                    uow_factory,
-                    tenant_id=tenant_id,
-                    artifact_id=uuid5(
-                        request.attempt_id, "provider-execution-evidence"
-                    ),
-                )
-                recorded_evidence = ProviderExecutionEvidence.model_validate_json(
-                    evidence_record.inline_content or ""
-                )
-                recorded_conformance = evaluate_conformance(
-                    policy=conformance_policy,
-                    binding=binding,
-                    evidence=recorded_evidence,
-                    wire_outcome=result.outcome,
-                )
+                result = recorded_gate.result
+                recorded_conformance = recorded_gate.conformance
                 wire_succeeded = result.outcome == ModelOutcome.SUCCEEDED
                 local_output, local_validation_errors = (
                     _local_output(result)
@@ -1345,20 +1476,24 @@ async def execute_turn_interpret(
 
         if checkpoint.status == CheckpointStatus.PROVIDER_COMPLETED:
             assert checkpoint.provider_result_artifact is not None
-            result_record = await _load_artifact(
-                uow_factory,
-                tenant_id=tenant_id,
-                artifact_id=checkpoint.provider_result_artifact.artifact_id,
-            )
-            result = ModelCallResult.model_validate_json(
-                result_record.inline_content or ""
-            )
-            if result.parsed_output is None:
-                raise CheckpointConflict("provider-completed result has no parsed output")
-            output = TurnInterpretOutput.model_validate(result.parsed_output.load())
             request = await _request_for_checkpoint(
                 uow_factory, tenant_id=tenant_id, checkpoint=checkpoint
             )
+            # §5.6 provider_completed 行:載入 exact 三件 artifact、重驗 eligible
+            # 後才跑 local verifier。
+            _, completed_gate = await _load_and_validate_provider_gate(
+                uow_factory,
+                tenant_id=tenant_id,
+                request=request,
+                result_ref=checkpoint.provider_result_artifact,
+                evidence_ref=checkpoint.provider_execution_evidence_artifact,
+                conformance_ref=checkpoint.provider_conformance_artifact,
+                require_eligible=True,
+            )
+            result = completed_gate.result
+            if result.parsed_output is None:
+                raise CheckpointConflict("provider-completed result has no parsed output")
+            output = TurnInterpretOutput.model_validate(result.parsed_output.load())
             context = await _context_for_request(
                 uow_factory, tenant_id=tenant_id, request=request
             )
@@ -1396,17 +1531,24 @@ async def execute_turn_interpret(
 
         if checkpoint.status == CheckpointStatus.VERIFIED:
             if report is None or verification_artifact is None:
-                report, verification_artifact = await _report_for_checkpoint(
+                # §5.6 verified 行:fresh-process 先重驗 provider gate,再載入
+                # verification report,才可 commit。
+                request = await _request_for_checkpoint(
                     uow_factory, tenant_id=tenant_id, checkpoint=checkpoint
                 )
                 assert checkpoint.provider_result_artifact is not None
-                result_record = await _load_artifact(
+                _, verified_gate = await _load_and_validate_provider_gate(
                     uow_factory,
                     tenant_id=tenant_id,
-                    artifact_id=checkpoint.provider_result_artifact.artifact_id,
+                    request=request,
+                    result_ref=checkpoint.provider_result_artifact,
+                    evidence_ref=checkpoint.provider_execution_evidence_artifact,
+                    conformance_ref=checkpoint.provider_conformance_artifact,
+                    require_eligible=True,
                 )
-                result = ModelCallResult.model_validate_json(
-                    result_record.inline_content or ""
+                result = verified_gate.result
+                report, verification_artifact = await _report_for_checkpoint(
+                    uow_factory, tenant_id=tenant_id, checkpoint=checkpoint
                 )
                 output = TurnInterpretOutput.model_validate(
                     result.parsed_output.load()

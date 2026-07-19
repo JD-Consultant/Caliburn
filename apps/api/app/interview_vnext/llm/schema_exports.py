@@ -15,7 +15,7 @@ from .context import (
 )
 from .execution import ProviderExecutionEvidence
 from .operation import OperationSpec
-from .port import ModelCallRequest
+from .port import ModelCallRequest, ResolvedModelCall
 from .portable_schema import SchemaProjectionReport, portable_strict_output_schema
 from .result import ModelCallResult
 from .turn_interpret import (
@@ -53,9 +53,9 @@ SCHEMA_EXPORTS: dict[str, tuple[str, str, SchemaFactory]] = {
         "Caliburn interview vNext LLM operation specification v1",
         OperationSpec.model_json_schema,
     ),
-    "model-call-request.v1.schema.json": (
-        "https://caliburn.local/schemas/model-call-request.v1.schema.json",
-        "Caliburn interview vNext provider-neutral model request v1",
+    "model-call-request.v2.schema.json": (
+        "https://caliburn.local/schemas/model-call-request.v2.schema.json",
+        "Caliburn interview vNext binding-resolved model request v2",
         ModelCallRequest.model_json_schema,
     ),
     "provider-binding.v1.schema.json": (
@@ -73,10 +73,15 @@ SCHEMA_EXPORTS: dict[str, tuple[str, str, SchemaFactory]] = {
         "Caliburn interview vNext normalized provider execution evidence v1",
         ProviderExecutionEvidence.model_json_schema,
     ),
-    "model-call-result.v1.schema.json": (
-        "https://caliburn.local/schemas/model-call-result.v1.schema.json",
-        "Caliburn interview vNext provider-neutral model result v1",
+    "model-call-result.v2.schema.json": (
+        "https://caliburn.local/schemas/model-call-result.v2.schema.json",
+        "Caliburn interview vNext provider-neutral model result v2",
         ModelCallResult.model_json_schema,
+    ),
+    "resolved-model-call.v1.schema.json": (
+        "https://caliburn.local/schemas/resolved-model-call.v1.schema.json",
+        "Caliburn interview vNext resolved model call v1",
+        ResolvedModelCall.model_json_schema,
     ),
     "reference-snapshot.v1.schema.json": (
         "https://caliburn.local/schemas/reference-snapshot.v1.schema.json",
@@ -104,6 +109,17 @@ SCHEMA_EXPORTS: dict[str, tuple[str, str, SchemaFactory]] = {
         TurnInterpretVerificationReport.model_json_schema,
     ),
 }
+
+
+# v1 request/result schemas are superseded by v2 but never rewritten or deleted
+# (ADR 0036 §11; plan §4.1). They stay on disk as frozen historical artifacts and
+# are not regenerated from the active Pydantic models.
+HISTORICAL_SCHEMAS: frozenset[str] = frozenset(
+    {
+        "model-call-request.v1.schema.json",
+        "model-call-result.v1.schema.json",
+    }
+)
 
 
 def published_schema(filename: str) -> dict[str, Any]:

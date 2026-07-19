@@ -14,7 +14,6 @@ import app.interview_vnext.application.operation_executor as executor_module
 from app.interview_vnext.application.durable_commands import apply_durable_command
 from app.interview_vnext.application.operation_executor import (
     TurnExecutionStatus,
-    TurnInterpretProviderProfile,
     execute_turn_interpret,
 )
 from app.interview_vnext.domain.commands import (
@@ -42,6 +41,12 @@ from app.interview_vnext.llm.port import (
     LlmPort,
     ModelCallEnvelope,
     ModelCallRequest,
+    ResolvedModelCall,
+)
+from app.interview_vnext.llm.testing import (
+    scripted_execution_evidence,
+    scripted_provider_config,
+    scripted_turn_binding,
 )
 from app.interview_vnext.llm.result import (
     FailureKind,
@@ -63,7 +68,7 @@ from app.interview_vnext.llm.turn_interpret import (
 )
 from app.interview_vnext.observability.artifacts import build_inline_artifact
 from app.interview_vnext.observability.checkpoint import CheckpointStatus
-from app.interview_vnext.observability.taxonomy import INTERVIEW_VNEXT_EXECUTION_V1
+from app.interview_vnext.observability.taxonomy import INTERVIEW_VNEXT_EXECUTION_V2
 from app.interview_vnext.persistence.errors import CheckpointConflict
 from app.interview_vnext.persistence.unit_of_work import SqlAlchemyVNextUnitOfWork
 from app.interview_vnext.application.persistence import WorkflowRun
@@ -83,7 +88,7 @@ def uow_factory(factory):
 
 
 def open_run(ids) -> WorkflowRun:
-    taxonomy = INTERVIEW_VNEXT_EXECUTION_V1
+    taxonomy = INTERVIEW_VNEXT_EXECUTION_V2
     return WorkflowRun(
         run_id=ids.run_id,
         session_id=ids.session_id,
@@ -243,6 +248,32 @@ def usage() -> TokenUsage:
     )
 
 
+# V3-5A: the executor resolves this binding into a ResolvedModelCall; the scripted
+# providers below produce v2 envelopes (wire result + attribution-strict-eligible
+# execution evidence) bound to it.
+BINDING = scripted_turn_binding()
+
+
+def _scripted_routing_artifact(request: ModelCallRequest, *, created_at):
+    return build_inline_artifact(
+        artifact_id=uuid5(request.attempt_id, "scripted-routing"),
+        kind="provider.scripted.routing",
+        media_type="application/json",
+        payload={
+            "schema_version": "scripted_routing.v1",
+            "strategy": "direct",
+            "upstream_attempt_count": 1,
+        },
+        run_id=request.run_id,
+        session_id=request.session_id,
+        turn_id=request.turn_id,
+        operation_id=request.operation_id,
+        attempt_id=request.attempt_id,
+        created_at=created_at,
+        contains_test_data=True,
+    )
+
+
 class ResultProvider(LlmPort):
     def __init__(
         self,
@@ -259,8 +290,10 @@ class ResultProvider(LlmPort):
         self.requests: list[ModelCallRequest] = []
 
     async def generate_structured(
-        self, request: ModelCallRequest
+        self, call: ResolvedModelCall
     ) -> ModelCallEnvelope:
+        request = call.request
+        binding = call.binding
         self.requests.append(request)
         if self.lock_factory is not None:
             assert self.lock_tenant_id is not None
@@ -289,7 +322,9 @@ class ResultProvider(LlmPort):
             attempt=request.attempt,
             operation_name=request.operation_name,
             operation_definition_hash=request.operation_definition_hash,
-            provider=request.provider,
+            binding_id=binding.binding_id,
+            binding_hash=binding.binding_hash,
+            gateway_provider=binding.gateway_provider,
             requested_model=request.requested_model,
             resolved_model=request.requested_model,
             usage=usage(),
@@ -302,20 +337,13 @@ class ResultProvider(LlmPort):
             context_hash=request.context_hash,
         )
         if script == "timeout":
-            return ModelCallEnvelope(
-                result=ModelCallResult(
-                    **common,
-                    outcome=ModelOutcome.FAILED,
-                    finish_reason=FinishReason.PROVIDER_ERROR,
-                    failure=ModelFailure(
-                        kind=FailureKind.TRANSPORT_TIMEOUT,
-                        reason_code="provider.timeout",
-                        retryable=True,
-                        safe_message="scripted timeout",
-                    ),
-                ),
-                supporting_artifacts=(),
+            return executor_module._timeout_envelope(
+                request, binding=binding, now=completed_at
             )
+        routing = _scripted_routing_artifact(request, created_at=completed_at)
+        evidence = scripted_execution_evidence(
+            binding, usage=usage(), raw_routing_artifact=routing.ref
+        )
 
         raw = {
             "success": output(proposal()),
@@ -370,7 +398,8 @@ class ResultProvider(LlmPort):
             )
         return ModelCallEnvelope(
             result=result,
-            supporting_artifacts=(visible,),
+            execution_evidence=evidence,
+            supporting_artifacts=(visible, routing),
         )
 
 
@@ -378,7 +407,7 @@ class CrashingProvider(LlmPort):
     def __init__(self) -> None:
         self.calls = 0
 
-    async def generate_structured(self, request: ModelCallRequest):
+    async def generate_structured(self, call: ResolvedModelCall):
         self.calls += 1
         raise RuntimeError("simulated process loss after durable attempt start")
 
@@ -391,12 +420,12 @@ class BlockingProvider(ResultProvider):
         self.entered_count = 0
 
     async def generate_structured(
-        self, request: ModelCallRequest
+        self, call: ResolvedModelCall
     ) -> ModelCallEnvelope:
         self.entered_count += 1
         self.entered.set()
         await self.release.wait()
-        return await super().generate_structured(request)
+        return await super().generate_structured(call)
 
 
 def execute_kwargs(ids, employee: TranscriptTurn, provider: LlmPort):
@@ -408,10 +437,8 @@ def execute_kwargs(ids, employee: TranscriptTurn, provider: LlmPort):
         operation_id=uid(ids, "operation/turn-interpret"),
         idempotency_key="turn-2:interpret",
         llm=provider,
-        profile=TurnInterpretProviderProfile(
-            provider="scripted",
-            requested_model="quality-ceiling-test",
-        ),
+        binding=BINDING,
+        provider_config=scripted_provider_config(),
         started_at=EXECUTE_AT,
         now=EXECUTE_AT,
         contains_test_data=True,

@@ -16,10 +16,23 @@ from app.interview_vnext.domain.evidence import Evidence
 from app.interview_vnext.domain.hashing import canonical_hash, canonical_json
 from app.interview_vnext.domain.identifiers import NonEmptyText, StableName
 from app.interview_vnext.domain.reducers import ReductionResult
+from app.interview_vnext.llm.binding import ProviderBinding
+from app.interview_vnext.llm.conformance import (
+    ATTRIBUTION_STRICT_POLICY_V1,
+    ConformancePolicy,
+    ConformanceReport,
+    evaluate_conformance,
+)
 from app.interview_vnext.llm.context import (
     CONTEXT_PACKET_ADAPTER,
     TURN_INTERPRET_CONTEXT_POLICY_V1,
     TurnInterpretContextPacket,
+)
+from app.interview_vnext.llm.execution import (
+    CacheStatus,
+    ProviderExecutionEvidence,
+    TransformationStatus,
+    define_provider_execution_evidence,
 )
 from app.interview_vnext.llm.operation import OperationSpec
 from app.interview_vnext.llm.operation_documents import (
@@ -32,6 +45,13 @@ from app.interview_vnext.llm.port import (
     ModelCallEnvelope,
     ModelCallRequest,
     ModelMessage,
+    ResolvedModelCall,
+)
+from app.interview_vnext.llm.portable_schema import (
+    PORTABLE_STRICT_OUTPUT_POLICY_V2,
+    SchemaProjectionPolicy,
+    SchemaProjectionReport,
+    project_portable_strict_output_schema,
 )
 from app.interview_vnext.llm.result import (
     FailureKind,
@@ -41,7 +61,7 @@ from app.interview_vnext.llm.result import (
     ModelOutcome,
     TokenUsage,
 )
-from app.interview_vnext.llm.schema_exports import published_schema
+from app.interview_vnext.llm.schema_exports import SCHEMA_EXPORTS, published_schema
 from app.interview_vnext.llm.turn_interpret import (
     TurnInterpretOutput,
     TurnInterpretVerificationReport,
@@ -77,10 +97,25 @@ from .turn_interpret import (
 
 
 MODEL_REQUEST_SCHEMA_ID = (
-    "https://caliburn.local/schemas/model-call-request.v1.schema.json"
+    "https://caliburn.local/schemas/model-call-request.v2.schema.json"
 )
 MODEL_RESULT_SCHEMA_ID = (
-    "https://caliburn.local/schemas/model-call-result.v1.schema.json"
+    "https://caliburn.local/schemas/model-call-result.v2.schema.json"
+)
+PROVIDER_BINDING_SCHEMA_ID = (
+    "https://caliburn.local/schemas/provider-binding.v1.schema.json"
+)
+PROVIDER_CONFIG_SCHEMA_ID = (
+    "https://caliburn.local/schemas/provider-config.v1.schema.json"
+)
+SCHEMA_PROJECTION_SCHEMA_ID = (
+    "https://caliburn.local/schemas/schema-projection-report.v1.schema.json"
+)
+EXECUTION_EVIDENCE_SCHEMA_ID = (
+    "https://caliburn.local/schemas/provider-execution-evidence.v1.schema.json"
+)
+CONFORMANCE_SCHEMA_ID = (
+    "https://caliburn.local/schemas/provider-conformance-report.v1.schema.json"
 )
 TURN_INPUT_SCHEMA_ID = (
     "https://caliburn.local/schemas/turn-interpret-input.v1.schema.json"
@@ -108,9 +143,54 @@ class TurnExecutionStatus(StrEnum):
     FAILED = "failed"
 
 
-class TurnInterpretProviderProfile(DomainModel):
-    provider: StableName
-    requested_model: NonEmptyText
+def _resolve_projection_policy(binding: ProviderBinding) -> SchemaProjectionPolicy:
+    policy = PORTABLE_STRICT_OUTPUT_POLICY_V2
+    identity = binding.schema_projection_policy
+    if (
+        identity.name != policy.name
+        or identity.version != policy.version
+        or identity.content_hash != policy.policy_hash
+    ):
+        raise CheckpointConflict(
+            "binding schema projection policy is not the active portable-strict policy"
+        )
+    return policy
+
+
+def _resolve_conformance_policy(binding: ProviderBinding) -> ConformancePolicy:
+    policy = ATTRIBUTION_STRICT_POLICY_V1
+    identity = binding.conformance_policy
+    if (
+        identity.name != policy.name
+        or identity.version != policy.version
+        or identity.content_hash != policy.policy_hash
+    ):
+        raise CheckpointConflict(
+            "binding conformance policy is not the active attribution-strict policy"
+        )
+    return policy
+
+
+def _project_turn_output_schema(
+    policy: SchemaProjectionPolicy,
+) -> tuple[dict, SchemaProjectionReport]:
+    """Project the turn output schema and account for every removed constraint.
+
+    The projected schema is byte-identical to the published portable schema (so
+    the eval schema catalog and operation output contract still resolve), while
+    the report documents the real projection from the raw Pydantic model.
+    """
+
+    schema_id, title, _factory = SCHEMA_EXPORTS["turn-interpret-output.v1.schema.json"]
+    source = {
+        **TurnInterpretOutput.model_json_schema(),
+        "$id": schema_id,
+        "title": title,
+    }
+    projected = project_portable_strict_output_schema(
+        source, source_schema_id=schema_id, target_profile=policy.target_profile
+    )
+    return projected.schema, projected.report
 
 
 class TurnInterpretExecutionOutcome(DomainModel):
@@ -268,8 +348,12 @@ def _request_artifact(
     )
 
 
-def _validate_result(request: ModelCallRequest, envelope: ModelCallEnvelope) -> None:
-    result = envelope.result
+def _assert_result_identity(
+    request: ModelCallRequest,
+    result: ModelCallResult,
+    *,
+    binding: ProviderBinding,
+) -> None:
     expected = (
         request.run_id,
         request.session_id,
@@ -279,7 +363,8 @@ def _validate_result(request: ModelCallRequest, envelope: ModelCallEnvelope) -> 
         request.attempt,
         request.operation_name,
         request.operation_definition_hash,
-        request.provider,
+        request.binding_id,
+        request.binding_hash,
         request.requested_model,
         request.prompt_hash,
         request.output_schema_id,
@@ -295,7 +380,8 @@ def _validate_result(request: ModelCallRequest, envelope: ModelCallEnvelope) -> 
         result.attempt,
         result.operation_name,
         result.operation_definition_hash,
-        result.provider,
+        result.binding_id,
+        result.binding_hash,
         result.requested_model,
         result.prompt_hash,
         result.output_schema_id,
@@ -304,22 +390,32 @@ def _validate_result(request: ModelCallRequest, envelope: ModelCallEnvelope) -> 
     )
     if actual != expected or result.started_at < request.created_at:
         raise CheckpointConflict("model result identity does not match request")
+    if result.gateway_provider != binding.gateway_provider:
+        raise CheckpointConflict("model result gateway provider does not match binding")
+
+
+def _validate_result(
+    request: ModelCallRequest,
+    envelope: ModelCallEnvelope,
+    *,
+    binding: ProviderBinding,
+) -> None:
+    _assert_result_identity(request, envelope.result, binding=binding)
 
 
 def _attempt_classification(
-    *, result: ModelCallResult, local_output_valid: bool, attempt: int,
-    operation: OperationSpec,
+    *, result: ModelCallResult, conformance_eligible: bool,
+    local_output_valid: bool, attempt: int, operation: OperationSpec,
 ) -> tuple[AttemptOutcome, str, bool]:
-    schema_repair = (
-        result.outcome == ModelOutcome.SUCCEEDED
-        and not local_output_valid
-        and attempt <= operation.repair_policy.schema_repair_attempts
-        and attempt < operation.max_attempts
-    )
-    if result.outcome == ModelOutcome.SUCCEEDED and local_output_valid:
-        return AttemptOutcome.SUCCEEDED, "provider_succeeded", False
-    if schema_repair:
-        return AttemptOutcome.RETRYABLE_FAILURE, "output_schema_invalid", True
+    """§7.4 gate precedence: wire failure → conformance → local schema.
+
+    Returns (outcome, reason_code, is_schema_repair). Conformance is only
+    consulted for a wire-succeeded result; a wire-succeeded but ineligible attempt
+    is a non-retryable conformance failure whose authority is the conformance
+    report (recorded by ``record_attempt_result``).
+    """
+
+    # wire failure takes precedence over any conformance/local judgement
     if (
         result.outcome == ModelOutcome.FAILED
         and result.failure is not None
@@ -335,9 +431,141 @@ def _attempt_classification(
             f"provider_incomplete_{result.finish_reason.value}",
             False,
         )
-    if result.failure is not None:
+    if result.outcome == ModelOutcome.FAILED and result.failure is not None:
         return AttemptOutcome.NON_RETRYABLE_FAILURE, result.failure.reason_code, False
+    if result.outcome == ModelOutcome.FAILED:
+        return AttemptOutcome.NON_RETRYABLE_FAILURE, "output_schema_invalid", False
+
+    # wire succeeded: conformance gate before the local schema gate
+    if not conformance_eligible:
+        return AttemptOutcome.NON_RETRYABLE_FAILURE, "provider.conformance_failed", False
+    if local_output_valid:
+        return AttemptOutcome.SUCCEEDED, "provider_succeeded", False
+    schema_repair = (
+        attempt <= operation.repair_policy.schema_repair_attempts
+        and attempt < operation.max_attempts
+    )
+    if schema_repair:
+        return AttemptOutcome.RETRYABLE_FAILURE, "output_schema_invalid", True
     return AttemptOutcome.NON_RETRYABLE_FAILURE, "output_schema_invalid", False
+
+
+def _evidence_artifact(
+    evidence: ProviderExecutionEvidence,
+    *,
+    request: ModelCallRequest,
+    created_at: datetime,
+    contains_test_data: bool,
+) -> ArtifactRecord:
+    return build_inline_artifact(
+        artifact_id=uuid5(request.attempt_id, "provider-execution-evidence"),
+        kind="model.provider_execution_evidence",
+        media_type="application/json",
+        payload=evidence,
+        schema_id=EXECUTION_EVIDENCE_SCHEMA_ID,
+        run_id=request.run_id,
+        session_id=request.session_id,
+        turn_id=request.turn_id,
+        operation_id=request.operation_id,
+        attempt_id=request.attempt_id,
+        created_at=created_at,
+        contains_test_data=contains_test_data,
+    )
+
+
+def _conformance_artifact(
+    report: ConformanceReport,
+    *,
+    request: ModelCallRequest,
+    created_at: datetime,
+    contains_test_data: bool,
+) -> ArtifactRecord:
+    return build_inline_artifact(
+        artifact_id=uuid5(request.attempt_id, "provider-conformance"),
+        kind="model.provider_conformance",
+        media_type="application/json",
+        payload=report,
+        schema_id=CONFORMANCE_SCHEMA_ID,
+        run_id=request.run_id,
+        session_id=request.session_id,
+        turn_id=request.turn_id,
+        operation_id=request.operation_id,
+        attempt_id=request.attempt_id,
+        created_at=created_at,
+        contains_test_data=contains_test_data,
+    )
+
+
+def _timeout_envelope(
+    request: ModelCallRequest, *, binding: ProviderBinding, now: datetime
+) -> ModelCallEnvelope:
+    """Synthesize a locally-produced deadline timeout with unknown evidence (§7.1)."""
+
+    timeout_result = ModelCallResult(
+        run_id=request.run_id,
+        session_id=request.session_id,
+        turn_id=request.turn_id,
+        operation_id=request.operation_id,
+        attempt_id=request.attempt_id,
+        attempt=request.attempt,
+        operation_name=request.operation_name,
+        operation_definition_hash=request.operation_definition_hash,
+        binding_id=binding.binding_id,
+        binding_hash=binding.binding_hash,
+        gateway_provider=binding.gateway_provider,
+        requested_model=binding.requested_model,
+        resolved_model=binding.requested_model,
+        outcome=ModelOutcome.FAILED,
+        finish_reason=FinishReason.PROVIDER_ERROR,
+        failure=ModelFailure(
+            kind=FailureKind.TRANSPORT_TIMEOUT,
+            reason_code="provider.timeout",
+            retryable=True,
+            safe_message="Attempt deadline elapsed before a durable result.",
+        ),
+        usage=TokenUsage(limitations=("no provider usage available after timeout",)),
+        latency_ms=max(
+            0,
+            int((request.deadline_at - request.created_at).total_seconds() * 1000),
+        ),
+        started_at=request.created_at,
+        completed_at=max(now, request.deadline_at),
+        prompt_hash=request.prompt_hash,
+        output_schema_id=request.output_schema_id,
+        output_schema_hash=request.output_schema_hash,
+        context_hash=request.context_hash,
+    )
+    evidence = define_provider_execution_evidence(
+        binding_id=binding.binding_id,
+        binding_hash=binding.binding_hash,
+        adapter_id=binding.adapter_id,
+        adapter_version=binding.adapter_version,
+        gateway_provider=binding.gateway_provider,
+        requested_model=binding.requested_model,
+        gateway_resolved_model=None,
+        upstream_provider=None,
+        upstream_model=None,
+        upstream_endpoint=None,
+        route_strategy=None,
+        upstream_attempt_count=None,
+        transformation_status=TransformationStatus.UNKNOWN,
+        pipeline_stages=(),
+        cache_status=CacheStatus.UNKNOWN,
+        provider_request_id=None,
+        generation_id=None,
+        usage=TokenUsage(limitations=("no provider usage available after timeout",)),
+        cost_decimal=None,
+        limitations=(
+            "cost unavailable after transport timeout",
+            "route metadata unavailable after transport timeout",
+        ),
+        raw_routing_artifact=None,
+    )
+    return ModelCallEnvelope(
+        result=timeout_result,
+        execution_evidence=evidence,
+        supporting_artifacts=(),
+    )
 
 
 def _local_output(
@@ -423,10 +651,13 @@ async def _fresh_request(
     operation_id: UUID,
     idempotency_key: str,
     operation: OperationSpec,
-    profile: TurnInterpretProviderProfile,
+    binding: ProviderBinding,
+    provider_config: object,
     started_at: datetime,
     contains_test_data: bool,
 ) -> tuple[OperationCheckpoint, ModelCallRequest]:
+    projection_policy = _resolve_projection_policy(binding)
+    _resolve_conformance_policy(binding)
     state = await _load_state(
         uow_factory, tenant_id=tenant_id, session_id=session_id
     )
@@ -439,7 +670,7 @@ async def _fresh_request(
     )
     input_value = turn_interpret_input_from_context(context.packet)
     prompt = TURN_INTERPRET_PROMPT_PATH.read_text(encoding="utf-8")
-    output_schema = published_schema("turn-interpret-output.v1.schema.json")
+    output_schema, projection_report = _project_turn_output_schema(projection_policy)
     common = dict(
         operation_id=operation_id,
         run_id=run_id,
@@ -495,6 +726,36 @@ async def _fresh_request(
         payload=input_value,
         schema_id=TURN_INPUT_SCHEMA_ID,
     )
+    binding_artifact = _artifact(
+        **common,
+        label="provider-binding",
+        kind="model.provider_binding",
+        media_type="application/json",
+        payload=binding,
+        schema_id=PROVIDER_BINDING_SCHEMA_ID,
+    )
+    if binding_artifact.ref.content_hash != canonical_hash(binding):
+        raise CheckpointConflict("binding artifact content hash mismatch")
+    config_artifact = _artifact(
+        **common,
+        label="provider-config",
+        kind="provider.config",
+        media_type="application/json",
+        payload=provider_config,
+        schema_id=PROVIDER_CONFIG_SCHEMA_ID,
+    )
+    if config_artifact.ref.content_hash != binding.provider_config_hash:
+        raise CheckpointConflict(
+            "provider config artifact hash does not match the binding config hash"
+        )
+    projection_artifact = _artifact(
+        **common,
+        label="schema-projection",
+        kind="model.schema_projection",
+        media_type="application/json",
+        payload=projection_report,
+        schema_id=SCHEMA_PROJECTION_SCHEMA_ID,
+    )
     attempt_id = turn_execution_uuid(operation_id, "attempt/1")
     request = ModelCallRequest(
         run_id=run_id,
@@ -506,9 +767,9 @@ async def _fresh_request(
         operation_name=operation.name,
         operation_definition_hash=operation.definition_hash,
         idempotency_key=f"{idempotency_key}:attempt:1",
-        provider=profile.provider,
-        requested_model=profile.requested_model,
-        quality_profile=operation.quality_profile,
+        binding_id=binding.binding_id,
+        binding_hash=binding.binding_hash,
+        requested_model=binding.requested_model,
         instructions=prompt,
         messages=(
             ModelMessage(role=MessageRole.USER, text=canonical_json(input_value)),
@@ -518,6 +779,9 @@ async def _fresh_request(
         output_schema_artifact=schema_artifact.ref,
         context_artifact=context_artifact.ref,
         selection_manifest_artifact=manifest_artifact.ref,
+        binding_artifact=binding_artifact.ref,
+        provider_config_artifact=config_artifact.ref,
+        schema_projection_artifact=projection_artifact.ref,
         deadline_at=started_at + timedelta(milliseconds=operation.timeout_ms),
         created_at=started_at,
         max_output_tokens=operation.max_output_tokens,
@@ -543,6 +807,9 @@ async def _fresh_request(
             manifest_artifact,
             budget_artifact,
             input_artifact,
+            binding_artifact,
+            config_artifact,
+            projection_artifact,
         ),
         expected_state_hash=context.packet.state_hash,
         turn_id=employee_turn_id,
@@ -571,6 +838,36 @@ async def _request_for_checkpoint(
         uow_factory, tenant_id=tenant_id, artifact_id=artifact_id
     )
     return ModelCallRequest.model_validate_json(record.inline_content or "")
+
+
+async def _resolved_call_for_request(
+    uow_factory: Callable[[], VNextUnitOfWork],
+    *,
+    tenant_id: UUID,
+    request: ModelCallRequest,
+) -> ResolvedModelCall:
+    """Reconstruct the resolved call from the request's immutable artifact refs.
+
+    fresh-process recovery reads the binding and schema projection back from the
+    persisted request; it never re-resolves a binding from current deployment
+    config (ADR 0036 §3). ResolvedModelCall's own validators re-check every hash.
+    """
+
+    binding_record = await _load_artifact(
+        uow_factory, tenant_id=tenant_id,
+        artifact_id=request.binding_artifact.artifact_id,
+    )
+    projection_record = await _load_artifact(
+        uow_factory, tenant_id=tenant_id,
+        artifact_id=request.schema_projection_artifact.artifact_id,
+    )
+    binding = ProviderBinding.model_validate_json(binding_record.inline_content or "")
+    projection = SchemaProjectionReport.model_validate_json(
+        projection_record.inline_content or ""
+    )
+    return ResolvedModelCall(
+        request=request, binding=binding, schema_projection=projection
+    )
 
 
 async def _context_for_request(
@@ -753,7 +1050,8 @@ async def execute_turn_interpret(
     operation_id: UUID,
     idempotency_key: str,
     llm: LlmPort,
-    profile: TurnInterpretProviderProfile,
+    binding: ProviderBinding,
+    provider_config: object,
     started_at: datetime,
     now: datetime,
     operation: OperationSpec | None = None,
@@ -767,6 +1065,9 @@ async def execute_turn_interpret(
         raise ValueError("executor only accepts the committed turn.interpret operation")
     if operation.repair_policy.semantic_repair_attempts != 0:
         raise ValueError("V3 executor does not support semantic repair")
+    if binding.operation_name != operation.name:
+        raise ValueError("binding operation does not match the turn operation")
+    conformance_policy = _resolve_conformance_policy(binding)
 
     checkpoint = await _load_checkpoint(
         uow_factory, tenant_id=tenant_id, operation_id=operation_id
@@ -782,7 +1083,8 @@ async def execute_turn_interpret(
             operation_id=operation_id,
             idempotency_key=idempotency_key,
             operation=operation,
-            profile=profile,
+            binding=binding,
+            provider_config=provider_config,
             started_at=started_at,
             contains_test_data=contains_test_data,
         )
@@ -808,12 +1110,14 @@ async def execute_turn_interpret(
         request = await _request_for_checkpoint(
             uow_factory, tenant_id=tenant_id, checkpoint=checkpoint
         )
+        # fresh-process recovery uses the binding persisted in the request, not the
+        # binding the caller happens to pass now (ADR 0036 §3).
         if (
-            request.provider != profile.provider
-            or request.requested_model != profile.requested_model
+            request.binding_id != binding.binding_id
+            or request.binding_hash != binding.binding_hash
         ):
             raise CheckpointConflict(
-                "provider profile does not match the persisted model request"
+                "provider binding does not match the persisted model request"
             )
 
     while True:
@@ -828,8 +1132,8 @@ async def execute_turn_interpret(
                 tenant_id=tenant_id,
                 operation_id=operation_id,
                 attempt_id=request.attempt_id,
-                provider=profile.provider,
-                requested_model=profile.requested_model,
+                provider=binding.gateway_provider,
+                requested_model=binding.requested_model,
                 deadline_at=request.deadline_at,
                 max_attempts=operation.max_attempts,
                 request_artifact=request_artifact,
@@ -858,59 +1162,34 @@ async def execute_turn_interpret(
             )
             if attempt.status == AttemptStatus.CALLING:
                 if now > request.deadline_at:
-                    timeout_result = ModelCallResult(
-                        run_id=request.run_id,
-                        session_id=request.session_id,
-                        turn_id=request.turn_id,
-                        operation_id=request.operation_id,
-                        attempt_id=request.attempt_id,
-                        attempt=request.attempt,
-                        operation_name=request.operation_name,
-                        operation_definition_hash=request.operation_definition_hash,
-                        provider=request.provider,
-                        requested_model=request.requested_model,
-                        resolved_model=request.requested_model,
-                        outcome=ModelOutcome.FAILED,
-                        finish_reason=FinishReason.PROVIDER_ERROR,
-                        failure=ModelFailure(
-                            kind=FailureKind.TRANSPORT_TIMEOUT,
-                            reason_code="provider.timeout",
-                            retryable=True,
-                            safe_message="Attempt deadline elapsed before a durable result.",
-                        ),
-                        usage=TokenUsage(
-                            limitations=("no provider usage available after timeout",)
-                        ),
-                        latency_ms=max(
-                            0,
-                            int(
-                                (request.deadline_at - request.created_at)
-                                .total_seconds()
-                                * 1000
-                            ),
-                        ),
-                        started_at=request.created_at,
-                        completed_at=max(now, request.deadline_at),
-                        prompt_hash=request.prompt_hash,
-                        output_schema_id=request.output_schema_id,
-                        output_schema_hash=request.output_schema_hash,
-                        context_hash=request.context_hash,
-                    )
-                    envelope = ModelCallEnvelope(
-                        result=timeout_result, supporting_artifacts=()
-                    )
+                    envelope = _timeout_envelope(request, binding=binding, now=now)
                 elif request.attempt_id not in callable_attempt_ids:
                     return TurnInterpretExecutionOutcome(
                         status=TurnExecutionStatus.PENDING,
                         checkpoint=checkpoint,
                     )
                 else:
-                    envelope = await llm.generate_structured(request)
-                _validate_result(request, envelope)
+                    resolved_call = await _resolved_call_for_request(
+                        uow_factory, tenant_id=tenant_id, request=request
+                    )
+                    envelope = await llm.generate_structured(resolved_call)
+                _validate_result(request, envelope, binding=binding)
                 result = envelope.result
-                local_output, local_validation_errors = _local_output(result)
+                conformance = evaluate_conformance(
+                    policy=conformance_policy,
+                    binding=binding,
+                    evidence=envelope.execution_evidence,
+                    wire_outcome=result.outcome,
+                )
+                wire_succeeded = result.outcome == ModelOutcome.SUCCEEDED
+                local_output, local_validation_errors = (
+                    _local_output(result)
+                    if wire_succeeded and conformance.eligible
+                    else (None, None)
+                )
                 classification, reason, schema_repair = _attempt_classification(
                     result=result,
+                    conformance_eligible=conformance.eligible,
                     local_output_valid=local_output is not None,
                     attempt=request.attempt,
                     operation=operation,
@@ -929,18 +1208,37 @@ async def execute_turn_interpret(
                     created_at=result.completed_at,
                     contains_test_data=contains_test_data,
                 )
+                evidence_artifact = _evidence_artifact(
+                    envelope.execution_evidence,
+                    request=request,
+                    created_at=result.completed_at,
+                    contains_test_data=contains_test_data,
+                )
+                conformance_artifact = _conformance_artifact(
+                    conformance,
+                    request=request,
+                    created_at=result.completed_at,
+                    contains_test_data=contains_test_data,
+                )
                 checkpoint = await record_attempt_result(
                     uow_factory,
                     tenant_id=tenant_id,
                     operation_id=operation_id,
                     attempt_id=request.attempt_id,
                     result_artifact=result_artifact,
+                    execution_evidence_artifact=evidence_artifact,
+                    conformance_artifact=conformance_artifact,
                     extra_result_artifacts=envelope.supporting_artifacts,
                     outcome=classification,
+                    wire_succeeded=wire_succeeded,
+                    conformance_eligible=conformance.eligible,
                     max_attempts=operation.max_attempts,
                     failure_reason_code=reason,
-                    event_id=turn_execution_uuid(
+                    result_event_id=turn_execution_uuid(
                         operation_id, f"event/attempt/{request.attempt}/result"
+                    ),
+                    conformance_event_id=turn_execution_uuid(
+                        operation_id, f"event/attempt/{request.attempt}/conformance"
                     ),
                     occurred_at=result.completed_at,
                 )
@@ -968,8 +1266,8 @@ async def execute_turn_interpret(
                         tenant_id=tenant_id,
                         operation_id=operation_id,
                         attempt_id=request.attempt_id,
-                        provider=profile.provider,
-                        requested_model=profile.requested_model,
+                        provider=binding.gateway_provider,
+                        requested_model=binding.requested_model,
                         deadline_at=request.deadline_at,
                         max_attempts=operation.max_attempts,
                         request_artifact=retry_artifact,
@@ -995,23 +1293,32 @@ async def execute_turn_interpret(
                 result = ModelCallResult.model_validate_json(
                     result_record.inline_content or ""
                 )
-                _validate_result(
-                    request,
-                    ModelCallEnvelope(
-                        result=result,
-                        supporting_artifacts=tuple(
-                            record
-                            for record in await _supporting_artifacts_for_result(
-                                uow_factory,
-                                tenant_id=tenant_id,
-                                result=result,
-                            )
-                        ),
+                _assert_result_identity(request, result, binding=binding)
+                evidence_record = await _load_artifact(
+                    uow_factory,
+                    tenant_id=tenant_id,
+                    artifact_id=uuid5(
+                        request.attempt_id, "provider-execution-evidence"
                     ),
                 )
-                local_output, local_validation_errors = _local_output(result)
+                recorded_evidence = ProviderExecutionEvidence.model_validate_json(
+                    evidence_record.inline_content or ""
+                )
+                recorded_conformance = evaluate_conformance(
+                    policy=conformance_policy,
+                    binding=binding,
+                    evidence=recorded_evidence,
+                    wire_outcome=result.outcome,
+                )
+                wire_succeeded = result.outcome == ModelOutcome.SUCCEEDED
+                local_output, local_validation_errors = (
+                    _local_output(result)
+                    if wire_succeeded and recorded_conformance.eligible
+                    else (None, None)
+                )
                 classification, _reason, schema_repair = _attempt_classification(
                     result=result,
+                    conformance_eligible=recorded_conformance.eligible,
                     local_output_valid=local_output is not None,
                     attempt=request.attempt,
                     operation=operation,
@@ -1036,8 +1343,8 @@ async def execute_turn_interpret(
                     tenant_id=tenant_id,
                     operation_id=operation_id,
                     attempt_id=request.attempt_id,
-                    provider=profile.provider,
-                    requested_model=profile.requested_model,
+                    provider=binding.gateway_provider,
+                    requested_model=binding.requested_model,
                     deadline_at=request.deadline_at,
                     max_attempts=operation.max_attempts,
                     request_artifact=retry_artifact,

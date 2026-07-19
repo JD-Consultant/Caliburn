@@ -125,7 +125,7 @@ class ModelFailure(DomainModel):
 
 
 class ModelCallResult(DomainModel):
-    schema_version: Literal["model_call_result.v1"] = "model_call_result.v1"
+    schema_version: Literal["model_call_result.v2"] = "model_call_result.v2"
     run_id: UUID
     session_id: UUID
     turn_id: UUID | None = None
@@ -134,7 +134,9 @@ class ModelCallResult(DomainModel):
     attempt: int = Field(ge=1)
     operation_name: StableName
     operation_definition_hash: Sha256
-    provider: StableName
+    binding_id: StableName
+    binding_hash: Sha256
+    gateway_provider: StableName
     requested_model: NonEmptyText
     resolved_model: NonEmptyText
     provider_request_id: str | None = None

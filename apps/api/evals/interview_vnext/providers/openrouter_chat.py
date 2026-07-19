@@ -35,11 +35,19 @@ from uuid import uuid5
 import httpx
 
 from app.interview_vnext.domain.hashing import canonical_json
+from app.interview_vnext.llm.binding import ProviderBinding
+from app.interview_vnext.llm.execution import (
+    CacheStatus,
+    ProviderExecutionEvidence,
+    TransformationStatus,
+    define_provider_execution_evidence,
+)
 from app.interview_vnext.llm.port import (
     LlmPort,
     MessageRole,
     ModelCallEnvelope,
     ModelCallRequest,
+    ResolvedModelCall,
 )
 from app.interview_vnext.llm.result import (
     FailureKind,
@@ -53,6 +61,7 @@ from app.interview_vnext.llm.result import (
 )
 from app.interview_vnext.observability.artifacts import (
     ArtifactRecord,
+    ArtifactRef,
     RedactionStatus,
     build_inline_artifact,
 )
@@ -396,7 +405,9 @@ def _allowed_headers(headers: httpx.Headers) -> dict[str, str]:
     }
 
 
-def _identity_fields(request: ModelCallRequest) -> dict[str, Any]:
+def _identity_fields(
+    request: ModelCallRequest, binding: ProviderBinding
+) -> dict[str, Any]:
     return {
         "run_id": request.run_id,
         "session_id": request.session_id,
@@ -406,7 +417,9 @@ def _identity_fields(request: ModelCallRequest) -> dict[str, Any]:
         "attempt": request.attempt,
         "operation_name": request.operation_name,
         "operation_definition_hash": request.operation_definition_hash,
-        "provider": request.provider,
+        "binding_id": request.binding_id,
+        "binding_hash": request.binding_hash,
+        "gateway_provider": binding.gateway_provider,
         "requested_model": request.requested_model,
         "prompt_hash": request.prompt_hash,
         "output_schema_id": request.output_schema_id,
@@ -521,11 +534,13 @@ class OpenRouterChatEvalAdapter(LlmPort):
         if self._owns_http_client:
             await self._client.aclose()
 
-    async def generate_structured(self, request: ModelCallRequest) -> ModelCallEnvelope:
+    async def generate_structured(self, call: ResolvedModelCall) -> ModelCallEnvelope:
+        request = call.request
+        provider_binding = call.binding
         started_at = self._now()
         started_mono = self._monotonic()
         try:
-            binding = self._validate_binding(request)
+            schema_binding = self._validate_binding(request, provider_binding)
         except _LocalBindingError as exc:
             failure = _Failure(
                 FailureKind.INVALID_REQUEST,
@@ -534,7 +549,7 @@ class OpenRouterChatEvalAdapter(LlmPort):
                 SAFE_MESSAGES["binding"],
             )
             return self._failure_envelope(
-                request, failure,
+                request, provider_binding, failure,
                 started_at=started_at, started_mono=started_mono, detail=exc.detail,
             )
 
@@ -545,12 +560,12 @@ class OpenRouterChatEvalAdapter(LlmPort):
                 SAFE_MESSAGES["timeout"],
             )
             return self._failure_envelope(
-                request, failure,
+                request, provider_binding, failure,
                 started_at=started_at, started_mono=started_mono,
                 detail="attempt deadline expired before the provider call",
             )
 
-        body = self._build_body(request, binding)
+        body = self._build_body(request, schema_binding)
         headers = {
             "Authorization": f"Bearer {self._api_key}",
             "Content-Type": "application/json",
@@ -575,7 +590,7 @@ class OpenRouterChatEvalAdapter(LlmPort):
                 SAFE_MESSAGES["timeout"],
             )
             return self._failure_envelope(
-                request, failure,
+                request, provider_binding, failure,
                 started_at=started_at, started_mono=started_mono,
                 detail=f"transport timeout: {type(exc).__name__}",
                 exception=exc,
@@ -586,21 +601,25 @@ class OpenRouterChatEvalAdapter(LlmPort):
                 SAFE_MESSAGES["connection"],
             )
             return self._failure_envelope(
-                request, failure,
+                request, provider_binding, failure,
                 started_at=started_at, started_mono=started_mono,
                 detail=f"transport error: {type(exc).__name__}",
                 exception=exc,
             )
         return self._normalize_response(
-            request, response, started_at=started_at, started_mono=started_mono
+            request, provider_binding, response,
+            started_at=started_at, started_mono=started_mono,
         )
 
     # ---- pre-HTTP validation (§7.1) -----------------------------------------
 
-    def _validate_binding(self, request: ModelCallRequest) -> SchemaBinding:
-        if request.provider != self._config.provider:
+    def _validate_binding(
+        self, request: ModelCallRequest, provider_binding: ProviderBinding
+    ) -> SchemaBinding:
+        if provider_binding.gateway_provider != self._config.provider:
             raise _LocalBindingError(
-                f"request provider {request.provider!r} is not approved for this adapter"
+                f"binding gateway provider {provider_binding.gateway_provider!r} "
+                "is not approved for this adapter"
             )
         if request.requested_model != self._config.requested_model:
             raise _LocalBindingError(
@@ -796,6 +815,7 @@ class OpenRouterChatEvalAdapter(LlmPort):
     def _failure_envelope(
         self,
         request: ModelCallRequest,
+        binding: ProviderBinding,
         failure: _Failure,
         *,
         started_at: datetime,
@@ -815,8 +835,9 @@ class OpenRouterChatEvalAdapter(LlmPort):
             detail=detail,
             exception_type=type(exception).__name__ if exception is not None else None,
         )
+        usage = TokenUsage(limitations=(LIMITATION_NO_RESPONSE,))
         result = ModelCallResult(
-            **_identity_fields(request),
+            **_identity_fields(request, binding),
             resolved_model=request.requested_model,
             provider_request_id=None,
             provider_conversation_id=None,
@@ -834,18 +855,26 @@ class OpenRouterChatEvalAdapter(LlmPort):
                 provider_error_code=failure.provider_error_code,
                 error_artifact=error.ref,
             ),
-            usage=TokenUsage(limitations=(LIMITATION_NO_RESPONSE,)),
+            usage=usage,
             latency_ms=latency_ms,
             started_at=started_at,
             completed_at=completed_at,
         )
-        return ModelCallEnvelope(result=result, supporting_artifacts=(error,))
+        evidence = _openrouter_execution_evidence(
+            binding, request, resolved_model=None, routing=None, routing_ref=None,
+            usage=usage, cost_decimal=None, request_id=None, generation_id=None,
+            transformation_status=TransformationStatus.UNKNOWN,
+        )
+        return ModelCallEnvelope(
+            result=result, execution_evidence=evidence, supporting_artifacts=(error,)
+        )
 
     # ---- response normalization (§9/§10/§11) --------------------------------
 
     def _normalize_response(
         self,
         request: ModelCallRequest,
+        binding: ProviderBinding,
         response: httpx.Response,
         *,
         started_at: datetime,
@@ -870,7 +899,7 @@ class OpenRouterChatEvalAdapter(LlmPort):
         )
 
         base = dict(
-            **_identity_fields(request),
+            **_identity_fields(request, binding),
             provider_request_id=request_id,
             provider_conversation_id=None,
             latency_ms=latency_ms,
@@ -894,7 +923,7 @@ class OpenRouterChatEvalAdapter(LlmPort):
                     status_code=status, request_id=request_id,
                 )
                 return self._assemble_failure(
-                    base, failure, provider_finish_reason=f"http_error:{status}:decode",
+                    binding, base, failure, provider_finish_reason=f"http_error:{status}:decode",
                     usage=TokenUsage(limitations=(LIMITATION_NO_USAGE,)),
                     error=error, extra=(raw, visible), visible=visible,
                     resolved_model=request.requested_model,
@@ -907,7 +936,7 @@ class OpenRouterChatEvalAdapter(LlmPort):
                 body=response.text[:2000],
             )
             return self._assemble_failure(
-                base, failure, provider_finish_reason=f"http_error:{status}:non_json",
+                binding, base, failure, provider_finish_reason=f"http_error:{status}:non_json",
                 usage=TokenUsage(limitations=(LIMITATION_NO_USAGE,)),
                 error=error, extra=(raw,), visible=None, resolved_model=request.requested_model,
             )
@@ -916,7 +945,7 @@ class OpenRouterChatEvalAdapter(LlmPort):
 
         try:
             return self._interpret_body(
-                request, body, base=base, usage=usage, raw=raw,
+                request, binding, body, base=base, usage=usage, raw=raw,
                 status=status, request_id=request_id,
                 generation_id_header=generation_id_header, retry_after=retry_after,
                 completed_at=completed_at,
@@ -942,14 +971,14 @@ class OpenRouterChatEvalAdapter(LlmPort):
                 exc.error_type in _REFUSAL_ERROR_TYPES
             ):
                 return self._assemble_refusal(
-                    base, usage=usage, visible=visible or self._visible_artifact(
+                    binding, base, usage=usage, visible=visible or self._visible_artifact(
                         request, body, created_at=completed_at
                     ),
                     raw=raw, provider_category=exc.error_type or "refusal",
                     resolved_model=resolved or request.requested_model,
                 )
             return self._assemble_failure(
-                base, exc.failure, provider_finish_reason=exc.provider_finish_reason,
+                binding, base, exc.failure, provider_finish_reason=exc.provider_finish_reason,
                 usage=usage, error=error, extra=extras, visible=visible,
                 resolved_model=resolved
                 if isinstance(resolved, str) and resolved
@@ -959,6 +988,7 @@ class OpenRouterChatEvalAdapter(LlmPort):
     def _interpret_body(
         self,
         request: ModelCallRequest,
+        binding: ProviderBinding,
         body: dict[str, Any],
         *,
         base: dict[str, Any],
@@ -1060,7 +1090,7 @@ class OpenRouterChatEvalAdapter(LlmPort):
                 route_conformance=routing_conformance(routing),
             )
             return self._assemble_failure(
-                base, failure, provider_finish_reason=_provider_finish(body),
+                binding, base, failure, provider_finish_reason=_provider_finish(body),
                 usage=usage, error=error, extra=(raw, routing_artifact, visible),
                 visible=visible, resolved_model=resolved_model,
             )
@@ -1078,7 +1108,7 @@ class OpenRouterChatEvalAdapter(LlmPort):
                 route_conformance=routing_conformance(routing),
             )
             return self._assemble_failure(
-                base, failure, provider_finish_reason=(
+                binding, base, failure, provider_finish_reason=(
                     f"route_contaminated:{routing.failures[0]}"
                 ),
                 usage=usage, error=error, extra=(raw, routing_artifact, visible),
@@ -1100,7 +1130,7 @@ class OpenRouterChatEvalAdapter(LlmPort):
                 request_id=request_id, generation_id=generation_id,
             )
             return self._assemble_failure(
-                base, failure, provider_finish_reason="chat:none", usage=usage,
+                binding, base, failure, provider_finish_reason="chat:none", usage=usage,
                 error=error, extra=(raw, routing_artifact, visible), visible=visible,
                 resolved_model=resolved_model,
             )
@@ -1117,7 +1147,7 @@ class OpenRouterChatEvalAdapter(LlmPort):
                 request_id=request_id, generation_id=generation_id,
             )
             return self._assemble_failure(
-                base, failure, provider_finish_reason="chat:none", usage=usage,
+                binding, base, failure, provider_finish_reason="chat:none", usage=usage,
                 error=error, extra=(raw, routing_artifact, visible), visible=visible,
                 resolved_model=resolved_model,
             )
@@ -1134,7 +1164,7 @@ class OpenRouterChatEvalAdapter(LlmPort):
             visible = self._visible_artifact(request, body, created_at=completed_at)
             if error_type in _REFUSAL_ERROR_TYPES:
                 return self._assemble_refusal(
-                    base, usage=usage, visible=visible, raw=raw,
+                    binding, base, usage=usage, visible=visible, raw=raw,
                     routing=routing_artifact, provider_category=error_type,
                     resolved_model=resolved_model,
                 )
@@ -1146,7 +1176,7 @@ class OpenRouterChatEvalAdapter(LlmPort):
                 retry_after_seconds=retry_hint,
             )
             return self._assemble_failure(
-                base, failure,
+                binding, base, failure,
                 provider_finish_reason=f"embedded_error:{error_type or 'unmapped'}",
                 usage=usage, error=error, extra=(raw, routing_artifact, visible),
                 visible=visible, resolved_model=resolved_model,
@@ -1168,17 +1198,22 @@ class OpenRouterChatEvalAdapter(LlmPort):
                 request_id=request_id, generation_id=generation_id,
             )
             return self._assemble_failure(
-                base, failure, provider_finish_reason=provider_finish, usage=usage,
+                binding, base, failure, provider_finish_reason=provider_finish, usage=usage,
                 error=error, extra=(raw, routing_artifact, visible), visible=visible,
                 resolved_model=resolved_model,
             )
 
         if finish_reason == "content_filter":
             return self._assemble_refusal(
-                base, usage=usage, visible=visible, raw=raw, routing=routing_artifact,
+                binding, base, usage=usage, visible=visible, raw=raw, routing=routing_artifact,
                 provider_category="content_filter", resolved_model=resolved_model,
             )
 
+        clean_cost = _decimal_str(
+            body.get("usage", {}).get("cost")
+            if isinstance(body.get("usage"), dict)
+            else None
+        )
         if finish_reason == "length":
             result = ModelCallResult(
                 **base, resolved_model=resolved_model,
@@ -1188,8 +1223,15 @@ class OpenRouterChatEvalAdapter(LlmPort):
                 parsed_output=None, visible_response_artifact=visible.ref,
                 refusal=None, failure=None, usage=usage,
             )
+            evidence = _openrouter_execution_evidence(
+                binding, request, resolved_model=resolved_model, routing=routing,
+                routing_ref=routing_artifact.ref, usage=usage, cost_decimal=clean_cost,
+                request_id=request_id, generation_id=generation_id,
+                transformation_status=TransformationStatus.CLEAN,
+            )
             return ModelCallEnvelope(
-                result=result, supporting_artifacts=(raw, routing_artifact, visible)
+                result=result, execution_evidence=evidence,
+                supporting_artifacts=(raw, routing_artifact, visible),
             )
 
         if finish_reason != "stop":
@@ -1203,7 +1245,7 @@ class OpenRouterChatEvalAdapter(LlmPort):
                 request_id=request_id, generation_id=generation_id,
             )
             return self._assemble_failure(
-                base, failure, provider_finish_reason=provider_finish, usage=usage,
+                binding, base, failure, provider_finish_reason=provider_finish, usage=usage,
                 error=error, extra=(raw, routing_artifact, visible), visible=visible,
                 resolved_model=resolved_model,
             )
@@ -1221,7 +1263,7 @@ class OpenRouterChatEvalAdapter(LlmPort):
                 request_id=request_id, generation_id=generation_id,
             )
             return self._assemble_failure(
-                base, failure, provider_finish_reason=provider_finish, usage=usage,
+                binding, base, failure, provider_finish_reason=provider_finish, usage=usage,
                 error=error, extra=(raw, routing_artifact, visible), visible=visible,
                 resolved_model=resolved_model,
             )
@@ -1238,7 +1280,7 @@ class OpenRouterChatEvalAdapter(LlmPort):
                 request_id=request_id, generation_id=generation_id,
             )
             return self._assemble_failure(
-                base, failure, provider_finish_reason=provider_finish, usage=usage,
+                binding, base, failure, provider_finish_reason=provider_finish, usage=usage,
                 error=error, extra=(raw, routing_artifact, visible), visible=visible,
                 resolved_model=resolved_model,
             )
@@ -1253,7 +1295,7 @@ class OpenRouterChatEvalAdapter(LlmPort):
                 request_id=request_id, generation_id=generation_id,
             )
             return self._assemble_failure(
-                base, failure, provider_finish_reason=provider_finish, usage=usage,
+                binding, base, failure, provider_finish_reason=provider_finish, usage=usage,
                 error=error, extra=(raw, routing_artifact, visible), visible=visible,
                 resolved_model=resolved_model,
             )
@@ -1267,8 +1309,15 @@ class OpenRouterChatEvalAdapter(LlmPort):
             visible_response_artifact=visible.ref, refusal=None, failure=None,
             usage=usage,
         )
+        evidence = _openrouter_execution_evidence(
+            binding, request, resolved_model=resolved_model, routing=routing,
+            routing_ref=routing_artifact.ref, usage=usage, cost_decimal=clean_cost,
+            request_id=request_id, generation_id=generation_id,
+            transformation_status=TransformationStatus.CLEAN,
+        )
         return ModelCallEnvelope(
-            result=result, supporting_artifacts=(raw, routing_artifact, visible)
+            result=result, execution_evidence=evidence,
+            supporting_artifacts=(raw, routing_artifact, visible),
         )
 
     # ---- routing (§9.3/§12.2) -----------------------------------------------
@@ -1414,6 +1463,7 @@ class OpenRouterChatEvalAdapter(LlmPort):
 
     def _assemble_failure(
         self,
+        binding: ProviderBinding,
         base: dict[str, Any],
         failure: _Failure,
         *,
@@ -1439,11 +1489,14 @@ class OpenRouterChatEvalAdapter(LlmPort):
             usage=usage,
         )
         return ModelCallEnvelope(
-            result=result, supporting_artifacts=(*extra, error)
+            result=result,
+            execution_evidence=_unknown_evidence_from_base(binding, base, usage),
+            supporting_artifacts=(*extra, error),
         )
 
     def _assemble_refusal(
         self,
+        binding: ProviderBinding,
         base: dict[str, Any],
         *,
         usage: TokenUsage,
@@ -1466,10 +1519,118 @@ class OpenRouterChatEvalAdapter(LlmPort):
             ),
             failure=None, usage=usage,
         )
-        return ModelCallEnvelope(result=result, supporting_artifacts=extras)
+        return ModelCallEnvelope(
+            result=result,
+            execution_evidence=_unknown_evidence_from_base(binding, base, usage),
+            supporting_artifacts=extras,
+        )
 
 
 # ---- module-level pure helpers ----------------------------------------------
+
+
+def _unknown_evidence_from_base(
+    binding: ProviderBinding, base: dict[str, Any], usage: TokenUsage
+) -> ProviderExecutionEvidence:
+    """Evidence for a wire failure/refusal: conformance is wire_not_succeeded, so
+    only the binding-scoped identity fields matter; route facts are unknown."""
+
+    return define_provider_execution_evidence(
+        binding_id=binding.binding_id,
+        binding_hash=binding.binding_hash,
+        adapter_id=binding.adapter_id,
+        adapter_version=binding.adapter_version,
+        gateway_provider=binding.gateway_provider,
+        requested_model=base["requested_model"],
+        gateway_resolved_model=None,
+        upstream_provider=None,
+        upstream_model=None,
+        upstream_endpoint=None,
+        route_strategy=None,
+        upstream_attempt_count=None,
+        transformation_status=TransformationStatus.UNKNOWN,
+        pipeline_stages=(),
+        cache_status=CacheStatus.UNKNOWN,
+        provider_request_id=None,
+        generation_id=None,
+        usage=usage,
+        cost_decimal=None,
+        limitations=("openrouter execution evidence unavailable for a failed attempt",),
+        raw_routing_artifact=None,
+    )
+
+
+def _openrouter_execution_evidence(
+    binding: ProviderBinding,
+    request: ModelCallRequest,
+    *,
+    resolved_model: str | None,
+    routing: "_RoutingCheck | None",
+    routing_ref: ArtifactRef | None,
+    usage: TokenUsage,
+    cost_decimal: str | None,
+    request_id: str | None,
+    generation_id: str | None,
+    transformation_status: TransformationStatus,
+) -> ProviderExecutionEvidence:
+    """Normalize one attempt's route/usage facts into neutral execution evidence.
+
+    R3 mechanical migration: the adapter still fails closed on contamination
+    (returning a wire failure), so a wire-succeeded result always carries a clean
+    direct route here. Eligibility is decided later by the application conformance
+    policy; this only records what happened.
+    """
+
+    if routing is not None and routing.metadata_present:
+        upstream_provider = routing.selected_provider_name
+        upstream_model = routing.selected_model
+        route_strategy = routing.strategy if isinstance(routing.strategy, str) else None
+        upstream_attempt = (
+            routing.router_attempt if isinstance(routing.router_attempt, int) else None
+        )
+        upstream_endpoint = (
+            binding.upstream_endpoint if upstream_provider is not None else None
+        )
+        cache_status = CacheStatus.ABSENT
+    else:
+        upstream_provider = upstream_model = route_strategy = upstream_endpoint = None
+        upstream_attempt = None
+        cache_status = CacheStatus.UNKNOWN
+    limitations: list[str] = []
+    if (
+        resolved_model is None
+        or upstream_provider is None
+        or upstream_model is None
+        or upstream_endpoint is None
+        or route_strategy is None
+        or upstream_attempt is None
+    ):
+        limitations.append("openrouter route metadata was not fully available")
+    if cost_decimal is None:
+        limitations.append("openrouter response did not include cost")
+    return define_provider_execution_evidence(
+        binding_id=binding.binding_id,
+        binding_hash=binding.binding_hash,
+        adapter_id=binding.adapter_id,
+        adapter_version=binding.adapter_version,
+        gateway_provider=binding.gateway_provider,
+        requested_model=request.requested_model,
+        gateway_resolved_model=resolved_model,
+        upstream_provider=upstream_provider,
+        upstream_model=upstream_model,
+        upstream_endpoint=upstream_endpoint,
+        route_strategy=route_strategy,
+        upstream_attempt_count=upstream_attempt,
+        transformation_status=transformation_status,
+        pipeline_stages=(),
+        cache_status=cache_status,
+        provider_request_id=request_id,
+        generation_id=generation_id,
+        usage=usage,
+        cost_decimal=cost_decimal,
+        limitations=tuple(sorted(set(limitations))),
+        raw_routing_artifact=routing_ref,
+    )
 
 
 def routing_conformance(routing: _RoutingCheck) -> dict[str, Any]:

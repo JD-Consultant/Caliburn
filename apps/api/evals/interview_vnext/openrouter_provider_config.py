@@ -23,6 +23,10 @@ from pydantic import Field, model_validator
 from app.interview_vnext.domain.base import DomainModel
 from app.interview_vnext.domain.hashing import canonical_hash
 from app.interview_vnext.domain.identifiers import NonEmptyText, Sha256
+from app.interview_vnext.llm.binding import ProviderBinding, define_provider_binding
+from app.interview_vnext.llm.conformance import ATTRIBUTION_STRICT_POLICY_V1
+from app.interview_vnext.llm.operation import ContractIdentity
+from app.interview_vnext.llm.portable_schema import PORTABLE_STRICT_OUTPUT_POLICY_V2
 
 from .openrouter_model_catalog import (
     OpenRouterEndpointSnapshot,
@@ -228,4 +232,62 @@ def build_openrouter_eval_config(
         reasoning_effort=probe_inputs.reasoning_effort,
         reasoning_max_tokens=probe_inputs.reasoning_max_tokens,
         connect_timeout_seconds=probe_inputs.connect_timeout_seconds,
+    )
+
+
+OPENROUTER_ADAPTER_ID = "openrouter.chat-completions"
+OPENROUTER_ADAPTER_VERSION = "2.0.0"
+
+
+def build_openrouter_eval_binding(
+    config: OpenRouterChatEvalConfig,
+    *,
+    operation_name: str = "turn.interpret",
+    binding_id: str = "turn-interpret-c1-openrouter-attribution-strict",
+    quality_profile: str = "turn-interpret-c1-high-precision",
+    reasoning_policy: str = "medium-excluded",
+) -> ProviderBinding:
+    """The sole live binding builder (ADR 0036 §6.1).
+
+    Derives the runtime binding from a verified, secret-free config; the provider
+    config hash binds the immutable config document the executor persists.
+    """
+
+    accepted_upstream = tuple(
+        sorted({config.requested_model, config.catalog_canonical_model})
+    )
+    return define_provider_binding(
+        binding_id=binding_id,
+        operation_name=operation_name,
+        quality_profile=quality_profile,
+        adapter_id=OPENROUTER_ADAPTER_ID,
+        adapter_version=OPENROUTER_ADAPTER_VERSION,
+        gateway_provider=config.provider,
+        requested_model=config.requested_model,
+        accepted_gateway_models=(config.requested_model,),
+        upstream_provider=config.expected_upstream_provider_name,
+        upstream_endpoint=config.upstream_endpoint_slug,
+        accepted_upstream_models=accepted_upstream,
+        required_capabilities=(
+            "routing-metadata",
+            "single-choice",
+            "structured-output.native-json-schema",
+            "usage.cost",
+            "usage.tokens",
+        ),
+        schema_projection_policy=ContractIdentity(
+            name=PORTABLE_STRICT_OUTPUT_POLICY_V2.name,
+            version=PORTABLE_STRICT_OUTPUT_POLICY_V2.version,
+            content_hash=PORTABLE_STRICT_OUTPUT_POLICY_V2.policy_hash,
+        ),
+        conformance_policy=ContractIdentity(
+            name=ATTRIBUTION_STRICT_POLICY_V1.name,
+            version=ATTRIBUTION_STRICT_POLICY_V1.version,
+            content_hash=ATTRIBUTION_STRICT_POLICY_V1.policy_hash,
+        ),
+        storage_policy="stateless-no-provider-store",
+        cache_policy="disabled",
+        reasoning_policy=reasoning_policy,
+        data_collection_policy=config.data_collection,
+        provider_config_hash=config.config_hash,
     )

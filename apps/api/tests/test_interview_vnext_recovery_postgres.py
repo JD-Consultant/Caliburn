@@ -45,7 +45,7 @@ from app.interview_vnext.domain.session import (
 from app.interview_vnext.domain.state import InterviewState
 from app.interview_vnext.observability.artifacts import build_inline_artifact
 from app.interview_vnext.observability.checkpoint import CheckpointStatus
-from app.interview_vnext.observability.taxonomy import INTERVIEW_VNEXT_EXECUTION_V1
+from app.interview_vnext.observability.taxonomy import INTERVIEW_VNEXT_EXECUTION_V2
 from app.interview_vnext.persistence.errors import (
     CheckpointConflict,
     ExecutionEventConflict,
@@ -67,7 +67,7 @@ def initial_state(ids) -> InterviewState:
 
 
 def open_run(ids) -> WorkflowRun:
-    tax = INTERVIEW_VNEXT_EXECUTION_V1
+    tax = INTERVIEW_VNEXT_EXECUTION_V2
     return WorkflowRun(
         run_id=ids.run_id, session_id=ids.session_id,
         architecture_id=ARCHITECTURE_ID, workflow_version="1.0.0",
@@ -133,6 +133,12 @@ async def start(factory, ids, *, attempt_id: UUID, at=None, deadline=None):
 
 async def record(factory, ids, *, attempt_id: UUID, name: str, outcome: AttemptOutcome,
                  at=None):
+    # V3-5A §7.3: result + normalized execution evidence + conformance report are
+    # persisted in one transaction. record_attempt_result validates only artifact
+    # scope, not content, so scope-correct JSON artifacts stand in for the
+    # provider's evidence/conformance here. SUCCEEDED is a clean wire success with
+    # an eligible conformance; the failure outcomes are wire failures.
+    succeeded = outcome == AttemptOutcome.SUCCEEDED
     return await record_attempt_result(
         uow_factory(factory), tenant_id=ids.tenant_id, operation_id=op_id(ids),
         attempt_id=attempt_id,
@@ -142,7 +148,15 @@ async def record(factory, ids, *, attempt_id: UUID, name: str, outcome: AttemptO
             {"outcome": outcome.value, "n": name},
             attempt_id=attempt_id,
         ),
-        outcome=outcome, max_attempts=MAX_ATTEMPTS, event_id=uuid4(),
+        execution_evidence_artifact=artifact(
+            ids, f"{name}-evidence", {"evidence": name}, attempt_id=attempt_id
+        ),
+        conformance_artifact=artifact(
+            ids, f"{name}-conformance", {"eligible": succeeded}, attempt_id=attempt_id
+        ),
+        outcome=outcome, wire_succeeded=succeeded, conformance_eligible=succeeded,
+        max_attempts=MAX_ATTEMPTS,
+        result_event_id=uuid4(), conformance_event_id=uuid4(),
         occurred_at=at or NOW + timedelta(seconds=3))
 
 

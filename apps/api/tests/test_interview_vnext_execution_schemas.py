@@ -12,6 +12,7 @@ from app.interview_vnext.application.write_schemas import (
     SCHEMA_DIR as APPLICATION_SCHEMA_DIR,
 )
 from app.interview_vnext.llm.schema_exports import (
+    HISTORICAL_SCHEMAS as LLM_HISTORICAL_SCHEMAS,
     SCHEMA_EXPORTS as LLM_SCHEMA_EXPORTS,
     published_schema as published_llm_schema,
 )
@@ -38,6 +39,7 @@ from app.interview_vnext.llm.write_verifier_policies import (
     POLICY_DIR as VERIFIER_POLICY_DIR,
 )
 from app.interview_vnext.observability.schema_exports import (
+    HISTORICAL_SCHEMAS as CAPTURE_HISTORICAL_SCHEMAS,
     SCHEMA_EXPORTS as CAPTURE_SCHEMA_EXPORTS,
     published_schema as published_capture_schema,
 )
@@ -55,12 +57,19 @@ def test_committed_application_llm_and_capture_schemas_match_contracts():
             APPLICATION_SCHEMA_DIR,
             APPLICATION_SCHEMA_EXPORTS,
             published_application_schema,
+            frozenset(),
         ),
-        (LLM_SCHEMA_DIR, LLM_SCHEMA_EXPORTS, published_llm_schema),
-        (CAPTURE_SCHEMA_DIR, CAPTURE_SCHEMA_EXPORTS, published_capture_schema),
+        (LLM_SCHEMA_DIR, LLM_SCHEMA_EXPORTS, published_llm_schema, LLM_HISTORICAL_SCHEMAS),
+        (
+            CAPTURE_SCHEMA_DIR,
+            CAPTURE_SCHEMA_EXPORTS,
+            published_capture_schema,
+            CAPTURE_HISTORICAL_SCHEMAS,
+        ),
     )
-    for directory, exports, publisher in groups:
-        assert {path.name for path in directory.glob("*.json")} == set(exports)
+    for directory, exports, publisher, historical in groups:
+        # active exports are regenerated from models; historical files stay frozen
+        assert {path.name for path in directory.glob("*.json")} == set(exports) | historical
         for filename in exports:
             committed = json.loads((directory / filename).read_text(encoding="utf-8"))
             assert committed == publisher(filename)
@@ -70,6 +79,16 @@ def test_committed_application_llm_and_capture_schemas_match_contracts():
             for definition in committed.get("$defs", {}).values():
                 if definition.get("type") == "object":
                     assert definition["additionalProperties"] is False
+
+
+def test_historical_llm_schemas_stay_present_and_frozen():
+    """v1 request/result schemas are superseded but never deleted (plan §4.1)."""
+
+    for filename in LLM_HISTORICAL_SCHEMAS:
+        committed = json.loads((LLM_SCHEMA_DIR / filename).read_text(encoding="utf-8"))
+        assert committed["$id"] == f"https://caliburn.local/schemas/{filename}"
+        # the historical file is not regenerated: its schema_version stays v1
+        assert filename not in LLM_SCHEMA_EXPORTS
 
 
 def test_committed_context_policies_match_hash_addressed_registry():

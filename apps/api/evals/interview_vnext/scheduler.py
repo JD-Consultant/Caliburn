@@ -24,9 +24,9 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from app.interview_vnext.application.operation_executor import (
     TurnExecutionStatus,
-    TurnInterpretProviderProfile,
 )
 from app.interview_vnext.domain.hashing import canonical_json
+from app.interview_vnext.llm.binding import ProviderBinding
 from app.interview_vnext.llm.port import LlmPort
 from app.interview_vnext.llm.turn_interpret import TurnInterpretOutput
 
@@ -381,7 +381,8 @@ async def schedule_slot(
     slot_index: int,
     session_factory: async_sessionmaker,
     llm_factory: LlmFactory,
-    profile: TurnInterpretProviderProfile,
+    binding: ProviderBinding,
+    provider_config: object,
     trial_started_at_factory: Callable[[], object],
     max_trial_attempts: int,
     budget: Budget,
@@ -414,7 +415,8 @@ async def schedule_slot(
                 inputs,
                 session_factory=session_factory,
                 llm=llm_factory(inputs, trial_id),
-                profile=profile,
+                binding=binding,
+                provider_config=provider_config,
                 trial_id=trial_id,
                 trial_started_at=trial_started_at_factory(),
             )

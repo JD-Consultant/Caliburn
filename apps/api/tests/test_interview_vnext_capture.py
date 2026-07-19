@@ -282,6 +282,8 @@ def test_outbox_retries_after_exporter_failure_without_duplicate_event():
 def test_checkpoint_recovery_reuses_provider_result_and_committed_outcome():
     request_artifact = artifact("model.request").ref
     result_artifact = artifact("model.result").ref
+    evidence_artifact = artifact("model.provider_execution_evidence").ref
+    conformance_artifact = artifact("model.provider_conformance").ref
     verification_artifact = artifact("verification.result").ref
     domain_result_artifact = artifact("domain.reducer_result").ref
     response_artifact = artifact("consultant.response").ref
@@ -309,11 +311,15 @@ def test_checkpoint_recovery_reuses_provider_result_and_committed_outcome():
     provider_completed = mark_provider_completed(
         calling,
         result_artifact=result_artifact,
+        execution_evidence_artifact=evidence_artifact,
+        conformance_artifact=conformance_artifact,
         occurred_at=NOW + timedelta(seconds=2),
     )
     assert mark_provider_completed(
         provider_completed,
         result_artifact=result_artifact,
+        execution_evidence_artifact=evidence_artifact,
+        conformance_artifact=conformance_artifact,
         occurred_at=NOW + timedelta(seconds=99),
     ) == provider_completed
     verified = mark_verified(
@@ -419,6 +425,8 @@ def test_checkpoint_persists_failed_attempt_before_retrying_same_operation():
     completed = mark_provider_completed(
         second,
         result_artifact=final_result,
+        execution_evidence_artifact=artifact("attempt.evidence.success").ref,
+        conformance_artifact=artifact("attempt.conformance.success").ref,
         occurred_at=NOW + timedelta(seconds=3),
     )
 

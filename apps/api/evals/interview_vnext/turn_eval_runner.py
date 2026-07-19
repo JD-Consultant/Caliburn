@@ -21,7 +21,6 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 from app.interview_vnext.application.durable_commands import apply_durable_command
 from app.interview_vnext.application.operation_executor import (
     TurnExecutionStatus,
-    TurnInterpretProviderProfile,
     TurnInterpretExecutionOutcome,
     execute_turn_interpret,
 )
@@ -32,10 +31,11 @@ from app.interview_vnext.application.persistence import (
 from app.interview_vnext.domain.hashing import canonical_hash
 from app.interview_vnext.domain.session import ARCHITECTURE_ID
 from app.interview_vnext.domain.state import InterviewState
+from app.interview_vnext.llm.binding import ProviderBinding
 from app.interview_vnext.llm.port import LlmPort
 from app.interview_vnext.observability.artifacts import ArtifactRef
 from app.interview_vnext.observability.events import ExecutionStatus
-from app.interview_vnext.observability.taxonomy import INTERVIEW_VNEXT_EXECUTION_V1
+from app.interview_vnext.observability.taxonomy import INTERVIEW_VNEXT_EXECUTION_V2
 from app.interview_vnext.persistence.unit_of_work import SqlAlchemyVNextUnitOfWork
 from app.models import JobProfile, User
 
@@ -102,11 +102,12 @@ async def run_trial(
     *,
     session_factory: async_sessionmaker,
     llm: LlmPort,
-    profile: TurnInterpretProviderProfile,
+    binding: ProviderBinding,
+    provider_config: object,
     trial_id: UUID,
     trial_started_at: datetime,
 ) -> TrialExecution:
-    """§11 one-trial flow steps 2–10;caller 只提供 runtime inputs 與 LlmPort。"""
+    """§11 one-trial flow steps 2–10;caller 提供 runtime inputs、LlmPort 與 binding。"""
 
     ids = trial_scoped_ids(trial_id)
     base_time = trial_started_at - FIXTURE_WINDOW
@@ -116,7 +117,7 @@ async def run_trial(
 
     await provision_identity(session_factory, ids)
 
-    taxonomy = INTERVIEW_VNEXT_EXECUTION_V1
+    taxonomy = INTERVIEW_VNEXT_EXECUTION_V2
     state = InterviewState(
         session=session_at(
             session_id=ids.session_id,
@@ -178,7 +179,8 @@ async def run_trial(
         operation_id=ids.operation_id,
         idempotency_key=f"turn-eval:{trial_id}:turn-interpret",
         llm=llm,
-        profile=profile,
+        binding=binding,
+        provider_config=provider_config,
         started_at=trial_started_at,
         now=trial_started_at,
         contains_test_data=True,
@@ -195,6 +197,8 @@ async def run_trial(
         for ref in (
             checkpoint.request_artifact,
             checkpoint.provider_result_artifact,
+            checkpoint.provider_execution_evidence_artifact,
+            checkpoint.provider_conformance_artifact,
             checkpoint.verification_artifact,
             checkpoint.domain_result_artifact,
             checkpoint.response_artifact,

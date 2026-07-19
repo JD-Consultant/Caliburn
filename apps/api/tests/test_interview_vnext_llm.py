@@ -29,8 +29,26 @@ from app.interview_vnext.llm.result import (
     TokenUsage,
     build_structured_payload,
 )
-from app.interview_vnext.llm.testing import ScriptedLlmPort, ScriptedStep
+from app.interview_vnext.llm.testing import (
+    ScriptedLlmPort,
+    ScriptedStep,
+    scripted_provider_config,
+    scripted_turn_binding,
+)
 from app.interview_vnext.observability.artifacts import build_inline_artifact
+
+from tests.interview_vnext_llm_fixtures import (
+    TURN_OUTPUT_SCHEMA_ID,
+    binding_artifact_ref,
+    config_artifact_ref,
+    output_schema_artifact_ref,
+    projection_artifact_ref,
+    resolved_call,
+    unknown_execution_evidence,
+)
+
+
+SCRIPTED_BINDING = scripted_turn_binding()
 
 
 NOW = datetime(2026, 7, 16, 1, 0, tzinfo=UTC)
@@ -106,7 +124,9 @@ def test_model_envelope_rejects_dangling_visible_response_ref() -> None:
         attempt=model_request.attempt,
         operation_name=model_request.operation_name,
         operation_definition_hash=model_request.operation_definition_hash,
-        provider=model_request.provider,
+        binding_id=model_request.binding_id,
+        binding_hash=model_request.binding_hash,
+        gateway_provider=SCRIPTED_BINDING.gateway_provider,
         requested_model=model_request.requested_model,
         resolved_model=model_request.requested_model,
         outcome=ModelOutcome.SUCCEEDED,
@@ -133,11 +153,16 @@ def test_model_envelope_rejects_dangling_visible_response_ref() -> None:
     )
 
     with pytest.raises(ValidationError, match="missing a referenced"):
-        ModelCallEnvelope(result=result, supporting_artifacts=())
+        ModelCallEnvelope(
+            result=result,
+            execution_evidence=unknown_execution_evidence(SCRIPTED_BINDING),
+            supporting_artifacts=(),
+        )
 
 
 def request(*, attempt: int, attempt_name: str) -> ModelCallRequest:
     spec = operation()
+    binding = SCRIPTED_BINDING
     return ModelCallRequest(
         run_id=uid("run"),
         session_id=uid("session"),
@@ -148,16 +173,19 @@ def request(*, attempt: int, attempt_name: str) -> ModelCallRequest:
         operation_name=spec.name,
         operation_definition_hash=spec.definition_hash,
         idempotency_key="turn-7:turn.interpret",
-        provider="fake",
-        requested_model="quality-ceiling",
-        quality_profile=spec.quality_profile,
+        binding_id=binding.binding_id,
+        binding_hash=binding.binding_hash,
+        requested_model=binding.requested_model,
         instructions="Extract only employee-supported work evidence.",
         messages=(ModelMessage(role=MessageRole.USER, text="我每週整理測試結果。"),),
         prompt_artifact=artifact("prompt.template", {"prompt": "v1"}),
-        output_schema_id="turn_interpret.v1",
-        output_schema_artifact=artifact("schema.output", {"type": "object"}),
+        output_schema_id=TURN_OUTPUT_SCHEMA_ID,
+        output_schema_artifact=output_schema_artifact_ref(),
         context_artifact=artifact("context.packet", {"turn": 7}),
         selection_manifest_artifact=artifact("context.selection", {"selected": [7]}),
+        binding_artifact=binding_artifact_ref(binding),
+        provider_config_artifact=config_artifact_ref(scripted_provider_config()),
+        schema_projection_artifact=projection_artifact_ref(),
         created_at=NOW + timedelta(seconds=attempt),
         deadline_at=NOW + timedelta(seconds=attempt + 45),
         max_output_tokens=spec.max_output_tokens,
@@ -231,7 +259,7 @@ def test_structured_payload_is_canonical_and_returns_fresh_values():
 
 def test_result_outcomes_are_explicit_and_mutually_exclusive():
     req = request(attempt=1, attempt_name="success")
-    parsed = build_structured_payload(schema_id="turn_interpret.v1", value={"evidence": []})
+    parsed = build_structured_payload(schema_id=req.output_schema_id, value={"evidence": []})
     base = dict(
         run_id=req.run_id,
         session_id=req.session_id,
@@ -241,7 +269,9 @@ def test_result_outcomes_are_explicit_and_mutually_exclusive():
         attempt=req.attempt,
         operation_name=req.operation_name,
         operation_definition_hash=req.operation_definition_hash,
-        provider=req.provider,
+        binding_id=req.binding_id,
+        binding_hash=req.binding_hash,
+        gateway_provider=SCRIPTED_BINDING.gateway_provider,
         requested_model=req.requested_model,
         resolved_model=req.requested_model,
         usage=complete_usage(),
@@ -325,7 +355,7 @@ async def test_scripted_port_exposes_retry_attempts_without_changing_operation_i
         safe_message="Provider timed out.",
     )
     parsed = build_structured_payload(
-        schema_id="turn_interpret.v1",
+        schema_id=TURN_OUTPUT_SCHEMA_ID,
         value={"evidence": [{"claim": "整理測試結果"}]},
     )
     first_request = request(attempt=1, attempt_name="retry-1")
@@ -351,13 +381,16 @@ async def test_scripted_port_exposes_retry_attempts_without_changing_operation_i
                     visible_response_artifact=visible.ref,
                     supporting_artifacts=(visible,),
                     usage=complete_usage(),
-                    resolved_model="quality-ceiling-2026-07-01",
                 ),
             )
         }
     )
-    first_envelope = await port.generate_structured(first_request)
-    second_envelope = await port.generate_structured(second_request)
+    first_envelope = await port.generate_structured(
+        resolved_call(first_request, SCRIPTED_BINDING)
+    )
+    second_envelope = await port.generate_structured(
+        resolved_call(second_request, SCRIPTED_BINDING)
+    )
     first = first_envelope.result
     second = second_envelope.result
 
@@ -367,7 +400,9 @@ async def test_scripted_port_exposes_retry_attempts_without_changing_operation_i
     assert first.attempt_id != second.attempt_id
     assert first_request.idempotency_key == second_request.idempotency_key
     assert first.context_hash == second.context_hash
-    assert second_envelope.supporting_artifacts == (visible,)
+    # v2 scripted port also emits a clean-route artifact alongside the visible one.
+    assert second_envelope.supporting_artifacts[0] == visible
+    assert len(second_envelope.supporting_artifacts) == 2
     assert port.requests == (first_request, second_request)
     port.assert_exhausted()
 
@@ -387,4 +422,6 @@ async def test_scripted_port_fails_fast_on_unexpected_order_or_exhaustion():
         }
     )
     with pytest.raises(AssertionError, match="expected attempt 2"):
-        await port.generate_structured(request(attempt=1, attempt_name="wrong"))
+        await port.generate_structured(
+            resolved_call(request(attempt=1, attempt_name="wrong"), SCRIPTED_BINDING)
+        )

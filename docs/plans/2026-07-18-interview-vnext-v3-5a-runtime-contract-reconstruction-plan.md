@@ -1,7 +1,7 @@
 # Interview AI vNext V3-5A——Runtime Binding、Conformance、Turn Interpreter C1 v2 實作交接規格
 
 - 日期：2026-07-18
-- 狀態：**R1–R3 已有本地 commits；R3 code review 發現 runtime integrity blockers，R3-C 待實作，R4 blocked**
+- 狀態：**R1–R3 與 R3-C corrective 已完成；R4 provider evidence/conformance 分離為下一個可實作切片**
 - 決策：[`../adr/0036-interview-vnext-provider-binding-conformance-and-idless-turn-v2.md`](../adr/0036-interview-vnext-provider-binding-conformance-and-idless-turn-v2.md)
 - 研究：[`../specs/2026-07-18-interview-vnext-llm-runtime-architecture-review.md`](../specs/2026-07-18-interview-vnext-llm-runtime-architecture-review.md)
 - 前一階段：[`2026-07-18-interview-vnext-v3-5-turn-eval-harness-plan.md`](2026-07-18-interview-vnext-v3-5-turn-eval-harness-plan.md)
@@ -16,7 +16,9 @@ Anthropic direct、multi-agent、provider memory、production fallback或SQL mig
 
 R3 baseline commit `6ea5ed5412617cbae893e0baeab1abde6aa0d075` 的後續 code review 發現 binding/config、
 projection identity、durable gate、fresh-process recovery與Capture closure尚未完全符合本文件原訂驗收。
-R3修正細節以R3-C corrective authority為準；R3-C完成前不得開始R4或任何paid live。
+上述缺口已由 R3-C commits `e1716c8`、`2cf3404`、`1eaa774` 修正並通過完整 no-network 與 real PostgreSQL
+驗收；R4 **實作** entry gate 已開啟。這不等於允許 paid live：paid live 仍須等 R4–R7 完成並依 R8 gate
+重新確認，V3-6／production route／Web／promotion 仍 blocked。
 
 ---
 
@@ -1365,9 +1367,14 @@ no-network/real PG suites，但缺少exact runtime config preflight、projection
 artifact closure、terminal recovery revalidation與完整Capture roots。必須先完成
 [`R3-C corrective plan`](2026-07-19-interview-vnext-v3-5a-r3-corrective-plan.md)，上述R3驗收才算成立。
 
+**2026-07-19 closure evidence**：R3-C1 `e1716c8`、R3-C2 `2cf3404`、R3-C3 `1eaa774` 已完成；
+`interview_vnext` 全量 real PostgreSQL 為 `653 passed, 0 skipped`，完整 API no-network 為
+`844 passed, 197 skipped, 0 failed`，dependency guard `5 passed`，Alembic `0010 (head)`且無`0011`。
+R3驗收現已成立；R4 entry gate 開啟，但不得把這份工程完整性證據解讀成模型品質或 live gate 通過。
+
 ### R4——Provider adapters v2
 
-**Entry gate**：R3-C全部完成並回寫exact測試證據前，R4不得開始。
+**Entry gate（2026-07-19 已通過）**：R3-C全部完成並已回寫exact測試證據；R4可開始實作。
 
 先OpenRouter，再OpenAI reference；fixture matrix全綠才commit。R3 已把 adapter 機械遷移到新簽名並保留舊
 fail-closed 行為；R4 才把 eligibility 決策從 adapter 搬出（不再對 contamination 回 `ModelFailure`），改由

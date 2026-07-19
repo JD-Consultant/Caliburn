@@ -1,14 +1,23 @@
 # Interview vNext — eval-only provider adapters
 
-**Status（2026-07-19）：V3-5A R1–R3已有本地commits；R3 code review發現runtime integrity blockers，R3-C待實作，R4/paid live/V3-6 blocked**
+**Status（2026-07-19）：V3-5A R3-C complete；R4 implementation unblocked，paid live/V3-6仍 blocked**
 
 Owner已核准ADR 0036；下一個實作authority為
 [`V3-5A runtime contract reconstruction plan`](../../../../docs/plans/2026-07-18-interview-vnext-v3-5a-runtime-contract-reconstruction-plan.md)，
-其中R3修正必須依
+其中R3修正依
 [`R3-C corrective plan`](../../../../docs/plans/2026-07-19-interview-vnext-v3-5a-r3-corrective-plan.md)。
-baseline R3 SHA為`6ea5ed5412617cbae893e0baeab1abde6aa0d075`；不得重跑舊v1 batch或開始R4。
+baseline R3 SHA為`6ea5ed5412617cbae893e0baeab1abde6aa0d075`，corrective code commits為
+`e1716c8`、`2cf3404`、`1eaa774`；R4現在可開始實作，但不得重跑舊v1 batch或paid live。
 active target仍是`turn.interpret/2.0.0`、ProviderBinding/execution evidence/conformance與canonical regrade；
 migration維持0010。
+
+- R3-C exact binding/projection、typed durable gate與terminal recovery已完成；missing/tampered
+  binding/config/projection/result/evidence/conformance全部fail closed且不打HTTP。
+- model-call events與manifest現在direct close over request/binding/config/projection，以及每個attempt的
+  result/evidence/conformance；export會拒絕missing root、forged full ref/hash與nested-ref-only manifest。
+- R3-C驗收：全部`test_interview_vnext_*.py` + real PostgreSQL **653 passed, 0 skipped**；完整API
+  no-network **844 passed, 197 skipped, 0 failed**；dependency guard **5 passed**；Alembic **0010 (head)**。
+- R3-C沒有改route contamination wire outcome，沒有跑network/live；R4才負責把wire evidence與eligibility分離。
 
 - V3-5 turn eval harness(`contracts`/`loader`/`identities`/`fixture_builder`/`turn_eval_runner`/
   `capture_export`/`turn_graders`/`review`/`turn_report`/`scheduler`/`batch_orchestrator`/`live_wiring`/

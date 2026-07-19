@@ -1,6 +1,6 @@
 # Interview AI vNext（隔離開發中）
 
-本 package 是 ADR 0034 的 greenfield 實作區。目前已完成 **V0 + V1 domain foundation + V2-A provider/Capture contracts + V2-B durable persistence + V3-0 readiness + V3-1 Context Engine + V3-2 Turn Interpreter contracts/verifier + V3-3 fixed-replay executor + V3-4R OpenRouter live conformance**，另有隔離於`evals/`的direct OpenAI V3-4 mocked reference。V3-5 harness executable path已落地並全綠(887 passed/0 skipped)，true live亦已嘗試；但batch `5bad4e3f-...`因route contamination停線，並揭露model-generated proposal identity、unsupported qualifier與offline grader drift，故無模型品質裁決。Owner已核准ADR 0036與**V3-5A runtime contract reconstruction**；R1–R3已有本地commits，但R3 baseline `6ea5ed5412617cbae893e0baeab1abde6aa0d075`經code review發現binding/config/projection、durable recovery與Capture closure缺口，下一步固定為R3-C corrective slice，完成前不得開始R4或paid live。V3-6保持blocked，migration仍為0010八張表，不得新增0011。仍然**沒有 route或production live provider call**，eval adapter沒有被production composition root import；現行使用者流量仍走`app/interview/` v3。
+本 package 是 ADR 0034 的 greenfield 實作區。目前已完成 **V0 + V1 domain foundation + V2-A provider/Capture contracts + V2-B durable persistence + V3-0 readiness + V3-1 Context Engine + V3-2 Turn Interpreter contracts/verifier + V3-3 fixed-replay executor + V3-4R OpenRouter live conformance**，另有隔離於`evals/`的direct OpenAI V3-4 mocked reference。V3-5 harness executable path已落地並全綠(887 passed/0 skipped)，true live亦已嘗試；但batch `5bad4e3f-...`因route contamination停線，並揭露model-generated proposal identity、unsupported qualifier與offline grader drift，故無模型品質裁決。Owner已核准ADR 0036與**V3-5A runtime contract reconstruction**；R1–R3及阻擋性的R3-C corrective現已完成，exact binding/config/projection、typed durable gate、fresh-process recovery與Capture closure均已通過no-network/real PostgreSQL驗收，下一步是R4 provider evidence/conformance分離。R4可開始實作，但paid live、V3-6、production route/Web與promotion仍blocked。migration仍為0010八張表，不得新增0011。仍然**沒有 route或production live provider call**，eval adapter沒有被production composition root import；現行使用者流量仍走`app/interview/` v3。
 
 權威文件：
 
@@ -424,6 +424,18 @@ ProviderBinding/execution evidence/conformance與ID-less C1 v2。V3-5A通過
 (`TURN_GATE_PASS_ENGINEERING`或更高)只代表可開始V3-6 `episode_code`，不代表完整JD/顧問品質/production
 readiness。實作與後續改版不得只依README摘要，必須遵守
 [`V3-5 turn eval規格`](../../../../docs/plans/2026-07-18-interview-vnext-v3-5-turn-eval-harness-plan.md)。
+
+**V3-5A R3-C runtime integrity（2026-07-19，complete）**：corrective commits為`e1716c8`、
+`2cf3404`、`1eaa774`。model events固定direct refs為request/binding/provider-config/schema-projection，
+result event另輸出result/evidence，conformance event固定binding+evidence→report；manifest依event sequence保留
+每個attempt的result/evidence/conformance roots。export會重驗event chain、root existence/full ref、model-call
+closure與secret/reasoning；刪root、偽造hash、nested ref未direct-root、multi-attempt與重export/regrade都有負向測試。
+attempt claim在insert child row前鎖operation checkpoint，避免FK key-share與CAS deadlock。驗收為全部
+`test_interview_vnext_*.py` + real PostgreSQL `653 passed, 0 skipped`、完整API no-network
+`844 passed, 197 skipped, 0 failed`、dependency guard `5 passed`、Alembic `0010 (head)`；沒有live/network call、
+沒有0011，也沒有提前改OpenRouter route contamination語意。完整證據見
+[`R3-C §13`](../../../../docs/plans/2026-07-19-interview-vnext-v3-5a-r3-corrective-plan.md#13-2026-07-19-最終交付證據)。
+
 先做Capture/persistence、Context Engine與durable executor的原因是：
 沒有可重播 execution record,就無法判斷未來品質差是模型、context selection、
 verifier 還是 reducer 所造成。V5 前必須完成 authenticated principal → tenant

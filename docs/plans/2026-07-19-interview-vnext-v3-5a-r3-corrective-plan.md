@@ -1,14 +1,15 @@
 # Interview AI vNext V3-5A R3-C——Runtime binding、durable conformance 與 Capture 完整性修正交接規格
 
 - 日期：2026-07-19
-- 狀態：**可直接實作；R3-C code 尚未開始，R4 blocked**
+- 狀態：**R3-C complete；R4 implementation unblocked，paid live/V3-6仍 blocked**
 - 被審查的 baseline commit：`6ea5ed5412617cbae893e0baeab1abde6aa0d075`
 - baseline subject：`feat(interview): execute resolved model calls with conformance gates`
 - 上位決策：[`../adr/0036-interview-vnext-provider-binding-conformance-and-idless-turn-v2.md`](../adr/0036-interview-vnext-provider-binding-conformance-and-idless-turn-v2.md)
 - 母計畫：[`2026-07-18-interview-vnext-v3-5a-runtime-contract-reconstruction-plan.md`](2026-07-18-interview-vnext-v3-5a-runtime-contract-reconstruction-plan.md)
 - 架構研究：[`../specs/2026-07-18-interview-vnext-llm-runtime-architecture-review.md`](../specs/2026-07-18-interview-vnext-llm-runtime-architecture-review.md)
 - Scope：**只補正 R3 已發布契約的完整性，不提前實作 R4 route eligibility 分離**
-- Release gate：R3-C 全部驗收完成前，**R4、paid live、V3-6、production route/Web、adapter promotion 皆 blocked**
+- Release gate：R3-C 已完成，故 **R4 code slice 可開始**；paid live、V3-6、production route/Web、adapter
+  promotion 仍須遵守母計畫後續 gates，不因 R3-C 完成而自動解鎖
 
 本文件是 V3-5A 母計畫的 R3 corrective addendum。若本文件與 baseline commit 的註解、測試假設或交付摘要
 衝突，R3 修正範圍以本文件為準；若與 ADR 0036 衝突，以 ADR 為準。本文件不改 R4 的責任：OpenRouter
@@ -831,24 +832,24 @@ Get-ChildItem alembic\versions | Sort-Object Name | Select-Object -Last 3 Name
 
 只有同時滿足下列條件才能把R3-C標成complete、開始R4：
 
-- [ ] 兩個adapter都exact驗adapter ID/version/provider/config hash且pre-HTTP fail closed；
-- [ ] code review的medium/high config drift向量已轉成回歸測試；
-- [ ] projection name/version/hash/target profile exact；
-- [ ] `2.0.0 -> 9.9.9` forged report向量已轉成回歸測試；
-- [ ] `record_attempt_result()`不再接受獨立wire/conformance布林；
-- [ ] durable write解析並交叉驗證三個typed artifacts；
-- [ ] provider_completed/verified/committed/failed/retry recovery共用同一gate validator；
-- [ ] tampered/missing binding/config/projection/evidence/conformance全部fail closed且0 HTTP；
-- [ ] model/conformance events與manifest roots形成完整closure；
-- [ ]不存在的provider config schema ID已移除，未偽造替代schema；
-- [ ] no-network full suite 0 fail；
-- [ ] real PostgreSQL focused 0 skipped、0 fail；
-- [ ] dependency/schema drift/hygiene全綠；
-- [ ] Alembic仍0010、無migration；
-- [ ] 未執行network/paid live；
-- [ ] 每個code commit author/committer仍只有owner指定identity；
-- [ ] 工作樹無未解釋變更；
-- [ ] 母計畫與README回寫exact commit/test evidence。
+- [x] 兩個adapter都exact驗adapter ID/version/provider/config hash且pre-HTTP fail closed；
+- [x] code review的medium/high config drift向量已轉成回歸測試；
+- [x] projection name/version/hash/target profile exact；
+- [x] `2.0.0 -> 9.9.9` forged report向量已轉成回歸測試；
+- [x] `record_attempt_result()`不再接受獨立wire/conformance布林；
+- [x] durable write解析並交叉驗證三個typed artifacts；
+- [x] provider_completed/verified/committed/failed/retry recovery共用同一gate validator；
+- [x] tampered/missing binding/config/projection/evidence/conformance全部fail closed且0 HTTP；
+- [x] model/conformance events與manifest roots形成完整closure；
+- [x]不存在的provider config schema ID已移除，未偽造替代schema；
+- [x] no-network full suite 0 fail；
+- [x] real PostgreSQL focused 0 skipped、0 fail；
+- [x] dependency/schema drift/hygiene全綠；
+- [x] Alembic仍0010、無migration；
+- [x] 未執行network/paid live；
+- [x] 每個code commit author/committer仍只有owner指定identity；
+- [x] 工作樹無未解釋變更；
+- [x] 母計畫與README回寫exact commit/test evidence。
 
 ---
 
@@ -911,3 +912,97 @@ R4 unblocked: yes/no with reason
 
 交付摘要不能只寫「全部通過」。必須列出exact mismatch/tamper cases、HTTP call count、PG skipped數、migration
 head，以及R4行為確實未提前改動。
+
+---
+
+## 13. 2026-07-19 最終交付證據
+
+### 13.1 狀態與 commits
+
+R3-C 狀態為 **complete**。baseline 仍是
+`6ea5ed5412617cbae893e0baeab1abde6aa0d075`；corrective code commits 為：
+
+1. `e1716c8` — `fix(interview): enforce exact resolved provider bindings`；
+2. `2cf3404` — `fix(interview): revalidate durable provider gates on recovery`；
+3. `1eaa774` — `fix(interview): close provider artifacts into capture manifests`。
+
+C0 文件／裁決 commits 為 `44168e9` 與 `b76b3d4`。C4 使用
+`docs(interview): close R3 runtime integrity corrections` 獨立提交；其 SHA 屬 commit 外部交付 metadata，
+避免在 commit 內容中形成 self-referential hash。所有 commits 的 Author/Committer 均為
+`ArIs0x145 <aris0x145@gmail.com>`。
+
+### 13.2 Runtime binding、projection 與 durable gate
+
+- OpenRouter與OpenAI reference adapter都在 HTTP 前 exact 比對 runtime adapter ID/version/gateway、
+  binding identity、requested model與provider config canonical hash；任一 mismatch transport call count=`0`。
+- schema projection以註冊的policy name/version/hash/target profile與projected schema hash完整比對；偽造
+  `2.0.0 -> 9.9.9`、未知policy、hash/target drift全部fail closed。
+- `record_attempt_result()`只接typed result/evidence/conformance artifacts與application outcome，不再接可獨立
+  漂移的wire/conformance布林；三件artifact先由`validate_provider_gate_artifacts()`交叉驗證，再同transaction
+  保存result、evidence、report、checkpoint與events。
+- provider_completed、verified、committed、provider-attempt failed，以及calling+recorded retry都從persisted
+  request refs重載並走同一provider gate；missing/tampered binding/config/projection/result/evidence/conformance
+  皆以corruption／checkpoint conflict fail closed且不打HTTP。
+- `provider.config`保持`schema_id=None`，content hash仍與binding exact一致；未建立假的generic schema。
+
+### 13.3 Capture closure（C3）
+
+唯一model-call直接引用順序固定為：
+
+```text
+model.call.started inputs
+  = request, binding, provider-config, schema-projection
+
+model.call.completed|failed inputs
+  = request, binding, provider-config, schema-projection
+outputs tail
+  = result, execution-evidence
+
+provider.conformance.completed inputs
+  = binding, execution-evidence
+outputs
+  = conformance report
+```
+
+`llm/capture.py`集中`model_call_input_artifacts()`與
+`validate_model_call_capture_closure()`，禁止各adapter／runner自行猜順序。terminal manifest roots先放
+request/binding/config/projection，再依event sequence放入**每個attempt**的result/evidence/conformance，最後放
+verification/domain/response/failure artifacts；artifact IDs去重且保序。這個「每個attempt」規則是在
+schema-invalid multi-attempt負向測試中找到的真缺口：只讀final checkpoint會漏掉event chain中的provider authority。
+
+Capture export現在把event chain、manifest root existence/full-ref、model-call closure與secret/reasoning scan合成
+同一integrity gate。下列破壞向量都有回歸測試：
+
+- 從export bundle刪除root artifact；
+- 保留artifact ID但替換root content hash/full ref；
+- request JSON仍含provider-config nested ref，但manifest移除其direct root；
+- 同一run重export、重grade，manifest與所有event/root hashes不變。
+
+新增direct event refs後，兩個attempt-1 claimant揭露child FK key-share與checkpoint CAS的鎖順序deadlock；
+`_start_attempt()`現先以`SELECT ... FOR UPDATE`鎖operation checkpoint，再插attempt child row，CAS仍保留，
+競爭者穩定得到一個winner與一個`CheckpointConflict`，不再把DB deadlock洩漏成workflow結果。這是durable
+claim完整性修正，不改provider route或retry policy。
+
+兩個mocked probe也補足request/binding/config/projection direct refs與manifest roots，但仍使用其原本的
+wire+local validation摘要；R3-C沒有宣稱probe已具R4 persisted conformance semantics，也沒有執行live probe。
+
+### 13.4 測試、schema、migration與邊界
+
+- C3 no-network focused：`39 passed`；
+- C3/recovery/manifest/corruption/re-export real PostgreSQL focused：`23 passed, 0 skipped`；
+- 全部`test_interview_vnext_*.py` + real PostgreSQL：`653 passed, 0 skipped`；
+- 完整API no-network：`844 passed, 197 skipped, 0 failed`；skips全為未注入DB/network的既有條件；
+- dependency guard：`5 passed`；dependency/schema combined focused：`34 passed`；
+- Alembic：`0010 (head)`；無`0011`、無migration變更；
+- `git diff --check`乾淨；production `app/`無`evals.*` import；
+- 未執行network、catalog、paid live或12×3 batch；未讀出、提交或輸出API key／bundle。
+
+### 13.5 最終裁決與下一步
+
+R3 的 exact runtime binding、typed durable gate、fresh-process recovery與Capture authority現已可信，故
+**R4 implementation unblocked**。R4下一步只做provider wire outcome、execution evidence normalization與
+conformance eligibility分離；OpenRouter route contamination在R3-C仍維持adapter內`ModelFailure` fail-closed，
+沒有被提前修改。
+
+R3-C完成不是模型品質裁決，也不解除paid live、V3-6、production route、Web或adapter promotion。上述項目仍須
+依母計畫R4–R9逐關通過；舊v1 incomplete batch不得重跑、續跑或升格成品質結論。

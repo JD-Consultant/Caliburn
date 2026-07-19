@@ -35,8 +35,7 @@ from app.interview_vnext.llm.testing import (
     scripted_turn_binding,
 )
 from app.interview_vnext.observability.artifacts import build_inline_artifact
-from app.interview_vnext.observability.events import RunManifest
-from app.interview_vnext.persistence import serialization as ser
+from evals.interview_vnext.capture_export import export_run_bundle
 from evals.interview_vnext.contracts import ExpectedCommit
 from evals.interview_vnext.fixture_builder import materialize_reference_output
 from evals.interview_vnext.identities import (
@@ -193,52 +192,58 @@ async def test_terminal_run_manifest_matches_event_chain(
         cleanup=tracked_cleanup,
     )
     ids = execution.ids
-    async with postgres_session_factory() as session:
-        manifest_row = (
-            await session.execute(
-                sa.text(
-                    "SELECT inline_content FROM interview_vnext_artifacts "
-                    "WHERE tenant_id = :tenant_id AND artifact_id = :artifact_id"
-                ),
-                {
-                    "tenant_id": str(ids.tenant_id),
-                    "artifact_id": str(execution.run.manifest_artifact_id),
-                },
-            )
-        ).one()
-        event_rows = (
-            await session.execute(
-                sa.text(
-                    "SELECT event_hash, sequence FROM interview_vnext_execution_events "
-                    "WHERE tenant_id = :tenant_id AND run_id = :run_id "
-                    "ORDER BY sequence"
-                ),
-                {"tenant_id": str(ids.tenant_id), "run_id": str(ids.run_id)},
-            )
-        ).all()
-    manifest = RunManifest.model_validate_json(manifest_row.inline_content)
-    assert manifest.event_count == len(event_rows) == execution.run.event_count
-    assert manifest.first_event_hash == event_rows[0].event_hash
-    assert manifest.last_event_hash == event_rows[-1].event_hash
+    bundle = await export_run_bundle(
+        postgres_session_factory, tenant_id=ids.tenant_id, run_id=ids.run_id
+    )
+    manifest = bundle.manifest
+    assert manifest.event_count == len(bundle.events) == execution.run.event_count
+    assert manifest.first_event_hash == bundle.events[0].event_hash
+    assert manifest.last_event_hash == bundle.events[-1].event_hash
     assert manifest.root_artifacts, "terminal run must carry root artifacts"
-    kinds = set()
-    async with postgres_session_factory() as session:
-        for ref in manifest.root_artifacts:
-            row = (
-                await session.execute(
-                    sa.text(
-                        "SELECT kind FROM interview_vnext_artifacts "
-                        "WHERE tenant_id = :tenant_id AND artifact_id = :artifact_id"
-                    ),
-                    {
-                        "tenant_id": str(ids.tenant_id),
-                        "artifact_id": str(ref.artifact_id),
-                    },
-                )
-            ).one()
-            kinds.add(row.kind)
-    assert "model.request" in kinds
-    assert "operation.verification" in kinds
+    root_kinds = [ref.kind for ref in manifest.root_artifacts]
+    assert len({ref.artifact_id for ref in manifest.root_artifacts}) == len(
+        manifest.root_artifacts
+    )
+    assert root_kinds[:4] == [
+        "model.request",
+        "model.provider_binding",
+        "provider.config",
+        "model.schema_projection",
+    ]
+    assert {
+        "model.result",
+        "model.provider_execution_evidence",
+        "model.provider_conformance",
+        "operation.verification",
+    }.issubset(root_kinds)
+
+    started = next(
+        event for event in bundle.events if event.event_type == "model.call.started"
+    )
+    result = next(
+        event
+        for event in bundle.events
+        if event.event_type in {"model.call.completed", "model.call.failed"}
+    )
+    conformance = next(
+        event
+        for event in bundle.events
+        if event.event_type == "provider.conformance.completed"
+    )
+    assert [ref.kind for ref in started.input_artifacts] == root_kinds[:4]
+    assert result.input_artifacts == started.input_artifacts
+    assert [ref.kind for ref in result.output_artifacts[-2:]] == [
+        "model.result",
+        "model.provider_execution_evidence",
+    ]
+    assert conformance.input_artifacts == (
+        started.input_artifacts[1],
+        result.output_artifacts[-1],
+    )
+    assert [ref.kind for ref in conformance.output_artifacts] == [
+        "model.provider_conformance"
+    ]
+    assert result.status.value == conformance.status.value == "ok"
 
 
 async def test_two_trials_share_no_state(

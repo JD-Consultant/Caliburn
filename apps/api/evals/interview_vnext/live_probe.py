@@ -27,6 +27,10 @@ import openai
 from pydantic import ValidationError
 
 from app.interview_vnext.domain.hashing import canonical_hash, canonical_json
+from app.interview_vnext.llm.capture import (
+    model_call_input_artifacts,
+    validate_model_call_capture_closure,
+)
 from app.interview_vnext.llm.context import INJECTION_BOUNDARY
 from app.interview_vnext.llm.operation_documents import (
     TURN_INTERPRET_PROMPT_PATH,
@@ -327,6 +331,7 @@ async def run_probe(
         schema_id=MODEL_REQUEST_SCHEMA_ID,
         attempt_id=attempt_id,
     )
+    call_inputs = model_call_input_artifacts(request_artifact.ref, request)
 
     store = InMemoryArtifactStore()
     recorder = CaptureRecorder(
@@ -390,7 +395,7 @@ async def run_probe(
         status=ExecutionStatus.OK,
         occurred_at=started_at,
         with_attempt=True,
-        input_artifacts=(request_artifact.ref,),
+        input_artifacts=call_inputs,
     )
 
     try:
@@ -425,7 +430,8 @@ async def run_probe(
         status=call_event[2],
         occurred_at=result.completed_at,
         with_attempt=True,
-        output_artifacts=(result_artifact.ref, *supporting_refs),
+        input_artifacts=call_inputs,
+        output_artifacts=(*supporting_refs, result_artifact.ref),
     )
 
     local_output_validation_passed = False
@@ -455,7 +461,10 @@ async def run_probe(
     manifest = recorder.build_manifest(
         run_id=run_id,
         completed_at=completed_at,
-        root_artifacts=(config_artifact.ref, request_artifact.ref, result_artifact.ref),
+        root_artifacts=(config_artifact.ref, *call_inputs, result_artifact.ref),
+    )
+    validate_model_call_capture_closure(
+        recorder.events(run_id), manifest=manifest, artifact_store=store
     )
 
     report = _build_report(

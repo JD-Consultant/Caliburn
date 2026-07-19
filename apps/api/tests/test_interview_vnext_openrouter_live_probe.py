@@ -15,6 +15,7 @@ import httpx
 import pytest
 
 from app.interview_vnext.domain.hashing import canonical_hash
+from app.interview_vnext.llm.capture import validate_model_call_capture_closure
 from app.interview_vnext.observability.artifacts import (
     ArtifactRecord,
     InMemoryArtifactStore,
@@ -127,11 +128,15 @@ def validate_capture_chain(data: dict) -> tuple[list[ExecutionEvent], RunManifes
             for line in data["artifacts.jsonl"].strip().splitlines()
         )
     }
+    store = InMemoryArtifactStore(records)
     validate_event_chain(
         tuple(events),
         taxonomy=INTERVIEW_VNEXT_EXECUTION_V1,
-        artifact_store=InMemoryArtifactStore(records),
+        artifact_store=store,
         manifest=manifest,
+    )
+    validate_model_call_capture_closure(
+        tuple(events), manifest=manifest, artifact_store=store
     )
     return events, manifest
 
@@ -186,6 +191,24 @@ class TestSuccessBundle:
         ]
         assert [event.status.value for event in events] == [
             "ok", "ok", "ok", "ok", "ok",
+        ]
+        call_started = events[2]
+        call_completed = events[3]
+        assert [ref.kind for ref in call_started.input_artifacts] == [
+            "model.request",
+            "model.provider_binding",
+            "provider.config",
+            "model.schema_projection",
+        ]
+        assert call_completed.input_artifacts == call_started.input_artifacts
+        assert call_completed.output_artifacts[-1].kind == "model.result"
+        assert [ref.kind for ref in manifest.root_artifacts] == [
+            "probe.inputs",
+            "model.request",
+            "model.provider_binding",
+            "provider.config",
+            "model.schema_projection",
+            "model.result",
         ]
 
         # R3-C1(§7.6):provider.config artifact 不宣告不存在的 generic schema ID,

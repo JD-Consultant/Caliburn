@@ -14,6 +14,7 @@ import httpx
 import pytest
 
 from app.interview_vnext.domain.hashing import canonical_hash
+from app.interview_vnext.llm.capture import validate_model_call_capture_closure
 from app.interview_vnext.observability.artifacts import (
     ArtifactRecord,
     InMemoryArtifactStore,
@@ -103,6 +104,9 @@ def validate_capture_chain(data: dict) -> tuple[list[ExecutionEvent], RunManifes
         artifact_store=store,
         manifest=manifest,
     )
+    validate_model_call_capture_closure(
+        tuple(events), manifest=manifest, artifact_store=store
+    )
     return events, manifest
 
 
@@ -148,6 +152,25 @@ class TestMockedProbeBundle:
         ]
         assert [event.status.value for event in events] == ["ok", "ok", "ok", "ok"]
         assert {event.stage for event in events} == {"workflow.run", "turn.interpret"}
+        call_started = events[1]
+        call_completed = events[2]
+        assert [ref.kind for ref in call_started.input_artifacts] == [
+            "model.request",
+            "model.provider_binding",
+            "provider.config",
+            "model.schema_projection",
+        ]
+        assert call_completed.input_artifacts == call_started.input_artifacts
+        assert call_completed.output_artifacts[-1].kind == "model.result"
+        root_kinds = [ref.kind for ref in manifest.root_artifacts]
+        assert root_kinds == [
+            "eval.provider_config",
+            "model.request",
+            "model.provider_binding",
+            "provider.config",
+            "model.schema_projection",
+            "model.result",
+        ]
 
         report = json.loads(data["probe-report.json"])
         assert report["outcome"] == "succeeded"

@@ -275,6 +275,12 @@ class CheckpointRepository(Protocol):
         self, *, tenant_id: UUID, operation_id: UUID
     ) -> OperationCheckpoint | None: ...
 
+    async def get_by_operation_for_update(
+        self, *, tenant_id: UUID, operation_id: UUID
+    ) -> OperationCheckpoint | None:
+        """Serialize attempt claims before inserting the operation's child row."""
+        ...
+
     async def get_by_idempotency(
         self, *, tenant_id: UUID, session_id: UUID, operation_name: str, idempotency_key: str
     ) -> OperationCheckpoint | None: ...

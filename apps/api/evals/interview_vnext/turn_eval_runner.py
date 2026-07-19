@@ -32,10 +32,13 @@ from app.interview_vnext.domain.hashing import canonical_hash
 from app.interview_vnext.domain.session import ARCHITECTURE_ID
 from app.interview_vnext.domain.state import InterviewState
 from app.interview_vnext.llm.binding import ProviderBinding
-from app.interview_vnext.llm.port import LlmPort
+from app.interview_vnext.llm.capture import model_call_input_artifacts
+from app.interview_vnext.llm.port import LlmPort, ModelCallRequest
 from app.interview_vnext.observability.artifacts import ArtifactRef
 from app.interview_vnext.observability.events import ExecutionStatus
 from app.interview_vnext.observability.taxonomy import INTERVIEW_VNEXT_EXECUTION_V2
+from app.interview_vnext.persistence import serialization as ser
+from app.interview_vnext.persistence.models import VNextExecutionEventRow
 from app.interview_vnext.persistence.unit_of_work import SqlAlchemyVNextUnitOfWork
 from app.models import JobProfile, User
 
@@ -67,6 +70,42 @@ class TrialExecution:
 
 def _uid(trial_id: UUID, label: str) -> UUID:
     return uuid5(trial_id, label)
+
+
+async def _provider_authority_roots(
+    session_factory: async_sessionmaker, *, tenant_id: UUID, run_id: UUID
+) -> tuple[ArtifactRef, ...]:
+    """Collect every persisted attempt's result/evidence/conformance in event order."""
+
+    authority_kinds = {
+        "model.result",
+        "model.provider_execution_evidence",
+        "model.provider_conformance",
+    }
+    async with session_factory() as session:
+        rows = (
+            await session.execute(
+                sa.select(VNextExecutionEventRow)
+                .where(
+                    VNextExecutionEventRow.tenant_id == tenant_id,
+                    VNextExecutionEventRow.run_id == run_id,
+                )
+                .order_by(VNextExecutionEventRow.sequence)
+            )
+        ).scalars().all()
+    roots: list[ArtifactRef] = []
+    for row in rows:
+        event = ser.load_event(
+            row.event_json,
+            row.event_hash,
+            event_id=row.event_id,
+            run_id=row.run_id,
+            sequence=row.sequence,
+        )
+        roots.extend(
+            ref for ref in event.output_artifacts if ref.kind in authority_kinds
+        )
+    return tuple(roots)
 
 
 async def provision_identity(
@@ -192,10 +231,25 @@ async def run_trial(
         )
 
     checkpoint = outcome.checkpoint
+    async with uow_factory() as uow:
+        request_record = await uow.artifacts.get(
+            tenant_id=ids.tenant_id,
+            artifact_id=checkpoint.request_artifact.artifact_id,
+        )
+    if request_record.ref != checkpoint.request_artifact:
+        raise RuntimeError("trial request artifact reference changed before finalize")
+    request = ModelCallRequest.model_validate_json(request_record.inline_content or "")
+    request_roots = model_call_input_artifacts(request_record.ref, request)
+    provider_authority_roots = await _provider_authority_roots(
+        session_factory,
+        tenant_id=ids.tenant_id,
+        run_id=ids.run_id,
+    )
     root_artifacts = tuple(
         ref
         for ref in (
-            checkpoint.request_artifact,
+            *request_roots,
+            *provider_authority_roots,
             checkpoint.provider_result_artifact,
             checkpoint.provider_execution_evidence_artifact,
             checkpoint.provider_conformance_artifact,

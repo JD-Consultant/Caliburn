@@ -531,6 +531,21 @@ class SqlAlchemyCheckpointRepository:
                 VNextCheckpointRow.operation_id == operation_id))).scalar_one_or_none()
         return None if row is None else _checkpoint_from_row(row)
 
+    async def get_by_operation_for_update(
+        self, *, tenant_id: UUID, operation_id: UUID
+    ) -> OperationCheckpoint | None:
+        row = (
+            await self._s.execute(
+                sa.select(VNextCheckpointRow)
+                .where(
+                    VNextCheckpointRow.tenant_id == tenant_id,
+                    VNextCheckpointRow.operation_id == operation_id,
+                )
+                .with_for_update()
+            )
+        ).scalar_one_or_none()
+        return None if row is None else _checkpoint_from_row(row)
+
     async def get_by_idempotency(self, *, tenant_id: UUID, session_id: UUID,
                                  operation_name: str,
                                  idempotency_key: str) -> OperationCheckpoint | None:

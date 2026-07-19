@@ -26,6 +26,7 @@ from app.interview_vnext.domain.commands import CommandBase
 from app.interview_vnext.domain.hashing import canonical_hash, canonical_json
 from app.interview_vnext.domain.reducers import ReductionResult
 from app.interview_vnext.llm.binding import ProviderBinding
+from app.interview_vnext.llm.capture import model_call_input_artifacts
 from app.interview_vnext.llm.port import ModelCallRequest
 from app.interview_vnext.llm.portable_schema import (
     SchemaProjectionMismatch,
@@ -186,8 +187,19 @@ async def _start_attempt(
     """§7.5:短 transaction 記 calling attempt;commit 後呼叫端才打 provider。
     attempt 1 只能由 prepared 建立;retry 必須已保存前一 attempt result。"""
     async with uow_factory() as uow:
-        checkpoint = await _require_checkpoint(uow, tenant_id=tenant_id,
-                                               operation_id=operation_id)
+        # Lock the parent checkpoint before inserting its attempt child row.
+        # Otherwise two attempt-1 claimants can deadlock between the child's FK
+        # key-share lock and the checkpoint CAS update instead of yielding one
+        # deterministic loser.
+        checkpoint = await uow.checkpoints.get_by_operation_for_update(
+            tenant_id=tenant_id, operation_id=operation_id
+        )
+        if checkpoint is None:
+            raise CheckpointConflict(
+                "operation checkpoint does not exist",
+                tenant_id=tenant_id,
+                operation_id=operation_id,
+            )
         if (checkpoint.status == CheckpointStatus.CALLING
                 and checkpoint.active_attempt_id == attempt_id):
             attempt = await uow.attempts.get(tenant_id=tenant_id,
@@ -263,6 +275,34 @@ async def _start_attempt(
             request_artifact_id = stored_request.ref.artifact_id
         else:
             request_artifact_id = checkpoint.request_artifact.artifact_id
+            stored_request = await _uow_exact_artifact(
+                uow, tenant_id=tenant_id, ref=checkpoint.request_artifact
+            )
+
+        try:
+            model_request = ModelCallRequest.model_validate_json(
+                stored_request.inline_content or ""
+            )
+        except ValidationError as exc:
+            raise PersistedDataCorruption(
+                "attempt request artifact failed typed validation",
+                operation_id=operation_id,
+                attempt_id=attempt_id,
+            ) from exc
+        if (
+            model_request.run_id != checkpoint.run_id
+            or model_request.session_id != checkpoint.session_id
+            or model_request.turn_id != checkpoint.turn_id
+            or model_request.operation_id != operation_id
+            or model_request.attempt_id != attempt_id
+            or model_request.attempt != attempt_number
+        ):
+            raise CheckpointConflict(
+                "typed model request identity does not match the claimed attempt",
+                operation_id=operation_id,
+                attempt_id=attempt_id,
+            )
+        call_inputs = model_call_input_artifacts(stored_request.ref, model_request)
 
         attempt = OperationAttempt(
             attempt_id=attempt_id, run_id=checkpoint.run_id,
@@ -283,7 +323,8 @@ async def _start_attempt(
                 session_id=checkpoint.session_id, turn_id=checkpoint.turn_id,
                 operation_id=operation_id, attempt_id=attempt_id,
                 attempt=attempt_number, event_type="model.call.started",
-                stage=stage, status=ExecutionStatus.OK))
+                stage=stage, status=ExecutionStatus.OK,
+                input_artifacts=call_inputs))
         await uow.commit()
         return next_checkpoint, attempt, True
 
@@ -544,6 +585,7 @@ async def record_attempt_result(
         binding = await _load_validated_gate_inputs(
             uow, tenant_id=tenant_id, request=request
         )
+        call_inputs = model_call_input_artifacts(request_record.ref, request)
         gate = validate_provider_gate_artifacts(
             request=request,
             binding=binding,
@@ -630,6 +672,7 @@ async def record_attempt_result(
                 operation_id=operation_id, attempt_id=attempt_id,
                 attempt=attempt.attempt, event_type=event_type, stage=stage,
                 status=event_status,
+                input_artifacts=call_inputs,
                 output_artifacts=tuple(
                     item.ref for item in stored_supporting
                 ) + (stored.ref, stored_evidence.ref)))
@@ -648,7 +691,7 @@ async def record_attempt_result(
                 attempt=attempt.attempt,
                 event_type="provider.conformance.completed", stage=stage,
                 status=conformance_status,
-                input_artifacts=(stored_evidence.ref,),
+                input_artifacts=(request.binding_artifact, stored_evidence.ref),
                 output_artifacts=(stored_conformance.ref,)))
         await uow.commit()
         return next_checkpoint if next_checkpoint is not None else checkpoint

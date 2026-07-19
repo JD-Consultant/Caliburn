@@ -17,6 +17,7 @@ from uuid import UUID
 import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
+from app.interview_vnext.llm.capture import validate_model_call_capture_closure
 from app.interview_vnext.observability.artifacts import ArtifactRecord
 from app.interview_vnext.observability.events import (
     ExecutionEvent,
@@ -83,6 +84,45 @@ class CaptureBundle:
     @property
     def last_event_hash(self) -> str:
         return self.events[-1].event_hash
+
+
+def validate_capture_bundle(bundle: CaptureBundle) -> None:
+    """Revalidate an in-memory export, including model-call root closure."""
+
+    if bundle.run != bundle.manifest:
+        raise CaptureExportError("capture bundle run and manifest disagree")
+    if bundle.run_id != bundle.manifest.run_id:
+        raise CaptureExportError("capture bundle run identity mismatch")
+    records: dict[UUID, ArtifactRecord] = {}
+    for record in bundle.artifacts:
+        artifact_id = record.ref.artifact_id
+        if artifact_id in records:
+            raise CaptureExportError(f"duplicate artifact in bundle: {artifact_id}")
+        records[artifact_id] = record
+        _scan_secret(record.inline_content, where=f"artifact {artifact_id}")
+        _scan_reasoning(record)
+
+    taxonomy = resolve_execution_taxonomy(
+        bundle.manifest.taxonomy_id, bundle.manifest.taxonomy_version
+    )
+    store = _MemoryArtifactStore(records)
+    try:
+        validate_event_chain(
+            bundle.events,
+            taxonomy=taxonomy,
+            artifact_store=store,
+            manifest=bundle.manifest,
+        )
+        validate_model_call_capture_closure(
+            bundle.events, manifest=bundle.manifest, artifact_store=store
+        )
+    except CaptureExportError:
+        raise
+    except (KeyError, TypeError, ValueError) as exc:
+        raise CaptureExportError(f"capture bundle integrity validation failed: {exc}") from exc
+
+    for event in bundle.events:
+        _scan_secret(event.metadata_json, where=f"event {event.event_id} metadata")
 
 
 def _scan_secret(text: str | None, *, where: str) -> None:
@@ -166,19 +206,7 @@ async def export_run_bundle(
         raise CaptureExportError("run manifest artifact is missing or external")
     manifest = RunManifest.model_validate_json(manifest_record.inline_content)
 
-    taxonomy = resolve_execution_taxonomy(
-        run_row.taxonomy_id, run_row.taxonomy_version
-    )
-    store = _MemoryArtifactStore(records)
-    # 事件 chain + manifest + 每個 artifact ref 的 scope/hash 一致性一起驗
-    validate_event_chain(
-        events, taxonomy=taxonomy, artifact_store=store, manifest=manifest
-    )
-
-    for event in events:
-        _scan_secret(event.metadata_json, where=f"event {event.event_id} metadata")
-
-    return CaptureBundle(
+    bundle = CaptureBundle(
         tenant_id=tenant_id,
         run_id=run_id,
         run=manifest,
@@ -186,3 +214,7 @@ async def export_run_bundle(
         artifacts=tuple(ordered_records),
         manifest=manifest,
     )
+    # Event chain, root existence/hash, model-call closure and redaction are one
+    # export gate so re-export and offline regrade share identical integrity rules.
+    validate_capture_bundle(bundle)
+    return bundle

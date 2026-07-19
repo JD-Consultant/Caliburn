@@ -7,6 +7,7 @@
 - 前一階段：[`2026-07-18-interview-vnext-v3-5-turn-eval-harness-plan.md`](2026-07-18-interview-vnext-v3-5-turn-eval-harness-plan.md)
 - Provider wire authority：[`2026-07-17-interview-vnext-v3-4r-openrouter-first-adapter-plan.md`](2026-07-17-interview-vnext-v3-4r-openrouter-first-adapter-plan.md)
 - R3 corrective authority：[`2026-07-19-interview-vnext-v3-5a-r3-corrective-plan.md`](2026-07-19-interview-vnext-v3-5a-r3-corrective-plan.md)
+- R4 detailed implementation authority：[`2026-07-19-interview-vnext-v3-5a-r4-provider-evidence-conformance-plan.md`](2026-07-19-interview-vnext-v3-5a-r4-provider-evidence-conformance-plan.md)
 - Scope：**V3-5A only**；修harness authority、建立runtime binding/conformance、發布C1 v2並重新取得完整turn gate
 - Release gate：本文件全部完成且新identity true-live gate通過前，**V3-6、production route/Web、adapter promotion全部blocked**
 
@@ -757,7 +758,8 @@ adapter新行為：
 3. structured payload可解析時回wire `succeeded`；
 4. unknown metadata shape不猜，欄位null + limitation + transformation unknown；
 5. conformance policy在executor判ineligible；
-6. adapter constructor接`config + binding + schema_catalog + http_client`，先驗config hash/binding adapter ID；
+6. adapter constructor接`config + schema_catalog + http_client`；每次`generate_structured(ResolvedModelCall)`先驗
+   call binding的config hash/adapter ID/version/gateway，不在constructor複製第二份binding；
 7. outbound body仍不加入binding/conformance內部欄位；
 8. 429/500/timeout transport call count仍各exact 1。
 
@@ -1375,6 +1377,12 @@ R3驗收現已成立；R4 entry gate 開啟，但不得把這份工程完整性�
 ### R4——Provider adapters v2
 
 **Entry gate（2026-07-19 已通過）**：R3-C全部完成並已回寫exact測試證據；R4可開始實作。
+
+R4 的逐欄 provenance、OpenRouter pipeline/cache normalizer、wire/evidence/conformance outcome matrix、probe
+artifact/event closure、逐檔清單、full-green commit slicing 與 exact 驗收命令，以
+[`R4 detailed implementation authority`](2026-07-19-interview-vnext-v3-5a-r4-provider-evidence-conformance-plan.md)
+為準。特別是 binding 由現行 `ResolvedModelCall` 傳入，不再複製進 adapter constructor；routing artifact 的
+policy verdict移除，cache不得由token/cost heuristic猜測。
 
 先OpenRouter，再OpenAI reference；fixture matrix全綠才commit。R3 已把 adapter 機械遷移到新簽名並保留舊
 fail-closed 行為；R4 才把 eligibility 決策從 adapter 搬出（不再對 contamination 回 `ModelFailure`），改由

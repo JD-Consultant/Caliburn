@@ -6,6 +6,8 @@ Owner已核准ADR 0036；下一個實作authority為
 [`V3-5A runtime contract reconstruction plan`](../../../../docs/plans/2026-07-18-interview-vnext-v3-5a-runtime-contract-reconstruction-plan.md)，
 其中R3修正依
 [`R3-C corrective plan`](../../../../docs/plans/2026-07-19-interview-vnext-v3-5a-r3-corrective-plan.md)。
+R4 provider wire/evidence/conformance 的逐欄、逐檔與測試 authority為
+[`R4 detailed implementation plan`](../../../../docs/plans/2026-07-19-interview-vnext-v3-5a-r4-provider-evidence-conformance-plan.md)。
 baseline R3 SHA為`6ea5ed5412617cbae893e0baeab1abde6aa0d075`，corrective code commits為
 `e1716c8`、`2cf3404`、`1eaa774`；R4現在可開始實作，但不得重跑舊v1 batch或paid live。
 active target仍是`turn.interpret/2.0.0`、ProviderBinding/execution evidence/conformance與canonical regrade；

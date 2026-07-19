@@ -1,7 +1,9 @@
-"""V3-4 live probe — no-key preflight、mocked smoke 與 Capture bundle 驗證。
+"""V3-4/R4 OpenAI reference probe — no-key preflight、mocked smoke 與 bundle 驗證。
 
-規格 §16:live gate 本身需要真 key,另行執行;這裡只測 CLI 行為與 bundle 完整性,
-不打 live API,也絕不以 skip 冒充 live 成功。
+規格 §16/§10.3:R4 僅 mocked/reference,不打 OpenAI live;驗 probe gate、
+result/evidence/conformance closure 與 report v2。
+
+規格:docs/plans/2026-07-19-interview-vnext-v3-5a-r4-provider-evidence-conformance-plan.md
 """
 
 from __future__ import annotations
@@ -24,7 +26,7 @@ from app.interview_vnext.observability.events import (
     RunManifest,
     validate_event_chain,
 )
-from app.interview_vnext.observability.taxonomy import INTERVIEW_VNEXT_EXECUTION_V1
+from app.interview_vnext.observability.taxonomy import INTERVIEW_VNEXT_EXECUTION_V2
 
 from evals.interview_vnext.live_probe import build_config, main, run_probe
 from evals.interview_vnext.provider_config import OpenAIResponsesEvalConfig
@@ -100,7 +102,7 @@ def validate_capture_chain(data: dict) -> tuple[list[ExecutionEvent], RunManifes
     store = InMemoryArtifactStore(records)
     validate_event_chain(
         tuple(events),
-        taxonomy=INTERVIEW_VNEXT_EXECUTION_V1,
+        taxonomy=INTERVIEW_VNEXT_EXECUTION_V2,
         artifact_store=store,
         manifest=manifest,
     )
@@ -148,12 +150,16 @@ class TestMockedProbeBundle:
             "workflow.run.started",
             "model.call.started",
             "model.call.completed",
+            "provider.conformance.completed",
             "workflow.run.completed",
         ]
-        assert [event.status.value for event in events] == ["ok", "ok", "ok", "ok"]
+        assert [event.status.value for event in events] == [
+            "ok", "ok", "ok", "ok", "ok",
+        ]
         assert {event.stage for event in events} == {"workflow.run", "turn.interpret"}
         call_started = events[1]
         call_completed = events[2]
+        conformance_event = events[3]
         assert [ref.kind for ref in call_started.input_artifacts] == [
             "model.request",
             "model.provider_binding",
@@ -161,7 +167,17 @@ class TestMockedProbeBundle:
             "model.schema_projection",
         ]
         assert call_completed.input_artifacts == call_started.input_artifacts
-        assert call_completed.output_artifacts[-1].kind == "model.result"
+        assert [ref.kind for ref in call_completed.output_artifacts[-2:]] == [
+            "model.result",
+            "model.provider_execution_evidence",
+        ]
+        assert [ref.kind for ref in conformance_event.input_artifacts] == [
+            "model.provider_binding",
+            "model.provider_execution_evidence",
+        ]
+        assert [ref.kind for ref in conformance_event.output_artifacts] == [
+            "model.provider_conformance",
+        ]
         root_kinds = [ref.kind for ref in manifest.root_artifacts]
         assert root_kinds == [
             "eval.provider_config",
@@ -170,14 +186,26 @@ class TestMockedProbeBundle:
             "provider.config",
             "model.schema_projection",
             "model.result",
+            "model.provider_execution_evidence",
+            "model.provider_conformance",
         ]
 
         report = json.loads(data["probe-report.json"])
+        assert report["schema_version"] == "live_probe_report.v2"
         assert report["outcome"] == "succeeded"
         assert report["local_output_validation_passed"] is True
         assert report["resolved_model"] == "gpt-5.6-sol"
         assert report["provider_request_id"] == "req_fx_success"
         assert report["usage"]["input_tokens"] == 1200
+        assert report["conformance_eligible"] is True
+        assert report["conformance_reason_codes"] == []
+        assert report["conformance_policy_name"] == "attribution-strict"
+        assert report["transformation_status"] == "clean"
+        assert report["cache_status"] == "absent"
+        assert report["execution_evidence_hash"].startswith("sha256:")
+        assert report["conformance_report_hash"].startswith("sha256:")
+        assert report["evidence_artifact_id"]
+        assert report["conformance_artifact_id"]
         assert report["manifest_hash"] == canonical_hash(manifest)
         assert report["last_event_hash"] == manifest.last_event_hash
         assert report["config_hash"] == OpenAIResponsesEvalConfig().config_hash
@@ -223,12 +251,14 @@ class TestMockedProbeBundle:
             "workflow.run.started",
             "model.call.started",
             "model.call.failed",
+            "provider.conformance.completed",
             "workflow.run.failed",
         ]
         assert [event.status.value for event in events] == [
             "ok",
             "ok",
             "failed",
+            "skipped",
             "failed",
         ]
         report = json.loads(data["probe-report.json"])
@@ -236,6 +266,38 @@ class TestMockedProbeBundle:
         assert report["failure"]["reason_code"] == "openai.server_error"
         assert report["failure"]["retryable"] is True
         assert report["local_output_validation_passed"] is False
+        assert report["conformance_eligible"] is False
+        assert report["conformance_reason_codes"] == [
+            "conformance.wire_not_succeeded"
+        ]
+
+    async def test_resolved_model_mismatch_is_wire_success_but_failed_probe(
+        self, tmp_path
+    ):
+        """R4 §10.3:mismatch mocked response → wire success、probe failed、
+        local validation 不執行。"""
+
+        exit_code, bundle = await run_mocked_probe(
+            tmp_path, "resolved_model_mismatch.json"
+        )
+        assert exit_code == 1
+        data = load_bundle(bundle)
+        events, _ = validate_capture_chain(data)
+        event_status = {event.event_type: event.status.value for event in events}
+        assert event_status["model.call.completed"] == "ok"
+        assert event_status["provider.conformance.completed"] == "failed"
+        assert events[-1].event_type == "workflow.run.failed"
+        report = json.loads(data["probe-report.json"])
+        assert report["outcome"] == "succeeded"
+        assert report["failure"] is None
+        assert report["resolved_model"] == "gpt-5.7-mini"
+        assert report["conformance_eligible"] is False
+        assert report["conformance_reason_codes"] == [
+            "conformance.gateway_model_mismatch",
+            "conformance.upstream_model_mismatch",
+        ]
+        assert report["local_output_validation_passed"] is False
+        assert report["local_validation_error"] is None
 
     async def test_refusal_is_partial_model_call_but_failed_run(self, tmp_path):
         exit_code, bundle = await run_mocked_probe(tmp_path, "refusal.json")

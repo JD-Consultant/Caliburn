@@ -11,7 +11,12 @@ cancellations (``cancelled``) and unexpected non-terminal statuses
 (``unknown``). The lossless provider view lives in ``provider_finish_reason``
 and the raw artifact.
 
-規格:docs/plans/2026-07-17-interview-vnext-v3-4-openai-responses-adapter-plan.md
+R4(V3-5A):mocked/reference only,不執行 live。adapter 只回 wire result 與
+actual execution evidence(response model/ID、raw Responses artifact 作 route
+source);resolved-model mismatch 由 application conformance 判定,不再是
+wire failure。規格:docs/plans/2026-07-19-interview-vnext-v3-5a-r4-provider-
+evidence-conformance-plan.md(前身 2026-07-17-interview-vnext-v3-4-openai-
+responses-adapter-plan.md)。
 """
 
 from __future__ import annotations
@@ -68,6 +73,7 @@ from app.interview_vnext.llm.result import (
 )
 from app.interview_vnext.observability.artifacts import (
     ArtifactRecord,
+    ArtifactRef,
     RedactionStatus,
     build_inline_artifact,
 )
@@ -114,7 +120,6 @@ SAFE_MESSAGES: dict[str, str] = {
     "unavailable": "OpenAI was temporarily unavailable.",
     "cancelled": "OpenAI cancelled the response.",
     "bad_output": "OpenAI returned an unusable structured response.",
-    "model_mismatch": "OpenAI resolved an unapproved model.",
     "unexpected": "The adapter could not normalize the OpenAI response.",
 }
 
@@ -620,18 +625,14 @@ class OpenAIResponsesEvalAdapter(LlmPort):
             started_at=started_at,
             completed_at=completed_at,
         )
-        if preflight_mismatch:
-            # §5.1:preflight 失敗不建立假 routing metadata;evidence 描述實際
-            # runtime adapter,route/cache/transformation 依 unknown failure 規則。
-            evidence = _preflight_mismatch_evidence(
-                binding, request,
-                gateway_provider=self._config.provider,
-                usage=usage,
-            )
-        else:
-            evidence = _openai_execution_evidence(
-                binding, request, resolved_model=request.requested_model, usage=usage
-            )
+        # R4 §7.5(reference 對齊):沒有 Response 就沒有 execution facts;
+        # route/cache 一律 unknown,不從 binding 期望值複製 actual。
+        evidence = _no_response_evidence(
+            binding, request,
+            gateway_provider=self._config.provider,
+            usage=usage,
+            preflight_mismatch=preflight_mismatch,
+        )
         return ModelCallEnvelope(
             result=result, execution_evidence=evidence, supporting_artifacts=(error,)
         )
@@ -661,6 +662,7 @@ class OpenAIResponsesEvalAdapter(LlmPort):
         usage = _map_usage(response)
         resolved_raw = response.model
         resolved_model = resolved_raw or request.requested_model
+        generation_id = getattr(response, "id", None)
         base = dict(
             **_identity_fields(request, gateway_provider=self._config.provider),
             resolved_model=resolved_model,
@@ -672,8 +674,12 @@ class OpenAIResponsesEvalAdapter(LlmPort):
             completed_at=completed_at,
         )
         artifacts = (raw, visible)
+        # R4 §9.2:evidence 只記 actual response facts(model/ID);raw Responses
+        # artifact 是 direct provider 的 route source authority(§4.5)。
         evidence = _openai_execution_evidence(
-            binding, request, resolved_model=resolved_model, usage=usage
+            binding, request, resolved_model=resolved_raw, usage=usage,
+            request_id=request_id, generation_id=generation_id,
+            raw_source=raw.ref,
         )
 
         def failed(
@@ -718,17 +724,8 @@ class OpenAIResponsesEvalAdapter(LlmPort):
         status = response.status
         provider_status = status if status is not None else "none"
 
-        if resolved_raw is None or resolved_raw not in self._config.accepted_resolved_models:
-            return failed(
-                _Failure(
-                    FailureKind.RESOLVED_MODEL_MISMATCH,
-                    "openai.resolved_model_mismatch",
-                    False,
-                    SAFE_MESSAGES["model_mismatch"],
-                ),
-                provider_finish_reason=_provider_finish_reason(response),
-                detail=f"resolved model {resolved_raw!r} is not in the eval allowlist",
-            )
+        # R4 §9.2:resolved-model mismatch 不再是 wire failure;actual model 已
+        # 進 evidence,由 conformance 產生 gateway/upstream model mismatch。
 
         if status == "incomplete":
             reason = (
@@ -915,19 +912,27 @@ def _identity_fields(
     }
 
 
-def _preflight_mismatch_evidence(
+def _no_response_evidence(
     binding: ProviderBinding,
     request: ModelCallRequest,
     *,
     gateway_provider: str,
     usage: TokenUsage,
+    preflight_mismatch: bool = False,
 ) -> ProviderExecutionEvidence:
-    """Route-less evidence for a runtime binding preflight failure(§5.1.1)。
+    """Route-less evidence when no ``Response`` object exists (R4 §7.5):
+    preflight/binding/deadline failures and SDK/transport exceptions. All route
+    facts stay unknown; nothing is fabricated from binding expectations.
 
     binding ID/hash 保留 attempted identity;adapter ID/version/gateway 描述實際
-    runtime adapter,不從不相符的 binding 複製;不記任何假 upstream/route facts。
+    runtime adapter,不從不相符的 binding 複製(§5.1.1)。
     """
 
+    limitations = ["openai execution evidence unavailable for a failed attempt"]
+    if preflight_mismatch:
+        limitations.append(
+            "openai runtime binding preflight failed before any provider call"
+        )
     return define_provider_execution_evidence(
         binding_id=binding.binding_id,
         binding_hash=binding.binding_hash,
@@ -948,10 +953,7 @@ def _preflight_mismatch_evidence(
         generation_id=None,
         usage=usage,
         cost_decimal=None,
-        limitations=(
-            "openai execution evidence unavailable for a failed attempt",
-            "openai runtime binding preflight failed before any provider call",
-        ),
+        limitations=tuple(sorted(limitations)),
         raw_routing_artifact=None,
     )
 
@@ -960,21 +962,31 @@ def _openai_execution_evidence(
     binding: ProviderBinding,
     request: ModelCallRequest,
     *,
-    resolved_model: str,
+    resolved_model: str | None,
     usage: TokenUsage,
+    request_id: str | None,
+    generation_id: str | None,
+    raw_source: ArtifactRef,
 ) -> ProviderExecutionEvidence:
-    """Direct OpenAI Responses execution evidence (reference adapter).
+    """Direct OpenAI Responses execution evidence (reference adapter; R4 §9.2).
 
-    The reference adapter only proves the neutral contract holds across providers;
-    it is never run live and its conformance eligibility is not asserted. Cost is
-    not exposed by the Responses API, recorded as a limitation.
+    A direct adapter has no gateway router: the endpoint is the adapter's own
+    fixed official Responses API (an outbound execution fact), the resolved
+    model comes from the response, and the immutable redacted raw Responses
+    artifact is the route source authority (§4.5/§9.3). ``cached_tokens`` maps
+    only to ``TokenUsage``; response cache status is ``ABSENT`` because the
+    direct endpoint replays nothing. Cost is not exposed by the Responses API,
+    recorded as a limitation.
     """
 
+    limitations = ["openai responses api does not expose per-call cost"]
+    if resolved_model is None:
+        limitations.append("openai response did not include a resolved model")
     return define_provider_execution_evidence(
         binding_id=binding.binding_id,
         binding_hash=binding.binding_hash,
-        adapter_id=binding.adapter_id,
-        adapter_version=binding.adapter_version,
+        adapter_id=OPENAI_ADAPTER_ID,
+        adapter_version=OPENAI_ADAPTER_VERSION,
         gateway_provider=binding.gateway_provider,
         requested_model=request.requested_model,
         gateway_resolved_model=resolved_model,
@@ -986,12 +998,12 @@ def _openai_execution_evidence(
         transformation_status=TransformationStatus.CLEAN,
         pipeline_stages=(),
         cache_status=CacheStatus.ABSENT,
-        provider_request_id=None,
-        generation_id=None,
+        provider_request_id=request_id,
+        generation_id=generation_id,
         usage=usage,
         cost_decimal=None,
-        limitations=("openai responses api does not expose per-call cost",),
-        raw_routing_artifact=None,
+        limitations=tuple(sorted(limitations)),
+        raw_routing_artifact=raw_source,
     )
 
 

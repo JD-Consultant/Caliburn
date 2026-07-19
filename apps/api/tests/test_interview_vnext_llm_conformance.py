@@ -417,6 +417,94 @@ def test_any_pipeline_stage_is_ineligible_even_if_only_inspected(pipeline_status
     )
 
 
+def test_combined_violations_have_exact_sorted_reason_union():
+    """R4 §12.2:多重污染的 reason codes 是 exact sorted union,不是單一摘要。"""
+
+    binding = make_binding()
+    evidence = clean_evidence(
+        binding,
+        gateway_resolved_model="anthropic/other-model",
+        route_strategy="fallback",
+        cache_status=CacheStatus.HIT,
+        upstream_attempt_count=3,
+        pipeline_stages=(stage(1, TransformationStatus.MUTATED),),
+        transformation_status=TransformationStatus.MUTATED,
+    )
+    report = evaluate_conformance(
+        policy=ATTRIBUTION_STRICT_POLICY_V1,
+        binding=binding,
+        evidence=evidence,
+        wire_outcome=ModelOutcome.SUCCEEDED,
+    )
+    assert report.eligible is False
+    assert report.reason_codes == (
+        ConformanceReasonCode.CACHE_INELIGIBLE,
+        ConformanceReasonCode.GATEWAY_MODEL_MISMATCH,
+        ConformanceReasonCode.PIPELINE_NOT_EMPTY,
+        ConformanceReasonCode.ROUTE_STRATEGY_MISMATCH,
+        ConformanceReasonCode.TRANSFORMATION_INELIGIBLE,
+        ConformanceReasonCode.UPSTREAM_ATTEMPT_MISMATCH,
+    )
+
+
+def test_pipeline_precedence_propagates_to_report_transformation_status():
+    """R4 §6.5:report 的 transformation status 保留 unknown > mutated > inspected。"""
+
+    binding = make_binding()
+    for statuses, expected in (
+        (
+            (TransformationStatus.INSPECTED, TransformationStatus.MUTATED),
+            TransformationStatus.MUTATED,
+        ),
+        (
+            (
+                TransformationStatus.INSPECTED,
+                TransformationStatus.MUTATED,
+                TransformationStatus.UNKNOWN,
+            ),
+            TransformationStatus.UNKNOWN,
+        ),
+    ):
+        stages = tuple(
+            stage(index, status) for index, status in enumerate(statuses, 1)
+        )
+        report = evaluate_conformance(
+            policy=ATTRIBUTION_STRICT_POLICY_V1,
+            binding=binding,
+            evidence=clean_evidence(
+                binding, pipeline_stages=stages, transformation_status=expected
+            ),
+            wire_outcome=ModelOutcome.SUCCEEDED,
+        )
+        assert report.transformation_status == expected
+        assert report.reason_codes == (
+            ConformanceReasonCode.PIPELINE_NOT_EMPTY,
+            ConformanceReasonCode.TRANSFORMATION_INELIGIBLE,
+        )
+
+
+def test_direct_provider_raw_source_artifact_satisfies_route_authority():
+    """R4 §4.5:direct provider(無 gateway router)以 immutable raw response
+    artifact 作 route facts 的 source authority;同一 neutral policy 可 eligible。"""
+
+    binding = make_binding()
+    raw_source = ArtifactRef(
+        artifact_id=uuid5(NAMESPACE_URL, "conformance-test:direct-raw"),
+        kind="provider.openai.response.raw",
+        media_type="application/json",
+        content_hash=SHA,
+        byte_size=128,
+    )
+    report = evaluate_conformance(
+        policy=ATTRIBUTION_STRICT_POLICY_V1,
+        binding=binding,
+        evidence=clean_evidence(binding, raw_routing_artifact=raw_source),
+        wire_outcome=ModelOutcome.SUCCEEDED,
+    )
+    assert report.eligible is True
+    assert report.reason_codes == ()
+
+
 def test_reason_codes_are_sorted_and_report_is_deterministic():
     binding = make_binding()
     evidence = clean_evidence(

@@ -5,7 +5,9 @@
     "reference": "https://openrouter.ai/docs/api/reference/overview",
     "models": "https://openrouter.ai/docs/guides/overview/models",
     "endpoints": "https://openrouter.ai/docs/api/api-reference/endpoints/list-endpoints",
-    "checked": "2026-07-17",
+    "router_metadata": "https://openrouter.ai/docs/guides/features/router-metadata",
+    "response_caching": "https://openrouter.ai/docs/guides/features/response-caching",
+    "checked": "2026-07-19",
     "synthetic": true,
     "contains_test_data": true
   },
@@ -26,7 +28,7 @@
       "kind": "chat_response",
       "status": 200,
       "headers": {"x-request-id": "req_fx_success", "x-generation-id": "gen-fx-success"},
-      "purpose": "finish_reason=stop, clean direct routing metadata, full usage incl cache_write/reasoning/cost; parses to a single object"
+      "purpose": "finish_reason=stop, clean direct routing metadata in the official nested endpoints.available[] shape, full usage incl cache_write/reasoning/cost; parses to a single object"
     },
     "success-with-reasoning.json": {
       "kind": "chat_response",
@@ -74,7 +76,7 @@
       "kind": "chat_response",
       "status": 200,
       "headers": {"x-request-id": "req_fx_model_mismatch"},
-      "purpose": "resolved model not in the allowlist -> RESOLVED_MODEL_MISMATCH, no prefix acceptance"
+      "purpose": "resolved model not in the allowlist (legacy flat endpoints array) -> R4: wire success, conformance gateway/upstream model mismatch; no prefix acceptance"
     },
     "usage-missing.json": {
       "kind": "chat_response",

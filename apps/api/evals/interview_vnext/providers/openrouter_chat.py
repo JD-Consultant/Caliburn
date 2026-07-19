@@ -6,17 +6,19 @@ is no transport or adapter retry, and every failure returns as a typed
 ``ModelCallEnvelope``; only ``asyncio.CancelledError`` propagates.
 
 The adapter is deliberately private to OpenRouter's wire boundary. It never
-imports the OpenAI adapter, never accepts an arbitrary base URL, and never
-weakens the exact-route / clean-pipeline gates that make a trial attributable.
-Success only reaches ``StructuredPayload``; the full Pydantic + semantic
-verification stays in the V3-3 executor.
+imports the OpenAI adapter and never accepts an arbitrary base URL. Since R4 it
+only answers two questions: what came back on the wire (``ModelCallResult``)
+and what execution facts are observable (``ProviderExecutionEvidence`` via the
+pure ``openrouter_routing`` normalizer). Route/model/pipeline/cache eligibility
+is decided outside the adapter by the application conformance policy; a
+contaminated route is a wire success with honest evidence, never a synthetic
+``ModelFailure``. Local schema + semantic verification stays in the executor.
 
-Provider wire shape confirmed against OpenRouter official docs on 2026-07-17:
-router metadata (`X-OpenRouter-Metadata: enabled` -> top-level
-`openrouter_metadata`), chat response (`id`/`model`/`object`/`choices`/`usage`),
-choice `finish_reason` + `native_finish_reason`, usage `prompt_tokens`/
-`completion_tokens`/`cost`. See docs/plans/2026-07-17-interview-vnext-v3-4r-
-openrouter-first-adapter-plan.md.
+Provider wire shape confirmed against OpenRouter official docs on 2026-07-17
+(router metadata/chat response/usage) and re-checked 2026-07-19 (nested
+``endpoints.available[]``, pipeline stage types, ``X-OpenRouter-Cache-Status``).
+See docs/plans/2026-07-19-interview-vnext-v3-5a-r4-provider-evidence-
+conformance-plan.md.
 """
 
 from __future__ import annotations
@@ -27,7 +29,7 @@ import json
 import math
 import time
 from collections.abc import Callable
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import UTC, datetime
 from typing import Any
 from uuid import uuid5
@@ -80,6 +82,13 @@ from ..schema_catalog import (
     SchemaBinding,
     SchemaCatalogError,
 )
+from .openrouter_routing import (
+    CACHE_STATUS_HEADER,
+    LIMITATION_ENDPOINT_NOT_ATTESTED,
+    OpenRouterRoutingFacts,
+    attest_upstream_endpoint,
+    normalize_openrouter_routing,
+)
 
 
 CHAT_COMPLETIONS_URL = "https://openrouter.ai/api/v1/chat/completions"
@@ -95,11 +104,8 @@ VISIBLE_ARTIFACT_KIND = "provider.response.visible"
 ERROR_ARTIFACT_KIND = "provider.openrouter.error"
 
 RAW_SCHEMA_VERSION = "openrouter_chat_raw.v1"
-ROUTING_SCHEMA_VERSION = "openrouter_routing.v1"
+ROUTING_SCHEMA_VERSION = "openrouter_routing.v2"
 VISIBLE_SCHEMA_VERSION = "provider_visible_response.v1"
-
-# §9.3: initial strategy allowlist accepts only fully-pinned direct routing.
-APPROVED_ROUTER_STRATEGIES = frozenset({"direct"})
 
 LIMITATION_NO_RESPONSE = "openrouter response was not received"
 LIMITATION_NO_USAGE = "openrouter response did not include usage"
@@ -118,12 +124,20 @@ SAFE_MESSAGES: dict[str, str] = {
     "unavailable": "OpenRouter or the selected model endpoint was temporarily unavailable.",
     "bad_output": "OpenRouter returned an unusable structured response.",
     "route": "OpenRouter did not use the approved model routing profile.",
-    "model_mismatch": "OpenRouter resolved an unapproved model.",
     "unexpected": "The adapter could not normalize the OpenRouter response.",
 }
 
-# Allowlisted response headers persisted in the raw artifact (§9.1).
-_ALLOWED_HEADER_KEYS = ("x-request-id", "x-generation-id", "retry-after")
+# Allowlisted response headers persisted in the raw artifact (§9.1; R4 §6.6
+# adds the official cache facts — age/ttl are observability only, never an
+# eligibility authority).
+_ALLOWED_HEADER_KEYS = (
+    "x-request-id",
+    "x-generation-id",
+    "retry-after",
+    "x-openrouter-cache-status",
+    "x-openrouter-cache-age",
+    "x-openrouter-cache-ttl",
+)
 
 
 @dataclass(frozen=True)
@@ -443,81 +457,6 @@ def _identity_fields(
     }
 
 
-@dataclass
-class _RoutingCheck:
-    """Deterministic router-metadata conformance result (§9.3/§12.2)."""
-
-    metadata_present: bool
-    strategy: Any = None
-    requested: Any = None
-    router_attempt: Any = None
-    selected_provider_name: str | None = None
-    selected_model: str | None = None
-    attempts: list[Any] = field(default_factory=list)
-    pipeline: list[Any] = field(default_factory=list)
-    is_byok: bool | None = None
-    region: Any = None
-    failures: list[str] = field(default_factory=list)
-    model_match: bool = False
-    provider_model_match: bool = False
-    single_upstream_attempt: bool = False
-    pipeline_clean: bool = False
-
-    @property
-    def clean(self) -> bool:
-        return not self.failures
-
-
-def _selected_endpoint(metadata: dict[str, Any]) -> tuple[str | None, str | None, int]:
-    """Extract the single selected {provider, model} from router metadata.
-
-    Tolerant of the two documented shapes for `endpoints`: a flat array of
-    ``{provider, model, selected}`` entries, or a nested
-    ``{available: [...], selected: {...}}`` object. Returns
-    ``(provider, model, selected_count)``; the caller fails closed unless
-    exactly one selection is present. The exact live nesting is confirmed by
-    the R6 live probe capture bundle.
-    """
-
-    endpoints = metadata.get("endpoints")
-    selected: list[dict[str, Any]] = []
-    if isinstance(endpoints, dict):
-        one = endpoints.get("selected")
-        if isinstance(one, dict):
-            selected.append(one)
-        candidates = endpoints.get("available")
-        if isinstance(candidates, list):
-            selected.extend(
-                item
-                for item in candidates
-                if isinstance(item, dict) and item.get("selected") is True
-            )
-    elif isinstance(endpoints, list):
-        selected.extend(
-            item
-            for item in endpoints
-            if isinstance(item, dict) and item.get("selected") is True
-        )
-    # de-duplicate identical selections (nested `selected` may repeat in `available`)
-    unique = []
-    seen = set()
-    for item in selected:
-        key = (item.get("provider"), item.get("model"))
-        if key not in seen:
-            seen.add(key)
-            unique.append(item)
-    if len(unique) != 1:
-        return None, None, len(unique)
-    entry = unique[0]
-    provider = entry.get("provider")
-    model = entry.get("model")
-    return (
-        provider if isinstance(provider, str) else None,
-        model if isinstance(model, str) else None,
-        1,
-    )
-
-
 class OpenRouterChatEvalAdapter(LlmPort):
     """Eval-only ``LlmPort`` over OpenRouter Chat Completions (direct HTTP)."""
 
@@ -817,7 +756,6 @@ class OpenRouterChatEvalAdapter(LlmPort):
         request_id: str | None = None,
         generation_id: str | None = None,
         retry_after_seconds: int | None = None,
-        route_conformance: dict[str, Any] | None = None,
         status_mismatch: bool = False,
         body: Any = None,
         exception_type: str | None = None,
@@ -837,7 +775,9 @@ class OpenRouterChatEvalAdapter(LlmPort):
             "request_id": request_id,
             "generation_id": generation_id,
             "retry_after_seconds": retry_after_seconds,
-            "route_conformance": route_conformance,
+            # R4: eligibility verdicts moved to the application conformance
+            # report; the wire-error artifact keeps its v1 shape with no verdict.
+            "route_conformance": None,
             "status_mismatch": status_mismatch,
             "body": _redact_reasoning(_json_safe(body)),
             "exception_type": exception_type,
@@ -899,12 +839,9 @@ class OpenRouterChatEvalAdapter(LlmPort):
             started_at=started_at,
             completed_at=completed_at,
         )
-        evidence = _openrouter_execution_evidence(
+        evidence = _no_response_evidence(
             binding, request, gateway_provider=self._config.provider,
-            resolved_model=None, routing=None, routing_ref=None,
-            usage=usage, cost_decimal=None, request_id=None, generation_id=None,
-            transformation_status=TransformationStatus.UNKNOWN,
-            preflight_mismatch=preflight_mismatch,
+            usage=usage, preflight_mismatch=preflight_mismatch,
         )
         return ModelCallEnvelope(
             result=result, execution_evidence=evidence, supporting_artifacts=(error,)
@@ -927,6 +864,7 @@ class OpenRouterChatEvalAdapter(LlmPort):
         request_id = response.headers.get("x-request-id")
         generation_id_header = response.headers.get("x-generation-id")
         retry_after = _parse_retry_after(response.headers.get("retry-after"))
+        cache_header = response.headers.get(CACHE_STATUS_HEADER)
         status = response.status_code
 
         try:
@@ -950,6 +888,11 @@ class OpenRouterChatEvalAdapter(LlmPort):
 
         # §9.2.1: JSON decode failure.
         if body is None:
+            no_usage = TokenUsage(limitations=(LIMITATION_NO_USAGE,))
+            no_response_evidence = _no_response_evidence(
+                binding, request, gateway_provider=self._config.provider,
+                usage=no_usage,
+            )
             if 200 <= status < 300:
                 failure = _Failure(
                     FailureKind.OUTPUT_PARSE_FAILED, "openrouter.output_parse_failed",
@@ -965,7 +908,7 @@ class OpenRouterChatEvalAdapter(LlmPort):
                 )
                 return self._assemble_failure(
                     binding, base, failure, provider_finish_reason=f"http_error:{status}:decode",
-                    usage=TokenUsage(limitations=(LIMITATION_NO_USAGE,)),
+                    usage=no_usage, evidence=no_response_evidence,
                     error=error, extra=(raw, visible), visible=visible,
                     resolved_model=request.requested_model,
                 )
@@ -978,15 +921,53 @@ class OpenRouterChatEvalAdapter(LlmPort):
             )
             return self._assemble_failure(
                 binding, base, failure, provider_finish_reason=f"http_error:{status}:non_json",
-                usage=TokenUsage(limitations=(LIMITATION_NO_USAGE,)),
-                error=error, extra=(raw,), visible=None, resolved_model=request.requested_model,
+                usage=no_usage, evidence=no_response_evidence,
+                error=error, extra=(raw,), visible=None,
+                resolved_model=request.requested_model,
             )
 
         usage = _map_usage(body)
 
+        # §7.2 step 3: pure observation before any wire verdict. Route/cache/
+        # pipeline facts are normalized once from the parseable body and reused
+        # by every downstream outcome — success, refusal, error — so an error
+        # response never loses its known routing facts (§7.5).
+        routing_artifact: ArtifactRecord | None = None
+        if isinstance(body, dict):
+            metadata = body.get("openrouter_metadata")
+            facts = normalize_openrouter_routing(
+                metadata, cache_header_value=cache_header
+            )
+            raw_model = body.get("model")
+            resolved_actual = (
+                raw_model if isinstance(raw_model, str) and raw_model else None
+            )
+            generation_id = _generation_id(body, generation_id_header)
+            usage_dict = (
+                body.get("usage") if isinstance(body.get("usage"), dict) else {}
+            )
+            cost_decimal = _decimal_str(usage_dict.get("cost"))
+            routing_artifact = self._routing_artifact(
+                request, facts, metadata=metadata, resolved_model=resolved_actual,
+                generation_id=generation_id, request_id=request_id,
+                cost_decimal=cost_decimal, usage_dict=usage_dict,
+                cache_header_value=cache_header, created_at=completed_at,
+            )
+            evidence = self._facts_evidence(
+                binding, request, facts=facts, resolved_model=resolved_actual,
+                routing_ref=routing_artifact.ref, usage=usage,
+                cost_decimal=cost_decimal, request_id=request_id,
+                generation_id=generation_id,
+            )
+        else:
+            evidence = _no_response_evidence(
+                binding, request, gateway_provider=self._config.provider, usage=usage
+            )
+
         try:
             return self._interpret_body(
                 request, binding, body, base=base, usage=usage, raw=raw,
+                routing_artifact=routing_artifact, evidence=evidence,
                 status=status, request_id=request_id,
                 generation_id_header=generation_id_header, retry_after=retry_after,
                 completed_at=completed_at,
@@ -994,10 +975,12 @@ class OpenRouterChatEvalAdapter(LlmPort):
         except _ResponseError as exc:
             resolved = body.get("model") if isinstance(body, dict) else None
             visible = None
-            extras: tuple[ArtifactRecord, ...] = (raw,)
+            extras: tuple[ArtifactRecord, ...] = (
+                (raw, routing_artifact) if routing_artifact is not None else (raw,)
+            )
             if exc.include_visible:
                 visible = self._visible_artifact(request, body, created_at=completed_at)
-                extras = (raw, visible)
+                extras = (*extras, visible)
             generation_id = _generation_id(body, generation_id_header)
             error = self._error_artifact(
                 request, failure=exc.failure, created_at=completed_at, detail=exc.detail,
@@ -1015,12 +998,14 @@ class OpenRouterChatEvalAdapter(LlmPort):
                     binding, base, usage=usage, visible=visible or self._visible_artifact(
                         request, body, created_at=completed_at
                     ),
-                    raw=raw, provider_category=exc.error_type or "refusal",
+                    raw=raw, routing=routing_artifact, evidence=evidence,
+                    provider_category=exc.error_type or "refusal",
                     resolved_model=resolved or request.requested_model,
                 )
             return self._assemble_failure(
                 binding, base, exc.failure, provider_finish_reason=exc.provider_finish_reason,
-                usage=usage, error=error, extra=extras, visible=visible,
+                usage=usage, evidence=evidence, error=error, extra=extras,
+                visible=visible,
                 resolved_model=resolved
                 if isinstance(resolved, str) and resolved
                 else request.requested_model,
@@ -1035,6 +1020,8 @@ class OpenRouterChatEvalAdapter(LlmPort):
         base: dict[str, Any],
         usage: TokenUsage,
         raw: ArtifactRecord,
+        routing_artifact: ArtifactRecord | None,
+        evidence: ProviderExecutionEvidence,
         status: int,
         request_id: str | None,
         generation_id_header: str | None,
@@ -1076,7 +1063,7 @@ class OpenRouterChatEvalAdapter(LlmPort):
             )
 
         # §9.2.4: protocol envelope.
-        if body.get("object") != "chat.completion":
+        if not isinstance(body, dict) or body.get("object") != "chat.completion":
             raise _ResponseError(
                 _Failure(
                     FailureKind.UNKNOWN_PROVIDER_FAILURE, "openrouter.protocol_invalid",
@@ -1109,52 +1096,12 @@ class OpenRouterChatEvalAdapter(LlmPort):
                 include_visible=False,
             )
 
-        # §9.3: router metadata gate.
-        routing = self._check_routing(body, resolved_model=resolved_model)
-        routing_artifact = self._routing_artifact(
-            request, routing, resolved_model=resolved_model,
-            generation_id=generation_id, request_id=request_id, body=body,
-            created_at=completed_at,
-        )
-
-        # §9.4/§9.6: resolved model must be the exact requested catalog model ID.
-        if resolved_model not in self._config.accepted_resolved_models:
-            visible = self._visible_artifact(request, body, created_at=completed_at)
-            failure = _Failure(
-                FailureKind.RESOLVED_MODEL_MISMATCH, "openrouter.resolved_model_mismatch",
-                False, SAFE_MESSAGES["model_mismatch"],
-            )
-            error = self._error_artifact(
-                request, failure=failure, created_at=completed_at,
-                detail=f"resolved model {resolved_model!r} is not in the eval allowlist",
-                request_id=request_id, generation_id=generation_id,
-                route_conformance=routing_conformance(routing),
-            )
-            return self._assemble_failure(
-                binding, base, failure, provider_finish_reason=_provider_finish(body),
-                usage=usage, error=error, extra=(raw, routing_artifact, visible),
-                visible=visible, resolved_model=resolved_model,
-            )
-
-        if not routing.clean:
-            visible = self._visible_artifact(request, body, created_at=completed_at)
-            failure = _Failure(
-                FailureKind.UNKNOWN_PROVIDER_FAILURE, "openrouter.route_contaminated",
-                False, SAFE_MESSAGES["route"],
-            )
-            error = self._error_artifact(
-                request, failure=failure, created_at=completed_at,
-                detail="; ".join(routing.failures),
-                request_id=request_id, generation_id=generation_id,
-                route_conformance=routing_conformance(routing),
-            )
-            return self._assemble_failure(
-                binding, base, failure, provider_finish_reason=(
-                    f"route_contaminated:{routing.failures[0]}"
-                ),
-                usage=usage, error=error, extra=(raw, routing_artifact, visible),
-                visible=visible, resolved_model=resolved_model,
-            )
+        # R4: no adapter-side routing/model gate. Route facts were already
+        # normalized into `evidence`/`routing_artifact` (§7.2 step 3); whether
+        # this execution is eligible is the application conformance policy's
+        # call, after the wire result. `routing_artifact` is always present on
+        # this path (the body is a dict).
+        assert routing_artifact is not None
 
         # §9.2.6: exactly one choice at index 0.
         choices = body.get("choices")
@@ -1172,7 +1119,8 @@ class OpenRouterChatEvalAdapter(LlmPort):
             )
             return self._assemble_failure(
                 binding, base, failure, provider_finish_reason="chat:none", usage=usage,
-                error=error, extra=(raw, routing_artifact, visible), visible=visible,
+                evidence=evidence, error=error,
+                extra=(raw, routing_artifact, visible), visible=visible,
                 resolved_model=resolved_model,
             )
         choice = choices[0]
@@ -1189,7 +1137,8 @@ class OpenRouterChatEvalAdapter(LlmPort):
             )
             return self._assemble_failure(
                 binding, base, failure, provider_finish_reason="chat:none", usage=usage,
-                error=error, extra=(raw, routing_artifact, visible), visible=visible,
+                evidence=evidence, error=error,
+                extra=(raw, routing_artifact, visible), visible=visible,
                 resolved_model=resolved_model,
             )
 
@@ -1206,7 +1155,8 @@ class OpenRouterChatEvalAdapter(LlmPort):
             if error_type in _REFUSAL_ERROR_TYPES:
                 return self._assemble_refusal(
                     binding, base, usage=usage, visible=visible, raw=raw,
-                    routing=routing_artifact, provider_category=error_type,
+                    routing=routing_artifact, evidence=evidence,
+                    provider_category=error_type,
                     resolved_model=resolved_model,
                 )
             error = self._error_artifact(
@@ -1219,7 +1169,8 @@ class OpenRouterChatEvalAdapter(LlmPort):
             return self._assemble_failure(
                 binding, base, failure,
                 provider_finish_reason=f"embedded_error:{error_type or 'unmapped'}",
-                usage=usage, error=error, extra=(raw, routing_artifact, visible),
+                usage=usage, evidence=evidence, error=error,
+                extra=(raw, routing_artifact, visible),
                 visible=visible, resolved_model=resolved_model,
             )
 
@@ -1240,21 +1191,18 @@ class OpenRouterChatEvalAdapter(LlmPort):
             )
             return self._assemble_failure(
                 binding, base, failure, provider_finish_reason=provider_finish, usage=usage,
-                error=error, extra=(raw, routing_artifact, visible), visible=visible,
+                evidence=evidence, error=error,
+                extra=(raw, routing_artifact, visible), visible=visible,
                 resolved_model=resolved_model,
             )
 
         if finish_reason == "content_filter":
             return self._assemble_refusal(
-                binding, base, usage=usage, visible=visible, raw=raw, routing=routing_artifact,
+                binding, base, usage=usage, visible=visible, raw=raw,
+                routing=routing_artifact, evidence=evidence,
                 provider_category="content_filter", resolved_model=resolved_model,
             )
 
-        clean_cost = _decimal_str(
-            body.get("usage", {}).get("cost")
-            if isinstance(body.get("usage"), dict)
-            else None
-        )
         if finish_reason == "length":
             result = ModelCallResult(
                 **base, resolved_model=resolved_model,
@@ -1263,13 +1211,6 @@ class OpenRouterChatEvalAdapter(LlmPort):
                 provider_finish_reason=provider_finish,
                 parsed_output=None, visible_response_artifact=visible.ref,
                 refusal=None, failure=None, usage=usage,
-            )
-            evidence = _openrouter_execution_evidence(
-                binding, request, gateway_provider=self._config.provider,
-                resolved_model=resolved_model, routing=routing,
-                routing_ref=routing_artifact.ref, usage=usage, cost_decimal=clean_cost,
-                request_id=request_id, generation_id=generation_id,
-                transformation_status=TransformationStatus.CLEAN,
             )
             return ModelCallEnvelope(
                 result=result, execution_evidence=evidence,
@@ -1288,7 +1229,8 @@ class OpenRouterChatEvalAdapter(LlmPort):
             )
             return self._assemble_failure(
                 binding, base, failure, provider_finish_reason=provider_finish, usage=usage,
-                error=error, extra=(raw, routing_artifact, visible), visible=visible,
+                evidence=evidence, error=error,
+                extra=(raw, routing_artifact, visible), visible=visible,
                 resolved_model=resolved_model,
             )
 
@@ -1306,7 +1248,8 @@ class OpenRouterChatEvalAdapter(LlmPort):
             )
             return self._assemble_failure(
                 binding, base, failure, provider_finish_reason=provider_finish, usage=usage,
-                error=error, extra=(raw, routing_artifact, visible), visible=visible,
+                evidence=evidence, error=error,
+                extra=(raw, routing_artifact, visible), visible=visible,
                 resolved_model=resolved_model,
             )
         try:
@@ -1323,7 +1266,8 @@ class OpenRouterChatEvalAdapter(LlmPort):
             )
             return self._assemble_failure(
                 binding, base, failure, provider_finish_reason=provider_finish, usage=usage,
-                error=error, extra=(raw, routing_artifact, visible), visible=visible,
+                evidence=evidence, error=error,
+                extra=(raw, routing_artifact, visible), visible=visible,
                 resolved_model=resolved_model,
             )
         if not isinstance(value, dict):
@@ -1338,7 +1282,8 @@ class OpenRouterChatEvalAdapter(LlmPort):
             )
             return self._assemble_failure(
                 binding, base, failure, provider_finish_reason=provider_finish, usage=usage,
-                error=error, extra=(raw, routing_artifact, visible), visible=visible,
+                evidence=evidence, error=error,
+                extra=(raw, routing_artifact, visible), visible=visible,
                 resolved_model=resolved_model,
             )
         payload = build_structured_payload(
@@ -1351,133 +1296,69 @@ class OpenRouterChatEvalAdapter(LlmPort):
             visible_response_artifact=visible.ref, refusal=None, failure=None,
             usage=usage,
         )
-        evidence = _openrouter_execution_evidence(
-            binding, request, gateway_provider=self._config.provider,
-            resolved_model=resolved_model, routing=routing,
-            routing_ref=routing_artifact.ref, usage=usage, cost_decimal=clean_cost,
-            request_id=request_id, generation_id=generation_id,
-            transformation_status=TransformationStatus.CLEAN,
-        )
         return ModelCallEnvelope(
             result=result, execution_evidence=evidence,
             supporting_artifacts=(raw, routing_artifact, visible),
         )
 
-    # ---- routing (§9.3/§12.2) -----------------------------------------------
-
-    def _check_routing(
-        self, body: dict[str, Any], *, resolved_model: str
-    ) -> _RoutingCheck:
-        metadata = body.get("openrouter_metadata")
-        if not isinstance(metadata, dict):
-            return _RoutingCheck(
-                metadata_present=False, failures=["metadata missing"]
-            )
-        check = _RoutingCheck(metadata_present=True)
-        check.strategy = metadata.get("strategy")
-        check.requested = metadata.get("requested")
-        check.router_attempt = metadata.get("attempt")
-        check.is_byok = metadata.get("is_byok") if isinstance(
-            metadata.get("is_byok"), bool
-        ) else None
-        check.region = metadata.get("region")
-        attempts = metadata.get("attempts")
-        check.attempts = attempts if isinstance(attempts, list) else []
-        pipeline = metadata.get("pipeline")
-        check.pipeline = pipeline if isinstance(pipeline, list) else []
-        provider_name, selected_model, selected_count = _selected_endpoint(metadata)
-        check.selected_provider_name = provider_name
-        check.selected_model = selected_model
-
-        check.model_match = check.requested == self._config.requested_model
-        if not check.model_match:
-            check.failures.append(f"requested {check.requested!r} != config model")
-        if check.strategy not in APPROVED_ROUTER_STRATEGIES:
-            check.failures.append(f"strategy {check.strategy!r} not approved")
-
-        provider_ok = selected_count == 1
-        accepted_metadata_models = {
-            self._config.requested_model,
-            self._config.catalog_canonical_model,
-        }
-        if selected_count != 1:
-            check.failures.append(
-                f"expected exactly one selected endpoint, found {selected_count}"
-            )
-        else:
-            if provider_name != self._config.expected_upstream_provider_name:
-                provider_ok = False
-                check.failures.append(
-                    f"selected provider {provider_name!r} != "
-                    f"{self._config.expected_upstream_provider_name!r}"
-                )
-            if selected_model not in accepted_metadata_models:
-                provider_ok = False
-                check.failures.append(
-                    f"selected model {selected_model!r} is not one of the "
-                    "snapshot-bound request/canonical model identities"
-                )
-        check.provider_model_match = provider_ok
-
-        attempt_conflict = False
-        for entry in check.attempts:
-            if isinstance(entry, dict):
-                provider = entry.get("provider")
-                model = entry.get("model")
-                if (
-                    provider is not None
-                    and provider != self._config.expected_upstream_provider_name
-                ) or (
-                    model is not None and model not in accepted_metadata_models
-                ):
-                    attempt_conflict = True
-                    break
-        check.single_upstream_attempt = check.router_attempt == 1 and not attempt_conflict
-        if check.router_attempt != 1:
-            check.failures.append(f"router attempt {check.router_attempt!r} != 1")
-        if attempt_conflict:
-            check.failures.append("attempts include a different provider/model")
-
-        check.pipeline_clean = not check.pipeline
-        if check.pipeline:
-            check.failures.append(
-                f"pipeline is not empty ({len(check.pipeline)} stage(s))"
-            )
-        return check
+    # ---- routing facts artifact (R4 §7.4) -----------------------------------
 
     def _routing_artifact(
         self,
         request: ModelCallRequest,
-        routing: _RoutingCheck,
+        facts: OpenRouterRoutingFacts,
         *,
-        resolved_model: str,
+        metadata: Any,
+        resolved_model: str | None,
         generation_id: str | None,
         request_id: str | None,
-        body: dict[str, Any],
+        cost_decimal: str | None,
+        usage_dict: dict[str, Any],
+        cache_header_value: str | None,
         created_at: datetime,
     ) -> ArtifactRecord:
-        usage = body.get("usage") if isinstance(body.get("usage"), dict) else {}
-        cost = usage.get("cost")
+        """Immutable provider-specific source artifact behind the normalized
+        route facts. Pure observation — no ``eligible``/``conformance``/
+        ``pipeline_clean`` verdicts (§7.4). ``attempts``/``pipeline`` keep the
+        sanitized raw metadata values even when malformed."""
+
+        metadata_dict = metadata if isinstance(metadata, dict) else {}
         payload = {
             "schema_version": ROUTING_SCHEMA_VERSION,
             "requested_model": request.requested_model,
+            "metadata_requested_model": facts.metadata_requested_model,
             "resolved_model": resolved_model,
             "catalog_canonical_model": self._config.catalog_canonical_model,
             "configured_endpoint_slug": self._config.upstream_endpoint_slug,
             "expected_provider_name": self._config.expected_upstream_provider_name,
-            "selected_provider_name": routing.selected_provider_name,
-            "selected_model": routing.selected_model,
-            "strategy": routing.strategy,
-            "router_attempt": routing.router_attempt,
-            "attempts": _json_safe(routing.attempts),
-            "pipeline": _json_safe(routing.pipeline),
-            "is_byok": routing.is_byok,
-            "region": _json_safe(routing.region),
+            "selected_provider_name": facts.selected_provider,
+            "selected_model": facts.selected_model,
+            "selected_count": facts.selected_count,
+            "strategy": facts.route_strategy,
+            "router_attempt": facts.router_attempt,
+            "attempts": _json_safe(metadata_dict.get("attempts")),
+            "pipeline": _json_safe(metadata_dict.get("pipeline")),
+            "pipeline_stage_summaries": [
+                {
+                    "index": stage.index,
+                    "type": stage.stage_type,
+                    "name": stage.name,
+                    "status": stage.status,
+                    "transformation": stage.transformation_status.value,
+                    "details_hash": stage.details_hash,
+                }
+                for stage in facts.pipeline_stages
+            ],
+            "transformation_status": facts.transformation_status.value,
+            "cache_status": facts.cache_status.value,
+            "cache_header_value": cache_header_value,
+            "is_byok": facts.is_byok,
+            "region": facts.region,
             "generation_id": generation_id,
             "http_request_id": request_id,
-            "cost": _decimal_str(cost),
-            "usage_total_mismatch": _usage_total_mismatch(usage),
-            "conformance": routing_conformance(routing),
+            "cost": cost_decimal,
+            "usage_total_mismatch": _usage_total_mismatch(usage_dict),
+            "normalization_limitations": sorted(set(facts.limitations)),
         }
         return self._supporting_artifact(
             request,
@@ -1485,6 +1366,71 @@ class OpenRouterChatEvalAdapter(LlmPort):
             kind=ROUTING_ARTIFACT_KIND,
             payload=payload,
             created_at=created_at,
+        )
+
+    def _facts_evidence(
+        self,
+        binding: ProviderBinding,
+        request: ModelCallRequest,
+        *,
+        facts: OpenRouterRoutingFacts,
+        resolved_model: str | None,
+        routing_ref: ArtifactRef,
+        usage: TokenUsage,
+        cost_decimal: str | None,
+        request_id: str | None,
+        generation_id: str | None,
+    ) -> ProviderExecutionEvidence:
+        """Unified facts → evidence builder for every parseable object body.
+
+        Actual observed values only: the binding's expected provider/model are
+        never copied into actual fields, and the endpoint slug is recorded only
+        when §6.4 attestation holds. The wire outcome does not change what gets
+        recorded here (§7.5).
+        """
+
+        upstream_endpoint = attest_upstream_endpoint(
+            facts,
+            outbound_requested_model=request.requested_model,
+            configured_endpoint_slug=binding.upstream_endpoint or "",
+            expected_upstream_provider=binding.upstream_provider or "",
+            accepted_upstream_models=binding.accepted_upstream_models,
+        ) or None
+        limitations = set(facts.limitations)
+        if upstream_endpoint is None:
+            limitations.add(LIMITATION_ENDPOINT_NOT_ATTESTED)
+        if cost_decimal is None:
+            limitations.add("openrouter response did not include cost")
+        if (
+            resolved_model is None
+            or facts.selected_provider is None
+            or facts.selected_model is None
+            or facts.route_strategy is None
+            or facts.router_attempt is None
+        ):
+            limitations.add("openrouter route metadata was not fully available")
+        return define_provider_execution_evidence(
+            binding_id=binding.binding_id,
+            binding_hash=binding.binding_hash,
+            adapter_id=OPENROUTER_ADAPTER_ID,
+            adapter_version=OPENROUTER_ADAPTER_VERSION,
+            gateway_provider=self._config.provider,
+            requested_model=request.requested_model,
+            gateway_resolved_model=resolved_model,
+            upstream_provider=facts.selected_provider,
+            upstream_model=facts.selected_model,
+            upstream_endpoint=upstream_endpoint,
+            route_strategy=facts.route_strategy,
+            upstream_attempt_count=facts.router_attempt,
+            transformation_status=facts.transformation_status,
+            pipeline_stages=facts.pipeline_stages,
+            cache_status=facts.cache_status,
+            provider_request_id=request_id,
+            generation_id=generation_id,
+            usage=usage,
+            cost_decimal=cost_decimal,
+            limitations=tuple(sorted(limitations)),
+            raw_routing_artifact=routing_ref,
         )
 
     def _visible_artifact(
@@ -1512,6 +1458,7 @@ class OpenRouterChatEvalAdapter(LlmPort):
         *,
         provider_finish_reason: str,
         usage: TokenUsage,
+        evidence: ProviderExecutionEvidence,
         error: ArtifactRecord,
         extra: tuple[ArtifactRecord, ...],
         visible: ArtifactRecord | None,
@@ -1533,7 +1480,7 @@ class OpenRouterChatEvalAdapter(LlmPort):
         )
         return ModelCallEnvelope(
             result=result,
-            execution_evidence=_unknown_evidence_from_base(binding, base, usage),
+            execution_evidence=evidence,
             supporting_artifacts=(*extra, error),
         )
 
@@ -1545,6 +1492,7 @@ class OpenRouterChatEvalAdapter(LlmPort):
         usage: TokenUsage,
         visible: ArtifactRecord,
         raw: ArtifactRecord,
+        evidence: ProviderExecutionEvidence,
         provider_category: str,
         resolved_model: str,
         routing: ArtifactRecord | None = None,
@@ -1564,7 +1512,7 @@ class OpenRouterChatEvalAdapter(LlmPort):
         )
         return ModelCallEnvelope(
             result=result,
-            execution_evidence=_unknown_evidence_from_base(binding, base, usage),
+            execution_evidence=evidence,
             supporting_artifacts=extras,
         )
 
@@ -1572,23 +1520,34 @@ class OpenRouterChatEvalAdapter(LlmPort):
 # ---- module-level pure helpers ----------------------------------------------
 
 
-def _unknown_evidence_from_base(
-    binding: ProviderBinding, base: dict[str, Any], usage: TokenUsage
+def _no_response_evidence(
+    binding: ProviderBinding,
+    request: ModelCallRequest,
+    *,
+    gateway_provider: str,
+    usage: TokenUsage,
+    preflight_mismatch: bool = False,
 ) -> ProviderExecutionEvidence:
-    """Evidence for a wire failure/refusal: conformance is wire_not_succeeded, so
-    only the binding-scoped identity fields matter; route facts are unknown.
+    """Route-less evidence when no parseable provider body exists (§7.5):
+    binding/deadline/transport failures and undecodable response bodies. All
+    route facts are unknown; nothing is fabricated from binding expectations.
 
-    adapter ID/version/gateway 描述實際 runtime adapter(§5.1.1);這條路徑只在
-    preflight 通過後可達,值必然等於 binding 的宣告。
+    adapter ID/version/gateway 描述實際 runtime adapter(§5.1.1);preflight
+    mismatch 時不從不相符的 binding 複製,並以 limitation 明確記錄。
     """
 
+    limitations = ["openrouter execution evidence unavailable for a failed attempt"]
+    if preflight_mismatch:
+        limitations.append(
+            "openrouter runtime binding preflight failed before any provider call"
+        )
     return define_provider_execution_evidence(
         binding_id=binding.binding_id,
         binding_hash=binding.binding_hash,
         adapter_id=OPENROUTER_ADAPTER_ID,
         adapter_version=OPENROUTER_ADAPTER_VERSION,
-        gateway_provider=base["gateway_provider"],
-        requested_model=base["requested_model"],
+        gateway_provider=gateway_provider,
+        requested_model=request.requested_model,
         gateway_resolved_model=None,
         upstream_provider=None,
         upstream_model=None,
@@ -1602,100 +1561,9 @@ def _unknown_evidence_from_base(
         generation_id=None,
         usage=usage,
         cost_decimal=None,
-        limitations=("openrouter execution evidence unavailable for a failed attempt",),
+        limitations=tuple(sorted(limitations)),
         raw_routing_artifact=None,
     )
-
-
-def _openrouter_execution_evidence(
-    binding: ProviderBinding,
-    request: ModelCallRequest,
-    *,
-    gateway_provider: str,
-    resolved_model: str | None,
-    routing: "_RoutingCheck | None",
-    routing_ref: ArtifactRef | None,
-    usage: TokenUsage,
-    cost_decimal: str | None,
-    request_id: str | None,
-    generation_id: str | None,
-    transformation_status: TransformationStatus,
-    preflight_mismatch: bool = False,
-) -> ProviderExecutionEvidence:
-    """Normalize one attempt's route/usage facts into neutral execution evidence.
-
-    R3 mechanical migration: the adapter still fails closed on contamination
-    (returning a wire failure), so a wire-succeeded result always carries a clean
-    direct route here. Eligibility is decided later by the application conformance
-    policy; this only records what happened. adapter ID/version 與 ``gateway_provider``
-    描述實際 runtime adapter(§5.1.1),preflight mismatch 時不從不相符的 binding
-    複製,並以 limitation 明確記錄 preflight 失敗。
-    """
-
-    if routing is not None and routing.metadata_present:
-        upstream_provider = routing.selected_provider_name
-        upstream_model = routing.selected_model
-        route_strategy = routing.strategy if isinstance(routing.strategy, str) else None
-        upstream_attempt = (
-            routing.router_attempt if isinstance(routing.router_attempt, int) else None
-        )
-        upstream_endpoint = (
-            binding.upstream_endpoint if upstream_provider is not None else None
-        )
-        cache_status = CacheStatus.ABSENT
-    else:
-        upstream_provider = upstream_model = route_strategy = upstream_endpoint = None
-        upstream_attempt = None
-        cache_status = CacheStatus.UNKNOWN
-    limitations: list[str] = []
-    if (
-        resolved_model is None
-        or upstream_provider is None
-        or upstream_model is None
-        or upstream_endpoint is None
-        or route_strategy is None
-        or upstream_attempt is None
-    ):
-        limitations.append("openrouter route metadata was not fully available")
-    if cost_decimal is None:
-        limitations.append("openrouter response did not include cost")
-    if preflight_mismatch:
-        limitations.append(
-            "openrouter runtime binding preflight failed before any provider call"
-        )
-    return define_provider_execution_evidence(
-        binding_id=binding.binding_id,
-        binding_hash=binding.binding_hash,
-        adapter_id=OPENROUTER_ADAPTER_ID,
-        adapter_version=OPENROUTER_ADAPTER_VERSION,
-        gateway_provider=gateway_provider,
-        requested_model=request.requested_model,
-        gateway_resolved_model=resolved_model,
-        upstream_provider=upstream_provider,
-        upstream_model=upstream_model,
-        upstream_endpoint=upstream_endpoint,
-        route_strategy=route_strategy,
-        upstream_attempt_count=upstream_attempt,
-        transformation_status=transformation_status,
-        pipeline_stages=(),
-        cache_status=cache_status,
-        provider_request_id=request_id,
-        generation_id=generation_id,
-        usage=usage,
-        cost_decimal=cost_decimal,
-        limitations=tuple(sorted(set(limitations))),
-        raw_routing_artifact=routing_ref,
-    )
-
-
-def routing_conformance(routing: _RoutingCheck) -> dict[str, Any]:
-    return {
-        "metadata_present": routing.metadata_present,
-        "model_match": routing.model_match,
-        "provider_model_match": routing.provider_model_match,
-        "single_upstream_attempt": routing.single_upstream_attempt,
-        "pipeline_clean": routing.pipeline_clean,
-    }
 
 
 def _decimal_str(cost: Any) -> str | None:

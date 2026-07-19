@@ -1,10 +1,12 @@
-"""V3-4R OpenRouter Chat eval adapter — mocked-HTTP conformance tests.
+"""V3-4R/V3-5A R4 OpenRouter Chat eval adapter — mocked-HTTP wire/evidence tests.
 
 不打 live API;所有 provider 行為經 `httpx.MockTransport` + adapter 的真 JSON
-decoder。R3 覆蓋 request projection、single-call/deadline、error matrix 與
-raw/error artifacts;R4(同檔)覆蓋 success/routing/usage/redaction。
+decoder。覆蓋 request projection、single-call/deadline、error matrix、raw/error
+artifacts、success/usage/redaction,以及 R4 的 wire/evidence 分離:route/model/
+pipeline/cache 污染是 wire success + 誠實 evidence,eligibility 由 application
+`attribution-strict/1.0.0` conformance 判定(§12.2)。
 
-規格:docs/plans/2026-07-17-interview-vnext-v3-4r-openrouter-first-adapter-plan.md
+規格:docs/plans/2026-07-19-interview-vnext-v3-5a-r4-provider-evidence-conformance-plan.md
 """
 
 from __future__ import annotations
@@ -22,6 +24,13 @@ import pytest
 
 from app.interview_vnext.domain.hashing import canonical_hash, canonical_json
 from app.interview_vnext.llm.binding import ProviderBinding, define_provider_binding
+from app.interview_vnext.llm.conformance import (
+    ConformanceReasonCode,
+    ConformanceReport,
+    evaluate_conformance,
+    resolve_conformance_policy,
+)
+from app.interview_vnext.llm.execution import CacheStatus, TransformationStatus
 from app.interview_vnext.llm.operation_documents import turn_interpret_operation
 from app.interview_vnext.llm.port import (
     MessageRole,
@@ -287,6 +296,43 @@ def artifact_by_label(envelope: ModelCallEnvelope, label: str) -> dict[str, Any]
     stored = {record.ref.artifact_id: record for record in envelope.supporting_artifacts}
     record = stored[uuid5(attempt_id, label)]
     return json.loads(record.inline_content)
+
+
+def conformance_report(
+    envelope: ModelCallEnvelope, binding: ProviderBinding | None = None
+) -> ConformanceReport:
+    """§5.3:executor/probe 用同一純函式評 eligibility;測試亦然。"""
+
+    binding = binding or STANDARD_BINDING
+    policy = resolve_conformance_policy(binding.conformance_policy)
+    return evaluate_conformance(
+        policy=policy,
+        binding=binding,
+        evidence=envelope.execution_evidence,
+        wire_outcome=envelope.result.outcome,
+    )
+
+
+def assert_wire_success_with_reasons(
+    envelope: ModelCallEnvelope,
+    expected_reasons: tuple[ConformanceReasonCode, ...],
+) -> None:
+    """§12.2 三段式:wire success、payload 保留、ineligible + exact reasons。"""
+
+    result = envelope.result
+    assert result.outcome is ModelOutcome.SUCCEEDED
+    assert result.parsed_output is not None
+    assert result.failure is None
+    report = conformance_report(envelope)
+    assert report.eligible is False
+    assert report.reason_codes == expected_reasons
+    # conformance-only failure 不建立 ModelFailure/error artifact(§7.4)。
+    kinds = {record.ref.kind for record in envelope.supporting_artifacts}
+    assert ERROR_ARTIFACT_KIND not in kinds
+    assert RAW_ARTIFACT_KIND in kinds
+    assert "provider.openrouter.routing" in kinds
+    assert "provider.response.visible" in kinds
+    assert_no_secret_anywhere(envelope)
 
 
 def assert_failure(
@@ -977,25 +1023,48 @@ class TestSuccessPath:
         assert raw["redactions"] == []
 
         routing = artifact_by_label(envelope, ROUTING_ARTIFACT_LABEL)
+        assert routing["schema_version"] == "openrouter_routing.v2"
         assert routing["resolved_model"] == REQUESTED_MODEL
+        assert routing["metadata_requested_model"] == REQUESTED_MODEL
         assert routing["catalog_canonical_model"] == CANONICAL_MODEL
         assert routing["configured_endpoint_slug"] == ENDPOINT_SLUG
         assert routing["expected_provider_name"] == "TestHost"
         assert routing["selected_provider_name"] == "TestHost"
         assert routing["selected_model"] == REQUESTED_MODEL
+        assert routing["selected_count"] == 1
         assert routing["strategy"] == "direct"
         assert routing["router_attempt"] == 1
         assert routing["generation_id"] == "gen-fx-success"
         assert isinstance(routing["cost"], str)
         assert float(routing["cost"]) == pytest.approx(0.00123)
         assert routing["usage_total_mismatch"] is False
-        assert routing["conformance"] == {
-            "metadata_present": True,
-            "model_match": True,
-            "provider_model_match": True,
-            "single_upstream_attempt": True,
-            "pipeline_clean": True,
-        }
+        assert routing["pipeline_stage_summaries"] == []
+        assert routing["transformation_status"] == "clean"
+        assert routing["cache_status"] == "absent"
+        assert routing["cache_header_value"] is None
+        assert routing["normalization_limitations"] == []
+        # §7.4:artifact 是 observation,不含任何 eligibility verdict。
+        for forbidden in ("conformance", "eligible", "pipeline_clean"):
+            assert forbidden not in routing
+
+        # §7.5:evidence 只記 actual facts;endpoint 由 outbound + response 共同 attest。
+        evidence = envelope.execution_evidence
+        assert evidence.gateway_resolved_model == REQUESTED_MODEL
+        assert evidence.upstream_provider == "TestHost"
+        assert evidence.upstream_model == REQUESTED_MODEL
+        assert evidence.upstream_endpoint == ENDPOINT_SLUG
+        assert evidence.route_strategy == "direct"
+        assert evidence.upstream_attempt_count == 1
+        assert evidence.transformation_status == TransformationStatus.CLEAN
+        assert evidence.pipeline_stages == ()
+        assert evidence.cache_status == CacheStatus.ABSENT
+        assert evidence.limitations == ()
+        assert evidence.raw_routing_artifact is not None
+        assert evidence.raw_routing_artifact.kind == "provider.openrouter.routing"
+
+        report = conformance_report(envelope)
+        assert report.eligible is True
+        assert report.reason_codes == ()
 
         visible = artifact_by_label(envelope, VISIBLE_ARTIFACT_LABEL)
         assert visible["schema_version"] == "provider_visible_response.v1"
@@ -1090,28 +1159,36 @@ class TestSuccessPath:
             retryable=False,
         )
 
-    async def test_resolved_model_mismatch_fails_closed(self):
+    async def test_resolved_model_mismatch_is_wire_success_but_ineligible(self):
+        """R4 §8:top-level model 不在 binding allowlist 不再是 ModelFailure。"""
+
         adapter, _ = make_adapter(
             lambda request: fixture_response("resolved-model-mismatch.json")
         )
         envelope = await adapter.generate_structured(make_call())
-        assert_failure(
+        # fixture 的 metadata selected model 也是未綁定的 mini,endpoint 無法 attest。
+        assert_wire_success_with_reasons(
             envelope,
-            kind=FailureKind.RESOLVED_MODEL_MISMATCH,
-            reason_code="openrouter.resolved_model_mismatch",
-            retryable=False,
+            (
+                ConformanceReasonCode.GATEWAY_MODEL_MISMATCH,
+                ConformanceReasonCode.ROUTE_METADATA_MISSING,
+                ConformanceReasonCode.UPSTREAM_MODEL_MISMATCH,
+            ),
         )
         assert envelope.result.resolved_model == "testlab/analyst-mini"
+        assert envelope.execution_evidence.gateway_resolved_model == (
+            "testlab/analyst-mini"
+        )
 
-    async def test_prefix_model_is_not_accepted(self):
+    async def test_prefix_model_is_wire_success_but_ineligible(self):
         body = success_body(model="testlab/analyst-large-2026")
         adapter, _ = make_adapter(lambda request: respond(body))
         envelope = await adapter.generate_structured(make_call())
-        assert_failure(
-            envelope,
-            kind=FailureKind.RESOLVED_MODEL_MISMATCH,
-            reason_code="openrouter.resolved_model_mismatch",
-            retryable=False,
+        assert_wire_success_with_reasons(
+            envelope, (ConformanceReasonCode.GATEWAY_MODEL_MISMATCH,)
+        )
+        assert envelope.execution_evidence.gateway_resolved_model == (
+            "testlab/analyst-large-2026"
         )
 
     async def test_multiple_choices_is_cardinality_failure(self):
@@ -1224,43 +1301,67 @@ class TestUsageMapping:
         assert routing["cost"] == "0.0001234567890123"
 
 
+METADATA_MISSING_REASONS = (
+    ConformanceReasonCode.CACHE_INELIGIBLE,
+    ConformanceReasonCode.ROUTE_METADATA_MISSING,
+    ConformanceReasonCode.TRANSFORMATION_INELIGIBLE,
+)
+PIPELINE_REASONS = (
+    ConformanceReasonCode.PIPELINE_NOT_EMPTY,
+    ConformanceReasonCode.TRANSFORMATION_INELIGIBLE,
+)
+
+
 class TestRoutingContamination:
-    async def _run(self, metadata):
+    """R4 §8/§12.2:每個污染向量都是 wire success + 誠實 evidence + exact reasons。"""
+
+    async def _run(self, metadata, *, headers: dict | None = None):
         body = success_body(metadata=metadata)
-        adapter, _ = make_adapter(lambda request: respond(body))
+        adapter, _ = make_adapter(lambda request: respond(body, headers=headers))
         return await adapter.generate_structured(make_call())
 
-    async def test_metadata_missing_is_contaminated(self):
+    async def test_metadata_missing_is_ineligible_route_unknown(self):
         body = success_body()
         del body["openrouter_metadata"]
         adapter, _ = make_adapter(lambda request: respond(body))
         envelope = await adapter.generate_structured(make_call())
-        assert_failure(
-            envelope,
-            kind=FailureKind.UNKNOWN_PROVIDER_FAILURE,
-            reason_code="openrouter.route_contaminated",
-            retryable=False,
-        )
+        assert_wire_success_with_reasons(envelope, METADATA_MISSING_REASONS)
+        evidence = envelope.execution_evidence
+        assert evidence.upstream_provider is None
+        assert evidence.upstream_endpoint is None
+        assert evidence.route_strategy is None
+        assert evidence.transformation_status == TransformationStatus.UNKNOWN
+        assert evidence.cache_status == CacheStatus.UNKNOWN
+        assert evidence.limitations  # explicit, sorted, non-empty
 
-    async def test_requested_model_mismatch_is_contaminated(self):
+    async def test_requested_model_mismatch_blocks_endpoint_attestation(self):
         envelope = await self._run(clean_metadata(requested="testlab/other"))
-        assert_failure(
-            envelope,
-            kind=FailureKind.UNKNOWN_PROVIDER_FAILURE,
-            reason_code="openrouter.route_contaminated",
-            retryable=False,
+        assert_wire_success_with_reasons(
+            envelope, (ConformanceReasonCode.ROUTE_METADATA_MISSING,)
         )
+        evidence = envelope.execution_evidence
+        # actual metadata 保存;endpoint 不可 attest(§6.4)。
+        assert evidence.upstream_provider == "TestHost"
+        assert evidence.upstream_endpoint is None
+        routing = artifact_by_label(envelope, ROUTING_ARTIFACT_LABEL)
+        assert routing["metadata_requested_model"] == "testlab/other"
 
     @pytest.mark.parametrize("strategy", ["auto", "latest", "fallback", "pareto", "fusion"])
-    async def test_non_direct_strategy_is_contaminated(self, strategy):
+    async def test_non_direct_strategy_is_ineligible(self, strategy):
         envelope = await self._run(clean_metadata(strategy=strategy))
-        assert envelope.result.failure.reason_code == "openrouter.route_contaminated"
+        assert_wire_success_with_reasons(
+            envelope, (ConformanceReasonCode.ROUTE_STRATEGY_MISMATCH,)
+        )
+        assert envelope.execution_evidence.route_strategy == strategy
 
-    async def test_router_attempt_gt_one_is_contaminated(self):
+    async def test_router_attempt_gt_one_is_ineligible(self):
         envelope = await self._run(clean_metadata(attempt=2))
-        assert envelope.result.failure.reason_code == "openrouter.route_contaminated"
+        assert_wire_success_with_reasons(
+            envelope, (ConformanceReasonCode.UPSTREAM_ATTEMPT_MISMATCH,)
+        )
+        assert envelope.execution_evidence.upstream_attempt_count == 2
 
-    async def test_selected_provider_mismatch_is_contaminated(self):
+    async def test_selected_provider_mismatch_keeps_actual_provider(self):
         envelope = await self._run(
             clean_metadata(
                 endpoints=[
@@ -1268,9 +1369,18 @@ class TestRoutingContamination:
                 ]
             )
         )
-        assert envelope.result.failure.reason_code == "openrouter.route_contaminated"
+        assert_wire_success_with_reasons(
+            envelope,
+            (
+                ConformanceReasonCode.ROUTE_METADATA_MISSING,
+                ConformanceReasonCode.UPSTREAM_PROVIDER_MISMATCH,
+            ),
+        )
+        evidence = envelope.execution_evidence
+        assert evidence.upstream_provider == "OtherHost"
+        assert evidence.upstream_endpoint is None
 
-    async def test_multiple_selected_endpoints_is_contaminated(self):
+    async def test_multiple_selected_endpoints_null_route_facts(self):
         envelope = await self._run(
             clean_metadata(
                 endpoints=[
@@ -1279,9 +1389,17 @@ class TestRoutingContamination:
                 ]
             )
         )
-        assert envelope.result.failure.reason_code == "openrouter.route_contaminated"
+        assert_wire_success_with_reasons(
+            envelope, (ConformanceReasonCode.ROUTE_METADATA_MISSING,)
+        )
+        evidence = envelope.execution_evidence
+        assert evidence.upstream_provider is None
+        assert evidence.upstream_model is None
+        assert evidence.upstream_endpoint is None
+        routing = artifact_by_label(envelope, ROUTING_ARTIFACT_LABEL)
+        assert routing["selected_count"] == 2
 
-    async def test_attempts_show_earlier_provider_failure(self):
+    async def test_attempts_conflict_blocks_endpoint_attestation(self):
         envelope = await self._run(
             clean_metadata(
                 attempts=[
@@ -1290,31 +1408,44 @@ class TestRoutingContamination:
                 ]
             )
         )
-        assert envelope.result.failure.reason_code == "openrouter.route_contaminated"
+        assert_wire_success_with_reasons(
+            envelope, (ConformanceReasonCode.ROUTE_METADATA_MISSING,)
+        )
+        assert envelope.execution_evidence.upstream_endpoint is None
 
     @pytest.mark.parametrize(
-        "stage",
+        ("stage", "expected_status"),
         [
-            {"type": "context_compression", "name": "middle-out"},
-            {"type": "response_healing", "name": "json-heal"},
-            {"type": "server_tool", "name": "web"},
-            {"type": "unknown_future_stage", "name": "x"},
+            ({"type": "guardrail", "name": "moderation"}, "inspected"),
+            ({"type": "guardrail", "name": "moderation", "flagged": False}, "inspected"),
+            ({"type": "context_compression", "name": "middle-out"}, "mutated"),
+            ({"type": "response_healing", "name": "json-heal"}, "mutated"),
+            ({"type": "server_tools", "name": "web"}, "mutated"),
+            ({"type": "plugin", "name": "file-parser"}, "mutated"),
+            ({"type": "unknown_future_stage", "name": "x"}, "unknown"),
         ],
     )
-    async def test_any_pipeline_stage_fails_closed(self, stage):
+    async def test_any_pipeline_stage_is_ineligible(self, stage, expected_status):
         envelope = await self._run(clean_metadata(pipeline=[stage]))
-        assert_failure(
-            envelope,
-            kind=FailureKind.UNKNOWN_PROVIDER_FAILURE,
-            reason_code="openrouter.route_contaminated",
-            retryable=False,
-        )
+        assert_wire_success_with_reasons(envelope, PIPELINE_REASONS)
+        evidence = envelope.execution_evidence
+        assert len(evidence.pipeline_stages) == 1
+        assert evidence.pipeline_stages[0].transformation_status.value == expected_status
+        assert evidence.transformation_status.value == expected_status
+        report = conformance_report(envelope)
+        assert report.transformation_status.value == expected_status
+        routing = artifact_by_label(envelope, ROUTING_ARTIFACT_LABEL)
+        summary = routing["pipeline_stage_summaries"][0]
+        assert summary["index"] == 1
+        assert summary["transformation"] == expected_status
+        assert summary["details_hash"].startswith("sha256:")
 
     async def test_general_unknown_metadata_field_is_ignored(self):
         envelope = await self._run(
             clean_metadata(unexpected_router_field={"anything": True})
         )
         assert envelope.result.outcome == ModelOutcome.SUCCEEDED
+        assert conformance_report(envelope).eligible is True
 
     async def test_snapshot_canonical_model_in_selected_route_is_accepted(self):
         envelope = await self._run(
@@ -1332,11 +1463,12 @@ class TestRoutingContamination:
             )
         )
         assert envelope.result.outcome == ModelOutcome.SUCCEEDED
+        assert conformance_report(envelope).eligible is True
         routing = artifact_by_label(envelope, ROUTING_ARTIFACT_LABEL)
         assert routing["selected_model"] == CANONICAL_MODEL
-        assert routing["conformance"]["provider_model_match"] is True
+        assert envelope.execution_evidence.upstream_endpoint == ENDPOINT_SLUG
 
-    async def test_unbound_selected_model_is_contaminated(self):
+    async def test_unbound_selected_model_is_ineligible(self):
         envelope = await self._run(
             clean_metadata(
                 endpoints=[
@@ -1348,20 +1480,145 @@ class TestRoutingContamination:
                 ]
             )
         )
-        assert envelope.result.failure.reason_code == "openrouter.route_contaminated"
+        assert_wire_success_with_reasons(
+            envelope,
+            (
+                ConformanceReasonCode.ROUTE_METADATA_MISSING,
+                ConformanceReasonCode.UPSTREAM_MODEL_MISMATCH,
+            ),
+        )
+        assert envelope.execution_evidence.upstream_model == "testlab/unbound-model"
 
-    async def test_cache_like_response_is_not_success(self):
-        # cache hit: metadata absent + zero usage -> must not be a quality trial.
+    async def test_cache_hit_header_is_ineligible_cache(self):
+        # 官方語意:cache hit 通常同時移除 metadata → cache + route 雙重 ineligible。
         body = success_body()
         del body["openrouter_metadata"]
-        body["usage"] = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
+        adapter, _ = make_adapter(
+            lambda request: respond(
+                body,
+                headers={
+                    "x-request-id": "req_fx_cache",
+                    "x-openrouter-cache-status": "HIT",
+                },
+            )
+        )
+        envelope = await adapter.generate_structured(make_call())
+        # metadata 同時缺失 → cache + route + transformation 全 fail closed。
+        assert_wire_success_with_reasons(envelope, METADATA_MISSING_REASONS)
+        assert envelope.execution_evidence.cache_status == CacheStatus.HIT
+        routing = artifact_by_label(envelope, ROUTING_ARTIFACT_LABEL)
+        assert routing["cache_status"] == "hit"
+        assert routing["cache_header_value"] == "HIT"
+
+    async def test_cache_hit_with_metadata_is_cache_only_reason(self):
+        envelope = await self._run(
+            clean_metadata(),
+            headers={
+                "x-request-id": "req_fx_cache2",
+                "x-openrouter-cache-status": "HIT",
+            },
+        )
+        assert_wire_success_with_reasons(
+            envelope, (ConformanceReasonCode.CACHE_INELIGIBLE,)
+        )
+        assert envelope.execution_evidence.cache_status == CacheStatus.HIT
+
+    async def test_unrecognized_cache_header_is_unknown_and_ineligible(self):
+        envelope = await self._run(
+            clean_metadata(),
+            headers={
+                "x-request-id": "req_fx_cache3",
+                "x-openrouter-cache-status": "STALE",
+            },
+        )
+        assert_wire_success_with_reasons(
+            envelope, (ConformanceReasonCode.CACHE_INELIGIBLE,)
+        )
+        assert envelope.execution_evidence.cache_status == CacheStatus.UNKNOWN
+
+    async def test_cache_miss_header_stays_eligible(self):
+        envelope = await self._run(
+            clean_metadata(),
+            headers={
+                "x-request-id": "req_fx_cache4",
+                "x-openrouter-cache-status": "MISS",
+            },
+        )
+        assert envelope.result.outcome == ModelOutcome.SUCCEEDED
+        assert envelope.execution_evidence.cache_status == CacheStatus.MISS
+        assert conformance_report(envelope).eligible is True
+
+    async def test_zero_usage_without_cache_header_is_not_cache_hit(self):
+        # 禁止 heuristic:token 0/cost 0 不是 cache hit 證據(§6.6)。
+        body = success_body()
+        body["usage"] = {
+            "prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0,
+            "prompt_tokens_details": {"cached_tokens": 0, "cache_write_tokens": 0},
+            "completion_tokens_details": {"reasoning_tokens": 0},
+            "cost": 0,
+        }
         adapter, _ = make_adapter(lambda request: respond(body))
         envelope = await adapter.generate_structured(make_call())
-        assert envelope.result.outcome == ModelOutcome.FAILED
-        assert envelope.result.failure.reason_code == "openrouter.route_contaminated"
+        assert envelope.result.outcome == ModelOutcome.SUCCEEDED
+        assert envelope.execution_evidence.cache_status == CacheStatus.ABSENT
+        assert conformance_report(envelope).eligible is True
 
     async def test_contaminated_route_still_captures_routing_artifact(self):
         envelope = await self._run(clean_metadata(strategy="auto"))
         routing = artifact_by_label(envelope, ROUTING_ARTIFACT_LABEL)
         assert routing["strategy"] == "auto"
-        assert routing["conformance"]["metadata_present"] is True
+        assert routing["schema_version"] == "openrouter_routing.v2"
+        assert "conformance" not in routing
+
+
+class TestWireFailureKeepsRouteFacts:
+    """§7.5/§8:wire failure 的 route facts 不再被丟掉;authority 仍是 wire failure。"""
+
+    async def test_invalid_json_with_contaminated_route_is_wire_failure(self):
+        body = fixture_json("invalid-json.json")
+        body["openrouter_metadata"] = clean_metadata(strategy="auto")
+        adapter, _ = make_adapter(lambda request: respond(body))
+        envelope = await adapter.generate_structured(make_call())
+        assert_failure(
+            envelope,
+            kind=FailureKind.OUTPUT_PARSE_FAILED,
+            reason_code="openrouter.output_parse_failed",
+            retryable=False,
+        )
+        # evidence 仍保存 actual route facts。
+        assert envelope.execution_evidence.route_strategy == "auto"
+        # conformance 只回 wire_not_succeeded,不改 retryability。
+        report = conformance_report(envelope)
+        assert report.eligible is False
+        assert report.reason_codes == (ConformanceReasonCode.WIRE_NOT_SUCCEEDED,)
+
+    async def test_error_response_metadata_still_enters_evidence(self):
+        body = {
+            **error_body("rate_limit_exceeded", code=429),
+            "openrouter_metadata": clean_metadata(strategy="fallback"),
+        }
+        adapter, calls = make_adapter(lambda request: httpx.Response(429, json=body))
+        envelope = await adapter.generate_structured(make_call())
+        assert len(calls) == 1
+        assert_failure(
+            envelope,
+            kind=FailureKind.RATE_LIMITED,
+            reason_code="openrouter.rate_limited",
+            retryable=True,
+        )
+        evidence = envelope.execution_evidence
+        assert evidence.route_strategy == "fallback"
+        assert evidence.upstream_provider == "TestHost"
+        assert evidence.raw_routing_artifact is not None
+        routing = artifact_by_label(envelope, ROUTING_ARTIFACT_LABEL)
+        assert routing["strategy"] == "fallback"
+
+    async def test_refusal_with_contaminated_route_keeps_facts(self):
+        body = fixture_json("content-filter.json")
+        body["openrouter_metadata"] = clean_metadata(attempt=2)
+        adapter, _ = make_adapter(lambda request: respond(body))
+        envelope = await adapter.generate_structured(make_call())
+        assert envelope.result.outcome == ModelOutcome.REFUSED
+        assert envelope.execution_evidence.upstream_attempt_count == 2
+        report = conformance_report(envelope)
+        assert report.reason_codes == (ConformanceReasonCode.WIRE_NOT_SUCCEEDED,)

@@ -35,7 +35,11 @@ from uuid import uuid5
 import httpx
 
 from app.interview_vnext.domain.hashing import canonical_json
-from app.interview_vnext.llm.binding import ProviderBinding
+from app.interview_vnext.llm.binding import (
+    ProviderBinding,
+    RuntimeBindingMismatch,
+    require_runtime_binding,
+)
 from app.interview_vnext.llm.execution import (
     CacheStatus,
     ProviderExecutionEvidence,
@@ -66,7 +70,11 @@ from app.interview_vnext.observability.artifacts import (
     build_inline_artifact,
 )
 
-from ..openrouter_provider_config import OpenRouterChatEvalConfig
+from ..openrouter_provider_config import (
+    OPENROUTER_ADAPTER_ID,
+    OPENROUTER_ADAPTER_VERSION,
+    OpenRouterChatEvalConfig,
+)
 from ..schema_catalog import (
     PublishedOutputSchemaCatalog,
     SchemaBinding,
@@ -406,8 +414,15 @@ def _allowed_headers(headers: httpx.Headers) -> dict[str, str]:
 
 
 def _identity_fields(
-    request: ModelCallRequest, binding: ProviderBinding
+    request: ModelCallRequest, *, gateway_provider: str
 ) -> dict[str, Any]:
+    """Result identity:attempted request/binding identity + actual runtime gateway.
+
+    §5.1.1 語意表:`binding_id/hash/requested_model` 保留被嘗試的 binding
+    identity;`gateway_provider` 記實際 runtime adapter gateway(preflight 通過時
+    兩者必然相等,唯一可見差異是 `runtime_binding_mismatch` failure)。
+    """
+
     return {
         "run_id": request.run_id,
         "session_id": request.session_id,
@@ -419,7 +434,7 @@ def _identity_fields(
         "operation_definition_hash": request.operation_definition_hash,
         "binding_id": request.binding_id,
         "binding_hash": request.binding_hash,
-        "gateway_provider": binding.gateway_provider,
+        "gateway_provider": gateway_provider,
         "requested_model": request.requested_model,
         "prompt_hash": request.prompt_hash,
         "output_schema_id": request.output_schema_id,
@@ -539,6 +554,29 @@ class OpenRouterChatEvalAdapter(LlmPort):
         provider_binding = call.binding
         started_at = self._now()
         started_mono = self._monotonic()
+        # R3-C1(修正計畫 §5.1/§6.7):neutral runtime binding preflight 先於既有
+        # schema/body validation;adapter ID/version/gateway/config hash 任一不符
+        # 即 fail closed,0 次 HTTP,neutral failure kind 固定 RUNTIME_BINDING_MISMATCH。
+        try:
+            require_runtime_binding(
+                provider_binding,
+                adapter_id=OPENROUTER_ADAPTER_ID,
+                adapter_version=OPENROUTER_ADAPTER_VERSION,
+                gateway_provider=self._config.provider,
+                provider_config_hash=self._config.config_hash,
+            )
+        except RuntimeBindingMismatch as exc:
+            failure = _Failure(
+                FailureKind.RUNTIME_BINDING_MISMATCH,
+                "openrouter.binding_invalid",
+                False,
+                SAFE_MESSAGES["binding"],
+            )
+            return self._failure_envelope(
+                request, provider_binding, failure,
+                started_at=started_at, started_mono=started_mono, detail=str(exc),
+                preflight_mismatch=True,
+            )
         try:
             schema_binding = self._validate_binding(request, provider_binding)
         except _LocalBindingError as exc:
@@ -822,6 +860,7 @@ class OpenRouterChatEvalAdapter(LlmPort):
         started_mono: float,
         detail: str | None = None,
         exception: Exception | None = None,
+        preflight_mismatch: bool = False,
     ) -> ModelCallEnvelope:
         """Failure with no usable HTTP response (binding/deadline/transport)."""
 
@@ -837,7 +876,7 @@ class OpenRouterChatEvalAdapter(LlmPort):
         )
         usage = TokenUsage(limitations=(LIMITATION_NO_RESPONSE,))
         result = ModelCallResult(
-            **_identity_fields(request, binding),
+            **_identity_fields(request, gateway_provider=self._config.provider),
             resolved_model=request.requested_model,
             provider_request_id=None,
             provider_conversation_id=None,
@@ -861,9 +900,11 @@ class OpenRouterChatEvalAdapter(LlmPort):
             completed_at=completed_at,
         )
         evidence = _openrouter_execution_evidence(
-            binding, request, resolved_model=None, routing=None, routing_ref=None,
+            binding, request, gateway_provider=self._config.provider,
+            resolved_model=None, routing=None, routing_ref=None,
             usage=usage, cost_decimal=None, request_id=None, generation_id=None,
             transformation_status=TransformationStatus.UNKNOWN,
+            preflight_mismatch=preflight_mismatch,
         )
         return ModelCallEnvelope(
             result=result, execution_evidence=evidence, supporting_artifacts=(error,)
@@ -899,7 +940,7 @@ class OpenRouterChatEvalAdapter(LlmPort):
         )
 
         base = dict(
-            **_identity_fields(request, binding),
+            **_identity_fields(request, gateway_provider=self._config.provider),
             provider_request_id=request_id,
             provider_conversation_id=None,
             latency_ms=latency_ms,
@@ -1224,7 +1265,8 @@ class OpenRouterChatEvalAdapter(LlmPort):
                 refusal=None, failure=None, usage=usage,
             )
             evidence = _openrouter_execution_evidence(
-                binding, request, resolved_model=resolved_model, routing=routing,
+                binding, request, gateway_provider=self._config.provider,
+                resolved_model=resolved_model, routing=routing,
                 routing_ref=routing_artifact.ref, usage=usage, cost_decimal=clean_cost,
                 request_id=request_id, generation_id=generation_id,
                 transformation_status=TransformationStatus.CLEAN,
@@ -1310,7 +1352,8 @@ class OpenRouterChatEvalAdapter(LlmPort):
             usage=usage,
         )
         evidence = _openrouter_execution_evidence(
-            binding, request, resolved_model=resolved_model, routing=routing,
+            binding, request, gateway_provider=self._config.provider,
+            resolved_model=resolved_model, routing=routing,
             routing_ref=routing_artifact.ref, usage=usage, cost_decimal=clean_cost,
             request_id=request_id, generation_id=generation_id,
             transformation_status=TransformationStatus.CLEAN,
@@ -1533,14 +1576,18 @@ def _unknown_evidence_from_base(
     binding: ProviderBinding, base: dict[str, Any], usage: TokenUsage
 ) -> ProviderExecutionEvidence:
     """Evidence for a wire failure/refusal: conformance is wire_not_succeeded, so
-    only the binding-scoped identity fields matter; route facts are unknown."""
+    only the binding-scoped identity fields matter; route facts are unknown.
+
+    adapter ID/version/gateway 描述實際 runtime adapter(§5.1.1);這條路徑只在
+    preflight 通過後可達,值必然等於 binding 的宣告。
+    """
 
     return define_provider_execution_evidence(
         binding_id=binding.binding_id,
         binding_hash=binding.binding_hash,
-        adapter_id=binding.adapter_id,
-        adapter_version=binding.adapter_version,
-        gateway_provider=binding.gateway_provider,
+        adapter_id=OPENROUTER_ADAPTER_ID,
+        adapter_version=OPENROUTER_ADAPTER_VERSION,
+        gateway_provider=base["gateway_provider"],
         requested_model=base["requested_model"],
         gateway_resolved_model=None,
         upstream_provider=None,
@@ -1564,6 +1611,7 @@ def _openrouter_execution_evidence(
     binding: ProviderBinding,
     request: ModelCallRequest,
     *,
+    gateway_provider: str,
     resolved_model: str | None,
     routing: "_RoutingCheck | None",
     routing_ref: ArtifactRef | None,
@@ -1572,13 +1620,16 @@ def _openrouter_execution_evidence(
     request_id: str | None,
     generation_id: str | None,
     transformation_status: TransformationStatus,
+    preflight_mismatch: bool = False,
 ) -> ProviderExecutionEvidence:
     """Normalize one attempt's route/usage facts into neutral execution evidence.
 
     R3 mechanical migration: the adapter still fails closed on contamination
     (returning a wire failure), so a wire-succeeded result always carries a clean
     direct route here. Eligibility is decided later by the application conformance
-    policy; this only records what happened.
+    policy; this only records what happened. adapter ID/version 與 ``gateway_provider``
+    描述實際 runtime adapter(§5.1.1),preflight mismatch 時不從不相符的 binding
+    複製,並以 limitation 明確記錄 preflight 失敗。
     """
 
     if routing is not None and routing.metadata_present:
@@ -1608,12 +1659,16 @@ def _openrouter_execution_evidence(
         limitations.append("openrouter route metadata was not fully available")
     if cost_decimal is None:
         limitations.append("openrouter response did not include cost")
+    if preflight_mismatch:
+        limitations.append(
+            "openrouter runtime binding preflight failed before any provider call"
+        )
     return define_provider_execution_evidence(
         binding_id=binding.binding_id,
         binding_hash=binding.binding_hash,
-        adapter_id=binding.adapter_id,
-        adapter_version=binding.adapter_version,
-        gateway_provider=binding.gateway_provider,
+        adapter_id=OPENROUTER_ADAPTER_ID,
+        adapter_version=OPENROUTER_ADAPTER_VERSION,
+        gateway_provider=gateway_provider,
         requested_model=request.requested_model,
         gateway_resolved_model=resolved_model,
         upstream_provider=upstream_provider,

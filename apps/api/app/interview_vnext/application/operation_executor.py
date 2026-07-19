@@ -48,10 +48,19 @@ from app.interview_vnext.llm.port import (
     ResolvedModelCall,
 )
 from app.interview_vnext.llm.portable_schema import (
-    PORTABLE_STRICT_OUTPUT_POLICY_V2,
+    SchemaProjectionMismatch,
     SchemaProjectionPolicy,
     SchemaProjectionReport,
     project_portable_strict_output_schema,
+    resolve_schema_projection_policy,
+)
+from app.interview_vnext.llm.schema_ids import (
+    CONFORMANCE_SCHEMA_ID,
+    EXECUTION_EVIDENCE_SCHEMA_ID,
+    MODEL_REQUEST_SCHEMA_ID,
+    MODEL_RESULT_SCHEMA_ID,
+    PROVIDER_BINDING_SCHEMA_ID,
+    SCHEMA_PROJECTION_SCHEMA_ID,
 )
 from app.interview_vnext.llm.result import (
     FailureKind,
@@ -96,27 +105,9 @@ from .turn_interpret import (
 )
 
 
-MODEL_REQUEST_SCHEMA_ID = (
-    "https://caliburn.local/schemas/model-call-request.v2.schema.json"
-)
-MODEL_RESULT_SCHEMA_ID = (
-    "https://caliburn.local/schemas/model-call-result.v2.schema.json"
-)
-PROVIDER_BINDING_SCHEMA_ID = (
-    "https://caliburn.local/schemas/provider-binding.v1.schema.json"
-)
-PROVIDER_CONFIG_SCHEMA_ID = (
-    "https://caliburn.local/schemas/provider-config.v1.schema.json"
-)
-SCHEMA_PROJECTION_SCHEMA_ID = (
-    "https://caliburn.local/schemas/schema-projection-report.v1.schema.json"
-)
-EXECUTION_EVIDENCE_SCHEMA_ID = (
-    "https://caliburn.local/schemas/provider-execution-evidence.v1.schema.json"
-)
-CONFORMANCE_SCHEMA_ID = (
-    "https://caliburn.local/schemas/provider-conformance-report.v1.schema.json"
-)
+# 共用 LLM contract schema IDs 收斂在 llm/schema_ids.py(R3-C1 §6.1.1);
+# 這裡只留 operation-specific IDs。provider config artifact 刻意無 schema ID
+# (§5.2:generic provider-config schema 不存在,以 content hash 對 binding)。
 TURN_INPUT_SCHEMA_ID = (
     "https://caliburn.local/schemas/turn-interpret-input.v1.schema.json"
 )
@@ -144,17 +135,12 @@ class TurnExecutionStatus(StrEnum):
 
 
 def _resolve_projection_policy(binding: ProviderBinding) -> SchemaProjectionPolicy:
-    policy = PORTABLE_STRICT_OUTPUT_POLICY_V2
-    identity = binding.schema_projection_policy
-    if (
-        identity.name != policy.name
-        or identity.version != policy.version
-        or identity.content_hash != policy.policy_hash
-    ):
-        raise CheckpointConflict(
-            "binding schema projection policy is not the active portable-strict policy"
-        )
-    return policy
+    """Resolve via the shared exact authority(R3-C1 §6.2;不再維護第二份邏輯)。"""
+
+    try:
+        return resolve_schema_projection_policy(binding.schema_projection_policy)
+    except SchemaProjectionMismatch as exc:
+        raise CheckpointConflict(str(exc)) from exc
 
 
 def _resolve_conformance_policy(binding: ProviderBinding) -> ConformancePolicy:
@@ -742,7 +728,6 @@ async def _fresh_request(
         kind="provider.config",
         media_type="application/json",
         payload=provider_config,
-        schema_id=PROVIDER_CONFIG_SCHEMA_ID,
     )
     if config_artifact.ref.content_hash != binding.provider_config_hash:
         raise CheckpointConflict(

@@ -14,9 +14,12 @@ from app.interview_vnext.domain.hashing import canonical_hash
 from app.interview_vnext.llm.binding import (
     ProviderBinding,
     ProviderBindingDefinition,
+    RuntimeBindingMismatch,
     define_provider_binding,
+    require_runtime_binding,
 )
 from app.interview_vnext.llm.operation import ContractIdentity
+from app.interview_vnext.llm.result import FailureKind
 
 
 PROJECTION_POLICY = ContractIdentity(
@@ -162,3 +165,64 @@ def test_binding_does_not_accept_arbitrary_provider_options():
         define_provider_binding(
             **binding_values(), provider_options={"transforms": []}
         )
+
+
+# ---- R3-C1 runtime adapter/binding preflight(修正計畫 §5.1/§6.1)----------
+
+
+def runtime_identity(binding: ProviderBinding) -> dict:
+    """The exact runtime facts an adapter must present before any HTTP call."""
+
+    return dict(
+        adapter_id=binding.adapter_id,
+        adapter_version=binding.adapter_version,
+        gateway_provider=binding.gateway_provider,
+        provider_config_hash=binding.provider_config_hash,
+    )
+
+
+class TestRequireRuntimeBinding:
+    def test_exact_runtime_identity_passes(self):
+        binding = define_provider_binding(**binding_values())
+        assert require_runtime_binding(binding, **runtime_identity(binding)) is None
+
+    @pytest.mark.parametrize(
+        "field,value,match",
+        [
+            ("adapter_id", "openai.responses", "adapter id"),
+            ("adapter_version", "1.9.0", "adapter version"),
+            ("gateway_provider", "openai", "gateway provider"),
+            ("provider_config_hash", "sha256:" + "9" * 64, "config hash"),
+        ],
+    )
+    def test_any_runtime_identity_mismatch_fails_closed(self, field, value, match):
+        binding = define_provider_binding(**binding_values())
+        identity = runtime_identity(binding)
+        identity[field] = value
+        with pytest.raises(RuntimeBindingMismatch, match=match):
+            require_runtime_binding(binding, **identity)
+
+    def test_config_hash_mismatch_alone_rejects_even_with_same_model(self):
+        """§7.1.7:requested model 相同、只有 config hash 不同仍拒絕。"""
+
+        binding = define_provider_binding(**binding_values())
+        drifted = runtime_identity(binding)
+        drifted["provider_config_hash"] = "sha256:" + "a" * 64
+        with pytest.raises(RuntimeBindingMismatch):
+            require_runtime_binding(binding, **drifted)
+
+    def test_mismatch_is_a_value_error_and_names_no_secret(self):
+        binding = define_provider_binding(**binding_values())
+        identity = runtime_identity(binding)
+        identity["provider_config_hash"] = "sha256:" + "9" * 64
+        with pytest.raises(RuntimeBindingMismatch) as excinfo:
+            require_runtime_binding(binding, **identity)
+        assert isinstance(excinfo.value, ValueError)
+        # 訊息可含 hash,但不得含 config 值或 key 樣式字串(§5.1)。
+        assert "sk-" not in str(excinfo.value)
+        assert "Bearer" not in str(excinfo.value)
+
+    def test_runtime_binding_mismatch_failure_kind_is_published(self):
+        """§6.1:neutral failure kind,active v2 corrective enum addition。"""
+
+        assert FailureKind.RUNTIME_BINDING_MISMATCH.value == "runtime_binding_mismatch"

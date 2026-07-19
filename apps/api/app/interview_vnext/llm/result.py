@@ -47,6 +47,10 @@ class FailureKind(StrEnum):
     OUTPUT_PARSE_FAILED = "output_parse_failed"
     RESOLVED_MODEL_MISMATCH = "resolved_model_mismatch"
     UNKNOWN_PROVIDER_FAILURE = "unknown_provider_failure"
+    # R3-C1(修正計畫 §5.1.1):HTTP 前 adapter ID/version/gateway/config hash
+    # mismatch 專用;唯一允許 result/evidence gateway 與 binding gateway 不同的
+    # failure kind,必為 outcome=failed、retryable=false、0 次 provider call。
+    RUNTIME_BINDING_MISMATCH = "runtime_binding_mismatch"
 
 
 class StructuredPayload(DomainModel):

@@ -116,3 +116,44 @@ def define_provider_binding(**values) -> ProviderBinding:
     return ProviderBinding(
         **definition.model_dump(), binding_hash=canonical_hash(definition)
     )
+
+
+class RuntimeBindingMismatch(ValueError):
+    """The runtime adapter identity/config does not exactly match the binding."""
+
+
+def require_runtime_binding(
+    binding: ProviderBinding,
+    *,
+    adapter_id: str,
+    adapter_version: str,
+    gateway_provider: str,
+    provider_config_hash: str,
+) -> None:
+    """Neutral pre-HTTP preflight(R3-C1;修正計畫 §5.1/§6.1)。
+
+    每個 adapter 在送出任何 provider call 前必須以自己的 runtime 事實 exact
+    通過這一個 authority;任一不符即 fail closed,不打 HTTP。訊息只含
+    ID/version/hash,不得含 config 值或 secret。
+    """
+
+    if adapter_id != binding.adapter_id:
+        raise RuntimeBindingMismatch(
+            f"runtime adapter id {adapter_id!r} does not match "
+            f"the binding adapter id {binding.adapter_id!r}"
+        )
+    if adapter_version != binding.adapter_version:
+        raise RuntimeBindingMismatch(
+            f"runtime adapter version {adapter_version!r} does not match "
+            f"the binding adapter version {binding.adapter_version!r}"
+        )
+    if gateway_provider != binding.gateway_provider:
+        raise RuntimeBindingMismatch(
+            f"runtime gateway provider {gateway_provider!r} does not match "
+            f"the binding gateway provider {binding.gateway_provider!r}"
+        )
+    if provider_config_hash != binding.provider_config_hash:
+        raise RuntimeBindingMismatch(
+            f"runtime provider config hash {provider_config_hash} does not match "
+            f"the binding provider config hash {binding.provider_config_hash}"
+        )

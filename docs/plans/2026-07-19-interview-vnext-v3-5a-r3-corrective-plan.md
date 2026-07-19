@@ -175,6 +175,36 @@ composition/eval wiring
 
 ### 5.1 Runtime adapter/binding preflight
 
+#### 5.1.1 Intent 與 runtime facts 的欄位語意（2026-07-19裁決）
+
+採用「result與evidence都記runtime facts」，不放寬成所有`FAILED`都可不一致：
+
+```text
+ModelCallRequest + ProviderBinding       = desired/attempted execution intent
+ModelCallResult.binding_id/hash          = attempted immutable binding identity
+ModelCallResult.requested_model          = attempted requested model
+ModelCallResult.gateway_provider         = actual runtime adapter gateway
+ProviderExecutionEvidence.adapter/gateway = actual runtime adapter facts
+```
+
+因此preflight發現gateway mismatch時，result與evidence的gateway都填runtime adapter gateway；attempted gateway仍
+完整保存在binding artifact，不會遺失。`ModelCallEnvelope`的result/evidence gateway equality validator保持無條件
+exact，不依`outcome`放寬。
+
+新增neutral `FailureKind.RUNTIME_BINDING_MISMATCH`，只用於HTTP前的adapter ID/version/gateway/config hash mismatch：
+
+```text
+outcome=failed
+failure.kind=runtime_binding_mismatch
+failure.retryable=false
+HTTP calls=0
+```
+
+executor與persisted gate仍要求`result.gateway_provider == binding.gateway_provider`，唯一例外是上述exact failure
+kind。不得用`result.outcome == FAILED`作為寬鬆條件；transport timeout、connection、HTTP、provider、parse或其他
+failure仍必須符合正常gateway identity。兩個adapter可保留各自provider-specific `reason_code`，但判斷例外只能
+看neutral failure kind，不得讓application hard-code `openrouter.*`／`openai.*`字串。
+
 任何 adapter 在送出 HTTP 前必須 exact 滿足：
 
 ```text
@@ -189,11 +219,12 @@ request operation name   == binding.operation_name
 
 任一不符：
 
-- 回既有 provider-specific `binding_invalid` 類型的 local `ModelFailure`；
+- 回provider-specific `binding_invalid` reason code，但neutral failure kind固定為
+  `RUNTIME_BINDING_MISMATCH`；
 - `retryable=false`；
 - transport/mock call count 必須是 `0`；
-- result保留「被嘗試的」request/binding identity；execution evidence的adapter ID/version/gateway必須描述實際
-  runtime adapter，不得從不相符的binding複製成假事實；
+- result保留attempted request/binding ID/hash/requested model，但result gateway與execution evidence的adapter
+  ID/version/gateway必須描述實際runtime adapter，不得從不相符的binding複製成假事實；
 - 不建立假的 routing metadata，route/cache/transformation依既有unknown failure規則保存；
 - evidence limitation/error artifact明確記錄runtime binding preflight失敗，但不保存完整config或secret；
 - 不洩漏 config 值或 secret 到 safe message。
@@ -254,7 +285,11 @@ conformance artifact -> ConformanceReport.v1
 - 三個 artifact 都是 inline JSON、kind/schema/scope/attempt exact；
 - generic ArtifactRecord content hash/byte size 正確；
 - typed model 內部 `binding_hash`、`evidence_hash`、`report_hash` 正確；
-- result/evidence 的 run/session/turn/operation/attempt/binding/provider/model exact；
+- result/evidence 的 run/session/turn/operation/attempt/binding/requested-model彼此exact；
+- result/evidence gateway永遠exact相等；它們與binding gateway也必須相等，唯一例外是
+  `outcome=failed + failure.kind=runtime_binding_mismatch`，此時兩者共同保存actual runtime gateway；
+- evidence adapter ID/version必須等於binding，唯一例外同樣是`runtime_binding_mismatch`，此時保存actual runtime
+  adapter identity；
 - conformance binding ID/hash等於 binding；
 - conformance `execution_evidence_hash` 等於 evidence；
 - conformance `wire_outcome` 等於 result outcome；
@@ -363,7 +398,11 @@ def require_runtime_binding(
 它只做 exact identity/hash 驗證，不import SDK、eval config或application executor。OpenRouter/OpenAI adapter 都呼叫
 這一個 function，再把 exception 翻成各自既有的 local binding failure。
 
-### 6.1.1 LLM contract schema IDs
+`llm/result.py`的`FailureKind`新增`RUNTIME_BINDING_MISMATCH = "runtime_binding_mismatch"`。這是active v2在
+R3 gate完成前的corrective enum addition；必須重生`model-call-result.v2` active schema並更新drift assertion，
+但不得修改frozen `model-call-result.v1`。不新增result schema version或SQL migration。
+
+#### 6.1.1 LLM contract schema IDs
 
 result/evidence/conformance artifact metadata不能從`operation_executor.py`與probe各自複製字串。將R3-C會共用的
 active IDs收斂到provider-neutral LLM module（建議`llm/schema_ids.py`）：
@@ -540,6 +579,19 @@ OpenRouter與OpenAI各自覆蓋：
 6. config只有storage/cache/plugin/routing field不同、hash不同 → HTTP calls=0（依provider現有欄位）；
 7. requested model相同但config hash不同仍拒絕；
 8. safe error artifact不含完整config、hash以外的敏感資料或API key。
+
+gateway mismatch case另外必須斷言：
+
+```text
+result.gateway_provider == runtime gateway
+evidence.gateway_provider == runtime gateway
+result.binding_id/hash == attempted binding
+failure.kind == runtime_binding_mismatch
+HTTP calls == 0
+```
+
+並加入負向防放寬測試：任一非`RUNTIME_BINDING_MISMATCH`的failed result若gateway與binding不同，envelope後的
+executor/provider-gate validation必須拒絕；不能因`outcome=failed`一律放行。
 
 ### 7.2 Projection
 

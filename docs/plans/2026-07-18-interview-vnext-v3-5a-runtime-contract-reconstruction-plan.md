@@ -1,17 +1,22 @@
 # Interview AI vNext V3-5A——Runtime Binding、Conformance、Turn Interpreter C1 v2 實作交接規格
 
 - 日期：2026-07-18
-- 狀態：**R0文件已備妥；owner 已核准架構，R1–R9 code/live尚未開始**
+- 狀態：**R1–R3 已有本地 commits；R3 code review 發現 runtime integrity blockers，R3-C 待實作，R4 blocked**
 - 決策：[`../adr/0036-interview-vnext-provider-binding-conformance-and-idless-turn-v2.md`](../adr/0036-interview-vnext-provider-binding-conformance-and-idless-turn-v2.md)
 - 研究：[`../specs/2026-07-18-interview-vnext-llm-runtime-architecture-review.md`](../specs/2026-07-18-interview-vnext-llm-runtime-architecture-review.md)
 - 前一階段：[`2026-07-18-interview-vnext-v3-5-turn-eval-harness-plan.md`](2026-07-18-interview-vnext-v3-5-turn-eval-harness-plan.md)
 - Provider wire authority：[`2026-07-17-interview-vnext-v3-4r-openrouter-first-adapter-plan.md`](2026-07-17-interview-vnext-v3-4r-openrouter-first-adapter-plan.md)
+- R3 corrective authority：[`2026-07-19-interview-vnext-v3-5a-r3-corrective-plan.md`](2026-07-19-interview-vnext-v3-5a-r3-corrective-plan.md)
 - Scope：**V3-5A only**；修harness authority、建立runtime binding/conformance、發布C1 v2並重新取得完整turn gate
 - Release gate：本文件全部完成且新identity true-live gate通過前，**V3-6、production route/Web、adapter promotion全部blocked**
 
 本文件是可直接交給實作者的唯一V3-5A build authority。若摘要、舊V3 plan、README或v1 code comment與
 本文件衝突，以ADR 0036與本文件為準。實作者不得自行縮成「修regex後重跑」，也不得順手加入
 Anthropic direct、multi-agent、provider memory、production fallback或SQL migration 0011。
+
+R3 baseline commit `6ea5ed5412617cbae893e0baeab1abde6aa0d075` 的後續 code review 發現 binding/config、
+projection identity、durable gate、fresh-process recovery與Capture closure尚未完全符合本文件原訂驗收。
+R3修正細節以R3-C corrective authority為準；R3-C完成前不得開始R4或任何paid live。
 
 ---
 
@@ -1355,7 +1360,14 @@ suite 仍綠；R4 才把 eligibility 從 adapter 搬到 conformance policy 並�
 
 建議commit：`feat(interview): execute resolved model calls with conformance gates`
 
+**2026-07-19 review gate**：baseline SHA `6ea5ed5412617cbae893e0baeab1abde6aa0d075` 雖通過既有
+no-network/real PG suites，但缺少exact runtime config preflight、projection version/hash gate、typed durable
+artifact closure、terminal recovery revalidation與完整Capture roots。必須先完成
+[`R3-C corrective plan`](2026-07-19-interview-vnext-v3-5a-r3-corrective-plan.md)，上述R3驗收才算成立。
+
 ### R4——Provider adapters v2
+
+**Entry gate**：R3-C全部完成並回寫exact測試證據前，R4不得開始。
 
 先OpenRouter，再OpenAI reference；fixture matrix全綠才commit。R3 已把 adapter 機械遷移到新簽名並保留舊
 fail-closed 行為；R4 才把 eligibility 決策從 adapter 搬出（不再對 contamination 回 `ModelFailure`），改由

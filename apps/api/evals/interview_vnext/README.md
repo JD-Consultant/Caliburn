@@ -1,11 +1,14 @@
 # Interview vNext — eval-only provider adapters
 
-**Status（2026-07-18）：V3-5 E0–E8 executable harness 已落地並全綠；true live 已嘗試但因 route contamination／contract／grader drift 無品質裁決，V3-6 blocked**
+**Status（2026-07-19）：V3-5A R1–R3已有本地commits；R3 code review發現runtime integrity blockers，R3-C待實作，R4/paid live/V3-6 blocked**
 
 Owner已核准ADR 0036；下一個實作authority為
-[`V3-5A runtime contract reconstruction plan`](../../../../docs/plans/2026-07-18-interview-vnext-v3-5a-runtime-contract-reconstruction-plan.md)。
-尚未開始code；不得重跑舊v1 batch。active target是`turn.interpret/2.0.0`、ProviderBinding/execution evidence/
-conformance與canonical regrade；migration維持0010。
+[`V3-5A runtime contract reconstruction plan`](../../../../docs/plans/2026-07-18-interview-vnext-v3-5a-runtime-contract-reconstruction-plan.md)，
+其中R3修正必須依
+[`R3-C corrective plan`](../../../../docs/plans/2026-07-19-interview-vnext-v3-5a-r3-corrective-plan.md)。
+baseline R3 SHA為`6ea5ed5412617cbae893e0baeab1abde6aa0d075`；不得重跑舊v1 batch或開始R4。
+active target仍是`turn.interpret/2.0.0`、ProviderBinding/execution evidence/conformance與canonical regrade；
+migration維持0010。
 
 - V3-5 turn eval harness(`contracts`/`loader`/`identities`/`fixture_builder`/`turn_eval_runner`/
   `capture_export`/`turn_graders`/`review`/`turn_report`/`scheduler`/`batch_orchestrator`/`live_wiring`/

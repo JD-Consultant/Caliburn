@@ -23,6 +23,7 @@ This package implements ADR 0034 and the 2026-07-16 greenfield architecture.
 - V2-B implementation handoff: `docs/plans/2026-07-16-interview-vnext-v2b-durable-persistence-plan.md`
 - Runtime contract decision: `docs/adr/0036-interview-vnext-provider-binding-conformance-and-idless-turn-v2.md`
 - Active implementation handoff: `docs/plans/2026-07-18-interview-vnext-v3-5a-runtime-contract-reconstruction-plan.md`
+- Active R4 detailed handoff: `docs/plans/2026-07-19-interview-vnext-v3-5a-r4-provider-evidence-conformance-plan.md`
 - Completed R3 corrective evidence: `docs/plans/2026-07-19-interview-vnext-v3-5a-r3-corrective-plan.md`
 
 R3-C has passed its no-network and real PostgreSQL gates; R4 is the active next implementation slice.

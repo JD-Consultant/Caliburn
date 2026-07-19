@@ -43,6 +43,13 @@ from app.interview_vnext.domain.session import (
     session_at,
 )
 from app.interview_vnext.domain.state import InterviewState
+from app.interview_vnext.llm.conformance import (
+    ConformanceReport,
+    ConformanceReportDefinition,
+)
+from app.interview_vnext.llm.result import ModelOutcome, TokenUsage
+from app.interview_vnext.llm.testing import scripted_turn_binding
+from app.interview_vnext.persistence.errors import PersistedDataCorruption
 from app.interview_vnext.observability.artifacts import build_inline_artifact
 from app.interview_vnext.observability.checkpoint import CheckpointStatus
 from app.interview_vnext.observability.taxonomy import INTERVIEW_VNEXT_EXECUTION_V2
@@ -51,6 +58,14 @@ from app.interview_vnext.persistence.errors import (
     ExecutionEventConflict,
 )
 from app.interview_vnext.persistence.unit_of_work import SqlAlchemyVNextUnitOfWork
+
+from tests.interview_vnext_llm_fixtures import (
+    GateRecords,
+    request_input_records,
+    scripted_gate_records,
+    scripted_model_request,
+    unknown_execution_evidence,
+)
 
 
 NOW = datetime(2026, 7, 17, 7, 0, tzinfo=UTC)
@@ -113,48 +128,83 @@ def uow_factory(factory):
     return lambda: SqlAlchemyVNextUnitOfWork(factory)
 
 
+# R3-C2(修正計畫 §6.5):record_attempt_result 從 attempt 的 request artifact
+# 載回 typed request 並交叉驗證 typed result/evidence/conformance,plain JSON
+# 替身不再合法;helpers 以 attempt_id 為種子建 deterministic scripted gate。
+BINDING = scripted_turn_binding()
+
+
+def request_for(ids, attempt_id: UUID):
+    return scripted_model_request(
+        name=f"recovery:{ids.session_id}:{attempt_id}",
+        run_id=ids.run_id,
+        session_id=ids.session_id,
+        turn_id=None,
+        operation_id=op_id(ids),
+        attempt_id=attempt_id,
+        created_at=NOW + timedelta(seconds=1),
+    )
+
+
+def prepare_request_uid(ids) -> UUID:
+    return uuid5(NAMESPACE_URL, f"caliburn-recovery-prepare:{ids.session_id}")
+
+
 async def prepare(factory, ids):
+    request = request_for(ids, prepare_request_uid(ids))
+    request_record, binding_record, config_record, projection_record = (
+        request_input_records(request, BINDING)
+    )
     return await prepare_operation(
         uow_factory(factory), tenant_id=ids.tenant_id, run_id=ids.run_id,
         session_id=ids.session_id, checkpoint_id=uuid4(), operation_id=op_id(ids),
         operation_name=OP_NAME, operation_definition_hash=DEFINITION_HASH,
         idempotency_key="turn-1:interpret",
-        request_artifact=artifact(ids, "request", {"prompt": "最近一次上線做了什麼?"}),
+        request_artifact=request_record,
+        extra_request_artifacts=(binding_record, config_record, projection_record),
         step_event_id=uuid4(), occurred_at=NOW + timedelta(seconds=1))
 
 
 async def start(factory, ids, *, attempt_id: UUID, at=None, deadline=None):
+    # 每個 attempt 綁自己的 typed request artifact(binding/config/projection 的
+    # persisted refs 由該 request 的 deterministic ids 引用)。
+    request = request_for(ids, attempt_id)
+    request_record, binding_record, config_record, projection_record = (
+        request_input_records(request, BINDING)
+    )
+    async with SqlAlchemyVNextUnitOfWork(factory) as uow:
+        for record_item in (binding_record, config_record, projection_record):
+            await uow.artifacts.put(tenant_id=ids.tenant_id, record=record_item)
+        await uow.commit()
     return await start_attempt(
         uow_factory(factory), tenant_id=ids.tenant_id, operation_id=op_id(ids),
-        attempt_id=attempt_id, provider="scripted", requested_model="fake-model",
+        attempt_id=attempt_id, provider="scripted",
+        requested_model=BINDING.requested_model,
         deadline_at=deadline or DEADLINE, max_attempts=MAX_ATTEMPTS,
+        request_artifact=request_record,
         call_event_id=uuid4(), occurred_at=at or NOW + timedelta(seconds=2))
 
 
 async def record(factory, ids, *, attempt_id: UUID, name: str, outcome: AttemptOutcome,
                  at=None):
-    # V3-5A §7.3: result + normalized execution evidence + conformance report are
-    # persisted in one transaction. record_attempt_result validates only artifact
-    # scope, not content, so scope-correct JSON artifacts stand in for the
-    # provider's evidence/conformance here. SUCCEEDED is a clean wire success with
-    # an eligible conformance; the failure outcomes are wire failures.
-    succeeded = outcome == AttemptOutcome.SUCCEEDED
+    # SUCCEEDED 是 clean wire success + eligible conformance;失敗 outcome 是
+    # wire failure(unknown route、conformance=wire_not_succeeded)。三件 typed
+    # artifact 與 request/binding 交叉一致,record_attempt_result 內的 provider
+    # gate 全驗後才落盤。
+    request = request_for(ids, attempt_id)
+    wire = (
+        ModelOutcome.SUCCEEDED
+        if outcome == AttemptOutcome.SUCCEEDED
+        else ModelOutcome.FAILED
+    )
+    gate = scripted_gate_records(request, BINDING, outcome=wire)
     return await record_attempt_result(
         uow_factory(factory), tenant_id=ids.tenant_id, operation_id=op_id(ids),
         attempt_id=attempt_id,
-        result_artifact=artifact(
-            ids,
-            name,
-            {"outcome": outcome.value, "n": name},
-            attempt_id=attempt_id,
-        ),
-        execution_evidence_artifact=artifact(
-            ids, f"{name}-evidence", {"evidence": name}, attempt_id=attempt_id
-        ),
-        conformance_artifact=artifact(
-            ids, f"{name}-conformance", {"eligible": succeeded}, attempt_id=attempt_id
-        ),
-        outcome=outcome, wire_succeeded=succeeded, conformance_eligible=succeeded,
+        result_artifact=gate.result_record,
+        execution_evidence_artifact=gate.evidence_record,
+        conformance_artifact=gate.conformance_record,
+        outcome=outcome,
         max_attempts=MAX_ATTEMPTS,
         result_event_id=uuid4(), conformance_event_id=uuid4(),
         occurred_at=at or NOW + timedelta(seconds=3))
@@ -748,3 +798,165 @@ async def test_coordinator_executes_one_decision_per_step(postgres_session_facto
                                   now=NOW + timedelta(seconds=61)) == \
         RecoveryAction.RETURN_FAILED
     assert provider.calls == 1
+
+
+# ── R3-C2 §7.3:durable write truth table 與 rollback ────────────────────────
+
+
+def ineligible_success_gate(ids, attempt_id) -> GateRecords:
+    """wire succeeded 但 attribution ineligible(route facts unknown)的 gate。"""
+
+    request = request_for(ids, attempt_id)
+    evidence = unknown_execution_evidence(
+        BINDING,
+        usage=TokenUsage(
+            input_tokens=100, output_tokens=20, cache_read_tokens=0,
+            cache_write_tokens=0, reasoning_tokens=0,
+        ),
+    )
+    return scripted_gate_records(
+        request, BINDING, outcome=ModelOutcome.SUCCEEDED,
+        evidence_override=evidence,
+    )
+
+
+def forged_conformance(report: ConformanceReport, **overrides) -> ConformanceReport:
+    definition = ConformanceReportDefinition.model_validate(
+        {**report.model_dump(exclude={"report_hash"}), **overrides}
+    )
+    return ConformanceReport(
+        **definition.model_dump(), report_hash=canonical_hash(definition)
+    )
+
+
+async def gate_side_effect_counts(factory, ids) -> tuple[int, int, list]:
+    async with factory() as s:
+        artifacts = (await s.execute(sa.text(
+            "SELECT count(*) FROM interview_vnext_artifacts WHERE tenant_id = :t"),
+            {"t": str(ids.tenant_id)})).scalar_one()
+        events = (await s.execute(sa.text(
+            "SELECT count(*) FROM interview_vnext_execution_events WHERE tenant_id = :t"),
+            {"t": str(ids.tenant_id)})).scalar_one()
+    return artifacts, events, await _attempt_rows(factory, ids)
+
+
+async def record_gate(factory, ids, *, attempt_id, gate: GateRecords,
+                      outcome: AttemptOutcome, at=None):
+    return await record_attempt_result(
+        uow_factory(factory), tenant_id=ids.tenant_id, operation_id=op_id(ids),
+        attempt_id=attempt_id,
+        result_artifact=gate.result_record,
+        execution_evidence_artifact=gate.evidence_record,
+        conformance_artifact=gate.conformance_record,
+        outcome=outcome, max_attempts=MAX_ATTEMPTS,
+        result_event_id=uuid4(), conformance_event_id=uuid4(),
+        occurred_at=at or NOW + timedelta(seconds=3))
+
+
+async def test_wire_succeeded_but_ineligible_fails_with_conformance_authority(
+        postgres_session_factory, vnext_profile):
+    """§7.3.2:succeeded+ineligible → failed,failure authority=conformance report。"""
+
+    ids = vnext_profile
+    await bootstrap(postgres_session_factory, ids)
+    await prepare(postgres_session_factory, ids)
+    a1 = uuid4()
+    await start(postgres_session_factory, ids, attempt_id=a1)
+    gate = ineligible_success_gate(ids, a1)
+    checkpoint = await record_gate(
+        postgres_session_factory, ids, attempt_id=a1, gate=gate,
+        outcome=AttemptOutcome.NON_RETRYABLE_FAILURE)
+    assert checkpoint.status == CheckpointStatus.FAILED
+    assert checkpoint.failure_artifact == gate.conformance_record.ref
+    assert (
+        checkpoint.provider_execution_evidence_artifact == gate.evidence_record.ref
+    )
+    assert checkpoint.provider_conformance_artifact == gate.conformance_record.ref
+
+
+@pytest.mark.parametrize(
+    "case", ["succeeded_on_wire_failure", "succeeded_on_ineligible",
+             "retryable_on_ineligible"],
+)
+async def test_impossible_classifications_roll_back_before_any_write(
+        postgres_session_factory, vnext_profile, case):
+    """§7.3.4-6:§5.5 truth table 的矛盾組合在任何 write 前 raise 且零殘留。"""
+
+    ids = vnext_profile
+    await bootstrap(postgres_session_factory, ids)
+    await prepare(postgres_session_factory, ids)
+    a1 = uuid4()
+    await start(postgres_session_factory, ids, attempt_id=a1)
+    if case == "succeeded_on_wire_failure":
+        gate = scripted_gate_records(
+            request_for(ids, a1), BINDING, outcome=ModelOutcome.FAILED
+        )
+        outcome = AttemptOutcome.SUCCEEDED
+    elif case == "succeeded_on_ineligible":
+        gate = ineligible_success_gate(ids, a1)
+        outcome = AttemptOutcome.SUCCEEDED
+    else:
+        gate = ineligible_success_gate(ids, a1)
+        outcome = AttemptOutcome.RETRYABLE_FAILURE
+    before = await gate_side_effect_counts(postgres_session_factory, ids)
+    with pytest.raises(CheckpointConflict):
+        await record_gate(
+            postgres_session_factory, ids, attempt_id=a1, gate=gate, outcome=outcome
+        )
+    # §7.3.12:rollback 後沒有新增 artifacts/events,attempt 也未轉 result_recorded。
+    assert await gate_side_effect_counts(postgres_session_factory, ids) == before
+    rows = await _attempt_rows(postgres_session_factory, ids)
+    assert [(r.attempt, r.status) for r in rows] == [(1, "calling")]
+
+
+@pytest.mark.parametrize(
+    "tamper", ["foreign_binding_evidence", "evidence_hash_drift", "wrong_kind"],
+)
+async def test_tampered_gate_artifacts_roll_back_before_any_write(
+        postgres_session_factory, vnext_profile, tamper):
+    """§7.3.7/8/11(PG 面):typed 交叉驗證失敗 → 整個 UoW rollback、零殘留。"""
+
+    ids = vnext_profile
+    await bootstrap(postgres_session_factory, ids)
+    await prepare(postgres_session_factory, ids)
+    a1 = uuid4()
+    await start(postgres_session_factory, ids, attempt_id=a1)
+    request = request_for(ids, a1)
+    if tamper == "foreign_binding_evidence":
+        foreign = scripted_turn_binding(binding_id="turn-interpret-foreign")
+        gate = scripted_gate_records(
+            request, BINDING, outcome=ModelOutcome.FAILED,
+            evidence_override=unknown_execution_evidence(foreign),
+        )
+    elif tamper == "evidence_hash_drift":
+        base = scripted_gate_records(request, BINDING)
+        gate = scripted_gate_records(
+            request, BINDING,
+            conformance_override=forged_conformance(
+                base.conformance, execution_evidence_hash="sha256:" + "9" * 64
+            ),
+        )
+    else:
+        base = scripted_gate_records(request, BINDING)
+        payload = base.result_record.model_dump()
+        payload["ref"] = {**payload["ref"], "kind": "model.request"}
+        from app.interview_vnext.observability.artifacts import ArtifactRecord
+
+        gate = GateRecords(
+            result=base.result, evidence=base.evidence,
+            conformance=base.conformance,
+            result_record=ArtifactRecord.model_validate(payload),
+            evidence_record=base.evidence_record,
+            conformance_record=base.conformance_record,
+        )
+    before = await gate_side_effect_counts(postgres_session_factory, ids)
+    with pytest.raises(PersistedDataCorruption):
+        await record_gate(
+            postgres_session_factory, ids, attempt_id=a1, gate=gate,
+            outcome=AttemptOutcome.RETRYABLE_FAILURE
+            if tamper != "wrong_kind"
+            else AttemptOutcome.SUCCEEDED,
+        )
+    assert await gate_side_effect_counts(postgres_session_factory, ids) == before
+    rows = await _attempt_rows(postgres_session_factory, ids)
+    assert [(r.attempt, r.status) for r in rows] == [(1, "calling")]

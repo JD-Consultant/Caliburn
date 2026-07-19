@@ -20,11 +20,23 @@ from enum import StrEnum
 from typing import Any, Callable
 from uuid import UUID
 
+from pydantic import ValidationError
+
 from app.interview_vnext.domain.commands import CommandBase
 from app.interview_vnext.domain.hashing import canonical_hash, canonical_json
 from app.interview_vnext.domain.reducers import ReductionResult
+from app.interview_vnext.llm.binding import ProviderBinding
+from app.interview_vnext.llm.port import ModelCallRequest
+from app.interview_vnext.llm.portable_schema import (
+    SchemaProjectionMismatch,
+    SchemaProjectionReport,
+    require_projection_report,
+    resolve_schema_projection_policy,
+)
+from app.interview_vnext.llm.result import ModelOutcome
 from app.interview_vnext.observability.artifacts import (
     ArtifactRecord,
+    ArtifactRef,
     build_inline_artifact,
 )
 from app.interview_vnext.observability.checkpoint import (
@@ -52,6 +64,7 @@ from .persistence import (
     OperationAttempt,
     VNextUnitOfWork,
 )
+from .provider_gate import validate_provider_gate_artifacts
 
 
 class AttemptOutcome(StrEnum):
@@ -376,6 +389,77 @@ async def claim_attempt_for_provider(
         raise
 
 
+async def _uow_exact_artifact(
+    uow: VNextUnitOfWork, *, tenant_id: UUID, ref: ArtifactRef
+) -> ArtifactRecord:
+    """載入 ref 指向的 artifact 並比較完整 ``ArtifactRef``(§5.6)。"""
+
+    record = await uow.artifacts.get(tenant_id=tenant_id, artifact_id=ref.artifact_id)
+    if record.ref != ref:
+        raise PersistedDataCorruption(
+            "persisted artifact does not match its recorded reference",
+            artifact_id=ref.artifact_id,
+        )
+    return record
+
+
+async def _load_validated_gate_inputs(
+    uow: VNextUnitOfWork, *, tenant_id: UUID, request: ModelCallRequest
+) -> ProviderBinding:
+    """依 request 的 exact refs 載入並驗證 binding、provider config 與 projection。
+
+    §6.5:provider config full ref/content hash 必須等於 binding,projection 必須
+    通過 exact policy validator;任一不符 fail closed,不進任何 write。
+    """
+
+    binding_record = await _uow_exact_artifact(
+        uow, tenant_id=tenant_id, ref=request.binding_artifact
+    )
+    config_record = await _uow_exact_artifact(
+        uow, tenant_id=tenant_id, ref=request.provider_config_artifact
+    )
+    projection_record = await _uow_exact_artifact(
+        uow, tenant_id=tenant_id, ref=request.schema_projection_artifact
+    )
+    try:
+        binding = ProviderBinding.model_validate_json(
+            binding_record.inline_content or ""
+        )
+        projection = SchemaProjectionReport.model_validate_json(
+            projection_record.inline_content or ""
+        )
+    except ValidationError as exc:
+        raise PersistedDataCorruption(
+            "persisted binding/projection artifact failed typed validation",
+            operation_id=request.operation_id,
+        ) from exc
+    if (
+        request.binding_id != binding.binding_id
+        or request.binding_hash != binding.binding_hash
+    ):
+        raise PersistedDataCorruption(
+            "request binding identity does not match the persisted binding",
+            operation_id=request.operation_id,
+        )
+    if config_record.ref.content_hash != binding.provider_config_hash:
+        raise PersistedDataCorruption(
+            "provider config artifact does not match the binding config hash",
+            operation_id=request.operation_id,
+        )
+    try:
+        policy = resolve_schema_projection_policy(binding.schema_projection_policy)
+        require_projection_report(
+            policy=policy,
+            report=projection,
+            projected_schema_hash=request.output_schema_hash,
+        )
+    except SchemaProjectionMismatch as exc:
+        raise PersistedDataCorruption(
+            str(exc), operation_id=request.operation_id
+        ) from exc
+    return binding
+
+
 async def record_attempt_result(
     uow_factory: Callable[[], VNextUnitOfWork],
     *,
@@ -387,8 +471,6 @@ async def record_attempt_result(
     conformance_artifact: ArtifactRecord,
     extra_result_artifacts: tuple[ArtifactRecord, ...] = (),
     outcome: AttemptOutcome,
-    wire_succeeded: bool,
-    conformance_eligible: bool,
     max_attempts: int,
     failure_reason_code: str = "provider_failure",
     stage: str = "turn.interpret",
@@ -398,13 +480,19 @@ async def record_attempt_result(
 ) -> OperationCheckpoint:
     """§7.3/§7.6:provider 返回後的單一 transaction。
 
-    wire result、normalized execution evidence 與 conformance report 一起保存,
-    再依 classification 推進 checkpoint:succeeded(wire 成功+conformance 合格+
-    local schema 有效)→ provider_completed;retryable 且還有額度 → checkpoint
-    保留 calling(三個 artifact 只在 events/artifacts,不留 checkpoint 指標);
-    non-retryable/額度耗盡 → failed。wire 成功但 conformance 不合格時,failure
-    authority 是 conformance report,attempt 由 wire result 終結(§7.4)。兩個
-    event(model.call.* 與 provider.conformance.completed)同一 transaction。"""
+    R3-C2(修正計畫 §5.5/§6.5):不再接受可獨立漂移的 wire/conformance 布林。
+    從 attempt 的 request artifact 載回 typed request,依 exact refs 驗證
+    binding/provider config/schema projection,再以共用 provider gate 交叉驗證
+    三件 typed artifact;``wire_succeeded``/``conformance_eligible`` 由 validated
+    result/report 派生,分類矛盾在任何 artifact/event/checkpoint write 前
+    raise,任一驗證失敗整個 UoW rollback。
+
+    分類推進:succeeded(wire 成功+conformance 合格+local schema 有效)→
+    provider_completed;retryable 且還有額度 → checkpoint 保留 calling(三個
+    artifact 只在 events/artifacts,不留 checkpoint 指標);non-retryable/額度
+    耗盡 → failed。wire 成功但 conformance 不合格時,failure authority 是
+    conformance report,attempt 由 wire result 終結(§7.4)。兩個 event
+    (model.call.* 與 provider.conformance.completed)同一 transaction。"""
     async with uow_factory() as uow:
         checkpoint = await _require_checkpoint(uow, tenant_id=tenant_id,
                                                operation_id=operation_id)
@@ -433,6 +521,59 @@ async def record_attempt_result(
                     attempt_id=attempt_id,
                     artifact_id=record.ref.artifact_id,
                 )
+        # ── R3-C2 §6.5:typed provider gate,在任何 write 之前 ────────────────
+        request_record = await uow.artifacts.get(
+            tenant_id=tenant_id, artifact_id=attempt.request_artifact_id
+        )
+        try:
+            request = ModelCallRequest.model_validate_json(
+                request_record.inline_content or ""
+            )
+        except ValidationError as exc:
+            raise PersistedDataCorruption(
+                "attempt request artifact failed typed validation",
+                operation_id=operation_id,
+                attempt_id=attempt_id,
+            ) from exc
+        if request.attempt_id != attempt_id or request.operation_id != operation_id:
+            raise PersistedDataCorruption(
+                "attempt request artifact does not belong to this attempt",
+                operation_id=operation_id,
+                attempt_id=attempt_id,
+            )
+        binding = await _load_validated_gate_inputs(
+            uow, tenant_id=tenant_id, request=request
+        )
+        gate = validate_provider_gate_artifacts(
+            request=request,
+            binding=binding,
+            result_artifact=result_artifact,
+            evidence_artifact=execution_evidence_artifact,
+            conformance_artifact=conformance_artifact,
+            require_eligible=None,
+        )
+        wire_succeeded = gate.result.outcome == ModelOutcome.SUCCEEDED
+        conformance_eligible = gate.conformance.eligible
+        # §5.5 truth table:不可能的分類組合在任何 write 前 fail closed。
+        if outcome == AttemptOutcome.SUCCEEDED and not (
+            wire_succeeded and conformance_eligible
+        ):
+            raise CheckpointConflict(
+                "succeeded classification requires a wire-succeeded, "
+                "conformance-eligible provider gate",
+                operation_id=operation_id,
+                attempt_id=attempt_id,
+            )
+        if (
+            wire_succeeded
+            and not conformance_eligible
+            and outcome == AttemptOutcome.RETRYABLE_FAILURE
+        ):
+            raise CheckpointConflict(
+                "wire-succeeded but conformance-ineligible attempt cannot be retryable",
+                operation_id=operation_id,
+                attempt_id=attempt_id,
+            )
         stored_supporting = tuple(
             [
                 await uow.artifacts.put(tenant_id=tenant_id, record=record)

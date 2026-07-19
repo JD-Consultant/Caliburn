@@ -16,9 +16,13 @@ from app.interview_vnext.domain.hashing import canonical_hash
 from app.interview_vnext.llm.binding import define_provider_binding
 from app.interview_vnext.llm.conformance import (
     ATTRIBUTION_STRICT_POLICY_V1,
+    ConformanceMismatch,
     ConformanceReasonCode,
     ConformanceReport,
+    ConformanceReportDefinition,
     evaluate_conformance,
+    require_conformance_report,
+    resolve_conformance_policy,
 )
 from app.interview_vnext.llm.execution import (
     CacheStatus,
@@ -451,4 +455,165 @@ def test_report_has_no_wall_clock_field_and_forged_hash_is_rejected():
     with pytest.raises(ValidationError, match="hash"):
         ConformanceReport.model_validate(
             {**report.model_dump(), "report_hash": "sha256:" + "0" * 64}
+        )
+
+
+# ── R3-C2 exact policy resolution 與 persisted report 重驗(§5.4/§6.3)───────
+
+
+def forged_conformance_report(report: ConformanceReport, **overrides) -> ConformanceReport:
+    """Tamper a report and recompute its self-hash(合法自我 hash 的偽造)。"""
+
+    definition = ConformanceReportDefinition.model_validate(
+        {**report.model_dump(exclude={"report_hash"}), **overrides}
+    )
+    return ConformanceReport(
+        **definition.model_dump(), report_hash=canonical_hash(definition)
+    )
+
+
+class TestResolveConformancePolicy:
+    def test_active_identity_resolves_to_the_registry_policy(self):
+        identity = ContractIdentity(
+            name=ATTRIBUTION_STRICT_POLICY_V1.name,
+            version=ATTRIBUTION_STRICT_POLICY_V1.version,
+            content_hash=ATTRIBUTION_STRICT_POLICY_V1.policy_hash,
+        )
+        assert resolve_conformance_policy(identity) is ATTRIBUTION_STRICT_POLICY_V1
+
+    @pytest.mark.parametrize(
+        "overrides",
+        [
+            {"name": "attribution-lenient"},
+            {"version": "9.9.9"},
+            {"content_hash": "sha256:" + "0" * 64},
+        ],
+        ids=["name", "version", "hash"],
+    )
+    def test_unknown_or_partial_identity_fails_closed(self, overrides):
+        values = dict(
+            name=ATTRIBUTION_STRICT_POLICY_V1.name,
+            version=ATTRIBUTION_STRICT_POLICY_V1.version,
+            content_hash=ATTRIBUTION_STRICT_POLICY_V1.policy_hash,
+        )
+        values.update(overrides)
+        with pytest.raises(ConformanceMismatch):
+            resolve_conformance_policy(ContractIdentity(**values))
+
+
+class TestRequireConformanceReport:
+    def _persisted(self, binding, *, wire_outcome=ModelOutcome.SUCCEEDED):
+        evidence = clean_evidence(binding)
+        report = evaluate_conformance(
+            policy=ATTRIBUTION_STRICT_POLICY_V1,
+            binding=binding,
+            evidence=evidence,
+            wire_outcome=wire_outcome,
+        )
+        return evidence, report
+
+    def test_exact_persisted_report_passes(self):
+        binding = make_binding()
+        evidence, report = self._persisted(binding)
+        assert (
+            require_conformance_report(
+                policy=ATTRIBUTION_STRICT_POLICY_V1,
+                binding=binding,
+                evidence=evidence,
+                wire_outcome=ModelOutcome.SUCCEEDED,
+                report=report,
+            )
+            is None
+        )
+
+    def test_self_consistent_but_not_reevaluated_report_is_rejected(self):
+        """§7.3.10(pure 面):合法自我 hash、但不等於 deterministic re-evaluation。"""
+
+        binding = make_binding()
+        evidence, report = self._persisted(binding)
+        forged = forged_conformance_report(
+            report,
+            eligible=False,
+            reason_codes=(ConformanceReasonCode.CACHE_INELIGIBLE,),
+        )
+        with pytest.raises(ConformanceMismatch, match="re-evaluat|equal"):
+            require_conformance_report(
+                policy=ATTRIBUTION_STRICT_POLICY_V1,
+                binding=binding,
+                evidence=evidence,
+                wire_outcome=ModelOutcome.SUCCEEDED,
+                report=forged,
+            )
+
+    def test_report_policy_identity_drift_is_rejected(self):
+        binding = make_binding()
+        evidence, report = self._persisted(binding)
+        forged = forged_conformance_report(report, policy_version="9.9.9")
+        with pytest.raises(ConformanceMismatch):
+            require_conformance_report(
+                policy=ATTRIBUTION_STRICT_POLICY_V1,
+                binding=binding,
+                evidence=evidence,
+                wire_outcome=ModelOutcome.SUCCEEDED,
+                report=forged,
+            )
+
+    def test_report_binding_identity_drift_is_rejected(self):
+        binding = make_binding()
+        evidence, report = self._persisted(binding)
+        forged = forged_conformance_report(
+            report, binding_hash="sha256:" + "9" * 64
+        )
+        with pytest.raises(ConformanceMismatch, match="binding"):
+            require_conformance_report(
+                policy=ATTRIBUTION_STRICT_POLICY_V1,
+                binding=binding,
+                evidence=evidence,
+                wire_outcome=ModelOutcome.SUCCEEDED,
+                report=forged,
+            )
+
+    def test_report_evidence_hash_drift_is_rejected(self):
+        """§7.3.8(pure 面):report 的 evidence hash 與 evidence 不同。"""
+
+        binding = make_binding()
+        evidence, report = self._persisted(binding)
+        forged = forged_conformance_report(
+            report, execution_evidence_hash="sha256:" + "9" * 64
+        )
+        with pytest.raises(ConformanceMismatch, match="evidence"):
+            require_conformance_report(
+                policy=ATTRIBUTION_STRICT_POLICY_V1,
+                binding=binding,
+                evidence=evidence,
+                wire_outcome=ModelOutcome.SUCCEEDED,
+                report=forged,
+            )
+
+    def test_report_wire_outcome_drift_is_rejected(self):
+        """§7.3.9(pure 面):report 的 wire outcome 與 result outcome 不同。"""
+
+        binding = make_binding()
+        evidence, report = self._persisted(binding)
+        with pytest.raises(ConformanceMismatch, match="wire"):
+            require_conformance_report(
+                policy=ATTRIBUTION_STRICT_POLICY_V1,
+                binding=binding,
+                evidence=evidence,
+                wire_outcome=ModelOutcome.FAILED,
+                report=report,
+            )
+
+    def test_wire_failure_report_must_carry_wire_not_succeeded(self):
+        binding = make_binding()
+        evidence, report = self._persisted(
+            binding, wire_outcome=ModelOutcome.FAILED
+        )
+        assert report.reason_codes == (ConformanceReasonCode.WIRE_NOT_SUCCEEDED,)
+        require_conformance_report(
+            policy=ATTRIBUTION_STRICT_POLICY_V1,
+            binding=binding,
+            evidence=evidence,
+            wire_outcome=ModelOutcome.FAILED,
+            report=report,
         )

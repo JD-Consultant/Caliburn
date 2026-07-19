@@ -744,3 +744,257 @@ async def test_state_change_during_provider_call_rejects_stale_verified_commit(
             operation_id=uid(ids, "operation/turn-interpret"),
         )
     assert checkpoint.status == CheckpointStatus.VERIFIED
+
+
+# ── R3-C2 §7.4:fresh-process recovery corruption matrix ─────────────────────
+#
+# inline-content tamper 向量在真 DB 被 interview_vnext_artifacts 的 immutability
+# trigger 直接擋下(defense in depth;下方有 trigger 證據測試),application 層
+# 對每一種 typed 不一致的拒絕由 no-network provider-gate 測試覆蓋。PG matrix
+# 因此驗「可實際發生」的 corruption:gate artifact row 消失(FK 未引用的
+# binding/config/projection 與 retry 的 evidence/conformance)與 crash 後的
+# fresh-process gate 重驗。
+
+
+async def delete_artifact(factory, ids, *, kind: str) -> None:
+    async with factory() as session:
+        await session.execute(sa.text(
+            "DELETE FROM interview_vnext_artifacts "
+            "WHERE tenant_id = :t AND kind = :k"),
+            {"t": str(ids.tenant_id), "k": kind})
+        await session.commit()
+
+
+async def checkpoint_status(factory, ids) -> str:
+    async with factory() as session:
+        return (await session.execute(sa.text(
+            "SELECT status FROM interview_vnext_operation_checkpoints "
+            "WHERE tenant_id = :t"), {"t": str(ids.tenant_id)})).scalar_one()
+
+
+async def test_artifact_rows_are_immutable_at_the_database(
+    postgres_session_factory, vnext_profile
+):
+    """§7.4 tamper 防線:artifact row 的 UPDATE 被 DB trigger 擋(row 是證據)。"""
+
+    ids = vnext_profile
+    employee = await bootstrap(postgres_session_factory, ids)
+    provider = ResultProvider(("success",))
+    first = await execute_turn_interpret(
+        uow_factory(postgres_session_factory), **execute_kwargs(ids, employee, provider)
+    )
+    assert first.status == TurnExecutionStatus.COMMITTED
+    with pytest.raises(sa.exc.DBAPIError, match="immutable"):
+        async with postgres_session_factory() as session:
+            await session.execute(sa.text(
+                "UPDATE interview_vnext_artifacts "
+                "SET inline_content = inline_content || ' ' "
+                "WHERE tenant_id = :t AND kind = 'model.provider_execution_evidence'"),
+                {"t": str(ids.tenant_id)})
+            await session.commit()
+
+
+@pytest.mark.parametrize(
+    "kind", ("model.provider_binding", "provider.config", "model.schema_projection")
+)
+async def test_committed_recovery_fails_closed_on_missing_gate_input(
+    postgres_session_factory, vnext_profile, kind
+):
+    """§7.4 committed 行:binding/config/projection row 消失 → corruption、
+    0 provider call、checkpoint 不動。"""
+
+    ids = vnext_profile
+    employee = await bootstrap(postgres_session_factory, ids)
+    provider = ResultProvider(("success",))
+    first = await execute_turn_interpret(
+        uow_factory(postgres_session_factory), **execute_kwargs(ids, employee, provider)
+    )
+    assert first.status == TurnExecutionStatus.COMMITTED
+    await delete_artifact(postgres_session_factory, ids, kind=kind)
+
+    replay_provider = ResultProvider(("success",))
+    with pytest.raises(executor_module.PersistedDataCorruption):
+        await execute_turn_interpret(
+            uow_factory(postgres_session_factory),
+            **execute_kwargs(ids, employee, replay_provider),
+        )
+    assert len(replay_provider.requests) == 0
+    assert await checkpoint_status(postgres_session_factory, ids) == "committed"
+
+
+async def test_retry_recovery_fails_closed_on_missing_recorded_evidence(
+    postgres_session_factory, vnext_profile, monkeypatch
+):
+    """§7.4 calling+result_recorded 行:prior evidence 消失 → 不 claim next attempt。"""
+
+    ids = vnext_profile
+    employee = await bootstrap(postgres_session_factory, ids)
+    real_claim_attempt = executor_module.claim_attempt_for_provider
+    starts = 0
+
+    async def crash_before_second_start(*args, **kwargs):
+        nonlocal starts
+        starts += 1
+        if starts == 2:
+            raise RuntimeError("simulated crash before retry attempt start")
+        return await real_claim_attempt(*args, **kwargs)
+
+    with monkeypatch.context() as patched:
+        patched.setattr(
+            executor_module, "claim_attempt_for_provider", crash_before_second_start
+        )
+        first_provider = ResultProvider(("timeout",))
+        with pytest.raises(RuntimeError, match="before retry attempt"):
+            await execute_turn_interpret(
+                uow_factory(postgres_session_factory),
+                **execute_kwargs(ids, employee, first_provider),
+            )
+    rows = await attempt_rows(postgres_session_factory, ids)
+    assert [(row.attempt, row.status) for row in rows] == [(1, "result_recorded")]
+    # attempt 1 的 evidence/conformance 不在 checkpoint refs(無 FK),可被移除。
+    await delete_artifact(
+        postgres_session_factory, ids, kind="model.provider_execution_evidence"
+    )
+
+    replay_provider = ResultProvider(("success",))
+    with pytest.raises(executor_module.PersistedDataCorruption):
+        await execute_turn_interpret(
+            uow_factory(postgres_session_factory),
+            **execute_kwargs(ids, employee, replay_provider),
+        )
+    assert len(replay_provider.requests) == 0
+    rows = await attempt_rows(postgres_session_factory, ids)
+    assert [(row.attempt, row.status) for row in rows] == [(1, "result_recorded")]
+
+
+async def test_provider_completed_recovery_revalidates_gate_before_verifier(
+    postgres_session_factory, vnext_profile, monkeypatch
+):
+    """§7.4 provider_completed 行:先重驗 gate;config 消失 → 不跑 verifier、
+    0 provider call;clean replay 則完成 commit 且不重打 provider。"""
+
+    ids = vnext_profile
+    employee = await bootstrap(postgres_session_factory, ids)
+    provider = ResultProvider(("success",))
+
+    def crash_verifier(**_kwargs):
+        raise RuntimeError("simulated crash before verification")
+
+    with monkeypatch.context() as patched:
+        patched.setattr(
+            executor_module, "verify_turn_interpret_output", crash_verifier
+        )
+        with pytest.raises(RuntimeError, match="before verification"):
+            await execute_turn_interpret(
+                uow_factory(postgres_session_factory),
+                **execute_kwargs(ids, employee, provider),
+            )
+    assert await checkpoint_status(postgres_session_factory, ids) == (
+        "provider_completed"
+    )
+    await delete_artifact(postgres_session_factory, ids, kind="provider.config")
+
+    corrupted_replay = ResultProvider(("success",))
+    with pytest.raises(executor_module.PersistedDataCorruption):
+        await execute_turn_interpret(
+            uow_factory(postgres_session_factory),
+            **execute_kwargs(ids, employee, corrupted_replay),
+        )
+    assert len(corrupted_replay.requests) == 0
+    assert await checkpoint_status(postgres_session_factory, ids) == (
+        "provider_completed"
+    )
+
+
+async def test_provider_completed_clean_recovery_commits_without_provider(
+    postgres_session_factory, vnext_profile, monkeypatch
+):
+    ids = vnext_profile
+    employee = await bootstrap(postgres_session_factory, ids)
+    provider = ResultProvider(("success",))
+
+    def crash_verifier(**_kwargs):
+        raise RuntimeError("simulated crash before verification")
+
+    with monkeypatch.context() as patched:
+        patched.setattr(
+            executor_module, "verify_turn_interpret_output", crash_verifier
+        )
+        with pytest.raises(RuntimeError, match="before verification"):
+            await execute_turn_interpret(
+                uow_factory(postgres_session_factory),
+                **execute_kwargs(ids, employee, provider),
+            )
+    replay_provider = ResultProvider(("success",))
+    outcome = await execute_turn_interpret(
+        uow_factory(postgres_session_factory),
+        **execute_kwargs(ids, employee, replay_provider),
+    )
+    assert outcome.status == TurnExecutionStatus.COMMITTED
+    assert len(replay_provider.requests) == 0
+
+
+async def test_verified_recovery_revalidates_gate_before_commit(
+    postgres_session_factory, vnext_profile, monkeypatch
+):
+    """§7.4 verified 行:先重驗 provider gate,再載 verification,才可 commit。"""
+
+    ids = vnext_profile
+    employee = await bootstrap(postgres_session_factory, ids)
+    provider = ResultProvider(("success",))
+
+    async def crash_commit(*_args, **_kwargs):
+        raise RuntimeError("simulated crash before commit")
+
+    with monkeypatch.context() as patched:
+        patched.setattr(
+            executor_module, "commit_verified_operation", crash_commit
+        )
+        with pytest.raises(RuntimeError, match="before commit"):
+            await execute_turn_interpret(
+                uow_factory(postgres_session_factory),
+                **execute_kwargs(ids, employee, provider),
+            )
+    assert await checkpoint_status(postgres_session_factory, ids) == "verified"
+    await delete_artifact(postgres_session_factory, ids, kind="provider.config")
+
+    replay_provider = ResultProvider(("success",))
+    with pytest.raises(executor_module.PersistedDataCorruption):
+        await execute_turn_interpret(
+            uow_factory(postgres_session_factory),
+            **execute_kwargs(ids, employee, replay_provider),
+        )
+    assert len(replay_provider.requests) == 0
+    assert await checkpoint_status(postgres_session_factory, ids) == "verified"
+
+
+async def test_failed_wire_recovery_revalidates_failure_authority(
+    postgres_session_factory, vnext_profile
+):
+    """§7.4 failed 行:refusal 重驗 gate 後 idempotent 回 failed;config 消失則拒。"""
+
+    ids = vnext_profile
+    employee = await bootstrap(postgres_session_factory, ids)
+    provider = ResultProvider(("refusal",))
+    first = await execute_turn_interpret(
+        uow_factory(postgres_session_factory), **execute_kwargs(ids, employee, provider)
+    )
+    assert first.status == TurnExecutionStatus.FAILED
+
+    clean_replay = ResultProvider(("refusal",))
+    replay = await execute_turn_interpret(
+        uow_factory(postgres_session_factory),
+        **execute_kwargs(ids, employee, clean_replay),
+    )
+    assert replay.status == TurnExecutionStatus.FAILED
+    assert replay.checkpoint == first.checkpoint
+    assert len(clean_replay.requests) == 0
+
+    await delete_artifact(postgres_session_factory, ids, kind="provider.config")
+    corrupted_replay = ResultProvider(("refusal",))
+    with pytest.raises(executor_module.PersistedDataCorruption):
+        await execute_turn_interpret(
+            uow_factory(postgres_session_factory),
+            **execute_kwargs(ids, employee, corrupted_replay),
+        )
+    assert len(corrupted_replay.requests) == 0

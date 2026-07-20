@@ -2,9 +2,9 @@
 title: Interview vNext 專業職務分析、短回答 grounding 與 OCS/JD 共編架構研究
 status: proposed-research-not-implementation-authority
 date: 2026-07-20
-revision: 2
+revision: 3
 audience: owner, architect, implementer, evaluator
-scope: R5 前置設計；訪談證據、職務模型、企業自訂 K/S、authoring core、API/indexer 與交付 projection
+scope: R5 前置設計；當下單一職務的訪談證據、職務模型、document-local K/S、authoring 與交付 projection
 ---
 
 # Interview vNext 專業職務分析、短回答 grounding 與 OCS/JD 共編架構研究
@@ -14,9 +14,12 @@ scope: R5 前置設計；訪談證據、職務模型、企業自訂 K/S、author
 > owner 核准本文的裁決後，才回寫 mother plan／ADR 並交給實作者；不得因本文存在就自行新增 migration、
 > production route、Web wiring 或 paid live。
 >
-> **Revision 2（owner correction）**：現有 editor、深文件契約、API、indexer 與欄位都只是可盤點的既有資產，
+> **Revision 3（owner scope correction）**：現有 editor、深文件契約、API、indexer 與欄位都只是可盤點的既有資產，
 > 不是必須整合的限制。目標架構先以產品品質、可追溯性與一人團隊可維護性設計，再用明確 gate 決定保留、
 > 包裝、遷移或替換哪些既有元件。
+>
+> 本階段產品只處理「一個人當下的工作 → 這一份專屬職務說明書」。客戶可能是公司、個人或其他單位，但不建立
+> 公司層 capability catalog、跨職務 K/S 共用、人才盤點或個人能力評分。這些都不是目前需求。
 
 ## 1. 結論先行
 
@@ -38,10 +41,10 @@ scope: R5 前置設計；訪談證據、職務模型、企業自訂 K/S、author
   -> Employee Evidence（員工事實，保留可驗證 provenance）
   -> Episode / Task Model（同一工作片段的輸入、行動、產出、標準、例外）
   -> Candidate Job Model（主要職責、任務、產出、指標）
-  -> Capability Coverage（查企業目錄與公版，判定 exact/partial/no-match）
-  -> Reference Linker／Tenant Capability Discovery
-  -> Human Review（員工確認事實；顧問／SME 確認專業表述與 K/S linkage）
-  -> Canonical Job & Capability Model
+  -> Optional Reference Coverage（查公版，判定 usable/partial/no-match）
+  -> Document-local K/S Drafting（公版不足時依已確認 task 產候選）
+  -> Human Review（員工確認事實；顧問確認專業表述與 K/S linkage）
+  -> Canonical Job Model Revision
   -> Authoring Workspace（新建或既有 UI adapter，由產品 gate 決定）
   -> Deterministic Export（OCS JSON、JD、PDF、XLSX、API）
 ```
@@ -55,7 +58,7 @@ provenance**。如此「是」、「每週」、「主管」、「都會」可�
 port；不因本需求新增多 Agent framework、session vector database 或把完整 transcript 每輪全部送入模型。
 
 現有 OCS document、editor `_pending`、knowledge pack 與 Qdrant pipeline **不可直接被宣告為 canonical product core**。
-它們需分別接受 authoring fidelity、provenance、custom K/S、retrieval quality、維運成本與 migration cost gate。
+它們需分別接受 authoring fidelity、provenance、document-local K/S、retrieval quality、維運成本與 migration cost gate。
 
 ## 2. 本次實際閱讀與盤點範圍
 
@@ -105,10 +108,9 @@ Competency-based Job Model**。
   -> one or more delivery surfaces
 ```
 
-既有 contract 的 `CompetencyBlock.knowledge/skills` 只保存 `CodeName`；同一 K/S 會隨 task block 重複，缺少全域
-concept identity、定義、alias、tenant namespace、版本、跨 taxonomy alignment 與 task-link review lifecycle。
-knowledge pack 又以原始字串精確比對去重。這些設計可作 OCS exchange/editor projection，但不足以直接承擔
-企業專屬 skills graph 的 source of truth。
+既有 contract 的 `CompetencyBlock.knowledge/skills` 只保存 `CodeName`，沒有 typed basis、evidence/reference closure 與
+review status。knowledge pack 又以原始字串精確比對去重。這些設計可作 OCS exchange/editor projection，但在決定
+「為何這份 JD 需要這項 K/S」時仍不足；不過本階段只補 document-local requirement，不建立跨文件 concept graph。
 
 ### 2.3 外部 authority
 
@@ -226,17 +228,17 @@ truth。
 └──────────────────────────────┬────────────────────────────────┘
                                │ selected task query
 ┌──────────────────────────────▼────────────────────────────────┐
-│ Capability Retrieval View                                    │
-│ tenant-approved + official namespaces -> hybrid -> rerank     │
+│ Optional Official Reference Search                           │
+│ selected public sources -> hybrid retrieval -> bounded set    │
 └──────────────────────────────┬────────────────────────────────┘
                                │ immutable candidate snapshot
 ┌──────────────────────────────▼────────────────────────────────┐
-│ Coverage / Concept Resolution                                 │
-│ exact/close/partial/no-match -> reuse/map/create tenant K/S   │
+│ Document-local Requirement Drafting                           │
+│ usable/partial/no-match -> K/S items grounded in this job     │
 └──────────────────────────────┬────────────────────────────────┘
-                               │ reviewed concepts + task links
+                               │ reviewed K/S + task links
 ┌──────────────────────────────▼────────────────────────────────┐
-│ Canonical Job & Capability Authoring Core                     │
+│ Canonical Job Authoring Core                                  │
 │ revisions + proposals + decisions + provenance + publication │
 └──────────────────────────────┬────────────────────────────────┘
                                │ deterministic projections
@@ -524,10 +526,8 @@ observable action + object
 - 至少閉合到 literal 或 contextual employee evidence；
 - reference task 相似只能協助命名，不能證明員工有做。
 
-Job Model 裡的 task 以企業實際工作為 truth，**不需要公版先存在**。外部 OCS/NICE/O*NET task 只能建立 optional
-alignment；不能取代 tenant task identity。若相同或近似 task 在多個職務反覆出現，可經顧問 review 後提升成
-versioned `TenantTaskTemplate` 供後續重用；單一特殊職務則保留 job-local task 即可。不能為了建共用模板而消除真正的
-公司差異。
+Job Model 裡的 task 以受訪者當下實際工作為 truth，**不需要公版先存在**。外部 OCS/NICE/O*NET task 只能作 optional
+reference/alignment，不能取代這份 JD 的 task identity。此階段不把 task 提升成公司模板，也不處理跨 JD 重用。
 
 ### 9.3 工作產出（Output）
 
@@ -570,16 +570,16 @@ condition/context
 iCAP 2026 手冊定義為執行任務所需理解、可應用於該領域的原則與事實。K linkage 需要：
 
 - 明確 task candidate；
-- OCS/ESCO/NICE/其他 approved taxonomy concept 或 tenant-owned concept；
+- OCS/ESCO/NICE/其他公版候選，或根據本職務 task 形成的 document-local K；
 - task–knowledge relevance reason；
-- concept ID/version；外部來源另帶 reference URI/version；
+- 這份 JD 內的 requirement ID；有公版來源才帶 reference URI/version；
 - reviewer decision。
 
 員工提到工具或動作不代表已證明具備所有底層理論知識。
 
-K statement 應描述單一可理解與取回的概念，例如「公司 X 告警分級與升級規則」，不是「熟悉、了解、精通」等
-熟練度措辭，也不是把整個 task 改寫成名詞。公司專屬流程、資料模型、設備原理、產品規則與法遵規範完全可以是
-合法 tenant knowledge；它們不需要先存在於公版。
+K statement 應描述單一可理解與取回的概念，例如「告警分級與升級規則」，不是「熟悉、了解、精通」等熟練度
+措辭，也不是把整個 task 改寫成名詞。流程、資料模型、設備原理、產品規則與法遵規範完全可以是這份 JD 的 K；
+它們不需要先存在於公版，也不需要因此建立公司層 catalog。
 
 ### 9.6 S（Skills）
 
@@ -593,38 +593,50 @@ iCAP 定義為完成任務所需的認知能力或技術操作能力。推薦 S 
 「使用 Excel/SAP/Python」先是 tool evidence。只有 evidence 顯示如何配置、分析、排錯、整合或達成品質標準，才形成
 skill candidate；reference 可提出候選，仍需 task linkage 與 human review。
 
-S statement 應描述一個可觀察 action，例如「依公司 X 告警紀錄定位跨系統資料同步異常」。工具、知識、態度、
-職稱與抽象能力不得直接冒充 S。公版沒有這項技能時，建立 tenant-owned skill，而不是選一個語意較遠的官方 skill
-硬貼標籤。
+S statement 應描述一個可觀察 action，例如「依告警紀錄定位跨系統資料同步異常」。工具、知識、態度、職稱與
+抽象能力不得直接冒充 S。公版沒有這項技能時，建立這份 JD 的 custom skill candidate，而不是選一個語意較遠的
+官方 skill 硬貼標籤。
 
 ### 9.7 公版沒有任務或 K/S 時的正式流程
 
 公版不是 allow-list。NIST workforce playbook 明確承認組織同時有 common tasks 與 context-unique tasks；T/K/S
-building blocks 可依組織情境組成工作角色。OPM 也允許組織依 job analysis 補充或修改 competencies。因此 no-match
-不是 retrieval failure，而是一個要被建模的正常 outcome。
+building blocks 可依情境組成工作角色。OPM 也允許依 job analysis 補充或修改 competencies。因此 no-match 不是
+retrieval failure，也不要求建立企業 taxonomy；只代表這份 JD 要使用 custom requirement。
 
 ```text
-confirmed tenant task
-  -> retrieve tenant-approved concepts first
-  -> retrieve official/reference concepts
-  -> coverage decision: exact | close | partial | no_match | ambiguous
-  -> exact/close: propose a version-pinned TaskCapabilityLink
-  -> partial: retain matched concept + propose the missing narrower concept
-  -> no_match: draft a tenant-owned K/S concept
-  -> duplicate/alias/relation resolution
-  -> consultant/SME review
-  -> approve concept + approve task linkage separately
-  -> publish new catalog revision and reindex derived retrieval view
+confirmed job-local task
+  -> optionally retrieve bounded public references
+  -> coverage decision: usable | partial | no_match | ambiguous
+  -> usable: adapt reference wording only where it truly fits
+  -> partial: keep supported part + draft the missing job-local K/S
+  -> no_match: draft document-local K/S from task/output/indicator/context
+  -> K/S authoring-rule + evidence/support + duplicate-within-document gates
+  -> consultant review
+  -> save in this JobModelRevision and link to its task
 ```
 
 禁止的捷徑：
 
 - nearest vector 一定要選一筆；
-- 把 tenant wording 覆蓋到官方 URI；
+- 把自訂 wording 覆蓋到官方 URI；
 - AI 自創 `icap_ref`、ESCO URI 或官方 code；
-- 因只有一名員工提到就自動拒絕；
-- 因很多人提到就自動視為正確；
 - 把「這個職務需要某技能」誤寫成「受訪員工已具備某技能」。
+
+這份 JD 內的最小 requirement：
+
+```text
+JobRequirementItem
+  requirement_id               # 只在本 JobModel 中穩定
+  kind: knowledge | skill
+  statement
+  linked_task_ids[]
+  support_basis: task_inference | employee_statement | policy | public_reference | human
+  support_refs[]
+  public_alignment | null       # source URI/version + usable/partial；沒有也合法
+  status: proposed | accepted | edited | rejected
+```
+
+只做同一份 JD 內的重複檢查與 task linkage，不做跨 JD alias、全公司 concept identity、發布或 deprecation lifecycle。
 
 後兩者是不同 domain：
 
@@ -668,19 +680,18 @@ R5 不讀 OCS reference，避免 reference laundering。
 - 現有 episode candidates；
 - 必要且已 snapshot 的 reference snippets。
 
-### 10.3 Capability operation packet
+### 10.3 K/S drafting operation packet
 
 依 operation 最小化：
 
 - confirmed task revision、outputs、indicators 與直接支持 evidence；
-- tenant/company domain context（已核准 policy artifact，不是任意整庫文件）；
-- bounded tenant-approved candidates；
-- bounded external candidates；
-- immutable retrieval snapshot + catalog revisions；
-- coverage/discovery operation 所需的 K/S authoring rules。
+- 必要的工作情境／policy artifact；
+- bounded public-reference candidates（若本次有查）；
+- immutable retrieval snapshot；
+- K/S authoring rules 與本文件已存在 requirements（只為 document-local dedup）。
 
-不給完整 transcript、不給其他 tenant、不給未選中的整個 taxonomy。coverage、discover、resolve 與 link 各自使用
-不同 schema；前一步結果由 application 驗證並持久化後，下一步才能讀。
+不給完整 transcript、不給未選中的整個 taxonomy。第一版以一次 `requirements.draft` call 同時輸出 coverage 與 K/S
+typed 區塊；只有 eval 證明分開能顯著改善品質或失敗歸因，才拆成兩個 operation。
 
 ### 10.4 Global consolidation packet
 
@@ -696,160 +707,102 @@ conversation transcript 是 audit source，不是 working memory。工作記憶�
 - Evidence；
 - Inference；
 - CandidateJobItem；
-- CapabilityConcept／TaskCapabilityLink revision；
+- JobRequirementItem；
 - ReviewDecision。
 
 provider conversation ID、server-side compaction 或 prompt cache 只能是 adapter optimization，不能取代 app-owned state。
 
-## 11. Capability Catalog、linkage graph 與 retrieval
+## 11. 公版 retrieval 與 document-local K/S
 
-### 11.1 公版與企業自訂概念是同一介面、不同 authority
+### 11.1 公版的角色
 
-產品需要的是可擴充的 capability catalog，不是只有 OCS 下拉選單。至少有三個 namespace：
+公版只負責：
 
-| Namespace | Authority | 可修改性 | 例子 |
-|---|---|---|---|
-| `external/*` | iCAP、ESCO、NICE、O*NET 等來源 | 唯讀；以來源版本更新 | 官方 K/S、task、occupation |
-| `tenant/{tenant_id}` | 該企業顧問／SME | tenant 內版本化 | 公司流程、產品、設備、內規相關 K/S |
-| `system-candidate/{tenant_id}` | LLM proposal | 不可直接發布 | 待去重、待定義、待 review 的新概念 |
+- 提醒可能漏掉的 task/output/indicator/K/S；
+- 提供較專業、標準化的候選措辭；
+- 提供 source URI/version 讓顧問知道參考來源；
+- 協助比較這份 JD 與職能基準的覆蓋程度。
 
-tenant concept 可以沒有任何 external mapping。若有 mapping，也只表示語意關係，不改變它自己的身分與文字。
-tenant 私有資料預設不得進 global catalog，也不得被其他 tenant retrieval 命中。
+公版不能限制實際工作，也不能證明員工有做某 task 或具備某能力。客戶是不是公司不影響這條規則。
 
-### 11.2 Canonical capability model
+### 11.2 最小 K/S model
 
-`CapabilityConcept` 最少需要：
+本階段不建立 CapabilityConcept、namespace、alias graph 或跨 JD catalog。只在 `JobModelRevision` 保存：
 
 ```text
-concept_id                    # application UUID；穩定，不用顯示碼當 identity
-tenant_id | null              # null = imported external namespace
-kind: knowledge | skill
-preferred_label
-definition
-statement                     # K 單一 concept；S 單一 observable action
-aliases[]                     # 縮寫、口語、舊名、多語
-locale
-domain_tags[]
-origin: external | tenant_authored | imported | ai_proposed
-status: proposed | in_review | approved | deprecated | rejected
-revision
-created_by / reviewed_by / reviewed_at
-supporting_task_ids[]
-supporting_assertion_refs[]      # employee evidence、company policy 或 SME decision，typed
-supersedes_concept_id | null
-```
-
-不要把 lineage、alignment 與 task requirement 全塞進 concept JSON；它們是有自己 provenance、status 與版本的 edge：
-
-```text
-ConceptRelation
-  subject_concept_id
-  predicate: broader | narrower | related | prerequisite | tool_for | alias_of
-  object_concept_id
-  status / provenance / revision
-
-ExternalAlignment
-  concept_id
-  scheme / external_uri / external_version
-  relation: exact | close | broader | narrower | related
-  rationale / score | null / reviewer decision
-
-TaskCapabilityLink
-  task_id
-  concept_id + concept_revision
-  requirement_kind: requires_knowledge | requires_skill
-  importance | null
-  target_proficiency | null
-  rationale
-  support_basis[]: employee_work_evidence | company_policy | sme_decision | external_reference
+JobRequirementItem
+  requirement_id
+  kind: knowledge | skill
+  statement
+  linked_task_ids[]
+  support_basis
   support_refs[]
-  reference_snapshot_ids[]
-  status: proposed | approved | rejected | superseded
+  public_alignment | null
+  status
+  reviewer_edit | null
 ```
 
-同一 capability 可連多個 task；同一 task 可需要多個 K/S。concept approval 與 link approval 必須分開：一個定義良好的
-skill 不代表它適用於這個職務。
+同一份 JD 內可以把一個 K/S 連到多個 task，也可以按輸出格式展開成每個 competency block；是否跨任務共用只是一份
+文件內的 normalization，不形成企業資產。
 
-### 11.3 Coverage 與 tenant concept discovery
+### 11.3 Coverage 與 drafting
 
-對每個 confirmed task 執行：
+對 confirmed task：
 
-1. 查 tenant 已核准 concepts 與歷史 task links；
-2. 查 selected official sources；
-3. LLM 在 bounded candidates 上判 `exact/close/partial/no_match/ambiguous`，並提出 rationale；
-4. deterministic gate 驗證候選 ID、版本、kind、snapshot closure；
-5. exact/close 只建立 link proposal；
-6. partial/no-match 才執行 `capability.discover`，提出最小的新 K/S concept；
-7. resolve 可能的 duplicate、alias、broader/narrower 與 tool-vs-skill 混淆；
-8. reviewer 可選 reuse、map、merge、split、create、reject；
-9. 核准後發新 catalog revision；derived index 非同步更新。
+1. 可選擇查 selected public sources；
+2. LLM 在 bounded candidates 上判 `usable/partial/no_match/ambiguous`；
+3. deterministic gate 驗證候選 ID、版本與 snapshot closure；
+4. usable：可引用或改寫，但保留來源與適用理由；
+5. partial/no-match：依 task、output、indicator、tools/context 起草 document-local K/S；
+6. verifier 檢查 K/S 定義、單一性、可觀察性、tool/trait 混淆與 evidence/support closure；
+7. 顧問 accept/edit/reject；
+8. 寫入本 JobModelRevision，不發布到其他職務。
 
-`capability.discover` 的輸入只能是 confirmed task、output、indicator、tools/domain 與 bounded reference snapshot；不能讀
-其他 tenant 資料，不能產 official code，不能把 model prior 當來源。它可以提出專業措辭，但 supporting basis 必須回到
-task evidence、公司 policy 或 SME decision。
-
-新概念不必等多名員工重複才成立。單一特殊職位也可能有真實且關鍵的技能；重複出現次數只影響 review priority 與
-dedup 信心，不是真偽規則。
+LLM 可以利用通用專業知識提出 K/S 候選，但此時 `support_basis=task_inference`，不是 employee fact、company fact 或
+official reference；必須讓顧問看得出來並審核。LLM 不得產 official code。
 
 ### 11.4 Retrieval index 不是 source of truth
 
-推薦 greenfield ownership：
-
-```text
-PostgreSQL canonical catalog + revisions + edges + review decisions
-  -> transactional outbox
-  -> index projection worker
-  -> lexical/vector/graph retrieval adapter
-```
-
-向量 index 只保存可重建 projection；concept identity、官方 URI、tenant ACL、版本與 review status 以 PostgreSQL 為準。
-搜尋結果必須回 canonical ID + revision，再由 canonical store hydration，不直接把 vector payload 當 authority。
+公版來源的原始結構化資料與版本是 authority；向量 index 只是可重建搜尋 projection。搜尋結果必須帶 source identity、
+版本與 task bundle，再形成 immutable `ReferenceSnapshot`，不能直接把向量 payload 投影進 JD。
 
 ### 11.5 現有 Qdrant／BGE-M3 的處置
 
-現有 BGE-M3 dense+sparse + Qdrant RRF 是有價值的 baseline，但不是已核准的永久架構。建議：
+現有 BGE-M3 dense+sparse + Qdrant RRF 是可用 baseline，但不是永久結論：
 
-- 保留一個 `CapabilitySearchPort`，Qdrant 只是 adapter；
-- 先把現有 v4 當 benchmark candidate，不讓 interview domain import indexer DTO；
-- indexer 改以 catalog revision/outbox 建 read model，而不是從最終 OCS JSON 猜 domain；
-- tenant、external scheme/version、kind、approval status 必須先做 metadata/ACL filter；
-- lexical + dense/sparse + optional graph-neighbor expansion 分開量測；
-- top-k、reranker、embedding text 與 engine 都由 eval 決定。
+- 保留 `ReferenceSearchPort`，Qdrant 只是 adapter；
+- 不讓 interview/job domain import indexer DTO；
+- 只 index 公版 reference corpus，不 index 使用者的 JD 或建立公司 skills catalog；
+- selected source/version/chunk type 先 filter；
+- top-k、reranker、embedding text 與 engine 都由 retrieval eval 決定。
 
-若 Qdrant baseline 在多語、tenant isolation、recall、latency 與維運成本勝出就保留；若 PostgreSQL FTS/pgvector 或其他
-adapter 達到相同品質且明顯降低一人團隊維運，才遷移。不能因為既有就保留，也不能因為 greenfield 就重寫。
+若現有方案在繁中 recall、latency、維運成本勝出就保留；否則可替換。這項決策不影響 Job Model。
 
 ### 11.6 Contextual indexing experiment
 
-可比較兩種 projection：
+可比較：
 
 ```text
-baseline: preferred label + statement
+baseline: task/K/S 原始文字
 
 contextual:
-  concept kind + definition + aliases
-  linked task action/object/output
-  occupation/domain/company-safe context
-  parent/related labels
+  occupation + duty + task
+  output/indicator
+  K/S item
 ```
 
-payload 仍保持結構化 canonical facts，context 只用於 indexing。只有 blind retrieval eval 顯著勝出才 promote；
-Anthropic Contextual Retrieval 是實驗假設來源，不是直接照抄的產品結論。
+context 只用於 indexing，不改寫公版 payload。只有 blind retrieval eval 顯著勝出才 promote。
 
-### 11.7 Capability quality gates
+### 11.7 Quality gates
 
-至少評：
-
-- external exact/close mapping precision；
-- no-match detection recall；
-- tenant concept duplicate/alias rate；
+- public candidate relevance precision/recall；
+- usable/partial/no-match confusion matrix；
 - K/S classification accuracy；
 - tool-to-skill 與 task-to-knowledge false upgrade；
+- unsupported K/S rate；
 - task-link precision/recall；
-- wrong-tenant leakage（critical，必須 0）；
-- deprecated/wrong-version hit rate（critical，必須 0）；
-- reviewer merge/split/reject rate；
-- concept reuse rate與平均 review 時間。
+- wrong-source/wrong-version contamination（critical = 0）；
+- reviewer accept/edit/reject rate與平均 review 時間。
 
 ## 12. Canonical authoring core 與 delivery surfaces
 
@@ -858,8 +811,8 @@ Anthropic Contextual Retrieval 是實驗假設來源，不是直接照抄的產�
 目前 `ocs_doc` 與 `packages/ocs-contract` 對公版匯入／匯出很實用，但 active `CodeName` 主要只有 code/name，
 `CompetencyBlock` 內重複 K/S 陣列；`_pending` 又把 review UI metadata 嵌在待輸出的文件樹。這造成：
 
-- concept identity 與顯示位置 code 混合；
-- 同一 K/S 跨 task 重複，難以管理 alias、版本與 deprecation；
+- K/S requirement identity 與顯示位置 code 混合；
+- 同一份 JD 內的 K/S 與 task linkage 難以清楚表示；
 - task–K/S linkage 沒有獨立 status/rationale/provenance；
 - proposal、accepted truth 與 export shape 耦合；
 - final strip metadata 後，不能只靠文件重建完整 review/audit history。
@@ -875,11 +828,9 @@ JobProfile
 JobModelRevision
 Duty
 Task
-TenantTaskTemplate（optional reusable pattern，不取代 job-local task）
 Output
 BehaviorIndicator
-CapabilityConcept
-TaskCapabilityLink
+JobRequirementItem（K/S；document-local）
 RequirementLevel
 SourceAssertion / Evidence / Inference
 Proposal
@@ -914,15 +865,13 @@ proposal 與 revision；人工 accepted/edited 內容不被後續 AI 靜默覆�
 
 ```text
 Interview module       session/turn/question frame/evidence/gap
-Job Analysis module    episode/duty/task/output/indicator
-Capability module      concepts/relations/alignments/task links
-Authoring module       revision/proposal/review/publication
-Knowledge module       sources/import/catalog snapshots/search port
+Job Authoring module   episode/duty/task/output/indicator/K/S/revision/proposal/review/publication
+Reference module       public sources/import/snapshots/search port
 LLM Runtime module     operations/provider port/executor/conformance
 Evaluation module      capture/replay/eval（不被 production import）
 
 Workers
-  catalog ingest/index projection/export/long-running eval
+  public-reference ingest/index/export/long-running eval
 ```
 
 外部 API 按 use case 暴露 commands/queries，不直接把資料表或完整深 JSON 當 CRUD：
@@ -930,28 +879,27 @@ Workers
 - append interview turn、answer/revise question；
 - get grounded state/gaps；
 - review proposal；
-- create/merge/deprecate tenant capability；
-- approve/reject task link；
+- accept/edit/reject document-local K/S 與 task link；
 - get revision/diff/provenance；
 - publish/export；
-- search official/tenant catalog。
+- search selected public references。
 
 ### 12.5 Editor 保留或重做的 decision gate
 
 不先裁決「沿用」或「全部重做」。用一個 vertical slice 比較：
 
 1. 一段訪談建立 3–5 tasks；
-2. 至少一個 official K/S exact match；
-3. 至少一個 tenant no-match 新 concept；
-4. 顧問完成 link review、merge/edit 與 publication；
+2. 至少一個 usable public K/S；
+3. 至少一個 no-match document-local K/S；
+4. 顧問完成 K/S edit、task-link review 與 publication；
 5. 可回看 evidence、reference、reasoning limitation 與完整 diff。
 
 評估現有 editor adapter 與新 authoring workspace：
 
-- 是否能無損呈現 canonical entities/edges；
+- 是否能無損呈現 canonical entities與 task/K/S links；
 - 顧問完成時間與操作錯誤；
 - provenance 可理解性；
-- concept reuse/merge 體驗；
+- custom K/S edit 與 linkage 體驗；
 - conflict/revision handling；
 - 前後端改造量與後續維護成本。
 
@@ -964,9 +912,9 @@ slice，則可先留作 migration surface。產品架構不依賴這項 UI 決�
 
 - AI 為何提出這一項？
 - 哪些是員工原話／contextual confirmation？
-- 哪些來自官方公版、公司規則或 SME？
-- 公版是 exact、close、partial 還是 no-match？
-- 這是新公司 concept、既有 concept 還是 alias/duplicate？
+- 哪些來自官方公版、工作情境、policy、AI task inference 或人工？
+- 公版是 usable、partial 還是 no-match？
+- 這項 K/S 是公版候選還是本文件 custom item？
 - 哪些 task 要求此 K/S，link 的理由是什麼？
 - 接受後會改哪個 revision，發布到哪些 delivery formats？
 
@@ -980,10 +928,7 @@ slice，則可先留作 migration surface。產品架構不依賴這項 UI 決�
 | `episode.code/1.x` | task/output/indicator hypothesis、gaps | episode evidence + bounded reference | 直接 mutation |
 | `question.select/1.x` | 選 gap、產 response text + QuestionFrame | agenda state | 產 employee facts |
 | `job.consolidate/1.x` | duty grouping、跨 episode dedupe/conflict | candidates + evidence closure | 補不存在的 facts |
-| `capability.coverage/1.x` | 對 bounded K/S candidates 判 exact/close/partial/no-match | confirmed task + snapshot | 強迫 nearest match |
-| `capability.discover/1.x` | no-match 時提出 tenant K/S concept | task evidence + company policy + snapshot | 發布 concept、發明 official code |
-| `concept.resolve/1.x` | 提 duplicate/alias/relationship/mapping 候選 | proposed + approved catalog slice | 自動 merge/deprecate |
-| `task-capability.link/1.x` | 提出 task↔K/S requirement 與 rationale | task + concept revisions | 證明個人已具備能力 |
+| `requirements.draft/1.x` | 判公版 usable/partial/no-match，並提出本 JD 的 K/S + task links + support basis | confirmed job model + optional snapshot | 強迫 nearest match、發布官方 code、證明個人能力 |
 | `job.compose/1.x` | 工作摘要／招募 JD wording | accepted candidates | 變更 canonical truth |
 
 同一 provider/model 可以實作全部 operation；operation separation 是為了 schema、context、eval 與 failure attribution，
@@ -1026,14 +971,14 @@ slice，則可先留作 migration surface。產品架構不依賴這項 UI 決�
 5. **R5e docs/status**：hash/catalog/README/mother plan；
 6. **R6a grounding eval**：短回答專用 suite；
 7. **R6b existing 12 cases migration**；
-8. **post-R5 architecture slice（編號待 mother plan 重排）**：canonical Job/Capability/Authoring contracts；
+8. **post-R5 architecture slice（編號待 mother plan 重排）**：canonical Job/Authoring contracts；
 9. **後續 eval**：episode/job、no-match K/S、linkage、retrieval 與 authoring vertical slice。
 
 每個 commit 必須保持完整 no-network suite 綠；若 active hard cut 無法拆綠，R5b–R5d 合併成一個原子 commit，禁止
 相容 shim 同時支援兩個 active contract。
 
 R5 的完成定義仍只到「自然且可信地理解一輪並形成 evidence」。不得在 R5 順手修改 editor、深文件契約或 indexer；
-Job/Capability/Authoring core 需先由本文 D5–D11 核准，再寫獨立 implementation authority。這是控制架構風險，
+Job/Authoring core 需先由本文 D5–D11 核准，再寫獨立 implementation authority。這是控制架構風險，
 不是承諾沿用舊元件。
 
 ## 15. Eval design
@@ -1090,11 +1035,10 @@ Hard metrics：
 
 - query-to-task recall@5/10/20；
 - MRR/nDCG；
-- tenant-approved vs external source ranking；
-- exact/close/partial/no-match confusion matrix；
+- public candidate relevance ranking；
+- usable/partial/no-match confusion matrix；
 - wrong-version/foreign-source contamination；
-- wrong-tenant leakage（critical = 0）；
-- task bundle與 capability revision closure；
+- task bundle與 reference snapshot closure；
 - baseline vs contextual projection blind comparison；
 - latency/cost。
 
@@ -1134,11 +1078,10 @@ Caliburn 應繼續使用自己的 versioned harness/Capture，不依賴即將退
 ### Stage C：形成指標與 K/S
 
 - behavior indicator component support；
-- Capability Catalog 與 namespace；
-- official + tenant K/S coverage；
-- no-match tenant concept discovery；
-- task–competency linkage review；
-- concept dedup/mapping/retrieval eval。
+- optional public K/S coverage；
+- no-match document-local K/S drafting；
+- task–K/S linkage review；
+- document-local dedup 與 retrieval eval。
 
 ### Stage D：共編與最終文件
 
@@ -1164,10 +1107,9 @@ Caliburn 應繼續使用自己的 versioned harness/Capture，不依賴即將退
 - 把 structured output schema success 當內容正確；
 - 把 reference text 當 employee evidence；
 - 把公版當 allow-list，找不到就強迫 nearest match；
-- 把 company-defined K/S 只存成每份文件裡的自由文字；
+- 把 custom K/S 存成沒有 support basis、task linkage、review status 的自由文字；
 - 把職務需要某 K/S 當成受訪者已具備該能力；
-- 因為 domain 有 graph relations 就先導入 graph database；第一版用 PostgreSQL typed edge tables 即可；
-- 把 API、indexer、capability、authoring 各拆成獨立微服務增加一人團隊維運面；
+- 把 API、indexer、authoring 各拆成獨立微服務增加一人團隊維運面；
 - 從工具名直接推 skill；
 - 從一句自評直接推 ability/attitude；
 - 為了讓短回答通過而關閉 quote/provenance gate；
@@ -1209,42 +1151,41 @@ Caliburn 應繼續使用自己的 versioned harness/Capture，不依賴即將退
 
 ### D6 — K/S authority
 
-**推薦：K/S 可來自 version-pinned external concept 或 tenant-owned concept；兩者都需獨立 task-link review。**
+**推薦：K/S 是這份 JD 的 document-local requirement；可參考公版，也可由 task inference 形成 custom item。**
 
-員工可提供工作佐證與修正，但「職務需要什麼」由後續 coverage/discovery/linkage operation + 顧問／SME 判定；
+員工可提供工作佐證與修正，但「職務需要什麼」由後續 coverage/drafting operation + 顧問判定；
 不能把它當 R5 employee fact，也不能因此宣稱員工本人已具備。
 
 ### D7 — editor strategy
 
 **修訂推薦：先建與 UI 無關的 canonical authoring core；舊 editor 只作 vertical-slice adapter candidate。**
 
-舊 UI 若能以薄 adapter 無損處理 concept identity、task link、proposal/revision/provenance 就保留；若需大量深文件 hack，
+舊 UI 若能以薄 adapter 無損處理 task/K/S linkage、proposal/revision/provenance 就保留；若需大量深文件 hack，
 就建立新的 authoring workspace。不得先以沉沒成本裁決。
 
-### D8 — capability identity
+### D8 — K/S identity
 
-**推薦：CapabilityConcept 使用穩定 application ID + revision；顯示碼與官方 URI 都不是內部 identity。**
+**推薦：`JobRequirementItem` 使用這份 JobModel 內的 application ID；K01/S01 只是輸出位置碼。**
 
-external URI/version 放 alignment；tenant concept 可無 external mapping。K/S 在 catalog 定義一次，由 link 連多個 task。
+public source URI/version 是 optional alignment。沒有公版來源也合法；不建立跨 JD identity 或 catalog。
 
 ### D9 — public task/K/S no-match
 
-**推薦：`no_match` 是一級正常 outcome，允許建立 tenant-owned K/S。**
+**推薦：`no_match` 是一級正常 outcome，允許建立 document-local custom K/S。**
 
-新 concept 必經 authoring rule、duplicate/alias resolution 與人審；LLM 不得創造官方 code。公司內已核准概念後續優先
-重用。公版沒有的 task 直接保留為 job-local tenant truth；反覆出現且值得共用時，再提升成 reviewed
-`TenantTaskTemplate`。
+custom K/S 必經 authoring rule、support/linkage gate 與人審；LLM 不得創造官方 code。公版沒有的 task 直接保留為
+這份 JD 的 truth，不提升成公司模板。
 
-### D10 — catalog/index ownership
+### D10 — reference index ownership
 
-**推薦：PostgreSQL canonical catalog + outbox + rebuildable retrieval index。**
+**推薦：公版結構化來源／版本是 authority，retrieval index 是可重建 adapter。**
 
-Qdrant/BGE-M3 保留為 benchmark adapter，不是 domain authority；是否延用由多語 retrieval quality、ACL、latency 與
+Qdrant/BGE-M3 保留為 benchmark adapter，不是 Job Model authority；是否延用由繁中 retrieval quality、latency 與
 一人維運成本決定。
 
 ### D11 — deployment topology
 
-**推薦：先做 modular monolith + background workers，不先拆 capability/editor/indexer 微服務。**
+**推薦：先做 modular monolith + 必要 background workers，不先拆 editor/indexer 微服務。**
 
 port 與 module boundary 先固定；只有獨立 scaling、failure isolation 或 deployment ownership 有實測需求才拆服務。
 
@@ -1279,9 +1220,6 @@ port 與 module boundary 先固定；只有獨立 scaling、failure isolation �
 - NIST, [Privacy Workforce Taxonomy](https://www.nist.gov/privacy-framework/workforce-advancement/privacy-workforce-taxonomy) — Task、Knowledge、Skill statement 定義、modular application 與非 one-size-fits-all 原則。
 - European Commission ESCO, [About ESCO](https://esco.ec.europa.eu/en/about-esco) — occupation/skill/knowledge concepts 與關係資料。
 - European Commission ESCO, [ESCO v1.2](https://esco.ec.europa.eu/en/about-esco/escopedia/escopedia/esco-v12) — AI-assisted extraction/linking + human expertise/quality improvement。
-- European Commission ESCO, [CPASS AI-native skills verification case](https://esco.ec.europa.eu/en/news/cpass-use-esco-ai-native-skills-verification-platform) — internal domain taxonomy + ESCO/O*NET 等 crosswalk、localization layer，以及官方粒度不足時的 sub-skill mapping。
-- LinkedIn Engineering, [Building and maintaining the Skills Graph taxonomy](https://www.linkedin.com/blog/engineering/data/building-maintaining-the-skills-taxonomy-that-powers-linkedins-skills-graph) — stable skill concepts/IDs/aliases/relationships、candidate discovery、去噪、human curation + ML 與 graph serving 的大型產品案例。
-- Open Skills Network, [Rich Skill Descriptor implementation recommendations](https://rsd.openskillsnetwork.org/) — organization-authored skill 的 canonical URL、statement、metadata、collection 與 external alignment；此來源是 interoperability guidance，不是正式 SDO authority。
 
 ## 20. Proposed decision
 
@@ -1293,18 +1231,17 @@ Evidence-first
   + short-answer AnswerBinding
   + composite employee provenance
   + task/output/indicator synthesis
-  + official/tenant Capability Catalog
-  + exact/partial/no-match coverage
-  + tenant K/S discovery + task linkage review
-  + canonical revision/proposal authoring core
+  + optional public-reference coverage
+  + document-local K/S drafting + task linkage review
+  + canonical JobModel revision/proposal authoring core
   + replaceable editor/index/API adapters
 ```
 
-這能同時保住三個產品目標：
+這能同時保住三個產品目標，而且不建立公司層系統：
 
 1. 訪談自然、能理解短回答，不必強迫員工每次說完整句；
-2. 公版沒有的公司特有任務與 K/S 可以正式建立、治理、重用與版本化，不會被迫錯配官方 taxonomy；
-3. 最終主要職責、任務、產出、行為指標與 K/S 都能回答「為什麼有這一項、來源是員工、公版、公司規則還是人工」。
+2. 公版沒有的任務與 K/S 可以直接成為這份 JD 的 custom item，不會被迫錯配官方 taxonomy；
+3. 最終主要職責、任務、產出、行為指標與 K/S 都能回答「為什麼有這一項、來源是員工、公版、task inference、policy 還是人工」。
 
-Revision 2 不裁決舊 editor／API／indexer 一定刪除；它裁決的是 **canonical product model 不得依賴它們**。各舊元件
+Revision 3 不裁決舊 editor／API／indexer 一定刪除；它裁決的是 **canonical Job Model 不得依賴它們**。各舊元件
 只有通過 vertical-slice quality/maintainability gate 才保留，否則可替換而不重做職務與職能核心。

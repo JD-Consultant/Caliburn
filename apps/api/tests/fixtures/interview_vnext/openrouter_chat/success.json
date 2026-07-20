@@ -1,0 +1,43 @@
+{
+  "id": "gen-fx-success",
+  "object": "chat.completion",
+  "created": 1780000100,
+  "model": "testlab/analyst-large",
+  "choices": [
+    {
+      "index": 0,
+      "finish_reason": "stop",
+      "native_finish_reason": "end_turn",
+      "message": {
+        "role": "assistant",
+        "content": "{\"schema_version\":\"turn_interpret_output.v1\",\"observations\":[],\"user_signal\":\"answer\",\"episode_signal\":\"continue\",\"emergent_topics\":[],\"insufficiencies\":[]}"
+      }
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 1200,
+    "completion_tokens": 350,
+    "total_tokens": 1550,
+    "prompt_tokens_details": {"cached_tokens": 0, "cache_write_tokens": 256},
+    "completion_tokens_details": {"reasoning_tokens": 128},
+    "cost": 0.00123
+  },
+  "openrouter_metadata": {
+    "requested": "testlab/analyst-large",
+    "strategy": "direct",
+    "attempt": 1,
+    "region": "us-east",
+    "is_byok": false,
+    "summary": "direct route to TestHost",
+    "endpoints": {
+      "total": 1,
+      "available": [
+        {"provider": "TestHost", "model": "testlab/analyst-large", "selected": true}
+      ]
+    },
+    "attempts": [
+      {"provider": "TestHost", "model": "testlab/analyst-large", "status": 200}
+    ],
+    "pipeline": []
+  }
+}

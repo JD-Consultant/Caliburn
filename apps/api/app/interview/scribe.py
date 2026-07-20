@@ -21,6 +21,7 @@ from app.interview import coverage as CO
 from app.interview.docpath import get_at
 from app.interview.scribe_schema import ScribeOutput, scribe_schema
 from app.interview.slots import SLOT_DEFS, coerce_slot_value
+from app.interview.trace_utils import canonical_hash
 from app.interview.verify import VerifyResult, verify_ops
 from app.observability import record_verify_rejects
 
@@ -85,6 +86,11 @@ class ScribeResult:
     ops: list[dict] = field(default_factory=list)
     pools: dict = field(default_factory=dict)
     pool_items: dict = field(default_factory=dict)
+    llm_called: bool = False
+    attempt_count: int = 0
+    outcome: str = "success"
+    prompt_hash: str | None = None
+    tool_schema_hash: str | None = None
 
 
 def _mark(op: str, turn_id: int, *, src: dict | None = None,
@@ -386,9 +392,16 @@ async def scribe_pass(llm, knowledge, *, doc: dict, turns: dict[int, str],
     latest = turns.get(turn_id, "")
     prompt = f"{SCRIBE_SYS}\n\n任務清單:{task_keys}\n合法官方池:{pools}\n員工最新發言:{latest}"
 
-    res = ScribeResult(pools=pools, pool_items=pool_items)
+    res = ScribeResult(
+        pools=pools,
+        pool_items=pool_items,
+        llm_called=True,
+        prompt_hash=canonical_hash(prompt),
+        tool_schema_hash=canonical_hash(schema),
+    )
     ops: list[dict] | None = None
     for attempt in range(max_retry + 1):
+        res.attempt_count = attempt + 1
         try:
             data = await llm.select_schema(prompt, schema, role="select",
                                            schema_name="scribe_output")
@@ -416,6 +429,7 @@ async def scribe_pass(llm, knowledge, *, doc: dict, turns: dict[int, str],
 
     if ops is None:
         res.records_failed = True                     # 抽取全敗(交 backstop);不擋回合
+        res.outcome = "parse_failure"
         return res
 
     new_doc, guard, landed = land_ops(ops, doc=doc, turns=turns, ref_codes=ref_codes,

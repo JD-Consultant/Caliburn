@@ -1,0 +1,80 @@
+{
+  "schema_version": "turn_eval_reference_output.v1",
+  "case_id": "TI-02-action-output",
+  "output": {
+    "schema_version": "turn_interpret_output.v1",
+    "observations": [
+      {
+        "proposal_key": "obs-consolidate-shortage",
+        "subject": "employee",
+        "kind": "action",
+        "claim": "彙整各門市的缺貨明細",
+        "quote": "彙整各門市的缺貨明細",
+        "quote_occurrence": 1,
+        "qualifiers": {
+          "time_scope": "current",
+          "typicality": "typical",
+          "polarity": "affirmed",
+          "frequency": {
+            "value": null,
+            "unit": "unknown",
+            "verbatim": null
+          },
+          "importance": "not_stated",
+          "ownership": "owner"
+        },
+        "correction_target_evidence_ids": [],
+        "correction_target_unknown": false
+      },
+      {
+        "proposal_key": "obs-produce-restock-table",
+        "subject": "employee",
+        "kind": "output",
+        "claim": "產出補貨建議表",
+        "quote": "產出補貨建議表",
+        "quote_occurrence": 1,
+        "qualifiers": {
+          "time_scope": "current",
+          "typicality": "typical",
+          "polarity": "affirmed",
+          "frequency": {
+            "value": null,
+            "unit": "unknown",
+            "verbatim": null
+          },
+          "importance": "not_stated",
+          "ownership": "owner"
+        },
+        "correction_target_evidence_ids": [],
+        "correction_target_unknown": false
+      },
+      {
+        "proposal_key": "obs-table-recipient",
+        "subject": "employee",
+        "kind": "recipient",
+        "claim": "補貨建議表交給採購主管",
+        "quote": "給採購主管",
+        "quote_occurrence": 1,
+        "qualifiers": {
+          "time_scope": "current",
+          "typicality": "typical",
+          "polarity": "affirmed",
+          "frequency": {
+            "value": null,
+            "unit": "unknown",
+            "verbatim": null
+          },
+          "importance": "not_stated",
+          "ownership": "owner"
+        },
+        "correction_target_evidence_ids": [],
+        "correction_target_unknown": false
+      }
+    ],
+    "user_signal": "answer",
+    "episode_signal": "continue",
+    "emergent_topics": [],
+    "insufficiencies": []
+  },
+  "correction_target_bindings": {}
+}

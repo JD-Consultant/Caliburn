@@ -1,0 +1,6 @@
+{"schema_version": "turn_eval_transcript_turn.v1", "turn_key": "consultant-01", "sequence": 1, "role": "consultant", "locale": "zh-TW", "text": "請描述你的例行報表工作。", "occurred_offset_seconds": 2}
+{"schema_version": "turn_eval_transcript_turn.v1", "turn_key": "employee-prior-1", "sequence": 2, "role": "employee", "locale": "zh-TW", "text": "我每週寄一次庫存報表。", "occurred_offset_seconds": 4}
+{"schema_version": "turn_eval_transcript_turn.v1", "turn_key": "consultant-02", "sequence": 3, "role": "consultant", "locale": "zh-TW", "text": "還有其他定期報表嗎?", "occurred_offset_seconds": 6}
+{"schema_version": "turn_eval_transcript_turn.v1", "turn_key": "employee-prior-2", "sequence": 4, "role": "employee", "locale": "zh-TW", "text": "我每月整理一次客訴報表。", "occurred_offset_seconds": 8}
+{"schema_version": "turn_eval_transcript_turn.v1", "turn_key": "consultant-03", "sequence": 5, "role": "consultant", "locale": "zh-TW", "text": "好的,還有需要修正的嗎?", "occurred_offset_seconds": 10}
+{"schema_version": "turn_eval_transcript_turn.v1", "turn_key": "employee-target", "sequence": 6, "role": "employee", "locale": "zh-TW", "text": "前面那個頻率我講錯了,應該是每季一次。", "occurred_offset_seconds": 12}

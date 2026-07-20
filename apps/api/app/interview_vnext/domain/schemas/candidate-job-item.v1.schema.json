@@ -1,0 +1,312 @@
+{
+  "$defs": {
+    "CandidateKind": {
+      "enum": [
+        "task",
+        "output",
+        "knowledge",
+        "skill",
+        "ability",
+        "attitude",
+        "behavior_indicator"
+      ],
+      "title": "CandidateKind",
+      "type": "string"
+    },
+    "CandidateStatus": {
+      "enum": [
+        "draft",
+        "verified",
+        "insufficient",
+        "conflicted",
+        "projected",
+        "rejected",
+        "accepted"
+      ],
+      "title": "CandidateStatus",
+      "type": "string"
+    },
+    "EvidenceQualifiers": {
+      "additionalProperties": false,
+      "properties": {
+        "time_scope": {
+          "$ref": "#/$defs/TimeScope",
+          "default": "unknown"
+        },
+        "typicality": {
+          "$ref": "#/$defs/Typicality",
+          "default": "unknown"
+        },
+        "polarity": {
+          "$ref": "#/$defs/Polarity",
+          "default": "uncertain"
+        },
+        "frequency": {
+          "$ref": "#/$defs/FrequencyQualifier"
+        },
+        "importance": {
+          "$ref": "#/$defs/Importance",
+          "default": "not_stated"
+        },
+        "ownership": {
+          "$ref": "#/$defs/Ownership",
+          "default": "unknown"
+        }
+      },
+      "title": "EvidenceQualifiers",
+      "type": "object"
+    },
+    "FrequencyQualifier": {
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Value"
+        },
+        "unit": {
+          "$ref": "#/$defs/FrequencyUnit",
+          "default": "unknown"
+        },
+        "verbatim": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Verbatim"
+        }
+      },
+      "title": "FrequencyQualifier",
+      "type": "object"
+    },
+    "FrequencyUnit": {
+      "enum": [
+        "per_day",
+        "per_week",
+        "per_month",
+        "per_quarter",
+        "per_year",
+        "irregular",
+        "unknown"
+      ],
+      "title": "FrequencyUnit",
+      "type": "string"
+    },
+    "Importance": {
+      "enum": [
+        "explicit_core",
+        "explicit_supporting",
+        "not_stated"
+      ],
+      "title": "Importance",
+      "type": "string"
+    },
+    "Ownership": {
+      "enum": [
+        "owner",
+        "shared",
+        "assists",
+        "receives",
+        "not_responsible",
+        "unknown"
+      ],
+      "title": "Ownership",
+      "type": "string"
+    },
+    "Polarity": {
+      "enum": [
+        "affirmed",
+        "denied",
+        "uncertain"
+      ],
+      "title": "Polarity",
+      "type": "string"
+    },
+    "QuantitativeThreshold": {
+      "additionalProperties": false,
+      "properties": {
+        "expression": {
+          "minLength": 1,
+          "title": "Expression",
+          "type": "string"
+        },
+        "source_type": {
+          "$ref": "#/$defs/ThresholdSourceType"
+        },
+        "source_id": {
+          "minLength": 1,
+          "title": "Source Id",
+          "type": "string"
+        },
+        "evidence_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Evidence Id"
+        }
+      },
+      "required": [
+        "expression",
+        "source_type",
+        "source_id"
+      ],
+      "title": "QuantitativeThreshold",
+      "type": "object"
+    },
+    "ThresholdSourceType": {
+      "enum": [
+        "employee_evidence",
+        "approved_policy",
+        "human"
+      ],
+      "title": "ThresholdSourceType",
+      "type": "string"
+    },
+    "TimeScope": {
+      "enum": [
+        "current",
+        "past",
+        "future",
+        "hypothetical",
+        "unknown"
+      ],
+      "title": "TimeScope",
+      "type": "string"
+    },
+    "Typicality": {
+      "enum": [
+        "typical",
+        "occasional",
+        "exception",
+        "unknown"
+      ],
+      "title": "Typicality",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "candidate_job_item.v1",
+      "default": "candidate_job_item.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "candidate_id": {
+      "format": "uuid",
+      "title": "Candidate Id",
+      "type": "string"
+    },
+    "session_id": {
+      "format": "uuid",
+      "title": "Session Id",
+      "type": "string"
+    },
+    "kind": {
+      "$ref": "#/$defs/CandidateKind"
+    },
+    "statement": {
+      "minLength": 1,
+      "title": "Statement",
+      "type": "string"
+    },
+    "evidence_ids": {
+      "items": {
+        "format": "uuid",
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Evidence Ids",
+      "type": "array"
+    },
+    "inference_ids": {
+      "default": [],
+      "items": {
+        "format": "uuid",
+        "type": "string"
+      },
+      "title": "Inference Ids",
+      "type": "array"
+    },
+    "reference_urns": {
+      "default": [],
+      "items": {
+        "maxLength": 512,
+        "minLength": 3,
+        "type": "string"
+      },
+      "title": "Reference Urns",
+      "type": "array"
+    },
+    "qualifiers": {
+      "$ref": "#/$defs/EvidenceQualifiers"
+    },
+    "thresholds": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/QuantitativeThreshold"
+      },
+      "title": "Thresholds",
+      "type": "array"
+    },
+    "status": {
+      "$ref": "#/$defs/CandidateStatus",
+      "default": "draft"
+    },
+    "created_by_operation": {
+      "maxLength": 128,
+      "minLength": 1,
+      "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+      "title": "Created By Operation",
+      "type": "string"
+    },
+    "review_decision_id": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Review Decision Id"
+    }
+  },
+  "required": [
+    "candidate_id",
+    "session_id",
+    "kind",
+    "statement",
+    "evidence_ids",
+    "created_by_operation"
+  ],
+  "title": "Caliburn interview vNext candidate job item v1",
+  "type": "object",
+  "$id": "https://caliburn.local/schemas/candidate-job-item.v1.schema.json"
+}

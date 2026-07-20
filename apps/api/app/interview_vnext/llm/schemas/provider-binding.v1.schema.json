@@ -1,0 +1,219 @@
+{
+  "$defs": {
+    "ContractIdentity": {
+      "additionalProperties": false,
+      "description": "Stable identity for a schema, prompt, or context policy artifact.",
+      "properties": {
+        "name": {
+          "maxLength": 128,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+          "title": "Name",
+          "type": "string"
+        },
+        "version": {
+          "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(?:-[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?(?:\\+[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?$",
+          "title": "Version",
+          "type": "string"
+        },
+        "content_hash": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "version",
+        "content_hash"
+      ],
+      "title": "ContractIdentity",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "provider_binding.v1",
+      "default": "provider_binding.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "binding_id": {
+      "maxLength": 128,
+      "minLength": 1,
+      "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+      "title": "Binding Id",
+      "type": "string"
+    },
+    "operation_name": {
+      "maxLength": 128,
+      "minLength": 1,
+      "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+      "title": "Operation Name",
+      "type": "string"
+    },
+    "quality_profile": {
+      "maxLength": 128,
+      "minLength": 1,
+      "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+      "title": "Quality Profile",
+      "type": "string"
+    },
+    "adapter_id": {
+      "maxLength": 128,
+      "minLength": 1,
+      "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+      "title": "Adapter Id",
+      "type": "string"
+    },
+    "adapter_version": {
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(?:-[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?(?:\\+[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?$",
+      "title": "Adapter Version",
+      "type": "string"
+    },
+    "gateway_provider": {
+      "maxLength": 128,
+      "minLength": 1,
+      "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+      "title": "Gateway Provider",
+      "type": "string"
+    },
+    "requested_model": {
+      "minLength": 1,
+      "title": "Requested Model",
+      "type": "string"
+    },
+    "accepted_gateway_models": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Accepted Gateway Models",
+      "type": "array"
+    },
+    "upstream_provider": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Upstream Provider"
+    },
+    "upstream_endpoint": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Upstream Endpoint"
+    },
+    "accepted_upstream_models": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Accepted Upstream Models",
+      "type": "array"
+    },
+    "required_capabilities": {
+      "items": {
+        "maxLength": 128,
+        "minLength": 1,
+        "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+        "type": "string"
+      },
+      "title": "Required Capabilities",
+      "type": "array"
+    },
+    "schema_projection_policy": {
+      "$ref": "#/$defs/ContractIdentity"
+    },
+    "conformance_policy": {
+      "$ref": "#/$defs/ContractIdentity"
+    },
+    "retry_owner": {
+      "const": "executor",
+      "default": "executor",
+      "title": "Retry Owner",
+      "type": "string"
+    },
+    "provider_internal_retries": {
+      "const": 0,
+      "default": 0,
+      "title": "Provider Internal Retries",
+      "type": "integer"
+    },
+    "storage_policy": {
+      "maxLength": 128,
+      "minLength": 1,
+      "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+      "title": "Storage Policy",
+      "type": "string"
+    },
+    "cache_policy": {
+      "maxLength": 128,
+      "minLength": 1,
+      "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+      "title": "Cache Policy",
+      "type": "string"
+    },
+    "reasoning_policy": {
+      "maxLength": 128,
+      "minLength": 1,
+      "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+      "title": "Reasoning Policy",
+      "type": "string"
+    },
+    "data_collection_policy": {
+      "maxLength": 128,
+      "minLength": 1,
+      "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+      "title": "Data Collection Policy",
+      "type": "string"
+    },
+    "provider_config_hash": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Provider Config Hash",
+      "type": "string"
+    },
+    "binding_hash": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Binding Hash",
+      "type": "string"
+    }
+  },
+  "required": [
+    "binding_id",
+    "operation_name",
+    "quality_profile",
+    "adapter_id",
+    "adapter_version",
+    "gateway_provider",
+    "requested_model",
+    "accepted_gateway_models",
+    "upstream_provider",
+    "upstream_endpoint",
+    "accepted_upstream_models",
+    "required_capabilities",
+    "schema_projection_policy",
+    "conformance_policy",
+    "storage_policy",
+    "cache_policy",
+    "reasoning_policy",
+    "data_collection_policy",
+    "provider_config_hash",
+    "binding_hash"
+  ],
+  "title": "Caliburn interview vNext runtime provider binding v1",
+  "type": "object",
+  "$id": "https://caliburn.local/schemas/provider-binding.v1.schema.json"
+}

@@ -1,0 +1,357 @@
+{
+  "$defs": {
+    "EmergentTopicProposal": {
+      "additionalProperties": false,
+      "properties": {
+        "topic": {
+          "title": "Topic",
+          "type": "string"
+        },
+        "quote": {
+          "title": "Quote",
+          "type": "string"
+        },
+        "quote_occurrence": {
+          "title": "Quote Occurrence",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "topic",
+        "quote",
+        "quote_occurrence"
+      ],
+      "title": "EmergentTopicProposal",
+      "type": "object"
+    },
+    "EpisodeSignal": {
+      "enum": [
+        "continue",
+        "possible_shift",
+        "explicit_shift",
+        "possible_close"
+      ],
+      "title": "EpisodeSignal",
+      "type": "string"
+    },
+    "EvidenceKind": {
+      "enum": [
+        "action",
+        "input",
+        "output",
+        "purpose",
+        "condition",
+        "standard",
+        "frequency",
+        "importance",
+        "ownership",
+        "tool",
+        "recipient",
+        "dependency",
+        "exception",
+        "negation",
+        "correction",
+        "preference"
+      ],
+      "title": "EvidenceKind",
+      "type": "string"
+    },
+    "EvidenceQualifiersProposal": {
+      "additionalProperties": false,
+      "properties": {
+        "time_scope": {
+          "$ref": "#/$defs/TimeScope"
+        },
+        "typicality": {
+          "$ref": "#/$defs/Typicality"
+        },
+        "polarity": {
+          "$ref": "#/$defs/Polarity"
+        },
+        "frequency": {
+          "$ref": "#/$defs/FrequencyQualifierProposal"
+        },
+        "importance": {
+          "$ref": "#/$defs/Importance"
+        },
+        "ownership": {
+          "$ref": "#/$defs/Ownership"
+        }
+      },
+      "required": [
+        "time_scope",
+        "typicality",
+        "polarity",
+        "frequency",
+        "importance",
+        "ownership"
+      ],
+      "title": "EvidenceQualifiersProposal",
+      "type": "object"
+    },
+    "EvidenceSubject": {
+      "enum": [
+        "employee",
+        "employee_team",
+        "other_role",
+        "organization",
+        "unknown"
+      ],
+      "title": "EvidenceSubject",
+      "type": "string"
+    },
+    "FrequencyQualifierProposal": {
+      "additionalProperties": false,
+      "description": "Provider-facing frequency with decimal text preserved losslessly.",
+      "properties": {
+        "value": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        },
+        "unit": {
+          "$ref": "#/$defs/FrequencyUnit"
+        },
+        "verbatim": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Verbatim"
+        }
+      },
+      "required": [
+        "value",
+        "unit",
+        "verbatim"
+      ],
+      "title": "FrequencyQualifierProposal",
+      "type": "object"
+    },
+    "FrequencyUnit": {
+      "enum": [
+        "per_day",
+        "per_week",
+        "per_month",
+        "per_quarter",
+        "per_year",
+        "irregular",
+        "unknown"
+      ],
+      "title": "FrequencyUnit",
+      "type": "string"
+    },
+    "Importance": {
+      "enum": [
+        "explicit_core",
+        "explicit_supporting",
+        "not_stated"
+      ],
+      "title": "Importance",
+      "type": "string"
+    },
+    "InsufficiencyProposal": {
+      "additionalProperties": false,
+      "properties": {
+        "reason_code": {
+          "$ref": "#/$defs/InsufficiencyReason"
+        },
+        "observation_proposal_keys": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Observation Proposal Keys",
+          "type": "array"
+        }
+      },
+      "required": [
+        "reason_code",
+        "observation_proposal_keys"
+      ],
+      "title": "InsufficiencyProposal",
+      "type": "object"
+    },
+    "InsufficiencyReason": {
+      "enum": [
+        "ambiguous_frequency",
+        "ambiguous_ownership",
+        "ambiguous_subject",
+        "ambiguous_time_scope",
+        "contradiction_unresolved",
+        "correction_target_unknown",
+        "insufficient_detail",
+        "no_work_fact"
+      ],
+      "title": "InsufficiencyReason",
+      "type": "string"
+    },
+    "ObservationProposal": {
+      "additionalProperties": false,
+      "properties": {
+        "proposal_key": {
+          "title": "Proposal Key",
+          "type": "string"
+        },
+        "subject": {
+          "$ref": "#/$defs/EvidenceSubject"
+        },
+        "kind": {
+          "$ref": "#/$defs/EvidenceKind"
+        },
+        "claim": {
+          "title": "Claim",
+          "type": "string"
+        },
+        "quote": {
+          "title": "Quote",
+          "type": "string"
+        },
+        "quote_occurrence": {
+          "title": "Quote Occurrence",
+          "type": "integer"
+        },
+        "qualifiers": {
+          "$ref": "#/$defs/EvidenceQualifiersProposal"
+        },
+        "correction_target_evidence_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Correction Target Evidence Ids",
+          "type": "array"
+        },
+        "correction_target_unknown": {
+          "title": "Correction Target Unknown",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "proposal_key",
+        "subject",
+        "kind",
+        "claim",
+        "quote",
+        "quote_occurrence",
+        "qualifiers",
+        "correction_target_evidence_ids",
+        "correction_target_unknown"
+      ],
+      "title": "ObservationProposal",
+      "type": "object"
+    },
+    "Ownership": {
+      "enum": [
+        "owner",
+        "shared",
+        "assists",
+        "receives",
+        "not_responsible",
+        "unknown"
+      ],
+      "title": "Ownership",
+      "type": "string"
+    },
+    "Polarity": {
+      "enum": [
+        "affirmed",
+        "denied",
+        "uncertain"
+      ],
+      "title": "Polarity",
+      "type": "string"
+    },
+    "TimeScope": {
+      "enum": [
+        "current",
+        "past",
+        "future",
+        "hypothetical",
+        "unknown"
+      ],
+      "title": "TimeScope",
+      "type": "string"
+    },
+    "Typicality": {
+      "enum": [
+        "typical",
+        "occasional",
+        "exception",
+        "unknown"
+      ],
+      "title": "Typicality",
+      "type": "string"
+    },
+    "UserSignal": {
+      "enum": [
+        "answer",
+        "clarification",
+        "correction",
+        "dont_know",
+        "decline",
+        "stop",
+        "off_topic",
+        "mixed"
+      ],
+      "title": "UserSignal",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "enum": [
+        "turn_interpret_output.v1"
+      ],
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "observations": {
+      "items": {
+        "$ref": "#/$defs/ObservationProposal"
+      },
+      "title": "Observations",
+      "type": "array"
+    },
+    "user_signal": {
+      "$ref": "#/$defs/UserSignal"
+    },
+    "episode_signal": {
+      "$ref": "#/$defs/EpisodeSignal"
+    },
+    "emergent_topics": {
+      "items": {
+        "$ref": "#/$defs/EmergentTopicProposal"
+      },
+      "title": "Emergent Topics",
+      "type": "array"
+    },
+    "insufficiencies": {
+      "items": {
+        "$ref": "#/$defs/InsufficiencyProposal"
+      },
+      "title": "Insufficiencies",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "observations",
+    "user_signal",
+    "episode_signal",
+    "emergent_topics",
+    "insufficiencies"
+  ],
+  "title": "Caliburn interview vNext portable turn interpretation output v1",
+  "type": "object",
+  "$id": "https://caliburn.local/schemas/turn-interpret-output.v1.schema.json"
+}

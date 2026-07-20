@@ -1,0 +1,14 @@
+{"seq":1,"role":"consultant","text":"你好，我是 AI 訪談顧問。接下來大約 15 分鐘，我會請你聊聊實際的工作內容，幫你整理成職務說明書。先跟我說說，你平常一天的工作大概長什麼樣？"}
+{"seq":2,"role":"employee","text":"我是軟體測試工程師，平常主要在做手動測試跟版本回歸，每天會零星測，每兩週上線前會密集跑兩天回歸。"}
+{"seq":3,"role":"consultant","text":"那密集回歸那次，是什麼情況下開始的？"}
+{"seq":4,"role":"employee","text":"每天 build 好之後 Slack bot 會通知，我就開始測。上線前那輪是照 release 排程來的。"}
+{"seq":5,"role":"consultant","text":"一輪回歸大概要處理多少東西？"}
+{"seq":6,"role":"employee","text":"回歸套件大概三百多條，自動化跑兩百、手動一百，密集的那次大概兩天，大概占我四分之一的時間，25%。"}
+{"seq":7,"role":"consultant","text":"開始測之前要準備什麼？"}
+{"seq":8,"role":"employee","text":"要有回歸清單、測試環境的帳號，還有這版改了什麼的說明。工具是 staging 環境、Postman，自動化那塊是自己寫的 pytest 腳本。"}
+{"seq":9,"role":"consultant","text":"過程中最容易卡在哪？"}
+{"seq":10,"role":"employee","text":"環境只有一套，被開發佔住就要排隊，平均等一兩個小時。有缺陷就跟開發來回，環境掛了找 DevOps。"}
+{"seq":11,"role":"consultant","text":"遇到擋版的問題你會怎麼處理？"}
+{"seq":12,"role":"employee","text":"遇到擋版的 blocker 就立刻通報組長跟開發 Lead，當天修完重測。"}
+{"seq":13,"role":"consultant","text":"怎樣算這輪回歸做完了？"}
+{"seq":14,"role":"employee","text":"回歸要百分之百跑完、沒有未解的 blocker，我簽核了才放行。趕的時候手動的可以抽樣，但簽核那步絕不省。"}

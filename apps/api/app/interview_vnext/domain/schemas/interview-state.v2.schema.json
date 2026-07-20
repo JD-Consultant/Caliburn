@@ -1,0 +1,1356 @@
+{
+  "$defs": {
+    "CandidateJobItem": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "candidate_job_item.v1",
+          "default": "candidate_job_item.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "candidate_id": {
+          "format": "uuid",
+          "title": "Candidate Id",
+          "type": "string"
+        },
+        "session_id": {
+          "format": "uuid",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/CandidateKind"
+        },
+        "statement": {
+          "minLength": 1,
+          "title": "Statement",
+          "type": "string"
+        },
+        "evidence_ids": {
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Evidence Ids",
+          "type": "array"
+        },
+        "inference_ids": {
+          "default": [],
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Inference Ids",
+          "type": "array"
+        },
+        "reference_urns": {
+          "default": [],
+          "items": {
+            "maxLength": 512,
+            "minLength": 3,
+            "type": "string"
+          },
+          "title": "Reference Urns",
+          "type": "array"
+        },
+        "qualifiers": {
+          "$ref": "#/$defs/EvidenceQualifiers"
+        },
+        "thresholds": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/QuantitativeThreshold"
+          },
+          "title": "Thresholds",
+          "type": "array"
+        },
+        "status": {
+          "$ref": "#/$defs/CandidateStatus",
+          "default": "draft"
+        },
+        "created_by_operation": {
+          "maxLength": 128,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+          "title": "Created By Operation",
+          "type": "string"
+        },
+        "review_decision_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Review Decision Id"
+        }
+      },
+      "required": [
+        "candidate_id",
+        "session_id",
+        "kind",
+        "statement",
+        "evidence_ids",
+        "created_by_operation"
+      ],
+      "title": "CandidateJobItem",
+      "type": "object"
+    },
+    "CandidateKind": {
+      "enum": [
+        "task",
+        "output",
+        "knowledge",
+        "skill",
+        "ability",
+        "attitude",
+        "behavior_indicator"
+      ],
+      "title": "CandidateKind",
+      "type": "string"
+    },
+    "CandidateStatus": {
+      "enum": [
+        "draft",
+        "verified",
+        "insufficient",
+        "conflicted",
+        "projected",
+        "rejected",
+        "accepted"
+      ],
+      "title": "CandidateStatus",
+      "type": "string"
+    },
+    "EpisodeState": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "episode_state.v1",
+          "default": "episode_state.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "episode_id": {
+          "format": "uuid",
+          "title": "Episode Id",
+          "type": "string"
+        },
+        "session_id": {
+          "format": "uuid",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "target": {
+          "minLength": 1,
+          "title": "Target",
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/$defs/EpisodeStatus",
+          "default": "open"
+        },
+        "opened_turn_id": {
+          "format": "uuid",
+          "title": "Opened Turn Id",
+          "type": "string"
+        },
+        "closed_turn_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Closed Turn Id"
+        },
+        "evidence_ids": {
+          "default": [],
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Evidence Ids",
+          "type": "array"
+        },
+        "gap_ids": {
+          "default": [],
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Gap Ids",
+          "type": "array"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "updated_at": {
+          "format": "date-time",
+          "title": "Updated At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "episode_id",
+        "session_id",
+        "target",
+        "opened_turn_id",
+        "created_at",
+        "updated_at"
+      ],
+      "title": "EpisodeState",
+      "type": "object"
+    },
+    "EpisodeStatus": {
+      "enum": [
+        "open",
+        "closing",
+        "closed"
+      ],
+      "title": "EpisodeStatus",
+      "type": "string"
+    },
+    "Evidence": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "evidence.v2",
+          "default": "evidence.v2",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "evidence_id": {
+          "format": "uuid",
+          "title": "Evidence Id",
+          "type": "string"
+        },
+        "session_id": {
+          "format": "uuid",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "turn_id": {
+          "format": "uuid",
+          "title": "Turn Id",
+          "type": "string"
+        },
+        "episode_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Episode Id"
+        },
+        "subject": {
+          "$ref": "#/$defs/EvidenceSubject"
+        },
+        "kind": {
+          "$ref": "#/$defs/EvidenceKind"
+        },
+        "claim": {
+          "minLength": 1,
+          "title": "Claim",
+          "type": "string"
+        },
+        "quote": {
+          "minLength": 1,
+          "title": "Quote",
+          "type": "string"
+        },
+        "span": {
+          "$ref": "#/$defs/QuoteSpan"
+        },
+        "quote_match": {
+          "$ref": "#/$defs/QuoteMatch",
+          "default": "exact"
+        },
+        "normalization_version": {
+          "anyOf": [
+            {
+              "const": "quote_nfkc_ws.v1",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Normalization Version"
+        },
+        "qualifiers": {
+          "$ref": "#/$defs/EvidenceQualifiers"
+        },
+        "status": {
+          "$ref": "#/$defs/EvidenceStatus",
+          "default": "active"
+        },
+        "supersedes": {
+          "default": [],
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Supersedes",
+          "type": "array"
+        },
+        "superseded_by": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Superseded By"
+        },
+        "withdrawn_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Withdrawn Reason"
+        },
+        "withdrawn_by_turn_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Withdrawn By Turn Id"
+        },
+        "correction_target_unknown": {
+          "default": false,
+          "title": "Correction Target Unknown",
+          "type": "boolean"
+        },
+        "extractor_operation_id": {
+          "format": "uuid",
+          "title": "Extractor Operation Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "evidence_id",
+        "session_id",
+        "turn_id",
+        "subject",
+        "kind",
+        "claim",
+        "quote",
+        "span",
+        "extractor_operation_id"
+      ],
+      "title": "Evidence",
+      "type": "object"
+    },
+    "EvidenceKind": {
+      "enum": [
+        "action",
+        "input",
+        "output",
+        "purpose",
+        "condition",
+        "standard",
+        "frequency",
+        "importance",
+        "ownership",
+        "tool",
+        "recipient",
+        "dependency",
+        "exception",
+        "negation",
+        "correction",
+        "preference"
+      ],
+      "title": "EvidenceKind",
+      "type": "string"
+    },
+    "EvidenceQualifiers": {
+      "additionalProperties": false,
+      "properties": {
+        "time_scope": {
+          "$ref": "#/$defs/TimeScope",
+          "default": "unknown"
+        },
+        "typicality": {
+          "$ref": "#/$defs/Typicality",
+          "default": "unknown"
+        },
+        "polarity": {
+          "$ref": "#/$defs/Polarity",
+          "default": "uncertain"
+        },
+        "frequency": {
+          "$ref": "#/$defs/FrequencyQualifier"
+        },
+        "importance": {
+          "$ref": "#/$defs/Importance",
+          "default": "not_stated"
+        },
+        "ownership": {
+          "$ref": "#/$defs/Ownership",
+          "default": "unknown"
+        }
+      },
+      "title": "EvidenceQualifiers",
+      "type": "object"
+    },
+    "EvidenceStatus": {
+      "enum": [
+        "active",
+        "superseded",
+        "withdrawn"
+      ],
+      "title": "EvidenceStatus",
+      "type": "string"
+    },
+    "EvidenceSubject": {
+      "enum": [
+        "employee",
+        "employee_team",
+        "other_role",
+        "organization",
+        "unknown"
+      ],
+      "title": "EvidenceSubject",
+      "type": "string"
+    },
+    "FrequencyQualifier": {
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Value"
+        },
+        "unit": {
+          "$ref": "#/$defs/FrequencyUnit",
+          "default": "unknown"
+        },
+        "verbatim": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Verbatim"
+        }
+      },
+      "title": "FrequencyQualifier",
+      "type": "object"
+    },
+    "FrequencyUnit": {
+      "enum": [
+        "per_day",
+        "per_week",
+        "per_month",
+        "per_quarter",
+        "per_year",
+        "irregular",
+        "unknown"
+      ],
+      "title": "FrequencyUnit",
+      "type": "string"
+    },
+    "Gap": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "gap.v2",
+          "default": "gap.v2",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "gap_id": {
+          "format": "uuid",
+          "title": "Gap Id",
+          "type": "string"
+        },
+        "session_id": {
+          "format": "uuid",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "episode_id": {
+          "format": "uuid",
+          "title": "Episode Id",
+          "type": "string"
+        },
+        "dimension": {
+          "$ref": "#/$defs/GapDimension"
+        },
+        "question_goal": {
+          "minLength": 1,
+          "title": "Question Goal",
+          "type": "string"
+        },
+        "supporting_evidence_ids": {
+          "default": [],
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Supporting Evidence Ids",
+          "type": "array"
+        },
+        "status": {
+          "$ref": "#/$defs/GapStatus",
+          "default": "open"
+        },
+        "priority_features": {
+          "$ref": "#/$defs/GapPriorityFeatures"
+        },
+        "asked_turn_ids": {
+          "default": [],
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Asked Turn Ids",
+          "type": "array"
+        },
+        "resolution_turn_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Resolution Turn Id"
+        },
+        "resolution_evidence_ids": {
+          "default": [],
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Resolution Evidence Ids",
+          "type": "array"
+        },
+        "unresolved_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unresolved Reason"
+        }
+      },
+      "required": [
+        "gap_id",
+        "session_id",
+        "episode_id",
+        "dimension",
+        "question_goal",
+        "priority_features"
+      ],
+      "title": "Gap",
+      "type": "object"
+    },
+    "GapDimension": {
+      "enum": [
+        "trigger_input",
+        "action_decision",
+        "output_recipient",
+        "purpose",
+        "ownership_collaboration",
+        "condition_tool",
+        "standard_result",
+        "frequency_importance",
+        "exception_rework",
+        "contradiction",
+        "emergent"
+      ],
+      "title": "GapDimension",
+      "type": "string"
+    },
+    "GapPriorityFeatures": {
+      "additionalProperties": false,
+      "properties": {
+        "jd_value": {
+          "$ref": "#/$defs/ValueLevel"
+        },
+        "contradiction": {
+          "default": false,
+          "title": "Contradiction",
+          "type": "boolean"
+        },
+        "redundancy": {
+          "default": false,
+          "title": "Redundancy",
+          "type": "boolean"
+        },
+        "sensitivity": {
+          "$ref": "#/$defs/Sensitivity",
+          "default": "low"
+        },
+        "burden": {
+          "$ref": "#/$defs/ValueLevel",
+          "default": "low"
+        }
+      },
+      "required": [
+        "jd_value"
+      ],
+      "title": "GapPriorityFeatures",
+      "type": "object"
+    },
+    "GapStatus": {
+      "enum": [
+        "open",
+        "asked",
+        "answered",
+        "declined",
+        "not_applicable",
+        "deferred"
+      ],
+      "title": "GapStatus",
+      "type": "string"
+    },
+    "Importance": {
+      "enum": [
+        "explicit_core",
+        "explicit_supporting",
+        "not_stated"
+      ],
+      "title": "Importance",
+      "type": "string"
+    },
+    "Inference": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "inference.v2",
+          "default": "inference.v2",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "inference_id": {
+          "format": "uuid",
+          "title": "Inference Id",
+          "type": "string"
+        },
+        "session_id": {
+          "format": "uuid",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "type": {
+          "maxLength": 128,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+          "title": "Type",
+          "type": "string"
+        },
+        "statement": {
+          "minLength": 1,
+          "title": "Statement",
+          "type": "string"
+        },
+        "supporting_evidence_ids": {
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Supporting Evidence Ids",
+          "type": "array"
+        },
+        "contradicting_evidence_ids": {
+          "default": [],
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Contradicting Evidence Ids",
+          "type": "array"
+        },
+        "reference_urns": {
+          "default": [],
+          "items": {
+            "maxLength": 512,
+            "minLength": 3,
+            "type": "string"
+          },
+          "title": "Reference Urns",
+          "type": "array"
+        },
+        "status": {
+          "$ref": "#/$defs/InferenceStatus",
+          "default": "candidate"
+        },
+        "method": {
+          "$ref": "#/$defs/InferenceMethod"
+        },
+        "operation_name": {
+          "maxLength": 128,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+          "title": "Operation Name",
+          "type": "string"
+        },
+        "operation_definition_hash": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Operation Definition Hash",
+          "type": "string"
+        },
+        "supersedes": {
+          "default": [],
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Supersedes",
+          "type": "array"
+        },
+        "superseded_by": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Superseded By"
+        },
+        "decision_evidence_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Decision Evidence Id"
+        },
+        "uncertainty_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Uncertainty Reason"
+        }
+      },
+      "required": [
+        "inference_id",
+        "session_id",
+        "type",
+        "statement",
+        "supporting_evidence_ids",
+        "method",
+        "operation_name",
+        "operation_definition_hash"
+      ],
+      "title": "Inference",
+      "type": "object"
+    },
+    "InferenceMethod": {
+      "enum": [
+        "llm",
+        "rule",
+        "human"
+      ],
+      "title": "InferenceMethod",
+      "type": "string"
+    },
+    "InferenceStatus": {
+      "enum": [
+        "candidate",
+        "confirmed_by_employee",
+        "rejected",
+        "superseded",
+        "insufficient"
+      ],
+      "title": "InferenceStatus",
+      "type": "string"
+    },
+    "InterviewSession": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "interview_session.v1",
+          "default": "interview_session.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "session_id": {
+          "format": "uuid",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "profile_id": {
+          "format": "uuid",
+          "title": "Profile Id",
+          "type": "string"
+        },
+        "tenant_id": {
+          "format": "uuid",
+          "title": "Tenant Id",
+          "type": "string"
+        },
+        "architecture_id": {
+          "const": "interview-vnext-evidence-workflow",
+          "default": "interview-vnext-evidence-workflow",
+          "title": "Architecture Id",
+          "type": "string"
+        },
+        "workflow_version": {
+          "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(?:-[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?(?:\\+[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?$",
+          "title": "Workflow Version",
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/$defs/SessionStatus",
+          "default": "planned"
+        },
+        "state_version": {
+          "default": 0,
+          "minimum": 0,
+          "title": "State Version",
+          "type": "integer"
+        },
+        "active_episode_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Active Episode Id"
+        },
+        "turn_count": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Turn Count",
+          "type": "integer"
+        },
+        "stop_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Stop Reason"
+        },
+        "reference_snapshot_id": {
+          "minLength": 1,
+          "title": "Reference Snapshot Id",
+          "type": "string"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "updated_at": {
+          "format": "date-time",
+          "title": "Updated At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "session_id",
+        "profile_id",
+        "tenant_id",
+        "workflow_version",
+        "reference_snapshot_id",
+        "created_at",
+        "updated_at"
+      ],
+      "title": "InterviewSession",
+      "type": "object"
+    },
+    "Ownership": {
+      "enum": [
+        "owner",
+        "shared",
+        "assists",
+        "receives",
+        "not_responsible",
+        "unknown"
+      ],
+      "title": "Ownership",
+      "type": "string"
+    },
+    "Polarity": {
+      "enum": [
+        "affirmed",
+        "denied",
+        "uncertain"
+      ],
+      "title": "Polarity",
+      "type": "string"
+    },
+    "QuantitativeThreshold": {
+      "additionalProperties": false,
+      "properties": {
+        "expression": {
+          "minLength": 1,
+          "title": "Expression",
+          "type": "string"
+        },
+        "source_type": {
+          "$ref": "#/$defs/ThresholdSourceType"
+        },
+        "source_id": {
+          "minLength": 1,
+          "title": "Source Id",
+          "type": "string"
+        },
+        "evidence_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Evidence Id"
+        }
+      },
+      "required": [
+        "expression",
+        "source_type",
+        "source_id"
+      ],
+      "title": "QuantitativeThreshold",
+      "type": "object"
+    },
+    "QuoteMatch": {
+      "enum": [
+        "exact",
+        "normalized"
+      ],
+      "title": "QuoteMatch",
+      "type": "string"
+    },
+    "QuoteSpan": {
+      "additionalProperties": false,
+      "properties": {
+        "unit": {
+          "const": "unicode_code_point",
+          "default": "unicode_code_point",
+          "title": "Unit",
+          "type": "string"
+        },
+        "start": {
+          "minimum": 0,
+          "title": "Start",
+          "type": "integer"
+        },
+        "end": {
+          "exclusiveMinimum": 0,
+          "title": "End",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "start",
+        "end"
+      ],
+      "title": "QuoteSpan",
+      "type": "object"
+    },
+    "ReviewAction": {
+      "enum": [
+        "accept",
+        "edit",
+        "reject"
+      ],
+      "title": "ReviewAction",
+      "type": "string"
+    },
+    "ReviewDecision": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "review_decision.v1",
+          "default": "review_decision.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "review_id": {
+          "format": "uuid",
+          "title": "Review Id",
+          "type": "string"
+        },
+        "session_id": {
+          "format": "uuid",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "candidate_id": {
+          "format": "uuid",
+          "title": "Candidate Id",
+          "type": "string"
+        },
+        "reviewer_id": {
+          "format": "uuid",
+          "title": "Reviewer Id",
+          "type": "string"
+        },
+        "action": {
+          "$ref": "#/$defs/ReviewAction"
+        },
+        "edited_statement": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Edited Statement"
+        },
+        "edited_thresholds": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/QuantitativeThreshold"
+          },
+          "title": "Edited Thresholds",
+          "type": "array"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reason"
+        },
+        "decided_at": {
+          "format": "date-time",
+          "title": "Decided At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "review_id",
+        "session_id",
+        "candidate_id",
+        "reviewer_id",
+        "action",
+        "decided_at"
+      ],
+      "title": "ReviewDecision",
+      "type": "object"
+    },
+    "Sensitivity": {
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "prohibited"
+      ],
+      "title": "Sensitivity",
+      "type": "string"
+    },
+    "SessionStatus": {
+      "enum": [
+        "planned",
+        "active",
+        "paused",
+        "finishing",
+        "completed",
+        "failed"
+      ],
+      "title": "SessionStatus",
+      "type": "string"
+    },
+    "ThresholdSourceType": {
+      "enum": [
+        "employee_evidence",
+        "approved_policy",
+        "human"
+      ],
+      "title": "ThresholdSourceType",
+      "type": "string"
+    },
+    "TimeScope": {
+      "enum": [
+        "current",
+        "past",
+        "future",
+        "hypothetical",
+        "unknown"
+      ],
+      "title": "TimeScope",
+      "type": "string"
+    },
+    "TranscriptRole": {
+      "enum": [
+        "consultant",
+        "employee"
+      ],
+      "title": "TranscriptRole",
+      "type": "string"
+    },
+    "TranscriptTurn": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "transcript_turn.v1",
+          "default": "transcript_turn.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "turn_id": {
+          "format": "uuid",
+          "title": "Turn Id",
+          "type": "string"
+        },
+        "session_id": {
+          "format": "uuid",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "client_turn_id": {
+          "maxLength": 512,
+          "minLength": 1,
+          "title": "Client Turn Id",
+          "type": "string"
+        },
+        "sequence": {
+          "minimum": 1,
+          "title": "Sequence",
+          "type": "integer"
+        },
+        "role": {
+          "$ref": "#/$defs/TranscriptRole"
+        },
+        "text": {
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        },
+        "previous_turn_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Previous Turn Id"
+        },
+        "locale": {
+          "default": "zh-TW",
+          "pattern": "^[A-Za-z]{2,3}(?:-[A-Za-z0-9]{2,8})*$",
+          "title": "Locale",
+          "type": "string"
+        },
+        "occurred_at": {
+          "format": "date-time",
+          "title": "Occurred At",
+          "type": "string"
+        },
+        "received_at": {
+          "format": "date-time",
+          "title": "Received At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "turn_id",
+        "session_id",
+        "client_turn_id",
+        "sequence",
+        "role",
+        "text",
+        "occurred_at",
+        "received_at"
+      ],
+      "title": "TranscriptTurn",
+      "type": "object"
+    },
+    "Typicality": {
+      "enum": [
+        "typical",
+        "occasional",
+        "exception",
+        "unknown"
+      ],
+      "title": "Typicality",
+      "type": "string"
+    },
+    "ValueLevel": {
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "title": "ValueLevel",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "interview_state.v2",
+      "default": "interview_state.v2",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "session": {
+      "$ref": "#/$defs/InterviewSession"
+    },
+    "turns": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/TranscriptTurn"
+      },
+      "title": "Turns",
+      "type": "array"
+    },
+    "evidence": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/Evidence"
+      },
+      "title": "Evidence",
+      "type": "array"
+    },
+    "inferences": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/Inference"
+      },
+      "title": "Inferences",
+      "type": "array"
+    },
+    "episodes": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/EpisodeState"
+      },
+      "title": "Episodes",
+      "type": "array"
+    },
+    "gaps": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/Gap"
+      },
+      "title": "Gaps",
+      "type": "array"
+    },
+    "candidates": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/CandidateJobItem"
+      },
+      "title": "Candidates",
+      "type": "array"
+    },
+    "reviews": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/ReviewDecision"
+      },
+      "title": "Reviews",
+      "type": "array"
+    },
+    "processed_command_ids": {
+      "default": [],
+      "items": {
+        "format": "uuid",
+        "type": "string"
+      },
+      "title": "Processed Command Ids",
+      "type": "array"
+    }
+  },
+  "required": [
+    "session"
+  ],
+  "title": "Caliburn interview vNext materialized state v2",
+  "type": "object",
+  "$id": "https://caliburn.local/schemas/interview-state.v2.schema.json"
+}

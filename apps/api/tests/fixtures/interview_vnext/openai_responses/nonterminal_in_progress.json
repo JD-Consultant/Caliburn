@@ -1,0 +1,11 @@
+{
+  "id": "resp_fx_in_progress",
+  "object": "response",
+  "created_at": 1784602800,
+  "status": "in_progress",
+  "model": "gpt-5.6",
+  "error": null,
+  "incomplete_details": null,
+  "output": [],
+  "usage": null
+}

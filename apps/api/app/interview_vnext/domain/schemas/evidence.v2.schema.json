@@ -1,0 +1,366 @@
+{
+  "$defs": {
+    "EvidenceKind": {
+      "enum": [
+        "action",
+        "input",
+        "output",
+        "purpose",
+        "condition",
+        "standard",
+        "frequency",
+        "importance",
+        "ownership",
+        "tool",
+        "recipient",
+        "dependency",
+        "exception",
+        "negation",
+        "correction",
+        "preference"
+      ],
+      "title": "EvidenceKind",
+      "type": "string"
+    },
+    "EvidenceQualifiers": {
+      "additionalProperties": false,
+      "properties": {
+        "time_scope": {
+          "$ref": "#/$defs/TimeScope",
+          "default": "unknown"
+        },
+        "typicality": {
+          "$ref": "#/$defs/Typicality",
+          "default": "unknown"
+        },
+        "polarity": {
+          "$ref": "#/$defs/Polarity",
+          "default": "uncertain"
+        },
+        "frequency": {
+          "$ref": "#/$defs/FrequencyQualifier"
+        },
+        "importance": {
+          "$ref": "#/$defs/Importance",
+          "default": "not_stated"
+        },
+        "ownership": {
+          "$ref": "#/$defs/Ownership",
+          "default": "unknown"
+        }
+      },
+      "title": "EvidenceQualifiers",
+      "type": "object"
+    },
+    "EvidenceStatus": {
+      "enum": [
+        "active",
+        "superseded",
+        "withdrawn"
+      ],
+      "title": "EvidenceStatus",
+      "type": "string"
+    },
+    "EvidenceSubject": {
+      "enum": [
+        "employee",
+        "employee_team",
+        "other_role",
+        "organization",
+        "unknown"
+      ],
+      "title": "EvidenceSubject",
+      "type": "string"
+    },
+    "FrequencyQualifier": {
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Value"
+        },
+        "unit": {
+          "$ref": "#/$defs/FrequencyUnit",
+          "default": "unknown"
+        },
+        "verbatim": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Verbatim"
+        }
+      },
+      "title": "FrequencyQualifier",
+      "type": "object"
+    },
+    "FrequencyUnit": {
+      "enum": [
+        "per_day",
+        "per_week",
+        "per_month",
+        "per_quarter",
+        "per_year",
+        "irregular",
+        "unknown"
+      ],
+      "title": "FrequencyUnit",
+      "type": "string"
+    },
+    "Importance": {
+      "enum": [
+        "explicit_core",
+        "explicit_supporting",
+        "not_stated"
+      ],
+      "title": "Importance",
+      "type": "string"
+    },
+    "Ownership": {
+      "enum": [
+        "owner",
+        "shared",
+        "assists",
+        "receives",
+        "not_responsible",
+        "unknown"
+      ],
+      "title": "Ownership",
+      "type": "string"
+    },
+    "Polarity": {
+      "enum": [
+        "affirmed",
+        "denied",
+        "uncertain"
+      ],
+      "title": "Polarity",
+      "type": "string"
+    },
+    "QuoteMatch": {
+      "enum": [
+        "exact",
+        "normalized"
+      ],
+      "title": "QuoteMatch",
+      "type": "string"
+    },
+    "QuoteSpan": {
+      "additionalProperties": false,
+      "properties": {
+        "unit": {
+          "const": "unicode_code_point",
+          "default": "unicode_code_point",
+          "title": "Unit",
+          "type": "string"
+        },
+        "start": {
+          "minimum": 0,
+          "title": "Start",
+          "type": "integer"
+        },
+        "end": {
+          "exclusiveMinimum": 0,
+          "title": "End",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "start",
+        "end"
+      ],
+      "title": "QuoteSpan",
+      "type": "object"
+    },
+    "TimeScope": {
+      "enum": [
+        "current",
+        "past",
+        "future",
+        "hypothetical",
+        "unknown"
+      ],
+      "title": "TimeScope",
+      "type": "string"
+    },
+    "Typicality": {
+      "enum": [
+        "typical",
+        "occasional",
+        "exception",
+        "unknown"
+      ],
+      "title": "Typicality",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "evidence.v2",
+      "default": "evidence.v2",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "evidence_id": {
+      "format": "uuid",
+      "title": "Evidence Id",
+      "type": "string"
+    },
+    "session_id": {
+      "format": "uuid",
+      "title": "Session Id",
+      "type": "string"
+    },
+    "turn_id": {
+      "format": "uuid",
+      "title": "Turn Id",
+      "type": "string"
+    },
+    "episode_id": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Episode Id"
+    },
+    "subject": {
+      "$ref": "#/$defs/EvidenceSubject"
+    },
+    "kind": {
+      "$ref": "#/$defs/EvidenceKind"
+    },
+    "claim": {
+      "minLength": 1,
+      "title": "Claim",
+      "type": "string"
+    },
+    "quote": {
+      "minLength": 1,
+      "title": "Quote",
+      "type": "string"
+    },
+    "span": {
+      "$ref": "#/$defs/QuoteSpan"
+    },
+    "quote_match": {
+      "$ref": "#/$defs/QuoteMatch",
+      "default": "exact"
+    },
+    "normalization_version": {
+      "anyOf": [
+        {
+          "const": "quote_nfkc_ws.v1",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Normalization Version"
+    },
+    "qualifiers": {
+      "$ref": "#/$defs/EvidenceQualifiers"
+    },
+    "status": {
+      "$ref": "#/$defs/EvidenceStatus",
+      "default": "active"
+    },
+    "supersedes": {
+      "default": [],
+      "items": {
+        "format": "uuid",
+        "type": "string"
+      },
+      "title": "Supersedes",
+      "type": "array"
+    },
+    "superseded_by": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Superseded By"
+    },
+    "withdrawn_reason": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Withdrawn Reason"
+    },
+    "withdrawn_by_turn_id": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Withdrawn By Turn Id"
+    },
+    "correction_target_unknown": {
+      "default": false,
+      "title": "Correction Target Unknown",
+      "type": "boolean"
+    },
+    "extractor_operation_id": {
+      "format": "uuid",
+      "title": "Extractor Operation Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "evidence_id",
+    "session_id",
+    "turn_id",
+    "subject",
+    "kind",
+    "claim",
+    "quote",
+    "span",
+    "extractor_operation_id"
+  ],
+  "title": "Caliburn interview vNext evidence v2",
+  "type": "object",
+  "$id": "https://caliburn.local/schemas/evidence.v2.schema.json"
+}

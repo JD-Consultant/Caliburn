@@ -1,0 +1,163 @@
+{
+  "$defs": {
+    "DialogueAct": {
+      "enum": [
+        "standalone_answer",
+        "affirm",
+        "deny",
+        "slot_value",
+        "choose",
+        "correction",
+        "dont_know",
+        "decline",
+        "stop",
+        "off_topic",
+        "mixed"
+      ],
+      "title": "DialogueAct",
+      "type": "string"
+    },
+    "EpisodeSignal": {
+      "enum": [
+        "continue",
+        "possible_shift",
+        "explicit_shift",
+        "possible_close"
+      ],
+      "title": "EpisodeSignal",
+      "type": "string"
+    },
+    "TurnInsufficiencyCode": {
+      "enum": [
+        "ambiguous_frequency",
+        "ambiguous_ownership",
+        "ambiguous_subject",
+        "ambiguous_time_scope",
+        "contradiction_unresolved",
+        "correction_target_unknown",
+        "insufficient_detail",
+        "no_work_fact",
+        "answer_binding_ambiguous",
+        "question_frame_missing",
+        "question_frame_stale",
+        "question_frame_not_immediate",
+        "choice_selection_ambiguous"
+      ],
+      "title": "TurnInsufficiencyCode",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "turn_interpretation_record.v1",
+      "default": "turn_interpretation_record.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "interpretation_id": {
+      "format": "uuid",
+      "title": "Interpretation Id",
+      "type": "string"
+    },
+    "session_id": {
+      "format": "uuid",
+      "title": "Session Id",
+      "type": "string"
+    },
+    "employee_turn_id": {
+      "format": "uuid",
+      "title": "Employee Turn Id",
+      "type": "string"
+    },
+    "operation_id": {
+      "format": "uuid",
+      "title": "Operation Id",
+      "type": "string"
+    },
+    "question_frame_id": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Question Frame Id"
+    },
+    "question_frame_definition_hash": {
+      "anyOf": [
+        {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Question Frame Definition Hash"
+    },
+    "context_packet_hash": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Context Packet Hash",
+      "type": "string"
+    },
+    "output_hash": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Output Hash",
+      "type": "string"
+    },
+    "verification_report_hash": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Verification Report Hash",
+      "type": "string"
+    },
+    "accepted_evidence_ids": {
+      "default": [],
+      "items": {
+        "format": "uuid",
+        "type": "string"
+      },
+      "title": "Accepted Evidence Ids",
+      "type": "array"
+    },
+    "dialogue_act": {
+      "$ref": "#/$defs/DialogueAct"
+    },
+    "episode_signal": {
+      "$ref": "#/$defs/EpisodeSignal"
+    },
+    "insufficiency_codes": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/TurnInsufficiencyCode"
+      },
+      "title": "Insufficiency Codes",
+      "type": "array"
+    },
+    "applied_at": {
+      "format": "date-time",
+      "title": "Applied At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "interpretation_id",
+    "session_id",
+    "employee_turn_id",
+    "operation_id",
+    "context_packet_hash",
+    "output_hash",
+    "verification_report_hash",
+    "dialogue_act",
+    "episode_signal",
+    "applied_at"
+  ],
+  "title": "Caliburn interview vNext turn interpretation record v1",
+  "type": "object",
+  "$id": "https://caliburn.local/schemas/turn-interpretation-record.v1.schema.json"
+}

@@ -1,0 +1,58 @@
+{
+  "schema_version": "turn_eval_reference_output.v1",
+  "case_id": "TI-03-tools-not-skills",
+  "output": {
+    "schema_version": "turn_interpret_output.v1",
+    "observations": [
+      {
+        "proposal_key": "obs-tool-sap",
+        "subject": "employee",
+        "kind": "tool",
+        "claim": "工作中使用 SAP",
+        "quote": "SAP",
+        "quote_occurrence": 1,
+        "qualifiers": {
+          "time_scope": "current",
+          "typicality": "typical",
+          "polarity": "affirmed",
+          "frequency": {
+            "value": null,
+            "unit": "unknown",
+            "verbatim": null
+          },
+          "importance": "not_stated",
+          "ownership": "owner"
+        },
+        "correction_target_evidence_ids": [],
+        "correction_target_unknown": false
+      },
+      {
+        "proposal_key": "obs-tool-excel",
+        "subject": "employee",
+        "kind": "tool",
+        "claim": "工作中使用 Excel",
+        "quote": "Excel",
+        "quote_occurrence": 1,
+        "qualifiers": {
+          "time_scope": "current",
+          "typicality": "typical",
+          "polarity": "affirmed",
+          "frequency": {
+            "value": null,
+            "unit": "unknown",
+            "verbatim": null
+          },
+          "importance": "not_stated",
+          "ownership": "owner"
+        },
+        "correction_target_evidence_ids": [],
+        "correction_target_unknown": false
+      }
+    ],
+    "user_signal": "answer",
+    "episode_signal": "continue",
+    "emergent_topics": [],
+    "insufficiencies": []
+  },
+  "correction_target_bindings": {}
+}

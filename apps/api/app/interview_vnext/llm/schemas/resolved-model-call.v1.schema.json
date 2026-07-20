@@ -1,0 +1,620 @@
+{
+  "$defs": {
+    "ArtifactRef": {
+      "additionalProperties": false,
+      "description": "Portable pointer that always carries the content integrity fields.",
+      "properties": {
+        "artifact_id": {
+          "format": "uuid",
+          "title": "Artifact Id",
+          "type": "string"
+        },
+        "kind": {
+          "maxLength": 128,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+          "title": "Kind",
+          "type": "string"
+        },
+        "media_type": {
+          "minLength": 1,
+          "title": "Media Type",
+          "type": "string"
+        },
+        "schema_id": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Schema Id"
+        },
+        "content_hash": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "byte_size": {
+          "minimum": 0,
+          "title": "Byte Size",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "artifact_id",
+        "kind",
+        "media_type",
+        "content_hash",
+        "byte_size"
+      ],
+      "title": "ArtifactRef",
+      "type": "object"
+    },
+    "ContractIdentity": {
+      "additionalProperties": false,
+      "description": "Stable identity for a schema, prompt, or context policy artifact.",
+      "properties": {
+        "name": {
+          "maxLength": 128,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+          "title": "Name",
+          "type": "string"
+        },
+        "version": {
+          "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(?:-[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?(?:\\+[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?$",
+          "title": "Version",
+          "type": "string"
+        },
+        "content_hash": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "version",
+        "content_hash"
+      ],
+      "title": "ContractIdentity",
+      "type": "object"
+    },
+    "MessageRole": {
+      "enum": [
+        "user",
+        "assistant"
+      ],
+      "title": "MessageRole",
+      "type": "string"
+    },
+    "ModelCallRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "model_call_request.v2",
+          "default": "model_call_request.v2",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "run_id": {
+          "format": "uuid",
+          "title": "Run Id",
+          "type": "string"
+        },
+        "session_id": {
+          "format": "uuid",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "turn_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Turn Id"
+        },
+        "operation_id": {
+          "format": "uuid",
+          "title": "Operation Id",
+          "type": "string"
+        },
+        "attempt_id": {
+          "format": "uuid",
+          "title": "Attempt Id",
+          "type": "string"
+        },
+        "attempt": {
+          "minimum": 1,
+          "title": "Attempt",
+          "type": "integer"
+        },
+        "operation_name": {
+          "maxLength": 128,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+          "title": "Operation Name",
+          "type": "string"
+        },
+        "operation_definition_hash": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Operation Definition Hash",
+          "type": "string"
+        },
+        "idempotency_key": {
+          "minLength": 1,
+          "title": "Idempotency Key",
+          "type": "string"
+        },
+        "binding_id": {
+          "maxLength": 128,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+          "title": "Binding Id",
+          "type": "string"
+        },
+        "binding_hash": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Binding Hash",
+          "type": "string"
+        },
+        "requested_model": {
+          "minLength": 1,
+          "title": "Requested Model",
+          "type": "string"
+        },
+        "instructions": {
+          "minLength": 1,
+          "title": "Instructions",
+          "type": "string"
+        },
+        "messages": {
+          "items": {
+            "$ref": "#/$defs/ModelMessage"
+          },
+          "title": "Messages",
+          "type": "array"
+        },
+        "prompt_artifact": {
+          "$ref": "#/$defs/ArtifactRef"
+        },
+        "output_schema_id": {
+          "minLength": 1,
+          "title": "Output Schema Id",
+          "type": "string"
+        },
+        "output_schema_artifact": {
+          "$ref": "#/$defs/ArtifactRef"
+        },
+        "context_artifact": {
+          "$ref": "#/$defs/ArtifactRef"
+        },
+        "selection_manifest_artifact": {
+          "$ref": "#/$defs/ArtifactRef"
+        },
+        "binding_artifact": {
+          "$ref": "#/$defs/ArtifactRef"
+        },
+        "provider_config_artifact": {
+          "$ref": "#/$defs/ArtifactRef"
+        },
+        "schema_projection_artifact": {
+          "$ref": "#/$defs/ArtifactRef"
+        },
+        "deadline_at": {
+          "format": "date-time",
+          "title": "Deadline At",
+          "type": "string"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "max_output_tokens": {
+          "minimum": 1,
+          "title": "Max Output Tokens",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "run_id",
+        "session_id",
+        "operation_id",
+        "attempt_id",
+        "attempt",
+        "operation_name",
+        "operation_definition_hash",
+        "idempotency_key",
+        "binding_id",
+        "binding_hash",
+        "requested_model",
+        "instructions",
+        "messages",
+        "prompt_artifact",
+        "output_schema_id",
+        "output_schema_artifact",
+        "context_artifact",
+        "selection_manifest_artifact",
+        "binding_artifact",
+        "provider_config_artifact",
+        "schema_projection_artifact",
+        "deadline_at",
+        "created_at",
+        "max_output_tokens"
+      ],
+      "title": "ModelCallRequest",
+      "type": "object"
+    },
+    "ModelMessage": {
+      "additionalProperties": false,
+      "properties": {
+        "role": {
+          "$ref": "#/$defs/MessageRole"
+        },
+        "text": {
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "role",
+        "text"
+      ],
+      "title": "ModelMessage",
+      "type": "object"
+    },
+    "ProviderBinding": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "provider_binding.v1",
+          "default": "provider_binding.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "binding_id": {
+          "maxLength": 128,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+          "title": "Binding Id",
+          "type": "string"
+        },
+        "operation_name": {
+          "maxLength": 128,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+          "title": "Operation Name",
+          "type": "string"
+        },
+        "quality_profile": {
+          "maxLength": 128,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+          "title": "Quality Profile",
+          "type": "string"
+        },
+        "adapter_id": {
+          "maxLength": 128,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+          "title": "Adapter Id",
+          "type": "string"
+        },
+        "adapter_version": {
+          "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(?:-[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?(?:\\+[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?$",
+          "title": "Adapter Version",
+          "type": "string"
+        },
+        "gateway_provider": {
+          "maxLength": 128,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+          "title": "Gateway Provider",
+          "type": "string"
+        },
+        "requested_model": {
+          "minLength": 1,
+          "title": "Requested Model",
+          "type": "string"
+        },
+        "accepted_gateway_models": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Accepted Gateway Models",
+          "type": "array"
+        },
+        "upstream_provider": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Upstream Provider"
+        },
+        "upstream_endpoint": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Upstream Endpoint"
+        },
+        "accepted_upstream_models": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Accepted Upstream Models",
+          "type": "array"
+        },
+        "required_capabilities": {
+          "items": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+            "type": "string"
+          },
+          "title": "Required Capabilities",
+          "type": "array"
+        },
+        "schema_projection_policy": {
+          "$ref": "#/$defs/ContractIdentity"
+        },
+        "conformance_policy": {
+          "$ref": "#/$defs/ContractIdentity"
+        },
+        "retry_owner": {
+          "const": "executor",
+          "default": "executor",
+          "title": "Retry Owner",
+          "type": "string"
+        },
+        "provider_internal_retries": {
+          "const": 0,
+          "default": 0,
+          "title": "Provider Internal Retries",
+          "type": "integer"
+        },
+        "storage_policy": {
+          "maxLength": 128,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+          "title": "Storage Policy",
+          "type": "string"
+        },
+        "cache_policy": {
+          "maxLength": 128,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+          "title": "Cache Policy",
+          "type": "string"
+        },
+        "reasoning_policy": {
+          "maxLength": 128,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+          "title": "Reasoning Policy",
+          "type": "string"
+        },
+        "data_collection_policy": {
+          "maxLength": 128,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+          "title": "Data Collection Policy",
+          "type": "string"
+        },
+        "provider_config_hash": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Provider Config Hash",
+          "type": "string"
+        },
+        "binding_hash": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Binding Hash",
+          "type": "string"
+        }
+      },
+      "required": [
+        "binding_id",
+        "operation_name",
+        "quality_profile",
+        "adapter_id",
+        "adapter_version",
+        "gateway_provider",
+        "requested_model",
+        "accepted_gateway_models",
+        "upstream_provider",
+        "upstream_endpoint",
+        "accepted_upstream_models",
+        "required_capabilities",
+        "schema_projection_policy",
+        "conformance_policy",
+        "storage_policy",
+        "cache_policy",
+        "reasoning_policy",
+        "data_collection_policy",
+        "provider_config_hash",
+        "binding_hash"
+      ],
+      "title": "ProviderBinding",
+      "type": "object"
+    },
+    "RemovedSchemaConstraint": {
+      "additionalProperties": false,
+      "properties": {
+        "json_pointer": {
+          "pattern": "^(?:/(?:[^~/]|~0|~1)*)*$",
+          "title": "Json Pointer",
+          "type": "string"
+        },
+        "keyword": {
+          "minLength": 1,
+          "title": "Keyword",
+          "type": "string"
+        },
+        "value_hash": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Value Hash",
+          "type": "string"
+        }
+      },
+      "required": [
+        "json_pointer",
+        "keyword",
+        "value_hash"
+      ],
+      "title": "RemovedSchemaConstraint",
+      "type": "object"
+    },
+    "SchemaProjectionReport": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "schema_projection_report.v1",
+          "default": "schema_projection_report.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "policy_name": {
+          "maxLength": 128,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+          "title": "Policy Name",
+          "type": "string"
+        },
+        "policy_version": {
+          "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(?:-[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?(?:\\+[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?$",
+          "title": "Policy Version",
+          "type": "string"
+        },
+        "policy_hash": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Policy Hash",
+          "type": "string"
+        },
+        "source_schema_id": {
+          "minLength": 1,
+          "title": "Source Schema Id",
+          "type": "string"
+        },
+        "source_schema_hash": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Source Schema Hash",
+          "type": "string"
+        },
+        "target_profile": {
+          "maxLength": 128,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+          "title": "Target Profile",
+          "type": "string"
+        },
+        "projected_schema_id": {
+          "minLength": 1,
+          "title": "Projected Schema Id",
+          "type": "string"
+        },
+        "projected_schema_hash": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Projected Schema Hash",
+          "type": "string"
+        },
+        "removed_constraints": {
+          "items": {
+            "$ref": "#/$defs/RemovedSchemaConstraint"
+          },
+          "title": "Removed Constraints",
+          "type": "array"
+        },
+        "rewritten_constraints": {
+          "items": {
+            "$ref": "#/$defs/RemovedSchemaConstraint"
+          },
+          "title": "Rewritten Constraints",
+          "type": "array"
+        },
+        "prompt_obligations": {
+          "items": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+            "type": "string"
+          },
+          "title": "Prompt Obligations",
+          "type": "array"
+        },
+        "report_hash": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Report Hash",
+          "type": "string"
+        }
+      },
+      "required": [
+        "policy_name",
+        "policy_version",
+        "policy_hash",
+        "source_schema_id",
+        "source_schema_hash",
+        "target_profile",
+        "projected_schema_id",
+        "projected_schema_hash",
+        "removed_constraints",
+        "rewritten_constraints",
+        "prompt_obligations",
+        "report_hash"
+      ],
+      "title": "SchemaProjectionReport",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "The immutable, fully-resolved call an adapter executes.\n\ncaller 解析唯一 binding 後打包 request + binding + schema projection;\nadapter 只能照這裡執行,不得自行選 fallback 或改 model。fresh-process\nrecovery 從 request 的 artifact refs 讀回這些 object,不重呼叫 resolver。",
+  "properties": {
+    "schema_version": {
+      "const": "resolved_model_call.v1",
+      "default": "resolved_model_call.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "request": {
+      "$ref": "#/$defs/ModelCallRequest"
+    },
+    "binding": {
+      "$ref": "#/$defs/ProviderBinding"
+    },
+    "schema_projection": {
+      "$ref": "#/$defs/SchemaProjectionReport"
+    }
+  },
+  "required": [
+    "request",
+    "binding",
+    "schema_projection"
+  ],
+  "title": "Caliburn interview vNext resolved model call v1",
+  "type": "object",
+  "$id": "https://caliburn.local/schemas/resolved-model-call.v1.schema.json"
+}

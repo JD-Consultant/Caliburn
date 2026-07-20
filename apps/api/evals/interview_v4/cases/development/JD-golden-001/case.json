@@ -1,0 +1,58 @@
+{
+  "schema_version": "interview_eval_case.v0.1",
+  "case_id": "JD-golden-001",
+  "split": "development",
+  "source_type": "migrated_provisional",
+  "locale": "zh-TW",
+  "role_family": "software_quality_assurance",
+  "risk_tags": [
+    "E-QUAL",
+    "I-OVER",
+    "P-UNSUPPORTED"
+  ],
+  "privacy": {
+    "status": "synthetic",
+    "version": "legacy-golden.v1",
+    "approved_use": "architecture_eval",
+    "raw_source_in_repo": false,
+    "residual_scan_passed": true,
+    "manual_review_required": false
+  },
+  "initial": {
+    "document_fixture": "initial_document.json",
+    "session_state_fixture": "initial_state.json",
+    "reference_snapshot": "reference_snapshot.json",
+    "review_events_fixture": "review_events.json"
+  },
+  "transcript": "transcript.jsonl",
+  "gold": "gold.json",
+  "annotation": {
+    "status": "draft",
+    "annotator_roles": [
+      "legacy_agent_authored"
+    ],
+    "guideline_version": "claim-label.v0.1",
+    "adjudication_notes": "adjudication.md"
+  },
+  "replay": {
+    "ready": false,
+    "episode_boundaries": [
+      {
+        "opened_employee_seq": 2,
+        "closed_employee_seq": 14,
+        "target": "manual_test_and_release_regression",
+        "reason": "migrated_transcript_boundary"
+      }
+    ],
+    "limitations": [
+      "Original initial document, selected reference set and production session state were not preserved with the legacy golden.",
+      "The 100 percent completion rule conflicts with the stated manual-sampling exception and requires adjudication."
+    ]
+  },
+  "applicable_graders": [
+    "case_integrity",
+    "quote_validity",
+    "source_subject",
+    "state_invariants"
+  ]
+}

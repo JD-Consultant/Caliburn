@@ -1383,8 +1383,11 @@ status close。下方驗收逐項成立：outbound body/headers exact 測試不�
 transport call、route contamination 回 wire success + 誠實 evidence + ineligible conformance report
 （payload 保留、無 error artifact）、unknown pipeline stage = unknown/ineligible + opaque hash、
 usage/cost/redaction/secret scan 維持、OpenAI reference 73 tests 全綠、`app/` 不 import `evals.*`。
-完整 no-network 927 passed／197 skipped／0 failed；interview_vnext + real PostgreSQL 736 passed／
-0 skipped；migration 仍 `0010 (head)`。exact 證據與逐項回報見
+owner review 發現的三個 blocker（null pipeline 誤判 clean、attempt/attempts 筆數矛盾、blank-string
+造成 evidence ValidationError 外洩）已由 R4-C corrective commit 以先紅後綠的 regression tests 修正
+（見 R4 plan §19.1）。corrective 後：完整 no-network 941 passed／197 skipped／0 failed；
+interview_vnext + real PostgreSQL 750 passed／0 skipped；migration 仍 `0010 (head)`。
+exact 證據與逐項回報見
 [`R4 detailed implementation authority`](2026-07-19-interview-vnext-v3-5a-r4-provider-evidence-conformance-plan.md) §19。
 
 **Entry gate（2026-07-19 已通過）**：R3-C全部完成並已回寫exact測試證據；R4可開始實作。

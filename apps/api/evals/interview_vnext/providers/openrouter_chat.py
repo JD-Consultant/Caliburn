@@ -940,7 +940,7 @@ class OpenRouterChatEvalAdapter(LlmPort):
             )
             raw_model = body.get("model")
             resolved_actual = (
-                raw_model if isinstance(raw_model, str) and raw_model else None
+                raw_model if isinstance(raw_model, str) and raw_model.strip() else None
             )
             generation_id = _generation_id(body, generation_id_header)
             usage_dict = (
@@ -1000,14 +1000,16 @@ class OpenRouterChatEvalAdapter(LlmPort):
                     ),
                     raw=raw, routing=routing_artifact, evidence=evidence,
                     provider_category=exc.error_type or "refusal",
-                    resolved_model=resolved or request.requested_model,
+                    resolved_model=resolved
+                    if isinstance(resolved, str) and resolved.strip()
+                    else request.requested_model,
                 )
             return self._assemble_failure(
                 binding, base, exc.failure, provider_finish_reason=exc.provider_finish_reason,
                 usage=usage, evidence=evidence, error=error, extra=extras,
                 visible=visible,
                 resolved_model=resolved
-                if isinstance(resolved, str) and resolved
+                if isinstance(resolved, str) and resolved.strip()
                 else request.requested_model,
             )
 
@@ -1085,7 +1087,8 @@ class OpenRouterChatEvalAdapter(LlmPort):
                 detail="response is missing a generation id",
                 include_visible=False,
             )
-        if not isinstance(resolved_model, str) or not resolved_model:
+        if not isinstance(resolved_model, str) or not resolved_model.strip():
+            # blank-only model 也不是可用的 protocol fact(NonEmptyText 下游)。
             raise _ResponseError(
                 _Failure(
                     FailureKind.UNKNOWN_PROVIDER_FAILURE, "openrouter.protocol_invalid",

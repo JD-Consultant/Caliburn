@@ -1188,3 +1188,36 @@ R4 完成只代表 provider boundary 能正確區分 wire facts 與 attribution 
 21. **明確確認**：未跑任何 paid/live（OpenRouter live、OpenAI live 均未執行）、未接
     production route/Web、未新增 direct Anthropic/universal framework/第二 executor、未 push。
 22. **未完成項**：無；§16 Definition of Done 全項成立，不阻擋 R5（Turn Interpreter C1 v2）。
+
+### 19.1 R4-C corrective（2026-07-20 owner review 三個 blocker 的修正）
+
+Owner review 在初次 close 後發現三個 blocker，均以 regression test 先紅後綠修正
+（corrective commit，不重寫 R4-1～R4-4）：
+
+1. **`"pipeline": null` 被誤判 clean** — normalizer 原以 `metadata.get("pipeline") is None`
+   同視「key 缺失」與「明確 null」。修正：只有 **key 不存在**（官方 no-op 省略語意）或
+   `[]` 才是 clean；明確 null 走 malformed 路徑 → overall `unknown`＋limitation →
+   `transformation_ineligible` fail closed。
+2. **attempt 與 attempts 筆數矛盾仍 eligible** — `attempt=1` 但 `attempts` 兩筆（同
+   provider）原本通過。修正：§6.4 條件 8 補上筆數一致性——`attempt` 與非空 `attempts`
+   筆數不一致時，attempt fact 視為無法證立（null＋
+   `openrouter attempt count contradicts the recorded attempts` limitation）→
+   evidence `upstream_attempt_count=None` → `route_metadata_missing` ineligible。
+   一致的 fallback metadata（attempt=2＋兩筆）仍照實記 2 → `upstream_attempt_mismatch`。
+3. **blank-only 字串讓 typed evidence 拋 ValidationError 外洩** — `"strategy": " "` 等
+   blank 值通過 truthiness 檢查後，在 `define_provider_execution_evidence()`
+   （`NonEmptyText`）拋例外，adapter 未回受控 envelope。影響面比回報更廣：
+   `ModelCallResult.resolved_model` 也是 `NonEmptyText`，blank body `model` 會炸
+   result 建構，OpenAI reference 同類。修正：normalizer `_fact_text()` 把 blank-only
+   的 requested/strategy/selected provider/model null 化（非 blank 值原樣保留、不
+   strip 改寫）；OpenRouter blank body model → 受控 `openrouter.protocol_invalid`
+   wire failure（含 except-handler 兩處 fallback）；OpenAI blank `response.model` →
+   result 回退 requested、evidence null＋limitation → `route_metadata_missing`
+   ineligible。
+
+Regression tests：pure normalizer ＋ adapter ＋ OpenAI 共 14 個新測試（先紅證實
+blocker、修正後綠）。corrective 後 gates：focused 七檔 **333 passed／2 skipped**
+（skip＝real-PG orchestration，PG gate 補跑綠）；完整 no-network
+**941 passed／197 skipped／0 failed**；interview_vnext＋real PostgreSQL
+**750 passed／0 skipped**；dependency/schema guard **14 passed**；Alembic
+**`0010 (head)`**。R4 complete 狀態在此 corrective 之後重新確認。

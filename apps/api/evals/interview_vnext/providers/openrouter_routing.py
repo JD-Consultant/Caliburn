@@ -44,6 +44,9 @@ LIMITATION_SELECTED_NOT_UNIQUE = (
     "openrouter metadata did not identify exactly one selected endpoint"
 )
 LIMITATION_PIPELINE_MALFORMED = "openrouter pipeline metadata was not an array"
+LIMITATION_ATTEMPTS_CONTRADICTORY = (
+    "openrouter attempt count contradicts the recorded attempts"
+)
 LIMITATION_CACHE_HEADER_UNRECOGNIZED = (
     "openrouter cache status header value was not recognized"
 )
@@ -99,6 +102,19 @@ def _json_safe(value: Any) -> Any:
     except (TypeError, ValueError):
         return str(value)
     return value
+
+
+def _fact_text(value: Any) -> str | None:
+    """A usable text fact: a non-blank string, kept verbatim (never stripped).
+
+    Blank-only strings are not facts — downstream typed evidence uses
+    ``NonEmptyText`` and must receive null instead of a value that would raise
+    inside the adapter (R4-C blocker 3).
+    """
+
+    if isinstance(value, str) and value.strip():
+        return value
+    return None
 
 
 def _canonical_token(value: str) -> str:
@@ -191,14 +207,7 @@ def _selected_endpoint(
     if len(unique) != 1:
         return None, None, len(unique), (LIMITATION_SELECTED_NOT_UNIQUE,)
     entry = unique[0]
-    provider = entry.get("provider")
-    model = entry.get("model")
-    return (
-        provider if isinstance(provider, str) and provider else None,
-        model if isinstance(model, str) and model else None,
-        1,
-        (),
-    )
+    return _fact_text(entry.get("provider")), _fact_text(entry.get("model")), 1, ()
 
 
 def _normalize_cache(
@@ -259,12 +268,8 @@ def normalize_openrouter_routing(
 
     limitations: set[str] = set()
 
-    requested = metadata.get("requested")
-    metadata_requested_model = (
-        requested if isinstance(requested, str) and requested else None
-    )
-    strategy = metadata.get("strategy")
-    route_strategy = strategy if isinstance(strategy, str) and strategy else None
+    metadata_requested_model = _fact_text(metadata.get("requested"))
+    route_strategy = _fact_text(metadata.get("strategy"))
     attempt = metadata.get("attempt")
     router_attempt = (
         attempt
@@ -281,13 +286,22 @@ def normalize_openrouter_routing(
         if isinstance(raw_attempts, list)
         else ()
     )
+    # R4-C blocker 2 (§6.4 condition 8): the attempt counter and the recorded
+    # attempts must not contradict each other. When they do, a single direct
+    # execution cannot be attested — the attempt fact becomes unknown and the
+    # strict policy fails closed on the missing route metadata.
+    if router_attempt is not None and attempts and len(attempts) != router_attempt:
+        router_attempt = None
+        limitations.add(LIMITATION_ATTEMPTS_CONTRADICTORY)
 
+    # R4-C blocker 1: only an *absent* key (official "no-op stages are
+    # omitted" semantics) or an explicit empty array attests a clean
+    # pass-through. An explicit ``"pipeline": null`` is an unrecognized shape
+    # and fails closed to unknown.
     raw_pipeline_value = metadata.get("pipeline")
-    if raw_pipeline_value is None or (
+    if "pipeline" not in metadata or (
         isinstance(raw_pipeline_value, list) and not raw_pipeline_value
     ):
-        # §6.5: no-op stages are omitted upstream; metadata with an absent or
-        # empty pipeline attests a clean pass-through.
         raw_pipeline: tuple[object, ...] = ()
         pipeline_stages: tuple[ProviderPipelineStage, ...] = ()
         transformation_status = TransformationStatus.CLEAN

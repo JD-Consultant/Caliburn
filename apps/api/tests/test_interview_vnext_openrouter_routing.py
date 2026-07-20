@@ -16,6 +16,7 @@ import pytest
 from app.interview_vnext.llm.execution import CacheStatus, TransformationStatus
 
 from evals.interview_vnext.providers.openrouter_routing import (
+    LIMITATION_ATTEMPTS_CONTRADICTORY,
     LIMITATION_CACHE_HEADER_UNRECOGNIZED,
     LIMITATION_CACHE_UNKNOWN,
     LIMITATION_ENDPOINTS_MALFORMED,
@@ -195,16 +196,56 @@ class TestMetadataMissing:
         assert LIMITATION_CACHE_UNKNOWN in facts.limitations
 
 
+def attempt_entry(status: int = 200) -> dict[str, Any]:
+    return {"provider": PROVIDER_NAME, "model": REQUESTED_MODEL, "status": status}
+
+
 class TestAttemptFacts:
-    @pytest.mark.parametrize(("attempt", "expected"), [(0, 0), (1, 1), (2, 2)])
-    def test_attempt_integers_are_recorded_verbatim(self, attempt, expected):
-        facts = normalize_openrouter_routing(clean_metadata(attempt=attempt))
+    @pytest.mark.parametrize(
+        ("attempt", "attempts", "expected"),
+        [
+            (0, [], 0),
+            (1, [attempt_entry()], 1),
+            (2, [attempt_entry(503), attempt_entry()], 2),
+        ],
+    )
+    def test_consistent_attempt_integers_are_recorded_verbatim(
+        self, attempt, attempts, expected
+    ):
+        facts = normalize_openrouter_routing(
+            clean_metadata(attempt=attempt, attempts=attempts)
+        )
         assert facts.router_attempt == expected
+        assert LIMITATION_ATTEMPTS_CONTRADICTORY not in facts.limitations
+
+    def test_attempt_with_omitted_attempts_detail_is_kept(self):
+        metadata = clean_metadata(attempt=1)
+        del metadata["attempts"]
+        facts = normalize_openrouter_routing(metadata)
+        assert facts.router_attempt == 1
 
     @pytest.mark.parametrize("attempt", [True, "1", -1, None, 1.5])
     def test_non_countable_attempt_is_null(self, attempt):
         facts = normalize_openrouter_routing(clean_metadata(attempt=attempt))
         assert facts.router_attempt is None
+
+    @pytest.mark.parametrize(
+        ("attempt", "attempts"),
+        [
+            (1, [attempt_entry(503), attempt_entry()]),
+            (2, [attempt_entry()]),
+            (0, [attempt_entry()]),
+        ],
+    )
+    def test_attempt_contradicting_attempts_count_is_nulled(self, attempt, attempts):
+        """R4-C blocker 2:attempt 與 attempts 筆數自相矛盾時,單次 execution 的
+        事實無法證立——attempt fact 必須變 unknown(fail closed),不得 eligible。"""
+
+        facts = normalize_openrouter_routing(
+            clean_metadata(attempt=attempt, attempts=attempts)
+        )
+        assert facts.router_attempt is None
+        assert LIMITATION_ATTEMPTS_CONTRADICTORY in facts.limitations
 
     def test_attempts_are_preserved_as_sanitized_raw(self):
         raw_attempts = [
@@ -213,6 +254,33 @@ class TestAttemptFacts:
         ]
         facts = normalize_openrouter_routing(clean_metadata(attempts=raw_attempts))
         assert facts.attempts == tuple(raw_attempts)
+
+
+class TestBlankStringFacts:
+    """R4-C blocker 3:blank-only 字串不是可用的 fact,必須 null 化,否則 typed
+    evidence(NonEmptyText)會在 adapter 內拋 ValidationError 而非回 envelope。"""
+
+    def test_blank_requested_and_strategy_are_null(self):
+        facts = normalize_openrouter_routing(
+            clean_metadata(requested=" ", strategy="  \t")
+        )
+        assert facts.metadata_requested_model is None
+        assert facts.route_strategy is None
+
+    def test_blank_selected_provider_and_model_are_null(self):
+        facts = normalize_openrouter_routing(
+            clean_metadata(
+                endpoints=[{"provider": " ", "model": "\t", "selected": True}]
+            )
+        )
+        assert facts.selected_count == 1
+        assert facts.selected_provider is None
+        assert facts.selected_model is None
+
+    def test_whitespace_padded_values_are_kept_verbatim(self):
+        # 非 blank-only 的值照實保留(mismatch 由 conformance 判),不 strip 改寫。
+        facts = normalize_openrouter_routing(clean_metadata(strategy="direct "))
+        assert facts.route_strategy == "direct "
 
 
 class TestPipelineClassification:
@@ -230,6 +298,15 @@ class TestPipelineClassification:
         facts = self._stages([])
         assert facts.transformation_status == TransformationStatus.CLEAN
         assert facts.pipeline_stages == ()
+
+    def test_explicit_null_pipeline_is_unknown_not_clean(self):
+        """R4-C blocker 1:key 存在但值是 null ≠ 官方「no-op stage 省略」;
+        不可與 key 缺失同視為 clean,必須 fail closed 為 unknown。"""
+
+        facts = self._stages(None)
+        assert facts.transformation_status == TransformationStatus.UNKNOWN
+        assert facts.pipeline_stages == ()
+        assert LIMITATION_PIPELINE_MALFORMED in facts.limitations
 
     @pytest.mark.parametrize(
         "stage_type", ["guardrail", "moderation", "content_filter"]

@@ -26,7 +26,9 @@ from .commands import (
 from .episode import EpisodeState, Gap
 from .events import DomainEvent
 from .evidence import Evidence, Inference
+from .interpretation import TurnInterpretationRecord
 from .job_model import CandidateJobItem
+from .question_frame import QuestionFrame
 from .reducers import ReductionResult
 from .review import ReviewDecision
 from .session import InterviewSession
@@ -61,6 +63,16 @@ SCHEMA_EXPORTS: dict[str, tuple[str, str, SchemaFactory]] = {
         "https://caliburn.local/schemas/inference.v2.schema.json",
         "Caliburn interview vNext inference v2",
         _model_schema(Inference),
+    ),
+    "question-frame.v1.schema.json": (
+        "https://caliburn.local/schemas/question-frame.v1.schema.json",
+        "Caliburn interview vNext question frame v1",
+        _model_schema(QuestionFrame),
+    ),
+    "turn-interpretation-record.v1.schema.json": (
+        "https://caliburn.local/schemas/turn-interpretation-record.v1.schema.json",
+        "Caliburn interview vNext turn interpretation record v1",
+        _model_schema(TurnInterpretationRecord),
     ),
     "episode-state.v1.schema.json": (
         "https://caliburn.local/schemas/episode-state.v1.schema.json",

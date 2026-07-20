@@ -1,6 +1,6 @@
 # Interview vNext — eval-only provider adapters
 
-**Status（2026-07-20）：V3-5A R4 complete；R5（Turn Interpreter C1 v2）unblocked，paid live/V3-6仍 blocked**
+**Status（2026-07-20）：V3-5A R4 complete；R5 grounded short-answer authority approved/planned，paid live/V3-6仍 blocked**
 
 Owner已核准ADR 0036；實作authority為
 [`V3-5A runtime contract reconstruction plan`](../../../../docs/plans/2026-07-18-interview-vnext-v3-5a-runtime-contract-reconstruction-plan.md)，
@@ -13,6 +13,12 @@ R4 provider wire/evidence/conformance 依
 對齊）；不得重跑舊v1 batch或paid live。
 active target仍是`turn.interpret/2.0.0`、ProviderBinding/execution evidence/conformance與canonical regrade；
 migration維持0010。
+
+R5 exact authority已改由
+[`ADR 0037`](../../../../docs/adr/0037-interview-vnext-question-frame-contextual-evidence-and-employee-authority.md)與
+[`grounded short-answer amendment`](../../../../docs/plans/2026-07-20-interview-vnext-v3-5a-r5-grounded-short-answer-amendment-plan.md)
+管理。R5 active hard cut會把minimum eval/provider fixtures機械遷移到QuestionFrame、Evidence/State v3與Turn Input/Output v2，
+以保持每個commit完整suite綠；R6才負責grounded short-answer多trial、gold/grader與真模型品質，不得在R5跑paid live。
 
 - **R4 語意**：adapter 只回 wire result + normalized execution evidence（`openrouter_routing.py` pure
   normalizer：official nested/legacy flat endpoints、pipeline stage 分類、official cache header、
@@ -80,10 +86,12 @@ V2/V3 已發布的 provider-neutral contract(`app.interview_vnext.llm`)」。
   `docs/plans/2026-07-17-interview-vnext-v3-4r-openrouter-first-adapter-plan.md`。
 - OpenAI direct reference規格：
   `docs/plans/2026-07-17-interview-vnext-v3-4-openai-responses-adapter-plan.md`。
-- V3-5 turn品質評測唯一實作規格：
-  `docs/plans/2026-07-18-interview-vnext-v3-5-turn-eval-harness-plan.md`（harness/cases尚未落地）。
+- V3-5 original harness規格：
+  `docs/plans/2026-07-18-interview-vnext-v3-5-turn-eval-harness-plan.md`（E0–E8已落地；舊true-live不具品質裁決資格）。
+- R5 contract migration與R6 grounding quality邊界：
+  `docs/plans/2026-07-20-interview-vnext-v3-5a-r5-grounded-short-answer-amendment-plan.md`。
 - **production `apps/api/app/` 不得 import 本目錄**;dependency guard 測試強制。
-- 這裡沒有品質評測:V3-4 只做 adapter conformance;12-case 品質/多 trial 是 V3-5。
+- 本目錄已有品質harness，但新contract尚未完成true-live multi-trial，因此目前沒有promotion verdict。
 
 ## V3-5 turn eval harness 檔案
 

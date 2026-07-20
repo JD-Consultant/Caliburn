@@ -1384,9 +1384,10 @@ transport call、route contamination 回 wire success + 誠實 evidence + inelig
 （payload 保留、無 error artifact）、unknown pipeline stage = unknown/ineligible + opaque hash、
 usage/cost/redaction/secret scan 維持、OpenAI reference 73 tests 全綠、`app/` 不 import `evals.*`。
 owner review 發現的三個 blocker（null pipeline 誤判 clean、attempt/attempts 筆數矛盾、blank-string
-造成 evidence ValidationError 外洩）已由 R4-C corrective commit 以先紅後綠的 regression tests 修正
-（見 R4 plan §19.1）。corrective 後：完整 no-network 941 passed／197 skipped／0 failed；
-interview_vnext + real PostgreSQL 750 passed／0 skipped；migration 仍 `0010 (head)`。
+造成 evidence ValidationError 外洩）已由 R4-C corrective 修正（R4 plan §19.1）；follow-up review 的
+同類 usage/cost 數值外洩（科學記號／非法／負數）由 R4-C2 修正（§19.2），均以先紅後綠的 regression
+tests 釘住。corrective 後：完整 no-network 951 passed／197 skipped／0 failed；
+interview_vnext + real PostgreSQL 760 passed／0 skipped；migration 仍 `0010 (head)`。
 exact 證據與逐項回報見
 [`R4 detailed implementation authority`](2026-07-19-interview-vnext-v3-5a-r4-provider-evidence-conformance-plan.md) §19。
 

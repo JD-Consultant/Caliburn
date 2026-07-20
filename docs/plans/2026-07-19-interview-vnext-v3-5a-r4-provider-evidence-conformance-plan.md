@@ -1221,3 +1221,28 @@ blocker、修正後綠）。corrective 後 gates：focused 七檔 **333 passed�
 **941 passed／197 skipped／0 failed**；interview_vnext＋real PostgreSQL
 **750 passed／0 skipped**；dependency/schema guard **14 passed**；Alembic
 **`0010 (head)`**。R4 complete 狀態在此 corrective 之後重新確認。
+
+### 19.2 R4-C2 corrective（2026-07-20 follow-up review：usage/cost 數值同類 P1）
+
+Follow-up review 發現與 blocker 3 同類的數值版外洩——usage/cost mapping 未驗證的
+異常數值會讓 typed contracts 拋 `ValidationError` 而非回受控 envelope
+（OpenRouter `cost=1e-7`／`cost="not-a-decimal"`／`prompt_tokens=-1`、OpenAI
+`input_tokens=-1` 均實測重現）。修正（regression tests 先紅後綠）：
+
+1. **`_decimal_str` canonical 化**：合法科學記號 cost（`1e-7`）以
+   `Decimal(repr(float))` → `format(value, "f")` 正規化為 `0.0000001`（無 float
+   重算）；非數字／負數／非有限（NaN/Infinity）／bool → `None`＋
+   `openrouter response cost was not a usable decimal` limitation（與「缺 cost」
+   的 limitation 區分）；evidence 與 routing artifact v2 共用同一 canonical 值。
+2. **OpenRouter `_map_usage`**：負數 token → `None`＋
+   `openrouter usage {field} was negative` limitation（`TokenUsage` 是 ge=0
+   typed contract）。
+3. **OpenAI `_map_usage`**：負數／非整數／bool token → `None`＋
+   `openai usage {field} was not a usable count` limitation。
+
+usage/cost 不是 attribution 判準：null 化後 conformance 仍照 route facts 判
+（clean route 仍 eligible），wire outcome 不變。新增 10 個 regression tests
+（OpenRouter 9＋OpenAI 1）。R4-C2 後 gates：focused 七檔 **343 passed／2 skipped**；
+完整 no-network **951 passed／197 skipped／0 failed**；interview_vnext＋real
+PostgreSQL **760 passed／0 skipped**；dependency/schema guard **14 passed**；
+Alembic **`0010 (head)`**。

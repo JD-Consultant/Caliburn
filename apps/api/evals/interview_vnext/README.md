@@ -1,17 +1,29 @@
 # Interview vNext — eval-only provider adapters
 
-**Status（2026-07-19）：V3-5A R3-C complete；R4 implementation unblocked，paid live/V3-6仍 blocked**
+**Status（2026-07-20）：V3-5A R4 complete；R5（Turn Interpreter C1 v2）unblocked，paid live/V3-6仍 blocked**
 
-Owner已核准ADR 0036；下一個實作authority為
+Owner已核准ADR 0036；實作authority為
 [`V3-5A runtime contract reconstruction plan`](../../../../docs/plans/2026-07-18-interview-vnext-v3-5a-runtime-contract-reconstruction-plan.md)，
 其中R3修正依
-[`R3-C corrective plan`](../../../../docs/plans/2026-07-19-interview-vnext-v3-5a-r3-corrective-plan.md)。
-R4 provider wire/evidence/conformance 的逐欄、逐檔與測試 authority為
-[`R4 detailed implementation plan`](../../../../docs/plans/2026-07-19-interview-vnext-v3-5a-r4-provider-evidence-conformance-plan.md)。
-baseline R3 SHA為`6ea5ed5412617cbae893e0baeab1abde6aa0d075`，corrective code commits為
-`e1716c8`、`2cf3404`、`1eaa774`；R4現在可開始實作，但不得重跑舊v1 batch或paid live。
+[`R3-C corrective plan`](../../../../docs/plans/2026-07-19-interview-vnext-v3-5a-r3-corrective-plan.md)、
+R4 provider wire/evidence/conformance 依
+[`R4 detailed implementation plan`](../../../../docs/plans/2026-07-19-interview-vnext-v3-5a-r4-provider-evidence-conformance-plan.md)
+（含 §19 執行結果）。R4 commits 為 `aee798a`（pure `openrouter_routing` normalizer）、`a814789`
+（OpenRouter wire/evidence 分離＋probe/scheduler vertical cut）、`067504b`（OpenAI mocked reference
+對齊）；不得重跑舊v1 batch或paid live。
 active target仍是`turn.interpret/2.0.0`、ProviderBinding/execution evidence/conformance與canonical regrade；
 migration維持0010。
+
+- **R4 語意**：adapter 只回 wire result + normalized execution evidence（`openrouter_routing.py` pure
+  normalizer：official nested/legacy flat endpoints、pipeline stage 分類、official cache header、
+  §6.4 endpoint attestation）；route/model/pipeline/cache 污染是 wire success＋誠實 evidence，
+  eligibility 由 application `attribution-strict/1.0.0` 判定，executor terminal reason
+  `provider.conformance_failed`＝harness invalid（scheduler stop-gap）。routing artifact 升
+  `openrouter_routing.v2`（無 verdict）；兩個 probe 走 taxonomy v2、保存
+  result/evidence/conformance closure、report v2。
+- **R4 驗收**：完整 no-network **927 passed, 197 skipped, 0 failed**；全部
+  `test_interview_vnext_*` + real PostgreSQL **736 passed, 0 skipped**；dependency/schema guard
+  **14 passed**；Alembic **0010 (head)**；未跑任何 live。
 
 - R3-C exact binding/projection、typed durable gate與terminal recovery已完成；missing/tampered
   binding/config/projection/result/evidence/conformance全部fail closed且不打HTTP。
@@ -19,7 +31,8 @@ migration維持0010。
   result/evidence/conformance；export會拒絕missing root、forged full ref/hash與nested-ref-only manifest。
 - R3-C驗收：全部`test_interview_vnext_*.py` + real PostgreSQL **653 passed, 0 skipped**；完整API
   no-network **844 passed, 197 skipped, 0 failed**；dependency guard **5 passed**；Alembic **0010 (head)**。
-- R3-C沒有改route contamination wire outcome，沒有跑network/live；R4才負責把wire evidence與eligibility分離。
+- R3-C沒有改route contamination wire outcome；R4（`a814789`/`067504b`）已完成wire evidence與eligibility
+  分離：contamination不再產生active `ModelFailure`，failure authority是conformance report。
 
 - V3-5 turn eval harness(`contracts`/`loader`/`identities`/`fixture_builder`/`turn_eval_runner`/
   `capture_export`/`turn_graders`/`review`/`turn_report`/`scheduler`/`batch_orchestrator`/`live_wiring`/

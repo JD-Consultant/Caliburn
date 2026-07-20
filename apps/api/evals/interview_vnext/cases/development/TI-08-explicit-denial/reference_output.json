@@ -1,0 +1,80 @@
+{
+  "schema_version": "turn_eval_reference_output.v1",
+  "case_id": "TI-08-explicit-denial",
+  "output": {
+    "schema_version": "turn_interpret_output.v1",
+    "observations": [
+      {
+        "proposal_key": "obs-deny-po-approval",
+        "subject": "employee",
+        "kind": "negation",
+        "claim": "不負責核准採購單",
+        "quote": "我不負責核准採購單",
+        "quote_occurrence": 1,
+        "qualifiers": {
+          "time_scope": "current",
+          "typicality": "unknown",
+          "polarity": "denied",
+          "frequency": {
+            "value": null,
+            "unit": "unknown",
+            "verbatim": null
+          },
+          "importance": "not_stated",
+          "ownership": "not_responsible"
+        },
+        "correction_target_evidence_ids": [],
+        "correction_target_unknown": false
+      },
+      {
+        "proposal_key": "obs-deny-supplier-decision",
+        "subject": "employee",
+        "kind": "negation",
+        "claim": "不決定供應商",
+        "quote": "也不會決定供應商",
+        "quote_occurrence": 1,
+        "qualifiers": {
+          "time_scope": "current",
+          "typicality": "unknown",
+          "polarity": "denied",
+          "frequency": {
+            "value": null,
+            "unit": "unknown",
+            "verbatim": null
+          },
+          "importance": "not_stated",
+          "ownership": "not_responsible"
+        },
+        "correction_target_evidence_ids": [],
+        "correction_target_unknown": false
+      },
+      {
+        "proposal_key": "obs-prepare-handoff",
+        "subject": "employee",
+        "kind": "action",
+        "claim": "把資料整理好交給主管",
+        "quote": "只會把資料整理好交給主管",
+        "quote_occurrence": 1,
+        "qualifiers": {
+          "time_scope": "current",
+          "typicality": "typical",
+          "polarity": "affirmed",
+          "frequency": {
+            "value": null,
+            "unit": "unknown",
+            "verbatim": null
+          },
+          "importance": "not_stated",
+          "ownership": "assists"
+        },
+        "correction_target_evidence_ids": [],
+        "correction_target_unknown": false
+      }
+    ],
+    "user_signal": "answer",
+    "episode_signal": "continue",
+    "emergent_topics": [],
+    "insufficiencies": []
+  },
+  "correction_target_bindings": {}
+}

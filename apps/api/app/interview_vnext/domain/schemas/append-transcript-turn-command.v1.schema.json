@@ -1,0 +1,129 @@
+{
+  "$defs": {
+    "TranscriptRole": {
+      "enum": [
+        "consultant",
+        "employee"
+      ],
+      "title": "TranscriptRole",
+      "type": "string"
+    },
+    "TranscriptTurn": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "transcript_turn.v1",
+          "default": "transcript_turn.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "turn_id": {
+          "format": "uuid",
+          "title": "Turn Id",
+          "type": "string"
+        },
+        "session_id": {
+          "format": "uuid",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "client_turn_id": {
+          "maxLength": 512,
+          "minLength": 1,
+          "title": "Client Turn Id",
+          "type": "string"
+        },
+        "sequence": {
+          "minimum": 1,
+          "title": "Sequence",
+          "type": "integer"
+        },
+        "role": {
+          "$ref": "#/$defs/TranscriptRole"
+        },
+        "text": {
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        },
+        "previous_turn_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Previous Turn Id"
+        },
+        "locale": {
+          "default": "zh-TW",
+          "pattern": "^[A-Za-z]{2,3}(?:-[A-Za-z0-9]{2,8})*$",
+          "title": "Locale",
+          "type": "string"
+        },
+        "occurred_at": {
+          "format": "date-time",
+          "title": "Occurred At",
+          "type": "string"
+        },
+        "received_at": {
+          "format": "date-time",
+          "title": "Received At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "turn_id",
+        "session_id",
+        "client_turn_id",
+        "sequence",
+        "role",
+        "text",
+        "occurred_at",
+        "received_at"
+      ],
+      "title": "TranscriptTurn",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "command_id": {
+      "format": "uuid",
+      "title": "Command Id",
+      "type": "string"
+    },
+    "expected_state_version": {
+      "minimum": 0,
+      "title": "Expected State Version",
+      "type": "integer"
+    },
+    "occurred_at": {
+      "format": "date-time",
+      "title": "Occurred At",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "append_transcript_turn_command.v1",
+      "default": "append_transcript_turn_command.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "turn": {
+      "$ref": "#/$defs/TranscriptTurn"
+    }
+  },
+  "required": [
+    "command_id",
+    "expected_state_version",
+    "occurred_at",
+    "turn"
+  ],
+  "title": "Caliburn interview vNext append transcript turn command v1",
+  "type": "object",
+  "$id": "https://caliburn.local/schemas/append-transcript-turn-command.v1.schema.json"
+}

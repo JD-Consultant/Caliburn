@@ -1,0 +1,309 @@
+{
+  "$defs": {
+    "AnnotationMetadata": {
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "$ref": "#/$defs/AnnotationStatus"
+        },
+        "annotator_roles": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Annotator Roles",
+          "type": "array"
+        },
+        "guideline_version": {
+          "minLength": 1,
+          "title": "Guideline Version",
+          "type": "string"
+        },
+        "adjudication_notes": {
+          "minLength": 1,
+          "title": "Adjudication Notes",
+          "type": "string"
+        }
+      },
+      "required": [
+        "status",
+        "guideline_version",
+        "adjudication_notes"
+      ],
+      "title": "AnnotationMetadata",
+      "type": "object"
+    },
+    "AnnotationStatus": {
+      "enum": [
+        "draft",
+        "maintainer_checked",
+        "domain_reviewed",
+        "adjudicated",
+        "disputed"
+      ],
+      "title": "AnnotationStatus",
+      "type": "string"
+    },
+    "EpisodeBoundary": {
+      "additionalProperties": false,
+      "properties": {
+        "opened_employee_seq": {
+          "minimum": 1,
+          "title": "Opened Employee Seq",
+          "type": "integer"
+        },
+        "closed_employee_seq": {
+          "minimum": 1,
+          "title": "Closed Employee Seq",
+          "type": "integer"
+        },
+        "target": {
+          "minLength": 1,
+          "title": "Target",
+          "type": "string"
+        },
+        "reason": {
+          "default": "fixture",
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "opened_employee_seq",
+        "closed_employee_seq",
+        "target"
+      ],
+      "title": "EpisodeBoundary",
+      "type": "object"
+    },
+    "InitialFixtures": {
+      "additionalProperties": false,
+      "properties": {
+        "document_fixture": {
+          "minLength": 1,
+          "title": "Document Fixture",
+          "type": "string"
+        },
+        "session_state_fixture": {
+          "minLength": 1,
+          "title": "Session State Fixture",
+          "type": "string"
+        },
+        "reference_snapshot": {
+          "minLength": 1,
+          "title": "Reference Snapshot",
+          "type": "string"
+        },
+        "review_events_fixture": {
+          "minLength": 1,
+          "title": "Review Events Fixture",
+          "type": "string"
+        }
+      },
+      "required": [
+        "document_fixture",
+        "session_state_fixture",
+        "reference_snapshot",
+        "review_events_fixture"
+      ],
+      "title": "InitialFixtures",
+      "type": "object"
+    },
+    "PrivacyMetadata": {
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "$ref": "#/$defs/PrivacyStatus"
+        },
+        "version": {
+          "minLength": 1,
+          "title": "Version",
+          "type": "string"
+        },
+        "approved_use": {
+          "const": "architecture_eval",
+          "title": "Approved Use",
+          "type": "string"
+        },
+        "raw_source_in_repo": {
+          "const": false,
+          "default": false,
+          "title": "Raw Source In Repo",
+          "type": "boolean"
+        },
+        "residual_scan_passed": {
+          "default": false,
+          "title": "Residual Scan Passed",
+          "type": "boolean"
+        },
+        "manual_review_required": {
+          "default": true,
+          "title": "Manual Review Required",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "status",
+        "version",
+        "approved_use"
+      ],
+      "title": "PrivacyMetadata",
+      "type": "object"
+    },
+    "PrivacyStatus": {
+      "enum": [
+        "synthetic",
+        "deidentified",
+        "redaction_pending_review"
+      ],
+      "title": "PrivacyStatus",
+      "type": "string"
+    },
+    "ReplayConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "ready": {
+          "default": false,
+          "title": "Ready",
+          "type": "boolean"
+        },
+        "episode_boundaries": {
+          "items": {
+            "$ref": "#/$defs/EpisodeBoundary"
+          },
+          "title": "Episode Boundaries",
+          "type": "array"
+        },
+        "limitations": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Limitations",
+          "type": "array"
+        }
+      },
+      "title": "ReplayConfig",
+      "type": "object"
+    },
+    "SourceType": {
+      "enum": [
+        "real_incident",
+        "real_success",
+        "constructed_edge",
+        "migrated_provisional"
+      ],
+      "title": "SourceType",
+      "type": "string"
+    },
+    "Split": {
+      "enum": [
+        "development",
+        "validation",
+        "held_out"
+      ],
+      "title": "Split",
+      "type": "string"
+    }
+  },
+  "$id": "https://caliburn.local/schemas/interview-eval-case.v0.1.json",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "interview_eval_case.v0.1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "case_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{2,127}$",
+      "title": "Case Id",
+      "type": "string"
+    },
+    "split": {
+      "$ref": "#/$defs/Split"
+    },
+    "source_type": {
+      "$ref": "#/$defs/SourceType"
+    },
+    "locale": {
+      "default": "zh-TW",
+      "minLength": 1,
+      "title": "Locale",
+      "type": "string"
+    },
+    "role_family": {
+      "minLength": 1,
+      "title": "Role Family",
+      "type": "string"
+    },
+    "risk_tags": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Risk Tags",
+      "type": "array"
+    },
+    "privacy": {
+      "$ref": "#/$defs/PrivacyMetadata"
+    },
+    "initial": {
+      "$ref": "#/$defs/InitialFixtures"
+    },
+    "transcript": {
+      "minLength": 1,
+      "title": "Transcript",
+      "type": "string"
+    },
+    "gold": {
+      "minLength": 1,
+      "title": "Gold",
+      "type": "string"
+    },
+    "source_audit": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Source Audit"
+    },
+    "annotation": {
+      "$ref": "#/$defs/AnnotationMetadata"
+    },
+    "replay": {
+      "$ref": "#/$defs/ReplayConfig"
+    },
+    "applicable_graders": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Applicable Graders",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "case_id",
+    "split",
+    "source_type",
+    "role_family",
+    "risk_tags",
+    "privacy",
+    "initial",
+    "transcript",
+    "gold",
+    "annotation",
+    "applicable_graders"
+  ],
+  "title": "Caliburn interview evaluation case v0.1",
+  "type": "object"
+}

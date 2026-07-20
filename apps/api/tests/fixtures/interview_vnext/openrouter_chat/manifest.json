@@ -1,0 +1,112 @@
+{
+  "schema_version": "openrouter_chat_fixture_manifest.v1",
+  "source": {
+    "openapi": "https://openrouter.ai/openapi.json",
+    "reference": "https://openrouter.ai/docs/api/reference/overview",
+    "models": "https://openrouter.ai/docs/guides/overview/models",
+    "endpoints": "https://openrouter.ai/docs/api/api-reference/endpoints/list-endpoints",
+    "router_metadata": "https://openrouter.ai/docs/guides/features/router-metadata",
+    "response_caching": "https://openrouter.ai/docs/guides/features/response-caching",
+    "checked": "2026-07-19",
+    "synthetic": true,
+    "contains_test_data": true
+  },
+  "fixtures": {
+    "catalog-model.json": {
+      "kind": "catalog",
+      "status": 200,
+      "headers": {"x-request-id": "req_fx_catalog_model"},
+      "purpose": "GET /model/{author}/{slug} snapshot: canonical slug, text modalities, structured outputs + reasoning capability, top provider budgets"
+    },
+    "catalog-endpoints.json": {
+      "kind": "catalog",
+      "status": 200,
+      "headers": {"x-request-id": "req_fx_catalog_endpoints"},
+      "purpose": "GET /models/{author}/{slug}/endpoints snapshot: unique 'testhost' endpoint, 'regionhost' base-slug ambiguity pair, EU variant missing structured_outputs for endpoint-level capability gate"
+    },
+    "success.json": {
+      "kind": "chat_response",
+      "status": 200,
+      "headers": {"x-request-id": "req_fx_success", "x-generation-id": "gen-fx-success"},
+      "purpose": "finish_reason=stop, clean direct routing metadata in the official nested endpoints.available[] shape, full usage incl cache_write/reasoning/cost; parses to a single object"
+    },
+    "success-with-reasoning.json": {
+      "kind": "chat_response",
+      "status": 200,
+      "headers": {"x-request-id": "req_fx_reasoning"},
+      "purpose": "message carries reasoning + reasoning_details even though exclude=true; raw artifact must redact the text, secret scan must pass"
+    },
+    "length.json": {
+      "kind": "chat_response",
+      "status": 200,
+      "headers": {"x-request-id": "req_fx_length"},
+      "purpose": "finish_reason=length -> INCOMPLETE/MAX_OUTPUT_TOKENS, partial content preserved, JSON never guessed"
+    },
+    "content-filter.json": {
+      "kind": "chat_response",
+      "status": 200,
+      "headers": {"x-request-id": "req_fx_content_filter"},
+      "purpose": "finish_reason=content_filter -> REFUSED/SAFETY_REFUSAL, provider text only in visible artifact"
+    },
+    "tool-calls.json": {
+      "kind": "chat_response",
+      "status": 200,
+      "headers": {"x-request-id": "req_fx_tool_calls"},
+      "purpose": "finish_reason=tool_calls though request has no tools -> OUTPUT_PARSE_FAILED/TOOL_USE, not executed"
+    },
+    "empty-content.json": {
+      "kind": "chat_response",
+      "status": 200,
+      "headers": {"x-request-id": "req_fx_empty"},
+      "purpose": "stop with empty content -> retryable PROVIDER_ERROR openrouter.empty_content"
+    },
+    "invalid-json.json": {
+      "kind": "chat_response",
+      "status": 200,
+      "headers": {"x-request-id": "req_fx_invalid_json"},
+      "purpose": "stop with markdown-fenced invalid JSON -> OUTPUT_PARSE_FAILED, adapter must not strip fences or repair"
+    },
+    "non-object-root.json": {
+      "kind": "chat_response",
+      "status": 200,
+      "headers": {"x-request-id": "req_fx_array_root"},
+      "purpose": "stop with a JSON array root -> OUTPUT_SCHEMA_INVALID"
+    },
+    "resolved-model-mismatch.json": {
+      "kind": "chat_response",
+      "status": 200,
+      "headers": {"x-request-id": "req_fx_model_mismatch"},
+      "purpose": "resolved model not in the allowlist (legacy flat endpoints array) -> R4: wire success, conformance gateway/upstream model mismatch; no prefix acceptance"
+    },
+    "usage-missing.json": {
+      "kind": "chat_response",
+      "status": 200,
+      "headers": {"x-request-id": "req_fx_usage_missing"},
+      "purpose": "success with no usage object -> all token fields null with a single limitation"
+    },
+    "usage-zeros.json": {
+      "kind": "chat_response",
+      "status": 200,
+      "headers": {"x-request-id": "req_fx_usage_zeros"},
+      "purpose": "success with explicit zero usage incl cost=0 -> zeros preserved, no limitation"
+    },
+    "top-error-200.json": {
+      "kind": "chat_response",
+      "status": 200,
+      "headers": {"x-request-id": "req_fx_top_error"},
+      "purpose": "HTTP 200 body carrying a top-level error object -> error_type wins over status, status_mismatch=true"
+    },
+    "choice-embedded-error.json": {
+      "kind": "chat_response",
+      "status": 200,
+      "headers": {"x-request-id": "req_fx_choice_error"},
+      "purpose": "HTTP 200 with choice-level embedded error + partial content -> embedded error classified, partial content not parsed"
+    },
+    "multiple-choices.json": {
+      "kind": "chat_response",
+      "status": 200,
+      "headers": {"x-request-id": "req_fx_multi_choice"},
+      "purpose": "two choices -> OUTPUT_PARSE_FAILED choice cardinality, both visible items kept"
+    }
+  }
+}

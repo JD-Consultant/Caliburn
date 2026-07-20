@@ -1,0 +1,592 @@
+{
+  "$defs": {
+    "EpisodeSignal": {
+      "enum": [
+        "continue",
+        "possible_shift",
+        "explicit_shift",
+        "possible_close"
+      ],
+      "title": "EpisodeSignal",
+      "type": "string"
+    },
+    "EvidenceKind": {
+      "enum": [
+        "action",
+        "input",
+        "output",
+        "purpose",
+        "condition",
+        "standard",
+        "frequency",
+        "importance",
+        "ownership",
+        "tool",
+        "recipient",
+        "dependency",
+        "exception",
+        "negation",
+        "correction",
+        "preference"
+      ],
+      "title": "EvidenceKind",
+      "type": "string"
+    },
+    "EvidenceSubject": {
+      "enum": [
+        "employee",
+        "employee_team",
+        "other_role",
+        "organization",
+        "unknown"
+      ],
+      "title": "EvidenceSubject",
+      "type": "string"
+    },
+    "ExpectedCommit": {
+      "enum": [
+        "evidence",
+        "no_op"
+      ],
+      "title": "ExpectedCommit",
+      "type": "string"
+    },
+    "FailureSeverity": {
+      "enum": [
+        "critical",
+        "major",
+        "minor",
+        "diagnostic"
+      ],
+      "title": "FailureSeverity",
+      "type": "string"
+    },
+    "GoldLabelStatus": {
+      "description": "§6.5:unknown/disputed/needs_sme 必須可表示;非 adjudicated 不進 gate 分母。",
+      "enum": [
+        "adjudicated",
+        "unknown",
+        "disputed",
+        "needs_sme"
+      ],
+      "title": "GoldLabelStatus",
+      "type": "string"
+    },
+    "GoldQualifierExpectations": {
+      "additionalProperties": false,
+      "description": "Per-field discriminated expectation;三種 shape 互斥,不用 null 猜語意。",
+      "properties": {
+        "time_scope": {
+          "discriminator": {
+            "mapping": {
+              "exact": "#/$defs/QualifierExact",
+              "not_applicable": "#/$defs/QualifierNotApplicable",
+              "one_of": "#/$defs/QualifierOneOf"
+            },
+            "propertyName": "mode"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/QualifierExact"
+            },
+            {
+              "$ref": "#/$defs/QualifierOneOf"
+            },
+            {
+              "$ref": "#/$defs/QualifierNotApplicable"
+            }
+          ],
+          "title": "Time Scope"
+        },
+        "typicality": {
+          "discriminator": {
+            "mapping": {
+              "exact": "#/$defs/QualifierExact",
+              "not_applicable": "#/$defs/QualifierNotApplicable",
+              "one_of": "#/$defs/QualifierOneOf"
+            },
+            "propertyName": "mode"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/QualifierExact"
+            },
+            {
+              "$ref": "#/$defs/QualifierOneOf"
+            },
+            {
+              "$ref": "#/$defs/QualifierNotApplicable"
+            }
+          ],
+          "title": "Typicality"
+        },
+        "polarity": {
+          "discriminator": {
+            "mapping": {
+              "exact": "#/$defs/QualifierExact",
+              "not_applicable": "#/$defs/QualifierNotApplicable",
+              "one_of": "#/$defs/QualifierOneOf"
+            },
+            "propertyName": "mode"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/QualifierExact"
+            },
+            {
+              "$ref": "#/$defs/QualifierOneOf"
+            },
+            {
+              "$ref": "#/$defs/QualifierNotApplicable"
+            }
+          ],
+          "title": "Polarity"
+        },
+        "frequency_unit": {
+          "discriminator": {
+            "mapping": {
+              "exact": "#/$defs/QualifierExact",
+              "not_applicable": "#/$defs/QualifierNotApplicable",
+              "one_of": "#/$defs/QualifierOneOf"
+            },
+            "propertyName": "mode"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/QualifierExact"
+            },
+            {
+              "$ref": "#/$defs/QualifierOneOf"
+            },
+            {
+              "$ref": "#/$defs/QualifierNotApplicable"
+            }
+          ],
+          "title": "Frequency Unit"
+        },
+        "frequency_value": {
+          "discriminator": {
+            "mapping": {
+              "exact": "#/$defs/QualifierExact",
+              "not_applicable": "#/$defs/QualifierNotApplicable",
+              "one_of": "#/$defs/QualifierOneOf"
+            },
+            "propertyName": "mode"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/QualifierExact"
+            },
+            {
+              "$ref": "#/$defs/QualifierOneOf"
+            },
+            {
+              "$ref": "#/$defs/QualifierNotApplicable"
+            }
+          ],
+          "title": "Frequency Value"
+        },
+        "importance": {
+          "discriminator": {
+            "mapping": {
+              "exact": "#/$defs/QualifierExact",
+              "not_applicable": "#/$defs/QualifierNotApplicable",
+              "one_of": "#/$defs/QualifierOneOf"
+            },
+            "propertyName": "mode"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/QualifierExact"
+            },
+            {
+              "$ref": "#/$defs/QualifierOneOf"
+            },
+            {
+              "$ref": "#/$defs/QualifierNotApplicable"
+            }
+          ],
+          "title": "Importance"
+        },
+        "ownership": {
+          "discriminator": {
+            "mapping": {
+              "exact": "#/$defs/QualifierExact",
+              "not_applicable": "#/$defs/QualifierNotApplicable",
+              "one_of": "#/$defs/QualifierOneOf"
+            },
+            "propertyName": "mode"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/QualifierExact"
+            },
+            {
+              "$ref": "#/$defs/QualifierOneOf"
+            },
+            {
+              "$ref": "#/$defs/QualifierNotApplicable"
+            }
+          ],
+          "title": "Ownership"
+        }
+      },
+      "required": [
+        "time_scope",
+        "typicality",
+        "polarity",
+        "frequency_unit",
+        "frequency_value",
+        "importance",
+        "ownership"
+      ],
+      "title": "GoldQualifierExpectations",
+      "type": "object"
+    },
+    "GoldRequirement": {
+      "enum": [
+        "required",
+        "optional"
+      ],
+      "title": "GoldRequirement",
+      "type": "string"
+    },
+    "GoldSourceAnchor": {
+      "additionalProperties": false,
+      "properties": {
+        "turn_key": {
+          "maxLength": 64,
+          "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$",
+          "title": "Turn Key",
+          "type": "string"
+        },
+        "quote": {
+          "minLength": 1,
+          "title": "Quote",
+          "type": "string"
+        },
+        "occurrence": {
+          "minimum": 1,
+          "title": "Occurrence",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "turn_key",
+        "quote",
+        "occurrence"
+      ],
+      "title": "GoldSourceAnchor",
+      "type": "object"
+    },
+    "GoldStateExpectation": {
+      "additionalProperties": false,
+      "properties": {
+        "state_hash_changed": {
+          "title": "State Hash Changed",
+          "type": "boolean"
+        },
+        "prior_evidence_superseded_keys": {
+          "default": [],
+          "items": {
+            "maxLength": 64,
+            "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$",
+            "type": "string"
+          },
+          "title": "Prior Evidence Superseded Keys",
+          "type": "array"
+        },
+        "forbidden_superseded_keys": {
+          "default": [],
+          "items": {
+            "maxLength": 64,
+            "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$",
+            "type": "string"
+          },
+          "title": "Forbidden Superseded Keys",
+          "type": "array"
+        }
+      },
+      "required": [
+        "state_hash_changed"
+      ],
+      "title": "GoldStateExpectation",
+      "type": "object"
+    },
+    "InsufficiencyReason": {
+      "enum": [
+        "ambiguous_frequency",
+        "ambiguous_ownership",
+        "ambiguous_subject",
+        "ambiguous_time_scope",
+        "contradiction_unresolved",
+        "correction_target_unknown",
+        "insufficient_detail",
+        "no_work_fact"
+      ],
+      "title": "InsufficiencyReason",
+      "type": "string"
+    },
+    "QualifierExact": {
+      "additionalProperties": false,
+      "properties": {
+        "mode": {
+          "const": "exact",
+          "title": "Mode",
+          "type": "string"
+        },
+        "value": {
+          "minLength": 1,
+          "title": "Value",
+          "type": "string"
+        }
+      },
+      "required": [
+        "mode",
+        "value"
+      ],
+      "title": "QualifierExact",
+      "type": "object"
+    },
+    "QualifierNotApplicable": {
+      "additionalProperties": false,
+      "properties": {
+        "mode": {
+          "const": "not_applicable",
+          "title": "Mode",
+          "type": "string"
+        }
+      },
+      "required": [
+        "mode"
+      ],
+      "title": "QualifierNotApplicable",
+      "type": "object"
+    },
+    "QualifierOneOf": {
+      "additionalProperties": false,
+      "properties": {
+        "mode": {
+          "const": "one_of",
+          "title": "Mode",
+          "type": "string"
+        },
+        "values": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Values",
+          "type": "array"
+        }
+      },
+      "required": [
+        "mode",
+        "values"
+      ],
+      "title": "QualifierOneOf",
+      "type": "object"
+    },
+    "TurnEvalGoldForbiddenClaim": {
+      "additionalProperties": false,
+      "properties": {
+        "gold_id": {
+          "maxLength": 64,
+          "pattern": "^[gf]-[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "title": "Gold Id",
+          "type": "string"
+        },
+        "description": {
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        },
+        "severity": {
+          "$ref": "#/$defs/FailureSeverity"
+        }
+      },
+      "required": [
+        "gold_id",
+        "description",
+        "severity"
+      ],
+      "title": "TurnEvalGoldForbiddenClaim",
+      "type": "object"
+    },
+    "TurnEvalGoldObservation": {
+      "additionalProperties": false,
+      "properties": {
+        "gold_id": {
+          "maxLength": 64,
+          "pattern": "^[gf]-[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "title": "Gold Id",
+          "type": "string"
+        },
+        "requirement": {
+          "$ref": "#/$defs/GoldRequirement"
+        },
+        "label_status": {
+          "$ref": "#/$defs/GoldLabelStatus",
+          "default": "adjudicated"
+        },
+        "semantic_target": {
+          "minLength": 1,
+          "title": "Semantic Target",
+          "type": "string"
+        },
+        "allowed_subjects": {
+          "items": {
+            "$ref": "#/$defs/EvidenceSubject"
+          },
+          "minItems": 1,
+          "title": "Allowed Subjects",
+          "type": "array"
+        },
+        "allowed_kinds": {
+          "items": {
+            "$ref": "#/$defs/EvidenceKind"
+          },
+          "minItems": 1,
+          "title": "Allowed Kinds",
+          "type": "array"
+        },
+        "source_anchors": {
+          "items": {
+            "$ref": "#/$defs/GoldSourceAnchor"
+          },
+          "minItems": 1,
+          "title": "Source Anchors",
+          "type": "array"
+        },
+        "qualifiers": {
+          "$ref": "#/$defs/GoldQualifierExpectations"
+        },
+        "correction_target_evidence_keys": {
+          "default": [],
+          "items": {
+            "maxLength": 64,
+            "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$",
+            "type": "string"
+          },
+          "title": "Correction Target Evidence Keys",
+          "type": "array"
+        },
+        "severity_if_missed": {
+          "$ref": "#/$defs/FailureSeverity"
+        },
+        "rationale": {
+          "minLength": 1,
+          "title": "Rationale",
+          "type": "string"
+        }
+      },
+      "required": [
+        "gold_id",
+        "requirement",
+        "semantic_target",
+        "allowed_subjects",
+        "allowed_kinds",
+        "source_anchors",
+        "qualifiers",
+        "severity_if_missed",
+        "rationale"
+      ],
+      "title": "TurnEvalGoldObservation",
+      "type": "object"
+    },
+    "UserSignal": {
+      "enum": [
+        "answer",
+        "clarification",
+        "correction",
+        "dont_know",
+        "decline",
+        "stop",
+        "off_topic",
+        "mixed"
+      ],
+      "title": "UserSignal",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "turn_eval_gold.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "case_id": {
+      "maxLength": 64,
+      "pattern": "^TI-[0-9]{2}-[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "title": "Case Id",
+      "type": "string"
+    },
+    "allowed_user_signals": {
+      "items": {
+        "$ref": "#/$defs/UserSignal"
+      },
+      "minItems": 1,
+      "title": "Allowed User Signals",
+      "type": "array"
+    },
+    "allowed_episode_signals": {
+      "items": {
+        "$ref": "#/$defs/EpisodeSignal"
+      },
+      "minItems": 1,
+      "title": "Allowed Episode Signals",
+      "type": "array"
+    },
+    "expected_commit": {
+      "$ref": "#/$defs/ExpectedCommit"
+    },
+    "observations": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/TurnEvalGoldObservation"
+      },
+      "title": "Observations",
+      "type": "array"
+    },
+    "forbidden_claims": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/TurnEvalGoldForbiddenClaim"
+      },
+      "title": "Forbidden Claims",
+      "type": "array"
+    },
+    "required_insufficiencies": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/InsufficiencyReason"
+      },
+      "title": "Required Insufficiencies",
+      "type": "array"
+    },
+    "allowed_insufficiencies": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/InsufficiencyReason"
+      },
+      "title": "Allowed Insufficiencies",
+      "type": "array"
+    },
+    "state_expectation": {
+      "$ref": "#/$defs/GoldStateExpectation"
+    }
+  },
+  "required": [
+    "schema_version",
+    "case_id",
+    "allowed_user_signals",
+    "allowed_episode_signals",
+    "expected_commit",
+    "state_expectation"
+  ],
+  "title": "Caliburn interview vNext turn eval gold criteria v1",
+  "type": "object",
+  "$id": "https://caliburn.local/schemas/turn-eval-gold.v1.schema.json"
+}

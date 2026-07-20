@@ -1,0 +1,27 @@
+{
+  "schema_version": "context_policy.v1",
+  "name": "episode-code",
+  "version": "1.0.0",
+  "operation_name": "episode.code",
+  "max_utf8_bytes": 262144,
+  "reserved_output_tokens": 12288,
+  "token_estimator": {
+    "name": "utf8-codepoint-heuristic",
+    "version": "1.0.0"
+  },
+  "section_order": [
+    "injection_boundary",
+    "episode_identity",
+    "positive_evidence",
+    "excluded_or_negative_evidence",
+    "contradictions",
+    "existing_candidates",
+    "reference_snippets",
+    "authority_rules"
+  ],
+  "max_evidence_items": 256,
+  "max_contradiction_items": 64,
+  "max_candidate_items": 128,
+  "max_reference_snippets": 8,
+  "policy_hash": "sha256:0d85a4d4e03f9fd7a46e3af5983227c41ec12a7da932af9cb284d4c66f90e1e3"
+}

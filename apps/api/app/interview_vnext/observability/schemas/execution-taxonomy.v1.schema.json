@@ -1,0 +1,53 @@
+{
+  "additionalProperties": false,
+  "description": "Versioned allowlist; event fields remain open strings rather than Literals.",
+  "properties": {
+    "schema_version": {
+      "const": "execution_taxonomy.v1",
+      "default": "execution_taxonomy.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "taxonomy_id": {
+      "maxLength": 128,
+      "minLength": 1,
+      "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+      "title": "Taxonomy Id",
+      "type": "string"
+    },
+    "version": {
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(?:-[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?(?:\\+[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?$",
+      "title": "Version",
+      "type": "string"
+    },
+    "event_types": {
+      "items": {
+        "maxLength": 128,
+        "minLength": 1,
+        "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+        "type": "string"
+      },
+      "title": "Event Types",
+      "type": "array"
+    },
+    "stages": {
+      "items": {
+        "maxLength": 128,
+        "minLength": 1,
+        "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+        "type": "string"
+      },
+      "title": "Stages",
+      "type": "array"
+    }
+  },
+  "required": [
+    "taxonomy_id",
+    "version",
+    "event_types",
+    "stages"
+  ],
+  "title": "Caliburn interview vNext execution taxonomy v1",
+  "type": "object",
+  "$id": "https://caliburn.local/schemas/execution-taxonomy.v1.schema.json"
+}

@@ -1,0 +1,30 @@
+{
+  "id": "gen-fx-multi-choice",
+  "object": "chat.completion",
+  "created": 1780000220,
+  "model": "testlab/analyst-large",
+  "choices": [
+    {
+      "index": 0,
+      "finish_reason": "stop",
+      "native_finish_reason": "stop",
+      "message": {"role": "assistant", "content": "{\"a\": 1}"}
+    },
+    {
+      "index": 1,
+      "finish_reason": "stop",
+      "native_finish_reason": "stop",
+      "message": {"role": "assistant", "content": "{\"b\": 2}"}
+    }
+  ],
+  "usage": {"prompt_tokens": 700, "completion_tokens": 20, "total_tokens": 720},
+  "openrouter_metadata": {
+    "requested": "testlab/analyst-large",
+    "strategy": "direct",
+    "attempt": 1,
+    "endpoints": [
+      {"provider": "TestHost", "model": "testlab/analyst-large", "selected": true}
+    ],
+    "pipeline": []
+  }
+}

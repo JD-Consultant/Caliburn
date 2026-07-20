@@ -17,6 +17,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from app.interview import coverage as CO
 from app.interview.schema_utils import _obj, _s, _variant
+from app.interview.trace_utils import canonical_hash
 from app.interview.verify import normalize, quote_verified
 
 logger = logging.getLogger(__name__)
@@ -76,6 +77,11 @@ class CurationResult:
     declined: list[dict] = field(default_factory=list)   # {key,quote}(→ ledger_state)
     guard_log: list[str] = field(default_factory=list)
     failed: bool = False                                  # 重試仍敗(fail-closed 空結果)
+    llm_called: bool = False
+    attempt_count: int = 0
+    outcome: str = "success"
+    prompt_hash: str | None = None
+    tool_schema_hash: str | None = None
 
 
 def apply_curation(records: list[dict], *, pool_tasks: list[dict],
@@ -164,17 +170,29 @@ async def curation_pass(llm, *, pool_tasks: list[dict], employee_texts: list[str
     menu = "\n".join(f"- {p['key']}:{p['name']}({p.get('unit') or ''})" for p in pool_tasks)
     said = "\n".join(employee_texts[-12:])
     prompt = f"{CURATION_SYS}\n\n官方任務候選:\n{menu}\n\n員工至今發言:\n{said}"
+    first_prompt_hash = canonical_hash(prompt)
+    schema_hash = canonical_hash(schema)
     for attempt in range(max_retry + 1):
         try:
             data = await llm.select_schema(prompt, schema, role="select",
                                            schema_name="curation_output")
             records = [r.model_dump() for r in CurationOutput.model_validate(data).records]
-            return apply_curation(records, pool_tasks=pool_tasks,
-                                  employee_texts=employee_texts)
+            res = apply_curation(records, pool_tasks=pool_tasks,
+                                 employee_texts=employee_texts)
+            res.llm_called = True
+            res.attempt_count = attempt + 1
+            res.prompt_hash = first_prompt_hash
+            res.tool_schema_hash = schema_hash
+            return res
         except Exception as exc:  # noqa: BLE001  (pydantic/provider 皆 fail-closed)
             logger.warning("curation 抽取不合法(attempt %d):%s", attempt, str(exc)[:160])
             prompt = (f"{prompt}\n(上次輸出不合法:{str(exc)[:120]}——請修正重出;"
                       f"無可判就回 records=[{{\"type\":\"none\"}}])")
     res = CurationResult()
     res.failed = True
+    res.llm_called = True
+    res.attempt_count = max_retry + 1
+    res.outcome = "parse_failure"
+    res.prompt_hash = first_prompt_hash
+    res.tool_schema_hash = schema_hash
     return res

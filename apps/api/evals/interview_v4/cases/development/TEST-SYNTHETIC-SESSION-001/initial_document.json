@@ -1,0 +1,6 @@
+{
+  "schema_version": "unavailable_fixture.v0.1",
+  "available": false,
+  "fixture": "initial_document",
+  "reason": "Production history retained only the latest mutable draft at export time."
+}

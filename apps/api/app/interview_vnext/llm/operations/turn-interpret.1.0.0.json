@@ -1,0 +1,39 @@
+{
+  "schema_version": "llm_operation_definition.v1",
+  "name": "turn.interpret",
+  "version": "1.0.0",
+  "input_contract": {
+    "name": "turn-interpret-input",
+    "version": "1.0.0",
+    "content_hash": "sha256:9c40743a80400e18c22334002376544d48c89745be12fd0f353918ac525d06f8"
+  },
+  "output_contract": {
+    "name": "turn-interpret-output",
+    "version": "1.0.0",
+    "content_hash": "sha256:3fd844ed53ee1e65cb115293790184d3b1fe6564c69d7787332c9b0bb3d93d05"
+  },
+  "prompt_template": {
+    "name": "turn-interpret",
+    "version": "1.0.0",
+    "content_hash": "sha256:2f8214d02ec3d75a940922e4c1d4b929d7f7180f821bc9ac2f086ca0d79eb42f"
+  },
+  "context_policy": {
+    "name": "turn-interpret",
+    "version": "1.0.0",
+    "content_hash": "sha256:460a4e1d3074e1d5ab2be96e01b4cfee57c78843d476b2bf7c51d77508973f1b"
+  },
+  "quality_profile": "turn-interpret-verifier-v1",
+  "timeout_ms": 120000,
+  "max_attempts": 3,
+  "max_output_tokens": 8192,
+  "allowed_tools": [],
+  "repair_policy": {
+    "schema_repair_attempts": 1,
+    "semantic_repair_attempts": 0
+  },
+  "safety_policy_flags": [
+    "no-chain-of-thought",
+    "untrusted-input-boundary"
+  ],
+  "definition_hash": "sha256:9e86be181a4b3755f02f5c97a24690ba761fba5b4d6ab975c93e0e414ade86f8"
+}

@@ -1,0 +1,65 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "interview_turn_trajectory.v0.1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "turn_seq": {
+      "minimum": 1,
+      "title": "Turn Seq",
+      "type": "integer"
+    },
+    "state_before_hash": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "State Before Hash",
+      "type": "string"
+    },
+    "document_before_hash": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Document Before Hash",
+      "type": "string"
+    },
+    "state_after_hash": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "State After Hash",
+      "type": "string"
+    },
+    "document_after_hash": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Document After Hash",
+      "type": "string"
+    },
+    "model_call_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Model Call Ids",
+      "type": "array"
+    },
+    "stop_or_transition_reason": {
+      "minLength": 1,
+      "title": "Stop Or Transition Reason",
+      "type": "string"
+    },
+    "limitations": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Limitations",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "turn_seq",
+    "state_before_hash",
+    "document_before_hash",
+    "state_after_hash",
+    "document_after_hash",
+    "stop_or_transition_reason"
+  ],
+  "title": "TurnTrajectory",
+  "type": "object"
+}

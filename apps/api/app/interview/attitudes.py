@@ -11,6 +11,7 @@ import logging
 from dataclasses import dataclass, field
 
 from app.interview.schema_utils import _obj, _s
+from app.interview.trace_utils import canonical_hash
 from app.interview.verify import quote_verified
 from app.interview.coverage import MAX_A
 
@@ -35,6 +36,11 @@ class AttitudesResult:
     proposals: list[dict] = field(default_factory=list)   # {pool_id,name,quote,rationale}
     guard_log: list[str] = field(default_factory=list)
     failed: bool = False
+    llm_called: bool = False
+    attempt_count: int = 0
+    outcome: str = "success"
+    prompt_hash: str | None = None
+    tool_schema_hash: str | None = None
 
     def to_suggestions(self) -> list[dict]:
         """轉建議層(員工確認才落;quote+rationale 入 reason 供人審)。"""
@@ -58,10 +64,15 @@ async def attitudes_pass(llm, *, pool: list[str], pool_items: dict[str, str],
     menu = "\n".join(f"- {p}:{pool_items.get(p, '')}" for p in candidates)
     prompt = (f"{ATTITUDES_SYS}\n\n官方態度池(只能從這挑):\n{menu}\n\n"
               f"<逐字稿>\n" + "\n".join(employee_texts) + "\n</逐字稿>")
+    schema = attitudes_schema(candidates)
+    res.llm_called = True
+    res.prompt_hash = canonical_hash(prompt)
+    res.tool_schema_hash = canonical_hash(schema)
     data = None
     for attempt in range(max_retry + 1):
+        res.attempt_count = attempt + 1
         try:
-            data = await llm.select_schema(prompt, attitudes_schema(candidates),
+            data = await llm.select_schema(prompt, schema,
                                            role="select", schema_name="attitudes_wrapup")
             break
         except Exception as exc:  # noqa: BLE001
@@ -69,6 +80,7 @@ async def attitudes_pass(llm, *, pool: list[str], pool_items: dict[str, str],
             prompt = f"{prompt}\n(上次輸出不合法:{str(exc)[:120]}——請修正重出)"
     if data is None:
         res.failed = True
+        res.outcome = "parse_failure"
         return res
 
     seen: set[str] = set()

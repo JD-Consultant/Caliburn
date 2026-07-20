@@ -1,0 +1,177 @@
+{
+  "$defs": {
+    "QuantitativeThreshold": {
+      "additionalProperties": false,
+      "properties": {
+        "expression": {
+          "minLength": 1,
+          "title": "Expression",
+          "type": "string"
+        },
+        "source_type": {
+          "$ref": "#/$defs/ThresholdSourceType"
+        },
+        "source_id": {
+          "minLength": 1,
+          "title": "Source Id",
+          "type": "string"
+        },
+        "evidence_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Evidence Id"
+        }
+      },
+      "required": [
+        "expression",
+        "source_type",
+        "source_id"
+      ],
+      "title": "QuantitativeThreshold",
+      "type": "object"
+    },
+    "ReviewAction": {
+      "enum": [
+        "accept",
+        "edit",
+        "reject"
+      ],
+      "title": "ReviewAction",
+      "type": "string"
+    },
+    "ReviewDecision": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "review_decision.v1",
+          "default": "review_decision.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "review_id": {
+          "format": "uuid",
+          "title": "Review Id",
+          "type": "string"
+        },
+        "session_id": {
+          "format": "uuid",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "candidate_id": {
+          "format": "uuid",
+          "title": "Candidate Id",
+          "type": "string"
+        },
+        "reviewer_id": {
+          "format": "uuid",
+          "title": "Reviewer Id",
+          "type": "string"
+        },
+        "action": {
+          "$ref": "#/$defs/ReviewAction"
+        },
+        "edited_statement": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Edited Statement"
+        },
+        "edited_thresholds": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/QuantitativeThreshold"
+          },
+          "title": "Edited Thresholds",
+          "type": "array"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reason"
+        },
+        "decided_at": {
+          "format": "date-time",
+          "title": "Decided At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "review_id",
+        "session_id",
+        "candidate_id",
+        "reviewer_id",
+        "action",
+        "decided_at"
+      ],
+      "title": "ReviewDecision",
+      "type": "object"
+    },
+    "ThresholdSourceType": {
+      "enum": [
+        "employee_evidence",
+        "approved_policy",
+        "human"
+      ],
+      "title": "ThresholdSourceType",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "command_id": {
+      "format": "uuid",
+      "title": "Command Id",
+      "type": "string"
+    },
+    "expected_state_version": {
+      "minimum": 0,
+      "title": "Expected State Version",
+      "type": "integer"
+    },
+    "occurred_at": {
+      "format": "date-time",
+      "title": "Occurred At",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "apply_review_decision_command.v1",
+      "default": "apply_review_decision_command.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "decision": {
+      "$ref": "#/$defs/ReviewDecision"
+    }
+  },
+  "required": [
+    "command_id",
+    "expected_state_version",
+    "occurred_at",
+    "decision"
+  ],
+  "title": "Caliburn interview vNext apply review decision command v1",
+  "type": "object",
+  "$id": "https://caliburn.local/schemas/apply-review-decision-command.v1.schema.json"
+}

@@ -1,0 +1,90 @@
+{
+  "schema_version": "turn_eval_gold.v1",
+  "case_id": "TI-10-unknown-correction-target",
+  "allowed_user_signals": [
+    "correction"
+  ],
+  "allowed_episode_signals": [
+    "continue"
+  ],
+  "expected_commit": "evidence",
+  "observations": [
+    {
+      "gold_id": "g-correction-unknown-target",
+      "requirement": "required",
+      "semantic_target": "某項先前頻率更正為每季一次,但目標無法從語境確定",
+      "allowed_subjects": [
+        "employee"
+      ],
+      "allowed_kinds": [
+        "correction"
+      ],
+      "source_anchors": [
+        {
+          "turn_key": "employee-target",
+          "quote": "前面那個頻率我講錯了,應該是每季一次。",
+          "occurrence": 1
+        },
+        {
+          "turn_key": "employee-target",
+          "quote": "應該是每季一次",
+          "occurrence": 1
+        }
+      ],
+      "qualifiers": {
+        "time_scope": {
+          "mode": "exact",
+          "value": "current"
+        },
+        "typicality": {
+          "mode": "not_applicable"
+        },
+        "polarity": {
+          "mode": "exact",
+          "value": "affirmed"
+        },
+        "frequency_unit": {
+          "mode": "exact",
+          "value": "per_quarter"
+        },
+        "frequency_value": {
+          "mode": "not_applicable"
+        },
+        "importance": {
+          "mode": "one_of",
+          "values": [
+            "not_stated"
+          ]
+        },
+        "ownership": {
+          "mode": "exact",
+          "value": "owner"
+        }
+      },
+      "correction_target_evidence_keys": [],
+      "severity_if_missed": "major",
+      "rationale": "兩個 frequency candidates 都成立時,唯一安全行為是correction_target_unknown 並回報 insufficiency"
+    }
+  ],
+  "forbidden_claims": [
+    {
+      "gold_id": "f-guess-correction-target",
+      "description": "不得猜測任一 prior evidence 當更正目標並覆寫",
+      "severity": "critical"
+    }
+  ],
+  "required_insufficiencies": [
+    "correction_target_unknown"
+  ],
+  "allowed_insufficiencies": [
+    "ambiguous_frequency"
+  ],
+  "state_expectation": {
+    "state_hash_changed": true,
+    "prior_evidence_superseded_keys": [],
+    "forbidden_superseded_keys": [
+      "prior-inventory-report-frequency",
+      "prior-complaint-report-frequency"
+    ]
+  }
+}

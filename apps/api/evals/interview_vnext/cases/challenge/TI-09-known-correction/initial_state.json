@@ -1,0 +1,34 @@
+{
+  "schema_version": "turn_eval_initial_fixture.v1",
+  "session_status_before_replay": "planned",
+  "activate_before_transcript": true,
+  "open_episode": {
+    "episode_key": "episode-main",
+    "target": "例行報表工作",
+    "opened_turn_key": "consultant-01"
+  },
+  "prior_evidence": [
+    {
+      "evidence_key": "prior-inventory-report-frequency",
+      "source_turn_key": "employee-prior",
+      "episode_key": "episode-main",
+      "subject": "employee",
+      "kind": "frequency",
+      "claim": "每週寄一次庫存報表",
+      "quote": "我每週寄一次庫存報表。",
+      "quote_occurrence": 1,
+      "qualifiers": {
+        "time_scope": "current",
+        "typicality": "typical",
+        "polarity": "affirmed",
+        "frequency": {
+          "value": null,
+          "unit": "per_week",
+          "verbatim": "每週"
+        },
+        "importance": "not_stated",
+        "ownership": "owner"
+      }
+    }
+  ]
+}

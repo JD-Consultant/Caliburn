@@ -1,0 +1,60 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "interview_verify_finding.v0.2",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "op_index": {
+      "minimum": 0,
+      "title": "Op Index",
+      "type": "integer"
+    },
+    "check": {
+      "enum": [
+        "contract",
+        "quote",
+        "src",
+        "permission",
+        "invariant",
+        "hygiene"
+      ],
+      "title": "Check",
+      "type": "string"
+    },
+    "reason_code": {
+      "minLength": 1,
+      "title": "Reason Code",
+      "type": "string"
+    },
+    "target_kind": {
+      "enum": [
+        "task",
+        "output",
+        "indicator",
+        "knowledge",
+        "skill",
+        "attitude",
+        "header",
+        "other"
+      ],
+      "title": "Target Kind",
+      "type": "string"
+    },
+    "retryable": {
+      "title": "Retryable",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "schema_version",
+    "op_index",
+    "check",
+    "reason_code",
+    "target_kind",
+    "retryable"
+  ],
+  "title": "VerifyFinding",
+  "type": "object"
+}

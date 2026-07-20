@@ -660,8 +660,13 @@ class OpenAIResponsesEvalAdapter(LlmPort):
             request, traversal.visible_items, created_at=completed_at
         )
         usage = _map_usage(response)
-        resolved_raw = response.model
-        resolved_model = resolved_raw or request.requested_model
+        # blank-only model 不是可用 fact:result 回退 requested(identity 欄位
+        # NonEmptyText),evidence 記 null + limitation(R4-C blocker 3 同類)。
+        raw_model = response.model
+        resolved_actual = (
+            raw_model if isinstance(raw_model, str) and raw_model.strip() else None
+        )
+        resolved_model = resolved_actual or request.requested_model
         generation_id = getattr(response, "id", None)
         base = dict(
             **_identity_fields(request, gateway_provider=self._config.provider),
@@ -677,7 +682,7 @@ class OpenAIResponsesEvalAdapter(LlmPort):
         # R4 §9.2:evidence 只記 actual response facts(model/ID);raw Responses
         # artifact 是 direct provider 的 route source authority(§4.5)。
         evidence = _openai_execution_evidence(
-            binding, request, resolved_model=resolved_raw, usage=usage,
+            binding, request, resolved_model=resolved_actual, usage=usage,
             request_id=request_id, generation_id=generation_id,
             raw_source=raw.ref,
         )

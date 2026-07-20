@@ -916,6 +916,31 @@ class TestAdapterResponseMatrix:
         assert report.reason_codes == ()
         assert_no_secret_anywhere(envelope)
 
+    async def test_blank_resolved_model_is_typed_envelope_not_exception(self):
+        """R4-C blocker 3(同類):blank `response.model` 不是可用 fact——result
+        回退 requested、evidence null 化,不得讓 NonEmptyText ValidationError 外洩。"""
+
+        body = json.loads(
+            (FIXTURES / "success_reasoning_then_message.json").read_text("utf-8")
+        )
+        body["model"] = "   "
+        adapter, _ = make_adapter(
+            lambda request: httpx.Response(
+                200, json=body, headers={"x-request-id": "req_fx_blank_model"}
+            )
+        )
+        envelope = await adapter.generate_structured(make_call())
+        assert envelope.result.outcome is ModelOutcome.SUCCEEDED
+        assert envelope.result.resolved_model == "gpt-5.6"
+        evidence = envelope.execution_evidence
+        assert evidence.gateway_resolved_model is None
+        assert evidence.upstream_model is None
+        report = conformance_report(envelope)
+        assert report.eligible is False
+        assert report.reason_codes == (
+            ConformanceReasonCode.ROUTE_METADATA_MISSING,
+        )
+
     async def test_prompt_cached_tokens_are_usage_not_response_cache_hit(self):
         """§12.3:input cached_tokens 只進 TokenUsage;cache_status 仍 ABSENT。"""
 

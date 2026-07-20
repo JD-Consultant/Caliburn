@@ -1355,11 +1355,85 @@ class TestRoutingContamination:
         assert envelope.execution_evidence.route_strategy == strategy
 
     async def test_router_attempt_gt_one_is_ineligible(self):
-        envelope = await self._run(clean_metadata(attempt=2))
+        # attempts 與 attempt=2 一致(真實 fallback retry 的誠實 metadata)。
+        envelope = await self._run(
+            clean_metadata(
+                attempt=2,
+                attempts=[
+                    {"provider": "TestHost", "model": REQUESTED_MODEL, "status": 503},
+                    {"provider": "TestHost", "model": REQUESTED_MODEL, "status": 200},
+                ],
+            )
+        )
         assert_wire_success_with_reasons(
             envelope, (ConformanceReasonCode.UPSTREAM_ATTEMPT_MISMATCH,)
         )
         assert envelope.execution_evidence.upstream_attempt_count == 2
+
+    async def test_two_attempts_with_lying_attempt_field_is_ineligible(self):
+        """R4-C blocker 2:attempt=1 但 attempts 有兩筆(同 provider)——
+        單次 direct execution 無法證立,不得 eligible。"""
+
+        envelope = await self._run(
+            clean_metadata(
+                attempt=1,
+                attempts=[
+                    {"provider": "TestHost", "model": REQUESTED_MODEL, "status": 503},
+                    {"provider": "TestHost", "model": REQUESTED_MODEL, "status": 200},
+                ],
+            )
+        )
+        assert_wire_success_with_reasons(
+            envelope, (ConformanceReasonCode.ROUTE_METADATA_MISSING,)
+        )
+        assert envelope.execution_evidence.upstream_attempt_count is None
+
+    async def test_explicit_null_pipeline_is_ineligible(self):
+        """R4-C blocker 1:`"pipeline": null` 不是官方省略語意,必須 unknown。"""
+
+        envelope = await self._run(clean_metadata(pipeline=None))
+        assert_wire_success_with_reasons(
+            envelope, (ConformanceReasonCode.TRANSFORMATION_INELIGIBLE,)
+        )
+        evidence = envelope.execution_evidence
+        assert evidence.transformation_status == TransformationStatus.UNKNOWN
+        assert evidence.pipeline_stages == ()
+
+    async def test_blank_strategy_is_typed_envelope_not_exception(self):
+        """R4-C blocker 3:blank metadata 值必須回受控 envelope,不得讓
+        evidence ValidationError 外洩。"""
+
+        envelope = await self._run(clean_metadata(strategy=" "))
+        assert_wire_success_with_reasons(
+            envelope, (ConformanceReasonCode.ROUTE_METADATA_MISSING,)
+        )
+        assert envelope.execution_evidence.route_strategy is None
+
+    async def test_blank_selected_provider_is_typed_envelope_not_exception(self):
+        envelope = await self._run(
+            clean_metadata(
+                endpoints=[{"provider": " ", "model": "\t", "selected": True}]
+            )
+        )
+        assert_wire_success_with_reasons(
+            envelope, (ConformanceReasonCode.ROUTE_METADATA_MISSING,)
+        )
+        evidence = envelope.execution_evidence
+        assert evidence.upstream_provider is None
+        assert evidence.upstream_model is None
+
+    async def test_blank_body_model_is_typed_protocol_failure(self):
+        body = success_body(model="   ")
+        adapter, calls = make_adapter(lambda request: respond(body))
+        envelope = await adapter.generate_structured(make_call())
+        assert len(calls) == 1
+        assert_failure(
+            envelope,
+            kind=FailureKind.UNKNOWN_PROVIDER_FAILURE,
+            reason_code="openrouter.protocol_invalid",
+            retryable=False,
+        )
+        assert envelope.execution_evidence.gateway_resolved_model is None
 
     async def test_selected_provider_mismatch_keeps_actual_provider(self):
         envelope = await self._run(
@@ -1615,7 +1689,13 @@ class TestWireFailureKeepsRouteFacts:
 
     async def test_refusal_with_contaminated_route_keeps_facts(self):
         body = fixture_json("content-filter.json")
-        body["openrouter_metadata"] = clean_metadata(attempt=2)
+        body["openrouter_metadata"] = clean_metadata(
+            attempt=2,
+            attempts=[
+                {"provider": "TestHost", "model": REQUESTED_MODEL, "status": 503},
+                {"provider": "TestHost", "model": REQUESTED_MODEL, "status": 200},
+            ],
+        )
         adapter, _ = make_adapter(lambda request: respond(body))
         envelope = await adapter.generate_structured(make_call())
         assert envelope.result.outcome == ModelOutcome.REFUSED

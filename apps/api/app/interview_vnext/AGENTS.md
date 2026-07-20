@@ -23,11 +23,14 @@ This package implements ADR 0034 and the 2026-07-16 greenfield architecture.
 - V2-B implementation handoff: `docs/plans/2026-07-16-interview-vnext-v2b-durable-persistence-plan.md`
 - Runtime contract decision: `docs/adr/0036-interview-vnext-provider-binding-conformance-and-idless-turn-v2.md`
 - Active implementation handoff: `docs/plans/2026-07-18-interview-vnext-v3-5a-runtime-contract-reconstruction-plan.md`
-- Active R4 detailed handoff: `docs/plans/2026-07-19-interview-vnext-v3-5a-r4-provider-evidence-conformance-plan.md`
+- Completed R4 provider evidence/conformance evidence: `docs/plans/2026-07-19-interview-vnext-v3-5a-r4-provider-evidence-conformance-plan.md`
 - Completed R3 corrective evidence: `docs/plans/2026-07-19-interview-vnext-v3-5a-r3-corrective-plan.md`
 
-R3-C has passed its no-network and real PostgreSQL gates; R4 is the active next implementation slice.
-Paid live remains blocked until the V3-5A R4–R7 prerequisites and R8 checklist are complete.
+R4 has passed its no-network and real PostgreSQL gates (commits `aee798a`/`a814789`/`067504b`; evidence
+in the R4 plan §19): provider adapters report wire results plus normalized execution evidence only, and
+eligibility is decided by the application conformance policy. R5 (Turn Interpreter C1 v2) is the active
+next implementation slice.
+Paid live remains blocked until the V3-5A R5–R7 prerequisites and R8 checklist are complete.
 Until V3-5A passes its new live gate, V3-6, production routes, Web wiring, provider promotion,
 direct-vendor adapters, and migration 0011 are blocked. The active turn contract target is
 `turn.interpret/2.0.0`; do not patch or create new runs with `turn.interpret/1.0.0`.

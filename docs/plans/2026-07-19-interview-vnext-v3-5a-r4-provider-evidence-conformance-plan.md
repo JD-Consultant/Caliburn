@@ -1,7 +1,7 @@
 # Interview AI vNext V3-5A R4——Provider wire evidence 與 conformance eligibility 分離實作交接規格
 
-- 日期：2026-07-19
-- 狀態：**Ready for implementation；本文件只完成研究、設計與交接，R4 程式尚未實作**
+- 日期：2026-07-19（實作完成回寫：2026-07-20）
+- 狀態：**已完成；R4-1～R4-4 全部落地並通過驗收，執行結果與逐項回報見 §19**
 - 上位決策：[`../adr/0036-interview-vnext-provider-binding-conformance-and-idless-turn-v2.md`](../adr/0036-interview-vnext-provider-binding-conformance-and-idless-turn-v2.md)
 - 母計畫：[`2026-07-18-interview-vnext-v3-5a-runtime-contract-reconstruction-plan.md`](2026-07-18-interview-vnext-v3-5a-runtime-contract-reconstruction-plan.md)
 - R3-C baseline：[`2026-07-19-interview-vnext-v3-5a-r3-corrective-plan.md`](2026-07-19-interview-vnext-v3-5a-r3-corrective-plan.md)
@@ -1101,3 +1101,90 @@ R4 完成只代表 provider boundary 能正確區分 wire facts 與 attribution 
 - prompt/operation/schema/verifier identities hard cut。
 
 仍不得直接跳到 paid 12×3 live batch。R5、R6、R7全部通過後，owner 才在 R8 checklist下核准 true-live。
+
+---
+
+## 19. R4 執行結果與逐項回報（2026-07-20 實作完成）
+
+依 §17 格式逐項回報。
+
+1. **Commits**（Author/Committer 均為 `ArIs0x145 <aris0x145@gmail.com>`）：
+   - R4-1 `aee798a` — `feat(evals): normalize OpenRouter execution facts`；
+   - R4-2 `a814789` — `refactor(evals): separate OpenRouter wire results from conformance`；
+   - R4-3 `067504b` — `refactor(evals): align OpenAI reference evidence with conformance`；
+   - R4-4 — 本 status close commit（`docs(interview): close R4 provider conformance separation`）。
+2. **檔案**：新增 `evals/interview_vnext/providers/openrouter_routing.py`、
+   `tests/test_interview_vnext_openrouter_routing.py`；修改 `providers/openrouter_chat.py`、
+   `providers/openai_responses.py`、`openrouter_live_probe.py`、`live_probe.py`、`scheduler.py`、
+   openrouter_chat fixtures（`success.json`/`manifest.json`/`README.md`）、
+   `test_interview_vnext_openrouter_eval_adapter.py`、`test_interview_vnext_openrouter_live_probe.py`、
+   `test_interview_vnext_openai_eval_adapter.py`、`test_interview_vnext_openai_live_probe.py`、
+   `test_interview_vnext_llm_conformance.py`、`test_interview_vnext_turn_eval_openrouter.py`；
+   §11.5 的「原則上不修改」清單（executor/durable/port schemas/persistence/interpreter/production）
+   **零改動**。
+3. **Neutral schema/version**：無變更（`model_call_result.v2`、`model_call_envelope.v2`、
+   `provider_execution_evidence.v1`、`provider_conformance_report.v1`、`attribution-strict/1.0.0`）；
+   schema guard `test_interview_vnext_schemas.py` + `test_interview_vnext_execution_schemas.py` 綠。
+4. **Routing artifact schema version**：`openrouter_routing.v2`（無 `eligible`/`conformance`/
+   `pipeline_clean`；含 `metadata_requested_model`/`selected_count`/`pipeline_stage_summaries`/
+   `transformation_status`/`cache_status`/`cache_header_value`/`normalization_limitations`）。
+5. **Endpoint decoder**：official nested `endpoints.available[]`（`success.json` 已改用）與 legacy
+   flat array（`resolved-model-mismatch.json` 保留）均可讀；nested `selected` 與 available 重複只算
+   一筆；均有 pure tests。
+6. **Pipeline classification**：guardrail／legacy moderation/content_filter → `inspected`；
+   context_compression／response_healing／server_tools／known plugin（web/web-search/file-parser）
+   ／rewrite/redaction/message-transform alias → `mutated`；unknown type/name/非 object stage →
+   `unknown` + `details_hash=canonical_hash(raw_stage)` opaque 保留；整體 `unknown > mutated >
+   inspected`；`pipeline` 非 array → overall unknown + limitation。
+7. **Cache**：`X-OpenRouter-Cache-Status` HIT/MISS 直判；header 缺失＋metadata present → `absent`；
+   header 缺失＋metadata missing → `unknown`＋limitation；unknown header 值 → `unknown`＋limitation；
+   zero-usage/zero-cost 不推導 cache hit（測試明確覆蓋）。
+8. **Contamination = wire success + ineligible**：每個向量三段式驗證
+   （`outcome is SUCCEEDED`＋`parsed_output is not None`＋`failure is None`，再
+   `evaluate_conformance()` 斷言 `eligible=False` 與 exact sorted reasons）；conformance-only failure
+   無 `ModelFailure`/error artifact，raw/routing/visible artifacts 保留。
+9. **Exact reason codes**（代表向量）：metadata missing →
+   `[cache_ineligible, route_metadata_missing, transformation_ineligible]`；requested mismatch／
+   multiple selected／attempts conflict → `[route_metadata_missing]`；strategy 非 direct →
+   `[route_strategy_mismatch]`；attempt>1 → `[upstream_attempt_mismatch]`；provider mismatch →
+   `[route_metadata_missing, upstream_provider_mismatch]`；unbound selected model →
+   `[route_metadata_missing, upstream_model_mismatch]`；pipeline 任一 stage →
+   `[pipeline_not_empty, transformation_ineligible]`；cache HIT（metadata present）→
+   `[cache_ineligible]`；top-level model mismatch → `[gateway_model_mismatch]`。
+10. **Invalid output + contamination**：仍是 wire `output_parse_failed`（authority 是 wire failure、
+    retryability 不被 conformance 改寫）；evidence 仍保存 actual route facts；conformance 只回
+    `wire_not_succeeded`。error response 的 route metadata 亦進 evidence（429＋metadata 測試）。
+11. **OpenAI reference**：clean completed → wire succeeded＋同一 neutral evaluator eligible；
+    resolved model mismatch → wire succeeded＋`[gateway_model_mismatch, upstream_model_mismatch]`；
+    `cached_tokens` 只進 `TokenUsage`（cache_status 仍 `absent`）；`response.id`/`_request_id` 映射
+    到 evidence；raw Responses artifact 為 §4.5 direct route source（在 supporting artifacts 且
+    evidence 引用）；refusal/incomplete/failed/cancelled/nonterminal/invalid output wire 語意不變；
+    `openai==2.46.0` lock、request body、`max_retries=0` 單次 transport call 不變。
+12. **Probes**：兩個 probe 均 hard cut 到 `INTERVIEW_VNEXT_EXECUTION_V2`；artifact IDs
+    `UUIDv5(attempt_id, "provider-execution-evidence")`/`UUIDv5(attempt_id, "provider-conformance")`；
+    `model.call.completed/failed` output tail `(*supporting, result, evidence)`；
+    `provider.conformance.completed` input `(binding, evidence)`、output `(conformance,)`、status
+    eligible=ok／wire-success-ineligible=failed／wire-fail=skipped；manifest roots 含
+    binding/config/projection/result/evidence/conformance closure，Capture validator 重驗綠；
+    report 升 `openrouter_live_probe_report.v2`／`live_probe_report.v2`（含 binding/evidence/
+    conformance hash、reason codes、transformation/cache、artifact IDs；v1 `route_conformance`
+    verdict 移除）；bundle corruption（移除 evidence/conformance root、竄改 conformance event
+    inputs）驗證失敗測試通過；no key 仍 exit 2 零副作用。
+13. **Transport counts**：429/500/timeout 各 exact 1 次 HTTP call（既有測試維持綠）。
+14. **Focused 測試逐檔**：`openrouter_routing` 65、`llm_conformance` 54、`openrouter_eval_adapter` 102、
+    `openrouter_live_probe` 11、`openai_eval_adapter` 66、`openai_live_probe` 7、
+    `turn_eval_openrouter` 14 passed／2 skipped（skip 為 real-PG orchestration，於 §14.4 gate 以
+    TEST_DATABASE_URL 補跑並綠）。
+15. **完整 no-network**：`927 passed, 197 skipped, 0 failed`。
+16. **Real PostgreSQL**：focused 四檔 `57 passed, 0 skipped`；全部 `test_interview_vnext_*`＋real PG
+    `736 passed, 0 skipped, 0 failed`（R3-C baseline 653＋R4 新增）。
+17. **Dependency/schema guard**：`test_interview_vnext_dependencies.py`＋schemas＋execution schemas
+    `14 passed`；active generated schemas byte-equal、historical schemas 未改寫。
+18. **Alembic**：`0010 (head)`；無 migration `0011`。
+19. **Secret/reasoning scan**：adapter/probe secret 掃描測試全綠；reasoning redaction 測試維持；
+    repo 內無真實 key（僅 README `<secret>` 佔位與測試假 key）。
+20. **Cleanup**：real PG 測試走 per-test transaction rollback＋tenant-scoped cleanup；無 output
+    bundle、`.env` 或 key 進 git（`git status` 乾淨、hygiene grep 綠）。
+21. **明確確認**：未跑任何 paid/live（OpenRouter live、OpenAI live 均未執行）、未接
+    production route/Web、未新增 direct Anthropic/universal framework/第二 executor、未 push。
+22. **未完成項**：無；§16 Definition of Done 全項成立，不阻擋 R5（Turn Interpreter C1 v2）。

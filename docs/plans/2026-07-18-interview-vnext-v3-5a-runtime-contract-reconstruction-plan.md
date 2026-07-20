@@ -1,7 +1,7 @@
 # Interview AI vNext V3-5A——Runtime Binding、Conformance、Turn Interpreter C1 v2 實作交接規格
 
 - 日期：2026-07-18
-- 狀態：**R1–R3 與 R3-C corrective 已完成；R4 provider evidence/conformance 分離為下一個可實作切片**
+- 狀態：**R1–R4 已完成（含 R3-C corrective）；R5 Turn Interpreter C1 v2 為下一個可實作切片**
 - 決策：[`../adr/0036-interview-vnext-provider-binding-conformance-and-idless-turn-v2.md`](../adr/0036-interview-vnext-provider-binding-conformance-and-idless-turn-v2.md)
 - 研究：[`../specs/2026-07-18-interview-vnext-llm-runtime-architecture-review.md`](../specs/2026-07-18-interview-vnext-llm-runtime-architecture-review.md)
 - 前一階段：[`2026-07-18-interview-vnext-v3-5-turn-eval-harness-plan.md`](2026-07-18-interview-vnext-v3-5-turn-eval-harness-plan.md)
@@ -18,8 +18,10 @@ Anthropic direct、multi-agent、provider memory、production fallback或SQL mig
 R3 baseline commit `6ea5ed5412617cbae893e0baeab1abde6aa0d075` 的後續 code review 發現 binding/config、
 projection identity、durable gate、fresh-process recovery與Capture closure尚未完全符合本文件原訂驗收。
 上述缺口已由 R3-C commits `e1716c8`、`2cf3404`、`1eaa774` 修正並通過完整 no-network 與 real PostgreSQL
-驗收；R4 **實作** entry gate 已開啟。這不等於允許 paid live：paid live 仍須等 R4–R7 完成並依 R8 gate
-重新確認，V3-6／production route／Web／promotion 仍 blocked。
+驗收。R4 已依 detailed authority 以 commits `aee798a`（R4-1 pure routing normalizer）、`a814789`
+（R4-2 OpenRouter wire/evidence/probe/scheduler vertical cut）、`067504b`（R4-3 OpenAI mocked reference
+對齊）完成，驗收證據回寫於 R4 plan §19；R5 **實作** entry gate 已開啟。這不等於允許 paid live：
+paid live 仍須等 R5–R7 完成並依 R8 gate 重新確認，V3-6／production route／Web／promotion 仍 blocked。
 
 ---
 
@@ -1375,6 +1377,15 @@ artifact closure、terminal recovery revalidation與完整Capture roots。必須
 R3驗收現已成立；R4 entry gate 開啟，但不得把這份工程完整性證據解讀成模型品質或 live gate 通過。
 
 ### R4——Provider adapters v2
+
+**已完成（2026-07-20）**：commits `aee798a`（R4-1）、`a814789`（R4-2）、`067504b`（R4-3）＋本次
+status close。下方驗收逐項成立：outbound body/headers exact 測試不漂、429/500/timeout 各 1 次
+transport call、route contamination 回 wire success + 誠實 evidence + ineligible conformance report
+（payload 保留、無 error artifact）、unknown pipeline stage = unknown/ineligible + opaque hash、
+usage/cost/redaction/secret scan 維持、OpenAI reference 73 tests 全綠、`app/` 不 import `evals.*`。
+完整 no-network 927 passed／197 skipped／0 failed；interview_vnext + real PostgreSQL 736 passed／
+0 skipped；migration 仍 `0010 (head)`。exact 證據與逐項回報見
+[`R4 detailed implementation authority`](2026-07-19-interview-vnext-v3-5a-r4-provider-evidence-conformance-plan.md) §19。
 
 **Entry gate（2026-07-19 已通過）**：R3-C全部完成並已回寫exact測試證據；R4可開始實作。
 

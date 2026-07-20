@@ -1,13 +1,13 @@
 ---
-title: Interview vNext 專業職務分析、短回答 grounding 與 OCS/JD 共編架構研究
+title: Interview vNext 員工訪談、專業職務分析與即時 JD 共編架構研究
 status: proposed-research-not-implementation-authority
 date: 2026-07-20
-revision: 3
+revision: 4
 audience: owner, architect, implementer, evaluator
-scope: R5 前置設計；當下單一職務的訪談證據、職務模型、document-local K/S、authoring 與交付 projection
+scope: R5 前置設計；員工訪談、短回答、即時共編、當下單一職務、document-local K/S 與交付 projection
 ---
 
-# Interview vNext 專業職務分析、短回答 grounding 與 OCS/JD 共編架構研究
+# Interview vNext 員工訪談、專業職務分析與即時 JD 共編架構研究
 
 > 本文是 **R5 實作前的研究與提案**，不是新的 active implementation authority。現行實作 authority 仍是
 > [`2026-07-18-interview-vnext-v3-5a-runtime-contract-reconstruction-plan.md`](../plans/2026-07-18-interview-vnext-v3-5a-runtime-contract-reconstruction-plan.md)。
@@ -20,6 +20,11 @@ scope: R5 前置設計；當下單一職務的訪談證據、職務模型、docu
 >
 > 本階段產品只處理「一個人當下的工作 → 這一份專屬職務說明書」。客戶可能是公司、個人或其他單位，但不建立
 > 公司層 capability catalog、跨職務 K/S 共用、人才盤點或個人能力評分。這些都不是目前需求。
+>
+> **Revision 4（employee product correction）**：第一版不是 SaaS，也沒有另一位職務分析顧問負責審稿。
+> 使用者與最終決策者就是員工；AI 扮演專業顧問。員工可在訪談期間直接修改文件，AI 的新增、修改與刪除只能先形成
+> 可理解的 proposal，由員工接受、修改後採用或拒絕。共編不是訪談結束後才接上的附屬 editor，而是從第一輪就與
+> 對話同步的產品核心；但 editor UI 不得反向污染 R5 的 turn-grounding contract。
 
 ## 1. 結論先行
 
@@ -33,7 +38,8 @@ scope: R5 前置設計；當下單一職務的訪談證據、職務模型、docu
 6. 職能內涵 S（skills）；
 7. 必要時再加職能級別、態度、任職條件與整體工作描述。
 
-但這些欄位**不能全部由 R5 單輪模型直接產生**。最佳架構是：
+但這些欄位**不能全部由 R5 單輪模型直接產生**。員工看到的是「跟 AI 顧問對話，同時看著自己的 JD 逐步成形」；
+內部才拆成可驗證的 operations：
 
 ```text
 訪談原話／短回答
@@ -43,9 +49,9 @@ scope: R5 前置設計；當下單一職務的訪談證據、職務模型、docu
   -> Candidate Job Model（主要職責、任務、產出、指標）
   -> Optional Reference Coverage（查公版，判定 usable/partial/no-match）
   -> Document-local K/S Drafting（公版不足時依已確認 task 產候選）
-  -> Human Review（員工確認事實；顧問確認專業表述與 K/S linkage）
+  -> Employee Review（員工用白話確認符合工作、修改或拒絕）
   -> Canonical Job Model Revision
-  -> Authoring Workspace（新建或既有 UI adapter，由產品 gate 決定）
+  -> Live Authoring Workspace（員工也可隨時直接編輯）
   -> Deterministic Export（OCS JSON、JD、PDF、XLSX、API）
 ```
 
@@ -59,6 +65,11 @@ port；不因本需求新增多 Agent framework、session vector database 或把
 
 現有 OCS document、editor `_pending`、knowledge pack 與 Qdrant pipeline **不可直接被宣告為 canonical product core**。
 它們需分別接受 authoring fidelity、provenance、document-local K/S、retrieval quality、維運成本與 migration cost gate。
+
+**R5 現行計畫不可直接開工。**不是因為要先完成整個 editor，而是 R5 仍明文延後短答繼承問題 scope，且把
+「每天／每週／每月」同時當成 current marker；這兩點會直接造成自然訪談誤判。先凍結 QuestionFrame、
+AnswerBinding、contextual assertion 與 frequency/time 規則，再讓實作者寫 R5。文件 proposal UI、政府公版匯出與
+舊／新 editor 選型可以在這個最小 seam 之後處理，不必阻塞 R5。
 
 ## 2. 本次實際閱讀與盤點範圍
 
@@ -105,8 +116,13 @@ Competency-based Job Model**。
   -> 可追溯 Employee Evidence
   -> 任務／產出／指標／K/S 候選
   -> versioned authoring/review model
-  -> one or more delivery surfaces
+ -> one or more delivery surfaces
 ```
+
+現有 [`ADR 0030`](../adr/0030-ai-coedit-tracked-changes-one-brain.md) 的「AI 不可靜默改動、員工可接受／拒絕」方向可保留，
+但有兩個實作裁決與 Revision 4 衝突：它把 proposal 主要存為文件內 `_pending`，且人改內容只記 trace、不讓後續模型
+知道。新產品需要 canonical proposal/decision 與 `JobStateDigest`，否則 AI 會重問或重提員工已經親手改過的內容。本文
+核准後必須另寫 superseding ADR 指明替換哪些段落，不能讓實作者同時遵循兩套 authority。
 
 既有 contract 的 `CompetencyBlock.knowledge/skills` 只保存 `CodeName`，沒有 typed basis、evidence/reference closure 與
 review status。knowledge pack 又以原始字串精確比對去重。這些設計可作 OCS exchange/editor projection，但在決定
@@ -200,67 +216,69 @@ truth。
 ## 5. Recommended target architecture
 
 ```text
-┌───────────────────────────────────────────────────────────────┐
-│ Conversation Owner                                            │
-│ Question Policy -> response_text + persisted QuestionFrame    │
-└──────────────────────────────┬────────────────────────────────┘
-                               │
-                 employee answer: long or short
-                               │
-┌──────────────────────────────▼────────────────────────────────┐
-│ R5 Turn Grounder / Interpreter                                │
-│ dialogue act + literal observations + answer bindings         │
-└──────────────────────────────┬────────────────────────────────┘
-                               │ typed proposal
-┌──────────────────────────────▼────────────────────────────────┐
-│ Local gates                                                   │
-│ schema -> frame scope -> span -> binding -> semantic verifier │
-└──────────────────────────────┬────────────────────────────────┘
-                               │
-┌──────────────────────────────▼────────────────────────────────┐
-│ Deterministic Reducers                                        │
-│ Evidence / contextual assertion / correction / gap state      │
-└──────────────────────────────┬────────────────────────────────┘
-                               │ episode boundary
-┌──────────────────────────────▼────────────────────────────────┐
-│ Episode Coder                                                 │
-│ task/output/behavior candidates + unresolved gaps             │
-└──────────────────────────────┬────────────────────────────────┘
-                               │ selected task query
-┌──────────────────────────────▼────────────────────────────────┐
-│ Optional Official Reference Search                           │
-│ selected public sources -> hybrid retrieval -> bounded set    │
-└──────────────────────────────┬────────────────────────────────┘
-                               │ immutable candidate snapshot
-┌──────────────────────────────▼────────────────────────────────┐
-│ Document-local Requirement Drafting                           │
-│ usable/partial/no-match -> K/S items grounded in this job     │
-└──────────────────────────────┬────────────────────────────────┘
-                               │ reviewed K/S + task links
-┌──────────────────────────────▼────────────────────────────────┐
-│ Canonical Job Authoring Core                                  │
-│ revisions + proposals + decisions + provenance + publication │
-└──────────────────────────────┬────────────────────────────────┘
-                               │ deterministic projections
-┌──────────────────────────────▼────────────────────────────────┐
-│ Delivery Surfaces                                            │
-│ new workspace / legacy adapter / API / OCS / JD / PDF / XLSX │
-└───────────────────────────────────────────────────────────────┘
+┌──────────────────────── Employee Workspace ─────────────────────────┐
+│ AI 顧問對話                         Live JD canvas                  │
+│ 問問題／說明進度                    員工直接編輯（立即生效）       │
+│                                      AI 修改（先顯示 proposal）      │
+│                                      符合我的工作／修改／不符合     │
+└──────────────────┬──────────────────────────┬───────────────────────┘
+                   │ employee turn            │ document command/decision
+                   ▼                          ▼
+┌──────────────────────────┐      ┌───────────────────────────────────┐
+│ Conversation Core        │      │ Canonical Job Authoring Core      │
+│ QuestionFrame            │      │ entities + draft revisions        │
+│ R5 Turn Interpreter      │      │ employee commands                 │
+│ literal/contextual gates │      │ AI proposals + employee decisions │
+│ Evidence/Gap reducers    │      │ provenance + optimistic conflict  │
+└────────────┬─────────────┘      └────────────────┬──────────────────┘
+             │ grounded support                    │ accepted job state
+             └──────────────────┬──────────────────┘
+                                ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│ Context Engine / Workflow Policy                                    │
+│ minimal operation packet + current JobStateDigest + next best gap   │
+└───────────────┬───────────────────────────────┬─────────────────────┘
+                │                               │
+                ▼                               ▼
+┌────────────────────────────┐     ┌──────────────────────────────────┐
+│ Episode / Job Operations   │     │ Optional Official Reference Port │
+│ task/output/indicator/duty │     │ public task/O/P/K/S snapshots     │
+└──────────────┬─────────────┘     └────────────────┬─────────────────┘
+               └──────────────────────┬─────────────┘
+                                      ▼
+                         ┌──────────────────────────┐
+                         │ AI Document Proposals    │
+                         │ including document-local │
+                         │ K/S + task linkage       │
+                         └────────────┬─────────────┘
+                                      ▼ employee decision
+                         Canonical revision -> deterministic export
+                         internal JD / government OCS / PDF / XLSX
 ```
 
 這是 deterministic workflow with semantic decision points，不是一組角色互相聊天的 multi-agent system。
 任何 editor、API 或 retrieval engine 都是上述 domain ports 的 adapter，不得反過來決定 canonical model。
 
-## 6. 四種來源必須分開
+這張圖有兩條同等重要的輸入路徑：
+
+1. 員工在聊天中回答，由 R5 形成 literal evidence 或 contextual assertion；
+2. 員工在文件中直接編輯，由 Authoring Core 形成 employee-authored document assertion。
+
+第二條不送進 R5，也不假裝成 transcript quote。它直接成為目前 draft 的有效內容，並透過 `JobStateDigest` 讓
+Question Policy 知道哪些內容已填、哪些 gap 仍存在。AI 若要據此推導其他欄位，仍須建立有 support linkage 的
+proposal，不能把一次直接編輯無限外推。
+
+## 6. 五種來源必須分開
 
 | Source channel | 能證明什麼 | 不能證明什麼 |
 |---|---|---|
 | Employee literal evidence | 員工這一輪明說的事實與限定條件 | 未說出的 currentness、ownership、K/S、KPI |
 | Employee contextual answer | 員工對一個已持久化、可驗證 question frame 的確認／否認／slot value | 任意舊問題、複合 leading question 中未被清楚確認的所有假設 |
+| Employee document edit | 員工主動寫入或修改後採用的文件內容 | 不代表 transcript 曾說過，也不能自動支持其他衍生欄位 |
 | Reference knowledge | 官方名稱、定義、相似任務、O/P/K/S 候選及來源 | 員工實際有做、員工一定具備某技能 |
-| Human/policy | 顧問批准的表述、組織標準、人工輸入 KPI | 不可被偽裝成員工 quote |
+| AI inference / optional policy | 專業措辭、task linkage、候選標準或另行提供的規則 | 未經員工接受前不是這份 JD 的 accepted truth |
 
-任何 projected job claim 都要保存來源類型。reference relevance、employee actuality、human approval 是三個不同
+任何 projected job claim 都要保存來源類型。reference relevance、employee actuality、employee approval 是三個不同
 判斷，不得合併成一個模糊 confidence score。
 
 ## 7. 短回答不能靠完整 transcript 猜
@@ -295,6 +313,8 @@ QuestionFrame.v1
   consultant_turn_id
   episode_id | null
   selected_gap_id | null
+  base_job_revision_id | null
+  target_entity_versions[]
   mode:
     open_narrative
     slot_request
@@ -314,7 +334,8 @@ QuestionFrame.v1
     review_candidates
   question_text_hash
   frame_hash
-  valid_for_next_employee_turn: true
+  status: active | consumed | stale | superseded
+  valid_for_next_employee_conversation_turn: true
 ```
 
 `QuestionProposition` 不是 employee evidence。它至少保存：
@@ -324,12 +345,17 @@ ordinal
 subject
 kind
 claim
-existing_employee_evidence_ids
+source_kind: prior_employee_support | employee_document_edit | public_reference | ai_inference
+support_refs[]
 reference_urns
 introduced_dimensions
 ```
 
 ID 由 application 派生；模型不得產 DB identity 或任意 cross-reference key。
+
+Lifecycle：同一 session 最多一個 active frame；下一個 employee **conversation turn** 消耗它。文件 direct edit 本身不
+消耗 frame；但若修改到 frame 的 target entity/version，frame 轉 `stale`，下一個短答不能再綁定。新的 AI 問題會把
+舊 frame 標成 `superseded`。open narrative 可沒有 proposition；atomic confirmation 必須剛好一個。
 
 ### 7.3 confirmation 防 leading 規則
 
@@ -339,7 +365,7 @@ ID 由 application 派生；模型不得產 DB identity 或任意 cross-referenc
 2. proposition 只確認一個工作事實，或所有其他欄位已有 employee evidence；
 3. 一題不得同時首次引入 action、ownership、frequency、output、recipient 等多個未知事實；
 4. reference-derived proposition 要標示來源，不得偽裝成員工先前說過；
-5. frame 只對緊接的下一個 employee turn 有效；
+5. frame 只對緊接的下一個 employee conversation turn 有效，且 target 未因 direct edit 變 stale；
 6. response text hash 必須與 persisted frame 對得上；
 7. 若問題文字與 frame 不一致，整個 contextual binding fail closed。
 
@@ -375,7 +401,6 @@ turn_insufficiency_codes[]
 `AnswerBindingProposal`：
 
 ```text
-frame_id
 binding_kind: proposition | slot | choice | review
 proposition_ordinal | null
 slot | null
@@ -387,37 +412,37 @@ value_text | null
 insufficiency_codes[]
 ```
 
-模型只提 binding；application 驗證 frame scope、ordinal、quote、slot type、single-target 與 expiry。
+request 每次只帶一個 active frame，模型不得回傳 frame/domain ID。模型只提 binding ordinal；application 從 operation
+input 取得真正 frame identity，並驗證 frame scope、ordinal、quote、slot type、single-target 與 expiry。
 
 ### 7.5 contextual evidence 需要 composite provenance
 
 目前 `Evidence.v2` 只有一個 employee quote/span，無法誠實表示：「語意來自問題 frame，權威來自員工短答」。
-推薦在 R5 核准後升版為 `Evidence.v3`，不要把完整 proposition 偽裝成由「是」字面支持。
+Revision 4 推薦**保留 `Evidence.v2` 專指 literal evidence**，另建立 `ContextualAssertion.v1`；不要把完整 proposition
+偽裝成由「是」字面支持，也不要讓現有 literal consumers 誤把 composite claim 當逐字 quote。
 
 ```text
-Evidence.v3
-  ...existing evidence fields...
-  support_basis:
-    literal_employee_span
-    contextual_slot_binding
-    contextual_confirmation
-  support_segments[]:
-    turn_id
-    role
-    span | null
-    text_hash
-    contribution: semantic_context | employee_authority | literal_content
-  question_frame_id | null
-  proposition_hash | null
+ContextualAssertion.v1
+  assertion_id
+  session_id
+  employee_turn_id
+  employee_response_quote / span
+  question_frame_id / frame_hash
+  proposition_ordinal | requested_slot
+  binding_kind / resolution
+  claim_or_value
+  status / supersession
+  interpreter_operation_id
 ```
 
 不變量：
 
-- 每筆 evidence 至少有一個 employee-authority segment；
-- reference snippet 永遠不可進 `support_segments`；
-- contextual evidence 必須同時閉合到 frame hash 與 employee answer span；
+- 每筆 contextual assertion 必須閉合到 active QuestionFrame 與 employee answer span；
+- reference snippet 永遠不可成為 employee authority；reference-derived proposition 仍須標示來源；
 - full claim 不需是「是」的 substring，但必須等於已驗證 frame proposition／slot resolution；
 - correction、withdraw、supersede 語意仍由 deterministic reducer 處理。
+
+後續 Job Model 用 typed `SupportRef` 引用 literal evidence 或 contextual assertion；不把兩者壓成一個模糊 confidence。
 
 如果不願升 `Evidence` contract，替代方案只能是把短回答保存成非投影的 `GroundedAnswer`，之後再問完整句；這會保留
 精度但無法解決訪談過長，因此不推薦作最終產品架構。
@@ -446,10 +471,11 @@ Evidence.v3
 1. 先用 open narrative 收工作廣度；
 2. 自動拆出高價值 task/episode；
 3. 每個 episode 預設只追問 1–2 個最高價值 gap；
-4. K/S 主要靠 reference retrieval + reviewer selection，不要求員工自己背 taxonomy；
+4. K/S 主要靠已確認 task + optional reference + AI drafting，員工只需用白話判斷「這份工作是否真的需要」；
 5. 數字 KPI、能力級別、態度只在產品需要且證據不足時追問；
 6. unknown 是合法狀態，不用為填滿每一格無限追問；
-7. 在 authoring workspace 一次審多筆候選，避免聊天逐筆確認。
+7. 在 authoring workspace 依同一 task／episode 成組審候選，避免聊天逐筆確認；
+8. 不能因追求完整表格而追問低價值欄位；unknown、not_applicable 與「稍後由 AI 起草」都是合法狀態。
 
 ### 8.2 資訊價值與負擔共同排序
 
@@ -474,8 +500,9 @@ AI 可以用一句短 recap 收尾：
 
 > 我先整理成「彙整各門市缺貨明細，供採購主管安排補貨」，目前知道是每週進行；我接著想了解另一項工作。
 
-員工可立即更正，但不要求每輪回答「確認」。更完整的 task/output/indicator/K/S 候選進 authoring workspace，以結構化 review
-一次處理。
+員工可立即更正，但不要求每輪回答「確認」。更完整的 task/output/indicator/K/S 候選直接顯示在同步文件區，以
+「符合我的工作／修改後採用／不符合」一次處理。proposal 應在 episode close 或有實質新資訊時產生，不要每一句話
+都讓文件閃動。
 
 ### 8.4 interview budget
 
@@ -487,7 +514,8 @@ human collaboration。Caliburn 不必硬鎖相同時間，但第一版應把下�
 - clarification rate；
 - 使用者提前停止率；
 - 「被正確理解」評分；
-- reviewer override rate；
+- AI proposal accept/edit/reject rate；
+- 員工直接編輯率與 AI proposal 被 direct edit 取代率；
 - 最終 JD usefulness。
 
 只看 extraction precision 而不看訪談負擔，會再次得到工程測試漂亮、產品體驗失敗的系統。
@@ -504,7 +532,7 @@ human collaboration。Caliburn 不必硬鎖相同時間，但第一版應把下�
 2. 依共同 purpose、workflow stage、stakeholder、system/domain 聚類；
 3. 產生「動詞／功能 + 受詞／領域」名稱；
 4. 保存 child task candidate IDs 與 evidence closure；
-5. 顧問可重分組、改名、合併、拆分；
+5. AI 可提出重分組、改名、合併、拆分 proposal，員工決定採用、修改或拒絕；
 6. projector 最後才編 T1、T2…位置碼。
 
 `CandidateKind` 目前缺 `duty`；核准本文後應新增，而不是把 duty 塞入 task 或只靠 Episode target 代替。
@@ -558,12 +586,13 @@ condition/context
 來源規則：
 
 - condition、behavior、result 各自保存 evidence 或 approved reference/policy；
-- 數值 threshold 只能來自 employee evidence、approved organization policy 或 human input；
+- 數值 threshold 只能來自 employee support、另行提供且獲接受的 policy，或員工直接輸入；
 - reference indicator 可以作候選措辭，不可自動成為 employee fact；
 - 不產生「積極負責、溝通良好」等不可觀察口號；
 - 不把 ability/attitude 標籤直接當 indicator。
 
-現有 `QuantitativeThreshold.source_type` 已有 employee/policy/human 分流，應保留。
+現有 `QuantitativeThreshold.source_type` 的 employee/policy/human 分流概念應保留，但下一個 active contract 應把
+`human` 中性值明確 rename 為 `employee_direct_input`；舊值只留歷史 schema，不能暗示另有專業顧問替員工把關。
 
 ### 9.5 K（Knowledge）
 
@@ -573,7 +602,7 @@ iCAP 2026 手冊定義為執行任務所需理解、可應用於該領域的原�
 - OCS/ESCO/NICE/其他公版候選，或根據本職務 task 形成的 document-local K；
 - task–knowledge relevance reason；
 - 這份 JD 內的 requirement ID；有公版來源才帶 reference URI/version；
-- reviewer decision。
+- employee decision；員工審的是「這份工作是否需要這項知識」，不是術語或 taxonomy 是否學術正確。
 
 員工提到工具或動作不代表已證明具備所有底層理論知識。
 
@@ -591,7 +620,8 @@ iCAP 定義為完成任務所需的認知能力或技術操作能力。推薦 S 
 - 分析測試結果並提出優化方案。
 
 「使用 Excel/SAP/Python」先是 tool evidence。只有 evidence 顯示如何配置、分析、排錯、整合或達成品質標準，才形成
-skill candidate；reference 可提出候選，仍需 task linkage 與 human review。
+skill candidate；reference 可提出候選，仍需 task linkage 與 employee review。系統必須把 linkage 用白話呈現，例如
+「因為你需要依告警紀錄定位同步異常，所以建議加入這項技能」。
 
 S statement 應描述一個可觀察 action，例如「依告警紀錄定位跨系統資料同步異常」。工具、知識、態度、職稱與
 抽象能力不得直接冒充 S。公版沒有這項技能時，建立這份 JD 的 custom skill candidate，而不是選一個語意較遠的
@@ -611,7 +641,7 @@ confirmed job-local task
   -> partial: keep supported part + draft the missing job-local K/S
   -> no_match: draft document-local K/S from task/output/indicator/context
   -> K/S authoring-rule + evidence/support + duplicate-within-document gates
-  -> consultant review
+  -> employee plain-language review
   -> save in this JobModelRevision and link to its task
 ```
 
@@ -630,7 +660,7 @@ JobRequirementItem
   kind: knowledge | skill
   statement
   linked_task_ids[]
-  support_basis: task_inference | employee_statement | policy | public_reference | human
+  support_basis: task_inference | employee_statement | employee_document_edit | policy | public_reference
   support_refs[]
   public_alignment | null       # source URI/version + usable/partial；沒有也合法
   status: proposed | accepted | edited | rejected
@@ -650,8 +680,8 @@ PersonCapabilityAssessment: 某個人目前具備到什麼程度
 ### 9.8 Ability、Attitude、Level
 
 - Ability 應由跨 episode pattern 或員工明確確認產生，不由單輪工具使用推斷；
-- Attitude 高度容易受語氣偏誤影響，應以跨情境可觀察行為 + human review 為主；
-- competency level 不由模型憑措辭直接猜，可取 approved reference level、rubric rating 或 human decision；
+- Attitude 高度容易受語氣偏誤影響，第一版不主動由訪談語氣推斷；若要交付，應由跨情境可觀察行為形成 proposal 並由員工確認；
+- competency level 不由模型憑措辭直接猜，可取 approved reference level、rubric rating 或 employee decision；
 - 全部都是後續 consolidation/review，不是 R5 literal extraction 的責任。
 
 ## 10. Context Engine 應如何供應每一步
@@ -668,9 +698,48 @@ PersonCapabilityAssessment: 某個人目前具備到什麼程度
 - correction candidates；
 - 少量 recent active evidence／contradiction。
 
-R5 不讀 OCS reference，避免 reference laundering。
+R5 不讀 OCS reference，也不讀完整 JD，避免 reference laundering 與 editor shape 污染。若上一題是在確認一個文件
+proposal，所需 target、base revision 與 proposition 必須已封裝在 QuestionFrame；R5 只做 answer grounding。
 
-### 10.2 Episode Coder packet
+### 10.2 Question Policy packet
+
+Question Policy 可讀：
+
+- active episode／gap priority；
+- active QuestionFrame 與最近必要的 employee support；
+- `JobStateDigest`：目前 revision、已接受的 duty/task/output/indicator/K/S 摘要、未解 critical gaps、pending/stale
+  proposal 計數與明確 correction target；
+- interview budget、fatigue／decline state。
+
+`JobStateDigest` 是 canonical authoring state 的 bounded projection，不是完整 editor JSON。員工直接新增一個 task 後，
+digest 會讓 Question Policy 停止再問「你還有哪些工作」，改問該 task 最有價值的缺口；這是共編與訪談真正同步的
+地方。
+
+最小 contract：
+
+```text
+JobStateDigest.v1
+  session_id / job_model_id
+  revision_id / revision_sequence
+  selected_items[]:
+    entity_id / entity_version
+    kind: duty | task | output | indicator | knowledge | skill
+    parent_entity_id | null
+    statement
+    source_channels[]
+  unresolved_gaps[]:
+    gap_id / target_entity_id / dimension / severity
+  pending_proposal_targets[]       # ID/kind/target only，不把 proposed value 當 truth
+  stale_proposal_targets[]
+  omitted_counts_by_kind
+  selection_policy_name/version/hash
+  digest_hash
+```
+
+ContextBuilder 依 operation 選最小項目並保存 selection manifest；`omitted_counts_by_kind` 讓模型知道 digest 被裁切，不能
+把「沒看到」推論成「不存在」。同一 canonical state + policy 必須產 byte-identical digest。
+
+### 10.3 Episode Coder packet
 
 只給：
 
@@ -680,7 +749,7 @@ R5 不讀 OCS reference，避免 reference laundering。
 - 現有 episode candidates；
 - 必要且已 snapshot 的 reference snippets。
 
-### 10.3 K/S drafting operation packet
+### 10.4 K/S drafting operation packet
 
 依 operation 最小化：
 
@@ -693,11 +762,11 @@ R5 不讀 OCS reference，避免 reference laundering。
 不給完整 transcript、不給未選中的整個 taxonomy。第一版以一次 `requirements.draft` call 同時輸出 coverage 與 K/S
 typed 區塊；只有 eval 證明分開能顯著改善品質或失敗歸因，才拆成兩個 operation。
 
-### 10.4 Global consolidation packet
+### 10.5 Global consolidation packet
 
 只給 candidate/inference/evidence closure，不重送完整 transcript；需要驗證時可按 evidence ID 回取原 quote。
 
-### 10.5 長對話
+### 10.6 長對話
 
 conversation transcript 是 audit source，不是 working memory。工作記憶使用 persisted state：
 
@@ -708,7 +777,7 @@ conversation transcript 是 audit source，不是 working memory。工作記憶�
 - Inference；
 - CandidateJobItem；
 - JobRequirementItem；
-- ReviewDecision。
+- DocumentRevision／AI Proposal／EmployeeDecision 的 bounded digest。
 
 provider conversation ID、server-side compaction 或 prompt cache 只能是 adapter optimization，不能取代 app-owned state。
 
@@ -720,7 +789,7 @@ provider conversation ID、server-side compaction 或 prompt cache 只能是 ada
 
 - 提醒可能漏掉的 task/output/indicator/K/S；
 - 提供較專業、標準化的候選措辭；
-- 提供 source URI/version 讓顧問知道參考來源；
+- 提供 source URI/version，讓員工能展開查看「AI 為何建議」；
 - 協助比較這份 JD 與職能基準的覆蓋程度。
 
 公版不能限制實際工作，也不能證明員工有做某 task 或具備某能力。客戶是不是公司不影響這條規則。
@@ -739,7 +808,7 @@ JobRequirementItem
   support_refs[]
   public_alignment | null
   status
-  reviewer_edit | null
+  employee_edit | null
 ```
 
 同一份 JD 內可以把一個 K/S 連到多個 task，也可以按輸出格式展開成每個 competency block；是否跨任務共用只是一份
@@ -755,11 +824,11 @@ JobRequirementItem
 4. usable：可引用或改寫，但保留來源與適用理由；
 5. partial/no-match：依 task、output、indicator、tools/context 起草 document-local K/S；
 6. verifier 檢查 K/S 定義、單一性、可觀察性、tool/trait 混淆與 evidence/support closure；
-7. 顧問 accept/edit/reject；
+7. 員工以白話 accept/edit/reject；
 8. 寫入本 JobModelRevision，不發布到其他職務。
 
 LLM 可以利用通用專業知識提出 K/S 候選，但此時 `support_basis=task_inference`，不是 employee fact、company fact 或
-official reference；必須讓顧問看得出來並審核。LLM 不得產 official code。
+official reference；必須讓員工看得出來並審核。LLM 不得產 official code。
 
 ### 11.4 Retrieval index 不是 source of truth
 
@@ -802,11 +871,31 @@ context 只用於 indexing，不改寫公版 payload。只有 blind retrieval ev
 - unsupported K/S rate；
 - task-link precision/recall；
 - wrong-source/wrong-version contamination（critical = 0）；
-- reviewer accept/edit/reject rate與平均 review 時間。
+- employee accept/edit/reject rate與平均 review 時間。
 
 ## 12. Canonical authoring core 與 delivery surfaces
 
-### 12.1 現有深文件適合 exchange，不足以直接作產品核心
+### 12.1 共編是產品骨架，不是訪談完成後的附加功能
+
+OpenAI Canvas、Anthropic Artifacts、Gemini in Docs 與 Microsoft Copilot in Word 的官方產品都採相近模式：對話或
+指令與可編輯畫布並存；AI 對指定範圍提出修改；使用者可以直接編輯、接受／取代／拒絕，並可回看版本。這不是要
+複製任何一家 UI，而是確認目前成熟的人機共編邊界：**人可以直接寫，AI 必須留下可審查的變更。**
+
+桌面第一版建議雙欄：左側 AI 顧問對話，右側 live JD canvas；行動裝置可切成「訪談／文件」兩個頁籤，但必須共享
+同一個 session 與 draft revision。員工可在任何時點切到文件修改，不需要等 AI 宣告一個 episode 結束。
+
+### 12.2 三種寫入 authority
+
+| Writer | 寫入語意 | 是否再審 | 可否改 accepted truth |
+|---|---|---:|---:|
+| Employee direct edit | 員工明確要文件呈現的內容 | 否，欄位 commit 後立即成 draft truth | 可以，產新 revision |
+| AI operation | 專業顧問建議的新增／修改／刪除／link | 必須；只能建立 pending proposal | 不可直接改 |
+| Deterministic projector | 編號、排序、schema normalization、匯出格式 | 不作語意審查 | 不可創造或改寫語意 |
+
+「員工直接編輯」與「員工修改 AI 建議後採用」都算 employee-authored final value。AI 後續可以再提出 proposal，但不能
+因為重新跑模型就覆蓋。`accepted` 不是永遠鎖死；它代表只有員工命令或另一筆經員工決定的 proposal 才能改。
+
+### 12.3 現有深文件適合 exchange，不足以直接作產品核心
 
 目前 `ocs_doc` 與 `packages/ocs-contract` 對公版匯入／匯出很實用，但 active `CodeName` 主要只有 code/name，
 `CompetencyBlock` 內重複 K/S 陣列；`_pending` 又把 review UI metadata 嵌在待輸出的文件樹。這造成：
@@ -819,7 +908,7 @@ context 只用於 indexing，不改寫公版 payload。只有 blind retrieval ev
 
 因此 OCS JSON 應降為 publication/export contract，不再預設為 greenfield authoring source of truth。
 
-### 12.2 Canonical Job Model
+### 12.4 Canonical Job Model
 
 推薦 authoring domain：
 
@@ -832,40 +921,104 @@ Output
 BehaviorIndicator
 JobRequirementItem（K/S；document-local）
 RequirementLevel
-SourceAssertion / Evidence / Inference
-Proposal
-ReviewDecision
+SupportRef（literal/contextual/document-edit/reference/inference）
+AiDocumentProposal
+EmployeeDocumentCommand
+EmployeeProposalDecision
 Publication
 ```
 
 所有 domain entity 使用 application identity；T1/T1.1/O01/P01/K01/S01 是 deterministic publication position code，
-不是永久 ID。revision 發布後 immutable；修改建立新 draft revision，不能在已發布 JSON 上原地覆寫。
+不是永久 ID。發布 revision immutable；繼續修改時從它建立新 draft，不在已發布 JSON 上原地覆寫。第一版只有一名
+員工與一份 active draft，不加入 tenant、多人權限、comment thread、presence 或 CRDT。
 
-### 12.3 Proposal 與 accepted truth 分離
+### 12.5 最小 command/proposal contracts
 
-AI 不直接修改 canonical revision，而是建立 typed proposal：
+`EmployeeDocumentCommand.v1`：
 
 ```text
-target entity/path
-operation: add | revise | remove | link | unlink | merge | split
-proposed value
-evidence/inference/reference closure
-conflicts/uncertainty
-model operation identity
-status: pending | accepted | edited | rejected | superseded
-review decision + reviewer-authored final value
+command_id                     # application UUID；idempotency key
+session_id / job_model_id
+base_revision_id
+operation: add | revise | remove | move | link | unlink
+target_entity_id | parent_entity_id
+target_field | null
+target_version | null          # revise/remove/link 時必要
+employee_value | null
+client_command_sequence
 ```
 
-這保留現有 `_pending` 的正確人機邊界，但不要求沿用其文件內嵌實作。任何 editor 都只透過 command/query API 操作
-proposal 與 revision；人工 accepted/edited 內容不被後續 AI 靜默覆蓋。
+`AiDocumentProposal.v1`：
 
-### 12.4 API 與模組邊界
+```text
+proposal_id                    # application 派生，不由模型產生
+session_id / job_model_id
+base_revision_id
+operation: add | revise | remove | move | link | unlink | merge | split
+target_entity_id | parent_entity_id
+target_field | null
+target_version | null
+before_value | null
+proposed_value | null
+support_refs[]                 # closure 必須存在且 scope 正確
+reference_snapshot_refs[]
+plain_language_reason          # 可顯示依據，不保存 hidden chain-of-thought
+limitations[]
+created_by_operation_id
+status: pending | accepted | edited | rejected | stale | superseded
+```
+
+`EmployeeProposalDecision.v1`：
+
+```text
+decision_id / proposal_id
+action: accept | edit | reject
+base_revision_id
+final_value | null             # edit 必填；accept 必須等於 proposed value
+decided_at
+```
+
+第一版應限制一筆 proposal 只改一個可理解的 entity／field 或一組不可分割 link；不要讓模型用單筆 proposal 重寫整份
+JD。若員工要求「重寫整份」，系統要產 section-level proposal group 與新 revision diff，而不是失去逐項決定能力。
+
+### 12.6 Apply 與 conflict protocol
+
+Employee direct edit：
+
+1. UI 先保留本地輸入；欄位 commit／debounce 後送 command，不在每個 key stroke 觸發 AI；
+2. application 驗證 base revision、target identity/version、schema 與 domain invariants；
+3. 同一 transaction 建立新 draft revision、保存 command 與 employee-document support；
+4. 與本次 target 重疊的 pending AI proposal 標成 `stale`，不自動套用或靜默 rebase；
+5. 發布新的 `JobStateDigest`，讓 gap/question policy 在下一 operation 看見更新。
+
+AI proposal decision：
+
+1. proposal 必須仍為 pending，support closure 與 target scope 完整；
+2. 比對 base revision 與 target version/fingerprint；
+3. non-overlap 的其他編輯不必阻擋；target 有變則回 typed stale conflict；
+4. accept 使用 proposed value；edit 使用 employee final value；reject 不改文件；
+5. accept/edit 在同一 transaction 建 revision + decision + provenance；
+6. reject 建 suppression fact，除非出現新 evidence、target 已重大變更或員工主動要求，AI 不得立刻重提同義內容。
+
+沿用現有 editor「optimistic concurrency、409 不回滾使用者本地文字」的產品原則；但新核心應以 entity/field command
+表達衝突，不把整份深 JSON 最後寫入者勝出。第一版不需要 Google Docs 等級的即時多人合併。
+
+### 12.7 Context 與 provenance 規則
+
+- R5 只處理聊天 turn；文件 command 不經過 Turn Interpreter。
+- 員工 direct edit 足以成為該文件欄位的 accepted content，來源標為 `employee_document_edit`。
+- direct edit 不是 transcript quote；若 AI 要從它推導 K/S、indicator 或另一個 task，必須建立新 proposal 並連回該 edit。
+- AI proposal 的 `plain_language_reason` 只說可驗證依據，例如「你提到每週彙整缺貨明細」，不顯示或保存模型思考鏈。
+- 公版內容永遠標 public reference；AI 自行依 task 推導則標 task inference；兩者不能偽裝成員工原話。
+- AI 每次 operation 讀 latest accepted `JobStateDigest`；pending proposal 不是 accepted truth，必要時只以 pending 摘要防止重複提案。
+
+### 12.8 API 與模組邊界
 
 一人團隊推薦 **modular monolith + background workers**，不要為每個 operation 拆微服務：
 
 ```text
-Interview module       session/turn/question frame/evidence/gap
-Job Authoring module   episode/duty/task/output/indicator/K/S/revision/proposal/review/publication
+Interview module       session/turn/question frame/literal evidence/contextual assertion/gap
+Job Authoring module   duty/task/output/indicator/K/S/revision/command/proposal/decision/publication
 Reference module       public sources/import/snapshots/search port
 LLM Runtime module     operations/provider port/executor/conformance
 Evaluation module      capture/replay/eval（不被 production import）
@@ -876,47 +1029,60 @@ Workers
 
 外部 API 按 use case 暴露 commands/queries，不直接把資料表或完整深 JSON 當 CRUD：
 
-- append interview turn、answer/revise question；
-- get grounded state/gaps；
-- review proposal；
-- accept/edit/reject document-local K/S 與 task link；
-- get revision/diff/provenance；
-- publish/export；
+- append interview turn；
+- get conversation state／agenda／current QuestionFrame；
+- issue employee document command；
+- list/get/decide AI proposal；
+- get revision/diff/provenance／JobStateDigest；
+- suggest finish、finish、publish/export；
 - search selected public references。
 
-### 12.5 Editor 保留或重做的 decision gate
+### 12.9 Editor 保留或重做的 decision gate
 
-不先裁決「沿用」或「全部重做」。用一個 vertical slice 比較：
+現有 editor 值得保留的能力：task/duty/O/P/K/S pool、來源保留、任務改名不丟 source、`選同主要職責／工作任務`、
+相似任務提示、直接 inline edit、autosave、optimistic conflict 與 deterministic renumber/export。這些是產品資產，不等於
+必須保留現在的深文件資料模型。
 
-1. 一段訪談建立 3–5 tasks；
-2. 至少一個 usable public K/S；
-3. 至少一個 no-match document-local K/S；
-4. 顧問完成 K/S edit、task-link review 與 publication；
-5. 可回看 evidence、reference、reasoning limitation 與完整 diff。
+需要重做或至少改造的部分：
 
-評估現有 editor adapter 與新 authoring workspace：
+- `_pending` 不再是唯一 proposal store；
+- hover 才出現 ✓／✗ 對非專業員工不夠明顯，也不利鍵盤／行動裝置操作；
+- 全文件 PATCH 不得覆蓋 entity-level revision/conflict；
+- 全域「接受全部」第一版不預設開放；若之後要做，只能按同一 episode/section 分組、顯示摘要，並以 pilot 證明不造成
+  approval fatigue；
+- UI 不能要求員工理解 OCU、O/P/K/S linkage、taxonomy alignment 才能完成審核。
 
-- 是否能無損呈現 canonical entities與 task/K/S links；
-- 顧問完成時間與操作錯誤；
-- provenance 可理解性；
-- custom K/S edit 與 linkage 體驗；
-- conflict/revision handling；
-- 前後端改造量與後續維護成本。
+vertical slice 必須讓一名非職務分析專業的員工完成：訪談產 3–5 tasks、直接改一項、接受一項、修改後採用一項、
+拒絕一項、處理一筆 stale conflict、接受一項 no-match custom K/S，最後匯出。若現有 editor 可用薄 adapter 無損做到，
+就先沿用；若必須持續把新 core 壓回 `_pending` 深樹 hack，就建立新 workspace。
 
-若舊 editor 需要把 canonical model 壓回大量 `_pending` 深樹 hack 才能工作，就重做；若薄 adapter 即可滿足 vertical
-slice，則可先留作 migration surface。產品架構不依賴這項 UI 決定。
+### 12.10 員工可理解的 UI 語言
 
-### 12.6 UI 最低產品能力
+內部 contract 可用 `accept/edit/reject`，畫面建議用：
 
-不論新舊 UI，顧問至少能回答：
+- **符合我的工作**；
+- **修改後採用**；
+- **不符合**；
+- **為什麼建議這項？**；
+- **這項工作還缺什麼？**。
 
-- AI 為何提出這一項？
-- 哪些是員工原話／contextual confirmation？
-- 哪些來自官方公版、工作情境、policy、AI task inference 或人工？
-- 公版是 usable、partial 還是 no-match？
-- 這項 K/S 是公版候選還是本文件 custom item？
-- 哪些 task 要求此 K/S，link 的理由是什麼？
-- 接受後會改哪個 revision，發布到哪些 delivery formats？
+每筆 AI 變更常駐顯示 target、before/after、影響範圍與三個決定；來源與詳細限制可展開，不要一次塞滿。員工審的是
+工作事實與是否適合這份文件；系統負責專業寫法、K/S 類型、linkage、來源 closure 與格式驗證。
+
+### 12.11 完成與匯出
+
+員工可以隨時按「準備完成」。AI 也可以建議結束，但不能自行發布。`CompletionAssessment` 至少檢查：
+
+- 是否有足夠的 current tasks 與主要職責 coverage；
+- 重要 task 是否至少有可理解的 action/object，並有 output 或成功標準的合理資訊；
+- critical contradiction／critical gap 是否仍未解；
+- 是否仍有會改變核心內容的 pending/stale proposals；
+- K/S 是否有 task linkage，且 custom/public 來源標示正確；
+- schema/domain invariants 與 export projection 是否通過；
+- interview budget／fatigue 是否已達上限。
+
+最後畫面用白話列「已完成、建議再補、仍有衝突」，讓員工選擇繼續訪談或照目前版本完成。內部 canonical model 不採
+政府表格 shape；政府公版格式、簡化 JD、PDF/XLSX 都是 deterministic export profile，可在完成時選擇。
 
 ## 13. LLM operations，而不是多 Agent 角色
 
@@ -954,31 +1120,97 @@ slice，則可先留作 migration surface。產品架構不依賴這項 UI 決�
 1. `TurnInterpretInput` 加 persisted QuestionFrame，而不是只有 preceding question text；
 2. output 加 dialogue act 與 `answer_bindings`；
 3. literal observation 與 contextual binding 分開驗證；
-4. `Evidence.v3` 支援 composite provenance；
+4. 保留 `Evidence.v2` 的 literal quote 語意，新增 `ContextualAssertion.v1`，不要把「是」偽裝成能逐字支持整個問題；
 5. frequency marker 不直接證明 current time scope；
 6. 「unknown qualifier 是否值得追問」移到 Gap/Question Policy；
 7. 加短回答、stale frame、leading question、mixed answer eval；
-8. `CandidateKind` 後續加 duty，不能等 projection 時臨時猜分組。
+8. `CandidateKind` 後續加 duty，不能等 projection 時臨時猜分組；
+9. 預留 typed `SupportRef`，讓後續 Job Model 能同時引用 literal evidence、contextual assertion 與 employee document edit，
+   但 R5 不負責 editor command。
 
-### 14.3 建議實作切片
+Revision 3 原先提議把 composite provenance 直接塞進 `Evidence.v3`。重新核對現有 `Evidence.v2` 後，Revision 4 改採
+separate type，原因是 literal quote 與 contextual confirmation 的證明強度不同：
+
+```text
+Evidence.v2
+  claim 必須由 employee quote/span 直接支持
+
+ContextualAssertion.v1
+  assertion_id
+  session_id
+  employee_turn_id
+  question_frame_id / frame_hash
+  proposition_ordinal | requested_slot
+  binding_kind: affirm | deny | slot_value | choose | correction
+  claim_or_value
+  employee_response_quote / span
+  status / supersession
+  interpreter_operation_id
+```
+
+例如 AI 問「這項工作是每週進行嗎？」、員工答「是」，`是`只能證明員工接受該 frame proposition；它不是「每週」
+的 literal quote。分型後，grader、UI 與最終 provenance 都能誠實區分。更高層的 `SupportRef.v1` 只保存
+`support_type + support_id`，並由 application 驗證被指物件存在、active、same-session 與 closure；LLM 不產這些 ID。
+
+### 14.3 R5 與共編的硬邊界
+
+R5 必須知道：
+
+- 這一輪是哪個 employee turn；
+- 前一個 AI 問題與 application-validated QuestionFrame；
+- frame 要確認的 proposition／slot／choice；
+- active episode、必要的 correction candidates 與少量 recent support。
+
+R5 不得知道：
+
+- editor component、深 JSON path 或 React state；
+- 完整 `JobModelRevision`；
+- pending proposal 全文；
+- OCS／向量檢索結果；
+- 下一題或是否完成訪談。
+
+若員工在文件區直接修改，Authoring Core 自行處理並更新 `JobStateDigest`。Question Policy 下一輪使用 digest；R5 不解析
+該 document command。如此未來換 editor、API 或 export 都不需要重寫 R5。
+
+### 14.4 R5 開工前必須凍結的 contract
+
+以下四項若沒有核准，現行 R5 **No-Go**：
+
+1. `QuestionFrame.v1` exact schema、hash、active/consumed/stale lifecycle 與 next-employee-turn scope；
+2. `TurnInterpretOutput.v2` 的 `dialogue_act + literal_observations + answer_bindings` exact schema；
+3. `ContextualAssertion.v1`、binding verifier、correction/supersession 與 Capture closure；
+4. marker policy 修正為 frequency 與 time scope 分開，並增加「以前每週」等組合反例。
+
+同時只凍結一個 authoring seam：Question Policy 可讀 bounded `JobStateDigest`，R5 不讀。以下項目**不阻塞 R5**：
+
+- 舊 editor 或新 workspace 的選型；
+- `AiDocumentProposal` 的最終資料表／API route；
+- K/S drafting prompt 與 retrieval engine；
+- 政府 OCS export 版面；
+- SaaS、tenant、多使用者協作。
+
+### 14.5 建議實作切片
 
 若 owner 核准，不建議把所有變更塞進一個巨大 R5 commit。推薦：
 
-1. **R5a inactive contracts**：QuestionFrame、AnswerBinding、Evidence v3 schema 與 pure validators，active runtime 暫不切；
-2. **R5b question frame persistence**：Question Policy contract、state/reducer、recovery/Capture roots；
+1. **R5a inactive contracts**：QuestionFrame、AnswerBinding、ContextualAssertion、SupportRef schema 與 pure validators，active runtime 暫不切；
+2. **R5b question frame persistence**：Question Policy contract、state/reducer、recovery/Capture roots；在母計畫 `0010 only`
+   限制下，實作者必須先證明能用既有 event/artifact authority 無損保存；證明不能才回報 owner，不得偷加 `0011`；
 3. **R5c interpreter hard cut**：turn operation/output/prompt/verifier 一次切到新 active contract；
-4. **R5d contextual reducer**：literal/contextual evidence、correction、gap transition；
+4. **R5d contextual reducer**：literal evidence/contextual assertion、correction、gap transition；
 5. **R5e docs/status**：hash/catalog/README/mother plan；
 6. **R6a grounding eval**：短回答專用 suite；
 7. **R6b existing 12 cases migration**；
-8. **post-R5 architecture slice（編號待 mother plan 重排）**：canonical Job/Authoring contracts；
+8. **post-R5 product vertical slice（編號待 mother plan 重排）**：canonical Job/Authoring contracts + employee direct edit +
+   one AI proposal accept/edit/reject；不要把共編延到所有 K/S 完成後；
 9. **後續 eval**：episode/job、no-match K/S、linkage、retrieval 與 authoring vertical slice。
 
 每個 commit 必須保持完整 no-network suite 綠；若 active hard cut 無法拆綠，R5b–R5d 合併成一個原子 commit，禁止
 相容 shim 同時支援兩個 active contract。
 
-R5 的完成定義仍只到「自然且可信地理解一輪並形成 evidence」。不得在 R5 順手修改 editor、深文件契約或 indexer；
-Job/Authoring core 需先由本文 D5–D11 核准，再寫獨立 implementation authority。這是控制架構風險，
+R5 的完成定義仍只到「自然且可信地理解一輪並形成 literal evidence 或 contextual assertion」。不得在 R5 順手修改
+editor、深文件契約或 indexer。R5 先核准 D1–D4 與 D15；Job/Authoring core 再依 D5–D14 寫獨立 implementation
+authority。這是控制架構風險，
 不是承諾沿用舊元件。
 
 ## 15. Eval design
@@ -1042,14 +1274,29 @@ Hard metrics：
 - baseline vs contextual projection blind comparison；
 - latency/cost。
 
-### 15.4 Human pilot
+### 15.4 Employee pilot
 
 至少分開記錄：
 
 - employee：「AI 有沒有理解我的工作」；
-- consultant：欄位正確性、改寫時間、override severity；
+- employee coediting：direct edit、accept/edit/reject、stale conflict 成功率與完成時間；
+- employee comprehension：是否看得懂 AI 為何建議、是否知道接受後會改哪裡；
 - final document：盲評 usefulness、specificity、completeness、unsupported claim；
 - interaction：時間、回合數、疲勞、提前終止。
+
+產品流程不依賴另一位顧問；但研發 eval 可以請獨立職務分析專家對去識別化結果做 blind quality audit。那是模型／產品
+驗證，不是每份 JD 的必要審批者。
+
+### 15.5 Authoring deterministic and UX gates
+
+- AI 未經 decision 直接改 accepted truth：0；
+- employee command idempotency／revision replay：100%；
+- overlapping stale proposal 被自動套用：0；
+- reject 後無新 support 立即重提率：0；
+- direct edit 後下一題仍重問已填內容的比例；
+- source channel／support closure 完整率：100%；
+- 非專業員工在不看教學下完成 accept/edit/reject 的 task success；
+- 全域／批次接受造成的錯誤接受率；第一版未有證據前不開全域 accept-all。
 
 OpenAI 官方 meeting-intelligence 指引也建議以 human-reviewed transcript labels、holdout、exact/near-exact evidence
 checks、precision/recall 及 reviewer override 持續評估。OpenAI hosted Evals platform 已公告 2026-11 關閉，因此
@@ -1057,42 +1304,55 @@ Caliburn 應繼續使用自己的 versioned harness/Capture，不依賴即將退
 
 ## 16. 一人團隊的最低可行最強版
 
-第一個可測產品不要一次完成所有 taxonomy 與所有投影。建議順序：
+第一個可測產品不要一次完成所有 taxonomy 與所有投影，也不要等分析引擎全部完成才接 UI。建議以可垂直驗證的順序：
 
 ### Stage A：自然且可信地聽懂
 
 - QuestionFrame；
 - short-answer grounding；
-- literal/contextual evidence；
+- literal evidence／contextual assertion；
 - correction；
 - current 12 cases + grounding suite。
 
-### Stage B：形成任務與產出
+### Stage B：先打通最小共編垂直切片
+
+- canonical draft revision 與 entity identity；
+- employee direct edit；
+- 一筆 AI task proposal 的 accept/edit/reject；
+- stale/conflict 與 `JobStateDigest`；
+- 雙欄或雙頁籤 prototype；
+- 非專業員工 usability test。
+
+Stage B 不需要先有完整 K/S。它用 scripted proposal 也可以驗證人機權限、版本與產品 loop，避免做到最後才發現
+conversation 與 document 無法同步。
+
+### Stage C：形成任務與產出
 
 - Episode Coder；
 - task/output candidates；
 - gap priority；
-- canonical Job Model draft revision；
+- 將 candidates 轉成 AI document proposals；
 - bounded reference task retrieval。
 
-### Stage C：形成指標與 K/S
+到這裡已有第一個可用測試品：員工可對話、看見 tasks/output 逐步形成、直接改、審 AI 修改，並繼續被追問。
+
+### Stage D：形成指標與 K/S
 
 - behavior indicator component support；
 - optional public K/S coverage；
 - no-match document-local K/S drafting；
-- task–K/S linkage review；
+- task–K/S linkage employee review；
 - document-local dedup 與 retrieval eval。
 
-### Stage D：共編與最終文件
+### Stage E：完成與最終文件
 
-- canonical authoring core；
-- proposal/revision/review API；
-- 新 workspace 或既有 editor thin adapter 的 vertical-slice 決策；
 - deterministic publication projector；
-- human review events；
+- final completion assessment；
+- employee decision/audit closure；
+- 新 workspace 或既有 editor thin adapter 的最終保留裁決；
 - final OCS/JD outcome eval。
 
-### Stage E：模型與成本優化
+### Stage F：模型與成本優化
 
 - 用同一 eval 比較 OpenRouter models/endpoints；
 - 只有 failure trace 證明需要才拆第二 call／reranker／更大模型；
@@ -1114,6 +1374,10 @@ Caliburn 應繼續使用自己的 versioned harness/Capture，不依賴即將退
 - 從一句自評直接推 ability/attitude；
 - 為了讓短回答通過而關閉 quote/provenance gate；
 - 讓模型生成 DB IDs、OCS 最終位置碼或文件 mutation；
+- 讓 AI 直接覆蓋 accepted document content，再要求員工事後找差異；
+- 把員工直接編輯送進 R5 偽裝成 transcript evidence；
+- 要求非專業員工理解 OCU/O/P/K/S taxonomy 才能接受或拒絕；
+- 第一版先做 tenant、多人共編、權限矩陣、CRDT 或公司 capability catalog；
 - 為追求「最潮」預先加入 graph framework、多 Agent、fine-tuning；
 - 依賴將於 2026-11 關閉的 OpenAI hosted Evals platform。
 
@@ -1121,9 +1385,10 @@ Caliburn 應繼續使用自己的 versioned harness/Capture，不依賴即將退
 
 ### D1 — contextual evidence contract
 
-**推薦：核准 `Evidence.v3` composite provenance。**
+**Revision 4 推薦：保留 literal-only `Evidence.v2`，另核准 `ContextualAssertion.v1` composite provenance。**
 
-替代方案是維持 literal-only，所有「是」都要再問完整句；工程簡單但與自然訪談目標衝突。
+這比把兩種證明強度塞進同一 Evidence type 更不易誤用。替代方案是完全維持 literal-only，所有「是」都再問完整句；
+工程簡單但與自然訪談目標衝突。
 
 ### D2 — R5 output
 
@@ -1153,8 +1418,9 @@ Caliburn 應繼續使用自己的 versioned harness/Capture，不依賴即將退
 
 **推薦：K/S 是這份 JD 的 document-local requirement；可參考公版，也可由 task inference 形成 custom item。**
 
-員工可提供工作佐證與修正，但「職務需要什麼」由後續 coverage/drafting operation + 顧問判定；
-不能把它當 R5 employee fact，也不能因此宣稱員工本人已具備。
+AI 根據已確認 task、output、indicator 與 optional public reference 起草；員工用白話接受、修改或拒絕「這份工作是否
+需要這項 K/S」。系統以 definition/linkage/provenance gate 承擔專業品質，不能要求員工扮演 taxonomy 專家，也不能
+因為 requirement 被接受就宣稱員工本人已具備。
 
 ### D7 — editor strategy
 
@@ -1189,6 +1455,42 @@ Qdrant/BGE-M3 保留為 benchmark adapter，不是 Job Model authority；是否�
 
 port 與 module boundary 先固定；只有獨立 scaling、failure isolation 或 deployment ownership 有實測需求才拆服務。
 
+### D12 — product user and write authority
+
+**推薦：唯一人工決策者是員工；AI 是顧問，不是文件 authority。**
+
+員工 direct edit 立即成為 draft truth；AI 任何語意新增／修改／刪除都先形成 proposal。內部
+accept/edit/reject 對外使用「符合我的工作／修改後採用／不符合」。
+
+### D13 — live coediting timing
+
+**推薦：共編 seam 在 R5 後第一個 product vertical slice 就實作，不延後到完整 K/S 之後。**
+
+R5 不 import editor contract，只由 Question Policy 使用 `JobStateDigest`。這既防止 R5 被 UI 綁死，也能及早驗證真正
+成品的 conversation-document loop。
+
+### D14 — first-product scope
+
+**推薦：先做單一員工、單一 session／JobModel、單一 active draft 的 modular monolith。**
+
+不先做 SaaS、tenant、多人權限、即時多人游標、CRDT、公司層共用 K/S。核心 entity/revision/proposal ID 與 module port
+仍保持乾淨，未來需要時可擴充，不以當下未需求的基礎設施拖延成品。
+
+### D15 — R5 go/no-go
+
+**推薦：現行 mother plan 的 R5 暫時 No-Go；核准 D1–D4、D12–D14 並回寫 exact contracts 後立即 Go。**
+
+不需要等 editor 選型、K/S prompt、retrieval benchmark 或 export 完成。真正阻擋 R5 的只有短回答證明模型、
+QuestionFrame lifecycle 與 frequency/current 語意；先修這些比寫完後再改 Evidence/ContextBuilder 成本低得多。
+
+### D16 — ADR 0030 compatibility
+
+**推薦：保留「一條 conversation owner、AI 不可靜默修改、人可接受／拒絕」，以新 ADR supersede `_pending` 為
+canonical proposal store 與「人改不告知模型」兩項。**
+
+新核心以 command/proposal/decision/revision 為 authority；舊 editor `_pending` 最多是 UI projection。員工 direct edit
+透過 bounded `JobStateDigest` 進下一輪 Context Engine，而不是把完整文件或每個 keystroke 送給模型。
+
 ## 19. Sources
 
 ### 19.1 LLM architecture / conversation / evaluation
@@ -1221,6 +1523,17 @@ port 與 module boundary 先固定；只有獨立 scaling、failure isolation �
 - European Commission ESCO, [About ESCO](https://esco.ec.europa.eu/en/about-esco) — occupation/skill/knowledge concepts 與關係資料。
 - European Commission ESCO, [ESCO v1.2](https://esco.ec.europa.eu/en/about-esco/escopedia/escopedia/esco-v12) — AI-assisted extraction/linking + human expertise/quality improvement。
 
+### 19.3 Employee-facing AI coediting / human control
+
+- OpenAI, [Apps SDK UI guidelines — fullscreen](https://developers.openai.com/apps-sdk/concepts/ui-guidelines#fullscreen) — rich editing canvas／multi-step workflow 可與 conversation composer 並存，保留對話 context。
+- OpenAI Help, [What is the canvas feature in ChatGPT and how do I use it?](https://help.openai.com/en/articles/9930697-what-is-the-canvas-feature-in-chatgpt-and-how-do-i-use-it) — 直接編輯、選取範圍要求 AI 處理、顯示差異、版本歷史與還原。
+- Anthropic Help, [What are artifacts and how do I use them?](https://support.claude.com/en/articles/9487310-what-are-artifacts-and-how-do-i-use-them) — 對話旁的 dedicated artifact window、targeted update 與 version selector。
+- Google Docs Help, [Collaborate with Gemini in Google Docs](https://support.google.com/docs/answer/13447609?hl=en) — 對選取文字 refine，建議可逐項／批次接受或拒絕，並可顯示來源。
+- Microsoft Support, [Rewrite text with Copilot in Word](https://support.microsoft.com/en-us/word/copilot-rewrite-text-with-copilot-in-word) — 選取範圍後 rewrite、replace／insert／regenerate，使用者可先編輯 suggestion。
+- Microsoft Support, [Welcome to Copilot in Word](https://support.microsoft.com/en-us/word/welcome-to-copilot-in-word) — document canvas + chat，變更先供 review／approval 再寫入共享文件。
+- Microsoft, [Guidelines for Human-AI Interaction](https://www.microsoft.com/en-us/haxtoolkit/ai-guidelines/) — AI 能力、原因、控制與失敗處理應讓使用者理解；避免以解釋製造過度信任。
+- Google PAIR, [Explainability + Trust](https://pair.withgoogle.com/guidebook-v2/chapter/explainability-trust/) — explanation 應對使用者決策有用，並保留 feedback、control 與 manual fallback。
+
 ## 20. Proposed decision
 
 R5 不應直接照現有 literal-only contract 實作，也不應推翻 Evidence-first 主線。推薦的調整是：
@@ -1229,7 +1542,10 @@ R5 不應直接照現有 literal-only contract 實作，也不應推翻 Evidence
 Evidence-first
   + explicit QuestionFrame
   + short-answer AnswerBinding
-  + composite employee provenance
+  + literal Evidence / ContextualAssertion 分型 provenance
+  + employee direct document command
+  + AI proposal -> employee accept/edit/reject
+  + bounded JobStateDigest feedback loop
   + task/output/indicator synthesis
   + optional public-reference coverage
   + document-local K/S drafting + task linkage review
@@ -1237,11 +1553,17 @@ Evidence-first
   + replaceable editor/index/API adapters
 ```
 
-這能同時保住三個產品目標，而且不建立公司層系統：
+這能同時保住五個產品目標，而且不建立公司層系統：
 
 1. 訪談自然、能理解短回答，不必強迫員工每次說完整句；
-2. 公版沒有的任務與 K/S 可以直接成為這份 JD 的 custom item，不會被迫錯配官方 taxonomy；
-3. 最終主要職責、任務、產出、行為指標與 K/S 都能回答「為什麼有這一項、來源是員工、公版、task inference、policy 還是人工」。
+2. 員工可隨時直接編輯，AI 變更則永遠可接受、修改或拒絕；
+3. 文件更新會回饋下一題選擇，不重問員工已經親手補上的內容；
+4. 公版沒有的任務與 K/S 可以直接成為這份 JD 的 custom item，不會被迫錯配官方 taxonomy；
+5. 最終主要職責、任務、產出、行為指標與 K/S 都能回答「為什麼有這一項、來源是員工原話、短答確認、員工文件編輯、公版或 AI task inference」。
 
-Revision 3 不裁決舊 editor／API／indexer 一定刪除；它裁決的是 **canonical Job Model 不得依賴它們**。各舊元件
+Revision 4 不裁決舊 editor／API／indexer 一定刪除；它裁決的是 **canonical Job Model 不得依賴它們**。各舊元件
 只有通過 vertical-slice quality/maintainability gate 才保留，否則可替換而不重做職務與職能核心。
+
+因此目前回答是：**R5 還不能照舊計畫寫，但不需要再無限研究。**先把本文 D1–D4、D12–D16 核准並轉成一份
+可執行的 R5 amendment；完成 exact schema、lifecycle、verifier 與 eval matrix 後即可交給實作者。共編完整實作不塞進
+R5，但它的 `JobStateDigest` seam 與員工 write authority 現在就要凍結，避免 R5 做完後重構 Context Engine。

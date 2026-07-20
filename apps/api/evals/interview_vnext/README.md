@@ -21,11 +21,13 @@ migration維持0010。
   `provider.conformance_failed`＝harness invalid（scheduler stop-gap）。routing artifact 升
   `openrouter_routing.v2`（無 verdict）；兩個 probe 走 taxonomy v2、保存
   result/evidence/conformance closure、report v2。
-- **R4 驗收（含 R4-C corrective，見 R4 plan §19.1）**：owner review 的三個 blocker
+- **R4 驗收（含 R4-C／R4-C2 correctives，見 R4 plan §19.1/§19.2）**：owner review 的三個 blocker
   （`"pipeline": null` 誤判 clean、attempt/attempts 筆數矛盾仍 eligible、blank-only metadata
-  造成 typed evidence ValidationError 外洩）已修正並補 14 個 regression tests。完整 no-network
-  **941 passed, 197 skipped, 0 failed**；全部 `test_interview_vnext_*` + real PostgreSQL
-  **750 passed, 0 skipped**；dependency/schema guard **14 passed**；Alembic **0010 (head)**；
+  造成 typed evidence ValidationError 外洩）與 follow-up 的同類 usage/cost 數值外洩
+  （科學記號 cost canonical 化、非法/負數 cost/token → null＋limitation）已修正，
+  共補 24 個 regression tests（先紅後綠）。完整 no-network
+  **951 passed, 197 skipped, 0 failed**；全部 `test_interview_vnext_*` + real PostgreSQL
+  **760 passed, 0 skipped**；dependency/schema guard **14 passed**；Alembic **0010 (head)**；
   未跑任何 live。
 
 - R3-C exact binding/projection、typed durable gate與terminal recovery已完成；missing/tampered

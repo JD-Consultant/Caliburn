@@ -1300,6 +1300,56 @@ class TestUsageMapping:
         routing = artifact_by_label(envelope, ROUTING_ARTIFACT_LABEL)
         assert routing["cost"] == "0.0001234567890123"
 
+    async def test_scientific_notation_cost_becomes_canonical_decimal(self):
+        """R4-C2:合法但科學記號的 cost 必須 canonical 化,不得讓 typed evidence
+        的 canonical-decimal 驗證拋例外。"""
+
+        body = success_body()
+        body["usage"]["cost"] = 1e-7
+        adapter, _ = make_adapter(lambda request: respond(body))
+        envelope = await adapter.generate_structured(make_call())
+        assert envelope.result.outcome is ModelOutcome.SUCCEEDED
+        assert envelope.execution_evidence.cost_decimal == "0.0000001"
+        routing = artifact_by_label(envelope, ROUTING_ARTIFACT_LABEL)
+        assert routing["cost"] == "0.0000001"
+        assert conformance_report(envelope).eligible is True
+
+    @pytest.mark.parametrize(
+        "cost", ["not-a-decimal", -0.5, "-1", "NaN", "Infinity", True]
+    )
+    async def test_unusable_cost_is_null_with_limitation_not_exception(self, cost):
+        body = success_body()
+        body["usage"]["cost"] = cost
+        adapter, _ = make_adapter(lambda request: respond(body))
+        envelope = await adapter.generate_structured(make_call())
+        assert envelope.result.outcome is ModelOutcome.SUCCEEDED
+        evidence = envelope.execution_evidence
+        assert evidence.cost_decimal is None
+        assert any("cost" in item for item in evidence.limitations)
+        # cost 不是 attribution 判準;facts 誠實記 null 後仍 eligible。
+        assert conformance_report(envelope).eligible is True
+
+    @pytest.mark.parametrize(
+        "field", ["prompt_tokens", "completion_tokens"]
+    )
+    async def test_negative_token_counts_are_null_with_limitation(self, field):
+        """R4-C2:負數 token 不是可用 fact(TokenUsage ge=0),必須 null 化,
+        不得讓 ValidationError 外洩。"""
+
+        body = success_body()
+        body["usage"][field] = -1
+        adapter, _ = make_adapter(lambda request: respond(body))
+        envelope = await adapter.generate_structured(make_call())
+        assert envelope.result.outcome is ModelOutcome.SUCCEEDED
+        usage = envelope.result.usage
+        mapped = {
+            "prompt_tokens": usage.input_tokens,
+            "completion_tokens": usage.output_tokens,
+        }[field]
+        assert mapped is None
+        assert any(field in item for item in usage.limitations)
+        assert conformance_report(envelope).eligible is True
+
 
 METADATA_MISSING_REASONS = (
     ConformanceReasonCode.CACHE_INELIGIBLE,

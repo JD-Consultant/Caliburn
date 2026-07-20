@@ -368,6 +368,12 @@ def _map_usage(response: Response) -> TokenUsage:
         value = getattr(container, name, None) if container is not None else None
         if value is None:
             limitations.add(f"openai usage did not include {dotted}")
+            return None
+        if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+            # R4-C2:TokenUsage 是 ge=0 typed contract;負數/非整數不是可用
+            # fact,null 化而非讓 ValidationError 外洩。
+            limitations.add(f"openai usage {dotted} was not a usable count")
+            return None
         return value
 
     input_tokens = field(usage, "input_tokens", "input_tokens")

@@ -31,6 +31,7 @@ import time
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import UTC, datetime
+from decimal import Decimal, InvalidOperation
 from typing import Any
 from uuid import uuid5
 
@@ -946,7 +947,8 @@ class OpenRouterChatEvalAdapter(LlmPort):
             usage_dict = (
                 body.get("usage") if isinstance(body.get("usage"), dict) else {}
             )
-            cost_decimal = _decimal_str(usage_dict.get("cost"))
+            raw_cost = usage_dict.get("cost")
+            cost_decimal = _decimal_str(raw_cost)
             routing_artifact = self._routing_artifact(
                 request, facts, metadata=metadata, resolved_model=resolved_actual,
                 generation_id=generation_id, request_id=request_id,
@@ -956,7 +958,9 @@ class OpenRouterChatEvalAdapter(LlmPort):
             evidence = self._facts_evidence(
                 binding, request, facts=facts, resolved_model=resolved_actual,
                 routing_ref=routing_artifact.ref, usage=usage,
-                cost_decimal=cost_decimal, request_id=request_id,
+                cost_decimal=cost_decimal,
+                cost_invalid=raw_cost is not None and cost_decimal is None,
+                request_id=request_id,
                 generation_id=generation_id,
             )
         else:
@@ -1381,6 +1385,7 @@ class OpenRouterChatEvalAdapter(LlmPort):
         routing_ref: ArtifactRef,
         usage: TokenUsage,
         cost_decimal: str | None,
+        cost_invalid: bool = False,
         request_id: str | None,
         generation_id: str | None,
     ) -> ProviderExecutionEvidence:
@@ -1403,7 +1408,11 @@ class OpenRouterChatEvalAdapter(LlmPort):
         if upstream_endpoint is None:
             limitations.add(LIMITATION_ENDPOINT_NOT_ATTESTED)
         if cost_decimal is None:
-            limitations.add("openrouter response did not include cost")
+            limitations.add(
+                "openrouter response cost was not a usable decimal"
+                if cost_invalid
+                else "openrouter response did not include cost"
+            )
         if (
             resolved_model is None
             or facts.selected_provider is None
@@ -1570,20 +1579,30 @@ def _no_response_evidence(
 
 
 def _decimal_str(cost: Any) -> str | None:
-    """Canonicalize cost as a decimal string; never recompute with binary float."""
+    """Canonicalize cost as a non-negative finite decimal string; never
+    recompute with binary float arithmetic.
 
-    if cost is None:
+    R4-C2:typed evidence 的 `cost_decimal` 只收 canonical decimal;科學記號
+    (`1e-07`)在此正規化,不可用的值(非數字/負數/非有限)回 None(caller 記
+    limitation),不得讓 ValidationError 從 adapter 外洩。
+    """
+
+    if cost is None or isinstance(cost, bool):
         return None
-    if isinstance(cost, bool):
-        return None
-    if isinstance(cost, str):
-        return cost
-    if isinstance(cost, int):
-        return str(cost)
     if isinstance(cost, float):
         # `repr` round-trips the exact float without adding precision noise.
-        return repr(cost)
-    return None
+        text = repr(cost)
+    elif isinstance(cost, (str, int)):
+        text = str(cost)
+    else:
+        return None
+    try:
+        value = Decimal(text)
+    except InvalidOperation:
+        return None
+    if not value.is_finite() or value < 0:
+        return None
+    return format(value, "f")
 
 
 def _usage_total_mismatch(usage: dict[str, Any]) -> bool:
@@ -1703,6 +1722,11 @@ def _map_usage(body: dict[str, Any]) -> TokenUsage:
             return None
         if isinstance(value, bool) or not isinstance(value, int):
             limitations.add(f"openrouter usage {dotted} was not an integer")
+            return None
+        if value < 0:
+            # R4-C2:TokenUsage 是 ge=0 typed contract;負數不是可用 fact,
+            # null 化而非讓 ValidationError 外洩。
+            limitations.add(f"openrouter usage {dotted} was negative")
             return None
         return value
 

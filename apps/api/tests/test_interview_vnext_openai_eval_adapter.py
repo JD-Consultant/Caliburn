@@ -941,6 +941,26 @@ class TestAdapterResponseMatrix:
             ConformanceReasonCode.ROUTE_METADATA_MISSING,
         )
 
+    async def test_negative_token_counts_are_null_with_limitation(self):
+        """R4-C2:負數 usage 不是可用 fact(TokenUsage ge=0),必須 null 化,
+        不得讓 ValidationError 外洩。"""
+
+        body = json.loads(
+            (FIXTURES / "success_reasoning_then_message.json").read_text("utf-8")
+        )
+        body["usage"]["input_tokens"] = -1
+        adapter, _ = make_adapter(
+            lambda request: httpx.Response(
+                200, json=body, headers={"x-request-id": "req_fx_neg_usage"}
+            )
+        )
+        envelope = await adapter.generate_structured(make_call())
+        assert envelope.result.outcome is ModelOutcome.SUCCEEDED
+        usage = envelope.result.usage
+        assert usage.input_tokens is None
+        assert any("input_tokens" in item for item in usage.limitations)
+        assert conformance_report(envelope).eligible is True
+
     async def test_prompt_cached_tokens_are_usage_not_response_cache_hit(self):
         """§12.3:input cached_tokens 只進 TokenUsage;cache_status 仍 ABSENT。"""
 

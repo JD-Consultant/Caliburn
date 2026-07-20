@@ -1,13 +1,22 @@
 # Interview AI vNext（隔離開發中）
 
-本 package 是 ADR 0034 的 greenfield 實作區。目前已完成 **V0 + V1 domain foundation + V2-A provider/Capture contracts + V2-B durable persistence + V3-0 readiness + V3-1 Context Engine + V3-2 Turn Interpreter contracts/verifier + V3-3 fixed-replay executor + V3-4R OpenRouter live conformance**，另有隔離於`evals/`的direct OpenAI V3-4 mocked reference。V3-5 harness executable path已落地並全綠(887 passed/0 skipped)，true live亦已嘗試；但batch `5bad4e3f-...`因route contamination停線，並揭露model-generated proposal identity、unsupported qualifier與offline grader drift，故無模型品質裁決。Owner已核准ADR 0036與**V3-5A runtime contract reconstruction**；R1–R3及阻擋性的R3-C corrective已完成，exact binding/config/projection、typed durable gate、fresh-process recovery與Capture closure均已通過no-network/real PostgreSQL驗收。R4 provider evidence/conformance分離亦已完成（commits `aee798a`/`a814789`/`067504b`）：eval adapter只回wire result＋normalized execution evidence，route/model/pipeline/cache eligibility由application `attribution-strict/1.0.0`判定，probe/Capture保存result/evidence/conformance closure；驗收為no-network 927/197/0與interview_vnext+real PostgreSQL 736/0 skipped。下一步是R5 Turn Interpreter C1 v2；paid live、V3-6、production route/Web與promotion仍blocked。migration仍為0010八張表，不得新增0011。仍然**沒有 route或production live provider call**，eval adapter沒有被production composition root import；現行使用者流量仍走`app/interview/` v3。
+本 package 是 ADR 0034 的隔離 greenfield 實作區。V0～V3-5 harness與V3-5A R1–R4（含correctives）已完成；
+R4後 final gate為no-network `951 passed / 197 skipped / 0 failed`、
+interview_vnext + real PostgreSQL `760 passed / 0 skipped`。owner已核准 ADR 0037；R5不再依 mother plan舊§9的
+literal-only短答設計，而使用 persisted QuestionFrame、AnswerBinding、Evidence.v3 literal/contextual support、每turn receipt、
+frequency/time分離與state-version CAS。R5詳細計畫已完成、尚未寫code或跑live。舊 true-live batch
+`5bad4e3f-...`因route contamination停線，沒有模型品質裁決；paid live、V3-6、production route/Web與promotion仍 blocked。
+migration仍為0010八張表，不得新增0011。這個package仍沒有production route/live provider call，eval adapter未被production
+composition root import；現行使用者流量仍走`app/interview/` v3。
 
 權威文件：
 
 - 目標架構：[`../../../../docs/specs/2026-07-16-interview-ai-vnext-greenfield-architecture.md`](../../../../docs/specs/2026-07-16-interview-ai-vnext-greenfield-architecture.md)
 - 2026 LLM runtime架構審查（已核准）：[`../../../../docs/specs/2026-07-18-interview-vnext-llm-runtime-architecture-review.md`](../../../../docs/specs/2026-07-18-interview-vnext-llm-runtime-architecture-review.md)
 - Runtime binding/Turn v2決策：[`../../../../docs/adr/0036-interview-vnext-provider-binding-conformance-and-idless-turn-v2.md`](../../../../docs/adr/0036-interview-vnext-provider-binding-conformance-and-idless-turn-v2.md)
+- Grounded short-answer／employee authority決策：[`../../../../docs/adr/0037-interview-vnext-question-frame-contextual-evidence-and-employee-authority.md`](../../../../docs/adr/0037-interview-vnext-question-frame-contextual-evidence-and-employee-authority.md)
 - V3-5A實作交接：[`../../../../docs/plans/2026-07-18-interview-vnext-v3-5a-runtime-contract-reconstruction-plan.md`](../../../../docs/plans/2026-07-18-interview-vnext-v3-5a-runtime-contract-reconstruction-plan.md)
+- R5 grounded short-answer詳細交接（Approved/planned）：[`../../../../docs/plans/2026-07-20-interview-vnext-v3-5a-r5-grounded-short-answer-amendment-plan.md`](../../../../docs/plans/2026-07-20-interview-vnext-v3-5a-r5-grounded-short-answer-amendment-plan.md)
 - R3-C修正交接：[`../../../../docs/plans/2026-07-19-interview-vnext-v3-5a-r3-corrective-plan.md`](../../../../docs/plans/2026-07-19-interview-vnext-v3-5a-r3-corrective-plan.md)
 - R4 provider evidence/conformance交接（已完成，§19 為執行結果）：[`../../../../docs/plans/2026-07-19-interview-vnext-v3-5a-r4-provider-evidence-conformance-plan.md`](../../../../docs/plans/2026-07-19-interview-vnext-v3-5a-r4-provider-evidence-conformance-plan.md)
 - V2 研究：[`../../../../docs/specs/2026-07-16-interview-vnext-v2-provider-capture-research.md`](../../../../docs/specs/2026-07-16-interview-vnext-v2-provider-capture-research.md)
@@ -302,6 +311,10 @@ Request同樣是per-attempt：attempt 1 request在prepare保存，transport/sche
 
 `prepare_operation(expected_state_hash=...)`阻止ContextBuilder完成到prepare之間的stale context；Evidence與no-op commit原本的transaction內state-hash gate阻止provider call期間前進的state被舊結果覆蓋。後者會保留`VERIFIED` artifact供稽核並raise conflict；caller需用新operation ID從新state重建，不能repair舊context。
 
+> 上段描述 R5 前現行行為。R5 amendment 會把 `state_version` 納入 Context v2 identity，並將 provider call期間的
+> state前進明確保存為terminal `state_context_stale` failure；不再讓 turn interpretation停留於 generic VERIFIED conflict，
+> 也不再以Evidence/no-op二分表示commit。
+
 ### Retry／repair的正式範圍
 
 - typed retryable transport/provider failure依`max_attempts`有限重試；refusal、incomplete與non-retryable failure不進reducer；
@@ -420,8 +433,8 @@ capture_export/turn_graders/review/turn_report/scheduler/batch_orchestrator/live
 attempt route/cost ledger、unique blind-review identity、attestation/import與offline regrade。完整API+real PostgreSQL
 `887 passed, 0 skipped`；`app/`不import`evals.*`。true live clean canary通過wire/Capture但顯示unsupported qualifier；正式batch
 `5bad4e3f-...`建立18 trials、27 inference calls後因route contamination停線，另發現proposal identity與offline grader drift，
-總cost `US$0.499882`。因此沒有模型品質verdict，V3-6保持blocked；後續只依ADR 0036/V3-5A plan先修harness authority、
-ProviderBinding/execution evidence/conformance與ID-less C1 v2。V3-5A通過
+總cost `US$0.499882`。因此沒有模型品質verdict，V3-6保持blocked；R1–R4已依ADR 0036完成，R5改依ADR 0037／
+grounded short-answer amendment實作QuestionFrame、Evidence v3與ID-less C1 v2。V3-5A通過
 (`TURN_GATE_PASS_ENGINEERING`或更高)只代表可開始V3-6 `episode_code`，不代表完整JD/顧問品質/production
 readiness。實作與後續改版不得只依README摘要，必須遵守
 [`V3-5 turn eval規格`](../../../../docs/plans/2026-07-18-interview-vnext-v3-5-turn-eval-harness-plan.md)。

@@ -2,7 +2,7 @@
 
 日期：2026-07-18
 
-狀態：Accepted（owner 已核准 D1–D8；production 實作尚未開始）
+狀態：Accepted（R1–R4 已實作；Turn Interpreter R5 部分由 ADR 0037／2026-07-20 amendment 修訂）
 
 依據：
 

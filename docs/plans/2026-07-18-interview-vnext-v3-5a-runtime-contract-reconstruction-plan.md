@@ -1,8 +1,10 @@
 # Interview AI vNext V3-5A——Runtime Binding、Conformance、Turn Interpreter C1 v2 實作交接規格
 
 - 日期：2026-07-18
-- 狀態：**R1–R4 已完成（含 R3-C corrective）；R5 Turn Interpreter C1 v2 為下一個可實作切片**
-- 決策：[`../adr/0036-interview-vnext-provider-binding-conformance-and-idless-turn-v2.md`](../adr/0036-interview-vnext-provider-binding-conformance-and-idless-turn-v2.md)
+- 狀態：**R1–R4 已完成（含 correctives）；R5 grounded short-answer amendment 已核准，可交實作者**
+- Runtime 決策：[`../adr/0036-interview-vnext-provider-binding-conformance-and-idless-turn-v2.md`](../adr/0036-interview-vnext-provider-binding-conformance-and-idless-turn-v2.md)
+- R5 決策：[`../adr/0037-interview-vnext-question-frame-contextual-evidence-and-employee-authority.md`](../adr/0037-interview-vnext-question-frame-contextual-evidence-and-employee-authority.md)
+- R5 detailed authority：[`2026-07-20-interview-vnext-v3-5a-r5-grounded-short-answer-amendment-plan.md`](2026-07-20-interview-vnext-v3-5a-r5-grounded-short-answer-amendment-plan.md)
 - 研究：[`../specs/2026-07-18-interview-vnext-llm-runtime-architecture-review.md`](../specs/2026-07-18-interview-vnext-llm-runtime-architecture-review.md)
 - 前一階段：[`2026-07-18-interview-vnext-v3-5-turn-eval-harness-plan.md`](2026-07-18-interview-vnext-v3-5-turn-eval-harness-plan.md)
 - Provider wire authority：[`2026-07-17-interview-vnext-v3-4r-openrouter-first-adapter-plan.md`](2026-07-17-interview-vnext-v3-4r-openrouter-first-adapter-plan.md)
@@ -11,8 +13,10 @@
 - Scope：**V3-5A only**；修harness authority、建立runtime binding/conformance、發布C1 v2並重新取得完整turn gate
 - Release gate：本文件全部完成且新identity true-live gate通過前，**V3-6、production route/Web、adapter promotion全部blocked**
 
-本文件是可直接交給實作者的唯一V3-5A build authority。若摘要、舊V3 plan、README或v1 code comment與
-本文件衝突，以ADR 0036與本文件為準。實作者不得自行縮成「修regex後重跑」，也不得順手加入
+本文件仍是 V3-5A mother plan；R5 的 exact domain/context/output/persistence/Capture/commit authority 已由上列
+2026-07-20 amendment 取代本文件 §4 turn/context/domain rows、§9、§13 R5、§14.5 與 R5/R6 migration 邊界。
+其他 R1–R4 與 R6–R9 規則仍有效。若摘要、舊V3 plan、README或v1 code comment與
+ADR 0037／R5 amendment衝突，以新文件為準。實作者不得自行縮成「修regex後重跑」，也不得順手加入
 Anthropic direct、multi-agent、provider memory、production fallback或SQL migration 0011。
 
 R3 baseline commit `6ea5ed5412617cbae893e0baeab1abde6aa0d075` 的後續 code review 發現 binding/config、
@@ -22,6 +26,10 @@ projection identity、durable gate、fresh-process recovery與Capture closure尚
 （R4-2 OpenRouter wire/evidence/probe/scheduler vertical cut）、`067504b`（R4-3 OpenAI mocked reference
 對齊）完成，驗收證據回寫於 R4 plan §19；R5 **實作** entry gate 已開啟。這不等於允許 paid live：
 paid live 仍須等 R5–R7 完成並依 R8 gate 重新確認，V3-6／production route／Web／promotion 仍 blocked。
+
+2026-07-20 owner 另核准 grounded short-answer 修訂：R5 必須加入 persisted QuestionFrame、AnswerBinding、
+Evidence.v3 discriminated support、每 turn interpretation receipt、frequency/time 分離與 state-version CAS；完整共編、
+JD synthesis、K/S、editor/Web 仍不進 R5。詳細原因與 exact contract 只看 ADR 0037／R5 amendment。
 
 ---
 
@@ -145,11 +153,13 @@ vNext沒有production route或需續跑的production checkpoint，因此active r
 | Contract/artifact | 現行 | V3-5A active | 動作 |
 |---|---|---|---|
 | operation | `turn.interpret/1.0.0` | `turn.interpret/2.0.0` | 新prompt/output/verifier identity；registry只active v2 |
-| input | `turn_interpret_input.v1` | **保留v1** | Context輸入shape未變，不為改版而改版 |
-| context packet/policy | v1／`turn-interpret/1.0.0` | **保留** | selection行為不變；C1 ablation只改output contract |
-| output | `turn_interpret_output.v1` | `turn_interpret_output.v2` | 移除key、加入support/insufficiency codes |
-| verifier report | v1 | v2 | `proposal_ref`、qualifier support reasons |
-| verifier policy | `1.0.0` | `2.0.0` | marker/support/duplicate rules改義 |
+| input | `turn_interpret_input.v1` | `turn_interpret_input.v2` | id-less QuestionFrame/ordinal projection |
+| context packet/manifest/budget | v1／`turn-interpret/1.0.0` | v2／`turn-interpret/2.0.0` | state version、QuestionFrame、correction ordinal |
+| output | `turn_interpret_output.v1` | `turn_interpret_output.v2` | literal observations + answer bindings；無domain IDs |
+| verifier report | v1 | v2 | observation/binding分流、application identities |
+| verifier policy | `1.0.0` | `2.0.0` | frame binding、marker/support/duplicate rules改義 |
+| Evidence / state | `evidence.v2`／`interview_state.v2` | v3／v3 | discriminated support、QuestionFrame、interpretation receipt |
+| turn domain command | append-turn v1／apply-evidence v2 | consultant/employee/apply-interpretation v1 | old schemas frozen historical |
 | model request | v1 | v2 | binding/config/projection refs；caller不填provider |
 | model result | v1 | v2 | binding identity；wire結果不再表達route eligibility |
 | model envelope | implicit v1 | v2 | result + execution evidence + supporting artifacts |
@@ -162,6 +172,8 @@ vNext沒有production route或需續跑的production checkpoint，因此active r
 | eval suite | `turn-interpret-pilot.v1` | `turn-interpret-c1-v2-pilot.v1` | 同12 case內容，全部hash重算 |
 | eval reference output | v1 | v2 | correction binding改用一基ordinal |
 | eval batch plan/trial/grader/report | v1 | v2 | 綁binding/conformance/proposal_ref |
+
+上表的 turn/domain/context 列以 R5 amendment §5 為 exact authority；本表只保留 mother-plan 摘要。
 
 ### 4.1 保留但不active的檔案
 
@@ -806,7 +818,13 @@ reference adapter只證neutral contract跨provider，不阻擋OpenRouter C1 live
 
 ---
 
-## 9. Turn Interpreter C1 v2 exact contract
+## 9. Turn Interpreter C1 v2 exact contract（歷史草案；已被 R5 amendment 取代）
+
+> **不要依本節實作。** 2026-07-20 owner 核准 ADR 0037 後，本節 §9.1–§9.8 的 provider output、literal-only
+> short-answer邊界、correction Evidence ID、marker policy與no-op語意已被
+> [`R5 grounded short-answer amendment`](2026-07-20-interview-vnext-v3-5a-r5-grounded-short-answer-amendment-plan.md)
+> 取代。保留本節只為說明第一次 true-live 診斷後的歷史設計，不是 active contract。active R5 使用 persisted
+> QuestionFrame、AnswerBinding、Evidence.v3 support union、interpretation receipt、frequency/time分離與context state CAS。
 
 ### 9.1 Provider-facing output
 
@@ -1418,27 +1436,34 @@ no-network API suite 仍須全綠。
 
 ### R5——Turn Interpreter C1 v2
 
-修改turn contracts/application verifier/prompt/operation/policies/schema/catalog及unit tests。
+**Detailed authority 已於 2026-07-20 改版。** 不再照下方舊驗收摘要直接實作；完整 schema、lifecycle、
+reducers、Context v2、Evidence/State v3、stale CAS、Capture closure、逐檔清單、測試與full-green commit slicing 見：
+
+[`2026-07-20-interview-vnext-v3-5a-r5-grounded-short-answer-amendment-plan.md`](2026-07-20-interview-vnext-v3-5a-r5-grounded-short-answer-amendment-plan.md)
+
+R5 的新 outcome 是可靠理解一輪：persisted QuestionFrame + literal/contextual Evidence + durable interpretation receipt。
+不做 editor、JD synthesis、K/S、Web 或 paid live。
 
 驗收：
 
-- outbound schema完全沒有`proposal_key`/cross refs/domain IDs；
-- ordinal UUID exact vectors；
-- drop不重編；duplicate all-drop；
-- every qualifier support matrix；
-- unknown/no-work/correction/injection；
-- prompt examples parse active schema；
-- operation/prompt/schema/verifier hashes重生一致；
-- local schema and semantic gate仍分開。
+- model input/output沒有domain IDs；QuestionFrame target/correction都用ordinal；
+- Evidence.v3 literal/contextual support可分型且graph閉合；
+- zero-Evidence turn也commit receipt/consume frame；
+- frequency不暗示current；short/mixed/stale/leading cases全綠；
+- provider call期間state前進會terminal `state_context_stale`，不rebase；
+- operation/prompt/schema/verifier/Capture hashes與manifest closure一致；
+-完整no-network與real PostgreSQL保持全綠；Alembic仍0010。
 
-建議commit：`feat(interview): publish evidence-grounded turn interpreter v2`
+commits依 amendment R5-A～R5-E，不再使用單一巨大commit。
 
 ### R6——Eval contracts、12 cases與graders v2
 
-一次機械改名與語意改版分commit較好：
+R5 active hard cut 已負責「保持整套suite可import/可執行」所需的最小 eval/provider mechanical migration；不得把紅窗留到R6。
+R6負責真正的 grounding/model-quality eval：short answer、mixed、leading/stale/frequency、multi-trial、人工trace review與promotion
+metrics。一次語意改版分commit較好：
 
-- R6a contracts/schemas/loader/fixture materializer；
-- R6b 12 case files/reference/gold/adjudication；
+- R6a grounding contracts/schemas/loader/gold；
+- R6b short-answer cases + existing 12 case semantic migration/adjudication；
 - R6c graders/review/report。
 
 驗收：
@@ -1550,6 +1575,11 @@ V3-6改unblocked；fail/incomplete/harness invalid各自保留真實狀態。
 - malformed metadataforward-compatible但fail-closed conformance。
 
 ### 14.5 Turn v2
+
+> 本小節是第一次 R5 草案的摘要；active exact matrix 已由
+> [`R5 amendment §16`](2026-07-20-interview-vnext-v3-5a-r5-grounded-short-answer-amendment-plan.md#16-exact-test-matrix)
+> 取代。下列舊項只可視為仍需保留的子集合，不得據此省略 QuestionFrame、contextual support、receipt、frequency/time、
+> stale CAS與Capture tests。
 
 - schema forbidsextra/domain IDs/key；
 - exact quote/overlap/Unicode span；
@@ -1786,9 +1816,10 @@ Dashboard不可完整由API證明的項目仍需人工確認；response metadata
 
 - [ ] provider output完全無application/domain identity？
 - [ ] ordinal ref/UUID在filter前派生、drop不重編？
-- [ ] specific qualifier皆有exact employee quote support？
+- [ ] persisted QuestionFrame只綁 immediate employee answer，且active/consumed/stale pointer閉合？
+- [ ] literal qualifier有exact employee quote support；contextual qualifier有eligible frame target + answer span雙重closure？
 - [ ] false specificity被verifier/grader揭露？
-- [ ] correction、zero evidence、injection、duplicate paths明確？
+- [ ] correction、zero evidence receipt、frequency/time、stale CAS、injection、duplicate paths明確？
 
 ### Persistence/Capture
 
@@ -1816,7 +1847,7 @@ Dashboard不可完整由API證明的項目仍需人工確認；response metadata
 - 把moderation inspected標clean；
 - silently strip schema constraint而沒有projection report；
 - model輸出任何proposal/evidence/application ID；
-- 用preceding question替employee補specific qualifier；
+- 沒有 eligible QuestionFrame／answer binding就用preceding question替employee補specific qualifier；
 - verifier修model JSON/claim/support；
 - semantic repair或LLM judge；
 - 同一commit同時修harness與改prompt，無法歸因；

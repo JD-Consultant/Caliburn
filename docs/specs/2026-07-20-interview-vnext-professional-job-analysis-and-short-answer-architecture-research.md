@@ -1,18 +1,19 @@
 ---
 title: Interview vNext 員工訪談、專業職務分析與即時 JD 共編架構研究
-status: proposed-research-not-implementation-authority
+status: accepted-research; implementation authority is ADR 0037 + R5 amendment
 date: 2026-07-20
-revision: 4
+revision: 5
 audience: owner, architect, implementer, evaluator
 scope: R5 前置設計；員工訪談、短回答、即時共編、當下單一職務、document-local K/S 與交付 projection
 ---
 
 # Interview vNext 員工訪談、專業職務分析與即時 JD 共編架構研究
 
-> 本文是 **R5 實作前的研究與提案**，不是新的 active implementation authority。現行實作 authority 仍是
-> [`2026-07-18-interview-vnext-v3-5a-runtime-contract-reconstruction-plan.md`](../plans/2026-07-18-interview-vnext-v3-5a-runtime-contract-reconstruction-plan.md)。
-> owner 核准本文的裁決後，才回寫 mother plan／ADR 並交給實作者；不得因本文存在就自行新增 migration、
-> production route、Web wiring 或 paid live。
+> 本文保存 R5 前置研究、產品邊界與後續職務分析／共編方向；**不是 exact implementation authority**。owner 已於
+> 2026-07-20 核准 R5 必要裁決，active 決策為
+> [`ADR 0037`](../adr/0037-interview-vnext-question-frame-contextual-evidence-and-employee-authority.md)，exact build authority 為
+> [`R5 grounded short-answer amendment`](../plans/2026-07-20-interview-vnext-v3-5a-r5-grounded-short-answer-amendment-plan.md)。
+> 不得因本文存在就自行新增 migration、production route、Web wiring 或 paid live。
 >
 > **Revision 3（owner scope correction）**：現有 editor、深文件契約、API、indexer 與欄位都只是可盤點的既有資產，
 > 不是必須整合的限制。目標架構先以產品品質、可追溯性與一人團隊可維護性設計，再用明確 gate 決定保留、
@@ -25,6 +26,11 @@ scope: R5 前置設計；員工訪談、短回答、即時共編、當下單一�
 > 使用者與最終決策者就是員工；AI 扮演專業顧問。員工可在訪談期間直接修改文件，AI 的新增、修改與刪除只能先形成
 > 可理解的 proposal，由員工接受、修改後採用或拒絕。共編不是訪談結束後才接上的附屬 editor，而是從第一輪就與
 > 對話同步的產品核心；但 editor UI 不得反向污染 R5 的 turn-grounding contract。
+>
+> **Revision 5（code-audit refinement）**：literal 與 contextual provenance 仍必須分型，但不再建立與 Evidence 平行的
+> `ContextualAssertion` aggregate。現有 Episode／Gap／Inference／Candidate 全以 `evidence_id` 閉合，因此 active 決策是
+> `Evidence.v3.support = literal_employee_span | contextual_answer` discriminated union。此修正保留兩種證明強度，並避免
+> R5 為一個短答功能重寫整個 Job Model support graph。
 
 ## 1. 結論先行
 
@@ -66,10 +72,10 @@ port；不因本需求新增多 Agent framework、session vector database 或把
 現有 OCS document、editor `_pending`、knowledge pack 與 Qdrant pipeline **不可直接被宣告為 canonical product core**。
 它們需分別接受 authoring fidelity、provenance、document-local K/S、retrieval quality、維運成本與 migration cost gate。
 
-**R5 現行計畫不可直接開工。**不是因為要先完成整個 editor，而是 R5 仍明文延後短答繼承問題 scope，且把
-「每天／每週／每月」同時當成 current marker；這兩點會直接造成自然訪談誤判。先凍結 QuestionFrame、
-AnswerBinding、contextual assertion 與 frequency/time 規則，再讓實作者寫 R5。文件 proposal UI、政府公版匯出與
-舊／新 editor 選型可以在這個最小 seam 之後處理，不必阻塞 R5。
+原 R5 計畫不可直接開工，因它明文延後短答繼承問題 scope，且把「每天／每週／每月」同時當成 current marker。
+Revision 5 已由 ADR 0037／R5 amendment 凍結 QuestionFrame、AnswerBinding、Evidence.v3 support union、interpretation
+receipt 與 frequency/time 規則，故 **R5 現在可按新 authority 開工**。文件 proposal UI、政府公版匯出與舊／新 editor
+選型仍不阻塞 R5。
 
 ## 2. 本次實際閱讀與盤點範圍
 
@@ -261,7 +267,7 @@ truth。
 
 這張圖有兩條同等重要的輸入路徑：
 
-1. 員工在聊天中回答，由 R5 形成 literal evidence 或 contextual assertion；
+1. 員工在聊天中回答，由 R5 形成 literal 或 contextual-support Evidence；
 2. 員工在文件中直接編輯，由 Authoring Core 形成 employee-authored document assertion。
 
 第二條不送進 R5，也不假裝成 transcript quote。它直接成為目前 draft 的有效內容，並透過 `JobStateDigest` 讓
@@ -418,34 +424,39 @@ input 取得真正 frame identity，並驗證 frame scope、ordinal、quote、sl
 ### 7.5 contextual evidence 需要 composite provenance
 
 目前 `Evidence.v2` 只有一個 employee quote/span，無法誠實表示：「語意來自問題 frame，權威來自員工短答」。
-Revision 4 推薦**保留 `Evidence.v2` 專指 literal evidence**，另建立 `ContextualAssertion.v1`；不要把完整 proposition
-偽裝成由「是」字面支持，也不要讓現有 literal consumers 誤把 composite claim 當逐字 quote。
+Revision 4 曾推薦保留 `Evidence.v2` 並另建 `ContextualAssertion.v1`。Revision 5 盤點現有 Episode、Gap、Inference、
+Candidate 與 ContextBuilder 後，改採 **`Evidence.v3` + discriminated support union**。不要把完整 proposition 偽裝成
+由「是」字面支持，也不要讓 literal consumers 誤把 composite claim 當逐字 quote；但不需因此建立第二套 assertion graph。
 
 ```text
-ContextualAssertion.v1
-  assertion_id
+Evidence.v3
+  evidence_id
   session_id
-  employee_turn_id
-  employee_response_quote / span
-  question_frame_id / frame_hash
-  proposition_ordinal | requested_slot
-  binding_kind / resolution
-  claim_or_value
+  subject / kind / claim / qualifiers
+  support:
+    literal_employee_span
+      employee_turn_id / quote / span / quote_match
+    | contextual_answer
+      employee_turn_id / answer_quote / answer_span
+      question_frame_id / definition_hash
+      target_ordinal / target_hash
+      binding_kind / resolution / value-or-choice
   status / supersession
-  interpreter_operation_id
+  extractor_operation_id
 ```
 
 不變量：
 
-- 每筆 contextual assertion 必須閉合到 active QuestionFrame 與 employee answer span；
+- 每筆 contextual support 必須閉合到驗證時 eligible 的 QuestionFrame 與 employee answer span；同一 reducer commit後該
+  frame轉 consumed，Evidence仍引用其 immutable definition/target hash；
 - reference snippet 永遠不可成為 employee authority；reference-derived proposition 仍須標示來源；
 - full claim 不需是「是」的 substring，但必須等於已驗證 frame proposition／slot resolution；
 - correction、withdraw、supersede 語意仍由 deterministic reducer 處理。
 
-後續 Job Model 用 typed `SupportRef` 引用 literal evidence 或 contextual assertion；不把兩者壓成一個模糊 confidence。
+後續 Job Model仍引用 `evidence_id`；要顯示或評分證明強度時先依 `support_kind` 分流，不把兩者壓成模糊 confidence。
 
-如果不願升 `Evidence` contract，替代方案只能是把短回答保存成非投影的 `GroundedAnswer`，之後再問完整句；這會保留
-精度但無法解決訪談過長，因此不推薦作最終產品架構。
+平行 `ContextualAssertion` 只在未來有證據顯示 assertion 具有完全不同 lifecycle/ownership 時再考慮；R5 不先支付整個
+support graph 的 polymorphic migration 成本。
 
 ### 7.6 短回答 acceptance matrix
 
@@ -921,7 +932,7 @@ Output
 BehaviorIndicator
 JobRequirementItem（K/S；document-local）
 RequirementLevel
-SupportRef（literal/contextual/document-edit/reference/inference）
+JobFieldSupportRef（Evidence/document-edit/reference/inference；Evidence內再分literal/contextual support）
 AiDocumentProposal
 EmployeeDocumentCommand
 EmployeeProposalDecision
@@ -1017,7 +1028,7 @@ AI proposal decision：
 一人團隊推薦 **modular monolith + background workers**，不要為每個 operation 拆微服務：
 
 ```text
-Interview module       session/turn/question frame/literal evidence/contextual assertion/gap
+Interview module       session/turn/question frame/Evidence(literal|contextual support)/gap
 Job Authoring module   duty/task/output/indicator/K/S/revision/command/proposal/decision/publication
 Reference module       public sources/import/snapshots/search port
 LLM Runtime module     operations/provider port/executor/conformance
@@ -1120,37 +1131,29 @@ vertical slice 必須讓一名非職務分析專業的員工完成：訪談產 3
 1. `TurnInterpretInput` 加 persisted QuestionFrame，而不是只有 preceding question text；
 2. output 加 dialogue act 與 `answer_bindings`；
 3. literal observation 與 contextual binding 分開驗證；
-4. 保留 `Evidence.v2` 的 literal quote 語意，新增 `ContextualAssertion.v1`，不要把「是」偽裝成能逐字支持整個問題；
+4. `Evidence.v3` 以 `literal_employee_span | contextual_answer` 分型 support 保留兩種證明強度；不要把「是」偽裝成
+   能逐字支持整個問題；
 5. frequency marker 不直接證明 current time scope；
 6. 「unknown qualifier 是否值得追問」移到 Gap/Question Policy；
 7. 加短回答、stale frame、leading question、mixed answer eval；
 8. `CandidateKind` 後續加 duty，不能等 projection 時臨時猜分組；
-9. 預留 typed `SupportRef`，讓後續 Job Model 能同時引用 literal evidence、contextual assertion 與 employee document edit，
-   但 R5 不負責 editor command。
+9. 後續 Job Model仍以 evidence ID閉合，consumer依 support kind分流；employee document edit是 Authoring Core 的獨立來源，
+   不在 R5 偽裝成 Evidence。
 
-Revision 3 原先提議把 composite provenance 直接塞進 `Evidence.v3`。重新核對現有 `Evidence.v2` 後，Revision 4 改採
-separate type，原因是 literal quote 與 contextual confirmation 的證明強度不同：
+Revision 4 的 separate type 能清楚表達證明強度，但 code audit 發現它會迫使所有現有 evidence consumers立即升級成
+polymorphic SupportRef。Revision 5 的決定是讓 Evidence identity/lifecycle共用、support type分開：
 
 ```text
-Evidence.v2
-  claim 必須由 employee quote/span 直接支持
-
-ContextualAssertion.v1
-  assertion_id
-  session_id
-  employee_turn_id
-  question_frame_id / frame_hash
-  proposition_ordinal | requested_slot
-  binding_kind: affirm | deny | slot_value | choose | correction
-  claim_or_value
-  employee_response_quote / span
-  status / supersession
-  interpreter_operation_id
+Evidence.v3
+  common identity / claim / qualifiers / status / supersession
+  support =
+    literal_employee_span(employee turn + exact quote/span)
+    | contextual_answer(question frame/target hash + employee answer quote/span + binding)
 ```
 
 例如 AI 問「這項工作是每週進行嗎？」、員工答「是」，`是`只能證明員工接受該 frame proposition；它不是「每週」
-的 literal quote。分型後，grader、UI 與最終 provenance 都能誠實區分。更高層的 `SupportRef.v1` 只保存
-`support_type + support_id`，並由 application 驗證被指物件存在、active、same-session 與 closure；LLM 不產這些 ID。
+的 literal quote。分型後，grader、UI 與最終 provenance 都能誠實區分；Episode/Gap/Inference/Candidate 仍只保存
+`evidence_id`，由 application 驗證被指物件存在、active、same-session 與 closure；LLM 不產這些 ID。
 
 ### 14.3 R5 與共編的硬邊界
 
@@ -1174,11 +1177,11 @@ R5 不得知道：
 
 ### 14.4 R5 開工前必須凍結的 contract
 
-以下四項若沒有核准，現行 R5 **No-Go**：
+以下四項已由 ADR 0037／R5 amendment 核准，R5 **Go**：
 
 1. `QuestionFrame.v1` exact schema、hash、active/consumed/stale lifecycle 與 next-employee-turn scope；
 2. `TurnInterpretOutput.v2` 的 `dialogue_act + literal_observations + answer_bindings` exact schema；
-3. `ContextualAssertion.v1`、binding verifier、correction/supersession 與 Capture closure；
+3. `Evidence.v3` contextual support、binding verifier、correction/supersession 與 Capture closure；
 4. marker policy 修正為 frequency 與 time scope 分開，並增加「以前每週」等組合反例。
 
 同時只凍結一個 authoring seam：Question Policy 可讀 bounded `JobStateDigest`，R5 不讀。以下項目**不阻塞 R5**：
@@ -1193,23 +1196,22 @@ R5 不得知道：
 
 若 owner 核准，不建議把所有變更塞進一個巨大 R5 commit。推薦：
 
-1. **R5a inactive contracts**：QuestionFrame、AnswerBinding、ContextualAssertion、SupportRef schema 與 pure validators，active runtime 暫不切；
-2. **R5b question frame persistence**：Question Policy contract、state/reducer、recovery/Capture roots；在母計畫 `0010 only`
-   限制下，實作者必須先證明能用既有 event/artifact authority 無損保存；證明不能才回報 owner，不得偷加 `0011`；
-3. **R5c interpreter hard cut**：turn operation/output/prompt/verifier 一次切到新 active contract；
-4. **R5d contextual reducer**：literal evidence/contextual assertion、correction、gap transition；
-5. **R5e docs/status**：hash/catalog/README/mother plan；
+1. **R5-A inactive contracts**：QuestionFrame、AnswerBinding、Evidence v3 support、receipt schema 與 pure validators；
+2. **R5-B domain/state hard cut**：Evidence/State v3、question/employee/interpretation commands、reducers、persistence explicit reject；
+3. **R5-C interpreter hard cut**：Context/Input/Output/Prompt/Verifier/Executor與minimum eval/provider schema migration；
+4. **R5-D correctness closure**：frequency、mixed、stale CAS、recovery、Capture、bundle corruption；
+5. **R5-E docs/status**：hash/catalog/README/mother plan；
 6. **R6a grounding eval**：短回答專用 suite；
 7. **R6b existing 12 cases migration**；
 8. **post-R5 product vertical slice（編號待 mother plan 重排）**：canonical Job/Authoring contracts + employee direct edit +
    one AI proposal accept/edit/reject；不要把共編延到所有 K/S 完成後；
 9. **後續 eval**：episode/job、no-match K/S、linkage、retrieval 與 authoring vertical slice。
 
-每個 commit 必須保持完整 no-network suite 綠；若 active hard cut 無法拆綠，R5b–R5d 合併成一個原子 commit，禁止
+每個 commit 必須保持完整 no-network suite 綠；若 active hard cut 無法拆綠，R5-B～R5-D 合併成一個原子 commit，禁止
 相容 shim 同時支援兩個 active contract。
 
-R5 的完成定義仍只到「自然且可信地理解一輪並形成 literal evidence 或 contextual assertion」。不得在 R5 順手修改
-editor、深文件契約或 indexer。R5 先核准 D1–D4 與 D15；Job/Authoring core 再依 D5–D14 寫獨立 implementation
+R5 的完成定義仍只到「自然且可信地理解一輪並形成 literal 或 contextual Evidence」。不得在 R5 順手修改
+editor、深文件契約或 indexer。R5 已依 D1–D4 與 D15 寫成 active authority；Job/Authoring core 再依 D5–D14 寫獨立 implementation
 authority。這是控制架構風險，
 不是承諾沿用舊元件。
 
@@ -1310,7 +1312,7 @@ Caliburn 應繼續使用自己的 versioned harness/Capture，不依賴即將退
 
 - QuestionFrame；
 - short-answer grounding；
-- literal evidence／contextual assertion；
+- literal／contextual-support Evidence；
 - correction；
 - current 12 cases + grounding suite。
 
@@ -1385,10 +1387,10 @@ conversation 與 document 無法同步。
 
 ### D1 — contextual evidence contract
 
-**Revision 4 推薦：保留 literal-only `Evidence.v2`，另核准 `ContextualAssertion.v1` composite provenance。**
+**Revision 5 已核准：`Evidence.v3` 使用 `literal_employee_span | contextual_answer` discriminated support。**
 
-這比把兩種證明強度塞進同一 Evidence type 更不易誤用。替代方案是完全維持 literal-only，所有「是」都再問完整句；
-工程簡單但與自然訪談目標衝突。
+兩種證明強度仍是不同 type；共同的是 Evidence identity/lifecycle，讓既有 graph不用立刻改成多種頂層 support ID。完整欄位與
+consumer規則以 ADR 0037／R5 amendment為準。平行 ContextualAssertion是被否決的 R4 proposal，不可再實作。
 
 ### D2 — R5 output
 
@@ -1478,10 +1480,10 @@ R5 不 import editor contract，只由 Question Policy 使用 `JobStateDigest`�
 
 ### D15 — R5 go/no-go
 
-**推薦：現行 mother plan 的 R5 暫時 No-Go；核准 D1–D4、D12–D14 並回寫 exact contracts 後立即 Go。**
+**已裁決：原 mother plan R5 No-Go；ADR 0037／R5 amendment 版本 Go。**
 
-不需要等 editor 選型、K/S prompt、retrieval benchmark 或 export 完成。真正阻擋 R5 的只有短回答證明模型、
-QuestionFrame lifecycle 與 frequency/current 語意；先修這些比寫完後再改 Evidence/ContextBuilder 成本低得多。
+不需要等 editor 選型、K/S prompt、retrieval benchmark 或 export。新 authority 已固定短回答證明模型、QuestionFrame
+lifecycle、Evidence/State v3、state CAS 與 frequency/current 語意。
 
 ### D16 — ADR 0030 compatibility
 
@@ -1503,6 +1505,8 @@ canonical proposal store 與「人改不告知模型」兩項。**
 - OpenAI, [Speaker-aware meeting intelligence](https://developers.openai.com/cookbook/examples/audio/speaker_aware_meeting_intelligence/speaker_aware_meeting_intelligence) — structured extraction、evidence references、deterministic grounding、human labels、precision/recall 與 optional LLM judge。
 - Anthropic, [Building effective agents](https://www.anthropic.com/engineering/building-effective-agents) — simple composable workflow、single-call/retrieval baseline、programmatic gates、只有量測證明後才加複雜度。
 - Anthropic, [Effective context engineering for AI agents](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents) — context 是有限 attention budget；每輪選最小高訊號 state。
+- Anthropic, [Demystifying evals for AI agents](https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents) — 2026 多輪 eval 的 task/trial/transcript/outcome/harness 定義、code/model/human graders、人工閱讀 trace 與 grader 校準。
+- Anthropic, [Harness design for long-running application development](https://www.anthropic.com/engineering/harness-design-long-running-apps) — 2026 harness 以 structured state handoff維持長任務，並以逐項 ablation而非盲目增加 scaffolding。
 - Anthropic, [Contextual Retrieval](https://www.anthropic.com/engineering/contextual-retrieval) — chunk-specific context、BM25/embedding、reranking 與 retrieval eval。
 - Anthropic, [Anthropic Interviewer](https://www.anthropic.com/research/anthropic-interviewer) — planning/interviewing/analysis 三階段、adaptive 10–15 分鐘訪談、illustrative quotations 與 human researcher collaboration。
 - Google Cloud, [Dialogflow CX Parameters](https://docs.cloud.google.com/dialogflow/cx/docs/concept/parameter) — active form parameter、session parameter、slot/form filling 與 reprompt；證明短回答需綁定 active state。
@@ -1542,7 +1546,7 @@ R5 不應直接照現有 literal-only contract 實作，也不應推翻 Evidence
 Evidence-first
   + explicit QuestionFrame
   + short-answer AnswerBinding
-  + literal Evidence / ContextualAssertion 分型 provenance
+  + Evidence.v3 literal/contextual support 分型 provenance
   + employee direct document command
   + AI proposal -> employee accept/edit/reject
   + bounded JobStateDigest feedback loop
@@ -1561,9 +1565,9 @@ Evidence-first
 4. 公版沒有的任務與 K/S 可以直接成為這份 JD 的 custom item，不會被迫錯配官方 taxonomy；
 5. 最終主要職責、任務、產出、行為指標與 K/S 都能回答「為什麼有這一項、來源是員工原話、短答確認、員工文件編輯、公版或 AI task inference」。
 
-Revision 4 不裁決舊 editor／API／indexer 一定刪除；它裁決的是 **canonical Job Model 不得依賴它們**。各舊元件
+Revision 5 不裁決舊 editor／API／indexer 一定刪除；它裁決的是 **canonical Job Model 不得依賴它們**。各舊元件
 只有通過 vertical-slice quality/maintainability gate 才保留，否則可替換而不重做職務與職能核心。
 
-因此目前回答是：**R5 還不能照舊計畫寫，但不需要再無限研究。**先把本文 D1–D4、D12–D16 核准並轉成一份
-可執行的 R5 amendment；完成 exact schema、lifecycle、verifier 與 eval matrix 後即可交給實作者。共編完整實作不塞進
-R5，但它的 `JobStateDigest` seam 與員工 write authority 現在就要凍結，避免 R5 做完後重構 Context Engine。
+因此目前回答是：**舊 R5 不可做，新 R5 authority 已可交實作者。**ADR 0037 與 detailed amendment 已完成 exact schema、
+lifecycle、verifier、persistence/recovery、Capture 與 eval matrix。共編完整實作不塞進 R5，但 `JobStateDigest` seam、
+frame invalidation 與員工 write authority 已凍結，避免 R5 做完後重構 Context Engine。

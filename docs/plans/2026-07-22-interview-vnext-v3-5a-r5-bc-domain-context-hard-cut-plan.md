@@ -1,6 +1,6 @@
 # Interview AI vNext V3-5A R5-BC——Domain、Context 與 Turn Interpreter 原子 Hard Cut 實作交接規格
 
-- 狀態：**Approved / planned；實作尚未開始**
+- 狀態：**Approved / planned；實作尚未開始；TI-09/TI-10 prior-turn replay 阻斷已裁決於 §15.3**
 - 日期：2026-07-22
 - 前置完成：R5-A `bf35137`、R5-A corrective `09f406a`、corrective status `195c6a3`
 - 分支 baseline：`research/llm-interview-integration`，文件建立時 HEAD `195c6a3`
@@ -169,7 +169,9 @@ turn-interpret-verification-report.v1.schema.json
 ```
 
 Eval 現有 11 個 `turn-eval-*.v1.schema.json` 全部保留為 historical；active models/files 使用 v2，避免 outer v1 schema 因巢狀
-production type 改變而 silent drift。`case_id`、12 個 case 的語意與 dev/challenge split 不變，但 suite/file hashes全部重算。
+production type 改變而 silent drift。另新增一個 eval-only `turn-eval-prior-interpretation-seed.v1.schema.json`，用途只限 §15.3
+把既有多輪 correction fixture 閉合成真實 State v3；它不是 provider output、不是 production contract，也不進 quality scoring。
+`case_id`、12 個 case 的語意與 dev/challenge split 不變，但 suite/file hashes全部重算。
 
 ---
 
@@ -655,6 +657,181 @@ turn-interpret-c1-v2-pilot.v1
 
 這是契約硬切與 harness可執行性，不是 R6 模型品質改標。R6才新增真正 short-answer/mixed/frequency quality cases與 live multi-trial。
 
+### 15.3 TI-09／TI-10 prior employee turn 的 seeded interpretation
+
+#### 15.3.1 阻斷事實與裁決
+
+TI-09 在 target 前有一個 employee turn，TI-10 有兩個。若 fixture builder先 append完整 transcript，再補 prior Evidence，則在下一個
+consultant turn到來時，前一個 employee turn仍沒有 receipt；`AppendConsultantQuestionCommand` 必須回
+`turn_interpretation_pending`／`question_frame_answer_pending`，fixture無法建立。這不是可忽略的測試細節。
+
+裁決：採 **seeded prior interpretation**。不得放寬 State v3 invariant，不得壓縮／改寫 TI-09、TI-10 transcript，也不得恢復
+`ApplyEvidenceCommand.v2` 或讓 fixture自由指定 Evidence UUID。
+
+這裡的 seeded 表示「eval initial fixture 已由 case author明確宣告並 adjudicate 的 prior state」，不是假裝模型已正確推論。它只在
+`evals/interview_vnext` 內存在，production `app/` 不得 import seed contract。
+
+#### 15.3.2 Existing 12-case frame規則
+
+現有 TI-01～TI-12 的 consultant turns全是完整敘述型問題；本次 mechanical migration一律由 eval builder建立：
+
+```python
+build_question_frame_definition(
+    mode=QuestionMode.OPEN_NARRATIVE,
+    question_text=consultant_turn.text,
+    targets=(),
+)
+```
+
+這是 `turn-interpret-c1-v2-pilot.v1` 既有12 case的明確 suite規則，不是 production fallback，也不得拿來自動處理 R6 新增的
+short-answer cases。R6若需要 atomic/slot/choice/correction frame，必須新增 id-less declarative frame fixture contract，不由文字猜 mode。
+
+每個 consultant append仍走 production `AppendConsultantQuestionCommand`，frame ID依正式公式
+`uuid5(consultant_turn_id, "question-frame")` 產生。
+
+#### 15.3.3 Replay 必須 interleave
+
+setup planner改成 stateful replay，不可先回傳「全部 transcript command」後再 append prior operations。對每個 transcript turn：
+
+1. consultant：append consultant + open-narrative frame；若是 episode opened turn，依既有規則緊接著 open episode；
+2. employee：append employee並由 reducer綁定 immediate frame；
+3. 若該 employee不是 `target_turn_key`，立即建立 seeded prior interpretation、apply並 consume frame；
+4. 只有步驟3成功後，才可處理下一個 consultant turn；
+5. target employee只 append/bind，留給本 trial正式 `turn.interpret` operation，不在 setup建立 receipt。
+
+TI-09 exact setup順序：
+
+```text
+activate
+append consultant-01 + frame
+open episode
+append employee-prior + answer bind
+seed/apply prior interpretation + consume frame + receipt
+append consultant-02 + frame
+append employee-target + answer bind
+target turn.interpret operation
+```
+
+TI-10 對 `employee-prior-1`、`employee-prior-2` 各重複一次 seed/apply，再到 target。pure state materializer與 durable runner必須共用
+同一 planner/step identity；不得各自寫一套 interleave。
+
+#### 15.3.4 Exact identities 與 logical key mapping
+
+每個 prior employee turn只有一個 seeded operation：
+
+```python
+prior_operation_id = uuid5(trial_id, f"operation/prior/{employee_turn_key}")
+prior_interpretation_id = uuid5(prior_operation_id, "turn-interpretation")
+prior_command_id = uuid5(prior_operation_id, "command/turn-interpretation")
+prior_evidence_id = uuid5(
+    prior_operation_id,
+    f"literal/{observation_index:04d}",
+)
+```
+
+`observation_index` 是該 source turn 在 `initial_state.prior_evidence` 宣告順序中的一基位置，1..9999。seed path是 adjudicated
+fixture，不做 semantic drop/repair；任何 item無法 materialize成合法 literal Evidence時整個 fixture invalid。
+loader必須拒絕 duplicate `evidence_key`、unknown/non-employee/target source、同一 source group不連續、或 non-target employee沒有可建立
+receipt的 prior group。現有 TI-09/TI-10每個 prior employee都有一筆，故不需改 case語意。
+
+`evidence_key` 從此只是 case-local logical label。移除／停用舊的：
+
+```python
+uuid5(trial_id, f"evidence/{evidence_key}")
+```
+
+改由 fixture materialization產生 immutable mapping：
+
+```text
+evidence_key -> (source_turn_key, observation_index, prior_operation_id, evidence_id)
+```
+
+reference correction bindings、gold expected/forbidden supersession與grader全部只透過同一 mapping解 key；不得在各 consumer重算另一種 UUID。
+
+#### 15.3.5 Receipt、Evidence 與時間
+
+seeded command的 observations是 fixture宣告 materialize出的 `Evidence.v3`：
+
+- 一律 `LiteralEmployeeSpanSupport`，quote/span對應 source employee turn；
+- qualifiers直接使用 adjudicated domain `EvidenceQualifiers`；seed path不冒充 provider semantic verifier；
+- `extractor_operation_id = prior_operation_id`；
+- `accepted_evidence_ids` exact等於 observation order；
+- `dialogue_act = standalone_answer`、`episode_signal = continue`、insufficiency empty；
+- receipt frame ID/hash取當時已 answer-bound的 open-narrative frame；apply後必須 consume；
+- `record.applied_at == command.occurred_at`；
+- command時間固定為 employee append command時間後 `1 microsecond`，loader驗證它嚴格早於下一 transcript turn；現有 offsets皆有空間。
+
+#### 15.3.6 Hash provenance：禁止 placeholder
+
+seeded receipt仍不得使用空字串、常數 hash或偽造 `TurnInterpretOutput.v2`。builder必須：
+
+1. 在 prior employee仍為 tail時用 production `ContextBuilder` 建實際 Context v2並保存 context artifact；
+2. 建一個 eval-only `TurnEvalPriorInterpretationSeed.v1` artifact，exact shape：
+
+```text
+TurnEvalPriorInterpretationSeedOutput.v1
+  schema_version = turn_eval_prior_interpretation_seed_output.v1
+  initial_fixture_hash                  # canonical_hash(TurnEvalInitialFixture.v2)
+  employee_turn_key
+  observations                         # ordered TurnEvalPriorEvidenceFixture.v2 tuple
+  dialogue_act = standalone_answer
+  episode_signal = continue
+  insufficiency_codes = ()
+
+TurnEvalPriorEvidenceBinding.v1
+  evidence_key
+  observation_index
+  evidence_id
+
+TurnEvalPriorInterpretationSeedReport.v1
+  schema_version = turn_eval_prior_interpretation_seed_report.v1
+  output_hash                           # canonical_hash(seed.output)
+  evidence_bindings                    # exact observation order
+  accepted_evidence_ids                 # exact binding IDs order
+
+TurnEvalPriorInterpretationSeed.v1
+  schema_version = turn_eval_prior_interpretation_seed.v1
+  suite_version / case_id / trial_id
+  employee_turn_id / operation_id
+  question_frame_id / question_frame_definition_hash
+  context_packet_hash
+  output: TurnEvalPriorInterpretationSeedOutput
+  report: TurnEvalPriorInterpretationSeedReport
+```
+
+3. validators要求 output/report/top scope、hash、ordinal與accepted IDs完全閉合；binding keys unique且逐項對應 output observations；
+4. receipt hashes固定為：
+
+```text
+context_packet_hash = canonical_hash(actual ContextPacket.v2)
+output_hash = canonical_hash(seed.output)
+verification_report_hash = canonical_hash(seed.report)
+```
+
+5. runner保存 seed artifact並讓 setup event/manifest可達 seed→context→command→reduction；pure replay建立 byte-identical payload/hash。
+
+seed output/report不是 provider output，也不得寫成 `interview.turn_interpret_output.v2`／production verification artifact kind。artifact kind固定：
+
+```text
+interview.eval_prior_interpretation_seed.v1
+```
+
+這個例外只解決 adjudicated eval initial state。production receipt仍必須指向正式 output/report artifacts；R6 live trial不得以 seed receipt計入
+target operation quality或promotion分母。
+
+#### 15.3.7 Required regression tests
+
+- TI-09 exact step order；consultant-02前已有 prior receipt、prior frame consumed；
+- TI-10兩個不同 prior operation/receipt/frame consume；
+- prior operation/interpretation/command/Evidence fixed UUID vectors；
+- logical key mapping被 reference/gold/grader共用，舊 direct key UUID公式零使用；
+- receipt三個 hashes可從保存 artifacts重算，tamper seed/context會fail；
+- pure/durable setup的 final State v3 hash與 logical mapping byte-equal；
+- second consultant若刻意省略 prior seed，production reducer確實reject；
+- target employee setup後仍無 receipt、frame仍 answer-bound；正式 operation後才consume；
+- State v3「最多一個 pending且必為tail」invariant保持原樣；
+- TI-09/TI-10 transcript、gold semantic target與known/unknown correction行為未改。
+
 ---
 
 ## 16. 逐檔施工責任
@@ -796,9 +973,10 @@ R5-A/R4歷史 commits。
 
 ### 18.5 Eval/provider
 
-- all 11 v1 schemas byte frozen、11 v2 active deterministic；
+- all 11 v1 schemas byte frozen、11 v2 active deterministic，另加1個seed schema deterministic；
 - 12/12 v2 reference outputs走 production gate；
 - suite hash固定且非舊 v1 hash；
+- TI-09/TI-10 prior receipts interleave、seed provenance與logical evidence-key mapping exact；
 - gold不再有 `UserSignal`/`NO_OP`；
 - OpenRouter/OpenAI outbound schema hash精確等於 v2 catalog；
 - 429/500/timeout single-call、route/cache/conformance R4 regression全綠；
@@ -890,6 +1068,7 @@ bundle/migration 0011進 staged files。
 - [ ] recovery不重打已完成 provider call、不重複 domain writes；
 - [ ] persistence正確區分 unsupported major與 corruption；
 - [ ] eval v2 suite/11 schemas/hash完成機械 hard cut，舊 v1 frozen；
+- [ ] TI-09/TI-10 seeded prior interpretations先於下一 consultant落地，State invariant未放寬、transcript語意未改；
 - [ ] R4 OpenRouter/OpenAI reference regression不漂；
 - [ ] minimum Capture roots閉合；
 - [ ] focused、full no-network、全部 vNext real PG gates全綠；
@@ -917,10 +1096,11 @@ bundle/migration 0011進 staged files。
 12. unsupported persisted major/corruption分類測試；
 13. Capture roots與 minimum corruption測試；
 14. eval suite ID/new hash、12 case IDs/split/reference gate；
-15. OpenRouter/OpenAI adapter focused回歸數字；
-16.完整 no-network exact passed/skipped/failed與 baseline delta；
-17.全部 vNext real PostgreSQL exact passed/skipped/failed；
-18. schema/dependency/secret/diff/Alembic gates；
-19. DB/container/output cleanup狀態；
-20. 未完成項、是否解鎖 R5-D；
-21. 明確確認未跑 paid live、未接 production/Web/editor、未 push。
+15. TI-09/TI-10 seeded prior operation/receipt/Evidence IDs、step order、hash provenance與logical key mapping；
+16. OpenRouter/OpenAI adapter focused回歸數字；
+17.完整 no-network exact passed/skipped/failed與 baseline delta；
+18.全部 vNext real PostgreSQL exact passed/skipped/failed；
+19. schema/dependency/secret/diff/Alembic gates；
+20. DB/container/output cleanup狀態；
+21. 未完成項、是否解鎖 R5-D；
+22. 明確確認未跑 paid live、未接 production/Web/editor、未 push。

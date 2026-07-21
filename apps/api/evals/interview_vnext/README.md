@@ -21,6 +21,8 @@ R5 exact authority已改由
 [`support dependency/lifecycle closure plan`](../../../../docs/plans/2026-07-21-interview-vnext-v3-5a-r5-a-corrective-contract-closure-plan.md)。
 R5-BC exact施工authority為
 [`domain/context atomic hard-cut plan`](../../../../docs/plans/2026-07-22-interview-vnext-v3-5a-r5-bc-domain-context-hard-cut-plan.md)。
+TI-09/TI-10 的多輪fixture依該計畫§15.3在每個prior employee後立即套用deterministic seeded interpretation；
+`evidence_key`只作logical mapping，實際Evidence ID由prior operation + literal index導出。不得放寬pending-turn invariant或改寫transcript。
 R5 active hard cut會把minimum eval/provider fixtures機械遷移到QuestionFrame、Evidence/State v3與Turn Input/Output v2，
 以保持每個commit完整suite綠；R6才負責grounded short-answer多trial、gold/grader與真模型品質，不得在R5跑paid live。
 

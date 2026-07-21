@@ -1250,6 +1250,9 @@ validation必須fail。reasoning/secret scan規則不變。
 - scripted provider outputs；
 - probe scripts的 request/context builders（不執行 live）；
 - `evals/interview_vnext/fixture_builder.py` 以 consultant/employee/interpretation commands建立 state；
+- TI-09/TI-10 的 prior employee turns必須在下一 consultant append前，用每turn deterministic seeded
+  `ApplyTurnInterpretationCommand` 建 literal Evidence + receipt並consume frame；不得等完整 transcript replay後才補 evidence、不得放寬
+  pending-turn invariant。exact identity/provenance/key mapping見 R5-BC §15.3；
 - runner/live wiring/contracts/schema catalog能import active v2；
 - 既有 12 cases可先用 deterministic reference output維持 contract green。
 

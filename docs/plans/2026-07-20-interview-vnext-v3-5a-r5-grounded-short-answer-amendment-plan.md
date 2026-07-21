@@ -1,15 +1,16 @@
 # Interview AI vNext V3-5A R5——Grounded Short Answer 與 QuestionFrame 實作交接規格
 
 - 日期：2026-07-20
-- 狀態：**Approved / implementation in progress；R5-A 與其 corrective 已完成，R5-B ready**
+- 狀態：**Approved / implementation in progress；R5-A 與 corrective 已完成，R5-B／R5-C 已依 code audit 合併為 R5-BC 並 ready**
 - 決策：[`../adr/0037-interview-vnext-question-frame-contextual-evidence-and-employee-authority.md`](../adr/0037-interview-vnext-question-frame-contextual-evidence-and-employee-authority.md)
 - 母計畫：[`2026-07-18-interview-vnext-v3-5a-runtime-contract-reconstruction-plan.md`](2026-07-18-interview-vnext-v3-5a-runtime-contract-reconstruction-plan.md)
 - 研究：[`../specs/2026-07-20-interview-vnext-professional-job-analysis-and-short-answer-architecture-research.md`](../specs/2026-07-20-interview-vnext-professional-job-analysis-and-short-answer-architecture-research.md)
 - Entry baseline：R4 + correctives，tag `vnext-v3-5a-r4`，commit `14b9bfd`
 - R5-A implementation：`bf35137`；review corrective：`09f406a`，規格與執行結果見 [`2026-07-21-interview-vnext-v3-5a-r5-a-corrective-contract-closure-plan.md`](2026-07-21-interview-vnext-v3-5a-r5-a-corrective-contract-closure-plan.md)
+- R5-BC 原子 hard-cut authority：[`2026-07-22-interview-vnext-v3-5a-r5-bc-domain-context-hard-cut-plan.md`](2026-07-22-interview-vnext-v3-5a-r5-bc-domain-context-hard-cut-plan.md)
 - Scope：**R5 only：可靠理解一輪 employee answer；不做 JD synthesis／editor／Web／paid live**
 
-本文件是 R5 唯一 detailed implementation authority。它取代母計畫 §4 中 turn/context/domain 版本列、§9、§13 R5、
+本文件是 R5 總體 detailed authority；R5-BC 的逐檔施工與 atomic gate 由上列 2026-07-22 計畫進一步明確化。它取代母計畫 §4 中 turn/context/domain 版本列、§9、§13 R5、
 §14.5 與其 R5/R6 migration 邊界；其他 provider binding、conformance、Capture、R6–R9 gate 仍以母計畫為準。
 若 code comment、研究 Revision 4、ADR 0036 或舊 README 與本文件衝突，以 ADR 0037 與本文件為準。
 
@@ -736,8 +737,8 @@ current_turn: {sequence, locale, text}
 question_frame: TurnInputQuestionFrame | null
 active_episode: {target, status} | null
 contradictions: tuple[{contradiction_ordinal, status, question_goal}, ...]
-correction_candidates: tuple[{candidate_ordinal, subject, kind, claim, quote, qualifiers}, ...]
-recent_active_evidence: tuple[{recent_ordinal, subject, kind, claim, quote, qualifiers}, ...]
+correction_candidates: tuple[{candidate_ordinal, subject, kind, claim, support_kind, quote, qualifiers}, ...]
+recent_active_evidence: tuple[{recent_ordinal, subject, kind, claim, support_kind, quote, qualifiers}, ...]
 ```
 
 `TurnInputQuestionFrame`：
@@ -749,6 +750,11 @@ targets                               # domain IDs/source refs已移除的 seman
 ```
 
 target/option ordinals與語意保留；hash、source refs、supersede IDs全部不給模型。input projection需有 pure byte-equality test。
+
+`support_kind` 是必要的扁平分流欄位：literal 的 `quote` 投影 `support.quote`，contextual 的 `quote` 投影
+`support.answer_quote`。contextual quote只是短答，不是 claim 的逐字支持；prompt、grader與未來 UI consumer都必須先查看
+`support_kind`。不得為了方便在 domain `Evidence` 新增會混淆兩種證據的通用 `quote` property。此 refinement 的完整實作規則見
+R5-BC §3.1。
 
 ### 8.6 JobStateDigest seam
 
@@ -1364,24 +1370,24 @@ test_interview_vnext_turn_eval_*.py
 `QuoteSpan`／`QuoteMatch` ownership 移入 `domain/support.py`（`evidence -> support` 單向，AST guard + fresh-process 測試鎖住），
 QuestionFrame 補上 `closed_at >= opened_at`。完整 no-network `1020 passed / 197 skipped / 0 failed`、real PostgreSQL focused
 `64 passed / 0 skipped / 0 failed`、`*.schema.json` 零 diff、Alembic 仍 0010。逐項證據見
-[`R5-A corrective §15`](2026-07-21-interview-vnext-v3-5a-r5-a-corrective-contract-closure-plan.md)。**R5-B 已解鎖。**
+[`R5-A corrective §15`](2026-07-21-interview-vnext-v3-5a-r5-a-corrective-contract-closure-plan.md)。**R5-BC 已解鎖。**
 
-### R5-B——Domain/state hard cut
+### R5-BC——Domain/state + Context/interpreter/executor 原子 hard cut
 
-切 Evidence/State/commands/events/reducers/schema registry；同 commit機械遷移所有 app/eval/test domain fixtures，加入 explicit persisted
-version reject。若拆開會紅，全部同一 commit。
+Code audit 已確認 Evidence 直接巢狀於 Context packet、executor直接建立舊 apply command、eval/provider fixtures直接 import active
+input/output。若只提交 R5-B，必然改寫 frozen v1 schema或讓完整 suite紅；因此依本節「相鄰 slice無法全綠時合併」規則，
+R5-B與R5-C正式合併。
 
-驗收：domain/workflow/schema +完整 no-network + real PostgreSQL focused；Alembic 0010。
+一次切 Evidence/State/commands/events/reducers/persistence、context/input/output/report/prompt/policies/operation/executor、minimum
+Capture closure與全部 app/eval/provider/test consumers。不得加 dual-active shim；provider wire/routing/cache/conformance行為不改。
 
-建議 commit：`feat(interview): persist question frames and turn interpretations`
+詳細逐欄契約、實作 phase、eval v2 migration、測試矩陣與 gate 以
+[`R5-BC atomic hard-cut plan`](2026-07-22-interview-vnext-v3-5a-r5-bc-domain-context-hard-cut-plan.md)為唯一施工 authority。
 
-### R5-C——Context/interpreter/executor hard cut
+驗收：domain/context/turn/llm/adapters/executor/recovery/eval focused + 完整 no-network + 全部 vNext real PostgreSQL 0 skipped；
+Alembic維持0010。
 
-一次切 context/input/output/report/prompt/policies/operation/executor、minimum eval/provider schema fixtures；provider wire行為不改。
-
-驗收：context/turn/llm/adapters/executor/recovery +完整 no-network + real PostgreSQL focused。
-
-建議 commit：`feat(interview): interpret grounded short answers with question frames`
+建議 commit：`feat(interview): ground turn interpretation in persisted question frames`
 
 ### R5-D——Correctness closure
 

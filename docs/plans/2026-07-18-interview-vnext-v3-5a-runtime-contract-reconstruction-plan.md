@@ -1,10 +1,11 @@
 # Interview AI vNext V3-5A——Runtime Binding、Conformance、Turn Interpreter C1 v2 實作交接規格
 
 - 日期：2026-07-18
-- 狀態：**R1–R4 已完成（含 correctives）；R5 grounded short-answer amendment 已核准，可交實作者**
+- 狀態：**R1–R4 已完成（含 correctives）；R5-A與corrective已完成，R5-B／R5-C已合併為atomic R5-BC並ready**
 - Runtime 決策：[`../adr/0036-interview-vnext-provider-binding-conformance-and-idless-turn-v2.md`](../adr/0036-interview-vnext-provider-binding-conformance-and-idless-turn-v2.md)
 - R5 決策：[`../adr/0037-interview-vnext-question-frame-contextual-evidence-and-employee-authority.md`](../adr/0037-interview-vnext-question-frame-contextual-evidence-and-employee-authority.md)
 - R5 detailed authority：[`2026-07-20-interview-vnext-v3-5a-r5-grounded-short-answer-amendment-plan.md`](2026-07-20-interview-vnext-v3-5a-r5-grounded-short-answer-amendment-plan.md)
+- R5-BC施工 authority：[`2026-07-22-interview-vnext-v3-5a-r5-bc-domain-context-hard-cut-plan.md`](2026-07-22-interview-vnext-v3-5a-r5-bc-domain-context-hard-cut-plan.md)
 - 研究：[`../specs/2026-07-18-interview-vnext-llm-runtime-architecture-review.md`](../specs/2026-07-18-interview-vnext-llm-runtime-architecture-review.md)
 - 前一階段：[`2026-07-18-interview-vnext-v3-5-turn-eval-harness-plan.md`](2026-07-18-interview-vnext-v3-5-turn-eval-harness-plan.md)
 - Provider wire authority：[`2026-07-17-interview-vnext-v3-4r-openrouter-first-adapter-plan.md`](2026-07-17-interview-vnext-v3-4r-openrouter-first-adapter-plan.md)
@@ -1441,6 +1442,10 @@ reducers、Context v2、Evidence/State v3、stale CAS、Capture closure、逐檔
 
 [`2026-07-20-interview-vnext-v3-5a-r5-grounded-short-answer-amendment-plan.md`](2026-07-20-interview-vnext-v3-5a-r5-grounded-short-answer-amendment-plan.md)
 
+R5-A已完成；code audit確認 Evidence/State hard cut與Context/Interpreter/Executor之間不存在可保持frozen schema與full suite同時全綠的
+中間版本，因此原R5-B／R5-C依amendment的相鄰slice合併規則改為一個atomic R5-BC。實作者的exact施工順序、eval v2機械遷移與
+commit gate只看 [`R5-BC plan`](2026-07-22-interview-vnext-v3-5a-r5-bc-domain-context-hard-cut-plan.md)。
+
 R5 的新 outcome 是可靠理解一輪：persisted QuestionFrame + literal/contextual Evidence + durable interpretation receipt。
 不做 editor、JD synthesis、K/S、Web 或 paid live。
 
@@ -1454,7 +1459,7 @@ R5 的新 outcome 是可靠理解一輪：persisted QuestionFrame + literal/cont
 - operation/prompt/schema/verifier/Capture hashes與manifest closure一致；
 -完整no-network與real PostgreSQL保持全綠；Alembic仍0010。
 
-commits依 amendment R5-A～R5-E，不再使用單一巨大commit。
+commits依 amendment R5-A、atomic R5-BC、R5-D、R5-E；R5-BC在工作樹內分phase，但只有全套gate綠後才提交一次，禁止紅窗或shim。
 
 ### R6——Eval contracts、12 cases與graders v2
 

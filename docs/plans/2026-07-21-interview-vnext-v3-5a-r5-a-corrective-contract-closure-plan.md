@@ -1,7 +1,7 @@
 # Interview AI vNext V3-5A R5-A Corrective——Support 依賴方向與 QuestionFrame 生命週期閉合
 
 - 日期：2026-07-21
-- 狀態：**Completed（2026-07-21，commit `09f406a`）；R5-B 已解鎖**——執行結果見 §15
+- 狀態：**Completed（2026-07-21，commit `09f406a`）**——當時解鎖 R5-B；後續 code audit 已將 R5-B／R5-C 合併為 R5-BC，見 [`2026-07-22-interview-vnext-v3-5a-r5-bc-domain-context-hard-cut-plan.md`](2026-07-22-interview-vnext-v3-5a-r5-bc-domain-context-hard-cut-plan.md)
 - Review baseline：`bf35137`（`feat(interview): define grounded answer domain contracts`）
 - 上位決策：[`../adr/0037-interview-vnext-question-frame-contextual-evidence-and-employee-authority.md`](../adr/0037-interview-vnext-question-frame-contextual-evidence-and-employee-authority.md)
 - R5 主規格：[`2026-07-20-interview-vnext-v3-5a-r5-grounded-short-answer-amendment-plan.md`](2026-07-20-interview-vnext-v3-5a-r5-grounded-short-answer-amendment-plan.md)
@@ -639,7 +639,7 @@ question_frame.py / state.py / application / llm / evals / tests
 
 ### 15.3 機械遷移的 consumer
 
-`rg -n "QuoteSpan|QuoteMatch"` 確認無漏網（repo 內僅 `apps/api` Python + 本 docs 提及）。實際改動 8 個 consumer：
+`rg -n "QuoteSpan|QuoteMatch"` 確認無漏網（repo 內僅 `apps/api` Python + 本 docs 提及）。實際改動 10 個 consumer files：
 
 - `app/interview_vnext/domain/__init__.py`（export source → `.support`，公開名稱不變）
 - `app/interview_vnext/domain/invariants.py`
@@ -666,7 +666,7 @@ fresh-process harness 另以刻意錯誤 assertion 驗證會回傳 returncode 1�
 
 | Gate | 結果 |
 |---|---|
-| focused（question_frame／dependencies／schemas／domain／turn_interpret／workflow_reducers／context_builder） | 131 passed（baseline 121 + 新增） |
+| focused（question_frame／dependencies／schemas／domain／turn_interpret／workflow_reducers／context_builder） | 139 passed（baseline 121 + 新增 18） |
 | full no-network | **1020 passed / 197 skipped / 0 failed**（baseline 1002／197；+18 全為新增測試，無測試被改成 skip） |
 | real PostgreSQL focused（persistence／outbox／fixed_replay／recovery） | **64 passed / 0 skipped / 0 failed** |
 | `alembic current`／`heads` | 皆 `0010 (head)`；`alembic/versions` 仍只有 0001–0010 |
@@ -685,4 +685,4 @@ conformance／Capture／editor／Web，未新增 migration `0011`、未新增 de
 
 ### 15.7 結論
 
-§12 Definition of Done 全部成立，**R5-B 解鎖**。
+§12 Definition of Done 全部成立，當時 **R5-B 解鎖**；後續因 active domain/context相依性，施工單位已合併為 **R5-BC**。

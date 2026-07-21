@@ -1,6 +1,6 @@
 # Interview vNext — eval-only provider adapters
 
-**Status（2026-07-20）：V3-5A R4 complete；R5 grounded short-answer authority approved/planned，paid live/V3-6仍 blocked**
+**Status（2026-07-21）：V3-5A R4 complete；R5-A已落地但corrective完成前R5-B blocked，paid live/V3-6仍 blocked**
 
 Owner已核准ADR 0036；實作authority為
 [`V3-5A runtime contract reconstruction plan`](../../../../docs/plans/2026-07-18-interview-vnext-v3-5a-runtime-contract-reconstruction-plan.md)，
@@ -17,7 +17,9 @@ migration維持0010。
 R5 exact authority已改由
 [`ADR 0037`](../../../../docs/adr/0037-interview-vnext-question-frame-contextual-evidence-and-employee-authority.md)與
 [`grounded short-answer amendment`](../../../../docs/plans/2026-07-20-interview-vnext-v3-5a-r5-grounded-short-answer-amendment-plan.md)
-管理。R5 active hard cut會把minimum eval/provider fixtures機械遷移到QuestionFrame、Evidence/State v3與Turn Input/Output v2，
+管理；R5-A review corrective另見
+[`support dependency/lifecycle closure plan`](../../../../docs/plans/2026-07-21-interview-vnext-v3-5a-r5-a-corrective-contract-closure-plan.md)。
+R5 active hard cut會把minimum eval/provider fixtures機械遷移到QuestionFrame、Evidence/State v3與Turn Input/Output v2，
 以保持每個commit完整suite綠；R6才負責grounded short-answer多trial、gold/grader與真模型品質，不得在R5跑paid live。
 
 - **R4 語意**：adapter 只回 wire result + normalized execution evidence（`openrouter_routing.py` pure

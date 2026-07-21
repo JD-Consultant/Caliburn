@@ -1,10 +1,13 @@
 # Interview AI vNext（隔離開發中）
 
 本 package 是 ADR 0034 的隔離 greenfield 實作區。V0～V3-5 harness與V3-5A R1–R4（含correctives）已完成；
-R5-A inactive domain contracts已由`bf35137`落地，review重跑no-network為`1002 passed / 197 skipped / 0 failed`。
+R5-A inactive domain contracts已由`bf35137`落地，其review corrective已由`09f406a`完成，no-network為
+`1020 passed / 197 skipped / 0 failed`、real PostgreSQL focused `64 passed / 0 skipped / 0 failed`。
 owner已核准 ADR 0037；R5不再依 mother plan舊§9的literal-only短答設計，而使用 persisted QuestionFrame、
 AnswerBinding、Evidence.v3 literal/contextual support、每turn receipt、frequency/time分離與state-version CAS。
-R5-B目前由R5-A corrective阻擋：必須先消除support/evidence潛在循環依賴並補QuestionFrame closure chronology。舊 true-live batch
+`QuoteSpan`／`QuoteMatch`的唯一owner是`domain/support.py`，依賴方向固定為`evidence -> support`（AST guard＋
+fresh-process測試鎖住，禁止late import／forward-ref／雙份class）；QuestionFrame已拒絕`closed_at < opened_at`。
+**R5-B已解鎖**（Evidence.v3／State.v3 hard cut仍未開始）。舊 true-live batch
 `5bad4e3f-...`因route contamination停線，沒有模型品質裁決；paid live、V3-6、production route/Web與promotion仍 blocked。
 migration仍為0010八張表，不得新增0011。這個package仍沒有production route/live provider call，eval adapter未被production
 composition root import；現行使用者流量仍走`app/interview/` v3。

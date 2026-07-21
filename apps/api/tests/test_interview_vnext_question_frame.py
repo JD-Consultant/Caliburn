@@ -465,6 +465,8 @@ from datetime import UTC, datetime
 from app.interview_vnext.domain.question_frame import QuestionFrame
 
 NOW = datetime(2026, 7, 20, 0, 0, tzinfo=UTC)
+BEFORE_NOW = datetime(2026, 7, 19, 23, 59, 59, tzinfo=UTC)
+AFTER_NOW = datetime(2026, 7, 20, 0, 0, 1, tzinfo=UTC)
 
 
 def _frame(**overrides):
@@ -546,16 +548,64 @@ def test_stale_frame_requires_reason_and_allows_answer():
         _frame(status=QuestionFrameStatus.STALE, stale_reason=None, closed_at=NOW)
 
 
+def _closed_frame(status: QuestionFrameStatus, closed_at):
+    """A terminal frame of each status, varying only the closing timestamp."""
+    if status is QuestionFrameStatus.CONSUMED:
+        return _frame(
+            status=status,
+            answer_turn_id=uuid4(),
+            consumed_operation_id=uuid4(),
+            closed_at=closed_at,
+        )
+    if status is QuestionFrameStatus.SUPERSEDED:
+        return _frame(status=status, superseded_by_frame_id=uuid4(), closed_at=closed_at)
+    return _frame(
+        status=status,
+        stale_reason=QuestionFrameStaleReason.ANSWER_NOT_IMMEDIATE,
+        closed_at=closed_at,
+    )
+
+
+_TERMINAL_STATUSES = [
+    QuestionFrameStatus.CONSUMED,
+    QuestionFrameStatus.SUPERSEDED,
+    QuestionFrameStatus.STALE,
+]
+
+
+@pytest.mark.parametrize("status", _TERMINAL_STATUSES)
+def test_terminal_frame_rejects_closed_at_before_opened_at(status):
+    """R5-A corrective §4.2:`closed_at` 早於 `opened_at` 是不可能的時間線。
+    正常 reducer 不會產生,但 persisted state/fixture/future command 會,而
+    intra-model coherence 是 QuestionFrame 自己的責任。"""
+    with pytest.raises(ValidationError):
+        _closed_frame(status, BEFORE_NOW)
+
+
+@pytest.mark.parametrize("status", _TERMINAL_STATUSES)
+def test_terminal_frame_accepts_closed_at_equal_to_opened_at(status):
+    """同一 transaction／測試 clock 可能開關用同一 timestamp,必須合法。"""
+    frame = _closed_frame(status, NOW)
+    assert frame.closed_at == frame.opened_at
+
+
+@pytest.mark.parametrize("status", _TERMINAL_STATUSES)
+def test_terminal_frame_accepts_closed_at_after_opened_at(status):
+    frame = _closed_frame(status, AFTER_NOW)
+    assert frame.closed_at > frame.opened_at
+
+
 # ---------------------------------------------------------------------------
 # Batch F: Evidence support union
 # ---------------------------------------------------------------------------
 
-from app.interview_vnext.domain.evidence import QuoteMatch, QuoteSpan
 from app.interview_vnext.domain.support import (
     ContextualAnswerSupport,
     ContextualBindingKind,
     ContextualResolution,
     LiteralEmployeeSpanSupport,
+    QuoteMatch,
+    QuoteSpan,
 )
 
 

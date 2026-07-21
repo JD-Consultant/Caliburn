@@ -14,11 +14,11 @@ from .evidence import (
     EvidenceSubject,
     Ownership,
     Polarity,
-    QuoteMatch,
     TimeScope,
 )
 from .job_model import CandidateJobItem, CandidateKind, CandidateStatus
 from .reason_codes import ReasonCode
+from .support import QuoteMatch
 from .transcript import TranscriptRole, TranscriptTurn
 
 

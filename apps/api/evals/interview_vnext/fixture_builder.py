@@ -32,8 +32,6 @@ from app.interview_vnext.domain.evidence import (
     EvidenceQualifiers,
     EvidenceStatus,
     FrequencyQualifier,
-    QuoteMatch,
-    QuoteSpan,
 )
 from app.interview_vnext.domain.hashing import canonical_hash
 from app.interview_vnext.domain.reducers import (
@@ -44,6 +42,7 @@ from app.interview_vnext.domain.reducers import (
 )
 from app.interview_vnext.domain.session import SessionStatus, session_at
 from app.interview_vnext.domain.state import InterviewState
+from app.interview_vnext.domain.support import QuoteMatch, QuoteSpan
 from app.interview_vnext.domain.transcript import TranscriptTurn
 from app.interview_vnext.llm.context import (
     TURN_INTERPRET_CONTEXT_POLICY_V1,

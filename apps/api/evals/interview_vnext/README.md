@@ -1,6 +1,6 @@
 # Interview vNext — eval-only provider adapters
 
-**Status（2026-07-21）：V3-5A R4 complete；R5-A已落地但corrective完成前R5-B blocked，paid live/V3-6仍 blocked**
+**Status（2026-07-21）：V3-5A R4 complete；R5-A與其corrective（`09f406a`）已完成、R5-B ready，paid live/V3-6仍 blocked**
 
 Owner已核准ADR 0036；實作authority為
 [`V3-5A runtime contract reconstruction plan`](../../../../docs/plans/2026-07-18-interview-vnext-v3-5a-runtime-contract-reconstruction-plan.md)，

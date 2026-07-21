@@ -1,7 +1,7 @@
 # Interview AI vNext V3-5A R5-A Corrective——Support 依賴方向與 QuestionFrame 生命週期閉合
 
 - 日期：2026-07-21
-- 狀態：**Approved / planned；R5-B 在本 corrective 完成前 blocked**
+- 狀態：**Completed（2026-07-21，commit `09f406a`）；R5-B 已解鎖**——執行結果見 §15
 - Review baseline：`bf35137`（`feat(interview): define grounded answer domain contracts`）
 - 上位決策：[`../adr/0037-interview-vnext-question-frame-contextual-evidence-and-employee-authority.md`](../adr/0037-interview-vnext-question-frame-contextual-evidence-and-employee-authority.md)
 - R5 主規格：[`2026-07-20-interview-vnext-v3-5a-r5-grounded-short-answer-amendment-plan.md`](2026-07-20-interview-vnext-v3-5a-r5-grounded-short-answer-amendment-plan.md)
@@ -604,3 +604,85 @@ docs(interview): close R5-A corrective handoff
 14. 明確結論：R5-B 是否已解鎖。
 
 「測試大致通過」或只回報 focused suite 不算交付完成。
+
+---
+
+## 15. 執行結果（2026-07-21）
+
+### 15.1 Commits
+
+| Slice | SHA | Subject | Author／committer |
+|---|---|---|---|
+| R5-A-C1 | `09f406a` | `fix(interview): close R5-A support and frame invariants` | ArIs0x145 <aris0x145@gmail.com>（無 co-author） |
+| R5-A-C2 | 本 docs-only commit | `docs(interview): close R5-A corrective handoff` | 同上 |
+
+`bf35137` 未被改寫。
+
+### 15.2 最終 ownership 與 import graph
+
+`QuoteSpan`／`QuoteMatch` 的唯一 class authority 是 `app/interview_vnext/domain/support.py`：
+
+```text
+identifiers.py / base.py
+        ^
+        |
+    support.py        (QuoteSpan, QuoteMatch, contextual enums, support models, union)
+        ^
+        |
+    evidence.py       (from .support import QuoteMatch, QuoteSpan)
+        ^
+        |
+question_frame.py / state.py / application / llm / evals / tests
+```
+
+`support.py` 不 import evidence／question_frame／state；無 late import、forward-ref hack 或雙份 class。
+
+### 15.3 機械遷移的 consumer
+
+`rg -n "QuoteSpan|QuoteMatch"` 確認無漏網（repo 內僅 `apps/api` Python + 本 docs 提及）。實際改動 8 個 consumer：
+
+- `app/interview_vnext/domain/__init__.py`（export source → `.support`，公開名稱不變）
+- `app/interview_vnext/domain/invariants.py`
+- `app/interview_vnext/application/turn_interpret.py`
+- `app/interview_vnext/llm/turn_interpret.py`
+- `evals/interview_vnext/fixture_builder.py`
+- `tests/test_interview_vnext_domain.py`／`_question_frame.py`／`_turn_interpret.py`／`_workflow_reducers.py`／`_context_builder.py`
+
+### 15.4 新增測試（18 個）
+
+| 測試 | 數量 | 內容 |
+|---|---|---|
+| `test_support_module_never_imports_evidence_or_aggregates` | 1 | AST guard，違規輸出 `檔案:行號` |
+| `test_quote_primitive_ownership_holds_in_a_cold_process` | 4 | fresh-process：support-first／evidence-first import order、`Evidence.model_json_schema()`、`TypeAdapter(EvidenceSupport).json_schema()`（discriminator=`support_kind`）；並斷言 domain/application/llm 取得同一 class object |
+| `test_terminal_frame_rejects_closed_at_before_opened_at` | 3 | consumed／superseded／stale 全拒絕倒序 |
+| `test_terminal_frame_accepts_closed_at_equal_to_opened_at` | 3 | equal timestamp 合法 |
+| `test_terminal_frame_accepts_closed_at_after_opened_at` | 3 | 正序合法 |
+| `test_quote_span_accepts_a_minimal_span` + `test_quote_span_rejects_impossible_bounds` | 4 | `start=0,end=1` 合法；empty／reversed／negative 拒絕 |
+
+四個 §7 Step 1 必紅向量在 corrective 前確認為紅（`4 failed, 62 passed`），修完轉綠。
+fresh-process harness 另以刻意錯誤 assertion 驗證會回傳 returncode 1，排除空過。
+
+### 15.5 Gate 結果
+
+| Gate | 結果 |
+|---|---|
+| focused（question_frame／dependencies／schemas／domain／turn_interpret／workflow_reducers／context_builder） | 131 passed（baseline 121 + 新增） |
+| full no-network | **1020 passed / 197 skipped / 0 failed**（baseline 1002／197；+18 全為新增測試，無測試被改成 skip） |
+| real PostgreSQL focused（persistence／outbox／fixed_replay／recovery） | **64 passed / 0 skipped / 0 failed** |
+| `alembic current`／`heads` | 皆 `0010 (head)`；`alembic/versions` 仍只有 0001–0010 |
+| schema writer（domain／application／llm／observability／evals）後 `git diff --exit-code -- "*.schema.json"` | clean，零 diff |
+| domain writer determinism | 兩個 temp dir 27 檔 byte-equal，且與 committed 目錄 hash 完全一致 |
+| `git diff --check` | clean（只有 repo 既有 autocrlf 警告） |
+| secret scan | 無 key／token／bundle |
+
+### 15.6 明確未做
+
+Evidence 仍 `evidence.v2`、State 仍 `interview_state.v2`、QuestionFrame 仍 `question_frame.v1`。未加
+`support: EvidenceSupport` 欄位、未動 commands/events/reducers/registry、未改 provider adapter／route／cache／
+conformance／Capture／editor／Web，未新增 migration `0011`、未新增 dependency、未 push、未跑 paid live。
+
+§13 十項停線條件皆未觸發。
+
+### 15.7 結論
+
+§12 Definition of Done 全部成立，**R5-B 解鎖**。

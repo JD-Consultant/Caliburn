@@ -1,12 +1,12 @@
 # Interview AI vNext V3-5A R5——Grounded Short Answer 與 QuestionFrame 實作交接規格
 
 - 日期：2026-07-20
-- 狀態：**Approved / implementation in progress；R5-A 已落地，R5-A corrective 完成前 R5-B blocked**
+- 狀態：**Approved / implementation in progress；R5-A 與其 corrective 已完成，R5-B ready**
 - 決策：[`../adr/0037-interview-vnext-question-frame-contextual-evidence-and-employee-authority.md`](../adr/0037-interview-vnext-question-frame-contextual-evidence-and-employee-authority.md)
 - 母計畫：[`2026-07-18-interview-vnext-v3-5a-runtime-contract-reconstruction-plan.md`](2026-07-18-interview-vnext-v3-5a-runtime-contract-reconstruction-plan.md)
 - 研究：[`../specs/2026-07-20-interview-vnext-professional-job-analysis-and-short-answer-architecture-research.md`](../specs/2026-07-20-interview-vnext-professional-job-analysis-and-short-answer-architecture-research.md)
 - Entry baseline：R4 + correctives，tag `vnext-v3-5a-r4`，commit `14b9bfd`
-- R5-A implementation：`bf35137`；review corrective：[`2026-07-21-interview-vnext-v3-5a-r5-a-corrective-contract-closure-plan.md`](2026-07-21-interview-vnext-v3-5a-r5-a-corrective-contract-closure-plan.md)
+- R5-A implementation：`bf35137`；review corrective：`09f406a`，規格與執行結果見 [`2026-07-21-interview-vnext-v3-5a-r5-a-corrective-contract-closure-plan.md`](2026-07-21-interview-vnext-v3-5a-r5-a-corrective-contract-closure-plan.md)
 - Scope：**R5 only：可靠理解一輪 employee answer；不做 JD synthesis／editor／Web／paid live**
 
 本文件是 R5 唯一 detailed implementation authority。它取代母計畫 §4 中 turn/context/domain 版本列、§9、§13 R5、
@@ -1360,10 +1360,11 @@ test_interview_vnext_turn_eval_*.py
 
 建議 commit：`feat(interview): define grounded answer domain contracts`
 
-實作狀態（2026-07-21 review）：主切片已由 `bf35137` 完成，review 重跑 focused 58 passed、完整 no-network
-`1002 passed / 197 skipped / 0 failed`。但 `support.py -> evidence.py` 的依賴方向會在 R5-B Evidence.v3 回接 support union時
-形成 cycle/partial-initialization 風險，且 QuestionFrame 尚缺 `closed_at >= opened_at` invariant。修正方式、逐檔責任與 gates 以
-[`R5-A corrective`](2026-07-21-interview-vnext-v3-5a-r5-a-corrective-contract-closure-plan.md)為準；corrective 完成前不得開始 R5-B。
+實作狀態（2026-07-21）：**完成**。主切片由 `bf35137` 落地，review 找到的兩個契約閉合問題由 corrective `09f406a` 修掉——
+`QuoteSpan`／`QuoteMatch` ownership 移入 `domain/support.py`（`evidence -> support` 單向，AST guard + fresh-process 測試鎖住），
+QuestionFrame 補上 `closed_at >= opened_at`。完整 no-network `1020 passed / 197 skipped / 0 failed`、real PostgreSQL focused
+`64 passed / 0 skipped / 0 failed`、`*.schema.json` 零 diff、Alembic 仍 0010。逐項證據見
+[`R5-A corrective §15`](2026-07-21-interview-vnext-v3-5a-r5-a-corrective-contract-closure-plan.md)。**R5-B 已解鎖。**
 
 ### R5-B——Domain/state hard cut
 

@@ -26,7 +26,6 @@ from app.interview_vnext.domain.evidence import (
     EvidenceSubject,
     Ownership,
     Polarity,
-    QuoteSpan,
     TimeScope,
 )
 from app.interview_vnext.domain.hashing import canonical_json
@@ -36,6 +35,7 @@ from app.interview_vnext.domain.job_model import (
 )
 from app.interview_vnext.domain.session import SessionStatus, session_at
 from app.interview_vnext.domain.state import InterviewState
+from app.interview_vnext.domain.support import QuoteSpan
 from app.interview_vnext.domain.transcript import TranscriptRole, TranscriptTurn
 from app.interview_vnext.llm.context import (
     EPISODE_CODE_CONTEXT_POLICY_V1,

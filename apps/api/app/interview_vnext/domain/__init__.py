@@ -16,7 +16,7 @@ from .commands import (
     TransitionSessionCommand,
     WithdrawEvidenceCommand,
 )
-from .evidence import Evidence, EvidenceQualifiers, Inference, QuoteSpan
+from .evidence import Evidence, EvidenceQualifiers, Inference
 from .episode import EpisodeState, Gap
 from .job_model import CandidateJobItem
 from .reducers import (
@@ -39,6 +39,7 @@ from .reducers import (
 from .review import ReviewDecision
 from .session import InterviewSession
 from .state import InterviewState
+from .support import QuoteSpan
 from .transcript import TranscriptTurn
 
 __all__ = [

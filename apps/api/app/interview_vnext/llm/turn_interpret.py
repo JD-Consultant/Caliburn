@@ -20,7 +20,6 @@ from app.interview_vnext.domain.evidence import (
     Importance,
     Ownership,
     Polarity,
-    QuoteSpan,
     TimeScope,
     Typicality,
 )
@@ -32,6 +31,7 @@ from app.interview_vnext.domain.identifiers import (
     Sha256,
     StableName,
 )
+from app.interview_vnext.domain.support import QuoteSpan
 from app.interview_vnext.llm.context import INJECTION_BOUNDARY
 
 

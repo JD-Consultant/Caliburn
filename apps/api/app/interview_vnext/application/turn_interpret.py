@@ -15,10 +15,9 @@ from app.interview_vnext.domain.evidence import (
     EvidenceStatus,
     FrequencyQualifier,
     FrequencyUnit,
-    QuoteMatch,
-    QuoteSpan,
 )
 from app.interview_vnext.domain.hashing import canonical_hash
+from app.interview_vnext.domain.support import QuoteMatch, QuoteSpan
 from app.interview_vnext.domain.transcript import TranscriptRole
 from app.interview_vnext.llm.context import (
     INJECTION_BOUNDARY,

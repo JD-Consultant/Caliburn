@@ -44,7 +44,6 @@ from app.interview_vnext.domain.evidence import (
     InferenceStatus,
     Ownership,
     Polarity,
-    QuoteSpan,
     TimeScope,
     Typicality,
 )
@@ -74,6 +73,7 @@ from app.interview_vnext.domain.reducers import (
 from app.interview_vnext.domain.review import ReviewAction, ReviewDecision
 from app.interview_vnext.domain.session import InterviewSession, SessionStatus
 from app.interview_vnext.domain.state import InterviewState
+from app.interview_vnext.domain.support import QuoteSpan
 from app.interview_vnext.domain.transcript import TranscriptRole, TranscriptTurn
 
 

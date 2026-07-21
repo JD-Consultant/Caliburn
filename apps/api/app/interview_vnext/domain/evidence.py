@@ -11,6 +11,7 @@ from pydantic import Field, field_validator, model_validator
 
 from .base import DomainModel
 from .identifiers import NonEmptyText, ReferenceUrn, Sha256, StableName
+from .support import QuoteMatch, QuoteSpan
 
 
 class EvidenceSubject(StrEnum):
@@ -110,23 +111,6 @@ class EvidenceQualifiers(DomainModel):
     frequency: FrequencyQualifier = Field(default_factory=FrequencyQualifier)
     importance: Importance = Importance.NOT_STATED
     ownership: Ownership = Ownership.UNKNOWN
-
-
-class QuoteSpan(DomainModel):
-    unit: Literal["unicode_code_point"] = "unicode_code_point"
-    start: int = Field(ge=0)
-    end: int = Field(gt=0)
-
-    @model_validator(mode="after")
-    def end_is_after_start(self) -> "QuoteSpan":
-        if self.end <= self.start:
-            raise ValueError("quote span end must be greater than start")
-        return self
-
-
-class QuoteMatch(StrEnum):
-    EXACT = "exact"
-    NORMALIZED = "normalized"
 
 
 class EvidenceStatus(StrEnum):

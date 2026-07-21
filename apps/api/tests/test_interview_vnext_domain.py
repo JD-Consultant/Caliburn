@@ -27,8 +27,6 @@ from app.interview_vnext.domain.evidence import (
     Importance,
     Ownership,
     Polarity,
-    QuoteMatch,
-    QuoteSpan,
     TimeScope,
     Typicality,
 )
@@ -53,6 +51,7 @@ from app.interview_vnext.domain.reducers import (
 )
 from app.interview_vnext.domain.session import InterviewSession, SessionStatus
 from app.interview_vnext.domain.state import InterviewState
+from app.interview_vnext.domain.support import QuoteMatch, QuoteSpan
 from app.interview_vnext.domain.transcript import TranscriptRole, TranscriptTurn
 from app.interview_vnext.domain.review import ReviewAction, ReviewDecision
 
@@ -362,6 +361,22 @@ def test_turn_append_enforces_chain_and_client_id_uniqueness():
             ),
         )
     assert caught.value.reason_code == ReasonCode.CLIENT_TURN_ID_DUPLICATE
+
+
+def test_quote_span_accepts_a_minimal_span():
+    span = QuoteSpan(start=0, end=1)
+    assert span.unit == "unicode_code_point"
+
+
+@pytest.mark.parametrize(
+    "start,end",
+    [(1, 1), (2, 1), (-1, 1)],
+    ids=["empty", "reversed", "negative_start"],
+)
+def test_quote_span_rejects_impossible_bounds(start, end):
+    """R5-A corrective §8.2:primitive 搬到 `domain.support` 後行為必須完全不變。"""
+    with pytest.raises(ValidationError):
+        QuoteSpan(start=start, end=end)
 
 
 def test_exact_and_normalized_quotes_are_checked_against_employee_span():

@@ -1,6 +1,6 @@
 # Interview vNext — eval-only provider adapters
 
-**Status（2026-07-21）：V3-5A R4 complete；R5-A與其corrective（`09f406a`）已完成、R5-B ready，paid live/V3-6仍 blocked**
+**Status（2026-07-22）：V3-5A R4 complete；R5-A與corrective（`09f406a`）已完成，R5-B＋R5-C已合併為atomic R5-BC並ready；paid live/V3-6仍 blocked**
 
 Owner已核准ADR 0036；實作authority為
 [`V3-5A runtime contract reconstruction plan`](../../../../docs/plans/2026-07-18-interview-vnext-v3-5a-runtime-contract-reconstruction-plan.md)，
@@ -19,6 +19,8 @@ R5 exact authority已改由
 [`grounded short-answer amendment`](../../../../docs/plans/2026-07-20-interview-vnext-v3-5a-r5-grounded-short-answer-amendment-plan.md)
 管理；R5-A review corrective另見
 [`support dependency/lifecycle closure plan`](../../../../docs/plans/2026-07-21-interview-vnext-v3-5a-r5-a-corrective-contract-closure-plan.md)。
+R5-BC exact施工authority為
+[`domain/context atomic hard-cut plan`](../../../../docs/plans/2026-07-22-interview-vnext-v3-5a-r5-bc-domain-context-hard-cut-plan.md)。
 R5 active hard cut會把minimum eval/provider fixtures機械遷移到QuestionFrame、Evidence/State v3與Turn Input/Output v2，
 以保持每個commit完整suite綠；R6才負責grounded short-answer多trial、gold/grader與真模型品質，不得在R5跑paid live。
 

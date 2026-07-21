@@ -7,7 +7,8 @@ owner已核准 ADR 0037；R5不再依 mother plan舊§9的literal-only短答設�
 AnswerBinding、Evidence.v3 literal/contextual support、每turn receipt、frequency/time分離與state-version CAS。
 `QuoteSpan`／`QuoteMatch`的唯一owner是`domain/support.py`，依賴方向固定為`evidence -> support`（AST guard＋
 fresh-process測試鎖住，禁止late import／forward-ref／雙份class）；QuestionFrame已拒絕`closed_at < opened_at`。
-**R5-B已解鎖**（Evidence.v3／State.v3 hard cut仍未開始）。舊 true-live batch
+Code audit確認Domain hard cut無法與Context／Interpreter／Executor分開提交而維持frozen schema與full suite全綠，因此
+**R5-B＋R5-C已合併為R5-BC並解鎖**（實作仍未開始；禁止dual-active shim）。舊 true-live batch
 `5bad4e3f-...`因route contamination停線，沒有模型品質裁決；paid live、V3-6、production route/Web與promotion仍 blocked。
 migration仍為0010八張表，不得新增0011。這個package仍沒有production route/live provider call，eval adapter未被production
 composition root import；現行使用者流量仍走`app/interview/` v3。
@@ -21,6 +22,7 @@ composition root import；現行使用者流量仍走`app/interview/` v3。
 - V3-5A實作交接：[`../../../../docs/plans/2026-07-18-interview-vnext-v3-5a-runtime-contract-reconstruction-plan.md`](../../../../docs/plans/2026-07-18-interview-vnext-v3-5a-runtime-contract-reconstruction-plan.md)
 - R5 grounded short-answer詳細交接（Approved/in progress）：[`../../../../docs/plans/2026-07-20-interview-vnext-v3-5a-r5-grounded-short-answer-amendment-plan.md`](../../../../docs/plans/2026-07-20-interview-vnext-v3-5a-r5-grounded-short-answer-amendment-plan.md)
 - R5-A review corrective（R5-B前置）：[`../../../../docs/plans/2026-07-21-interview-vnext-v3-5a-r5-a-corrective-contract-closure-plan.md`](../../../../docs/plans/2026-07-21-interview-vnext-v3-5a-r5-a-corrective-contract-closure-plan.md)
+- R5-BC Domain／Context／Interpreter原子hard cut（Approved/planned）：[`../../../../docs/plans/2026-07-22-interview-vnext-v3-5a-r5-bc-domain-context-hard-cut-plan.md`](../../../../docs/plans/2026-07-22-interview-vnext-v3-5a-r5-bc-domain-context-hard-cut-plan.md)
 - R3-C修正交接：[`../../../../docs/plans/2026-07-19-interview-vnext-v3-5a-r3-corrective-plan.md`](../../../../docs/plans/2026-07-19-interview-vnext-v3-5a-r3-corrective-plan.md)
 - R4 provider evidence/conformance交接（已完成，§19 為執行結果）：[`../../../../docs/plans/2026-07-19-interview-vnext-v3-5a-r4-provider-evidence-conformance-plan.md`](../../../../docs/plans/2026-07-19-interview-vnext-v3-5a-r4-provider-evidence-conformance-plan.md)
 - V2 研究：[`../../../../docs/specs/2026-07-16-interview-vnext-v2-provider-capture-research.md`](../../../../docs/specs/2026-07-16-interview-vnext-v2-provider-capture-research.md)

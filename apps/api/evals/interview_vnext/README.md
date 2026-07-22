@@ -1,6 +1,6 @@
 # Interview vNext — eval-only provider adapters
 
-**Status（2026-07-22）：V3-5A R4、R5-A與atomic R5-BC均已完成；suite已hard cut到`turn-interpret-c1-v2-pilot.v1`，paid live/V3-6仍blocked**
+**Status（2026-07-22）：V3-5A R4、R5-A、atomic R5-BC與R5-D bounded correctness closure均已完成；suite已hard cut到`turn-interpret-c1-v2-pilot.v1`（frozen hash 未變），paid live/V3-6仍blocked，下一步最小Authoring Core**
 
 Owner已核准ADR 0036；實作authority為
 [`V3-5A runtime contract reconstruction plan`](../../../../docs/plans/2026-07-18-interview-vnext-v3-5a-runtime-contract-reconstruction-plan.md)，
@@ -21,6 +21,10 @@ R5 exact authority已改由
 [`support dependency/lifecycle closure plan`](../../../../docs/plans/2026-07-21-interview-vnext-v3-5a-r5-a-corrective-contract-closure-plan.md)。
 R5-BC exact施工authority為
 [`domain/context atomic hard-cut plan`](../../../../docs/plans/2026-07-22-interview-vnext-v3-5a-r5-bc-domain-context-hard-cut-plan.md)。
+R5-D（**completed**）補齊 Capture terminal roots、bundle corruption matrix 與 byte-identical re-export，交付證據見
+[`bounded correctness closure plan §17`](../../../../docs/plans/2026-07-22-interview-vnext-v3-5a-r5-d-bounded-correctness-closure-plan.md)；
+未改provider/domain/schema、未擴增case。現行active suite frozen hash為
+`sha256:5f60255dd323cd6c458b4ced7e067ca0a6c48cb9b3d2b5765bce8fada7a9bcc5`。
 TI-09/TI-10 的多輪fixture依該計畫§15.3在每個prior employee後立即套用deterministic seeded interpretation；
 `evidence_key`只作logical mapping，實際Evidence ID由prior operation + literal index導出。不得放寬pending-turn invariant或改寫transcript。
 R5-BC已把minimum eval/provider fixtures遷移到QuestionFrame、Evidence/State v3與Turn Input/Output v2；
@@ -56,7 +60,7 @@ R6才負責grounded short-answer多trial與真模型品質，不得把本次mock
   `capture_export`/`turn_graders`/`review`/`turn_report`/`scheduler`/`batch_orchestrator`/`live_wiring`/
   `turn_eval_cli`)已落地。focused 逐檔:contracts **32**、loader **62**、fixtures **9**、
   graders/review **26**、PG reference harness **5**、runner/report/export **8**、OpenRouter CLI/wiring **14**。
-- 12 個繁中 pilot cases(8 dev + 4 challenge)已凍結;suite hash
+- 原始V3-5 v1的12個繁中pilot cases(8 dev + 4 challenge)歷史suite hash
   `sha256:ed51167d64a9887f7a119568ad501ea71e1edd63eace6e44ccba222b5d763d5a`;12/12 reference output 通過
   production ContextBuilder/verifier/reducer gate,mocked 12×3 batch 端到端在 real PostgreSQL 產出
   `TURN_GATE_PASS_ENGINEERING`(harness 自測,**非** promotion-eligible)。

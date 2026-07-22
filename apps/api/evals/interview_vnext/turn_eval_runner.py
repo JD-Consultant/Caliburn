@@ -292,6 +292,14 @@ async def run_trial(
         raise RuntimeError("trial request artifact reference changed before finalize")
     request = ModelCallRequest.model_validate_json(request_record.inline_content or "")
     request_roots = model_call_input_artifacts(request_record.ref, request)
+    # §5.1/§5.2:provider authority(前四項,順序不變)後緊接 request 的四個內容
+    # dependency,讓 prompt/schema/context/selection 也是 terminal roots。
+    request_content_roots = (
+        request.prompt_artifact,
+        request.output_schema_artifact,
+        request.context_artifact,
+        request.selection_manifest_artifact,
+    )
     provider_authority_roots = await _provider_authority_roots(
         session_factory,
         tenant_id=ids.tenant_id,
@@ -301,6 +309,7 @@ async def run_trial(
         ref
         for ref in (
             *request_roots,
+            *request_content_roots,
             *setup_artifact_roots,
             *provider_authority_roots,
             budget_record.ref,

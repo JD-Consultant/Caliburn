@@ -1,8 +1,9 @@
 # Interview AI vNext（隔離開發中）
 
-本 package 是 ADR 0034 的隔離 greenfield 實作區。V0～V3-5 harness、V3-5A R1–R4（含correctives）、R5-A與
-**R5-BC grounded turn interpretation hard cut**均已完成。R5-BC 的完整 API no-network gate為
-`1071 passed / 198 skipped / 0 failed`，完整 API＋real PostgreSQL為`1269 passed / 0 skipped / 0 failed`。
+本 package 是 ADR 0034 的隔離 greenfield 實作區。V0～V3-5 harness、V3-5A R1–R4（含correctives）、R5-A、
+**R5-BC grounded turn interpretation hard cut**與 **R5-D bounded correctness closure** 均已完成。R5-D 後的完整 API
+no-network gate為 `1071 passed / 211 skipped / 0 failed`（+13 skip 為新增 real-PG capture 完整性 test nodes 在
+no-network 由 `require_postgres` 跳過），完整 API＋real PostgreSQL為 `1282 passed / 0 skipped / 0 failed`。
 
 R5-BC 現行路徑使用persisted QuestionFrame、AnswerBinding、Evidence.v3 literal/contextual support、每個成功employee turn
 一筆receipt、frequency/time分離與state-version/hash CAS。模型只提出不帶domain identity的v2 proposals；application依
@@ -12,7 +13,8 @@ sealed verifier policy決定接受或拒絕，再由operation-local位置產生E
 這一層的產品責任，是把員工訪談回答轉成可追溯、可更正的JD證據；它還不是完整JD synthesis或共編UI。此次沒有加入
 公司／租戶、SaaS、通用agent framework、production route或Web/editor整合。migration仍為0010八張表，eval adapter未被
 production composition root import；現行使用者流量仍走`app/interview/` v3。舊true-live batch `5bad4e3f-...`不具模型
-品質裁決資格；paid live、V3-6、production promotion仍blocked，下一個工程切片是R5-D correctness closure。
+品質裁決資格；paid live、V3-6、production promotion仍blocked。R5-D 已封住 Capture terminal-root closure、bundle
+corruption matrix 與 byte-identical re-export，下一個工程切片是**最小 Authoring Core**（見 R5-D 計畫 §18）。
 
 權威文件：
 
@@ -20,10 +22,12 @@ production composition root import；現行使用者流量仍走`app/interview/`
 - 2026 LLM runtime架構審查（已核准）：[`../../../../docs/specs/2026-07-18-interview-vnext-llm-runtime-architecture-review.md`](../../../../docs/specs/2026-07-18-interview-vnext-llm-runtime-architecture-review.md)
 - Runtime binding/Turn v2決策：[`../../../../docs/adr/0036-interview-vnext-provider-binding-conformance-and-idless-turn-v2.md`](../../../../docs/adr/0036-interview-vnext-provider-binding-conformance-and-idless-turn-v2.md)
 - Grounded short-answer／employee authority決策：[`../../../../docs/adr/0037-interview-vnext-question-frame-contextual-evidence-and-employee-authority.md`](../../../../docs/adr/0037-interview-vnext-question-frame-contextual-evidence-and-employee-authority.md)
+- R5後Context Engine／專業顧問workflow／Authoring Core決策：[`../../../../docs/adr/0038-interview-vnext-context-engine-and-professional-consultant-workflow.md`](../../../../docs/adr/0038-interview-vnext-context-engine-and-professional-consultant-workflow.md)
 - V3-5A實作交接：[`../../../../docs/plans/2026-07-18-interview-vnext-v3-5a-runtime-contract-reconstruction-plan.md`](../../../../docs/plans/2026-07-18-interview-vnext-v3-5a-runtime-contract-reconstruction-plan.md)
 - R5 grounded short-answer詳細交接（R5-BC已完成）：[`../../../../docs/plans/2026-07-20-interview-vnext-v3-5a-r5-grounded-short-answer-amendment-plan.md`](../../../../docs/plans/2026-07-20-interview-vnext-v3-5a-r5-grounded-short-answer-amendment-plan.md)
 - R5-A review corrective（R5-B前置）：[`../../../../docs/plans/2026-07-21-interview-vnext-v3-5a-r5-a-corrective-contract-closure-plan.md`](../../../../docs/plans/2026-07-21-interview-vnext-v3-5a-r5-a-corrective-contract-closure-plan.md)
 - R5-BC Domain／Context／Interpreter原子hard cut（completed，§23為交付證據）：[`../../../../docs/plans/2026-07-22-interview-vnext-v3-5a-r5-bc-domain-context-hard-cut-plan.md`](../../../../docs/plans/2026-07-22-interview-vnext-v3-5a-r5-bc-domain-context-hard-cut-plan.md)
+- R5-D bounded correctness closure（**completed**，§17為交付證據；下一步最小Authoring Core）：[`../../../../docs/plans/2026-07-22-interview-vnext-v3-5a-r5-d-bounded-correctness-closure-plan.md`](../../../../docs/plans/2026-07-22-interview-vnext-v3-5a-r5-d-bounded-correctness-closure-plan.md)
 - R3-C修正交接：[`../../../../docs/plans/2026-07-19-interview-vnext-v3-5a-r3-corrective-plan.md`](../../../../docs/plans/2026-07-19-interview-vnext-v3-5a-r3-corrective-plan.md)
 - R4 provider evidence/conformance交接（已完成，§19 為執行結果）：[`../../../../docs/plans/2026-07-19-interview-vnext-v3-5a-r4-provider-evidence-conformance-plan.md`](../../../../docs/plans/2026-07-19-interview-vnext-v3-5a-r4-provider-evidence-conformance-plan.md)
 - V2 研究：[`../../../../docs/specs/2026-07-16-interview-vnext-v2-provider-capture-research.md`](../../../../docs/specs/2026-07-16-interview-vnext-v2-provider-capture-research.md)

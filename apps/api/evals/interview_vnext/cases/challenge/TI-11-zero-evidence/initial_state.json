@@ -1,11 +1,13 @@
 {
-  "schema_version": "turn_eval_initial_fixture.v1",
-  "session_status_before_replay": "planned",
-  "activate_before_transcript": true,
-  "open_episode": {
-    "episode_key": "episode-main",
-    "target": "例外處理流程",
-    "opened_turn_key": "consultant-01"
-  },
-  "prior_evidence": []
+    "schema_version":  "turn_eval_initial_fixture.v2",
+    "session_status_before_replay":  "planned",
+    "activate_before_transcript":  true,
+    "open_episode":  {
+                         "episode_key":  "episode-main",
+                         "target":  "例外處理流程",
+                         "opened_turn_key":  "consultant-01"
+                     },
+    "prior_evidence":  [
+
+                       ]
 }

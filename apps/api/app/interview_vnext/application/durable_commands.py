@@ -20,13 +20,15 @@ from uuid import UUID
 
 from app.interview_vnext.domain.commands import (
     ApplyCandidateProposalsCommand,
-    ApplyEvidenceCommand,
     ApplyGapProposalsCommand,
     ApplyInferenceProposalsCommand,
     ApplyReviewDecisionCommand,
-    AppendTranscriptTurnCommand,
+    ApplyTurnInterpretationCommand,
+    AppendConsultantQuestionCommand,
+    AppendEmployeeTurnCommand,
     CommandBase,
     DecideInferenceCommand,
+    InvalidateQuestionFrameCommand,
     OpenEpisodeCommand,
     SupersedeInferenceCommand,
     TransitionCandidateCommand,
@@ -38,13 +40,15 @@ from app.interview_vnext.domain.commands import (
 from app.interview_vnext.domain.hashing import canonical_hash
 from app.interview_vnext.domain.reducers import (
     ReductionResult,
-    append_transcript_turn,
+    append_consultant_question,
+    append_employee_turn,
     apply_candidate_proposals,
-    apply_evidence,
     apply_gap_proposals,
     apply_inference_proposals,
     apply_review_decision,
+    apply_turn_interpretation,
     decide_inference,
+    invalidate_question_frame,
     open_episode,
     supersede_inference,
     transition_candidate,
@@ -74,11 +78,18 @@ _SCHEMA_BASE = "https://caliburn.local/schemas"
 _COMMAND_BINDINGS: dict[type[CommandBase], tuple[str, Callable]] = {
     TransitionSessionCommand:
         (f"{_SCHEMA_BASE}/transition-session-command.v1.schema.json", transition_session),
-    AppendTranscriptTurnCommand:
-        (f"{_SCHEMA_BASE}/append-transcript-turn-command.v1.schema.json",
-         append_transcript_turn),
-    ApplyEvidenceCommand:
-        (f"{_SCHEMA_BASE}/apply-evidence-command.v2.schema.json", apply_evidence),
+    AppendConsultantQuestionCommand:
+        (f"{_SCHEMA_BASE}/append-consultant-question-command.v1.schema.json",
+         append_consultant_question),
+    AppendEmployeeTurnCommand:
+        (f"{_SCHEMA_BASE}/append-employee-turn-command.v1.schema.json",
+         append_employee_turn),
+    InvalidateQuestionFrameCommand:
+        (f"{_SCHEMA_BASE}/invalidate-question-frame-command.v1.schema.json",
+         invalidate_question_frame),
+    ApplyTurnInterpretationCommand:
+        (f"{_SCHEMA_BASE}/apply-turn-interpretation-command.v1.schema.json",
+         apply_turn_interpretation),
     WithdrawEvidenceCommand:
         (f"{_SCHEMA_BASE}/withdraw-evidence-command.v1.schema.json", withdraw_evidence),
     OpenEpisodeCommand:
@@ -109,8 +120,19 @@ _COMMAND_BINDINGS: dict[type[CommandBase], tuple[str, Callable]] = {
          apply_review_decision),
 }
 
-REDUCTION_RESULT_SCHEMA_ID = f"{_SCHEMA_BASE}/reduction-result.v1.schema.json"
-INTERVIEW_STATE_SCHEMA_ID = f"{_SCHEMA_BASE}/interview-state.v2.schema.json"
+REDUCTION_RESULT_SCHEMA_ID = f"{_SCHEMA_BASE}/reduction-result.v2.schema.json"
+INTERVIEW_STATE_SCHEMA_ID = f"{_SCHEMA_BASE}/interview-state.v3.schema.json"
+
+
+def _artifact_kinds(command: CommandBase) -> tuple[str, str]:
+    """Use the active interpreter closure kinds without changing generic commands."""
+
+    if isinstance(command, ApplyTurnInterpretationCommand):
+        return (
+            "interview.apply_turn_interpretation_command.v1",
+            "interview.reduction_result.v2",
+        )
+    return "domain.command", "domain.reduction_result"
 
 
 @dataclass(frozen=True)
@@ -172,12 +194,16 @@ async def _commit_command_core(
     reduction_artifact_id: UUID,
     committed_at: datetime,
     request_idempotency_key: str | None,
+    turn_id: UUID | None = None,
+    operation_id: UUID | None = None,
+    contains_test_data: bool = False,
 ):
     """§7.3 steps ①½–⑦(caller 已做 dup 快查、之後負責 commit/分類)。
     回傳 (result, record, command_ref, reduction_ref);CAS 0 rows 時已
     rollback 並回 None;reducer 判 idempotent 時回 DurableCommandOutcome(replay)。
     供 apply_durable_command 與 commit_verified_operation(§7.8)共用。"""
     command_schema_id, reducer = _binding(command)
+    command_artifact_kind, reduction_artifact_kind = _artifact_kinds(command)
     command_hash = canonical_hash(command)
 
     # ①½ 先鎖 run row:一致鎖序(run → session/artifacts)。不先鎖的話,
@@ -216,17 +242,19 @@ async def _commit_command_core(
     command_artifact = await uow.artifacts.put(
         tenant_id=tenant_id,
         record=build_inline_artifact(
-            artifact_id=command_artifact_id, kind="domain.command",
+            artifact_id=command_artifact_id, kind=command_artifact_kind,
             media_type="application/json", payload=command,
             schema_id=command_schema_id, run_id=run_id, session_id=session_id,
-            created_at=committed_at))
+            turn_id=turn_id, operation_id=operation_id,
+            created_at=committed_at, contains_test_data=contains_test_data))
     reduction_artifact = await uow.artifacts.put(
         tenant_id=tenant_id,
         record=build_inline_artifact(
-            artifact_id=reduction_artifact_id, kind="domain.reduction_result",
+            artifact_id=reduction_artifact_id, kind=reduction_artifact_kind,
             media_type="application/json", payload=result,
             schema_id=REDUCTION_RESULT_SCHEMA_ID, run_id=run_id,
-            session_id=session_id, created_at=committed_at))
+            session_id=session_id, turn_id=turn_id, operation_id=operation_id,
+            created_at=committed_at, contains_test_data=contains_test_data))
 
     # ⑤ command row
     record = CommandRecord(

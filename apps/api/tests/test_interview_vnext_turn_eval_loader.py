@@ -14,6 +14,7 @@ from evals.interview_vnext.contracts import CaseSplit, QualifierExact
 from evals.interview_vnext.identities import (
     episode_uuid,
     prior_evidence_uuid,
+    prior_operation_uuid,
     slot_uuid,
     trial_scoped_ids,
     trial_uuid,
@@ -42,7 +43,7 @@ TARGET_TEXT = "我每天早上核對前一日的出貨訂單。"
 
 def base_case_doc(case_id: str = "TI-01-single-action") -> dict:
     return {
-        "schema_version": "turn_eval_case.v1",
+        "schema_version": "turn_eval_case.v2",
         "case_id": case_id,
         "split": "development",
         "locale": "zh-TW",
@@ -74,7 +75,7 @@ def base_case_doc(case_id: str = "TI-01-single-action") -> dict:
 def transcript_lines() -> list[dict]:
     def turn(key: str, sequence: int, role: str, text: str) -> dict:
         return {
-            "schema_version": "turn_eval_transcript_turn.v1",
+            "schema_version": "turn_eval_transcript_turn.v2",
             "turn_key": key,
             "sequence": sequence,
             "role": role,
@@ -104,7 +105,7 @@ def proposal_qualifiers(unit: str = "per_day") -> dict:
 
 def initial_state_doc() -> dict:
     return {
-        "schema_version": "turn_eval_initial_fixture.v1",
+        "schema_version": "turn_eval_initial_fixture.v2",
         "session_status_before_replay": "planned",
         "activate_before_transcript": True,
         "open_episode": {
@@ -130,11 +131,11 @@ def initial_state_doc() -> dict:
 
 def gold_doc(case_id: str = "TI-01-single-action") -> dict:
     return {
-        "schema_version": "turn_eval_gold.v1",
+        "schema_version": "turn_eval_gold.v2",
         "case_id": case_id,
-        "allowed_user_signals": ["answer"],
+        "allowed_dialogue_acts": ["standalone_answer"],
         "allowed_episode_signals": ["continue"],
-        "expected_commit": "evidence",
+        "expected_commit": "evidence_and_receipt",
         "observations": [
             {
                 "gold_id": "g-action-check-orders",
@@ -182,27 +183,25 @@ def gold_doc(case_id: str = "TI-01-single-action") -> dict:
 
 def reference_output_doc(case_id: str = "TI-01-single-action") -> dict:
     return {
-        "schema_version": "turn_eval_reference_output.v1",
+        "schema_version": "turn_eval_reference_output.v2",
         "case_id": case_id,
         "output": {
-            "schema_version": "turn_interpret_output.v1",
-            "observations": [
+            "schema_version": "turn_interpret_output.v2",
+            "literal_observations": [
                 {
-                    "proposal_key": "obs-check-orders",
                     "subject": "employee",
                     "kind": "action",
                     "claim": "每天早上核對前一日的出貨訂單",
                     "quote": "核對前一日的出貨訂單",
                     "quote_occurrence": 1,
                     "qualifiers": proposal_qualifiers(),
-                    "correction_target_evidence_ids": [],
-                    "correction_target_unknown": False,
                 }
             ],
-            "user_signal": "answer",
+            "answer_bindings": [],
+            "dialogue_act": "standalone_answer",
             "episode_signal": "continue",
             "emergent_topics": [],
-            "insufficiencies": [],
+            "turn_insufficiency_codes": [],
         },
         "correction_target_bindings": {},
     }
@@ -488,7 +487,9 @@ def test_reference_output_quotes_and_bindings_are_verified(case_dir: Path):
     rewrite(
         case_dir,
         "reference_output.json",
-        lambda doc: doc["output"]["observations"][0].update({"quote": "不存在的引文"}),
+        lambda doc: doc["output"]["literal_observations"][0].update(
+            {"quote": "不存在的引文"}
+        ),
     )
     with pytest.raises(CaseLoadError, match="reference proposal"):
         load_case_gold(case_dir)
@@ -496,10 +497,16 @@ def test_reference_output_quotes_and_bindings_are_verified(case_dir: Path):
     fresh = write_case(case_dir.parent / "binding", "TI-01-single-action")
 
     def bind(doc: dict) -> None:
-        doc["output"]["observations"][0].update(
-            {"kind": "correction", "correction_target_unknown": False}
+        doc["output"]["literal_observations"][0].update(
+            {
+                "kind": "correction",
+                "correction": {
+                    "target_candidate_ordinals": [],
+                    "target_unknown": False,
+                },
+            }
         )
-        doc["correction_target_bindings"] = {"obs-check-orders": ["prior-x"]}
+        doc["correction_target_bindings"] = {"1": ["prior-x"]}
 
     rewrite(fresh, "reference_output.json", bind)
     with pytest.raises(CaseLoadError, match="unknown prior evidence"):
@@ -547,7 +554,11 @@ def test_trial_scoped_ids_are_deterministic_and_distinct():
     assert ids.tenant_id == uuid5(trial_id, "tenant")
     assert turn_uuid(trial_id, "employee-target") == uuid5(trial_id, "turn/employee-target")
     assert episode_uuid(trial_id, "episode-main") == uuid5(trial_id, "episode/episode-main")
-    assert prior_evidence_uuid(trial_id, "prior-a") == uuid5(trial_id, "evidence/prior-a")
+    prior_operation = prior_operation_uuid(trial_id, "employee-prior")
+    assert prior_operation == uuid5(trial_id, "operation/prior/employee-prior")
+    assert prior_evidence_uuid(trial_id, "employee-prior", 1) == uuid5(
+        prior_operation, "literal/0001"
+    )
 
 
 def test_slot_and_trial_uuid_layout():
@@ -611,9 +622,9 @@ def make_entry(
     if noop:
         update.update(
             observations=(),
-            expected_commit="no_op",
+            expected_commit="receipt_only",
             state_expectation=gold.state_expectation.model_copy(
-                update={"state_hash_changed": False}
+                update={"state_hash_changed": True}
             ),
         )
     else:

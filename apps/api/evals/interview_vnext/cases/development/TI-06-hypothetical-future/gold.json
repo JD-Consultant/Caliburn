@@ -1,148 +1,158 @@
 {
-  "schema_version": "turn_eval_gold.v1",
-  "case_id": "TI-06-hypothetical-future",
-  "allowed_user_signals": [
-    "answer"
-  ],
-  "allowed_episode_signals": [
-    "continue"
-  ],
-  "expected_commit": "evidence",
-  "observations": [
-    {
-      "gold_id": "g-hypothetical-assist-testing",
-      "requirement": "required",
-      "semantic_target": "若明年導入新系統,員工可能協助測試(不確定、假設性)",
-      "allowed_subjects": [
-        "employee"
-      ],
-      "allowed_kinds": [
-        "action"
-      ],
-      "source_anchors": [
-        {
-          "turn_key": "employee-target",
-          "quote": "我可能會協助測試",
-          "occurrence": 1
-        },
-        {
-          "turn_key": "employee-target",
-          "quote": "協助測試",
-          "occurrence": 1
-        }
-      ],
-      "qualifiers": {
-        "time_scope": {
-          "mode": "one_of",
-          "values": [
-            "future",
-            "hypothetical"
-          ]
-        },
-        "typicality": {
-          "mode": "not_applicable"
-        },
-        "polarity": {
-          "mode": "exact",
-          "value": "uncertain"
-        },
-        "frequency_unit": {
-          "mode": "exact",
-          "value": "unknown"
-        },
-        "frequency_value": {
-          "mode": "not_applicable"
-        },
-        "importance": {
-          "mode": "one_of",
-          "values": [
-            "not_stated"
-          ]
-        },
-        "ownership": {
-          "mode": "exact",
-          "value": "assists"
-        }
-      },
-      "correction_target_evidence_keys": [],
-      "severity_if_missed": "major",
-      "rationale": "假設性意願只能以 uncertain/hypothetical 保留"
-    },
-    {
-      "gold_id": "g-not-doing-now",
-      "requirement": "required",
-      "semantic_target": "員工目前尚未進行系統測試",
-      "allowed_subjects": [
-        "employee"
-      ],
-      "allowed_kinds": [
-        "negation",
-        "action"
-      ],
-      "source_anchors": [
-        {
-          "turn_key": "employee-target",
-          "quote": "但目前還沒有做",
-          "occurrence": 1
-        },
-        {
-          "turn_key": "employee-target",
-          "quote": "目前還沒有做",
-          "occurrence": 1
-        }
-      ],
-      "qualifiers": {
-        "time_scope": {
-          "mode": "exact",
-          "value": "current"
-        },
-        "typicality": {
-          "mode": "not_applicable"
-        },
-        "polarity": {
-          "mode": "exact",
-          "value": "denied"
-        },
-        "frequency_unit": {
-          "mode": "exact",
-          "value": "unknown"
-        },
-        "frequency_value": {
-          "mode": "not_applicable"
-        },
-        "importance": {
-          "mode": "one_of",
-          "values": [
-            "not_stated"
-          ]
-        },
-        "ownership": {
-          "mode": "one_of",
-          "values": [
-            "not_responsible",
-            "unknown"
-          ]
-        }
-      },
-      "correction_target_evidence_keys": [],
-      "severity_if_missed": "major",
-      "rationale": "current 否定是防止把假設寫成現職的鎖"
-    }
-  ],
-  "forbidden_claims": [
-    {
-      "gold_id": "f-current-testing-duty",
-      "description": "不得產生 affirmative current 的「負責系統測試」事實",
-      "severity": "critical"
-    }
-  ],
-  "required_insufficiencies": [],
-  "allowed_insufficiencies": [
-    "insufficient_detail"
-  ],
-  "state_expectation": {
-    "state_hash_changed": true,
-    "prior_evidence_superseded_keys": [],
-    "forbidden_superseded_keys": []
-  }
+    "schema_version":  "turn_eval_gold.v2",
+    "case_id":  "TI-06-hypothetical-future",
+    "allowed_episode_signals":  [
+                                    "continue"
+                                ],
+    "expected_commit":  "evidence_and_receipt",
+    "observations":  [
+                         {
+                             "gold_id":  "g-hypothetical-assist-testing",
+                             "requirement":  "required",
+                             "semantic_target":  "若明年導入新系統,員工可能協助測試(不確定、假設性)",
+                             "allowed_subjects":  [
+                                                      "employee"
+                                                  ],
+                             "allowed_kinds":  [
+                                                   "action"
+                                               ],
+                             "source_anchors":  [
+                                                    {
+                                                        "turn_key":  "employee-target",
+                                                        "quote":  "我可能會協助測試",
+                                                        "occurrence":  1
+                                                    },
+                                                    {
+                                                        "turn_key":  "employee-target",
+                                                        "quote":  "協助測試",
+                                                        "occurrence":  1
+                                                    }
+                                                ],
+                             "qualifiers":  {
+                                                "time_scope":  {
+                                                                   "mode":  "one_of",
+                                                                   "values":  [
+                                                                                  "future",
+                                                                                  "hypothetical"
+                                                                              ]
+                                                               },
+                                                "typicality":  {
+                                                                   "mode":  "not_applicable"
+                                                               },
+                                                "polarity":  {
+                                                                 "mode":  "exact",
+                                                                 "value":  "uncertain"
+                                                             },
+                                                "frequency_unit":  {
+                                                                       "mode":  "exact",
+                                                                       "value":  "unknown"
+                                                                   },
+                                                "frequency_value":  {
+                                                                        "mode":  "not_applicable"
+                                                                    },
+                                                "importance":  {
+                                                                   "mode":  "one_of",
+                                                                   "values":  [
+                                                                                  "not_stated"
+                                                                              ]
+                                                               },
+                                                "ownership":  {
+                                                                  "mode":  "exact",
+                                                                  "value":  "unknown"
+                                                              }
+                                            },
+                             "correction_target_evidence_keys":  [
+
+                                                                 ],
+                             "severity_if_missed":  "major",
+                             "rationale":  "假設性意願只能以 uncertain/hypothetical 保留"
+                         },
+                         {
+                             "gold_id":  "g-not-doing-now",
+                             "requirement":  "required",
+                             "semantic_target":  "員工目前尚未進行系統測試",
+                             "allowed_subjects":  [
+                                                      "employee"
+                                                  ],
+                             "allowed_kinds":  [
+                                                   "negation",
+                                                   "action"
+                                               ],
+                             "source_anchors":  [
+                                                    {
+                                                        "turn_key":  "employee-target",
+                                                        "quote":  "但目前還沒有做",
+                                                        "occurrence":  1
+                                                    },
+                                                    {
+                                                        "turn_key":  "employee-target",
+                                                        "quote":  "目前還沒有做",
+                                                        "occurrence":  1
+                                                    }
+                                                ],
+                             "qualifiers":  {
+                                                "time_scope":  {
+                                                                   "mode":  "exact",
+                                                                   "value":  "current"
+                                                               },
+                                                "typicality":  {
+                                                                   "mode":  "not_applicable"
+                                                               },
+                                                "polarity":  {
+                                                                 "mode":  "exact",
+                                                                 "value":  "denied"
+                                                             },
+                                                "frequency_unit":  {
+                                                                       "mode":  "exact",
+                                                                       "value":  "unknown"
+                                                                   },
+                                                "frequency_value":  {
+                                                                        "mode":  "not_applicable"
+                                                                    },
+                                                "importance":  {
+                                                                   "mode":  "one_of",
+                                                                   "values":  [
+                                                                                  "not_stated"
+                                                                              ]
+                                                               },
+                                                "ownership":  {
+                                                                  "mode":  "one_of",
+                                                                  "values":  [
+                                                                                 "not_responsible",
+                                                                                 "unknown"
+                                                                             ]
+                                                              }
+                                            },
+                             "correction_target_evidence_keys":  [
+
+                                                                 ],
+                             "severity_if_missed":  "major",
+                             "rationale":  "current 否定是防止把假設寫成現職的鎖"
+                         }
+                     ],
+    "forbidden_claims":  [
+                             {
+                                 "gold_id":  "f-current-testing-duty",
+                                 "description":  "不得產生 affirmative current 的「負責系統測試」事實",
+                                 "severity":  "critical"
+                             }
+                         ],
+    "required_insufficiencies":  [
+
+                                 ],
+    "allowed_insufficiencies":  [
+                                    "insufficient_detail"
+                                ],
+    "state_expectation":  {
+                              "state_hash_changed":  true,
+                              "prior_evidence_superseded_keys":  [
+
+                                                                 ],
+                              "forbidden_superseded_keys":  [
+
+                                                            ]
+                          },
+    "allowed_dialogue_acts":  [
+                                  "standalone_answer"
+                              ]
 }

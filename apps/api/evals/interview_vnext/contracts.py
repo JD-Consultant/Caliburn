@@ -45,12 +45,14 @@ from app.interview_vnext.llm.result import (
     ModelOutcome,
     TokenUsage,
 )
-from app.interview_vnext.llm.turn_interpret import (
+from app.interview_vnext.domain.interpretation import (
+    DialogueAct,
     EpisodeSignal,
+    TurnInsufficiencyCode,
+)
+from app.interview_vnext.llm.turn_interpret import (
     EvidenceQualifiersProposal,
-    InsufficiencyReason,
     TurnInterpretOutput,
-    UserSignal,
 )
 
 
@@ -131,8 +133,15 @@ class FailureSeverity(StrEnum):
 
 
 class ExpectedCommit(StrEnum):
-    EVIDENCE = "evidence"
-    NO_OP = "no_op"
+    """What a successful turn must leave behind.
+
+    There is no no-op outcome any more: a turn that produced no evidence still
+    commits a receipt, so the distinction is only whether evidence came with it
+    (plan §15.2).
+    """
+
+    EVIDENCE_AND_RECEIPT = "evidence_and_receipt"
+    RECEIPT_ONLY = "receipt_only"
 
 
 class ExecutionMode(StrEnum):
@@ -196,7 +205,7 @@ class CaseDecision(StrEnum):
     REVIEW_INCOMPLETE = "review_incomplete"
 
 
-# ── turn_eval_case.v1(§6.1)─────────────────────────────────────────────────
+# ── turn_eval_case.v2(§6.1)─────────────────────────────────────────────────
 
 
 class TurnEvalCaseFiles(DomainModel):
@@ -211,7 +220,7 @@ class TurnEvalCaseFiles(DomainModel):
 
 
 class TurnEvalCase(DomainModel):
-    schema_version: Literal["turn_eval_case.v1"]
+    schema_version: Literal["turn_eval_case.v2"]
     case_id: CaseId
     split: CaseSplit
     locale: Locale
@@ -252,13 +261,13 @@ class TurnEvalCase(DomainModel):
         return self
 
 
-# ── turn_eval_transcript_turn.v1(§6.2)──────────────────────────────────────
+# ── turn_eval_transcript_turn.v2(§6.2)──────────────────────────────────────
 
 
 class TurnEvalTranscriptTurn(DomainModel):
     """One transcript line; raw text preserved, no trim/NFKC/whitespace merge."""
 
-    schema_version: Literal["turn_eval_transcript_turn.v1"]
+    schema_version: Literal["turn_eval_transcript_turn.v2"]
     turn_key: CaseKey
     sequence: int = Field(ge=1)
     role: TranscriptRole
@@ -267,7 +276,7 @@ class TurnEvalTranscriptTurn(DomainModel):
     occurred_offset_seconds: int = Field(ge=0)
 
 
-# ── turn_eval_initial_fixture.v1(§6.3)──────────────────────────────────────
+# ── turn_eval_initial_fixture.v2(§6.3)──────────────────────────────────────
 
 
 class TurnEvalOpenEpisodeFixture(DomainModel):
@@ -291,7 +300,7 @@ class TurnEvalPriorEvidenceFixture(DomainModel):
 
 
 class TurnEvalInitialFixture(DomainModel):
-    schema_version: Literal["turn_eval_initial_fixture.v1"]
+    schema_version: Literal["turn_eval_initial_fixture.v2"]
     # 計畫 §6.3 範例寫 "draft",但 domain SessionStatus 的初始值是 planned
     # (planned -> active 才是 production 合法轉換);fixture 對映真實 enum。
     session_status_before_replay: Literal["planned"]
@@ -320,7 +329,102 @@ class TurnEvalInitialFixture(DomainModel):
         return self
 
 
-# ── turn_eval_gold.v1(§6.5)─────────────────────────────────────────────────
+# ── Prior-interpretation seed(R5-BC §15.3;eval-only)────────────────────────
+
+
+class TurnEvalPriorEvidenceBinding(DomainModel):
+    schema_version: Literal["turn_eval_prior_evidence_binding.v1"] = (
+        "turn_eval_prior_evidence_binding.v1"
+    )
+    evidence_key: CaseKey
+    observation_index: int = Field(ge=1)
+    evidence_id: UUID
+
+
+class TurnEvalPriorInterpretationSeedOutput(DomainModel):
+    schema_version: Literal["turn_eval_prior_interpretation_seed_output.v1"] = (
+        "turn_eval_prior_interpretation_seed_output.v1"
+    )
+    initial_fixture_hash: Sha256
+    employee_turn_key: CaseKey
+    observations: tuple["TurnEvalPriorEvidenceFixture", ...] = ()
+    dialogue_act: Literal[DialogueAct.STANDALONE_ANSWER] = DialogueAct.STANDALONE_ANSWER
+    episode_signal: Literal[EpisodeSignal.CONTINUE] = EpisodeSignal.CONTINUE
+    insufficiency_codes: tuple[TurnInsufficiencyCode, ...] = ()
+
+
+class TurnEvalPriorInterpretationSeedReport(DomainModel):
+    schema_version: Literal["turn_eval_prior_interpretation_seed_report.v1"] = (
+        "turn_eval_prior_interpretation_seed_report.v1"
+    )
+    output_hash: Sha256
+    evidence_bindings: tuple[TurnEvalPriorEvidenceBinding, ...] = ()
+    accepted_evidence_ids: tuple[UUID, ...] = ()
+
+    @model_validator(mode="after")
+    def bindings_close_over_accepted_ids(
+        self,
+    ) -> "TurnEvalPriorInterpretationSeedReport":
+        indices = tuple(item.observation_index for item in self.evidence_bindings)
+        if indices != tuple(range(1, len(indices) + 1)):
+            raise ValueError("seed binding indices must be contiguous from 1")
+        keys = tuple(item.evidence_key for item in self.evidence_bindings)
+        if len(keys) != len(set(keys)):
+            raise ValueError("seed binding evidence keys must be unique")
+        if self.accepted_evidence_ids != tuple(
+            item.evidence_id for item in self.evidence_bindings
+        ):
+            raise ValueError("accepted IDs must match binding order exactly")
+        return self
+
+
+class TurnEvalPriorInterpretationSeed(DomainModel):
+    """Provenance for an adjudicated prior turn's receipt.
+
+    TI-09/TI-10 declare evidence that already existed before the target turn. The
+    domain now requires every employee turn to carry a receipt, so the fixture
+    commits a real interpretation for those turns — and this artifact records the
+    context, output and key mapping it was built from, so no receipt hash is ever
+    a placeholder or a faked provider output (plan §15.3.6).
+
+    Eval-only: production ``app/`` must never import this contract, and a seeded
+    receipt never counts toward model quality or promotion.
+    """
+
+    schema_version: Literal["turn_eval_prior_interpretation_seed.v1"] = (
+        "turn_eval_prior_interpretation_seed.v1"
+    )
+    suite_version: StableName
+    case_id: CaseId
+    trial_id: UUID
+    employee_turn_id: UUID
+    operation_id: UUID
+    question_frame_id: UUID
+    question_frame_definition_hash: Sha256
+    context_packet_hash: Sha256
+    output: TurnEvalPriorInterpretationSeedOutput
+    report: TurnEvalPriorInterpretationSeedReport
+
+    @model_validator(mode="after")
+    def seed_is_closed(self) -> "TurnEvalPriorInterpretationSeed":
+        if self.report.output_hash != canonical_hash(self.output):
+            raise ValueError("seed report output_hash does not match the seed output")
+        if len(self.report.evidence_bindings) != len(self.output.observations):
+            raise ValueError("seed bindings must cover every declared observation")
+        for binding, observation in zip(
+            self.report.evidence_bindings, self.output.observations, strict=True
+        ):
+            if binding.evidence_key != observation.evidence_key:
+                raise ValueError("seed binding order must follow observation order")
+            if observation.source_turn_key != self.output.employee_turn_key:
+                raise ValueError("seed observations must share one source turn")
+        return self
+
+
+SEED_ARTIFACT_KIND = "interview.eval_prior_interpretation_seed.v1"
+
+
+# ── turn_eval_gold.v2(§6.5)─────────────────────────────────────────────────
 
 
 class QualifierExact(DomainModel):
@@ -410,6 +514,9 @@ class GoldSourceAnchor(DomainModel):
     occurrence: int = Field(ge=1)
 
 
+SupportKind = Literal["literal_employee_span", "contextual_answer"]
+
+
 class TurnEvalGoldObservation(DomainModel):
     gold_id: GoldId
     requirement: GoldRequirement
@@ -417,6 +524,10 @@ class TurnEvalGoldObservation(DomainModel):
     semantic_target: NonEmptyText
     allowed_subjects: tuple[EvidenceSubject, ...] = Field(min_length=1)
     allowed_kinds: tuple[EvidenceKind, ...] = Field(min_length=1)
+    # Which support the evidence is allowed to carry. The grader branches on this
+    # before reading a quote, so a contextual 「是」 can never satisfy a gold entry
+    # that demands the claim be quoted literally (plan §15.2).
+    allowed_support_kinds: tuple[SupportKind, ...] = ("literal_employee_span",)
     source_anchors: tuple[GoldSourceAnchor, ...] = Field(min_length=1)
     qualifiers: GoldQualifierExpectations
     correction_target_evidence_keys: tuple[CaseKey, ...] = ()
@@ -428,6 +539,15 @@ class TurnEvalGoldObservation(DomainModel):
     def enum_lists_are_unique(cls, value: tuple) -> tuple:
         if len(value) != len(set(value)):
             raise ValueError("allowed subject/kind lists must be unique")
+        return value
+
+    @field_validator("allowed_support_kinds")
+    @classmethod
+    def support_kinds_are_canonical(cls, value: tuple) -> tuple:
+        if not value:
+            raise ValueError("allowed_support_kinds cannot be empty")
+        if len(value) != len(set(value)) or tuple(sorted(value)) != value:
+            raise ValueError("allowed_support_kinds must be unique and sorted")
         return value
 
     @model_validator(mode="after")
@@ -485,18 +605,18 @@ class GoldStateExpectation(DomainModel):
 
 
 class TurnEvalGold(DomainModel):
-    schema_version: Literal["turn_eval_gold.v1"]
+    schema_version: Literal["turn_eval_gold.v2"]
     case_id: CaseId
-    allowed_user_signals: tuple[UserSignal, ...] = Field(min_length=1)
+    allowed_dialogue_acts: tuple[DialogueAct, ...] = Field(min_length=1)
     allowed_episode_signals: tuple[EpisodeSignal, ...] = Field(min_length=1)
     expected_commit: ExpectedCommit
     observations: tuple[TurnEvalGoldObservation, ...] = ()
     forbidden_claims: tuple[TurnEvalGoldForbiddenClaim, ...] = ()
-    required_insufficiencies: tuple[InsufficiencyReason, ...] = ()
-    allowed_insufficiencies: tuple[InsufficiencyReason, ...] = ()
+    required_insufficiencies: tuple[TurnInsufficiencyCode, ...] = ()
+    allowed_insufficiencies: tuple[TurnInsufficiencyCode, ...] = ()
     state_expectation: GoldStateExpectation
 
-    @field_validator("allowed_user_signals", "allowed_episode_signals")
+    @field_validator("allowed_dialogue_acts", "allowed_episode_signals")
     @classmethod
     def signal_lists_are_unique(cls, value: tuple) -> tuple:
         if len(value) != len(set(value)):
@@ -521,61 +641,69 @@ class TurnEvalGold(DomainModel):
             for item in self.observations
             if item.requirement == GoldRequirement.REQUIRED
         )
-        if self.expected_commit == ExpectedCommit.NO_OP:
+        if self.expected_commit == ExpectedCommit.RECEIPT_ONLY:
             if required:
-                raise ValueError("no-op gold cannot carry required observations")
-            if self.state_expectation.state_hash_changed:
-                raise ValueError("no-op gold requires an unchanged state hash")
+                raise ValueError("receipt-only gold cannot carry required observations")
             if self.state_expectation.prior_evidence_superseded_keys:
-                raise ValueError("no-op gold cannot expect superseded evidence")
-        else:
-            if not required:
-                raise ValueError("evidence gold requires at least one required claim")
-            if not self.state_expectation.state_hash_changed:
-                raise ValueError("evidence gold requires a changed state hash")
+                raise ValueError("receipt-only gold cannot expect superseded evidence")
+        elif not required:
+            raise ValueError("evidence gold requires at least one required claim")
+        # Both commit shapes advance the state: the receipt itself is a state
+        # change, so a zero-evidence turn still moves the hash (plan §15.2).
+        if not self.state_expectation.state_hash_changed:
+            raise ValueError("a committed interpretation always changes the state hash")
         return self
 
 
-# ── turn_eval_reference_output.v1(§6.6)─────────────────────────────────────
+# ── turn_eval_reference_output.v2(§6.6)─────────────────────────────────────
 
 
 class TurnEvalReferenceOutput(DomainModel):
     """Known-good output with logical correction targets, portable across trials."""
 
-    schema_version: Literal["turn_eval_reference_output.v1"]
+    schema_version: Literal["turn_eval_reference_output.v2"]
     case_id: CaseId
     output: TurnInterpretOutput
+    # Keyed by the observation's 1-based position in ``output.literal_observations``
+    # — the model no longer emits proposal keys, so position is the identity
+    # (plan §15.2).
     correction_target_bindings: dict[str, tuple[CaseKey, ...]] = {}
 
     @model_validator(mode="after")
     def bindings_are_the_single_target_source(self) -> "TurnEvalReferenceOutput":
-        proposals = {item.proposal_key: item for item in self.output.observations}
-        for proposal in self.output.observations:
-            if proposal.correction_target_evidence_ids:
+        observations = self.output.literal_observations
+        for proposal in observations:
+            if proposal.correction.target_candidate_ordinals:
                 raise ValueError(
-                    "reference output must not persist trial-scoped correction UUIDs"
+                    "reference output must not persist trial-scoped correction ordinals"
                 )
-        for proposal_key, targets in self.correction_target_bindings.items():
-            proposal = proposals.get(proposal_key)
-            if proposal is None:
+        for raw_index, targets in self.correction_target_bindings.items():
+            try:
+                index = int(raw_index)
+            except ValueError as error:
                 raise ValueError(
-                    f"binding references unknown proposal key {proposal_key!r}"
+                    "correction target binding keys must be observation indices"
+                ) from error
+            if not 1 <= index <= len(observations):
+                raise ValueError(
+                    f"binding references unknown observation index {raw_index!r}"
                 )
+            proposal = observations[index - 1]
             if not targets:
                 raise ValueError("correction target binding cannot be empty")
             if len(targets) != len(set(targets)):
                 raise ValueError("correction target binding keys must be unique")
             if proposal.kind != EvidenceKind.CORRECTION:
                 raise ValueError("only correction proposals may bind targets")
-            if proposal.correction_target_unknown:
+            if proposal.correction.target_unknown:
                 raise ValueError(
                     "unknown-target corrections cannot carry a target binding"
                 )
-        for proposal in self.output.observations:
+        for index, proposal in enumerate(observations, 1):
             if (
                 proposal.kind == EvidenceKind.CORRECTION
-                and not proposal.correction_target_unknown
-                and proposal.proposal_key not in self.correction_target_bindings
+                and not proposal.correction.target_unknown
+                and str(index) not in self.correction_target_bindings
             ):
                 raise ValueError(
                     "known-target corrections require a logical target binding"
@@ -595,8 +723,8 @@ class SuiteManifestEntry(DomainModel):
 
 
 class TurnEvalSuiteManifestDefinition(DomainModel):
-    schema_version: Literal["turn_eval_suite_manifest.v1"] = (
-        "turn_eval_suite_manifest.v1"
+    schema_version: Literal["turn_eval_suite_manifest.v2"] = (
+        "turn_eval_suite_manifest.v2"
     )
     suite_version: StableName
     cases: tuple[SuiteManifestEntry, ...] = Field(min_length=1)
@@ -637,7 +765,7 @@ def define_turn_eval_suite_manifest(**values) -> TurnEvalSuiteManifest:
     )
 
 
-# ── turn_eval_batch_plan.v1(§9.1/§10)───────────────────────────────────────
+# ── turn_eval_batch_plan.v2(§9.1/§10)───────────────────────────────────────
 
 
 class BatchPlanCase(DomainModel):
@@ -649,7 +777,7 @@ class BatchPlanCase(DomainModel):
 
 
 class TurnEvalBatchPlanDefinition(DomainModel):
-    schema_version: Literal["turn_eval_batch_plan.v1"] = "turn_eval_batch_plan.v1"
+    schema_version: Literal["turn_eval_batch_plan.v2"] = "turn_eval_batch_plan.v2"
     batch_id: UUID
     execution_mode: ExecutionMode
     suite_version: StableName
@@ -746,7 +874,7 @@ def define_turn_eval_batch_plan(**values) -> TurnEvalBatchPlan:
     )
 
 
-# ── turn_eval_trial.v1(§9.3/§9.4)───────────────────────────────────────────
+# ── turn_eval_trial.v2(§9.3/§9.4)───────────────────────────────────────────
 
 
 class TrialRouteEvidence(DomainModel):
@@ -779,7 +907,7 @@ class TrialAttemptRecord(DomainModel):
 
 
 class TurnEvalTrial(DomainModel):
-    schema_version: Literal["turn_eval_trial.v1"]
+    schema_version: Literal["turn_eval_trial.v2"]
     trial_id: UUID
     case_id: CaseId
     slot_index: int = Field(ge=1, le=3)
@@ -858,11 +986,11 @@ class TurnEvalTrial(DomainModel):
         return self
 
 
-# ── turn_eval_grader_result.v1(§13)─────────────────────────────────────────
+# ── turn_eval_grader_result.v2(§13)─────────────────────────────────────────
 
 
 class TurnEvalGraderResult(DomainModel):
-    schema_version: Literal["turn_eval_grader_result.v1"]
+    schema_version: Literal["turn_eval_grader_result.v2"]
     grader_name: StableName
     grader_version: SemVer
     grader_definition_hash: Sha256
@@ -886,11 +1014,11 @@ class TurnEvalGraderResult(DomainModel):
         return self
 
 
-# ── turn_eval_review_decision.v1(§14.3)─────────────────────────────────────
+# ── turn_eval_review_decision.v2(§14.3)─────────────────────────────────────
 
 
 class TurnEvalReviewDecision(DomainModel):
-    schema_version: Literal["turn_eval_review_decision.v1"]
+    schema_version: Literal["turn_eval_review_decision.v2"]
     review_item_id: UUID
     review_item_hash: Sha256
     decision: ReviewDecisionLabel
@@ -998,7 +1126,7 @@ class MetricSummary(DomainModel):
         return cls(values=values, median=median, worst=present[0])
 
 
-# ── turn_eval_case_report.v1(§15.2)─────────────────────────────────────────
+# ── turn_eval_case_report.v2(§15.2)─────────────────────────────────────────
 
 
 class CaseSlotReport(DomainModel):
@@ -1027,7 +1155,7 @@ class CaseSlotReport(DomainModel):
 
 
 class TurnEvalCaseReport(DomainModel):
-    schema_version: Literal["turn_eval_case_report.v1"]
+    schema_version: Literal["turn_eval_case_report.v2"]
     case_id: CaseId
     split: CaseSplit
     slots: tuple[CaseSlotReport, ...] = Field(min_length=1)
@@ -1064,7 +1192,7 @@ class TurnEvalCaseReport(DomainModel):
         return self
 
 
-# ── turn_eval_batch_report.v1(§15.3~§15.6)──────────────────────────────────
+# ── turn_eval_batch_report.v2(§15.3~§15.6)──────────────────────────────────
 
 
 class HardGateResult(DomainModel):
@@ -1141,7 +1269,7 @@ class BatchTotals(DomainModel):
 
 
 class TurnEvalBatchReport(DomainModel):
-    schema_version: Literal["turn_eval_batch_report.v1"]
+    schema_version: Literal["turn_eval_batch_report.v2"]
     batch_id: UUID
     plan_hash: Sha256
     suite_version: StableName

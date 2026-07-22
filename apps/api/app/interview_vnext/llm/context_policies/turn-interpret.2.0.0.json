@@ -1,0 +1,41 @@
+{
+  "schema_version": "context_policy.v1",
+  "name": "turn-interpret",
+  "version": "2.0.0",
+  "operation_name": "turn.interpret",
+  "max_utf8_bytes": 65536,
+  "reserved_output_tokens": 8192,
+  "token_estimator": {
+    "name": "utf8-codepoint-heuristic",
+    "version": "1.0.0"
+  },
+  "section_order": [
+    "injection_boundary",
+    "preceding_consultant_turn",
+    "current_employee_turn",
+    "question_frame",
+    "active_episode",
+    "contradictions",
+    "correction_candidates",
+    "recent_active_evidence"
+  ],
+  "contradiction_cap": 4,
+  "correction_candidate_cap": 8,
+  "default_correction_candidate_cap": 4,
+  "recent_active_evidence_cap": 6,
+  "correction_cues": [
+    "actually",
+    "correction",
+    "i meant",
+    "rather than",
+    "不是",
+    "修正",
+    "其實",
+    "剛才說錯",
+    "應該是",
+    "我說錯",
+    "改成",
+    "更正"
+  ],
+  "policy_hash": "sha256:09468ace1f0564da5a7b1387fc8066a96275590554cc5cafd77274ebaa2b87f3"
+}

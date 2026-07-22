@@ -87,7 +87,7 @@ from app.interview_vnext.observability.artifacts import (
 
 
 TURN_OUTPUT_SCHEMA_ID = (
-    "https://caliburn.local/schemas/turn-interpret-output.v1.schema.json"
+    "https://caliburn.local/schemas/turn-interpret-output.v2.schema.json"
 )
 
 
@@ -95,12 +95,12 @@ TURN_OUTPUT_SCHEMA_ID = (
 def turn_output_projection() -> ProjectedSchema:
     """The active turn output projection the executor builds for every request.
 
-    Byte-identical to the published ``turn-interpret-output.v1`` portable schema,
+    Byte-identical to the published ``turn-interpret-output.v2`` portable schema,
     so a request whose ``output_schema_artifact`` hashes the published schema is
     consistent with this projection's ``projected_schema_hash``.
     """
 
-    schema_id, title, _factory = SCHEMA_EXPORTS["turn-interpret-output.v1.schema.json"]
+    schema_id, title, _factory = SCHEMA_EXPORTS["turn-interpret-output.v2.schema.json"]
     source = {**TurnInterpretOutput.model_json_schema(), "$id": schema_id, "title": title}
     return project_portable_strict_output_schema(
         source,

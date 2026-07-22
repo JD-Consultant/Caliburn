@@ -139,9 +139,9 @@ def test_reduction_result_round_trip_carries_schema_discriminator():
             target_status=SessionStatus.ACTIVE,
         ),
     )
-    assert result.schema_version == "reduction_result.v1"
+    assert result.schema_version == "reduction_result.v2"
     text = dump_model(result)
-    assert '"schema_version":"reduction_result.v1"' in text
+    assert '"schema_version":"reduction_result.v2"' in text
     assert ReductionResult.model_validate_json(text) == result
 
 
@@ -201,8 +201,8 @@ def test_invalid_json_and_unknown_fields_are_corruption_with_chained_cause():
     assert excinfo.value.__cause__ is not None        # exception chaining 供 log
     state = _state()
     smuggled = dump_model(state).replace(
-        '"schema_version":"interview_state.v2"',
-        '"schema_version":"interview_state.v2","extra_field":1', 1)
+        '"schema_version":"interview_state.v3"',
+        '"schema_version":"interview_state.v3","extra_field":1', 1)
     with pytest.raises(PersistedDataCorruption):      # strict:未知欄位不容忍
         load_state(smuggled, canonical_hash(state))
 

@@ -1,101 +1,107 @@
 {
-  "schema_version": "turn_eval_gold.v1",
-  "case_id": "TI-09-known-correction",
-  "allowed_user_signals": [
-    "correction"
-  ],
-  "allowed_episode_signals": [
-    "continue"
-  ],
-  "expected_commit": "evidence",
-  "observations": [
-    {
-      "gold_id": "g-correction-monthly-report",
-      "requirement": "required",
-      "semantic_target": "庫存報表頻率更正為每月一次,且明確指向既有的每週事實",
-      "allowed_subjects": [
-        "employee"
-      ],
-      "allowed_kinds": [
-        "correction"
-      ],
-      "source_anchors": [
-        {
-          "turn_key": "employee-target",
-          "quote": "不是每週,是每月寄一次庫存報表",
-          "occurrence": 1
-        },
-        {
-          "turn_key": "employee-target",
-          "quote": "是每月寄一次庫存報表",
-          "occurrence": 1
-        },
-        {
-          "turn_key": "employee-target",
-          "quote": "每月寄一次庫存報表",
-          "occurrence": 1
-        }
-      ],
-      "qualifiers": {
-        "time_scope": {
-          "mode": "exact",
-          "value": "current"
-        },
-        "typicality": {
-          "mode": "one_of",
-          "values": [
-            "typical",
-            "unknown"
-          ]
-        },
-        "polarity": {
-          "mode": "exact",
-          "value": "affirmed"
-        },
-        "frequency_unit": {
-          "mode": "exact",
-          "value": "per_month"
-        },
-        "frequency_value": {
-          "mode": "not_applicable"
-        },
-        "importance": {
-          "mode": "one_of",
-          "values": [
-            "not_stated"
-          ]
-        },
-        "ownership": {
-          "mode": "exact",
-          "value": "owner"
-        }
-      },
-      "correction_target_evidence_keys": [
-        "prior-inventory-report-frequency"
-      ],
-      "severity_if_missed": "major",
-      "rationale": "已知目標的更正必須 supersede 舊事實,否則舊頻率仍有效"
-    }
-  ],
-  "forbidden_claims": [
-    {
-      "gold_id": "f-keep-weekly-active",
-      "description": "不得留下「每週寄一次」的 active 事實或重複輸出舊頻率",
-      "severity": "critical"
-    },
-    {
-      "gold_id": "f-target-other-evidence",
-      "description": "不得把更正指向其他 evidence 或發明新目標",
-      "severity": "critical"
-    }
-  ],
-  "required_insufficiencies": [],
-  "allowed_insufficiencies": [],
-  "state_expectation": {
-    "state_hash_changed": true,
-    "prior_evidence_superseded_keys": [
-      "prior-inventory-report-frequency"
-    ],
-    "forbidden_superseded_keys": []
-  }
+    "schema_version":  "turn_eval_gold.v2",
+    "case_id":  "TI-09-known-correction",
+    "allowed_episode_signals":  [
+                                    "continue"
+                                ],
+    "expected_commit":  "evidence_and_receipt",
+    "observations":  [
+                         {
+                             "gold_id":  "g-correction-monthly-report",
+                             "requirement":  "required",
+                             "semantic_target":  "庫存報表頻率更正為每月一次,且明確指向既有的每週事實",
+                             "allowed_subjects":  [
+                                                      "employee"
+                                                  ],
+                             "allowed_kinds":  [
+                                                   "correction"
+                                               ],
+                             "source_anchors":  [
+                                                    {
+                                                        "turn_key":  "employee-target",
+                                                        "quote":  "不是每週,是每月寄一次庫存報表",
+                                                        "occurrence":  1
+                                                    },
+                                                    {
+                                                        "turn_key":  "employee-target",
+                                                        "quote":  "是每月寄一次庫存報表",
+                                                        "occurrence":  1
+                                                    },
+                                                    {
+                                                        "turn_key":  "employee-target",
+                                                        "quote":  "每月寄一次庫存報表",
+                                                        "occurrence":  1
+                                                    }
+                                                ],
+                             "qualifiers":  {
+                                                "time_scope":  {
+                                                                   "mode":  "exact",
+                                                                   "value":  "unknown"
+                                                               },
+                                                "typicality":  {
+                                                                   "mode":  "one_of",
+                                                                   "values":  [
+                                                                                  "typical",
+                                                                                  "unknown"
+                                                                              ]
+                                                               },
+                                                "polarity":  {
+                                                                 "mode":  "exact",
+                                                                 "value":  "affirmed"
+                                                             },
+                                                "frequency_unit":  {
+                                                                       "mode":  "exact",
+                                                                       "value":  "per_month"
+                                                                   },
+                                                "frequency_value":  {
+                                                                        "mode":  "not_applicable"
+                                                                    },
+                                                "importance":  {
+                                                                   "mode":  "one_of",
+                                                                   "values":  [
+                                                                                  "not_stated"
+                                                                              ]
+                                                               },
+                                                "ownership":  {
+                                                                  "mode":  "exact",
+                                                                  "value":  "unknown"
+                                                              }
+                                            },
+                             "correction_target_evidence_keys":  [
+                                                                     "prior-inventory-report-frequency"
+                                                                 ],
+                             "severity_if_missed":  "major",
+                             "rationale":  "已知目標的更正必須 supersede 舊事實,否則舊頻率仍有效"
+                         }
+                     ],
+    "forbidden_claims":  [
+                             {
+                                 "gold_id":  "f-keep-weekly-active",
+                                 "description":  "不得留下「每週寄一次」的 active 事實或重複輸出舊頻率",
+                                 "severity":  "critical"
+                             },
+                             {
+                                 "gold_id":  "f-target-other-evidence",
+                                 "description":  "不得把更正指向其他 evidence 或發明新目標",
+                                 "severity":  "critical"
+                             }
+                         ],
+    "required_insufficiencies":  [
+
+                                 ],
+    "allowed_insufficiencies":  [
+
+                                ],
+    "state_expectation":  {
+                              "state_hash_changed":  true,
+                              "prior_evidence_superseded_keys":  [
+                                                                     "prior-inventory-report-frequency"
+                                                                 ],
+                              "forbidden_superseded_keys":  [
+
+                                                            ]
+                          },
+    "allowed_dialogue_acts":  [
+                                  "correction"
+                              ]
 }

@@ -20,6 +20,7 @@ from app.interview_vnext.domain.identifiers import (
     StableName,
 )
 from app.interview_vnext.domain.job_model import CandidateJobItem
+from app.interview_vnext.domain.question_frame import QuestionFrame, QuestionFrameStatus
 from app.interview_vnext.domain.transcript import TranscriptRole, TranscriptTurn
 
 
@@ -27,6 +28,7 @@ TURN_INTERPRET_SECTION_ORDER = (
     "injection_boundary",
     "preceding_consultant_turn",
     "current_employee_turn",
+    "question_frame",
     "active_episode",
     "contradictions",
     "correction_candidates",
@@ -93,7 +95,7 @@ class TurnInterpretContextPolicyDefinition(ContextPolicyDefinition):
     @model_validator(mode="after")
     def turn_policy_is_canonical(self) -> "TurnInterpretContextPolicyDefinition":
         if self.section_order != TURN_INTERPRET_SECTION_ORDER:
-            raise ValueError("turn policy section order does not match v1")
+            raise ValueError("turn policy section order does not match 2.0.0")
         if tuple(sorted(set(self.correction_cues))) != self.correction_cues:
             raise ValueError("correction cues must be unique and sorted")
         if self.default_correction_candidate_cap > self.correction_candidate_cap:
@@ -169,9 +171,9 @@ def define_episode_code_context_policy(**values) -> EpisodeCodeContextPolicy:
     )
 
 
-TURN_INTERPRET_CONTEXT_POLICY_V1 = define_turn_interpret_context_policy(
+TURN_INTERPRET_CONTEXT_POLICY_V2 = define_turn_interpret_context_policy(
     name="turn-interpret",
-    version="1.0.0",
+    version="2.0.0",
     max_utf8_bytes=65_536,
     reserved_output_tokens=8_192,
     token_estimator=TokenEstimatorIdentity(
@@ -219,9 +221,9 @@ EPISODE_CODE_CONTEXT_POLICY_V1 = define_episode_code_context_policy(
 
 CONTEXT_POLICIES: dict[tuple[str, str], ContextPolicyDefinition] = {
     (
-        TURN_INTERPRET_CONTEXT_POLICY_V1.name,
-        TURN_INTERPRET_CONTEXT_POLICY_V1.version,
-    ): TURN_INTERPRET_CONTEXT_POLICY_V1,
+        TURN_INTERPRET_CONTEXT_POLICY_V2.name,
+        TURN_INTERPRET_CONTEXT_POLICY_V2.version,
+    ): TURN_INTERPRET_CONTEXT_POLICY_V2,
     (
         EPISODE_CODE_CONTEXT_POLICY_V1.name,
         EPISODE_CODE_CONTEXT_POLICY_V1.version,
@@ -243,6 +245,7 @@ class ContextSourceType(StrEnum):
     CANDIDATE = "candidate"
     REVIEW = "review"
     REFERENCE = "reference"
+    QUESTION_FRAME = "question_frame"
 
 
 class ContextSourceRef(DomainModel):
@@ -250,6 +253,11 @@ class ContextSourceRef(DomainModel):
     source_id: NonEmptyText
     state_hash: Sha256 | None = None
     reference_snapshot_hash: Sha256 | None = None
+    # Seals the source object itself, so a frame or evidence that was superseded
+    # or edited after selection cannot silently keep its packet slot. Required
+    # for question_frame and evidence sources; other sources keep their existing
+    # identity authority (R5 amendment §8.1; corrective §6.3).
+    content_hash: Sha256 | None = None
 
     @model_validator(mode="after")
     def source_container_is_explicit(self) -> "ContextSourceRef":
@@ -261,6 +269,11 @@ class ContextSourceRef(DomainModel):
                 raise ValueError("reference source requires only reference snapshot hash")
         elif self.state_hash is None or self.reference_snapshot_hash is not None:
             raise ValueError("working-state source requires only state hash")
+        if (
+            self.source_type in {ContextSourceType.QUESTION_FRAME, ContextSourceType.EVIDENCE}
+            and self.content_hash is None
+        ):
+            raise ValueError("question_frame and evidence sources require a content_hash")
         return self
 
 
@@ -295,6 +308,9 @@ class ContextIdentity(DomainModel):
     turn_id: UUID
     operation_id: UUID
     state_hash: Sha256
+    # The version the packet was built from: the executor commits against it, so
+    # a concurrent advance fails closed rather than rebasing (plan §9.1, §13.2).
+    state_version: int = Field(ge=0)
     reference_snapshot_hash: Sha256 | None = None
     section_order: tuple[StableName, ...]
 
@@ -306,8 +322,8 @@ class ContextIdentity(DomainModel):
 
 
 class ContextSelectionManifest(ContextIdentity):
-    schema_version: Literal["context_selection_manifest.v1"] = (
-        "context_selection_manifest.v1"
+    schema_version: Literal["context_selection_manifest.v2"] = (
+        "context_selection_manifest.v2"
     )
     decisions: tuple[ContextItemDecision, ...]
 
@@ -351,7 +367,7 @@ class ContextSectionBudget(DomainModel):
 
 
 class ContextBudgetReport(ContextIdentity):
-    schema_version: Literal["context_budget_report.v1"] = "context_budget_report.v1"
+    schema_version: Literal["context_budget_report.v2"] = "context_budget_report.v2"
     max_utf8_bytes: int = Field(ge=1)
     actual_utf8_bytes: int = Field(ge=0)
     unicode_code_points: int = Field(ge=0)
@@ -394,6 +410,8 @@ class ContextEvidenceItem(DomainModel):
             or self.source.source_id != str(self.evidence.evidence_id)
         ):
             raise ValueError("context evidence source identity mismatch")
+        if self.source.content_hash != canonical_hash(self.evidence):
+            raise ValueError("context evidence source content hash mismatch")
         return self
 
 
@@ -499,12 +517,55 @@ class ContextReferenceItem(DomainModel):
         return self
 
 
+class ContextQuestionFrame(DomainModel):
+    """The frame the current answer may be read against, when it is eligible.
+
+    Absent whenever the frame is stale, missing, or not the immediately
+    preceding question — in which case a bare 「是」 binds to nothing and only
+    literal extraction remains available (ADR 0037 §3).
+    """
+
+    source: ContextSourceRef
+    frame: QuestionFrame
+
+    @model_validator(mode="after")
+    def source_matches_frame(self) -> "ContextQuestionFrame":
+        if (
+            self.source.source_type != ContextSourceType.QUESTION_FRAME
+            or self.source.source_id != str(self.frame.question_frame_id)
+        ):
+            raise ValueError("context question frame source identity mismatch")
+        if self.source.content_hash != canonical_hash(self.frame):
+            raise ValueError("context question frame source content hash mismatch")
+        return self
+
+
+class QuestionFrameLimitation(StrEnum):
+    """Why an otherwise relevant frame was withheld from the model packet.
+
+    This remains application-only: the provider sees either a complete eligible
+    frame or no frame, while the local verifier retains enough deterministic
+    provenance to distinguish missing, not-immediate, and stale cases.
+    """
+
+    MISSING = "question_frame_missing"
+    NOT_ACTIVE = "question_frame_not_active"
+    ANSWER_NOT_BOUND = "question_frame_answer_not_bound"
+    NOT_IMMEDIATE = "question_frame_not_immediate"
+    TEXT_HASH_MISMATCH = "question_frame_text_hash_mismatch"
+    SOURCE_INVALID = "question_frame_source_invalid"
+    SOURCE_NOT_ACTIVE = "question_frame_source_not_active"
+    SOURCE_HASH_MISMATCH = "question_frame_source_hash_mismatch"
+
+
 class TurnInterpretContextPacket(ContextIdentity):
-    schema_version: Literal["context_packet.v1"] = "context_packet.v1"
+    schema_version: Literal["context_packet.v2"] = "context_packet.v2"
     packet_kind: Literal["turn_interpret"] = "turn_interpret"
     injection_boundary: Literal[INJECTION_BOUNDARY] = INJECTION_BOUNDARY
     preceding_consultant_turn: TranscriptTurn | None
     current_employee_turn: TranscriptTurn
+    question_frame: ContextQuestionFrame | None = None
+    question_frame_limitation: QuestionFrameLimitation | None = None
     active_episode: ContextEpisodeIdentity | None
     contradictions: tuple[ContextContradiction, ...] = ()
     correction_candidates: tuple[ContextEvidenceItem, ...] = ()
@@ -513,13 +574,29 @@ class TurnInterpretContextPacket(ContextIdentity):
     @model_validator(mode="after")
     def turn_packet_is_canonical(self) -> "TurnInterpretContextPacket":
         if self.section_order != TURN_INTERPRET_SECTION_ORDER:
-            raise ValueError("turn packet section order does not match v1")
+            raise ValueError("turn packet section order does not match 2.0.0")
         if (
             self.current_employee_turn.turn_id != self.turn_id
             or self.current_employee_turn.session_id != self.session_id
             or self.current_employee_turn.role != TranscriptRole.EMPLOYEE
         ):
             raise ValueError("current employee turn does not match context identity")
+        if self.question_frame is not None:
+            if self.question_frame_limitation is not None:
+                raise ValueError("eligible question frame cannot carry a limitation")
+            frame = self.question_frame.frame
+            if (
+                frame.session_id != self.session_id
+                or frame.answer_turn_id != self.turn_id
+                or frame.status != QuestionFrameStatus.ACTIVE
+                or self.question_frame.source.state_hash != self.state_hash
+            ):
+                raise ValueError("question frame does not match context identity")
+            if (
+                self.preceding_consultant_turn is None
+                or frame.consultant_turn_id != self.preceding_consultant_turn.turn_id
+            ):
+                raise ValueError("question frame must be the immediately preceding question")
         if self.preceding_consultant_turn is not None and (
             self.preceding_consultant_turn.session_id != self.session_id
             or self.preceding_consultant_turn.role != TranscriptRole.CONSULTANT
@@ -570,7 +647,7 @@ class TurnInterpretContextPacket(ContextIdentity):
 
 
 class EpisodeCodeContextPacket(ContextIdentity):
-    schema_version: Literal["context_packet.v1"] = "context_packet.v1"
+    schema_version: Literal["context_packet.v2"] = "context_packet.v2"
     packet_kind: Literal["episode_code"] = "episode_code"
     injection_boundary: Literal[INJECTION_BOUNDARY] = INJECTION_BOUNDARY
     episode: ContextEpisodeIdentity
@@ -646,7 +723,7 @@ CONTEXT_PACKET_ADAPTER = TypeAdapter(ContextPacket)
 
 
 class ContextBuildResult(DomainModel):
-    schema_version: Literal["context_build_result.v1"] = "context_build_result.v1"
+    schema_version: Literal["context_build_result.v2"] = "context_build_result.v2"
     packet: ContextPacket
     manifest: ContextSelectionManifest
     budget: ContextBudgetReport

@@ -160,7 +160,7 @@ def _parse_args(argv: list[str] | None) -> argparse.Namespace:
 def _turn_output_projection():
     """The active turn output projection (byte-identical to the published schema)."""
 
-    schema_id, title, _factory = SCHEMA_EXPORTS["turn-interpret-output.v1.schema.json"]
+    schema_id, title, _factory = SCHEMA_EXPORTS["turn-interpret-output.v2.schema.json"]
     source = {**TurnInterpretOutput.model_json_schema(), "$id": schema_id, "title": title}
     return project_portable_strict_output_schema(
         source,
@@ -389,19 +389,18 @@ async def run_probe(
 
         # ---- build request artifacts -----------------------------------------
         turn_id = uuid5(run_id, "turn/current")
-        preceding_turn_id = uuid5(run_id, "turn/preceding")
         operation_id = uuid5(run_id, "operation")
         attempt_id = uuid5(operation_id, "attempt/1")
         prompt = TURN_INTERPRET_PROMPT_PATH.read_text(encoding="utf-8")
-        schema = published_schema("turn-interpret-output.v1.schema.json")
+        schema = published_schema("turn-interpret-output.v2.schema.json")
         input_value = TurnInterpretInput(
             input_boundary=INJECTION_BOUNDARY,
             preceding_question=TurnInputTurn(
-                turn_id=preceding_turn_id, sequence=1, locale=probe["locale"],
+                sequence=1, locale=probe["locale"],
                 text=probe["preceding_question"],
             ),
             current_turn=TurnInputTurn(
-                turn_id=turn_id, sequence=2, locale=probe["locale"],
+                sequence=2, locale=probe["locale"],
                 text=probe["turn_text"],
             ),
             active_episode=None, contradictions=(), correction_candidates=(),

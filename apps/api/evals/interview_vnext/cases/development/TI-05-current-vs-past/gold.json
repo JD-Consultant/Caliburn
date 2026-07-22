@@ -1,210 +1,225 @@
 {
-  "schema_version": "turn_eval_gold.v1",
-  "case_id": "TI-05-current-vs-past",
-  "allowed_user_signals": [
-    "answer"
-  ],
-  "allowed_episode_signals": [
-    "continue"
-  ],
-  "expected_commit": "evidence",
-  "observations": [
-    {
-      "gold_id": "g-past-training-arrangement",
-      "requirement": "required",
-      "semantic_target": "員工過去(去年)負責安排教育訓練",
-      "allowed_subjects": [
-        "employee"
-      ],
-      "allowed_kinds": [
-        "action"
-      ],
-      "source_anchors": [
-        {
-          "turn_key": "employee-target",
-          "quote": "去年我負責安排教育訓練",
-          "occurrence": 1
-        },
-        {
-          "turn_key": "employee-target",
-          "quote": "負責安排教育訓練",
-          "occurrence": 1
-        }
-      ],
-      "qualifiers": {
-        "time_scope": {
-          "mode": "exact",
-          "value": "past"
-        },
-        "typicality": {
-          "mode": "one_of",
-          "values": [
-            "typical",
-            "unknown"
-          ]
-        },
-        "polarity": {
-          "mode": "exact",
-          "value": "affirmed"
-        },
-        "frequency_unit": {
-          "mode": "exact",
-          "value": "unknown"
-        },
-        "frequency_value": {
-          "mode": "not_applicable"
-        },
-        "importance": {
-          "mode": "one_of",
-          "values": [
-            "not_stated"
-          ]
-        },
-        "ownership": {
-          "mode": "exact",
-          "value": "owner"
-        }
-      },
-      "correction_target_evidence_keys": [],
-      "severity_if_missed": "major",
-      "rationale": "過去職責必須標 past,否則 JD 會把已移交工作寫成現職"
-    },
-    {
-      "gold_id": "g-current-provide-roster",
-      "requirement": "required",
-      "semantic_target": "員工目前只提供教育訓練名單",
-      "allowed_subjects": [
-        "employee"
-      ],
-      "allowed_kinds": [
-        "action"
-      ],
-      "source_anchors": [
-        {
-          "turn_key": "employee-target",
-          "quote": "我目前只提供名單",
-          "occurrence": 1
-        },
-        {
-          "turn_key": "employee-target",
-          "quote": "提供名單",
-          "occurrence": 1
-        }
-      ],
-      "qualifiers": {
-        "time_scope": {
-          "mode": "exact",
-          "value": "current"
-        },
-        "typicality": {
-          "mode": "exact",
-          "value": "typical"
-        },
-        "polarity": {
-          "mode": "exact",
-          "value": "affirmed"
-        },
-        "frequency_unit": {
-          "mode": "exact",
-          "value": "unknown"
-        },
-        "frequency_value": {
-          "mode": "not_applicable"
-        },
-        "importance": {
-          "mode": "one_of",
-          "values": [
-            "not_stated"
-          ]
-        },
-        "ownership": {
-          "mode": "one_of",
-          "values": [
-            "assists",
-            "owner"
-          ]
-        }
-      },
-      "correction_target_evidence_keys": [],
-      "severity_if_missed": "major",
-      "rationale": "現職唯一保留的動作;「只」表達範圍限縮"
-    },
-    {
-      "gold_id": "g-hr-current-ownership",
-      "requirement": "optional",
-      "semantic_target": "教育訓練目前由人資負責",
-      "allowed_subjects": [
-        "other_role"
-      ],
-      "allowed_kinds": [
-        "ownership",
-        "action"
-      ],
-      "source_anchors": [
-        {
-          "turn_key": "employee-target",
-          "quote": "現在這項工作由人資負責",
-          "occurrence": 1
-        },
-        {
-          "turn_key": "employee-target",
-          "quote": "由人資負責",
-          "occurrence": 1
-        }
-      ],
-      "qualifiers": {
-        "time_scope": {
-          "mode": "exact",
-          "value": "current"
-        },
-        "typicality": {
-          "mode": "exact",
-          "value": "typical"
-        },
-        "polarity": {
-          "mode": "exact",
-          "value": "affirmed"
-        },
-        "frequency_unit": {
-          "mode": "exact",
-          "value": "unknown"
-        },
-        "frequency_value": {
-          "mode": "not_applicable"
-        },
-        "importance": {
-          "mode": "one_of",
-          "values": [
-            "not_stated"
-          ]
-        },
-        "ownership": {
-          "mode": "exact",
-          "value": "owner"
-        }
-      },
-      "correction_target_evidence_keys": [],
-      "severity_if_missed": "major",
-      "rationale": "他角色責任是有價值的邊界資訊,但漏掉不罰"
-    }
-  ],
-  "forbidden_claims": [
-    {
-      "gold_id": "f-training-as-current",
-      "description": "不得把安排教育訓練寫成員工現職責任",
-      "severity": "critical"
-    },
-    {
-      "gold_id": "f-hr-duty-to-employee",
-      "description": "不得把人資的責任算給員工",
-      "severity": "critical"
-    }
-  ],
-  "required_insufficiencies": [],
-  "allowed_insufficiencies": [],
-  "state_expectation": {
-    "state_hash_changed": true,
-    "prior_evidence_superseded_keys": [],
-    "forbidden_superseded_keys": []
-  }
+    "schema_version":  "turn_eval_gold.v2",
+    "case_id":  "TI-05-current-vs-past",
+    "allowed_episode_signals":  [
+                                    "continue"
+                                ],
+    "expected_commit":  "evidence_and_receipt",
+    "observations":  [
+                         {
+                             "gold_id":  "g-past-training-arrangement",
+                             "requirement":  "required",
+                             "semantic_target":  "員工過去(去年)負責安排教育訓練",
+                             "allowed_subjects":  [
+                                                      "employee"
+                                                  ],
+                             "allowed_kinds":  [
+                                                   "action"
+                                               ],
+                             "source_anchors":  [
+                                                    {
+                                                        "turn_key":  "employee-target",
+                                                        "quote":  "去年我負責安排教育訓練",
+                                                        "occurrence":  1
+                                                    },
+                                                    {
+                                                        "turn_key":  "employee-target",
+                                                        "quote":  "負責安排教育訓練",
+                                                        "occurrence":  1
+                                                    }
+                                                ],
+                             "qualifiers":  {
+                                                "time_scope":  {
+                                                                   "mode":  "exact",
+                                                                   "value":  "unknown"
+                                                               },
+                                                "typicality":  {
+                                                                   "mode":  "one_of",
+                                                                   "values":  [
+                                                                                  "typical",
+                                                                                  "unknown"
+                                                                              ]
+                                                               },
+                                                "polarity":  {
+                                                                 "mode":  "exact",
+                                                                 "value":  "affirmed"
+                                                             },
+                                                "frequency_unit":  {
+                                                                       "mode":  "exact",
+                                                                       "value":  "unknown"
+                                                                   },
+                                                "frequency_value":  {
+                                                                        "mode":  "not_applicable"
+                                                                    },
+                                                "importance":  {
+                                                                   "mode":  "one_of",
+                                                                   "values":  [
+                                                                                  "not_stated"
+                                                                              ]
+                                                               },
+                                                "ownership":  {
+                                                                  "mode":  "exact",
+                                                                  "value":  "owner"
+                                                              }
+                                            },
+                             "correction_target_evidence_keys":  [
+
+                                                                 ],
+                             "severity_if_missed":  "major",
+                             "rationale":  "過去職責必須標 past,否則 JD 會把已移交工作寫成現職"
+                         },
+                         {
+                             "gold_id":  "g-current-provide-roster",
+                             "requirement":  "required",
+                             "semantic_target":  "員工目前只提供教育訓練名單",
+                             "allowed_subjects":  [
+                                                      "employee"
+                                                  ],
+                             "allowed_kinds":  [
+                                                   "action"
+                                               ],
+                             "source_anchors":  [
+                                                    {
+                                                        "turn_key":  "employee-target",
+                                                        "quote":  "我目前只提供名單",
+                                                        "occurrence":  1
+                                                    },
+                                                    {
+                                                        "turn_key":  "employee-target",
+                                                        "quote":  "提供名單",
+                                                        "occurrence":  1
+                                                    }
+                                                ],
+                             "qualifiers":  {
+                                                "time_scope":  {
+                                                                   "mode":  "exact",
+                                                                   "value":  "current"
+                                                               },
+                                                "typicality":  {
+                                                                   "mode":  "exact",
+                                                                   "value":  "unknown"
+                                                               },
+                                                "polarity":  {
+                                                                 "mode":  "exact",
+                                                                 "value":  "affirmed"
+                                                             },
+                                                "frequency_unit":  {
+                                                                       "mode":  "exact",
+                                                                       "value":  "unknown"
+                                                                   },
+                                                "frequency_value":  {
+                                                                        "mode":  "not_applicable"
+                                                                    },
+                                                "importance":  {
+                                                                   "mode":  "one_of",
+                                                                   "values":  [
+                                                                                  "not_stated"
+                                                                              ]
+                                                               },
+                                                "ownership":  {
+                                                                  "mode":  "one_of",
+                                                                  "values":  [
+                                                                                 "assists",
+                                                                                 "owner",
+                                                                                 "unknown"
+                                                                             ]
+                                                              }
+                                            },
+                             "correction_target_evidence_keys":  [
+
+                                                                 ],
+                             "severity_if_missed":  "major",
+                             "rationale":  "現職唯一保留的動作;「只」表達範圍限縮"
+                         },
+                         {
+                             "gold_id":  "g-hr-current-ownership",
+                             "requirement":  "optional",
+                             "semantic_target":  "教育訓練目前由人資負責",
+                             "allowed_subjects":  [
+                                                      "other_role"
+                                                  ],
+                             "allowed_kinds":  [
+                                                   "ownership",
+                                                   "action"
+                                               ],
+                             "source_anchors":  [
+                                                    {
+                                                        "turn_key":  "employee-target",
+                                                        "quote":  "現在這項工作由人資負責",
+                                                        "occurrence":  1
+                                                    },
+                                                    {
+                                                        "turn_key":  "employee-target",
+                                                        "quote":  "由人資負責",
+                                                        "occurrence":  1
+                                                    }
+                                                ],
+                             "qualifiers":  {
+                                                "time_scope":  {
+                                                                   "mode":  "exact",
+                                                                   "value":  "current"
+                                                               },
+                                                "typicality":  {
+                                                                   "mode":  "exact",
+                                                                   "value":  "unknown"
+                                                               },
+                                                "polarity":  {
+                                                                 "mode":  "exact",
+                                                                 "value":  "affirmed"
+                                                             },
+                                                "frequency_unit":  {
+                                                                       "mode":  "exact",
+                                                                       "value":  "unknown"
+                                                                   },
+                                                "frequency_value":  {
+                                                                        "mode":  "not_applicable"
+                                                                    },
+                                                "importance":  {
+                                                                   "mode":  "one_of",
+                                                                   "values":  [
+                                                                                  "not_stated"
+                                                                              ]
+                                                               },
+                                                "ownership":  {
+                                                                  "mode":  "exact",
+                                                                  "value":  "unknown"
+                                                              }
+                                            },
+                             "correction_target_evidence_keys":  [
+
+                                                                 ],
+                             "severity_if_missed":  "major",
+                             "rationale":  "他角色責任是有價值的邊界資訊,但漏掉不罰"
+                         }
+                     ],
+    "forbidden_claims":  [
+                             {
+                                 "gold_id":  "f-training-as-current",
+                                 "description":  "不得把安排教育訓練寫成員工現職責任",
+                                 "severity":  "critical"
+                             },
+                             {
+                                 "gold_id":  "f-hr-duty-to-employee",
+                                 "description":  "不得把人資的責任算給員工",
+                                 "severity":  "critical"
+                             }
+                         ],
+    "required_insufficiencies":  [
+
+                                 ],
+    "allowed_insufficiencies":  [
+
+                                ],
+    "state_expectation":  {
+                              "state_hash_changed":  true,
+                              "prior_evidence_superseded_keys":  [
+
+                                                                 ],
+                              "forbidden_superseded_keys":  [
+
+                                                            ]
+                          },
+    "allowed_dialogue_acts":  [
+                                  "standalone_answer"
+                              ]
 }

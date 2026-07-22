@@ -53,7 +53,7 @@ from evals.interview_vnext.contracts import (
     ReviewCompleteness,
     TrialDisposition,
 )
-from evals.interview_vnext.fixture_builder import materialize_reference_output
+from evals.interview_vnext.fixture_builder import run_pure_reference_gate
 from evals.interview_vnext.identities import trial_scoped_ids, turn_uuid
 from evals.interview_vnext.live_batch import (
     LiveBatchError,
@@ -82,14 +82,14 @@ from evals.interview_vnext.turn_report import (
 CASES_ROOT = Path(__file__).resolve().parents[1] / "evals/interview_vnext/cases"
 TRIAL_STARTED_AT = datetime(2026, 7, 18, 9, 0, tzinfo=UTC)
 OUTPUT_SCHEMA_ID = (
-    "https://caliburn.local/schemas/turn-interpret-output.v1.schema.json"
+    "https://caliburn.local/schemas/turn-interpret-output.v2.schema.json"
 )
 BINDING = scripted_turn_binding()
 
 
 @pytest.fixture(scope="module")
 def suite():
-    return load_suite(CASES_ROOT, suite_version="turn-interpret-pilot.v1")
+    return load_suite(CASES_ROOT, suite_version="turn-interpret-c1-v2-pilot.v1")
 
 
 @pytest_asyncio.fixture
@@ -112,9 +112,12 @@ def reference_llm_factory(suite):
     def factory(inputs, trial_id) -> LlmPort:
         idx = index_by_id[inputs.case.case_id]
         evaluation = suite.evaluation_contracts[idx]
-        output = materialize_reference_output(
-            inputs, evaluation.reference_output, trial_id=trial_id
-        )
+        output = run_pure_reference_gate(
+            inputs,
+            evaluation,
+            trial_id=trial_id,
+            base_time=TRIAL_STARTED_AT,
+        ).output
         ids = trial_scoped_ids(trial_id)
         attempt_id = uuid5(ids.operation_id, "attempt/1")
         visible = build_inline_artifact(
@@ -605,7 +608,7 @@ async def test_reference_batch_reaches_engineering_pass(
     report = build_batch_report(
         batch_id=uuid4(),
         plan_hash="sha256:" + "0" * 64,
-        suite_version="turn-interpret-pilot.v1",
+        suite_version="turn-interpret-c1-v2-pilot.v1",
         suite_hash=suite.manifest.suite_hash,
         execution_mode="mocked",
         git_sha="1" * 40,
@@ -637,7 +640,7 @@ def invalid_output_llm(inputs, trial_id) -> ScriptedLlmPort:
     """兩次 schema-invalid provider success → terminal ``output_schema_invalid``。"""
 
     ids = trial_scoped_ids(trial_id)
-    payload = {"schema_version": "turn_interpret_output.v1", "unexpected": True}
+    payload = {"schema_version": "turn_interpret_output.v2", "unexpected": True}
     steps = []
     for attempt in (1, 2):
         attempt_id = uuid5(ids.operation_id, f"attempt/{attempt}")
@@ -739,7 +742,7 @@ def _rewrite_json(path: Path, mutate) -> None:
     "path_name,case_id,llm_kind",
     [
         ("committed-evidence", "TI-01-single-action", "reference"),
-        ("committed-noop", "TI-11-zero-evidence", "reference"),
+        ("committed-receipt-only", "TI-11-zero-evidence", "reference"),
         ("schema-invalid", "TI-01-single-action", "invalid"),
     ],
 )
@@ -760,7 +763,7 @@ async def test_grading_golden_paths_are_online_offline_byte_equal(
             g for g in graded.grader_results if g.grader_name == "output_schema"
         )
         assert schema_grade.reason_code == "output_schema_invalid"
-    elif path_name == "committed-noop":
+    elif path_name == "committed-receipt-only":
         assert trial.terminal_outcome == "committed"
         assert trial.verifier_accepted_count == 0
     else:
@@ -825,7 +828,7 @@ async def test_tampered_bundle_fails_integrity_or_grader_drift(
     )
 
     def poison_claim(data):
-        data["observations"][0]["claim"] = "每天 999 次竄改主張"
+        data["literal_observations"][0]["claim"] = "每天 999 次竄改主張"
 
     _rewrite_json(dir2 / "candidate-output.json", poison_claim)
     assert _verify_trial_integrity(dir2) is False

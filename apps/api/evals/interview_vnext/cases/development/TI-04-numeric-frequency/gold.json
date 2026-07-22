@@ -1,91 +1,101 @@
 {
-  "schema_version": "turn_eval_gold.v1",
-  "case_id": "TI-04-numeric-frequency",
-  "allowed_user_signals": [
-    "answer"
-  ],
-  "allowed_episode_signals": [
-    "continue"
-  ],
-  "expected_commit": "evidence",
-  "observations": [
-    {
-      "gold_id": "g-inventory-count-frequency",
-      "requirement": "required",
-      "semantic_target": "員工每月盤點庫存 2 次",
-      "allowed_subjects": [
-        "employee"
-      ],
-      "allowed_kinds": [
-        "action",
-        "frequency"
-      ],
-      "source_anchors": [
-        {
-          "turn_key": "employee-target",
-          "quote": "我每月盤點庫存 2 次。",
-          "occurrence": 1
-        },
-        {
-          "turn_key": "employee-target",
-          "quote": "每月盤點庫存 2 次",
-          "occurrence": 1
-        }
-      ],
-      "qualifiers": {
-        "time_scope": {
-          "mode": "exact",
-          "value": "current"
-        },
-        "typicality": {
-          "mode": "exact",
-          "value": "typical"
-        },
-        "polarity": {
-          "mode": "exact",
-          "value": "affirmed"
-        },
-        "frequency_unit": {
-          "mode": "exact",
-          "value": "per_month"
-        },
-        "frequency_value": {
-          "mode": "exact",
-          "value": "2"
-        },
-        "importance": {
-          "mode": "one_of",
-          "values": [
-            "not_stated"
-          ]
-        },
-        "ownership": {
-          "mode": "exact",
-          "value": "owner"
-        }
-      },
-      "correction_target_evidence_keys": [],
-      "severity_if_missed": "major",
-      "rationale": "數字頻率必須逐字保留;單位或數值錯都是實質錯誤"
-    }
-  ],
-  "forbidden_claims": [
-    {
-      "gold_id": "f-frequency-rewrite",
-      "description": "不得把每月 2 次改寫成每週/每日或其他未支持頻率",
-      "severity": "critical"
-    },
-    {
-      "gold_id": "f-unsupported-number",
-      "description": "不得出現原文沒有的數字或數量門檻",
-      "severity": "critical"
-    }
-  ],
-  "required_insufficiencies": [],
-  "allowed_insufficiencies": [],
-  "state_expectation": {
-    "state_hash_changed": true,
-    "prior_evidence_superseded_keys": [],
-    "forbidden_superseded_keys": []
-  }
+    "schema_version":  "turn_eval_gold.v2",
+    "case_id":  "TI-04-numeric-frequency",
+    "allowed_episode_signals":  [
+                                    "continue"
+                                ],
+    "expected_commit":  "evidence_and_receipt",
+    "observations":  [
+                         {
+                             "gold_id":  "g-inventory-count-frequency",
+                             "requirement":  "required",
+                             "semantic_target":  "員工每月盤點庫存 2 次",
+                             "allowed_subjects":  [
+                                                      "employee"
+                                                  ],
+                             "allowed_kinds":  [
+                                                   "action",
+                                                   "frequency"
+                                               ],
+                             "source_anchors":  [
+                                                    {
+                                                        "turn_key":  "employee-target",
+                                                        "quote":  "我每月盤點庫存 2 次。",
+                                                        "occurrence":  1
+                                                    },
+                                                    {
+                                                        "turn_key":  "employee-target",
+                                                        "quote":  "每月盤點庫存 2 次",
+                                                        "occurrence":  1
+                                                    }
+                                                ],
+                             "qualifiers":  {
+                                                "time_scope":  {
+                                                                   "mode":  "exact",
+                                                                   "value":  "unknown"
+                                                               },
+                                                "typicality":  {
+                                                                   "mode":  "exact",
+                                                                   "value":  "unknown"
+                                                               },
+                                                "polarity":  {
+                                                                 "mode":  "exact",
+                                                                 "value":  "affirmed"
+                                                             },
+                                                "frequency_unit":  {
+                                                                       "mode":  "exact",
+                                                                       "value":  "per_month"
+                                                                   },
+                                                "frequency_value":  {
+                                                                        "mode":  "exact",
+                                                                        "value":  "2"
+                                                                    },
+                                                "importance":  {
+                                                                   "mode":  "one_of",
+                                                                   "values":  [
+                                                                                  "not_stated"
+                                                                              ]
+                                                               },
+                                                "ownership":  {
+                                                                  "mode":  "exact",
+                                                                  "value":  "unknown"
+                                                              }
+                                            },
+                             "correction_target_evidence_keys":  [
+
+                                                                 ],
+                             "severity_if_missed":  "major",
+                             "rationale":  "數字頻率必須逐字保留;單位或數值錯都是實質錯誤"
+                         }
+                     ],
+    "forbidden_claims":  [
+                             {
+                                 "gold_id":  "f-frequency-rewrite",
+                                 "description":  "不得把每月 2 次改寫成每週/每日或其他未支持頻率",
+                                 "severity":  "critical"
+                             },
+                             {
+                                 "gold_id":  "f-unsupported-number",
+                                 "description":  "不得出現原文沒有的數字或數量門檻",
+                                 "severity":  "critical"
+                             }
+                         ],
+    "required_insufficiencies":  [
+
+                                 ],
+    "allowed_insufficiencies":  [
+
+                                ],
+    "state_expectation":  {
+                              "state_hash_changed":  true,
+                              "prior_evidence_superseded_keys":  [
+
+                                                                 ],
+                              "forbidden_superseded_keys":  [
+
+                                                            ]
+                          },
+    "allowed_dialogue_acts":  [
+                                  "standalone_answer"
+                              ]
 }

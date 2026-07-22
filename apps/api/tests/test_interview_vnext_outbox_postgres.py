@@ -8,6 +8,7 @@ trigger → 回填時間欄位 → 恢復」模擬時間流逝;這只繞過第�
 from __future__ import annotations
 
 import asyncio
+import json
 from datetime import UTC, datetime, timedelta
 from uuid import UUID, uuid4
 
@@ -28,6 +29,7 @@ from app.interview_vnext.domain.session import (
 )
 from app.interview_vnext.domain.state import InterviewState
 from app.interview_vnext.observability.events import ExecutionStatus, RunManifest
+from app.interview_vnext.observability.artifacts import build_inline_artifact
 from app.interview_vnext.observability.taxonomy import INTERVIEW_VNEXT_EXECUTION_V1
 from app.interview_vnext.persistence.errors import (
     OutboxLeaseConflict,
@@ -179,10 +181,24 @@ async def test_finalize_builds_manifest_and_seals_run(postgres_session_factory,
     manifest_id, terminal_event = uuid4(), uuid4()
     done = NOW + timedelta(seconds=9)
     async with SqlAlchemyVNextUnitOfWork(postgres_session_factory) as uow:
+        root = await uow.artifacts.put(
+            tenant_id=ids.tenant_id,
+            record=build_inline_artifact(
+                artifact_id=uuid4(),
+                kind="test.terminal_root",
+                media_type="application/json",
+                payload={"terminal": True},
+                run_id=ids.run_id,
+                session_id=ids.session_id,
+                created_at=done,
+                contains_test_data=True,
+            ),
+        )
         run, manifest_ref = await uow.capture.finalize_run(
             tenant_id=ids.tenant_id, run_id=ids.run_id,
             final_status=RunStatus.COMPLETED, terminal_event_id=terminal_event,
-            manifest_artifact_id=manifest_id, completed_at=done)
+            manifest_artifact_id=manifest_id, completed_at=done,
+            root_artifacts=(root.ref,))
         await uow.commit()
     assert run.status == RunStatus.COMPLETED and run.event_count == 2
     state = await _run_state(postgres_session_factory, ids)
@@ -194,6 +210,7 @@ async def test_finalize_builds_manifest_and_seals_run(postgres_session_factory,
         manifest = RunManifest.model_validate_json(record.inline_content or "")
         assert manifest.event_count == 2
         assert manifest.last_event_hash == run.last_event_hash
+        assert manifest.root_artifacts == (root.ref,)
 
         # terminal run 拒絕後續 event;相同 inputs 冪等;不同 completion conflict
         with pytest.raises(RunConflict):
@@ -215,6 +232,23 @@ async def test_finalize_builds_manifest_and_seals_run(postgres_session_factory,
                 manifest_artifact_id=manifest_id,
                 completed_at=done + timedelta(seconds=5))
         await uow.rollback()
+
+    async with postgres_session_factory() as session:
+        event_json = (
+            await session.execute(
+                sa.text(
+                    "SELECT event_json FROM interview_vnext_execution_events "
+                    "WHERE tenant_id = :tenant_id AND event_id = :event_id"
+                ),
+                {
+                    "tenant_id": str(ids.tenant_id),
+                    "event_id": str(terminal_event),
+                },
+            )
+        ).scalar_one()
+    assert json.loads(event_json)["input_artifacts"] == [
+        root.ref.model_dump(mode="json")
+    ]
 
 
 async def test_finalize_rollback_leaves_run_open_with_no_partial_rows(

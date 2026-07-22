@@ -17,7 +17,8 @@ from app.interview_vnext.application.operation_executor import (
     execute_turn_interpret,
 )
 from app.interview_vnext.domain.commands import (
-    AppendTranscriptTurnCommand,
+    AppendConsultantQuestionCommand,
+    AppendEmployeeTurnCommand,
     TransitionSessionCommand,
 )
 from app.interview_vnext.domain.evidence import (
@@ -34,6 +35,11 @@ from app.interview_vnext.domain.session import (
     ARCHITECTURE_ID,
     SessionStatus,
     session_at,
+)
+from app.interview_vnext.domain.interpretation import DialogueAct, EpisodeSignal
+from app.interview_vnext.domain.question_frame import (
+    QuestionMode,
+    build_question_frame_definition,
 )
 from app.interview_vnext.domain.state import InterviewState
 from app.interview_vnext.domain.transcript import TranscriptRole, TranscriptTurn
@@ -59,12 +65,11 @@ from app.interview_vnext.llm.result import (
     build_structured_payload,
 )
 from app.interview_vnext.llm.turn_interpret import (
-    EpisodeSignal,
+    CorrectionProposal,
     EvidenceQualifiersProposal,
     FrequencyQualifierProposal,
     ObservationProposal,
     TurnInterpretOutput,
-    UserSignal,
 )
 from app.interview_vnext.observability.artifacts import build_inline_artifact
 from app.interview_vnext.observability.checkpoint import CheckpointStatus
@@ -163,11 +168,16 @@ async def bootstrap(factory, ids) -> TranscriptTurn:
     await commit_bootstrap_command(
         factory,
         ids,
-        AppendTranscriptTurnCommand(
+        AppendConsultantQuestionCommand(
             command_id=uid(ids, "append/consultant"),
             expected_state_version=1,
             occurred_at=NOW + timedelta(seconds=2),
             turn=consultant,
+            frame_definition=build_question_frame_definition(
+                mode=QuestionMode.OPEN_NARRATIVE,
+                question_text=consultant.text,
+                targets=(),
+            ),
         ),
         name="append-consultant",
         at=NOW + timedelta(seconds=2),
@@ -186,7 +196,7 @@ async def bootstrap(factory, ids) -> TranscriptTurn:
     await commit_bootstrap_command(
         factory,
         ids,
-        AppendTranscriptTurnCommand(
+        AppendEmployeeTurnCommand(
             command_id=uid(ids, "append/employee"),
             expected_state_version=2,
             occurred_at=NOW + timedelta(seconds=3),
@@ -200,41 +210,46 @@ async def bootstrap(factory, ids) -> TranscriptTurn:
 
 def qualifiers() -> EvidenceQualifiersProposal:
     return EvidenceQualifiersProposal(
-        time_scope=TimeScope.CURRENT,
-        typicality=Typicality.TYPICAL,
+        time_scope=TimeScope.UNKNOWN,
+        time_scope_support=None,
+        typicality=Typicality.UNKNOWN,
+        typicality_support=None,
         polarity=Polarity.AFFIRMED,
+        polarity_support=None,
         frequency=FrequencyQualifierProposal(
             value=None,
             unit=FrequencyUnit.PER_DAY,
             verbatim="每天",
         ),
         importance=Importance.NOT_STATED,
-        ownership=Ownership.OWNER,
+        importance_support=None,
+        ownership=Ownership.UNKNOWN,
+        ownership_support=None,
     )
 
 
-def proposal(*, key: str = "obs-01", quote: str = "我每天核對訂單"):
+def proposal(*, quote: str = "我每天核對訂單"):
     return ObservationProposal(
-        proposal_key=key,
         subject=EvidenceSubject.EMPLOYEE,
         kind=EvidenceKind.ACTION,
         claim="每天核對訂單",
         quote=quote,
         quote_occurrence=1,
         qualifiers=qualifiers(),
-        correction_target_evidence_ids=(),
-        correction_target_unknown=False,
+        correction=CorrectionProposal(),
+        insufficiency_codes=(),
     )
 
 
 def output(*observations: ObservationProposal) -> TurnInterpretOutput:
     return TurnInterpretOutput(
-        schema_version="turn_interpret_output.v1",
-        observations=observations,
-        user_signal=UserSignal.ANSWER,
+        schema_version="turn_interpret_output.v2",
+        dialogue_act=DialogueAct.STANDALONE_ANSWER,
         episode_signal=EpisodeSignal.CONTINUE,
+        literal_observations=observations,
+        answer_bindings=(),
         emergent_topics=(),
-        insufficiencies=(),
+        turn_insufficiency_codes=(),
     )
 
 
@@ -348,7 +363,7 @@ class ResultProvider(LlmPort):
         raw = {
             "success": output(proposal()),
             "partial": output(
-                proposal(), proposal(key="obs-02", quote="不存在的逐字引文")
+                proposal(), proposal(quote="不存在的逐字引文")
             ),
             "noop": output(),
             "invalid": {"not": "the committed output contract"},
@@ -492,7 +507,29 @@ async def test_executor_commits_verified_evidence_replays_without_provider_and_r
     assert first.reduction_result is not None
     assert replay.status == TurnExecutionStatus.COMMITTED
     assert replay.checkpoint == first.checkpoint
+    assert replay == first
     assert len(provider.requests) == 1
+    refs = (
+        first.context_packet_ref,
+        first.input_ref,
+        first.provider_result_ref,
+        first.verification_report_ref,
+        first.interpretation_record_ref,
+        first.domain_command_ref,
+        first.reduction_result_ref,
+        first.turn_output_ref,
+    )
+    assert all(ref is not None for ref in refs)
+    assert [ref.kind for ref in refs if ref is not None] == [
+        "interview.context_packet.v2",
+        "interview.turn_interpret_input.v2",
+        "model.result",
+        "interview.turn_interpret_verification_report.v2",
+        "interview.turn_interpretation_record.v1",
+        "interview.apply_turn_interpretation_command.v1",
+        "interview.reduction_result.v2",
+        "interview.turn_interpret_output.v2",
+    ]
     state = await load_state(postgres_session_factory, ids)
     assert [item.claim for item in state.evidence] == ["每天核對訂單"]
     rows = await attempt_rows(postgres_session_factory, ids)
@@ -543,7 +580,7 @@ async def test_two_workers_only_claim_one_provider_call(
     assert len(provider.requests) == 1
 
 
-async def test_executor_commits_typed_noop_without_state_mutation(
+async def test_executor_commits_zero_evidence_receipt_and_consumes_turn(
     postgres_session_factory, vnext_profile
 ):
     ids = vnext_profile
@@ -558,10 +595,16 @@ async def test_executor_commits_typed_noop_without_state_mutation(
 
     after = await load_state(postgres_session_factory, ids)
     assert result.status == TurnExecutionStatus.COMMITTED
-    assert result.noop_result is not None
-    assert result.reduction_result is None
+    assert result.noop_result is None
+    assert result.reduction_result is not None
+    assert result.interpretation is not None
+    assert result.interpretation_record_ref is not None
+    assert result.domain_command_ref is not None
+    assert result.reduction_result_ref is not None
     assert result.verification_report.accepted_count == 0
-    assert before == after
+    assert after.session.state_version == before.session.state_version + 1
+    assert after.evidence == before.evidence == ()
+    assert after.turn_interpretations == (result.interpretation,)
 
 
 async def test_executor_commits_only_locally_verified_observations(
@@ -703,47 +746,73 @@ async def test_state_change_during_provider_call_rejects_stale_verified_commit(
     ids = vnext_profile
     employee = await bootstrap(postgres_session_factory, ids)
 
-    async def append_concurrent_turn(_request: ModelCallRequest) -> None:
-        turn = TranscriptTurn(
-            turn_id=uid(ids, "turn/concurrent"),
-            session_id=ids.session_id,
-            client_turn_id="test-concurrent-1",
-            sequence=3,
-            role=TranscriptRole.CONSULTANT,
-            text="這是 provider 執行期間進來的新訊息。",
-            previous_turn_id=employee.turn_id,
-            occurred_at=EXECUTE_AT + timedelta(milliseconds=500),
-            received_at=EXECUTE_AT + timedelta(milliseconds=500),
-        )
+    async def advance_session_during_provider(_request: ModelCallRequest) -> None:
         await commit_bootstrap_command(
             postgres_session_factory,
             ids,
-            AppendTranscriptTurnCommand(
-                command_id=uid(ids, "append/concurrent"),
+            TransitionSessionCommand(
+                command_id=uid(ids, "pause/concurrent"),
                 expected_state_version=3,
                 occurred_at=EXECUTE_AT + timedelta(milliseconds=500),
-                turn=turn,
+                target_status=SessionStatus.PAUSED,
             ),
-            name="append-concurrent",
+            name="pause-concurrent",
             at=EXECUTE_AT + timedelta(milliseconds=500),
         )
 
-    provider = ResultProvider(("success",), before_return=append_concurrent_turn)
-    with pytest.raises(CheckpointConflict, match="state moved"):
-        await execute_turn_interpret(
-            uow_factory(postgres_session_factory),
-            **execute_kwargs(ids, employee, provider),
-        )
+    provider = ResultProvider(("success",), before_return=advance_session_during_provider)
+    result = await execute_turn_interpret(
+        uow_factory(postgres_session_factory),
+        **execute_kwargs(ids, employee, provider),
+    )
 
     state = await load_state(postgres_session_factory, ids)
+    assert result.status == TurnExecutionStatus.FAILED
+    assert result.reason_code == "state_context_stale"
+    assert len(provider.requests) == 1
     assert state.session.state_version == 4
     assert state.evidence == ()
+    assert state.turn_interpretations == ()
     async with uow_factory(postgres_session_factory)() as uow:
         checkpoint = await uow.checkpoints.get_by_operation(
             tenant_id=ids.tenant_id,
             operation_id=uid(ids, "operation/turn-interpret"),
         )
-    assert checkpoint.status == CheckpointStatus.VERIFIED
+    assert checkpoint.status == CheckpointStatus.FAILED
+
+    async with postgres_session_factory() as session:
+        command_count = (
+            await session.execute(
+                sa.text(
+                    "SELECT count(*) FROM interview_vnext_commands "
+                    "WHERE tenant_id = :tenant_id AND command_id = :command_id"
+                ),
+                {
+                    "tenant_id": str(ids.tenant_id),
+                    "command_id": str(
+                        executor_module.turn_execution_uuid(
+                            uid(ids, "operation/turn-interpret"),
+                            "command/interpretation",
+                        )
+                    ),
+                },
+            )
+        ).scalar_one()
+    assert command_count == 0
+
+    replay_provider = ResultProvider(("success",))
+    replay = await execute_turn_interpret(
+        uow_factory(postgres_session_factory),
+        **execute_kwargs(ids, employee, replay_provider),
+    )
+    assert replay.status == TurnExecutionStatus.FAILED
+    assert replay.reason_code == "state_context_stale"
+    assert replay == result
+    assert result.context_packet_ref is not None
+    assert result.input_ref is not None
+    assert result.verification_report_ref is not None
+    assert result.failure_ref == result.checkpoint.failure_artifact
+    assert replay_provider.requests == []
 
 
 # ── R3-C2 §7.4:fresh-process recovery corruption matrix ─────────────────────

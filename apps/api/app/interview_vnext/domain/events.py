@@ -10,8 +10,10 @@ from pydantic import Field, model_validator
 from .base import DomainModel
 from .episode import EpisodeStatus, GapStatus
 from .evidence import InferenceStatus
-from .identifiers import NonEmptyText, UtcDatetime
+from .identifiers import NonEmptyText, Sha256, UtcDatetime
+from .interpretation import DialogueAct, EpisodeSignal, TurnInsufficiencyCode
 from .job_model import CandidateStatus
+from .question_frame import QuestionFrameStaleReason
 from .review import ReviewAction
 from .session import SessionStatus
 
@@ -170,6 +172,69 @@ class CandidateTransitionedEvent(EventBase):
     ]
 
 
+class QuestionFrameOpenedEvent(EventBase):
+    schema_version: Literal["question_frame_opened_event.v1"] = (
+        "question_frame_opened_event.v1"
+    )
+    event_type: Literal["question_frame.opened"] = "question_frame.opened"
+    question_frame_id: UUID
+    consultant_turn_id: UUID
+    definition_hash: Sha256
+
+
+class QuestionFrameAnswerBoundEvent(EventBase):
+    schema_version: Literal["question_frame_answer_bound_event.v1"] = (
+        "question_frame_answer_bound_event.v1"
+    )
+    event_type: Literal["question_frame.answer_bound"] = "question_frame.answer_bound"
+    question_frame_id: UUID
+    employee_turn_id: UUID
+
+
+class QuestionFrameConsumedEvent(EventBase):
+    schema_version: Literal["question_frame_consumed_event.v1"] = (
+        "question_frame_consumed_event.v1"
+    )
+    event_type: Literal["question_frame.consumed"] = "question_frame.consumed"
+    question_frame_id: UUID
+    employee_turn_id: UUID
+    operation_id: UUID
+
+
+class QuestionFrameSupersededEvent(EventBase):
+    schema_version: Literal["question_frame_superseded_event.v1"] = (
+        "question_frame_superseded_event.v1"
+    )
+    event_type: Literal["question_frame.superseded"] = "question_frame.superseded"
+    previous_question_frame_id: UUID
+    replacement_question_frame_id: UUID
+
+
+class QuestionFrameStaledEvent(EventBase):
+    schema_version: Literal["question_frame_staled_event.v1"] = (
+        "question_frame_staled_event.v1"
+    )
+    event_type: Literal["question_frame.staled"] = "question_frame.staled"
+    question_frame_id: UUID
+    answer_turn_id: UUID | None = None
+    reason: QuestionFrameStaleReason
+
+
+class TurnInterpretationAppliedEvent(EventBase):
+    schema_version: Literal["turn_interpretation_applied_event.v1"] = (
+        "turn_interpretation_applied_event.v1"
+    )
+    event_type: Literal["turn.interpretation_applied"] = "turn.interpretation_applied"
+    interpretation_id: UUID
+    employee_turn_id: UUID
+    operation_id: UUID
+    question_frame_id: UUID | None = None
+    accepted_evidence_ids: tuple[UUID, ...] = ()
+    dialogue_act: DialogueAct
+    episode_signal: EpisodeSignal
+    insufficiency_codes: tuple[TurnInsufficiencyCode, ...] = ()
+
+
 class ReviewDecisionAppliedEvent(EventBase):
     schema_version: Literal["review_decision_applied_event.v1"] = (
         "review_decision_applied_event.v1"
@@ -195,6 +260,12 @@ DomainEvent: TypeAlias = Annotated[
     | InferenceSupersededEvent
     | CandidateAppliedEvent
     | CandidateTransitionedEvent
+    | QuestionFrameOpenedEvent
+    | QuestionFrameAnswerBoundEvent
+    | QuestionFrameConsumedEvent
+    | QuestionFrameSupersededEvent
+    | QuestionFrameStaledEvent
+    | TurnInterpretationAppliedEvent
     | ReviewDecisionAppliedEvent,
     Field(discriminator="event_type"),
 ]

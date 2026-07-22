@@ -1,0 +1,378 @@
+{
+  "$defs": {
+    "EvidenceKind": {
+      "enum": [
+        "action",
+        "input",
+        "output",
+        "purpose",
+        "condition",
+        "standard",
+        "frequency",
+        "importance",
+        "ownership",
+        "tool",
+        "recipient",
+        "dependency",
+        "exception",
+        "negation",
+        "correction",
+        "preference"
+      ],
+      "title": "EvidenceKind",
+      "type": "string"
+    },
+    "EvidenceQualifiersProposal": {
+      "additionalProperties": false,
+      "properties": {
+        "time_scope": {
+          "$ref": "#/$defs/TimeScope"
+        },
+        "time_scope_support": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Time Scope Support"
+        },
+        "typicality": {
+          "$ref": "#/$defs/Typicality"
+        },
+        "typicality_support": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Typicality Support"
+        },
+        "polarity": {
+          "$ref": "#/$defs/Polarity"
+        },
+        "polarity_support": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Polarity Support"
+        },
+        "frequency": {
+          "$ref": "#/$defs/FrequencyQualifierProposal"
+        },
+        "importance": {
+          "$ref": "#/$defs/Importance"
+        },
+        "importance_support": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Importance Support"
+        },
+        "ownership": {
+          "$ref": "#/$defs/Ownership"
+        },
+        "ownership_support": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Ownership Support"
+        }
+      },
+      "required": [
+        "time_scope",
+        "typicality",
+        "polarity",
+        "frequency",
+        "importance",
+        "ownership"
+      ],
+      "title": "EvidenceQualifiersProposal",
+      "type": "object"
+    },
+    "EvidenceSubject": {
+      "enum": [
+        "employee",
+        "employee_team",
+        "other_role",
+        "organization",
+        "unknown"
+      ],
+      "title": "EvidenceSubject",
+      "type": "string"
+    },
+    "FrequencyQualifierProposal": {
+      "additionalProperties": false,
+      "description": "Provider-facing frequency with decimal text preserved losslessly.",
+      "properties": {
+        "value": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        },
+        "unit": {
+          "$ref": "#/$defs/FrequencyUnit"
+        },
+        "verbatim": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Verbatim"
+        }
+      },
+      "required": [
+        "value",
+        "unit",
+        "verbatim"
+      ],
+      "title": "FrequencyQualifierProposal",
+      "type": "object"
+    },
+    "FrequencyUnit": {
+      "enum": [
+        "per_day",
+        "per_week",
+        "per_month",
+        "per_quarter",
+        "per_year",
+        "irregular",
+        "unknown"
+      ],
+      "title": "FrequencyUnit",
+      "type": "string"
+    },
+    "Importance": {
+      "enum": [
+        "explicit_core",
+        "explicit_supporting",
+        "not_stated"
+      ],
+      "title": "Importance",
+      "type": "string"
+    },
+    "Ownership": {
+      "enum": [
+        "owner",
+        "shared",
+        "assists",
+        "receives",
+        "not_responsible",
+        "unknown"
+      ],
+      "title": "Ownership",
+      "type": "string"
+    },
+    "Polarity": {
+      "enum": [
+        "affirmed",
+        "denied",
+        "uncertain"
+      ],
+      "title": "Polarity",
+      "type": "string"
+    },
+    "TimeScope": {
+      "enum": [
+        "current",
+        "past",
+        "future",
+        "hypothetical",
+        "unknown"
+      ],
+      "title": "TimeScope",
+      "type": "string"
+    },
+    "TurnEvalOpenEpisodeFixture": {
+      "additionalProperties": false,
+      "properties": {
+        "episode_key": {
+          "maxLength": 64,
+          "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$",
+          "title": "Episode Key",
+          "type": "string"
+        },
+        "target": {
+          "minLength": 1,
+          "title": "Target",
+          "type": "string"
+        },
+        "opened_turn_key": {
+          "maxLength": 64,
+          "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$",
+          "title": "Opened Turn Key",
+          "type": "string"
+        }
+      },
+      "required": [
+        "episode_key",
+        "target",
+        "opened_turn_key"
+      ],
+      "title": "TurnEvalOpenEpisodeFixture",
+      "type": "object"
+    },
+    "TurnEvalPriorEvidenceFixture": {
+      "additionalProperties": false,
+      "description": "Declarative prior evidence rebuilt through ApplyEvidenceCommand (§6.3).",
+      "properties": {
+        "evidence_key": {
+          "maxLength": 64,
+          "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$",
+          "title": "Evidence Key",
+          "type": "string"
+        },
+        "source_turn_key": {
+          "maxLength": 64,
+          "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$",
+          "title": "Source Turn Key",
+          "type": "string"
+        },
+        "episode_key": {
+          "anyOf": [
+            {
+              "maxLength": 64,
+              "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Episode Key"
+        },
+        "subject": {
+          "$ref": "#/$defs/EvidenceSubject"
+        },
+        "kind": {
+          "$ref": "#/$defs/EvidenceKind"
+        },
+        "claim": {
+          "minLength": 1,
+          "title": "Claim",
+          "type": "string"
+        },
+        "quote": {
+          "minLength": 1,
+          "title": "Quote",
+          "type": "string"
+        },
+        "quote_occurrence": {
+          "minimum": 1,
+          "title": "Quote Occurrence",
+          "type": "integer"
+        },
+        "qualifiers": {
+          "$ref": "#/$defs/EvidenceQualifiersProposal"
+        }
+      },
+      "required": [
+        "evidence_key",
+        "source_turn_key",
+        "subject",
+        "kind",
+        "claim",
+        "quote",
+        "quote_occurrence",
+        "qualifiers"
+      ],
+      "title": "TurnEvalPriorEvidenceFixture",
+      "type": "object"
+    },
+    "Typicality": {
+      "enum": [
+        "typical",
+        "occasional",
+        "exception",
+        "unknown"
+      ],
+      "title": "Typicality",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "turn_eval_initial_fixture.v2",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "session_status_before_replay": {
+      "const": "planned",
+      "title": "Session Status Before Replay",
+      "type": "string"
+    },
+    "activate_before_transcript": {
+      "title": "Activate Before Transcript",
+      "type": "boolean"
+    },
+    "open_episode": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/TurnEvalOpenEpisodeFixture"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "prior_evidence": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/TurnEvalPriorEvidenceFixture"
+      },
+      "title": "Prior Evidence",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "session_status_before_replay",
+    "activate_before_transcript"
+  ],
+  "title": "Caliburn interview vNext turn eval initial fixture v2",
+  "type": "object",
+  "$id": "https://caliburn.local/schemas/turn-eval-initial-fixture.v2.schema.json"
+}

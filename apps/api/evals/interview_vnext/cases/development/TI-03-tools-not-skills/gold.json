@@ -1,141 +1,153 @@
 {
-  "schema_version": "turn_eval_gold.v1",
-  "case_id": "TI-03-tools-not-skills",
-  "allowed_user_signals": [
-    "answer"
-  ],
-  "allowed_episode_signals": [
-    "continue"
-  ],
-  "expected_commit": "evidence",
-  "observations": [
-    {
-      "gold_id": "g-tool-sap",
-      "requirement": "required",
-      "semantic_target": "員工工作中使用 SAP",
-      "allowed_subjects": [
-        "employee"
-      ],
-      "allowed_kinds": [
-        "tool"
-      ],
-      "source_anchors": [
-        {
-          "turn_key": "employee-target",
-          "quote": "SAP",
-          "occurrence": 1
-        },
-        {
-          "turn_key": "employee-target",
-          "quote": "用 SAP 和 Excel",
-          "occurrence": 1
-        }
-      ],
-      "qualifiers": {
-        "time_scope": {
-          "mode": "exact",
-          "value": "current"
-        },
-        "typicality": {
-          "mode": "exact",
-          "value": "typical"
-        },
-        "polarity": {
-          "mode": "exact",
-          "value": "affirmed"
-        },
-        "frequency_unit": {
-          "mode": "exact",
-          "value": "unknown"
-        },
-        "frequency_value": {
-          "mode": "not_applicable"
-        },
-        "importance": {
-          "mode": "one_of",
-          "values": [
-            "not_stated"
-          ]
-        },
-        "ownership": {
-          "mode": "exact",
-          "value": "owner"
-        }
-      },
-      "correction_target_evidence_keys": [],
-      "severity_if_missed": "major",
-      "rationale": "工具必須以 tool kind 保留,不得升格為技能"
-    },
-    {
-      "gold_id": "g-tool-excel",
-      "requirement": "required",
-      "semantic_target": "員工工作中使用 Excel",
-      "allowed_subjects": [
-        "employee"
-      ],
-      "allowed_kinds": [
-        "tool"
-      ],
-      "source_anchors": [
-        {
-          "turn_key": "employee-target",
-          "quote": "Excel",
-          "occurrence": 1
-        },
-        {
-          "turn_key": "employee-target",
-          "quote": "用 SAP 和 Excel",
-          "occurrence": 1
-        }
-      ],
-      "qualifiers": {
-        "time_scope": {
-          "mode": "exact",
-          "value": "current"
-        },
-        "typicality": {
-          "mode": "exact",
-          "value": "typical"
-        },
-        "polarity": {
-          "mode": "exact",
-          "value": "affirmed"
-        },
-        "frequency_unit": {
-          "mode": "exact",
-          "value": "unknown"
-        },
-        "frequency_value": {
-          "mode": "not_applicable"
-        },
-        "importance": {
-          "mode": "one_of",
-          "values": [
-            "not_stated"
-          ]
-        },
-        "ownership": {
-          "mode": "exact",
-          "value": "owner"
-        }
-      },
-      "correction_target_evidence_keys": [],
-      "severity_if_missed": "major",
-      "rationale": "兩個工具是兩筆 required gold;合併只滿足一筆"
-    }
-  ],
-  "forbidden_claims": [
-    {
-      "gold_id": "f-skill-upgrade",
-      "description": "不得生成「熟練SAP」「Excel分析能力」等 skill/ability 語意強化",
-      "severity": "major"
-    }
-  ],
-  "required_insufficiencies": [],
-  "allowed_insufficiencies": [],
-  "state_expectation": {
-    "state_hash_changed": true,
-    "prior_evidence_superseded_keys": [],
-    "forbidden_superseded_keys": []
-  }
+    "schema_version":  "turn_eval_gold.v2",
+    "case_id":  "TI-03-tools-not-skills",
+    "allowed_episode_signals":  [
+                                    "continue"
+                                ],
+    "expected_commit":  "evidence_and_receipt",
+    "observations":  [
+                         {
+                             "gold_id":  "g-tool-sap",
+                             "requirement":  "required",
+                             "semantic_target":  "員工工作中使用 SAP",
+                             "allowed_subjects":  [
+                                                      "employee"
+                                                  ],
+                             "allowed_kinds":  [
+                                                   "tool"
+                                               ],
+                             "source_anchors":  [
+                                                    {
+                                                        "turn_key":  "employee-target",
+                                                        "quote":  "SAP",
+                                                        "occurrence":  1
+                                                    },
+                                                    {
+                                                        "turn_key":  "employee-target",
+                                                        "quote":  "用 SAP 和 Excel",
+                                                        "occurrence":  1
+                                                    }
+                                                ],
+                             "qualifiers":  {
+                                                "time_scope":  {
+                                                                   "mode":  "exact",
+                                                                   "value":  "unknown"
+                                                               },
+                                                "typicality":  {
+                                                                   "mode":  "exact",
+                                                                   "value":  "unknown"
+                                                               },
+                                                "polarity":  {
+                                                                 "mode":  "exact",
+                                                                 "value":  "affirmed"
+                                                             },
+                                                "frequency_unit":  {
+                                                                       "mode":  "exact",
+                                                                       "value":  "unknown"
+                                                                   },
+                                                "frequency_value":  {
+                                                                        "mode":  "not_applicable"
+                                                                    },
+                                                "importance":  {
+                                                                   "mode":  "one_of",
+                                                                   "values":  [
+                                                                                  "not_stated"
+                                                                              ]
+                                                               },
+                                                "ownership":  {
+                                                                  "mode":  "exact",
+                                                                  "value":  "unknown"
+                                                              }
+                                            },
+                             "correction_target_evidence_keys":  [
+
+                                                                 ],
+                             "severity_if_missed":  "major",
+                             "rationale":  "工具必須以 tool kind 保留,不得升格為技能"
+                         },
+                         {
+                             "gold_id":  "g-tool-excel",
+                             "requirement":  "required",
+                             "semantic_target":  "員工工作中使用 Excel",
+                             "allowed_subjects":  [
+                                                      "employee"
+                                                  ],
+                             "allowed_kinds":  [
+                                                   "tool"
+                                               ],
+                             "source_anchors":  [
+                                                    {
+                                                        "turn_key":  "employee-target",
+                                                        "quote":  "Excel",
+                                                        "occurrence":  1
+                                                    },
+                                                    {
+                                                        "turn_key":  "employee-target",
+                                                        "quote":  "用 SAP 和 Excel",
+                                                        "occurrence":  1
+                                                    }
+                                                ],
+                             "qualifiers":  {
+                                                "time_scope":  {
+                                                                   "mode":  "exact",
+                                                                   "value":  "unknown"
+                                                               },
+                                                "typicality":  {
+                                                                   "mode":  "exact",
+                                                                   "value":  "unknown"
+                                                               },
+                                                "polarity":  {
+                                                                 "mode":  "exact",
+                                                                 "value":  "affirmed"
+                                                             },
+                                                "frequency_unit":  {
+                                                                       "mode":  "exact",
+                                                                       "value":  "unknown"
+                                                                   },
+                                                "frequency_value":  {
+                                                                        "mode":  "not_applicable"
+                                                                    },
+                                                "importance":  {
+                                                                   "mode":  "one_of",
+                                                                   "values":  [
+                                                                                  "not_stated"
+                                                                              ]
+                                                               },
+                                                "ownership":  {
+                                                                  "mode":  "exact",
+                                                                  "value":  "unknown"
+                                                              }
+                                            },
+                             "correction_target_evidence_keys":  [
+
+                                                                 ],
+                             "severity_if_missed":  "major",
+                             "rationale":  "兩個工具是兩筆 required gold;合併只滿足一筆"
+                         }
+                     ],
+    "forbidden_claims":  [
+                             {
+                                 "gold_id":  "f-skill-upgrade",
+                                 "description":  "不得生成「熟練SAP」「Excel分析能力」等 skill/ability 語意強化",
+                                 "severity":  "major"
+                             }
+                         ],
+    "required_insufficiencies":  [
+
+                                 ],
+    "allowed_insufficiencies":  [
+
+                                ],
+    "state_expectation":  {
+                              "state_hash_changed":  true,
+                              "prior_evidence_superseded_keys":  [
+
+                                                                 ],
+                              "forbidden_superseded_keys":  [
+
+                                                            ]
+                          },
+    "allowed_dialogue_acts":  [
+                                  "standalone_answer"
+                              ]
 }

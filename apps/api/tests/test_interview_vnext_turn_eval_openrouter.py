@@ -26,7 +26,7 @@ CASES_ROOT = Path(__file__).resolve().parents[1] / "evals/interview_vnext/cases"
 def base_live_argv(tmp_path, *, with_budget=True, with_checklist=True):
     argv = [
         "live-batch",
-        "--suite-version", "turn-interpret-pilot.v1",
+        "--suite-version", "turn-interpret-c1-v2-pilot.v1",
         "--cases-root", str(CASES_ROOT),
         "--database-url-env", "INTERVIEW_VNEXT_EVAL_DATABASE_URL",
         "--model", "anthropic/claude-sonnet-5",
@@ -224,7 +224,7 @@ def test_validate_suite_cli(capsys):
     rc = cli.main(
         [
             "validate-suite",
-            "--suite-version", "turn-interpret-pilot.v1",
+            "--suite-version", "turn-interpret-c1-v2-pilot.v1",
             "--cases-root", str(CASES_ROOT),
         ]
     )
@@ -238,7 +238,7 @@ def test_reference_gate_cli(capsys):
     rc = cli.main(
         [
             "reference-gate",
-            "--suite-version", "turn-interpret-pilot.v1",
+            "--suite-version", "turn-interpret-c1-v2-pilot.v1",
             "--cases-root", str(CASES_ROOT),
         ]
     )
@@ -252,7 +252,7 @@ def test_validate_suite_reports_integrity_error(tmp_path, capsys):
     rc = cli.main(
         [
             "validate-suite",
-            "--suite-version", "turn-interpret-pilot.v1",
+            "--suite-version", "turn-interpret-c1-v2-pilot.v1",
             "--cases-root", str(tmp_path),
         ]
     )
@@ -294,7 +294,7 @@ async def test_mocked_batch_orchestrator_writes_bundle_and_report(
     from evals.interview_vnext.loader import load_suite
     from evals.interview_vnext.turn_eval_runner import cleanup_trial_rows
 
-    suite = load_suite(CASES_ROOT, suite_version="turn-interpret-pilot.v1")
+    suite = load_suite(CASES_ROOT, suite_version="turn-interpret-c1-v2-pilot.v1")
     batch_id = uuid4()
     result = await orchestrate_mocked_batch(
         suite,
@@ -392,7 +392,7 @@ async def test_live_orchestrator_requires_unique_review_and_rebuilds_report(
         endpoint_snapshot=endpoint_snapshot,
         binding=build_openrouter_eval_binding(config),
     )
-    suite = load_suite(CASES_ROOT, suite_version="turn-interpret-pilot.v1")
+    suite = load_suite(CASES_ROOT, suite_version="turn-interpret-c1-v2-pilot.v1")
     reference_factory = _reference_llm_factory(suite)
 
     class RouteDecoratingLlm:
@@ -475,7 +475,7 @@ async def test_live_orchestrator_requires_unique_review_and_rebuilds_report(
         assert len(queue) == len({item.review_item_id for item in queue})
         decisions = [
             TurnEvalReviewDecision(
-                schema_version="turn_eval_review_decision.v1",
+                schema_version="turn_eval_review_decision.v2",
                 review_item_id=item.review_item_id,
                 review_item_hash=item.review_item_hash,
                 decision=(

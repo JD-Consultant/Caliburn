@@ -9,8 +9,9 @@ import pytest
 from pydantic import TypeAdapter, ValidationError
 
 from app.interview_vnext.domain.commands import (
-    ApplyEvidenceCommand,
-    AppendTranscriptTurnCommand,
+    ApplyTurnInterpretationCommand,
+    AppendConsultantQuestionCommand,
+    AppendEmployeeTurnCommand,
     TransitionSessionCommand,
 )
 from app.interview_vnext.domain.errors import DomainViolation
@@ -43,15 +44,30 @@ from app.interview_vnext.domain.job_model import (
     QuantitativeThreshold,
     ThresholdSourceType,
 )
+from app.interview_vnext.domain.interpretation import (
+    DialogueAct,
+    EpisodeSignal,
+    TurnInterpretationRecord,
+)
+from app.interview_vnext.domain.question_frame import (
+    QuestionMode,
+    build_question_frame_definition,
+)
 from app.interview_vnext.domain.reason_codes import ReasonCode
 from app.interview_vnext.domain.reducers import (
-    apply_evidence,
-    append_transcript_turn,
+    append_consultant_question,
+    append_employee_turn,
+    apply_turn_interpretation,
     transition_session,
 )
 from app.interview_vnext.domain.session import InterviewSession, SessionStatus
 from app.interview_vnext.domain.state import InterviewState
-from app.interview_vnext.domain.support import QuoteMatch, QuoteSpan
+from app.interview_vnext.domain.support import (
+    LiteralEmployeeSpanSupport,
+    QuoteMatch,
+    QuoteSpan,
+)
+from app.interview_vnext.domain.turn_identity import turn_interpretation_id
 from app.interview_vnext.domain.transcript import TranscriptRole, TranscriptTurn
 from app.interview_vnext.domain.review import ReviewAction, ReviewDecision
 
@@ -110,6 +126,17 @@ def turn_for(
     )
 
 
+TEST_HASH = "sha256:" + "0" * 64
+
+
+def open_narrative_definition(text: str):
+    return build_question_frame_definition(
+        mode=QuestionMode.OPEN_NARRATIVE,
+        question_text=text,
+        targets=(),
+    )
+
+
 def append_turn(
     state: InterviewState,
     *,
@@ -119,16 +146,79 @@ def append_turn(
     at: datetime,
 ) -> tuple[InterviewState, TranscriptTurn]:
     turn = turn_for(state, name=name, role=role, text=text, at=at)
-    result = append_transcript_turn(
+    if role == TranscriptRole.CONSULTANT:
+        result = append_consultant_question(
+            state,
+            AppendConsultantQuestionCommand(
+                command_id=uid(f"append:{name}"),
+                expected_state_version=state.session.state_version,
+                occurred_at=at,
+                turn=turn,
+                frame_definition=open_narrative_definition(text),
+            ),
+        )
+    else:
+        result = append_employee_turn(
+            state,
+            AppendEmployeeTurnCommand(
+                command_id=uid(f"append:{name}"),
+                expected_state_version=state.session.state_version,
+                occurred_at=at,
+                turn=turn,
+            ),
+        )
+    return result.state, turn
+
+
+def interpret(
+    state: InterviewState,
+    turn: TranscriptTurn,
+    observations: tuple[Evidence, ...] = (),
+    *,
+    name: str,
+    at: datetime,
+    operation_id: UUID | None = None,
+    dialogue_act: DialogueAct = DialogueAct.STANDALONE_ANSWER,
+):
+    """Commit a receipt for ``turn``, consuming the frame it answered."""
+
+    operation_id = operation_id or uid(f"operation:{name}")
+    frame = None
+    if state.active_question_frame_id is not None:
+        candidate = next(
+            item
+            for item in state.question_frames
+            if item.question_frame_id == state.active_question_frame_id
+        )
+        if candidate.answer_turn_id == turn.turn_id:
+            frame = candidate
+    record = TurnInterpretationRecord(
+        interpretation_id=turn_interpretation_id(operation_id),
+        session_id=state.session.session_id,
+        employee_turn_id=turn.turn_id,
+        operation_id=operation_id,
+        question_frame_id=frame.question_frame_id if frame is not None else None,
+        question_frame_definition_hash=(
+            frame.definition.definition_hash if frame is not None else None
+        ),
+        context_packet_hash=TEST_HASH,
+        output_hash=TEST_HASH,
+        verification_report_hash=TEST_HASH,
+        accepted_evidence_ids=tuple(item.evidence_id for item in observations),
+        dialogue_act=dialogue_act,
+        episode_signal=EpisodeSignal.CONTINUE,
+        applied_at=at,
+    )
+    return apply_turn_interpretation(
         state,
-        AppendTranscriptTurnCommand(
-            command_id=uid(f"append:{name}"),
+        ApplyTurnInterpretationCommand(
+            command_id=uid(f"apply:{name}"),
             expected_state_version=state.session.state_version,
             occurred_at=at,
-            turn=turn,
+            record=record,
+            observations=tuple(observations),
         ),
     )
-    return result.state, turn
 
 
 def current_qualifiers(**changes) -> EvidenceQualifiers:
@@ -155,24 +245,29 @@ def evidence_for(
     qualifiers: EvidenceQualifiers | None = None,
     supersedes: tuple[UUID, ...] = (),
     quote_match: QuoteMatch = QuoteMatch.EXACT,
+    operation_id: UUID | None = None,
 ) -> Evidence:
     source_quote = source_quote or quote
     start = turn.text.index(source_quote)
     return Evidence(
         evidence_id=uid(f"evidence:{name}"),
         session_id=turn.session_id,
-        turn_id=turn.turn_id,
         episode_id=episode_id,
         subject=EvidenceSubject.EMPLOYEE,
         kind=kind,
         claim=quote,
-        quote=quote,
-        span=QuoteSpan(start=start, end=start + len(source_quote)),
-        quote_match=quote_match,
-        normalization_version="quote_nfkc_ws.v1" if quote_match == QuoteMatch.NORMALIZED else None,
+        support=LiteralEmployeeSpanSupport(
+            employee_turn_id=turn.turn_id,
+            quote=quote,
+            span=QuoteSpan(start=start, end=start + len(source_quote)),
+            quote_match=quote_match,
+            normalization_version=(
+                "quote_nfkc_ws.v1" if quote_match == QuoteMatch.NORMALIZED else None
+            ),
+        ),
         qualifiers=qualifiers or current_qualifiers(),
         supersedes=supersedes,
-        extractor_operation_id=uid(f"operation:{name}"),
+        extractor_operation_id=operation_id or uid(f"operation:{name}"),
     )
 
 
@@ -315,9 +410,9 @@ def test_terminal_session_rejects_new_turn_even_with_current_version():
         at=NOW + timedelta(seconds=3),
     )
     with pytest.raises(DomainViolation) as caught:
-        append_transcript_turn(
+        append_employee_turn(
             state,
-            AppendTranscriptTurnCommand(
+            AppendEmployeeTurnCommand(
                 command_id=uid("append-after-terminal"),
                 expected_state_version=state.session.state_version,
                 occurred_at=NOW + timedelta(seconds=3),
@@ -351,9 +446,9 @@ def test_turn_append_enforces_chain_and_client_id_uniqueness():
         received_at=NOW + timedelta(seconds=3),
     )
     with pytest.raises(DomainViolation) as caught:
-        append_transcript_turn(
+        append_employee_turn(
             state,
-            AppendTranscriptTurnCommand(
+            AppendEmployeeTurnCommand(
                 command_id=uid("duplicate-client-command"),
                 expected_state_version=state.session.state_version,
                 occurred_at=NOW + timedelta(seconds=3),
@@ -391,9 +486,11 @@ def test_exact_and_normalized_quotes_are_checked_against_employee_span():
     )
     assert_evidence_matches_turn(exact, turn)
     assert_evidence_matches_turn(normalized, turn)
-    assert exact.span.unit == "unicode_code_point"
+    assert exact.support.span.unit == "unicode_code_point"
 
-    bad = exact.model_copy(update={"quote": "不存在的原話"})
+    bad = exact.model_copy(
+        update={"support": exact.support.model_copy(update={"quote": "不存在的原話"})}
+    )
     with pytest.raises(DomainViolation) as caught:
         assert_evidence_matches_turn(bad, turn)
     assert caught.value.reason_code == ReasonCode.QUOTE_MISMATCH
@@ -414,31 +511,35 @@ def test_evidence_cannot_quote_a_consultant_turn():
     assert caught.value.reason_code == ReasonCode.EVIDENCE_REQUIRES_EMPLOYEE_TURN
 
 
-def test_apply_evidence_supports_multiple_observations_and_atomic_correction():
+def test_apply_interpretation_supports_multiple_observations_and_atomic_correction():
     state, turn = state_with_employee_turn()
     original_hash = canonical_hash(state)
-    action = evidence_for(turn, name="action", quote="整理測試結果")
+    first_operation = uid("operation:first-batch")
+    action = evidence_for(
+        turn, name="action", quote="整理測試結果", operation_id=first_operation
+    )
     recipient = evidence_for(
         turn,
         name="recipient",
         quote="交給產品經理",
         kind=EvidenceKind.RECIPIENT,
+        operation_id=first_operation,
     )
-    first = apply_evidence(
+    first = interpret(
         state,
-        ApplyEvidenceCommand(
-            command_id=uid("apply-first-evidence"),
-            expected_state_version=state.session.state_version,
-            occurred_at=NOW + timedelta(seconds=4),
-            turn_id=turn.turn_id,
-            observations=(action, recipient),
-        ),
+        turn,
+        (action, recipient),
+        name="first-evidence",
+        at=NOW + timedelta(seconds=4),
+        operation_id=first_operation,
     )
     assert len(first.state.evidence) == 2
     assert canonical_hash(state) == original_hash
     assert [event.event_type for event in first.events] == [
         "evidence.observed",
         "evidence.observed",
+        "question_frame.consumed",
+        "turn.interpretation_applied",
     ]
 
     state, correction_turn = append_turn(
@@ -455,15 +556,13 @@ def test_apply_evidence_supports_multiple_observations_and_atomic_correction():
         kind=EvidenceKind.RECIPIENT,
         supersedes=(recipient.evidence_id,),
     )
-    result = apply_evidence(
+    result = interpret(
         state,
-        ApplyEvidenceCommand(
-            command_id=uid("apply-correction"),
-            expected_state_version=state.session.state_version,
-            occurred_at=NOW + timedelta(seconds=6),
-            turn_id=correction_turn.turn_id,
-            observations=(corrected,),
-        ),
+        correction_turn,
+        (corrected,),
+        name="correction",
+        at=NOW + timedelta(seconds=6),
+        operation_id=corrected.extractor_operation_id,
     )
 
     by_id = {item.evidence_id: item for item in result.state.evidence}
@@ -473,30 +572,31 @@ def test_apply_evidence_supports_multiple_observations_and_atomic_correction():
     assert [event.event_type for event in result.events] == [
         "evidence.observed",
         "evidence.superseded",
+        "turn.interpretation_applied",
     ]
     assert InterviewState.model_validate_json(result.state.model_dump_json()) == result.state
 
 
-def test_apply_evidence_rejects_bad_quote_without_partial_mutation():
+def test_apply_interpretation_rejects_bad_quote_without_partial_mutation():
     state, turn = state_with_employee_turn()
-    valid = evidence_for(turn, name="valid", quote="整理測試結果")
+    operation_id = uid("operation:mixed")
+    valid = evidence_for(
+        turn, name="valid", quote="整理測試結果", operation_id=operation_id
+    )
     invalid = valid.model_copy(
         update={
             "evidence_id": uid("evidence:invalid"),
-            "quote": "不存在",
-            "extractor_operation_id": uid("operation:invalid"),
+            "support": valid.support.model_copy(update={"quote": "不存在"}),
         }
     )
     with pytest.raises(DomainViolation) as caught:
-        apply_evidence(
+        interpret(
             state,
-            ApplyEvidenceCommand(
-                command_id=uid("mixed-invalid"),
-                expected_state_version=state.session.state_version,
-                occurred_at=NOW + timedelta(seconds=4),
-                turn_id=turn.turn_id,
-                observations=(valid, invalid),
-            ),
+            turn,
+            (valid, invalid),
+            name="mixed-invalid",
+            at=NOW + timedelta(seconds=4),
+            operation_id=operation_id,
         )
     assert caught.value.reason_code == ReasonCode.QUOTE_MISMATCH
     assert state.evidence == ()
@@ -792,17 +892,34 @@ def test_replaying_the_same_command_stream_produces_identical_hashes():
                 text=f"第 {index + 1} 回合",
                 at=at,
             )
-            result = append_transcript_turn(
-                state,
-                AppendTranscriptTurnCommand(
-                    command_id=uid(f"property-command-{index}"),
-                    expected_state_version=state.session.state_version,
-                    occurred_at=at,
-                    turn=turn,
-                ),
-            )
+            if turn.role == TranscriptRole.CONSULTANT:
+                result = append_consultant_question(
+                    state,
+                    AppendConsultantQuestionCommand(
+                        command_id=uid(f"property-command-{index}"),
+                        expected_state_version=state.session.state_version,
+                        occurred_at=at,
+                        turn=turn,
+                        frame_definition=open_narrative_definition(turn.text),
+                    ),
+                )
+            else:
+                result = append_employee_turn(
+                    state,
+                    AppendEmployeeTurnCommand(
+                        command_id=uid(f"property-command-{index}"),
+                        expected_state_version=state.session.state_version,
+                        occurred_at=at,
+                        turn=turn,
+                    ),
+                )
             state = result.state
             event_ids.extend(event.event_id for event in result.events)
+            if turn.role == TranscriptRole.EMPLOYEE:
+                # The next question cannot open until this answer is interpreted.
+                receipt = interpret(state, turn, name=f"property-{index}", at=at)
+                state = receipt.state
+                event_ids.extend(event.event_id for event in receipt.events)
         return state, tuple(event_ids)
 
     first_state, first_events = run()

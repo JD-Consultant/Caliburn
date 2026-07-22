@@ -279,7 +279,8 @@ class DurableCaptureWriter:
             draft=ExecutionEventDraft(
                 event_id=terminal_event_id, occurred_at=completed_at,
                 session_id=current.session_id, event_type=event_type,
-                stage="workflow.run", status=event_status))
+                stage="workflow.run", status=event_status,
+                input_artifacts=root_artifacts))
 
         manifest_ref = await self.build_and_store_manifest(
             tenant_id=tenant_id, run_id=run_id,

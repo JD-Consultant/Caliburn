@@ -23,7 +23,7 @@ from app.interview_vnext.llm.schema_exports import published_schema
 
 
 TURN_INTERPRET_OUTPUT_SCHEMA_ID = (
-    "https://caliburn.local/schemas/turn-interpret-output.v1.schema.json"
+    "https://caliburn.local/schemas/turn-interpret-output.v2.schema.json"
 )
 
 
@@ -47,8 +47,8 @@ class SchemaBinding:
 
 _PUBLISHED_ENTRIES: dict[str, CatalogEntry] = {
     TURN_INTERPRET_OUTPUT_SCHEMA_ID: CatalogEntry(
-        filename="turn-interpret-output.v1.schema.json",
-        format_name="turn_interpret_output_v1",
+        filename="turn-interpret-output.v2.schema.json",
+        format_name="turn_interpret_output_v2",
     ),
 }
 

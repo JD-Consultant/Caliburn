@@ -10,13 +10,15 @@ from pydantic import Field
 from .base import DomainModel
 from .commands import (
     ApplyCandidateProposalsCommand,
-    ApplyEvidenceCommand,
     ApplyGapProposalsCommand,
     ApplyInferenceProposalsCommand,
     ApplyReviewDecisionCommand,
-    AppendTranscriptTurnCommand,
+    ApplyTurnInterpretationCommand,
+    AppendConsultantQuestionCommand,
+    AppendEmployeeTurnCommand,
     CommandBase,
     DecideInferenceCommand,
+    InvalidateQuestionFrameCommand,
     OpenEpisodeCommand,
     SupersedeInferenceCommand,
     TransitionCandidateCommand,
@@ -40,13 +42,30 @@ from .events import (
     InferenceAppliedEvent,
     InferenceSupersededEvent,
     InferenceTransitionedEvent,
+    QuestionFrameAnswerBoundEvent,
+    QuestionFrameConsumedEvent,
+    QuestionFrameOpenedEvent,
+    QuestionFrameStaledEvent,
+    QuestionFrameSupersededEvent,
     ReviewDecisionAppliedEvent,
     SessionTransitionedEvent,
     TranscriptTurnAppendedEvent,
+    TurnInterpretationAppliedEvent,
 )
+from .question_frame import (
+    PropositionQuestionTarget,
+    QuestionFrame,
+    QuestionFrameDefinition,
+    QuestionFrameStaleReason,
+    QuestionFrameStatus,
+    QuestionSourceKind,
+    QuestionSourceRef,
+    SlotQuestionTarget,
+)
+from .turn_identity import question_frame_id as derive_question_frame_id
 from .episode import EpisodeState, EpisodeStatus, GapStatus, Sensitivity
 from .evidence import Evidence, EvidenceStatus, InferenceMethod, InferenceStatus
-from .hashing import canonical_hash
+from .hashing import canonical_hash, sha256_utf8_text
 from .invariants import (
     assert_candidate_lineage,
     assert_candidate_projectable,
@@ -63,14 +82,15 @@ from .session import (
     SessionStatus,
 )
 from .state import InterviewState
-from .transcript import TranscriptRole
+from .support import ContextualAnswerSupport
+from .transcript import TranscriptRole, TranscriptTurn
 
 
 class ReductionResult(DomainModel):
     """Reducer output; persisted verbatim as the immutable command-result artifact
     (V2-B §5.4),故需要固定 schema discriminator 與 committed JSON Schema。"""
 
-    schema_version: Literal["reduction_result.v1"] = "reduction_result.v1"
+    schema_version: Literal["reduction_result.v2"] = "reduction_result.v2"
     state: InterviewState
     events: tuple[DomainEvent, ...] = ()
     reason_code: ReasonCode
@@ -218,20 +238,7 @@ def transition_session(
     return _result(next_state, (event,))
 
 
-def append_transcript_turn(
-    state: InterviewState,
-    command: AppendTranscriptTurnCommand,
-) -> ReductionResult:
-    duplicate = _preflight(state, command)
-    if duplicate is not None:
-        return duplicate
-    if state.session.status != SessionStatus.ACTIVE:
-        raise DomainViolation(
-            ReasonCode.INVALID_SESSION_TRANSITION,
-            "transcript turns may only be appended to an active session",
-        )
-
-    turn = command.turn
+def _assert_turn_chain(state: InterviewState, turn: TranscriptTurn) -> int:
     if turn.session_id != state.session.session_id:
         raise DomainViolation(ReasonCode.SESSION_ID_MISMATCH, "turn belongs to another session")
     if any(existing.turn_id == turn.turn_id for existing in state.turns):
@@ -254,8 +261,189 @@ def append_transcript_turn(
             ReasonCode.PREVIOUS_TURN_MISMATCH,
             "previous_turn_id does not match the transcript tail",
         )
+    return expected_sequence
+
+
+def _frame_by_id(state: InterviewState) -> dict[UUID, QuestionFrame]:
+    return {frame.question_frame_id: frame for frame in state.question_frames}
+
+
+def _active_frame(state: InterviewState) -> QuestionFrame | None:
+    if state.active_question_frame_id is None:
+        return None
+    return _frame_by_id(state)[state.active_question_frame_id]
+
+
+def _pending_employee_turn(state: InterviewState) -> TranscriptTurn | None:
+    """The employee turn still awaiting a receipt, if any (at most one)."""
+
+    interpreted = {record.employee_turn_id for record in state.turn_interpretations}
+    for turn in state.turns:
+        if turn.role == TranscriptRole.EMPLOYEE and turn.turn_id not in interpreted:
+            return turn
+    return None
+
+
+def _definition_source_refs(definition: QuestionFrameDefinition) -> tuple[QuestionSourceRef, ...]:
+    refs: list[QuestionSourceRef] = []
+    for target in definition.targets:
+        if isinstance(target, PropositionQuestionTarget):
+            refs.extend(target.proposition.source_refs)
+        elif isinstance(target, SlotQuestionTarget):
+            refs.extend(target.source_refs)
+        else:
+            for option in target.options:
+                refs.extend(option.proposition.source_refs)
+    return tuple(refs)
+
+
+def _assert_frame_sources_are_active(state: InterviewState, definition) -> None:
+    """``employee_evidence`` refs must resolve to active evidence at open time.
+
+    Only checked when a frame is opened or used: a frame closed earlier keeps the
+    hash it was built from, so superseding that evidence later must not make the
+    historical frame undeserializable (amendment plan §6.1).
+    """
+
+    evidence_by_id = {item.evidence_id: item for item in state.evidence}
+    for ref in _definition_source_refs(definition):
+        if ref.source_kind != QuestionSourceKind.EMPLOYEE_EVIDENCE:
+            continue
+        try:
+            evidence_id = UUID(ref.source_ref)
+        except ValueError as error:
+            raise DomainViolation(
+                ReasonCode.QUESTION_FRAME_TARGET_INVALID,
+                "employee_evidence source_ref must be a UUID",
+                details={"source_ref": ref.source_ref},
+            ) from error
+        item = evidence_by_id.get(evidence_id)
+        if item is None or item.status != EvidenceStatus.ACTIVE:
+            raise DomainViolation(
+                ReasonCode.QUESTION_FRAME_TARGET_INVALID,
+                "employee_evidence source must be active evidence in this session",
+                details={"source_ref": ref.source_ref},
+            )
+        if canonical_hash(item) != ref.source_hash:
+            raise DomainViolation(
+                ReasonCode.QUESTION_FRAME_HASH_MISMATCH,
+                "employee_evidence source_hash does not match the referenced evidence",
+                details={"source_ref": ref.source_ref},
+            )
+
+
+def append_consultant_question(
+    state: InterviewState,
+    command: AppendConsultantQuestionCommand,
+) -> ReductionResult:
+    duplicate = _preflight(state, command)
+    if duplicate is not None:
+        return duplicate
+    if state.session.status != SessionStatus.ACTIVE:
+        raise DomainViolation(
+            ReasonCode.INVALID_SESSION_TRANSITION,
+            "transcript turns may only be appended to an active session",
+        )
+
+    turn = command.turn
+    expected_sequence = _assert_turn_chain(state, turn)
+
+    definition = command.frame_definition
+    if definition.question_text_hash != sha256_utf8_text(turn.text):
+        raise DomainViolation(
+            ReasonCode.QUESTION_FRAME_DEFINITION_INVALID,
+            "frame definition does not describe this consultant turn",
+        )
+    _assert_frame_sources_are_active(state, definition)
+
+    # A new question cannot open while the previous answer is unresolved: the
+    # answer would otherwise bind to the wrong frame (ADR 0037 §3).
+    active = _active_frame(state)
+    if active is not None and active.answer_turn_id is not None:
+        raise DomainViolation(
+            ReasonCode.QUESTION_FRAME_ANSWER_PENDING,
+            "the active frame already bound an answer awaiting interpretation",
+        )
+    if _pending_employee_turn(state) is not None:
+        raise DomainViolation(
+            ReasonCode.TURN_INTERPRETATION_PENDING,
+            "an employee turn is still awaiting interpretation",
+        )
 
     next_version = state.session.state_version + 1
+    new_frame_id = derive_question_frame_id(turn.turn_id)
+    if new_frame_id in _frame_by_id(state):
+        raise DomainViolation(
+            ReasonCode.QUESTION_FRAME_DEFINITION_INVALID,
+            "question frame already exists for this consultant turn",
+        )
+
+    frames = list(state.question_frames)
+    events: list[DomainEvent] = []
+    ordinal = 0
+    events.append(
+        TranscriptTurnAppendedEvent(
+            event_id=_event_id(command.command_id, "transcript.turn_appended", ordinal),
+            session_id=state.session.session_id,
+            command_id=command.command_id,
+            ordinal=ordinal,
+            state_version=next_version,
+            occurred_at=command.occurred_at,
+            turn_id=turn.turn_id,
+            turn_sequence=turn.sequence,
+        )
+    )
+    ordinal += 1
+
+    if active is not None:
+        for index, frame in enumerate(frames):
+            if frame.question_frame_id != active.question_frame_id:
+                continue
+            frames[index] = _replace(
+                frame,
+                status=QuestionFrameStatus.SUPERSEDED,
+                superseded_by_frame_id=new_frame_id,
+                closed_at=command.occurred_at,
+            )
+        events.append(
+            QuestionFrameSupersededEvent(
+                event_id=_event_id(command.command_id, "question_frame.superseded", ordinal),
+                session_id=state.session.session_id,
+                command_id=command.command_id,
+                ordinal=ordinal,
+                state_version=next_version,
+                occurred_at=command.occurred_at,
+                previous_question_frame_id=active.question_frame_id,
+                replacement_question_frame_id=new_frame_id,
+            )
+        )
+        ordinal += 1
+
+    frames.append(
+        QuestionFrame(
+            question_frame_id=new_frame_id,
+            session_id=state.session.session_id,
+            consultant_turn_id=turn.turn_id,
+            definition=definition,
+            status=QuestionFrameStatus.ACTIVE,
+            opened_state_version=next_version,
+            opened_at=command.occurred_at,
+        )
+    )
+    events.append(
+        QuestionFrameOpenedEvent(
+            event_id=_event_id(command.command_id, "question_frame.opened", ordinal),
+            session_id=state.session.session_id,
+            command_id=command.command_id,
+            ordinal=ordinal,
+            state_version=next_version,
+            occurred_at=command.occurred_at,
+            question_frame_id=new_frame_id,
+            consultant_turn_id=turn.turn_id,
+            definition_hash=definition.definition_hash,
+        )
+    )
+
     session = _replace(
         state.session,
         state_version=next_version,
@@ -266,25 +454,178 @@ def append_transcript_turn(
         state,
         session=session,
         turns=state.turns + (turn,),
+        question_frames=tuple(frames),
+        active_question_frame_id=new_frame_id,
         processed_command_ids=state.processed_command_ids + (command.command_id,),
     )
-    event = TranscriptTurnAppendedEvent(
-        event_id=_event_id(command.command_id, "transcript.turn_appended", 0),
+    return _result(next_state, tuple(events))
+
+
+def append_employee_turn(
+    state: InterviewState,
+    command: AppendEmployeeTurnCommand,
+) -> ReductionResult:
+    duplicate = _preflight(state, command)
+    if duplicate is not None:
+        return duplicate
+    if state.session.status != SessionStatus.ACTIVE:
+        raise DomainViolation(
+            ReasonCode.INVALID_SESSION_TRANSITION,
+            "transcript turns may only be appended to an active session",
+        )
+
+    turn = command.turn
+    expected_sequence = _assert_turn_chain(state, turn)
+    if _pending_employee_turn(state) is not None:
+        raise DomainViolation(
+            ReasonCode.TURN_INTERPRETATION_PENDING,
+            "the previous employee turn is still awaiting interpretation",
+        )
+
+    next_version = state.session.state_version + 1
+    active = _active_frame(state)
+    frames = list(state.question_frames)
+    events: list[DomainEvent] = []
+    ordinal = 0
+    events.append(
+        TranscriptTurnAppendedEvent(
+            event_id=_event_id(command.command_id, "transcript.turn_appended", ordinal),
+            session_id=state.session.session_id,
+            command_id=command.command_id,
+            ordinal=ordinal,
+            state_version=next_version,
+            occurred_at=command.occurred_at,
+            turn_id=turn.turn_id,
+            turn_sequence=turn.sequence,
+        )
+    )
+    ordinal += 1
+
+    active_frame_id = state.active_question_frame_id
+    if active is not None:
+        # Only the question immediately before this answer may claim it.
+        immediate = state.turns and state.turns[-1].turn_id == active.consultant_turn_id
+        if immediate:
+            for index, frame in enumerate(frames):
+                if frame.question_frame_id == active.question_frame_id:
+                    frames[index] = _replace(frame, answer_turn_id=turn.turn_id)
+            events.append(
+                QuestionFrameAnswerBoundEvent(
+                    event_id=_event_id(
+                        command.command_id, "question_frame.answer_bound", ordinal
+                    ),
+                    session_id=state.session.session_id,
+                    command_id=command.command_id,
+                    ordinal=ordinal,
+                    state_version=next_version,
+                    occurred_at=command.occurred_at,
+                    question_frame_id=active.question_frame_id,
+                    employee_turn_id=turn.turn_id,
+                )
+            )
+        else:
+            for index, frame in enumerate(frames):
+                if frame.question_frame_id == active.question_frame_id:
+                    frames[index] = _replace(
+                        frame,
+                        status=QuestionFrameStatus.STALE,
+                        stale_reason=QuestionFrameStaleReason.ANSWER_NOT_IMMEDIATE,
+                        closed_at=command.occurred_at,
+                    )
+            active_frame_id = None
+            events.append(
+                QuestionFrameStaledEvent(
+                    event_id=_event_id(command.command_id, "question_frame.staled", ordinal),
+                    session_id=state.session.session_id,
+                    command_id=command.command_id,
+                    ordinal=ordinal,
+                    state_version=next_version,
+                    occurred_at=command.occurred_at,
+                    question_frame_id=active.question_frame_id,
+                    answer_turn_id=None,
+                    reason=QuestionFrameStaleReason.ANSWER_NOT_IMMEDIATE,
+                )
+            )
+
+    session = _replace(
+        state.session,
+        state_version=next_version,
+        turn_count=expected_sequence,
+        updated_at=command.occurred_at,
+    )
+    next_state = _replace(
+        state,
+        session=session,
+        turns=state.turns + (turn,),
+        question_frames=tuple(frames),
+        active_question_frame_id=active_frame_id,
+        processed_command_ids=state.processed_command_ids + (command.command_id,),
+    )
+    return _result(next_state, tuple(events))
+
+
+def invalidate_question_frame(
+    state: InterviewState,
+    command: InvalidateQuestionFrameCommand,
+) -> ReductionResult:
+    duplicate = _preflight(state, command)
+    if duplicate is not None:
+        return duplicate
+
+    frame = _frame_by_id(state).get(command.question_frame_id)
+    if frame is None:
+        raise DomainViolation(
+            ReasonCode.QUESTION_FRAME_NOT_FOUND,
+            "question frame does not exist",
+        )
+    if frame.status != QuestionFrameStatus.ACTIVE:
+        raise DomainViolation(
+            ReasonCode.QUESTION_FRAME_NOT_ACTIVE,
+            "only an active question frame can be invalidated",
+        )
+
+    frames = tuple(
+        _replace(
+            item,
+            status=QuestionFrameStatus.STALE,
+            stale_reason=command.reason,
+            closed_at=command.occurred_at,
+        )
+        if item.question_frame_id == frame.question_frame_id
+        else item
+        for item in state.question_frames
+    )
+    next_state, next_version = _commit_state(
+        state,
+        command,
+        question_frames=frames,
+        active_question_frame_id=None,
+    )
+    event = QuestionFrameStaledEvent(
+        event_id=_event_id(command.command_id, "question_frame.staled", 0),
         session_id=state.session.session_id,
         command_id=command.command_id,
         ordinal=0,
         state_version=next_version,
         occurred_at=command.occurred_at,
-        turn_id=turn.turn_id,
-        turn_sequence=turn.sequence,
+        question_frame_id=frame.question_frame_id,
+        answer_turn_id=frame.answer_turn_id,
+        reason=command.reason,
     )
     return _result(next_state, (event,))
 
 
-def apply_evidence(
+def apply_turn_interpretation(
     state: InterviewState,
-    command: ApplyEvidenceCommand,
+    command: ApplyTurnInterpretationCommand,
 ) -> ReductionResult:
+    """Commit one employee turn's interpretation: evidence, frame and receipt.
+
+    Zero observations is a success, not a no-op: a dont-know or fully-dropped
+    turn still leaves a receipt so the turn is never re-interpreted and the frame
+    is consumed exactly once (ADR 0037 §6).
+    """
+
     duplicate = _preflight(state, command)
     if duplicate is not None:
         return duplicate
@@ -294,8 +635,29 @@ def apply_evidence(
             "evidence may only be applied to an active or finishing session",
         )
 
+    record = command.record
+    if record.session_id != state.session.session_id:
+        raise DomainViolation(
+            ReasonCode.INTERPRETATION_SCOPE_MISMATCH,
+            "interpretation record belongs to another session",
+        )
+    if record.applied_at != command.occurred_at:
+        raise DomainViolation(
+            ReasonCode.INTERPRETATION_SCOPE_MISMATCH,
+            "record.applied_at must equal command.occurred_at",
+        )
+    if any(
+        existing.interpretation_id == record.interpretation_id
+        or existing.operation_id == record.operation_id
+        for existing in state.turn_interpretations
+    ):
+        raise DomainViolation(
+            ReasonCode.INTERPRETATION_ID_DUPLICATE,
+            "interpretation or operation has already been recorded",
+        )
+
     turn_by_id = {turn.turn_id: turn for turn in state.turns}
-    turn = turn_by_id.get(command.turn_id)
+    turn = turn_by_id.get(record.employee_turn_id)
     if turn is None:
         raise DomainViolation(ReasonCode.TURN_NOT_FOUND, "evidence source turn does not exist")
     if turn.role != TranscriptRole.EMPLOYEE:
@@ -303,6 +665,56 @@ def apply_evidence(
             ReasonCode.EVIDENCE_REQUIRES_EMPLOYEE_TURN,
             "evidence source turn must be employee-authored",
         )
+    if any(
+        existing.employee_turn_id == turn.turn_id for existing in state.turn_interpretations
+    ):
+        raise DomainViolation(
+            ReasonCode.TURN_ALREADY_INTERPRETED,
+            "this employee turn already has an interpretation receipt",
+        )
+
+    frame = None
+    if record.question_frame_id is not None:
+        frame = _frame_by_id(state).get(record.question_frame_id)
+        if frame is None:
+            raise DomainViolation(
+                ReasonCode.QUESTION_FRAME_NOT_FOUND,
+                "interpretation frame does not exist",
+            )
+        if frame.status != QuestionFrameStatus.ACTIVE:
+            raise DomainViolation(
+                ReasonCode.QUESTION_FRAME_NOT_ACTIVE,
+                "only an active frame can be consumed by an interpretation",
+            )
+        if frame.answer_turn_id != turn.turn_id:
+            raise DomainViolation(
+                ReasonCode.QUESTION_FRAME_NOT_IMMEDIATE,
+                "interpretation frame is not bound to this employee turn",
+            )
+        if frame.definition.definition_hash != record.question_frame_definition_hash:
+            raise DomainViolation(
+                ReasonCode.QUESTION_FRAME_HASH_MISMATCH,
+                "record frame definition hash does not match the active frame",
+            )
+
+    for item in command.observations:
+        support = item.support
+        if not isinstance(support, ContextualAnswerSupport):
+            continue
+        if frame is None:
+            raise DomainViolation(
+                ReasonCode.CONTEXTUAL_SUPPORT_MISMATCH,
+                "contextual support requires an interpretation frame",
+            )
+        if (
+            support.question_frame_id != frame.question_frame_id
+            or support.question_frame_definition_hash != frame.definition.definition_hash
+            or support.employee_turn_id != turn.turn_id
+        ):
+            raise DomainViolation(
+                ReasonCode.CONTEXTUAL_SUPPORT_MISMATCH,
+                "contextual support does not close over this frame and turn",
+            )
 
     existing_by_id = {item.evidence_id: item for item in state.evidence}
     batch_ids = [item.evidence_id for item in command.observations]
@@ -316,7 +728,7 @@ def apply_evidence(
                 ReasonCode.EVIDENCE_PROPOSAL_STATUS_INVALID,
                 "new evidence proposals must be active",
             )
-        if item.session_id != state.session.session_id or item.turn_id != command.turn_id:
+        if item.session_id != state.session.session_id or item.source_turn_id != turn.turn_id:
             raise DomainViolation(
                 ReasonCode.EVIDENCE_TURN_MISMATCH,
                 "evidence does not belong to the command source turn",
@@ -358,7 +770,7 @@ def apply_evidence(
                     ReasonCode.SUPERSEDE_TARGET_NOT_ACTIVE,
                     "only active evidence may be superseded",
                 )
-            target_turn = turn_by_id[target.turn_id]
+            target_turn = turn_by_id[target.source_turn_id]
             if turn.sequence <= target_turn.sequence:
                 raise DomainViolation(
                     ReasonCode.EVIDENCE_TURN_MISMATCH,
@@ -401,11 +813,31 @@ def apply_evidence(
         state_version=next_version,
         updated_at=command.occurred_at,
     )
+
+    frames = state.question_frames
+    active_frame_id = state.active_question_frame_id
+    if frame is not None:
+        frames = tuple(
+            _replace(
+                item,
+                status=QuestionFrameStatus.CONSUMED,
+                consumed_operation_id=record.operation_id,
+                closed_at=command.occurred_at,
+            )
+            if item.question_frame_id == frame.question_frame_id
+            else item
+            for item in frames
+        )
+        active_frame_id = None
+
     next_state = _replace(
         state,
         session=session,
         evidence=tuple(updated_existing) + command.observations,
         episodes=tuple(episodes),
+        question_frames=frames,
+        active_question_frame_id=active_frame_id,
+        turn_interpretations=state.turn_interpretations + (record,),
         processed_command_ids=state.processed_command_ids + (command.command_id,),
     )
 
@@ -421,7 +853,7 @@ def apply_evidence(
                 state_version=next_version,
                 occurred_at=command.occurred_at,
                 evidence_id=item.evidence_id,
-                turn_id=item.turn_id,
+                turn_id=item.source_turn_id,
             )
         )
         ordinal += 1
@@ -439,6 +871,43 @@ def apply_evidence(
                 )
             )
             ordinal += 1
+
+    if frame is not None:
+        events.append(
+            QuestionFrameConsumedEvent(
+                event_id=_event_id(command.command_id, "question_frame.consumed", ordinal),
+                session_id=state.session.session_id,
+                command_id=command.command_id,
+                ordinal=ordinal,
+                state_version=next_version,
+                occurred_at=command.occurred_at,
+                question_frame_id=frame.question_frame_id,
+                employee_turn_id=turn.turn_id,
+                operation_id=record.operation_id,
+            )
+        )
+        ordinal += 1
+
+    # Always last, zero-evidence turns included: the receipt is what closes the
+    # turn (amendment plan §7.6).
+    events.append(
+        TurnInterpretationAppliedEvent(
+            event_id=_event_id(command.command_id, "turn.interpretation_applied", ordinal),
+            session_id=state.session.session_id,
+            command_id=command.command_id,
+            ordinal=ordinal,
+            state_version=next_version,
+            occurred_at=command.occurred_at,
+            interpretation_id=record.interpretation_id,
+            employee_turn_id=turn.turn_id,
+            operation_id=record.operation_id,
+            question_frame_id=record.question_frame_id,
+            accepted_evidence_ids=record.accepted_evidence_ids,
+            dialogue_act=record.dialogue_act,
+            episode_signal=record.episode_signal,
+            insufficiency_codes=record.insufficiency_codes,
+        )
+    )
     return _result(next_state, tuple(events))
 
 
@@ -474,7 +943,7 @@ def withdraw_evidence(
             ReasonCode.EVIDENCE_WITHDRAW_TURN_INVALID,
             "withdrawal requires an employee-authored source turn",
         )
-    target_turn = next(item for item in state.turns if item.turn_id == target.turn_id)
+    target_turn = next(item for item in state.turns if item.turn_id == target.source_turn_id)
     if turn.sequence <= target_turn.sequence:
         raise DomainViolation(
             ReasonCode.EVIDENCE_WITHDRAW_TURN_INVALID,
@@ -560,6 +1029,32 @@ def withdraw_evidence(
             )
             candidates[index] = _replace(item, status=CandidateStatus.INSUFFICIENT)
 
+    # Withdrawing evidence an active frame was built on invalidates the frame in
+    # the same transaction — ContextBuilder must never have to repair state
+    # after the fact (amendment plan §7.5).
+    active = _active_frame(state)
+    staled_frame_id: UUID | None = None
+    frames = state.question_frames
+    active_frame_id = state.active_question_frame_id
+    if active is not None and any(
+        ref.source_kind == QuestionSourceKind.EMPLOYEE_EVIDENCE
+        and ref.source_ref == str(target.evidence_id)
+        for ref in _definition_source_refs(active.definition)
+    ):
+        staled_frame_id = active.question_frame_id
+        frames = tuple(
+            _replace(
+                item,
+                status=QuestionFrameStatus.STALE,
+                stale_reason=QuestionFrameStaleReason.SOURCE_EVIDENCE_CHANGED,
+                closed_at=command.occurred_at,
+            )
+            if item.question_frame_id == staled_frame_id
+            else item
+            for item in frames
+        )
+        active_frame_id = None
+
     next_state, next_version = _commit_state(
         state,
         command,
@@ -567,6 +1062,8 @@ def withdraw_evidence(
         gaps=tuple(gaps),
         inferences=tuple(inferences),
         candidates=tuple(candidates),
+        question_frames=frames,
+        active_question_frame_id=active_frame_id,
     )
     events: list[DomainEvent] = [
         EvidenceWithdrawnEvent(
@@ -582,6 +1079,21 @@ def withdraw_evidence(
         )
     ]
     ordinal = 1
+    if staled_frame_id is not None:
+        events.append(
+            QuestionFrameStaledEvent(
+                event_id=_event_id(command.command_id, "question_frame.staled", ordinal),
+                session_id=state.session.session_id,
+                command_id=command.command_id,
+                ordinal=ordinal,
+                state_version=next_version,
+                occurred_at=command.occurred_at,
+                question_frame_id=staled_frame_id,
+                answer_turn_id=active.answer_turn_id if active is not None else None,
+                reason=QuestionFrameStaleReason.SOURCE_EVIDENCE_CHANGED,
+            )
+        )
+        ordinal += 1
     for gap_id, previous, target_status, source_turn_id in gap_transitions:
         events.append(
             GapTransitionedEvent(
@@ -970,7 +1482,7 @@ def transition_gap(
                 if (
                     evidence is None
                     or evidence.status != EvidenceStatus.ACTIVE
-                    or evidence.turn_id != command.source_turn_id
+                    or evidence.source_turn_id != command.source_turn_id
                 ):
                     raise DomainViolation(
                         ReasonCode.GAP_TRANSITION_INVALID,
@@ -1145,7 +1657,7 @@ def decide_inference(
             "decision evidence must exist and be active",
         )
     source_turn = next(
-        (item for item in state.turns if item.turn_id == evidence.turn_id),
+        (item for item in state.turns if item.turn_id == evidence.source_turn_id),
         None,
     )
     if source_turn is None or source_turn.role != TranscriptRole.EMPLOYEE:

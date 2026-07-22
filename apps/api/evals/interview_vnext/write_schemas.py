@@ -19,6 +19,7 @@ from .contracts import (
     TurnEvalGold,
     TurnEvalGraderResult,
     TurnEvalInitialFixture,
+    TurnEvalPriorInterpretationSeed,
     TurnEvalReferenceOutput,
     TurnEvalReviewDecision,
     TurnEvalTranscriptTurn,
@@ -30,62 +31,83 @@ SCHEMA_DIR = Path(__file__).with_name("schemas")
 SchemaFactory = Callable[[], dict[str, Any]]
 
 SCHEMA_EXPORTS: dict[str, tuple[str, str, SchemaFactory]] = {
-    "turn-eval-case.v1.schema.json": (
-        "https://caliburn.local/schemas/turn-eval-case.v1.schema.json",
-        "Caliburn interview vNext turn eval case descriptor v1",
+    "turn-eval-case.v2.schema.json": (
+        "https://caliburn.local/schemas/turn-eval-case.v2.schema.json",
+        "Caliburn interview vNext turn eval case descriptor v2",
         TurnEvalCase.model_json_schema,
     ),
-    "turn-eval-transcript.v1.schema.json": (
-        "https://caliburn.local/schemas/turn-eval-transcript.v1.schema.json",
-        "Caliburn interview vNext turn eval transcript turn v1",
+    "turn-eval-transcript.v2.schema.json": (
+        "https://caliburn.local/schemas/turn-eval-transcript.v2.schema.json",
+        "Caliburn interview vNext turn eval transcript turn v2",
         TurnEvalTranscriptTurn.model_json_schema,
     ),
-    "turn-eval-initial-fixture.v1.schema.json": (
-        "https://caliburn.local/schemas/turn-eval-initial-fixture.v1.schema.json",
-        "Caliburn interview vNext turn eval initial fixture v1",
+    "turn-eval-initial-fixture.v2.schema.json": (
+        "https://caliburn.local/schemas/turn-eval-initial-fixture.v2.schema.json",
+        "Caliburn interview vNext turn eval initial fixture v2",
         TurnEvalInitialFixture.model_json_schema,
     ),
-    "turn-eval-gold.v1.schema.json": (
-        "https://caliburn.local/schemas/turn-eval-gold.v1.schema.json",
-        "Caliburn interview vNext turn eval gold criteria v1",
+    "turn-eval-gold.v2.schema.json": (
+        "https://caliburn.local/schemas/turn-eval-gold.v2.schema.json",
+        "Caliburn interview vNext turn eval gold criteria v2",
         TurnEvalGold.model_json_schema,
     ),
-    "turn-eval-reference-output.v1.schema.json": (
-        "https://caliburn.local/schemas/turn-eval-reference-output.v1.schema.json",
-        "Caliburn interview vNext turn eval reference output v1",
+    "turn-eval-reference-output.v2.schema.json": (
+        "https://caliburn.local/schemas/turn-eval-reference-output.v2.schema.json",
+        "Caliburn interview vNext turn eval reference output v2",
         TurnEvalReferenceOutput.model_json_schema,
     ),
-    "turn-eval-batch-plan.v1.schema.json": (
-        "https://caliburn.local/schemas/turn-eval-batch-plan.v1.schema.json",
-        "Caliburn interview vNext turn eval batch plan v1",
+    "turn-eval-batch-plan.v2.schema.json": (
+        "https://caliburn.local/schemas/turn-eval-batch-plan.v2.schema.json",
+        "Caliburn interview vNext turn eval batch plan v2",
         TurnEvalBatchPlan.model_json_schema,
     ),
-    "turn-eval-trial.v1.schema.json": (
-        "https://caliburn.local/schemas/turn-eval-trial.v1.schema.json",
-        "Caliburn interview vNext turn eval trial record v1",
+    "turn-eval-trial.v2.schema.json": (
+        "https://caliburn.local/schemas/turn-eval-trial.v2.schema.json",
+        "Caliburn interview vNext turn eval trial record v2",
         TurnEvalTrial.model_json_schema,
     ),
-    "turn-eval-grader-result.v1.schema.json": (
-        "https://caliburn.local/schemas/turn-eval-grader-result.v1.schema.json",
-        "Caliburn interview vNext turn eval grader result v1",
+    "turn-eval-grader-result.v2.schema.json": (
+        "https://caliburn.local/schemas/turn-eval-grader-result.v2.schema.json",
+        "Caliburn interview vNext turn eval grader result v2",
         TurnEvalGraderResult.model_json_schema,
     ),
-    "turn-eval-review-decision.v1.schema.json": (
-        "https://caliburn.local/schemas/turn-eval-review-decision.v1.schema.json",
-        "Caliburn interview vNext turn eval review decision v1",
+    "turn-eval-review-decision.v2.schema.json": (
+        "https://caliburn.local/schemas/turn-eval-review-decision.v2.schema.json",
+        "Caliburn interview vNext turn eval review decision v2",
         TurnEvalReviewDecision.model_json_schema,
     ),
-    "turn-eval-case-report.v1.schema.json": (
-        "https://caliburn.local/schemas/turn-eval-case-report.v1.schema.json",
-        "Caliburn interview vNext turn eval case report v1",
+    "turn-eval-case-report.v2.schema.json": (
+        "https://caliburn.local/schemas/turn-eval-case-report.v2.schema.json",
+        "Caliburn interview vNext turn eval case report v2",
         TurnEvalCaseReport.model_json_schema,
     ),
-    "turn-eval-batch-report.v1.schema.json": (
-        "https://caliburn.local/schemas/turn-eval-batch-report.v1.schema.json",
-        "Caliburn interview vNext turn eval batch report v1",
+    "turn-eval-batch-report.v2.schema.json": (
+        "https://caliburn.local/schemas/turn-eval-batch-report.v2.schema.json",
+        "Caliburn interview vNext turn eval batch report v2",
         TurnEvalBatchReport.model_json_schema,
     ),
+    "turn-eval-prior-interpretation-seed.v1.schema.json": (
+        "https://caliburn.local/schemas/turn-eval-prior-interpretation-seed.v1.schema.json",
+        "Caliburn interview vNext adjudicated prior interpretation seed v1",
+        TurnEvalPriorInterpretationSeed.model_json_schema,
+    ),
 }
+
+HISTORICAL_SCHEMAS = frozenset(
+    {
+        "turn-eval-case.v1.schema.json",
+        "turn-eval-transcript.v1.schema.json",
+        "turn-eval-initial-fixture.v1.schema.json",
+        "turn-eval-gold.v1.schema.json",
+        "turn-eval-reference-output.v1.schema.json",
+        "turn-eval-batch-plan.v1.schema.json",
+        "turn-eval-trial.v1.schema.json",
+        "turn-eval-grader-result.v1.schema.json",
+        "turn-eval-review-decision.v1.schema.json",
+        "turn-eval-case-report.v1.schema.json",
+        "turn-eval-batch-report.v1.schema.json",
+    }
+)
 
 
 def published_schema(filename: str) -> dict[str, Any]:

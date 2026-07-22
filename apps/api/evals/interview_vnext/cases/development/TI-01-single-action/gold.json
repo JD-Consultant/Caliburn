@@ -1,89 +1,99 @@
 {
-  "schema_version": "turn_eval_gold.v1",
-  "case_id": "TI-01-single-action",
-  "allowed_user_signals": [
-    "answer"
-  ],
-  "allowed_episode_signals": [
-    "continue"
-  ],
-  "expected_commit": "evidence",
-  "observations": [
-    {
-      "gold_id": "g-action-check-orders",
-      "requirement": "required",
-      "semantic_target": "員工目前每天早上固定核對前一日的出貨訂單",
-      "allowed_subjects": [
-        "employee"
-      ],
-      "allowed_kinds": [
-        "action"
-      ],
-      "source_anchors": [
-        {
-          "turn_key": "employee-target",
-          "quote": "我每天早上核對前一日的出貨訂單。",
-          "occurrence": 1
-        },
-        {
-          "turn_key": "employee-target",
-          "quote": "核對前一日的出貨訂單",
-          "occurrence": 1
-        }
-      ],
-      "qualifiers": {
-        "time_scope": {
-          "mode": "exact",
-          "value": "current"
-        },
-        "typicality": {
-          "mode": "exact",
-          "value": "typical"
-        },
-        "polarity": {
-          "mode": "exact",
-          "value": "affirmed"
-        },
-        "frequency_unit": {
-          "mode": "exact",
-          "value": "per_day"
-        },
-        "frequency_value": {
-          "mode": "not_applicable"
-        },
-        "importance": {
-          "mode": "one_of",
-          "values": [
-            "not_stated"
-          ]
-        },
-        "ownership": {
-          "mode": "exact",
-          "value": "owner"
-        }
-      },
-      "correction_target_evidence_keys": [],
-      "severity_if_missed": "major",
-      "rationale": "唯一明確的例行工作事實,是本 case 的全部訊號"
-    }
-  ],
-  "forbidden_claims": [
-    {
-      "gold_id": "f-invented-authority-kpi",
-      "description": "不得新增原文沒有的核准權、KPI、數字門檻或品質標準",
-      "severity": "critical"
-    },
-    {
-      "gold_id": "f-synonym-split",
-      "description": "不得把同一句拆成多筆同義 evidence 灌precision分母",
-      "severity": "major"
-    }
-  ],
-  "required_insufficiencies": [],
-  "allowed_insufficiencies": [],
-  "state_expectation": {
-    "state_hash_changed": true,
-    "prior_evidence_superseded_keys": [],
-    "forbidden_superseded_keys": []
-  }
+    "schema_version":  "turn_eval_gold.v2",
+    "case_id":  "TI-01-single-action",
+    "allowed_episode_signals":  [
+                                    "continue"
+                                ],
+    "expected_commit":  "evidence_and_receipt",
+    "observations":  [
+                         {
+                             "gold_id":  "g-action-check-orders",
+                             "requirement":  "required",
+                             "semantic_target":  "員工目前每天早上固定核對前一日的出貨訂單",
+                             "allowed_subjects":  [
+                                                      "employee"
+                                                  ],
+                             "allowed_kinds":  [
+                                                   "action"
+                                               ],
+                             "source_anchors":  [
+                                                    {
+                                                        "turn_key":  "employee-target",
+                                                        "quote":  "我每天早上核對前一日的出貨訂單。",
+                                                        "occurrence":  1
+                                                    },
+                                                    {
+                                                        "turn_key":  "employee-target",
+                                                        "quote":  "核對前一日的出貨訂單",
+                                                        "occurrence":  1
+                                                    }
+                                                ],
+                             "qualifiers":  {
+                                                "time_scope":  {
+                                                                   "mode":  "exact",
+                                                                   "value":  "unknown"
+                                                               },
+                                                "typicality":  {
+                                                                   "mode":  "exact",
+                                                                   "value":  "unknown"
+                                                               },
+                                                "polarity":  {
+                                                                 "mode":  "exact",
+                                                                 "value":  "affirmed"
+                                                             },
+                                                "frequency_unit":  {
+                                                                       "mode":  "exact",
+                                                                       "value":  "per_day"
+                                                                   },
+                                                "frequency_value":  {
+                                                                        "mode":  "not_applicable"
+                                                                    },
+                                                "importance":  {
+                                                                   "mode":  "one_of",
+                                                                   "values":  [
+                                                                                  "not_stated"
+                                                                              ]
+                                                               },
+                                                "ownership":  {
+                                                                  "mode":  "exact",
+                                                                  "value":  "unknown"
+                                                              }
+                                            },
+                             "correction_target_evidence_keys":  [
+
+                                                                 ],
+                             "severity_if_missed":  "major",
+                             "rationale":  "唯一明確的例行工作事實,是本 case 的全部訊號"
+                         }
+                     ],
+    "forbidden_claims":  [
+                             {
+                                 "gold_id":  "f-invented-authority-kpi",
+                                 "description":  "不得新增原文沒有的核准權、KPI、數字門檻或品質標準",
+                                 "severity":  "critical"
+                             },
+                             {
+                                 "gold_id":  "f-synonym-split",
+                                 "description":  "不得把同一句拆成多筆同義 evidence 灌precision分母",
+                                 "severity":  "major"
+                             }
+                         ],
+    "required_insufficiencies":  [
+
+                                 ],
+    "allowed_insufficiencies":  [
+
+                                ],
+    "state_expectation":  {
+                              "state_hash_changed":  true,
+                              "prior_evidence_superseded_keys":  [
+
+                                                                 ],
+                              "forbidden_superseded_keys":  [
+
+                                                            ]
+                          },
+    "allowed_dialogue_acts":  [
+                                  "standalone_answer"
+                              ]
 }

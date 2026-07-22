@@ -1,36 +1,56 @@
 {
-  "schema_version": "turn_eval_reference_output.v1",
-  "case_id": "TI-01-single-action",
-  "output": {
-    "schema_version": "turn_interpret_output.v1",
-    "observations": [
-      {
-        "proposal_key": "obs-daily-order-check",
-        "subject": "employee",
-        "kind": "action",
-        "claim": "每天早上核對前一日的出貨訂單",
-        "quote": "我每天早上核對前一日的出貨訂單。",
-        "quote_occurrence": 1,
-        "qualifiers": {
-          "time_scope": "current",
-          "typicality": "typical",
-          "polarity": "affirmed",
-          "frequency": {
-            "value": null,
-            "unit": "per_day",
-            "verbatim": "每天"
-          },
-          "importance": "not_stated",
-          "ownership": "owner"
-        },
-        "correction_target_evidence_ids": [],
-        "correction_target_unknown": false
-      }
-    ],
-    "user_signal": "answer",
-    "episode_signal": "continue",
-    "emergent_topics": [],
-    "insufficiencies": []
-  },
-  "correction_target_bindings": {}
+    "schema_version":  "turn_eval_reference_output.v2",
+    "case_id":  "TI-01-single-action",
+    "output":  {
+                   "schema_version":  "turn_interpret_output.v2",
+                   "dialogue_act":  "standalone_answer",
+                   "episode_signal":  "continue",
+                   "literal_observations":  [
+                                                {
+                                                    "subject":  "employee",
+                                                    "kind":  "action",
+                                                    "claim":  "每天早上核對前一日的出貨訂單",
+                                                    "quote":  "我每天早上核對前一日的出貨訂單。",
+                                                    "quote_occurrence":  1,
+                                                    "qualifiers":  {
+                                                                       "time_scope":  "unknown",
+                                                                       "time_scope_support":  null,
+                                                                       "typicality":  "unknown",
+                                                                       "typicality_support":  null,
+                                                                       "polarity":  "affirmed",
+                                                                       "polarity_support":  null,
+                                                                       "frequency":  {
+                                                                                         "value":  null,
+                                                                                         "unit":  "per_day",
+                                                                                         "verbatim":  "每天"
+                                                                                     },
+                                                                       "importance":  "not_stated",
+                                                                       "importance_support":  null,
+                                                                       "ownership":  "unknown",
+                                                                       "ownership_support":  null
+                                                                   },
+                                                    "correction":  {
+                                                                       "target_candidate_ordinals":  [
+
+                                                                                                     ],
+                                                                       "target_unknown":  false
+                                                                   },
+                                                    "insufficiency_codes":  [
+
+                                                                            ]
+                                                }
+                                            ],
+                   "answer_bindings":  [
+
+                                       ],
+                   "emergent_topics":  [
+
+                                       ],
+                   "turn_insufficiency_codes":  [
+
+                                                ]
+               },
+    "correction_target_bindings":  {
+
+                                   }
 }

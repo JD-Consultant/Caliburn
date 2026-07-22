@@ -10,10 +10,13 @@ from pydantic import model_validator
 from .base import DomainModel
 from .episode import EpisodeState, EpisodeStatus, Gap
 from .evidence import Evidence, EvidenceStatus, Inference, InferenceStatus
+from .interpretation import TurnInterpretationRecord
 from .invariants import assert_candidate_projectable
 from .job_model import CandidateJobItem, CandidateStatus
+from .question_frame import QuestionFrame, QuestionFrameStatus
 from .review import ReviewAction, ReviewDecision
 from .session import InterviewSession
+from .support import ContextualAnswerSupport, LiteralEmployeeSpanSupport, QuoteMatch
 from .transcript import TranscriptRole, TranscriptTurn
 
 
@@ -23,7 +26,7 @@ def _assert_unique(values: tuple[UUID, ...], label: str) -> None:
 
 
 class InterviewState(DomainModel):
-    schema_version: Literal["interview_state.v2"] = "interview_state.v2"
+    schema_version: Literal["interview_state.v3"] = "interview_state.v3"
     session: InterviewSession
     turns: tuple[TranscriptTurn, ...] = ()
     evidence: tuple[Evidence, ...] = ()
@@ -32,6 +35,9 @@ class InterviewState(DomainModel):
     gaps: tuple[Gap, ...] = ()
     candidates: tuple[CandidateJobItem, ...] = ()
     reviews: tuple[ReviewDecision, ...] = ()
+    question_frames: tuple[QuestionFrame, ...] = ()
+    active_question_frame_id: UUID | None = None
+    turn_interpretations: tuple[TurnInterpretationRecord, ...] = ()
     processed_command_ids: tuple[UUID, ...] = ()
 
     @model_validator(mode="after")
@@ -45,6 +51,19 @@ class InterviewState(DomainModel):
             (tuple(item.gap_id for item in self.gaps), "gap"),
             (tuple(item.candidate_id for item in self.candidates), "candidate"),
             (tuple(item.review_id for item in self.reviews), "review"),
+            (tuple(item.question_frame_id for item in self.question_frames), "question frame"),
+            (
+                tuple(item.interpretation_id for item in self.turn_interpretations),
+                "interpretation",
+            ),
+            (
+                tuple(item.operation_id for item in self.turn_interpretations),
+                "interpretation operation",
+            ),
+            (
+                tuple(item.employee_turn_id for item in self.turn_interpretations),
+                "interpretation turn",
+            ),
             (self.processed_command_ids, "processed command"),
         )
         for values, label in collections:
@@ -120,7 +139,7 @@ class InterviewState(DomainModel):
         for item in self.evidence:
             if item.session_id != session_id:
                 raise ValueError("evidence belongs to another session")
-            if item.turn_id not in turn_by_id:
+            if item.source_turn_id not in turn_by_id:
                 raise ValueError("evidence turn does not exist")
             if item.episode_id is not None and item.episode_id not in episode_by_id:
                 raise ValueError("evidence episode does not exist")
@@ -166,7 +185,7 @@ class InterviewState(DomainModel):
                 decision_evidence = evidence_by_id.get(item.decision_evidence_id)
                 if decision_evidence is None or decision_evidence.status != EvidenceStatus.ACTIVE:
                     raise ValueError("inference decision evidence must be active")
-                decision_turn = turn_by_id[decision_evidence.turn_id]
+                decision_turn = turn_by_id[decision_evidence.source_turn_id]
                 if decision_turn.role != TranscriptRole.EMPLOYEE:
                     raise ValueError("inference decision evidence must come from employee")
             if (
@@ -222,7 +241,7 @@ class InterviewState(DomainModel):
                 resolution_evidence = evidence_by_id[evidence_id]
                 if (
                     resolution_evidence.status != EvidenceStatus.ACTIVE
-                    or resolution_evidence.turn_id != gap.resolution_turn_id
+                    or resolution_evidence.source_turn_id != gap.resolution_turn_id
                 ):
                     raise ValueError(
                         "gap resolution evidence must be active and match resolution turn"
@@ -270,4 +289,111 @@ class InterviewState(DomainModel):
                 and candidate.statement != review.edited_statement
             ):
                 raise ValueError("edited review text must equal the accepted candidate statement")
+
+        frame_by_id = {frame.question_frame_id: frame for frame in self.question_frames}
+        receipt_by_operation = {item.operation_id: item for item in self.turn_interpretations}
+        interpreted_turn_ids = {item.employee_turn_id for item in self.turn_interpretations}
+
+        for frame in self.question_frames:
+            if frame.session_id != session_id:
+                raise ValueError("question frame belongs to another session")
+            consultant_turn = turn_by_id.get(frame.consultant_turn_id)
+            if consultant_turn is None or consultant_turn.role != TranscriptRole.CONSULTANT:
+                raise ValueError("question frame requires a consultant source turn")
+            if frame.answer_turn_id is not None:
+                answer_turn = turn_by_id.get(frame.answer_turn_id)
+                if answer_turn is None or answer_turn.role != TranscriptRole.EMPLOYEE:
+                    raise ValueError("question frame answer must be an employee turn")
+                if answer_turn.sequence != consultant_turn.sequence + 1:
+                    raise ValueError("question frame answer must immediately follow its question")
+            if (
+                frame.superseded_by_frame_id is not None
+                and frame.superseded_by_frame_id not in frame_by_id
+            ):
+                raise ValueError("superseding question frame does not exist")
+            if frame.consumed_operation_id is not None:
+                receipt = receipt_by_operation.get(frame.consumed_operation_id)
+                if receipt is None or receipt.question_frame_id != frame.question_frame_id:
+                    raise ValueError("consumed frame requires its interpretation receipt")
+
+        active_frame_ids = tuple(
+            frame.question_frame_id
+            for frame in self.question_frames
+            if frame.status == QuestionFrameStatus.ACTIVE
+        )
+        expected_active_frame_ids = (
+            (self.active_question_frame_id,) if self.active_question_frame_id is not None else ()
+        )
+        if active_frame_ids != expected_active_frame_ids:
+            raise ValueError("active_question_frame_id must match the only active question frame")
+
+        for receipt in self.turn_interpretations:
+            if receipt.session_id != session_id:
+                raise ValueError("interpretation receipt belongs to another session")
+            employee_turn = turn_by_id.get(receipt.employee_turn_id)
+            if employee_turn is None or employee_turn.role != TranscriptRole.EMPLOYEE:
+                raise ValueError("interpretation receipt requires an employee turn")
+            if receipt.question_frame_id is not None:
+                receipt_frame = frame_by_id.get(receipt.question_frame_id)
+                if receipt_frame is None:
+                    raise ValueError("interpretation receipt frame does not exist")
+                if (
+                    receipt_frame.definition.definition_hash
+                    != receipt.question_frame_definition_hash
+                ):
+                    raise ValueError("interpretation receipt frame definition hash mismatch")
+            produced_evidence_ids = tuple(
+                item.evidence_id
+                for item in self.evidence
+                if item.extractor_operation_id == receipt.operation_id
+            )
+            if receipt.accepted_evidence_ids != produced_evidence_ids:
+                raise ValueError(
+                    "accepted_evidence_ids must equal the evidence its operation produced, in order"
+                )
+
+        # At most one employee turn may await interpretation, and it must be the
+        # transcript tail: the next consultant question cannot open until the
+        # previous answer is interpreted (plan §7.2, §7.5).
+        pending_employee_turns = tuple(
+            turn
+            for turn in self.turns
+            if turn.role == TranscriptRole.EMPLOYEE and turn.turn_id not in interpreted_turn_ids
+        )
+        if len(pending_employee_turns) > 1:
+            raise ValueError("at most one employee turn may await interpretation")
+        if pending_employee_turns and pending_employee_turns[0].turn_id != self.turns[-1].turn_id:
+            raise ValueError("an uninterpreted employee turn must be the transcript tail")
+
+        if self.active_question_frame_id is not None:
+            active_frame = frame_by_id[self.active_question_frame_id]
+            if active_frame.answer_turn_id is not None:
+                if not pending_employee_turns:
+                    raise ValueError("answer-bound active frame requires a pending employee turn")
+                if active_frame.answer_turn_id != pending_employee_turns[0].turn_id:
+                    raise ValueError("answer-bound active frame must bind the pending employee tail")
+
+        for item in self.evidence:
+            source_turn = turn_by_id[item.source_turn_id]
+            if source_turn.role != TranscriptRole.EMPLOYEE:
+                raise ValueError("evidence must be supported by an employee turn")
+            support = item.support
+            if isinstance(support, LiteralEmployeeSpanSupport):
+                if support.quote_match == QuoteMatch.EXACT:
+                    quoted = source_turn.text[support.span.start : support.span.end]
+                    if quoted != support.quote:
+                        raise ValueError("literal support must quote its employee turn exactly")
+            elif isinstance(support, ContextualAnswerSupport):
+                receipt = receipt_by_operation.get(item.extractor_operation_id)
+                if receipt is None:
+                    raise ValueError("contextual evidence requires its interpretation receipt")
+                if receipt.question_frame_id != support.question_frame_id:
+                    raise ValueError("contextual evidence frame must match its receipt frame")
+                if receipt.employee_turn_id != support.employee_turn_id:
+                    raise ValueError("contextual evidence turn must match its receipt turn")
+                if (
+                    receipt.question_frame_definition_hash
+                    != support.question_frame_definition_hash
+                ):
+                    raise ValueError("contextual evidence frame definition hash mismatch")
         return self

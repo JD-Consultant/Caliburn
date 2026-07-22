@@ -14,8 +14,18 @@ from app.interview_vnext.domain.evidence import (
     Polarity,
     TimeScope,
 )
-from app.interview_vnext.domain.hashing import canonical_hash, canonical_json
+from app.interview_vnext.domain.hashing import (
+    canonical_hash,
+    canonical_json,
+    sha256_utf8_text,
+)
 from app.interview_vnext.domain.job_model import CandidateStatus
+from app.interview_vnext.domain.question_frame import (
+    PropositionQuestionTarget,
+    QuestionFrameStatus,
+    QuestionSourceKind,
+    SlotQuestionTarget,
+)
 from app.interview_vnext.domain.state import InterviewState
 from app.interview_vnext.domain.transcript import TranscriptRole
 from app.interview_vnext.llm.context import (
@@ -30,6 +40,8 @@ from app.interview_vnext.llm.context import (
     ContextIdentity,
     ContextItemDecision,
     ContextPacket,
+    ContextQuestionFrame,
+    QuestionFrameLimitation,
     ContextReferenceItem,
     ContextSectionBudget,
     ContextSelectionManifest,
@@ -58,6 +70,36 @@ TOKEN_ESTIMATE_LIMITATION = (
     "Estimated input tokens use a provider-neutral UTF-8/code-point heuristic; "
     "provider billing tokenization may differ."
 )
+# Stated in the budget report so a downstream reader can tell "no frame existed"
+# from "a frame existed but was not usable" (plan §9.3).
+QUESTION_FRAME_LIMITATIONS = {
+    QuestionFrameLimitation.MISSING: (
+        "No usable question frame: no active frame pointer exists."
+    ),
+    QuestionFrameLimitation.NOT_ACTIVE: (
+        "No usable question frame: the active frame is no longer active."
+    ),
+    QuestionFrameLimitation.ANSWER_NOT_BOUND: (
+        "No usable question frame: the active frame is not bound to this answer."
+    ),
+    QuestionFrameLimitation.NOT_IMMEDIATE: (
+        "No usable question frame: the active frame is not the immediately "
+        "preceding consultant question."
+    ),
+    QuestionFrameLimitation.TEXT_HASH_MISMATCH: (
+        "No usable question frame: the frame definition does not describe the "
+        "preceding consultant question."
+    ),
+    QuestionFrameLimitation.SOURCE_INVALID: (
+        "No usable question frame: an employee_evidence source ref is not a UUID."
+    ),
+    QuestionFrameLimitation.SOURCE_NOT_ACTIVE: (
+        "No usable question frame: an employee_evidence source is no longer active."
+    ),
+    QuestionFrameLimitation.SOURCE_HASH_MISMATCH: (
+        "No usable question frame: an employee_evidence source hash no longer matches."
+    ),
+}
 
 
 class ContextBuildError(ValueError):
@@ -95,8 +137,28 @@ def _metrics(value: Any) -> tuple[str, int, int]:
     return canonical_hash(value), len(content.encode("utf-8")), len(content)
 
 
+def _authoritative_content(source: ContextSourceRef, content: Any) -> Any:
+    """The object a frame/evidence decision hashes.
+
+    Selection wraps the domain object (``ContextEvidenceItem`` /
+    ``ContextQuestionFrame``) while exclusion carries the raw object; both must
+    hash to the same authoritative value so a source's identity never depends on
+    whether it made the cut (corrective §6.3 point 6).
+    """
+
+    if source.source_type == ContextSourceType.EVIDENCE:
+        return content.evidence if isinstance(content, ContextEvidenceItem) else content
+    if source.source_type == ContextSourceType.QUESTION_FRAME:
+        return content.frame if isinstance(content, ContextQuestionFrame) else content
+    return content
+
+
 def _decision(draft: _DecisionDraft) -> ContextItemDecision:
-    content_hash, byte_size, code_points = _metrics(draft.content)
+    content_hash, byte_size, code_points = _metrics(
+        _authoritative_content(draft.source, draft.content)
+    )
+    if draft.source.content_hash is not None and content_hash != draft.source.content_hash:
+        raise ContextBuildError("context decision content hash disagrees with its source")
     return ContextItemDecision(
         source=draft.source,
         section=draft.section,
@@ -113,11 +175,13 @@ def _state_source(
     source_type: ContextSourceType,
     source_id: object,
     state_hash: str,
+    content_hash: str | None = None,
 ) -> ContextSourceRef:
     return ContextSourceRef(
         source_type=source_type,
         source_id=str(source_id),
         state_hash=state_hash,
+        content_hash=content_hash,
     )
 
 
@@ -145,6 +209,7 @@ def _identity(
     turn_id: UUID,
     operation_id: UUID,
     state_hash: str,
+    state_version: int,
     reference_snapshot_hash: str | None,
 ) -> dict[str, Any]:
     return ContextIdentity(
@@ -157,6 +222,7 @@ def _identity(
         turn_id=turn_id,
         operation_id=operation_id,
         state_hash=state_hash,
+        state_version=state_version,
         reference_snapshot_hash=reference_snapshot_hash,
         section_order=policy.section_order,
     ).model_dump()
@@ -181,6 +247,7 @@ def _budget_report(
     manifest: ContextSelectionManifest,
     policy,
     item_caps: dict[str, int | None],
+    limitations: tuple[str, ...] = (),
 ) -> ContextBudgetReport:
     packet_json = canonical_json(packet)
     actual_bytes = len(packet_json.encode("utf-8"))
@@ -223,7 +290,7 @@ def _budget_report(
         estimated_input_tokens=estimated_tokens,
         sections=sections,
         within_budget=within_budget,
-        limitations=(TOKEN_ESTIMATE_LIMITATION,),
+        limitations=tuple(sorted({TOKEN_ESTIMATE_LIMITATION, *limitations})),
     )
 
 
@@ -248,7 +315,7 @@ def _result_or_raise(
 def _turn_sequence_by_evidence(state: InterviewState) -> dict[UUID, int]:
     turn_sequences = {turn.turn_id: turn.sequence for turn in state.turns}
     return {
-        evidence.evidence_id: turn_sequences[evidence.turn_id]
+        evidence.evidence_id: turn_sequences[evidence.source_turn_id]
         for evidence in state.evidence
     }
 
@@ -295,10 +362,88 @@ def _contradictions(
 def _evidence_item(state_hash: str, turn_sequences: dict[UUID, int], evidence):
     return ContextEvidenceItem(
         source=_state_source(
-            ContextSourceType.EVIDENCE, evidence.evidence_id, state_hash
+            ContextSourceType.EVIDENCE,
+            evidence.evidence_id,
+            state_hash,
+            canonical_hash(evidence),
         ),
-        turn_sequence=turn_sequences[evidence.turn_id],
+        turn_sequence=turn_sequences[evidence.source_turn_id],
         evidence=evidence,
+    )
+
+
+def _question_frame_source_refs(definition) -> tuple:
+    refs: list = []
+    for target in definition.targets:
+        if isinstance(target, PropositionQuestionTarget):
+            refs.extend(target.proposition.source_refs)
+        elif isinstance(target, SlotQuestionTarget):
+            refs.extend(target.source_refs)
+        else:
+            for option in target.options:
+                refs.extend(option.proposition.source_refs)
+    return tuple(refs)
+
+
+def _eligible_question_frame(
+    *,
+    state: InterviewState,
+    current_turn,
+    preceding,
+    state_hash: str,
+) -> tuple[ContextQuestionFrame | None, QuestionFrameLimitation | None]:
+    """Project the frame only when every closure condition holds.
+
+    A frame that is stale, superseded, or not the immediately preceding question
+    is deliberately withheld rather than repaired: the builder only observes
+    state, and a short answer with no frame must fail to bind rather than bind
+    to a stale question (plan §9.3).
+    """
+
+    if state.active_question_frame_id is None:
+        return None, QuestionFrameLimitation.MISSING
+    frame = next(
+        (
+            item
+            for item in state.question_frames
+            if item.question_frame_id == state.active_question_frame_id
+        ),
+        None,
+    )
+    if frame is None or frame.status != QuestionFrameStatus.ACTIVE:
+        return None, QuestionFrameLimitation.NOT_ACTIVE
+    if frame.answer_turn_id != current_turn.turn_id:
+        return None, QuestionFrameLimitation.ANSWER_NOT_BOUND
+    if preceding is None or frame.consultant_turn_id != preceding.turn_id:
+        return None, QuestionFrameLimitation.NOT_IMMEDIATE
+    if frame.definition.question_text_hash != sha256_utf8_text(preceding.text):
+        return None, QuestionFrameLimitation.TEXT_HASH_MISMATCH
+
+    evidence_by_id = {item.evidence_id: item for item in state.evidence}
+    for ref in _question_frame_source_refs(frame.definition):
+        if ref.source_kind != QuestionSourceKind.EMPLOYEE_EVIDENCE:
+            continue
+        try:
+            evidence_id = UUID(ref.source_ref)
+        except ValueError:
+            return None, QuestionFrameLimitation.SOURCE_INVALID
+        source = evidence_by_id.get(evidence_id)
+        if source is None or source.status != EvidenceStatus.ACTIVE:
+            return None, QuestionFrameLimitation.SOURCE_NOT_ACTIVE
+        if canonical_hash(source) != ref.source_hash:
+            return None, QuestionFrameLimitation.SOURCE_HASH_MISMATCH
+
+    return (
+        ContextQuestionFrame(
+            source=_state_source(
+                ContextSourceType.QUESTION_FRAME,
+                frame.question_frame_id,
+                state_hash,
+                canonical_hash(frame),
+            ),
+            frame=frame,
+        ),
+        None,
     )
 
 
@@ -369,9 +514,19 @@ class ContextBuilder:
                     and item.episode_id == episode.episode_id
                     and item.status == EvidenceStatus.ACTIVE
                 ),
-                key=lambda item: (turn_sequences[item.turn_id], str(item.evidence_id)),
+                key=lambda item: (
+                    turn_sequences[item.source_turn_id],
+                    str(item.evidence_id),
+                ),
             )
         )
+        question_frame_item, frame_limitation = _eligible_question_frame(
+            state=state,
+            current_turn=current_turn,
+            preceding=preceding,
+            state_hash=state_hash,
+        )
+
         folded_text = current_turn.text.casefold()
         has_correction_cue = any(
             cue.casefold() in folded_text for cue in policy.correction_cues
@@ -403,12 +558,15 @@ class ContextBuilder:
             turn_id=current_turn.turn_id,
             operation_id=operation_id,
             state_hash=state_hash,
+            state_version=state.session.state_version,
             reference_snapshot_hash=None,
         )
         packet = TurnInterpretContextPacket(
             **identity,
             preceding_consultant_turn=preceding,
             current_employee_turn=current_turn,
+            question_frame=question_frame_item,
+            question_frame_limitation=frame_limitation,
             active_episode=episode_identity,
             contradictions=selected_contradictions,
             correction_candidates=correction_items,
@@ -439,6 +597,16 @@ class ContextBuilder:
             "required_current_turn",
             current_turn,
         )
+        if question_frame_item is not None:
+            # Mandatory when eligible: budget pressure may never drop or truncate
+            # the frame, because a partial frame would silently change what the
+            # short answer binds to (plan §9.2).
+            choose(
+                question_frame_item.source,
+                "question_frame",
+                "eligible_question_frame",
+                question_frame_item,
+            )
         if episode is not None:
             choose(
                 _state_source(ContextSourceType.EPISODE, episode.episode_id, state_hash),
@@ -519,6 +687,17 @@ class ContextBuilder:
                 item,
                 "not_active_episode",
             )
+        for frame in state.question_frames:
+            add(
+                _state_source(
+                    ContextSourceType.QUESTION_FRAME,
+                    frame.question_frame_id,
+                    state_hash,
+                    canonical_hash(frame),
+                ),
+                frame,
+                (frame_limitation or QuestionFrameLimitation.NOT_ACTIVE).value,
+            )
         selected_contradiction_ids = {
             item.gap.gap_id for item in selected_contradictions
         }
@@ -549,7 +728,10 @@ class ContextBuilder:
                 reason = "section_cap_exceeded"
             add(
                 _state_source(
-                    ContextSourceType.EVIDENCE, evidence.evidence_id, state_hash
+                    ContextSourceType.EVIDENCE,
+                    evidence.evidence_id,
+                    state_hash,
+                    canonical_hash(evidence),
                 ),
                 evidence,
                 reason,
@@ -587,11 +769,17 @@ class ContextBuilder:
                 "injection_boundary": 1,
                 "preceding_consultant_turn": 1,
                 "current_employee_turn": 1,
+                "question_frame": 1,
                 "active_episode": 1,
                 "contradictions": policy.contradiction_cap,
                 "correction_candidates": correction_cap,
                 "recent_active_evidence": policy.recent_active_evidence_cap,
             },
+            limitations=(
+                (QUESTION_FRAME_LIMITATIONS[frame_limitation],)
+                if frame_limitation is not None
+                else ()
+            ),
         )
         return _result_or_raise(packet=packet, manifest=manifest, budget=budget)
 
@@ -630,7 +818,10 @@ class ContextBuilder:
                     if evidence.episode_id == episode_id
                     and evidence.status == EvidenceStatus.ACTIVE
                 ),
-                key=lambda item: (turn_sequences[item.turn_id], str(item.evidence_id)),
+                key=lambda item: (
+                    turn_sequences[item.source_turn_id],
+                    str(item.evidence_id),
+                ),
             )
         )
 
@@ -697,6 +888,7 @@ class ContextBuilder:
             turn_id=boundary_turn_id,
             operation_id=operation_id,
             state_hash=state_hash,
+            state_version=state.session.state_version,
             reference_snapshot_hash=reference_snapshot.snapshot_hash,
         )
         packet = EpisodeCodeContextPacket(
@@ -794,7 +986,10 @@ class ContextBuilder:
                 reason = "not_selected"
             add(
                 _state_source(
-                    ContextSourceType.EVIDENCE, evidence.evidence_id, state_hash
+                    ContextSourceType.EVIDENCE,
+                    evidence.evidence_id,
+                    state_hash,
+                    canonical_hash(evidence),
                 ),
                 evidence,
                 reason,

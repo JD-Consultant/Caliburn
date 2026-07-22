@@ -10,6 +10,7 @@ from __future__ import annotations
 from uuid import UUID, uuid5
 
 from app.interview_vnext.domain.base import DomainModel
+from app.interview_vnext.domain.turn_identity import literal_evidence_id
 
 
 class TrialScopedIds(DomainModel):
@@ -44,8 +45,20 @@ def episode_uuid(trial_id: UUID, episode_key: str) -> UUID:
     return uuid5(trial_id, f"episode/{episode_key}")
 
 
-def prior_evidence_uuid(trial_id: UUID, evidence_key: str) -> UUID:
-    return uuid5(trial_id, f"evidence/{evidence_key}")
+def prior_operation_uuid(trial_id: UUID, employee_turn_key: str) -> UUID:
+    """One adjudicated seed operation for each non-target employee turn."""
+
+    return uuid5(trial_id, f"operation/prior/{employee_turn_key}")
+
+
+def prior_evidence_uuid(
+    trial_id: UUID, employee_turn_key: str, observation_index: int
+) -> UUID:
+    """Seed evidence follows the production literal-evidence identity formula."""
+
+    return literal_evidence_id(
+        prior_operation_uuid(trial_id, employee_turn_key), observation_index
+    )
 
 
 def slot_uuid(batch_id: UUID, case_id: str, slot_index: int) -> UUID:

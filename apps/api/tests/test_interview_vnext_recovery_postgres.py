@@ -56,8 +56,10 @@ from app.interview_vnext.observability.taxonomy import INTERVIEW_VNEXT_EXECUTION
 from app.interview_vnext.persistence.errors import (
     CheckpointConflict,
     ExecutionEventConflict,
+    StateContextStale,
 )
 from app.interview_vnext.persistence.unit_of_work import SqlAlchemyVNextUnitOfWork
+from app.interview_vnext.persistence.repositories import SqlAlchemySessionRepository
 
 from tests.interview_vnext_llm_fixtures import (
     GateRecords,
@@ -506,7 +508,7 @@ async def test_late_phases_never_call_provider_and_committed_replays(
         transition_event_id=uuid5(NAMESPACE_URL, f"ev-t:{ids.session_id}"),
         step_event_id=uuid5(NAMESPACE_URL, f"ev-s:{ids.session_id}"),
         committed_at=NOW + timedelta(seconds=8))
-    first_cp, first_result = await commit_verified_operation(
+    first_cp, first_result, first_closure = await commit_verified_operation(
         uow_factory(postgres_session_factory), **commit_kwargs)
     assert first_cp.status == CheckpointStatus.COMMITTED
     assert first_result.state.session.status == SessionStatus.ACTIVE
@@ -514,11 +516,12 @@ async def test_late_phases_never_call_provider_and_committed_replays(
     # committed:回既有 response/domain result,不重跑 reducer、不打 provider
     assert await decide(postgres_session_factory, ids) == \
         RecoveryAction.RETURN_COMMITTED
-    replay_cp, replay_result = await commit_verified_operation(
+    replay_cp, replay_result, replay_closure = await commit_verified_operation(
         uow_factory(postgres_session_factory), **commit_kwargs)
     assert replay_cp.response_artifact == first_cp.response_artifact
     assert replay_cp.domain_result_artifact == first_cp.domain_result_artifact
     assert replay_result.state_hash == first_result.state_hash
+    assert replay_closure == first_closure
     assert provider.calls == 1                               # 全程恰一次 generate
     provider_events = await _provider_event_payloads(postgres_session_factory, ids)
     assert [event["event_type"] for event in provider_events] == [
@@ -816,7 +819,7 @@ async def test_stale_state_blocks_verified_commit(postgres_session_factory,
             target_status=SessionStatus.ACTIVE),
         stage="session.plan", event_id=uuid4(), command_artifact_id=uuid4(),
         reduction_artifact_id=uuid4(), committed_at=NOW + timedelta(seconds=8))
-    with pytest.raises(CheckpointConflict, match="re-prepare"):
+    with pytest.raises(StateContextStale) as captured:
         await commit_verified_operation(
             uow_factory(postgres_session_factory), tenant_id=ids.tenant_id,
             operation_id=op_id(ids), run_id=ids.run_id,
@@ -828,6 +831,76 @@ async def test_stale_state_blocks_verified_commit(postgres_session_factory,
             command_artifact_id=uuid4(), reduction_artifact_id=uuid4(),
             transition_event_id=uuid4(), step_event_id=uuid4(),
             committed_at=NOW + timedelta(seconds=9))
+    assert captured.value.expected_state_version == 0
+    assert captured.value.actual_state_version == 1
+
+
+async def test_verified_commit_cas_loser_is_typed_stale_and_rolls_back(
+    postgres_session_factory, vnext_profile, monkeypatch
+):
+    """C4 race window 3: state CAS loses after reduction; no domain rows survive."""
+
+    ids = vnext_profile
+    await bootstrap(postgres_session_factory, ids)
+    await prepare(postgres_session_factory, ids)
+    attempt_id = uuid4()
+    await start(postgres_session_factory, ids, attempt_id=attempt_id)
+    await record(
+        postgres_session_factory,
+        ids,
+        attempt_id=attempt_id,
+        name="result-cas-loser",
+        outcome=AttemptOutcome.SUCCEEDED,
+    )
+    await record_verification(
+        uow_factory(postgres_session_factory),
+        tenant_id=ids.tenant_id,
+        operation_id=op_id(ids),
+        verification_artifact=artifact(ids, "verification-cas-loser", {"accepted": True}),
+        accepted=True,
+        event_id=uuid4(),
+        occurred_at=NOW + timedelta(seconds=6),
+    )
+
+    command_id = uuid4()
+
+    async def lose_cas(self, *, tenant_id, old_version, new_state):
+        return False
+
+    monkeypatch.setattr(SqlAlchemySessionRepository, "save_cas", lose_cas)
+    with pytest.raises(StateContextStale) as captured:
+        await commit_verified_operation(
+            uow_factory(postgres_session_factory),
+            tenant_id=ids.tenant_id,
+            operation_id=op_id(ids),
+            run_id=ids.run_id,
+            command=TransitionSessionCommand(
+                command_id=command_id,
+                expected_state_version=0,
+                occurred_at=NOW + timedelta(seconds=9),
+                target_status=SessionStatus.ACTIVE,
+            ),
+            response_payload={},
+            response_artifact_id=uuid4(),
+            command_artifact_id=uuid4(),
+            reduction_artifact_id=uuid4(),
+            transition_event_id=uuid4(),
+            step_event_id=uuid4(),
+            committed_at=NOW + timedelta(seconds=9),
+        )
+    assert captured.value.actual_state_version is None
+
+    async with postgres_session_factory() as session:
+        command_count = (
+            await session.execute(
+                sa.text(
+                    "SELECT count(*) FROM interview_vnext_commands "
+                    "WHERE tenant_id = :tenant_id AND command_id = :command_id"
+                ),
+                {"tenant_id": str(ids.tenant_id), "command_id": str(command_id)},
+            )
+        ).scalar_one()
+    assert command_count == 0
 
 
 async def test_coordinator_executes_one_decision_per_step(postgres_session_factory,

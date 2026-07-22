@@ -119,7 +119,7 @@ def make_request(
     binding = binding or STANDARD_BINDING
     config = config if config is not None else STANDARD_CONFIG
     operation = turn_interpret_operation()
-    schema = published_schema("turn-interpret-output.v1.schema.json")
+    schema = published_schema("turn-interpret-output.v2.schema.json")
     attempt_id = overrides.pop("attempt_id", uuid4())
     values: dict[str, Any] = {
         "run_id": RUN_ID,
@@ -262,8 +262,8 @@ class TestPublishedOutputSchemaCatalog:
         request = make_request()
         binding = PublishedOutputSchemaCatalog().resolve(request)
         assert binding.schema_id == TURN_INTERPRET_OUTPUT_SCHEMA_ID
-        assert binding.format_name == "turn_interpret_output_v1"
-        assert binding.schema == published_schema("turn-interpret-output.v1.schema.json")
+        assert binding.format_name == "turn_interpret_output_v2"
+        assert binding.schema == published_schema("turn-interpret-output.v2.schema.json")
         assert binding.schema_hash == request.output_schema_hash
         assert canonical_hash(binding.schema) == request.output_schema_hash
         operation = turn_interpret_operation()
@@ -274,7 +274,7 @@ class TestPublishedOutputSchemaCatalog:
         first = catalog.resolve(make_request())
         first.schema["properties"].clear()
         second = catalog.resolve(make_request())
-        assert second.schema == published_schema("turn-interpret-output.v1.schema.json")
+        assert second.schema == published_schema("turn-interpret-output.v2.schema.json")
 
     def test_unknown_schema_id_fails_closed(self):
         request = make_request(
@@ -284,7 +284,7 @@ class TestPublishedOutputSchemaCatalog:
             PublishedOutputSchemaCatalog().resolve(request)
 
     def test_schema_hash_mismatch_fails_closed(self):
-        tampered = published_schema("turn-interpret-output.v1.schema.json")
+        tampered = published_schema("turn-interpret-output.v2.schema.json")
         tampered["properties"]["tampered"] = {"type": "string"}
         request = make_request(
             output_schema_artifact=_json_ref(
@@ -300,8 +300,8 @@ class TestPublishedOutputSchemaCatalog:
         catalog = PublishedOutputSchemaCatalog(
             {
                 TURN_INTERPRET_OUTPUT_SCHEMA_ID: CatalogEntry(
-                    filename="turn-interpret-input.v1.schema.json",
-                    format_name="turn_interpret_output_v1",
+                    filename="turn-interpret-input.v2.schema.json",
+                    format_name="turn_interpret_output_v2",
                 )
             }
         )
@@ -310,14 +310,14 @@ class TestPublishedOutputSchemaCatalog:
 
     def test_non_portable_published_schema_fails_lint(self):
         input_schema_id = (
-            "https://caliburn.local/schemas/turn-interpret-input.v1.schema.json"
+            "https://caliburn.local/schemas/turn-interpret-input.v2.schema.json"
         )
-        input_schema = published_schema("turn-interpret-input.v1.schema.json")
+        input_schema = published_schema("turn-interpret-input.v2.schema.json")
         catalog = PublishedOutputSchemaCatalog(
             {
                 input_schema_id: CatalogEntry(
-                    filename="turn-interpret-input.v1.schema.json",
-                    format_name="turn_interpret_input_v1",
+                    filename="turn-interpret-input.v2.schema.json",
+                    format_name="turn_interpret_input_v2",
                 )
             }
         )
@@ -479,7 +479,7 @@ class TestAdapterFailsBeforeHttp:
         # Portable-but-different output schema: the catalog compares the request's
         # output-schema hash to the published schema and fails closed. In v2 the
         # request/projection stay consistent, so the tampered schema is projected.
-        tampered = published_schema("turn-interpret-output.v1.schema.json")
+        tampered = published_schema("turn-interpret-output.v2.schema.json")
         tampered["properties"]["tampered"] = {"type": "string"}
         tampered["required"] = [*tampered["required"], "tampered"]
         projected = project_portable_strict_output_schema(
@@ -777,12 +777,13 @@ class TestAdapterHttpErrorMapping:
 
 
 EXPECTED_SUCCESS_OUTPUT = {
-    "schema_version": "turn_interpret_output.v1",
-    "observations": [],
-    "user_signal": "answer",
+    "schema_version": "turn_interpret_output.v2",
+    "dialogue_act": "standalone_answer",
     "episode_signal": "continue",
+    "literal_observations": [],
+    "answer_bindings": [],
     "emergent_topics": [],
-    "insufficiencies": [],
+    "turn_insufficiency_codes": [],
 }
 
 
@@ -809,11 +810,11 @@ class TestAdapterRequestProjection:
 
         text_format = body["text"]["format"]
         assert text_format["type"] == "json_schema"
-        assert text_format["name"] == "turn_interpret_output_v1"
+        assert text_format["name"] == "turn_interpret_output_v2"
         assert text_format["strict"] is True
         assert canonical_hash(text_format["schema"]) == request.output_schema_hash
         assert text_format["schema"] == published_schema(
-            "turn-interpret-output.v1.schema.json"
+            "turn-interpret-output.v2.schema.json"
         )
 
         assert body["model"] == "gpt-5.6"

@@ -20,9 +20,9 @@ from app.interview_vnext.domain.base import DomainModel
 from app.interview_vnext.domain.evidence import EvidenceKind, Polarity
 from app.interview_vnext.domain.hashing import canonical_hash, canonical_json
 from app.interview_vnext.domain.identifiers import Sha256, StableName
+from app.interview_vnext.domain.interpretation import TurnInsufficiencyCode
 from app.interview_vnext.domain.transcript import TranscriptRole
 from app.interview_vnext.llm.context import ReferenceSnapshot
-from app.interview_vnext.llm.turn_interpret import InsufficiencyReason
 
 from .contracts import (
     CaseSplit,
@@ -273,6 +273,31 @@ def load_case_inputs(case_dir: Path) -> TurnEvalCaseInputs:
             what=f"prior evidence {item.evidence_key!r}",
             path=fixture_path,
         )
+    source_groups = tuple(item.source_turn_key for item in fixture.prior_evidence)
+    closed_groups: set[str] = set()
+    previous_source = None
+    for source_key in source_groups:
+        if source_key != previous_source:
+            if source_key in closed_groups:
+                raise CaseLoadError(
+                    "prior evidence source groups must be contiguous",
+                    path=fixture_path,
+                )
+            if previous_source is not None:
+                closed_groups.add(previous_source)
+            previous_source = source_key
+    seeded_turns = set(source_groups)
+    prior_employee_turns = {
+        turn.turn_key
+        for turn in turns
+        if turn.role == TranscriptRole.EMPLOYEE
+        and turn.turn_key != case.target_turn_key
+    }
+    if seeded_turns != prior_employee_turns:
+        raise CaseLoadError(
+            "every non-target employee turn requires exactly one prior seed group",
+            path=fixture_path,
+        )
 
     snapshot_path = case_dir / "reference_snapshot.json"
     try:
@@ -376,12 +401,12 @@ def load_case_gold(case_dir: Path) -> TurnEvalCaseGold:
         raise CaseLoadError(
             "reference output case_id does not match the case", path=reference_path
         )
-    for proposal in reference.output.observations:
+    for index, proposal in enumerate(reference.output.literal_observations, 1):
         _require_occurrence(
             text=target.text,
             quote=proposal.quote,
             occurrence=proposal.quote_occurrence,
-            what=f"reference proposal {proposal.proposal_key!r}",
+            what=f"reference proposal p{index:04d}",
             path=reference_path,
         )
     for topic in reference.output.emergent_topics:
@@ -392,11 +417,11 @@ def load_case_gold(case_dir: Path) -> TurnEvalCaseGold:
             what="reference emergent topic",
             path=reference_path,
         )
-    for proposal_key, targets in reference.correction_target_bindings.items():
+    for proposal_index, targets in reference.correction_target_bindings.items():
         unknown_bindings = set(targets) - prior_keys
         if unknown_bindings:
             raise CaseLoadError(
-                f"reference binding {proposal_key!r} references unknown prior evidence "
+                f"reference binding {proposal_index!r} references unknown prior evidence "
                 f"{sorted(unknown_bindings)}",
                 path=reference_path,
             )
@@ -480,10 +505,10 @@ def assert_suite_balance(
                 has_known_correction = True
         if _gold_has_denial(gold):
             has_denial = True
-        if gold.expected_commit == ExpectedCommit.NO_OP:
+        if gold.expected_commit == ExpectedCommit.RECEIPT_ONLY:
             has_noop = True
         if (
-            InsufficiencyReason.CORRECTION_TARGET_UNKNOWN
+            TurnInsufficiencyCode.CORRECTION_TARGET_UNKNOWN
             in gold.required_insufficiencies
         ):
             has_unknown_correction = True

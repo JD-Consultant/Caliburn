@@ -1,80 +1,122 @@
 {
-  "schema_version": "turn_eval_reference_output.v1",
-  "case_id": "TI-07-responsibility-boundary",
-  "output": {
-    "schema_version": "turn_interpret_output.v1",
-    "observations": [
-      {
-        "proposal_key": "obs-shared-report",
-        "subject": "employee_team",
-        "kind": "action",
-        "claim": "月報由員工與同事共同完成",
-        "quote": "月報由我和同事共同完成",
-        "quote_occurrence": 1,
-        "qualifiers": {
-          "time_scope": "current",
-          "typicality": "typical",
-          "polarity": "affirmed",
-          "frequency": {
-            "value": null,
-            "unit": "unknown",
-            "verbatim": null
-          },
-          "importance": "not_stated",
-          "ownership": "shared"
-        },
-        "correction_target_evidence_ids": [],
-        "correction_target_unknown": false
-      },
-      {
-        "proposal_key": "obs-assist-sales-figures",
-        "subject": "employee",
-        "kind": "action",
-        "claim": "協助整理銷售數字",
-        "quote": "我只協助整理銷售數字",
-        "quote_occurrence": 1,
-        "qualifiers": {
-          "time_scope": "current",
-          "typicality": "typical",
-          "polarity": "affirmed",
-          "frequency": {
-            "value": null,
-            "unit": "unknown",
-            "verbatim": null
-          },
-          "importance": "not_stated",
-          "ownership": "assists"
-        },
-        "correction_target_evidence_ids": [],
-        "correction_target_unknown": false
-      },
-      {
-        "proposal_key": "obs-colleague-final",
-        "subject": "other_role",
-        "kind": "action",
-        "claim": "同事負責最終彙整與送出",
-        "quote": "最後由同事彙整並送出",
-        "quote_occurrence": 1,
-        "qualifiers": {
-          "time_scope": "current",
-          "typicality": "typical",
-          "polarity": "affirmed",
-          "frequency": {
-            "value": null,
-            "unit": "unknown",
-            "verbatim": null
-          },
-          "importance": "not_stated",
-          "ownership": "owner"
-        },
-        "correction_target_evidence_ids": [],
-        "correction_target_unknown": false
-      }
-    ],
-    "user_signal": "answer",
-    "episode_signal": "continue",
-    "emergent_topics": [],
-    "insufficiencies": []
-  },
-  "correction_target_bindings": {}
+    "schema_version":  "turn_eval_reference_output.v2",
+    "case_id":  "TI-07-responsibility-boundary",
+    "output":  {
+                   "schema_version":  "turn_interpret_output.v2",
+                   "dialogue_act":  "standalone_answer",
+                   "episode_signal":  "continue",
+                   "literal_observations":  [
+                                                {
+                                                    "subject":  "employee_team",
+                                                    "kind":  "action",
+                                                    "claim":  "月報由員工與同事共同完成",
+                                                    "quote":  "月報由我和同事共同完成",
+                                                    "quote_occurrence":  1,
+                                                    "qualifiers":  {
+                                                                       "time_scope":  "unknown",
+                                                                       "time_scope_support":  null,
+                                                                       "typicality":  "unknown",
+                                                                       "typicality_support":  null,
+                                                                       "polarity":  "affirmed",
+                                                                       "polarity_support":  null,
+                                                                       "frequency":  {
+                                                                                         "value":  null,
+                                                                                         "unit":  "unknown",
+                                                                                         "verbatim":  null
+                                                                                     },
+                                                                       "importance":  "not_stated",
+                                                                       "importance_support":  null,
+                                                                       "ownership":  "shared",
+                                                                       "ownership_support":  "月報由我和同事共同完成"
+                                                                   },
+                                                    "correction":  {
+                                                                       "target_candidate_ordinals":  [
+
+                                                                                                     ],
+                                                                       "target_unknown":  false
+                                                                   },
+                                                    "insufficiency_codes":  [
+
+                                                                            ]
+                                                },
+                                                {
+                                                    "subject":  "employee",
+                                                    "kind":  "action",
+                                                    "claim":  "協助整理銷售數字",
+                                                    "quote":  "我只協助整理銷售數字",
+                                                    "quote_occurrence":  1,
+                                                    "qualifiers":  {
+                                                                       "time_scope":  "unknown",
+                                                                       "time_scope_support":  null,
+                                                                       "typicality":  "unknown",
+                                                                       "typicality_support":  null,
+                                                                       "polarity":  "affirmed",
+                                                                       "polarity_support":  null,
+                                                                       "frequency":  {
+                                                                                         "value":  null,
+                                                                                         "unit":  "unknown",
+                                                                                         "verbatim":  null
+                                                                                     },
+                                                                       "importance":  "not_stated",
+                                                                       "importance_support":  null,
+                                                                       "ownership":  "unknown",
+                                                                       "ownership_support":  null
+                                                                   },
+                                                    "correction":  {
+                                                                       "target_candidate_ordinals":  [
+
+                                                                                                     ],
+                                                                       "target_unknown":  false
+                                                                   },
+                                                    "insufficiency_codes":  [
+
+                                                                            ]
+                                                },
+                                                {
+                                                    "subject":  "other_role",
+                                                    "kind":  "action",
+                                                    "claim":  "同事負責最終彙整與送出",
+                                                    "quote":  "最後由同事彙整並送出",
+                                                    "quote_occurrence":  1,
+                                                    "qualifiers":  {
+                                                                       "time_scope":  "unknown",
+                                                                       "time_scope_support":  null,
+                                                                       "typicality":  "unknown",
+                                                                       "typicality_support":  null,
+                                                                       "polarity":  "affirmed",
+                                                                       "polarity_support":  null,
+                                                                       "frequency":  {
+                                                                                         "value":  null,
+                                                                                         "unit":  "unknown",
+                                                                                         "verbatim":  null
+                                                                                     },
+                                                                       "importance":  "not_stated",
+                                                                       "importance_support":  null,
+                                                                       "ownership":  "unknown",
+                                                                       "ownership_support":  null
+                                                                   },
+                                                    "correction":  {
+                                                                       "target_candidate_ordinals":  [
+
+                                                                                                     ],
+                                                                       "target_unknown":  false
+                                                                   },
+                                                    "insufficiency_codes":  [
+
+                                                                            ]
+                                                }
+                                            ],
+                   "answer_bindings":  [
+
+                                       ],
+                   "emergent_topics":  [
+
+                                       ],
+                   "turn_insufficiency_codes":  [
+
+                                                ]
+               },
+    "correction_target_bindings":  {
+
+                                   }
 }

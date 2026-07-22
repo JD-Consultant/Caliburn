@@ -138,7 +138,7 @@ def trial_hard_gate(score: TrialScore, gold: TurnEvalGold) -> bool:
         return False
     if not score.metrics.insufficiency_pass:
         return False
-    if gold.expected_commit == ExpectedCommit.NO_OP:
+    if gold.expected_commit == ExpectedCommit.RECEIPT_ONLY:
         return score.metrics.expected_no_evidence_passed is True
     # evidence case:required recall 必須 1(raw model 準)
     return score.metrics.recall.value == Decimal("1.000000")
@@ -208,7 +208,7 @@ def build_case_report(
         decision = CaseDecision.FAIL
 
     return TurnEvalCaseReport(
-        schema_version="turn_eval_case_report.v1",
+        schema_version="turn_eval_case_report.v2",
         case_id=case_id,
         split=split,
         slots=slots,
@@ -407,7 +407,7 @@ def build_batch_report(
     )
 
     return TurnEvalBatchReport(
-        schema_version="turn_eval_batch_report.v1",
+        schema_version="turn_eval_batch_report.v2",
         batch_id=batch_id,
         plan_hash=plan_hash,
         suite_version=suite_version,

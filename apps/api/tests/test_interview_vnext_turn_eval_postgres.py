@@ -37,9 +37,11 @@ from app.interview_vnext.llm.testing import (
 from app.interview_vnext.observability.artifacts import build_inline_artifact
 from evals.interview_vnext.capture_export import export_run_bundle
 from evals.interview_vnext.contracts import ExpectedCommit
-from evals.interview_vnext.fixture_builder import materialize_reference_output
+from evals.interview_vnext.fixture_builder import (
+    prior_evidence_id_map,
+    run_pure_reference_gate,
+)
 from evals.interview_vnext.identities import (
-    prior_evidence_uuid,
     trial_scoped_ids,
     turn_uuid,
 )
@@ -52,7 +54,7 @@ from evals.interview_vnext.turn_eval_runner import (
 CASES_ROOT = Path(__file__).resolve().parents[1] / "evals/interview_vnext/cases"
 TRIAL_STARTED_AT = datetime(2026, 7, 18, 9, 0, tzinfo=UTC)
 OUTPUT_SCHEMA_ID = (
-    "https://caliburn.local/schemas/turn-interpret-output.v1.schema.json"
+    "https://caliburn.local/schemas/turn-interpret-output.v2.schema.json"
 )
 BINDING = scripted_turn_binding()
 
@@ -63,7 +65,7 @@ def trial_uuid_for(case_id: str, salt: str = "pg") -> object:
 
 @pytest.fixture(scope="module")
 def suite():
-    return load_suite(CASES_ROOT, suite_version="turn-interpret-pilot.v1")
+    return load_suite(CASES_ROOT, suite_version="turn-interpret-c1-v2-pilot.v1")
 
 
 @pytest_asyncio.fixture
@@ -84,9 +86,12 @@ def usage() -> TokenUsage:
 
 
 def scripted_reference_llm(inputs, evaluation, trial_id) -> ScriptedLlmPort:
-    output = materialize_reference_output(
-        inputs, evaluation.reference_output, trial_id=trial_id
-    )
+    output = run_pure_reference_gate(
+        inputs,
+        evaluation,
+        trial_id=trial_id,
+        base_time=TRIAL_STARTED_AT,
+    ).output
     ids = trial_scoped_ids(trial_id)
     attempt_id = uuid5(ids.operation_id, "attempt/1")
     visible = build_inline_artifact(
@@ -161,25 +166,28 @@ async def test_all_reference_cases_commit_on_real_postgres(
         report = execution.outcome.verification_report
         assert report is not None and report.dropped_count == 0, case_id
 
-        if evaluation.gold.expected_commit == ExpectedCommit.EVIDENCE:
+        if evaluation.gold.expected_commit == ExpectedCommit.EVIDENCE_AND_RECEIPT:
             assert execution.outcome.reduction_result is not None, case_id
             assert execution.state_after_hash != execution.state_before_hash, case_id
         else:
-            assert execution.outcome.noop_result is not None, case_id
-            assert execution.state_after_hash == execution.state_before_hash, case_id
+            assert execution.outcome.reduction_result is not None, case_id
+            assert execution.outcome.interpretation_record_ref is not None, case_id
+            assert report.accepted_evidence_ids == (), case_id
+            assert execution.state_after_hash != execution.state_before_hash, case_id
 
         expectation = evaluation.gold.state_expectation
         status_by_id = {
             e.evidence_id: e.status for e in execution.state_after.evidence
         }
+        prior_ids = prior_evidence_id_map(inputs, trial_id=execution.ids.trial_id)
         for key in expectation.prior_evidence_superseded_keys:
             assert (
-                status_by_id[prior_evidence_uuid(execution.ids.trial_id, key)]
+                status_by_id[prior_ids[key]]
                 == EvidenceStatus.SUPERSEDED
             ), (case_id, key)
         for key in expectation.forbidden_superseded_keys:
             assert (
-                status_by_id[prior_evidence_uuid(execution.ids.trial_id, key)]
+                status_by_id[prior_ids[key]]
                 == EvidenceStatus.ACTIVE
             ), (case_id, key)
 
@@ -211,11 +219,16 @@ async def test_terminal_run_manifest_matches_event_chain(
         "model.schema_projection",
     ]
     assert {
-        "model.result",
-        "model.provider_execution_evidence",
-        "model.provider_conformance",
-        "operation.verification",
-    }.issubset(root_kinds)
+            "model.result",
+            "model.provider_execution_evidence",
+            "model.provider_conformance",
+            "interview.turn_interpret_verification_report.v2",
+            "interview.turn_interpretation_record.v1",
+            "interview.apply_turn_interpretation_command.v1",
+            "interview.reduction_result.v2",
+            "interview.turn_interpret_output.v2",
+            "interview.turn_interpret_execution_outcome.v2",
+        }.issubset(root_kinds)
 
     started = next(
         event for event in bundle.events if event.event_type == "model.call.started"

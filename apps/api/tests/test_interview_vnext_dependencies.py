@@ -84,8 +84,13 @@ from app.interview_vnext import domain
 from app.interview_vnext.application import turn_interpret as application_turn_interpret
 from app.interview_vnext.llm import turn_interpret as llm_turn_interpret
 
-assert evidence.QuoteSpan is support.QuoteSpan, "evidence holds a second QuoteSpan"
-assert evidence.QuoteMatch is support.QuoteMatch, "evidence holds a second QuoteMatch"
+# Evidence.v3 carries no top-level quote at all: the support union owns the
+# primitive, so evidence.py must not re-declare or re-export one (plan §7.1).
+assert not hasattr(evidence, "QuoteSpan"), "evidence re-declares QuoteSpan"
+assert not hasattr(evidence, "QuoteMatch"), "evidence re-declares QuoteMatch"
+assert "span" not in evidence.Evidence.model_fields, "Evidence.v3 has no top-level span"
+assert "quote" not in evidence.Evidence.model_fields, "Evidence.v3 has no top-level quote"
+
 assert domain.QuoteSpan is support.QuoteSpan, "domain export is a second QuoteSpan"
 assert application_turn_interpret.QuoteSpan is support.QuoteSpan
 assert application_turn_interpret.QuoteMatch is support.QuoteMatch

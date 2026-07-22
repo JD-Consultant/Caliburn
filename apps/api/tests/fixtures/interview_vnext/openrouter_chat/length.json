@@ -10,7 +10,7 @@
       "native_finish_reason": "max_tokens",
       "message": {
         "role": "assistant",
-        "content": "{\"schema_version\":\"turn_interpret_output.v1\",\"observations\":[{\"parti"
+        "content": "{\"schema_version\":\"turn_interpret_output.v2\",\"observations\":[{\"parti"
       }
     }
   ],

@@ -1,0 +1,4042 @@
+{
+  "$defs": {
+    "CandidateAppliedEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "event_id": {
+          "format": "uuid",
+          "title": "Event Id",
+          "type": "string"
+        },
+        "session_id": {
+          "format": "uuid",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "command_id": {
+          "format": "uuid",
+          "title": "Command Id",
+          "type": "string"
+        },
+        "ordinal": {
+          "minimum": 0,
+          "title": "Ordinal",
+          "type": "integer"
+        },
+        "state_version": {
+          "minimum": 1,
+          "title": "State Version",
+          "type": "integer"
+        },
+        "occurred_at": {
+          "format": "date-time",
+          "title": "Occurred At",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "candidate_applied_event.v1",
+          "default": "candidate_applied_event.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "event_type": {
+          "const": "candidate.applied",
+          "default": "candidate.applied",
+          "title": "Event Type",
+          "type": "string"
+        },
+        "candidate_id": {
+          "format": "uuid",
+          "title": "Candidate Id",
+          "type": "string"
+        },
+        "previous_status": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CandidateStatus"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "target_status": {
+          "$ref": "#/$defs/CandidateStatus"
+        }
+      },
+      "required": [
+        "event_id",
+        "session_id",
+        "command_id",
+        "ordinal",
+        "state_version",
+        "occurred_at",
+        "candidate_id",
+        "target_status"
+      ],
+      "title": "CandidateAppliedEvent",
+      "type": "object"
+    },
+    "CandidateJobItem": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "candidate_job_item.v1",
+          "default": "candidate_job_item.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "candidate_id": {
+          "format": "uuid",
+          "title": "Candidate Id",
+          "type": "string"
+        },
+        "session_id": {
+          "format": "uuid",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/CandidateKind"
+        },
+        "statement": {
+          "minLength": 1,
+          "title": "Statement",
+          "type": "string"
+        },
+        "evidence_ids": {
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Evidence Ids",
+          "type": "array"
+        },
+        "inference_ids": {
+          "default": [],
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Inference Ids",
+          "type": "array"
+        },
+        "reference_urns": {
+          "default": [],
+          "items": {
+            "maxLength": 512,
+            "minLength": 3,
+            "type": "string"
+          },
+          "title": "Reference Urns",
+          "type": "array"
+        },
+        "qualifiers": {
+          "$ref": "#/$defs/EvidenceQualifiers"
+        },
+        "thresholds": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/QuantitativeThreshold"
+          },
+          "title": "Thresholds",
+          "type": "array"
+        },
+        "status": {
+          "$ref": "#/$defs/CandidateStatus",
+          "default": "draft"
+        },
+        "created_by_operation": {
+          "maxLength": 128,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+          "title": "Created By Operation",
+          "type": "string"
+        },
+        "review_decision_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Review Decision Id"
+        }
+      },
+      "required": [
+        "candidate_id",
+        "session_id",
+        "kind",
+        "statement",
+        "evidence_ids",
+        "created_by_operation"
+      ],
+      "title": "CandidateJobItem",
+      "type": "object"
+    },
+    "CandidateKind": {
+      "enum": [
+        "task",
+        "output",
+        "knowledge",
+        "skill",
+        "ability",
+        "attitude",
+        "behavior_indicator"
+      ],
+      "title": "CandidateKind",
+      "type": "string"
+    },
+    "CandidateStatus": {
+      "enum": [
+        "draft",
+        "verified",
+        "insufficient",
+        "conflicted",
+        "projected",
+        "rejected",
+        "accepted"
+      ],
+      "title": "CandidateStatus",
+      "type": "string"
+    },
+    "CandidateTransitionedEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "event_id": {
+          "format": "uuid",
+          "title": "Event Id",
+          "type": "string"
+        },
+        "session_id": {
+          "format": "uuid",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "command_id": {
+          "format": "uuid",
+          "title": "Command Id",
+          "type": "string"
+        },
+        "ordinal": {
+          "minimum": 0,
+          "title": "Ordinal",
+          "type": "integer"
+        },
+        "state_version": {
+          "minimum": 1,
+          "title": "State Version",
+          "type": "integer"
+        },
+        "occurred_at": {
+          "format": "date-time",
+          "title": "Occurred At",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "candidate_transitioned_event.v1",
+          "default": "candidate_transitioned_event.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "event_type": {
+          "const": "candidate.transitioned",
+          "default": "candidate.transitioned",
+          "title": "Event Type",
+          "type": "string"
+        },
+        "candidate_id": {
+          "format": "uuid",
+          "title": "Candidate Id",
+          "type": "string"
+        },
+        "previous_status": {
+          "$ref": "#/$defs/CandidateStatus"
+        },
+        "target_status": {
+          "$ref": "#/$defs/CandidateStatus"
+        },
+        "cause": {
+          "enum": [
+            "verifier",
+            "evidence_withdrawn",
+            "inference_rejected",
+            "inference_superseded"
+          ],
+          "title": "Cause",
+          "type": "string"
+        }
+      },
+      "required": [
+        "event_id",
+        "session_id",
+        "command_id",
+        "ordinal",
+        "state_version",
+        "occurred_at",
+        "candidate_id",
+        "previous_status",
+        "target_status",
+        "cause"
+      ],
+      "title": "CandidateTransitionedEvent",
+      "type": "object"
+    },
+    "ChoiceOption": {
+      "additionalProperties": false,
+      "properties": {
+        "option_ordinal": {
+          "maximum": 16,
+          "minimum": 1,
+          "title": "Option Ordinal",
+          "type": "integer"
+        },
+        "label": {
+          "minLength": 1,
+          "title": "Label",
+          "type": "string"
+        },
+        "proposition": {
+          "$ref": "#/$defs/QuestionProposition"
+        },
+        "option_hash": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Option Hash",
+          "type": "string"
+        }
+      },
+      "required": [
+        "option_ordinal",
+        "label",
+        "proposition",
+        "option_hash"
+      ],
+      "title": "ChoiceOption",
+      "type": "object"
+    },
+    "ChoiceQuestionTarget": {
+      "additionalProperties": false,
+      "properties": {
+        "target_kind": {
+          "const": "choice",
+          "default": "choice",
+          "title": "Target Kind",
+          "type": "string"
+        },
+        "target_ordinal": {
+          "maximum": 16,
+          "minimum": 1,
+          "title": "Target Ordinal",
+          "type": "integer"
+        },
+        "multi_select": {
+          "title": "Multi Select",
+          "type": "boolean"
+        },
+        "introduced_dimension": {
+          "$ref": "#/$defs/QuestionDimension"
+        },
+        "options": {
+          "items": {
+            "$ref": "#/$defs/ChoiceOption"
+          },
+          "title": "Options",
+          "type": "array"
+        },
+        "target_hash": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Target Hash",
+          "type": "string"
+        }
+      },
+      "required": [
+        "target_ordinal",
+        "multi_select",
+        "introduced_dimension",
+        "options",
+        "target_hash"
+      ],
+      "title": "ChoiceQuestionTarget",
+      "type": "object"
+    },
+    "ContextualAnswerSupport": {
+      "additionalProperties": false,
+      "properties": {
+        "support_kind": {
+          "const": "contextual_answer",
+          "default": "contextual_answer",
+          "title": "Support Kind",
+          "type": "string"
+        },
+        "employee_turn_id": {
+          "format": "uuid",
+          "title": "Employee Turn Id",
+          "type": "string"
+        },
+        "answer_quote": {
+          "minLength": 1,
+          "title": "Answer Quote",
+          "type": "string"
+        },
+        "answer_span": {
+          "$ref": "#/$defs/QuoteSpan"
+        },
+        "question_frame_id": {
+          "format": "uuid",
+          "title": "Question Frame Id",
+          "type": "string"
+        },
+        "question_frame_definition_hash": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Question Frame Definition Hash",
+          "type": "string"
+        },
+        "target_ordinal": {
+          "minimum": 1,
+          "title": "Target Ordinal",
+          "type": "integer"
+        },
+        "target_hash": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Target Hash",
+          "type": "string"
+        },
+        "binding_kind": {
+          "$ref": "#/$defs/ContextualBindingKind"
+        },
+        "resolution": {
+          "$ref": "#/$defs/ContextualResolution"
+        },
+        "value_text": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Value Text"
+        },
+        "choice_option_ordinal": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Choice Option Ordinal"
+        }
+      },
+      "required": [
+        "employee_turn_id",
+        "answer_quote",
+        "answer_span",
+        "question_frame_id",
+        "question_frame_definition_hash",
+        "target_ordinal",
+        "target_hash",
+        "binding_kind",
+        "resolution"
+      ],
+      "title": "ContextualAnswerSupport",
+      "type": "object"
+    },
+    "ContextualBindingKind": {
+      "enum": [
+        "affirmation",
+        "denial",
+        "slot_value",
+        "choice_selection"
+      ],
+      "title": "ContextualBindingKind",
+      "type": "string"
+    },
+    "ContextualResolution": {
+      "enum": [
+        "affirmed",
+        "denied",
+        "supplied",
+        "selected"
+      ],
+      "title": "ContextualResolution",
+      "type": "string"
+    },
+    "DialogueAct": {
+      "enum": [
+        "standalone_answer",
+        "affirm",
+        "deny",
+        "slot_value",
+        "choose",
+        "correction",
+        "dont_know",
+        "decline",
+        "stop",
+        "off_topic",
+        "mixed"
+      ],
+      "title": "DialogueAct",
+      "type": "string"
+    },
+    "EpisodeOpenedEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "event_id": {
+          "format": "uuid",
+          "title": "Event Id",
+          "type": "string"
+        },
+        "session_id": {
+          "format": "uuid",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "command_id": {
+          "format": "uuid",
+          "title": "Command Id",
+          "type": "string"
+        },
+        "ordinal": {
+          "minimum": 0,
+          "title": "Ordinal",
+          "type": "integer"
+        },
+        "state_version": {
+          "minimum": 1,
+          "title": "State Version",
+          "type": "integer"
+        },
+        "occurred_at": {
+          "format": "date-time",
+          "title": "Occurred At",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "episode_opened_event.v1",
+          "default": "episode_opened_event.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "event_type": {
+          "const": "episode.opened",
+          "default": "episode.opened",
+          "title": "Event Type",
+          "type": "string"
+        },
+        "episode_id": {
+          "format": "uuid",
+          "title": "Episode Id",
+          "type": "string"
+        },
+        "opened_turn_id": {
+          "format": "uuid",
+          "title": "Opened Turn Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "event_id",
+        "session_id",
+        "command_id",
+        "ordinal",
+        "state_version",
+        "occurred_at",
+        "episode_id",
+        "opened_turn_id"
+      ],
+      "title": "EpisodeOpenedEvent",
+      "type": "object"
+    },
+    "EpisodeSignal": {
+      "enum": [
+        "continue",
+        "possible_shift",
+        "explicit_shift",
+        "possible_close"
+      ],
+      "title": "EpisodeSignal",
+      "type": "string"
+    },
+    "EpisodeState": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "episode_state.v1",
+          "default": "episode_state.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "episode_id": {
+          "format": "uuid",
+          "title": "Episode Id",
+          "type": "string"
+        },
+        "session_id": {
+          "format": "uuid",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "target": {
+          "minLength": 1,
+          "title": "Target",
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/$defs/EpisodeStatus",
+          "default": "open"
+        },
+        "opened_turn_id": {
+          "format": "uuid",
+          "title": "Opened Turn Id",
+          "type": "string"
+        },
+        "closed_turn_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Closed Turn Id"
+        },
+        "evidence_ids": {
+          "default": [],
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Evidence Ids",
+          "type": "array"
+        },
+        "gap_ids": {
+          "default": [],
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Gap Ids",
+          "type": "array"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "updated_at": {
+          "format": "date-time",
+          "title": "Updated At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "episode_id",
+        "session_id",
+        "target",
+        "opened_turn_id",
+        "created_at",
+        "updated_at"
+      ],
+      "title": "EpisodeState",
+      "type": "object"
+    },
+    "EpisodeStatus": {
+      "enum": [
+        "open",
+        "closing",
+        "closed"
+      ],
+      "title": "EpisodeStatus",
+      "type": "string"
+    },
+    "EpisodeTransitionedEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "event_id": {
+          "format": "uuid",
+          "title": "Event Id",
+          "type": "string"
+        },
+        "session_id": {
+          "format": "uuid",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "command_id": {
+          "format": "uuid",
+          "title": "Command Id",
+          "type": "string"
+        },
+        "ordinal": {
+          "minimum": 0,
+          "title": "Ordinal",
+          "type": "integer"
+        },
+        "state_version": {
+          "minimum": 1,
+          "title": "State Version",
+          "type": "integer"
+        },
+        "occurred_at": {
+          "format": "date-time",
+          "title": "Occurred At",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "episode_transitioned_event.v1",
+          "default": "episode_transitioned_event.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "event_type": {
+          "const": "episode.transitioned",
+          "default": "episode.transitioned",
+          "title": "Event Type",
+          "type": "string"
+        },
+        "episode_id": {
+          "format": "uuid",
+          "title": "Episode Id",
+          "type": "string"
+        },
+        "previous_status": {
+          "$ref": "#/$defs/EpisodeStatus"
+        },
+        "target_status": {
+          "$ref": "#/$defs/EpisodeStatus"
+        },
+        "closed_turn_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Closed Turn Id"
+        }
+      },
+      "required": [
+        "event_id",
+        "session_id",
+        "command_id",
+        "ordinal",
+        "state_version",
+        "occurred_at",
+        "episode_id",
+        "previous_status",
+        "target_status"
+      ],
+      "title": "EpisodeTransitionedEvent",
+      "type": "object"
+    },
+    "Evidence": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "evidence.v3",
+          "default": "evidence.v3",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "evidence_id": {
+          "format": "uuid",
+          "title": "Evidence Id",
+          "type": "string"
+        },
+        "session_id": {
+          "format": "uuid",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "episode_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Episode Id"
+        },
+        "subject": {
+          "$ref": "#/$defs/EvidenceSubject"
+        },
+        "kind": {
+          "$ref": "#/$defs/EvidenceKind"
+        },
+        "claim": {
+          "minLength": 1,
+          "title": "Claim",
+          "type": "string"
+        },
+        "support": {
+          "discriminator": {
+            "mapping": {
+              "contextual_answer": "#/$defs/ContextualAnswerSupport",
+              "literal_employee_span": "#/$defs/LiteralEmployeeSpanSupport"
+            },
+            "propertyName": "support_kind"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/LiteralEmployeeSpanSupport"
+            },
+            {
+              "$ref": "#/$defs/ContextualAnswerSupport"
+            }
+          ],
+          "title": "Support"
+        },
+        "qualifiers": {
+          "$ref": "#/$defs/EvidenceQualifiers"
+        },
+        "status": {
+          "$ref": "#/$defs/EvidenceStatus",
+          "default": "active"
+        },
+        "supersedes": {
+          "default": [],
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Supersedes",
+          "type": "array"
+        },
+        "superseded_by": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Superseded By"
+        },
+        "withdrawn_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Withdrawn Reason"
+        },
+        "withdrawn_by_turn_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Withdrawn By Turn Id"
+        },
+        "correction_target_unknown": {
+          "default": false,
+          "title": "Correction Target Unknown",
+          "type": "boolean"
+        },
+        "extractor_operation_id": {
+          "format": "uuid",
+          "title": "Extractor Operation Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "evidence_id",
+        "session_id",
+        "subject",
+        "kind",
+        "claim",
+        "support",
+        "extractor_operation_id"
+      ],
+      "title": "Evidence",
+      "type": "object"
+    },
+    "EvidenceKind": {
+      "enum": [
+        "action",
+        "input",
+        "output",
+        "purpose",
+        "condition",
+        "standard",
+        "frequency",
+        "importance",
+        "ownership",
+        "tool",
+        "recipient",
+        "dependency",
+        "exception",
+        "negation",
+        "correction",
+        "preference"
+      ],
+      "title": "EvidenceKind",
+      "type": "string"
+    },
+    "EvidenceObservedEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "event_id": {
+          "format": "uuid",
+          "title": "Event Id",
+          "type": "string"
+        },
+        "session_id": {
+          "format": "uuid",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "command_id": {
+          "format": "uuid",
+          "title": "Command Id",
+          "type": "string"
+        },
+        "ordinal": {
+          "minimum": 0,
+          "title": "Ordinal",
+          "type": "integer"
+        },
+        "state_version": {
+          "minimum": 1,
+          "title": "State Version",
+          "type": "integer"
+        },
+        "occurred_at": {
+          "format": "date-time",
+          "title": "Occurred At",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "evidence_observed_event.v1",
+          "default": "evidence_observed_event.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "event_type": {
+          "const": "evidence.observed",
+          "default": "evidence.observed",
+          "title": "Event Type",
+          "type": "string"
+        },
+        "evidence_id": {
+          "format": "uuid",
+          "title": "Evidence Id",
+          "type": "string"
+        },
+        "turn_id": {
+          "format": "uuid",
+          "title": "Turn Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "event_id",
+        "session_id",
+        "command_id",
+        "ordinal",
+        "state_version",
+        "occurred_at",
+        "evidence_id",
+        "turn_id"
+      ],
+      "title": "EvidenceObservedEvent",
+      "type": "object"
+    },
+    "EvidenceQualifiers": {
+      "additionalProperties": false,
+      "properties": {
+        "time_scope": {
+          "$ref": "#/$defs/TimeScope",
+          "default": "unknown"
+        },
+        "typicality": {
+          "$ref": "#/$defs/Typicality",
+          "default": "unknown"
+        },
+        "polarity": {
+          "$ref": "#/$defs/Polarity",
+          "default": "uncertain"
+        },
+        "frequency": {
+          "$ref": "#/$defs/FrequencyQualifier"
+        },
+        "importance": {
+          "$ref": "#/$defs/Importance",
+          "default": "not_stated"
+        },
+        "ownership": {
+          "$ref": "#/$defs/Ownership",
+          "default": "unknown"
+        }
+      },
+      "title": "EvidenceQualifiers",
+      "type": "object"
+    },
+    "EvidenceStatus": {
+      "enum": [
+        "active",
+        "superseded",
+        "withdrawn"
+      ],
+      "title": "EvidenceStatus",
+      "type": "string"
+    },
+    "EvidenceSubject": {
+      "enum": [
+        "employee",
+        "employee_team",
+        "other_role",
+        "organization",
+        "unknown"
+      ],
+      "title": "EvidenceSubject",
+      "type": "string"
+    },
+    "EvidenceSupersededEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "event_id": {
+          "format": "uuid",
+          "title": "Event Id",
+          "type": "string"
+        },
+        "session_id": {
+          "format": "uuid",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "command_id": {
+          "format": "uuid",
+          "title": "Command Id",
+          "type": "string"
+        },
+        "ordinal": {
+          "minimum": 0,
+          "title": "Ordinal",
+          "type": "integer"
+        },
+        "state_version": {
+          "minimum": 1,
+          "title": "State Version",
+          "type": "integer"
+        },
+        "occurred_at": {
+          "format": "date-time",
+          "title": "Occurred At",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "evidence_superseded_event.v1",
+          "default": "evidence_superseded_event.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "event_type": {
+          "const": "evidence.superseded",
+          "default": "evidence.superseded",
+          "title": "Event Type",
+          "type": "string"
+        },
+        "previous_evidence_id": {
+          "format": "uuid",
+          "title": "Previous Evidence Id",
+          "type": "string"
+        },
+        "replacement_evidence_id": {
+          "format": "uuid",
+          "title": "Replacement Evidence Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "event_id",
+        "session_id",
+        "command_id",
+        "ordinal",
+        "state_version",
+        "occurred_at",
+        "previous_evidence_id",
+        "replacement_evidence_id"
+      ],
+      "title": "EvidenceSupersededEvent",
+      "type": "object"
+    },
+    "EvidenceWithdrawnEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "event_id": {
+          "format": "uuid",
+          "title": "Event Id",
+          "type": "string"
+        },
+        "session_id": {
+          "format": "uuid",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "command_id": {
+          "format": "uuid",
+          "title": "Command Id",
+          "type": "string"
+        },
+        "ordinal": {
+          "minimum": 0,
+          "title": "Ordinal",
+          "type": "integer"
+        },
+        "state_version": {
+          "minimum": 1,
+          "title": "State Version",
+          "type": "integer"
+        },
+        "occurred_at": {
+          "format": "date-time",
+          "title": "Occurred At",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "evidence_withdrawn_event.v1",
+          "default": "evidence_withdrawn_event.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "event_type": {
+          "const": "evidence.withdrawn",
+          "default": "evidence.withdrawn",
+          "title": "Event Type",
+          "type": "string"
+        },
+        "evidence_id": {
+          "format": "uuid",
+          "title": "Evidence Id",
+          "type": "string"
+        },
+        "source_turn_id": {
+          "format": "uuid",
+          "title": "Source Turn Id",
+          "type": "string"
+        },
+        "reason": {
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "event_id",
+        "session_id",
+        "command_id",
+        "ordinal",
+        "state_version",
+        "occurred_at",
+        "evidence_id",
+        "source_turn_id",
+        "reason"
+      ],
+      "title": "EvidenceWithdrawnEvent",
+      "type": "object"
+    },
+    "FrequencyQualifier": {
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Value"
+        },
+        "unit": {
+          "$ref": "#/$defs/FrequencyUnit",
+          "default": "unknown"
+        },
+        "verbatim": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Verbatim"
+        }
+      },
+      "title": "FrequencyQualifier",
+      "type": "object"
+    },
+    "FrequencyUnit": {
+      "enum": [
+        "per_day",
+        "per_week",
+        "per_month",
+        "per_quarter",
+        "per_year",
+        "irregular",
+        "unknown"
+      ],
+      "title": "FrequencyUnit",
+      "type": "string"
+    },
+    "Gap": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "gap.v2",
+          "default": "gap.v2",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "gap_id": {
+          "format": "uuid",
+          "title": "Gap Id",
+          "type": "string"
+        },
+        "session_id": {
+          "format": "uuid",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "episode_id": {
+          "format": "uuid",
+          "title": "Episode Id",
+          "type": "string"
+        },
+        "dimension": {
+          "$ref": "#/$defs/GapDimension"
+        },
+        "question_goal": {
+          "minLength": 1,
+          "title": "Question Goal",
+          "type": "string"
+        },
+        "supporting_evidence_ids": {
+          "default": [],
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Supporting Evidence Ids",
+          "type": "array"
+        },
+        "status": {
+          "$ref": "#/$defs/GapStatus",
+          "default": "open"
+        },
+        "priority_features": {
+          "$ref": "#/$defs/GapPriorityFeatures"
+        },
+        "asked_turn_ids": {
+          "default": [],
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Asked Turn Ids",
+          "type": "array"
+        },
+        "resolution_turn_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Resolution Turn Id"
+        },
+        "resolution_evidence_ids": {
+          "default": [],
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Resolution Evidence Ids",
+          "type": "array"
+        },
+        "unresolved_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unresolved Reason"
+        }
+      },
+      "required": [
+        "gap_id",
+        "session_id",
+        "episode_id",
+        "dimension",
+        "question_goal",
+        "priority_features"
+      ],
+      "title": "Gap",
+      "type": "object"
+    },
+    "GapDimension": {
+      "enum": [
+        "trigger_input",
+        "action_decision",
+        "output_recipient",
+        "purpose",
+        "ownership_collaboration",
+        "condition_tool",
+        "standard_result",
+        "frequency_importance",
+        "exception_rework",
+        "contradiction",
+        "emergent"
+      ],
+      "title": "GapDimension",
+      "type": "string"
+    },
+    "GapPriorityFeatures": {
+      "additionalProperties": false,
+      "properties": {
+        "jd_value": {
+          "$ref": "#/$defs/ValueLevel"
+        },
+        "contradiction": {
+          "default": false,
+          "title": "Contradiction",
+          "type": "boolean"
+        },
+        "redundancy": {
+          "default": false,
+          "title": "Redundancy",
+          "type": "boolean"
+        },
+        "sensitivity": {
+          "$ref": "#/$defs/Sensitivity",
+          "default": "low"
+        },
+        "burden": {
+          "$ref": "#/$defs/ValueLevel",
+          "default": "low"
+        }
+      },
+      "required": [
+        "jd_value"
+      ],
+      "title": "GapPriorityFeatures",
+      "type": "object"
+    },
+    "GapProposedEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "event_id": {
+          "format": "uuid",
+          "title": "Event Id",
+          "type": "string"
+        },
+        "session_id": {
+          "format": "uuid",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "command_id": {
+          "format": "uuid",
+          "title": "Command Id",
+          "type": "string"
+        },
+        "ordinal": {
+          "minimum": 0,
+          "title": "Ordinal",
+          "type": "integer"
+        },
+        "state_version": {
+          "minimum": 1,
+          "title": "State Version",
+          "type": "integer"
+        },
+        "occurred_at": {
+          "format": "date-time",
+          "title": "Occurred At",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "gap_proposed_event.v1",
+          "default": "gap_proposed_event.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "event_type": {
+          "const": "gap.proposed",
+          "default": "gap.proposed",
+          "title": "Event Type",
+          "type": "string"
+        },
+        "gap_id": {
+          "format": "uuid",
+          "title": "Gap Id",
+          "type": "string"
+        },
+        "episode_id": {
+          "format": "uuid",
+          "title": "Episode Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "event_id",
+        "session_id",
+        "command_id",
+        "ordinal",
+        "state_version",
+        "occurred_at",
+        "gap_id",
+        "episode_id"
+      ],
+      "title": "GapProposedEvent",
+      "type": "object"
+    },
+    "GapStatus": {
+      "enum": [
+        "open",
+        "asked",
+        "answered",
+        "declined",
+        "not_applicable",
+        "deferred"
+      ],
+      "title": "GapStatus",
+      "type": "string"
+    },
+    "GapTransitionedEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "event_id": {
+          "format": "uuid",
+          "title": "Event Id",
+          "type": "string"
+        },
+        "session_id": {
+          "format": "uuid",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "command_id": {
+          "format": "uuid",
+          "title": "Command Id",
+          "type": "string"
+        },
+        "ordinal": {
+          "minimum": 0,
+          "title": "Ordinal",
+          "type": "integer"
+        },
+        "state_version": {
+          "minimum": 1,
+          "title": "State Version",
+          "type": "integer"
+        },
+        "occurred_at": {
+          "format": "date-time",
+          "title": "Occurred At",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "gap_transitioned_event.v1",
+          "default": "gap_transitioned_event.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "event_type": {
+          "const": "gap.transitioned",
+          "default": "gap.transitioned",
+          "title": "Event Type",
+          "type": "string"
+        },
+        "gap_id": {
+          "format": "uuid",
+          "title": "Gap Id",
+          "type": "string"
+        },
+        "previous_status": {
+          "$ref": "#/$defs/GapStatus"
+        },
+        "target_status": {
+          "$ref": "#/$defs/GapStatus"
+        },
+        "source_turn_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Turn Id"
+        },
+        "cause": {
+          "default": "command",
+          "enum": [
+            "command",
+            "evidence_withdrawn"
+          ],
+          "title": "Cause",
+          "type": "string"
+        }
+      },
+      "required": [
+        "event_id",
+        "session_id",
+        "command_id",
+        "ordinal",
+        "state_version",
+        "occurred_at",
+        "gap_id",
+        "previous_status",
+        "target_status"
+      ],
+      "title": "GapTransitionedEvent",
+      "type": "object"
+    },
+    "Importance": {
+      "enum": [
+        "explicit_core",
+        "explicit_supporting",
+        "not_stated"
+      ],
+      "title": "Importance",
+      "type": "string"
+    },
+    "Inference": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "inference.v2",
+          "default": "inference.v2",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "inference_id": {
+          "format": "uuid",
+          "title": "Inference Id",
+          "type": "string"
+        },
+        "session_id": {
+          "format": "uuid",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "type": {
+          "maxLength": 128,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+          "title": "Type",
+          "type": "string"
+        },
+        "statement": {
+          "minLength": 1,
+          "title": "Statement",
+          "type": "string"
+        },
+        "supporting_evidence_ids": {
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Supporting Evidence Ids",
+          "type": "array"
+        },
+        "contradicting_evidence_ids": {
+          "default": [],
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Contradicting Evidence Ids",
+          "type": "array"
+        },
+        "reference_urns": {
+          "default": [],
+          "items": {
+            "maxLength": 512,
+            "minLength": 3,
+            "type": "string"
+          },
+          "title": "Reference Urns",
+          "type": "array"
+        },
+        "status": {
+          "$ref": "#/$defs/InferenceStatus",
+          "default": "candidate"
+        },
+        "method": {
+          "$ref": "#/$defs/InferenceMethod"
+        },
+        "operation_name": {
+          "maxLength": 128,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+          "title": "Operation Name",
+          "type": "string"
+        },
+        "operation_definition_hash": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Operation Definition Hash",
+          "type": "string"
+        },
+        "supersedes": {
+          "default": [],
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Supersedes",
+          "type": "array"
+        },
+        "superseded_by": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Superseded By"
+        },
+        "decision_evidence_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Decision Evidence Id"
+        },
+        "uncertainty_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Uncertainty Reason"
+        }
+      },
+      "required": [
+        "inference_id",
+        "session_id",
+        "type",
+        "statement",
+        "supporting_evidence_ids",
+        "method",
+        "operation_name",
+        "operation_definition_hash"
+      ],
+      "title": "Inference",
+      "type": "object"
+    },
+    "InferenceAppliedEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "event_id": {
+          "format": "uuid",
+          "title": "Event Id",
+          "type": "string"
+        },
+        "session_id": {
+          "format": "uuid",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "command_id": {
+          "format": "uuid",
+          "title": "Command Id",
+          "type": "string"
+        },
+        "ordinal": {
+          "minimum": 0,
+          "title": "Ordinal",
+          "type": "integer"
+        },
+        "state_version": {
+          "minimum": 1,
+          "title": "State Version",
+          "type": "integer"
+        },
+        "occurred_at": {
+          "format": "date-time",
+          "title": "Occurred At",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "inference_applied_event.v1",
+          "default": "inference_applied_event.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "event_type": {
+          "const": "inference.applied",
+          "default": "inference.applied",
+          "title": "Event Type",
+          "type": "string"
+        },
+        "inference_id": {
+          "format": "uuid",
+          "title": "Inference Id",
+          "type": "string"
+        },
+        "previous_status": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/InferenceStatus"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "target_status": {
+          "$ref": "#/$defs/InferenceStatus"
+        }
+      },
+      "required": [
+        "event_id",
+        "session_id",
+        "command_id",
+        "ordinal",
+        "state_version",
+        "occurred_at",
+        "inference_id",
+        "target_status"
+      ],
+      "title": "InferenceAppliedEvent",
+      "type": "object"
+    },
+    "InferenceMethod": {
+      "enum": [
+        "llm",
+        "rule",
+        "human"
+      ],
+      "title": "InferenceMethod",
+      "type": "string"
+    },
+    "InferenceStatus": {
+      "enum": [
+        "candidate",
+        "confirmed_by_employee",
+        "rejected",
+        "superseded",
+        "insufficient"
+      ],
+      "title": "InferenceStatus",
+      "type": "string"
+    },
+    "InferenceSupersededEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "event_id": {
+          "format": "uuid",
+          "title": "Event Id",
+          "type": "string"
+        },
+        "session_id": {
+          "format": "uuid",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "command_id": {
+          "format": "uuid",
+          "title": "Command Id",
+          "type": "string"
+        },
+        "ordinal": {
+          "minimum": 0,
+          "title": "Ordinal",
+          "type": "integer"
+        },
+        "state_version": {
+          "minimum": 1,
+          "title": "State Version",
+          "type": "integer"
+        },
+        "occurred_at": {
+          "format": "date-time",
+          "title": "Occurred At",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "inference_superseded_event.v1",
+          "default": "inference_superseded_event.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "event_type": {
+          "const": "inference.superseded",
+          "default": "inference.superseded",
+          "title": "Event Type",
+          "type": "string"
+        },
+        "previous_inference_id": {
+          "format": "uuid",
+          "title": "Previous Inference Id",
+          "type": "string"
+        },
+        "replacement_inference_id": {
+          "format": "uuid",
+          "title": "Replacement Inference Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "event_id",
+        "session_id",
+        "command_id",
+        "ordinal",
+        "state_version",
+        "occurred_at",
+        "previous_inference_id",
+        "replacement_inference_id"
+      ],
+      "title": "InferenceSupersededEvent",
+      "type": "object"
+    },
+    "InferenceTransitionedEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "event_id": {
+          "format": "uuid",
+          "title": "Event Id",
+          "type": "string"
+        },
+        "session_id": {
+          "format": "uuid",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "command_id": {
+          "format": "uuid",
+          "title": "Command Id",
+          "type": "string"
+        },
+        "ordinal": {
+          "minimum": 0,
+          "title": "Ordinal",
+          "type": "integer"
+        },
+        "state_version": {
+          "minimum": 1,
+          "title": "State Version",
+          "type": "integer"
+        },
+        "occurred_at": {
+          "format": "date-time",
+          "title": "Occurred At",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "inference_transitioned_event.v1",
+          "default": "inference_transitioned_event.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "event_type": {
+          "const": "inference.transitioned",
+          "default": "inference.transitioned",
+          "title": "Event Type",
+          "type": "string"
+        },
+        "inference_id": {
+          "format": "uuid",
+          "title": "Inference Id",
+          "type": "string"
+        },
+        "previous_status": {
+          "$ref": "#/$defs/InferenceStatus"
+        },
+        "target_status": {
+          "$ref": "#/$defs/InferenceStatus"
+        },
+        "cause": {
+          "enum": [
+            "employee_decision",
+            "evidence_withdrawn"
+          ],
+          "title": "Cause",
+          "type": "string"
+        },
+        "decision_evidence_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Decision Evidence Id"
+        }
+      },
+      "required": [
+        "event_id",
+        "session_id",
+        "command_id",
+        "ordinal",
+        "state_version",
+        "occurred_at",
+        "inference_id",
+        "previous_status",
+        "target_status",
+        "cause"
+      ],
+      "title": "InferenceTransitionedEvent",
+      "type": "object"
+    },
+    "InterviewSession": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "interview_session.v1",
+          "default": "interview_session.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "session_id": {
+          "format": "uuid",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "profile_id": {
+          "format": "uuid",
+          "title": "Profile Id",
+          "type": "string"
+        },
+        "tenant_id": {
+          "format": "uuid",
+          "title": "Tenant Id",
+          "type": "string"
+        },
+        "architecture_id": {
+          "const": "interview-vnext-evidence-workflow",
+          "default": "interview-vnext-evidence-workflow",
+          "title": "Architecture Id",
+          "type": "string"
+        },
+        "workflow_version": {
+          "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(?:-[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?(?:\\+[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?$",
+          "title": "Workflow Version",
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/$defs/SessionStatus",
+          "default": "planned"
+        },
+        "state_version": {
+          "default": 0,
+          "minimum": 0,
+          "title": "State Version",
+          "type": "integer"
+        },
+        "active_episode_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Active Episode Id"
+        },
+        "turn_count": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Turn Count",
+          "type": "integer"
+        },
+        "stop_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Stop Reason"
+        },
+        "reference_snapshot_id": {
+          "minLength": 1,
+          "title": "Reference Snapshot Id",
+          "type": "string"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "updated_at": {
+          "format": "date-time",
+          "title": "Updated At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "session_id",
+        "profile_id",
+        "tenant_id",
+        "workflow_version",
+        "reference_snapshot_id",
+        "created_at",
+        "updated_at"
+      ],
+      "title": "InterviewSession",
+      "type": "object"
+    },
+    "InterviewState": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "interview_state.v3",
+          "default": "interview_state.v3",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "session": {
+          "$ref": "#/$defs/InterviewSession"
+        },
+        "turns": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/TranscriptTurn"
+          },
+          "title": "Turns",
+          "type": "array"
+        },
+        "evidence": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Evidence"
+          },
+          "title": "Evidence",
+          "type": "array"
+        },
+        "inferences": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Inference"
+          },
+          "title": "Inferences",
+          "type": "array"
+        },
+        "episodes": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/EpisodeState"
+          },
+          "title": "Episodes",
+          "type": "array"
+        },
+        "gaps": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Gap"
+          },
+          "title": "Gaps",
+          "type": "array"
+        },
+        "candidates": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/CandidateJobItem"
+          },
+          "title": "Candidates",
+          "type": "array"
+        },
+        "reviews": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ReviewDecision"
+          },
+          "title": "Reviews",
+          "type": "array"
+        },
+        "question_frames": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/QuestionFrame"
+          },
+          "title": "Question Frames",
+          "type": "array"
+        },
+        "active_question_frame_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Active Question Frame Id"
+        },
+        "turn_interpretations": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/TurnInterpretationRecord"
+          },
+          "title": "Turn Interpretations",
+          "type": "array"
+        },
+        "processed_command_ids": {
+          "default": [],
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Processed Command Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "session"
+      ],
+      "title": "InterviewState",
+      "type": "object"
+    },
+    "LiteralEmployeeSpanSupport": {
+      "additionalProperties": false,
+      "properties": {
+        "support_kind": {
+          "const": "literal_employee_span",
+          "default": "literal_employee_span",
+          "title": "Support Kind",
+          "type": "string"
+        },
+        "employee_turn_id": {
+          "format": "uuid",
+          "title": "Employee Turn Id",
+          "type": "string"
+        },
+        "quote": {
+          "minLength": 1,
+          "title": "Quote",
+          "type": "string"
+        },
+        "span": {
+          "$ref": "#/$defs/QuoteSpan"
+        },
+        "quote_match": {
+          "$ref": "#/$defs/QuoteMatch",
+          "default": "exact"
+        },
+        "normalization_version": {
+          "anyOf": [
+            {
+              "const": "quote_nfkc_ws.v1",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Normalization Version"
+        }
+      },
+      "required": [
+        "employee_turn_id",
+        "quote",
+        "span"
+      ],
+      "title": "LiteralEmployeeSpanSupport",
+      "type": "object"
+    },
+    "Ownership": {
+      "enum": [
+        "owner",
+        "shared",
+        "assists",
+        "receives",
+        "not_responsible",
+        "unknown"
+      ],
+      "title": "Ownership",
+      "type": "string"
+    },
+    "Polarity": {
+      "enum": [
+        "affirmed",
+        "denied",
+        "uncertain"
+      ],
+      "title": "Polarity",
+      "type": "string"
+    },
+    "PropositionQuestionTarget": {
+      "additionalProperties": false,
+      "properties": {
+        "target_kind": {
+          "const": "proposition",
+          "default": "proposition",
+          "title": "Target Kind",
+          "type": "string"
+        },
+        "target_ordinal": {
+          "maximum": 16,
+          "minimum": 1,
+          "title": "Target Ordinal",
+          "type": "integer"
+        },
+        "proposition": {
+          "$ref": "#/$defs/QuestionProposition"
+        },
+        "introduced_dimensions": {
+          "items": {
+            "$ref": "#/$defs/QuestionDimension"
+          },
+          "title": "Introduced Dimensions",
+          "type": "array"
+        },
+        "target_hash": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Target Hash",
+          "type": "string"
+        }
+      },
+      "required": [
+        "target_ordinal",
+        "proposition",
+        "introduced_dimensions",
+        "target_hash"
+      ],
+      "title": "PropositionQuestionTarget",
+      "type": "object"
+    },
+    "QuantitativeThreshold": {
+      "additionalProperties": false,
+      "properties": {
+        "expression": {
+          "minLength": 1,
+          "title": "Expression",
+          "type": "string"
+        },
+        "source_type": {
+          "$ref": "#/$defs/ThresholdSourceType"
+        },
+        "source_id": {
+          "minLength": 1,
+          "title": "Source Id",
+          "type": "string"
+        },
+        "evidence_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Evidence Id"
+        }
+      },
+      "required": [
+        "expression",
+        "source_type",
+        "source_id"
+      ],
+      "title": "QuantitativeThreshold",
+      "type": "object"
+    },
+    "QuestionDimension": {
+      "enum": [
+        "action",
+        "input",
+        "output",
+        "purpose",
+        "condition",
+        "standard",
+        "frequency",
+        "importance",
+        "ownership",
+        "tool",
+        "recipient",
+        "dependency",
+        "exception",
+        "time_scope",
+        "typicality",
+        "polarity"
+      ],
+      "title": "QuestionDimension",
+      "type": "string"
+    },
+    "QuestionFrame": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "question_frame.v1",
+          "default": "question_frame.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "question_frame_id": {
+          "format": "uuid",
+          "title": "Question Frame Id",
+          "type": "string"
+        },
+        "session_id": {
+          "format": "uuid",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "consultant_turn_id": {
+          "format": "uuid",
+          "title": "Consultant Turn Id",
+          "type": "string"
+        },
+        "definition": {
+          "$ref": "#/$defs/QuestionFrameDefinition"
+        },
+        "status": {
+          "$ref": "#/$defs/QuestionFrameStatus"
+        },
+        "opened_state_version": {
+          "minimum": 1,
+          "title": "Opened State Version",
+          "type": "integer"
+        },
+        "opened_at": {
+          "format": "date-time",
+          "title": "Opened At",
+          "type": "string"
+        },
+        "answer_turn_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Answer Turn Id"
+        },
+        "consumed_operation_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Consumed Operation Id"
+        },
+        "superseded_by_frame_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Superseded By Frame Id"
+        },
+        "stale_reason": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/QuestionFrameStaleReason"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "closed_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Closed At"
+        }
+      },
+      "required": [
+        "question_frame_id",
+        "session_id",
+        "consultant_turn_id",
+        "definition",
+        "status",
+        "opened_state_version",
+        "opened_at"
+      ],
+      "title": "QuestionFrame",
+      "type": "object"
+    },
+    "QuestionFrameAnswerBoundEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "event_id": {
+          "format": "uuid",
+          "title": "Event Id",
+          "type": "string"
+        },
+        "session_id": {
+          "format": "uuid",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "command_id": {
+          "format": "uuid",
+          "title": "Command Id",
+          "type": "string"
+        },
+        "ordinal": {
+          "minimum": 0,
+          "title": "Ordinal",
+          "type": "integer"
+        },
+        "state_version": {
+          "minimum": 1,
+          "title": "State Version",
+          "type": "integer"
+        },
+        "occurred_at": {
+          "format": "date-time",
+          "title": "Occurred At",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "question_frame_answer_bound_event.v1",
+          "default": "question_frame_answer_bound_event.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "event_type": {
+          "const": "question_frame.answer_bound",
+          "default": "question_frame.answer_bound",
+          "title": "Event Type",
+          "type": "string"
+        },
+        "question_frame_id": {
+          "format": "uuid",
+          "title": "Question Frame Id",
+          "type": "string"
+        },
+        "employee_turn_id": {
+          "format": "uuid",
+          "title": "Employee Turn Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "event_id",
+        "session_id",
+        "command_id",
+        "ordinal",
+        "state_version",
+        "occurred_at",
+        "question_frame_id",
+        "employee_turn_id"
+      ],
+      "title": "QuestionFrameAnswerBoundEvent",
+      "type": "object"
+    },
+    "QuestionFrameConsumedEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "event_id": {
+          "format": "uuid",
+          "title": "Event Id",
+          "type": "string"
+        },
+        "session_id": {
+          "format": "uuid",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "command_id": {
+          "format": "uuid",
+          "title": "Command Id",
+          "type": "string"
+        },
+        "ordinal": {
+          "minimum": 0,
+          "title": "Ordinal",
+          "type": "integer"
+        },
+        "state_version": {
+          "minimum": 1,
+          "title": "State Version",
+          "type": "integer"
+        },
+        "occurred_at": {
+          "format": "date-time",
+          "title": "Occurred At",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "question_frame_consumed_event.v1",
+          "default": "question_frame_consumed_event.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "event_type": {
+          "const": "question_frame.consumed",
+          "default": "question_frame.consumed",
+          "title": "Event Type",
+          "type": "string"
+        },
+        "question_frame_id": {
+          "format": "uuid",
+          "title": "Question Frame Id",
+          "type": "string"
+        },
+        "employee_turn_id": {
+          "format": "uuid",
+          "title": "Employee Turn Id",
+          "type": "string"
+        },
+        "operation_id": {
+          "format": "uuid",
+          "title": "Operation Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "event_id",
+        "session_id",
+        "command_id",
+        "ordinal",
+        "state_version",
+        "occurred_at",
+        "question_frame_id",
+        "employee_turn_id",
+        "operation_id"
+      ],
+      "title": "QuestionFrameConsumedEvent",
+      "type": "object"
+    },
+    "QuestionFrameDefinition": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "question_frame_definition.v1",
+          "default": "question_frame_definition.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "mode": {
+          "$ref": "#/$defs/QuestionMode"
+        },
+        "question_text_hash": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Question Text Hash",
+          "type": "string"
+        },
+        "targets": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "choice": "#/$defs/ChoiceQuestionTarget",
+                "proposition": "#/$defs/PropositionQuestionTarget",
+                "slot": "#/$defs/SlotQuestionTarget"
+              },
+              "propertyName": "target_kind"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/PropositionQuestionTarget"
+              },
+              {
+                "$ref": "#/$defs/SlotQuestionTarget"
+              },
+              {
+                "$ref": "#/$defs/ChoiceQuestionTarget"
+              }
+            ]
+          },
+          "title": "Targets",
+          "type": "array"
+        },
+        "definition_hash": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Definition Hash",
+          "type": "string"
+        }
+      },
+      "required": [
+        "mode",
+        "question_text_hash",
+        "targets",
+        "definition_hash"
+      ],
+      "title": "QuestionFrameDefinition",
+      "type": "object"
+    },
+    "QuestionFrameOpenedEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "event_id": {
+          "format": "uuid",
+          "title": "Event Id",
+          "type": "string"
+        },
+        "session_id": {
+          "format": "uuid",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "command_id": {
+          "format": "uuid",
+          "title": "Command Id",
+          "type": "string"
+        },
+        "ordinal": {
+          "minimum": 0,
+          "title": "Ordinal",
+          "type": "integer"
+        },
+        "state_version": {
+          "minimum": 1,
+          "title": "State Version",
+          "type": "integer"
+        },
+        "occurred_at": {
+          "format": "date-time",
+          "title": "Occurred At",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "question_frame_opened_event.v1",
+          "default": "question_frame_opened_event.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "event_type": {
+          "const": "question_frame.opened",
+          "default": "question_frame.opened",
+          "title": "Event Type",
+          "type": "string"
+        },
+        "question_frame_id": {
+          "format": "uuid",
+          "title": "Question Frame Id",
+          "type": "string"
+        },
+        "consultant_turn_id": {
+          "format": "uuid",
+          "title": "Consultant Turn Id",
+          "type": "string"
+        },
+        "definition_hash": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Definition Hash",
+          "type": "string"
+        }
+      },
+      "required": [
+        "event_id",
+        "session_id",
+        "command_id",
+        "ordinal",
+        "state_version",
+        "occurred_at",
+        "question_frame_id",
+        "consultant_turn_id",
+        "definition_hash"
+      ],
+      "title": "QuestionFrameOpenedEvent",
+      "type": "object"
+    },
+    "QuestionFrameStaleReason": {
+      "enum": [
+        "document_target_changed",
+        "source_evidence_changed",
+        "answer_not_immediate",
+        "manual_invalidation"
+      ],
+      "title": "QuestionFrameStaleReason",
+      "type": "string"
+    },
+    "QuestionFrameStaledEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "event_id": {
+          "format": "uuid",
+          "title": "Event Id",
+          "type": "string"
+        },
+        "session_id": {
+          "format": "uuid",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "command_id": {
+          "format": "uuid",
+          "title": "Command Id",
+          "type": "string"
+        },
+        "ordinal": {
+          "minimum": 0,
+          "title": "Ordinal",
+          "type": "integer"
+        },
+        "state_version": {
+          "minimum": 1,
+          "title": "State Version",
+          "type": "integer"
+        },
+        "occurred_at": {
+          "format": "date-time",
+          "title": "Occurred At",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "question_frame_staled_event.v1",
+          "default": "question_frame_staled_event.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "event_type": {
+          "const": "question_frame.staled",
+          "default": "question_frame.staled",
+          "title": "Event Type",
+          "type": "string"
+        },
+        "question_frame_id": {
+          "format": "uuid",
+          "title": "Question Frame Id",
+          "type": "string"
+        },
+        "answer_turn_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Answer Turn Id"
+        },
+        "reason": {
+          "$ref": "#/$defs/QuestionFrameStaleReason"
+        }
+      },
+      "required": [
+        "event_id",
+        "session_id",
+        "command_id",
+        "ordinal",
+        "state_version",
+        "occurred_at",
+        "question_frame_id",
+        "reason"
+      ],
+      "title": "QuestionFrameStaledEvent",
+      "type": "object"
+    },
+    "QuestionFrameStatus": {
+      "enum": [
+        "active",
+        "consumed",
+        "superseded",
+        "stale"
+      ],
+      "title": "QuestionFrameStatus",
+      "type": "string"
+    },
+    "QuestionFrameSupersededEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "event_id": {
+          "format": "uuid",
+          "title": "Event Id",
+          "type": "string"
+        },
+        "session_id": {
+          "format": "uuid",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "command_id": {
+          "format": "uuid",
+          "title": "Command Id",
+          "type": "string"
+        },
+        "ordinal": {
+          "minimum": 0,
+          "title": "Ordinal",
+          "type": "integer"
+        },
+        "state_version": {
+          "minimum": 1,
+          "title": "State Version",
+          "type": "integer"
+        },
+        "occurred_at": {
+          "format": "date-time",
+          "title": "Occurred At",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "question_frame_superseded_event.v1",
+          "default": "question_frame_superseded_event.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "event_type": {
+          "const": "question_frame.superseded",
+          "default": "question_frame.superseded",
+          "title": "Event Type",
+          "type": "string"
+        },
+        "previous_question_frame_id": {
+          "format": "uuid",
+          "title": "Previous Question Frame Id",
+          "type": "string"
+        },
+        "replacement_question_frame_id": {
+          "format": "uuid",
+          "title": "Replacement Question Frame Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "event_id",
+        "session_id",
+        "command_id",
+        "ordinal",
+        "state_version",
+        "occurred_at",
+        "previous_question_frame_id",
+        "replacement_question_frame_id"
+      ],
+      "title": "QuestionFrameSupersededEvent",
+      "type": "object"
+    },
+    "QuestionMode": {
+      "enum": [
+        "open_narrative",
+        "atomic_confirmation",
+        "slot_request",
+        "choice",
+        "correction_check"
+      ],
+      "title": "QuestionMode",
+      "type": "string"
+    },
+    "QuestionProposition": {
+      "additionalProperties": false,
+      "properties": {
+        "subject": {
+          "$ref": "#/$defs/EvidenceSubject"
+        },
+        "kind": {
+          "$ref": "#/$defs/EvidenceKind"
+        },
+        "claim": {
+          "minLength": 1,
+          "title": "Claim",
+          "type": "string"
+        },
+        "qualifiers": {
+          "$ref": "#/$defs/EvidenceQualifiers"
+        },
+        "source_refs": {
+          "items": {
+            "$ref": "#/$defs/QuestionSourceRef"
+          },
+          "title": "Source Refs",
+          "type": "array"
+        },
+        "supersedes_evidence_ids": {
+          "default": [],
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Supersedes Evidence Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "subject",
+        "kind",
+        "claim",
+        "source_refs"
+      ],
+      "title": "QuestionProposition",
+      "type": "object"
+    },
+    "QuestionSlotKind": {
+      "enum": [
+        "frequency",
+        "recipient",
+        "output",
+        "standard",
+        "tool",
+        "condition",
+        "purpose",
+        "ownership",
+        "importance",
+        "time_scope",
+        "typicality"
+      ],
+      "title": "QuestionSlotKind",
+      "type": "string"
+    },
+    "QuestionSourceKind": {
+      "enum": [
+        "employee_evidence",
+        "employee_document",
+        "public_reference",
+        "consultant_hypothesis"
+      ],
+      "title": "QuestionSourceKind",
+      "type": "string"
+    },
+    "QuestionSourceRef": {
+      "additionalProperties": false,
+      "properties": {
+        "source_kind": {
+          "$ref": "#/$defs/QuestionSourceKind"
+        },
+        "source_ref": {
+          "minLength": 1,
+          "title": "Source Ref",
+          "type": "string"
+        },
+        "source_hash": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Source Hash",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_kind",
+        "source_ref",
+        "source_hash"
+      ],
+      "title": "QuestionSourceRef",
+      "type": "object"
+    },
+    "QuoteMatch": {
+      "enum": [
+        "exact",
+        "normalized"
+      ],
+      "title": "QuoteMatch",
+      "type": "string"
+    },
+    "QuoteSpan": {
+      "additionalProperties": false,
+      "properties": {
+        "unit": {
+          "const": "unicode_code_point",
+          "default": "unicode_code_point",
+          "title": "Unit",
+          "type": "string"
+        },
+        "start": {
+          "minimum": 0,
+          "title": "Start",
+          "type": "integer"
+        },
+        "end": {
+          "exclusiveMinimum": 0,
+          "title": "End",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "start",
+        "end"
+      ],
+      "title": "QuoteSpan",
+      "type": "object"
+    },
+    "ReasonCode": {
+      "enum": [
+        "applied",
+        "duplicate_command",
+        "state_version_conflict",
+        "command_time_regression",
+        "invalid_session_transition",
+        "terminal_session",
+        "stop_reason_required",
+        "active_episode_must_close",
+        "session_id_mismatch",
+        "turn_id_duplicate",
+        "client_turn_id_duplicate",
+        "turn_sequence_invalid",
+        "previous_turn_mismatch",
+        "turn_not_found",
+        "evidence_id_duplicate",
+        "evidence_proposal_status_invalid",
+        "evidence_turn_mismatch",
+        "evidence_episode_invalid",
+        "evidence_requires_employee_turn",
+        "quote_span_out_of_range",
+        "quote_mismatch",
+        "normalization_version_invalid",
+        "supersede_target_not_found",
+        "supersede_target_not_active",
+        "supersede_target_duplicate",
+        "evidence_not_found",
+        "evidence_not_active",
+        "evidence_withdraw_turn_invalid",
+        "episode_not_found",
+        "episode_id_duplicate",
+        "active_episode_exists",
+        "episode_open_turn_invalid",
+        "episode_transition_invalid",
+        "episode_has_unresolved_gaps",
+        "gap_id_duplicate",
+        "gap_proposal_invalid",
+        "gap_not_found",
+        "gap_transition_invalid",
+        "gap_turn_invalid",
+        "inference_id_duplicate",
+        "inference_proposal_invalid",
+        "inference_evidence_not_found",
+        "inference_not_found",
+        "inference_decision_invalid",
+        "candidate_id_duplicate",
+        "candidate_proposal_invalid",
+        "candidate_not_found",
+        "candidate_transition_invalid",
+        "candidate_inference_not_found",
+        "review_id_duplicate",
+        "review_decision_invalid",
+        "review_candidate_not_reviewable",
+        "reference_only_candidate",
+        "candidate_evidence_inactive",
+        "candidate_current_scope_invalid",
+        "ability_cross_episode_evidence_required",
+        "numeric_threshold_source_required",
+        "human_decision_protected",
+        "question_frame_definition_invalid",
+        "question_frame_answer_pending",
+        "question_frame_not_active",
+        "question_frame_not_immediate",
+        "question_frame_scope_mismatch",
+        "question_frame_hash_mismatch",
+        "question_frame_target_invalid",
+        "question_frame_not_found",
+        "turn_already_interpreted",
+        "turn_interpretation_pending",
+        "interpretation_scope_mismatch",
+        "interpretation_evidence_mismatch",
+        "interpretation_id_duplicate",
+        "contextual_support_mismatch",
+        "unsupported_persisted_schema_version"
+      ],
+      "title": "ReasonCode",
+      "type": "string"
+    },
+    "ReviewAction": {
+      "enum": [
+        "accept",
+        "edit",
+        "reject"
+      ],
+      "title": "ReviewAction",
+      "type": "string"
+    },
+    "ReviewDecision": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "review_decision.v1",
+          "default": "review_decision.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "review_id": {
+          "format": "uuid",
+          "title": "Review Id",
+          "type": "string"
+        },
+        "session_id": {
+          "format": "uuid",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "candidate_id": {
+          "format": "uuid",
+          "title": "Candidate Id",
+          "type": "string"
+        },
+        "reviewer_id": {
+          "format": "uuid",
+          "title": "Reviewer Id",
+          "type": "string"
+        },
+        "action": {
+          "$ref": "#/$defs/ReviewAction"
+        },
+        "edited_statement": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Edited Statement"
+        },
+        "edited_thresholds": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/QuantitativeThreshold"
+          },
+          "title": "Edited Thresholds",
+          "type": "array"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reason"
+        },
+        "decided_at": {
+          "format": "date-time",
+          "title": "Decided At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "review_id",
+        "session_id",
+        "candidate_id",
+        "reviewer_id",
+        "action",
+        "decided_at"
+      ],
+      "title": "ReviewDecision",
+      "type": "object"
+    },
+    "ReviewDecisionAppliedEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "event_id": {
+          "format": "uuid",
+          "title": "Event Id",
+          "type": "string"
+        },
+        "session_id": {
+          "format": "uuid",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "command_id": {
+          "format": "uuid",
+          "title": "Command Id",
+          "type": "string"
+        },
+        "ordinal": {
+          "minimum": 0,
+          "title": "Ordinal",
+          "type": "integer"
+        },
+        "state_version": {
+          "minimum": 1,
+          "title": "State Version",
+          "type": "integer"
+        },
+        "occurred_at": {
+          "format": "date-time",
+          "title": "Occurred At",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "review_decision_applied_event.v1",
+          "default": "review_decision_applied_event.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "event_type": {
+          "const": "review.applied",
+          "default": "review.applied",
+          "title": "Event Type",
+          "type": "string"
+        },
+        "review_id": {
+          "format": "uuid",
+          "title": "Review Id",
+          "type": "string"
+        },
+        "candidate_id": {
+          "format": "uuid",
+          "title": "Candidate Id",
+          "type": "string"
+        },
+        "action": {
+          "$ref": "#/$defs/ReviewAction"
+        }
+      },
+      "required": [
+        "event_id",
+        "session_id",
+        "command_id",
+        "ordinal",
+        "state_version",
+        "occurred_at",
+        "review_id",
+        "candidate_id",
+        "action"
+      ],
+      "title": "ReviewDecisionAppliedEvent",
+      "type": "object"
+    },
+    "Sensitivity": {
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "prohibited"
+      ],
+      "title": "Sensitivity",
+      "type": "string"
+    },
+    "SessionStatus": {
+      "enum": [
+        "planned",
+        "active",
+        "paused",
+        "finishing",
+        "completed",
+        "failed"
+      ],
+      "title": "SessionStatus",
+      "type": "string"
+    },
+    "SessionTransitionedEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "event_id": {
+          "format": "uuid",
+          "title": "Event Id",
+          "type": "string"
+        },
+        "session_id": {
+          "format": "uuid",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "command_id": {
+          "format": "uuid",
+          "title": "Command Id",
+          "type": "string"
+        },
+        "ordinal": {
+          "minimum": 0,
+          "title": "Ordinal",
+          "type": "integer"
+        },
+        "state_version": {
+          "minimum": 1,
+          "title": "State Version",
+          "type": "integer"
+        },
+        "occurred_at": {
+          "format": "date-time",
+          "title": "Occurred At",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "session_transitioned_event.v1",
+          "default": "session_transitioned_event.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "event_type": {
+          "const": "session.transitioned",
+          "default": "session.transitioned",
+          "title": "Event Type",
+          "type": "string"
+        },
+        "previous_status": {
+          "$ref": "#/$defs/SessionStatus"
+        },
+        "target_status": {
+          "$ref": "#/$defs/SessionStatus"
+        },
+        "stop_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Stop Reason"
+        }
+      },
+      "required": [
+        "event_id",
+        "session_id",
+        "command_id",
+        "ordinal",
+        "state_version",
+        "occurred_at",
+        "previous_status",
+        "target_status"
+      ],
+      "title": "SessionTransitionedEvent",
+      "type": "object"
+    },
+    "SlotQuestionTarget": {
+      "additionalProperties": false,
+      "properties": {
+        "target_kind": {
+          "const": "slot",
+          "default": "slot",
+          "title": "Target Kind",
+          "type": "string"
+        },
+        "target_ordinal": {
+          "maximum": 16,
+          "minimum": 1,
+          "title": "Target Ordinal",
+          "type": "integer"
+        },
+        "slot_kind": {
+          "$ref": "#/$defs/QuestionSlotKind"
+        },
+        "subject": {
+          "$ref": "#/$defs/EvidenceSubject"
+        },
+        "evidence_kind": {
+          "$ref": "#/$defs/EvidenceKind"
+        },
+        "base_claim": {
+          "minLength": 1,
+          "title": "Base Claim",
+          "type": "string"
+        },
+        "claim_template": {
+          "minLength": 1,
+          "title": "Claim Template",
+          "type": "string"
+        },
+        "base_qualifiers": {
+          "$ref": "#/$defs/EvidenceQualifiers"
+        },
+        "source_refs": {
+          "items": {
+            "$ref": "#/$defs/QuestionSourceRef"
+          },
+          "title": "Source Refs",
+          "type": "array"
+        },
+        "supersedes_evidence_ids": {
+          "default": [],
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Supersedes Evidence Ids",
+          "type": "array"
+        },
+        "introduced_dimension": {
+          "$ref": "#/$defs/QuestionDimension"
+        },
+        "target_hash": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Target Hash",
+          "type": "string"
+        }
+      },
+      "required": [
+        "target_ordinal",
+        "slot_kind",
+        "subject",
+        "evidence_kind",
+        "base_claim",
+        "claim_template",
+        "source_refs",
+        "introduced_dimension",
+        "target_hash"
+      ],
+      "title": "SlotQuestionTarget",
+      "type": "object"
+    },
+    "ThresholdSourceType": {
+      "enum": [
+        "employee_evidence",
+        "approved_policy",
+        "human"
+      ],
+      "title": "ThresholdSourceType",
+      "type": "string"
+    },
+    "TimeScope": {
+      "enum": [
+        "current",
+        "past",
+        "future",
+        "hypothetical",
+        "unknown"
+      ],
+      "title": "TimeScope",
+      "type": "string"
+    },
+    "TranscriptRole": {
+      "enum": [
+        "consultant",
+        "employee"
+      ],
+      "title": "TranscriptRole",
+      "type": "string"
+    },
+    "TranscriptTurn": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "transcript_turn.v1",
+          "default": "transcript_turn.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "turn_id": {
+          "format": "uuid",
+          "title": "Turn Id",
+          "type": "string"
+        },
+        "session_id": {
+          "format": "uuid",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "client_turn_id": {
+          "maxLength": 512,
+          "minLength": 1,
+          "title": "Client Turn Id",
+          "type": "string"
+        },
+        "sequence": {
+          "minimum": 1,
+          "title": "Sequence",
+          "type": "integer"
+        },
+        "role": {
+          "$ref": "#/$defs/TranscriptRole"
+        },
+        "text": {
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        },
+        "previous_turn_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Previous Turn Id"
+        },
+        "locale": {
+          "default": "zh-TW",
+          "pattern": "^[A-Za-z]{2,3}(?:-[A-Za-z0-9]{2,8})*$",
+          "title": "Locale",
+          "type": "string"
+        },
+        "occurred_at": {
+          "format": "date-time",
+          "title": "Occurred At",
+          "type": "string"
+        },
+        "received_at": {
+          "format": "date-time",
+          "title": "Received At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "turn_id",
+        "session_id",
+        "client_turn_id",
+        "sequence",
+        "role",
+        "text",
+        "occurred_at",
+        "received_at"
+      ],
+      "title": "TranscriptTurn",
+      "type": "object"
+    },
+    "TranscriptTurnAppendedEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "event_id": {
+          "format": "uuid",
+          "title": "Event Id",
+          "type": "string"
+        },
+        "session_id": {
+          "format": "uuid",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "command_id": {
+          "format": "uuid",
+          "title": "Command Id",
+          "type": "string"
+        },
+        "ordinal": {
+          "minimum": 0,
+          "title": "Ordinal",
+          "type": "integer"
+        },
+        "state_version": {
+          "minimum": 1,
+          "title": "State Version",
+          "type": "integer"
+        },
+        "occurred_at": {
+          "format": "date-time",
+          "title": "Occurred At",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "transcript_turn_appended_event.v1",
+          "default": "transcript_turn_appended_event.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "event_type": {
+          "const": "transcript.turn_appended",
+          "default": "transcript.turn_appended",
+          "title": "Event Type",
+          "type": "string"
+        },
+        "turn_id": {
+          "format": "uuid",
+          "title": "Turn Id",
+          "type": "string"
+        },
+        "turn_sequence": {
+          "minimum": 1,
+          "title": "Turn Sequence",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "event_id",
+        "session_id",
+        "command_id",
+        "ordinal",
+        "state_version",
+        "occurred_at",
+        "turn_id",
+        "turn_sequence"
+      ],
+      "title": "TranscriptTurnAppendedEvent",
+      "type": "object"
+    },
+    "TurnInsufficiencyCode": {
+      "enum": [
+        "ambiguous_frequency",
+        "ambiguous_ownership",
+        "ambiguous_subject",
+        "ambiguous_time_scope",
+        "contradiction_unresolved",
+        "correction_target_unknown",
+        "insufficient_detail",
+        "no_work_fact",
+        "answer_binding_ambiguous",
+        "question_frame_missing",
+        "question_frame_stale",
+        "question_frame_not_immediate",
+        "choice_selection_ambiguous"
+      ],
+      "title": "TurnInsufficiencyCode",
+      "type": "string"
+    },
+    "TurnInterpretationAppliedEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "event_id": {
+          "format": "uuid",
+          "title": "Event Id",
+          "type": "string"
+        },
+        "session_id": {
+          "format": "uuid",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "command_id": {
+          "format": "uuid",
+          "title": "Command Id",
+          "type": "string"
+        },
+        "ordinal": {
+          "minimum": 0,
+          "title": "Ordinal",
+          "type": "integer"
+        },
+        "state_version": {
+          "minimum": 1,
+          "title": "State Version",
+          "type": "integer"
+        },
+        "occurred_at": {
+          "format": "date-time",
+          "title": "Occurred At",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "turn_interpretation_applied_event.v1",
+          "default": "turn_interpretation_applied_event.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "event_type": {
+          "const": "turn.interpretation_applied",
+          "default": "turn.interpretation_applied",
+          "title": "Event Type",
+          "type": "string"
+        },
+        "interpretation_id": {
+          "format": "uuid",
+          "title": "Interpretation Id",
+          "type": "string"
+        },
+        "employee_turn_id": {
+          "format": "uuid",
+          "title": "Employee Turn Id",
+          "type": "string"
+        },
+        "operation_id": {
+          "format": "uuid",
+          "title": "Operation Id",
+          "type": "string"
+        },
+        "question_frame_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Question Frame Id"
+        },
+        "accepted_evidence_ids": {
+          "default": [],
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Accepted Evidence Ids",
+          "type": "array"
+        },
+        "dialogue_act": {
+          "$ref": "#/$defs/DialogueAct"
+        },
+        "episode_signal": {
+          "$ref": "#/$defs/EpisodeSignal"
+        },
+        "insufficiency_codes": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/TurnInsufficiencyCode"
+          },
+          "title": "Insufficiency Codes",
+          "type": "array"
+        }
+      },
+      "required": [
+        "event_id",
+        "session_id",
+        "command_id",
+        "ordinal",
+        "state_version",
+        "occurred_at",
+        "interpretation_id",
+        "employee_turn_id",
+        "operation_id",
+        "dialogue_act",
+        "episode_signal"
+      ],
+      "title": "TurnInterpretationAppliedEvent",
+      "type": "object"
+    },
+    "TurnInterpretationRecord": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "turn_interpretation_record.v1",
+          "default": "turn_interpretation_record.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "interpretation_id": {
+          "format": "uuid",
+          "title": "Interpretation Id",
+          "type": "string"
+        },
+        "session_id": {
+          "format": "uuid",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "employee_turn_id": {
+          "format": "uuid",
+          "title": "Employee Turn Id",
+          "type": "string"
+        },
+        "operation_id": {
+          "format": "uuid",
+          "title": "Operation Id",
+          "type": "string"
+        },
+        "question_frame_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Question Frame Id"
+        },
+        "question_frame_definition_hash": {
+          "anyOf": [
+            {
+              "pattern": "^sha256:[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Question Frame Definition Hash"
+        },
+        "context_packet_hash": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Context Packet Hash",
+          "type": "string"
+        },
+        "output_hash": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Output Hash",
+          "type": "string"
+        },
+        "verification_report_hash": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Verification Report Hash",
+          "type": "string"
+        },
+        "accepted_evidence_ids": {
+          "default": [],
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Accepted Evidence Ids",
+          "type": "array"
+        },
+        "dialogue_act": {
+          "$ref": "#/$defs/DialogueAct"
+        },
+        "episode_signal": {
+          "$ref": "#/$defs/EpisodeSignal"
+        },
+        "insufficiency_codes": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/TurnInsufficiencyCode"
+          },
+          "title": "Insufficiency Codes",
+          "type": "array"
+        },
+        "applied_at": {
+          "format": "date-time",
+          "title": "Applied At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "interpretation_id",
+        "session_id",
+        "employee_turn_id",
+        "operation_id",
+        "context_packet_hash",
+        "output_hash",
+        "verification_report_hash",
+        "dialogue_act",
+        "episode_signal",
+        "applied_at"
+      ],
+      "title": "TurnInterpretationRecord",
+      "type": "object"
+    },
+    "Typicality": {
+      "enum": [
+        "typical",
+        "occasional",
+        "exception",
+        "unknown"
+      ],
+      "title": "Typicality",
+      "type": "string"
+    },
+    "ValueLevel": {
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "title": "ValueLevel",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Reducer output; persisted verbatim as the immutable command-result artifact\n(V2-B §5.4),故需要固定 schema discriminator 與 committed JSON Schema。",
+  "properties": {
+    "schema_version": {
+      "const": "reduction_result.v2",
+      "default": "reduction_result.v2",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "state": {
+      "$ref": "#/$defs/InterviewState"
+    },
+    "events": {
+      "default": [],
+      "items": {
+        "discriminator": {
+          "mapping": {
+            "candidate.applied": "#/$defs/CandidateAppliedEvent",
+            "candidate.transitioned": "#/$defs/CandidateTransitionedEvent",
+            "episode.opened": "#/$defs/EpisodeOpenedEvent",
+            "episode.transitioned": "#/$defs/EpisodeTransitionedEvent",
+            "evidence.observed": "#/$defs/EvidenceObservedEvent",
+            "evidence.superseded": "#/$defs/EvidenceSupersededEvent",
+            "evidence.withdrawn": "#/$defs/EvidenceWithdrawnEvent",
+            "gap.proposed": "#/$defs/GapProposedEvent",
+            "gap.transitioned": "#/$defs/GapTransitionedEvent",
+            "inference.applied": "#/$defs/InferenceAppliedEvent",
+            "inference.superseded": "#/$defs/InferenceSupersededEvent",
+            "inference.transitioned": "#/$defs/InferenceTransitionedEvent",
+            "question_frame.answer_bound": "#/$defs/QuestionFrameAnswerBoundEvent",
+            "question_frame.consumed": "#/$defs/QuestionFrameConsumedEvent",
+            "question_frame.opened": "#/$defs/QuestionFrameOpenedEvent",
+            "question_frame.staled": "#/$defs/QuestionFrameStaledEvent",
+            "question_frame.superseded": "#/$defs/QuestionFrameSupersededEvent",
+            "review.applied": "#/$defs/ReviewDecisionAppliedEvent",
+            "session.transitioned": "#/$defs/SessionTransitionedEvent",
+            "transcript.turn_appended": "#/$defs/TranscriptTurnAppendedEvent",
+            "turn.interpretation_applied": "#/$defs/TurnInterpretationAppliedEvent"
+          },
+          "propertyName": "event_type"
+        },
+        "oneOf": [
+          {
+            "$ref": "#/$defs/SessionTransitionedEvent"
+          },
+          {
+            "$ref": "#/$defs/TranscriptTurnAppendedEvent"
+          },
+          {
+            "$ref": "#/$defs/EvidenceObservedEvent"
+          },
+          {
+            "$ref": "#/$defs/EvidenceSupersededEvent"
+          },
+          {
+            "$ref": "#/$defs/EvidenceWithdrawnEvent"
+          },
+          {
+            "$ref": "#/$defs/EpisodeOpenedEvent"
+          },
+          {
+            "$ref": "#/$defs/EpisodeTransitionedEvent"
+          },
+          {
+            "$ref": "#/$defs/GapProposedEvent"
+          },
+          {
+            "$ref": "#/$defs/GapTransitionedEvent"
+          },
+          {
+            "$ref": "#/$defs/InferenceAppliedEvent"
+          },
+          {
+            "$ref": "#/$defs/InferenceTransitionedEvent"
+          },
+          {
+            "$ref": "#/$defs/InferenceSupersededEvent"
+          },
+          {
+            "$ref": "#/$defs/CandidateAppliedEvent"
+          },
+          {
+            "$ref": "#/$defs/CandidateTransitionedEvent"
+          },
+          {
+            "$ref": "#/$defs/QuestionFrameOpenedEvent"
+          },
+          {
+            "$ref": "#/$defs/QuestionFrameAnswerBoundEvent"
+          },
+          {
+            "$ref": "#/$defs/QuestionFrameConsumedEvent"
+          },
+          {
+            "$ref": "#/$defs/QuestionFrameSupersededEvent"
+          },
+          {
+            "$ref": "#/$defs/QuestionFrameStaledEvent"
+          },
+          {
+            "$ref": "#/$defs/TurnInterpretationAppliedEvent"
+          },
+          {
+            "$ref": "#/$defs/ReviewDecisionAppliedEvent"
+          }
+        ]
+      },
+      "title": "Events",
+      "type": "array"
+    },
+    "reason_code": {
+      "$ref": "#/$defs/ReasonCode"
+    },
+    "idempotent": {
+      "default": false,
+      "title": "Idempotent",
+      "type": "boolean"
+    },
+    "state_hash": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "State Hash",
+      "type": "string"
+    }
+  },
+  "required": [
+    "state",
+    "reason_code",
+    "state_hash"
+  ],
+  "title": "Caliburn interview vNext reduction result v2",
+  "type": "object",
+  "$id": "https://caliburn.local/schemas/reduction-result.v2.schema.json"
+}

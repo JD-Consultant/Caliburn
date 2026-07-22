@@ -1,0 +1,857 @@
+{
+  "$defs": {
+    "FailureKind": {
+      "enum": [
+        "transport_timeout",
+        "transport_error",
+        "rate_limited",
+        "authentication_failed",
+        "invalid_request",
+        "provider_unavailable",
+        "cancelled",
+        "output_schema_invalid",
+        "output_parse_failed",
+        "resolved_model_mismatch",
+        "unknown_provider_failure",
+        "runtime_binding_mismatch"
+      ],
+      "title": "FailureKind",
+      "type": "string"
+    },
+    "FinishReason": {
+      "enum": [
+        "completed",
+        "max_output_tokens",
+        "context_window_exceeded",
+        "stop_sequence",
+        "tool_use",
+        "paused",
+        "safety_refusal",
+        "cancelled",
+        "provider_error",
+        "unknown"
+      ],
+      "title": "FinishReason",
+      "type": "string"
+    },
+    "ModelOutcome": {
+      "enum": [
+        "succeeded",
+        "refused",
+        "incomplete",
+        "failed"
+      ],
+      "title": "ModelOutcome",
+      "type": "string"
+    },
+    "TokenUsage": {
+      "additionalProperties": false,
+      "properties": {
+        "input_tokens": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Input Tokens"
+        },
+        "output_tokens": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Output Tokens"
+        },
+        "cache_read_tokens": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Cache Read Tokens"
+        },
+        "cache_write_tokens": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Cache Write Tokens"
+        },
+        "reasoning_tokens": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reasoning Tokens"
+        },
+        "limitations": {
+          "default": [],
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Limitations",
+          "type": "array"
+        }
+      },
+      "title": "TokenUsage",
+      "type": "object"
+    },
+    "TrialAttemptRecord": {
+      "additionalProperties": false,
+      "properties": {
+        "attempt": {
+          "minimum": 1,
+          "title": "Attempt",
+          "type": "integer"
+        },
+        "outcome": {
+          "$ref": "#/$defs/ModelOutcome"
+        },
+        "finish_reason": {
+          "$ref": "#/$defs/FinishReason"
+        },
+        "failure_kind": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FailureKind"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "reason_code": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reason Code"
+        },
+        "retryable": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Retryable"
+        },
+        "resolved_model": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Resolved Model"
+        },
+        "provider_request_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Provider Request Id"
+        },
+        "generation_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Generation Id"
+        },
+        "usage": {
+          "$ref": "#/$defs/TokenUsage"
+        },
+        "observed_cost_usd": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Observed Cost Usd"
+        },
+        "latency_ms": {
+          "minimum": 0,
+          "title": "Latency Ms",
+          "type": "integer"
+        },
+        "had_schema_repair": {
+          "default": false,
+          "title": "Had Schema Repair",
+          "type": "boolean"
+        },
+        "route": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TrialRouteEvidence"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "attempt",
+        "outcome",
+        "finish_reason",
+        "usage",
+        "latency_ms"
+      ],
+      "title": "TrialAttemptRecord",
+      "type": "object"
+    },
+    "TrialDisposition": {
+      "enum": [
+        "quality_scored",
+        "infrastructure_invalid",
+        "harness_invalid",
+        "cancelled"
+      ],
+      "title": "TrialDisposition",
+      "type": "string"
+    },
+    "TrialRouteEvidence": {
+      "additionalProperties": false,
+      "description": "Normalized routing summary; the authoritative artifact stays in Capture.",
+      "properties": {
+        "metadata_present": {
+          "title": "Metadata Present",
+          "type": "boolean"
+        },
+        "strategy": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Strategy"
+        },
+        "selected_provider_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Selected Provider Name"
+        },
+        "selected_model": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Selected Model"
+        },
+        "single_upstream_attempt": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Single Upstream Attempt"
+        },
+        "pipeline_clean": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Pipeline Clean"
+        },
+        "failures": {
+          "default": [],
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Failures",
+          "type": "array"
+        }
+      },
+      "required": [
+        "metadata_present"
+      ],
+      "title": "TrialRouteEvidence",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "turn_eval_trial.v2",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "trial_id": {
+      "format": "uuid",
+      "title": "Trial Id",
+      "type": "string"
+    },
+    "case_id": {
+      "maxLength": 64,
+      "pattern": "^TI-[0-9]{2}-[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "title": "Case Id",
+      "type": "string"
+    },
+    "slot_index": {
+      "maximum": 3,
+      "minimum": 1,
+      "title": "Slot Index",
+      "type": "integer"
+    },
+    "trial_attempt": {
+      "maximum": 3,
+      "minimum": 1,
+      "title": "Trial Attempt",
+      "type": "integer"
+    },
+    "runtime_input_hash": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Runtime Input Hash",
+      "type": "string"
+    },
+    "evaluation_contract_hash": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Evaluation Contract Hash",
+      "type": "string"
+    },
+    "tenant_id": {
+      "format": "uuid",
+      "title": "Tenant Id",
+      "type": "string"
+    },
+    "user_id": {
+      "format": "uuid",
+      "title": "User Id",
+      "type": "string"
+    },
+    "profile_id": {
+      "format": "uuid",
+      "title": "Profile Id",
+      "type": "string"
+    },
+    "session_id": {
+      "format": "uuid",
+      "title": "Session Id",
+      "type": "string"
+    },
+    "run_id": {
+      "format": "uuid",
+      "title": "Run Id",
+      "type": "string"
+    },
+    "operation_id": {
+      "format": "uuid",
+      "title": "Operation Id",
+      "type": "string"
+    },
+    "started_at": {
+      "format": "date-time",
+      "title": "Started At",
+      "type": "string"
+    },
+    "completed_at": {
+      "format": "date-time",
+      "title": "Completed At",
+      "type": "string"
+    },
+    "disposition": {
+      "$ref": "#/$defs/TrialDisposition"
+    },
+    "included_in_quality_denominator": {
+      "title": "Included In Quality Denominator",
+      "type": "boolean"
+    },
+    "had_infrastructure_retry": {
+      "default": false,
+      "title": "Had Infrastructure Retry",
+      "type": "boolean"
+    },
+    "terminal_run_status": {
+      "anyOf": [
+        {
+          "enum": [
+            "open",
+            "completed",
+            "failed"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Terminal Run Status"
+    },
+    "terminal_checkpoint_status": {
+      "anyOf": [
+        {
+          "maxLength": 128,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Terminal Checkpoint Status"
+    },
+    "terminal_outcome": {
+      "anyOf": [
+        {
+          "enum": [
+            "committed",
+            "failed",
+            "pending"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Terminal Outcome"
+    },
+    "terminal_reason_code": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Terminal Reason Code"
+    },
+    "attempts": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/TrialAttemptRecord"
+      },
+      "title": "Attempts",
+      "type": "array"
+    },
+    "requested_model": {
+      "minLength": 1,
+      "title": "Requested Model",
+      "type": "string"
+    },
+    "context_hash": {
+      "anyOf": [
+        {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Context Hash"
+    },
+    "prompt_hash": {
+      "anyOf": [
+        {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Prompt Hash"
+    },
+    "output_schema_hash": {
+      "anyOf": [
+        {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Output Schema Hash"
+    },
+    "operation_definition_hash": {
+      "anyOf": [
+        {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Operation Definition Hash"
+    },
+    "provider_config_hash": {
+      "anyOf": [
+        {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Provider Config Hash"
+    },
+    "model_catalog_hash": {
+      "anyOf": [
+        {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Model Catalog Hash"
+    },
+    "endpoint_catalog_hash": {
+      "anyOf": [
+        {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Endpoint Catalog Hash"
+    },
+    "state_before_hash": {
+      "anyOf": [
+        {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "State Before Hash"
+    },
+    "state_after_hash": {
+      "anyOf": [
+        {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "State After Hash"
+    },
+    "accepted_evidence_ids": {
+      "default": [],
+      "items": {
+        "format": "uuid",
+        "type": "string"
+      },
+      "title": "Accepted Evidence Ids",
+      "type": "array"
+    },
+    "verifier_accepted_count": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Verifier Accepted Count"
+    },
+    "verifier_dropped_count": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Verifier Dropped Count"
+    },
+    "verifier_reason_codes": {
+      "default": [],
+      "items": {
+        "maxLength": 128,
+        "minLength": 1,
+        "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+        "type": "string"
+      },
+      "title": "Verifier Reason Codes",
+      "type": "array"
+    },
+    "usage_input_tokens": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Usage Input Tokens"
+    },
+    "usage_output_tokens": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Usage Output Tokens"
+    },
+    "usage_cache_read_tokens": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Usage Cache Read Tokens"
+    },
+    "usage_cache_write_tokens": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Usage Cache Write Tokens"
+    },
+    "usage_reasoning_tokens": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Usage Reasoning Tokens"
+    },
+    "observed_cost_total_usd": {
+      "anyOf": [
+        {
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Observed Cost Total Usd"
+    },
+    "latency_total_ms": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Latency Total Ms"
+    },
+    "capture_manifest_artifact_id": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Capture Manifest Artifact Id"
+    },
+    "capture_event_count": {
+      "anyOf": [
+        {
+          "minimum": 1,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Capture Event Count"
+    },
+    "capture_last_event_hash": {
+      "anyOf": [
+        {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Capture Last Event Hash"
+    },
+    "limitations": {
+      "default": [],
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Limitations",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "trial_id",
+    "case_id",
+    "slot_index",
+    "trial_attempt",
+    "runtime_input_hash",
+    "evaluation_contract_hash",
+    "tenant_id",
+    "user_id",
+    "profile_id",
+    "session_id",
+    "run_id",
+    "operation_id",
+    "started_at",
+    "completed_at",
+    "disposition",
+    "included_in_quality_denominator",
+    "requested_model"
+  ],
+  "title": "Caliburn interview vNext turn eval trial record v2",
+  "type": "object",
+  "$id": "https://caliburn.local/schemas/turn-eval-trial.v2.schema.json"
+}

@@ -1,6 +1,6 @@
 # Interview AI vNext V3-5A R5-BC——Domain、Context 與 Turn Interpreter 原子 Hard Cut 實作交接規格
 
-- 狀態：**Approved / planned；實作尚未開始；TI-09/TI-10 prior-turn replay 阻斷已裁決於 §15.3**
+- 狀態：**Completed locally；Phase 3.5、Phase 4 與全部驗收 gate 已完成，交付於包含本文件的 single atomic commit；TI-09/TI-10 prior-turn replay 依 §15.3 裁決落地**
 - 日期：2026-07-22
 - 前置完成：R5-A `bf35137`、R5-A corrective `09f406a`、corrective status `195c6a3`
 - 分支 baseline：`research/llm-interview-integration`，文件建立時 HEAD `195c6a3`
@@ -11,6 +11,7 @@
 
 - [`2026-07-20-interview-vnext-v3-5a-r5-grounded-short-answer-amendment-plan.md`](2026-07-20-interview-vnext-v3-5a-r5-grounded-short-answer-amendment-plan.md)
 - [`../adr/0037-interview-vnext-question-frame-contextual-evidence-and-employee-authority.md`](../adr/0037-interview-vnext-question-frame-contextual-evidence-and-employee-authority.md)
+- Code-review corrective：[`2026-07-22-interview-vnext-v3-5a-r5-bc-phase-3-5-corrective-plan.md`](2026-07-22-interview-vnext-v3-5a-r5-bc-phase-3-5-corrective-plan.md)——已完成 Phase 3.5 production closure、Phase 4 eval hard cut 與最終 gates
 - [`2026-07-21-interview-vnext-v3-5a-r5-a-corrective-contract-closure-plan.md`](2026-07-21-interview-vnext-v3-5a-r5-a-corrective-contract-closure-plan.md)
 - [`2026-07-18-interview-vnext-v3-5a-runtime-contract-reconstruction-plan.md`](2026-07-18-interview-vnext-v3-5a-runtime-contract-reconstruction-plan.md)
 
@@ -1058,23 +1059,23 @@ bundle/migration 0011進 staged files。
 
 ## 21. Definition of Done
 
-- [ ] Evidence.v3/State.v3/commands/events/reduction唯一 active，v1/v2 historical frozen；
-- [ ] QuestionFrame從 consultant append到employee bind/consume/stale/supersede完整閉合；
-- [ ] literal/contextual support全 consumer可區分，contextual「是」不偽裝 literal claim；
-- [ ] input/output/report v2無 domain identity且 deterministic；
-- [ ] zero-Evidence success有 receipt/state/event，不走 no-op；
-- [ ] provider/operation failure無 receipt；
-- [ ] context state version/hash參與 CAS，stale fail closed不 rebase；
-- [ ] recovery不重打已完成 provider call、不重複 domain writes；
-- [ ] persistence正確區分 unsupported major與 corruption；
-- [ ] eval v2 suite/11 schemas/hash完成機械 hard cut，舊 v1 frozen；
-- [ ] TI-09/TI-10 seeded prior interpretations先於下一 consultant落地，State invariant未放寬、transcript語意未改；
-- [ ] R4 OpenRouter/OpenAI reference regression不漂；
-- [ ] minimum Capture roots閉合；
-- [ ] focused、full no-network、全部 vNext real PG gates全綠；
-- [ ] Alembic仍0010，無新 dependency、secret、paid live、production/Web/editor改動；
-- [ ] code只在全部 gate綠後以一個 atomic commit提交，作者/提交者只顯示專案 owner；
-- [ ] 未 push。
+- [x] Evidence.v3/State.v3/commands/events/reduction唯一 active，v1/v2 historical frozen；
+- [x] QuestionFrame從 consultant append到employee bind/consume/stale/supersede完整閉合；
+- [x] literal/contextual support全 consumer可區分，contextual「是」不偽裝 literal claim；
+- [x] input/output/report v2無 domain identity且 deterministic；
+- [x] zero-Evidence success有 receipt/state/event，不走 no-op；
+- [x] provider/operation failure無 receipt；
+- [x] context state version/hash參與 CAS，stale fail closed不 rebase；
+- [x] recovery不重打已完成 provider call、不重複 domain writes；
+- [x] persistence正確區分 unsupported major與 corruption；
+- [x] eval v2 suite、11份v2 contract schema、1份prior-seed schema與suite hash完成hard cut，舊11份v1 frozen；
+- [x] TI-09/TI-10 seeded prior interpretations先於下一 consultant落地，State invariant未放寬、transcript語意未改；
+- [x] R4 OpenRouter/OpenAI reference regression不漂；
+- [x] minimum Capture roots閉合；
+- [x] focused、full no-network、完整API＋real PostgreSQL gates全綠；
+- [x] Alembic仍0010，無新 dependency、secret、paid live、production/Web/editor改動；
+- [x] code只在全部 gate綠後以一個 atomic commit提交，作者/提交者只顯示專案 owner；
+- [x] 未 push。
 
 全部成立才解鎖 R5-D correctness closure。R5-D 完成後才可做 R5-E status handoff；R6才做真模型多 trial品質判斷。
 
@@ -1104,3 +1105,70 @@ bundle/migration 0011進 staged files。
 20. DB/container/output cleanup狀態；
 21. 未完成項、是否解鎖 R5-D；
 22. 明確確認未跑 paid live、未接 production/Web/editor、未 push。
+
+---
+
+## 23. 2026-07-22 最終實作與驗收紀錄
+
+### 23.1 成品邊界
+
+本次只完成專業顧問產品所需的「單輪回答落地層」：系統保存顧問問題的 QuestionFrame，將員工的長答、短答、
+更正、否認與不知道轉成有來源的 Evidence，並且每個成功處理的 employee turn 都留下 receipt。這些 Evidence 才是後續
+工作任務、工作產出、行為指標與 K/S 草稿的可靠輸入。R5-BC **沒有**加入公司／租戶模型、SaaS、完整 JD synthesis、
+editor 共編、通用 agent framework 或新的 provider abstraction；這些不是本 atomic hard cut 的必要條件。
+
+### 23.2 唯一 active contracts
+
+- Domain：`evidence.v3`、`interview_state.v3`、`domain_event.v2`、`reduction_result.v2`；舊 major 只讀歷史資料，
+  不存在 dual-write／dual-active shim。
+- LLM：Context／Input／Output／Verification Report 全為 v2；prompt、context policy、verifier policy 與 operation
+  均為 `2.0.0`。
+- Application：`turn-interpret-execution-outcome.v2`；成功結果只有
+  `EVIDENCE_AND_RECEIPT` 或 `RECEIPT_ONLY`，generic no-op 退役。
+- Eval：suite `turn-interpret-c1-v2-pilot.v1`，12 cases（8 development＋4 challenge），frozen suite hash
+  `sha256:5f60255dd323cd6c458b4ced7e067ca0a6c48cb9b3d2b5765bce8fada7a9bcc5`。
+
+主要 identity hashes：
+
+| Identity | Canonical hash |
+|---|---|
+| operation `turn.interpret/2.0.0` | `sha256:efa6523519cae5c4db14a7ddf6141657e073dcc8115b12d395b9e77f74963a4c` |
+| context policy `turn-interpret/2.0.0` | `sha256:09468ace1f0564da5a7b1387fc8066a96275590554cc5cafd77274ebaa2b87f3` |
+| verifier policy `turn-interpret-verifier/2.0.0` | `sha256:baf2180e3e10940c80c602a91b47ff7e9aec37fa9eb85febcc4b24e8b9d4474b` |
+| prompt `turn-interpret/2.0.0` | `sha256:a25438b3a2673f0b8da5ff417f9916cddebbe74204b75ff3506a40e05be41893` |
+
+### 23.3 關鍵行為證據
+
+- literal 與 contextual support 分開保存；員工回答「是」時保留 QuestionFrame 的問題語境，不偽造一段員工沒說過的
+  literal claim。
+- zero-Evidence／不知道／無法判定仍建立 receipt、消耗 frame 並推進 state；provider、schema 或 conformance failure
+  不建立 receipt。
+- Context 的 `state_version`＋`state_hash` 是 transaction CAS authority；prepare 前、provider call 中與 commit 前的 stale
+  race 都 fail closed 為 `state_context_stale`，不自動 rebase。
+- TI-09／TI-10 以 eval-only、deterministic prior operation interleaved replay 建立前輪 receipt/Evidence；production invariant
+  未放寬，transcript 的更正語意未改。
+- provider wire success＋eligible conformance 後若本地 output schema 驗證失敗，failure authority 正確歸於本地
+  `output_schema_invalid`；不誤報 provider conformance failure，也不讓 raw validation exception 外洩。
+- Capture terminal event refs 與 manifest roots 封住 request、result、execution evidence、conformance、verification、receipt／
+  state artifacts；missing／wrong-hash roots 會拒絕 finalize。
+
+### 23.4 Exact gates
+
+| Gate | Result |
+|---|---|
+| contracts/schema combined | `43 passed` |
+| eval loader | `30 passed` |
+| 12-case fixture/reference gate | `9 passed` |
+| graders/review | `29 passed` |
+| OpenRouter＋OpenAI reference adapters | `184 passed` |
+| mocked provider live probes | `18 passed` |
+| real PostgreSQL turn eval | `5 passed / 0 skipped` |
+| real PostgreSQL runner/Capture | `14 passed / 0 skipped` |
+| real PostgreSQL mocked OpenRouter batch/CLI | `16 passed / 0 skipped` |
+| all `test_interview_vnext_*`, no-network | `794 passed / 87 skipped / 0 failed` |
+| full API, no-network | `1071 passed / 198 skipped / 0 failed` |
+| full API＋real PostgreSQL | `1269 passed / 0 skipped / 0 failed` |
+
+Domain／LLM／application／eval schema writers均已重跑；active schema deterministic、historical files未改寫。Alembic
+`current`／`heads`維持 `0010 (head)`，沒有0011或新dependency。沒有呼叫paid live、沒有production route／Web／editor
+整合、沒有provider promotion、沒有push。R5-D correctness closure可開始；真模型多-trial品質裁決仍留給R6。

@@ -1,17 +1,18 @@
 # Interview AI vNext（隔離開發中）
 
-本 package 是 ADR 0034 的隔離 greenfield 實作區。V0～V3-5 harness與V3-5A R1–R4（含correctives）已完成；
-R5-A inactive domain contracts已由`bf35137`落地，其review corrective已由`09f406a`完成，no-network為
-`1020 passed / 197 skipped / 0 failed`、real PostgreSQL focused `64 passed / 0 skipped / 0 failed`。
-owner已核准 ADR 0037；R5不再依 mother plan舊§9的literal-only短答設計，而使用 persisted QuestionFrame、
-AnswerBinding、Evidence.v3 literal/contextual support、每turn receipt、frequency/time分離與state-version CAS。
-`QuoteSpan`／`QuoteMatch`的唯一owner是`domain/support.py`，依賴方向固定為`evidence -> support`（AST guard＋
-fresh-process測試鎖住，禁止late import／forward-ref／雙份class）；QuestionFrame已拒絕`closed_at < opened_at`。
-Code audit確認Domain hard cut無法與Context／Interpreter／Executor分開提交而維持frozen schema與full suite全綠，因此
-**R5-B＋R5-C已合併為R5-BC並解鎖**（實作仍未開始；禁止dual-active shim）。舊 true-live batch
-`5bad4e3f-...`因route contamination停線，沒有模型品質裁決；paid live、V3-6、production route/Web與promotion仍 blocked。
-migration仍為0010八張表，不得新增0011。這個package仍沒有production route/live provider call，eval adapter未被production
-composition root import；現行使用者流量仍走`app/interview/` v3。
+本 package 是 ADR 0034 的隔離 greenfield 實作區。V0～V3-5 harness、V3-5A R1–R4（含correctives）、R5-A與
+**R5-BC grounded turn interpretation hard cut**均已完成。R5-BC 的完整 API no-network gate為
+`1071 passed / 198 skipped / 0 failed`，完整 API＋real PostgreSQL為`1269 passed / 0 skipped / 0 failed`。
+
+R5-BC 現行路徑使用persisted QuestionFrame、AnswerBinding、Evidence.v3 literal/contextual support、每個成功employee turn
+一筆receipt、frequency/time分離與state-version/hash CAS。模型只提出不帶domain identity的v2 proposals；application依
+sealed verifier policy決定接受或拒絕，再由operation-local位置產生Evidence identity。零Evidence不是失敗或no-op：不知道、
+無法判定等回答仍留下`RECEIPT_ONLY`，而provider/schema/conformance失敗不會偽造receipt。
+
+這一層的產品責任，是把員工訪談回答轉成可追溯、可更正的JD證據；它還不是完整JD synthesis或共編UI。此次沒有加入
+公司／租戶、SaaS、通用agent framework、production route或Web/editor整合。migration仍為0010八張表，eval adapter未被
+production composition root import；現行使用者流量仍走`app/interview/` v3。舊true-live batch `5bad4e3f-...`不具模型
+品質裁決資格；paid live、V3-6、production promotion仍blocked，下一個工程切片是R5-D correctness closure。
 
 權威文件：
 
@@ -20,9 +21,9 @@ composition root import；現行使用者流量仍走`app/interview/` v3。
 - Runtime binding/Turn v2決策：[`../../../../docs/adr/0036-interview-vnext-provider-binding-conformance-and-idless-turn-v2.md`](../../../../docs/adr/0036-interview-vnext-provider-binding-conformance-and-idless-turn-v2.md)
 - Grounded short-answer／employee authority決策：[`../../../../docs/adr/0037-interview-vnext-question-frame-contextual-evidence-and-employee-authority.md`](../../../../docs/adr/0037-interview-vnext-question-frame-contextual-evidence-and-employee-authority.md)
 - V3-5A實作交接：[`../../../../docs/plans/2026-07-18-interview-vnext-v3-5a-runtime-contract-reconstruction-plan.md`](../../../../docs/plans/2026-07-18-interview-vnext-v3-5a-runtime-contract-reconstruction-plan.md)
-- R5 grounded short-answer詳細交接（Approved/in progress）：[`../../../../docs/plans/2026-07-20-interview-vnext-v3-5a-r5-grounded-short-answer-amendment-plan.md`](../../../../docs/plans/2026-07-20-interview-vnext-v3-5a-r5-grounded-short-answer-amendment-plan.md)
+- R5 grounded short-answer詳細交接（R5-BC已完成）：[`../../../../docs/plans/2026-07-20-interview-vnext-v3-5a-r5-grounded-short-answer-amendment-plan.md`](../../../../docs/plans/2026-07-20-interview-vnext-v3-5a-r5-grounded-short-answer-amendment-plan.md)
 - R5-A review corrective（R5-B前置）：[`../../../../docs/plans/2026-07-21-interview-vnext-v3-5a-r5-a-corrective-contract-closure-plan.md`](../../../../docs/plans/2026-07-21-interview-vnext-v3-5a-r5-a-corrective-contract-closure-plan.md)
-- R5-BC Domain／Context／Interpreter原子hard cut（Approved/planned）：[`../../../../docs/plans/2026-07-22-interview-vnext-v3-5a-r5-bc-domain-context-hard-cut-plan.md`](../../../../docs/plans/2026-07-22-interview-vnext-v3-5a-r5-bc-domain-context-hard-cut-plan.md)
+- R5-BC Domain／Context／Interpreter原子hard cut（completed，§23為交付證據）：[`../../../../docs/plans/2026-07-22-interview-vnext-v3-5a-r5-bc-domain-context-hard-cut-plan.md`](../../../../docs/plans/2026-07-22-interview-vnext-v3-5a-r5-bc-domain-context-hard-cut-plan.md)
 - R3-C修正交接：[`../../../../docs/plans/2026-07-19-interview-vnext-v3-5a-r3-corrective-plan.md`](../../../../docs/plans/2026-07-19-interview-vnext-v3-5a-r3-corrective-plan.md)
 - R4 provider evidence/conformance交接（已完成，§19 為執行結果）：[`../../../../docs/plans/2026-07-19-interview-vnext-v3-5a-r4-provider-evidence-conformance-plan.md`](../../../../docs/plans/2026-07-19-interview-vnext-v3-5a-r4-provider-evidence-conformance-plan.md)
 - V2 研究：[`../../../../docs/specs/2026-07-16-interview-vnext-v2-provider-capture-research.md`](../../../../docs/specs/2026-07-16-interview-vnext-v2-provider-capture-research.md)
@@ -41,13 +42,13 @@ composition root import；現行使用者流量仍走`app/interview/` v3。
 
 ```text
 domain/                 已實作：純 Pydantic contracts、validators、reducers、domain events、schemas
-application/            已實作(V2-B/V3-0/V3-1/V3-2/V3-3)：async persistence ports、apply_durable_command、
-                        durable operations(prepare/attempt/verify/commit/fail/no-op)、
-                        typed no-op result/application schema、crash recovery、pure ContextBuilder、
-                        turn input projection/proposal verifier/Evidence mapping、explicit turn executor
+application/            已實作至R5-BC：async persistence ports、apply_durable_command、
+                        durable operations(prepare/attempt/verify/commit/fail)、receipt＋state CAS、
+                        outcome v2、crash recovery、pure ContextBuilder、QuestionFrame-aware verifier、
+                        Evidence mapping與explicit turn executor
 llm/                    已實作：neutral operation/request/result/failure、registry、scripted fake、
-                        V3-1 context contracts/policies、V3-2 turn contracts/portable schema/
-                        prompt/operation/verifier policy、schemas
+                        Context／Turn contracts v2、portable schema、prompt/context/verifier policy
+                        與operation 2.0.0、historical schemas
 providers/              空殼：尚未接 OpenAI/Anthropic SDK或模型
 knowledge/              空殼：尚未接 reference snapshot
 persistence/            已實作(V2-B)：ORM rows、migration 0010、serialization、repositories、
@@ -255,7 +256,11 @@ transition會拒絕跳步、時間倒退或 terminal改寫；重送相同 artifa
 
 超過hard byte/item cap時不做first-N、摘要或文字截斷；`ContextBudgetExceeded`帶回完整未截斷packet/manifest與failing budget，且不得呼叫模型。修改policy必須建立新semver文件並以eval/ablation證明，不能原地覆寫`1.0.0`。
 
-## V3-2 Turn Interpreter contract與verifier（已完成，2026-07-17）
+## V3-2 Turn Interpreter contract與verifier（歷史基線，已由R5-BC v2取代）
+
+> 本節保留2026-07-17的v1設計脈絡，不是目前active contract。現行使用位置式`proposal_ref`／`binding_ref`、
+> application派生的candidate Evidence IDs、`TurnInterpretVerificationReport.v2`與
+> `turn-interpret-verifier/2.0.0`；模型不再產生`proposal_key`。
 
 `llm/turn_interpret.py`把模型權限限制為proposal。模型可輸出atomic observation、user/episode signal、emergent topic與insufficiency；不可輸出`evidence_id`、session/turn ID、span、status、extractor ID或DB action。`proposal_key`只在單次operation內有效，application固定用：
 
@@ -282,7 +287,10 @@ prompt `turn-interpret.1.0.0.md`固定authority/input/extraction/unknown/injecti
 
 Deterministic verifier只能證明provenance、格式與明確hard rules，不能單靠字串規則證明自然語言claim完整蘊含於quote；semantic precision/recall仍必須由V3-5多case、多trial graders與人工failure review量測。V3-2通過不等於模型品質已通過。
 
-## V3-3 Fixed-replay durable executor（已完成，2026-07-17）
+## V3-3 Fixed-replay durable executor（歷史基線，已由R5-BC outcome v2取代）
+
+> 本節的no-op與generic VERIFIED conflict是R5前行為。現行成功一定建立turn receipt，結果為
+> `EVIDENCE_AND_RECEIPT`或`RECEIPT_ONLY`；state變動會terminal fail為`state_context_stale`。
 
 `application/operation_executor.py`實作單一顯式`execute_turn_interpret()`，不是萬用agent runner。固定順序為：hydrate persisted state → ContextBuilder → 保存prompt/schema/context/manifest/input/request artifacts → prepare checkpoint → claim attempt → transaction外呼叫`LlmPort` → 保存provider artifacts/result → parse/verify → Evidence或typed no-op atomic commit。Operation definition必須等於目前committed `turn.interpret/1.0.0`；hash不同不接手舊checkpoint。
 
@@ -332,7 +340,9 @@ V3-3 PostgreSQL tests涵蓋happy/partial/no-op、duplicate committed replay、�
 
 ## JSON Schema
 
-committed schema 目前共 42 份：`domain/schemas/` 25 份、`application/schemas/` 1 份、`llm/schemas/` 10 份、`observability/schemas/` 6 份。檔名與 `$id` 都有 major version。V1-B完成時是24份domain schema，V2-B為durable command result新增`reduction-result.v1`後成為25份；這裡記的是目前實際檔案數。修改 Pydantic contract 後執行：
+committed schema 在R5-BC完成後共67份：`domain/schemas/` 35份、`application/schemas/` 2份、
+`llm/schemas/` 23份、`observability/schemas/` 7份。檔名與`$id`都有major version；舊major是不可改寫的historical
+contract，runtime只有R5-BC表列的active major。修改Pydantic contract後執行：
 
 ```powershell
 cd apps/api

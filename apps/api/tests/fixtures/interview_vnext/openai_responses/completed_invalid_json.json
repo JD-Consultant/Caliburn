@@ -15,7 +15,7 @@
       "content": [
         {
           "type": "output_text",
-          "text": "```json\n{\"schema_version\": \"turn_interpret_output.v1\"\n",
+          "text": "```json\n{\"schema_version\": \"turn_interpret_output.v2\"\n",
           "annotations": []
         }
       ]

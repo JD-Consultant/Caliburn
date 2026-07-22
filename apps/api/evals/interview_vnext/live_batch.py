@@ -23,10 +23,10 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from app.interview_vnext.domain.hashing import canonical_json
 from app.interview_vnext.domain.state import InterviewState
-from app.interview_vnext.llm.context import TURN_INTERPRET_CONTEXT_POLICY_V1
+from app.interview_vnext.llm.context import TURN_INTERPRET_CONTEXT_POLICY_V2
 from app.interview_vnext.llm.operation_documents import turn_interpret_operation
 from app.interview_vnext.llm.turn_interpret import (
-    TURN_INTERPRET_VERIFIER_POLICY_V1,
+    TURN_INTERPRET_VERIFIER_POLICY_V2,
     TurnInterpretOutput,
     TurnInterpretVerificationReport,
 )
@@ -181,8 +181,8 @@ def _build_plan(
         operation_definition_hash=operation.definition_hash,
         prompt_hash=operation.prompt_template.content_hash,
         output_schema_hash=operation.output_contract.content_hash,
-        context_policy_hash=TURN_INTERPRET_CONTEXT_POLICY_V1.policy_hash,
-        verifier_policy_hash=TURN_INTERPRET_VERIFIER_POLICY_V1.policy_hash,
+        context_policy_hash=TURN_INTERPRET_CONTEXT_POLICY_V2.policy_hash,
+        verifier_policy_hash=TURN_INTERPRET_VERIFIER_POLICY_V2.policy_hash,
         provider=config.provider,
         provider_config_hash=config.config_hash,
         requested_model=config.requested_model,
@@ -542,7 +542,11 @@ def _score_trial(
     decisions = edge_decision_map(imported, review_items)
     edges = (
         build_candidate_edges(
-            inputs, evaluation.gold, output, trial_id=trial.trial_id
+            inputs,
+            evaluation.gold,
+            output,
+            report=verification,
+            trial_id=trial.trial_id,
         )
         if output is not None
         else ()

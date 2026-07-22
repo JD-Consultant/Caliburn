@@ -11,11 +11,16 @@ from uuid import UUID, uuid5
 from pydantic import ValidationError, model_validator
 
 from app.interview_vnext.domain.base import DomainModel
-from app.interview_vnext.domain.commands import ApplyEvidenceCommand
+from app.interview_vnext.domain.commands import ApplyTurnInterpretationCommand
 from app.interview_vnext.domain.evidence import Evidence
 from app.interview_vnext.domain.hashing import canonical_hash, canonical_json
 from app.interview_vnext.domain.identifiers import NonEmptyText, StableName
+from app.interview_vnext.domain.interpretation import (
+    TurnInsufficiencyCode,
+    TurnInterpretationRecord,
+)
 from app.interview_vnext.domain.reducers import ReductionResult
+from app.interview_vnext.domain.turn_identity import turn_interpretation_id
 from app.interview_vnext.llm.binding import ProviderBinding
 from app.interview_vnext.llm.conformance import (
     ConformanceMismatch,
@@ -26,7 +31,7 @@ from app.interview_vnext.llm.conformance import (
 )
 from app.interview_vnext.llm.context import (
     CONTEXT_PACKET_ADAPTER,
-    TURN_INTERPRET_CONTEXT_POLICY_V1,
+    TURN_INTERPRET_CONTEXT_POLICY_V2,
     TurnInterpretContextPacket,
 )
 from app.interview_vnext.llm.execution import (
@@ -89,14 +94,15 @@ from app.interview_vnext.persistence.errors import (
     ArtifactNotFound,
     CheckpointConflict,
     PersistedDataCorruption,
+    StateContextStale,
 )
 
 from .context_builder import ContextBuilder
 from .durable_operations import (
     AttemptOutcome,
     claim_attempt_for_provider,
-    commit_verified_noop_operation,
     commit_verified_operation,
+    fail_operation,
     prepare_operation,
     record_attempt_result,
     record_verification,
@@ -111,31 +117,72 @@ from .provider_gate import (
 from .turn_interpret import (
     accepted_evidence,
     turn_interpret_input_from_context,
+    turn_interpret_projection,
     verify_turn_interpret_output,
 )
+
+
+# A concurrent state advance is a clean, terminal, deterministic failure — never
+# a rebase and never confused with persisted corruption (plan §13.2, §13.4).
+STATE_CONTEXT_STALE = "state_context_stale"
+
+
+def _merged_insufficiency_codes(report) -> tuple[TurnInsufficiencyCode, ...]:
+    order = {code: index for index, code in enumerate(TurnInsufficiencyCode)}
+    merged = set(report.model_insufficiency_codes) | set(
+        report.system_insufficiency_codes
+    )
+    return tuple(sorted(merged, key=order.__getitem__))
 
 
 # 共用 LLM contract schema IDs 收斂在 llm/schema_ids.py(R3-C1 §6.1.1);
 # 這裡只留 operation-specific IDs。provider config artifact 刻意無 schema ID
 # (§5.2:generic provider-config schema 不存在,以 content hash 對 binding)。
 TURN_INPUT_SCHEMA_ID = (
-    "https://caliburn.local/schemas/turn-interpret-input.v1.schema.json"
+    "https://caliburn.local/schemas/turn-interpret-input.v2.schema.json"
 )
 TURN_OUTPUT_SCHEMA_ID = (
-    "https://caliburn.local/schemas/turn-interpret-output.v1.schema.json"
+    "https://caliburn.local/schemas/turn-interpret-output.v2.schema.json"
 )
 TURN_REPORT_SCHEMA_ID = (
-    "https://caliburn.local/schemas/turn-interpret-verification-report.v1.schema.json"
+    "https://caliburn.local/schemas/turn-interpret-verification-report.v2.schema.json"
 )
 CONTEXT_PACKET_SCHEMA_ID = (
-    "https://caliburn.local/schemas/context-packet.v1.schema.json"
+    "https://caliburn.local/schemas/context-packet.v2.schema.json"
 )
 CONTEXT_MANIFEST_SCHEMA_ID = (
-    "https://caliburn.local/schemas/context-selection-manifest.v1.schema.json"
+    "https://caliburn.local/schemas/context-selection-manifest.v2.schema.json"
 )
 CONTEXT_BUDGET_SCHEMA_ID = (
-    "https://caliburn.local/schemas/context-budget-report.v1.schema.json"
+    "https://caliburn.local/schemas/context-budget-report.v2.schema.json"
 )
+QUESTION_FRAME_SCHEMA_ID = (
+    "https://caliburn.local/schemas/question-frame.v1.schema.json"
+)
+INTERPRETATION_RECORD_SCHEMA_ID = (
+    "https://caliburn.local/schemas/turn-interpretation-record.v1.schema.json"
+)
+TURN_COMMAND_SCHEMA_ID = (
+    "https://caliburn.local/schemas/apply-turn-interpretation-command.v1.schema.json"
+)
+REDUCTION_RESULT_SCHEMA_ID = (
+    "https://caliburn.local/schemas/reduction-result.v2.schema.json"
+)
+TURN_EXECUTION_OUTCOME_SCHEMA_ID = (
+    "https://caliburn.local/schemas/turn-interpret-execution-outcome.v2.schema.json"
+)
+
+FRAME_ARTIFACT_KIND = "interview.question_frame_snapshot.v1"
+CONTEXT_ARTIFACT_KIND = "interview.context_packet.v2"
+CONTEXT_MANIFEST_ARTIFACT_KIND = "interview.context_selection_manifest.v2"
+CONTEXT_BUDGET_ARTIFACT_KIND = "interview.context_budget_report.v2"
+TURN_INPUT_ARTIFACT_KIND = "interview.turn_interpret_input.v2"
+TURN_OUTPUT_ARTIFACT_KIND = "interview.turn_interpret_output.v2"
+TURN_REPORT_ARTIFACT_KIND = "interview.turn_interpret_verification_report.v2"
+INTERPRETATION_RECORD_ARTIFACT_KIND = "interview.turn_interpretation_record.v1"
+TURN_COMMAND_ARTIFACT_KIND = "interview.apply_turn_interpretation_command.v1"
+REDUCTION_ARTIFACT_KIND = "interview.reduction_result.v2"
+TURN_OUTCOME_ARTIFACT_KIND = "interview.turn_interpret_execution_outcome.v2"
 
 
 class TurnExecutionStatus(StrEnum):
@@ -172,7 +219,7 @@ def _project_turn_output_schema(
     the report documents the real projection from the raw Pydantic model.
     """
 
-    schema_id, title, _factory = SCHEMA_EXPORTS["turn-interpret-output.v1.schema.json"]
+    schema_id, title, _factory = SCHEMA_EXPORTS["turn-interpret-output.v2.schema.json"]
     source = {
         **TurnInterpretOutput.model_json_schema(),
         "$id": schema_id,
@@ -185,28 +232,104 @@ def _project_turn_output_schema(
 
 
 class TurnInterpretExecutionOutcome(DomainModel):
-    schema_version: Literal["turn_interpret_execution_outcome.v1"] = (
-        "turn_interpret_execution_outcome.v1"
+    schema_version: Literal["turn_interpret_execution_outcome.v2"] = (
+        "turn_interpret_execution_outcome.v2"
     )
     status: TurnExecutionStatus
     checkpoint: OperationCheckpoint
+    context_packet_ref: ArtifactRef | None = None
+    input_ref: ArtifactRef | None = None
+    provider_result_ref: ArtifactRef | None = None
+    verification_report_ref: ArtifactRef | None = None
+    interpretation_record_ref: ArtifactRef | None = None
+    domain_command_ref: ArtifactRef | None = None
+    reduction_result_ref: ArtifactRef | None = None
+    turn_output_ref: ArtifactRef | None = None
+    failure_ref: ArtifactRef | None = None
     provider_result: ModelCallResult | None = None
     verification_report: TurnInterpretVerificationReport | None = None
+    interpretation: TurnInterpretationRecord | None = None
     accepted_evidence: tuple[Evidence, ...] = ()
     reduction_result: ReductionResult | None = None
+    # Always null on this path: a zero-evidence turn commits a receipt, so the
+    # interpreter never produces a generic no-op result any more (plan §13.3).
     noop_result: OperationNoopResult | None = None
     response_artifact: ArtifactRef | None = None
     reason_code: StableName | None = None
 
     @model_validator(mode="after")
     def outcome_matches_checkpoint(self) -> "TurnInterpretExecutionOutcome":
+        payload_refs = (
+            (self.provider_result, self.provider_result_ref, "provider result"),
+            (
+                self.verification_report,
+                self.verification_report_ref,
+                "verification report",
+            ),
+            (
+                self.interpretation,
+                self.interpretation_record_ref,
+                "interpretation record",
+            ),
+            (self.reduction_result, self.reduction_result_ref, "reduction result"),
+        )
+        for payload, ref, label in payload_refs:
+            if payload is not None and ref is not None:
+                if canonical_hash(payload) != ref.content_hash:
+                    raise ValueError(f"{label} payload does not match its artifact ref")
+        if (
+            self.provider_result_ref is not None
+            and self.checkpoint.provider_result_artifact is not None
+            and self.provider_result_ref != self.checkpoint.provider_result_artifact
+        ):
+            raise ValueError("provider result ref does not match checkpoint")
+        if (
+            self.verification_report_ref is not None
+            and self.checkpoint.verification_artifact is not None
+            and self.verification_report_ref != self.checkpoint.verification_artifact
+        ):
+            raise ValueError("verification report ref does not match checkpoint")
+        if (
+            self.reduction_result_ref is not None
+            and self.checkpoint.domain_result_artifact is not None
+            and self.reduction_result_ref != self.checkpoint.domain_result_artifact
+        ):
+            raise ValueError("reduction ref does not match checkpoint")
+        if (
+            self.turn_output_ref is not None
+            and self.checkpoint.response_artifact is not None
+            and self.turn_output_ref != self.checkpoint.response_artifact
+        ):
+            raise ValueError("turn output ref does not match checkpoint")
+        if self.response_artifact is not None and (
+            self.turn_output_ref is None or self.response_artifact != self.turn_output_ref
+        ):
+            raise ValueError("legacy response ref must equal turn output ref")
         if self.status == TurnExecutionStatus.COMMITTED:
             if self.checkpoint.status != CheckpointStatus.COMMITTED:
                 raise ValueError("committed outcome requires a committed checkpoint")
             if self.verification_report is None or self.response_artifact is None:
                 raise ValueError("committed outcome requires report and response artifact")
-            if (self.reduction_result is None) == (self.noop_result is None):
-                raise ValueError("committed outcome requires exactly one domain/no-op result")
+            if self.reduction_result is None or self.interpretation is None:
+                raise ValueError("committed outcome requires a reduction and a receipt")
+            if any(
+                ref is None
+                for ref in (
+                    self.context_packet_ref,
+                    self.input_ref,
+                    self.provider_result_ref,
+                    self.verification_report_ref,
+                    self.interpretation_record_ref,
+                    self.domain_command_ref,
+                    self.reduction_result_ref,
+                    self.turn_output_ref,
+                )
+            ):
+                raise ValueError("committed outcome requires the full artifact closure")
+            if self.noop_result is not None:
+                raise ValueError("turn interpretation never commits a no-op result")
+            if self.reason_code is not None or self.failure_ref is not None:
+                raise ValueError("committed outcome cannot carry failure fields")
         elif self.status == TurnExecutionStatus.FAILED:
             if self.checkpoint.status != CheckpointStatus.FAILED:
                 raise ValueError("failed outcome requires a failed checkpoint")
@@ -308,6 +431,62 @@ async def _load_exact_artifact(
             "persisted artifact does not match its recorded reference",
             artifact_id=ref.artifact_id,
         )
+    return record
+
+
+def _require_turn_artifact(
+    record: ArtifactRecord,
+    *,
+    checkpoint: OperationCheckpoint,
+    kind: str,
+    schema_id: str | None,
+) -> None:
+    if (
+        record.run_id != checkpoint.run_id
+        or record.session_id != checkpoint.session_id
+        or record.turn_id != checkpoint.turn_id
+        or record.operation_id != checkpoint.operation_id
+        or record.attempt_id is not None
+        or record.ref.kind != kind
+        or record.ref.schema_id != schema_id
+    ):
+        raise PersistedDataCorruption(
+            "turn artifact scope, kind, or schema does not match the operation",
+            operation_id=checkpoint.operation_id,
+            artifact_id=record.ref.artifact_id,
+            artifact_kind=record.ref.kind,
+        )
+
+
+async def _load_turn_artifact(
+    uow_factory: Callable[[], VNextUnitOfWork],
+    *,
+    tenant_id: UUID,
+    checkpoint: OperationCheckpoint,
+    artifact_id: UUID,
+    kind: str,
+    schema_id: str | None,
+    ref: ArtifactRef | None = None,
+) -> ArtifactRecord:
+    try:
+        record = await _load_artifact(
+            uow_factory, tenant_id=tenant_id, artifact_id=artifact_id
+        )
+    except ArtifactNotFound as exc:
+        raise PersistedDataCorruption(
+            "turn artifact reference points at a missing row",
+            operation_id=checkpoint.operation_id,
+            artifact_id=artifact_id,
+        ) from exc
+    if ref is not None and record.ref != ref:
+        raise PersistedDataCorruption(
+            "turn artifact does not match its authoritative ref",
+            operation_id=checkpoint.operation_id,
+            artifact_id=artifact_id,
+        )
+    _require_turn_artifact(
+        record, checkpoint=checkpoint, kind=kind, schema_id=schema_id
+    )
     return record
 
 
@@ -631,7 +810,7 @@ async def _fresh_request(
         employee_turn_id=employee_turn_id,
         operation_id=operation_id,
         operation_definition_hash=operation.definition_hash,
-        policy=TURN_INTERPRET_CONTEXT_POLICY_V1,
+        policy=TURN_INTERPRET_CONTEXT_POLICY_V2,
     )
     input_value = turn_interpret_input_from_context(context.packet)
     prompt = TURN_INTERPRET_PROMPT_PATH.read_text(encoding="utf-8")
@@ -662,7 +841,7 @@ async def _fresh_request(
     context_artifact = _artifact(
         **common,
         label="context-packet",
-        kind="context.packet",
+        kind=CONTEXT_ARTIFACT_KIND,
         media_type="application/json",
         payload=context.packet,
         schema_id=CONTEXT_PACKET_SCHEMA_ID,
@@ -670,7 +849,7 @@ async def _fresh_request(
     manifest_artifact = _artifact(
         **common,
         label="context-manifest",
-        kind="context.selection_manifest",
+        kind=CONTEXT_MANIFEST_ARTIFACT_KIND,
         media_type="application/json",
         payload=context.manifest,
         schema_id=CONTEXT_MANIFEST_SCHEMA_ID,
@@ -678,7 +857,7 @@ async def _fresh_request(
     budget_artifact = _artifact(
         **common,
         label="context-budget",
-        kind="context.budget_report",
+        kind=CONTEXT_BUDGET_ARTIFACT_KIND,
         media_type="application/json",
         payload=context.budget,
         schema_id=CONTEXT_BUDGET_SCHEMA_ID,
@@ -686,11 +865,28 @@ async def _fresh_request(
     input_artifact = _artifact(
         **common,
         label="turn-input",
-        kind="operation.input",
+        kind=TURN_INPUT_ARTIFACT_KIND,
         media_type="application/json",
         payload=input_value,
         schema_id=TURN_INPUT_SCHEMA_ID,
     )
+    # The frame exactly as the model was allowed to read it. Persisted separately
+    # so an audit can prove which question a contextual answer resolved without
+    # re-deriving it from current state (plan §13.1).
+    frame_artifact = None
+    if context.packet.question_frame is not None:
+        frame_artifact = _artifact(
+            **common,
+            label="question-frame-snapshot",
+            kind=FRAME_ARTIFACT_KIND,
+            media_type="application/json",
+            payload=context.packet.question_frame.frame,
+            schema_id=QUESTION_FRAME_SCHEMA_ID,
+        )
+        if frame_artifact.ref.content_hash != canonical_hash(
+            context.packet.question_frame.frame
+        ):
+            raise CheckpointConflict("question frame snapshot hash mismatch")
     binding_artifact = _artifact(
         **common,
         label="provider-binding",
@@ -774,7 +970,8 @@ async def _fresh_request(
             binding_artifact,
             config_artifact,
             projection_artifact,
-        ),
+        )
+        + ((frame_artifact,) if frame_artifact is not None else ()),
         expected_state_hash=context.packet.state_hash,
         turn_id=employee_turn_id,
         step_event_id=turn_execution_uuid(operation_id, "event/prepared"),
@@ -798,10 +995,55 @@ async def _request_for_checkpoint(
         artifact_id = attempt.request_artifact_id
     else:
         artifact_id = checkpoint.request_artifact.artifact_id
-    record = await _load_artifact(
-        uow_factory, tenant_id=tenant_id, artifact_id=artifact_id
-    )
-    return ModelCallRequest.model_validate_json(record.inline_content or "")
+    try:
+        record = await _load_artifact(
+            uow_factory, tenant_id=tenant_id, artifact_id=artifact_id
+        )
+    except ArtifactNotFound as exc:
+        raise PersistedDataCorruption(
+            "operation request artifact is missing",
+            operation_id=checkpoint.operation_id,
+            artifact_id=artifact_id,
+        ) from exc
+    if checkpoint.active_attempt_id is None and record.ref != checkpoint.request_artifact:
+        raise PersistedDataCorruption(
+            "prepared request does not match checkpoint ref",
+            operation_id=checkpoint.operation_id,
+        )
+    if (
+        record.ref.kind != "model.request"
+        or record.ref.schema_id != MODEL_REQUEST_SCHEMA_ID
+        or record.run_id != checkpoint.run_id
+        or record.session_id != checkpoint.session_id
+        or record.turn_id != checkpoint.turn_id
+        or record.operation_id != checkpoint.operation_id
+    ):
+        raise PersistedDataCorruption(
+            "operation request scope, kind, or schema is invalid",
+            operation_id=checkpoint.operation_id,
+            artifact_id=artifact_id,
+        )
+    try:
+        request = ModelCallRequest.model_validate_json(record.inline_content or "")
+    except ValidationError as exc:
+        raise PersistedDataCorruption(
+            "operation request artifact failed typed validation",
+            operation_id=checkpoint.operation_id,
+            artifact_id=artifact_id,
+        ) from exc
+    if (
+        request.run_id != checkpoint.run_id
+        or request.session_id != checkpoint.session_id
+        or request.turn_id != checkpoint.turn_id
+        or request.operation_id != checkpoint.operation_id
+        or record.attempt_id != request.attempt_id
+    ):
+        raise PersistedDataCorruption(
+            "operation request payload does not match checkpoint scope",
+            operation_id=checkpoint.operation_id,
+            artifact_id=artifact_id,
+        )
+    return request
 
 
 async def _resolved_call_for_request(
@@ -951,12 +1193,14 @@ async def _revalidate_failed_checkpoint(
             "failed provider attempt is missing its terminating result artifact",
             operation_id=checkpoint.operation_id,
         )
-    # failure authority 決定 gate 的 eligibility 要求:conformance report 作
-    # authority(wire succeeded + ineligible)或 wire result 作 authority(wire
-    # failure)都要求 ineligible;其他 authority(verification rejection)代表
-    # provider gate 本身通過。
-    if checkpoint.failure_artifact in (conformance_ref, result_ref):
+    # failure authority 決定 gate 的 eligibility 要求。Conformance authority
+    # 必須 ineligible；result authority 可能是 wire failure，也可能是
+    # wire-success + eligible 後才發現的 local output-schema failure，因此先
+    # 驗完整 gate、再依 typed result + persisted reason 分流。
+    if checkpoint.failure_artifact == conformance_ref:
         require_eligible = False
+    elif checkpoint.failure_artifact == result_ref:
+        require_eligible = None
     else:
         require_eligible = True
     _, gate = await _load_and_validate_provider_gate(
@@ -978,20 +1222,34 @@ async def _revalidate_failed_checkpoint(
     if checkpoint.failure_artifact == result_ref and (
         gate.result.outcome == ModelOutcome.SUCCEEDED
     ):
+        if (
+            not gate.conformance.eligible
+            or checkpoint.failure_reason_code != "output_schema_invalid"
+        ):
+            raise PersistedDataCorruption(
+                "succeeded result authority requires an eligible gate and a "
+                "local output-schema failure",
+                operation_id=checkpoint.operation_id,
+            )
+    elif checkpoint.failure_artifact == result_ref and gate.conformance.eligible:
         raise PersistedDataCorruption(
-            "wire failure authority requires a non-succeeded result",
+            "wire failure authority requires an ineligible conformance report",
             operation_id=checkpoint.operation_id,
         )
 
 
 async def _context_for_request(
     uow_factory: Callable[[], VNextUnitOfWork],
-    *, tenant_id: UUID, request: ModelCallRequest,
+    *, tenant_id: UUID, request: ModelCallRequest, checkpoint: OperationCheckpoint,
 ) -> TurnInterpretContextPacket:
-    record = await _load_artifact(
+    record = await _load_turn_artifact(
         uow_factory,
         tenant_id=tenant_id,
+        checkpoint=checkpoint,
         artifact_id=request.context_artifact.artifact_id,
+        kind=CONTEXT_ARTIFACT_KIND,
+        schema_id=CONTEXT_PACKET_SCHEMA_ID,
+        ref=request.context_artifact,
     )
     packet = CONTEXT_PACKET_ADAPTER.validate_json(record.inline_content or "")
     if not isinstance(packet, TurnInterpretContextPacket):
@@ -1004,8 +1262,14 @@ async def _report_for_checkpoint(
     *, tenant_id: UUID, checkpoint: OperationCheckpoint,
 ) -> tuple[TurnInterpretVerificationReport, ArtifactRecord]:
     assert checkpoint.verification_artifact is not None
-    record = await _load_exact_artifact(
-        uow_factory, tenant_id=tenant_id, ref=checkpoint.verification_artifact
+    record = await _load_turn_artifact(
+        uow_factory,
+        tenant_id=tenant_id,
+        checkpoint=checkpoint,
+        artifact_id=checkpoint.verification_artifact.artifact_id,
+        kind=TURN_REPORT_ARTIFACT_KIND,
+        schema_id=TURN_REPORT_SCHEMA_ID,
+        ref=checkpoint.verification_artifact,
     )
     return (
         TurnInterpretVerificationReport.model_validate_json(
@@ -1015,38 +1279,211 @@ async def _report_for_checkpoint(
     )
 
 
+async def _failed_outcome(
+    uow_factory: Callable[[], VNextUnitOfWork],
+    *,
+    tenant_id: UUID,
+    checkpoint: OperationCheckpoint,
+) -> TurnInterpretExecutionOutcome:
+    """Reconstruct only the artifacts that existed before a terminal failure."""
+
+    request = await _request_for_checkpoint(
+        uow_factory, tenant_id=tenant_id, checkpoint=checkpoint
+    )
+    await _context_for_request(
+        uow_factory,
+        tenant_id=tenant_id,
+        request=request,
+        checkpoint=checkpoint,
+    )
+    input_record = await _load_turn_artifact(
+        uow_factory,
+        tenant_id=tenant_id,
+        checkpoint=checkpoint,
+        artifact_id=turn_execution_uuid(checkpoint.operation_id, "turn-input"),
+        kind=TURN_INPUT_ARTIFACT_KIND,
+        schema_id=TURN_INPUT_SCHEMA_ID,
+    )
+    await _revalidate_failed_checkpoint(
+        uow_factory,
+        tenant_id=tenant_id,
+        checkpoint=checkpoint,
+        request=request,
+    )
+    provider_result = None
+    provider_result_ref = checkpoint.provider_result_artifact
+    if provider_result_ref is None and checkpoint.provider_execution_evidence_artifact:
+        provider_result_ref = checkpoint.attempt_result_artifacts[-1]
+    if provider_result_ref is not None:
+        provider_record = await _load_exact_artifact(
+            uow_factory, tenant_id=tenant_id, ref=provider_result_ref
+        )
+        try:
+            provider_result = ModelCallResult.model_validate_json(
+                provider_record.inline_content or ""
+            )
+        except ValidationError as exc:
+            raise PersistedDataCorruption(
+                "failed provider result failed typed validation",
+                operation_id=checkpoint.operation_id,
+            ) from exc
+    report = None
+    report_ref = checkpoint.verification_artifact
+    if report_ref is not None:
+        report, _ = await _report_for_checkpoint(
+            uow_factory, tenant_id=tenant_id, checkpoint=checkpoint
+        )
+    return TurnInterpretExecutionOutcome(
+        status=TurnExecutionStatus.FAILED,
+        checkpoint=checkpoint,
+        context_packet_ref=request.context_artifact,
+        input_ref=input_record.ref,
+        provider_result_ref=provider_result_ref,
+        verification_report_ref=report_ref,
+        failure_ref=checkpoint.failure_artifact,
+        provider_result=provider_result,
+        verification_report=report,
+        reason_code=checkpoint.failure_reason_code,
+    )
+
+
 async def _committed_outcome(
     uow_factory: Callable[[], VNextUnitOfWork],
     *, tenant_id: UUID, checkpoint: OperationCheckpoint,
 ) -> TurnInterpretExecutionOutcome:
+    request = await _request_for_checkpoint(
+        uow_factory, tenant_id=tenant_id, checkpoint=checkpoint
+    )
+    await _context_for_request(
+        uow_factory,
+        tenant_id=tenant_id,
+        request=request,
+        checkpoint=checkpoint,
+    )
+    input_record = await _load_turn_artifact(
+        uow_factory,
+        tenant_id=tenant_id,
+        checkpoint=checkpoint,
+        artifact_id=turn_execution_uuid(checkpoint.operation_id, "turn-input"),
+        kind=TURN_INPUT_ARTIFACT_KIND,
+        schema_id=TURN_INPUT_SCHEMA_ID,
+    )
+    assert checkpoint.provider_result_artifact is not None
+    _, provider_gate = await _load_and_validate_provider_gate(
+        uow_factory,
+        tenant_id=tenant_id,
+        request=request,
+        result_ref=checkpoint.provider_result_artifact,
+        evidence_ref=checkpoint.provider_execution_evidence_artifact,
+        conformance_ref=checkpoint.provider_conformance_artifact,
+        require_eligible=True,
+    )
     report, _ = await _report_for_checkpoint(
         uow_factory, tenant_id=tenant_id, checkpoint=checkpoint
     )
     assert checkpoint.domain_result_artifact is not None
     assert checkpoint.response_artifact is not None
     # §5.6 committed 行:committed artifacts 也以 exact ref 載回。
-    await _load_exact_artifact(
-        uow_factory, tenant_id=tenant_id, ref=checkpoint.response_artifact
+    output_record = await _load_turn_artifact(
+        uow_factory,
+        tenant_id=tenant_id,
+        checkpoint=checkpoint,
+        artifact_id=checkpoint.response_artifact.artifact_id,
+        kind=TURN_OUTPUT_ARTIFACT_KIND,
+        schema_id=TURN_OUTPUT_SCHEMA_ID,
+        ref=checkpoint.response_artifact,
     )
-    domain_record = await _load_exact_artifact(
-        uow_factory, tenant_id=tenant_id, ref=checkpoint.domain_result_artifact
+    domain_record = await _load_turn_artifact(
+        uow_factory,
+        tenant_id=tenant_id,
+        checkpoint=checkpoint,
+        artifact_id=checkpoint.domain_result_artifact.artifact_id,
+        kind=REDUCTION_ARTIFACT_KIND,
+        schema_id=REDUCTION_RESULT_SCHEMA_ID,
+        ref=checkpoint.domain_result_artifact,
     )
-    reduction = None
-    noop = None
+    # A committed turn always holds a reduction: the no-op branch is gone, so a
+    # no-op artifact here means the row predates R5-BC (plan §13.3).
     if domain_record.ref.kind == "operation.noop_result":
-        noop = OperationNoopResult.model_validate_json(domain_record.inline_content or "")
-    else:
-        reduction = ReductionResult.model_validate_json(domain_record.inline_content or "")
+        raise PersistedDataCorruption(
+            "committed turn interpretation references a legacy no-op result",
+            operation_id=checkpoint.operation_id,
+        )
+    reduction = ReductionResult.model_validate_json(domain_record.inline_content or "")
+    record = next(
+        (
+            item
+            for item in reduction.state.turn_interpretations
+            if item.operation_id == checkpoint.operation_id
+        ),
+        None,
+    )
+    if record is None:
+        raise PersistedDataCorruption(
+            "committed reduction has no receipt for the operation",
+            operation_id=checkpoint.operation_id,
+        )
+    receipt_record = await _load_turn_artifact(
+        uow_factory,
+        tenant_id=tenant_id,
+        checkpoint=checkpoint,
+        artifact_id=turn_execution_uuid(
+            checkpoint.operation_id, "interpretation-record"
+        ),
+        kind=INTERPRETATION_RECORD_ARTIFACT_KIND,
+        schema_id=INTERPRETATION_RECORD_SCHEMA_ID,
+    )
+    command_record = await _load_turn_artifact(
+        uow_factory,
+        tenant_id=tenant_id,
+        checkpoint=checkpoint,
+        artifact_id=turn_execution_uuid(checkpoint.operation_id, "command-artifact"),
+        kind=TURN_COMMAND_ARTIFACT_KIND,
+        schema_id=TURN_COMMAND_SCHEMA_ID,
+    )
+    try:
+        stored_receipt = TurnInterpretationRecord.model_validate_json(
+            receipt_record.inline_content or ""
+        )
+        stored_command = ApplyTurnInterpretationCommand.model_validate_json(
+            command_record.inline_content or ""
+        )
+        TurnInterpretOutput.model_validate_json(output_record.inline_content or "")
+    except ValidationError as exc:
+        raise PersistedDataCorruption(
+            "committed turn closure failed typed validation",
+            operation_id=checkpoint.operation_id,
+        ) from exc
+    if stored_receipt != record or stored_command.record != record:
+        raise PersistedDataCorruption(
+            "committed receipt, command, and reduction disagree",
+            operation_id=checkpoint.operation_id,
+        )
     return TurnInterpretExecutionOutcome(
         status=TurnExecutionStatus.COMMITTED,
         checkpoint=checkpoint,
+        context_packet_ref=request.context_artifact,
+        input_ref=input_record.ref,
+        provider_result_ref=checkpoint.provider_result_artifact,
+        verification_report_ref=checkpoint.verification_artifact,
+        interpretation_record_ref=receipt_record.ref,
+        domain_command_ref=command_record.ref,
+        reduction_result_ref=domain_record.ref,
+        turn_output_ref=output_record.ref,
+        provider_result=provider_gate.result,
         verification_report=report,
+        interpretation=record,
         accepted_evidence=tuple(
             item.evidence for item in report.decisions if item.accepted
+        )
+        + tuple(
+            evidence
+            for item in report.binding_decisions
+            if item.accepted
+            for evidence in item.materialized_evidence
         ),
         reduction_result=reduction,
-        noop_result=noop,
-        response_artifact=checkpoint.response_artifact,
+        response_artifact=output_record.ref,
     )
 
 
@@ -1060,29 +1497,126 @@ async def _commit_report(
     verification_artifact: ArtifactRecord,
     output: TurnInterpretOutput,
     provider_result: ModelCallResult,
+    request: ModelCallRequest,
+    context: TurnInterpretContextPacket,
     committed_at: datetime,
     contains_test_data: bool,
 ) -> TurnInterpretExecutionOutcome:
+    """Commit the receipt — with or without evidence — against the context snapshot.
+
+    The expected version and hash come from the context the model actually saw,
+    never from a freshly loaded state: if the session moved on while the provider
+    was answering, this must fail closed rather than rebase a stale answer onto
+    new state (plan §13.2).
+    """
+
     evidence = accepted_evidence(
         report=report,
         session_id=checkpoint.session_id,
         turn_id=checkpoint.turn_id,
         operation_id=checkpoint.operation_id,
     )
-    if evidence:
+    async def stale_outcome() -> TurnInterpretExecutionOutcome:
         state = await _load_state(
             uow_factory,
             tenant_id=tenant_id,
             session_id=checkpoint.session_id,
         )
-        command = ApplyEvidenceCommand(
-            command_id=turn_execution_uuid(checkpoint.operation_id, "command/evidence"),
-            expected_state_version=state.session.state_version,
-            occurred_at=committed_at,
+        actual_hash = canonical_hash(state)
+        failure_artifact = _artifact(
+            operation_id=checkpoint.operation_id,
+            label="state-context-stale",
+            kind="operation.local_failure",
+            media_type="application/json",
+            payload={
+                "reason_code": STATE_CONTEXT_STALE,
+                "expected_state_version": context.state_version,
+                "actual_state_version": state.session.state_version,
+                "expected_state_hash": context.state_hash,
+                "actual_state_hash": actual_hash,
+            },
+            run_id=run_id,
+            session_id=checkpoint.session_id,
             turn_id=checkpoint.turn_id,
-            observations=evidence,
+            created_at=committed_at,
+            contains_test_data=contains_test_data,
         )
-        next_checkpoint, reduction = await commit_verified_operation(
+        next_checkpoint = await fail_operation(
+            uow_factory,
+            tenant_id=tenant_id,
+            operation_id=checkpoint.operation_id,
+            reason_code=STATE_CONTEXT_STALE,
+            failure_artifact=failure_artifact,
+            event_id=turn_execution_uuid(
+                checkpoint.operation_id, "event/state-context-stale"
+            ),
+            occurred_at=committed_at,
+        )
+        return TurnInterpretExecutionOutcome(
+            status=TurnExecutionStatus.FAILED,
+            checkpoint=next_checkpoint,
+            context_packet_ref=request.context_artifact,
+            input_ref=input_record.ref,
+            provider_result_ref=next_checkpoint.provider_result_artifact,
+            verification_report_ref=verification_artifact.ref,
+            failure_ref=next_checkpoint.failure_artifact,
+            provider_result=provider_result,
+            verification_report=report,
+            reason_code=STATE_CONTEXT_STALE,
+        )
+
+    frame = context.question_frame.frame if context.question_frame is not None else None
+    insufficiency_codes = _merged_insufficiency_codes(report)
+    record = TurnInterpretationRecord(
+        interpretation_id=turn_interpretation_id(checkpoint.operation_id),
+        session_id=checkpoint.session_id,
+        employee_turn_id=checkpoint.turn_id,
+        operation_id=checkpoint.operation_id,
+        question_frame_id=frame.question_frame_id if frame is not None else None,
+        question_frame_definition_hash=(
+            frame.definition.definition_hash if frame is not None else None
+        ),
+        context_packet_hash=report.context_packet_hash,
+        output_hash=report.output_hash,
+        verification_report_hash=canonical_hash(report),
+        accepted_evidence_ids=tuple(item.evidence_id for item in evidence),
+        dialogue_act=report.dialogue_act,
+        episode_signal=report.episode_signal,
+        insufficiency_codes=insufficiency_codes,
+        applied_at=committed_at,
+    )
+    command = ApplyTurnInterpretationCommand(
+        command_id=turn_execution_uuid(
+            checkpoint.operation_id, "command/interpretation"
+        ),
+        expected_state_version=context.state_version,
+        occurred_at=committed_at,
+        record=record,
+        observations=evidence,
+    )
+    receipt_artifact = _artifact(
+        operation_id=checkpoint.operation_id,
+        label="interpretation-record",
+        kind=INTERPRETATION_RECORD_ARTIFACT_KIND,
+        media_type="application/json",
+        payload=record,
+        schema_id=INTERPRETATION_RECORD_SCHEMA_ID,
+        run_id=run_id,
+        session_id=checkpoint.session_id,
+        turn_id=checkpoint.turn_id,
+        created_at=committed_at,
+        contains_test_data=contains_test_data,
+    )
+    input_record = await _load_turn_artifact(
+        uow_factory,
+        tenant_id=tenant_id,
+        checkpoint=checkpoint,
+        artifact_id=turn_execution_uuid(checkpoint.operation_id, "turn-input"),
+        kind=TURN_INPUT_ARTIFACT_KIND,
+        schema_id=TURN_INPUT_SCHEMA_ID,
+    )
+    try:
+        next_checkpoint, reduction, closure = await commit_verified_operation(
             uow_factory,
             tenant_id=tenant_id,
             operation_id=checkpoint.operation_id,
@@ -1099,58 +1633,38 @@ async def _commit_report(
                 checkpoint.operation_id, "reduction-artifact"
             ),
             transition_event_id=turn_execution_uuid(
-                checkpoint.operation_id, "event/evidence-committed"
+                checkpoint.operation_id, "event/interpretation-committed"
             ),
             step_event_id=turn_execution_uuid(
                 checkpoint.operation_id, "event/completed"
             ),
             committed_at=committed_at,
             request_idempotency_key=checkpoint.idempotency_key,
+            expected_state_hash=context.state_hash,
+            additional_domain_artifacts=(receipt_artifact,),
+            response_artifact_kind=TURN_OUTPUT_ARTIFACT_KIND,
+            response_schema_id=TURN_OUTPUT_SCHEMA_ID,
+            contains_test_data=contains_test_data,
         )
-        return TurnInterpretExecutionOutcome(
-            status=TurnExecutionStatus.COMMITTED,
-            checkpoint=next_checkpoint,
-            provider_result=provider_result,
-            verification_report=report,
-            accepted_evidence=evidence,
-            reduction_result=reduction,
-            response_artifact=next_checkpoint.response_artifact,
-        )
-
-    response_artifact = _artifact(
-        operation_id=checkpoint.operation_id,
-        label="response",
-        kind="operation.response",
-        media_type="application/json",
-        payload=output,
-        run_id=run_id,
-        session_id=checkpoint.session_id,
-        turn_id=checkpoint.turn_id,
-        created_at=committed_at,
-        contains_test_data=contains_test_data,
-    )
-    next_checkpoint, noop = await commit_verified_noop_operation(
-        uow_factory,
-        tenant_id=tenant_id,
-        operation_id=checkpoint.operation_id,
-        response_artifact=response_artifact,
-        verification_artifact=verification_artifact,
-        noop_result_artifact_id=turn_execution_uuid(
-            checkpoint.operation_id, "noop-result"
-        ),
-        step_event_id=turn_execution_uuid(
-            checkpoint.operation_id, "event/completed"
-        ),
-        committed_at=committed_at,
-        dropped_count=report.dropped_count,
-    )
+    except StateContextStale:
+        return await stale_outcome()
     return TurnInterpretExecutionOutcome(
         status=TurnExecutionStatus.COMMITTED,
         checkpoint=next_checkpoint,
+        context_packet_ref=request.context_artifact,
+        input_ref=input_record.ref,
+        provider_result_ref=next_checkpoint.provider_result_artifact,
+        verification_report_ref=verification_artifact.ref,
+        interpretation_record_ref=closure.additional_domain_refs[0],
+        domain_command_ref=closure.command_ref,
+        reduction_result_ref=closure.reduction_ref,
+        turn_output_ref=closure.response_ref,
         provider_result=provider_result,
         verification_report=report,
-        noop_result=noop,
-        response_artifact=response_artifact.ref,
+        interpretation=record,
+        accepted_evidence=evidence,
+        reduction_result=reduction,
+        response_artifact=closure.response_ref,
     )
 
 
@@ -1226,29 +1740,12 @@ async def execute_turn_interpret(
         # §5.6:every fresh-process terminal path 先重驗 persisted provider gate,
         # 再回 idempotent outcome;不得以 refs 存在即視為正確。
         if checkpoint.status == CheckpointStatus.COMMITTED:
-            await _load_and_validate_provider_gate(
-                uow_factory,
-                tenant_id=tenant_id,
-                request=request,
-                result_ref=checkpoint.provider_result_artifact,
-                evidence_ref=checkpoint.provider_execution_evidence_artifact,
-                conformance_ref=checkpoint.provider_conformance_artifact,
-                require_eligible=True,
-            )
             return await _committed_outcome(
                 uow_factory, tenant_id=tenant_id, checkpoint=checkpoint
             )
         if checkpoint.status == CheckpointStatus.FAILED:
-            await _revalidate_failed_checkpoint(
-                uow_factory,
-                tenant_id=tenant_id,
-                checkpoint=checkpoint,
-                request=request,
-            )
-            return TurnInterpretExecutionOutcome(
-                status=TurnExecutionStatus.FAILED,
-                checkpoint=checkpoint,
-                reason_code=checkpoint.failure_reason_code,
+            return await _failed_outcome(
+                uow_factory, tenant_id=tenant_id, checkpoint=checkpoint
             )
 
     while True:
@@ -1373,11 +1870,8 @@ async def execute_turn_interpret(
                     occurred_at=result.completed_at,
                 )
                 if checkpoint.status == CheckpointStatus.FAILED:
-                    return TurnInterpretExecutionOutcome(
-                        status=TurnExecutionStatus.FAILED,
-                        checkpoint=checkpoint,
-                        provider_result=result,
-                        reason_code=checkpoint.failure_reason_code,
+                    return await _failed_outcome(
+                        uow_factory, tenant_id=tenant_id, checkpoint=checkpoint
                     )
                 if classification == AttemptOutcome.RETRYABLE_FAILURE:
                     request = _retry_request(
@@ -1495,7 +1989,10 @@ async def execute_turn_interpret(
                 raise CheckpointConflict("provider-completed result has no parsed output")
             output = TurnInterpretOutput.model_validate(result.parsed_output.load())
             context = await _context_for_request(
-                uow_factory, tenant_id=tenant_id, request=request
+                uow_factory,
+                tenant_id=tenant_id,
+                request=request,
+                checkpoint=checkpoint,
             )
             report = verify_turn_interpret_output(
                 output=output, context=context, operation_id=operation_id
@@ -1504,7 +2001,7 @@ async def execute_turn_interpret(
             verification_artifact = _artifact(
                 operation_id=operation_id,
                 label="verification",
-                kind="operation.verification",
+                kind=TURN_REPORT_ARTIFACT_KIND,
                 media_type="application/json",
                 payload=report,
                 schema_id=TURN_REPORT_SCHEMA_ID,
@@ -1528,6 +2025,7 @@ async def execute_turn_interpret(
             output = None
             report = None
             verification_artifact = None
+            context = None
 
         if checkpoint.status == CheckpointStatus.VERIFIED:
             if report is None or verification_artifact is None:
@@ -1554,6 +2052,16 @@ async def execute_turn_interpret(
                     result.parsed_output.load()
                 )
             assert result is not None and output is not None
+            if context is None:
+                request = await _request_for_checkpoint(
+                    uow_factory, tenant_id=tenant_id, checkpoint=checkpoint
+                )
+                context = await _context_for_request(
+                    uow_factory,
+                    tenant_id=tenant_id,
+                    request=request,
+                    checkpoint=checkpoint,
+                )
             return await _commit_report(
                 uow_factory,
                 tenant_id=tenant_id,
@@ -1563,6 +2071,8 @@ async def execute_turn_interpret(
                 verification_artifact=verification_artifact,
                 output=output,
                 provider_result=result,
+                request=request,
+                context=context,
                 committed_at=max(
                     checkpoint.updated_at + timedelta(microseconds=1),
                     result.completed_at + timedelta(microseconds=2),
@@ -1575,8 +2085,6 @@ async def execute_turn_interpret(
                 uow_factory, tenant_id=tenant_id, checkpoint=checkpoint
             )
         if checkpoint.status == CheckpointStatus.FAILED:
-            return TurnInterpretExecutionOutcome(
-                status=TurnExecutionStatus.FAILED,
-                checkpoint=checkpoint,
-                reason_code=checkpoint.failure_reason_code,
+            return await _failed_outcome(
+                uow_factory, tenant_id=tenant_id, checkpoint=checkpoint
             )

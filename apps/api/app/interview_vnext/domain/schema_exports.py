@@ -9,12 +9,14 @@ from pydantic import TypeAdapter
 
 from .commands import (
     ApplyCandidateProposalsCommand,
-    ApplyEvidenceCommand,
     ApplyGapProposalsCommand,
     ApplyInferenceProposalsCommand,
     ApplyReviewDecisionCommand,
-    AppendTranscriptTurnCommand,
+    ApplyTurnInterpretationCommand,
+    AppendConsultantQuestionCommand,
+    AppendEmployeeTurnCommand,
     DecideInferenceCommand,
+    InvalidateQuestionFrameCommand,
     OpenEpisodeCommand,
     SupersedeInferenceCommand,
     TransitionCandidateCommand,
@@ -54,9 +56,9 @@ SCHEMA_EXPORTS: dict[str, tuple[str, str, SchemaFactory]] = {
         "Caliburn interview vNext transcript turn v1",
         _model_schema(TranscriptTurn),
     ),
-    "evidence.v2.schema.json": (
-        "https://caliburn.local/schemas/evidence.v2.schema.json",
-        "Caliburn interview vNext evidence v2",
+    "evidence.v3.schema.json": (
+        "https://caliburn.local/schemas/evidence.v3.schema.json",
+        "Caliburn interview vNext evidence v3",
         _model_schema(Evidence),
     ),
     "inference.v2.schema.json": (
@@ -94,19 +96,19 @@ SCHEMA_EXPORTS: dict[str, tuple[str, str, SchemaFactory]] = {
         "Caliburn interview vNext review decision v1",
         _model_schema(ReviewDecision),
     ),
-    "interview-state.v2.schema.json": (
-        "https://caliburn.local/schemas/interview-state.v2.schema.json",
-        "Caliburn interview vNext materialized state v2",
+    "interview-state.v3.schema.json": (
+        "https://caliburn.local/schemas/interview-state.v3.schema.json",
+        "Caliburn interview vNext materialized state v3",
         _model_schema(InterviewState),
     ),
-    "domain-event.v1.schema.json": (
-        "https://caliburn.local/schemas/domain-event.v1.schema.json",
-        "Caliburn interview vNext domain event v1",
+    "domain-event.v2.schema.json": (
+        "https://caliburn.local/schemas/domain-event.v2.schema.json",
+        "Caliburn interview vNext domain event v2",
         TypeAdapter(DomainEvent).json_schema,
     ),
-    "reduction-result.v1.schema.json": (
-        "https://caliburn.local/schemas/reduction-result.v1.schema.json",
-        "Caliburn interview vNext reduction result v1",
+    "reduction-result.v2.schema.json": (
+        "https://caliburn.local/schemas/reduction-result.v2.schema.json",
+        "Caliburn interview vNext reduction result v2",
         _model_schema(ReductionResult),
     ),
     "transition-session-command.v1.schema.json": (
@@ -114,15 +116,25 @@ SCHEMA_EXPORTS: dict[str, tuple[str, str, SchemaFactory]] = {
         "Caliburn interview vNext transition session command v1",
         _model_schema(TransitionSessionCommand),
     ),
-    "append-transcript-turn-command.v1.schema.json": (
-        "https://caliburn.local/schemas/append-transcript-turn-command.v1.schema.json",
-        "Caliburn interview vNext append transcript turn command v1",
-        _model_schema(AppendTranscriptTurnCommand),
+    "append-consultant-question-command.v1.schema.json": (
+        "https://caliburn.local/schemas/append-consultant-question-command.v1.schema.json",
+        "Caliburn interview vNext append consultant question command v1",
+        _model_schema(AppendConsultantQuestionCommand),
     ),
-    "apply-evidence-command.v2.schema.json": (
-        "https://caliburn.local/schemas/apply-evidence-command.v2.schema.json",
-        "Caliburn interview vNext apply evidence command v2",
-        _model_schema(ApplyEvidenceCommand),
+    "append-employee-turn-command.v1.schema.json": (
+        "https://caliburn.local/schemas/append-employee-turn-command.v1.schema.json",
+        "Caliburn interview vNext append employee turn command v1",
+        _model_schema(AppendEmployeeTurnCommand),
+    ),
+    "invalidate-question-frame-command.v1.schema.json": (
+        "https://caliburn.local/schemas/invalidate-question-frame-command.v1.schema.json",
+        "Caliburn interview vNext invalidate question frame command v1",
+        _model_schema(InvalidateQuestionFrameCommand),
+    ),
+    "apply-turn-interpretation-command.v1.schema.json": (
+        "https://caliburn.local/schemas/apply-turn-interpretation-command.v1.schema.json",
+        "Caliburn interview vNext apply turn interpretation command v1",
+        _model_schema(ApplyTurnInterpretationCommand),
     ),
     "withdraw-evidence-command.v1.schema.json": (
         "https://caliburn.local/schemas/withdraw-evidence-command.v1.schema.json",
@@ -180,6 +192,26 @@ SCHEMA_EXPORTS: dict[str, tuple[str, str, SchemaFactory]] = {
         _model_schema(ApplyReviewDecisionCommand),
     ),
 }
+
+
+# Files committed by an earlier active version. The writer never regenerates
+# these — they are frozen bytes that tests lock by hash, so that changing a
+# nested production type can never silently rewrite published history
+# (plan §5.1).
+HISTORICAL_SCHEMAS: frozenset[str] = frozenset(
+    {
+        "evidence.v2.schema.json",
+        "interview-state.v2.schema.json",
+        "append-transcript-turn-command.v1.schema.json",
+        "apply-evidence-command.v2.schema.json",
+        "domain-event.v1.schema.json",
+        "reduction-result.v1.schema.json",
+    }
+)
+
+_OVERLAP = HISTORICAL_SCHEMAS & SCHEMA_EXPORTS.keys()
+if _OVERLAP:
+    raise RuntimeError(f"schema filenames cannot be both active and historical: {sorted(_OVERLAP)}")
 
 
 def published_schema(filename: str) -> dict[str, Any]:

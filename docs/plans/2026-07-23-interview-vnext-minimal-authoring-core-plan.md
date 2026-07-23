@@ -124,6 +124,7 @@ OpenRouter model output 時，不必重寫 revision、decision、stale 或 diges
 目前目標不是建立可販售的多租戶平台，而是儘快讓一名員工能與 AI 顧問完成一份高品質、客製化職務說明書。因此：
 
 - `tenant_id` 只作既有 vNext session／FK 的內部相容欄位；不因此建立 organization、member、ACL、quota、billing、tenant admin、跨租戶測試矩陣或 SaaS UI；
+- 員工使用的是本機 Web app；啟動流程可自動開啟 localhost UI，但不會收到遠端產品網址、帳號或密碼，也不需自行設定 host／port；
 - 不為「未來可能需要」增加 generic repository、command bus、workflow framework、額外 hash 層或全面測試排列；
 - 不刪除 immutable revision、AI-only-proposal、employee decision、Evidence provenance、transaction/CAS 等會直接影響文件正確性的核心架構；
 - 測試採風險導向：純契約／transition 代表邊界、資料庫關鍵不變量、以及一條真 PostgreSQL 產品 golden；後續功能不要求全面排列組合覆蓋；
@@ -1398,7 +1399,7 @@ A1之後不再擴充Authoring generic能力，也不做 SaaS。為了最快看�
 
 1. **Context Engine + `question.select`**：把 Evidence、未解缺口與最新 `JobStateDigest` 組成 operation-specific context，選出最有資訊價值的一題；
 2. **`episode.code/1.x` 工作分析**：用 OpenRouter 將一段已訪談內容分析成 id-less task/output proposal，再映射到本切片的 `CreateTaskProposalCommand`；
-3. **最小單機 workspace**：聊天、文件預覽／直接編輯、AI 提案的接受／修改／拒絕共用同一 application service；不先做登入、組織或多人協作；
+3. **最小本機 Web workspace**：聊天、文件預覽／直接編輯、AI 提案的接受／修改／拒絕共用同一 application service；不先做登入、組織或多人協作；
 4. **真模型產品 loop eval**：評估提問效率、task/output 正確性、證據支持與使用者修訂量，而非再增加底層 framework；
 5. 產品 loop 穩定後，再依序加入 behavior indicator、duty、K/S、公版 retrieval 與 publication/export。
 

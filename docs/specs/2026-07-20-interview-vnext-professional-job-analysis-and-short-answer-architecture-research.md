@@ -2,7 +2,7 @@
 title: Interview vNext 員工訪談、專業職務分析與即時 JD 共編架構研究
 status: accepted-research; R5 authority is ADR 0037 + amendment; post-R5 product authority is ADR 0038
 date: 2026-07-20
-revision: 6
+revision: 7
 audience: owner, architect, implementer, evaluator
 scope: R5 前置設計；員工訪談、短回答、即時共編、當下單一職務、document-local K/S 與交付 projection
 ---
@@ -39,6 +39,11 @@ scope: R5 前置設計；員工訪談、短回答、即時共編、當下單一�
 > `question.select`、`episode.code`、`job.consolidate`、`requirements.draft`、`job.compose`分成versioned operations，使用
 > operation-specific typed context。`JobStateDigest`由canonical draft確定性投影，provider memory不是domain truth；AI文件
 > 變更一律proposal，員工direct edit立即成為draft truth。不得重新合併成大型`consultant.advance`prompt。
+>
+> **Revision 7（local-web product scope lock）**：第一個成品是員工電腦本機運行的 Web 應用程式，不是雲端網站或
+> 單人版 SaaS。啟動流程可開啟 localhost UI，但員工不拿遠端網址、不註冊、不登入、沒有帳號密碼，也不設定 host／port。
+> 這不強制完全離線：本機 Web app 可使用 owner 配置的 OpenRouter key。除非 owner 明確改變範圍，不做 organization、tenant
+> product behavior、ACL、計費、雲端部署或多人協作；研究與工程優先投入訪談品質、LLM 工作分析與 JD 成品品質。
 
 ## 1. 結論先行
 
@@ -1481,10 +1486,11 @@ R5 不 import editor contract，只由 Question Policy 使用 `JobStateDigest`�
 
 ### D14 — first-product scope
 
-**推薦：先做單一員工、單一 session／JobModel、單一 active draft 的 modular monolith。**
+**已裁決：先做單一員工、單一 session／JobModel、單一 active draft 的本機 Web 應用程式。**
 
 不先做 SaaS、tenant、多人權限、即時多人游標、CRDT、公司層共用 K/S。核心 entity/revision/proposal ID 與 module port
-仍保持乾淨，未來需要時可擴充，不以當下未需求的基礎設施拖延成品。
+仍保持乾淨，未來需要時可擴充，不以當下未需求的基礎設施拖延成品。員工可由啟動流程進入 localhost Web UI，但不經
+遠端網址、註冊、登入或帳密流程，也不自行設定 host／port；不要求原生桌面殼。
 
 ### D15 — R5 go/no-go
 

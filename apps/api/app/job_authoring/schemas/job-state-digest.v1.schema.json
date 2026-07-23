@@ -1,0 +1,147 @@
+{
+  "$defs": {
+    "JobStateDigestTask": {
+      "additionalProperties": false,
+      "properties": {
+        "ordinal": {
+          "title": "Ordinal",
+          "type": "string"
+        },
+        "task_id": {
+          "format": "uuid",
+          "title": "Task Id",
+          "type": "string"
+        },
+        "entity_version": {
+          "minimum": 1,
+          "title": "Entity Version",
+          "type": "integer"
+        },
+        "statement_excerpt": {
+          "title": "Statement Excerpt",
+          "type": "string"
+        },
+        "output_excerpts": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Output Excerpts",
+          "type": "array"
+        },
+        "omitted_output_count": {
+          "minimum": 0,
+          "title": "Omitted Output Count",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "ordinal",
+        "task_id",
+        "entity_version",
+        "statement_excerpt",
+        "output_excerpts",
+        "omitted_output_count"
+      ],
+      "title": "JobStateDigestTask",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "job_state_digest.v1",
+      "default": "job_state_digest.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "projection_version": {
+      "const": "1.0.0",
+      "default": "1.0.0",
+      "title": "Projection Version",
+      "type": "string"
+    },
+    "document_id": {
+      "format": "uuid",
+      "title": "Document Id",
+      "type": "string"
+    },
+    "session_id": {
+      "format": "uuid",
+      "title": "Session Id",
+      "type": "string"
+    },
+    "revision_id": {
+      "format": "uuid",
+      "title": "Revision Id",
+      "type": "string"
+    },
+    "revision_number": {
+      "minimum": 0,
+      "title": "Revision Number",
+      "type": "integer"
+    },
+    "revision_hash": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Revision Hash",
+      "type": "string"
+    },
+    "job_title": {
+      "maxLength": 256,
+      "minLength": 1,
+      "title": "Job Title",
+      "type": "string"
+    },
+    "tasks": {
+      "items": {
+        "$ref": "#/$defs/JobStateDigestTask"
+      },
+      "title": "Tasks",
+      "type": "array"
+    },
+    "omitted_task_count": {
+      "minimum": 0,
+      "title": "Omitted Task Count",
+      "type": "integer"
+    },
+    "pending_proposal_ids": {
+      "items": {
+        "format": "uuid",
+        "type": "string"
+      },
+      "title": "Pending Proposal Ids",
+      "type": "array"
+    },
+    "pending_proposal_count": {
+      "minimum": 0,
+      "title": "Pending Proposal Count",
+      "type": "integer"
+    },
+    "stale_proposal_count": {
+      "minimum": 0,
+      "title": "Stale Proposal Count",
+      "type": "integer"
+    },
+    "digest_hash": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Digest Hash",
+      "type": "string"
+    }
+  },
+  "required": [
+    "document_id",
+    "session_id",
+    "revision_id",
+    "revision_number",
+    "revision_hash",
+    "job_title",
+    "tasks",
+    "omitted_task_count",
+    "pending_proposal_ids",
+    "pending_proposal_count",
+    "stale_proposal_count",
+    "digest_hash"
+  ],
+  "title": "Caliburn job authoring job state digest v1",
+  "type": "object",
+  "$id": "https://caliburn.local/schemas/job-state-digest.v1.schema.json"
+}

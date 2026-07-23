@@ -1,7 +1,10 @@
 # Caliburn — agent orientation
 
-Caliburn 是給顧問用的**多租戶 B2B SaaS**(職能基準 OCS → 職務說明書),公司間資料隔離。
-Monorepo。維護者用**繁體中文**,請用繁中回應。
+Caliburn 現行目標是給員工使用的**本機 Web AI 職務分析與職務說明書應用程式**。Web UI/API/資料在員工電腦本機運行；
+員工不拿遠端產品網址、不註冊、不登入、
+沒有帳號密碼；第一版是一名員工當下的一份職務說明書。repo 仍含早期多租戶 B2B SaaS 程式，但那不是目前產品方向。
+除非 owner 明確指示，不得新增 SaaS、organization/member/ACL、登入、計費、tenant administration、雲端部署或多人協作。
+完整產品範圍鎖定見 `docs/product-notes.md`。Monorepo。維護者用**繁體中文**,請用繁中回應。
 
 > 記憶是 per-project 的,不會跨資料夾搬。**這個 repo 的 `CLAUDE.md` + `docs/` 才是權威**;
 > 不確定就讀下面指的文件,別憑空猜。
@@ -20,6 +23,15 @@ Monorepo。維護者用**繁體中文**,請用繁中回應。
 7. **改子系統就更文檔** —— 文檔架構/擺放/寫作/維護的**權威總則見 `docs/README.md`**。跨 app/seam 的
    端到端說明住 `docs/design/`(單一 app 的住該 app 底下);**動到那條線的碼 → 同 commit 更新該文檔**
    (fossilization 是頭號壞味道);寫法照 dual-audience 清單(動作→請求、真名、不變量、退役禁令)。
+
+### 現行產品優先級（高於歷史 SaaS 架構慣性）
+
+- 先做員工可操作、可一鍵啟動的本機 Web 成品；可自動開啟 localhost UI，但不得要求員工設定 host／port，也不要引入
+  未被要求的 Electron／Tauri／原生桌面殼。
+- 時間、研究與設計優先投入訪談品質、Context Engine、LLM 工作分析、task/output/indicator/K/S 品質、Evidence linkage與JD成品品質。
+- 本機 Web app 可呼叫 OpenRouter，不代表必須完全離線；API key 是 owner／開發設定，不是員工帳號流程。
+- 不為未被要求的 SaaS、generic framework、全面 hash／audit 或測試排列拖延成品；仍保留會直接保護文件真相、員工決策、
+  provenance與交易正確性的核心安全網。
 
 ## 架構(權威:`ARCHITECTURE.md` + `docs/adr/README.md`)
 

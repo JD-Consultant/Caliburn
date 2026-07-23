@@ -36,7 +36,8 @@ complete. Authoring lives in the independent `app/job_authoring/` module; do not
 
 Product work is standalone/single-user first. Unless the owner explicitly changes scope, do not add organizations,
 memberships, ACLs, quotas, billing, tenant administration, or a SaaS test matrix; retained `tenant_id` fields are
-storage compatibility only. Spend the next slices on Context Engine, question selection, episode job analysis,
+storage compatibility only. The employee launches a local Web app; its startup may open a localhost UI, but there is
+no remote product URL, registration, login, account, or password flow, and host/port setup must remain an implementation detail. Spend the next slices on Context Engine, question selection, episode job analysis,
 OpenRouter-backed proposals, and a minimal workspace. Production routes, Web wiring, provider promotion,
 direct-vendor adapters and paid live still need their own approved slice. Migration `0011_job_authoring_core.py` is
 limited to the three exact Authoring tables in the A1 plan. The active turn contract remains

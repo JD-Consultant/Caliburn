@@ -3,8 +3,10 @@
 > **關於文檔的文檔**:哪種文檔幹嘛、住哪、怎麼寫、怎麼維護,加現行索引。**給人也給 agent**。
 > 動到文檔慣例時**同 commit 更新本檔**。為什麼這樣設計 → 兩份研究紀錄(§6)。
 
-Caliburn 現階段的產品目標是**單機／單使用者的 AI 職務分析與職務說明書成品**。repo 仍保留早期 B2B／多租戶程式，
-但 SaaS、公司／成員／權限／計費不在現行 roadmap；除非 owner 明確指示，不得把新核心工作轉去平台 SaaS 化。
+Caliburn 現階段的產品目標是**員工在自己的電腦運行的本機 Web AI 職務分析與職務說明書成品**；可由啟動流程開啟
+localhost Web UI，但員工不拿遠端產品網址、
+不註冊、不登入，也沒有帳號密碼。repo 仍保留早期 B2B／多租戶程式，但 SaaS、公司／成員／權限／計費不在現行 roadmap；
+除非 owner 明確指示，不得把新核心工作轉去平台 SaaS 化。完整範圍鎖定見 [`product-notes.md`](product-notes.md)。
 Monorepo:Turborepo + per-app uv。
 
 ---

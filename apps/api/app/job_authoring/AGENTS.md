@@ -11,8 +11,10 @@ Current product scope is a standalone/single-user deliverable. `tenant_id`
 exists only because the vNext persistence parent and composite foreign keys
 already require that storage scope. Unless the owner explicitly asks for SaaS,
 do not add organization/member/ACL/quota/billing/admin behavior or tests. The
-next engineering budget belongs to the LLM job-analysis loop and minimal user
-workspace, not platform generalization.
+employee uses a local Web app: startup may open localhost, but there is no
+remote product URL, registration, login, account, or password, and host/port
+setup is not an employee workflow. The next engineering budget belongs to the
+LLM job-analysis loop and minimal local Web workspace, not platform generalization.
 
 ## Non-negotiable invariants
 

@@ -491,3 +491,29 @@ verifier 還是 reducer 所造成。V5 前必須完成 authenticated principal �
 Web seam或模型 bake-off；production 行為仍為
 零變化(composition root 不 import vNext)。durable outbox/checkpoint 已由
 V2-B DB tests 證明;只有 V3 fixed replay與 V6 bake-off通過後才能談模型品質或上線。
+
+## Production OpenRouter 與最小顧問 loop（2026-07-23）
+
+上段是歷史階段說明；目前 production backend 已往前完成：
+
+```text
+interpreted employee turn
+  -> deterministic STOP / explicit-shift control
+  -> QuestionAgenda + bounded Context
+  -> question.select/1.0.0
+  -> production OpenRouter Chat adapter
+  -> schema + semantic + route conformance
+  -> atomic consultant question + QuestionFrame + gap/episode commit
+```
+
+- provider production code在`providers/openrouter_*.py`；`evals/`只保留相容 wrapper。
+- 開發 profile固定`openai/gpt-5.4-mini`、canonical
+  `openai/gpt-5.4-mini-20260317`、exact `openai/flex`、reasoning low。
+- fallback、cache與mutating plugins關閉；provider conversation不保存產品記憶。
+- `application/question_select_executor.py`是operation-specific executor，不是generic agent runner。
+- `application/consultant_loop.py`只處理確定的STOP／explicit shift；模糊訊號不做不可逆mutation。
+- 真 PostgreSQL + paid live均已通過；live cost `US$0.000558375`，詳見
+  [`production loop plan §5`](../../../../docs/plans/2026-07-23-interview-vnext-production-openrouter-consultant-loop-plan.md)。
+
+仍未完成的是local Web route/UI與可見JD canvas。下一切片先接一輪localhost對話，不做SaaS、登入、
+K/S或graph framework；`episode.code`及有Evidence linkage的task/output proposal在可見主線之後。

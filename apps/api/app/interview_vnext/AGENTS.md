@@ -26,19 +26,21 @@ This package implements ADR 0034 and the 2026-07-16 greenfield architecture.
 - V3-5A runtime mother handoff: `docs/plans/2026-07-18-interview-vnext-v3-5a-runtime-contract-reconstruction-plan.md`
 - R5 exact implementation handoff: `docs/plans/2026-07-20-interview-vnext-v3-5a-r5-grounded-short-answer-amendment-plan.md`
 - Post-R5 product decision: `docs/adr/0038-interview-vnext-context-engine-and-professional-consultant-workflow.md`
-- Active implementation handoff: `docs/plans/2026-07-23-interview-vnext-minimal-authoring-core-plan.md`
+- Completed question selection handoff: `docs/plans/2026-07-23-interview-vnext-question-select-context-loop-plan.md`
 - Completed R4 provider evidence/conformance evidence: `docs/plans/2026-07-19-interview-vnext-v3-5a-r4-provider-evidence-conformance-plan.md`
 - Completed R3 corrective evidence: `docs/plans/2026-07-19-interview-vnext-v3-5a-r3-corrective-plan.md`
 
-R5 grounded short-answer, R5-D bounded correctness closure, and the UI-independent minimal Authoring Core are
-complete. Authoring lives in the independent `app/job_authoring/` module; do not retrofit the old
+R5 grounded short-answer, R5-D bounded correctness closure, the UI-independent minimal Authoring Core, and the
+provider-neutral `question.select/1.0.0` Context/Agenda/QuestionFrame slice are complete. Authoring lives in the independent `app/job_authoring/` module; do not retrofit the old
 `DocumentVersion/_pending` tree or make Authoring domain import the legacy editor/OCS/indexer contracts.
 
 Product work is standalone/single-user first. Unless the owner explicitly changes scope, do not add organizations,
 memberships, ACLs, quotas, billing, tenant administration, or a SaaS test matrix; retained `tenant_id` fields are
 storage compatibility only. The employee launches a local Web app; its startup may open a localhost UI, but there is
-no remote product URL, registration, login, account, or password flow, and host/port setup must remain an implementation detail. Spend the next slices on Context Engine, question selection, episode job analysis,
-OpenRouter-backed proposals, and a minimal workspace. Production routes, Web wiring, provider promotion,
-direct-vendor adapters and paid live still need their own approved slice. Migration `0011_job_authoring_core.py` is
+no remote product URL, registration, login, account, or password flow, and host/port setup must remain an implementation detail. The next slice should compose the existing durable executor/OpenRouter boundary with
+`question.select`, then expose the smallest local Web conversation + JD canvas; `episode.code` and grounded task/output
+proposals follow. Do not rebuild Agenda as a planner agent, add a graph framework, or start K/S/SaaS before that
+vertical path works. Production routes, Web wiring, provider promotion, direct-vendor adapters and paid live still
+need their own approved slice. Migration `0011_job_authoring_core.py` is
 limited to the three exact Authoring tables in the A1 plan. The active turn contract remains
 `turn.interpret/2.0.0`; do not patch or create new runs with `turn.interpret/1.0.0`.

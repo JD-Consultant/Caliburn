@@ -1,9 +1,9 @@
 # Interview AI vNext（隔離開發中）
 
 本 package 是 ADR 0034 的隔離 greenfield 實作區。V0～V3-5 harness、V3-5A R1–R4（含correctives）、R5-A、
-**R5-BC grounded turn interpretation hard cut**與 **R5-D bounded correctness closure** 均已完成。R5-D 後的完整 API
-no-network gate為 `1071 passed / 211 skipped / 0 failed`（+13 skip 為新增 real-PG capture 完整性 test nodes 在
-no-network 由 `require_postgres` 跳過），完整 API＋real PostgreSQL為 `1282 passed / 0 skipped / 0 failed`。
+**R5-BC grounded turn interpretation hard cut**、**R5-D bounded correctness closure**、最小Authoring Core與
+provider-neutral **`question.select/1.0.0` 核心**均已完成。2026-07-23 question.select 後完整 API no-network gate為
+`1166 passed / 217 skipped / 0 failed`；本切片沒有新增DB測試或migration。
 
 R5-BC 現行路徑使用persisted QuestionFrame、AnswerBinding、Evidence.v3 literal/contextual support、每個成功employee turn
 一筆receipt、frequency/time分離與state-version/hash CAS。模型只提出不帶domain identity的v2 proposals；application依
@@ -17,8 +17,12 @@ production composition root import；現行使用者流量仍走`app/interview/`
 品質裁決資格；paid live、V3-6、production promotion仍blocked。R5-D 已封住 Capture terminal-root closure、bundle
 corruption matrix 與 byte-identical re-export；**A1 最小 Authoring Core 已完成**，建立獨立`app/job_authoring/`核心，
 不把新文件真相塞回舊`DocumentVersion/_pending`。它已支援 task/output revision、員工直接編輯、AI proposal的
-accept/edit/reject、stale與digest，但尚未接LLM operation、API或UI。產品先面向單機／單使用者；除非owner明確要求，
-不做SaaS，下一步把工程資源放在Context Engine、選題、episode工作分析與最小workspace。
+accept/edit/reject、stale與digest。`question.select`現已用deterministic Agenda從Evidence與JobStateDigest產生最多三個
+高價值候選，ContextBuilder只送必要turn／episode／support／digest，模型只選ordinal並寫一句自然問題；application再
+驗ordinal、重複問題與action，建立QuestionFrame與既有domain commands。output／purpose可形成grounded slot，
+broaden coverage可開新episode，existing gap可轉asked。它尚未接production OpenRouter、API或UI，也未做paid live模型
+品質裁決。產品先面向單機／單使用者；除非owner明確要求，不做SaaS。下一步把這份operation接進既有durable
+executor／OpenRouter，接著完成最小local Web conversation + JD canvas，再做`episode.code`文件proposal。
 
 權威文件：
 
@@ -33,6 +37,8 @@ accept/edit/reject、stale與digest，但尚未接LLM operation、API或UI。產
 - R5-BC Domain／Context／Interpreter原子hard cut（completed，§23為交付證據）：[`../../../../docs/plans/2026-07-22-interview-vnext-v3-5a-r5-bc-domain-context-hard-cut-plan.md`](../../../../docs/plans/2026-07-22-interview-vnext-v3-5a-r5-bc-domain-context-hard-cut-plan.md)
 - R5-D bounded correctness closure（**completed**，§17為交付證據；下一步最小Authoring Core）：[`../../../../docs/plans/2026-07-22-interview-vnext-v3-5a-r5-d-bounded-correctness-closure-plan.md`](../../../../docs/plans/2026-07-22-interview-vnext-v3-5a-r5-d-bounded-correctness-closure-plan.md)
 - A1 最小 Authoring Core（**completed**；task/output、revision、direct edit、proposal decision、stale、digest、0011 exact scope；交付證據見§21）：[`../../../../docs/plans/2026-07-23-interview-vnext-minimal-authoring-core-plan.md`](../../../../docs/plans/2026-07-23-interview-vnext-minimal-authoring-core-plan.md)
+- 下一題選擇／Context／Loop研究（**accepted**；含2026現行OpenAI／Anthropic／Microsoft官方方法核對）：[`../../../../docs/specs/2026-07-23-interview-vnext-question-selection-context-loop-research.md`](../../../../docs/specs/2026-07-23-interview-vnext-question-selection-context-loop-research.md)
+- `question.select/1.0.0`最小垂直切片（**completed**；交付證據見§7）：[`../../../../docs/plans/2026-07-23-interview-vnext-question-select-context-loop-plan.md`](../../../../docs/plans/2026-07-23-interview-vnext-question-select-context-loop-plan.md)
 - R3-C修正交接：[`../../../../docs/plans/2026-07-19-interview-vnext-v3-5a-r3-corrective-plan.md`](../../../../docs/plans/2026-07-19-interview-vnext-v3-5a-r3-corrective-plan.md)
 - R4 provider evidence/conformance交接（已完成，§19 為執行結果）：[`../../../../docs/plans/2026-07-19-interview-vnext-v3-5a-r4-provider-evidence-conformance-plan.md`](../../../../docs/plans/2026-07-19-interview-vnext-v3-5a-r4-provider-evidence-conformance-plan.md)
 - V2 研究：[`../../../../docs/specs/2026-07-16-interview-vnext-v2-provider-capture-research.md`](../../../../docs/specs/2026-07-16-interview-vnext-v2-provider-capture-research.md)
@@ -51,14 +57,15 @@ accept/edit/reject、stale與digest，但尚未接LLM operation、API或UI。產
 
 ```text
 domain/                 已實作：純 Pydantic contracts、validators、reducers、domain events、schemas
-application/            已實作至R5-BC：async persistence ports、apply_durable_command、
+application/            已實作：async persistence ports、apply_durable_command、
                         durable operations(prepare/attempt/verify/commit/fail)、receipt＋state CAS、
                         outcome v2、crash recovery、pure ContextBuilder、QuestionFrame-aware verifier、
-                        Evidence mapping與explicit turn executor
+                        Evidence mapping、explicit turn executor、deterministic QuestionAgenda、
+                        question.select projection/verifier與domain command plan
 llm/                    已實作：neutral operation/request/result/failure、registry、scripted fake、
                         Context／Turn contracts v2、portable schema、prompt/context/verifier policy
-                        與operation 2.0.0、historical schemas
-providers/              空殼：尚未接 OpenAI/Anthropic SDK或模型
+                        與turn.interpret 2.0.0、question.select 1.0.0、historical schemas
+providers/              production空殼：尚未把eval-verified OpenRouter adapter接入composition root
 knowledge/              空殼：尚未接 reference snapshot
 persistence/            已實作(V2-B)：ORM rows、migration 0010、serialization、repositories、
                         UoW、durable capture(run/event/outbox)、Postgres outbox lease adapter

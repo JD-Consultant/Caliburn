@@ -1,0 +1,55 @@
+{
+  "$defs": {
+    "QuestionSelectAction": {
+      "enum": [
+        "ask_gap",
+        "broaden_coverage",
+        "offer_finish"
+      ],
+      "title": "QuestionSelectAction",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "enum": [
+        "question_select_output.v1"
+      ],
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "acknowledgement": {
+      "title": "Acknowledgement",
+      "type": "string"
+    },
+    "action": {
+      "$ref": "#/$defs/QuestionSelectAction"
+    },
+    "selected_gap_ordinal": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Selected Gap Ordinal"
+    },
+    "question_text": {
+      "title": "Question Text",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "acknowledgement",
+    "action",
+    "selected_gap_ordinal",
+    "question_text"
+  ],
+  "title": "Caliburn interview vNext portable question selection output v1",
+  "type": "object",
+  "$id": "https://caliburn.local/schemas/question-select-output.v1.schema.json"
+}

@@ -6,6 +6,10 @@ from dataclasses import dataclass
 from typing import Any
 from uuid import UUID
 
+from app.interview_vnext.application.agenda import (
+    QuestionAgenda,
+    QuestionAgendaSource,
+)
 from app.interview_vnext.domain.episode import GapDimension, GapStatus
 from app.interview_vnext.domain.evidence import (
     EvidenceStatus,
@@ -49,10 +53,16 @@ from app.interview_vnext.llm.context import (
     ContextSourceType,
     EpisodeCodeContextPacket,
     EpisodeCodeContextPolicy,
+    QuestionSelectContextBuildResult,
+    QuestionSelectContextCandidate,
+    QuestionSelectContextPacket,
+    QuestionSelectContextPolicy,
+    QuestionSelectDialogueLimits,
     ReferenceSnapshot,
     TurnInterpretContextPacket,
     TurnInterpretContextPolicy,
 )
+from app.job_authoring.contracts import JobStateDigest
 
 
 UNRESOLVED_CONTRADICTION_STATUSES = frozenset(
@@ -243,10 +253,11 @@ def _finalize_manifest(
 def _budget_report(
     *,
     identity: dict[str, Any],
-    packet: ContextPacket,
+    packet: Any,
     manifest: ContextSelectionManifest,
     policy,
     item_caps: dict[str, int | None],
+    section_singletons: dict[str, tuple[Any, ...]] | None = None,
     limitations: tuple[str, ...] = (),
 ) -> ContextBudgetReport:
     packet_json = canonical_json(packet)
@@ -261,19 +272,34 @@ def _budget_report(
         )
         for section in policy.section_order
     }
+    section_singletons = section_singletons or {}
+
+    def section_metrics(section: str) -> tuple[int, int, int]:
+        decisions = selected_by_section[section]
+        singletons = section_singletons.get(section, ())
+        singleton_metrics = tuple(_metrics(item) for item in singletons)
+        return (
+            len(decisions) + len(singletons),
+            sum(item.utf8_bytes for item in decisions)
+            + sum(item[1] for item in singleton_metrics),
+            sum(item.unicode_code_points for item in decisions)
+            + sum(item[2] for item in singleton_metrics),
+        )
+
+    metrics = {
+        section: section_metrics(section) for section in policy.section_order
+    }
     sections = tuple(
         ContextSectionBudget(
             section=section,
-            selected_items=len(selected_by_section[section]),
+            selected_items=metrics[section][0],
             item_cap=item_caps.get(section),
             within_item_cap=(
                 item_caps.get(section) is None
-                or len(selected_by_section[section]) <= item_caps[section]
+                or metrics[section][0] <= item_caps[section]
             ),
-            utf8_bytes=sum(item.utf8_bytes for item in selected_by_section[section]),
-            unicode_code_points=sum(
-                item.unicode_code_points for item in selected_by_section[section]
-            ),
+            utf8_bytes=metrics[section][1],
+            unicode_code_points=metrics[section][2],
         )
         for section in policy.section_order
     )
@@ -303,6 +329,24 @@ def _result_or_raise(
     if not budget.within_budget:
         raise ContextBudgetExceeded(packet=packet, manifest=manifest, budget=budget)
     return ContextBuildResult(
+        packet=packet,
+        manifest=manifest,
+        budget=budget,
+        packet_hash=canonical_hash(packet),
+        manifest_hash=canonical_hash(manifest),
+        budget_hash=canonical_hash(budget),
+    )
+
+
+def _question_result_or_raise(
+    *,
+    packet: QuestionSelectContextPacket,
+    manifest: ContextSelectionManifest,
+    budget: ContextBudgetReport,
+) -> QuestionSelectContextBuildResult:
+    if not budget.within_budget:
+        raise ContextBudgetExceeded(packet=packet, manifest=manifest, budget=budget)
+    return QuestionSelectContextBuildResult(
         packet=packet,
         manifest=manifest,
         budget=budget,
@@ -782,6 +826,383 @@ class ContextBuilder:
             ),
         )
         return _result_or_raise(packet=packet, manifest=manifest, budget=budget)
+
+    def build_question_select(
+        self,
+        *,
+        state: InterviewState,
+        agenda: QuestionAgenda,
+        job_digest: JobStateDigest,
+        operation_id: UUID,
+        operation_definition_hash: str,
+        policy: QuestionSelectContextPolicy,
+    ) -> QuestionSelectContextBuildResult:
+        """Build the bounded state used to choose one next consultant question."""
+
+        state = InterviewState.model_validate(state.model_dump())
+        agenda = QuestionAgenda.model_validate(agenda.model_dump())
+        job_digest = JobStateDigest.model_validate(job_digest.model_dump())
+        policy = QuestionSelectContextPolicy.model_validate(policy.model_dump())
+        if (
+            agenda.session_id != state.session.session_id
+            or agenda.state_version != state.session.state_version
+        ):
+            raise ContextBuildError("question agenda is stale or belongs to another session")
+        if job_digest.session_id != state.session.session_id:
+            raise ContextBuildError("job digest belongs to another interview session")
+        if agenda.active_episode_id != state.session.active_episode_id:
+            raise ContextBuildError("question agenda active episode is stale")
+        if not state.turns or state.turns[-1].role != TranscriptRole.EMPLOYEE:
+            raise ContextBuildError(
+                "question.select requires an employee turn at the transcript tail"
+            )
+
+        latest_employee = state.turns[-1]
+        if latest_employee.turn_id not in {
+            item.employee_turn_id for item in state.turn_interpretations
+        }:
+            raise ContextBuildError(
+                "question.select requires the latest employee turn to be interpreted"
+            )
+        recent_consultant = next(
+            (
+                turn
+                for turn in reversed(state.turns[:-1])
+                if turn.role == TranscriptRole.CONSULTANT
+            ),
+            None,
+        )
+        episode = next(
+            (
+                item
+                for item in state.episodes
+                if item.episode_id == state.session.active_episode_id
+            ),
+            None,
+        )
+        episode_identity = (
+            ContextEpisodeIdentity(
+                episode_id=episode.episode_id,
+                target=episode.target,
+                status=episode.status,
+            )
+            if episode is not None
+            else None
+        )
+        state_hash = canonical_hash(state)
+        active_evidence = {
+            item.evidence_id: item
+            for item in state.evidence
+            if item.status == EvidenceStatus.ACTIVE
+            and (
+                episode is None
+                or item.episode_id == episode.episode_id
+            )
+        }
+        requested_support_ids = tuple(
+            sorted(
+                {
+                    evidence_id
+                    for candidate in agenda.candidates
+                    for evidence_id in candidate.supporting_evidence_ids
+                    if evidence_id in active_evidence
+                },
+                key=str,
+            )
+        )
+        selected_support_ids = requested_support_ids[: policy.max_evidence_items]
+        turn_sequences = {turn.turn_id: turn.sequence for turn in state.turns}
+        evidence_items = tuple(
+            _evidence_item(
+                state_hash, turn_sequences, active_evidence[evidence_id]
+            )
+            for evidence_id in selected_support_ids
+        )
+        selected_support_set = set(selected_support_ids)
+
+        context_candidates: list[QuestionSelectContextCandidate] = []
+        for candidate in agenda.candidates[: policy.max_candidate_items]:
+            source = (
+                _state_source(
+                    ContextSourceType.GAP,
+                    candidate.existing_gap_id,
+                    state_hash,
+                )
+                if candidate.source == QuestionAgendaSource.EXISTING_GAP
+                else _policy_source(f"question-agenda:{candidate.stable_key}")
+            )
+            context_candidates.append(
+                QuestionSelectContextCandidate(
+                    source=source,
+                    ordinal=candidate.ordinal,
+                    stable_key=candidate.stable_key,
+                    dimension=candidate.dimension,
+                    question_goal=candidate.question_goal,
+                    supporting_evidence_ids=tuple(
+                        evidence_id
+                        for evidence_id in candidate.supporting_evidence_ids
+                        if evidence_id in selected_support_set
+                    ),
+                    existing_gap_id=candidate.existing_gap_id,
+                )
+            )
+
+        identity = _identity(
+            operation_name=policy.operation_name,
+            operation_definition_hash=operation_definition_hash,
+            policy=policy,
+            session_id=state.session.session_id,
+            turn_id=latest_employee.turn_id,
+            operation_id=operation_id,
+            state_hash=state_hash,
+            state_version=state.session.state_version,
+            reference_snapshot_hash=None,
+        )
+        dialogue_limits = QuestionSelectDialogueLimits(
+            allow_broaden_coverage=agenda.allow_broaden_coverage,
+            allow_offer_finish=agenda.allow_offer_finish,
+            remaining_high_value_questions=agenda.remaining_high_value_questions,
+        )
+        packet = QuestionSelectContextPacket(
+            **identity,
+            latest_employee_turn=latest_employee,
+            recent_consultant_question=recent_consultant,
+            active_episode=episode_identity,
+            agenda_candidates=tuple(context_candidates),
+            supporting_evidence=evidence_items,
+            job_state_digest=job_digest,
+            dialogue_limits=dialogue_limits,
+        )
+
+        selected: dict[
+            tuple[ContextSourceType, str], tuple[str, set[str], Any]
+        ] = {}
+
+        def choose(source, section: str, reason: str, content: Any) -> None:
+            key = (source.source_type, source.source_id)
+            if key in selected:
+                selected[key][1].add(reason)
+            else:
+                selected[key] = (section, {reason}, content)
+
+        boundary_source = _policy_source(f"{policy.name}:injection-boundary")
+        choose(
+            boundary_source,
+            "injection_boundary",
+            "required_policy_boundary",
+            INJECTION_BOUNDARY,
+        )
+        choose(
+            _state_source(
+                ContextSourceType.TURN, latest_employee.turn_id, state_hash
+            ),
+            "latest_employee_turn",
+            "required_latest_employee_turn",
+            latest_employee,
+        )
+        if recent_consultant is not None:
+            choose(
+                _state_source(
+                    ContextSourceType.TURN, recent_consultant.turn_id, state_hash
+                ),
+                "recent_consultant_question",
+                "recent_question_for_repetition_control",
+                recent_consultant,
+            )
+        if episode is not None:
+            choose(
+                _state_source(
+                    ContextSourceType.EPISODE, episode.episode_id, state_hash
+                ),
+                "active_episode",
+                "active_episode_identity",
+                episode_identity,
+            )
+        for item in context_candidates:
+            choose(
+                item.source,
+                "agenda_candidates",
+                "eligible_question_candidate",
+                item,
+            )
+        for item in evidence_items:
+            choose(
+                item.source,
+                "supporting_evidence",
+                "candidate_supporting_evidence",
+                item,
+            )
+
+        selected_order = sorted(
+            selected.items(),
+            key=lambda pair: (
+                policy.section_order.index(pair[1][0]),
+                _selected_content_order(pair[1][2]),
+            ),
+        )
+        selected_ordinals = {
+            key: ordinal for ordinal, (key, _value) in enumerate(selected_order, 1)
+        }
+        drafts: list[_DecisionDraft] = []
+        drafted: set[tuple[ContextSourceType, str]] = set()
+
+        def add(source, content, excluded_reason: str) -> None:
+            key = (source.source_type, source.source_id)
+            if key in drafted:
+                return
+            drafted.add(key)
+            if key in selected:
+                section, reasons, selected_content = selected[key]
+                drafts.append(
+                    _DecisionDraft(
+                        source,
+                        section,
+                        True,
+                        tuple(reasons),
+                        selected_ordinals[key],
+                        selected_content,
+                    )
+                )
+            else:
+                drafts.append(
+                    _DecisionDraft(
+                        source,
+                        "excluded",
+                        False,
+                        (excluded_reason,),
+                        None,
+                        content,
+                    )
+                )
+
+        add(boundary_source, INJECTION_BOUNDARY, "not_selected")
+        for turn in state.turns:
+            add(
+                _state_source(ContextSourceType.TURN, turn.turn_id, state_hash),
+                turn,
+                "outside_recent_question_window",
+            )
+        for item in state.episodes:
+            add(
+                _state_source(
+                    ContextSourceType.EPISODE, item.episode_id, state_hash
+                ),
+                item,
+                "not_active_episode",
+            )
+        context_candidate_by_key = {
+            item.stable_key: item for item in context_candidates
+        }
+        for candidate in agenda.candidates:
+            item = context_candidate_by_key.get(candidate.stable_key)
+            source = (
+                item.source
+                if item is not None
+                else (
+                    _state_source(
+                        ContextSourceType.GAP,
+                        candidate.existing_gap_id,
+                        state_hash,
+                    )
+                    if candidate.source == QuestionAgendaSource.EXISTING_GAP
+                    else _policy_source(
+                        f"question-agenda:{candidate.stable_key}"
+                    )
+                )
+            )
+            add(
+                source,
+                item or candidate,
+                "candidate_cap_exceeded",
+            )
+        for evidence in state.evidence:
+            if evidence.evidence_id in selected_support_set:
+                reason = "not_selected"
+            elif evidence.status != EvidenceStatus.ACTIVE:
+                reason = "inactive_evidence"
+            elif episode is None or evidence.episode_id != episode.episode_id:
+                reason = "outside_active_episode"
+            elif evidence.evidence_id in requested_support_ids:
+                reason = "section_cap_exceeded"
+            else:
+                reason = "not_candidate_support"
+            add(
+                _state_source(
+                    ContextSourceType.EVIDENCE,
+                    evidence.evidence_id,
+                    state_hash,
+                    canonical_hash(evidence),
+                ),
+                evidence,
+                reason,
+            )
+        for gap in state.gaps:
+            add(
+                _state_source(ContextSourceType.GAP, gap.gap_id, state_hash),
+                gap,
+                "not_eligible_question_candidate",
+            )
+        for inference in state.inferences:
+            add(
+                _state_source(
+                    ContextSourceType.INFERENCE,
+                    inference.inference_id,
+                    state_hash,
+                ),
+                inference,
+                "inference_not_allowed_in_question_context",
+            )
+        for candidate in state.candidates:
+            add(
+                _state_source(
+                    ContextSourceType.CANDIDATE,
+                    candidate.candidate_id,
+                    state_hash,
+                ),
+                candidate,
+                "job_candidate_not_allowed_in_question_context",
+            )
+        for review in state.reviews:
+            add(
+                _state_source(
+                    ContextSourceType.REVIEW, review.review_id, state_hash
+                ),
+                review,
+                "review_not_allowed_in_question_context",
+            )
+
+        manifest = _finalize_manifest(identity, drafts)
+        budget = _budget_report(
+            identity=identity,
+            packet=packet,
+            manifest=manifest,
+            policy=policy,
+            item_caps={
+                "injection_boundary": 1,
+                "latest_employee_turn": 1,
+                "recent_consultant_question": 1,
+                "active_episode": 1,
+                "agenda_candidates": policy.max_candidate_items,
+                "supporting_evidence": policy.max_evidence_items,
+                "job_state_digest": 1,
+                "dialogue_limits": 1,
+            },
+            section_singletons={
+                "job_state_digest": (job_digest,),
+                "dialogue_limits": (dialogue_limits,),
+            },
+            limitations=(
+                (
+                    "Question agenda supporting Evidence was capped; candidate "
+                    "support ordinals include only selected Evidence."
+                ,)
+                if len(requested_support_ids) > len(selected_support_ids)
+                else ()
+            ),
+        )
+        return _question_result_or_raise(
+            packet=packet, manifest=manifest, budget=budget
+        )
 
     def build_episode_code(
         self,

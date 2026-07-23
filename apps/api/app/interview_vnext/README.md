@@ -11,10 +11,14 @@ sealed verifier policy決定接受或拒絕，再由operation-local位置產生E
 無法判定等回答仍留下`RECEIPT_ONLY`，而provider/schema/conformance失敗不會偽造receipt。
 
 這一層的產品責任，是把員工訪談回答轉成可追溯、可更正的JD證據；它還不是完整JD synthesis或共編UI。此次沒有加入
-公司／租戶、SaaS、通用agent framework、production route或Web/editor整合。migration仍為0010八張表，eval adapter未被
+公司／租戶、SaaS、通用agent framework、production route或Web/editor整合。vNext runtime仍是0010八張表；另已完成
+獨立的0011三張Authoring Core表。eval adapter未被
 production composition root import；現行使用者流量仍走`app/interview/` v3。舊true-live batch `5bad4e3f-...`不具模型
 品質裁決資格；paid live、V3-6、production promotion仍blocked。R5-D 已封住 Capture terminal-root closure、bundle
-corruption matrix 與 byte-identical re-export，下一個工程切片是**最小 Authoring Core**（見 R5-D 計畫 §18）。
+corruption matrix 與 byte-identical re-export；**A1 最小 Authoring Core 已完成**，建立獨立`app/job_authoring/`核心，
+不把新文件真相塞回舊`DocumentVersion/_pending`。它已支援 task/output revision、員工直接編輯、AI proposal的
+accept/edit/reject、stale與digest，但尚未接LLM operation、API或UI。產品先面向單機／單使用者；除非owner明確要求，
+不做SaaS，下一步把工程資源放在Context Engine、選題、episode工作分析與最小workspace。
 
 權威文件：
 
@@ -28,6 +32,7 @@ corruption matrix 與 byte-identical re-export，下一個工程切片是**最�
 - R5-A review corrective（R5-B前置）：[`../../../../docs/plans/2026-07-21-interview-vnext-v3-5a-r5-a-corrective-contract-closure-plan.md`](../../../../docs/plans/2026-07-21-interview-vnext-v3-5a-r5-a-corrective-contract-closure-plan.md)
 - R5-BC Domain／Context／Interpreter原子hard cut（completed，§23為交付證據）：[`../../../../docs/plans/2026-07-22-interview-vnext-v3-5a-r5-bc-domain-context-hard-cut-plan.md`](../../../../docs/plans/2026-07-22-interview-vnext-v3-5a-r5-bc-domain-context-hard-cut-plan.md)
 - R5-D bounded correctness closure（**completed**，§17為交付證據；下一步最小Authoring Core）：[`../../../../docs/plans/2026-07-22-interview-vnext-v3-5a-r5-d-bounded-correctness-closure-plan.md`](../../../../docs/plans/2026-07-22-interview-vnext-v3-5a-r5-d-bounded-correctness-closure-plan.md)
+- A1 最小 Authoring Core（**completed**；task/output、revision、direct edit、proposal decision、stale、digest、0011 exact scope；交付證據見§21）：[`../../../../docs/plans/2026-07-23-interview-vnext-minimal-authoring-core-plan.md`](../../../../docs/plans/2026-07-23-interview-vnext-minimal-authoring-core-plan.md)
 - R3-C修正交接：[`../../../../docs/plans/2026-07-19-interview-vnext-v3-5a-r3-corrective-plan.md`](../../../../docs/plans/2026-07-19-interview-vnext-v3-5a-r3-corrective-plan.md)
 - R4 provider evidence/conformance交接（已完成，§19 為執行結果）：[`../../../../docs/plans/2026-07-19-interview-vnext-v3-5a-r4-provider-evidence-conformance-plan.md`](../../../../docs/plans/2026-07-19-interview-vnext-v3-5a-r4-provider-evidence-conformance-plan.md)
 - V2 研究：[`../../../../docs/specs/2026-07-16-interview-vnext-v2-provider-capture-research.md`](../../../../docs/specs/2026-07-16-interview-vnext-v2-provider-capture-research.md)

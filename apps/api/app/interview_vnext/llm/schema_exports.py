@@ -11,6 +11,7 @@ from .context import (
     CONTEXT_PACKET_ADAPTER,
     ContextBudgetReport,
     ContextSelectionManifest,
+    QuestionSelectContextPacket,
     ReferenceSnapshot,
 )
 from .execution import ProviderExecutionEvidence
@@ -23,6 +24,11 @@ from .turn_interpret import (
     TurnInterpretOutput,
     TurnInterpretVerificationReport,
 )
+from .question_select import (
+    QuestionSelectInput,
+    QuestionSelectOutput,
+    QuestionSelectVerificationReport,
+)
 
 
 SchemaFactory = Callable[[], dict[str, Any]]
@@ -30,6 +36,10 @@ SchemaFactory = Callable[[], dict[str, Any]]
 
 def _turn_interpret_output_schema() -> dict[str, Any]:
     return portable_strict_output_schema(TurnInterpretOutput.model_json_schema())
+
+
+def _question_select_output_schema() -> dict[str, Any]:
+    return portable_strict_output_schema(QuestionSelectOutput.model_json_schema())
 
 
 SCHEMA_EXPORTS: dict[str, tuple[str, str, SchemaFactory]] = {
@@ -107,6 +117,26 @@ SCHEMA_EXPORTS: dict[str, tuple[str, str, SchemaFactory]] = {
         "https://caliburn.local/schemas/turn-interpret-verification-report.v2.schema.json",
         "Caliburn interview vNext turn interpretation verification report v2",
         TurnInterpretVerificationReport.model_json_schema,
+    ),
+    "question-select-context.v1.schema.json": (
+        "https://caliburn.local/schemas/question-select-context.v1.schema.json",
+        "Caliburn interview vNext question selection context v1",
+        QuestionSelectContextPacket.model_json_schema,
+    ),
+    "question-select-input.v1.schema.json": (
+        "https://caliburn.local/schemas/question-select-input.v1.schema.json",
+        "Caliburn interview vNext question selection input v1",
+        QuestionSelectInput.model_json_schema,
+    ),
+    "question-select-output.v1.schema.json": (
+        "https://caliburn.local/schemas/question-select-output.v1.schema.json",
+        "Caliburn interview vNext portable question selection output v1",
+        _question_select_output_schema,
+    ),
+    "question-select-verification-report.v1.schema.json": (
+        "https://caliburn.local/schemas/question-select-verification-report.v1.schema.json",
+        "Caliburn interview vNext question selection verification report v1",
+        QuestionSelectVerificationReport.model_json_schema,
     ),
 }
 

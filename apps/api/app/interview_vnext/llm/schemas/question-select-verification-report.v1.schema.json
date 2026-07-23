@@ -1,0 +1,66 @@
+{
+  "$defs": {
+    "QuestionSelectAction": {
+      "enum": [
+        "ask_gap",
+        "broaden_coverage",
+        "offer_finish"
+      ],
+      "title": "QuestionSelectAction",
+      "type": "string"
+    },
+    "QuestionSelectRejectCode": {
+      "enum": [
+        "action_not_allowed",
+        "gap_ordinal_out_of_range",
+        "duplicate_recent_question",
+        "question_looks_compound"
+      ],
+      "title": "QuestionSelectRejectCode",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "question_select_verification_report.v1",
+      "default": "question_select_verification_report.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "accepted": {
+      "title": "Accepted",
+      "type": "boolean"
+    },
+    "action": {
+      "$ref": "#/$defs/QuestionSelectAction"
+    },
+    "selected_gap_ordinal": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Selected Gap Ordinal"
+    },
+    "reason_codes": {
+      "items": {
+        "$ref": "#/$defs/QuestionSelectRejectCode"
+      },
+      "title": "Reason Codes",
+      "type": "array"
+    }
+  },
+  "required": [
+    "accepted",
+    "action",
+    "selected_gap_ordinal",
+    "reason_codes"
+  ],
+  "title": "Caliburn interview vNext question selection verification report v1",
+  "type": "object",
+  "$id": "https://caliburn.local/schemas/question-select-verification-report.v1.schema.json"
+}

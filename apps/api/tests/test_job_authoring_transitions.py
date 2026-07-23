@@ -492,6 +492,7 @@ def test_edit_equal_to_proposal_requires_accept() -> None:
     with pytest.raises(AuthoringError) as excinfo:
         transitions.materialize_edit(head, proposal, decision_command, _ACTIVE_EVIDENCE)
     assert excinfo.value.code == "authoring_no_semantic_change"
+    assert excinfo.value.details["required_action"] == "accept"
 
 
 def test_reject_produces_decision_without_revision() -> None:

@@ -51,8 +51,17 @@ def _digest_task(ordinal: str, task: JobTask) -> JobStateDigestTask:
 def build_job_state_digest(
     revision: JobDocumentRevision,
     pending_proposals: Sequence[tuple[datetime, UUID]],
+    pending_proposal_count: int,
     stale_proposal_count: int,
 ) -> JobStateDigest:
+    """Project one revision to a bounded digest.
+
+    ``pending_proposals`` is the already-bounded head of the pending list (at
+    most 16, ordered by created_at/proposal_id); ``pending_proposal_count`` is
+    the full total, supplied separately so the caller never loads every proposal
+    into memory just to count them (plan §22 correction 5).
+    """
+
     tasks = revision.snapshot.tasks
     digest_tasks = tuple(
         _digest_task(f"T{index:02d}", task)
@@ -71,7 +80,7 @@ def build_job_state_digest(
         tasks=digest_tasks,
         omitted_task_count=max(0, len(tasks) - MAX_DIGEST_TASKS),
         pending_proposal_ids=pending_ids,
-        pending_proposal_count=len(pending_proposals),
+        pending_proposal_count=pending_proposal_count,
         stale_proposal_count=stale_proposal_count,
     )
     provisional = JobStateDigest.model_construct(**body, digest_hash=_PLACEHOLDER_HASH)

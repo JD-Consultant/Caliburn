@@ -100,15 +100,48 @@ _VNEXT_TABLES_REVERSE_ORDER = (
 @pytest_asyncio.fixture
 async def cleanup_vnext_rows(postgres_session_factory, vnext_ids):
     """只清本 case IDs：先把 run manifest／session initial-state 指標設 null
-    （斷開 circular FK），再依 attempts → … → sessions → profile/user 反向刪除。"""
+    （斷開 circular FK），Authoring 先按 proposal → revision leaves → document
+    清除，再依 attempts → … → sessions → profile/user 反向刪除。"""
     yield vnext_ids
     async with postgres_session_factory() as session:
         rows = await session.execute(text(
             "SELECT table_name FROM information_schema.tables "
-            "WHERE table_schema = 'public' AND table_name LIKE 'interview_vnext_%'"
+            "WHERE table_schema = 'public' "
+            "AND (table_name LIKE 'interview_vnext_%' "
+            "OR table_name LIKE 'job_authoring_%')"
         ))
         existing = {name for (name,) in rows.all()}
         params = {"tenant_id": str(vnext_ids.tenant_id)}
+        if "job_authoring_proposals" in existing:
+            await session.execute(text(
+                "DELETE FROM job_authoring_proposals WHERE tenant_id = :tenant_id"
+            ), params)
+        if "job_authoring_revisions" in existing:
+            while True:
+                deleted = await session.execute(text(
+                    "DELETE FROM job_authoring_revisions AS revision "
+                    "WHERE revision.tenant_id = :tenant_id "
+                    "AND NOT EXISTS ("
+                    "  SELECT 1 FROM job_authoring_revisions AS child "
+                    "  WHERE child.tenant_id = revision.tenant_id "
+                    "  AND child.parent_revision_id = revision.revision_id"
+                    ") RETURNING revision.revision_id"
+                ), params)
+                deleted_count = len(deleted.all())
+                if deleted_count == 0:
+                    remaining = await session.scalar(text(
+                        "SELECT count(*) FROM job_authoring_revisions "
+                        "WHERE tenant_id = :tenant_id"
+                    ), params)
+                    if remaining:
+                        raise RuntimeError(
+                            "authoring revision cleanup made no progress"
+                        )
+                    break
+        if "job_authoring_documents" in existing:
+            await session.execute(text(
+                "DELETE FROM job_authoring_documents WHERE tenant_id = :tenant_id"
+            ), params)
         if "interview_vnext_runs" in existing:
             await session.execute(text(
                 "UPDATE interview_vnext_runs SET manifest_artifact_id = NULL "

@@ -307,7 +307,12 @@ def materialize_edit(
     if edited.statement == proposal.proposed_task.statement and [
         (o.output_id, o.statement) for o in new_outputs
     ] == [(o.output_id, o.statement) for o in proposal.proposed_task.outputs]:
-        raise AuthoringError(AuthoringErrorCode.NO_SEMANTIC_CHANGE)
+        # Employee "edited" the proposal into an exact copy: do not create a
+        # revision, do not change the proposal, and never silently accept for
+        # them — signal that they should press accept instead (plan §5.7 ruling).
+        raise AuthoringError(
+            AuthoringErrorCode.NO_SEMANTIC_CHANGE, required_action="accept"
+        )
 
     if len(head.snapshot.tasks) >= MAX_TASKS_PER_DRAFT:
         raise AuthoringError(AuthoringErrorCode.CAPACITY_EXCEEDED)

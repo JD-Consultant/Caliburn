@@ -896,5 +896,10 @@ Evidence（員工事實）
   → canonical JobDocument revision
 ```
 
-第一個可操作vertical slice只做：一個task proposal、必要output/indicator欄位、employee review、accepted revision與scripted端到端demo。
-Agenda/Sufficiency、question.select、OpenRouter production composition、episode coding與K/S推論依ADR順序後接；不要再用R5-D當理由延後產品核心。
+第一個可操作vertical slice的exact施工規格已落在
+[2026-07-23 minimal Authoring Core plan](2026-07-23-interview-vnext-minimal-authoring-core-plan.md)：只做一個task proposal、
+可選outputs、employee direct edit、accept/edit/reject、stale、accepted revision、deterministic JobStateDigest與scripted端到端
+golden。**本切片不做indicator**；它依ADR 0038 §10延後到task/output產品loop成立之後。
+上述最小 Authoring Core 已於 2026-07-23 完成；後續依該計畫 §20 進入 Context Engine、episode工作分析與最小單機workspace，
+不再把時間投入 Authoring generic framework 或 SaaS 化。
+ Agenda/Sufficiency、question.select、OpenRouter production composition、episode coding與K/S推論依ADR順序後接；不要再用R5-D當理由延後產品核心。

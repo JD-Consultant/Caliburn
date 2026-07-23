@@ -7,6 +7,13 @@ exact build spec is
 This file is the short rule sheet — it does **not** restate the plan. Read the
 plan before changing anything here.
 
+Current product scope is a standalone/single-user deliverable. `tenant_id`
+exists only because the vNext persistence parent and composite foreign keys
+already require that storage scope. Unless the owner explicitly asks for SaaS,
+do not add organization/member/ACL/quota/billing/admin behavior or tests. The
+next engineering budget belongs to the LLM job-analysis loop and minimal user
+workspace, not platform generalization.
+
 ## Non-negotiable invariants
 
 - **Canonical truth lives here.** Do not re-derive document truth from the old

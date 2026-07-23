@@ -7,6 +7,10 @@ import pytest
 
 from app.interview_vnext.application.agenda import build_question_agenda
 from app.interview_vnext.application.context_builder import ContextBuilder
+from app.interview_vnext.application.consultant_loop import (
+    LoopDisposition,
+    plan_loop_control,
+)
 from app.interview_vnext.application.question_select import (
     QuestionSelectionRejected,
     materialize_question_selection,
@@ -15,10 +19,15 @@ from app.interview_vnext.application.question_select import (
 )
 from app.interview_vnext.domain.episode import (
     EpisodeState,
+    EpisodeStatus,
     Gap,
     GapDimension,
     GapPriorityFeatures,
     ValueLevel,
+)
+from app.interview_vnext.domain.commands import (
+    TransitionEpisodeCommand,
+    TransitionSessionCommand,
 )
 from app.interview_vnext.domain.evidence import (
     Evidence,
@@ -247,6 +256,46 @@ def _context(state: InterviewState):
         policy=QUESTION_SELECT_CONTEXT_POLICY_V1,
     )
     return agenda, result
+
+
+def test_loop_control_keeps_stop_and_explicit_shift_out_of_the_model():
+    stop_state = _state(active_episode=False)
+    stop_receipt = stop_state.turn_interpretations[-1].model_copy(
+        update={"dialogue_act": DialogueAct.STOP}
+    )
+    stop_state = stop_state.model_copy(
+        update={"turn_interpretations": (stop_receipt,)}
+    )
+    stop_plan = plan_loop_control(
+        stop_state,
+        stop_receipt,
+        operation_id=uid("stop-loop"),
+        occurred_at=NOW + timedelta(hours=1),
+    )
+    assert stop_plan.disposition == LoopDisposition.FINISHING
+    assert len(stop_plan.commands) == 1
+    assert isinstance(stop_plan.commands[0], TransitionSessionCommand)
+    assert stop_plan.commands[0].target_status == SessionStatus.FINISHING
+
+    shift_state = _state(active_episode=True)
+    shift_receipt = shift_state.turn_interpretations[-1].model_copy(
+        update={"episode_signal": EpisodeSignal.EXPLICIT_SHIFT}
+    )
+    shift_state = shift_state.model_copy(
+        update={"turn_interpretations": (shift_receipt,)}
+    )
+    shift_plan = plan_loop_control(
+        shift_state,
+        shift_receipt,
+        operation_id=uid("shift-loop"),
+        occurred_at=NOW + timedelta(hours=1),
+    )
+    assert shift_plan.disposition == LoopDisposition.ASK_NEXT
+    assert [
+        command.target_status
+        for command in shift_plan.commands
+        if isinstance(command, TransitionEpisodeCommand)
+    ] == [EpisodeStatus.CLOSING, EpisodeStatus.CLOSED]
 
 
 def test_agenda_prioritizes_output_then_purpose_without_field_checklist():

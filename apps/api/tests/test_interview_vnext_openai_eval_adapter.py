@@ -302,6 +302,7 @@ class TestPublishedOutputSchemaCatalog:
                 TURN_INTERPRET_OUTPUT_SCHEMA_ID: CatalogEntry(
                     filename="turn-interpret-input.v2.schema.json",
                     format_name="turn_interpret_output_v2",
+                    operation=turn_interpret_operation(),
                 )
             }
         )
@@ -318,6 +319,7 @@ class TestPublishedOutputSchemaCatalog:
                 input_schema_id: CatalogEntry(
                     filename="turn-interpret-input.v2.schema.json",
                     format_name="turn_interpret_input_v2",
+                    operation=turn_interpret_operation(),
                 )
             }
         )

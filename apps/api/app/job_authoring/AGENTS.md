@@ -7,13 +7,23 @@ exact build spec is
 This file is the short rule sheet — it does **not** restate the plan. Read the
 plan before changing anything here.
 
+**2026-07-24 owner correction:** the completed revision-based module is the
+existing v1 slice, not the storage target for the first visible product. Do not
+extend it with revision-scoped Duty/Indicator/K/S tables or entity versions.
+New JD content persistence must follow
+**[the current-row v2 storage authority](../../../../docs/specs/2026-07-24-job-authoring-v2-relational-storage-research.md)**
+and a new implementation plan. Existing v1 history code may remain until that
+cutover is implemented; do not create dual-write authority.
+
 Current product scope is a standalone/single-user deliverable. `tenant_id`
 exists only because the vNext persistence parent and composite foreign keys
 already require that storage scope. Unless the owner explicitly asks for SaaS,
 do not add organization/member/ACL/quota/billing/admin behavior or tests. The
 employee uses a local Web app: startup may open localhost, but there is no
 remote product URL, registration, login, account, or password, and host/port
-setup is not an employee workflow. The next engineering budget belongs to the
+setup is not an employee workflow. One local operator may save multiple
+documents, but only one document workspace is active in the UI at a time; this
+does not authorize account/workspace/SaaS behavior. The next engineering budget belongs to the
 LLM job-analysis loop and minimal local Web workspace, not platform generalization.
 
 ## Non-negotiable invariants
@@ -28,9 +38,10 @@ LLM job-analysis loop and minimal local Web workspace, not platform generalizati
 - **Every persisted claim has provenance**, and every proposed task/output has a
   non-empty Evidence basis. Consultant questions, public references, and model
   common sense are not employee Evidence.
-- **Three tables only** (`job_authoring_documents/revisions/proposals`). No
-  generic event/patch/ACL/framework table, no fourth table, no K/S, indicator,
-  publish/export, provider call, Web, or route in this slice.
+- **Existing v1 has three tables only**
+  (`job_authoring_documents/revisions/proposals`). This is a historical slice
+  constraint, not a ban on the approved v2 current Duty/Task/O/P/K/S tables.
+  Do not add generic event/patch/ACL/framework tables.
 
 ## Layering / dependencies (plan §4, §6.2, §14.9)
 

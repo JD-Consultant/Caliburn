@@ -35,6 +35,18 @@
 `DocumentVersion`／OCS deep JSON／`_pending` 不得恢復為新產品真相。詳細裁決見
 [`ADR 0039`](adr/0039-local-multi-document-canonical-public-form-workspace.md)。
 
+**2026-07-24 owner correction：**第一個成品不做 JD 版本歷史、還原或 revision diff。員工儲存與接受 AI proposal
+直接更新每份文件的 current rows；既有 0011 revision core 暫留但不再擴張。詳細 current-table 設計見
+[`Job Authoring v2 本機單一現況儲存設計`](specs/2026-07-24-job-authoring-v2-relational-storage-research.md)。
+
+### 內部 Job Model 不等於政府公版
+
+**狀態：已決定（2026-07-24）。**政府公版是 UI／export profile，不是內部資料上限。內部 Task 可以保存
+`purpose/context/frequency/ownership/importance/typicality/optional time share`，用於專業訪談、核心任務判斷與
+文件品質檢查。`time_scope` 與 `polarity` 只作 Evidence materialization gate，不進正式 JD。頻率不等於重要性，
+低頻高風險任務仍可為 core；也不要求每項工時比重必填或全文件加總 100%。這些資料主要從自然工作敘事抽取，
+只針對高價值缺口追問，不按公版欄位逐格盤問。
+
 除非 owner 明確提出，**不得投入** organization、tenant product behavior、member／role／ACL、登入、密碼重設、計費、quota、
 admin console、雲端部署、多租戶測試矩陣、多人即時協作或其他 SaaS infrastructure。既有資料表的 `tenant_id` 是歷史／FK 相容
 細節，不是新增上述功能的授權。也不得因追求全面 hash、audit 或測試覆蓋而延後可操作成品；只保留直接保護文件正確性、

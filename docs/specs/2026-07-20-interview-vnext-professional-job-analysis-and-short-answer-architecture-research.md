@@ -2,7 +2,7 @@
 title: Interview vNext 員工訪談、專業職務分析與即時 JD 共編架構研究
 status: accepted-research; R5 authority is ADR 0037 + amendment; post-R5 product authority is ADR 0038
 date: 2026-07-20
-revision: 7
+revision: 8
 audience: owner, architect, implementer, evaluator
 scope: R5 前置設計；員工訪談、短回答、即時共編、當下單一職務、document-local K/S 與交付 projection
 ---
@@ -44,6 +44,13 @@ scope: R5 前置設計；員工訪談、短回答、即時共編、當下單一�
 > 單人版 SaaS。啟動流程可開啟 localhost UI，但員工不拿遠端網址、不註冊、不登入、沒有帳號密碼，也不設定 host／port。
 > 這不強制完全離線：本機 Web app 可使用 owner 配置的 OpenRouter key。除非 owner 明確改變範圍，不做 organization、tenant
 > product behavior、ACL、計費、雲端部署或多人協作；研究與工程優先投入訪談品質、LLM 工作分析與 JD 成品品質。
+>
+> **Revision 8（no-history MVP correction）**：owner 於 2026-07-24 決定第一個成品不做 JD 版本歷史。active JD
+> persistence 只保存每份文件的目前內容；員工直接編輯或接受 AI proposal 時更新 current relational rows，不建立完整
+> immutable revision、不複製全文件 rows，也不加入 `entity_version`／`link_version`。本文後續所有 revision、restore、
+> revision diff、head hash／CAS 描述一律降為後續可選優化，不是 MVP 實作要求。AI 仍只能提出 proposal，不能繞過員工
+> accept／edit／reject。詳細 current-table authority 見
+> [Job Authoring v2 本機單一現況儲存設計](2026-07-24-job-authoring-v2-relational-storage-research.md)。
 
 ## 1. 結論先行
 
@@ -332,8 +339,8 @@ QuestionFrame.v1
   consultant_turn_id
   episode_id | null
   selected_gap_id | null
-  base_job_revision_id | null
-  target_entity_versions[]
+  document_id | null
+  target_entity_ids[]
   mode:
     open_narrative
     slot_request
@@ -666,7 +673,7 @@ confirmed job-local task
   -> no_match: draft document-local K/S from task/output/indicator/context
   -> K/S authoring-rule + evidence/support + duplicate-within-document gates
   -> employee plain-language review
-  -> save in this JobModelRevision and link to its task
+  -> save in this CurrentJobDocument and link to its task
 ```
 
 禁止的捷徑：
@@ -676,21 +683,41 @@ confirmed job-local task
 - AI 自創 `icap_ref`、ESCO URI 或官方 code；
 - 把「這個職務需要某技能」誤寫成「受訪員工已具備某技能」。
 
-這份 JD 內的最小 requirement：
+這份 JD 內的最小 Knowledge／Skill 與 linkage：
 
 ```text
-JobRequirementItem
-  requirement_id               # 只在本 JobModel 中穩定
-  kind: knowledge | skill
+JobKnowledgeRequirement
+  knowledge_id                 # application UUID；只在本 JobModel 中穩定
   statement
-  linked_task_ids[]
-  support_basis: task_inference | employee_statement | employee_document_edit | policy | public_reference
   support_refs[]
   public_alignment | null       # source URI/version + usable/partial；沒有也合法
   status: proposed | accepted | edited | rejected
+
+JobSkillRequirement
+  skill_id                     # application UUID；只在本 JobModel 中穩定
+  statement
+  support_refs[]
+  public_alignment | null
+  status: proposed | accepted | edited | rejected
+
+TaskKnowledgeLink
+  task_id                      # 真正的 application UUID，不是 T1/T2
+  knowledge_id
+  relevance_reason
+  support_refs[]
+
+TaskSkillLink
+  task_id                      # 真正的 application UUID，不是 T1/T2
+  skill_id
+  relevance_reason
+  support_refs[]
 ```
 
-只做同一份 JD 內的重複檢查與 task linkage，不做跨 JD alias、全公司 concept identity、發布或 deprecation lifecycle。
+這是 domain contract，不是資料庫 DDL。資料庫不得把 `linked_task_ids` 存成 `T1/T2` 字串或 UUID array；K 與 S
+各自成為不同 entity/table，task linkage 以帶外鍵的兩張 association table 保存。`T1/K01/S01` 只由 projector
+在顯示或匯出時依排序產生。只做同一份 JD 內的重複檢查與 task linkage，不做跨 JD alias、全公司 concept
+identity、發布或 deprecation lifecycle。詳細關聯式設計見
+[Job Authoring v2 關聯式儲存研究](2026-07-24-job-authoring-v2-relational-storage-research.md)。
 
 後兩者是不同 domain：
 
@@ -731,8 +758,9 @@ Question Policy 可讀：
 
 - active episode／gap priority；
 - active QuestionFrame 與最近必要的 employee support；
-- `JobStateDigest`：目前 revision、已接受的 duty/task/output/indicator/K/S 摘要、未解 critical gaps、pending/stale
-  proposal 計數與明確 correction target；
+- `JobStateDigest`：目前 document、已接受的 duty/task/output/indicator/K/S 摘要、Task 的
+  purpose/frequency/ownership/importance/typicality、未解 critical gaps、pending/stale proposal 計數與明確
+  correction target；
 - interview budget、fatigue／decline state。
 
 `JobStateDigest` 是 canonical authoring state 的 bounded projection，不是完整 editor JSON。員工直接新增一個 task 後，
@@ -743,14 +771,17 @@ digest 會讓 Question Policy 停止再問「你還有哪些工作」，改問�
 
 ```text
 JobStateDigest.v1
-  session_id / job_model_id
-  revision_id / revision_sequence
+  session_id / document_id
   selected_items[]:
-    entity_id / entity_version
+    entity_id
     kind: duty | task | output | indicator | knowledge | skill
     parent_entity_id | null
     statement
-    source_channels[]
+    task_analysis | null:
+      purpose_text | null
+      frequency_value / frequency_unit / frequency_text | null
+      ownership / importance / typicality | null
+      time_share_percent | null
   unresolved_gaps[]:
     gap_id / target_entity_id / dimension / severity
   pending_proposal_targets[]       # ID/kind/target only，不把 proposed value 當 truth
@@ -777,7 +808,7 @@ ContextBuilder 依 operation 選最小項目並保存 selection manifest；`omit
 
 依 operation 最小化：
 
-- confirmed task revision、outputs、indicators 與直接支持 evidence；
+- confirmed current task、outputs、indicators 與直接支持 evidence；
 - 必要的工作情境／policy artifact；
 - bounded public-reference candidates（若本次有查）；
 - immutable retrieval snapshot；
@@ -820,20 +851,12 @@ provider conversation ID、server-side compaction 或 prompt cache 只能是 ada
 
 ### 11.2 最小 K/S model
 
-本階段不建立 CapabilityConcept、namespace、alias graph 或跨 JD catalog。只在 `JobModelRevision` 保存：
+本階段不建立 CapabilityConcept、namespace、alias graph 或跨 JD catalog。`CurrentJobDocument` 分別保存
+`JobKnowledgeRequirement[]`、`JobSkillRequirement[]`、`TaskKnowledgeLink[]` 與 `TaskSkillLink[]`。Knowledge 與
+Skill 各有自己的 application UUID；link 使用真正 `task_id`，並保存 relevance reason／support。
 
-```text
-JobRequirementItem
-  requirement_id
-  kind: knowledge | skill
-  statement
-  linked_task_ids[]
-  support_basis
-  support_refs[]
-  public_alignment | null
-  status
-  employee_edit | null
-```
+`linked_task_ids` 若出現在 API 讀模型，只能是由 association links 聚合出的 UUID tuple，不能保存成資料庫 array，更
+不能使用 `T1/T2` publication code。
 
 同一份 JD 內可以把一個 K/S 連到多個 task，也可以按輸出格式展開成每個 competency block；是否跨任務共用只是一份
 文件內的 normalization，不形成企業資產。
@@ -849,7 +872,7 @@ JobRequirementItem
 5. partial/no-match：依 task、output、indicator、tools/context 起草 document-local K/S；
 6. verifier 檢查 K/S 定義、單一性、可觀察性、tool/trait 混淆與 evidence/support closure；
 7. 員工以白話 accept/edit/reject；
-8. 寫入本 JobModelRevision，不發布到其他職務。
+8. 寫入本 CurrentJobDocument，不發布到其他職務。
 
 LLM 可以利用通用專業知識提出 K/S 候選，但此時 `support_basis=task_inference`，不是 employee fact、company fact 或
 official reference；必須讓員工看得出來並審核。LLM 不得產 official code。
@@ -906,13 +929,13 @@ OpenAI Canvas、Anthropic Artifacts、Gemini in Docs 與 Microsoft Copilot in Wo
 複製任何一家 UI，而是確認目前成熟的人機共編邊界：**人可以直接寫，AI 必須留下可審查的變更。**
 
 桌面第一版建議雙欄：左側 AI 顧問對話，右側 live JD canvas；行動裝置可切成「訪談／文件」兩個頁籤，但必須共享
-同一個 session 與 draft revision。員工可在任何時點切到文件修改，不需要等 AI 宣告一個 episode 結束。
+同一個 session 與 current document。員工可在任何時點切到文件修改，不需要等 AI 宣告一個 episode 結束。
 
 ### 12.2 三種寫入 authority
 
 | Writer | 寫入語意 | 是否再審 | 可否改 accepted truth |
 |---|---|---:|---:|
-| Employee direct edit | 員工明確要文件呈現的內容 | 否，欄位 commit 後立即成 draft truth | 可以，產新 revision |
+| Employee direct edit | 員工明確要文件呈現的內容 | 否，欄位 commit 後立即成 current truth | 可以，更新 current rows |
 | AI operation | 專業顧問建議的新增／修改／刪除／link | 必須；只能建立 pending proposal | 不可直接改 |
 | Deterministic projector | 編號、排序、schema normalization、匯出格式 | 不作語意審查 | 不可創造或改寫語意 |
 
@@ -937,104 +960,99 @@ OpenAI Canvas、Anthropic Artifacts、Gemini in Docs 與 Microsoft Copilot in Wo
 推薦 authoring domain：
 
 ```text
-JobProfile
-JobModelRevision
+CurrentJobDocument
 Duty
 Task
 Output
 BehaviorIndicator
 JobRequirementItem（K/S；document-local）
 RequirementLevel
-JobFieldSupportRef（Evidence/document-edit/reference/inference；Evidence內再分literal/contextual support）
 AiDocumentProposal
-EmployeeDocumentCommand
-EmployeeProposalDecision
-Publication
+JobStateDigest
+PublicationView
 ```
 
 所有 domain entity 使用 application identity；T1/T1.1/O01/P01/K01/S01 是 deterministic publication position code，
-不是永久 ID。發布 revision immutable；繼續修改時從它建立新 draft，不在已發布 JSON 上原地覆寫。第一版只有一名
-員工與一份 active draft，不加入 tenant、多人權限、comment thread、presence 或 CRDT。
+不是永久 ID。第一個成品只保存每份文件的 current relational state；公版 JSON／PDF／XLSX 是 export projection，
+不是另一份可寫真相。第一版只有一名本機操作者，不加入 tenant、多人權限、comment thread、presence、CRDT 或
+revision history。
 
 ### 12.5 最小 command/proposal contracts
 
-`EmployeeDocumentCommand.v1`：
+`EmployeeDocumentEdit.v2`：
 
 ```text
-command_id                     # application UUID；idempotency key
-session_id / job_model_id
-base_revision_id
+document_id
 operation: add | revise | remove | move | link | unlink
 target_entity_id | parent_entity_id
 target_field | null
-target_version | null          # revise/remove/link 時必要
+base_value | null              # revise/remove 時避免覆蓋較新的人工內容
 employee_value | null
-client_command_sequence
 ```
 
-`AiDocumentProposal.v1`：
+`AiDocumentProposal.v2`：
 
 ```text
 proposal_id                    # application 派生，不由模型產生
-session_id / job_model_id
-base_revision_id
+document_id
 operation: add | revise | remove | move | link | unlink | merge | split
 target_entity_id | parent_entity_id
 target_field | null
-target_version | null
 before_value | null
 proposed_value | null
-support_refs[]                 # closure 必須存在且 scope 正確
-reference_snapshot_refs[]
 plain_language_reason          # 可顯示依據，不保存 hidden chain-of-thought
-limitations[]
-created_by_operation_id
-status: pending | accepted | edited | rejected | stale | superseded
+status: pending | accepted | edited | rejected | stale
 ```
 
-`EmployeeProposalDecision.v1`：
+`EmployeeProposalDecision.v2`：
 
 ```text
-decision_id / proposal_id
+proposal_id
 action: accept | edit | reject
-base_revision_id
 final_value | null             # edit 必填；accept 必須等於 proposed value
 decided_at
 ```
 
 第一版應限制一筆 proposal 只改一個可理解的 entity／field 或一組不可分割 link；不要讓模型用單筆 proposal 重寫整份
-JD。若員工要求「重寫整份」，系統要產 section-level proposal group 與新 revision diff，而不是失去逐項決定能力。
+JD。若員工要求「重寫整份」，系統要產 section-level proposal group，仍讓員工逐組決定，不得以 whole-document
+overwrite 失去控制。
 
 ### 12.6 Apply 與 conflict protocol
 
 Employee direct edit：
 
 1. UI 先保留本地輸入；欄位 commit／debounce 後送 command，不在每個 key stroke 觸發 AI；
-2. application 驗證 base revision、target identity/version、schema 與 domain invariants；
-3. 同一 transaction 建立新 draft revision、保存 command 與 employee-document support；
-4. 與本次 target 重疊的 pending AI proposal 標成 `stale`，不自動套用或靜默 rebase；
-5. 發布新的 `JobStateDigest`，讓 gap/question policy 在下一 operation 看見更新。
+2. application 驗證 document／target identity、schema、same-document FK 與 domain invariants；
+3. 同一 transaction 更新 current rows；
+4. pending AI proposal 的 `before_value` 若已不等於 current target，就標成 `stale`，不自動套用；
+5. 重新投影 `JobStateDigest`，讓 gap/question policy 在下一 operation 看見更新。
 
 AI proposal decision：
 
-1. proposal 必須仍為 pending，support closure 與 target scope 完整；
-2. 比對 base revision 與 target version/fingerprint；
-3. non-overlap 的其他編輯不必阻擋；target 有變則回 typed stale conflict；
+1. proposal 必須仍為 pending，target scope 完整；
+2. edit/delete 比對 proposal `before_value` 與 current target；
+3. 不相關的其他編輯不必阻擋；target 有變則回 typed stale conflict；
 4. accept 使用 proposed value；edit 使用 employee final value；reject 不改文件；
-5. accept/edit 在同一 transaction 建 revision + decision + provenance；
+5. accept/edit 在同一 transaction 更新 current rows + proposal decision；
 6. reject 建 suppression fact，除非出現新 evidence、target 已重大變更或員工主動要求，AI 不得立刻重提同義內容。
 
-沿用現有 editor「optimistic concurrency、409 不回滾使用者本地文字」的產品原則；但新核心應以 entity/field command
-表達衝突，不把整份深 JSON 最後寫入者勝出。第一版不需要 Google Docs 等級的即時多人合併。
+新核心以 entity/field edit 表達修改，不把整份深 JSON 最後寫入者勝出。第一版是單一本機操作者，不建立 generic
+revision CAS、多人合併或 Google Docs 等級的同步機制。
 
 ### 12.7 Context 與 provenance 規則
 
 - R5 只處理聊天 turn；文件 command 不經過 Turn Interpreter。
-- 員工 direct edit 足以成為該文件欄位的 accepted content，來源標為 `employee_document_edit`。
-- direct edit 不是 transcript quote；若 AI 要從它推導 K/S、indicator 或另一個 task，必須建立新 proposal 並連回該 edit。
+- 員工 direct edit 足以成為該文件欄位的 accepted content。
+- direct edit 不是 transcript quote；若 AI 要從它推導 K/S、indicator 或另一個 task，必須建立新 proposal。
 - AI proposal 的 `plain_language_reason` 只說可驗證依據，例如「你提到每週彙整缺貨明細」，不顯示或保存模型思考鏈。
-- 公版內容永遠標 public reference；AI 自行依 task 推導則標 task inference；兩者不能偽裝成員工原話。
+- 公版內容只保存既有 Indexer stable ID `ref_urn`；AI 自行依 task 推導的 custom item 不得偽裝成公版。
 - AI 每次 operation 讀 latest accepted `JobStateDigest`；pending proposal 不是 accepted truth，必要時只以 pending 摘要防止重複提案。
+
+2026-07-24 第一個本機成品範圍已進一步收斂：上述來源區分仍可供 LLM operation／verifier 在當次執行使用，但
+Job Authoring entity rows 暫不持久化逐欄 writer、editor、Evidence refs、source hash 或完整 provenance。既有 Proposal／
+Decision／Revision command 足以維持 AI 不得直接寫入與版本歷史；公版只保存既有 Indexer stable ID
+`ref_urn TEXT NULL`。日後有稽核或可解釋性產品需求再升版，不先建立 generic source graph。資料庫 authority 見
+[Job Authoring v2 關聯式儲存研究](2026-07-24-job-authoring-v2-relational-storage-research.md)。
 
 ### 12.8 API 與模組邊界
 
@@ -1180,7 +1198,7 @@ R5 必須知道：
 R5 不得知道：
 
 - editor component、深 JSON path 或 React state；
-- 完整 `JobModelRevision`；
+- 完整 `CurrentJobDocument`；
 - pending proposal 全文；
 - OCS／向量檢索結果；
 - 下一題或是否完成訪談。
@@ -1488,7 +1506,7 @@ R5 不 import editor contract，只由 Question Policy 使用 `JobStateDigest`�
 
 **已裁決：先做單一員工、單一 session／JobModel、單一 active draft 的本機 Web 應用程式。**
 
-不先做 SaaS、tenant、多人權限、即時多人游標、CRDT、公司層共用 K/S。核心 entity/revision/proposal ID 與 module port
+不先做 SaaS、tenant、多人權限、即時多人游標、CRDT、公司層共用 K/S 或版本歷史。核心 entity/proposal ID 與 module port
 仍保持乾淨，未來需要時可擴充，不以當下未需求的基礎設施拖延成品。員工可由啟動流程進入 localhost Web UI，但不經
 遠端網址、註冊、登入或帳密流程，也不自行設定 host／port；不要求原生桌面殼。
 
@@ -1504,7 +1522,7 @@ lifecycle、Evidence/State v3、state CAS 與 frequency/current 語意。
 **推薦：保留「一條 conversation owner、AI 不可靜默修改、人可接受／拒絕」，以新 ADR supersede `_pending` 為
 canonical proposal store 與「人改不告知模型」兩項。**
 
-新核心以 command/proposal/decision/revision 為 authority；舊 editor `_pending` 最多是 UI projection。員工 direct edit
+新核心以 current Job entity、proposal 與 employee decision 為 authority；舊 editor `_pending` 最多是 UI projection。員工 direct edit
 透過 bounded `JobStateDigest` 進下一輪 Context Engine，而不是把完整文件或每個 keystroke 送給模型。
 
 ## 19. Sources

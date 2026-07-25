@@ -8,6 +8,14 @@
 - 下一切片：A2 Context Engine + `question.select`；其後才是 `episode.code` 真模型 task/output proposal
 - 產品運行範圍：**單機／單使用者成品優先；SaaS 除非 owner 明確要求，否則不排入 roadmap**
 
+> **2026-07-24 post-completion scope correction**
+>
+> 本計畫已完成的 0011／revision core 保留為歷史實驗切片與既有 code，不回寫歷史 commit；但 owner 已決定第一個
+> 可見成品不再擴張這套 revision model。後續 JD 欄位使用 current relational rows，不建立 revision-scoped entity
+> tables、不加入 `entity_version`／`link_version`，也不在 MVP 提供 history／restore／diff。AI proposal 與 employee
+> accept／edit／reject 原則繼續有效。active persistence authority 改為
+> [Job Authoring v2 本機單一現況儲存設計](../specs/2026-07-24-job-authoring-v2-relational-storage-research.md)。
+
 > 本文件是 ADR 0038 之後第一份 Authoring Core 可施工規格。實作者不得再以舊 editor `_pending`、
 > `DocumentVersion.content` 或 `InterviewState.candidates` 自行推導另一套文件真相。
 

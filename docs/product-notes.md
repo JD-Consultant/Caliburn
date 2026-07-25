@@ -14,7 +14,8 @@
 - 啟動本機 Web app 後，直接與 AI 專業顧問訪談並同步編輯自己的職務說明書；
 - 不會收到或登入遠端產品網址；本機啟動流程可以自動開啟 browser／localhost UI，員工不必手動設定 host、port 或部署；
 - 不需要註冊、登入、帳號、密碼、公司代碼、workspace invitation 或 tenant 選擇；
-- 第一版只處理一名員工當下的一份職務說明書，不處理公司管理或多人共同作業。
+- 第一版只處理一名本機操作者，一次開啟並訪談一份職務說明書；同一台電腦可以建立、保存、關閉與重新開啟多份
+  彼此隔離的職務說明書。這是本機文件庫，不是帳號 workspace、公司管理或多人共同作業。
 
 「本機 Web app」是產品交付邊界：Web UI、API、資料庫與必要服務皆在本機組合運行，不要求 Electron、Tauri 或原生桌面殼。
 可以沿用或重構現有 Web 技術，但不得把 port、服務啟停、資料庫或基礎設施設定暴露成員工的日常操作流程。
@@ -29,6 +30,10 @@
 3. Context Engine、episode 工作分析、文件提案與員工接受／修改／拒絕的完整 loop；
 4. 職務說明書內容完整度、一致性、客製化程度與可匯出品質；
 5. 能讓員工實際操作、可一鍵啟動的最小本機 Web workspace。
+
+本機 Web workspace 的文件權威是 `app/job_authoring` current canonical relational state；畫面可採政府公版欄位排列，但舊
+`DocumentVersion`／OCS deep JSON／`_pending` 不得恢復為新產品真相。詳細裁決見
+[`ADR 0039`](adr/0039-local-multi-document-canonical-public-form-workspace.md)。
 
 除非 owner 明確提出，**不得投入** organization、tenant product behavior、member／role／ACL、登入、密碼重設、計費、quota、
 admin console、雲端部署、多租戶測試矩陣、多人即時協作或其他 SaaS infrastructure。既有資料表的 `tenant_id` 是歷史／FK 相容

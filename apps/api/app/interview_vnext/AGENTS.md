@@ -38,7 +38,10 @@ provider-neutral `question.select/1.0.0` Context/Agenda/QuestionFrame slice are 
 Product work is standalone/single-user first. Unless the owner explicitly changes scope, do not add organizations,
 memberships, ACLs, quotas, billing, tenant administration, or a SaaS test matrix; retained `tenant_id` fields are
 storage compatibility only. The employee launches a local Web app; its startup may open a localhost UI, but there is
-no remote product URL, registration, login, account, or password flow, and host/port setup must remain an implementation detail. The next slice should compose the existing durable executor/OpenRouter boundary with
+no remote product URL, registration, login, account, or password flow, and host/port setup must remain an implementation
+detail. The local app may save multiple isolated JD workspaces, with only one active in the UI at a time; never share
+transcript, Evidence, QuestionFrame, episode or `JobStateDigest` across documents. The next slice should compose the
+existing durable executor/OpenRouter boundary with
 `question.select`, then expose the smallest local Web conversation + JD canvas; `episode.code` and grounded task/output
 proposals follow. Do not rebuild Agenda as a planner agent, add a graph framework, or start K/S/SaaS before that
 vertical path works. The production OpenRouter adapter, exact GPT-5.4 mini flex profile, durable

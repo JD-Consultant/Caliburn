@@ -73,7 +73,11 @@ Same discipline used for Phases 1–3 and contracts #1/#2:
   `ocs-contract`'s schema**: add the TS generation target (`json-schema-to-typescript`) for the
   web, and define the thin api⇄web REST *envelope* (request/response wrapper around the OCS
   document) as its own small schema or shared types. Do **not** hand-write TS document types in
-  the web app. (Confirm in #3's own research record before building.)
+  the web app. This pre-answer remains the legacy OCS editor/export seam. **ADR 0039 changes the
+  vNext live-workspace seam:** canonical Authoring is no longer an OCS document, so the new
+  Python⇄TypeScript seam uses its own small `local-workspace-contract` JSON Schema + generated
+  Pydantic/TS package; `ocs-contract` remains the deterministic public/export shape. Do not make
+  either contract import or redefine the other.
 
 ## 6. References
 - Alistair Cockburn — Hexagonal (ports define the contract). Chris Richardson — *Microservices

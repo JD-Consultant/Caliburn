@@ -47,6 +47,7 @@ ADR 是「為什麼」層;搭配 `../specs/`(細節設計)與 `../runbook.md`(�
 | [0036](0036-interview-vnext-provider-binding-conformance-and-idless-turn-v2.md) | Interview AI vNext runtime：Operation／ProviderBinding／adapter／conformance分層；wire與eligibility分離；Turn Interpreter v2移除model identity並加入qualifier evidence support | Accepted（2026-07-18；R3/R4已完成） |
 | [0037](0037-interview-vnext-question-frame-contextual-evidence-and-employee-authority.md) | Interview AI vNext grounded short answer：persisted QuestionFrame、Evidence.v3 literal/contextual support、receipt、strict CAS與員工文件權威 | Accepted（2026-07-20；R5-BC已完成） |
 | [0038](0038-interview-vnext-context-engine-and-professional-consultant-workflow.md) | Interview AI vNext產品工作流：operation-specific Context Engine、Agenda／Sufficiency、JobStateDigest、專業顧問operations、canonical Authoring Core與公版參考邊界 | Accepted（2026-07-22；後續產品切片authority） |
+| [0039](0039-local-multi-document-canonical-public-form-workspace.md) | 本機多文件Workspace：單一操作者可保存多份JD、current canonical文件權威、公版樣式UI與autosave；MVP不做revision history | Proposed with owner amendment（2026-07-24） |
 
 完整脈絡見 [`../specs/2026-06-27-system-architecture-design.md`](../specs/2026-06-27-system-architecture-design.md)。
 契約怎麼選/怎麼交付的規範見 [`../contract-strategy.md`](../contract-strategy.md)（ADR 0004/0010 的一般化、預答契約 #3）。

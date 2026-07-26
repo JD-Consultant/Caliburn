@@ -80,15 +80,16 @@ claim table 是 P0 的**唯一自變數**。它只做原子化切分，不做任
 
 ### `structured_only` 現在能損失什麼（收窄後的診斷射程）
 
-顧問提問逐字保留、員工陳述逐字覆蓋、順序保留、標記不剝離——四條規則合起來，
-`structured_only` 與 `raw_only` 的差距**只剩句間連接詞與非主張片段**（「不過…」「講到這個」
-「嗯，那個…」等把兩句話綁在一起的膠）。這是刻意的：那些膠正是跨句更正與責任轉移的線索，
-若模型只有原子化 claims 就判錯 C4／C2，那是真發現。
+顧問提問逐字保留、員工陳述逐字覆蓋、順序保留、標記不剝離——四條規則會大幅縮小
+`structured_only` 與 `raw_only` 的資訊差距，但兩者仍不只差句間連接詞。`structured_only`
+同時引入原子化切分、row 邊界、claim ID 與顯式 `sequence_index`，並省略未進 claim 的非主張片段
+（「不過…」「講到這個」「嗯，那個…」等）。因此這個 arm 量的是**整個字面原子化表示轉換的淨影響**，
+不能把結果歸因成單一的「句間膠效果」。
 
 反過來說，這個 arm 已經不能宣稱「用結構取代原文會遺失脈絡」這種大結論——
-它現在只回答「句間膠是否承重」。案例作者若把切分做到連膠都不損失，這個 arm 就會測不到東西
-（結果是 `raw_only` 的改名版）；若為了製造損失而剝掉標記，就違反規則 3。
-兩種都要在 `adjudication.notes` 說明切分判斷，讓 `report.md` 能誠實界定這個 arm 的射程。
+它只回答「這一種人工字面原子化表示，相對完整員工原話的淨影響為何」。案例作者若把切分做到
+幾乎逐句照搬，表示差異會很薄；若為了製造損失而剝掉標記，就違反規則 3。兩種情況都要在
+`adjudication.notes` 說明切分判斷，讓 `report.md` 能誠實界定這個 arm 的射程。
 
 ## Context 組裝
 
@@ -109,6 +110,20 @@ claim table 是 P0 的**唯一自變數**。它只做原子化切分，不做任
 否則兩者的差異就不只是 claim table。
 
 `adjudication` 不傳給受測 subagent；reviewer subagent 會收到（判 `C6_SOURCE_FIDELITY` 需要）。
+
+## 驗證
+
+在實驗目錄執行：
+
+```powershell
+python validate_cases.py cases
+python -m unittest test_validate_cases.py -v
+```
+
+驗證器只檢查可決定的機械規則：固定六案、欄位白名單、逐字子字串、單一 employee source turn、
+turn／claim 連號與順序、每個 employee turn 至少一個 claim、相關片段引用及模板占位文字。
+它**不宣稱**能驗證「每一條語意陳述皆完整覆蓋」或切分是否公平；這兩項仍須依本文件規則人工審查，
+並寫入 `adjudication.notes`。
 
 ## 凍結規則
 

@@ -1,7 +1,7 @@
 # R1-P0 Context Representation Subagent Screening
 
 - 日期：2026-07-26
-- 狀態：**Designed（2026-07-26 corrective revision）— 待建立正式案例後執行**
+- 狀態：**Cases frozen（experiment revision 1，2026-07-26）— 待執行第 1 輪 trials**
 - 性質：R1 前置、免外部 API key 的**否證實驗**
 - 不使用：`OPENROUTER_API_KEY`、`OPENAI_API_KEY`、production route、Web、資料庫
 - 上游 authority：
@@ -53,7 +53,7 @@ typed Evidence／Work Model 的價值仍超出 P0 射程，不能由這個結果
 |---|---|---|
 | `raw_only` vs `raw_plus_spans` | 關鍵原句是否被重貼 | 顯著性／重複是否有幫助 |
 | `raw_plus_spans` vs `hybrid` | 是否附 claim table | 結構化是否另外有價值 |
-| `raw_only` vs `structured_only` | 只把員工原話換成字面 claims；顧問 turns 不變 | 取代員工原話會損失什麼 |
+| `raw_only` vs `structured_only` | 只把員工原話換成字面 claims；顧問 turns 不變 | 原子化表示、切分邊界與省略的非主張脈絡合起來有何淨影響 |
 
 **`hybrid` 必須保留完整 transcript。** 原設計的 hybrid 省略未選中的 turns，於是同時改動了「結構」與
 「資訊刪減」兩個變因，任何差異都無法歸因。長對話壓縮是另一個問題，另開實驗。
@@ -155,6 +155,10 @@ P0 固定六個 case；每案只測一個主要風險，避免案例數膨脹：
 案例格式與建立規則見 [`cases/README.md`](cases/README.md)。正式 transcript 與四種 context payload
 必須在第一個 trial 前一次完成並固定。
 
+六份正式 constructed cases 已於 2026-07-26 凍結為 experiment revision `1`。字面 claim、欄位白名單、
+turn／claim 順序與模板殘留由 [`validate_cases.py`](validate_cases.py) 檢查；語意完整性、Task 邊界與
+切分公平性仍以人工 `adjudication` 為準。
+
 ## 6. 共同受測指令
 
 以下文字是所有 arm 的共同 instruction；實際送出的單一完整 request 仍逐 trial 原樣保存在 `trials/`：
@@ -244,12 +248,20 @@ Task 邊界品質，不把 subagent 的 JSON adherence 外推為 provider 能力
 
 **0. 射程限定** —— 見 §3.2。P0 的結論只涵蓋「人工整理的字面 claim table」，不涵蓋 typed Work Model。
 
-**1. 一致性門檻** —— 任何刪除類決策需 CR-01／CR-03／CR-05 各 **3/3 同方向**；
-任一案例出現 2/1 分裂即 `inconclusive`，留到正式 R1，不得在 P0 下結論。
+**1. 一致性門檻** —— 只在相鄰、單變因的 pair 上判斷。對同一 case 與同一 critical check：
+
+- 候選 arm 三次皆 `fail`、直接對照 arm 三次皆 `pass`，才算 **3/3 穩定 regression**；
+- 候選 arm 三次皆 `pass`、直接對照 arm 三次皆 `fail`，才算 **3/3 穩定 improvement**；
+- 其他組合（含 2/1、平手或尚未裁決的 `unknown`）一律 `inconclusive`。
+
+任一重複案例出現 3/3 穩定 critical regression，就足以淘汰造成該 regression 的可選元件；
+不要求三個重複案例全部失敗。反之，保留候選只表示「值得正式 R1 確認」：至少一個重複案例
+出現 3/3 穩定 improvement，且其他重複案例沒有 3/3 穩定 regression。CR-02／CR-04／CR-06
+仍只可標 `flagged_n1`，不得參與這項裁決。
 
 | # | 觀察到的模式 | 決策 |
 |---|---|---|
-| 2 | Hybrid 反覆輸給 `raw_only` | 字面 claim table 被否證；第一版不建 literal-claim layer；typed Evidence 仍未決 |
+| 2 | Hybrid 3/3 穩定輸給其直接對照 `raw_plus_spans` | 字面 claim table 被否證；第一版不建 literal-claim layer；typed Evidence 仍未決 |
 | 3 | `raw_plus_spans` > `raw_only`，且 Hybrid ≈ `raw_plus_spans` | 價值來自檢索／顯著性；保留 span 選取候選，不建 literal-claim layer；typed Evidence 仍未決 |
 | 4 | `raw_plus_spans` < `raw_only` | 重貼原句有害；production 不做 span 重貼，且 Hybrid 的任何優勢須先扣除此效果再解讀 |
 | 5 | Hybrid 穩定優於 `raw_plus_spans` | 字面結構化尚未被否證，只取得「值得進一步驗證」資格；下一步測 extraction fidelity |
@@ -271,8 +283,9 @@ Task 邊界品質，不把 subagent 的 JSON adherence 外推為 provider 能力
 - 只有重複組（CR-01／CR-03／CR-05）跑到 3 次；CR-02／CR-04／CR-06 為 n=1，
   差異只能標 `flagged_n1` 送正式 R1，不得據以下決策（rubric §5）。
   **代價：責任邊界（CR-04／C2）在 P0 沒有可下決策的證據強度**，這是把重複配額給 merge/split 的直接後果。
-- `structured_only` 在保留顧問逐字提問之後，與 `raw_only` 的差距收窄為**句間連接詞與非主張片段**；
-  它只回答「句間膠是否承重」，不能宣稱「用結構取代原文會遺失脈絡」這種大結論
+- `structured_only` 在保留顧問逐字提問之後，與 `raw_only` 的差距主要來自**原子化切分、row 邊界、
+  顯式 sequence metadata，以及未進 claim 的句間連接詞與非主張片段**；它量的是這個表示轉換的
+  淨影響，不能宣稱只隔離了「句間膠」，也不能外推成「所有結構化表示都會遺失脈絡」
   （見 [`cases/README.md`](cases/README.md)）。
 - 四個 arm 的字元量不同，且 `raw_plus_spans` 與 `hybrid` 的 spans 是**重複計入**的字元，
   結果要同時報告可見輸入字元數，**不得把字元較少直接解讀為效率較高**，也不把較長 Context
@@ -280,9 +293,8 @@ Task 邊界品質，不把 subagent 的 JSON adherence 外推為 provider 能力
 
 ## 12. 本階段交付邊界
 
-本文件核准後才建立正式 case JSON 並派 subagent。P0 完成時應新增：
+正式 case JSON 與最小驗證器已完成。P0 後續執行仍需新增：
 
-- `cases/CR-01...CR-06.json`
 - `trials/*.json`
 - `results.csv`
 - `report.md`

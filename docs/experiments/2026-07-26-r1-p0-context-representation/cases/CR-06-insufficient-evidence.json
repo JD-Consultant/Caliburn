@@ -1,0 +1,118 @@
+{
+  "case_id": "CR-06-insufficient-evidence",
+  "case_family_id": "CR-06",
+  "source_type": "constructed_edge",
+  "title": "資訊不足時不得製造工作",
+  "primary_risk": "員工只提到工具、泛稱溝通與偶爾幫忙，沒有可辨識的穩定責任或結果；模型可能為了產出而虛構 Task",
+  "applicable_critical_checks": [
+    "C1_TOOL_BOUNDARY",
+    "C2_RESPONSIBILITY_BOUNDARY",
+    "C5_ZERO_EVIDENCE",
+    "C6_SOURCE_FIDELITY"
+  ],
+  "transcript": [
+    {
+      "source_id": "turn-001",
+      "role": "consultant",
+      "text": "請描述你平常反覆負責、可以從開始做到完成的一項工作。"
+    },
+    {
+      "source_id": "turn-002",
+      "role": "employee",
+      "text": "我主要會用 Excel，也常常跟客戶溝通，事情很多。"
+    },
+    {
+      "source_id": "turn-003",
+      "role": "consultant",
+      "text": "可以舉一個最近反覆發生、由你負責到完成的具體例子嗎？"
+    },
+    {
+      "source_id": "turn-004",
+      "role": "employee",
+      "text": "一時想不到固定流程，有時同事忙不過來，我就幫忙看一下資料，但做什麼不一定。"
+    }
+  ],
+  "claim_table": [
+    {
+      "claim_id": "claim-001",
+      "speaker": "employee",
+      "literal_text": "我主要會用 Excel",
+      "source_turn_ids": [
+        "turn-002"
+      ],
+      "sequence_index": 1
+    },
+    {
+      "claim_id": "claim-002",
+      "speaker": "employee",
+      "literal_text": "也常常跟客戶溝通",
+      "source_turn_ids": [
+        "turn-002"
+      ],
+      "sequence_index": 2
+    },
+    {
+      "claim_id": "claim-003",
+      "speaker": "employee",
+      "literal_text": "事情很多",
+      "source_turn_ids": [
+        "turn-002"
+      ],
+      "sequence_index": 3
+    },
+    {
+      "claim_id": "claim-004",
+      "speaker": "employee",
+      "literal_text": "一時想不到固定流程",
+      "source_turn_ids": [
+        "turn-004"
+      ],
+      "sequence_index": 4
+    },
+    {
+      "claim_id": "claim-005",
+      "speaker": "employee",
+      "literal_text": "有時同事忙不過來",
+      "source_turn_ids": [
+        "turn-004"
+      ],
+      "sequence_index": 5
+    },
+    {
+      "claim_id": "claim-006",
+      "speaker": "employee",
+      "literal_text": "我就幫忙看一下資料",
+      "source_turn_ids": [
+        "turn-004"
+      ],
+      "sequence_index": 6
+    },
+    {
+      "claim_id": "claim-007",
+      "speaker": "employee",
+      "literal_text": "但做什麼不一定",
+      "source_turn_ids": [
+        "turn-004"
+      ],
+      "sequence_index": 7
+    }
+  ],
+  "relevant_span_ids": [
+    "turn-002",
+    "turn-004"
+  ],
+  "adjudication": {
+    "must_retain_tasks": [],
+    "must_not_create_tasks_from": [
+      "使用 Excel",
+      "與客戶溝通",
+      "偶爾幫同事看資料",
+      "未被原文支持的資料分析、客服或報表工作"
+    ],
+    "allowed_task_variants": [],
+    "required_uncertainties": [
+      "需要一個目前反覆發生、由本人負責到完成，且有明確對象與結果的具體工作例子"
+    ],
+    "notes": "Excel 是工具，「跟客戶溝通」缺少目的與結果，「幫忙看一下資料」又被同事忙碌、有時與內容不固定所限定，沒有任何內容足以建立穩定 Task。兩個 employee turns 都列為相關片段，避免只突出看似工作導向的詞。claim 切分保留「一時想不到固定流程」「有時同事忙不過來」「但做什麼不一定」等不足與責任邊界標記。"
+  }
+}

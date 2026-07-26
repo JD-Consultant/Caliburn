@@ -104,12 +104,16 @@ owner 先人工裁決**至少 1 個 case** 的四份輸出，再與 reviewer sub
 
 ## 5. Arm 層結論
 
-- `rejected`：在**重複組案例**（CR-01／CR-03／CR-05）出現另一候選沒有的 critical regression，
-  且達 3/3 同方向。
-- `retain_for_confirmation`：相對 `raw_only` 多通過至少一個 critical case，且無新增 critical regression。
+- `rejected`：在**任一重複組案例**（CR-01／CR-03／CR-05）的同一 critical check，
+  候選 arm 三次皆 `fail`、其直接對照 arm 三次皆 `pass`。一個 3/3 穩定 critical regression
+  即足以淘汰造成它的可選元件，不要求三個案例全部失敗。
+- `retain_for_confirmation`：在至少一個重複組案例的同一 critical check，候選 arm 三次皆 `pass`、
+  其直接對照 arm 三次皆 `fail`，且其他重複組案例沒有 3/3 穩定 critical regression。
+  這只代表值得進正式 R1，不代表產品架構已成立。
 - `tie_prefer_simpler`：critical 與實質品質持平；依 YAGNI 選 `raw_only`。
 - `diagnostic_only`：`structured_only` 可揭露資訊損失，但不具產品候選資格。
-- `inconclusive`：重複組案例的三次重複未達 3/3 同方向（README §10.1）。
+- `inconclusive`：未形成上述 3-pass 對 3-fail 的穩定差異，包括 2/1、平手或尚未裁決的 `unknown`
+  （README §10.1）。
 - `flagged_n1`：差異只出現在 **n=1 案例**（CR-02／CR-04／CR-06）。
 
 **`flagged_n1` 不足以單獨支持任何 arm 結論。** CR-02／CR-04／CR-06 每格只跑一次，

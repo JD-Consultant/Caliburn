@@ -47,4 +47,4 @@
 - [`2026-07-26-r1-p0-context-representation/`](2026-07-26-r1-p0-context-representation/) —
   在不使用外部 API key 的情況下，以隔離的最強 subagent 比較 Raw-only、Raw+Spans、Hybrid 與
   Structured-only 四種 Context 對 Task 邊界分析的影響。**否證實驗**：可證明字面結構化表示沒有加值，
-  不能反過來宣稱 Evidence 架構已成立。
+  不能反過來宣稱 Evidence 架構已成立。六份 constructed cases 已凍結為 revision 1，待執行 trials。

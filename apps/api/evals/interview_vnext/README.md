@@ -1,6 +1,6 @@
 # Interview vNext — eval-only provider adapters
 
-**Status（2026-07-20）：V3-5A R4 complete；R5 grounded short-answer authority approved/planned，paid live/V3-6仍 blocked**
+**Status（2026-07-22）：V3-5A R4、R5-A、atomic R5-BC與R5-D bounded correctness closure均已完成；suite已hard cut到`turn-interpret-c1-v2-pilot.v1`（frozen hash 未變），paid live/V3-6仍blocked，下一步最小Authoring Core**
 
 Owner已核准ADR 0036；實作authority為
 [`V3-5A runtime contract reconstruction plan`](../../../../docs/plans/2026-07-18-interview-vnext-v3-5a-runtime-contract-reconstruction-plan.md)，
@@ -17,8 +17,19 @@ migration維持0010。
 R5 exact authority已改由
 [`ADR 0037`](../../../../docs/adr/0037-interview-vnext-question-frame-contextual-evidence-and-employee-authority.md)與
 [`grounded short-answer amendment`](../../../../docs/plans/2026-07-20-interview-vnext-v3-5a-r5-grounded-short-answer-amendment-plan.md)
-管理。R5 active hard cut會把minimum eval/provider fixtures機械遷移到QuestionFrame、Evidence/State v3與Turn Input/Output v2，
-以保持每個commit完整suite綠；R6才負責grounded short-answer多trial、gold/grader與真模型品質，不得在R5跑paid live。
+管理；R5-A review corrective另見
+[`support dependency/lifecycle closure plan`](../../../../docs/plans/2026-07-21-interview-vnext-v3-5a-r5-a-corrective-contract-closure-plan.md)。
+R5-BC exact施工authority為
+[`domain/context atomic hard-cut plan`](../../../../docs/plans/2026-07-22-interview-vnext-v3-5a-r5-bc-domain-context-hard-cut-plan.md)。
+R5-D（**completed**）補齊 Capture terminal roots、bundle corruption matrix 與 byte-identical re-export，交付證據見
+[`bounded correctness closure plan §17`](../../../../docs/plans/2026-07-22-interview-vnext-v3-5a-r5-d-bounded-correctness-closure-plan.md)；
+未改provider/domain/schema、未擴增case。現行active suite frozen hash為
+`sha256:5f60255dd323cd6c458b4ced7e067ca0a6c48cb9b3d2b5765bce8fada7a9bcc5`。
+TI-09/TI-10 的多輪fixture依該計畫§15.3在每個prior employee後立即套用deterministic seeded interpretation；
+`evidence_key`只作logical mapping，實際Evidence ID由prior operation + literal index導出。不得放寬pending-turn invariant或改寫transcript。
+R5-BC已把minimum eval/provider fixtures遷移到QuestionFrame、Evidence/State v3與Turn Input/Output v2；
+TI-09/TI-10的prior employee turn由eval-only deterministic seed先取得receipt，沒有放寬production State invariant。
+R6才負責grounded short-answer多trial與真模型品質，不得把本次mocked/reference綠燈當成promotion verdict。
 
 - **R4 語意**：adapter 只回 wire result + normalized execution evidence（`openrouter_routing.py` pure
   normalizer：official nested/legacy flat endpoints、pipeline stage 分類、official cache header、
@@ -49,7 +60,7 @@ R5 exact authority已改由
   `capture_export`/`turn_graders`/`review`/`turn_report`/`scheduler`/`batch_orchestrator`/`live_wiring`/
   `turn_eval_cli`)已落地。focused 逐檔:contracts **32**、loader **62**、fixtures **9**、
   graders/review **26**、PG reference harness **5**、runner/report/export **8**、OpenRouter CLI/wiring **14**。
-- 12 個繁中 pilot cases(8 dev + 4 challenge)已凍結;suite hash
+- 原始V3-5 v1的12個繁中pilot cases(8 dev + 4 challenge)歷史suite hash
   `sha256:ed51167d64a9887f7a119568ad501ea71e1edd63eace6e44ccba222b5d763d5a`;12/12 reference output 通過
   production ContextBuilder/verifier/reducer gate,mocked 12×3 batch 端到端在 real PostgreSQL 產出
   `TURN_GATE_PASS_ENGINEERING`(harness 自測,**非** promotion-eligible)。
@@ -98,7 +109,7 @@ V2/V3 已發布的 provider-neutral contract(`app.interview_vnext.llm`)」。
 | 檔案 | 責任 |
 |---|---|
 | `contracts.py` | case/transcript/initial-fixture/gold/reference-output/suite-manifest/batch-plan/trial/grader-result/review-decision/case-report/batch-report 的 strict 契約 + hash-bound 定義 + N/A-preserving metrics |
-| `write_schemas.py` + `schemas/turn-eval-*.v1.schema.json` | 11 份可攜 JSON Schema 的 deterministic 匯出 + drift check |
+| `write_schemas.py` + `schemas/turn-eval-*.schema.json` | 11份frozen historical v1＋11份active v2 contract＋1份prior-seed v1 schema的deterministic匯出與drift check |
 | `loader.py` | path/byte(UTF-8/LF/無 BOM/無 symlink/無未知檔)、transcript 結構、overlapping-occurrence quote、三層 runtime/evaluation/content hash、gold 隔離、suite balance |
 | `identities.py` | logical key → trial-scoped UUIDv5(tenant/user/profile/session/run/turn/episode/evidence/slot/trial) |
 | `fixture_builder.py` | case → 公開 durable command 序列 + 純函式 reference gate(production context/verifier/reducer) |
@@ -142,8 +153,8 @@ OpenRouter 主線(V3-4R):
   selected provider/model 與 snapshot 不符、或任何 pipeline stage → route contaminated(fail closed)。
 - known mutating plugins(context-compression、response-healing、web、file-parser)顯式 disabled;
   不解析 markdown fence、不修 JSON、不降級 JSON mode;reasoning text 一律 redact,不進 Capture。
-- 送出的 schema 是 V3-2 published portable schema(hash 驗證);adapter 成功只到 `StructuredPayload`,
-  完整 Pydantic/semantic 驗證仍在既有 V3-3 executor。
+- 送出的schema是R5-BC `turn-interpret-output.v2` portable schema（hash驗證）；adapter成功只到
+  `StructuredPayload`，完整Pydantic/semantic驗證仍由application executor負責。
 
 OpenAI direct(reference):
 
@@ -156,14 +167,14 @@ OpenAI direct(reference):
 cd apps/api
 # 只驗 case/schema/hash/cross refs,不需 DB/key
 uv run --locked python -m evals.interview_vnext.turn_eval_cli validate-suite `
-  --suite-version turn-interpret-pilot.v1
+  --suite-version turn-interpret-c1-v2-pilot.v1
 # known-good outputs 走純函式 production gate(不需 DB/key)
 uv run --locked python -m evals.interview_vnext.turn_eval_cli reference-gate `
-  --suite-version turn-interpret-pilot.v1
+  --suite-version turn-interpret-c1-v2-pilot.v1
 # mocked 12×3 batch(需 eval DB;harness 自測,非 promotion)
 $env:INTERVIEW_VNEXT_EVAL_DATABASE_URL='postgresql+asyncpg://postgres:password@localhost:5432/caliburn_test'
 uv run --locked python -m evals.interview_vnext.turn_eval_cli mocked-batch `
-  --suite-version turn-interpret-pilot.v1 `
+  --suite-version turn-interpret-c1-v2-pilot.v1 `
   --database-url-env INTERVIEW_VNEXT_EVAL_DATABASE_URL `
   --output-dir ../../output/interview_vnext/turn-eval
 # 讀回既有 batch 的 decision
@@ -185,7 +196,7 @@ cd apps/api
 $env:OPENROUTER_API_KEY='<secret>'
 $env:INTERVIEW_VNEXT_EVAL_DATABASE_URL='postgresql+asyncpg://.../<name>_eval'
 uv run --locked python -m evals.interview_vnext.turn_eval_cli live-batch `
-  --suite-version turn-interpret-pilot.v1 `
+  --suite-version turn-interpret-c1-v2-pilot.v1 `
   --database-url-env INTERVIEW_VNEXT_EVAL_DATABASE_URL `
   --model anthropic/claude-sonnet-5 --upstream-endpoint anthropic `
   --data-collection deny --zdr-required false --reasoning-effort medium `

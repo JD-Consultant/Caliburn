@@ -42,6 +42,36 @@ class StateVersionConflict(PersistenceError):
     code = "state_version_conflict"
 
 
+class StateContextStale(PersistenceError):
+    """The persisted state moved beyond the exact context shown to the model."""
+
+    code = "state_context_stale"
+
+    def __init__(
+        self,
+        message: str,
+        /,
+        *,
+        expected_state_version: int,
+        expected_state_hash: str,
+        actual_state_version: int | None = None,
+        actual_state_hash: str | None = None,
+        **identifiers: object,
+    ) -> None:
+        super().__init__(
+            message,
+            expected_state_version=expected_state_version,
+            expected_state_hash=expected_state_hash,
+            actual_state_version=actual_state_version,
+            actual_state_hash=actual_state_hash,
+            **identifiers,
+        )
+        self.expected_state_version = expected_state_version
+        self.expected_state_hash = expected_state_hash
+        self.actual_state_version = actual_state_version
+        self.actual_state_hash = actual_state_hash
+
+
 class IdempotencyConflict(PersistenceError):
     """Same command ID / request key with a different canonical hash."""
 
@@ -89,6 +119,30 @@ class PersistedDataCorruption(PersistenceError):
     Never "repaired" on read — the row is evidence, surfacing beats guessing."""
 
     code = "persisted_data_corruption"
+
+
+class UnsupportedPersistedSchemaVersion(PersistenceError):
+    """The row is intact but written by a major version this build cannot read.
+
+    Kept distinct from corruption on purpose: a well-formed ``interview_state.v2``
+    row is not damaged data, and reporting it as corruption would hide a clean
+    migration signal behind a data-integrity alarm (plan §8.1).
+    """
+
+    code = "unsupported_persisted_schema_version"
+
+    def __init__(
+        self,
+        message: str,
+        /,
+        *,
+        expected: str,
+        actual: str | None,
+        **identifiers: object,
+    ) -> None:
+        super().__init__(message, expected=expected, actual=actual, **identifiers)
+        self.expected = expected
+        self.actual = actual
 
 
 class ExternalArtifactStoreUnavailable(PersistenceError):

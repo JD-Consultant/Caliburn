@@ -1,0 +1,561 @@
+{
+  "$defs": {
+    "AnswerBindingKind": {
+      "enum": [
+        "proposition",
+        "slot",
+        "choice"
+      ],
+      "title": "AnswerBindingKind",
+      "type": "string"
+    },
+    "AnswerBindingProposal": {
+      "additionalProperties": false,
+      "description": "A short answer bound to one QuestionFrame target.\n\nDeliberately flat rather than a discriminated union: a provider-portable\nschema projection must not have to reproduce union branches (§9.3).",
+      "properties": {
+        "target_ordinal": {
+          "minimum": 1,
+          "title": "Target Ordinal",
+          "type": "integer"
+        },
+        "binding_kind": {
+          "$ref": "#/$defs/AnswerBindingKind"
+        },
+        "resolution": {
+          "$ref": "#/$defs/AnswerBindingResolution"
+        },
+        "answer_quote": {
+          "minLength": 1,
+          "title": "Answer Quote",
+          "type": "string"
+        },
+        "answer_quote_occurrence": {
+          "minimum": 1,
+          "title": "Answer Quote Occurrence",
+          "type": "integer"
+        },
+        "value_text": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Value Text"
+        },
+        "selected_choice_ordinals": {
+          "default": [],
+          "items": {
+            "type": "integer"
+          },
+          "title": "Selected Choice Ordinals",
+          "type": "array"
+        },
+        "insufficiency_codes": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/TurnInsufficiencyCode"
+          },
+          "title": "Insufficiency Codes",
+          "type": "array"
+        }
+      },
+      "required": [
+        "target_ordinal",
+        "binding_kind",
+        "resolution",
+        "answer_quote",
+        "answer_quote_occurrence"
+      ],
+      "title": "AnswerBindingProposal",
+      "type": "object"
+    },
+    "AnswerBindingResolution": {
+      "enum": [
+        "affirmed",
+        "denied",
+        "supplied",
+        "selected",
+        "ambiguous",
+        "unknown"
+      ],
+      "title": "AnswerBindingResolution",
+      "type": "string"
+    },
+    "CorrectionProposal": {
+      "additionalProperties": false,
+      "properties": {
+        "target_candidate_ordinals": {
+          "default": [],
+          "items": {
+            "type": "integer"
+          },
+          "title": "Target Candidate Ordinals",
+          "type": "array"
+        },
+        "target_unknown": {
+          "default": false,
+          "title": "Target Unknown",
+          "type": "boolean"
+        }
+      },
+      "title": "CorrectionProposal",
+      "type": "object"
+    },
+    "DialogueAct": {
+      "enum": [
+        "standalone_answer",
+        "affirm",
+        "deny",
+        "slot_value",
+        "choose",
+        "correction",
+        "dont_know",
+        "decline",
+        "stop",
+        "off_topic",
+        "mixed"
+      ],
+      "title": "DialogueAct",
+      "type": "string"
+    },
+    "EmergentTopicProposal": {
+      "additionalProperties": false,
+      "properties": {
+        "topic": {
+          "minLength": 1,
+          "title": "Topic",
+          "type": "string"
+        },
+        "quote": {
+          "minLength": 1,
+          "title": "Quote",
+          "type": "string"
+        },
+        "quote_occurrence": {
+          "minimum": 1,
+          "title": "Quote Occurrence",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "topic",
+        "quote",
+        "quote_occurrence"
+      ],
+      "title": "EmergentTopicProposal",
+      "type": "object"
+    },
+    "EpisodeSignal": {
+      "enum": [
+        "continue",
+        "possible_shift",
+        "explicit_shift",
+        "possible_close"
+      ],
+      "title": "EpisodeSignal",
+      "type": "string"
+    },
+    "EvidenceKind": {
+      "enum": [
+        "action",
+        "input",
+        "output",
+        "purpose",
+        "condition",
+        "standard",
+        "frequency",
+        "importance",
+        "ownership",
+        "tool",
+        "recipient",
+        "dependency",
+        "exception",
+        "negation",
+        "correction",
+        "preference"
+      ],
+      "title": "EvidenceKind",
+      "type": "string"
+    },
+    "EvidenceQualifiersProposal": {
+      "additionalProperties": false,
+      "properties": {
+        "time_scope": {
+          "$ref": "#/$defs/TimeScope"
+        },
+        "time_scope_support": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Time Scope Support"
+        },
+        "typicality": {
+          "$ref": "#/$defs/Typicality"
+        },
+        "typicality_support": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Typicality Support"
+        },
+        "polarity": {
+          "$ref": "#/$defs/Polarity"
+        },
+        "polarity_support": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Polarity Support"
+        },
+        "frequency": {
+          "$ref": "#/$defs/FrequencyQualifierProposal"
+        },
+        "importance": {
+          "$ref": "#/$defs/Importance"
+        },
+        "importance_support": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Importance Support"
+        },
+        "ownership": {
+          "$ref": "#/$defs/Ownership"
+        },
+        "ownership_support": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Ownership Support"
+        }
+      },
+      "required": [
+        "time_scope",
+        "typicality",
+        "polarity",
+        "frequency",
+        "importance",
+        "ownership"
+      ],
+      "title": "EvidenceQualifiersProposal",
+      "type": "object"
+    },
+    "EvidenceSubject": {
+      "enum": [
+        "employee",
+        "employee_team",
+        "other_role",
+        "organization",
+        "unknown"
+      ],
+      "title": "EvidenceSubject",
+      "type": "string"
+    },
+    "FrequencyQualifierProposal": {
+      "additionalProperties": false,
+      "description": "Provider-facing frequency with decimal text preserved losslessly.",
+      "properties": {
+        "value": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        },
+        "unit": {
+          "$ref": "#/$defs/FrequencyUnit"
+        },
+        "verbatim": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Verbatim"
+        }
+      },
+      "required": [
+        "value",
+        "unit",
+        "verbatim"
+      ],
+      "title": "FrequencyQualifierProposal",
+      "type": "object"
+    },
+    "FrequencyUnit": {
+      "enum": [
+        "per_day",
+        "per_week",
+        "per_month",
+        "per_quarter",
+        "per_year",
+        "irregular",
+        "unknown"
+      ],
+      "title": "FrequencyUnit",
+      "type": "string"
+    },
+    "Importance": {
+      "enum": [
+        "explicit_core",
+        "explicit_supporting",
+        "not_stated"
+      ],
+      "title": "Importance",
+      "type": "string"
+    },
+    "ObservationProposal": {
+      "additionalProperties": false,
+      "description": "A claim the employee stated literally in this turn.\n\nIdentity is the proposal's original position in the output tuple — the model\nnever names an Evidence ID or a proposal key (amendment plan §9.2).",
+      "properties": {
+        "subject": {
+          "$ref": "#/$defs/EvidenceSubject"
+        },
+        "kind": {
+          "$ref": "#/$defs/EvidenceKind"
+        },
+        "claim": {
+          "minLength": 1,
+          "title": "Claim",
+          "type": "string"
+        },
+        "quote": {
+          "minLength": 1,
+          "title": "Quote",
+          "type": "string"
+        },
+        "quote_occurrence": {
+          "minimum": 1,
+          "title": "Quote Occurrence",
+          "type": "integer"
+        },
+        "qualifiers": {
+          "$ref": "#/$defs/EvidenceQualifiersProposal"
+        },
+        "correction": {
+          "$ref": "#/$defs/CorrectionProposal"
+        },
+        "insufficiency_codes": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/TurnInsufficiencyCode"
+          },
+          "title": "Insufficiency Codes",
+          "type": "array"
+        }
+      },
+      "required": [
+        "subject",
+        "kind",
+        "claim",
+        "quote",
+        "quote_occurrence",
+        "qualifiers"
+      ],
+      "title": "ObservationProposal",
+      "type": "object"
+    },
+    "Ownership": {
+      "enum": [
+        "owner",
+        "shared",
+        "assists",
+        "receives",
+        "not_responsible",
+        "unknown"
+      ],
+      "title": "Ownership",
+      "type": "string"
+    },
+    "Polarity": {
+      "enum": [
+        "affirmed",
+        "denied",
+        "uncertain"
+      ],
+      "title": "Polarity",
+      "type": "string"
+    },
+    "TimeScope": {
+      "enum": [
+        "current",
+        "past",
+        "future",
+        "hypothetical",
+        "unknown"
+      ],
+      "title": "TimeScope",
+      "type": "string"
+    },
+    "TurnInsufficiencyCode": {
+      "enum": [
+        "ambiguous_frequency",
+        "ambiguous_ownership",
+        "ambiguous_subject",
+        "ambiguous_time_scope",
+        "contradiction_unresolved",
+        "correction_target_unknown",
+        "insufficient_detail",
+        "no_work_fact",
+        "answer_binding_ambiguous",
+        "question_frame_missing",
+        "question_frame_stale",
+        "question_frame_not_immediate",
+        "choice_selection_ambiguous"
+      ],
+      "title": "TurnInsufficiencyCode",
+      "type": "string"
+    },
+    "TurnInterpretOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "turn_interpret_output.v2",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "dialogue_act": {
+          "$ref": "#/$defs/DialogueAct"
+        },
+        "episode_signal": {
+          "$ref": "#/$defs/EpisodeSignal"
+        },
+        "literal_observations": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ObservationProposal"
+          },
+          "title": "Literal Observations",
+          "type": "array"
+        },
+        "answer_bindings": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/AnswerBindingProposal"
+          },
+          "title": "Answer Bindings",
+          "type": "array"
+        },
+        "emergent_topics": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/EmergentTopicProposal"
+          },
+          "title": "Emergent Topics",
+          "type": "array"
+        },
+        "turn_insufficiency_codes": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/TurnInsufficiencyCode"
+          },
+          "title": "Turn Insufficiency Codes",
+          "type": "array"
+        }
+      },
+      "required": [
+        "schema_version",
+        "dialogue_act",
+        "episode_signal"
+      ],
+      "title": "TurnInterpretOutput",
+      "type": "object"
+    },
+    "Typicality": {
+      "enum": [
+        "typical",
+        "occasional",
+        "exception",
+        "unknown"
+      ],
+      "title": "Typicality",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Known-good output with logical correction targets, portable across trials.",
+  "properties": {
+    "schema_version": {
+      "const": "turn_eval_reference_output.v2",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "case_id": {
+      "maxLength": 64,
+      "pattern": "^TI-[0-9]{2}-[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "title": "Case Id",
+      "type": "string"
+    },
+    "output": {
+      "$ref": "#/$defs/TurnInterpretOutput"
+    },
+    "correction_target_bindings": {
+      "additionalProperties": {
+        "items": {
+          "maxLength": 64,
+          "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$",
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "default": {},
+      "title": "Correction Target Bindings",
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema_version",
+    "case_id",
+    "output"
+  ],
+  "title": "Caliburn interview vNext turn eval reference output v2",
+  "type": "object",
+  "$id": "https://caliburn.local/schemas/turn-eval-reference-output.v2.schema.json"
+}

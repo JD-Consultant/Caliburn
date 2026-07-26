@@ -237,11 +237,17 @@ class TestOpenRouterChatEvalConfig:
             ("transport_retries", 1),
             ("response_cache", True),
             ("session_sticky_routing", True),
-            ("contains_test_data", False),
             ("base_url", "https://example.com/v1"),
         ):
             with pytest.raises(ValidationError):
                 OpenRouterChatEvalConfig(**{**config.model_dump(), field: value})
+
+    def test_data_classification_is_not_a_provider_wire_invariant(self):
+        config = build_config()
+        production = OpenRouterChatEvalConfig(
+            **{**config.model_dump(), "contains_test_data": False}
+        )
+        assert production.contains_test_data is False
 
     def test_privacy_and_route_profile_enter_config_hash(self):
         base = build_config()

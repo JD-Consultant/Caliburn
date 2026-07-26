@@ -15,7 +15,7 @@
       "content": [
         {
           "type": "output_text",
-          "text": "{\"schema_version\":\"turn_interpret_output.v1\",\"observations\":[],\"user_signal\":\"answer\",\"episode_signal\":\"continue\",\"emergent_topics\":[],\"insufficiencies\":[{\"reason_code\":\"no_work_fact\",\"observation_proposal_keys\":[\"missing-proposal-key\"]}]}",
+          "text": "{\"schema_version\":\"turn_interpret_output.v2\",\"literal_observations\":[],\"answer_bindings\":[],\"dialogue_act\":\"standalone_answer\",\"episode_signal\":\"continue\",\"emergent_topics\":[],\"insufficiencies\":[{\"reason_code\":\"no_work_fact\",\"observation_proposal_keys\":[\"missing-proposal-key\"]}]}",
           "annotations": []
         }
       ]

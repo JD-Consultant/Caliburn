@@ -11,6 +11,7 @@ from pydantic import Field, field_validator, model_validator
 
 from .base import DomainModel
 from .identifiers import NonEmptyText, ReferenceUrn, Sha256, StableName
+from .support import EvidenceSupport
 
 
 class EvidenceSubject(StrEnum):
@@ -112,23 +113,6 @@ class EvidenceQualifiers(DomainModel):
     ownership: Ownership = Ownership.UNKNOWN
 
 
-class QuoteSpan(DomainModel):
-    unit: Literal["unicode_code_point"] = "unicode_code_point"
-    start: int = Field(ge=0)
-    end: int = Field(gt=0)
-
-    @model_validator(mode="after")
-    def end_is_after_start(self) -> "QuoteSpan":
-        if self.end <= self.start:
-            raise ValueError("quote span end must be greater than start")
-        return self
-
-
-class QuoteMatch(StrEnum):
-    EXACT = "exact"
-    NORMALIZED = "normalized"
-
-
 class EvidenceStatus(StrEnum):
     ACTIVE = "active"
     SUPERSEDED = "superseded"
@@ -136,18 +120,14 @@ class EvidenceStatus(StrEnum):
 
 
 class Evidence(DomainModel):
-    schema_version: Literal["evidence.v2"] = "evidence.v2"
+    schema_version: Literal["evidence.v3"] = "evidence.v3"
     evidence_id: UUID
     session_id: UUID
-    turn_id: UUID
     episode_id: UUID | None = None
     subject: EvidenceSubject
     kind: EvidenceKind
     claim: NonEmptyText
-    quote: NonEmptyText
-    span: QuoteSpan
-    quote_match: QuoteMatch = QuoteMatch.EXACT
-    normalization_version: Literal["quote_nfkc_ws.v1"] | None = None
+    support: EvidenceSupport
     qualifiers: EvidenceQualifiers = Field(default_factory=EvidenceQualifiers)
     status: EvidenceStatus = EvidenceStatus.ACTIVE
     supersedes: tuple[UUID, ...] = ()
@@ -157,11 +137,20 @@ class Evidence(DomainModel):
     correction_target_unknown: bool = False
     extractor_operation_id: UUID
 
-    @field_validator("claim", "quote")
+    @property
+    def source_turn_id(self) -> UUID:
+        """Employee turn this evidence came from, whatever the support kind.
+
+        The only source convenience accessor: v2's top-level ``turn_id`` is gone
+        and consumers must never reconstruct it from a quote (plan §7.1).
+        """
+        return self.support.employee_turn_id
+
+    @field_validator("claim")
     @classmethod
     def semantic_text_is_not_blank(cls, value: str) -> str:
         if not value.strip():
-            raise ValueError("claim and quote cannot be blank")
+            raise ValueError("claim cannot be blank")
         return value
 
     @model_validator(mode="after")
@@ -181,10 +170,6 @@ class Evidence(DomainModel):
                 raise ValueError("withdrawn evidence requires withdrawn_by_turn_id")
         elif self.withdrawn_reason is not None or self.withdrawn_by_turn_id is not None:
             raise ValueError("only withdrawn evidence may set withdrawal fields")
-        if self.quote_match == QuoteMatch.NORMALIZED and self.normalization_version is None:
-            raise ValueError("normalized quotes require normalization_version")
-        if self.quote_match == QuoteMatch.EXACT and self.normalization_version is not None:
-            raise ValueError("exact quotes cannot set normalization_version")
         if self.correction_target_unknown and self.kind != EvidenceKind.CORRECTION:
             raise ValueError("correction_target_unknown requires correction kind")
         if self.kind == EvidenceKind.CORRECTION and not (

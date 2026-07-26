@@ -1,206 +1,221 @@
 {
-  "schema_version": "turn_eval_gold.v1",
-  "case_id": "TI-08-explicit-denial",
-  "allowed_user_signals": [
-    "answer"
-  ],
-  "allowed_episode_signals": [
-    "continue"
-  ],
-  "expected_commit": "evidence",
-  "observations": [
-    {
-      "gold_id": "g-deny-po-approval",
-      "requirement": "required",
-      "semantic_target": "員工不負責核准採購單",
-      "allowed_subjects": [
-        "employee"
-      ],
-      "allowed_kinds": [
-        "negation",
-        "ownership"
-      ],
-      "source_anchors": [
-        {
-          "turn_key": "employee-target",
-          "quote": "我不負責核准採購單",
-          "occurrence": 1
-        },
-        {
-          "turn_key": "employee-target",
-          "quote": "不負責核准採購單",
-          "occurrence": 1
-        }
-      ],
-      "qualifiers": {
-        "time_scope": {
-          "mode": "exact",
-          "value": "current"
-        },
-        "typicality": {
-          "mode": "not_applicable"
-        },
-        "polarity": {
-          "mode": "exact",
-          "value": "denied"
-        },
-        "frequency_unit": {
-          "mode": "exact",
-          "value": "unknown"
-        },
-        "frequency_value": {
-          "mode": "not_applicable"
-        },
-        "importance": {
-          "mode": "one_of",
-          "values": [
-            "not_stated"
-          ]
-        },
-        "ownership": {
-          "mode": "exact",
-          "value": "not_responsible"
-        }
-      },
-      "correction_target_evidence_keys": [],
-      "severity_if_missed": "major",
-      "rationale": "明確否認的權限必須以 denied 保留"
-    },
-    {
-      "gold_id": "g-deny-supplier-decision",
-      "requirement": "required",
-      "semantic_target": "員工不決定供應商",
-      "allowed_subjects": [
-        "employee"
-      ],
-      "allowed_kinds": [
-        "negation",
-        "ownership"
-      ],
-      "source_anchors": [
-        {
-          "turn_key": "employee-target",
-          "quote": "也不會決定供應商",
-          "occurrence": 1
-        },
-        {
-          "turn_key": "employee-target",
-          "quote": "不會決定供應商",
-          "occurrence": 1
-        }
-      ],
-      "qualifiers": {
-        "time_scope": {
-          "mode": "exact",
-          "value": "current"
-        },
-        "typicality": {
-          "mode": "not_applicable"
-        },
-        "polarity": {
-          "mode": "exact",
-          "value": "denied"
-        },
-        "frequency_unit": {
-          "mode": "exact",
-          "value": "unknown"
-        },
-        "frequency_value": {
-          "mode": "not_applicable"
-        },
-        "importance": {
-          "mode": "one_of",
-          "values": [
-            "not_stated"
-          ]
-        },
-        "ownership": {
-          "mode": "exact",
-          "value": "not_responsible"
-        }
-      },
-      "correction_target_evidence_keys": [],
-      "severity_if_missed": "major",
-      "rationale": "第二個獨立否認,不能與第一個合併"
-    },
-    {
-      "gold_id": "g-prepare-and-handoff",
-      "requirement": "required",
-      "semantic_target": "員工把資料整理好交給主管",
-      "allowed_subjects": [
-        "employee"
-      ],
-      "allowed_kinds": [
-        "action"
-      ],
-      "source_anchors": [
-        {
-          "turn_key": "employee-target",
-          "quote": "只會把資料整理好交給主管",
-          "occurrence": 1
-        },
-        {
-          "turn_key": "employee-target",
-          "quote": "把資料整理好交給主管",
-          "occurrence": 1
-        }
-      ],
-      "qualifiers": {
-        "time_scope": {
-          "mode": "exact",
-          "value": "current"
-        },
-        "typicality": {
-          "mode": "exact",
-          "value": "typical"
-        },
-        "polarity": {
-          "mode": "exact",
-          "value": "affirmed"
-        },
-        "frequency_unit": {
-          "mode": "exact",
-          "value": "unknown"
-        },
-        "frequency_value": {
-          "mode": "not_applicable"
-        },
-        "importance": {
-          "mode": "one_of",
-          "values": [
-            "not_stated"
-          ]
-        },
-        "ownership": {
-          "mode": "one_of",
-          "values": [
-            "assists",
-            "owner"
-          ]
-        }
-      },
-      "correction_target_evidence_keys": [],
-      "severity_if_missed": "major",
-      "rationale": "實際執行的正向工作,與兩個否認並存"
-    }
-  ],
-  "forbidden_claims": [
-    {
-      "gold_id": "f-approval-authority",
-      "description": "任何員工核准採購單的權限聲明",
-      "severity": "critical"
-    },
-    {
-      "gold_id": "f-supplier-authority",
-      "description": "任何員工決定供應商的權限聲明",
-      "severity": "critical"
-    }
-  ],
-  "required_insufficiencies": [],
-  "allowed_insufficiencies": [],
-  "state_expectation": {
-    "state_hash_changed": true,
-    "prior_evidence_superseded_keys": [],
-    "forbidden_superseded_keys": []
-  }
+    "schema_version":  "turn_eval_gold.v2",
+    "case_id":  "TI-08-explicit-denial",
+    "allowed_episode_signals":  [
+                                    "continue"
+                                ],
+    "expected_commit":  "evidence_and_receipt",
+    "observations":  [
+                         {
+                             "gold_id":  "g-deny-po-approval",
+                             "requirement":  "required",
+                             "semantic_target":  "員工不負責核准採購單",
+                             "allowed_subjects":  [
+                                                      "employee"
+                                                  ],
+                             "allowed_kinds":  [
+                                                   "negation",
+                                                   "ownership"
+                                               ],
+                             "source_anchors":  [
+                                                    {
+                                                        "turn_key":  "employee-target",
+                                                        "quote":  "我不負責核准採購單",
+                                                        "occurrence":  1
+                                                    },
+                                                    {
+                                                        "turn_key":  "employee-target",
+                                                        "quote":  "不負責核准採購單",
+                                                        "occurrence":  1
+                                                    }
+                                                ],
+                             "qualifiers":  {
+                                                "time_scope":  {
+                                                                   "mode":  "exact",
+                                                                   "value":  "unknown"
+                                                               },
+                                                "typicality":  {
+                                                                   "mode":  "not_applicable"
+                                                               },
+                                                "polarity":  {
+                                                                 "mode":  "exact",
+                                                                 "value":  "denied"
+                                                             },
+                                                "frequency_unit":  {
+                                                                       "mode":  "exact",
+                                                                       "value":  "unknown"
+                                                                   },
+                                                "frequency_value":  {
+                                                                        "mode":  "not_applicable"
+                                                                    },
+                                                "importance":  {
+                                                                   "mode":  "one_of",
+                                                                   "values":  [
+                                                                                  "not_stated"
+                                                                              ]
+                                                               },
+                                                "ownership":  {
+                                                                  "mode":  "exact",
+                                                                  "value":  "not_responsible"
+                                                              }
+                                            },
+                             "correction_target_evidence_keys":  [
+
+                                                                 ],
+                             "severity_if_missed":  "major",
+                             "rationale":  "明確否認的權限必須以 denied 保留"
+                         },
+                         {
+                             "gold_id":  "g-deny-supplier-decision",
+                             "requirement":  "required",
+                             "semantic_target":  "員工不決定供應商",
+                             "allowed_subjects":  [
+                                                      "employee"
+                                                  ],
+                             "allowed_kinds":  [
+                                                   "negation",
+                                                   "ownership"
+                                               ],
+                             "source_anchors":  [
+                                                    {
+                                                        "turn_key":  "employee-target",
+                                                        "quote":  "也不會決定供應商",
+                                                        "occurrence":  1
+                                                    },
+                                                    {
+                                                        "turn_key":  "employee-target",
+                                                        "quote":  "不會決定供應商",
+                                                        "occurrence":  1
+                                                    }
+                                                ],
+                             "qualifiers":  {
+                                                "time_scope":  {
+                                                                   "mode":  "exact",
+                                                                   "value":  "unknown"
+                                                               },
+                                                "typicality":  {
+                                                                   "mode":  "not_applicable"
+                                                               },
+                                                "polarity":  {
+                                                                 "mode":  "exact",
+                                                                 "value":  "denied"
+                                                             },
+                                                "frequency_unit":  {
+                                                                       "mode":  "exact",
+                                                                       "value":  "unknown"
+                                                                   },
+                                                "frequency_value":  {
+                                                                        "mode":  "not_applicable"
+                                                                    },
+                                                "importance":  {
+                                                                   "mode":  "one_of",
+                                                                   "values":  [
+                                                                                  "not_stated"
+                                                                              ]
+                                                               },
+                                                "ownership":  {
+                                                                  "mode":  "exact",
+                                                                  "value":  "unknown"
+                                                              }
+                                            },
+                             "correction_target_evidence_keys":  [
+
+                                                                 ],
+                             "severity_if_missed":  "major",
+                             "rationale":  "第二個獨立否認,不能與第一個合併"
+                         },
+                         {
+                             "gold_id":  "g-prepare-and-handoff",
+                             "requirement":  "required",
+                             "semantic_target":  "員工把資料整理好交給主管",
+                             "allowed_subjects":  [
+                                                      "employee"
+                                                  ],
+                             "allowed_kinds":  [
+                                                   "action"
+                                               ],
+                             "source_anchors":  [
+                                                    {
+                                                        "turn_key":  "employee-target",
+                                                        "quote":  "只會把資料整理好交給主管",
+                                                        "occurrence":  1
+                                                    },
+                                                    {
+                                                        "turn_key":  "employee-target",
+                                                        "quote":  "把資料整理好交給主管",
+                                                        "occurrence":  1
+                                                    }
+                                                ],
+                             "qualifiers":  {
+                                                "time_scope":  {
+                                                                   "mode":  "exact",
+                                                                   "value":  "unknown"
+                                                               },
+                                                "typicality":  {
+                                                                   "mode":  "exact",
+                                                                   "value":  "unknown"
+                                                               },
+                                                "polarity":  {
+                                                                 "mode":  "exact",
+                                                                 "value":  "affirmed"
+                                                             },
+                                                "frequency_unit":  {
+                                                                       "mode":  "exact",
+                                                                       "value":  "unknown"
+                                                                   },
+                                                "frequency_value":  {
+                                                                        "mode":  "not_applicable"
+                                                                    },
+                                                "importance":  {
+                                                                   "mode":  "one_of",
+                                                                   "values":  [
+                                                                                  "not_stated"
+                                                                              ]
+                                                               },
+                                                "ownership":  {
+                                                                  "mode":  "one_of",
+                                                                  "values":  [
+                                                                                 "assists",
+                                                                                 "owner",
+                                                                                 "unknown"
+                                                                             ]
+                                                              }
+                                            },
+                             "correction_target_evidence_keys":  [
+
+                                                                 ],
+                             "severity_if_missed":  "major",
+                             "rationale":  "實際執行的正向工作,與兩個否認並存"
+                         }
+                     ],
+    "forbidden_claims":  [
+                             {
+                                 "gold_id":  "f-approval-authority",
+                                 "description":  "任何員工核准採購單的權限聲明",
+                                 "severity":  "critical"
+                             },
+                             {
+                                 "gold_id":  "f-supplier-authority",
+                                 "description":  "任何員工決定供應商的權限聲明",
+                                 "severity":  "critical"
+                             }
+                         ],
+    "required_insufficiencies":  [
+
+                                 ],
+    "allowed_insufficiencies":  [
+
+                                ],
+    "state_expectation":  {
+                              "state_hash_changed":  true,
+                              "prior_evidence_superseded_keys":  [
+
+                                                                 ],
+                              "forbidden_superseded_keys":  [
+
+                                                            ]
+                          },
+    "allowed_dialogue_acts":  [
+                                  "standalone_answer"
+                              ]
 }

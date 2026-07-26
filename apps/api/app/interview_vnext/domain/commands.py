@@ -11,10 +11,12 @@ from .base import DomainModel
 from .episode import EpisodeStatus, Gap, GapStatus
 from .evidence import Evidence, Inference, InferenceStatus
 from .identifiers import NonEmptyText, UtcDatetime
+from .interpretation import TurnInterpretationRecord
 from .job_model import CandidateJobItem, CandidateStatus
+from .question_frame import QuestionFrameDefinition, QuestionFrameStaleReason
 from .review import ReviewDecision
 from .session import SessionStatus
-from .transcript import TranscriptTurn
+from .transcript import TranscriptRole, TranscriptTurn
 
 
 class CommandBase(DomainModel):
@@ -36,17 +38,65 @@ class TransitionSessionCommand(CommandBase):
         return value
 
 
-class AppendTranscriptTurnCommand(CommandBase):
-    schema_version: Literal["append_transcript_turn_command.v1"] = (
-        "append_transcript_turn_command.v1"
+class AppendConsultantQuestionCommand(CommandBase):
+    """A consultant question always persists the frame it opens (ADR 0037 §3)."""
+
+    schema_version: Literal["append_consultant_question_command.v1"] = (
+        "append_consultant_question_command.v1"
+    )
+    turn: TranscriptTurn
+    frame_definition: QuestionFrameDefinition
+
+    @model_validator(mode="after")
+    def turn_is_consultant(self) -> "AppendConsultantQuestionCommand":
+        if self.turn.role != TranscriptRole.CONSULTANT:
+            raise ValueError("consultant question command requires a consultant turn")
+        return self
+
+
+class AppendEmployeeTurnCommand(CommandBase):
+    """Frame binding is the reducer's job: the caller cannot name a frame."""
+
+    schema_version: Literal["append_employee_turn_command.v1"] = (
+        "append_employee_turn_command.v1"
     )
     turn: TranscriptTurn
 
+    @model_validator(mode="after")
+    def turn_is_employee(self) -> "AppendEmployeeTurnCommand":
+        if self.turn.role != TranscriptRole.EMPLOYEE:
+            raise ValueError("employee turn command requires an employee turn")
+        return self
 
-class ApplyEvidenceCommand(CommandBase):
-    schema_version: Literal["apply_evidence_command.v2"] = "apply_evidence_command.v2"
-    turn_id: UUID
-    observations: Annotated[tuple[Evidence, ...], Field(min_length=1)]
+
+class InvalidateQuestionFrameCommand(CommandBase):
+    schema_version: Literal["invalidate_question_frame_command.v1"] = (
+        "invalidate_question_frame_command.v1"
+    )
+    question_frame_id: UUID
+    reason: QuestionFrameStaleReason
+
+
+class ApplyTurnInterpretationCommand(CommandBase):
+    """Receipt plus the evidence it accepted; zero observations is valid."""
+
+    schema_version: Literal["apply_turn_interpretation_command.v1"] = (
+        "apply_turn_interpretation_command.v1"
+    )
+    record: TurnInterpretationRecord
+    observations: tuple[Evidence, ...] = ()
+
+    @model_validator(mode="after")
+    def accepted_ids_match_observations(self) -> "ApplyTurnInterpretationCommand":
+        observed_ids = tuple(item.evidence_id for item in self.observations)
+        if self.record.accepted_evidence_ids != observed_ids:
+            raise ValueError("record.accepted_evidence_ids must equal observation IDs, in order")
+        for item in self.observations:
+            if item.extractor_operation_id != self.record.operation_id:
+                raise ValueError("observations must come from the record's operation")
+            if item.session_id != self.record.session_id:
+                raise ValueError("observations must belong to the record's session")
+        return self
 
 
 class WithdrawEvidenceCommand(CommandBase):

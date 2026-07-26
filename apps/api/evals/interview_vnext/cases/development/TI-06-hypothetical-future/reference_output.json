@@ -1,58 +1,89 @@
 {
-  "schema_version": "turn_eval_reference_output.v1",
-  "case_id": "TI-06-hypothetical-future",
-  "output": {
-    "schema_version": "turn_interpret_output.v1",
-    "observations": [
-      {
-        "proposal_key": "obs-hypothetical-testing",
-        "subject": "employee",
-        "kind": "action",
-        "claim": "未來導入新系統時可能協助測試",
-        "quote": "我可能會協助測試",
-        "quote_occurrence": 1,
-        "qualifiers": {
-          "time_scope": "hypothetical",
-          "typicality": "unknown",
-          "polarity": "uncertain",
-          "frequency": {
-            "value": null,
-            "unit": "unknown",
-            "verbatim": null
-          },
-          "importance": "not_stated",
-          "ownership": "assists"
-        },
-        "correction_target_evidence_ids": [],
-        "correction_target_unknown": false
-      },
-      {
-        "proposal_key": "obs-not-doing-now",
-        "subject": "employee",
-        "kind": "negation",
-        "claim": "目前尚未進行系統測試",
-        "quote": "但目前還沒有做",
-        "quote_occurrence": 1,
-        "qualifiers": {
-          "time_scope": "current",
-          "typicality": "unknown",
-          "polarity": "denied",
-          "frequency": {
-            "value": null,
-            "unit": "unknown",
-            "verbatim": null
-          },
-          "importance": "not_stated",
-          "ownership": "not_responsible"
-        },
-        "correction_target_evidence_ids": [],
-        "correction_target_unknown": false
-      }
-    ],
-    "user_signal": "answer",
-    "episode_signal": "continue",
-    "emergent_topics": [],
-    "insufficiencies": []
-  },
-  "correction_target_bindings": {}
+    "schema_version":  "turn_eval_reference_output.v2",
+    "case_id":  "TI-06-hypothetical-future",
+    "output":  {
+                   "schema_version":  "turn_interpret_output.v2",
+                   "dialogue_act":  "standalone_answer",
+                   "episode_signal":  "continue",
+                   "literal_observations":  [
+                                                {
+                                                    "subject":  "employee",
+                                                    "kind":  "action",
+                                                    "claim":  "未來導入新系統時可能協助測試",
+                                                    "quote":  "我可能會協助測試",
+                                                    "quote_occurrence":  1,
+                                                    "qualifiers":  {
+                                                                       "time_scope":  "hypothetical",
+                                                                       "time_scope_support":  "我可能會協助測試",
+                                                                       "typicality":  "unknown",
+                                                                       "typicality_support":  null,
+                                                                       "polarity":  "uncertain",
+                                                                       "polarity_support":  "我可能會協助測試",
+                                                                       "frequency":  {
+                                                                                         "value":  null,
+                                                                                         "unit":  "unknown",
+                                                                                         "verbatim":  null
+                                                                                     },
+                                                                       "importance":  "not_stated",
+                                                                       "importance_support":  null,
+                                                                       "ownership":  "unknown",
+                                                                       "ownership_support":  null
+                                                                   },
+                                                    "correction":  {
+                                                                       "target_candidate_ordinals":  [
+
+                                                                                                     ],
+                                                                       "target_unknown":  false
+                                                                   },
+                                                    "insufficiency_codes":  [
+
+                                                                            ]
+                                                },
+                                                {
+                                                    "subject":  "employee",
+                                                    "kind":  "negation",
+                                                    "claim":  "目前尚未進行系統測試",
+                                                    "quote":  "但目前還沒有做",
+                                                    "quote_occurrence":  1,
+                                                    "qualifiers":  {
+                                                                       "time_scope":  "current",
+                                                                       "time_scope_support":  "但目前還沒有做",
+                                                                       "typicality":  "unknown",
+                                                                       "typicality_support":  null,
+                                                                       "polarity":  "denied",
+                                                                       "polarity_support":  "但目前還沒有做",
+                                                                       "frequency":  {
+                                                                                         "value":  null,
+                                                                                         "unit":  "unknown",
+                                                                                         "verbatim":  null
+                                                                                     },
+                                                                       "importance":  "not_stated",
+                                                                       "importance_support":  null,
+                                                                       "ownership":  "unknown",
+                                                                       "ownership_support":  null
+                                                                   },
+                                                    "correction":  {
+                                                                       "target_candidate_ordinals":  [
+
+                                                                                                     ],
+                                                                       "target_unknown":  false
+                                                                   },
+                                                    "insufficiency_codes":  [
+
+                                                                            ]
+                                                }
+                                            ],
+                   "answer_bindings":  [
+
+                                       ],
+                   "emergent_topics":  [
+
+                                       ],
+                   "turn_insufficiency_codes":  [
+
+                                                ]
+               },
+    "correction_target_bindings":  {
+
+                                   }
 }

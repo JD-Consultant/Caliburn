@@ -184,7 +184,7 @@ def build_trial_record(
     ]
     observed_cost = sum(costs, Decimal(0)) if costs else None
     return TurnEvalTrial(
-        schema_version="turn_eval_trial.v1",
+        schema_version="turn_eval_trial.v2",
         trial_id=ids.trial_id,
         case_id=case_id,
         slot_index=slot_index,

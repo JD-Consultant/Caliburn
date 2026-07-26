@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from uuid import uuid4
@@ -11,6 +12,7 @@ import pytest
 from pydantic import ValidationError
 
 from app.interview_vnext.domain.evidence import EvidenceKind, EvidenceSubject
+from app.interview_vnext.domain.interpretation import DialogueAct
 from app.interview_vnext.domain.hashing import canonical_hash, canonical_json
 from app.interview_vnext.domain.transcript import TranscriptRole
 from app.interview_vnext.llm.result import (
@@ -20,11 +22,11 @@ from app.interview_vnext.llm.result import (
 )
 from app.interview_vnext.llm.turn_interpret import (
     EpisodeSignal,
+    CorrectionProposal,
     EvidenceQualifiersProposal,
     FrequencyQualifierProposal,
     ObservationProposal,
     TurnInterpretOutput,
-    UserSignal,
 )
 from app.interview_vnext.domain.evidence import (
     FrequencyUnit,
@@ -70,6 +72,7 @@ from evals.interview_vnext.contracts import (
     define_turn_eval_suite_manifest,
 )
 from evals.interview_vnext.write_schemas import (
+    HISTORICAL_SCHEMAS,
     SCHEMA_DIR,
     SCHEMA_EXPORTS,
     published_schema,
@@ -81,10 +84,24 @@ NOW = datetime(2026, 7, 18, 8, 0, tzinfo=UTC)
 SHA = "sha256:" + "0" * 64
 GIT_SHA = "1" * 40
 
+HISTORICAL_SCHEMA_HASHES = {
+    "turn-eval-batch-plan.v1.schema.json": "sha256:c6db755690bcae447cf58da427220e51260773be96998989266662b1d466aaa1",
+    "turn-eval-batch-report.v1.schema.json": "sha256:12b9243b4100daeac7637093dcefebd5403a02754a9cea6fca05acaa2f933728",
+    "turn-eval-case.v1.schema.json": "sha256:6222ad7955eb862003fa4eceaab8942c09de908628e30a412c32c6dbbd4a89c6",
+    "turn-eval-case-report.v1.schema.json": "sha256:812c502586735d6d1b37f5f07137f2cdf3bccaa2a3890adbdda79158c34e6ecf",
+    "turn-eval-gold.v1.schema.json": "sha256:1d8b8886e1d777f4f3491bf9cbf34a37178f45ce946cea22a8999a55ef0b8184",
+    "turn-eval-grader-result.v1.schema.json": "sha256:385adb08f90639dc539e32203d6fe29a6a5527d810b11f464b284ae8f6d4a312",
+    "turn-eval-initial-fixture.v1.schema.json": "sha256:174a88f05893be650b68f50382df7c1cdf5b1e3fe4968ca77744879c710e7277",
+    "turn-eval-reference-output.v1.schema.json": "sha256:f7abbcf5b423dd73e9732edf23c3ab15062f0b63a5d6f749a5a25dd494d2c176",
+    "turn-eval-review-decision.v1.schema.json": "sha256:416b7cd6f2e615026d7b705a70e1397590ba6e3dbb83b414f857967276385e32",
+    "turn-eval-transcript.v1.schema.json": "sha256:b49140e7a8275ccd6ac9325c33632307098873024942f4ea9a6a50f5ce42b136",
+    "turn-eval-trial.v1.schema.json": "sha256:bf475714581279661c88f2ccd93b4b6a5ce53189c649f54a67e7e3593b35289e",
+}
+
 
 def valid_case(**overrides) -> TurnEvalCase:
     payload = {
-        "schema_version": "turn_eval_case.v1",
+        "schema_version": "turn_eval_case.v2",
         "case_id": "TI-01-single-action",
         "split": "development",
         "locale": "zh-TW",
@@ -137,11 +154,11 @@ def gold_observation(**overrides) -> TurnEvalGoldObservation:
 
 def valid_gold(**overrides) -> TurnEvalGold:
     payload = {
-        "schema_version": "turn_eval_gold.v1",
+        "schema_version": "turn_eval_gold.v2",
         "case_id": "TI-01-single-action",
-        "allowed_user_signals": ["answer"],
+        "allowed_dialogue_acts": ["standalone_answer"],
         "allowed_episode_signals": ["continue"],
-        "expected_commit": "evidence",
+        "expected_commit": "evidence_and_receipt",
         "observations": [gold_observation().model_dump()],
         "forbidden_claims": [
             {"gold_id": "f-invented-kpi", "description": "不得新增原文沒有的數字", "severity": "critical"}
@@ -171,30 +188,29 @@ def proposal_qualifiers() -> EvidenceQualifiersProposal:
 
 def correction_proposal(*, key: str = "obs-correction", unknown: bool = False) -> ObservationProposal:
     return ObservationProposal(
-        proposal_key=key,
         subject=EvidenceSubject.EMPLOYEE,
         kind=EvidenceKind.CORRECTION,
         claim="每月寄一次庫存報表",
         quote="是每月寄一次庫存報表",
         quote_occurrence=1,
         qualifiers=proposal_qualifiers(),
-        correction_target_evidence_ids=(),
-        correction_target_unknown=unknown,
+        correction=CorrectionProposal(target_unknown=unknown),
     )
 
 
 def reference_output(*, observations=(), bindings=None) -> TurnEvalReferenceOutput:
     return TurnEvalReferenceOutput.model_validate(
         {
-            "schema_version": "turn_eval_reference_output.v1",
+            "schema_version": "turn_eval_reference_output.v2",
             "case_id": "TI-09-known-correction",
             "output": TurnInterpretOutput(
-                schema_version="turn_interpret_output.v1",
-                observations=tuple(observations),
-                user_signal=UserSignal.CORRECTION,
+                schema_version="turn_interpret_output.v2",
+                literal_observations=tuple(observations),
+                answer_bindings=(),
+                dialogue_act=DialogueAct.CORRECTION,
                 episode_signal=EpisodeSignal.CONTINUE,
                 emergent_topics=(),
-                insufficiencies=(),
+                turn_insufficiency_codes=(),
             ).model_dump(),
             "correction_target_bindings": bindings or {},
         }
@@ -215,7 +231,7 @@ def valid_plan_definition(**overrides) -> dict:
     payload = {
         "batch_id": uuid4(),
         "execution_mode": "mocked",
-        "suite_version": "turn-interpret-pilot.v1",
+        "suite_version": "turn-interpret-c1-v2-pilot.v1",
         "suite_hash": SHA,
         "cases": [plan_case()],
         "quality_slots_per_case": 3,
@@ -244,7 +260,7 @@ def valid_plan_definition(**overrides) -> dict:
 
 def valid_trial(**overrides) -> TurnEvalTrial:
     payload = {
-        "schema_version": "turn_eval_trial.v1",
+        "schema_version": "turn_eval_trial.v2",
         "trial_id": uuid4(),
         "case_id": "TI-01-single-action",
         "slot_index": 1,
@@ -306,7 +322,7 @@ def test_top_level_documents_reject_extra_fields():
 def test_transcript_turn_contract():
     turn = TurnEvalTranscriptTurn.model_validate(
         {
-            "schema_version": "turn_eval_transcript_turn.v1",
+            "schema_version": "turn_eval_transcript_turn.v2",
             "turn_key": "employee-target",
             "sequence": 2,
             "role": "employee",
@@ -352,7 +368,7 @@ def test_case_files_are_fixed_names():
 
 def test_fixture_requires_activation_and_episode_consistency():
     fixture = {
-        "schema_version": "turn_eval_initial_fixture.v1",
+        "schema_version": "turn_eval_initial_fixture.v2",
         "session_status_before_replay": "planned",
         "activate_before_transcript": True,
         "open_episode": {
@@ -439,14 +455,14 @@ def test_gold_correction_targets_require_correction_kind():
     )
 
 
-def test_gold_no_op_and_evidence_commit_coherence():
+def test_gold_receipt_only_and_evidence_commit_coherence():
     with pytest.raises(ValidationError):
-        valid_gold(expected_commit="no_op")
+        valid_gold(expected_commit="receipt_only")
     valid_gold(
-        expected_commit="no_op",
+        expected_commit="receipt_only",
         observations=[],
         state_expectation={
-            "state_hash_changed": False,
+            "state_hash_changed": True,
             "prior_evidence_superseded_keys": [],
             "forbidden_superseded_keys": [],
         },
@@ -488,26 +504,26 @@ def test_state_expectation_key_sets_disjoint():
 def test_reference_output_bindings_are_single_source_of_truth():
     reference_output(
         observations=(correction_proposal(),),
-        bindings={"obs-correction": ("prior-inventory-report-frequency",)},
+        bindings={"1": ("prior-inventory-report-frequency",)},
     )
     with pytest.raises(ValidationError):
         reference_output(observations=(correction_proposal(),))  # 缺 binding
     with pytest.raises(ValidationError):
         reference_output(
             observations=(correction_proposal(unknown=True),),
-            bindings={"obs-correction": ("prior-a",)},
+            bindings={"1": ("prior-a",)},
         )
     with pytest.raises(ValidationError):
         reference_output(bindings={"missing-key": ("prior-a",)})
 
 
-def test_reference_output_rejects_persisted_uuid_targets():
+def test_reference_output_rejects_trial_scoped_correction_ordinals():
     proposal = correction_proposal().model_copy(
-        update={"correction_target_evidence_ids": (uuid4(),), "correction_target_unknown": False}
+        update={"correction": CorrectionProposal(target_candidate_ordinals=(1,))}
     )
     with pytest.raises(ValidationError):
         reference_output(
-            observations=(proposal,), bindings={"obs-correction": ("prior-a",)}
+            observations=(proposal,), bindings={"1": ("prior-a",)}
         )
 
 
@@ -516,7 +532,7 @@ def test_reference_output_rejects_persisted_uuid_targets():
 
 def test_suite_manifest_orders_cases_and_verifies_hash():
     manifest = define_turn_eval_suite_manifest(
-        suite_version="turn-interpret-pilot.v1",
+        suite_version="turn-interpret-c1-v2-pilot.v1",
         cases=[
             plan_case("TI-09-known-correction", "challenge"),
             plan_case("TI-01-single-action", "development"),
@@ -535,7 +551,7 @@ def test_suite_manifest_orders_cases_and_verifies_hash():
 def test_suite_manifest_input_must_be_presorted():
     with pytest.raises(ValidationError):
         define_turn_eval_suite_manifest(
-            suite_version="turn-interpret-pilot.v1",
+            suite_version="turn-interpret-c1-v2-pilot.v1",
             cases=[
                 plan_case("TI-02-action-output", "development"),
                 plan_case("TI-01-single-action", "development"),
@@ -615,7 +631,7 @@ def test_trial_committed_requires_state_hashes_and_distinct_ids():
 
 def test_grader_result_severity_and_details_rules():
     base = {
-        "schema_version": "turn_eval_grader_result.v1",
+        "schema_version": "turn_eval_grader_result.v2",
         "grader_name": "quote_span",
         "grader_version": "1.0.0",
         "grader_definition_hash": SHA,
@@ -641,7 +657,7 @@ def test_grader_result_severity_and_details_rules():
 
 def test_review_decision_revision_chain():
     base = {
-        "schema_version": "turn_eval_review_decision.v1",
+        "schema_version": "turn_eval_review_decision.v2",
         "review_item_id": uuid4(),
         "review_item_hash": SHA,
         "decision": "equivalent",
@@ -720,7 +736,7 @@ def slot(index: int, *, passed: bool = True, disposition: str = "quality_scored"
 def case_report(**overrides) -> TurnEvalCaseReport:
     ones = MetricSummary.compute((Decimal("1"), Decimal("1"), Decimal("1"))).model_dump()
     payload = {
-        "schema_version": "turn_eval_case_report.v1",
+        "schema_version": "turn_eval_case_report.v2",
         "case_id": "TI-01-single-action",
         "split": "development",
         "slots": [slot(1), slot(2), slot(3)],
@@ -764,10 +780,10 @@ def test_case_report_critical_cannot_pass():
 def batch_report(**overrides) -> TurnEvalBatchReport:
     metric = MetricResult.compute(1, 1).model_dump()
     payload = {
-        "schema_version": "turn_eval_batch_report.v1",
+        "schema_version": "turn_eval_batch_report.v2",
         "batch_id": uuid4(),
         "plan_hash": SHA,
-        "suite_version": "turn-interpret-pilot.v1",
+        "suite_version": "turn-interpret-c1-v2-pilot.v1",
         "suite_hash": SHA,
         "execution_mode": "live",
         "git_sha": GIT_SHA,
@@ -858,10 +874,21 @@ def test_schema_export_is_deterministic(tmp_path):
 
 
 def test_committed_turn_eval_schemas_match_models():
-    assert {path.name for path in SCHEMA_DIR.glob("*.json")} == set(SCHEMA_EXPORTS)
+    assert {path.name for path in SCHEMA_DIR.glob("*.json")} == (
+        set(SCHEMA_EXPORTS) | set(HISTORICAL_SCHEMAS)
+    )
     for filename in SCHEMA_EXPORTS:
         committed = json.loads((SCHEMA_DIR / filename).read_text(encoding="utf-8"))
         assert committed == published_schema(filename), filename
+
+
+def test_historical_turn_eval_schemas_are_frozen():
+    assert set(HISTORICAL_SCHEMA_HASHES) == set(HISTORICAL_SCHEMAS)
+    for filename, expected in HISTORICAL_SCHEMA_HASHES.items():
+        actual = "sha256:" + hashlib.sha256(
+            (SCHEMA_DIR / filename).read_bytes()
+        ).hexdigest()
+        assert actual == expected, filename
 
 
 def test_published_schemas_have_stable_ids_and_forbid_unknown_fields():

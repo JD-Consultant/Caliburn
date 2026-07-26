@@ -10,7 +10,7 @@
       "native_finish_reason": "stop",
       "message": {
         "role": "assistant",
-        "content": "```json\n{\"schema_version\": \"turn_interpret_output.v1\",}\n```"
+        "content": "```json\n{\"schema_version\": \"turn_interpret_output.v2\",}\n```"
       }
     }
   ],

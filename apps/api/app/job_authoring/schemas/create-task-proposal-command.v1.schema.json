@@ -1,0 +1,187 @@
+{
+  "$defs": {
+    "EvidenceBasisRef": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence_id": {
+          "format": "uuid",
+          "title": "Evidence Id",
+          "type": "string"
+        },
+        "evidence_hash": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Evidence Hash",
+          "type": "string"
+        }
+      },
+      "required": [
+        "evidence_id",
+        "evidence_hash"
+      ],
+      "title": "EvidenceBasisRef",
+      "type": "object"
+    },
+    "ProposedOutputDraft": {
+      "additionalProperties": false,
+      "properties": {
+        "statement": {
+          "maxLength": 512,
+          "minLength": 1,
+          "title": "Statement",
+          "type": "string"
+        },
+        "evidence_basis": {
+          "items": {
+            "$ref": "#/$defs/EvidenceBasisRef"
+          },
+          "minItems": 1,
+          "title": "Evidence Basis",
+          "type": "array"
+        }
+      },
+      "required": [
+        "statement",
+        "evidence_basis"
+      ],
+      "title": "ProposedOutputDraft",
+      "type": "object"
+    },
+    "TaskBundleProposalDraft": {
+      "additionalProperties": false,
+      "properties": {
+        "statement": {
+          "maxLength": 512,
+          "minLength": 1,
+          "title": "Statement",
+          "type": "string"
+        },
+        "evidence_basis": {
+          "items": {
+            "$ref": "#/$defs/EvidenceBasisRef"
+          },
+          "minItems": 1,
+          "title": "Evidence Basis",
+          "type": "array"
+        },
+        "outputs": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ProposedOutputDraft"
+          },
+          "title": "Outputs",
+          "type": "array"
+        },
+        "plain_language_reason": {
+          "maxLength": 512,
+          "minLength": 1,
+          "title": "Plain Language Reason",
+          "type": "string"
+        },
+        "limitations": {
+          "default": [],
+          "items": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Limitations",
+          "type": "array"
+        }
+      },
+      "required": [
+        "statement",
+        "evidence_basis",
+        "plain_language_reason"
+      ],
+      "title": "TaskBundleProposalDraft",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "create_task_proposal_command.v1",
+      "default": "create_task_proposal_command.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "proposal_id": {
+      "format": "uuid",
+      "title": "Proposal Id",
+      "type": "string"
+    },
+    "tenant_id": {
+      "format": "uuid",
+      "title": "Tenant Id",
+      "type": "string"
+    },
+    "session_id": {
+      "format": "uuid",
+      "title": "Session Id",
+      "type": "string"
+    },
+    "document_id": {
+      "format": "uuid",
+      "title": "Document Id",
+      "type": "string"
+    },
+    "base_revision_id": {
+      "format": "uuid",
+      "title": "Base Revision Id",
+      "type": "string"
+    },
+    "base_revision_hash": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Base Revision Hash",
+      "type": "string"
+    },
+    "evidence_state_version": {
+      "minimum": 0,
+      "title": "Evidence State Version",
+      "type": "integer"
+    },
+    "evidence_state_hash": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Evidence State Hash",
+      "type": "string"
+    },
+    "source_kind": {
+      "enum": [
+        "scripted",
+        "llm_operation"
+      ],
+      "title": "Source Kind",
+      "type": "string"
+    },
+    "source_id": {
+      "format": "uuid",
+      "title": "Source Id",
+      "type": "string"
+    },
+    "draft": {
+      "$ref": "#/$defs/TaskBundleProposalDraft"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "proposal_id",
+    "tenant_id",
+    "session_id",
+    "document_id",
+    "base_revision_id",
+    "base_revision_hash",
+    "evidence_state_version",
+    "evidence_state_hash",
+    "source_kind",
+    "source_id",
+    "draft",
+    "created_at"
+  ],
+  "title": "Caliburn job authoring create task proposal command v1",
+  "type": "object",
+  "$id": "https://caliburn.local/schemas/create-task-proposal-command.v1.schema.json"
+}

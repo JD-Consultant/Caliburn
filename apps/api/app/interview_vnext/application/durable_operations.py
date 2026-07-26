@@ -15,15 +15,19 @@ transaction 轉 failed/provider_completed)。
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from datetime import datetime
 from enum import StrEnum
-from typing import Any, Callable
+from typing import Any, Callable, Literal
 from uuid import UUID
 
-from pydantic import ValidationError
+from pydantic import Field, ValidationError
 
 from app.interview_vnext.domain.commands import CommandBase
+from app.interview_vnext.domain.base import DomainModel
+from app.interview_vnext.domain.errors import DomainViolation
 from app.interview_vnext.domain.hashing import canonical_hash, canonical_json
+from app.interview_vnext.domain.reason_codes import ReasonCode
 from app.interview_vnext.domain.reducers import ReductionResult
 from app.interview_vnext.llm.binding import ProviderBinding
 from app.interview_vnext.llm.capture import model_call_input_artifacts
@@ -54,7 +58,7 @@ from app.interview_vnext.observability.events import ExecutionStatus
 from app.interview_vnext.persistence.errors import (
     CheckpointConflict,
     PersistedDataCorruption,
-    StateVersionConflict,
+    StateContextStale,
 )
 
 from .durable_commands import DurableCommandOutcome, _commit_command_core
@@ -72,6 +76,34 @@ class AttemptOutcome(StrEnum):
     SUCCEEDED = "succeeded"
     RETRYABLE_FAILURE = "retryable_failure"
     NON_RETRYABLE_FAILURE = "non_retryable_failure"
+
+
+@dataclass(frozen=True)
+class VerifiedOperationArtifacts:
+    """Authoritative artifact closure produced by one verified domain commit."""
+
+    command_ref: ArtifactRef
+    reduction_ref: ArtifactRef
+    response_ref: ArtifactRef
+    additional_domain_refs: tuple[ArtifactRef, ...] = ()
+
+
+class CommittedCommandPlanItem(DomainModel):
+    command_id: UUID
+    command_ref: ArtifactRef
+    reduction_ref: ArtifactRef
+    result_state_version: int = Field(ge=1)
+    result_state_hash: str
+
+
+class CommittedCommandPlan(DomainModel):
+    """Atomic closure for an operation that applies multiple domain commands."""
+
+    schema_version: Literal["committed_command_plan.v1"] = "committed_command_plan.v1"
+    operation_id: UUID
+    items: tuple[CommittedCommandPlanItem, ...] = Field(min_length=1)
+    final_state_version: int = Field(ge=1)
+    final_state_hash: str
 
 
 async def _require_checkpoint(uow: VNextUnitOfWork, *, tenant_id: UUID,
@@ -756,7 +788,12 @@ async def commit_verified_operation(
     committed_at: datetime,
     stage: str = "turn.interpret",
     request_idempotency_key: str | None = None,
-) -> tuple[OperationCheckpoint, ReductionResult]:
+    expected_state_hash: str | None = None,
+    additional_domain_artifacts: tuple[ArtifactRecord, ...] = (),
+    response_artifact_kind: str = "operation.response",
+    response_schema_id: str | None = None,
+    contains_test_data: bool = False,
+) -> tuple[OperationCheckpoint, ReductionResult, VerifiedOperationArtifacts]:
     """§7.8:session、command、checkpoint、event、outbox 同生共死。
     committed 後重呼叫回既有 domain result/response,不重跑 reducer。
     state 已 stale(state_before_hash 不符)→ conflict,不把舊 proposal 硬套新 state。"""
@@ -765,35 +802,149 @@ async def commit_verified_operation(
                                                operation_id=operation_id)
         if checkpoint.status == CheckpointStatus.COMMITTED:
             assert checkpoint.domain_result_artifact is not None
+            assert checkpoint.response_artifact is not None
             stored = await uow.artifacts.get(
                 tenant_id=tenant_id,
                 artifact_id=checkpoint.domain_result_artifact.artifact_id)
             result = ReductionResult.model_validate_json(stored.inline_content or "")
-            return checkpoint, result
+            command_record = await uow.commands.get_by_command_id(
+                tenant_id=tenant_id,
+                session_id=checkpoint.session_id,
+                command_id=command.command_id,
+            )
+            if command_record is None:
+                raise PersistedDataCorruption(
+                    "committed operation has no durable command record",
+                    operation_id=operation_id,
+                    command_id=command.command_id,
+                )
+            stored_command = await uow.artifacts.get(
+                tenant_id=tenant_id,
+                artifact_id=command_record.command_artifact_id,
+            )
+            stored_response = await uow.artifacts.get(
+                tenant_id=tenant_id,
+                artifact_id=checkpoint.response_artifact.artifact_id,
+            )
+            if (
+                stored.ref != checkpoint.domain_result_artifact
+                or stored_response.ref != checkpoint.response_artifact
+                or stored_command.ref.artifact_id != command_artifact_id
+                or stored.ref.artifact_id != reduction_artifact_id
+                or stored_response.ref.artifact_id != response_artifact_id
+            ):
+                raise PersistedDataCorruption(
+                    "committed operation artifact identity changed",
+                    operation_id=operation_id,
+                )
+            additional_refs: list[ArtifactRef] = []
+            for expected in additional_domain_artifacts:
+                _require_operation_artifact_scope(
+                    expected, checkpoint=checkpoint, role="additional domain"
+                )
+                actual = await uow.artifacts.get(
+                    tenant_id=tenant_id,
+                    artifact_id=expected.ref.artifact_id,
+                )
+                if actual != expected:
+                    raise PersistedDataCorruption(
+                        "committed additional domain artifact changed",
+                        operation_id=operation_id,
+                        artifact_id=expected.ref.artifact_id,
+                    )
+                additional_refs.append(actual.ref)
+            return (
+                checkpoint,
+                result,
+                VerifiedOperationArtifacts(
+                    command_ref=stored_command.ref,
+                    reduction_ref=stored.ref,
+                    response_ref=stored_response.ref,
+                    additional_domain_refs=tuple(additional_refs),
+                ),
+            )
         if checkpoint.status != CheckpointStatus.VERIFIED:
             raise CheckpointConflict(
                 f"commit requires a verified checkpoint, got {checkpoint.status.value}",
                 operation_id=operation_id)
 
+        if len(additional_domain_artifacts) > 1:
+            raise CheckpointConflict(
+                "turn interpretation accepts at most one additional domain artifact",
+                operation_id=operation_id,
+            )
+        stored_additional: list[ArtifactRef] = []
+        for artifact in additional_domain_artifacts:
+            _require_operation_artifact_scope(
+                artifact, checkpoint=checkpoint, role="additional domain"
+            )
+            if artifact.ref.kind != "interview.turn_interpretation_record.v1":
+                raise CheckpointConflict(
+                    "unsupported additional domain artifact kind",
+                    operation_id=operation_id,
+                    artifact_kind=artifact.ref.kind,
+                )
+            stored_artifact = await uow.artifacts.put(
+                tenant_id=tenant_id,
+                record=artifact,
+            )
+            stored_additional.append(stored_artifact.ref)
+
         state = await uow.sessions.get(tenant_id=tenant_id,
                                        session_id=checkpoint.session_id)
-        if canonical_hash(state) != checkpoint.state_before_hash:
-            raise CheckpointConflict(
-                "session state moved since prepare; re-prepare the operation",
-                operation_id=operation_id, session_id=checkpoint.session_id)
+        actual_state_hash = canonical_hash(state)
+        authoritative_expected_hash = expected_state_hash or checkpoint.state_before_hash
+        if (
+            state.session.state_version != command.expected_state_version
+            or actual_state_hash != authoritative_expected_hash
+        ):
+            await uow.rollback()
+            raise StateContextStale(
+                "session state moved beyond the model context",
+                expected_state_version=command.expected_state_version,
+                expected_state_hash=authoritative_expected_hash,
+                actual_state_version=state.session.state_version,
+                actual_state_hash=actual_state_hash,
+                operation_id=operation_id,
+                session_id=checkpoint.session_id,
+            )
 
-        core = await _commit_command_core(
-            uow, tenant_id=tenant_id, session_id=checkpoint.session_id,
-            run_id=run_id, command=command, stage=stage,
-            event_id=transition_event_id,
-            command_artifact_id=command_artifact_id,
-            reduction_artifact_id=reduction_artifact_id,
-            committed_at=committed_at,
-            request_idempotency_key=request_idempotency_key)
+        try:
+            core = await _commit_command_core(
+                uow, tenant_id=tenant_id, session_id=checkpoint.session_id,
+                run_id=run_id, command=command, stage=stage,
+                event_id=transition_event_id,
+                command_artifact_id=command_artifact_id,
+                reduction_artifact_id=reduction_artifact_id,
+                committed_at=committed_at,
+                request_idempotency_key=request_idempotency_key,
+                turn_id=checkpoint.turn_id,
+                operation_id=operation_id,
+                contains_test_data=contains_test_data)
+        except DomainViolation as exc:
+            if exc.reason_code != ReasonCode.STATE_VERSION_CONFLICT:
+                raise
+            await uow.rollback()
+            raise StateContextStale(
+                "session state moved before the verified command could reduce",
+                expected_state_version=command.expected_state_version,
+                expected_state_hash=authoritative_expected_hash,
+                actual_state_version=(
+                    int(exc.details["actual"])
+                    if "actual" in exc.details
+                    else None
+                ),
+                operation_id=operation_id,
+                session_id=checkpoint.session_id,
+            ) from exc
         if core is None:
-            raise StateVersionConflict(
+            raise StateContextStale(
                 "session state moved during verified-operation commit",
-                operation_id=operation_id, session_id=checkpoint.session_id)
+                expected_state_version=command.expected_state_version,
+                expected_state_hash=authoritative_expected_hash,
+                operation_id=operation_id,
+                session_id=checkpoint.session_id,
+            )
         if isinstance(core, DurableCommandOutcome):
             # command 已由別的路徑 commit(duplicate race)→ 沿用既有 reduction
             result = core.result
@@ -801,16 +952,23 @@ async def commit_verified_operation(
                 tenant_id=tenant_id,
                 artifact_id=core.record.reduction_artifact_id)
             reduction_ref = stored_reduction.ref
+            stored_command = await uow.artifacts.get(
+                tenant_id=tenant_id,
+                artifact_id=core.record.command_artifact_id)
+            command_ref = stored_command.ref
         else:
-            result, _record, _command_ref, reduction_ref = core
+            result, _record, command_ref, reduction_ref = core
 
         response = await uow.artifacts.put(
             tenant_id=tenant_id,
             record=build_inline_artifact(
-                artifact_id=response_artifact_id, kind="operation.response",
+                artifact_id=response_artifact_id, kind=response_artifact_kind,
                 media_type="application/json", payload=response_payload,
+                schema_id=response_schema_id,
                 run_id=run_id, session_id=checkpoint.session_id,
-                operation_id=operation_id, created_at=committed_at))
+                turn_id=checkpoint.turn_id, operation_id=operation_id,
+                created_at=committed_at,
+                contains_test_data=contains_test_data))
         next_checkpoint = mark_committed(
             checkpoint, domain_result_artifact=reduction_ref,
             response_artifact=response.ref, state_after_hash=result.state_hash,
@@ -825,11 +983,270 @@ async def commit_verified_operation(
                 session_id=checkpoint.session_id, turn_id=checkpoint.turn_id,
                 operation_id=operation_id, event_type="workflow.step.completed",
                 stage=stage, status=ExecutionStatus.OK,
-                output_artifacts=(reduction_ref, response.ref),
+                output_artifacts=(
+                    *stored_additional,
+                    command_ref,
+                    reduction_ref,
+                    response.ref,
+                ),
                 state_before_hash=checkpoint.state_before_hash,
                 state_after_hash=result.state_hash))
         await uow.commit()
-        return next_checkpoint, result
+        return (
+            next_checkpoint,
+            result,
+            VerifiedOperationArtifacts(
+                command_ref=command_ref,
+                reduction_ref=reduction_ref,
+                response_ref=response.ref,
+                additional_domain_refs=tuple(stored_additional),
+            ),
+        )
+
+
+async def commit_verified_command_plan(
+    uow_factory: Callable[[], VNextUnitOfWork],
+    *,
+    tenant_id: UUID,
+    operation_id: UUID,
+    run_id: UUID,
+    commands: tuple[CommandBase, ...],
+    response_payload: Any,
+    plan_result_artifact_id: UUID,
+    response_artifact_id: UUID,
+    command_artifact_ids: tuple[UUID, ...],
+    reduction_artifact_ids: tuple[UUID, ...],
+    transition_event_ids: tuple[UUID, ...],
+    step_event_id: UUID,
+    committed_at: datetime,
+    expected_state_hash: str,
+    stage: str,
+    response_artifact_kind: str,
+    response_schema_id: str | None = None,
+    contains_test_data: bool = False,
+) -> tuple[OperationCheckpoint, CommittedCommandPlan, ArtifactRef]:
+    """Atomically apply one verified operation's ordered command plan.
+
+    This is intentionally smaller than a workflow engine. It exists because
+    ``question.select`` must append the consultant question and then mark the
+    selected gap/opened episode as one all-or-nothing domain mutation.
+    """
+
+    if not commands:
+        raise ValueError("verified command plan cannot be empty")
+    lengths = {
+        len(commands),
+        len(command_artifact_ids),
+        len(reduction_artifact_ids),
+        len(transition_event_ids),
+    }
+    if len(lengths) != 1:
+        raise ValueError("command plan IDs must align one-to-one with commands")
+    first_version = commands[0].expected_state_version
+    if any(
+        command.expected_state_version != first_version + index
+        for index, command in enumerate(commands)
+    ):
+        raise ValueError("command plan expected state versions must be contiguous")
+
+    async with uow_factory() as uow:
+        checkpoint = await _require_checkpoint(
+            uow, tenant_id=tenant_id, operation_id=operation_id
+        )
+        if checkpoint.run_id != run_id:
+            raise CheckpointConflict(
+                "command plan run does not match operation checkpoint",
+                operation_id=operation_id,
+            )
+        if checkpoint.status == CheckpointStatus.COMMITTED:
+            assert checkpoint.domain_result_artifact is not None
+            assert checkpoint.response_artifact is not None
+            stored_plan = await uow.artifacts.get(
+                tenant_id=tenant_id,
+                artifact_id=checkpoint.domain_result_artifact.artifact_id,
+            )
+            stored_response = await uow.artifacts.get(
+                tenant_id=tenant_id,
+                artifact_id=checkpoint.response_artifact.artifact_id,
+            )
+            try:
+                plan = CommittedCommandPlan.model_validate_json(
+                    stored_plan.inline_content or ""
+                )
+            except ValidationError as exc:
+                raise PersistedDataCorruption(
+                    "committed command plan failed typed validation",
+                    operation_id=operation_id,
+                ) from exc
+            if (
+                stored_plan.ref != checkpoint.domain_result_artifact
+                or stored_response.ref != checkpoint.response_artifact
+                or plan.operation_id != operation_id
+                or plan.final_state_hash != checkpoint.state_after_hash
+            ):
+                raise PersistedDataCorruption(
+                    "committed command plan closure changed",
+                    operation_id=operation_id,
+                )
+            return checkpoint, plan, stored_response.ref
+        if checkpoint.status != CheckpointStatus.VERIFIED:
+            raise CheckpointConflict(
+                f"command plan commit requires verified checkpoint, got "
+                f"{checkpoint.status.value}",
+                operation_id=operation_id,
+            )
+
+        state = await uow.sessions.get(
+            tenant_id=tenant_id, session_id=checkpoint.session_id
+        )
+        actual_hash = canonical_hash(state)
+        if (
+            state.session.state_version != first_version
+            or actual_hash != expected_state_hash
+        ):
+            await uow.rollback()
+            raise StateContextStale(
+                "session state moved beyond the verified command plan context",
+                expected_state_version=first_version,
+                expected_state_hash=expected_state_hash,
+                actual_state_version=state.session.state_version,
+                actual_state_hash=actual_hash,
+                operation_id=operation_id,
+                session_id=checkpoint.session_id,
+            )
+
+        items: list[CommittedCommandPlanItem] = []
+        final_result: ReductionResult | None = None
+        for index, command in enumerate(commands):
+            try:
+                core = await _commit_command_core(
+                    uow,
+                    tenant_id=tenant_id,
+                    session_id=checkpoint.session_id,
+                    run_id=run_id,
+                    command=command,
+                    stage=stage,
+                    event_id=transition_event_ids[index],
+                    command_artifact_id=command_artifact_ids[index],
+                    reduction_artifact_id=reduction_artifact_ids[index],
+                    committed_at=committed_at,
+                    request_idempotency_key=None,
+                    turn_id=checkpoint.turn_id,
+                    operation_id=operation_id,
+                    contains_test_data=contains_test_data,
+                )
+            except DomainViolation as exc:
+                if exc.reason_code != ReasonCode.STATE_VERSION_CONFLICT:
+                    raise
+                await uow.rollback()
+                raise StateContextStale(
+                    "session state moved while committing the verified command plan",
+                    expected_state_version=command.expected_state_version,
+                    expected_state_hash=expected_state_hash,
+                    operation_id=operation_id,
+                    session_id=checkpoint.session_id,
+                ) from exc
+            if core is None:
+                raise StateContextStale(
+                    "session state moved during verified command plan commit",
+                    expected_state_version=command.expected_state_version,
+                    expected_state_hash=expected_state_hash,
+                    operation_id=operation_id,
+                    session_id=checkpoint.session_id,
+                )
+            if isinstance(core, DurableCommandOutcome):
+                raise CheckpointConflict(
+                    "verified command plan collided with an existing command",
+                    operation_id=operation_id,
+                    command_id=command.command_id,
+                )
+            result, _record, command_ref, reduction_ref = core
+            final_result = result
+            items.append(
+                CommittedCommandPlanItem(
+                    command_id=command.command_id,
+                    command_ref=command_ref,
+                    reduction_ref=reduction_ref,
+                    result_state_version=result.state.session.state_version,
+                    result_state_hash=result.state_hash,
+                )
+            )
+
+        assert final_result is not None
+        plan = CommittedCommandPlan(
+            operation_id=operation_id,
+            items=tuple(items),
+            final_state_version=final_result.state.session.state_version,
+            final_state_hash=final_result.state_hash,
+        )
+        stored_plan = await uow.artifacts.put(
+            tenant_id=tenant_id,
+            record=build_inline_artifact(
+                artifact_id=plan_result_artifact_id,
+                kind="operation.command_plan_result.v1",
+                media_type="application/json",
+                payload=plan,
+                run_id=run_id,
+                session_id=checkpoint.session_id,
+                turn_id=checkpoint.turn_id,
+                operation_id=operation_id,
+                created_at=committed_at,
+                contains_test_data=contains_test_data,
+            ),
+        )
+        response = await uow.artifacts.put(
+            tenant_id=tenant_id,
+            record=build_inline_artifact(
+                artifact_id=response_artifact_id,
+                kind=response_artifact_kind,
+                media_type="application/json",
+                payload=response_payload,
+                schema_id=response_schema_id,
+                run_id=run_id,
+                session_id=checkpoint.session_id,
+                turn_id=checkpoint.turn_id,
+                operation_id=operation_id,
+                created_at=committed_at,
+                contains_test_data=contains_test_data,
+            ),
+        )
+        next_checkpoint = mark_committed(
+            checkpoint,
+            domain_result_artifact=stored_plan.ref,
+            response_artifact=response.ref,
+            state_after_hash=final_result.state_hash,
+            occurred_at=committed_at,
+        )
+        await _cas_or_conflict(
+            uow,
+            tenant_id=tenant_id,
+            expected_revision=checkpoint.revision,
+            checkpoint=next_checkpoint,
+        )
+        await uow.capture.append_event(
+            tenant_id=tenant_id,
+            run_id=run_id,
+            draft=ExecutionEventDraft(
+                event_id=step_event_id,
+                occurred_at=committed_at,
+                session_id=checkpoint.session_id,
+                turn_id=checkpoint.turn_id,
+                operation_id=operation_id,
+                event_type="workflow.step.completed",
+                stage=stage,
+                status=ExecutionStatus.OK,
+                output_artifacts=tuple(
+                    ref
+                    for item in items
+                    for ref in (item.command_ref, item.reduction_ref)
+                )
+                + (stored_plan.ref, response.ref),
+                state_before_hash=checkpoint.state_before_hash,
+                state_after_hash=final_result.state_hash,
+            ),
+        )
+        await uow.commit()
+        return next_checkpoint, plan, response.ref
 
 
 def _require_operation_artifact_scope(

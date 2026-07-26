@@ -21,6 +21,7 @@ from uuid import UUID, uuid5
 from app.interview_vnext.domain.base import DomainModel
 from app.interview_vnext.domain.hashing import canonical_hash
 from app.interview_vnext.domain.identifiers import NonEmptyText, Sha256
+from app.interview_vnext.domain.turn_identity import derive_proposal_ref
 from app.interview_vnext.llm.turn_interpret import (
     ObservationProposal,
     TurnInterpretOutput,
@@ -101,11 +102,15 @@ class ReviewItem(DomainModel):
 
 
 def _candidate_view(
-    proposal: ObservationProposal, *, accepted: bool, reason_codes: tuple[str, ...]
+    proposal: ObservationProposal,
+    *,
+    proposal_key: str,
+    accepted: bool,
+    reason_codes: tuple[str, ...],
 ) -> ReviewCandidateView:
     q = proposal.qualifiers
     return ReviewCandidateView(
-        proposal_key=proposal.proposal_key,
+        proposal_key=proposal_key,
         subject=proposal.subject.value,
         kind=proposal.kind.value,
         claim=proposal.claim,
@@ -156,7 +161,10 @@ def build_review_items(
         for item in inputs.initial_fixture.prior_evidence
     )
     gold_by_id = {item.gold_id: item for item in gold.observations}
-    proposal_by_key = {p.proposal_key: p for p in output.observations}
+    proposal_by_key = {
+        derive_proposal_ref(index): proposal
+        for index, proposal in enumerate(output.literal_observations, 1)
+    }
 
     items: list[ReviewItem] = []
 
@@ -164,6 +172,7 @@ def build_review_items(
         proposal = proposal_by_key[proposal_key]
         candidate = _candidate_view(
             proposal,
+            proposal_key=proposal_key,
             accepted=proposal_key in accepted_proposal_keys,
             reason_codes=verifier_reason_codes.get(proposal_key, ()),
         )

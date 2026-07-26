@@ -26,18 +26,20 @@ from app.interview_vnext.domain.evidence import (
 )
 from app.interview_vnext.domain.session import InterviewSession
 from app.interview_vnext.domain.state import InterviewState
+from app.interview_vnext.domain.interpretation import DialogueAct
+from app.interview_vnext.domain.turn_identity import literal_evidence_id
 from app.interview_vnext.llm.result import FinishReason, ModelOutcome, TokenUsage
 from app.interview_vnext.llm.turn_interpret import (
+    CorrectionProposal,
     EpisodeSignal,
     EvidenceQualifiersProposal,
     FrequencyQualifierProposal,
     ObservationProposal,
     ObservationVerification,
-    TURN_INTERPRET_VERIFIER_POLICY_V1,
+    TURN_INTERPRET_VERIFIER_POLICY_V2,
     TurnInterpretOutput,
     TurnInterpretRejectCode,
     TurnInterpretVerificationReport,
-    UserSignal,
 )
 from evals.interview_vnext.contracts import (
     ExpectedCommit,
@@ -49,7 +51,8 @@ from evals.interview_vnext.contracts import (
     TurnEvalTrial,
 )
 from evals.interview_vnext.fixture_builder import run_pure_reference_gate
-from evals.interview_vnext.identities import prior_evidence_uuid, trial_scoped_ids
+from evals.interview_vnext.fixture_builder import prior_evidence_id_map
+from evals.interview_vnext.identities import trial_scoped_ids
 from evals.interview_vnext.loader import load_suite
 from evals.interview_vnext.review import (
     ReviewImportError,
@@ -68,7 +71,7 @@ from evals.interview_vnext.turn_graders import (
     build_grading_context,
     compute_trial_metrics,
     grade_correction_lineage,
-    grade_no_op,
+    grade_receipt_only,
     grade_output_schema,
     grade_quote_span,
     grade_reference_leakage,
@@ -90,7 +93,7 @@ SHA = "sha256:" + "0" * 64
 
 @pytest.fixture(scope="module")
 def suite():
-    return load_suite(CASES_ROOT, suite_version="turn-interpret-pilot.v1")
+    return load_suite(CASES_ROOT, suite_version="turn-interpret-c1-v2-pilot.v1")
 
 
 def case_pair(suite, case_id: str):
@@ -120,33 +123,37 @@ def proposal(
     quals=None, targets=(), unknown=False,
 ) -> ObservationProposal:
     return ObservationProposal(
-        proposal_key=key,
         subject=EvidenceSubject(subject),
         kind=EvidenceKind(kind),
         claim=claim,
         quote=quote,
         quote_occurrence=occurrence,
         qualifiers=quals or qualifiers(),
-        correction_target_evidence_ids=tuple(targets),
-        correction_target_unknown=unknown,
+        correction=CorrectionProposal(
+            target_candidate_ordinals=tuple(range(1, len(targets) + 1)),
+            target_unknown=unknown,
+        ),
     )
 
 
 def output(*observations, user_signal="answer", episode_signal="continue", insufficiencies=()):
     return TurnInterpretOutput(
-        schema_version="turn_interpret_output.v1",
-        observations=tuple(observations),
-        user_signal=UserSignal(user_signal),
+        schema_version="turn_interpret_output.v2",
+        dialogue_act=DialogueAct(
+            "standalone_answer" if user_signal == "answer" else user_signal
+        ),
         episode_signal=EpisodeSignal(episode_signal),
+        literal_observations=tuple(observations),
+        answer_bindings=(),
         emergent_topics=(),
-        insufficiencies=tuple(insufficiencies),
+        turn_insufficiency_codes=tuple(insufficiencies),
     )
 
 
 def make_context(
-    suite, case_id, *, output_value, committed_kind="evidence",
+    suite, case_id, *, output_value, committed_kind="evidence_and_receipt",
     state_before="sha256:" + "a" * 64, state_after="sha256:" + "b" * 64,
-    evidence_status=None, trial_id=None,
+    evidence_status=None, trial_id=None, report=None,
 ):
     inputs, evaluation = case_pair(suite, case_id)
     return GradingContext(
@@ -155,7 +162,7 @@ def make_context(
         trial_id=trial_id or uuid5(NAMESPACE_URL, f"grader-test:{case_id}"),
         case_id=case_id,
         output=output_value,
-        report=None,
+        report=report,
         committed_kind=committed_kind,
         state_before_hash=state_before,
         state_after_hash=state_after,
@@ -176,7 +183,7 @@ def test_quote_span_flags_unresolvable_quote(suite):
     )
     result = grade_quote_span(ctx)
     assert result.status == GraderStatus.FAIL
-    assert "obs" in result.subject_ids
+    assert "p0001" in result.subject_ids
 
 
 def test_source_subject_rejects_non_target_quote(suite):
@@ -196,14 +203,18 @@ def test_source_subject_rejects_non_target_quote(suite):
 
 
 def test_foreign_id_grader_rejects_unknown_target(suite):
+    trial = minimal_trial(terminal_outcome="committed")
     ctx = make_context(
         suite,
         "TI-01-single-action",
         output_value=output(
             proposal(
                 "obs", kind="correction", claim="x",
-                quote="核對前一日的出貨訂單", targets=(uuid4(),),
+                quote="核對前一日的出貨訂單",
             )
+        ),
+        report=rejected_only_report(
+            trial, reason=TurnInterpretRejectCode.FOREIGN_CORRECTION_TARGET
         ),
     )
     results = {g.grader_name: g for g in run_deterministic_graders(ctx)}
@@ -224,30 +235,30 @@ def test_state_transition_detects_hash_mismatch(suite):
     assert result.severity.value == "critical"
 
 
-def test_no_op_grader_fails_if_evidence_committed(suite):
+def test_receipt_only_grader_fails_if_evidence_committed(suite):
     ctx = make_context(
         suite,
         "TI-11-zero-evidence",
         output_value=output(),
-        committed_kind="evidence",
+        committed_kind="evidence_and_receipt",
         state_before=SHA,
         state_after="sha256:" + "c" * 64,
     )
-    result = grade_no_op(ctx)
+    result = grade_receipt_only(ctx)
     assert result.status == GraderStatus.FAIL
     assert result.severity.value == "critical"
 
 
-def test_no_op_grader_passes_typed_noop(suite):
+def test_receipt_only_grader_passes_typed_receipt(suite):
     ctx = make_context(
         suite,
         "TI-11-zero-evidence",
         output_value=output(insufficiencies=()),
-        committed_kind="noop",
+        committed_kind="receipt_only",
         state_before=SHA,
-        state_after=SHA,
+        state_after="sha256:" + "c" * 64,
     )
-    assert grade_no_op(ctx).status == GraderStatus.PASS
+    assert grade_receipt_only(ctx).status == GraderStatus.PASS
 
 
 def test_unsupported_quantification_flags_invented_number(suite):
@@ -281,29 +292,18 @@ def test_reference_leakage_flags_taxonomy_marker(suite):
 
 
 def test_correction_lineage_flags_guessed_unknown_target(suite):
-    ctx = make_context(
-        suite,
-        "TI-10-unknown-correction-target",
-        output_value=output(
-            proposal(
-                "obs", kind="correction", claim="每季一次",
-                quote="應該是每季一次", targets=(),
-            )
-        ),
+    inputs, evaluation = case_pair(suite, "TI-10-unknown-correction-target")
+    trial_id = uuid5(NAMESPACE_URL, "unknown-correction-lineage")
+    gate = run_pure_reference_gate(
+        inputs, evaluation, trial_id=trial_id, base_time=BASE_TIME
     )
-    # gold 要求 unknown,但這裡沒 target 也沒標 unknown → 由 lineage 判 pass?
-    # 反例:提供 target 才是 critical
-    trial_id = ctx.trial_id
+    prior_id = next(iter(prior_evidence_id_map(inputs, trial_id=trial_id).values()))
     with_target = make_context(
         suite,
         "TI-10-unknown-correction-target",
-        output_value=output(
-            proposal(
-                "obs", kind="correction", claim="每季一次",
-                quote="應該是每季一次",
-                targets=(prior_evidence_uuid(trial_id, "prior-inventory-report-frequency"),),
-            )
-        ),
+        output_value=gate.output,
+        report=gate.report,
+        evidence_status={prior_id: EvidenceStatus.SUPERSEDED},
         trial_id=trial_id,
     )
     result = grade_correction_lineage(with_target)
@@ -318,14 +318,18 @@ def test_reference_output_edges_match_all_required(suite):
     for inputs, evaluation in zip(
         suite.runtime_inputs, suite.evaluation_contracts, strict=True
     ):
-        if evaluation.gold.expected_commit != ExpectedCommit.EVIDENCE:
+        if evaluation.gold.expected_commit != ExpectedCommit.EVIDENCE_AND_RECEIPT:
             continue
         trial_id = uuid5(NAMESPACE_URL, f"edge-test:{inputs.case.case_id}")
         result = run_pure_reference_gate(
             inputs, evaluation, trial_id=trial_id, base_time=BASE_TIME
         )
         edges = build_candidate_edges(
-            inputs, evaluation.gold, result.output, trial_id=trial_id
+            inputs,
+            evaluation.gold,
+            result.output,
+            report=result.report,
+            trial_id=trial_id,
         )
         decisions = {
             edge.edge_key: ReviewDecisionLabel.EQUIVALENT for edge in edges
@@ -336,7 +340,9 @@ def test_reference_output_edges_match_all_required(suite):
             edges=edges,
             decisions=decisions,
             accepted_proposal_keys=frozenset(
-                p.proposal_key for p in result.output.observations
+                item.proposal_ref
+                for item in result.report.decisions
+                if item.accepted
             ),
         )
         assert metrics.recall.value == Decimal("1.000000"), inputs.case.case_id
@@ -351,26 +357,44 @@ def test_broader_unsupported_is_false_positive(suite):
     trial_id = uuid5(NAMESPACE_URL, "broader")
     # 一筆合法 SAP tool + 一筆技能強化(broader)
     out = output(
-        proposal("obs-sap", kind="tool", claim="使用 SAP", quote="SAP"),
-        proposal("obs-skill", kind="tool", claim="熟練 Excel 分析能力", quote="Excel"),
+        proposal(
+            "obs-sap",
+            kind="tool",
+            claim="使用 SAP",
+            quote="SAP",
+            quals=qualifiers(
+                time_scope="unknown", typicality="unknown", ownership="unknown"
+            ),
+        ),
+        proposal(
+            "obs-skill",
+            kind="tool",
+            claim="熟練 Excel 分析能力",
+            quote="Excel",
+            quals=qualifiers(
+                time_scope="unknown", typicality="unknown", ownership="unknown"
+            ),
+        ),
     )
     edges = build_candidate_edges(inputs, evaluation.gold, out, trial_id=trial_id)
     decisions = {}
     for edge in edges:
-        if edge.proposal_key == "obs-skill":
+        if edge.proposal_key == "p0002":
             decisions[edge.edge_key] = ReviewDecisionLabel.BROADER_UNSUPPORTED
-        else:
+        elif edge.gold_id == "g-tool-sap":
             decisions[edge.edge_key] = ReviewDecisionLabel.EQUIVALENT
+        else:
+            decisions[edge.edge_key] = ReviewDecisionLabel.DIFFERENT
     metrics = compute_trial_metrics(
         gold=evaluation.gold,
         output=out,
         edges=edges,
         decisions=decisions,
-        accepted_proposal_keys=frozenset({"obs-sap", "obs-skill"}),
+        accepted_proposal_keys=frozenset({"p0001", "p0002"}),
     )
     # SAP matched;Excel-skill broader → false positive,precision < 1
     assert metrics.raw_precision.value == Decimal("0.500000")
-    assert "obs-skill" in metrics.false_positive_keys
+    assert "p0002" in metrics.false_positive_keys
     # Excel required gold 沒被滿足 → recall < 1
     assert metrics.recall.value == Decimal("0.500000")
 
@@ -381,14 +405,20 @@ def test_narrower_but_valid_matches_recall(suite):
     out = output(
         proposal(
             "obs", claim="核對出貨訂單", quote="核對前一日的出貨訂單",
-            quals=qualifiers(unit="per_day", verbatim="每天"),
+            quals=qualifiers(
+                time_scope="unknown",
+                typicality="unknown",
+                unit="per_day",
+                verbatim="每天",
+                ownership="unknown",
+            ),
         )
     )
     edges = build_candidate_edges(inputs, evaluation.gold, out, trial_id=trial_id)
     decisions = {edge.edge_key: ReviewDecisionLabel.NARROWER_BUT_VALID for edge in edges}
     metrics = compute_trial_metrics(
         gold=evaluation.gold, output=out, edges=edges, decisions=decisions,
-        accepted_proposal_keys=frozenset({"obs"}),
+        accepted_proposal_keys=frozenset({"p0001"}),
     )
     assert metrics.recall.value == Decimal("1.000000")
 
@@ -403,21 +433,21 @@ def test_dropped_by_verifier_stays_in_raw_precision(suite):
     edges = build_candidate_edges(inputs, evaluation.gold, out, trial_id=trial_id)
     decisions = {}
     for edge in edges:
-        if edge.proposal_key == "obs-bad":
+        if edge.proposal_key == "p0002":
             decisions[edge.edge_key] = ReviewDecisionLabel.BROADER_UNSUPPORTED
         else:
             decisions[edge.edge_key] = ReviewDecisionLabel.EQUIVALENT
-    decisions[("__unmatched__", "obs-bad")] = ReviewDecisionLabel.BROADER_UNSUPPORTED
+    decisions[("__unmatched__", "p0002")] = ReviewDecisionLabel.BROADER_UNSUPPORTED
     # verifier 只接受 obs-good;obs-bad 被 drop
     metrics = compute_trial_metrics(
         gold=evaluation.gold, output=out, edges=edges, decisions=decisions,
-        accepted_proposal_keys=frozenset({"obs-good"}),
+        accepted_proposal_keys=frozenset({"p0001"}),
     )
     # raw precision:2 個 output,1 個 match → 0.5(bad 仍在分母)
     assert metrics.raw_precision.value == Decimal("0.500000")
     # committed precision:只有 obs-good committed 且 matched → 1.0
     assert metrics.committed_precision.value == Decimal("1.000000")
-    assert "obs-bad" in metrics.prevented_by_verifier_keys
+    assert "p0002" in metrics.prevented_by_verifier_keys
 
 
 def test_matching_is_one_to_one(suite):
@@ -453,7 +483,7 @@ def test_matching_flags_score_affecting_tie(suite):
     for edge in sap_edges:
         decisions[edge.edge_key] = (
             ReviewDecisionLabel.EQUIVALENT
-            if edge.proposal_key == "obs-a"
+            if edge.proposal_key == "p0001"
             else ReviewDecisionLabel.NARROWER_BUT_VALID
         )
     matching = match_edges(edges, decisions, gold=evaluation.gold, output=out)
@@ -466,13 +496,27 @@ def test_qualifier_field_scores_counts_only_applicable(suite):
     gold_item = evaluation.gold.observations[0]
     good = proposal(
         "obs", kind="action", claim="每月盤點庫存 2 次", quote="我每月盤點庫存 2 次。",
-        quals=qualifiers(unit="per_month", value="2", verbatim="每月"),
+        quals=qualifiers(
+            time_scope="unknown",
+            typicality="unknown",
+            unit="per_month",
+            value="2",
+            verbatim="每月",
+            ownership="unknown",
+        ),
     )
     correct, applicable, wrong = qualifier_field_scores(gold_item, good)
     assert applicable >= 5 and not wrong and correct == applicable
     bad = proposal(
         "obs", kind="action", claim="每週盤點", quote="我每月盤點庫存 2 次。",
-        quals=qualifiers(unit="per_week", value="2", verbatim="每月"),
+        quals=qualifiers(
+            time_scope="unknown",
+            typicality="unknown",
+            unit="per_week",
+            value="2",
+            verbatim="每月",
+            ownership="unknown",
+        ),
     )
     _, _, wrong_bad = qualifier_field_scores(gold_item, bad)
     assert "frequency_unit" in wrong_bad
@@ -511,13 +555,17 @@ def build_reference_review(suite, case_id, batch_id):
         inputs, evaluation, trial_id=trial_id, base_time=BASE_TIME
     )
     edges = build_candidate_edges(
-        inputs, evaluation.gold, result.output, trial_id=trial_id
+        inputs,
+        evaluation.gold,
+        result.output,
+        report=result.report,
+        trial_id=trial_id,
     )
     matched_outputs = {e.proposal_key for e in edges}
     unmatched = [
-        p.proposal_key
-        for p in result.output.observations
-        if p.proposal_key not in matched_outputs
+        item.proposal_ref
+        for item in result.report.decisions
+        if item.proposal_ref not in matched_outputs
     ]
     items = build_review_items(
         batch_id=batch_id,
@@ -526,7 +574,9 @@ def build_reference_review(suite, case_id, batch_id):
         gold=evaluation.gold,
         output=result.output,
         accepted_proposal_keys=frozenset(
-            p.proposal_key for p in result.output.observations
+            item.proposal_ref
+            for item in result.report.decisions
+            if item.accepted
         ),
         verifier_reason_codes={},
         edges=edges,
@@ -558,7 +608,7 @@ def test_review_queue_ordering_is_seed_stable(suite):
 
 def decision_for(item, label, *, reviewer="maintainer", reason="語意等價"):
     return TurnEvalReviewDecision(
-        schema_version="turn_eval_review_decision.v1",
+        schema_version="turn_eval_review_decision.v2",
         review_item_id=item.review_item_id,
         review_item_hash=item.review_item_hash,
         decision=label,
@@ -642,7 +692,11 @@ def test_edge_decision_map_feeds_metrics(suite):
         inputs, evaluation, trial_id=trial_id, base_time=BASE_TIME
     )
     edges = build_candidate_edges(
-        inputs, evaluation.gold, result.output, trial_id=trial_id
+        inputs,
+        evaluation.gold,
+        result.output,
+        report=result.report,
+        trial_id=trial_id,
     )
     metrics = compute_trial_metrics(
         gold=evaluation.gold,
@@ -650,7 +704,9 @@ def test_edge_decision_map_feeds_metrics(suite):
         edges=edges,
         decisions=edge_map,
         accepted_proposal_keys=frozenset(
-            p.proposal_key for p in result.output.observations
+            item.proposal_ref
+            for item in result.report.decisions
+            if item.accepted
         ),
     )
     assert metrics.recall.value == Decimal("1.000000")
@@ -667,7 +723,7 @@ def minimal_trial(
 ) -> TurnEvalTrial:
     ns = uuid5(NAMESPACE_URL, "grading-context-trial")
     return TurnEvalTrial(
-        schema_version="turn_eval_trial.v1",
+        schema_version="turn_eval_trial.v2",
         trial_id=uuid5(ns, "trial"),
         case_id="TI-01-single-action",
         slot_index=1,
@@ -719,8 +775,12 @@ def minimal_final_state() -> InterviewState:
     )
 
 
-def rejected_only_report(trial: TurnEvalTrial) -> TurnInterpretVerificationReport:
-    policy = TURN_INTERPRET_VERIFIER_POLICY_V1
+def rejected_only_report(
+    trial: TurnEvalTrial,
+    *,
+    reason: TurnInterpretRejectCode = TurnInterpretRejectCode.QUOTE_NOT_FOUND,
+) -> TurnInterpretVerificationReport:
+    policy = TURN_INTERPRET_VERIFIER_POLICY_V2
     return TurnInterpretVerificationReport(
         operation_id=trial.operation_id,
         operation_definition_hash=SHA,
@@ -731,21 +791,24 @@ def rejected_only_report(trial: TurnEvalTrial) -> TurnInterpretVerificationRepor
         turn_id=uuid5(trial.trial_id, "turn"),
         context_packet_hash=SHA,
         output_hash=SHA,
-        user_signal=UserSignal("answer"),
+        dialogue_act=DialogueAct.STANDALONE_ANSWER,
         episode_signal=EpisodeSignal("continue"),
         decisions=(
             ObservationVerification(
                 proposal_index=1,
-                proposal_key="obs-rejected",
+                proposal_ref="p0001",
+                candidate_evidence_id=literal_evidence_id(trial.operation_id, 1),
                 accepted=False,
-                reason_codes=(TurnInterpretRejectCode.QUOTE_NOT_FOUND,),
+                reason_codes=(reason,),
                 computed_span=None,
                 evidence=None,
             ),
         ),
+        binding_decisions=(),
         accepted_evidence_ids=(),
         emergent_topic_decisions=(),
-        insufficiencies=(),
+        model_insufficiency_codes=(),
+        system_insufficiency_codes=(),
         accepted_count=0,
         dropped_count=1,
     )
@@ -787,7 +850,7 @@ def test_grading_context_committed_kind_comes_from_report_count(suite):
         report=rejected_only_report(trial),
         final_state=minimal_final_state(),
     )
-    assert context.committed_kind == "noop"
+    assert context.committed_kind == "receipt_only"
     assert context.evidence_status == {}
     # report 缺席的 committed(理論上不會發生)也不得誤標 evidence
     context_without_report = build_grading_context(
@@ -798,7 +861,7 @@ def test_grading_context_committed_kind_comes_from_report_count(suite):
         report=None,
         final_state=minimal_final_state(),
     )
-    assert context_without_report.committed_kind == "noop"
+    assert context_without_report.committed_kind == "receipt_only"
 
 
 def test_accepted_proposal_keys_come_only_from_report(suite):
@@ -808,3 +871,4 @@ def test_accepted_proposal_keys_come_only_from_report(suite):
         accepted_proposal_keys_from_report(rejected_only_report(trial))
         == frozenset()
     )
+    CorrectionProposal,

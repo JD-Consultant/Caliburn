@@ -8,11 +8,12 @@ from pydantic import TypeAdapter
 
 from app.interview_vnext.domain.commands import (
     ApplyCandidateProposalsCommand,
-    ApplyEvidenceCommand,
     ApplyGapProposalsCommand,
     ApplyInferenceProposalsCommand,
     ApplyReviewDecisionCommand,
-    AppendTranscriptTurnCommand,
+    ApplyTurnInterpretationCommand,
+    AppendConsultantQuestionCommand,
+    AppendEmployeeTurnCommand,
     DecideInferenceCommand,
     OpenEpisodeCommand,
     SupersedeInferenceCommand,
@@ -44,7 +45,6 @@ from app.interview_vnext.domain.evidence import (
     InferenceStatus,
     Ownership,
     Polarity,
-    QuoteSpan,
     TimeScope,
     Typicality,
 )
@@ -54,14 +54,24 @@ from app.interview_vnext.domain.job_model import (
     CandidateKind,
     CandidateStatus,
 )
+from app.interview_vnext.domain.interpretation import (
+    DialogueAct,
+    EpisodeSignal,
+    TurnInterpretationRecord,
+)
+from app.interview_vnext.domain.question_frame import (
+    QuestionMode,
+    build_question_frame_definition,
+)
 from app.interview_vnext.domain.reason_codes import ReasonCode
 from app.interview_vnext.domain.reducers import (
+    append_consultant_question,
+    append_employee_turn,
     apply_candidate_proposals,
-    apply_evidence,
     apply_gap_proposals,
     apply_inference_proposals,
     apply_review_decision,
-    append_transcript_turn,
+    apply_turn_interpretation,
     decide_inference,
     open_episode,
     supersede_inference,
@@ -74,6 +84,8 @@ from app.interview_vnext.domain.reducers import (
 from app.interview_vnext.domain.review import ReviewAction, ReviewDecision
 from app.interview_vnext.domain.session import InterviewSession, SessionStatus
 from app.interview_vnext.domain.state import InterviewState
+from app.interview_vnext.domain.support import LiteralEmployeeSpanSupport, QuoteSpan
+from app.interview_vnext.domain.turn_identity import turn_interpretation_id
 from app.interview_vnext.domain.transcript import TranscriptRole, TranscriptTurn
 
 
@@ -129,16 +141,85 @@ def append_turn(
         occurred_at=occurred_at,
         received_at=occurred_at,
     )
-    result = append_transcript_turn(
+    if role == TranscriptRole.CONSULTANT:
+        result = append_consultant_question(
+            state,
+            AppendConsultantQuestionCommand(
+                command_id=uid(f"append:{name}"),
+                expected_state_version=state.session.state_version,
+                occurred_at=occurred_at,
+                turn=turn,
+                frame_definition=build_question_frame_definition(
+                    mode=QuestionMode.OPEN_NARRATIVE,
+                    question_text=text,
+                    targets=(),
+                ),
+            ),
+        )
+    else:
+        result = append_employee_turn(
+            state,
+            AppendEmployeeTurnCommand(
+                command_id=uid(f"append:{name}"),
+                expected_state_version=state.session.state_version,
+                occurred_at=occurred_at,
+                turn=turn,
+            ),
+        )
+    return result.state, turn
+
+
+TEST_HASH = "sha256:" + "0" * 64
+
+
+def interpret(
+    state: InterviewState,
+    turn: TranscriptTurn,
+    observations: tuple[Evidence, ...] = (),
+    *,
+    name: str,
+    operation_id: UUID | None = None,
+):
+    """Commit a receipt for ``turn``, consuming the frame it answered."""
+
+    operation_id = operation_id or uid(f"operation:{name}")
+    occurred_at = at(state)
+    frame = None
+    if state.active_question_frame_id is not None:
+        candidate = next(
+            item
+            for item in state.question_frames
+            if item.question_frame_id == state.active_question_frame_id
+        )
+        if candidate.answer_turn_id == turn.turn_id:
+            frame = candidate
+    record = TurnInterpretationRecord(
+        interpretation_id=turn_interpretation_id(operation_id),
+        session_id=state.session.session_id,
+        employee_turn_id=turn.turn_id,
+        operation_id=operation_id,
+        question_frame_id=frame.question_frame_id if frame is not None else None,
+        question_frame_definition_hash=(
+            frame.definition.definition_hash if frame is not None else None
+        ),
+        context_packet_hash=TEST_HASH,
+        output_hash=TEST_HASH,
+        verification_report_hash=TEST_HASH,
+        accepted_evidence_ids=tuple(item.evidence_id for item in observations),
+        dialogue_act=DialogueAct.STANDALONE_ANSWER,
+        episode_signal=EpisodeSignal.CONTINUE,
+        applied_at=occurred_at,
+    )
+    return apply_turn_interpretation(
         state,
-        AppendTranscriptTurnCommand(
-            command_id=uid(f"append:{name}"),
+        ApplyTurnInterpretationCommand(
+            command_id=uid(f"apply:{name}"),
             expected_state_version=state.session.state_version,
             occurred_at=occurred_at,
-            turn=turn,
+            record=record,
+            observations=tuple(observations),
         ),
     )
-    return result.state, turn
 
 
 def evidence_for(
@@ -148,25 +229,28 @@ def evidence_for(
     quote: str,
     episode_id: UUID,
     kind: EvidenceKind = EvidenceKind.ACTION,
+    operation_id: UUID | None = None,
 ) -> Evidence:
     start = turn.text.index(quote)
     return Evidence(
         evidence_id=uid(f"evidence:{name}"),
         session_id=turn.session_id,
-        turn_id=turn.turn_id,
         episode_id=episode_id,
         subject=EvidenceSubject.EMPLOYEE,
         kind=kind,
         claim=quote,
-        quote=quote,
-        span=QuoteSpan(start=start, end=start + len(quote)),
+        support=LiteralEmployeeSpanSupport(
+            employee_turn_id=turn.turn_id,
+            quote=quote,
+            span=QuoteSpan(start=start, end=start + len(quote)),
+        ),
         qualifiers=EvidenceQualifiers(
             time_scope=TimeScope.CURRENT,
             typicality=Typicality.TYPICAL,
             polarity=Polarity.AFFIRMED,
             ownership=Ownership.OWNER,
         ),
-        extractor_operation_id=uid(f"operation:{name}"),
+        extractor_operation_id=operation_id or uid(f"operation:{name}"),
     )
 
 
@@ -202,15 +286,12 @@ def state_with_open_episode_and_evidence() -> tuple[InterviewState, TranscriptTu
         quote="整理測試結果",
         episode_id=episode_id,
     )
-    state = apply_evidence(
+    state = interpret(
         state,
-        ApplyEvidenceCommand(
-            command_id=uid("apply:testing-action"),
-            expected_state_version=state.session.state_version,
-            occurred_at=at(state),
-            turn_id=answer.turn_id,
-            observations=(evidence,),
-        ),
+        answer,
+        (evidence,),
+        name="testing-action",
+        operation_id=evidence.extractor_operation_id,
     ).state
     return state, answer, evidence
 
@@ -428,15 +509,12 @@ def test_closed_episode_rejects_late_or_backdated_evidence():
         episode_id=episode_id,
     )
     with pytest.raises(DomainViolation) as caught:
-        apply_evidence(
+        interpret(
             state,
-            ApplyEvidenceCommand(
-                command_id=uid("late-evidence:apply"),
-                expected_state_version=state.session.state_version,
-                occurred_at=at(state),
-                turn_id=late_turn.turn_id,
-                observations=(late,),
-            ),
+            late_turn,
+            (late,),
+            name="late-evidence",
+            operation_id=late.extractor_operation_id,
         )
     assert caught.value.reason_code == ReasonCode.EVIDENCE_EPISODE_INVALID
 
@@ -484,15 +562,12 @@ def test_gap_question_and_answer_are_role_bound_and_terminal():
         episode_id=state.session.active_episode_id,
         kind=EvidenceKind.RECIPIENT,
     )
-    state = apply_evidence(
+    state = interpret(
         state,
-        ApplyEvidenceCommand(
-            command_id=uid("apply:gap-answer-recipient"),
-            expected_state_version=state.session.state_version,
-            occurred_at=at(state),
-            turn_id=answer.turn_id,
-            observations=(resolution,),
-        ),
+        answer,
+        (resolution,),
+        name="gap-answer-recipient",
+        operation_id=resolution.extractor_operation_id,
     ).state
     state = transition_gap(
         state,
@@ -699,15 +774,12 @@ def test_inference_proposal_can_revise_but_employee_decision_is_protected():
         episode_id=state.session.active_episode_id,
         kind=EvidenceKind.PURPOSE,
     )
-    state = apply_evidence(
+    state = interpret(
         state,
-        ApplyEvidenceCommand(
-            command_id=uid("apply:inference-confirmation"),
-            expected_state_version=state.session.state_version,
-            occurred_at=at(state),
-            turn_id=confirmation_turn.turn_id,
-            observations=(confirmation,),
-        ),
+        confirmation_turn,
+        (confirmation,),
+        name="inference-confirmation",
+        operation_id=confirmation.extractor_operation_id,
     ).state
     decision_result = decide_inference(
         state,

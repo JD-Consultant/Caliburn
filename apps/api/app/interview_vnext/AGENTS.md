@@ -23,17 +23,30 @@ This package implements ADR 0034 and the 2026-07-16 greenfield architecture.
 - V2-B implementation handoff: `docs/plans/2026-07-16-interview-vnext-v2b-durable-persistence-plan.md`
 - Runtime contract decision: `docs/adr/0036-interview-vnext-provider-binding-conformance-and-idless-turn-v2.md`
 - Grounded short-answer decision: `docs/adr/0037-interview-vnext-question-frame-contextual-evidence-and-employee-authority.md`
-- Active implementation handoff: `docs/plans/2026-07-18-interview-vnext-v3-5a-runtime-contract-reconstruction-plan.md`
+- V3-5A runtime mother handoff: `docs/plans/2026-07-18-interview-vnext-v3-5a-runtime-contract-reconstruction-plan.md`
 - R5 exact implementation handoff: `docs/plans/2026-07-20-interview-vnext-v3-5a-r5-grounded-short-answer-amendment-plan.md`
+- Post-R5 product decision: `docs/adr/0038-interview-vnext-context-engine-and-professional-consultant-workflow.md`
+- Completed question selection handoff: `docs/plans/2026-07-23-interview-vnext-question-select-context-loop-plan.md`
+- Completed production OpenRouter/consultant loop handoff: `docs/plans/2026-07-23-interview-vnext-production-openrouter-consultant-loop-plan.md`
 - Completed R4 provider evidence/conformance evidence: `docs/plans/2026-07-19-interview-vnext-v3-5a-r4-provider-evidence-conformance-plan.md`
 - Completed R3 corrective evidence: `docs/plans/2026-07-19-interview-vnext-v3-5a-r3-corrective-plan.md`
 
-R4 has passed its no-network and real PostgreSQL gates (commits `aee798a`/`a814789`/`067504b`; evidence
-in the R4 plan §19): provider adapters report wire results plus normalized execution evidence only, and
-eligibility is decided by the application conformance policy. R5 grounded short-answer is the active next implementation slice;
-the 2026-07-20 amendment supersedes the mother plan's old §9/R5 literal-only contract. It requires persisted QuestionFrame,
-Evidence.v3 literal/contextual support, per-turn interpretation receipt, frequency/time separation and context state CAS.
-Paid live remains blocked until the V3-5A R5–R7 prerequisites and R8 checklist are complete.
-Until V3-5A passes its new live gate, V3-6, production routes, Web wiring, provider promotion,
-direct-vendor adapters, and migration 0011 are blocked. The active turn contract target is
+R5 grounded short-answer, R5-D bounded correctness closure, the UI-independent minimal Authoring Core, and the
+provider-neutral `question.select/1.0.0` Context/Agenda/QuestionFrame slice are complete. Authoring lives in the independent `app/job_authoring/` module; do not retrofit the old
+`DocumentVersion/_pending` tree or make Authoring domain import the legacy editor/OCS/indexer contracts.
+
+Product work is standalone/single-user first. Unless the owner explicitly changes scope, do not add organizations,
+memberships, ACLs, quotas, billing, tenant administration, or a SaaS test matrix; retained `tenant_id` fields are
+storage compatibility only. The employee launches a local Web app; its startup may open a localhost UI, but there is
+no remote product URL, registration, login, account, or password flow, and host/port setup must remain an implementation
+detail. The local app may save multiple isolated JD workspaces, with only one active in the UI at a time; never share
+transcript, Evidence, QuestionFrame, episode or `JobStateDigest` across documents. The next slice should compose the
+existing durable executor/OpenRouter boundary with
+`question.select`, then expose the smallest local Web conversation + JD canvas; `episode.code` and grounded task/output
+proposals follow. Do not rebuild Agenda as a planner agent, add a graph framework, or start K/S/SaaS before that
+vertical path works. The production OpenRouter adapter, exact GPT-5.4 mini flex profile, durable
+`question.select` executor, deterministic STOP/explicit-shift control and one paid live smoke are now complete.
+The next slice is the smallest localhost conversation + JD canvas route/UI; direct-vendor adapters remain optional.
+Do not rebuild the completed provider/loop seam before that visible vertical. Migration `0011_job_authoring_core.py` is
+limited to the three exact Authoring tables in the A1 plan. The active turn contract remains
 `turn.interpret/2.0.0`; do not patch or create new runs with `turn.interpret/1.0.0`.

@@ -18,9 +18,11 @@ from uuid import UUID
 from app.interview_vnext.domain.evidence import EvidenceStatus
 from app.interview_vnext.domain.hashing import canonical_json
 from app.interview_vnext.domain.state import InterviewState
+from app.interview_vnext.domain.turn_identity import derive_proposal_ref
 from app.interview_vnext.llm.turn_interpret import (
     ObservationProposal,
-    TURN_INTERPRET_VERIFIER_POLICY_V1,
+    TURN_INTERPRET_VERIFIER_POLICY_V2,
+    TurnInterpretRejectCode,
     TurnInterpretOutput,
     TurnInterpretVerificationReport,
 )
@@ -42,12 +44,12 @@ from .contracts import (
     TurnEvalGraderResult,
     TurnEvalTrial,
 )
-from .identities import prior_evidence_uuid
+from .fixture_builder import prior_evidence_id_map
 from .loader import TurnEvalCaseInputs, quote_occurrences
 
 
-_NUMBER = re.compile(TURN_INTERPRET_VERIFIER_POLICY_V1.number_pattern)
-_REFERENCE_MARKERS = TURN_INTERPRET_VERIFIER_POLICY_V1.reference_markers
+_NUMBER = re.compile(TURN_INTERPRET_VERIFIER_POLICY_V2.number_pattern)
+_REFERENCE_MARKERS = TURN_INTERPRET_VERIFIER_POLICY_V2.reference_markers
 
 # 進 recall 分母/自動裁決的 gold label 狀態;disputed/unknown/needs_sme 不計分(§6.5)
 _SCORABLE_LABELS = frozenset({GoldLabelStatus.ADJUDICATED})
@@ -88,7 +90,7 @@ class GradingContext:
     case_id: str
     output: TurnInterpretOutput | None
     report: TurnInterpretVerificationReport | None
-    committed_kind: str | None  # "evidence" | "noop" | None(failed)
+    committed_kind: str | None  # evidence_and_receipt | receipt_only | None
     state_before_hash: str | None
     state_after_hash: str | None
     evidence_status: Mapping[UUID, EvidenceStatus] = field(default_factory=dict)
@@ -100,10 +102,7 @@ class GradingContext:
 
     @property
     def prior_uuid_by_key(self) -> dict[str, UUID]:
-        return {
-            item.evidence_key: prior_evidence_uuid(self.trial_id, item.evidence_key)
-            for item in self.inputs.initial_fixture.prior_evidence
-        }
+        return prior_evidence_id_map(self.inputs, trial_id=self.trial_id)
 
 
 def accepted_proposal_keys_from_report(
@@ -114,7 +113,7 @@ def accepted_proposal_keys_from_report(
     if report is None:
         return frozenset()
     return frozenset(
-        decision.proposal_key for decision in report.decisions if decision.accepted
+        decision.proposal_ref for decision in report.decisions if decision.accepted
     )
 
 
@@ -138,7 +137,9 @@ def build_grading_context(
     committed_kind: str | None = None
     if trial.terminal_outcome == "committed":
         committed_kind = (
-            "evidence" if report is not None and report.accepted_count else "noop"
+            "evidence_and_receipt"
+            if report is not None and report.accepted_evidence_ids
+            else "receipt_only"
         )
     return GradingContext(
         inputs=inputs,
@@ -168,7 +169,7 @@ def _result(
     details: dict | None = None,
 ) -> TurnEvalGraderResult:
     return TurnEvalGraderResult(
-        schema_version="turn_eval_grader_result.v1",
+        schema_version="turn_eval_grader_result.v2",
         grader_name=definition.grader_name,
         grader_version=definition.grader_version,
         grader_definition_hash=definition.definition_hash,
@@ -195,7 +196,9 @@ FOREIGN_ID_GRADER = GraderDefinition(grader_name="foreign_id", grader_version="1
 STATE_TRANSITION_GRADER = GraderDefinition(
     grader_name="state_transition", grader_version="1.0.0"
 )
-NO_OP_GRADER = GraderDefinition(grader_name="no_op", grader_version="1.0.0")
+RECEIPT_ONLY_GRADER = GraderDefinition(
+    grader_name="receipt_only", grader_version="2.0.0"
+)
 CORRECTION_LINEAGE_GRADER = GraderDefinition(
     grader_name="correction_lineage", grader_version="1.0.0"
 )
@@ -230,9 +233,9 @@ def grade_quote_span(context: GradingContext) -> TurnEvalGraderResult:
             reason_code="no_output",
         )
     bad: list[str] = []
-    for proposal in context.output.observations:
+    for index, proposal in enumerate(context.output.literal_observations, 1):
         if _span(context.target_text, proposal.quote, proposal.quote_occurrence) is None:
-            bad.append(proposal.proposal_key)
+            bad.append(derive_proposal_ref(index))
     for topic in context.output.emergent_topics:
         if _span(context.target_text, topic.quote, topic.quote_occurrence) is None:
             bad.append(f"topic:{topic.topic}")
@@ -259,12 +262,12 @@ def grade_source_subject(context: GradingContext) -> TurnEvalGraderResult:
         turn.text for turn in context.inputs.transcript[:-1]
     ]
     offenders: list[str] = []
-    for proposal in context.output.observations:
+    for index, proposal in enumerate(context.output.literal_observations, 1):
         in_target = quote_occurrences(context.target_text, proposal.quote) > 0
         if not in_target and any(
             quote_occurrences(text, proposal.quote) > 0 for text in non_target_texts
         ):
-            offenders.append(proposal.proposal_key)
+            offenders.append(derive_proposal_ref(index))
     if offenders:
         return _result(
             context, SOURCE_SUBJECT_GRADER, status=GraderStatus.FAIL,
@@ -283,12 +286,13 @@ def grade_foreign_id(context: GradingContext) -> TurnEvalGraderResult:
             context, FOREIGN_ID_GRADER, status=GraderStatus.NOT_APPLICABLE,
             reason_code="no_output",
         )
-    allowed = set(context.prior_uuid_by_key.values())
-    offenders = [
-        proposal.proposal_key
-        for proposal in context.output.observations
-        if set(proposal.correction_target_evidence_ids) - allowed
-    ]
+    offenders = []
+    if context.report is not None:
+        offenders = [
+            item.proposal_ref
+            for item in context.report.decisions
+            if TurnInterpretRejectCode.FOREIGN_CORRECTION_TARGET in item.reason_codes
+        ]
     if offenders:
         return _result(
             context, FOREIGN_ID_GRADER, status=GraderStatus.FAIL,
@@ -342,22 +346,23 @@ def grade_state_transition(context: GradingContext) -> TurnEvalGraderResult:
     )
 
 
-def grade_no_op(context: GradingContext) -> TurnEvalGraderResult:
-    if context.gold.expected_commit != ExpectedCommit.NO_OP:
+def grade_receipt_only(context: GradingContext) -> TurnEvalGraderResult:
+    if context.gold.expected_commit != ExpectedCommit.RECEIPT_ONLY:
         return _result(
-            context, NO_OP_GRADER, status=GraderStatus.NOT_APPLICABLE,
-            reason_code="not_a_noop_case",
+            context, RECEIPT_ONLY_GRADER, status=GraderStatus.NOT_APPLICABLE,
+            reason_code="not_a_receipt_only_case",
         )
     if (
-        context.committed_kind == "noop"
-        and context.state_before_hash == context.state_after_hash
+        context.committed_kind == "receipt_only"
+        and context.state_before_hash != context.state_after_hash
     ):
         return _result(
-            context, NO_OP_GRADER, status=GraderStatus.PASS, reason_code="ok"
+            context, RECEIPT_ONLY_GRADER, status=GraderStatus.PASS, reason_code="ok"
         )
     return _result(
-        context, NO_OP_GRADER, status=GraderStatus.FAIL,
-        severity=FailureSeverity.CRITICAL, reason_code="noop_case_committed_evidence",
+        context, RECEIPT_ONLY_GRADER, status=GraderStatus.FAIL,
+        severity=FailureSeverity.CRITICAL,
+        reason_code="receipt_only_case_did_not_commit_exactly_one_receipt",
         details={"committed_kind": context.committed_kind},
     )
 
@@ -391,8 +396,9 @@ def grade_correction_lineage(context: GradingContext) -> TurnEvalGraderResult:
         }
         claimed = {
             target
-            for proposal in context.output.observations
-            for target in proposal.correction_target_evidence_ids
+            for decision in (context.report.decisions if context.report else ())
+            if decision.accepted and decision.evidence is not None
+            for target in decision.evidence.supersedes
         }
         if claimed != expected_targets:
             return _result(
@@ -406,9 +412,11 @@ def grade_correction_lineage(context: GradingContext) -> TurnEvalGraderResult:
             )
     if expected_unknown:
         guessed = [
-            proposal.proposal_key
-            for proposal in context.output.observations
-            if proposal.correction_target_evidence_ids
+            decision.proposal_ref
+            for decision in (context.report.decisions if context.report else ())
+            if decision.accepted
+            and decision.evidence is not None
+            and decision.evidence.supersedes
         ]
         if guessed:
             return _result(
@@ -441,14 +449,14 @@ def grade_unsupported_quantification(context: GradingContext) -> TurnEvalGraderR
             status=GraderStatus.NOT_APPLICABLE, reason_code="no_output",
         )
     offenders: list[str] = []
-    for proposal in context.output.observations:
+    for index, proposal in enumerate(context.output.literal_observations, 1):
         quote_numbers = set(_NUMBER.findall(proposal.quote))
         if not set(_NUMBER.findall(proposal.claim)) <= quote_numbers:
-            offenders.append(proposal.proposal_key)
+            offenders.append(derive_proposal_ref(index))
             continue
         value = proposal.qualifiers.frequency.value
         if value is not None and value not in proposal.quote:
-            offenders.append(proposal.proposal_key)
+            offenders.append(derive_proposal_ref(index))
     if offenders:
         return _result(
             context, UNSUPPORTED_QUANTIFICATION_GRADER, status=GraderStatus.FAIL,
@@ -468,8 +476,8 @@ def grade_reference_leakage(context: GradingContext) -> TurnEvalGraderResult:
             reason_code="no_output",
         )
     offenders = [
-        proposal.proposal_key
-        for proposal in context.output.observations
+        derive_proposal_ref(index)
+        for index, proposal in enumerate(context.output.literal_observations, 1)
         if any(marker in proposal.claim.casefold() for marker in _REFERENCE_MARKERS)
     ]
     if offenders:
@@ -489,7 +497,7 @@ DETERMINISTIC_GRADERS = (
     grade_source_subject,
     grade_foreign_id,
     grade_state_transition,
-    grade_no_op,
+    grade_receipt_only,
     grade_correction_lineage,
     grade_unsupported_quantification,
     grade_reference_leakage,
@@ -604,17 +612,20 @@ def build_candidate_edges(
     output: TurnInterpretOutput,
     *,
     trial_id: UUID,
+    report: TurnInterpretVerificationReport | None = None,
 ) -> tuple[CandidateEdge, ...]:
     """§13.2 edge 條件:同 source turn(恆為 target)、quote/occ 命中 anchor 或
     span 被 anchor 完整包含、subject/kind 無衝突、correction target 無衝突。"""
 
     target_text = inputs.transcript[-1].text
-    prior = {
-        item.evidence_key: prior_evidence_uuid(trial_id, item.evidence_key)
-        for item in inputs.initial_fixture.prior_evidence
+    prior = prior_evidence_id_map(inputs, trial_id=trial_id)
+    accepted_targets = {
+        item.proposal_ref: set(item.evidence.supersedes)
+        for item in (report.decisions if report else ())
+        if item.accepted and item.evidence is not None
     }
     edges: list[CandidateEdge] = []
-    for index, proposal in enumerate(output.observations, 1):
+    for index, proposal in enumerate(output.literal_observations, 1):
         span = _span(target_text, proposal.quote, proposal.quote_occurrence)
         if span is None:
             continue
@@ -622,6 +633,8 @@ def build_candidate_edges(
             if proposal.subject not in gold_item.allowed_subjects:
                 continue
             if proposal.kind not in gold_item.allowed_kinds:
+                continue
+            if "literal_employee_span" not in gold_item.allowed_support_kinds:
                 continue
             anchor_hit = False
             for anchor in gold_item.source_anchors:
@@ -644,7 +657,8 @@ def build_candidate_edges(
             expected_targets = {
                 prior[key] for key in gold_item.correction_target_evidence_keys
             }
-            claimed_targets = set(proposal.correction_target_evidence_ids)
+            proposal_ref = derive_proposal_ref(index)
+            claimed_targets = accepted_targets.get(proposal_ref, set())
             correction_conflict = False
             if gold_item.correction_target_evidence_keys:
                 correction_conflict = claimed_targets != expected_targets
@@ -653,7 +667,7 @@ def build_candidate_edges(
             edges.append(
                 CandidateEdge(
                     gold_id=gold_item.gold_id,
-                    proposal_key=proposal.proposal_key,
+                    proposal_key=proposal_ref,
                     output_index=index,
                     qualifiers_pass=qualifier_expectations_pass(gold_item, proposal),
                     correction_conflict=correction_conflict,
@@ -747,9 +761,9 @@ def match_edges(
         if item.gold_id not in matched_gold
     )
     unmatched_outputs = tuple(
-        proposal.proposal_key
-        for proposal in output.observations
-        if proposal.proposal_key not in matched_outputs
+        derive_proposal_ref(index)
+        for index, _proposal in enumerate(output.literal_observations, 1)
+        if derive_proposal_ref(index) not in matched_outputs
     )
     return MatchingResult(
         pairs=tuple(sorted(chosen)),
@@ -802,7 +816,7 @@ def compute_trial_metrics(
             recall=MetricResult.compute(0, len(scorable_required)),
             qualifier_exactness=MetricResult.compute(0, 0),
             expected_no_evidence_passed=(
-                None if gold.expected_commit != ExpectedCommit.NO_OP else False
+                None if gold.expected_commit != ExpectedCommit.RECEIPT_ONLY else False
             ),
             signals_pass=False,
             insufficiency_pass=False,
@@ -819,21 +833,25 @@ def compute_trial_metrics(
     review_incomplete = matching.ambiguous
     # 每個 output observation 都必須有裁決:有 edge 的看 edge decision;
     # 無 edge 的必須有 (\"__unmatched__\", key) 裁決(broader/different)。
-    for proposal in output.observations:
+    for index, _proposal in enumerate(output.literal_observations, 1):
+        proposal_key = derive_proposal_ref(index)
         has_edge_decision = any(
-            (edge.gold_id, proposal.proposal_key) in decisions
+            (edge.gold_id, proposal_key) in decisions
             for edge in edges
-            if edge.proposal_key == proposal.proposal_key
+            if edge.proposal_key == proposal_key
         )
         if not has_edge_decision and (
-            "__unmatched__", proposal.proposal_key
+            "__unmatched__", proposal_key
         ) not in decisions:
             review_incomplete = True
 
     matched_pairs = matching.pairs
     matched_output_keys = {key for _, key in matched_pairs}
 
-    all_keys = [proposal.proposal_key for proposal in output.observations]
+    all_keys = [
+        derive_proposal_ref(index)
+        for index, _proposal in enumerate(output.literal_observations, 1)
+    ]
     raw_denominator = len(all_keys)
     raw_numerator = len(matched_output_keys)
     committed_keys = [key for key in all_keys if key in accepted_proposal_keys]
@@ -866,7 +884,10 @@ def compute_trial_metrics(
 
     qualifier_correct = 0
     qualifier_applicable = 0
-    proposal_by_key = {p.proposal_key: p for p in output.observations}
+    proposal_by_key = {
+        derive_proposal_ref(index): proposal
+        for index, proposal in enumerate(output.literal_observations, 1)
+    }
     for gold_id, key in matched_pairs:
         gold_item = gold_by_id[gold_id]
         if gold_item.label_status not in _SCORABLE_LABELS:
@@ -877,13 +898,13 @@ def compute_trial_metrics(
         qualifier_correct += correct
         qualifier_applicable += applicable
 
-    if gold.expected_commit == ExpectedCommit.NO_OP and not gold.observations:
-        expected_no_evidence = len(output.observations) == 0
+    if gold.expected_commit == ExpectedCommit.RECEIPT_ONLY and not gold.observations:
+        expected_no_evidence = len(output.literal_observations) == 0
         raw_precision = MetricResult.compute(0, 0)
         committed_precision = MetricResult.compute(0, 0)
         # 若模型輸出了 observation,不填 precision=1,用 expected_no_evidence fail
-        if output.observations:
-            raw_precision = MetricResult.compute(0, len(output.observations))
+        if output.literal_observations:
+            raw_precision = MetricResult.compute(0, len(output.literal_observations))
             committed_precision = MetricResult.compute(0, len(committed_keys))
     else:
         expected_no_evidence = None
@@ -893,10 +914,10 @@ def compute_trial_metrics(
         )
 
     signals_pass = (
-        output.user_signal in gold.allowed_user_signals
+        output.dialogue_act in gold.allowed_dialogue_acts
         and output.episode_signal in gold.allowed_episode_signals
     )
-    produced = {item.reason_code for item in output.insufficiencies}
+    produced = set(output.turn_insufficiency_codes)
     required_set = set(gold.required_insufficiencies)
     allowed_set = set(gold.allowed_insufficiencies)
     insufficiency_pass = required_set <= produced and not (

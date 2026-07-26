@@ -20,6 +20,10 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from app.interview_vnext.application.durable_commands import apply_durable_command
 from app.interview_vnext.application.operation_executor import (
+    CONTEXT_BUDGET_ARTIFACT_KIND,
+    FRAME_ARTIFACT_KIND,
+    TURN_EXECUTION_OUTCOME_SCHEMA_ID,
+    TURN_OUTCOME_ARTIFACT_KIND,
     TurnExecutionStatus,
     TurnInterpretExecutionOutcome,
     execute_turn_interpret,
@@ -34,10 +38,14 @@ from app.interview_vnext.domain.state import InterviewState
 from app.interview_vnext.llm.binding import ProviderBinding
 from app.interview_vnext.llm.capture import model_call_input_artifacts
 from app.interview_vnext.llm.port import LlmPort, ModelCallRequest
-from app.interview_vnext.observability.artifacts import ArtifactRef
+from app.interview_vnext.observability.artifacts import (
+    ArtifactRef,
+    build_inline_artifact,
+)
 from app.interview_vnext.observability.events import ExecutionStatus
 from app.interview_vnext.observability.taxonomy import INTERVIEW_VNEXT_EXECUTION_V2
 from app.interview_vnext.persistence import serialization as ser
+from app.interview_vnext.persistence.errors import ArtifactNotFound
 from app.interview_vnext.persistence.models import VNextExecutionEventRow
 from app.interview_vnext.persistence.unit_of_work import SqlAlchemyVNextUnitOfWork
 from app.models import JobProfile, User
@@ -188,6 +196,7 @@ async def run_trial(
         await uow.commit()
 
     steps = setup_commands(inputs, ids=ids, base_time=base_time)
+    setup_artifact_roots: list[ArtifactRef] = []
     for step in steps:
         await apply_durable_command(
             uow_factory,
@@ -202,6 +211,14 @@ async def run_trial(
             committed_at=step.command.occurred_at,
             request_idempotency_key=f"turn-eval:{trial_id}:{step.name}",
         )
+        if step.additional_artifacts:
+            async with uow_factory() as uow:
+                for artifact in step.additional_artifacts:
+                    stored = await uow.artifacts.put(
+                        tenant_id=ids.tenant_id, record=artifact
+                    )
+                    setup_artifact_roots.append(stored.ref)
+                await uow.commit()
 
     async with uow_factory() as uow:
         state_before = await uow.sessions.get(
@@ -231,15 +248,58 @@ async def run_trial(
         )
 
     checkpoint = outcome.checkpoint
+    outcome_record = build_inline_artifact(
+        artifact_id=_uid(trial_id, "artifact/turn-outcome"),
+        kind=TURN_OUTCOME_ARTIFACT_KIND,
+        media_type="application/json",
+        payload=outcome,
+        schema_id=TURN_EXECUTION_OUTCOME_SCHEMA_ID,
+        run_id=ids.run_id,
+        session_id=ids.session_id,
+        turn_id=checkpoint.turn_id,
+        operation_id=checkpoint.operation_id,
+        created_at=checkpoint.updated_at,
+        contains_test_data=True,
+    )
     async with uow_factory() as uow:
+        stored_outcome = await uow.artifacts.put(
+            tenant_id=ids.tenant_id, record=outcome_record
+        )
         request_record = await uow.artifacts.get(
             tenant_id=ids.tenant_id,
             artifact_id=checkpoint.request_artifact.artifact_id,
         )
+        budget_record = await uow.artifacts.get(
+            tenant_id=ids.tenant_id,
+            artifact_id=uuid5(checkpoint.operation_id, "context-budget"),
+        )
+        if budget_record.ref.kind != CONTEXT_BUDGET_ARTIFACT_KIND:
+            raise RuntimeError("turn context budget artifact kind changed")
+        frame_ref = None
+        try:
+            frame_record = await uow.artifacts.get(
+                tenant_id=ids.tenant_id,
+                artifact_id=uuid5(checkpoint.operation_id, "question-frame-snapshot"),
+            )
+        except ArtifactNotFound:
+            frame_record = None
+        if frame_record is not None:
+            if frame_record.ref.kind != FRAME_ARTIFACT_KIND:
+                raise RuntimeError("turn question-frame artifact kind changed")
+            frame_ref = frame_record.ref
+        await uow.commit()
     if request_record.ref != checkpoint.request_artifact:
         raise RuntimeError("trial request artifact reference changed before finalize")
     request = ModelCallRequest.model_validate_json(request_record.inline_content or "")
     request_roots = model_call_input_artifacts(request_record.ref, request)
+    # §5.1/§5.2:provider authority(前四項,順序不變)後緊接 request 的四個內容
+    # dependency,讓 prompt/schema/context/selection 也是 terminal roots。
+    request_content_roots = (
+        request.prompt_artifact,
+        request.output_schema_artifact,
+        request.context_artifact,
+        request.selection_manifest_artifact,
+    )
     provider_authority_roots = await _provider_authority_roots(
         session_factory,
         tenant_id=ids.tenant_id,
@@ -249,7 +309,11 @@ async def run_trial(
         ref
         for ref in (
             *request_roots,
+            *request_content_roots,
+            *setup_artifact_roots,
             *provider_authority_roots,
+            budget_record.ref,
+            frame_ref,
             checkpoint.provider_result_artifact,
             checkpoint.provider_execution_evidence_artifact,
             checkpoint.provider_conformance_artifact,
@@ -257,6 +321,16 @@ async def run_trial(
             checkpoint.domain_result_artifact,
             checkpoint.response_artifact,
             outcome.response_artifact,
+            outcome.context_packet_ref,
+            outcome.input_ref,
+            outcome.provider_result_ref,
+            outcome.verification_report_ref,
+            outcome.interpretation_record_ref,
+            outcome.domain_command_ref,
+            outcome.reduction_result_ref,
+            outcome.turn_output_ref,
+            outcome.failure_ref,
+            stored_outcome.ref,
         )
         if ref is not None
     )

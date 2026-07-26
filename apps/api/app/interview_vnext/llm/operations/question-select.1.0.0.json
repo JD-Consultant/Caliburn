@@ -1,0 +1,39 @@
+{
+  "schema_version": "llm_operation_definition.v1",
+  "name": "question.select",
+  "version": "1.0.0",
+  "input_contract": {
+    "name": "question-select-input",
+    "version": "1.0.0",
+    "content_hash": "sha256:9dbb1c859bf35494cef7d99016a00a284a83f4d05e25cff91a024335b8330440"
+  },
+  "output_contract": {
+    "name": "question-select-output",
+    "version": "1.0.0",
+    "content_hash": "sha256:8c0d383274417a6b24dfb5e14f3b9ecfc3acd37be63088ec5e3f1e724f0d2bea"
+  },
+  "prompt_template": {
+    "name": "question-select",
+    "version": "1.0.0",
+    "content_hash": "sha256:431a65e4e9616f20c2c0b7d5efe74a2931f5839c72bd5e51980f50da28bda4d8"
+  },
+  "context_policy": {
+    "name": "question-select",
+    "version": "1.0.0",
+    "content_hash": "sha256:ee2ef489bf535e0bfececf171b9bdecd4d01338696e6d09d5294cf866de64e30"
+  },
+  "quality_profile": "question-select-verifier-v1",
+  "timeout_ms": 90000,
+  "max_attempts": 2,
+  "max_output_tokens": 4096,
+  "allowed_tools": [],
+  "repair_policy": {
+    "schema_repair_attempts": 1,
+    "semantic_repair_attempts": 0
+  },
+  "safety_policy_flags": [
+    "no-chain-of-thought",
+    "untrusted-input-boundary"
+  ],
+  "definition_hash": "sha256:ae64161d0a23812887c10bcb115704ced782f9769a2e5af13f23d6f9e3c0de6c"
+}

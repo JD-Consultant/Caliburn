@@ -26,20 +26,26 @@ from app.interview_vnext.domain.evidence import (
     EvidenceSubject,
     Ownership,
     Polarity,
-    QuoteSpan,
     TimeScope,
 )
-from app.interview_vnext.domain.hashing import canonical_json
+from app.interview_vnext.domain.hashing import canonical_hash, canonical_json
+from app.interview_vnext.domain.interpretation import (
+    DialogueAct,
+    EpisodeSignal,
+    TurnInterpretationRecord,
+)
 from app.interview_vnext.domain.job_model import (
     CandidateJobItem,
     CandidateKind,
 )
 from app.interview_vnext.domain.session import SessionStatus, session_at
+from app.interview_vnext.domain.turn_identity import turn_interpretation_id
 from app.interview_vnext.domain.state import InterviewState
+from app.interview_vnext.domain.support import LiteralEmployeeSpanSupport, QuoteSpan
 from app.interview_vnext.domain.transcript import TranscriptRole, TranscriptTurn
 from app.interview_vnext.llm.context import (
     EPISODE_CODE_CONTEXT_POLICY_V1,
-    TURN_INTERPRET_CONTEXT_POLICY_V1,
+    TURN_INTERPRET_CONTEXT_POLICY_V2,
     ContextSourceType,
     EpisodeCodeContextPacket,
     TurnInterpretContextPacket,
@@ -56,6 +62,65 @@ DEFINITION_HASH = "sha256:" + "a" * 64
 
 def uid(name: str) -> UUID:
     return uuid5(NAMESPACE_URL, f"caliburn-context-test:{name}")
+
+
+def literal_support(source_turn: TranscriptTurn) -> LiteralEmployeeSpanSupport:
+    return LiteralEmployeeSpanSupport(
+        employee_turn_id=source_turn.turn_id,
+        quote=source_turn.text,
+        span=QuoteSpan(start=0, end=len(source_turn.text)),
+    )
+
+
+def prior_turn_operation(source_turn: TranscriptTurn) -> UUID:
+    """One interpretation operation per prior employee turn.
+
+    State.v3 makes a turn's evidence share the operation that produced it, so
+    the fixture cannot give each evidence its own operation id any more
+    (corrective §6.1).
+    """
+
+    return uid(f"prior-op-{source_turn.turn_id}")
+
+
+def prior_receipts(
+    *,
+    session_id: UUID,
+    evidence: list[Evidence],
+    prior_turns: tuple[TranscriptTurn, ...],
+) -> tuple[TurnInterpretationRecord, ...]:
+    """A receipt for each non-tail employee turn, closing over its evidence.
+
+    ``accepted_evidence_ids`` must equal the evidence its operation produced, in
+    the order it appears in state, so it is derived from the evidence list itself
+    (State.v3 aggregate invariant; plan §7.2).
+    """
+
+    hash_stub = "sha256:" + "0" * 64
+    receipts: list[TurnInterpretationRecord] = []
+    for source_turn in prior_turns:
+        operation_id = prior_turn_operation(source_turn)
+        accepted = tuple(
+            item.evidence_id
+            for item in evidence
+            if item.extractor_operation_id == operation_id
+        )
+        receipts.append(
+            TurnInterpretationRecord(
+                interpretation_id=turn_interpretation_id(operation_id),
+                session_id=session_id,
+                employee_turn_id=source_turn.turn_id,
+                operation_id=operation_id,
+                context_packet_hash=hash_stub,
+                output_hash=hash_stub,
+                verification_report_hash=hash_stub,
+                accepted_evidence_ids=accepted,
+                dialogue_act=DialogueAct.STANDALONE_ANSWER,
+                episode_signal=EpisodeSignal.CONTINUE,
+                applied_at=NOW + timedelta(minutes=1),
+            )
+        )
+    return tuple(receipts)
 
 
 def turn(
@@ -116,7 +181,6 @@ def rich_state(*, correction_text: str | None = None) -> InterviewState:
             Evidence(
                 evidence_id=uid(f"positive-{index}"),
                 session_id=session_id,
-                turn_id=source_turn.turn_id,
                 episode_id=episode_id,
                 subject=(
                     EvidenceSubject.EMPLOYEE
@@ -125,13 +189,12 @@ def rich_state(*, correction_text: str | None = None) -> InterviewState:
                 ),
                 kind=EvidenceKind.ACTION if index % 2 == 0 else EvidenceKind.OUTPUT,
                 claim=f"可支持的工作事實 {index}",
-                quote=source_turn.text,
-                span=QuoteSpan(start=0, end=len(source_turn.text)),
+                support=literal_support(source_turn),
                 qualifiers=EvidenceQualifiers(
                     time_scope=TimeScope.CURRENT,
                     polarity=Polarity.AFFIRMED,
                 ),
-                extractor_operation_id=uid(f"extract-{index}"),
+                extractor_operation_id=prior_turn_operation(source_turn),
             )
         )
 
@@ -185,13 +248,11 @@ def rich_state(*, correction_text: str | None = None) -> InterviewState:
             Evidence(
                 evidence_id=uid(name),
                 session_id=session_id,
-                turn_id=source_turn.turn_id,
                 episode_id=episode_id,
                 subject=subject,
                 kind=EvidenceKind.ACTION,
                 claim=f"variant {name}",
-                quote=source_turn.text,
-                span=QuoteSpan(start=0, end=len(source_turn.text)),
+                support=literal_support(source_turn),
                 qualifiers=EvidenceQualifiers(
                     time_scope=time_scope,
                     polarity=polarity,
@@ -204,7 +265,7 @@ def rich_state(*, correction_text: str | None = None) -> InterviewState:
                     if status == EvidenceStatus.WITHDRAWN
                     else None
                 ),
-                extractor_operation_id=uid(f"extract-{name}"),
+                extractor_operation_id=prior_turn_operation(source_turn),
             )
         )
 
@@ -262,6 +323,11 @@ def rich_state(*, correction_text: str | None = None) -> InterviewState:
         episodes=(episode,),
         gaps=gaps,
         candidates=(candidate,),
+        turn_interpretations=prior_receipts(
+            session_id=session_id,
+            evidence=evidence,
+            prior_turns=(turns[1], turns[3]),
+        ),
     )
 
 
@@ -303,7 +369,7 @@ def test_turn_context_is_deterministic_minimal_grounded_and_verbatim() -> None:
         "employee_turn_id": state.turns[-1].turn_id,
         "operation_id": uid("turn-operation"),
         "operation_definition_hash": DEFINITION_HASH,
-        "policy": TURN_INTERPRET_CONTEXT_POLICY_V1,
+        "policy": TURN_INTERPRET_CONTEXT_POLICY_V2,
     }
 
     first = builder.build_turn_interpret(**kwargs)
@@ -352,7 +418,7 @@ def test_turn_context_without_correction_cue_uses_four_plus_two_deduped() -> Non
         employee_turn_id=state.turns[-1].turn_id,
         operation_id=uuid4(),
         operation_definition_hash=DEFINITION_HASH,
-        policy=TURN_INTERPRET_CONTEXT_POLICY_V1,
+        policy=TURN_INTERPRET_CONTEXT_POLICY_V2,
     )
     assert isinstance(result.packet, TurnInterpretContextPacket)
     assert len(result.packet.correction_candidates) == 4
@@ -370,9 +436,20 @@ def test_turn_context_without_correction_cue_uses_four_plus_two_deduped() -> Non
 def test_turn_selection_is_canonical_when_non_turn_collections_arrive_shuffled() -> None:
     state = rich_state()
     shuffled_payload = state.model_dump()
-    shuffled_payload["evidence"] = list(reversed(shuffled_payload["evidence"]))
+    # Evidence order within one operation is fixed by its receipt, so only the
+    # relative order of the two operations' blocks is free to move; reordering
+    # those blocks (plus the order-free gaps) still exercises the builder's
+    # canonicalization while keeping the state valid (State.v3 §7.2).
+    evidence_rows = shuffled_payload["evidence"]
+    blocks: dict[str, list] = {}
+    for row in evidence_rows:
+        blocks.setdefault(str(row["extractor_operation_id"]), []).append(row)
+    shuffled_payload["evidence"] = [
+        row for key in reversed(list(blocks)) for row in blocks[key]
+    ]
     shuffled_payload["gaps"] = list(reversed(shuffled_payload["gaps"]))
     shuffled_state = InterviewState.model_validate(shuffled_payload)
+    assert shuffled_state.evidence != state.evidence
     builder = ContextBuilder()
 
     def build(item):
@@ -381,7 +458,7 @@ def test_turn_selection_is_canonical_when_non_turn_collections_arrive_shuffled()
             employee_turn_id=item.turns[-1].turn_id,
             operation_id=uid("canonical-operation"),
             operation_definition_hash=DEFINITION_HASH,
-            policy=TURN_INTERPRET_CONTEXT_POLICY_V1,
+            policy=TURN_INTERPRET_CONTEXT_POLICY_V2,
         )
 
     ordered = build(state)
@@ -442,7 +519,7 @@ def test_turn_context_explicitly_represents_missing_question_and_episode() -> No
         employee_turn_id=employee.turn_id,
         operation_id=uuid4(),
         operation_definition_hash=DEFINITION_HASH,
-        policy=TURN_INTERPRET_CONTEXT_POLICY_V1,
+        policy=TURN_INTERPRET_CONTEXT_POLICY_V2,
     )
     assert result.packet.preceding_consultant_turn is None
     assert result.packet.active_episode is None
@@ -452,7 +529,7 @@ def test_turn_context_explicitly_represents_missing_question_and_episode() -> No
 
 def test_turn_required_text_over_budget_is_a_hard_failure_without_truncation() -> None:
     state = rich_state()
-    policy_values = TURN_INTERPRET_CONTEXT_POLICY_V1.model_dump(
+    policy_values = TURN_INTERPRET_CONTEXT_POLICY_V2.model_dump(
         exclude={"policy_hash"}
     )
     policy_values["max_utf8_bytes"] = 100
@@ -560,7 +637,7 @@ def test_episode_evidence_and_reference_caps_fail_without_silent_omission() -> N
 
 def test_policy_hash_and_reference_snapshot_identity_are_verified() -> None:
     state = rich_state()
-    bad_policy = TURN_INTERPRET_CONTEXT_POLICY_V1.model_copy(
+    bad_policy = TURN_INTERPRET_CONTEXT_POLICY_V2.model_copy(
         update={"policy_hash": "sha256:" + "0" * 64}
     )
     with pytest.raises(ValidationError, match="policy hash mismatch"):
@@ -594,3 +671,141 @@ def test_policy_hash_and_reference_snapshot_identity_are_verified() -> None:
             operation_definition_hash=DEFINITION_HASH,
             policy=EPISODE_CODE_CONTEXT_POLICY_V1,
         )
+
+
+# ── R5-BC corrective §6.4 / §12.1: eligible frame + source content hash ───────
+
+
+def _frame_state() -> InterviewState:
+    """A two-turn active session whose answer is bound to an open-narrative frame.
+
+    Built through the production reducers so the frame pointer, answer binding
+    and receipt invariants hold exactly as they would at runtime.
+    """
+
+    from app.interview_vnext.domain.commands import (
+        AppendConsultantQuestionCommand,
+        AppendEmployeeTurnCommand,
+        TransitionSessionCommand,
+    )
+    from app.interview_vnext.domain.question_frame import (
+        QuestionMode,
+        build_question_frame_definition,
+    )
+    from app.interview_vnext.domain.reducers import (
+        append_consultant_question,
+        append_employee_turn,
+        transition_session,
+    )
+    from app.interview_vnext.domain.session import InterviewSession
+
+    session_id = uid("frame-session")
+    base = InterviewState(
+        session=InterviewSession(
+            session_id=session_id,
+            profile_id=uid("frame-profile"),
+            tenant_id=uid("frame-tenant"),
+            workflow_version="1.0.0",
+            reference_snapshot_id="reference-fixture-v1",
+            created_at=NOW,
+            updated_at=NOW,
+        )
+    )
+    state = transition_session(
+        base,
+        TransitionSessionCommand(
+            command_id=uid("frame-activate"),
+            expected_state_version=0,
+            occurred_at=NOW + timedelta(seconds=1),
+            target_status=SessionStatus.ACTIVE,
+        ),
+    ).state
+    question = turn(
+        session_id=session_id,
+        sequence=1,
+        role=TranscriptRole.CONSULTANT,
+        text="你固定負責什麼工作？",
+        previous_turn_id=None,
+    )
+    state = append_consultant_question(
+        state,
+        AppendConsultantQuestionCommand(
+            command_id=uid("frame-question"),
+            expected_state_version=state.session.state_version,
+            occurred_at=NOW + timedelta(seconds=2),
+            turn=question,
+            frame_definition=build_question_frame_definition(
+                mode=QuestionMode.OPEN_NARRATIVE,
+                question_text=question.text,
+                targets=(),
+            ),
+        ),
+    ).state
+    answer = turn(
+        session_id=session_id,
+        sequence=2,
+        role=TranscriptRole.EMPLOYEE,
+        text="我每天核對出貨訂單。",
+        previous_turn_id=question.turn_id,
+    )
+    state = append_employee_turn(
+        state,
+        AppendEmployeeTurnCommand(
+            command_id=uid("frame-answer"),
+            expected_state_version=state.session.state_version,
+            occurred_at=NOW + timedelta(seconds=3),
+            turn=answer,
+        ),
+    ).state
+    return state
+
+
+def test_eligible_frame_is_projected_with_sealed_source_content_hash() -> None:
+    state = _frame_state()
+    frame = state.question_frames[0]
+    result = ContextBuilder().build_turn_interpret(
+        state=state,
+        employee_turn_id=state.turns[-1].turn_id,
+        operation_id=uid("frame-operation"),
+        operation_definition_hash=DEFINITION_HASH,
+        policy=TURN_INTERPRET_CONTEXT_POLICY_V2,
+    )
+    projected = result.packet.question_frame
+    assert projected is not None
+    assert projected.frame.question_frame_id == frame.question_frame_id
+    assert projected.source.content_hash == canonical_hash(frame)
+
+    frame_decision = decision(
+        result, ContextSourceType.QUESTION_FRAME, frame.question_frame_id
+    )
+    assert frame_decision.selected is True
+    assert frame_decision.content_hash == canonical_hash(frame)
+
+
+def test_context_state_version_matches_persisted_state() -> None:
+    state = _frame_state()
+    result = ContextBuilder().build_turn_interpret(
+        state=state,
+        employee_turn_id=state.turns[-1].turn_id,
+        operation_id=uid("frame-version-operation"),
+        operation_definition_hash=DEFINITION_HASH,
+        policy=TURN_INTERPRET_CONTEXT_POLICY_V2,
+    )
+    assert result.packet.state_version == state.session.state_version
+    assert result.manifest.state_version == state.session.state_version
+    assert result.budget.state_version == state.session.state_version
+
+
+def test_tampered_frame_source_content_hash_fails_closed() -> None:
+    state = _frame_state()
+    result = ContextBuilder().build_turn_interpret(
+        state=state,
+        employee_turn_id=state.turns[-1].turn_id,
+        operation_id=uid("frame-tamper-operation"),
+        operation_definition_hash=DEFINITION_HASH,
+        policy=TURN_INTERPRET_CONTEXT_POLICY_V2,
+    )
+    payload = result.packet.model_dump()
+    payload["question_frame"]["source"]["content_hash"] = "sha256:" + "0" * 64
+    with pytest.raises(ValidationError, match="content hash mismatch"):
+        TurnInterpretContextPacket.model_validate(payload)

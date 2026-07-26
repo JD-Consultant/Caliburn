@@ -1,7 +1,7 @@
 # Case records
 
-本目錄在執行前放置六個固定 JSON case。每個 case 同時包含 raw、structured、hybrid 三種 paired
-Context；三者必須來自同一 transcript，不得額外替某個 arm 補答案。
+本目錄在執行前放置六個固定 JSON case。每個 case 同時包含四個 arm 所需的 paired Context；
+四者必須來自同一 transcript，不得額外替某個 arm 補答案。
 
 ## Case JSON 格式
 
@@ -28,23 +28,16 @@ Context；三者必須來自同一 transcript，不得額外替某個 arm 補答
       "text": "案例正式內容會在執行前寫入。"
     }
   ],
-  "structured_context": {
-    "claims": [
-      {
-        "claim_id": "claim-001",
-        "statement": "案例正式結構化內容會在執行前寫入。",
-        "actor": "employee",
-        "time_scope": "current",
-        "responsibility": "unknown",
-        "candidate_kind": "unmapped",
-        "source_ids": ["turn-002"],
-        "qualifiers": []
-      }
-    ],
-    "corrections": [],
-    "unresolved": []
-  },
-  "hybrid_source_ids": ["turn-002"],
+  "claim_table": [
+    {
+      "claim_id": "claim-001",
+      "speaker": "employee",
+      "literal_text": "必須是 source_turn_ids 所指 turn text 的逐字子字串",
+      "source_turn_ids": ["turn-002"],
+      "sequence_index": 1
+    }
+  ],
+  "relevant_span_ids": ["turn-002"],
   "adjudication": {
     "must_retain_tasks": [],
     "must_not_create_tasks_from": ["Java", "Python", "HTML"],
@@ -55,21 +48,54 @@ Context；三者必須來自同一 transcript，不得額外替某個 arm 補答
 }
 ```
 
-上例只定義格式，`turn-002`、claim 與 adjudication 的示意文字不得直接拿去跑 trial。正式案例建立後，
-不得保留「正式內容會在執行前寫入」等模板文字。
+上例只定義格式，示意文字不得直接拿去跑 trial。正式案例建立後，不得保留「正式內容會在執行前寫入」
+等模板文字。
+
+## claim_table 構造規則（硬性）
+
+claim table 是 P0 的**唯一自變數**。它只做原子化切分，不做任何職務分析判斷。
+
+**只有這五個欄位**：`claim_id`、`speaker`、`literal_text`、`source_turn_ids`、`sequence_index`。
+
+**禁止欄位**：`actor`、`time_scope`、`responsibility`、`candidate_kind`、`corrections`、`unresolved`、
+`qualifiers`，以及任何等價命名。這些欄位與 rubric 的 C1／C2／C4／C5 幾乎一對一，
+填了就是把答案卡交給受測模型（見 README §3.1）。
+
+1. **逐字**：`literal_text` 必須是 `source_turn_ids` 所指 turn `text` 的**逐字子字串**，
+   不得改寫、摘要、補主詞或修正錯字。建立案例後以字串包含檢查驗證全部 claim。
+2. **完整覆蓋**：claim table 必須收錄員工的**每一條陳述**，包含工具提及、過去工作、他人責任、
+   假設語氣與後來被撤回的說法。**不得因為「那不是 Task」而不收** —— 用省略排除等於用答案卡排除，
+   而且會讓 `structured_only` 塌成 `raw_only` 的改名版。
+3. **切分規則寫死**：一條獨立陳述一個 claim（可獨立判真假的最小主張）。
+   一個 turn 通常產生多個 claim；一個 claim 不得跨 turn。
+4. **順序保留**：`sequence_index` 從 1 連號，依 transcript 出現順序。這是模型能判更正／否定
+   先後關係的唯一線索——因為 `corrections` 欄位已刪除。
+5. **不含顧問提問**：claim table 只收 `speaker: "employee"` 的陳述；顧問問句只存在於 transcript。
+   這正是 `structured_only` 預期會遺失脈絡的地方，屬受測內容，不是缺陷。
 
 ## Context 組裝
 
-- `raw_only`：只傳 `transcript`。
-- `structured_only`：只傳 `structured_context`。
-- `hybrid`：傳 `structured_context`、`hybrid_source_ids` 指向的逐字 turns，以及 transcript 最後一個
-  employee turn；不得附 `adjudication`。
+四個 arm 都保留原始 `source_id`，讓輸出的 `source_ids` 可驗證：
 
-三種 payload 都要保留原始 `source_id`，讓 `source_ids` 可驗證。
+- `raw_only`：只傳 `transcript`。
+- `raw_plus_spans`：傳 `transcript`，再把 `relevant_span_ids` 指向的 turns **逐字重貼一次**
+  為「相關片段」；不含 claim table。
+- `hybrid`：傳 `transcript` ＋ 相同的逐字相關片段 ＋ `claim_table`。
+- `structured_only`：只傳 `claim_table`。
+
+**`hybrid` 必須含完整 transcript。** 原設計省略未選中的 turns，於是同時改動「結構」與「資訊刪減」，
+差異無法歸因。長對話壓縮另開實驗。
+
+`raw_plus_spans` 與 `hybrid` 的相關片段必須是**同一組** `relevant_span_ids`，逐字相同、順序相同，
+否則兩者的差異就不只是 claim table。
+
+`adjudication` 不傳給受測 subagent；reviewer subagent 會收到（判 `C6_SOURCE_FIDELITY` 需要）。
 
 ## 凍結規則
 
 - 六個案例一次完成後才開始 trial。
-- `adjudication` 不會傳給受測 subagent。
-- 若 transcript、structured context 或 adjudication 有任何實質修改，既有 trial 不得混入新版結果。
+- `relevant_span_ids` 的選取本身帶人工判斷，因此選取理由寫進 `adjudication.notes`；
+  選取不得只挑「支持正確答案」的 turns，也要納入容易誤導的關鍵句。
+- 若 transcript、claim table、`relevant_span_ids` 或 `adjudication` 有任何實質修改，
+  既有 trial 不得混入新版結果。
 - P0 不沿用舊 Evidence schema、gold、loader、grader 名稱或 suite hash；舊案例只能提供語意陷阱靈感。

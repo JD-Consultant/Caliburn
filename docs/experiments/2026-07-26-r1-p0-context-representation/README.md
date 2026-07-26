@@ -1,13 +1,20 @@
-# R1-P0 Context Representation Subagent Screening
+# R1-P0 Context Representation Screening
 
 - 日期：2026-07-26
-- 狀態：**Cases frozen（experiment revision 1，2026-07-26）— 待執行第 1 輪 trials**
-- 性質：R1 前置、免外部 API key 的**否證實驗**
+- 狀態：**Deferred／未執行**（cases frozen；沒有 trial、結果或模型品質證據）
+- 性質：R1 前置**否證實驗設計與案例資產**
 - 不使用：`OPENROUTER_API_KEY`、`OPENAI_API_KEY`、production route、Web、資料庫
 - 上游 authority：
   - [ADR 0040](../../adr/0040-professional-consultant-engine-and-r1-validation-contract.md)
   - [R1 Task Discovery 深入研究](../../specs/2026-07-25-professional-consultant-r1-task-discovery-deep-research.md)
   - [2026-07-26 紅隊修訂](../../specs/2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md)
+  - [Context 表示外部權威證據審查](../../specs/2026-07-26-professional-consultant-context-representation-external-evidence-review.md)
+
+> **2026-07-26 執行修訂**：原計畫把 Codex subagent 當作原本要由 API 呼叫的受測 LLM；owner 確認平台
+> 不允許這種用法，因此本實驗停止在 cases／rubric／assembler 已凍結、**尚未執行任何 trial**的狀態。
+> 下文 §4、§7–§10 保留原實驗設計供追溯，**不得照其 subagent 步驟執行，也不得虛構結果**。
+> 未來若改用實際 provider endpoint，必須另升 experiment revision、重寫 execution metadata 與外部效度，
+> 經 owner 明確核准後才執行。
 
 ## 1. 要回答的問題
 
@@ -91,7 +98,7 @@ R1 的 Evidence／Work Model 之所以叫 typed，價值假說本來就在 actor
 
 P0 的任何結論**不得**寫成「Evidence 架構已被實驗否決／成立」。
 
-## 4. 受測模型策略
+## 4. 原受測模型策略（已停止，不得執行）
 
 ### 4.1 一律使用最強模型
 

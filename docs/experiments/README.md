@@ -32,10 +32,10 @@
 
 ## 3. 保存規則
 
-- 保存**我們實際送出的可見 prompt/input**與 subagent 最終回覆，不聲稱能取得平台隱藏 system
+- 保存**我們實際送出的可見 prompt/input**與受測模型最終回覆，不聲稱能取得平台隱藏 system
   instructions、私有 reasoning 或完整內部執行軌跡。
 - 不要求、不保存 chain-of-thought；需要理由時只保存短而可檢查的 decision rationale。
-- 每個 trial 記錄 requested model、reasoning effort、`fork_context`、case、arm 與時間。
+- 每個 trial 記錄 requested/resolved model、provider/endpoint、reasoning effort、case、arm、執行環境與時間。
 - 同一比較中的模型、rubric、輸出格式與非受測條件必須相同。
 - 案例與 rubric 在開始跑 trial 前固定；中途修正就升實驗 revision，不能默默改完繼續混算。
 - 小型 constructed 實驗可將完整 trial 提交 Git；大量或敏感資料另訂保存規則，不能把秘密或 API key
@@ -45,6 +45,8 @@
 ## 4. 現行實驗
 
 - [`2026-07-26-r1-p0-context-representation/`](2026-07-26-r1-p0-context-representation/) —
-  在不使用外部 API key 的情況下，以隔離的最強 subagent 比較 Raw-only、Raw+Spans、Hybrid 與
-  Structured-only 四種 Context 對 Task 邊界分析的影響。**否證實驗**：可證明字面結構化表示沒有加值，
-  不能反過來宣稱 Evidence 架構已成立。六份 constructed cases 已凍結為 revision 1，待執行 trials。
+  比較 Raw-only、Raw+Spans、Hybrid 與 Structured-only 四種 Context 對 Task 邊界分析的影響。
+  六份 constructed cases、rubric 與 assembler 已凍結為 revision 1；**沒有執行任何 trial**。
+  原 Codex-subagent 執行法已停止，因平台不允許把 subagent 當外部 API 受測模型。若未來改用實際
+  provider，須另升 revision 並明確核准。外部證據審查見
+  [`2026-07-26-professional-consultant-context-representation-external-evidence-review.md`](../specs/2026-07-26-professional-consultant-context-representation-external-evidence-review.md)。

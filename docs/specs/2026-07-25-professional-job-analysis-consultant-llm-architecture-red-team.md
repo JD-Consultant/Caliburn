@@ -9,6 +9,19 @@
 
 ---
 
+> **【2026-07-26 修訂索引｜先讀這裡】** 本文件經外部紅隊複審後有兩項修訂，分佈於四個章節：
+>
+> | 編號 | 位置 | 修訂 |
+> |---|---|---|
+> | C-01 | §5.8、§8.1、§19 | 「一般回合 2 次模型呼叫」**降級為待實驗假說**（持平時選一次呼叫）；「固定便宜模型跑 2–3 trials」**已修正**為最強模型建天花板 + ablation；baseline 必須是**強模型 + 最小 harness** |
+> | C-05 | §16 | 「Event Sourcing」改為「不做以事件為唯一真相、靠 replay 重建 Current State 的完整 Event Sourcing」，允許同交易的 append-only Consultation Journal |
+>
+> 原文一律保留並就地標記，**不得據被否決的原文實作**。依據見
+> [R1 紅隊複審與修訂裁決](2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §3.1、§3.5、
+> [ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md)。
+
+---
+
 ## 1. 文件目的
 
 前一份文件已回答「專業顧問應該如何訪談、分析與完成職務說明書」。本文件只回答下一層問題：
@@ -551,7 +564,8 @@ Anthropic 把 orchestrator-workers 放在「子任務數量與性質事前無法
 
 採用「兩條路徑」：
 
-- **一般回合**：理解 + 回應，通常 2 次模型呼叫；
+- **一般回合**：理解 + 回應，通常 2 次模型呼叫；【C-01 修正：**「2 次」降級為待實驗假說**，
+  由 R1 的 ablation（一次呼叫 vs 兩階段）裁決，不得在實驗前寫成已採用】
 - **深度回合**：只有遇到跨故事重整、文件提案或完成檢查時才追加專門 operation。
 
 每個 operation 都可單獨評測，不建立固定五段流水線。
@@ -1342,12 +1356,16 @@ Anthropic 在其多 Agent Research 的評測中，曾比較多個 judge 與單�
 10. UI 顯示回答與 JD 目前狀態
 ```
 
-一般回合目標是 2 次 LLM 呼叫：
+一般回合目標是 2 次 LLM 呼叫：【C-01：此為**待實驗假說**，見本節末修訂框】
 
 1. 理解；
 2. 決策與自然回應。
 
 如果同一次可靠完成，可經評測後合併；不能只為少一次呼叫犧牲漏訊號率。
+
+> 【C-01 修正】**「目標 2 次」降級為待實驗假說。** R1 必須實際比較「一次呼叫」與「兩階段」，
+> 並且**持平時選較簡單者**（一次呼叫），不得預設兩階段為架構。原文最後一句的保護條件（不得為省一次呼叫
+> 犧牲漏訊號率）繼續有效，作為 ablation 的判準之一。
 
 ### 8.2 深度 reconciliation 路徑
 
@@ -1887,6 +1905,20 @@ Skill 是可執行的能力，例如：
 
 ## 16. 明確不做
 
+> **【2026-07-26 修訂 C-05｜下列清單的「Event Sourcing」一項已修正】**
+>
+> 原文以無限定詞方式禁止 Event Sourcing，與[實現路線圖](2026-07-25-professional-consultant-architecture-realization-roadmap.md)
+> §10.5 的「避免**過早**建立」口徑不一致，會使合法的 append-only journal 設計被後續實作者誤判為違規。
+> **現行規定為：**
+>
+> > 第一版不做以事件為唯一真相、靠 replay 重建 Current State 的完整 Event Sourcing；允許 Current State
+> > 同交易附帶 append-only Consultation Journal。Journal 不被要求足以重建 Current State；
+> > prompt／context／model 的比較重播由 runtime 之外的 eval capture artifacts 負責。
+>
+> 依據：[R1 紅隊複審與修訂裁決](2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §3.5、
+> [ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md) 決定 18–22。
+> 以下原文保留供追溯，**該項不得據原文實作**。
+
 第一版不做：
 
 - SaaS；
@@ -1900,7 +1932,7 @@ Skill 是可執行的能力，例如：
 - 通用 multi-agent framework；
 - planner/executor 平台；
 - 任意動態 agent spawning；
-- Event Sourcing；
+- ~~Event Sourcing；~~ ←【C-05 已修正，見本節開頭修訂框】
 - token-level workflow recovery；
 - 複雜 provenance UI；
 - 全面 hash / audit platform；
@@ -2030,15 +2062,23 @@ Task 實驗時保留一個簡單單 Agent baseline，在相同：
 
 下比較。
 
-推薦架構只有在以下至少一項實質改善、且沒有 critical regression 時才值得保留：
+> **【C-02 修正｜原「至少一項實質改善」重新打開了逃生門】**
+> 原文允許僅憑「可診斷性」一項通過。**現行規定為：無 critical regression，
+> 且 Task 邊界品質（precision／recall、merge/split correctness）必須有預先定義的實質改善；
+> 若只是持平，選較簡單的 baseline／較少呼叫的架構。可診斷性與員工修改負擔只作加分，
+> 不得單獨替較複雜的架構取得通行證。**
+> 依據：[修訂裁決](2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §3.2、
+> [ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md) 決定 9–10。
 
-- Task precision／recall；
+~~推薦架構只有在以下至少一項實質改善、且沒有 critical regression 時才值得保留：~~ ←【C-02 已修正】
+
+- Task precision／recall；【必要維度】
 - correction reliability；
-- merge/split correctness；
+- merge/split correctness；【必要維度】
 - proposal integrity；
 - resume fidelity；
-- 可診斷性；
-- 員工修改負擔。
+- ~~可診斷性；~~ ←【C-02：只加分，不得單獨通行】
+- ~~員工修改負擔。~~ ←【C-02：只加分，不得單獨通行】
 
 不能因為架構看起來專業就假設它比較好。
 
@@ -2088,8 +2128,10 @@ Task 實驗時保留一個簡單單 Agent baseline，在相同：
 
 1. 固定 `turn.understand`、`work.reconcile`、`consultation.decide` 的最小輸入輸出；
 2. 準備 6–8 個高風險案例；
-3. 用一個固定便宜模型跑 2–3 trials；
-4. 與簡單單 Agent baseline 比較；
+3. 用**最強可用模型**建立品質天花板，再以 model × schema ablation 檢查便宜模型是否夠用；
+   ←【C-01 已修正；原文為「用一個固定便宜模型跑 2–3 trials」】
+4. 與**強模型 + 最小 harness** 的簡單單 Agent baseline 比較；←【W2／C-01：baseline 必須用同一個強模型，
+   否則證明不了 harness 是否承重】
 5. 人工閱讀 transcript；
 6. 先證明工具、故事、責任與 Task 邊界分析方向正確。
 

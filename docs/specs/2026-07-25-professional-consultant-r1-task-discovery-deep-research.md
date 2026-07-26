@@ -13,6 +13,22 @@
 
 ---
 
+> **【2026-07-26 修訂索引｜先讀這裡】**
+>
+> 本文件經外部紅隊複審後有五項修訂，分佈於六個章節。**原文一律保留並就地標記，不得據被否決的原文實作。**
+> 完整依據見 [R1 紅隊複審與修訂裁決](2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md)
+> 與 [ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md)。
+>
+> | 編號 | 位置 | 修訂 |
+> |---|---|---|
+> | C-01 | §10.8、§13.2 | 便宜模型優先**已否決**；改為先用最強模型建天花板 + 2×2 model × schema ablation；兩階段拆分降級為待實驗假說 |
+> | C-02 | §12.5 | exit gate 的「或可診斷性」**已否決**；Task 邊界不得退步為硬條件，判準須跑實驗前寫定 |
+> | C-03 | §11、§12 | 8 案例只作快速篩選；鎖架構前擴至 20–30；critical 跑 pass³；案例須帶 `case_family_id` 與 `source_type` |
+> | C-04 | §12.4 | 評審者拆三層：Rubric 資產／R1 blind grader／R7 product challenger |
+> | C-07 | §13.3 | Structured Output 契約：provider 保證不可攜；portable subset + deterministic verifier；endpoint pinning |
+
+---
+
 ## 1. 研究問題
 
 本文件只深入回答第一個、也是最容易讓整份 JD 失敗的問題：
@@ -41,7 +57,8 @@
 4. `work.reconcile` 如何處理一故事多工作、多故事一工作、merge／split／no-op；
 5. `consultation.decide` 如何選一個自然、有效且不引導的下一問；
 6. Prompt、Context、LLM、deterministic code 與人工評測的責任邊界；
-7. 用最少案例與低成本模型，如何先證明方向優於簡單 baseline。
+7. 用最少案例，如何先證明方向優於簡單 baseline。←【C-01 已修正；原文為「用最少案例**與低成本模型**」。
+   低成本模型是 ablation 的一個 arm，不是驗證方向的前提】
 
 ### 1.2 明確不做
 
@@ -59,13 +76,24 @@
 
 ## 2. 執行摘要
 
-### 2.1 最終推薦
+### 2.1 ~~最終推薦~~ 待實驗的主要候選【C-01】
 
 R1 推薦採用：
 
 > **兩次受約束的語意判斷，加一個普通 application controller。**
 
-概念上有三個責任，但第一版只需要兩次模型呼叫：
+> **【C-01 修正｜此推薦降級為待實驗假說】** 「兩次」不再是已定案架構。R1 必須實際比較
+> 「一次呼叫」與「兩階段」，**持平時選較簡單者（一次呼叫）**。快篩矩陣**同時**包含 A2–A5 的
+> model × schema 2×2，以及固定「最強 + 輕 schema」下 **A2 vs A6** 的兩階段／一次呼叫比較 ——
+> **不是「ablation 之後才在較佳配置比較」**；勝出配置下的 matched comparison 延後到
+> shortlist 或 shipping model gate。
+> 實驗矩陣固定為 **6 個 arm**，其中 A1 =**最強模型 + 輕 schema + 一次呼叫 + minimal harness**
+> （baseline，算在六個之內，不另計），與 A6（同配置但 full harness）對照以檢驗 **harness bundle**
+> 是否承重；定義見 §12.2 與 ADR 0040 決定 6。
+> 見 [修訂裁決](2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §3.1、
+> [ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md) 決定 5–8。
+
+概念上有三個責任，但第一版只需要兩次模型呼叫：【C-01：此句為**待實驗假說**，見上方修訂框】
 
 ```text
 員工原話 + 當輪 QuestionContext
@@ -749,10 +777,34 @@ BEI／STAR 擅長取得具體資料，但罕見事故可能比例行工作更容
 
 ### 10.8 反方八：便宜模型可能根本做不好複雜邊界
 
+> **【2026-07-26 修訂 C-01｜本節防線已被否決】**
+>
+> 原防線的順序與 2026 年權威指引相反。OpenAI 明確建議：先用**最強模型**建立品質 baseline，
+> 再換小模型 ——「**this way, you don't prematurely limit the agent's abilities, and you can diagnose
+> where smaller models succeed or fail**」。理由不是成本，是**歸因能力**。
+> Anthropic 亦指出「every component in a harness encodes an assumption about what the model can't do
+> on its own, and those assumptions are worth stress testing」：用弱模型校準 harness，
+> 會把 scaffolding 永久 over-fit 到該模型。
+>
+> **現行規定為：**
+>
+> 1. R1 的快篩矩陣是 6 個 arm，**同時**包含 A2–A5 的 model × schema 2×2
+>    （｛最強, 便宜｝×｛輕, 重 schema｝，架構固定兩階段），以及固定「最強 + 輕 schema」下
+>    **A2 vs A6** 的兩階段／一次呼叫比較，另含 A1（同配置、minimal harness）作 harness 承重對照；
+> 2. **勝出配置下的 matched comparison 延後到 shortlist 或 shipping model gate** ——
+>    不是「ablation 之後才在較佳配置比較」；
+> 3. **兩階段拆分降級為待實驗假說**，不再視為已確定架構，持平時選一次呼叫；
+> 4. shipping 模型定案時必須重跑一次該對照，並重審 harness、拆掉不再承重的 scaffolding。
+>
+> 依據：[R1 紅隊複審與修訂裁決](2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §3.1、
+> [ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md) 決定 5–8。
+> 以下原文保留供追溯，**不得據原文執行**。
+
 防線：
 
-- 固定便宜模型先驗證架構，不先花錢比較多模型；
-- 若錯誤集中在模型能力而不是 context／schema／責任分工，再用一個較強模型做小型 spot check；
+- ~~固定便宜模型先驗證架構，不先花錢比較多模型；~~ ←【C-01 已否決】
+- ~~若錯誤集中在模型能力而不是 context／schema／責任分工，再用一個較強模型做小型 spot check；~~
+  ←【C-01 已否決：順序反轉】
 - 不因換強模型暫時變好，就忽略可診斷性與 critical failure。
 
 ### 10.9 最終反方裁決
@@ -770,6 +822,25 @@ Graph、資料庫與 Web。
 ---
 
 ## 11. 最小 capability cases
+
+> **【2026-07-26 修訂 C-03｜八類案例的定位與擴充規則】**
+>
+> 八類案例本身保留，但**定位改變**：它們是**快速篩選**用的，只能淘汰明確錯誤設計，
+> **不得用於宣稱候選架構勝出**（8 個高度相關的樣本撐不起比較結論）。
+>
+> - 鎖定架構前擴至 **20–30 個**，優先取真實失敗語料，不足才補構造案例；
+> - critical case 跑 **3 trials 看 pass³**（面向員工、要求一致性的系統用 pass^k 而非 pass@k）；
+> - 每個案例必帶 `case_family_id`（統計聚類單位）與
+>   `source_type`（`constructed_edge`／`human_manual_test`／`real_employee_interview`）——
+>   **不設預設值，依實際來源分類**：人工構造或由舊 session 改寫合成＝`constructed_edge`
+>   （可另留 `source_session_ref`）；原樣使用人類操作逐字稿＝`human_manual_test`；
+>   **一律不得升級為 `real_employee_interview`**；
+> - 同一 session 衍生的多個案例共用一個 family，整組算一個單位；
+> - R1 **不做正式 power analysis**。
+>
+> 可重用的既有語料與不可沿用的舊 gold 契約，見
+> [修訂裁決](2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §5。
+> 依據：同文件 §3.3、[ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md) 決定 11–13。
 
 案例不以數量取勝。第一批固定八類，每類一個主要能力與明確禁止錯誤。
 
@@ -922,11 +993,36 @@ turn.understand
 
 ### 12.2 第一輪執行量
 
+> **【C-03 已修正｜分三階段，避免測試爆量也避免以 8 案冒充結論】**
+>
+> | 階段 | 規模 | 用途 |
+> |---|---|---|
+> | 1. 快速篩選 | 8 cases × 6 configurations × **1 trial** | **只淘汰明顯錯誤設計**，不得宣稱任何架構勝出 |
+> | 2. 候選縮小 | shortlist 後才擴至 **20–30 cases** | 形成可討論的品質判斷 |
+> | 3. Gate | 僅 shortlisted 架構的 **critical subset 跑 pass³** | 決定是否進 R2 |
+>
+> 六個 arm 的定義見
+> [ADR 0040 決定 6](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md)：
+> **A1 = 最強模型 + 輕 schema + 一次呼叫 + minimal harness**（baseline，算在六個之內，不另計）；
+> A2–A5 = 兩階段 + full harness 下的｛最強, 便宜｝×｛輕, 重 schema｝2×2；
+> **A6 = 最強模型 + 輕 schema + 一次呼叫 + full harness**（**固定配置，不是 A2–A5 勝出配置**，
+> 否則 A1 vs A6 會同時改動模型、schema 與 harness）。
+>
+> 每個比較只打開一個變因：**A1 vs A6** = harness bundle（minimal ↔ full）；**A2–A5 內部** = 模型 × schema；
+> **A2 vs A6** = 架構（兩階段 ↔ 一次呼叫）。勝出配置下的一次／兩階段複驗移到 shortlist 或 shipping gate。
+>
+> 規模＝**48 個 case-arm trial observations**；生成器模型呼叫 **80 次**
+> （單階段 2 × 8 = 16、兩階段 4 × 8 × 2 = 64），grader 呼叫另計。**不是每個 arm 都跑 pass³。**
+>
+> 原文保留於下，**不得據原文執行**。依據見
+> [修訂裁決](2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §3.3、
+> [ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md) 決定 11–12。
+
 為避免測試拖慢成品：
 
-1. 8 cases × baseline 1 次；
-2. 8 cases × candidate 1 次；
-3. 只對結果不穩或 critical 的案例補 1–2 次；
+1. ~~8 cases × baseline 1 次；~~ ←【C-03 已修正】
+2. ~~8 cases × candidate 1 次；~~ ←【C-03 已修正】
+3. ~~只對結果不穩或 critical 的案例補 1–2 次；~~ ←【C-03 已修正：改為 shortlisted 架構的 critical subset 跑 pass³】
 4. 不一開始做大規模 Monte Carlo；
 5. 不做跨十個模型排行榜。
 
@@ -971,6 +1067,25 @@ turn.understand
 
 ### 12.4 Grader 策略
 
+> **【2026-07-26 修訂 C-04｜評審者拆成三層】**
+>
+> 原文第 3 點「不讓同一模型自己判自己就是通過」方向正確但不夠。Anthropic 2026-03 的實測是
+> 「agents tend to respond by confidently praising the work—**even when, to a human observer,
+> the quality is obviously mediocre**」，其解法是**分離產生器與評審者、把評審者調成 skeptical、
+> 每條標準給硬門檻**，且校準需數輪。**現行規定為三層，共用判準但不共用 prompt 與輸出目的：**
+>
+> 1. **Job Analysis Quality Rubric** —— 單一權威判準資產（Task 邊界、支持度、禁止錯誤、完成條件）。
+> 2. **R1 Eval Grader** —— 開發期、盲測、可回 `Unknown`、**不讀產生器的 rationale**、按維度分開評分
+>    （不要一個 judge 打全部）。
+> 3. **R7 Product Challenger** —— 執行期產品元件，讀 Evidence／Current Work Model／JD，
+>    **不讀產生器自我辯護**，只輸出 blocker／疑點／追問；不得宣布完成，不得修改正式文件。
+>
+> 注意：Anthropic 觀察到的是**執行期**行為，所以 R7 也必須繼承同樣的懷疑工程（乾淨 context、明確 rubric、
+> 硬門檻），否則它在生產環境就是一台自誇機器。
+>
+> 依據：[R1 紅隊複審與修訂裁決](2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §3.4、
+> [ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md) 決定 14–17。
+
 第一版使用：
 
 1. deterministic checks：明確 actor／time／forbidden promotion；
@@ -989,12 +1104,16 @@ turn.understand
 
 候選架構至少要：
 
-- 8 個案例無 critical false promotion；
+- 8 個案例無 critical false promotion；【C-03：此為快速篩選門檻，非架構通過門檻】
 - correction 不復活；
 - 一故事多工作與多故事一工作沒有明顯過拆／過併；
 - `no-op` 可正常成立；
 - 每題只問一個主要問題；
-- 相較 baseline，在 Task 邊界或錯誤可診斷性至少一項實質更好；
+- ~~相較 baseline，在 Task 邊界或錯誤可診斷性至少一項實質更好；~~
+  ←【C-02 已修正：**Task 邊界品質不得退步為必要條件**，可診斷性只加分；且判準須在跑實驗前寫定。
+  8 案例的結果只能淘汰明確錯誤設計，不能宣稱架構勝出 —— 見
+  [修訂裁決](2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §3.2、
+  [ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md) 決定 9–11】
 - 不出現足以抵銷改善的新 critical regression。
 
 這不是正式產品 promotion，只是允許進入 R1 prototype 與 R2 多輪研究。
@@ -1014,7 +1133,18 @@ openai/gpt-5.4-mini
 [OpenRouter 官方模型頁](https://openrouter.ai/openai/gpt-5.4-mini/api)在本次研究時提供該 exact slug。
 模型價格、端點與上游供應狀態可能變動，因此實驗前再取得一次官方 catalog snapshot；研究文件不把價格寫成永久規格。
 
-### 13.2 為什麼先固定一個便宜模型
+### 13.2 ~~為什麼先固定一個便宜模型~~【已否決，見 C-01】
+
+> **【2026-07-26 修訂 C-01｜本節整節已被否決】**
+>
+> 「同時比較多模型會讓錯誤難以歸因」的顧慮成立，但解法不是**先固定弱模型**，而是**先固定強模型**：
+> 天花板未知時，任何架構結論都無法排除「模型能力不足」這個混淆因子。
+> §13.1 的 exact slug 仍然要固定，但「固定哪一個」由 2×2 ablation 決定。
+> 8 個案例 × 4 種配置的成本仍在個位數美元量級，成本不構成採用弱模型優先的理由。
+>
+> 依據：[R1 紅隊複審與修訂裁決](2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §3.1、
+> [ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md) 決定 5–8。
+> 以下原文保留供追溯，**不得據原文執行**。
 
 - 現在要驗證的是責任分工、Task rubric 與 context，而不是選模型冠軍；
 - 同時比較多模型會讓錯誤難以歸因；
@@ -1022,6 +1152,36 @@ openai/gpt-5.4-mini
 - 若 mini 模型在特定語意邊界持續失敗，再以一個較強模型做少量對照，判斷是架構問題還是能力上限。
 
 ### 13.3 可重現性
+
+> **【2026-07-26 修訂 C-07｜Structured Output 契約，屬 R1 前提，不是附註】**
+>
+> OpenRouter 官方文件（ADR 0035 的 provider 主線）明載：
+>
+> > "Support is determined **per endpoint, not just per model**."
+> > "**Enforcement varies by provider**: some guarantee schema-conforming output, while others
+> > **translate your schema into their own structured-output format or treat it as a strong hint,
+> > so exact compliance is not guaranteed on every endpoint.**"
+> > "Strict modes may also **restrict which JSON Schema features you can use**."
+>
+> 因此**沒有任何 provider 端的 schema 保證是可攜的，包括 key ordering**。責任分工必須寫死：
+>
+> | Schema 負責 | Deterministic verifier 負責 |
+> |---|---|
+> | object／array／基本型別、required、nullable union（模擬 optional）、enum、`additionalProperties: false`、基本巢狀 | quote 非空與最小有效長度、至少一個 source anchor、陣列語意去重、數值範圍、source span 真實存在、ID／跨欄位引用合法、correction target 存在、Task 不得因 schema 必填被迫產生、actor／time／ownership 語意規則 |
+>
+> **執行要求**：固定 exact model slug **與 endpoint**、`require_parameters: true`、**禁 fallback**、
+> R1 live preflight 實際送 portable schema、local verifier 永遠存在。
+>
+> **JSON Schema 容量上限不是架構常數**（OpenAI direct 與 Azure OpenAI 當期數字不同），由 resolved endpoint
+> 決定；核心規格不寫死全域 property／nesting 上限，**以 live preflight 實測為準，文件只是預期值**。
+> 帶日期的 provider 數字見[修訂裁決](2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §7。
+>
+> 「先推理後格式化」**不靠 schema 欄位順序**（可見 rationale ≠ 內部推理、可能先合理化錯誤結論、
+> 增加 token 與 schema 負擔）。依序採用：具原生 reasoning 能力的模型 → 減輕 schema →
+> 避免 forced function calling → 最後才拆兩次呼叫。
+>
+> 依據：[修訂裁決](2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §3.6、
+> [ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md) 決定 23–28。
 
 - 使用 exact model slug，不用 `auto`、`free`、`latest` 等可變 alias；
 - 記錄執行時 resolved model 與 provider endpoint；
@@ -1038,7 +1198,7 @@ openai/gpt-5.4-mini
 |---|---|---|
 | Prompt Engineering | 為 `turn.understand` 與 `work.reconcile + decide` 寫單一責任、來源約束、Task rubric、少量 examples 與 structured output | mega-prompt、CoT 要求、一次產完整 JD |
 | Context Engineering | 依 operation 提供最小高訊號 packet；保留原始片段、更正與 omission | 全 transcript、全公版、全 Work Model 每次重送 |
-| Harness Engineering | 8 cases、baseline 對照、critical checks、人工 rubric、少量重跑 | 通用 eval 平台、大量測試排列、dashboard |
+| Harness Engineering | 8 cases 快速篩選 → 20–30 cases → critical subset pass³；強模型 + 最小 harness baseline 對照、critical checks、盲測 grader、人工 rubric【C-03 修正；原文為「8 cases、baseline 對照、critical checks、人工 rubric、少量重跑」】 | 通用 eval 平台、大量測試排列、dashboard、正式 power analysis |
 | Loop Engineering | 每輪只選 broaden／deepen／clarify 之一，問一個自然問題 | 長期 Planner、固定問卷、十題清單 |
 | Graph Engineering | 保存 Message→Claim→Story／Work Unit→Task Candidate 的多對多來源關係；route 由普通 code 表達 | Graph database、LangGraph 類 runtime、N-agent graph |
 | Structured Output | 讓 operation result 可驗證、允許 no-op／unknown／unmapped | 把 schema adherence 當語意正確 |
@@ -1083,7 +1243,7 @@ openai/gpt-5.4-mini
 
 需要確認是否採用此粒度作第一版權威。
 
-### 決策二：兩次模型呼叫
+### 決策二：~~兩次模型呼叫~~【C-01：降級為待實驗假說，由 ablation 裁決；持平時選一次呼叫】
 
 推薦：
 
@@ -1106,9 +1266,12 @@ openai/gpt-5.4-mini
 
 ### 決策四：第一批測試素材
 
-推薦先使用本文 8 類小型合成案例；通過後，再加 2–3 個未放入 Prompt 的真實／匿名片段作 unseen check。
+推薦先使用本文 8 類小型合成案例；通過後，再加 2–3 個**未曝光於 Prompt 的片段**作 unseen check。
+←【C-03 已修正；原文為「真實／匿名片段」。**owner 已裁定沒有真人員工訪談資料**，
+unseen check 只能取自未用於調 prompt 的 constructed 或 human_manual_test 片段】
 
-需要確認是否有現成失敗案例希望優先加入，但總案例數仍保持少量。
+需要確認是否有現成失敗案例希望優先加入。總案例數在快速篩選階段保持少量（8），
+鎖定架構前才擴至 20–30。
 
 ### 決策五：R1 到哪裡算完成
 
@@ -1124,18 +1287,23 @@ openai/gpt-5.4-mini
 
 ### 17.1 先討論，不立即施工
 
-先由 owner 確認第 16 節五項決策，尤其是 Task 粒度與兩次模型呼叫。
+先由 owner 確認第 16 節五項決策，尤其是 Task 粒度。**兩次模型呼叫不再是待確認的決策，
+而是待實驗的假說**（C-01）：由 R1 的 ablation 裁決，持平時選一次呼叫。
 
 ### 17.2 確認後才寫 R1 實作計畫
 
 實作計畫只需包含：
 
-1. 兩個 operation 的最小輸入／輸出；
-2. 8 個 fixture；
-3. 單次 baseline；
-4. 一個 CLI runner；
-5. 簡單結果輸出與人工 rubric；
-6. OpenRouter exact-model adapter 的最薄接線；
+1. **兩種候選架構的最小輸入／輸出**：一次呼叫（單一 operation）與兩階段
+   （`turn.understand` → `work.reconcile + decide`），兩者共用同一份 Task rubric；
+   ←【C-01 已修正；原文為「兩個 operation 的最小輸入／輸出」，預設了兩階段】
+2. 8 個快速篩選 fixture，**以及擴充到 20–30 cases 的路徑**（含 `case_family_id`／`source_type` 欄位）；
+   ←【C-03 已修正；原文只有「8 個 fixture」】
+3. **強模型 + 最小 harness 的單次 baseline**；←【W2／C-01 已修正；原文為「單次 baseline」，未指定模型與 harness】
+4. 一個 CLI runner，**能跑 6 個 arm 的 ablation 矩陣並輸出 Trial Manifest**；
+5. 簡單結果輸出、**盲測 grader** 與人工 rubric；←【C-04】
+6. OpenRouter exact-model **與 exact endpoint** adapter 的最薄接線，含 `require_parameters: true`、
+   禁 fallback 與 live preflight；←【C-07】
 7. 成本上限與停止條件。
 
 ### 17.3 不可提早展開
@@ -1200,6 +1368,7 @@ Planner → 多個 Worker／Reviewer → Graph runtime → 看起來很專業
 - 每次模型判斷都有清楚責任；
 - 以 task-specific eval 與人工校準否決錯誤方向；
 - Graph 先表達關係與 route，不先引入 framework；
-- 只在評測證明需要時增加模型呼叫、reviewer 或更強模型。
+- 只在評測證明需要時增加模型呼叫、reviewer，或**為個別 operation 回補比 shipping 模型更強的模型**。
+  ←【C-01 補充：品質天花板在 R1 第一步就用最強可用模型量過；此處指降本之後的回補，不是初次升級】
 
 本文件目前仍是研究提案。第 16 節決策經 owner 確認後，才可進入 R1 implementation plan。

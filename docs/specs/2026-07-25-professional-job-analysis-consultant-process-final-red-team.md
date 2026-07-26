@@ -12,6 +12,18 @@
 
 ---
 
+> **【2026-07-26 修訂索引】** 本文件經外部紅隊複審後有兩處修訂：
+>
+> | 編號 | 位置 | 修訂 |
+> |---|---|---|
+> | C-01 | §11 第一優先 #6 | 「用便宜模型跑小批多 trial」**已修正**為先用最強可用模型建天花板，再以 ablation 檢查便宜模型 |
+> | C-08 | §5.9 Step 7 | 補上 K/S/A 與 Indicator 的四級支持度，以可查核方式落實本文既有的「不評估員工個人熟練度」原則 |
+>
+> 依據見 [R1 紅隊複審與修訂裁決](2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §3.1、§3.7、
+> [ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md)。
+
+---
+
 ## 1. 最終結論
 
 ### 1.1 能不能保證「不會出差錯」
@@ -557,6 +569,23 @@ Duty 也可以重新分組。
 
 ### 5.9 Step 7：O/P/K/S 漸進分析
 
+> **【2026-07-26 修訂 C-08｜補上支持度記錄，強化本節既有原則】**
+>
+> 本節「不評估員工個人熟練度，只描述職位完成 Task 所需能力」的原則正確，但缺少可查核的記錄方式。
+> 職務分析文獻（Morgeson, Delaney-Klinger, Mayfield, Ferrara & Campion, 2004, *JAP* 89(4), 674–686）的田野實驗
+> 發現：**在職者對 ability 陳述的評分膨脹顯著高於 task 陳述**；在該研究的 clerical supervisor 與
+> trained job analyst 補充樣本中，未重現 job incumbent 的一致 ability inflation 模式。
+> 本產品只有一位在職者、沒有主管或分析師對照樣本，因此 K/S/A 是全份資料裡最脆弱的一格。
+>
+> **補充規定**：K／S／A 與 Indicator 數值門檻一律帶支持度 ——
+> `behavior_grounded`（有 Task／故事／行為證據，可入正式 JD）／
+> `employee_confirmed`（員工明確確認是**工作要求**而非自己會，可入但保留標記）／
+> `reference_candidate`（只來自公版，僅作候選）／`unsupported`（模型推測，不得入正式 JD）。
+> Attitude 一併適用。**員工按接受不得被記錄成已有行為證據。**
+>
+> 依據：[R1 紅隊複審與修訂裁決](2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §3.7、
+> [ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md) 決定 29–32。
+
 不是四個互不相干的生成工作，也不是一次整包生成。
 
 ```text
@@ -881,7 +910,9 @@ Context 應區分：
 3. Task boundary rubric；
 4. 跨故事 add/edit/merge/split/no-op/clarify；
 5. 持續 coverage 與反證；
-6. 用便宜模型跑小批多 trial，人工讀 transcript。
+6. **先用最強可用模型**跑小批多 trial 建立品質天花板，再以 ablation 檢查便宜模型是否夠用；人工讀 transcript。
+   ←【C-01 已修正；原文為「用便宜模型跑小批多 trial」。理由見
+   [修訂裁決](2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §3.1】
 
 這一步比先完成全部 K/S、公版匯出或新基礎設施重要。
 

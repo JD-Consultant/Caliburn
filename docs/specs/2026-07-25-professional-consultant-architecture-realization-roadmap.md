@@ -10,6 +10,24 @@
 
 ---
 
+> **【2026-07-26 修訂索引｜先讀這裡】**
+>
+> 本文件經外部紅隊複審後有七項修訂，分佈於六個章節。**原文一律保留並就地標記，不得據被否決的原文執行。**
+> 完整依據見 [R1 紅隊複審與修訂裁決](2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md)
+> 與 [ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md)。
+>
+> | 編號 | 位置 | 修訂 |
+> |---|---|---|
+> | C-01 | §6.3、§6.4 | 便宜模型優先**已否決**；先用最強模型建天花板 + 2×2 model × schema ablation |
+> | C-02 | §8.7 | exit gate 的「或可診斷性」**已否決**；Task 邊界不得退步為硬條件，判準跑實驗前寫定 |
+> | C-03 | §6.3 | 8 案例只作快速篩選；鎖架構前擴至 20–30；critical 跑 pass³；案例帶 `case_family_id`／`source_type` |
+> | C-05 | §10.5 | Current State 唯一真相 + 同交易 append-only Journal（不要求可重建）；已定案，非待研究題 |
+> | C-06 | §10.5 | 三層 eval capture + 單一不可變 Trial Manifest，置於 runtime 之外 |
+> | C-08 | §11.5 | K/S/A 與 Indicator 加入四級支持度，Attitude 一併適用 |
+> | C-09 | §14.4 | 匯出須明示為採 iCAP 版型的客製 JD，非官方職能基準，不自產基準代碼 |
+
+---
+
 ## 1. 這份路線圖解決什麼
 
 前兩份權威文件已分別回答：
@@ -234,9 +252,31 @@ Revision 3：
 
 ### 6.3 小型能力案例
 
+> **【2026-07-26 修訂 C-01／C-03｜模型策略與案例規模已修正】**
+>
+> 原文第 2 點「先跑一個固定便宜模型」會混淆「模型能力不足」與「架構設計錯誤」，並使 harness 永久
+> over-fit 到弱模型；原文第 1、3 點的案例規模與 trial 數低於大廠建議一個量級。**現行規定為：**
+>
+> - **先以最強可用模型建立品質天花板，再往下換便宜模型**。快篩矩陣**同時**包含 A2–A5 的
+>   model × schema 2×2（｛最強, 便宜｝×｛輕, 重 schema｝，架構固定兩階段），以及固定「最強 + 輕 schema」下
+>   **A2 vs A6** 的兩階段／一次呼叫比較；另含 A1（同配置、minimal harness）作 harness 承重對照。
+>   **勝出配置下的 matched comparison 延後到 shortlist 或 shipping model gate。**
+>   六個 arm 的定義見 [ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md) 決定 6。
+> - 8 個案例保留作**快速篩選**（只用於淘汰明確錯誤設計，**不得用於宣稱架構勝出**）；
+>   **鎖定架構前擴至 20–30 個**，critical case 跑 3 trials 看 pass³。
+> - R1 **不做正式 power analysis**；同一 session 衍生案例共用 `case_family_id`，統計時整組算一個單位。
+> - 案例 metadata 必含 `source_type`（`constructed_edge`／`human_manual_test`／`real_employee_interview`）。
+>   **不設預設值，依實際來源分類**：人工構造＝`constructed_edge`；原樣使用人類操作逐字稿＝
+>   `human_manual_test`；由舊 session 改寫或合成的新案例＝`constructed_edge`（可另留 `source_session_ref`）。
+>   **一律不得升級為 `real_employee_interview`** —— owner 已裁定沒有真實員工訪談資料。
+>
+> 依據：[R1 紅隊複審與修訂裁決](2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §3.1、§3.3、
+> [ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md) 決定 5–13。
+> 以下原文保留供追溯，**不得據原文執行**。
+
 - 第一個切片使用 6–8 個關鍵案例；
-- 先跑一個固定便宜模型與一個簡單單 Agent baseline；
-- 日常迭代每案例先跑一次；
+- ~~先跑一個固定便宜模型與一個簡單單 Agent baseline；~~ ←【C-01 已修正】
+- ~~日常迭代每案例先跑一次；~~ ←【C-03 已修正】
 - 只有 critical 或不穩定案例在 gate 前跑 2–3 trials；
 - 發現真實新失敗才新增案例，不追求全面排列；
 - 保存模型輸出、工作模型變化、下一問與人工判斷。
@@ -245,7 +285,9 @@ Revision 3：
 
 - 先使用 fixture、CLI 或測試入口；
 - 普通 application code 表示 Execution Graph；
-- 固定單一模型與精確版本／slug；
+- 固定單一模型與精確版本／slug；【C-01 補充：exact slug 與 endpoint 仍必須固定；但「固定哪一個」由 §6.3
+  修訂框的 ablation 決定，不預設為便宜模型。另依 ADR 0040 決定 23–28：`require_parameters: true`、禁 fallback、
+  live preflight 實送 portable schema、local verifier 永遠存在】
 - Provider Adapter 保持薄；
 - 不接 Web、不建 Graph runtime、不拆微服務；
 - 不為還沒出現的 SaaS 或多人需求預留複雜欄位。
@@ -356,7 +398,7 @@ Revision 3：
 - Web；
 - Graph framework。
 
-### 8.5 第一批 8 個案例
+### 8.5 第一批 8 個案例（**定位＝快速篩選**，見 §6.3 修訂框）
 
 1. 工具名稱不是 Task；
 2. 工具操作本身有獨立 outcome 與責任，因此可以是 Task；
@@ -379,12 +421,26 @@ Revision 3：
 
 ### 8.7 Exit gate
 
+> **【2026-07-26 修訂 C-02｜最後一條的「或」已修正】**
+>
+> 原文允許候選架構在 Task 邊界沒有改善時、僅憑「可診斷性較好」通過 R1，正好抵銷 §21
+> 「Task Discovery 不優於簡單 baseline 就停」的效力。**現行規定為：**
+>
+> - **Task 邊界品質不得退步**為必要條件；可診斷性只作加分，不得單獨構成通過理由。
+> - 所有判準必須在跑實驗**之前**寫定：哪些是 deterministic check、哪些是人工 rubric、
+>   兩階段要贏多少才算贏。
+> - 8 案例的結果只能用於淘汰明確錯誤設計，不能宣稱架構勝出（見 §6.3 修訂框）。
+>
+> 依據：[R1 紅隊複審與修訂裁決](2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §3.2、
+> [ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md) 決定 9–11。
+
 - critical negative cases 不把工具、過去、他人與一次性內容誤寫為穩定 Task；
 - 一故事多工作與多故事一工作皆能形成合理候選；
 - correction 能壓過舊說法；
 - `no-op` 是正常結果，不強迫每輪產生 Task；
 - 下一問自然、單一、不引導；
-- 相對簡單單 Agent baseline，Task 邊界或可診斷性至少有一項實質改善，且無 critical regression。
+- ~~相對簡單單 Agent baseline，Task 邊界或可診斷性至少有一項實質改善，且無 critical regression。~~
+  ←【C-02 已修正：Task 邊界不得退步為硬條件，可診斷性只加分】
 
 若失敗，優先調整 claim、Work Unit、Task rubric、context packet 或 operation 分工；不要接資料庫與 Web。
 
@@ -505,12 +561,31 @@ R5 再加入：
 
 ### 10.5 要研究
 
-- 哪一份 state 是 authority，哪些摘要只作索引；
+> **【2026-07-26 修訂 C-05／C-06｜第 1 與第 6 點已改為定案，不再是待研究題】**
+>
+> 狀態與歷史的邊界已裁定如下，R3 研究不必再重新開放：
+>
+> ```text
+> Current Work Model / Current JD  = 唯一現況真相；reload 直接讀取，不 replay
+> Consultation Journal             = append-only（回合、員工決策、直接編輯），與現況修改同一 transaction；
+>                                    不要求足以重建 Current State
+> Eval Capture（runtime 之外）      = prompt／context／model 的比較重播，不參與 production reload
+> ```
+>
+> Eval capture 保存三層（source/state snapshot／context packet + operation input／trial evidence），
+> 由單一 **Trial Manifest**（一次 trial 一份、寫入後不可變）管理版本來源；
+> `resolved_model`／`resolved_provider+endpoint` 必須取自**回應**，不得由請求推斷。
+>
+> 依據：[R1 紅隊複審與修訂裁決](2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §3.5、
+> [ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md) 決定 18–22。
+> 以下原文保留供追溯；其餘 4 點仍為 R3 待研究題。
+
+- 哪一份 state 是 authority，哪些摘要只作索引；【C-05 已定案，見本節修訂框】
 - 更正、否定與 supersession 如何在恢復後保持優先；
 - operation-specific context 如何從同一 state 重建；
 - 最小本機儲存與完整回合提交邊界；
 - provider／parse 失敗時如何保留上一完整回合；
-- 如何避免過早建立 event sourcing、workflow checkpoint 或全面 hash。
+- 如何避免過早建立 event sourcing、workflow checkpoint 或全面 hash。【C-05 已定案，見本節修訂框】
 
 ### 10.6 Exit gate
 
@@ -568,9 +643,30 @@ Duty 在有一批相對穩定 Task 後，依共同 purpose、outcome、responsib
 
 ### 11.5 Exit gate
 
+> **【2026-07-26 修訂 C-08｜K/S/A 與 Indicator 加入支持度，原 gate 不足】**
+>
+> 原文只要求 task linkage 與禁止無來源數字。職務分析文獻（Morgeson et al. 2004, *JAP* 89(4), 674–686）顯示
+> **在職者對 ability 陳述的評分膨脹顯著高於 task 陳述**，而本產品沒有主管或分析師對照樣本，
+> 因此 K/S/A 是全份資料裡最脆弱的一格。**現行規定為：**
+>
+> | 支持度 | 定義 | 可否進正式 JD |
+> |---|---|---|
+> | `behavior_grounded` | 有具體 Task／故事／行為證據 | 可 |
+> | `employee_confirmed` | 員工明確確認這是**工作要求**，不只是自己會 | 可，但保留標記 |
+> | `reference_candidate` | 只來自公版 | 只能作候選 |
+> | `unsupported` | 模型推測 | 不可 |
+>
+> - Attitude 與 Indicator 數值門檻**一併適用**。
+> - 系統必須區分「員工會什麼」與「這份工作要求什麼」；「需要 Java」「主動積極」「每月 99%」
+>   都要追問其 Task、行為、產出或實際判準。
+> - **員工按接受不得被記錄成已有行為證據。**
+>
+> 依據：[R1 紅隊複審與修訂裁決](2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §3.7、
+> [ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md) 決定 29–32。
+
 - O/P/K/S/A 不要求每格都有值；
-- 所有採用的 K/S 都有 Task linkage 與白話理由；
-- 無來源數字不會成為已確認 Indicator；
+- 所有採用的 K/S 都有 Task linkage 與白話理由；【C-08 補充：另需帶支持度標記】
+- 無來源數字不會成為已確認 Indicator；【C-08 補充：Indicator 門檻同樣帶支持度】
 - Output 能涵蓋服務、狀態改變或判斷結果；
 - O/P/K/S 能觸發 Task reopen，而不是把錯誤 Task 補完整。
 
@@ -735,10 +831,23 @@ Retrieval node 只取得候選；`public.challenge` 只比較候選與 Work Mode
 
 ### 14.4 匯出
 
+> **【2026-07-26 修訂 C-09｜匯出措辭必須明示非官方職能基準】**
+>
+> 依「職能發展及應用推動要點」第 2、7、9 點，**職能基準是「特定職業或職類」層級**、以行業／職業／職類為
+> 發展範疇、由中央目的事業主管機關等發展（國際對應做法 DACUM 亦為 5–12 位專家 + 引導師的工作坊）。
+> 本產品是一位員工 + AI 產出的**企業內個別職務說明書**，因此匯出必須標示：
+>
+> > 本文件為客製職務說明書，採 iCAP 職能基準欄位版型，不代表勞動部認證或官方職能基準。
+>
+> 且**不得自行產生看起來像官方認證的職能基準代碼**。
+>
+> 依據：[R1 紅隊複審與修訂裁決](2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §3.8、
+> [ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md) 決定 33–34。
+
 至少支援：
 
 - 內部高品質 JD view；
-- 政府公版格式 projection。
+- 政府公版格式 projection。【C-09：措辭見本節修訂框】
 
 公版格式只是輸出映射，不反向限制內部資料模型。
 
@@ -833,7 +942,8 @@ R8 是可用成品，不代表已達到「取代專業顧問」的品質。接�
 只有評測證明需要，才考慮：
 
 - 對高風險 merge／split 或 final review 增加第二 Reviewer；
-- 引入更強模型處理特定 operation；
+- 為特定 operation 引入**比 shipping 模型更強**的模型；←【C-01 補充：R1 已用最強可用模型建過天花板，
+  所以這裡指的是「shipping 降本後，個別 operation 需要回補能力」，不是「第一次考慮強模型」】
 - 導入 Graph runtime；
 - fine-tuning；
 - 新增更多正式資料來源。
@@ -932,8 +1042,9 @@ Harness 可以直接呼叫相同 operation 與 state transition，但不應被 p
 2. Story／Work Unit／Task boundary 的專業判準；
 3. `work.reconcile` 的決策集合；
 4. `consultation.decide` 的早期三動作；
-5. 8 個案例與 baseline 比較方法；
-6. 固定便宜模型的 operation 設計與結構化輸出能力。
+5. 8 個案例的**快速篩選**方法與 baseline 比較設計（8 案只淘汰明確錯誤，不宣稱勝出；鎖架構前擴至 20–30）；
+6. **最強可用模型**的 operation 設計與結構化輸出能力，以及 model × schema ablation 的執行方式。
+   ←【C-01／C-03 已修正；原文為「8 個案例與 baseline 比較方法」「固定便宜模型的 operation 設計與結構化輸出能力」】
 
 ### 19.2 現在不要研究到細節
 
@@ -958,7 +1069,11 @@ Harness 可以直接呼叫相同 operation 與 state transition，但不應被 p
 - 兩種 Work Model；
 - 兩種 Graph framework。
 
-先固定模型與測試案例，只比較 baseline 與一個候選架構。若失敗，再依錯誤歸因改一個主要變因。
+~~先固定模型與測試案例，只比較 baseline 與一個候選架構。~~ ←【C-01 已修正】
+**現行做法**：R1 刻意用受控的 factorial 設計同時打開**模型**與 **schema 重量**兩個變因（2×2），
+因為兩者互為混淆因子（弱模型 + 重 schema 會同時退化，逐一變更無法歸因）。
+其餘變因（prompt、Work Model、Graph framework）仍維持一次只動一個。
+若失敗，再依錯誤歸因改一個主要變因。
 
 ---
 
@@ -999,7 +1114,9 @@ Harness 可以直接呼叫相同 operation 與 state transition，但不應被 p
 3. 檢查 Work Model 是否把語意硬塞錯類型；
 4. 檢查 operation 是否分得過細或責任重疊；
 5. 檢查 prompt／schema／verifier；
-6. 最後才考慮更強模型、Reviewer 或 Graph runtime。
+6. 最後才考慮 Reviewer 或 Graph runtime。←【C-01 已修正；原文為「最後才考慮更強模型、Reviewer 或
+   Graph runtime」。**更強模型已在 R1 第一步用來建立品質天花板，不再是最後手段**；此處要問的是
+   「便宜模型是否夠用」而不是「要不要升級模型」】
 
 ---
 
@@ -1010,7 +1127,9 @@ Harness 可以直接呼叫相同 operation 與 state transition，但不應被 p
 - 先完成本路線圖，再逐階段寫深入研究與實作計畫；
 - 採薄垂直切片，不採孤立元件完工後再整合；
 - 第一個切片是 Task Discovery；
-- R1 只用 fixture／CLI、小型 Harness、固定便宜模型與簡單 baseline；
+- R1 只用 fixture／CLI、小型 Harness、**最強可用模型建立品質天花板**，並與**強模型 + 最小 harness**
+  的簡單 baseline 對照；便宜模型於 ablation 中比較，不作為裁決架構的基準；
+  ←【C-01 已修正；原文為「固定便宜模型與簡單 baseline」】
 - Prompt、Context、Harness、Loop、Graph 在每個切片共同演進；
 - Work Graph 保存系統知道什麼，Execution Graph 決定下一步；
 - Execution Graph 第一版使用普通 application code；

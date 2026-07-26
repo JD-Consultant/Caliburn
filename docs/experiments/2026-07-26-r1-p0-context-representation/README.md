@@ -200,7 +200,8 @@ Task 邊界品質，不把 subagent 的 JSON adherence 外推為 provider 能力
 
 1. 依 [`rubric.md`](rubric.md) 完成六個案例與人工 adjudication。
 2. 為每案建立 paired `raw_context`、`raw_plus_spans_context`、`hybrid_context`、`structured_context`，
-   並以字串包含檢查驗證每個 `literal_text` 與 span 都是原 turn 的逐字子字串。
+   並以 [`assemble_context.py`](assemble_context.py) 決定性組裝；驗證每個 `literal_text` 與 span
+   都是原 turn 的逐字子字串。
 3. 凍結共同 instruction、案例與 rubric；記錄 experiment revision `1`。
 4. 跑第 1 輪 24 trials；同一 subagent 不得看到兩個 arm。
 5. 驗證輸出能否解析；保留原始輸出，不自動修 JSON。

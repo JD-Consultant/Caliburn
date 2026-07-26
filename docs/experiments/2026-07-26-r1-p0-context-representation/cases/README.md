@@ -111,12 +111,22 @@ claim table 是 P0 的**唯一自變數**。它只做原子化切分，不做任
 
 `adjudication` 不傳給受測 subagent；reviewer subagent 會收到（判 `C6_SOURCE_FIDELITY` 需要）。
 
+實際 Context 與完整 `subject_request` 由實驗目錄內的 `assemble_context.py` 組裝。例如：
+
+```powershell
+python assemble_context.py cases/CR-01-tools-not-tasks.json raw_only
+```
+
+合法 arm 為 `raw_only`、`raw_plus_spans`、`hybrid`、`structured_only`。CLI 輸出的 envelope
+只供 orchestrator 保存 metadata；受測 subagent 只收到其中的 `subject_request`。
+
 ## 驗證
 
 在實驗目錄執行：
 
 ```powershell
 python validate_cases.py cases
+python -m unittest test_assemble_context.py -v
 python -m unittest test_validate_cases.py -v
 ```
 

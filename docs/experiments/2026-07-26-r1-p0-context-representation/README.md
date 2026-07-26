@@ -233,7 +233,9 @@ Task 邊界品質，不把 subagent 的 JSON adherence 外推為 provider 能力
 - Critical：工具升格、責任邊界、merge／split、更正否定、零證據、來源忠實度。
 - Secondary：Task statement 品質、下一問價值、未支持推測、輸入負擔。
 - arm 必須先通過所有適用的 critical checks，secondary 分數才可比較。
-- 每個 critical check 允許 `unknown`；`unknown` 不算通過也不算失敗，交 owner 人工裁決。
+- 每個 critical check 允許 `unknown`。聚合固定為：任一 `fail` → `false`；無 `fail` 但有 `unknown`
+  → `null`（交 owner 裁決後才定案）；全部 `pass` → `true`。**`fail` 優先於 `unknown`**，
+  `null` 不等於通過。
 - 盲評由獨立 reviewer subagent 執行，不讀生成器 rationale，一次比較同一 case 的四份匿名輸出，
   避免不同 reviewer 尺度漂移；上線前先經 §7.6 的人工校準。
 - P0 只有 6 個案例，不做顯著性、排行榜或「最佳架構」宣稱。
@@ -247,7 +249,7 @@ Task 邊界品質，不把 subagent 的 JSON adherence 外推為 provider 能力
 
 | # | 觀察到的模式 | 決策 |
 |---|---|---|
-| 2 | Hybrid 反覆輸給 `raw_only` | 字面 claim table 被否證；第一版 Task Discovery 不建它 |
+| 2 | Hybrid 反覆輸給 `raw_only` | 字面 claim table 被否證；第一版不建 literal-claim layer；typed Evidence 仍未決 |
 | 3 | `raw_plus_spans` > `raw_only`，且 Hybrid ≈ `raw_plus_spans` | 價值來自檢索／顯著性；保留 span 選取候選，不建 literal-claim layer；typed Evidence 仍未決 |
 | 4 | `raw_plus_spans` < `raw_only` | 重貼原句有害；production 不做 span 重貼，且 Hybrid 的任何優勢須先扣除此效果再解讀 |
 | 5 | Hybrid 穩定優於 `raw_plus_spans` | 字面結構化尚未被否證，只取得「值得進一步驗證」資格；下一步測 extraction fidelity |
@@ -266,7 +268,12 @@ Task 邊界品質，不把 subagent 的 JSON adherence 外推為 provider 能力
   而被餵 spans 的 arm 會不成比例地引用那幾個 turn ID，arm 身分因此部分洩漏。無法根治。
 - 6 個 constructed cases 只適合發現明顯錯誤，不代表真實員工分布；也不是 C-03 的正式八案 screening。
 - Structured／Hybrid 使用人工製作的字面表示，只量測表示效用上限，不量測 extraction reliability。
-- 只有三個關鍵案例跑到 3 次；其餘案例 n=1，不足以宣稱穩定性。
+- 只有重複組（CR-01／CR-03／CR-05）跑到 3 次；CR-02／CR-04／CR-06 為 n=1，
+  差異只能標 `flagged_n1` 送正式 R1，不得據以下決策（rubric §5）。
+  **代價：責任邊界（CR-04／C2）在 P0 沒有可下決策的證據強度**，這是把重複配額給 merge/split 的直接後果。
+- `structured_only` 在保留顧問逐字提問之後，與 `raw_only` 的差距收窄為**句間連接詞與非主張片段**；
+  它只回答「句間膠是否承重」，不能宣稱「用結構取代原文會遺失脈絡」這種大結論
+  （見 [`cases/README.md`](cases/README.md)）。
 - 四個 arm 的字元量不同，且 `raw_plus_spans` 與 `hybrid` 的 spans 是**重複計入**的字元，
   結果要同時報告可見輸入字元數，**不得把字元較少直接解讀為效率較高**，也不把較長 Context
   自動解讀為架構較好。

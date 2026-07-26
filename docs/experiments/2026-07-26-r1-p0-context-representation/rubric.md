@@ -16,7 +16,7 @@
 
 ## 2. Critical checks
 
-每案依 `applicable_critical_checks` 判斷。任一適用項為 `fail`，該 trial 即為 `critical_pass=false`。
+每案依 `applicable_critical_checks` 判斷。聚合順序見 §2.1，不是「任一非 pass 即 false」。
 
 | Code | 必須成立 |
 |---|---|
@@ -27,19 +27,30 @@
 | `C5_ZERO_EVIDENCE` | 沒有足夠工作證據時不建立 Task |
 | `C6_SOURCE_FIDELITY` | 每個 Task 的 `source_ids` 真正支持該 Task，且沒有輸入外推測 |
 
-### 2.1 三值判定
+### 2.1 三值判定與聚合
 
 每個 check 的允許值：`pass` / `fail` / `unknown`。
 
 `unknown` 用於評審無法從輸出安全判斷的情況（例如敘述含糊、無法確定是否已把某工具排除）。
-**`unknown` 不算通過也不算失敗**，不計入 §5 的 arm 結論，交 owner 人工裁決；
-裁決結果寫回 trial record 並在 `report.md` 列出所有 `unknown` 及其人工結論。
-
 允許 `unknown` 是紅隊修訂 C-04 的要求（LLM judge 必須有出口，否則會被迫二選一而製造假訊號）。
+
+`critical_pass` 的聚合順序固定，與 [`trials/README.md`](trials/README.md) 一致：
+
+| 適用 checks 的狀態 | `critical_pass` |
+|---|---|
+| 任一 `fail` | `false` |
+| 沒有 `fail`，但存在 `unknown` | `null`（待裁決） |
+| 全部 `pass` | `true` |
+
+**`fail` 優先於 `unknown`** —— 已確認的失敗不會被另一項無法判斷的 check 洗成待裁決。
+
+`critical_pass=null` 的 trial **不是通過**，也不得直接丟棄：owner 在 `owner_resolution` 逐項裁決
+`unknown` 後重算聚合，定案值才進入 §4.3 的比較與 §5 的 arm 結論。所有 `unknown` 與其人工結論
+一律列進 `report.md`；若 `unknown` 集中在某個 arm，本身就是該 arm 輸出可判讀性較差的證據，要在報告指出。
 
 ## 3. Secondary scores
 
-每項使用 0–2 分；只在 `critical_pass=true` 的 trial 間比較。
+每項使用 0–2 分；只在 `critical_pass=true` 的 trial 間比較（`null` 者須先經 §2.1 裁決定案）。
 
 | Code | 0 | 1 | 2 |
 |---|---|---|---|
@@ -77,7 +88,8 @@ owner 先人工裁決**至少 1 個 case** 的四份輸出，再與 reviewer sub
 
 ### 4.3 Pairwise adjudication
 
-1. 先比較 critical checks（`unknown` 不計）；
+1. 先比較 critical checks。仍為 `unknown` 的項目**先送 owner 裁決**（§2.1），未定案前該 case
+   不進入 arm 層比較；不得把 `unknown` 當成 pass，也不得當成 fail；
 2. critical 相同才比較 `S1`–`S3`；
 3. 品質仍相同時，解盲後才評 `S4`，以較少元件者勝；
 4. 不以輸出較長、欄位較多或理由較像專家作為勝出依據。
@@ -92,11 +104,20 @@ owner 先人工裁決**至少 1 個 case** 的四份輸出，再與 reviewer sub
 
 ## 5. Arm 層結論
 
-- `rejected`：出現另一候選沒有的 critical regression。
+- `rejected`：在**重複組案例**（CR-01／CR-03／CR-05）出現另一候選沒有的 critical regression，
+  且達 3/3 同方向。
 - `retain_for_confirmation`：相對 `raw_only` 多通過至少一個 critical case，且無新增 critical regression。
 - `tie_prefer_simpler`：critical 與實質品質持平；依 YAGNI 選 `raw_only`。
 - `diagnostic_only`：`structured_only` 可揭露資訊損失，但不具產品候選資格。
-- `inconclusive`：關鍵案例的三次重複未達 3/3 同方向（README §10.1）。
+- `inconclusive`：重複組案例的三次重複未達 3/3 同方向（README §10.1）。
+- `flagged_n1`：差異只出現在 **n=1 案例**（CR-02／CR-04／CR-06）。
+
+**`flagged_n1` 不足以單獨支持任何 arm 結論。** CR-02／CR-04／CR-06 每格只跑一次，
+單一二元事件落在 run-to-run 變異範圍內，因此在這些案例觀察到的 regression 或 improvement
+只能列為正式 R1 的待查項，不得據以 `rejected` 或 `retain_for_confirmation`。
+`CR-04` 的責任邊界因此在 P0 **沒有可下決策的證據強度**，這是重複組選擇 CR-03（merge/split）
+換來的代價，必須寫進 `report.md`。
 
 P0 不使用總分選冠軍；`S1`–`S4` 只協助解釋 paired difference。
-任何 arm 結論都受 README §3.2 的射程限定：P0 判的是**字面 claim table**，不是 typed Work Model。
+任何 arm 結論都受 README §3.2 的射程限定：P0 判的是**字面 claim table**（literal-claim layer），
+不是 typed Work Model；`rejected` 只能否決前者。

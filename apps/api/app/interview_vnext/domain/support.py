@@ -1,7 +1,11 @@
-"""Discriminated Evidence support union for grounded short answers.
+"""Quote primitives and the discriminated Evidence support union.
 
-``Evidence.v3`` (R5-B) carries provenance as a discriminated union instead of a
-single top-level quote/span. Two support kinds exist:
+This module owns ``QuoteSpan``/``QuoteMatch``. ``evidence.py`` imports them from
+here, so the dependency runs evidence -> support only: ``Evidence.v3`` (R5-B) can
+add a ``support`` field without an import cycle.
+
+That union carries provenance instead of a single top-level quote/span. Two
+support kinds exist:
 
 - ``literal_employee_span``: the claim is directly supported by an exact quote of
   the current employee turn (the v2 quote/span semantics);
@@ -23,8 +27,24 @@ from uuid import UUID
 from pydantic import Field, model_validator
 
 from .base import DomainModel
-from .evidence import QuoteMatch, QuoteSpan
 from .identifiers import NonEmptyText, Sha256
+
+
+class QuoteSpan(DomainModel):
+    unit: Literal["unicode_code_point"] = "unicode_code_point"
+    start: int = Field(ge=0)
+    end: int = Field(gt=0)
+
+    @model_validator(mode="after")
+    def end_is_after_start(self) -> "QuoteSpan":
+        if self.end <= self.start:
+            raise ValueError("quote span end must be greater than start")
+        return self
+
+
+class QuoteMatch(StrEnum):
+    EXACT = "exact"
+    NORMALIZED = "normalized"
 
 
 class ContextualBindingKind(StrEnum):

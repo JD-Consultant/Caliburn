@@ -1,0 +1,93 @@
+{
+  "$defs": {
+    "ReviewDecisionLabel": {
+      "enum": [
+        "equivalent",
+        "narrower_but_valid",
+        "broader_unsupported",
+        "different",
+        "unknown",
+        "needs_sme"
+      ],
+      "title": "ReviewDecisionLabel",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "turn_eval_review_decision.v2",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "review_item_id": {
+      "format": "uuid",
+      "title": "Review Item Id",
+      "type": "string"
+    },
+    "review_item_hash": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Review Item Hash",
+      "type": "string"
+    },
+    "decision": {
+      "$ref": "#/$defs/ReviewDecisionLabel"
+    },
+    "violated_forbidden_gold_ids": {
+      "default": [],
+      "items": {
+        "maxLength": 64,
+        "pattern": "^[gf]-[a-z0-9]+(?:-[a-z0-9]+)*$",
+        "type": "string"
+      },
+      "title": "Violated Forbidden Gold Ids",
+      "type": "array"
+    },
+    "reason": {
+      "minLength": 1,
+      "title": "Reason",
+      "type": "string"
+    },
+    "reviewer": {
+      "minLength": 1,
+      "title": "Reviewer",
+      "type": "string"
+    },
+    "reviewed_at": {
+      "format": "date-time",
+      "title": "Reviewed At",
+      "type": "string"
+    },
+    "revision": {
+      "default": 1,
+      "minimum": 1,
+      "title": "Revision",
+      "type": "integer"
+    },
+    "supersedes_revision": {
+      "anyOf": [
+        {
+          "minimum": 1,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Supersedes Revision"
+    }
+  },
+  "required": [
+    "schema_version",
+    "review_item_id",
+    "review_item_hash",
+    "decision",
+    "reason",
+    "reviewer",
+    "reviewed_at"
+  ],
+  "title": "Caliburn interview vNext turn eval review decision v2",
+  "type": "object",
+  "$id": "https://caliburn.local/schemas/turn-eval-review-decision.v2.schema.json"
+}

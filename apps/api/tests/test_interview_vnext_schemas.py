@@ -1,17 +1,38 @@
 from __future__ import annotations
 
 import json
+import hashlib
 from pathlib import Path
 
-from app.interview_vnext.domain.schema_exports import SCHEMA_EXPORTS, published_schema
+from app.interview_vnext.domain.schema_exports import (
+    HISTORICAL_SCHEMAS,
+    SCHEMA_EXPORTS,
+    published_schema,
+)
 from app.interview_vnext.domain.write_schemas import SCHEMA_DIR
 
 
 def test_committed_vnext_schemas_match_pydantic_contracts():
-    assert {path.name for path in SCHEMA_DIR.glob("*.json")} == set(SCHEMA_EXPORTS)
+    assert {path.name for path in SCHEMA_DIR.glob("*.json")} == (
+        set(SCHEMA_EXPORTS) | HISTORICAL_SCHEMAS
+    )
     for filename in SCHEMA_EXPORTS:
         committed = SCHEMA_DIR / filename
         assert json.loads(committed.read_text(encoding="utf-8")) == published_schema(filename)
+
+
+def test_historical_vnext_schemas_are_frozen_bytes():
+    expected = {
+        "append-transcript-turn-command.v1.schema.json": "94899ac07856314a322f3a04673b552780616a4c07bb4e1a3296b04fc455a6da",
+        "apply-evidence-command.v2.schema.json": "8ebbdc3553df7f5253d3981f6fabb2f1b47804f820ab0bb4d27df800b81281bc",
+        "domain-event.v1.schema.json": "8a396f9c07aae27be70c7cefb713b92a29652118954b218eb953cdcef9a2f2cc",
+        "evidence.v2.schema.json": "2a6c5bd9dda6cc452930cc5a470e62e66492f1fa849f6a94ccc9b051a2da7088",
+        "interview-state.v2.schema.json": "713dbdb1faeaa859830f02e0a8f9899648c913c397234df3e7600ecfcbc83e70",
+        "reduction-result.v1.schema.json": "c4dc9e31c91cbbc4a58bb0a4096323a0b55ceb57ab76672819d253b4ae16b82d",
+    }
+    assert set(expected) == HISTORICAL_SCHEMAS
+    for filename, digest in expected.items():
+        assert hashlib.sha256((SCHEMA_DIR / filename).read_bytes()).hexdigest() == digest
 
 
 def test_published_schemas_have_stable_ids_and_forbid_unknown_fields():

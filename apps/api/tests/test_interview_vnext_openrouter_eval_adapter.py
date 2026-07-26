@@ -163,7 +163,7 @@ def make_request(
     binding = binding or STANDARD_BINDING
     config = config if config is not None else STANDARD_CONFIG
     operation = turn_interpret_operation()
-    schema = published_schema("turn-interpret-output.v1.schema.json")
+    schema = published_schema("turn-interpret-output.v2.schema.json")
     attempt_id = overrides.pop("attempt_id", uuid4())
     values: dict[str, Any] = {
         "run_id": RUN_ID,
@@ -514,7 +514,7 @@ class TestAdapterFailsBeforeHttp:
         # output-schema hash against the published schema and fails closed. In v2 the
         # request and projection must stay internally consistent, so the tampered
         # schema is projected and referenced by both.
-        tampered = published_schema("turn-interpret-output.v1.schema.json")
+        tampered = published_schema("turn-interpret-output.v2.schema.json")
         tampered["properties"]["tampered"] = {"type": "string"}
         tampered["required"] = [*tampered["required"], "tampered"]
         projected = project_portable_strict_output_schema(
@@ -592,13 +592,13 @@ class TestAdapterRequestProjection:
         ]
         text_format = body["response_format"]
         assert text_format["type"] == "json_schema"
-        assert text_format["json_schema"]["name"] == "turn_interpret_output_v1"
+        assert text_format["json_schema"]["name"] == "turn_interpret_output_v2"
         assert text_format["json_schema"]["strict"] is True
         assert canonical_hash(text_format["json_schema"]["schema"]) == (
             request.output_schema_hash
         )
         assert text_format["json_schema"]["schema"] == published_schema(
-            "turn-interpret-output.v1.schema.json"
+            "turn-interpret-output.v2.schema.json"
         )
         assert body["provider"] == {
             "order": [ENDPOINT_SLUG],
@@ -954,12 +954,13 @@ class TestErrorMatrix:
 # ============================ R4: success / routing / usage ==================
 
 EXPECTED_SUCCESS_OUTPUT = {
-    "schema_version": "turn_interpret_output.v1",
-    "observations": [],
-    "user_signal": "answer",
+    "schema_version": "turn_interpret_output.v2",
+    "dialogue_act": "standalone_answer",
     "episode_signal": "continue",
+    "literal_observations": [],
+    "answer_bindings": [],
     "emergent_topics": [],
-    "insufficiencies": [],
+    "turn_insufficiency_codes": [],
 }
 
 

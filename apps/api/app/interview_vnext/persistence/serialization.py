@@ -23,7 +23,10 @@ from app.interview_vnext.observability.artifacts import ArtifactRecord, Artifact
 from app.interview_vnext.observability.checkpoint import OperationCheckpoint
 from app.interview_vnext.observability.events import ExecutionEvent
 
-from .errors import PersistedDataCorruption
+from .errors import PersistedDataCorruption, UnsupportedPersistedSchemaVersion
+
+
+SUPPORTED_STATE_SCHEMA_VERSION = "interview_state.v3"
 
 
 def dump_model(model: DomainModel) -> str:
@@ -54,6 +57,28 @@ def _require_canonical(model: DomainModel, text: str, label: str, **ids: object)
         )
 
 
+def _require_supported_state_version(text: str, *, session_id: UUID | None) -> None:
+    try:
+        payload = json.loads(text)
+    except (json.JSONDecodeError, TypeError) as exc:
+        raise PersistedDataCorruption(
+            "persisted interview state is not valid JSON", session_id=session_id
+        ) from exc
+    if not isinstance(payload, dict):
+        raise PersistedDataCorruption(
+            "persisted interview state is not a JSON object", session_id=session_id
+        )
+    raw_version = payload.get("schema_version")
+    version = raw_version if isinstance(raw_version, str) else None
+    if version != SUPPORTED_STATE_SCHEMA_VERSION:
+        raise UnsupportedPersistedSchemaVersion(
+            "persisted interview state was written by an unsupported schema version",
+            expected=SUPPORTED_STATE_SCHEMA_VERSION,
+            actual=version,
+            session_id=session_id,
+        )
+
+
 def load_state(
     text: str,
     expected_hash: str,
@@ -62,8 +87,14 @@ def load_state(
     state_version: int | None = None,
 ) -> InterviewState:
     """Hydrate ``InterviewState`` and verify canonical text, hash, and the
-    normalized row identity the caller already read (§6.4 dual check)."""
+    normalized row identity the caller already read (§6.4 dual check).
 
+    The raw ``schema_version`` is read before Pydantic runs so that a readable
+    row from an older major version reports as unsupported rather than as
+    corruption — there is no dual reader and no v2→v3 upgrade (plan §8.1).
+    """
+
+    _require_supported_state_version(text, session_id=session_id)
     state: InterviewState = _validated(InterviewState, text, "interview state",
                                        session_id=session_id)
     ids = {"session_id": state.session.session_id}

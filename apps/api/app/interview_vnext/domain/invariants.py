@@ -14,11 +14,11 @@ from .evidence import (
     EvidenceSubject,
     Ownership,
     Polarity,
-    QuoteMatch,
     TimeScope,
 )
 from .job_model import CandidateJobItem, CandidateKind, CandidateStatus
 from .reason_codes import ReasonCode
+from .support import LiteralEmployeeSpanSupport, QuoteMatch
 from .transcript import TranscriptRole, TranscriptTurn
 
 
@@ -34,36 +34,57 @@ def normalize_quote(value: str) -> str:
 
 
 def assert_evidence_matches_turn(evidence: Evidence, turn: TranscriptTurn) -> None:
+    """Both support kinds anchor a span in the same employee turn.
+
+    A literal support quotes the claim itself; a contextual support quotes only
+    the short answer (是 / 每週) that resolved a QuestionFrame target. Either way
+    the span must exist verbatim in the turn — the difference in what the quote
+    *means* is the support kind's job, not this gate's (ADR 0037 §4).
+    """
+
     if turn.role != TranscriptRole.EMPLOYEE:
         raise DomainViolation(
             ReasonCode.EVIDENCE_REQUIRES_EMPLOYEE_TURN,
             "evidence may only quote an employee turn",
             details={"turn_id": str(turn.turn_id)},
         )
-    if evidence.session_id != turn.session_id or evidence.turn_id != turn.turn_id:
+    if evidence.session_id != turn.session_id or evidence.source_turn_id != turn.turn_id:
         raise DomainViolation(
             ReasonCode.EVIDENCE_TURN_MISMATCH,
             "evidence session/turn IDs do not match the quoted turn",
             details={"evidence_id": str(evidence.evidence_id)},
         )
-    if evidence.span.end > len(turn.text):
+
+    support = evidence.support
+    if isinstance(support, LiteralEmployeeSpanSupport):
+        span = support.span
+        quote = support.quote
+        quote_match = support.quote_match
+        normalization_version = support.normalization_version
+    else:
+        span = support.answer_span
+        quote = support.answer_quote
+        quote_match = QuoteMatch.EXACT
+        normalization_version = None
+
+    if span.end > len(turn.text):
         raise DomainViolation(
             ReasonCode.QUOTE_SPAN_OUT_OF_RANGE,
             "quote span exceeds the employee turn",
-            details={"text_length": len(turn.text), "span_end": evidence.span.end},
+            details={"text_length": len(turn.text), "span_end": span.end},
         )
 
-    source = turn.text[evidence.span.start : evidence.span.end]
-    if evidence.quote_match == QuoteMatch.EXACT:
-        matches = source == evidence.quote
+    source = turn.text[span.start : span.end]
+    if quote_match == QuoteMatch.EXACT:
+        matches = source == quote
     else:
-        if evidence.normalization_version != QUOTE_NORMALIZATION_VERSION:
+        if normalization_version != QUOTE_NORMALIZATION_VERSION:
             raise DomainViolation(
                 ReasonCode.NORMALIZATION_VERSION_INVALID,
                 "unsupported quote normalization version",
-                details={"normalization_version": evidence.normalization_version},
+                details={"normalization_version": normalization_version},
             )
-        matches = normalize_quote(source) == normalize_quote(evidence.quote)
+        matches = normalize_quote(source) == normalize_quote(quote)
     if not matches:
         raise DomainViolation(
             ReasonCode.QUOTE_MISMATCH,

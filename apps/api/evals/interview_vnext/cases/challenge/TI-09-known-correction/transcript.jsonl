@@ -1,4 +1,4 @@
-{"schema_version": "turn_eval_transcript_turn.v1", "turn_key": "consultant-01", "sequence": 1, "role": "consultant", "locale": "zh-TW", "text": "請描述你固定負責的報表工作。", "occurred_offset_seconds": 2}
-{"schema_version": "turn_eval_transcript_turn.v1", "turn_key": "employee-prior", "sequence": 2, "role": "employee", "locale": "zh-TW", "text": "我每週寄一次庫存報表。", "occurred_offset_seconds": 4}
-{"schema_version": "turn_eval_transcript_turn.v1", "turn_key": "consultant-02", "sequence": 3, "role": "consultant", "locale": "zh-TW", "text": "了解,還有要補充或修正的嗎?", "occurred_offset_seconds": 6}
-{"schema_version": "turn_eval_transcript_turn.v1", "turn_key": "employee-target", "sequence": 4, "role": "employee", "locale": "zh-TW", "text": "更正一下,不是每週,是每月寄一次庫存報表。", "occurred_offset_seconds": 8}
+{"schema_version":"turn_eval_transcript_turn.v2","turn_key":"consultant-01","sequence":1,"role":"consultant","locale":"zh-TW","text":"請描述你固定負責的報表工作。","occurred_offset_seconds":2}
+{"schema_version":"turn_eval_transcript_turn.v2","turn_key":"employee-prior","sequence":2,"role":"employee","locale":"zh-TW","text":"我每週寄一次庫存報表。","occurred_offset_seconds":4}
+{"schema_version":"turn_eval_transcript_turn.v2","turn_key":"consultant-02","sequence":3,"role":"consultant","locale":"zh-TW","text":"了解,還有要補充或修正的嗎?","occurred_offset_seconds":6}
+{"schema_version":"turn_eval_transcript_turn.v2","turn_key":"employee-target","sequence":4,"role":"employee","locale":"zh-TW","text":"更正一下,不是每週,是每月寄一次庫存報表。","occurred_offset_seconds":8}

@@ -444,6 +444,9 @@ class QuestionFrame(DomainModel):
                 raise ValueError("stale frame requires stale_reason and closed_at")
             if consumed or superseded:
                 raise ValueError("stale frame must not be consumed or superseded")
+
+        if closed and self.closed_at < self.opened_at:
+            raise ValueError("question frame closed_at cannot precede opened_at")
         return self
 
 

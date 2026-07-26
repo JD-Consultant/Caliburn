@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from .turn_interpret import TURN_INTERPRET_VERIFIER_POLICY_V1
+from .turn_interpret import TURN_INTERPRET_VERIFIER_POLICY_V2
 
 
 POLICY_DIR = Path(__file__).with_name("verifier_policies")
@@ -13,10 +13,10 @@ POLICY_DIR = Path(__file__).with_name("verifier_policies")
 
 def write_verifier_policies(policy_dir: Path = POLICY_DIR) -> list[Path]:
     policy_dir.mkdir(parents=True, exist_ok=True)
-    path = policy_dir / "turn-interpret-verifier.1.0.0.json"
+    path = policy_dir / "turn-interpret-verifier.2.0.0.json"
     path.write_text(
         json.dumps(
-            TURN_INTERPRET_VERIFIER_POLICY_V1.model_dump(mode="json"),
+            TURN_INTERPRET_VERIFIER_POLICY_V2.model_dump(mode="json"),
             ensure_ascii=False,
             indent=2,
         )

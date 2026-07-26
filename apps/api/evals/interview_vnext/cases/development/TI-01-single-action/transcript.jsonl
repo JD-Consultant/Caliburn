@@ -1,2 +1,2 @@
-{"schema_version": "turn_eval_transcript_turn.v1", "turn_key": "consultant-01", "sequence": 1, "role": "consultant", "locale": "zh-TW", "text": "請描述你固定負責的工作與產出。", "occurred_offset_seconds": 2}
-{"schema_version": "turn_eval_transcript_turn.v1", "turn_key": "employee-target", "sequence": 2, "role": "employee", "locale": "zh-TW", "text": "我每天早上核對前一日的出貨訂單。", "occurred_offset_seconds": 4}
+{"schema_version":"turn_eval_transcript_turn.v2","turn_key":"consultant-01","sequence":1,"role":"consultant","locale":"zh-TW","text":"請描述你固定負責的工作與產出。","occurred_offset_seconds":2}
+{"schema_version":"turn_eval_transcript_turn.v2","turn_key":"employee-target","sequence":2,"role":"employee","locale":"zh-TW","text":"我每天早上核對前一日的出貨訂單。","occurred_offset_seconds":4}

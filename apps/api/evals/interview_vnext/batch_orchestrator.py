@@ -20,6 +20,7 @@ from uuid import UUID, uuid5
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from app.interview_vnext.domain.hashing import canonical_hash
+from app.interview_vnext.domain.turn_identity import derive_proposal_ref
 from app.interview_vnext.llm.testing import (
     scripted_provider_config,
     scripted_turn_binding,
@@ -33,7 +34,7 @@ from .contracts import (
     TrialDisposition,
     TurnEvalTrial,
 )
-from .fixture_builder import materialize_reference_output
+from .fixture_builder import run_pure_reference_gate
 from .identities import trial_scoped_ids, turn_uuid
 from .loader import TurnEvalSuite
 from .review import build_review_items, edge_decision_map, import_review_decisions
@@ -97,13 +98,17 @@ def grade_execution(
     review_items = ()
     if output is not None:
         edges = build_candidate_edges(
-            inputs, evaluation.gold, output, trial_id=trial_record.trial_id
+            inputs,
+            evaluation.gold,
+            output,
+            trial_id=trial_record.trial_id,
+            report=report,
         )
         matched = {e.proposal_key for e in edges}
         unmatched = [
-            p.proposal_key
-            for p in output.observations
-            if p.proposal_key not in matched
+            derive_proposal_ref(index)
+            for index, _proposal in enumerate(output.literal_observations, 1)
+            if derive_proposal_ref(index) not in matched
         ]
         review_items = build_review_items(
             batch_id=batch_id,
@@ -114,7 +119,7 @@ def grade_execution(
             accepted_proposal_keys=accepted_keys,
             verifier_reason_codes=(
                 {
-                    decision.proposal_key: tuple(
+                    decision.proposal_ref: tuple(
                         code.value for code in decision.reason_codes
                     )
                     for decision in report.decisions
@@ -187,18 +192,21 @@ def _reference_llm_factory(suite: TurnEvalSuite):
     )
     from app.interview_vnext.llm.testing import ScriptedLlmPort, ScriptedStep
     from app.interview_vnext.observability.artifacts import build_inline_artifact
-    from datetime import UTC, datetime
+    from datetime import UTC, datetime, timedelta
 
     output_schema_id = (
-        "https://caliburn.local/schemas/turn-interpret-output.v1.schema.json"
+        "https://caliburn.local/schemas/turn-interpret-output.v2.schema.json"
     )
     index_by_id = {c.case.case_id: i for i, c in enumerate(suite.runtime_inputs)}
 
     def factory(inputs, trial_id, started_at):
         evaluation = suite.evaluation_contracts[index_by_id[inputs.case.case_id]]
-        output = materialize_reference_output(
-            inputs, evaluation.reference_output, trial_id=trial_id
-        )
+        output = run_pure_reference_gate(
+            inputs,
+            evaluation,
+            trial_id=trial_id,
+            base_time=started_at - timedelta(minutes=10),
+        ).output
         ids = trial_scoped_ids(trial_id)
         attempt_id = uuid5(ids.operation_id, "attempt/1")
         visible = build_inline_artifact(

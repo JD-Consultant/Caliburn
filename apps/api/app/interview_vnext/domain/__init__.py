@@ -2,12 +2,14 @@
 
 from .commands import (
     ApplyCandidateProposalsCommand,
-    ApplyEvidenceCommand,
     ApplyGapProposalsCommand,
     ApplyInferenceProposalsCommand,
     ApplyReviewDecisionCommand,
-    AppendTranscriptTurnCommand,
+    ApplyTurnInterpretationCommand,
+    AppendConsultantQuestionCommand,
+    AppendEmployeeTurnCommand,
     DecideInferenceCommand,
+    InvalidateQuestionFrameCommand,
     OpenEpisodeCommand,
     SupersedeInferenceCommand,
     TransitionCandidateCommand,
@@ -16,18 +18,22 @@ from .commands import (
     TransitionSessionCommand,
     WithdrawEvidenceCommand,
 )
-from .evidence import Evidence, EvidenceQualifiers, Inference, QuoteSpan
+from .evidence import Evidence, EvidenceQualifiers, Inference
 from .episode import EpisodeState, Gap
+from .interpretation import TurnInterpretationRecord
 from .job_model import CandidateJobItem
+from .question_frame import QuestionFrame, QuestionFrameDefinition
 from .reducers import (
     ReductionResult,
+    append_consultant_question,
+    append_employee_turn,
     apply_candidate_proposals,
-    apply_evidence,
     apply_gap_proposals,
     apply_inference_proposals,
     apply_review_decision,
-    append_transcript_turn,
+    apply_turn_interpretation,
     decide_inference,
+    invalidate_question_frame,
     open_episode,
     supersede_inference,
     transition_candidate,
@@ -39,16 +45,19 @@ from .reducers import (
 from .review import ReviewDecision
 from .session import InterviewSession
 from .state import InterviewState
+from .support import ContextualAnswerSupport, LiteralEmployeeSpanSupport, QuoteSpan
 from .transcript import TranscriptTurn
 
 __all__ = [
-    "ApplyEvidenceCommand",
+    "AppendConsultantQuestionCommand",
+    "AppendEmployeeTurnCommand",
     "ApplyCandidateProposalsCommand",
     "ApplyGapProposalsCommand",
     "ApplyInferenceProposalsCommand",
     "ApplyReviewDecisionCommand",
-    "AppendTranscriptTurnCommand",
+    "ApplyTurnInterpretationCommand",
     "CandidateJobItem",
+    "ContextualAnswerSupport",
     "EpisodeState",
     "Evidence",
     "EvidenceQualifiers",
@@ -56,11 +65,16 @@ __all__ = [
     "Inference",
     "InterviewSession",
     "InterviewState",
+    "InvalidateQuestionFrameCommand",
+    "LiteralEmployeeSpanSupport",
+    "QuestionFrame",
+    "QuestionFrameDefinition",
     "QuoteSpan",
     "ReductionResult",
     "ReviewDecision",
     "TranscriptTurn",
     "TransitionSessionCommand",
+    "TurnInterpretationRecord",
     "DecideInferenceCommand",
     "OpenEpisodeCommand",
     "SupersedeInferenceCommand",
@@ -68,13 +82,15 @@ __all__ = [
     "TransitionEpisodeCommand",
     "TransitionGapCommand",
     "WithdrawEvidenceCommand",
+    "append_consultant_question",
+    "append_employee_turn",
     "apply_candidate_proposals",
-    "apply_evidence",
     "apply_gap_proposals",
     "apply_inference_proposals",
     "apply_review_decision",
-    "append_transcript_turn",
+    "apply_turn_interpretation",
     "decide_inference",
+    "invalidate_question_frame",
     "open_episode",
     "supersede_inference",
     "transition_candidate",

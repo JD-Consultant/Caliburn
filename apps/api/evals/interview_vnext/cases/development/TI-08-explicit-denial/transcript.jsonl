@@ -1,2 +1,2 @@
-{"schema_version": "turn_eval_transcript_turn.v1", "turn_key": "consultant-01", "sequence": 1, "role": "consultant", "locale": "zh-TW", "text": "採購流程中你的權限到哪裡?", "occurred_offset_seconds": 2}
-{"schema_version": "turn_eval_transcript_turn.v1", "turn_key": "employee-target", "sequence": 2, "role": "employee", "locale": "zh-TW", "text": "我不負責核准採購單,也不會決定供應商,只會把資料整理好交給主管。", "occurred_offset_seconds": 4}
+{"schema_version":"turn_eval_transcript_turn.v2","turn_key":"consultant-01","sequence":1,"role":"consultant","locale":"zh-TW","text":"採購流程中你的權限到哪裡?","occurred_offset_seconds":2}
+{"schema_version":"turn_eval_transcript_turn.v2","turn_key":"employee-target","sequence":2,"role":"employee","locale":"zh-TW","text":"我不負責核准採購單,也不會決定供應商,只會把資料整理好交給主管。","occurred_offset_seconds":4}

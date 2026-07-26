@@ -2,7 +2,7 @@
   "schema_version": "turn_interpret_probe.v1",
   "probe_id": "turn-interpret-openrouter-smoke.v1",
   "contains_test_data": true,
-  "expected_output_schema_id": "https://caliburn.local/schemas/turn-interpret-output.v1.schema.json",
+  "expected_output_schema_id": "https://caliburn.local/schemas/turn-interpret-output.v2.schema.json",
   "locale": "zh-TW",
   "preceding_question": "請描述你每天固定要做的一項工作,以及它的具體產出是什麼?",
   "turn_text": "我每天早上八點會盤點冷凍庫的進貨數量,把短少或破損的品項記錄到倉儲系統,然後通知採購補貨。",

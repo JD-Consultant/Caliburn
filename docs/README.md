@@ -21,6 +21,7 @@ Monorepo:Turborepo + per-app uv。
 |---|---|---|---|---|
 | **ADR** | 為什麼這樣**決策**(脈絡 + 取捨) | 人 | `docs/adr/00NN-*.md` | explanation(決策) |
 | **spec(研究紀錄)** | 為什麼這樣做(研究/診斷/選項/比對) | 人 | `docs/specs/<date>-*.md` | explanation(研究) |
+| **experiment(實驗紀錄)** | 實際怎麼測、送了什麼、回了什麼、如何裁決 | 人/agent | `docs/experiments/<date>-<name>/` | empirical evidence |
 | **plan** | 怎麼**建**(bite-size 實作步驟) | 人/agent | `docs/plans/<date>-*.md` | how-to(建置) |
 | **design** | 這東西**怎麼運作**(端到端、click→request) | **agent**(也人) | `docs/design/`(跨 app)或該 app 底下 | reference + explanation |
 | **README(索引)** | 這裡**有什麼、住哪**(地圖) | 人/agent | 各資料夾 / 各 app | reference(導引) |
@@ -119,6 +120,7 @@ Monorepo:Turborepo + per-app uv。
 - [`design/`](design/) — **子系統端到端設計(agent-facing)**;現有 [`editor-knowledge-pack.md`](design/editor-knowledge-pack.md)(編輯器 × 知識包)、[`interview-engine.md`](design/interview-engine.md)(訪談引擎)。寫法見 [`design/README.md`](design/README.md)。
 - [`adr/`](adr/) — Architecture Decision Records(決策的「為什麼」+ 取捨;**0001–0040**)；**現行AI層方向以[ADR 0040](adr/0040-professional-consultant-engine-and-r1-validation-contract.md)為準（Accepted，2026-07-26；完整取代0038）**；provider主線為[ADR 0035](adr/0035-interview-vnext-openrouter-first-provider-boundary.md)，本機多文件／公版樣式workspace為[ADR 0039](adr/0039-local-multi-document-canonical-public-form-workspace.md)（儲存語意段落由0040修正）。0034／0036／0037／**0038** 屬vNext路線：**0038已被0040取代，勿據以開新工**；0034的greenfield原則保留但operation catalog與state形狀不再沿用。
 - [`specs/`](specs/) — 研究紀錄(研究/診斷/選項/比對)。
+- [`experiments/`](experiments/) — 小型、可追溯的模型實驗：方法、case、完整可見 prompt/input/output、rubric、結果與限制；實驗結論須再經 spec／ADR 採納才成為架構 authority。
 - [`plans/`](plans/) — bite-size 實作計畫。
 - [`ocs-schema.md`](ocs-schema.md) — OCS **著作產出**文件 JSON 結構與代碼規則(T/P/O/K/S/A);`packages/ocs-contract` 依據。
 - [`ocs-source-json.md`](ocs-source-json.md) — OCS **來源**(PDF→JSON)契約注意事項:欄位基數、indexer 取用。

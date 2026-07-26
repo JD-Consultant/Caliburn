@@ -3,12 +3,13 @@
 Caliburn 現行目標是給員工使用的**本機 Web AI 職務分析與職務說明書應用程式**。Web UI/API/資料在員工電腦本機運行；
 員工不拿遠端產品網址、不註冊、不登入、
 沒有帳號密碼；第一版是一名本機操作者、一次開啟一份職務說明書，但可以保存並重新開啟多份彼此隔離的本機
-職務說明書。repo 仍含早期多租戶 B2B SaaS 程式，但那不是目前產品方向。
-除非 owner 明確指示，不得新增 SaaS、organization/member/ACL、登入、計費、tenant administration、雲端部署或多人協作。
+職務說明書。repo 不做多租戶 B2B SaaS 程式——owner 已明確指示，不得新增 SaaS、organization/member/ACL、
+登入、計費、tenant administration、雲端部署或多人協作。
 完整產品範圍鎖定見 `docs/product-notes.md`。Monorepo。維護者用**繁體中文**,請用繁中回應。
 
 > 記憶是 per-project 的,不會跨資料夾搬。**這個 repo 的 `AGENTS.md` + `docs/` 才是權威**;
 > 不確定就讀下面指的文件,別憑空猜。
+> 本檔是唯一來源:`CLAUDE.md` 只做 `@AGENTS.md` import,**要改 orientation 就改這裡**,別在 `CLAUDE.md` 抄一份。
 
 ## 最重要:工作紀律(每個變更都照這個)
 
@@ -33,6 +34,17 @@ Caliburn 現行目標是給員工使用的**本機 Web AI 職務分析與職務�
 - 本機 Web app 可呼叫 OpenRouter，不代表必須完全離線；API key 是 owner／開發設定，不是員工帳號流程。
 - 不為未被要求的 SaaS、generic framework、全面 hash／audit 或測試排列拖延成品；仍保留會直接保護文件真相、員工決策、
   provenance與交易正確性的核心安全網。
+
+### 輸出風格
+
+- **文檔長度照任務給** —— `docs/specs/`、ADR、`docs/plans/` 講清楚實質內容就停;不要補填充章節、
+  重複摘要、樣板段落。ADR 就是 Nygard 那幾段(context / decision / consequences),不是論文。
+- **回應精簡** —— 動手前一句話說要做什麼;過程中只在有發現或改方向時回報;收尾第一句先講結果,
+  細節放後面。但書與免責從簡。
+- **少開 subagent** —— 只有大型、真正獨立可平行的工作(例如跨多檔案的橫向調查)才委派。幾個 tool call
+  能做完的不要委派;**不要開 subagent 複查自己的工作**;一個能做完就別開多個。
+- 規則 4 的測試綠燈、一 task 一 commit 是工程紀律,留著。但**不要再加「做完自己再複查一遍」這類自我複查
+  指令** —— 模型本來就會自查,重複下令只會多燒 token 而不提升品質。
 
 ## 架構(權威:`ARCHITECTURE.md` + `docs/adr/README.md`)
 
@@ -70,7 +82,8 @@ Caliburn 現行目標是給員工使用的**本機 Web AI 職務分析與職務�
 - **Bash/PowerShell 工具的 cwd 未必是你以為的 repo**——Bash 工具每次 reset cwd,且可能落在別的
   checkout(封存的舊 repo,或 worktree 開發時落回主 checkout `main`);徵狀似是而非(grep 找不到明明
   存在的欄位)。**動手前 `pwd` + `git branch --show-current` 驗證**;docker compose 用 `-p caliburn`
-  並從 repo 根跑。**本機絕對路徑 / 封存舊 repo 位置 / GPU 型號見 `Codex.local.md`。**
+  並從 repo 根跑。**本機絕對路徑 / 封存舊 repo 位置 / GPU 型號見 `CLAUDE.local.md`**(gitignored;
+  Codex 讀者另有 `Codex.local.md` 位置,兩者都在 `.gitignore`)。
 - GPU-in-Docker 已驗證可用(Docker Desktop + WSL2、`nvidia` runtime);embedder 容器用 `gpus: all`。
 - `run_live.py` 的 reload 已關(改後端碼要手動重啟);git autocrlf(比對 codegen 用 `git diff` 不要用
   原始 diff);uv venv 沒有 pip,用 `uv pip`;CJK 用 `PYTHONUTF8=1`。

@@ -16,9 +16,9 @@
 1. 強模型直接閱讀原始對話，是否已足以正確辨識 Task？
 2. 把關鍵原句重貼一次（提高顯著性）本身是否就足以解釋任何改善？
 3. 在完整原文之外再加一份**字面 claim table**，是否另外還有價值？
-4. 若用結構取代原文，會遺失多少否定、更正、時間、責任邊界與故事脈絡？
+4. 若用字面結構取代員工原話、但仍保留顧問逐字提問，會遺失多少否定、更正、時間、責任邊界與故事脈絡？
 
-**P0 是否證實驗。** 它可以證明「人工整理的字面 claim table 沒有加值」，因此第一版不建；
+**P0 是否證實驗。** 它可以證明「人工整理的字面 claim table 沒有加值」，因此第一版不建這層；
 但它**不能**因為人工理想表示表現好就宣稱 Evidence 架構已成立——那只換得「值得進一步驗證」資格。
 本實驗不選 OpenRouter shipping model，也不驗證 provider structured output、routing、成本或 latency。
 
@@ -33,8 +33,8 @@
 ADR 0040 的正式 R1 六 arm 會同時比較 model、schema、單／雙階段與整體 harness。它可以判斷 full harness
 是否承重，卻不能單獨歸因 Context 表示的價值。
 
-若連理想化的字面結構表示都無法優於 Raw-only 與 Raw+Spans，就不應先建 Evidence Engine 或完整
-Context Engine。
+若連理想化的字面結構表示都無法優於 Raw-only 與 Raw+Spans，就不應先建專用的 literal-claim layer。
+typed Evidence／Work Model 的價值仍超出 P0 射程，不能由這個結果一併否決。
 
 ## 3. 受測 arms
 
@@ -45,7 +45,7 @@ Context Engine。
 | `raw_only` | 完整案例 transcript，逐字保留 | 最簡單 baseline；測強模型能否自行理解 |
 | `raw_plus_spans` | 完整 transcript ＋ 相關原句逐字重貼一次 | 隔離**顯著性／重複**效果，不含任何結構化欄位 |
 | `hybrid` | 完整 transcript ＋ 相同相關原句 ＋ 字面 claim table | 測 claim table 在顯著性之外是否另有價值 |
-| `structured_only` | 只有字面 claim table | 資訊損失診斷；**不是產品候選** |
+| `structured_only` | 顧問 turns 逐字保留；員工 turns 由字面 claim table 取代 | 診斷員工原話被字面結構取代時的資訊損失；**不是產品候選** |
 
 三個成對比較各只打開一個變因：
 
@@ -53,7 +53,7 @@ Context Engine。
 |---|---|---|
 | `raw_only` vs `raw_plus_spans` | 關鍵原句是否被重貼 | 顯著性／重複是否有幫助 |
 | `raw_plus_spans` vs `hybrid` | 是否附 claim table | 結構化是否另外有價值 |
-| `raw_only` vs `structured_only` | 用結構取代原文 | 取代會損失什麼 |
+| `raw_only` vs `structured_only` | 只把員工原話換成字面 claims；顧問 turns 不變 | 取代員工原話會損失什麼 |
 
 **`hybrid` 必須保留完整 transcript。** 原設計的 hybrid 省略未選中的 turns，於是同時改動了「結構」與
 「資訊刪減」兩個變因，任何差異都無法歸因。長對話壓縮是另一個問題，另開實驗。
@@ -100,8 +100,8 @@ P0 的任何結論**不得**寫成「Evidence 架構已被實驗否決／成立�
 - 每個 case × arm × 重複一個新的 subagent，`fork_context=false`
 
 **不做便宜模型快篩。** 原設計先用 `gpt-5.6-luna` 跑 18 trials 再以強模型複驗，
-但無論快篩結果如何，最終都由強模型裁決，因此快篩沒有架構裁決能力；且 scaffolding 對弱模型的邊際效益
-本來就高於強模型，快篩方向會系統性偏向 Hybrid。這與紅隊修訂 C-01 衝突，已移除。
+但無論快篩結果如何，最終都由強模型裁決，因此快篩沒有架構裁決能力，也無法排除模型能力不足這個混淆因子。
+這與紅隊修訂 C-01 衝突，已移除。
 
 ### 4.2 兩輪規模
 
@@ -113,8 +113,9 @@ P0 的任何結論**不得**寫成「Evidence 架構已被實驗否決／成立�
 合計 **42 個最強 subagent trials**。第 2 輪只重複 `raw_only`、`raw_plus_spans`、`hybrid`；
 `structured_only` 是診斷用，不重跑。
 
-關鍵案例在第一個 trial 前指定為 **CR-01、CR-04、CR-05**（工具升格、責任邊界、更正否定——
-三個最直接決定「結構是否承重」的風險）。
+關鍵案例在第一個 trial 前指定為 **CR-01、CR-03、CR-05**（工具升格、多故事錯拆成多個 Task、
+更正否定）。它們直接覆蓋前版產品的工作爆量風險、Task merge/split 與跨回合修正；CR-04 責任邊界
+仍在第 1 輪執行，但不作三次重跑。
 
 ### 4.3 Subagent 邊界
 
@@ -202,7 +203,7 @@ Task 邊界品質，不把 subagent 的 JSON adherence 外推為 provider 能力
 6. **校準盲評者**：owner 先人工裁決 1 個 case 的四份輸出，與 reviewer subagent 判決比對；
    不一致以人工為準，並給 reviewer prompt 一輪修正，之後才用它裁決其餘案例。
 7. 以 rubric 逐案匿名裁決（pass／fail／unknown），先記 critical，再記 0–2 品質分。
-8. 跑第 2 輪：CR-01／CR-04／CR-05 的三個產品 arm 各補至 3 次。
+8. 跑第 2 輪：CR-01／CR-03／CR-05 的三個產品 arm 各補至 3 次。
 9. 產生 `results.csv` 與 `report.md`，將平手、失敗、`unknown` 與限制一併回報。
 10. 結果若要改變 ADR 0040 或最終架構，另開研究修訂／ADR；不得直接以實驗 README 當新 authority。
 
@@ -241,17 +242,17 @@ Task 邊界品質，不把 subagent 的 JSON adherence 外推為 provider 能力
 
 **0. 射程限定** —— 見 §3.2。P0 的結論只涵蓋「人工整理的字面 claim table」，不涵蓋 typed Work Model。
 
-**1. 一致性門檻** —— 任何刪除類決策需 CR-01／CR-04／CR-05 各 **3/3 同方向**；
+**1. 一致性門檻** —— 任何刪除類決策需 CR-01／CR-03／CR-05 各 **3/3 同方向**；
 任一案例出現 2/1 分裂即 `inconclusive`，留到正式 R1，不得在 P0 下結論。
 
 | # | 觀察到的模式 | 決策 |
 |---|---|---|
 | 2 | Hybrid 反覆輸給 `raw_only` | 字面 claim table 被否證；第一版 Task Discovery 不建它 |
-| 3 | `raw_plus_spans` > `raw_only`，且 Hybrid ≈ `raw_plus_spans` | 價值來自檢索／顯著性；做 span 選取，不做 typed Evidence |
+| 3 | `raw_plus_spans` > `raw_only`，且 Hybrid ≈ `raw_plus_spans` | 價值來自檢索／顯著性；保留 span 選取候選，不建 literal-claim layer；typed Evidence 仍未決 |
 | 4 | `raw_plus_spans` < `raw_only` | 重貼原句有害；production 不做 span 重貼，且 Hybrid 的任何優勢須先扣除此效果再解讀 |
 | 5 | Hybrid 穩定優於 `raw_plus_spans` | 字面結構化尚未被否證，只取得「值得進一步驗證」資格；下一步測 extraction fidelity |
 | 6 | `structured_only` 出現否定／更正／時間／責任／脈絡遺失 | 永遠不得單獨取代原始對話（`diagnostic_only`） |
-| 7 | critical 與實質品質持平 | 依 YAGNI 選 `raw_only`；這是 §1.1 已登記的預期結果 |
+| 7 | critical 與實質品質持平 | P0 依 YAGNI 選 `raw_only`，不建 literal-claim layer；typed Evidence 仍未決。這是 §1.1 已登記的預期結果 |
 
 **8. 不以架構完整性為理由保留。** 也不得因為人工理想表示表現好，就把它當成產品能力。
 

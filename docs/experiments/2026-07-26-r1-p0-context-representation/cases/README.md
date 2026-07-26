@@ -70,8 +70,10 @@ claim table 是 P0 的**唯一自變數**。它只做原子化切分，不做任
    一個 turn 通常產生多個 claim；一個 claim 不得跨 turn。
 4. **順序保留**：`sequence_index` 從 1 連號，依 transcript 出現順序。這是模型能判更正／否定
    先後關係的唯一線索——因為 `corrections` 欄位已刪除。
-5. **不含顧問提問**：claim table 只收 `speaker: "employee"` 的陳述；顧問問句只存在於 transcript。
-   這正是 `structured_only` 預期會遺失脈絡的地方，屬受測內容，不是缺陷。
+5. **顧問 turns 不進 claim table，但不能從 structured-only 消失**：claim table 只收
+   `speaker: "employee"` 的陳述；所有 `role: "consultant"` turns 必須逐字、完整、依原順序保留在
+   `structured_only` payload。短回答依賴提問才能理解，刪掉提問會預先製造資訊損失，而不是公平測試
+   員工原話被字面 claims 取代的效果。
 
 ## Context 組裝
 
@@ -81,7 +83,9 @@ claim table 是 P0 的**唯一自變數**。它只做原子化切分，不做任
 - `raw_plus_spans`：傳 `transcript`，再把 `relevant_span_ids` 指向的 turns **逐字重貼一次**
   為「相關片段」；不含 claim table。
 - `hybrid`：傳 `transcript` ＋ 相同的逐字相關片段 ＋ `claim_table`。
-- `structured_only`：只傳 `claim_table`。
+- `structured_only`：依 transcript 原順序組裝一條混合 stream：顧問 turns 逐字保留；每個員工 turn
+  以其 `source_turn_ids` 對應的 claim rows 取代。不得遺漏任何顧問 turn，也不得把完整員工 turn
+  偷渡回 payload。
 
 **`hybrid` 必須含完整 transcript。** 原設計省略未選中的 turns，於是同時改動「結構」與「資訊刪減」，
 差異無法歸因。長對話壓縮另開實驗。

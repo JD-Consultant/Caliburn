@@ -9,7 +9,7 @@
 ```
 
 `t0N` 是同一 case × arm 的重複序號。第 1 輪全部為 `t01`；
-第 2 輪只有 CR-01／CR-04／CR-05 的三個產品 arm 增加 `t02`、`t03`。
+第 2 輪只有 CR-01／CR-03／CR-05 的三個產品 arm 增加 `t02`、`t03`。
 
 ## JSON 格式
 
@@ -82,8 +82,9 @@
   讓 `S4` 不會把重複計入的字元讀成效率差異；
 - 原始輸出永遠保留；解析失敗不得靜默修復；
 - 只寫適用的 critical checks；
-- 三值判定：`pass` / `fail` / `unknown`。出現任何 `unknown` 時 `critical_pass` 先填 `null`，
-  由 owner 在 `owner_resolution` 裁決後才定案；
+- 三值判定：`pass` / `fail` / `unknown`。`critical_pass` 聚合順序固定為：
+  任一 `fail` → `false`；沒有 `fail` 但存在 `unknown` → `null`；全部 `pass` → `true`。
+  `unknown` 由 owner 在 `owner_resolution` 裁決後才定案；
 - reviewer 在不知道 arm 名稱、且同時看同一 case 四份匿名輸出的狀態下完成 `C*` 與 `S1`–`S3`，
   解盲後才評 `S4`；
 - `reviewer_calibrated` 記錄該裁決是否在 rubric §4.2 的人工校準之後產生；

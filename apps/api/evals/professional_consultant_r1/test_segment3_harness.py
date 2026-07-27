@@ -10,12 +10,22 @@ import pytest
 
 from .assembler import STAGE_FINAL, STAGE_UNDERSTAND, assemble_stage
 from .batch import run_batch
-from .blind_grader import build_blind_packets, build_grader_stage, merge_grader_passes
+from .blind_grader import (
+    build_blind_packets,
+    build_grader_stage,
+    gradable_views,
+    merge_grader_passes,
+)
 from .contracts import load_case, load_case_dir
 from .matrix import arm_by_id, build_observation_plans, max_generator_calls
 from .paths import CASES_DIR
 from .report import build_batch_report
-from .runner import OUTCOME_COMPLETED, OUTCOME_STAGE1_INVALID, run_observation
+from .runner import (
+    OUTCOME_COMPLETED,
+    OUTCOME_FINAL_INVALID,
+    OUTCOME_STAGE1_INVALID,
+    run_observation,
+)
 
 
 @pytest.fixture(scope="module")
@@ -205,6 +215,36 @@ def test_blind_packets_include_sources_but_hide_arms_and_reverse_order(cases) ->
     )
     assert all(arm_id not in grader_visible for arm_id in views)
     assert "decision_basis" not in grader_visible
+
+
+def test_stage1_context_withholds_stage2_task_criteria(cases) -> None:
+    """設計 §5.3：判準屬 Stage 2。Stage 1 也帶就變成同一份 context 打兩次。"""
+    case = cases[0]
+    arm = arm_by_id("A2")
+
+    stage1 = assemble_stage(case, arm, STAGE_UNDERSTAND)
+    stage2 = assemble_stage(case, arm, STAGE_FINAL, stage1_result=_stage1_output())
+
+    assert "task_policies" not in stage1.context_packet
+    assert "current_work_model" in stage1.context_packet
+    assert stage2.context_packet["task_policies"]
+
+
+@pytest.mark.asyncio
+async def test_deterministically_invalid_observations_never_reach_the_grader(cases) -> None:
+    case = cases[0]
+    plans = build_observation_plans([case])
+    good_plan = next(plan for plan in plans if plan.arm.arm_id == "A1")
+    bad_plan = next(plan for plan in plans if plan.arm.arm_id == "A6")
+
+    good = await run_observation(case, good_plan, ScriptedPort([_final_output()]))
+    bad_output = _final_output(full=True)
+    bad_output["analysis_decision"] = "propose_current_tasks"  # 宣稱有 Task 卻是空陣列
+    bad = await run_observation(case, bad_plan, ScriptedPort([bad_output]))
+
+    assert bad.outcome == OUTCOME_FINAL_INVALID
+    assert bad.canonical_view is not None  # 有值，所以不能只靠 None 判斷
+    assert gradable_views({"A1": good, "A6": bad}) == {"A1": good.canonical_view}
 
 
 def test_grader_disagreement_becomes_unknown() -> None:

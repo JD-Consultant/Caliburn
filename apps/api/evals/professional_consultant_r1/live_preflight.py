@@ -41,6 +41,11 @@ OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 DISPOSABLE_CASE_ID = "R1-PREFLIGHT-DISPOSABLE"
 # owner 於 2026-07-27 將 disposable preflight 上限提高為 US$1。
 MAX_PREFLIGHT_COST = Decimal("1.00")
+ROLE_COST_RESERVES = {
+    "strongest": Decimal("0.10"),
+    "economical": Decimal("0.04"),
+    "grader": Decimal("0.15"),
+}
 
 MODEL_PROFILES = {
     "strongest": ("openai/gpt-5.6-sol-pro", "openai/flex"),
@@ -297,7 +302,7 @@ async def fetch_catalog_binding(
 def _attest_route(
     wire: WireResult,
     binding: CatalogBinding,
-) -> tuple[str, str]:
+) -> tuple[str, str, tuple[str, ...]]:
     if wire.outcome != OUTCOME_OK or not isinstance(wire.body, dict):
         raise HarnessFailure(
             f"provider request failed before quality evaluation: {wire.outcome} "
@@ -329,8 +334,22 @@ def _attest_route(
     selected_endpoint = available[0]
     if not isinstance(selected_endpoint, dict) or selected_endpoint.get("selected") is not True:
         raise HarnessFailure("router metadata available endpoint was not selected")
-    if metadata.get("pipeline") not in (None, []):
-        raise HarnessFailure("router pipeline altered or inspected the request")
+    pipeline = metadata.get("pipeline")
+    route_limitations: tuple[str, ...] = ()
+    if pipeline not in (None, []):
+        if not isinstance(pipeline, list):
+            raise HarnessFailure("unsupported router pipeline metadata")
+        for stage in pipeline:
+            if (
+                not isinstance(stage, dict)
+                or stage.get("type") != "guardrail"
+                or stage.get("name") != "moderation"
+                or not isinstance(stage.get("data"), dict)
+            ):
+                raise HarnessFailure("unsupported router pipeline stage")
+            if stage["data"].get("flagged") is not False:
+                raise HarnessFailure("router moderation flagged or changed the request")
+        route_limitations = ("inspected_nonmutating: moderation",)
     if not facts.usable:
         raise HarnessFailure(f"route facts were not usable: {list(facts.limitations)}")
     if facts.resolved_provider is None or (
@@ -340,7 +359,21 @@ def _attest_route(
             f"resolved provider mismatch: {facts.resolved_provider!r} "
             f"!= {binding.provider_name!r}"
         )
-    return facts.resolved_model or "", facts.resolved_provider
+    return facts.resolved_model or "", facts.resolved_provider, route_limitations
+
+
+def manifest_case_identity(
+    case: dict[str, Any],
+    *,
+    suite_hash: str,
+) -> dict[str, Any]:
+    return {
+        "case_id": case["case_id"],
+        "case_revision": case["case_revision"],
+        "case_family_id": case["case_family_id"],
+        "source_type": case["source_type"],
+        "suite_hash": suite_hash,
+    }
 
 
 @dataclass
@@ -349,8 +382,17 @@ class LiveSession:
     api_key: str
     output_dir: Path
     bindings: dict[str, CatalogBinding]
+    max_cost: Decimal = MAX_PREFLIGHT_COST
     total_cost: Decimal = Decimal("0")
     call_index: int = 0
+
+    def ensure_budget(self, role: str) -> None:
+        reserve = ROLE_COST_RESERVES[role]
+        if self.total_cost + reserve > self.max_cost:
+            raise HarnessFailure(
+                f"reserved budget would exceed cap: "
+                f"US${self.total_cost} + US${reserve} > US${self.max_cost}"
+            )
 
     async def send_structured(
         self,
@@ -365,11 +407,10 @@ class LiveSession:
         context_version: str,
         context_packet: dict[str, Any],
         max_output_tokens: int,
+        case: dict[str, Any] = DISPOSABLE_CASE,
+        suite_hash: str = "disposable-preflight-no-suite",
     ) -> Any:
-        if self.total_cost >= MAX_PREFLIGHT_COST:
-            raise HarnessFailure(
-                f"preflight cost cap reached: US${self.total_cost}"
-            )
+        self.ensure_budget(role)
         binding = self.bindings[role]
         config = ProviderConfig(
             requested_model=binding.requested_model,
@@ -419,7 +460,11 @@ class LiveSession:
         resolved_provider: str | None = None
         limitations = list(wire.limitations) + list(wire.usage.limitations)
         try:
-            resolved_model, resolved_provider = _attest_route(wire, binding)
+            resolved_model, resolved_provider, route_limitations = _attest_route(
+                wire,
+                binding,
+            )
+            limitations.extend(route_limitations)
             payload = parse_chat_payload(wire.body)
             parse_outcome = "ok"
         except (HarnessFailure, ModelOutputFailure, ValueError) as exc:
@@ -427,6 +472,8 @@ class LiveSession:
             limitations.append(str(exc))
             manifest = self._manifest(
                 capture,
+                case=case,
+                suite_hash=suite_hash,
                 arm=arm,
                 prompt_version=prompt_version,
                 context_version=context_version,
@@ -444,13 +491,15 @@ class LiveSession:
         if wire.usage.cost is None:
             raise HarnessFailure("OpenRouter response omitted usage.cost")
         self.total_cost += Decimal(wire.usage.cost)
-        if self.total_cost > MAX_PREFLIGHT_COST:
+        if self.total_cost > self.max_cost:
             raise HarnessFailure(
-                f"preflight exceeded US${MAX_PREFLIGHT_COST}: US${self.total_cost}"
+                f"preflight exceeded US${self.max_cost}: US${self.total_cost}"
             )
 
         manifest = self._manifest(
             capture,
+            case=case,
+            suite_hash=suite_hash,
             arm=arm,
             prompt_version=prompt_version,
             context_version=context_version,
@@ -475,6 +524,8 @@ class LiveSession:
     def _manifest(
         capture: TrialCapture,
         *,
+        case: dict[str, Any],
+        suite_hash: str,
         arm: str,
         prompt_version: str,
         context_version: str,
@@ -487,11 +538,7 @@ class LiveSession:
         limitations: list[str],
     ) -> dict[str, Any]:
         return {
-            "case_id": DISPOSABLE_CASE_ID,
-            "case_revision": 1,
-            "case_family_id": DISPOSABLE_CASE_ID,
-            "source_type": "constructed_edge",
-            "suite_hash": "disposable-preflight-no-suite",
+            **manifest_case_identity(case, suite_hash=suite_hash),
             "arm": arm,
             "round": 0,
             "attempt": 1,
@@ -519,6 +566,8 @@ class LiveSession:
 @dataclass
 class LiveModelPort:
     session: LiveSession
+    case: dict[str, Any] | None = None
+    suite_hash: str = "disposable-preflight-no-suite"
 
     async def complete(self, stage: AssembledStage) -> Any:
         role = arm_by_id(stage.arm_id).model_role
@@ -533,6 +582,8 @@ class LiveModelPort:
             context_version=stage.context_assembler_version,
             context_packet=stage.context_packet,
             max_output_tokens=2048,
+            case=self.case or DISPOSABLE_CASE,
+            suite_hash=self.suite_hash,
         )
 
 

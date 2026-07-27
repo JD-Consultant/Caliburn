@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from decimal import Decimal
+
 import pytest
 
 from .assembler import STAGE_FINAL, assemble_stage
@@ -9,7 +11,9 @@ from .live_preflight import (
     DISPOSABLE_CASE,
     CatalogBinding,
     LiveModelPort,
+    LiveSession,
     _attest_route,
+    manifest_case_identity,
     parse_chat_payload,
     parse_grader_payload,
     select_catalog_binding,
@@ -180,4 +184,126 @@ def test_route_attestation_uses_available_not_catalog_total() -> None:
     assert _attest_route(wire, binding) == (
         binding.canonical_model,
         binding.provider_name,
+        (),
     )
+
+
+def test_route_attestation_allows_only_unflagged_nonmutating_moderation() -> None:
+    binding = CatalogBinding(
+        requested_model="anthropic/claude-opus-5",
+        canonical_model="anthropic/claude-opus-5-20260723",
+        endpoint_tag="anthropic",
+        provider_name="Anthropic",
+        prompt_price="0.000005",
+        completion_price="0.000025",
+        snapshot_hash="a" * 64,
+        model_snapshot={},
+        endpoint_snapshot={},
+    )
+
+    def wire_with_pipeline(pipeline: list[dict[str, object]]) -> WireResult:
+        return WireResult(
+            outcome=OUTCOME_OK,
+            status_code=200,
+            headers={},
+            body={
+                "openrouter_metadata": {
+                    "requested": binding.requested_model,
+                    "strategy": "direct",
+                    "attempt": 1,
+                    "endpoints": {
+                        "total": 1,
+                        "available": [
+                            {
+                                "provider": binding.provider_name,
+                                "model": binding.canonical_model,
+                                "selected": True,
+                            }
+                        ],
+                    },
+                    "pipeline": pipeline,
+                }
+            },
+            raw_text=None,
+            latency_ms=1,
+            usage=TokenUsage(cost="0.01"),
+        )
+
+    assert _attest_route(
+        wire_with_pipeline(
+            [
+                {
+                    "type": "guardrail",
+                    "name": "moderation",
+                    "data": {
+                        "engine": "openai-moderations",
+                        "flagged": False,
+                    },
+                }
+            ]
+        ),
+        binding,
+    ) == (
+        binding.canonical_model,
+        binding.provider_name,
+        ("inspected_nonmutating: moderation",),
+    )
+
+    with pytest.raises(Exception, match="flagged or changed"):
+        _attest_route(
+            wire_with_pipeline(
+                [
+                    {
+                        "type": "guardrail",
+                        "name": "moderation",
+                        "data": {"flagged": True},
+                    }
+                ]
+            ),
+            binding,
+        )
+
+    with pytest.raises(Exception, match="unsupported router pipeline"):
+        _attest_route(
+            wire_with_pipeline(
+                [
+                    {
+                        "type": "plugin",
+                        "name": "unknown-plugin",
+                        "data": {},
+                    }
+                ]
+            ),
+            binding,
+        )
+
+
+def test_live_session_stops_before_role_reserve_would_exceed_budget(tmp_path) -> None:
+    session = LiveSession(
+        client=None,
+        api_key="not-used",
+        output_dir=tmp_path,
+        bindings={},
+        max_cost=Decimal("2.50"),
+        total_cost=Decimal("2.41"),
+    )
+
+    with pytest.raises(Exception, match="reserved budget"):
+        session.ensure_budget("strongest")
+
+
+def test_formal_manifest_identity_comes_from_case_not_disposable_defaults() -> None:
+    case = {
+        "case_id": "TI-R1-08",
+        "case_revision": 3,
+        "case_family_id": "correction-family",
+        "source_type": "constructed_edge",
+    }
+
+    assert manifest_case_identity(case, suite_hash="suite-123") == {
+        "case_id": "TI-R1-08",
+        "case_revision": 3,
+        "case_family_id": "correction-family",
+        "source_type": "constructed_edge",
+        "suite_hash": "suite-123",
+    }

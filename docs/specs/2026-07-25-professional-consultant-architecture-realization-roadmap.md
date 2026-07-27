@@ -411,16 +411,18 @@ Revision 3：
 
 共享 outcome 不過度拆分與不同 outcome 不過度合併，要嵌入第 3、4 類案例，不為增加測試數而額外建立大量排列。
 
-> **【2026-07-27 補充｜八案須切 holdout】**
+> **【2026-07-27 補充｜八案全數為 development set，不切 holdout】**
 >
-> §10.6 已把「八個案例很容易被 Prompt 過度擬合」列為反方六，但原文沒有對應防護。
-> 依 [ADR 0041](../adr/0041-r1-p0-closure-first-version-context-and-holdout.md) 決定 11–14：
+> §10.6 已把「八個案例很容易被 Prompt 過度擬合」列為反方六。依
+> [ADR 0041](../adr/0041-r1-p0-closure-first-version-context-and-holdout.md) 決定 13–17：
 >
-> - **第 2 案（工具操作有獨立 outcome）與第 7 案（一次性支援）為 holdout**，在第一次 prompt 迭代
->   之前就要切開，迭代期間不得檢視其輸出、不得據以改 prompt。
-> - 迭代組只剩第 1、3、4、5、6、8 案，仍覆蓋工具／拆分／合併／時間／他人責任／更正六類。
-> - holdout **只在 shortlist 前開封一次**；開封後若再改 prompt／context／schema，該次結果作廢。
-> - **迭代組通過而 holdout 失敗＝過度擬合證據**，必須寫入 R1 報告，不得以「案例太少」帶過。
+> - **八案不切 holdout**。§11 的 `TI-R1-01`–`08` 連 `輸入核心`、`預期` 與 `Critical failure` 都已公開，
+>   而本文件是寫 prompt 的人必讀的 authority；答案已曝光的案例標成 holdout 不產生 unseen 證據。
+> - 尤其**不得抽走第 2 案**（唯一的正向案例）：抽走會把 prompt 推向「看到工具就不建 Task」的單邊最佳化。
+> - 八案期間的防線是**凍結期望**：`預期` 與 `Critical failure` 不得為配合模型輸出而改寫，要改須升 case
+>   revision。第 2、7 案另標為 **locked regression cases**（防退步），不得宣稱證明 unseen generalization。
+> - **真 holdout 延到 20–30 案擴充階段**：新建、未曝光、正反平衡、由未參與 prompt 迭代者產出，
+>   且其輸入與期望**不得寫進任何 authority 文件**。critical failure → 不得宣稱通過。
 
 ### 8.6 輸出物
 

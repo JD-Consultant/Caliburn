@@ -54,4 +54,10 @@
   收斂為「不建 literal-claim layer」。**該結論的依據是 YAGNI 與外部證據，不是本實驗的結果。**
   frozen 案例、rubric 與 assembler 保留為可重用資產，再使用須另升 revision。
 
-**目前沒有進行中的實驗。** 下一個實證是 ADR 0040 的正式 R1 六 arm 快篩（含 ADR 0041 的 2 案 holdout）。
+- [`2026-07-27-r1-task-discovery/`](2026-07-27-r1-task-discovery/) —
+  ADR 0040 正式 R1 六 arm 快篩的實驗資產。**Segment 1 完成**（八案凍結、rubric、契約與 deterministic
+  verifier，全離線），experiment revision 1，suite hash
+  `6c8863863a233830a9216a3ebae46389c91082f097b337c25404400bc93694f7`；**尚未執行任何 trial**。
+  設計 authority 在
+  [`2026-07-27-professional-consultant-r1-task-discovery-experiment-design.md`](../specs/2026-07-27-professional-consultant-r1-task-discovery-experiment-design.md)，
+  分段見 [實作計畫](../plans/2026-07-27-r1-task-discovery-implementation-plan.md)。

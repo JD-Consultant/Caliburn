@@ -183,6 +183,8 @@ async def test_success_issues_exactly_one_http_call(request_obj) -> None:
 
     def handler(req: httpx.Request) -> httpx.Response:
         calls.append(req)
+        assert req.headers["X-OpenRouter-Metadata"] == "enabled"
+        assert req.headers["X-OpenRouter-Cache"] == "false"
         return httpx.Response(
             200,
             json={"choices": [{"message": {"content": "{}"}}], "usage": {"prompt_tokens": 10}},

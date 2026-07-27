@@ -21,8 +21,10 @@ from .matrix import arm_by_id, build_observation_plans, max_generator_calls
 from .paths import CASES_DIR
 from .report import build_batch_report
 from .runner import (
+    HarnessFailure,
     OUTCOME_COMPLETED,
     OUTCOME_FINAL_INVALID,
+    OUTCOME_HARNESS_INVALID,
     OUTCOME_STAGE1_INVALID,
     ObservationResult,
     run_observation,
@@ -178,6 +180,25 @@ async def test_invalid_stage1_is_terminal_without_repair_or_second_call(cases) -
     assert result.outcome == OUTCOME_STAGE1_INVALID
     assert len(port.calls) == 1
     assert result.canonical_view is None
+
+
+@pytest.mark.asyncio
+async def test_transport_failure_is_harness_invalid_not_model_quality(cases) -> None:
+    class FailingPort:
+        async def complete(self, stage: Any) -> dict[str, Any]:
+            raise HarnessFailure("route metadata could not attest the endpoint")
+
+    case = cases[0]
+    plan = next(
+        plan for plan in build_observation_plans([case]) if plan.arm.arm_id == "A1"
+    )
+
+    result = await run_observation(case, plan, FailingPort())
+
+    assert result.outcome == OUTCOME_HARNESS_INVALID
+    assert result.call_count == 1
+    assert result.canonical_view is None
+    assert result.findings[0].check == "harness_invalid"
 
 
 def test_blind_packets_include_sources_but_hide_arms_and_reverse_order(cases) -> None:

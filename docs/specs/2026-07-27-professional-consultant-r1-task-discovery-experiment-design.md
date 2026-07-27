@@ -1,7 +1,8 @@
 # AI 專業職務分析顧問 R1：Task Discovery 實驗設計與共識草案
 
 - 日期：2026-07-27
-- 狀態：**Proposed；供 owner 與第二位審查者形成共識，尚未授權施工或付費 trial**
+- 狀態：**Accepted for implementation**（2026-07-27；owner 指示開工，第二位審查者確認共識成立）。
+  **Segment 4／5 的付費 live 執行仍需 owner 另行核准**，§12.3 的停線不變。
 - 範圍：R1 的案例、六個 arm、Prompt／Context／schema、模型、provider、grader、capture 與裁決方法
 - 不包含：Web、資料庫、正式 Current JD、O/P/K/S/A、公版檢索、多輪保存、Graph runtime、多 Agent
 - Owner 直接裁定（2026-07-27 對話，於本文件首次落成 repo 紀錄）：**「不採 GPT-5.4 mini」**
@@ -338,7 +339,7 @@ analysis_decision
 proposed_tasks[]
   - task_statement
   - intended_outcome
-  - source_quotes[]
+  - source_anchors[]        # 每筆 = { source_id, quote }
 
 next_question
   - text | null
@@ -363,9 +364,14 @@ affected_existing_task_ids[]
 這讓 A1 可依 transcript 通過共同 correction 語意，又不假裝它有能力操作看不到的 Current Work Model ID。
 State-change mechanics 由 full-only verifier／rubric 檢查，不混入 A1 vs A6 的 Task-boundary 分數。
 
+`source_anchors` 必須同時帶 `source_id` 與逐字 `quote`（設計 §4.4）：只給 quote 無法確認模型指的是
+哪一筆來源，也無法驗證更正關係。local verifier 驗 `source_id` 存在，且 quote 是**該筆** source 的子字串。
+
 模型可輸出一段短 `decision_basis` 供除錯，但：
 
 - 不要求或保存 chain-of-thought；
+- **`decision_basis` 屬於 raw output，不屬於 `CanonicalTaskReviewView`**；
+  投影成 grader packet 時由 projector 強制移除，不靠 prompt 約定；
 - blind grader 不讀 `decision_basis`；
 - `decision_basis` 不可補救缺失的來源；
 - 正式比較以 Task 結果、來源與下一問為準。

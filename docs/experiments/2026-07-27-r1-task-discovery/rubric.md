@@ -22,6 +22,9 @@
 | Deterministic checks | `verify_output.py` | 形狀／引用／逐字對應的硬失敗 |
 | Semantic dimensions | blind model grader ＋ owner | 每維度 `pass`／`fail`／`unknown` |
 
+grader 讀的是 `project_canonical_view()` 投影後的 packet：`decision_basis`、arm、model、schema、
+latency、cost 等一律在投影時被移除，**由程式保證，不靠 prompt 約定**。
+
 **deterministic 失敗優先**：任一 deterministic error 成立，該 trial 先記 invalid，
 不進語意比較（避免拿壞掉的輸出去談 Task 品質）。
 
@@ -89,7 +92,8 @@ past／other／one-off leakage；不得因 schema 必填而硬造 Task；不得�
   （n=1 之下隨機排序無法抵銷位置效應，設計 §8.2）；
 - 上線前先做校準：owner 先人工裁決一個 disposable packet，與 grader 比對，
   給 grader prompt 一輪修正後才凍結；
-- 不得改用 generator 同款模型當 grader 來省成本（grader 呼叫本來就只有個位數）。
+- 不得改用 generator 同款模型當 grader 來省成本：正序＋反序合計 **16 次 grader 呼叫**
+  （8 案 × 2），相對 80 次 generator 呼叫仍是小數目，省不出值得冒 self-grading 風險的錢。
 
 ## 7. 「實質改善」的效力上限
 

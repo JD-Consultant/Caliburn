@@ -1,7 +1,7 @@
 # R1 Task Discovery 實作計畫
 
 - 日期：2026-07-27
-- 狀態：**Segment 1 實作中**；Segment 2–5 待 owner 逐段核准
+- 狀態：**Segment 1 完成**（含第二位審查者的 corrective 修訂）；Segment 2–5 待 owner 逐段核准
 - 上位決策：[ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md)、
   [ADR 0041](../adr/0041-r1-p0-closure-first-version-context-and-holdout.md)
 - 實驗設計（唯一 authority）：
@@ -74,7 +74,7 @@ docs/experiments/2026-07-27-r1-task-discovery/
 ### 完成定義
 
 - `uv run pytest` 綠；
-- 八案通過 `validate_cases.py`；
+- 八案通過 `validate_r1_cases.py`（含 `FROZEN_SUITE_HASH` 比對）；
 - suite canonical hash 記錄於實驗 README；
 - 期望值凍結（ADR 0041 決定 15：`預期`／`Critical failure` 不得為配合模型輸出而改寫）。
 

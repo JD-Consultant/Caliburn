@@ -3,6 +3,9 @@
 **本模組不判斷「這是不是一個好 Task」。** 它只驗形狀、引用與逐字對應。
 Task 邊界品質由 rubric 的人工／model grader 決定。
 
+**fail-closed**：模型輸出是不可信輸入。任意 JSON 值都必須回 typed finding，
+絕不可以拋例外把 trial runner 打掛。
+
 Segment 2 才會補上需要網路的三條：provider route／model／endpoint 符合 binding、
 無隱藏 retry／fallback／cache replay。那些檢查不屬於本模組。
 """
@@ -17,9 +20,11 @@ from contracts import (
     CANONICAL_VIEW_KEYS,
     CHANGE_TYPES,
     FULL_ONLY_LEAK_KEYS,
+    GRADER_FORBIDDEN_KEYS,
     MIN_QUOTE_CHARS,
     NEXT_QUESTION_KEYS,
     PROPOSED_TASK_KEYS,
+    SOURCE_ANCHOR_KEYS,
     STATE_CHANGE_VIEW_KEYS,
     Result,
     existing_task_ids,
@@ -36,6 +41,11 @@ _WHITESPACE = re.compile(r"\s+")
 def _normalize(text: str) -> str:
     """比對機械重複用：收掉所有空白並 casefold。"""
     return _WHITESPACE.sub("", text).casefold()
+
+
+def _text_or_none(value: Any) -> str | None:
+    """只接受字串。任何其他型別回 None，由呼叫端記 finding。"""
+    return value if isinstance(value, str) else None
 
 
 def _check_view_shape(view: dict[str, Any], result: Result) -> None:
@@ -57,8 +67,19 @@ def _check_view_shape(view: dict[str, Any], result: Result) -> None:
         )
     if "proposed_tasks" in view and not isinstance(view["proposed_tasks"], list):
         result.error("canonical_view_shape", "proposed_tasks 必須是陣列", "canonical_view")
-    if "limitations" in view and not isinstance(view["limitations"], list):
-        result.error("canonical_view_shape", "limitations 必須是陣列", "canonical_view")
+
+    if "limitations" in view:
+        limitations = view["limitations"]
+        if not isinstance(limitations, list):
+            result.error("canonical_view_shape", "limitations 必須是陣列", "canonical_view")
+        else:
+            for i, item in enumerate(limitations):
+                if _text_or_none(item) is None:
+                    result.error(
+                        "canonical_view_shape",
+                        "limitations 的每一項都必須是字串",
+                        f"limitations[{i}]",
+                    )
 
 
 def _check_decision_consistency(view: dict[str, Any], result: Result) -> None:
@@ -85,9 +106,72 @@ def _check_next_question(view: dict[str, Any], result: Result) -> None:
         return
     for key in sorted(set(nq) - NEXT_QUESTION_KEYS):
         result.error("next_question_shape", f"next_question 不得包含欄位 {key}", "next_question")
-    text = nq.get("text")
-    if text is not None and not str(text).strip():
-        result.error("next_question_shape", "next_question.text 若非 null 就不得為空白", "next_question")
+    if "text" in nq and nq["text"] is not None:
+        text = _text_or_none(nq["text"])
+        if text is None:
+            result.error("next_question_shape", "next_question.text 必須是字串或 null", "next_question")
+        elif not text.strip():
+            result.error(
+                "next_question_shape", "next_question.text 若非 null 就不得為空白", "next_question"
+            )
+    if "purpose" in nq and nq["purpose"] is not None and _text_or_none(nq["purpose"]) is None:
+        result.error("next_question_shape", "next_question.purpose 必須是字串或 null", "next_question")
+
+
+def _check_source_anchors(
+    anchors: Any,
+    texts: dict[str, str],
+    locator: str,
+    result: Result,
+) -> None:
+    """設計 §4.4：每個 Task 至少一個 `source_id` ＋ 對應的逐字 quote，
+    且 quote 必須是**該筆** source 的子字串（不是「某一筆」）。"""
+    if not isinstance(anchors, list):
+        result.error("task_shape", "source_anchors 必須是陣列", locator)
+        return
+    if not anchors:
+        # ADR 0040 決定 25：每個 Task 至少一個 source anchor。
+        result.error("source_anchor", "Task 至少要有一個 source_anchor", locator)
+        return
+
+    seen: set[tuple[str, str]] = set()
+    for index, anchor in enumerate(anchors):
+        a_locator = f"{locator}.source_anchors[{index}]"
+        if not isinstance(anchor, dict):
+            result.error("source_anchor", "source_anchor 必須是物件", a_locator)
+            continue
+        for key in sorted(set(anchor) - SOURCE_ANCHOR_KEYS):
+            result.error("source_anchor", f"source_anchor 不得包含欄位 {key}", a_locator)
+
+        source_id = _text_or_none(anchor.get("source_id"))
+        quote = _text_or_none(anchor.get("quote"))
+        if source_id is None:
+            result.error("source_anchor", "source_anchor 缺少字串 source_id", a_locator)
+        elif source_id not in texts:
+            result.error(
+                "source_reference", f"source_id 不存在於本 case：{source_id!r}", a_locator
+            )
+
+        if quote is None:
+            result.error("source_anchor", "source_anchor 缺少字串 quote", a_locator)
+            continue
+        if len(quote.strip()) < MIN_QUOTE_CHARS:
+            result.error(
+                "quote_verbatim", f"quote 長度不足（至少 {MIN_QUOTE_CHARS} 字）：{quote!r}", a_locator
+            )
+            continue
+        if source_id is not None and source_id in texts and quote not in texts[source_id]:
+            result.error(
+                "quote_verbatim",
+                f"quote 不是 {source_id} 的逐字子字串：{quote!r}",
+                a_locator,
+            )
+
+        if source_id is not None:
+            key = (source_id, _normalize(quote))
+            if key in seen:
+                result.error("mechanical_duplication", f"同一 Task 內 anchor 重複：{quote!r}", a_locator)
+            seen.add(key)
 
 
 def _check_tasks(case: dict[str, Any], view: dict[str, Any], result: Result) -> None:
@@ -107,8 +191,10 @@ def _check_tasks(case: dict[str, Any], view: dict[str, Any], result: Result) -> 
         for key in sorted(set(task) - PROPOSED_TASK_KEYS):
             result.error("task_shape", f"Task 不得包含欄位 {key}", locator)
 
-        statement = (task.get("task_statement") or "").strip()
-        if not statement:
+        statement = _text_or_none(task.get("task_statement"))
+        if statement is None:
+            result.error("task_shape", "task_statement 必須是字串", locator)
+        elif not statement.strip():
             result.error("task_shape", "task_statement 不得為空", locator)
         else:
             norm = _normalize(statement)
@@ -121,46 +207,21 @@ def _check_tasks(case: dict[str, Any], view: dict[str, Any], result: Result) -> 
             else:
                 seen_statements[norm] = index
 
-        if not (task.get("intended_outcome") or "").strip():
+        outcome = _text_or_none(task.get("intended_outcome"))
+        if outcome is None:
+            result.error("task_shape", "intended_outcome 必須是字串", locator)
+        elif not outcome.strip():
             result.error("task_shape", "intended_outcome 不得為空", locator)
 
-        quotes = task.get("source_quotes")
-        if not isinstance(quotes, list):
-            result.error("task_shape", "source_quotes 必須是陣列", locator)
-            continue
-        if not quotes:
-            # ADR 0040 決定 25：每個 Task 至少一個 source anchor。
-            result.error("source_anchor", "Task 至少要有一個 source_quote", locator)
-
-        seen_quotes: set[str] = set()
-        for q_index, quote in enumerate(quotes):
-            q_locator = f"{locator}.source_quotes[{q_index}]"
-            if not isinstance(quote, str):
-                result.error("quote_verbatim", "source_quote 必須是字串", q_locator)
-                continue
-            stripped = quote.strip()
-            if len(stripped) < MIN_QUOTE_CHARS:
-                result.error(
-                    "quote_verbatim",
-                    f"quote 長度不足（至少 {MIN_QUOTE_CHARS} 字）：{quote!r}",
-                    q_locator,
-                )
-                continue
-            if not any(quote in text for text in texts.values()):
-                result.error(
-                    "quote_verbatim",
-                    f"quote 不是任何 source 的逐字子字串：{quote!r}",
-                    q_locator,
-                )
-            norm_quote = _normalize(quote)
-            if norm_quote in seen_quotes:
-                result.error("mechanical_duplication", f"同一 Task 內 quote 重複：{quote!r}", q_locator)
-            seen_quotes.add(norm_quote)
+        if "source_anchors" not in task:
+            result.error("source_anchor", "Task 缺少 source_anchors", locator)
+        else:
+            _check_source_anchors(task["source_anchors"], texts, locator, result)
 
 
 def _check_state_change(
     case: dict[str, Any],
-    state_change_view: dict[str, Any] | None,
+    state_change_view: Any,
     arm_class: str,
     result: Result,
 ) -> None:
@@ -183,6 +244,10 @@ def _check_state_change(
         )
         return
 
+    if not isinstance(state_change_view, dict):
+        result.error("state_change_shape", "診斷視圖必須是物件", "state_change_view")
+        return
+
     for key in sorted(set(state_change_view) - STATE_CHANGE_VIEW_KEYS):
         result.error("state_change_shape", f"診斷視圖不得包含欄位 {key}", "state_change_view")
 
@@ -202,7 +267,14 @@ def _check_state_change(
         return
 
     known = existing_task_ids(case)
-    for task_id in affected:
+    for i, task_id in enumerate(affected):
+        if _text_or_none(task_id) is None:
+            result.error(
+                "state_change_shape",
+                "affected_existing_task_ids 的每一項都必須是字串",
+                f"state_change_view.affected_existing_task_ids[{i}]",
+            )
+            continue
         if task_id not in known:
             result.error(
                 "existing_task_reference",
@@ -219,13 +291,33 @@ def _check_state_change(
         )
 
 
+def verify_grader_packet(packet: Any) -> Result:
+    """盲評 packet 的乾淨性檢查：不得攜帶 rationale、arm、model、schema 等識別資訊。
+
+    這是 `project_canonical_view` 的守門測試，用來證明 grader 看不到 arm 身分。
+    """
+    result = Result()
+    if not isinstance(packet, dict):
+        result.error("grader_packet", "grader packet 必須是物件", "grader_packet")
+        return result
+    for key in sorted(set(packet) & GRADER_FORBIDDEN_KEYS):
+        result.error("grader_packet", f"grader packet 不得包含欄位 {key}", "grader_packet")
+    for key in sorted(set(packet) - CANONICAL_VIEW_KEYS):
+        if key not in GRADER_FORBIDDEN_KEYS:
+            result.error("grader_packet", f"grader packet 出現未知欄位 {key}", "grader_packet")
+    return result
+
+
 def verify_output(
     case: dict[str, Any],
-    canonical_view: dict[str, Any],
+    canonical_view: Any,
     arm_class: str,
-    state_change_view: dict[str, Any] | None = None,
+    state_change_view: Any = None,
 ) -> Result:
-    """對單一 trial 的輸出跑所有不需網路的 deterministic checks。"""
+    """對單一 trial 的**已投影**共同視圖跑所有不需網路的 deterministic checks。
+
+    傳進來的應該是 `project_canonical_view()` 的結果，不是 raw 模型輸出。
+    """
     result = Result()
     if arm_class not in ARM_CLASSES:
         result.error("arm_contract", f"arm_class 必須是 {ARM_CLASSES} 之一", "arm_class")

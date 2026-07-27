@@ -17,6 +17,10 @@ from typing import Any
 
 CASE_SCHEMA_ID = "professional-consultant-r1-case.v1"
 
+# 本檔與 verify_output 的契約版本。改欄位、改門檻都要升這個號，
+# 並在實驗 README 記錄；**案例內容沒變就不要動 case_revision**。
+VERIFIER_REVISION = 2
+
 # ADR 0040 決定 13：依實際來源分類，八案全為人工構造。
 SOURCE_TYPES = ("constructed_edge", "human_manual_test", "real_employee_interview")
 
@@ -45,19 +49,46 @@ COMMON_DIMENSIONS = (
 # 設計 §4.2／§6.1：只有 full harness arm 具備操作既有 Task ID 的能力。
 FULL_HARNESS_ONLY_DIMENSIONS = ("state_change_targets_existing_task",)
 
-# 共同視圖允許出現的 key。多一個 key 就視為洩漏或越界（設計 §11.1）。
+# --- 兩層輸出：raw 與投影後的盲評視圖 ------------------------------------------
+#
+# 設計 §6.1 允許模型輸出一段 `decision_basis` 供除錯，但 blind grader 不得讀它。
+# 因此 raw 與 canonical 是**兩個不同的形狀**：投影時一定要把 rationale 拿掉。
+
 CANONICAL_VIEW_KEYS = frozenset(
-    {"analysis_decision", "proposed_tasks", "next_question", "limitations", "decision_basis"}
+    {"analysis_decision", "proposed_tasks", "next_question", "limitations"}
 )
-PROPOSED_TASK_KEYS = frozenset({"task_statement", "intended_outcome", "source_quotes"})
+RAW_OUTPUT_KEYS = CANONICAL_VIEW_KEYS | {"decision_basis"}
+
+PROPOSED_TASK_KEYS = frozenset({"task_statement", "intended_outcome", "source_anchors"})
+SOURCE_ANCHOR_KEYS = frozenset({"source_id", "quote"})
 NEXT_QUESTION_KEYS = frozenset({"text", "purpose"})
 STATE_CHANGE_VIEW_KEYS = frozenset({"change_type", "affected_existing_task_ids"})
 
 # 共同視圖若出現這些 key，代表 full-only 診斷欄位漏進盲評視圖。
 FULL_ONLY_LEAK_KEYS = frozenset({"change_type", "affected_existing_task_ids"})
 
+# 盲評 packet 一律不得攜帶的識別資訊（設計 §8.2）。
+GRADER_FORBIDDEN_KEYS = frozenset(
+    {
+        "decision_basis",
+        "arm",
+        "arm_id",
+        "arm_class",
+        "model",
+        "resolved_model",
+        "schema",
+        "schema_weight",
+        "stage",
+        "harness",
+        "latency_ms",
+        "cost_usd",
+        "usage",
+    }
+) | FULL_ONLY_LEAK_KEYS
+
 # quote 最小長度。ADR 0040 決定 25 只要求「非空與最小長度」，未給數字；
-# 這裡取 4（中文四字已足以定位原句），凍結前可調，調了要升 case_revision。
+# 這裡取 4（中文四字已足以定位原句）。這是 provisional threshold：
+# 它只擋過短引用，**不代表證據充分**。要調就升 VERIFIER_REVISION。
 MIN_QUOTE_CHARS = 4
 
 SEVERITY_ERROR = "error"
@@ -92,6 +123,18 @@ class Result:
         self.findings.extend(other.findings)
 
 
+def project_canonical_view(raw_output: Any) -> dict[str, Any]:
+    """把 raw 模型輸出投影成盲評視圖：**只保留 CANONICAL_VIEW_KEYS**。
+
+    `decision_basis`、arm／model／schema 等任何額外欄位一律在此被丟掉 ——
+    grader packet 的乾淨性靠這個函式保證，不靠 prompt 約定。
+    非 dict 輸入回空 dict，由 verifier 去記錄形狀錯誤。
+    """
+    if not isinstance(raw_output, dict):
+        return {}
+    return {k: v for k, v in raw_output.items() if k in CANONICAL_VIEW_KEYS}
+
+
 def canonical_json(payload: Any) -> str:
     """決定性序列化：排序 key、無多餘空白、保留非 ASCII 原字。"""
     return json.dumps(payload, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
@@ -117,9 +160,17 @@ def suite_hash(cases: list[dict[str, Any]]) -> str:
 
 
 def source_texts(case: dict[str, Any]) -> dict[str, str]:
-    return {s["source_id"]: s["text"] for s in case.get("sources", [])}
+    return {
+        s["source_id"]: s["text"]
+        for s in case.get("sources", [])
+        if isinstance(s.get("source_id"), str) and isinstance(s.get("text"), str)
+    }
 
 
 def existing_task_ids(case: dict[str, Any]) -> set[str]:
     model = case.get("initial_work_model") or {}
-    return {t["task_id"] for t in model.get("task_candidates", [])}
+    return {
+        t["task_id"]
+        for t in model.get("task_candidates", [])
+        if isinstance(t.get("task_id"), str)
+    }

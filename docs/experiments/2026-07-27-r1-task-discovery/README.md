@@ -1,9 +1,10 @@
 # R1 Task Discovery 實驗資產
 
 - 日期：2026-07-27
-- 狀態：**Segment 1 完成；沒有執行任何 trial**
-- experiment revision：**1**
+- 狀態：**Segment 1 完成（含第二位審查者 corrective 修訂）；沒有執行任何 trial**
+- experiment revision：**1**（案例內容）／verifier revision：**2**（契約與門檻）
 - suite canonical hash：`6c8863863a233830a9216a3ebae46389c91082f097b337c25404400bc93694f7`
+  —— 由 `FROZEN_SUITE_HASH` 常數與測試斷言鎖住，改案例會直接紅燈
 - 不使用：`OPENROUTER_API_KEY`、任何 provider、production route、Web、資料庫
 
 > **設計 authority 不在本目錄**，在
@@ -15,12 +16,19 @@
 
 | 檔案 | 責任 |
 |---|---|
-| [`cases/`](cases/) | 八個凍結案例 `TI-R1-01`–`08` ＋ 建立與凍結規則 |
+| [`cases/`](cases/) | 八個凍結案例 `TI-R1-01`–`08`、建立與凍結規則、[人工裁決理由](cases/adjudication.md) |
 | [`rubric.md`](rubric.md) | 裁決標準：共同／full-only 維度分層、三值聚合、anchors、效力上限 |
-| [`contracts.py`](contracts.py) | case 與兩種輸出視圖的最小契約、維度白名單、canonical hash |
+| [`contracts.py`](contracts.py) | case 與兩種輸出視圖的最小契約、維度白名單、canonical hash、`project_canonical_view()` |
 | [`validate_r1_cases.py`](validate_r1_cases.py) | 案例凍結完整性 ＋ suite hash |
 | [`verify_output.py`](verify_output.py) | 模型輸出的 deterministic checks（不需網路的部分） |
-| `test_*.py` | 50 個離線測試 |
+| `test_*.py` | 144 個離線測試（含 malformed-output 型別矩陣） |
+
+### 兩個由程式保證、不靠約定的不變量
+
+1. **raw ≠ 盲評視圖**：`decision_basis`、arm、model、schema、latency、cost 由
+   `project_canonical_view()` 在投影時強制移除；`verify_grader_packet()` 是它的守門測試。
+2. **anchor 必須指名來源**：每個 Task 的 `source_anchors[]` 帶 `source_id` ＋ 逐字 `quote`，
+   且 quote 必須是**該筆** source 的子字串 —— 只驗「出現在某個來源」擋不住張冠李戴。
 
 ## 本段**沒有**做什麼
 

@@ -28,6 +28,10 @@ CASES_DIR = Path(__file__).parent / "cases"
 
 EXPECTED_CASE_IDS = tuple(f"TI-R1-0{i}" for i in range(1, 9))
 
+# experiment revision 1 的凍結指紋。案例只要改一個字就會對不上。
+# 真的要改案例：升該案的 `case_revision`、記錄理由、更新這個常數，並視為新實驗。
+FROZEN_SUITE_HASH = "6c8863863a233830a9216a3ebae46389c91082f097b337c25404400bc93694f7"
+
 # ADR 0041 決定 15：兩案標為 locked regression anchors。
 LOCKED_REGRESSION_ANCHORS = ("TI-R1-02", "TI-R1-07")
 
@@ -211,8 +215,18 @@ def main() -> int:
     if not result.ok:
         print(f"\n案例驗證失敗：{len(result.findings)} 項")
         return 1
+
+    actual = suite_hash(cases)
     print(f"八案驗證通過（{len(cases)} 個案例）")
-    print(f"suite_canonical_hash = {suite_hash(cases)}")
+    print(f"suite_canonical_hash = {actual}")
+    if actual != FROZEN_SUITE_HASH:
+        print(
+            "\n凍結指紋不符！案例已被改動。\n"
+            f"  expected = {FROZEN_SUITE_HASH}\n"
+            f"  actual   = {actual}\n"
+            "若為刻意修改：升該案 case_revision、記錄理由、更新 FROZEN_SUITE_HASH，並視為新實驗。"
+        )
+        return 1
     return 0
 
 

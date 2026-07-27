@@ -8,7 +8,12 @@ from pathlib import Path
 import pytest
 
 from contracts import load_case, load_case_dir, suite_hash
-from validate_r1_cases import CASES_DIR, EXPECTED_CASE_IDS, validate_suite
+from validate_r1_cases import (
+    CASES_DIR,
+    EXPECTED_CASE_IDS,
+    FROZEN_SUITE_HASH,
+    validate_suite,
+)
 
 
 @pytest.fixture(scope="module")
@@ -23,6 +28,12 @@ def test_eight_frozen_cases_are_present(cases: list[dict]) -> None:
 def test_frozen_suite_validates(cases: list[dict]) -> None:
     result = validate_suite(cases)
     assert result.ok, [str(f) for f in result.findings]
+
+
+def test_suite_hash_matches_the_frozen_fingerprint(cases: list[dict]) -> None:
+    """凍結斷言：改了任何一個案例，這條就會紅。
+    要改案例必須同時升 case_revision、記錄理由並更新 FROZEN_SUITE_HASH。"""
+    assert suite_hash(cases) == FROZEN_SUITE_HASH
 
 
 def test_suite_hash_is_stable_and_order_independent(cases: list[dict]) -> None:

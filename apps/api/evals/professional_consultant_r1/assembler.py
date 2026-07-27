@@ -238,7 +238,11 @@ def assemble_stage(
         context["current_work_model"] = case.get("initial_work_model") or {
             "task_candidates": []
         }
-        context["task_policies"] = list(TASK_POLICIES)
+        # 設計 §5.3：Stage 1 只收 Source Layer、Current Work Model 與理解型 prompt；
+        # Task 六項判準與變更規則屬 Stage 2。若 Stage 1 也帶判準，two-stage 會退化成
+        # 「同一份 context 打兩次」，one-stage vs two-stage 的對比就不成立。
+        if stage == STAGE_FINAL:
+            context["task_policies"] = list(TASK_POLICIES)
     if stage1_result is not None:
         context["stage1_result"] = stage1_result
 

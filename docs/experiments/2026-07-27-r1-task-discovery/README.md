@@ -31,9 +31,9 @@
 | `apps/api/evals/professional_consultant_r1/matrix.py` | Segment 3：固定六 arm、48 observations 與最多 80 次 generator calls |
 | `apps/api/evals/professional_consultant_r1/assembler.py` | Segment 3：minimal／full Context、one／two-stage prompt、light／heavy portable schema 與 local schema verifier |
 | `apps/api/evals/professional_consultant_r1/runner.py` | Segment 3：注入式 model port；Stage 1 無效即終止，不 repair／retry |
-| `apps/api/evals/professional_consultant_r1/blind_grader.py` | Segment 3：匿名正反序評審 packet 與 disagreement→unknown |
+| `apps/api/evals/professional_consultant_r1/blind_grader.py` | Segment 3：`gradable_views()` 擋掉 deterministic fail、匿名正反序評審 packet 與 disagreement→unknown |
 | `apps/api/evals/professional_consultant_r1/batch.py`、`report.py` | Segment 3：scripted 批次骨架與不得宣稱品質的報表 |
-| `apps/api/evals/professional_consultant_r1/test_*.py` | 215 個離線測試；Segment 3 只新增 9 項結論保護測試 |
+| `apps/api/evals/professional_consultant_r1/test_*.py` | 217 個離線測試；Segment 3 只新增 11 項結論保護測試 |
 
 ### 兩個由程式保證、不靠約定的不變量
 
@@ -50,7 +50,8 @@ disposable live preflight。在那之前一律 fail closed：讀不懂的形狀�
 `resolved_model` 留 null，寧可作廢一個 trial 也不猜。
 
 既有的 `app/interview_vnext` 實作**不是本實驗的權威**：R1 是重新設計，
-舊實作可能有多餘或錯誤的決定。測試 `test_r1_eval_never_imports_interview_vnext` 守住這條界線。
+舊實作可能有多餘或錯誤的決定。測試 `test_r1_eval_and_production_dependencies_are_one_way`
+掃描原始碼，雙向擋住 eval→`app.*`（含 `interview_vnext`）與 `app.*`→eval。
 
 ## 本段**沒有**做什麼
 

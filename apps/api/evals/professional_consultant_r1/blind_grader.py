@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from .contracts import COMMON_DIMENSIONS, canonical_hash, canonical_json, project_canonical_view
+from .runner import OUTCOME_COMPLETED, ObservationResult
 from .verify_output import verify_grader_packet
 
 GRADE_VALUES = frozenset({"pass", "fail", "unknown"})
@@ -36,6 +37,21 @@ class GraderStage:
     @property
     def schema_hash(self) -> str:
         return canonical_hash(self.output_schema)
+
+
+def gradable_views(
+    results_by_arm: dict[str, ObservationResult],
+) -> dict[str, dict[str, Any]]:
+    """設計 §5.3.1 第 6 條：deterministic validity 為 fail 的 observation **不得進 semantic grader**。
+
+    它仍以 fail 記在 deterministic 層；這裡只負責不把它送去盲評。
+    `final_invalid` 的 `canonical_view` 是有值的，所以必須看 outcome，不能只看 view 是否為 None。
+    """
+    return {
+        arm_id: result.canonical_view
+        for arm_id, result in sorted(results_by_arm.items())
+        if result.outcome == OUTCOME_COMPLETED and result.canonical_view is not None
+    }
 
 
 def build_blind_packets(

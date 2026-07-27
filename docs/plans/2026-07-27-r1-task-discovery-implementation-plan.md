@@ -135,8 +135,15 @@ Segment 3 完成後停線。Segment 4 的 disposable live preflight 仍需 owner
 - scripted 48 observations 全數走完，generator call 上限實際為 80；
 - Stage 1／final raw output 均由本地 portable-subset verifier 驗收，不依賴 provider 自述；
 - `decision_basis` 可為 null，且投影後不進 blind grader，避免強迫 rationale 成為隱藏 treatment；
-- focused package：**215 passed／0 skipped**；其中 Segment 3 僅 9 項結論保護測試；
+- focused package：**217 passed／0 skipped**；其中 Segment 3 僅 11 項結論保護測試；
 - 未讀 API key、未送網路請求、未建立正式 trial 結果。
+
+段末複查抓到兩處與設計不符，已於本段修掉：
+
+1. Stage 1 的 context 原本也帶 Task 六項判準，違反設計 §5.3（判準屬 Stage 2），
+   會讓 two-stage 退化成「同一份 context 打兩次」，A2 vs A6 的對比失效。
+2. `final_invalid` 的 observation 仍留有 `canonical_view`，原本沒有任何東西阻止它被送進盲評，
+   違反設計 §5.3.1 第 6 條。新增 `gradable_views()` 作為唯一入口，只放行 `completed`。
 
 ## 已知會踩的環境雷
 

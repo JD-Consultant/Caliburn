@@ -42,11 +42,16 @@
   放進本目錄。
 - 實驗失敗、平手與限制都要保留，不能只提交看起來成功的輸出。
 
-## 4. 現行實驗
+## 4. 實驗清單
 
 - [`2026-07-26-r1-p0-context-representation/`](2026-07-26-r1-p0-context-representation/) —
-  比較 Raw-only、Raw+Spans、Hybrid 與 Structured-only 四種 Context 對 Task 邊界分析的影響。
-  六份 constructed cases、rubric 與 assembler 已凍結為 revision 1；**沒有執行任何 trial**。
-  原 Codex-subagent 執行法已停止，因平台不允許把 subagent 當外部 API 受測模型。若未來改用實際
-  provider，須另升 revision 並明確核准。外部證據審查見
-  [`2026-07-26-professional-consultant-context-representation-external-evidence-review.md`](../specs/2026-07-26-professional-consultant-context-representation-external-evidence-review.md)。
+  **Closed／不執行**（[ADR 0041](../adr/0041-r1-p0-closure-first-version-context-and-holdout.md)，2026-07-27）。
+  原欲比較 Raw-only、Raw+Spans、Hybrid 與 Structured-only 四種 Context 對 Task 邊界分析的影響；
+  六份 constructed cases、rubric 與 assembler 已凍結為 revision 1，**零個 trial 曾被執行**。
+  原 Codex-subagent 執行法先被停止（平台不允許把 subagent 當外部 API 受測模型），
+  其後 owner 裁定不另付真 provider 成本，改以
+  [外部權威證據審查](../specs/2026-07-26-professional-consultant-context-representation-external-evidence-review.md)
+  收斂為「不建 literal-claim layer」。**該結論的依據是 YAGNI 與外部證據，不是本實驗的結果。**
+  frozen 案例、rubric 與 assembler 保留為可重用資產，再使用須另升 revision。
+
+**目前沒有進行中的實驗。** 下一個實證是 ADR 0040 的正式 R1 六 arm 快篩（含 ADR 0041 的 2 案 holdout）。

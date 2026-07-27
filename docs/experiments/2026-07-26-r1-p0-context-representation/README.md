@@ -1,8 +1,9 @@
 # R1-P0 Context Representation Screening
 
 - 日期：2026-07-26
-- 狀態：**Deferred／未執行**（cases frozen；沒有 trial、結果或模型品質證據）
-- 性質：R1 前置**否證實驗設計與案例資產**
+- 狀態：**Closed／不執行**（[ADR 0041](../../adr/0041-r1-p0-closure-first-version-context-and-holdout.md)，2026-07-27）。
+  **零個 trial 曾被執行**，沒有結果或模型品質證據。
+- 性質：R1 前置**否證實驗設計與案例資產**（結案後仍為可重用資產）
 - 不使用：`OPENROUTER_API_KEY`、`OPENAI_API_KEY`、production route、Web、資料庫
 - 上游 authority：
   - [ADR 0040](../../adr/0040-professional-consultant-engine-and-r1-validation-contract.md)
@@ -15,6 +16,13 @@
 > 下文 §4、§7–§10 保留原實驗設計供追溯，**不得照其 subagent 步驟執行，也不得虛構結果**。
 > 未來若改用實際 provider endpoint，必須另升 experiment revision、重寫 execution metadata 與外部效度，
 > 經 owner 明確核准後才執行。
+>
+> **2026-07-27 結案**（[ADR 0041](../../adr/0041-r1-p0-closure-first-version-context-and-holdout.md)）：
+> owner 裁定不為本實驗支付 trial 成本，改以
+> [Context 表示外部權威證據審查](../../specs/2026-07-26-professional-consultant-context-representation-external-evidence-review.md)
+> 收斂。第一版**不建 literal-claim layer**，理由是 **YAGNI 與外部證據，不是實驗結果**——
+> §1.1 的預期結果**未被驗證，只是未被推翻**，任何文件不得把本結案寫成「實驗顯示持平」。
+> 下文設計與六個 frozen cases、rubric、assembler 保留為可重用資產；要再使用須另升 revision。
 
 ## 1. 要回答的問題
 

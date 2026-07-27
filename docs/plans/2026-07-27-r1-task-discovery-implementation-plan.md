@@ -1,7 +1,7 @@
 # R1 Task Discovery 實作計畫
 
 - 日期：2026-07-27
-- 狀態：**Segment 1 完成**（含第二位審查者的 corrective 修訂）；Segment 2–5 待 owner 逐段核准
+- 狀態：**Segment 1–2 完成**；Segment 3–5 待 owner 逐段核准
 - 上位決策：[ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md)、
   [ADR 0041](../adr/0041-r1-p0-closure-first-version-context-and-holdout.md)
 - 實驗設計（唯一 authority）：
@@ -78,8 +78,22 @@ docs/experiments/2026-07-27-r1-task-discovery/
 - suite canonical hash 記錄於實驗 README；
 - 期望值凍結（ADR 0041 決定 15：`預期`／`Critical failure` 不得為配合模型輸出而改寫）。
 
+## Segment 2（已完成）
+
+`provider_request.py`／`routing_facts.py`／`transport.py`／`capture.py` ＋ mocked-HTTP 測試。
+涵蓋設計 §12.1 第 7–11 項：精確路由、每 attempt 一次 HTTP、resolved route 只能來自回應、
+secret／reasoning 不進 capture、manifest 可驗 refs 與 hash。
+
+**既有 `app/interview_vnext` 不是權威。** R1 是重新設計；舊實作可能有多餘或錯誤的決定。
+本段只承接兩類東西：設計 §8.3 明文要求的條件，以及 OpenRouter 的 wire 形狀 ——
+後者標為 **PROVISIONAL**，要在 Segment 4 用真實回應核對。讀不懂的形狀一律 fail closed。
+dependency guard 測試禁止本 eval import `app.*`。
+
 ## 已知會踩的環境雷
 
 - 跑測試用 `apps/api` 的 uv 環境（`uv run pytest <path>`）；本機 global python 沒有 pytest。
+- **async 測試一律加 `@pytest.mark.asyncio`**：`asyncio_mode=auto` 只在 `apps/api/pytest.ini`
+  被當 rootdir 時生效；用絕對路徑跑本目錄時吃不到，async 測試會被**靜默跳過**而不是失敗。
+  （Segment 2 一度有 9 個測試這樣消失。）
 - CJK 內容需 `PYTHONUTF8=1`。
 - 檔案是 LF，git autocrlf 會轉；比對用 `git diff`。

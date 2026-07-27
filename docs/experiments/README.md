@@ -55,8 +55,9 @@
   frozen 案例、rubric 與 assembler 保留為可重用資產，再使用須另升 revision。
 
 - [`2026-07-27-r1-task-discovery/`](2026-07-27-r1-task-discovery/) —
-  ADR 0040 正式 R1 六 arm 快篩的實驗資產。**Segment 1 完成**（八案凍結、rubric、契約與 deterministic
-  verifier，全離線），experiment revision 1，suite hash
+  ADR 0040 正式 R1 六 arm 快篩的實驗資產。**Segment 1–3 完成**（八案凍結、rubric、契約、
+  deterministic verifier、mocked transport、六 arm assembler／runner／blind grader，全離線）；
+  scripted 48-observation／80-call 骨架已跑通但不具品質結論資格。experiment revision 1，suite hash
   `6c8863863a233830a9216a3ebae46389c91082f097b337c25404400bc93694f7`；**尚未執行任何 trial**。
   設計 authority 在
   [`2026-07-27-professional-consultant-r1-task-discovery-experiment-design.md`](../specs/2026-07-27-professional-consultant-r1-task-discovery-experiment-design.md)，

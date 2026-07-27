@@ -1,7 +1,7 @@
 # R1 Task Discovery 實驗資產
 
 - 日期：2026-07-27
-- 狀態：**Segment 1–2 完成；沒有執行任何 trial，沒有送出任何真實請求**
+- 狀態：**Segment 1–3 完成；scripted 骨架已跑通，零真模型 trial、零真實請求**
 - experiment revision：**1**（案例內容）／verifier revision：**2**（契約與門檻）
 - suite canonical hash：`6c8863863a233830a9216a3ebae46389c91082f097b337c25404400bc93694f7`
   —— 由 `FROZEN_SUITE_HASH` 常數與測試斷言鎖住，改案例會直接紅燈
@@ -28,7 +28,12 @@
 | `apps/api/evals/professional_consultant_r1/routing_facts.py` | Segment 2：從**回應**正規化 resolved route 與 cache 狀態，拿不到就 fail closed |
 | `apps/api/evals/professional_consultant_r1/transport.py` | Segment 2：一次 attempt 一次 HTTP，永不 retry；環境失敗與品質結果分開 |
 | `apps/api/evals/professional_consultant_r1/capture.py` | Segment 2：trial 目錄、redaction、Trial Manifest 與其完整性檢查 |
-| `apps/api/evals/professional_consultant_r1/test_*.py` | 206 個離線測試（malformed-output 型別矩陣 ＋ mocked HTTP） |
+| `apps/api/evals/professional_consultant_r1/matrix.py` | Segment 3：固定六 arm、48 observations 與最多 80 次 generator calls |
+| `apps/api/evals/professional_consultant_r1/assembler.py` | Segment 3：minimal／full Context、one／two-stage prompt、light／heavy portable schema 與 local schema verifier |
+| `apps/api/evals/professional_consultant_r1/runner.py` | Segment 3：注入式 model port；Stage 1 無效即終止，不 repair／retry |
+| `apps/api/evals/professional_consultant_r1/blind_grader.py` | Segment 3：匿名正反序評審 packet 與 disagreement→unknown |
+| `apps/api/evals/professional_consultant_r1/batch.py`、`report.py` | Segment 3：scripted 批次骨架與不得宣稱品質的報表 |
+| `apps/api/evals/professional_consultant_r1/test_*.py` | 215 個離線測試；Segment 3 只新增 9 項結論保護測試 |
 
 ### 兩個由程式保證、不靠約定的不變量
 
@@ -50,10 +55,10 @@ disposable live preflight。在那之前一律 fail closed：讀不懂的形狀�
 ## 本段**沒有**做什麼
 
 - 沒有送出任何真實 API 請求（Segment 4 才有，且需 owner 核准）；
-- 沒有 context assembler、runner、grader prompt（Segment 3）；
 - 沒有 `trials/`、`results.csv`、`report.md` —— **沒有結果就不會有這些檔案**；
-- deterministic checks 中需要網路的三條（provider route／binding、無隱藏 retry、無 cache replay）
-  刻意未實作，程式內已標明歸屬 Segment 2。
+- 沒有把任何實驗欄位、schema、runner 或 grader 當成 production 契約；
+- Segment 2 的 route／binding／單次 HTTP／cache 檢查目前只有 mocked 證據，真實 wire 形狀仍待
+  Segment 4 preflight。
 
 ## 執行
 

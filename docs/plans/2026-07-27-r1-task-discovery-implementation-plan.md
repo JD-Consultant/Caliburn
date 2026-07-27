@@ -1,7 +1,7 @@
 # R1 Task Discovery 實作計畫
 
 - 日期：2026-07-27
-- 狀態：**Segment 1–2 完成**；Segment 3–5 待 owner 逐段核准
+- 狀態：**Segment 1–3 完成**；Segment 4–5 待 owner 逐段核准
 - 上位決策：[ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md)、
   [ADR 0041](../adr/0041-r1-p0-closure-first-version-context-and-holdout.md)
 - 實驗設計（唯一 authority）：
@@ -104,7 +104,7 @@ secret／reasoning 不進 capture、manifest 可驗 refs 與 hash。
 後者標為 **PROVISIONAL**，要在 Segment 4 用真實回應核對。讀不懂的形狀一律 fail closed。
 dependency guard 測試禁止本 eval import `app.*`。
 
-## Segment 3（本次）
+## Segment 3（已完成）
 
 只做正式付費實驗前需要的 no-network 骨架，不建通用 eval framework：
 
@@ -129,6 +129,14 @@ dependency guard 測試禁止本 eval import `app.*`。
 - 全程無真實 network。
 
 Segment 3 完成後停線。Segment 4 的 disposable live preflight 仍需 owner 明確允許付費。
+
+### 完成證據
+
+- scripted 48 observations 全數走完，generator call 上限實際為 80；
+- Stage 1／final raw output 均由本地 portable-subset verifier 驗收，不依賴 provider 自述；
+- `decision_basis` 可為 null，且投影後不進 blind grader，避免強迫 rationale 成為隱藏 treatment；
+- focused package：**215 passed／0 skipped**；其中 Segment 3 僅 9 項結論保護測試；
+- 未讀 API key、未送網路請求、未建立正式 trial 結果。
 
 ## 已知會踩的環境雷
 

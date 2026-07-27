@@ -131,8 +131,8 @@ async def send_once(
         )
 
     headers = {
+        **request.headers_without_secrets,
         "Authorization": f"Bearer {api_key}",
-        "Content-Type": "application/json",
     }
     started = time.monotonic()
     try:

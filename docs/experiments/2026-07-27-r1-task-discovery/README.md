@@ -1,11 +1,12 @@
 # R1 Task Discovery 實驗資產
 
 - 日期：2026-07-27
-- 狀態：**Segment 1–3 完成；scripted 骨架已跑通，零真模型 trial、零真實請求**
+- 狀態：**Segment 1–4 完成；disposable live plumbing 已通過，正式八案仍為零 trial**
 - experiment revision：**1**（案例內容）／verifier revision：**2**（契約與門檻）
 - suite canonical hash：`6c8863863a233830a9216a3ebae46389c91082f097b337c25404400bc93694f7`
   —— 由 `FROZEN_SUITE_HASH` 常數與測試斷言鎖住，改案例會直接紅燈
-- 不使用：`OPENROUTER_API_KEY`、任何 provider、production route、Web、資料庫
+- 正式八案不使用：任何 provider、production route、Web、資料庫。Segment 4 的 inline
+  disposable case 使用 owner 開發環境的 `OPENROUTER_API_KEY`，key 未寫入 artifact 或 Git。
 
 > **設計 authority 不在本目錄**，在
 > [R1 Task Discovery 實驗設計](../../specs/2026-07-27-professional-consultant-r1-task-discovery-experiment-design.md)。
@@ -33,7 +34,8 @@
 | `apps/api/evals/professional_consultant_r1/runner.py` | Segment 3：注入式 model port；Stage 1 無效即終止，不 repair／retry |
 | `apps/api/evals/professional_consultant_r1/blind_grader.py` | Segment 3：公開 packet builder 先以 `gradable_views()` 擋掉 deterministic fail，再建立匿名正反序評審 packet 與 disagreement→unknown |
 | `apps/api/evals/professional_consultant_r1/batch.py`、`report.py` | Segment 3：scripted 批次骨架與不得宣稱品質的報表 |
-| `apps/api/evals/professional_consultant_r1/test_*.py` | 217 個離線測試；Segment 3 只新增 11 項結論保護測試 |
+| `apps/api/evals/professional_consultant_r1/live_preflight.py` | Segment 4：一次性 catalog／route／structured output／grader live plumbing |
+| `apps/api/evals/professional_consultant_r1/test_*.py` | 223 個離線測試；只保護會污染實驗結論的契約 |
 
 ### 兩個由程式保證、不靠約定的不變量
 
@@ -42,12 +44,13 @@
 2. **anchor 必須指名來源**：每個 Task 的 `source_anchors[]` 帶 `source_id` ＋ 逐字 `quote`，
    且 quote 必須是**該筆** source 的子字串 —— 只驗「出現在某個來源」擋不住張冠李戴。
 
-### Provider 形狀是 PROVISIONAL
+### Provider 形狀已由 disposable live preflight 核對
 
-`provider_request.py` 的 plugin id 清單與 `routing_facts.py` 的 router metadata 形狀，
-依 OpenRouter 的 wire 結構寫成，但**尚未用真實回應核對** —— 那要等 Segment 4 的
-disposable live preflight。在那之前一律 fail closed：讀不懂的形狀記 limitation、
-`resolved_model` 留 null，寧可作廢一個 trial 也不猜。
+`provider_request.py` 的 plugin id、metadata／cache headers 與 `routing_facts.py` 的 router
+metadata 形狀已由 Segment 4 真實回應核對。真實 wire 顯示 `endpoints.total` 可大於 1，
+即使 exact routing 後 `available[]` 只有一個 selected endpoint；歸因因此以
+`available[]`、`selected`、resolved provider／model、strategy 與 attempt 聯合證明，
+不使用 `total == 1` 這個錯誤假設。讀不懂的形狀仍一律 fail closed。
 
 既有的 `app/interview_vnext` 實作**不是本實驗的權威**：R1 是重新設計，
 舊實作可能有多餘或錯誤的決定。測試 `test_r1_eval_and_production_dependencies_are_one_way`
@@ -55,11 +58,26 @@ disposable live preflight。在那之前一律 fail closed：讀不懂的形狀�
 
 ## 本段**沒有**做什麼
 
-- 沒有送出任何真實 API 請求（Segment 4 才有，且需 owner 核准）；
+- 沒有對八個凍結案例送出任何真實 API 請求；Segment 4 只使用一個 inline
+  disposable case；
 - 沒有 `trials/`、`results.csv`、`report.md` —— **沒有結果就不會有這些檔案**；
 - 沒有把任何實驗欄位、schema、runner 或 grader 當成 production 契約；
-- Segment 2 的 route／binding／單次 HTTP／cache 檢查目前只有 mocked 證據，真實 wire 形狀仍待
-  Segment 4 preflight。
+- Segment 4 不形成 Task Discovery 品質結果；它只驗證 route／binding／單次 HTTP／
+  cache 禁用、structured output、two-stage 與 blind grader plumbing。
+
+## Segment 4 live preflight 證據
+
+- run：`preflight-20260727T113646Z`；A1／A3／A4 三條代表路徑完成。
+- 5 次 generator calls ＋ 2 次 grader calls；該 run cost **US$0.1868955**。
+- 加上前一次由過嚴 route gate 中止、但已成功送出的 US$0.02765，Segment 4 累計
+  **US$0.2145455**（owner 上限 US$1）。
+- requested／canonical／endpoint 與三份 catalog snapshot hash 詳見
+  [實作計畫 Segment 4](../../plans/2026-07-27-r1-task-discovery-implementation-plan.md#完成證據)。
+- artifacts 在 gitignored
+  `apps/api/output/professional-consultant-r1/preflight-20260727T113646Z/`；
+  manifest 完整性與 secret scan 通過。
+- grader 正反序一致只代表管線能解析、合併；`quality_conclusion_eligible=false`，
+  **不能據此裁決任何 arm、模型或架構**。
 
 ## 執行
 

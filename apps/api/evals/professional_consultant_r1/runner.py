@@ -20,10 +20,19 @@ from .verify_output import ARM_CLASS_FULL, ARM_CLASS_MINIMAL, verify_output
 OUTCOME_COMPLETED = "completed"
 OUTCOME_STAGE1_INVALID = "stage1_invalid"
 OUTCOME_FINAL_INVALID = "final_invalid"
+OUTCOME_HARNESS_INVALID = "harness_invalid"
+
+
+class HarnessFailure(RuntimeError):
+    """Transport／route／provider protocol 失敗；不得記成模型語意品質。"""
+
+
+class ModelOutputFailure(RuntimeError):
+    """模型沒有產生可進 local verifier 的 structured payload。"""
 
 
 class ModelPort(Protocol):
-    async def complete(self, stage: AssembledStage) -> dict[str, Any]: ...
+    async def complete(self, stage: AssembledStage) -> Any: ...
 
 
 @dataclass(frozen=True)
@@ -34,7 +43,7 @@ class ObservationResult:
     canonical_view: dict[str, Any] | None
     state_change_view: dict[str, Any] | None
     findings: tuple[Finding, ...]
-    stage_outputs: tuple[dict[str, Any], ...]
+    stage_outputs: tuple[Any, ...]
 
 
 async def run_observation(
@@ -42,12 +51,35 @@ async def run_observation(
     plan: ObservationPlan,
     port: ModelPort,
 ) -> ObservationResult:
-    outputs: list[dict[str, Any]] = []
-    stage1_result: dict[str, Any] | None = None
+    outputs: list[Any] = []
+    stage1_result: Any = None
+    attempted_calls = 0
 
     if plan.arm.stage_count == 2:
         first = assemble_stage(case, plan.arm, STAGE_UNDERSTAND)
-        stage1_result = await port.complete(first)
+        attempted_calls += 1
+        try:
+            stage1_result = await port.complete(first)
+        except ModelOutputFailure as exc:
+            return ObservationResult(
+                observation_id=plan.observation_id,
+                outcome=OUTCOME_STAGE1_INVALID,
+                call_count=attempted_calls,
+                canonical_view=None,
+                state_change_view=None,
+                findings=(Finding(check="output_parse", message=str(exc)),),
+                stage_outputs=tuple(outputs),
+            )
+        except HarnessFailure as exc:
+            return ObservationResult(
+                observation_id=plan.observation_id,
+                outcome=OUTCOME_HARNESS_INVALID,
+                call_count=attempted_calls,
+                canonical_view=None,
+                state_change_view=None,
+                findings=(Finding(check="harness_invalid", message=str(exc)),),
+                stage_outputs=tuple(outputs),
+            )
         outputs.append(stage1_result)
         stage1_verification = verify_stage1_result(case, plan.arm, stage1_result)
         if not stage1_verification.ok:
@@ -67,7 +99,29 @@ async def run_observation(
         STAGE_FINAL,
         stage1_result=stage1_result,
     )
-    raw_final = await port.complete(final)
+    attempted_calls += 1
+    try:
+        raw_final = await port.complete(final)
+    except ModelOutputFailure as exc:
+        return ObservationResult(
+            observation_id=plan.observation_id,
+            outcome=OUTCOME_FINAL_INVALID,
+            call_count=attempted_calls,
+            canonical_view=None,
+            state_change_view=None,
+            findings=(Finding(check="output_parse", message=str(exc)),),
+            stage_outputs=tuple(outputs),
+        )
+    except HarnessFailure as exc:
+        return ObservationResult(
+            observation_id=plan.observation_id,
+            outcome=OUTCOME_HARNESS_INVALID,
+            call_count=attempted_calls,
+            canonical_view=None,
+            state_change_view=None,
+            findings=(Finding(check="harness_invalid", message=str(exc)),),
+            stage_outputs=tuple(outputs),
+        )
     outputs.append(raw_final)
     canonical = project_canonical_view(raw_final)
     state_change = raw_final.get("state_change") if isinstance(raw_final, dict) else None

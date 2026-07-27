@@ -25,7 +25,12 @@ FORBIDDEN_SLUG_TOKENS = ("auto", "latest", "free", "nitro", "floor")
 # **PROVISIONAL**：plugin id 字串必須在 Segment 4 的 live preflight 對 OpenRouter
 # 實際 catalog 核對後才算確認。現在的清單是「已知會改寫內容」的候選，寧可多停用；
 # 停用一個不存在的 id 是無害的，漏停一個會改寫內容的才致命。
-DISABLED_PLUGINS = ("web", "file-parser", "cache")
+DISABLED_PLUGINS = (
+    "context-compression",
+    "response-healing",
+    "web",
+    "file-parser",
+)
 
 # 請求體不得出現的 key（tools／provider 端會談狀態／preset／自動路由）。
 FORBIDDEN_BODY_KEYS = frozenset(
@@ -162,7 +167,15 @@ def build_chat_request(
         body=body,
         config_hash=config.config_hash,
         schema_hash=canonical_hash(output_schema),
-        headers_without_secrets={"Content-Type": "application/json"},
+        headers_without_secrets={
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            # OpenRouter 官方 router-metadata 契約：未 opt in 就不會回
+            # openrouter_metadata，resolved route 也就無法證立。
+            "X-OpenRouter-Metadata": "enabled",
+            # response cache 預設雖為 off，實驗仍明確關閉，避免帳戶設定污染。
+            "X-OpenRouter-Cache": "false",
+        },
     )
 
 

@@ -1,7 +1,7 @@
 # R1 Task Discovery 實作計畫
 
 - 日期：2026-07-27
-- 狀態：**Segment 1–3 完成**；Segment 4–5 待 owner 逐段核准
+- 狀態：**Segment 1–4 完成**；Segment 5 待 owner 核准
 - 上位決策：[ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md)、
   [ADR 0041](../adr/0041-r1-p0-closure-first-version-context-and-holdout.md)
 - 實驗設計（唯一 authority）：
@@ -145,6 +145,75 @@ Segment 3 完成後停線。Segment 4 的 disposable live preflight 仍需 owner
 2. `final_invalid` 的 observation 仍留有 `canonical_view`，原本沒有任何東西阻止它被送進盲評，
    違反設計 §5.3.1 第 6 條。公開 `build_blind_packets()` 會先強制套用
    `gradable_views()`，只放行 `completed`，呼叫端不能直接繞過。
+
+## Segment 4（已完成）
+
+owner 於 2026-07-27 回覆「OK 繼續」，核准小額付費 disposable live preflight。這不是正式
+R1 結果，不得使用八個凍結案例，也不得據此裁決架構。
+
+### Catalog 預查（零推理成本）
+
+2026-07-27 已從 OpenRouter 官方 model／endpoint API 核對：
+
+| 角色 | request slug | canonical slug | exact endpoint tag |
+|---|---|---|---|
+| strongest | `openai/gpt-5.6-sol-pro` | `openai/gpt-5.6-sol-pro-20260709` | `openai/flex` |
+| economical | `openai/gpt-5.6-luna-pro` | `openai/gpt-5.6-luna-pro-20260709` | `openai/flex` |
+| blind grader | `anthropic/claude-opus-5` | `anthropic/claude-opus-5-20260723` | `anthropic` |
+
+三個 exact endpoint 均宣告支援 `response_format`、`structured_outputs`、`reasoning` 與所需
+token 參數。alias 與 canonical slug 必須分開保存：request 用前者，resolved route 只接受
+catalog 當次回傳的 canonical slug。
+
+### 最小實作與請求
+
+1. 修正 request headers：明確送 `X-OpenRouter-Metadata: enabled` 與
+   `X-OpenRouter-Cache: false`，transport 必須真的帶上它們。
+2. 新增 experiment-only live preflight：抓 model／endpoint snapshot、驗 exact tag 與 required
+   parameters、保存 canonical hash；不抽 production provider abstraction。
+3. 補齊兩個 Segment 5 前必需 seam：
+   - transport／route 失敗 → `harness_invalid`，不得混進模型品質；
+   - grader structured output 解析與 label／dimension cardinality 驗證。
+4. 只使用一個 inline disposable case，跑三條代表路徑：
+   - A1：strongest／minimal／light／one-stage；
+   - A3：strongest／full／heavy／two-stage；
+   - A4：economical／full／light／two-stage；
+   - 將有效輸出匿名後交 grader 正序／反序各一次。
+5. 所有 request／response／catalog snapshot 經 redaction 寫入 gitignored `apps/api/output/`；
+   只把 run ID、hash、route、token、cost、limitation 與結論回寫本文件／實驗 README。
+
+### Stop gate
+
+- 任何 catalog／exact endpoint／required parameter 不符，零推理停止；
+- 任何 route metadata 無法證明單一 selected endpoint、attempt 不是 1、cache replay、model／provider
+  不符，preflight 失敗；
+- owner 後續將 Segment 4 上限提高為 **US$1.00**；實際所有 live 嘗試累計
+  **US$0.2145455**，未觸發上限；
+- API key／Authorization／reasoning 進 artifact，整次作廢；
+- preflight 只證明 plumbing 可用，**不形成模型品質或架構結論**。
+
+### 完成證據
+
+- 成功 run：`preflight-20260727T113646Z`；inline disposable case，未使用八個凍結案例。
+- generator：A1 一次、A3 兩次、A4 兩次；grader 正序／反序各一次，共 **7 calls**。
+- 該 run cost：**US$0.1868955**；先前 route gate 誤判後停止的單次成功 HTTP
+  cost：**US$0.02765**；Segment 4 累計 **US$0.2145455**。
+- 三個 role 的 request／canonical／exact endpoint：
+  `openai/gpt-5.6-sol-pro` → `openai/gpt-5.6-sol-pro-20260709` → `openai/flex`；
+  `openai/gpt-5.6-luna-pro` → `openai/gpt-5.6-luna-pro-20260709` → `openai/flex`；
+  `anthropic/claude-opus-5` → `anthropic/claude-opus-5-20260723` → `anthropic`。
+- catalog snapshot hashes：strongest
+  `0b99f2ed48027903340e8756e39c04d7ba9b9be9906573e93b8229f3a64ed222`；
+  economical `fc8197855dd4b4b5c9e61dace167045a3cefea325b66907b9584ac8d94e7c649`；
+  grader `d9f9565277f9bd3db81bf4d7702f956a8ff2a2846abef3cd00e0c97c27289986`。
+- 真實 metadata 證實 `endpoints.total` 可能大於 1，即使 exact routing 後
+  `available[]` 恰一個且 `selected=true`；gate 已改為以可路由集合與 selected endpoint
+  證明歸因，不再把 catalog 總數誤當實際候選數。
+- 三個 observation 都完成；grader 正反序一致。但案例只是 plumbing smoke，
+  `quality_conclusion_eligible=false`，**不得據此說 A1／A3／A4 誰比較好**。
+- gitignored artifacts 位於
+  `apps/api/output/professional-consultant-r1/preflight-20260727T113646Z/`；
+  7 份 manifest 均通過完整性驗證，secret pattern scan 為 0。
 
 ## 已知會踩的環境雷
 

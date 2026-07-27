@@ -24,6 +24,7 @@ from .runner import (
     OUTCOME_COMPLETED,
     OUTCOME_FINAL_INVALID,
     OUTCOME_STAGE1_INVALID,
+    ObservationResult,
     run_observation,
 )
 
@@ -181,25 +182,33 @@ async def test_invalid_stage1_is_terminal_without_repair_or_second_call(cases) -
 
 def test_blind_packets_include_sources_but_hide_arms_and_reverse_order(cases) -> None:
     case = cases[0]
-    views = {
-        arm_id: {
-            "analysis_decision": "no_change",
-            "proposed_tasks": [],
-            "next_question": None,
-            "limitations": [],
-        }
+    results = {
+        arm_id: ObservationResult(
+            observation_id=f"{case['case_id']}:{arm_id}",
+            outcome=OUTCOME_COMPLETED,
+            call_count=1,
+            canonical_view={
+                "analysis_decision": "no_change",
+                "proposed_tasks": [],
+                "next_question": None,
+                "limitations": [],
+            },
+            state_change_view=None,
+            findings=(),
+            stage_outputs=(),
+        )
         for arm_id in ("A1", "A2", "A3", "A4", "A5", "A6")
     }
 
-    forward, reverse, label_to_arm = build_blind_packets(case, views, seed=20260727)
+    forward, reverse, label_to_arm = build_blind_packets(case, results, seed=20260727)
 
     assert forward["sources"] == reverse["sources"] == case["sources"]
     assert [item["label"] for item in reverse["candidates"]] == list(
         reversed([item["label"] for item in forward["candidates"]])
     )
     serialized = json.dumps([forward, reverse], ensure_ascii=False)
-    assert all(arm_id not in serialized for arm_id in views)
-    assert set(label_to_arm.values()) == set(views)
+    assert all(arm_id not in serialized for arm_id in results)
+    assert set(label_to_arm.values()) == set(results)
 
     grader_stage = build_grader_stage(
         forward,
@@ -213,7 +222,7 @@ def test_blind_packets_include_sources_but_hide_arms_and_reverse_order(cases) ->
         },
         ensure_ascii=False,
     )
-    assert all(arm_id not in grader_visible for arm_id in views)
+    assert all(arm_id not in grader_visible for arm_id in results)
     assert "decision_basis" not in grader_visible
 
 
@@ -245,6 +254,13 @@ async def test_deterministically_invalid_observations_never_reach_the_grader(cas
     assert bad.outcome == OUTCOME_FINAL_INVALID
     assert bad.canonical_view is not None  # 有值，所以不能只靠 None 判斷
     assert gradable_views({"A1": good, "A6": bad}) == {"A1": good.canonical_view}
+    forward, reverse, label_to_arm = build_blind_packets(
+        case,
+        {"A1": good, "A6": bad},
+        seed=20260727,
+    )
+    assert len(forward["candidates"]) == len(reverse["candidates"]) == 1
+    assert label_to_arm == {"candidate-01": "A1"}
 
 
 def test_grader_disagreement_becomes_unknown() -> None:

@@ -143,7 +143,8 @@ Segment 3 完成後停線。Segment 4 的 disposable live preflight 仍需 owner
 1. Stage 1 的 context 原本也帶 Task 六項判準，違反設計 §5.3（判準屬 Stage 2），
    會讓 two-stage 退化成「同一份 context 打兩次」，A2 vs A6 的對比失效。
 2. `final_invalid` 的 observation 仍留有 `canonical_view`，原本沒有任何東西阻止它被送進盲評，
-   違反設計 §5.3.1 第 6 條。新增 `gradable_views()` 作為唯一入口，只放行 `completed`。
+   違反設計 §5.3.1 第 6 條。公開 `build_blind_packets()` 會先強制套用
+   `gradable_views()`，只放行 `completed`，呼叫端不能直接繞過。
 
 ## 已知會踩的環境雷
 

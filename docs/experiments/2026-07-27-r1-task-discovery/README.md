@@ -31,7 +31,7 @@
 | `apps/api/evals/professional_consultant_r1/matrix.py` | Segment 3：固定六 arm、48 observations 與最多 80 次 generator calls |
 | `apps/api/evals/professional_consultant_r1/assembler.py` | Segment 3：minimal／full Context、one／two-stage prompt、light／heavy portable schema 與 local schema verifier |
 | `apps/api/evals/professional_consultant_r1/runner.py` | Segment 3：注入式 model port；Stage 1 無效即終止，不 repair／retry |
-| `apps/api/evals/professional_consultant_r1/blind_grader.py` | Segment 3：`gradable_views()` 擋掉 deterministic fail、匿名正反序評審 packet 與 disagreement→unknown |
+| `apps/api/evals/professional_consultant_r1/blind_grader.py` | Segment 3：公開 packet builder 先以 `gradable_views()` 擋掉 deterministic fail，再建立匿名正反序評審 packet 與 disagreement→unknown |
 | `apps/api/evals/professional_consultant_r1/batch.py`、`report.py` | Segment 3：scripted 批次骨架與不得宣稱品質的報表 |
 | `apps/api/evals/professional_consultant_r1/test_*.py` | 217 個離線測試；Segment 3 只新增 11 項結論保護測試 |
 

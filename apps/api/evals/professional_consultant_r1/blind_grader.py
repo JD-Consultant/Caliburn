@@ -56,10 +56,15 @@ def gradable_views(
 
 def build_blind_packets(
     case: dict[str, Any],
-    views_by_arm: dict[str, dict[str, Any]],
+    results_by_arm: dict[str, ObservationResult],
     *,
     seed: int,
 ) -> tuple[dict[str, Any], dict[str, Any], dict[str, str]]:
+    # 公開入口先套 deterministic validity gate，呼叫端不能把 final_invalid
+    # 的 canonical_view 直接繞進 semantic grader。
+    views_by_arm = gradable_views(results_by_arm)
+    if not views_by_arm:
+        raise ValueError("no deterministically valid observations to grade")
     case_id = case["case_id"]
     arm_ids = sorted(views_by_arm)
     random.Random(f"{case_id}:{seed}").shuffle(arm_ids)

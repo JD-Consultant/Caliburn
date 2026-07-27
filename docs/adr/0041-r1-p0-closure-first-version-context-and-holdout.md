@@ -1,11 +1,12 @@
 # 0041. R1-P0 結案、第一版 Context 表示與 R1 holdout
 
 - 狀態：**Accepted**（owner 於 2026-07-27 裁定不為 P0 支付 trial 成本，改以外部權威證據結論收斂；
-  **同日第二位審查者條件式核准，六項條件已修畢**——見文末「2026-07-27 第二次審查修訂」）
+  同日第二位審查者提出七項意見，**採納六項並修畢，第七項（狀態應降為 Proposed）經查證後駁回、
+  審查者撤回異議**——見文末「2026-07-27 第二次審查修訂」）
 - 日期：2026-07-27
-- 範圍：R1-P0 實驗的處置、第一版 Context 表示的預設架構、R1 快篩案例的 holdout 規則
+- 範圍：R1-P0 實驗的處置、第一版 Context 表示的預設架構、R1 案例的 development／challenge set 分層
 - 補充：[0040](0040-professional-consultant-engine-and-r1-validation-contract.md)
-  （六 arm、exit gate、模型策略一律不變；本 ADR 只補 0040 未規定的 Context 表示預設與案例 holdout）
+  （六 arm、exit gate、模型策略一律不變；本 ADR 只補 0040 未規定的 Context 表示預設與案例分層規則）
 - 權威文件：
   [Context 表示外部權威證據審查](../specs/2026-07-26-professional-consultant-context-representation-external-evidence-review.md)、
   [R1 Task Discovery 深入研究](../specs/2026-07-25-professional-consultant-r1-task-discovery-deep-research.md) §10.6
@@ -76,8 +77,12 @@ owner 裁定不為 P0 另付真 provider 的 trial 成本，改以外部權威�
 
    **Source Layer 永遠完整保存**，縮減的只是每次送給模型的 Context Packet。
    不以任意固定 token 數當永久架構常數（證據審查 §1 建議 1–2）。
-9. Current Work Model 的每個重要判斷必須能回到 `turn_id`。此要求由 ADR 0040 決定 25 的
-   deterministic verifier（source span 存在、ID／跨欄位引用合法）承擔，不另建機制。
+9. Current Work Model 的每個重要判斷必須能回到 **Source Layer 的具體來源**，來源型別至少涵蓋
+   **顧問回合、員工直接編輯、員工對提案的決策**三類（對齊決定 5 的 Source Layer 與
+   ADR 0040 決定 19 的 Journal 內容）。**只連 `turn_id` 不足**，接不住後兩類。
+   本 ADR 只規定能力，**不鎖定欄位名稱與形狀**，那屬於契約與 plan。
+   此要求由 ADR 0040 決定 25 的 deterministic verifier（source span 存在、ID／跨欄位引用合法）
+   承擔，不另建機制。
 
 ### 3. R1 效力不變
 
@@ -93,7 +98,7 @@ owner 裁定不為 P0 另付真 provider 的 trial 成本，改以外部權威�
     因此只能說 R1 會測「兩階段拆分是否值得」與「harness 是否承重」，
     **不得寫成 R1 會獨立驗證 typed Work Model 的價值**。
 
-### 4. R1 快篩案例：八案全數為 development set，真 holdout 延到擴充階段
+### 4. R1 快篩案例：八案全數為 development set，未曝光評測集延到擴充階段
 
 13. **八案不切 holdout，全部作 development screening。**
     `TI-R1-01`–`TI-R1-08` 的 `輸入核心`、`預期`（含建議的 Task 句子）與 `Critical failure` 已完整公開在
@@ -107,19 +112,41 @@ owner 裁定不為 P0 另付真 provider 的 trial 成本，改以外部權威�
 15. 八案期間的實際防線是**凍結期望**：`預期` 與 `Critical failure` 在迭代期間**不得為了配合模型輸出而改寫**。
     要改須升 case revision 並記錄理由。`TI-R1-02`／`TI-R1-07` 另標為 **locked regression cases**
     （凍結行為錨點、防退步），**不得宣稱它們證明 unseen generalization**。
-16. **真正的 holdout 延到 ADR 0040 決定 11 的 20–30 案擴充階段**，且必須同時滿足：
+16. **未曝光的評測集延到 ADR 0040 決定 11 的 20–30 案擴充階段**建立，且必須同時滿足：
 
+    - **時間隔離可稽核**：本 repo 是一人團隊、agent 可全庫搜尋，「請不要看」無法驗證，因此改用
+      **順序**而非資訊屏障——
+
+      ```text
+      prompt／context／schema 最終凍結
+        → 記錄 freeze 的 commit SHA + canonical hash
+        → 之後才建立 challenge case 與期望
+        → 凍結 challenge revision
+        → 執行一次
+        → 若再修改 prompt／context／schema，該批 challenge 立即失效
+      ```
+
+      **不以檔案建立時間為憑**（checkout 會重設、且可竄改）；freeze 記錄寫進 ADR 0040 決定 22 的
+      Trial Manifest，不另建 artifact。
     - **新建、未曝光**：不得取自任何已發布的 spec／ADR／roadmap；其輸入與期望
-      **不得寫進任何 authority 文件**，只存在於封存的 case 檔（否則本次的失敗模式會原樣重演）；
-    - **正反平衡**：同時含「應形成 Task」與「不應形成 Task」的案例；
-    - 由**未參與該輪 prompt 迭代**的來源產出；
-    - 開封前不得檢視輸出、不得據以改 prompt。
+      **不得寫進任何 authority 文件**（否則本次的失敗模式會原樣重演）；
+    - **正反平衡**：同時含「應形成 Task」與「不應形成 Task」的案例。
 
-17. holdout 的裁決效力（適用第 16 條的真 holdout）：
+17. **命名必須誠實**，不得把較弱的東西叫成 holdout：
+
+    | 名稱 | 成立條件 |
+    |---|---|
+    | `holdout` | 由**獨立人員**製作且對 prompt 作者未曝光 |
+    | `post-freeze fresh challenge set` | 一人團隊採第 16 條的時間隔離；**本 repo 現實可達的最強形式** |
+    | `regression set` | 已看過或已反覆執行過的案例（含 `TI-R1-02`／`TI-R1-07`） |
+
+    重複使用同一批案例調整 prompt，會使其逐步失效並降級為 `regression set`。
+
+18. 裁決效力（適用第 16 條的 post-freeze fresh challenge set 或真 holdout）：
 
     - 出現 critical failure → **不得宣稱該候選通過**；候選標為 `inconclusive` 或淘汰；
-    - **只開封一次**；開封後若再改 prompt／context／schema，該 holdout 即失效，須新建一組；
-    - 迭代組通過而 holdout 失敗＝過度擬合證據，必須寫入報告，不得以「案例太少」帶過。
+    - **只執行一次**；之後若再改 prompt／context／schema，該批即失效，須新建一組；
+    - development set 通過而這批失敗＝過度擬合證據，必須寫入報告，不得以「案例太少」帶過。
 
 ## 後果
 
@@ -127,9 +154,10 @@ owner 裁定不為 P0 另付真 provider 的 trial 成本，改以外部權威�
 
 - P0 的狀態明確結案，下一位實作者不會以為還有實驗待跑，也不會誤引為已驗證結果。
 - 第一版 Context 有明文預設，填補 0040 決定 2 讓 0038 失效後留下的空白。
-- 省下 P0 真 provider 的 trial 成本與時間，而其唯一未決問題（literal-claim layer）本來就落在
-  P0 事前登記的預期結果上，以 YAGNI 收斂不損失資訊。
-- 過度擬合防線寫在正確的階段：八案期間靠凍結期望，真 holdout 留到有足夠案例可正反平衡時才建立，
+- 省下第一版的 trial 成本與時間。**代價是接受沒有取得產品內的比較證據**——P0 §1.1 的
+  「預期持平」只是事前登記的假說，不是結果；若後續出現 extraction fidelity 或 Task 邊界問題，
+  仍應重啟（決定 4）。
+- 過度擬合防線寫在正確的階段：八案期間靠凍結期望，未曝光評測集留到有足夠案例可正反平衡時才建立，
   且明文禁止把它的輸入與期望寫進 authority 文件——這正是本次差點犯下的錯。
 
 ### 負面與成本
@@ -138,7 +166,10 @@ owner 裁定不為 P0 另付真 provider 的 trial 成本，改以外部權威�
   必須重開實驗，屆時成本比現在跑 P0 更高（已有實作綁定）。
 - **八案階段沒有任何 unseen 證據**。快篩通過只代表「沒有明顯錯誤設計」，這與 ADR 0040 決定 11
   「不得宣稱勝出」一致，但也意味著過度擬合要到 20–30 案擴充才會被抓到。
-- 20–30 案階段必須額外產出一組不寫進任何文件的封存案例，是新增的工程與紀律負擔。
+- 20–30 案階段必須額外產出一組不寫進任何文件的 challenge case，並綁 freeze commit SHA 與 hash，
+  是新增的工程與紀律負擔。
+- 一人團隊做不到獨立人員製作，因此**永遠只能達到 `post-freeze fresh challenge set`**，
+  不能宣稱嚴格 holdout（決定 17）。
 
 ### 風險與未決
 
@@ -153,15 +184,27 @@ owner 裁定不為 P0 另付真 provider 的 trial 成本，改以外部權威�
 
 ## 2026-07-27 第二次審查修訂
 
-初稿當日經第二位審查者條件式核准，六項條件已修畢（比照 ADR 0040 的同日修訂處理方式）：
+初稿當日經第二位審查者兩輪審查（比照 ADR 0040 的同日修訂處理方式）。
+**第一輪七項意見：採納六項，第七項駁回。**
 
 | # | 指出的問題 | 處置 |
 |---|---|---|
-| 1 | 初稿的「不重啟、不升 revision」把 owner 的**成本裁定**寫成永久禁令 | 決定 1 改為第一版成本裁定，保留升 revision 重啟路徑 |
-| 2 | `TI-R1-02`／`07` 的輸入與期望早已公開在必讀 authority spec，事後標 holdout 無效 | **撤銷 holdout 設計**；決定 13 改為八案全數 development set |
-| 3 | 抽走唯一正向案例會讓迭代組單邊失衡，其失敗只反映自造的覆蓋缺口 | 決定 14 明文禁止抽走 `TI-R1-02`；改以決定 15 的凍結期望＋locked regression cases 替代 |
-| 4 | 初稿的 holdout 失敗「不是自動否決」等於沒有裁決效力 | 決定 17 給出真 holdout 的硬效力（不得宣稱通過／`inconclusive` 或淘汰／只開封一次） |
-| 5 | 初稿把 typed Work Model 的驗證掛在 A2 vs A6，與 ADR 0040 的 arm 定義不符 | 新增決定 12 並修正風險段：沒有任何 arm 能單獨歸因 |
-| 6 | 決定 7 表格的 `recent window` 易被讀成第一版就截斷 transcript | 新增決定 8 的兩段啟用時機；Source Layer 永遠完整保存 |
+| 1 | 初稿的「不重啟、不升 revision」把 owner 的**成本裁定**寫成永久禁令 | **採納**：決定 1 改為第一版成本裁定，保留升 revision 重啟路徑 |
+| 2 | `TI-R1-02`／`07` 的輸入與期望早已公開在必讀 authority spec，事後標 holdout 無效 | **採納**：撤銷 holdout 設計，決定 13 改為八案全數 development set |
+| 3 | 抽走唯一正向案例會讓 development set 單邊失衡，其失敗只反映自造的覆蓋缺口 | **採納**：決定 14 明文禁止抽走 `TI-R1-02`；改以決定 15 的凍結期望替代 |
+| 4 | 初稿的 holdout 失敗「不是自動否決」等於沒有裁決效力 | **採納**：決定 18 給出硬效力（不得宣稱通過／`inconclusive` 或淘汰／只執行一次） |
+| 5 | 初稿把 typed Work Model 的驗證掛在 A2 vs A6，與 ADR 0040 的 arm 定義不符 | **採納**：新增決定 12 並修正風險段 |
+| 6 | 決定 7 表格的 `recent window` 易被讀成第一版就截斷 transcript | **採納**：新增決定 8 的兩段啟用時機 |
+| 7 | 狀態應降為 `Proposed`，owner 授權不足 | **駁回**：審查者依據的是 repo 的 2026-07-26 文件軌跡，未及 07-27 對話。owner 當日原話為「不用花成本在這上面」，並核准本 ADR 內容。查證後審查者撤回異議 |
 
-第 2、3 項的教訓已回寫進決定 16：真 holdout 的輸入與期望**不得寫進任何 authority 文件**。
+**第二輪四項，全數採納：**
+
+| # | 指出的問題 | 處置 |
+|---|---|---|
+| 8 | 狀態行寫「六項條件已修畢」，未揭露第七項是**駁回**而非滿足 | 狀態行改為「採納六項、第七項駁回並經撤回」 |
+| 9 | 正面後果的「以 YAGNI 收斂不損失資訊」與決定 4 自相矛盾——沒跑就是失去了產品內證據 | 刪除該句，改為明寫接受沒有產品內比較證據 |
+| 10 | 決定 16 的「只存在於封存的 case 檔」在 agent 可全庫搜尋的 repo 形同虛設；且不應以檔案時間為憑 | 改為 **Git commit SHA + canonical hash 的可稽核時序**，freeze 記錄寫進 ADR 0040 決定 22 的 Trial Manifest；新增決定 17 的三層誠實命名 |
+| 11 | 決定 9 只要求回溯 `turn_id`，接不住員工直接編輯與員工決策（與決定 5、ADR 0040 決定 19 矛盾） | 決定 9 改為回溯 Source Layer 三類來源；**欄位名不入 ADR**，留給契約與 plan |
+
+第 2、3、10 項的共同教訓已寫進決定 16–17：未曝光評測集的輸入與期望**不得寫進任何 authority 文件**，
+且一人團隊只能宣稱 `post-freeze fresh challenge set`。

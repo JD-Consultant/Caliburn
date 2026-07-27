@@ -421,8 +421,11 @@ Revision 3：
 > - 尤其**不得抽走第 2 案**（唯一的正向案例）：抽走會把 prompt 推向「看到工具就不建 Task」的單邊最佳化。
 > - 八案期間的防線是**凍結期望**：`預期` 與 `Critical failure` 不得為配合模型輸出而改寫，要改須升 case
 >   revision。第 2、7 案另標為 **locked regression cases**（防退步），不得宣稱證明 unseen generalization。
-> - **真 holdout 延到 20–30 案擴充階段**：新建、未曝光、正反平衡、由未參與 prompt 迭代者產出，
->   且其輸入與期望**不得寫進任何 authority 文件**。critical failure → 不得宣稱通過。
+> - **未曝光評測集延到 20–30 案擴充階段**：在 prompt／context／schema **最終凍結之後**才建立
+>   （以 freeze 的 commit SHA + canonical hash 為憑，**不以檔案時間為憑**），正反平衡，
+>   其輸入與期望**不得寫進任何 authority 文件**。critical failure → 不得宣稱通過。
+> - **命名誠實**：獨立人員製作且未曝光才叫 `holdout`；本 repo 一人團隊採時間隔離，
+>   只能叫 `post-freeze fresh challenge set`；已看過或反覆執行的降級為 `regression set`。
 
 ### 8.6 輸出物
 

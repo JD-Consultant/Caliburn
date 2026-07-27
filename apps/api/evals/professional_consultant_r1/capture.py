@@ -15,7 +15,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from contracts import Result, canonical_hash, canonical_json
+from .contracts import Result, canonical_hash, canonical_json
 
 # 任何 key 命中就整個值換成 stub。大小寫不敏感。
 SECRET_KEYS = frozenset(

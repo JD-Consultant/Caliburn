@@ -11,6 +11,9 @@
 > [R1 Task Discovery 實驗設計](../../specs/2026-07-27-professional-consultant-r1-task-discovery-experiment-design.md)。
 > 本目錄只是那份設計的可執行資產；兩者衝突以設計為準。
 > 實作分段見 [實作計畫](../../plans/2026-07-27-r1-task-discovery-implementation-plan.md)。
+> Python harness 與 tests 位於
+> [`apps/api/evals/professional_consultant_r1/`](../../../apps/api/evals/professional_consultant_r1/)；
+> 本目錄只保存凍結案例、rubric 與之後的 trial 結果。
 
 ## 本段交付了什麼
 
@@ -18,14 +21,14 @@
 |---|---|
 | [`cases/`](cases/) | 八個凍結案例 `TI-R1-01`–`08`、建立與凍結規則、[人工裁決理由](cases/adjudication.md) |
 | [`rubric.md`](rubric.md) | 裁決標準：共同／full-only 維度分層、三值聚合、anchors、效力上限 |
-| [`contracts.py`](contracts.py) | case 與兩種輸出視圖的最小契約、維度白名單、canonical hash、`project_canonical_view()` |
-| [`validate_r1_cases.py`](validate_r1_cases.py) | 案例凍結完整性 ＋ suite hash |
-| [`verify_output.py`](verify_output.py) | 模型輸出的 deterministic checks（不需網路的部分） |
-| [`provider_request.py`](provider_request.py) | Segment 2：provider 綁定與精確請求體（禁 fallback／單一 upstream／strict schema／停用 plugin） |
-| [`routing_facts.py`](routing_facts.py) | Segment 2：從**回應**正規化 resolved route 與 cache 狀態，拿不到就 fail closed |
-| [`transport.py`](transport.py) | Segment 2：一次 attempt 一次 HTTP，永不 retry；環境失敗與品質結果分開 |
-| [`capture.py`](capture.py) | Segment 2：trial 目錄、redaction、Trial Manifest 與其完整性檢查 |
-| `test_*.py` | 206 個離線測試（malformed-output 型別矩陣 ＋ mocked HTTP） |
+| `apps/api/evals/professional_consultant_r1/contracts.py` | case 與兩種輸出視圖的最小契約、維度白名單、canonical hash、`project_canonical_view()` |
+| `apps/api/evals/professional_consultant_r1/validate_r1_cases.py` | 案例凍結完整性 ＋ suite hash |
+| `apps/api/evals/professional_consultant_r1/verify_output.py` | 模型輸出的 deterministic checks（不需網路的部分） |
+| `apps/api/evals/professional_consultant_r1/provider_request.py` | Segment 2：provider 綁定與精確請求體（禁 fallback／單一 upstream／strict schema／停用 plugin） |
+| `apps/api/evals/professional_consultant_r1/routing_facts.py` | Segment 2：從**回應**正規化 resolved route 與 cache 狀態，拿不到就 fail closed |
+| `apps/api/evals/professional_consultant_r1/transport.py` | Segment 2：一次 attempt 一次 HTTP，永不 retry；環境失敗與品質結果分開 |
+| `apps/api/evals/professional_consultant_r1/capture.py` | Segment 2：trial 目錄、redaction、Trial Manifest 與其完整性檢查 |
+| `apps/api/evals/professional_consultant_r1/test_*.py` | 206 個離線測試（malformed-output 型別矩陣 ＋ mocked HTTP） |
 
 ### 兩個由程式保證、不靠約定的不變量
 
@@ -56,10 +59,10 @@ disposable live preflight。在那之前一律 fail closed：讀不懂的形狀�
 
 ```bash
 # 測試（用 apps/api 的 uv 環境）
-cd apps/api && uv run pytest ../../docs/experiments/2026-07-27-r1-task-discovery -q
+cd apps/api && uv run pytest evals/professional_consultant_r1 -q
 
 # 驗證案例並印出 suite hash
-cd docs/experiments/2026-07-27-r1-task-discovery && python validate_r1_cases.py
+cd apps/api && uv run python -m evals.professional_consultant_r1.validate_r1_cases
 ```
 
 CJK 內容在 Windows 上需 `PYTHONUTF8=1`。

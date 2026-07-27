@@ -16,7 +16,7 @@ import re
 from dataclasses import dataclass, field
 from typing import Any
 
-from contracts import Result, canonical_hash
+from .contracts import Result, canonical_hash
 
 # 設計 §8.3：禁止任何會讓路由浮動的 slug 形式。
 FORBIDDEN_SLUG_TOKENS = ("auto", "latest", "free", "nitro", "floor")

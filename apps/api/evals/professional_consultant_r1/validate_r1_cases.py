@@ -10,10 +10,9 @@
 from __future__ import annotations
 
 import sys
-from pathlib import Path
 from typing import Any
 
-from contracts import (
+from .contracts import (
     CASE_SCHEMA_ID,
     COMMON_DIMENSIONS,
     FULL_HARNESS_ONLY_DIMENSIONS,
@@ -23,8 +22,7 @@ from contracts import (
     load_case_dir,
     suite_hash,
 )
-
-CASES_DIR = Path(__file__).parent / "cases"
+from .paths import CASES_DIR
 
 EXPECTED_CASE_IDS = tuple(f"TI-R1-0{i}" for i in range(1, 9))
 

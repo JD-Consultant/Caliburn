@@ -15,7 +15,7 @@ from __future__ import annotations
 import re
 from typing import Any
 
-from contracts import (
+from .contracts import (
     ANALYSIS_DECISIONS,
     CANONICAL_VIEW_KEYS,
     CHANGE_TYPES,

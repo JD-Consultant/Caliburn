@@ -25,6 +25,21 @@
 
 Segment 4 之前不得送出任何真實 API 請求。Segment 5 之前不得動用八案。
 
+## 實驗資產與執行碼邊界
+
+凍結案例、rubric、人工裁決與執行結果留在
+`docs/experiments/2026-07-27-r1-task-discovery/`；可執行 Python harness 與 tests 放在
+`apps/api/evals/professional_consultant_r1/`。這是為了使用 `apps/api` 的 pytest／uv 環境、
+避免不同實驗的頂層模組撞名，並落實設計 §9.2 的單向 dependency guard。
+
+這個 package 是**可丟棄的實驗儀器，不是 production 雛形**：
+
+- `app/` 不得 import 它；
+- 它不得 import `app.*` 或既有 `interview_vnext`；
+- R1 的欄位、schema、prompt、runner 與 grader 名稱不構成成品契約；
+- R1 只裁決 harness、呼叫階段、schema 重量與模型能力，不裁決正式資料庫、API、Graph 或
+  Current Work Model 的最終形狀。
+
 ## Segment 1（本次）
 
 ### 交付物
@@ -88,6 +103,32 @@ secret／reasoning 不進 capture、manifest 可驗 refs 與 hash。
 本段只承接兩類東西：設計 §8.3 明文要求的條件，以及 OpenRouter 的 wire 形狀 ——
 後者標為 **PROVISIONAL**，要在 Segment 4 用真實回應核對。讀不懂的形狀一律 fail closed。
 dependency guard 測試禁止本 eval import `app.*`。
+
+## Segment 3（本次）
+
+只做正式付費實驗前需要的 no-network 骨架，不建通用 eval framework：
+
+1. `matrix.py`：固定 A1–A6，展開 8 cases × 6 arms＝48 observations，最大 generator calls＝80。
+2. `assembler.py`：組裝 minimal／full、one-stage／two-stage、light／heavy 的 prompt、Context 與
+   portable schema；不得包含 case-specific expected answer。
+3. `runner.py`：依 observation plan 呼叫注入的 scripted port；one-stage 恰一次，two-stage 最多兩次；
+   Stage 1 verifier 失敗即 terminal，不呼叫 Stage 2，也不 repair／retry。
+4. `blind_grader.py`：只接收 canonical review views；建立 seeded 正序與完全反序 packet；
+   同一維度兩次判決不一致時聚合為 `unknown`。
+5. `report.py`：輸出 48-observation 骨架、deterministic outcome 與待 grader／owner 欄位；
+   scripted 結果不得冒充模型品質結果。
+
+最小測試只保護能影響結論的行為：
+
+- 六 arm 與 48／80 計數；
+- A1 不含 Current Work Model，full arm 會包含；two-stage final 仍含完整原始 sources；
+- one-stage／two-stage 呼叫次數與 Stage 1 terminal fail；
+- common projection 不洩漏 arm／schema／model／rationale；
+- 正反序與 `unknown` 聚合；
+- production/eval 雙向 dependency guard；
+- 全程無真實 network。
+
+Segment 3 完成後停線。Segment 4 的 disposable live preflight 仍需 owner 明確允許付費。
 
 ## 已知會踩的環境雷
 

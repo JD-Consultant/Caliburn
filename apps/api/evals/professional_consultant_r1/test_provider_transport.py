@@ -13,7 +13,7 @@ from typing import Any
 import httpx
 import pytest
 
-from capture import (
+from .capture import (
     REDACTED_REASONING,
     REDACTED_SECRET,
     TrialCapture,
@@ -22,14 +22,14 @@ from capture import (
     redact,
     verify_manifest,
 )
-from provider_request import (
+from .provider_request import (
     DISABLED_PLUGINS,
     ProviderConfig,
     build_chat_request,
     validate_config,
     verify_request_is_exact,
 )
-from routing_facts import (
+from .routing_facts import (
     CACHE_STATUS_HEADER,
     LIMITATION_CACHE_REPLAY,
     LIMITATION_METADATA_MISSING,
@@ -38,7 +38,7 @@ from routing_facts import (
     LIMITATION_SELECTED_NOT_UNIQUE,
     normalize_route_facts,
 )
-from transport import (
+from .transport import (
     OUTCOME_HTTP_ERROR,
     OUTCOME_INVALID_JSON,
     OUTCOME_OK,
@@ -284,7 +284,7 @@ def test_build_client_disables_redirects_and_uses_explicit_transport() -> None:
 
 
 def test_usage_cost_is_decimal_normalized(request_obj) -> None:
-    from transport import _normalize_usage
+    from .transport import _normalize_usage
 
     usage = _normalize_usage({"usage": {"cost": 0.0000123, "prompt_tokens": 5}})
     assert usage.cost == "0.0000123"
@@ -292,7 +292,7 @@ def test_usage_cost_is_decimal_normalized(request_obj) -> None:
 
 
 def test_usage_missing_is_a_limitation_not_a_crash() -> None:
-    from transport import _normalize_usage
+    from .transport import _normalize_usage
 
     assert _normalize_usage({}).limitations
 
@@ -494,16 +494,25 @@ def test_manifest_rejects_unredacted_secret() -> None:
 # --- 依賴防線（設計 §9.2）---------------------------------------------------------
 
 
-def test_r1_eval_never_imports_interview_vnext() -> None:
-    """R1 eval 不得依賴 vNext —— ADR 0034 說 vNext 達 gate 後要刪。"""
+def test_r1_eval_and_production_dependencies_are_one_way() -> None:
+    """R1 eval 不 import app；production app 也不 import experiment-only eval。"""
     here = Path(__file__).parent
     offenders = []
     for path in sorted(here.glob("*.py")):
         text = path.read_text(encoding="utf-8")
         for line in text.splitlines():
             stripped = line.strip()
-            if stripped.startswith(("import ", "from ")) and (
-                "app.interview_vnext" in stripped or stripped.startswith("from app.")
+            if stripped.startswith(("import app", "from app")):
+                offenders.append(f"eval -> app: {path.name}: {stripped}")
+
+    app_root = here.parents[1] / "app"
+    for path in sorted(app_root.rglob("*.py")):
+        text = path.read_text(encoding="utf-8")
+        for line in text.splitlines():
+            stripped = line.strip()
+            if (
+                stripped.startswith(("import ", "from "))
+                and "evals.professional_consultant_r1" in stripped
             ):
-                offenders.append(f"{path.name}: {stripped}")
+                offenders.append(f"app -> eval: {path.relative_to(app_root)}: {stripped}")
     assert offenders == [], offenders

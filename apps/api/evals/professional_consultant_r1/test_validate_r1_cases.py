@@ -7,8 +7,8 @@ from pathlib import Path
 
 import pytest
 
-from contracts import load_case, load_case_dir, suite_hash
-from validate_r1_cases import (
+from .contracts import load_case, load_case_dir, suite_hash
+from .validate_r1_cases import (
     CASES_DIR,
     EXPECTED_CASE_IDS,
     FROZEN_SUITE_HASH,

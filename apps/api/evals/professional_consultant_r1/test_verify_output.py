@@ -12,9 +12,9 @@ from typing import Any
 
 import pytest
 
-from contracts import load_case, project_canonical_view
-from validate_r1_cases import CASES_DIR
-from verify_output import (
+from .contracts import load_case, project_canonical_view
+from .validate_r1_cases import CASES_DIR
+from .verify_output import (
     ARM_CLASS_FULL,
     ARM_CLASS_MINIMAL,
     verify_grader_packet,

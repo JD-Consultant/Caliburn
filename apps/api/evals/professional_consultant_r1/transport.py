@@ -18,7 +18,7 @@ from typing import Any
 
 import httpx
 
-from provider_request import ChatRequest, verify_request_is_exact
+from .provider_request import ChatRequest, verify_request_is_exact
 
 # 只保留判讀路由與快取需要的回應 header，避免把不相干內容寫進 capture。
 CAPTURED_RESPONSE_HEADERS = (

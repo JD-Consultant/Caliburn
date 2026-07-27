@@ -1,7 +1,8 @@
 # R1 Task Discovery 實作計畫
 
 - 日期：2026-07-27
-- 狀態：**Segment 1–4 完成**；Segment 5 待 owner 核准
+- 狀態：**Segment 1–5 完成**；Segment 5 以預算受限的 R1a 三 arm
+  架構快篩完成（owner 於 2026-07-27 核准，US$2.5 上限），語意裁決待 owner 確認
 - 上位決策：[ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md)、
   [ADR 0041](../adr/0041-r1-p0-closure-first-version-context-and-holdout.md)
 - 實驗設計（唯一 authority）：
@@ -21,7 +22,7 @@
 | 2 | Thin OpenRouter transport + capture | mocked HTTP | 設計 §9.2／§12.1 綠 |
 | 3 | 六 arm assembler + runner + blind grader | scripted output | 48 observation 骨架可跑 |
 | 4 | Disposable live preflight | **實網路、丟棄式 fixture** | 需 owner 明確允許付費 |
-| 5 | 正式 48 observations | 實網路 | 需 §12.3 八項全數具備 |
+| 5 | R1a 正式 24 observations（A1／A6／A2） | 實網路 | 批次完成；owner 語意裁決待確認 |
 
 Segment 4 之前不得送出任何真實 API 請求。Segment 5 之前不得動用八案。
 
@@ -214,6 +215,96 @@ catalog 當次回傳的 canonical slug。
 - gitignored artifacts 位於
   `apps/api/output/professional-consultant-r1/preflight-20260727T113646Z/`；
   7 份 manifest 均通過完整性驗證，secret pattern scan 為 0。
+
+## Segment 5（R1a 三 arm 架構快篩，已核准）
+
+完整六 arm 依 Segment 4 真實 token／cost 外推約需 US$3.5–5，超過 owner
+提供的 US$2.5。owner 核准先執行不改 prompt／schema／rubric 的預算受限子集：
+
+| Arm | 保留原因 |
+|---|---|
+| A1 | strongest／minimal／light／one-stage baseline |
+| A6 | strongest／full／light／one-stage；與 A1 比 full harness bundle |
+| A2 | strongest／full／light／two-stage；與 A6 比兩階段 treatment |
+
+八案 × 三 arm＝**24 observations**，最多 **32 generator calls**；每案仍由
+Claude Opus 5 正序／反序各評一次，共 **16 grader calls**。正式八案前先用
+不屬於 suite 的三候選 packet 跑 grader calibration 正反序各一次。
+
+### 效力邊界
+
+- 本批只回答「full harness 是否值得進下一階段」與「兩階段是否值得進下一階段」。
+- A3／A4／A5 未執行，因此**不能**回答 heavy schema 或 economical model。
+- 本批名稱固定為 **R1a architecture screening**；不得寫成完整 R1 六 arm 已完成。
+- 八案仍只有 development screening 效力；結果最多淘汰明顯錯誤設計或送
+  20–30 案，不得宣稱 shipping architecture 已被證明。
+
+### 成本與停線
+
+- 付費上限為 **US$2.50**，只計本次 R1a fresh batch；每次 request 前保留
+  role-specific 安全額度，預估下一次可能超限就停止。
+- 不 repair、不在同一 request retry、不重送已成功 call；任一 `harness_invalid`、
+  grader calibration 不符、secret／reasoning 外洩或 manifest 驗證失敗，整批停止。
+  owner 裁決環境規則後，可從已驗證 immutable capture 接續**尚未執行**項目，但不得
+  把舊 response 改寫成新 response。
+- 若預算耗盡而 24 observations／16 grader calls 未完整，結果標
+  `incomplete_budget`，不得用已完成的 arm/case 片段裁決。
+- `TI-R1-02`、`TI-R1-07` 全部輸出，以及任何 grader fail／unknown，進 owner
+  review queue；未完成 owner review 前只能提供 provisional screening analysis。
+
+### Grader calibration 修訂紀錄
+
+第一次 calibration 正反序一致，唯一差異是「未提出 Task、只要求澄清」的候選：
+grader 對 `source_grounding` 回 `unknown`，原 gold 寫 `pass`。依 rubric，
+`source_grounding` 問的是 Task 是否有合法來源；沒有 Task 就沒有可評 claim，不能硬算
+pass，因此修正 gold 為 `unknown`，grader prompt 不變。這是設計允許的唯一一輪
+calibration 修正；第一次兩次 grader calls 共 US$0.047885，後續 fresh run 上限降為
+US$2.45，使所有 R1a 嘗試累計不超過 owner 的 US$2.50。
+
+第二次 calibration 在第一個 forward call 以 `finish_reason=length` 停止；usage 顯示
+2048 completion tokens 中 reasoning 只有 295，主因是可見 `reason` 過長。依 §8.2.1
+允許的唯一一輪 grader prompt 修正，prompt 升為
+`r1-task-discovery-grader.2`，只增加「每個 reason 限一個短句（最多 30 個中文字）」；
+模型、rubric、dimensions、schema 與 generator prompt 均不變。該失敗 call 花
+US$0.05748；前兩次嘗試累計 US$0.105365，因此下一個 fresh run 上限降為 US$2.39，
+所有 R1a 嘗試累計仍不超過 US$2.50。
+
+### Live 執行與 resume 紀錄
+
+正式 run `r1a-20260727T120447Z` 完成 32 次 generator 與前 9 次 formal grader
+後，call 43 的 OpenRouter metadata 出現：
+
+```json
+{
+  "type": "guardrail",
+  "name": "moderation",
+  "data": {"engine": "openai-moderations", "flagged": false}
+}
+```
+
+舊 gate 把所有非空 pipeline 一律停線。依 OpenRouter 官方 router metadata／guardrail
+定義與 owner 裁決，規則收斂為：
+
+- 只接受 `type=guardrail`、`name=moderation`、`data.flagged=false`；
+- 保存 `inspected_nonmutating: moderation` limitation；
+- `flagged=true`、未知 guardrail、plugin、compression／healing 或其他 pipeline
+  一律 fail closed。
+
+call 43 的 manifest 與 raw response 保持不可變；resume 重新驗 file hashes、route
+identity、raw response 與 local parser，沒有改寫舊 artifact。其後只補送尚未執行的
+7 次 grader，沒有重送 calibration 或 32 次 generator。綁死本 run／call 43 的
+一次性 recovery code 在完成後移除，不把事故腳本偽裝成長期通用框架。
+
+完成證據：
+
+- 24 / 24 observations、24 `completed`；
+- 32 generator calls、16 formal grader calls、2 calibration calls；
+- run 共 50 個 call directories；
+- formal run cost `US$1.6658400`；
+- 加上前兩次中止嘗試共 `US$1.7712050 < US$2.50`；
+- batch 完整，`quality_conclusion_eligible=false` 直到 owner 確認語意稽核；
+- 結果與限制見
+  [R1a 架構快篩結果](../experiments/2026-07-27-r1-task-discovery/r1a-results.md)。
 
 ## 已知會踩的環境雷
 

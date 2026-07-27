@@ -11,7 +11,7 @@ from .runner import OUTCOME_COMPLETED, ObservationResult
 from .verify_output import verify_grader_packet
 
 GRADE_VALUES = frozenset({"pass", "fail", "unknown"})
-GRADER_PROMPT_VERSION = "r1-task-discovery-grader.1"
+GRADER_PROMPT_VERSION = "r1-task-discovery-grader.2"
 
 DIMENSION_GUIDANCE = {
     "meaningful_outcome": "Task 是否有可辨識目的或結果，而不是純工具或手段。",
@@ -107,7 +107,8 @@ def build_grader_stage(
     system = (
         "你是獨立的職務分析盲評者。只根據匿名候選內容與下列共同判準評分；"
         "不知道就回 unknown，不得猜測候選所屬架構、模型或 schema。"
-        "不得用文風、篇幅或解釋長度代替 Task 邊界品質。\n"
+        "不得用文風、篇幅或解釋長度代替 Task 邊界品質。"
+        "每個 reason 限一個短句（最多 30 個中文字），只指出最關鍵依據。\n"
         f"{guidance}"
     )
     schema = {

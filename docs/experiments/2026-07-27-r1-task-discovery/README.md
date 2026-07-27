@@ -1,12 +1,12 @@
 # R1 Task Discovery 實驗資產
 
 - 日期：2026-07-27
-- 狀態：**Segment 1–4 完成；disposable live plumbing 已通過，正式八案仍為零 trial**
+- 狀態：**Segment 1–5 完成；R1a 三 arm 快篩批次完整，語意裁決待 owner 確認**
 - experiment revision：**1**（案例內容）／verifier revision：**2**（契約與門檻）
 - suite canonical hash：`6c8863863a233830a9216a3ebae46389c91082f097b337c25404400bc93694f7`
   —— 由 `FROZEN_SUITE_HASH` 常數與測試斷言鎖住，改案例會直接紅燈
-- 正式八案不使用：任何 provider、production route、Web、資料庫。Segment 4 的 inline
-  disposable case 使用 owner 開發環境的 `OPENROUTER_API_KEY`，key 未寫入 artifact 或 Git。
+- 正式八案仍不接 production route、Web 或資料庫。Segment 4 disposable preflight 與
+  Segment 5 R1a 使用 owner 開發環境的 `OPENROUTER_API_KEY`，key 未寫入 artifact 或 Git。
 
 > **設計 authority 不在本目錄**，在
 > [R1 Task Discovery 實驗設計](../../specs/2026-07-27-professional-consultant-r1-task-discovery-experiment-design.md)。
@@ -35,7 +35,8 @@
 | `apps/api/evals/professional_consultant_r1/blind_grader.py` | Segment 3：公開 packet builder 先以 `gradable_views()` 擋掉 deterministic fail，再建立匿名正反序評審 packet 與 disagreement→unknown |
 | `apps/api/evals/professional_consultant_r1/batch.py`、`report.py` | Segment 3：scripted 批次骨架與不得宣稱品質的報表 |
 | `apps/api/evals/professional_consultant_r1/live_preflight.py` | Segment 4：一次性 catalog／route／structured output／grader live plumbing |
-| `apps/api/evals/professional_consultant_r1/test_*.py` | 223 個離線測試；只保護會污染實驗結論的契約 |
+| `apps/api/evals/professional_consultant_r1/live_batch.py` | Segment 5：A1／A6／A2 正式批次、grader calibration、預算停線與 owner review queue |
+| `apps/api/evals/professional_consultant_r1/test_*.py` | 離線測試；只保護會污染實驗結論的契約 |
 
 ### 兩個由程式保證、不靠約定的不變量
 
@@ -56,14 +57,12 @@ metadata 形狀已由 Segment 4 真實回應核對。真實 wire 顯示 `endpoin
 舊實作可能有多餘或錯誤的決定。測試 `test_r1_eval_and_production_dependencies_are_one_way`
 掃描原始碼，雙向擋住 eval→`app.*`（含 `interview_vnext`）與 `app.*`→eval。
 
-## 本段**沒有**做什麼
+## 本實驗**沒有**做什麼
 
-- 沒有對八個凍結案例送出任何真實 API 請求；Segment 4 只使用一個 inline
-  disposable case；
-- 沒有 `trials/`、`results.csv`、`report.md` —— **沒有結果就不會有這些檔案**；
 - 沒有把任何實驗欄位、schema、runner 或 grader 當成 production 契約；
-- Segment 4 不形成 Task Discovery 品質結果；它只驗證 route／binding／單次 HTTP／
-  cache 禁用、structured output、two-stage 與 blind grader plumbing。
+- 沒有執行 A3／A4／A5，所以不回答 heavy schema 或 economical model；
+- 沒有接 Web／DB，也沒有把 R1a 當成 shipping architecture 已證明；
+- Segment 4 只驗證 plumbing；Segment 5 才形成 development screening 證據。
 
 ## Segment 4 live preflight 證據
 
@@ -78,6 +77,20 @@ metadata 形狀已由 Segment 4 真實回應核對。真實 wire 顯示 `endpoin
   manifest 完整性與 secret scan 通過。
 - grader 正反序一致只代表管線能解析、合併；`quality_conclusion_eligible=false`，
   **不能據此裁決任何 arm、模型或架構**。
+
+## Segment 5 R1a 完成證據
+
+- run：`r1a-20260727T120447Z`；
+- 24 / 24 observations、32 generator calls、16 formal grader calls、2 calibration calls；
+- 24 個 observation 全為 `completed`，無 deterministic／harness invalid；
+- formal run cost **US$1.6658400**；連兩次中止嘗試共 **US$1.7712050**，
+  低於 owner US$2.50 上限；
+- exact model／endpoint、direct route、attempt 1、無 fallback、無 retry；
+- call 43 命中 OpenRouter moderation inspection，但 `flagged=false`、內容未改寫。
+  owner 核准只允許這個精確形狀並留下 limitation；其餘 pipeline 仍 fail closed；
+- 由既有 capture 接續剩餘 7 次 grader，**沒有重送 32 次 generator**；
+- 完整結果、人工稽核草案與暫定建議見
+  [R1a 架構快篩結果](r1a-results.md)。
 
 ## 執行
 

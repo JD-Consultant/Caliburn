@@ -473,6 +473,160 @@ v1 重新定義，不繼承其資料模型或程式碼。）
 
 ### 9.7 不在 Task v1 內
 
-Product Proposal 的 target 形狀與 `pending｜accepted｜edited｜rejected｜deferred` 生命週期、
-員工決策如何分別更新 Work Model 與 Current JD，屬下一個獨立題目；Context Packet 在其後。
-本節不預先裁決它們。
+Product Proposal 的 target 形狀與生命週期、員工決策如何分別更新 Work Model 與 Current JD，
+見 **§10**（在 Task v1 凍結之後另外定案）。Context Packet 在其後。
+
+## 10. Product Proposal v1 凍結形狀（2026-07-28）
+
+與 §9 同性質：production contract 的研究基礎，不是資料庫 schema。Proposal **只 gate Current JD**；
+Work Model 的更新規則見 §9.6。
+
+### 10.1 狀態與轉移
+
+```text
+pending  → deferred | accepted | edited | rejected | revision_requested | stale
+deferred → accepted | edited | rejected | revision_requested | stale
+
+terminal: accepted | edited | rejected | revision_requested | stale
+```
+
+| 狀態 | 誰決定 | payload |
+|---|---|---|
+| `pending` | application 建立 | — |
+| `deferred` | 員工 | — |
+| `accepted` | 員工 | — |
+| `edited` | 員工 | `edited_jd_after`（見 §10.5） |
+| `rejected` | 員工 | `reason?` 自由文字 |
+| `revision_requested` | 員工 | `excluded_member_task_ids[]`（merge）或 `excluded_child_refs[]`（split），至少一項 |
+| `stale` | **application 判定，非員工決策** | `stale_reason`（員工可見） |
+
+**`stale` 只套用於仍為 `pending`／`deferred` 的 Proposal；terminal Proposal 不會被改成 `stale`。**
+
+命名注意：`source` 一詞已專指 provenance／`SourceRef`，因此排除清單用 `member`／`child`，
+不得叫 `source_ids`。
+
+### 10.2 action 與 target
+
+| action | target | `affected_task_ids` | 何時需要 Proposal |
+|---|---|---|---|
+| `add` | `task_id`（Work Model 候選） | `[task_id]` | 要進 JD 時 |
+| `revise` | `task_id` | `[task_id]` | JD 文字也要改時 |
+| `withdraw` | `task_id` | `[task_id]` | 該 Task **在 JD 中**時（JD 外直接 retire，§9.6） |
+| `merge` | staged `new_task_id` ＋ `member_task_ids[]`（≥2） | 新 ID ＋ 全部成員 | 任一成員在 JD 時 |
+| `split` | `parent_task_id` ＋ staged `child_ids[]`（≥2） | 母 ＋ 全部子 | 母 Task 在 JD 時 |
+
+staged 的新 ID 與子 ID 由 application 在提案建立時配發、冪等；提案未被接受即成為未使用的孤兒 ID。
+`excluded_child_refs` 指的就是這些 staged child id，**不另立第二套 ordinal 指涉**。
+
+### 10.3 JD before／after 與 precondition
+
+```text
+jd_before: { task_id -> JD 目前內容 | null }    null = 尚未在 JD（add 的常態）
+jd_after:  { task_id -> 提議內容   | null }     null = 從 JD 移除（withdraw、merge 成員）
+```
+
+precondition：每個 `affected_task_ids` 的 **JD 現況等於 `jd_before` 對應值**；不等即 `stale`，不套用。
+
+### 10.4 staged Work Model delta
+
+```text
+staged_work_model_delta?    只有跨層 topology 變更（merge／split／JD 內 withdraw）才有
+├─ retirement / merged_into / split_from
+└─ staged 新 Task 的語意欄位
+```
+
+`accepted`／`edited` 時與 JD 變更**原子套用兩層**；`rejected`／`stale`／`revision_requested` 兩層都不套用；
+`deferred` 留在提案內，Context 標為待決假說。
+
+### 10.5 `edited` 的硬規則
+
+`edited` 是**文字修改**，不是結構修改。payload 是完整 map：
+
+```text
+edited_jd_after: { task_id -> edited content | null }
+```
+
+- key 集合必須與原 `jd_after` **完全相同**；
+- `null`／非 `null` 的位置必須**完全相同**；
+- 只能修改非 `null` 的內容；
+- **不得**修改 `action`、`target`、成員集合或任何 topology。
+
+不符合即拒絕整筆決定。這幾條讓「edited 真的只是改字」成為可機械檢查的事實，而不是靠實作者自律。
+
+### 10.6 決策對兩層的效果
+
+| 決策 | Current JD | Current Work Model |
+|---|---|---|
+| `accepted` | 套用 `jd_after` | 套用 staged delta（若有）；產生 `proposal_decision` Source |
+| `edited` | 套用 `edited_jd_after` | 套用 staged delta（若有）＋ 受影響 Task 設 `pending_reconciliation` |
+| `rejected` | 不變 | `add`／`revise` 已先進 Work Model → 設 `pending_reconciliation`；`merge`／`split`／`withdraw` 未套用 → 不需要 |
+| `deferred` | 不變 | 不變 |
+| `revision_requested` | 不變 | 不變；原 Proposal **永不執行** |
+| `stale` | 不變 | 不變 |
+
+結構性提案被 `edited` 時，staged delta 照原樣套用、只有文字換成員工的；因此新產生的 Task
+一落地就帶 `pending_reconciliation`，由下一輪對齊。
+
+### 10.7 `revision_requested` → replacement
+
+```text
+交易 1   Proposal → revision_requested、保存排除清單與員工決策、兩層都不套用、commit
+交易外   依最新 authority snapshot 呼叫 LLM 重建
+交易 2   snapshot 仍有效 → 建立 replacement Proposal（caused_by_decision_id 指回該決策）
+         snapshot 已失效 → 丟棄結果，重組 context 重來
+```
+
+重建以**語意正確優先**，減少不必要的改寫；**不得為追求小 diff 而保留受排除成員影響的內容**。
+
+解析結果有持久落點，兩者互斥：
+
+```text
+RevisionRequestResolution
+├─ replacement Proposal（由 caused_by_decision_id 關聯）
+└─ closed_without_replacement_reason?
+```
+
+狀態由此推導：兩者皆無 → 等待重建，reload 後可重試；有 replacement → 新的提案待確認；
+有 closure reason → 已結束並顯示原因。
+
+**唯一性：同一筆 `revision_requested` 決策最多產生一份 replacement**（不是「最多一份非 stale」）。
+該 replacement 日後若 stale，後續提案依最新現況重新產生，**不得復活舊的 revision request**。
+
+重建結論是不需要改 JD 時走 `closed_without_replacement`；**不為「不做某件事」要一次核准**。
+
+### 10.8 stale 觸發與 disposition
+
+| 觸發 | disposition |
+|---|---|
+| 新提案的 `affected_task_ids` 與它有交集，且它仍 `pending`／`deferred` | 新提案即 replacement |
+| affected Task 的 JD 現況 ≠ `jd_before` | replacement 或 visible closure |
+| affected Task 進入 `pending_reconciliation` 或 `retirement != null` | replacement 或 visible closure |
+| 純 Work Model topology 變更使它失效 | **同一交易**內 replacement 或 visible closure（§9.6） |
+
+`closed_without_replacement` 的理由必須**員工看得到**；只存資料庫等同無聲消失。
+
+### 10.9 Authority snapshot 的 read-set
+
+read-set 是該輪 Context Packet 中**所有會影響分析且可能變動的 authority input**：
+
+- 投影出的 Task 語意欄位；
+- JD membership 與 `jd_before` 內容；
+- 相關的 Proposal 決策；
+- `open_issues[]` 與 `excluded_signals[]`。
+
+其中任何一項在模型執行期間改變 → **該次分析結果失效，不得套用**，必須重新分析；不得只重算
+§9.6 的交集然後換一種分類硬套。與本次分析無關的資料被改動不作廢整輪——只保護模型真正讀過的部分。
+
+### 10.10 提案卡最低顯示
+
+變更 diff、JD before／after、相關員工原話、被排除成員目前如何處理。
+取消勾選時不再問一次；員工審查 replacement 後按一次接受即可。
+
+**引用邊界**：OpenAI 的 HITL 指引直接支持的是「新生成內容投入使用前應由人審查」與「審查者應能方便
+取回原始資料」——因此**顯示員工原話有官方依據**。diff、before／after 與排除成員狀態是本產品的
+設計選擇，不得標成 OpenAI 的要求。
+
+### 10.11 不在 Product Proposal v1 內
+
+資料庫表、job／workflow framework、版本歷史、通用 topology editor、批次核准、
+Proposal 之外的通知機制。

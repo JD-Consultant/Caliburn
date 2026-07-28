@@ -294,6 +294,11 @@ O\*NET 的 Core／Periphery 是**職業群體**構念（core＝多數在職者�
 本節是 production contract 的**研究基礎，不是最終資料庫 schema**。欄位到此凍結；
 要再增加必須先指出它避免的具體使用者失敗。
 
+**本節只凍結 Current Work Model 的 Task Analysis slice，不是完整 Current Work Model。**
+角色假說（Role Hypothesis）、coverage、current focus、active question、conversation 與
+Product Proposal 由後續垂直切片定義（見 [roadmap §9.2](2026-07-25-professional-consultant-architecture-realization-roadmap.md)）；
+它們沒有被刪除，只是不在這一輪的範圍內。
+
 ### 9.1 形狀
 
 ```text
@@ -369,9 +374,16 @@ application → 驗證後唯一負責寫入 Current Work Model 與 Current JD
 - `pending_reconciliation` 必須指向 `direct_edit`；
 - **`active` Task 至少一條 `superseded_by == null` 的 SupportLink**；
 - **原子性**：同一次寫入若使某 `active` Task 的最後一條有效 SupportLink 變成 `superseded_by != null`，
-  該次寫入必須同時給它新的有效 SupportLink 或設定 `retirement`，否則整筆拒絕（`TI-R1-08`）。
-  Work Model 可立即 retire（AI 的理解對齊員工剛說的話）；**Current JD 中已核准的內容不因此消失**，
-  移除仍須經 Proposal 由員工決定。
+  該次寫入必須**同時滿足下列其中一項**，否則整筆拒絕：
+
+  | 出口 | 適用情境 | 對 Current JD 的效果 |
+  |---|---|---|
+  | 新增有效 SupportLink | 新說法只修正細節，仍支持同一 Task（`revise`） | 由 Proposal 決定是否改文字 |
+  | 設定 `pending_reconciliation` | 員工直接編輯與舊分析不一致 | **JD 不動**，等待重新對齊 |
+  | 設定 `retirement` | 員工在訪談中明確否認原 Task（`TI-R1-08`） | Work Model 可立即 retire；**JD 中已核准的內容不因此消失**，移除須另提 Proposal |
+
+  三個出口對應三種不同的真實情境，缺一就會出現「active 但零有效支持」或
+  「員工編輯被當成否認」的錯誤處置。
 
 其餘（purpose 是否相同、該不該 merge／split、outcome 是否可理解、enabler 分類是否正確）
 一律歸 rubric 與員工審核，**不得寫進 verifier**，也不得用 schema required 逼模型硬填

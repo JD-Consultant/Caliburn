@@ -705,3 +705,81 @@ Task Analysis Model Request
 | `active_question` | `support_links.question_turn_id` 的來源；缺它短答無法解讀 | §9.3、§9.5 |
 
 沒有其他新增。欄位到此停止擴充。
+
+## 12. TaskAnalysisResult.v1（2026-07-28）
+
+模型的 production output shape 與其 application mapping。**模型永遠不產生 ID**，只用 packet 給的
+ordinal 與本次輸出內的位置索引；所有 ID 由 application 配發（§9.6、§11.2）。
+
+### 12.1 形狀
+
+```text
+TaskAnalysisResult.v1
+├─ work_signals[]                     一段回答可產生 0..N 條
+│  ├─ anchors[]  { turn_ordinal, quote }        ≥1；`矛盾未解` 需 ≥2
+│  ├─ identity   { relation, target_task_ordinals[] }
+│  │                relation: no_match | duplicate | overlap | uncertain
+│  ├─ disposition: task_change | support_only | exclude | open_issue
+│  └─ payload（依 disposition 擇一）
+│     ├─ task_change  { change, target_task_ordinals[], task_fields?, split_children[]? }
+│     │                  change: add | revise | withdraw | merge | split
+│     ├─ support_only { }                       只追加來源，不改 Task
+│     ├─ exclude      { reason, summary }
+│     └─ open_issue   { kind, summary }
+│
+├─ next_question { text, purpose, target? }
+│                   target: { kind: existing_open_issue, ordinal }
+│                         | { kind: new_signal, index }
+│                         | null
+└─ limitations[]
+```
+
+`task_fields`＝§9.1 的語意欄位子集：`statement`、`action`、`object`、`purpose_result?`、`context?`、
+`deliverable_hint?`、`success_criterion_hint?`、`enablers[]`。**不含** `task_id`、`support_links`、
+`retirement`、`merged_into`、`split_from`——那些全部由 application 依 anchors 與 gate 產生。
+
+**不設整體 `analysis_decision` 欄位**：本輪是提案、澄清還是不變更，由 `work_signals` 推導
+（無 `task_change` 即澄清或不變更）。多存一個可能與陣列內容矛盾的欄位沒有價值（§9.2 同一原則）。
+
+### 12.2 relation × disposition → application mapping
+
+| relation | disposition | application 效果 |
+|---|---|---|
+| `duplicate` | `support_only` | 既有 Task 追加 SupportLink，不改語意欄位 |
+| `overlap`（1 target） | `task_change: revise` | 沿用該 `task_id` 改寫語意欄位 ＋ 追加 SupportLink |
+| `overlap`（≥2 targets） | `task_change: merge` | merge 候選；存續 ID 依 §5／§9.6 |
+| `no_match` | `task_change: add` | 建立新候選 Task（application 配發 ID） |
+| 任一 | `task_change: withdraw` | 依 §9.6：JD 外立即 retire；JD 內走 Proposal |
+| 任一 | `task_change: split` | 母 Task ＋ ≥2 個 `split_children` |
+| 任一 | `exclude` | 寫入 `excluded_signals[]`（他人工作／過去工作／一次性支援／工具或步驟／員工否認） |
+| `uncertain` | `open_issue` | 寫入 `open_issues[]`（`task_boundary_uncertain`） |
+| 任一 | `open_issue` | 責任邊界不明／證據不足／矛盾未解 |
+
+每一筆 `task_change` 由 application 各自計算
+`topology_affected_existing_ids ∩ current_jd_task_ids`，決定立即套用或建立 Proposal（§9.6）。
+同一輪可同時包含立即套用與 Proposal 兩類結果。
+
+模型只給 `anchors`；application 把 `turn_ordinal` 解析成 `SourceRef`，再建立 SupportLink
+與 `source_anchors[]`（§9.1）。
+
+### 12.3 這個形狀專屬的 verifier 規則
+
+在 §9.5／§10.5 之外另加：
+
+- `anchors` ≥1；`open_issue.kind == 矛盾未解` 時 ≥2；
+- `quote` 必須是該 `turn_ordinal` 原文的逐字子字串，且該回合必須是**員工回合**；
+- `target_task_ordinals` 必須在 packet 範圍內；`no_match` 時必須為空、`duplicate`／`overlap` 時 ≥1、
+  `merge` 時 ≥2；
+- `change == merge` → `task_fields` 必填；`change == split` → 1 個母 target ＋ `split_children` ≥2；
+  `change == withdraw` → **不得**帶 `task_fields`；
+- 同一個 target Task 被兩筆 `task_change` 指涉 → **兩筆都拒絕**，不任選贏家；
+- `next_question.target` 必須指向存在的 packet ordinal 或本次輸出的合法 index；
+- 輸出中不得出現 UUID 形狀字串（防止模型自造 ID）。
+
+分類是否正確、該不該 merge、outcome 是否可理解，一律仍歸 rubric（§9.5 末段）。
+
+### 12.4 provider schema 範圍
+
+**只有 `TaskAnalysisResult.v1` 需要提交 provider-facing JSON Schema**（portable subset，
+ADR 0040 決定 24）。Task、Proposal、Context 等同 package 內部契約用 Pydantic ＋ 少量 unit test 即可，
+不為內部 DTO 產生大量 JSON Schema 與 golden。

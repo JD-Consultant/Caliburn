@@ -630,3 +630,78 @@ read-set 是該輪 Context Packet 中**所有會影響分析且可能變動的 a
 
 資料庫表、job／workflow framework、版本歷史、通用 topology editor、批次核准、
 Proposal 之外的通知機制。
+
+## 11. TaskAnalysisContext.v1（2026-07-28）
+
+分區依據是**資料的權威來源**，不是模型的思考步驟。identity 比對、Task 邊界、變更提案與下一題
+共用同一批資料，按思考步驟拆會重複資料並逼模型照死流程推理；完全扁平則容易讓「員工已確認的事」、
+「AI 暫時的理解」與「尚未核准的提案」混在一起。OpenAI 與 Anthropic 的 prompt／context 指引都主張
+用清楚區段表達邏輯邊界，且只放足以完成任務的最小高訊號內容。
+
+### 11.1 請求結構
+
+```text
+Task Analysis Model Request
+├─ Static Instructions          （固定 prompt，不隨產品現況變動）
+│  ├─ 顧問角色
+│  ├─ Task policies（§4 判準）
+│  ├─ 行為與禁止事項
+│  └─ 輸出規則
+│
+├─ Dynamic Context Packet
+│  ├─ conversation_context
+│  │  ├─ transcript            第一版送完整
+│  │  └─ active_question       產生 question_turn_id 的來源
+│  │
+│  ├─ current_authorities
+│  │  ├─ tasks[]               ＋ context-local ordinal
+│  │  ├─ jd_presence           該 Task 是否在 Current JD 及目前文字
+│  │  ├─ open_issues[]
+│  │  └─ excluded_signals[]
+│  │
+│  └─ proposal_context
+│     ├─ pending / deferred proposals   明標「尚未成立」
+│     ├─ 尚未完成的 revision requests
+│     └─ 會約束後續判斷的 rejection
+│
+└─ Output Schema
+   ├─ identity_assessments
+   ├─ task changes
+   └─ next_question
+```
+
+### 11.2 固定限制
+
+- `next_question` 是**輸出**，不是輸入區段；
+- Task policies 屬 Static Instructions，**不混進動態產品現況**；
+- pending／deferred Proposal 必須明標**尚未成立**，模型不得當現況事實（§9.6）；
+- 第一版直接送**完整 transcript 與全部 Work Model Tasks**，不做 embedding、retrieval、compaction
+  或通用 Context framework；長對話出現退化再啟用 ADR 0041 決定 8 已定案的 recent-window；
+- Proposal 只引用 Task **ordinal**，不重複整份 Task 內容；
+- ordinal 每輪重新編號、在 packet 中明示、超出範圍即 invalid；ordinal↔ID mapping 存在該輪呼叫
+  紀錄側，不進產品 domain（§9.3）。
+
+### 11.3 read-set 的保守定義
+
+分區只能讓權威邊界清楚，**不能證明模型實際注意了哪些資料**。因此：
+
+> read-set ＝ 本輪 packet 中送出的**所有可變 authority 資料**（保守計入）。
+> application 保存當輪的實際投影，寫入前只檢查這批 authority 是否已變（§10.9）。
+
+不另建 read-set framework，也不試圖從模型輸出反推它「真正讀了什麼」。
+
+### 11.4 與 A6 的關係（ADR 0042 決定 7 的逐項理由）
+
+本結構仍是 A6 已 live 驗證過的 `sources ＋ current_work_model ＋ task_policies`，只是把後續定案時
+確實存在的資料放到正確位置。每一項新增都對應一個已定案的機制：
+
+| 新增項 | 為什麼必要 | 出處 |
+|---|---|---|
+| `jd_presence`（是否在 JD ＋ 目前文字） | identity gate 的交集判斷與 `jd_before` precondition 都需要它 | §9.6、§10.3 |
+| `open_issues[]` | 未被選中追問的缺口否則會消失；`uncertain` 需要落點 | §9.1 |
+| `excluded_signals[]` | 否則同一訊號會被重複提成 Task，員工得重複拒絕 | §9.1 |
+| pending／deferred proposals | 避免重複提案，並允許以新證據修訂或取代待決提案 | §9.6 |
+| 受約束的 rejection 記錄 | direct-edit 已知例外的唯一承擔者 | §9.6 |
+| `active_question` | `support_links.question_turn_id` 的來源；缺它短答無法解讀 | §9.3、§9.5 |
+
+沒有其他新增。欄位到此停止擴充。

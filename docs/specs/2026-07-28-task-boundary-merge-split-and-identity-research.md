@@ -149,14 +149,16 @@ Task Matching 階段把每筆新資訊對既有 task 分成三類：
 
 1. 可寫成 `action + object (+ purpose/result)` 的單句，不需要分號；
 2. 所有動作**共享同一個 purpose/result**；
-3. 有可辨識的關鍵工作產出，或有可描述的成功判準（iCAP 二擇一）；
+3. 有**可理解的 meaningful outcome**——可以明寫在 purpose/result、關鍵工作產出或成功判準，
+   也可以合理隱含於 action＋object（O\*NET 的 "Mops, sweeps, and dusts halls and corridors"）；
 4. 是本人目前的責任（actor／time 由 Source 判定，不在本研究範圍）。
 
 `purpose/result` **欄位可以為空**——O\*NET 明示它常常是隱含的（"Mops, sweeps, and dusts halls
 and corridors" 的 result 隱含在 action＋object）。成立條件要求的是「目的說得出來」，
 **不是欄位非空**；前者是語意判斷，後者才是 verifier 能查的。
 
-不滿足 3 時 → `clarify`，不得先建 Task。不滿足 1–2 時 → 觸發 split 檢查。
+**不得用「三個欄位皆空」作結構性否決**——是否具備可理解的 outcome 由 rubric 判斷。
+確實判不出 outcome 時 → `clarify`，不先建 Task。不滿足 1–2 時 → 觸發 split 檢查。
 
 ### 4.2 Enabler 硬規則
 

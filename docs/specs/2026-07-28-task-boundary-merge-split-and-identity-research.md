@@ -342,7 +342,9 @@ Task
 │                      reason: other_person|past_work|one_off|enabler_or_step|employee_denied
 │                      （只有 kind == withdrawn 才有 reason）
 ├─ merged_into? / split_from?
-└─ pending_reconciliation?: SourceRef   必須指向 direct_edit；多次修改指向最新一筆
+└─ pending_reconciliation?: SourceRef   合法來源見 §9.5（direct_edit｜employee_turn｜
+                                        proposal_decision 且 decision 為 edited 或 rejected）；
+                                        多筆未對齊時指向最新一筆
 
 Current Work Model
 ├─ tasks[]
@@ -732,8 +734,11 @@ Task Analysis Model Request
 | support link 的 task-local ordinal | 否則模型無法指認「哪一句依據被更正」，`superseded_by` 永遠設不了（§12.1） | §9.1、§9.5 |
 | `retired_tasks[]`（精簡） | 否則已撤回的工作會被重新提出，員工得重複拒絕 | §9.6 |
 
-`retired_tasks[]` **只作為「不要重提」的參考，不是現況**，不得被引用為 `target_task_ordinals`
-以外的用途，也不得成為 `revise` 的目標。
+`retired_tasks[]` 是 **read-only 的防重提資訊**：
+
+- **不進 active Task 的 ordinal namespace**（另一組編號）；
+- **不得出現在任何 `target_task_ordinals` 或 supersession reference**；
+- 新證據若與該 `retirement` 衝突，第一版**輸出 `open_issue`**，不得自動復活。
 
 沒有其他新增。欄位到此停止擴充。
 
@@ -809,7 +814,14 @@ TaskAnalysisResult.v1
 - `next_question.target` 必須指向存在的 packet ordinal 或本次輸出的合法 index；
 - `supersedes_support_ordinals[]` 的每一項必須指向 packet 中存在、且**目前 `superseded_by == null`**
   的 support link；其 `task_ordinal` 必須出現在同一筆 signal 的 `target_task_ordinals` 中；
-- 輸出中不得出現 UUID 形狀字串（防止模型自造 ID）。
+  `retired_tasks[]` 不在此 namespace，不得被指涉。
+
+**`superseded_by` 要寫哪個新來源**：第一版一律指向**本次 operation 正在處理的 employee turn**，
+且該 turn 必須存在於同一筆 signal 的 `anchors` 中。不加欄位讓模型指定。日後若 direct edit 或
+proposal decision 的 reconciliation 共用這個 operation，再另升契約。
+
+輸出契約本身沒有任何可讓模型填 ID 的欄位，因此**不做「掃描全文是否含 UUID 形狀字串」的檢查**——
+員工原話可能合法含有 request／correlation UUID，掃描會誤殺。只驗 ordinal 與結構欄位。
 
 **為什麼需要 `supersedes_support_ordinals`**：§9.1 的 `SupportLink.superseded_by` 與 §9.5 的原子性
 三出口，都以「某條依據被後續來源取代」為前提。若模型無法指認是哪一條，application 只能自行猜測，

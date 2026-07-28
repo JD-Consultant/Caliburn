@@ -288,3 +288,97 @@ O\*NET 的 Core／Periphery 是**職業群體**構念（core＝多數在職者�
 - DACUM 來源為大學課程頁面，僅用於佐證 duty／task 兩層與 task 的操作型定義，不作為主要依據。
 - 本研究**沒有**新的模型實驗證據；owner 已裁定第一版不再跑架構矩陣。判準是否被模型遵守，
   只有實作後的少量案例檢查能看出來。
+
+## 9. Task v1 凍結形狀（2026-07-28）
+
+本節是 production contract 的**研究基礎，不是最終資料庫 schema**。欄位到此凍結；
+要再增加必須先指出它避免的具體使用者失敗。
+
+### 9.1 形狀
+
+```text
+SourceRef { kind: employee_turn | direct_edit | proposal_decision, id }
+
+SourceAnchor { source_ref, quote?, question_turn_id? }
+
+Task
+├─ task_id                       application 產生，冪等
+├─ statement                     給人看的 AI 敘述；Current JD 另有自己的文字，兩者可不同
+├─ action / object               必填
+├─ purpose_result? / context?
+├─ deliverable_hint? / success_criterion_hint?
+├─ enablers[]        { kind: tool_system|method|knowledge|skill|other, name }
+├─ support_links[]   { source_ref, quote?, question_turn_id?, superseded_by?: SourceRef }
+├─ retirement?       { kind: withdrawn|merged|split, reason?, source_ref }
+│                      reason: other_person|past_work|one_off|enabler_or_step|employee_denied
+│                      （只有 kind == withdrawn 才有 reason）
+├─ merged_into? / split_from?
+└─ pending_reconciliation?: SourceRef   必須指向 direct_edit；多次修改指向最新一筆
+
+Current Work Model
+├─ tasks[]
+├─ open_issues[]      { id, kind, summary, source_anchors[], last_asked_turn_id? }
+│    kind: 責任邊界不明 | 證據不足 | 矛盾未解 | task_boundary_uncertain
+└─ excluded_signals[] { id, reason, summary, source_anchors[] }
+     reason: 他人工作 | 過去工作 | 一次性支援 | 工具或步驟 | 員工否認
+```
+
+`task_boundary_uncertain` 涵蓋 duplicate／overlap 不確定、merge／split 邊界不明、
+是否共用 meaningful outcome 不明。它是暫時性 `identity_assessment.relation = uncertain`
+的**持久落點**——本輪若選擇先問別的問題，這個缺口不會消失。
+
+### 9.2 推導狀態（不存 status 欄位）
+
+| 狀態 | 條件 | 可否作為穩定現況產生新文件提案 |
+|---|---|---|
+| `active` | `retirement == null` 且 `pending_reconciliation == null` | 可 |
+| `pending reconciliation` | `retirement == null` 且 `pending_reconciliation != null` | **不可**；優先進 reconciliation／clarify |
+| `retired` | `retirement != null` | 不可 |
+
+reconciliation 必須讀 **Current JD 的目前文字**，不是只讀該筆 edit；成功對齊後清空
+`pending_reconciliation`。不建立 revision、checkpoint 或 reconciliation history。
+
+### 9.3 持久與暫時
+
+全部持久，**除了**單次模型輸出的 `identity_assessments[]`、`task_change_proposals[]`、
+原始 `next_question`，以及 ordinal↔ID mapping（存在該輪呼叫紀錄側）。
+
+模型送出的 `next_question` 一旦實際發問，**必須**轉成持久的顧問回合與 active question——
+`support_links[].question_turn_id` 依賴它；少了它，reload 後員工的短答無從連回問題。
+
+### 9.4 寫入權威
+
+```text
+模型      → 提出候選結果（依據）
+員工      → 接受／修改／拒絕，或直接編輯 Current JD（依據與文件權威）
+application → 驗證後唯一負責寫入 Current Work Model 與 Current JD
+```
+
+員工直接編輯**不覆寫** Work Model 欄位：JD 立即保存員工文字 → 該編輯成為 `direct_edit` Source
+→ Task 標記 `pending_reconciliation` → application 驗證新的分析結果後才更新 Work Model。
+
+### 9.5 確定性 verifier 規則
+
+- 欄位型別與 enum 值域；ordinal 在 Context Packet 範圍內；
+- `source_ref.kind == employee_turn` → `quote` 必填且為該回合原文的逐字子字串；
+  只有 `direct_edit`／`proposal_decision` 的 `quote` 可空；
+- `question_turn_id` 指向**已存在且較早**的顧問回合，不得指向員工回合或未來回合；
+- `open_issue` 至少一個 anchor；`矛盾未解` 至少兩個；
+- `retirement.kind == withdrawn` → `reason` 必填；`== merged` → `merged_into` 必填；
+- `merged_into`／`split_from` 目標必須存在且不得成 cycle；
+- `pending_reconciliation` 必須指向 `direct_edit`；
+- **`active` Task 至少一條 `superseded_by == null` 的 SupportLink**；
+- **原子性**：同一次寫入若使某 `active` Task 的最後一條有效 SupportLink 變成 `superseded_by != null`，
+  該次寫入必須同時給它新的有效 SupportLink 或設定 `retirement`，否則整筆拒絕（`TI-R1-08`）。
+  Work Model 可立即 retire（AI 的理解對齊員工剛說的話）；**Current JD 中已核准的內容不因此消失**，
+  移除仍須經 Proposal 由員工決定。
+
+其餘（purpose 是否相同、該不該 merge／split、outcome 是否可理解、enabler 分類是否正確）
+一律歸 rubric 與員工審核，**不得寫進 verifier**，也不得用 schema required 逼模型硬填
+（ADR 0040 決定 25）。
+
+### 9.6 不在 Task v1 內
+
+Product Proposal 的 target 形狀與 `pending｜accepted｜edited｜rejected｜deferred` 生命週期、
+員工決策如何分別更新 Work Model 與 Current JD，屬下一個獨立題目；Context Packet 在其後。
+本節不預先裁決它們。

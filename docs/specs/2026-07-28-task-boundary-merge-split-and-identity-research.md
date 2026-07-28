@@ -16,7 +16,7 @@ R1a 之後，**能靠研究推進的**是三個判準問題。R1a 用的已是�
 
 1. **粒度**：什麼算一個 Task？何時是步驟、工具或工作活動？
 2. **同一性**：新回答裡的敘述，是既有 Task 的換句話說、補充，還是新工作？
-3. **merge/split**：什麼條件觸發合併或拆分？輸出要長什麼樣才能機械檢查？
+3. **merge/split**：什麼條件觸發合併或拆分？輸出要長什麼樣才能可診斷（不是可自動判定）？
 
 第 2 題是實作 blocker：沒有同一性判準，`revise` 保留哪個 Task、`merge` 合併哪幾個、
 `split` 從哪裡拆出來、`withdraw` 撤回哪一項，都無法表達。
@@ -185,11 +185,13 @@ possible」是 O\*NET **撰寫階段**把一群網路蒐集資料寫成精簡敘
 裁決規則，不得當 tie-break 直接套用。邊界不明時員工才是權威（ADR 0037／0040 的 employee authority），
 應追問，不是替他決定。
 
-### 4.5 低頻與支援性工作用 frequency／importance 表達，第一版不採 Core／Periphery
+### 4.5 第一版不採 Core／Periphery，也不加 frequency／importance 欄位
 
 O\*NET 的 Core／Periphery 是**職業群體**構念（core＝多數在職者都會做），本產品是單一員工的客製 JD，
-沒有 incumbent 分布可依據。第一版改用既有的 frequency／importance 表達「低頻但正式」與「重要性」，
-**不引入 centrality 欄位**。
+沒有 incumbent 分布可依據，因此**不引入 centrality 欄位**。
+
+第一版**也不加 frequency／importance 欄位**：「正式低頻責任可成立」已經在 Task policies 的判準文字裡，
+不需要欄位承載。真的需要區分時再加，並受 ADR 0042 決定 7 約束。
 
 正式低頻責任、支援性工作不因低頻而被排除。真正的排除只留給：他人責任、過去工作、一次性支援、
 純工具／步驟、員工明確否認、證據不足——且**排除理由必須分開保留**，不可壓成單一「已排除」狀態。
@@ -201,24 +203,47 @@ O\*NET 的 Core／Periphery 是**職業群體**構念（core＝多數在職者�
 | 換句話說，無新資訊 | Duplicative | `no_change` + 追加 source support | 既有 ID 不變 |
 | 重疊但帶新內容 | Overlapping | `revise` | **保留既有 ID**，敘述改寫 |
 | 完全不同的工作 | Unique | `add` | application 配發新候選 ID |
-| 兩個既有候選其實是一件事 | Task Joining | `merge` | 明列來源 ID；**存續 ID 由 application 依確定規則決定（最早建立者存續），模型不得指定**，其餘標為被併入 |
+| 新內容被某個既有 Task 吸收 | Task Revision | `revise` | **沿用該 Task ID**；不產生新 ID |
+| 兩個既有 Task 合成一個較廣的工作 | Task Joining | `merge` | **建立新 Task ID**，兩個舊 Task 都記 `merged_into`；舊記錄不刪除 |
 | 一個既有 Task 內含兩個獨立結果 | Task Separation | `split` | 明列來源 ID；產生的每個新 Task 都記錄 parent ID |
 | **既有** Task 被新證據推翻 | Task Deletion | `withdraw` | 既有 ID 不刪除，標為撤回並記錄理由型別 |
+
+**吸收與合成的區分判準**用已經拆開的 `purpose_result` 欄位就能表達，不需要新機制：
+合成後的目的若等於其中一個舊 Task 的目的 → 那是吸收（`revise`，沿用該 ID）；
+若需要一個涵蓋兩者、比原本更廣的新目的 → 那是合成（新 ID）。
+模型提出判斷，但因為它會改變 JD，最終仍由員工在提案決定時確認。
+**建立時間不作為存續依據**——它不代表語意主體。
+
+新 Task ID 必須**冪等**：由 application 從 `operation_id` ＋ 該提案在輸出中的位置確定性導出。
+否則同一個 operation 重試會產生第二個 Task（舊路徑就是為此改用位置式 proposal ref）。
 
 **一開始就不成立的訊號不建立 Task**。工具、步驟、他人責任、過去工作、一次性支援、證據不足
 一律不先建 Task 再撤回——那會污染 Work Model，也給模型一條「先建再退」的避險路徑。
 它們留在 source 與 open issues。`withdraw` 只適用於**已經存在**的 Task 被後來的證據推翻
 （`TI-R1-08`），這條路徑必須保留。
 
-未被選中追問的缺口、以及已判定的排除，都要留在 Work Model 的 open issues，而且**必須能區分
-「待釐清」與「已判定排除」**。不區分的話，模型下一輪會把同一件事再提一次 Task，員工得重複說
-「那是別人做的」——`TI-R1-06` 正是這種訊號。
+不成立的訊號分成兩個最小集合存在 Work Model，**判準是「agenda 還會不會主動追問它」**：
+
+| 集合 | 內容 | agenda 行為 |
+|---|---|---|
+| `open_issues[]` | 責任邊界不明、**證據不足**、矛盾未解 | 會被選中追問；一輪只問一題，未選中的留著 |
+| `excluded_signals[]` | 他人工作、過去工作、一次性支援、純工具／步驟、員工明確否認 | **不主動再問** |
+
+`insufficient_evidence` 屬 `open_issues`，不是排除——它是「還沒問到」，不是「已判定不是」。
+
+`excluded_signals` **不是永久 terminal**：員工日後自己更正（「其實那個我也要做」）仍可讓它重新成為候選。
+差別只在系統不主動騷擾。這個分法沿用舊路徑 Gap lifecycle 已驗證的區分——`declined`（之後不可重問）
+與 `deferred`（可重新追問）——不是新發明。
+
+不分開的話，模型下一輪會把同一件事再提一次 Task，員工得重複說「那是別人做的」——
+`TI-R1-06` 正是這種訊號。兩者都是最小 Work Model 資料，不是新的 Evidence／Claim layer。
 
 ## 6. 對契約的直接含意
 
 1. **Task 不能只存一個 `task_statement` 字串。** 至少要分開存 `action`／`object`／`purpose_result`／
-   `enabler`／`context`。否則 §4.3–4.4 的判準無法機械檢查——「兩個候選 purpose/result 是否相同」
-   是 merge 提示的核心訊號，字串比對做不到。
+   `enabler`／`context`。理由是**可診斷性**：「兩個候選是不是同一個 purpose/result」是 merge 的核心訊號，
+   拆開欄位讓模型與 reviewer 有明確的比較對象、讓錯誤有明確的位置。
+   **這不代表 purpose、merge、split 可以由程式自動判定**，字串比對做不到這件事。
 2. **identity 在候選建立時就配發，不等員工接受。** 否則跨回合無法 `revise`／`merge`，
    每輪只能重複提案。員工接受是把候選送進 Current JD，不是產生 identity。
 3. **模型不得自造 ID**，只能引用 Context Packet 提供的既有 Task；引用形式建議用 context-local ordinal

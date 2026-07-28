@@ -11,7 +11,8 @@
 
 ## 1. 要回答的三個問題
 
-R1a 之後，Task Discovery 剩下的不是「模型夠不夠強」，而是三個判準問題：
+R1a 之後，**能靠研究推進的**是三個判準問題。R1a 用的已是最強模型且 `TI-R1-03`／`04` 仍失敗，
+因此**不得推論「模型能力不是原因」**；判準寫清楚之後模型是否遵守，第一版沒有實驗可回答（ADR 0042 決定 8）。
 
 1. **粒度**：什麼算一個 Task？何時是步驟、工具或工作活動？
 2. **同一性**：新回答裡的敘述，是既有 Task 的換句話說、補充，還是新工作？
@@ -62,8 +63,13 @@ Action (Behavior) → Object of the Action → Purpose/Result
 methods used、**knowledge and skill drawn upon**、nature of the instructions followed。
 
 也就是說「Java／Python／HTML」在權威規範裡有指定的欄位——它們是 enabler 片語
-（`using` / `based on` / `following` 引導），**結構上就不可能自己成為 task statement**。
+（`using` / `based on` / `following` 引導），**工具名稱本身不構成 task statement**。
 `TI-R1-01` 的期望因此有官方依據，不是我們的偏好。
+
+反面同樣重要：**含有工具的工作可以是 Task**。`TI-R1-02` 是八案中唯一的正向案例——
+「開發與維護訂單處理服務，以支援門市交易資料正確傳送至 ERP」成立，Java／Python 落在 enabler。
+判準管的是「工具名稱不能當 action+object+purpose」，不是「提到工具就不建 Task」。
+ADR 0041 決定 14 已明文警告後者會把 prompt 推向單邊最佳化。
 
 ### 3.3 何時拆：多個 action + 多個 purpose
 
@@ -131,8 +137,9 @@ Task Matching 階段把每筆新資訊對既有 task 分成三類：
 因為本產品的匯出版型就是 iCAP，這一條是**最硬的粒度尺**：
 一個「工作任務」必須能對應到自己的關鍵工作產出或自己的成功判準；對不上的，是工作活動（步驟），不是工作任務。
 
-> 查證註記：外界常引「一份職能基準約 5–10 項工作任務」，**本指引正文查無此數字**，只有「建議 2 層為主」。
-> 不得把它寫成官方規定。
+> 查證註記：外界常引「一份職能基準約 5–10 項工作任務」。**本指引（2022 版）正文查無此數字**，
+> 只有「建議 2 層為主」。這只代表本文件未見，不代表其他官方文件沒有；要引用須指出實際出處，
+> 不得逕稱為官方規定。
 
 ## 4. 由證據導出的第一版判準
 
@@ -145,13 +152,19 @@ Task Matching 階段把每筆新資訊對既有 task 分成三類：
 3. 有可辨識的關鍵工作產出，或有可描述的成功判準（iCAP 二擇一）；
 4. 是本人目前的責任（actor／time 由 Source 判定，不在本研究範圍）。
 
+`purpose/result` **欄位可以為空**——O\*NET 明示它常常是隱含的（"Mops, sweeps, and dusts halls
+and corridors" 的 result 隱含在 action＋object）。成立條件要求的是「目的說得出來」，
+**不是欄位非空**；前者是語意判斷，後者才是 verifier 能查的。
+
 不滿足 3 時 → `clarify`，不得先建 Task。不滿足 1–2 時 → 觸發 split 檢查。
 
 ### 4.2 Enabler 硬規則
 
-工具、程式語言、系統、方法、知識、技能一律進 enabler 欄位。
-**任何情況下都不得單獨成為 Task**，包括員工大量描述它的時候。
-它們可另作 Knowledge／Skill 候選（支持度依 ADR 0040 決定 29–31）。
+工具、程式語言、系統、方法、知識、技能一律進 enabler 欄位；**工具名稱本身不成為 Task**，
+包括員工大量描述它的時候。它們可另作 Knowledge／Skill 候選（支持度依 ADR 0040 決定 29–31）。
+
+但**不得反向過度套用**：使用該工具完成的工作，若自己有 action＋object＋purpose/result，仍然成立
+（`TI-R1-02`）。判準檢查的是「這句話的 action 與 object 是不是工具本身」。
 
 ### 4.3 Split 觸發條件（任一成立即檢查）
 
@@ -167,14 +180,19 @@ Task Matching 階段把每筆新資訊對既有 task 分成三類：
 - 兩者對應**同一個**工作產出且無法各自寫出獨立的行為指標；
 - 兩者太相似，無法各自 stand alone。
 
-**平手時偏向合併**：O\*NET 明示 cluster 應寫成盡可能少的敘述、單一為佳。
-這與 repo 既有的「持平選較簡單者」一致。
+**語意平手時不預設合併，也不預設拆分，而是 `clarify`。** §3.4 引的「as few summary tasks as
+possible」是 O\*NET **撰寫階段**把一群網路蒐集資料寫成精簡敘述的規則，不是單一員工工作邊界的
+裁決規則，不得當 tie-break 直接套用。邊界不明時員工才是權威（ADR 0037／0040 的 employee authority），
+應追問，不是替他決定。
 
-### 4.5 不是 include／exclude，是 Core／Periphery
+### 4.5 低頻與支援性工作用 frequency／importance 表達，第一版不採 Core／Periphery
 
-正式低頻責任、支援性工作不應被排除，應標為 periphery。
-排除只留給：他人責任、過去工作、一次性支援、純工具／步驟、員工明確否認、證據不足——
-且**排除理由必須分開保留**，不可壓成單一「已排除」狀態。
+O\*NET 的 Core／Periphery 是**職業群體**構念（core＝多數在職者都會做），本產品是單一員工的客製 JD，
+沒有 incumbent 分布可依據。第一版改用既有的 frequency／importance 表達「低頻但正式」與「重要性」，
+**不引入 centrality 欄位**。
+
+正式低頻責任、支援性工作不因低頻而被排除。真正的排除只留給：他人責任、過去工作、一次性支援、
+純工具／步驟、員工明確否認、證據不足——且**排除理由必須分開保留**，不可壓成單一「已排除」狀態。
 
 ## 5. 同一性判準與動作對照
 
@@ -183,9 +201,18 @@ Task Matching 階段把每筆新資訊對既有 task 分成三類：
 | 換句話說，無新資訊 | Duplicative | `no_change` + 追加 source support | 既有 ID 不變 |
 | 重疊但帶新內容 | Overlapping | `revise` | **保留既有 ID**，敘述改寫 |
 | 完全不同的工作 | Unique | `add` | application 配發新候選 ID |
-| 兩個既有候選其實是一件事 | Task Joining | `merge` | 明列來源 ID；產生的 Task 取其一為存續 ID，其餘標為被併入 |
+| 兩個既有候選其實是一件事 | Task Joining | `merge` | 明列來源 ID；**存續 ID 由 application 依確定規則決定（最早建立者存續），模型不得指定**，其餘標為被併入 |
 | 一個既有 Task 內含兩個獨立結果 | Task Separation | `split` | 明列來源 ID；產生的每個新 Task 都記錄 parent ID |
-| 不成立、他人、過去、否認 | Task Deletion | `withdraw` | 既有 ID 不刪除，標為撤回並記錄理由型別 |
+| **既有** Task 被新證據推翻 | Task Deletion | `withdraw` | 既有 ID 不刪除，標為撤回並記錄理由型別 |
+
+**一開始就不成立的訊號不建立 Task**。工具、步驟、他人責任、過去工作、一次性支援、證據不足
+一律不先建 Task 再撤回——那會污染 Work Model，也給模型一條「先建再退」的避險路徑。
+它們留在 source 與 open issues。`withdraw` 只適用於**已經存在**的 Task 被後來的證據推翻
+（`TI-R1-08`），這條路徑必須保留。
+
+未被選中追問的缺口、以及已判定的排除，都要留在 Work Model 的 open issues，而且**必須能區分
+「待釐清」與「已判定排除」**。不區分的話，模型下一輪會把同一件事再提一次 Task，員工得重複說
+「那是別人做的」——`TI-R1-06` 正是這種訊號。
 
 ## 6. 對契約的直接含意
 
@@ -199,9 +226,15 @@ Task Matching 階段把每筆新資訊對既有 task 分成三類：
 4. **一輪可含多個 proposal**，因此需要衝突規則：同一 target 被兩個 proposal 指涉時**兩者都拒絕**
    （沿用既有 verifier 對 duplicate correction target 的裁決，不任選贏家）；
    `merge` 的來源必須兩個以上且都存在；`split` 的來源必須存在且不得同時被 `withdraw`。
-5. **verifier 可機械檢查的項目**：分號、多 purpose/result、enabler 欄位混入 action、
-   引用 ID 不存在、merge/split 來源數量、產出與行為指標同時為空。
-   其餘（是否真的太相似）仍是語意判斷，由 rubric 與人工審查承擔。
+5. **verifier 與 rubric 的分界要寫死**，否則會出現「用 schema required 逼模型硬填一句話」，
+   那正是 ADR 0040 決定 25 禁止的「Task 不得因 schema 必填被迫產生」：
+
+   | verifier（確定性） | rubric／模型（語意） |
+   |---|---|
+   | 欄位型別與存在、分號、引用的 Task ordinal 是否在範圍內、source anchor 是否存在且 quote 可回原文核對、merge/split 來源數量、lineage 是否成環 | 目的是否合理、工作結果是否足夠、兩個候選是不是同一個 purpose、該不該 merge／split |
+
+   §4.3–4.4 的判準**大部分不是機械檢查**——「是否共享同一 purpose/result」是語意判斷。
+   欄位拆開的價值是讓語意判斷**有明確的比較對象與可診斷的位置**，不是讓它變成可自動驗證。
 
 ## 7. 依新判準重新檢視 TI-R1-03／04
 

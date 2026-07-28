@@ -214,12 +214,13 @@ O\*NET 的 Core／Periphery 是**職業群體**構念（core＝多數在職者�
 模型提出判斷，但因為它會改變 JD，最終仍由員工在提案決定時確認。
 **建立時間不作為存續依據**——它不代表語意主體。
 
-新 Task ID 必須**冪等**：由 application 從 `operation_id` ＋ 該提案在輸出中的位置確定性導出。
-否則同一個 operation 重試會產生第二個 Task（舊路徑就是為此改用位置式 proposal ref）。
+新 Task ID 必須**冪等**——這是不變量：同一份已保存的模型結果重送時，不得建立第二個 Task ID。
+**實際做法留給 production contract／plan**，本研究不鎖死機制，避免把舊路徑的複雜 identity 推導搬回來。
 
 **一開始就不成立的訊號不建立 Task**。工具、步驟、他人責任、過去工作、一次性支援、證據不足
 一律不先建 Task 再撤回——那會污染 Work Model，也給模型一條「先建再退」的避險路徑。
-它們留在 source 與 open issues。`withdraw` 只適用於**已經存在**的 Task 被後來的證據推翻
+它們依判定結果留在 Source Layer、`open_issues[]` 或 `excluded_signals[]`。
+`withdraw` 只適用於**已經存在**的 Task 被後來的證據推翻
 （`TI-R1-08`），這條路徑必須保留。
 
 不成立的訊號分成兩個最小集合存在 Work Model，**判準是「agenda 還會不會主動追問它」**：
@@ -232,8 +233,9 @@ O\*NET 的 Core／Periphery 是**職業群體**構念（core＝多數在職者�
 `insufficient_evidence` 屬 `open_issues`，不是排除——它是「還沒問到」，不是「已判定不是」。
 
 `excluded_signals` **不是永久 terminal**：員工日後自己更正（「其實那個我也要做」）仍可讓它重新成為候選。
-差別只在系統不主動騷擾。這個分法沿用舊路徑 Gap lifecycle 已驗證的區分——`declined`（之後不可重問）
-與 `deferred`（可重新追問）——不是新發明。
+差別只在系統不主動騷擾。此區分與舊路徑 `deferred`／`declined` 的**產品語意一致**，可作先例參考；
+但依 ADR 0040 決定 3，production v1 仍重新定義，**不繼承舊資料模型或程式碼**，
+也不得以舊實作曾經運作來主張新模型正確。
 
 不分開的話，模型下一輪會把同一件事再提一次 Task，員工得重複說「那是別人做的」——
 `TI-R1-06` 正是這種訊號。兩者都是最小 Work Model 資料，不是新的 Evidence／Claim layer。

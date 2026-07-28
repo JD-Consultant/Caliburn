@@ -1,7 +1,10 @@
 # R1a 架構快篩結果
 
 - run：`r1a-20260727T120447Z`
-- 狀態：**批次完整；語意裁決待 owner 確認**
+- 狀態：**批次完整；owner 已於 2026-07-27 接受 A6 作第一版方向與相關風險**
+  （見 [ADR 0042](../../adr/0042-r1-screening-stop-and-a6-first-version-default.md) 決定 11）。
+  下列逐案語意稽核**不是 SME 正式驗證**，Task Discovery **尚未宣稱通過**；
+  R1b、A3／A4／A5 與 20–30 案擴充依同一裁決不執行。
 - suite hash：`6c8863863a233830a9216a3ebae46389c91082f097b337c25404400bc93694f7`
 - 比較：A1（minimal one-stage）／A6（full one-stage）／A2（full two-stage）
 - 未執行：A3／A4／A5；因此不能回答 heavy schema 或 economical model
@@ -62,8 +65,10 @@ call 43 的 OpenRouter metadata 出現 `guardrail/moderation`，但
 | 07 一次性代班 | 通過 anchor | 通過 anchor | 通過 anchor | 都拒絕建立供應商請款 Task；A1 說明較弱但核心決策正確 |
 | 08 更正 | 通過共同語意 | 通過 | 通過 | 都排除本人部署；A6/A2 另正確 `withdraw task-existing-001` |
 
-這張表是 Codex 依凍結 `expected`／rubric 做的審查草案，**不是 owner 已核准的
-adjudication**。
+這張表是 Codex 依凍結 `expected`／rubric 做的審查草案。owner 已接受它作為第一版方向的依據
+（ADR 0042 決定 11），但**它不是 SME adjudication**，不得當成模型品質已驗證。
+`TI-R1-01`–`TI-R1-08` 的 case revision 1 不改寫；新的 Task 邊界判準見
+[Task 邊界／merge-split／同一性研究](../../specs/2026-07-28-task-boundary-merge-split-and-identity-research.md)。
 
 ## 4. 可下到什麼程度的暫定判斷
 

@@ -51,5 +51,7 @@ ADR 是「為什麼」層;搭配 `../specs/`(細節設計)與 `../runbook.md`(�
 | [0040](0040-professional-consultant-engine-and-r1-validation-contract.md) | 專業顧問引擎greenfield與R1驗證契約：**Supersedes 0038（完整取代）**；強模型先建天花板+最小harness baseline+model×schema ablation；exit gate須有預先定義的實質改善、持平選簡單者；三層評審者；Current State唯一真相+append-only Journal+runtime外eval capture與Trial Manifest；portable schema+deterministic verifier；K/S/A四級支持度；公版匯出措辭 | **Accepted**（2026-07-26；owner核准＋第二位審查者複審後定案） |
 | [0041](0041-r1-p0-closure-first-version-context-and-holdout.md) | R1-P0 結案（**不執行**，理由＝YAGNI＋外部證據，**非實驗結果**；frozen 資產保留）＋第一版 Context 採三層 Hybrid 安全預設（Source／Current Work Model／operation Context Packet，不建 literal-claim layer）＋**0040 六 arm 效力不變**（研究不取代 A/B）＋R1 八案**全數 development set**（答案已在必讀 spec 曝光，不切 holdout；改凍結期望；未曝光評測集延到 20–30 案擴充，以 freeze commit SHA+hash 的時序為憑、不得寫進 authority 文件，一人團隊只能稱 post-freeze fresh challenge set） | **Accepted**（2026-07-27；補充 0040；同日第二次審查兩輪十一項：採納十項、狀態異議經查證駁回並撤回） |
 
+| [0042](0042-r1-screening-stop-and-a6-first-version-default.md) | 停止 R1 架構實驗（owner 時程裁決，**非實驗結論、非永久禁令**）＋A6（強模型／light schema／one-stage／full harness）作第一版實作預設；exit gate 暫停阻擋效力但判準未被否決；heavy schema／便宜模型／two-stage 截至第一版未量測；實驗欄位不得當 production contract，須另定 TaskAnalysis v1 契約；verifier／支持度四級／公版措辭等防線一律保留；兩個「三層」拆為 Runtime Context Stack 與 Product Authority Model | **Accepted**（2026-07-28；部分修正 0040 決定 9、0041 決定 11） |
+
 完整脈絡見 [`../specs/2026-06-27-system-architecture-design.md`](../specs/2026-06-27-system-architecture-design.md)。
 契約怎麼選/怎麼交付的規範見 [`../contract-strategy.md`](../contract-strategy.md)（ADR 0004/0010 的一般化、預答契約 #3）。

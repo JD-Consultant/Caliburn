@@ -362,6 +362,10 @@ application → 驗證後唯一負責寫入 Current Work Model 與 Current JD
 員工直接編輯**不覆寫** Work Model 欄位：JD 立即保存員工文字 → 該編輯成為 `direct_edit` Source
 → Task 標記 `pending_reconciliation` → application 驗證新的分析結果後才更新 Work Model。
 
+Proposal **只 gate Current JD**。分析結果對 Work Model 的更新在通過 verifier 後即可套用，
+唯一例外是會碰到 JD 既有 identity 的 topology 變更（§9.6）。被 `reject` 時**不回滾** Work Model——
+拒絕成為新來源，由下一輪向前重新分析，不做補償交易。
+
 ### 9.5 確定性 verifier 規則
 
 - 欄位型別與 enum 值域；ordinal 在 Context Packet 範圍內；
@@ -371,7 +375,11 @@ application → 驗證後唯一負責寫入 Current Work Model 與 Current JD
 - `open_issue` 至少一個 anchor；`矛盾未解` 至少兩個；
 - `retirement.kind == withdrawn` → `reason` 必填；`== merged` → `merged_into` 必填；
 - `merged_into`／`split_from` 目標必須存在且不得成 cycle；
-- `pending_reconciliation` 必須指向 `direct_edit`；
+- `pending_reconciliation` 必須指向下列其中一種來源：`direct_edit`、`employee_turn`（訪談中的更正
+  或否認）、`proposal_decision` 且該決定為 `edited`（對齊員工文字）或 `rejected`（重新判斷方向）；
+  `deferred` 不觸發。它是**觸發器與最近原因指標，不是待辦清單**——reconcile 一律讀 Current JD 現況
+  與該 Task 的最近相關決策，不能只讀那一筆 `SourceRef`。判定 reconcile 目標需要
+  `source_ref` **加上** 該 Proposal 的 decision，只看 `kind` 分不出 `edited` 與 `rejected`；
 - **`active` Task 至少一條 `superseded_by == null` 的 SupportLink**；
 - **原子性**：同一次寫入若使某 `active` Task 的最後一條有效 SupportLink 變成 `superseded_by != null`，
   該次寫入必須**同時滿足下列其中一項**，否則整筆拒絕：
@@ -389,7 +397,81 @@ application → 驗證後唯一負責寫入 Current Work Model 與 Current JD
 一律歸 rubric 與員工審核，**不得寫進 verifier**，也不得用 schema required 逼模型硬填
 （ADR 0040 決定 25）。
 
-### 9.6 不在 Task v1 內
+### 9.6 Identity gate：什麼時候可以直接改 Work Model
+
+閘門條件不是動作類型，也不是「有沒有建立新 ID」，而是**這次 topology 變更是否碰到 Current JD
+已有的 identity**：
+
+```text
+topology_affected_existing_ids ∩ current_jd_task_ids
+```
+
+| 交集 | 處置 |
+|---|---|
+| 空 | 純 Work Model 整理，**立即更新**，不建立 Proposal、不打擾員工 |
+| 非空 | 建立 Proposal，同時保存 `staged_work_model_delta` 與 JD before／after |
+
+逐情境：
+
+| 情境 | Work Model | Proposal |
+|---|---|---|
+| JD 外候選 `withdraw` | 立即 retire | 不建立 |
+| JD 內 Task `withdraw` | 暫不 retire，設 `pending_reconciliation` | 建立 |
+| `merge` 來源全不在 JD | 立即 merge | 不建立 |
+| `merge` 任一來源在 JD | 暫不套用 topology | 建立 |
+| `split` 母 Task 不在 JD | 立即 split | 不建立 |
+| `split` 母 Task 在 JD | 暫不套用 topology | 建立 |
+| `add` 候選 | 立即建立候選 ID | 只有要加入 JD 時才建立 |
+| 同 ID `revise` | 立即更新（topology delta 為空） | JD 文字也要改時才建立 |
+
+`accept`／`edit` 時 `staged_work_model_delta` 與 JD 變更**原子套用**；`reject`／`stale` 兩層都不套用；
+`defer` 兩層都不動，delta 留在 Proposal，Context 標為待決假說。
+`add`／`revise` 已先進 Work Model，被 `reject` 後需要 reconciliation；`merge`／`split` 尚未套用，
+被 `reject` 不需要 reconciliation，只需記錄拒絕；JD 內 `withdraw` 等待期間本來就在 reconciliation。
+
+**待決 Proposal 不得當成已成立事實**，但可用於避免重複，也可被新證據修訂或取代。
+
+#### Authority snapshot：不得用過期分析套用新現況
+
+LLM 分析所依據的 Work Model 與 Current JD 是一份 **authority snapshot**。寫入時：
+
+1. 若該分析**實際讀取或指涉**的 Task 與其 JD membership 在模型執行期間改變 → **整份分析結果失效，
+   不得套用**，必須重新分析。不得只在最後重算交集然後換一種分類方式硬套——那會把基於舊上下文的
+   判斷用到新現況上，兩個方向都可能套錯語意。
+2. snapshot 仍有效時，才在同一原子操作中重算上面的交集。
+
+read-set 的範圍以**該輪 Context Packet 投影出的 Task 集合及其 JD membership** 為準：模型只能引用
+packet 給的 ordinal，所以它碰得到的東西必然在 packet 裡。與本次分析無關的 Task 被編輯，不需要
+作廢整輪——單機單人但員工可在 AI 回應期間編輯文件，全域作廢會讓員工每次順手改字都白等一輪。
+
+這只需要最小的 stale-input／optimistic concurrency 保護，**不需要 Event Sourcing、hash chain 或
+版本歷史**；用 generation、before-value 或其他機制留給 contract／persistence 決定。
+（舊路徑的 `state_context_stale` 是同一個教訓的產品語意先例；依 ADR 0040 決定 3，
+v1 重新定義，不繼承其資料模型或程式碼。）
+
+#### 舊 Proposal 因純 Work Model 變更而失效時
+
+同一交易必須給出明確 disposition，不得讓它無聲消失：
+
+- **replacement**：仍有對應的 JD 修改建議 → 建立新 Proposal，舊的 stale；
+- **closed_without_replacement**：分析後已不再建議修改 JD → 舊的 stale，並保留**員工看得到**的失效理由。
+
+不得強制一定要有 replacement——那會把已被否決的內容換個形式再推給員工一次。
+理由只存在資料庫而 UI 從不呈現，等同無聲消失。
+
+#### 已知例外：direct edit 讓被拒絕的 topology 再次出現
+
+一般接受流程下，Task 離開 JD 時必然同時在 Work Model retire，因此被拒絕的跨層 topology
+不會退化成「純 Work Model 整理」。**員工直接編輯 JD 刪除某條目是已知例外**：該 Task 離開了
+`current_jd_task_ids`，卻只被設為 `pending_reconciliation` 而未 retire，於是同一個 topology
+判斷下一輪的交集會變成空集合。
+
+後果有界——AI 仍不能靜默改 JD，只能再提一次讓員工再拒一次；但 duplicate-rejection 規則攔不住它
+（新提案的 action＋target＋after 與被拒的那份不同）。因此**被拒絕的 topology 判斷必須持久保存，
+並在 Context Builder 再次分析相關 Task 時帶入**。這不是永久禁令：有新資訊時 AI 仍可重新提出，
+但不得當作舊拒絕不存在。
+
+### 9.7 不在 Task v1 內
 
 Product Proposal 的 target 形狀與 `pending｜accepted｜edited｜rejected｜deferred` 生命週期、
 員工決策如何分別更新 Work Model 與 Current JD，屬下一個獨立題目；Context Packet 在其後。

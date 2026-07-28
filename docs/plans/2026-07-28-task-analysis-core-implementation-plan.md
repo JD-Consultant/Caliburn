@@ -54,7 +54,8 @@ enum、`additionalProperties: false`）；schema golden test。
 
 **完成條件**：每條規則各有正向與反向 test，特別是——`quote` 必須是該員工回合的逐字子字串、
 `no_match` 時 `target_task_ordinals` 必須為空、`merge` 需 ≥2 target、`withdraw` 不得帶 `task_fields`、
-同一 target 被兩筆 `task_change` 指涉時**兩筆都拒**、輸出不得含 UUID 形狀字串。
+同一 target 被兩筆 `task_change` 指涉時**兩筆都拒**、`supersedes_support_ordinals` 必須指向存在且
+仍有效的 support link 且其 task 在同筆 signal 的 target 內、輸出不得含 UUID 形狀字串。
 **不做**：任何語意判斷（是否同一 purpose、該不該 merge）——那些歸 rubric。
 
 排在 assembler 之前，因為它只依賴 T1／T2，而且是唯一能在沒有模型的情況下端到端測的東西。

@@ -26,7 +26,9 @@ R1a 之後，**能靠研究推進的**是三個判準問題。R1a 用的已是�
 | 來源 | 性質 |
 |---|---|
 | [O\*NET Task Writing Guidelines（Appendix B）](https://www.onetcenter.org/dl_files/GreenTask_AppB.pdf) | 美國勞工部 O\*NET 中心的 task statement 撰寫規範 |
-| [Summary of Procedures for O\*NET Task Updating and New Task Generation（Dierdorff & Norton, 2011）](https://www.onetcenter.org/dl_files/TaskUpdating.pdf) | O\*NET 官方的 task 更新程序，含比對、分群、合併、拆分、刪除 |
+| [Identification of Emerging Tasks in the O\*NET System: A Revised Approach（2025 No. 021，2025-02-25）](https://www.onetcenter.org/reports/EmergingTasks_RevisedApproach.html) | **現行**官方程序；duplicate／overlap 判準的第一來源（§3.5） |
+| [Adding Drone-Specific Tasks to the O\*NET Database: Initial Identification of Emerging Tasks using ChatGPT](https://www.onetcenter.org/dl_files/Drone_Tasks.pdf) | 官方以 LLM 產生候選、再由分析師審查的實作紀錄 |
+| [Summary of Procedures for O\*NET Task Updating and New Task Generation（Dierdorff & Norton, 2011）](https://www.onetcenter.org/dl_files/TaskUpdating.pdf) | **歷史機制補充**；Task Joining／Separation 等編輯階段程序（§3.4），2025 文件未涵蓋同一階段 |
 | 同上 Appendix：A Primer on Preparing O\*NET Occupational Task Statements（Cunningham） | task statement 結構的原始教材；引用 Fine & Getkate (1995) 與 DOL《Revised Handbook for Analyzing Jobs》(1991) |
 | [職能基準發展指引（勞動部勞動力發展署／工研院）](https://icap.wda.gov.tw/ap/knowledge_introduction.php) | 本產品匯出版型的官方定義（主要職責／工作任務／工作產出／行為指標） |
 | [DACUM Occupational Analysis（Eastern Kentucky University）](https://www.eku.edu/in/guides/dacum-occupational-analysis/) | duty／task 兩層與 task 的操作型定義 |
@@ -112,15 +114,37 @@ Task Sorting 階段定義了「什麼算同一群」：
 > Emphasis is placed on writing **as few summary tasks as possible** for a given cluster – a single
 > task is preferable, but up to five summary tasks are allowed.
 
-### 3.5 同一性：官方的三分類
+### 3.5 同一性：現行（2025-02-25）官方判準
 
-Task Matching 階段把每筆新資訊對既有 task 分成三類：
+**第一來源是 2025 年的 Revised Approach**，其 Step 3 把每筆新陳述對既有 task 分成兩類：
 
-> a) **Duplicative** of a preexisting O\*NET task; b) **Unique** relative to all of the O-tasks; or
-> c) **Overlapping** an O-task but still providing additional content information.
+> A **duplicate** is defined as a write-in statement that is **conceptually redundant with or fully
+> encompassed by** one of the published tasks. Write-in statements deemed to be duplicates are not
+> considered for further review and are discarded from the evaluation process.
 
-第 (c) 類的處置寫在 Task Revision 階段：**用重疊內容改寫既有 task**，而不是新增一個。
-這正是我們缺的 add / revise / no_change 判準。
+> **Overlap** in this context refers to situations where a write-in statement shares significant
+> conceptual similarity with a task in the published list, but **provides additional details or nuance
+> not captured** in the original task description. In such cases, the overlapping write-in statement is
+> retained for further review, **with the aim of potentially revising the corresponding published task**.
+
+同一份文件明說它與舊術語的關係：
+
+> These judgment criteria differ slightly from those used in prior evaluation cycles. Previously,
+> analysts used categories such as "completely redundant," "partially redundant," and "unique"…
+> Although the terminology has changed, **the underlying concepts and intent remain the same**.
+
+因此 2011 版的 duplicative／unique／overlapping 三分類仍然可引，但**只作歷史補充**，
+現行判準以 2025 版為準。
+
+流程上，NLP 先產生 pre-populated 判斷與 cosine similarity，**分析師再審查與調整**——
+機器提候選、人做裁決，與本產品的 verifier ＋ rubric ＋ 員工決定同構。
+
+> **本產品刻意的分歧**：O\*NET 對 `duplicate` 的處置是 **discard**；本產品是
+> `support_only`（追加 SupportLink）。原因是 O\*NET 在建職業層級的 task 清單，
+> 我們必須能回答「這個 Task 憑什麼有這些依據」。這是有理由的分歧，不是引用錯誤。
+
+> **不可移植的部分**：2025 版 Step 4 規定「兩位以上專家或在職者的重疊陳述才建立或修訂 task」。
+> 那是跨受訪者的**共識門檻**，本產品是單一員工的客製 JD，沒有這個分布，不得移植。
 
 ### 3.6 iCAP：粒度必須對得上工作產出與行為指標
 
@@ -655,7 +679,9 @@ Task Analysis Model Request
 │  │
 │  ├─ current_authorities
 │  │  ├─ tasks[]               ＋ context-local ordinal
+│  │  │   └─ support_links[]   ＋ task-local ordinal（模型指認被更正的依據時用）
 │  │  ├─ jd_presence           該 Task 是否在 Current JD 及目前文字
+│  │  ├─ retired_tasks[]       精簡形式：ordinal、statement、retirement.kind/reason
 │  │  ├─ open_issues[]
 │  │  └─ excluded_signals[]
 │  │
@@ -703,6 +729,11 @@ Task Analysis Model Request
 | pending／deferred proposals | 避免重複提案，並允許以新證據修訂或取代待決提案 | §9.6 |
 | 受約束的 rejection 記錄 | direct-edit 已知例外的唯一承擔者 | §9.6 |
 | `active_question` | `support_links.question_turn_id` 的來源；缺它短答無法解讀 | §9.3、§9.5 |
+| support link 的 task-local ordinal | 否則模型無法指認「哪一句依據被更正」，`superseded_by` 永遠設不了（§12.1） | §9.1、§9.5 |
+| `retired_tasks[]`（精簡） | 否則已撤回的工作會被重新提出，員工得重複拒絕 | §9.6 |
+
+`retired_tasks[]` **只作為「不要重提」的參考，不是現況**，不得被引用為 `target_task_ordinals`
+以外的用途，也不得成為 `revise` 的目標。
 
 沒有其他新增。欄位到此停止擴充。
 
@@ -719,6 +750,8 @@ TaskAnalysisResult.v1
 │  ├─ anchors[]  { turn_ordinal, quote }        ≥1；`矛盾未解` 需 ≥2
 │  ├─ identity   { relation, target_task_ordinals[] }
 │  │                relation: no_match | duplicate | overlap | uncertain
+│  ├─ supersedes_support_ordinals[]            預設空；指認被本次更正取代的既有依據
+│  │                每項 { task_ordinal, support_ordinal }
 │  ├─ disposition: task_change | support_only | exclude | open_issue
 │  └─ payload（依 disposition 擇一）
 │     ├─ task_change  { change, target_task_ordinals[], task_fields?, split_children[]? }
@@ -774,7 +807,15 @@ TaskAnalysisResult.v1
   `change == withdraw` → **不得**帶 `task_fields`；
 - 同一個 target Task 被兩筆 `task_change` 指涉 → **兩筆都拒絕**，不任選贏家；
 - `next_question.target` 必須指向存在的 packet ordinal 或本次輸出的合法 index；
+- `supersedes_support_ordinals[]` 的每一項必須指向 packet 中存在、且**目前 `superseded_by == null`**
+  的 support link；其 `task_ordinal` 必須出現在同一筆 signal 的 `target_task_ordinals` 中；
 - 輸出中不得出現 UUID 形狀字串（防止模型自造 ID）。
+
+**為什麼需要 `supersedes_support_ordinals`**：§9.1 的 `SupportLink.superseded_by` 與 §9.5 的原子性
+三出口，都以「某條依據被後續來源取代」為前提。若模型無法指認是哪一條，application 只能自行猜測，
+而那是語意判斷，依 §9.5 末段不得放進 verifier。`TI-R1-08`（員工更正責任範圍）在缺這個欄位時
+**無法實作**：舊的錯誤引述會繼續掛在 Task 上當有效依據。這是本欄位存在的唯一理由，
+不作其他用途。
 
 分類是否正確、該不該 merge、outcome 是否可理解，一律仍歸 rubric（§9.5 末段）。
 

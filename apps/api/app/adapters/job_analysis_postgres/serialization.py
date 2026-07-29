@@ -1,0 +1,175 @@
+"""Fail-closed serialization for migration 0012 rows."""
+
+from __future__ import annotations
+
+from typing import Any
+
+from pydantic import ValidationError
+
+from app.job_analysis.application import (
+    ACTIVE_QUESTION_SCHEMA_ID,
+    COMPLETED_TURN_SCHEMA_ID,
+    DIRECT_EDIT_SCHEMA_ID,
+    PROPOSAL_DECISION_SCHEMA_ID,
+    PROPOSAL_SCHEMA_ID,
+    WORK_MODEL_SCHEMA_ID,
+    ActiveQuestion,
+    CompletedTurnPayload,
+    DirectEditPayload,
+    DocumentRecord,
+    JournalEntry,
+    ProposalDecisionPayload,
+)
+from app.job_analysis.domain import (
+    CurrentWorkModel,
+    JdTask,
+    Proposal,
+)
+
+
+class PersistedJobAnalysisCorruption(RuntimeError):
+    """A persisted row cannot be trusted as a current product authority."""
+
+
+def _fail(label: str, detail: object, cause: Exception | None = None):
+    error = PersistedJobAnalysisCorruption(f"persisted {label} is invalid: {detail}")
+    if cause is None:
+        raise error
+    raise error from cause
+
+
+def dump_work_model(value: CurrentWorkModel) -> dict[str, Any]:
+    return value.model_dump(mode="json")
+
+
+def load_work_model(*, schema_id: str, payload: object) -> CurrentWorkModel:
+    if schema_id != WORK_MODEL_SCHEMA_ID:
+        _fail("work model schema", schema_id)
+    try:
+        return CurrentWorkModel.model_validate(payload)
+    except (ValidationError, TypeError, ValueError) as exc:
+        _fail("Work Model", exc, exc)
+
+
+def dump_active_question(value: ActiveQuestion | None) -> dict[str, Any] | None:
+    if value is None:
+        return None
+    return {
+        "schema_id": ACTIVE_QUESTION_SCHEMA_ID,
+        "payload": value.model_dump(mode="json"),
+    }
+
+
+def load_active_question(payload: object) -> ActiveQuestion | None:
+    if payload is None:
+        return None
+    if not isinstance(payload, dict):
+        _fail("active question envelope", type(payload).__name__)
+    if payload.get("schema_id") != ACTIVE_QUESTION_SCHEMA_ID:
+        _fail("active question schema", payload.get("schema_id"))
+    try:
+        return ActiveQuestion.model_validate(payload.get("payload"))
+    except (ValidationError, TypeError, ValueError) as exc:
+        _fail("Active Question", exc, exc)
+
+
+def load_document(row: Any) -> DocumentRecord:
+    return DocumentRecord(
+        document_id=row.document_id,
+        title=row.title,
+        work_model=load_work_model(
+            schema_id=row.work_model_schema_id,
+            payload=row.work_model_json,
+        ),
+        active_question=load_active_question(row.active_question_json),
+        authority_generation=row.authority_generation,
+        created_at=row.created_at,
+        updated_at=row.updated_at,
+    )
+
+
+def dump_jd_task_enablers(task: JdTask) -> list[dict[str, Any]]:
+    return [enabler.model_dump(mode="json") for enabler in task.enablers]
+
+
+def load_jd_task(row: Any) -> JdTask:
+    try:
+        return JdTask.model_validate(
+            {
+                "task_id": row.task_id,
+                "statement": row.statement,
+                "purpose_result": row.purpose_result,
+                "context": row.context,
+                "frequency_text": row.frequency_text,
+                "responsibility_role": row.responsibility_role,
+                "enablers": row.enablers_json,
+                "display_order": row.display_order,
+            }
+        )
+    except (ValidationError, TypeError, ValueError) as exc:
+        _fail("JD Task", exc, exc)
+
+
+_PROPOSAL_RELATIONAL_FIELDS = {
+    "proposal_id",
+    "status",
+    "caused_by_decision_id",
+}
+
+
+def dump_proposal_payload(proposal: Proposal) -> dict[str, Any]:
+    return proposal.model_dump(
+        mode="json",
+        exclude=_PROPOSAL_RELATIONAL_FIELDS,
+    )
+
+
+def load_proposal(row: Any) -> Proposal:
+    if row.proposal_schema_id != PROPOSAL_SCHEMA_ID:
+        _fail("Proposal schema", row.proposal_schema_id)
+    if not isinstance(row.proposal_payload, dict):
+        _fail("Proposal payload", type(row.proposal_payload).__name__)
+    duplicate = _PROPOSAL_RELATIONAL_FIELDS & set(row.proposal_payload)
+    if duplicate:
+        _fail("Proposal payload", f"duplicates relational fields {sorted(duplicate)}")
+    try:
+        return Proposal.model_validate(
+            {
+                **row.proposal_payload,
+                "proposal_id": row.proposal_id,
+                "status": row.status,
+                "caused_by_decision_id": row.caused_by_decision_id,
+            }
+        )
+    except (ValidationError, TypeError, ValueError) as exc:
+        _fail("Proposal", exc, exc)
+
+
+_JOURNAL_PAYLOAD_TYPES = {
+    COMPLETED_TURN_SCHEMA_ID: CompletedTurnPayload,
+    DIRECT_EDIT_SCHEMA_ID: DirectEditPayload,
+    PROPOSAL_DECISION_SCHEMA_ID: ProposalDecisionPayload,
+}
+
+
+def dump_journal_payload(entry: JournalEntry) -> dict[str, Any]:
+    return entry.payload.model_dump(mode="json")
+
+
+def load_journal(row: Any) -> JournalEntry:
+    payload_type = _JOURNAL_PAYLOAD_TYPES.get(row.payload_schema_id)
+    if payload_type is None:
+        _fail("Journal schema", row.payload_schema_id)
+    try:
+        payload = payload_type.model_validate(row.payload)
+        return JournalEntry(
+            document_id=row.document_id,
+            entry_id=row.entry_id,
+            kind=row.kind,
+            payload_schema_id=row.payload_schema_id,
+            payload=payload,
+            created_at=row.created_at,
+        )
+    except (ValidationError, TypeError, ValueError) as exc:
+        _fail("Journal entry", exc, exc)
+

@@ -47,7 +47,7 @@ class JobAnalysisDocumentRow(Base):
     work_model_schema_id: Mapped[str] = mapped_column(Text, nullable=False)
     work_model_json: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
     active_question_json: Mapped[dict[str, Any] | None] = mapped_column(
-        JSONB,
+        JSONB(none_as_null=True),
         nullable=True,
     )
     authority_generation: Mapped[int] = mapped_column(BigInteger, nullable=False)
@@ -258,4 +258,3 @@ class JobAnalysisJournalRow(Base):
             text("journal_sequence DESC"),
         ),
     )
-

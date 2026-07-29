@@ -337,30 +337,30 @@ Proposal JSONB 不重複 relational `proposal_id/status/caused_by_decision_id`�
 `Proposal.model_validate`。任何 schema ID、enum、JSON shape、JD/Work Model identity 不一致都 raise
 `PersistedJobAnalysisCorruption`。
 
-- [ ] **Step 1: 寫 real-PostgreSQL 失敗測試**
+- [x] **Step 1: 寫 real-PostgreSQL 失敗測試**
 
 只測：create/list/get、ordered Task round-trip、open Proposal round-trip、recent completed turn、`FOR UPDATE`
 鎖 document、corrupt Work Model/Proposal/enablers fail closed。
 
-- [ ] **Step 2: 確認測試先紅**
+- [x] **Step 2: 確認測試先紅**
 
 ```powershell
 cd apps/api
 uv run pytest tests/test_job_analysis_postgres.py -q
 ```
 
-- [ ] **Step 3: 實作 serialization 與 repositories**
+- [x] **Step 3: 實作 serialization 與 repositories**
 
 UoW `__aenter__` 開一個 `AsyncSession`/transaction；未呼叫 `commit()` 時 `__aexit__` rollback。不得在 repository
 內 commit，不得 hidden retry。
 
-- [ ] **Step 4: 跑 focused PostgreSQL tests**
+- [x] **Step 4: 跑 focused PostgreSQL tests**
 
 ```powershell
 uv run pytest tests/test_job_analysis_postgres.py -q
 ```
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```powershell
 git add apps/api/app/adapters/job_analysis_postgres apps/api/tests/test_job_analysis_postgres.py

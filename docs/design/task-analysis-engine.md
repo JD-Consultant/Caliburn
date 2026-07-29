@@ -1,5 +1,5 @@
 ---
-title: Task Analysis 引擎 — 端到端設計(第一條 vertical,無 DB／無 route)
+title: Task Analysis 引擎 — 端到端設計(第一條 vertical＋PostgreSQL adapter,無 route)
 audience: agent-primary(也給人)
 scope: apps/api app/job_analysis/*(domain / llm / application / providers)
 updated: 2026-07-29
@@ -16,7 +16,10 @@ updated: 2026-07-29
 > 新增欄位須指出它避免的具體使用者失敗)、[ADR 0035](../adr/0035-interview-vnext-openrouter-first-provider-boundary.md)(OpenRouter-first)。
 > 凍結形狀與判準:[`2026-07-28-task-boundary-merge-split-and-identity-research.md`](../specs/2026-07-28-task-boundary-merge-split-and-identity-research.md)
 > **§4／§5(判準)、§9(Task)、§10(Proposal)、§11(Context)、§12(Result)**。
-> 計畫:[`2026-07-28-task-analysis-core-implementation-plan.md`](../plans/2026-07-28-task-analysis-core-implementation-plan.md)。
+> 計畫:[`2026-07-28-task-analysis-core-implementation-plan.md`](../plans/2026-07-28-task-analysis-core-implementation-plan.md)、
+> [`2026-07-29-job-analysis-postgresql-persistence-plan.md`](../plans/2026-07-29-job-analysis-postgresql-persistence-plan.md)。
+> Current State authority 與 greenfield 儲存邊界見
+> [ADR 0043](../adr/0043-job-analysis-local-current-state-persistence-and-authoring-authority.md)。
 
 ## 1. 一句話
 
@@ -36,6 +39,8 @@ OpenRouter 拿 `TaskAnalysisResult.v1` → **verifier**(純函式、零 LLM)擋�
 | operation | 組 packet → 呼叫 → parse → verifier | `application/operation.py` | 單一顯式流程;**不是 agent runner**,無 retry |
 | provider | 最小 OpenRouter Chat adapter | `providers/openrouter.py` | 一次 HTTP;固定 `reasoning=high` 且不回傳 reasoning;成功內容必須由 response `model` 證明來自 exact configured model;typed 失敗;**只收 render 過的文字** |
 | transition | 結果 → Work Model 變更 ＋ Proposal | `application/transition.py` | **唯一寫入者**;全有或全無 |
+| persistence ports | Current State repositories／UoW／版本化 Journal payload | `application/persistence.py` | 純 Protocol 與 frozen contracts；不認 ORM／JSON row |
+| PostgreSQL adapter | 0012 四表、serialization、repositories、UoW | `app/adapters/job_analysis_postgres/` | JSONB 讀取必須 hydrate；schema/shape 壞掉 fail-closed；repository 不 commit |
 
 ## 3. 一輪的資料流(每步標函式)
 
@@ -129,12 +134,12 @@ JD 只在員工決定提案時才改。
 
 | 沒有的東西 | 現況 | 什麼時候做 |
 |---|---|---|
-| DB／persistence | state 是記憶體裡的 `JobAnalysisState` | 下一份 persistence plan(原子寫入、authority snapshot stale 保護、reload) |
+| durable use cases | 0012 四表、repositories、UoW 與 fail-closed hydrate 已有；transition 尚未接進 transaction | 本 persistence plan 的 direct edit／AI turn／Proposal decision 切片 |
 | route／Web UI | 完全沒有 | persistence 之後的最小 local Web |
 | exactly-once replay | 決定性 Task／Proposal ID 已採 **insert-only**，不同內容撞 ID 會整筆拒絕；但相同 operation 完整重送仍可能重複追加 support link／open issue | 需要 operation ledger,留給 persistence plan |
 | endpoint variant preflight | `provider_order` 只鎖 base slug,同 provider 可能有多個 endpoint variant | 真正付費呼叫前的 catalog／live preflight |
 | prompt 品質調校 | `llm/prompt.py` 只寫到「不與 §4 判準相反」的結構最小集 | rubric／eval 的獨立工作 |
-| 員工決定提案的流程 | Proposal 建得出來,但沒有套用決定的服務 | 與 persistence 同期 |
+| 員工決定提案的流程 | Proposal 建得出來、可持久化，但尚無套用決定的 use case | persistence plan Task 7 |
 
 ## 9. 指路
 
@@ -142,5 +147,7 @@ JD 只在員工決定提案時才改。
 - 決策:[ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md)、
   [ADR 0042](../adr/0042-r1-screening-stop-and-a6-first-version-default.md)
 - 實作步驟:[T1–T7 計畫](../plans/2026-07-28-task-analysis-core-implementation-plan.md)
+- durable vertical:
+  [`PostgreSQL persistence plan`](../plans/2026-07-29-job-analysis-postgresql-persistence-plan.md)
 - 舊路徑(**已退場,勿救回**):[`interview-engine.md`](interview-engine.md)、
   [ADR 0030](../adr/0030-ai-coedit-tracked-changes-one-brain.md)

@@ -4,7 +4,9 @@
 
 ## 鳥瞰
 
-Caliburn 是給顧問用的**多租戶 B2B SaaS**:把官方 OCS 職能基準 → 客製職務說明書。一個 monorepo,三個 bounded context + 一個前端:
+Caliburn 是給員工使用的**本機 Web AI 職務分析與職務說明書應用程式**。第一版是一名本機操作者、
+無登入／帳密／多租戶 SaaS；OCS／iCAP 等公版資料只作參考與匯出格式，不取代員工訪談所得的
+客製工作分析。一個 monorepo,三個 bounded context + 一個前端:
 
 ```
 PDF ──▶ pdf-to-json ──(OCS JSON)──▶ ocs-indexer ──(HTTP 查詢)──▶ api ──▶ web ──▶ 使用者
@@ -31,9 +33,12 @@ PDF ──▶ pdf-to-json ──(OCS JSON)──▶ ocs-indexer ──(HTTP 查�
 - **Hexagonal/Clean + DDD,每 context 一個模組化單體**(非微服務)。依賴往內指向 domain core。
 - **資料主權**:Postgres 屬 api、Qdrant 屬 indexer;別的服務只經其 API 取資料,不直接碰倉庫。
 - **契約優先**(Phase 2):OCS 結構由 `packages/ocs-contract` 的 JSON-Schema 單一定義。
-- **多租戶**:租戶隔離只在 api(Pool + Postgres RLS);知識服務全域共享。
-- **Agent**:自研訪談引擎(`apps/api/app/interview/`,唯一 AI 大腦;op→verify→`_pending`
-  追蹤修訂,ADR 0030;舊 LangGraph/CopilotKit 已退場勿救回);indexer 縫 MCP-ready。
+- **產品資料**:第一版是單機、單操作者、一次開啟一份 JD；repo 早期 RLS／tenant 程式不是新工作的
+  架構前提，不新增登入、ACL、計費或多人協作。
+- **AI 工作面**:`apps/api/app/interview/` 是既有 production 訪談路徑；
+  `apps/api/app/job_analysis/` 是 ADR 0040／0042 下的隔離 greenfield Task Analysis 引擎，
+  已有 scripted vertical、尚未接 DB／route／Web。兩者不得互相 import；舊 LangGraph／CopilotKit
+  已退場勿救回。
 - **依賴降級**:對 indexer 等外部依賴**逐端點分類**——critical(掛→快錯 5xx)vs enrichment(掛→回部分資料 + `meta.partial`,不擋主流程)。見 [ADR 0018](docs/adr/0018-indexer-dependency-degradation-policy.md)。
 
 決策史與取捨:[`docs/adr/`](docs/adr/)。維運:[`docs/runbook.md`](docs/runbook.md)。上手:[`CONTRIBUTING.md`](CONTRIBUTING.md)。

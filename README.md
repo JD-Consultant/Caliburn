@@ -1,6 +1,7 @@
 # Caliburn
 
-給顧問用的多租戶 B2B SaaS(職能基準 OCS → 職務說明書)。Monorepo:Turborepo + per-app uv。
+給員工在自己電腦上使用的**本機 Web AI 職務分析與職務說明書應用程式**。不註冊、不登入、
+不做多租戶 SaaS；可保存並重新開啟多份本機 JD。Monorepo:Turborepo + per-app uv。
 架構見 [`ARCHITECTURE.md`](ARCHITECTURE.md);決策見 [`docs/adr/`](docs/adr/);維運見 [`docs/runbook.md`](docs/runbook.md)。
 
 ---

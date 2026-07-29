@@ -23,6 +23,7 @@ from app.job_analysis.domain import (
     TaskId,
     is_allowed_transition,
     jd_map,
+    withdraw_delta_matches_target_state,
 )
 
 from .authoring import (
@@ -146,6 +147,38 @@ def _apply_staged_delta(
     return CurrentWorkModel(
         tasks=tuple(tasks.values()),
         open_issues=work_model.open_issues,
+        excluded_signals=work_model.excluded_signals,
+    )
+
+
+def _withdraw_target_state_matches(
+    work_model: CurrentWorkModel,
+    proposal: Proposal,
+) -> bool:
+    if proposal.action is not ProposalAction.WITHDRAW:
+        return True
+    target = work_model.task_by_id(proposal.target.task_id)
+    return withdraw_delta_matches_target_state(
+        target_has_non_retired_task=(
+            target is not None and target.retirement is None
+        ),
+        staged_work_model_delta=proposal.staged_work_model_delta,
+    )
+
+
+def _prune_missing_reconciliation_issues(
+    work_model: CurrentWorkModel,
+    current_jd: tuple[JdTask, ...],
+) -> CurrentWorkModel:
+    jd_task_ids = {task.task_id for task in current_jd}
+    return CurrentWorkModel(
+        tasks=work_model.tasks,
+        open_issues=tuple(
+            issue
+            for issue in work_model.open_issues
+            if issue.reconciliation_task_id is None
+            or issue.reconciliation_task_id in jd_task_ids
+        ),
         excluded_signals=work_model.excluded_signals,
     )
 
@@ -500,6 +533,25 @@ async def decide_proposal(
                 journal_entry=None,
             )
             return stale
+        if not _withdraw_target_state_matches(record.work_model, proposal):
+            stale = Proposal.model_validate(
+                {
+                    **proposal.model_dump(),
+                    "status": ProposalStatus.STALE,
+                    "stale_reason": (
+                        "Work Model 已在提案建立後變更，請重新分析後再決定。"
+                    ),
+                }
+            )
+            await _persist(
+                uow,
+                record=record,
+                work_model=record.work_model,
+                current_jd=current_jd,
+                proposals=_replace_proposal(proposals, stale),
+                journal_entry=None,
+            )
+            return stale
 
         decided = _decided_value(
             proposal,
@@ -545,6 +597,10 @@ async def decide_proposal(
                     task_ids=required,
                     decision_id=decision_id,
                 )
+            work_model = _prune_missing_reconciliation_issues(
+                work_model,
+                next_jd,
+            )
         elif target_status is ProposalStatus.REJECTED and proposal.action in {
             ProposalAction.ADD,
             ProposalAction.REVISE,

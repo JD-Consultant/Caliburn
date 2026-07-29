@@ -20,13 +20,17 @@ from app.job_analysis.domain import (
     JdEntry,
     JdTask,
     MergeTarget,
+    OpenIssue,
+    OpenIssueKind,
     Proposal,
     ProposalAction,
     ProposalStatus,
     Retirement,
     RetirementKind,
+    RetirementReason,
     SingleTaskTarget,
     SourceKind,
+    SourceAnchor,
     SourceRef,
     StagedTask,
     StagedTaskLineage,
@@ -136,6 +140,32 @@ def merge_proposal() -> tuple[CurrentWorkModel, tuple[JdTask, ...], Proposal]:
     return CurrentWorkModel(tasks=(first, second)), current_jd, proposal
 
 
+def jd_only_withdraw_proposal():
+    task_id = "task-direct-1"
+    current = jd_task(task_id, "只幫同事做過一次盤點")
+    issue = OpenIssue(
+        id="issue-direct-1",
+        kind=OpenIssueKind.INSUFFICIENT_EVIDENCE,
+        summary="需要確認是否為固定責任",
+        source_anchors=(
+            SourceAnchor(
+                source_ref=SourceRef(kind=SourceKind.DIRECT_EDIT, id="edit-1")
+            ),
+        ),
+        reconciliation_task_id=task_id,
+    )
+    proposal = Proposal(
+        proposal_id="proposal-jd-only-withdraw",
+        target=SingleTaskTarget(
+            action=ProposalAction.WITHDRAW,
+            task_id=task_id,
+        ),
+        jd_before=(JdEntry(task_id=task_id, value=current),),
+        jd_after=(JdEntry(task_id=task_id, value=None),),
+    )
+    return CurrentWorkModel(open_issues=(issue,)), (current,), proposal
+
+
 async def seed(
     session_factory,
     document_id,
@@ -242,6 +272,131 @@ async def test_accept_adds_the_task_to_current_jd_and_replay_is_a_noop(
     assert loaded is not None
     assert [item.task_id for item in loaded.state.current_jd] == ["task-new"]
     assert loaded.document.authority_generation == 2
+
+
+async def test_accept_jd_only_withdraw_removes_the_jd_task_and_dangling_issue(
+    postgres_session_factory,
+    cleanup_job_analysis_rows,
+):
+    document_id = cleanup_job_analysis_rows
+    work_model, current_jd, proposal = jd_only_withdraw_proposal()
+    await seed(
+        postgres_session_factory,
+        document_id,
+        work_model=work_model,
+        current_jd=current_jd,
+        proposal=proposal,
+    )
+
+    accepted = await decide_proposal(
+        factory(postgres_session_factory),
+        document_id=document_id,
+        proposal_id=proposal.proposal_id,
+        decision_id="decision-withdraw-jd-only",
+        decision="accepted",
+    )
+    loaded = await load_document(factory(postgres_session_factory), document_id)
+
+    assert accepted.status is ProposalStatus.ACCEPTED
+    assert loaded is not None
+    assert loaded.state.current_jd == ()
+    assert loaded.state.work_model.tasks == ()
+    assert loaded.state.work_model.open_issues == ()
+
+
+async def test_delta_less_withdraw_goes_stale_if_an_active_work_model_task_now_exists(
+    postgres_session_factory,
+    cleanup_job_analysis_rows,
+):
+    document_id = cleanup_job_analysis_rows
+    _, current_jd, proposal = jd_only_withdraw_proposal()
+    active = task("task-direct-1", current_jd[0].statement)
+    await seed(
+        postgres_session_factory,
+        document_id,
+        work_model=CurrentWorkModel(tasks=(active,)),
+        current_jd=current_jd,
+        proposal=proposal,
+    )
+
+    stale = await decide_proposal(
+        factory(postgres_session_factory),
+        document_id=document_id,
+        proposal_id=proposal.proposal_id,
+        decision_id="decision-stale-withdraw",
+        decision="accepted",
+    )
+    loaded = await load_document(factory(postgres_session_factory), document_id)
+
+    assert stale.status is ProposalStatus.STALE
+    assert loaded is not None
+    assert loaded.state.current_jd == current_jd
+    assert loaded.state.work_model.task_by_id("task-direct-1").state is TaskState.ACTIVE
+
+
+async def test_old_withdraw_delta_cannot_overwrite_a_newer_retirement(
+    postgres_session_factory,
+    cleanup_job_analysis_rows,
+):
+    document_id = cleanup_job_analysis_rows
+    task_id = "task-existing"
+    current = jd_task(task_id, "每週彙整營運週報")
+    old_source = SourceRef(kind=SourceKind.EMPLOYEE_TURN, id="employee-old")
+    newer_retirement = Retirement(
+        kind=RetirementKind.WITHDRAWN,
+        reason=RetirementReason.ONE_OFF,
+        source_ref=old_source,
+    )
+    retired = task(task_id, current.statement).model_copy(
+        update={"retirement": newer_retirement}
+    )
+    stale_delta = StagedWorkModelDelta(
+        lineage_changes=(
+            StagedTaskLineage(
+                task_id=task_id,
+                retirement=Retirement(
+                    kind=RetirementKind.WITHDRAWN,
+                    reason=RetirementReason.EMPLOYEE_DENIED,
+                    source_ref=SourceRef(
+                        kind=SourceKind.EMPLOYEE_TURN,
+                        id="employee-stale",
+                    ),
+                ),
+            ),
+        )
+    )
+    proposal = Proposal(
+        proposal_id="proposal-old-withdraw",
+        target=SingleTaskTarget(
+            action=ProposalAction.WITHDRAW,
+            task_id=task_id,
+        ),
+        jd_before=(JdEntry(task_id=task_id, value=current),),
+        jd_after=(JdEntry(task_id=task_id, value=None),),
+        staged_work_model_delta=stale_delta,
+    )
+    await seed(
+        postgres_session_factory,
+        document_id,
+        work_model=CurrentWorkModel(tasks=(retired,)),
+        current_jd=(current,),
+        proposal=proposal,
+    )
+
+    stale = await decide_proposal(
+        factory(postgres_session_factory),
+        document_id=document_id,
+        proposal_id=proposal.proposal_id,
+        decision_id="decision-old-withdraw",
+        decision="accepted",
+    )
+    loaded = await load_document(factory(postgres_session_factory), document_id)
+
+    assert stale.status is ProposalStatus.STALE
+    assert loaded is not None
+    preserved = loaded.state.work_model.task_by_id(task_id)
+    assert preserved.retirement == newer_retirement
+    assert loaded.state.current_jd == (current,)
 
 
 async def test_edited_acceptance_saves_employee_text_and_marks_reconciliation(

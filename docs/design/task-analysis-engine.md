@@ -2,7 +2,7 @@
 title: Task Analysis 引擎 — 端到端設計(durable PostgreSQL vertical,無 route)
 audience: agent-primary(也給人)
 scope: apps/api app/job_analysis/* + app/adapters/job_analysis_postgres/*
-updated: 2026-07-29
+updated: 2026-07-30
 ---
 
 # Task Analysis 引擎 — 端到端設計
@@ -19,7 +19,9 @@ updated: 2026-07-29
 > 計畫:[`2026-07-28-task-analysis-core-implementation-plan.md`](../plans/2026-07-28-task-analysis-core-implementation-plan.md)、
 > [`2026-07-29-job-analysis-postgresql-persistence-plan.md`](../plans/2026-07-29-job-analysis-postgresql-persistence-plan.md)。
 > Current State authority 與 greenfield 儲存邊界見
-> [ADR 0043](../adr/0043-job-analysis-local-current-state-persistence-and-authoring-authority.md)。
+> [ADR 0043](../adr/0043-job-analysis-local-current-state-persistence-and-authoring-authority.md)；
+> 員工不完整 Task 的 identity 對齊見
+> [ADR 0044](../adr/0044-partial-jd-task-reconciliation-and-human-confirmation.md)。
 
 ## 1. 一句話
 
@@ -60,7 +62,14 @@ OpenRouter 拿 `TaskAnalysisResult.v1` → **verifier**(純函式、零 LLM)擋�
 員工直接編輯走另一條短路徑：`add_jd_task`／`edit_jd_task`／`delete_jd_task`／
 `reorder_jd_tasks` 先鎖 document，以 Journal `entry_id` 做 replay/conflict 判定，同交易保存
 Current JD、相關 Proposal stale、Work Model reconcile trigger、Journal 與 generation。**按儲存不呼叫 LLM**；
-既有 Task 在下一次 AI 互動時看到 JD/Work Model 差異，JD-only Task 先落一筆可追問的 open issue。
+既有 Task 在下一次 AI 互動時看到 JD/Work Model 差異；JD-only Task 先落一筆
+`insufficient_evidence` open issue，明確保存該 JD `task_id`，不補造空殼 Work Model Task。
+下一輪 packet 只把它投影成可追問的 partial Task：
+
+- `no_match + add` 才能以同一 `task_id` materialize Work Model Task；
+- `exclude` 只建立員工可見的 JD-only withdraw Proposal，不靜默移除文件；
+- `duplicate`／`overlap`／`uncertain` 保留 issue 並追問，不以文字相似度猜 identity；
+- next question 指向該 issue 時，同一 transition 保存 `last_asked_turn_id`，reload 後可續問。
 
 持久 AI 回合由 composition 依序呼叫 `prepare_turn()` →
 `run_task_analysis_operation()` → `commit_verified_turn()`。第一步讀完即關閉交易，LLM I/O
@@ -73,6 +82,9 @@ Proposal 決策由 `decide_proposal()` 完成，沒有 LLM。`accepted` 套用 `
 `revision_requested` 不改 Current JD。merge／split／JD 內 withdraw 的
 `staged_work_model_delta` 只在 accepted／edited 時與 JD 同交易套用。`jd_before`
 已不等於 Current JD 時，提案轉為員工可見的 `stale`，舊內容不得硬套。
+JD-only withdraw 可以沒有 staged delta；決策端在 document lock 內以目前 Work Model 重驗：
+target 後來出現未退休 Task 或已被較新 retirement 取代時，一律轉 `stale`。接受移除 JD Task
+時，同交易清除指向該 Task 的 reconciliation issue，避免 reload 後繼續追問已不存在的內容。
 Task Analysis 的 `add` 只建立 Work Model 候選；`propose_task_for_jd()` 是把一個已穩定候選
 送給員工審核的顯式 bridge。它不每輪自動製造提案，也不替員工接受。
 
@@ -160,7 +172,7 @@ JD 只在員工決定提案時才改。
 | route／Web UI | 完全沒有 | persistence 之後的最小 local Web |
 | endpoint variant preflight | `provider_order` 只鎖 base slug,同 provider 可能有多個 endpoint variant | 真正付費呼叫前的 catalog／live preflight |
 | prompt 品質調校 | `llm/prompt.py` 只寫到「不與 §4 判準相反」的結構最小集 | rubric／eval 的獨立工作 |
-| JD-only direct add 的 identity reconciliation | 目前以 open issue 保留，尚不能把後續分析的新 Task 自動對回同一個 JD task_id | Loop／reconciliation 契約前先補，不得假裝已完成 |
+| duplicate／overlap identity 自動收斂 | 第一版刻意不做；模型保留 issue 並追問員工 | 有真實重複摩擦證據後再研究，不用相似度猜測 |
 | O/P/K/S/A、完整 header、匯出 | 目前只做 Task 與較豐富的內部 JD Task 欄位 | 各自研究／契約完成後逐項加；匯出才對齊公版 |
 | revision-request replacement | revision request 可保存／reload，但不會自動重建 replacement | 後續模型流程 |
 
@@ -172,5 +184,8 @@ JD 只在員工決定提案時才改。
 - 實作步驟:[T1–T7 計畫](../plans/2026-07-28-task-analysis-core-implementation-plan.md)
 - durable vertical:
   [`PostgreSQL persistence plan`](../plans/2026-07-29-job-analysis-postgresql-persistence-plan.md)
+- partial Task reconciliation:
+  [`ADR 0044`](../adr/0044-partial-jd-task-reconciliation-and-human-confirmation.md)、
+  [`implementation plan`](../plans/2026-07-30-job-analysis-partial-task-reconciliation-plan.md)
 - 舊路徑(**已退場,勿救回**):[`interview-engine.md`](interview-engine.md)、
   [ADR 0030](../adr/0030-ai-coedit-tracked-changes-one-brain.md)

@@ -181,6 +181,77 @@ async def test_authority_change_after_prepare_rejects_the_old_model_result(
     assert loaded.state.work_model.tasks == ()
 
 
+async def test_partial_jd_task_materializes_with_the_same_identity_after_reload(
+    postgres_session_factory,
+    cleanup_job_analysis_rows,
+):
+    document_id = cleanup_job_analysis_rows
+    uow_factory = factory(postgres_session_factory)
+    await create_document(
+        uow_factory,
+        document_id=document_id,
+        title="門市營運專員",
+    )
+    created = await add_jd_task(
+        uow_factory,
+        document_id=document_id,
+        entry_id="direct-partial-weekly",
+        fields=JdTaskFields(statement="每週彙整營運週報"),
+    )
+    employee = employee_turn()
+    snapshot = await prepare_turn(
+        uow_factory,
+        document_id=document_id,
+        employee_turn=employee,
+    )
+    result = TaskAnalysisResult(
+        work_signals=(
+            WorkSignal(
+                anchors=(
+                    SignalAnchor(
+                        turn_ordinal=1,
+                        quote="我每週會彙整營運週報",
+                    ),
+                ),
+                identity=IdentityAssessment(relation=IdentityRelation.NO_MATCH),
+                resolves_open_issue_ordinal=1,
+                disposition=SignalDisposition.TASK_CHANGE,
+                task_change=TaskChangePayload(
+                    change=TaskChangeKind.ADD,
+                    task_fields={
+                        "statement": "每週彙整營運週報",
+                        "action": "彙整",
+                        "object": "營運週報",
+                    },
+                ),
+            ),
+        ),
+        next_question=NextQuestion(
+            text="這份週報主要提供給誰？",
+            purpose="釐清工作產出的使用者",
+        ),
+    )
+    operation = TaskAnalysisOperationResult(
+        outcome=OperationOutcome.VERIFIED,
+        result=result,
+        report=VerificationReport(),
+    )
+
+    await commit_verified_turn(
+        uow_factory,
+        snapshot=snapshot,
+        operation_id="operation-partial-weekly",
+        employee_turn=employee,
+        operation_result=operation,
+    )
+    loaded = await load_document(uow_factory, document_id)
+
+    assert loaded is not None
+    assert loaded.state.work_model.task_by_id(created.task_id) is not None
+    assert loaded.state.work_model.open_issues == ()
+    assert loaded.state.current_jd == (created,)
+
+
 async def test_unverified_provider_outcome_never_writes_current_state(
     postgres_session_factory,
     cleanup_job_analysis_rows,

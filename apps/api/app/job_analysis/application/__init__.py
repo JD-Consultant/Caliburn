@@ -20,6 +20,12 @@ from .operation import (
     TaskAnalysisOperationResult,
     run_task_analysis_operation,
 )
+from .transition import (
+    JobAnalysisState,
+    TransitionOutcome,
+    TransitionResult,
+    apply_task_analysis_result,
+)
 from .verifier import (
     PacketOpenIssue,
     PacketRetiredTask,
@@ -36,8 +42,12 @@ from .verifier import (
 
 __all__ = [
     "ActiveQuestion",
+    "JobAnalysisState",
     "OperationOutcome",
     "TaskAnalysisOperationResult",
+    "TransitionOutcome",
+    "TransitionResult",
+    "apply_task_analysis_result",
     "run_task_analysis_operation",
     "ConversationContext",
     "ConversationTurn",

@@ -35,6 +35,7 @@ from app.job_analysis.llm import (
     OpenIssuePayload,
     SignalAnchor,
     SignalDisposition,
+    SplitChildPayload,
     SupportOrdinalRef,
     TaskAnalysisResult,
     TaskChangeKind,
@@ -372,10 +373,13 @@ def test_target_count_must_make_the_mapping_total(change, targets):
                     RetirementReason.EMPLOYEE_DENIED
                     if change is TaskChangeKind.WITHDRAW
                     else None
-                ),
-                split_children=(fields("子一"), fields("子二"))
-                if change is TaskChangeKind.SPLIT
-                else (),
+                    ),
+                    split_children=(
+                        SplitChildPayload(task_fields=fields("子一")),
+                        SplitChildPayload(task_fields=fields("子二")),
+                    )
+                    if change is TaskChangeKind.SPLIT
+                    else (),
             ),
         )
     )
@@ -393,10 +397,18 @@ def test_split_requires_one_parent_and_two_children():
         ),
     )
     assert ViolationCode.SPLIT_CHILDREN_INSUFFICIENT in codes(
-        split_signal((fields("只有一個子"),))
+        split_signal((SplitChildPayload(task_fields=fields("只有一個子")),))
     )
     assert verify_task_analysis_result(
-        result(split_signal((fields("子一"), fields("子二")))), context()
+        result(
+            split_signal(
+                (
+                    SplitChildPayload(task_fields=fields("子一")),
+                    SplitChildPayload(task_fields=fields("子二")),
+                )
+            )
+        ),
+        context(),
     ).is_valid
 
 
@@ -663,6 +675,33 @@ def test_two_task_changes_claiming_the_same_target_are_both_rejected():
     ]
     assert len(duplicates) == 2
     assert report.rejected_signal_indexes == {0, 1}
+
+
+def test_split_child_may_only_inherit_an_effective_support_on_its_parent():
+    split = signal(
+        identity=IdentityAssessment(
+            relation=IdentityRelation.UNCERTAIN, target_task_ordinals=(1,)
+        ),
+        task_change=TaskChangePayload(
+            change=TaskChangeKind.SPLIT,
+            target_task_ordinals=(1,),
+            split_children=(
+                SplitChildPayload(
+                    task_fields=fields("彙整營運週報"),
+                    inherited_support_ordinals=(1,),
+                ),
+                SplitChildPayload(
+                    task_fields=fields("追蹤營運缺料"),
+                    inherited_support_ordinals=(99,),
+                ),
+            ),
+        ),
+    )
+
+    report = verify_task_analysis_result(result(split), context())
+
+    assert ViolationCode.SPLIT_SUPPORT_UNKNOWN in report.codes
+    assert report.rejected_signal_indexes == {0}
 
 
 def test_distinct_targets_may_be_changed_in_the_same_round():

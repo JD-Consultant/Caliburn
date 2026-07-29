@@ -74,7 +74,7 @@ OpenRouter 拿 `TaskAnalysisResult.v1` → **verifier**(純函式、零 LLM)擋�
 | 層 | 規則 | 例子 |
 |---|---|---|
 | domain 型別 | 形狀不變量,**非法狀態無法被建構** | `active` Task 至少一條有效 SupportLink;`withdrawn` 必有 reason;`merged_into` 只配 merged retirement;retirement 與 pending_reconciliation 不並存;lineage 不成環;§10.5 的 `edited_jd_after` 四條硬規則;staged delta 必須對應 action 的 target |
-| verifier | 需要 packet 才判斷得出的規則 | quote 必須是該員工回合的逐字子字串;ordinal 在範圍內;`no_match` 不得帶 target;merge ≥2;withdraw 不得帶 `task_fields` 但必須帶 `withdraw_reason`;同一 target 被兩筆 `task_change` 指涉 → **兩筆都拒**;supersession 必須指向仍有效且被同一筆 signal 指涉的 support link |
+| verifier | 需要 packet 才判斷得出的規則 | quote 必須是該員工回合的逐字子字串;ordinal 在範圍內;`no_match` 不得帶 target;merge ≥2;split child 只能沿用母 Task 的有效 support ordinal;withdraw 不得帶 `task_fields` 但必須帶 `withdraw_reason`;同一 target 被兩筆 `task_change` 指涉 → **兩筆都拒**;supersession 必須指向仍有效且被同一筆 signal 指涉的 support link |
 | transition | 需要 state 才判斷得出的規則 | identity gate;§9.5 三出口;§10.8 stale disposition |
 | **不在任何一層** | 語意判斷 | purpose 是否相同、該不該 merge／split、outcome 是否可理解、enabler 分類是否正確——**歸 rubric 與員工審核**(§9.5 末段) |
 
@@ -92,6 +92,10 @@ OpenRouter 拿 `TaskAnalysisResult.v1` → **verifier**(純函式、零 LLM)擋�
 | `merge`,任一成員在 JD | 暫不套用 topology | 建立(帶 staged delta) |
 | `split`,母 Task 不在 JD | 立即 split | 不建立 |
 | `split`,母 Task 在 JD | 暫不套用 topology | 建立(帶 staged delta) |
+
+Merge 的新 Task 保留所有 member 的有效 SupportLink並加入本輪來源；split child 只繼承模型
+以 `inherited_support_ordinals` 明確選取的母 Task 來源，再加入本輪來源。跨 JD 的 staged
+新 Task 保存同一組 application-built SupportLink，接受時不重新猜測 provenance。
 
 同一輪可以同時包含立即套用與 Proposal。**`apply_task_analysis_result` 永遠不動 `current_jd`**:
 JD 只在員工決定提案時才改。

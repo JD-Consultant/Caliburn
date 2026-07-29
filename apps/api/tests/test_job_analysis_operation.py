@@ -78,10 +78,15 @@ class RecordingTransport:
         return self.response
 
 
-def chat_response(content: str, **overrides) -> TransportResponse:
+def chat_response(
+    content: str, *, response_model: str | None = CONFIG.model, **overrides
+) -> TransportResponse:
     choice = {"message": {"content": content, "refusal": None}, "finish_reason": "stop"}
     choice.update(overrides)
-    return TransportResponse(status_code=200, body={"choices": [choice]})
+    body = {"choices": [choice]}
+    if response_model is not None:
+        body["model"] = response_model
+    return TransportResponse(status_code=200, body=body)
 
 
 def packet():
@@ -159,6 +164,7 @@ async def test_a_verified_round_makes_exactly_one_call_with_the_pinned_route():
     assert call["url"] == CHAT_COMPLETIONS_URL
     assert call["headers"]["Authorization"] == "Bearer sk-test"
     assert body["model"] == "anthropic/claude-opus-5"
+    assert body["reasoning"] == {"effort": "high", "exclude": True}
     assert body["stream"] is False
     assert body["provider"] == {
         "order": ["anthropic"],
@@ -174,6 +180,24 @@ async def test_a_verified_round_makes_exactly_one_call_with_the_pinned_route():
             "schema": task_analysis_result_provider_schema(),
         },
     }
+
+
+@pytest.mark.parametrize(
+    "response_model",
+    [None, "anthropic/claude-opus-4.6"],
+)
+async def test_successful_content_must_be_attributed_to_the_configured_model(
+    response_model,
+):
+    transport = RecordingTransport(
+        chat_response(valid_result_json(), response_model=response_model)
+    )
+
+    result, _ = await run(transport)
+
+    assert result.outcome is OperationOutcome.FAILED
+    assert result.detail.startswith("model_mismatch")
+    assert len(transport.calls) == 1
 
 
 async def test_the_provider_only_ever_sees_the_rendered_packet():

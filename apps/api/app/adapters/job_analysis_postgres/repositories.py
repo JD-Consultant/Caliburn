@@ -294,21 +294,21 @@ class SqlAlchemyJournalRepository:
         self,
         document_id: UUID,
         *,
-        limit: int,
+        limit: int | None,
     ) -> tuple[CompletedTurnPayload, ...]:
-        if limit <= 0:
+        if limit is not None and limit <= 0:
             return ()
-        rows = (
-            await self._session.scalars(
-                select(JobAnalysisJournalRow)
-                .where(
-                    JobAnalysisJournalRow.document_id == document_id,
-                    JobAnalysisJournalRow.kind == "employee_turn",
-                )
-                .order_by(JobAnalysisJournalRow.journal_sequence.desc())
-                .limit(limit)
+        statement = (
+            select(JobAnalysisJournalRow)
+            .where(
+                JobAnalysisJournalRow.document_id == document_id,
+                JobAnalysisJournalRow.kind == "employee_turn",
             )
-        ).all()
+            .order_by(JobAnalysisJournalRow.journal_sequence.desc())
+        )
+        if limit is not None:
+            statement = statement.limit(limit)
+        rows = (await self._session.scalars(statement)).all()
         entries = [ser.load_journal(row) for row in reversed(rows)]
         return tuple(
             entry.payload
@@ -363,4 +363,3 @@ class SqlAlchemyJobAnalysisUnitOfWork:
         finally:
             await self._session.close()
             self._session = None
-

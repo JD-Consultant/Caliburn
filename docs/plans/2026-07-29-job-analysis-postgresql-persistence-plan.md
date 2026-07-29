@@ -186,7 +186,8 @@ class JobAnalysisUnitOfWork(Protocol):
 ```
 
 `CompletedTurnPayload` 保存 employee turn、實際送出的 consultant next-question turn、operation ID；
-`DirectEditPayload` 保存 edit kind 與完成後 `JdTask | None`；`ProposalDecisionPayload` 保存 proposal ID、
+`DirectEditPayload` 保存 edit kind 與完成後 `JdTask | None`；reorder 另存完整
+`ordered_task_ids`（它不是單一 Task 變更，不能假裝成一個 `after`）。`ProposalDecisionPayload` 保存 proposal ID、
 decision 與員工文字／理由。三者都是 frozen Pydantic contract，不讓 raw ORM/JSON 越過 port。
 
 - [x] **Step 1: 寫失敗測試**
@@ -380,7 +381,7 @@ git commit -m "feat(job-analysis): persist and hydrate current state"
 **Interfaces:**
 
 ```python
-async def create_document(uow_factory, *, document_id: UUID, title: str, entry_id: str) -> DocumentRecord
+async def create_document(uow_factory, *, document_id: UUID, title: str) -> DocumentRecord
 async def list_documents(uow_factory) -> tuple[DocumentSummary, ...]
 async def load_document(uow_factory, document_id: UUID) -> LoadedDocument | None
 async def add_jd_task(uow_factory, *, document_id: UUID, entry_id: str, fields: JdTaskFields) -> JdTask
@@ -389,34 +390,35 @@ async def delete_jd_task(uow_factory, *, document_id: UUID, entry_id: str, task_
 async def reorder_jd_tasks(uow_factory, *, document_id: UUID, entry_id: str, ordered_task_ids: tuple[TaskId, ...]) -> tuple[JdTask, ...]
 ```
 
-新增 Task ID 由 application 以 `(document_id, entry_id)` 決定性配發；同 entry replay 回相同結果。
+`document_id` 本身就是 create 的 idempotency key，不另造一筆沒有 payload kind 可承載的 create journal。
+新增 Task ID 由 application 以 direct-edit `entry_id` 決定性配發；同 entry replay 回相同結果。
 
-- [ ] **Step 1: 寫失敗測試**
+- [x] **Step 1: 寫失敗測試**
 
 測 create/list/load、add/edit/delete/reorder、完整 reload、同 entry replay 不重做、不同 payload 共用 entry ID
 回 idempotency conflict、direct edit 產生 Journal、generation 恰加一、相關 Proposal stale、Work Model
 `pending_reconciliation` 更新但 UI DTO 不需要暴露。
 
-- [ ] **Step 2: 確認測試先紅**
+- [x] **Step 2: 確認測試先紅**
 
 ```powershell
 cd apps/api
 uv run pytest tests/test_job_analysis_authoring_postgres.py -q
 ```
 
-- [ ] **Step 3: 實作短 transaction**
+- [x] **Step 3: 實作短 transaction**
 
 固定順序：lock document → idempotency lookup → 讀 Task/Proposal → 套用 pure change → replace rows →
 insert direct-edit Journal → generation + 1 → commit。找不到 document/task 回 typed application error，
 不把 SQLAlchemy exception 洩漏給 caller。
 
-- [ ] **Step 4: 跑 focused tests**
+- [x] **Step 4: 跑 focused tests**
 
 ```powershell
 uv run pytest tests/test_job_analysis_authoring_postgres.py tests/test_job_analysis_postgres.py -q
 ```
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```powershell
 git add apps/api/app/job_analysis/application apps/api/tests/test_job_analysis_authoring_postgres.py

@@ -41,6 +41,7 @@ OpenRouter 拿 `TaskAnalysisResult.v1` → **verifier**(純函式、零 LLM)擋�
 | transition | 結果 → Work Model 變更 ＋ Proposal | `application/transition.py` | **唯一寫入者**;全有或全無 |
 | persistence ports | Current State repositories／UoW／版本化 Journal payload | `application/persistence.py` | 純 Protocol 與 frozen contracts；不認 ORM／JSON row |
 | PostgreSQL adapter | 0012 四表、serialization、repositories、UoW | `app/adapters/job_analysis_postgres/` | JSONB 讀取必須 hydrate；schema/shape 壞掉 fail-closed；repository 不 commit |
+| authoring use cases | 文件庫與 JD Task add/edit/delete/reorder | `application/authoring.py` | document row lock → entry replay check → Current State/Journal/generation 同交易；不呼叫 LLM |
 
 ## 3. 一輪的資料流(每步標函式)
 
@@ -53,6 +54,11 @@ OpenRouter 拿 `TaskAnalysisResult.v1` → **verifier**(純函式、零 LLM)擋�
    - `adapter.complete(...)` → **一次** `POST https://openrouter.ai/api/v1/chat/completions`;
    - `TaskAnalysisResult.model_validate_json(text)` → `verify_task_analysis_result(...)`。
 3. `apply_task_analysis_result(state=…, packet=…, result=…, operation_id=…)` → `TransitionResult`。
+
+員工直接編輯走另一條短路徑：`add_jd_task`／`edit_jd_task`／`delete_jd_task`／
+`reorder_jd_tasks` 先鎖 document，以 Journal `entry_id` 做 replay/conflict 判定，同交易保存
+Current JD、相關 Proposal stale、Work Model reconcile trigger、Journal 與 generation。**按儲存不呼叫 LLM**；
+既有 Task 在下一次 AI 互動時看到 JD/Work Model 差異，JD-only Task 先落一筆可追問的 open issue。
 
 `OperationOutcome` 五種結局,呼叫端照名字處置:
 
@@ -134,7 +140,7 @@ JD 只在員工決定提案時才改。
 
 | 沒有的東西 | 現況 | 什麼時候做 |
 |---|---|---|
-| durable use cases | 0012 四表、repositories、UoW 與 fail-closed hydrate 已有；transition 尚未接進 transaction | 本 persistence plan 的 direct edit／AI turn／Proposal decision 切片 |
+| durable AI turn | 0012、repositories、UoW、reload 與 direct edit 已有；transition 尚未接進 transaction | persistence plan Task 6 |
 | route／Web UI | 完全沒有 | persistence 之後的最小 local Web |
 | exactly-once replay | 決定性 Task／Proposal ID 已採 **insert-only**，不同內容撞 ID 會整筆拒絕；但相同 operation 完整重送仍可能重複追加 support link／open issue | 需要 operation ledger,留給 persistence plan |
 | endpoint variant preflight | `provider_order` 只鎖 base slug,同 provider 可能有多個 endpoint variant | 真正付費呼叫前的 catalog／live preflight |

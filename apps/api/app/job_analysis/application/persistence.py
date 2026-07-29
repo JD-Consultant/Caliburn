@@ -96,11 +96,24 @@ DirectEditKind = Literal["add", "edit", "delete", "reorder"]
 
 class DirectEditPayload(DomainModel):
     edit_kind: DirectEditKind
-    task_id: TaskId
-    after: JdTask | None
+    task_id: TaskId | None = None
+    after: JdTask | None = None
+    ordered_task_ids: tuple[TaskId, ...] = ()
 
     @model_validator(mode="after")
     def completed_value_matches_the_edit(self):
+        if self.edit_kind == "reorder":
+            if self.task_id is not None or self.after is not None:
+                raise ValueError("reorder must not carry one task or completed value")
+            if not self.ordered_task_ids:
+                raise ValueError("reorder requires ordered_task_ids")
+            if len(set(self.ordered_task_ids)) != len(self.ordered_task_ids):
+                raise ValueError("reorder task ids must be distinct")
+            return self
+        if self.task_id is None:
+            raise ValueError(f"{self.edit_kind} requires a task id")
+        if self.ordered_task_ids:
+            raise ValueError(f"{self.edit_kind} must not carry ordered_task_ids")
         if self.edit_kind == "delete":
             if self.after is not None:
                 raise ValueError("delete direct edit must have a null completed task")
@@ -219,7 +232,7 @@ class JournalRepository(Protocol):
     async def add(self, entry: JournalEntry) -> None: ...
 
     async def list_recent_turns(
-        self, document_id: UUID, *, limit: int
+        self, document_id: UUID, *, limit: int | None
     ) -> tuple[CompletedTurnPayload, ...]: ...
 
 
@@ -242,4 +255,3 @@ class JobAnalysisUnitOfWork(Protocol):
 
 
 JobAnalysisUnitOfWorkFactory = Callable[[], JobAnalysisUnitOfWork]
-

@@ -28,7 +28,7 @@ from app.job_analysis.domain import (
     DomainModel,
     ExcludedSignal,
     Identifier,
-    JdEntry,
+    JdTask,
     NonEmptyText,
     OpenIssue,
     Proposal,
@@ -78,11 +78,11 @@ class PacketTaskView(DomainModel):
 
     ordinal: int
     task: Task
-    jd_content: NonEmptyText | None = None
+    jd_task: JdTask | None = None
 
     @property
     def in_jd(self) -> bool:
-        return self.jd_content is not None
+        return self.jd_task is not None
 
     @property
     def support_ordinals(self) -> tuple[int, ...]:
@@ -255,7 +255,7 @@ def build_context_packet(
     transcript: tuple[ConversationTurn, ...],
     current_turn_id: str,
     work_model: CurrentWorkModel,
-    current_jd: tuple[JdEntry, ...] = (),
+    current_jd: tuple[JdTask, ...] = (),
     active_question: ActiveQuestion | None = None,
     proposals: tuple[Proposal, ...] = (),
 ) -> TaskAnalysisPacket:
@@ -272,13 +272,13 @@ def build_context_packet(
     if current_turn_ordinal is None:
         raise ValueError(f"current turn {current_turn_id!r} is not in the transcript")
 
-    jd_content = jd_map(current_jd)
+    jd_tasks = {task.task_id: task for task in current_jd}
     active_tasks = tuple(task for task in work_model.tasks if task.retirement is None)
     retired_tasks = tuple(task for task in work_model.tasks if task.retirement is not None)
 
     task_views = tuple(
         PacketTaskView(
-            ordinal=ordinal, task=task, jd_content=jd_content.get(task.task_id)
+            ordinal=ordinal, task=task, jd_task=jd_tasks.get(task.task_id)
         )
         for ordinal, task in enumerate(active_tasks, start=1)
     )
@@ -438,11 +438,28 @@ def render_context_packet(packet: TaskAnalysisPacket) -> str:
                 f"{enabler.kind.value}:{enabler.name}" for enabler in task.enablers
             )
             lines.append(f"    enablers: {enablers}")
-        lines.append(
-            f"    jd_presence: 在 Current JD——{view.jd_content}"
-            if view.in_jd
-            else "    jd_presence: 不在 Current JD"
-        )
+        if view.jd_task is None:
+            lines.append("    jd_presence: 不在 Current JD")
+        else:
+            lines.append(f"    jd_presence: 在 Current JD——{view.jd_task.statement}")
+            for label, value in (
+                ("purpose_result", view.jd_task.purpose_result),
+                ("context", view.jd_task.context),
+                ("frequency", view.jd_task.frequency_text),
+            ):
+                if value is not None:
+                    lines.append(f"    jd_{label}: {value}")
+            if view.jd_task.responsibility_role is not None:
+                lines.append(
+                    "    jd_responsibility_role: "
+                    f"{view.jd_task.responsibility_role.value}"
+                )
+            if view.jd_task.enablers:
+                jd_enablers = ", ".join(
+                    f"{enabler.kind.value}:{enabler.name}"
+                    for enabler in view.jd_task.enablers
+                )
+                lines.append(f"    jd_enablers: {jd_enablers}")
         if task.pending_reconciliation is not None:
             lines.append("    狀態: 待與 Current JD 重新對齊(pending reconciliation)")
         lines.append("    support_links:")
@@ -513,9 +530,9 @@ def _render_proposal(view: PacketProposalView) -> list[str]:
     lines = [
         f"- {proposal.action.value} → {targets}({proposal.status.value})"
     ]
-    for task_id, content in jd_map(proposal.jd_after).items():
+    for task_id, task in jd_map(proposal.jd_after).items():
         ordinal = _ordinal_for(view, task_id)
-        after = content if content is not None else "(自 JD 移除)"
+        after = task.statement if task is not None else "(自 JD 移除)"
         lines.append(f"    {ordinal} jd_after: {after}")
     if proposal.rejection_reason is not None:
         lines.append(f"    拒絕理由: {proposal.rejection_reason}")

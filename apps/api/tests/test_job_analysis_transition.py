@@ -21,6 +21,7 @@ from app.job_analysis.application import (
 from app.job_analysis.domain import (
     CurrentWorkModel,
     JdEntry,
+    JdTask,
     MergeTarget,
     Proposal,
     ProposalAction,
@@ -85,7 +86,20 @@ def fields(statement: str = "每週彙整營運週報") -> TaskFields:
     return TaskFields(statement=statement, action="彙整", object="營運週報")
 
 
-def state(*, jd: tuple[JdEntry, ...] = (), proposals=()) -> JobAnalysisState:
+def jd_task(
+    task_id: str,
+    statement: str,
+    *,
+    display_order: int = 0,
+) -> JdTask:
+    return JdTask(
+        task_id=task_id,
+        statement=statement,
+        display_order=display_order,
+    )
+
+
+def state(*, jd: tuple[JdTask, ...] = (), proposals=()) -> JobAnalysisState:
     return JobAnalysisState(
         work_model=CurrentWorkModel(
             tasks=(task("task-1", "每週彙整營運週報"), task("task-2", "每週追蹤缺料"))
@@ -159,7 +173,7 @@ def apply(
     )
 
 
-IN_JD = (JdEntry(task_id="task-1", content="每週彙整營運週報"),)
+IN_JD = (jd_task("task-1", "每週彙整營運週報"),)
 
 
 # ── §12.2 mapping ───────────────────────────────────────────────────────────
@@ -223,8 +237,8 @@ def test_revise_updates_in_place_and_only_proposes_when_the_jd_text_must_change(
     assert inside.created_proposal_ids == ("op-1-p0",)
     proposal = inside.state.proposals[0]
     assert proposal.action is ProposalAction.REVISE
-    assert jd_map(proposal.jd_before) == {"task-1": "每週彙整營運週報"}
-    assert jd_map(proposal.jd_after) == {"task-1": "合併後的工作"}
+    assert jd_map(proposal.jd_before)["task-1"].statement == "每週彙整營運週報"
+    assert jd_map(proposal.jd_after)["task-1"].statement == "合併後的工作"
     # Work Model 立即更新;等 JD 的只有文字。
     assert inside.state.work_model.task_by_id("task-1").statement == "合併後的工作"
 
@@ -329,11 +343,10 @@ def test_merge_with_a_member_in_the_jd_creates_a_proposal_and_stages_the_topolog
     proposal = outcome.state.proposals[0]
     assert isinstance(proposal.target, MergeTarget)
     assert proposal.affected_task_ids == ("op-1-m0", "task-1", "task-2")
-    assert jd_map(proposal.jd_after) == {
-        "task-1": None,
-        "task-2": None,
-        "op-1-m0": "合併後的工作",
-    }
+    after = jd_map(proposal.jd_after)
+    assert after["task-1"] is None
+    assert after["task-2"] is None
+    assert after["op-1-m0"].statement == "合併後的工作"
     delta = proposal.staged_work_model_delta
     assert {change.task_id for change in delta.lineage_changes} == {"task-1", "task-2"}
     assert [staged.task_id for staged in delta.new_tasks] == ["op-1-m0"]
@@ -499,7 +512,12 @@ def existing_withdraw_proposal() -> Proposal:
     return Proposal(
         proposal_id="prop-old",
         target=SingleTaskTarget(action=ProposalAction.WITHDRAW, task_id="task-1"),
-        jd_before=(JdEntry(task_id="task-1", content="每週彙整營運週報"),),
+        jd_before=(
+            JdEntry(
+                task_id="task-1",
+                value=jd_task("task-1", "每週彙整營運週報"),
+            ),
+        ),
         jd_after=(JdEntry(task_id="task-1"),),
         staged_work_model_delta=StagedWorkModelDelta(
             lineage_changes=(
@@ -591,8 +609,8 @@ def test_operation_id_collision_never_overwrites_a_different_task():
 
 def test_state_rejects_duplicate_jd_and_proposal_ids():
     duplicate_jd = (
-        JdEntry(task_id="task-1", content="版本一"),
-        JdEntry(task_id="task-1", content="版本二"),
+        jd_task("task-1", "版本一", display_order=0),
+        jd_task("task-1", "版本二", display_order=1),
     )
     with pytest.raises(ValidationError, match="duplicate current JD task ids"):
         JobAnalysisState(current_jd=duplicate_jd)
@@ -604,8 +622,16 @@ def test_state_rejects_duplicate_jd_and_proposal_ids():
     with pytest.raises(ValidationError, match="current JD must be sorted"):
         JobAnalysisState(
             current_jd=(
-                JdEntry(task_id="task-2", content="二"),
-                JdEntry(task_id="task-1", content="一"),
+                jd_task("task-2", "二", display_order=1),
+                jd_task("task-1", "一", display_order=0),
+            )
+        )
+
+    with pytest.raises(ValidationError, match="display orders must be unique"):
+        JobAnalysisState(
+            current_jd=(
+                jd_task("task-1", "一", display_order=0),
+                jd_task("task-2", "二", display_order=0),
             )
         )
 

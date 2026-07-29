@@ -27,6 +27,7 @@ from app.job_analysis.domain import (
     ExcludedSignal,
     Identifier,
     JdEntry,
+    JdTask,
     MergeTarget,
     NonEmptyText,
     OpenIssue,
@@ -46,8 +47,8 @@ from app.job_analysis.domain import (
     StagedWorkModelDelta,
     SupportLink,
     Task,
+    TaskFields,
     TaskId,
-    jd_map,
 )
 from app.job_analysis.llm import (
     SignalDisposition,
@@ -64,7 +65,7 @@ class JobAnalysisState(DomainModel):
     """一名員工、一份職務說明書的目前狀態(§9.4 的兩層)。"""
 
     work_model: CurrentWorkModel = CurrentWorkModel()
-    current_jd: tuple[JdEntry, ...] = ()
+    current_jd: tuple[JdTask, ...] = ()
     proposals: tuple[Proposal, ...] = ()
 
     @model_validator(mode="after")
@@ -72,8 +73,14 @@ class JobAnalysisState(DomainModel):
         jd_ids = [entry.task_id for entry in self.current_jd]
         if len(set(jd_ids)) != len(jd_ids):
             raise ValueError("duplicate current JD task ids")
-        if jd_ids != sorted(jd_ids):
-            raise ValueError("current JD must be sorted by task id")
+        expected = sorted(
+            self.current_jd, key=lambda task: (task.display_order, task.task_id)
+        )
+        if list(self.current_jd) != expected:
+            raise ValueError("current JD must be sorted by display order and task id")
+        display_orders = [task.display_order for task in self.current_jd]
+        if len(set(display_orders)) != len(display_orders):
+            raise ValueError("current JD task display orders must be unique")
         proposal_ids = [proposal.proposal_id for proposal in self.proposals]
         if len(set(proposal_ids)) != len(proposal_ids):
             raise ValueError("duplicate proposal ids")
@@ -81,9 +88,7 @@ class JobAnalysisState(DomainModel):
 
     @property
     def current_jd_task_ids(self) -> frozenset[TaskId]:
-        return frozenset(
-            entry.task_id for entry in self.current_jd if entry.content is not None
-        )
+        return frozenset(task.task_id for task in self.current_jd)
 
 
 class TransitionOutcome(StrEnum):
@@ -158,7 +163,7 @@ class _Writer:
         self._open_issues = list(state.work_model.open_issues)
         self._excluded = list(state.work_model.excluded_signals)
         self._proposals = {proposal.proposal_id: proposal for proposal in state.proposals}
-        self._jd = jd_map(state.current_jd)
+        self._jd = {task.task_id: task for task in state.current_jd}
         self._immediate: list[TaskId] = []
         self._created: list[Identifier] = []
         self._staled: list[Identifier] = []
@@ -345,12 +350,21 @@ class _Writer:
         )
         self._materially_reanalysed.add(task_id)
         self._immediate.append(task_id)
-        jd_content = self._jd.get(task_id)
-        if jd_content is not None and jd_content != fields.statement:
+        jd_task = self._jd.get(task_id)
+        revised_jd = (
+            self._jd_task_from_fields(
+                task_id=task_id,
+                fields=fields,
+                existing=jd_task,
+            )
+            if jd_task is not None
+            else None
+        )
+        if jd_task is not None and jd_task != revised_jd:
             self._create_proposal(
                 index,
                 SingleTaskTarget(action=ProposalAction.REVISE, task_id=task_id),
-                jd_after={task_id: fields.statement},
+                jd_after={task_id: revised_jd},
             )
 
     def _withdraw(self, index: int, signal: WorkSignal, task_id: TaskId) -> None:
@@ -413,7 +427,11 @@ class _Writer:
             index,
             MergeTarget(new_task_id=new_task_id, member_task_ids=tuple(members)),
             jd_after={
-                new_task_id: fields.statement,
+                new_task_id: self._jd_task_from_fields(
+                    task_id=new_task_id,
+                    fields=fields,
+                    display_order=self._next_jd_order(),
+                ),
                 **{member: None for member in members},
             },
             delta=StagedWorkModelDelta(
@@ -464,8 +482,14 @@ class _Writer:
             jd_after={
                 parent_id: None,
                 **{
-                    child_id: child.task_fields.statement
-                    for child_id, child in zip(child_ids, children)
+                    child_id: self._jd_task_from_fields(
+                        task_id=child_id,
+                        fields=child.task_fields,
+                        display_order=self._next_jd_order() + offset,
+                    )
+                    for offset, (child_id, child) in enumerate(
+                        zip(child_ids, children)
+                    )
                 },
             },
             delta=StagedWorkModelDelta(
@@ -496,7 +520,7 @@ class _Writer:
         index: int,
         target,
         *,
-        jd_after: dict[TaskId, str | None],
+        jd_after: dict[TaskId, JdTask | None],
         delta: StagedWorkModelDelta | None = None,
     ) -> None:
         affected = sorted(target.affected_task_ids)
@@ -504,11 +528,11 @@ class _Writer:
             proposal_id=f"{self._operation_id}-p{index}",
             target=target,
             jd_before=tuple(
-                JdEntry(task_id=task_id, content=self._jd.get(task_id))
+                JdEntry(task_id=task_id, value=self._jd.get(task_id))
                 for task_id in affected
             ),
             jd_after=tuple(
-                JdEntry(task_id=task_id, content=jd_after.get(task_id))
+                JdEntry(task_id=task_id, value=jd_after.get(task_id))
                 for task_id in affected
             ),
             staged_work_model_delta=delta,
@@ -517,6 +541,40 @@ class _Writer:
             return
         self._created.append(proposal.proposal_id)
         self._stale_superseded_proposals(proposal)
+
+    def _next_jd_order(self) -> int:
+        return max((task.display_order for task in self._jd.values()), default=-1) + 1
+
+    def _jd_task_from_fields(
+        self,
+        *,
+        task_id: TaskId,
+        fields: TaskFields,
+        existing: JdTask | None = None,
+        display_order: int | None = None,
+    ) -> JdTask:
+        return JdTask(
+            task_id=task_id,
+            statement=fields.statement,
+            purpose_result=fields.purpose_result,
+            context=fields.context,
+            frequency_text=(
+                existing.frequency_text if existing is not None else None
+            ),
+            responsibility_role=(
+                existing.responsibility_role if existing is not None else None
+            ),
+            enablers=fields.enablers,
+            display_order=(
+                existing.display_order
+                if existing is not None
+                else (
+                    display_order
+                    if display_order is not None
+                    else self._next_jd_order()
+                )
+            ),
+        )
 
     def _stale_superseded_proposals(self, replacement: Proposal) -> None:
         """§10.8:新提案與待決提案的 `affected_task_ids` 有交集 → 舊的 stale。

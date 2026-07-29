@@ -63,11 +63,11 @@
 - Materially re-analysed tasks close overlapping old proposals even without a replacement.
 - Retirement provenance is selected from the signal anchors.
 
-- [ ] Write failing tests for duplicate signal, duplicate IDs, operation collision, invalid staged delta, visible stale closure, and unanchored retirement.
-- [ ] Run tests and confirm expected RED failures.
-- [ ] Add validators and insert-only helpers without adding a repository/ledger abstraction.
-- [ ] Run focused domain/verifier/transition tests.
-- [ ] Commit `fix(api): close task analysis state integrity gaps`.
+- [x] Write failing tests for duplicate signal, duplicate IDs, operation collision, invalid staged delta, visible stale closure, and unanchored retirement.
+- [x] Run tests and confirm seven expected RED failures.
+- [x] Add validators and insert-only helpers without adding a repository/ledger abstraction.
+- [x] Run focused domain/verifier/transition tests（208 passed）。
+- [x] Commit `fix(api): close task analysis state integrity gaps`.
 
 ### Task 3: Provider treatment and response attribution
 

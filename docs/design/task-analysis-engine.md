@@ -73,9 +73,9 @@ OpenRouter 拿 `TaskAnalysisResult.v1` → **verifier**(純函式、零 LLM)擋�
 
 | 層 | 規則 | 例子 |
 |---|---|---|
-| domain 型別 | 形狀不變量,**非法狀態無法被建構** | `active` Task 至少一條有效 SupportLink;`withdrawn` 必有 reason;`merged_into` 只配 merged retirement;retirement 與 pending_reconciliation 不並存;lineage 不成環;§10.5 的 `edited_jd_after` 四條硬規則;staged delta 必須對應 action 的 target |
-| verifier | 需要 packet 才判斷得出的規則 | quote 必須是該員工回合的逐字子字串;ordinal 在範圍內;`no_match` 不得帶 target;merge ≥2;split child 只能沿用母 Task 的有效 support ordinal;withdraw 不得帶 `task_fields` 但必須帶 `withdraw_reason`;同一 target 被兩筆 `task_change` 指涉 → **兩筆都拒**;supersession 必須指向仍有效且被同一筆 signal 指涉的 support link |
-| transition | 需要 state 才判斷得出的規則 | identity gate;§9.5 三出口;§10.8 stale disposition |
+| domain 型別 | 形狀不變量,**非法狀態無法被建構** | `active` Task 至少一條有效 SupportLink;`withdrawn` 必有 reason;lineage 不成環;staged delta 的 ID 不重複且欄位必須符合 action;Current JD／Proposal ID 不重複且 JD 投影順序 canonical;§10.5 的 `edited_jd_after` 四條硬規則 |
+| verifier | 需要 packet 才判斷得出的規則 | quote 必須是該員工回合的逐字子字串;ordinal 在範圍內;`no_match` 不得帶 target;merge ≥2;split child 只能沿用母 Task 的有效 support ordinal;withdraw 不得帶 `task_fields` 但必須帶 `withdraw_reason`;同一 target 被兩筆 `task_change` 指涉或兩筆 signal 逐欄完全相同 → **明確拒絕**;supersession 必須指向仍有效且被同一筆 signal 指涉的 support link |
+| transition | 需要 state 才判斷得出的規則 | identity gate;§9.5 三出口;Task／Proposal 的決定性 ID 採 insert-only,撞到不同內容即拒絕;retirement 來源只能取自該 signal 實際引用的 anchor;§10.8 stale disposition |
 | **不在任何一層** | 語意判斷 | purpose 是否相同、該不該 merge／split、outcome 是否可理解、enabler 分類是否正確——**歸 rubric 與員工審核**(§9.5 末段) |
 
 ## 6. Identity gate:什麼時候可以直接改 Work Model
@@ -111,6 +111,10 @@ JD 只在員工決定提案時才改。
   request／correlation UUID,掃描只會誤殺。
 - **全有或全無。** transition 中途用 `model_copy(update=…)` 疊改(不驗證),收尾逐筆
   `Task.model_validate(...)`;§9.5 的三出口在那裡執行,任何一條不變量不成立就整筆拒絕、state 原封不動。
+- **精確重複才由程式拒絕。** 逐欄完全相同的 `work_signals[]` 是確定性錯誤；近似文字、
+  同義改寫與 Task 邊界仍是語意問題，不做相似度服務或工具字典。
+- **新分析不能讓舊提案無聲留下。** 同一 Task 已被本輪實質重新分析、但沒有 replacement 時，
+  仍將重疊的 pending／deferred Proposal 標成 stale，並保存員工看得到的理由。
 - **greenfield 邊界。** `app/job_analysis` **不得 import** `app.interview`、`app.interview_vnext`、
   `app.job_authoring`、`evals`,也不得 import DB／web 框架。由
   `tests/test_job_analysis_dependencies.py` 以 AST 強制。
@@ -124,7 +128,7 @@ JD 只在員工決定提案時才改。
 |---|---|---|
 | DB／persistence | state 是記憶體裡的 `JobAnalysisState` | 下一份 persistence plan(原子寫入、authority snapshot stale 保護、reload) |
 | route／Web UI | 完全沒有 | persistence 之後的最小 local Web |
-| exactly-once replay | 只有**決定性 ID 配發**;把已套用的結果再送一次會重複追加 support link、open issue 因 ID 重複被拒 | 需要 operation ledger,留給 persistence plan |
+| exactly-once replay | 決定性 Task／Proposal ID 已採 **insert-only**，不同內容撞 ID 會整筆拒絕；但相同 operation 完整重送仍可能重複追加 support link／open issue | 需要 operation ledger,留給 persistence plan |
 | endpoint variant preflight | `provider_order` 只鎖 base slug,同 provider 可能有多個 endpoint variant | 真正付費呼叫前的 catalog／live preflight |
 | prompt 品質調校 | `llm/prompt.py` 只寫到「不與 §4 判準相反」的結構最小集 | rubric／eval 的獨立工作 |
 | 員工決定提案的流程 | Proposal 建得出來,但沒有套用決定的服務 | 與 persistence 同期 |

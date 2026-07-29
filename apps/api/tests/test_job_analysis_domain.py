@@ -573,6 +573,44 @@ def test_empty_staged_delta_is_rejected():
         StagedWorkModelDelta()
 
 
+def test_withdraw_delta_may_not_smuggle_merge_lineage():
+    with pytest.raises(ValidationError, match="withdraw delta"):
+        Proposal(
+            proposal_id="prop-withdraw",
+            target=SingleTaskTarget(
+                action=ProposalAction.WITHDRAW, task_id="task-1"
+            ),
+            jd_before=jd(("task-1", "原文")),
+            jd_after=jd(("task-1", None)),
+            staged_work_model_delta=StagedWorkModelDelta(
+                lineage_changes=(
+                    StagedTaskLineage(
+                        task_id="task-1",
+                        retirement=Retirement(
+                            kind=RetirementKind.WITHDRAWN,
+                            reason=RetirementReason.EMPLOYEE_DENIED,
+                            source_ref=employee_ref(),
+                        ),
+                        merged_into="task-9",
+                    ),
+                )
+            ),
+        )
+
+
+def test_staged_delta_rejects_duplicate_lineage_ids_before_correspondence():
+    duplicate = StagedTaskLineage(
+        task_id="task-1",
+        retirement=merged_retirement(),
+        merged_into="task-9",
+    )
+    with pytest.raises(ValidationError, match="duplicate lineage task ids"):
+        StagedWorkModelDelta(
+            lineage_changes=(duplicate, duplicate),
+            new_tasks=merge_delta().new_tasks,
+        )
+
+
 # ── §10.5 `edited` 的四條硬規則 ─────────────────────────────────────────────
 
 

@@ -401,6 +401,9 @@ Proposal **只 gate Current JD**。分析結果對 Work Model 的更新在通過
 - `open_issue` 至少一個 anchor；`矛盾未解` 至少兩個；
 - `retirement.kind == withdrawn` → `reason` 必填；`== merged` → `merged_into` 必填；
 - `merged_into`／`split_from` 目標必須存在且不得成 cycle；
+- Current JD 與 Proposal ID 不得重複，Current JD 投影必須使用 canonical Task ID 順序；
+- staged delta 內的 lineage／new Task ID 不得重複，且 withdraw／merge／split 不得夾帶
+  不屬於該 action 的 lineage 欄位；
 - `pending_reconciliation` 必須指向下列其中一種來源：`direct_edit`、`employee_turn`（訪談中的更正
   或否認）、`proposal_decision` 且該決定為 `edited`（對齊員工文字）或 `rejected`（重新判斷方向）；
   `deferred` 不觸發。它是**觸發器與最近原因指標，不是待辦清單**——reconcile 一律讀 Current JD 現況
@@ -418,6 +421,12 @@ Proposal **只 gate Current JD**。分析結果對 Work Model 的更新在通過
 
   三個出口對應三種不同的真實情境，缺一就會出現「active 但零有效支持」或
   「員工編輯被當成否認」的錯誤處置。
+
+retirement 的 `source_ref` 必須取自該 `work_signal` 實際引用的 employee-turn anchor；
+不得因為某個回合恰好是 current turn，就把未被模型引用的回合寫成撤回依據。
+application 配發的 Task／Proposal ID 採 insert-only：相同 ID 已存在且內容不同時整筆拒絕，
+不得用 dict overwrite 靜默改寫既有真相。這仍不等於 exactly-once；完整 replay 留給 persistence
+階段的 operation ledger。
 
 其餘（purpose 是否相同、該不該 merge／split、outcome 是否可理解、enabler 分類是否正確）
 一律歸 rubric 與員工審核，**不得寫進 verifier**，也不得用 schema required 逼模型硬填
@@ -628,6 +637,7 @@ RevisionRequestResolution
 | affected Task 的 JD 現況 ≠ `jd_before` | replacement 或 visible closure |
 | affected Task 進入 `pending_reconciliation` 或 `retirement != null` | replacement 或 visible closure |
 | 純 Work Model topology 變更使它失效 | **同一交易**內 replacement 或 visible closure（§9.6） |
+| 本輪已實質重新分析 affected Task、但沒有 replacement | visible closure |
 
 `closed_without_replacement` 的理由必須**員工看得到**；只存資料庫等同無聲消失。
 
@@ -822,6 +832,8 @@ Merge 則由 application 合併所有 member 的有效 SupportLink，再加入�
 - `supersedes_support_ordinals[]` 的每一項必須指向 packet 中存在、且**目前 `superseded_by == null`**
   的 support link；其 `task_ordinal` 必須出現在同一筆 signal 的 `target_task_ordinals` 中；
   `retired_tasks[]` 不在此 namespace，不得被指涉。
+- 兩筆 `work_signals[]` 若逐欄完全相同，兩筆都拒絕；只做 exact duplicate 檢查，
+  不以文字相似度、embedding 或語意模型猜測是否重複。
 
 **`superseded_by` 要寫哪個新來源**：第一版一律指向**本次 operation 正在處理的 employee turn**，
 且該 turn 必須存在於同一筆 signal 的 `anchors` 中。不加欄位讓模型指定。日後若 direct edit 或

@@ -71,6 +71,7 @@ from .proposal_decisions import (
     ProposalNotDecidable,
     ProposalNotFound,
     decide_proposal,
+    propose_task_for_jd,
 )
 from .transition import (
     JobAnalysisState,
@@ -166,6 +167,7 @@ __all__ = [
     "list_documents",
     "load_document",
     "prepare_turn",
+    "propose_task_for_jd",
     "reorder_jd_tasks",
     "verify_task_analysis_result",
 ]

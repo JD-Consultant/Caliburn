@@ -17,6 +17,7 @@ from app.job_analysis.domain import (
     ProposalStatus,
     SourceKind,
     SourceRef,
+    SingleTaskTarget,
     StagedWorkModelDelta,
     Task,
     TaskId,
@@ -321,6 +322,106 @@ async def _persist(
             f"document {record.document_id} authority changed concurrently"
         )
     await uow.commit()
+
+
+async def propose_task_for_jd(
+    uow_factory: JobAnalysisUnitOfWorkFactory,
+    *,
+    document_id: UUID,
+    task_id: TaskId,
+    proposal_id: str,
+) -> Proposal:
+    """Expose one stable Work Model candidate for employee review.
+
+    Task Analysis creates candidates first. This explicit bridge is the only
+    thing that turns one candidate into a pending Current JD proposal; it does
+    not call a model and never accepts the proposal for the employee.
+    """
+
+    async with uow_factory() as uow:
+        record = await uow.documents.get(document_id, for_update=True)
+        if record is None:
+            raise DocumentNotFound(f"document {document_id} was not found")
+        proposals = await uow.proposals.list(document_id)
+        existing = next(
+            (item for item in proposals if item.proposal_id == proposal_id),
+            None,
+        )
+        if existing is not None:
+            if (
+                existing.action is ProposalAction.ADD
+                and existing.affected_task_ids == (task_id,)
+            ):
+                return existing
+            raise IdempotencyConflict(
+                f"proposal id {proposal_id!r} already belongs to another candidate"
+            )
+
+        candidate = record.work_model.task_by_id(task_id)
+        if candidate is None or candidate.retirement is not None:
+            raise InvalidProposalDecision(
+                f"Task {task_id!r} is not an active Work Model candidate"
+            )
+        if candidate.pending_reconciliation is not None:
+            raise InvalidProposalDecision(
+                f"Task {task_id!r} must be reconciled before it can enter Current JD"
+            )
+        current_jd = await uow.tasks.list(document_id)
+        if any(item.task_id == task_id for item in current_jd):
+            raise ProposalNotDecidable(
+                f"Task {task_id!r} is already present in Current JD"
+            )
+
+        after = JdTask(
+            task_id=task_id,
+            statement=candidate.statement,
+            purpose_result=candidate.purpose_result,
+            context=candidate.context,
+            enablers=candidate.enablers,
+            display_order=max(
+                (item.display_order for item in current_jd),
+                default=-1,
+            )
+            + 1,
+        )
+        proposal = Proposal(
+            proposal_id=proposal_id,
+            target=SingleTaskTarget(
+                action=ProposalAction.ADD,
+                task_id=task_id,
+            ),
+            jd_before=(JdEntry(task_id=task_id, value=None),),
+            jd_after=(JdEntry(task_id=task_id, value=after),),
+        )
+        next_proposals: list[Proposal] = []
+        for old in proposals:
+            if (
+                old.status in {ProposalStatus.PENDING, ProposalStatus.DEFERRED}
+                and task_id in old.affected_task_ids
+            ):
+                next_proposals.append(
+                    Proposal.model_validate(
+                        {
+                            **old.model_dump(),
+                            "status": ProposalStatus.STALE,
+                            "stale_reason": (
+                                "同一項工作已有較新的加入 JD 提案。"
+                            ),
+                        }
+                    )
+                )
+            else:
+                next_proposals.append(old)
+        next_proposals.append(proposal)
+        await _persist(
+            uow,
+            record=record,
+            work_model=record.work_model,
+            current_jd=current_jd,
+            proposals=tuple(next_proposals),
+            journal_entry=None,
+        )
+        return proposal
 
 
 async def decide_proposal(

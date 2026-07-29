@@ -172,6 +172,7 @@ class ViolationCode(StrEnum):
     WITHDRAW_REASON_REQUIRED = "withdraw_reason_required"
     WITHDRAW_REASON_FORBIDDEN = "withdraw_reason_forbidden"
     SPLIT_CHILDREN_INSUFFICIENT = "split_children_insufficient"
+    SPLIT_SUPPORT_UNKNOWN = "split_support_unknown"
     OPEN_ISSUE_ANCHORS_INSUFFICIENT = "open_issue_anchors_insufficient"
     NEXT_QUESTION_TARGET_INVALID = "next_question_target_invalid"
     SUPERSESSION_UNKNOWN = "supersession_unknown"
@@ -519,6 +520,32 @@ def _verify_task_change(
             f"split requires at least two children, got {len(change.split_children)}",
             index,
         )
+    if change.change is TaskChangeKind.SPLIT and len(targets) == 1:
+        parent = context.task(targets[0])
+        if parent is not None:
+            effective = {
+                support.ordinal
+                for support in parent.support_links
+                if support.is_effective
+            }
+            for child_index, child in enumerate(change.split_children):
+                inherited = child.inherited_support_ordinals
+                if len(set(inherited)) != len(inherited):
+                    _add(
+                        violations,
+                        ViolationCode.SPLIT_SUPPORT_UNKNOWN,
+                        f"split child {child_index} repeats a parent support ordinal",
+                        index,
+                    )
+                unknown = set(inherited) - effective
+                if unknown:
+                    _add(
+                        violations,
+                        ViolationCode.SPLIT_SUPPORT_UNKNOWN,
+                        f"split child {child_index} references unknown or superseded "
+                        f"parent support ordinal(s): {sorted(unknown)}",
+                        index,
+                    )
 
 
 def _verify_open_issue(

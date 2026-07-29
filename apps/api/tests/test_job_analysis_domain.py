@@ -114,6 +114,7 @@ def merge_delta(
                 fields=TaskFields(
                     statement="合併後的工作", action="彙整", object="營運週報"
                 ),
+                support_links=(support(),),
             ),
         ),
     )

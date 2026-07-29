@@ -12,6 +12,7 @@ from typing import Annotated, Literal
 from pydantic import Field, model_validator
 
 from .base import DomainModel, Identifier, NonEmptyText, TaskId
+from .sources import SupportLink
 from .task import Retirement, RetirementKind, TaskFields
 
 
@@ -190,6 +191,13 @@ class StagedTask(DomainModel):
 
     task_id: TaskId
     fields: TaskFields
+    support_links: tuple[SupportLink, ...]
+
+    @model_validator(mode="after")
+    def future_active_task_has_effective_support(self):
+        if not any(link.is_effective for link in self.support_links):
+            raise ValueError("staged active task requires an effective support link")
+        return self
 
 
 class StagedWorkModelDelta(DomainModel):

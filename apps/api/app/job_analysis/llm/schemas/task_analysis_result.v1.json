@@ -233,6 +233,28 @@
       "title": "SignalDisposition",
       "type": "string"
     },
+    "SplitChildPayload": {
+      "additionalProperties": false,
+      "description": "Split 子項的語意欄位與要沿用的母 Task 依據。\n\nordinal 是母 Task 內的 task-local support ordinal；application 會解析成\n``SupportLink``。模型不接觸 SourceRef 或內部 ID。",
+      "properties": {
+        "task_fields": {
+          "$ref": "#/$defs/TaskFields"
+        },
+        "inherited_support_ordinals": {
+          "items": {
+            "type": "integer"
+          },
+          "title": "Inherited Support Ordinals",
+          "type": "array"
+        }
+      },
+      "required": [
+        "task_fields",
+        "inherited_support_ordinals"
+      ],
+      "title": "SplitChildPayload",
+      "type": "object"
+    },
     "SupportOrdinalRef": {
       "additionalProperties": false,
       "description": "指認被本次更正取代的既有依據(§12.3 末段:這是 `TI-R1-08` 的唯一支撐)。",
@@ -299,7 +321,7 @@
         },
         "split_children": {
           "items": {
-            "$ref": "#/$defs/TaskFields"
+            "$ref": "#/$defs/SplitChildPayload"
           },
           "title": "Split Children",
           "type": "array"

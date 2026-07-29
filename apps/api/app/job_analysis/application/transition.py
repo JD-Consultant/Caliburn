@@ -187,6 +187,35 @@ class _Writer:
             SupportLink(**anchor.model_dump()) for anchor in self._anchors(signal)
         )
 
+    @staticmethod
+    def _unique_support_links(
+        *groups: tuple[SupportLink, ...],
+    ) -> tuple[SupportLink, ...]:
+        """保留首次出現順序的 exact dedupe；不做語意相似度猜測。"""
+        unique: list[SupportLink] = []
+        for group in groups:
+            for link in group:
+                if link not in unique:
+                    unique.append(link)
+        return tuple(unique)
+
+    def _merge_support_links(
+        self, members: list[TaskId], signal: WorkSignal
+    ) -> tuple[SupportLink, ...]:
+        return self._unique_support_links(
+            *(self._tasks[member].effective_support_links for member in members),
+            self._support_links(signal),
+        )
+
+    def _split_support_links(
+        self, parent_id: TaskId, inherited_ordinals: tuple[int, ...], signal: WorkSignal
+    ) -> tuple[SupportLink, ...]:
+        parent = self._tasks[parent_id]
+        inherited = tuple(
+            parent.support_links[ordinal - 1] for ordinal in inherited_ordinals
+        )
+        return self._unique_support_links(inherited, self._support_links(signal))
+
     # ── 逐筆訊號 ────────────────────────────────────────────────────────────
 
     def apply_signal(self, index: int, signal: WorkSignal) -> None:
@@ -338,6 +367,7 @@ class _Writer:
     def _merge(self, index: int, signal: WorkSignal, members: list[TaskId]) -> None:
         new_task_id = f"{self._operation_id}-m{index}"
         fields = signal.task_change.task_fields
+        support_links = self._merge_support_links(members, signal)
         retirement = Retirement(
             kind=RetirementKind.MERGED,
             source_ref=SourceRef(kind=SourceKind.EMPLOYEE_TURN, id=self._current_turn_id),
@@ -347,7 +377,7 @@ class _Writer:
                 Task(
                     task_id=new_task_id,
                     **dict(fields),
-                    support_links=self._support_links(signal),
+                    support_links=support_links,
                 )
             )
             for member in members:
@@ -372,7 +402,13 @@ class _Writer:
                     )
                     for member in members
                 ),
-                new_tasks=(StagedTask(task_id=new_task_id, fields=fields),),
+                new_tasks=(
+                    StagedTask(
+                        task_id=new_task_id,
+                        fields=fields,
+                        support_links=support_links,
+                    ),
+                ),
             ),
         )
 
@@ -384,12 +420,15 @@ class _Writer:
             source_ref=SourceRef(kind=SourceKind.EMPLOYEE_TURN, id=self._current_turn_id),
         )
         if self._gate_is_open([parent_id]):
-            for child_id, fields in zip(child_ids, children):
+            for child_id, child in zip(child_ids, children):
+                support_links = self._split_support_links(
+                    parent_id, child.inherited_support_ordinals, signal
+                )
                 self._replace(
                     Task(
                         task_id=child_id,
-                        **dict(fields),
-                        support_links=self._support_links(signal),
+                        **dict(child.task_fields),
+                        support_links=support_links,
                         split_from=parent_id,
                     )
                 )
@@ -404,8 +443,8 @@ class _Writer:
             jd_after={
                 parent_id: None,
                 **{
-                    child_id: fields.statement
-                    for child_id, fields in zip(child_ids, children)
+                    child_id: child.task_fields.statement
+                    for child_id, child in zip(child_ids, children)
                 },
             },
             delta=StagedWorkModelDelta(
@@ -417,8 +456,14 @@ class _Writer:
                     ),
                 ),
                 new_tasks=tuple(
-                    StagedTask(task_id=child_id, fields=fields)
-                    for child_id, fields in zip(child_ids, children)
+                    StagedTask(
+                        task_id=child_id,
+                        fields=child.task_fields,
+                        support_links=self._split_support_links(
+                            parent_id, child.inherited_support_ordinals, signal
+                        ),
+                    )
+                    for child_id, child in zip(child_ids, children)
                 ),
             ),
         )

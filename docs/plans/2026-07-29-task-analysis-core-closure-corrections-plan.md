@@ -38,11 +38,11 @@
 - Immediate merge unions member effective links plus current anchors.
 - Split children receive only explicitly selected parent links plus current anchors.
 
-- [ ] Write focused failing tests for immediate merge preservation, child-specific split assignment, and staged active-task support.
-- [ ] Run the focused tests and confirm each fails for the missing support closure.
-- [ ] Add the smallest contract/verifier/transition changes.
-- [ ] Run domain, schema, verifier, and transition focused tests.
-- [ ] Commit `fix(api): preserve task support across merge and split`.
+- [x] Write focused failing tests for immediate merge preservation, child-specific split assignment, and staged active-task support.
+- [x] Run the focused tests and confirm each fails for the missing support closure.
+- [x] Add the smallest contract/verifier/transition changes.
+- [x] Run domain, schema, verifier, and transition focused tests（201 passed）。
+- [x] Commit `fix(api): preserve task support across merge and split`.
 
 ### Task 2: State and proposal integrity
 

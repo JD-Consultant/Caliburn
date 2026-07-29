@@ -45,6 +45,7 @@ from app.job_analysis.llm import (
     OpenIssuePayload,
     SignalAnchor,
     SignalDisposition,
+    SplitChildPayload,
     SupportOrdinalRef,
     TaskAnalysisResult,
     TaskChangeKind,
@@ -268,6 +269,26 @@ def test_merge_applies_immediately_when_no_member_is_in_the_jd():
         assert merged.merged_into == "op-1-m0"
 
 
+def test_merge_preserves_member_support_and_adds_the_current_signal():
+    """多個故事支持同一 Task；merge 不可只留下最後一輪原話。"""
+    first = task("task-1", "每週彙整營運週報").model_copy(
+        update={"support_links": (link("turn-old-1", "先前週報故事"),)}
+    )
+    second = task("task-2", "每週追蹤缺料").model_copy(
+        update={"support_links": (link("turn-old-2", "先前缺料故事"),)}
+    )
+    current = JobAnalysisState(
+        work_model=CurrentWorkModel(tasks=(first, second)),
+    )
+
+    outcome = apply(change_signal(TaskChangeKind.MERGE, (1, 2)), current=current)
+
+    survivor = outcome.state.work_model.task_by_id("op-1-m0")
+    assert {
+        support.source_ref.id for support in survivor.effective_support_links
+    } == {"turn-old-1", "turn-old-2", "turn-2"}
+
+
 def test_merge_with_a_member_in_the_jd_creates_a_proposal_and_stages_the_topology():
     outcome = apply(
         change_signal(TaskChangeKind.MERGE, (1, 2)), current=state(jd=IN_JD)
@@ -287,10 +308,20 @@ def test_merge_with_a_member_in_the_jd_creates_a_proposal_and_stages_the_topolog
     delta = proposal.staged_work_model_delta
     assert {change.task_id for change in delta.lineage_changes} == {"task-1", "task-2"}
     assert [staged.task_id for staged in delta.new_tasks] == ["op-1-m0"]
+    assert delta.new_tasks[0].support_links
 
 
 def test_split_follows_the_same_gate():
-    children = (fields("每週彙整營運週報"), fields("每週追蹤缺料"))
+    children = (
+        SplitChildPayload(
+            task_fields=fields("每週彙整營運週報"),
+            inherited_support_ordinals=(1,),
+        ),
+        SplitChildPayload(
+            task_fields=fields("每週追蹤缺料"),
+            inherited_support_ordinals=(1,),
+        ),
+    )
     outside = apply(
         change_signal(
             TaskChangeKind.SPLIT,
@@ -313,6 +344,48 @@ def test_split_follows_the_same_gate():
     )
     assert inside.state.work_model.task_by_id("task-1").state is TaskState.ACTIVE
     assert inside.state.proposals[0].action is ProposalAction.SPLIT
+
+
+def test_split_assigns_only_the_selected_parent_support_to_each_child():
+    parent = task("task-1", "處理營運例行工作").model_copy(
+        update={
+            "support_links": (
+                link("turn-old-1", "先前週報故事"),
+                link("turn-old-2", "先前缺料故事"),
+            )
+        }
+    )
+    current = JobAnalysisState(work_model=CurrentWorkModel(tasks=(parent,)))
+    children = (
+        SplitChildPayload(
+            task_fields=fields("每週彙整營運週報"),
+            inherited_support_ordinals=(1,),
+        ),
+        SplitChildPayload(
+            task_fields=fields("每週追蹤缺料"),
+            inherited_support_ordinals=(2,),
+        ),
+    )
+
+    outcome = apply(
+        change_signal(
+            TaskChangeKind.SPLIT,
+            (1,),
+            payload={"task_fields": None, "split_children": children},
+        ),
+        current=current,
+    )
+
+    first = outcome.state.work_model.task_by_id("op-1-s0-0")
+    second = outcome.state.work_model.task_by_id("op-1-s0-1")
+    assert {link.source_ref.id for link in first.support_links} == {
+        "turn-old-1",
+        "turn-2",
+    }
+    assert {link.source_ref.id for link in second.support_links} == {
+        "turn-old-2",
+        "turn-2",
+    }
 
 
 def test_one_round_can_mix_an_immediate_change_with_a_proposal():

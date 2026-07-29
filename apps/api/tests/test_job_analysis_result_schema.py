@@ -9,6 +9,7 @@ import pytest
 from app.job_analysis.domain import ExclusionReason, OpenIssueKind, TaskFields
 from app.job_analysis.llm import (
     PROVIDER_SCHEMA_PATH,
+    TASK_ANALYSIS_INSTRUCTIONS,
     IdentityAssessment,
     IdentityRelation,
     NextQuestion,
@@ -17,6 +18,7 @@ from app.job_analysis.llm import (
     ProviderSchemaPortabilityError,
     SignalAnchor,
     SignalDisposition,
+    SplitChildPayload,
     TaskAnalysisResult,
     TaskChangeKind,
     TaskChangePayload,
@@ -56,6 +58,10 @@ def test_result_top_level_shape_is_frozen():
         "task_fields",
         "split_children",
     ]
+    assert list(SplitChildPayload.model_fields) == [
+        "task_fields",
+        "inherited_support_ordinals",
+    ]
     assert list(SignalAnchor.model_fields) == ["turn_ordinal", "quote"]
     assert list(NextQuestion.model_fields) == ["text", "purpose", "target"]
 
@@ -78,6 +84,21 @@ def test_task_fields_is_the_semantic_subset_only():
         "success_criterion_hint",
         "enablers",
     ]
+
+
+def test_split_children_can_assign_existing_parent_support_by_ordinal():
+    """Split 不能把母 Task 的全部來源複製給每個 child，也不能全部丟掉。
+
+    provider contract 必須讓每個 child 明確選擇要沿用的 task-local support ordinal。
+    """
+    split_children = TaskChangePayload.model_json_schema()["properties"][
+        "split_children"
+    ]
+    assert split_children["items"]["$ref"].endswith("/SplitChildPayload")
+
+
+def test_split_prompt_explains_child_specific_support_inheritance():
+    assert "inherited_support_ordinals" in TASK_ANALYSIS_INSTRUCTIONS
 
 
 def test_result_enum_domains_are_frozen():

@@ -71,6 +71,17 @@ class TaskChangeKind(StrEnum):
     SPLIT = "split"
 
 
+class SplitChildPayload(DomainModel):
+    """Split 子項的語意欄位與要沿用的母 Task 依據。
+
+    ordinal 是母 Task 內的 task-local support ordinal；application 會解析成
+    ``SupportLink``。模型不接觸 SourceRef 或內部 ID。
+    """
+
+    task_fields: TaskFields
+    inherited_support_ordinals: tuple[int, ...] = ()
+
+
 class TaskChangePayload(DomainModel):
     change: TaskChangeKind
     withdraw_reason: RetirementReason | None = None
@@ -84,7 +95,7 @@ class TaskChangePayload(DomainModel):
 
     target_task_ordinals: tuple[int, ...] = ()
     task_fields: TaskFields | None = None
-    split_children: tuple[TaskFields, ...] = ()
+    split_children: tuple[SplitChildPayload, ...] = ()
 
 
 class ExcludePayload(DomainModel):

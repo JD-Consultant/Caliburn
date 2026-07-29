@@ -761,6 +761,7 @@ TaskAnalysisResult.v1
 │  └─ payload（依 disposition 擇一）
 │     ├─ task_change  { change, target_task_ordinals[], task_fields?, split_children[]? }
 │     │                  change: add | revise | withdraw | merge | split
+│     │                  split child: { task_fields, inherited_support_ordinals[] }
 │     ├─ support_only { }                       只追加來源，不改 Task
 │     ├─ exclude      { reason, summary }
 │     └─ open_issue   { kind, summary }
@@ -775,6 +776,11 @@ TaskAnalysisResult.v1
 `task_fields`＝§9.1 的語意欄位子集：`statement`、`action`、`object`、`purpose_result?`、`context?`、
 `deliverable_hint?`、`success_criterion_hint?`、`enablers[]`。**不含** `task_id`、`support_links`、
 `retirement`、`merged_into`、`split_from`——那些全部由 application 依 anchors 與 gate 產生。
+`split_children[].inherited_support_ordinals` 是 task-local ordinal，只用來讓 application
+把母 Task 的既有有效 SupportLink 分配給真正受其支持的 child；不得把全部來源無差別複製。
+Merge 則由 application 合併所有 member 的有效 SupportLink，再加入本輪 anchors。
+跨 JD 的 staged merge／split 必須保存 application 已解析完成的同一組 SupportLink，
+確保接受後的新 active Task 不需猜測來源。
 
 **不設整體 `analysis_decision` 欄位**：本輪是提案、澄清還是不變更，由 `work_signals` 推導
 （無 `task_change` 即澄清或不變更）。多存一個可能與陣列內容矛盾的欄位沒有價值（§9.2 同一原則）。
@@ -810,6 +816,7 @@ TaskAnalysisResult.v1
   `merge` 時 ≥2；
 - `change == merge` → `task_fields` 必填；`change == split` → 1 個母 target ＋ `split_children` ≥2；
   `change == withdraw` → **不得**帶 `task_fields`；
+- split child 的 `inherited_support_ordinals` 不得重複，且只能指向母 Task 目前有效的 support link；
 - 同一個 target Task 被兩筆 `task_change` 指涉 → **兩筆都拒絕**，不任選贏家；
 - `next_question.target` 必須指向存在的 packet ordinal 或本次輸出的合法 index；
 - `supersedes_support_ordinals[]` 的每一項必須指向 packet 中存在、且**目前 `superseded_by == null`**

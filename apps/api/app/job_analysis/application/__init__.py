@@ -1,5 +1,21 @@
-"""Use-case 層:deterministic verifier(T3);context assembler 與 transition 待後續 task。"""
+"""Use-case 層:context assembler(T4)＋ deterministic verifier(T3);transition 待後續 task。"""
 
+from .context import (
+    RETIRED_ORDINAL_BASE,
+    ActiveQuestion,
+    ConversationContext,
+    ConversationTurn,
+    CurrentAuthorities,
+    PacketOpenIssueView,
+    PacketProposalView,
+    PacketRetiredTaskView,
+    PacketTaskView,
+    PacketTurnView,
+    ProposalContext,
+    TaskAnalysisPacket,
+    build_context_packet,
+    render_context_packet,
+)
 from .verifier import (
     PacketOpenIssue,
     PacketRetiredTask,
@@ -15,6 +31,20 @@ from .verifier import (
 )
 
 __all__ = [
+    "RETIRED_ORDINAL_BASE",
+    "ActiveQuestion",
+    "ConversationContext",
+    "ConversationTurn",
+    "CurrentAuthorities",
+    "PacketOpenIssueView",
+    "PacketProposalView",
+    "PacketRetiredTaskView",
+    "PacketTaskView",
+    "PacketTurnView",
+    "ProposalContext",
+    "TaskAnalysisPacket",
+    "build_context_packet",
+    "render_context_packet",
     "PacketOpenIssue",
     "PacketRetiredTask",
     "PacketSupportLink",

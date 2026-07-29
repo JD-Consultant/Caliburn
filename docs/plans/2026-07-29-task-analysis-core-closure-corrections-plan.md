@@ -100,12 +100,12 @@
 - Modify: `docs/design/task-analysis-engine.md`
 - Modify: `docs/plans/2026-07-28-task-analysis-core-implementation-plan.md`
 
-- [ ] Replace stale SaaS/consultant/only-AI-brain descriptions with the local employee Web scope.
-- [ ] Add ADR 0042, R1a result, and `job_analysis` isolation status to indexes.
-- [ ] Mark the T1–T7 plan completed with actual test/writeback information.
-- [ ] Replace the PowerShell-incompatible glob command.
-- [ ] Run link checks where available and `git diff --check`.
-- [ ] Commit `docs: align task analysis authority after closure review`.
+- [x] Replace stale SaaS/consultant/only-AI-brain descriptions with the local employee Web scope.
+- [x] Add ADR 0042, R1a result, and `job_analysis` isolation status to indexes.
+- [x] Mark the T1–T7 plan completed with actual test/writeback information.
+- [x] Replace the PowerShell-incompatible glob command.
+- [x] Run relative-link checks（8 files）and `git diff --check`.
+- [x] Commit `docs: align task analysis authority after closure review`.
 
 ### Task 5: Final verification
 

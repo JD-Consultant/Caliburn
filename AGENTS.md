@@ -52,7 +52,7 @@ Caliburn 現行目標是給員工使用的**本機 Web AI 職務分析與職務�
 - **3 個 bounded context**:`apps/pdf-to-json`(PDF→OCS JSON 解析)/ `apps/ocs-indexer`(檢索,Qdrant)/
   `apps/api` + `apps/web`(著作)。語言在這三處切換(對齊 DDD)。
 - **api = 六邊形**:`app/core`(ports + domain,純)、`app/adapters`(DB/LLM/knowledge 等邊緣)、
-  `app/services`(use-case)、`app/interview`(**現行 production 唯一 AI 大腦**:顧問+書記 op→verify→`_pending`
+  `app/services`(use-case)、`app/interview`(**既有 production AI 路徑**:顧問+書記 op→verify→`_pending`
   追蹤修訂;判準教材在 `app/interview/skills/`,調教首選改 skill 不改碼)、`app/observability.py`
   (OTel 橫切)。ADR 0008 / **0030**(舊 LangGraph/CopilotKit 已退場,勿救回;端到端見
   `docs/design/interview-engine.md`)。
@@ -94,7 +94,7 @@ Caliburn 現行目標是給員工使用的**本機 Web AI 職務分析與職務�
   原始 diff);uv venv 沒有 pip,用 `uv pip`;CJK 用 `PYTHONUTF8=1`。
 
 ## 指路
-**`docs/README.md`(文檔系統:架構/規則/索引)** · `ARCHITECTURE.md` · `docs/adr/README.md`(0001–0041)·
+**`docs/README.md`(文檔系統:架構/規則/索引)** · `ARCHITECTURE.md` · `docs/adr/README.md`(0001–0042)·
 `docs/contract-strategy.md` · `CONTRIBUTING.md` · `docs/runbook.md` · `docs/specs/`(研究紀錄)·
 `docs/experiments/`(實證紀錄)·
 `docs/plans/` · `docs/design/`(子系統端到端設計,給 agent)。

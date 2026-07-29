@@ -1,7 +1,7 @@
 # Task Analysis Core 實作計畫（第一條可運作 vertical）
 
 - 日期：2026-07-28
-- 狀態：Proposed
+- 狀態：**Completed（2026-07-28；2026-07-29 closure review 已另案修正）**
 - 目標：證明 `員工回覆 → 組 Context → 模型分析 → verifier → 更新 in-memory Work Model →
   建立可供員工決定的 Proposal → 選出下一題` 這條路走得通
 - 決策依據：[ADR 0042](../adr/0042-r1-screening-stop-and-a6-first-version-default.md)、
@@ -120,7 +120,8 @@ merge 成員全不在 JD 時立即套用、任一成員在 JD 時建立 Proposal
 
 ## 2. 驗收
 
-- `cd apps/api && uv run pytest tests/test_job_analysis_*.py -q` 全綠；
+- PowerShell 從 `apps/api` 執行：
+  `$tests = Get-ChildItem -LiteralPath tests -Filter 'test_job_analysis_*.py' | Sort-Object Name | ForEach-Object FullName; uv run pytest @tests -q` 全綠；
 - dependency guard 測試證明 `app/job_analysis` 未 import 上述四個舊路徑；
 - 完整 API suite 維持 green-before == green-after；
 - 全程 no-network（T5 用 mock transport，T7 用 scripted provider）。
@@ -137,3 +138,24 @@ merge 成員全不在 JD 時立即套用、任一成員在 JD 時建立 Proposal
 
 第二份很短的 persistence plan：目前狀態資料表 → 原子寫入 → authority snapshot stale 保護 →
 關閉後 reload。再之後才是最小 local Web。
+
+## 5. 執行紀錄
+
+T1–T7 已依序完成並各自提交：
+
+| Task | Commit | 交付 |
+|---|---|---|
+| T1 | `ee39c31` | domain contracts |
+| T2 | `bad3a7b` | `TaskAnalysisResult.v1` 與 provider schema |
+| T3 | `a116086` | deterministic verifier |
+| T4 | `d1a8e2b` | Context assembler |
+| T5 | `1b15fbb` | one-stage operation 與薄 OpenRouter adapter |
+| T6 | `6a7b0dd` | in-memory transition／Proposal |
+| T7 | `59468ea` | 五案例 scripted smoke |
+| design writeback | `7512d04` | `docs/design/task-analysis-engine.md` 與索引 |
+
+完成時完整 API 為 `1363 passed`，另有一個動工前即存在的 vNext raw-bytes schema hash failure；
+新增路徑未 import 舊 AI／DB／Web，且全程 no-network。2026-07-29 closure review 發現的來源閉包、
+狀態完整性與 provider 歸因修正由
+[`2026-07-29-task-analysis-core-closure-corrections-plan.md`](2026-07-29-task-analysis-core-closure-corrections-plan.md)
+接續，不回寫成「模型品質已通過」。

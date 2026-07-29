@@ -6,11 +6,14 @@ from .models import (
     JobAnalysisJournalRow,
     JobAnalysisProposalRow,
 )
+from .repositories import SqlAlchemyJobAnalysisUnitOfWork
+from .serialization import PersistedJobAnalysisCorruption
 
 __all__ = [
     "JobAnalysisDocumentRow",
     "JobAnalysisJdTaskRow",
     "JobAnalysisJournalRow",
     "JobAnalysisProposalRow",
+    "PersistedJobAnalysisCorruption",
+    "SqlAlchemyJobAnalysisUnitOfWork",
 ]
-

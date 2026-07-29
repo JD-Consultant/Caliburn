@@ -1,0 +1,121 @@
+"""`TaskAnalysisResult.v1`:模型的 production output shape(§12.1)。
+
+兩件事在這裡刻意**不做**:
+
+1. **不做任何跨欄位驗證。** disposition↔payload、ordinal 範圍、`merge` 至少兩個 target、
+   `withdraw` 不得帶 `task_fields` 等等,全部屬 deterministic verifier(§12.3、T3)。
+   模型送回結構合法但語意違規的輸出時,系統要能 parse 出來、由 verifier 給出明確的
+   拒絕理由,而不是在 parse 階段變成一個看不出原因的 schema 失敗。
+2. **不設整體 `analysis_decision` 欄位**(§12.1):本輪是提案、澄清還是不變更,由
+   `work_signals` 推導。
+
+模型永遠不產生 ID,只用 packet 給的 ordinal 與本次輸出內的位置索引(§12.1)。
+
+**portable subset 的編碼**(ADR 0040 決定 24):payload 在凍結文件裡是「依 disposition
+擇一」的 union,但可攜子集只允許兩支的 nullable union。因此四種 payload 落成三個
+nullable 兄弟欄位(`support_only` 沒有 payload,四者皆 null 即是它),`next_question.target`
+的兩種 kind 同理落成 `ordinal`／`index` 兩個 nullable 欄位。這是同一個形狀的編碼,
+不是新增欄位;「哪一個欄位該非 null」由 verifier 依 `disposition`／`kind` 檢查。
+"""
+
+from __future__ import annotations
+
+from enum import StrEnum
+
+from app.job_analysis.domain import DomainModel, NonEmptyText
+from app.job_analysis.domain.task import TaskFields
+from app.job_analysis.domain.work_model import ExclusionReason, OpenIssueKind
+
+
+TASK_ANALYSIS_RESULT_SCHEMA_NAME = "task_analysis_result.v1"
+
+
+class SignalAnchor(DomainModel):
+    """指向 packet 中某個回合的逐字引用;application 再把 ordinal 解成 SourceRef。"""
+
+    turn_ordinal: int
+    quote: NonEmptyText
+
+
+class IdentityRelation(StrEnum):
+    NO_MATCH = "no_match"
+    DUPLICATE = "duplicate"
+    OVERLAP = "overlap"
+    UNCERTAIN = "uncertain"
+
+
+class IdentityAssessment(DomainModel):
+    relation: IdentityRelation
+    target_task_ordinals: tuple[int, ...] = ()
+
+
+class SupportOrdinalRef(DomainModel):
+    """指認被本次更正取代的既有依據(§12.3 末段:這是 `TI-R1-08` 的唯一支撐)。"""
+
+    task_ordinal: int
+    support_ordinal: int
+
+
+class SignalDisposition(StrEnum):
+    TASK_CHANGE = "task_change"
+    SUPPORT_ONLY = "support_only"
+    EXCLUDE = "exclude"
+    OPEN_ISSUE = "open_issue"
+
+
+class TaskChangeKind(StrEnum):
+    ADD = "add"
+    REVISE = "revise"
+    WITHDRAW = "withdraw"
+    MERGE = "merge"
+    SPLIT = "split"
+
+
+class TaskChangePayload(DomainModel):
+    change: TaskChangeKind
+    target_task_ordinals: tuple[int, ...] = ()
+    task_fields: TaskFields | None = None
+    split_children: tuple[TaskFields, ...] = ()
+
+
+class ExcludePayload(DomainModel):
+    reason: ExclusionReason
+    summary: NonEmptyText
+
+
+class OpenIssuePayload(DomainModel):
+    kind: OpenIssueKind
+    summary: NonEmptyText
+
+
+class WorkSignal(DomainModel):
+    anchors: tuple[SignalAnchor, ...] = ()
+    identity: IdentityAssessment
+    supersedes_support_ordinals: tuple[SupportOrdinalRef, ...] = ()
+    disposition: SignalDisposition
+    task_change: TaskChangePayload | None = None
+    exclude: ExcludePayload | None = None
+    open_issue: OpenIssuePayload | None = None
+
+
+class NextQuestionTargetKind(StrEnum):
+    EXISTING_OPEN_ISSUE = "existing_open_issue"
+    NEW_SIGNAL = "new_signal"
+
+
+class NextQuestionTarget(DomainModel):
+    kind: NextQuestionTargetKind
+    ordinal: int | None = None
+    index: int | None = None
+
+
+class NextQuestion(DomainModel):
+    text: NonEmptyText
+    purpose: NonEmptyText
+    target: NextQuestionTarget | None = None
+
+
+class TaskAnalysisResult(DomainModel):
+    work_signals: tuple[WorkSignal, ...] = ()
+    next_question: NextQuestion
+    limitations: tuple[NonEmptyText, ...] = ()

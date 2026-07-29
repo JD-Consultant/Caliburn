@@ -13,6 +13,7 @@ from app.job_analysis.application import (
     create_document,
     decide_proposal,
     load_document,
+    propose_task_for_jd,
 )
 from app.job_analysis.domain import (
     CurrentWorkModel,
@@ -141,7 +142,7 @@ async def seed(
     *,
     work_model: CurrentWorkModel,
     current_jd: tuple[JdTask, ...],
-    proposal: Proposal,
+    proposal: Proposal | None,
 ) -> None:
     uow_factory = factory(session_factory)
     await create_document(
@@ -161,8 +162,48 @@ async def seed(
         )
         assert updated
         await uow.tasks.replace(document_id, current_jd)
-        await uow.proposals.replace(document_id, (proposal,))
+        await uow.proposals.replace(
+            document_id,
+            (proposal,) if proposal is not None else (),
+        )
         await uow.commit()
+
+
+async def test_active_candidate_can_become_a_pending_add_proposal(
+    postgres_session_factory,
+    cleanup_job_analysis_rows,
+):
+    document_id = cleanup_job_analysis_rows
+    candidate = task("task-new", "每週彙整營運週報")
+    await seed(
+        postgres_session_factory,
+        document_id,
+        work_model=CurrentWorkModel(tasks=(candidate,)),
+        current_jd=(),
+        proposal=None,
+    )
+    uow_factory = factory(postgres_session_factory)
+
+    proposed = await propose_task_for_jd(
+        uow_factory,
+        document_id=document_id,
+        task_id=candidate.task_id,
+        proposal_id="proposal-add",
+    )
+    replay = await propose_task_for_jd(
+        uow_factory,
+        document_id=document_id,
+        task_id=candidate.task_id,
+        proposal_id="proposal-add",
+    )
+    loaded = await load_document(uow_factory, document_id)
+
+    assert proposed == replay
+    assert proposed.status is ProposalStatus.PENDING
+    assert proposed.action is ProposalAction.ADD
+    assert loaded is not None
+    assert loaded.state.current_jd == ()
+    assert loaded.state.proposals == (proposed,)
 
 
 async def test_accept_adds_the_task_to_current_jd_and_replay_is_a_noop(

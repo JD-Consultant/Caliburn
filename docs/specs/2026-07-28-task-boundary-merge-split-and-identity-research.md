@@ -553,6 +553,11 @@ terminal: accepted | edited | rejected | revision_requested | stale
 staged 的新 ID 與子 ID 由 application 在提案建立時配發、冪等；提案未被接受即成為未使用的孤兒 ID。
 `excluded_child_refs` 指的就是這些 staged child id，**不另立第二套 ordinal 指涉**。
 
+第一版把「Task Analysis 建立候選」與「候選送進 Current JD 審核」維持為兩個顯式動作：
+`add` 只建立 Work Model 候選；agenda／產品流程判定現在值得送審時，才呼叫
+`propose_task_for_jd()` 建立 `add` Proposal。不得因每輪發現新候選就自動堆一張提案卡，也不得
+跳過 Proposal 直接寫 JD。
+
 ### 10.3 JD before／after 與 precondition
 
 ```text

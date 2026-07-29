@@ -43,7 +43,7 @@ OpenRouter 拿 `TaskAnalysisResult.v1` → **verifier**(純函式、零 LLM)擋�
 | PostgreSQL adapter | 0012 四表、serialization、repositories、UoW | `app/adapters/job_analysis_postgres/` | JSONB 讀取必須 hydrate；schema/shape 壞掉 fail-closed；repository 不 commit |
 | authoring use cases | 文件庫與 JD Task add/edit/delete/reorder | `application/authoring.py` | document row lock → entry replay check → Current State/Journal/generation 同交易；不呼叫 LLM |
 | durable turn | authority snapshot → 交易外模型呼叫 → verified commit | `application/durable_turn.py` | commit 時重鎖並比對 generation/read-set；Work Model、Proposal、下一題與 completed-turn Journal 同交易 |
-| Proposal decisions | accept/edit/reject/defer/revision request | `application/proposal_decisions.py` | document lock 序列化；接受類才改 JD；staged topology 與 JD 原子套用；決策寫 Journal |
+| Proposal use cases | 候選送審 + accept/edit/reject/defer/revision request | `application/proposal_decisions.py` | `propose_task_for_jd()` 不自動接受；決策由 document lock 序列化；接受類才改 JD；決策寫 Journal |
 
 ## 3. 一輪的資料流(每步標函式)
 
@@ -73,6 +73,8 @@ Proposal 決策由 `decide_proposal()` 完成，沒有 LLM。`accepted` 套用 `
 `revision_requested` 不改 Current JD。merge／split／JD 內 withdraw 的
 `staged_work_model_delta` 只在 accepted／edited 時與 JD 同交易套用。`jd_before`
 已不等於 Current JD 時，提案轉為員工可見的 `stale`，舊內容不得硬套。
+Task Analysis 的 `add` 只建立 Work Model 候選；`propose_task_for_jd()` 是把一個已穩定候選
+送給員工審核的顯式 bridge。它不每輪自動製造提案，也不替員工接受。
 
 `OperationOutcome` 五種結局,呼叫端照名字處置:
 

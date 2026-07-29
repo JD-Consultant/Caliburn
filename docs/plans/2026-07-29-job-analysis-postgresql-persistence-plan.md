@@ -564,7 +564,8 @@ create document
 → direct add/edit/reorder
 → 關閉 UoW
 → 新 session reload
-→ fake verified AI turn 建 Proposal
+→ fake verified AI turn 建 Work Model 候選
+→ propose_task_for_jd 建 pending Proposal
 → 關閉 UoW
 → 新 session accept Proposal
 → 再 reload 並核對 Current JD／Work Model／Journal／generation

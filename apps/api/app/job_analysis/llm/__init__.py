@@ -11,6 +11,7 @@ from .provider_schema import (
     render_provider_schema_file,
     task_analysis_result_provider_schema,
 )
+from .prompt import TASK_ANALYSIS_INSTRUCTIONS
 from .result import (
     TASK_ANALYSIS_RESULT_SCHEMA_NAME,
     ExcludePayload,
@@ -31,6 +32,7 @@ from .result import (
 
 __all__ = [
     "PROVIDER_SCHEMA_PATH",
+    "TASK_ANALYSIS_INSTRUCTIONS",
     "TASK_ANALYSIS_RESULT_SCHEMA_NAME",
     "ExcludePayload",
     "IdentityAssessment",

@@ -15,6 +15,11 @@ from .context import (
     build_context_packet,
     render_context_packet,
 )
+from .operation import (
+    OperationOutcome,
+    TaskAnalysisOperationResult,
+    run_task_analysis_operation,
+)
 from .verifier import (
     PacketOpenIssue,
     PacketRetiredTask,
@@ -31,6 +36,9 @@ from .verifier import (
 
 __all__ = [
     "ActiveQuestion",
+    "OperationOutcome",
+    "TaskAnalysisOperationResult",
+    "run_task_analysis_operation",
     "ConversationContext",
     "ConversationTurn",
     "CurrentAuthorities",

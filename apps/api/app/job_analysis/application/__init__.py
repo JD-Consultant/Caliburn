@@ -29,6 +29,14 @@ from .context import (
     build_context_packet,
     render_context_packet,
 )
+from .durable_turn import (
+    StaleAuthoritySnapshot,
+    TransitionCommitRejected,
+    TurnSnapshot,
+    UncommittableOperationResult,
+    commit_verified_turn,
+    prepare_turn,
+)
 from .operation import (
     OperationOutcome,
     TaskAnalysisOperationResult,
@@ -107,6 +115,10 @@ __all__ = [
     "ProposalDecisionPayload",
     "ProposalRepository",
     "TaskAnalysisOperationResult",
+    "StaleAuthoritySnapshot",
+    "TransitionCommitRejected",
+    "TurnSnapshot",
+    "UncommittableOperationResult",
     "TransitionOutcome",
     "TransitionResult",
     "apply_task_analysis_result",
@@ -136,10 +148,12 @@ __all__ = [
     "WORK_MODEL_SCHEMA_ID",
     "add_jd_task",
     "create_document",
+    "commit_verified_turn",
     "delete_jd_task",
     "edit_jd_task",
     "list_documents",
     "load_document",
+    "prepare_turn",
     "reorder_jd_tasks",
     "verify_task_analysis_result",
 ]

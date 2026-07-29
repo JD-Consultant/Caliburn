@@ -96,16 +96,26 @@ def withdraw_delta(task_id: str = "task-1") -> StagedWorkModelDelta:
     )
 
 
-def merge_delta() -> StagedWorkModelDelta:
+def merge_delta(
+    members: tuple[str, ...] = ("task-1", "task-2"), new_task_id: str = "task-9"
+) -> StagedWorkModelDelta:
     return StagedWorkModelDelta(
+        lineage_changes=tuple(
+            StagedTaskLineage(
+                task_id=member,
+                retirement=merged_retirement(),
+                merged_into=new_task_id,
+            )
+            for member in members
+        ),
         new_tasks=(
             StagedTask(
-                task_id="task-9",
+                task_id=new_task_id,
                 fields=TaskFields(
                     statement="合併後的工作", action="彙整", object="營運週報"
                 ),
             ),
-        )
+        ),
     )
 
 
@@ -509,17 +519,8 @@ def test_withdraw_proposal_removes_a_task_that_is_in_the_jd():
 
 
 def test_staged_delta_is_only_for_cross_layer_topology():
-    delta = StagedWorkModelDelta(
-        lineage_changes=(
-            StagedTaskLineage(
-                task_id="task-1",
-                retirement=merged_retirement(),
-                merged_into="task-9",
-            ),
-        )
-    )
     with pytest.raises(ValidationError, match="must not carry a staged work model delta"):
-        add_proposal(staged_work_model_delta=delta)
+        add_proposal(staged_work_model_delta=merge_delta())
 
     merge = Proposal(
         proposal_id="prop-2",

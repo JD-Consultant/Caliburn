@@ -418,6 +418,16 @@ def merge_proposal(status: ProposalStatus = ProposalStatus.PENDING, **overrides)
             JdEntry(task_id="task-new", content="每週彙整營運週報並追蹤缺料"),
         ),
         "staged_work_model_delta": StagedWorkModelDelta(
+            lineage_changes=tuple(
+                StagedTaskLineage(
+                    task_id=member,
+                    retirement=Retirement(
+                        kind=RetirementKind.MERGED, source_ref=employee_ref()
+                    ),
+                    merged_into="task-new",
+                )
+                for member in ("task-1", "task-b")
+            ),
             new_tasks=(
                 StagedTask(
                     task_id="task-new",
@@ -425,7 +435,7 @@ def merge_proposal(status: ProposalStatus = ProposalStatus.PENDING, **overrides)
                         statement="合併後的工作", action="彙整", object="營運週報"
                     ),
                 ),
-            )
+            ),
         ),
         "status": status,
     }
@@ -459,7 +469,16 @@ def test_rejections_are_carried_only_for_tasks_in_this_packet():
         jd_before=(JdEntry(task_id="task-z", content="舊的"),),
         jd_after=(JdEntry(task_id="task-z"),),
         staged_work_model_delta=StagedWorkModelDelta(
-            lineage_changes=(StagedTaskLineage(task_id="task-z"),)
+            lineage_changes=(
+                StagedTaskLineage(
+                    task_id="task-z",
+                    retirement=Retirement(
+                        kind=RetirementKind.WITHDRAWN,
+                        reason=RetirementReason.EMPLOYEE_DENIED,
+                        source_ref=employee_ref(),
+                    ),
+                ),
+            )
         ),
         status=ProposalStatus.REJECTED,
     )

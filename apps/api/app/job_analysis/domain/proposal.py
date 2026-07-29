@@ -12,7 +12,7 @@ from typing import Annotated, Literal
 from pydantic import Field, model_validator
 
 from .base import DomainModel, Identifier, NonEmptyText, TaskId
-from .task import Retirement, TaskFields
+from .task import Retirement, RetirementKind, TaskFields
 
 
 class ProposalAction(StrEnum):
@@ -304,6 +304,72 @@ class Proposal(DomainModel):
             raise ValueError(
                 f"{self.action.value} proposal must not carry a staged work model delta"
             )
+        return self
+
+    @model_validator(mode="after")
+    def staged_delta_corresponds_to_the_target(self):
+        """delta 的內容必須真的是這個 action 對這些 target 做的事。
+
+        只檢查非空不夠:一份「merge 提案配上只 retire 了其中一個成員」的 delta,
+        接受後兩層仍然會分岔——JD 少了兩條、Work Model 卻還留著一條 active 的孤兒。
+        這裡把 §10.4 的對應關係寫成型別層規則,套用端(transition)不必再自行判斷。
+        """
+        delta = self.staged_work_model_delta
+        if delta is None:
+            return self
+        lineage = {change.task_id: change for change in delta.lineage_changes}
+        staged_new = {staged.task_id for staged in delta.new_tasks}
+
+        def require(condition: bool, message: str) -> None:
+            if not condition:
+                raise ValueError(message)
+
+        if self.action is ProposalAction.WITHDRAW:
+            change = lineage.get(self.target.task_id)
+            require(
+                set(lineage) == {self.target.task_id} and not staged_new,
+                "withdraw delta must retire exactly its target",
+            )
+            require(
+                change.retirement is not None
+                and change.retirement.kind is RetirementKind.WITHDRAWN,
+                "withdraw delta must carry a withdrawn retirement",
+            )
+        elif self.action is ProposalAction.MERGE:
+            require(
+                set(lineage) == set(self.target.member_task_ids),
+                "merge delta must cover exactly its members",
+            )
+            require(
+                staged_new == {self.target.new_task_id},
+                "merge delta must stage exactly the surviving task",
+            )
+            for change in lineage.values():
+                require(
+                    change.retirement is not None
+                    and change.retirement.kind is RetirementKind.MERGED
+                    and change.merged_into == self.target.new_task_id,
+                    "every merge member must be merged into the surviving task",
+                )
+        elif self.action is ProposalAction.SPLIT:
+            parent = self.target.parent_task_id
+            children = set(self.target.child_task_ids)
+            require(
+                set(lineage) == {parent} | children,
+                "split delta must cover the parent and every child",
+            )
+            require(staged_new == children, "split delta must stage exactly its children")
+            parent_change = lineage[parent]
+            require(
+                parent_change.retirement is not None
+                and parent_change.retirement.kind is RetirementKind.SPLIT,
+                "split delta must retire the parent as split",
+            )
+            for child in children:
+                require(
+                    lineage[child].split_from == parent,
+                    "every split child must record its parent",
+                )
         return self
 
     @model_validator(mode="after")

@@ -23,6 +23,7 @@ from app.job_analysis.domain import (
     JdEntry,
     JdTask,
     JdTaskFields,
+    OpenIssueKind,
     Proposal,
     ProposalAction,
     ProposalStatus,
@@ -130,7 +131,10 @@ async def test_add_edit_reorder_delete_reload_and_idempotent_replay(
         second.model_copy(update={"display_order": 0}),
     )
     assert len(loaded.state.work_model.open_issues) == 1
-    assert loaded.state.work_model.open_issues[0].summary == "每月盤點門市耗材"
+    issue = loaded.state.work_model.open_issues[0]
+    assert issue.summary == "每月盤點門市耗材"
+    assert issue.kind is OpenIssueKind.INSUFFICIENT_EVIDENCE
+    assert issue.reconciliation_task_id == second.task_id
     # add replay does not execute the mutation or increment generation twice:
     # four distinct edits after the first add => generation 5.
     assert loaded.document.authority_generation == 5

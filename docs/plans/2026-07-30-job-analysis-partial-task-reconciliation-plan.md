@@ -1,5 +1,7 @@
 # Job Analysis Partial Task Reconciliation Implementation Plan
 
+**Status:** Completed（2026-07-30；T1 `a141f7d`、T2 `40f9cbf`、T3 `0bf9f96`、T4 見本計畫收尾 commit）
+
 **Goal:** 讓員工只寫 Task 名稱／描述也能立即保存；後續 AI 可看見、追問，並以同一 ID 建立完整
 Work Model Task 或提出員工可確認的移除 Proposal。
 

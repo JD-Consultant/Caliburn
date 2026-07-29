@@ -106,7 +106,9 @@ def _reconciled_work_model(
     source = _direct_source(entry_id)
     issue_id = f"direct-task-{task_id}"
     remaining_issues = tuple(
-        issue for issue in work_model.open_issues if issue.id != issue_id
+        issue
+        for issue in work_model.open_issues
+        if issue.id != issue_id and issue.reconciliation_task_id != task_id
     )
     tasks: list[Task] = []
     matched_active = False
@@ -138,9 +140,10 @@ def _reconciled_work_model(
         )
     issue = OpenIssue(
         id=issue_id,
-        kind=OpenIssueKind.TASK_BOUNDARY_UNCERTAIN,
+        kind=OpenIssueKind.INSUFFICIENT_EVIDENCE,
         summary=summary,
         source_anchors=(SourceAnchor(source_ref=source),),
+        reconciliation_task_id=task_id,
     )
     return CurrentWorkModel(
         tasks=tuple(tasks),

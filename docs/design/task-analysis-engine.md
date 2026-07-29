@@ -42,6 +42,7 @@ OpenRouter 拿 `TaskAnalysisResult.v1` → **verifier**(純函式、零 LLM)擋�
 | persistence ports | Current State repositories／UoW／版本化 Journal payload | `application/persistence.py` | 純 Protocol 與 frozen contracts；不認 ORM／JSON row |
 | PostgreSQL adapter | 0012 四表、serialization、repositories、UoW | `app/adapters/job_analysis_postgres/` | JSONB 讀取必須 hydrate；schema/shape 壞掉 fail-closed；repository 不 commit |
 | authoring use cases | 文件庫與 JD Task add/edit/delete/reorder | `application/authoring.py` | document row lock → entry replay check → Current State/Journal/generation 同交易；不呼叫 LLM |
+| durable turn | authority snapshot → 交易外模型呼叫 → verified commit | `application/durable_turn.py` | commit 時重鎖並比對 generation/read-set；Work Model、Proposal、下一題與 completed-turn Journal 同交易 |
 
 ## 3. 一輪的資料流(每步標函式)
 
@@ -59,6 +60,12 @@ OpenRouter 拿 `TaskAnalysisResult.v1` → **verifier**(純函式、零 LLM)擋�
 `reorder_jd_tasks` 先鎖 document，以 Journal `entry_id` 做 replay/conflict 判定，同交易保存
 Current JD、相關 Proposal stale、Work Model reconcile trigger、Journal 與 generation。**按儲存不呼叫 LLM**；
 既有 Task 在下一次 AI 互動時看到 JD/Work Model 差異，JD-only Task 先落一筆可追問的 open issue。
+
+持久 AI 回合由 composition 依序呼叫 `prepare_turn()` →
+`run_task_analysis_operation()` → `commit_verified_turn()`。第一步讀完即關閉交易，LLM I/O
+期間不持有 PostgreSQL lock；最後一步才重鎖 document。generation、packet read-set 或
+conversation authority 任一不一致就回 `StaleAuthoritySnapshot`，舊結果不得套用。
+相同 `operation_id` 的已提交回合只回傳目前狀態，不會再新增 Task／Proposal／Journal。
 
 `OperationOutcome` 五種結局,呼叫端照名字處置:
 
@@ -140,9 +147,8 @@ JD 只在員工決定提案時才改。
 
 | 沒有的東西 | 現況 | 什麼時候做 |
 |---|---|---|
-| durable AI turn | 0012、repositories、UoW、reload 與 direct edit 已有；transition 尚未接進 transaction | persistence plan Task 6 |
+| Proposal decision | durable AI turn 與 direct edit 已有；accept/edit/reject/defer/revision request 尚未接進 transaction | persistence plan Task 7 |
 | route／Web UI | 完全沒有 | persistence 之後的最小 local Web |
-| exactly-once replay | 決定性 Task／Proposal ID 已採 **insert-only**，不同內容撞 ID 會整筆拒絕；但相同 operation 完整重送仍可能重複追加 support link／open issue | 需要 operation ledger,留給 persistence plan |
 | endpoint variant preflight | `provider_order` 只鎖 base slug,同 provider 可能有多個 endpoint variant | 真正付費呼叫前的 catalog／live preflight |
 | prompt 品質調校 | `llm/prompt.py` 只寫到「不與 §4 判準相反」的結構最小集 | rubric／eval 的獨立工作 |
 | 員工決定提案的流程 | Proposal 建得出來、可持久化，但尚無套用決定的 use case | persistence plan Task 7 |

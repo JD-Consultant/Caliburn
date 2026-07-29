@@ -454,30 +454,30 @@ async def commit_verified_turn(..., snapshot: TurnSnapshot, operation_id: str,
 composition 呼叫順序固定為 `prepare_turn()` → transaction 外
 `run_task_analysis_operation()` → `commit_verified_turn()`；application API 不提供把 adapter 傳入 transaction 的簽章。
 
-- [ ] **Step 1: 寫失敗測試**
+- [x] **Step 1: 寫失敗測試**
 
 測 fake provider 期間另一個 session direct edit 使舊 snapshot 被拒、未變更時 transition/Proposal/next question/
 completed-turn Journal 同交易保存、同 operation replay 不長第二份 Task/Proposal、provider failure 不寫 current state。
 
-- [ ] **Step 2: 確認測試先紅**
+- [x] **Step 2: 確認測試先紅**
 
 ```powershell
 cd apps/api
 uv run pytest tests/test_job_analysis_durable_turn_postgres.py -q
 ```
 
-- [ ] **Step 3: 實作兩段式 commit**
+- [x] **Step 3: 實作兩段式 commit**
 
 prepare transaction 結束後才外呼；commit transaction 先 lock document，再比較 generation 與 packet read-set。
 不符回 `stale_authority_snapshot`，不得只重算交集後套用舊 result。
 
-- [ ] **Step 4: 跑 focused tests**
+- [x] **Step 4: 跑 focused tests**
 
 ```powershell
 uv run pytest tests/test_job_analysis_durable_turn_postgres.py tests/test_job_analysis_operation.py tests/test_job_analysis_transition.py -q
 ```
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```powershell
 git add apps/api/app/job_analysis/application apps/api/tests/test_job_analysis_durable_turn_postgres.py

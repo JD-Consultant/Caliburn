@@ -87,17 +87,17 @@ class JdEntry(DomainModel):
     value: JdTask | None = None
 ```
 
-- `JobAnalysisState.current_jd` 仍為 canonical tuple，但依 `display_order, task_id` 排序；`current_jd_task_ids`
-  由 `value is not None` 推導。
+- `JobAnalysisState.current_jd` 只保存目前存在於 JD 的 `JdTask`，依 `display_order, task_id` 排序；
+  `current_jd_task_ids` 直接由這組 Task 推導。
 - Proposal `edited_jd_after` 可改非 null `JdTask` 的可見內容，但不得改 key、null 位置、`task_id` 或
   `display_order`。
 
-- [ ] **Step 1: 寫失敗測試**
+- [x] **Step 1: 寫失敗測試**
 
 加入四個 focused cases：完整 `JdTask` round-trip、非法 responsibility role、edited 改 `display_order` 被拒、
-context rendering 顯示 statement/frequency/role 而不顯示內部 Task ID。
+context rendering 顯示員工可編輯的完整 JD 欄位而不顯示內部 Task ID。
 
-- [ ] **Step 2: 確認測試先紅**
+- [x] **Step 2: 確認測試先紅**
 
 Run:
 
@@ -108,13 +108,13 @@ uv run pytest tests/test_job_analysis_domain.py tests/test_job_analysis_context.
 
 Expected: `JdTask`／`ResponsibilityRole` 尚不存在。
 
-- [ ] **Step 3: 實作最小契約並做機械替換**
+- [x] **Step 3: 實作最小契約並做機械替換**
 
 把舊 `content` string 映射改成 `entry.value.statement`；transition 新建 JD after 時由 Work Model
 `TaskFields` 投影 `JdTaskFields`，新順序使用目前最大 `display_order + 1`。不要把 Work Model
 `action/object/support/lineage` 複製進 Current JD。
 
-- [ ] **Step 4: 跑 focused 與全部 job_analysis tests**
+- [x] **Step 4: 跑 focused 與全部 job_analysis tests**
 
 ```powershell
 $tests = Get-ChildItem -LiteralPath tests -Filter 'test_job_analysis_*.py' | Sort-Object Name | ForEach-Object FullName
@@ -123,7 +123,7 @@ uv run pytest @tests -q
 
 Expected: 全綠，既有五個 smoke 語意不變。
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```powershell
 git add apps/api/app/job_analysis apps/api/tests/test_job_analysis_*.py

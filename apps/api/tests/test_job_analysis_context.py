@@ -26,6 +26,7 @@ from app.job_analysis.domain import (
     ExcludedSignal,
     ExclusionReason,
     JdEntry,
+    JdTask,
     MergeTarget,
     OpenIssue,
     OpenIssueKind,
@@ -35,6 +36,7 @@ from app.job_analysis.domain import (
     Retirement,
     RetirementKind,
     RetirementReason,
+    ResponsibilityRole,
     RevisionRequestResolution,
     SingleTaskTarget,
     SourceAnchor,
@@ -91,6 +93,29 @@ def make_task(task_id: str = "task-1", **overrides) -> Task:
     }
     base.update(overrides)
     return Task(task_id=task_id, **base)
+
+
+def jd_task(
+    task_id: str,
+    statement: str,
+    *,
+    display_order: int = 0,
+    purpose_result: str | None = None,
+    context: str | None = None,
+    frequency_text: str | None = None,
+    responsibility_role: ResponsibilityRole | None = None,
+    enablers: tuple[Enabler, ...] = (),
+) -> JdTask:
+    return JdTask(
+        task_id=task_id,
+        statement=statement,
+        purpose_result=purpose_result,
+        context=context,
+        frequency_text=frequency_text,
+        responsibility_role=responsibility_role,
+        enablers=enablers,
+        display_order=display_order,
+    )
 
 
 def retired_task(task_id: str = "task-9") -> Task:
@@ -151,7 +176,7 @@ def test_same_input_produces_a_verbatim_identical_packet():
     )
     kwargs = {
         "work_model": work_model,
-        "current_jd": (JdEntry(task_id="task-1", content="每週彙整營運週報"),),
+        "current_jd": (jd_task("task-1", "每週彙整營運週報"),),
         "active_question": ActiveQuestion(turn_id="turn-1", text="可以說說你的一週嗎?"),
     }
     first, second = build(**kwargs), build(**kwargs)
@@ -303,10 +328,28 @@ def test_active_question_must_be_the_earlier_consultant_turn_it_claims_to_be(
 
 def test_jd_presence_carries_the_current_text_or_says_it_is_absent():
     packet = build(
-        current_jd=(JdEntry(task_id="task-1", content="每週彙整營運週報"),)
+        current_jd=(
+            jd_task(
+                "task-1",
+                "每週彙整營運週報",
+                purpose_result="讓主管掌握營運狀況",
+                context="每週五結算後",
+                frequency_text="每週一次",
+                responsibility_role=ResponsibilityRole.PRIMARY,
+                enablers=(
+                    Enabler(kind=EnablerKind.TOOL_SYSTEM, name="Excel"),
+                ),
+            ),
+        )
     )
     assert packet.current_authorities.tasks[0].in_jd
-    assert "jd_presence: 在 Current JD——每週彙整營運週報" in render_context_packet(packet)
+    rendered = render_context_packet(packet)
+    assert "jd_presence: 在 Current JD——每週彙整營運週報" in rendered
+    assert "jd_purpose_result: 讓主管掌握營運狀況" in rendered
+    assert "jd_context: 每週五結算後" in rendered
+    assert "jd_frequency: 每週一次" in rendered
+    assert "jd_responsibility_role: primary" in rendered
+    assert "jd_enablers: tool_system:Excel" in rendered
     assert "jd_presence: 不在 Current JD" in render_context_packet(build())
 
 
@@ -408,14 +451,27 @@ def merge_proposal(status: ProposalStatus = ProposalStatus.PENDING, **overrides)
             new_task_id="task-new", member_task_ids=("task-1", "task-b")
         ),
         "jd_before": (
-            JdEntry(task_id="task-1", content="每週彙整營運週報"),
-            JdEntry(task_id="task-b", content="每週追蹤缺料"),
+            JdEntry(
+                task_id="task-1",
+                value=jd_task("task-1", "每週彙整營運週報", display_order=0),
+            ),
+            JdEntry(
+                task_id="task-b",
+                value=jd_task("task-b", "每週追蹤缺料", display_order=1),
+            ),
             JdEntry(task_id="task-new"),
         ),
         "jd_after": (
             JdEntry(task_id="task-1"),
             JdEntry(task_id="task-b"),
-            JdEntry(task_id="task-new", content="每週彙整營運週報並追蹤缺料"),
+            JdEntry(
+                task_id="task-new",
+                value=jd_task(
+                    "task-new",
+                    "每週彙整營運週報並追蹤缺料",
+                    display_order=0,
+                ),
+            ),
         ),
         "staged_work_model_delta": StagedWorkModelDelta(
             lineage_changes=tuple(
@@ -467,7 +523,12 @@ def test_rejections_are_carried_only_for_tasks_in_this_packet():
     unrelated = Proposal(
         proposal_id="prop-2",
         target=SingleTaskTarget(action=ProposalAction.WITHDRAW, task_id="task-z"),
-        jd_before=(JdEntry(task_id="task-z", content="舊的"),),
+        jd_before=(
+            JdEntry(
+                task_id="task-z",
+                value=jd_task("task-z", "舊的", display_order=0),
+            ),
+        ),
         jd_after=(JdEntry(task_id="task-z"),),
         staged_work_model_delta=StagedWorkModelDelta(
             lineage_changes=(

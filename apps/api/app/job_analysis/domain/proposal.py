@@ -13,7 +13,7 @@ from pydantic import Field, model_validator
 
 from .base import DomainModel, Identifier, NonEmptyText, TaskId
 from .sources import SupportLink
-from .task import Retirement, RetirementKind, TaskFields
+from .task import Enabler, Retirement, RetirementKind, TaskFields
 
 
 class ProposalAction(StrEnum):
@@ -132,15 +132,43 @@ ProposalTarget = Annotated[
 # ── JD before／after(§10.3)──────────────────────────────────────────────────
 
 
+class ResponsibilityRole(StrEnum):
+    PRIMARY = "primary"
+    SHARED = "shared"
+    ASSIST = "assist"
+
+
+class JdTaskFields(DomainModel):
+    """員工可見、可編輯的 Current JD Task 欄位。"""
+
+    statement: NonEmptyText
+    purpose_result: NonEmptyText | None = None
+    context: NonEmptyText | None = None
+    frequency_text: NonEmptyText | None = None
+    responsibility_role: ResponsibilityRole | None = None
+    enablers: tuple[Enabler, ...] = ()
+
+
+class JdTask(JdTaskFields):
+    task_id: TaskId
+    display_order: int = Field(ge=0)
+
+
 class JdEntry(DomainModel):
-    """Current JD 中某個 Task 的內容;``content is None`` 表示不在 JD。"""
+    """Proposal 內某個 Current JD Task 的完整快照；``value is None`` 表示不在 JD。"""
 
     task_id: TaskId
-    content: NonEmptyText | None = None
+    value: JdTask | None = None
+
+    @model_validator(mode="after")
+    def value_uses_the_map_key_identity(self):
+        if self.value is not None and self.value.task_id != self.task_id:
+            raise ValueError("JD entry value must use the entry task id")
+        return self
 
 
-def jd_map(entries: tuple[JdEntry, ...]) -> dict[TaskId, str | None]:
-    return {entry.task_id: entry.content for entry in entries}
+def jd_map(entries: tuple[JdEntry, ...]) -> dict[TaskId, JdTask | None]:
+    return {entry.task_id: entry.value for entry in entries}
 
 
 def _require_canonical_entries(entries: tuple[JdEntry, ...], label: str) -> None:
@@ -171,6 +199,14 @@ def validate_edited_jd_after(
         if (content is None) != (edited[task_id] is None):
             raise ValueError(
                 f"edited_jd_after must keep the null position of {task_id!r}"
+            )
+        if (
+            content is not None
+            and edited[task_id] is not None
+            and content.display_order != edited[task_id].display_order
+        ):
+            raise ValueError(
+                f"edited_jd_after must keep the display_order of {task_id!r}"
             )
 
 

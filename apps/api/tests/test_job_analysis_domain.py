@@ -18,6 +18,8 @@ from app.job_analysis.domain import (
     ExcludedSignal,
     ExclusionReason,
     JdEntry,
+    JdTask,
+    JdTaskFields,
     MergeTarget,
     OpenIssue,
     OpenIssueKind,
@@ -27,6 +29,7 @@ from app.job_analysis.domain import (
     Retirement,
     RetirementKind,
     RetirementReason,
+    ResponsibilityRole,
     RevisionRequestResolution,
     SingleTaskTarget,
     SourceAnchor,
@@ -70,7 +73,21 @@ def make_task(task_id: str = "task-1", **overrides) -> Task:
 
 
 def jd(*pairs: tuple[str, str | None]) -> tuple[JdEntry, ...]:
-    return tuple(JdEntry(task_id=task_id, content=content) for task_id, content in pairs)
+    return tuple(
+        JdEntry(
+            task_id=task_id,
+            value=(
+                JdTask(
+                    task_id=task_id,
+                    statement=content,
+                    display_order=display_order,
+                )
+                if content is not None
+                else None
+            ),
+        )
+        for display_order, (task_id, content) in enumerate(pairs)
+    )
 
 
 def merged_retirement() -> Retirement:
@@ -324,6 +341,92 @@ def test_optional_semantic_fields_default_to_none():
     assert task.deliverable_hint is None
     assert task.success_criterion_hint is None
     assert task.enablers == ()
+
+
+def test_current_jd_task_keeps_employee_editable_analysis_fields():
+    task = JdTask(
+        task_id="task-1",
+        statement="每週彙整營運週報",
+        purpose_result="讓主管掌握營運狀況",
+        context="每週五結算後",
+        frequency_text="每週一次",
+        responsibility_role=ResponsibilityRole.PRIMARY,
+        enablers=(Enabler(kind=EnablerKind.TOOL_SYSTEM, name="Excel"),),
+        display_order=0,
+    )
+
+    assert task.statement == "每週彙整營運週報"
+    assert task.frequency_text == "每週一次"
+    assert task.responsibility_role is ResponsibilityRole.PRIMARY
+    assert task.enablers[0].name == "Excel"
+
+
+def test_current_jd_task_rejects_unknown_responsibility_and_negative_order():
+    with pytest.raises(ValidationError):
+        JdTask(
+            task_id="task-1",
+            statement="彙整營運週報",
+            responsibility_role="owner",
+            display_order=0,
+        )
+    with pytest.raises(ValidationError, match="display_order"):
+        JdTask(
+            task_id="task-1",
+            statement="彙整營運週報",
+            display_order=-1,
+        )
+
+
+def test_jd_entry_carries_the_complete_current_jd_task():
+    current = JdTask(
+        task_id="task-1",
+        statement="每週彙整營運週報",
+        frequency_text="每週一次",
+        display_order=0,
+    )
+
+    entry = JdEntry(task_id="task-1", value=current)
+
+    assert entry.value == current
+    assert entry.value.task_id == entry.task_id
+
+
+def test_jd_entry_value_must_use_the_entry_task_identity():
+    with pytest.raises(ValidationError, match="entry task id"):
+        JdEntry(
+            task_id="task-1",
+            value=JdTask(
+                task_id="task-2",
+                statement="另一項工作",
+                display_order=0,
+            ),
+        )
+
+
+def test_edited_proposal_may_not_change_current_jd_display_order():
+    before = (
+        JdEntry(
+            task_id="task-1",
+            value=JdTask(
+                task_id="task-1",
+                statement="舊文字",
+                display_order=0,
+            ),
+        ),
+    )
+    edited = (
+        JdEntry(
+            task_id="task-1",
+            value=JdTask(
+                task_id="task-1",
+                statement="員工改過的文字",
+                display_order=1,
+            ),
+        ),
+    )
+
+    with pytest.raises(ValueError, match="display_order"):
+        validate_edited_jd_after(before, edited)
 
 
 @pytest.mark.parametrize("missing", ["statement", "action", "object"])
@@ -648,9 +751,9 @@ def test_edited_may_not_move_a_null_position():
 
 
 def test_edited_payload_cannot_express_topology():
-    """第 4 條:payload 只是 `{task_id -> content}`;要改 topology 只能改 key 集合,
+    """第 4 條:payload 只是 `{task_id -> value}`;要改 topology 只能改 key 集合,
     而那條路已經被第 1 條擋死——型別上沒有 action／target／成員可以填。"""
-    assert set(JdEntry.model_fields) == {"task_id", "content"}
+    assert set(JdEntry.model_fields) == {"task_id", "value"}
     merge_after = jd(("task-1", None), ("task-2", None), ("task-9", "合併後"))
     with pytest.raises(ValueError, match="exactly the jd_after task ids"):
         validate_edited_jd_after(

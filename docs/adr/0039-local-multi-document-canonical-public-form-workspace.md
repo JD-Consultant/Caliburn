@@ -1,6 +1,6 @@
 # 0039. 本機多文件 Workspace、Canonical 文件權威與公版樣式 UI
 
-- 狀態：Proposed with owner amendment；版本相關段落已被 2026-07-24 裁決取代
+- 狀態：Superseded by [0043](0043-job-analysis-local-current-state-persistence-and-authoring-authority.md)（勿據以施工）
 - 日期：2026-07-23
 - 範圍：Local Web 文件庫、儲存／續作、API／Web 文件 shape、既有 editor 取捨
 - 前置決策：[0015](0015-document-save-optimistic-concurrency.md)、
@@ -17,6 +17,12 @@
 > proposal，由員工 accept／edit／reject。本文關於本機多文件、內部 canonical model、公版樣式 UI 與保留前端資產的
 > 決策繼續有效；所有「建立 revision」「revision CAS／hash」文字降為後續優化。active storage authority 見
 > [Job Authoring v2 本機單一現況儲存設計](../specs/2026-07-24-job-authoring-v2-relational-storage-research.md)。
+
+> **2026-07-29 supersession**
+>
+> 本 ADR 從未升為 Accepted，現由 [ADR 0043](0043-job-analysis-local-current-state-persistence-and-authoring-authority.md)
+> 完整取代。現行設計採 greenfield `app/job_analysis`、不搬遷／不整合／不雙寫舊資料；本文保留供追溯，
+> 不得據以施工。
 
 ## 脈絡
 

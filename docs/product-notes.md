@@ -31,21 +31,23 @@
 4. 職務說明書內容完整度、一致性、客製化程度與可匯出品質；
 5. 能讓員工實際操作、可一鍵啟動的最小本機 Web workspace。
 
-本機 Web workspace 的文件權威是 `app/job_authoring` current canonical relational state；畫面可採政府公版欄位排列，但舊
+本機 Web workspace 的新文件權威是 greenfield `app/job_analysis`：Current JD 保存員工確認或直接編輯的文件內容，
+Current Work Model 保存 AI 可修正的分析。第一版不整合、不雙寫，也不搬遷舊 `job_authoring`／vNext 資料；舊
 `DocumentVersion`／OCS deep JSON／`_pending` 不得恢復為新產品真相。詳細裁決見
-[`ADR 0039`](adr/0039-local-multi-document-canonical-public-form-workspace.md)。
+[`ADR 0043`](adr/0043-job-analysis-local-current-state-persistence-and-authoring-authority.md)與
+[`本機 JD 分層編輯與 PostgreSQL 持久化研究`](specs/2026-07-29-local-jd-authoring-and-postgresql-persistence-research.md)。
 
-**2026-07-24 owner correction：**第一個成品不做 JD 版本歷史、還原或 revision diff。員工儲存與接受 AI proposal
-直接更新每份文件的 current rows；既有 0011 revision core 暫留但不再擴張。詳細 current-table 設計見
-[`Job Authoring v2 本機單一現況儲存設計`](specs/2026-07-24-job-authoring-v2-relational-storage-research.md)。
+第一個成品不做 JD 版本歷史、還原或 revision diff。員工 direct edit 直接更新 Current JD；下次 AI 互動前才
+reconcile，UI 不必顯示內部待對齊狀態。完成的回合、編輯與提案決策可恢復，未完成的模型回答可丟棄。
 
 ### 內部 Job Model 不等於政府公版
 
-**狀態：已決定（2026-07-24）。**政府公版是 UI／export profile，不是內部資料上限。內部 Task 可以保存
-`purpose/context/frequency/ownership/importance/typicality/optional time share`，用於專業訪談、核心任務判斷與
-文件品質檢查。`time_scope` 與 `polarity` 只作 Evidence materialization gate，不進正式 JD。頻率不等於重要性，
-低頻高風險任務仍可為 core；也不要求每項工時比重必填或全文件加總 100%。這些資料主要從自然工作敘事抽取，
-只針對高價值缺口追問，不按公版欄位逐格盤問。
+**狀態：已決定（2026-07-29）。**政府公版是 export profile，不是內部資料上限。UI 必須容納公版必要欄位，
+也可以用分層編輯器增加工作分析資訊。Task 第一版只增加 `purpose/context/frequency/responsibility role/enablers`：
+公版與 Task statement 常駐，分析詳情可展開編輯，來源按需唯讀，系統 ID／lineage／generation 隱藏。
+
+第一版不加入 O*NET 群體 `core/supporting`、importance、typicality 或 time share，也不預建尚無 production contract 的
+O/P/K/S/A tables。未來匯出才要求與公版格式一模一樣；內部 UI 不必被公版版面限制。
 
 除非 owner 明確提出，**不得投入** organization、tenant product behavior、member／role／ACL、登入、密碼重設、計費、quota、
 admin console、雲端部署、多租戶測試矩陣、多人即時協作或其他 SaaS infrastructure。既有資料表的 `tenant_id` 是歷史／FK 相容

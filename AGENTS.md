@@ -56,6 +56,11 @@ Caliburn 現行目標是給員工使用的**本機 Web AI 職務分析與職務�
   追蹤修訂;判準教材在 `app/interview/skills/`,調教首選改 skill 不改碼)、`app/observability.py`
   (OTel 橫切)。ADR 0008 / **0030**(舊 LangGraph/CopilotKit 已退場,勿救回;端到端見
   `docs/design/interview-engine.md`)。
+- **Task Analysis 引擎(現行新工作面)**：`app/job_analysis` 依 ADR **0040／0042** greenfield 實作
+  (domain／llm／application／providers)。第一條 vertical 已接通:packet → 一次 HTTP → verifier →
+  identity gate → Proposal → 下一題;**無 DB、無 route、production 尚未接上**。禁止 import
+  `app.interview`／`app.interview_vnext`／`app.job_authoring`／`evals`(AST 測試強制)。
+  端到端見 `docs/design/task-analysis-engine.md`。
 - **AI vNext 隔離中**：`app/interview_vnext` 依 ADR **0034** greenfield 實作；V1 domain 與 V2-A
   provider-neutral/Capture contracts 已完成，無 route/DB/live LLM，production 不 import。禁止 import/wrap v3 consultant/scribe/harvest/select；細節先讀
   `app/interview_vnext/README.md`、其 `AGENTS.md` 與 `docs/plans/2026-07-16-interview-ai-vnext-implementation-plan.md`。

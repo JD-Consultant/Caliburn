@@ -10,7 +10,7 @@ from enum import StrEnum
 
 from pydantic import model_validator
 
-from .base import DomainModel, Identifier, NonEmptyText
+from .base import DomainModel, Identifier, NonEmptyText, TaskId
 from .sources import SourceAnchor
 from .task import Task
 
@@ -36,6 +36,7 @@ class OpenIssue(DomainModel):
     summary: NonEmptyText
     source_anchors: tuple[SourceAnchor, ...]
     last_asked_turn_id: Identifier | None = None
+    reconciliation_task_id: TaskId | None = None
 
     @model_validator(mode="after")
     def anchor_count_matches_kind(self):

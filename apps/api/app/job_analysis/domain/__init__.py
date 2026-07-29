@@ -22,6 +22,7 @@ from .proposal import (
     is_allowed_transition,
     jd_map,
     validate_edited_jd_after,
+    withdraw_delta_matches_target_state,
 )
 from .sources import SourceAnchor, SourceKind, SourceRef, SupportLink
 from .task import (
@@ -84,4 +85,5 @@ __all__ = [
     "is_allowed_transition",
     "jd_map",
     "validate_edited_jd_after",
+    "withdraw_delta_matches_target_state",
 ]

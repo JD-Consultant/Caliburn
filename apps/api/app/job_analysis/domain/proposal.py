@@ -257,6 +257,20 @@ class StagedWorkModelDelta(DomainModel):
         return self
 
 
+def withdraw_delta_matches_target_state(
+    *,
+    target_has_non_retired_task: bool,
+    staged_work_model_delta: StagedWorkModelDelta | None,
+) -> bool:
+    """JD-only withdraw 無 delta；存在未退休 Work Model Task 時必須有 delta。
+
+    Proposal 本身沒有 Work Model snapshot，application 建立與接受兩端必須在各自鎖定的
+    authority state 上呼叫同一個判斷，避免一端放寬、另一端仍覆寫新狀態。
+    """
+
+    return (staged_work_model_delta is not None) is target_has_non_retired_task
+
+
 # ── revision request 的解析結果(§10.7)───────────────────────────────────────
 
 
@@ -334,11 +348,11 @@ class Proposal(DomainModel):
 
     @model_validator(mode="after")
     def staged_delta_matches_the_cross_layer_action(self):
-        """§10.4:merge／split／JD 內 withdraw **必須**帶非空 staged delta;其餘不得帶。
+        """§10.4:merge／split 必須帶 staged delta;withdraw 由 application 依 target 現況判斷。
 
-        缺了它就能建立「改 JD、Work Model 卻沒有對應變更」的提案:`accepted`／`edited`
-        時 §9.6 要求兩層原子套用,但根本沒有第二層可套——JD 少了那條 Task,Work Model
-        裡的 Task 卻還 active 且毫髮無傷。非空由 `StagedWorkModelDelta` 自己保證。
+        JD-only withdraw 沒有 Work Model Task 可 retire，不能為了滿足型別而補造空殼。
+        Proposal 值物件看不到 Work Model，因此 withdraw 的雙向條件由 application 建立端
+        與決策端共用 ``withdraw_delta_matches_target_state`` 重驗。
 
         **只保證非空,不保證內容對得上 target**(例如 merge 的 delta 是否真的 retire
         了每個 member、split 的子 Task 是否就是 `child_task_ids`)。那是 action-specific
@@ -347,14 +361,16 @@ class Proposal(DomainModel):
         cross_layer = {
             ProposalAction.MERGE,
             ProposalAction.SPLIT,
-            ProposalAction.WITHDRAW,
         }
         if self.action in cross_layer:
             if self.staged_work_model_delta is None:
                 raise ValueError(
                     f"{self.action.value} proposal requires a staged work model delta"
                 )
-        elif self.staged_work_model_delta is not None:
+        elif (
+            self.action is not ProposalAction.WITHDRAW
+            and self.staged_work_model_delta is not None
+        ):
             raise ValueError(
                 f"{self.action.value} proposal must not carry a staged work model delta"
             )

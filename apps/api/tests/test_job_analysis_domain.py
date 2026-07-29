@@ -45,6 +45,7 @@ from app.job_analysis.domain import (
     TaskState,
     is_allowed_transition,
     validate_edited_jd_after,
+    withdraw_delta_matches_target_state,
 )
 
 
@@ -532,6 +533,20 @@ def test_unresolved_contradiction_requires_two_anchors():
     assert issue.last_asked_turn_id is None
 
 
+def test_open_issue_carries_an_optional_reconciliation_task_identity():
+    issue = OpenIssue(
+        id="issue-1",
+        kind=OpenIssueKind.INSUFFICIENT_EVIDENCE,
+        summary="員工剛新增，仍需分析",
+        source_anchors=(SourceAnchor(source_ref=employee_ref(), quote="每週彙整週報"),),
+        reconciliation_task_id="task-direct-1",
+    )
+
+    reparsed = OpenIssue.model_validate_json(issue.model_dump_json())
+
+    assert reparsed.reconciliation_task_id == "task-direct-1"
+
+
 def test_excluded_signal_requires_an_anchor():
     with pytest.raises(ValidationError, match="at least one source anchor"):
         ExcludedSignal(
@@ -650,14 +665,9 @@ def test_staged_delta_is_only_for_cross_layer_topology():
             jd(("task-1", "a"), ("task-8", None), ("task-9", None)),
             jd(("task-1", None), ("task-8", "子一"), ("task-9", "子二")),
         ),
-        (
-            SingleTaskTarget(action=ProposalAction.WITHDRAW, task_id="task-1"),
-            jd(("task-1", "a")),
-            jd(("task-1", None)),
-        ),
     ],
 )
-def test_cross_layer_topology_proposals_require_a_staged_delta(
+def test_merge_and_split_proposals_require_a_staged_delta(
     target, jd_before, jd_after
 ):
     """§9.6／§10.4:`accepted`／`edited` 要兩層原子套用,少了 delta 就只改得動 JD——
@@ -669,6 +679,40 @@ def test_cross_layer_topology_proposals_require_a_staged_delta(
             jd_before=jd_before,
             jd_after=jd_after,
         )
+
+
+def test_jd_only_withdraw_can_omit_a_staged_delta_but_state_guard_detects_mismatch():
+    proposal = Proposal(
+        proposal_id="prop-jd-only-withdraw",
+        target=SingleTaskTarget(
+            action=ProposalAction.WITHDRAW, task_id="task-direct-1"
+        ),
+        jd_before=jd(("task-direct-1", "每週彙整週報")),
+        jd_after=jd(("task-direct-1", None)),
+    )
+
+    assert proposal.staged_work_model_delta is None
+    assert withdraw_delta_matches_target_state(
+        target_has_non_retired_task=False,
+        staged_work_model_delta=proposal.staged_work_model_delta,
+    )
+    assert not withdraw_delta_matches_target_state(
+        target_has_non_retired_task=True,
+        staged_work_model_delta=proposal.staged_work_model_delta,
+    )
+
+
+def test_work_model_withdraw_requires_a_delta_under_the_same_state_guard():
+    delta = withdraw_delta()
+
+    assert withdraw_delta_matches_target_state(
+        target_has_non_retired_task=True,
+        staged_work_model_delta=delta,
+    )
+    assert not withdraw_delta_matches_target_state(
+        target_has_non_retired_task=False,
+        staged_work_model_delta=delta,
+    )
 
 
 def test_empty_staged_delta_is_rejected():

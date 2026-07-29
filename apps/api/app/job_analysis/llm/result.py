@@ -112,6 +112,7 @@ class WorkSignal(DomainModel):
     anchors: tuple[SignalAnchor, ...] = ()
     identity: IdentityAssessment
     supersedes_support_ordinals: tuple[SupportOrdinalRef, ...] = ()
+    resolves_open_issue_ordinal: int | None = None
     disposition: SignalDisposition
     task_change: TaskChangePayload | None = None
     exclude: ExcludePayload | None = None

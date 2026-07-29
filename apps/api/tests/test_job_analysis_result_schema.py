@@ -44,6 +44,7 @@ def test_result_top_level_shape_is_frozen():
         "anchors",
         "identity",
         "supersedes_support_ordinals",
+        "resolves_open_issue_ordinal",
         "disposition",
         "task_change",
         "exclude",
@@ -158,6 +159,29 @@ def test_result_round_trips_through_json():
     result = make_result()
     reparsed = TaskAnalysisResult.model_validate_json(result.model_dump_json())
     assert reparsed == result
+
+
+def test_signal_can_reference_the_open_issue_it_resolves():
+    signal = WorkSignal(
+        anchors=(SignalAnchor(turn_ordinal=3, quote="我每週彙整營運週報"),),
+        identity=IdentityAssessment(relation=IdentityRelation.NO_MATCH),
+        resolves_open_issue_ordinal=2,
+        disposition=SignalDisposition.TASK_CHANGE,
+        task_change=TaskChangePayload(
+            change=TaskChangeKind.ADD,
+            task_fields=TaskFields(
+                statement="每週彙整營運週報",
+                action="彙整",
+                object="營運週報",
+            ),
+        ),
+    )
+
+    assert (
+        WorkSignal.model_validate_json(signal.model_dump_json())
+        .resolves_open_issue_ordinal
+        == 2
+    )
 
 
 def test_contract_carries_no_cross_field_validation():

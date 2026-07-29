@@ -198,6 +198,9 @@ async def test_the_provider_only_ever_sees_the_rendered_packet():
         ("~anthropic/claude-opus-5", ("anthropic",)),
         ("claude-opus-5", ("anthropic",)),
         ("anthropic/claude-opus-5", ()),
+        # `order` 會依序嘗試清單內的 provider,allow_fallbacks:false 只擋清單外的;
+        # 放兩個等於 fallback 換了個位置,那輪實際跑在誰身上會不可知。
+        ("anthropic/claude-opus-5", ("anthropic", "google-vertex")),
     ],
 )
 def test_the_route_must_be_exact(model, provider_order):
@@ -242,6 +245,45 @@ async def test_a_refusal_is_not_a_failure():
     result, _ = await run(transport)
     assert result.outcome is OperationOutcome.REFUSED
     assert result.detail == "I can't help with that."
+    assert len(transport.calls) == 1
+
+
+async def test_partial_content_behind_finish_reason_error_never_reaches_the_verifier():
+    """非串流的 provider 錯誤可能維持 HTTP 200 並附上半截輸出。
+
+    這裡刻意讓 partial content 是**合法**的 TaskAnalysisResult:錯誤若晚一步才看,
+    它就會被當成一輪成功的分析寫進 Work Model。
+    """
+    transport = RecordingTransport(
+        chat_response(
+            valid_result_json(),
+            finish_reason="error",
+            error={"message": "upstream disconnected", "metadata": {"error_type": "provider_error"}},
+        )
+    )
+    result, _ = await run(transport)
+    assert result.outcome is OperationOutcome.FAILED
+    assert result.detail.startswith(ProviderFailureKind.PROVIDER_ERROR.value)
+    assert result.result is None
+    assert len(transport.calls) == 1
+
+
+async def test_a_typed_refusal_error_envelope_is_a_refusal_not_a_failure():
+    """refusal 是 typed error,不是只出現在 message.refusal;錯報成故障會讓呼叫端以為重試有用。"""
+    transport = RecordingTransport(
+        TransportResponse(
+            status_code=200,
+            body={
+                "error": {
+                    "message": "The model declined this request.",
+                    "metadata": {"error_type": "refusal"},
+                }
+            },
+        )
+    )
+    result, _ = await run(transport)
+    assert result.outcome is OperationOutcome.REFUSED
+    assert result.detail == "The model declined this request."
     assert len(transport.calls) == 1
 
 

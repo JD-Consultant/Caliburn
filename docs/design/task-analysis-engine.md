@@ -43,6 +43,7 @@ OpenRouter 拿 `TaskAnalysisResult.v1` → **verifier**(純函式、零 LLM)擋�
 | PostgreSQL adapter | 0012 四表、serialization、repositories、UoW | `app/adapters/job_analysis_postgres/` | JSONB 讀取必須 hydrate；schema/shape 壞掉 fail-closed；repository 不 commit |
 | authoring use cases | 文件庫與 JD Task add/edit/delete/reorder | `application/authoring.py` | document row lock → entry replay check → Current State/Journal/generation 同交易；不呼叫 LLM |
 | durable turn | authority snapshot → 交易外模型呼叫 → verified commit | `application/durable_turn.py` | commit 時重鎖並比對 generation/read-set；Work Model、Proposal、下一題與 completed-turn Journal 同交易 |
+| Proposal decisions | accept/edit/reject/defer/revision request | `application/proposal_decisions.py` | document lock 序列化；接受類才改 JD；staged topology 與 JD 原子套用；決策寫 Journal |
 
 ## 3. 一輪的資料流(每步標函式)
 
@@ -66,6 +67,12 @@ Current JD、相關 Proposal stale、Work Model reconcile trigger、Journal 與 
 期間不持有 PostgreSQL lock；最後一步才重鎖 document。generation、packet read-set 或
 conversation authority 任一不一致就回 `StaleAuthoritySnapshot`，舊結果不得套用。
 相同 `operation_id` 的已提交回合只回傳目前狀態，不會再新增 Task／Proposal／Journal。
+
+Proposal 決策由 `decide_proposal()` 完成，沒有 LLM。`accepted` 套用 `jd_after`；
+`edited` 套用員工文字並標記後續 reconcile；`rejected`、`deferred`、
+`revision_requested` 不改 Current JD。merge／split／JD 內 withdraw 的
+`staged_work_model_delta` 只在 accepted／edited 時與 JD 同交易套用。`jd_before`
+已不等於 Current JD 時，提案轉為員工可見的 `stale`，舊內容不得硬套。
 
 `OperationOutcome` 五種結局,呼叫端照名字處置:
 
@@ -147,7 +154,6 @@ JD 只在員工決定提案時才改。
 
 | 沒有的東西 | 現況 | 什麼時候做 |
 |---|---|---|
-| Proposal decision | durable AI turn 與 direct edit 已有；accept/edit/reject/defer/revision request 尚未接進 transaction | persistence plan Task 7 |
 | route／Web UI | 完全沒有 | persistence 之後的最小 local Web |
 | endpoint variant preflight | `provider_order` 只鎖 base slug,同 provider 可能有多個 endpoint variant | 真正付費呼叫前的 catalog／live preflight |
 | prompt 品質調校 | `llm/prompt.py` 只寫到「不與 §4 判準相反」的結構最小集 | rubric／eval 的獨立工作 |

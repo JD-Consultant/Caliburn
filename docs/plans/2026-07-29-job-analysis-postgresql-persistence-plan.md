@@ -511,32 +511,32 @@ async def decide_proposal(
 ) -> Proposal
 ```
 
-- [ ] **Step 1: 寫失敗測試**
+- [x] **Step 1: 寫失敗測試**
 
 測 accept 原子套用 JD + staged Work Model delta、edited 套員工文字並標 reconcile、reject 不動 JD、defer reload
 仍可決定、revision-request 保存 payload 但不呼叫 provider、`jd_before` 不符即 stale、terminal 不可再決定、
 同 decision replay、同 decision ID 不同內容 conflict。
 
-- [ ] **Step 2: 確認測試先紅**
+- [x] **Step 2: 確認測試先紅**
 
 ```powershell
 cd apps/api
 uv run pytest tests/test_job_analysis_proposal_decisions_postgres.py -q
 ```
 
-- [ ] **Step 3: 實作固定 lock 與原子 mutation**
+- [x] **Step 3: 實作固定 lock 與原子 mutation**
 
 lock document → proposal → task IDs sorted；以完整 `JdTask` 比較 `jd_before`。accepted/edited 才改 JD；
 staged delta 與 JD 必須同 transaction；寫 proposal-decision Journal 後 generation + 1。
 replacement LLM rebuild 不在本計畫，revision request 只需 durable、可 reload。
 
-- [ ] **Step 4: 跑 focused tests**
+- [x] **Step 4: 跑 focused tests**
 
 ```powershell
 uv run pytest tests/test_job_analysis_proposal_decisions_postgres.py tests/test_job_analysis_authoring_postgres.py -q
 ```
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```powershell
 git add apps/api/app/job_analysis/application apps/api/tests/test_job_analysis_proposal_decisions_postgres.py

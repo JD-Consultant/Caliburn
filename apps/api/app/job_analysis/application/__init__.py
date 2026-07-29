@@ -65,6 +65,13 @@ from .persistence import (
     ProposalDecisionPayload,
     ProposalRepository,
 )
+from .proposal_decisions import (
+    InvalidProposalDecision,
+    ProposalDecision,
+    ProposalNotDecidable,
+    ProposalNotFound,
+    decide_proposal,
+)
 from .transition import (
     JobAnalysisState,
     TransitionOutcome,
@@ -100,6 +107,7 @@ __all__ = [
     "DocumentSummary",
     "IdempotencyConflict",
     "InvalidJdTaskOrder",
+    "InvalidProposalDecision",
     "JobAnalysisState",
     "JobAnalysisUnitOfWork",
     "JobAnalysisUnitOfWorkFactory",
@@ -113,6 +121,9 @@ __all__ = [
     "PROPOSAL_DECISION_SCHEMA_ID",
     "PROPOSAL_SCHEMA_ID",
     "ProposalDecisionPayload",
+    "ProposalDecision",
+    "ProposalNotDecidable",
+    "ProposalNotFound",
     "ProposalRepository",
     "TaskAnalysisOperationResult",
     "StaleAuthoritySnapshot",
@@ -150,6 +161,7 @@ __all__ = [
     "create_document",
     "commit_verified_turn",
     "delete_jd_task",
+    "decide_proposal",
     "edit_jd_task",
     "list_documents",
     "load_document",

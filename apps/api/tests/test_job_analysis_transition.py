@@ -119,6 +119,11 @@ def change_signal(change: TaskChangeKind, targets: tuple[int, ...], **overrides)
         "change": change,
         "target_task_ordinals": targets,
         "task_fields": None if change is TaskChangeKind.WITHDRAW else fields("合併後的工作"),
+        "withdraw_reason": (
+            RetirementReason.EMPLOYEE_DENIED
+            if change is TaskChangeKind.WITHDRAW
+            else None
+        ),
     }
     payload.update(overrides.pop("payload", {}))
     return signal(
@@ -219,13 +224,21 @@ def test_revise_updates_in_place_and_only_proposes_when_the_jd_text_must_change(
 # ── §9.6 identity gate ──────────────────────────────────────────────────────
 
 
-def test_withdraw_outside_the_jd_retires_immediately():
-    outcome = apply(change_signal(TaskChangeKind.WITHDRAW, (2,)))
+def test_withdraw_outside_the_jd_retires_immediately_with_the_reason_the_model_gave():
+    """「那只是去年代班一次」是 `one_off`,不是 `employee_denied`;寫死一種就是把
+    撤回理由寫成假的,而只有模型讀得出員工說的是哪一種。"""
+    outcome = apply(
+        change_signal(
+            TaskChangeKind.WITHDRAW,
+            (2,),
+            payload={"withdraw_reason": RetirementReason.ONE_OFF},
+        )
+    )
     assert outcome.created_proposal_ids == ()
     retired = outcome.state.work_model.task_by_id("task-2")
     assert retired.state is TaskState.RETIRED
     assert retired.retirement.kind is RetirementKind.WITHDRAWN
-    assert retired.retirement.reason is RetirementReason.EMPLOYEE_DENIED
+    assert retired.retirement.reason is RetirementReason.ONE_OFF
     assert retired.retirement.source_ref.id == "turn-2"
 
 
@@ -433,8 +446,13 @@ def test_the_transition_never_touches_the_current_jd():
     assert outcome.state.current_jd == before.current_jd
 
 
-def test_replaying_the_same_operation_allocates_the_same_ids():
-    """§5:同一份已保存的結果重送,不得長出第二個 Task ID。"""
+def test_id_allocation_is_deterministic_for_the_same_operation_and_state():
+    """同一份結果對同一份起始 state → 同樣的 ID 與同樣的結果。
+
+    **這不是 replay 冪等**:把結果對已套用過的 state 再送一次,support link 會被追加
+    第二次、open issue 會因 ID 重複被拒。§5 要求的 exactly-once 需要 operation ledger,
+    第一版不做,留給 persistence plan。
+    """
     first = apply(signal())
     second = apply(signal())
     assert first.state == second.state

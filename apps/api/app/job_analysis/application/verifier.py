@@ -169,6 +169,8 @@ class ViolationCode(StrEnum):
     TASK_CHANGE_TARGET_COUNT = "task_change_target_count"
     TASK_FIELDS_REQUIRED = "task_fields_required"
     TASK_FIELDS_FORBIDDEN = "task_fields_forbidden"
+    WITHDRAW_REASON_REQUIRED = "withdraw_reason_required"
+    WITHDRAW_REASON_FORBIDDEN = "withdraw_reason_forbidden"
     SPLIT_CHILDREN_INSUFFICIENT = "split_children_insufficient"
     OPEN_ISSUE_ANCHORS_INSUFFICIENT = "open_issue_anchors_insufficient"
     NEXT_QUESTION_TARGET_INVALID = "next_question_target_invalid"
@@ -483,6 +485,15 @@ def _verify_task_change(
                 "withdraw must not carry task_fields",
                 index,
             )
+        # §9.5 要求 withdrawn 一定有 reason,而只有模型知道是哪一種;缺了它
+        # application 只能猜,猜錯就把撤回理由寫成假的。
+        if change.withdraw_reason is None:
+            _add(
+                violations,
+                ViolationCode.WITHDRAW_REASON_REQUIRED,
+                "withdraw requires a withdraw_reason",
+                index,
+            )
     elif change.change is not TaskChangeKind.SPLIT and change.task_fields is None:
         # merge 由 §12.3 明文要求;add／revise 由 §12.2 推出——沒有語意欄位,
         # application 連一個 Task 都建不出來(domain 的 statement／action／object 必填)。
@@ -490,6 +501,14 @@ def _verify_task_change(
             violations,
             ViolationCode.TASK_FIELDS_REQUIRED,
             f"{change.change.value} requires task_fields",
+            index,
+        )
+
+    if change.change is not TaskChangeKind.WITHDRAW and change.withdraw_reason is not None:
+        _add(
+            violations,
+            ViolationCode.WITHDRAW_REASON_FORBIDDEN,
+            f"{change.change.value} must not carry a withdraw_reason",
             index,
         )
 

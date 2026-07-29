@@ -23,7 +23,7 @@ from __future__ import annotations
 from enum import StrEnum
 
 from app.job_analysis.domain import DomainModel, NonEmptyText
-from app.job_analysis.domain.task import TaskFields
+from app.job_analysis.domain.task import RetirementReason, TaskFields
 from app.job_analysis.domain.work_model import ExclusionReason, OpenIssueKind
 
 
@@ -73,6 +73,15 @@ class TaskChangeKind(StrEnum):
 
 class TaskChangePayload(DomainModel):
     change: TaskChangeKind
+    withdraw_reason: RetirementReason | None = None
+    """為什麼撤回;`withdraw` 必填,其他 change 不得帶(由 verifier 檢查)。
+
+    §9.5 要求 `retirement.kind == withdrawn` 一定有 reason,而**只有模型知道是哪一種**:
+    「那只是去年代班一次」是 `one_off`,不是 `employee_denied`。既有形狀沒有欄位能表達
+    這個區別,application 只能猜——猜錯就把撤回理由寫成假的。沿用 domain 的
+    `RetirementReason`,不另立第二套值域。
+    """
+
     target_task_ordinals: tuple[int, ...] = ()
     task_fields: TaskFields | None = None
     split_children: tuple[TaskFields, ...] = ()

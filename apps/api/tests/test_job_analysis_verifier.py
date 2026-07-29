@@ -19,7 +19,12 @@ from app.job_analysis.application import (
     ViolationCode,
     verify_task_analysis_result,
 )
-from app.job_analysis.domain import ExclusionReason, OpenIssueKind, TaskFields
+from app.job_analysis.domain import (
+    ExclusionReason,
+    OpenIssueKind,
+    RetirementReason,
+    TaskFields,
+)
 from app.job_analysis.llm import (
     ExcludePayload,
     IdentityAssessment,
@@ -280,6 +285,7 @@ def test_withdraw_must_not_carry_task_fields():
                 change=TaskChangeKind.WITHDRAW,
                 target_task_ordinals=(1,),
                 task_fields=fields(),
+                withdraw_reason=RetirementReason.EMPLOYEE_DENIED,
             ),
         )
     )
@@ -288,12 +294,37 @@ def test_withdraw_must_not_carry_task_fields():
             signal(
                 **withdraw_target,
                 task_change=TaskChangePayload(
-                    change=TaskChangeKind.WITHDRAW, target_task_ordinals=(1,)
+                    change=TaskChangeKind.WITHDRAW,
+                    target_task_ordinals=(1,),
+                    withdraw_reason=RetirementReason.ONE_OFF,
                 ),
             )
         ),
         context(),
     ).is_valid
+
+
+def test_withdraw_reason_is_required_by_withdraw_and_forbidden_elsewhere():
+    """§9.5 要求 withdrawn 一定有 reason,而只有模型知道是哪一種。"""
+    assert ViolationCode.WITHDRAW_REASON_REQUIRED in codes(
+        signal(
+            identity=IdentityAssessment(
+                relation=IdentityRelation.DUPLICATE, target_task_ordinals=(1,)
+            ),
+            task_change=TaskChangePayload(
+                change=TaskChangeKind.WITHDRAW, target_task_ordinals=(1,)
+            ),
+        )
+    )
+    assert ViolationCode.WITHDRAW_REASON_FORBIDDEN in codes(
+        signal(
+            task_change=TaskChangePayload(
+                change=TaskChangeKind.ADD,
+                task_fields=fields(),
+                withdraw_reason=RetirementReason.ONE_OFF,
+            )
+        )
+    )
 
 
 @pytest.mark.parametrize(
@@ -337,6 +368,11 @@ def test_target_count_must_make_the_mapping_total(change, targets):
                 change=change,
                 target_task_ordinals=targets,
                 task_fields=None if change is TaskChangeKind.WITHDRAW else fields(),
+                withdraw_reason=(
+                    RetirementReason.EMPLOYEE_DENIED
+                    if change is TaskChangeKind.WITHDRAW
+                    else None
+                ),
                 split_children=(fields("子一"), fields("子二"))
                 if change is TaskChangeKind.SPLIT
                 else (),
@@ -614,7 +650,9 @@ def test_two_task_changes_claiming_the_same_target_are_both_rejected():
             relation=IdentityRelation.DUPLICATE, target_task_ordinals=(1,)
         ),
         task_change=TaskChangePayload(
-            change=TaskChangeKind.WITHDRAW, target_task_ordinals=(1,)
+            change=TaskChangeKind.WITHDRAW,
+            target_task_ordinals=(1,),
+            withdraw_reason=RetirementReason.EMPLOYEE_DENIED,
         ),
     )
     report = verify_task_analysis_result(result(first, second), context())
@@ -634,7 +672,9 @@ def test_distinct_targets_may_be_changed_in_the_same_round():
             relation=IdentityRelation.DUPLICATE, target_task_ordinals=(2,)
         ),
         task_change=TaskChangePayload(
-            change=TaskChangeKind.WITHDRAW, target_task_ordinals=(2,)
+            change=TaskChangeKind.WITHDRAW,
+            target_task_ordinals=(2,),
+            withdraw_reason=RetirementReason.EMPLOYEE_DENIED,
         ),
     )
     assert verify_task_analysis_result(result(first, second), context()).is_valid

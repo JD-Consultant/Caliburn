@@ -63,7 +63,7 @@ def test_domain_imports_only_stdlib_pydantic_or_itself():
 
 
 def test_job_analysis_never_imports_persistence_or_web_frameworks():
-    """第一輪不碰 DB／route(計畫 §0);框架 import 是最早的越界訊號。"""
+    """核心 package 只認 ports；DB adapter 住在 app/adapters，不得反向滲入。"""
     forbidden_roots = {
         "alembic",
         "asyncpg",

@@ -1,4 +1,4 @@
-"""Use-case 層:context assembler(T4)＋ deterministic verifier(T3);transition 待後續 task。"""
+"""Use-case 層：context、operation、transition 與純 persistence ports。"""
 
 from .context import (
     ActiveQuestion,
@@ -19,6 +19,29 @@ from .operation import (
     OperationOutcome,
     TaskAnalysisOperationResult,
     run_task_analysis_operation,
+)
+from .persistence import (
+    ACTIVE_QUESTION_SCHEMA_ID,
+    COMPLETED_TURN_SCHEMA_ID,
+    DIRECT_EDIT_SCHEMA_ID,
+    PROPOSAL_DECISION_SCHEMA_ID,
+    PROPOSAL_SCHEMA_ID,
+    WORK_MODEL_SCHEMA_ID,
+    CompletedTurnPayload,
+    DirectEditKind,
+    DirectEditPayload,
+    DocumentRecord,
+    DocumentRepository,
+    DocumentSummary,
+    JdTaskRepository,
+    JobAnalysisUnitOfWork,
+    JobAnalysisUnitOfWorkFactory,
+    JournalEntry,
+    JournalKind,
+    JournalRepository,
+    LoadedDocument,
+    ProposalDecisionPayload,
+    ProposalRepository,
 )
 from .transition import (
     JobAnalysisState,
@@ -42,8 +65,28 @@ from .verifier import (
 
 __all__ = [
     "ActiveQuestion",
+    "ACTIVE_QUESTION_SCHEMA_ID",
+    "COMPLETED_TURN_SCHEMA_ID",
+    "CompletedTurnPayload",
+    "DIRECT_EDIT_SCHEMA_ID",
+    "DirectEditKind",
+    "DirectEditPayload",
+    "DocumentRecord",
+    "DocumentRepository",
+    "DocumentSummary",
     "JobAnalysisState",
+    "JobAnalysisUnitOfWork",
+    "JobAnalysisUnitOfWorkFactory",
+    "JdTaskRepository",
+    "JournalEntry",
+    "JournalKind",
+    "JournalRepository",
+    "LoadedDocument",
     "OperationOutcome",
+    "PROPOSAL_DECISION_SCHEMA_ID",
+    "PROPOSAL_SCHEMA_ID",
+    "ProposalDecisionPayload",
+    "ProposalRepository",
     "TaskAnalysisOperationResult",
     "TransitionOutcome",
     "TransitionResult",
@@ -71,5 +114,6 @@ __all__ = [
     "VerificationReport",
     "Violation",
     "ViolationCode",
+    "WORK_MODEL_SCHEMA_ID",
     "verify_task_analysis_result",
 ]

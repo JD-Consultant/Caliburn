@@ -189,19 +189,19 @@ class JobAnalysisUnitOfWork(Protocol):
 `DirectEditPayload` 保存 edit kind 與完成後 `JdTask | None`；`ProposalDecisionPayload` 保存 proposal ID、
 decision 與員工文字／理由。三者都是 frozen Pydantic contract，不讓 raw ORM/JSON 越過 port。
 
-- [ ] **Step 1: 寫失敗測試**
+- [x] **Step 1: 寫失敗測試**
 
 測 frozen records、負 generation 被拒、三種 journal payload 與 kind 必須相符、UoW Protocol 不含
 SQLAlchemy 型別、dependency guard 仍禁止 `sqlalchemy` 進 `app/job_analysis`。
 
-- [ ] **Step 2: 確認測試先紅**
+- [x] **Step 2: 確認測試先紅**
 
 ```powershell
 cd apps/api
 uv run pytest tests/test_job_analysis_persistence_contracts.py tests/test_job_analysis_dependencies.py -q
 ```
 
-- [ ] **Step 3: 實作 records／ports**
+- [x] **Step 3: 實作 records／ports**
 
 Repository methods 固定為：
 
@@ -224,13 +224,13 @@ JournalRepository.list_recent_turns(document_id, *, limit) -> tuple[CompletedTur
 
 `replace` 是 document lock 下的 aggregate persistence seam，不是 generic repository framework。
 
-- [ ] **Step 4: 跑 focused tests**
+- [x] **Step 4: 跑 focused tests**
 
 ```powershell
 uv run pytest tests/test_job_analysis_persistence_contracts.py tests/test_job_analysis_dependencies.py -q
 ```
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```powershell
 git add apps/api/app/job_analysis/application apps/api/tests/test_job_analysis_persistence_contracts.py apps/api/tests/test_job_analysis_dependencies.py

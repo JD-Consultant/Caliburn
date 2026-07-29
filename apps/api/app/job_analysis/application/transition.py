@@ -49,8 +49,11 @@ from app.job_analysis.domain import (
     Task,
     TaskFields,
     TaskId,
+    withdraw_delta_matches_target_state,
 )
 from app.job_analysis.llm import (
+    NextQuestion,
+    NextQuestionTargetKind,
     SignalDisposition,
     TaskAnalysisResult,
     TaskChangeKind,
@@ -135,6 +138,7 @@ def apply_task_analysis_result(
     try:
         for index, signal in enumerate(result.work_signals):
             writer.apply_signal(index, signal)
+        writer.record_next_question(result.next_question)
         return writer.finish()
     except (_TransitionRejected, ValidationError) as rejection:
         return _rejected(state, str(rejection))
@@ -244,6 +248,9 @@ class _Writer:
 
     def apply_signal(self, index: int, signal: WorkSignal) -> None:
         self._apply_supersessions(signal)
+        if signal.resolves_open_issue_ordinal is not None:
+            self._resolve_reconciliation_issue(index, signal)
+            return
         if signal.disposition is SignalDisposition.SUPPORT_ONLY:
             for ordinal in signal.identity.target_task_ordinals:
                 self._append_support(self._task_id(ordinal), signal)
@@ -269,6 +276,152 @@ class _Writer:
             )
             return
         self._apply_task_change(index, signal)
+
+    def _reconciliation_issue(
+        self, ordinal: int
+    ) -> tuple[OpenIssue, TaskId]:
+        view = next(
+            (
+                candidate
+                for candidate in self._packet.current_authorities.open_issues
+                if candidate.ordinal == ordinal
+            ),
+            None,
+        )
+        if view is None or view.issue.reconciliation_task_id is None:
+            raise _TransitionRejected(
+                f"open issue ordinal {ordinal} is not a reconciliation issue"
+            )
+        local = next(
+            (issue for issue in self._open_issues if issue.id == view.issue.id),
+            None,
+        )
+        if local is None or local != view.issue:
+            raise _TransitionRejected(
+                f"open issue ordinal {ordinal} changed after the packet was built"
+            )
+        task_id = local.reconciliation_task_id
+        jd_task = self._jd.get(task_id)
+        if jd_task is None or jd_task != view.jd_task:
+            raise _TransitionRejected(
+                f"JD task for open issue ordinal {ordinal} changed or disappeared"
+            )
+        if task_id in self._tasks:
+            raise _TransitionRejected(
+                f"reconciliation task id {task_id!r} already exists in the Work Model"
+            )
+        return local, task_id
+
+    def _resolve_reconciliation_issue(
+        self, index: int, signal: WorkSignal
+    ) -> None:
+        issue, task_id = self._reconciliation_issue(
+            signal.resolves_open_issue_ordinal
+        )
+        if signal.disposition is SignalDisposition.TASK_CHANGE:
+            self._materialize_reconciliation_task(index, issue, task_id, signal)
+            return
+        if signal.disposition is SignalDisposition.EXCLUDE:
+            self._exclude_reconciliation_task(index, issue, task_id, signal)
+            return
+        raise _TransitionRejected(
+            "a reconciliation issue may only resolve through add or exclude"
+        )
+
+    def _materialize_reconciliation_task(
+        self,
+        index: int,
+        issue: OpenIssue,
+        task_id: TaskId,
+        signal: WorkSignal,
+    ) -> None:
+        fields = signal.task_change.task_fields
+        issue_support = tuple(
+            SupportLink(**anchor.model_dump()) for anchor in issue.source_anchors
+        )
+        self._insert(
+            Task(
+                task_id=task_id,
+                **dict(fields),
+                support_links=self._unique_support_links(
+                    issue_support,
+                    self._support_links(signal),
+                ),
+            )
+        )
+        self._open_issues.remove(issue)
+        self._immediate.append(task_id)
+        self._materially_reanalysed.add(task_id)
+
+        current_jd = self._jd[task_id]
+        proposed_jd = self._jd_task_from_fields(
+            task_id=task_id,
+            fields=fields,
+            existing=current_jd,
+        )
+        if proposed_jd != current_jd:
+            self._create_proposal(
+                index,
+                SingleTaskTarget(action=ProposalAction.REVISE, task_id=task_id),
+                jd_after={task_id: proposed_jd},
+            )
+
+    def _exclude_reconciliation_task(
+        self,
+        index: int,
+        issue: OpenIssue,
+        task_id: TaskId,
+        signal: WorkSignal,
+    ) -> None:
+        self._excluded.append(
+            ExcludedSignal(
+                id=f"{self._operation_id}-x{index}",
+                reason=signal.exclude.reason,
+                summary=signal.exclude.summary,
+                source_anchors=self._anchors(signal),
+            )
+        )
+        if not withdraw_delta_matches_target_state(
+            target_has_non_retired_task=False,
+            staged_work_model_delta=None,
+        ):
+            raise _TransitionRejected("JD-only withdraw delta state is inconsistent")
+        self._create_proposal(
+            index,
+            SingleTaskTarget(action=ProposalAction.WITHDRAW, task_id=task_id),
+            jd_after={task_id: None},
+        )
+
+    def record_next_question(self, question: NextQuestion) -> None:
+        target = question.target
+        if (
+            target is None
+            or target.kind is not NextQuestionTargetKind.EXISTING_OPEN_ISSUE
+        ):
+            return
+        view = next(
+            (
+                candidate
+                for candidate in self._packet.current_authorities.open_issues
+                if candidate.ordinal == target.ordinal
+            ),
+            None,
+        )
+        if view is None:
+            raise _TransitionRejected(
+                f"next question references unknown open issue ordinal {target.ordinal}"
+            )
+        for position, issue in enumerate(self._open_issues):
+            if issue.id == view.issue.id:
+                self._open_issues[position] = issue.model_copy(
+                    update={
+                        "last_asked_turn_id": f"{self._operation_id}-consultant"
+                    }
+                )
+                return
+        raise _TransitionRejected(
+            "next question targets an open issue already resolved by this result"
+        )
 
     def _apply_supersessions(self, signal: WorkSignal) -> None:
         """§12.3 末段:被取代的依據一律指向本次正在處理的 employee turn。"""

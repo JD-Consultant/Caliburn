@@ -192,6 +192,17 @@
       "title": "OpenIssuePayload",
       "type": "object"
     },
+    "RetirementReason": {
+      "enum": [
+        "other_person",
+        "past_work",
+        "one_off",
+        "enabler_or_step",
+        "employee_denied"
+      ],
+      "title": "RetirementReason",
+      "type": "string"
+    },
     "SignalAnchor": {
       "additionalProperties": false,
       "description": "指向 packet 中某個回合的逐字引用;application 再把 ordinal 解成 SourceRef。",
@@ -259,6 +270,16 @@
         "change": {
           "$ref": "#/$defs/TaskChangeKind"
         },
+        "withdraw_reason": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RetirementReason"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
         "target_task_ordinals": {
           "items": {
             "type": "integer"
@@ -286,6 +307,7 @@
       },
       "required": [
         "change",
+        "withdraw_reason",
         "target_task_ordinals",
         "task_fields",
         "split_children"

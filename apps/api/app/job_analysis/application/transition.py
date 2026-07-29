@@ -101,8 +101,13 @@ def apply_task_analysis_result(
 ) -> TransitionResult:
     """套用一輪分析結果。
 
-    `operation_id` 讓 ID 配發**冪等**(§5 的不變量):同一份已保存的結果重送,產生的
-    Task／Proposal ID 完全相同,不會長出第二份。
+    `operation_id` 讓 ID 配發**決定性**:同一份結果對同一份起始 state,產生的
+    Task／Proposal ID 完全相同。
+
+    **這不等於 replay 冪等。** 真的把同一份結果對「已套用過的 state」再送一次,
+    support link 會被追加第二次,open issue 會因為 ID 重複而整筆被拒。§5 要求的
+    exactly-once(同一份已保存結果不得建立第二個 Task ID)需要 operation ledger,
+    第一版不做,留給 persistence plan。
     """
 
     report = verify_task_analysis_result(result, packet.verification_context())
@@ -301,10 +306,10 @@ class _Writer:
     def _withdraw(self, index: int, signal: WorkSignal, task_id: TaskId) -> None:
         retirement = Retirement(
             kind=RetirementKind.WITHDRAWN,
-            # 輸出契約沒有 reason 欄位,而 v1 走到 withdraw 的唯一路徑是「既有 Task
-            # 被員工在訪談中推翻」(§5、TI-R1-08);其他理由的訊號根本不會先變成 Task,
-            # 它們留在 excluded_signals。source_ref 記下是哪一個回合說的。
-            reason=RetirementReason.EMPLOYEE_DENIED,
+            # 理由由模型指認(verifier 保證 withdraw 一定帶):同一個既有 Task 可能因為
+            # 「其實是同事做的」「那是去年的事」「只代班過一次」而被推翻,寫死一種就是
+            # 把撤回理由寫成假的。source_ref 記下是哪一個回合說的。
+            reason=signal.task_change.withdraw_reason,
             source_ref=SourceRef(kind=SourceKind.EMPLOYEE_TURN, id=self._current_turn_id),
         )
         if self._gate_is_open([task_id]):

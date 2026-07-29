@@ -49,6 +49,9 @@ def test_result_top_level_shape_is_frozen():
     ]
     assert list(TaskChangePayload.model_fields) == [
         "change",
+        # §12.1 之後補上的唯一欄位:§9.5 要求 withdrawn 必有 reason,而只有模型知道
+        # 是哪一種(「只代班過一次」是 one_off,不是 employee_denied)。
+        "withdraw_reason",
         "target_task_ordinals",
         "task_fields",
         "split_children",

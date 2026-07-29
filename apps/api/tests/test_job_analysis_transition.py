@@ -23,6 +23,7 @@ from app.job_analysis.domain import (
     JdEntry,
     JdTask,
     MergeTarget,
+    OpenIssue,
     Proposal,
     ProposalAction,
     ProposalStatus,
@@ -30,6 +31,7 @@ from app.job_analysis.domain import (
     RetirementReason,
     SingleTaskTarget,
     SourceKind,
+    SourceAnchor,
     SourceRef,
     StagedTaskLineage,
     StagedWorkModelDelta,
@@ -44,6 +46,8 @@ from app.job_analysis.llm import (
     IdentityAssessment,
     IdentityRelation,
     NextQuestion,
+    NextQuestionTarget,
+    NextQuestionTargetKind,
     OpenIssuePayload,
     SignalAnchor,
     SignalDisposition,
@@ -155,6 +159,7 @@ def apply(
     operation_id="op-1",
     transcript=TRANSCRIPT,
     current_turn_id="turn-2",
+    next_question: NextQuestion | None = None,
 ):
     current = current or state()
     packet = build_context_packet(
@@ -166,7 +171,8 @@ def apply(
     )
     result = TaskAnalysisResult(
         work_signals=signals,
-        next_question=NextQuestion(text="週報交給誰?", purpose="釐清產出對象"),
+        next_question=next_question
+        or NextQuestion(text="週報交給誰?", purpose="釐清產出對象"),
     )
     return apply_task_analysis_result(
         state=current, packet=packet, result=result, operation_id=operation_id
@@ -174,6 +180,31 @@ def apply(
 
 
 IN_JD = (jd_task("task-1", "每週彙整營運週報"),)
+
+
+def partial_state(statement: str = "每週整理週報") -> JobAnalysisState:
+    task_id = "task-direct-1"
+    return JobAnalysisState(
+        work_model=CurrentWorkModel(
+            open_issues=(
+                OpenIssue(
+                    id="issue-direct-1",
+                    kind=OpenIssueKind.INSUFFICIENT_EVIDENCE,
+                    summary="員工新增了 Task，仍需分析",
+                    source_anchors=(
+                        SourceAnchor(
+                            source_ref=SourceRef(
+                                kind=SourceKind.DIRECT_EDIT,
+                                id="edit-1",
+                            )
+                        ),
+                    ),
+                    reconciliation_task_id=task_id,
+                ),
+            )
+        ),
+        current_jd=(jd_task(task_id, statement),),
+    )
 
 
 # ── §12.2 mapping ───────────────────────────────────────────────────────────
@@ -188,6 +219,109 @@ def test_add_creates_a_candidate_task_immediately_without_a_proposal():
     assert created.statement == "每週追蹤客訴"
     assert created.state is TaskState.ACTIVE
     assert len(created.support_links) == 1
+
+
+def test_no_match_add_materializes_the_partial_jd_task_with_the_same_identity():
+    resolution = signal(
+        resolves_open_issue_ordinal=1,
+        task_change=TaskChangePayload(
+            change=TaskChangeKind.ADD,
+            task_fields=fields("每週彙整營運週報"),
+        ),
+    )
+
+    outcome = apply(resolution, current=partial_state())
+
+    assert outcome.is_applied
+    created = outcome.state.work_model.task_by_id("task-direct-1")
+    assert created.statement == "每週彙整營運週報"
+    assert {item.source_ref.kind for item in created.support_links} == {
+        SourceKind.DIRECT_EDIT,
+        SourceKind.EMPLOYEE_TURN,
+    }
+    assert outcome.state.work_model.open_issues == ()
+    assert outcome.created_proposal_ids == ("op-1-p0",)
+    assert outcome.state.current_jd[0].statement == "每週整理週報"
+    assert jd_map(outcome.state.proposals[0].jd_after)[
+        "task-direct-1"
+    ].statement == "每週彙整營運週報"
+
+
+def test_resolution_rejects_an_identity_already_present_even_if_it_is_retired():
+    retired = task("task-direct-1", "舊分析").model_copy(
+        update={
+            "retirement": Retirement(
+                kind=RetirementKind.WITHDRAWN,
+                reason=RetirementReason.EMPLOYEE_DENIED,
+                source_ref=SourceRef(
+                    kind=SourceKind.EMPLOYEE_TURN,
+                    id="turn-old",
+                ),
+            )
+        }
+    )
+    before = partial_state().model_copy(
+        update={
+            "work_model": CurrentWorkModel(
+                tasks=(retired,),
+                open_issues=partial_state().work_model.open_issues,
+            )
+        }
+    )
+    resolution = signal(
+        resolves_open_issue_ordinal=1,
+        task_change=TaskChangePayload(
+            change=TaskChangeKind.ADD,
+            task_fields=fields(),
+        ),
+    )
+
+    outcome = apply(resolution, current=before)
+
+    assert outcome.outcome is TransitionOutcome.REJECTED
+    assert outcome.state == before
+    assert "already exists" in outcome.detail
+
+
+def test_excluding_a_partial_jd_task_creates_a_delta_less_withdraw_proposal():
+    resolution = signal(
+        resolves_open_issue_ordinal=1,
+        disposition=SignalDisposition.EXCLUDE,
+        task_change=None,
+        exclude=ExcludePayload(
+            reason=ExclusionReason.ONE_OFF_SUPPORT,
+            summary="只代班過一次",
+        ),
+    )
+
+    outcome = apply(resolution, current=partial_state())
+
+    assert outcome.is_applied
+    assert outcome.state.current_jd[0].task_id == "task-direct-1"
+    assert outcome.state.work_model.open_issues[0].id == "issue-direct-1"
+    assert outcome.state.work_model.excluded_signals[0].summary == "只代班過一次"
+    proposal = outcome.state.proposals[0]
+    assert proposal.action is ProposalAction.WITHDRAW
+    assert proposal.staged_work_model_delta is None
+    assert jd_map(proposal.jd_after)["task-direct-1"] is None
+
+
+def test_asking_the_partial_issue_records_the_consultant_turn_id():
+    question = NextQuestion(
+        text="這項工作完成後會產出什麼？",
+        purpose="釐清工作產出",
+        target=NextQuestionTarget(
+            kind=NextQuestionTargetKind.EXISTING_OPEN_ISSUE,
+            ordinal=1,
+        ),
+    )
+
+    outcome = apply(current=partial_state(), next_question=question)
+
+    assert (
+        outcome.state.work_model.open_issues[0].last_asked_turn_id
+        == "op-1-consultant"
+    )
 
 
 def test_support_only_appends_evidence_without_touching_semantic_fields():

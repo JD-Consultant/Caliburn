@@ -1,7 +1,7 @@
 ---
-title: Task Analysis 引擎 — 端到端設計(第一條 vertical＋PostgreSQL adapter,無 route)
+title: Task Analysis 引擎 — 端到端設計(durable PostgreSQL vertical,無 route)
 audience: agent-primary(也給人)
-scope: apps/api app/job_analysis/*(domain / llm / application / providers)
+scope: apps/api app/job_analysis/* + app/adapters/job_analysis_postgres/*
 updated: 2026-07-29
 ---
 
@@ -148,7 +148,8 @@ JD 只在員工決定提案時才改。
 - **greenfield 邊界。** `app/job_analysis` **不得 import** `app.interview`、`app.interview_vnext`、
   `app.job_authoring`、`evals`,也不得 import DB／web 框架。由
   `tests/test_job_analysis_dependencies.py` 以 AST 強制。
-- **smoke 綠燈不代表模型品質通過。** `tests/test_job_analysis_smoke.py` 用 scripted provider。
+- **smoke 綠燈不代表模型品質通過。** `tests/test_job_analysis_smoke.py` 用 scripted provider；
+  `tests/test_job_analysis_durable_smoke.py` 用 fake verified result 與真 PostgreSQL，只證明交易／reload vertical。
   依 ADR 0042 決定 3,R1 exit gate 判準未被否決、只是暫停阻擋效力;**任何文件都不得把它寫成
   Task Discovery 已通過**。
 
@@ -159,7 +160,9 @@ JD 只在員工決定提案時才改。
 | route／Web UI | 完全沒有 | persistence 之後的最小 local Web |
 | endpoint variant preflight | `provider_order` 只鎖 base slug,同 provider 可能有多個 endpoint variant | 真正付費呼叫前的 catalog／live preflight |
 | prompt 品質調校 | `llm/prompt.py` 只寫到「不與 §4 判準相反」的結構最小集 | rubric／eval 的獨立工作 |
-| 員工決定提案的流程 | Proposal 建得出來、可持久化，但尚無套用決定的 use case | persistence plan Task 7 |
+| JD-only direct add 的 identity reconciliation | 目前以 open issue 保留，尚不能把後續分析的新 Task 自動對回同一個 JD task_id | Loop／reconciliation 契約前先補，不得假裝已完成 |
+| O/P/K/S/A、完整 header、匯出 | 目前只做 Task 與較豐富的內部 JD Task 欄位 | 各自研究／契約完成後逐項加；匯出才對齊公版 |
+| revision-request replacement | revision request 可保存／reload，但不會自動重建 replacement | 後續模型流程 |
 
 ## 9. 指路
 

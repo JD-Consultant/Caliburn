@@ -555,7 +555,7 @@ git commit -m "feat(job-analysis): persist proposal decisions"
 - Modify: `AGENTS.md`
 - Modify: `docs/plans/2026-07-29-job-analysis-postgresql-persistence-plan.md`
 
-- [ ] **Step 1: 寫 real-PostgreSQL durable smoke**
+- [x] **Step 1: 寫 real-PostgreSQL durable smoke**
 
 一條測試完成：
 
@@ -573,7 +573,7 @@ create document
 
 不打網路，不接 route，不使用舊 tables。
 
-- [ ] **Step 2: 跑 durable smoke 與全部 job_analysis tests**
+- [x] **Step 2: 跑 durable smoke 與全部 job_analysis tests**
 
 ```powershell
 cd apps/api
@@ -582,12 +582,12 @@ $tests = Get-ChildItem -LiteralPath tests -Filter 'test_job_analysis_*.py' | Sor
 uv run pytest @tests -q
 ```
 
-- [ ] **Step 3: 更新端到端文件**
+- [x] **Step 3: 更新端到端文件**
 
 `docs/design/task-analysis-engine.md` 必須寫真實 module/function 名、四表 authority、direct edit 與 AI turn
 transaction 時序、reload、idempotency、greenfield 禁令，以及仍未提供 Web/O/P/K/S/A/export。
 
-- [ ] **Step 4: 跑完整 API suite**
+- [x] **Step 4: 跑完整 API suite**
 
 ```powershell
 cd apps/api
@@ -597,7 +597,12 @@ uv run pytest -q
 Expected: green-before == green-after；若既有 vNext raw-bytes hash failure 仍存在，需以同一 test node
 在動工前後均失敗證明不是本分支造成。
 
-- [ ] **Step 5: 文件檢查與 commit**
+執行結果（2026-07-29）：`job_analysis` 全線 `249 passed`；完整 API
+`1634 passed, 1 failed`。唯一失敗仍是動工前相同節點
+`test_interview_vnext_execution_schemas.py::test_committed_operation_document_and_prompt_match_current_contracts`
+的 Windows CRLF/raw-bytes hash 差異；本計畫未修改該 vNext frozen asset。
+
+- [x] **Step 5: 文件檢查與 commit**
 
 ```powershell
 git diff --check

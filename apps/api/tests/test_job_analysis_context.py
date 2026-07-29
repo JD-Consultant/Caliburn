@@ -415,6 +415,70 @@ def test_open_issues_and_exclusions_show_their_anchors_and_last_asked():
     assert "    最近提問: (尚未問過)" in never_asked
 
 
+def test_jd_only_task_is_projected_through_its_open_issue_not_as_an_active_task():
+    jd_only = jd_task("task-direct-1", "每週彙整營運週報")
+    issue = OpenIssue(
+        id="issue-direct-1",
+        kind=OpenIssueKind.INSUFFICIENT_EVIDENCE,
+        summary="員工剛新增，仍需分析工作內容",
+        source_anchors=(
+            SourceAnchor(
+                source_ref=SourceRef(kind=SourceKind.DIRECT_EDIT, id="edit-1")
+            ),
+        ),
+        reconciliation_task_id=jd_only.task_id,
+    )
+
+    packet = build(
+        work_model=CurrentWorkModel(open_issues=(issue,)),
+        current_jd=(jd_only,),
+    )
+
+    assert packet.current_authorities.tasks == ()
+    assert packet.current_authorities.open_issues[0].jd_task == jd_only
+    assert (
+        packet.verification_context().open_issues[0].reconciliation_task_id
+        == jd_only.task_id
+    )
+    rendered = render_context_packet(packet)
+    assert "Current JD Task: 每週彙整營運週報" in rendered
+    assert "待分析欄位: purpose_result, context, frequency, responsibility_role" in rendered
+
+
+def test_pending_jd_only_withdraw_is_derived_as_waiting_for_employee_decision():
+    jd_only = jd_task("task-direct-1", "只幫同事做過一次盤點")
+    issue = OpenIssue(
+        id="issue-direct-1",
+        kind=OpenIssueKind.INSUFFICIENT_EVIDENCE,
+        summary="需要確認是否為正式責任",
+        source_anchors=(
+            SourceAnchor(
+                source_ref=SourceRef(kind=SourceKind.DIRECT_EDIT, id="edit-1")
+            ),
+        ),
+        reconciliation_task_id=jd_only.task_id,
+    )
+    proposal = Proposal(
+        proposal_id="proposal-withdraw-direct-1",
+        target=SingleTaskTarget(
+            action=ProposalAction.WITHDRAW,
+            task_id=jd_only.task_id,
+        ),
+        jd_before=(JdEntry(task_id=jd_only.task_id, value=jd_only),),
+        jd_after=(JdEntry(task_id=jd_only.task_id, value=None),),
+    )
+
+    rendered = render_context_packet(
+        build(
+            work_model=CurrentWorkModel(open_issues=(issue,)),
+            current_jd=(jd_only,),
+            proposals=(proposal,),
+        )
+    )
+
+    assert "狀態: 等待員工決定 withdraw 提案" in rendered
+
+
 def test_rendering_never_exposes_internal_ids():
     """§11.2:packet 只用 ordinal 說話;契約裡也沒有任何欄位可讓模型回填 ID。"""
     work_model = CurrentWorkModel(

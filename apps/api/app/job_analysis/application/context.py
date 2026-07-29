@@ -99,6 +99,7 @@ class PacketRetiredTaskView(DomainModel):
 class PacketOpenIssueView(DomainModel):
     ordinal: int
     issue: OpenIssue
+    jd_task: JdTask | None = None
 
 
 class PacketProposalView(DomainModel):
@@ -241,7 +242,11 @@ class TaskAnalysisPacket(DomainModel):
                 for view in self.current_authorities.retired_tasks
             ),
             open_issues=tuple(
-                PacketOpenIssue(ordinal=view.ordinal, issue_id=view.issue.id)
+                PacketOpenIssue(
+                    ordinal=view.ordinal,
+                    issue_id=view.issue.id,
+                    reconciliation_task_id=view.issue.reconciliation_task_id,
+                )
                 for view in self.current_authorities.open_issues
             ),
         )
@@ -289,7 +294,15 @@ def build_context_packet(
         for ordinal, task in enumerate(retired_tasks, start=len(active_tasks) + 1)
     )
     issue_views = tuple(
-        PacketOpenIssueView(ordinal=ordinal, issue=issue)
+        PacketOpenIssueView(
+            ordinal=ordinal,
+            issue=issue,
+            jd_task=(
+                jd_tasks.get(issue.reconciliation_task_id)
+                if issue.reconciliation_task_id is not None
+                else None
+            ),
+        )
         for ordinal, issue in enumerate(work_model.open_issues, start=1)
     )
 
@@ -486,6 +499,40 @@ def render_context_packet(packet: TaskAnalysisPacket) -> str:
         lines.append("(無)")
     for view in authorities.open_issues:
         lines.append(f"[{view.ordinal}] {view.issue.kind.value}: {view.issue.summary}")
+        if view.issue.reconciliation_task_id is not None:
+            if view.jd_task is None:
+                lines.append("    Current JD Task: (已不存在)")
+            else:
+                lines.append(f"    Current JD Task: {view.jd_task.statement}")
+                missing = [
+                    label
+                    for label, value in (
+                        ("purpose_result", view.jd_task.purpose_result),
+                        ("context", view.jd_task.context),
+                        ("frequency", view.jd_task.frequency_text),
+                        ("responsibility_role", view.jd_task.responsibility_role),
+                        ("enablers", view.jd_task.enablers or None),
+                    )
+                    if value is None
+                ]
+                lines.append(
+                    "    待分析欄位: "
+                    + (", ".join(missing) if missing else "(目前均有值)")
+                )
+            waiting_actions = sorted(
+                {
+                    proposal_view.proposal.action.value
+                    for proposal_view in packet.proposal_context.pending
+                    if view.issue.reconciliation_task_id
+                    in proposal_view.proposal.affected_task_ids
+                }
+            )
+            if waiting_actions:
+                lines.append(
+                    "    狀態: 等待員工決定 "
+                    + "／".join(waiting_actions)
+                    + " 提案"
+                )
         # 缺了 anchors,模型看不出矛盾在哪兩句之間;缺了 last_asked,它會把剛問過的
         # 缺口當成沒問過再問一次——那正是 Context 要解決的跨回合記憶。
         for anchor in view.issue.source_anchors:

@@ -77,6 +77,7 @@ class PacketRetiredTask(DomainModel):
 class PacketOpenIssue(DomainModel):
     ordinal: int
     issue_id: Identifier
+    reconciliation_task_id: TaskId | None = None
 
 
 class VerificationContext(DomainModel):
@@ -141,6 +142,12 @@ class VerificationContext(DomainModel):
                 return task
         return None
 
+    def open_issue(self, ordinal: int) -> PacketOpenIssue | None:
+        for issue in self.open_issues:
+            if issue.ordinal == ordinal:
+                return issue
+        return None
+
     @property
     def retired_task_ordinals(self) -> frozenset[int]:
         return frozenset(task.ordinal for task in self.retired_tasks)
@@ -181,6 +188,12 @@ class ViolationCode(StrEnum):
     SUPERSESSION_MISSING_CURRENT_TURN_ANCHOR = "supersession_missing_current_turn_anchor"
     DUPLICATE_TASK_CHANGE_TARGET = "duplicate_task_change_target"
     DUPLICATE_WORK_SIGNAL = "duplicate_work_signal"
+    RESOLUTION_OPEN_ISSUE_UNKNOWN = "resolution_open_issue_unknown"
+    RESOLUTION_OPEN_ISSUE_NOT_RECONCILABLE = (
+        "resolution_open_issue_not_reconcilable"
+    )
+    RESOLUTION_MAPPING_INVALID = "resolution_mapping_invalid"
+    RESOLUTION_OPEN_ISSUE_REPEATED = "resolution_open_issue_repeated"
 
 
 class Violation(DomainModel):
@@ -219,6 +232,7 @@ def verify_task_analysis_result(
     violations: list[Violation] = []
     for index, signal in enumerate(result.work_signals):
         _verify_signal(index, signal, context, violations)
+    _verify_open_issues_are_resolved_once(result, violations)
     _verify_task_change_targets_are_claimed_once(result, violations)
     _verify_work_signals_are_not_exact_duplicates(result, violations)
     _verify_next_question(result, context, violations)
@@ -246,7 +260,77 @@ def _verify_signal(
     _verify_mapping_combination(index, signal, violations)
     _verify_task_change(index, signal, context, violations)
     _verify_open_issue(index, signal, violations)
+    _verify_open_issue_resolution(index, signal, context, violations)
     _verify_supersessions(index, signal, context, violations)
+
+
+def _verify_open_issue_resolution(
+    index: int,
+    signal: WorkSignal,
+    context: VerificationContext,
+    violations: list[Violation],
+) -> None:
+    """ADR 0044:只允許 ``no_match + add`` 或 ``exclude`` 關閉 JD-only issue。"""
+
+    ordinal = signal.resolves_open_issue_ordinal
+    if ordinal is None:
+        return
+    issue = context.open_issue(ordinal)
+    if issue is None:
+        _add(
+            violations,
+            ViolationCode.RESOLUTION_OPEN_ISSUE_UNKNOWN,
+            f"open issue ordinal {ordinal} is outside the packet",
+            index,
+        )
+        return
+    if issue.reconciliation_task_id is None:
+        _add(
+            violations,
+            ViolationCode.RESOLUTION_OPEN_ISSUE_NOT_RECONCILABLE,
+            f"open issue ordinal {ordinal} has no reconciliation task",
+            index,
+        )
+        return
+
+    change = signal.task_change
+    is_no_match_add = (
+        signal.disposition is SignalDisposition.TASK_CHANGE
+        and change is not None
+        and change.change is TaskChangeKind.ADD
+        and signal.identity.relation is IdentityRelation.NO_MATCH
+        and not signal.identity.target_task_ordinals
+        and not change.target_task_ordinals
+    )
+    is_exclusion = (
+        signal.disposition is SignalDisposition.EXCLUDE and signal.exclude is not None
+    )
+    if not (is_no_match_add or is_exclusion):
+        _add(
+            violations,
+            ViolationCode.RESOLUTION_MAPPING_INVALID,
+            "a reconciliation issue may only resolve through no_match + add or exclude",
+            index,
+        )
+
+
+def _verify_open_issues_are_resolved_once(
+    result: TaskAnalysisResult,
+    violations: list[Violation],
+) -> None:
+    seen: set[int] = set()
+    for index, signal in enumerate(result.work_signals):
+        ordinal = signal.resolves_open_issue_ordinal
+        if ordinal is None:
+            continue
+        if ordinal in seen:
+            _add(
+                violations,
+                ViolationCode.RESOLUTION_OPEN_ISSUE_REPEATED,
+                f"open issue ordinal {ordinal} is resolved more than once",
+                index,
+            )
+        seen.add(ordinal)
 
 
 def _verify_anchors(

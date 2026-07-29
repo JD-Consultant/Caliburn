@@ -127,6 +127,101 @@ def test_a_well_formed_result_passes():
     assert report.rejected_signal_indexes == frozenset()
 
 
+def test_no_match_add_may_resolve_a_reconciliation_open_issue():
+    ctx = context(
+        open_issues=(
+            PacketOpenIssue(
+                ordinal=1,
+                issue_id="issue-1",
+                reconciliation_task_id="task-direct-1",
+            ),
+        )
+    )
+
+    assert verify_task_analysis_result(
+        result(signal(resolves_open_issue_ordinal=1)), ctx
+    ).is_valid
+
+
+def test_exclude_may_resolve_a_reconciliation_open_issue():
+    ctx = context(
+        open_issues=(
+            PacketOpenIssue(
+                ordinal=1,
+                issue_id="issue-1",
+                reconciliation_task_id="task-direct-1",
+            ),
+        )
+    )
+    exclude = signal(
+        resolves_open_issue_ordinal=1,
+        disposition=SignalDisposition.EXCLUDE,
+        task_change=None,
+        exclude=ExcludePayload(
+            reason=ExclusionReason.ONE_OFF_SUPPORT,
+            summary="只代班過一次",
+        ),
+    )
+
+    assert verify_task_analysis_result(result(exclude), ctx).is_valid
+
+
+def test_open_issue_resolution_requires_a_known_reconciliation_issue():
+    unknown = signal(resolves_open_issue_ordinal=99)
+    non_reconciliation = signal(resolves_open_issue_ordinal=1)
+
+    assert ViolationCode.RESOLUTION_OPEN_ISSUE_UNKNOWN in codes(unknown)
+    assert ViolationCode.RESOLUTION_OPEN_ISSUE_NOT_RECONCILABLE in codes(
+        non_reconciliation
+    )
+
+
+def test_duplicate_or_overlap_cannot_silently_resolve_the_issue():
+    ctx = context(
+        open_issues=(
+            PacketOpenIssue(
+                ordinal=1,
+                issue_id="issue-1",
+                reconciliation_task_id="task-direct-1",
+            ),
+        )
+    )
+    duplicate = signal(
+        resolves_open_issue_ordinal=1,
+        identity=IdentityAssessment(
+            relation=IdentityRelation.DUPLICATE,
+            target_task_ordinals=(1,),
+        ),
+        disposition=SignalDisposition.SUPPORT_ONLY,
+        task_change=None,
+    )
+
+    assert ViolationCode.RESOLUTION_MAPPING_INVALID in verify_task_analysis_result(
+        result(duplicate), ctx
+    ).codes
+
+
+def test_same_open_issue_cannot_be_resolved_twice_in_one_result():
+    ctx = context(
+        open_issues=(
+            PacketOpenIssue(
+                ordinal=1,
+                issue_id="issue-1",
+                reconciliation_task_id="task-direct-1",
+            ),
+        )
+    )
+    first = signal(resolves_open_issue_ordinal=1)
+    second = signal(
+        resolves_open_issue_ordinal=1,
+        anchors=(anchor(quote="順便盯 request 3f0c-uuid 那張單"),),
+    )
+
+    assert ViolationCode.RESOLUTION_OPEN_ISSUE_REPEATED in verify_task_analysis_result(
+        result(first, second), ctx
+    ).codes
+
+
 def test_verifier_is_pure_and_repeatable():
     payload, ctx = result(), context()
     assert verify_task_analysis_result(payload, ctx) == verify_task_analysis_result(

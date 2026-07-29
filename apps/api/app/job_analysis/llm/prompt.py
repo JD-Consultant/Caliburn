@@ -72,6 +72,12 @@ Merge:兩個候選共享同一個 action 或 purpose;其中一方是另一方的
   supersession reference。新證據與某筆撤回衝突時,輸出 open_issue,不要自行復活它。
 - 只有當本次回合更正了某條既有依據時,才填 `supersedes_support_ordinals`,
   並且該回合必須出現在同一筆訊號的 `anchors` 裡。
+- packet 的 open issue 若顯示一筆員工直接新增但仍待分析的 Current JD Task,
+  只有兩種情況可填 `resolves_open_issue_ordinal`:確認它是新工作時用
+  `identity=no_match + task_change.add`;確認它不成立時用 `exclude`。
+- 如果它可能是既有 Task 的 `duplicate／overlap／uncertain`,保留 issue 並追問員工;
+  **不得自動換 ID 或 merge**,也不得填 `resolves_open_issue_ordinal`。
+- open issue 若顯示「等待員工決定」,不要重問或重送同一份提案。
 - `split` 的每個 child 以 `inherited_support_ordinals` 指明要沿用母 Task 的哪些有效
   support link；只選真正支持該 child 的依據，不得把母 Task 的全部依據無差別複製。
 - 一輪只問一個問題。短答要能接回 `active_question`,所以問題要問得具體。

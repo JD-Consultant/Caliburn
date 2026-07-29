@@ -102,6 +102,12 @@ def test_split_prompt_explains_child_specific_support_inheritance():
     assert "inherited_support_ordinals" in TASK_ANALYSIS_INSTRUCTIONS
 
 
+def test_prompt_does_not_auto_merge_a_partial_jd_task_with_a_possible_duplicate():
+    assert "resolves_open_issue_ordinal" in TASK_ANALYSIS_INSTRUCTIONS
+    assert "duplicate／overlap／uncertain" in TASK_ANALYSIS_INSTRUCTIONS
+    assert "不得自動換 ID 或 merge" in TASK_ANALYSIS_INSTRUCTIONS
+
+
 def test_result_enum_domains_are_frozen():
     assert {member.value for member in IdentityRelation} == {
         "no_match",

@@ -109,7 +109,18 @@
 
 ### Task 5: Final verification
 
-- [ ] Run all focused `test_job_analysis_*.py` files through PowerShell file expansion.
-- [ ] Run full API pytest and compare with the known baseline.
-- [ ] Run `git diff --check` and inspect `git status`.
-- [ ] Create a new reviewed milestone tag without moving the existing historical tag.
+- [x] Run all focused `test_job_analysis_*.py` files through PowerShell file expansion（210 passed）。
+- [x] Run full API pytest and compare with the known baseline（1377 passed／218 skipped／1 known
+  vNext CRLF raw-bytes hash failure；green-before == green-after）。
+- [x] Run `git diff --check` and inspect `git status`.
+- [x] Create a new reviewed milestone tag without moving the existing historical tag
+  （`task-analysis-core-v1-scripted-reviewed`）。
+
+## Final overdesign audit
+
+- 沒有 DB、route、Web、SaaS、tenant、登入、Graph／agent runtime、event sourcing 或 hash chain。
+- 沒有 semantic similarity、embedding dedupe、工具字典、provider registry 或 operation ledger。
+- 新增形狀只有 split child 明確選取既有 SupportLink 的最小 payload；其餘修正都落在既有
+  domain validator、deterministic verifier、transition 與薄 provider adapter。
+- 仍維持 in-memory scripted vertical；persistence、員工 Proposal 決策流程與 prompt 品質調校
+  依 living design 明確延後，未假裝已完成。

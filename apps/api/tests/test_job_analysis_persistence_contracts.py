@@ -142,21 +142,28 @@ def test_completed_turn_payload_requires_employee_then_consultant_roles():
 
 
 @pytest.mark.parametrize(
-    ("edit_kind", "after"),
+    ("edit_kind", "task_id", "after", "ordered_task_ids"),
     [
-        ("add", jd_task()),
-        ("edit", jd_task()),
-        ("reorder", jd_task()),
-        ("delete", None),
+        ("add", "task-1", jd_task(), ()),
+        ("edit", "task-1", jd_task(), ()),
+        ("reorder", None, None, ("task-2", "task-1")),
+        ("delete", "task-1", None, ()),
     ],
 )
-def test_direct_edit_payload_preserves_the_completed_value(edit_kind, after):
+def test_direct_edit_payload_preserves_the_completed_value(
+    edit_kind,
+    task_id,
+    after,
+    ordered_task_ids,
+):
     payload = DirectEditPayload(
         edit_kind=edit_kind,
-        task_id="task-1",
+        task_id=task_id,
         after=after,
+        ordered_task_ids=ordered_task_ids,
     )
     assert payload.after == after
+    assert payload.ordered_task_ids == ordered_task_ids
 
 
 def test_direct_edit_payload_rejects_an_impossible_kind_value_combination():
@@ -165,18 +172,35 @@ def test_direct_edit_payload_rejects_an_impossible_kind_value_combination():
             edit_kind="delete",
             task_id="task-1",
             after=jd_task(),
+            ordered_task_ids=(),
         )
     with pytest.raises(ValidationError, match="requires the completed task"):
         DirectEditPayload(
             edit_kind="edit",
             task_id="task-1",
             after=None,
+            ordered_task_ids=(),
         )
     with pytest.raises(ValidationError, match="task id"):
         DirectEditPayload(
             edit_kind="edit",
             task_id="task-1",
             after=jd_task("task-2"),
+            ordered_task_ids=(),
+        )
+    with pytest.raises(ValidationError, match="reorder"):
+        DirectEditPayload(
+            edit_kind="reorder",
+            task_id="task-1",
+            after=None,
+            ordered_task_ids=("task-1",),
+        )
+    with pytest.raises(ValidationError, match="distinct"):
+        DirectEditPayload(
+            edit_kind="reorder",
+            task_id=None,
+            after=None,
+            ordered_task_ids=("task-1", "task-1"),
         )
 
 
@@ -272,4 +296,3 @@ def test_uow_protocol_exposes_only_application_ports():
 
     assert {"documents", "tasks", "proposals", "journal"} <= set(annotations)
     assert "sqlalchemy" not in rendered
-

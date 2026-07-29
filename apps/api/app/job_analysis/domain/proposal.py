@@ -279,14 +279,24 @@ class Proposal(DomainModel):
         return self
 
     @model_validator(mode="after")
-    def staged_delta_only_for_cross_layer_topology(self):
-        """§10.4:只有 merge／split／JD 內 withdraw 才有 staged delta。"""
+    def staged_delta_matches_the_cross_layer_action(self):
+        """§10.4:merge／split／JD 內 withdraw **必須**帶非空 staged delta;其餘不得帶。
+
+        缺了它就能建立「改 JD、Work Model 卻沒有對應變更」的提案:`accepted`／`edited`
+        時 §9.6 要求兩層原子套用,但根本沒有第二層可套——JD 少了那條 Task,Work Model
+        裡的 Task 卻還 active 且毫髮無傷。非空由 `StagedWorkModelDelta` 自己保證。
+        """
         cross_layer = {
             ProposalAction.MERGE,
             ProposalAction.SPLIT,
             ProposalAction.WITHDRAW,
         }
-        if self.staged_work_model_delta is not None and self.action not in cross_layer:
+        if self.action in cross_layer:
+            if self.staged_work_model_delta is None:
+                raise ValueError(
+                    f"{self.action.value} proposal requires a staged work model delta"
+                )
+        elif self.staged_work_model_delta is not None:
             raise ValueError(
                 f"{self.action.value} proposal must not carry a staged work model delta"
             )

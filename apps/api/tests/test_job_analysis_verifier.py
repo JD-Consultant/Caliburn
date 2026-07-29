@@ -442,6 +442,69 @@ def test_unresolved_contradiction_requires_two_anchors():
     ).is_valid
 
 
+# ── §12.2 的組合一致性 ──────────────────────────────────────────────────────
+
+
+@pytest.mark.parametrize(
+    ("relation", "disposition", "change"),
+    [
+        (IdentityRelation.NO_MATCH, SignalDisposition.SUPPORT_ONLY, None),
+        (IdentityRelation.DUPLICATE, SignalDisposition.TASK_CHANGE, TaskChangeKind.ADD),
+        (
+            IdentityRelation.DUPLICATE,
+            SignalDisposition.TASK_CHANGE,
+            TaskChangeKind.REVISE,
+        ),
+    ],
+)
+def test_relation_must_match_the_mapping_table(relation, disposition, change):
+    """三者各自合法不代表組合合法:`duplicate` ＋ `add` 會憑既有 Task 的依據再造一個
+    重複 Task,`no_match` ＋ `support_only` 則把沒有對象的依據掛到空氣上。"""
+    targets = () if relation is IdentityRelation.NO_MATCH else (1,)
+    assert ViolationCode.RELATION_DOES_NOT_MATCH_MAPPING in codes(
+        signal(
+            identity=IdentityAssessment(
+                relation=relation, target_task_ordinals=targets
+            ),
+            disposition=disposition,
+            task_change=None
+            if change is None
+            else TaskChangePayload(
+                change=change, target_task_ordinals=targets, task_fields=fields()
+            ),
+        )
+    )
+
+
+def test_identity_and_task_change_must_agree_on_the_targets():
+    """`revise` 沿用該 task_id、`merge` 併的就是那幾個;兩組 target 不同,application
+    無從知道該信哪一組。"""
+    assert ViolationCode.TARGET_ORDINALS_DISAGREE in codes(
+        signal(
+            identity=IdentityAssessment(
+                relation=IdentityRelation.OVERLAP, target_task_ordinals=(1,)
+            ),
+            task_change=TaskChangePayload(
+                change=TaskChangeKind.REVISE,
+                target_task_ordinals=(2,),
+                task_fields=fields(),
+            ),
+        )
+    )
+    assert ViolationCode.TARGET_ORDINALS_DISAGREE in codes(
+        signal(
+            identity=IdentityAssessment(
+                relation=IdentityRelation.OVERLAP, target_task_ordinals=(1,)
+            ),
+            task_change=TaskChangePayload(
+                change=TaskChangeKind.MERGE,
+                target_task_ordinals=(1, 2),
+                task_fields=fields(),
+            ),
+        )
+    )
+
+
 # ── supersession(§12.3 末段)──────────────────────────────────────────────
 
 

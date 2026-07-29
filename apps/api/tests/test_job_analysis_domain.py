@@ -73,6 +73,42 @@ def jd(*pairs: tuple[str, str | None]) -> tuple[JdEntry, ...]:
     return tuple(JdEntry(task_id=task_id, content=content) for task_id, content in pairs)
 
 
+def merged_retirement() -> Retirement:
+    return Retirement(kind=RetirementKind.MERGED, source_ref=employee_ref())
+
+
+def merged_task(task_id: str, into: str) -> Task:
+    return make_task(task_id, merged_into=into, retirement=merged_retirement())
+
+
+def withdraw_delta(task_id: str = "task-1") -> StagedWorkModelDelta:
+    return StagedWorkModelDelta(
+        lineage_changes=(
+            StagedTaskLineage(
+                task_id=task_id,
+                retirement=Retirement(
+                    kind=RetirementKind.WITHDRAWN,
+                    reason=RetirementReason.EMPLOYEE_DENIED,
+                    source_ref=employee_ref(),
+                ),
+            ),
+        )
+    )
+
+
+def merge_delta() -> StagedWorkModelDelta:
+    return StagedWorkModelDelta(
+        new_tasks=(
+            StagedTask(
+                task_id="task-9",
+                fields=TaskFields(
+                    statement="合併後的工作", action="彙整", object="營運週報"
+                ),
+            ),
+        )
+    )
+
+
 # ── enum 值域(逐字對照凍結文件)────────────────────────────────────────────
 
 
@@ -240,17 +276,34 @@ def test_retired_or_reconciling_tasks_may_have_no_effective_support():
     assert make_task().state is TaskState.ACTIVE
 
 
-def test_retirement_wins_over_pending_reconciliation_in_the_derived_state():
-    task = make_task(
-        support_links=(support(superseded_by=employee_ref("turn-9")),),
-        pending_reconciliation=SourceRef(kind=SourceKind.DIRECT_EDIT, id="edit-2"),
-        retirement=Retirement(
-            kind=RetirementKind.WITHDRAWN,
-            reason=RetirementReason.ONE_OFF,
-            source_ref=employee_ref("turn-9"),
-        ),
-    )
-    assert task.state is TaskState.RETIRED
+def test_retired_task_may_not_also_be_pending_reconciliation():
+    """並存時推導狀態只會顯示 retired,那筆等著對齊的員工編輯就靜默消失。"""
+    with pytest.raises(ValidationError, match="not also be pending reconciliation"):
+        make_task(
+            support_links=(support(superseded_by=employee_ref("turn-9")),),
+            pending_reconciliation=SourceRef(kind=SourceKind.DIRECT_EDIT, id="edit-2"),
+            retirement=Retirement(
+                kind=RetirementKind.WITHDRAWN,
+                reason=RetirementReason.ONE_OFF,
+                source_ref=employee_ref("turn-9"),
+            ),
+        )
+
+
+def test_merged_into_requires_a_merged_retirement():
+    """`active` 卻帶 `merged_into` = 已併入別人還留在線上,同一件事會被提兩次。"""
+    with pytest.raises(ValidationError, match="merged_into requires a merged retirement"):
+        make_task(merged_into="task-9")
+    with pytest.raises(ValidationError, match="merged_into requires a merged retirement"):
+        make_task(
+            merged_into="task-9",
+            support_links=(support(superseded_by=employee_ref("turn-9")),),
+            retirement=Retirement(
+                kind=RetirementKind.WITHDRAWN,
+                reason=RetirementReason.ONE_OFF,
+                source_ref=employee_ref("turn-9"),
+            ),
+        )
 
 
 def test_optional_semantic_fields_default_to_none():
@@ -285,10 +338,16 @@ def test_blank_text_is_not_a_value(blank):
 # ── lineage(§9.5)──────────────────────────────────────────────────────────
 
 
-@pytest.mark.parametrize("field_name", ["merged_into", "split_from"])
-def test_task_lineage_may_not_point_at_itself(field_name):
+@pytest.mark.parametrize(
+    "overrides",
+    [
+        {"merged_into": "task-1", "retirement": merged_retirement()},
+        {"split_from": "task-1"},
+    ],
+)
+def test_task_lineage_may_not_point_at_itself(overrides):
     with pytest.raises(ValidationError, match="itself"):
-        make_task(**{field_name: "task-1"})
+        make_task(**overrides)
 
 
 def test_lineage_targets_must_exist_in_the_work_model():
@@ -297,27 +356,23 @@ def test_lineage_targets_must_exist_in_the_work_model():
 
 
 def test_two_task_lineage_cycle_is_rejected():
-    first = make_task("task-1", merged_into="task-2")
-    second = make_task("task-2", merged_into="task-1")
     with pytest.raises(ValidationError, match="lineage cycle"):
-        CurrentWorkModel(tasks=(first, second))
+        CurrentWorkModel(
+            tasks=(merged_task("task-1", "task-2"), merged_task("task-2", "task-1"))
+        )
 
 
 def test_longer_lineage_cycle_across_both_edge_kinds_is_rejected():
-    first = make_task("task-1", merged_into="task-2")
+    first = merged_task("task-1", "task-2")
     second = make_task("task-2", split_from="task-3")
-    third = make_task("task-3", merged_into="task-1")
+    third = merged_task("task-3", "task-1")
     with pytest.raises(ValidationError, match="lineage cycle"):
         CurrentWorkModel(tasks=(first, second, third))
 
 
 def test_acyclic_lineage_chain_is_accepted():
     survivor = make_task("task-3")
-    merged = make_task(
-        "task-1",
-        merged_into="task-3",
-        retirement=Retirement(kind=RetirementKind.MERGED, source_ref=employee_ref()),
-    )
+    merged = merged_task("task-1", "task-3")
     child = make_task("task-2", split_from="task-3")
     model = CurrentWorkModel(tasks=(merged, child, survivor))
     assert model.task_by_id("task-1") is merged
@@ -458,9 +513,7 @@ def test_staged_delta_is_only_for_cross_layer_topology():
         lineage_changes=(
             StagedTaskLineage(
                 task_id="task-1",
-                retirement=Retirement(
-                    kind=RetirementKind.MERGED, source_ref=employee_ref()
-                ),
+                retirement=merged_retirement(),
                 merged_into="task-9",
             ),
         )
@@ -473,19 +526,44 @@ def test_staged_delta_is_only_for_cross_layer_topology():
         target=MergeTarget(new_task_id="task-9", member_task_ids=("task-1", "task-2")),
         jd_before=jd(("task-1", "a"), ("task-2", "b"), ("task-9", None)),
         jd_after=jd(("task-1", None), ("task-2", None), ("task-9", "合併後")),
-        staged_work_model_delta=StagedWorkModelDelta(
-            new_tasks=(
-                StagedTask(
-                    task_id="task-9",
-                    fields=TaskFields(
-                        statement="合併後的工作", action="彙整", object="營運週報"
-                    ),
-                ),
-            )
-        ),
+        staged_work_model_delta=merge_delta(),
     )
     assert merge.action is ProposalAction.MERGE
     assert merge.affected_task_ids == ("task-9", "task-1", "task-2")
+
+
+@pytest.mark.parametrize(
+    ("target", "jd_before", "jd_after"),
+    [
+        (
+            MergeTarget(new_task_id="task-9", member_task_ids=("task-1", "task-2")),
+            jd(("task-1", "a"), ("task-2", "b"), ("task-9", None)),
+            jd(("task-1", None), ("task-2", None), ("task-9", "合併後")),
+        ),
+        (
+            SplitTarget(parent_task_id="task-1", child_task_ids=("task-8", "task-9")),
+            jd(("task-1", "a"), ("task-8", None), ("task-9", None)),
+            jd(("task-1", None), ("task-8", "子一"), ("task-9", "子二")),
+        ),
+        (
+            SingleTaskTarget(action=ProposalAction.WITHDRAW, task_id="task-1"),
+            jd(("task-1", "a")),
+            jd(("task-1", None)),
+        ),
+    ],
+)
+def test_cross_layer_topology_proposals_require_a_staged_delta(
+    target, jd_before, jd_after
+):
+    """§9.6／§10.4:`accepted`／`edited` 要兩層原子套用,少了 delta 就只改得動 JD——
+    Task 從 JD 消失,Work Model 裡卻還 active 且毫髮無傷。"""
+    with pytest.raises(ValidationError, match="requires a staged work model delta"):
+        Proposal(
+            proposal_id="prop-2",
+            target=target,
+            jd_before=jd_before,
+            jd_after=jd_after,
+        )
 
 
 def test_empty_staged_delta_is_rejected():
@@ -523,6 +601,7 @@ def test_edited_may_not_move_a_null_position():
         "target": SingleTaskTarget(action=ProposalAction.WITHDRAW, task_id="task-1"),
         "jd_before": jd(("task-1", "舊文字")),
         "jd_after": jd(("task-1", None)),
+        "staged_work_model_delta": withdraw_delta(),
     }
     with pytest.raises(ValidationError, match="keep the null position"):
         edited_proposal(jd(("task-1", "員工想留著")), **withdraw)
@@ -571,6 +650,7 @@ def test_revision_request_requires_an_exclusion_from_its_own_members():
     merge_jd = {
         "jd_before": jd(("task-1", "a"), ("task-2", "b"), ("task-9", None)),
         "jd_after": jd(("task-1", None), ("task-2", None), ("task-9", "合併後")),
+        "staged_work_model_delta": merge_delta(),
     }
     with pytest.raises(ValidationError, match="requires at least one exclusion"):
         Proposal(
@@ -616,6 +696,7 @@ def test_exclusion_lists_belong_to_revision_requested_only():
             excluded_member_task_ids=("task-2",),
             jd_before=jd(("task-1", "a"), ("task-2", "b"), ("task-9", None)),
             jd_after=jd(("task-1", None), ("task-2", None), ("task-9", "合併後")),
+            staged_work_model_delta=merge_delta(),
         )
 
 

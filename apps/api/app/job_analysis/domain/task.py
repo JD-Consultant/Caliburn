@@ -105,14 +105,34 @@ class Task(TaskFields):
         return tuple(link for link in self.support_links if link.is_effective)
 
     @model_validator(mode="after")
-    def merged_requires_merged_into(self):
-        """§9.5:``retirement.kind == merged`` → ``merged_into`` 必填。"""
-        if (
+    def merged_into_pairs_with_a_merged_retirement(self):
+        """§9.5:``retirement.kind == merged`` → ``merged_into`` 必填,且只有它會有。
+
+        反向也要鎖:`active` Task 帶著 `merged_into` 表示「已併入別人卻仍在線上」,
+        兩邊都會被當成現況產生提案,員工看到同一件事出現兩次。
+        """
+        merged = (
             self.retirement is not None
             and self.retirement.kind is RetirementKind.MERGED
-            and self.merged_into is None
-        ):
+        )
+        if merged and self.merged_into is None:
             raise ValueError("merged retirement requires merged_into")
+        if self.merged_into is not None and not merged:
+            raise ValueError("merged_into requires a merged retirement")
+        return self
+
+    @model_validator(mode="after")
+    def retirement_and_pending_reconciliation_are_exclusive(self):
+        """§9.2:兩者並存的 Task 沒有意義。
+
+        `pending_reconciliation` 是「等著和 Current JD 重新對齊」的觸發器,retired 的
+        Task 不會再被對齊;放任並存,推導狀態只會顯示 retired,那筆待對齊的來源就靜默
+        消失——而它正是員工剛做的編輯或更正。
+        """
+        if self.retirement is not None and self.pending_reconciliation is not None:
+            raise ValueError(
+                "a retired task must not also be pending reconciliation"
+            )
         return self
 
     @model_validator(mode="after")

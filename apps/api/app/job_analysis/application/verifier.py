@@ -164,6 +164,8 @@ class ViolationCode(StrEnum):
     IDENTITY_TARGETS_NOT_EMPTY = "identity_targets_not_empty"
     IDENTITY_TARGETS_MISSING = "identity_targets_missing"
     PAYLOAD_DOES_NOT_MATCH_DISPOSITION = "payload_does_not_match_disposition"
+    RELATION_DOES_NOT_MATCH_MAPPING = "relation_does_not_match_mapping"
+    TARGET_ORDINALS_DISAGREE = "target_ordinals_disagree"
     TASK_CHANGE_TARGET_COUNT = "task_change_target_count"
     TASK_FIELDS_REQUIRED = "task_fields_required"
     TASK_FIELDS_FORBIDDEN = "task_fields_forbidden"
@@ -236,6 +238,7 @@ def _verify_signal(
     _verify_anchors(index, signal, context, violations)
     _verify_identity(index, signal, context, violations)
     _verify_payload_matches_disposition(index, signal, violations)
+    _verify_mapping_combination(index, signal, violations)
     _verify_task_change(index, signal, context, violations)
     _verify_open_issue(index, signal, violations)
     _verify_supersessions(index, signal, context, violations)
@@ -376,6 +379,66 @@ def _verify_payload_matches_disposition(
                 f"{signal.disposition.value} requires a {field} payload",
                 index,
             )
+
+
+#: §12.2 的 relation × disposition 對照中,relation 被唯一決定的那幾格。
+#: `withdraw`／`split`／`exclude`／`open_issue` 在表中寫的是「任一 relation」,不收緊。
+_REQUIRED_RELATION_BY_DISPOSITION = {
+    SignalDisposition.SUPPORT_ONLY: IdentityRelation.DUPLICATE,
+}
+_REQUIRED_RELATION_BY_CHANGE = {
+    TaskChangeKind.ADD: IdentityRelation.NO_MATCH,
+    TaskChangeKind.REVISE: IdentityRelation.OVERLAP,
+    TaskChangeKind.MERGE: IdentityRelation.OVERLAP,
+}
+#: 這兩格的 mapping 明寫「沿用該 task_id」／「merge 候選」,identity 認的是哪些 Task,
+#: 改的就必須是那些 Task;兩組 target 不同,application 無從知道該信哪一組。
+_CHANGES_SHARING_IDENTITY_TARGETS = frozenset(
+    {TaskChangeKind.REVISE, TaskChangeKind.MERGE}
+)
+
+
+def _verify_mapping_combination(
+    index: int, signal: WorkSignal, violations: list[Violation]
+) -> None:
+    """§12.2:relation × disposition 的組合必須落在對照表上。
+
+    三者各自合法不代表組合合法——`duplicate` ＋ `add` 會憑一筆已知 Task 的依據再造一個
+    重複 Task,`no_match` ＋ `support_only` 則會把一筆沒有對象的依據掛到空氣上。
+    """
+    relation = signal.identity.relation
+    required = _REQUIRED_RELATION_BY_DISPOSITION.get(signal.disposition)
+    if required is not None and relation is not required:
+        _add(
+            violations,
+            ViolationCode.RELATION_DOES_NOT_MATCH_MAPPING,
+            f"{signal.disposition.value} requires relation {required.value}, "
+            f"got {relation.value}",
+            index,
+        )
+
+    change = signal.task_change
+    if change is None:
+        return
+    required = _REQUIRED_RELATION_BY_CHANGE.get(change.change)
+    if required is not None and relation is not required:
+        _add(
+            violations,
+            ViolationCode.RELATION_DOES_NOT_MATCH_MAPPING,
+            f"{change.change.value} requires relation {required.value}, "
+            f"got {relation.value}",
+            index,
+        )
+    if change.change in _CHANGES_SHARING_IDENTITY_TARGETS and set(
+        change.target_task_ordinals
+    ) != set(signal.identity.target_task_ordinals):
+        _add(
+            violations,
+            ViolationCode.TARGET_ORDINALS_DISAGREE,
+            f"{change.change.value} targets {sorted(set(change.target_task_ordinals))} "
+            f"but identity matched {sorted(set(signal.identity.target_task_ordinals))}",
+            index,
+        )
 
 
 #: §12.2 mapping 的 target 數量;寫成表格,讓「哪個 change 收幾個 target」只有一處權威。

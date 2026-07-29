@@ -180,6 +180,7 @@ class ViolationCode(StrEnum):
     SUPERSESSION_TASK_NOT_TARGETED = "supersession_task_not_targeted"
     SUPERSESSION_MISSING_CURRENT_TURN_ANCHOR = "supersession_missing_current_turn_anchor"
     DUPLICATE_TASK_CHANGE_TARGET = "duplicate_task_change_target"
+    DUPLICATE_WORK_SIGNAL = "duplicate_work_signal"
 
 
 class Violation(DomainModel):
@@ -219,6 +220,7 @@ def verify_task_analysis_result(
     for index, signal in enumerate(result.work_signals):
         _verify_signal(index, signal, context, violations)
     _verify_task_change_targets_are_claimed_once(result, violations)
+    _verify_work_signals_are_not_exact_duplicates(result, violations)
     _verify_next_question(result, context, violations)
     return VerificationReport(violations=tuple(violations))
 
@@ -660,6 +662,25 @@ def _verify_task_change_targets_are_claimed_once(
                 ViolationCode.DUPLICATE_TASK_CHANGE_TARGET,
                 f"task ordinal {ordinal} is claimed by task_change signals "
                 f"{indexes}",
+                index,
+            )
+
+
+def _verify_work_signals_are_not_exact_duplicates(
+    result: TaskAnalysisResult, violations: list[Violation]
+) -> None:
+    """只拒絕逐欄完全相同的 signal；不做文字相似度或語意猜測。"""
+    groups: dict[str, list[int]] = {}
+    for index, signal in enumerate(result.work_signals):
+        groups.setdefault(signal.model_dump_json(), []).append(index)
+    for indexes in groups.values():
+        if len(indexes) < 2:
+            continue
+        for index in indexes:
+            _add(
+                violations,
+                ViolationCode.DUPLICATE_WORK_SIGNAL,
+                f"work signal is an exact duplicate of signal(s) {indexes}",
                 index,
             )
 

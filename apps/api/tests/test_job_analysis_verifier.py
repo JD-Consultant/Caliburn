@@ -677,6 +677,15 @@ def test_two_task_changes_claiming_the_same_target_are_both_rejected():
     assert report.rejected_signal_indexes == {0, 1}
 
 
+def test_exact_duplicate_work_signals_are_both_rejected():
+    duplicate = signal()
+
+    report = verify_task_analysis_result(result(duplicate, duplicate), context())
+
+    assert ViolationCode.DUPLICATE_WORK_SIGNAL in report.codes
+    assert report.rejected_signal_indexes == {0, 1}
+
+
 def test_split_child_may_only_inherit_an_effective_support_on_its_parent():
     split = signal(
         identity=IdentityAssessment(

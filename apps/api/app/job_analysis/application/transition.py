@@ -19,7 +19,7 @@ from __future__ import annotations
 
 from enum import StrEnum
 
-from pydantic import ValidationError
+from pydantic import ValidationError, model_validator
 
 from app.job_analysis.domain import (
     CurrentWorkModel,
@@ -66,6 +66,18 @@ class JobAnalysisState(DomainModel):
     work_model: CurrentWorkModel = CurrentWorkModel()
     current_jd: tuple[JdEntry, ...] = ()
     proposals: tuple[Proposal, ...] = ()
+
+    @model_validator(mode="after")
+    def ids_are_unique_and_jd_is_canonical(self):
+        jd_ids = [entry.task_id for entry in self.current_jd]
+        if len(set(jd_ids)) != len(jd_ids):
+            raise ValueError("duplicate current JD task ids")
+        if jd_ids != sorted(jd_ids):
+            raise ValueError("current JD must be sorted by task id")
+        proposal_ids = [proposal.proposal_id for proposal in self.proposals]
+        if len(set(proposal_ids)) != len(proposal_ids):
+            raise ValueError("duplicate proposal ids")
+        return self
 
     @property
     def current_jd_task_ids(self) -> frozenset[TaskId]:
@@ -119,7 +131,7 @@ def apply_task_analysis_result(
         for index, signal in enumerate(result.work_signals):
             writer.apply_signal(index, signal)
         return writer.finish()
-    except _TransitionRejected as rejection:
+    except (_TransitionRejected, ValidationError) as rejection:
         return _rejected(state, str(rejection))
 
 
@@ -151,6 +163,7 @@ class _Writer:
         self._created: list[Identifier] = []
         self._staled: list[Identifier] = []
         self._touched: set[TaskId] = set()
+        self._materially_reanalysed: set[TaskId] = set()
 
     # ── 解析 ────────────────────────────────────────────────────────────────
 
@@ -186,6 +199,12 @@ class _Writer:
         return tuple(
             SupportLink(**anchor.model_dump()) for anchor in self._anchors(signal)
         )
+
+    def _retirement_source(self, signal: WorkSignal) -> SourceRef:
+        """選模型實際引用的最新員工回合，不把無關 current turn 寫成來源。"""
+        anchor = max(signal.anchors, key=lambda candidate: candidate.turn_ordinal)
+        turn_id = self._packet.turn_view(anchor.turn_ordinal).turn.turn_id
+        return SourceRef(kind=SourceKind.EMPLOYEE_TURN, id=turn_id)
 
     @staticmethod
     def _unique_support_links(
@@ -299,14 +318,15 @@ class _Writer:
     def _add(self, index: int, signal: WorkSignal) -> None:
         """`add` 不碰任何既有 identity:一律立即建立候選;要不要進 JD 是後續的事。"""
         task_id = f"{self._operation_id}-t{index}"
-        self._replace(
+        inserted = self._insert(
             Task(
                 task_id=task_id,
                 **dict(signal.task_change.task_fields),
                 support_links=self._support_links(signal),
             )
         )
-        self._immediate.append(task_id)
+        if inserted:
+            self._immediate.append(task_id)
 
     def _revise(self, index: int, signal: WorkSignal, task_id: TaskId) -> None:
         """同 ID revise:Work Model 立即更新(topology delta 為空);JD 文字要跟著改才提案。"""
@@ -323,6 +343,7 @@ class _Writer:
                 }
             )
         )
+        self._materially_reanalysed.add(task_id)
         self._immediate.append(task_id)
         jd_content = self._jd.get(task_id)
         if jd_content is not None and jd_content != fields.statement:
@@ -339,7 +360,7 @@ class _Writer:
             # 「其實是同事做的」「那是去年的事」「只代班過一次」而被推翻,寫死一種就是
             # 把撤回理由寫成假的。source_ref 記下是哪一個回合說的。
             reason=signal.task_change.withdraw_reason,
-            source_ref=SourceRef(kind=SourceKind.EMPLOYEE_TURN, id=self._current_turn_id),
+            source_ref=self._retirement_source(signal),
         )
         if self._gate_is_open([task_id]):
             self._replace(
@@ -370,10 +391,10 @@ class _Writer:
         support_links = self._merge_support_links(members, signal)
         retirement = Retirement(
             kind=RetirementKind.MERGED,
-            source_ref=SourceRef(kind=SourceKind.EMPLOYEE_TURN, id=self._current_turn_id),
+            source_ref=self._retirement_source(signal),
         )
         if self._gate_is_open(members):
-            self._replace(
+            self._insert(
                 Task(
                     task_id=new_task_id,
                     **dict(fields),
@@ -417,14 +438,14 @@ class _Writer:
         child_ids = [f"{self._operation_id}-s{index}-{n}" for n in range(len(children))]
         retirement = Retirement(
             kind=RetirementKind.SPLIT,
-            source_ref=SourceRef(kind=SourceKind.EMPLOYEE_TURN, id=self._current_turn_id),
+            source_ref=self._retirement_source(signal),
         )
         if self._gate_is_open([parent_id]):
             for child_id, child in zip(child_ids, children):
                 support_links = self._split_support_links(
                     parent_id, child.inherited_support_ordinals, signal
                 )
-                self._replace(
+                self._insert(
                     Task(
                         task_id=child_id,
                         **dict(child.task_fields),
@@ -492,7 +513,8 @@ class _Writer:
             ),
             staged_work_model_delta=delta,
         )
-        self._proposals[proposal.proposal_id] = proposal
+        if not self._insert_proposal(proposal):
+            return
         self._created.append(proposal.proposal_id)
         self._stale_superseded_proposals(proposal)
 
@@ -543,14 +565,58 @@ class _Writer:
             )
             self._staled.append(proposal_id)
 
+    def _stale_proposals_for_reanalysed_tasks(self) -> None:
+        """最新分析已確認 Task 內容、但沒產生 replacement 時仍要關閉舊提案。"""
+        if not self._materially_reanalysed:
+            return
+        for proposal_id, proposal in list(self._proposals.items()):
+            if proposal_id in self._created:
+                continue
+            if proposal.status not in {ProposalStatus.PENDING, ProposalStatus.DEFERRED}:
+                continue
+            if not self._materially_reanalysed & set(proposal.affected_task_ids):
+                continue
+            self._proposals[proposal_id] = proposal.model_copy(
+                update={
+                    "status": ProposalStatus.STALE,
+                    "stale_reason": "這項工作已由較新的分析確認為目前內容,舊提案不再適用。",
+                }
+            )
+            self._staled.append(proposal_id)
+
     # ── 收尾 ────────────────────────────────────────────────────────────────
 
     def _replace(self, task: Task) -> None:
         self._tasks[task.task_id] = task
         self._touched.add(task.task_id)
 
+    def _insert(self, task: Task) -> bool:
+        existing = self._tasks.get(task.task_id)
+        if existing is None:
+            self._tasks[task.task_id] = task
+            self._touched.add(task.task_id)
+            return True
+        if existing != task:
+            raise _TransitionRejected(
+                f"task id collision for {task.task_id!r}; existing content differs"
+            )
+        return False
+
+    def _insert_proposal(self, proposal: Proposal) -> bool:
+        existing = self._proposals.get(proposal.proposal_id)
+        if existing is None:
+            self._proposals[proposal.proposal_id] = proposal
+            return True
+        if existing != proposal:
+            raise _TransitionRejected(
+                f"proposal id collision for {proposal.proposal_id!r}; "
+                "existing content differs"
+            )
+        return False
+
     def finish(self) -> TransitionResult:
         self._stale_proposals_for_unstable_tasks()
+        self._stale_proposals_for_reanalysed_tasks()
         try:
             # model_copy 疊改不驗證,所以這裡逐筆 revalidate:§9.5 的「active Task 至少
             # 一條有效 SupportLink」在此執行,三個出口之一沒被走到就會整筆拒絕。

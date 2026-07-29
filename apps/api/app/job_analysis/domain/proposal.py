@@ -210,6 +210,16 @@ class StagedWorkModelDelta(DomainModel):
             raise ValueError("staged work model delta must not be empty")
         return self
 
+    @model_validator(mode="after")
+    def task_ids_are_unique_within_each_collection(self):
+        lineage_ids = [change.task_id for change in self.lineage_changes]
+        if len(set(lineage_ids)) != len(lineage_ids):
+            raise ValueError("staged delta has duplicate lineage task ids")
+        new_task_ids = [task.task_id for task in self.new_tasks]
+        if len(set(new_task_ids)) != len(new_task_ids):
+            raise ValueError("staged delta has duplicate new task ids")
+        return self
+
 
 # ── revision request 的解析結果(§10.7)───────────────────────────────────────
 
@@ -343,6 +353,10 @@ class Proposal(DomainModel):
                 and change.retirement.kind is RetirementKind.WITHDRAWN,
                 "withdraw delta must carry a withdrawn retirement",
             )
+            require(
+                change.merged_into is None and change.split_from is None,
+                "withdraw delta must not carry merge or split lineage",
+            )
         elif self.action is ProposalAction.MERGE:
             require(
                 set(lineage) == set(self.target.member_task_ids),
@@ -359,6 +373,10 @@ class Proposal(DomainModel):
                     and change.merged_into == self.target.new_task_id,
                     "every merge member must be merged into the surviving task",
                 )
+                require(
+                    change.split_from is None,
+                    "merge member must not carry split lineage",
+                )
         elif self.action is ProposalAction.SPLIT:
             parent = self.target.parent_task_id
             children = set(self.target.child_task_ids)
@@ -373,9 +391,16 @@ class Proposal(DomainModel):
                 and parent_change.retirement.kind is RetirementKind.SPLIT,
                 "split delta must retire the parent as split",
             )
+            require(
+                parent_change.merged_into is None
+                and parent_change.split_from is None,
+                "split parent must not carry merge or child lineage",
+            )
             for child in children:
                 require(
-                    lineage[child].split_from == parent,
+                    lineage[child].retirement is None
+                    and lineage[child].merged_into is None
+                    and lineage[child].split_from == parent,
                     "every split child must record its parent",
                 )
         return self

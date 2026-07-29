@@ -8,6 +8,7 @@ merge 成員全不在 JD 立即套用、任一成員在 JD 建立 Proposal、`ac
 from __future__ import annotations
 
 import pytest
+from pydantic import ValidationError
 
 from app.job_analysis.application import (
     ConversationTurn,
@@ -134,11 +135,17 @@ def change_signal(change: TaskChangeKind, targets: tuple[int, ...], **overrides)
     )
 
 
-def apply(*signals: WorkSignal, current: JobAnalysisState | None = None, operation_id="op-1"):
+def apply(
+    *signals: WorkSignal,
+    current: JobAnalysisState | None = None,
+    operation_id="op-1",
+    transcript=TRANSCRIPT,
+    current_turn_id="turn-2",
+):
     current = current or state()
     packet = build_context_packet(
-        transcript=TRANSCRIPT,
-        current_turn_id="turn-2",
+        transcript=transcript,
+        current_turn_id=current_turn_id,
         work_model=current.work_model,
         current_jd=current.current_jd,
         proposals=current.proposals,
@@ -241,6 +248,28 @@ def test_withdraw_outside_the_jd_retires_immediately_with_the_reason_the_model_g
     assert retired.retirement.kind is RetirementKind.WITHDRAWN
     assert retired.retirement.reason is RetirementReason.ONE_OFF
     assert retired.retirement.source_ref.id == "turn-2"
+
+
+def test_retirement_source_is_an_anchor_the_model_actually_used():
+    transcript = (
+        *TRANSCRIPT,
+        ConversationTurn(
+            turn_id="turn-3",
+            speaker=TurnSpeaker.EMPLOYEE,
+            text="另外我今天只是來補充別件事",
+        ),
+    )
+
+    outcome = apply(
+        change_signal(TaskChangeKind.WITHDRAW, (2,)),
+        transcript=transcript,
+        current_turn_id="turn-3",
+    )
+
+    assert (
+        outcome.state.work_model.task_by_id("task-2").retirement.source_ref.id
+        == "turn-2"
+    )
 
 
 def test_withdraw_inside_the_jd_goes_through_a_proposal():
@@ -509,6 +538,23 @@ def test_a_pending_proposal_goes_stale_when_its_task_is_retired_this_round():
     assert outcome.created_proposal_ids == ()
 
 
+def test_reanalysis_closes_an_old_proposal_even_without_a_replacement():
+    outcome = apply(
+        change_signal(
+            TaskChangeKind.REVISE,
+            (1,),
+            payload={"task_fields": fields("每週彙整營運週報")},
+        ),
+        current=state(jd=IN_JD, proposals=(existing_withdraw_proposal(),)),
+    )
+
+    assert outcome.created_proposal_ids == ()
+    assert outcome.staled_proposal_ids == ("prop-old",)
+    stale = next(p for p in outcome.state.proposals if p.proposal_id == "prop-old")
+    assert stale.status is ProposalStatus.STALE
+    assert stale.stale_reason
+
+
 # ── 寫入權威與冪等 ──────────────────────────────────────────────────────────
 
 
@@ -530,6 +576,38 @@ def test_id_allocation_is_deterministic_for_the_same_operation_and_state():
     second = apply(signal())
     assert first.state == second.state
     assert first.immediate_task_ids == second.immediate_task_ids == ("op-1-t0",)
+
+
+def test_operation_id_collision_never_overwrites_a_different_task():
+    existing = task("op-1-t0", "既有且不同的工作")
+    before = JobAnalysisState(work_model=CurrentWorkModel(tasks=(existing,)))
+
+    outcome = apply(signal(), current=before, operation_id="op-1")
+
+    assert outcome.outcome is TransitionOutcome.REJECTED
+    assert outcome.state == before
+    assert "collision" in outcome.detail
+
+
+def test_state_rejects_duplicate_jd_and_proposal_ids():
+    duplicate_jd = (
+        JdEntry(task_id="task-1", content="版本一"),
+        JdEntry(task_id="task-1", content="版本二"),
+    )
+    with pytest.raises(ValidationError, match="duplicate current JD task ids"):
+        JobAnalysisState(current_jd=duplicate_jd)
+
+    duplicate = existing_withdraw_proposal()
+    with pytest.raises(ValidationError, match="duplicate proposal ids"):
+        JobAnalysisState(proposals=(duplicate, duplicate))
+
+    with pytest.raises(ValidationError, match="current JD must be sorted"):
+        JobAnalysisState(
+            current_jd=(
+                JdEntry(task_id="task-2", content="二"),
+                JdEntry(task_id="task-1", content="一"),
+            )
+        )
 
 
 @pytest.mark.parametrize("operation_id", ["op-1", "op-2"])

@@ -61,6 +61,44 @@ async def postgres_session_factory(require_postgres):
         await engine.dispose()
 
 
+# ── greenfield job-analysis PostgreSQL fixtures（ADR 0043）────────────────
+
+
+@pytest.fixture
+def job_analysis_document_id() -> UUID:
+    return uuid4()
+
+
+@pytest_asyncio.fixture
+async def cleanup_job_analysis_rows(
+    postgres_session_factory,
+    job_analysis_document_id: UUID,
+):
+    """只清一份新 document；不依賴 tenant，也不碰舊 authoring/vNext cleanup。"""
+    yield job_analysis_document_id
+    async with postgres_session_factory() as session:
+        exists = await session.scalar(text(
+            "SELECT EXISTS ("
+            " SELECT 1 FROM information_schema.tables"
+            " WHERE table_schema = 'public'"
+            " AND table_name = 'job_analysis_documents'"
+            ")"
+        ))
+        if exists:
+            params = {"document_id": str(job_analysis_document_id)}
+            for table in (
+                "job_analysis_journal",
+                "job_analysis_proposals",
+                "job_analysis_jd_tasks",
+                "job_analysis_documents",
+            ):
+                await session.execute(
+                    text(f"DELETE FROM {table} WHERE document_id = :document_id"),  # noqa: S608
+                    params,
+                )
+            await session.commit()
+
+
 @dataclass(frozen=True)
 class VNextIds:
     """每 case 唯一的 vNext identity；tenant_id 獨立產生，絕不拿 user_id 充當。"""

@@ -265,12 +265,12 @@ git commit -m "feat(job-analysis): define persistence ports"
 所有 constraint/index 名稱以 `ja2_` 開頭，避免與 0011 舊表混淆。`ON DELETE CASCADE` 只用於同一新 document
 內的三張 child tables。
 
-- [ ] **Step 1: 寫 migration introspection 失敗測試**
+- [x] **Step 1: 寫 migration introspection 失敗測試**
 
 測 upgrade `0011 → 0012`、四表 columns/PK/FK/UNIQUE/CHECK/index、downgrade 回 0011 後舊
 `job_authoring_*` 仍存在、新表消失、Alembic single head 為 0012。
 
-- [ ] **Step 2: 確認 migration test 先紅**
+- [x] **Step 2: 確認 migration test 先紅**
 
 ```powershell
 cd apps/api
@@ -279,23 +279,23 @@ uv run pytest tests/test_job_analysis_migration.py -q
 
 Expected: revision `0012` 不存在。
 
-- [ ] **Step 3: 建 migration 與 models**
+- [x] **Step 3: 建 migration 與 models**
 
 只使用 PostgreSQL 16 已有 JSONB、identity、FK、UNIQUE、CHECK、index。不得建 trigger、RLS、tenant 欄位、
 revision table 或舊資料 INSERT/SELECT。
 
-- [ ] **Step 4: 增加 document-scoped cleanup**
+- [x] **Step 4: 增加 document-scoped cleanup**
 
 在 `tests/conftest.py` 新增獨立 `job_analysis_document_id` 與 cleanup fixture，依
 Journal → Proposal → JD Task → Document 反向刪除；不得把它塞進舊 tenant-scoped vNext cleanup。
 
-- [ ] **Step 5: 跑 migration tests**
+- [x] **Step 5: 跑 migration tests**
 
 ```powershell
 uv run pytest tests/test_job_analysis_migration.py tests/test_interview_vnext_migration.py -q
 ```
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```powershell
 git add apps/api/alembic apps/api/app/adapters/job_analysis_postgres apps/api/tests/conftest.py apps/api/tests/test_job_analysis_migration.py apps/api/tests/test_interview_vnext_migration.py

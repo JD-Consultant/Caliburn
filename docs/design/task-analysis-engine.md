@@ -34,7 +34,7 @@ OpenRouter 拿 `TaskAnalysisResult.v1` → **verifier**(純函式、零 LLM)擋�
 | assembler | 現況 → `TaskAnalysisPacket` ＋ 決定性 rendering | `application/context.py` | 純函式;ordinal 的唯一產地 |
 | verifier | §9.5／§12.3 的全部確定性規則 | `application/verifier.py` | 純函式;**只回報違規,不改任何東西** |
 | operation | 組 packet → 呼叫 → parse → verifier | `application/operation.py` | 單一顯式流程;**不是 agent runner**,無 retry |
-| provider | 最小 OpenRouter Chat adapter | `providers/openrouter.py` | 一次 HTTP;typed 失敗;**只收 render 過的文字** |
+| provider | 最小 OpenRouter Chat adapter | `providers/openrouter.py` | 一次 HTTP;固定 `reasoning=high` 且不回傳 reasoning;成功內容必須由 response `model` 證明來自 exact configured model;typed 失敗;**只收 render 過的文字** |
 | transition | 結果 → Work Model 變更 ＋ Proposal | `application/transition.py` | **唯一寫入者**;全有或全無 |
 
 ## 3. 一輪的資料流(每步標函式)
@@ -57,7 +57,7 @@ OpenRouter 拿 `TaskAnalysisResult.v1` → **verifier**(純函式、零 LLM)擋�
 | `rejected` | parse 得出來但違反確定性規則 | 不得套用;`report.violations` 有逐條理由 |
 | `invalid_output` | 不是合法的 `TaskAnalysisResult.v1` JSON | 重組 context 再來,不是 retry 同一份 |
 | `refused` | 模型拒答 | **不是錯誤,也不可重試** |
-| `failed` | timeout／連線／非 200／provider error／截斷 | 依 `detail` 的 kind 決定,`truncated` 要調 `max_tokens` |
+| `failed` | timeout／連線／非 200／provider error／截斷／response model 不符 | 依 `detail` 的 kind 決定；`truncated` 要調 `max_tokens`，`model_mismatch` 不得拿來判斷產品品質 |
 
 ## 4. ordinal 與 ID:誰認得誰
 
@@ -105,6 +105,9 @@ JD 只在員工決定提案時才改。
 - **一次 operation ＝ 一次 HTTP。** 沒有 fallback、沒有隱藏 retry、沒有 provider registry。
   `provider_order` 恰好一個 slug:OpenRouter 的 `order` 會依序嘗試清單內的 provider,
   `allow_fallbacks: false` 只擋清單外的。
+- **A6 treatment 不可靜默漂移。** request 固定送
+  `reasoning: {effort: high, exclude: true}`；有成功 content 時，response `model` 缺失或不等於
+  configured exact model 一律 `model_mismatch`，不 parse、不 retry。
 - **provider 只收 `render_context_packet()` 的文字。** `adapter.complete()` 的簽章收不到 packet 模型
   ——不要為了方便加一個吃 model_dump 的多載,那等於把內部 ID 送出去。
 - **不做全文 UUID 形狀掃描**(§12.3):輸出契約沒有可填 ID 的欄位,而員工原話可能合法含有

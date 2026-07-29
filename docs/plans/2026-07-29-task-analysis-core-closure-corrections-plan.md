@@ -82,11 +82,11 @@
 - A successful response must identify the exact configured model.
 - Missing/mismatched response model becomes `MALFORMED_RESPONSE` or a dedicated typed routing failure; no retry.
 
-- [ ] Write failing wire-body and response-model tests.
-- [ ] Run them and confirm RED.
-- [ ] Implement the minimal request and response checks.
-- [ ] Run operation tests.
-- [ ] Commit `fix(api): pin task analysis reasoning and response model`.
+- [x] Write failing wire-body and response-model tests.
+- [x] Run them and confirm three expected RED failures.
+- [x] Implement the minimal request and response checks.
+- [x] Run operation tests（20 passed；完整 job_analysis focused suite 210 passed）。
+- [x] Commit `fix(api): pin task analysis reasoning and response model`.
 
 ### Task 4: Documentation authority and writeback
 

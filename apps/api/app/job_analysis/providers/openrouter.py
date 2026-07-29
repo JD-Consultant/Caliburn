@@ -6,6 +6,8 @@
 沿用已驗證的 wire invariants(ADR 0040 決定 26、ADR 0035):固定 exact model slug 與
 provider endpoint、`allow_fallbacks: false`、`require_parameters: true`、
 portable structured output(`response_format.json_schema`,`strict: true`)。
+第一版品質 treatment 固定 `reasoning.effort=high` 並排除 reasoning tokens；成功回應必須
+由 OpenRouter 的 `model` 欄位證明實際使用的模型與 request 完全相同。
 
 **config 不放 secret**:API key 由建構子傳入,不進任何會被 dump 的模型。
 
@@ -86,6 +88,7 @@ class ProviderFailureKind(StrEnum):
     HTTP_STATUS = "http_status"
     PROVIDER_ERROR = "provider_error"
     MALFORMED_RESPONSE = "malformed_response"
+    MODEL_MISMATCH = "model_mismatch"
     TRUNCATED = "truncated"
 
 
@@ -131,6 +134,7 @@ class OpenRouterAdapter:
                 {"role": "user", "content": packet_text},
             ],
             "max_tokens": self._config.max_output_tokens,
+            "reasoning": {"effort": "high", "exclude": True},
             "stream": False,
             "response_format": {
                 "type": "json_schema",
@@ -180,7 +184,7 @@ class OpenRouterAdapter:
             return ProviderFailure(
                 kind=ProviderFailureKind.CONNECTION, detail=str(error) or "transport error"
             )
-        return _interpret(response)
+        return _interpret(response, expected_model=self._config.model)
 
 
 def _error_envelope(payload: Any) -> dict[str, Any] | None:
@@ -207,7 +211,9 @@ def _from_error_envelope(error: dict[str, Any]) -> ProviderOutcome:
     )
 
 
-def _interpret(response: TransportResponse) -> ProviderOutcome:
+def _interpret(
+    response: TransportResponse, *, expected_model: str
+) -> ProviderOutcome:
     body = response.body
     if response.status_code != 200:
         error = _error_envelope(body)
@@ -269,6 +275,15 @@ def _interpret(response: TransportResponse) -> ProviderOutcome:
         return ProviderFailure(
             kind=ProviderFailureKind.MALFORMED_RESPONSE,
             detail="message carried no content",
+        )
+    response_model = body.get("model")
+    if response_model != expected_model:
+        return ProviderFailure(
+            kind=ProviderFailureKind.MODEL_MISMATCH,
+            detail=(
+                f"expected response model {expected_model!r}, "
+                f"received {response_model!r}"
+            ),
         )
     return ProviderText(text=content)
 

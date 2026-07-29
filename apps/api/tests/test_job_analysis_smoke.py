@@ -78,6 +78,7 @@ class ScriptedProvider:
         return TransportResponse(
             status_code=200,
             body={
+                "model": CONFIG.model,
                 "choices": [
                     {
                         "message": {

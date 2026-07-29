@@ -7,10 +7,13 @@
 **ordinal 只住在這裡**(§11.2、§9.3):每輪重新編號、在 packet 中明示,mapping 存在
 該輪呼叫紀錄側,不進 domain——domain 的 Task 只認 `task_id`。
 
-**retired 用另一個號段**:`RETIRED_ORDINAL_BASE` 起跳,與 active 的 1..N 不相交。
-§11.4 要求 `retired_tasks[]` 不進 active 的 namespace,而 verifier 只有在兩組整數
-不相交時才判斷得出「這個 target 指的是已撤回的工作」;共用整數則永遠先命中 active,
-規則等於不存在。
+**retired 接在 active 之後編號**(active `1..N`、retired `N+1..N+M`):§11.4 要求
+`retired_tasks[]` 不進 active 的 namespace,而 verifier 只有在兩組整數不相交時才判斷
+得出「這個 target 指的是已撤回的工作」;共用整數則永遠先命中 active,規則等於不存在。
+ordinal 本來就每輪重編,不需要固定號段基準,也就沒有上限。
+
+**packet 只用 ordinal 說話**:transcript 回合、被引用的依據、最近提問一律以 ordinal
+呈現,內部的 turn_id／task_id／issue_id 不進 rendering(§11.2)。
 
 `Static Instructions` 與 `Output Schema` 不在這裡——前者是固定 prompt(§11.2:
 Task policies 不混進動態產品現況),後者是 `llm/` 已凍結的 provider schema。
@@ -30,6 +33,7 @@ from app.job_analysis.domain import (
     OpenIssue,
     Proposal,
     ProposalStatus,
+    SourceKind,
     Task,
     TaskId,
     jd_map,
@@ -43,9 +47,6 @@ from .verifier import (
     TurnSpeaker,
     VerificationContext,
 )
-
-
-RETIRED_ORDINAL_BASE = 1000
 
 
 # ── 輸入(conversation 尚未凍結,§9 前言把它留給後續垂直切片)──────────────
@@ -136,10 +137,47 @@ class TaskAnalysisPacket(DomainModel):
     current_turn_ordinal: int
 
     @model_validator(mode="after")
+    def transcript_turn_ids_are_unique(self):
+        """ordinal↔turn_id 必須是雙射,否則 anchor 解析會指到任意一個同名回合。"""
+        turn_ids = [view.turn.turn_id for view in self.conversation_context.transcript]
+        if len(set(turn_ids)) != len(turn_ids):
+            raise ValueError("duplicate transcript turn id")
+        return self
+
+    @model_validator(mode="after")
     def current_turn_is_an_employee_turn(self):
         view = self.turn_view(self.current_turn_ordinal)
         if view is None or view.turn.speaker is not TurnSpeaker.EMPLOYEE:
             raise ValueError("current turn must be an employee turn in the packet")
+        return self
+
+    @model_validator(mode="after")
+    def active_question_is_an_earlier_consultant_turn(self):
+        """`active_question` 是 `support_links.question_turn_id` 的來源(§11.4)。
+
+        指錯回合的代價很具體:員工的短答(「對」「大概兩小時」)會被接到另一個問題上,
+        整條依據鏈從此指向錯的提問。所以它必須真的是 transcript 裡**較早的顧問回合**,
+        而且文字一致——文字不同表示送進 packet 的問題已經不是實際問出口的那句。
+        """
+        question = self.conversation_context.active_question
+        if question is None:
+            return self
+        view = next(
+            (
+                candidate
+                for candidate in self.conversation_context.transcript
+                if candidate.turn.turn_id == question.turn_id
+            ),
+            None,
+        )
+        if view is None:
+            raise ValueError("active question must reference a transcript turn")
+        if view.turn.speaker is not TurnSpeaker.CONSULTANT:
+            raise ValueError("active question must reference a consultant turn")
+        if view.ordinal >= self.current_turn_ordinal:
+            raise ValueError("active question must be earlier than the current turn")
+        if view.turn.text != question.text:
+            raise ValueError("active question text must match its transcript turn")
         return self
 
     def turn_view(self, ordinal: int) -> PacketTurnView | None:
@@ -147,6 +185,14 @@ class TaskAnalysisPacket(DomainModel):
             if view.ordinal == ordinal:
                 return view
         return None
+
+    @property
+    def turn_ordinal_by_id(self) -> dict[str, int]:
+        """rendering 用的解析表;ordinal↔ID mapping 只住 application(§9.3)。"""
+        return {
+            view.turn.turn_id: view.ordinal
+            for view in self.conversation_context.transcript
+        }
 
     def task_view(self, ordinal: int) -> PacketTaskView | None:
         for view in self.current_authorities.tasks:
@@ -229,10 +275,6 @@ def build_context_packet(
     jd_content = jd_map(current_jd)
     active_tasks = tuple(task for task in work_model.tasks if task.retirement is None)
     retired_tasks = tuple(task for task in work_model.tasks if task.retirement is not None)
-    if len(active_tasks) >= RETIRED_ORDINAL_BASE:
-        raise ValueError(
-            "active task ordinals would collide with the retired ordinal block"
-        )
 
     task_views = tuple(
         PacketTaskView(
@@ -240,9 +282,11 @@ def build_context_packet(
         )
         for ordinal, task in enumerate(active_tasks, start=1)
     )
+    # active 1..N、retired N+1..N+M:不相交(verifier 才判斷得出 target 指到已撤回的
+    # 工作),決定性,而且不需要任何固定號段基準或上限。
     retired_views = tuple(
         PacketRetiredTaskView(ordinal=ordinal, task=task)
-        for ordinal, task in enumerate(retired_tasks, start=RETIRED_ORDINAL_BASE + 1)
+        for ordinal, task in enumerate(retired_tasks, start=len(active_tasks) + 1)
     )
     issue_views = tuple(
         PacketOpenIssueView(ordinal=ordinal, issue=issue)
@@ -317,9 +361,32 @@ def _revision_is_unresolved(proposal: Proposal) -> bool:
 
 _SPEAKER_LABEL = {TurnSpeaker.CONSULTANT: "顧問", TurnSpeaker.EMPLOYEE: "員工"}
 _PENDING_BANNER = "尚未成立,不得當作現況事實"
-_RETIRED_BANNER = (
-    f"另一組編號,自 {RETIRED_ORDINAL_BASE + 1} 起;唯讀,不得出現在任何 target"
-)
+_RETIRED_BANNER = "接在 active 之後編號;唯讀,不得出現在任何 target"
+
+
+def _render_turn_ref(turn_id: str | None, turn_ordinals: dict[str, int]) -> str | None:
+    """把內部 turn_id 換成 ordinal;不在本輪 transcript 的一律不印 ID(§11.2)。"""
+    if turn_id is None:
+        return None
+    ordinal = turn_ordinals.get(turn_id)
+    return f"[{ordinal}]" if ordinal is not None else "(不在本輪 transcript)"
+
+
+def _render_anchor(anchor, turn_ordinals: dict[str, int]) -> str:
+    """一筆依據:來源回合 ordinal ＋ 逐字引用 ＋ 它回應的提問。
+
+    非 employee_turn 的來源(員工直接編輯、提案決策)不在 transcript 裡,只印種類——
+    ID 對模型沒有用途,而且契約裡沒有任何欄位可以讓它回填 ID。
+    """
+    source = anchor.source_ref
+    where = (
+        _render_turn_ref(source.id, turn_ordinals)
+        if source.kind is SourceKind.EMPLOYEE_TURN
+        else f"({source.kind.value})"
+    )
+    quote = f"「{anchor.quote}」" if anchor.quote else "(無引用)"
+    asked = _render_turn_ref(anchor.question_turn_id, turn_ordinals)
+    return f"{where} {quote}" + (f" 回應提問 {asked}" if asked else "")
 
 
 def render_context_packet(packet: TaskAnalysisPacket) -> str:
@@ -329,6 +396,7 @@ def render_context_packet(packet: TaskAnalysisPacket) -> str:
     與「尚未核准的提案」不混在一起,不是要模型照步驟推理。
     """
 
+    turn_ordinals = packet.turn_ordinal_by_id
     lines: list[str] = ["# Dynamic Context Packet", "", "## conversation_context", ""]
     lines.append("### transcript")
     for view in packet.conversation_context.transcript:
@@ -340,7 +408,11 @@ def render_context_packet(packet: TaskAnalysisPacket) -> str:
     lines.append("")
     lines.append("### active_question")
     question = packet.conversation_context.active_question
-    lines.append(f"({question.turn_id}) {question.text}" if question else "(無)")
+    lines.append(
+        f"{_render_turn_ref(question.turn_id, turn_ordinals)} {question.text}"
+        if question
+        else "(無)"
+    )
     lines.append("")
 
     authorities = packet.current_authorities
@@ -376,12 +448,8 @@ def render_context_packet(packet: TaskAnalysisPacket) -> str:
         lines.append("    support_links:")
         for ordinal, link in zip(view.support_ordinals, task.support_links):
             state = "有效" if link.is_effective else "已被取代"
-            quote = f"「{link.quote}」" if link.quote else "(無引用)"
-            asked = (
-                f" 回應提問 {link.question_turn_id}" if link.question_turn_id else ""
-            )
             lines.append(
-                f"      ({ordinal}) [{state}] {link.source_ref.kind.value} {quote}{asked}"
+                f"      ({ordinal}) [{state}] {_render_anchor(link, turn_ordinals)}"
             )
     lines.append("")
 
@@ -401,6 +469,12 @@ def render_context_packet(packet: TaskAnalysisPacket) -> str:
         lines.append("(無)")
     for view in authorities.open_issues:
         lines.append(f"[{view.ordinal}] {view.issue.kind.value}: {view.issue.summary}")
+        # 缺了 anchors,模型看不出矛盾在哪兩句之間;缺了 last_asked,它會把剛問過的
+        # 缺口當成沒問過再問一次——那正是 Context 要解決的跨回合記憶。
+        for anchor in view.issue.source_anchors:
+            lines.append(f"    依據: {_render_anchor(anchor, turn_ordinals)}")
+        asked = _render_turn_ref(view.issue.last_asked_turn_id, turn_ordinals)
+        lines.append(f"    最近提問: {asked}" if asked else "    最近提問: (尚未問過)")
     lines.append("")
 
     lines.append("### excluded_signals")
@@ -408,6 +482,8 @@ def render_context_packet(packet: TaskAnalysisPacket) -> str:
         lines.append("(無)")
     for signal in authorities.excluded_signals:
         lines.append(f"- {signal.reason.value}: {signal.summary}")
+        for anchor in signal.source_anchors:
+            lines.append(f"    依據: {_render_anchor(anchor, turn_ordinals)}")
     lines.append("")
 
     proposals = packet.proposal_context

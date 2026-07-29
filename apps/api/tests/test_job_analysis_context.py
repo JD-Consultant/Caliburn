@@ -11,7 +11,6 @@ from pydantic import ValidationError
 
 from app.job_analysis import domain as domain_package
 from app.job_analysis.application import (
-    RETIRED_ORDINAL_BASE,
     ActiveQuestion,
     ConversationTurn,
     TurnSpeaker,
@@ -179,21 +178,18 @@ def test_ordinals_are_renumbered_each_round_and_spelled_out_in_the_packet():
     assert "[1] 每週彙整營運週報並送交主管" in rendered
     assert "[2] 員工: 我每週要出一份營運週報 ← 本次要分析的回合" in rendered
     assert (
-        "      (1) [有效] employee_turn 「我每週要出一份營運週報」 回應提問 turn-1"
-        in rendered
+        "      (1) [有效] [2] 「我每週要出一份營運週報」 回應提問 [1]" in rendered
     )
 
 
-def test_retired_tasks_use_a_disjoint_ordinal_block():
+def test_retired_tasks_are_numbered_after_the_active_ones():
     """§11.4:另一組編號,唯讀;不相交才讓 verifier 判斷得出 target 指到已撤回的工作。"""
     packet = build(work_model=CurrentWorkModel(tasks=(make_task(), retired_task())))
     assert [view.ordinal for view in packet.current_authorities.tasks] == [1]
-    assert [view.ordinal for view in packet.current_authorities.retired_tasks] == [
-        RETIRED_ORDINAL_BASE + 1
-    ]
+    assert [view.ordinal for view in packet.current_authorities.retired_tasks] == [2]
     rendered = render_context_packet(packet)
     assert "不得出現在任何 target" in rendered
-    assert f"[{RETIRED_ORDINAL_BASE + 1}] 幫同事代班結帳 — withdrawn/other_person" in rendered
+    assert f"[2] 幫同事代班結帳 — withdrawn/other_person" in rendered
 
 
 def test_ordinals_do_not_leak_into_the_domain():
@@ -214,7 +210,7 @@ def test_the_packet_feeds_the_verifier_with_the_same_ordinals():
     packet = build(work_model=CurrentWorkModel(tasks=(make_task(), retired_task())))
     context = packet.verification_context()
     assert context.task(1).task_id == "task-1"
-    assert context.retired_task_ordinals == frozenset({RETIRED_ORDINAL_BASE + 1})
+    assert context.retired_task_ordinals == frozenset({2})
     assert context.current_turn_ordinal == 2
 
     result = TaskAnalysisResult(
@@ -255,6 +251,53 @@ def test_current_turn_must_be_an_employee_turn_in_the_transcript():
         build(current_turn_id="turn-1")
 
 
+def test_transcript_turn_ids_must_be_unique():
+    """ordinal↔turn_id 不是雙射時,anchor 會被解析到任意一個同名回合。"""
+    duplicated = (
+        *TRANSCRIPT,
+        ConversationTurn(
+            turn_id="turn-1", speaker=TurnSpeaker.CONSULTANT, text="再問一次"
+        ),
+    )
+    with pytest.raises(ValidationError, match="duplicate transcript turn id"):
+        build(transcript=duplicated)
+
+
+@pytest.mark.parametrize(
+    ("question", "message"),
+    [
+        (
+            ActiveQuestion(turn_id="turn-9", text="可以說說你的一週嗎?"),
+            "must reference a transcript turn",
+        ),
+        (
+            ActiveQuestion(turn_id="turn-2", text=EMPLOYEE_TEXT),
+            "must reference a consultant turn",
+        ),
+        (
+            ActiveQuestion(turn_id="turn-3", text="那份週報交給誰?"),
+            "must be earlier than the current turn",
+        ),
+        (
+            ActiveQuestion(turn_id="turn-1", text="你平常都做些什麼?"),
+            "text must match its transcript turn",
+        ),
+    ],
+)
+def test_active_question_must_be_the_earlier_consultant_turn_it_claims_to_be(
+    question, message
+):
+    """指錯回合,員工的短答就會被接到另一個問題上,整條依據鏈從此指向錯的提問。"""
+    transcript = (
+        *TRANSCRIPT,
+        ConversationTurn(
+            turn_id="turn-3", speaker=TurnSpeaker.CONSULTANT, text="那份週報交給誰?"
+        ),
+    )
+    with pytest.raises(ValidationError, match=message):
+        build(transcript=transcript, active_question=question)
+
+
 # ── jd_presence(§11.4)────────────────────────────────────────────────────
 
 
@@ -265,6 +308,94 @@ def test_jd_presence_carries_the_current_text_or_says_it_is_absent():
     assert packet.current_authorities.tasks[0].in_jd
     assert "jd_presence: 在 Current JD——每週彙整營運週報" in render_context_packet(packet)
     assert "jd_presence: 不在 Current JD" in render_context_packet(build())
+
+
+# ── open_issues／excluded_signals 的跨回合記憶(§11.4)──────────────────────
+
+
+def test_open_issues_and_exclusions_show_their_anchors_and_last_asked():
+    """少了 anchor 與 last-asked,模型看不出矛盾在哪兩句之間、也不知道剛剛才問過。"""
+    work_model = CurrentWorkModel(
+        tasks=(make_task(),),
+        open_issues=(
+            OpenIssue(
+                id="issue-1",
+                kind=OpenIssueKind.UNRESOLVED_CONTRADICTION,
+                summary="是誰在做結帳",
+                source_anchors=(
+                    SourceAnchor(
+                        source_ref=employee_ref(),
+                        quote=EMPLOYEE_TEXT,
+                        question_turn_id="turn-1",
+                    ),
+                    SourceAnchor(
+                        source_ref=SourceRef(kind=SourceKind.DIRECT_EDIT, id="edit-7")
+                    ),
+                ),
+                last_asked_turn_id="turn-1",
+            ),
+        ),
+        excluded_signals=(
+            ExcludedSignal(
+                id="ex-1",
+                reason=ExclusionReason.OTHER_PERSON_WORK,
+                summary="結帳是同事的工作",
+                source_anchors=(
+                    SourceAnchor(source_ref=employee_ref(), quote=EMPLOYEE_TEXT),
+                ),
+            ),
+        ),
+    )
+    rendered = render_context_packet(build(work_model=work_model))
+    assert f"    依據: [2] 「{EMPLOYEE_TEXT}」 回應提問 [1]" in rendered
+    assert "    依據: (direct_edit) (無引用)" in rendered
+    assert "    最近提問: [1]" in rendered
+    assert f"- 他人工作: 結帳是同事的工作\n    依據: [2] 「{EMPLOYEE_TEXT}」" in rendered
+
+    never_asked = render_context_packet(
+        build(
+            work_model=CurrentWorkModel(
+                tasks=(make_task(),),
+                open_issues=(
+                    OpenIssue(
+                        id="issue-2",
+                        kind=OpenIssueKind.INSUFFICIENT_EVIDENCE,
+                        summary="還不知道頻率",
+                        source_anchors=(
+                            SourceAnchor(source_ref=employee_ref(), quote=EMPLOYEE_TEXT),
+                        ),
+                    ),
+                ),
+            )
+        )
+    )
+    assert "    最近提問: (尚未問過)" in never_asked
+
+
+def test_rendering_never_exposes_internal_ids():
+    """§11.2:packet 只用 ordinal 說話;契約裡也沒有任何欄位可讓模型回填 ID。"""
+    work_model = CurrentWorkModel(
+        tasks=(make_task(), retired_task()),
+        open_issues=(
+            OpenIssue(
+                id="issue-1",
+                kind=OpenIssueKind.INSUFFICIENT_EVIDENCE,
+                summary="還不知道週報交給誰",
+                source_anchors=(
+                    SourceAnchor(source_ref=employee_ref(), quote=EMPLOYEE_TEXT),
+                ),
+                last_asked_turn_id="turn-1",
+            ),
+        ),
+    )
+    rendered = render_context_packet(
+        build(
+            work_model=work_model,
+            active_question=ActiveQuestion(turn_id="turn-1", text="可以說說你的一週嗎?"),
+        )
+    )
+    for internal_id in ("task-1", "task-9", "issue-1", "turn-1", "turn-2"):
+        assert internal_id not in rendered
 
 
 # ── proposal_context(§11.1、§11.2、§9.6)─────────────────────────────────

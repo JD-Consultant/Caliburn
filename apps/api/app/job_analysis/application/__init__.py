@@ -1,7 +1,6 @@
 """Use-case 層:context assembler(T4)＋ deterministic verifier(T3);transition 待後續 task。"""
 
 from .context import (
-    RETIRED_ORDINAL_BASE,
     ActiveQuestion,
     ConversationContext,
     ConversationTurn,
@@ -31,7 +30,6 @@ from .verifier import (
 )
 
 __all__ = [
-    "RETIRED_ORDINAL_BASE",
     "ActiveQuestion",
     "ConversationContext",
     "ConversationTurn",

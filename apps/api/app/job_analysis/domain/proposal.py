@@ -285,6 +285,10 @@ class Proposal(DomainModel):
         缺了它就能建立「改 JD、Work Model 卻沒有對應變更」的提案:`accepted`／`edited`
         時 §9.6 要求兩層原子套用,但根本沒有第二層可套——JD 少了那條 Task,Work Model
         裡的 Task 卻還 active 且毫髮無傷。非空由 `StagedWorkModelDelta` 自己保證。
+
+        **只保證非空,不保證內容對得上 target**(例如 merge 的 delta 是否真的 retire
+        了每個 member、split 的子 Task 是否就是 `child_task_ids`)。那是 action-specific
+        correspondence,T6 套用前必須驗,不能只看非空。
         """
         cross_layer = {
             ProposalAction.MERGE,

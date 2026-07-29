@@ -57,8 +57,9 @@ Caliburn 現行目標是給員工使用的**本機 Web AI 職務分析與職務�
   (OTel 橫切)。ADR 0008 / **0030**(舊 LangGraph/CopilotKit 已退場,勿救回;端到端見
   `docs/design/interview-engine.md`)。
 - **Task Analysis 引擎(現行新工作面)**：`app/job_analysis` 依 ADR **0040／0042** greenfield 實作
-  (domain／llm／application／providers)。第一條 vertical 已接通:packet → 一次 HTTP → verifier →
-  identity gate → Proposal → 下一題;**無 DB、無 route、production 尚未接上**。禁止 import
+  (domain／llm／application／providers)。durable vertical 已接通：文件/direct edit → PostgreSQL
+  Current State → packet → 一次 HTTP → verifier → identity gate → 候選/Proposal → 員工決策 → reload；
+  **仍無 route／Web，production 尚未接上**。資料從新四表開始，不搬、不整合、不雙寫舊資料。禁止 import
   `app.interview`／`app.interview_vnext`／`app.job_authoring`／`evals`(AST 測試強制)。
   端到端見 `docs/design/task-analysis-engine.md`。
 - **AI vNext 隔離中**：`app/interview_vnext` 依 ADR **0034** greenfield 實作；V1 domain 與 V2-A

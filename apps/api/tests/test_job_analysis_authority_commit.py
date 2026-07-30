@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
+from dataclasses import replace
 from datetime import UTC, datetime
 from uuid import UUID
 
 import pytest
 from pydantic import ValidationError
 
-from app.job_analysis.application import DocumentRecord, add_jd_task
+from app.job_analysis.application import DocumentRecord, add_jd_task, create_document
 from app.job_analysis.domain import CurrentWorkModel, JdTask, JdTaskFields
 
 
@@ -29,6 +30,18 @@ class _Documents:
 
     async def update_authority(self, *args, **kwargs) -> bool:
         self.writes.append("update_authority")
+        return True
+
+    async def update_title(
+        self,
+        document_id: UUID,
+        *,
+        title: str,
+        updated_at: datetime,
+    ) -> bool:
+        assert document_id == DOCUMENT_ID
+        self.writes.append("update_title")
+        self.record = replace(self.record, title=title, updated_at=updated_at)
         return True
 
 
@@ -115,3 +128,18 @@ async def test_direct_edit_rejects_invalid_complete_state_before_any_write():
 
     assert uow.writes == []
 
+
+async def test_rename_updates_only_document_metadata():
+    """Routing a title change through authority commit would stale paid turns."""
+
+    uow = _UnitOfWork()
+
+    renamed = await create_document(
+        lambda: uow,
+        document_id=DOCUMENT_ID,
+        title="資深門市營運專員",
+    )
+
+    assert renamed.title == "資深門市營運專員"
+    assert renamed.authority_generation == 0
+    assert uow.writes == ["update_title", "commit"]

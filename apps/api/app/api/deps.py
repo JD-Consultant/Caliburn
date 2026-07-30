@@ -4,7 +4,10 @@
 documents router and the root occupations router can depend on it.
 """
 from app.adapters.knowledge_http import HttpIndexerClient
+from app.adapters.job_analysis_postgres import SqlAlchemyJobAnalysisUnitOfWork
 from app.config import settings
+from app.database import AsyncSessionLocal
+from app.job_analysis.application import JobAnalysisUnitOfWorkFactory
 
 
 async def get_knowledge():
@@ -15,3 +18,7 @@ async def get_knowledge():
         yield client
     finally:
         await client.aclose()
+
+
+def get_job_analysis_uow_factory() -> JobAnalysisUnitOfWorkFactory:
+    return lambda: SqlAlchemyJobAnalysisUnitOfWork(AsyncSessionLocal)

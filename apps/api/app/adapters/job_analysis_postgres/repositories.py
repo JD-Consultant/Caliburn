@@ -95,6 +95,20 @@ class SqlAlchemyDocumentRepository:
             for row, task_count in rows
         )
 
+    async def update_title(
+        self,
+        document_id: UUID,
+        *,
+        title: str,
+        updated_at: datetime,
+    ) -> bool:
+        result = await self._session.execute(
+            update(JobAnalysisDocumentRow)
+            .where(JobAnalysisDocumentRow.document_id == document_id)
+            .values(title=title, updated_at=updated_at)
+        )
+        return result.rowcount == 1
+
     async def update_authority(
         self,
         document_id: UUID,

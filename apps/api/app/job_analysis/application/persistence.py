@@ -192,6 +192,14 @@ class DocumentRepository(Protocol):
 
     async def list(self) -> tuple[DocumentSummary, ...]: ...
 
+    async def update_title(
+        self,
+        document_id: UUID,
+        *,
+        title: str,
+        updated_at: datetime,
+    ) -> bool: ...
+
     async def update_authority(
         self,
         document_id: UUID,

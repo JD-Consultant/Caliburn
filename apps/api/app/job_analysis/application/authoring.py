@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass, replace
 from datetime import UTC, datetime
 from uuid import UUID
 
@@ -42,6 +43,12 @@ from .transition import JobAnalysisState
 
 def _utcnow() -> datetime:
     return datetime.now(UTC)
+
+
+@dataclass(frozen=True)
+class DocumentMetadataWriteResult:
+    document: DocumentRecord
+    created: bool
 
 
 def _task_fields(task: JdTask) -> JdTaskFields:
@@ -212,14 +219,39 @@ async def create_document(
     document_id: UUID,
     title: str,
 ) -> DocumentRecord:
+    return (
+        await put_document_metadata(
+            uow_factory,
+            document_id=document_id,
+            title=title,
+        )
+    ).document
+
+
+async def put_document_metadata(
+    uow_factory: JobAnalysisUnitOfWorkFactory,
+    *,
+    document_id: UUID,
+    title: str,
+) -> DocumentMetadataWriteResult:
     async with uow_factory() as uow:
         existing = await uow.documents.get(document_id, for_update=True)
         if existing is not None:
             if existing.title != title:
-                raise IdempotencyConflict(
-                    f"document {document_id} already exists with another title"
+                now = _utcnow()
+                updated = await uow.documents.update_title(
+                    document_id,
+                    title=title,
+                    updated_at=now,
                 )
-            return existing
+                if not updated:
+                    raise DocumentNotFound(f"document {document_id} was not found")
+                await uow.commit()
+                return DocumentMetadataWriteResult(
+                    document=replace(existing, title=title, updated_at=now),
+                    created=False,
+                )
+            return DocumentMetadataWriteResult(document=existing, created=False)
         now = _utcnow()
         record = DocumentRecord(
             document_id=document_id,
@@ -232,7 +264,7 @@ async def create_document(
         )
         await uow.documents.create(record)
         await uow.commit()
-        return record
+        return DocumentMetadataWriteResult(document=record, created=True)
 
 
 async def list_documents(

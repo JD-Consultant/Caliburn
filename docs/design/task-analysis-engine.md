@@ -1,7 +1,7 @@
 ---
-title: Task Analysis 引擎 — 端到端設計(durable PostgreSQL vertical,無 route)
+title: Task Analysis 引擎 — 端到端設計(durable PostgreSQL + document API)
 audience: agent-primary(也給人)
-scope: apps/api app/job_analysis/* + app/adapters/job_analysis_postgres/*
+scope: apps/api app/job_analysis/* + app/adapters/job_analysis_postgres/* + app/api/routes/job_analysis.py
 updated: 2026-07-30
 ---
 
@@ -22,6 +22,8 @@ updated: 2026-07-30
 > [ADR 0043](../adr/0043-job-analysis-local-current-state-persistence-and-authoring-authority.md)；
 > 員工不完整 Task 的 identity 對齊見
 > [ADR 0044](../adr/0044-partial-jd-task-reconciliation-and-human-confirmation.md)。
+> Local Web transport 邊界見
+> [ADR 0045](../adr/0045-job-analysis-local-web-contract-and-current-jd-editing.md)。
 
 ## 1. 一句話
 
@@ -47,6 +49,7 @@ OpenRouter 拿 `TaskAnalysisResult.v1` → **verifier**(純函式、零 LLM)擋�
 | authoring use cases | 文件庫與 JD Task add/edit/delete/reorder | `application/authoring.py` | document row lock → entry replay check → Current State/Journal/generation 同交易；不呼叫 LLM |
 | durable turn | authority snapshot → 交易外模型呼叫 → verified commit | `application/durable_turn.py` | commit 時重鎖並比對 generation/read-set；Work Model、Proposal、下一題與 completed-turn Journal 同交易 |
 | Proposal use cases | 候選送審 + accept/edit/reject/defer/revision request | `application/proposal_decisions.py` | `propose_task_for_jd()` 不自動接受；決策由 document lock 序列化；接受類才改 JD；決策寫 Journal |
+| document API | 本機文件列表、建立／改名、開啟 Current JD | `app/api/routes/job_analysis.py` | 只做 generated wire DTO mapping；不暴露 Work Model、Proposal、Journal 或 generation |
 
 ## 3. 一輪的資料流(每步標函式)
 
@@ -67,6 +70,12 @@ Current JD、相關 Proposal stale、Work Model reconcile trigger、Journal 與 
 `commit_authority_change()` 做完整狀態驗證與最終寫入。Durable AI turn 不走這個 seam：
 `apply_task_analysis_result()` 已驗證新狀態，且 durable turn 另有 provider-outside-transaction 與
 snapshot revalidation 語意。
+
+本機 Web 文件入口走 `GET /api/v1/job-analysis/documents`、
+`PUT /api/v1/job-analysis/documents/{document_id}` 與
+`GET /api/v1/job-analysis/documents/{document_id}`。標題只是 metadata：同 ID 的 PUT 可建立或改名，
+但不走 authority seam、不寫 Journal、也不 bump `authority_generation`。新路徑的錯誤使用
+RFC 9457 `application/problem+json`；path-scoped handler 會把舊 routes 的既有錯誤 body 原樣保留。
 既有 Task 在下一次 AI 互動時看到 JD/Work Model 差異；JD-only Task 先落一筆
 `insufficient_evidence` open issue，明確保存該 JD `task_id`，不補造空殼 Work Model Task。
 下一輪 packet 只把它投影成可追問的 partial Task：
@@ -174,7 +183,7 @@ JD 只在員工決定提案時才改。
 
 | 沒有的東西 | 現況 | 什麼時候做 |
 |---|---|---|
-| route／Web UI | 完全沒有 | persistence 之後的最小 local Web |
+| Task mutation route／Web UI | 文件讀取 API 已有；Task 寫入與畫面尚未接上 | 下一個最小 local Web 切片 |
 | endpoint variant preflight | `provider_order` 只鎖 base slug,同 provider 可能有多個 endpoint variant | 真正付費呼叫前的 catalog／live preflight |
 | prompt 品質調校 | `llm/prompt.py` 只寫到「不與 §4 判準相反」的結構最小集 | rubric／eval 的獨立工作 |
 | duplicate／overlap identity 自動收斂 | 第一版刻意不做；模型保留 issue 並追問員工 | 有真實重複摩擦證據後再研究，不用相似度猜測 |
@@ -192,5 +201,8 @@ JD 只在員工決定提案時才改。
 - partial Task reconciliation:
   [`ADR 0044`](../adr/0044-partial-jd-task-reconciliation-and-human-confirmation.md)、
   [`implementation plan`](../plans/2026-07-30-job-analysis-partial-task-reconciliation-plan.md)
+- Local Web first slice:
+  [`ADR 0045`](../adr/0045-job-analysis-local-web-contract-and-current-jd-editing.md)、
+  [`implementation plan`](../plans/2026-07-30-job-analysis-local-web-first-slice-plan.md)
 - 舊路徑(**已退場,勿救回**):[`interview-engine.md`](interview-engine.md)、
   [ADR 0030](../adr/0030-ai-coedit-tracked-changes-one-brain.md)

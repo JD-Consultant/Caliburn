@@ -16,6 +16,7 @@ from app.job_analysis.application import (
     edit_jd_task,
     list_documents,
     load_document,
+    put_document_metadata,
     reorder_jd_tasks,
 )
 from app.job_analysis.domain import (
@@ -73,6 +74,38 @@ async def test_create_list_and_load_an_empty_document(
     assert loaded.state.current_jd == ()
     assert loaded.recent_turns == ()
     assert next(item for item in summaries if item.document_id == document_id).task_count == 0
+
+
+async def test_rename_changes_only_document_metadata(
+    postgres_session_factory,
+    cleanup_job_analysis_rows,
+):
+    document_id = cleanup_job_analysis_rows
+    factory = lambda: SqlAlchemyJobAnalysisUnitOfWork(postgres_session_factory)
+    await create_document(factory, document_id=document_id, title="門市營運專員")
+    before = await load_document(factory, document_id)
+
+    result = await put_document_metadata(
+        factory,
+        document_id=document_id,
+        title="資深門市營運專員",
+    )
+    after = await load_document(factory, document_id)
+
+    assert before is not None
+    assert after is not None
+    assert result.created is False
+    assert after.document.title == "資深門市營運專員"
+    assert after.document.authority_generation == before.document.authority_generation
+    assert after.state == before.state
+    assert after.recent_turns == before.recent_turns
+
+    async with factory() as uow:
+        assert await uow.documents.update_title(
+            UUID(int=0),
+            title="不存在的文件",
+            updated_at=NOW,
+        ) is False
 
 
 async def test_add_edit_reorder_delete_reload_and_idempotent_replay(

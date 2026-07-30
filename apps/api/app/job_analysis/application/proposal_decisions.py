@@ -26,8 +26,8 @@ from app.job_analysis.domain import (
     withdraw_delta_matches_target_state,
 )
 
-from .authoring import (
-    ConcurrentAuthorityChange,
+from .authority_commit import commit_authority_change
+from .errors import (
     DocumentNotFound,
     IdempotencyConflict,
     JobAnalysisApplicationError,
@@ -332,29 +332,17 @@ async def _persist(
     proposals: tuple[Proposal, ...],
     journal_entry: JournalEntry | None,
 ) -> None:
-    now = _utcnow()
-    # Validate the complete two-layer state before issuing any writes.
-    JobAnalysisState(
-        work_model=work_model,
-        current_jd=current_jd,
-        proposals=proposals,
+    await commit_authority_change(
+        uow,
+        record=record,
+        state=JobAnalysisState(
+            work_model=work_model,
+            current_jd=current_jd,
+            proposals=proposals,
+        ),
+        journal_entry=journal_entry,
+        updated_at=_utcnow(),
     )
-    await uow.tasks.replace(record.document_id, current_jd)
-    await uow.proposals.replace(record.document_id, proposals)
-    if journal_entry is not None:
-        await uow.journal.add(journal_entry)
-    updated = await uow.documents.update_authority(
-        record.document_id,
-        expected_generation=record.authority_generation,
-        work_model=work_model,
-        active_question=record.active_question,
-        updated_at=now,
-    )
-    if not updated:
-        raise ConcurrentAuthorityChange(
-            f"document {record.document_id} authority changed concurrently"
-        )
-    await uow.commit()
 
 
 async def propose_task_for_jd(

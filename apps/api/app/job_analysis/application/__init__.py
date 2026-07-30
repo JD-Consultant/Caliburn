@@ -1,11 +1,6 @@
 """Use-case 層：context、operation、transition 與純 persistence ports。"""
 
 from .authoring import (
-    ConcurrentAuthorityChange,
-    DocumentNotFound,
-    IdempotencyConflict,
-    InvalidJdTaskOrder,
-    JdTaskNotFound,
     add_jd_task,
     create_document,
     delete_jd_task,
@@ -13,6 +8,13 @@ from .authoring import (
     list_documents,
     load_document,
     reorder_jd_tasks,
+)
+from .errors import (
+    ConcurrentAuthorityChange,
+    DocumentNotFound,
+    IdempotencyConflict,
+    InvalidJdTaskOrder,
+    JdTaskNotFound,
 )
 from .context import (
     ActiveQuestion,

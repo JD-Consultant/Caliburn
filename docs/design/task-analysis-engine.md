@@ -43,6 +43,7 @@ OpenRouter 拿 `TaskAnalysisResult.v1` → **verifier**(純函式、零 LLM)擋�
 | transition | 結果 → Work Model 變更 ＋ Proposal | `application/transition.py` | **唯一寫入者**;全有或全無 |
 | persistence ports | Current State repositories／UoW／版本化 Journal payload | `application/persistence.py` | 純 Protocol 與 frozen contracts；不認 ORM／JSON row |
 | PostgreSQL adapter | 0012 四表、serialization、repositories、UoW | `app/adapters/job_analysis_postgres/` | JSONB 讀取必須 hydrate；schema/shape 壞掉 fail-closed；repository 不 commit |
+| authority commit seam | 完整 Current State → 同一 UoW 原子寫入 | `application/authority_commit.py` | 先重驗完整 `JobAnalysisState`，再 replace JD／Proposal、選擇性寫 Journal、generation CAS、單次 commit |
 | authoring use cases | 文件庫與 JD Task add/edit/delete/reorder | `application/authoring.py` | document row lock → entry replay check → Current State/Journal/generation 同交易；不呼叫 LLM |
 | durable turn | authority snapshot → 交易外模型呼叫 → verified commit | `application/durable_turn.py` | commit 時重鎖並比對 generation/read-set；Work Model、Proposal、下一題與 completed-turn Journal 同交易 |
 | Proposal use cases | 候選送審 + accept/edit/reject/defer/revision request | `application/proposal_decisions.py` | `propose_task_for_jd()` 不自動接受；決策由 document lock 序列化；接受類才改 JD；決策寫 Journal |
@@ -62,6 +63,10 @@ OpenRouter 拿 `TaskAnalysisResult.v1` → **verifier**(純函式、零 LLM)擋�
 員工直接編輯走另一條短路徑：`add_jd_task`／`edit_jd_task`／`delete_jd_task`／
 `reorder_jd_tasks` 先鎖 document，以 Journal `entry_id` 做 replay/conflict 判定，同交易保存
 Current JD、相關 Proposal stale、Work Model reconcile trigger、Journal 與 generation。**按儲存不呼叫 LLM**；
+它與 Proposal use cases 各自完成入口規則與狀態推導後，共用
+`commit_authority_change()` 做完整狀態驗證與最終寫入。Durable AI turn 不走這個 seam：
+`apply_task_analysis_result()` 已驗證新狀態，且 durable turn 另有 provider-outside-transaction 與
+snapshot revalidation 語意。
 既有 Task 在下一次 AI 互動時看到 JD/Work Model 差異；JD-only Task 先落一筆
 `insufficient_evidence` open issue，明確保存該 JD `task_id`，不補造空殼 Work Model Task。
 下一輪 packet 只把它投影成可追問的 partial Task：

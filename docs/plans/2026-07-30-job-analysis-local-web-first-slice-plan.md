@@ -22,9 +22,9 @@
 
 ## Baseline
 
-- [ ] 在 `apps/api` 執行 `uv run pytest -q`，記錄既有結果；已知無關的 `test_interview_vnext_execution_schemas.py` 若仍失敗，須確認 failure fingerprint 與動工前相同。
-- [ ] 在 `apps/web` 執行 `npm run test`、`npx tsc --noEmit`、`npm run lint`，三項必須先綠。
-- [ ] 確認 `git status --short` 只有本計畫檔；若有其他變更，不得混入後續 commit。
+- [x] 在 `apps/api` 執行 `uv run pytest -q`，記錄既有結果；已知無關的 `test_interview_vnext_execution_schemas.py` 若仍失敗，須確認 failure fingerprint 與動工前相同。
+- [x] 在 `apps/web` 執行 `npm run test`、`npx tsc --noEmit`、`npm run lint`，三項必須先綠。
+- [x] 確認 `git status --short` 只有本計畫檔；若有其他變更，不得混入後續 commit。
 
 ---
 
@@ -57,21 +57,21 @@ async def commit_authority_change(
 
 它必須先建立／重驗完整 `JobAnalysisState`，通過後才依序 replace Current JD Tasks、replace Proposals、選擇性 append Journal、以 `record.authority_generation` CAS 更新 authority，最後 commit 一次。CAS 失敗丟 `ConcurrentAuthorityChange`；任何驗證或 repository 失敗都不得留下部分寫入。
 
-- [ ] **Step 1: 寫紅測試**
+- [x] **Step 1: 寫紅測試**
 
   Characterize direct edit 與 Proposal decision 都會呼叫共用 seam；非法完整狀態時 repository 零寫入；CAS false 時不 commit；journal `None` 時不 append。把 application errors 移到 `errors.py`，既有 import 維持可用。
 
-- [ ] **Step 2: 跑 focused red gate**（working directory: `apps/api`）
+- [x] **Step 2: 跑 focused red gate**（working directory: `apps/api`）
 
   ```powershell
   uv run pytest tests/test_job_analysis_authority_commit.py tests/test_job_analysis_authoring_postgres.py tests/test_job_analysis_proposal_decisions_postgres.py -q
   ```
 
-- [ ] **Step 3: 做 move-first refactor**
+- [x] **Step 3: 做 move-first refactor**
 
   從 `proposal_decisions._persist` 移出共同順序，讓 `_commit_direct_edit` 與 Proposal use cases 只保留各自的入口規則與狀態推導。Durable turn 不接入此 helper。
 
-- [ ] **Step 4: 跑 focused 與全 `job_analysis` gate**
+- [x] **Step 4: 跑 focused 與全 `job_analysis` gate**
 
   ```powershell
   uv run pytest tests/test_job_analysis_authority_commit.py tests/test_job_analysis_authoring_postgres.py tests/test_job_analysis_proposal_decisions_postgres.py tests/test_job_analysis_durable_turn_postgres.py -q
@@ -79,7 +79,7 @@ async def commit_authority_change(
   uv run pytest @tests -q
   ```
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
   ```powershell
   git add apps/api/app/job_analysis apps/api/tests docs/design/task-analysis-engine.md

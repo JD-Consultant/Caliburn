@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from uuid import UUID
 
-from .authoring import (
+from .errors import (
     ConcurrentAuthorityChange,
     DocumentNotFound,
     IdempotencyConflict,

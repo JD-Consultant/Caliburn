@@ -20,6 +20,13 @@ from app.job_analysis.domain import (
     TaskId,
 )
 
+from .authority_commit import commit_authority_change
+from .errors import (
+    DocumentNotFound,
+    IdempotencyConflict,
+    InvalidJdTaskOrder,
+    JdTaskNotFound,
+)
 from .persistence import (
     DIRECT_EDIT_SCHEMA_ID,
     DirectEditPayload,
@@ -31,30 +38,6 @@ from .persistence import (
     LoadedDocument,
 )
 from .transition import JobAnalysisState
-
-
-class JobAnalysisApplicationError(RuntimeError):
-    pass
-
-
-class DocumentNotFound(JobAnalysisApplicationError):
-    pass
-
-
-class JdTaskNotFound(JobAnalysisApplicationError):
-    pass
-
-
-class IdempotencyConflict(JobAnalysisApplicationError):
-    pass
-
-
-class ConcurrentAuthorityChange(JobAnalysisApplicationError):
-    pass
-
-
-class InvalidJdTaskOrder(JobAnalysisApplicationError):
-    pass
 
 
 def _utcnow() -> datetime:
@@ -203,30 +186,24 @@ async def _commit_direct_edit(
     payload: DirectEditPayload,
 ) -> None:
     now = _utcnow()
-    await uow.tasks.replace(record.document_id, tasks)
-    await uow.proposals.replace(record.document_id, proposals)
-    await uow.journal.add(
-        JournalEntry(
+    await commit_authority_change(
+        uow,
+        record=record,
+        state=JobAnalysisState(
+            work_model=work_model,
+            current_jd=tasks,
+            proposals=proposals,
+        ),
+        journal_entry=JournalEntry(
             document_id=record.document_id,
             entry_id=entry_id,
             kind="direct_edit",
             payload_schema_id=DIRECT_EDIT_SCHEMA_ID,
             payload=payload,
             created_at=now,
-        )
-    )
-    updated = await uow.documents.update_authority(
-        record.document_id,
-        expected_generation=record.authority_generation,
-        work_model=work_model,
-        active_question=record.active_question,
+        ),
         updated_at=now,
     )
-    if not updated:
-        raise ConcurrentAuthorityChange(
-            f"document {record.document_id} authority changed concurrently"
-        )
-    await uow.commit()
 
 
 async def create_document(

@@ -7,7 +7,14 @@ from pathlib import Path
 
 from jsonschema import Draft202012Validator
 
-from job_analysis_contract import JdTaskWrite, ProblemDetail
+from job_analysis_contract import (
+    ConsultationView,
+    EmployeeTurnWrite,
+    JdTaskWrite,
+    ProblemDetail,
+    ProposalDecisionWrite,
+    ProposalView,
+)
 
 
 PACKAGE_ROOT = Path(__file__).parents[1]
@@ -19,6 +26,8 @@ PROBLEM_TYPES = {
     "https://caliburn.dev/problems/job-analysis/authority-conflict",
     "https://caliburn.dev/problems/job-analysis/invalid-task-order",
     "https://caliburn.dev/problems/job-analysis/invalid-request",
+    "https://caliburn.dev/problems/job-analysis/proposal-not-found",
+    "https://caliburn.dev/problems/job-analysis/consultant-unavailable",
 }
 
 
@@ -39,22 +48,85 @@ def test_schema_owns_only_the_workspace_wire_contract():
         "DocumentMetadataView",
         "DocumentSummary",
         "DocumentView",
+        "ActiveQuestionView",
+        "ConsultationView",
+        "ConversationTurnView",
+        "EmployeeTurnWrite",
         "Enabler",
         "JdTaskWrite",
         "JdTaskView",
         "ProblemDetail",
         "ProblemFieldError",
+        "ProposalDecisionWrite",
+        "ProposalJdEntryView",
+        "ProposalView",
         "TaskOrderWrite",
     }
 
 
-def test_problem_type_is_the_six_value_machine_identifier():
+def test_problem_type_is_the_eight_value_machine_identifier():
     """Adding an untyped error branch must change the generated consumers."""
 
     problem = _schema()["$defs"]["ProblemDetail"]
 
     assert set(problem["properties"]["type"]["enum"]) == PROBLEM_TYPES
     assert problem["additionalProperties"] is True
+
+
+def test_consultation_contract_exposes_only_product_views_and_supported_decisions():
+    schema = _schema()
+    consultation = schema["$defs"]["ConsultationView"]
+    decision = schema["$defs"]["ProposalDecisionWrite"]
+
+    assert consultation["additionalProperties"] is False
+    assert set(consultation["properties"]) == {
+        "document",
+        "conversation",
+        "active_question",
+        "proposals",
+        "tasks",
+    }
+    assert set(decision["properties"]["decision"]["enum"]) == {
+        "accepted",
+        "edited",
+        "rejected",
+        "deferred",
+    }
+    assert "revision_requested" not in decision["properties"]["decision"]["enum"]
+
+
+def test_proposal_view_can_preserve_null_snapshots_edits_stale_reason_and_quotes():
+    validator = Draft202012Validator(_schema())
+    proposal = {
+        "proposal_id": "proposal-1",
+        "action": "withdraw",
+        "status": "stale",
+        "jd_before": [
+            {
+                "task_id": "task-1",
+                "value": {
+                    "task_id": "task-1",
+                    "statement": "處理客戶退貨",
+                    "purpose_result": None,
+                    "context": None,
+                    "frequency_text": None,
+                    "responsibility_role": None,
+                    "enablers": [],
+                    "display_order": 0,
+                },
+            }
+        ],
+        "jd_after": [{"task_id": "task-1", "value": None}],
+        "edited_jd_after": None,
+        "rejection_reason": None,
+        "stale_reason": "Current JD 已由員工修改",
+        "evidence_quotes": ["那其實是別人在做"],
+    }
+
+    errors = validator.evolve(
+        schema={"$ref": "#/$defs/ProposalView"}
+    ).iter_errors(proposal)
+    assert list(errors) == []
 
 
 def test_optional_task_text_can_reach_the_mapper_as_blank_or_null():
@@ -128,3 +200,10 @@ def test_generated_models_keep_normalization_and_problem_extension_boundaries():
     assert problem.model_extra == {
         "future_extension": {"ignored_by_old_consumers": True}
     }
+
+
+def test_generated_consultation_models_are_exported_from_the_package():
+    assert ConsultationView.__name__ == "ConsultationView"
+    assert ProposalView.__name__ == "ProposalView"
+    assert EmployeeTurnWrite(text="我每週彙整營運週報").text.startswith("我")
+    assert ProposalDecisionWrite(decision="accepted").decision.value == "accepted"

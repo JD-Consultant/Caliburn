@@ -1,27 +1,41 @@
 """Generated Local Web job-analysis wire models."""
 
 from .models import (
+    ActiveQuestionView,
+    ConsultationView,
+    ConversationTurnView,
     DocumentMetadataView,
     DocumentMetadataWrite,
     DocumentSummary,
     DocumentView,
+    EmployeeTurnWrite,
     Enabler,
     JdTaskView,
     JdTaskWrite,
     ProblemDetail,
     ProblemFieldError,
+    ProposalDecisionWrite,
+    ProposalJdEntryView,
+    ProposalView,
     TaskOrderWrite,
 )
 
 __all__ = [
+    "ActiveQuestionView",
+    "ConsultationView",
+    "ConversationTurnView",
     "DocumentMetadataView",
     "DocumentMetadataWrite",
     "DocumentSummary",
     "DocumentView",
+    "EmployeeTurnWrite",
     "Enabler",
     "JdTaskView",
     "JdTaskWrite",
     "ProblemDetail",
     "ProblemFieldError",
+    "ProposalDecisionWrite",
+    "ProposalJdEntryView",
+    "ProposalView",
     "TaskOrderWrite",
 ]

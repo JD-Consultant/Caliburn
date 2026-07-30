@@ -81,6 +81,73 @@ export interface DocumentView {
 }
 /**
  * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "ConversationTurnView".
+ */
+export interface ConversationTurnView {
+  turn_id: string;
+  speaker: "employee" | "consultant";
+  text: string;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "ActiveQuestionView".
+ */
+export interface ActiveQuestionView {
+  turn_id: string;
+  text: string;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "ProposalJdEntryView".
+ */
+export interface ProposalJdEntryView {
+  task_id: string;
+  value: JdTaskView | null;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "ProposalView".
+ */
+export interface ProposalView {
+  proposal_id: string;
+  action: "add" | "revise" | "withdraw" | "merge" | "split";
+  status: "pending" | "deferred" | "accepted" | "edited" | "rejected" | "revision_requested" | "stale";
+  jd_before: ProposalJdEntryView[];
+  jd_after: ProposalJdEntryView[];
+  edited_jd_after: ProposalJdEntryView[] | null;
+  rejection_reason: string | null;
+  stale_reason: string | null;
+  evidence_quotes: string[];
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "ConsultationView".
+ */
+export interface ConsultationView {
+  document: DocumentMetadataView;
+  conversation: ConversationTurnView[];
+  active_question: ActiveQuestionView | null;
+  proposals: ProposalView[];
+  tasks: JdTaskView[];
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "EmployeeTurnWrite".
+ */
+export interface EmployeeTurnWrite {
+  text: string;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "ProposalDecisionWrite".
+ */
+export interface ProposalDecisionWrite {
+  decision: "accepted" | "edited" | "rejected" | "deferred";
+  edited_jd_after?: ProposalJdEntryView[] | null;
+  reason?: string | null;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
  * via the `definition` "TaskOrderWrite".
  */
 export interface TaskOrderWrite {
@@ -105,7 +172,9 @@ export interface ProblemDetail {
     | "https://caliburn.dev/problems/job-analysis/idempotency-conflict"
     | "https://caliburn.dev/problems/job-analysis/authority-conflict"
     | "https://caliburn.dev/problems/job-analysis/invalid-task-order"
-    | "https://caliburn.dev/problems/job-analysis/invalid-request";
+    | "https://caliburn.dev/problems/job-analysis/invalid-request"
+    | "https://caliburn.dev/problems/job-analysis/proposal-not-found"
+    | "https://caliburn.dev/problems/job-analysis/consultant-unavailable";
   title: string;
   status: number;
   detail?: string | null;

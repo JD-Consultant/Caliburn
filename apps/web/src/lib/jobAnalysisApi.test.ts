@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { JdTaskWrite } from "@caliburn/job-analysis-contract";
+import type { JdTaskWrite, ProposalDecisionWrite } from "@caliburn/job-analysis-contract";
 
 import {
   JobAnalysisApiError,
@@ -8,10 +8,13 @@ import {
   deleteTask,
   editTask,
   getDocument,
+  getConsultation,
   jobAnalysisProblemMessage,
   listDocuments,
   putDocument,
   reorderTasks,
+  submitEmployeeTurn,
+  decideProposal,
 } from "./jobAnalysisApi";
 
 const DOCUMENT_ID = "00000000-0000-0000-0000-000000000045";
@@ -157,6 +160,8 @@ describe("jobAnalysisProblemMessage", () => {
     ["authority-conflict", "內容已有更新"],
     ["invalid-task-order", "工作順序不正確"],
     ["invalid-request", "請檢查輸入內容"],
+    ["proposal-not-found", "找不到這項提案"],
+    ["consultant-unavailable", "顧問暫時無法完成分析，請稍後重試"],
   ])("maps %s without parsing detail", (suffix, message) => {
     expect(
       jobAnalysisProblemMessage(
@@ -169,5 +174,47 @@ describe("jobAnalysisProblemMessage", () => {
     expect(jobAnalysisProblemMessage("https://example.test/future")).toBe(
       "操作失敗，請稍後再試",
     );
+  });
+});
+
+describe("consultant loop client", () => {
+  const consultation = {
+    document: {
+      document_id: DOCUMENT_ID,
+      title: "門市營運專員",
+      updated_at: "2026-07-30T10:00:00Z",
+    },
+    conversation: [],
+    active_question: null,
+    proposals: [],
+    tasks: [],
+  };
+
+  it("uses only the new consultation routes and caller-owned retry keys", async () => {
+    const decision: ProposalDecisionWrite = { decision: "accepted" };
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(response(consultation))
+      .mockResolvedValueOnce(response(consultation))
+      .mockResolvedValueOnce(response(consultation));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await getConsultation(DOCUMENT_ID);
+    await submitEmployeeTurn(DOCUMENT_ID, "turn-op-1", "我每週彙整營運週報");
+    await decideProposal(DOCUMENT_ID, "proposal-1", "decision-op-1", decision);
+
+    expect(fetchMock.mock.calls.map((call) => [call[1].method, call[0]])).toEqual([
+      ["GET", `http://127.0.0.1:8001/api/v1/job-analysis/documents/${DOCUMENT_ID}/consultation`],
+      ["POST", `http://127.0.0.1:8001/api/v1/job-analysis/documents/${DOCUMENT_ID}/turns`],
+      ["POST", `http://127.0.0.1:8001/api/v1/job-analysis/documents/${DOCUMENT_ID}/proposals/proposal-1/decisions`],
+    ]);
+    expect(fetchMock.mock.calls[1][1]).toMatchObject({
+      headers: expect.objectContaining({ "Idempotency-Key": "turn-op-1" }),
+      body: JSON.stringify({ text: "我每週彙整營運週報" }),
+    });
+    expect(fetchMock.mock.calls[2][1]).toMatchObject({
+      headers: expect.objectContaining({ "Idempotency-Key": "decision-op-1" }),
+      body: JSON.stringify(decision),
+    });
   });
 });

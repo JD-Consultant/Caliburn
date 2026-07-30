@@ -280,15 +280,15 @@ POST /api/v1/job-analysis/documents/{document_id}/proposals/{proposal_id}/decisi
 - edit 只送完整 `edited_jd_after` 文字 map，不改 topology。
 - Current JD 仍用既有同一套 FastAPI direct-edit seam；AI Proposal 與人類編輯不另建第二條資料庫寫入路徑。
 
-- [ ] **Step 1: client／pure helper 紅測試**
+- [x] **Step 1: client／pure helper 紅測試**
 
   測新 API path/header/body、兩種新 Problem 文案、Proposal 分組、editable entry map、retry key 保留規則與 query invalidation。
 
-- [ ] **Step 2: 最小元件實作**
+- [x] **Step 2: 最小元件實作**
 
   將 `TaskEditor` 變成可嵌入右欄的 Task 面板，header/back/整頁 dirty guard 提升到 `ConsultationWorkspace`；不引入新 state library。可見文字與 Proposal 決策都留在同頁。
 
-- [ ] **Step 3: Gate**（working directory: `apps/web`）
+- [x] **Step 3: Gate**（working directory: `apps/web`）
 
   ```powershell
   npm run test
@@ -297,7 +297,7 @@ POST /api/v1/job-analysis/documents/{document_id}/proposals/{proposal_id}/decisi
   npm run build
   ```
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
   ```powershell
   git add apps/web

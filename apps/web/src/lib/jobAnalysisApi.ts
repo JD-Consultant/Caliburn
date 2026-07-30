@@ -1,10 +1,12 @@
 import type {
+  ConsultationView,
   DocumentMetadataView,
   DocumentSummary,
   DocumentView,
   JdTaskView,
   JdTaskWrite,
   ProblemDetail,
+  ProposalDecisionWrite,
 } from "@caliburn/job-analysis-contract";
 
 const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8001";
@@ -73,6 +75,12 @@ export function getDocument(documentId: string): Promise<DocumentView> {
   return request<DocumentView>(`/documents/${documentId}`, { method: "GET" });
 }
 
+export function getConsultation(documentId: string): Promise<ConsultationView> {
+  return request<ConsultationView>(`/documents/${documentId}/consultation`, {
+    method: "GET",
+  });
+}
+
 function mutationHeaders(idempotencyKey: string) {
   return { "Idempotency-Key": idempotencyKey };
 }
@@ -125,6 +133,34 @@ export function reorderTasks(
   });
 }
 
+export function submitEmployeeTurn(
+  documentId: string,
+  idempotencyKey: string,
+  text: string,
+): Promise<ConsultationView> {
+  return request<ConsultationView>(`/documents/${documentId}/turns`, {
+    method: "POST",
+    headers: mutationHeaders(idempotencyKey),
+    body: JSON.stringify({ text }),
+  });
+}
+
+export function decideProposal(
+  documentId: string,
+  proposalId: string,
+  idempotencyKey: string,
+  decision: ProposalDecisionWrite,
+): Promise<ConsultationView> {
+  return request<ConsultationView>(
+    `/documents/${documentId}/proposals/${proposalId}/decisions`,
+    {
+      method: "POST",
+      headers: mutationHeaders(idempotencyKey),
+      body: JSON.stringify(decision),
+    },
+  );
+}
+
 type KnownProblemType = ProblemDetail["type"];
 
 function knownProblemMessage(type: KnownProblemType): string {
@@ -141,6 +177,10 @@ function knownProblemMessage(type: KnownProblemType): string {
       return "工作順序不正確";
     case "https://caliburn.dev/problems/job-analysis/invalid-request":
       return "請檢查輸入內容";
+    case "https://caliburn.dev/problems/job-analysis/proposal-not-found":
+      return "找不到這項提案";
+    case "https://caliburn.dev/problems/job-analysis/consultant-unavailable":
+      return "顧問暫時無法完成分析，請稍後重試";
     default:
       return assertNever(type);
   }
@@ -153,6 +193,8 @@ const KNOWN_PROBLEM_TYPES = new Set<string>([
   "https://caliburn.dev/problems/job-analysis/authority-conflict",
   "https://caliburn.dev/problems/job-analysis/invalid-task-order",
   "https://caliburn.dev/problems/job-analysis/invalid-request",
+  "https://caliburn.dev/problems/job-analysis/proposal-not-found",
+  "https://caliburn.dev/problems/job-analysis/consultant-unavailable",
 ] satisfies KnownProblemType[]);
 
 function assertNever(value: never): never {

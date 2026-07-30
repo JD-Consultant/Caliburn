@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowDown, ArrowLeft, ArrowUp, Pencil, Plus, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -40,7 +40,15 @@ function errorText(error: unknown) {
     : "操作失敗，請稍後再試";
 }
 
-export function TaskEditor({ documentId }: { documentId: string }) {
+export function TaskEditor({
+  documentId,
+  embedded = false,
+  onDirtyChange,
+}: {
+  documentId: string;
+  embedded?: boolean;
+  onDirtyChange?: (dirty: boolean) => void;
+}) {
   const queryClient = useQueryClient();
   const document = useQuery(documentQueryOptions(documentId));
   const [editingTaskId, setEditingTaskId] = useState<string | "new" | null>(null);
@@ -88,6 +96,10 @@ export function TaskEditor({ documentId }: { documentId: string }) {
   const dirty = Boolean(
     baseline && draft && isTaskFormDirty(baseline, draft),
   );
+
+  useEffect(() => {
+    onDirtyChange?.(dirty);
+  }, [dirty, onDirtyChange]);
 
   const startNew = () => {
     saveMutation.reset();
@@ -171,9 +183,9 @@ export function TaskEditor({ documentId }: { documentId: string }) {
     saveMutation.isPending || deleteMutation.isPending || reorderMutation.isPending;
 
   return (
-    <div className="min-h-screen bg-muted/30">
+    <div className={embedded ? "" : "min-h-screen bg-muted/30"}>
       <UnsavedChangesGuard dirty={dirty} />
-      <header className="border-b bg-background">
+      {!embedded ? <header className="border-b bg-background">
         <div className="mx-auto flex max-w-5xl items-center gap-4 px-6 py-5">
           <GuardedLink
             dirty={dirty}
@@ -194,9 +206,22 @@ export function TaskEditor({ documentId }: { documentId: string }) {
             新增工作
           </Button>
         </div>
-      </header>
+      </header> : (
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <div>
+            <h2 className="text-lg font-semibold">目前文件</h2>
+            <p className="text-sm text-muted-foreground">
+              {document.data.tasks.length} 項工作；可直接新增或修改。
+            </p>
+          </div>
+          <Button disabled={busy || editingTaskId !== null} onClick={startNew}>
+            <Plus />
+            新增工作
+          </Button>
+        </div>
+      )}
 
-      <main className="mx-auto max-w-5xl space-y-4 px-6 py-8">
+      <main className={embedded ? "space-y-4" : "mx-auto max-w-5xl space-y-4 px-6 py-8"}>
         {editingTaskId === "new" && draft ? (
           <Card className="p-5">
             <h2 className="text-base font-semibold">新增工作</h2>

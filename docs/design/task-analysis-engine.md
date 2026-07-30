@@ -23,7 +23,9 @@ updated: 2026-07-30
 > 員工不完整 Task 的 identity 對齊見
 > [ADR 0044](../adr/0044-partial-jd-task-reconciliation-and-human-confirmation.md)。
 > Local Web transport 邊界見
-> [ADR 0045](../adr/0045-job-analysis-local-web-contract-and-current-jd-editing.md)。
+> [ADR 0045](../adr/0045-job-analysis-local-web-contract-and-current-jd-editing.md)；
+> 最小顧問回合與固定開場見
+> [ADR 0046](../adr/0046-professional-consultant-minimal-durable-loop.md)。
 
 ## 1. 一句話
 
@@ -44,10 +46,10 @@ OpenRouter 拿 `TaskAnalysisResult.v1` → **verifier**(純函式、零 LLM)擋�
 | provider | 最小 OpenRouter Chat adapter | `providers/openrouter.py` | 一次 HTTP;固定 `reasoning=high` 且不回傳 reasoning;成功內容必須由 response `model` 證明來自 exact configured model;typed 失敗;**只收 render 過的文字** |
 | transition | 結果 → Work Model 變更 ＋ Proposal | `application/transition.py` | **唯一寫入者**;全有或全無 |
 | persistence ports | Current State repositories／UoW／版本化 Journal payload | `application/persistence.py` | 純 Protocol 與 frozen contracts；不認 ORM／JSON row |
-| PostgreSQL adapter | 0012 四表、serialization、repositories、UoW | `app/adapters/job_analysis_postgres/` | JSONB 讀取必須 hydrate；schema/shape 壞掉 fail-closed；repository 不 commit |
+| PostgreSQL adapter | 0012 四表＋0013 Journal kind、serialization、repositories、UoW | `app/adapters/job_analysis_postgres/` | JSONB 讀取必須 hydrate；schema/shape 壞掉 fail-closed；repository 不 commit |
 | authority commit seam | 完整 Current State → 同一 UoW 原子寫入 | `application/authority_commit.py` | 先重驗完整 `JobAnalysisState`，再 replace JD／Proposal、選擇性寫 Journal、generation CAS、單次 commit |
 | authoring use cases | 文件庫與 JD Task add/edit/delete/reorder | `application/authoring.py` | document row lock → entry replay check → Current State/Journal/generation 同交易；不呼叫 LLM |
-| durable turn | authority snapshot → 交易外模型呼叫 → verified commit | `application/durable_turn.py` | commit 時重鎖並比對 generation/read-set；Work Model、Proposal、下一題與 completed-turn Journal 同交易 |
+| consultation use case | provider 前 replay → authority snapshot → 交易外模型呼叫 → verified commit | `application/consultation.py`、`application/durable_turn.py` | 已提交的同 key／同回答零 provider call；commit 時重鎖並比對 generation/read-set；Work Model、Proposal、下一題與 completed-turn Journal 同交易 |
 | Proposal use cases | 候選送審 + accept/edit/reject/defer/revision request | `application/proposal_decisions.py` | `propose_task_for_jd()` 不自動接受；決策由 document lock 序列化；接受類才改 JD；決策寫 Journal |
 | Local Web API | 本機文件列表、建立／改名、開啟與 Current JD Task 編輯 | `app/api/routes/job_analysis.py` | 只做 generated wire DTO mapping；不暴露 Work Model、Proposal、Journal 或 generation；mutation 直接呼叫既有 authoring use cases |
 | Local Web UI | 文件庫與單一開啟文件的 Task editor | `apps/web/src/app/workspace/`、`components/workspace/` | generated TS DTO + TanStack Query；一份本地草稿、明確儲存，不用 Server Action／autosave／第二份 document store |
@@ -84,6 +86,11 @@ Web 的 `/workspace` 用 `DocumentLibrary` 列出／建立／改名；`/workspac
 `TaskEditor` 一次只載入一份 `DocumentView`。Task form 的 draft 只在編輯期間存在；成功後 invalidate
 文件與文件庫 query 並回讀 PostgreSQL 現況。相同失敗操作、相同 payload 的人工重送沿用原
 `Idempotency-Key`；未改內容禁止儲存，避免製造空 Journal 與無關 generation bump。
+新 document 建立時，`put_document_metadata()` 在同一個 UoW 建立固定 consultant opening
+Journal entry 並設為 `active_question`；不呼叫模型、不另建 chat table。rename 與 metadata replay
+不重複開場。`JournalRepository.list_conversation_turns()` 依 `journal_sequence` 將 opening 展開成
+一個 consultant turn，並將每個 completed-turn payload 展開成 employee＋consultant；這份 lossless
+transcript 同時供下一輪 packet 與之後的 Consultation View 使用。
 既有 Task 在下一次 AI 互動時看到 JD/Work Model 差異；JD-only Task 先落一筆
 `insufficient_evidence` open issue，明確保存該 JD `task_id`，不補造空殼 Work Model Task。
 下一輪 packet 只把它投影成可追問的 partial Task：
@@ -93,11 +100,13 @@ Web 的 `/workspace` 用 `DocumentLibrary` 列出／建立／改名；`/workspac
 - `duplicate`／`overlap`／`uncertain` 保留 issue 並追問，不以文字相似度猜 identity；
 - next question 指向該 issue 時，同一 transition 保存 `last_asked_turn_id`，reload 後可續問。
 
-持久 AI 回合由 composition 依序呼叫 `prepare_turn()` →
+持久 AI 回合由 `submit_employee_turn()` 先以 `operation_id` 查 Journal：已提交且回答相同就直接
+返回，回答不同則 `IdempotencyConflict`；只有尚未提交才依序呼叫 `prepare_turn()` →
 `run_task_analysis_operation()` → `commit_verified_turn()`。第一步讀完即關閉交易，LLM I/O
 期間不持有 PostgreSQL lock；最後一步才重鎖 document。generation、packet read-set 或
 conversation authority 任一不一致就回 `StaleAuthoritySnapshot`，舊結果不得套用。
-相同 `operation_id` 的已提交回合只回傳目前狀態，不會再新增 Task／Proposal／Journal。
+相同 `operation_id` 的已提交回合不會再打 provider，也不會新增 Task／Proposal／Journal。
+兩個同時飛行中的相同 request 尚未合併；這是單機第一版的明示限制，不得稱為 exactly-once。
 
 Proposal 決策由 `decide_proposal()` 完成，沒有 LLM。`accepted` 套用 `jd_after`；
 `edited` 套用員工文字並標記後續 reconcile；`rejected`、`deferred`、

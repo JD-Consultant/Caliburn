@@ -65,7 +65,7 @@ def verified_add_result() -> TaskAnalysisOperationResult:
             WorkSignal(
                 anchors=(
                     SignalAnchor(
-                        turn_ordinal=1,
+                        turn_ordinal=2,
                         quote="我每週會彙整營運週報",
                     ),
                 ),
@@ -137,8 +137,8 @@ async def test_verified_turn_commits_state_question_journal_and_replays_once(
     ]
     assert loaded.document.active_question is not None
     assert loaded.document.active_question.text == "這份週報主要交給誰？"
-    assert len(loaded.recent_turns) == 1
-    assert loaded.recent_turns[0].operation_id == "operation-1"
+    assert len(loaded.conversation_turns) == 3
+    assert loaded.conversation_turns[-1].turn_id == "operation-1-consultant"
 
 
 async def test_authority_change_after_prepare_rejects_the_old_model_result(
@@ -177,7 +177,7 @@ async def test_authority_change_after_prepare_rejects_the_old_model_result(
     loaded = await load_document(uow_factory, document_id)
     assert loaded is not None
     assert loaded.document.authority_generation == 1
-    assert loaded.recent_turns == ()
+    assert len(loaded.conversation_turns) == 1
     assert loaded.state.work_model.tasks == ()
 
 
@@ -209,7 +209,7 @@ async def test_partial_jd_task_materializes_with_the_same_identity_after_reload(
             WorkSignal(
                 anchors=(
                     SignalAnchor(
-                        turn_ordinal=1,
+                            turn_ordinal=2,
                         quote="我每週會彙整營運週報",
                     ),
                 ),
@@ -285,7 +285,7 @@ async def test_unverified_provider_outcome_never_writes_current_state(
     loaded = await load_document(uow_factory, document_id)
     assert loaded is not None
     assert loaded.document.authority_generation == 0
-    assert loaded.recent_turns == ()
+    assert len(loaded.conversation_turns) == 1
 
 
 async def test_verified_revise_persists_the_proposal_with_the_completed_turn(
@@ -340,7 +340,7 @@ async def test_verified_revise_persists_the_proposal_with_the_completed_turn(
             WorkSignal(
                 anchors=(
                     SignalAnchor(
-                        turn_ordinal=1,
+                            turn_ordinal=2,
                         quote="我每週會彙整營運週報",
                     ),
                 ),
@@ -385,4 +385,4 @@ async def test_verified_revise_persists_the_proposal_with_the_completed_turn(
     assert loaded.document.authority_generation == 2
     assert loaded.state.proposals[0].proposal_id == "operation-revise-p0"
     assert loaded.state.current_jd == (jd_task,)
-    assert isinstance(loaded.recent_turns[0], CompletedTurnPayload)
+    assert loaded.conversation_turns[-1].speaker is TurnSpeaker.CONSULTANT

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 from datetime import UTC, datetime, timedelta
+from types import SimpleNamespace
 from uuid import UUID
 
 import pytest
@@ -13,10 +14,13 @@ from app.adapters.job_analysis_postgres import (
     PersistedJobAnalysisCorruption,
     SqlAlchemyJobAnalysisUnitOfWork,
 )
+from app.adapters.job_analysis_postgres import serialization as ser
 from app.job_analysis.application import (
     COMPLETED_TURN_SCHEMA_ID,
+    CONSULTANT_OPENING_SCHEMA_ID,
     ActiveQuestion,
     CompletedTurnPayload,
+    ConsultantOpeningPayload,
     ConversationTurn,
     DocumentRecord,
     JournalEntry,
@@ -38,6 +42,29 @@ from app.job_analysis.domain import (
 
 pytestmark = pytest.mark.asyncio
 NOW = datetime(2026, 7, 29, 10, 0, tzinfo=UTC)
+
+
+async def test_consultant_opening_journal_serialization_round_trip():
+    turn = ConversationTurn(
+        turn_id="consultant-opening",
+        speaker=TurnSpeaker.CONSULTANT,
+        text="先說說這個職位主要替誰解決什麼問題？",
+    )
+    entry = ser.load_journal(
+        SimpleNamespace(
+            document_id=UUID(int=45),
+            entry_id="consultant-opening",
+            kind="consultant_opening",
+            payload_schema_id=CONSULTANT_OPENING_SCHEMA_ID,
+            payload=ConsultantOpeningPayload(
+                consultant_turn=turn
+            ).model_dump(mode="json"),
+            created_at=NOW,
+        )
+    )
+
+    assert isinstance(entry.payload, ConsultantOpeningPayload)
+    assert entry.payload.consultant_turn == turn
 
 
 def document(document_id: UUID) -> DocumentRecord:
@@ -137,13 +164,19 @@ async def test_document_tasks_proposal_and_recent_turns_round_trip(
         loaded_document = await uow.documents.get(document_id)
         loaded_tasks = await uow.tasks.list(document_id)
         loaded_proposals = await uow.proposals.list(document_id)
-        recent = await uow.journal.list_recent_turns(document_id, limit=1)
+        conversation = await uow.journal.list_conversation_turns(document_id)
         summaries = await uow.documents.list()
 
     assert loaded_document == document(document_id)
     assert loaded_tasks == (jd_task(),)
     assert loaded_proposals == (deferred,)
-    assert [turn.operation_id for turn in recent] == ["operation-2"]
+    assert [turn.speaker for turn in conversation] == [
+        TurnSpeaker.EMPLOYEE,
+        TurnSpeaker.CONSULTANT,
+        TurnSpeaker.EMPLOYEE,
+        TurnSpeaker.CONSULTANT,
+    ]
+    assert conversation[-1].turn_id == "consultant-2"
     summary = next(item for item in summaries if item.document_id == document_id)
     assert summary.task_count == 1
 

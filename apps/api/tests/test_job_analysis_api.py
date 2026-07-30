@@ -126,8 +126,17 @@ class _Journal:
     async def add(self, entry) -> None:
         self.store.journal[entry.entry_id] = entry
 
-    async def list_recent_turns(self, document_id: UUID, *, limit):
-        return ()
+    async def list_conversation_turns(self, document_id: UUID):
+        turns = []
+        for entry in self.store.journal.values():
+            payload = entry.payload
+            if hasattr(payload, "consultant_turn") and not hasattr(
+                payload, "employee_turn"
+            ):
+                turns.append(payload.consultant_turn)
+            elif hasattr(payload, "employee_turn"):
+                turns.extend((payload.employee_turn, payload.consultant_turn))
+        return tuple(turns)
 
 
 class _UnitOfWork:
@@ -177,6 +186,13 @@ async def test_put_creates_then_replaces_only_document_metadata(api_client):
     assert renamed.json()["title"] == "資深門市營運專員"
     assert store.document is not None
     assert store.document.authority_generation == 0
+    assert store.document.active_question is not None
+    assert store.document.active_question.text == (
+        "先不用照職稱回答：你這個職位最主要替誰解決什麼問題？"
+    )
+    assert len(store.journal) == 1
+    opening = next(iter(store.journal.values()))
+    assert opening.kind == "consultant_opening"
 
 
 async def test_list_and_open_return_only_the_current_jd_projection(api_client):

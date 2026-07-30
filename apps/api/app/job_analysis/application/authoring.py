@@ -22,6 +22,7 @@ from app.job_analysis.domain import (
 )
 
 from .authority_commit import commit_authority_change
+from .context import ActiveQuestion, ConversationTurn
 from .errors import (
     DocumentNotFound,
     IdempotencyConflict,
@@ -29,7 +30,9 @@ from .errors import (
     JdTaskNotFound,
 )
 from .persistence import (
+    CONSULTANT_OPENING_SCHEMA_ID,
     DIRECT_EDIT_SCHEMA_ID,
+    ConsultantOpeningPayload,
     DirectEditPayload,
     DocumentRecord,
     DocumentSummary,
@@ -39,6 +42,13 @@ from .persistence import (
     LoadedDocument,
 )
 from .transition import JobAnalysisState
+from .verifier import TurnSpeaker
+
+
+CONSULTANT_OPENING_ENTRY_ID = "consultant-opening"
+CONSULTANT_OPENING_TEXT = (
+    "先不用照職稱回答：你這個職位最主要替誰解決什麼問題？"
+)
 
 
 def _utcnow() -> datetime:
@@ -253,16 +263,34 @@ async def put_document_metadata(
                 )
             return DocumentMetadataWriteResult(document=existing, created=False)
         now = _utcnow()
+        opening_turn = ConversationTurn(
+            turn_id=CONSULTANT_OPENING_ENTRY_ID,
+            speaker=TurnSpeaker.CONSULTANT,
+            text=CONSULTANT_OPENING_TEXT,
+        )
         record = DocumentRecord(
             document_id=document_id,
             title=title,
             work_model=CurrentWorkModel(),
-            active_question=None,
+            active_question=ActiveQuestion(
+                turn_id=opening_turn.turn_id,
+                text=opening_turn.text,
+            ),
             authority_generation=0,
             created_at=now,
             updated_at=now,
         )
         await uow.documents.create(record)
+        await uow.journal.add(
+            JournalEntry(
+                document_id=document_id,
+                entry_id=CONSULTANT_OPENING_ENTRY_ID,
+                kind="consultant_opening",
+                payload_schema_id=CONSULTANT_OPENING_SCHEMA_ID,
+                payload=ConsultantOpeningPayload(consultant_turn=opening_turn),
+                created_at=now,
+            )
+        )
         await uow.commit()
         return DocumentMetadataWriteResult(document=record, created=True)
 
@@ -284,7 +312,7 @@ async def load_document(
             return None
         tasks = await uow.tasks.list(document_id)
         proposals = await uow.proposals.list(document_id)
-        turns = await uow.journal.list_recent_turns(document_id, limit=None)
+        turns = await uow.journal.list_conversation_turns(document_id)
         return LoadedDocument(
             document=record,
             state=JobAnalysisState(
@@ -292,7 +320,7 @@ async def load_document(
                 current_jd=tasks,
                 proposals=proposals,
             ),
-            recent_turns=turns,
+            conversation_turns=turns,
         )
 
 

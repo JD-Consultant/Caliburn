@@ -60,19 +60,6 @@ def _utcnow() -> datetime:
     return datetime.now(UTC)
 
 
-def _transcript(
-    completed_turns: tuple[CompletedTurnPayload, ...],
-    *,
-    employee_turn: ConversationTurn,
-) -> tuple[ConversationTurn, ...]:
-    prior = tuple(
-        turn
-        for completed in completed_turns
-        for turn in (completed.employee_turn, completed.consultant_turn)
-    )
-    return (*prior, employee_turn)
-
-
 async def _load_state(
     uow: JobAnalysisUnitOfWork,
     record: DocumentRecord,
@@ -91,12 +78,9 @@ async def _packet_for(
     state: JobAnalysisState,
     employee_turn: ConversationTurn,
 ) -> TaskAnalysisPacket:
-    completed = await uow.journal.list_recent_turns(
-        record.document_id,
-        limit=None,
-    )
+    conversation = await uow.journal.list_conversation_turns(record.document_id)
     return build_context_packet(
-        transcript=_transcript(completed, employee_turn=employee_turn),
+        transcript=(*conversation, employee_turn),
         current_turn_id=employee_turn.turn_id,
         work_model=state.work_model,
         current_jd=state.current_jd,

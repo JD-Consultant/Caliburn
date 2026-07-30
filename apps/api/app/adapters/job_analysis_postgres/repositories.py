@@ -14,6 +14,8 @@ from app.job_analysis.application import (
     WORK_MODEL_SCHEMA_ID,
     ActiveQuestion,
     CompletedTurnPayload,
+    ConsultantOpeningPayload,
+    ConversationTurn,
     DocumentRecord,
     DocumentSummary,
     JournalEntry,
@@ -304,31 +306,30 @@ class SqlAlchemyJournalRepository:
             )
         )
 
-    async def list_recent_turns(
+    async def list_conversation_turns(
         self,
         document_id: UUID,
-        *,
-        limit: int | None,
-    ) -> tuple[CompletedTurnPayload, ...]:
-        if limit is not None and limit <= 0:
-            return ()
-        statement = (
-            select(JobAnalysisJournalRow)
-            .where(
-                JobAnalysisJournalRow.document_id == document_id,
-                JobAnalysisJournalRow.kind == "employee_turn",
+    ) -> tuple[ConversationTurn, ...]:
+        rows = (
+            await self._session.scalars(
+                select(JobAnalysisJournalRow)
+                .where(
+                    JobAnalysisJournalRow.document_id == document_id,
+                    JobAnalysisJournalRow.kind.in_(
+                        ("consultant_opening", "employee_turn")
+                    ),
+                )
+                .order_by(JobAnalysisJournalRow.journal_sequence.asc())
             )
-            .order_by(JobAnalysisJournalRow.journal_sequence.desc())
-        )
-        if limit is not None:
-            statement = statement.limit(limit)
-        rows = (await self._session.scalars(statement)).all()
-        entries = [ser.load_journal(row) for row in reversed(rows)]
-        return tuple(
-            entry.payload
-            for entry in entries
-            if isinstance(entry.payload, CompletedTurnPayload)
-        )
+        ).all()
+        turns: list[ConversationTurn] = []
+        for row in rows:
+            payload = ser.load_journal(row).payload
+            if isinstance(payload, ConsultantOpeningPayload):
+                turns.append(payload.consultant_turn)
+            elif isinstance(payload, CompletedTurnPayload):
+                turns.extend((payload.employee_turn, payload.consultant_turn))
+        return tuple(turns)
 
 
 class SqlAlchemyJobAnalysisUnitOfWork:

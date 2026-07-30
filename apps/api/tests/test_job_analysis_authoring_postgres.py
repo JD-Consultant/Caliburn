@@ -72,7 +72,13 @@ async def test_create_list_and_load_an_empty_document(
     assert loaded is not None
     assert loaded.document == created
     assert loaded.state.current_jd == ()
-    assert loaded.recent_turns == ()
+    assert loaded.document.active_question is not None
+    assert loaded.document.active_question.text == (
+        "先不用照職稱回答：你這個職位最主要替誰解決什麼問題？"
+    )
+    assert [turn.text for turn in loaded.conversation_turns] == [
+        "先不用照職稱回答：你這個職位最主要替誰解決什麼問題？"
+    ]
     assert next(item for item in summaries if item.document_id == document_id).task_count == 0
 
 
@@ -98,7 +104,7 @@ async def test_rename_changes_only_document_metadata(
     assert after.document.title == "資深門市營運專員"
     assert after.document.authority_generation == before.document.authority_generation
     assert after.state == before.state
-    assert after.recent_turns == before.recent_turns
+    assert after.conversation_turns == before.conversation_turns
 
     async with factory() as uow:
         assert await uow.documents.update_title(

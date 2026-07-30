@@ -12,8 +12,9 @@
 
 在接 route 前，先收斂一個現有重複：員工 direct edit 與 Proposal decision 最終都會改 Current JD，
 兩者必須先各自完成權限／precondition 檢查，再把完整的新狀態交給同一個 application-level
-Current JD commit seam。該 seam 統一做完整狀態驗證、repositories 寫入、Journal、authority-generation
-CAS 與 commit／rollback。它不是通用 workflow framework，也不吸收不修改 Current JD 的 AI turn transaction。
+`commit_authority_change` seam。該 seam 統一做完整狀態驗證、repositories 寫入、Journal、
+authority-generation CAS 與 commit／rollback。它也可承接只改 Proposal／stale 狀態的 authority change，
+因此不以 Current JD 命名。它不是通用 workflow framework，也不吸收 durable AI turn transaction。
 
 API 與 Web 是 Python／TypeScript 跨語言 seam，依 [`docs/contract-strategy.md`](../contract-strategy.md)
 採小型 JSON Schema SSOT，生成 Pydantic wire models 與 TypeScript types。Domain model 不由 wire schema
@@ -26,7 +27,8 @@ API 與 Web 是 Python／TypeScript 跨語言 seam，依 [`docs/contract-strateg
 - 員工直接編輯 Current JD，按「儲存」後立即寫 PostgreSQL，不呼叫 LLM，也不顯示內部
   `pending_reconciliation`。
 - AI 不能呼叫 direct-edit 路徑。第二切片中 AI 只能建立 Proposal；員工接受／修改後接受才會寫 Current JD。
-- 員工直接編輯與 AI Proposal review 共用同一個 Task form、同一份 `JdTaskFields` 語意與最終 commit seam；
+- 員工直接編輯與 AI Proposal review 共用同一個 Task form、同一份 `JdTaskFields` 語意與最終
+  `commit_authority_change` seam；
   入口規則仍分開。
 - Task 只要求非空 `statement`；`purpose_result`、`context`、`frequency_text`、
   `responsibility_role` 與 `enablers` 都可留白。
@@ -48,9 +50,10 @@ API 與 Web 是 Python／TypeScript 跨語言 seam，依 [`docs/contract-strateg
 但只有 Proposal helper 在發出 repository 寫入前建構完整 `JobAnalysisState` 驗證兩層狀態。這使核心
 安全網不是單一來源：日後新增欄位或不變量時，存在只改一條路徑的真實風險。
 
-裁決：建立一個只服務「會改 Current JD 的 authority change」的共用函式。Direct edit 與 Proposal
-decision 保留自己的命令驗證、stale 判斷與狀態推導；完成後才呼叫共用函式。Durable AI turn 不改
-Current JD，且另有 provider-outside-transaction／snapshot revalidation 語意，不為追求表面統一而塞入。
+裁決：建立 `commit_authority_change` 共用函式。Direct edit 與 Proposal decision 保留自己的命令驗證、
+stale 判斷與狀態推導；完成後才呼叫共用函式。Durable AI turn 不併入，因為
+`apply_task_analysis_result` 已產生驗證過的 `JobAnalysisState`，且另有
+provider-outside-transaction／snapshot revalidation 語意，不為追求表面統一而塞入。
 
 ### 3.2 舊 Web 不是新產品資料流
 
@@ -74,6 +77,12 @@ workspace DTO，FastAPI 仍提供 OpenAPI 文件；第一版只生成 types，�
 - 生成 `@caliburn/job-analysis-contract` TypeScript types 給 Web；
 - codegen check 以既有 `ocs-contract` 做法為模板；
 - domain `JdTaskFields` 維持純核心模型，route mapper test 確認所有公開欄位完整映射。
+- `apps/api/tests/test_job_analysis_dependencies.py` 把 `job_analysis_contract` 加進禁止 import；只有
+  `app/api` route／mapper 可以同時認識 transport contract 與 domain。
+
+第一版 schema 是封閉且簡單的 object／array／enum／nullable 欄位，先沿用 repo 現有
+`json-schema-to-typescript`。若需要它無法可靠生成的 JSON Schema 2020-12 特性，才停線評估 FastAPI
+OpenAPI 3.1 + `openapi-typescript`，不先建立第二套 codegen pipeline。
 
 這避免 Python route DTO 與 TypeScript type 漂移，但不把 transport concerns 倒灌到 domain。
 
@@ -92,17 +101,21 @@ commit、例外時 rollback；`async_sessionmaker.begin()` 同時提供新 Async
 - SQLAlchemy 2.0.51，[Transactions and Connection Management](https://docs.sqlalchemy.org/en/20/orm/session_transaction.html)
 - SQLAlchemy 2.0.51，[Asynchronous I/O](https://docs.sqlalchemy.org/en/20/orm/extensions/asyncio.html)
 
-### 4.2 FastAPI：獨立 router、明確 response model、更新語意要對得上 HTTP
+### 4.2 FastAPI／HTTP：獨立 router、明確 response model、更新語意要對得上方法
 
-FastAPI 官方目前仍以 `APIRouter` 組織大型應用；response model 會驗證、文件化並過濾輸出。局部更新可
-用 `PATCH` + `exclude_unset`；完整取代則使用 `PUT` 更誠實。
+FastAPI 官方目前仍以 `APIRouter` 組織大型應用；response model 會驗證、文件化並過濾輸出。HTTP 的
+`PUT` 是建立或取代 target resource 的表述，且具冪等語意。本產品把 Document 的可寫表述明定為 metadata
+（第一版只有 `title`），Tasks 是 subresource；`GET document` 可以回 server 組合的較完整讀取投影。
 
 本切片：
 
 - 新增單一 `job_analysis` router，掛入現有唯一 composition root；
-- 文件標題若日後開放局部修改才用 `PATCH`；本切片只在建立時設定標題；
+- `PUT /documents/{document_id}` 建立或取代 metadata，因此同時負責改名；不另養 PATCH。PUT metadata
+  不得改動 Tasks、Work Model、Proposals 或 Journal；
 - Task form 每次送完整可編輯欄位，使用 `PUT`，不把完整取代偽裝成 partial patch；
-- route 只做 transport mapping 與 application error → HTTP status，domain／transaction 規則不寫進 route。
+- route 只做 transport mapping 與 application error → HTTP，domain／transaction 規則不寫進 route；
+- repo 固定 FastAPI 0.115.0；官方 release notes 於 2026-07-29 已到 0.141.1。本切片不把 framework
+  upgrade 混進功能施工，另案評估。
 
 來源：
 
@@ -110,6 +123,8 @@ FastAPI 官方目前仍以 `APIRouter` 組織大型應用；response model 會�
 - FastAPI，[Response Model](https://fastapi.tiangolo.com/tutorial/response-model/)
 - FastAPI，[Body Updates](https://fastapi.tiangolo.com/tutorial/body-updates/)
 - FastAPI，[Generating SDKs](https://fastapi.tiangolo.com/advanced/generate-clients/)
+- FastAPI，[Release Notes — 0.141.1](https://fastapi.tiangolo.com/release-notes/#01411)
+- IETF RFC 9110，[PUT](https://www.rfc-editor.org/rfc/rfc9110.html#name-put)
 
 ### 4.3 Next.js 16.2.6／TanStack Query v5：互動邊界要小，server state 不另抄一份
 
@@ -150,6 +165,59 @@ W3C WAI 要求表單控制項有可辨識標籤。第一版每個輸入都有 vi
 
 來源：W3C WAI，[Labeling Controls](https://www.w3.org/WAI/tutorials/forms/labels/)
 
+### 4.6 Header、Problem Details 與併發邊界
+
+RFC 6648 已廢除新參數使用 `X-` 前綴，因此 Task mutation 採業界慣用的 `Idempotency-Key`。IETF
+Idempotency-Key 文件截至本研究日仍是已過期 Internet-Draft，不得寫成正式標準；第一版只把 header 映射到
+既有 `entry_id`，不建立全站 middleware。
+
+RFC 9457 把 `type` URI 定為 problem 的主要機器識別；建議使用穩定絕對 URI、consumer 不解析 `detail`，
+且必須忽略不認得的 extension。相對 `/api/v1/problems/...` 會因 localhost hostname／port 解析成不同 identity。
+未註冊的 `urn:caliburn:...` 也不採用：RFC 8141 明訂只有語法像 `urn:` 不足以成為有效 URN，NID 必須註冊。
+本產品沿用 repo 已有 `https://caliburn.dev/schema/...` namespace，定義六個固定 type：
+
+- `https://caliburn.dev/problems/job-analysis/document-not-found`
+- `https://caliburn.dev/problems/job-analysis/task-not-found`
+- `https://caliburn.dev/problems/job-analysis/idempotency-conflict`
+- `https://caliburn.dev/problems/job-analysis/authority-conflict`
+- `https://caliburn.dev/problems/job-analysis/invalid-task-order`
+- `https://caliburn.dev/problems/job-analysis/invalid-request`
+
+這六值直接寫進 JSON Schema enum，生成 TypeScript literal union；Web 使用 exhaustive switch／`never`，只依
+`type` 分支。`errors?` 是本產品自訂 extension，不是 RFC 欄位，固定為
+`Array<{field: string, message: string}>`；其他未知 extension 依 RFC 忽略。
+
+FastAPI／Starlette exception handler 是 app-scoped。Application error 由新 route 自己映射；framework body
+validation 只在單一 handler 中依 `/api/v1/job-analysis/*` prefix 轉為 Problem Details，其他 path 呼叫既有
+FastAPI handler。這是相容邊界，不建立通用錯誤框架，並以 legacy error-body regression test 守住。
+
+現有 `authority_generation` CAS 發生在同一 transaction 的 server-side read／write 之間，不會阻止 stale
+browser page 覆寫。第一切片接受單一操作者下的 last-write-wins；若真實使用出現 lost update，再採 RFC 9110
+ETag／`If-Match` → 412，不在此切片預建版本機制，也不繼承 ADR 0015 的 legacy autosave 契約。
+
+來源：
+
+- IETF BCP 178，[RFC 6648](https://www.rfc-editor.org/rfc/rfc6648.html)
+- IETF Datatracker，[The Idempotency-Key HTTP Header Field（expired draft）](https://datatracker.ietf.org/doc/draft-ietf-httpapi-idempotency-key-header/)
+- IETF，[RFC 9457 §3.1.1／§3.2](https://www.rfc-editor.org/rfc/rfc9457.html#section-3.1.1)
+- IETF，[RFC 8141 — URN namespace registration](https://www.rfc-editor.org/rfc/rfc8141.html)
+- IETF，[RFC 9110 §13.1.1 If-Match](https://www.rfc-editor.org/rfc/rfc9110.html#name-if-match)
+
+### 4.7 明確儲存與未存草稿
+
+ADR 0043 的「立即保存」是員工按儲存後直接寫 PostgreSQL、不呼叫 LLM，不代表 keypress autosave。一次 Task
+儲存還會寫 Journal、stale 相關 Proposal、更新 Work Model reconciliation 並 bump authority generation；
+將半句話 debounce autosave 會讓下游把打字中狀態當權威。故第一版採明確儲存，並以 Next 16
+`<Link onNavigate>`、browser `beforeunload`、Ctrl／Cmd+Enter 與 Esc 補足離站與鍵盤操作。
+
+Next 官方也提供 Server Actions 寫入，但這不是強制架構。本產品同一份 Current State 只有
+Client mutation → FastAPI 一條 Web 寫入路徑，避免形成第二份 server-state orchestration。
+
+來源：
+
+- Next.js 16，[`<Link onNavigate>`](https://nextjs.org/docs/app/api-reference/components/link#onnavigate)
+- Next.js 16，[Mutating Data](https://nextjs.org/docs/app/getting-started/updating-data)
+
 ## 5. 方案比較
 
 ### A. 改造舊 dashboard／OCS editor
@@ -164,7 +232,7 @@ W3C WAI 要求表單控制項有可辨識標籤。第一版每個輸入都有 vi
 
 ### C. 兩個薄切片（採用）
 
-第一切片驗證文件庫、單文件編輯、共用 commit seam、API contract、PostgreSQL reload 與基本 UX；第二切片在
+第一切片驗證文件庫、單文件編輯、共用 authority commit seam、API contract、PostgreSQL reload 與基本 UX；第二切片在
 同一個 Task form 上加對話與 Proposal 卡。若第一切片的 DTO／表單欄位不合理，修正成本仍很低。
 
 ## 6. 第一切片具體邊界
@@ -173,7 +241,7 @@ W3C WAI 要求表單控制項有可辨識標籤。第一版每個輸入都有 vi
 
 ```text
 GET    /api/v1/job-analysis/documents
-POST   /api/v1/job-analysis/documents
+PUT    /api/v1/job-analysis/documents/{document_id}
 GET    /api/v1/job-analysis/documents/{document_id}
 POST   /api/v1/job-analysis/documents/{document_id}/tasks
 PUT    /api/v1/job-analysis/documents/{document_id}/tasks/{task_id}
@@ -181,13 +249,15 @@ DELETE /api/v1/job-analysis/documents/{document_id}/tasks/{task_id}
 PUT    /api/v1/job-analysis/documents/{document_id}/task-order
 ```
 
-- `POST document` 由 Web 先生成 UUID，重送同一 request 不建立第二份文件。
-- Task mutation 使用 Web 每次操作生成、同一次重送保持不變的 `X-Operation-Id` header，映射既有
-  `entry_id` idempotency；這是本 route 的明確參數，不新增全站 middleware，也不宣稱它是外部標準。
+- `PUT document` 由 Web 先生成 UUID；不存在時建立（201），已存在時完整取代可寫 metadata `title`（200），
+  因此也是 rename。它不得改動 Task 等 subresource，也不需要 `Idempotency-Key`。
+- Task mutation 使用 Web 每次操作生成、同一次重送保持不變的 `Idempotency-Key` header，映射既有
+  `entry_id` idempotency；這是 de-facto 慣例，不是已發布標準，也不新增全站 middleware。
 - `GET document` 第一版只回文件資訊與 Current JD Tasks；不外洩 Work Model、generation、lineage、Journal 或
   內部 reconciliation。
-- application errors 明確映射：404 not found、409 idempotency／authority conflict、422 invalid order／payload。
-- 第一切片不做 rename、delete document、duplicate、search、pagination 或 export。
+- application errors 以六種固定 RFC 9457 type 映射 404／409／422；不解析 `detail`。
+- Optional text trim 後空字串轉 `null`；`statement` trim 後為空則回 `invalid-request`。
+- 第一切片不做 delete document、duplicate、search、pagination、ETag 或 export。
 
 ### 6.2 Web
 
@@ -209,6 +279,7 @@ PUT    /api/v1/job-analysis/documents/{document_id}/task-order
 ```
 
 - 每個 Task 以明確「編輯 → 儲存／取消」提交；不做每個 keypress autosave，也不呼叫 LLM。
+- 離站時以 `onNavigate`＋`beforeunload` 保護 dirty draft；Ctrl／Cmd+Enter 儲存、Esc 取消。
 - `statement` 必填，其餘欄位留白合法；空值顯示「尚未填寫」，不補 placeholder 內容。
 - 排序先用可鍵盤操作的上移／下移，不在第一版加入 drag-only interaction。
 - mutation 期間鎖定該操作，成功後 invalidate 文件／文件庫 query；失敗保留表單內容並顯示錯誤。
@@ -218,12 +289,14 @@ PUT    /api/v1/job-analysis/documents/{document_id}/task-order
 
 最小但足夠的安全網：
 
-1. 共用 commit seam characterization：direct edit 與 accepted/edited Proposal 都經同一函式；完整狀態不合法時
+1. 共用 `commit_authority_change` characterization：direct edit 與 Proposal authority change 都經同一函式；完整狀態不合法時
    repository 零寫入，CAS 失敗 rollback。
-2. Contract codegen guard：JSON Schema、Pydantic、TypeScript 任一漂移即 fail。
-3. API route tests：create/list/open/add/edit/delete/reorder、404/409/422 與 no-user/no-tenant contract。
+2. Contract codegen guard：JSON Schema、Pydantic、TypeScript 任一漂移即 fail；Problem type 生成 literal union。
+3. API route tests：create/rename/list/open/add/edit/delete/reorder、六種 Problem type、空字串正規化與
+   no-user/no-tenant contract；legacy 422／409 body 形狀保持不變。
 4. 一條 real PostgreSQL HTTP vertical：建立文件 → 新增只有 statement 的 Task → 補欄位 → 排序 → reload。
-5. Web pure tests：DTO↔form mapping、空 optional fields、query keys、mutation error 保留 draft。
+5. Web pure tests：DTO↔form mapping、空 optional fields、query keys、Problem type exhaustive mapping、
+   mutation error 與離站時保留 draft。
 6. Web gates：Vitest、`tsc --noEmit`、ESLint；必要時以本機 browser 做一次手動 smoke，但不先引入 E2E framework。
 
 停線：若需要 import 舊 user/profile/OCS 資料流、修改 `job_analysis` domain 只為配合 UI、建立通用 API framework、
@@ -231,6 +304,6 @@ PUT    /api/v1/job-analysis/documents/{document_id}/task-order
 
 ## 8. 下一步
 
-1. ADR 接受本研究的 commit seam、contract mechanism 與兩個薄切片。
+1. ADR 接受本研究的 authority commit seam、contract mechanism 與兩個薄切片。
 2. 使用者確認書面設計，尤其是「按儲存」而非 keypress autosave，以及第一切片暫不做 AI UI。
-3. 另寫 bite-size plan；TDD 依序做 commit seam → contract → API → Web → real-PG/browser smoke。
+3. 另寫 bite-size plan；TDD 依序做 authority commit seam → contract → API → Web → real-PG/browser smoke。

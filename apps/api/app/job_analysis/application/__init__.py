@@ -33,6 +33,7 @@ from .context import (
     build_context_packet,
     render_context_packet,
 )
+from .consultation import submit_employee_turn
 from .durable_turn import (
     StaleAuthoritySnapshot,
     TransitionCommitRejected,
@@ -48,12 +49,14 @@ from .operation import (
 )
 from .persistence import (
     ACTIVE_QUESTION_SCHEMA_ID,
+    CONSULTANT_OPENING_SCHEMA_ID,
     COMPLETED_TURN_SCHEMA_ID,
     DIRECT_EDIT_SCHEMA_ID,
     PROPOSAL_DECISION_SCHEMA_ID,
     PROPOSAL_SCHEMA_ID,
     WORK_MODEL_SCHEMA_ID,
     CompletedTurnPayload,
+    ConsultantOpeningPayload,
     DirectEditKind,
     DirectEditPayload,
     DocumentRecord,
@@ -101,7 +104,9 @@ __all__ = [
     "ActiveQuestion",
     "ACTIVE_QUESTION_SCHEMA_ID",
     "COMPLETED_TURN_SCHEMA_ID",
+    "CONSULTANT_OPENING_SCHEMA_ID",
     "CompletedTurnPayload",
+    "ConsultantOpeningPayload",
     "ConcurrentAuthorityChange",
     "DIRECT_EDIT_SCHEMA_ID",
     "DirectEditKind",
@@ -152,6 +157,7 @@ __all__ = [
     "TaskAnalysisPacket",
     "build_context_packet",
     "render_context_packet",
+    "submit_employee_turn",
     "PacketOpenIssue",
     "PacketRetiredTask",
     "PacketSupportLink",

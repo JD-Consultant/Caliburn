@@ -34,6 +34,7 @@ from .verifier import TurnSpeaker
 WORK_MODEL_SCHEMA_ID = "job-analysis-work-model/1"
 PROPOSAL_SCHEMA_ID = "job-analysis-proposal/1"
 ACTIVE_QUESTION_SCHEMA_ID = "job-analysis-active-question/1"
+CONSULTANT_OPENING_SCHEMA_ID = "job-analysis-consultant-opening/1"
 COMPLETED_TURN_SCHEMA_ID = "job-analysis-completed-turn/1"
 DIRECT_EDIT_SCHEMA_ID = "job-analysis-direct-edit/1"
 PROPOSAL_DECISION_SCHEMA_ID = "job-analysis-proposal-decision/1"
@@ -60,7 +61,7 @@ class DocumentRecord:
 class LoadedDocument:
     document: DocumentRecord
     state: JobAnalysisState
-    recent_turns: tuple["CompletedTurnPayload", ...]
+    conversation_turns: tuple[ConversationTurn, ...]
 
 
 @dataclass(frozen=True)
@@ -86,6 +87,16 @@ class CompletedTurnPayload(DomainModel):
     def roles_match_the_completed_turn(self):
         if self.employee_turn.speaker is not TurnSpeaker.EMPLOYEE:
             raise ValueError("employee_turn must have the employee speaker")
+        if self.consultant_turn.speaker is not TurnSpeaker.CONSULTANT:
+            raise ValueError("consultant_turn must have the consultant speaker")
+        return self
+
+
+class ConsultantOpeningPayload(DomainModel):
+    consultant_turn: ConversationTurn
+
+    @model_validator(mode="after")
+    def role_matches_the_opening(self):
         if self.consultant_turn.speaker is not TurnSpeaker.CONSULTANT:
             raise ValueError("consultant_turn must have the consultant speaker")
         return self
@@ -149,10 +160,24 @@ class ProposalDecisionPayload(DomainModel):
         return self
 
 
-JournalKind = Literal["employee_turn", "direct_edit", "proposal_decision"]
-JournalPayload = CompletedTurnPayload | DirectEditPayload | ProposalDecisionPayload
+JournalKind = Literal[
+    "consultant_opening",
+    "employee_turn",
+    "direct_edit",
+    "proposal_decision",
+]
+JournalPayload = (
+    ConsultantOpeningPayload
+    | CompletedTurnPayload
+    | DirectEditPayload
+    | ProposalDecisionPayload
+)
 
 _JOURNAL_CONTRACT: dict[type[DomainModel], tuple[JournalKind, str]] = {
+    ConsultantOpeningPayload: (
+        "consultant_opening",
+        CONSULTANT_OPENING_SCHEMA_ID,
+    ),
     CompletedTurnPayload: ("employee_turn", COMPLETED_TURN_SCHEMA_ID),
     DirectEditPayload: ("direct_edit", DIRECT_EDIT_SCHEMA_ID),
     ProposalDecisionPayload: ("proposal_decision", PROPOSAL_DECISION_SCHEMA_ID),
@@ -239,9 +264,9 @@ class JournalRepository(Protocol):
 
     async def add(self, entry: JournalEntry) -> None: ...
 
-    async def list_recent_turns(
-        self, document_id: UUID, *, limit: int | None
-    ) -> tuple[CompletedTurnPayload, ...]: ...
+    async def list_conversation_turns(
+        self, document_id: UUID
+    ) -> tuple[ConversationTurn, ...]: ...
 
 
 class JobAnalysisUnitOfWork(Protocol):

@@ -191,18 +191,18 @@ def _column_kind(column_type) -> str:
     return str(column_type).lower()
 
 
-def test_alembic_has_0012_as_its_single_head():
+def test_alembic_has_0013_as_its_single_head():
     from alembic.config import Config
     from alembic.script import ScriptDirectory
 
     config = Config(str(API_DIR / "alembic.ini"))
     config.set_main_option("script_location", str(API_DIR / "alembic"))
 
-    assert ScriptDirectory.from_config(config).get_heads() == ["0012"]
+    assert ScriptDirectory.from_config(config).get_heads() == ["0013"]
 
 
 @pytest.mark.usefixtures("require_postgres")
-def test_migration_0012_cycle_builds_greenfield_tables_and_preserves_0011():
+def test_migration_0013_cycle_builds_greenfield_tables_and_preserves_0011():
     admin = sa.create_engine(_sync_url("postgres"), isolation_level="AUTOCOMMIT")
     with admin.connect() as connection:
         connection.execute(sa.text(f"DROP DATABASE IF EXISTS {MIG_DB} WITH (FORCE)"))
@@ -221,7 +221,7 @@ def test_migration_0012_cycle_builds_greenfield_tables_and_preserves_0011():
             "job_authoring_proposals",
         }
 
-        _alembic("upgrade", "0012", _async_url(MIG_DB))
+        _alembic("upgrade", "0013", _async_url(MIG_DB))
         inspector = sa.inspect(engine)
         assert TABLES <= set(inspector.get_table_names(schema="public"))
 
@@ -263,6 +263,16 @@ def test_migration_0012_cycle_builds_greenfield_tables_and_preserves_0011():
                 )
             }
         assert EXPECTED_INDEXES <= index_names
+
+        with engine.connect() as connection:
+            journal_kind_check = connection.scalar(
+                sa.text(
+                    "SELECT pg_get_constraintdef(oid) "
+                    "FROM pg_constraint WHERE conname = 'ja2_ck_journal_kind'"
+                )
+            )
+        assert journal_kind_check is not None
+        assert "consultant_opening" in journal_kind_check
 
         _alembic("downgrade", "0011", _async_url(MIG_DB))
         remaining = set(sa.inspect(engine).get_table_names(schema="public"))

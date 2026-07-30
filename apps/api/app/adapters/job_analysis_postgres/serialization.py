@@ -9,12 +9,14 @@ from pydantic import ValidationError
 from app.job_analysis.application import (
     ACTIVE_QUESTION_SCHEMA_ID,
     COMPLETED_TURN_SCHEMA_ID,
+    CONSULTANT_OPENING_SCHEMA_ID,
     DIRECT_EDIT_SCHEMA_ID,
     PROPOSAL_DECISION_SCHEMA_ID,
     PROPOSAL_SCHEMA_ID,
     WORK_MODEL_SCHEMA_ID,
     ActiveQuestion,
     CompletedTurnPayload,
+    ConsultantOpeningPayload,
     DirectEditPayload,
     DocumentRecord,
     JournalEntry,
@@ -146,6 +148,7 @@ def load_proposal(row: Any) -> Proposal:
 
 
 _JOURNAL_PAYLOAD_TYPES = {
+    CONSULTANT_OPENING_SCHEMA_ID: ConsultantOpeningPayload,
     COMPLETED_TURN_SCHEMA_ID: CompletedTurnPayload,
     DIRECT_EDIT_SCHEMA_ID: DirectEditPayload,
     PROPOSAL_DECISION_SCHEMA_ID: ProposalDecisionPayload,
@@ -172,4 +175,3 @@ def load_journal(row: Any) -> JournalEntry:
         )
     except (ValidationError, TypeError, ValueError) as exc:
         _fail("Journal entry", exc, exc)
-

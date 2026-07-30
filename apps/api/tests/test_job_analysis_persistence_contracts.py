@@ -13,6 +13,7 @@ from uuid import uuid4
 import pytest
 from pydantic import ValidationError
 
+import app.job_analysis.application as application
 from app.job_analysis.application import (
     ActiveQuestion,
     CompletedTurnPayload,
@@ -61,6 +62,16 @@ def consultant_turn() -> ConversationTurn:
         speaker=TurnSpeaker.CONSULTANT,
         text="這份週報主要交給誰？",
     )
+
+
+def test_consultant_opening_is_a_typed_consultant_journal_payload():
+    payload_type = getattr(application, "ConsultantOpeningPayload", None)
+    assert payload_type is not None
+    payload = payload_type(consultant_turn=consultant_turn())
+    assert payload.consultant_turn == consultant_turn()
+
+    with pytest.raises(ValidationError, match="consultant"):
+        payload_type(consultant_turn=employee_turn())
 
 
 def test_document_records_are_frozen_and_reject_negative_generation():
@@ -114,7 +125,7 @@ def test_loaded_state_keeps_complete_current_jd_values():
     )
     state = JobAnalysisState(current_jd=(jd_task(),))
 
-    loaded = LoadedDocument(document=document, state=state, recent_turns=())
+    loaded = LoadedDocument(document=document, state=state, conversation_turns=())
 
     assert loaded.state.current_jd[0].frequency_text == "每週一次"
 

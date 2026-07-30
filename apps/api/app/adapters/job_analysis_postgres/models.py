@@ -241,7 +241,7 @@ class JobAnalysisJournalRow(Base):
             name="ja2_ck_journal_entry_id",
         ),
         CheckConstraint(
-            "kind IN ('employee_turn','direct_edit','proposal_decision')",
+            "kind IN ('consultant_opening','employee_turn','direct_edit','proposal_decision')",
             name="ja2_ck_journal_kind",
         ),
         CheckConstraint(

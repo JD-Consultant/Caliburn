@@ -168,7 +168,7 @@ async def test_local_document_survives_every_transaction_boundary(
         == "每日追蹤缺料並回報主管"
     )
     assert reloaded.state.proposals[0].status is ProposalStatus.ACCEPTED
-    assert len(reloaded.recent_turns) == 1
+    assert len(reloaded.conversation_turns) == 3
     assert (
         reloaded.document.active_question.text
         == "你通常透過什麼方式回報缺料？"

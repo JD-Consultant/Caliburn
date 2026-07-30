@@ -40,7 +40,10 @@
 - Modify: `apps/api/app/job_analysis/application/__init__.py`
 - Modify: `apps/api/app/adapters/job_analysis_postgres/serialization.py`
 - Modify: `apps/api/app/adapters/job_analysis_postgres/repositories.py`
+- Modify: `apps/api/app/adapters/job_analysis_postgres/models.py`
+- Create: `apps/api/alembic/versions/0013_job_analysis_consultant_opening.py`
 - Modify: `apps/api/tests/test_job_analysis_persistence_contracts.py`
+- Modify: `apps/api/tests/test_job_analysis_migration.py`
 - Modify: `apps/api/tests/test_job_analysis_authoring_postgres.py`
 - Modify: `apps/api/tests/test_job_analysis_postgres.py`
 - Modify: `apps/api/tests/test_job_analysis_durable_turn_postgres.py`
@@ -90,7 +93,7 @@ Repository 提供按 Journal sequence 展開的 `conversation_turns`：opening �
 - [ ] **Step 5: Commit**
 
   ```powershell
-  git add apps/api/app/job_analysis apps/api/app/adapters/job_analysis_postgres apps/api/tests docs/design/task-analysis-engine.md
+  git add apps/api/alembic/versions/0013_job_analysis_consultant_opening.py apps/api/app/job_analysis apps/api/app/adapters/job_analysis_postgres apps/api/tests docs/design/task-analysis-engine.md docs/plans/2026-07-30-professional-consultant-minimal-loop-plan.md
   git commit -m "feat(job-analysis): persist consultant conversation loop"
   ```
 
@@ -341,4 +344,3 @@ POST /api/v1/job-analysis/documents/{document_id}/proposals/{proposal_id}/decisi
 - [ ] **Step 6: Tag**
 
   全部必要 gate 綠且工作樹乾淨後，依 repo 規則建立 annotated tag；tag 名於收尾時依既有 tag 命名檢查後決定，不預先猜測。
-

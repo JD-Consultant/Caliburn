@@ -474,17 +474,29 @@ class _Writer:
         return not (set(topology_affected) & self._state.current_jd_task_ids)
 
     def _add(self, index: int, signal: WorkSignal) -> None:
-        """`add` 不碰任何既有 identity:一律立即建立候選;要不要進 JD 是後續的事。"""
+        """`add` 立即建立候選；同輪 Proposal 讓員工決定是否進 JD。"""
         task_id = f"{self._operation_id}-t{index}"
+        fields = signal.task_change.task_fields
         inserted = self._insert(
             Task(
                 task_id=task_id,
-                **dict(signal.task_change.task_fields),
+                **dict(fields),
                 support_links=self._support_links(signal),
             )
         )
         if inserted:
             self._immediate.append(task_id)
+            self._create_proposal(
+                index,
+                SingleTaskTarget(action=ProposalAction.ADD, task_id=task_id),
+                jd_after={
+                    task_id: self._jd_task_from_fields(
+                        task_id=task_id,
+                        fields=fields,
+                        display_order=self._next_jd_order(),
+                    )
+                },
+            )
 
     def _revise(self, index: int, signal: WorkSignal, task_id: TaskId) -> None:
         """同 ID revise:Work Model 立即更新(topology delta 為空);JD 文字要跟著改才提案。"""

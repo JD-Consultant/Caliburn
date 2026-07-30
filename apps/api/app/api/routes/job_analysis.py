@@ -1,5 +1,6 @@
-"""Local Web document library and Current JD transport routes."""
+"""Local Web document, Current JD, and consultant-loop transport routes."""
 
+import logging
 from typing import Annotated
 from uuid import UUID
 
@@ -9,41 +10,53 @@ from job_analysis_contract import (
     DocumentMetadataWrite,
     DocumentSummary,
     DocumentView,
+    ConsultationView,
+    EmployeeTurnWrite,
     JdTaskView,
     JdTaskWrite,
     ProblemFieldError,
+    ProposalDecisionWrite,
     TaskOrderWrite,
 )
 from pydantic import ValidationError
 
-from app.api.deps import get_job_analysis_uow_factory
+from app.api.deps import get_job_analysis_adapter, get_job_analysis_uow_factory
 from app.api.job_analysis_mapper import (
     to_document_metadata_view,
     to_document_summary,
     to_document_view,
     to_jd_task_fields,
     to_jd_task_view,
+    to_consultation_view,
+    to_proposal_decision,
 )
 from app.api.job_analysis_problems import (
     DOCUMENT_NOT_FOUND,
     INVALID_REQUEST,
     application_error_response,
+    consultant_unavailable_response,
     domain_validation_error_response,
     problem_response,
 )
 from app.job_analysis.application import (
     JobAnalysisUnitOfWorkFactory,
+    TransitionCommitRejected,
+    UncommittableOperationResult,
     add_jd_task,
     delete_jd_task,
     edit_jd_task,
     list_documents,
     load_document,
+    decide_proposal,
     put_document_metadata,
     reorder_jd_tasks,
+    submit_employee_turn,
 )
 from app.job_analysis.application.errors import JobAnalysisApplicationError
+from app.job_analysis.providers import OpenRouterAdapter
 
 
+logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/job-analysis/documents", tags=["job-analysis"])
 IdempotencyKey = Annotated[
     str,
@@ -108,6 +121,100 @@ async def get_document(
             status=404,
         )
     return to_document_view(loaded)
+
+
+@router.get("/{document_id}/consultation", response_model=ConsultationView)
+async def get_consultation(
+    document_id: UUID,
+    uow_factory: JobAnalysisUnitOfWorkFactory = Depends(
+        get_job_analysis_uow_factory
+    ),
+):
+    loaded = await load_document(uow_factory, document_id)
+    if loaded is None:
+        return problem_response(
+            type_uri=DOCUMENT_NOT_FOUND,
+            title="Document not found",
+            status=404,
+        )
+    return to_consultation_view(loaded)
+
+
+@router.post("/{document_id}/turns", response_model=ConsultationView)
+async def post_employee_turn(
+    document_id: UUID,
+    body: EmployeeTurnWrite,
+    idempotency_key: IdempotencyKey,
+    uow_factory: JobAnalysisUnitOfWorkFactory = Depends(
+        get_job_analysis_uow_factory
+    ),
+    adapter: OpenRouterAdapter = Depends(get_job_analysis_adapter),
+):
+    text = body.text.strip()
+    if not text:
+        return problem_response(
+            type_uri=INVALID_REQUEST,
+            title="Invalid request",
+            status=422,
+            errors=[
+                ProblemFieldError(
+                    field="text",
+                    message="Employee response cannot be blank.",
+                )
+            ],
+        )
+    try:
+        await submit_employee_turn(
+            uow_factory,
+            adapter=adapter,
+            document_id=document_id,
+            operation_id=idempotency_key,
+            text=text,
+        )
+    except (UncommittableOperationResult, TransitionCommitRejected) as error:
+        logger.warning(
+            "job-analysis consultant turn was not committable: %s",
+            type(error).__name__,
+        )
+        return consultant_unavailable_response()
+    except JobAnalysisApplicationError as error:
+        return application_error_response(error)
+    loaded = await load_document(uow_factory, document_id)
+    assert loaded is not None
+    return to_consultation_view(loaded)
+
+
+@router.post(
+    "/{document_id}/proposals/{proposal_id}/decisions",
+    response_model=ConsultationView,
+)
+async def post_proposal_decision(
+    document_id: UUID,
+    proposal_id: str,
+    body: ProposalDecisionWrite,
+    idempotency_key: IdempotencyKey,
+    uow_factory: JobAnalysisUnitOfWorkFactory = Depends(
+        get_job_analysis_uow_factory
+    ),
+):
+    try:
+        decision, edited_jd_after, reason = to_proposal_decision(body)
+        await decide_proposal(
+            uow_factory,
+            document_id=document_id,
+            proposal_id=proposal_id,
+            decision_id=idempotency_key,
+            decision=decision,
+            edited_jd_after=edited_jd_after,
+            reason=reason,
+        )
+    except ValidationError as error:
+        return domain_validation_error_response(error)
+    except JobAnalysisApplicationError as error:
+        return application_error_response(error)
+    loaded = await load_document(uow_factory, document_id)
+    assert loaded is not None
+    return to_consultation_view(loaded)
 
 
 @router.post("/{document_id}/tasks", response_model=JdTaskView, status_code=201)

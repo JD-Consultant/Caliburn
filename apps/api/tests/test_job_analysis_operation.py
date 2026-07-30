@@ -121,6 +121,19 @@ def packet():
     )
 
 
+def test_prompt_keeps_the_first_version_consultant_loop_flexible():
+    for rule in (
+        "先理解這個職位替誰解決什麼問題",
+        "辨識 0..N 個工作訊號",
+        "故事結束後",
+        "例行、週期與例外責任",
+        "會改變 Task 邊界的矛盾或責任問題",
+        "待決提案不妨礙繼續訪談",
+        "不得宣稱訪談或職務說明書已完成",
+    ):
+        assert rule in TASK_ANALYSIS_INSTRUCTIONS
+
+
 def valid_result_json(quote: str = EMPLOYEE_TEXT) -> str:
     return TaskAnalysisResult(
         work_signals=(

@@ -1,5 +1,10 @@
 # web — Caliburn 前端(Next.js 16)
 
+現行 greenfield 本機產品入口是 `/workspace`：不登入，直接讀寫
+`/api/v1/job-analysis/*`，可建立、改名並重新開啟多份彼此隔離的本機職務說明書；畫面任一時間只開一份。
+這條線使用 `@caliburn/job-analysis-contract` 生成型別與獨立 `jobAnalysisApi.ts`，不接舊
+user/profile/OCS 狀態。舊 `/dashboard` 與 `/documents/*` 暫留作歷史開發面，不是新路徑的依賴。
+
 「著作」bounded context 的前端:職務說明書**工作台**(D27)。使用者在一張可編輯的官方
 職能基準表格上「選職類 → 選任務 → 填格」,所有變更自動儲存為 draft,最後 finalize 產
 正式版本。只跟 `apps/api`(:8001)講話;**不直接碰 indexer / DB**。
@@ -23,7 +28,9 @@ npm run lint
 
 | 路徑 | 是什麼 |
 |---|---|
-| `src/app/` | 路由:`/`(→dashboard)、`/dashboard`(職務檔案清單)、`/documents/[id]`(**工作台**,主畫面)、`/documents/[id]/intake`(3 題小表單,存 job_summary 供選職類預填)、`/documents/[id]/interview`(逐字稿稽核視圖) |
+| `src/app/` | 路由:`/`(→workspace)；舊 `/dashboard`、`/documents/[id]`、intake／interview 暫留但不被新入口依賴 |
+| `src/app/workspace/` | greenfield 本機工作區；文件庫是 Server Component shell + 小型 Client Component，不使用 Server Action 寫資料 |
+| `src/lib/jobAnalysisApi.ts` | 新 `/job-analysis` 唯一 fetch client；Problem Details 只依 stable `type` 顯示，不解析 `detail` |
 | `src/components/interview/` | 工作台元件:`JobDocTable`(主表格,dnd 排序;**T8 `_pending` 四態渲染+✓✗?+批量工具列**)、`PendingMark`(追蹤修訂 UI:綠字/紅刪除線+出處卡;ADR 0030)、`AgendaList`(議程三態)、`DocHeader`(官方表頭)、`OccupationPicker`、`UnitPickerMenu`、`TaskPickerMenu`、`GlobalTaskPickerMenu`、`ConflictDialog`、`DocNotes`、`fields/*`(FieldCombobox/OfficialMenu/FieldText/SourceLine)、`InterviewPanel`(**AI 訪談側欄**:打字機對話+議程+收尾卡;ADR 0030) |
 | `src/hooks/` | 資料層 hooks:`useDocument`(文件 + autosave + 選職類)、`useKnowledge`(知識包 query,ADR 0021)、`useInterview`(start/turn/finish/view;turn 後 invalidate document→外部變化路徑重設 baseline)、`useProfiles`、`useHydrated` |
 | `src/lib/` | `api.ts`(唯一 fetch client,`/api/v1/*` + `ApiError`)、`ocsDoc.ts`(**純函式**文件編輯:clone→改→回傳 + 位置重編碼 + A4 文件級 K/S 重編 + **`_pending` 四態輔助 accept/reject/listPending**;ADR 0030)、`pack.ts`(知識包→選單選項純函式;ADR 0021/0022)、`interviewUi.ts`(側欄純邏輯:議程/chips/打字機)、`slots.ts`(槽標籤)、`urn.ts`、`download.ts` |

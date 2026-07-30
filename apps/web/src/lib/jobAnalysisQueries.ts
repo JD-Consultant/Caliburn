@@ -21,3 +21,7 @@ export function documentQueryOptions(documentId: string) {
     queryFn: () => getDocument(documentId),
   });
 }
+
+export function jobAnalysisInvalidationKeys(documentId: string) {
+  return [jobAnalysisKeys.document(documentId), jobAnalysisKeys.documents] as const;
+}

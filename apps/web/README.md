@@ -4,6 +4,7 @@
 `/api/v1/job-analysis/*`，可建立、改名並重新開啟多份彼此隔離的本機職務說明書；畫面任一時間只開一份。
 這條線使用 `@caliburn/job-analysis-contract` 生成型別與獨立 `jobAnalysisApi.ts`，不接舊
 user/profile/OCS 狀態。舊 `/dashboard` 與 `/documents/*` 暫留作歷史開發面，不是新路徑的依賴。
+Greenfield Task 編輯採「編輯 → 明確儲存／取消」；沒有 debounce autosave。下方 autosave 說明只描述舊 OCS 工作台。
 
 「著作」bounded context 的前端:職務說明書**工作台**(D27)。使用者在一張可編輯的官方
 職能基準表格上「選職類 → 選任務 → 填格」,所有變更自動儲存為 draft,最後 finalize 產
@@ -29,7 +30,7 @@ npm run lint
 | 路徑 | 是什麼 |
 |---|---|
 | `src/app/` | 路由:`/`(→workspace)；舊 `/dashboard`、`/documents/[id]`、intake／interview 暫留但不被新入口依賴 |
-| `src/app/workspace/` | greenfield 本機工作區；文件庫是 Server Component shell + 小型 Client Component，不使用 Server Action 寫資料 |
+| `src/app/workspace/` | greenfield 本機工作區；Server Component shell + 小型 Client Components，不使用 Server Action 寫資料；Task 可新增、編輯、刪除、鍵盤排序 |
 | `src/lib/jobAnalysisApi.ts` | 新 `/job-analysis` 唯一 fetch client；Problem Details 只依 stable `type` 顯示，不解析 `detail` |
 | `src/components/interview/` | 工作台元件:`JobDocTable`(主表格,dnd 排序;**T8 `_pending` 四態渲染+✓✗?+批量工具列**)、`PendingMark`(追蹤修訂 UI:綠字/紅刪除線+出處卡;ADR 0030)、`AgendaList`(議程三態)、`DocHeader`(官方表頭)、`OccupationPicker`、`UnitPickerMenu`、`TaskPickerMenu`、`GlobalTaskPickerMenu`、`ConflictDialog`、`DocNotes`、`fields/*`(FieldCombobox/OfficialMenu/FieldText/SourceLine)、`InterviewPanel`(**AI 訪談側欄**:打字機對話+議程+收尾卡;ADR 0030) |
 | `src/hooks/` | 資料層 hooks:`useDocument`(文件 + autosave + 選職類)、`useKnowledge`(知識包 query,ADR 0021)、`useInterview`(start/turn/finish/view;turn 後 invalidate document→外部變化路徑重設 baseline)、`useProfiles`、`useHydrated` |

@@ -353,23 +353,23 @@ PUT    /api/v1/job-analysis/documents/{document_id}/task-order
 - Modify: `apps/web/src/lib/jobAnalysisQueries.ts`
 - Modify: `apps/web/README.md`
 
-- [ ] **Step 1: 寫 form／API 紅測試**
+- [x] **Step 1: 寫 form／API 紅測試**
 
   測 DTO↔form mapping、只有 statement 合法、optional 空值送 null、所有 enabler 與 responsibility role、相同 mutation retry key、成功後要 invalidate 的 document/library query keys、Problem type 顯示文字。
 
-- [ ] **Step 2: 實作共用 `TaskForm`**
+- [x] **Step 2: 實作共用 `TaskForm`**
 
   呈現 statement、purpose/result、context、frequency、responsibility role、enablers。所有 input 有 visible label；空值顯示「尚未填寫」，不製造 placeholder 內容。此 form 日後可被 Proposal review 重用，但本 Task 不接 AI。
 
-- [ ] **Step 3: 實作 Task CRUD 與排序**
+- [x] **Step 3: 實作 Task CRUD 與排序**
 
   每個 Task 使用「編輯 → 儲存／取消」；刪除先確認；排序用可鍵盤操作的上移／下移。Mutation pending 時鎖該操作，成功後 invalidate/refetch，失敗保留草稿並以 `aria-live` 顯示錯誤。
 
-- [ ] **Step 4: 實作 dirty guard**
+- [x] **Step 4: 實作 dirty guard**
 
   使用 Next `<Link onNavigate>`、`beforeunload`、Ctrl/Cmd+Enter 儲存、Esc 取消。不得加入 debounce autosave 或第二份 document store。
 
-- [ ] **Step 5: Gate**（working directory: `apps/web`）
+- [x] **Step 5: Gate**（working directory: `apps/web`）
 
   ```powershell
   npm run test

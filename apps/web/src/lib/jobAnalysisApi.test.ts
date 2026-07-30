@@ -1,12 +1,17 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+import type { JdTaskWrite } from "@caliburn/job-analysis-contract";
 
 import {
   JobAnalysisApiError,
   createDocument,
+  addTask,
+  deleteTask,
+  editTask,
   getDocument,
   jobAnalysisProblemMessage,
   listDocuments,
   putDocument,
+  reorderTasks,
 } from "./jobAnalysisApi";
 
 const DOCUMENT_ID = "00000000-0000-0000-0000-000000000045";
@@ -105,6 +110,42 @@ describe("job-analysis document client", () => {
     expect(error.problem?.type).toBe(
       "https://caliburn.dev/problems/job-analysis/document-not-found",
     );
+  });
+});
+
+describe("Current JD Task client", () => {
+  const task: JdTaskWrite = {
+    statement: "盤點耗材",
+    purpose_result: null,
+    context: null,
+    frequency_text: null,
+    responsibility_role: null,
+    enablers: [],
+  };
+
+  it("uses the caller-owned retry key for every mutation", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(response({ ...task, task_id: "task-1", display_order: 0 }, 201))
+      .mockResolvedValueOnce(response({ ...task, task_id: "task-1", display_order: 0 }))
+      .mockResolvedValueOnce(response([{ ...task, task_id: "task-1", display_order: 0 }]))
+      .mockResolvedValueOnce(response(null, 204));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await addTask(DOCUMENT_ID, task, "operation-1");
+    await editTask(DOCUMENT_ID, "task-1", task, "operation-1");
+    await reorderTasks(DOCUMENT_ID, ["task-1"], "operation-1");
+    await deleteTask(DOCUMENT_ID, "task-1", "operation-1");
+
+    for (const call of fetchMock.mock.calls) {
+      expect(call[1].headers).toMatchObject({ "Idempotency-Key": "operation-1" });
+    }
+    expect(fetchMock.mock.calls.map((call) => [call[1].method, call[0]])).toEqual([
+      ["POST", `http://127.0.0.1:8001/api/v1/job-analysis/documents/${DOCUMENT_ID}/tasks`],
+      ["PUT", `http://127.0.0.1:8001/api/v1/job-analysis/documents/${DOCUMENT_ID}/tasks/task-1`],
+      ["PUT", `http://127.0.0.1:8001/api/v1/job-analysis/documents/${DOCUMENT_ID}/task-order`],
+      ["DELETE", `http://127.0.0.1:8001/api/v1/job-analysis/documents/${DOCUMENT_ID}/tasks/task-1`],
+    ]);
   });
 });
 

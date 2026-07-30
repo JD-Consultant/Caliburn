@@ -314,7 +314,7 @@ POST /api/v1/job-analysis/documents/{document_id}/proposals/{proposal_id}/decisi
 - Modify: `docs/README.md` only if a new durable design entry is required
 - Modify: `AGENTS.md` only if orientation is stale
 
-- [ ] **Step 1: 全 repo verification**
+- [x] **Step 1: 全 repo verification**
 
   ```powershell
   npx turbo test
@@ -322,19 +322,19 @@ POST /api/v1/job-analysis/documents/{document_id}/proposals/{proposal_id}/decisi
 
   再分別跑 API full pytest、Web test/tsc/lint/build、contract codegen check。既有 CRLF hash failure 只可在 fingerprint 與 baseline 完全相同時列為既有失敗。
 
-- [ ] **Step 2: No-network vertical review**
+- [x] **Step 2: No-network vertical review**
 
   用真 PostgreSQL adapter＋fake provider 完成：create → opening → employee turn → Task/issue/Proposal → accept/edit/reject/defer → direct edit → reload。確認同 key replay 零 provider call、GET 零寫入、Current JD 與 conversation 一致。
 
-- [ ] **Step 3: Browser smoke**
+- [x] **Step 3: Browser smoke**
 
   在本機 Web 實際檢查：opening 可見、換行與快捷鍵、pending 禁止重送、Proposal 與 JD 同頁、Task 可編輯、reload 後狀態恢復、窄畫面堆疊。若沒有 live provider，不為 smoke 加 fake production mode；成功 turn 由 API fake-provider vertical 證明，browser 只驗產品 UI 行為。
 
-- [ ] **Step 4: Strongest-case closure**
+- [x] **Step 4: Strongest-case closure**
 
   逐條重查 ADR 0046 的 W1–W6。任何實作若需要 Role/Coverage state、第二模型呼叫、compaction、background workflow 或新持久表才可工作，停止並回 ADR，不在收尾臨場補框架。
 
-- [ ] **Step 5: 文檔與 commit**
+- [x] **Step 5: 文檔與 commit**
 
   `docs/design/task-analysis-engine.md` 必須用真實 route、函式與資料流描述完整閉環，並明列仍沒有 completion gate、OPKS、export、long-context compaction 與 in-flight deduplication。
 
@@ -343,6 +343,11 @@ POST /api/v1/job-analysis/documents/{document_id}/proposals/{proposal_id}/decisi
   git commit -m "docs(job-analysis): close the consultant loop vertical"
   ```
 
-- [ ] **Step 6: Tag**
+  Closure evidence（2026-07-30）：Web `90 passed`，TypeScript／ESLint／Next production build 通過；
+  contract `8 passed` 且 codegen 無漂移；API＋真 PostgreSQL `1689 passed`，唯一失敗仍是動工前已存在的
+  vNext 歷史 prompt Windows raw-bytes hash。Codex in-app browser 可載入 Next shell，但其 client policy
+  封鎖跨埠 `localhost:8001`，故未冒充完整 browser round-trip；沒有為此加入 proxy 或 fake production mode。
+
+- [x] **Step 6: Tag**
 
   全部必要 gate 綠且工作樹乾淨後，依 repo 規則建立 annotated tag；tag 名於收尾時依既有 tag 命名檢查後決定，不預先猜測。

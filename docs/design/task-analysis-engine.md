@@ -1,5 +1,5 @@
 ---
-title: Task Analysis 引擎 — 端到端設計(durable PostgreSQL + document API)
+title: Task Analysis 引擎 — 端到端設計(durable PostgreSQL + consultant Web)
 audience: agent-primary(也給人)
 scope: apps/api job_analysis + job_analysis_postgres + job_analysis routes + apps/web workspace
 updated: 2026-07-30
@@ -52,7 +52,7 @@ OpenRouter 拿 `TaskAnalysisResult.v1` → **verifier**(純函式、零 LLM)擋�
 | consultation use case | provider 前 replay → authority snapshot → 交易外模型呼叫 → verified commit | `application/consultation.py`、`application/durable_turn.py` | 已提交的同 key／同回答零 provider call；commit 時重鎖並比對 generation/read-set；Work Model、Proposal、下一題與 completed-turn Journal 同交易 |
 | Proposal use cases | 候選送審 + accept/edit/reject/defer/revision request | `application/proposal_decisions.py` | `propose_task_for_jd()` 不自動接受；決策由 document lock 序列化；接受類才改 JD；決策寫 Journal |
 | Local Web API | 本機文件、Current JD 與 Consultation routes | `app/api/routes/job_analysis.py` | 只做 generated wire DTO mapping；不暴露 Work Model、Journal、generation 或 provider detail；turn／Proposal decision 直接呼叫 greenfield application use cases |
-| Local Web UI | 文件庫與單一開啟文件的 Task editor | `apps/web/src/app/workspace/`、`components/workspace/` | generated TS DTO + TanStack Query；一份本地草稿、明確儲存，不用 Server Action／autosave／第二份 document store |
+| Local Web UI | 文件庫、顧問訪談、Proposal 審查與單一開啟文件的 Task editor | `apps/web/src/app/workspace/`、`components/workspace/` | generated TS DTO + TanStack Query；conversation／Proposal／Current JD 同頁，一份本地編輯草稿、明確儲存，不用 Server Action／autosave／第二份 document store |
 
 ## 3. 一輪的資料流(每步標函式)
 
@@ -83,8 +83,10 @@ Current JD Task 的 POST／PUT／DELETE 與排序 PUT 都要求 `Idempotency-Key
 Journal `entry_id`；沒有 middleware、隱藏 retry 或第二套寫入邏輯。員工清空 optional text 時，
 wire mapper 先 trim 並轉成 `null`；必填 statement 變空則回 `invalid-request`，不讓半成品進 domain。
 Web 的 `/workspace` 用 `DocumentLibrary` 列出／建立／改名；`/workspace/[document_id]` 用
-`TaskEditor` 一次只載入一份 `DocumentView`。Task form 的 draft 只在編輯期間存在；成功後 invalidate
-文件與文件庫 query 並回讀 PostgreSQL 現況。相同失敗操作、相同 payload 的人工重送沿用原
+`ConsultationWorkspace` 同頁組合 `ConsultationPanel`、Proposal cards 與 `TaskEditor`，一次只開一份文件。
+顧問讀寫只走 `GET …/consultation`、`POST …/turns` 與 `POST …/proposals/{id}/decisions`；成功回應同步更新
+Consultation／Document query，人工 Task 編輯仍走同一組 Current JD routes，不另建 AI document store。
+Task form 的 draft 只在編輯期間存在；成功後 invalidate 文件、Consultation 與文件庫 query 並回讀 PostgreSQL 現況。相同失敗操作、相同 payload 的人工重送沿用原
 `Idempotency-Key`；未改內容禁止儲存，避免製造空 Journal 與無關 generation bump。
 新 document 建立時，`put_document_metadata()` 在同一個 UoW 建立固定 consultant opening
 Journal entry 並設為 `active_question`；不呼叫模型、不另建 chat table。rename 與 metadata replay
@@ -163,7 +165,7 @@ Consultation turn 不再重複呼叫它。
 
 | 情境 | Work Model | Proposal |
 |---|---|---|
-| `add` 候選 | 立即建立候選 ID | 不建立(要進 JD 是後續的事) |
+| `add` 候選 | 立即建立候選 ID | 顧問回合在同一結果建立 pending add Proposal；員工接受／修改後接受才進 JD |
 | 同 ID `revise` | 立即更新 | 只有 JD 文字也要改時才建立 |
 | `withdraw`,target 不在 JD | 立即 retire | 不建立 |
 | `withdraw`,target 在 JD | 暫不 retire,設 `pending_reconciliation` | 建立 |
@@ -206,18 +208,20 @@ JD 只在員工決定提案時才改。
   mutation、排序、reload 與 metadata rename 邊界；它仍不代表瀏覽器 UX 或模型品質通過。
   依 ADR 0042 決定 3,R1 exit gate 判準未被否決、只是暫停阻擋效力;**任何文件都不得把它寫成
   Task Discovery 已通過**。
+- **第一版不是固定問卷或完成判定器。** 固定的只有開場與權力邊界；模型每輪可辨識 0..N 個訊號並只選
+  一個最高價值問題。現在沒有 completion gate、Role/Coverage entity、planner、第二模型呼叫、Graph runtime
+  或 background workflow；不得因 UI 已閉環就宣稱完整職務分析已完成。
 
 ## 8. 現在還沒有的(別假設它存在)
 
 | 沒有的東西 | 現況 | 什麼時候做 |
 |---|---|---|
-| AI conversation／Proposal review UI | Consultation API 已接通；瀏覽器仍只有文件庫與人工 Task editor | 下一個切片只做雙欄 conversation／Proposal UX |
 | endpoint variant preflight | `provider_order` 只鎖 base slug,同 provider 可能有多個 endpoint variant | 真正付費呼叫前的 catalog／live preflight |
 | prompt 品質調校 | `llm/prompt.py` 已有 Task 判準與彈性顧問行為基線，但尚未用真實員工資料調校 | 有真實使用摩擦後以 rubric／eval 調整，不先加 planner 或第二次呼叫 |
 | duplicate／overlap identity 自動收斂 | 第一版刻意不做；模型保留 issue 並追問員工 | 有真實重複摩擦證據後再研究，不用相似度猜測 |
 | O/P/K/S/A、完整 header、匯出 | 目前只做 Task 與較豐富的內部 JD Task 欄位 | 各自研究／契約完成後逐項加；匯出才對齊公版 |
 | revision-request replacement | revision request 可保存／reload，但不會自動重建 replacement | 後續模型流程 |
-| 實際瀏覽器點擊 smoke | 元件測試與本機 HTTP／CORS／PostgreSQL vertical 已通過；2026-07-30 執行環境無可連接瀏覽器 | 可用瀏覽器環境下人工確認，不另建 E2E framework |
+| 一般瀏覽器完整跨埠 smoke | Next UI shell 已實際載入；本次 Codex in-app browser 的 client policy 封鎖 `localhost:8001`，故無法在該瀏覽器完成 API round-trip。Web 90 tests／tsc／lint／build 與真 PostgreSQL API vertical 已通過 | 用一般本機瀏覽器確認即可；不為測試環境加入 proxy、fake production mode 或 E2E framework |
 
 ## 9. 指路
 

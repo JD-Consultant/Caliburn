@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   documentListQueryOptions,
   documentQueryOptions,
+  jobAnalysisInvalidationKeys,
   jobAnalysisKeys,
 } from "./jobAnalysisQueries";
 
@@ -20,6 +21,13 @@ describe("job-analysis query identity", () => {
     expect(documentQueryOptions("doc-1").queryKey).toEqual(
       jobAnalysisKeys.document("doc-1"),
     );
+  });
+
+  it("invalidates both the open document and the library after a write", () => {
+    expect(jobAnalysisInvalidationKeys("doc-1")).toEqual([
+      jobAnalysisKeys.document("doc-1"),
+      jobAnalysisKeys.documents,
+    ]);
   });
 
   it("does not opt the mutable document state into persisted cache", () => {

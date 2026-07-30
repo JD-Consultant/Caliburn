@@ -2,6 +2,8 @@ import type {
   DocumentMetadataView,
   DocumentSummary,
   DocumentView,
+  JdTaskView,
+  JdTaskWrite,
   ProblemDetail,
 } from "@caliburn/job-analysis-contract";
 
@@ -69,6 +71,58 @@ export function createDocument(
 
 export function getDocument(documentId: string): Promise<DocumentView> {
   return request<DocumentView>(`/documents/${documentId}`, { method: "GET" });
+}
+
+function mutationHeaders(idempotencyKey: string) {
+  return { "Idempotency-Key": idempotencyKey };
+}
+
+export function addTask(
+  documentId: string,
+  task: JdTaskWrite,
+  idempotencyKey: string,
+): Promise<JdTaskView> {
+  return request<JdTaskView>(`/documents/${documentId}/tasks`, {
+    method: "POST",
+    headers: mutationHeaders(idempotencyKey),
+    body: JSON.stringify(task),
+  });
+}
+
+export function editTask(
+  documentId: string,
+  taskId: string,
+  task: JdTaskWrite,
+  idempotencyKey: string,
+): Promise<JdTaskView> {
+  return request<JdTaskView>(`/documents/${documentId}/tasks/${taskId}`, {
+    method: "PUT",
+    headers: mutationHeaders(idempotencyKey),
+    body: JSON.stringify(task),
+  });
+}
+
+export function deleteTask(
+  documentId: string,
+  taskId: string,
+  idempotencyKey: string,
+): Promise<void> {
+  return request<void>(`/documents/${documentId}/tasks/${taskId}`, {
+    method: "DELETE",
+    headers: mutationHeaders(idempotencyKey),
+  });
+}
+
+export function reorderTasks(
+  documentId: string,
+  orderedTaskIds: string[],
+  idempotencyKey: string,
+): Promise<JdTaskView[]> {
+  return request<JdTaskView[]>(`/documents/${documentId}/task-order`, {
+    method: "PUT",
+    headers: mutationHeaders(idempotencyKey),
+    body: JSON.stringify({ ordered_task_ids: orderedTaskIds }),
+  });
 }
 
 type KnownProblemType = ProblemDetail["type"];

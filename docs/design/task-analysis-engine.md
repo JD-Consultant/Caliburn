@@ -1,7 +1,7 @@
 ---
 title: Task Analysis 引擎 — 端到端設計(durable PostgreSQL + document API)
 audience: agent-primary(也給人)
-scope: apps/api app/job_analysis/* + app/adapters/job_analysis_postgres/* + app/api/routes/job_analysis.py
+scope: apps/api job_analysis + job_analysis_postgres + job_analysis routes + apps/web workspace
 updated: 2026-07-30
 ---
 
@@ -50,6 +50,7 @@ OpenRouter 拿 `TaskAnalysisResult.v1` → **verifier**(純函式、零 LLM)擋�
 | durable turn | authority snapshot → 交易外模型呼叫 → verified commit | `application/durable_turn.py` | commit 時重鎖並比對 generation/read-set；Work Model、Proposal、下一題與 completed-turn Journal 同交易 |
 | Proposal use cases | 候選送審 + accept/edit/reject/defer/revision request | `application/proposal_decisions.py` | `propose_task_for_jd()` 不自動接受；決策由 document lock 序列化；接受類才改 JD；決策寫 Journal |
 | Local Web API | 本機文件列表、建立／改名、開啟與 Current JD Task 編輯 | `app/api/routes/job_analysis.py` | 只做 generated wire DTO mapping；不暴露 Work Model、Proposal、Journal 或 generation；mutation 直接呼叫既有 authoring use cases |
+| Local Web UI | 文件庫與單一開啟文件的 Task editor | `apps/web/src/app/workspace/`、`components/workspace/` | generated TS DTO + TanStack Query；一份本地草稿、明確儲存，不用 Server Action／autosave／第二份 document store |
 
 ## 3. 一輪的資料流(每步標函式)
 
@@ -79,6 +80,10 @@ RFC 9457 `application/problem+json`；path-scoped handler 會把舊 routes 的�
 Current JD Task 的 POST／PUT／DELETE 與排序 PUT 都要求 `Idempotency-Key`，原樣映射成
 Journal `entry_id`；沒有 middleware、隱藏 retry 或第二套寫入邏輯。員工清空 optional text 時，
 wire mapper 先 trim 並轉成 `null`；必填 statement 變空則回 `invalid-request`，不讓半成品進 domain。
+Web 的 `/workspace` 用 `DocumentLibrary` 列出／建立／改名；`/workspace/[document_id]` 用
+`TaskEditor` 一次只載入一份 `DocumentView`。Task form 的 draft 只在編輯期間存在；成功後 invalidate
+文件與文件庫 query 並回讀 PostgreSQL 現況。相同失敗操作、相同 payload 的人工重送沿用原
+`Idempotency-Key`；未改內容禁止儲存，避免製造空 Journal 與無關 generation bump。
 既有 Task 在下一次 AI 互動時看到 JD/Work Model 差異；JD-only Task 先落一筆
 `insufficient_evidence` open issue，明確保存該 JD `task_id`，不補造空殼 Work Model Task。
 下一輪 packet 只把它投影成可追問的 partial Task：
@@ -186,7 +191,7 @@ JD 只在員工決定提案時才改。
 
 | 沒有的東西 | 現況 | 什麼時候做 |
 |---|---|---|
-| Web UI | 文件與 Task API 已有；畫面尚未接上 | 下一個最小 local Web 切片 |
+| AI conversation／Proposal review UI | 文件庫與人工 Task editor 已接通；AI 互動尚未接 Web | 顧問 loop 與 Proposal UX 各自研究後再做 |
 | endpoint variant preflight | `provider_order` 只鎖 base slug,同 provider 可能有多個 endpoint variant | 真正付費呼叫前的 catalog／live preflight |
 | prompt 品質調校 | `llm/prompt.py` 只寫到「不與 §4 判準相反」的結構最小集 | rubric／eval 的獨立工作 |
 | duplicate／overlap identity 自動收斂 | 第一版刻意不做；模型保留 issue 並追問員工 | 有真實重複摩擦證據後再研究，不用相似度猜測 |

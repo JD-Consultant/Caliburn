@@ -309,19 +309,19 @@ PUT    /api/v1/job-analysis/documents/{document_id}/task-order
 - Modify: `apps/web/src/app/page.tsx`
 - Modify: `apps/web/README.md`
 
-- [ ] **Step 1: 寫純函式紅測試**
+- [x] **Step 1: 寫純函式紅測試**
 
   測 URL、query keys、document create/rename payload、六種 Problem `type` exhaustive mapping 與 generic fallback；不解析 `detail`，忽略未知 extension。使用 generated TS types，不手抄 DTO。
 
-- [ ] **Step 2: 實作小型 API client**
+- [x] **Step 2: 實作小型 API client**
 
   新 client 只服務 `/job-analysis`，不 import 舊 user/profile/OCS client。Mutation 每次產生 operation key，重送同一次操作時保持同 key；PUT document 不送 key。
 
-- [ ] **Step 3: 實作 `/workspace`**
+- [x] **Step 3: 實作 `/workspace`**
 
   Server Component page 只提供 shell；`DocumentLibrary` 是小型 Client Component，列出、建立、改名、開啟文件。建立後導向 `/workspace/{document_id}`；首頁 redirect 改為 `/workspace`。不要持久化 current-document pointer。
 
-- [ ] **Step 4: Gate**（working directory: `apps/web`）
+- [x] **Step 4: Gate**（working directory: `apps/web`）
 
   ```powershell
   npm run test

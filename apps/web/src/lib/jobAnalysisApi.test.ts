@@ -1,0 +1,132 @@
+import { afterEach, describe, expect, it, vi } from "vitest";
+
+import {
+  JobAnalysisApiError,
+  createDocument,
+  getDocument,
+  jobAnalysisProblemMessage,
+  listDocuments,
+  putDocument,
+} from "./jobAnalysisApi";
+
+const DOCUMENT_ID = "00000000-0000-0000-0000-000000000045";
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
+
+function response(body: unknown, status = 200, contentType = "application/json") {
+  return new Response(status === 204 ? null : JSON.stringify(body), {
+    status,
+    headers: { "Content-Type": contentType },
+  });
+}
+
+describe("job-analysis document client", () => {
+  it("uses only the greenfield document endpoints", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(response([]))
+      .mockResolvedValueOnce(
+        response({
+          document_id: DOCUMENT_ID,
+          title: "門市營運專員",
+          updated_at: "2026-07-30T10:00:00Z",
+        }),
+      )
+      .mockResolvedValueOnce(
+        response({
+          document_id: DOCUMENT_ID,
+          title: "門市營運專員",
+          updated_at: "2026-07-30T10:00:00Z",
+          tasks: [],
+        }),
+      );
+    vi.stubGlobal("fetch", fetchMock);
+
+    await listDocuments();
+    await putDocument(DOCUMENT_ID, "門市營運專員");
+    await getDocument(DOCUMENT_ID);
+
+    expect(fetchMock.mock.calls[0]).toEqual([
+      "http://127.0.0.1:8001/api/v1/job-analysis/documents",
+      expect.objectContaining({ method: "GET" }),
+    ]);
+    expect(fetchMock.mock.calls[1]).toEqual([
+      `http://127.0.0.1:8001/api/v1/job-analysis/documents/${DOCUMENT_ID}`,
+      expect.objectContaining({
+        method: "PUT",
+        body: JSON.stringify({ title: "門市營運專員" }),
+      }),
+    ]);
+    expect(fetchMock.mock.calls[1][1].headers).not.toHaveProperty(
+      "Idempotency-Key",
+    );
+    expect(fetchMock.mock.calls[2][0]).toBe(
+      `http://127.0.0.1:8001/api/v1/job-analysis/documents/${DOCUMENT_ID}`,
+    );
+  });
+
+  it("creates with the caller-provided local identity", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      response({
+        document_id: DOCUMENT_ID,
+        title: "設備維護工程師",
+        updated_at: "2026-07-30T10:00:00Z",
+      }, 201),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    await createDocument("設備維護工程師", DOCUMENT_ID);
+
+    expect(fetchMock.mock.calls[0][0]).toContain(DOCUMENT_ID);
+  });
+
+  it("keeps a typed problem and ignores unknown extensions", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        response(
+          {
+            type: "https://caliburn.dev/problems/job-analysis/document-not-found",
+            title: "Document not found",
+            status: 404,
+            future_extension: { anything: true },
+          },
+          404,
+          "application/problem+json",
+        ),
+      ),
+    );
+
+    const error = await getDocument(DOCUMENT_ID).catch((value) => value);
+
+    expect(error).toBeInstanceOf(JobAnalysisApiError);
+    expect(error.problem?.type).toBe(
+      "https://caliburn.dev/problems/job-analysis/document-not-found",
+    );
+  });
+});
+
+describe("jobAnalysisProblemMessage", () => {
+  it.each([
+    ["document-not-found", "找不到這份職務說明書"],
+    ["task-not-found", "找不到這項工作"],
+    ["idempotency-conflict", "這次操作內容已經改變"],
+    ["authority-conflict", "內容已有更新"],
+    ["invalid-task-order", "工作順序不正確"],
+    ["invalid-request", "請檢查輸入內容"],
+  ])("maps %s without parsing detail", (suffix, message) => {
+    expect(
+      jobAnalysisProblemMessage(
+        `https://caliburn.dev/problems/job-analysis/${suffix}`,
+      ),
+    ).toBe(message);
+  });
+
+  it("uses one generic fallback for a future problem type", () => {
+    expect(jobAnalysisProblemMessage("https://example.test/future")).toBe(
+      "操作失敗，請稍後再試",
+    );
+  });
+});

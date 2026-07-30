@@ -38,8 +38,8 @@
 - Modify: `apps/api/app/job_analysis/application/proposal_decisions.py`
 - Modify: `apps/api/app/job_analysis/application/__init__.py`
 - Create: `apps/api/tests/test_job_analysis_authority_commit.py`
-- Modify: `apps/api/tests/test_job_analysis_authoring.py`
-- Modify: `apps/api/tests/test_job_analysis_proposal_decisions.py`
+- Modify: `apps/api/tests/test_job_analysis_authoring_postgres.py`
+- Modify: `apps/api/tests/test_job_analysis_proposal_decisions_postgres.py`
 - Modify: `docs/design/task-analysis-engine.md`
 
 **Contract:**
@@ -64,7 +64,7 @@ async def commit_authority_change(
 - [ ] **Step 2: 跑 focused red gate**（working directory: `apps/api`）
 
   ```powershell
-  uv run pytest tests/test_job_analysis_authority_commit.py tests/test_job_analysis_authoring.py tests/test_job_analysis_proposal_decisions.py -q
+  uv run pytest tests/test_job_analysis_authority_commit.py tests/test_job_analysis_authoring_postgres.py tests/test_job_analysis_proposal_decisions_postgres.py -q
   ```
 
 - [ ] **Step 3: 做 move-first refactor**
@@ -74,8 +74,9 @@ async def commit_authority_change(
 - [ ] **Step 4: 跑 focused 與全 `job_analysis` gate**
 
   ```powershell
-  uv run pytest tests/test_job_analysis_authority_commit.py tests/test_job_analysis_authoring.py tests/test_job_analysis_proposal_decisions.py tests/test_job_analysis_durable_turn.py -q
-  uv run pytest tests/test_job_analysis_*.py -q
+  uv run pytest tests/test_job_analysis_authority_commit.py tests/test_job_analysis_authoring_postgres.py tests/test_job_analysis_proposal_decisions_postgres.py tests/test_job_analysis_durable_turn_postgres.py -q
+  $tests = Get-ChildItem -LiteralPath tests -Filter 'test_job_analysis_*.py' | Sort-Object Name | ForEach-Object FullName
+  uv run pytest @tests -q
   ```
 
 - [ ] **Step 5: Commit**
@@ -173,7 +174,6 @@ async def commit_authority_change(
 - Modify: `apps/api/app/api/router.py`
 - Modify: `apps/api/app/api/deps.py`
 - Modify: `apps/api/app/app_factory.py`
-- Modify: `apps/api/tests/test_job_analysis_authoring.py`
 - Modify: `apps/api/tests/test_job_analysis_authoring_postgres.py`
 - Create: `apps/api/tests/test_job_analysis_api.py`
 - Modify: `apps/api/tests/test_app_wiring.py`
@@ -221,8 +221,9 @@ GET /api/v1/job-analysis/documents/{document_id}
 - [ ] **Step 5: Gate**（working directory: `apps/api`）
 
   ```powershell
-  uv run pytest tests/test_job_analysis_authoring.py tests/test_job_analysis_authoring_postgres.py tests/test_job_analysis_api.py tests/test_app_wiring.py -q
-  uv run pytest tests/test_job_analysis_*.py -q
+  uv run pytest tests/test_job_analysis_authoring_postgres.py tests/test_job_analysis_api.py tests/test_app_wiring.py -q
+  $tests = Get-ChildItem -LiteralPath tests -Filter 'test_job_analysis_*.py' | Sort-Object Name | ForEach-Object FullName
+  uv run pytest @tests -q
   ```
 
 - [ ] **Step 6: Commit**
@@ -272,8 +273,9 @@ PUT    /api/v1/job-analysis/documents/{document_id}/task-order
 - [ ] **Step 4: Gate**（working directory: `apps/api`）
 
   ```powershell
-  uv run pytest tests/test_job_analysis_api.py tests/test_job_analysis_authoring.py -q
-  uv run pytest tests/test_job_analysis_*.py tests/test_app_wiring.py -q
+  uv run pytest tests/test_job_analysis_api.py tests/test_job_analysis_authoring_postgres.py -q
+  $tests = Get-ChildItem -LiteralPath tests -Filter 'test_job_analysis_*.py' | Sort-Object Name | ForEach-Object FullName
+  uv run pytest @tests tests/test_app_wiring.py -q
   ```
 
 - [ ] **Step 5: Commit**
@@ -432,4 +434,3 @@ PUT    /api/v1/job-analysis/documents/{document_id}/task-order
 - AI 沒有 direct-edit route；AI conversation／Proposal review 尚未接 Web，文件誠實標示。
 - Contract codegen、API focused/full tests、Web Vitest/tsc/lint、real PostgreSQL vertical 與 browser smoke 均有實際結果。
 - 無舊資料整合、無 autosave、無 ETag、無通用 framework、無額外欄位預建。
-

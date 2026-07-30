@@ -36,6 +36,11 @@ from app.job_analysis.domain import (
     Task,
     TaskFields,
     TaskState,
+    JdEntry,
+    JdTask,
+    Proposal,
+    ProposalAction,
+    SingleTaskTarget,
 )
 from app.job_analysis.llm import (
     ExcludePayload,
@@ -435,3 +440,60 @@ async def test_a_short_answer_is_only_interpretable_through_the_active_question(
     assert new_link.question_turn_id == "turn-3"
     assert "整理產能報表" in summary
     print("\n" + summary)
+
+
+# ── 6. 待決提案不會凍結訪談，故事結束後回到工作週期 ──────────────────────
+
+
+async def test_a_pending_proposal_does_not_block_the_next_coverage_question():
+    existing = Task(
+        task_id="task-1",
+        statement="處理客戶退貨",
+        action="處理",
+        object="客戶退貨",
+        support_links=(
+            SupportLink(
+                source_ref=SourceRef(kind=SourceKind.EMPLOYEE_TURN, id="turn-2"),
+                quote="昨天我處理了一筆客戶退貨",
+            ),
+        ),
+    )
+    proposal = Proposal(
+        proposal_id="proposal-1",
+        target=SingleTaskTarget(action=ProposalAction.ADD, task_id="task-1"),
+        jd_before=(JdEntry(task_id="task-1"),),
+        jd_after=(
+            JdEntry(
+                task_id="task-1",
+                value=JdTask(
+                    task_id="task-1",
+                    statement="處理客戶退貨",
+                    display_order=0,
+                ),
+            ),
+        ),
+    )
+    scripted = TaskAnalysisResult(
+        work_signals=(),
+        next_question=question(
+            "除了這次退貨，還有哪些每週固定或偶爾發生、但仍由你負責的工作？",
+            "故事結束後掃描尚未覆蓋的工作週期",
+        ),
+    )
+
+    transition, summary, rendered = await run_round(
+        transcript=(
+            consultant("turn-1", "說一個最近處理客戶問題的例子。"),
+            employee("turn-2", "昨天我處理了一筆客戶退貨"),
+        ),
+        current_turn_id="turn-2",
+        scripted=scripted,
+        state=JobAnalysisState(
+            work_model=CurrentWorkModel(tasks=(existing,)),
+            proposals=(proposal,),
+        ),
+    )
+
+    assert transition.state.proposals[0].status.value == "pending"
+    assert "尚未成立,不得當作現況事實" in rendered
+    assert "每週固定或偶爾發生" in summary

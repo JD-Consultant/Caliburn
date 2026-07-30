@@ -91,6 +91,11 @@ Journal entry 並設為 `active_question`；不呼叫模型、不另建 chat tab
 不重複開場。`JournalRepository.list_conversation_turns()` 依 `journal_sequence` 將 opening 展開成
 一個 consultant turn，並將每個 completed-turn payload 展開成 employee＋consultant；這份 lossless
 transcript 同時供下一輪 packet 與之後的 Consultation View 使用。
+one-stage prompt 不把訪談寫成固定問卷：先理解職位的服務對象與目的，每段完整回答可辨識
+0..N 個工作訊號；故事仍有資訊時可深挖，故事結束後回到例行、週期與例外責任。下一題優先處理
+會改變 Task 邊界的矛盾／責任問題，再處理 open issue 與遺漏掃描。pending／deferred Proposal
+只是待決假說，不會凍結訪談；第一版沒有完成 gate，模型不得宣稱訪談或 JD 已完成。這些是
+scripted smoke 保護的顧問行為基線，不代表模型品質已通過。
 既有 Task 在下一次 AI 互動時看到 JD/Work Model 差異；JD-only Task 先落一筆
 `insufficient_evidence` open issue，明確保存該 JD `task_id`，不補造空殼 Work Model Task。
 下一輪 packet 只把它投影成可追問的 partial Task：
@@ -204,7 +209,7 @@ JD 只在員工決定提案時才改。
 |---|---|---|
 | AI conversation／Proposal review UI | 文件庫與人工 Task editor 已接通；AI 互動尚未接 Web | 顧問 loop 與 Proposal UX 各自研究後再做 |
 | endpoint variant preflight | `provider_order` 只鎖 base slug,同 provider 可能有多個 endpoint variant | 真正付費呼叫前的 catalog／live preflight |
-| prompt 品質調校 | `llm/prompt.py` 只寫到「不與 §4 判準相反」的結構最小集 | rubric／eval 的獨立工作 |
+| prompt 品質調校 | `llm/prompt.py` 已有 Task 判準與彈性顧問行為基線，但尚未用真實員工資料調校 | 有真實使用摩擦後以 rubric／eval 調整，不先加 planner 或第二次呼叫 |
 | duplicate／overlap identity 自動收斂 | 第一版刻意不做；模型保留 issue 並追問員工 | 有真實重複摩擦證據後再研究，不用相似度猜測 |
 | O/P/K/S/A、完整 header、匯出 | 目前只做 Task 與較豐富的內部 JD Task 欄位 | 各自研究／契約完成後逐項加；匯出才對齊公版 |
 | revision-request replacement | revision request 可保存／reload，但不會自動重建 replacement | 後續模型流程 |

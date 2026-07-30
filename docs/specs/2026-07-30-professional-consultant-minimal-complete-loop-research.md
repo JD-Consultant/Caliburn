@@ -1,7 +1,7 @@
 # 專業顧問第一個最小完整迴圈：研究與設計
 
 日期：2026-07-30
-狀態：設計已在對話中收斂；書面規格待 owner 最終審閱
+狀態：owner 已授權在 strongest-case 反方審查後自行定案；決策 authority 待 ADR 0046
 
 ## 1. 要解決的產品缺口
 
@@ -143,20 +143,30 @@ Repository 應提供按 Journal sequence 展開的 conversation turns；開場�
 
 沿用現有兩段式流程：
 
-1. 讀取 authority snapshot 與完整 conversation；
-2. 關閉 DB transaction；
-3. 交易外執行一次 LLM request；
-4. parse 並跑 deterministic verifier；
-5. 重鎖 document，重建 read-set；
-6. generation、authority、conversation 任一已改變就拒絕 stale result；
-7. 套用 transition；
-8. Work Model、Proposal、completed-turn Journal、`active_question` 與 generation 同交易 commit。
+1. 以 `operation_id = Idempotency-Key` 查 Journal；已提交且 payload 相同就直接回目前 Consultation View，
+   不再呼叫 provider；同 key 不同 payload 回 `idempotency-conflict`；
+2. 尚未提交才讀取 authority snapshot 與完整 conversation；
+3. 關閉 DB transaction；
+4. 交易外執行一次 LLM request；
+5. parse 並跑 deterministic verifier；
+6. 重鎖 document，重建 read-set；
+7. generation、authority、conversation 任一已改變就拒絕 stale result；
+8. 套用 transition；
+9. Work Model、Proposal、completed-turn Journal、`active_question` 與 generation 同交易 commit。
+
+這個 replay short-circuit 必須在 provider call **之前**。現行 `commit_verified_turn()` 雖能防第二次 DB 寫入，但若
+route 每次都先 `prepare_turn()` 與呼叫模型，再到 commit 才發現 replay，同一把 key 仍會多付一次模型成本，
+且非決定性輸出可能反而觸發 conflict；那不是真正可安全重送的產品行為。
 
 不新增背景工作、SSE、polling、隱藏 retry、operation ledger 或 workflow checkpoint。此模型操作是一次短回應；
 OpenAI 的 background mode 是為數分鐘級工作設計，會引入輪詢與更高 time-to-first-token，第一版沒有理由採用。
 
 若 provider、parse 或 verifier 失敗，Current State 與 Journal 都不變；Web 保留員工草稿與同一把 idempotency key
 供明確重送。若 commit 前 authority 已改變，回傳既有 `authority-conflict`，不得用舊分析覆蓋新資料。
+
+第一版保證的是**已提交請求的循序重送**。不新增 pending-operation ledger 來合併兩個同時飛行中的相同 POST；
+Web 在 mutation pending 時停用同一送出按鈕。若實際觀察到跨程序／同時重送，再以真實失敗理由設計 in-flight
+deduplication，不能把目前行為誇大成完整 exactly-once。
 
 ## 8. 最小 API 與 UI
 
@@ -167,12 +177,14 @@ OpenAI 的 background mode 是為數分鐘級工作設計，會引入輪詢與�
 - `POST /api/v1/job-analysis/documents/{document_id}/turns`
 - `POST /api/v1/job-analysis/documents/{document_id}/proposals/{proposal_id}/decisions`
 
-GET 投影只回 UI 需要的 conversation、active question、pending/deferred Proposal、Current JD 與文件 metadata；
-Work Model、Journal payload、authority generation 與內部 ordinal mapping 不外洩。
+GET 投影只回 UI 需要的 conversation、active question、**全部 Proposal（由 UI 依 status 分成待決與摺疊歷史）**、
+Current JD 與文件 metadata；Work Model、Journal payload、authority generation 與內部 ordinal mapping 不外洩。
+第一版本機資料量不做 Proposal pagination；若日後一份文件的歷史真的造成負擔，再加入 bounded history。
 
-POST turn 使用 `Idempotency-Key`。verified result 才回成功；provider refused、truncated、invalid output、transport failure
-對員工統一為 `consultant-unavailable`，細節留在 server log，不讓 Web 解析錯誤字串。不存在的 Proposal 使用
-`proposal-not-found`；generation/read-set 衝突沿用 `authority-conflict`。
+兩個 POST（turn 與 Proposal decision）都使用 `Idempotency-Key`。verified result 才回成功；provider refused、
+truncated、invalid output、transport failure 對員工統一為 `consultant-unavailable`，細節留在 server log，不讓
+Web 解析錯誤字串。不存在的 Proposal 使用 `proposal-not-found`；generation/read-set 衝突沿用
+`authority-conflict`。`Idempotency-Key` 是現行業界慣例與仍在演進的 HTTPAPI work item，不宣稱已是 RFC。
 
 Workspace 採單頁雙欄：左側 conversation 與 composer，右側 Proposal cards 與 Current JD Task editor；窄畫面上下
 排列，不做 tab、drawer 或第二份 client store。Proposal 卡提供 accept／文字 edit／reject／defer；
@@ -191,7 +203,9 @@ conversation 使用 `role=log`，狀態與錯誤分別使用 `role=status`／`ro
 - 一回合可同時產生多個 Task／issue／排除項及一個下一題；
 - Java／Python 等工具不單獨成 Task，含工具的完整工作仍可成立；
 - provider／parse／verifier／stale 失敗皆零狀態變更；成功才原子保存完整回合；
+- 已提交 turn／decision 以相同 key、相同 payload 重送不呼叫 provider、不重複 Journal；不同 payload 明確 conflict；
 - Proposal accept／edit／reject／defer 不會遺失 active question；
+- Consultation View 同時包含待決 Proposal 與 terminal／stale 歷史，兩者不互相冒充；
 - 關閉再開後 conversation、待決 Proposal、Current JD 與待回答問題一致；
 - legacy API error body 不因新 route 改變；
 - PostgreSQL real-adapter smoke 與真實瀏覽器 smoke 各一條，不用大量模型矩陣冒充產品驗證。
@@ -203,7 +217,49 @@ conversation 使用 `role=log`，狀態與錯誤分別使用 `role=status`／`ro
 - 單一 operation 無法清楚承擔顧問與 Task 分析責任，才重新評估 specialist；
 - 需要多步工具循環或長時間工作，才研究 Agent SDK／Graph workflow／background execution。
 
-## 10. 明確不做
+## 10. Strongest case：這個設計為什麼可能仍然是錯的
+
+### W1. 「專業顧問」被縮成 Task 抽取器
+
+沒有 Role Hypothesis、Coverage 與 StoryFocus，模型可能只追著一個精彩故事深挖，忘記例行工作與未談責任。
+這是最強的產品反對理由。第一版仍接受，因為目前切片的誠實名稱是 Task 訪談最小迴圈，不宣稱完整顧問完成；
+完整 transcript、open issues 與「故事深入後回到工作週期掃描」prompt 是暫時防線。若出現重問、遺忘或故事遮蔽
+例行工作的真實案例，就停止增加 prompt，改進 R2 的 Coverage／focus state。
+
+### W2. 一次呼叫同時理解、改 Work Model、提案、選題，可能互相干擾
+
+A6 的實證主要涵蓋 Task 邊界，不等於已證明下一題選擇品質。第一版採用是 owner 的時程風險接受，不是研究證明。
+但拆成 Controller + Task specialist 會立刻增加呼叫與同步，且沒有失敗證據指出干擾發生。先以 scripted fixtures、
+一個真實 provider smoke 與人工閱讀觀察；只有可重現失敗才拆 operation。
+
+### W3. 固定開場寫在 document creation，讓 metadata use case 知道 consultation
+
+更純的分層會新增 `start consultation` endpoint；更懶的做法則讓 GET 偷寫或只在 UI 合成。前者增加使用者看不到的
+生命週期，後兩者會讓 reload／短答 provenance 沒有可靠問題 turn。因為每份新文件本來就是可訪談的工作空間，
+第一版選 creation 同交易初始化；rename 仍然不碰 Journal、active question 或 authority generation。
+
+### W4. 完整 transcript 終將超過高訊號 context
+
+成立，但現在沒有真實長訪談資料可以合理設計 cut-off。任意 recent-window 會先製造更正遺失。第一版先 lossless；
+記錄 token／turn 數與失敗案例，退化後才研究 compaction，不能預先建 retrieval framework。
+
+### W5. required `next_question` 會讓訪談永遠不結束
+
+成立。這一切片沒有 completion gate，因此只能做遺漏檢查，不能宣告完成。使用者可隨時離開，active question 會保存；
+真正的「完成」必須等 Role／Coverage、OPKS 與 JD review 能力存在後另立規格，不能用 nullable question 假裝完成。
+
+### W6. Idempotency 仍不處理同時飛行中的相同請求
+
+成立。完整解法需要 pending ledger、等待／接管語意與失敗恢復，超出單機單操作者第一切片。最小產品防線是
+provider 前檢查已提交 replay、Web pending 禁止重複送出、commit 端唯一 Journal key；並明示這不是 exactly-once。
+
+### 反方裁決
+
+W1、W2、W4、W5 是已知品質或後續能力限制，不阻擋最小 Task 訪談垂直切片；W3 的替代方案比現案多一個生命
+週期或破壞 GET／provenance；W6 以單機產品約束收斂。真正阻擋施工的兩項是「provider 前 replay
+short-circuit」與「Proposal View 必須包含歷史」，已修入 §§7–9。
+
+## 11. 明確不做
 
 - 不整合或搬移 vNext／舊 interview 資料與程式；
 - 不新增 Role Hypothesis、Coverage Map、StoryFocus、Evidence claim layer；
@@ -213,7 +269,7 @@ conversation 使用 `role=log`，狀態與錯誤分別使用 `role=status`／`ro
 - 不為開發中舊資料做 migration／backfill；
 - 不以本切片完成宣稱整個專業顧問流程已完成。
 
-## 11. 來源
+## 12. 來源
 
 - OpenAI, [Agents SDK — Build with the SDK](https://developers.openai.com/api/docs/guides/agents#build-with-the-sdk)
 - OpenAI, [Orchestration and handoffs](https://developers.openai.com/api/docs/guides/agents/orchestration)
@@ -225,3 +281,5 @@ conversation 使用 `role=log`，狀態與錯誤分別使用 `role=status`／`ro
 - 勞動力發展署 iCAP，[職能基準發展指引](https://icap.wda.gov.tw/ap/get_file.php?c=%E8%81%B7%E8%83%BD%E5%9F%BA%E6%BA%96%E7%99%BC%E5%B1%95%E6%8C%87%E5%BC%95.pdf&e=20221026143138.pdf&t=download)，2022
 - U.S. OPM, [Job Analysis](https://www.opm.gov/policy-data-oversight/assessment-and-selection/job-analysis/)
 - O*NET, [Identification of Emerging Tasks: Revised Approach](https://www.onetcenter.org/reports/EmergingTasks_RevisedApproach.html), 2025-02-25
+- IETF HTTPAPI WG, [The Idempotency-Key HTTP Header Field, draft-07](https://datatracker.ietf.org/doc/draft-ietf-httpapi-idempotency-key-header/07/), 2025-10-15（work in progress；2026-04 已到期，非 RFC）
+- Stripe, [Idempotent requests](https://docs.stripe.com/api/idempotent_requests)（業界實作參考，不作本產品規範 authority）

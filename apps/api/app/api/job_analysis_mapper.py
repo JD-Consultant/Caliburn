@@ -4,6 +4,7 @@ from job_analysis_contract import (
     DocumentMetadataView,
     DocumentSummary as WireDocumentSummary,
     DocumentView,
+    JdTaskWrite,
     JdTaskView,
 )
 
@@ -12,7 +13,44 @@ from app.job_analysis.application import (
     DocumentSummary,
     LoadedDocument,
 )
-from app.job_analysis.domain import JdTask
+from app.job_analysis.domain import (
+    Enabler,
+    EnablerKind,
+    JdTask,
+    JdTaskFields,
+    ResponsibilityRole,
+)
+
+
+def _optional_text(value: str | None) -> str | None:
+    if value is None:
+        return None
+    normalized = value.strip()
+    return normalized or None
+
+
+def to_jd_task_fields(body: JdTaskWrite) -> JdTaskFields:
+    role_value = (
+        body.responsibility_role.value
+        if body.responsibility_role is not None
+        else None
+    )
+    return JdTaskFields(
+        statement=body.statement.strip(),
+        purpose_result=_optional_text(body.purpose_result),
+        context=_optional_text(body.context),
+        frequency_text=_optional_text(body.frequency_text),
+        responsibility_role=(
+            ResponsibilityRole(role_value) if role_value else None
+        ),
+        enablers=tuple(
+            Enabler(
+                kind=EnablerKind(item.kind.value),
+                name=item.name.strip(),
+            )
+            for item in body.enablers
+        ),
+    )
 
 
 def to_document_metadata_view(record: DocumentRecord) -> DocumentMetadataView:

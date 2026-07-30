@@ -249,6 +249,7 @@ GET /api/v1/job-analysis/documents/{document_id}
 - Modify: `apps/api/app/api/job_analysis_problems.py`
 - Modify: `apps/api/app/api/routes/job_analysis.py`
 - Modify: `apps/api/tests/test_job_analysis_api.py`
+- Create: `apps/api/tests/test_job_analysis_mapper.py`
 - Modify: `docs/design/task-analysis-engine.md`
 
 **HTTP scope:**
@@ -262,21 +263,21 @@ PUT    /api/v1/job-analysis/documents/{document_id}/task-order
 
 所有 Task mutation 讀 `Idempotency-Key` 並原樣映射到 `entry_id`，不建 middleware、不 retry。Mapper 對 optional text trim 後空字串轉 null；`statement` trim 後空白回 `invalid-request`。
 
-- [ ] **Step 1: 寫 route 紅測試**
+- [x] **Step 1: 寫 route 紅測試**
 
   覆蓋 add/edit/delete/reorder；缺 header；document/task 404；同 key 同 payload replay；同 key 不同 payload 409；authority conflict 409；非法順序與空 statement 422；六種 Problem type 與 `Content-Type`；unknown Problem extension 不影響 Web consumer contract。
 
   DELETE 明定：同 key 重送回原成功結果；不同新 key 刪已不存在 Task 回 `task-not-found` 404。
 
-- [ ] **Step 2: 寫 mapper 紅測試**
+- [x] **Step 2: 寫 mapper 紅測試**
 
   覆蓋所有 `JdTaskFields` 公開欄位、空 optional 正規化、enabler kind/name、responsibility role；禁止 mapper 遺漏 domain 欄位。
 
-- [ ] **Step 3: 實作最小 route mapping**
+- [x] **Step 3: 實作最小 route mapping**
 
   Application errors 只在新 route 映射為六種 Problem type；Web 不得需要解析 `detail`。Mutation 成功回 Task 或排序後 Tasks；DELETE 回 204。
 
-- [ ] **Step 4: Gate**（working directory: `apps/api`）
+- [x] **Step 4: Gate**（working directory: `apps/api`）
 
   ```powershell
   uv run pytest tests/test_job_analysis_api.py tests/test_job_analysis_authoring_postgres.py -q

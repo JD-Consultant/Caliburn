@@ -4,6 +4,16 @@ from collections.abc import Sequence
 
 from fastapi.responses import JSONResponse
 from job_analysis_contract import ProblemDetail, ProblemFieldError
+from pydantic import ValidationError
+
+from app.job_analysis.application import (
+    ConcurrentAuthorityChange,
+    DocumentNotFound,
+    IdempotencyConflict,
+    InvalidJdTaskOrder,
+    JdTaskNotFound,
+)
+from app.job_analysis.application.errors import JobAnalysisApplicationError
 
 
 DOCUMENT_NOT_FOUND = (
@@ -43,4 +53,55 @@ def problem_response(
         status_code=status,
         content=problem.model_dump(mode="json", exclude_none=True),
         media_type="application/problem+json",
+    )
+
+
+def application_error_response(
+    error: JobAnalysisApplicationError,
+) -> JSONResponse:
+    if isinstance(error, DocumentNotFound):
+        return problem_response(
+            type_uri=DOCUMENT_NOT_FOUND,
+            title="Document not found",
+            status=404,
+        )
+    if isinstance(error, JdTaskNotFound):
+        return problem_response(
+            type_uri=TASK_NOT_FOUND,
+            title="Task not found",
+            status=404,
+        )
+    if isinstance(error, IdempotencyConflict):
+        return problem_response(
+            type_uri=IDEMPOTENCY_CONFLICT,
+            title="Idempotency conflict",
+            status=409,
+        )
+    if isinstance(error, ConcurrentAuthorityChange):
+        return problem_response(
+            type_uri=AUTHORITY_CONFLICT,
+            title="Authority conflict",
+            status=409,
+        )
+    if isinstance(error, InvalidJdTaskOrder):
+        return problem_response(
+            type_uri=INVALID_TASK_ORDER,
+            title="Invalid Task order",
+            status=422,
+        )
+    raise TypeError(f"unmapped job-analysis error: {type(error).__name__}")
+
+
+def domain_validation_error_response(error: ValidationError) -> JSONResponse:
+    return problem_response(
+        type_uri=INVALID_REQUEST,
+        title="Invalid request",
+        status=422,
+        errors=[
+            ProblemFieldError(
+                field=".".join(str(part) for part in item["loc"]),
+                message=item["msg"],
+            )
+            for item in error.errors()
+        ],
     )

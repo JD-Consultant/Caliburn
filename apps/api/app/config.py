@@ -39,6 +39,13 @@ class Settings(BaseSettings):
     model_interview_fallback: str = ""
     model_select_fallback: str = ""
 
+    # Greenfield Task Analysis consultant (ADR 0046). This is deliberately
+    # separate from the retired interview model lineup above.
+    job_analysis_model: str = "anthropic/claude-opus-5"
+    job_analysis_provider: str = "anthropic"
+    job_analysis_max_output_tokens: int = 4096
+    job_analysis_timeout_s: float = 90.0
+
     # Document output
     document_output_dir: str = "./output/documents"
 

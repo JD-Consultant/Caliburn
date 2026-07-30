@@ -11,7 +11,10 @@ from app.job_analysis.application import (
     DocumentNotFound,
     IdempotencyConflict,
     InvalidJdTaskOrder,
+    InvalidProposalDecision,
     JdTaskNotFound,
+    ProposalNotDecidable,
+    ProposalNotFound,
 )
 from app.job_analysis.application.errors import JobAnalysisApplicationError
 
@@ -30,6 +33,12 @@ INVALID_TASK_ORDER = (
     "https://caliburn.dev/problems/job-analysis/invalid-task-order"
 )
 INVALID_REQUEST = "https://caliburn.dev/problems/job-analysis/invalid-request"
+PROPOSAL_NOT_FOUND = (
+    "https://caliburn.dev/problems/job-analysis/proposal-not-found"
+)
+CONSULTANT_UNAVAILABLE = (
+    "https://caliburn.dev/problems/job-analysis/consultant-unavailable"
+)
 
 
 def problem_response(
@@ -71,6 +80,12 @@ def application_error_response(
             title="Task not found",
             status=404,
         )
+    if isinstance(error, ProposalNotFound):
+        return problem_response(
+            type_uri=PROPOSAL_NOT_FOUND,
+            title="Proposal not found",
+            status=404,
+        )
     if isinstance(error, IdempotencyConflict):
         return problem_response(
             type_uri=IDEMPOTENCY_CONFLICT,
@@ -83,13 +98,33 @@ def application_error_response(
             title="Authority conflict",
             status=409,
         )
+    if isinstance(error, ProposalNotDecidable):
+        return problem_response(
+            type_uri=AUTHORITY_CONFLICT,
+            title="Proposal is no longer decidable",
+            status=409,
+        )
     if isinstance(error, InvalidJdTaskOrder):
         return problem_response(
             type_uri=INVALID_TASK_ORDER,
             title="Invalid Task order",
             status=422,
         )
+    if isinstance(error, InvalidProposalDecision):
+        return problem_response(
+            type_uri=INVALID_REQUEST,
+            title="Invalid proposal decision",
+            status=422,
+        )
     raise TypeError(f"unmapped job-analysis error: {type(error).__name__}")
+
+
+def consultant_unavailable_response() -> JSONResponse:
+    return problem_response(
+        type_uri=CONSULTANT_UNAVAILABLE,
+        title="Consultant temporarily unavailable",
+        status=503,
+    )
 
 
 def domain_validation_error_response(error: ValidationError) -> JSONResponse:

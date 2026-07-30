@@ -51,7 +51,7 @@ OpenRouter 拿 `TaskAnalysisResult.v1` → **verifier**(純函式、零 LLM)擋�
 | authoring use cases | 文件庫與 JD Task add/edit/delete/reorder | `application/authoring.py` | document row lock → entry replay check → Current State/Journal/generation 同交易；不呼叫 LLM |
 | consultation use case | provider 前 replay → authority snapshot → 交易外模型呼叫 → verified commit | `application/consultation.py`、`application/durable_turn.py` | 已提交的同 key／同回答零 provider call；commit 時重鎖並比對 generation/read-set；Work Model、Proposal、下一題與 completed-turn Journal 同交易 |
 | Proposal use cases | 候選送審 + accept/edit/reject/defer/revision request | `application/proposal_decisions.py` | `propose_task_for_jd()` 不自動接受；決策由 document lock 序列化；接受類才改 JD；決策寫 Journal |
-| Local Web API | 本機文件列表、建立／改名、開啟與 Current JD Task 編輯 | `app/api/routes/job_analysis.py` | 只做 generated wire DTO mapping；不暴露 Work Model、Proposal、Journal 或 generation；mutation 直接呼叫既有 authoring use cases |
+| Local Web API | 本機文件、Current JD 與 Consultation routes | `app/api/routes/job_analysis.py` | 只做 generated wire DTO mapping；不暴露 Work Model、Journal、generation 或 provider detail；turn／Proposal decision 直接呼叫 greenfield application use cases |
 | Local Web UI | 文件庫與單一開啟文件的 Task editor | `apps/web/src/app/workspace/`、`components/workspace/` | generated TS DTO + TanStack Query；一份本地草稿、明確儲存，不用 Server Action／autosave／第二份 document store |
 
 ## 3. 一輪的資料流(每步標函式)
@@ -112,6 +112,9 @@ scripted smoke 保護的顧問行為基線，不代表模型品質已通過。
 conversation authority 任一不一致就回 `StaleAuthoritySnapshot`，舊結果不得套用。
 相同 `operation_id` 的已提交回合不會再打 provider，也不會新增 Task／Proposal／Journal。
 兩個同時飛行中的相同 request 尚未合併；這是單機第一版的明示限制，不得稱為 exactly-once。
+模型輸出 `task_change.add` 表示該訊號已通過 Task 成立判準：transition 先建立 Work Model 候選，
+並在同一結果中建立 pending `add` Proposal。候選仍不是 Current JD；只有員工 accept／edit 後才進文件。
+若只建立不可見候選而沒有 Proposal，Consultation View 又不暴露 Work Model，員工就永遠無法審查 AI 找到的工作。
 
 Proposal 決策由 `decide_proposal()` 完成，沒有 LLM。`accepted` 套用 `jd_after`；
 `edited` 套用員工文字並標記後續 reconcile；`rejected`、`deferred`、
@@ -121,8 +124,9 @@ Proposal 決策由 `decide_proposal()` 完成，沒有 LLM。`accepted` 套用 `
 JD-only withdraw 可以沒有 staged delta；決策端在 document lock 內以目前 Work Model 重驗：
 target 後來出現未退休 Task 或已被較新 retirement 取代時，一律轉 `stale`。接受移除 JD Task
 時，同交易清除指向該 Task 的 reconciliation issue，避免 reload 後繼續追問已不存在的內容。
-Task Analysis 的 `add` 只建立 Work Model 候選；`propose_task_for_jd()` 是把一個已穩定候選
-送給員工審核的顯式 bridge。它不每輪自動製造提案，也不替員工接受。
+Task Analysis 的 `add` 建立 Work Model 候選，並在同一 transition 建立 pending `add` Proposal；
+它不替員工接受或直接寫入 JD。`propose_task_for_jd()` 仍是非顧問流程把既有候選送審的顯式 bridge，
+Consultation turn 不再重複呼叫它。
 
 `OperationOutcome` 五種結局,呼叫端照名字處置:
 
@@ -207,7 +211,7 @@ JD 只在員工決定提案時才改。
 
 | 沒有的東西 | 現況 | 什麼時候做 |
 |---|---|---|
-| AI conversation／Proposal review UI | 文件庫與人工 Task editor 已接通；AI 互動尚未接 Web | 顧問 loop 與 Proposal UX 各自研究後再做 |
+| AI conversation／Proposal review UI | Consultation API 已接通；瀏覽器仍只有文件庫與人工 Task editor | 下一個切片只做雙欄 conversation／Proposal UX |
 | endpoint variant preflight | `provider_order` 只鎖 base slug,同 provider 可能有多個 endpoint variant | 真正付費呼叫前的 catalog／live preflight |
 | prompt 品質調校 | `llm/prompt.py` 已有 Task 判準與彈性顧問行為基線，但尚未用真實員工資料調校 | 有真實使用摩擦後以 rubric／eval 調整，不先加 planner 或第二次呼叫 |
 | duplicate／overlap identity 自動收斂 | 第一版刻意不做；模型保留 issue 並追問員工 | 有真實重複摩擦證據後再研究，不用相似度猜測 |

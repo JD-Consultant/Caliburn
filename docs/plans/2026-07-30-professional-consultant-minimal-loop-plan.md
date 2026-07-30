@@ -194,11 +194,13 @@ Repository 提供按 Journal sequence 展開的 `conversation_turns`：opening �
 **Files:**
 
 - Modify: `apps/api/app/config.py`
+- Modify: `apps/api/app/job_analysis/application/transition.py`
 - Modify: `apps/api/app/api/deps.py`
 - Modify: `apps/api/app/api/job_analysis_mapper.py`
 - Modify: `apps/api/app/api/job_analysis_problems.py`
 - Modify: `apps/api/app/api/routes/job_analysis.py`
 - Modify: `apps/api/tests/test_job_analysis_mapper.py`
+- Modify: `apps/api/tests/test_job_analysis_transition.py`
 - Modify: `apps/api/tests/test_job_analysis_api.py`
 - Modify: `apps/api/tests/test_job_analysis_api_postgres.py`
 - Modify: `apps/api/tests/test_app_wiring.py`

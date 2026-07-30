@@ -1,9 +1,34 @@
 """Domain/wire mapping at the greenfield job-analysis transport seam."""
 
+from datetime import UTC, datetime
+from uuid import UUID
+
 from job_analysis_contract import JdTaskWrite
 
-from app.api.job_analysis_mapper import to_jd_task_fields
-from app.job_analysis.domain import EnablerKind, ResponsibilityRole
+from app.api.job_analysis_mapper import to_consultation_view, to_jd_task_fields
+from app.job_analysis.application import (
+    ActiveQuestion,
+    ConversationTurn,
+    DocumentRecord,
+    JobAnalysisState,
+    LoadedDocument,
+    TurnSpeaker,
+)
+from app.job_analysis.domain import (
+    CurrentWorkModel,
+    EnablerKind,
+    JdEntry,
+    JdTask,
+    Proposal,
+    ProposalAction,
+    ProposalStatus,
+    ResponsibilityRole,
+    SingleTaskTarget,
+    SourceKind,
+    SourceRef,
+    SupportLink,
+    Task,
+)
 
 
 def test_write_mapper_covers_and_normalizes_every_employee_editable_field():
@@ -47,3 +72,84 @@ def test_empty_responsibility_role_normalizes_to_none():
     )
 
     assert to_jd_task_fields(body).responsibility_role is None
+
+
+def test_consultation_view_keeps_history_without_leaking_internal_authority():
+    now = datetime(2026, 7, 30, 9, 0, tzinfo=UTC)
+    effective = SupportLink(
+        source_ref=SourceRef(kind=SourceKind.EMPLOYEE_TURN, id="turn-2"),
+        quote="我每週彙整營運週報",
+    )
+    duplicate = effective.model_copy()
+    direct_edit = SupportLink(
+        source_ref=SourceRef(kind=SourceKind.DIRECT_EDIT, id="edit-1")
+    )
+    superseded = SupportLink(
+        source_ref=SourceRef(kind=SourceKind.EMPLOYEE_TURN, id="turn-old"),
+        quote="舊說法",
+        superseded_by=SourceRef(kind=SourceKind.EMPLOYEE_TURN, id="turn-2"),
+    )
+    task = Task(
+        task_id="task-1",
+        statement="每週彙整營運週報",
+        action="彙整",
+        object="營運週報",
+        support_links=(effective, duplicate, direct_edit, superseded),
+    )
+    jd_task = JdTask(
+        task_id="task-1",
+        statement=task.statement,
+        display_order=0,
+    )
+    proposal = Proposal(
+        proposal_id="proposal-1",
+        target=SingleTaskTarget(action=ProposalAction.ADD, task_id="task-1"),
+        jd_before=(JdEntry(task_id="task-1"),),
+        jd_after=(JdEntry(task_id="task-1", value=jd_task),),
+        status=ProposalStatus.STALE,
+        stale_reason="Current JD 已由員工修改",
+    )
+    loaded = LoadedDocument(
+        document=DocumentRecord(
+            document_id=UUID("00000000-0000-0000-0000-000000000045"),
+            title="門市營運專員",
+            work_model=CurrentWorkModel(tasks=(task,)),
+            active_question=ActiveQuestion(turn_id="turn-3", text="週報交給誰？"),
+            authority_generation=7,
+            created_at=now,
+            updated_at=now,
+        ),
+        state=JobAnalysisState(
+            work_model=CurrentWorkModel(tasks=(task,)),
+            current_jd=(jd_task,),
+            proposals=(proposal,),
+        ),
+        conversation_turns=(
+            ConversationTurn(
+                turn_id="turn-1",
+                speaker=TurnSpeaker.CONSULTANT,
+                text="先說說這個職位替誰解決問題？",
+            ),
+            ConversationTurn(
+                turn_id="turn-2",
+                speaker=TurnSpeaker.EMPLOYEE,
+                text="我每週彙整營運週報",
+            ),
+        ),
+    )
+
+    view = to_consultation_view(loaded)
+    payload = view.model_dump(mode="json")
+
+    assert [turn["speaker"] for turn in payload["conversation"]] == [
+        "consultant",
+        "employee",
+    ]
+    assert payload["active_question"]["text"] == "週報交給誰？"
+    assert payload["proposals"][0]["status"] == "stale"
+    assert payload["proposals"][0]["evidence_quotes"] == [
+        "我每週彙整營運週報"
+    ]
+    assert payload["tasks"][0]["task_id"] == "task-1"
+    assert "authority_generation" not in payload
+    assert "work_model" not in payload

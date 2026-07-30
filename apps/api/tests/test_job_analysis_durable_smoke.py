@@ -18,7 +18,6 @@ from app.job_analysis.application import (
     edit_jd_task,
     load_document,
     prepare_turn,
-    propose_task_for_jd,
     reorder_jd_tasks,
 )
 from app.job_analysis.domain import JdTaskFields, ProposalStatus
@@ -141,12 +140,10 @@ async def test_local_document_survives_every_transaction_boundary(
         ),
     )
 
-    proposal = await propose_task_for_jd(
-        uow_factory,
-        document_id=document_id,
-        task_id="analysis-1-t0",
-        proposal_id="proposal-add-shortage",
-    )
+    after_analysis = await load_document(uow_factory, document_id)
+    assert after_analysis is not None
+    proposal = after_analysis.state.proposals[0]
+    assert proposal.proposal_id == "analysis-1-p0"
     await decide_proposal(
         uow_factory,
         document_id=document_id,
@@ -157,7 +154,7 @@ async def test_local_document_survives_every_transaction_boundary(
 
     reloaded = await load_document(uow_factory, document_id)
     assert reloaded is not None
-    assert reloaded.document.authority_generation == 7
+    assert reloaded.document.authority_generation == 6
     assert [task.statement for task in reloaded.state.current_jd] == [
         "每月盤點門市耗材",
         "每週彙整營運資料",

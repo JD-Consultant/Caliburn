@@ -12,7 +12,23 @@ import pytest_asyncio
 
 from app.api import deps
 from app.job_analysis.application import DocumentRecord, DocumentSummary
-from app.job_analysis.domain import CurrentWorkModel, JdTask
+from app.job_analysis.domain import CurrentWorkModel, JdTask, TaskFields
+from app.job_analysis.llm import (
+    IdentityAssessment,
+    IdentityRelation,
+    NextQuestion,
+    SignalAnchor,
+    SignalDisposition,
+    TaskAnalysisResult,
+    TaskChangeKind,
+    TaskChangePayload,
+    WorkSignal,
+)
+from app.job_analysis.providers import (
+    OpenRouterAdapter,
+    OpenRouterConfig,
+    TransportResponse,
+)
 from app.main import app
 
 
@@ -156,20 +172,89 @@ class _UnitOfWork:
         return None
 
 
+class _ScriptedTransport:
+    def __init__(self) -> None:
+        self.calls = 0
+        self.fail = False
+
+    async def __call__(self, *, url, headers, body, timeout):
+        self.calls += 1
+        if self.fail:
+            return TransportResponse(status_code=503, text="anthropic unavailable")
+        result = TaskAnalysisResult(
+            work_signals=(
+                WorkSignal(
+                    anchors=(
+                        SignalAnchor(
+                            turn_ordinal=2,
+                            quote="我每週彙整營運週報",
+                        ),
+                    ),
+                    identity=IdentityAssessment(
+                        relation=IdentityRelation.NO_MATCH
+                    ),
+                    disposition=SignalDisposition.TASK_CHANGE,
+                    task_change=TaskChangePayload(
+                        change=TaskChangeKind.ADD,
+                        task_fields=TaskFields(
+                            statement="每週彙整營運週報",
+                            action="彙整",
+                            object="營運週報",
+                            purpose_result="讓主管掌握營運狀況",
+                        ),
+                    ),
+                ),
+            ),
+            next_question=NextQuestion(
+                text="這份週報通常提供給誰？",
+                purpose="釐清產出的主要使用者",
+            ),
+        )
+        return TransportResponse(
+            status_code=200,
+            body={
+                "model": "anthropic/claude-opus-5",
+                "choices": [
+                    {
+                        "message": {
+                            "content": result.model_dump_json(),
+                            "refusal": None,
+                        },
+                        "finish_reason": "stop",
+                    }
+                ],
+            },
+        )
+
+
 @pytest_asyncio.fixture
 async def api_client():
     store = _Store()
+    provider = _ScriptedTransport()
+    adapter = OpenRouterAdapter(
+        config=OpenRouterConfig(
+            model="anthropic/claude-opus-5",
+            provider_order=("anthropic",),
+            max_output_tokens=4096,
+            timeout_seconds=90,
+        ),
+        api_key="sk-test",
+        transport=provider,
+    )
     dependency = getattr(deps, "get_job_analysis_uow_factory", None)
     if dependency is not None:
         app.dependency_overrides[dependency] = lambda: lambda: _UnitOfWork(store)
+    adapter_dependency = getattr(deps, "get_job_analysis_adapter", None)
+    if adapter_dependency is not None:
+        app.dependency_overrides[adapter_dependency] = lambda: adapter
     transport = httpx.ASGITransport(app=app)
     async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
-        yield client, store
+        yield client, store, provider
     app.dependency_overrides.clear()
 
 
 async def test_put_creates_then_replaces_only_document_metadata(api_client):
-    client, store = api_client
+    client, store, _ = api_client
 
     created = await client.put(
         f"/api/v1/job-analysis/documents/{DOCUMENT_ID}",
@@ -196,7 +281,7 @@ async def test_put_creates_then_replaces_only_document_metadata(api_client):
 
 
 async def test_list_and_open_return_only_the_current_jd_projection(api_client):
-    client, store = api_client
+    client, store, _ = api_client
     await client.put(
         f"/api/v1/job-analysis/documents/{DOCUMENT_ID}",
         json={"title": "門市營運專員"},
@@ -224,7 +309,7 @@ async def test_list_and_open_return_only_the_current_jd_projection(api_client):
 
 
 async def test_missing_document_uses_the_stable_problem_type(api_client):
-    client, _ = api_client
+    client, _, _ = api_client
 
     response = await client.get(
         f"/api/v1/job-analysis/documents/{DOCUMENT_ID}"
@@ -239,7 +324,7 @@ async def test_missing_document_uses_the_stable_problem_type(api_client):
 
 @pytest.mark.parametrize("payload", [{}, {"title": "   "}])
 async def test_invalid_document_metadata_uses_problem_details(api_client, payload):
-    client, _ = api_client
+    client, _, _ = api_client
 
     response = await client.put(
         f"/api/v1/job-analysis/documents/{DOCUMENT_ID}",
@@ -257,7 +342,7 @@ async def test_invalid_document_metadata_uses_problem_details(api_client, payloa
 
 
 async def test_legacy_validation_error_shape_is_unchanged(api_client):
-    client, _ = api_client
+    client, _, _ = api_client
 
     response = await client.get("/api/v1/occupations")
 
@@ -279,7 +364,7 @@ def _task_payload(statement: str = " 每週彙整營運週報 "):
 
 
 async def test_task_mutations_share_the_authoring_use_cases(api_client):
-    client, _ = api_client
+    client, _, _ = api_client
     await client.put(
         f"/api/v1/job-analysis/documents/{DOCUMENT_ID}",
         json={"title": "門市營運專員"},
@@ -382,7 +467,7 @@ async def test_task_mutation_failures_use_stable_problem_types(
     status,
     problem_type,
 ):
-    client, _ = api_client
+    client, _, _ = api_client
     await client.put(
         f"/api/v1/job-analysis/documents/{DOCUMENT_ID}",
         json={"title": "門市營運專員"},
@@ -398,7 +483,7 @@ async def test_task_mutation_failures_use_stable_problem_types(
 
 
 async def test_idempotency_conflict_and_authority_conflict_are_distinct(api_client):
-    client, store = api_client
+    client, store, _ = api_client
     await client.put(
         f"/api/v1/job-analysis/documents/{DOCUMENT_ID}",
         json={"title": "門市營運專員"},
@@ -427,7 +512,7 @@ async def test_idempotency_conflict_and_authority_conflict_are_distinct(api_clie
 
 
 async def test_delete_with_a_new_key_after_deletion_is_not_found(api_client):
-    client, _ = api_client
+    client, _, _ = api_client
     await client.put(
         f"/api/v1/job-analysis/documents/{DOCUMENT_ID}",
         json={"title": "門市營運專員"},
@@ -450,3 +535,112 @@ async def test_delete_with_a_new_key_after_deletion_is_not_found(api_client):
 
     assert response.status_code == 404
     assert response.json()["type"].endswith("/task-not-found")
+
+
+async def test_consultation_turn_is_durable_and_replays_before_the_provider(api_client):
+    client, _, provider = api_client
+    root = f"/api/v1/job-analysis/documents/{DOCUMENT_ID}"
+    await client.put(root, json={"title": "門市營運專員"})
+
+    opened = await client.get(f"{root}/consultation")
+    first = await client.post(
+        f"{root}/turns",
+        headers={"Idempotency-Key": "turn-1"},
+        json={"text": "我每週彙整營運週報"},
+    )
+    replay = await client.post(
+        f"{root}/turns",
+        headers={"Idempotency-Key": "turn-1"},
+        json={"text": "我每週彙整營運週報"},
+    )
+    conflict = await client.post(
+        f"{root}/turns",
+        headers={"Idempotency-Key": "turn-1"},
+        json={"text": "其實我每月才做一次"},
+    )
+
+    assert opened.status_code == 200
+    assert [turn["speaker"] for turn in opened.json()["conversation"]] == [
+        "consultant"
+    ]
+    assert first.status_code == 200
+    assert replay.json() == first.json()
+    assert provider.calls == 1
+    assert [turn["speaker"] for turn in first.json()["conversation"]] == [
+        "consultant",
+        "employee",
+        "consultant",
+    ]
+    assert first.json()["active_question"]["text"] == "這份週報通常提供給誰？"
+    assert first.json()["proposals"][0]["status"] == "pending"
+    assert conflict.status_code == 409
+    assert conflict.json()["type"].endswith("/idempotency-conflict")
+
+
+async def test_consultant_failure_does_not_leak_provider_details_or_change_state(api_client):
+    client, _, provider = api_client
+    root = f"/api/v1/job-analysis/documents/{DOCUMENT_ID}"
+    await client.put(root, json={"title": "門市營運專員"})
+    provider.fail = True
+
+    failed = await client.post(
+        f"{root}/turns",
+        headers={"Idempotency-Key": "failed-turn"},
+        json={"text": "我每週彙整營運週報"},
+    )
+    reloaded = await client.get(f"{root}/consultation")
+
+    assert failed.status_code == 503
+    assert failed.json()["type"].endswith("/consultant-unavailable")
+    assert "anthropic" not in failed.text.lower()
+    assert "provider" not in failed.text.lower()
+    assert len(reloaded.json()["conversation"]) == 1
+
+
+@pytest.mark.parametrize("decision", ["accepted", "edited", "rejected", "deferred"])
+async def test_proposal_decisions_preserve_the_active_question(api_client, decision):
+    client, _, _ = api_client
+    root = f"/api/v1/job-analysis/documents/{DOCUMENT_ID}"
+    await client.put(root, json={"title": "門市營運專員"})
+    consultation = await client.post(
+        f"{root}/turns",
+        headers={"Idempotency-Key": f"turn-{decision}"},
+        json={"text": "我每週彙整營運週報"},
+    )
+    proposal = consultation.json()["proposals"][0]
+    body = {"decision": decision}
+    if decision == "edited":
+        edited = proposal["jd_after"]
+        edited[0]["value"]["statement"] = "每週彙整並檢查營運週報"
+        body["edited_jd_after"] = edited
+    if decision == "rejected":
+        body["reason"] = "這不是正式責任"
+
+    response = await client.post(
+        f"{root}/proposals/{proposal['proposal_id']}/decisions",
+        headers={"Idempotency-Key": f"decision-{decision}"},
+        json=body,
+    )
+
+    assert response.status_code == 200
+    assert response.json()["proposals"][0]["status"] == decision
+    assert response.json()["active_question"]["text"] == "這份週報通常提供給誰？"
+    if decision in {"accepted", "edited"}:
+        assert len(response.json()["tasks"]) == 1
+    else:
+        assert response.json()["tasks"] == []
+
+
+async def test_missing_proposal_uses_its_own_problem_type(api_client):
+    client, _, _ = api_client
+    root = f"/api/v1/job-analysis/documents/{DOCUMENT_ID}"
+    await client.put(root, json={"title": "門市營運專員"})
+
+    response = await client.post(
+        f"{root}/proposals/missing/decisions",
+        headers={"Idempotency-Key": "missing-proposal"},
+        json={"decision": "accepted"},
+    )
+
+    assert response.status_code == 404
+    assert response.json()["type"].endswith("/proposal-not-found")

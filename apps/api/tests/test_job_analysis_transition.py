@@ -210,15 +210,19 @@ def partial_state(statement: str = "每週整理週報") -> JobAnalysisState:
 # ── §12.2 mapping ───────────────────────────────────────────────────────────
 
 
-def test_add_creates_a_candidate_task_immediately_without_a_proposal():
-    """§9.6:`add` 不碰任何既有 identity;要不要進 JD 是後續的事。"""
+def test_add_creates_a_candidate_and_a_pending_jd_proposal():
+    """Task 先進 Work Model；Proposal 讓員工決定是否進 JD。"""
     outcome = apply(signal())
     assert outcome.is_applied
-    assert outcome.created_proposal_ids == ()
+    assert outcome.created_proposal_ids == ("op-1-p0",)
     created = outcome.state.work_model.task_by_id("op-1-t0")
     assert created.statement == "每週追蹤客訴"
     assert created.state is TaskState.ACTIVE
     assert len(created.support_links) == 1
+    proposal = outcome.state.proposals[0]
+    assert proposal.action is ProposalAction.ADD
+    assert jd_map(proposal.jd_before)[created.task_id] is None
+    assert jd_map(proposal.jd_after)[created.task_id].statement == created.statement
 
 
 def test_no_match_add_materializes_the_partial_jd_task_with_the_same_identity():
@@ -572,7 +576,7 @@ def test_one_round_can_mix_an_immediate_change_with_a_proposal():
     )
     assert outcome.is_applied
     assert outcome.immediate_task_ids == ("op-1-t0",)
-    assert outcome.created_proposal_ids == ("op-1-p1",)
+    assert outcome.created_proposal_ids == ("op-1-p0", "op-1-p1")
     assert outcome.state.work_model.task_by_id("op-1-t0") is not None
     assert (
         outcome.state.work_model.task_by_id("task-1").state

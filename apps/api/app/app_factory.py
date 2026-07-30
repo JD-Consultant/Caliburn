@@ -4,14 +4,39 @@
 the ``/healthz`` readiness endpoint. T12(ADR 0030)後唯一入口=``app.main``
 (tests 與 production 同一顆;run_live.py 直起 ``app.main:app``)。
 """
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.exception_handlers import request_validation_exception_handler
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from job_analysis_contract import ProblemFieldError
 from sqlalchemy import text
 
+from app.api.job_analysis_problems import INVALID_REQUEST, problem_response
 from app.api.router import api_router
 from app.config import settings
 from app.database import AsyncSessionLocal
 from app.observability import setup_tracing
+
+
+async def _request_validation_error(
+    request: Request,
+    exc: RequestValidationError,
+):
+    if not request.url.path.startswith("/api/v1/job-analysis/"):
+        return await request_validation_exception_handler(request, exc)
+    errors = [
+        ProblemFieldError(
+            field=".".join(str(part) for part in error["loc"] if part != "body"),
+            message=error["msg"],
+        )
+        for error in exc.errors()
+    ]
+    return problem_response(
+        type_uri=INVALID_REQUEST,
+        title="Invalid request",
+        status=422,
+        errors=errors,
+    )
 
 
 def configure(app: FastAPI) -> FastAPI:
@@ -22,6 +47,7 @@ def configure(app: FastAPI) -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+    app.add_exception_handler(RequestValidationError, _request_validation_error)
     app.include_router(api_router)
 
     @app.get("/healthz")

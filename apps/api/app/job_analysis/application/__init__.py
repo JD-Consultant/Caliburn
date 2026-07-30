@@ -1,12 +1,14 @@
 """Use-case 層：context、operation、transition 與純 persistence ports。"""
 
 from .authoring import (
+    DocumentMetadataWriteResult,
     add_jd_task,
     create_document,
     delete_jd_task,
     edit_jd_task,
     list_documents,
     load_document,
+    put_document_metadata,
     reorder_jd_tasks,
 )
 from .errors import (
@@ -105,6 +107,7 @@ __all__ = [
     "DirectEditKind",
     "DirectEditPayload",
     "DocumentNotFound",
+    "DocumentMetadataWriteResult",
     "DocumentRecord",
     "DocumentRepository",
     "DocumentSummary",
@@ -169,6 +172,7 @@ __all__ = [
     "list_documents",
     "load_document",
     "prepare_turn",
+    "put_document_metadata",
     "propose_task_for_jd",
     "reorder_jd_tasks",
     "verify_task_analysis_result",

@@ -208,23 +208,23 @@ PUT /api/v1/job-analysis/documents/{document_id}
 GET /api/v1/job-analysis/documents/{document_id}
 ```
 
-- [ ] **Step 1: 寫 application／adapter 紅測試**
+- [x] **Step 1: 寫 application／adapter 紅測試**
 
   測 rename 只改 title/updated_at；tasks/work model/proposals/generation/journal 逐一不變；不存在的 update 回 false。同 ID、不同 title 不再丟 `IdempotencyConflict`。
 
-- [ ] **Step 2: 寫 route 紅測試**
+- [x] **Step 2: 寫 route 紅測試**
 
   測 list、201 create、200 rename、open、document 404、輸出不含 generation/work model/journal。先以 dependency override/fake UoW 測 transport，不要求 PostgreSQL。
 
-- [ ] **Step 3: 實作窄 port、mapper 與 route**
+- [x] **Step 3: 實作窄 port、mapper 與 route**
 
   Route 使用 generated Pydantic wire models；domain/wire mapping 只在 `app/api`。不要讓 route 直接操作 repositories。
 
-- [ ] **Step 4: 加 path-scoped validation handler**
+- [x] **Step 4: 加 path-scoped validation handler**
 
   新 `RequestValidationError` handler 只對 `/api/v1/job-analysis/*` 回 `application/problem+json`；其他 path 委派 FastAPI 既有 handler。加入 legacy 422 body regression，避免誤傷舊 routes。
 
-- [ ] **Step 5: Gate**（working directory: `apps/api`）
+- [x] **Step 5: Gate**（working directory: `apps/api`）
 
   ```powershell
   uv run pytest tests/test_job_analysis_authoring_postgres.py tests/test_job_analysis_api.py tests/test_app_wiring.py -q

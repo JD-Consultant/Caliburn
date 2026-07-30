@@ -121,29 +121,35 @@ async def commit_authority_change(
 
 `ProblemDetail.type` 必須是 ADR 0045 六個絕對 URI 的 enum；`errors` 固定為 `[{field, message}]`，Problem object 允許未知 RFC extension。其他 DTO `additionalProperties: false`。Optional text 在 wire 允許 `string | null` 及 `""`，因為 trim／空字串轉 null 是 mapper 責任；不得讓 generated model 在 mapper 前誤殺可正規化的表單值。
 
-- [ ] **Step 1: 寫 schema 與紅測試**
+- [x] **Step 1: 寫 schema 與紅測試**
 
   測 `$id`、required/nullable、六種 Problem URI、未知 Problem extension 可被忽略、TS 產生 literal union、generated Python model 可接 optional `""`。
 
-- [ ] **Step 2: 建 package 與 codegen**
+- [x] **Step 2: 建 package 與 codegen**
 
   只複用 `packages/ocs-contract` 的 codegen 形狀，不 import 其 OCS schema。加入 API path dependency 與 Web workspace dependency。
 
-- [ ] **Step 3: 強化 dependency guard**
+- [x] **Step 3: 強化 dependency guard**
 
   `apps/api/tests/test_job_analysis_dependencies.py` 必須拒絕 `app/job_analysis` import `job_analysis_contract`；`app/api` 不在禁單。
 
-- [ ] **Step 4: Gate**
+- [x] **Step 4: Gate**
 
   ```powershell
   npm run codegen --workspace=@caliburn/job-analysis-contract
   npm run check-codegen --workspace=@caliburn/job-analysis-contract
   ```
 
+  Working directory `packages/job-analysis-contract`:
+
+  ```powershell
+  uv run pytest tests/test_schema.py -q
+  ```
+
   Working directory `apps/api`:
 
   ```powershell
-  uv run pytest ../../packages/job-analysis-contract/tests/test_schema.py tests/test_job_analysis_dependencies.py -q
+  uv run pytest tests/test_job_analysis_dependencies.py -q
   ```
 
   Working directory `apps/web`:
@@ -152,7 +158,7 @@ async def commit_authority_change(
   npx tsc --noEmit
   ```
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
   ```powershell
   git add packages/job-analysis-contract apps/api/pyproject.toml apps/api/uv.lock apps/api/tests/test_job_analysis_dependencies.py apps/web/package.json package-lock.json

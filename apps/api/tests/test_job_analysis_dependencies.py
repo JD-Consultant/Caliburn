@@ -20,6 +20,7 @@ FORBIDDEN_ROOTS = (
     "app.interview_vnext",
     "app.job_authoring",
     "evals",
+    "job_analysis_contract",
 )
 
 

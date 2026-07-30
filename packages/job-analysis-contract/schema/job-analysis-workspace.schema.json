@@ -1,0 +1,168 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://caliburn.dev/schema/job-analysis-workspace.schema.json",
+  "title": "JobAnalysisWorkspaceContract",
+  "description": "Local Web document and Current JD Task wire contract.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {},
+  "$defs": {
+    "DocumentMetadataWrite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title"],
+      "properties": {
+        "title": { "type": "string" }
+      }
+    },
+    "DocumentMetadataView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["document_id", "title", "updated_at"],
+      "properties": {
+        "document_id": { "type": "string", "format": "uuid" },
+        "title": { "type": "string" },
+        "updated_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "DocumentSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["document_id", "title", "task_count", "updated_at"],
+      "properties": {
+        "document_id": { "type": "string", "format": "uuid" },
+        "title": { "type": "string" },
+        "task_count": { "type": "integer", "minimum": 0 },
+        "updated_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "Enabler": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "name"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["tool_system", "method", "knowledge", "skill", "other"]
+        },
+        "name": { "type": "string" }
+      }
+    },
+    "JdTaskWrite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "statement",
+        "purpose_result",
+        "context",
+        "frequency_text",
+        "responsibility_role",
+        "enablers"
+      ],
+      "properties": {
+        "statement": { "type": "string" },
+        "purpose_result": { "type": ["string", "null"] },
+        "context": { "type": ["string", "null"] },
+        "frequency_text": { "type": ["string", "null"] },
+        "responsibility_role": {
+          "type": ["string", "null"],
+          "enum": ["primary", "shared", "assist", "", null]
+        },
+        "enablers": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Enabler" }
+        }
+      }
+    },
+    "JdTaskView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "statement",
+        "purpose_result",
+        "context",
+        "frequency_text",
+        "responsibility_role",
+        "enablers",
+        "display_order"
+      ],
+      "properties": {
+        "task_id": { "type": "string" },
+        "statement": { "type": "string" },
+        "purpose_result": { "type": ["string", "null"] },
+        "context": { "type": ["string", "null"] },
+        "frequency_text": { "type": ["string", "null"] },
+        "responsibility_role": {
+          "type": ["string", "null"],
+          "enum": ["primary", "shared", "assist", null]
+        },
+        "enablers": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Enabler" }
+        },
+        "display_order": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "DocumentView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["document_id", "title", "updated_at", "tasks"],
+      "properties": {
+        "document_id": { "type": "string", "format": "uuid" },
+        "title": { "type": "string" },
+        "updated_at": { "type": "string", "format": "date-time" },
+        "tasks": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/JdTaskView" }
+        }
+      }
+    },
+    "TaskOrderWrite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ordered_task_ids"],
+      "properties": {
+        "ordered_task_ids": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "ProblemFieldError": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["field", "message"],
+      "properties": {
+        "field": { "type": "string" },
+        "message": { "type": "string" }
+      }
+    },
+    "ProblemDetail": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["type", "title", "status"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "https://caliburn.dev/problems/job-analysis/document-not-found",
+            "https://caliburn.dev/problems/job-analysis/task-not-found",
+            "https://caliburn.dev/problems/job-analysis/idempotency-conflict",
+            "https://caliburn.dev/problems/job-analysis/authority-conflict",
+            "https://caliburn.dev/problems/job-analysis/invalid-task-order",
+            "https://caliburn.dev/problems/job-analysis/invalid-request"
+          ]
+        },
+        "title": { "type": "string" },
+        "status": { "type": "integer", "minimum": 400, "maximum": 599 },
+        "detail": { "type": ["string", "null"], "default": null },
+        "errors": {
+          "type": ["array", "null"],
+          "items": { "$ref": "#/$defs/ProblemFieldError" },
+          "default": null
+        }
+      }
+    }
+  }
+}

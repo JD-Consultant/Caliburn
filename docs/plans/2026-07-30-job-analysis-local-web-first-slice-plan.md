@@ -395,11 +395,11 @@ PUT    /api/v1/job-analysis/documents/{document_id}/task-order
 - Modify: `docs/README.md`
 - Modify: `apps/web/README.md`
 
-- [ ] **Step 1: 寫 real PostgreSQL HTTP vertical**
+- [x] **Step 1: 寫 real PostgreSQL HTTP vertical**
 
   使用真實 migration schema 與 TestClient/ASGI client，完成：建立文件 → 新增只有 statement 的 Task → 補 optional 欄位 → 新增第二 Task → 排序 → 關閉 UoW → reload。另測 rename 前後 Tasks、generation、Journal 不變。
 
-- [ ] **Step 2: 跑 API gates**（working directory: `apps/api`）
+- [x] **Step 2: 跑 API gates**（working directory: `apps/api`）
 
   ```powershell
   uv run pytest tests/test_job_analysis_api_postgres.py -q
@@ -408,7 +408,12 @@ PUT    /api/v1/job-analysis/documents/{document_id}/task-order
 
   若唯一既有 vNext hash failure 仍存在，須比對 baseline 的 test name 與 failure fingerprint；不得把新 failure 稱為既有問題。
 
-- [ ] **Step 3: 跑 Web gates**（working directory: `apps/web`）
+  實際結果（2026-07-30）：real PostgreSQL vertical `1 passed`；完整 API
+  `1673 passed, 1 failed`。唯一失敗仍為
+  `test_committed_operation_document_and_prompt_match_current_contracts`，實際／預期 hash
+  `6789dba9...`／`2f8214d0...`，與動工前 Windows CRLF 基線相同。
+
+- [x] **Step 3: 跑 Web gates**（working directory: `apps/web`）
 
   ```powershell
   npm run test
@@ -416,15 +421,22 @@ PUT    /api/v1/job-analysis/documents/{document_id}/task-order
   npm run lint
   ```
 
+  實際結果（2026-07-30）：Vitest `84 passed`；`tsc --noEmit` 與 ESLint 通過。
+
 - [ ] **Step 4: 本機 browser smoke（不新增 E2E framework）**
 
   使用既有 `npm run up`：建立兩份 JD、任一時間只開一份、重新整理後資料仍在、空 optional 欄位可保存、改名不影響 Tasks、CRUD／排序可 reload、dirty draft 離站會警告、鍵盤儲存／取消有效。只記實際結果，不把手動 smoke 宣稱成自動測試。
 
-- [ ] **Step 5: 更新端到端文檔**
+  2026-07-30 執行環境沒有可連接的瀏覽器，因此沒有把元件測試或 HTTP probe 冒充實際點擊。
+  已用真實本機服務確認 `/workspace` 200、localhost CORS preflight、文件建立／改名、Task 新增與
+  PostgreSQL reload；UI 行為由 84 個 Vitest 測試覆蓋。實際瀏覽器點擊仍待可用瀏覽器環境確認，
+  不為此新增 Playwright 或另一套 E2E framework。
+
+- [x] **Step 5: 更新端到端文檔**
 
   把 `task-analysis-engine.md` 的「無 route／Web」改成實際函式／route／資料流，列出仍未交付的 AI conversation／Proposal UI、ETag、export、OPKS；同步文件索引與 Web run 說明。
 
-- [ ] **Step 6: Final diff checks and commit**
+- [x] **Step 6: Final diff checks and commit**
 
   ```powershell
   git diff --check
@@ -439,5 +451,5 @@ PUT    /api/v1/job-analysis/documents/{document_id}/task-order
 - 員工可新增只有 statement 的 Task，也可稍後補寫或清空 optional 欄位。
 - 員工新增、編輯、刪除、排序均走同一組 application 規則、完整狀態驗證與 PostgreSQL 原子寫入。
 - AI 沒有 direct-edit route；AI conversation／Proposal review 尚未接 Web，文件誠實標示。
-- Contract codegen、API focused/full tests、Web Vitest/tsc/lint、real PostgreSQL vertical 與 browser smoke 均有實際結果。
+- Contract codegen、API focused/full tests、Web Vitest/tsc/lint、real PostgreSQL vertical 與真實 HTTP/CORS 均有實際結果；實際 browser 點擊尚待可用瀏覽器環境確認。
 - 無舊資料整合、無 autosave、無 ETag、無通用 framework、無額外欄位預建。

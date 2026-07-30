@@ -18,8 +18,8 @@ Greenfield Task 編輯採「編輯 → 明確儲存／取消」；沒有 debounc
 
 ```bash
 npm run dev            # :3000(或 monorepo 根 npx turbo dev)
-npm run test           # vitest,只測 src/lib 純函式(ocsDoc/pack/urn)
-npx tsc --noEmit       # 型別檢查(UI 無單元測試,以 tsc + lint 為 gate)
+npm run test           # vitest；含 greenfield workspace/API client/Task editor 元件行為
+npx tsc --noEmit       # 型別檢查
 npm run lint
 ```
 

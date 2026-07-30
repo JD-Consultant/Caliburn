@@ -184,6 +184,8 @@ JD 只在員工決定提案時才改。
   `tests/test_job_analysis_dependencies.py` 以 AST 強制。
 - **smoke 綠燈不代表模型品質通過。** `tests/test_job_analysis_smoke.py` 用 scripted provider；
   `tests/test_job_analysis_durable_smoke.py` 用 fake verified result 與真 PostgreSQL，只證明交易／reload vertical。
+  `tests/test_job_analysis_api_postgres.py` 再以真 PostgreSQL 和實際 FastAPI route 驗證本機 Web 的文件／Task
+  mutation、排序、reload 與 metadata rename 邊界；它仍不代表瀏覽器 UX 或模型品質通過。
   依 ADR 0042 決定 3,R1 exit gate 判準未被否決、只是暫停阻擋效力;**任何文件都不得把它寫成
   Task Discovery 已通過**。
 
@@ -197,6 +199,7 @@ JD 只在員工決定提案時才改。
 | duplicate／overlap identity 自動收斂 | 第一版刻意不做；模型保留 issue 並追問員工 | 有真實重複摩擦證據後再研究，不用相似度猜測 |
 | O/P/K/S/A、完整 header、匯出 | 目前只做 Task 與較豐富的內部 JD Task 欄位 | 各自研究／契約完成後逐項加；匯出才對齊公版 |
 | revision-request replacement | revision request 可保存／reload，但不會自動重建 replacement | 後續模型流程 |
+| 實際瀏覽器點擊 smoke | 元件測試與本機 HTTP／CORS／PostgreSQL vertical 已通過；2026-07-30 執行環境無可連接瀏覽器 | 可用瀏覽器環境下人工確認，不另建 E2E framework |
 
 ## 9. 指路
 
@@ -210,7 +213,7 @@ JD 只在員工決定提案時才改。
   [`ADR 0044`](../adr/0044-partial-jd-task-reconciliation-and-human-confirmation.md)、
   [`implementation plan`](../plans/2026-07-30-job-analysis-partial-task-reconciliation-plan.md)
 - Local Web first slice:
-  [`ADR 0045`](../adr/0045-job-analysis-local-web-contract-and-current-jd-editing.md)、
+  [`ADR 0045`](../adr/0045-job-analysis-local-web-contract-and-shared-authority-commit.md)、
   [`implementation plan`](../plans/2026-07-30-job-analysis-local-web-first-slice-plan.md)
 - 舊路徑(**已退場,勿救回**):[`interview-engine.md`](interview-engine.md)、
   [ADR 0030](../adr/0030-ai-coedit-tracked-changes-one-brain.md)

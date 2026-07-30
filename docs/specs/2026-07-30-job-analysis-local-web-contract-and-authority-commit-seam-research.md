@@ -111,7 +111,11 @@ FastAPI 官方目前仍以 `APIRouter` 組織大型應用；response model 會�
 
 - 新增單一 `job_analysis` router，掛入現有唯一 composition root；
 - `PUT /documents/{document_id}` 建立或取代 metadata，因此同時負責改名；不另養 PATCH。PUT metadata
-  不得改動 Tasks、Work Model、Proposals 或 Journal；
+  不得改動 Tasks、Work Model、Proposals 或 Journal；title 不在模型 authority read-set，故改名不 bump
+  `authority_generation`、不寫 Journal，也不經 `commit_authority_change`；
+- `DocumentRepository` 新增只更新 `title`／`updated_at` 的窄 `update_title` port 與 PostgreSQL adapter。
+  現有 create-or-replay 流程遇到同 document ID、不同 title 時改為 update title，不再回
+  `IdempotencyConflict`；
 - Task form 每次送完整可編輯欄位，使用 `PUT`，不把完整取代偽裝成 partial patch；
 - route 只做 transport mapping 與 application error → HTTP，domain／transaction 規則不寫進 route；
 - repo 固定 FastAPI 0.115.0；官方 release notes 於 2026-07-29 已到 0.141.1。本切片不把 framework
@@ -250,7 +254,8 @@ PUT    /api/v1/job-analysis/documents/{document_id}/task-order
 ```
 
 - `PUT document` 由 Web 先生成 UUID；不存在時建立（201），已存在時完整取代可寫 metadata `title`（200），
-  因此也是 rename。它不得改動 Task 等 subresource，也不需要 `Idempotency-Key`。
+  因此也是 rename。它透過 `DocumentRepository.update_title` 寫入，不得改動 Task 等 subresource、
+  `authority_generation` 或 Journal，也不需要 `Idempotency-Key`。
 - Task mutation 使用 Web 每次操作生成、同一次重送保持不變的 `Idempotency-Key` header，映射既有
   `entry_id` idempotency；這是 de-facto 慣例，不是已發布標準，也不新增全站 middleware。
 - `GET document` 第一版只回文件資訊與 Current JD Tasks；不外洩 Work Model、generation、lineage、Journal 或
@@ -293,7 +298,7 @@ PUT    /api/v1/job-analysis/documents/{document_id}/task-order
    repository 零寫入，CAS 失敗 rollback。
 2. Contract codegen guard：JSON Schema、Pydantic、TypeScript 任一漂移即 fail；Problem type 生成 literal union。
 3. API route tests：create/rename/list/open/add/edit/delete/reorder、六種 Problem type、空字串正規化與
-   no-user/no-tenant contract；legacy 422／409 body 形狀保持不變。
+   no-user/no-tenant contract；rename 不改 generation／Journal，legacy 422／409 body 形狀保持不變。
 4. 一條 real PostgreSQL HTTP vertical：建立文件 → 新增只有 statement 的 Task → 補欄位 → 排序 → reload。
 5. Web pure tests：DTO↔form mapping、空 optional fields、query keys、Problem type exhaustive mapping、
    mutation error 與離站時保留 draft。

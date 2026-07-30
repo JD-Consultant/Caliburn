@@ -1,6 +1,6 @@
 # 0045. `job_analysis` 本機 Web 契約與共用 authority commit seam
 
-- 狀態：Proposed
+- 狀態：Accepted
 - 日期：2026-07-30
 - 補充：[0043](0043-job-analysis-local-current-state-persistence-and-authoring-authority.md)、
   [0044](0044-partial-jd-task-reconciliation-and-human-confirmation.md)
@@ -30,7 +30,13 @@ authority change，因此 seam 不得用 `Current JD` 命名誤導責任。
   不含 user、profile、tenant 或 auth。
 - `PUT /job-analysis/documents/{document_id}` 以 Web 產生的 UUID 建立文件或完整取代該文件的可寫 metadata
   （第一版只有 `title`），因此同一端點也負責改名；Tasks 是獨立 subresource，PUT metadata 不得改動 Tasks、
-  Work Model、Proposals 或 Journal。建立回 201，取代回 200；不另開 PATCH，也不要求 `Idempotency-Key`。
+  Work Model、Proposals 或 Journal。Title 不屬於模型 authority read-set；改名不 bump `authority_generation`、
+  不寫 Journal，也不經 `commit_authority_change`。建立回 201，取代回 200；不另開 PATCH，也不要求
+  `Idempotency-Key`。
+- Application layer 為 metadata write 在 `DocumentRepository` 增加只更新 `title`／`updated_at` 的
+  `update_title` port 與 PostgreSQL adapter；
+  現有 document create-or-replay 流程遇到同 ID、不同 title 時改為取代 title，不再回
+  `IdempotencyConflict`。這條 port 不得順帶承接 Task 或其他 authority 寫入。
 - Task mutation 使用 `Idempotency-Key` 對應既有 `entry_id`；它是業界慣例，不宣稱為已發布標準。不得新增
   全站 middleware、fallback 或隱藏 retry。
 - 新 route 的錯誤採 RFC 9457 `application/problem+json`。`type` 是 JSON Schema enum 與 Web 唯一判斷依據：

@@ -54,7 +54,7 @@ ADR 是「為什麼」層;搭配 `../specs/`(細節設計)與 `../runbook.md`(�
 | [0042](0042-r1-screening-stop-and-a6-first-version-default.md) | 停止 R1 架構實驗（owner 時程裁決，**非實驗結論、非永久禁令**）＋A6（強模型／light schema／one-stage／full harness）作第一版實作預設；exit gate 暫停阻擋效力但判準未被否決；heavy schema／便宜模型／two-stage 截至第一版未量測；實驗欄位不得當 production contract，須另定 TaskAnalysis v1 契約；verifier／支持度四級／公版措辭等防線一律保留；兩個「三層」拆為 Runtime Context Stack 與 Product Authority Model | **Accepted**（2026-07-28；部分修正 0040 決定 9、0041 決定 11） |
 | [0043](0043-job-analysis-local-current-state-persistence-and-authoring-authority.md) | `job_analysis` 本機 Current State persistence：greenfield、不搬／不整合／不雙寫舊資料；Current JD員工權威＋Work Model分析權威；四表hybrid relational/JSONB/Journal；分層編輯器；LLM transaction外、generation/read-set stale保護 | **Accepted**（2026-07-29；完整取代0039） |
 | [0044](0044-partial-jd-task-reconciliation-and-human-confirmation.md) | 不完整 JD Task 可立即保存；以明確 reconciliation identity 讓 AI 後續追問、同 ID 建立分析或提出移除；duplicate／overlap 不自動合併，AI 不靜默改員工文件 | **Accepted**（2026-07-30；補充0043） |
-| [0045](0045-job-analysis-local-web-contract-and-shared-authority-commit.md) | `job_analysis` Local Web 新入口＋JSON Schema→Pydantic/TypeScript workspace contract＋人／AI 共用 authority 原子寫入 seam；第一切片只做單文件 Task 編輯 | **Proposed**（2026-07-30；待 owner 書面設計核准） |
+| [0045](0045-job-analysis-local-web-contract-and-shared-authority-commit.md) | `job_analysis` Local Web 新入口＋JSON Schema→Pydantic/TypeScript workspace contract＋人／AI 共用 authority 原子寫入 seam；metadata rename 不碰 authority generation／Journal；第一切片只做單文件 Task 編輯 | **Accepted**（2026-07-30；owner 核准＋closure review） |
 
 完整脈絡見 [`../specs/2026-06-27-system-architecture-design.md`](../specs/2026-06-27-system-architecture-design.md)。
 契約怎麼選/怎麼交付的規範見 [`../contract-strategy.md`](../contract-strategy.md)（ADR 0004/0010 的一般化、契約 #1–#4 登記）。

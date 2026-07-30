@@ -2,7 +2,7 @@
 
 > Standing standard for **how we choose and deliver a contract** at any seam between Caliburn
 > components. Authored 2026-06-28. Generalizes the decisions in ADR 0004 (contract #1) and
-> ADR 0010 (contract #2), records contract #3, and proposes contract #4. This is the "作法規範" — read it before
+> ADR 0010 (contract #2), and records contracts #3/#4. This is the "作法規範" — read it before
 > opening a new contract.
 
 ## 1. Why
@@ -74,7 +74,7 @@ Same discipline used for Phases 1–3 and contracts #1/#2:
   web, and define the thin api⇄web REST *envelope* (request/response wrapper around the OCS
   document) as its own small schema or shared types. Do **not** hand-write TS document types in
   the web app. This remains the legacy OCS editor/export seam.
-- **#4 `job-analysis-contract` (Proposed by ADR 0045):** the greenfield Local Web workspace is not
+- **#4 `job-analysis-contract` (ADR 0045):** the greenfield Local Web workspace is not
   an OCS document and has Python／TypeScript consumers ⇒ rubric row 2 ⇒ its own small JSON Schema
   SSOT + generated Pydantic/TS package. `app.job_analysis` domain must not import the transport
   package; route mappers own the boundary. `ocs-contract` remains the public/export shape and

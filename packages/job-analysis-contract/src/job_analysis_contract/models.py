@@ -6,7 +6,7 @@ from __future__ import annotations
 from enum import Enum, StrEnum
 from uuid import UUID
 
-from pydantic import AwareDatetime, BaseModel, ConfigDict, conint
+from pydantic import AwareDatetime, BaseModel, ConfigDict, conint, constr
 
 
 class JobAnalysisWorkspaceContract(BaseModel):
@@ -112,6 +112,103 @@ class DocumentView(BaseModel):
     tasks: list[JdTaskView]
 
 
+class Speaker(StrEnum):
+    employee = 'employee'
+    consultant = 'consultant'
+
+
+class ConversationTurnView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    turn_id: str
+    speaker: Speaker
+    text: str
+
+
+class ActiveQuestionView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    turn_id: str
+    text: str
+
+
+class ProposalJdEntryView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    task_id: str
+    value: JdTaskView | None
+
+
+class Action(StrEnum):
+    add = 'add'
+    revise = 'revise'
+    withdraw = 'withdraw'
+    merge = 'merge'
+    split = 'split'
+
+
+class Status(StrEnum):
+    pending = 'pending'
+    deferred = 'deferred'
+    accepted = 'accepted'
+    edited = 'edited'
+    rejected = 'rejected'
+    revision_requested = 'revision_requested'
+    stale = 'stale'
+
+
+class ProposalView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    proposal_id: str
+    action: Action
+    status: Status
+    jd_before: list[ProposalJdEntryView]
+    jd_after: list[ProposalJdEntryView]
+    edited_jd_after: list[ProposalJdEntryView] | None
+    rejection_reason: str | None
+    stale_reason: str | None
+    evidence_quotes: list[str]
+
+
+class ConsultationView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    document: DocumentMetadataView
+    conversation: list[ConversationTurnView]
+    active_question: ActiveQuestionView | None
+    proposals: list[ProposalView]
+    tasks: list[JdTaskView]
+
+
+class EmployeeTurnWrite(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    text: constr(min_length=1)
+
+
+class Decision(StrEnum):
+    accepted = 'accepted'
+    edited = 'edited'
+    rejected = 'rejected'
+    deferred = 'deferred'
+
+
+class ProposalDecisionWrite(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    decision: Decision
+    edited_jd_after: list[ProposalJdEntryView] | None = None
+    reason: str | None = None
+
+
 class TaskOrderWrite(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -145,6 +242,12 @@ class Type(StrEnum):
     )
     https___caliburn_dev_problems_job_analysis_invalid_request = (
         'https://caliburn.dev/problems/job-analysis/invalid-request'
+    )
+    https___caliburn_dev_problems_job_analysis_proposal_not_found = (
+        'https://caliburn.dev/problems/job-analysis/proposal-not-found'
+    )
+    https___caliburn_dev_problems_job_analysis_consultant_unavailable = (
+        'https://caliburn.dev/problems/job-analysis/consultant-unavailable'
     )
 
 

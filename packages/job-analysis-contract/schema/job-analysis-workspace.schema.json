@@ -118,6 +118,148 @@
         }
       }
     },
+    "ConversationTurnView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["turn_id", "speaker", "text"],
+      "properties": {
+        "turn_id": { "type": "string" },
+        "speaker": { "type": "string", "enum": ["employee", "consultant"] },
+        "text": { "type": "string" }
+      }
+    },
+    "ActiveQuestionView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["turn_id", "text"],
+      "properties": {
+        "turn_id": { "type": "string" },
+        "text": { "type": "string" }
+      }
+    },
+    "ProposalJdEntryView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["task_id", "value"],
+      "properties": {
+        "task_id": { "type": "string" },
+        "value": {
+          "oneOf": [
+            { "$ref": "#/$defs/JdTaskView" },
+            { "type": "null" }
+          ]
+        }
+      }
+    },
+    "ProposalView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "proposal_id",
+        "action",
+        "status",
+        "jd_before",
+        "jd_after",
+        "edited_jd_after",
+        "rejection_reason",
+        "stale_reason",
+        "evidence_quotes"
+      ],
+      "properties": {
+        "proposal_id": { "type": "string" },
+        "action": {
+          "type": "string",
+          "enum": ["add", "revise", "withdraw", "merge", "split"]
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "deferred",
+            "accepted",
+            "edited",
+            "rejected",
+            "revision_requested",
+            "stale"
+          ]
+        },
+        "jd_before": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ProposalJdEntryView" }
+        },
+        "jd_after": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ProposalJdEntryView" }
+        },
+        "edited_jd_after": {
+          "type": ["array", "null"],
+          "items": { "$ref": "#/$defs/ProposalJdEntryView" }
+        },
+        "rejection_reason": { "type": ["string", "null"] },
+        "stale_reason": { "type": ["string", "null"] },
+        "evidence_quotes": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "ConsultationView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "document",
+        "conversation",
+        "active_question",
+        "proposals",
+        "tasks"
+      ],
+      "properties": {
+        "document": { "$ref": "#/$defs/DocumentMetadataView" },
+        "conversation": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ConversationTurnView" }
+        },
+        "active_question": {
+          "oneOf": [
+            { "$ref": "#/$defs/ActiveQuestionView" },
+            { "type": "null" }
+          ]
+        },
+        "proposals": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ProposalView" }
+        },
+        "tasks": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/JdTaskView" }
+        }
+      }
+    },
+    "EmployeeTurnWrite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["text"],
+      "properties": {
+        "text": { "type": "string", "minLength": 1 }
+      }
+    },
+    "ProposalDecisionWrite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["decision"],
+      "properties": {
+        "decision": {
+          "type": "string",
+          "enum": ["accepted", "edited", "rejected", "deferred"]
+        },
+        "edited_jd_after": {
+          "type": ["array", "null"],
+          "items": { "$ref": "#/$defs/ProposalJdEntryView" },
+          "default": null
+        },
+        "reason": { "type": ["string", "null"], "default": null }
+      }
+    },
     "TaskOrderWrite": {
       "type": "object",
       "additionalProperties": false,
@@ -151,7 +293,9 @@
             "https://caliburn.dev/problems/job-analysis/idempotency-conflict",
             "https://caliburn.dev/problems/job-analysis/authority-conflict",
             "https://caliburn.dev/problems/job-analysis/invalid-task-order",
-            "https://caliburn.dev/problems/job-analysis/invalid-request"
+            "https://caliburn.dev/problems/job-analysis/invalid-request",
+            "https://caliburn.dev/problems/job-analysis/proposal-not-found",
+            "https://caliburn.dev/problems/job-analysis/consultant-unavailable"
           ]
         },
         "title": { "type": "string" },

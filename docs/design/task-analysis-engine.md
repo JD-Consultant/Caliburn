@@ -49,7 +49,7 @@ OpenRouter 拿 `TaskAnalysisResult.v1` → **verifier**(純函式、零 LLM)擋�
 | authoring use cases | 文件庫與 JD Task add/edit/delete/reorder | `application/authoring.py` | document row lock → entry replay check → Current State/Journal/generation 同交易；不呼叫 LLM |
 | durable turn | authority snapshot → 交易外模型呼叫 → verified commit | `application/durable_turn.py` | commit 時重鎖並比對 generation/read-set；Work Model、Proposal、下一題與 completed-turn Journal 同交易 |
 | Proposal use cases | 候選送審 + accept/edit/reject/defer/revision request | `application/proposal_decisions.py` | `propose_task_for_jd()` 不自動接受；決策由 document lock 序列化；接受類才改 JD；決策寫 Journal |
-| document API | 本機文件列表、建立／改名、開啟 Current JD | `app/api/routes/job_analysis.py` | 只做 generated wire DTO mapping；不暴露 Work Model、Proposal、Journal 或 generation |
+| Local Web API | 本機文件列表、建立／改名、開啟與 Current JD Task 編輯 | `app/api/routes/job_analysis.py` | 只做 generated wire DTO mapping；不暴露 Work Model、Proposal、Journal 或 generation；mutation 直接呼叫既有 authoring use cases |
 
 ## 3. 一輪的資料流(每步標函式)
 
@@ -76,6 +76,9 @@ snapshot revalidation 語意。
 `GET /api/v1/job-analysis/documents/{document_id}`。標題只是 metadata：同 ID 的 PUT 可建立或改名，
 但不走 authority seam、不寫 Journal、也不 bump `authority_generation`。新路徑的錯誤使用
 RFC 9457 `application/problem+json`；path-scoped handler 會把舊 routes 的既有錯誤 body 原樣保留。
+Current JD Task 的 POST／PUT／DELETE 與排序 PUT 都要求 `Idempotency-Key`，原樣映射成
+Journal `entry_id`；沒有 middleware、隱藏 retry 或第二套寫入邏輯。員工清空 optional text 時，
+wire mapper 先 trim 並轉成 `null`；必填 statement 變空則回 `invalid-request`，不讓半成品進 domain。
 既有 Task 在下一次 AI 互動時看到 JD/Work Model 差異；JD-only Task 先落一筆
 `insufficient_evidence` open issue，明確保存該 JD `task_id`，不補造空殼 Work Model Task。
 下一輪 packet 只把它投影成可追問的 partial Task：
@@ -183,7 +186,7 @@ JD 只在員工決定提案時才改。
 
 | 沒有的東西 | 現況 | 什麼時候做 |
 |---|---|---|
-| Task mutation route／Web UI | 文件讀取 API 已有；Task 寫入與畫面尚未接上 | 下一個最小 local Web 切片 |
+| Web UI | 文件與 Task API 已有；畫面尚未接上 | 下一個最小 local Web 切片 |
 | endpoint variant preflight | `provider_order` 只鎖 base slug,同 provider 可能有多個 endpoint variant | 真正付費呼叫前的 catalog／live preflight |
 | prompt 品質調校 | `llm/prompt.py` 只寫到「不與 §4 判準相反」的結構最小集 | rubric／eval 的獨立工作 |
 | duplicate／overlap identity 自動收斂 | 第一版刻意不做；模型保留 issue 並追問員工 | 有真實重複摩擦證據後再研究，不用相似度猜測 |

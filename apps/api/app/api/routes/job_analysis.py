@@ -1,36 +1,54 @@
 """Local Web document library and Current JD transport routes."""
 
+from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Response
+from fastapi import APIRouter, Depends, Header, Response
 from job_analysis_contract import (
     DocumentMetadataView,
     DocumentMetadataWrite,
     DocumentSummary,
     DocumentView,
+    JdTaskView,
+    JdTaskWrite,
     ProblemFieldError,
+    TaskOrderWrite,
 )
+from pydantic import ValidationError
 
 from app.api.deps import get_job_analysis_uow_factory
 from app.api.job_analysis_mapper import (
     to_document_metadata_view,
     to_document_summary,
     to_document_view,
+    to_jd_task_fields,
+    to_jd_task_view,
 )
 from app.api.job_analysis_problems import (
     DOCUMENT_NOT_FOUND,
     INVALID_REQUEST,
+    application_error_response,
+    domain_validation_error_response,
     problem_response,
 )
 from app.job_analysis.application import (
     JobAnalysisUnitOfWorkFactory,
+    add_jd_task,
+    delete_jd_task,
+    edit_jd_task,
     list_documents,
     load_document,
     put_document_metadata,
+    reorder_jd_tasks,
 )
+from app.job_analysis.application.errors import JobAnalysisApplicationError
 
 
 router = APIRouter(prefix="/job-analysis/documents", tags=["job-analysis"])
+IdempotencyKey = Annotated[
+    str,
+    Header(alias="Idempotency-Key", min_length=1),
+]
 
 
 @router.get("", response_model=list[DocumentSummary])
@@ -90,3 +108,93 @@ async def get_document(
             status=404,
         )
     return to_document_view(loaded)
+
+
+@router.post("/{document_id}/tasks", response_model=JdTaskView, status_code=201)
+async def add_task(
+    document_id: UUID,
+    body: JdTaskWrite,
+    idempotency_key: IdempotencyKey,
+    uow_factory: JobAnalysisUnitOfWorkFactory = Depends(
+        get_job_analysis_uow_factory
+    ),
+):
+    try:
+        task = await add_jd_task(
+            uow_factory,
+            document_id=document_id,
+            entry_id=idempotency_key,
+            fields=to_jd_task_fields(body),
+        )
+    except ValidationError as error:
+        return domain_validation_error_response(error)
+    except JobAnalysisApplicationError as error:
+        return application_error_response(error)
+    return to_jd_task_view(task)
+
+
+@router.put("/{document_id}/tasks/{task_id}", response_model=JdTaskView)
+async def edit_task(
+    document_id: UUID,
+    task_id: str,
+    body: JdTaskWrite,
+    idempotency_key: IdempotencyKey,
+    uow_factory: JobAnalysisUnitOfWorkFactory = Depends(
+        get_job_analysis_uow_factory
+    ),
+):
+    try:
+        task = await edit_jd_task(
+            uow_factory,
+            document_id=document_id,
+            entry_id=idempotency_key,
+            task_id=task_id,
+            fields=to_jd_task_fields(body),
+        )
+    except ValidationError as error:
+        return domain_validation_error_response(error)
+    except JobAnalysisApplicationError as error:
+        return application_error_response(error)
+    return to_jd_task_view(task)
+
+
+@router.delete("/{document_id}/tasks/{task_id}", status_code=204)
+async def delete_task(
+    document_id: UUID,
+    task_id: str,
+    idempotency_key: IdempotencyKey,
+    uow_factory: JobAnalysisUnitOfWorkFactory = Depends(
+        get_job_analysis_uow_factory
+    ),
+):
+    try:
+        await delete_jd_task(
+            uow_factory,
+            document_id=document_id,
+            entry_id=idempotency_key,
+            task_id=task_id,
+        )
+    except JobAnalysisApplicationError as error:
+        return application_error_response(error)
+    return Response(status_code=204)
+
+
+@router.put("/{document_id}/task-order", response_model=list[JdTaskView])
+async def reorder_tasks(
+    document_id: UUID,
+    body: TaskOrderWrite,
+    idempotency_key: IdempotencyKey,
+    uow_factory: JobAnalysisUnitOfWorkFactory = Depends(
+        get_job_analysis_uow_factory
+    ),
+):
+    try:
+        tasks = await reorder_jd_tasks(
+            uow_factory,
+            document_id=document_id,
+            entry_id=idempotency_key,
+            ordered_task_ids=tuple(body.ordered_task_ids),
+        )
+    except JobAnalysisApplicationError as error:
+        return application_error_response(error)
+    return [to_jd_task_view(task) for task in tasks]

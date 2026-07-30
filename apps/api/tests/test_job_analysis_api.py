@@ -25,6 +25,9 @@ class _Store:
     def __init__(self) -> None:
         self.document: DocumentRecord | None = None
         self.tasks: tuple[JdTask, ...] = ()
+        self.proposals = ()
+        self.journal = {}
+        self.allow_authority_update = True
 
 
 class _Documents:
@@ -65,6 +68,31 @@ class _Documents:
         self.store.document = replace(record, title=title, updated_at=updated_at)
         return True
 
+    async def update_authority(
+        self,
+        document_id: UUID,
+        *,
+        expected_generation: int,
+        work_model,
+        active_question,
+        updated_at: datetime,
+    ) -> bool:
+        record = await self.get(document_id)
+        if (
+            record is None
+            or not self.store.allow_authority_update
+            or record.authority_generation != expected_generation
+        ):
+            return False
+        self.store.document = replace(
+            record,
+            work_model=work_model,
+            active_question=active_question,
+            authority_generation=expected_generation + 1,
+            updated_at=updated_at,
+        )
+        return True
+
 
 class _Tasks:
     def __init__(self, store: _Store) -> None:
@@ -73,13 +101,31 @@ class _Tasks:
     async def list(self, document_id: UUID):
         return self.store.tasks
 
+    async def replace(self, document_id: UUID, tasks) -> None:
+        self.store.tasks = tasks
+
 
 class _Proposals:
+    def __init__(self, store: _Store) -> None:
+        self.store = store
+
     async def list(self, document_id: UUID, *, statuses=None):
-        return ()
+        return self.store.proposals
+
+    async def replace(self, document_id: UUID, proposals) -> None:
+        self.store.proposals = proposals
 
 
 class _Journal:
+    def __init__(self, store: _Store) -> None:
+        self.store = store
+
+    async def get(self, document_id: UUID, entry_id: str):
+        return self.store.journal.get(entry_id)
+
+    async def add(self, entry) -> None:
+        self.store.journal[entry.entry_id] = entry
+
     async def list_recent_turns(self, document_id: UUID, *, limit):
         return ()
 
@@ -88,8 +134,8 @@ class _UnitOfWork:
     def __init__(self, store: _Store) -> None:
         self.documents = _Documents(store)
         self.tasks = _Tasks(store)
-        self.proposals = _Proposals()
-        self.journal = _Journal()
+        self.proposals = _Proposals(store)
+        self.journal = _Journal(store)
 
     async def __aenter__(self):
         return self
@@ -203,3 +249,188 @@ async def test_legacy_validation_error_shape_is_unchanged(api_client):
     assert response.headers["content-type"].startswith("application/json")
     assert "type" not in response.json()
     assert isinstance(response.json()["detail"], list)
+
+
+def _task_payload(statement: str = " 每週彙整營運週報 "):
+    return {
+        "statement": statement,
+        "purpose_result": " 讓主管掌握營運狀況 ",
+        "context": "   ",
+        "frequency_text": " 每週一次 ",
+        "responsibility_role": "primary",
+        "enablers": [{"kind": "tool_system", "name": " Excel "}],
+    }
+
+
+async def test_task_mutations_share_the_authoring_use_cases(api_client):
+    client, _ = api_client
+    await client.put(
+        f"/api/v1/job-analysis/documents/{DOCUMENT_ID}",
+        json={"title": "門市營運專員"},
+    )
+
+    created = await client.post(
+        f"/api/v1/job-analysis/documents/{DOCUMENT_ID}/tasks",
+        headers={"Idempotency-Key": "add-1"},
+        json=_task_payload(),
+    )
+    replay = await client.post(
+        f"/api/v1/job-analysis/documents/{DOCUMENT_ID}/tasks",
+        headers={"Idempotency-Key": "add-1"},
+        json=_task_payload(),
+    )
+    task_id = created.json()["task_id"]
+    edited = await client.put(
+        f"/api/v1/job-analysis/documents/{DOCUMENT_ID}/tasks/{task_id}",
+        headers={"Idempotency-Key": "edit-1"},
+        json=_task_payload("每週彙整並檢查營運週報"),
+    )
+    reordered = await client.put(
+        f"/api/v1/job-analysis/documents/{DOCUMENT_ID}/task-order",
+        headers={"Idempotency-Key": "order-1"},
+        json={"ordered_task_ids": [task_id]},
+    )
+    deleted = await client.delete(
+        f"/api/v1/job-analysis/documents/{DOCUMENT_ID}/tasks/{task_id}",
+        headers={"Idempotency-Key": "delete-1"},
+    )
+    delete_replay = await client.delete(
+        f"/api/v1/job-analysis/documents/{DOCUMENT_ID}/tasks/{task_id}",
+        headers={"Idempotency-Key": "delete-1"},
+    )
+
+    assert created.status_code == 201
+    assert replay.json() == created.json()
+    assert created.json()["statement"] == "每週彙整營運週報"
+    assert created.json()["context"] is None
+    assert created.json()["enablers"][0]["name"] == "Excel"
+    assert edited.status_code == 200
+    assert edited.json()["statement"] == "每週彙整並檢查營運週報"
+    assert reordered.status_code == 200
+    assert [item["task_id"] for item in reordered.json()] == [task_id]
+    assert deleted.status_code == 204
+    assert delete_replay.status_code == 204
+
+
+@pytest.mark.parametrize(
+    ("method", "path", "headers", "payload", "status", "problem_type"),
+    [
+        (
+            "post",
+            f"/api/v1/job-analysis/documents/{DOCUMENT_ID}/tasks",
+            {},
+            _task_payload(),
+            422,
+            "invalid-request",
+        ),
+        (
+            "post",
+            f"/api/v1/job-analysis/documents/{DOCUMENT_ID}/tasks",
+            {"Idempotency-Key": "blank"},
+            _task_payload("   "),
+            422,
+            "invalid-request",
+        ),
+        (
+            "post",
+            "/api/v1/job-analysis/documents/00000000-0000-0000-0000-000000000099/tasks",
+            {"Idempotency-Key": "missing-doc"},
+            _task_payload(),
+            404,
+            "document-not-found",
+        ),
+        (
+            "put",
+            f"/api/v1/job-analysis/documents/{DOCUMENT_ID}/tasks/missing-task",
+            {"Idempotency-Key": "missing-task"},
+            _task_payload(),
+            404,
+            "task-not-found",
+        ),
+        (
+            "put",
+            f"/api/v1/job-analysis/documents/{DOCUMENT_ID}/task-order",
+            {"Idempotency-Key": "bad-order"},
+            {"ordered_task_ids": ["not-current"]},
+            422,
+            "invalid-task-order",
+        ),
+    ],
+)
+async def test_task_mutation_failures_use_stable_problem_types(
+    api_client,
+    method,
+    path,
+    headers,
+    payload,
+    status,
+    problem_type,
+):
+    client, _ = api_client
+    await client.put(
+        f"/api/v1/job-analysis/documents/{DOCUMENT_ID}",
+        json={"title": "門市營運專員"},
+    )
+
+    response = await client.request(method, path, headers=headers, json=payload)
+
+    assert response.status_code == status
+    assert response.headers["content-type"].startswith(
+        "application/problem+json"
+    )
+    assert response.json()["type"].endswith(f"/{problem_type}")
+
+
+async def test_idempotency_conflict_and_authority_conflict_are_distinct(api_client):
+    client, store = api_client
+    await client.put(
+        f"/api/v1/job-analysis/documents/{DOCUMENT_ID}",
+        json={"title": "門市營運專員"},
+    )
+    await client.post(
+        f"/api/v1/job-analysis/documents/{DOCUMENT_ID}/tasks",
+        headers={"Idempotency-Key": "same-key"},
+        json=_task_payload("工作一"),
+    )
+    idempotency = await client.post(
+        f"/api/v1/job-analysis/documents/{DOCUMENT_ID}/tasks",
+        headers={"Idempotency-Key": "same-key"},
+        json=_task_payload("工作二"),
+    )
+    store.allow_authority_update = False
+    authority = await client.post(
+        f"/api/v1/job-analysis/documents/{DOCUMENT_ID}/tasks",
+        headers={"Idempotency-Key": "new-key"},
+        json=_task_payload("工作三"),
+    )
+
+    assert idempotency.status_code == 409
+    assert idempotency.json()["type"].endswith("/idempotency-conflict")
+    assert authority.status_code == 409
+    assert authority.json()["type"].endswith("/authority-conflict")
+
+
+async def test_delete_with_a_new_key_after_deletion_is_not_found(api_client):
+    client, _ = api_client
+    await client.put(
+        f"/api/v1/job-analysis/documents/{DOCUMENT_ID}",
+        json={"title": "門市營運專員"},
+    )
+    created = await client.post(
+        f"/api/v1/job-analysis/documents/{DOCUMENT_ID}/tasks",
+        headers={"Idempotency-Key": "add-delete"},
+        json=_task_payload(),
+    )
+    task_id = created.json()["task_id"]
+    await client.delete(
+        f"/api/v1/job-analysis/documents/{DOCUMENT_ID}/tasks/{task_id}",
+        headers={"Idempotency-Key": "delete-old"},
+    )
+
+    response = await client.delete(
+        f"/api/v1/job-analysis/documents/{DOCUMENT_ID}/tasks/{task_id}",
+        headers={"Idempotency-Key": "delete-new"},
+    )
+
+    assert response.status_code == 404
+    assert response.json()["type"].endswith("/task-not-found")

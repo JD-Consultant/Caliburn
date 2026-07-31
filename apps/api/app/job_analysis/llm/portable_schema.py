@@ -89,6 +89,122 @@ def portable_strict_output_schema(schema: dict[str, Any]) -> dict[str, Any]:
     return projected
 
 
+def _without_titles(value: Any) -> Any:
+    if isinstance(value, list):
+        return [_without_titles(item) for item in value]
+    if not isinstance(value, dict):
+        return value
+
+    stripped: dict[str, Any] = {}
+    for key, item in value.items():
+        if key == "title":
+            continue
+        if key in {"$defs", "properties"} and isinstance(item, dict):
+            # 這一層的 key 是 property／definition 名稱,不是 schema 關鍵字:
+            # 名為 `title` 的欄位不能被當成標註吃掉。
+            stripped[key] = {
+                name: _without_titles(child) for name, child in item.items()
+            }
+            continue
+        stripped[key] = _without_titles(item)
+    return stripped
+
+
+def compact_strict_output_schema(schema: dict[str, Any]) -> dict[str, Any]:
+    """可攜投影,再拿掉自動生成的 `title`。
+
+    `title` 是 Pydantic 依欄位名生成的 Title Case 版本(`target_task_ordinals` 旁邊配一個
+    `"Target Task Ordinals"`),對模型零資訊量卻佔 schema 的 17%。`description` 保留,
+    但在 wire 契約裡那是刻意寫給模型的中性值約定,不是開發者註解的出口——
+    `tests/test_job_analysis_wire_schema.py` 守住總量與內容。
+    """
+
+    projected = _project(_without_titles(deepcopy(schema)))
+    assert_portable_strict_output_schema(projected)
+    return projected
+
+
+def expand_refs(schema: dict[str, Any]) -> dict[str, Any]:
+    """把 `$ref` 全部內聯。編譯後的 grammar 沒有共用,計數必須照展開後的形狀算。"""
+
+    defs = schema.get("$defs") or schema.get("definitions") or {}
+
+    def walk(node: Any, depth: int = 0) -> Any:
+        if depth > 200:
+            raise RecursionError("schema appears recursive; unsupported by strict mode")
+        if isinstance(node, list):
+            return [walk(item, depth + 1) for item in node]
+        if not isinstance(node, dict):
+            return node
+        ref = node.get("$ref")
+        if isinstance(ref, str):
+            merged = deepcopy(defs[ref.rsplit("/", 1)[-1]])
+            merged.update({key: item for key, item in node.items() if key != "$ref"})
+            return walk(merged, depth + 1)
+        return {
+            key: walk(item, depth + 1) for key, item in node.items() if key != "$defs"
+        }
+
+    return walk(schema)
+
+
+def schema_complexity(schema: dict[str, Any]) -> dict[str, int]:
+    """strict grammar 編譯器關心的維度,一律以 `$ref` 展開後的形狀計數。
+
+    這不是官方限制的副本,是我們自己的預算尺。官方明載個別限制全部滿足仍可能被拒
+    (另有未公開的 compiled grammar size 上限),所以送出去的 schema 要留餘裕,
+    不是壓到剛好合規。
+    """
+
+    flat = expand_refs(schema)
+    totals = {
+        "union_parameters": 0,
+        "optional_parameters": 0,
+        "properties": 0,
+        "enum_sites": 0,
+        "enum_values": 0,
+        "nesting_levels": 0,
+    }
+
+    def walk(node: Any, level: int) -> None:
+        totals["nesting_levels"] = max(totals["nesting_levels"], level)
+        if isinstance(node, list):
+            for item in node:
+                walk(item, level)
+            return
+        if not isinstance(node, dict):
+            return
+
+        branches = node.get("anyOf")
+        if isinstance(branches, list):
+            totals["union_parameters"] += 1
+            if any(
+                isinstance(branch, dict) and branch.get("type") == "null"
+                for branch in branches
+            ):
+                # strict 要求全欄位 required;optional 就是以 null union 表達的那些。
+                totals["optional_parameters"] += 1
+            for branch in branches:
+                walk(branch, level)
+
+        enum_values = node.get("enum")
+        if isinstance(enum_values, list):
+            totals["enum_sites"] += 1
+            totals["enum_values"] += len(enum_values)
+
+        properties = node.get("properties")
+        if isinstance(properties, dict):
+            totals["properties"] += len(properties)
+            for sub in properties.values():
+                walk(sub, level + 1)
+
+        if "items" in node:
+            walk(node["items"], level + 1)
+
+    walk(flat, 0)
+    return totals
+
+
 def assert_portable_strict_output_schema(schema: dict[str, Any]) -> None:
     """在 schema 送到任何 provider 之前擋下不可攜的語意。"""
 

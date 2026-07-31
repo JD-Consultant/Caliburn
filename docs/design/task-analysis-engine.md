@@ -246,6 +246,32 @@ JD 只在員工決定提案時才改。
   因此 API key 沒有進檔案的路徑。Git 只收 `docs/experiments/` 的精簡報告。
 - `--max-generation-calls 0` 只做 catalog preflight,不建文件、不花錢。working tree dirty 時 CLI 在付費前停止。
 - 它**不是**瀏覽器 E2E:不驗 UI 點擊、CORS 或前端錯誤顯示。單次 trial 也不能宣稱穩定品質或比較模型。
+
+### 8.2 開發用便宜模型,生產用貴模型——以及哪些問題不准用便宜模型回答
+
+2026-07-31 owner 決定:**本機開發與測試跑 `openai/gpt-5.6-luna-pro`(實測約 Opus 的 10%),
+正式上線再切 Opus。** 落地方式刻意不對稱:
+
+- `config.py` 的 committed 預設**維持 `anthropic/claude-opus-5`** —— 生產 correct-by-default,
+  上線不需要記得切回去;要記得的是把本機 `.env` 的覆寫拿掉。
+- 便宜模型只以本機 `.env`(gitignored)的 `JOB_ANALYSIS_MODEL`／`JOB_ANALYSIS_PROVIDER` 覆寫。
+  smoke CLI 與 dev server 讀同一份 settings,所以兩邊自動一致。
+
+**分界線比切換方式重要。** Luna-Pro 在同一個凍結場景下會從「我會**協助**正式環境部署」
+生出一條 Task(run 6 與 run 8 兩次都是),而 Opus 5(2/2)與 Sonnet 5 都判成
+`責任邊界不明` open issue 並追問。把判準搬到 `disposition` 的 description 之後仍然如此
+——**能力問題,不是指令問題**(`docs/experiments/…-attributed-live-smoke/README.md` §0f／§0g)。
+
+| Luna-Pro 答得準(契約層,與模型無關) | Luna-Pro 答不準(判斷層,與模型高度相關) |
+|---|---|
+| schema 能不能編譯、跨 provider 可攜 | Task 邊界判斷 |
+| 機械耦合規則(relation↔change、ordinal、anchor) | 證據紀律(`open_issue` vs `task_change`) |
+| verifier／transition／persistence 整條鏈 | statement／`purpose_result` 品質 |
+| 新欄位有沒有被填、pipeline regression | 追問品質、跨回合取捨 |
+
+因此:**契約類改動在 Luna-Pro 上驗過即可;會影響判斷的改動(prompt 判準、schema description、
+context 取捨)在 Luna-Pro 上驗過只算「未在生產模型上驗過」,上線前要補一次 Opus／Sonnet run。**
+現有的一筆未清:commit `4b75190` 給 `disposition` 補的判準只在 Luna-Pro 上觀測過。
 | prompt 品質調校 | `llm/prompt.py` 已有 Task 判準與彈性顧問行為基線，但尚未用真實員工資料調校 | 有真實使用摩擦後以 rubric／eval 調整，不先加 planner 或第二次呼叫 |
 | duplicate／overlap identity 自動收斂 | 第一版刻意不做；模型保留 issue 並追問員工 | 有真實重複摩擦證據後再研究，不用相似度猜測 |
 | O/P/K/S/A、完整 header、匯出 | 目前只做 Task 與較豐富的內部 JD Task 欄位 | 各自研究／契約完成後逐項加；匯出才對齊公版 |

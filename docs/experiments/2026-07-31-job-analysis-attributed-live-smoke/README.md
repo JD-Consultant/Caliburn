@@ -1,9 +1,10 @@
 # Job Analysis attributed live smoke：執行結果
 
 日期：2026-07-31
-狀態：**四次 run 累計 US$0.251，找出三個契約層缺陷（grammar 過大／ordinal 基準不一致／
-6 條規則模型無從得知），全部已修。turn 1 穩定通過；turn 2 停在 open issue 關閉路徑，
-三回合場景仍未跑完。**
+狀態：**四次 run 累計 US$0.251，找出四個契約層缺陷（grammar 過大／ordinal 基準不一致／
+6 條規則模型無從得知／一般 open issue 無關閉路徑），全部已修。turn 1 穩定通過；
+turn 2 已用 run 4 的真模型輸出離線重放通過（US$0），並在重放中再找出第五個缺陷。
+turn 3 從未送出過。**
 計畫：[2026-07-31 attributed live smoke plan](../../plans/2026-07-31-job-analysis-attributed-live-smoke-plan.md)
 研究：[OpenRouter 歸因與最小 live smoke](../../specs/2026-07-31-job-analysis-openrouter-attribution-and-live-smoke-research.md)
 
@@ -126,6 +127,51 @@ turn 1 的 1-based 修正有效，穩定通過。turn 2（員工更正「正式�
 `remove(issue)`；`next_question` 指向它只更新 `last_asked_turn_id`。多輪訪談下 open issue
 單調累積，而 Static Instructions 要求優先處理「仍可取得答案的 open issue」——有重問迴圈的風險。
 本次觀測到的情境正是如此：員工已經回答了那個 issue，它仍會留在 Current State。
+
+---
+
+## 0d. 離線重放（2026-07-31，US$0，0 generation call）
+
+ADR 0047 修好之後，**不再付費去問同一個問題**：run 4 的 turn-2 原始輸出還在
+`output/…/20260731T123344Z/turn-02.json`，文件 `4f783a47-fc8d-4bc0-bba4-c2c3a529ef02`
+也還在本機 dev DB（turn 1 已 commit、turn 2 rollback）。用 `prepare_turn()` 讀回真 packet，
+再把那份輸出送過**現在的** mapper／verifier／transition。純函式，沒有寫入。
+
+| 檢查點 | 結果 |
+|---|---|
+| verifier | `is_valid = True`（原本 `RESOLUTION_OPEN_ISSUE_NOT_RECONCILABLE`） |
+| transition | `applied` |
+| turn 1 的 `責任邊界不明` issue | 已關閉，從 `open_issues` 消失 |
+| 該訊號自身的 exclude | 仍落地（`excluded_signals = 1 / 他人工作`）——ADR 0047「關閉後不 return」在真資料上驗證 |
+| open issue 總數 | 1 → 1（新的 `證據不足` 頂上，未單調累積） |
+| `next_question` | `target_ordinal 2` → `index 1`，落在 0..1 內 |
+| anchors | 全為 `turn_ordinal 4`，等於 `current_turn_ordinal`，新護欄不誤擋 |
+
+**重放不是新抽樣。** 它只證明契約接得住那一份既有輸出；模型下次會產生什麼、
+merge／split／Proposal 決策長什麼樣，都不在本節的證據範圍內。
+
+### 重放找出的第五個缺陷：新 open issue 永遠是「尚未問過」
+
+把 turn-2 結果往前推一步、算出 turn 3 的 packet 之後，open issue 那段渲染成：
+
+```text
+[1] 證據不足: 員工提到上線前的測試與檢查由本人執行，但未說明…
+    依據: [4] 「我只做上線前的測試與檢查」 回應提問 [3]
+    最近提問: (尚未問過)
+```
+
+但 `active_question`（同一份 packet 的上一節）問的就是它。
+
+`record_next_question()` 只認 `existing_open_issue`；當顧問**同一輪提出 issue 又追問它**
+（`next_question.target = new_signal`），新建的 issue 拿不到 `last_asked_turn_id`。
+`context.py` 的註解正好寫著這條路不能斷：「缺了 last_asked，它會把剛問過的缺口當成沒問過再問一次」。
+
+真模型到目前為止產生的**每一則** open issue 都命中這個缺口——turn 1 的
+`live-smoke-turn-01-i2` 在 `state_before` 裡也是 `last_asked_turn_id: null`，而 [3] 問的就是它。
+命中率 100%，且正是 ADR 0047 想避免的重問迴圈。
+
+已修：`new_signal` target 也記，issue id 用 `{operation_id}-i{index}` 對上；該訊號沒產生
+issue（例如追問剛新增的 Task）就沒得記，不是錯誤。修好後同一份重放渲染出 `最近提問: [5]`。
 
 ---
 

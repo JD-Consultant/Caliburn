@@ -396,6 +396,50 @@ def test_asking_the_partial_issue_records_the_consultant_turn_id():
     )
 
 
+def test_asking_about_an_issue_raised_this_turn_records_the_consultant_turn_id():
+    """同一輪提出 issue 又問它,是最自然的顧問行為——真模型每一則 open issue 都這樣產生。
+
+    只認 `existing_open_issue` 的話,新 issue 永遠是 `last_asked_turn_id = None`,
+    下一輪 packet 顯示「(尚未問過)」,模型就會把剛問過的缺口當成沒問過再問一次。
+    """
+    raised = signal(
+        disposition=SignalDisposition.OPEN_ISSUE,
+        task_change=None,
+        open_issue=OpenIssuePayload(
+            kind=OpenIssueKind.INSUFFICIENT_EVIDENCE,
+            summary="還不清楚這項工作要產出什麼",
+        ),
+    )
+    question = NextQuestion(
+        text="這項工作完成後會產出什麼?",
+        target=NextQuestionTarget(kind=NextQuestionTargetKind.NEW_SIGNAL, index=0),
+    )
+
+    outcome = apply(raised, next_question=question)
+
+    assert outcome.is_applied
+    issue = outcome.state.work_model.open_issues[-1]
+    assert issue.summary == "還不清楚這項工作要產出什麼"
+    assert issue.last_asked_turn_id == "op-1-consultant"
+
+
+def test_asking_about_a_new_signal_that_raised_no_issue_marks_nothing():
+    """追問剛新增的 Task 不該碰任何 open issue,也不該讓整輪被拒。"""
+    outcome = apply(
+        signal(),
+        current=partial_state(),
+        next_question=NextQuestion(
+            text="這份週報交給誰?",
+            target=NextQuestionTarget(
+                kind=NextQuestionTargetKind.NEW_SIGNAL, index=0
+            ),
+        ),
+    )
+
+    assert outcome.is_applied
+    assert outcome.state.work_model.open_issues[0].last_asked_turn_id is None
+
+
 def test_support_only_appends_evidence_without_touching_semantic_fields():
     outcome = apply(
         signal(

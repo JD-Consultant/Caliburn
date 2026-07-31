@@ -264,6 +264,21 @@ def test_wire_schema_is_portable_and_strict_shaped():
         assert obj["required"] == list(obj["properties"])
 
 
+def test_the_disposition_choice_carries_its_criterion_at_the_decision_point():
+    """`disposition` 是整份契約最要緊的一次判斷,規則必須住在這個欄位上。
+
+    2026-07-31 的 A/B:`openai/gpt-5.6-luna-pro` 從「我會**協助**正式環境部署」直接建了
+    一條 Task,下一回合又得 revise ＋ exclude 收拾——而 prompt 三處明文禁止
+    (成立條件 #4「是本人目前的責任」、「不要先建一個 Task」、「不先建 Task 再撤回」)。
+    規則在,但住在 system prompt 往上數十行的散文裡,**不在模型正在填的那個參數上**。
+    這條測試守住那個落點;下一次精簡 context 時不要把它當成重複而刪掉。
+    """
+    field = WireSignal.model_fields["disposition"]
+    assert field.description is not None
+    assert "本人目前的責任" in field.description
+    assert "open_issue" in field.description
+
+
 def test_wire_schema_inlines_every_ref():
     """送出去的 schema 不得有 `$ref`。
 

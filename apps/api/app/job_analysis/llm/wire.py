@@ -196,7 +196,12 @@ class WireSignal(DomainModel):
             "或 exclude 關閉。不確定性仍在就別關,改輸出新的 open_issue"
         ),
     )
-    disposition: SignalDisposition
+    disposition: SignalDisposition = Field(
+        description=(
+            "選 task_change 等於宣告四項成立條件都滿足,尤其「是本人目前的責任」;"
+            "責任歸屬或 outcome 判不出來就選 open_issue 追問,不先建 Task 再撤回"
+        )
+    )
     change: WireTaskChange = Field(
         default=WireTaskChange.NONE, description='"none" 表示這個訊號不是 Task 變更'
     )

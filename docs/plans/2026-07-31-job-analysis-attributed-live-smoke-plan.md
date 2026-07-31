@@ -377,8 +377,12 @@ async def run_live_smoke(
 | 2026-07-31 | Task 1 | `da7695e feat(job-analysis): capture OpenRouter route evidence` — gate 綠(81＋3 passed) |
 | 2026-07-31 | Task 2 | `685763a test(job-analysis): add attributed live smoke` — focused gate 111 passed、全 `test_job_analysis_*` 386 passed(真 PostgreSQL,`TEST_DATABASE_URL` 指向 `caliburn`,migration `0013 (head)`) |
 | 2026-07-31 | Task 2 修正 | `760b2f1 fix(job-analysis): point catalog preflight at the endpoints API` — 原 `/api/v1/models/{author}/{slug}` 回 404;endpoint 陣列只在 `/endpoints` 路徑,已改並更新測試 |
-| 2026-07-31 | Task 3 Step 1 | **停線,未進入 Step 2**。dry preflight(`--max-generation-calls 0`)輸出 `catalog preflight failed: endpoint status -2 is not the active value 0`。**0 次 generation call、US$0 支出**,未建立文件與 output directory |
+| 2026-07-31 | Task 3 Step 1(第一次) | **停線,未進入 Step 2**。dry preflight(`--max-generation-calls 0`)輸出 `catalog preflight failed: endpoint status -2 is not the active value 0`。**0 次 generation call、US$0 支出**,未建立文件與 output directory |
+| 2026-07-31 | Task 3 Step 1(第二次) | `anthropic` endpoint 回到 `status = 0`,價格與能力不變,preflight 通過 |
+| 2026-07-31 | Task 3 Step 2 | run `20260731T083501Z`,commit `9966255`(clean)。**turn 1 停線:1 次 generation call、US$0 實際支出、0 retry**。Anthropic 回 HTTP 400 `invalid_request_error`:"The compiled grammar is too large"(request_id `req_011CdZq1Xf7ubQGu1zGfADnz`)。最終 state 0 Task／1 turn,無半套資料落地 |
+| 2026-07-31 | Task 3 Step 3 | 八項判準只有 **route** 一項有結果且通過(direct、attempt 1、Anthropic endpoint、無 pipeline);其餘七項**無輸出可判**。`quality_eligible = false` 為正確 fail-closed |
+| 2026-07-31 | Task 3 Step 4 | 依順序歸入 **1 `provider_or_attribution`**;可行動根因在 **strict output schema(6,818 bytes)**,非 prompt／Context(packet 僅 551 字元)。未修、未調 prompt、未重跑 |
+| 2026-07-31 | Task 3 Step 5–8 | 報告見 [experiment](../experiments/2026-07-31-job-analysis-attributed-live-smoke/README.md);`docs/README.md` 與 `docs/design/task-analysis-engine.md` 已更新;`uv run pytest -q` 綠(既有 CRLF 失敗除外) |
 
-Step 2–8 未執行:沒有 transcript 可讀,因此沒有 route、tools、work boundaries、correction、cross-turn
-memory、grounding、consultant question、durability 的任何裁決,也沒有失敗分類。環境診斷與 owner 選項見
-[experiment](../experiments/2026-07-31-job-analysis-attributed-live-smoke/README.md)。
+**下一步不在本計畫範圍**:修 schema／strict 契約會動到 ADR 0040 決定 26,須另開研究與 ADR,
+不得當成 bug fix 直接改。修好後本 CLI、場景與預算原樣可重用。

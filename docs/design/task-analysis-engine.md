@@ -281,7 +281,7 @@ context 取捨)在 Luna-Pro 上驗過只算「未在生產模型上驗過」,上
 | duplicate／overlap identity 自動收斂 | 第一版刻意不做；模型保留 issue 並追問員工 | 有真實重複摩擦證據後再研究，不用相似度猜測 |
 | O/P/K/S/A、完整 header、匯出 | 目前只做 Task 與較豐富的內部 JD Task 欄位 | 各自研究／契約完成後逐項加；匯出才對齊公版 |
 | revision-request replacement | revision request 可保存／reload，但不會自動重建 replacement | 後續模型流程 |
-| 一般瀏覽器完整跨埠 smoke | Next UI shell 已實際載入；本次 Codex in-app browser 的 client policy 封鎖 `localhost:8001`，故無法在該瀏覽器完成 API round-trip。Web 90 tests／tsc／lint／build 與真 PostgreSQL API vertical 已通過 | 用一般本機瀏覽器確認即可；不為測試環境加入 proxy、fake production mode 或 E2E framework |
+| 一般瀏覽器完整跨埠 smoke | **HTTP 層已逐段驗過**（2026-07-31，api:8001 ＋ web:3000 同時在跑）：文件庫 `GET` 正確回報 `task_count`、consultation view 帶齊 conversation／proposals／tasks、**三筆 `add` 提案連續 `POST …/decisions` 全 200**（正是 `display_order` 缺陷會炸的路徑）、同 `Idempotency-Key` 重送 200 且不重複、reload 後 JD 排序正確；CORS preflight 200 且 `access-control-allow-headers` 含 `idempotency-key`。`/workspace` 與 `/workspace/{id}` 皆 HTTP 200。Web 90 tests／tsc／lint 通過 | **只剩真人在一般瀏覽器點一遍**（畫面渲染、按鈕狀態、錯誤顯示）——agent 沒有瀏覽器控制權。不為測試環境加入 proxy、fake production mode 或 E2E framework |
 
 ## 9. 指路
 

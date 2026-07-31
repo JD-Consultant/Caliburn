@@ -216,7 +216,9 @@ JD 只在員工決定提案時才改。
 
 | 沒有的東西 | 現況 | 什麼時候做 |
 |---|---|---|
-| endpoint variant preflight | `provider_order` 只鎖 base slug,同 provider 可能有多個 endpoint variant | 真正付費呼叫前的 catalog／live preflight |
+| endpoint variant preflight | `provider_order` 只鎖 base slug,同 provider 可能有多個 endpoint variant。`providers/openrouter_evidence.py` 的 `select_catalog_endpoint()` 已能從 model detail 選出唯一 active endpoint,但**沒有任何 runtime 路徑呼叫它** | 由待建的 live smoke wrapper 在付費前呼叫;不進 request 路徑 |
+| route 歸因 | `inspect_openrouter_execution()` 可解析 router metadata、pipeline 與 `usage.cost`,並判定該次能否用於品質歸因。**一般產品回合不要求也不送 metadata**;`OpenRouterAdapter` 的 headers 未改,結果不寫 PostgreSQL／Journal | metadata／no-cache opt-in 只留給待建的 smoke wrapper |
+| 真模型跑通的證據 | 上述兩個 parser 都只在離線 fixture 下驗過。**尚未對 Opus 5／Anthropic route 送過任何真實請求**,因此沒有 endpoint catalog 實測值,也沒有任何 prompt 品質結論 | 由 attributed live smoke 產生後,才把結論寫進 `docs/experiments/` 與本表 |
 | prompt 品質調校 | `llm/prompt.py` 已有 Task 判準與彈性顧問行為基線，但尚未用真實員工資料調校 | 有真實使用摩擦後以 rubric／eval 調整，不先加 planner 或第二次呼叫 |
 | duplicate／overlap identity 自動收斂 | 第一版刻意不做；模型保留 issue 並追問員工 | 有真實重複摩擦證據後再研究，不用相似度猜測 |
 | O/P/K/S/A、完整 header、匯出 | 目前只做 Task 與較豐富的內部 JD Task 欄位 | 各自研究／契約完成後逐項加；匯出才對齊公版 |

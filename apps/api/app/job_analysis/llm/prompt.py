@@ -7,6 +7,19 @@ Task、JD、提案都不進來。
 判準文字的**品質調校是另一件工作**(rubric／eval),不在本 task 的完成條件裡;
 但這裡不得寫出與 §4 相反的規則——例如用「三個欄位皆空」做結構性否決,或把
 「盡量少寫幾條 Task」當成邊界裁決的 tie-break,§4.1／§4.4 都明文禁止。
+
+**不要在這裡複述別處已經保證的事。** 三條界線:
+
+1. `verifier.py` 的 28 個 violation code 是確定性規則的權威(anchors 必有、relation 與
+   change 的對照、withdraw 才可帶 reason、supersession 的當回合 anchor…)。寫進這裡只是
+   多付一次 token,而重疊與衝突的訊息還會消耗模型的推理。
+2. strict structured output 保證輸出是合法 JSON,provider 另會自動注入一段輸出格式說明。
+   「只輸出 JSON、不要包在程式碼區塊裡」是第三份拷貝。
+3. 中性值約定(`""`／`"none"`／`0`)住在 `wire.py` 的 schema `description`,不住這裡。
+
+留在這裡的只有兩類:**顧問判準**(只有模型能做的語意判斷)與**違反成本特別高的提醒**
+(例如 `quote` 逐字——違反要付一次完整呼叫才發現)。依據見
+`docs/specs/2026-07-31-context-engineering-model-facing-contract-research.md`。
 """
 
 from __future__ import annotations
@@ -75,32 +88,18 @@ Merge:兩個候選共享同一個 action 或 purpose;其中一方是另一方的
 
 ## 行為與禁止事項
 
-- 你**永遠不產生 ID**。只使用 packet 給的 ordinal,以及本次輸出內的位置索引。
-- 每一筆訊號都要有 `anchors`;`quote` 必須是該員工回合原文的**逐字子字串**,不得改寫、
-  不得補字、不得翻譯。矛盾未解至少要引兩句。
+- 你**永遠不產生 ID**;只用 packet 給的 ordinal 與本次輸出內的位置索引。
+- `quote` 必須是該員工回合原文的**逐字子字串**,不得改寫、不得補字、不得翻譯。
+  矛盾未解至少要引兩句。
 - packet 裡標為「尚未成立」的提案是待決假說,**不是現況事實**;可以用來避免重複提案,
   也可以用新證據修訂它,但不得當成已經發生的事。
-- `retired_tasks` 是唯讀的防重提資訊,編號另計:**不得**出現在任何 target 或
-  supersession reference。新證據與某筆撤回衝突時,輸出 open_issue,不要自行復活它。
-- 只有當本次回合更正了某條既有依據時,才填 `supersedes_support_ordinals`,
-  並且該回合必須出現在同一筆訊號的 `anchors` 裡。
-- packet 的 open issue 若顯示一筆員工直接新增但仍待分析的 Current JD Task,
-  只有兩種情況可填 `resolves_open_issue_ordinal`:確認它是新工作時用
-  `identity=no_match + task_change.add`;確認它不成立時用 `exclude`。
-- 如果它可能是既有 Task 的 `duplicate／overlap／uncertain`,保留 issue 並追問員工;
-  **不得自動換 ID 或 merge**,也不得填 `resolves_open_issue_ordinal`。
+- 新證據與某筆 `retired_tasks` 衝突時,輸出 open_issue,不要自行復活它。
+- 只有本回合真的更正了某條既有依據,才填 `supersedes_support_ordinals`。
+- packet 的 open issue 若可能是既有 Task 的 `duplicate／overlap／uncertain`,保留 issue
+  並追問員工;**不得自動換 ID 或 merge**,也不得填 `resolves_open_issue_ordinal`。
 - open issue 若顯示「等待員工決定」,不要重問或重送同一份提案。
-- `split` 的每個 child 以 `inherited_support_ordinals` 指明要沿用母 Task 的哪些有效
-  support link；只選真正支持該 child 的依據，不得把母 Task 的全部依據無差別複製。
-- 一輪只問一個問題。短答要能接回 `active_question`,所以問題要問得具體。
-
-## 輸出規則
-
-只輸出符合輸出 schema 的 JSON,不要加說明文字、不要包在程式碼區塊裡。
-`disposition` 決定哪一個 payload 欄位非空,其餘三個必須是 null:
-`task_change`／`exclude`／`open_issue` 各自對應同名欄位,`support_only` 三個都是 null。
-`identity.relation` 與 `task_change.change` 必須一致:`support_only` 配 duplicate、
-`add` 配 no_match、`revise`／`merge` 配 overlap,且 identity 與 task_change 指的必須是
-同一批 ordinal。判斷不足以支持任何變更時,輸出 open_issue 或 support_only,不要硬填。
-`limitations` 用來說明你這一輪沒有把握的地方。
+- `split` 的每個 child 以 `inherited_support_ordinals` 只沿用真正支持它的依據,
+  不得把母 Task 的全部依據無差別複製。
+- 短答要能接回 `active_question`,所以問題要問得具體。
+- 判斷不足以支持任何變更時,輸出 open_issue 或 support_only,不要硬填。
 """

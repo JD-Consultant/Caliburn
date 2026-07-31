@@ -128,6 +128,11 @@ conversation authority 任一不一致就回 `StaleAuthoritySnapshot`，舊結�
 若只建立不可見候選而沒有 Proposal，Consultation View 又不暴露 Work Model，員工就永遠無法審查 AI 找到的工作。
 
 Proposal 決策由 `decide_proposal()` 完成，沒有 LLM。`accepted` 套用 `jd_after`；
+**新進 JD 的 Task 在套用時才拿到 `display_order`，不照抄提案帶的值**：提案建立時
+`transition._next_jd_order()` 讀的是當下的 Current JD，訪談期間 JD 是空的，所以每一筆 `add`
+都算出 0；照抄會讓第二筆被接受時撞上「display order 必須唯一」，而一次訪談產出多筆 `add`
+提案是常態。位置是 JD 清單的性質不是提案內容——員工審的是文字，`edited_jd_after` 也明文
+不准改 `display_order`。已在 JD 的 Task 保留原位置，移除先套用讓新進者填補空號。
 `edited` 套用員工文字並標記後續 reconcile；`rejected`、`deferred`、
 `revision_requested` 不改 Current JD。merge／split／JD 內 withdraw 的
 `staged_work_model_delta` 只在 accepted／edited 時與 JD 同交易套用。`jd_before`
@@ -227,7 +232,7 @@ JD 只在員工決定提案時才改。
 |---|---|---|
 | endpoint variant preflight | `provider_order` 只鎖 base slug,同 provider 可能有多個 endpoint variant。`providers/openrouter_evidence.py` 的 `select_catalog_endpoint()` 已能從 model detail 選出唯一 active endpoint,但**沒有任何 runtime 路徑呼叫它** | 由待建的 live smoke wrapper 在付費前呼叫;不進 request 路徑 |
 | route 歸因 | `inspect_openrouter_execution()` 可解析 router metadata、pipeline 與 `usage.cost`,並判定該次能否用於品質歸因。**一般產品回合不要求也不送 metadata**;`OpenRouterAdapter` 的 headers 未改,結果不寫 PostgreSQL／Journal | metadata／no-cache opt-in 只留給待建的 smoke wrapper |
-| **真模型跑通** | **三回合已在三個模型上跑完**(Opus 5／Sonnet 5／Luna-Pro,皆 `committed`×3)。2026-07-31 的八次付費 run 累計 US$0.613,找出**七個**契約層缺陷,全部已修：grammar 過大、`target_ordinal` 的 1-based／0-based 不一致、6 條 verifier 規則模型無從得知、一般 open issue 無關閉路徑（ADR 0047）、新 issue 拿不到 `last_asked_turn_id`、schema 名稱帶點、`$ref` 帶兄弟 keyword（後兩者是可攜性,契約原本鎖死 Anthropic）| **merge／split、supersession、Proposal 決策一次都沒被觀測到**；過早關閉 open issue 的風險也未被測到（turn 3 時已無 issue 可關）。`withdraw` 只在 Luna-Pro 的錯誤補救裡出現過,不算正常路徑觀測 |
+| **真模型跑通** | **三回合已在三個模型上跑完**(Opus 5／Sonnet 5／Luna-Pro,皆 `committed`×3)。2026-07-31 的八次付費 run 累計 US$0.613,找出**七個**契約層缺陷,全部已修：grammar 過大、`target_ordinal` 的 1-based／0-based 不一致、6 條 verifier 規則模型無從得知、一般 open issue 無關閉路徑（ADR 0047）、新 issue 拿不到 `last_asked_turn_id`、schema 名稱帶點、`$ref` 帶兄弟 keyword（後兩者是可攜性,契約原本鎖死 Anthropic）| **merge／split、supersession 一次都沒被觀測到**；過早關閉 open issue 的風險也未被測到（turn 3 時已無 issue 可關）。`withdraw` 只在 Luna-Pro 的錯誤補救裡出現過,不算正常路徑觀測。**Proposal 決策已首次走通**：run 5 的四筆 `add` 全部 accepted，產出第一份 4 條的 Current JD（`authority_generation: 7`）——並在該路徑上找出 `display_order` 照抄提案值的缺陷，已修 |
 | prompt 品質結論 | **仍然沒有 rubric。** 已觀測到跨回合記憶、更正處理與 enabler 硬規則守住,也用三模型 A/B 定位出一個判準落點缺陷(§8.2),但那些都是單次 synthetic trial 的事實記錄,不是品質 gate | 有可比對的判準與重複抽樣之後 |
 
 ### 8.1 Attributed live smoke(`scripts/job_analysis_live_smoke.py`)

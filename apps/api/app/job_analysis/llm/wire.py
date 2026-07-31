@@ -185,9 +185,9 @@ class WireSignal(DomainModel):
     resolves_open_issue_ordinal: int = Field(
         default=0,
         description=(
-            "0 表示不填,多數情況都填 0。只能指 packet 中帶「Current JD Task」那一行的 "
-            "open issue——其餘 open issue 不會因為員工回答就關閉,照常輸出 exclude 或新的 "
-            "open_issue 即可。兩種填法:確認是新工作用 no_match ＋ add,確認不成立用 exclude"
+            "0 表示不填。指本輪回答已經解掉、可以關閉的 open issue,anchors 必須含這一輪的"
+            "員工回合。帶「Current JD Task」那一行的 issue 另有規則:只能用 no_match ＋ add "
+            "或 exclude 關閉。不確定性仍在就別關,改輸出新的 open_issue"
         ),
     )
     disposition: SignalDisposition

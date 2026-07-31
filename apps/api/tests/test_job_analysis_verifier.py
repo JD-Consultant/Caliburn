@@ -166,13 +166,54 @@ def test_exclude_may_resolve_a_reconciliation_open_issue():
     assert verify_task_analysis_result(result(exclude), ctx).is_valid
 
 
-def test_open_issue_resolution_requires_a_known_reconciliation_issue():
-    unknown = signal(resolves_open_issue_ordinal=99)
-    non_reconciliation = signal(resolves_open_issue_ordinal=1)
+def test_open_issue_resolution_requires_an_issue_that_is_in_the_packet():
+    assert ViolationCode.RESOLUTION_OPEN_ISSUE_UNKNOWN in codes(
+        signal(resolves_open_issue_ordinal=99)
+    )
 
-    assert ViolationCode.RESOLUTION_OPEN_ISSUE_UNKNOWN in codes(unknown)
-    assert ViolationCode.RESOLUTION_OPEN_ISSUE_NOT_RECONCILABLE in codes(
-        non_reconciliation
+
+def test_a_model_raised_open_issue_may_be_closed_by_any_disposition():
+    """ADR 0047:只有處理這一輪答案的模型知道自己上一輪的問題有沒有被回答。"""
+    ctx = context(open_issues=(PacketOpenIssue(ordinal=1, issue_id="issue-1"),))
+    closing = signal(
+        resolves_open_issue_ordinal=1,
+        disposition=SignalDisposition.EXCLUDE,
+        task_change=None,
+        exclude=ExcludePayload(
+            reason=ExclusionReason.OTHER_PERSON_WORK,
+            summary="真正部署是平台組做的",
+        ),
+    )
+
+    assert verify_task_analysis_result(result(closing), ctx).is_valid
+
+
+def test_closing_an_open_issue_requires_the_current_turn_among_the_anchors():
+    """與 supersession 同一條不變量:改寫既有結論要基於當下這次回答,不能批次清單。"""
+    ctx = context(
+        turns=(
+            PacketTurn(ordinal=1, speaker=TurnSpeaker.CONSULTANT, turn_id="turn-1", text=CONSULTANT_TEXT),
+            PacketTurn(ordinal=2, speaker=TurnSpeaker.EMPLOYEE, turn_id="turn-2", text=EMPLOYEE_TEXT),
+            PacketTurn(ordinal=3, speaker=TurnSpeaker.CONSULTANT, turn_id="turn-3", text=CONSULTANT_TEXT),
+            PacketTurn(ordinal=4, speaker=TurnSpeaker.EMPLOYEE, turn_id="turn-4", text=EMPLOYEE_TEXT),
+        ),
+        current_turn_ordinal=4,
+        open_issues=(PacketOpenIssue(ordinal=1, issue_id="issue-1"),),
+    )
+    stale = signal(
+        resolves_open_issue_ordinal=1,
+        # 只引了舊回合,沒有引這一輪的答案。
+        anchors=(anchor(turn_ordinal=2),),
+        disposition=SignalDisposition.EXCLUDE,
+        task_change=None,
+        exclude=ExcludePayload(
+            reason=ExclusionReason.OTHER_PERSON_WORK, summary="別人做的"
+        ),
+    )
+
+    assert (
+        ViolationCode.RESOLUTION_MISSING_CURRENT_TURN_ANCHOR
+        in verify_task_analysis_result(result(stale), ctx).codes
     )
 
 

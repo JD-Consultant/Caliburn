@@ -189,8 +189,8 @@ class ViolationCode(StrEnum):
     DUPLICATE_TASK_CHANGE_TARGET = "duplicate_task_change_target"
     DUPLICATE_WORK_SIGNAL = "duplicate_work_signal"
     RESOLUTION_OPEN_ISSUE_UNKNOWN = "resolution_open_issue_unknown"
-    RESOLUTION_OPEN_ISSUE_NOT_RECONCILABLE = (
-        "resolution_open_issue_not_reconcilable"
+    RESOLUTION_MISSING_CURRENT_TURN_ANCHOR = (
+        "resolution_missing_current_turn_anchor"
     )
     RESOLUTION_MAPPING_INVALID = "resolution_mapping_invalid"
     RESOLUTION_OPEN_ISSUE_REPEATED = "resolution_open_issue_repeated"
@@ -270,7 +270,11 @@ def _verify_open_issue_resolution(
     context: VerificationContext,
     violations: list[Violation],
 ) -> None:
-    """ADR 0044:只允許 ``no_match + add`` 或 ``exclude`` 關閉 JD-only issue。"""
+    """ADR 0044:只允許 ``no_match + add`` 或 ``exclude`` 關閉 JD-only issue。
+
+    ADR 0047 把適用範圍擴及一般 open issue——那些是模型自己提的待答問題,任何 disposition
+    皆可關閉。0044 的 reconciliation 判準原樣保留。
+    """
 
     ordinal = signal.resolves_open_issue_ordinal
     if ordinal is None:
@@ -284,13 +288,21 @@ def _verify_open_issue_resolution(
             index,
         )
         return
-    if issue.reconciliation_task_id is None:
+
+    # ADR 0047:關閉既有結論必須錨定**當回合**的答案,不能用舊證據批次清單。
+    # 與 supersession 沿用同一條不變量。
+    if all(
+        anchor.turn_ordinal != context.current_turn_ordinal for anchor in signal.anchors
+    ):
         _add(
             violations,
-            ViolationCode.RESOLUTION_OPEN_ISSUE_NOT_RECONCILABLE,
-            f"open issue ordinal {ordinal} has no reconciliation task",
+            ViolationCode.RESOLUTION_MISSING_CURRENT_TURN_ANCHOR,
+            "resolving an open issue requires the current employee turn among the anchors",
             index,
         )
+
+    if issue.reconciliation_task_id is None:
+        # 一般 open issue:模型自己提的問題,它自己知道有沒有被回答(ADR 0047)。
         return
 
     change = signal.task_change

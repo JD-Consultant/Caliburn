@@ -181,16 +181,15 @@ def visible_to_the_model() -> str:
         ),
         pytest.param(
             ViolationCode.RESOLUTION_MAPPING_INVALID,
-            "確認是新工作用 no_match ＋ add",
+            "只能用 no_match ＋ add 或 exclude 關閉",
             id="resolution-mapping",
         ),
-        # 這一條真模型撞過(run 20260731T123344Z turn 2):它想關掉自己上一輪提的
-        # open issue,但這個欄位只為 JD-only reconciliation issue 而設(ADR 0044)。
-        # packet 用「Current JD Task」那一行區分兩者,但先前沒有任何地方說明那條線的意義。
+        # 真模型 run 20260731T123344Z turn 2 想關掉自己上一輪提的 open issue——
+        # 判斷正確,契約當時不允許。ADR 0047 放行,但關閉必須錨定當回合的答案。
         pytest.param(
-            ViolationCode.RESOLUTION_OPEN_ISSUE_NOT_RECONCILABLE,
-            "只能指 packet 中帶「Current JD Task」那一行的 open issue",
-            id="reconciliation-only",
+            ViolationCode.RESOLUTION_MISSING_CURRENT_TURN_ANCHOR,
+            "anchors 必須含這一輪的員工回合",
+            id="resolution-current-turn",
         ),
         pytest.param(
             ViolationCode.TARGET_ORDINAL_RETIRED,

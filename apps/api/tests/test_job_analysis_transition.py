@@ -207,6 +207,75 @@ def partial_state(statement: str = "每週整理週報") -> JobAnalysisState:
     )
 
 
+# ── ADR 0047:模型關閉自己提出的 open issue ─────────────────────────────────
+
+
+def model_raised_issue_state() -> JobAnalysisState:
+    """turn 1 的模型提了一個責任邊界問題;turn 2 員工回答了它。"""
+    return JobAnalysisState(
+        work_model=CurrentWorkModel(
+            tasks=(task("task-1", "每週彙整營運週報"), task("task-2", "每週追蹤缺料")),
+            open_issues=(
+                OpenIssue(
+                    id="op-0-i0",
+                    kind=OpenIssueKind.RESPONSIBILITY_UNCLEAR,
+                    summary="「協助正式環境部署」的責任範圍不明",
+                    source_anchors=(
+                        SourceAnchor(
+                            source_ref=SourceRef(
+                                kind=SourceKind.EMPLOYEE_TURN, id="turn-2"
+                            ),
+                            quote="我每週要出一份營運週報",
+                        ),
+                    ),
+                ),
+            )
+        )
+    )
+
+
+def test_closing_a_model_raised_issue_also_applies_the_signal_itself():
+    """員工的更正既要關掉舊問題,也要留下那筆 exclude——兩件事都得發生。
+
+    這正是真模型在 run `20260731T123344Z` turn 2 想做的事。
+    """
+    closing = signal(
+        resolves_open_issue_ordinal=1,
+        disposition=SignalDisposition.EXCLUDE,
+        task_change=None,
+        exclude=ExcludePayload(
+            reason=ExclusionReason.OTHER_PERSON_WORK,
+            summary="真正部署是平台組做的",
+        ),
+    )
+
+    outcome = apply(closing, current=model_raised_issue_state())
+
+    assert outcome.is_applied
+    assert outcome.state.work_model.open_issues == ()
+    assert len(outcome.state.work_model.excluded_signals) == 1
+    assert outcome.state.work_model.excluded_signals[0].reason is (
+        ExclusionReason.OTHER_PERSON_WORK
+    )
+
+
+def test_a_model_raised_issue_cannot_be_closed_twice_in_one_result():
+    def closing(**overrides):
+        return signal(
+            resolves_open_issue_ordinal=1,
+            disposition=SignalDisposition.EXCLUDE,
+            task_change=None,
+            exclude=ExcludePayload(
+                reason=ExclusionReason.OTHER_PERSON_WORK, summary="平台組做的"
+            ),
+            **overrides,
+        )
+
+    outcome = apply(closing(), closing(), current=model_raised_issue_state())
+
+    assert not outcome.is_applied
+
+
 # ── §12.2 mapping ───────────────────────────────────────────────────────────
 
 

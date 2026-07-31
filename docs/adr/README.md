@@ -56,6 +56,7 @@ ADR 是「為什麼」層;搭配 `../specs/`(細節設計)與 `../runbook.md`(�
 | [0044](0044-partial-jd-task-reconciliation-and-human-confirmation.md) | 不完整 JD Task 可立即保存；以明確 reconciliation identity 讓 AI 後續追問、同 ID 建立分析或提出移除；duplicate／overlap 不自動合併，AI 不靜默改員工文件 | **Accepted**（2026-07-30；補充0043） |
 | [0045](0045-job-analysis-local-web-contract-and-shared-authority-commit.md) | `job_analysis` Local Web 新入口＋JSON Schema→Pydantic/TypeScript workspace contract＋人／AI 共用 authority 原子寫入 seam；metadata rename 不碰 authority generation／Journal；第一切片只做單文件 Task 編輯 | **Accepted**（2026-07-30；owner 核准＋closure review） |
 | [0046](0046-professional-consultant-minimal-durable-loop.md) | 專業顧問第一個最小 durable Task 訪談迴圈：A6 單一 one-stage 顧問、固定持久開場、application-owned conversation、Proposal／下一題並行、三個薄 route；provider 前短路 committed replay，暫不做 Role/Coverage、Graph、多 Agent、streaming 或 completion gate | **Accepted**（2026-07-30；owner 授權 strongest-case 自審後施工） |
+| [0047](0047-model-owned-open-issue-closure.md) | 模型可關閉自己提出的 open issue：`resolves_open_issue_ordinal` 擴及一般 open issue（0044 的 reconciliation 判準原樣保留）；關閉必須錨定當回合員工回合，與 supersession 同一條不變量；不新增欄位／enum／員工 gate，不確定性仍在就輸出新 issue | **Accepted**（2026-07-31；補充 0044；付費 live run 撞出，owner 授權自審自決） |
 
 完整脈絡見 [`../specs/2026-06-27-system-architecture-design.md`](../specs/2026-06-27-system-architecture-design.md)。
 契約怎麼選/怎麼交付的規範見 [`../contract-strategy.md`](../contract-strategy.md)（ADR 0004/0010 的一般化、契約 #1–#4 登記）。

@@ -249,8 +249,13 @@ class _Writer:
     def apply_signal(self, index: int, signal: WorkSignal) -> None:
         self._apply_supersessions(signal)
         if signal.resolves_open_issue_ordinal is not None:
-            self._resolve_reconciliation_issue(index, signal)
-            return
+            if self._is_reconciliation(signal.resolves_open_issue_ordinal):
+                # 0044 的語意:關閉 JD-only issue **取代**本訊號原本的效果。
+                self._resolve_reconciliation_issue(index, signal)
+                return
+            # ADR 0047:一般 open issue 只是被移除,本訊號照常套用它自己的效果
+            # ——員工的更正既要關掉舊問題,也要留下那筆 exclude／Task。
+            self._close_open_issue(signal.resolves_open_issue_ordinal)
         if signal.disposition is SignalDisposition.SUPPORT_ONLY:
             for ordinal in signal.identity.target_task_ordinals:
                 self._append_support(self._task_id(ordinal), signal)
@@ -276,6 +281,35 @@ class _Writer:
             )
             return
         self._apply_task_change(index, signal)
+
+    def _packet_issue(self, ordinal: int):
+        return next(
+            (
+                candidate
+                for candidate in self._packet.current_authorities.open_issues
+                if candidate.ordinal == ordinal
+            ),
+            None,
+        )
+
+    def _is_reconciliation(self, ordinal: int) -> bool:
+        view = self._packet_issue(ordinal)
+        return view is not None and view.issue.reconciliation_task_id is not None
+
+    def _close_open_issue(self, ordinal: int) -> None:
+        """ADR 0047:移除模型自己提出、本輪已被回答的 open issue。"""
+
+        view = self._packet_issue(ordinal)
+        if view is None:
+            raise _TransitionRejected(f"open issue ordinal {ordinal} is not in the packet")
+        local = next(
+            (issue for issue in self._open_issues if issue.id == view.issue.id), None
+        )
+        if local is None:
+            raise _TransitionRejected(
+                f"open issue ordinal {ordinal} was already resolved by this result"
+            )
+        self._open_issues.remove(local)
 
     def _reconciliation_issue(
         self, ordinal: int

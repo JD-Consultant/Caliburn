@@ -72,7 +72,8 @@
               "exclude",
               "open_issue"
             ],
-            "type": "string"
+            "type": "string",
+            "description": "選 task_change 等於宣告四項成立條件都滿足,尤其「是本人目前的責任」;責任歸屬或 outcome 判不出來就選 open_issue 追問,不先建 Task 再撤回"
           },
           "change": {
             "enum": [

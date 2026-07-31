@@ -93,12 +93,32 @@ def _apply_jd_entries(
     current_jd: tuple[JdTask, ...],
     entries: tuple[JdEntry, ...],
 ) -> tuple[JdTask, ...]:
+    """套用一筆提案的 `jd_after`。**新進 JD 的 Task 在這裡才拿到 `display_order`。**
+
+    提案帶的那個值不能照抄:`transition._next_jd_order()` 讀的是提案建立當下的 Current JD,
+    訪談期間 JD 是空的,所以每一筆 add 都算出 0。照抄的話第二筆一被接受就撞上
+    「display order 必須唯一」——而一次訪談產出多筆 add 提案是常態,不是邊角案例。
+
+    位置是 JD 清單的性質,不是提案的內容:員工審的是文字,`edited_jd_after` 也明文不准
+    改動 `display_order`(§10 `proposal.py`)。已在 JD 的 Task 保留原位置;移除先套用,
+    讓新進者填補空出來的號碼。
+    """
+
     result = {task.task_id: task for task in current_jd}
     for entry in entries:
         if entry.value is None:
             result.pop(entry.task_id, None)
-        else:
+    next_order = max((task.display_order for task in result.values()), default=-1) + 1
+    for entry in entries:
+        if entry.value is None:
+            continue
+        if entry.task_id in result:
             result[entry.task_id] = entry.value
+            continue
+        result[entry.task_id] = entry.value.model_copy(
+            update={"display_order": next_order}
+        )
+        next_order += 1
     return tuple(
         sorted(result.values(), key=lambda task: (task.display_order, task.task_id))
     )

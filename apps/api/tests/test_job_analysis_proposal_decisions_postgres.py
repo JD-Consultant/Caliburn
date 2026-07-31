@@ -274,6 +274,68 @@ async def test_accept_adds_the_task_to_current_jd_and_replay_is_a_noop(
     assert loaded.document.authority_generation == 2
 
 
+async def test_accepting_several_add_proposals_gives_each_task_its_own_position(
+    postgres_session_factory,
+    cleanup_job_analysis_rows,
+):
+    """一次訪談產出多筆 add 提案是常態,而它們的 `display_order` 全都是 0。
+
+    `transition._next_jd_order()` 讀的是**提案建立當下**的 Current JD;訪談期間 JD 是空的,
+    所以每一筆 add 都算出 0。照抄那個值的話第二筆一被接受就撞上「display order 必須唯一」,
+    員工在 UI 上按第二個 accept 就失敗——AI 找到的工作永遠進不完 JD。
+    位置是 JD 清單的性質,不是提案的內容,要在**插入時**才決定。
+    """
+    document_id = cleanup_job_analysis_rows
+    candidates = tuple(
+        task(f"task-{index}", statement)
+        for index, statement in enumerate(("每週彙整營運週報", "維護資料匯入程式"))
+    )
+    proposals = tuple(
+        Proposal(
+            proposal_id=f"proposal-add-{index}",
+            target=SingleTaskTarget(
+                action=ProposalAction.ADD, task_id=candidate.task_id
+            ),
+            jd_before=(JdEntry(task_id=candidate.task_id, value=None),),
+            jd_after=(
+                JdEntry(
+                    task_id=candidate.task_id,
+                    # 兩筆都是 0,正是 transition 對空 JD 會產生的值。
+                    value=jd_task(candidate.task_id, candidate.statement, order=0),
+                ),
+            ),
+        )
+        for index, candidate in enumerate(candidates)
+    )
+    await seed(
+        postgres_session_factory,
+        document_id,
+        work_model=CurrentWorkModel(tasks=candidates),
+        current_jd=(),
+        proposal=None,
+    )
+    uow_factory = factory(postgres_session_factory)
+    async with uow_factory() as uow:
+        await uow.proposals.replace(document_id, proposals)
+        await uow.commit()
+
+    for index, proposal in enumerate(proposals):
+        decided = await decide_proposal(
+            uow_factory,
+            document_id=document_id,
+            proposal_id=proposal.proposal_id,
+            decision_id=f"decision-accept-{index}",
+            decision="accepted",
+        )
+        assert decided.status is ProposalStatus.ACCEPTED
+
+    loaded = await load_document(uow_factory, document_id)
+
+    assert loaded is not None
+    assert [item.task_id for item in loaded.state.current_jd] == ["task-0", "task-1"]
+    assert [item.display_order for item in loaded.state.current_jd] == [0, 1]
+
+
 async def test_accept_jd_only_withdraw_removes_the_jd_task_and_dangling_issue(
     postgres_session_factory,
     cleanup_job_analysis_rows,

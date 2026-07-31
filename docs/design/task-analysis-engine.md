@@ -221,7 +221,7 @@ JD 只在員工決定提案時才改。
 |---|---|---|
 | endpoint variant preflight | `provider_order` 只鎖 base slug,同 provider 可能有多個 endpoint variant。`providers/openrouter_evidence.py` 的 `select_catalog_endpoint()` 已能從 model detail 選出唯一 active endpoint,但**沒有任何 runtime 路徑呼叫它** | 由待建的 live smoke wrapper 在付費前呼叫;不進 request 路徑 |
 | route 歸因 | `inspect_openrouter_execution()` 可解析 router metadata、pipeline 與 `usage.cost`,並判定該次能否用於品質歸因。**一般產品回合不要求也不送 metadata**;`OpenRouterAdapter` 的 headers 未改,結果不寫 PostgreSQL／Journal | metadata／no-cache opt-in 只留給待建的 smoke wrapper |
-| **真模型跑通** | **2026-07-31 live smoke 在 turn 1 被 Anthropic 以 HTTP 400 拒絕**:`strict: true` 的 `task_analysis_result.v1` schema(6,818 bytes)編譯出的 grammar 過大。請求未生成任何 token(1 call、US$0),route 本身正常(direct、attempt 1、無 pipeline)。production 走同一份 schema 與同一個 `build_body()`,**同 route 下的員工 AI 回合現在應同樣失敗** | 先研究 Anthropic structured output 上限並決定契約讓步方向(縮小 grammar vs 放棄 strict 改靠 local verifier);後者動到 ADR 0040 決定 26,須另開 ADR。修好後原樣重跑同一支 CLI |
+| **真模型跑通** | **2026-07-31 已通過 turn 1**（run `20260731T120931Z`、commit `97bca87`）：精簡 wire 契約 `task_analysis_result.v2`（union 0、4,084 bytes）編譯成功，HTTP 200、1 call、0 retry、US$0.058195，turn outcome `committed`。產出 2 個 Task ＋ 1 個 `責任邊界不明` open issue，Enabler 硬規則有作用。**route 歸因 `quality_eligible = false`**，唯一 limitation 是 catalog 報 alias `anthropic/claude-opus-5` 而 router 選日期快照 `…-20260723`（fail-open 降級，路由本身乾淨）。先前的 `compiled grammar is too large` 400 已解除 | **turn 2／3 尚未以真模型跑過**：跨回合記憶、更正／撤回、merge／split、Proposal 決策都還沒有真模型觀測，需另外的預算授權。要不要讓歸因判準接受「alias → 其日期快照」是獨立決策，目前刻意維持精確比對 |
 | prompt 品質結論 | **一項都沒有。** 上述 run 沒有任何模型輸出,計畫的八項語意判準只有 route 一項有結果 | schema 阻塞解除、smoke 真的跑完三回合之後 |
 
 ### 8.1 Attributed live smoke(`scripts/job_analysis_live_smoke.py`)

@@ -227,8 +227,8 @@ JD 只在員工決定提案時才改。
 |---|---|---|
 | endpoint variant preflight | `provider_order` 只鎖 base slug,同 provider 可能有多個 endpoint variant。`providers/openrouter_evidence.py` 的 `select_catalog_endpoint()` 已能從 model detail 選出唯一 active endpoint,但**沒有任何 runtime 路徑呼叫它** | 由待建的 live smoke wrapper 在付費前呼叫;不進 request 路徑 |
 | route 歸因 | `inspect_openrouter_execution()` 可解析 router metadata、pipeline 與 `usage.cost`,並判定該次能否用於品質歸因。**一般產品回合不要求也不送 metadata**;`OpenRouterAdapter` 的 headers 未改,結果不寫 PostgreSQL／Journal | metadata／no-cache opt-in 只留給待建的 smoke wrapper |
-| **真模型跑通** | **三回合已跑完**（run `20260731T170405Z`,`committed`×3,US$0.210285）。2026-07-31 的五次付費 run 累計 US$0.461,找出五個契約層缺陷,全部已修：grammar 過大、`target_ordinal` 的 1-based／0-based 不一致、6 條 verifier 規則模型無從得知、一般 open issue 無關閉路徑（ADR 0047）、新 issue 拿不到 `last_asked_turn_id` | **merge／split／revise／withdraw 一筆真 Task、supersession、Proposal 決策一次都沒被觀測到**；過早關閉 open issue 的風險也未被測到（turn 3 時已無 issue 可關）|
-| prompt 品質結論 | **仍然沒有 rubric。** run 5 觀測到跨回合記憶、更正處理與 enabler 硬規則守住,但那是單次 synthetic trial 的事實記錄,不是品質 gate | 有黃金範本當尺、能重複抽樣之後 |
+| **真模型跑通** | **三回合已在三個模型上跑完**(Opus 5／Sonnet 5／Luna-Pro,皆 `committed`×3)。2026-07-31 的八次付費 run 累計 US$0.613,找出**七個**契約層缺陷,全部已修：grammar 過大、`target_ordinal` 的 1-based／0-based 不一致、6 條 verifier 規則模型無從得知、一般 open issue 無關閉路徑（ADR 0047）、新 issue 拿不到 `last_asked_turn_id`、schema 名稱帶點、`$ref` 帶兄弟 keyword（後兩者是可攜性,契約原本鎖死 Anthropic）| **merge／split、supersession、Proposal 決策一次都沒被觀測到**；過早關閉 open issue 的風險也未被測到（turn 3 時已無 issue 可關）。`withdraw` 只在 Luna-Pro 的錯誤補救裡出現過,不算正常路徑觀測 |
+| prompt 品質結論 | **仍然沒有 rubric。** 已觀測到跨回合記憶、更正處理與 enabler 硬規則守住,也用三模型 A/B 定位出一個判準落點缺陷(§8.2),但那些都是單次 synthetic trial 的事實記錄,不是品質 gate | 有可比對的判準與重複抽樣之後 |
 
 ### 8.1 Attributed live smoke(`scripts/job_analysis_live_smoke.py`)
 

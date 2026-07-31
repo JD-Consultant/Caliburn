@@ -1,0 +1,299 @@
+{
+  "$defs": {
+    "EnablerKind": {
+      "enum": [
+        "tool_system",
+        "method",
+        "knowledge",
+        "skill",
+        "other"
+      ],
+      "type": "string"
+    },
+    "IdentityRelation": {
+      "enum": [
+        "no_match",
+        "duplicate",
+        "overlap",
+        "uncertain"
+      ],
+      "type": "string"
+    },
+    "SignalDisposition": {
+      "enum": [
+        "task_change",
+        "support_only",
+        "exclude",
+        "open_issue"
+      ],
+      "type": "string"
+    },
+    "WireAnchor": {
+      "additionalProperties": false,
+      "properties": {
+        "turn_ordinal": {
+          "type": "integer"
+        },
+        "quote": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "turn_ordinal",
+        "quote"
+      ],
+      "type": "object"
+    },
+    "WireEnabler": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "$ref": "#/$defs/EnablerKind"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "name"
+      ],
+      "type": "object"
+    },
+    "WireNextQuestion": {
+      "additionalProperties": false,
+      "properties": {
+        "text": {
+          "type": "string"
+        },
+        "target_kind": {
+          "$ref": "#/$defs/WireNextQuestionTargetKind",
+          "description": "\"none\" 表示不指向任何東西"
+        },
+        "target_ordinal": {
+          "description": "existing_open_issue 時為 packet 的 open issue ordinal;new_signal 時為本次 work_signals 的索引",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "text",
+        "target_kind",
+        "target_ordinal"
+      ],
+      "type": "object"
+    },
+    "WireNextQuestionTargetKind": {
+      "enum": [
+        "none",
+        "existing_open_issue",
+        "new_signal"
+      ],
+      "type": "string"
+    },
+    "WireRejectionCode": {
+      "enum": [
+        "none",
+        "他人工作",
+        "過去工作",
+        "一次性支援",
+        "工具或步驟",
+        "員工否認",
+        "責任邊界不明",
+        "證據不足",
+        "矛盾未解",
+        "task_boundary_uncertain"
+      ],
+      "type": "string"
+    },
+    "WireSignal": {
+      "additionalProperties": false,
+      "properties": {
+        "anchors": {
+          "items": {
+            "$ref": "#/$defs/WireAnchor"
+          },
+          "type": "array"
+        },
+        "relation": {
+          "$ref": "#/$defs/IdentityRelation"
+        },
+        "target_task_ordinals": {
+          "description": "identity 與變更共用同一批",
+          "items": {
+            "type": "integer"
+          },
+          "type": "array"
+        },
+        "supersedes": {
+          "items": {
+            "$ref": "#/$defs/WireSupersession"
+          },
+          "type": "array"
+        },
+        "resolves_open_issue_ordinal": {
+          "description": "0 表示沒有解決任何 open issue",
+          "type": "integer"
+        },
+        "disposition": {
+          "$ref": "#/$defs/SignalDisposition"
+        },
+        "change": {
+          "$ref": "#/$defs/WireTaskChange",
+          "description": "\"none\" 表示這個訊號不是 Task 變更"
+        },
+        "withdraw_reason": {
+          "$ref": "#/$defs/WireWithdrawReason",
+          "description": "僅 change=withdraw 時填,否則 \"none\""
+        },
+        "task": {
+          "$ref": "#/$defs/WireTaskFields",
+          "description": "非 Task 變更時各欄填 \"\""
+        },
+        "split_children": {
+          "description": "僅 change=split 時填",
+          "items": {
+            "$ref": "#/$defs/WireSplitChild"
+          },
+          "type": "array"
+        },
+        "rejection_code": {
+          "$ref": "#/$defs/WireRejectionCode",
+          "description": "disposition 為 exclude 或 open_issue 時填對應值,否則 \"none\""
+        },
+        "rejection_summary": {
+          "description": "搭配 rejection_code;否則 \"\"",
+          "type": "string"
+        }
+      },
+      "required": [
+        "anchors",
+        "relation",
+        "target_task_ordinals",
+        "supersedes",
+        "resolves_open_issue_ordinal",
+        "disposition",
+        "change",
+        "withdraw_reason",
+        "task",
+        "split_children",
+        "rejection_code",
+        "rejection_summary"
+      ],
+      "type": "object"
+    },
+    "WireSplitChild": {
+      "additionalProperties": false,
+      "properties": {
+        "statement": {
+          "type": "string"
+        },
+        "action": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "inherited_support_ordinals": {
+          "items": {
+            "type": "integer"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "statement",
+        "action",
+        "object",
+        "inherited_support_ordinals"
+      ],
+      "type": "object"
+    },
+    "WireSupersession": {
+      "additionalProperties": false,
+      "properties": {
+        "task_ordinal": {
+          "type": "integer"
+        },
+        "support_ordinal": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "task_ordinal",
+        "support_ordinal"
+      ],
+      "type": "object"
+    },
+    "WireTaskChange": {
+      "enum": [
+        "none",
+        "add",
+        "revise",
+        "withdraw",
+        "merge",
+        "split"
+      ],
+      "type": "string"
+    },
+    "WireTaskFields": {
+      "additionalProperties": false,
+      "properties": {
+        "statement": {
+          "type": "string"
+        },
+        "action": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "purpose_result": {
+          "description": "說不出來就填 \"\"",
+          "type": "string"
+        },
+        "enablers": {
+          "items": {
+            "$ref": "#/$defs/WireEnabler"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "statement",
+        "action",
+        "object",
+        "purpose_result",
+        "enablers"
+      ],
+      "type": "object"
+    },
+    "WireWithdrawReason": {
+      "enum": [
+        "none",
+        "other_person",
+        "past_work",
+        "one_off",
+        "enabler_or_step",
+        "employee_denied"
+      ],
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "work_signals": {
+      "items": {
+        "$ref": "#/$defs/WireSignal"
+      },
+      "type": "array"
+    },
+    "next_question": {
+      "$ref": "#/$defs/WireNextQuestion"
+    }
+  },
+  "required": [
+    "work_signals",
+    "next_question"
+  ],
+  "type": "object"
+}

@@ -71,7 +71,7 @@
           "description": "\"none\" 表示不指向任何東西"
         },
         "target_ordinal": {
-          "description": "existing_open_issue 時為 packet 的 open issue ordinal;new_signal 時為本次 work_signals 的索引",
+          "description": "從 1 起算。existing_open_issue 時為 packet 的 open issue ordinal;new_signal 時為本次 work_signals 的第幾個",
           "type": "integer"
         }
       },

@@ -1,7 +1,8 @@
 # Job Analysis attributed live smoke：執行結果
 
 日期：2026-07-31
-狀態：**run 1 於 turn 1 停線（400，US$0）；run 2 以精簡 wire 契約重跑，turn 1 通過（US$0.058195）**
+狀態：**run 1 停線於 400（US$0）；run 2 turn 1 通過（US$0.058195）；run 3 停線於 verifier，
+找出 wire 契約的 1-based／0-based 缺陷（US$0.064145）。三回合場景仍未跑完。**
 計畫：[2026-07-31 attributed live smoke plan](../../plans/2026-07-31-job-analysis-attributed-live-smoke-plan.md)
 研究：[OpenRouter 歸因與最小 live smoke](../../specs/2026-07-31-job-analysis-openrouter-attribution-and-live-smoke-research.md)
 
@@ -56,6 +57,45 @@ catalog 報 `anthropic/claude-opus-5`，router 實際選 `anthropic/claude-opus-
 
 三回合場景只跑了第一回合，因此**跨回合記憶、更正／撤回、merge／split、Proposal 決策**
 都還沒有真模型的觀測。要驗證這些需要另外的授權。
+
+---
+
+## 0b. Run 3（2026-07-31 12:16 UTC）：turn 1 被 verifier 擋下，找出契約缺陷
+
+| 項目 | 值 |
+|---|---|
+| commit | `7069679`（`dirty: false`） |
+| 指令 | `--max-generation-calls 3 --budget-usd 0.50` |
+| run id | `20260731T121651Z` |
+| generation calls | **1**（上限 3；turn 2／3 未送出） |
+| retry | **0** |
+| 實際支出 | **US$0.064145** |
+| HTTP | 200（provider 正常） |
+| turn outcome | **failed** —— `UncommittableOperationResult: cannot commit operation outcome 'rejected'` |
+
+**根因是我們的契約缺陷，不是模型。** 模型輸出語意正確（2 個 Task ＋ 1 個
+`責任邊界不明` open issue，工具全部落在 enablers），被擋下的是 `next_question`。
+
+v1 有兩個分開的欄位：`ordinal`（packet 的 **1-based** ordinal）與 `index`
+（本次輸出的 **0-based** 位置）。v2 把它們併成單一的 `target_ordinal`，
+而這份契約裡其他每一個叫 ordinal 的東西都是 1-based。名字指向 1-based、
+description 卻要求 0-based。
+
+真模型在**兩次相同場景**下對**同一個**（第三個）訊號送出不同的值：
+
+| run | `target_ordinal` | 基準 | 結果 |
+|---|---:|---|---|
+| `20260731T120931Z` | 2 | 0-based | 落在範圍內 → 通過（**僥倖**） |
+| `20260731T121651Z` | 3 | 1-based | 超出 0..2 → `NEXT_QUESTION_TARGET_INVALID` |
+
+也就是說 §0 的通過是運氣，這個缺陷在真實使用中約每兩回合就會發作一次。
+
+**修法**（commit 見下方執行紀錄）：wire 一律 1-based，0-based 的
+`NextQuestionTarget.index` 由 mapper 換算，不外洩給模型；`target_ordinal < 1`
+直接拒絕。規則放進介面的一致性，而不是靠 description 講例外。
+被擋下的那份輸出以修好後的 mapper 重放，`index = 2`，落在 0..2 內。
+
+**turn 2／3 仍未以真模型跑過。**
 
 ---
 

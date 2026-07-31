@@ -1,4 +1,9 @@
-"""T2:`TaskAnalysisResult.v1` 契約與 provider-facing schema(研究稿 §12、ADR 0040 §6)。"""
+"""T2:`TaskAnalysisResult` 內部契約(研究稿 §12、ADR 0040 §6)。
+
+**送出去的形狀不在這裡** —— 那是 `wire.py` 的 `task_analysis_result.v2`,
+測試見 `test_job_analysis_wire_schema.py` 與 `test_job_analysis_wire_mapper.py`。
+這一份只守 verifier 與下游吃的形狀。
+"""
 
 from __future__ import annotations
 
@@ -8,13 +13,14 @@ import pytest
 
 from app.job_analysis.domain import ExclusionReason, OpenIssueKind, TaskFields
 from app.job_analysis.llm import (
-    PROVIDER_SCHEMA_PATH,
     TASK_ANALYSIS_INSTRUCTIONS,
+    ExcludePayload,
     IdentityAssessment,
     IdentityRelation,
     NextQuestion,
     NextQuestionTarget,
     NextQuestionTargetKind,
+    OpenIssuePayload,
     ProviderSchemaPortabilityError,
     SignalAnchor,
     SignalDisposition,
@@ -24,10 +30,7 @@ from app.job_analysis.llm import (
     TaskChangePayload,
     WorkSignal,
     assert_portable_strict_output_schema,
-    committed_provider_schema,
-    portable_strict_output_schema,
-    render_provider_schema_file,
-    task_analysis_result_provider_schema,
+    compact_strict_output_schema,
 )
 
 
@@ -35,11 +38,7 @@ from app.job_analysis.llm import (
 
 
 def test_result_top_level_shape_is_frozen():
-    assert list(TaskAnalysisResult.model_fields) == [
-        "work_signals",
-        "next_question",
-        "limitations",
-    ]
+    assert list(TaskAnalysisResult.model_fields) == ["work_signals", "next_question"]
     assert list(WorkSignal.model_fields) == [
         "anchors",
         "identity",
@@ -64,7 +63,7 @@ def test_result_top_level_shape_is_frozen():
         "inherited_support_ordinals",
     ]
     assert list(SignalAnchor.model_fields) == ["turn_ordinal", "quote"]
-    assert list(NextQuestion.model_fields) == ["text", "purpose", "target"]
+    assert list(NextQuestion.model_fields) == ["text", "target"]
 
 
 def test_result_has_no_overall_analysis_decision_field():
@@ -151,7 +150,6 @@ def make_result(**overrides) -> TaskAnalysisResult:
         ),
         "next_question": NextQuestion(
             text="這份週報完成後交給誰?",
-            purpose="釐清產出對象",
             target=NextQuestionTarget(
                 kind=NextQuestionTargetKind.NEW_SIGNAL, index=0
             ),
@@ -224,24 +222,15 @@ def test_payload_slots_encode_the_disposition_union():
 def test_payload_enums_reuse_the_domain_landing_spots():
     """§12.2:`exclude` 落在 `excluded_signals[]`、`open_issue` 落在 `open_issues[]`,
     值域必須是同一組,否則 mapping 時要翻譯就會漏。"""
-    schema = task_analysis_result_provider_schema()
-    assert schema["$defs"]["ExclusionReason"]["enum"] == [
-        member.value for member in ExclusionReason
-    ]
-    assert schema["$defs"]["OpenIssueKind"]["enum"] == [
-        member.value for member in OpenIssueKind
-    ]
+    assert ExcludePayload.model_fields["reason"].annotation is ExclusionReason
+    assert OpenIssuePayload.model_fields["kind"].annotation is OpenIssueKind
 
 
 # ── portable subset lint(ADR 0040 決定 24)─────────────────────────────────
 
 
-def test_generated_provider_schema_is_portable():
-    assert_portable_strict_output_schema(task_analysis_result_provider_schema())
-
-
 def test_projection_drops_local_constraints_and_requires_every_property():
-    projected = portable_strict_output_schema(
+    projected = compact_strict_output_schema(
         {
             "type": "object",
             "properties": {
@@ -326,27 +315,3 @@ def test_lint_reaches_nested_definitions():
     }
     with pytest.raises(ProviderSchemaPortabilityError, match=r"\$defs\.Inner"):
         assert_portable_strict_output_schema(schema)
-
-
-# ── golden(§12.4)──────────────────────────────────────────────────────────
-
-
-def test_committed_provider_schema_matches_the_contract():
-    """送給模型的形狀改變時,diff 必須在 review 裡看得見。
-
-    重新產生:`uv run python -c "from pathlib import Path;
-    from app.job_analysis.llm.provider_schema import PROVIDER_SCHEMA_PATH,
-    render_provider_schema_file;
-    PROVIDER_SCHEMA_PATH.write_text(render_provider_schema_file(), encoding='utf-8',
-    newline='\\n')"`
-    """
-    assert (
-        PROVIDER_SCHEMA_PATH.read_text(encoding="utf-8") == render_provider_schema_file()
-    )
-    assert committed_provider_schema() == task_analysis_result_provider_schema()
-
-
-def test_committed_schema_is_valid_json_and_portable():
-    schema = json.loads(PROVIDER_SCHEMA_PATH.read_text(encoding="utf-8"))
-    assert_portable_strict_output_schema(schema)
-    assert schema["title"] == "TaskAnalysisResult"

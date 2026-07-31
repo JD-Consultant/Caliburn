@@ -1,4 +1,9 @@
-"""`TaskAnalysisResult.v1`:模型的 production output shape(§12.1)。
+"""`TaskAnalysisResult`:一回合分析結果的**內部契約**(§12.1)。
+
+**這不是送出去的形狀。** 模型看到的是 `wire.py` 的 `task_analysis_result.v2`,
+還原由 `wire_to_task_analysis_result()` 負責;分開的理由見
+`docs/specs/2026-07-31-context-engineering-model-facing-contract-research.md`。
+verifier、transition 與下游一律吃這一份,不吃 wire。
 
 兩件事在這裡刻意**不做**:
 
@@ -11,11 +16,13 @@
 
 模型永遠不產生 ID,只用 packet 給的 ordinal 與本次輸出內的位置索引(§12.1)。
 
-**portable subset 的編碼**(ADR 0040 決定 24):payload 在凍結文件裡是「依 disposition
-擇一」的 union,但可攜子集只允許兩支的 nullable union。因此四種 payload 落成三個
-nullable 兄弟欄位(`support_only` 沒有 payload,四者皆 null 即是它),`next_question.target`
-的兩種 kind 同理落成 `ordinal`／`index` 兩個 nullable 欄位。這是同一個形狀的編碼,
-不是新增欄位;「哪一個欄位該非 null」由 verifier 依 `disposition`／`kind` 檢查。
+四種 payload 在凍結文件裡是「依 disposition 擇一」的 union,這裡落成三個 nullable
+兄弟欄位(`support_only` 沒有 payload,三者皆 null 即是它),`next_question.target`
+的兩種 kind 同理落成 `ordinal`／`index`。「哪一個欄位該非 null」由 verifier 依
+`disposition`／`kind` 檢查,不在這裡把不合的組合變成 parse 失敗。
+
+`limitations` 與 `next_question.purpose` 已移除:全 repo 沒有任何消費者,留著只是每回合
+向模型索取一次再丟掉。
 """
 
 from __future__ import annotations
@@ -132,11 +139,9 @@ class NextQuestionTarget(DomainModel):
 
 class NextQuestion(DomainModel):
     text: NonEmptyText
-    purpose: NonEmptyText
     target: NextQuestionTarget | None = None
 
 
 class TaskAnalysisResult(DomainModel):
     work_signals: tuple[WorkSignal, ...] = ()
     next_question: NextQuestion
-    limitations: tuple[NonEmptyText, ...] = ()

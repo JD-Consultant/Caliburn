@@ -260,7 +260,6 @@ def test_the_packet_feeds_the_verifier_with_the_same_ordinals():
         ),
         next_question=NextQuestion(
             text="雙週報交給誰?",
-            purpose="釐清產出對象",
             target=NextQuestionTarget(
                 kind=NextQuestionTargetKind.NEW_SIGNAL, index=0
             ),

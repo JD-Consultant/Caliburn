@@ -13,15 +13,14 @@ from app.job_analysis.application import (
     load_document,
 )
 from app.job_analysis.llm import (
-    IdentityAssessment,
     IdentityRelation,
-    NextQuestion,
-    SignalAnchor,
     SignalDisposition,
-    TaskAnalysisResult,
-    TaskChangeKind,
-    TaskChangePayload,
-    WorkSignal,
+    TaskAnalysisWire,
+    WireAnchor,
+    WireNextQuestion,
+    WireSignal,
+    WireTaskChange,
+    WireTaskFields,
 )
 from app.job_analysis.providers import (
     ProviderFailure,
@@ -38,31 +37,28 @@ def factory(session_factory):
 
 
 def verified_text() -> ProviderText:
-    result = TaskAnalysisResult(
+    result = TaskAnalysisWire(
         work_signals=(
-            WorkSignal(
+            WireSignal(
                 anchors=(
-                    SignalAnchor(
+                    WireAnchor(
                         turn_ordinal=2,
                         quote="我每週會彙整營運週報",
                     ),
                 ),
-                identity=IdentityAssessment(relation=IdentityRelation.NO_MATCH),
+                relation=IdentityRelation.NO_MATCH,
                 disposition=SignalDisposition.TASK_CHANGE,
-                task_change=TaskChangePayload(
-                    change=TaskChangeKind.ADD,
-                    task_fields={
-                        "statement": "每週彙整營運週報",
-                        "action": "彙整",
-                        "object": "營運週報",
-                        "purpose_result": "讓主管掌握營運狀況",
-                    },
+                change=WireTaskChange.ADD,
+                task=WireTaskFields(
+                    statement="每週彙整營運週報",
+                    action="彙整",
+                    object="營運週報",
+                    purpose_result="讓主管掌握營運狀況",
                 ),
             ),
         ),
-        next_question=NextQuestion(
+        next_question=WireNextQuestion(
             text="這份週報主要提供給誰？",
-            purpose="釐清工作產出的使用者",
         ),
     )
     return ProviderText(text=result.model_dump_json())

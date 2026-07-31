@@ -84,7 +84,6 @@ def verified_add_result() -> TaskAnalysisOperationResult:
         ),
         next_question=NextQuestion(
             text="這份週報主要交給誰？",
-            purpose="釐清工作產出的使用者",
         ),
     )
     return TaskAnalysisOperationResult(
@@ -228,7 +227,6 @@ async def test_partial_jd_task_materializes_with_the_same_identity_after_reload(
         ),
         next_question=NextQuestion(
             text="這份週報主要提供給誰？",
-            purpose="釐清工作產出的使用者",
         ),
     )
     operation = TaskAnalysisOperationResult(
@@ -362,7 +360,6 @@ async def test_verified_revise_persists_the_proposal_with_the_completed_turn(
         ),
         next_question=NextQuestion(
             text="你通常在星期幾完成？",
-            purpose="釐清工作頻率",
         ),
     )
     operation_result = TaskAnalysisOperationResult(

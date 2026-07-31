@@ -108,14 +108,25 @@ domain 的 `SplitChildPayload.task_fields` 不變,其餘欄位由 mapper 留 `No
 **新增** `wire_to_task_analysis_result(wire) -> TaskAnalysisResult`(放 `llm/wire.py`)。
 **改** `application/operation.py` 兩行:line 70 的 schema 來源、line 86 的 parse。
 
-mapper 規則,依 `disposition` 驅動:
+mapper 規則,依**各自的中性標記**驅動,**不依 `disposition`**:
 
-| disposition | 產生 | 必須為中性值,否則拒絕 |
-|---|---|---|
-| `task_change` | `TaskChangePayload`(`change != "none"`) | `rejection_code`／`rejection_summary` |
-| `support_only` | 三個 payload 皆 `None` | `change`、`task`、`split_children`、`rejection_*` |
-| `exclude` | `ExcludePayload`(code 須在 `ExclusionReason` 值域) | `change`、`task`、`split_children` |
-| `open_issue` | `OpenIssuePayload`(code 須在 `OpenIssueKind` 值域) | 同上 |
+| 判斷 | 產生 |
+|---|---|
+| `change != "none"` | `TaskChangePayload` |
+| `rejection_code` 落在 `ExclusionReason` 值域 | `ExcludePayload` |
+| `rejection_code` 落在 `OpenIssueKind` 值域 | `OpenIssuePayload` |
+| 以上皆否 | 三個 payload 皆 `None`(即 `support_only`) |
+
+**這一條是本 plan 起草時的修正。** 原本寫「依 `disposition` 驅動」,實作時發現那會讓
+mapper 做語意判斷並靜默「修正」矛盾——模型說 `disposition=exclude` 卻給 open-issue 的
+code 時,依 disposition 會產出 `ExcludePayload`,`PAYLOAD_DOES_NOT_MATCH_DISPOSITION`
+就永遠不會觸發。兩個值域互斥,依值決定落點是純的,而且保住每一條既有 violation。
+
+拒絕的條件收斂成一句:**內容沒有 domain 落點就拒絕**。
+`change` 是 `"none"` 時沒有 `TaskChangePayload`,所以 `task`／`split_children`／
+`withdraw_reason` 帶內容即拒;`rejection_code` 是 `"none"` 時沒有 payload,
+所以 `rejection_summary` 非空即拒。其餘一律放行給 verifier
+(例如 `change=add` 卻帶 `withdraw_reason` → `WITHDRAW_REASON_FORBIDDEN`)。
 
 `identity.target_task_ordinals` 與 `task_change.target_task_ordinals` 由 wire 的**單一**
 `target_task_ordinals` 同時填入 —— verifier 的 `TARGET_ORDINALS_DISAGREE` 因此恆不觸發,
@@ -189,7 +200,7 @@ mapper 規則,依 `disposition` 驅動:
 
 | Task | 狀態 | commit | 備註 |
 |---|---|---|---|
-| T1 | 未開始 | | |
-| T2 | 未開始 | | |
+| T1 | ✅ | `aef0d2f` | union 17→0、properties 54→32、nesting 9→6、wire 6,818→4,084 bytes。byte 預算由 3,000 改成 4,500 並改記為粗略迴歸護欄:實測 4,084,再壓下去只能縮短 property 名稱,與 S5「descriptive, unambiguous」相衝。同時移除已取消的 Probe U |
+| T2 | ✅ | (本 commit) | v2 成為唯一送出去的形狀;v1 provider schema 與 golden 一併移除(已無人送)。mapper 改為值驅動(見上)。`NextQuestion.purpose`、`TaskAnalysisResult.limitations` 移除 |
 | T3 | 未開始 | | |
 | T4 | 未開始 | | 待 owner 放行 US$0.10 |

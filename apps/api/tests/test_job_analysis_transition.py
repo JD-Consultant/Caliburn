@@ -172,7 +172,7 @@ def apply(
     result = TaskAnalysisResult(
         work_signals=signals,
         next_question=next_question
-        or NextQuestion(text="週報交給誰?", purpose="釐清產出對象"),
+        or NextQuestion(text="週報交給誰?"),
     )
     return apply_task_analysis_result(
         state=current, packet=packet, result=result, operation_id=operation_id
@@ -313,7 +313,6 @@ def test_excluding_a_partial_jd_task_creates_a_delta_less_withdraw_proposal():
 def test_asking_the_partial_issue_records_the_consultant_turn_id():
     question = NextQuestion(
         text="這項工作完成後會產出什麼？",
-        purpose="釐清工作產出",
         target=NextQuestionTarget(
             kind=NextQuestionTargetKind.EXISTING_OPEN_ISSUE,
             ordinal=1,

@@ -30,7 +30,8 @@ updated: 2026-07-30
 ## 1. 一句話
 
 員工回一句話 → **assembler** 把現況投影成一份只用 ordinal 說話的 packet → **一次 HTTP** 打
-OpenRouter 拿 `TaskAnalysisResult.v1` → **verifier**(純函式、零 LLM)擋掉所有確定性違規 →
+OpenRouter 拿 `task_analysis_result.v2`(送出去的精簡形狀)→ **mapper** 還原成內部的
+`TaskAnalysisResult` → **verifier**(純函式、零 LLM)擋掉所有確定性違規 →
 **transition** 依 identity gate 決定「直接改 Work Model」還是「建立提案交給員工」→ 產出下一題。
 **模型只提候選,application 是唯一寫入者,Proposal 只 gate Current JD。**
 
@@ -39,7 +40,8 @@ OpenRouter 拿 `TaskAnalysisResult.v1` → **verifier**(純函式、零 LLM)擋�
 | 組件 | 是什麼 | 碼 | 權力 |
 |---|---|---|---|
 | domain | Task／SourceRef／SupportLink／open_issues／excluded_signals／Proposal 的凍結形狀 | `app/job_analysis/domain/` | 純 Pydantic,frozen;**非法狀態無法被表示**;只 import stdlib＋pydantic |
-| llm 契約 | `TaskAnalysisResult.v1` ＋ portable provider schema ＋ Static Instructions | `app/job_analysis/llm/` | 只描述形狀與判準文字;**不做跨欄位驗證** |
+| llm 契約 | **兩份**:內部的 `TaskAnalysisResult`(`result.py`)＋送出去的 `task_analysis_result.v2`(`wire.py`)＋ Static Instructions | `app/job_analysis/llm/` | 只描述形狀與判準文字;**不做跨欄位驗證** |
+| wire mapper | 中性值 → `None` 的純還原 | `llm/wire.py` 的 `wire_to_task_analysis_result()` | **不做語意判斷**;沒有 domain 落點的夾帶內容一律拒絕,不靜默丟棄 |
 | assembler | 現況 → `TaskAnalysisPacket` ＋ 決定性 rendering | `application/context.py` | 純函式;ordinal 的唯一產地 |
 | verifier | §9.5／§12.3 的全部確定性規則 | `application/verifier.py` | 純函式;**只回報違規,不改任何東西** |
 | operation | 組 packet → 呼叫 → parse → verifier | `application/operation.py` | 單一顯式流程;**不是 agent runner**,無 retry |
@@ -61,9 +63,10 @@ OpenRouter 拿 `TaskAnalysisResult.v1` → **verifier**(純函式、零 LLM)擋�
 2. `run_task_analysis_operation(packet=…, adapter=…)`:
    - `render_context_packet(packet)` → 純文字,當成 user message;
    - `TASK_ANALYSIS_INSTRUCTIONS` 當成 system message;
-   - `task_analysis_result_provider_schema()` 當成 `response_format.json_schema.schema`;
+   - `task_analysis_wire_provider_schema()` 當成 `response_format.json_schema.schema`;
    - `adapter.complete(...)` → **一次** `POST https://openrouter.ai/api/v1/chat/completions`;
-   - `TaskAnalysisResult.model_validate_json(text)` → `verify_task_analysis_result(...)`。
+   - `TaskAnalysisWire.model_validate_json(text)` → `wire_to_task_analysis_result(...)`
+     → `verify_task_analysis_result(...)`。
 3. `apply_task_analysis_result(state=…, packet=…, result=…, operation_id=…)` → `TransitionResult`。
 
 員工直接編輯走另一條短路徑：`add_jd_task`／`edit_jd_task`／`delete_jd_task`／
@@ -81,7 +84,7 @@ snapshot revalidation 語意。
 RFC 9457 `application/problem+json`；path-scoped handler 會把舊 routes 的既有錯誤 body 原樣保留。
 Current JD Task 的 POST／PUT／DELETE 與排序 PUT 都要求 `Idempotency-Key`，原樣映射成
 Journal `entry_id`；沒有 middleware、隱藏 retry 或第二套寫入邏輯。員工清空 optional text 時，
-wire mapper 先 trim 並轉成 `null`；必填 statement 變空則回 `invalid-request`，不讓半成品進 domain。
+HTTP DTO mapper（與 LLM 的 `wire.py` 無關）先 trim 並轉成 `null`；必填 statement 變空則回 `invalid-request`，不讓半成品進 domain。
 Web 的 `/workspace` 用 `DocumentLibrary` 列出／建立／改名；`/workspace/[document_id]` 用
 `ConsultationWorkspace` 同頁組合 `ConsultationPanel`、Proposal cards 與 `TaskEditor`，一次只開一份文件。
 顧問讀寫只走 `GET …/consultation`、`POST …/turns` 與 `POST …/proposals/{id}/decisions`；成功回應同步更新
@@ -136,7 +139,7 @@ Consultation turn 不再重複呼叫它。
 |---|---|---|
 | `verified` | 通過 verifier | 交給 transition |
 | `rejected` | parse 得出來但違反確定性規則 | 不得套用;`report.violations` 有逐條理由 |
-| `invalid_output` | 不是合法的 `TaskAnalysisResult.v1` JSON | 重組 context 再來,不是 retry 同一份 |
+| `invalid_output` | 不是合法的 `task_analysis_result.v2` JSON,或還原不成 domain 契約(夾帶) | 重組 context 再來,不是 retry 同一份 |
 | `refused` | 模型拒答 | **不是錯誤,也不可重試** |
 | `failed` | timeout／連線／非 200／provider error／截斷／response model 不符 | 依 `detail` 的 kind 決定；`truncated` 要調 `max_tokens`，`model_mismatch` 不得拿來判斷產品品質 |
 

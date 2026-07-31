@@ -18,15 +18,14 @@ import pytest
 from app.adapters.job_analysis_postgres import SqlAlchemyJobAnalysisUnitOfWork
 from app.job_analysis.application import load_document, submit_employee_turn
 from app.job_analysis.llm import (
-    IdentityAssessment,
     IdentityRelation,
-    NextQuestion,
-    SignalAnchor,
     SignalDisposition,
-    TaskAnalysisResult,
-    TaskChangeKind,
-    TaskChangePayload,
-    WorkSignal,
+    TaskAnalysisWire,
+    WireAnchor,
+    WireNextQuestion,
+    WireSignal,
+    WireTaskChange,
+    WireTaskFields,
 )
 from app.job_analysis.providers import (
     OpenRouterAdapter,
@@ -121,25 +120,20 @@ def chat_response(
 def add_task_result(
     *, turn_ordinal: int, quote: str, statement: str, action: str, object_: str, question: str
 ) -> str:
-    result = TaskAnalysisResult(
+    return TaskAnalysisWire(
         work_signals=(
-            WorkSignal(
-                anchors=(SignalAnchor(turn_ordinal=turn_ordinal, quote=quote),),
-                identity=IdentityAssessment(relation=IdentityRelation.NO_MATCH),
+            WireSignal(
+                anchors=(WireAnchor(turn_ordinal=turn_ordinal, quote=quote),),
+                relation=IdentityRelation.NO_MATCH,
                 disposition=SignalDisposition.TASK_CHANGE,
-                task_change=TaskChangePayload(
-                    change=TaskChangeKind.ADD,
-                    task_fields={
-                        "statement": statement,
-                        "action": action,
-                        "object": object_,
-                    },
+                change=WireTaskChange.ADD,
+                task=WireTaskFields(
+                    statement=statement, action=action, object=object_
                 ),
             ),
         ),
-        next_question=NextQuestion(text=question, purpose="釐清工作邊界"),
-    )
-    return result.model_dump_json()
+        next_question=WireNextQuestion(text=question),
+    ).model_dump_json()
 
 
 def scripted_three_turns() -> list[TransportResponse]:

@@ -14,15 +14,14 @@ from app.api import deps
 from app.job_analysis.application import DocumentRecord, DocumentSummary
 from app.job_analysis.domain import CurrentWorkModel, JdTask, TaskFields
 from app.job_analysis.llm import (
-    IdentityAssessment,
     IdentityRelation,
-    NextQuestion,
-    SignalAnchor,
     SignalDisposition,
-    TaskAnalysisResult,
-    TaskChangeKind,
-    TaskChangePayload,
-    WorkSignal,
+    TaskAnalysisWire,
+    WireAnchor,
+    WireNextQuestion,
+    WireSignal,
+    WireTaskChange,
+    WireTaskFields,
 )
 from app.job_analysis.providers import (
     OpenRouterAdapter,
@@ -181,33 +180,29 @@ class _ScriptedTransport:
         self.calls += 1
         if self.fail:
             return TransportResponse(status_code=503, text="anthropic unavailable")
-        result = TaskAnalysisResult(
+        # 劇本是**模型送出來的** wire 形狀,不是 domain 形狀;否則這條路徑會跳過 mapper。
+        result = TaskAnalysisWire(
             work_signals=(
-                WorkSignal(
+                WireSignal(
                     anchors=(
-                        SignalAnchor(
+                        WireAnchor(
                             turn_ordinal=2,
                             quote="我每週彙整營運週報",
                         ),
                     ),
-                    identity=IdentityAssessment(
-                        relation=IdentityRelation.NO_MATCH
-                    ),
+                    relation=IdentityRelation.NO_MATCH,
                     disposition=SignalDisposition.TASK_CHANGE,
-                    task_change=TaskChangePayload(
-                        change=TaskChangeKind.ADD,
-                        task_fields=TaskFields(
-                            statement="每週彙整營運週報",
-                            action="彙整",
-                            object="營運週報",
-                            purpose_result="讓主管掌握營運狀況",
-                        ),
+                    change=WireTaskChange.ADD,
+                    task=WireTaskFields(
+                        statement="每週彙整營運週報",
+                        action="彙整",
+                        object="營運週報",
+                        purpose_result="讓主管掌握營運狀況",
                     ),
                 ),
             ),
-            next_question=NextQuestion(
+            next_question=WireNextQuestion(
                 text="這份週報通常提供給誰？",
-                purpose="釐清產出的主要使用者",
             ),
         )
         return TransportResponse(

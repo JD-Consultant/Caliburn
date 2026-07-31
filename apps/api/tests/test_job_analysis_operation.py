@@ -30,17 +30,16 @@ from app.job_analysis.domain import (
 )
 from app.job_analysis.llm import (
     TASK_ANALYSIS_INSTRUCTIONS,
-    TASK_ANALYSIS_RESULT_SCHEMA_NAME,
-    IdentityAssessment,
+    TASK_ANALYSIS_WIRE_SCHEMA_NAME,
     IdentityRelation,
-    NextQuestion,
-    SignalAnchor,
     SignalDisposition,
-    TaskAnalysisResult,
-    TaskChangeKind,
-    TaskChangePayload,
-    WorkSignal,
-    task_analysis_result_provider_schema,
+    TaskAnalysisWire,
+    WireAnchor,
+    WireNextQuestion,
+    WireSignal,
+    WireTaskChange,
+    WireTaskFields,
+    task_analysis_wire_provider_schema,
 )
 from app.job_analysis.providers import (
     CHAT_COMPLETIONS_URL,
@@ -135,21 +134,21 @@ def test_prompt_keeps_the_first_version_consultant_loop_flexible():
 
 
 def valid_result_json(quote: str = EMPLOYEE_TEXT) -> str:
-    return TaskAnalysisResult(
+    """模型送回來的是 wire 形狀,不是 domain 形狀。"""
+
+    return TaskAnalysisWire(
         work_signals=(
-            WorkSignal(
-                anchors=(SignalAnchor(turn_ordinal=2, quote=quote),),
-                identity=IdentityAssessment(relation=IdentityRelation.NO_MATCH),
+            WireSignal(
+                anchors=(WireAnchor(turn_ordinal=2, quote=quote),),
+                relation=IdentityRelation.NO_MATCH,
                 disposition=SignalDisposition.TASK_CHANGE,
-                task_change=TaskChangePayload(
-                    change=TaskChangeKind.ADD,
-                    task_fields=TaskFields(
-                        statement="每週追蹤缺料", action="追蹤", object="缺料狀況"
-                    ),
+                change=WireTaskChange.ADD,
+                task=WireTaskFields(
+                    statement="每週追蹤缺料", action="追蹤", object="缺料狀況"
                 ),
             ),
         ),
-        next_question=NextQuestion(text="週報交給誰?", purpose="釐清產出對象"),
+        next_question=WireNextQuestion(text="週報交給誰?"),
     ).model_dump_json()
 
 
@@ -188,9 +187,9 @@ async def test_a_verified_round_makes_exactly_one_call_with_the_pinned_route():
     assert body["response_format"] == {
         "type": "json_schema",
         "json_schema": {
-            "name": TASK_ANALYSIS_RESULT_SCHEMA_NAME,
+            "name": TASK_ANALYSIS_WIRE_SCHEMA_NAME,
             "strict": True,
-            "schema": task_analysis_result_provider_schema(),
+            "schema": task_analysis_wire_provider_schema(),
         },
     }
 
@@ -257,7 +256,7 @@ async def test_output_that_is_not_the_frozen_contract_is_invalid_output():
     transport = RecordingTransport(chat_response('{"work_signals": []}'))
     result, _ = await run(transport)
     assert result.outcome is OperationOutcome.INVALID_OUTPUT
-    assert "TaskAnalysisResult.v1" in result.detail
+    assert TASK_ANALYSIS_WIRE_SCHEMA_NAME in result.detail
     assert result.result is None
     assert len(transport.calls) == 1
 
@@ -288,7 +287,7 @@ async def test_a_refusal_is_not_a_failure():
 async def test_partial_content_behind_finish_reason_error_never_reaches_the_verifier():
     """非串流的 provider 錯誤可能維持 HTTP 200 並附上半截輸出。
 
-    這裡刻意讓 partial content 是**合法**的 TaskAnalysisResult:錯誤若晚一步才看,
+    這裡刻意讓 partial content 是**合法**的 wire 輸出:錯誤若晚一步才看,
     它就會被當成一輪成功的分析寫進 Work Model。
     """
     transport = RecordingTransport(

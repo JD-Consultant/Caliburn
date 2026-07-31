@@ -8,6 +8,7 @@
 from __future__ import annotations
 
 import json
+import re
 
 import pytest
 
@@ -26,6 +27,7 @@ from app.job_analysis.llm.portable_schema import (
 )
 from app.job_analysis.llm.wire import (
     NEUTRAL,
+    TASK_ANALYSIS_WIRE_SCHEMA_NAME,
     WIRE_SCHEMA_PATH,
     TaskAnalysisWire,
     WireNextQuestion,
@@ -260,6 +262,18 @@ def test_wire_schema_is_portable_and_strict_shaped():
     for obj in objects:
         assert obj["additionalProperties"] is False
         assert obj["required"] == list(obj["properties"])
+
+
+def test_wire_schema_name_survives_every_provider_naming_rule():
+    """名稱只能用 `[A-Za-z0-9_-]`,不是風格是 provider 硬限制。
+
+    OpenAI 對 `text.format.name` 就是這條 regex;帶點的 `task_analysis_result.v2`
+    在 2026-07-31 的 `openai/gpt-5.6-luna-pro` 上生成任何 token 之前就被 HTTP 400 擋掉。
+    Journal 的 payload schema id 是另一個 namespace,那邊的點狀慣例不適用於這裡——
+    把點加回來等於把契約鎖回單一 vendor。golden 檔名由這個常數推導,一起跟著走。
+    """
+    assert re.fullmatch(r"[A-Za-z0-9_-]+", TASK_ANALYSIS_WIRE_SCHEMA_NAME)
+    assert WIRE_SCHEMA_PATH.stem == TASK_ANALYSIS_WIRE_SCHEMA_NAME
 
 
 # ── 形狀凍結 ───────────────────────────────────────────────────────────────

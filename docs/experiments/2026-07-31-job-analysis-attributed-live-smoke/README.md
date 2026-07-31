@@ -1,11 +1,65 @@
 # Job Analysis attributed live smoke：執行結果
 
 日期：2026-07-31
-狀態：**turn 1 停線；1 次 generation call、US$0 支出、無 retry**
+狀態：**run 1 於 turn 1 停線（400，US$0）；run 2 以精簡 wire 契約重跑，turn 1 通過（US$0.058195）**
 計畫：[2026-07-31 attributed live smoke plan](../../plans/2026-07-31-job-analysis-attributed-live-smoke-plan.md)
 研究：[OpenRouter 歸因與最小 live smoke](../../specs/2026-07-31-job-analysis-openrouter-attribution-and-live-smoke-research.md)
 
-## 1. 結論
+## 0. Run 2（2026-07-31 12:09 UTC）：wire 契約修正後，turn 1 通過
+
+`compiled grammar is too large` 已解除。以下三節（§1–§5）保留 run 1 的原始紀錄，**不修改**。
+
+| 項目 | 值 |
+|---|---|
+| commit | `97bca87`（`dirty: false`） |
+| 指令 | `uv run python scripts/job_analysis_live_smoke.py --max-generation-calls 1 --budget-usd 0.20` |
+| run id | `20260731T120931Z` |
+| generation calls | **1**（本次授權上限 1） |
+| retry | **0** |
+| 實際支出 | **US$0.058195**（prompt 5,399 tok = US$0.026995；completion 1,248 tok 含 155 reasoning = US$0.0312） |
+| HTTP | 200 |
+| response id | `gen-1785499775-Vn5OY2FTlvgOKuKPDxwn` |
+| schema | `task_analysis_result.v2`，`strict: true`，`sha256:0cbc27a5fc430357…`，**4,084 bytes** |
+| prompt hash | `sha256:a7866627139d8107…`（5,090 bytes） |
+| turn outcome | **committed**（verifier 通過、transition 套用、authority_generation 1） |
+| 建立的文件 | `33a963c1-5d4a-4507-ba65-9b3c38f71ea2`（留在本機 dev DB） |
+| raw capture | `output/job-analysis-live-smoke/20260731T120931Z/`（gitignored） |
+
+`stopped_reason` 是 `turn 2 was not sent: already used 1 of 1 generation calls` —— 這是**預期的**，
+本次授權只買一次呼叫來驗證 grammar，不是失敗。
+
+### Route 歸因
+
+`strategy: direct`、`attempt: 1`、`provider: Anthropic`、pipeline 空、`region: TPE`、
+`endpoints.total: 7` 且 `available` 恰好一個 `selected: true`。
+
+`quality_eligible = false`，**唯一一項 limitation**：
+
+> `selected model did not match the preflight catalog endpoint`
+
+catalog 報 `anthropic/claude-opus-5`，router 實際選 `anthropic/claude-opus-5-20260723`
+（alias 背後的日期快照）。這是**已知的 fail-open 降級，不是路由問題**——路由本身完全乾淨。
+判準刻意用精確比對，**本檔不放寬它**；要不要讓判準接受「alias → 其日期快照」是獨立決策。
+
+### 這一輪模型實際產出了什麼
+
+**這不是品質 gate**（單次、合成場景、無 rubric），只記錄觀測到的事實：
+
+- 2 個 Task：`每週彙整服務錯誤與效能資料並產出營運週報…`（enablers: Python、Excel）、
+  `維護門市資料匯入程式，確保每日門市資料準時進入系統`（enabler: Java）。
+- 1 個 open issue（`責任邊界不明`）：員工說「版本上線時，我會協助正式環境部署」，
+  模型判定無法分辨是本人責任的獨立工作或他人工作的支援步驟，逐字引用該句並追問。
+- 0 個 exclude。next_question 指向該 open issue，問題具體到可以接短答。
+- Enabler 硬規則有作用：Python／Excel／Java 都進了 `enablers`，沒有任何一個被升格成 Task。
+
+### 仍未被本次觀測到的
+
+三回合場景只跑了第一回合，因此**跨回合記憶、更正／撤回、merge／split、Proposal 決策**
+都還沒有真模型的觀測。要驗證這些需要另外的授權。
+
+---
+
+## 1. 結論（run 1，2026-07-31 08:35 UTC）
 
 三回合場景**沒有跑完**。第一回合的請求被 Anthropic 以 HTTP 400 拒絕，原因不是模型輸出不好，
 而是**本產品的 strict output schema 編譯出的 grammar 過大**：
@@ -91,7 +145,7 @@ selected endpoint。這是**正確的 fail-closed**：請求被拒時本來就�
 
 依計畫與 owner 指示，**本輪不修、不調 prompt、不重跑**。
 
-## 6. 最小後續工作（未執行，需先決策）
+## 6. 最小後續工作（run 1 當時的規劃；1 與 2 已於 run 2 完成，見 §0）
 
 1. **確認限制的形狀。** 是 Anthropic 近期收緊 grammar 編譯上限，還是本 schema 一直就超過？
    查官方 structured output 限制，並量出目前 schema 觸發上限的是哪幾段（巢狀 union、

@@ -196,7 +196,10 @@ code 時,依 disposition 會產出 `ExcludePayload`,`PAYLOAD_DOES_NOT_MATCH_DISP
   `docs/experiments/2026-07-31-job-analysis-attributed-live-smoke/`
 - 必須留存:HTTP status、upstream error／request ID、route attribution、usage／cost、
   `generation calls`、`retries`、schema hash
-- 通過後才續跑原本的三回合 smoke(仍在原 US$0.75 授權的剩餘額度內)
+- 通過後才續跑原本的三回合 smoke
+
+**turn 2／3 尚未執行。** 原 US$0.75 授權已於 run 1 用掉,本次是另一次單獨授權;
+續跑三回合需要新的額度放行。
 
 **T1–T3 全部離線、零成本。T4 需要 owner 放行金額。**
 
@@ -209,4 +212,4 @@ code 時,依 disposition 會產出 `ExcludePayload`,`PAYLOAD_DOES_NOT_MATCH_DISP
 | T1 | ✅ | `aef0d2f` | union 17→0、properties 54→32、nesting 9→6、wire 6,818→4,084 bytes。byte 預算由 3,000 改成 4,500 並改記為粗略迴歸護欄:實測 4,084,再壓下去只能縮短 property 名稱,與 S5「descriptive, unambiguous」相衝。同時移除已取消的 Probe U |
 | T2 | ✅ | (本 commit) | v2 成為唯一送出去的形狀;v1 provider schema 與 golden 一併移除(已無人送)。mapper 改為值驅動(見上)。`NextQuestion.purpose`、`TaskAnalysisResult.limitations` 移除 |
 | T3 | ✅ | (本 commit) | 6,203 → 5,090 bytes(−18%);兩段機械規則 2,336 → 1,223(−48%),「輸出規則」整段消失。五段判準逐段位元組數不變,由 `test_job_analysis_prompt.py` 逐段守住 |
-| T4 | 未開始 | | 待 owner 放行 US$0.10 |
+| T4 | ✅ | 無碼變更 | run `20260731T120931Z`：HTTP 200、turn 1 `committed`、1 call、0 retry、**US$0.058195**。上限經 owner 同意由 US$0.10 上調至 US$0.20——保守 reserve 是 US$0.155(位元組當 input token ＋ 全額 `max_tokens`),US$0.10 會在 HTTP 之前擋下。實際落在估計的 US$0.06。結果見 [experiments](../experiments/2026-07-31-job-analysis-attributed-live-smoke/README.md) §0 |

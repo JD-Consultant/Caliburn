@@ -1,8 +1,9 @@
 # Job Analysis attributed live smoke：執行結果
 
 日期：2026-07-31
-狀態：**run 1 停線於 400（US$0）；run 2 turn 1 通過（US$0.058195）；run 3 停線於 verifier，
-找出 wire 契約的 1-based／0-based 缺陷（US$0.064145）。三回合場景仍未跑完。**
+狀態：**四次 run 累計 US$0.251，找出三個契約層缺陷（grammar 過大／ordinal 基準不一致／
+6 條規則模型無從得知），全部已修。turn 1 穩定通過；turn 2 停在 open issue 關閉路徑，
+三回合場景仍未跑完。**
 計畫：[2026-07-31 attributed live smoke plan](../../plans/2026-07-31-job-analysis-attributed-live-smoke-plan.md)
 研究：[OpenRouter 歸因與最小 live smoke](../../specs/2026-07-31-job-analysis-openrouter-attribution-and-live-smoke-research.md)
 
@@ -96,6 +97,35 @@ description 卻要求 0-based。
 被擋下的那份輸出以修好後的 mapper 重放，`index = 2`，落在 0..2 內。
 
 **turn 2／3 仍未以真模型跑過。**
+
+---
+
+## 0c. Run 4（2026-07-31 12:33 UTC）：turn 1 通過，turn 2 停線
+
+| 項目 | 值 |
+|---|---|
+| commit | `3e46836` |
+| run id | `20260731T123344Z` |
+| generation calls | **2**（上限 3；turn 3 未送出） |
+| 實際支出 | **US$0.128910** |
+| turn outcomes | `committed`, `failed` |
+
+turn 1 的 1-based 修正有效，穩定通過。turn 2（員工更正「正式環境部署不是我負責」）被
+`RESOLUTION_OPEN_ISSUE_NOT_RECONCILABLE` 擋下。
+
+**模型的判斷是對的，契約不允許。** 它把 turn 1 自己提的 `責任邊界不明` open issue 標成
+已解決（`resolves_open_issue_ordinal: 1`）＋ `exclude / 他人工作`。但依 ADR 0044，
+`resolves_open_issue_ordinal` **只服務 JD-only reconciliation issue**；packet 用
+「`Current JD Task:`」那一行區分兩者，先前**沒有任何地方說明那條線的意義**。
+
+已補：該欄位的 description 明說只能指帶那一行的 issue，其餘 issue 不會因為回答而關閉。
+
+### 未決的設計缺口（需 ADR）
+
+**模型自己提的 open issue 沒有任何關閉路徑。** `transition.py` 只在 reconciliation 路徑
+`remove(issue)`；`next_question` 指向它只更新 `last_asked_turn_id`。多輪訪談下 open issue
+單調累積，而 Static Instructions 要求優先處理「仍可取得答案的 open issue」——有重問迴圈的風險。
+本次觀測到的情境正是如此：員工已經回答了那個 issue，它仍會留在 Current State。
 
 ---
 

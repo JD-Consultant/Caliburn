@@ -184,6 +184,14 @@ def visible_to_the_model() -> str:
             "確認是新工作用 no_match ＋ add",
             id="resolution-mapping",
         ),
+        # 這一條真模型撞過(run 20260731T123344Z turn 2):它想關掉自己上一輪提的
+        # open issue,但這個欄位只為 JD-only reconciliation issue 而設(ADR 0044)。
+        # packet 用「Current JD Task」那一行區分兩者,但先前沒有任何地方說明那條線的意義。
+        pytest.param(
+            ViolationCode.RESOLUTION_OPEN_ISSUE_NOT_RECONCILABLE,
+            "只能指 packet 中帶「Current JD Task」那一行的 open issue",
+            id="reconciliation-only",
+        ),
         pytest.param(
             ViolationCode.TARGET_ORDINAL_RETIRED,
             "只能指 current_authorities.tasks 的編號",

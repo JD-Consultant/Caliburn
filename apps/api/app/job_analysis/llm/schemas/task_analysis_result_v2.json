@@ -1,73 +1,239 @@
 {
-  "$defs": {
-    "EnablerKind": {
-      "enum": [
-        "tool_system",
-        "method",
-        "knowledge",
-        "skill",
-        "other"
-      ],
-      "type": "string"
-    },
-    "IdentityRelation": {
-      "enum": [
-        "no_match",
-        "duplicate",
-        "overlap",
-        "uncertain"
-      ],
-      "type": "string"
-    },
-    "SignalDisposition": {
-      "enum": [
-        "task_change",
-        "support_only",
-        "exclude",
-        "open_issue"
-      ],
-      "type": "string"
-    },
-    "WireAnchor": {
-      "additionalProperties": false,
-      "properties": {
-        "turn_ordinal": {
-          "type": "integer"
+  "additionalProperties": false,
+  "properties": {
+    "work_signals": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "anchors": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "turn_ordinal": {
+                  "type": "integer"
+                },
+                "quote": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "turn_ordinal",
+                "quote"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "relation": {
+            "enum": [
+              "no_match",
+              "duplicate",
+              "overlap",
+              "uncertain"
+            ],
+            "type": "string",
+            "description": "必須與 change 一致:add→no_match、revise／merge→overlap、純補依據(change 與 rejection 皆 none)→duplicate;withdraw／split／exclude／open_issue 不限"
+          },
+          "target_task_ordinals": {
+            "description": "identity 與變更共用同一批,只能指 current_authorities.tasks 的編號。數量:add 0 個、revise／withdraw／split 各 1 個、merge 至少 2 個",
+            "items": {
+              "type": "integer"
+            },
+            "type": "array"
+          },
+          "supersedes": {
+            "description": "只在本回合更正了某條既有依據時填;該依據要屬於本訊號的 target Task 且目前標示為有效,而且 anchors 必須包含目前這一輪的員工回合",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "task_ordinal": {
+                  "type": "integer"
+                },
+                "support_ordinal": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "task_ordinal",
+                "support_ordinal"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "resolves_open_issue_ordinal": {
+            "description": "0 表示不填。指本輪回答已經解掉、可以關閉的 open issue,anchors 必須含這一輪的員工回合。帶「Current JD Task」那一行的 issue 另有規則:只能用 no_match ＋ add 或 exclude 關閉。不確定性仍在就別關,改輸出新的 open_issue",
+            "type": "integer"
+          },
+          "disposition": {
+            "enum": [
+              "task_change",
+              "support_only",
+              "exclude",
+              "open_issue"
+            ],
+            "type": "string"
+          },
+          "change": {
+            "enum": [
+              "none",
+              "add",
+              "revise",
+              "withdraw",
+              "merge",
+              "split"
+            ],
+            "type": "string",
+            "description": "\"none\" 表示這個訊號不是 Task 變更"
+          },
+          "withdraw_reason": {
+            "enum": [
+              "none",
+              "other_person",
+              "past_work",
+              "one_off",
+              "enabler_or_step",
+              "employee_denied"
+            ],
+            "type": "string",
+            "description": "僅 change=withdraw 時填,否則 \"none\""
+          },
+          "task": {
+            "additionalProperties": false,
+            "properties": {
+              "statement": {
+                "type": "string"
+              },
+              "action": {
+                "type": "string"
+              },
+              "object": {
+                "type": "string"
+              },
+              "purpose_result": {
+                "description": "說不出來就填 \"\"",
+                "type": "string"
+              },
+              "enablers": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "kind": {
+                      "enum": [
+                        "tool_system",
+                        "method",
+                        "knowledge",
+                        "skill",
+                        "other"
+                      ],
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "name"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "statement",
+              "action",
+              "object",
+              "purpose_result",
+              "enablers"
+            ],
+            "type": "object",
+            "description": "add／revise／merge 必填;withdraw 不得填;其餘各欄填 \"\""
+          },
+          "split_children": {
+            "description": "僅 change=split 時填,至少兩個;inherited_support_ordinals 只能用母 Task 標示為有效的 support 編號",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "statement": {
+                  "type": "string"
+                },
+                "action": {
+                  "type": "string"
+                },
+                "object": {
+                  "type": "string"
+                },
+                "inherited_support_ordinals": {
+                  "items": {
+                    "type": "integer"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": [
+                "statement",
+                "action",
+                "object",
+                "inherited_support_ordinals"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "rejection_code": {
+            "enum": [
+              "none",
+              "他人工作",
+              "過去工作",
+              "一次性支援",
+              "工具或步驟",
+              "員工否認",
+              "責任邊界不明",
+              "證據不足",
+              "矛盾未解",
+              "task_boundary_uncertain"
+            ],
+            "type": "string",
+            "description": "disposition 為 exclude 或 open_issue 時填對應值,否則 \"none\""
+          },
+          "rejection_summary": {
+            "description": "搭配 rejection_code;否則 \"\"",
+            "type": "string"
+          }
         },
-        "quote": {
-          "type": "string"
-        }
+        "required": [
+          "anchors",
+          "relation",
+          "target_task_ordinals",
+          "supersedes",
+          "resolves_open_issue_ordinal",
+          "disposition",
+          "change",
+          "withdraw_reason",
+          "task",
+          "split_children",
+          "rejection_code",
+          "rejection_summary"
+        ],
+        "type": "object"
       },
-      "required": [
-        "turn_ordinal",
-        "quote"
-      ],
-      "type": "object"
+      "type": "array"
     },
-    "WireEnabler": {
-      "additionalProperties": false,
-      "properties": {
-        "kind": {
-          "$ref": "#/$defs/EnablerKind"
-        },
-        "name": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "kind",
-        "name"
-      ],
-      "type": "object"
-    },
-    "WireNextQuestion": {
+    "next_question": {
       "additionalProperties": false,
       "properties": {
         "text": {
           "type": "string"
         },
         "target_kind": {
-          "$ref": "#/$defs/WireNextQuestionTargetKind",
+          "enum": [
+            "none",
+            "existing_open_issue",
+            "new_signal"
+          ],
+          "type": "string",
           "description": "\"none\" 表示不指向任何東西"
         },
         "target_ordinal": {
@@ -81,216 +247,6 @@
         "target_ordinal"
       ],
       "type": "object"
-    },
-    "WireNextQuestionTargetKind": {
-      "enum": [
-        "none",
-        "existing_open_issue",
-        "new_signal"
-      ],
-      "type": "string"
-    },
-    "WireRejectionCode": {
-      "enum": [
-        "none",
-        "他人工作",
-        "過去工作",
-        "一次性支援",
-        "工具或步驟",
-        "員工否認",
-        "責任邊界不明",
-        "證據不足",
-        "矛盾未解",
-        "task_boundary_uncertain"
-      ],
-      "type": "string"
-    },
-    "WireSignal": {
-      "additionalProperties": false,
-      "properties": {
-        "anchors": {
-          "items": {
-            "$ref": "#/$defs/WireAnchor"
-          },
-          "type": "array"
-        },
-        "relation": {
-          "$ref": "#/$defs/IdentityRelation",
-          "description": "必須與 change 一致:add→no_match、revise／merge→overlap、純補依據(change 與 rejection 皆 none)→duplicate;withdraw／split／exclude／open_issue 不限"
-        },
-        "target_task_ordinals": {
-          "description": "identity 與變更共用同一批,只能指 current_authorities.tasks 的編號。數量:add 0 個、revise／withdraw／split 各 1 個、merge 至少 2 個",
-          "items": {
-            "type": "integer"
-          },
-          "type": "array"
-        },
-        "supersedes": {
-          "description": "只在本回合更正了某條既有依據時填;該依據要屬於本訊號的 target Task 且目前標示為有效,而且 anchors 必須包含目前這一輪的員工回合",
-          "items": {
-            "$ref": "#/$defs/WireSupersession"
-          },
-          "type": "array"
-        },
-        "resolves_open_issue_ordinal": {
-          "description": "0 表示不填。指本輪回答已經解掉、可以關閉的 open issue,anchors 必須含這一輪的員工回合。帶「Current JD Task」那一行的 issue 另有規則:只能用 no_match ＋ add 或 exclude 關閉。不確定性仍在就別關,改輸出新的 open_issue",
-          "type": "integer"
-        },
-        "disposition": {
-          "$ref": "#/$defs/SignalDisposition"
-        },
-        "change": {
-          "$ref": "#/$defs/WireTaskChange",
-          "description": "\"none\" 表示這個訊號不是 Task 變更"
-        },
-        "withdraw_reason": {
-          "$ref": "#/$defs/WireWithdrawReason",
-          "description": "僅 change=withdraw 時填,否則 \"none\""
-        },
-        "task": {
-          "$ref": "#/$defs/WireTaskFields",
-          "description": "add／revise／merge 必填;withdraw 不得填;其餘各欄填 \"\""
-        },
-        "split_children": {
-          "description": "僅 change=split 時填,至少兩個;inherited_support_ordinals 只能用母 Task 標示為有效的 support 編號",
-          "items": {
-            "$ref": "#/$defs/WireSplitChild"
-          },
-          "type": "array"
-        },
-        "rejection_code": {
-          "$ref": "#/$defs/WireRejectionCode",
-          "description": "disposition 為 exclude 或 open_issue 時填對應值,否則 \"none\""
-        },
-        "rejection_summary": {
-          "description": "搭配 rejection_code;否則 \"\"",
-          "type": "string"
-        }
-      },
-      "required": [
-        "anchors",
-        "relation",
-        "target_task_ordinals",
-        "supersedes",
-        "resolves_open_issue_ordinal",
-        "disposition",
-        "change",
-        "withdraw_reason",
-        "task",
-        "split_children",
-        "rejection_code",
-        "rejection_summary"
-      ],
-      "type": "object"
-    },
-    "WireSplitChild": {
-      "additionalProperties": false,
-      "properties": {
-        "statement": {
-          "type": "string"
-        },
-        "action": {
-          "type": "string"
-        },
-        "object": {
-          "type": "string"
-        },
-        "inherited_support_ordinals": {
-          "items": {
-            "type": "integer"
-          },
-          "type": "array"
-        }
-      },
-      "required": [
-        "statement",
-        "action",
-        "object",
-        "inherited_support_ordinals"
-      ],
-      "type": "object"
-    },
-    "WireSupersession": {
-      "additionalProperties": false,
-      "properties": {
-        "task_ordinal": {
-          "type": "integer"
-        },
-        "support_ordinal": {
-          "type": "integer"
-        }
-      },
-      "required": [
-        "task_ordinal",
-        "support_ordinal"
-      ],
-      "type": "object"
-    },
-    "WireTaskChange": {
-      "enum": [
-        "none",
-        "add",
-        "revise",
-        "withdraw",
-        "merge",
-        "split"
-      ],
-      "type": "string"
-    },
-    "WireTaskFields": {
-      "additionalProperties": false,
-      "properties": {
-        "statement": {
-          "type": "string"
-        },
-        "action": {
-          "type": "string"
-        },
-        "object": {
-          "type": "string"
-        },
-        "purpose_result": {
-          "description": "說不出來就填 \"\"",
-          "type": "string"
-        },
-        "enablers": {
-          "items": {
-            "$ref": "#/$defs/WireEnabler"
-          },
-          "type": "array"
-        }
-      },
-      "required": [
-        "statement",
-        "action",
-        "object",
-        "purpose_result",
-        "enablers"
-      ],
-      "type": "object"
-    },
-    "WireWithdrawReason": {
-      "enum": [
-        "none",
-        "other_person",
-        "past_work",
-        "one_off",
-        "enabler_or_step",
-        "employee_denied"
-      ],
-      "type": "string"
-    }
-  },
-  "additionalProperties": false,
-  "properties": {
-    "work_signals": {
-      "items": {
-        "$ref": "#/$defs/WireSignal"
-      },
-      "type": "array"
-    },
-    "next_question": {
-      "$ref": "#/$defs/WireNextQuestion"
     }
   },
   "required": [

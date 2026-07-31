@@ -264,6 +264,31 @@ def test_wire_schema_is_portable_and_strict_shaped():
         assert obj["required"] == list(obj["properties"])
 
 
+def test_wire_schema_inlines_every_ref():
+    """送出去的 schema 不得有 `$ref`。
+
+    OpenAI strict 拒絕帶兄弟 keyword 的 `$ref`(2026-07-31 `openai/gpt-5.6-luna-pro`
+    回 `$ref cannot have keywords {'description'}`),而**我們的 `description` 就是給模型的
+    規則本體**,不能為了留 `$ref` 把它拿掉。這裡每個 `$def` 都只被引用一次,展開沒有重用
+    損失:schema 反而從 4,970 縮到 4,218 bytes,離 Anthropic 的 grammar 上限更遠。
+    """
+    schema = wire_schema()
+    found: list[str] = []
+
+    def walk(node, path="#") -> None:
+        if isinstance(node, dict):
+            for key, value in node.items():
+                if key in ("$ref", "$defs", "definitions"):
+                    found.append(f"{path}/{key}")
+                walk(value, f"{path}/{key}")
+        elif isinstance(node, list):
+            for index, item in enumerate(node):
+                walk(item, f"{path}[{index}]")
+
+    walk(schema)
+    assert found == []
+
+
 def test_wire_schema_name_survives_every_provider_naming_rule():
     """名稱只能用 `[A-Za-z0-9_-]`,不是風格是 provider 硬限制。
 
@@ -376,12 +401,24 @@ def test_wire_enums_are_the_domain_values_plus_one_neutral(wire_enum, domain_enu
 
 
 def test_enums_reused_unchanged_keep_their_domain_values():
+    """這三個 domain enum 原樣重用,不加中性值。`$ref` 內聯後它們住在使用點上。"""
     schema = wire_schema()
-    defs = schema["$defs"]
+    enums: list[list[str]] = []
 
-    assert defs["IdentityRelation"]["enum"] == [m.value for m in IdentityRelation]
-    assert defs["SignalDisposition"]["enum"] == [m.value for m in SignalDisposition]
-    assert defs["EnablerKind"]["enum"] == [m.value for m in EnablerKind]
+    def walk(node) -> None:
+        if isinstance(node, dict):
+            if isinstance(node.get("enum"), list):
+                enums.append(node["enum"])
+            for value in node.values():
+                walk(value)
+        elif isinstance(node, list):
+            for item in node:
+                walk(item)
+
+    walk(schema)
+
+    for domain_enum in (IdentityRelation, SignalDisposition, EnablerKind):
+        assert [member.value for member in domain_enum] in enums
 
 
 def test_next_question_target_sentinel_is_carried_by_the_kind_not_the_number():

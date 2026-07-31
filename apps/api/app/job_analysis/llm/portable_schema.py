@@ -111,17 +111,24 @@ def _without_titles(value: Any) -> Any:
 
 
 def compact_strict_output_schema(schema: dict[str, Any]) -> dict[str, Any]:
-    """可攜投影,再拿掉自動生成的 `title`。
+    """可攜投影:拿掉自動生成的 `title`,並把 `$ref` 全部內聯。
 
     `title` 是 Pydantic 依欄位名生成的 Title Case 版本(`target_task_ordinals` 旁邊配一個
     `"Target Task Ordinals"`),對模型零資訊量卻佔 schema 的 17%。`description` 保留,
     但在 wire 契約裡那是刻意寫給模型的中性值約定,不是開發者註解的出口——
     `tests/test_job_analysis_wire_schema.py` 守住總量與內容。
+
+    `$ref` 內聯是**可攜性要求**,不是最佳化:Pydantic 把 enum 欄位輸出成
+    `{"$ref": …, "description": …}`,OpenAI strict 直接拒收帶兄弟 keyword 的 `$ref`
+    (2026-07-31 `openai/gpt-5.6-luna-pro`:`$ref cannot have keywords {'description'}`)。
+    而那些 `description` 就是給模型的規則本體,不能為了保住 `$ref` 拿掉。
+    這份契約每個 `$def` 都只被引用一次,展開沒有重用損失——schema 反而變小,
+    離 Anthropic 的 grammar 上限更遠。展開時 property 端的 keyword 蓋過 `$def` 自己的。
     """
 
     projected = _project(_without_titles(deepcopy(schema)))
     assert_portable_strict_output_schema(projected)
-    return projected
+    return expand_refs(projected)
 
 
 def expand_refs(schema: dict[str, Any]) -> dict[str, Any]:

@@ -2,7 +2,7 @@
 
 日期：2026-07-31
 狀態：**三回合場景已跑完（run 5 Opus 5、run 6 Luna-Pro、run 7 Sonnet 5，皆 `committed`×3）。**
-七次 run 累計 US$0.593，找出**七個**契約層缺陷（grammar 過大／ordinal 基準不一致／
+八次 run 累計 US$0.613，找出**七個**契約層缺陷（grammar 過大／ordinal 基準不一致／
 6 條規則模型無從得知／一般 open issue 無關閉路徑／新 issue 拿不到 `last_asked_turn_id`／
 schema 名稱帶點／`$ref` 帶兄弟 keyword），全部已修；後兩個是換 provider 才浮現的**可攜性**
 缺陷，契約原本鎖死 Anthropic。**merge／split／withdraw、supersession 與 Proposal 決策

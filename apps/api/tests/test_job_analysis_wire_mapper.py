@@ -315,10 +315,12 @@ def test_anchors_and_supersessions_map_across():
         pytest.param(
             WireNextQuestionTargetKind.EXISTING_OPEN_ISSUE, 2, 2, None, id="open-issue"
         ),
-        pytest.param(WireNextQuestionTargetKind.NEW_SIGNAL, 1, None, 1, id="new-signal"),
-        # sentinel 由 kind 承載:索引 0 是合法值,不能被「0 表示無」吃掉。
+        # wire 一律 1-based;domain 的 `index` 是 0-based,換算只發生在 mapper。
         pytest.param(
-            WireNextQuestionTargetKind.NEW_SIGNAL, 0, None, 0, id="new-signal-index-zero"
+            WireNextQuestionTargetKind.NEW_SIGNAL, 1, None, 0, id="new-signal-first"
+        ),
+        pytest.param(
+            WireNextQuestionTargetKind.NEW_SIGNAL, 3, None, 2, id="new-signal-third"
         ),
     ],
 )
@@ -349,3 +351,52 @@ def test_neutral_target_kind_leaves_no_target():
 def test_blank_question_text_is_rejected():
     with pytest.raises(WireMappingError):
         wire_to_task_analysis_result(wire(next_question=WireNextQuestion(text="")))
+
+
+@pytest.mark.parametrize(
+    "kind",
+    [
+        WireNextQuestionTargetKind.EXISTING_OPEN_ISSUE,
+        WireNextQuestionTargetKind.NEW_SIGNAL,
+    ],
+)
+def test_a_target_ordinal_below_one_is_rejected(kind):
+    """0 不是「第 0 個」,是模型沒填。目標存在卻沒有編號就是壞掉的輸出。"""
+
+    with pytest.raises(WireMappingError):
+        wire_to_task_analysis_result(
+            wire(
+                next_question=WireNextQuestion(
+                    text="那實際動手的是誰?", target_kind=kind, target_ordinal=0
+                )
+            )
+        )
+
+
+# ── 真模型回歸(兩次 live run 的實際輸出)────────────────────────────────
+
+
+def test_the_last_signal_can_be_addressed_by_its_position():
+    """真模型 2026-07-31 送 `target_ordinal: 3` 指三個訊號中的最後一個
+    (run `20260731T121651Z`)。v2 當時對 `new_signal` 要求 0-based,3 因此超出
+    範圍,被 `NEXT_QUESTION_TARGET_INVALID` 擋下——**這是契約的缺陷,不是模型的**:
+    同場景的另一次(run `20260731T120931Z`)送 2,僥倖落在 0-based 範圍內而通過。
+
+    一致的 1-based 之後,「最後一個訊號」＝ 訊號數,永遠在範圍內。
+    """
+
+    signals = (signal(), signal(), signal())
+    result = wire_to_task_analysis_result(
+        wire(
+            work_signals=signals,
+            next_question=WireNextQuestion(
+                text="實際動手的是你還是別人?",
+                target_kind=WireNextQuestionTargetKind.NEW_SIGNAL,
+                target_ordinal=len(signals),
+            ),
+        )
+    )
+
+    index = result.next_question.target.index
+    assert 0 <= index < len(result.work_signals)
+    assert index == len(signals) - 1

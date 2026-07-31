@@ -195,13 +195,19 @@ class WireNextQuestion(DomainModel):
     target_kind: WireNextQuestionTargetKind = Field(
         default=WireNextQuestionTargetKind.NONE, description='"none" 表示不指向任何東西'
     )
-    # sentinel 由 `target_kind` 承載而非數值:`new_signal` 的索引可以是 0,
-    # 用「0 表示無」會把合法值吃掉。
+    # sentinel 由 `target_kind` 承載而非數值 —— 見下面「1 起算」的理由。
+    #
+    # **這份契約裡每一個數字都從 1 起算,沒有例外。** v2 剛上線時這一格對
+    # `new_signal` 要求 0-based 索引,名字卻叫 ordinal;真模型因此在兩次相同場景下
+    # 分別送出 2 與 3 來指同一個訊號(run 20260731T120931Z / 20260731T121651Z),
+    # 前者僥倖落在範圍內、後者被 verifier 擋下。改成一致的 1-based 之後,
+    # 「ordinal 都從 1 起算」是可學習的規則,不再需要靠 description 講例外。
+    # 0-based 的 `NextQuestionTarget.index` 由 mapper 換算,不外洩給模型。
     target_ordinal: int = Field(
         default=0,
         description=(
-            "existing_open_issue 時為 packet 的 open issue ordinal;"
-            "new_signal 時為本次 work_signals 的索引"
+            "從 1 起算。existing_open_issue 時為 packet 的 open issue ordinal;"
+            "new_signal 時為本次 work_signals 的第幾個"
         ),
     )
 
@@ -356,15 +362,21 @@ def _open_issue(signal: WireSignal) -> OpenIssuePayload | None:
 def _next_question(question: WireNextQuestion) -> NextQuestion:
     kind = question.target_kind
     if kind is WireNextQuestionTargetKind.NONE:
-        target = None
-    elif kind is WireNextQuestionTargetKind.EXISTING_OPEN_ISSUE:
+        return NextQuestion(text=question.text, target=None)
+
+    if question.target_ordinal < 1:
+        raise WireMappingError(
+            f"target_ordinal counts from 1, got {question.target_ordinal}"
+        )
+    if kind is WireNextQuestionTargetKind.EXISTING_OPEN_ISSUE:
         target = NextQuestionTarget(
             kind=NextQuestionTargetKind.EXISTING_OPEN_ISSUE,
             ordinal=question.target_ordinal,
         )
     else:
+        # domain 的 `index` 是 0-based 位置;wire 一律 1-based,換算只發生在這裡。
         target = NextQuestionTarget(
-            kind=NextQuestionTargetKind.NEW_SIGNAL, index=question.target_ordinal
+            kind=NextQuestionTargetKind.NEW_SIGNAL, index=question.target_ordinal - 1
         )
     return NextQuestion(text=question.text, target=target)
 

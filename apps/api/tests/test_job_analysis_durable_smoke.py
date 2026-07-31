@@ -125,7 +125,6 @@ async def test_local_document_survives_every_transaction_boundary(
         ),
         next_question=NextQuestion(
             text="你通常透過什麼方式回報缺料？",
-            purpose="釐清工作方法與產出形式",
         ),
     )
     await commit_verified_turn(

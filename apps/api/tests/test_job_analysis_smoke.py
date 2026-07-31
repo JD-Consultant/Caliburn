@@ -43,18 +43,18 @@ from app.job_analysis.domain import (
     SingleTaskTarget,
 )
 from app.job_analysis.llm import (
-    ExcludePayload,
-    IdentityAssessment,
     IdentityRelation,
-    NextQuestion,
-    OpenIssuePayload,
-    SignalAnchor,
     SignalDisposition,
-    SupportOrdinalRef,
-    TaskAnalysisResult,
-    TaskChangeKind,
-    TaskChangePayload,
-    WorkSignal,
+    TaskAnalysisWire,
+    WireAnchor,
+    WireEnabler,
+    WireNextQuestion,
+    WireRejectionCode,
+    WireSignal,
+    WireSupersession,
+    WireTaskChange,
+    WireTaskFields,
+    WireWithdrawReason,
 )
 from app.job_analysis.providers import (
     OpenRouterAdapter,
@@ -72,9 +72,13 @@ CONFIG = OpenRouterConfig(
 
 
 class ScriptedProvider:
-    """照劇本回一份 TaskAnalysisResult;wire 形狀與真的 OpenRouter 回應一致。"""
+    """照劇本回一份 wire 輸出;形狀與真的 OpenRouter 回應一致。
 
-    def __init__(self, result: TaskAnalysisResult) -> None:
+    劇本寫的是**模型送出來的東西**(`task_analysis_result.v2`),不是 domain 形狀——
+    否則這條 smoke 就會跳過 mapper,不再是端到端。
+    """
+
+    def __init__(self, result: TaskAnalysisWire) -> None:
         self._result = result
         self.calls = 0
 
@@ -101,7 +105,7 @@ async def run_round(
     *,
     transcript: tuple[ConversationTurn, ...],
     current_turn_id: str,
-    scripted: TaskAnalysisResult,
+    scripted: TaskAnalysisWire,
     state: JobAnalysisState | None = None,
     active_question: ActiveQuestion | None = None,
     operation_id: str = "op-1",
@@ -129,7 +133,7 @@ async def run_round(
     return transition, summarize(transition, operation.result), render_context_packet(packet)
 
 
-def summarize(transition: TransitionResult, result: TaskAnalysisResult) -> str:
+def summarize(transition: TransitionResult, result: TaskAnalysisWire) -> str:
     """人看得懂的一輪成果:產生了什麼工作、排除了什麼、還缺什麼、下一題問什麼。"""
     work_model = transition.state.work_model
     lines: list[str] = ["## 目前成立的工作"]
@@ -174,7 +178,7 @@ def summarize(transition: TransitionResult, result: TaskAnalysisResult) -> str:
             if proposal.proposal_id in transition.created_proposal_ids
         )
     lines.append("## 下一題")
-    lines.append(f"- {result.next_question.text}({result.next_question.purpose})")
+    lines.append(f"- {result.next_question.text}")
     return "\n".join(lines)
 
 
@@ -186,8 +190,18 @@ def employee(turn_id: str, text: str) -> ConversationTurn:
     return ConversationTurn(turn_id=turn_id, speaker=TurnSpeaker.EMPLOYEE, text=text)
 
 
-def question(text: str, purpose: str) -> NextQuestion:
-    return NextQuestion(text=text, purpose=purpose)
+#: `change` 是 `"none"` 的訊號必須送中性的 task,否則 mapper 會判定夾帶。
+NEUTRAL_TASK = WireTaskFields(statement="", action="", object="", purpose_result="")
+
+
+def question(text: str, intent: str) -> WireNextQuestion:
+    """`intent` 只是這個場景在說明「為什麼是這一題」。
+
+    `NextQuestion.purpose` 已移除——全 repo 沒有消費者,每回合向模型索取一次再丟掉。
+    """
+
+    del intent
+    return WireNextQuestion(text=text)
 
 
 # ── 1. 工具不成 Task(`TI-R1-01` 語意)──────────────────────────────────────
@@ -195,16 +209,15 @@ def question(text: str, purpose: str) -> NextQuestion:
 
 async def test_a_tool_alone_never_becomes_a_task():
     text = "我整天都在用 Excel,幾乎沒離開過它"
-    scripted = TaskAnalysisResult(
+    scripted = TaskAnalysisWire(
         work_signals=(
-            WorkSignal(
-                anchors=(SignalAnchor(turn_ordinal=2, quote="我整天都在用 Excel"),),
-                identity=IdentityAssessment(relation=IdentityRelation.NO_MATCH),
+            WireSignal(
+                anchors=(WireAnchor(turn_ordinal=2, quote="我整天都在用 Excel"),),
+                relation=IdentityRelation.NO_MATCH,
                 disposition=SignalDisposition.EXCLUDE,
-                exclude=ExcludePayload(
-                    reason=ExclusionReason.ENABLER_OR_STEP,
-                    summary="Excel 是工具本身,沒有說出用它完成什麼工作",
-                ),
+                task=NEUTRAL_TASK,
+                rejection_code=WireRejectionCode.ENABLER_OR_STEP,
+                rejection_summary="Excel 是工具本身,沒有說出用它完成什麼工作",
             ),
         ),
         next_question=question("你用 Excel 主要在做出什麼東西?", "把工具轉成產出"),
@@ -230,25 +243,23 @@ async def test_a_tool_alone_never_becomes_a_task():
 
 async def test_work_done_with_a_tool_still_becomes_a_task():
     text = "我每週用 Excel 整理產能報表給生產主管看"
-    scripted = TaskAnalysisResult(
+    scripted = TaskAnalysisWire(
         work_signals=(
-            WorkSignal(
+            WireSignal(
                 anchors=(
-                    SignalAnchor(
+                    WireAnchor(
                         turn_ordinal=2, quote="每週用 Excel 整理產能報表給生產主管看"
                     ),
                 ),
-                identity=IdentityAssessment(relation=IdentityRelation.NO_MATCH),
+                relation=IdentityRelation.NO_MATCH,
                 disposition=SignalDisposition.TASK_CHANGE,
-                task_change=TaskChangePayload(
-                    change=TaskChangeKind.ADD,
-                    task_fields=TaskFields(
-                        statement="每週整理產能報表供生產主管掌握產線狀況",
-                        action="整理",
-                        object="產能報表",
-                        purpose_result="讓生產主管掌握產線狀況",
-                        enablers=(Enabler(kind=EnablerKind.TOOL_SYSTEM, name="Excel"),),
-                    ),
+                change=WireTaskChange.ADD,
+                task=WireTaskFields(
+                    statement="每週整理產能報表供生產主管掌握產線狀況",
+                    action="整理",
+                    object="產能報表",
+                    purpose_result="讓生產主管掌握產線狀況",
+                    enablers=(WireEnabler(kind=EnablerKind.TOOL_SYSTEM, name="Excel"),),
                 ),
             ),
         ),
@@ -273,42 +284,37 @@ async def test_work_done_with_a_tool_still_becomes_a_task():
 
 async def test_one_answer_can_carry_several_work_signals():
     text = "早上我要盤點庫存,下午跑生產排程,有時候還要幫忙接客訴電話,不過那個不一定"
-    scripted = TaskAnalysisResult(
+    scripted = TaskAnalysisWire(
         work_signals=(
-            WorkSignal(
-                anchors=(SignalAnchor(turn_ordinal=2, quote="早上我要盤點庫存"),),
-                identity=IdentityAssessment(relation=IdentityRelation.NO_MATCH),
+            WireSignal(
+                anchors=(WireAnchor(turn_ordinal=2, quote="早上我要盤點庫存"),),
+                relation=IdentityRelation.NO_MATCH,
                 disposition=SignalDisposition.TASK_CHANGE,
-                task_change=TaskChangePayload(
-                    change=TaskChangeKind.ADD,
-                    task_fields=TaskFields(
-                        statement="每日盤點庫存以維持帳料一致",
-                        action="盤點",
-                        object="庫存",
-                    ),
+                change=WireTaskChange.ADD,
+                task=WireTaskFields(
+                    statement="每日盤點庫存以維持帳料一致",
+                    action="盤點",
+                    object="庫存",
                 ),
             ),
-            WorkSignal(
-                anchors=(SignalAnchor(turn_ordinal=2, quote="下午跑生產排程"),),
-                identity=IdentityAssessment(relation=IdentityRelation.NO_MATCH),
+            WireSignal(
+                anchors=(WireAnchor(turn_ordinal=2, quote="下午跑生產排程"),),
+                relation=IdentityRelation.NO_MATCH,
                 disposition=SignalDisposition.TASK_CHANGE,
-                task_change=TaskChangePayload(
-                    change=TaskChangeKind.ADD,
-                    task_fields=TaskFields(
-                        statement="每日排定生產排程", action="排定", object="生產排程"
-                    ),
+                change=WireTaskChange.ADD,
+                task=WireTaskFields(
+                    statement="每日排定生產排程", action="排定", object="生產排程"
                 ),
             ),
-            WorkSignal(
+            WireSignal(
                 anchors=(
-                    SignalAnchor(turn_ordinal=2, quote="有時候還要幫忙接客訴電話"),
+                    WireAnchor(turn_ordinal=2, quote="有時候還要幫忙接客訴電話"),
                 ),
-                identity=IdentityAssessment(relation=IdentityRelation.UNCERTAIN),
+                relation=IdentityRelation.UNCERTAIN,
                 disposition=SignalDisposition.OPEN_ISSUE,
-                open_issue=OpenIssuePayload(
-                    kind=OpenIssueKind.RESPONSIBILITY_UNCLEAR,
-                    summary="接客訴電話是不是這位員工的責任還不確定",
-                ),
+                task=NEUTRAL_TASK,
+                rejection_code=WireRejectionCode.RESPONSIBILITY_UNCLEAR,
+                rejection_summary="接客訴電話是不是這位員工的責任還不確定",
             ),
         ),
         next_question=question("接客訴電話是誰的職責?", "釐清責任邊界"),
@@ -345,26 +351,21 @@ async def test_a_correction_withdraws_an_existing_task_and_supersedes_its_eviden
         ),
     )
     correction = "其實結帳是會計在做,我只是去年他請產假時代班過那一次"
-    scripted = TaskAnalysisResult(
+    scripted = TaskAnalysisWire(
         work_signals=(
-            WorkSignal(
+            WireSignal(
                 anchors=(
-                    SignalAnchor(
+                    WireAnchor(
                         turn_ordinal=4, quote="結帳是會計在做,我只是去年他請產假時代班過那一次"
                     ),
                 ),
-                identity=IdentityAssessment(
-                    relation=IdentityRelation.DUPLICATE, target_task_ordinals=(1,)
-                ),
-                supersedes_support_ordinals=(
-                    SupportOrdinalRef(task_ordinal=1, support_ordinal=1),
-                ),
+                relation=IdentityRelation.DUPLICATE,
+                target_task_ordinals=(1,),
+                supersedes=(WireSupersession(task_ordinal=1, support_ordinal=1),),
                 disposition=SignalDisposition.TASK_CHANGE,
-                task_change=TaskChangePayload(
-                    change=TaskChangeKind.WITHDRAW,
-                    target_task_ordinals=(1,),
-                    withdraw_reason=RetirementReason.ONE_OFF,
-                ),
+                change=WireTaskChange.WITHDRAW,
+                withdraw_reason=WireWithdrawReason.ONE_OFF,
+                task=NEUTRAL_TASK,
             ),
         ),
         next_question=question("那月底那幾天你實際在忙什麼?", "補回被撤掉的時段"),
@@ -407,15 +408,15 @@ async def test_a_short_answer_is_only_interpretable_through_the_active_question(
         ),
     )
     asked = "這份產能報表多久整理一次?"
-    scripted = TaskAnalysisResult(
+    scripted = TaskAnalysisWire(
         work_signals=(
-            WorkSignal(
+            WireSignal(
                 # 「每週」單獨看沒有意義:要靠 active_question 才知道它在回答頻率。
-                anchors=(SignalAnchor(turn_ordinal=4, quote="每週"),),
-                identity=IdentityAssessment(
-                    relation=IdentityRelation.DUPLICATE, target_task_ordinals=(1,)
-                ),
+                anchors=(WireAnchor(turn_ordinal=4, quote="每週"),),
+                relation=IdentityRelation.DUPLICATE,
+                target_task_ordinals=(1,),
                 disposition=SignalDisposition.SUPPORT_ONLY,
+                task=NEUTRAL_TASK,
             ),
         ),
         next_question=question("報表整理好之後交給誰?", "釐清產出對象"),
@@ -473,7 +474,7 @@ async def test_a_pending_proposal_does_not_block_the_next_coverage_question():
             ),
         ),
     )
-    scripted = TaskAnalysisResult(
+    scripted = TaskAnalysisWire(
         work_signals=(),
         next_question=question(
             "除了這次退貨，還有哪些每週固定或偶爾發生、但仍由你負責的工作？",

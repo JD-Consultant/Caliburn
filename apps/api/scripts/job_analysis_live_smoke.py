@@ -54,8 +54,8 @@ from app.job_analysis.application import (  # noqa: E402
     submit_employee_turn,
 )
 from app.job_analysis.llm import (  # noqa: E402
-    TASK_ANALYSIS_RESULT_SCHEMA_NAME,
-    task_analysis_result_provider_schema,
+    TASK_ANALYSIS_WIRE_SCHEMA_NAME,
+    task_analysis_wire_provider_schema,
 )
 from app.job_analysis.llm.prompt import TASK_ANALYSIS_INSTRUCTIONS  # noqa: E402
 from app.job_analysis.providers import (  # noqa: E402
@@ -314,7 +314,7 @@ def _manifest(
     budget: LiveSmokeBudget,
     max_output_tokens: int,
 ) -> dict[str, Any]:
-    schema_text = canonical_request_json(task_analysis_result_provider_schema())
+    schema_text = canonical_request_json(task_analysis_wire_provider_schema())
     return {
         "run_id": run_id,
         "created_at": datetime.now(UTC).isoformat(),
@@ -326,7 +326,7 @@ def _manifest(
         "provider_name": endpoint.provider_name,
         "max_output_tokens": max_output_tokens,
         "reasoning_effort": "high",
-        "schema_name": TASK_ANALYSIS_RESULT_SCHEMA_NAME,
+        "schema_name": TASK_ANALYSIS_WIRE_SCHEMA_NAME,
         "prompt_sha256": sha256(
             TASK_ANALYSIS_INSTRUCTIONS.encode("utf-8")
         ).hexdigest(),

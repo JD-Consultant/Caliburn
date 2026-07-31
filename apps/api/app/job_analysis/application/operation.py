@@ -16,9 +16,12 @@ from pydantic import ValidationError
 
 from app.job_analysis.domain import DomainModel, NonEmptyText
 from app.job_analysis.llm import (
-    TASK_ANALYSIS_RESULT_SCHEMA_NAME,
+    TASK_ANALYSIS_WIRE_SCHEMA_NAME,
     TaskAnalysisResult,
-    task_analysis_result_provider_schema,
+    TaskAnalysisWire,
+    WireMappingError,
+    task_analysis_wire_provider_schema,
+    wire_to_task_analysis_result,
 )
 from app.job_analysis.llm.prompt import TASK_ANALYSIS_INSTRUCTIONS
 from app.job_analysis.providers import (
@@ -40,7 +43,7 @@ class OperationOutcome(StrEnum):
     """parse 得出來,但違反確定性規則(§9.5／§12.3);不得套用。"""
 
     INVALID_OUTPUT = "invalid_output"
-    """不是合法的 `TaskAnalysisResult.v1` JSON。"""
+    """不是合法的 `task_analysis_result.v2` JSON,或還原不成 domain 契約。"""
 
     REFUSED = "refused"
     """模型拒答。不是錯誤,也不是可重試的失敗。"""
@@ -66,8 +69,8 @@ async def run_task_analysis_operation(
     outcome = await adapter.complete(
         instructions=TASK_ANALYSIS_INSTRUCTIONS,
         packet_text=render_context_packet(packet),
-        schema_name=TASK_ANALYSIS_RESULT_SCHEMA_NAME,
-        schema=task_analysis_result_provider_schema(),
+        schema_name=TASK_ANALYSIS_WIRE_SCHEMA_NAME,
+        schema=task_analysis_wire_provider_schema(),
     )
 
     if isinstance(outcome, ProviderFailure):
@@ -83,11 +86,20 @@ async def run_task_analysis_operation(
 
     assert isinstance(outcome, ProviderText)
     try:
-        result = TaskAnalysisResult.model_validate_json(outcome.text)
+        result = wire_to_task_analysis_result(
+            TaskAnalysisWire.model_validate_json(outcome.text)
+        )
     except ValidationError as error:
         return TaskAnalysisOperationResult(
             outcome=OperationOutcome.INVALID_OUTPUT,
-            detail=f"output did not match TaskAnalysisResult.v1: {error.error_count()} error(s)",
+            detail=(
+                f"output did not match {TASK_ANALYSIS_WIRE_SCHEMA_NAME}: "
+                f"{error.error_count()} error(s)"
+            ),
+        )
+    except WireMappingError as error:
+        return TaskAnalysisOperationResult(
+            outcome=OperationOutcome.INVALID_OUTPUT, detail=str(error)
         )
 
     report = verify_task_analysis_result(result, packet.verification_context())

@@ -87,14 +87,19 @@ def test_wire_schema_stays_inside_the_byte_budget():
     assert wire_bytes() <= WIRE_BYTES_BUDGET
 
 
-def test_wire_schema_is_smaller_than_the_domain_schema_it_replaces():
-    from app.job_analysis.llm import task_analysis_result_provider_schema
+#: `task_analysis_result.v1` 送出去時的實測值(commit 9966255,撞上 400 的那一份)。
+#: 留成常數而不是留著舊 schema 來比:那份已經不送了,留著只會變成沒人維護的化石。
+V1_BASELINE = {
+    "union_parameters": 17,
+    "optional_parameters": 17,
+    "properties": 54,
+    "nesting_levels": 9,
+}
 
-    domain_counts = schema_complexity(task_analysis_result_provider_schema())
-    wire_counts = schema_complexity(wire_schema())
 
-    for dimension in ("union_parameters", "properties", "nesting_levels"):
-        assert wire_counts[dimension] < domain_counts[dimension]
+@pytest.mark.parametrize("dimension", sorted(V1_BASELINE))
+def test_every_dimension_improved_on_the_schema_that_hit_the_400(dimension: str):
+    assert schema_complexity(wire_schema())[dimension] < V1_BASELINE[dimension]
 
 
 # ── 沒有噪音漏給模型 ───────────────────────────────────────────────────────

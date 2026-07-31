@@ -34,12 +34,36 @@ from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
-from pydantic import Field
+from pydantic import Field, ValidationError
 
-from app.job_analysis.domain import DomainModel, EnablerKind
+from app.job_analysis.domain import (
+    DomainModel,
+    Enabler,
+    EnablerKind,
+    ExclusionReason,
+    OpenIssueKind,
+    RetirementReason,
+    TaskFields,
+)
 
 from .portable_schema import compact_strict_output_schema
-from .result import IdentityRelation, SignalDisposition
+from .result import (
+    ExcludePayload,
+    IdentityAssessment,
+    IdentityRelation,
+    NextQuestion,
+    NextQuestionTarget,
+    NextQuestionTargetKind,
+    OpenIssuePayload,
+    SignalAnchor,
+    SignalDisposition,
+    SplitChildPayload,
+    SupportOrdinalRef,
+    TaskAnalysisResult,
+    TaskChangeKind,
+    TaskChangePayload,
+    WorkSignal,
+)
 
 
 TASK_ANALYSIS_WIRE_SCHEMA_NAME = "task_analysis_result.v2"
@@ -185,6 +209,164 @@ class WireNextQuestion(DomainModel):
 class TaskAnalysisWire(DomainModel):
     work_signals: tuple[WireSignal, ...] = ()
     next_question: WireNextQuestion
+
+
+# ── 還原成 domain 契約 ─────────────────────────────────────────────────────
+
+
+class WireMappingError(ValueError):
+    """wire 輸出還原不成 domain 契約。呼叫端當成 `INVALID_OUTPUT`。"""
+
+
+_EXCLUSION_CODES = {member.value for member in ExclusionReason}
+_OPEN_ISSUE_CODES = {member.value for member in OpenIssueKind}
+
+
+def wire_to_task_analysis_result(wire: TaskAnalysisWire) -> TaskAnalysisResult:
+    """純還原:中性值 → `None`,其餘照抄。
+
+    這裡**不做**任何跨欄位判斷。「disposition 與 payload 對不對得上」「withdraw 該不該
+    帶 reason」全部是 verifier 的工作(§12.3),在這裡「順手修正」等於讓那些
+    violation code 永遠不會觸發。
+
+    唯一會失敗的情形是**模型在沒有 domain 落點的欄位夾帶內容**——例如 `change` 是
+    `"none"`(沒有 `TaskChangePayload` 可放)卻填了 `task.statement`。靜默丟棄會讓
+    模型真正說出口的東西消失,所以整回合失敗。
+    """
+
+    try:
+        return TaskAnalysisResult(
+            work_signals=tuple(_signal(signal) for signal in wire.work_signals),
+            next_question=_next_question(wire.next_question),
+        )
+    except ValidationError as error:
+        raise WireMappingError(
+            f"wire output could not be mapped: {error.error_count()} error(s)"
+        ) from error
+
+
+def _signal(signal: WireSignal) -> WorkSignal:
+    change = (
+        None
+        if signal.change is WireTaskChange.NONE
+        else TaskChangeKind(signal.change.value)
+    )
+    if change is None:
+        _reject_change_content_without_a_slot(signal)
+    if signal.rejection_code is WireRejectionCode.NONE and signal.rejection_summary:
+        raise WireMappingError(
+            'rejection_summary was filled while rejection_code is "none"'
+        )
+
+    return WorkSignal(
+        anchors=tuple(
+            SignalAnchor(turn_ordinal=anchor.turn_ordinal, quote=anchor.quote)
+            for anchor in signal.anchors
+        ),
+        identity=IdentityAssessment(
+            relation=signal.relation,
+            target_task_ordinals=signal.target_task_ordinals,
+        ),
+        supersedes_support_ordinals=tuple(
+            SupportOrdinalRef(
+                task_ordinal=ref.task_ordinal, support_ordinal=ref.support_ordinal
+            )
+            for ref in signal.supersedes
+        ),
+        resolves_open_issue_ordinal=signal.resolves_open_issue_ordinal or None,
+        disposition=signal.disposition,
+        task_change=None if change is None else _task_change(signal, change),
+        exclude=_exclude(signal),
+        open_issue=_open_issue(signal),
+    )
+
+
+def _reject_change_content_without_a_slot(signal: WireSignal) -> None:
+    if not _is_neutral(signal.task):
+        raise WireMappingError('task fields were filled while change is "none"')
+    if signal.split_children:
+        raise WireMappingError('split_children were filled while change is "none"')
+    if signal.withdraw_reason is not WireWithdrawReason.NONE:
+        raise WireMappingError('withdraw_reason was filled while change is "none"')
+
+
+def _is_neutral(task: WireTaskFields) -> bool:
+    return not any(
+        (task.statement, task.action, task.object, task.purpose_result, task.enablers)
+    )
+
+
+def _task_change(signal: WireSignal, change: TaskChangeKind) -> TaskChangePayload:
+    return TaskChangePayload(
+        change=change,
+        withdraw_reason=(
+            None
+            if signal.withdraw_reason is WireWithdrawReason.NONE
+            else RetirementReason(signal.withdraw_reason.value)
+        ),
+        target_task_ordinals=signal.target_task_ordinals,
+        task_fields=None if _is_neutral(signal.task) else _task_fields(signal.task),
+        split_children=tuple(_split_child(child) for child in signal.split_children),
+    )
+
+
+def _task_fields(task: WireTaskFields) -> TaskFields:
+    # `context`／`deliverable_hint`／`success_criterion_hint` 不再每回合向模型索取;
+    # domain 欄位還在,留給 OPKS 階段自己的取得路徑。
+    return TaskFields(
+        statement=task.statement,
+        action=task.action,
+        object=task.object,
+        purpose_result=task.purpose_result or None,
+        enablers=tuple(
+            Enabler(kind=enabler.kind, name=enabler.name) for enabler in task.enablers
+        ),
+    )
+
+
+def _split_child(child: WireSplitChild) -> SplitChildPayload:
+    return SplitChildPayload(
+        task_fields=TaskFields(
+            statement=child.statement, action=child.action, object=child.object
+        ),
+        inherited_support_ordinals=child.inherited_support_ordinals,
+    )
+
+
+def _exclude(signal: WireSignal) -> ExcludePayload | None:
+    # 落點由**值**決定,不由 `disposition` 決定:兩個值域互斥,而讓 disposition 決定
+    # 等於在 mapper 裡做語意判斷,並吃掉 `PAYLOAD_DOES_NOT_MATCH_DISPOSITION`。
+    if signal.rejection_code.value not in _EXCLUSION_CODES:
+        return None
+    return ExcludePayload(
+        reason=ExclusionReason(signal.rejection_code.value),
+        summary=signal.rejection_summary,
+    )
+
+
+def _open_issue(signal: WireSignal) -> OpenIssuePayload | None:
+    if signal.rejection_code.value not in _OPEN_ISSUE_CODES:
+        return None
+    return OpenIssuePayload(
+        kind=OpenIssueKind(signal.rejection_code.value),
+        summary=signal.rejection_summary,
+    )
+
+
+def _next_question(question: WireNextQuestion) -> NextQuestion:
+    kind = question.target_kind
+    if kind is WireNextQuestionTargetKind.NONE:
+        target = None
+    elif kind is WireNextQuestionTargetKind.EXISTING_OPEN_ISSUE:
+        target = NextQuestionTarget(
+            kind=NextQuestionTargetKind.EXISTING_OPEN_ISSUE,
+            ordinal=question.target_ordinal,
+        )
+    else:
+        target = NextQuestionTarget(
+            kind=NextQuestionTargetKind.NEW_SIGNAL, index=question.target_ordinal
+        )
+    return NextQuestion(text=question.text, target=target)
 
 
 # ── provider schema 與 golden ──────────────────────────────────────────────

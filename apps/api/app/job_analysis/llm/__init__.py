@@ -1,18 +1,16 @@
-"""`TaskAnalysisResult.v1` 契約與其 provider-facing schema(§12)。"""
+"""Task 分析的兩份契約(§12)。
+
+`result.py` 是 verifier 與下游吃的**內部**形狀;`wire.py` 的
+`task_analysis_result.v2` 才是**送給模型**的形狀,兩者以
+`wire_to_task_analysis_result()` 相接。
+"""
 
 from .portable_schema import (
     ProviderSchemaPortabilityError,
     assert_portable_strict_output_schema,
     compact_strict_output_schema,
     expand_refs,
-    portable_strict_output_schema,
     schema_complexity,
-)
-from .provider_schema import (
-    PROVIDER_SCHEMA_PATH,
-    committed_provider_schema,
-    render_provider_schema_file,
-    task_analysis_result_provider_schema,
 )
 from .prompt import TASK_ANALYSIS_INSTRUCTIONS
 from .result import (
@@ -35,6 +33,7 @@ from .result import (
 )
 from .wire import (
     NEUTRAL,
+    WireMappingError,
     TASK_ANALYSIS_WIRE_SCHEMA_NAME,
     WIRE_SCHEMA_PATH,
     TaskAnalysisWire,
@@ -52,11 +51,11 @@ from .wire import (
     committed_wire_schema,
     render_wire_schema_file,
     task_analysis_wire_provider_schema,
+    wire_to_task_analysis_result,
 )
 
 __all__ = [
     "NEUTRAL",
-    "PROVIDER_SCHEMA_PATH",
     "TASK_ANALYSIS_INSTRUCTIONS",
     "TASK_ANALYSIS_RESULT_SCHEMA_NAME",
     "TASK_ANALYSIS_WIRE_SCHEMA_NAME",
@@ -79,6 +78,7 @@ __all__ = [
     "TaskChangePayload",
     "WireAnchor",
     "WireEnabler",
+    "WireMappingError",
     "WireNextQuestion",
     "WireNextQuestionTargetKind",
     "WireRejectionCode",
@@ -90,14 +90,11 @@ __all__ = [
     "WireWithdrawReason",
     "WorkSignal",
     "assert_portable_strict_output_schema",
-    "committed_provider_schema",
     "committed_wire_schema",
     "compact_strict_output_schema",
     "expand_refs",
-    "portable_strict_output_schema",
-    "render_provider_schema_file",
     "render_wire_schema_file",
     "schema_complexity",
-    "task_analysis_result_provider_schema",
     "task_analysis_wire_provider_schema",
+    "wire_to_task_analysis_result",
 ]

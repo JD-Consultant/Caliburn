@@ -109,7 +109,7 @@ def result(*signals: WorkSignal, next_question: NextQuestion | None = None):
     return TaskAnalysisResult(
         work_signals=signals,
         next_question=next_question
-        or NextQuestion(text="這份週報交給誰?", purpose="釐清產出對象"),
+        or NextQuestion(text="這份週報交給誰?"),
     )
 
 
@@ -827,7 +827,7 @@ def test_distinct_targets_may_be_changed_in_the_same_round():
 
 
 def question(**overrides) -> NextQuestion:
-    base = {"text": "這份週報交給誰?", "purpose": "釐清產出對象"}
+    base = {"text": "這份週報交給誰?"}
     base.update(overrides)
     return NextQuestion(**base)
 

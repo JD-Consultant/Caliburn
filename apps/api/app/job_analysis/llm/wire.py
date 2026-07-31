@@ -23,8 +23,14 @@ domain 的 `TaskAnalysisResult`(`result.py`)是內部真相,這一份是**送出
   零消費者;三個 hint 的唯一消費者是下一回合的 packet 自己。domain 欄位保留,
   OPKS 開工時再設計它自己的取得路徑。
 
-名稱用 `task_analysis_result.v2`:模型看到的仍是「Task 分析結果」這個語意,
+名稱用 `task_analysis_result_v2`:模型看到的仍是「Task 分析結果」這個語意,
 版號說明送出去的形狀換了一版;domain 契約沒有跟著改版。
+
+**名稱只能用 `[A-Za-z0-9_-]`。** 這是 provider 的硬限制,不是風格:OpenAI 對
+`text.format.name` 就是這條 regex,帶點的 `…​.v2` 會在生成任何 token 之前被 HTTP 400
+擋掉(2026-07-31 實測 `openai/gpt-5.6-luna-pro`)。Journal 的 payload schema id 是**另一個
+namespace**,那邊的點狀慣例不適用於送給 provider 的 label。`test_job_analysis_wire_schema`
+有一條測試守著這件事——別為了對齊檔名慣例把點加回來,那等於把契約鎖回單一 vendor。
 """
 
 from __future__ import annotations
@@ -66,7 +72,7 @@ from .result import (
 )
 
 
-TASK_ANALYSIS_WIRE_SCHEMA_NAME = "task_analysis_result.v2"
+TASK_ANALYSIS_WIRE_SCHEMA_NAME = "task_analysis_result_v2"
 
 #: 所有「這一格不適用」的中性值。不得與任何 domain enum 值相同。
 NEUTRAL = "none"

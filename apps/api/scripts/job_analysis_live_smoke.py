@@ -59,7 +59,7 @@ from app.job_analysis.llm import (  # noqa: E402
 )
 from app.job_analysis.llm.prompt import TASK_ANALYSIS_INSTRUCTIONS  # noqa: E402
 from app.job_analysis.providers import (  # noqa: E402
-    MODEL_DETAIL_URL_TEMPLATE,
+    MODEL_ENDPOINTS_URL_TEMPLATE,
     OpenRouterAdapter,
     OpenRouterCatalogError,
     OpenRouterConfig,
@@ -259,7 +259,7 @@ async def fetch_endpoint_snapshot(
 ) -> OpenRouterEndpointSnapshot:
     """付費前唯一的一次外部查核。零 generation call,任何看不懂都停線。"""
     author, _, slug = model.partition("/")
-    url = MODEL_DETAIL_URL_TEMPLATE.format(author=author, slug=slug)
+    url = MODEL_ENDPOINTS_URL_TEMPLATE.format(author=author, slug=slug)
     try:
         response = await client.get(
             url,

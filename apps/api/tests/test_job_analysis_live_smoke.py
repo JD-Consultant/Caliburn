@@ -378,7 +378,9 @@ async def test_preflight_reads_only_the_model_detail_endpoint():
             client, model=MODEL, tag=TAG, api_key="k"
         )
 
-    assert seen == ["https://openrouter.ai/api/v1/models/anthropic/claude-opus-5"]
+    assert seen == [
+        "https://openrouter.ai/api/v1/models/anthropic/claude-opus-5/endpoints"
+    ]
     assert snapshot.provider_name == "Anthropic"
 
 

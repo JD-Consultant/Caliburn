@@ -24,7 +24,11 @@ from typing import Any
 from app.job_analysis.domain import DomainModel, NonEmptyText
 
 
-MODEL_DETAIL_URL_TEMPLATE = "https://openrouter.ai/api/v1/models/{author}/{slug}"
+# endpoint 陣列只有「list endpoints for a model」這條路徑會回;`/models/{author}/{slug}`
+# 是 404,`/model/{author}/{slug}` 只有 model 層級欄位、沒有 per-endpoint 價格與能力。
+MODEL_ENDPOINTS_URL_TEMPLATE = (
+    "https://openrouter.ai/api/v1/models/{author}/{slug}/endpoints"
+)
 
 # 本產品這一版 request 實際用到的能力。`require_parameters: true` 只保證路由到宣稱
 # 支援的 endpoint,不保證這份清單永遠存在——所以每次付費前都要重查。

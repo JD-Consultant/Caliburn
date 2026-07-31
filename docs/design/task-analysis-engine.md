@@ -227,8 +227,8 @@ JD 只在員工決定提案時才改。
 |---|---|---|
 | endpoint variant preflight | `provider_order` 只鎖 base slug,同 provider 可能有多個 endpoint variant。`providers/openrouter_evidence.py` 的 `select_catalog_endpoint()` 已能從 model detail 選出唯一 active endpoint,但**沒有任何 runtime 路徑呼叫它** | 由待建的 live smoke wrapper 在付費前呼叫;不進 request 路徑 |
 | route 歸因 | `inspect_openrouter_execution()` 可解析 router metadata、pipeline 與 `usage.cost`,並判定該次能否用於品質歸因。**一般產品回合不要求也不送 metadata**;`OpenRouterAdapter` 的 headers 未改,結果不寫 PostgreSQL／Journal | metadata／no-cache opt-in 只留給待建的 smoke wrapper |
-| **真模型跑通** | **turn 1 通過**（run `20260731T123344Z`）：`task_analysis_result.v2` 編譯成功並 `committed`。2026-07-31 的四次付費 run 累計 US$0.251,找出四個契約層缺陷,全部已修：grammar 過大、`target_ordinal` 的 1-based／0-based 不一致、6 條 verifier 規則模型無從得知、一般 open issue 無關閉路徑（ADR 0047）。**turn 2 已用該 run 的真模型輸出離線重放通過**（verifier valid、transition applied、issue 關閉且 exclude 仍落地）| **turn 3 從未送出過**。重放只證明契約接得住那一份輸出,不是新抽樣,也不含 merge／split／Proposal 決策 |
-| prompt 品質結論 | **一項都沒有。** 上述 run 沒有任何模型輸出,計畫的八項語意判準只有 route 一項有結果 | schema 阻塞解除、smoke 真的跑完三回合之後 |
+| **真模型跑通** | **三回合已跑完**（run `20260731T170405Z`,`committed`×3,US$0.210285）。2026-07-31 的五次付費 run 累計 US$0.461,找出五個契約層缺陷,全部已修：grammar 過大、`target_ordinal` 的 1-based／0-based 不一致、6 條 verifier 規則模型無從得知、一般 open issue 無關閉路徑（ADR 0047）、新 issue 拿不到 `last_asked_turn_id` | **merge／split／revise／withdraw 一筆真 Task、supersession、Proposal 決策一次都沒被觀測到**；過早關閉 open issue 的風險也未被測到（turn 3 時已無 issue 可關）|
+| prompt 品質結論 | **仍然沒有 rubric。** run 5 觀測到跨回合記憶、更正處理與 enabler 硬規則守住,但那是單次 synthetic trial 的事實記錄,不是品質 gate | 有黃金範本當尺、能重複抽樣之後 |
 
 ### 8.1 Attributed live smoke(`scripts/job_analysis_live_smoke.py`)
 

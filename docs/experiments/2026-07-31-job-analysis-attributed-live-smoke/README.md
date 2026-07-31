@@ -1,10 +1,10 @@
 # Job Analysis attributed live smoke：執行結果
 
 日期：2026-07-31
-狀態：**四次 run 累計 US$0.251，找出四個契約層缺陷（grammar 過大／ordinal 基準不一致／
-6 條規則模型無從得知／一般 open issue 無關閉路徑），全部已修。turn 1 穩定通過；
-turn 2 已用 run 4 的真模型輸出離線重放通過（US$0），並在重放中再找出第五個缺陷。
-turn 3 從未送出過。**
+狀態：**三回合場景已於 run 5 跑完（`committed / committed / committed`）。**
+五次 run 累計 US$0.461，找出五個契約層缺陷（grammar 過大／ordinal 基準不一致／
+6 條規則模型無從得知／一般 open issue 無關閉路徑／新 issue 拿不到 `last_asked_turn_id`），
+全部已修。**merge／split／revise／withdraw、supersession 與 Proposal 決策仍未被任何 run 觀測到。**
 計畫：[2026-07-31 attributed live smoke plan](../../plans/2026-07-31-job-analysis-attributed-live-smoke-plan.md)
 研究：[OpenRouter 歸因與最小 live smoke](../../specs/2026-07-31-job-analysis-openrouter-attribution-and-live-smoke-research.md)
 
@@ -172,6 +172,69 @@ merge／split／Proposal 決策長什麼樣，都不在本節的證據範圍內�
 
 已修：`new_signal` target 也記，issue id 用 `{operation_id}-i{index}` 對上；該訊號沒產生
 issue（例如追問剛新增的 Task）就沒得記，不是錯誤。修好後同一份重放渲染出 `最近提問: [5]`。
+
+---
+
+## 0e. Run 5（2026-07-31 17:04 UTC）：三回合首次跑完
+
+| 項目 | 值 |
+|---|---|
+| commit | `a70e5c0`（`dirty: false`） |
+| 指令 | `--max-generation-calls 3 --budget-usd 0.50` |
+| run id | `20260731T170405Z` |
+| generation calls | **3** |
+| retry | **0** |
+| 實際支出 | **US$0.210285**（turn 1 $0.0683／turn 2 $0.07984／turn 3 $0.062145） |
+| turn outcomes | `committed`, `committed`, `committed`；`stopped_reason: null` |
+| 建立的文件 | `1b9c390b-0fe8-4b74-b116-6efbadc2a98b`（留在本機 dev DB） |
+| 最終狀態 | 4 Task、0 open issue、1 excluded signal、4 筆 pending `add` Proposal、7 conversation turns、`authority_generation: 3` |
+
+Route 三回合都是 `direct`／`attempt: 1`／pipeline 空／provider Anthropic。
+`quality_eligible = 0/3`，limitation 每回合都只有同一條：`selected model did not match the
+preflight catalog endpoint`（catalog 報 `anthropic/claude-opus-5`，router 選
+`anthropic/claude-opus-5-20260723`）。這是刻意保留的嚴格判準，見 §0。
+
+### 首次觀測到的行為
+
+- **跨回合記憶。** turn 3 員工岔題（改講權限稽核、沒回答上一題），模型仍新增該工作，
+  並把 next question 明寫成「**回到上線前的測試與檢查**」，接回 turn 2 未答的線。
+- **更正處理。** turn 2 把「正式環境部署」判為 `exclude / 他人工作`（它從未成為 Task，
+  只是 open issue），**同一個訊號**關掉 turn 1 的 `責任邊界不明` issue，另外新增員工真正
+  在做的「上線前的測試與檢查」。
+- **ADR 0047 在真流量上成立。** 關閉與該訊號自身的 exclude 兩個效果都落地；
+  最終 `open_issues = 0`、`excluded_signals = 1`。
+- **`last_asked_turn_id` 修正在真流量上成立。** turn 1 的 next question 指向
+  `new_signal #3`（即那個 open_issue 訊號），issue 拿到
+  `last_asked_turn_id = live-smoke-turn-01-consultant`。同一位置在 run 4 是 `null`。
+- **Enabler 硬規則三回合都守住。** Python／Excel／Java 全在 `enablers`，沒有一個被升格成 Task；
+  「交給資訊安全窗口」寫在 Task statement 裡當交接，沒有變成另一筆 Task；
+  沒有工具的兩筆 Task 也沒有被硬塞 enabler。
+
+### Context 成長（給 context 預算用的實測）
+
+| turn | request bytes | prompt tokens | completion tokens |
+|---:|---:|---:|---:|
+| 1 | 11,850 | 6,360 | 1,460（reasoning 129） |
+| 2 | 13,989 | 7,193 | 1,755 |
+| 3 | 14,698 | 7,474 | 991 |
+
+每回合約 +550 prompt tokens。固定成本（instructions 5,090 ＋ schema 4,818 bytes）不隨對話成長，
+成長的是 packet；四筆 Task ＋ 四筆 Proposal 之後 packet 已是請求的主要變動項。
+
+### 本次**沒有**觀測到的（不得由本節推得）
+
+- **過早關閉 open issue 的風險沒有被測到。** turn 2 結束時 open issue 已歸零，
+  turn 3 根本沒有東西可以誤關（`resolves = 0` 是因為沒得關，不是因為模型克制）。
+- merge／split／revise／withdraw 一筆真正的 Task、supersession：一次都沒發生。
+- Proposal 決策：建立了 4 筆 pending，driver 不做決策，員工端路徑仍未經真模型驗證。
+- JD-only reconciliation issue：本文件從空白開始，沒有 Current JD。
+- 單次 trial 不能宣稱穩定性或品質；本節只記錄觀測到的事實，沒有 rubric。
+
+### 一個小的表達力缺口（記錄，不修）
+
+turn 3 的 `next_question.target_kind = none`：問題要回指的是**前一輪新增的 Task**，
+而 target 詞彙只有 `existing_open_issue` 與 `new_signal`，表達不了。模型選了中性值，
+是誠實的做法。真的造成追問失焦時再處理，現在不加欄位。
 
 ---
 

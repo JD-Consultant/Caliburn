@@ -17,6 +17,7 @@ from app.job_analysis.domain import (
     OpenIssueKind,
     RetirementReason,
 )
+from app.job_analysis.application.verifier import ViolationCode
 from app.job_analysis.llm import IdentityRelation, SignalDisposition, TaskChangeKind
 from app.job_analysis.llm.portable_schema import (
     assert_portable_strict_output_schema,
@@ -45,12 +46,15 @@ from app.job_analysis.llm.wire import (
 UNION_BUDGET = 0
 NESTING_BUDGET = 6
 PROPERTY_BUDGET = 35
-DESCRIPTION_BYTES_BUDGET = 600
+#: description 是**耦合規則的家**(欄位名表達不了「add 要 0 個 target」這種事),
+#: 不是開發者註解的出口。上限從 600 放寬到 1,500:一條 description 只要擋掉一次
+#: verifier rejection 就回本——被擋下的回合要付一整次呼叫,還賠掉員工那一輪。
+DESCRIPTION_BYTES_BUDGET = 1500
 
 #: 位元組是**粗略的迴歸護欄**,不是綁定條件——真正決定能不能編譯的是上面三個結構維度。
-#: 訂在 4,500 而非貼著實測值:貼著訂會讓任何一次 description 微調都紅,
-#: 而 description 正是我們刻意用來取代 prompt 散文的東西。
-WIRE_BYTES_BUDGET = 4500
+#: 貼著實測值訂會讓任何一次 description 微調都紅,而 description 正是我們刻意用來
+#: 取代 prompt 散文的東西。
+WIRE_BYTES_BUDGET = 5600
 
 
 def wire_schema() -> dict:
@@ -110,6 +114,93 @@ def test_wire_schema_carries_no_generated_titles():
     text = json.dumps(wire_schema(), ensure_ascii=False)
 
     assert '"title"' not in text
+
+
+def visible_to_the_model() -> str:
+    """模型實際看得到的全部文字:schema 的 description ＋ Static Instructions。"""
+    from app.job_analysis.llm import TASK_ANALYSIS_INSTRUCTIONS
+
+    found: list[str] = [TASK_ANALYSIS_INSTRUCTIONS]
+
+    def walk(node) -> None:
+        if isinstance(node, list):
+            for item in node:
+                walk(item)
+        elif isinstance(node, dict):
+            description = node.get("description")
+            if isinstance(description, str):
+                found.append(description)
+            for value in node.values():
+                walk(value)
+
+    walk(wire_schema())
+    return "\n".join(found)
+
+
+@pytest.mark.parametrize(
+    ("code", "phrase"),
+    [
+        # verifier 擋下來不是免費的:要付一整次呼叫,還賠掉員工那一輪。所以每一條
+        # **模型必須主動答對**的耦合規則,都得有一個模型看得到的出處。
+        pytest.param(
+            ViolationCode.RELATION_DOES_NOT_MATCH_MAPPING,
+            "add→no_match",
+            id="relation-mapping",
+        ),
+        pytest.param(
+            ViolationCode.TASK_CHANGE_TARGET_COUNT,
+            "merge 至少 2 個",
+            id="target-count",
+        ),
+        pytest.param(
+            ViolationCode.IDENTITY_TARGETS_NOT_EMPTY, "add 0 個", id="no-match-empty"
+        ),
+        pytest.param(
+            ViolationCode.TASK_FIELDS_FORBIDDEN, "withdraw 不得填", id="withdraw-fields"
+        ),
+        pytest.param(
+            ViolationCode.TASK_FIELDS_REQUIRED,
+            "add／revise／merge 必填",
+            id="fields-required",
+        ),
+        pytest.param(
+            ViolationCode.WITHDRAW_REASON_REQUIRED,
+            "僅 change=withdraw 時填",
+            id="withdraw-reason",
+        ),
+        pytest.param(
+            ViolationCode.SPLIT_CHILDREN_INSUFFICIENT, "至少兩個", id="split-children"
+        ),
+        pytest.param(
+            ViolationCode.SPLIT_SUPPORT_UNKNOWN, "標示為有效", id="split-support"
+        ),
+        pytest.param(
+            ViolationCode.SUPERSESSION_MISSING_CURRENT_TURN_ANCHOR,
+            "anchors 必須包含目前這一輪的員工回合",
+            id="supersession-anchor",
+        ),
+        pytest.param(
+            ViolationCode.RESOLUTION_MAPPING_INVALID,
+            "確認是新工作用 no_match ＋ add",
+            id="resolution-mapping",
+        ),
+        pytest.param(
+            ViolationCode.TARGET_ORDINAL_RETIRED,
+            "只能指 current_authorities.tasks 的編號",
+            id="retired-target",
+        ),
+        pytest.param(
+            ViolationCode.QUOTE_NOT_VERBATIM, "逐字子字串", id="verbatim-quote"
+        ),
+        pytest.param(
+            ViolationCode.OPEN_ISSUE_ANCHORS_INSUFFICIENT,
+            "矛盾未解至少要引兩句",
+            id="contradiction-anchors",
+        ),
+    ],
+)
+def test_every_rule_the_model_must_satisfy_is_discoverable(code, phrase: str):
+    assert phrase in visible_to_the_model(), f"nothing tells the model about {code}"
 
 
 def test_descriptions_are_deliberate_model_facing_and_budgeted():

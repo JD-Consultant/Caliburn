@@ -218,7 +218,8 @@ JD 只在員工決定提案時才改。
 |---|---|---|
 | endpoint variant preflight | `provider_order` 只鎖 base slug,同 provider 可能有多個 endpoint variant。`providers/openrouter_evidence.py` 的 `select_catalog_endpoint()` 已能從 model detail 選出唯一 active endpoint,但**沒有任何 runtime 路徑呼叫它** | 由待建的 live smoke wrapper 在付費前呼叫;不進 request 路徑 |
 | route 歸因 | `inspect_openrouter_execution()` 可解析 router metadata、pipeline 與 `usage.cost`,並判定該次能否用於品質歸因。**一般產品回合不要求也不送 metadata**;`OpenRouterAdapter` 的 headers 未改,結果不寫 PostgreSQL／Journal | metadata／no-cache opt-in 只留給待建的 smoke wrapper |
-| 真模型跑通的證據 | 上述兩個 parser 與下述 driver 都只在離線 fixture 下驗過。**尚未對 Opus 5／Anthropic route 送過任何真實請求**,因此沒有任何 prompt 品質結論。2026-07-31 的付費 run 在 catalog preflight 停線(0 call、US$0):設定的 `anthropic` endpoint 當下 `status = -2`,價格與能力未變 | endpoint 恢復 active 後重跑同一支 CLI;結論與環境診斷見 [experiment](../experiments/2026-07-31-job-analysis-attributed-live-smoke/README.md) |
+| **真模型跑通** | **2026-07-31 live smoke 在 turn 1 被 Anthropic 以 HTTP 400 拒絕**:`strict: true` 的 `task_analysis_result.v1` schema(6,818 bytes)編譯出的 grammar 過大。請求未生成任何 token(1 call、US$0),route 本身正常(direct、attempt 1、無 pipeline)。production 走同一份 schema 與同一個 `build_body()`,**同 route 下的員工 AI 回合現在應同樣失敗** | 先研究 Anthropic structured output 上限並決定契約讓步方向(縮小 grammar vs 放棄 strict 改靠 local verifier);後者動到 ADR 0040 決定 26,須另開 ADR。修好後原樣重跑同一支 CLI |
+| prompt 品質結論 | **一項都沒有。** 上述 run 沒有任何模型輸出,計畫的八項語意判準只有 route 一項有結果 | schema 阻塞解除、smoke 真的跑完三回合之後 |
 
 ### 8.1 Attributed live smoke(`scripts/job_analysis_live_smoke.py`)
 

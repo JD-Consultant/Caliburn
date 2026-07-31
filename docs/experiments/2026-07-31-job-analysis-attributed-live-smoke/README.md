@@ -314,6 +314,35 @@ Sonnet 5 比 run 5 的 Opus 更保守：turn 2 把「上線前測試與檢查」
 
 ---
 
+## 0g. Run 8（2026-07-31 20:59 UTC）：把判準搬到 `disposition` 之後，再測 Luna-Pro
+
+commit `4b75190`（`disposition` 補 195 bytes 判準；prompt 五段判準一字未改）。
+同場景、同模型、US$0.019079，`committed`×3。與 run 6 逐回合比：
+
+| | run 6（搬之前） | run 8（搬之後） |
+|---|---|---|
+| turn 1「協助正式環境部署」 | 建成 Task | **仍建成 Task** ✗ |
+| turn 2 收拾方式 | `revise` ＋ `exclude`（revise 後仍帶錯誤原版的 purpose） | **`withdraw` ＋ `employee_denied`**——語意正確的那個操作，Proposal 轉 `stale` |
+| turn 2「上線前測試與檢查」 | 直接建 Task | **留成 `證據不足` open issue** ✓（＝Sonnet 5 與 Opus run 4 的判法）|
+| turn 3 追問 | `target_kind: none` | **`existing_open_issue #1`**——精確指回未答的缺口 |
+| 最終 | 4 Task／0 issue | 3 活 Task ＋ 1 retired／1 issue |
+
+**結論：位置修正在次要判斷上有效，在最要緊的那一個上無效。**
+把規則放到模型正在填的那個參數上之後，Luna-Pro 仍然從「我會**協助**部署」生出一條 Task。
+規則在 prompt 三處明文、在 `open_issue` 的類別名稱上、現在還在決策點的 description 上——
+它還是走過去了。這支持「**能力問題，不是指令問題**」的判讀。
+
+再往下只剩對單一模型的失誤寫專門文字（例如列舉「協助／幫忙／支援」這類詞），
+那是 over-fit 到一個不打算上生產的模型，而且會讓強模型多付推理成本。**到此為止。**
+
+單一 trial：run 6 與 run 8 的其他差異也可能是抽樣雜訊，本節不宣稱它們由該修正造成；
+能說的是全部差異都朝期望方向，沒有一項反向。
+
+**未驗證的風險（本次造成）**：`4b75190` 改的是所有模型看到的東西，
+但只在 Luna-Pro 上觀測過。Sonnet 5／Opus 5 是否因此變差**沒有量過**。
+
+---
+
 ## 1. 結論（run 1，2026-07-31 08:35 UTC）
 
 三回合場景**沒有跑完**。第一回合的請求被 Anthropic 以 HTTP 400 拒絕，原因不是模型輸出不好，

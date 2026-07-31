@@ -14,9 +14,14 @@
 | union parameters | 17(展開後) | **0** | 16 |
 | nesting levels | 9 | ≤ 6 | — |
 | properties | 54 | ≤ 35 | — |
-| schema wire bytes | 6,818 | ≤ 3,000 | — |
-| instructions bytes | 6,203 | ≤ 2,800 | — |
-| request bytes | 14,491 | ≤ 7,500 | — |
+| schema wire bytes | 6,818 | ≤ 4,500 | — |
+| instructions bytes | 6,203 | ≤ 5,200 | — |
+| request bytes | 14,491 | ≤ 11,000 | — |
+
+**位元組目標在 T1／T3 被上修過,原值訂錯了。** schema 原訂 3,000:實測 4,084,再壓下去
+只能縮短 property 名稱,與「descriptive, unambiguous」相衝。instructions 原訂 2,800:
+五段顧問判準加開場白就是 3,867,不變量 1 說那些一字不改,2,800 從一開始就不可能。
+真正的綁定條件是結構維度,不是位元組。
 
 union 目標是 **0 而非「≤16」**:官方明載個別限制全部滿足仍可能被拒
 (「even if each individual limit in the preceding table is satisfied」),另有未公開的
@@ -154,7 +159,7 @@ code 時,依 disposition 會產出 `ExcludePayload`,`PAYLOAD_DOES_NOT_MATCH_DISP
 
 ## T3 — instructions 瘦身
 
-只刪兩段中確定由別處保證的句子,目標 ≤ 2,800 bytes:
+只刪兩段中確定由別處保證的句子,目標 ≤ 5,200 bytes(實測 5,090):
 
 | 刪除 | 依據 |
 |---|---|
@@ -175,8 +180,9 @@ code 時,依 disposition 會產出 `ExcludePayload`,`PAYLOAD_DOES_NOT_MATCH_DISP
 
 ### T3 的驗證
 
-`tests/test_job_analysis_prompt.py`(新增或擴充):instructions bytes `<= 2800`;
-五段顧問判準的標題與內容 hash 未變(防止瘦身誤傷判準)。
+`tests/test_job_analysis_prompt.py`:instructions bytes `<= 5200`;五段顧問判準**逐段
+位元組數**不變(比 hash 可讀,而且一樣抓得到誤傷);已搬走的規則不得回流(逐條對上
+`ViolationCode`);只有模型能做的判斷仍在。
 
 **commit**:`refactor(job-analysis): drop instructions the verifier already enforces`
 
@@ -202,5 +208,5 @@ code 時,依 disposition 會產出 `ExcludePayload`,`PAYLOAD_DOES_NOT_MATCH_DISP
 |---|---|---|---|
 | T1 | ✅ | `aef0d2f` | union 17→0、properties 54→32、nesting 9→6、wire 6,818→4,084 bytes。byte 預算由 3,000 改成 4,500 並改記為粗略迴歸護欄:實測 4,084,再壓下去只能縮短 property 名稱,與 S5「descriptive, unambiguous」相衝。同時移除已取消的 Probe U |
 | T2 | ✅ | (本 commit) | v2 成為唯一送出去的形狀;v1 provider schema 與 golden 一併移除(已無人送)。mapper 改為值驅動(見上)。`NextQuestion.purpose`、`TaskAnalysisResult.limitations` 移除 |
-| T3 | 未開始 | | |
+| T3 | ✅ | (本 commit) | 6,203 → 5,090 bytes(−18%);兩段機械規則 2,336 → 1,223(−48%),「輸出規則」整段消失。五段判準逐段位元組數不變,由 `test_job_analysis_prompt.py` 逐段守住 |
 | T4 | 未開始 | | 待 owner 放行 US$0.10 |

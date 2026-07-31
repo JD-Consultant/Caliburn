@@ -212,4 +212,46 @@ code 時,依 disposition 會產出 `ExcludePayload`,`PAYLOAD_DOES_NOT_MATCH_DISP
 | T1 | ✅ | `aef0d2f` | union 17→0、properties 54→32、nesting 9→6、wire 6,818→4,084 bytes。byte 預算由 3,000 改成 4,500 並改記為粗略迴歸護欄:實測 4,084,再壓下去只能縮短 property 名稱,與 S5「descriptive, unambiguous」相衝。同時移除已取消的 Probe U |
 | T2 | ✅ | (本 commit) | v2 成為唯一送出去的形狀;v1 provider schema 與 golden 一併移除(已無人送)。mapper 改為值驅動(見上)。`NextQuestion.purpose`、`TaskAnalysisResult.limitations` 移除 |
 | T3 | ✅ | (本 commit) | 6,203 → 5,090 bytes(−18%);兩段機械規則 2,336 → 1,223(−48%),「輸出規則」整段消失。五段判準逐段位元組數不變,由 `test_job_analysis_prompt.py` 逐段守住 |
+| T5 | ✅ | (本 commit) | 契約層稽核(見下)：修好 1-based 缺陷後,逐條問「模型有沒有途徑知道這條 verifier 規則」,補上 6 個缺口,其中 `task` 的描述原本寫反 |
 | T4 | ✅ | 無碼變更 | run `20260731T120931Z`：HTTP 200、turn 1 `committed`、1 call、0 retry、**US$0.058195**。上限經 owner 同意由 US$0.10 上調至 US$0.20——保守 reserve 是 US$0.155(位元組當 input token ＋ 全額 `max_tokens`),US$0.10 會在 HTTP 之前擋下。實際落在估計的 US$0.06。結果見 [experiments](../experiments/2026-07-31-job-analysis-attributed-live-smoke/README.md) §0 |
+
+
+---
+
+## T5 — 契約層稽核(2026-07-31,run 3 停線後)
+
+run 3 用 US$0.064 撞出一個「模型無從得知的規則」缺陷(`target_ordinal` 的 1-based／0-based)。
+與其一次付一次錢撞下一個,改成離線逐條稽核:**把 `verifier.py` 的每一條規則拿出來問
+「模型有沒有任何途徑知道這件事」**。
+
+| # | 規則(ViolationCode) | 稽核前 | 處置 |
+|---|---|---|---|
+| A | `RELATION_DOES_NOT_MATCH_MAPPING` | **無出處**(T3 刪掉、schema 沒寫) | 寫進 `relation` 的 description |
+| B | `TASK_CHANGE_TARGET_COUNT` | **從未寫過** | 寫進 `target_task_ordinals` |
+| C | `IDENTITY_TARGETS_NOT_EMPTY`／`_MISSING` | 無出處 | 同上 |
+| D | `TASK_FIELDS_FORBIDDEN` | **描述寫反**:「非 Task 變更時各欄填 `""`」暗示變更就該填,但 withdraw 不得填 | 改成「add／revise／merge 必填;withdraw 不得填」 |
+| E | `SPLIT_CHILDREN_INSUFFICIENT`／`SPLIT_SUPPORT_UNKNOWN` | 無出處 | 寫進 `split_children` |
+| F | `SUPERSESSION_MISSING_CURRENT_TURN_ANCHOR`／`RESOLUTION_MAPPING_INVALID` | T3 刪掉 | 寫進 `supersedes`／`resolves_open_issue_ordinal` |
+
+其餘 code(anchor 範圍、ordinal 重複、duplicate signal…)由 packet 的渲染或欄位語意即可推得,
+不另外寫。support link 的編號與有效性 packet 已渲染成 `(n) [有效／已被取代]`,模型看得到。
+
+### 這代表 T3 砍過頭了
+
+T3 的理由是「verifier 已強制」。但 **verifier 擋下來不是免費的**:要付一整次呼叫,
+還賠掉員工那一輪。Claude 5 那篇講的是刪**重複**的指令,不是刪掉某條耦合規則的唯一出處。
+
+修法仍照 P4——放進**介面**而不是放回散文,理由有三:(1) 緊鄰模型正在填的欄位;
+(2) 只寫一次;(3) 淨量仍比原本小。原本「行為與禁止事項」＋「輸出規則」是 2,336 bytes 而且
+**沒有**涵蓋 A／B／D／E;現在 prompt 1,223 ＋ description 1,163 = 2,386,涵蓋範圍嚴格更大。
+
+### T5 的驗證
+
+`test_every_rule_the_model_must_satisfy_is_discoverable`:把 schema 的全部 description
+加上 Static Instructions 併成「模型看得到的文字」,逐條 `ViolationCode` 斷言其出處仍在。
+刪掉任何一條 description 就會紅。
+
+預算隨之上修:description 600 → 1,500(實測 1,163)、wire bytes 4,500 → 5,600(實測 4,818)。
+一條 description 只要擋掉一次 rejection 就回本。
+
+**commit**:`fix(job-analysis): give the model every rule the verifier enforces`

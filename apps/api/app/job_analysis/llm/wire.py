@@ -161,13 +161,33 @@ class WireSplitChild(DomainModel):
 # `change` 決定哪些格子有內容。
 class WireSignal(DomainModel):
     anchors: tuple[WireAnchor, ...] = ()
-    relation: IdentityRelation
-    target_task_ordinals: tuple[int, ...] = Field(
-        default=(), description="identity 與變更共用同一批"
+    relation: IdentityRelation = Field(
+        description=(
+            "必須與 change 一致:add→no_match、revise／merge→overlap、"
+            "純補依據(change 與 rejection 皆 none)→duplicate;"
+            "withdraw／split／exclude／open_issue 不限"
+        )
     )
-    supersedes: tuple[WireSupersession, ...] = ()
+    target_task_ordinals: tuple[int, ...] = Field(
+        default=(),
+        description=(
+            "identity 與變更共用同一批,只能指 current_authorities.tasks 的編號。"
+            "數量:add 0 個、revise／withdraw／split 各 1 個、merge 至少 2 個"
+        ),
+    )
+    supersedes: tuple[WireSupersession, ...] = Field(
+        default=(),
+        description=(
+            "只在本回合更正了某條既有依據時填;該依據要屬於本訊號的 target Task "
+            "且目前標示為有效,而且 anchors 必須包含目前這一輪的員工回合"
+        ),
+    )
     resolves_open_issue_ordinal: int = Field(
-        default=0, description="0 表示沒有解決任何 open issue"
+        default=0,
+        description=(
+            "0 表示沒有解決任何 open issue。只有兩種填法:"
+            "確認是新工作用 no_match ＋ add,確認不成立用 exclude"
+        ),
     )
     disposition: SignalDisposition
     change: WireTaskChange = Field(
@@ -177,9 +197,15 @@ class WireSignal(DomainModel):
         default=WireWithdrawReason.NONE,
         description='僅 change=withdraw 時填,否則 "none"',
     )
-    task: WireTaskFields = Field(description='非 Task 變更時各欄填 ""')
+    task: WireTaskFields = Field(
+        description='add／revise／merge 必填;withdraw 不得填;其餘各欄填 ""'
+    )
     split_children: tuple[WireSplitChild, ...] = Field(
-        default=(), description="僅 change=split 時填"
+        default=(),
+        description=(
+            "僅 change=split 時填,至少兩個;inherited_support_ordinals 只能用母 Task "
+            "標示為有效的 support 編號"
+        ),
     )
     rejection_code: WireRejectionCode = Field(
         default=WireRejectionCode.NONE,

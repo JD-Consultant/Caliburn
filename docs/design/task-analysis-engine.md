@@ -218,7 +218,24 @@ JD 只在員工決定提案時才改。
 |---|---|---|
 | endpoint variant preflight | `provider_order` 只鎖 base slug,同 provider 可能有多個 endpoint variant。`providers/openrouter_evidence.py` 的 `select_catalog_endpoint()` 已能從 model detail 選出唯一 active endpoint,但**沒有任何 runtime 路徑呼叫它** | 由待建的 live smoke wrapper 在付費前呼叫;不進 request 路徑 |
 | route 歸因 | `inspect_openrouter_execution()` 可解析 router metadata、pipeline 與 `usage.cost`,並判定該次能否用於品質歸因。**一般產品回合不要求也不送 metadata**;`OpenRouterAdapter` 的 headers 未改,結果不寫 PostgreSQL／Journal | metadata／no-cache opt-in 只留給待建的 smoke wrapper |
-| 真模型跑通的證據 | 上述兩個 parser 都只在離線 fixture 下驗過。**尚未對 Opus 5／Anthropic route 送過任何真實請求**,因此沒有 endpoint catalog 實測值,也沒有任何 prompt 品質結論 | 由 attributed live smoke 產生後,才把結論寫進 `docs/experiments/` 與本表 |
+| 真模型跑通的證據 | 上述兩個 parser 與下述 driver 都只在離線 fixture 下驗過。**尚未對 Opus 5／Anthropic route 送過任何真實請求**,因此沒有 endpoint catalog 實測值,也沒有任何 prompt 品質結論 | 由 attributed live smoke 執行後,才把結論寫進 `docs/experiments/` 與本表 |
+
+### 8.1 Attributed live smoke(`scripts/job_analysis_live_smoke.py`)
+
+一支**一次性診斷 CLI**,不是 eval framework、不是常駐設施,也**沒有任何 runtime 或 route 依賴它**。
+它跑真 `create_document()` → `submit_employee_turn()` → `load_document()`、真 PostgreSQL 與真 OpenRouter,
+固定三回合 synthetic 場景(多工作＋工具 / 更正責任 / 途中新增工作),每回合只送一次。
+
+邊界:
+
+- 硬上限 **3 次 generation call、US$0.75、零 retry**;reserve 用 live catalog 單價在 HTTP **之前**算,
+  超過就停。完成後改用 `usage.cost` 累計,cost 缺失即停止剩餘回合。
+- 只有這支 CLI 的 `RecordingTransport` 加 `X-OpenRouter-Metadata: enabled` 與 `X-OpenRouter-Cache: false`;
+  **`OpenRouterAdapter` 與 FastAPI dependency 的 headers 未改**,產品回合不要求 metadata。
+- raw capture 寫 gitignored `output/job-analysis-live-smoke/<run-id>/`;request headers 永不落地,
+  因此 API key 沒有進檔案的路徑。Git 只收 `docs/experiments/` 的精簡報告。
+- `--max-generation-calls 0` 只做 catalog preflight,不建文件、不花錢。working tree dirty 時 CLI 在付費前停止。
+- 它**不是**瀏覽器 E2E:不驗 UI 點擊、CORS 或前端錯誤顯示。單次 trial 也不能宣稱穩定品質或比較模型。
 | prompt 品質調校 | `llm/prompt.py` 已有 Task 判準與彈性顧問行為基線，但尚未用真實員工資料調校 | 有真實使用摩擦後以 rubric／eval 調整，不先加 planner 或第二次呼叫 |
 | duplicate／overlap identity 自動收斂 | 第一版刻意不做；模型保留 issue 並追問員工 | 有真實重複摩擦證據後再研究，不用相似度猜測 |
 | O/P/K/S/A、完整 header、匯出 | 目前只做 Task 與較豐富的內部 JD Task 欄位 | 各自研究／契約完成後逐項加；匯出才對齊公版 |

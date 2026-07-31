@@ -368,3 +368,17 @@ async def run_live_smoke(
 - raw artifact 含 secret、非 synthetic 使用者資料，或 output directory 會被 Git 追蹤。
 - 實作需要 import 舊 AI／eval 路徑、增加 DB／API／Web contract、通用 provider framework、grader、Graph 或第二模型。
 - 實作者想因一次結果直接改 prompt／model／schema 或宣稱產品品質通過。
+
+## Execution record
+
+| 日期 | 項目 | 結果 |
+|---|---|---|
+| 2026-07-31 | Baseline | `apps/api` `uv run pytest -q` → 1 failed / 1440 passed / 249 skipped。唯一失敗是既有的 `test_interview_vnext_execution_schemas.py::test_committed_operation_document_and_prompt_match_current_contracts`(autocrlf 把 `turn-interpret.1.0.0.md` 檢出成 CRLF;LF 正規化後 hash 即為期望值),與本計畫無關,未處理 |
+| 2026-07-31 | Task 1 | `da7695e feat(job-analysis): capture OpenRouter route evidence` — gate 綠(81＋3 passed) |
+| 2026-07-31 | Task 2 | `685763a test(job-analysis): add attributed live smoke` — focused gate 111 passed、全 `test_job_analysis_*` 386 passed(真 PostgreSQL,`TEST_DATABASE_URL` 指向 `caliburn`,migration `0013 (head)`) |
+| 2026-07-31 | Task 2 修正 | `760b2f1 fix(job-analysis): point catalog preflight at the endpoints API` — 原 `/api/v1/models/{author}/{slug}` 回 404;endpoint 陣列只在 `/endpoints` 路徑,已改並更新測試 |
+| 2026-07-31 | Task 3 Step 1 | **停線,未進入 Step 2**。dry preflight(`--max-generation-calls 0`)輸出 `catalog preflight failed: endpoint status -2 is not the active value 0`。**0 次 generation call、US$0 支出**,未建立文件與 output directory |
+
+Step 2–8 未執行:沒有 transcript 可讀,因此沒有 route、tools、work boundaries、correction、cross-turn
+memory、grounding、consultant question、durability 的任何裁決,也沒有失敗分類。環境診斷與 owner 選項見
+[experiment](../experiments/2026-07-31-job-analysis-attributed-live-smoke/README.md)。

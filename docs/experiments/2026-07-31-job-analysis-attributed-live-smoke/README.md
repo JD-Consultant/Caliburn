@@ -1,10 +1,12 @@
 # Job Analysis attributed live smoke：執行結果
 
 日期：2026-07-31
-狀態：**三回合場景已於 run 5 跑完（`committed / committed / committed`）。**
-五次 run 累計 US$0.461，找出五個契約層缺陷（grammar 過大／ordinal 基準不一致／
-6 條規則模型無從得知／一般 open issue 無關閉路徑／新 issue 拿不到 `last_asked_turn_id`），
-全部已修。**merge／split／revise／withdraw、supersession 與 Proposal 決策仍未被任何 run 觀測到。**
+狀態：**三回合場景已跑完（run 5 Opus 5、run 6 Luna-Pro、run 7 Sonnet 5，皆 `committed`×3）。**
+七次 run 累計 US$0.593，找出**七個**契約層缺陷（grammar 過大／ordinal 基準不一致／
+6 條規則模型無從得知／一般 open issue 無關閉路徑／新 issue 拿不到 `last_asked_turn_id`／
+schema 名稱帶點／`$ref` 帶兄弟 keyword），全部已修；後兩個是換 provider 才浮現的**可攜性**
+缺陷，契約原本鎖死 Anthropic。**merge／split／withdraw、supersession 與 Proposal 決策
+仍未被任何 run 觀測到。**
 計畫：[2026-07-31 attributed live smoke plan](../../plans/2026-07-31-job-analysis-attributed-live-smoke-plan.md)
 研究：[OpenRouter 歸因與最小 live smoke](../../specs/2026-07-31-job-analysis-openrouter-attribution-and-live-smoke-research.md)
 
@@ -235,6 +237,80 @@ preflight catalog endpoint`（catalog 報 `anthropic/claude-opus-5`，router 選
 turn 3 的 `next_question.target_kind = none`：問題要回指的是**前一輪新增的 Task**，
 而 target 詞彙只有 `existing_open_issue` 與 `new_signal`，表達不了。模型選了中性值，
 是誠實的做法。真的造成追問失焦時再處理，現在不加欄位。
+
+---
+
+## 0f. Run 6–7（2026-07-31 20:19／20:26 UTC）：Luna-Pro 與 Sonnet 5 的 A/B
+
+同一個凍結場景、同一份 prompt、同一份 schema，只換 `job_analysis_model` 與
+`job_analysis_provider`（env var，不改 repo）。Opus 5 的 run 5 當 baseline。
+
+### 換 provider 先撞出兩個契約缺陷（都 US$0，生成前被拒）
+
+| # | 錯誤 | 根因 | 修正 |
+|---|---|---|---|
+| 1 | `Invalid 'text.format.name': …pattern '^[a-zA-Z0-9_-]+$'` | schema 名字裡的**點**（`task_analysis_result.v2`）；Anthropic 收，OpenAI 不收 | 改名 `task_analysis_result_v2`＋測試守住（`5f3a2a5`）|
+| 2 | `$ref cannot have keywords {'description'}` | Pydantic 把 enum 欄位輸出成 `{"$ref":…,"description":…}`；**那些 description 就是給模型的規則本體**，不能拿掉 | 可攜投影裡把 `$ref` 全部內聯（`12ddee1`）|
+
+第二項量過才做：14 個 `$def` **每個只被引用一次**，間接層零重用效益，展開後 schema
+從 4,970 縮到 4,218 bytes，離當初炸掉的 6,818 更遠。**兩家都賺，不是拿 Anthropic 換 OpenAI。**
+這兩個修正與最後選哪個模型無關——契約本來在兩處鎖死單一 vendor，現在不鎖了。
+
+### 成本：兩個「便宜」都被侵蝕，倍率與目錄單價差很多
+
+| 模型 | 目錄單價 vs Opus | **實測三回合** | **實際比例** |
+|---|---:|---:|---:|
+| `anthropic/claude-opus-5` | 100% | US$0.210285 | 100% |
+| `anthropic/claude-sonnet-5` | 40%（導入價） | US$0.111156 | **53%** |
+| `openai/gpt-5.6-luna-pro` | 2% | US$0.020856 | **10%** |
+
+侵蝕原因不同：
+
+- **Luna-Pro**：GPT tokenizer 吃繁中效率差，同一份 packet **20,039 vs 6,360 tokens（3.1x）**；
+  `mode=pro` 的 reasoning **7,722 vs 129（60x）**、completion 9,437 vs 1,460。
+- **Sonnet 5**：prompt token 與 Opus 相當（略少），但輸出較長（completion 2,788／3,328／1,133
+  vs Opus 1,460／1,755／991）。
+- Sonnet 5 現在是導入價 $2/$10、**2026-08-31 到期**；以牌價 $3/$15 重算同一次 run 是
+  US$0.1667 = **79% of Opus**——屆時只省兩成。
+
+### 判斷品質：一個測試點乾淨地分開了它們
+
+turn 1 員工說「版本上線時，我會**協助**正式環境部署」：
+
+| 模型 | 判斷 |
+|---|---|
+| Opus 5（run 4 **與** run 5，2/2） | 不成立 Task，開 `責任邊界不明` open issue，追問哪一段真的是他做的 |
+| Sonnet 5 | **同上**（`責任邊界不明`，relation 用 `uncertain`）|
+| Luna-Pro | **直接建 Task**：「協助執行正式環境部署，支援版本上線」，`purpose_result` 只是把句子重講一遍 |
+
+turn 2 的員工更正救了 Luna-Pro——但**那是場景剛好有更正**。真實訪談裡員工若沒更正，
+JD 會寫著他負責正式環境部署，而那是假的。open issue 機制存在的理由就是擋這個。
+Luna-Pro 的補救也不乾淨：`revise` 後的 Task 仍帶著錯誤原版的 `purpose_result`
+「支援版本上線」（Opus 寫的是「以確認版本具備上線條件」）；它的 `exclude` 還帶了
+`relation=overlap, targets=[3]`，而 exclude 不需要指向任何 Task。
+**Luna-Pro 三回合一則 open issue 都沒開過。**
+
+Sonnet 5 比 run 5 的 Opus 更保守：turn 2 把「上線前測試與檢查」留成 `證據不足` open issue
+而非成立 Task（＝run 4 的 Opus 判法），turn 3 並以 `existing_open_issue` 精確指回它。
+最終 3 Task ＋ 1 open issue（Opus run 5 是 4 Task ＋ 0）。兩種判法都在 Opus 自己身上出現過，
+沒有 rubric 就不能說誰對——但「該不該從『協助』二字生出一條 Task」不是這種擺盪，
+那條線 Luna-Pro 是踩過去了。
+
+### 每份 JD 的推估（用實測的每回合 +550 prompt tokens 外推 30 回合）
+
+| 模型 | 每份 JD |
+|---|---:|
+| Opus 5 | ~US$3.2 |
+| Sonnet 5（導入價／牌價） | ~US$1.6／~US$2.4 |
+| Luna-Pro | ~US$0.3 |
+
+這才是產品該看的數字；三回合 smoke 的成本是研發開銷，不是單位經濟。
+
+### 不得由本節推得
+
+單一 trial ×3，沒有 rubric，沒有重複抽樣。本節能支持的只有兩件事：兩個契約可攜性缺陷
+是真的且已修；以及「從『協助』生出一條 Task」這個具體失誤，Luna-Pro 犯了、兩個 Claude 模型
+沒犯。其餘差異都在單次抽樣的雜訊範圍內。
 
 ---
 

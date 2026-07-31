@@ -427,11 +427,20 @@ class _Writer:
         )
 
     def record_next_question(self, question: NextQuestion) -> None:
+        """記下這一輪問了哪個缺口。
+
+        兩條路都要記:顧問**同一輪提出 issue 又問它**是最常見的形狀,只認
+        `existing_open_issue` 會讓新 issue 永遠停在「尚未問過」,下一輪就被當成沒問過再問。
+        """
         target = question.target
-        if (
-            target is None
-            or target.kind is not NextQuestionTargetKind.EXISTING_OPEN_ISSUE
-        ):
+        if target is None:
+            return
+        if target.kind is NextQuestionTargetKind.NEW_SIGNAL:
+            # 追問的訊號未必產生 open issue(例如剛新增的 Task);沒有就沒得記。
+            if target.index is not None:
+                self._note_asked(f"{self._operation_id}-i{target.index}")
+            return
+        if target.kind is not NextQuestionTargetKind.EXISTING_OPEN_ISSUE:
             return
         view = next(
             (
@@ -445,17 +454,19 @@ class _Writer:
             raise _TransitionRejected(
                 f"next question references unknown open issue ordinal {target.ordinal}"
             )
+        if not self._note_asked(view.issue.id):
+            raise _TransitionRejected(
+                "next question targets an open issue already resolved by this result"
+            )
+
+    def _note_asked(self, issue_id: str) -> bool:
         for position, issue in enumerate(self._open_issues):
-            if issue.id == view.issue.id:
+            if issue.id == issue_id:
                 self._open_issues[position] = issue.model_copy(
-                    update={
-                        "last_asked_turn_id": f"{self._operation_id}-consultant"
-                    }
+                    update={"last_asked_turn_id": f"{self._operation_id}-consultant"}
                 )
-                return
-        raise _TransitionRejected(
-            "next question targets an open issue already resolved by this result"
-        )
+                return True
+        return False
 
     def _apply_supersessions(self, signal: WorkSignal) -> None:
         """§12.3 末段:被取代的依據一律指向本次正在處理的 employee turn。"""

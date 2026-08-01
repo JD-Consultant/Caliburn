@@ -1,11 +1,26 @@
 ---
 title: OPKS（工作產出／行為指標／知識／技能／態度）設計裁決研究
 date: 2026-08-01
-status: Proposed —— 供 owner 討論；尚未寫 ADR、未動碼
-purpose: 把 2026-08-01 三份原料收斂成可裁決的選項比對，並誠實標出兩處未完成的原料缺口
+status: Resolved —— 已由 [ADR 0048](../adr/0048-opks-evidence-axes-and-document-level-competencies.md) 裁決
+purpose: 把 2026-08-01 五份原料收斂成可裁決的選項比對，並誠實標出未完成的原料缺口
 ---
 
 # OPKS 設計裁決研究
+
+> **【2026-08-01 結案】本文的 §3 Q1–Q5 已經裁決完畢，裁決結果以
+> [ADR 0048](../adr/0048-opks-evidence-axes-and-document-level-competencies.md) 為準。**
+> 本文保留原貌供追溯（含**被否決的建議**），**不得據本文的建議施工**。
+>
+> 三處與 ADR 不同、以 ADR 為準的重點：
+>
+> | 本文原建議 | ADR 0048 的裁決 |
+> |---|---|
+> | Q1 先維持四級支持度，遇到表達不了的案例再拆 | **現在就拆成 `evidence_origin` × `task_linkage` 兩軸**＋`source_refs[]` 型別層非空；`employee_confirmed` 移回既有 Proposal／Current JD 權威層 |
+> | Q2 照 iCAP 層次，K/S 掛在行為指標底下 | **K/S/A 正規化到文件層**，與 Task／Indicator 多對多；「掛在指標底下」是對 iCAP 的誤讀，已於 `a464f42` 更正 |
+> | Q5 讓員工**只能否決**推導出的 K/S | 員工可 **confirm/edit/add/reject/unknown**；只能否決並無實證支持，且與員工文件權威衝突 |
+>
+> 另有兩處事實更正已落地（`a464f42`）：bogus item **撤出產品**（僅留離線 eval）、
+> Morgeson 的 task-anchoring 由「原著背書」降為**未經驗證的設計選擇**。
 
 ## 0. 這份回答什麼、不回答什麼
 

@@ -102,7 +102,13 @@ def _add_change(
     evidence: tuple[OpksEvidenceLink, ...],
 ) -> VerifiedOpksChange:
     kind = _domain_kind(item)
-    entity_id = f"{operation_id}-{kind.value}-{item_index}"
+    prefix = {
+        OpksEntityKind.OUTPUT: "o",
+        OpksEntityKind.INDICATOR: "p",
+        OpksEntityKind.KNOWLEDGE: "k",
+        OpksEntityKind.SKILL: "s",
+    }[kind]
+    entity_id = f"{operation_id}-{prefix}{item_index}"
     candidate = OpksItem(
         entity_id=entity_id,
         entity_kind=kind,
@@ -304,4 +310,3 @@ def verify_opks_result(
     if violations:
         return OpksVerificationReport(violations=tuple(violations))
     return OpksVerificationReport(changes=tuple(candidates))
-

@@ -127,11 +127,11 @@ def test_add_new_builds_a_grounded_candidate_with_deterministic_identity():
     ]
     output, knowledge = [change.after for change in report.changes]
     assert output is not None
-    assert output.entity_id == "operation-1-output-0"
+    assert output.entity_id == "operation-1-o0"
     assert output.task_refs == ("task-selected",)
     assert output.evidence_links == (employee_evidence(),)
     assert knowledge is not None
-    assert knowledge.entity_id == "operation-1-knowledge-1"
+    assert knowledge.entity_id == "operation-1-k1"
     assert knowledge.task_refs == ("task-selected",)
     assert knowledge.indicator_refs == ()
 
@@ -414,4 +414,3 @@ def test_semantic_quality_is_not_falsely_encoded_as_a_deterministic_rule():
     )
 
     assert report.is_valid
-

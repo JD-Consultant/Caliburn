@@ -93,6 +93,14 @@ export interface OpksItemView {
 }
 /**
  * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "OpksGenerationView".
+ */
+export interface OpksGenerationView {
+  outcome: "proposed" | "no_grounded_candidates";
+  proposal_ids: string[];
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
  * via the `definition` "OpksProposalView".
  */
 export interface OpksProposalView {

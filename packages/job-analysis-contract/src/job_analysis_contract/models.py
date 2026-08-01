@@ -132,6 +132,19 @@ class OpksItemView(BaseModel):
     evidence_quotes: list[str]
 
 
+class Outcome(StrEnum):
+    proposed = 'proposed'
+    no_grounded_candidates = 'no_grounded_candidates'
+
+
+class OpksGenerationView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    outcome: Outcome
+    proposal_ids: list[str]
+
+
 class Action(StrEnum):
     add = 'add'
     revise = 'revise'

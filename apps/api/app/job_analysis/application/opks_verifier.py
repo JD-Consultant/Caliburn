@@ -212,7 +212,11 @@ def verify_opks_result(
     violations: list[OpksViolation] = []
     candidates: list[VerifiedOpksChange] = []
     seen_targets: set[tuple[OpksEntityKind, int]] = set()
-    seen_add_candidates: set[tuple[OpksEntityKind, str]] = set()
+    seen_add_candidates = {
+        (kind, view.item.text.strip())
+        for kind in OpksEntityKind
+        for view in packet.items_for(kind)
+    }
     selected_task_id = packet.selected_task.task.task_id
     selected_indicator_ids = frozenset(
         view.item.entity_id for view in packet.indicators
@@ -241,8 +245,8 @@ def verify_opks_result(
                         code=OpksViolationCode.DUPLICATE_ADD_CANDIDATE,
                         item_index=item_index,
                         message=(
-                            "the same entity kind and exact add text appears "
-                            "more than once"
+                            "the same entity kind and exact add text already "
+                            "exists or appears more than once"
                         ),
                     )
                 )

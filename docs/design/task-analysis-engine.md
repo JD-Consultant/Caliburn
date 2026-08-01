@@ -112,7 +112,7 @@ A 保留；系統不會把舊 refs 猜接到 replacement Task。員工直接刪�
 OPKS Proposal 決策走 `decide_opks_proposal()`，不呼叫模型：`accepted` 套用原候選且不因員工按接受
 新增 Evidence；`edited` 只允許改文字，並在同交易寫 proposal-decision 與 direct-edit Journal、
 把 direct-edit Evidence 掛到 Current JD；remove Proposal 沒有 replacement text，因此 `edited` 會回
-typed 409，不進交易深處；`rejected`／`deferred` 不改 Current JD。target／Task refs
+typed 422 invalid request，不進交易深處；`rejected`／`deferred` 不改 Current JD。target／Task refs
 或同一 entity 的並行提案失效時只把 active 提案標成員工可見的 `stale`，terminal 不回寫；重送已
 stale 的決策不會再次 bump generation。Task 或 OPKS 人工編輯、Task Proposal 拓撲套用也會在同一
 authority transaction 重算相關 OPKS Proposal，而不靠背景修補。
@@ -254,7 +254,7 @@ JD 只在員工決定提案時才改。
   request／correlation UUID,掃描只會誤殺。
 - **全有或全無。** transition 中途用 `model_copy(update=…)` 疊改(不驗證),收尾逐筆
   `Task.model_validate(...)`;§9.5 的三出口在那裡執行,任何一條不變量不成立就整筆拒絕、state 原封不動。
-- **精確重複才由程式拒絕。** 逐欄完全相同的 `work_signals[]`，以及同一 OPKS batch 內
+- **精確重複才由程式拒絕。** 逐欄完全相同的 `work_signals[]`，以及 OPKS packet 現況或同批輸出中
   `entity_kind` 相同且 trim 後文字逐字相同的 `add_new`，都是確定性錯誤；近似文字、同義改寫與
   Task／OPKS identity 仍是語意問題，不做相似度服務或工具字典。
 - **新分析不能讓舊提案無聲留下。** 同一 Task 已被本輪實質重新分析、但沒有 replacement 時，

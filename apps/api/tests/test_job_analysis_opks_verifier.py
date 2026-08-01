@@ -425,6 +425,33 @@ def test_exact_duplicate_add_candidates_are_rejected_as_a_batch():
     ]
 
 
+def test_exact_add_candidate_already_in_packet_is_rejected():
+    existing = item(
+        "knowledge-1",
+        OpksEntityKind.KNOWLEDGE,
+        "營運指標定義",
+        task_refs=("task-selected",),
+    )
+
+    report = verify_opks_result(
+        packet(existing),
+        result(
+            model_item(
+                OpksGenerationEntityKind.KNOWLEDGE,
+                OpksDecision.ADD_NEW,
+                text="  營運指標定義  ",
+            )
+        ),
+        operation_id="operation-1",
+    )
+
+    assert not report.is_valid
+    assert report.changes == ()
+    assert [violation.code for violation in report.violations] == [
+        OpksViolationCode.DUPLICATE_ADD_CANDIDATE
+    ]
+
+
 def test_semantic_quality_is_not_falsely_encoded_as_a_deterministic_rule():
     report = verify_opks_result(
         packet(),

@@ -995,8 +995,8 @@ async def test_remove_opks_proposal_cannot_be_edited(api_client):
         json={"decision": "edited", "edited_text": "換一種移除說法"},
     )
 
-    assert response.status_code == 409
-    assert response.json()["type"].endswith("/authority-conflict")
+    assert response.status_code == 422
+    assert response.json()["type"].endswith("/invalid-request")
     assert store.opks == (current,)
     assert store.opks_proposals == (proposal,)
 

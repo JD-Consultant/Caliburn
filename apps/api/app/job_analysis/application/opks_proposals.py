@@ -23,6 +23,7 @@ from .authority_commit import commit_authority_change
 from .errors import (
     DocumentNotFound,
     IdempotencyConflict,
+    InvalidProposalDecision,
     OpksProposalNotDecidable,
     OpksProposalNotFound,
 )
@@ -256,7 +257,7 @@ async def decide_opks_proposal(
             target_status is OpksProposalStatus.EDITED
             and proposal.after is None
         ):
-            raise OpksProposalNotDecidable(
+            raise InvalidProposalDecision(
                 "a remove OPKS proposal has no replacement text to edit"
             )
 
@@ -275,7 +276,7 @@ async def decide_opks_proposal(
         ]
         if target_status is OpksProposalStatus.EDITED:
             if proposal.after is None or edited_text is None:
-                raise OpksProposalNotDecidable(
+                raise InvalidProposalDecision(
                     "an edited OPKS decision requires replacement text"
                 )
             edited_after = proposal.after.model_copy(update={"text": edited_text})

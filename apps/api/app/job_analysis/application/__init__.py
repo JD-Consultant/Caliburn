@@ -16,6 +16,7 @@ from .errors import (
     DocumentNotFound,
     IdempotencyConflict,
     InvalidJdTaskOrder,
+    InvalidProposalDecision,
     JdTaskNotFound,
     OpksItemNotFound,
     OpksProposalNotDecidable,
@@ -119,7 +120,6 @@ from .persistence import (
     ProposalRepository,
 )
 from .proposal_decisions import (
-    InvalidProposalDecision,
     ProposalDecision,
     ProposalNotDecidable,
     ProposalNotFound,

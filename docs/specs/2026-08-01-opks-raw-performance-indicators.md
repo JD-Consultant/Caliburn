@@ -19,11 +19,67 @@ source_discipline: 只收官方一手與學術原著；取得失敗與未核實�
 | **新加坡** SkillsFuture *Skills Framework for HR* | ✅ **全文取得**（9.4 MB／7,639 行）；官方網域只回 SPA 殼，改由 Wayback 對同一官方 URL 的 2025-08-05 快照取得 |
 | 澳洲 AQF 的指標升階判準語言 | ❌ 未取得 |
 
+### 0.2 複核方法（審核者可完整重現）
+
+```bash
+# Flanagan 1954（APA 官方）
+curl -sSL -A "Mozilla/5.0" -o flanagan.pdf \
+  "https://www.apa.org/pubs/databases/psycinfo/cit-article.pdf"
+pdftotext flanagan.pdf flanagan.txt
+
+# 美國 OPM（兩份，指令見工作產出原料 §0.2）
+
+# 澳洲 —— 單元本體與 Assessment Requirements 是兩個獨立官方元件
+B=https://training.gov.au/TrainingComponentFiles
+curl -sSL -o au-taeass412.pdf     "$B/TAE/TAEASS412_R1.pdf"
+curl -sSL -o au-taeass412-ar.pdf  "$B/TAE/TAEASS412_AssessmentRequirements_R1.pdf"
+curl -sSL -o au-bsbops401.pdf     "$B/BSB/BSBOPS401_R1.pdf"
+curl -sSL -o au-bsbops401-ar.pdf  "$B/BSB/BSBOPS401_AssessmentRequirements_R1.pdf"
+
+# 新加坡 —— 官方網域只回 SPA 殼，改用 Wayback 對同一官方 URL 的快照；
+# 首次下載會在剛好 5 MiB 截斷，必須用 -C - 續傳
+curl -sSL -C - --max-time 180 -A "Mozilla/5.0" -o sg-sfw-hr.pdf \
+  "http://web.archive.org/web/20250805003944id_/https://www.skillsfuture.gov.sg/docs/default-source/skills-framework/skills-framework-for-hr.pdf"
+# 完整檔 9,393,552 bytes → pdftotext -layout → 7,639 行
+```
+
+**§3b 的數值計數可用以下指令重現：**
+
+```bash
+grep -icE "at least|minimum of|no fewer|[0-9]+ (times|occasions)" \
+  au-taeass412.txt au-bsbops401.txt        # → 0 與 0（單元本體）
+grep -icE "at least|minimum of|no fewer|[0-9]+ (times|occasions)" \
+  au-taeass412-ar.txt au-bsbops401-ar.txt  # → 5 與 1（Assessment Requirements）
+grep -icE "at least [0-9]|minimum of [0-9]|[0-9]+%|within [0-9]+ (days|hours|weeks)" \
+  sg-sfw-hr.txt                            # → 5，逐一檢視後全為訓練補助／CPD
+```
+
+### 0.3 引用定位的限制（審核時務必注意）
+
+**Flanagan 那份 PDF 的頁面結構是壞的。** `pdftotext` 可整檔抽字，但
+`pdftotext -f N -l N` 逐頁抽取回傳空白，`pdfinfo` 亦無法讀出頁數。
+**因此本檔對 Flanagan 一律不標頁碼**，改用文章章節標題定位（可 Ctrl-F）：
+
+```
+THE CRITICAL INCIDENT TECHNIQUE（開篇）
+BACKGROUND AND EARLY DEVELOPMENTS
+DEVELOPMENTAL STUDIES AT THE AMERICAN INSTITUTE FOR RESEARCH
+STUDIES CARRIED OUT AT THE UNIVERSITY OF PITTSBURGH
+USES OF THE CRITICAL INCIDENT TECHNIQUE
+SUMMARY AND CONCLUSIONS
+```
+
+期刊頁範圍 51(4), 327–358 取自書目資料，**非本檔自行核實的頁碼**。
+OPM（自印 `Page D-1`）與澳洲（自印 `Page 2 of 4`）的頁碼則為文件自帶，可核實。
+
 ---
 
 ## 1. Flanagan (1954)：可觀察性的原始定義
 
-### 1a. incident 與 critical 的定義（逐字，p. 327）
+### 1a. incident 與 critical 的定義（逐字）
+
+**定位**：開篇第三段，緊接 "The critical incident technique consists of a set of procedures…" 之後。
+可 Ctrl-F `"By an incident is meant"`。（頁碼不標，理由見 §0.3。）
 
 > "By an incident is meant **any observable human activity that is sufficiently complete in itself to
 > permit inferences and predictions to be made about the person performing the act**. To be critical, an
@@ -176,15 +232,72 @@ Delco-Remy 研究中，三組領班分別以每日／每週／每兩週回報：
 > specified in **at least 2 different units** of competency…"
 > "identify and apply **at least 3 changes** to improve own assessment practice…"
 
-`BSBOPS401` 同樣：「coordinate **at least three** business resources」。
+**`BSBOPS401` 的 Performance Evidence 全文（逐字，供對照）：**
 
-而同兩個單元的 Elements 與 Performance Criteria，`at least`／`minimum of`／次數門檻的出現次數是
-**0 與 0**（Assessment Requirements 側則是 5 與 1）。
+> "The candidate must demonstrate the ability to complete the tasks outlined in the elements,
+> performance criteria and foundation skills of this unit, including evidence of the ability to:
+> · **coordinate at least three business resources.**
+> In the course of the above, the candidate must:
+> · calculate and assess costs in relation to use and maintenance of business resources
+> · develop and present resource requirement recommendations
+> · consult and communicate with individuals and teams about acquiring and using resources
+> · monitor and assess resource acquisition, allocation, use and procedures
+> · follow organisational policies and procedures in relation to business resource acquisition and
+>   monitoring and maintaining records."
+
+**對照組——同一個體系的 Performance Criteria 長什麼樣（逐字，`TAEASS412` Element 1–2）：**
+
+> "1.3 Access and analyse unit/s of competency and assessment tool, and check that tool maps to unit/s
+> and assessment requirements and complies with the principles of assessment and rules of evidence
+> 1.4 Identify actions required to be undertaken by candidate and assessor in preparation for assessment
+> 1.5 Identify and obtain resources required to meet assessment conditions **according to organisational
+> procedures**
+> 2.1 Identify where recognition of prior learning (RPL) and/or reasonable adjustment is required and can
+> be appropriately applied to the assessment process **without compromising the assessment's integrity**"
+
+→ 注意兩件事：（a）**一個數字都沒有**；（b）品質條件是用
+"according to organisational procedures"、"without compromising the assessment's integrity"
+這種**可查核的限定語**表達的——與香港例 #2、新加坡的做法同源。
+
+**計數證據**（指令見 §0.2）：同兩個單元的 Elements 與 Performance Criteria，
+`at least`／`minimum of`／次數門檻出現次數為 **0 與 0**；Assessment Requirements 側為 **5 與 1**。
 
 → **判準 D-7a：數字屬於「怎麼驗證」那一層，不屬於「工作是什麼」那一層。**
 澳洲用文件邊界把這件事做成了結構性強制。OPM 用「量表 vs 定義」做同一件事。
 
 ### 3d. 新加坡：把「標準」定義成外部權威的遵循
+
+**欄位結構（逐字，表頭）**：新加坡把三件事並列成一張表——
+
+> "**CRITICAL WORK FUNCTIONS** | **KEY TASKS** | **PERFORMANCE EXPECTATIONS**"
+
+**定位**：`grep -n "CRITICAL WORK FUNCTIONS"`，職務 *Chief Human Resource Officer (CHRO)*。
+`Critical Work Function` 全文出現 69 次、`Key Task` 138 次。
+
+**一個完整列（逐字）：**
+
+> **Critical Work Function** — "Apply business and financial acumen, MP：Using knowledge of key business
+> drivers and important company data to make informed decisions with a keen appreciation of their impact
+> on business outcomes"
+>
+> **Key Tasks** —
+> · "Formulate and shape the organisation's business strategy and enterprise risk management with senior
+>   business leaders and stakeholders by giving inputs related to business and people agenda"
+> · "Deliver credible and persuasive presentations to senior business leaders and stakeholders and
+>   display deep understanding of the business and industry"
+> · "Display professional maturity and executive presence in dealing with contentious or sensitive topics
+>   during discussion with senior business leaders and stakeholders"
+> · "Advise senior business leaders and stakeholders on the design of the organisation structure to
+>   enable business strategy and support the business objectives aligning to the organisation's vision,
+>   mission and goals"
+> · "Identify and assess an organisation's current and future core capabilities required to deliver
+>   against business strategy in a competitive operating environment and changing business landscape and
+>   economic conditions"
+>
+> **Performance Expectations** — 見下。
+
+→ **Key Tasks 是動詞開頭的行為陳述，而 Performance Expectations 完全不是它們的量化版本。**
+兩者不是「做什麼」與「做到多少」的關係。
 
 新加坡的 `Performance Expectations` 欄不是目標值，而是**具名法規與框架的清單**（逐字）：
 
@@ -236,7 +349,7 @@ iCAP 審核指標 3.4.3 要求「『行為指標』所描述的能力程度，�
 
 | 編號 | 判準 | 實作層 | 依據 |
 |---|---|---|---|
-| D-1 | 行為證據須：可觀察 + 意圖清楚 + 後果明確 | prompt／rubric | Flanagan 1954 p.327 逐字 |
+| D-1 | 行為證據須：可觀察 + 意圖清楚 + 後果明確 | prompt／rubric | Flanagan 1954 開篇逐字（定位見 §1a；不標頁碼，理由見 §0.3） |
 | D-2 | 指標必須對照已聲明的任務目的來寫 | schema（P 掛 Task） | Flanagan 1954 逐字 |
 | D-3 | 「想不起來」是正常結果；戲劇性事件會擠掉例行工作 | 顧問行為 | Flanagan 1954 實測（50%／80%／selective recall） |
 | D-4 | K/S 禁 `ability to`／「具備…能力」句式 | **deterministic** | OPM 逐字 + Morgeson 2004 實證 |

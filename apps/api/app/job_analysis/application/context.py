@@ -441,8 +441,6 @@ def render_context_packet(packet: TaskAnalysisPacket) -> str:
         for label, value in (
             ("purpose_result", task.purpose_result),
             ("context", task.context),
-            ("deliverable_hint", task.deliverable_hint),
-            ("success_criterion_hint", task.success_criterion_hint),
         ):
             if value is not None:
                 lines.append(f"    {label}: {value}")

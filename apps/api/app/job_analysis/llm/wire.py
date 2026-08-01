@@ -355,8 +355,7 @@ def _task_change(signal: WireSignal, change: TaskChangeKind) -> TaskChangePayloa
 
 
 def _task_fields(task: WireTaskFields) -> TaskFields:
-    # `context`／`deliverable_hint`／`success_criterion_hint` 不再每回合向模型索取;
-    # domain 欄位還在,留給 OPKS 階段自己的取得路徑。
+    # `context` 不在每回合重寫；既有 domain 值由 revise 的 identity 流程保留。
     return TaskFields(
         statement=task.statement,
         action=task.action,

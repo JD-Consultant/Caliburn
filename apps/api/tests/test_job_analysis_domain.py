@@ -339,8 +339,6 @@ def test_optional_semantic_fields_default_to_none():
     task = make_task()
     assert task.purpose_result is None
     assert task.context is None
-    assert task.deliverable_hint is None
-    assert task.success_criterion_hint is None
     assert task.enablers == ()
 
 

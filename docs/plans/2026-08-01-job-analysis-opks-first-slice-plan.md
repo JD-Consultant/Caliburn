@@ -427,23 +427,23 @@ accepted | edited | rejected | stale = terminal（無後續轉移）
 
 所有欄位 required，不用 nullable union：`0`／`""` 是 wire-only sentinel，mapping 後不得進 domain。`add_new` 要 `target_ordinal=0,text!=blank`；`reuse_existing` 只允許 K/S、target>0、text 空；`revise_existing` target>0 且 text 非空；`remove_existing` target>0 且 text 空；`uncertain` target=0 且 text 空。A 不在 enum。
 
-- [ ] **Step 1: 寫 Context 紅測試**
+- [x] **Step 1: 寫 Context 紅測試**
 
   測 ordinal 決定性、不同 namespace 不混用、rendering 零內部 ID、只帶有效員工 Evidence、既有 K/S 跨 Task可見、拒絕記憶只取相關項目、pending proposal 明標「待決而非事實」。
 
-- [ ] **Step 2: 寫 wire／portable schema 紅測試**
+- [x] **Step 2: 寫 wire／portable schema 紅測試**
 
   測 committed golden、`additionalProperties:false`、零 nullable union、provider schema lint、schema name 無點、`$ref` 無 sibling keyword、欄位／enum budget 固定。不得重開 Task schema 或把 OPKS 塞入 `task_analysis_result_v2`。
 
-- [ ] **Step 3: 寫 verifier 紅測試**
+- [x] **Step 3: 寫 verifier 紅測試**
 
   測五種 decision mapping、ordinal 範圍、kind 相符、同 target 不重複、O/P target 必屬選定 Task、K/S reuse 可追加 selected Task ref、`uncertain` 不建立 Proposal。單 Task operation 的 K/S `remove_existing` 只解除 selected Task 與該 Task Indicator 的 refs，永遠映射為 revise；即使因此成為 unlinked 也保留文件層 entity，不得刪掉其他 Task 仍使用或目前未連結的 K/S。目標原本與 selected Task 無關時拒絕該 model item。模型新建 K/S 第一版只連 selected Task，`indicator_refs` 留空，不增加同批 item 間的臨時 reference 語法。Verifier 不判「K/S 是否真的必要」「Indicator 是否可觀察」「數字是否合理」。
 
-- [ ] **Step 4: 實作 pure packet／mapping／verifier／prompt**
+- [x] **Step 4: 實作 pure packet／mapping／verifier／prompt**
 
   Prompt 只放 ADR 0048 的核心規則：behavior-first、O/P/K/S 定義、不得補官樣句或數字、Evidence 不足就 abstain、K/S 優先 reuse。Attitude、taxonomy、proficiency、匯出編碼不得出現在 prompt。
 
-- [ ] **Step 5: OPKS operation 就緒後才退役舊 hint，並 Gate**
+- [x] **Step 5: OPKS operation 就緒後才退役舊 hint，並 Gate**
 
   從 `TaskFields` 移除 `deliverable_hint`／`success_criterion_hint`，同步刪除 Context rendering 與只依賴這兩欄的 fixture。此步不得新增 replacement 欄位；正式 O/P 已由 `CurrentJdOpks` 承擔。不得提前到 Task 1，避免在 O/P 尚未接上前製造暫時功能缺口。
 
@@ -454,7 +454,7 @@ accepted | edited | rejected | stale = terminal（無後續轉移）
 
   Expected: `rg` 零 production hit；歷史 migration／文檔不在此 gate。
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
   ```powershell
   git add apps/api/app/job_analysis apps/api/tests docs/design/task-analysis-engine.md

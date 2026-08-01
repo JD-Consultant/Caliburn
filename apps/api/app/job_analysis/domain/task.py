@@ -65,8 +65,6 @@ class TaskFields(DomainModel):
     object: NonEmptyText
     purpose_result: NonEmptyText | None = None
     context: NonEmptyText | None = None
-    deliverable_hint: NonEmptyText | None = None
-    success_criterion_hint: NonEmptyText | None = None
     enablers: tuple[Enabler, ...] = ()
 
 

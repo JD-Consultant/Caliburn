@@ -13,6 +13,23 @@ from .portable_schema import (
     schema_complexity,
 )
 from .prompt import TASK_ANALYSIS_INSTRUCTIONS
+from .opks_result import (
+    OpksDecision,
+    OpksGenerationEntityKind,
+    OpksResult,
+    OpksResultItem,
+)
+from .opks_prompt import OPKS_INSTRUCTIONS
+from .opks_wire import (
+    OPKS_RESULT_WIRE_SCHEMA_NAME,
+    OPKS_WIRE_SCHEMA_PATH,
+    OpksResultWire,
+    OpksWireItem,
+    committed_opks_wire_schema,
+    opks_result_wire_provider_schema,
+    opks_wire_to_result,
+    render_opks_wire_schema_file,
+)
 from .result import (
     TASK_ANALYSIS_RESULT_SCHEMA_NAME,
     ExcludePayload,
@@ -56,6 +73,15 @@ from .wire import (
 
 __all__ = [
     "NEUTRAL",
+    "OPKS_RESULT_WIRE_SCHEMA_NAME",
+    "OPKS_INSTRUCTIONS",
+    "OPKS_WIRE_SCHEMA_PATH",
+    "OpksDecision",
+    "OpksGenerationEntityKind",
+    "OpksResult",
+    "OpksResultItem",
+    "OpksResultWire",
+    "OpksWireItem",
     "TASK_ANALYSIS_INSTRUCTIONS",
     "TASK_ANALYSIS_RESULT_SCHEMA_NAME",
     "TASK_ANALYSIS_WIRE_SCHEMA_NAME",
@@ -90,10 +116,14 @@ __all__ = [
     "WireWithdrawReason",
     "WorkSignal",
     "assert_portable_strict_output_schema",
+    "committed_opks_wire_schema",
     "committed_wire_schema",
     "compact_strict_output_schema",
     "expand_refs",
+    "opks_result_wire_provider_schema",
+    "opks_wire_to_result",
     "render_wire_schema_file",
+    "render_opks_wire_schema_file",
     "schema_complexity",
     "task_analysis_wire_provider_schema",
     "wire_to_task_analysis_result",

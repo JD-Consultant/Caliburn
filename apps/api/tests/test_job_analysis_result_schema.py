@@ -80,8 +80,6 @@ def test_task_fields_is_the_semantic_subset_only():
         "object",
         "purpose_result",
         "context",
-        "deliverable_hint",
-        "success_criterion_hint",
         "enablers",
     ]
 

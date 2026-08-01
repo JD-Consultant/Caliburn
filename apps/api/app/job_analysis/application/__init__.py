@@ -56,10 +56,23 @@ from .opks_authoring import (
     edit_opks_item,
     prune_opks_for_current_jd,
 )
+from .opks_context import (
+    OpksContextPacket,
+    OpksGroundingUnavailable,
+    build_opks_context_packet,
+    render_opks_context_packet,
+)
 from .opks_proposals import (
     decide_opks_proposal,
     remove_opks_item_and_indicator_refs,
     stale_invalid_opks_proposals,
+)
+from .opks_verifier import (
+    OpksVerificationReport,
+    OpksViolation,
+    OpksViolationCode,
+    VerifiedOpksChange,
+    verify_opks_result,
 )
 from .persistence import (
     ACTIVE_QUESTION_SCHEMA_ID,
@@ -159,9 +172,14 @@ __all__ = [
     "OpksRepository",
     "OpksDirectEditPayload",
     "OpksItemNotFound",
+    "OpksContextPacket",
+    "OpksGroundingUnavailable",
     "OpksProposalDecisionPayload",
     "OpksProposalNotDecidable",
     "OpksProposalNotFound",
+    "OpksVerificationReport",
+    "OpksViolation",
+    "OpksViolationCode",
     "PROPOSAL_DECISION_SCHEMA_ID",
     "PROPOSAL_SCHEMA_ID",
     "ProposalDecisionPayload",
@@ -199,11 +217,13 @@ __all__ = [
     "TurnSpeaker",
     "VerificationContext",
     "VerificationReport",
+    "VerifiedOpksChange",
     "Violation",
     "ViolationCode",
     "WORK_MODEL_SCHEMA_ID",
     "add_jd_task",
     "add_opks_item",
+    "build_opks_context_packet",
     "create_document",
     "commit_verified_turn",
     "delete_jd_task",
@@ -219,7 +239,9 @@ __all__ = [
     "put_document_metadata",
     "propose_task_for_jd",
     "reorder_jd_tasks",
+    "render_opks_context_packet",
     "remove_opks_item_and_indicator_refs",
     "stale_invalid_opks_proposals",
     "verify_task_analysis_result",
+    "verify_opks_result",
 ]

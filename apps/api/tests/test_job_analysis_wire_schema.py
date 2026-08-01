@@ -376,11 +376,9 @@ def test_identity_and_change_share_one_ordinal_list():
     )
 
 
-def test_hint_fields_are_not_asked_for_every_turn():
-    """`context`／`deliverable_hint`／`success_criterion_hint` 的唯一消費者是下一回合的
-    packet 自己;domain 欄位保留,但不再每回合要模型生成。"""
-    for name in ("context", "deliverable_hint", "success_criterion_hint"):
-        assert name not in WireTaskFields.model_fields
+def test_context_is_not_asked_for_every_turn():
+    """既有 context 由下一回合 packet 保留，不要求模型每輪重寫。"""
+    assert "context" not in WireTaskFields.model_fields
 
 
 # ── 中性值:值域不得與 domain 漂開 ─────────────────────────────────────────

@@ -148,11 +148,11 @@ Monorepo:Turborepo + per-app uv。
 - [`design/`](design/) — **子系統端到端設計(agent-facing)**;現有 [`editor-knowledge-pack.md`](design/editor-knowledge-pack.md)(編輯器 × 知識包)、[`interview-engine.md`](design/interview-engine.md)(訪談引擎)、[`task-analysis-engine.md`](design/task-analysis-engine.md)(Task Analysis 引擎,`app/job_analysis`)。寫法見 [`design/README.md`](design/README.md)。
 - [`adr/`](adr/) — Architecture Decision Records(決策的「為什麼」+ 取捨;**0001–0050**)；**現行 AI 層方向以 [ADR 0040](adr/0040-professional-consultant-engine-and-r1-validation-contract.md) 為基礎，第一版 Context 邊界由 [ADR 0041](adr/0041-r1-p0-closure-first-version-context-and-holdout.md) 補充，時程風險接受與 A6 第一版預設以 [ADR 0042](adr/0042-r1-screening-stop-and-a6-first-version-default.md) 為準；本機 Current State persistence 與分層編輯 authority 見 [ADR 0043](adr/0043-job-analysis-local-current-state-persistence-and-authoring-authority.md)，不完整 JD Task 對齊見 [ADR 0044](adr/0044-partial-jd-task-reconciliation-and-human-confirmation.md)，Local Web 與共用 authority commit 見 [ADR 0045](adr/0045-job-analysis-local-web-contract-and-shared-authority-commit.md)，最小 AI 顧問迴圈見 [ADR 0046](adr/0046-professional-consultant-minimal-durable-loop.md)，模型自關 open issue 見 [ADR 0047](adr/0047-model-owned-open-issue-closure.md)**。provider 主線為 ADR 0035。0038、0039 已被取代，勿據以開新工。
 
-  **OPKS（工作產出／行為指標／知識／技能／態度）現行裁決 = [0048](adr/0048-opks-evidence-axes-and-document-level-competencies.md) ＋ [0049](adr/0049-opks-derived-axes-evidence-whitelist-and-document-authority.md) ＋ [0050](adr/0050-opks-proposal-minimal-shape.md)，三份一起讀。**
+  **OPKS（工作產出／行為指標／知識／技能／態度）現行裁決 = [0048](adr/0048-opks-evidence-axes-and-document-level-competencies.md) ＋ [0049](adr/0049-opks-derived-axes-evidence-whitelist-and-document-authority.md) ＋ [0050](adr/0050-opks-proposal-minimal-shape.md) ＋ [0051](adr/0051-opks-proposal-status-machine-and-stable-entity-id.md)，四份一起讀。**
   0048 定概念（兩軸取代四級支持度、K/S/A 文件層多對多、不綁 taxonomy、behavior-first）；
   0049 定實作形狀（兩軸改推導不持久化、Evidence 來源白名單、不建 OPKS Work Model shadow、hint 欄位退役）；
-  0050 定 `OpksProposal` 最小形狀（獨立薄型別、每項一筆）。
-  **[ADR 0040 決定 29–30 的「支持度四級」已被 0048 翻案**，凡文件寫「四級支持度」者皆為歷史紀錄，不得據以施工。
+  0050 定 `OpksProposal` 最小形狀（獨立薄型別、每項一筆）；0051 定其狀態機與穩定 `entity_id`。
+  **[ADR 0040 決定 29–30 的「支持度四級」已被 0048 翻案**，凡文件寫「四級支持度」者（**包含本檔上方的 R1／0040／0042 摘要**）皆為**歷史紀錄**，不得據以施工。
   研究依據見 [`specs/2026-08-01-opks-design-decisions-research.md`](specs/2026-08-01-opks-design-decisions-research.md)
   與五份 `specs/2026-08-01-opks-raw-*.md` 原料。
 - [`specs/`](specs/) — 研究紀錄(研究/診斷/選項/比對)。

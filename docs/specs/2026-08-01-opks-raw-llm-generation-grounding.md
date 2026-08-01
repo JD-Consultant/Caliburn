@@ -11,6 +11,17 @@ source_discipline: >
   無法取得原文者一律列入 §10「查不到／需二次確認」,不憑記憶補寫。
 ---
 
+> **【現行裁決】** 本檔是**研究原料**。OPKS 的現行裁決是
+> **[ADR 0048](../adr/0048-opks-evidence-axes-and-document-level-competencies.md)
+> ＋ [0049](../adr/0049-opks-derived-axes-evidence-whitelist-and-document-authority.md)
+> ＋ [0050](../adr/0050-opks-proposal-minimal-shape.md)
+> ＋ [0051](../adr/0051-opks-proposal-status-machine-and-stable-entity-id.md)**（四份一起讀）。
+> 本檔建議凡與四份 ADR 不符者，**一律以 ADR 為準**。
+>
+> **本檔特別注意**：文中多處寫「每個 Task 一次呼叫、**五格**同批」（§表 3、§277–278）。
+> **ADR 0048 決定 8 已改為每個 Task 四格（O/P/K/S），態度（A）走文件層另處理**，
+> 不進 per-Task 呼叫。照本檔原文施工會把態度掛回每個 Task——而那正是證據上最會膨脹的一格。
+
 前置:`2026-07-31-context-engineering-model-facing-contract-research.md`(context 預算、規則放介面)
 與 `2026-07-31-anthropic-strict-schema-grammar-limit-research.md`(strict grammar 的 union 16／optional 24
 上限)。本研究不重寫那兩份的結論,只在它們之上回答 OPKS 特有的問題。

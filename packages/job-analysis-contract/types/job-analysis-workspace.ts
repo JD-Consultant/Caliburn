@@ -93,6 +93,23 @@ export interface OpksItemView {
 }
 /**
  * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "OpksProposalView".
+ */
+export interface OpksProposalView {
+  proposal_id: string;
+  operation_id: string;
+  entity_id: string;
+  entity_kind: "output" | "indicator" | "knowledge" | "skill" | "attitude";
+  action: "add" | "revise" | "remove";
+  status: "pending" | "deferred" | "accepted" | "edited" | "rejected" | "stale";
+  before: OpksItemView | null;
+  after: OpksItemView | null;
+  edited_after: OpksItemView | null;
+  rejection_reason: string | null;
+  stale_reason: string | null;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
  * via the `definition` "DocumentView".
  */
 export interface DocumentView {
@@ -151,6 +168,7 @@ export interface ConsultationView {
   conversation: ConversationTurnView[];
   active_question: ActiveQuestionView | null;
   proposals: ProposalView[];
+  opks_proposals: OpksProposalView[];
   tasks: JdTaskView[];
   opks_items: OpksItemView[];
 }
@@ -168,6 +186,15 @@ export interface EmployeeTurnWrite {
 export interface ProposalDecisionWrite {
   decision: "accepted" | "edited" | "rejected" | "deferred";
   edited_jd_after?: ProposalJdEntryView[] | null;
+  reason?: string | null;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "OpksProposalDecisionWrite".
+ */
+export interface OpksProposalDecisionWrite {
+  decision: "accepted" | "edited" | "rejected" | "deferred";
+  edited_text?: string | null;
   reason?: string | null;
 }
 /**

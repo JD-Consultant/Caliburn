@@ -39,6 +39,7 @@ PROPOSAL_SCHEMA_ID = "job-analysis-proposal/1"
 OPKS_ITEM_SCHEMA_ID = "job-analysis-opks-item/1"
 OPKS_PROPOSAL_SCHEMA_ID = "job-analysis-opks-proposal/1"
 OPKS_DIRECT_EDIT_SCHEMA_ID = "job-analysis-opks-direct-edit/1"
+OPKS_PROPOSAL_DECISION_SCHEMA_ID = "job-analysis-opks-proposal-decision/1"
 ACTIVE_QUESTION_SCHEMA_ID = "job-analysis-active-question/1"
 CONSULTANT_OPENING_SCHEMA_ID = "job-analysis-consultant-opening/1"
 COMPLETED_TURN_SCHEMA_ID = "job-analysis-completed-turn/1"
@@ -193,6 +194,39 @@ class ProposalDecisionPayload(DomainModel):
         return self
 
 
+EMPLOYEE_OPKS_PROPOSAL_DECISIONS = frozenset(
+    {
+        OpksProposalStatus.ACCEPTED,
+        OpksProposalStatus.EDITED,
+        OpksProposalStatus.REJECTED,
+        OpksProposalStatus.DEFERRED,
+    }
+)
+
+
+class OpksProposalDecisionPayload(DomainModel):
+    proposal_id: Identifier
+    decision: OpksProposalStatus
+    employee_text: NonEmptyText | None = None
+    reason: NonEmptyText | None = None
+
+    @model_validator(mode="after")
+    def status_is_an_employee_decision(self):
+        if self.decision not in EMPLOYEE_OPKS_PROPOSAL_DECISIONS:
+            raise ValueError(f"{self.decision.value} is not an employee decision")
+        if self.decision is OpksProposalStatus.EDITED:
+            if self.employee_text is None:
+                raise ValueError("edited OPKS decision requires employee_text")
+        elif self.employee_text is not None:
+            raise ValueError("employee_text belongs to edited OPKS decision only")
+        if self.decision is OpksProposalStatus.REJECTED:
+            if self.reason is None:
+                raise ValueError("rejected OPKS decision requires a reason")
+        elif self.reason is not None:
+            raise ValueError("reason belongs to rejected OPKS decision only")
+        return self
+
+
 JournalKind = Literal[
     "consultant_opening",
     "employee_turn",
@@ -204,6 +238,7 @@ JournalPayload = (
     | CompletedTurnPayload
     | DirectEditPayload
     | OpksDirectEditPayload
+    | OpksProposalDecisionPayload
     | ProposalDecisionPayload
 )
 
@@ -215,6 +250,10 @@ _JOURNAL_CONTRACT: dict[type[DomainModel], tuple[JournalKind, str]] = {
     CompletedTurnPayload: ("employee_turn", COMPLETED_TURN_SCHEMA_ID),
     DirectEditPayload: ("direct_edit", DIRECT_EDIT_SCHEMA_ID),
     OpksDirectEditPayload: ("direct_edit", OPKS_DIRECT_EDIT_SCHEMA_ID),
+    OpksProposalDecisionPayload: (
+        "proposal_decision",
+        OPKS_PROPOSAL_DECISION_SCHEMA_ID,
+    ),
     ProposalDecisionPayload: ("proposal_decision", PROPOSAL_DECISION_SCHEMA_ID),
 }
 

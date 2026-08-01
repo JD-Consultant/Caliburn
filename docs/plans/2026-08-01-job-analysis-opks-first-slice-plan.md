@@ -337,17 +337,17 @@ accepted | edited | rejected | stale = terminal（無後續轉移）
 
 `unknown` 的 Web decision 送 `deferred`。`edited_after` 是完整 snapshot，但 validator 強制除 `text` 外等於原始 `after`。`accepted` 套用 `after`；`edited` 套用 `edited_after` 並另鑄 direct-edit Source；`rejected`／`deferred` 不改 Current JD；`stale` 只有 application 可寫。
 
-- [ ] **Step 1: 寫決策與 replay 紅測試**
+- [x] **Step 1: 寫決策與 replay 紅測試**
 
   覆蓋六態轉移、terminal 不可再決定、accept 不鑄 Evidence、edited 必須真的改字才可決定、edited 同交易寫 proposal-decision Journal 與 direct-edit Journal、rejected reason 持久、deferred reload、相同 decision ID replay、不同 payload conflict。
 
-- [ ] **Step 2: 寫 stale 紅測試**
+- [x] **Step 2: 寫 stale 紅測試**
 
   三條規則逐條測：target 消失；refs Task 不存在／退休；同 entity 的另一 Proposal 先 accepted。再測 direct edit 與 Task delete 會讓相關 pending/deferred OPKS Proposal stale，並保留員工可見 `stale_reason`；terminal proposal 不改成 stale。
 
   同一組 regression 必須涵蓋既有 Task Proposal 決策：Task 3 已完成的 O/P 移除與 K/S refs prune 語意保持不變，並在同一交易把相關 pending/deferred OPKS Proposal 標 stale；terminal OPKS Proposal 不變。
 
-- [ ] **Step 3: 把 authority seam 的 Journal 參數收斂成 tuple**
+- [x] **Step 3: 把 authority seam 的 Journal 參數收斂成 tuple**
 
   ```python
   async def commit_authority_change(
@@ -359,7 +359,7 @@ accepted | edited | rejected | stale = terminal（無後續轉移）
 
   更新既有 Task direct edit／Task Proposal caller，只做簽章與迴圈的 move-first 修改；不得改其語意。這讓 edited OPKS decision 可在同交易寫兩筆 Journal，而不繞過共同 seam。
 
-- [ ] **Step 4: 實作 OPKS decision service 與 transport contract**
+- [x] **Step 4: 實作 OPKS decision service 與 transport contract**
 
   新 route：
 
@@ -369,7 +369,7 @@ accepted | edited | rejected | stale = terminal（無後續轉移）
 
   `OpksProposalDecisionWrite` 只允許 `accepted|edited|rejected|deferred`；`edited_after` 只是一段員工文字，mapper 以原 Proposal 組出完整 snapshot。`ConsultationView` 增加 `opks_proposals[]`，UI 所需 operation grouping 欄位保留。
 
-- [ ] **Step 5: Gate**
+- [x] **Step 5: Gate**
 
   ```powershell
   npm run codegen --workspace=@caliburn/job-analysis-contract
@@ -378,7 +378,7 @@ accepted | edited | rejected | stale = terminal（無後續轉移）
   uv run pytest tests/test_job_analysis_proposal_decisions_postgres.py tests/test_job_analysis_authoring_postgres.py -q
   ```
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
   ```powershell
   git add apps/api packages/job-analysis-contract docs/design/task-analysis-engine.md

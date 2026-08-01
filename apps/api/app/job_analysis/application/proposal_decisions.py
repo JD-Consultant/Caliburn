@@ -42,6 +42,7 @@ from .persistence import (
     ProposalDecisionPayload,
 )
 from .opks_authoring import prune_opks_for_current_jd
+from .opks_proposals import stale_invalid_opks_proposals
 from .transition import JobAnalysisState
 
 
@@ -355,22 +356,34 @@ async def _persist(
     journal_entry: JournalEntry | None,
     current_opks: CurrentJdOpks | None = None,
 ) -> None:
+    state = JobAnalysisState(
+        work_model=work_model,
+        current_jd=current_jd,
+        proposals=proposals,
+        current_opks=(
+            current_opks
+            if current_opks is not None
+            else {"items": await uow.opks.list(record.document_id)}
+        ),
+        opks_proposals=await uow.opks_proposals.list(record.document_id),
+    )
+    now = _utcnow()
+    state = state.model_copy(
+        update={
+            "opks_proposals": stale_invalid_opks_proposals(
+                state.opks_proposals,
+                current_opks=state.current_opks,
+                current_jd=state.current_jd,
+                now=now,
+            )
+        }
+    )
     await commit_authority_change(
         uow,
         record=record,
-        state=JobAnalysisState(
-            work_model=work_model,
-            current_jd=current_jd,
-            proposals=proposals,
-            current_opks=(
-                current_opks
-                if current_opks is not None
-                else {"items": await uow.opks.list(record.document_id)}
-            ),
-            opks_proposals=await uow.opks_proposals.list(record.document_id),
-        ),
-        journal_entry=journal_entry,
-        updated_at=_utcnow(),
+        state=state,
+        journal_entries=(journal_entry,) if journal_entry is not None else (),
+        updated_at=now,
     )
 
 

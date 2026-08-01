@@ -3,12 +3,17 @@
 from datetime import UTC, datetime
 from uuid import UUID
 
-from job_analysis_contract import JdTaskWrite, OpksItemWrite
+from job_analysis_contract import (
+    JdTaskWrite,
+    OpksItemWrite,
+    OpksProposalDecisionWrite,
+)
 
 from app.api.job_analysis_mapper import (
     to_consultation_view,
     to_jd_task_fields,
     to_opks_item_view,
+    to_opks_proposal_decision,
     to_opks_write,
 )
 from app.job_analysis.application import (
@@ -27,6 +32,8 @@ from app.job_analysis.domain import (
     OpksEntityKind,
     OpksEvidenceLink,
     OpksItem,
+    OpksProposal,
+    OpksProposalAction,
     Proposal,
     ProposalAction,
     ProposalStatus,
@@ -127,6 +134,28 @@ def test_opks_mapper_normalizes_employee_fields_and_exposes_only_quotes():
     assert "edit-secret" not in str(payload)
 
 
+def test_opks_proposal_decision_mapper_normalizes_optional_employee_text():
+    edited = OpksProposalDecisionWrite(
+        decision="edited",
+        edited_text=" 員工確認的文字 ",
+    )
+    rejected = OpksProposalDecisionWrite(
+        decision="rejected",
+        reason=" 不適用於我的工作 ",
+    )
+
+    assert to_opks_proposal_decision(edited) == (
+        "edited",
+        "員工確認的文字",
+        None,
+    )
+    assert to_opks_proposal_decision(rejected) == (
+        "rejected",
+        None,
+        "不適用於我的工作",
+    )
+
+
 def test_consultation_view_keeps_history_without_leaking_internal_authority():
     now = datetime(2026, 7, 30, 9, 0, tzinfo=UTC)
     effective = SupportLink(
@@ -162,6 +191,32 @@ def test_consultation_view_keeps_history_without_leaking_internal_authority():
         status=ProposalStatus.STALE,
         stale_reason="Current JD 已由員工修改",
     )
+    opks_item = OpksItem(
+        entity_id="output-1",
+        entity_kind=OpksEntityKind.OUTPUT,
+        text="營運週報",
+        task_refs=("task-1",),
+        evidence_links=(
+            OpksEvidenceLink(
+                source_ref=SourceRef(
+                    kind=SourceKind.EMPLOYEE_TURN,
+                    id="turn-2",
+                ),
+                quote="我每週彙整營運週報",
+            ),
+        ),
+    )
+    opks_proposal = OpksProposal(
+        proposal_id="opks-proposal-1",
+        operation_id="opks-operation-1",
+        entity_id=opks_item.entity_id,
+        entity_kind=opks_item.entity_kind,
+        action=OpksProposalAction.REVISE,
+        before=opks_item,
+        after=opks_item.model_copy(update={"text": "每週營運週報"}),
+        base_authority_generation=7,
+        created_at=now,
+    )
     loaded = LoadedDocument(
         document=DocumentRecord(
             document_id=UUID("00000000-0000-0000-0000-000000000045"),
@@ -176,25 +231,8 @@ def test_consultation_view_keeps_history_without_leaking_internal_authority():
             work_model=CurrentWorkModel(tasks=(task,)),
             current_jd=(jd_task,),
             proposals=(proposal,),
-            current_opks={
-                "items": [
-                    OpksItem(
-                        entity_id="output-1",
-                        entity_kind=OpksEntityKind.OUTPUT,
-                        text="營運週報",
-                        task_refs=("task-1",),
-                        evidence_links=(
-                            OpksEvidenceLink(
-                                source_ref=SourceRef(
-                                    kind=SourceKind.EMPLOYEE_TURN,
-                                    id="turn-2",
-                                ),
-                                quote="我每週彙整營運週報",
-                            ),
-                        ),
-                    )
-                ]
-            },
+            current_opks={"items": [opks_item]},
+            opks_proposals=(opks_proposal,),
         ),
         conversation_turns=(
             ConversationTurn(
@@ -224,5 +262,7 @@ def test_consultation_view_keeps_history_without_leaking_internal_authority():
     ]
     assert payload["tasks"][0]["task_id"] == "task-1"
     assert payload["opks_items"][0]["text"] == "營運週報"
+    assert payload["opks_proposals"][0]["operation_id"] == "opks-operation-1"
+    assert payload["opks_proposals"][0]["after"]["text"] == "每週營運週報"
     assert "authority_generation" not in payload
     assert "work_model" not in payload

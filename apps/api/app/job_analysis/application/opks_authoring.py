@@ -28,6 +28,10 @@ from .persistence import (
     JournalEntry,
     OpksDirectEditPayload,
 )
+from .opks_proposals import (
+    remove_opks_item_and_indicator_refs,
+    stale_invalid_opks_proposals,
+)
 from .transition import JobAnalysisState
 
 
@@ -165,17 +169,29 @@ async def _commit(
     payload: OpksDirectEditPayload,
 ) -> None:
     now = _utcnow()
+    state = state.model_copy(
+        update={
+            "opks_proposals": stale_invalid_opks_proposals(
+                state.opks_proposals,
+                current_opks=state.current_opks,
+                current_jd=state.current_jd,
+                now=now,
+            )
+        }
+    )
     await commit_authority_change(
         uow,
         record=record,
         state=state,
-        journal_entry=JournalEntry(
-            document_id=record.document_id,
-            entry_id=entry_id,
-            kind="direct_edit",
-            payload_schema_id=OPKS_DIRECT_EDIT_SCHEMA_ID,
-            payload=payload,
-            created_at=now,
+        journal_entries=(
+            JournalEntry(
+                document_id=record.document_id,
+                entry_id=entry_id,
+                kind="direct_edit",
+                payload_schema_id=OPKS_DIRECT_EDIT_SCHEMA_ID,
+                payload=payload,
+                created_at=now,
+            ),
         ),
         updated_at=now,
     )
@@ -302,23 +318,10 @@ async def delete_opks_item(
         before = state.current_opks.item_by_id(entity_id)
         if before is None:
             raise OpksItemNotFound(f"OPKS item {entity_id!r} was not found")
-        remaining: list[OpksItem] = []
-        for item in state.current_opks.items:
-            if item.entity_id == entity_id:
-                continue
-            if (
-                before.entity_kind is OpksEntityKind.INDICATOR
-                and entity_id in item.indicator_refs
-            ):
-                item = item.model_copy(
-                    update={
-                        "indicator_refs": tuple(
-                            ref for ref in item.indicator_refs if ref != entity_id
-                        )
-                    }
-                )
-            remaining.append(item)
-        next_opks = CurrentJdOpks(items=tuple(remaining))
+        next_opks = remove_opks_item_and_indicator_refs(
+            state.current_opks,
+            entity_id,
+        )
         await _commit(
             uow,
             record=record,

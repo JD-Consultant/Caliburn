@@ -12,7 +12,18 @@ import pytest_asyncio
 
 from app.api import deps
 from app.job_analysis.application import DocumentRecord, DocumentSummary
-from app.job_analysis.domain import CurrentWorkModel, JdTask, TaskFields
+from app.job_analysis.domain import (
+    CurrentWorkModel,
+    JdTask,
+    OpksEntityKind,
+    OpksEvidenceLink,
+    OpksItem,
+    OpksProposal,
+    OpksProposalAction,
+    SourceKind,
+    SourceRef,
+    TaskFields,
+)
 from app.job_analysis.llm import (
     IdentityRelation,
     SignalDisposition,
@@ -768,6 +779,82 @@ async def test_missing_proposal_uses_its_own_problem_type(api_client):
     response = await client.post(
         f"{root}/proposals/missing/decisions",
         headers={"Idempotency-Key": "missing-proposal"},
+        json={"decision": "accepted"},
+    )
+
+    assert response.status_code == 404
+    assert response.json()["type"].endswith("/proposal-not-found")
+
+
+@pytest.mark.parametrize("decision", ["accepted", "edited", "rejected", "deferred"])
+async def test_opks_proposal_decisions_use_the_independent_contract(
+    api_client,
+    decision,
+):
+    client, store, _ = api_client
+    root = f"/api/v1/job-analysis/documents/{DOCUMENT_ID}"
+    await client.put(root, json={"title": "門市營運專員"})
+    store.tasks = (
+        JdTask(
+            task_id="task-1",
+            statement="每週彙整營運週報",
+            display_order=0,
+        ),
+    )
+    candidate = OpksItem(
+        entity_id="knowledge-1",
+        entity_kind=OpksEntityKind.KNOWLEDGE,
+        text="營運資料定義",
+        task_refs=("task-1",),
+        evidence_links=(
+            OpksEvidenceLink(
+                source_ref=SourceRef(
+                    kind=SourceKind.EMPLOYEE_TURN,
+                    id="turn-1",
+                ),
+                quote="我需要理解營運資料定義",
+            ),
+        ),
+    )
+    proposal = OpksProposal(
+        proposal_id="opks-proposal-1",
+        operation_id="opks-operation-1",
+        entity_id=candidate.entity_id,
+        entity_kind=candidate.entity_kind,
+        action=OpksProposalAction.ADD,
+        after=candidate,
+        base_authority_generation=0,
+        created_at=NOW,
+    )
+    store.opks_proposals = (proposal,)
+    body = {"decision": decision}
+    if decision == "edited":
+        body["edited_text"] = "員工確認的營運資料定義"
+    if decision == "rejected":
+        body["reason"] = "這不是必要知識"
+
+    response = await client.post(
+        f"{root}/opks-proposals/{proposal.proposal_id}/decisions",
+        headers={"Idempotency-Key": f"opks-decision-{decision}"},
+        json=body,
+    )
+
+    assert response.status_code == 200
+    assert response.json()["opks_proposals"][0]["status"] == decision
+    if decision in {"accepted", "edited"}:
+        assert len(response.json()["opks_items"]) == 1
+    else:
+        assert response.json()["opks_items"] == []
+
+
+async def test_missing_opks_proposal_uses_the_proposal_problem_type(api_client):
+    client, _, _ = api_client
+    root = f"/api/v1/job-analysis/documents/{DOCUMENT_ID}"
+    await client.put(root, json={"title": "門市營運專員"})
+
+    response = await client.post(
+        f"{root}/opks-proposals/missing/decisions",
+        headers={"Idempotency-Key": "missing-opks-proposal"},
         json={"decision": "accepted"},
     )
 

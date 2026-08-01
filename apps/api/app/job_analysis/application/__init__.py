@@ -18,6 +18,8 @@ from .errors import (
     InvalidJdTaskOrder,
     JdTaskNotFound,
     OpksItemNotFound,
+    OpksProposalNotDecidable,
+    OpksProposalNotFound,
 )
 from .context import (
     ActiveQuestion,
@@ -54,6 +56,11 @@ from .opks_authoring import (
     edit_opks_item,
     prune_opks_for_current_jd,
 )
+from .opks_proposals import (
+    decide_opks_proposal,
+    remove_opks_item_and_indicator_refs,
+    stale_invalid_opks_proposals,
+)
 from .persistence import (
     ACTIVE_QUESTION_SCHEMA_ID,
     CONSULTANT_OPENING_SCHEMA_ID,
@@ -61,6 +68,7 @@ from .persistence import (
     DIRECT_EDIT_SCHEMA_ID,
     OPKS_ITEM_SCHEMA_ID,
     OPKS_DIRECT_EDIT_SCHEMA_ID,
+    OPKS_PROPOSAL_DECISION_SCHEMA_ID,
     OPKS_PROPOSAL_SCHEMA_ID,
     PROPOSAL_DECISION_SCHEMA_ID,
     PROPOSAL_SCHEMA_ID,
@@ -80,6 +88,7 @@ from .persistence import (
     JournalRepository,
     LoadedDocument,
     OpksDirectEditPayload,
+    OpksProposalDecisionPayload,
     OpksProposalRepository,
     OpksRepository,
     ProposalDecisionPayload,
@@ -144,11 +153,15 @@ __all__ = [
     "OperationOutcome",
     "OPKS_DIRECT_EDIT_SCHEMA_ID",
     "OPKS_ITEM_SCHEMA_ID",
+    "OPKS_PROPOSAL_DECISION_SCHEMA_ID",
     "OPKS_PROPOSAL_SCHEMA_ID",
     "OpksProposalRepository",
     "OpksRepository",
     "OpksDirectEditPayload",
     "OpksItemNotFound",
+    "OpksProposalDecisionPayload",
+    "OpksProposalNotDecidable",
+    "OpksProposalNotFound",
     "PROPOSAL_DECISION_SCHEMA_ID",
     "PROPOSAL_SCHEMA_ID",
     "ProposalDecisionPayload",
@@ -195,6 +208,7 @@ __all__ = [
     "commit_verified_turn",
     "delete_jd_task",
     "delete_opks_item",
+    "decide_opks_proposal",
     "decide_proposal",
     "edit_jd_task",
     "edit_opks_item",
@@ -205,5 +219,7 @@ __all__ = [
     "put_document_metadata",
     "propose_task_for_jd",
     "reorder_jd_tasks",
+    "remove_opks_item_and_indicator_refs",
+    "stale_invalid_opks_proposals",
     "verify_task_analysis_result",
 ]

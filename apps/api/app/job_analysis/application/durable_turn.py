@@ -68,6 +68,8 @@ async def _load_state(
         work_model=record.work_model,
         current_jd=await uow.tasks.list(record.document_id),
         proposals=await uow.proposals.list(record.document_id),
+        current_opks={"items": await uow.opks.list(record.document_id)},
+        opks_proposals=await uow.opks_proposals.list(record.document_id),
     )
 
 

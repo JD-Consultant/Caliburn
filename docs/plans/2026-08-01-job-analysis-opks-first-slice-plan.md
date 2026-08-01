@@ -64,10 +64,10 @@ class CurrentJdOpks(DomainModel):
 
 ## Baseline
 
-- [ ] 在 repo 根確認 `git branch --show-current` 是 `docs/task-analysis-v1-foundations`，`git status --short` 只含本 plan commit 之後的預期變更。
-- [ ] 在 `apps/api` 執行 `uv run pytest -q`，保存既有 failure fingerprint；若 `test_interview_vnext_execution_schemas.py` 仍因 CRLF hash 失敗，只能在 fingerprint 相同時列為既有失敗。
-- [ ] 在 `apps/web` 執行 `npm run test`、`npx tsc --noEmit`、`npm run lint`，三項必須先綠。
-- [ ] 在 `packages/job-analysis-contract` 執行 `npm run check-codegen` 與 `uv run pytest -q`，確認契約 SSOT 起點乾淨。
+- [x] 在 repo 根確認 `git branch --show-current` 是 `docs/task-analysis-v1-foundations`，`git status --short` 只含本 plan commit 之後的預期變更。
+- [x] 在 `apps/api` 執行 `uv run pytest -q`，保存既有 failure fingerprint；若 `test_interview_vnext_execution_schemas.py` 仍因 CRLF hash 失敗，只能在 fingerprint 相同時列為既有失敗。
+- [x] 在 `apps/web` 執行 `npm run test`、`npx tsc --noEmit`、`npm run lint`，三項必須先綠。
+- [x] 在 `packages/job-analysis-contract` 執行 `npm run check-codegen` 與 `uv run pytest -q`，確認契約 SSOT 起點乾淨。
 
 ---
 
@@ -89,11 +89,11 @@ class CurrentJdOpks(DomainModel):
 - `OpksProposalStatus` 固定六態：`pending|deferred|accepted|edited|rejected|stale`；`revision_requested` 不可表示。
 - `OpksProposal` 固定欄位：`proposal_id`、`operation_id`、`entity_id`、`entity_kind`、`action`、`before`、`after`、`edited_after`、`status`、`rejection_reason`、`stale_reason`、`base_authority_generation`、`created_at`、`resolved_at`。
 
-- [ ] **Step 1: 寫 domain 紅測試**
+- [x] **Step 1: 寫 domain 紅測試**
 
   覆蓋：Evidence 空陣列拒絕；`proposal_decision` Evidence 拒絕；O/P 非恰一 Task或帶 Indicator ref 拒絕；K/S refs 可多筆但重複值要拒絕、不靜默去重；A 帶 refs 拒絕；Indicator ref 必須指向同 aggregate 的 Indicator；推導軸不出現在 `model_dump()`；三種 action 的 before/after 組合；六態轉移；`edited_after` 只可改文字；stale/rejected payload 歸屬；`unknown` 不在 enum。
 
-- [ ] **Step 2: 跑 focused red gate**（working directory: `apps/api`）
+- [x] **Step 2: 跑 focused red gate**（working directory: `apps/api`）
 
   ```powershell
   uv run pytest tests/test_job_analysis_opks_domain.py tests/test_job_analysis_domain.py -q
@@ -101,7 +101,7 @@ class CurrentJdOpks(DomainModel):
 
   Expected: FAIL，因 OPKS types 尚不存在；不可用修改測試期望來變綠。
 
-- [ ] **Step 3: 實作最小 immutable contracts**
+- [x] **Step 3: 實作最小 immutable contracts**
 
   所有 collection 使用 tuple、`extra="forbid"`／frozen 沿用 `DomainModel`。`CurrentJdOpks` 驗 entity ID 唯一與 indicator refs；另提供：
 
@@ -112,13 +112,13 @@ class CurrentJdOpks(DomainModel):
 
   `validate_against_tasks()` 只驗 refs 存在，不判斷「這個 K 是否真的支援該 Task」。
 
-- [ ] **Step 4: 跑 focused 與 dependency gate**
+- [x] **Step 4: 跑 focused 與 dependency gate**
 
   ```powershell
   uv run pytest tests/test_job_analysis_opks_domain.py tests/test_job_analysis_domain.py tests/test_job_analysis_dependencies.py -q
   ```
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
   ```powershell
   git add apps/api/app/job_analysis/domain apps/api/tests/test_job_analysis_opks_domain.py apps/api/tests/test_job_analysis_domain.py apps/api/tests/test_job_analysis_dependencies.py docs/design/task-analysis-engine.md
@@ -189,17 +189,17 @@ class OpksProposalRepository(Protocol):
     ) -> None: ...
 ```
 
-- [ ] **Step 1: 寫 serialization／port／migration 紅測試**
+- [x] **Step 1: 寫 serialization／port／migration 紅測試**
 
   測完整 round-trip、未知 schema ID fail closed、損毀 payload fail closed、六態 DB check、active/terminal `resolved_at` check、文件刪除 cascade、兩個文件可使用相同 entity ID 而互不污染；Journal kind check 必須在保留既有 `consultant_opening|employee_turn|direct_edit|proposal_decision` 的前提下加入 `opks_generation`。
 
-- [ ] **Step 2: 跑 focused red gate**
+- [x] **Step 2: 跑 focused red gate**
 
   ```powershell
   uv run pytest tests/test_job_analysis_persistence_contracts.py tests/test_job_analysis_postgres.py tests/test_job_analysis_migration.py -q
   ```
 
-- [ ] **Step 3: 實作 migration、rows、serialization 與 repositories**
+- [x] **Step 3: 實作 migration、rows、serialization 與 repositories**
 
   新 schema IDs 固定為：
 
@@ -210,7 +210,7 @@ class OpksProposalRepository(Protocol):
 
   Repository 回傳順序固定 `(created_at, entity_id)`／`(created_at, proposal_id)`；第一版不增加可編輯排序欄位。
 
-- [ ] **Step 4: 把完整 OPKS authority 納入現有 state 與 commit seam**
+- [x] **Step 4: 把完整 OPKS authority 納入現有 state 與 commit seam**
 
   `JobAnalysisState` 新增：
 
@@ -221,13 +221,13 @@ class OpksProposalRepository(Protocol):
 
   `JobAnalysisState` validator 必須以 `current_jd_task_ids` 呼叫 `current_opks.validate_against_tasks()`；`_load_state()` 一律載入兩個新 repository。`commit_authority_change()` 在完整 `JobAnalysisState.model_validate()` 後，與 Tasks／Task Proposals 同交易 replace OPKS／OPKS Proposals，再寫 Journal、CAS generation、commit。舊 caller 傳入的空 OPKS 必須保持 no-op 語意，現有 Task transition 必須逐字保留未碰到的 OPKS state。
 
-- [ ] **Step 5: 跑 PostgreSQL focused gate**
+- [x] **Step 5: 跑 PostgreSQL focused gate**
 
   ```powershell
   uv run pytest tests/test_job_analysis_postgres.py tests/test_job_analysis_migration.py tests/test_job_analysis_authority_commit.py tests/test_job_analysis_durable_turn_postgres.py -q
   ```
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
   ```powershell
   git add apps/api/alembic/versions/0014_job_analysis_opks.py apps/api/app/job_analysis apps/api/app/adapters/job_analysis_postgres apps/api/tests docs/design/task-analysis-engine.md

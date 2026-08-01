@@ -1,4 +1,4 @@
-"""Migration 0012: greenfield local Current State tables.
+"""Migration 0014: greenfield local Current State and OPKS tables.
 
 The cycle runs in a disposable database and proves the migration neither
 rewrites nor removes the older 0011 authoring tables.
@@ -26,6 +26,8 @@ TABLES = {
     "job_analysis_jd_tasks",
     "job_analysis_proposals",
     "job_analysis_journal",
+    "job_analysis_opks_items",
+    "job_analysis_opks_proposals",
 }
 
 EXPECTED_COLUMNS = {
@@ -72,6 +74,29 @@ EXPECTED_COLUMNS = {
         "payload": ("jsonb", False),
         "created_at": ("timestamptz", False),
     },
+    "job_analysis_opks_items": {
+        "document_id": ("uuid", False),
+        "entity_id": ("text", False),
+        "entity_kind": ("text", False),
+        "item_schema_id": ("text", False),
+        "item_payload": ("jsonb", False),
+        "created_at": ("timestamptz", False),
+        "updated_at": ("timestamptz", False),
+    },
+    "job_analysis_opks_proposals": {
+        "document_id": ("uuid", False),
+        "proposal_id": ("text", False),
+        "operation_id": ("text", False),
+        "entity_id": ("text", False),
+        "entity_kind": ("text", False),
+        "action": ("text", False),
+        "status": ("text", False),
+        "base_authority_generation": ("bigint", False),
+        "proposal_schema_id": ("text", False),
+        "proposal_payload": ("jsonb", False),
+        "created_at": ("timestamptz", False),
+        "resolved_at": ("timestamptz", True),
+    },
 }
 
 EXPECTED_PK = {
@@ -91,6 +116,14 @@ EXPECTED_PK = {
         "ja2_pk_journal",
         ["journal_sequence"],
     ),
+    "job_analysis_opks_items": (
+        "ja2_pk_opks_items",
+        ["document_id", "entity_id"],
+    ),
+    "job_analysis_opks_proposals": (
+        "ja2_pk_opks_proposals",
+        ["document_id", "proposal_id"],
+    ),
 }
 
 EXPECTED_UNIQUES = {
@@ -98,6 +131,8 @@ EXPECTED_UNIQUES = {
     "job_analysis_jd_tasks": {"ja2_uq_jd_tasks_order"},
     "job_analysis_proposals": set(),
     "job_analysis_journal": {"ja2_uq_journal_entry"},
+    "job_analysis_opks_items": set(),
+    "job_analysis_opks_proposals": set(),
 }
 
 EXPECTED_FKS = {
@@ -105,6 +140,8 @@ EXPECTED_FKS = {
     "job_analysis_jd_tasks": {"ja2_fk_jd_tasks_document"},
     "job_analysis_proposals": {"ja2_fk_proposals_document"},
     "job_analysis_journal": {"ja2_fk_journal_document"},
+    "job_analysis_opks_items": {"ja2_fk_opks_items_document"},
+    "job_analysis_opks_proposals": {"ja2_fk_opks_proposals_document"},
 }
 
 EXPECTED_CHECKS = {
@@ -138,6 +175,25 @@ EXPECTED_CHECKS = {
         "ja2_ck_journal_schema",
         "ja2_ck_journal_payload",
     },
+    "job_analysis_opks_items": {
+        "ja2_ck_opks_items_id",
+        "ja2_ck_opks_items_kind",
+        "ja2_ck_opks_items_schema",
+        "ja2_ck_opks_items_payload",
+        "ja2_ck_opks_items_time_order",
+    },
+    "job_analysis_opks_proposals": {
+        "ja2_ck_opks_proposals_id",
+        "ja2_ck_opks_proposals_operation_id",
+        "ja2_ck_opks_proposals_entity_id",
+        "ja2_ck_opks_proposals_kind",
+        "ja2_ck_opks_proposals_action",
+        "ja2_ck_opks_proposals_status",
+        "ja2_ck_opks_proposals_generation",
+        "ja2_ck_opks_proposals_schema",
+        "ja2_ck_opks_proposals_payload",
+        "ja2_ck_opks_proposals_lifecycle",
+    },
 }
 
 EXPECTED_INDEXES = {
@@ -145,6 +201,8 @@ EXPECTED_INDEXES = {
     "ja2_ix_proposals_document_status",
     "ja2_uq_proposals_replacement",
     "ja2_ix_journal_document_sequence",
+    "ja2_ix_opks_items_document_created",
+    "ja2_ix_opks_proposals_document_status",
 }
 
 
@@ -191,18 +249,18 @@ def _column_kind(column_type) -> str:
     return str(column_type).lower()
 
 
-def test_alembic_has_0013_as_its_single_head():
+def test_alembic_has_0014_as_its_single_head():
     from alembic.config import Config
     from alembic.script import ScriptDirectory
 
     config = Config(str(API_DIR / "alembic.ini"))
     config.set_main_option("script_location", str(API_DIR / "alembic"))
 
-    assert ScriptDirectory.from_config(config).get_heads() == ["0013"]
+    assert ScriptDirectory.from_config(config).get_heads() == ["0014"]
 
 
 @pytest.mark.usefixtures("require_postgres")
-def test_migration_0013_cycle_builds_greenfield_tables_and_preserves_0011():
+def test_migration_0014_cycle_builds_greenfield_tables_and_preserves_0011():
     admin = sa.create_engine(_sync_url("postgres"), isolation_level="AUTOCOMMIT")
     with admin.connect() as connection:
         connection.execute(sa.text(f"DROP DATABASE IF EXISTS {MIG_DB} WITH (FORCE)"))
@@ -221,7 +279,7 @@ def test_migration_0013_cycle_builds_greenfield_tables_and_preserves_0011():
             "job_authoring_proposals",
         }
 
-        _alembic("upgrade", "0013", _async_url(MIG_DB))
+        _alembic("upgrade", "0014", _async_url(MIG_DB))
         inspector = sa.inspect(engine)
         assert TABLES <= set(inspector.get_table_names(schema="public"))
 
@@ -273,6 +331,37 @@ def test_migration_0013_cycle_builds_greenfield_tables_and_preserves_0011():
             )
         assert journal_kind_check is not None
         assert "consultant_opening" in journal_kind_check
+        assert "opks_generation" in journal_kind_check
+
+        with engine.connect() as connection:
+            opks_status_check = connection.scalar(
+                sa.text(
+                    "SELECT pg_get_constraintdef(oid) "
+                    "FROM pg_constraint "
+                    "WHERE conname = 'ja2_ck_opks_proposals_status'"
+                )
+            )
+            opks_lifecycle_check = connection.scalar(
+                sa.text(
+                    "SELECT pg_get_constraintdef(oid) "
+                    "FROM pg_constraint "
+                    "WHERE conname = 'ja2_ck_opks_proposals_lifecycle'"
+                )
+            )
+        assert opks_status_check is not None
+        for status in (
+            "pending",
+            "deferred",
+            "accepted",
+            "edited",
+            "rejected",
+            "stale",
+        ):
+            assert status in opks_status_check
+        assert "revision_requested" not in opks_status_check
+        assert opks_lifecycle_check is not None
+        assert "resolved_at IS NULL" in opks_lifecycle_check
+        assert "resolved_at IS NOT NULL" in opks_lifecycle_check
 
         _alembic("downgrade", "0011", _async_url(MIG_DB))
         remaining = set(sa.inspect(engine).get_table_names(schema="public"))

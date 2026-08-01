@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import timedelta
+from datetime import UTC, datetime, timedelta
 
 import pytest
 
@@ -26,6 +26,11 @@ from app.job_analysis.domain import (
     CurrentWorkModel,
     JdTask,
     JdTaskFields,
+    OpksEntityKind,
+    OpksEvidenceLink,
+    OpksItem,
+    OpksProposal,
+    OpksProposalAction,
     SourceKind,
     SourceRef,
     SupportLink,
@@ -45,6 +50,7 @@ from app.job_analysis.llm import (
 
 
 pytestmark = pytest.mark.asyncio
+OPKS_CREATED_AT = datetime(2026, 8, 1, 10, 0, tzinfo=UTC)
 
 
 def factory(session_factory):
@@ -93,6 +99,37 @@ def verified_add_result() -> TaskAnalysisOperationResult:
     )
 
 
+def persisted_attitude() -> OpksItem:
+    return OpksItem(
+        entity_id="attitude-1",
+        entity_kind=OpksEntityKind.ATTITUDE,
+        text="主動釐清異常",
+        evidence_links=(
+            OpksEvidenceLink(
+                source_ref=SourceRef(
+                    kind=SourceKind.EMPLOYEE_TURN,
+                    id="seed-turn",
+                ),
+                quote="遇到異常我會主動釐清",
+            ),
+        ),
+    )
+
+
+def persisted_opks_proposal() -> OpksProposal:
+    item = persisted_attitude()
+    return OpksProposal(
+        proposal_id="opks-proposal-1",
+        operation_id="opks-operation-1",
+        entity_id=item.entity_id,
+        entity_kind=item.entity_kind,
+        action=OpksProposalAction.ADD,
+        after=item,
+        base_authority_generation=0,
+        created_at=OPKS_CREATED_AT,
+    )
+
+
 async def test_verified_turn_commits_state_question_journal_and_replays_once(
     postgres_session_factory,
     cleanup_job_analysis_rows,
@@ -104,6 +141,13 @@ async def test_verified_turn_commits_state_question_journal_and_replays_once(
         document_id=document_id,
         title="門市營運專員",
     )
+    async with uow_factory() as uow:
+        await uow.opks.replace(document_id, (persisted_attitude(),))
+        await uow.opks_proposals.replace(
+            document_id,
+            (persisted_opks_proposal(),),
+        )
+        await uow.commit()
     employee = employee_turn()
     snapshot = await prepare_turn(
         uow_factory,
@@ -136,6 +180,8 @@ async def test_verified_turn_commits_state_question_journal_and_replays_once(
     ]
     assert loaded.document.active_question is not None
     assert loaded.document.active_question.text == "這份週報主要交給誰？"
+    assert loaded.state.current_opks.items == (persisted_attitude(),)
+    assert loaded.state.opks_proposals == (persisted_opks_proposal(),)
     assert len(loaded.conversation_turns) == 3
     assert loaded.conversation_turns[-1].turn_id == "operation-1-consultant"
 

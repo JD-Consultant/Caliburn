@@ -26,6 +26,11 @@ async def commit_authority_change(
     validated = JobAnalysisState.model_validate(state.model_dump())
     await uow.tasks.replace(record.document_id, validated.current_jd)
     await uow.proposals.replace(record.document_id, validated.proposals)
+    await uow.opks.replace(record.document_id, validated.current_opks.items)
+    await uow.opks_proposals.replace(
+        record.document_id,
+        validated.opks_proposals,
+    )
     if journal_entry is not None:
         await uow.journal.add(journal_entry)
     updated = await uow.documents.update_authority(
@@ -40,4 +45,3 @@ async def commit_authority_change(
             f"document {record.document_id} authority changed concurrently"
         )
     await uow.commit()
-

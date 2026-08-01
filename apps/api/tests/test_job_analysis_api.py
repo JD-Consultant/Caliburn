@@ -41,6 +41,8 @@ class _Store:
         self.document: DocumentRecord | None = None
         self.tasks: tuple[JdTask, ...] = ()
         self.proposals = ()
+        self.opks = ()
+        self.opks_proposals = ()
         self.journal = {}
         self.allow_authority_update = True
 
@@ -131,6 +133,28 @@ class _Proposals:
         self.store.proposals = proposals
 
 
+class _Opks:
+    def __init__(self, store: _Store) -> None:
+        self.store = store
+
+    async def list(self, document_id: UUID):
+        return self.store.opks
+
+    async def replace(self, document_id: UUID, items) -> None:
+        self.store.opks = items
+
+
+class _OpksProposals:
+    def __init__(self, store: _Store) -> None:
+        self.store = store
+
+    async def list(self, document_id: UUID, *, statuses=None):
+        return self.store.opks_proposals
+
+    async def replace(self, document_id: UUID, proposals) -> None:
+        self.store.opks_proposals = proposals
+
+
 class _Journal:
     def __init__(self, store: _Store) -> None:
         self.store = store
@@ -159,6 +183,8 @@ class _UnitOfWork:
         self.documents = _Documents(store)
         self.tasks = _Tasks(store)
         self.proposals = _Proposals(store)
+        self.opks = _Opks(store)
+        self.opks_proposals = _OpksProposals(store)
         self.journal = _Journal(store)
 
     async def __aenter__(self):

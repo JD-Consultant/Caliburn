@@ -359,6 +359,8 @@ async def _persist(
             work_model=work_model,
             current_jd=current_jd,
             proposals=proposals,
+            current_opks={"items": await uow.opks.list(record.document_id)},
+            opks_proposals=await uow.opks_proposals.list(record.document_id),
         ),
         journal_entry=journal_entry,
         updated_at=_utcnow(),

@@ -1,4 +1,4 @@
-"""SQLAlchemy rows matching migration 0012.
+"""SQLAlchemy rows matching the current job-analysis migration head.
 
 Rows remain adapter-private. Repositories hydrate application/domain contracts
 before returning data across the port.
@@ -36,6 +36,16 @@ _PROPOSAL_LIFECYCLE = (
     "(status IN ('pending','deferred') AND resolved_at IS NULL) OR "
     "(status IN ('accepted','edited','rejected','revision_requested','stale') "
     "AND resolved_at IS NOT NULL)"
+)
+_OPKS_ENTITY_KINDS = (
+    "entity_kind IN ('output','indicator','knowledge','skill','attitude')"
+)
+_OPKS_PROPOSAL_STATUSES = (
+    "status IN ('pending','deferred','accepted','edited','rejected','stale')"
+)
+_OPKS_PROPOSAL_LIFECYCLE = (
+    "(status IN ('pending','deferred') AND resolved_at IS NULL) OR "
+    "(status IN ('accepted','edited','rejected','stale') AND resolved_at IS NOT NULL)"
 )
 
 
@@ -212,6 +222,130 @@ class JobAnalysisProposalRow(Base):
     )
 
 
+class JobAnalysisOpksItemRow(Base):
+    __tablename__ = "job_analysis_opks_items"
+
+    document_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True))
+    entity_id: Mapped[str] = mapped_column(Text)
+    entity_kind: Mapped[str] = mapped_column(Text, nullable=False)
+    item_schema_id: Mapped[str] = mapped_column(Text, nullable=False)
+    item_payload: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+
+    __table_args__ = (
+        PrimaryKeyConstraint(
+            "document_id",
+            "entity_id",
+            name="ja2_pk_opks_items",
+        ),
+        ForeignKeyConstraint(
+            ["document_id"],
+            ["job_analysis_documents.document_id"],
+            name="ja2_fk_opks_items_document",
+            ondelete="CASCADE",
+        ),
+        CheckConstraint("btrim(entity_id) <> ''", name="ja2_ck_opks_items_id"),
+        CheckConstraint(_OPKS_ENTITY_KINDS, name="ja2_ck_opks_items_kind"),
+        CheckConstraint(
+            "btrim(item_schema_id) <> ''",
+            name="ja2_ck_opks_items_schema",
+        ),
+        CheckConstraint(
+            "jsonb_typeof(item_payload) = 'object'",
+            name="ja2_ck_opks_items_payload",
+        ),
+        CheckConstraint(
+            "updated_at >= created_at",
+            name="ja2_ck_opks_items_time_order",
+        ),
+        Index(
+            "ja2_ix_opks_items_document_created",
+            "document_id",
+            "created_at",
+            "entity_id",
+        ),
+    )
+
+
+class JobAnalysisOpksProposalRow(Base):
+    __tablename__ = "job_analysis_opks_proposals"
+
+    document_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True))
+    proposal_id: Mapped[str] = mapped_column(Text)
+    operation_id: Mapped[str] = mapped_column(Text, nullable=False)
+    entity_id: Mapped[str] = mapped_column(Text, nullable=False)
+    entity_kind: Mapped[str] = mapped_column(Text, nullable=False)
+    action: Mapped[str] = mapped_column(Text, nullable=False)
+    status: Mapped[str] = mapped_column(Text, nullable=False)
+    base_authority_generation: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    proposal_schema_id: Mapped[str] = mapped_column(Text, nullable=False)
+    proposal_payload: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    resolved_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True,
+    )
+
+    __table_args__ = (
+        PrimaryKeyConstraint(
+            "document_id",
+            "proposal_id",
+            name="ja2_pk_opks_proposals",
+        ),
+        ForeignKeyConstraint(
+            ["document_id"],
+            ["job_analysis_documents.document_id"],
+            name="ja2_fk_opks_proposals_document",
+            ondelete="CASCADE",
+        ),
+        CheckConstraint(
+            "btrim(proposal_id) <> ''",
+            name="ja2_ck_opks_proposals_id",
+        ),
+        CheckConstraint(
+            "btrim(operation_id) <> ''",
+            name="ja2_ck_opks_proposals_operation_id",
+        ),
+        CheckConstraint(
+            "btrim(entity_id) <> ''",
+            name="ja2_ck_opks_proposals_entity_id",
+        ),
+        CheckConstraint(_OPKS_ENTITY_KINDS, name="ja2_ck_opks_proposals_kind"),
+        CheckConstraint(
+            "action IN ('add','revise','remove')",
+            name="ja2_ck_opks_proposals_action",
+        ),
+        CheckConstraint(
+            _OPKS_PROPOSAL_STATUSES,
+            name="ja2_ck_opks_proposals_status",
+        ),
+        CheckConstraint(
+            "base_authority_generation >= 0",
+            name="ja2_ck_opks_proposals_generation",
+        ),
+        CheckConstraint(
+            "btrim(proposal_schema_id) <> ''",
+            name="ja2_ck_opks_proposals_schema",
+        ),
+        CheckConstraint(
+            "jsonb_typeof(proposal_payload) = 'object'",
+            name="ja2_ck_opks_proposals_payload",
+        ),
+        CheckConstraint(
+            _OPKS_PROPOSAL_LIFECYCLE,
+            name="ja2_ck_opks_proposals_lifecycle",
+        ),
+        Index(
+            "ja2_ix_opks_proposals_document_status",
+            "document_id",
+            "status",
+            "created_at",
+            "proposal_id",
+        ),
+    )
+
+
 class JobAnalysisJournalRow(Base):
     __tablename__ = "job_analysis_journal"
 
@@ -241,7 +375,8 @@ class JobAnalysisJournalRow(Base):
             name="ja2_ck_journal_entry_id",
         ),
         CheckConstraint(
-            "kind IN ('consultant_opening','employee_turn','direct_edit','proposal_decision')",
+            "kind IN ('consultant_opening','employee_turn','direct_edit',"
+            "'proposal_decision','opks_generation')",
             name="ja2_ck_journal_kind",
         ),
         CheckConstraint(

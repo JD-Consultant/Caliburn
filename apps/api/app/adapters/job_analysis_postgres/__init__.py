@@ -4,6 +4,8 @@ from .models import (
     JobAnalysisDocumentRow,
     JobAnalysisJdTaskRow,
     JobAnalysisJournalRow,
+    JobAnalysisOpksItemRow,
+    JobAnalysisOpksProposalRow,
     JobAnalysisProposalRow,
 )
 from .repositories import SqlAlchemyJobAnalysisUnitOfWork
@@ -13,6 +15,8 @@ __all__ = [
     "JobAnalysisDocumentRow",
     "JobAnalysisJdTaskRow",
     "JobAnalysisJournalRow",
+    "JobAnalysisOpksItemRow",
+    "JobAnalysisOpksProposalRow",
     "JobAnalysisProposalRow",
     "PersistedJobAnalysisCorruption",
     "SqlAlchemyJobAnalysisUnitOfWork",

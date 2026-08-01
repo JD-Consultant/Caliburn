@@ -1,6 +1,20 @@
-"""Pure, immutable domain contracts for job analysis(§9、§10 凍結形狀)。"""
+"""Pure immutable Task（§9/§10）與 OPKS（ADR 0048–0051）contracts。"""
 
 from .base import DomainModel, Identifier, NonEmptyText, TaskId
+from .opks import (
+    CurrentJdOpks,
+    OpksEntityKind,
+    OpksEvidenceLink,
+    OpksItem,
+)
+from .opks_proposal import (
+    OPKS_ALLOWED_STATUS_TRANSITIONS,
+    OPKS_TERMINAL_STATUSES,
+    OpksProposal,
+    OpksProposalAction,
+    OpksProposalStatus,
+    is_allowed_opks_transition,
+)
 from .proposal import (
     ALLOWED_STATUS_TRANSITIONS,
     TERMINAL_STATUSES,
@@ -45,6 +59,9 @@ from .work_model import (
 
 __all__ = [
     "ALLOWED_STATUS_TRANSITIONS",
+    "OPKS_ALLOWED_STATUS_TRANSITIONS",
+    "OPKS_TERMINAL_STATUSES",
+    "CurrentJdOpks",
     "CurrentWorkModel",
     "DomainModel",
     "Enabler",
@@ -59,6 +76,12 @@ __all__ = [
     "NonEmptyText",
     "OpenIssue",
     "OpenIssueKind",
+    "OpksEntityKind",
+    "OpksEvidenceLink",
+    "OpksItem",
+    "OpksProposal",
+    "OpksProposalAction",
+    "OpksProposalStatus",
     "Proposal",
     "ProposalAction",
     "ProposalStatus",
@@ -83,6 +106,7 @@ __all__ = [
     "TaskId",
     "TaskState",
     "is_allowed_transition",
+    "is_allowed_opks_transition",
     "jd_map",
     "validate_edited_jd_after",
     "withdraw_delta_matches_target_state",

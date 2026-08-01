@@ -39,7 +39,7 @@ OpenRouter 拿 `task_analysis_result_v2`(送出去的精簡形狀)→ **mapper**
 
 | 組件 | 是什麼 | 碼 | 權力 |
 |---|---|---|---|
-| domain | Task／SourceRef／SupportLink／open_issues／excluded_signals／Proposal 的凍結形狀 | `app/job_analysis/domain/` | 純 Pydantic,frozen;**非法狀態無法被表示**;只 import stdlib＋pydantic |
+| domain | Task／SourceRef／SupportLink／open_issues／excluded_signals／Task Proposal，以及 OPKS 的 `OpksItem`／`CurrentJdOpks`／獨立 `OpksProposal` 凍結形狀 | `app/job_analysis/domain/`（OPKS：`opks.py`、`opks_proposal.py`） | 純 Pydantic,frozen;**非法狀態無法被表示**;只 import stdlib＋pydantic。OPKS 此刻只有 domain contract，尚未接 persistence/API/model |
 | llm 契約 | **兩份**:內部的 `TaskAnalysisResult`(`result.py`)＋送出去的 `task_analysis_result_v2`(`wire.py`)＋ Static Instructions | `app/job_analysis/llm/` | 只描述形狀與判準文字;**不做跨欄位驗證** |
 | wire mapper | 中性值 → `None` 的純還原 | `llm/wire.py` 的 `wire_to_task_analysis_result()` | **不做語意判斷**;沒有 domain 落點的夾帶內容一律拒絕,不靜默丟棄 |
 | assembler | 現況 → `TaskAnalysisPacket` ＋ 決定性 rendering | `application/context.py` | 純函式;ordinal 的唯一產地 |
@@ -168,7 +168,7 @@ Consultation turn 不再重複呼叫它。
 
 | 層 | 規則 | 例子 |
 |---|---|---|
-| domain 型別 | 形狀不變量,**非法狀態無法被建構** | `active` Task 至少一條有效 SupportLink;`withdrawn` 必有 reason;lineage 不成環;staged delta 的 ID 不重複且欄位必須符合 action;Current JD／Proposal ID 不重複且 JD 投影順序 canonical;§10.5 的 `edited_jd_after` 四條硬規則 |
+| domain 型別 | 形狀不變量,**非法狀態無法被建構** | `active` Task 至少一條有效 SupportLink;`withdrawn` 必有 reason;lineage 不成環;staged delta 的 ID 不重複且欄位必須符合 action;Current JD／Proposal ID 不重複且 JD 投影順序 canonical;§10.5 的 `edited_jd_after` 四條硬規則；OPKS Evidence 非空且只收 employee turn/direct edit，O/P 恰連一個 Task、K/S 多對多、A 不帶 refs，OPKS Proposal 的 action/snapshot/status payload 不可矛盾 |
 | verifier | 需要 packet 才判斷得出的規則 | quote 必須是該員工回合的逐字子字串;ordinal 在範圍內;`no_match` 不得帶 target;merge ≥2;split child 只能沿用母 Task 的有效 support ordinal;withdraw 不得帶 `task_fields` 但必須帶 `withdraw_reason`;同一 target 被兩筆 `task_change` 指涉或兩筆 signal 逐欄完全相同 → **明確拒絕**;supersession 必須指向仍有效且被同一筆 signal 指涉的 support link |
 | transition | 需要 state 才判斷得出的規則 | identity gate;§9.5 三出口;Task／Proposal 的決定性 ID 採 insert-only,撞到不同內容即拒絕;retirement 來源只能取自該 signal 實際引用的 anchor;§10.8 stale disposition |
 | **不在任何一層** | 語意判斷 | purpose 是否相同、該不該 merge／split、outcome 是否可理解、enabler 分類是否正確——**歸 rubric 與員工審核**(§9.5 末段) |
@@ -279,7 +279,7 @@ context 取捨)在 Luna-Pro 上驗過只算「未在生產模型上驗過」,上
 現有的一筆未清:commit `4b75190` 給 `disposition` 補的判準只在 Luna-Pro 上觀測過。
 | prompt 品質調校 | `llm/prompt.py` 已有 Task 判準與彈性顧問行為基線，但尚未用真實員工資料調校 | 有真實使用摩擦後以 rubric／eval 調整，不先加 planner 或第二次呼叫 |
 | duplicate／overlap identity 自動收斂 | 第一版刻意不做；模型保留 issue 並追問員工 | 有真實重複摩擦證據後再研究，不用相似度猜測 |
-| O/P/K/S/A（OPKS） | **程式仍只做 Task**；但**研究與契約已完成**——裁決見 [ADR 0048](../adr/0048-opks-evidence-axes-and-document-level-competencies.md)（概念）＋[0049](../adr/0049-opks-derived-axes-evidence-whitelist-and-document-authority.md)（實作形狀）＋[0050](../adr/0050-opks-proposal-minimal-shape.md)（`OpksProposal`）＋[0051](../adr/0051-opks-proposal-status-machine-and-stable-entity-id.md)（狀態機與 `entity_id`），**四份一起讀**。`Task.deliverable_hint`／`success_criterion_hint` 依 0049 決定 15 於 OPKS 上線時退役 | 依 [OPKS 第一切片 plan](../plans/2026-08-01-job-analysis-opks-first-slice-plan.md) 施工：契約→persistence→手動編輯→OpksProposal→context/wire/verifier→model operation→Web→scripted vertical |
+| O/P/K/S/A（OPKS） | **Task 1 domain contracts 已落地**：`OpksItem`／`CurrentJdOpks`／獨立六態 `OpksProposal` 已可表示並鎖住 Evidence、refs、snapshot 與 status payload；尚無 persistence/API/model/Web，所以產品目前仍只顯示 Task。裁決見 [ADR 0048](../adr/0048-opks-evidence-axes-and-document-level-competencies.md)＋[0049](../adr/0049-opks-derived-axes-evidence-whitelist-and-document-authority.md)＋[0050](../adr/0050-opks-proposal-minimal-shape.md)＋[0051](../adr/0051-opks-proposal-status-machine-and-stable-entity-id.md)，**四份一起讀**。`Task.deliverable_hint`／`success_criterion_hint` 依 0049 決定 15，等 Context/wire 在 Task 5 接上正式 O/P 時才退役 | 依 [OPKS 第一切片 plan](../plans/2026-08-01-job-analysis-opks-first-slice-plan.md) 續做 persistence→手動編輯→OpksProposal→context/wire/verifier→model operation→Web→scripted vertical |
 | 完整 header、匯出 | 目前只做 Task 與較豐富的內部 JD Task 欄位 | 各自研究／契約完成後逐項加；匯出才對齊公版（不自產職能基準代碼，ADR 0040 決定 33–34） |
 | revision-request replacement | revision request 可保存／reload，但不會自動重建 replacement | 後續模型流程 |
 | 一般瀏覽器完整跨埠 smoke | **HTTP 層已逐段驗過**（2026-07-31，api:8001 ＋ web:3000 同時在跑）：文件庫 `GET` 正確回報 `task_count`、consultation view 帶齊 conversation／proposals／tasks、**三筆 `add` 提案連續 `POST …/decisions` 全 200**（正是 `display_order` 缺陷會炸的路徑）、同 `Idempotency-Key` 重送 200 且不重複、reload 後 JD 排序正確；CORS preflight 200 且 `access-control-allow-headers` 含 `idempotency-key`。`/workspace` 與 `/workspace/{id}` 皆 HTTP 200。Web 90 tests／tsc／lint 通過 **已由維護者在一般瀏覽器完成**（2026-07-31）：文件 `b47d6717` 的三筆 `add` 提案**在 UI 上連續按 accept 全部成立**，Current JD 由 0 條變 3 條、`display_order` 0/1/2；同文件被 withdraw 的那筆提案維持 `stale` 且無法接受，因此 Luna-Pro 在 turn 1 誤建的「協助正式環境部署」**沒有進入 JD**——Proposal gate 當安全網首次被真流量驗證 | 本列已無待辦。持續維持:不為測試環境加入 proxy、fake production mode 或 E2E framework |

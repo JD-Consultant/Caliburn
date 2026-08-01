@@ -11,6 +11,13 @@ source_discipline: >
   未逐字核實者一律標「未核實」並列入末章。
 ---
 
+> **【現行裁決】** 本檔是**研究原料**，其中對「支持度四級」的分析僅供追溯。
+> OPKS 的現行裁決是 **[ADR 0048](../adr/0048-opks-evidence-axes-and-document-level-competencies.md)（概念）
+> ＋ [0049](../adr/0049-opks-derived-axes-evidence-whitelist-and-document-authority.md)（實作形狀）
+> ＋ [0050](../adr/0050-opks-proposal-minimal-shape.md)（Proposal 形狀）**。
+> 四級已被兩正交軸取代。**引用本檔任何段落前請先確認未被三份 ADR 取代**——
+> 尤其 §判準 3-B(4) 的 bogus item 建議**已撤回**（見該處更正框）。
+
 > 前置研究：[國際主要職能/職業標準體系的欄位定義與撰寫標準](2026-07-13-ai-redesign-raw-intl-competency-standards.md)
 > （O\*NET / ESCO / SFIA / UK NOS / Bloom 的**欄位定義與句式規則**）。本篇**不重寫**那一層。
 

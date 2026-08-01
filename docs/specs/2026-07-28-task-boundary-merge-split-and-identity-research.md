@@ -1,5 +1,10 @@
 # Task 邊界、merge/split 與同一性判準研究
 
+> **【2026-08-01 更新】** 本文提到的 `Task.deliverable_hint` 與 `Task.success_criterion_hint`
+> **將由 [ADR 0049](../adr/0049-opks-derived-axes-evidence-whitelist-and-document-authority.md) 決定 15
+> 在 OPKS 上線時退役**（與正式 O/P 語意重疊，留著必成兩份真相）。目前 production 無寫入路徑。
+
+
 - 日期：2026-07-28
 - 狀態：Proposed；供 ADR 0042 與 Production Task Analysis v1 契約引用
 - 觸發：[R1a 結果](../experiments/2026-07-27-r1-task-discovery/r1a-results.md) §4「不能宣稱」——

@@ -7,8 +7,13 @@ purpose: 把 2026-08-01 五份原料收斂成可裁決的選項比對，並誠�
 
 # OPKS 設計裁決研究
 
-> **【2026-08-01 結案】本文的 §3 Q1–Q5 已經裁決完畢，裁決結果以
-> [ADR 0048](../adr/0048-opks-evidence-axes-and-document-level-competencies.md) 為準。**
+> **【2026-08-01 結案】本文的 §3 Q1–Q5 已經裁決完畢。現行裁決為三份 ADR，缺一不可：
+> [0048](../adr/0048-opks-evidence-axes-and-document-level-competencies.md)（概念）
+> ＋ [0049](../adr/0049-opks-derived-axes-evidence-whitelist-and-document-authority.md)（實作形狀）
+> ＋ [0050](../adr/0050-opks-proposal-minimal-shape.md)（Proposal 形狀）。**
+>
+> **注意：下表「ADR 0048 的裁決」欄有兩處已被 0049 再修正**——兩軸**不持久化**（改由 refs 推導），
+> 且 `evidence_links` 只收 `employee_turn`／`direct_edit`。以 0049 為準。
 > 本文保留原貌供追溯（含**被否決的建議**），**不得據本文的建議施工**。
 >
 > 三處與 ADR 不同、以 ADR 為準的重點：

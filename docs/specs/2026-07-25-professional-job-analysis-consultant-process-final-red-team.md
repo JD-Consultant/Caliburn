@@ -1,5 +1,15 @@
 # AI 專業職務分析顧問流程：最終反方審查與品質設計
 
+> **【2026-08-01 現行裁決索引｜先讀這裡】**
+> 本文提到的 **「K/S/A 支持度四級」（`behavior_grounded`／`employee_confirmed`／`reference_candidate`／`unsupported`）
+> 已由 [ADR 0048](../adr/0048-opks-evidence-axes-and-document-level-competencies.md) 翻案**，
+> 改為 `evidence_origin` × `task_linkage` 兩正交軸 ＋ `source_refs[]` 型別層非空。
+> 原文保留供追溯，**不得據以施工**。
+> OPKS 現行裁決 = **[0048](../adr/0048-opks-evidence-axes-and-document-level-competencies.md)（概念）
+> ＋ [0049](../adr/0049-opks-derived-axes-evidence-whitelist-and-document-authority.md)（實作形狀）
+> ＋ [0050](../adr/0050-opks-proposal-minimal-shape.md)（Proposal 形狀）**，三份一起讀。
+
+
 - 日期：2026-07-25
 - 狀態：研究結論，供 owner 審核
 - 產品範圍：本機 Web；員工與 AI 訪談、共同編輯並完成一份客製化職務說明書

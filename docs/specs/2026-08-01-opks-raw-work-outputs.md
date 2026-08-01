@@ -8,6 +8,10 @@ review_note: 本檔供第三方人工審核。§0.2 提供完整重現步驟，�
 
 # 工作產出（O）的權威處理（研究原料）
 
+> **【現行裁決】** 本檔是**研究原料**。OPKS 的現行裁決是 **[ADR 0048](../adr/0048-opks-evidence-axes-and-document-level-competencies.md) ＋ [0049](../adr/0049-opks-derived-axes-evidence-whitelist-and-document-authority.md) ＋ [0050](../adr/0050-opks-proposal-minimal-shape.md) ＋ [0051](../adr/0051-opks-proposal-status-machine-and-stable-entity-id.md)**（四份一起讀）。
+> 本檔的建議凡與四份 ADR 不符者，**一律以 ADR 為準**。
+
+
 ## 0. 取得狀態與複核方法
 
 ### 0.1 取得狀態

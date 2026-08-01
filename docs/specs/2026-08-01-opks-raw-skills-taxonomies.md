@@ -14,6 +14,10 @@ source_discipline: >
 
 # O/P/K/S 原料研究 —— taxonomy 現況、業界綁定做法與繁中可行性
 
+> **【現行裁決】** 本檔是**研究原料**。OPKS 的現行裁決是 **[ADR 0048](../adr/0048-opks-evidence-axes-and-document-level-competencies.md) ＋ [0049](../adr/0049-opks-derived-axes-evidence-whitelist-and-document-authority.md) ＋ [0050](../adr/0050-opks-proposal-minimal-shape.md) ＋ [0051](../adr/0051-opks-proposal-status-machine-and-stable-entity-id.md)**（四份一起讀）。
+> 本檔的建議凡與四份 ADR 不符者，**一律以 ADR 為準**。
+
+
 ## 0. 這份補什麼（與 2026-07-13 那份的分工）
 
 `docs/specs/2026-07-13-ai-redesign-raw-intl-competency-standards.md` 已研究過 ESCO/O\*NET/SFIA 的

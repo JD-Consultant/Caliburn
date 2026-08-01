@@ -2,7 +2,7 @@
 title: Task Analysis 引擎 — 端到端設計(durable PostgreSQL + consultant Web)
 audience: agent-primary(也給人)
 scope: apps/api job_analysis + job_analysis_postgres + job_analysis routes + apps/web workspace
-updated: 2026-07-30
+updated: 2026-08-01
 ---
 
 # Task Analysis 引擎 — 端到端設計

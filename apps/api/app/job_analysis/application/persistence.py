@@ -9,6 +9,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime
+from enum import StrEnum
 from types import TracebackType
 from typing import Literal, Protocol, Self
 from uuid import UUID
@@ -40,6 +41,7 @@ OPKS_ITEM_SCHEMA_ID = "job-analysis-opks-item/1"
 OPKS_PROPOSAL_SCHEMA_ID = "job-analysis-opks-proposal/1"
 OPKS_DIRECT_EDIT_SCHEMA_ID = "job-analysis-opks-direct-edit/1"
 OPKS_PROPOSAL_DECISION_SCHEMA_ID = "job-analysis-opks-proposal-decision/1"
+OPKS_GENERATION_SCHEMA_ID = "job-analysis-opks-generation/1"
 ACTIVE_QUESTION_SCHEMA_ID = "job-analysis-active-question/1"
 CONSULTANT_OPENING_SCHEMA_ID = "job-analysis-consultant-opening/1"
 COMPLETED_TURN_SCHEMA_ID = "job-analysis-completed-turn/1"
@@ -227,11 +229,35 @@ class OpksProposalDecisionPayload(DomainModel):
         return self
 
 
+class OpksGenerationOutcome(StrEnum):
+    PROPOSED = "proposed"
+    NO_GROUNDED_CANDIDATES = "no_grounded_candidates"
+
+
+class OpksGenerationPayload(DomainModel):
+    operation_id: Identifier
+    selected_task_id: TaskId
+    outcome: OpksGenerationOutcome
+    proposal_ids: tuple[Identifier, ...] = ()
+
+    @model_validator(mode="after")
+    def proposal_ids_match_outcome(self):
+        if self.outcome is OpksGenerationOutcome.PROPOSED:
+            if not self.proposal_ids:
+                raise ValueError("proposed OPKS generation requires proposal ids")
+        elif self.proposal_ids:
+            raise ValueError("no-candidate OPKS generation must not carry proposal ids")
+        if len(set(self.proposal_ids)) != len(self.proposal_ids):
+            raise ValueError("OPKS generation proposal ids must be unique")
+        return self
+
+
 JournalKind = Literal[
     "consultant_opening",
     "employee_turn",
     "direct_edit",
     "proposal_decision",
+    "opks_generation",
 ]
 JournalPayload = (
     ConsultantOpeningPayload
@@ -239,6 +265,7 @@ JournalPayload = (
     | DirectEditPayload
     | OpksDirectEditPayload
     | OpksProposalDecisionPayload
+    | OpksGenerationPayload
     | ProposalDecisionPayload
 )
 
@@ -253,6 +280,10 @@ _JOURNAL_CONTRACT: dict[type[DomainModel], tuple[JournalKind, str]] = {
     OpksProposalDecisionPayload: (
         "proposal_decision",
         OPKS_PROPOSAL_DECISION_SCHEMA_ID,
+    ),
+    OpksGenerationPayload: (
+        "opks_generation",
+        OPKS_GENERATION_SCHEMA_ID,
     ),
     ProposalDecisionPayload: ("proposal_decision", PROPOSAL_DECISION_SCHEMA_ID),
 }

@@ -14,6 +14,7 @@ from app.job_analysis.application import (
     OPKS_ITEM_SCHEMA_ID,
     OPKS_DIRECT_EDIT_SCHEMA_ID,
     OPKS_PROPOSAL_DECISION_SCHEMA_ID,
+    OPKS_GENERATION_SCHEMA_ID,
     OPKS_PROPOSAL_SCHEMA_ID,
     PROPOSAL_DECISION_SCHEMA_ID,
     PROPOSAL_SCHEMA_ID,
@@ -26,6 +27,7 @@ from app.job_analysis.application import (
     JournalEntry,
     OpksDirectEditPayload,
     OpksProposalDecisionPayload,
+    OpksGenerationPayload,
     ProposalDecisionPayload,
 )
 from app.job_analysis.domain import (
@@ -238,6 +240,7 @@ _JOURNAL_PAYLOAD_TYPES = {
     DIRECT_EDIT_SCHEMA_ID: DirectEditPayload,
     OPKS_DIRECT_EDIT_SCHEMA_ID: OpksDirectEditPayload,
     OPKS_PROPOSAL_DECISION_SCHEMA_ID: OpksProposalDecisionPayload,
+    OPKS_GENERATION_SCHEMA_ID: OpksGenerationPayload,
     PROPOSAL_DECISION_SCHEMA_ID: ProposalDecisionPayload,
 }
 

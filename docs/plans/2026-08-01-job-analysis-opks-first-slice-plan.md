@@ -504,19 +504,19 @@ POST /api/v1/job-analysis/documents/{document_id}/tasks/{task_id}/opks-proposals
 
 使用 `Idempotency-Key`；同 key replay 不打第二次 provider。回 `OpksGenerationView { outcome: proposed|no_grounded_candidates, proposal_ids[] }`。Provider failure/refusal/invalid/rejected 都不寫 Current JD 或 Proposal；route 沿用顧問 unavailable problem，不暴露 provider 細節。
 
-- [ ] **Step 1: 寫 operation outcome 紅測試**
+- [x] **Step 1: 寫 operation outcome 紅測試**
 
   覆蓋 verified/rejected/invalid_output/refused/failed；斷言 adapter 一次、schema/instructions 是 OPKS 專用、packet 字串無內部 ID、Task operation 完全不變。
 
-- [ ] **Step 2: 寫 durable generation 紅測試**
+- [x] **Step 2: 寫 durable generation 紅測試**
 
   覆蓋 provider-before-commit、同 key replay 零 call、不同 Task 同 key conflict、authority 改變即丟棄、零候選也有 receipt、add ID 由 operation+kind+position 決定、reuse 解析成既有 `entity_id` 的 revise Proposal。
 
-- [ ] **Step 3: 實作 generation Journal receipt**
+- [x] **Step 3: 實作 generation Journal receipt**
 
   `OpksGenerationPayload` 使用 Journal kind `opks_generation`、schema ID `job-analysis-opks-generation/1`，保存 operation ID、selected Task ID、outcome、proposal IDs；migration 0014 已預先允許該 kind。它只做 replay/audit，不是 Evidence Source。
 
-- [ ] **Step 4: 實作 durable service 與 route**
+- [x] **Step 4: 實作 durable service 與 route**
 
   模型 item index 從 0 起，ID 格式固定：
 
@@ -529,7 +529,7 @@ POST /api/v1/job-analysis/documents/{document_id}/tasks/{task_id}/opks-proposals
 
   `reuse_existing` 若沒有新增 Task ref、Evidence 或文字變更，視為 no-op，不建立一張內容完全相同的 Proposal；該 operation 仍由 generation receipt 完成冪等記錄。
 
-- [ ] **Step 5: Gate**
+- [x] **Step 5: Gate**
 
   ```powershell
   npm run codegen --workspace=@caliburn/job-analysis-contract
@@ -538,7 +538,7 @@ POST /api/v1/job-analysis/documents/{document_id}/tasks/{task_id}/opks-proposals
   uv run pytest tests/test_job_analysis_operation.py tests/test_job_analysis_durable_turn_postgres.py -q
   ```
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
   ```powershell
   git add apps/api packages/job-analysis-contract docs/design/task-analysis-engine.md

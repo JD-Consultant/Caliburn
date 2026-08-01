@@ -156,6 +156,21 @@
         }
       }
     },
+    "OpksGenerationView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["outcome", "proposal_ids"],
+      "properties": {
+        "outcome": {
+          "type": "string",
+          "enum": ["proposed", "no_grounded_candidates"]
+        },
+        "proposal_ids": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
     "OpksProposalView": {
       "type": "object",
       "additionalProperties": false,

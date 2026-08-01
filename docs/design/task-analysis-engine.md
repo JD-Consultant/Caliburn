@@ -69,7 +69,7 @@ OpenRouter 拿 `task_analysis_result_v2`(送出去的精簡形狀)→ **mapper**
      → `verify_task_analysis_result(...)`。
 3. `apply_task_analysis_result(state=…, packet=…, result=…, operation_id=…)` → `TransitionResult`。
 
-OPKS 是另一個**尚未接 provider／persistence use case**的單 Task operation，不擴充上面那份 Task schema：
+OPKS 是另一個已接通 durable generation 的單 Task operation，不擴充上面那份 Task schema：
 
 1. `build_opks_context_packet(selected_task=…, current_opks=…, proposals=…)` 只投影該 Task 的完整語意、
    有效 `employee_turn`／`direct_edit` Evidence、該 Task 的 O/P、全文件 K/S ordinal，及與該 Task 有關的
@@ -83,6 +83,12 @@ OPKS 是另一個**尚未接 provider／persistence use case**的單 Task operat
 4. `verify_opks_result()` 只解 ordinal 與 refs：O/P 綁選定 Task；K/S reuse 追加該 Task；K/S remove
    只解除該 Task及其 Indicator refs，映射成 revise，即使變成 unlinked 也不刪文件層 entity。
    「是否真的必要／可觀察／數值是否合理」留給 rubric 與員工 Proposal 決策。
+5. `generate_opks_proposals()` 先查 `opks_generation` receipt，再以 `prepare_opks_generation()` 保存
+   immutable authority snapshot；`run_opks_operation()` 在交易外做一次 provider 呼叫；
+   `commit_opks_generation()` 重鎖文件並比對 generation 與 packet read-set，最後才把 verified changes
+   轉成 pending `OpksProposal`，和 generation receipt 一起經 `commit_authority_change()` 原子提交。
+   同一 `Idempotency-Key` 重送不再呼叫 provider；零 change 也保存
+   `no_grounded_candidates` receipt。Provider failure、refusal、invalid 或 verifier rejected 都不改 Current JD。
 
 `TaskFields` 舊的兩個 OPKS hint 已退役；正式 O/P 的唯一資料來源是 `CurrentJdOpks`，不留第二份真相。
 
@@ -116,6 +122,8 @@ RFC 9457 `application/problem+json`；path-scoped handler 會把舊 routes 的�
 Current JD Task 的 POST／PUT／DELETE 與排序 PUT 都要求 `Idempotency-Key`，原樣映射成
 Journal `entry_id`；沒有 middleware、隱藏 retry 或第二套寫入邏輯。員工清空 optional text 時，
 HTTP DTO mapper（與 LLM 的 `wire.py` 無關）先 trim 並轉成 `null`；必填 statement 變空則回 `invalid-request`，不讓半成品進 domain。
+`POST …/tasks/{task_id}/opks-proposals` 只回 durable `outcome` 與 `proposal_ids`；不回模型 raw output、
+Work Model、Evidence ID 或 provider detail。它只建立待員工決定的 Proposal，不直接寫 Current JD OPKS。
 Web 的 `/workspace` 用 `DocumentLibrary` 列出／建立／改名；`/workspace/[document_id]` 用
 `ConsultationWorkspace` 同頁組合 `ConsultationPanel`、Proposal cards 與 `TaskEditor`，一次只開一份文件。
 顧問讀寫只走 `GET …/consultation`、`POST …/turns` 與 `POST …/proposals/{id}/decisions`；成功回應同步更新
@@ -310,7 +318,7 @@ context 取捨)在 Luna-Pro 上驗過只算「未在生產模型上驗過」,上
 現有的一筆未清:commit `4b75190` 給 `disposition` 補的判準只在 Luna-Pro 上觀測過。
 | prompt 品質調校 | `llm/prompt.py` 已有 Task 判準與彈性顧問行為基線，但尚未用真實員工資料調校 | 有真實使用摩擦後以 rubric／eval 調整，不先加 planner 或第二次呼叫 |
 | duplicate／overlap identity 自動收斂 | 第一版刻意不做；模型保留 issue 並追問員工 | 有真實重複摩擦證據後再研究，不用相似度猜測 |
-| O/P/K/S/A（OPKS） | **Task 1–5 已落地**：`OpksItem`／`CurrentJdOpks`／獨立六態 `OpksProposal` 已鎖住 Evidence、refs、snapshot 與 status payload；0014 以兩張表持久化；員工可經 application/API add/edit/delete OPKS，並可 accept/edit/reject/defer OPKS Proposal；Consultation wire 會回傳 OPKS items 與 proposals。Task 拓撲或人工編輯會同交易清理 refs 並 stale 相關 active proposal。單 Task 的最小 Context、零 union `opks_result_v1`、prompt 與 deterministic verifier 已完成；舊 OPKS hint 已退役。尚無 OPKS provider operation／durable generation use case 與 Web editor。裁決見 [ADR 0048](../adr/0048-opks-evidence-axes-and-document-level-competencies.md)＋[0049](../adr/0049-opks-derived-axes-evidence-whitelist-and-document-authority.md)＋[0050](../adr/0050-opks-proposal-minimal-shape.md)＋[0051](../adr/0051-opks-proposal-status-machine-and-stable-entity-id.md)，**四份一起讀** | 依 [OPKS 第一切片 plan](../plans/2026-08-01-job-analysis-opks-first-slice-plan.md) 續做 model operation→Web→scripted vertical |
+| O/P/K/S/A（OPKS） | **Task 1–6 已落地**：`OpksItem`／`CurrentJdOpks`／獨立六態 `OpksProposal` 已鎖住 Evidence、refs、snapshot 與 status payload；0014 以兩張表持久化；員工可經 application/API add/edit/delete OPKS，並可 accept/edit/reject/defer OPKS Proposal；Consultation wire 會回傳 OPKS items 與 proposals。Task 拓撲或人工編輯會同交易清理 refs 並 stale 相關 active proposal。單 Task 的最小 Context、零 union `opks_result_v1`、prompt、deterministic verifier、一次 provider operation 與 durable generation receipt 已接通；同 key replay 零 provider call，模型只建立 Proposal、不改 Current JD。舊 OPKS hint 已退役。尚無 Web editor。裁決見 [ADR 0048](../adr/0048-opks-evidence-axes-and-document-level-competencies.md)＋[0049](../adr/0049-opks-derived-axes-evidence-whitelist-and-document-authority.md)＋[0050](../adr/0050-opks-proposal-minimal-shape.md)＋[0051](../adr/0051-opks-proposal-status-machine-and-stable-entity-id.md)，**四份一起讀** | 依 [OPKS 第一切片 plan](../plans/2026-08-01-job-analysis-opks-first-slice-plan.md) 續做 Web→scripted vertical |
 | 完整 header、匯出 | 目前只做 Task 與較豐富的內部 JD Task 欄位 | 各自研究／契約完成後逐項加；匯出才對齊公版（不自產職能基準代碼，ADR 0040 決定 33–34） |
 | revision-request replacement | revision request 可保存／reload，但不會自動重建 replacement | 後續模型流程 |
 | 一般瀏覽器完整跨埠 smoke | **HTTP 層已逐段驗過**（2026-07-31，api:8001 ＋ web:3000 同時在跑）：文件庫 `GET` 正確回報 `task_count`、consultation view 帶齊 conversation／proposals／tasks、**三筆 `add` 提案連續 `POST …/decisions` 全 200**（正是 `display_order` 缺陷會炸的路徑）、同 `Idempotency-Key` 重送 200 且不重複、reload 後 JD 排序正確；CORS preflight 200 且 `access-control-allow-headers` 含 `idempotency-key`。`/workspace` 與 `/workspace/{id}` 皆 HTTP 200。Web 90 tests／tsc／lint 通過 **已由維護者在一般瀏覽器完成**（2026-07-31）：文件 `b47d6717` 的三筆 `add` 提案**在 UI 上連續按 accept 全部成立**，Current JD 由 0 條變 3 條、`display_order` 0/1/2；同文件被 withdraw 的那筆提案維持 `stale` 且無法接受，因此 Luna-Pro 在 turn 1 誤建的「協助正式環境部署」**沒有進入 JD**——Proposal gate 當安全網首次被真流量驗證 | 本列已無待辦。持續維持:不為測試環境加入 proxy、fake production mode 或 E2E framework |

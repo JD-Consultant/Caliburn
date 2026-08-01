@@ -9,6 +9,7 @@ from job_analysis_contract import (
     DocumentView,
     JdTaskWrite,
     JdTaskView,
+    OpksGenerationView,
     OpksItemView,
     OpksItemWrite,
     OpksProposalDecisionWrite,
@@ -22,6 +23,7 @@ from app.job_analysis.application import (
     DocumentRecord,
     DocumentSummary,
     LoadedDocument,
+    OpksGenerationResult,
 )
 from app.job_analysis.domain import (
     Enabler,
@@ -131,6 +133,13 @@ def to_opks_proposal_view(proposal: OpksProposal) -> OpksProposalView:
         ),
         rejection_reason=proposal.rejection_reason,
         stale_reason=proposal.stale_reason,
+    )
+
+
+def to_opks_generation_view(result: OpksGenerationResult) -> OpksGenerationView:
+    return OpksGenerationView(
+        outcome=result.outcome.value,
+        proposal_ids=list(result.proposal_ids),
     )
 
 

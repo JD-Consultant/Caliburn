@@ -14,6 +14,7 @@ from job_analysis_contract import (
     EmployeeTurnWrite,
     JdTaskView,
     JdTaskWrite,
+    OpksGenerationView,
     OpksItemView,
     OpksItemWrite,
     OpksProposalDecisionWrite,
@@ -30,6 +31,7 @@ from app.api.job_analysis_mapper import (
     to_document_view,
     to_jd_task_fields,
     to_jd_task_view,
+    to_opks_generation_view,
     to_opks_item_view,
     to_opks_proposal_decision,
     to_opks_write,
@@ -46,6 +48,7 @@ from app.api.job_analysis_problems import (
 )
 from app.job_analysis.application import (
     JobAnalysisUnitOfWorkFactory,
+    OpksGroundingUnavailable,
     TransitionCommitRejected,
     UncommittableOperationResult,
     add_jd_task,
@@ -54,6 +57,7 @@ from app.job_analysis.application import (
     delete_opks_item,
     edit_jd_task,
     edit_opks_item,
+    generate_opks_proposals,
     list_documents,
     load_document,
     decide_proposal,
@@ -192,6 +196,38 @@ async def post_employee_turn(
     loaded = await load_document(uow_factory, document_id)
     assert loaded is not None
     return to_consultation_view(loaded)
+
+
+@router.post(
+    "/{document_id}/tasks/{task_id}/opks-proposals",
+    response_model=OpksGenerationView,
+)
+async def post_opks_generation(
+    document_id: UUID,
+    task_id: str,
+    idempotency_key: IdempotencyKey,
+    uow_factory: JobAnalysisUnitOfWorkFactory = Depends(
+        get_job_analysis_uow_factory
+    ),
+    adapter: OpenRouterAdapter = Depends(get_job_analysis_adapter),
+):
+    try:
+        result = await generate_opks_proposals(
+            uow_factory,
+            adapter=adapter,
+            document_id=document_id,
+            task_id=task_id,
+            operation_id=idempotency_key,
+        )
+    except (UncommittableOperationResult, OpksGroundingUnavailable) as error:
+        logger.warning(
+            "job-analysis OPKS generation was not committable: %s",
+            type(error).__name__,
+        )
+        return consultant_unavailable_response()
+    except JobAnalysisApplicationError as error:
+        return application_error_response(error)
+    return to_opks_generation_view(result)
 
 
 @router.post(

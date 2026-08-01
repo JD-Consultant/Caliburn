@@ -26,6 +26,10 @@ from app.job_analysis.domain import (
 )
 from app.job_analysis.llm import (
     IdentityRelation,
+    OpksDecision,
+    OpksGenerationEntityKind,
+    OpksResultWire,
+    OpksWireItem,
     SignalDisposition,
     TaskAnalysisWire,
     WireAnchor,
@@ -217,6 +221,32 @@ class _ScriptedTransport:
         self.calls += 1
         if self.fail:
             return TransportResponse(status_code=503, text="anthropic unavailable")
+        if body["response_format"]["json_schema"]["name"] == "opks_result_v1":
+            result = OpksResultWire(
+                items=(
+                    OpksWireItem(
+                        entity_kind=OpksGenerationEntityKind.OUTPUT,
+                        decision=OpksDecision.ADD_NEW,
+                        target_ordinal=0,
+                        text="營運週報",
+                    ),
+                )
+            )
+            return TransportResponse(
+                status_code=200,
+                body={
+                    "model": "anthropic/claude-opus-5",
+                    "choices": [
+                        {
+                            "message": {
+                                "content": result.model_dump_json(),
+                                "refusal": None,
+                            },
+                            "finish_reason": "stop",
+                        }
+                    ],
+                },
+            )
         # 劇本是**模型送出來的** wire 形狀,不是 domain 形狀;否則這條路徑會跳過 mapper。
         result = TaskAnalysisWire(
             work_signals=(
@@ -735,6 +765,79 @@ async def test_consultant_failure_does_not_leak_provider_details_or_change_state
     assert "anthropic" not in failed.text.lower()
     assert "provider" not in failed.text.lower()
     assert len(reloaded.json()["conversation"]) == 1
+
+
+async def test_opks_generation_creates_durable_proposals_and_replays_before_provider(
+    api_client,
+):
+    client, _, provider = api_client
+    root = f"/api/v1/job-analysis/documents/{DOCUMENT_ID}"
+    await client.put(root, json={"title": "門市營運專員"})
+    consultation = await client.post(
+        f"{root}/turns",
+        headers={"Idempotency-Key": "task-turn"},
+        json={"text": "我每週彙整營運週報"},
+    )
+    proposal = consultation.json()["proposals"][0]
+    accepted = await client.post(
+        f"{root}/proposals/{proposal['proposal_id']}/decisions",
+        headers={"Idempotency-Key": "accept-task"},
+        json={"decision": "accepted"},
+    )
+    task_id = accepted.json()["tasks"][0]["task_id"]
+
+    first = await client.post(
+        f"{root}/tasks/{task_id}/opks-proposals",
+        headers={"Idempotency-Key": "opks-generate-1"},
+    )
+    replay = await client.post(
+        f"{root}/tasks/{task_id}/opks-proposals",
+        headers={"Idempotency-Key": "opks-generate-1"},
+    )
+    reloaded = await client.get(f"{root}/consultation")
+
+    assert first.status_code == 200
+    assert first.json() == {
+        "outcome": "proposed",
+        "proposal_ids": ["opks-generate-1-op0"],
+    }
+    assert replay.json() == first.json()
+    assert provider.calls == 2
+    assert reloaded.json()["opks_items"] == []
+    assert reloaded.json()["opks_proposals"][0]["status"] == "pending"
+
+
+async def test_opks_generation_failure_is_generic_and_does_not_create_proposals(
+    api_client,
+):
+    client, _, provider = api_client
+    root = f"/api/v1/job-analysis/documents/{DOCUMENT_ID}"
+    await client.put(root, json={"title": "門市營運專員"})
+    consultation = await client.post(
+        f"{root}/turns",
+        headers={"Idempotency-Key": "task-turn"},
+        json={"text": "我每週彙整營運週報"},
+    )
+    proposal = consultation.json()["proposals"][0]
+    accepted = await client.post(
+        f"{root}/proposals/{proposal['proposal_id']}/decisions",
+        headers={"Idempotency-Key": "accept-task"},
+        json={"decision": "accepted"},
+    )
+    task_id = accepted.json()["tasks"][0]["task_id"]
+    provider.fail = True
+
+    failed = await client.post(
+        f"{root}/tasks/{task_id}/opks-proposals",
+        headers={"Idempotency-Key": "opks-failed"},
+    )
+    reloaded = await client.get(f"{root}/consultation")
+
+    assert failed.status_code == 503
+    assert failed.json()["type"].endswith("/consultant-unavailable")
+    assert "anthropic" not in failed.text.lower()
+    assert "provider" not in failed.text.lower()
+    assert reloaded.json()["opks_proposals"] == []
 
 
 @pytest.mark.parametrize("decision", ["accepted", "edited", "rejected", "deferred"])

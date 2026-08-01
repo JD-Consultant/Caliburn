@@ -15,7 +15,7 @@ source_discipline: >
 > OPKS 的現行裁決是 **[ADR 0048](../adr/0048-opks-evidence-axes-and-document-level-competencies.md)（概念）
 > ＋ [0049](../adr/0049-opks-derived-axes-evidence-whitelist-and-document-authority.md)（實作形狀）
 > ＋ [0050](../adr/0050-opks-proposal-minimal-shape.md) ＋ [0051](../adr/0051-opks-proposal-status-machine-and-stable-entity-id.md)**。
-> 四級已被兩正交軸取代。**引用本檔任何段落前請先確認未被三份 ADR 取代**——
+> 四級已被兩正交軸取代。**引用本檔任何段落前請先確認未被四份 ADR 取代**——
 > 尤其 §判準 3-B(4) 的 bogus item 建議**已撤回**（見該處更正框）。
 
 > 前置研究：[國際主要職能/職業標準體系的欄位定義與撰寫標準](2026-07-13-ai-redesign-raw-intl-competency-standards.md)

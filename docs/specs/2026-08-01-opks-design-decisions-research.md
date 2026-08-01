@@ -182,24 +182,52 @@ Morgeson et al. (2004) 的操縱**只是加上 "ability to" 這個詞**就produc
 - **unknown 用可為空的 array 表示**：O/P/K/S/A 天然是清單，空 array 就是最誠實的「沒有」，
   不需要 sentinel、不動用 union 預算，沿用現行零 `anyOf` 紀律。
 
+補查 C／D 後新增（依據見 [工作產出原料](2026-08-01-opks-raw-work-outputs.md)、
+[行為指標原料](2026-08-01-opks-raw-performance-indicators.md)）：
+
+- **K/S 禁 `ability to`／「具備…之能力」句式**——OPM 逐字禁令（避免與 task 混淆）
+  與 Morgeson et al. (2004) 的膨脹實證**從兩個方向指向同一條規則**，可寫成 deterministic 檢查。
+- **K/S 禁程度修飾詞**——OPM 逐字：「'thorough' knowledge, 'considerable' skill, or 'basic'
+  understanding… do not provide meaningful information」。繁中黑名單：
+  熟悉／精通／良好的／深厚的／扎實的／基本的／豐富的／優秀的。字串層即可擋。
+- **知識用名詞、技能用動詞**——OPM 與 ESCO 兩個獨立體系逐字同意。
+- **數值門檻採三檔**：可逐字回溯 → 允許；有標準但講不出數值 → 寫成質性條件；
+  未提及 → **不得生成**。香港 SCS 全文無任何數值門檻，證明「沒有數字也能通過政府級品質審查」。
+- **第一版不自動判級**：缺 AQF／新加坡條文，且尚無真實 O/P/K/S 資料。
+  只確保指標寫得夠具體到日後可判級。
+
 ---
 
-## 5. 缺口（誠實標記，未完成）
+## 5. C／D 補查結果與**仍然**存在的缺口
 
-**C（工作產出的權威處理）與 D（行為指標與數字門檻）兩份原料未產出**——研究 agent 在寫檔前
-撞到 session limit；隨後改由主線補查時，`opm.gov`、`training.gov.au`、`hkqf.gov.hk`、
-`skillsfuture.gov.sg` 分別以 ECONNRESET／timeout／JS-only 渲染失敗，未取得一手內容。
+C 與 D 已於 2026-08-01 補查完成，產出兩份原料：
+[工作產出](2026-08-01-opks-raw-work-outputs.md)、[行為指標](2026-08-01-opks-raw-performance-indicators.md)。
+取得方式改為 **curl 直抓 PDF + `pdftotext` 抽字**，繞開 WebFetch 對 PDF 的解析限制。
 
-**尚未回答、且會影響 schema 的問題：**
+**已回答：**
 
-| 缺口 | 為什麼重要 | 還要查什麼 |
+| 原缺口 | 答案 | 依據 |
 |---|---|---|
-| C：無形產出 | iCAP 有 O 欄位、國際體系**都沒有**；服務／監控／預防／決策型工作寫不出交付物時該怎麼辦 | Gilbert *Human Competence* 的 accomplishment vs behavior 原文；Fine 的 FJA "result" 成分；新加坡 Skills Framework 的 Performance Expectations；香港 SCS 的 Range／Assessment Criteria；澳洲 Performance Evidence |
-| C：產出缺失是否該回頭質疑 Task | O\*NET 定義 task = "smallest unit of activity with a **meaningful outcome**"——若寫不出產出，可能是 Task 邊界錯 | 有無權威體系明文把「產出缺失」當任務品質訊號 |
-| D：數字門檻全禁或條件允許 | 直接決定 verifier 是硬擋還是標記 | 澳洲 Performance Criteria／香港 Assessment Criteria／新加坡 Performance Expectations 是否允許數字；有無官方要求標準須有組織資料佐證 |
-| D：指標與級別對齊 | iCAP 審核指標 3.4.3 要求指標能力程度對應職能級別 | SFIA／EQF／AQF 有無等價的「措辭隨級別升階」判準語言 |
+| 無形產出怎麼寫 | 寫成**「維持的狀態」或「避免的後果」**。香港 SCS 逐字：「Capable of using warehousing terms… correctly… **so as to avoid delays, mistakes or losses caused by wrong use of terms**」 | 香港 SCS 全文（一手） |
+| 產出缺失是否該質疑 Task | **是**，但無單一官方條文；由三條合成：O\*NET 的 task 定義（meaningful outcome 是成立要件）+ OPM 的**雙向**刪除規則 + iCAP 允許省略的是欄位而非成果 | 合成判準，須在 ADR 標明 |
+| 數字門檻全禁或有條件 | **有條件三檔**（見 §4）。關鍵區分：OPM 把數字放在**分析程序**（評分量表），不放在**文件內容** | OPM + 香港實例 + iCAP p48 |
+| 指標與級別對齊 | **第一版不做**；只確保指標具體到日後可判級 | 缺 AQF／SG 條文 |
 
-**在補上之前不得宣稱 O 與 P 的設計已有權威依據。** §3 的 Q1–Q5 不依賴 C／D，可以先討論。
+**額外收穫（原本沒問，但影響顧問行為）：** Flanagan (1954) 的實測——
+領班每週回報遺失約 **50%** 的事件、每兩週遺失 **80%**，且觀測到
+「**selective recall of dramatic or other special types of incidents**」。
+這給「精彩事件掩蓋高頻例行工作」與「想不起來是正常結果」兩條既有直覺**實測背書**。
+
+**仍然缺（不影響 §3 的裁決，但要記著）：**
+
+1. **Gilbert《Human Competence》一手文本**——專書無公開全文、*JOBM* 2019 回顧 403。
+   **不得引用其逐字定義**；「產出是行為的產物」改引香港 SCS 與 O\*NET task 定義。
+2. **澳洲 Performance Evidence 是否使用次數門檻**（"on at least 3 occasions"）——
+   `dewr.gov.au`／`asqa.gov.au` timeout。若確實使用，§4 的數值三檔需重審。
+3. **新加坡 Performance Expectations 欄位定義**——官方站回傳 SPA 殼。
+   這是唯一已知明確有「期望表現」欄位的政府體系。
+4. **Smith & Kendall (1963) BARS 原著**——付費牆；本輪完全未引用 BARS 建構步驟。
+5. **香港 SCS 的版本與官方出處**——取自 HKU SPACE 轉載，引用前須回 `hkqf.gov.hk` 確認版次。
 
 ---
 

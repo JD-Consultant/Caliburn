@@ -11,6 +11,14 @@ from .base import DomainModel, Identifier, NonEmptyText, TaskId
 from .sources import SourceAnchor, SourceKind
 
 
+_EVIDENCE_ORIGIN_BY_SOURCE_KIND: dict[
+    SourceKind, Literal["employee"]
+] = {
+    SourceKind.EMPLOYEE_TURN: "employee",
+    SourceKind.DIRECT_EDIT: "employee",
+}
+
+
 class OpksEntityKind(StrEnum):
     OUTPUT = "output"
     INDICATOR = "indicator"
@@ -24,10 +32,7 @@ class OpksEvidenceLink(SourceAnchor):
 
     @model_validator(mode="after")
     def source_is_employee_evidence(self):
-        if self.source_ref.kind not in {
-            SourceKind.EMPLOYEE_TURN,
-            SourceKind.DIRECT_EDIT,
-        }:
+        if self.source_ref.kind not in _EVIDENCE_ORIGIN_BY_SOURCE_KIND:
             raise ValueError("OPKS evidence must be employee_turn or direct_edit")
         return self
 
@@ -46,7 +51,10 @@ class OpksItem(DomainModel):
 
     @property
     def evidence_origins(self) -> frozenset[Literal["employee"]]:
-        return frozenset({"employee"})
+        return frozenset(
+            _EVIDENCE_ORIGIN_BY_SOURCE_KIND[link.source_ref.kind]
+            for link in self.evidence_links
+        )
 
     @model_validator(mode="after")
     def evidence_is_not_empty(self):

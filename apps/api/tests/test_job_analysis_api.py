@@ -950,6 +950,57 @@ async def test_opks_proposal_decisions_use_the_independent_contract(
         assert response.json()["opks_items"] == []
 
 
+async def test_remove_opks_proposal_cannot_be_edited(api_client):
+    client, store, _ = api_client
+    root = f"/api/v1/job-analysis/documents/{DOCUMENT_ID}"
+    await client.put(root, json={"title": "門市營運專員"})
+    store.tasks = (
+        JdTask(
+            task_id="task-1",
+            statement="每週彙整營運週報",
+            display_order=0,
+        ),
+    )
+    current = OpksItem(
+        entity_id="output-1",
+        entity_kind=OpksEntityKind.OUTPUT,
+        text="營運週報",
+        task_refs=("task-1",),
+        evidence_links=(
+            OpksEvidenceLink(
+                source_ref=SourceRef(
+                    kind=SourceKind.EMPLOYEE_TURN,
+                    id="turn-1",
+                ),
+                quote="我每週彙整營運週報",
+            ),
+        ),
+    )
+    store.opks = (current,)
+    proposal = OpksProposal(
+        proposal_id="remove-output-1",
+        operation_id="opks-operation-remove",
+        entity_id=current.entity_id,
+        entity_kind=current.entity_kind,
+        action=OpksProposalAction.REMOVE,
+        before=current,
+        base_authority_generation=0,
+        created_at=NOW,
+    )
+    store.opks_proposals = (proposal,)
+
+    response = await client.post(
+        f"{root}/opks-proposals/{proposal.proposal_id}/decisions",
+        headers={"Idempotency-Key": "edit-remove-output"},
+        json={"decision": "edited", "edited_text": "換一種移除說法"},
+    )
+
+    assert response.status_code == 409
+    assert response.json()["type"].endswith("/authority-conflict")
+    assert store.opks == (current,)
+    assert store.opks_proposals == (proposal,)
+
+
 async def test_missing_opks_proposal_uses_the_proposal_problem_type(api_client):
     client, _, _ = api_client
     root = f"/api/v1/job-analysis/documents/{DOCUMENT_ID}"

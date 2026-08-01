@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from enum import StrEnum
+from typing import cast
 
 from app.job_analysis.domain import (
     DomainModel,
@@ -21,6 +22,7 @@ class OpksViolationCode(StrEnum):
     TARGET_ORDINAL_UNKNOWN = "target_ordinal_unknown"
     TARGET_NOT_RELATED_TO_SELECTED_TASK = "target_not_related_to_selected_task"
     DUPLICATE_TARGET = "duplicate_target"
+    DUPLICATE_ADD_CANDIDATE = "duplicate_add_candidate"
 
 
 class OpksViolation(DomainModel):
@@ -210,6 +212,7 @@ def verify_opks_result(
     violations: list[OpksViolation] = []
     candidates: list[VerifiedOpksChange] = []
     seen_targets: set[tuple[OpksEntityKind, int]] = set()
+    seen_add_candidates: set[tuple[OpksEntityKind, str]] = set()
     selected_task_id = packet.selected_task.task.task_id
     selected_indicator_ids = frozenset(
         view.item.entity_id for view in packet.indicators
@@ -230,6 +233,21 @@ def verify_opks_result(
         if item.decision is OpksDecision.UNCERTAIN:
             continue
         if item.decision is OpksDecision.ADD_NEW:
+            add_text = cast(str, item.text)  # _payload_is_valid() above proved non-null.
+            add_key = (_domain_kind(item), add_text.strip())
+            if add_key in seen_add_candidates:
+                violations.append(
+                    OpksViolation(
+                        code=OpksViolationCode.DUPLICATE_ADD_CANDIDATE,
+                        item_index=item_index,
+                        message=(
+                            "the same entity kind and exact add text appears "
+                            "more than once"
+                        ),
+                    )
+                )
+                continue
+            seen_add_candidates.add(add_key)
             candidates.append(
                 _add_change(
                     packet,

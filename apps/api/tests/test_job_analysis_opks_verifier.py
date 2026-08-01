@@ -400,6 +400,31 @@ def test_unknown_duplicate_and_unrelated_targets_are_rejected_as_a_batch():
     }
 
 
+def test_exact_duplicate_add_candidates_are_rejected_as_a_batch():
+    report = verify_opks_result(
+        packet(),
+        result(
+            model_item(
+                OpksGenerationEntityKind.KNOWLEDGE,
+                OpksDecision.ADD_NEW,
+                text="營運指標定義",
+            ),
+            model_item(
+                OpksGenerationEntityKind.KNOWLEDGE,
+                OpksDecision.ADD_NEW,
+                text="營運指標定義",
+            ),
+        ),
+        operation_id="operation-1",
+    )
+
+    assert not report.is_valid
+    assert report.changes == ()
+    assert [violation.code for violation in report.violations] == [
+        OpksViolationCode.DUPLICATE_ADD_CANDIDATE
+    ]
+
+
 def test_semantic_quality_is_not_falsely_encoded_as_a_deterministic_rule():
     report = verify_opks_result(
         packet(),

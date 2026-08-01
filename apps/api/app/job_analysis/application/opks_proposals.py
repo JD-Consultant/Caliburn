@@ -252,6 +252,13 @@ async def decide_opks_proposal(
             raise OpksProposalNotDecidable(
                 f"OPKS proposal {proposal_id!r} is {proposal.status.value}"
             )
+        if (
+            target_status is OpksProposalStatus.EDITED
+            and proposal.after is None
+        ):
+            raise OpksProposalNotDecidable(
+                "a remove OPKS proposal has no replacement text to edit"
+            )
 
         now = _utcnow()
         edited_after: OpksItem | None = None
@@ -267,8 +274,10 @@ async def decide_opks_proposal(
             )
         ]
         if target_status is OpksProposalStatus.EDITED:
-            assert proposal.after is not None
-            assert edited_text is not None
+            if proposal.after is None or edited_text is None:
+                raise OpksProposalNotDecidable(
+                    "an edited OPKS decision requires replacement text"
+                )
             edited_after = proposal.after.model_copy(update={"text": edited_text})
             edit_entry_id = _direct_edit_entry_id(decision_id)
             applied_item = edited_after.model_copy(

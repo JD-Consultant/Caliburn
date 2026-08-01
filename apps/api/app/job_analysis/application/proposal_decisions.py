@@ -31,6 +31,7 @@ from .authority_commit import commit_authority_change
 from .errors import (
     DocumentNotFound,
     IdempotencyConflict,
+    InvalidProposalDecision,
     JobAnalysisApplicationError,
 )
 from .persistence import (
@@ -60,10 +61,6 @@ class ProposalNotFound(JobAnalysisApplicationError):
 
 
 class ProposalNotDecidable(JobAnalysisApplicationError):
-    pass
-
-
-class InvalidProposalDecision(JobAnalysisApplicationError):
     pass
 
 

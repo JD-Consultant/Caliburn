@@ -25,6 +25,10 @@ class OpksProposalNotDecidable(JobAnalysisApplicationError):
     pass
 
 
+class InvalidProposalDecision(JobAnalysisApplicationError):
+    pass
+
+
 class IdempotencyConflict(JobAnalysisApplicationError):
     pass
 

@@ -169,6 +169,8 @@ function knownProblemMessage(type: KnownProblemType): string {
       return "找不到這份職務說明書";
     case "https://caliburn.dev/problems/job-analysis/task-not-found":
       return "找不到這項工作";
+    case "https://caliburn.dev/problems/job-analysis/opks-item-not-found":
+      return "找不到這項職務內容";
     case "https://caliburn.dev/problems/job-analysis/idempotency-conflict":
       return "這次操作內容已經改變";
     case "https://caliburn.dev/problems/job-analysis/authority-conflict":
@@ -189,6 +191,7 @@ function knownProblemMessage(type: KnownProblemType): string {
 const KNOWN_PROBLEM_TYPES = new Set<string>([
   "https://caliburn.dev/problems/job-analysis/document-not-found",
   "https://caliburn.dev/problems/job-analysis/task-not-found",
+  "https://caliburn.dev/problems/job-analysis/opks-item-not-found",
   "https://caliburn.dev/problems/job-analysis/idempotency-conflict",
   "https://caliburn.dev/problems/job-analysis/authority-conflict",
   "https://caliburn.dev/problems/job-analysis/invalid-task-order",

@@ -323,8 +323,15 @@ async def test_list_and_open_return_only_the_current_jd_projection(api_client):
     assert listed.status_code == 200
     assert listed.json()[0]["task_count"] == 1
     assert opened.status_code == 200
-    assert set(opened.json()) == {"document_id", "title", "updated_at", "tasks"}
+    assert set(opened.json()) == {
+        "document_id",
+        "title",
+        "updated_at",
+        "tasks",
+        "opks_items",
+    }
     assert opened.json()["tasks"][0]["statement"] == "每週彙整營運週報"
+    assert opened.json()["opks_items"] == []
     forbidden = {"authority_generation", "work_model", "journal", "proposals"}
     assert forbidden.isdisjoint(opened.json())
 
@@ -384,6 +391,20 @@ def _task_payload(statement: str = " 每週彙整營運週報 "):
     }
 
 
+def _opks_payload(
+    task_id: str,
+    *,
+    text: str = " 營運週報 ",
+    entity_kind: str = "output",
+):
+    return {
+        "entity_kind": entity_kind,
+        "text": text,
+        "task_refs": [task_id],
+        "indicator_refs": [],
+    }
+
+
 async def test_task_mutations_share_the_authoring_use_cases(api_client):
     client, _, _ = api_client
     await client.put(
@@ -432,6 +453,93 @@ async def test_task_mutations_share_the_authoring_use_cases(api_client):
     assert [item["task_id"] for item in reordered.json()] == [task_id]
     assert deleted.status_code == 204
     assert delete_replay.status_code == 204
+
+
+async def test_opks_mutations_share_the_authority_commit_and_reload_views(api_client):
+    client, _, _ = api_client
+    root = f"/api/v1/job-analysis/documents/{DOCUMENT_ID}"
+    await client.put(root, json={"title": "門市營運專員"})
+    task = await client.post(
+        f"{root}/tasks",
+        headers={"Idempotency-Key": "task-for-opks"},
+        json=_task_payload(),
+    )
+    task_id = task.json()["task_id"]
+
+    created = await client.post(
+        f"{root}/opks",
+        headers={"Idempotency-Key": "opks-add"},
+        json=_opks_payload(task_id),
+    )
+    replay = await client.post(
+        f"{root}/opks",
+        headers={"Idempotency-Key": "opks-add"},
+        json=_opks_payload(task_id),
+    )
+    entity_id = created.json()["entity_id"]
+    edited = await client.put(
+        f"{root}/opks/{entity_id}",
+        headers={"Idempotency-Key": "opks-edit"},
+        json=_opks_payload(task_id, text=" 每週營運週報 "),
+    )
+    wrong_kind = await client.put(
+        f"{root}/opks/{entity_id}",
+        headers={"Idempotency-Key": "opks-change-kind"},
+        json=_opks_payload(
+            task_id,
+            text="每週營運週報",
+            entity_kind="knowledge",
+        ),
+    )
+    document = await client.get(root)
+    consultation = await client.get(f"{root}/consultation")
+    deleted = await client.delete(
+        f"{root}/opks/{entity_id}",
+        headers={"Idempotency-Key": "opks-delete"},
+    )
+    delete_replay = await client.delete(
+        f"{root}/opks/{entity_id}",
+        headers={"Idempotency-Key": "opks-delete"},
+    )
+    missing = await client.delete(
+        f"{root}/opks/{entity_id}",
+        headers={"Idempotency-Key": "opks-delete-new"},
+    )
+
+    assert created.status_code == 201
+    assert replay.json() == created.json()
+    assert created.json()["text"] == "營運週報"
+    assert created.json()["evidence_quotes"] == []
+    assert edited.status_code == 200
+    assert edited.json()["text"] == "每週營運週報"
+    assert wrong_kind.status_code == 422
+    assert wrong_kind.json()["type"].endswith("/invalid-request")
+    assert document.json()["opks_items"] == [edited.json()]
+    assert consultation.json()["opks_items"] == [edited.json()]
+    assert deleted.status_code == 204
+    assert delete_replay.status_code == 204
+    assert missing.status_code == 404
+    assert missing.json()["type"].endswith("/opks-item-not-found")
+
+
+async def test_invalid_opks_mutation_uses_invalid_request(api_client):
+    client, _, _ = api_client
+    root = f"/api/v1/job-analysis/documents/{DOCUMENT_ID}"
+    await client.put(root, json={"title": "門市營運專員"})
+
+    response = await client.post(
+        f"{root}/opks",
+        headers={"Idempotency-Key": "blank-opks"},
+        json={
+            "entity_kind": "knowledge",
+            "text": "   ",
+            "task_refs": [],
+            "indicator_refs": [],
+        },
+    )
+
+    assert response.status_code == 422
+    assert response.json()["type"].endswith("/invalid-request")
 
 
 @pytest.mark.parametrize(

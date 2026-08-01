@@ -156,6 +156,7 @@ describe("jobAnalysisProblemMessage", () => {
   it.each([
     ["document-not-found", "找不到這份職務說明書"],
     ["task-not-found", "找不到這項工作"],
+    ["opks-item-not-found", "找不到這項職務內容"],
     ["idempotency-conflict", "這次操作內容已經改變"],
     ["authority-conflict", "內容已有更新"],
     ["invalid-task-order", "工作順序不正確"],

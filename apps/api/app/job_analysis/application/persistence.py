@@ -38,6 +38,7 @@ WORK_MODEL_SCHEMA_ID = "job-analysis-work-model/1"
 PROPOSAL_SCHEMA_ID = "job-analysis-proposal/1"
 OPKS_ITEM_SCHEMA_ID = "job-analysis-opks-item/1"
 OPKS_PROPOSAL_SCHEMA_ID = "job-analysis-opks-proposal/1"
+OPKS_DIRECT_EDIT_SCHEMA_ID = "job-analysis-opks-direct-edit/1"
 ACTIVE_QUESTION_SCHEMA_ID = "job-analysis-active-question/1"
 CONSULTANT_OPENING_SCHEMA_ID = "job-analysis-consultant-opening/1"
 COMPLETED_TURN_SCHEMA_ID = "job-analysis-completed-turn/1"
@@ -141,6 +142,33 @@ class DirectEditPayload(DomainModel):
         return self
 
 
+OpksDirectEditAction = Literal["add", "edit", "delete"]
+
+
+class OpksDirectEditPayload(DomainModel):
+    action: OpksDirectEditAction
+    before: OpksItem | None = None
+    after: OpksItem | None = None
+
+    @model_validator(mode="after")
+    def snapshots_match_action(self):
+        valid = {
+            "add": self.before is None and self.after is not None,
+            "edit": self.before is not None and self.after is not None,
+            "delete": self.before is not None and self.after is None,
+        }[self.action]
+        if not valid:
+            raise ValueError(f"{self.action} OPKS edit snapshot shape is invalid")
+        if (
+            self.action == "edit"
+            and self.before is not None
+            and self.after is not None
+            and self.before.entity_id != self.after.entity_id
+        ):
+            raise ValueError("OPKS edit must preserve entity identity")
+        return self
+
+
 EMPLOYEE_PROPOSAL_DECISIONS = frozenset(
     {
         ProposalStatus.ACCEPTED,
@@ -175,6 +203,7 @@ JournalPayload = (
     ConsultantOpeningPayload
     | CompletedTurnPayload
     | DirectEditPayload
+    | OpksDirectEditPayload
     | ProposalDecisionPayload
 )
 
@@ -185,6 +214,7 @@ _JOURNAL_CONTRACT: dict[type[DomainModel], tuple[JournalKind, str]] = {
     ),
     CompletedTurnPayload: ("employee_turn", COMPLETED_TURN_SCHEMA_ID),
     DirectEditPayload: ("direct_edit", DIRECT_EDIT_SCHEMA_ID),
+    OpksDirectEditPayload: ("direct_edit", OPKS_DIRECT_EDIT_SCHEMA_ID),
     ProposalDecisionPayload: ("proposal_decision", PROPOSAL_DECISION_SCHEMA_ID),
 }
 

@@ -20,6 +20,9 @@ from app.job_analysis.domain import (
     JdEntry,
     JdTask,
     MergeTarget,
+    OpksEntityKind,
+    OpksEvidenceLink,
+    OpksItem,
     OpenIssue,
     OpenIssueKind,
     Proposal,
@@ -29,6 +32,7 @@ from app.job_analysis.domain import (
     RetirementKind,
     RetirementReason,
     SingleTaskTarget,
+    SplitTarget,
     SourceKind,
     SourceAnchor,
     SourceRef,
@@ -68,6 +72,28 @@ def task(task_id: str, statement: str) -> Task:
 
 def jd_task(task_id: str, statement: str, order: int = 0) -> JdTask:
     return JdTask(task_id=task_id, statement=statement, display_order=order)
+
+
+def opks_item(
+    entity_id: str,
+    entity_kind: OpksEntityKind,
+    text: str,
+    *,
+    task_refs: tuple[str, ...] = (),
+    indicator_refs: tuple[str, ...] = (),
+) -> OpksItem:
+    return OpksItem(
+        entity_id=entity_id,
+        entity_kind=entity_kind,
+        text=text,
+        task_refs=task_refs,
+        indicator_refs=indicator_refs,
+        evidence_links=(
+            OpksEvidenceLink(
+                source_ref=SourceRef(kind=SourceKind.DIRECT_EDIT, id="edit-opks"),
+            ),
+        ),
+    )
 
 
 def add_proposal() -> tuple[CurrentWorkModel, tuple[JdTask, ...], Proposal]:
@@ -166,6 +192,68 @@ def jd_only_withdraw_proposal():
     return CurrentWorkModel(open_issues=(issue,)), (current,), proposal
 
 
+def split_proposal() -> tuple[CurrentWorkModel, tuple[JdTask, ...], Proposal]:
+    parent = task("task-parent", "維護營運資料並製作週報")
+    first_fields = TaskFields(
+        statement="維護營運資料",
+        action="維護",
+        object="營運資料",
+    )
+    second_fields = TaskFields(
+        statement="製作營運週報",
+        action="製作",
+        object="營運週報",
+    )
+    source = SourceRef(kind=SourceKind.EMPLOYEE_TURN, id="employee-1")
+    child_a = StagedTask(
+        task_id="task-child-a",
+        fields=first_fields,
+        support_links=(support("維護營運資料"),),
+    )
+    child_b = StagedTask(
+        task_id="task-child-b",
+        fields=second_fields,
+        support_links=(support("製作營運週報"),),
+    )
+    delta = StagedWorkModelDelta(
+        lineage_changes=(
+            StagedTaskLineage(
+                task_id="task-parent",
+                retirement=Retirement(kind=RetirementKind.SPLIT, source_ref=source),
+            ),
+            StagedTaskLineage(task_id="task-child-a", split_from="task-parent"),
+            StagedTaskLineage(task_id="task-child-b", split_from="task-parent"),
+        ),
+        new_tasks=(child_a, child_b),
+    )
+    current_jd = (jd_task("task-parent", parent.statement),)
+    proposal = Proposal(
+        proposal_id="proposal-split",
+        target=SplitTarget(
+            parent_task_id="task-parent",
+            child_task_ids=("task-child-a", "task-child-b"),
+        ),
+        jd_before=(
+            JdEntry(task_id="task-child-a", value=None),
+            JdEntry(task_id="task-child-b", value=None),
+            JdEntry(task_id="task-parent", value=current_jd[0]),
+        ),
+        jd_after=(
+            JdEntry(
+                task_id="task-child-a",
+                value=jd_task("task-child-a", first_fields.statement, 0),
+            ),
+            JdEntry(
+                task_id="task-child-b",
+                value=jd_task("task-child-b", second_fields.statement, 1),
+            ),
+            JdEntry(task_id="task-parent", value=None),
+        ),
+        staged_work_model_delta=delta,
+    )
+    return CurrentWorkModel(tasks=(parent,)), current_jd, proposal
+
+
 async def seed(
     session_factory,
     document_id,
@@ -173,6 +261,7 @@ async def seed(
     work_model: CurrentWorkModel,
     current_jd: tuple[JdTask, ...],
     proposal: Proposal | None,
+    current_opks: tuple[OpksItem, ...] = (),
 ) -> None:
     uow_factory = factory(session_factory)
     await create_document(
@@ -196,6 +285,7 @@ async def seed(
             document_id,
             (proposal,) if proposal is not None else (),
         )
+        await uow.opks.replace(document_id, current_opks)
         await uow.commit()
 
 
@@ -342,12 +432,30 @@ async def test_accept_jd_only_withdraw_removes_the_jd_task_and_dangling_issue(
 ):
     document_id = cleanup_job_analysis_rows
     work_model, current_jd, proposal = jd_only_withdraw_proposal()
+    output = opks_item(
+        "output-withdrawn",
+        OpksEntityKind.OUTPUT,
+        "每週營運週報",
+        task_refs=("task-direct-1",),
+    )
+    knowledge = opks_item(
+        "knowledge-withdrawn",
+        OpksEntityKind.KNOWLEDGE,
+        "營運資料定義",
+        task_refs=("task-direct-1",),
+    )
+    attitude = opks_item(
+        "attitude-kept",
+        OpksEntityKind.ATTITUDE,
+        "主動釐清異常",
+    )
     await seed(
         postgres_session_factory,
         document_id,
         work_model=work_model,
         current_jd=current_jd,
         proposal=proposal,
+        current_opks=(output, knowledge, attitude),
     )
 
     accepted = await decide_proposal(
@@ -364,6 +472,13 @@ async def test_accept_jd_only_withdraw_removes_the_jd_task_and_dangling_issue(
     assert loaded.state.current_jd == ()
     assert loaded.state.work_model.tasks == ()
     assert loaded.state.work_model.open_issues == ()
+    opks_by_id = {
+        item.entity_id: item for item in loaded.state.current_opks.items
+    }
+    assert opks_by_id == {
+        knowledge.entity_id: knowledge.model_copy(update={"task_refs": ()}),
+        attitude.entity_id: attitude,
+    }
 
 
 async def test_delta_less_withdraw_goes_stale_if_an_active_work_model_task_now_exists(
@@ -566,12 +681,32 @@ async def test_accept_merge_atomically_updates_current_jd_and_work_model(
 ):
     document_id = cleanup_job_analysis_rows
     work_model, current_jd, proposal = merge_proposal()
+    output = opks_item(
+        "output-task-1",
+        OpksEntityKind.OUTPUT,
+        "門市資料",
+        task_refs=("task-1",),
+    )
+    indicator = opks_item(
+        "indicator-task-2",
+        OpksEntityKind.INDICATOR,
+        "每週完成週報",
+        task_refs=("task-2",),
+    )
+    skill = opks_item(
+        "skill-shared",
+        OpksEntityKind.SKILL,
+        "試算表整理",
+        task_refs=("task-1", "task-2"),
+        indicator_refs=(indicator.entity_id,),
+    )
     await seed(
         postgres_session_factory,
         document_id,
         work_model=work_model,
         current_jd=current_jd,
         proposal=proposal,
+        current_opks=(output, indicator, skill),
     )
 
     await decide_proposal(
@@ -588,6 +723,56 @@ async def test_accept_merge_atomically_updates_current_jd_and_work_model(
     assert loaded.state.work_model.task_by_id("task-merged").state is TaskState.ACTIVE
     assert loaded.state.work_model.task_by_id("task-1").state is TaskState.RETIRED
     assert loaded.state.work_model.task_by_id("task-2").state is TaskState.RETIRED
+    assert loaded.state.current_opks.items == (
+        skill.model_copy(update={"task_refs": (), "indicator_refs": ()}),
+    )
+
+
+async def test_accept_split_prunes_parent_opks_without_guessing_child_links(
+    postgres_session_factory,
+    cleanup_job_analysis_rows,
+):
+    document_id = cleanup_job_analysis_rows
+    work_model, current_jd, proposal = split_proposal()
+    output = opks_item(
+        "output-parent",
+        OpksEntityKind.OUTPUT,
+        "營運資料與週報",
+        task_refs=("task-parent",),
+    )
+    knowledge = opks_item(
+        "knowledge-parent",
+        OpksEntityKind.KNOWLEDGE,
+        "營運資料定義",
+        task_refs=("task-parent",),
+    )
+    await seed(
+        postgres_session_factory,
+        document_id,
+        work_model=work_model,
+        current_jd=current_jd,
+        proposal=proposal,
+        current_opks=(output, knowledge),
+    )
+
+    await decide_proposal(
+        factory(postgres_session_factory),
+        document_id=document_id,
+        proposal_id=proposal.proposal_id,
+        decision_id="decision-split",
+        decision="accepted",
+    )
+    loaded = await load_document(factory(postgres_session_factory), document_id)
+
+    assert loaded is not None
+    assert [item.task_id for item in loaded.state.current_jd] == [
+        "task-child-a",
+        "task-child-b",
+    ]
+    assert loaded.state.work_model.task_by_id("task-parent").state is TaskState.RETIRED
+    assert loaded.state.current_opks.items == (
+        knowledge.model_copy(update={"task_refs": ()}),
+    )
 
 
 async def test_revision_request_preserves_the_exclusion_without_applying_delta(

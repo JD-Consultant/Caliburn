@@ -1,16 +1,17 @@
 ---
 title: OPKS（工作產出／行為指標／知識／技能／態度）設計裁決研究
 date: 2026-08-01
-status: Resolved —— 已由 [ADR 0048](../adr/0048-opks-evidence-axes-and-document-level-competencies.md) 裁決
+status: Resolved —— 由 ADR 0048 ＋ 0049 ＋ 0050 ＋ 0051 共同裁決（缺一不可）
 purpose: 把 2026-08-01 五份原料收斂成可裁決的選項比對，並誠實標出未完成的原料缺口
 ---
 
 # OPKS 設計裁決研究
 
-> **【2026-08-01 結案】本文的 §3 Q1–Q5 已經裁決完畢。現行裁決為三份 ADR，缺一不可：
+> **【2026-08-01 結案】本文的 §3 Q1–Q5 已經裁決完畢。現行裁決為**四份 ADR，缺一不可**：
 > [0048](../adr/0048-opks-evidence-axes-and-document-level-competencies.md)（概念）
 > ＋ [0049](../adr/0049-opks-derived-axes-evidence-whitelist-and-document-authority.md)（實作形狀）
-> ＋ [0050](../adr/0050-opks-proposal-minimal-shape.md)（Proposal 形狀）。**
+> ＋ [0050](../adr/0050-opks-proposal-minimal-shape.md)（Proposal 形狀）
+> ＋ [0051](../adr/0051-opks-proposal-status-machine-and-stable-entity-id.md)（狀態機與 entity ID）。**
 >
 > **注意：下表「ADR 0048 的裁決」欄有兩處已被 0049 再修正**——兩軸**不持久化**（改由 refs 推導），
 > 且 `evidence_links` 只收 `employee_turn`／`direct_edit`。以 0049 為準。

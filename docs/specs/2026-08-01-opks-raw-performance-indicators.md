@@ -10,7 +10,7 @@ source_discipline: 只收官方一手與學術原著；取得失敗與未核實�
 > **【現行裁決】** 本檔是**研究原料**，其中對「支持度四級」的歷史分析僅供追溯。
 > OPKS 的現行裁決是 **[ADR 0048](../adr/0048-opks-evidence-axes-and-document-level-competencies.md)
 > ＋ [0049](../adr/0049-opks-derived-axes-evidence-whitelist-and-document-authority.md)
-> ＋ [0050](../adr/0050-opks-proposal-minimal-shape.md)**。**引用本檔任何段落前請先確認未被三份 ADR 取代。**
+> ＋ [0050](../adr/0050-opks-proposal-minimal-shape.md) ＋ [0051](../adr/0051-opks-proposal-status-machine-and-stable-entity-id.md)**。**引用本檔任何段落前請先確認未被三份 ADR 取代。**
 
 
 ## 0. 取得狀態

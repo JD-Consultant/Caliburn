@@ -9,6 +9,8 @@ from job_analysis_contract import (
     DocumentView,
     JdTaskWrite,
     JdTaskView,
+    OpksItemView,
+    OpksItemWrite,
     ProposalJdEntryView,
     ProposalDecisionWrite,
     ProposalView,
@@ -25,6 +27,8 @@ from app.job_analysis.domain import (
     JdTask,
     JdTaskFields,
     JdEntry,
+    OpksEntityKind,
+    OpksItem,
     Proposal,
     ResponsibilityRole,
     SourceKind,
@@ -60,6 +64,32 @@ def to_jd_task_fields(body: JdTaskWrite) -> JdTaskFields:
             )
             for item in body.enablers
         ),
+    )
+
+
+def to_opks_write(
+    body: OpksItemWrite,
+) -> tuple[OpksEntityKind, str, tuple[str, ...], tuple[str, ...]]:
+    return (
+        OpksEntityKind(body.entity_kind.value),
+        body.text.strip(),
+        tuple(body.task_refs),
+        tuple(body.indicator_refs),
+    )
+
+
+def to_opks_item_view(item: OpksItem) -> OpksItemView:
+    quotes: list[str] = []
+    for link in item.evidence_links:
+        if link.quote is not None and link.quote not in quotes:
+            quotes.append(link.quote)
+    return OpksItemView(
+        entity_id=item.entity_id,
+        entity_kind=item.entity_kind.value,
+        text=item.text,
+        task_refs=list(item.task_refs),
+        indicator_refs=list(item.indicator_refs),
+        evidence_quotes=quotes,
     )
 
 
@@ -149,6 +179,9 @@ def to_document_view(loaded: LoadedDocument) -> DocumentView:
         title=loaded.document.title,
         updated_at=loaded.document.updated_at,
         tasks=[to_jd_task_view(task) for task in loaded.state.current_jd],
+        opks_items=[
+            to_opks_item_view(item) for item in loaded.state.current_opks.items
+        ],
     )
 
 
@@ -230,4 +263,7 @@ def to_consultation_view(loaded: LoadedDocument) -> ConsultationView:
             for proposal in loaded.state.proposals
         ],
         tasks=[to_jd_task_view(task) for task in loaded.state.current_jd],
+        opks_items=[
+            to_opks_item_view(item) for item in loaded.state.current_opks.items
+        ],
     )

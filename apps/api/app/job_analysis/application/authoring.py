@@ -7,6 +7,7 @@ from datetime import UTC, datetime
 from uuid import UUID
 
 from app.job_analysis.domain import (
+    CurrentJdOpks,
     CurrentWorkModel,
     JdTask,
     JdTaskFields,
@@ -41,6 +42,7 @@ from .persistence import (
     JournalEntry,
     LoadedDocument,
 )
+from .opks_authoring import prune_opks_for_current_jd
 from .transition import JobAnalysisState
 from .verifier import TurnSpeaker
 
@@ -201,6 +203,7 @@ async def _commit_direct_edit(
     work_model: CurrentWorkModel,
     entry_id: str,
     payload: DirectEditPayload,
+    current_opks: CurrentJdOpks | None = None,
 ) -> None:
     now = _utcnow()
     await commit_authority_change(
@@ -210,7 +213,11 @@ async def _commit_direct_edit(
             work_model=work_model,
             current_jd=tasks,
             proposals=proposals,
-            current_opks={"items": await uow.opks.list(record.document_id)},
+            current_opks=(
+                current_opks
+                if current_opks is not None
+                else {"items": await uow.opks.list(record.document_id)}
+            ),
             opks_proposals=await uow.opks_proposals.list(record.document_id),
         ),
         journal_entry=JournalEntry(
@@ -483,10 +490,14 @@ async def delete_jd_task(
             summary=existing.statement,
             keep_missing_task_issue=False,
         )
+        next_tasks = tuple(task for task in tasks if task.task_id != task_id)
+        current_opks = CurrentJdOpks(
+            items=await uow.opks.list(document_id)
+        )
         await _commit_direct_edit(
             uow,
             record=record,
-            tasks=tuple(task for task in tasks if task.task_id != task_id),
+            tasks=next_tasks,
             proposals=_stale_related_proposals(
                 proposals,
                 affected_task_ids=frozenset({task_id}),
@@ -497,6 +508,10 @@ async def delete_jd_task(
                 edit_kind="delete",
                 task_id=task_id,
                 after=None,
+            ),
+            current_opks=prune_opks_for_current_jd(
+                current_opks,
+                next_tasks,
             ),
         )
 

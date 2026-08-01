@@ -3,9 +3,14 @@
 from datetime import UTC, datetime
 from uuid import UUID
 
-from job_analysis_contract import JdTaskWrite
+from job_analysis_contract import JdTaskWrite, OpksItemWrite
 
-from app.api.job_analysis_mapper import to_consultation_view, to_jd_task_fields
+from app.api.job_analysis_mapper import (
+    to_consultation_view,
+    to_jd_task_fields,
+    to_opks_item_view,
+    to_opks_write,
+)
 from app.job_analysis.application import (
     ActiveQuestion,
     ConversationTurn,
@@ -19,6 +24,9 @@ from app.job_analysis.domain import (
     EnablerKind,
     JdEntry,
     JdTask,
+    OpksEntityKind,
+    OpksEvidenceLink,
+    OpksItem,
     Proposal,
     ProposalAction,
     ProposalStatus,
@@ -74,6 +82,51 @@ def test_empty_responsibility_role_normalizes_to_none():
     assert to_jd_task_fields(body).responsibility_role is None
 
 
+def test_opks_mapper_normalizes_employee_fields_and_exposes_only_quotes():
+    body = OpksItemWrite(
+        entity_kind="knowledge",
+        text=" 營運資料定義 ",
+        task_refs=["task-1"],
+        indicator_refs=["indicator-1"],
+    )
+
+    kind, text, task_refs, indicator_refs = to_opks_write(body)
+
+    assert kind is OpksEntityKind.KNOWLEDGE
+    assert text == "營運資料定義"
+    assert task_refs == ("task-1",)
+    assert indicator_refs == ("indicator-1",)
+
+    item = OpksItem(
+        entity_id="knowledge-1",
+        entity_kind=kind,
+        text=text,
+        task_refs=task_refs,
+        indicator_refs=(),
+        evidence_links=(
+            OpksEvidenceLink(
+                source_ref=SourceRef(
+                    kind=SourceKind.EMPLOYEE_TURN,
+                    id="turn-secret",
+                ),
+                quote="我需要理解營運資料定義",
+            ),
+            OpksEvidenceLink(
+                source_ref=SourceRef(
+                    kind=SourceKind.DIRECT_EDIT,
+                    id="edit-secret",
+                ),
+            ),
+        ),
+    )
+    payload = to_opks_item_view(item).model_dump(mode="json")
+
+    assert payload["evidence_quotes"] == ["我需要理解營運資料定義"]
+    assert "evidence_links" not in payload
+    assert "turn-secret" not in str(payload)
+    assert "edit-secret" not in str(payload)
+
+
 def test_consultation_view_keeps_history_without_leaking_internal_authority():
     now = datetime(2026, 7, 30, 9, 0, tzinfo=UTC)
     effective = SupportLink(
@@ -123,6 +176,25 @@ def test_consultation_view_keeps_history_without_leaking_internal_authority():
             work_model=CurrentWorkModel(tasks=(task,)),
             current_jd=(jd_task,),
             proposals=(proposal,),
+            current_opks={
+                "items": [
+                    OpksItem(
+                        entity_id="output-1",
+                        entity_kind=OpksEntityKind.OUTPUT,
+                        text="營運週報",
+                        task_refs=("task-1",),
+                        evidence_links=(
+                            OpksEvidenceLink(
+                                source_ref=SourceRef(
+                                    kind=SourceKind.EMPLOYEE_TURN,
+                                    id="turn-2",
+                                ),
+                                quote="我每週彙整營運週報",
+                            ),
+                        ),
+                    )
+                ]
+            },
         ),
         conversation_turns=(
             ConversationTurn(
@@ -151,5 +223,6 @@ def test_consultation_view_keeps_history_without_leaking_internal_authority():
         "我每週彙整營運週報"
     ]
     assert payload["tasks"][0]["task_id"] == "task-1"
+    assert payload["opks_items"][0]["text"] == "營運週報"
     assert "authority_generation" not in payload
     assert "work_model" not in payload

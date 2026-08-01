@@ -13,6 +13,7 @@ from app.job_analysis.application import (
     InvalidJdTaskOrder,
     InvalidProposalDecision,
     JdTaskNotFound,
+    OpksItemNotFound,
     ProposalNotDecidable,
     ProposalNotFound,
 )
@@ -23,6 +24,9 @@ DOCUMENT_NOT_FOUND = (
     "https://caliburn.dev/problems/job-analysis/document-not-found"
 )
 TASK_NOT_FOUND = "https://caliburn.dev/problems/job-analysis/task-not-found"
+OPKS_ITEM_NOT_FOUND = (
+    "https://caliburn.dev/problems/job-analysis/opks-item-not-found"
+)
 IDEMPOTENCY_CONFLICT = (
     "https://caliburn.dev/problems/job-analysis/idempotency-conflict"
 )
@@ -78,6 +82,12 @@ def application_error_response(
         return problem_response(
             type_uri=TASK_NOT_FOUND,
             title="Task not found",
+            status=404,
+        )
+    if isinstance(error, OpksItemNotFound):
+        return problem_response(
+            type_uri=OPKS_ITEM_NOT_FOUND,
+            title="OPKS item not found",
             status=404,
         )
     if isinstance(error, ProposalNotFound):

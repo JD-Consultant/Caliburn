@@ -104,10 +104,62 @@
         "display_order": { "type": "integer", "minimum": 0 }
       }
     },
+    "OpksItemWrite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["entity_kind", "text", "task_refs", "indicator_refs"],
+      "properties": {
+        "entity_kind": {
+          "type": "string",
+          "enum": ["output", "indicator", "knowledge", "skill", "attitude"]
+        },
+        "text": { "type": "string" },
+        "task_refs": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "indicator_refs": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "OpksItemView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "entity_id",
+        "entity_kind",
+        "text",
+        "task_refs",
+        "indicator_refs",
+        "evidence_quotes"
+      ],
+      "properties": {
+        "entity_id": { "type": "string" },
+        "entity_kind": {
+          "type": "string",
+          "enum": ["output", "indicator", "knowledge", "skill", "attitude"]
+        },
+        "text": { "type": "string" },
+        "task_refs": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "indicator_refs": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "evidence_quotes": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
     "DocumentView": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["document_id", "title", "updated_at", "tasks"],
+      "required": ["document_id", "title", "updated_at", "tasks", "opks_items"],
       "properties": {
         "document_id": { "type": "string", "format": "uuid" },
         "title": { "type": "string" },
@@ -115,6 +167,10 @@
         "tasks": {
           "type": "array",
           "items": { "$ref": "#/$defs/JdTaskView" }
+        },
+        "opks_items": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/OpksItemView" }
         }
       }
     },
@@ -211,7 +267,8 @@
         "conversation",
         "active_question",
         "proposals",
-        "tasks"
+        "tasks",
+        "opks_items"
       ],
       "properties": {
         "document": { "$ref": "#/$defs/DocumentMetadataView" },
@@ -232,6 +289,10 @@
         "tasks": {
           "type": "array",
           "items": { "$ref": "#/$defs/JdTaskView" }
+        },
+        "opks_items": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/OpksItemView" }
         }
       }
     },
@@ -295,7 +356,8 @@
             "https://caliburn.dev/problems/job-analysis/invalid-task-order",
             "https://caliburn.dev/problems/job-analysis/invalid-request",
             "https://caliburn.dev/problems/job-analysis/proposal-not-found",
-            "https://caliburn.dev/problems/job-analysis/consultant-unavailable"
+            "https://caliburn.dev/problems/job-analysis/consultant-unavailable",
+            "https://caliburn.dev/problems/job-analysis/opks-item-not-found"
           ]
         },
         "title": { "type": "string" },

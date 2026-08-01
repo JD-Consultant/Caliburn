@@ -71,6 +71,28 @@ export interface JdTaskView {
 }
 /**
  * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "OpksItemWrite".
+ */
+export interface OpksItemWrite {
+  entity_kind: "output" | "indicator" | "knowledge" | "skill" | "attitude";
+  text: string;
+  task_refs: string[];
+  indicator_refs: string[];
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "OpksItemView".
+ */
+export interface OpksItemView {
+  entity_id: string;
+  entity_kind: "output" | "indicator" | "knowledge" | "skill" | "attitude";
+  text: string;
+  task_refs: string[];
+  indicator_refs: string[];
+  evidence_quotes: string[];
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
  * via the `definition` "DocumentView".
  */
 export interface DocumentView {
@@ -78,6 +100,7 @@ export interface DocumentView {
   title: string;
   updated_at: string;
   tasks: JdTaskView[];
+  opks_items: OpksItemView[];
 }
 /**
  * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
@@ -129,6 +152,7 @@ export interface ConsultationView {
   active_question: ActiveQuestionView | null;
   proposals: ProposalView[];
   tasks: JdTaskView[];
+  opks_items: OpksItemView[];
 }
 /**
  * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
@@ -174,7 +198,8 @@ export interface ProblemDetail {
     | "https://caliburn.dev/problems/job-analysis/invalid-task-order"
     | "https://caliburn.dev/problems/job-analysis/invalid-request"
     | "https://caliburn.dev/problems/job-analysis/proposal-not-found"
-    | "https://caliburn.dev/problems/job-analysis/consultant-unavailable";
+    | "https://caliburn.dev/problems/job-analysis/consultant-unavailable"
+    | "https://caliburn.dev/problems/job-analysis/opks-item-not-found";
   title: string;
   status: number;
   detail?: string | null;

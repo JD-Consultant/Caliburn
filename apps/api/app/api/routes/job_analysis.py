@@ -14,6 +14,8 @@ from job_analysis_contract import (
     EmployeeTurnWrite,
     JdTaskView,
     JdTaskWrite,
+    OpksItemView,
+    OpksItemWrite,
     ProblemFieldError,
     ProposalDecisionWrite,
     TaskOrderWrite,
@@ -27,6 +29,8 @@ from app.api.job_analysis_mapper import (
     to_document_view,
     to_jd_task_fields,
     to_jd_task_view,
+    to_opks_item_view,
+    to_opks_write,
     to_consultation_view,
     to_proposal_decision,
 )
@@ -43,8 +47,11 @@ from app.job_analysis.application import (
     TransitionCommitRejected,
     UncommittableOperationResult,
     add_jd_task,
+    add_opks_item,
     delete_jd_task,
+    delete_opks_item,
     edit_jd_task,
+    edit_opks_item,
     list_documents,
     load_document,
     decide_proposal,
@@ -280,6 +287,90 @@ async def delete_task(
             document_id=document_id,
             entry_id=idempotency_key,
             task_id=task_id,
+        )
+    except JobAnalysisApplicationError as error:
+        return application_error_response(error)
+    return Response(status_code=204)
+
+
+@router.post("/{document_id}/opks", response_model=OpksItemView, status_code=201)
+async def add_opks(
+    document_id: UUID,
+    body: OpksItemWrite,
+    idempotency_key: IdempotencyKey,
+    uow_factory: JobAnalysisUnitOfWorkFactory = Depends(
+        get_job_analysis_uow_factory
+    ),
+):
+    try:
+        entity_kind, text, task_refs, indicator_refs = to_opks_write(body)
+        item = await add_opks_item(
+            uow_factory,
+            document_id=document_id,
+            entry_id=idempotency_key,
+            entity_kind=entity_kind,
+            text=text,
+            task_refs=task_refs,
+            indicator_refs=indicator_refs,
+        )
+    except ValidationError as error:
+        return domain_validation_error_response(error)
+    except JobAnalysisApplicationError as error:
+        return application_error_response(error)
+    return to_opks_item_view(item)
+
+
+@router.put("/{document_id}/opks/{entity_id}", response_model=OpksItemView)
+async def edit_opks(
+    document_id: UUID,
+    entity_id: str,
+    body: OpksItemWrite,
+    idempotency_key: IdempotencyKey,
+    uow_factory: JobAnalysisUnitOfWorkFactory = Depends(
+        get_job_analysis_uow_factory
+    ),
+):
+    try:
+        entity_kind, text, task_refs, indicator_refs = to_opks_write(body)
+        item = await edit_opks_item(
+            uow_factory,
+            document_id=document_id,
+            entry_id=idempotency_key,
+            entity_id=entity_id,
+            entity_kind=entity_kind,
+            text=text,
+            task_refs=task_refs,
+            indicator_refs=indicator_refs,
+        )
+    except ValidationError as error:
+        return domain_validation_error_response(error)
+    except ValueError as error:
+        return problem_response(
+            type_uri=INVALID_REQUEST,
+            title="Invalid request",
+            status=422,
+            detail=str(error),
+        )
+    except JobAnalysisApplicationError as error:
+        return application_error_response(error)
+    return to_opks_item_view(item)
+
+
+@router.delete("/{document_id}/opks/{entity_id}", status_code=204)
+async def delete_opks(
+    document_id: UUID,
+    entity_id: str,
+    idempotency_key: IdempotencyKey,
+    uow_factory: JobAnalysisUnitOfWorkFactory = Depends(
+        get_job_analysis_uow_factory
+    ),
+):
+    try:
+        await delete_opks_item(
+            uow_factory,
+            document_id=document_id,
+            entry_id=idempotency_key,
+            entity_id=entity_id,
         )
     except JobAnalysisApplicationError as error:
         return application_error_response(error)

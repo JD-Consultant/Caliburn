@@ -13,6 +13,10 @@ class JdTaskNotFound(JobAnalysisApplicationError):
     pass
 
 
+class OpksItemNotFound(JobAnalysisApplicationError):
+    pass
+
+
 class IdempotencyConflict(JobAnalysisApplicationError):
     pass
 
@@ -23,4 +27,3 @@ class ConcurrentAuthorityChange(JobAnalysisApplicationError):
 
 class InvalidJdTaskOrder(JobAnalysisApplicationError):
     pass
-

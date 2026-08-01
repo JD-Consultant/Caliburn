@@ -12,6 +12,7 @@ from app.job_analysis.application import (
     CONSULTANT_OPENING_SCHEMA_ID,
     DIRECT_EDIT_SCHEMA_ID,
     OPKS_ITEM_SCHEMA_ID,
+    OPKS_DIRECT_EDIT_SCHEMA_ID,
     OPKS_PROPOSAL_SCHEMA_ID,
     PROPOSAL_DECISION_SCHEMA_ID,
     PROPOSAL_SCHEMA_ID,
@@ -22,6 +23,7 @@ from app.job_analysis.application import (
     DirectEditPayload,
     DocumentRecord,
     JournalEntry,
+    OpksDirectEditPayload,
     ProposalDecisionPayload,
 )
 from app.job_analysis.domain import (
@@ -232,6 +234,7 @@ _JOURNAL_PAYLOAD_TYPES = {
     CONSULTANT_OPENING_SCHEMA_ID: ConsultantOpeningPayload,
     COMPLETED_TURN_SCHEMA_ID: CompletedTurnPayload,
     DIRECT_EDIT_SCHEMA_ID: DirectEditPayload,
+    OPKS_DIRECT_EDIT_SCHEMA_ID: OpksDirectEditPayload,
     PROPOSAL_DECISION_SCHEMA_ID: ProposalDecisionPayload,
 }
 

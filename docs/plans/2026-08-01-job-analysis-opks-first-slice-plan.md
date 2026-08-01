@@ -255,6 +255,8 @@ class OpksProposalRepository(Protocol):
 - Create: `apps/api/tests/test_job_analysis_opks_authoring_postgres.py`
 - Modify: `apps/api/tests/test_job_analysis_mapper.py`
 - Modify: `apps/api/tests/test_job_analysis_api.py`
+- Modify: `apps/web/src/lib/jobAnalysisApi.ts`
+- Modify: `apps/web/src/lib/jobAnalysisApi.test.ts`
 - Modify: `docs/design/task-analysis-engine.md`
 
 **HTTP contract:**
@@ -267,35 +269,35 @@ DELETE /api/v1/job-analysis/documents/{document_id}/opks/{entity_id}
 
 `OpksItemWrite` 只帶 `entity_kind`、`text`、`task_refs[]`、`indicator_refs[]`；不接受 client 傳 Evidence 或 ID。add 的 `entity_id` 由 `Idempotency-Key` 決定性產生，edit/delete 使用 path ID。`DocumentView` 與 `ConsultationView` 增加 `opks_items[]`；wire view 可顯示 evidence quotes，但不可洩漏 Journal payload 或 authority generation。
 
-- [ ] **Step 1: 寫 application 紅測試**
+- [x] **Step 1: 寫 application 紅測試**
 
   測 add/edit/delete、相同 key replay、不同 payload 同 key conflict、非空 text、refs cardinality、edit 後 Evidence 只指向新 direct-edit entry、application 配發 ID、全程零 LLM call。
 
-- [ ] **Step 2: 寫 Task topology 變更的 OPKS 一致性紅測試**
+- [x] **Step 2: 寫 Task topology 變更的 OPKS 一致性紅測試**
 
   員工直接刪 Task，或接受既有 Task Proposal 的 withdraw／merge／split 時，必須在同一 authority transaction：刪除已離開 Current JD 的 Task 所擁有的 O/P；從 K/S 移除舊 Task refs 與已刪 Indicator refs；K/S 無 refs 時合法保留為 unlinked；A 不變。不得留下 O/P 指向不存在 Task，也不得靠 DB cascade 靜默猜語意；merge／split 不得把舊 refs 自動猜成新 Task。此步要在員工可建立 OPKS 的同一 commit 完成，不能把中間工作樹留成「OPKS 一存在，既有 Task 決策就驗證失敗」。
 
-- [ ] **Step 3: 實作 Journal payload 與 authoring service**
+- [x] **Step 3: 實作 Journal payload 與 authoring service**
 
   新 `OpksDirectEditPayload` 映射既有 Journal kind `direct_edit`，使用獨立 schema ID `job-analysis-opks-direct-edit/1`；payload 保存 action、before、after。SourceRef 仍是 `{kind: direct_edit, id: entry_id}`，不增加 SourceKind。
 
-- [ ] **Step 4: 擴充 JSON Schema SSOT 並 codegen**
+- [x] **Step 4: 擴充 JSON Schema SSOT 並 codegen**
 
   ```powershell
   npm run codegen --workspace=@caliburn/job-analysis-contract
   npm run check-codegen --workspace=@caliburn/job-analysis-contract
   ```
 
-  生成檔禁止手改。`OpksItemWrite.text` 空白由 mapper trim 後回 `invalid-request`；不存在的項目回 `opks-item-not-found` problem type，加入既有 Problem URI enum 與 Web exhaustive switch 的後續契約。
+  生成檔禁止手改。`OpksItemWrite.text` 空白由 mapper trim 後回 `invalid-request`；不存在的項目回 `opks-item-not-found` problem type，並在同一 Task 加入既有 Web exhaustive switch，避免 required contract 已變但 TypeScript consumer 暫時失效。
 
-- [ ] **Step 5: 實作薄 mapper／routes 並跑 gate**
+- [x] **Step 5: 實作薄 mapper／routes 並跑 gate**
 
   ```powershell
   uv run pytest tests/test_job_analysis_opks_authoring_postgres.py tests/test_job_analysis_mapper.py tests/test_job_analysis_api.py -q
   uv run pytest tests/test_job_analysis_authoring_postgres.py tests/test_job_analysis_authority_commit.py -q
   ```
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
   ```powershell
   git add apps/api packages/job-analysis-contract docs/design/task-analysis-engine.md

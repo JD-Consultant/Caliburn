@@ -11,6 +11,8 @@ from job_analysis_contract import (
     ConsultationView,
     EmployeeTurnWrite,
     JdTaskWrite,
+    OpksItemView,
+    OpksItemWrite,
     ProblemDetail,
     ProposalDecisionWrite,
     ProposalView,
@@ -28,6 +30,7 @@ PROBLEM_TYPES = {
     "https://caliburn.dev/problems/job-analysis/invalid-request",
     "https://caliburn.dev/problems/job-analysis/proposal-not-found",
     "https://caliburn.dev/problems/job-analysis/consultant-unavailable",
+    "https://caliburn.dev/problems/job-analysis/opks-item-not-found",
 }
 
 
@@ -55,6 +58,8 @@ def test_schema_owns_only_the_workspace_wire_contract():
         "Enabler",
         "JdTaskWrite",
         "JdTaskView",
+        "OpksItemView",
+        "OpksItemWrite",
         "ProblemDetail",
         "ProblemFieldError",
         "ProposalDecisionWrite",
@@ -64,7 +69,7 @@ def test_schema_owns_only_the_workspace_wire_contract():
     }
 
 
-def test_problem_type_is_the_eight_value_machine_identifier():
+def test_problem_type_is_the_nine_value_machine_identifier():
     """Adding an untyped error branch must change the generated consumers."""
 
     problem = _schema()["$defs"]["ProblemDetail"]
@@ -85,6 +90,7 @@ def test_consultation_contract_exposes_only_product_views_and_supported_decision
         "active_question",
         "proposals",
         "tasks",
+        "opks_items",
     }
     assert set(decision["properties"]["decision"]["enum"]) == {
         "accepted",
@@ -169,6 +175,7 @@ def test_document_view_accepts_one_complete_task_without_extra_fields():
                 "display_order": 0,
             }
         ],
+        "opks_items": [],
     }
 
     assert list(
@@ -207,3 +214,11 @@ def test_generated_consultation_models_are_exported_from_the_package():
     assert ProposalView.__name__ == "ProposalView"
     assert EmployeeTurnWrite(text="我每週彙整營運週報").text.startswith("我")
     assert ProposalDecisionWrite(decision="accepted").decision.value == "accepted"
+    write = OpksItemWrite(
+        entity_kind="knowledge",
+        text="營運資料定義",
+        task_refs=[],
+        indicator_refs=[],
+    )
+    assert write.entity_kind.value == "knowledge"
+    assert OpksItemView.__name__ == "OpksItemView"

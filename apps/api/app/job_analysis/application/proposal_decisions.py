@@ -9,6 +9,7 @@ from uuid import UUID
 from pydantic import ValidationError
 
 from app.job_analysis.domain import (
+    CurrentJdOpks,
     CurrentWorkModel,
     JdEntry,
     JdTask,
@@ -40,6 +41,7 @@ from .persistence import (
     JournalEntry,
     ProposalDecisionPayload,
 )
+from .opks_authoring import prune_opks_for_current_jd
 from .transition import JobAnalysisState
 
 
@@ -351,6 +353,7 @@ async def _persist(
     current_jd: tuple[JdTask, ...],
     proposals: tuple[Proposal, ...],
     journal_entry: JournalEntry | None,
+    current_opks: CurrentJdOpks | None = None,
 ) -> None:
     await commit_authority_change(
         uow,
@@ -359,7 +362,11 @@ async def _persist(
             work_model=work_model,
             current_jd=current_jd,
             proposals=proposals,
-            current_opks={"items": await uow.opks.list(record.document_id)},
+            current_opks=(
+                current_opks
+                if current_opks is not None
+                else {"items": await uow.opks.list(record.document_id)}
+            ),
             opks_proposals=await uow.opks_proposals.list(record.document_id),
         ),
         journal_entry=journal_entry,
@@ -573,6 +580,7 @@ async def decide_proposal(
         )
         next_jd = current_jd
         work_model = record.work_model
+        current_opks: CurrentJdOpks | None = None
         if target_status in {ProposalStatus.ACCEPTED, ProposalStatus.EDITED}:
             entries = (
                 decided.edited_jd_after
@@ -611,6 +619,10 @@ async def decide_proposal(
                 work_model,
                 next_jd,
             )
+            current_opks = prune_opks_for_current_jd(
+                CurrentJdOpks(items=await uow.opks.list(document_id)),
+                next_jd,
+            )
         elif target_status is ProposalStatus.REJECTED and proposal.action in {
             ProposalAction.ADD,
             ProposalAction.REVISE,
@@ -641,5 +653,6 @@ async def decide_proposal(
             current_jd=next_jd,
             proposals=_replace_proposal(proposals, decided),
             journal_entry=journal_entry,
+            current_opks=current_opks,
         )
         return decided

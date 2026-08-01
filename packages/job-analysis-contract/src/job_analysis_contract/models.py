@@ -102,6 +102,36 @@ class JdTaskView(BaseModel):
     display_order: conint(ge=0)
 
 
+class EntityKind(StrEnum):
+    output = 'output'
+    indicator = 'indicator'
+    knowledge = 'knowledge'
+    skill = 'skill'
+    attitude = 'attitude'
+
+
+class OpksItemWrite(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    entity_kind: EntityKind
+    text: str
+    task_refs: list[str]
+    indicator_refs: list[str]
+
+
+class OpksItemView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    entity_id: str
+    entity_kind: EntityKind
+    text: str
+    task_refs: list[str]
+    indicator_refs: list[str]
+    evidence_quotes: list[str]
+
+
 class DocumentView(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -110,6 +140,7 @@ class DocumentView(BaseModel):
     title: str
     updated_at: AwareDatetime
     tasks: list[JdTaskView]
+    opks_items: list[OpksItemView]
 
 
 class Speaker(StrEnum):
@@ -184,6 +215,7 @@ class ConsultationView(BaseModel):
     active_question: ActiveQuestionView | None
     proposals: list[ProposalView]
     tasks: list[JdTaskView]
+    opks_items: list[OpksItemView]
 
 
 class EmployeeTurnWrite(BaseModel):
@@ -248,6 +280,9 @@ class Type(StrEnum):
     )
     https___caliburn_dev_problems_job_analysis_consultant_unavailable = (
         'https://caliburn.dev/problems/job-analysis/consultant-unavailable'
+    )
+    https___caliburn_dev_problems_job_analysis_opks_item_not_found = (
+        'https://caliburn.dev/problems/job-analysis/opks-item-not-found'
     )
 
 

@@ -25,7 +25,9 @@ updated: 2026-08-01
 > Local Web transport 邊界見
 > [ADR 0045](../adr/0045-job-analysis-local-web-contract-and-shared-authority-commit.md)；
 > 最小顧問回合與固定開場見
-> [ADR 0046](../adr/0046-professional-consultant-minimal-durable-loop.md)。
+> [ADR 0046](../adr/0046-professional-consultant-minimal-durable-loop.md)。OPKS 必須一起讀
+> [ADR 0048](../adr/0048-opks-evidence-axes-and-document-level-competencies.md)～
+> [ADR 0051](../adr/0051-opks-proposal-status-machine-and-stable-entity-id.md)。
 
 ## 1. 一句話
 
@@ -39,12 +41,12 @@ OpenRouter 拿 `task_analysis_result_v2`(送出去的精簡形狀)→ **mapper**
 
 | 組件 | 是什麼 | 碼 | 權力 |
 |---|---|---|---|
-| domain | Task／SourceRef／SupportLink／open_issues／excluded_signals／Task Proposal，以及 OPKS 的 `OpksItem`／`CurrentJdOpks`／獨立 `OpksProposal` 凍結形狀 | `app/job_analysis/domain/`（OPKS：`opks.py`、`opks_proposal.py`） | 純 Pydantic,frozen;**非法狀態無法被表示**;只 import stdlib＋pydantic。OPKS 已進完整 authority state、人工編輯與 Proposal 決策 API；Web editor 尚未接上 |
+| domain | Task／SourceRef／SupportLink／open_issues／excluded_signals／Task Proposal，以及 OPKS 的 `OpksItem`／`CurrentJdOpks`／獨立 `OpksProposal` 凍結形狀 | `app/job_analysis/domain/`（OPKS：`opks.py`、`opks_proposal.py`） | 純 Pydantic,frozen;**非法狀態無法被表示**;只 import stdlib＋pydantic。OPKS 已進完整 authority state、人工編輯、Proposal 決策 API 與 Web editor |
 | llm 契約 | Task：內部 `TaskAnalysisResult`＋`task_analysis_result_v2` wire；OPKS：獨立 `OpksResult`＋`opks_result_v1` wire；各自一份 Static Instructions | `app/job_analysis/llm/` | 只描述形狀與判準文字;**不做跨欄位驗證**。OPKS wire 只有 5 個 property、零 union，不擴充既有 Task schema |
 | wire mapper | 中性值 → `None` 的純還原 | `llm/wire.py` 的 `wire_to_task_analysis_result()` | **不做語意判斷**;沒有 domain 落點的夾帶內容一律拒絕,不靜默丟棄 |
 | assembler | Task 現況 → `TaskAnalysisPacket`；單一選定 Task → `OpksContextPacket`；兩者都有決定性 rendering | `application/context.py`、`application/opks_context.py` | 純函式;ordinal 的唯一產地。OPKS 只投影選定 Task、有效員工依據、該 Task O/P、全文件 K/S 與相關提案，不送完整 transcript／A／內部 ID |
 | verifier | Task §9.5／§12.3 規則；OPKS decision／ordinal／refs 映射 | `application/verifier.py`、`application/opks_verifier.py` | 純函式；OPKS 會產出 application-side verified changes，但**不判必要性、可觀察性或文字品質** |
-| operation | 組 packet → 呼叫 → parse → verifier | `application/operation.py` | 單一顯式流程;**不是 agent runner**,無 retry |
+| operation | 組 packet → 呼叫 → parse → verifier | `application/operation.py`、`application/opks_operation.py` | Task 與 OPKS 各自一條顯式流程;**不是 agent runner**,無 retry |
 | provider | 最小 OpenRouter Chat adapter | `providers/openrouter.py` | 一次 HTTP;固定 `reasoning=high` 且不回傳 reasoning;成功內容必須由 response `model` 證明來自 exact configured model;typed 失敗;**只收 render 過的文字** |
 | transition | 結果 → Work Model 變更 ＋ Proposal | `application/transition.py` | **唯一寫入者**;全有或全無 |
 | persistence ports | Current State repositories／UoW／版本化 Journal payload | `application/persistence.py` | 純 Protocol 與 frozen contracts；不認 ORM／JSON row |
@@ -77,7 +79,7 @@ OPKS 是另一個已接通 durable generation 的單 Task operation，不擴充�
    `OpksGroundingUnavailable`，不呼叫 provider。
 2. `render_opks_context_packet()` 只呈現 ordinal 與員工可讀文字；K/S 另標是否已連到選定 Task，
    但不洩漏 Task／entity／source／proposal ID。待決內容明標「尚未成立」。
-3. 模型之後會用 `OPKS_INSTRUCTIONS`＋`opks_result_v1` 回傳
+3. 模型用 `OPKS_INSTRUCTIONS`＋`opks_result_v1` 回傳
    `add_new／reuse_existing／revise_existing／remove_existing／uncertain`。wire 的 `0`／空字串只在 mapper
    邊界存在，還原後交 `verify_opks_result()`；任一機械違規即整批不產生 change。
 4. `verify_opks_result()` 只解 ordinal 與 refs：O/P 綁選定 Task；K/S reuse 追加該 Task；K/S remove
@@ -260,6 +262,9 @@ JD 只在員工決定提案時才改。
   `tests/test_job_analysis_dependencies.py` 以 AST 強制。
 - **smoke 綠燈不代表模型品質通過。** `tests/test_job_analysis_smoke.py` 用 scripted provider；
   `tests/test_job_analysis_durable_smoke.py` 用 fake verified result 與真 PostgreSQL，只證明交易／reload vertical。
+  `tests/test_job_analysis_opks_vertical_postgres.py`／`scripts/job_analysis_opks_smoke.py` 也只以 scripted
+  provider 證明 OPKS 的生成、決策、人工編輯、reuse、Task delete 與無 Evidence 停線可經真 PostgreSQL
+  走完；它不打網路，也不證明 OPKS 文字品質。
   `tests/test_job_analysis_api_postgres.py` 再以真 PostgreSQL 和實際 FastAPI route 驗證本機 Web 的文件／Task
   mutation、排序、reload 與 metadata rename 邊界；它仍不代表瀏覽器 UX 或模型品質通過。
   依 ADR 0042 決定 3,R1 exit gate 判準未被否決、只是暫停阻擋效力;**任何文件都不得把它寫成
@@ -321,7 +326,7 @@ context 取捨)在 Luna-Pro 上驗過只算「未在生產模型上驗過」,上
 現有的一筆未清:commit `4b75190` 給 `disposition` 補的判準只在 Luna-Pro 上觀測過。
 | prompt 品質調校 | `llm/prompt.py` 已有 Task 判準與彈性顧問行為基線，但尚未用真實員工資料調校 | 有真實使用摩擦後以 rubric／eval 調整，不先加 planner 或第二次呼叫 |
 | duplicate／overlap identity 自動收斂 | 第一版刻意不做；模型保留 issue 並追問員工 | 有真實重複摩擦證據後再研究，不用相似度猜測 |
-| O/P/K/S/A（OPKS） | **Task 1–7 已落地**：`OpksItem`／`CurrentJdOpks`／獨立六態 `OpksProposal` 已鎖住 Evidence、refs、snapshot 與 status payload；0014 以兩張表持久化；員工可經 application/API/Web add/edit/delete OPKS，並可 accept/edit/reject/defer OPKS Proposal。Task 拓撲或人工編輯會同交易清理 refs 並 stale 相關 active proposal。單 Task 的最小 Context、零 union `opks_result_v1`、prompt、deterministic verifier、一次 provider operation 與 durable generation receipt 已接通；同 key replay 零 provider call，模型只建立 Proposal、不改 Current JD。Web 按 Task 顯示 O/P/K/S、保留 shared K/S identity，另顯示文件層 A 與 unlinked K/S；舊 OPKS hint 已退役。裁決見 [ADR 0048](../adr/0048-opks-evidence-axes-and-document-level-competencies.md)＋[0049](../adr/0049-opks-derived-axes-evidence-whitelist-and-document-authority.md)＋[0050](../adr/0050-opks-proposal-minimal-shape.md)＋[0051](../adr/0051-opks-proposal-status-machine-and-stable-entity-id.md)，**四份一起讀** | 依 [OPKS 第一切片 plan](../plans/2026-08-01-job-analysis-opks-first-slice-plan.md) 完成 scripted vertical 與交付 gate |
+| OPKS 真模型品質結論 | **第一切片已接通**：`OpksItem`／`CurrentJdOpks`／獨立六態 `OpksProposal`、0014 兩表、人工編輯、API、Web、單 Task Context、零 union `opks_result_v1`、deterministic verifier、一次 provider operation 與 durable generation receipt 均已落地。七情境 scripted vertical 以真 PostgreSQL 驗證同 key replay 零 call、四種員工決策、A 人工編輯、同一 K 跨 Task reuse、Task delete 清理與無 Evidence 在 provider 前停線；舊 OPKS hint 已退役。裁決見 [ADR 0048](../adr/0048-opks-evidence-axes-and-document-level-competencies.md)～[0051](../adr/0051-opks-proposal-status-machine-and-stable-entity-id.md)，**四份一起讀** | scripted provider 不回答真模型的 O/P/K/S 品質；需要品質結論時另做有預算上限的 live smoke，不重開本切片或加 eval framework |
 | 完整 header、匯出 | 目前只做 Task 與較豐富的內部 JD Task 欄位 | 各自研究／契約完成後逐項加；匯出才對齊公版（不自產職能基準代碼，ADR 0040 決定 33–34） |
 | revision-request replacement | revision request 可保存／reload，但不會自動重建 replacement | 後續模型流程 |
 | 一般瀏覽器完整跨埠 smoke | **HTTP 層已逐段驗過**（2026-07-31，api:8001 ＋ web:3000 同時在跑）：文件庫 `GET` 正確回報 `task_count`、consultation view 帶齊 conversation／proposals／tasks、**三筆 `add` 提案連續 `POST …/decisions` 全 200**（正是 `display_order` 缺陷會炸的路徑）、同 `Idempotency-Key` 重送 200 且不重複、reload 後 JD 排序正確；CORS preflight 200 且 `access-control-allow-headers` 含 `idempotency-key`。`/workspace` 與 `/workspace/{id}` 皆 HTTP 200。Web 90 tests／tsc／lint 通過 **已由維護者在一般瀏覽器完成**（2026-07-31）：文件 `b47d6717` 的三筆 `add` 提案**在 UI 上連續按 accept 全部成立**，Current JD 由 0 條變 3 條、`display_order` 0/1/2；同文件被 withdraw 的那筆提案維持 `stale` 且無法接受，因此 Luna-Pro 在 turn 1 誤建的「協助正式環境部署」**沒有進入 JD**——Proposal gate 當安全網首次被真流量驗證 | 本列已無待辦。持續維持:不為測試環境加入 proxy、fake production mode 或 E2E framework |
@@ -340,5 +345,9 @@ context 取捨)在 Luna-Pro 上驗過只算「未在生產模型上驗過」,上
 - Local Web first slice:
   [`ADR 0045`](../adr/0045-job-analysis-local-web-contract-and-shared-authority-commit.md)、
   [`implementation plan`](../plans/2026-07-30-job-analysis-local-web-first-slice-plan.md)
+- OPKS first slice:
+  [`ADR 0048`](../adr/0048-opks-evidence-axes-and-document-level-competencies.md)～
+  [`ADR 0051`](../adr/0051-opks-proposal-status-machine-and-stable-entity-id.md)、
+  [`implementation plan`](../plans/2026-08-01-job-analysis-opks-first-slice-plan.md)
 - 舊路徑(**已退場,勿救回**):[`interview-engine.md`](interview-engine.md)、
   [ADR 0030](../adr/0030-ai-coedit-tracked-changes-one-brain.md)

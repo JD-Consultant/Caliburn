@@ -623,15 +623,15 @@ POST /api/v1/job-analysis/documents/{document_id}/tasks/{task_id}/opks-proposals
 6. 刪除 Task → O/P cascade、K/S refs prune、相關 pending Proposal stale；另一文件完全不受影響。
 7. 無有效員工 Evidence 的 Task → provider call 0、Current JD／Proposal／Journal 不變。
 
-- [ ] **Step 1: 寫 PostgreSQL vertical 紅測試與人讀摘要斷言**
+- [x] **Step 1: 寫 PostgreSQL vertical 紅測試與人讀摘要斷言**
 
   Smoke 必須經真 UoW／repositories／serialization／authority seam，provider 使用 scripted transport；禁止 monkeypatch repository 直接塞最終狀態。
 
-- [ ] **Step 2: 實作最小 smoke driver**
+- [x] **Step 2: 實作最小 smoke driver**
 
   Driver 僅供本機開發，不加 production route、CLI framework 或 output artifact framework。輸出每個 scenario 的 proposal count、Current JD OPKS count、Journal count 與 provider call count。
 
-- [ ] **Step 3: 跑 focused、contract、Web 與全量 gate**
+- [x] **Step 3: 跑 focused、contract、Web 與全量 gate**
 
   Working directory `apps/api`：
 
@@ -664,11 +664,11 @@ POST /api/v1/job-analysis/documents/{document_id}/tasks/{task_id}/opks-proposals
   git status --short
   ```
 
-- [ ] **Step 4: 更新 living design 與 plan execution record**
+- [x] **Step 4: 更新 living design 與 plan execution record**
 
   `task-analysis-engine.md` 必須寫清楚 OPKS 的 domain/persistence/HTTP/model 真實函式名、Employee 與 AI 的共同 commit seam、ordinal→ID 邊界、目前未做項目。Plan 末尾記錄 exact test counts、既有 failure fingerprint、migration head 與 no-network 事實；不得把 scripted smoke 寫成模型品質驗證。
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
   ```powershell
   git add apps/api/tests/test_job_analysis_opks_vertical_postgres.py apps/api/scripts/job_analysis_opks_smoke.py docs/design/task-analysis-engine.md docs/README.md docs/plans/2026-08-01-job-analysis-opks-first-slice-plan.md
@@ -690,3 +690,18 @@ POST /api/v1/job-analysis/documents/{document_id}/tasks/{task_id}/opks-proposals
 - Attitude AI 生成、自動支持度／效度評分、招募／績效用途。
 - proficiency、frequency/importance、批次核准、跨文件 K/S 去重。
 - 付費 live model eval；本計畫只做到 deterministic/scripted vertical，真模型另開 bounded smoke。
+
+## Execution record（2026-08-01）
+
+- 七個 scripted scenario 經真 `SqlAlchemyJobAnalysisUnitOfWork`、PostgreSQL repositories／serialization
+  與 `commit_authority_change()` 走完；provider 是 queue-backed `ScriptedTransport`，全程 **0 network、
+  0 API cost、3 次預期 call、0 retry**。它只證明管線與交易，不宣稱真模型品質。
+- `tests/test_job_analysis_opks_vertical_postgres.py`：**1 passed**；全部
+  `test_job_analysis_*.py`：**572 passed**。
+- API 全量：**1958 passed, 1 failed**。唯一 failure 與 baseline 相同：
+  `test_interview_vnext_execution_schemas.py::test_committed_operation_document_and_prompt_match_current_contracts`
+  在 Windows CRLF checkout 對歷史 `turn-interpret.1.0.0.md` 做 raw-bytes hash，實際
+  `6789dba9…`、期望 LF `2f8214d0…`；本切片未修改 vNext。
+- `packages/job-analysis-contract`：codegen guard 通過，**10 passed**；Web：**97 passed**、
+  `tsc --noEmit` 與 ESLint 通過。
+- PostgreSQL migration `current` 與 `heads` 均為 **0014 (head)**。

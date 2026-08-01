@@ -201,7 +201,21 @@ iCAP 審核指標 3.4.3 要求「『行為指標』所描述的能力程度，�
 
 ---
 
-## 6. 查不到／需二次確認（誠實清單）
+## 6. 來源總表
+
+| # | 機關／體系 | 文件名 | 版本／年份 | URL | 取得方式 |
+|---|---|---|---|---|---|
+| 1 | **APA**（American Psychological Association 官方） | Flanagan, J. C., *The Critical Incident Technique*, *Psychological Bulletin* 51(4), 327–358 | **1954 年 7 月號** | https://www.apa.org/pubs/databases/psycinfo/cit-article.pdf | curl + `pdftotext`，全文 |
+| 2 | **美國 OPM** | *Delegated Examining Operations Handbook*, Appendix D "How Competencies Should be Written"／"Task and Competency Linkages" | 現行線上版 | https://www.opm.gov/policy-data-oversight/hiring-information/competitive-hiring/deo_handbook.pdf | curl + `pdftotext -layout`，2.3 MB 全文 |
+| 3 | **美國 OPM** | *Job Analysis Template*（Step 6c／6d 逐字） | 現行 | https://www.opm.gov/policy-data-oversight/assessment-and-selection/job-analysis/job_analysis_handout.pdf | curl + `pdftotext -layout`，全文 |
+| 4 | 香港 QF（經 HKU SPACE 轉載） | *Specification of Competency Standards for the Logistics Industry* | 版次未標 | https://hkuspace.hku.hk/f/rpl/103620/e_lo_tw.pdf | 見[工作產出原料](2026-08-01-opks-raw-work-outputs.md) §6 |
+| 5 | 美國聯邦法規 | 29 CFR §1607.14C(4)（Uniform Guidelines） | CFR 2024 年版 | 見[效度與法規原料](2026-08-01-opks-raw-validity-and-ai-regulation.md) §2 | 該檔已取 GPO 官方 XML 逐字 |
+| 6 | **台灣勞動部勞動力發展署** | 《職能基準發展指引》p48（量化指標要求） | 111 年 10 月修正 | 見 [2026-07-13 iCAP 原料](2026-07-13-ai-redesign-raw-icap-field-standards.md) §5 | 前輪已逐字核實 |
+| 7 | 學術原著 | Morgeson et al., *JAP* 89(4), 674–686（"ability to" 膨脹實證） | 2004 | 見[效度與法規原料](2026-08-01-opks-raw-validity-and-ai-regulation.md) §3.2 | 該檔已取作者站出版版 PDF |
+
+---
+
+## 7. 查不到／需二次確認（誠實清單）
 
 1. **Smith & Kendall (1963) BARS 原著**——付費牆，未取得。本檔完全未引用 BARS 的建構步驟。
 2. **澳洲 Performance Evidence 的次數門檻**（如 "on at least 3 occasions"）——未取得。

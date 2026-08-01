@@ -161,7 +161,22 @@ Impact" 回傳 HTTP 403；其餘搜尋結果為課程 wiki、廠商部落格等�
 
 ---
 
-## 6. 查不到／需二次確認（誠實清單）
+## 6. 來源總表
+
+| # | 機關／體系 | 文件名 | URL | 取得方式 |
+|---|---|---|---|---|
+| 1 | 香港教育局 QF（**經 HKU SPACE 轉載**） | *Specification of Competency Standards for the Logistics Industry (Terminals, Warehouse, & Logistics Centre)* | https://hkuspace.hku.hk/f/rpl/103620/e_lo_tw.pdf | curl + `pdftotext -layout`，1.7 MB／13,202 行全文 |
+| 2 | **美國 OPM**（聯邦人事管理局） | *Delegated Examining Operations Handbook*, Appendix D／G | https://www.opm.gov/policy-data-oversight/hiring-information/competitive-hiring/deo_handbook.pdf | curl + `pdftotext -layout`，2.3 MB／12,794 行全文 |
+| 3 | **美國 OPM** | *Job Analysis Template*（DEOH Appendix G 的工作表） | https://www.opm.gov/policy-data-oversight/assessment-and-selection/job-analysis/job_analysis_handout.pdf | curl + `pdftotext -layout`，全文 10 頁 |
+| 4 | O\*NET（美國勞工部 ETA 資助） | *Appendix B: Task Writing Guidelines* | 見 [2026-07-13 國際體系原料](2026-07-13-ai-redesign-raw-intl-competency-standards.md) §1a | 前輪已逐字核實 |
+| 5 | **台灣勞動部勞動力發展署** | 《職能基準發展指引》111 年 10 月修正 | 見 [2026-07-13 iCAP 原料](2026-07-13-ai-redesign-raw-icap-field-standards.md) | 前輪已逐字核實 |
+
+> **第 1 項的網域不是政府網域。** 內容是香港政府 QF 體系的 SCS，但取自香港大學專業進修學院轉載頁；
+> 版次未標。正式引用前須回 `hkqf.gov.hk` 取得官方版本（見 §7.5）。
+
+---
+
+## 7. 查不到／需二次確認（誠實清單）
 
 1. **Gilbert 一手文本**——未取得（§4）。ISPI 官方對 accomplishment 的定義亦未取得。
 2. **新加坡 Skills Framework 的 Performance Expectations 欄位定義**——官方站回傳 SPA 殼，未取得。

@@ -212,7 +212,7 @@ Delco-Remy 研究中，三組領班分別以每日／每週／每兩週回報：
 | 體系 | 承載「標準」的欄位 | 該欄位的數值門檻 | 數字實際住在哪 |
 |---|---|---|---|
 | **澳洲**（training.gov.au 兩個單元） | Performance Criteria（單元本體） | **0** | **獨立的 Assessment Requirements 元件**（見 §3c） |
-| **香港** SCS 物流業 | Performance Requirements ＋ integrated outcome requirements | **0** | 不存在 |
+| **香港** QF 官方資料庫，物流業**全 1,351 筆 UoC** | Performance Requirements ＋ `integrated outcome requirements`（官方 `uocItemDescEng_Criteria` 欄） | **0**（全量計數，非抽樣） | 不存在 |
 | **新加坡** Skills Framework (HR) | Performance Expectations | **0** | 不存在（見 §3d） |
 | **美國 OPM** | competency 定義 | **0**（另禁模糊修飾詞，§2b） | **評分量表**（importance 1–5、frequency 0–5、need-at-entry 1–4） |
 
@@ -367,7 +367,7 @@ iCAP 審核指標 3.4.3 要求「『行為指標』所描述的能力程度，�
 | 1 | **APA**（American Psychological Association 官方） | Flanagan, J. C., *The Critical Incident Technique*, *Psychological Bulletin* 51(4), 327–358 | **1954 年 7 月號** | https://www.apa.org/pubs/databases/psycinfo/cit-article.pdf | curl + `pdftotext`，全文 |
 | 2 | **美國 OPM** | *Delegated Examining Operations Handbook*, Appendix D "How Competencies Should be Written"／"Task and Competency Linkages" | 現行線上版 | https://www.opm.gov/policy-data-oversight/hiring-information/competitive-hiring/deo_handbook.pdf | curl + `pdftotext -layout`，2.3 MB 全文 |
 | 3 | **美國 OPM** | *Job Analysis Template*（Step 6c／6d 逐字） | 現行 | https://www.opm.gov/policy-data-oversight/assessment-and-selection/job-analysis/job_analysis_handout.pdf | curl + `pdftotext -layout`，全文 |
-| 4 | 香港 QF（經 HKU SPACE 轉載） | *Specification of Competency Standards for the Logistics Industry* | 版次未標 | https://hkuspace.hku.hk/f/rpl/103620/e_lo_tw.pdf | 見[工作產出原料](2026-08-01-opks-raw-work-outputs.md) §6 |
+| 4 | **香港教育局 QF（官方網域）** | 物流業 SCS 全量資料 | 每筆帶 `uoc_version`／`uoc_rev`；取得日 2026-08-01 | https://www.hkqf.gov.hk/api/content/en/record/logistics-scs | JSON 1,351 筆全量計數；PDF 副本已逐字比對一致。見[工作產出原料](2026-08-01-opks-raw-work-outputs.md) §1.4 |
 | 5 | 美國聯邦法規 | 29 CFR §1607.14C(4)（Uniform Guidelines） | CFR 2024 年版 | 見[效度與法規原料](2026-08-01-opks-raw-validity-and-ai-regulation.md) §2 | 該檔已取 GPO 官方 XML 逐字 |
 | 8 | **澳洲 DEWR**（training.gov.au 官方元件檔） | *TAEASS412 Assess competence*（單元）＋ *Assessment Requirements for TAEASS412* | Release 1；文件生成日 **2024-07-12**；TAE Training Package v5.0 | https://training.gov.au/TrainingComponentFiles/TAE/TAEASS412_R1.pdf ／ …/TAEASS412_AssessmentRequirements_R1.pdf | curl + `pdftotext -layout`，全文 |
 | 9 | **澳洲 DEWR** | *BSBOPS401 Coordinate business resources*（單元＋Assessment Requirements） | Release 1 | https://training.gov.au/TrainingComponentFiles/BSB/BSBOPS401_R1.pdf ／ …/BSBOPS401_AssessmentRequirements_R1.pdf | curl + `pdftotext -layout`，全文 |

@@ -14,7 +14,8 @@ review_note: 本檔供第三方人工審核。§0.2 提供完整重現步驟，�
 
 | 來源 | 狀態 |
 |---|---|
-| 香港 QF《Specification of Competency Standards for the Logistics Industry》 | ✅ PDF 全文，`pdftotext -layout` 抽出 **13,202 行** |
+| **香港 QF 官方資料庫**（`hkqf.gov.hk` API，物流業全量） | ✅ **官方一手**，JSON 7.9 MB，**1,351 筆 UoC**、5 個 branch；每筆帶 `uoc_code`／`old_uoc_code`／`uoc_version`／`uoc_rev`／`uoc_level`／`uoc_credit` 與逐欄 HTML 內容 |
+| 香港 QF《SCS for the Logistics Industry》PDF（HKU SPACE 轉載） | ✅ PDF 全文 13,202 行。**現降為佐證副本**——其內容已與官方資料庫逐字比對一致（見 §1.3） |
 | 美國 OPM *Delegated Examining Operations Handbook*（Appendix D／G） | ✅ PDF 全文，抽出 **12,794 行**；文件自帶 `Page D-1` 式頁碼標記，可核實 |
 | 美國 OPM *Job Analysis Template* | ✅ PDF 全文，10 頁 |
 | O\*NET *Task Writing Guidelines*、台灣 iCAP《職能基準發展指引》 | ✅ 前輪已逐字核實，見 §7 |
@@ -23,7 +24,12 @@ review_note: 本檔供第三方人工審核。§0.2 提供完整重現步驟，�
 ### 0.2 複核方法（審核者可完整重現）
 
 ```bash
-# 香港 SCS
+# 香港 QF 官方資料庫（主來源）
+#   官方站是 Nuxt SPA，頁面本身沒有內容；資料在 /api/content/{lang}/record/{industry}-scs
+curl -sSL -A "Mozilla/5.0" -o hk-api-scs.json \
+  "https://www.hkqf.gov.hk/api/content/en/record/logistics-scs"   # → 7,907,596 bytes
+
+# 香港 SCS PDF（佐證副本）
 curl -sSL -A "Mozilla/5.0" -o hk-scs.pdf \
   "https://hkuspace.hku.hk/f/rpl/103620/e_lo_tw.pdf"
 pdftotext -layout hk-scs.pdf hk-scs.txt      # → 13,202 行
@@ -98,8 +104,19 @@ pdftotext -layout opm-ja.pdf opm-ja.txt      # → 10 頁
 | 3. Range | "This unit of competency is applicable to logistics service providers. Practitioners should be capable of using basic warehousing terms, codes and abbreviations." |
 | 4. Level | 1 |
 | 5. Credit | 3 (for reference only) |
-| 6. Competency | 見下方 Performance Requirements 全文 |
-| 7. Assessment Criteria／8. Remarks | 本 UoC 未印內容 |
+| 6. Competency | 見下方 Performance Requirements 全文（官方欄位 `uocItemDescEng_Competency_1`／`_2`） |
+| 7. **Assessment Criteria** | **`integrated outcome requirements` 就住在這一欄**（官方欄位 `uocItemDescEng_Criteria`）。見下方 |
+| 8. Remarks | 空 |
+
+**官方識別碼（取自 API，PDF 上沒有）**：現行 `uoc_code` = **104734**；`old_uoc_code` = `LOWHOM101A`；
+`uoc_version` = **A**；`uoc_rev` = **01**；分類路徑 = Logistics → Terminals, Warehouse & Logistics Centre
+→ Operation Management。
+
+> **修正一處先前的判讀錯誤。** 本檔前一版把第 7／8 欄記成「未印內容」——那是 PDF 雙欄排版
+> （§0.3）造成的誤讀。官方資料證明**成果陳述正是 Assessment Criteria 欄的內容**。
+> 這一點不是細節：它表示香港把「成果」放在**評量準則**的位置，與 §1.1 第 25 段
+> 「QF level assignment is essentially a holistic judgment on the unit's integrated outcome
+> requirements」完全一致——**成果是判級與評量的依據，不是描述的裝飾。**
 
 **Competency 欄全文（逐字）：**
 
@@ -132,10 +149,37 @@ pdftotext -layout opm-ja.pdf opm-ja.txt      # → 10 頁
 **這一則是本檔最重要的單一證據**：一個**完全沒有實體交付物**的知識型單元，
 它的「成果」寫成 **能力 + 對象 + 正確性條件 + 所避免的損害**。
 
-### 1.4 更多 `integrated outcome requirements` 實例（逐字）
+### 1.4 全體系統計：這不是特例，是體系性欄位
 
-全文共出現 **153 次**（`grep -ci "integrated outcome requirements"`）。以下為 §1.3 之外的 7 則，
-用以證明句式一致、非單一特例：
+**以官方資料庫全量計數**（指令見 §0.2；`uocItemDescEng_Criteria` 欄）：
+
+| 指標 | 數字 |
+|---|---|
+| 物流業官方 UoC 總數（5 個 branch） | **1,351** |
+| Criteria 欄含 `integrated outcome requirements` | **1,337（98.9%）** |
+| Criteria 欄含 `Capable of` 句式 | **554** |
+| Criteria 欄含 `so as to`（目的／後果子句） | **178** |
+| Criteria 欄含 `in accordance with`（遵循規章） | **48** |
+| Criteria 欄含 `Capable of monitoring`（狀態維持） | **53** |
+| **Criteria 欄含數值門檻樣式**（`\d+%`／`at least \d`／`within \d+ days` 等） | **0** |
+
+**最後一列是本檔最強的單一數字：1,351 筆政府官方能力單元，零個數值門檻。**
+（跨體系比對見[行為指標原料](2026-08-01-opks-raw-performance-indicators.md) §3b。）
+
+### 1.5 官方實例（逐字，附官方代碼可核對）
+
+以下取自官方資料庫，證明 §1.7 的句式歸納非單一特例：
+
+| 官方代碼／舊碼 | 逐字（已去 HTML 標籤） |
+|---|---|
+| `109710` / `LOCUOM505B` | "Capable to formulate a comprehensive project management plan **in accordance with** special technical or professional requirements for an individual logistics project and requirements specified by the customer **so as to** ensure successf…" |
+| `109708` / `LOCUOM503B` | "Capable to formulate recruitment strategies **in accordance with** the requirements on the company's development and operation, **the legal requirements** and special technical requirements on daily logistics operation" |
+| `109821` / `LOCUCT504B` | "Capable of analysing freight transit requirements; Capable of planning the procedures and systems for freight transit; **Capable of monitoring freight transit and ensure the compliance of designed quality standard** and international…" |
+| `109846` / `LOCUSS601B` | "Capable of applying knowledge of security procedures; Capable of assessing security risks; Capable of specifying security requirements and establishing implementation strategies" |
+
+### 1.6 PDF 版的其他實例（逐字，與官方一致）
+
+以下 7 則取自 PDF 副本，用以呈現較短、較易讀的句式；其代碼可於官方資料庫以 `old_uoc_code` 反查：
 
 | # | 定位（可 grep） | 逐字 |
 |---|---|---|
@@ -146,9 +190,9 @@ pdftotext -layout opm-ja.pdf opm-ja.txt      # → 10 頁
 | 5 | 工作場所整理 UoC，頁 43 | "Capable of identifying workplace housekeeping procedures" / "Capable of **monitoring the tidiness and cleanliness of workplace**" / "Capable of carrying out work housekeeping activities" |
 | 6 | 危險品知識 UoC（"adapted from … LOCUSS202A"） | "Capable of understanding dangerous goods and their characteristics" / "Capable of applying basic knowledge of dangerous goods" |
 
-### 1.5 句式歸納
+### 1.7 句式歸納
 
-| 成分 | 有形交付物（例 #1、#4） | 無形／狀態維持（§1.3、例 #2、#5） |
+| 成分 | 有形交付物（例 #1、#4） | 無形／狀態維持（§1.3、§1.6 例 #2、#5） |
 |---|---|---|
 | 能力 | Capable of completing | Capable of using … correctly／Capable of monitoring |
 | 對象 | required records or notices ／ workplace documents | warehousing terms ／ the tidiness and cleanliness of workplace |
@@ -160,7 +204,7 @@ pdftotext -layout opm-ja.pdf opm-ja.txt      # → 10 頁
 > 例 #2 的 "in accordance with clearly defined company procedures and instructions" 與新加坡的
 > `Performance Expectations` 寫法同源，見[行為指標原料](2026-08-01-opks-raw-performance-indicators.md) §3d。
 
-### 1.6 誠實記錄一個權威衝突
+### 1.8 誠實記錄一個權威衝突
 
 §1.3 的 6.1 底下連續 **15 條**以 "Understand" 起首。這**直接違反** Bloom 修訂版的可觀察動詞規則
 ——Airasian & Miranda 明言 "Ambiguous verbs such as 'state,' 'list,' 'demonstrate,'… should be used
@@ -168,10 +212,10 @@ with great care"；Krathwohl 更點名 "understand" 可涵蓋從記憶到綜合�
 （逐字見 [2026-07-13 國際體系原料](2026-07-13-ai-redesign-raw-intl-competency-standards.md) §3a）。
 
 **不要假裝各權威一致。** 本 repo 應採 Bloom／O\*NET／OPM 這一系的可觀察動詞要求
-（理由見 §2.1 的 OPM 規則），並把香港的**成果句式**（§1.5）與其**動詞用法**分開採用。
+（理由見 §2.1 的 OPM 規則），並把香港的**成果句式**（§1.7）與其**動詞用法**分開採用。
 ——這是本檔唯一一處明知而不採用來源做法的地方，理由已寫明。
 
-### 1.7 數值門檻
+### 1.9 數值門檻
 
 抽出全文中，Performance Requirements 與 integrated outcome requirements
 **未出現任何數值門檻**（無百分比、無時限、無次數）。
@@ -319,7 +363,8 @@ HRD Press／ISPI Tribute edition, 1996）提出 behavior 與 accomplishment 的�
 
 | # | 機關／體系 | 文件名 | 版本／日期 | URL | 取得與定位方式 |
 |---|---|---|---|---|---|
-| 1 | 香港教育局 QF 體系（**經 HKU SPACE 轉載**） | *Specification of Competency Standards for the Logistics Industry (Terminals, Warehouse, & Logistics Centre)* | **版次未印**（見 §8.1） | https://hkuspace.hku.hk/f/rpl/103620/e_lo_tw.pdf | curl + `pdftotext -layout`；引文定位用段落編號、UoC 代碼與文件自印頁碼 |
+| 1 | **香港教育局 QF（官方網域）** | 物流業 SCS 全量資料（`/api/content/en/record/logistics-scs`） | 每筆 UoC 自帶 `uoc_version`（A／B）與 `uoc_rev`（01）；取得日 **2026-08-01** | https://www.hkqf.gov.hk/api/content/en/record/logistics-scs | curl → JSON 7.9 MB／1,351 筆；定位用 `uoc_code`／`old_uoc_code` |
+| 1b | 同上（**HKU SPACE 轉載副本**，佐證用） | *Specification of Competency Standards for the Logistics Industry (Terminals, Warehouse, & Logistics Centre)* | 版次未印 | https://hkuspace.hku.hk/f/rpl/103620/e_lo_tw.pdf | curl + `pdftotext -layout`；**內容已與第 1 項逐字比對一致**（§1.3） |
 | 2 | **美國 OPM** | *Delegated Examining Operations Handbook*, Appendix D／G | 現行線上版 | https://www.opm.gov/policy-data-oversight/hiring-information/competitive-hiring/deo_handbook.pdf | curl + `pdftotext -layout`；定位用文件自印 `Page D-1` |
 | 3 | **美國 OPM** | *Job Analysis Template*（DEOH Appendix G 工作表） | 現行 | https://www.opm.gov/policy-data-oversight/assessment-and-selection/job-analysis/job_analysis_handout.pdf | curl + `pdftotext -layout`；定位用步驟編號 |
 | 4 | O\*NET（美國勞工部 ETA 資助） | *Appendix B: Task Writing Guidelines* | 引 Cunningham 2000 | https://www.onetcenter.org/dl_files/GreenTask_AppB.pdf | 前輪逐字核實，見 [2026-07-13 原料](2026-07-13-ai-redesign-raw-intl-competency-standards.md) §1a |
@@ -331,10 +376,14 @@ HRD Press／ISPI Tribute edition, 1996）提出 behavior 與 accomplishment 的�
 
 ## 8. 查不到／需二次確認（誠實清單）
 
-1. **香港 SCS 的版本與官方出處** —— 抽出全文中**未見版次或發布日期**；HKU SPACE 為轉載 host。
-   正式引用前須回 `hkqf.gov.hk` 取得官方版本並核對本檔所有引文。**這是本檔最大的單一風險。**
-2. **香港 SCS 的跨產業一致性** —— 只讀了物流業一份（13,202 行）。
-   `integrated outcome requirements` 是否為全體系通用欄位，未驗證。
+1. ~~香港 SCS 的版本與官方出處~~ —— **已解決（2026-08-01）**。已取得 `hkqf.gov.hk` 官方 API
+   全量資料並逐字比對：§1.3 引用的單元現行官方碼為 **104734**（舊碼 `LOWHOM101A`），
+   版本 A／rev 01，內容與 PDF **完全一致**（連原文的 `consul t` 空格錯字都相同）。
+   比對過程另**修正了本檔一處欄位判讀錯誤**，見 §1.3 的修正框。
+2. ~~香港 SCS 的跨產業一致性~~ —— **部分解決**。已驗證**物流業全 5 個 branch、1,351 筆 UoC**
+   中有 1,337 筆（98.9%）帶 `integrated outcome requirements`，確認是體系性欄位而非特例。
+   **仍未驗證**：其他產業（零售、保安、汽車、ICT…）是否同樣採用此欄位。
+   官方 API 路徑為 `/api/content/en/record/{industry}-scs`，可用同法查證。
 3. **Gilbert 一手文本** —— 未取得（§5）。ISPI 官方對 accomplishment 的定義亦未取得。
 4. **香港 UoC 的 `Assessment Criteria` 與 `Remarks` 欄** —— §1.3 的 UoC 未印內容；
    是否為該產業排版特例、或該兩欄本就常留空，未確認。

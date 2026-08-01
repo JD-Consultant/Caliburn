@@ -16,6 +16,7 @@ from job_analysis_contract import (
     JdTaskWrite,
     OpksItemView,
     OpksItemWrite,
+    OpksProposalDecisionWrite,
     ProblemFieldError,
     ProposalDecisionWrite,
     TaskOrderWrite,
@@ -30,6 +31,7 @@ from app.api.job_analysis_mapper import (
     to_jd_task_fields,
     to_jd_task_view,
     to_opks_item_view,
+    to_opks_proposal_decision,
     to_opks_write,
     to_consultation_view,
     to_proposal_decision,
@@ -55,6 +57,7 @@ from app.job_analysis.application import (
     list_documents,
     load_document,
     decide_proposal,
+    decide_opks_proposal,
     put_document_metadata,
     reorder_jd_tasks,
     submit_employee_turn,
@@ -213,6 +216,39 @@ async def post_proposal_decision(
             decision_id=idempotency_key,
             decision=decision,
             edited_jd_after=edited_jd_after,
+            reason=reason,
+        )
+    except ValidationError as error:
+        return domain_validation_error_response(error)
+    except JobAnalysisApplicationError as error:
+        return application_error_response(error)
+    loaded = await load_document(uow_factory, document_id)
+    assert loaded is not None
+    return to_consultation_view(loaded)
+
+
+@router.post(
+    "/{document_id}/opks-proposals/{proposal_id}/decisions",
+    response_model=ConsultationView,
+)
+async def post_opks_proposal_decision(
+    document_id: UUID,
+    proposal_id: str,
+    body: OpksProposalDecisionWrite,
+    idempotency_key: IdempotencyKey,
+    uow_factory: JobAnalysisUnitOfWorkFactory = Depends(
+        get_job_analysis_uow_factory
+    ),
+):
+    try:
+        decision, edited_text, reason = to_opks_proposal_decision(body)
+        await decide_opks_proposal(
+            uow_factory,
+            document_id=document_id,
+            proposal_id=proposal_id,
+            decision_id=idempotency_key,
+            decision=decision,
+            edited_text=edited_text,
             reason=reason,
         )
     except ValidationError as error:

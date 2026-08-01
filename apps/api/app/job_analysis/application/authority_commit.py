@@ -18,8 +18,8 @@ async def commit_authority_change(
     *,
     record: DocumentRecord,
     state: JobAnalysisState,
-    journal_entry: JournalEntry | None,
     updated_at: datetime,
+    journal_entries: tuple[JournalEntry, ...] = (),
 ) -> None:
     """Validate the complete state, then persist it in the caller's UoW."""
 
@@ -31,7 +31,7 @@ async def commit_authority_change(
         record.document_id,
         validated.opks_proposals,
     )
-    if journal_entry is not None:
+    for journal_entry in journal_entries:
         await uow.journal.add(journal_entry)
     updated = await uow.documents.update_authority(
         record.document_id,

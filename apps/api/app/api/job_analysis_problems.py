@@ -14,6 +14,8 @@ from app.job_analysis.application import (
     InvalidProposalDecision,
     JdTaskNotFound,
     OpksItemNotFound,
+    OpksProposalNotDecidable,
+    OpksProposalNotFound,
     ProposalNotDecidable,
     ProposalNotFound,
 )
@@ -90,7 +92,7 @@ def application_error_response(
             title="OPKS item not found",
             status=404,
         )
-    if isinstance(error, ProposalNotFound):
+    if isinstance(error, (ProposalNotFound, OpksProposalNotFound)):
         return problem_response(
             type_uri=PROPOSAL_NOT_FOUND,
             title="Proposal not found",
@@ -108,7 +110,7 @@ def application_error_response(
             title="Authority conflict",
             status=409,
         )
-    if isinstance(error, ProposalNotDecidable):
+    if isinstance(error, (ProposalNotDecidable, OpksProposalNotDecidable)):
         return problem_response(
             type_uri=AUTHORITY_CONFLICT,
             title="Proposal is no longer decidable",

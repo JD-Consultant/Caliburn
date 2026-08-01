@@ -156,6 +156,60 @@
         }
       }
     },
+    "OpksProposalView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "proposal_id",
+        "operation_id",
+        "entity_id",
+        "entity_kind",
+        "action",
+        "status",
+        "before",
+        "after",
+        "edited_after",
+        "rejection_reason",
+        "stale_reason"
+      ],
+      "properties": {
+        "proposal_id": { "type": "string" },
+        "operation_id": { "type": "string" },
+        "entity_id": { "type": "string" },
+        "entity_kind": {
+          "type": "string",
+          "enum": ["output", "indicator", "knowledge", "skill", "attitude"]
+        },
+        "action": {
+          "type": "string",
+          "enum": ["add", "revise", "remove"]
+        },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "deferred", "accepted", "edited", "rejected", "stale"]
+        },
+        "before": {
+          "oneOf": [
+            { "$ref": "#/$defs/OpksItemView" },
+            { "type": "null" }
+          ]
+        },
+        "after": {
+          "oneOf": [
+            { "$ref": "#/$defs/OpksItemView" },
+            { "type": "null" }
+          ]
+        },
+        "edited_after": {
+          "oneOf": [
+            { "$ref": "#/$defs/OpksItemView" },
+            { "type": "null" }
+          ]
+        },
+        "rejection_reason": { "type": ["string", "null"] },
+        "stale_reason": { "type": ["string", "null"] }
+      }
+    },
     "DocumentView": {
       "type": "object",
       "additionalProperties": false,
@@ -267,6 +321,7 @@
         "conversation",
         "active_question",
         "proposals",
+        "opks_proposals",
         "tasks",
         "opks_items"
       ],
@@ -285,6 +340,10 @@
         "proposals": {
           "type": "array",
           "items": { "$ref": "#/$defs/ProposalView" }
+        },
+        "opks_proposals": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/OpksProposalView" }
         },
         "tasks": {
           "type": "array",
@@ -318,6 +377,19 @@
           "items": { "$ref": "#/$defs/ProposalJdEntryView" },
           "default": null
         },
+        "reason": { "type": ["string", "null"], "default": null }
+      }
+    },
+    "OpksProposalDecisionWrite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["decision"],
+      "properties": {
+        "decision": {
+          "type": "string",
+          "enum": ["accepted", "edited", "rejected", "deferred"]
+        },
+        "edited_text": { "type": ["string", "null"], "default": null },
         "reason": { "type": ["string", "null"], "default": null }
       }
     },

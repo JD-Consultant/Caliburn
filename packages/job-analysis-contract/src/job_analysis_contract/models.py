@@ -132,6 +132,38 @@ class OpksItemView(BaseModel):
     evidence_quotes: list[str]
 
 
+class Action(StrEnum):
+    add = 'add'
+    revise = 'revise'
+    remove = 'remove'
+
+
+class Status(StrEnum):
+    pending = 'pending'
+    deferred = 'deferred'
+    accepted = 'accepted'
+    edited = 'edited'
+    rejected = 'rejected'
+    stale = 'stale'
+
+
+class OpksProposalView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    proposal_id: str
+    operation_id: str
+    entity_id: str
+    entity_kind: EntityKind
+    action: Action
+    status: Status
+    before: OpksItemView | None
+    after: OpksItemView | None
+    edited_after: OpksItemView | None
+    rejection_reason: str | None
+    stale_reason: str | None
+
+
 class DocumentView(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -173,7 +205,7 @@ class ProposalJdEntryView(BaseModel):
     value: JdTaskView | None
 
 
-class Action(StrEnum):
+class Action1(StrEnum):
     add = 'add'
     revise = 'revise'
     withdraw = 'withdraw'
@@ -181,7 +213,7 @@ class Action(StrEnum):
     split = 'split'
 
 
-class Status(StrEnum):
+class Status1(StrEnum):
     pending = 'pending'
     deferred = 'deferred'
     accepted = 'accepted'
@@ -196,8 +228,8 @@ class ProposalView(BaseModel):
         extra='forbid',
     )
     proposal_id: str
-    action: Action
-    status: Status
+    action: Action1
+    status: Status1
     jd_before: list[ProposalJdEntryView]
     jd_after: list[ProposalJdEntryView]
     edited_jd_after: list[ProposalJdEntryView] | None
@@ -214,6 +246,7 @@ class ConsultationView(BaseModel):
     conversation: list[ConversationTurnView]
     active_question: ActiveQuestionView | None
     proposals: list[ProposalView]
+    opks_proposals: list[OpksProposalView]
     tasks: list[JdTaskView]
     opks_items: list[OpksItemView]
 
@@ -238,6 +271,15 @@ class ProposalDecisionWrite(BaseModel):
     )
     decision: Decision
     edited_jd_after: list[ProposalJdEntryView] | None = None
+    reason: str | None = None
+
+
+class OpksProposalDecisionWrite(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    decision: Decision
+    edited_text: str | None = None
     reason: str | None = None
 
 

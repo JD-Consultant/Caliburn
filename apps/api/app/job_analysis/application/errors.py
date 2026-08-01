@@ -17,6 +17,14 @@ class OpksItemNotFound(JobAnalysisApplicationError):
     pass
 
 
+class OpksProposalNotFound(JobAnalysisApplicationError):
+    pass
+
+
+class OpksProposalNotDecidable(JobAnalysisApplicationError):
+    pass
+
+
 class IdempotencyConflict(JobAnalysisApplicationError):
     pass
 

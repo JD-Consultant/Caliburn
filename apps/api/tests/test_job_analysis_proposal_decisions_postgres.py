@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import timedelta
+from datetime import UTC, datetime, timedelta
 
 import pytest
 
@@ -23,6 +23,9 @@ from app.job_analysis.domain import (
     OpksEntityKind,
     OpksEvidenceLink,
     OpksItem,
+    OpksProposal,
+    OpksProposalAction,
+    OpksProposalStatus,
     OpenIssue,
     OpenIssueKind,
     Proposal,
@@ -47,6 +50,7 @@ from app.job_analysis.domain import (
 
 
 pytestmark = pytest.mark.asyncio
+NOW = datetime(2026, 8, 1, 9, 0, tzinfo=UTC)
 
 
 def factory(session_factory):
@@ -262,6 +266,7 @@ async def seed(
     current_jd: tuple[JdTask, ...],
     proposal: Proposal | None,
     current_opks: tuple[OpksItem, ...] = (),
+    opks_proposals: tuple[OpksProposal, ...] = (),
 ) -> None:
     uow_factory = factory(session_factory)
     await create_document(
@@ -286,6 +291,7 @@ async def seed(
             (proposal,) if proposal is not None else (),
         )
         await uow.opks.replace(document_id, current_opks)
+        await uow.opks_proposals.replace(document_id, opks_proposals)
         await uow.commit()
 
 
@@ -700,6 +706,17 @@ async def test_accept_merge_atomically_updates_current_jd_and_work_model(
         task_refs=("task-1", "task-2"),
         indicator_refs=(indicator.entity_id,),
     )
+    pending_opks_proposal = OpksProposal(
+        proposal_id="opks-revise-skill",
+        operation_id="opks-operation-1",
+        entity_id=skill.entity_id,
+        entity_kind=skill.entity_kind,
+        action=OpksProposalAction.REVISE,
+        before=skill,
+        after=skill.model_copy(update={"text": "進階試算表整理"}),
+        base_authority_generation=0,
+        created_at=NOW,
+    )
     await seed(
         postgres_session_factory,
         document_id,
@@ -707,6 +724,7 @@ async def test_accept_merge_atomically_updates_current_jd_and_work_model(
         current_jd=current_jd,
         proposal=proposal,
         current_opks=(output, indicator, skill),
+        opks_proposals=(pending_opks_proposal,),
     )
 
     await decide_proposal(
@@ -726,6 +744,8 @@ async def test_accept_merge_atomically_updates_current_jd_and_work_model(
     assert loaded.state.current_opks.items == (
         skill.model_copy(update={"task_refs": (), "indicator_refs": ()}),
     )
+    assert loaded.state.opks_proposals[0].status is OpksProposalStatus.STALE
+    assert loaded.state.opks_proposals[0].stale_reason
 
 
 async def test_accept_split_prunes_parent_opks_without_guessing_child_links(

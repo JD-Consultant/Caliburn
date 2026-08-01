@@ -11,6 +11,8 @@ from job_analysis_contract import (
     JdTaskView,
     OpksItemView,
     OpksItemWrite,
+    OpksProposalDecisionWrite,
+    OpksProposalView,
     ProposalJdEntryView,
     ProposalDecisionWrite,
     ProposalView,
@@ -29,6 +31,7 @@ from app.job_analysis.domain import (
     JdEntry,
     OpksEntityKind,
     OpksItem,
+    OpksProposal,
     Proposal,
     ResponsibilityRole,
     SourceKind,
@@ -90,6 +93,44 @@ def to_opks_item_view(item: OpksItem) -> OpksItemView:
         task_refs=list(item.task_refs),
         indicator_refs=list(item.indicator_refs),
         evidence_quotes=quotes,
+    )
+
+
+def to_opks_proposal_decision(
+    body: OpksProposalDecisionWrite,
+) -> tuple[str, str | None, str | None]:
+    return (
+        body.decision.value,
+        _optional_text(body.edited_text),
+        _optional_text(body.reason),
+    )
+
+
+def to_opks_proposal_view(proposal: OpksProposal) -> OpksProposalView:
+    return OpksProposalView(
+        proposal_id=proposal.proposal_id,
+        operation_id=proposal.operation_id,
+        entity_id=proposal.entity_id,
+        entity_kind=proposal.entity_kind.value,
+        action=proposal.action.value,
+        status=proposal.status.value,
+        before=(
+            to_opks_item_view(proposal.before)
+            if proposal.before is not None
+            else None
+        ),
+        after=(
+            to_opks_item_view(proposal.after)
+            if proposal.after is not None
+            else None
+        ),
+        edited_after=(
+            to_opks_item_view(proposal.edited_after)
+            if proposal.edited_after is not None
+            else None
+        ),
+        rejection_reason=proposal.rejection_reason,
+        stale_reason=proposal.stale_reason,
     )
 
 
@@ -261,6 +302,10 @@ def to_consultation_view(loaded: LoadedDocument) -> ConsultationView:
         proposals=[
             _to_proposal_view(proposal, tasks=work_tasks)
             for proposal in loaded.state.proposals
+        ],
+        opks_proposals=[
+            to_opks_proposal_view(proposal)
+            for proposal in loaded.state.opks_proposals
         ],
         tasks=[to_jd_task_view(task) for task in loaded.state.current_jd],
         opks_items=[

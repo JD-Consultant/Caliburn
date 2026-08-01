@@ -228,7 +228,7 @@ async def test_authority_commit_rejects_dangling_opks_task_ref_before_any_write(
             uow,
             record=uow.documents.record,
             state=invalid,
-            journal_entry=None,
+            journal_entries=(),
             updated_at=NOW,
         )
 
@@ -259,7 +259,7 @@ async def test_authority_commit_writes_opks_in_the_same_transaction():
         uow,
         record=uow.documents.record,
         state=state,
-        journal_entry=None,
+        journal_entries=(),
         updated_at=NOW,
     )
 

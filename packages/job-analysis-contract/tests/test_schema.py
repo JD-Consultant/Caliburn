@@ -13,6 +13,8 @@ from job_analysis_contract import (
     JdTaskWrite,
     OpksItemView,
     OpksItemWrite,
+    OpksProposalDecisionWrite,
+    OpksProposalView,
     ProblemDetail,
     ProposalDecisionWrite,
     ProposalView,
@@ -60,6 +62,8 @@ def test_schema_owns_only_the_workspace_wire_contract():
         "JdTaskView",
         "OpksItemView",
         "OpksItemWrite",
+        "OpksProposalDecisionWrite",
+        "OpksProposalView",
         "ProblemDetail",
         "ProblemFieldError",
         "ProposalDecisionWrite",
@@ -91,6 +95,7 @@ def test_consultation_contract_exposes_only_product_views_and_supported_decision
         "proposals",
         "tasks",
         "opks_items",
+        "opks_proposals",
     }
     assert set(decision["properties"]["decision"]["enum"]) == {
         "accepted",
@@ -99,6 +104,13 @@ def test_consultation_contract_exposes_only_product_views_and_supported_decision
         "deferred",
     }
     assert "revision_requested" not in decision["properties"]["decision"]["enum"]
+    opks_decision = schema["$defs"]["OpksProposalDecisionWrite"]
+    assert set(opks_decision["properties"]["decision"]["enum"]) == {
+        "accepted",
+        "edited",
+        "rejected",
+        "deferred",
+    }
 
 
 def test_proposal_view_can_preserve_null_snapshots_edits_stale_reason_and_quotes():
@@ -133,6 +145,43 @@ def test_proposal_view_can_preserve_null_snapshots_edits_stale_reason_and_quotes
         schema={"$ref": "#/$defs/ProposalView"}
     ).iter_errors(proposal)
     assert list(errors) == []
+
+
+def test_opks_proposal_view_preserves_operation_grouping_and_snapshots():
+    validator = Draft202012Validator(_schema())
+    proposal = {
+        "proposal_id": "opks-proposal-1",
+        "operation_id": "opks-operation-1",
+        "entity_id": "knowledge-1",
+        "entity_kind": "knowledge",
+        "action": "revise",
+        "status": "pending",
+        "before": {
+            "entity_id": "knowledge-1",
+            "entity_kind": "knowledge",
+            "text": "營運資料",
+            "task_refs": [],
+            "indicator_refs": [],
+            "evidence_quotes": ["我會整理營運資料"],
+        },
+        "after": {
+            "entity_id": "knowledge-1",
+            "entity_kind": "knowledge",
+            "text": "營運資料定義",
+            "task_refs": [],
+            "indicator_refs": [],
+            "evidence_quotes": ["我會整理營運資料"],
+        },
+        "edited_after": None,
+        "rejection_reason": None,
+        "stale_reason": None,
+    }
+
+    assert list(
+        validator.evolve(
+            schema={"$ref": "#/$defs/OpksProposalView"}
+        ).iter_errors(proposal)
+    ) == []
 
 
 def test_optional_task_text_can_reach_the_mapper_as_blank_or_null():
@@ -214,6 +263,10 @@ def test_generated_consultation_models_are_exported_from_the_package():
     assert ProposalView.__name__ == "ProposalView"
     assert EmployeeTurnWrite(text="我每週彙整營運週報").text.startswith("我")
     assert ProposalDecisionWrite(decision="accepted").decision.value == "accepted"
+    assert (
+        OpksProposalDecisionWrite(decision="deferred").decision.value
+        == "deferred"
+    )
     write = OpksItemWrite(
         entity_kind="knowledge",
         text="營運資料定義",
@@ -222,3 +275,4 @@ def test_generated_consultation_models_are_exported_from_the_package():
     )
     assert write.entity_kind.value == "knowledge"
     assert OpksItemView.__name__ == "OpksItemView"
+    assert OpksProposalView.__name__ == "OpksProposalView"

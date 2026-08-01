@@ -22,6 +22,7 @@ from enum import StrEnum
 from pydantic import ValidationError, model_validator
 
 from app.job_analysis.domain import (
+    CurrentJdOpks,
     CurrentWorkModel,
     DomainModel,
     ExcludedSignal,
@@ -31,6 +32,7 @@ from app.job_analysis.domain import (
     MergeTarget,
     NonEmptyText,
     OpenIssue,
+    OpksProposal,
     Proposal,
     ProposalAction,
     ProposalStatus,
@@ -70,6 +72,8 @@ class JobAnalysisState(DomainModel):
     work_model: CurrentWorkModel = CurrentWorkModel()
     current_jd: tuple[JdTask, ...] = ()
     proposals: tuple[Proposal, ...] = ()
+    current_opks: CurrentJdOpks = CurrentJdOpks()
+    opks_proposals: tuple[OpksProposal, ...] = ()
 
     @model_validator(mode="after")
     def ids_are_unique_and_jd_is_canonical(self):
@@ -87,6 +91,12 @@ class JobAnalysisState(DomainModel):
         proposal_ids = [proposal.proposal_id for proposal in self.proposals]
         if len(set(proposal_ids)) != len(proposal_ids):
             raise ValueError("duplicate proposal ids")
+        self.current_opks.validate_against_tasks(frozenset(jd_ids))
+        opks_proposal_ids = [
+            proposal.proposal_id for proposal in self.opks_proposals
+        ]
+        if len(set(opks_proposal_ids)) != len(opks_proposal_ids):
+            raise ValueError("duplicate OPKS proposal ids")
         return self
 
     @property
@@ -907,6 +917,8 @@ class _Writer:
                 work_model=work_model,
                 current_jd=self._state.current_jd,
                 proposals=tuple(self._proposals.values()),
+                current_opks=self._state.current_opks,
+                opks_proposals=self._state.opks_proposals,
             ),
             immediate_task_ids=tuple(self._immediate),
             created_proposal_ids=tuple(self._created),

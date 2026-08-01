@@ -10,6 +10,8 @@ from sqlalchemy import delete, func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.job_analysis.application import (
+    OPKS_ITEM_SCHEMA_ID,
+    OPKS_PROPOSAL_SCHEMA_ID,
     PROPOSAL_SCHEMA_ID,
     WORK_MODEL_SCHEMA_ID,
     ActiveQuestion,
@@ -23,6 +25,9 @@ from app.job_analysis.application import (
 from app.job_analysis.domain import (
     CurrentWorkModel,
     JdTask,
+    OpksItem,
+    OpksProposal,
+    OpksProposalStatus,
     Proposal,
     ProposalStatus,
 )
@@ -32,6 +37,8 @@ from .models import (
     JobAnalysisDocumentRow,
     JobAnalysisJdTaskRow,
     JobAnalysisJournalRow,
+    JobAnalysisOpksItemRow,
+    JobAnalysisOpksProposalRow,
     JobAnalysisProposalRow,
 )
 
@@ -277,6 +284,124 @@ class SqlAlchemyProposalRepository:
         self._session.add_all(rows)
 
 
+class SqlAlchemyOpksRepository:
+    def __init__(self, session: AsyncSession) -> None:
+        self._session = session
+
+    async def list(self, document_id: UUID) -> tuple[OpksItem, ...]:
+        rows = (
+            await self._session.scalars(
+                select(JobAnalysisOpksItemRow)
+                .where(JobAnalysisOpksItemRow.document_id == document_id)
+                .order_by(
+                    JobAnalysisOpksItemRow.created_at,
+                    JobAnalysisOpksItemRow.entity_id,
+                )
+            )
+        ).all()
+        return tuple(ser.load_opks_item(row) for row in rows)
+
+    async def replace(
+        self,
+        document_id: UUID,
+        items: tuple[OpksItem, ...],
+    ) -> None:
+        existing = {
+            row.entity_id: row
+            for row in (
+                await self._session.scalars(
+                    select(JobAnalysisOpksItemRow).where(
+                        JobAnalysisOpksItemRow.document_id == document_id
+                    )
+                )
+            ).all()
+        }
+        await self._session.execute(
+            delete(JobAnalysisOpksItemRow).where(
+                JobAnalysisOpksItemRow.document_id == document_id
+            )
+        )
+        now = datetime.now(UTC)
+        self._session.add_all(
+            [
+                JobAnalysisOpksItemRow(
+                    document_id=document_id,
+                    entity_id=item.entity_id,
+                    entity_kind=item.entity_kind.value,
+                    item_schema_id=OPKS_ITEM_SCHEMA_ID,
+                    item_payload=ser.dump_opks_item_payload(item),
+                    created_at=(
+                        existing[item.entity_id].created_at
+                        if item.entity_id in existing
+                        else now
+                    ),
+                    updated_at=now,
+                )
+                for item in items
+            ]
+        )
+
+
+class SqlAlchemyOpksProposalRepository:
+    def __init__(self, session: AsyncSession) -> None:
+        self._session = session
+
+    async def list(
+        self,
+        document_id: UUID,
+        *,
+        statuses: frozenset[OpksProposalStatus] | None = None,
+    ) -> tuple[OpksProposal, ...]:
+        statement = select(JobAnalysisOpksProposalRow).where(
+            JobAnalysisOpksProposalRow.document_id == document_id
+        )
+        if statuses is not None:
+            statement = statement.where(
+                JobAnalysisOpksProposalRow.status.in_(
+                    tuple(status.value for status in statuses)
+                )
+            )
+        rows = (
+            await self._session.scalars(
+                statement.order_by(
+                    JobAnalysisOpksProposalRow.created_at,
+                    JobAnalysisOpksProposalRow.proposal_id,
+                )
+            )
+        ).all()
+        return tuple(ser.load_opks_proposal(row) for row in rows)
+
+    async def replace(
+        self,
+        document_id: UUID,
+        proposals: tuple[OpksProposal, ...],
+    ) -> None:
+        await self._session.execute(
+            delete(JobAnalysisOpksProposalRow).where(
+                JobAnalysisOpksProposalRow.document_id == document_id
+            )
+        )
+        self._session.add_all(
+            [
+                JobAnalysisOpksProposalRow(
+                    document_id=document_id,
+                    proposal_id=proposal.proposal_id,
+                    operation_id=proposal.operation_id,
+                    entity_id=proposal.entity_id,
+                    entity_kind=proposal.entity_kind.value,
+                    action=proposal.action.value,
+                    status=proposal.status.value,
+                    base_authority_generation=proposal.base_authority_generation,
+                    proposal_schema_id=OPKS_PROPOSAL_SCHEMA_ID,
+                    proposal_payload=ser.dump_opks_proposal_payload(proposal),
+                    created_at=proposal.created_at,
+                    resolved_at=proposal.resolved_at,
+                )
+                for proposal in proposals
+            ]
+        )
+
+
 class SqlAlchemyJournalRepository:
     def __init__(self, session: AsyncSession) -> None:
         self._session = session
@@ -345,6 +470,8 @@ class SqlAlchemyJobAnalysisUnitOfWork:
         self.documents: SqlAlchemyDocumentRepository
         self.tasks: SqlAlchemyJdTaskRepository
         self.proposals: SqlAlchemyProposalRepository
+        self.opks: SqlAlchemyOpksRepository
+        self.opks_proposals: SqlAlchemyOpksProposalRepository
         self.journal: SqlAlchemyJournalRepository
 
     async def __aenter__(self) -> "SqlAlchemyJobAnalysisUnitOfWork":
@@ -355,6 +482,8 @@ class SqlAlchemyJobAnalysisUnitOfWork:
         self.documents = SqlAlchemyDocumentRepository(self._session)
         self.tasks = SqlAlchemyJdTaskRepository(self._session)
         self.proposals = SqlAlchemyProposalRepository(self._session)
+        self.opks = SqlAlchemyOpksRepository(self._session)
+        self.opks_proposals = SqlAlchemyOpksProposalRepository(self._session)
         self.journal = SqlAlchemyJournalRepository(self._session)
         return self
 

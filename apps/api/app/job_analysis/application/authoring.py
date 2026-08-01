@@ -210,6 +210,8 @@ async def _commit_direct_edit(
             work_model=work_model,
             current_jd=tasks,
             proposals=proposals,
+            current_opks={"items": await uow.opks.list(record.document_id)},
+            opks_proposals=await uow.opks_proposals.list(record.document_id),
         ),
         journal_entry=JournalEntry(
             document_id=record.document_id,
@@ -312,6 +314,8 @@ async def load_document(
             return None
         tasks = await uow.tasks.list(document_id)
         proposals = await uow.proposals.list(document_id)
+        opks = await uow.opks.list(document_id)
+        opks_proposals = await uow.opks_proposals.list(document_id)
         turns = await uow.journal.list_conversation_turns(document_id)
         return LoadedDocument(
             document=record,
@@ -319,6 +323,8 @@ async def load_document(
                 work_model=record.work_model,
                 current_jd=tasks,
                 proposals=proposals,
+                current_opks={"items": opks},
+                opks_proposals=opks_proposals,
             ),
             conversation_turns=turns,
         )

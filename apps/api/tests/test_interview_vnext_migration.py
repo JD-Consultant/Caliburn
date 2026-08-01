@@ -305,7 +305,7 @@ def test_alembic_has_single_head():
     cfg = Config(str(API_DIR / "alembic.ini"))
     cfg.set_main_option("script_location", str(API_DIR / "alembic"))
     heads = ScriptDirectory.from_config(cfg).get_heads()
-    assert heads == ["0013"]
+    assert heads == ["0014"]
 
 
 @pytest.mark.usefixtures("require_postgres")

@@ -21,6 +21,9 @@ from app.job_analysis.domain import (
     Identifier,
     JdTask,
     NonEmptyText,
+    OpksItem,
+    OpksProposal,
+    OpksProposalStatus,
     Proposal,
     ProposalStatus,
     TaskId,
@@ -33,6 +36,8 @@ from .verifier import TurnSpeaker
 
 WORK_MODEL_SCHEMA_ID = "job-analysis-work-model/1"
 PROPOSAL_SCHEMA_ID = "job-analysis-proposal/1"
+OPKS_ITEM_SCHEMA_ID = "job-analysis-opks-item/1"
+OPKS_PROPOSAL_SCHEMA_ID = "job-analysis-opks-proposal/1"
 ACTIVE_QUESTION_SCHEMA_ID = "job-analysis-active-question/1"
 CONSULTANT_OPENING_SCHEMA_ID = "job-analysis-consultant-opening/1"
 COMPLETED_TURN_SCHEMA_ID = "job-analysis-completed-turn/1"
@@ -257,6 +262,29 @@ class ProposalRepository(Protocol):
     ) -> None: ...
 
 
+class OpksRepository(Protocol):
+    async def list(self, document_id: UUID) -> tuple[OpksItem, ...]: ...
+
+    async def replace(
+        self, document_id: UUID, items: tuple[OpksItem, ...]
+    ) -> None: ...
+
+
+class OpksProposalRepository(Protocol):
+    async def list(
+        self,
+        document_id: UUID,
+        *,
+        statuses: frozenset[OpksProposalStatus] | None = None,
+    ) -> tuple[OpksProposal, ...]: ...
+
+    async def replace(
+        self,
+        document_id: UUID,
+        proposals: tuple[OpksProposal, ...],
+    ) -> None: ...
+
+
 class JournalRepository(Protocol):
     async def get(
         self, document_id: UUID, entry_id: Identifier
@@ -273,6 +301,8 @@ class JobAnalysisUnitOfWork(Protocol):
     documents: DocumentRepository
     tasks: JdTaskRepository
     proposals: ProposalRepository
+    opks: OpksRepository
+    opks_proposals: OpksProposalRepository
     journal: JournalRepository
 
     async def __aenter__(self) -> Self: ...

@@ -24,14 +24,24 @@ from app.job_analysis.application import (
     JobAnalysisState,
     JobAnalysisUnitOfWork,
     JournalEntry,
+    OpksProposalRepository,
+    OpksRepository,
     ProposalDecisionPayload,
     TurnSpeaker,
 )
 from app.job_analysis.domain import (
     CurrentWorkModel,
     JdTask,
+    CurrentJdOpks,
+    OpksEntityKind,
+    OpksEvidenceLink,
+    OpksItem,
+    OpksProposal,
+    OpksProposalAction,
     ProposalStatus,
     ResponsibilityRole,
+    SourceKind,
+    SourceRef,
 )
 
 
@@ -61,6 +71,37 @@ def consultant_turn() -> ConversationTurn:
         turn_id="turn-3",
         speaker=TurnSpeaker.CONSULTANT,
         text="這份週報主要交給誰？",
+    )
+
+
+def output_item() -> OpksItem:
+    return OpksItem(
+        entity_id="output-1",
+        entity_kind=OpksEntityKind.OUTPUT,
+        text="營運週報",
+        task_refs=("task-1",),
+        evidence_links=(
+            OpksEvidenceLink(
+                source_ref=SourceRef(
+                    kind=SourceKind.EMPLOYEE_TURN,
+                    id="turn-2",
+                ),
+                quote="我每週會彙整營運週報",
+            ),
+        ),
+    )
+
+
+def output_proposal() -> OpksProposal:
+    return OpksProposal(
+        proposal_id="opks-proposal-1",
+        operation_id="opks-operation-1",
+        entity_id="output-1",
+        entity_kind=OpksEntityKind.OUTPUT,
+        action=OpksProposalAction.ADD,
+        after=output_item(),
+        base_authority_generation=0,
+        created_at=NOW,
     )
 
 
@@ -111,7 +152,7 @@ def test_document_records_are_frozen_and_reject_negative_generation():
         )
 
 
-def test_loaded_state_keeps_complete_current_jd_values():
+def test_loaded_state_keeps_complete_current_jd_and_opks_values():
     from app.job_analysis.application import LoadedDocument
 
     document = DocumentRecord(
@@ -123,11 +164,17 @@ def test_loaded_state_keeps_complete_current_jd_values():
         created_at=NOW,
         updated_at=NOW,
     )
-    state = JobAnalysisState(current_jd=(jd_task(),))
+    state = JobAnalysisState(
+        current_jd=(jd_task(),),
+        current_opks=CurrentJdOpks(items=(output_item(),)),
+        opks_proposals=(output_proposal(),),
+    )
 
     loaded = LoadedDocument(document=document, state=state, conversation_turns=())
 
     assert loaded.state.current_jd[0].frequency_text == "每週一次"
+    assert loaded.state.current_opks.items == (output_item(),)
+    assert loaded.state.opks_proposals == (output_proposal(),)
 
 
 def test_completed_turn_payload_requires_employee_then_consultant_roles():
@@ -305,5 +352,15 @@ def test_uow_protocol_exposes_only_application_ports():
     annotations = get_type_hints(JobAnalysisUnitOfWork)
     rendered = " ".join(repr(value) for value in annotations.values()).lower()
 
-    assert {"documents", "tasks", "proposals", "journal"} <= set(annotations)
+    assert {
+        "documents",
+        "tasks",
+        "proposals",
+        "opks",
+        "opks_proposals",
+        "journal",
+    } <= set(annotations)
     assert "sqlalchemy" not in rendered
+
+    assert OpksRepository is not None
+    assert OpksProposalRepository is not None

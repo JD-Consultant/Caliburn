@@ -11,6 +11,8 @@ from app.job_analysis.application import (
     COMPLETED_TURN_SCHEMA_ID,
     CONSULTANT_OPENING_SCHEMA_ID,
     DIRECT_EDIT_SCHEMA_ID,
+    OPKS_ITEM_SCHEMA_ID,
+    OPKS_PROPOSAL_SCHEMA_ID,
     PROPOSAL_DECISION_SCHEMA_ID,
     PROPOSAL_SCHEMA_ID,
     WORK_MODEL_SCHEMA_ID,
@@ -25,6 +27,8 @@ from app.job_analysis.application import (
 from app.job_analysis.domain import (
     CurrentWorkModel,
     JdTask,
+    OpksItem,
+    OpksProposal,
     Proposal,
 )
 
@@ -110,6 +114,83 @@ def load_jd_task(row: Any) -> JdTask:
         )
     except (ValidationError, TypeError, ValueError) as exc:
         _fail("JD Task", exc, exc)
+
+
+_OPKS_ITEM_RELATIONAL_FIELDS = {"entity_id", "entity_kind"}
+
+
+def dump_opks_item_payload(item: OpksItem) -> dict[str, Any]:
+    return item.model_dump(mode="json", exclude=_OPKS_ITEM_RELATIONAL_FIELDS)
+
+
+def load_opks_item(row: Any) -> OpksItem:
+    if row.item_schema_id != OPKS_ITEM_SCHEMA_ID:
+        _fail("OPKS item schema", row.item_schema_id)
+    if not isinstance(row.item_payload, dict):
+        _fail("OPKS item payload", type(row.item_payload).__name__)
+    duplicate = _OPKS_ITEM_RELATIONAL_FIELDS & set(row.item_payload)
+    if duplicate:
+        _fail("OPKS item payload", f"duplicates relational fields {sorted(duplicate)}")
+    try:
+        return OpksItem.model_validate(
+            {
+                **row.item_payload,
+                "entity_id": row.entity_id,
+                "entity_kind": row.entity_kind,
+            }
+        )
+    except (ValidationError, TypeError, ValueError) as exc:
+        _fail("OPKS item", exc, exc)
+
+
+_OPKS_PROPOSAL_RELATIONAL_FIELDS = {
+    "proposal_id",
+    "operation_id",
+    "entity_id",
+    "entity_kind",
+    "action",
+    "status",
+    "base_authority_generation",
+    "created_at",
+    "resolved_at",
+}
+
+
+def dump_opks_proposal_payload(proposal: OpksProposal) -> dict[str, Any]:
+    return proposal.model_dump(
+        mode="json",
+        exclude=_OPKS_PROPOSAL_RELATIONAL_FIELDS,
+    )
+
+
+def load_opks_proposal(row: Any) -> OpksProposal:
+    if row.proposal_schema_id != OPKS_PROPOSAL_SCHEMA_ID:
+        _fail("OPKS Proposal schema", row.proposal_schema_id)
+    if not isinstance(row.proposal_payload, dict):
+        _fail("OPKS Proposal payload", type(row.proposal_payload).__name__)
+    duplicate = _OPKS_PROPOSAL_RELATIONAL_FIELDS & set(row.proposal_payload)
+    if duplicate:
+        _fail(
+            "OPKS Proposal payload",
+            f"duplicates relational fields {sorted(duplicate)}",
+        )
+    try:
+        return OpksProposal.model_validate(
+            {
+                **row.proposal_payload,
+                "proposal_id": row.proposal_id,
+                "operation_id": row.operation_id,
+                "entity_id": row.entity_id,
+                "entity_kind": row.entity_kind,
+                "action": row.action,
+                "status": row.status,
+                "base_authority_generation": row.base_authority_generation,
+                "created_at": row.created_at,
+                "resolved_at": row.resolved_at,
+            }
+        )
+    except (ValidationError, TypeError, ValueError) as exc:
+        _fail("OPKS Proposal", exc, exc)
 
 
 _PROPOSAL_RELATIONAL_FIELDS = {

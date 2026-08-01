@@ -5,6 +5,10 @@ import type {
   DocumentView,
   JdTaskView,
   JdTaskWrite,
+  OpksGenerationView,
+  OpksItemView,
+  OpksItemWrite,
+  OpksProposalDecisionWrite,
   ProblemDetail,
   ProposalDecisionWrite,
 } from "@caliburn/job-analysis-contract";
@@ -133,6 +137,56 @@ export function reorderTasks(
   });
 }
 
+export function addOpksItem(
+  documentId: string,
+  item: OpksItemWrite,
+  idempotencyKey: string,
+): Promise<OpksItemView> {
+  return request<OpksItemView>(`/documents/${documentId}/opks`, {
+    method: "POST",
+    headers: mutationHeaders(idempotencyKey),
+    body: JSON.stringify(item),
+  });
+}
+
+export function editOpksItem(
+  documentId: string,
+  entityId: string,
+  item: OpksItemWrite,
+  idempotencyKey: string,
+): Promise<OpksItemView> {
+  return request<OpksItemView>(`/documents/${documentId}/opks/${entityId}`, {
+    method: "PUT",
+    headers: mutationHeaders(idempotencyKey),
+    body: JSON.stringify(item),
+  });
+}
+
+export function deleteOpksItem(
+  documentId: string,
+  entityId: string,
+  idempotencyKey: string,
+): Promise<void> {
+  return request<void>(`/documents/${documentId}/opks/${entityId}`, {
+    method: "DELETE",
+    headers: mutationHeaders(idempotencyKey),
+  });
+}
+
+export function generateOpksProposals(
+  documentId: string,
+  taskId: string,
+  idempotencyKey: string,
+): Promise<OpksGenerationView> {
+  return request<OpksGenerationView>(
+    `/documents/${documentId}/tasks/${taskId}/opks-proposals`,
+    {
+      method: "POST",
+      headers: mutationHeaders(idempotencyKey),
+    },
+  );
+}
+
 export function submitEmployeeTurn(
   documentId: string,
   idempotencyKey: string,
@@ -153,6 +207,22 @@ export function decideProposal(
 ): Promise<ConsultationView> {
   return request<ConsultationView>(
     `/documents/${documentId}/proposals/${proposalId}/decisions`,
+    {
+      method: "POST",
+      headers: mutationHeaders(idempotencyKey),
+      body: JSON.stringify(decision),
+    },
+  );
+}
+
+export function decideOpksProposal(
+  documentId: string,
+  proposalId: string,
+  idempotencyKey: string,
+  decision: OpksProposalDecisionWrite,
+): Promise<ConsultationView> {
+  return request<ConsultationView>(
+    `/documents/${documentId}/opks-proposals/${proposalId}/decisions`,
     {
       method: "POST",
       headers: mutationHeaders(idempotencyKey),

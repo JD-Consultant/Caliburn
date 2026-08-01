@@ -15,7 +15,9 @@ source_discipline: 只收官方一手與學術原著；取得失敗與未核實�
 | OPM *Delegated Examining Operations Handbook*（Appendix D）+ *Job Analysis Template* | ✅ **PDF 全文取得**；逐字 |
 | 香港 SCS 物流業 | ✅ 全文（見 [工作產出原料](2026-08-01-opks-raw-work-outputs.md)） |
 | Smith & Kendall (1963) BARS 原著 | ❌ 未取得（付費牆）；本檔不引用 |
-| 澳洲 Performance Evidence／AQF、新加坡 Performance Expectations | ❌ 官方站 timeout／SPA 殼；未取得 |
+| **澳洲** training.gov.au：`TAEASS412`、`BSBOPS401` 的單元＋Assessment Requirements | ✅ **四份官方 PDF 全文取得**；逐字（改走 `TrainingComponentFiles` 靜態路徑） |
+| **新加坡** SkillsFuture *Skills Framework for HR* | ✅ **全文取得**（9.4 MB／7,639 行）；官方網域只回 SPA 殼，改由 Wayback 對同一官方 URL 的 2025-08-05 快照取得 |
+| 澳洲 AQF 的指標升階判準語言 | ❌ 未取得 |
 
 ---
 
@@ -147,27 +149,71 @@ Delco-Remy 研究中，三組領班分別以每日／每週／每兩週回報：
 | **要求量化** | iCAP 指引 p48 | 「行為指標與工作產出可合併討論，以利討論出**可衡量工作成效之量化指標**及可觀察之行為指標」 |
 | **要求可佐證** | 29 CFR §1607.14C(4) | K/S/A 須以 "**observable aspects of work behavior**" 定義（見效度原料 §2） |
 
-### 3b. 實際觀測到的做法
+### 3b. 四個政府體系的實測：**職務描述層沒有一個放自訂數值目標**
 
-- **香港 SCS**（唯一取得全文的政府體系）：Performance Requirements 與 outcome requirements
-  **未出現任何數值門檻**，一律質性。
-- **OPM**：對 competency 的要求是禁模糊修飾詞（§2b），**未要求也未禁止數字**；
-  數字出現在**評分量表**（importance 1–5、frequency 0–5、need-at-entry 1–4）而不是在**能力陳述**裡。
-  → **這是關鍵區分：OPM 把數字放在「分析程序」，不放在「文件內容」。**
+四份官方文件全文抽字後逐一計數（方法與檔案見 §6）：
 
-### 3c. 裁決建議（合成，非單一條文）
+| 體系 | 承載「標準」的欄位 | 該欄位的數值門檻 | 數字實際住在哪 |
+|---|---|---|---|
+| **澳洲**（training.gov.au 兩個單元） | Performance Criteria（單元本體） | **0** | **獨立的 Assessment Requirements 元件**（見 §3c） |
+| **香港** SCS 物流業 | Performance Requirements ＋ integrated outcome requirements | **0** | 不存在 |
+| **新加坡** Skills Framework (HR) | Performance Expectations | **0** | 不存在（見 §3d） |
+| **美國 OPM** | competency 定義 | **0**（另禁模糊修飾詞，§2b） | **評分量表**（importance 1–5、frequency 0–5、need-at-entry 1–4） |
 
-**不全禁，但預設不生成。** 三檔：
+> 新加坡那份 7,639 行全文中符合數值門檻樣式的只有 5 處，逐一檢視後**全部是訓練補助與 CPD 規定**
+> （"70-90% course fee subsidy"、"at least 90 Continuing Professional Development"），
+> 與職務績效無關。
+
+**這是本檔最強的一條結論，因為它是四個獨立體系的一致行為，不是單一條文的解讀。**
+
+### 3c. 澳洲：數字存在，但被關在另一個元件裡
+
+澳洲是唯一**確實使用次數門檻**的體系——但門檻不在描述工作的單元裡，而在
+`AssessmentRequirements` 這個**分離的官方元件**（逐字，`TAEASS412`）：
+
+> "conduct a total of **at least 6** assessments, **at least 1** of which must use recognition of prior
+> learning (RPL). The above assessments must be for **3 different candidates** against all requirements
+> specified in **at least 2 different units** of competency…"
+> "identify and apply **at least 3 changes** to improve own assessment practice…"
+
+`BSBOPS401` 同樣：「coordinate **at least three** business resources」。
+
+而同兩個單元的 Elements 與 Performance Criteria，`at least`／`minimum of`／次數門檻的出現次數是
+**0 與 0**（Assessment Requirements 側則是 5 與 1）。
+
+→ **判準 D-7a：數字屬於「怎麼驗證」那一層，不屬於「工作是什麼」那一層。**
+澳洲用文件邊界把這件事做成了結構性強制。OPM 用「量表 vs 定義」做同一件事。
+
+### 3d. 新加坡：把「標準」定義成外部權威的遵循
+
+新加坡的 `Performance Expectations` 欄不是目標值，而是**具名法規與框架的清單**（逐字）：
+
+> "**In accordance with:** Central Provident Fund Act · Employment Act · Employment of Foreign Manpower
+> Act · Employment of Foreign Manpower (Work Passes) Regulations · Fair Consideration Framework ·
+> Industrial Relations Act · Retirement and Re-employment Act · Workman Injury Compensation Act"
+
+全文出現 27 次同樣的 "In accordance with" 句式。
+
+→ **判準 D-7b：這是第三種合法的「標準」寫法，而且對本產品特別好用。**
+員工通常講得出治理自己工作的**法規、SOP、公司規章或客戶 SLA 的名稱**——
+那是**可查核、不可虛構**的，遠優於憑空生成的百分比。
+當員工說「有標準但講不出數值」時，**先問「依據什麼」而不是「是多少」**。
+
+### 3e. 裁決建議
+
+**不全禁，但預設不生成。** 四檔（原三檔 + 新加坡模式）：
 
 | 情況 | 處置 | 支持度 |
 |---|---|---|
-| 員工說出具體數字，且可逐字回溯（「我們的 SLA 是 4 小時」） | 允許寫入，附 quote | `behavior_grounded` |
-| 員工確認有標準但講不出數值 | 寫成質性條件（「在約定時限內」），**不得補數字** | `employee_confirmed` |
+| 員工說出具體數字且可逐字回溯（「我們的 SLA 是 4 小時」） | 允許寫入，附 quote | `behavior_grounded` |
+| 員工講得出**依據的法規／SOP／規章名稱** | 寫成「依 X 辦理」——新加坡模式 | `behavior_grounded` |
+| 員工確認有標準但講不出數值也講不出依據 | 寫成質性條件（「在約定時限內」），**不得補數字** | `employee_confirmed` |
 | 員工未提及 | **不得生成任何數值** | 不寫 |
 
-依據：iCAP 要的是「可衡量」不是「有數字」——質性但可觀察的指標同樣滿足
-審核指標 3.4.2「具體清楚描述行為表現」；而**無來源的數字同時違反** §1607.14C(4) 的可觀察要求
-與 ADR 0040 決定 29–30。**香港 SCS 的全質性寫法證明「沒有數字也能通過政府級品質審查」**。
+依據：iCAP 要的是「可衡量」不是「有數字」——質性但可觀察的指標同樣滿足審核指標 3.4.2；
+無來源的數字則同時違反 §1607.14C(4) 與 ADR 0040 決定 29–30。
+**香港與新加坡的全質性寫法證明「沒有任何數字也能通過政府級品質審查」**，
+澳洲則證明**要用數字就該把它放到驗證層**。
 
 ---
 
@@ -210,6 +256,12 @@ iCAP 審核指標 3.4.3 要求「『行為指標』所描述的能力程度，�
 | 3 | **美國 OPM** | *Job Analysis Template*（Step 6c／6d 逐字） | 現行 | https://www.opm.gov/policy-data-oversight/assessment-and-selection/job-analysis/job_analysis_handout.pdf | curl + `pdftotext -layout`，全文 |
 | 4 | 香港 QF（經 HKU SPACE 轉載） | *Specification of Competency Standards for the Logistics Industry* | 版次未標 | https://hkuspace.hku.hk/f/rpl/103620/e_lo_tw.pdf | 見[工作產出原料](2026-08-01-opks-raw-work-outputs.md) §6 |
 | 5 | 美國聯邦法規 | 29 CFR §1607.14C(4)（Uniform Guidelines） | CFR 2024 年版 | 見[效度與法規原料](2026-08-01-opks-raw-validity-and-ai-regulation.md) §2 | 該檔已取 GPO 官方 XML 逐字 |
+| 8 | **澳洲 DEWR**（training.gov.au 官方元件檔） | *TAEASS412 Assess competence*（單元）＋ *Assessment Requirements for TAEASS412* | Release 1；文件生成日 **2024-07-12**；TAE Training Package v5.0 | https://training.gov.au/TrainingComponentFiles/TAE/TAEASS412_R1.pdf ／ …/TAEASS412_AssessmentRequirements_R1.pdf | curl + `pdftotext -layout`，全文 |
+| 9 | **澳洲 DEWR** | *BSBOPS401 Coordinate business resources*（單元＋Assessment Requirements） | Release 1 | https://training.gov.au/TrainingComponentFiles/BSB/BSBOPS401_R1.pdf ／ …/BSBOPS401_AssessmentRequirements_R1.pdf | curl + `pdftotext -layout`，全文 |
+| 10 | **新加坡 SkillsFuture SG** | *Skills Framework for Human Resource*（含 Critical Work Functions／Key Tasks／Performance Expectations 全表） | 官方站現行檔；**經 Wayback Machine 2025-08-05 快照取得** | https://web.archive.org/web/20250805003944id_/https://www.skillsfuture.gov.sg/docs/default-source/skills-framework/skills-framework-for-hr.pdf | curl（分段續傳）+ `pdftotext -layout`，9.4 MB／7,639 行 |
+
+> 第 10 項：官方網域直連只回傳 Next.js SPA 殼，無法取得 PDF；改用 Wayback 對**同一官方 URL** 的
+> 存檔快照。內容為 SkillsFuture SG 官方文件，但**版次以快照日期為準**，正式引用前宜回官方站核對。
 | 6 | **台灣勞動部勞動力發展署** | 《職能基準發展指引》p48（量化指標要求） | 111 年 10 月修正 | 見 [2026-07-13 iCAP 原料](2026-07-13-ai-redesign-raw-icap-field-standards.md) §5 | 前輪已逐字核實 |
 | 7 | 學術原著 | Morgeson et al., *JAP* 89(4), 674–686（"ability to" 膨脹實證） | 2004 | 見[效度與法規原料](2026-08-01-opks-raw-validity-and-ai-regulation.md) §3.2 | 該檔已取作者站出版版 PDF |
 
@@ -218,9 +270,12 @@ iCAP 審核指標 3.4.3 要求「『行為指標』所描述的能力程度，�
 ## 7. 查不到／需二次確認（誠實清單）
 
 1. **Smith & Kendall (1963) BARS 原著**——付費牆，未取得。本檔完全未引用 BARS 的建構步驟。
-2. **澳洲 Performance Evidence 的次數門檻**（如 "on at least 3 occasions"）——未取得。
-   若該體系確實使用次數門檻，§3c 的三檔規則需要重審（那會是「官方允許數字」的反例）。
-3. **新加坡 Performance Expectations 欄位定義**——未取得。
+2. ~~澳洲 Performance Evidence 的次數門檻~~ —— **已解決，見 §3c。**
+   澳洲確實使用次數門檻，但關在獨立的 Assessment Requirements 元件；單元本體為 0。
+   結論由「可能的反例」轉為**強化**。**仍待確認**：只取樣兩個單元（TAE／BSB 各一）。
+3. ~~新加坡 Performance Expectations 欄位定義~~ —— **已解決，見 §3d。**
+   結論意外：該欄不是目標值，而是具名法規清單（"In accordance with…"）。
+   **仍待確認**：只讀了 HR 一個框架，38 個 sector 是否全採同一寫法未驗證。
 4. **AQF 的指標升階判準語言**——未取得；D-6 因此保守處理。
 5. **Flanagan 全文的後半段**（分類系統建構程序）——已抽出但本檔僅用到方法論原則章節；
    若日後要做 rubric，該段仍值得再讀。

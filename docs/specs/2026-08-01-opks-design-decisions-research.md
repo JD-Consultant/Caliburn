@@ -191,8 +191,16 @@ Morgeson et al. (2004) 的操縱**只是加上 "ability to" 這個詞**就produc
   understanding… do not provide meaningful information」。繁中黑名單：
   熟悉／精通／良好的／深厚的／扎實的／基本的／豐富的／優秀的。字串層即可擋。
 - **知識用名詞、技能用動詞**——OPM 與 ESCO 兩個獨立體系逐字同意。
-- **數值門檻採三檔**：可逐字回溯 → 允許；有標準但講不出數值 → 寫成質性條件；
-  未提及 → **不得生成**。香港 SCS 全文無任何數值門檻，證明「沒有數字也能通過政府級品質審查」。
+- **數值門檻採四檔**：可逐字回溯的數字 → 允許（附 quote）；**講得出依據的法規／SOP／規章名稱 →
+  寫成「依 X 辦理」**；有標準但兩者都講不出 → 質性條件；未提及 → **不得生成**。
+
+  依據是四個政府體系的一致行為，不是單一條文解讀：**澳洲、香港、新加坡、OPM 的職務描述層
+  數值門檻皆為 0**。澳洲確實用次數門檻（"at least 6 assessments"），但關在**獨立的
+  Assessment Requirements 元件**裡，單元本體為 0；OPM 把數字放在**評分量表**而非能力定義。
+  → **數字屬於「怎麼驗證」那一層，不屬於「工作是什麼」那一層。**
+  新加坡的 `Performance Expectations` 更是把標準寫成**具名法規清單**（"In accordance with:
+  Employment Act · Industrial Relations Act…"，全文 27 次）——這對本產品特別好用，
+  因為員工講得出治理自己工作的規章名稱，那是**可查核、不可虛構**的。
 - **第一版不自動判級**：缺 AQF／新加坡條文，且尚無真實 O/P/K/S 資料。
   只確保指標寫得夠具體到日後可判級。
 
@@ -222,10 +230,11 @@ C 與 D 已於 2026-08-01 補查完成，產出兩份原料：
 
 1. **Gilbert《Human Competence》一手文本**——專書無公開全文、*JOBM* 2019 回顧 403。
    **不得引用其逐字定義**；「產出是行為的產物」改引香港 SCS 與 O\*NET task 定義。
-2. **澳洲 Performance Evidence 是否使用次數門檻**（"on at least 3 occasions"）——
-   `dewr.gov.au`／`asqa.gov.au` timeout。若確實使用，§4 的數值三檔需重審。
-3. **新加坡 Performance Expectations 欄位定義**——官方站回傳 SPA 殼。
-   這是唯一已知明確有「期望表現」欄位的政府體系。
+2. ~~澳洲 Performance Evidence~~ ／ ~~新加坡 Performance Expectations~~ —— **兩者皆已取得**
+   （2026-08-01 第二輪）。澳洲改走 `training.gov.au/TrainingComponentFiles/` 靜態路徑，
+   新加坡改由 Wayback 對同一官方 URL 的 2025-08-05 快照分段續傳取得。
+   結果見[行為指標原料](2026-08-01-opks-raw-performance-indicators.md) §3b–§3d，
+   已回寫成 §4 的數值四檔。**取樣仍窄**：澳洲兩個單元、新加坡一個框架（共 38 個 sector）。
 4. **Smith & Kendall (1963) BARS 原著**——付費牆；本輪完全未引用 BARS 建構步驟。
 5. **香港 SCS 的版本與官方出處**——取自 HKU SPACE 轉載，引用前須回 `hkqf.gov.hk` 確認版次。
 

@@ -6,19 +6,22 @@ import { useState } from "react";
 
 import { consultationQueryOptions } from "@/lib/jobAnalysisQueries";
 import { ConsultationPanel } from "./ConsultationPanel";
+import { OpksEditor } from "./OpksEditor";
 import { TaskEditor } from "./TaskEditor";
 import { GuardedLink } from "./UnsavedChangesGuard";
 
 export function ConsultationWorkspace({ documentId }: { documentId: string }) {
   const consultation = useQuery(consultationQueryOptions(documentId));
   const [taskDraftDirty, setTaskDraftDirty] = useState(false);
+  const [opksDraftDirty, setOpksDraftDirty] = useState(false);
+  const dirty = taskDraftDirty || opksDraftDirty;
 
   return (
     <div className="min-h-screen bg-muted/30">
       <header className="border-b bg-background">
         <div className="mx-auto flex max-w-7xl items-center gap-4 px-6 py-5">
           <GuardedLink
-            dirty={taskDraftDirty}
+            dirty={dirty}
             href="/workspace"
             className="rounded-lg p-2 hover:bg-muted"
             aria-label="返回文件庫"
@@ -38,11 +41,17 @@ export function ConsultationWorkspace({ documentId }: { documentId: string }) {
 
       <main className="mx-auto grid max-w-7xl gap-8 px-6 py-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
         <ConsultationPanel documentId={documentId} />
-        <TaskEditor
-          documentId={documentId}
-          embedded
-          onDirtyChange={setTaskDraftDirty}
-        />
+        <div className="space-y-8">
+          <TaskEditor
+            documentId={documentId}
+            embedded
+            onDirtyChange={setTaskDraftDirty}
+          />
+          <OpksEditor
+            documentId={documentId}
+            onDirtyChange={setOpksDraftDirty}
+          />
+        </div>
       </main>
     </div>
   );

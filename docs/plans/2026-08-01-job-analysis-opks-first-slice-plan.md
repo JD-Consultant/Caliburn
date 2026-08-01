@@ -574,19 +574,19 @@ POST /api/v1/job-analysis/documents/{document_id}/tasks/{task_id}/opks-proposals
 - edited 只開文字欄，不提供 refs/topology editor；需要改連結時先 reject，再由員工手動建立或重新生成。
 - 所有人工編輯按「儲存」才寫入，沿用 dirty guard、`beforeunload`、`onNavigate` 與 Ctrl/Cmd+Enter；不加 autosave、第二份 client store 或 Server Action。
 
-- [ ] **Step 1: 寫 pure Web helpers 紅測試**
+- [x] **Step 1: 寫 pure Web helpers 紅測試**
 
   測按 Task 分組、不複製 K/S identity、A 只出現在文件層、空集合文字、Proposal operation grouping、`unknown` 轉 `deferred`、edited payload 只帶文字、known problem type exhaustive mapping。
 
-- [ ] **Step 2: 擴充 API client 與 query invalidation**
+- [x] **Step 2: 擴充 API client 與 query invalidation**
 
   新 mutation 都重用失敗時的同一 Idempotency-Key；成功後 invalidate document + consultation，不手動 patch 第二份 cache。generation pending 時禁重複按鈕。
 
-- [ ] **Step 3: 實作最小 editor 與 proposal cards**
+- [x] **Step 3: 實作最小 editor 與 proposal cards**
 
   使用既有 Button/Card/Form primitive，不引入新表單 library、drag-and-drop、toast framework 或 component test framework。錯誤以現有 inline `aria-live` 呈現。
 
-- [ ] **Step 4: Gate**（working directory: `apps/web`）
+- [x] **Step 4: Gate**（working directory: `apps/web`）
 
   ```powershell
   npm run test -- src/lib/jobAnalysisOpks.test.ts src/lib/jobAnalysisApi.test.ts src/lib/jobAnalysisQueries.test.ts
@@ -594,7 +594,7 @@ POST /api/v1/job-analysis/documents/{document_id}/tasks/{task_id}/opks-proposals
   npm run lint
   ```
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
   ```powershell
   git add apps/web docs/design/task-analysis-engine.md

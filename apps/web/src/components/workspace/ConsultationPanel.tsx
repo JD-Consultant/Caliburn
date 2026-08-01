@@ -2,6 +2,7 @@
 
 import type {
   ConsultationView,
+  OpksProposalDecisionWrite,
   ProposalDecisionWrite,
 } from "@caliburn/job-analysis-contract";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -10,16 +11,19 @@ import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
+  decideOpksProposal,
   decideProposal,
   JobAnalysisApiError,
   submitEmployeeTurn,
 } from "@/lib/jobAnalysisApi";
+import { groupOpksProposals } from "@/lib/jobAnalysisOpks";
 import { groupProposals, operationForDraft } from "@/lib/jobAnalysisProposals";
 import {
   consultationQueryOptions,
   jobAnalysisKeys,
 } from "@/lib/jobAnalysisQueries";
 import { ProposalCard } from "./ProposalCard";
+import { OpksProposalCard } from "./OpksProposalCard";
 
 function errorText(error: unknown) {
   return error instanceof JobAnalysisApiError
@@ -37,6 +41,7 @@ export function ConsultationPanel({ documentId }: { documentId: string }) {
     queryClient.setQueryData(jobAnalysisKeys.document(documentId), {
       ...view.document,
       tasks: view.tasks,
+      opks_items: view.opks_items,
     });
     await queryClient.invalidateQueries({ queryKey: jobAnalysisKeys.documents });
   };
@@ -65,8 +70,28 @@ export function ConsultationPanel({ documentId }: { documentId: string }) {
     onSuccess: applyView,
   });
 
+  const opksDecisionMutation = useMutation({
+    mutationFn: (variables: {
+      proposalId: string;
+      idempotencyKey: string;
+      decision: OpksProposalDecisionWrite;
+    }) =>
+      decideOpksProposal(
+        documentId,
+        variables.proposalId,
+        variables.idempotencyKey,
+        variables.decision,
+      ),
+    onSuccess: applyView,
+  });
+
   const send = () => {
-    if (!draft.trim() || turnMutation.isPending || decisionMutation.isPending) return;
+    if (
+      !draft.trim() ||
+      turnMutation.isPending ||
+      decisionMutation.isPending ||
+      opksDecisionMutation.isPending
+    ) return;
     turnMutation.mutate(
       operationForDraft(
         turnMutation.variables,
@@ -94,6 +119,26 @@ export function ConsultationPanel({ documentId }: { documentId: string }) {
     );
   };
 
+  const decideOpks = (
+    proposalId: string,
+    decision: OpksProposalDecisionWrite,
+  ) => {
+    const previous = opksDecisionMutation.variables;
+    const sameFailedDecision =
+      opksDecisionMutation.isError &&
+      previous?.proposalId === proposalId &&
+      JSON.stringify(previous.decision) === JSON.stringify(decision);
+    opksDecisionMutation.mutate(
+      sameFailedDecision
+        ? previous
+        : {
+            proposalId,
+            decision,
+            idempotencyKey: crypto.randomUUID(),
+          },
+    );
+  };
+
   if (consultation.isPending) {
     return <p className="text-sm text-muted-foreground">正在讀取訪談…</p>;
   }
@@ -106,6 +151,17 @@ export function ConsultationPanel({ documentId }: { documentId: string }) {
   }
 
   const proposals = groupProposals(consultation.data.proposals);
+  const opksProposalGroups = groupOpksProposals(
+    consultation.data.opks_proposals,
+  );
+  const activeOpksGroups = opksProposalGroups.filter(
+    (group) => group.active.length > 0,
+  );
+  const opksHistory = opksProposalGroups.flatMap((group) => group.history);
+  const busy =
+    decisionMutation.isPending ||
+    opksDecisionMutation.isPending ||
+    turnMutation.isPending;
 
   return (
     <section className="space-y-6" aria-label="AI 職務分析顧問">
@@ -150,7 +206,7 @@ export function ConsultationPanel({ documentId }: { documentId: string }) {
           id="employee-turn"
           className="min-h-28 w-full rounded-xl border bg-background px-3 py-2 text-sm"
           value={draft}
-          disabled={turnMutation.isPending || decisionMutation.isPending}
+          disabled={busy}
           placeholder={consultation.data.active_question?.text ?? "補充你的工作內容"}
           onChange={(event) => setDraft(event.target.value)}
           onKeyDown={(event) => {
@@ -166,7 +222,7 @@ export function ConsultationPanel({ documentId }: { documentId: string }) {
           </span>
           <Button
             type="submit"
-            disabled={!draft.trim() || turnMutation.isPending || decisionMutation.isPending}
+            disabled={!draft.trim() || busy}
           >
             <Send />
             {turnMutation.isPending ? "分析中…" : "送出"}
@@ -193,7 +249,7 @@ export function ConsultationPanel({ documentId }: { documentId: string }) {
             <ProposalCard
               key={proposal.proposal_id}
               proposal={proposal}
-              busy={decisionMutation.isPending || turnMutation.isPending}
+              busy={busy}
               onDecision={(decision) => decide(proposal.proposal_id, decision)}
             />
           ))
@@ -201,6 +257,38 @@ export function ConsultationPanel({ documentId }: { documentId: string }) {
         {decisionMutation.isError ? (
           <p role="alert" className="text-sm text-destructive">
             {errorText(decisionMutation.error)}
+          </p>
+        ) : null}
+      </div>
+
+      <div className="space-y-3">
+        <h2 className="text-lg font-semibold">待確認的 O/P/K/S 建議</h2>
+        {activeOpksGroups.length === 0 ? (
+          <p className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">
+            目前沒有需要你確認的工作產出或職能建議。
+          </p>
+        ) : (
+          activeOpksGroups.map((group) => (
+            <div key={group.operationId} className="space-y-2">
+              <p className="text-xs font-medium text-muted-foreground">
+                同一輪產生的建議
+              </p>
+              {group.active.map((proposal) => (
+                <OpksProposalCard
+                  key={proposal.proposal_id}
+                  proposal={proposal}
+                  busy={busy}
+                  onDecision={(decision) =>
+                    decideOpks(proposal.proposal_id, decision)
+                  }
+                />
+              ))}
+            </div>
+          ))
+        )}
+        {opksDecisionMutation.isError ? (
+          <p role="alert" className="text-sm text-destructive">
+            {errorText(opksDecisionMutation.error)}
           </p>
         ) : null}
       </div>
@@ -213,6 +301,24 @@ export function ConsultationPanel({ documentId }: { documentId: string }) {
           <div className="mt-3 space-y-3">
             {proposals.history.map((proposal) => (
               <ProposalCard
+                key={proposal.proposal_id}
+                proposal={proposal}
+                busy={false}
+                onDecision={() => undefined}
+              />
+            ))}
+          </div>
+        </details>
+      ) : null}
+
+      {opksHistory.length ? (
+        <details>
+          <summary className="cursor-pointer text-sm text-muted-foreground">
+            O/P/K/S 歷史建議（{opksHistory.length}）
+          </summary>
+          <div className="mt-3 space-y-3">
+            {opksHistory.map((proposal) => (
+              <OpksProposalCard
                 key={proposal.proposal_id}
                 proposal={proposal}
                 busy={false}

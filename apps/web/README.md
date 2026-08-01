@@ -7,7 +7,9 @@ user/profile/OCS 狀態。舊 `/dashboard` 與 `/documents/*` 暫留作歷史開
 Greenfield Task 編輯採「編輯 → 明確儲存／取消」；沒有 debounce autosave。下方 autosave 說明只描述舊 OCS 工作台。
 `/workspace/[document_id]` 同頁顯示可恢復的 AI 顧問訪談、待確認 Proposal 與 Current JD；
 AI 只能提出文件變更，員工接受／修改後接受才會更新 Current JD。人工 Task 編輯仍走同一組
-`/api/v1/job-analysis` application seam，沒有第二份前端 store、舊 AI 整合或舊資料雙寫。
+`/api/v1/job-analysis` application seam，沒有第二份前端 store、舊 AI 整合或舊資料雙寫。Current JD
+同頁另按 Task 顯示 O/P/K/S，態度與未連結 K/S 留在文件層；員工可明確儲存，或要求 AI 先產生
+逐項可接受／修改／拒絕／稍後處理的 OPKS Proposal。
 
 「著作」bounded context 的前端:職務說明書**工作台**(D27)。使用者在一張可編輯的官方
 職能基準表格上「選職類 → 選任務 → 填格」,所有變更自動儲存為 draft,最後 finalize 產

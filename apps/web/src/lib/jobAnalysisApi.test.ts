@@ -1,12 +1,22 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { JdTaskWrite, ProposalDecisionWrite } from "@caliburn/job-analysis-contract";
+import type {
+  JdTaskWrite,
+  OpksItemWrite,
+  OpksProposalDecisionWrite,
+  ProposalDecisionWrite,
+} from "@caliburn/job-analysis-contract";
 
 import {
   JobAnalysisApiError,
   createDocument,
+  addOpksItem,
   addTask,
+  decideOpksProposal,
   deleteTask,
+  deleteOpksItem,
   editTask,
+  editOpksItem,
+  generateOpksProposals,
   getDocument,
   getConsultation,
   jobAnalysisProblemMessage,
@@ -149,6 +159,74 @@ describe("Current JD Task client", () => {
       ["PUT", `http://127.0.0.1:8001/api/v1/job-analysis/documents/${DOCUMENT_ID}/task-order`],
       ["DELETE", `http://127.0.0.1:8001/api/v1/job-analysis/documents/${DOCUMENT_ID}/tasks/task-1`],
     ]);
+  });
+});
+
+describe("Current JD OPKS client", () => {
+  const item: OpksItemWrite = {
+    entity_kind: "knowledge",
+    text: "營運指標定義",
+    task_refs: ["task-1"],
+    indicator_refs: [],
+  };
+
+  it("uses the explicit OPKS authoring, generation, and decision routes", async () => {
+    const view = {
+      ...item,
+      entity_id: "knowledge-1",
+      evidence_quotes: [],
+    };
+    const generation = {
+      outcome: "proposed",
+      proposal_ids: ["generation-1-op0"],
+    };
+    const consultation = {
+      document: {
+        document_id: DOCUMENT_ID,
+        title: "門市營運專員",
+        updated_at: "2026-08-01T10:00:00Z",
+      },
+      conversation: [],
+      active_question: null,
+      proposals: [],
+      opks_proposals: [],
+      tasks: [],
+      opks_items: [],
+    };
+    const decision: OpksProposalDecisionWrite = { decision: "accepted" };
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(response(view, 201))
+      .mockResolvedValueOnce(response(view))
+      .mockResolvedValueOnce(response(null, 204))
+      .mockResolvedValueOnce(response(generation))
+      .mockResolvedValueOnce(response(consultation));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await addOpksItem(DOCUMENT_ID, item, "opks-add");
+    await editOpksItem(DOCUMENT_ID, "knowledge-1", item, "opks-edit");
+    await deleteOpksItem(DOCUMENT_ID, "knowledge-1", "opks-delete");
+    await generateOpksProposals(DOCUMENT_ID, "task-1", "opks-generate");
+    await decideOpksProposal(
+      DOCUMENT_ID,
+      "proposal-1",
+      "opks-decide",
+      decision,
+    );
+
+    expect(fetchMock.mock.calls.map((call) => [call[1].method, call[0]])).toEqual([
+      ["POST", `http://127.0.0.1:8001/api/v1/job-analysis/documents/${DOCUMENT_ID}/opks`],
+      ["PUT", `http://127.0.0.1:8001/api/v1/job-analysis/documents/${DOCUMENT_ID}/opks/knowledge-1`],
+      ["DELETE", `http://127.0.0.1:8001/api/v1/job-analysis/documents/${DOCUMENT_ID}/opks/knowledge-1`],
+      ["POST", `http://127.0.0.1:8001/api/v1/job-analysis/documents/${DOCUMENT_ID}/tasks/task-1/opks-proposals`],
+      ["POST", `http://127.0.0.1:8001/api/v1/job-analysis/documents/${DOCUMENT_ID}/opks-proposals/proposal-1/decisions`],
+    ]);
+    expect(fetchMock.mock.calls.map((call) => call[1].headers)).toEqual(
+      ["opks-add", "opks-edit", "opks-delete", "opks-generate", "opks-decide"].map(
+        (key) => expect.objectContaining({ "Idempotency-Key": key }),
+      ),
+    );
+    expect(fetchMock.mock.calls[4][1].body).toBe(JSON.stringify(decision));
   });
 });
 

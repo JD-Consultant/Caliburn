@@ -216,41 +216,59 @@ def test_scenario_is_frozen_at_three_turns():
     assert "門市帳號權限清單" in SMOKE_TURNS[2].employee_text
 
 
-def test_reserve_uses_request_bytes_as_the_input_upper_bound():
+def test_precheck_estimate_is_derived_from_request_bytes_and_is_not_a_bound():
+    """byte 數只是決定性的量級估算。**它不是 token 數的上界**——2026-08-02 實測
+    3,744 bytes 對 12,168 prompt tokens，所以這個估算會低估，真正的保證是呼叫次數與
+    回應後的實際 cost 結算。"""
+
     budget = LiveSmokeBudget()
     body = {"model": MODEL, "messages": [{"role": "user", "content": "工作內容"}]}
-    expected_input = len(canonical_request_json(body).encode("utf-8"))
+    estimated_input = len(canonical_request_json(body).encode("utf-8"))
 
-    reserve = budget.reserve_or_raise(
+    estimate = budget.precheck_or_raise(
         request_body=body,
         endpoint=endpoint_snapshot(),
         max_output_tokens=MAX_OUTPUT_TOKENS,
     )
 
-    assert reserve == (
-        Decimal(expected_input) * Decimal("0.000005")
+    assert estimate == (
+        Decimal(estimated_input) * Decimal("0.000005")
         + Decimal(MAX_OUTPUT_TOKENS) * Decimal("0.000025")
     )
     assert budget.calls == 1
     assert budget.spent_usd == Decimal("0")
 
 
-def test_reserve_refuses_once_the_call_ceiling_is_reached():
+def test_actual_spend_may_exceed_the_precheck_estimate_and_still_stops_the_run():
+    """回歸守門:估算低估時,停線責任落在回應後的實際結算上。"""
+
+    budget = LiveSmokeBudget(limit_usd=Decimal("0.20"))
+    budget.precheck_or_raise(
+        request_body={"model": MODEL},
+        endpoint=endpoint_snapshot(),
+        max_output_tokens=MAX_OUTPUT_TOKENS,
+    )
+
+    with pytest.raises(LiveSmokeBudgetExceeded, match="actual spend"):
+        budget.record_actual_or_raise(cost_usd=Decimal("0.30"))
+
+
+def test_precheck_refuses_once_the_call_ceiling_is_reached():
     budget = LiveSmokeBudget(calls=MAX_GENERATION_CALLS)
 
     with pytest.raises(LiveSmokeBudgetExceeded, match="generation call"):
-        budget.reserve_or_raise(
+        budget.precheck_or_raise(
             request_body={"model": MODEL},
             endpoint=endpoint_snapshot(),
             max_output_tokens=MAX_OUTPUT_TOKENS,
         )
 
 
-def test_reserve_refuses_before_the_limit_would_be_crossed():
+def test_precheck_refuses_when_the_estimate_alone_already_exceeds_the_cap():
     budget = LiveSmokeBudget(spent_usd=Decimal("0.70"))
 
     with pytest.raises(LiveSmokeBudgetExceeded, match="US\\$"):
-        budget.reserve_or_raise(
+        budget.precheck_or_raise(
             request_body={"model": MODEL},
             endpoint=endpoint_snapshot(),
             max_output_tokens=MAX_OUTPUT_TOKENS,

@@ -4,8 +4,18 @@
 Context、Opus 5 與 Anthropic direct route 合在一起時,一條 synthetic 三回合路徑能不能
 跑完 verified commit／reload,以及下一個最值得修的是哪一層。
 
-硬界線(研究紀錄 §4.4):**最多 3 次 generation call、總額 US$0.75、沒有任何 retry**。
-每次 HTTP 之前先用 live catalog 價格算保守 reserve;超過就在送出前停,不是事後才說超支。
+硬界線(研究紀錄 §4.4):**最多 3 次 generation call、沒有任何 retry、每次回應後照實際 cost
+結算,超過 US$0.75 就停掉剩餘回合**。這三條是真的保證。
+
+送出前那道 `precheck_or_raise()` 只是**估算,不是上限**——2026-08-02 的 OPKS live smoke 實測
+證明它會低估(見 `docs/experiments/2026-08-02-opks-attributed-live-smoke/`):
+
+- **input**:計費用的是模型自家 tokenizer,本機只有 HTTP body 的 byte 數。**byte 數不是 token
+  數的上界**,那次是 3,744 bytes 對 12,168 prompt tokens。
+- **output**:reasoning token 是要計費的 output token,而且**不受送出的輸出上限約束**。
+  那次送 4,096,實際計費 completion 10,736(其中 9,211 是 reasoning)。
+
+所以真正擋住失控的是呼叫次數上限與回應後的實際 cost 結算,不是這道估算。
 
 只有這支 CLI 的 `RecordingTransport` 會 opt in router metadata 並明確關掉 response
 cache——`OpenRouterAdapter` 與 FastAPI dependency 的 headers 一個字都沒改。診斷需求不該
@@ -131,8 +141,12 @@ SMOKE_TURNS: tuple[SmokeTurn, ...] = (
 
 
 def canonical_request_json(body: Any) -> str:
-    """決定性序列化。也當作 input token 的上界基準——BPE token 數不會超過承載它的
-    UTF-8 byte 數,所以拿 byte 數估價一定偏保守。"""
+    """決定性序列化(manifest 的 schema hash 與成本估算共用同一份文字)。
+
+    **byte 數不是 token 數的上界。** 計費用模型自家的 tokenizer,本機看不到;實測同一份
+    request 是 3,744 bytes 對 12,168 prompt tokens。這裡用 byte 數只是要一個決定性的
+    量級估算,不能當成保證。
+    """
     return json.dumps(body, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
 
 
@@ -167,31 +181,37 @@ class LiveSmokeBudget:
     spent_usd: Decimal = Decimal("0")
     calls: int = 0
 
-    def reserve_or_raise(
+    def precheck_or_raise(
         self,
         *,
         request_body: Any,
         endpoint: OpenRouterEndpointSnapshot,
         max_output_tokens: int,
     ) -> Decimal:
-        """保守 reserve。reasoning 與可見輸出共用同一個 output 上限,所以整條上限都算進來。"""
+        """送出前的門。**呼叫次數是硬上限;金額只是估算。**
+
+        回傳的估算已知會低估:input 用 byte 數代替看不到的 provider tokenizer,output 用送出的
+        上限代替實際計費量,而 reasoning 不受該上限約束(2026-08-02 實測 2.7 倍)。它仍然
+        擋得掉「剩餘額度明顯不夠」這種情況,但**不能當成不會超支的保證**——那由
+        `record_actual_or_raise()` 在回應之後負責。
+        """
         if self.calls >= self.max_generation_calls:
             raise LiveSmokeBudgetExceeded(
                 f"already used {self.calls} of {self.max_generation_calls} generation calls"
             )
-        input_upper_tokens = len(canonical_request_json(request_body).encode("utf-8"))
-        reserve = (
-            Decimal(input_upper_tokens) * endpoint.prompt_price_per_token
+        estimated_input_tokens = len(canonical_request_json(request_body).encode("utf-8"))
+        estimate = (
+            Decimal(estimated_input_tokens) * endpoint.prompt_price_per_token
             + Decimal(max_output_tokens) * endpoint.completion_price_per_token
         )
-        if self.spent_usd + reserve > self.limit_usd:
+        if self.spent_usd + estimate > self.limit_usd:
             raise LiveSmokeBudgetExceeded(
-                f"reserve would exceed the cap: US${self.spent_usd} + US${reserve} "
+                f"estimate already exceeds the cap: US${self.spent_usd} + US${estimate} "
                 f"> US${self.limit_usd}"
             )
         # 先記帳再送出:中途爆掉也不會把這次呼叫算成沒發生過。
         self.calls += 1
-        return reserve
+        return estimate
 
     def record_actual_or_raise(self, *, cost_usd: Decimal | None) -> None:
         if cost_usd is None or cost_usd < 0:
@@ -233,7 +253,7 @@ class RecordingTransport:
     async def __call__(
         self, *, url: str, headers: Any, body: Any, timeout: float
     ) -> TransportResponse:
-        reserve = self._budget.reserve_or_raise(
+        estimate = self._budget.precheck_or_raise(
             request_body=body,
             endpoint=self._endpoint,
             max_output_tokens=self.max_output_tokens,
@@ -245,7 +265,7 @@ class RecordingTransport:
             timeout=timeout,
         )
         self.calls.append(
-            {"url": url, "body": dict(body), "reserved_usd": str(reserve)}
+            {"url": url, "body": dict(body), "estimated_usd": str(estimate)}
         )
         self.responses.append(response)
         return response
@@ -389,7 +409,7 @@ async def run_live_smoke(
             )
             outcome, detail = "committed", None
         except LiveSmokeBudgetExceeded as error:
-            # reserve 在 HTTP 之前就擋下了,這一回合沒有送出、也沒有 capture。
+            # 送出前的門擋下了,這一回合沒有 HTTP、也沒有 capture。
             stopped_reason = f"turn {index} was not sent: {error}"
             break
         except Exception as error:  # noqa: BLE001 — 每種失敗都要留在 capture 裡
@@ -518,6 +538,7 @@ async def _run(args: argparse.Namespace) -> int:
         "tag": endpoint.tag,
         "prompt_price_per_token": str(endpoint.prompt_price_per_token),
         "completion_price_per_token": str(endpoint.completion_price_per_token),
+        "output_cap_parameter": endpoint.output_cap_parameter,
     }
     if args.max_generation_calls == 0:
         print(
@@ -557,6 +578,8 @@ async def _run(args: argparse.Namespace) -> int:
                 provider_order=(tag,),
                 max_output_tokens=settings.job_analysis_max_output_tokens,
                 timeout_seconds=settings.job_analysis_timeout_s,
+                # catalog 說支援哪個就送哪個;不猜、也不硬換成偏好的新名字。
+                output_cap_parameter=endpoint.output_cap_parameter,
             ),
             api_key=api_key,
             transport=recording,

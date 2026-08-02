@@ -176,6 +176,8 @@ async def test_a_verified_round_makes_exactly_one_call_with_the_pinned_route():
     assert call["url"] == CHAT_COMPLETIONS_URL
     assert call["headers"]["Authorization"] == "Bearer sk-test"
     assert body["model"] == "anthropic/claude-opus-5"
+    assert body["max_tokens"] == 4096
+    assert "max_completion_tokens" not in body
     assert body["reasoning"] == {"effort": "high", "exclude": True}
     assert body["stream"] is False
     assert body["provider"] == {
@@ -192,6 +194,30 @@ async def test_a_verified_round_makes_exactly_one_call_with_the_pinned_route():
             "schema": task_analysis_wire_provider_schema(),
         },
     }
+
+
+def test_output_cap_parameter_name_comes_from_config_and_only_one_is_sent():
+    """OpenRouter 已 deprecate `max_tokens`,但 per-endpoint 的 supported_parameters 未必
+    跟著更名。request 帶 `require_parameters: true`,送一個沒宣告的名字會被拒或被靜默
+    丟掉——後者等於輸出上限消失。所以名字跟著 catalog 走,而且一次只送一個。"""
+
+    adapter = OpenRouterAdapter(
+        config=CONFIG.model_copy(
+            update={"output_cap_parameter": "max_completion_tokens"}
+        ),
+        api_key="sk-test",
+        transport=RecordingTransport(chat_response(valid_result_json())),
+    )
+
+    body = adapter.build_body(
+        instructions="x",
+        packet_text="y",
+        schema_name=TASK_ANALYSIS_WIRE_SCHEMA_NAME,
+        schema=task_analysis_wire_provider_schema(),
+    )
+
+    assert body["max_completion_tokens"] == 4096
+    assert "max_tokens" not in body
 
 
 @pytest.mark.parametrize(

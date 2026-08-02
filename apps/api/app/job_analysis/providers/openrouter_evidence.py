@@ -34,13 +34,31 @@ MODEL_ENDPOINTS_URL_TEMPLATE = (
 # 支援的 endpoint,不保證這份清單永遠存在——所以每次付費前都要重查。
 REQUIRED_ENDPOINT_PARAMETERS = frozenset(
     {
-        "max_tokens",
         "reasoning",
         "reasoning_effort",
         "response_format",
         "structured_outputs",
     }
 )
+
+# 輸出上限參數,偏好順序由新到舊。OpenRouter 已把 `max_tokens` 標為 deprecated 並建議改用
+# `max_completion_tokens`,但**per-endpoint 的 `supported_parameters` 未必已經跟著更名**
+# (2026-08-02 實測 `openai/gpt-5.6-luna-pro` 只列 `max_tokens`)。因為送出的 body 帶
+# `require_parameters: true` 且 `allow_fallbacks: false`,送一個 endpoint 沒宣告的參數不是
+# 路由失敗就是被靜默丟掉——後者會讓輸出上限整個消失,比舊參數名更危險。
+# 所以參數名**由 catalog 決定**,不由我們猜。
+OUTPUT_CAP_PARAMETERS = ("max_completion_tokens", "max_tokens")
+
+
+def select_output_cap_parameter(supported: frozenset[str] | set[str]) -> str:
+    """回傳這個 endpoint 實際宣告支援、且我們最偏好的輸出上限參數名。"""
+
+    for parameter in OUTPUT_CAP_PARAMETERS:
+        if parameter in supported:
+            return parameter
+    raise OpenRouterCatalogError(
+        f"endpoint advertises no output cap parameter: {sorted(OUTPUT_CAP_PARAMETERS)}"
+    )
 
 # 只有這種 stage 有機會保住資格:它宣稱只做檢查,而且資料自證沒有作用。
 _INSPECTION_STAGE_TYPE = "guardrail"
@@ -77,6 +95,8 @@ class OpenRouterEndpointSnapshot(DomainModel):
     prompt_price_per_token: Decimal
     completion_price_per_token: Decimal
     supported_parameters: frozenset[NonEmptyText]
+    # 這個 endpoint 當下真的宣告支援的輸出上限參數名;adapter 照它送,不照我們的偏好猜。
+    output_cap_parameter: NonEmptyText
 
 
 class OpenRouterExecutionEvidence(DomainModel):
@@ -198,6 +218,7 @@ def select_catalog_endpoint(
         prompt_price_per_token=_price(pricing, "prompt"),
         completion_price_per_token=_price(pricing, "completion"),
         supported_parameters=frozenset(supported),
+        output_cap_parameter=select_output_cap_parameter(supported),
     )
 
 

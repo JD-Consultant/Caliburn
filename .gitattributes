@@ -1,3 +1,11 @@
 # V3-5 turn eval case artifacts:hash 以 raw bytes/LF 計(plan §6.2/§6.7);
 # 不讓 git autocrlf 在 checkout 時改寫換行,否則 loader 的 no-CR gate 會 hard fail。
 apps/api/evals/interview_vnext/cases/** text eol=lf
+
+# vNext 的歷史契約以 committed LF bytes 鎖 hash；Windows checkout 也不得改成 CRLF。
+apps/api/app/interview_vnext/domain/schemas/** text eol=lf
+apps/api/app/interview_vnext/llm/context_policies/** text eol=lf
+apps/api/app/interview_vnext/llm/verifier_policies/** text eol=lf
+apps/api/app/interview_vnext/llm/operations/** text eol=lf
+apps/api/app/interview_vnext/llm/prompts/** text eol=lf
+apps/api/evals/interview_vnext/schemas/** text eol=lf

@@ -1,0 +1,461 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://caliburn.dev/schema/job-analysis-workspace.schema.json",
+  "title": "JobAnalysisWorkspaceContract",
+  "description": "Local Web document and Current JD Task wire contract.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {},
+  "$defs": {
+    "DocumentMetadataWrite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title"],
+      "properties": {
+        "title": { "type": "string" }
+      }
+    },
+    "DocumentMetadataView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["document_id", "title", "updated_at"],
+      "properties": {
+        "document_id": { "type": "string", "format": "uuid" },
+        "title": { "type": "string" },
+        "updated_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "DocumentSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["document_id", "title", "task_count", "updated_at"],
+      "properties": {
+        "document_id": { "type": "string", "format": "uuid" },
+        "title": { "type": "string" },
+        "task_count": { "type": "integer", "minimum": 0 },
+        "updated_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "Enabler": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "name"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["tool_system", "method", "knowledge", "skill", "other"]
+        },
+        "name": { "type": "string" }
+      }
+    },
+    "JdTaskWrite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "statement",
+        "purpose_result",
+        "context",
+        "frequency_text",
+        "responsibility_role",
+        "enablers"
+      ],
+      "properties": {
+        "statement": { "type": "string" },
+        "purpose_result": { "type": ["string", "null"] },
+        "context": { "type": ["string", "null"] },
+        "frequency_text": { "type": ["string", "null"] },
+        "responsibility_role": {
+          "type": ["string", "null"],
+          "enum": ["primary", "shared", "assist", "", null]
+        },
+        "enablers": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Enabler" }
+        }
+      }
+    },
+    "JdTaskView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "statement",
+        "purpose_result",
+        "context",
+        "frequency_text",
+        "responsibility_role",
+        "enablers",
+        "display_order"
+      ],
+      "properties": {
+        "task_id": { "type": "string" },
+        "statement": { "type": "string" },
+        "purpose_result": { "type": ["string", "null"] },
+        "context": { "type": ["string", "null"] },
+        "frequency_text": { "type": ["string", "null"] },
+        "responsibility_role": {
+          "type": ["string", "null"],
+          "enum": ["primary", "shared", "assist", null]
+        },
+        "enablers": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Enabler" }
+        },
+        "display_order": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "OpksItemWrite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["entity_kind", "text", "task_refs", "indicator_refs"],
+      "properties": {
+        "entity_kind": {
+          "type": "string",
+          "enum": ["output", "indicator", "knowledge", "skill", "attitude"]
+        },
+        "text": { "type": "string" },
+        "task_refs": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "indicator_refs": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "OpksItemView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "entity_id",
+        "entity_kind",
+        "text",
+        "task_refs",
+        "indicator_refs",
+        "evidence_quotes"
+      ],
+      "properties": {
+        "entity_id": { "type": "string" },
+        "entity_kind": {
+          "type": "string",
+          "enum": ["output", "indicator", "knowledge", "skill", "attitude"]
+        },
+        "text": { "type": "string" },
+        "task_refs": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "indicator_refs": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "evidence_quotes": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "OpksGenerationView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["outcome", "proposal_ids"],
+      "properties": {
+        "outcome": {
+          "type": "string",
+          "enum": ["proposed", "no_grounded_candidates"]
+        },
+        "proposal_ids": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "OpksProposalView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "proposal_id",
+        "operation_id",
+        "entity_id",
+        "entity_kind",
+        "action",
+        "status",
+        "before",
+        "after",
+        "edited_after",
+        "rejection_reason",
+        "stale_reason"
+      ],
+      "properties": {
+        "proposal_id": { "type": "string" },
+        "operation_id": { "type": "string" },
+        "entity_id": { "type": "string" },
+        "entity_kind": {
+          "type": "string",
+          "enum": ["output", "indicator", "knowledge", "skill", "attitude"]
+        },
+        "action": {
+          "type": "string",
+          "enum": ["add", "revise", "remove"]
+        },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "deferred", "accepted", "edited", "rejected", "stale"]
+        },
+        "before": {
+          "oneOf": [
+            { "$ref": "#/$defs/OpksItemView" },
+            { "type": "null" }
+          ]
+        },
+        "after": {
+          "oneOf": [
+            { "$ref": "#/$defs/OpksItemView" },
+            { "type": "null" }
+          ]
+        },
+        "edited_after": {
+          "oneOf": [
+            { "$ref": "#/$defs/OpksItemView" },
+            { "type": "null" }
+          ]
+        },
+        "rejection_reason": { "type": ["string", "null"] },
+        "stale_reason": { "type": ["string", "null"] }
+      }
+    },
+    "DocumentView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["document_id", "title", "updated_at", "tasks", "opks_items"],
+      "properties": {
+        "document_id": { "type": "string", "format": "uuid" },
+        "title": { "type": "string" },
+        "updated_at": { "type": "string", "format": "date-time" },
+        "tasks": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/JdTaskView" }
+        },
+        "opks_items": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/OpksItemView" }
+        }
+      }
+    },
+    "ConversationTurnView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["turn_id", "speaker", "text"],
+      "properties": {
+        "turn_id": { "type": "string" },
+        "speaker": { "type": "string", "enum": ["employee", "consultant"] },
+        "text": { "type": "string" }
+      }
+    },
+    "ActiveQuestionView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["turn_id", "text"],
+      "properties": {
+        "turn_id": { "type": "string" },
+        "text": { "type": "string" }
+      }
+    },
+    "ProposalJdEntryView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["task_id", "value"],
+      "properties": {
+        "task_id": { "type": "string" },
+        "value": {
+          "oneOf": [
+            { "$ref": "#/$defs/JdTaskView" },
+            { "type": "null" }
+          ]
+        }
+      }
+    },
+    "ProposalView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "proposal_id",
+        "action",
+        "status",
+        "jd_before",
+        "jd_after",
+        "edited_jd_after",
+        "rejection_reason",
+        "stale_reason",
+        "evidence_quotes"
+      ],
+      "properties": {
+        "proposal_id": { "type": "string" },
+        "action": {
+          "type": "string",
+          "enum": ["add", "revise", "withdraw", "merge", "split"]
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "deferred",
+            "accepted",
+            "edited",
+            "rejected",
+            "revision_requested",
+            "stale"
+          ]
+        },
+        "jd_before": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ProposalJdEntryView" }
+        },
+        "jd_after": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ProposalJdEntryView" }
+        },
+        "edited_jd_after": {
+          "type": ["array", "null"],
+          "items": { "$ref": "#/$defs/ProposalJdEntryView" }
+        },
+        "rejection_reason": { "type": ["string", "null"] },
+        "stale_reason": { "type": ["string", "null"] },
+        "evidence_quotes": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "ConsultationView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "document",
+        "conversation",
+        "active_question",
+        "proposals",
+        "opks_proposals",
+        "tasks",
+        "opks_items"
+      ],
+      "properties": {
+        "document": { "$ref": "#/$defs/DocumentMetadataView" },
+        "conversation": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ConversationTurnView" }
+        },
+        "active_question": {
+          "oneOf": [
+            { "$ref": "#/$defs/ActiveQuestionView" },
+            { "type": "null" }
+          ]
+        },
+        "proposals": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ProposalView" }
+        },
+        "opks_proposals": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/OpksProposalView" }
+        },
+        "tasks": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/JdTaskView" }
+        },
+        "opks_items": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/OpksItemView" }
+        }
+      }
+    },
+    "EmployeeTurnWrite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["text"],
+      "properties": {
+        "text": { "type": "string", "minLength": 1 }
+      }
+    },
+    "ProposalDecisionWrite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["decision"],
+      "properties": {
+        "decision": {
+          "type": "string",
+          "enum": ["accepted", "edited", "rejected", "deferred"]
+        },
+        "edited_jd_after": {
+          "type": ["array", "null"],
+          "items": { "$ref": "#/$defs/ProposalJdEntryView" },
+          "default": null
+        },
+        "reason": { "type": ["string", "null"], "default": null }
+      }
+    },
+    "OpksProposalDecisionWrite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["decision"],
+      "properties": {
+        "decision": {
+          "type": "string",
+          "enum": ["accepted", "edited", "rejected", "deferred"]
+        },
+        "edited_text": { "type": ["string", "null"], "default": null },
+        "reason": { "type": ["string", "null"], "default": null }
+      }
+    },
+    "TaskOrderWrite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ordered_task_ids"],
+      "properties": {
+        "ordered_task_ids": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "ProblemFieldError": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["field", "message"],
+      "properties": {
+        "field": { "type": "string" },
+        "message": { "type": "string" }
+      }
+    },
+    "ProblemDetail": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["type", "title", "status"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "https://caliburn.dev/problems/job-analysis/document-not-found",
+            "https://caliburn.dev/problems/job-analysis/task-not-found",
+            "https://caliburn.dev/problems/job-analysis/idempotency-conflict",
+            "https://caliburn.dev/problems/job-analysis/authority-conflict",
+            "https://caliburn.dev/problems/job-analysis/invalid-task-order",
+            "https://caliburn.dev/problems/job-analysis/invalid-request",
+            "https://caliburn.dev/problems/job-analysis/proposal-not-found",
+            "https://caliburn.dev/problems/job-analysis/consultant-unavailable",
+            "https://caliburn.dev/problems/job-analysis/opks-item-not-found"
+          ]
+        },
+        "title": { "type": "string" },
+        "status": { "type": "integer", "minimum": 400, "maximum": 599 },
+        "detail": { "type": ["string", "null"], "default": null },
+        "errors": {
+          "type": ["array", "null"],
+          "items": { "$ref": "#/$defs/ProblemFieldError" },
+          "default": null
+        }
+      }
+    }
+  }
+}

@@ -1,7 +1,7 @@
 # API test CI(vNext V2-B;durable persistence plan §3.1/§3.4):
 # 完整 pytest suite + PostgreSQL 16 整合測試(migration/repository/outbox/recovery)。
 # TEST_DATABASE_URL 在 CI 必設——require_postgres fixture 會把「未設 URL」判 fail,
-# 不允許 persistence tests 以 skipped 假通過。evals.yml(promptfoo)不算 persistence CI。
+# 不允許 persistence tests 以 skipped 假通過。淘汰的 v3 promptfoo PR workflow 已移除。
 name: api-tests
 
 on:

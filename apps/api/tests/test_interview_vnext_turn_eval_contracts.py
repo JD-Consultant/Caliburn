@@ -85,17 +85,17 @@ SHA = "sha256:" + "0" * 64
 GIT_SHA = "1" * 40
 
 HISTORICAL_SCHEMA_HASHES = {
-    "turn-eval-batch-plan.v1.schema.json": "sha256:c6db755690bcae447cf58da427220e51260773be96998989266662b1d466aaa1",
-    "turn-eval-batch-report.v1.schema.json": "sha256:12b9243b4100daeac7637093dcefebd5403a02754a9cea6fca05acaa2f933728",
-    "turn-eval-case.v1.schema.json": "sha256:6222ad7955eb862003fa4eceaab8942c09de908628e30a412c32c6dbbd4a89c6",
-    "turn-eval-case-report.v1.schema.json": "sha256:812c502586735d6d1b37f5f07137f2cdf3bccaa2a3890adbdda79158c34e6ecf",
-    "turn-eval-gold.v1.schema.json": "sha256:1d8b8886e1d777f4f3491bf9cbf34a37178f45ce946cea22a8999a55ef0b8184",
-    "turn-eval-grader-result.v1.schema.json": "sha256:385adb08f90639dc539e32203d6fe29a6a5527d810b11f464b284ae8f6d4a312",
-    "turn-eval-initial-fixture.v1.schema.json": "sha256:174a88f05893be650b68f50382df7c1cdf5b1e3fe4968ca77744879c710e7277",
-    "turn-eval-reference-output.v1.schema.json": "sha256:f7abbcf5b423dd73e9732edf23c3ab15062f0b63a5d6f749a5a25dd494d2c176",
-    "turn-eval-review-decision.v1.schema.json": "sha256:416b7cd6f2e615026d7b705a70e1397590ba6e3dbb83b414f857967276385e32",
-    "turn-eval-transcript.v1.schema.json": "sha256:b49140e7a8275ccd6ac9325c33632307098873024942f4ea9a6a50f5ce42b136",
-    "turn-eval-trial.v1.schema.json": "sha256:bf475714581279661c88f2ccd93b4b6a5ce53189c649f54a67e7e3593b35289e",
+    "turn-eval-batch-plan.v1.schema.json": "sha256:49e319e0fdd6a57ab82da49ddf32f3ebc16837598b35aa975e2e00eb01921fba",
+    "turn-eval-batch-report.v1.schema.json": "sha256:7f76a40a2e744b0cce509a87833c1af669f226e2f5de7e3b7bc33faa99bc8738",
+    "turn-eval-case.v1.schema.json": "sha256:223660b00487327c858576f8ed5e65a139b7ac754d3a017a285239ff66e2fcf9",
+    "turn-eval-case-report.v1.schema.json": "sha256:b63dcc32088244f3f45571d23df9d9463d9a7ce693761f23b27b02194ab45119",
+    "turn-eval-gold.v1.schema.json": "sha256:173abb0ba9bd63c8b01b29131c4b8f0822db5ce53a81aecfec7105828bcb417c",
+    "turn-eval-grader-result.v1.schema.json": "sha256:edca89202bb0279732349af64263cbc7611bcce5f979b7c22ce763fd94701fde",
+    "turn-eval-initial-fixture.v1.schema.json": "sha256:ebd56d8ed239d2e5ecf3372f4224d555dace6b97a68f94f368460dc0f6d89b57",
+    "turn-eval-reference-output.v1.schema.json": "sha256:e5c34a026818c068b0da1173a6de8ed2468f2282fdf09e102195f7866de6e75e",
+    "turn-eval-review-decision.v1.schema.json": "sha256:2cdc8012d3a55e1540271003dde3f2f0f701d5ff8be30766b2c0af293f01c051",
+    "turn-eval-transcript.v1.schema.json": "sha256:1e25f62715a2936233b63779c596d8918d8bd2596d4c99a24753992946cc2c14",
+    "turn-eval-trial.v1.schema.json": "sha256:ff6201463d22fa910855bcb66c8c8793c03e572d3f04eaa4d3817577c5e16c32",
 }
 
 

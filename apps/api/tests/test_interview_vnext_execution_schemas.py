@@ -108,7 +108,7 @@ def test_committed_context_policies_match_hash_addressed_registry():
         )
         assert policy.policy_hash.startswith("sha256:")
     assert sha256((POLICY_DIR / historical_name).read_bytes()).hexdigest() == (
-        "d6e34a228ab562fe41179daa3923fca6db9634b4b00fbac5a1b03593afce9619"
+        "38e0184ccda45be4adba486ca7d9acb959d4e222980aa9aa9768107450390528"
     )
 
 
@@ -147,7 +147,7 @@ def test_committed_turn_verifier_policy_matches_hash_addressed_contract():
     # v1 is frozen history, not a second active runtime contract.
     historical_bytes = paths["turn-interpret-verifier.1.0.0.json"].read_bytes()
     assert sha256(historical_bytes).hexdigest() == (
-        "71abe648c9c8bc9112c5c01cc0f1393af58da1e88ce57307370e2eead5b5eebb"
+        "3fa0fd958a587fd1117932b09b0b5228699e0051b869698bcd30c416f377bb31"
     )
 
     active = json.loads(
@@ -175,7 +175,7 @@ def test_committed_operation_document_and_prompt_match_current_contracts():
     for forbidden in ("o*net", "ocs", "職務說明書", "chain-of-thought"):
         assert forbidden not in folded
     assert sha256((OPERATION_DIR / historical_operation).read_bytes()).hexdigest() == (
-        "0eed5920a97f746e7696ea07d3633e4c6f638166b884ee17bb80f4db162d17e2"
+        "30656ac69518d9ab73d429bb434d894d334e535e8fb42c8b8d5a1b28e749f134"
     )
     historical_prompt = TURN_INTERPRET_PROMPT_PATH.with_name("turn-interpret.1.0.0.md")
     assert sha256(historical_prompt.read_bytes()).hexdigest() == (

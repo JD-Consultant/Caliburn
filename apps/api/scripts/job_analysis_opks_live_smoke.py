@@ -5,7 +5,7 @@ packet、wire schema 與產品配置的模型合在一起時，一次真呼叫�
 generate → verify → proposal，以及下一個最值得修的是哪一層。
 
 硬界線：**最多 1 次 generation call、沒有任何 retry、回應後照實際 cost 結算並在超過
-US$0.20 時停線**。送出前那道估算會低估（input 拿不到 provider tokenizer；輸出上限管不管得住
+``--budget-usd`` 時停線**（ceiling 見 ``DEFAULT_BUDGET_USD``，CLI 只能往下調）。送出前那道估算會低估（input 拿不到 provider tokenizer；輸出上限管不管得住
 reasoning per-provider 不同），所以它不是保證——理由與實測數字見
 ``job_analysis_live_smoke`` 的 docstring。預算、錄製與 catalog preflight 直接重用該模組，
 不另建一套。
@@ -24,7 +24,7 @@ raw capture 寫到已 gitignore 的 ``output/``，內容純 synthetic；**reques
 
 ```powershell
 uv run python scripts/job_analysis_opks_live_smoke.py --max-generation-calls 0   # 只做 preflight，不花錢
-uv run python scripts/job_analysis_opks_live_smoke.py --budget-usd 0.20 --max-generation-calls 1
+uv run python scripts/job_analysis_opks_live_smoke.py --budget-usd 0.60 --max-generation-calls 1
 ```
 """
 
@@ -106,7 +106,7 @@ from job_analysis_live_smoke import (  # noqa: E402
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_OUTPUT_ROOT = REPO_ROOT / "output" / "job-analysis-opks-live-smoke"
-DEFAULT_BUDGET_USD = Decimal("0.20")
+DEFAULT_BUDGET_USD = Decimal("0.60")
 MAX_GENERATION_CALLS = 1
 
 DOCUMENT_TITLE = "門市營運專員 [synthetic OPKS live smoke]"

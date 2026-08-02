@@ -1,8 +1,8 @@
 # job_authoring — agent rules
 
-Canonical employee/AI co-authored job document core. Greenfield module from
-**[ADR 0038](../../../../docs/adr/0038-interview-vnext-context-engine-and-professional-consultant-workflow.md)**;
-exact build spec is
+Completed revision-based employee/AI co-authoring **v1 prototype**. Its historical workflow decision was later superseded by
+**[ADR 0040](../../../../docs/adr/0040-professional-consultant-engine-and-r1-validation-contract.md)**;
+the exact v1 build spec remains
 **[2026-07-23 minimal authoring core plan](../../../../docs/plans/2026-07-23-interview-vnext-minimal-authoring-core-plan.md)**.
 This file is the short rule sheet — it does **not** restate the plan. Read the
 plan before changing anything here.
@@ -23,8 +23,10 @@ employee uses a local Web app: startup may open localhost, but there is no
 remote product URL, registration, login, account, or password, and host/port
 setup is not an employee workflow. One local operator may save multiple
 documents, but only one document workspace is active in the UI at a time; this
-does not authorize account/workspace/SaaS behavior. The next engineering budget belongs to the
-LLM job-analysis loop and minimal local Web workspace, not platform generalization.
+does not authorize account/workspace/SaaS behavior. The next engineering budget belongs to the R1 Task Discovery
+quality gate defined by ADR 0040, not a Web wiring of this prototype or platform generalization. Production cutover and
+retirement are governed by **[ADR 0041](../../../../docs/adr/0041-document-boundary-single-writer-cutover.md)** and
+**[the living boundary](../../../../docs/design/professional-consultant-engine.md)**.
 
 ## Non-negotiable invariants
 

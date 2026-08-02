@@ -52,13 +52,16 @@ Caliburn 現行目標是給員工使用的**本機 Web AI 職務分析與職務�
 - **3 個 bounded context**:`apps/pdf-to-json`(PDF→OCS JSON 解析)/ `apps/ocs-indexer`(檢索,Qdrant)/
   `apps/api` + `apps/web`(著作)。語言在這三處切換(對齊 DDD)。
 - **api = 六邊形**:`app/core`(ports + domain,純)、`app/adapters`(DB/LLM/knowledge 等邊緣)、
-  `app/services`(use-case)、`app/interview`(**現行 production 唯一 AI 大腦**:顧問+書記 op→verify→`_pending`
-  追蹤修訂;判準教材在 `app/interview/skills/`,調教首選改 skill 不改碼)、`app/observability.py`
-  (OTel 橫切)。ADR 0008 / **0030**(舊 LangGraph/CopilotKit 已退場,勿救回;端到端見
-  `docs/design/interview-engine.md`)。
-- **AI vNext 隔離中**：`app/interview_vnext` 依 ADR **0034** greenfield 實作；V1 domain 與 V2-A
-  provider-neutral/Capture contracts 已完成，無 route/DB/live LLM，production 不 import。禁止 import/wrap v3 consultant/scribe/harvest/select；細節先讀
-  `app/interview_vnext/README.md`、其 `AGENTS.md` 與 `docs/plans/2026-07-16-interview-ai-vnext-implementation-plan.md`。
+  `app/services`(use-case)、`app/interview`(**現行但過渡的 production 路徑**:顧問+書記
+  op→verify→`_pending`)、`app/observability.py`(OTel 橫切)。v3 只修阻斷／安全／資料損毀，
+  **不得擴建新產品能力**；端到端見 `docs/design/interview-engine.md`。
+- **兩個隔離 prototype 不是新核心前提**：`app/interview_vnext` 已有0010 durable persistence、
+  provider/Capture/checkpoint 與production OpenRouter backend元件，但正式router不import；`app/job_authoring` v1已有0011
+  revision三表，也未掛route。ADR **0040** 已取代0038的operation/state authority；兩者只能逐項作donor，
+  不得直接promotion或接Web。現行切換/退役邊界見 `docs/design/professional-consultant-engine.md` 與ADR **0041**。
+- **新顧問主線**：先做R1 Task Discovery品質gate，再依R2–R5完成multi-turn、resume、Duty/O/P/K/S/A、
+  proposal/current-row JD；通過後才建第一條local Web production vertical。禁止import/wrap v3
+  consultant/scribe/harvest/select，禁止重用舊vNext gold/schema/operation/state。
 - **契約**:#1 `packages/ocs-contract`(OCS 文件,JSON-schema→Pydantic+TS)、
   #2 `packages/indexer-contract`(indexer⇄api,共用 pydantic)、#3 web 吃 ocs-contract 生成的 TS。
   ADR 0004 / 0010 / 0011。
@@ -89,6 +92,6 @@ Caliburn 現行目標是給員工使用的**本機 Web AI 職務分析與職務�
   原始 diff);uv venv 沒有 pip,用 `uv pip`;CJK 用 `PYTHONUTF8=1`。
 
 ## 指路
-**`docs/README.md`(文檔系統:架構/規則/索引)** · `ARCHITECTURE.md` · `docs/adr/README.md`(0001–0034)·
+**`docs/README.md`(文檔系統:架構/規則/索引)** · `ARCHITECTURE.md` · `docs/adr/README.md`(0001–0041)·
 `docs/contract-strategy.md` · `CONTRIBUTING.md` · `docs/runbook.md` · `docs/specs/`(研究紀錄)·
 `docs/plans/` · `docs/design/`(子系統端到端設計,給 agent)。

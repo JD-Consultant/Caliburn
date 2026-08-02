@@ -1,5 +1,10 @@
 # web — Caliburn 前端(Next.js 16)
 
+> **生命周期：ACTIVE／TRANSITIONAL／maintenance-only。** 目前 UI 仍是正式可操作路徑，但 OCS deep JSON、
+> `DocumentVersion`、`profile_id` 與 `_pending` 都不是新 workspace authority。只修阻斷、安全與資料損毀；
+> 不在這條線新增新顧問／current-row 功能。切換設計見
+> [`docs/design/professional-consultant-engine.md`](../../docs/design/professional-consultant-engine.md)。
+
 「著作」bounded context 的前端:職務說明書**工作台**(D27)。使用者在一張可編輯的官方
 職能基準表格上「選職類 → 選任務 → 填格」,所有變更自動儲存為 draft,最後 finalize 產
 正式版本。只跟 `apps/api`(:8001)講話;**不直接碰 indexer / DB**。

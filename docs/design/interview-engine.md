@@ -7,6 +7,11 @@ updated: 2026-07-14
 
 # 訪談引擎 × 文件工作台 — 端到端設計(v3:一個大腦 + op→verify→`_pending`)
 
+> **生命周期：ACTIVE／TRANSITIONAL／maintenance-only。** 這仍是正式 router 的現行行為，但不是新產品 target。
+> 只修阻斷、安全與資料損毀；不得新增顧問 operation、擴充 `_pending` 或接 current-row Authoring。
+> 新引擎與退役 gate 見 [`professional-consultant-engine.md`](professional-consultant-engine.md)／
+> [ADR 0041](../adr/0041-document-boundary-single-writer-cutover.md)。
+>
 > **主讀者 = coding agent。** 目的:不看 code 也能改對這條線——不亂發明端點、不把信任
 > 機制交給 LLM、不繞過唯一寫入路徑。**living:動到這條線的碼,同 commit 更新本檔。**
 > 決策:**ADR [0033](../adr/0033-episode-agenda-consultant-tools.md)(事件驅動議程:顧問

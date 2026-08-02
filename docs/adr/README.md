@@ -14,7 +14,7 @@ ADR 是「為什麼」層;搭配 `../specs/`(細節設計)與 `../runbook.md`(�
 | [0003](0003-indexer-stays-separate-service.md) | ocs-indexer 維持獨立服務 | Accepted |
 | [0004](0004-contract-first-ocs-contract.md) | 契約優先 `packages/ocs-contract` | Accepted（Phase 2 規劃中） |
 | [0005](0005-per-app-uv-defer-workspace.md) | per-app uv 專案;uv workspace 延後 | Accepted（Phase 1） |
-| [0006](0006-multitenancy-pool-rls.md) | 多租戶 Pool + Postgres RLS | Accepted（登入時實作） |
+| [0006](0006-multitenancy-pool-rls.md) | 多租戶 Pool + Postgres RLS | **Historical product assumption／不實作**；現行本機單人範圍禁止登入與 tenant product behavior |
 | [0007](0007-langgraph-retained-mcp-ready.md) | LangGraph 留用 + 12-factor + MCP-ready | Accepted（LangGraph 留用部分由 0023 翻案:新訪談引擎全新實作,舊圖待清;12-factor 原則沿用且強化） |
 | [0008](0008-api-hexagonal-layering.md) | api 六邊形分層:ports→core、adapters→edge、移除反向邊 | Accepted（Phase 3a 已實作） |
 | [0009](0009-embedding-version-manifest.md) | embedding 版本 manifest + 查詢前相容驗證;瘦 CLI | Accepted（Phase 3c 已實作） |
@@ -49,6 +49,7 @@ ADR 是「為什麼」層;搭配 `../specs/`(細節設計)與 `../runbook.md`(�
 | [0038](0038-interview-vnext-context-engine-and-professional-consultant-workflow.md) | Interview AI vNext產品工作流：operation-specific Context Engine、Agenda／Sufficiency、JobStateDigest、專業顧問operations、canonical Authoring Core與公版參考邊界 | **Superseded by 0040**（2026-07-26；完整取代。新方向見0040，勿據0038開新工） |
 | [0039](0039-local-multi-document-canonical-public-form-workspace.md) | 本機多文件Workspace：單一操作者可保存多份JD、current canonical文件權威、公版樣式UI與autosave；MVP不做revision history | Proposed with owner amendment（2026-07-24）；儲存語意段落由0040修正（Current State + Journal 邊界） |
 | [0040](0040-professional-consultant-engine-and-r1-validation-contract.md) | 專業顧問引擎greenfield與R1驗證契約：**Supersedes 0038（完整取代）**；強模型先建天花板+最小harness baseline+model×schema ablation；exit gate須有預先定義的實質改善、持平選簡單者；三層評審者；Current State唯一真相+append-only Journal+runtime外eval capture與Trial Manifest；portable schema+deterministic verifier；K/S/A四級支持度；公版匯出措辭 | **Accepted**（2026-07-26；owner核准＋第二位審查者複審後定案） |
+| [0041](0041-document-boundary-single-writer-cutover.md) | 第一條 production vertical 與退役：以整份 `document_id` 為切換單位、同一文件單一 writer；現行 v3 maintenance-only；R1–R5 gate 後才掛新 local workspace；禁止 OCS/current-row dual-write；inventory／單向匯入後分 task 移除舊 Web、route、code、table | **Accepted**（2026-08-02；owner指示執行 R0） |
 
 完整脈絡見 [`../specs/2026-06-27-system-architecture-design.md`](../specs/2026-06-27-system-architecture-design.md)。
 契約怎麼選/怎麼交付的規範見 [`../contract-strategy.md`](../contract-strategy.md)（ADR 0004/0010 的一般化、預答契約 #3）。

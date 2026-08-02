@@ -39,6 +39,10 @@
 直接更新每份文件的 current rows；既有 0011 revision core 暫留但不再擴張。詳細 current-table 設計見
 [`Job Authoring v2 本機單一現況儲存設計`](specs/2026-07-24-job-authoring-v2-relational-storage-research.md)。
 
+**2026-08-02 切換裁決：**現行 v3／OCS editor 維持過渡 production 且只做 maintenance；新路徑在 R1–R5 gate
+通過後，以整份 `document_id` 單寫者切換到 current rows。禁止同文件 dual-write；退役順序與資料處理見
+[`ADR 0041`](adr/0041-document-boundary-single-writer-cutover.md)。
+
 ### 內部 Job Model 不等於政府公版
 
 **狀態：已決定（2026-07-24）。**政府公版是 UI／export profile，不是內部資料上限。內部 Task 可以保存

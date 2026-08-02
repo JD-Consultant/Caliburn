@@ -1,36 +1,27 @@
-# Interview AI vNext（隔離開發中）
+# Interview AI vNext（隔離 prototype／donor）
 
-本 package 是 ADR 0034 的隔離 greenfield 實作區。V0～V3-5 harness、V3-5A R1–R4（含correctives）、R5-A、
-**R5-BC grounded turn interpretation hard cut**、**R5-D bounded correctness closure**、最小Authoring Core與
-provider-neutral **`question.select/1.0.0` 核心**均已完成。2026-07-23 question.select 後完整 API no-network gate為
-`1166 passed / 217 skipped / 0 failed`；本切片沒有新增DB測試或migration。
+> **現行狀態（2026-08-02）：**本 package 有0010八表 durable persistence、provider-neutral runtime、Capture／outbox／
+> checkpoint／recovery、OpenRouter adapter與已完成的舊 `turn.interpret`／`question.select` backend vertical；但
+> `apps/api/app/api/router.py` 與 composition root **沒有 import**，使用者流量仍走 `app/interview` v3。
+>
+> ADR 0040 已完整取代 ADR 0038 的 operation catalog／state authority。本 package 現在是 prototype／候選 donor，
+> **不得直接 promotion、掛 route 或接 Web**。下一步是新專業顧問引擎的 R1 Task Discovery fixture／CLI 品質 gate，
+> 不是沿用本 package 做 localhost conversation。
 
-R5-BC 現行路徑使用persisted QuestionFrame、AnswerBinding、Evidence.v3 literal/contextual support、每個成功employee turn
-一筆receipt、frequency/time分離與state-version/hash CAS。模型只提出不帶domain identity的v2 proposals；application依
-sealed verifier policy決定接受或拒絕，再由operation-local位置產生Evidence identity。零Evidence不是失敗或no-op：不知道、
-無法判定等回答仍留下`RECEIPT_ONLY`，而provider/schema/conformance失敗不會偽造receipt。
+本 README 後續段落保存 V0～V3-5A、R5、Authoring v1、provider與paid-live的歷史實作證據。可候選重用的是
+provider／Capture／checkpoint／idempotency等基礎；舊 gold、schema、operation、Evidence/state、prompt、Context Builder、
+loader、grader與suite hash不得重用。現行產品／切換邊界以 ADR 0040、ADR 0041 與
+`docs/design/professional-consultant-engine.md` 為準。
 
-這一層的產品責任，是把員工訪談回答轉成可追溯、可更正的JD證據；它還不是完整JD synthesis或共編UI。此次沒有加入
-公司／租戶、SaaS、通用agent framework、production route或Web/editor整合。vNext runtime仍是0010八張表；另已完成
-獨立的0011三張Authoring Core表。eval adapter未被
-production composition root import；現行使用者流量仍走`app/interview/` v3。舊true-live batch `5bad4e3f-...`不具模型
-品質裁決資格；paid live、V3-6、production promotion仍blocked。R5-D 已封住 Capture terminal-root closure、bundle
-corruption matrix 與 byte-identical re-export；**A1 最小 Authoring Core 已完成**，建立獨立`app/job_authoring/`核心，
-不把新文件真相塞回舊`DocumentVersion/_pending`。它已支援 task/output revision、員工直接編輯、AI proposal的
-accept/edit/reject、stale與digest。`question.select`現已用deterministic Agenda從Evidence與JobStateDigest產生最多三個
-高價值候選，ContextBuilder只送必要turn／episode／support／digest，模型只選ordinal並寫一句自然問題；application再
-驗ordinal、重複問題與action，建立QuestionFrame與既有domain commands。output／purpose可形成grounded slot，
-broaden coverage可開新episode，existing gap可轉asked。它尚未接production OpenRouter、API或UI，也未做paid live模型
-品質裁決。產品先面向單機／單使用者；除非owner明確要求，不做SaaS。下一步把這份operation接進既有durable
-executor／OpenRouter，接著完成最小local Web conversation + JD canvas，再做`episode.code`文件proposal。
+現行與歷史指路（標為現行 authority 的項目優先；其餘是 prototype 實作證據）：
 
-權威文件：
-
-- 目標架構：[`../../../../docs/specs/2026-07-16-interview-ai-vnext-greenfield-architecture.md`](../../../../docs/specs/2026-07-16-interview-ai-vnext-greenfield-architecture.md)
+- 歷史 vNext 目標架構（donor context）：[`../../../../docs/specs/2026-07-16-interview-ai-vnext-greenfield-architecture.md`](../../../../docs/specs/2026-07-16-interview-ai-vnext-greenfield-architecture.md)
 - 2026 LLM runtime架構審查（已核准）：[`../../../../docs/specs/2026-07-18-interview-vnext-llm-runtime-architecture-review.md`](../../../../docs/specs/2026-07-18-interview-vnext-llm-runtime-architecture-review.md)
 - Runtime binding/Turn v2決策：[`../../../../docs/adr/0036-interview-vnext-provider-binding-conformance-and-idless-turn-v2.md`](../../../../docs/adr/0036-interview-vnext-provider-binding-conformance-and-idless-turn-v2.md)
 - Grounded short-answer／employee authority決策：[`../../../../docs/adr/0037-interview-vnext-question-frame-contextual-evidence-and-employee-authority.md`](../../../../docs/adr/0037-interview-vnext-question-frame-contextual-evidence-and-employee-authority.md)
-- R5後Context Engine／專業顧問workflow／Authoring Core決策：[`../../../../docs/adr/0038-interview-vnext-context-engine-and-professional-consultant-workflow.md`](../../../../docs/adr/0038-interview-vnext-context-engine-and-professional-consultant-workflow.md)
+- 新專業顧問核心／R1 gate（**現行 authority；完整取代0038**）：[`../../../../docs/adr/0040-professional-consultant-engine-and-r1-validation-contract.md`](../../../../docs/adr/0040-professional-consultant-engine-and-r1-validation-contract.md)
+- production切換／退役：[`../../../../docs/adr/0041-document-boundary-single-writer-cutover.md`](../../../../docs/adr/0041-document-boundary-single-writer-cutover.md)
+- living切換邊界：[`../../../../docs/design/professional-consultant-engine.md`](../../../../docs/design/professional-consultant-engine.md)
 - V3-5A實作交接：[`../../../../docs/plans/2026-07-18-interview-vnext-v3-5a-runtime-contract-reconstruction-plan.md`](../../../../docs/plans/2026-07-18-interview-vnext-v3-5a-runtime-contract-reconstruction-plan.md)
 - R5 grounded short-answer詳細交接（R5-BC已完成）：[`../../../../docs/plans/2026-07-20-interview-vnext-v3-5a-r5-grounded-short-answer-amendment-plan.md`](../../../../docs/plans/2026-07-20-interview-vnext-v3-5a-r5-grounded-short-answer-amendment-plan.md)
 - R5-A review corrective（R5-B前置）：[`../../../../docs/plans/2026-07-21-interview-vnext-v3-5a-r5-a-corrective-contract-closure-plan.md`](../../../../docs/plans/2026-07-21-interview-vnext-v3-5a-r5-a-corrective-contract-closure-plan.md)
@@ -65,7 +56,7 @@ application/            已實作：async persistence ports、apply_durable_comm
 llm/                    已實作：neutral operation/request/result/failure、registry、scripted fake、
                         Context／Turn contracts v2、portable schema、prompt/context/verifier policy
                         與turn.interpret 2.0.0、question.select 1.0.0、historical schemas
-providers/              production空殼：尚未把eval-verified OpenRouter adapter接入composition root
+providers/              已實作OpenRouter production-grade donor元件；未接正式composition root
 knowledge/              空殼：尚未接 reference snapshot
 persistence/            已實作(V2-B)：ORM rows、migration 0010、serialization、repositories、
                         UoW、durable capture(run/event/outbox)、Postgres outbox lease adapter
@@ -482,17 +473,16 @@ attempt claim在insert child row前鎖operation checkpoint，避免FK key-share�
 沒有0011，也沒有提前改OpenRouter route contamination語意。完整證據見
 [`R3-C §13`](../../../../docs/plans/2026-07-19-interview-vnext-v3-5a-r3-corrective-plan.md#13-2026-07-19-最終交付證據)。
 
-先做Capture/persistence、Context Engine與durable executor的原因是：
-沒有可重播 execution record,就無法判斷未來品質差是模型、context selection、
-verifier 還是 reducer 所造成。V5 前必須完成 authenticated principal → tenant
-→ profile ownership 驗證(reference §2.3),否則 production gate 不得通過。
+先做Capture/persistence、Context Engine與durable executor的歷史理由是：沒有可重播 execution record，就無法判斷
+品質差是模型、context selection、verifier 還是 reducer 所造成。舊文件曾要求 authenticated principal → tenant →
+profile ownership；該 SaaS 前提已被本機單人產品範圍取代，**不得據此新增登入或 tenant product behavior**。
 
 本階段明確未做 route、外部 Capture exporter、production OpenRouter/direct-vendor adapter、
 Web seam或模型 bake-off；production 行為仍為
 零變化(composition root 不 import vNext)。durable outbox/checkpoint 已由
 V2-B DB tests 證明;只有 V3 fixed replay與 V6 bake-off通過後才能談模型品質或上線。
 
-## Production OpenRouter 與最小顧問 loop（2026-07-23）
+## 歷史 donor：Production-grade OpenRouter 與最小顧問 loop（2026-07-23）
 
 上段是歷史階段說明；目前 production backend 已往前完成：
 
@@ -515,5 +505,5 @@ interpreted employee turn
 - 真 PostgreSQL + paid live均已通過；live cost `US$0.000558375`，詳見
   [`production loop plan §5`](../../../../docs/plans/2026-07-23-interview-vnext-production-openrouter-consultant-loop-plan.md)。
 
-仍未完成的是local Web route/UI與可見JD canvas。下一切片先接一輪localhost對話，不做SaaS、登入、
-K/S或graph framework；`episode.code`及有Evidence linkage的task/output proposal在可見主線之後。
+這條歷史 backend vertical 沒有 local Web route/UI；ADR 0040 之後也**不再以接 Web 為下一切片**。
+下一步是新專業顧問引擎 R1 Task Discovery fixture／CLI 與品質 gate；本節元件只有在新 contract／test 明確承重時才可作 donor。

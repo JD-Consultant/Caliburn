@@ -91,6 +91,23 @@ Caliburn 現行目標是給員工使用的**本機 Web AI 職務分析與職務�
 - `run_live.py` 的 reload 已關(改後端碼要手動重啟);git autocrlf(比對 codegen 用 `git diff` 不要用
   原始 diff);uv venv 沒有 pip,用 `uv pip`;CJK 用 `PYTHONUTF8=1`。
 
+## Agent skills
+
+### Issue tracker
+
+Issue、spec 與 ticket 使用 `.scratch/<feature>/` 下的 Local Markdown 管理。見
+`docs/agents/issue-tracker.md`。
+
+### Triage labels
+
+使用 `needs-triage`、`needs-info`、`ready-for-agent`、`ready-for-human`、`wontfix` 五種標準狀態。見
+`docs/agents/triage-labels.md`。
+
+### Domain docs
+
+採 multi-context domain docs；由根目錄 `CONTEXT-MAP.md` 指向各 bounded context 的 `CONTEXT.md`。見
+`docs/agents/domain.md`。
+
 ## 指路
 **`docs/README.md`(文檔系統:架構/規則/索引)** · `ARCHITECTURE.md` · `docs/adr/README.md`(0001–0041)·
 `docs/contract-strategy.md` · `CONTRIBUTING.md` · `docs/runbook.md` · `docs/specs/`(研究紀錄)·

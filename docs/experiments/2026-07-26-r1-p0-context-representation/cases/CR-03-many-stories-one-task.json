@@ -1,0 +1,164 @@
+{
+  "case_id": "CR-03-many-stories-one-task",
+  "case_family_id": "CR-03",
+  "source_type": "constructed_edge",
+  "title": "多個故事只是同一項穩定工作",
+  "primary_risk": "員工分別描述尺寸不合與商品破損的退貨案例，模型可能依事件表面差異建立多個重複 Task",
+  "applicable_critical_checks": [
+    "C3_MERGE_SPLIT",
+    "C6_SOURCE_FIDELITY"
+  ],
+  "transcript": [
+    {
+      "source_id": "turn-001",
+      "role": "consultant",
+      "text": "請舉一個最近實際處理的客戶問題，照你做的順序說明。"
+    },
+    {
+      "source_id": "turn-002",
+      "role": "employee",
+      "text": "像上週客戶說商品尺寸不合，我確認訂單後安排退貨，並更新處理狀態。"
+    },
+    {
+      "source_id": "turn-003",
+      "role": "consultant",
+      "text": "還有其他看起來不同、但也是你處理的情況嗎？"
+    },
+    {
+      "source_id": "turn-004",
+      "role": "employee",
+      "text": "前天有客戶收到破損商品，我也是先確認訂單，再安排退貨並更新狀態。"
+    },
+    {
+      "source_id": "turn-005",
+      "role": "consultant",
+      "text": "這些情況通常都由你負責到什麼結果？"
+    },
+    {
+      "source_id": "turn-006",
+      "role": "employee",
+      "text": "是，只要客戶提出退貨，我就負責確認資料、協調倉庫收回商品，並把結果回覆客戶。"
+    }
+  ],
+  "claim_table": [
+    {
+      "claim_id": "claim-001",
+      "speaker": "employee",
+      "literal_text": "像上週客戶說商品尺寸不合",
+      "source_turn_ids": [
+        "turn-002"
+      ],
+      "sequence_index": 1
+    },
+    {
+      "claim_id": "claim-002",
+      "speaker": "employee",
+      "literal_text": "我確認訂單後安排退貨",
+      "source_turn_ids": [
+        "turn-002"
+      ],
+      "sequence_index": 2
+    },
+    {
+      "claim_id": "claim-003",
+      "speaker": "employee",
+      "literal_text": "並更新處理狀態",
+      "source_turn_ids": [
+        "turn-002"
+      ],
+      "sequence_index": 3
+    },
+    {
+      "claim_id": "claim-004",
+      "speaker": "employee",
+      "literal_text": "前天有客戶收到破損商品",
+      "source_turn_ids": [
+        "turn-004"
+      ],
+      "sequence_index": 4
+    },
+    {
+      "claim_id": "claim-005",
+      "speaker": "employee",
+      "literal_text": "我也是先確認訂單",
+      "source_turn_ids": [
+        "turn-004"
+      ],
+      "sequence_index": 5
+    },
+    {
+      "claim_id": "claim-006",
+      "speaker": "employee",
+      "literal_text": "再安排退貨並更新狀態",
+      "source_turn_ids": [
+        "turn-004"
+      ],
+      "sequence_index": 6
+    },
+    {
+      "claim_id": "claim-007",
+      "speaker": "employee",
+      "literal_text": "是",
+      "source_turn_ids": [
+        "turn-006"
+      ],
+      "sequence_index": 7
+    },
+    {
+      "claim_id": "claim-008",
+      "speaker": "employee",
+      "literal_text": "只要客戶提出退貨",
+      "source_turn_ids": [
+        "turn-006"
+      ],
+      "sequence_index": 8
+    },
+    {
+      "claim_id": "claim-009",
+      "speaker": "employee",
+      "literal_text": "我就負責確認資料",
+      "source_turn_ids": [
+        "turn-006"
+      ],
+      "sequence_index": 9
+    },
+    {
+      "claim_id": "claim-010",
+      "speaker": "employee",
+      "literal_text": "協調倉庫收回商品",
+      "source_turn_ids": [
+        "turn-006"
+      ],
+      "sequence_index": 10
+    },
+    {
+      "claim_id": "claim-011",
+      "speaker": "employee",
+      "literal_text": "並把結果回覆客戶",
+      "source_turn_ids": [
+        "turn-006"
+      ],
+      "sequence_index": 11
+    }
+  ],
+  "relevant_span_ids": [
+    "turn-002",
+    "turn-004",
+    "turn-006"
+  ],
+  "adjudication": {
+    "must_retain_tasks": [
+      "處理客戶退貨申請，確認資料、協調商品收回並回覆結果"
+    ],
+    "must_not_create_tasks_from": [
+      "把尺寸不合退貨與商品破損退貨建立成兩個 Task",
+      "把確認訂單、安排退貨、更新狀態各自拆成 Task"
+    ],
+    "allowed_task_variants": [
+      "受理並追蹤客戶退貨案件至結果回覆",
+      "協調處理客戶退貨需求並更新處理結果"
+    ],
+    "required_uncertainties": [],
+    "notes": "兩個故事的原因不同，但觸發條件、責任流程與完成結果相同；turn-006 又明確抽象成所有退貨案件的穩定責任，因此只保留一項 Task。三個 employee turns 都列為相關片段，避免只重貼總結而隱藏容易誘發過度拆分的兩個具體故事。claim-007 的短答「是」依賴保留的 consultant 問句，正是 structured-only 必須保留顧問 turns 的理由。"
+  }
+}

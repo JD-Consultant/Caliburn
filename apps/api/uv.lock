@@ -120,6 +120,7 @@ dependencies = [
     { name = "httpx" },
     { name = "indexer-contract" },
     { name = "jinja2" },
+    { name = "job-analysis-contract" },
     { name = "langchain" },
     { name = "langchain-core" },
     { name = "langchain-openai" },
@@ -157,6 +158,7 @@ requires-dist = [
     { name = "httpx", specifier = "==0.27.2" },
     { name = "indexer-contract", editable = "../../packages/indexer-contract" },
     { name = "jinja2", specifier = "==3.1.4" },
+    { name = "job-analysis-contract", editable = "../../packages/job-analysis-contract" },
     { name = "langchain", specifier = "==1.3.9" },
     { name = "langchain-core", specifier = "==1.4.7" },
     { name = "langchain-openai", specifier = "==1.3.2" },
@@ -579,6 +581,24 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/60/e3/935b8034fd143f21125c87d51404a9e0e1449186a494405721ff5d1d695e/jiter-0.15.0-cp314-cp314t-win32.whl", hash = "sha256:7f6163c0f10b055245f814dcc59f4818da60dfe72f3e72ab89fc24b6bd5e9c52", size = 207950, upload-time = "2026-05-19T10:09:09.616Z" },
     { url = "https://files.pythonhosted.org/packages/93/59/984fd9ece895953dad3e0880a650e766f5a2da2c5514f0eafdaaabbeb5f9/jiter-0.15.0-cp314-cp314t-win_amd64.whl", hash = "sha256:980c256edb05b78a111b99c4de3b1d32e31634b867fd1fc2cf726e7b7bba9854", size = 200055, upload-time = "2026-05-19T10:09:11.367Z" },
     { url = "https://files.pythonhosted.org/packages/0e/a4/cf8d779feb133a27a2e3bc833bccb9e13aa332cdf820497ebf72c10ce8c3/jiter-0.15.0-cp314-cp314t-win_arm64.whl", hash = "sha256:66b1880df2d01e206e8339769d1c7c1753bcb653efd6289e203f6f24ebada0c0", size = 191244, upload-time = "2026-05-19T10:09:12.74Z" },
+]
+
+[[package]]
+name = "job-analysis-contract"
+version = "0.1.0"
+source = { editable = "../../packages/job-analysis-contract" }
+dependencies = [
+    { name = "pydantic" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "pydantic", specifier = ">=2.9,<3" }]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "datamodel-code-generator", specifier = ">=0.26" },
+    { name = "jsonschema", specifier = ">=4.20" },
+    { name = "pytest", specifier = ">=8.3" },
 ]
 
 [[package]]

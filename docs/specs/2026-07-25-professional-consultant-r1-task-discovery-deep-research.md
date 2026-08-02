@@ -1124,13 +1124,21 @@ turn.understand
 
 ### 13.1 R1 測試模型
 
-依 owner 指示，第一輪固定使用 OpenRouter 的具名模型：
+> **【2026-07-27 修正｜GPT-5.4 mini 指令退役】**
+>
+> Owner 已明確裁定**不採 GPT-5.4 mini**；且 ADR 0040 已把「固定便宜模型先驗架構」改為
+> strongest-first 的六 arm。下列舊 slug 只保留作歷史，不得據以執行。
+> 現行 proposed 配對、endpoint preflight 與裁決方法見
+> [R1 實驗設計與共識草案](2026-07-27-professional-consultant-r1-task-discovery-experiment-design.md) §8；
+> 在 owner 與第二位審查者核准、live catalog／endpoint preflight 完成前，不凍結 exact model。
+
+原先依 owner 指示，第一輪固定使用 OpenRouter 的具名模型：
 
 ```text
 openai/gpt-5.4-mini
 ```
 
-[OpenRouter 官方模型頁](https://openrouter.ai/openai/gpt-5.4-mini/api)在本次研究時提供該 exact slug。
+[OpenRouter 官方模型頁](https://openrouter.ai/openai/gpt-5.4-mini/api)在當次研究時提供該 exact slug。
 模型價格、端點與上游供應狀態可能變動，因此實驗前再取得一次官方 catalog snapshot；研究文件不把價格寫成永久規格。
 
 ### 13.2 ~~為什麼先固定一個便宜模型~~【已否決，見 C-01】

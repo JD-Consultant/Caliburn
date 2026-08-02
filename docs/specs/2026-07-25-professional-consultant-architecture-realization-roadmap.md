@@ -1,5 +1,15 @@
 # AI 專業職務分析顧問：最終架構實現路線圖
 
+> **【2026-08-01 現行裁決索引｜先讀這裡】**
+> 本文提到的 **「K/S/A 支持度四級」（`behavior_grounded`／`employee_confirmed`／`reference_candidate`／`unsupported`）
+> 已由 [ADR 0048](../adr/0048-opks-evidence-axes-and-document-level-competencies.md) 翻案**，
+> 改為 `evidence_origin` × `task_linkage` 兩正交軸 ＋ `source_refs[]` 型別層非空。
+> 原文保留供追溯，**不得據以施工**。
+> OPKS 現行裁決 = **[0048](../adr/0048-opks-evidence-axes-and-document-level-competencies.md)（概念）
+> ＋ [0049](../adr/0049-opks-derived-axes-evidence-whitelist-and-document-authority.md)（實作形狀）
+> ＋ [0050](../adr/0050-opks-proposal-minimal-shape.md)（Proposal 形狀）**，三份一起讀。
+
+
 > 日期：2026-07-25
 > 狀態：Proposed，供 owner 審核
 > 文件性質：從已核准顧問流程與最終程式架構，走到可測試核心、可恢復原型與本機 Web 成品的實現路線
@@ -410,6 +420,22 @@ Revision 3：
 8. 員工更正先前說法。
 
 共享 outcome 不過度拆分與不同 outcome 不過度合併，要嵌入第 3、4 類案例，不為增加測試數而額外建立大量排列。
+
+> **【2026-07-27 補充｜八案全數為 development set，不切 holdout】**
+>
+> §10.6 已把「八個案例很容易被 Prompt 過度擬合」列為反方六。依
+> [ADR 0041](../adr/0041-r1-p0-closure-first-version-context-and-holdout.md) 決定 13–17：
+>
+> - **八案不切 holdout**。§11 的 `TI-R1-01`–`08` 連 `輸入核心`、`預期` 與 `Critical failure` 都已公開，
+>   而本文件是寫 prompt 的人必讀的 authority；答案已曝光的案例標成 holdout 不產生 unseen 證據。
+> - 尤其**不得抽走第 2 案**（唯一的正向案例）：抽走會把 prompt 推向「看到工具就不建 Task」的單邊最佳化。
+> - 八案期間的防線是**凍結期望**：`預期` 與 `Critical failure` 不得為配合模型輸出而改寫，要改須升 case
+>   revision。第 2、7 案另標為 **locked regression cases**（防退步），不得宣稱證明 unseen generalization。
+> - **未曝光評測集延到 20–30 案擴充階段**：在 prompt／context／schema **最終凍結之後**才建立
+>   （以 freeze 的 commit SHA + canonical hash 為憑，**不以檔案時間為憑**），正反平衡，
+>   其輸入與期望**不得寫進任何 authority 文件**。critical failure → 不得宣稱通過。
+> - **命名誠實**：獨立人員製作且未曝光才叫 `holdout`；本 repo 一人團隊採時間隔離，
+>   只能叫 `post-freeze fresh challenge set`；已看過或反覆執行的降級為 `regression set`。
 
 ### 8.6 輸出物
 

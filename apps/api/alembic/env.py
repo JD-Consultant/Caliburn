@@ -15,6 +15,9 @@ import app.interview_vnext.persistence.models  # noqa: F401
 # UI-independent canonical Authoring Core (migration 0011).  Import only for
 # metadata registration; production composition remains unwired.
 import app.job_authoring.postgres_models  # noqa: F401
+# Greenfield local Current State persistence (migration 0012). Adapter metadata
+# registration only; no composition with old authoring/vNext paths.
+import app.adapters.job_analysis_postgres.models  # noqa: F401
 
 if sys.platform == "win32":
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())

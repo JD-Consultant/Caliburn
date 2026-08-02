@@ -2,7 +2,7 @@
 
 > Standing standard for **how we choose and deliver a contract** at any seam between Caliburn
 > components. Authored 2026-06-28. Generalizes the decisions in ADR 0004 (contract #1) and
-> ADR 0010 (contract #2), and pre-answers contract #3. This is the "作法規範" — read it before
+> ADR 0010 (contract #2), and records contracts #3/#4. This is the "作法規範" — read it before
 > opening a new contract.
 
 ## 1. Why
@@ -63,21 +63,23 @@ Same discipline used for Phases 1–3 and contracts #1/#2:
    task; back-compat re-export shims are fine (definitions live only in the SSOT).
 5. **Guard + tag** — wire the mechanism's CI guard (§3); tag `contractN-<name>`.
 
-## 5. Worked precedents & the pre-answer for #3
+## 5. Worked precedents and registered seams
 - **#1 `ocs-contract`** (ADR 0004): the OCS document. Non-Python consumer (web/TS renders it) +
   real-world standard ⇒ **JSON-Schema + codegen**. ✔ rubric row 2.
 - **#2 `indexer-contract`** (ADR 0010): indexer query API. All-Python, single consumer ⇒
   **shared pydantic package**. ✔ rubric row 3.
-- **#3 api⇄web authored document (pre-answer):** the authored document **is an OCS document**,
+- **#3 legacy api⇄web OCS authored document:** the authored document **is an OCS document**,
   and the **web/TS consumer renders it** ⇒ rubric row 2 ⇒ **JSON-Schema + codegen, and reuse
   `ocs-contract`'s schema**: add the TS generation target (`json-schema-to-typescript`) for the
   web, and define the thin api⇄web REST *envelope* (request/response wrapper around the OCS
   document) as its own small schema or shared types. Do **not** hand-write TS document types in
-  the web app. This pre-answer remains the legacy OCS editor/export seam. **ADR 0039 changes the
-  vNext live-workspace seam:** canonical Authoring is no longer an OCS document, so the new
-  Python⇄TypeScript seam uses its own small `local-workspace-contract` JSON Schema + generated
-  Pydantic/TS package; `ocs-contract` remains the deterministic public/export shape. Do not make
-  either contract import or redefine the other.
+  the web app. This remains the legacy OCS editor/export seam.
+- **#4 `job-analysis-contract` (ADR 0045):** the greenfield Local Web workspace is not
+  an OCS document and has Python／TypeScript consumers ⇒ rubric row 2 ⇒ its own small JSON Schema
+  SSOT + generated Pydantic/TS package. `app.job_analysis` domain must not import the transport
+  package; route mappers own the boundary. `ocs-contract` remains the public/export shape and
+  neither contract imports or redefines the other. The former ADR 0039-era
+  `local-workspace-contract` pre-answer is withdrawn and must not be used for new construction.
 
 ## 6. References
 - Alistair Cockburn — Hexagonal (ports define the contract). Chris Richardson — *Microservices

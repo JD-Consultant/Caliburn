@@ -16,7 +16,10 @@ Caliburn 現行目標是給員工使用的**本機 Web AI 職務分析與職務�
 1. **先研究再動手** —— 重大變更前找**權威/主流/大廠/資深人物**的資料(官方文件、原作者、規範),
    寫一份**研究紀錄**到 `docs/specs/<date>-*.md`(含來源、診斷、選項、比對)。
 2. **決策寫 ADR** `docs/adr/00NN-*.md`(Nygard 式;Accepted 後不改內容,要翻案開新號),
-   並更新索引 `docs/adr/README.md`。
+   並更新索引 `docs/adr/README.md`。**狀態預設 `Proposed`**——審查中的修正一律直接改那份
+   Proposed ADR;**owner 核准後另開一個 commit** 把 ADR 與索引一起轉 `Accepted`。
+   只有 owner 事先明確核准具體內容才可一開始就寫 `Accepted`。先例:ADR 0045
+   (`820695a` Proposed → `f45b268` Accepted)。
 3. **plan** 寫到 `docs/plans/`(bite-size、可獨立驗證),再實作。
 4. **安全網優先** —— 盡量 **move-only** 重構;既有測試/golden 當 characterization net,
    **green-before == green-after**;**一個 task 一個 commit**,綠了才 commit;收尾打 git tag。
@@ -52,10 +55,17 @@ Caliburn 現行目標是給員工使用的**本機 Web AI 職務分析與職務�
 - **3 個 bounded context**:`apps/pdf-to-json`(PDF→OCS JSON 解析)/ `apps/ocs-indexer`(檢索,Qdrant)/
   `apps/api` + `apps/web`(著作)。語言在這三處切換(對齊 DDD)。
 - **api = 六邊形**:`app/core`(ports + domain,純)、`app/adapters`(DB/LLM/knowledge 等邊緣)、
-  `app/services`(use-case)、`app/interview`(**現行 production 唯一 AI 大腦**:顧問+書記 op→verify→`_pending`
+  `app/services`(use-case)、`app/interview`(**淘汰但暫留的舊 AI 路徑**:顧問+書記 op→verify→`_pending`
   追蹤修訂;判準教材在 `app/interview/skills/`,調教首選改 skill 不改碼)、`app/observability.py`
   (OTel 橫切)。ADR 0008 / **0030**(舊 LangGraph/CopilotKit 已退場,勿救回;端到端見
   `docs/design/interview-engine.md`)。
+- **Task Analysis 引擎(現行新工作面)**：`app/job_analysis` 依 ADR **0040／0042** greenfield 實作
+  (domain／llm／application／providers)。durable vertical 已接通：文件/direct edit → PostgreSQL
+  Current State → packet → 一次 HTTP → verifier → identity gate → 候選/Proposal → 員工決策 → reload；
+  新 `/api/v1/job-analysis` routes 與 `/workspace` Web 已接通，conversation／Proposal／Current JD 同頁。
+  資料從新四表開始，不搬、不整合、不雙寫舊資料。禁止 import
+  `app.interview`／`app.interview_vnext`／`app.job_authoring`／`evals`(AST 測試強制)。
+  端到端見 `docs/design/task-analysis-engine.md`。
 - **AI vNext 隔離中**：`app/interview_vnext` 依 ADR **0034** greenfield 實作；V1 domain 與 V2-A
   provider-neutral/Capture contracts 已完成，無 route/DB/live LLM，production 不 import。禁止 import/wrap v3 consultant/scribe/harvest/select；細節先讀
   `app/interview_vnext/README.md`、其 `AGENTS.md` 與 `docs/plans/2026-07-16-interview-ai-vnext-implementation-plan.md`。
@@ -89,6 +99,7 @@ Caliburn 現行目標是給員工使用的**本機 Web AI 職務分析與職務�
   原始 diff);uv venv 沒有 pip,用 `uv pip`;CJK 用 `PYTHONUTF8=1`。
 
 ## 指路
-**`docs/README.md`(文檔系統:架構/規則/索引)** · `ARCHITECTURE.md` · `docs/adr/README.md`(0001–0034)·
+**`docs/README.md`(文檔系統:架構/規則/索引)** · `ARCHITECTURE.md` · `docs/adr/README.md`(0001–0053)·
 `docs/contract-strategy.md` · `CONTRIBUTING.md` · `docs/runbook.md` · `docs/specs/`(研究紀錄)·
+`docs/experiments/`(實證紀錄)·
 `docs/plans/` · `docs/design/`(子系統端到端設計,給 agent)。

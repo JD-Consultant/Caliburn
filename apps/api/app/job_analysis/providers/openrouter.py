@@ -50,6 +50,11 @@ class OpenRouterConfig(DomainModel):
     # 輸出上限的參數名。預設留舊名是因為 body 帶 `require_parameters: true`——送一個
     # endpoint 沒宣告的名字會被路由拒絕或靜默丟掉,後者等於沒有上限。正確值來自
     # `OpenRouterEndpointSnapshot.output_cap_parameter`(catalog 實際宣告的那個)。
+    #
+    # **目前只有 live-smoke script 會傳這個值。** `get_job_analysis_adapter()` 不傳,
+    # 所以 production 走預設 `max_tokens` 且不做 catalog preflight——現行 endpoint 只宣告
+    # 舊名,兩者答案一致。哪天要用的 endpoint 只宣告 `max_completion_tokens`,那條路徑才需要
+    # 處理(加設定值或啟動時查一次),不是現在。
     output_cap_parameter: Literal["max_completion_tokens", "max_tokens"] = "max_tokens"
 
     @model_validator(mode="after")

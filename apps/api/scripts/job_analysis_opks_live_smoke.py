@@ -5,9 +5,10 @@ packet、wire schema 與產品配置的模型合在一起時，一次真呼叫�
 generate → verify → proposal，以及下一個最值得修的是哪一層。
 
 硬界線：**最多 1 次 generation call、沒有任何 retry、回應後照實際 cost 結算並在超過
-US$0.20 時停線**。送出前那道估算會低估（input 拿不到 provider tokenizer、reasoning 不受
-輸出上限約束），所以它不是保證——理由與實測數字見 ``job_analysis_live_smoke`` 的 docstring。
-預算、錄製與 catalog preflight 直接重用該模組，不另建一套。
+US$0.20 時停線**。送出前那道估算會低估（input 拿不到 provider tokenizer；輸出上限管不管得住
+reasoning per-provider 不同），所以它不是保證——理由與實測數字見
+``job_analysis_live_smoke`` 的 docstring。預算、錄製與 catalog preflight 直接重用該模組，
+不另建一套。
 
 場景在 run 之前凍結，**不在 live run 中臨場改題**。單一 Task、單一呼叫，同時觀察：
 O／P／K／S 四類是否都出、`reuse_existing` 會不會用在已存在的知識上、沒有數字的依據會不會

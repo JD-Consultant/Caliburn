@@ -97,7 +97,12 @@ AFTER : 門市報廢與庫存調整單的核准流程 | refs=['task-2', 'task-1'
    OpenRouter 也沒有公開的輸入 token 預估端點可以在送出前查。
 2. 同一份 docstring 寫「reasoning 與可見輸出共用同一個 output 上限，所以整條上限都算進來」。
    **送出 `max_tokens: 4096`，實際計費 completion 10,736**——reasoning token 是要計費的 output
-   token，而且不受該上限約束。
+   token，而且在這條路徑上不受該上限約束。
+
+   **這第 2 點只成立於實測過的那條路徑**（OpenAI `openai/gpt-5.6-luna-pro`，舊 `max_tokens`
+   參數），**不可泛稱到所有 provider**。Anthropic 官方明定 Claude 的 `max_tokens` 涵蓋 thinking
+   且是硬上限，因此 Opus 路徑預期不會有同樣的 output 溢出。輸出上限管不管得住 reasoning，
+   **per-provider 不同，各自實測**。第 1 點（byte 數不是 token 上界）則與 provider 無關。
 
 `reserve_or_raise()` 的用途是**在 HTTP 之前**擋下會超額的呼叫。它系統性低估，這次約 2.7 倍。
 這次無害（US$0.0077 對上 US$0.20 上限），但**同一個 guard 也守著三回合那支 US$0.75 的 smoke**
@@ -118,6 +123,17 @@ AFTER : 門市報廢與庫存調整單的核准流程 | refs=['task-2', 'task-1'
 - wire invariant 測試原本**完全沒有斷言輸出上限那個 key**，所以改它不會被發現。現在有了。
 
 沒有加通用 tokenizer、provider framework 或複雜預算系統。
+
+#### 生效範圍（不要誤讀成 production 已經動態選參數）
+
+catalog 自動選參數**目前只接在兩支 live-smoke script 上**。正式 FastAPI 的
+`get_job_analysis_adapter()` 建 `OpenRouterConfig` 時**不帶 `output_cap_parameter`**，
+因此沿用預設值 `max_tokens`，而且**production 路徑沒有 catalog preflight**——員工的每一次
+回合不會為了查參數名多打一次外部 API。
+
+這是刻意的取捨，不是遺漏：production 目前跑的 endpoint 本來就只宣告 `max_tokens`，
+預設值與 catalog 的答案一致。等到哪個要用的 endpoint 只宣告 `max_completion_tokens`，
+`get_job_analysis_adapter()` 才需要處理，屆時再決定是加設定值還是啟動時查一次。
 
 ## 5. 這次能與不能宣稱
 

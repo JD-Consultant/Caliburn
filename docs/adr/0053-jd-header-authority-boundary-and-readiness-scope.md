@@ -1,6 +1,6 @@
 # 0053. JdHeader 的 authority 邊界與 readiness 第一版範圍
 
-- 狀態：Proposed
+- 狀態：Accepted
 - 日期：2026-08-02
 - 補充：[0045](0045-job-analysis-local-web-contract-and-shared-authority-commit.md) 的 authority 邊界
   （**0045 本身的裁決不變**：`title` 仍不屬模型 authority read-set、改名仍不 bump generation）

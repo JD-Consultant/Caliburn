@@ -58,6 +58,12 @@ Evidence provenance、員工決策與關鍵 transaction 的安全網。
 
 ## 選取即自動填(autofill on selection)— 延後
 
+> **本節描述的是 legacy OCS editor,不是現行 `job_analysis`。**
+> `OccupationPicker`／`TaskCuratePanel`／`CellFillerPanel`／`services/knowledge/` 的 header-meta
+> 服務都屬舊編輯器。**不得拿來接新的 `job_analysis` header**——後者走 `JdHeader` 的 authority
+> seam(Journal＋generation＋CAS),見 ADR [0053](adr/0053-jd-header-authority-boundary-and-readiness-scope.md)
+> 決定 2／3／5。下面的 UX 期望仍可當未來討論素材,但**實作路徑不適用**。
+
 **使用者期望的 UX**(2026-06-26 提出,當下決定先不動、晚點討論):
 
 - **選職類後**自動填表頭:所屬類別、職能基準名稱、工作描述、基準級別、態度 A、應備資格、補充說明。

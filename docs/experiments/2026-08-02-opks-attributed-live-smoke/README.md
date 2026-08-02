@@ -92,17 +92,32 @@ AFTER : 門市報廢與庫存調整單的核准流程 | refs=['task-2', 'task-1'
 實際是 reserve 的 **2.7 倍**。兩個假設各自被推翻：
 
 1. **`job_analysis_live_smoke.py` 的 docstring 寫**「BPE token 數不會超過承載它的 UTF-8 byte 數，
-   所以拿 byte 數估價一定偏保守」。繁中在 GPT tokenizer 下**每 byte 超過 1 個 token**，
-   這裡是 3.25 倍。
+   所以拿 byte 數估價一定偏保守」。**這條錯的原因不是繁中字節多**——是計費用的是模型自家的
+   tokenizer，本機只有 HTTP body 的 byte 數，**byte 數對 token 數根本不構成上界**，與語言無關。
+   OpenRouter 也沒有公開的輸入 token 預估端點可以在送出前查。
 2. 同一份 docstring 寫「reasoning 與可見輸出共用同一個 output 上限，所以整條上限都算進來」。
-   **送出 `max_tokens: 4096`，實際計費 completion 10,736**——reasoning 被計費但不受 `max_tokens` 約束。
+   **送出 `max_tokens: 4096`，實際計費 completion 10,736**——reasoning token 是要計費的 output
+   token，而且不受該上限約束。
 
-`reserve_or_raise()` 的用途是**在 HTTP 之前**擋下會超額的呼叫。它現在會系統性低估，
-低估幅度在這個模型／語言組合上約 2.7 倍。這次無害（US$0.0077 對上 US$0.20 上限），
-但**同一個 guard 也守著三回合那支 US$0.75 的 smoke**——照這個倍率，那裡的 US$0.75 授權
-可能實際花到約 US$2。
+`reserve_or_raise()` 的用途是**在 HTTP 之前**擋下會超額的呼叫。它系統性低估，這次約 2.7 倍。
+這次無害（US$0.0077 對上 US$0.20 上限），但**同一個 guard 也守著三回合那支 US$0.75 的 smoke**
+——照這個倍率，那裡的 US$0.75 授權可能實際花到約 US$2。
 
-尚未修。修法應該是拿 catalog 的實際計價欄位而不是 byte 數，且不假設 `max_tokens` 涵蓋 reasoning。
+### 4.1 已修（commit `1bd22c7`）
+
+- `reserve_or_raise()` → **`precheck_or_raise()`**，並在碼與文檔裡明講它是估算。
+  真正的保證只剩三條且只宣稱這三條：**呼叫次數上限、零 retry、每次回應後照實際 cost 結算停線**。
+  新增回歸測試：估算低估時，停線責任確實落在回應後的結算上。
+- **輸出上限參數名改由 catalog 決定。** OpenRouter 已 deprecate `max_tokens` 並建議
+  `max_completion_tokens`，但 **per-endpoint 的 `supported_parameters` 還沒跟著更名**——
+  這次抓回的 `openai/gpt-5.6-luna-pro` 只列 `max_tokens`。因為 request 帶
+  `require_parameters: true` 且 `allow_fallbacks: false`，送一個沒宣告的名字不是被路由拒絕
+  就是被靜默丟掉，**後者等於輸出上限整個消失**，比留著舊名更危險。
+  所以 `OpenRouterEndpointSnapshot` 現在帶 `output_cap_parameter`，adapter 照它送，
+  preflight 對兩個名字都沒宣告的 endpoint 直接停線。免費 preflight 現在會印出選中的名字。
+- wire invariant 測試原本**完全沒有斷言輸出上限那個 key**，所以改它不會被發現。現在有了。
+
+沒有加通用 tokenizer、provider framework 或複雜預算系統。
 
 ## 5. 這次能與不能宣稱
 

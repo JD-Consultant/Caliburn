@@ -12,8 +12,11 @@ Context、Opus 5 與 Anthropic direct route 合在一起時,一條 synthetic 三
 
 - **input**:計費用的是模型自家 tokenizer,本機只有 HTTP body 的 byte 數。**byte 數不是 token
   數的上界**,那次是 3,744 bytes 對 12,168 prompt tokens。
-- **output**:reasoning token 是要計費的 output token,而且**不受送出的輸出上限約束**。
-  那次送 4,096,實際計費 completion 10,736(其中 9,211 是 reasoning)。
+- **output**:reasoning token 是要計費的 output token。在**那條路徑上**(OpenAI 的
+  `openai/gpt-5.6-luna-pro`,舊 `max_tokens` 參數)它**不受送出的上限約束**——送 4,096,
+  實際計費 completion 10,736(其中 9,211 是 reasoning)。
+  **這條不可以泛稱到所有 provider**:Anthropic 官方明定 Claude 的 `max_tokens` 涵蓋 thinking
+  且是硬上限。輸出上限到底管不管得住 reasoning,**per-provider 不同,要各自實測**。
 
 所以真正擋住失控的是呼叫次數上限與回應後的實際 cost 結算,不是這道估算。
 
@@ -190,9 +193,10 @@ class LiveSmokeBudget:
     ) -> Decimal:
         """送出前的門。**呼叫次數是硬上限;金額只是估算。**
 
-        回傳的估算已知會低估:input 用 byte 數代替看不到的 provider tokenizer,output 用送出的
-        上限代替實際計費量,而 reasoning 不受該上限約束(2026-08-02 實測 2.7 倍)。它仍然
-        擋得掉「剩餘額度明顯不夠」這種情況,但**不能當成不會超支的保證**——那由
+        回傳的估算已知會低估:input 用 byte 數代替看不到的 provider tokenizer;output 用送出的
+        上限代替實際計費量,而該上限是否管得住 reasoning **per-provider 不同**——OpenAI 的
+        luna-pro 路徑實測不管(2026-08-02,2.7 倍),Anthropic 則明定 `max_tokens` 涵蓋 thinking。
+        它仍然擋得掉「剩餘額度明顯不夠」這種情況,但**不能當成不會超支的保證**——那由
         `record_actual_or_raise()` 在回應之後負責。
         """
         if self.calls >= self.max_generation_calls:

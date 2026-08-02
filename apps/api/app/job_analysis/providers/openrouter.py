@@ -19,7 +19,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from enum import StrEnum
-from typing import Any, Protocol
+from typing import Any, Literal, Protocol
 
 import httpx
 from pydantic import Field, model_validator
@@ -47,6 +47,10 @@ class OpenRouterConfig(DomainModel):
     provider_order: tuple[NonEmptyText, ...]
     max_output_tokens: int = Field(gt=0)
     timeout_seconds: float = Field(gt=0)
+    # 輸出上限的參數名。預設留舊名是因為 body 帶 `require_parameters: true`——送一個
+    # endpoint 沒宣告的名字會被路由拒絕或靜默丟掉,後者等於沒有上限。正確值來自
+    # `OpenRouterEndpointSnapshot.output_cap_parameter`(catalog 實際宣告的那個)。
+    output_cap_parameter: Literal["max_completion_tokens", "max_tokens"] = "max_tokens"
 
     @model_validator(mode="after")
     def route_is_exact(self):
@@ -133,7 +137,7 @@ class OpenRouterAdapter:
                 {"role": "system", "content": instructions},
                 {"role": "user", "content": packet_text},
             ],
-            "max_tokens": self._config.max_output_tokens,
+            self._config.output_cap_parameter: self._config.max_output_tokens,
             "reasoning": {"effort": "high", "exclude": True},
             "stream": False,
             "response_format": {

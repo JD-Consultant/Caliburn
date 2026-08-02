@@ -4,9 +4,10 @@
 packet、wire schema 與產品配置的模型合在一起時，一次真呼叫能不能走完
 generate → verify → proposal，以及下一個最值得修的是哪一層。
 
-硬界線：**最多 1 次 generation call、總額 US$0.20、沒有任何 retry**。送出前先用 live catalog
-價格算保守 reserve；超過就在 HTTP 之前停。預算、錄製與 catalog preflight 直接重用
-``job_analysis_live_smoke``，不另建一套。
+硬界線：**最多 1 次 generation call、沒有任何 retry、回應後照實際 cost 結算並在超過
+US$0.20 時停線**。送出前那道估算會低估（input 拿不到 provider tokenizer、reasoning 不受
+輸出上限約束），所以它不是保證——理由與實測數字見 ``job_analysis_live_smoke`` 的 docstring。
+預算、錄製與 catalog preflight 直接重用該模組，不另建一套。
 
 場景在 run 之前凍結，**不在 live run 中臨場改題**。單一 Task、單一呼叫，同時觀察：
 O／P／K／S 四類是否都出、`reuse_existing` 會不會用在已存在的知識上、沒有數字的依據會不會
@@ -279,6 +280,7 @@ async def _run(args: argparse.Namespace) -> int:
         "tag": endpoint.tag,
         "prompt_price_per_token": str(endpoint.prompt_price_per_token),
         "completion_price_per_token": str(endpoint.completion_price_per_token),
+        "output_cap_parameter": endpoint.output_cap_parameter,
     }
     if args.max_generation_calls == 0:
         print(json.dumps({"status": "preflight_only", "catalog": catalog_facts}, ensure_ascii=False, sort_keys=True))
@@ -336,6 +338,8 @@ async def _run(args: argparse.Namespace) -> int:
                 provider_order=(tag,),
                 max_output_tokens=settings.job_analysis_max_output_tokens,
                 timeout_seconds=settings.job_analysis_timeout_s,
+                # catalog 說支援哪個就送哪個;不猜、也不硬換成偏好的新名字。
+                output_cap_parameter=endpoint.output_cap_parameter,
             ),
             api_key=api_key,
             transport=recording,

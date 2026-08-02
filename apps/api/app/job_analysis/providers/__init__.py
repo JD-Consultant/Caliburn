@@ -24,12 +24,14 @@ from .openrouter_evidence import (
     LIMITATION_SELECTED_PROVIDER_MISMATCH,
     LIMITATION_STRATEGY_NOT_DIRECT,
     MODEL_ENDPOINTS_URL_TEMPLATE,
+    OUTPUT_CAP_PARAMETERS,
     REQUIRED_ENDPOINT_PARAMETERS,
     OpenRouterCatalogError,
     OpenRouterEndpointSnapshot,
     OpenRouterExecutionEvidence,
     inspect_openrouter_execution,
     select_catalog_endpoint,
+    select_output_cap_parameter,
 )
 
 __all__ = [
@@ -44,6 +46,7 @@ __all__ = [
     "LIMITATION_SELECTED_PROVIDER_MISMATCH",
     "LIMITATION_STRATEGY_NOT_DIRECT",
     "MODEL_ENDPOINTS_URL_TEMPLATE",
+    "OUTPUT_CAP_PARAMETERS",
     "REQUIRED_ENDPOINT_PARAMETERS",
     "ChatTransport",
     "OpenRouterAdapter",
@@ -60,4 +63,5 @@ __all__ = [
     "httpx_chat_transport",
     "inspect_openrouter_execution",
     "select_catalog_endpoint",
+    "select_output_cap_parameter",
 ]

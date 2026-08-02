@@ -26,11 +26,13 @@ from app.job_analysis.providers import (
     LIMITATION_SELECTED_NOT_UNIQUE,
     LIMITATION_SELECTED_PROVIDER_MISMATCH,
     LIMITATION_STRATEGY_NOT_DIRECT,
+    OUTPUT_CAP_PARAMETERS,
     REQUIRED_ENDPOINT_PARAMETERS,
     OpenRouterCatalogError,
     OpenRouterEndpointSnapshot,
     inspect_openrouter_execution,
     select_catalog_endpoint,
+    select_output_cap_parameter,
 )
 
 
@@ -151,15 +153,48 @@ def with_pipeline(*stages: dict[str, Any]) -> dict[str, Any]:
 
 
 def test_required_parameters_are_exactly_the_capabilities_this_request_uses():
+    """輸出上限不在這裡:它的參數名由 catalog 決定,見 OUTPUT_CAP_PARAMETERS。"""
+
     assert REQUIRED_ENDPOINT_PARAMETERS == frozenset(
         {
-            "max_tokens",
             "reasoning",
             "reasoning_effort",
             "response_format",
             "structured_outputs",
         }
     )
+
+
+def test_output_cap_parameter_prefers_the_new_name_but_accepts_the_advertised_one():
+    """OpenRouter 已把 max_tokens 標為 deprecated,但 per-endpoint 的 supported_parameters
+    未必跟著更名(2026-08-02 實測 openai/gpt-5.6-luna-pro 只列 max_tokens)。因為 request 帶
+    require_parameters,送一個沒宣告的名字會被拒或被靜默丟掉——後者等於沒有上限。"""
+
+    assert OUTPUT_CAP_PARAMETERS == ("max_completion_tokens", "max_tokens")
+    assert select_output_cap_parameter({"max_tokens"}) == "max_tokens"
+    assert (
+        select_output_cap_parameter({"max_completion_tokens"})
+        == "max_completion_tokens"
+    )
+    assert (
+        select_output_cap_parameter({"max_tokens", "max_completion_tokens"})
+        == "max_completion_tokens"
+    )
+
+
+def test_endpoint_without_any_output_cap_parameter_is_refused_before_paying():
+    payload = catalog_payload()
+    endpoint = payload["data"]["endpoints"][0]
+    endpoint["supported_parameters"] = sorted(
+        set(endpoint["supported_parameters"]) - set(OUTPUT_CAP_PARAMETERS)
+    )
+
+    with pytest.raises(OpenRouterCatalogError, match="output cap parameter"):
+        select_catalog_endpoint(payload, expected_model=MODEL, expected_tag=TAG)
+
+
+def test_snapshot_carries_the_output_cap_parameter_the_endpoint_advertises():
+    assert endpoint_snapshot().output_cap_parameter == "max_tokens"
 
 
 def test_catalog_selects_the_single_matching_endpoint_and_normalizes_prices():

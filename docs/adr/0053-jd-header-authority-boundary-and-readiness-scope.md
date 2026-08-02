@@ -1,6 +1,6 @@
 # 0053. JdHeader 的 authority 邊界與 readiness 第一版範圍
 
-- 狀態：Accepted
+- 狀態：Proposed
 - 日期：2026-08-02
 - 補充：[0045](0045-job-analysis-local-web-contract-and-shared-authority-commit.md) 的 authority 邊界
   （**0045 本身的裁決不變**：`title` 仍不屬模型 authority read-set、改名仍不 bump generation）
@@ -43,8 +43,8 @@
    - 放在**獨立、沒有 ordinal 也沒有 `SourceRef` 的「員工填寫整體描述」區**，
      與有 ordinal 的訪談依據明確分開。
    - 用途只有四項：**理解用語、找 coverage 缺口、發現矛盾、選擇要追問什麼**。
-   - **不得單靠它新增、revise 或 withdraw 任何 Task**；顧問看到 header 寫了某項責任，
-     正確行為是追問員工實際做法，再由員工原話建立 Evidence。
+   - **不得單靠它產生任何 Task change**（`add`／`revise`／`withdraw`／`merge`／`split`）；
+     顧問看到 header 寫了某項責任，正確行為是追問員工實際做法，再由員工原話建立 Evidence。
    - **OPKS packet 本切片不變**：header 不進 OPKS，否則工作描述會變相支撐 K/S，
      繞過 0048／0049 的 Evidence 白名單。
 
@@ -66,7 +66,7 @@
 ### 正面
 
 - header 只有一條寫入路徑，且與 Task／OPKS 相同：Journal、generation、CAS、整份驗證一致。
-- 員工改工作描述會使執行中的舊 AI 分析正確失效，不會產生「AI 看不到員工已寫下的事實」。
+- 員工改工作描述會使執行中的舊 AI 分析正確失效，不會產生「AI 看不到員工已寫下的整體描述」。
 - readiness 不會在缺 Duty 時說謊，也不會顯示員工修不好的缺漏。
 - `title` 與職能基準名稱分離，文件庫改名不再被誤讀為改動產品內容。
 
@@ -79,5 +79,6 @@
 - header 進 Task Analysis packet 會增加 token 與被誤用為證據的風險，靠決定 4 的分區標示、
   「不得單靠它動 Task」與既有 prompt 邊界擋；OPKS 則以「不放進去」直接避開。
 - 與 blind-first 顧問流程相容：固定開場仍是「先不用照職稱回答」，header 屬**待驗證脈絡**而非答案。
-  舊流程中「防止職稱錨定」保留；但「表頭永遠晚到 Task 穩定後才可見」不再適用——
-  現在員工可自由編輯 header，AI 看不到員工已寫下的事實才是更大的失真。
+  舊流程中「防止職稱錨定」保留；「表頭永遠晚到 Task 穩定後才可見」則**只對員工已填寫的
+  header 不再適用**——現在員工可自由編輯 header，AI 看不到員工已寫下的整體描述才是更大的失真。
+  **這不授權 AI 提前生成或提案 header**：header 一律由員工填寫，模型只讀不寫。

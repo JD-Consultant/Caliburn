@@ -16,7 +16,10 @@ Caliburn 現行目標是給員工使用的**本機 Web AI 職務分析與職務�
 1. **先研究再動手** —— 重大變更前找**權威/主流/大廠/資深人物**的資料(官方文件、原作者、規範),
    寫一份**研究紀錄**到 `docs/specs/<date>-*.md`(含來源、診斷、選項、比對)。
 2. **決策寫 ADR** `docs/adr/00NN-*.md`(Nygard 式;Accepted 後不改內容,要翻案開新號),
-   並更新索引 `docs/adr/README.md`。
+   並更新索引 `docs/adr/README.md`。**狀態預設 `Proposed`**——審查中的修正一律直接改那份
+   Proposed ADR;**owner 核准後另開一個 commit** 把 ADR 與索引一起轉 `Accepted`。
+   只有 owner 事先明確核准具體內容才可一開始就寫 `Accepted`。先例:ADR 0045
+   (`820695a` Proposed → `f45b268` Accepted)。
 3. **plan** 寫到 `docs/plans/`(bite-size、可獨立驗證),再實作。
 4. **安全網優先** —— 盡量 **move-only** 重構;既有測試/golden 當 characterization net,
    **green-before == green-after**;**一個 task 一個 commit**,綠了才 commit;收尾打 git tag。

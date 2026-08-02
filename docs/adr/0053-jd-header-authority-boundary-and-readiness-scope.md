@@ -38,9 +38,20 @@
    說明與補充事項）。**不擴充 `DocumentMetadataWrite`**，兩者是不同的東西。
 3. **`JdHeader` 屬 Current JD authority**：員工儲存必須走 `commit_authority_change`、
    寫 Journal、bump `authority_generation` 並受 CAS 保護——與 Task／OPKS 同一條 seam。
-4. **高訊號 header 進 AI Context**：**至少職能基準名稱與工作描述**不得永遠對模型隱形。
-   但 packet 必須標示它們是**員工填寫的整體描述**，**不得當作個別 Task 的行為證據**——
-   否則模型會從職稱式摘要生出 Task（2026-08-02 live smoke 已觀測到便宜模型有此傾向）。
+4. **高訊號 header 只進 Task Analysis packet**：**至少職能基準名稱與工作描述**不得永遠對
+   模型隱形，但範圍限定在 Task Analysis 這一個 operation。
+   - 放在**獨立、沒有 ordinal 也沒有 `SourceRef` 的「員工填寫整體描述」區**，
+     與有 ordinal 的訪談依據明確分開。
+   - 用途只有四項：**理解用語、找 coverage 缺口、發現矛盾、選擇要追問什麼**。
+   - **不得單靠它新增、revise 或 withdraw 任何 Task**；顧問看到 header 寫了某項責任，
+     正確行為是追問員工實際做法，再由員工原話建立 Evidence。
+   - **OPKS packet 本切片不變**：header 不進 OPKS，否則工作描述會變相支撐 K/S，
+     繞過 0048／0049 的 Evidence 白名單。
+
+   依據與其界線：2026-07-31 live smoke 已觀測到**便宜模型會把模糊的員工語句過度升格為 Task**
+   （Luna-Pro 從員工說的「我會**協助**正式環境部署」直接建出一條 Task），
+   因此推論 JdHeader 也必須明確標示為整體脈絡而非 Task 證據。
+   **JdHeader 本身尚未直接實測**——2026-08-02 那次是 OPKS，Task 由場景種入，未涉 task discovery。
 5. **不建通用 metadata framework，不接舊 OCS autofill 路徑**
    （`OccupationPicker`／header-meta 服務屬 legacy editor，與本 seam 無關）。
 6. **readiness 第一版只回 issue 清單**：`DocumentReadinessView` **不含 `is_complete`／`ready`**，
@@ -65,4 +76,8 @@
   但這正是它與 rename 的差別所在。
 - 第一版 readiness 永遠不會說「完成」，員工得不到明確的完工訊號；
   這是刻意的，直到 Duty 切片補上為止。
-- header 進 packet 會增加 token 與被誤用為證據的風險，靠決定 4 的標示與既有 prompt 邊界擋。
+- header 進 Task Analysis packet 會增加 token 與被誤用為證據的風險，靠決定 4 的分區標示、
+  「不得單靠它動 Task」與既有 prompt 邊界擋；OPKS 則以「不放進去」直接避開。
+- 與 blind-first 顧問流程相容：固定開場仍是「先不用照職稱回答」，header 屬**待驗證脈絡**而非答案。
+  舊流程中「防止職稱錨定」保留；但「表頭永遠晚到 Task 穩定後才可見」不再適用——
+  現在員工可自由編輯 header，AI 看不到員工已寫下的事實才是更大的失真。

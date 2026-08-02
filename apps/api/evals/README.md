@@ -35,7 +35,8 @@ evidence見
   **歷史 reference 是維護者／agent 依權威來源整理的 provisional 樣本，不是 domain-SME
   ground truth；只可做 migration、grader smoke 與待審 capability case。新的 semantic
   release gate 必須使用 claim-level gold，並依上列實驗計畫標示 domain review 狀態。**
-- CI:`.github/workflows/evals.yml`(promptfoo-action;引擎/評測檔變更觸發,紅燈擋 merge)。
+- 舊 v3 的 promptfoo PR workflow 已移除；本目錄保留的 promptfoo 資產只供需要時手動重播，
+  不代表現行 `job_analysis` 的品質閘。
 
 ## 跑法
     npm run up                     # api:8001 起

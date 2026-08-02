@@ -253,7 +253,7 @@ def _manifest(
         ],
         "limitations": [
             "one synthetic Task, one trial; not a quality gate and not a model comparison",
-            "the configured model is the local dev model; this cannot settle consultant quality",
+            "one trial cannot settle consultant quality for whichever model is configured",
         ],
     }
 
@@ -425,7 +425,7 @@ async def _run(args: argparse.Namespace) -> int:
                 "quality_eligible": bool(evidence and evidence.quality_eligible),
                 "stopped_reason": stopped_reason,
                 "limitations": [
-                    "one trial on the local dev model; no consultant-quality claim",
+                    "a single trial cannot claim stable quality or compare models",
                 ],
             },
             ensure_ascii=False,

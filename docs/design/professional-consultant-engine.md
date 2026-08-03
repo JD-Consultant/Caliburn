@@ -1,15 +1,16 @@
 ---
 title: 專業顧問引擎與 current-row JD — production 切換邊界
 audience: agent-primary（也給人）
-status: R1 T2 implemented；R1 gate 未通過；新 production route 尚未實作
+status: R1 T3 implemented；R1 gate 未通過；新 production route 尚未實作
 updated: 2026-08-03
 ---
 
 # 專業顧問引擎與 current-row JD — production 切換邊界
 
 > **目前沒有新專業顧問 route／Web seam。** `apps/api/app/api/router.py` 未掛 `interview_vnext`、
-> `job_authoring`、`professional_consultant` 或 `job_workspace`。R1 T1/T2 已建立離線合約、八案、rubric、verifier、
-> prompts/schema 與 scripted runners；六臂 harness、live provider 與 gate 仍未完成，不得把 partial implementation 當成端點或 R1 通過。切換決策見
+> `job_authoring`、`professional_consultant` 或 `job_workspace`。R1 T1–T3 已建立離線合約、八案、rubric、verifier、
+> prompts/schema/runners、精確六臂 registry 與 immutable capture harness；blind grader、CLI、live provider 與 gate 仍未完成，
+> 不得把 partial implementation 當成端點或 R1 通過。切換決策見
 > [ADR 0041](../adr/0041-document-boundary-single-writer-cutover.md)，職務發現語意見
 > [ADR 0042](../adr/0042-hybrid-job-discovery-and-ttop-formation.md)，第一版發布門檻見
 > [ADR 0043](../adr/0043-real-employee-pilot-release-gate.md)，deployment boundary 見
@@ -38,7 +39,7 @@ Web /documents/[id]/interview
 | `app/interview_vnext` | ISOLATED PROTOTYPE／DONOR | 依 ADR 0040 逐項評估 provider、Capture、checkpoint 等基礎 | 直接掛 router；重用舊 gold/schema/operation/state |
 | `app/job_authoring` v1 | ISOLATED PROTOTYPE | 保留既有測試與三表，不擴張 | 新增 revision-scoped entity；讓 `snapshot_json` 成為 v2 truth |
 | current-row Authoring v2 | PLANNED／NOT IMPLEMENTED | 後續依核准 storage research 實作 | R0 建表、假裝 route 已存在 |
-| 新 professional consultant | R1 T2 IMPLEMENTED／R1 IN PROGRESS | T1 authority bundle + T2 prompts、portable schema、scripted once/two-stage runner；下一步 T3 harness/Capture | import/wrap v3；直接 promotion 現有 vNext loop；未有 live 證據宣稱 gate 通過 |
+| 新 professional consultant | R1 T3 IMPLEMENTED／R1 IN PROGRESS | T1 authority + T2 pure runners + T3 A1–A6/capture/offline harness；下一步 T4 blind grader/CLI/preflight | import/wrap v3；直接 promotion 現有 vNext loop；未有 live 證據宣稱 gate 通過 |
 | `job_workspace` seam | PLANNED／NOT IMPLEMENTED | R1–R5 過 gate 後組合第一條 production vertical | 在 R0 發明 request／response 或 route |
 
 ## 3. 第一條 production vertical（PV1，PLANNED）
@@ -106,7 +107,22 @@ T2 新增的可執行邊界：
   `VerificationReport`。runner 不捕捉 async cancellation。
 - eval-only `ScriptedProvider` 只依序回 neutral response 或 typed provider failure，production `app/` 不 import 它。
 
-此 bundle **尚不包含** A1–A6 harness、Trial Manifest/Capture、blind grader、CLI、OpenRouter adapter/preflight 或 live eval。
+T3 新增的 runtime 外 eval 邊界：
+
+- `ABLATION_ARMS` 是 ADR 0040 的六筆 literal registry；8 cases 先凍結為 48 trial slots、80 expected generator calls，grader
+  另計。run summary 從讀回的 evidence 計算 terminal trials、actual attempts、evaluable observations 與 failures，不拿 48/80
+  計畫常數冒充執行事實。
+- A1 走 eval-only minimal bundle：只有 Task rubric、turn-only context、`MinimalTaskDiscoveryOutput`（Task statements＋一問）與
+  minimal verifier；A6 才走 T2 full once runner。兩者的 schema/context/verifier 都可由 capture 看出，不是只換 prompt 名稱。
+- 每 trial 分成 `source-state.json`、`context-operation-input.json`、`trial-evidence.json`；`manifest.json` 快照完整 arm 並以
+  `artifact_id/kind/relative_path/SHA-256` 關聯。writer 只允許首次建立且最後發布 manifest；reader 對缺檔、額外檔、digest 或
+  trial/case/arm relation 漂移 fail closed。
+- `ObservedScriptedProvider` 把 requested model 與 response-supplied generation/resolved model/provider/endpoint 分欄。成功與 typed
+  provider/parse/schema/verifier failure 都能形成 terminal evidence；two-stage stage 1 failure 不補造第二次呼叫。
+- 離線測試實際跑完成功的 48 manifests／80 attempts，另鎖定 stage-1 failure 只有 79 actual attempts 且 summary 不標完整；
+  這只是 harness correctness，不是八案品質結果或架構勝出證據。
+
+此 bundle **尚不包含** blind grader、CLI、OpenRouter adapter/preflight 或 live eval。
 因此 R1 仍是 `IN PROGRESS`，不是 `OFFLINE-READY`、`GATE-PASSED` 或 production。
 
 ## 4. 文件 ownership 與寫入不變量
@@ -190,4 +206,5 @@ indexer-contract         = API 與 indexer 的 Python query contract
 - R0／PV1 plan：[`../plans/2026-08-02-professional-consultant-production-cutover-plan.md`](../plans/2026-08-02-professional-consultant-production-cutover-plan.md)
 - R1 離線研究：[`../specs/2026-08-03-r1-offline-contract-verifier-implementation-research.md`](../specs/2026-08-03-r1-offline-contract-verifier-implementation-research.md)
 - R1 T2 研究：[`../specs/2026-08-03-r1-t2-prompt-schema-scripted-runner-research.md`](../specs/2026-08-03-r1-t2-prompt-schema-scripted-runner-research.md)
+- R1 T3 研究：[`../specs/2026-08-03-r1-t3-ablation-manifest-capture-research.md`](../specs/2026-08-03-r1-t3-ablation-manifest-capture-research.md)
 - R1 實作 plan：[`../plans/2026-08-03-r1-task-discovery-offline-implementation-plan.md`](../plans/2026-08-03-r1-task-discovery-offline-implementation-plan.md)

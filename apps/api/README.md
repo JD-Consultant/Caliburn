@@ -6,8 +6,9 @@
 現行 production AI 共編端到端仍是 v3（一個大腦／追蹤修訂），但已標為 **ACTIVE／TRANSITIONAL／maintenance-only**，見
 [`docs/design/interview-engine.md`](../../docs/design/interview-engine.md)。隔離的 `interview_vnext` 已有0010 durable persistence、
 provider/Capture/checkpoint與production OpenRouter backend元件，`job_authoring` v1已有0011 revision三表；兩者都**沒有掛正式 router**，
-也不是ADR 0040新核心的前提。greenfield `professional_consultant` 已有 R1 T1/T2 的 pure contracts、verifier、versioned
-prompts、portable schema 與 provider-neutral scripted runner；尚無六臂 harness、live provider/route。新引擎、current-row JD與切換／退役見
+也不是ADR 0040新核心的前提。greenfield `professional_consultant` 已有 R1 T1/T2 pure core；eval 外圈另有 T3 的精確六臂
+registry、A1 minimal baseline、immutable Trial Manifest／三層 capture 與 48/80 offline harness。尚無 blind grader、CLI、
+live provider/route。新引擎、current-row JD與切換／退役見
 [`docs/design/professional-consultant-engine.md`](../../docs/design/professional-consultant-engine.md)。
 
 - **import 套件名**:`app`(Phase 3 才改 `caliburn_api`;現由 `pytest.ini` 的 `pythonpath=.` 提供)。
@@ -40,7 +41,8 @@ uv run pytest -q                   # 無 DB 時 DB 相關測試自動 skip
 | `app/interview/` | **現行但過渡的 production 訪談引擎**(ADR 0030)：`consultant.py`、`scribe.py`、`verify.py`、`ledger.py`、`backstop.py`、`skills/`、`service.py` | maintenance-only；不得擴充新產品能力或 `_pending` |
 | `app/interview_vnext/` | **隔離 prototype／donor**：0010八表、neutral runtime、Capture/checkpoint/outbox、OpenRouter adapter與舊question loop均已有實作；無正式route | production composition root不import；ADR0040禁止直接沿用舊operation/state/gold/schema |
 | `app/job_authoring/` | **隔離 v1 prototype**：0011 documents/revisions/proposals三表與employee proposal decision | revision/snapshot不是current-row v2 target；不掛route、不擴張revision entities |
-| `app/professional_consultant/` | **R1 T1/T2 pure core**：Task Discovery contracts/verifier、versioned prompts、light/heavy portable schema、once/two-stage runner；8案/rubric/scripted fake住`evals/` | 只依賴stdlib/Pydantic/自身；neutral request不含provider wire；不import v3、vNext、Authoring、DB或eval；尚無live adapter/route |
+| `app/professional_consultant/` | **R1 T1/T2 pure core**：Task Discovery contracts/verifier、versioned prompts、light/heavy portable schema、once/two-stage runner | 只依賴stdlib/Pydantic/自身；neutral request不含provider wire；不import v3、vNext、Authoring、DB或eval；尚無live adapter/route |
+| `evals/professional_consultant/r1/` | **R1 T1–T3 offline eval**：8案/rubric、A1–A6 registry、minimal baseline、observed fake、三層 capture/manifest、48/80 harness | runtime input看不到expectations/adjudication；resolved facts只收response evidence；不import legacy/provider SDK；不是production route |
 | `app/observability.py` | OTel tracing 橫切(gen_ai.* 手埋;verify 拒收/審閱事件 span) | — |
 | `app/api/` | HTTP 面:`routes/{users,job_profiles,documents,occupations,ai}.py`、`router.py`(唯一聚合點)、`deps.py`(get_knowledge) | 薄轉接,邏輯下沉 |
 | `app/app_factory.py` | composition root:`configure()` 掛 router/CORS/healthz | — |

@@ -62,7 +62,7 @@ PDF -> pdf-to-json -> OCS JSON -> ocs-indexer -> Qdrant
 | `app/interview` + OCS editor | ACTIVE／TRANSITIONAL | 現行流量；只修阻斷、安全、資料損毀，不擴充 `_pending` |
 | `app/interview_vnext` | ISOLATED PROTOTYPE／DONOR | 有 durable persistence、provider/Capture 與舊 operation；production router 不 import；不得直接 promotion |
 | `app/job_authoring` v1 | ISOLATED PROTOTYPE | migration 0011 三表 revision core；不是 current-row v2 target，不得擴張 revision entities |
-| 專業顧問引擎 | R1 T2 IMPLEMENTED／R1 IN PROGRESS | T1 contracts/8案/rubric/verifier 加 T2 versioned prompts、portable schema 與 scripted once/two-stage runner 已落地；六臂 harness、live provider／route 尚未實作，R1 gate 未通過 |
+| 專業顧問引擎 | R1 T3 IMPLEMENTED／R1 IN PROGRESS | T1 contracts/8案/rubric/verifier、T2 prompts/schema/runners、T3 精確六臂 registry、A1 minimal baseline、immutable manifest／三層 capture 與 48/80 offline harness 已落地；blind grader、CLI、live provider／route 尚未實作，R1 gate 未通過 |
 | current-row Authoring v2 | PLANNED／NOT IMPLEMENTED | Current Work Model／Current JD 唯一真相；AI 只提 proposal；Current State + Journal 同交易 |
 | `job_workspace` Web/API seam | PLANNED／NOT IMPLEMENTED | R1–R5 gate 後才建第一條 production vertical；目前沒有 route/package |
 

@@ -12,6 +12,7 @@ from pathlib import Path
 API_DIR = Path(__file__).parents[1]
 CORE_ROOT = API_DIR / "app" / "professional_consultant"
 APP_ROOT = API_DIR / "app"
+R1_EVAL_ROOT = API_DIR / "evals" / "professional_consultant" / "r1"
 
 
 def _imports(path: Path) -> list[tuple[int, str]]:
@@ -88,6 +89,39 @@ def test_production_app_does_not_import_r1_eval_assets() -> None:
     assert violations == []
 
 
+def test_r1_eval_harness_never_imports_legacy_or_provider_frameworks() -> None:
+    forbidden_roots = {
+        "sqlalchemy",
+        "alembic",
+        "asyncpg",
+        "psycopg",
+        "fastapi",
+        "anthropic",
+        "openai",
+        "langchain",
+        "langgraph",
+        "pydantic_ai",
+        "torch",
+    }
+    violations: list[str] = []
+    for path in R1_EVAL_ROOT.glob("*.py"):
+        for line, module in _imports(path):
+            root = module.split(".", 1)[0]
+            if (
+                root in forbidden_roots
+                or module == "app.interview"
+                or module.startswith("app.interview.")
+                or module == "app.interview_vnext"
+                or module.startswith("app.interview_vnext.")
+                or module == "app.job_authoring"
+                or module.startswith("app.job_authoring.")
+            ):
+                violations.append(
+                    f"{path.relative_to(R1_EVAL_ROOT)}:{line} imports {module}"
+                )
+    assert violations == []
+
+
 def test_contracts_and_verifier_import_cleanly_in_a_cold_process() -> None:
     script = (
         "from app.professional_consultant import contracts, prompts, runner\n"
@@ -97,6 +131,10 @@ def test_contracts_and_verifier_import_cleanly_in_a_cold_process() -> None:
         "    prompts.OperationName.TASK_DISCOVERY,\n"
         "    schema_projection.SchemaProfile.LIGHT,\n"
         ")\n"
+        "from evals.professional_consultant.r1 import ablation, capture, harness\n"
+        "from evals.professional_consultant.r1 import minimal_harness\n"
+        "from evals.professional_consultant.r1 import observed_provider\n"
+        "assert len(ablation.ABLATION_ARMS) == 6\n"
     )
     proc = subprocess.run(
         [sys.executable, "-c", script],

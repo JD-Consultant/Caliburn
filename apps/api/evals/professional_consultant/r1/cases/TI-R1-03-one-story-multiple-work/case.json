@@ -1,0 +1,26 @@
+{
+  "schema_version": "r1_task_discovery_case.v1",
+  "case_id": "TI-R1-03-one-story-multiple-work",
+  "case_family_id": "family-one-story-multiple-work",
+  "source_type": "constructed_edge",
+  "source_session_ref": null,
+  "title": "一個故事包含多個工作",
+  "capability": "把故障處理步驟整併，同時辨識具不同 outcome 的事故後改善責任",
+  "target_message_id": "turn-a1",
+  "question_context": {
+    "question_id": "turn-q1",
+    "question_text": "請說一個你最近處理系統故障的例子。",
+    "target_claim_ids": [],
+    "target_candidate_ids": []
+  },
+  "prior_claims": [],
+  "prior_stories": [],
+  "prior_work_units": [],
+  "existing_task_candidates": [],
+  "omitted_relevant_context": false,
+  "files": {
+    "transcript": "transcript.jsonl",
+    "expectations": "expectations.json",
+    "adjudication": "adjudication.md"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "schema_version": "r1_task_discovery_expectations.v1",
+  "case_id": "TI-R1-02-tool-work-with-outcome",
+  "minimum_task_candidates": 1,
+  "maximum_task_candidates": 1,
+  "permitted_decisions": ["add", "clarify"],
+  "expected_next_action": "clarify_boundary",
+  "forbidden_promotions": [
+    {"category": "step", "statement": "執行相容性驗證"},
+    {"category": "step", "statement": "安排停機時間"},
+    {"category": "step", "statement": "確認服務恢復"}
+  ],
+  "acceptable_task_examples": ["規劃並執行 Java 執行環境升級，以維持服務相容性與可用性。"],
+  "required_qualifier_notes": ["每季、本人主責、服務恢復結果共同支持正式週期責任。"],
+  "question_intent": "確認升級責任的範圍或成功標準，不重問已知頻率。",
+  "critical_notes": ["不得把驗證、排程與恢復確認拆成三個獨立 Task。"]
+}

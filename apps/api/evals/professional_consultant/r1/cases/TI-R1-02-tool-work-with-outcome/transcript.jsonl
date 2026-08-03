@@ -1,0 +1,2 @@
+{"turn_id":"turn-q1","role":"consultant","text":"你目前有哪些固定負責的技術維護工作？"}
+{"turn_id":"turn-a1","role":"employee","text":"我每季主責 Java 執行環境升級，要先做相容性驗證、排停機時間，最後確認服務都恢復。"}

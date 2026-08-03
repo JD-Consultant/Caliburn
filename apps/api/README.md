@@ -6,7 +6,8 @@
 現行 production AI 共編端到端仍是 v3（一個大腦／追蹤修訂），但已標為 **ACTIVE／TRANSITIONAL／maintenance-only**，見
 [`docs/design/interview-engine.md`](../../docs/design/interview-engine.md)。隔離的 `interview_vnext` 已有0010 durable persistence、
 provider/Capture/checkpoint與production OpenRouter backend元件，`job_authoring` v1已有0011 revision三表；兩者都**沒有掛正式 router**，
-也不是ADR 0040新核心的前提。新引擎、current-row JD與切換／退役見
+也不是ADR 0040新核心的前提。greenfield `professional_consultant` 目前只有 R1 T1 的 pure contracts、verifier 與隔離 eval
+fixtures，尚無 runner/provider/route。新引擎、current-row JD與切換／退役見
 [`docs/design/professional-consultant-engine.md`](../../docs/design/professional-consultant-engine.md)。
 
 - **import 套件名**:`app`(Phase 3 才改 `caliburn_api`;現由 `pytest.ini` 的 `pythonpath=.` 提供)。
@@ -39,6 +40,7 @@ uv run pytest -q                   # 無 DB 時 DB 相關測試自動 skip
 | `app/interview/` | **現行但過渡的 production 訪談引擎**(ADR 0030)：`consultant.py`、`scribe.py`、`verify.py`、`ledger.py`、`backstop.py`、`skills/`、`service.py` | maintenance-only；不得擴充新產品能力或 `_pending` |
 | `app/interview_vnext/` | **隔離 prototype／donor**：0010八表、neutral runtime、Capture/checkpoint/outbox、OpenRouter adapter與舊question loop均已有實作；無正式route | production composition root不import；ADR0040禁止直接沿用舊operation/state/gold/schema |
 | `app/job_authoring/` | **隔離 v1 prototype**：0011 documents/revisions/proposals三表與employee proposal decision | revision/snapshot不是current-row v2 target；不掛route、不擴張revision entities |
+| `app/professional_consultant/` | **R1 T1 pure core**：greenfield Task Discovery contracts 與 deterministic verifier；8案/rubric住`evals/` | 只依賴stdlib/Pydantic/自身；不import v3、vNext、Authoring、provider、DB或eval；尚無runner/route |
 | `app/observability.py` | OTel tracing 橫切(gen_ai.* 手埋;verify 拒收/審閱事件 span) | — |
 | `app/api/` | HTTP 面:`routes/{users,job_profiles,documents,occupations,ai}.py`、`router.py`(唯一聚合點)、`deps.py`(get_knowledge) | 薄轉接,邏輯下沉 |
 | `app/app_factory.py` | composition root:`configure()` 掛 router/CORS/healthz | — |
@@ -116,6 +118,7 @@ competencies)→ `core/domain/knowledge_pack.build_pack` 純函式**照優先序
 ## 不變量
 
 - **core 不 import 外圈**(adapters/interview/fastapi);違反=架構回歸(ADR 0008)。
+- **professional consultant 不 import 舊引擎／vNext／Authoring／eval**；現階段亦不接 provider、DB 或 route。
 - **`/ai/*` 永不寫 DB**:提議由前端套用後走 PATCH(read-only 純函數;**不是**共編路徑)。
 - **文件寫入只有三條路**:PATCH(使用者編輯,含 ✓/✗ 去標還原)、finalize(產正式版)、
   **書記 op→verify→`_pending`**(AI 唯一寫入;ADR 0030)。PUT occupations 只寫 profile

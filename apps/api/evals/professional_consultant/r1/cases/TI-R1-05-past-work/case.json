@@ -1,0 +1,26 @@
+{
+  "schema_version": "r1_task_discovery_case.v1",
+  "case_id": "TI-R1-05-past-work",
+  "case_family_id": "family-past-work",
+  "source_type": "constructed_edge",
+  "source_session_ref": null,
+  "title": "過去工作不得成為現行 Task",
+  "capability": "保留過去經驗但不讓它支持現職 Task，繼續釐清現行應用測試結果",
+  "target_message_id": "turn-a1",
+  "question_context": {
+    "question_id": "turn-q1",
+    "question_text": "你現在主要負責哪些工作？",
+    "target_claim_ids": [],
+    "target_candidate_ids": []
+  },
+  "prior_claims": [],
+  "prior_stories": [],
+  "prior_work_units": [],
+  "existing_task_candidates": [],
+  "omitted_relevant_context": false,
+  "files": {
+    "transcript": "transcript.jsonl",
+    "expectations": "expectations.json",
+    "adjudication": "adjudication.md"
+  }
+}

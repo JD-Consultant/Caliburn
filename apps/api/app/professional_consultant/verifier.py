@@ -18,6 +18,8 @@ from .contracts import (
     TimeScope,
     TranscriptRole,
     Typicality,
+    TurnUnderstandInput,
+    TurnUnderstandOutput,
 )
 
 
@@ -146,6 +148,77 @@ def _check_references(
 def _normalized_question(value: str) -> str:
     compact = "".join(value.split()).casefold()
     return compact.rstrip("?？。.!！")
+
+
+def _report(issues: list[VerificationIssue]) -> VerificationReport:
+    ordered = tuple(
+        sorted(
+            issues,
+            key=lambda item: (item.code.value, item.path, item.entity_id or ""),
+        )
+    )
+    return VerificationReport(
+        schema_version="task_discovery_verification_report.v1", issues=ordered
+    )
+
+
+def verify_turn_understand(
+    source: TurnUnderstandInput, result: TurnUnderstandOutput
+) -> VerificationReport:
+    """Verify a stage-one result before it can enter reconciliation."""
+
+    messages = {source.employee_message.message_id: source.employee_message.text}
+    messages.update(
+        {
+            turn.turn_id: turn.text
+            for turn in source.recent_transcript
+            if turn.role is TranscriptRole.EMPLOYEE
+        }
+    )
+    all_claims = (*source.prior_claims, *result.claims)
+    claim_ids = {claim.claim_id for claim in all_claims}
+    issues = _check_unique_ids(
+        tuple(claim.claim_id for claim in all_claims), path="claims"
+    )
+    issues.extend(
+        _check_unique_ids(
+            tuple(signal.signal_id for signal in result.unmapped_signals),
+            path="unmapped_signals",
+        )
+    )
+    for claim in result.claims:
+        for index, span in enumerate(claim.anchors):
+            issues.extend(
+                _verify_span(
+                    span,
+                    path=f"claims/{claim.claim_id}/anchors/{index}",
+                    entity_id=claim.claim_id,
+                    messages=messages,
+                )
+            )
+        if (
+            claim.kind is ClaimKind.CORRECTION
+            and claim.correction_target_claim_id not in claim_ids
+        ):
+            issues.append(
+                _issue(
+                    VerificationIssueCode.CORRECTION_TARGET_MISSING,
+                    f"claims/{claim.claim_id}/correction_target_claim_id",
+                    claim.claim_id,
+                    "correction references an unknown claim",
+                )
+            )
+    for signal in result.unmapped_signals:
+        for index, span in enumerate(signal.anchors):
+            issues.extend(
+                _verify_span(
+                    span,
+                    path=f"unmapped_signals/{signal.signal_id}/anchors/{index}",
+                    entity_id=signal.signal_id,
+                    messages=messages,
+                )
+            )
+    return _report(issues)
 
 
 def verify_task_discovery(
@@ -443,12 +516,4 @@ def verify_task_discovery(
             )
         )
 
-    ordered = tuple(
-        sorted(
-            issues,
-            key=lambda item: (item.code.value, item.path, item.entity_id or ""),
-        )
-    )
-    return VerificationReport(
-        schema_version="task_discovery_verification_report.v1", issues=ordered
-    )
+    return _report(issues)

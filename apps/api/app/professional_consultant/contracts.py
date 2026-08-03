@@ -291,6 +291,7 @@ class WorkReconcileDecideInput(ConsultantContract):
     schema_version: Literal["work_reconcile_decide_input.v1"]
     employee_message: EmployeeMessage
     understanding: TurnUnderstandOutput
+    prior_claims: tuple[SourceClaim, ...]
     prior_stories: tuple[Story, ...]
     prior_work_units: tuple[WorkUnit, ...]
     existing_task_candidates: tuple[TaskCandidate, ...]

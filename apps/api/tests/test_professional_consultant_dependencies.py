@@ -90,8 +90,13 @@ def test_production_app_does_not_import_r1_eval_assets() -> None:
 
 def test_contracts_and_verifier_import_cleanly_in_a_cold_process() -> None:
     script = (
-        "from app.professional_consultant import contracts, verifier\n"
+        "from app.professional_consultant import contracts, prompts, runner\n"
+        "from app.professional_consultant import schema_projection, verifier\n"
         "contracts.TaskDiscoveryOutput.model_json_schema()\n"
+        "schema_projection.provider_schema_for(\n"
+        "    prompts.OperationName.TASK_DISCOVERY,\n"
+        "    schema_projection.SchemaProfile.LIGHT,\n"
+        ")\n"
     )
     proc = subprocess.run(
         [sys.executable, "-c", script],
@@ -104,3 +109,12 @@ def test_contracts_and_verifier_import_cleanly_in_a_cold_process() -> None:
         errors="replace",
     )
     assert proc.returncode == 0, proc.stderr
+
+
+def test_t2_public_runner_seams_are_exported_from_the_package() -> None:
+    import app.professional_consultant as consultant
+
+    assert consultant.run_task_discovery_once
+    assert consultant.run_task_discovery_two_stage
+    assert consultant.StructuredOutputProvider
+    assert consultant.OperationRunError

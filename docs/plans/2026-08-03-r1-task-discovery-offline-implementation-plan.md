@@ -1,12 +1,13 @@
 # R1 Task Discovery 離線實作計畫
 
 - 日期：2026-08-03
-- 狀態：T1 COMPLETE；R1 IN PROGRESS（尚未 OFFLINE-READY／GATE-PASSED）
+- 狀態：T1/T2 COMPLETE；R1 IN PROGRESS（尚未 OFFLINE-READY／GATE-PASSED）
 - 決策：[ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md)、
   [ADR 0042](../adr/0042-hybrid-job-discovery-and-ttop-formation.md)
 - 研究：[R1 深入研究](../specs/2026-07-25-professional-consultant-r1-task-discovery-deep-research.md)、
   [R1 紅隊修訂](../specs/2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md)、
-  [離線契約／verifier 實作研究](../specs/2026-08-03-r1-offline-contract-verifier-implementation-research.md)
+  [離線契約／verifier 實作研究](../specs/2026-08-03-r1-offline-contract-verifier-implementation-research.md)、
+  [T2 prompt/schema/runner 研究](../specs/2026-08-03-r1-t2-prompt-schema-scripted-runner-research.md)
 
 ## 1. 目標與現況
 
@@ -23,14 +24,14 @@ TDD 只測下列公開邊界：
 1. `app.professional_consultant.contracts`：greenfield 的 domain／operation typed values；
 2. `app.professional_consultant.verifier.verify_task_discovery`：來源＋結果進、排序穩定的 report 出；
 3. `evals.professional_consultant.r1.loader`：runtime input 與 expectations／adjudication 分離載入；
-4. 後續 runner 的一次呼叫與兩階段介面、CLI 與 Trial Manifest。
+4. runner 的一次呼叫與兩階段介面，以及後續 CLI／Trial Manifest。
 
 domain 不 import FastAPI、ORM、provider SDK、`app.interview`、`app.interview_vnext`、`app.job_authoring` 或 eval package。
-測試不 mock 自有模組，只在未來 provider 邊界使用 scripted fake。
+測試不 mock 自有模組，只在 external provider port 使用 scripted fake。
 
 ## 3. Task 切片
 
-### T1 — 離線 authority bundle（本 session）
+### T1 — 離線 authority bundle（完成）
 
 先依 red→green 小步完成：
 
@@ -48,12 +49,35 @@ domain 不 import FastAPI、ORM、provider SDK、`app.interview`、`app.intervie
 correction、disqualified-only support、duplicate relation 與 exact-repeat question 的 invalid examples 都被擋；cold import／AST
 guard 通過；targeted tests、受影響 tests、baseline comparison、`git diff --check` 通過。提交一個 task commit，不打 R1 tag。
 
-### T2 — operation prompt、portable schema 與 scripted runner
+### T2 — operation prompt、portable schema 與 scripted runner（完成）
 
 - 版本化 minimal／full prompt 與 light／heavy provider schema projection；
 - 一次呼叫 runner，以及 `turn.understand → work.reconcile + decide` 兩階段 runner；
 - deterministic verifier 在每個 provider result 後必跑；scripted fake 覆蓋成功、invalid、parse／provider failure；
 - 禁止 provider payload 穿越 operation seam。
+
+逐檔案施工順序：
+
+1. `app/professional_consultant/prompts.py` 與 `prompt_assets/*.txt`：建立
+   `task.discover` minimal/full、`turn.understand` full、`work.reconcile_decide` full 的版本化 artifact；prompt 只描述
+   operation 責任、Task rubric、來源限制與一個下一問，不要求 chain-of-thought。
+2. `app/professional_consultant/schema_projection.py`：從同一 output model 產生相同 value shape 的 light/heavy portable schema；
+   light 只含 structural vocabulary，heavy 只多 property descriptions。兩者 inline `$ref`、移除 local constraints，
+   `const` 轉 singleton enum，輸出 canonical JSON。
+3. `app/professional_consultant/runner.py`：建立 neutral `StructuredOutputProvider` Protocol、frozen request/response、
+   `run_task_discovery_once` 與 `run_task_discovery_two_stage`；operation request 不含 OpenRouter/SDK wire fields。
+4. `contracts.py` 只補兩階段組合所需的 `WorkReconcileDecideInput.prior_claims`；`verifier.py` 補 stage-1 understanding verifier，
+   不改 Task 定義或放寬 full verifier。
+5. `evals/professional_consultant/r1/scripted_provider.py`：唯一 external-boundary fake，依序回 typed response 或 typed provider
+   failure，保存 neutral requests 供 offline harness 使用；production `app/` 不 import 它。
+6. 新增 `tests/test_professional_consultant_prompt_schema.py` 與 `tests/test_professional_consultant_runner.py`，逐個 red→green
+   鎖定 artifact version、portable vocabulary、同 shape、一次／兩階段成功、stage-1 fail-fast，以及
+   `provider_failed`／`output_json_invalid`／`output_schema_invalid`／`verification_failed` 四類錯誤。
+
+完成條件：所有新 public seam 測試綠；stage 1 invalid 時 scripted provider 只收到一次請求；每個成功 provider result 後都跑
+deterministic verifier；cancellation 不被改寫；dependency/cold-import guard 通過；完整 API 相較 T1 baseline 只增加 pass，既有五個
+historical frozen-byte mismatch 不變。同 commit 更新 `apps/api/README.md`、`ARCHITECTURE.md`、`docs/README.md` 與 living design；
+提交一個 T2 commit，不打 tag、不進 T3。
 
 ### T3 — 六臂 ablation、Trial Manifest 與 capture
 
@@ -104,3 +128,19 @@ trial evidence，由單一 immutable Trial Manifest 關聯。
 - `git diff --check` 通過；AST 與 cold-process guards 證明新 core 未 import v3、vNext、Authoring、eval、FastAPI、
   persistence、provider SDK、torch 或 agent/Graph framework。
 - 未執行 provider/live call、paid API、DB migration、route、Web 或 deployment；未建立 tag。下一個可獨立 task 是 T2。
+
+## 6. T2 執行證據（2026-08-03）
+
+- RED→GREEN slices：prompt module 缺失、兩階段 prompt 缺失、schema projector 缺失、once runner 缺失、strict duplicate-JSON
+  分類、typed provider failure、two-stage runner 與 package export 均先有可重現 RED，再以 public seam 轉綠。
+- professional consultant T1+T2 targeted：`29 passed`；相鄰 app wiring、job-authoring/vNext dependency guards 合跑
+  `46 passed`。
+- 完整 API no-network：`1192 passed / 218 skipped / 5 failed`；相較 T1 baseline
+  `1181 passed / 218 skipped / 5 failed` 新增 11 passed。五個 failure 仍是完全相同的 historical vNext frozen-byte hash
+  mismatch，沒有新 regression。
+- light/heavy schema 三個 operation 都通過同 value-shape、portable keyword、closed/required object 與 canonical JSON guard；
+  neutral request 明確沒有 provider/HTTP/SDK wire fields。
+- scripted once/two-stage success、stage-1 fail-fast、provider/JSON/schema/verifier 四類 failure、attached verification report 與
+  cancellation propagation 均通過 offline tests。
+- 未呼叫 live／paid provider，未選 model/endpoint，未建立 Trial Manifest/Capture、CLI、DB、route、Web 或 deployment；未打 tag。
+  下一個可獨立 task 是 T3。

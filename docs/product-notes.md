@@ -50,9 +50,10 @@
 這延伸 [ADR 0037](adr/0037-interview-vnext-question-frame-contextual-evidence-and-employee-authority.md) 的員工文件權威：
 「current draft truth」只回答目前草稿內容由誰決定，不等於建立企業 approval authority。
 
-現行本機單人產品不新增提交、退回、簽核、主管／HR reviewer role 或多人共編。未來可研究多人審閱流程或服務多家
-中小企業的平台，但目前只記為未決產品選項；除非另案研究、ADR 與 owner 明確排入 roadmap，不得據此新增帳號、
-organization／tenant、ACL、雲端部署或 SaaS infrastructure。
+現行本機單人產品不新增提交、退回、簽核、主管／HR reviewer role 或多人共編。**Owner 於 2026-08-03 確認：**未來可研究
+多人審閱流程或服務多家中小企業的平台，但只保留為 future option，**不列入現行 active roadmap，也不是本機第一版完成後的
+既定下一階段**。除非日後另案研究、ADR 與 owner 明確重新排入 roadmap，不得據此新增帳號、organization／tenant、ACL、
+雲端部署或 SaaS infrastructure。
 
 ### 內部 Job Model 不等於政府公版
 

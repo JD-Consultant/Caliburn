@@ -28,6 +28,12 @@
 
 ---
 
+> **【2026-08-03 owner 修訂】** [ADR 0043](../adr/0043-real-employee-pilot-release-gate.md) 將 R8 明確改為
+> 「本機 Web 發布候選版」，R9 改為第一版發布前必須通過的真實員工試用 gate。合成案例、高擬真 transcript、內部自測、
+> LLM grader 或非操作者專家審閱都不能取代實際在職員工以本人工作完成端到端試用。
+
+---
+
 ## 1. 這份路線圖解決什麼
 
 前兩份權威文件已分別回答：
@@ -61,6 +67,8 @@
 
 > 一個在員工電腦本機運行的 Web 應用。員工與 AI 專業顧問持續對話，逐步盤點與分析目前工作，AI 以提案方式協助
 > 建立或修改 JD，員工可接受、修改、拒絕、延後或直接編輯；完整回合、顧問進度與多份 JD 可以保存、關閉並重新開啟。
+
+這個「正式成品」定義只有在 R9 真實員工發布 gate 通過後成立；R8 只產出具備上述能力的 release candidate。
 
 成品至少要讓員工完成以下旅程：
 
@@ -862,7 +870,7 @@ Retrieval node 只取得候選；`public.challenge` 只比較候選與 Work Mode
 
 ---
 
-## 15. R8：本機 Web 成品
+## 15. R8：本機 Web 發布候選版
 
 ### 15.1 何時才接
 
@@ -923,21 +931,31 @@ R9 起，任何改變上述行為的程式變更都要同步更新此檔。
 - supporting artifacts 可選提供、查看、移除／替換，且不會自動覆蓋員工現況；
 - 完成主要使用旅程時不需要技術人員介入；
 - `docs/design/professional-consultant-engine.md` 已由通過 gate 的真實程式路徑建立；
-- 實際員工試用未出現系統性誤導、重複追問或無法理解 proposal 的問題。
+- 工程與模型 safety net 已綠，可交付受控的 R9 真實員工試用。
+
+通過本 gate 只代表 release candidate 已成立，不代表「員工可用成品」已通過真人驗證。
 
 ---
 
-## 16. R9：小規模真實試用與品質打磨
+## 16. R9：真實員工試用發布 gate 與品質打磨
 
-R8 是可用成品，不代表已達到「取代專業顧問」的品質。接著用少量真實員工或高擬真 transcript：
+R8 是可供受控試用的 release candidate，不是已可發布的員工成品。R9 必須由第一版的預期操作者，以本人目前實際從事的
+工作完成小規模端到端試用；主管、HR 或 SME 可作第二層內容審閱，但不能取代 incumbent 操作。高擬真 transcript、模擬
+persona、產品團隊自測、合成 eval 與 LLM grader 仍可用於除錯與 regression，但不能讓本 gate 成立。
 
-- 比較最終 JD 與原始工作內容；
-- 由 owner／職務分析專業人士盲審；
-- 記錄員工最常修改、拒絕與不理解的 proposal；
-- 找出漏問、重問、引導與訪談過長；
-- 看 Task 邊界、O/P/K/S、Duty 與公版 challenge 的穩定性；
+Pilot 開始前須在獨立執行計畫固定 release scope、招募條件、情境 coverage、rubric、severity、樣本數與
+pass／rework／invalid decision rule。試用至少要：
+
+- 觀察員工從啟動、訪談、提案決策、保存／重開到匯出是否真正完成，並記錄 false-success、求助與放棄；
+- 比較最終 JD 與本人工作證據，檢查 Duty／Task／O／P／KSA 的重要缺漏、捏造、邊界與 linkage；
+- 記錄員工修改、拒絕、不理解的 proposal，以及漏問、重問、引導、訪談過長與不可恢復問題；
+- 檢查敏感資料處理、員工可停止／拒絕／修正的 agency，以及 Evidence／reference／AI 推論的 provenance；
+- 保留 consent／data plan、build 與設定、session evidence、內容驗證、issue register、release decision 與重測範圍；
 - 比較模型、prompt 與 context policy，但一次只改一個主要變因；
 - 評估 latency、token 與費用。
+
+沒有合格真實員工、預先定義的門檻或可追溯證據時，pilot 無效而不是 pass。出現 release blocker 時回到受影響的 R1–R8
+階段修正並重測；只有通過本 gate，M8 才能稱為第一個經真實員工驗證的可用成品。這仍不代表企業正式核准或組織級效度。
 
 只有評測證明需要，才考慮：
 
@@ -971,7 +989,7 @@ R8 是可用成品，不代表已達到「取代專業顧問」的品質。接�
 | Observability | R1 最小 | R8 | 只依診斷需求增加 |
 | Quality Harness | R1 | 持續成長 | 每階段只新增必要案例 |
 | Execution Graph | R1 普通 code | R7 | 有實證才評估 Graph runtime |
-| Local Web | 無 | R8 | R9 使用性打磨 |
+| Local Web | 無 | R8 release candidate | R9 真人發布 gate 與使用性打磨 |
 | Living program design | 無 | R8 真實 production vertical 通過後 | R9 起跟隨行為變更 |
 
 沒有任何階段要求「先完整做完 Prompt Engineering、再完整做 Context Engineering」。五種 Engineering 的角色是：
@@ -1087,8 +1105,8 @@ Harness 可以直接呼叫相同 operation 與 state transition，但不應被 p
 | M4：工作分析核心（R4） | Task、Duty、O/P/K/S/A 候選 | 專業 JD 內容可逐步形成 | AI 還不能安全寫入正式文件 |
 | M5：共編核心測試品（R5） | proposal、決策、Current JD、direct edit | 已可實際共同建立小型 JD | 尚未做公版與完成檢查 |
 | M6：完整 JD 核心（R6–R7） | 公版 challenge、反方檢查、完成與匯出 | 內容流程完整 | 尚未是員工友善成品 |
-| M7：本機 Web 成品（R8） | 可操作、保存多份 JD、重開、匯出 | 第一個完整產品 | 尚需真實試用持續打磨 |
-| M8：品質打磨（R9） | 更穩定、較少修改與誤判 | 逐步接近專業顧問品質 | 不自動取得組織級正式效度 |
+| M7：本機 Web 發布候選版（R8） | 可操作、保存多份 JD、重開、匯出 | 可進入受控真實員工試用 | 尚不是員工可用成品 |
+| M8：真人驗證成品（R9） | 真實在職員工完成端到端旅程，已知 blocker 經處理與重測 | 第一個經真實員工驗證的可用產品 | 不自動取得企業核准或組織級正式效度 |
 
 ---
 

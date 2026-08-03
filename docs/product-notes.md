@@ -55,6 +55,17 @@
 既定下一階段**。除非日後另案研究、ADR 與 owner 明確重新排入 roadmap，不得據此新增帳號、organization／tenant、ACL、
 雲端部署或 SaaS infrastructure。
 
+### 第一版發布門檻：真實員工試用
+
+**狀態：已決定（2026-08-03）。**完整本機 Web、工程測試與模型 eval 通過後，只能稱為 **release candidate**。
+第一版在稱為「可供員工使用的成品」前，必須由實際在職、也是預期操作者的員工，以本人目前工作完成端到端試用，並驗證
+操作結果、互動理解、T–T–O–P／KSA 內容、安全／agency 與 provenance。高擬真 transcript、模擬 persona、產品團隊自測、
+合成 eval、LLM grader 或僅由主管／HR／SME 離線審閱，都不能取代此 gate。
+
+Pilot 開始前須另由 owner 核准 release scope、參與者 coverage、樣本數、rubric 數值、blocker severity、資料處理與最終
+release authority；無預先門檻或可追溯證據時不能判定通過。通過 gate 仍只代表經真實員工驗證的「員工確認 JD 草稿」產品，
+不代表企業正式核准或組織級效度。決策見 [ADR 0043](adr/0043-real-employee-pilot-release-gate.md)。
+
 ### 內部 Job Model 不等於政府公版
 
 **狀態：已決定（2026-07-24）。**政府公版是 UI／export profile，不是內部資料上限。內部 Task 可以保存

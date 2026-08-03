@@ -4,7 +4,8 @@
 - 狀態：R0 accepted；P1–P8 是後續施工順序，尚未授權實作，且須等待 R1–R5 gate
 - 決策：[ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md)、
   [ADR 0041](../adr/0041-document-boundary-single-writer-cutover.md)、
-  [ADR 0042](../adr/0042-hybrid-job-discovery-and-ttop-formation.md)
+  [ADR 0042](../adr/0042-hybrid-job-discovery-and-ttop-formation.md)、
+  [ADR 0043](../adr/0043-real-employee-pilot-release-gate.md)
 - 研究：[R0 架構真相與 production cutover](../specs/2026-08-02-r0-architecture-truth-and-production-cutover-research.md)
 
 ## 1. 交付目標
@@ -12,6 +13,8 @@
 在不擴建現行 v3、不 dual-write 同一文件的前提下，交付第一條新 production vertical（PV1）：
 建立新 JD、送出一段工作故事、得到下一題、建立具支持的 Task proposal、由員工決策、重啟後精確重開。
 完成資料 inventory／必要匯入後，依 gate 退役舊 Web 寫入、route、domain 與 tables。
+本計畫 P1–P8 與 technical cutover 完成後只形成 release candidate；第一版要稱為員工可用成品，仍須執行並通過另案核准的
+R9 真實員工 pilot。高擬真 transcript、合成 eval 或內部自測不得替代。
 
 ## 2. 前置 gate
 
@@ -149,12 +152,15 @@
 
 ## 5. 最終驗收
 
+本節驗收的是 production vertical 與 technical cutover，不是第一版產品 release gate。
+
 - PV1 可從一鍵本機啟動流程操作，不要求員工設定 host／port。
 - create→answer→proposal→decision→restart→reload 端到端通過。
 - Current JD 是唯一可寫文件真相；OCS 只由 projector 匯出。
 - 每筆採用內容有合法 support／Evidence linkage；reference candidate 不冒充 employee Evidence。
 - legacy inventory 為零後，舊寫路徑與 `_pending` 已移除；legacy tables 的刪除有獨立 migration、備份與 tag。
 - living design 只描述真實存在的 route／contract／transaction／錯誤路徑，沒有預想 API。
+- 產物標示為 release candidate；只有 ADR 0043 的 R9 真實員工 pilot 通過後，才改稱第一個員工可用成品。
 
 ## 6. R0 執行證據（2026-08-02）
 

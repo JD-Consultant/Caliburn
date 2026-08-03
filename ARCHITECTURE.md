@@ -4,7 +4,8 @@
 > [`docs/product-notes.md`](docs/product-notes.md)；顧問核心與切換決策見 ADR
 > [0040](docs/adr/0040-professional-consultant-engine-and-r1-validation-contract.md)／
 > [0041](docs/adr/0041-document-boundary-single-writer-cutover.md)／
-> [0042](docs/adr/0042-hybrid-job-discovery-and-ttop-formation.md)。
+> [0042](docs/adr/0042-hybrid-job-discovery-and-ttop-formation.md)／
+> [0043](docs/adr/0043-real-employee-pilot-release-gate.md)。
 
 ## 產品邊界
 
@@ -54,6 +55,7 @@ PDF -> pdf-to-json -> OCS JSON -> ocs-indexer -> Qdrant
 
 切換按整份 `document_id` 單寫者執行，不做同文件 dual-write。完整 gate、rollback 與退役順序見
 [`docs/design/professional-consultant-engine.md`](docs/design/professional-consultant-engine.md)。
+完整本機 Web 只形成 release candidate；通過 R9 真實在職員工端到端 pilot gate 後，才可稱為第一個員工可用成品。
 
 ## Code map
 
@@ -77,6 +79,7 @@ PDF -> pdf-to-json -> OCS JSON -> ocs-indexer -> Qdrant
 - **文件權威**：新產品的 Current Work Model／Current JD 是唯一真相；OCS 是 ingest/export shape，不是 live workspace store。
 - **AI 權限**：LLM 只能提出有 support/Evidence 的 proposal；員工 accept/edit-accept 後 deterministic application code 才能更新 Current JD。
 - **職務發現**：以暫定框架＋開放敘事＋定向補漏形成 Task，再歸納 Duty 與 O/P/KSA；reference 是假說／候選，不是員工 Evidence。
+- **發布證據**：工程／模型 eval 是進入 pilot 的前置安全網，不能取代實際在職員工以本人工作完成端到端試用。
 - **狀態與歷史**：Current State 直接讀；Consultation Journal 與狀態同 transaction 追加，但不作 Event Sourcing replay。
 - **依賴降級**：critical dependency fail-fast；reference enrichment 可回部分結果 + `meta.partial`。見 [ADR 0018](docs/adr/0018-indexer-dependency-degradation-policy.md)。
 

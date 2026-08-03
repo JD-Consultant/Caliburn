@@ -44,3 +44,7 @@ _Avoid_：正式 JD、封閉職責清單
 **混合式職務發現（Hybrid Job Discovery）**：
 以暫定職務框架引導覆蓋、以具體工作敘事提供證據，再經跨敘事整併、結構化檢查與人員確認形成職務模型的方法。
 _Avoid_：純上而下填表、純故事自動生成
+
+**真實員工試用（Real Employee Pilot）**：
+由第一版預期操作者中的實際在職員工，以本人目前工作操作 release candidate 並確認或修正 JD 草稿的發布前驗證。
+_Avoid_：模擬 persona、產品團隊自測、高擬真 transcript、只由主管／HR／SME 離線審閱

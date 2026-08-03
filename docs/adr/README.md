@@ -51,6 +51,7 @@ ADR 是「為什麼」層;搭配 `../specs/`(細節設計)與 `../runbook.md`(�
 | [0040](0040-professional-consultant-engine-and-r1-validation-contract.md) | 專業顧問引擎greenfield與R1驗證契約：**Supersedes 0038（完整取代）**；強模型先建天花板+最小harness baseline+model×schema ablation；exit gate須有預先定義的實質改善、持平選簡單者；三層評審者；Current State唯一真相+append-only Journal+runtime外eval capture與Trial Manifest；portable schema+deterministic verifier；K/S/A四級支持度；公版匯出措辭 | **Accepted**（2026-07-26；owner核准＋第二位審查者複審後定案） |
 | [0041](0041-document-boundary-single-writer-cutover.md) | 第一條 production vertical 與退役：以整份 `document_id` 為切換單位、同一文件單一 writer；現行 v3 maintenance-only；R1–R5 gate 後才掛新 local workspace；禁止 OCS/current-row dual-write；inventory／單向匯入後分 task 移除舊 Web、route、code、table | **Accepted**（2026-08-02；owner指示執行 R0） |
 | [0042](0042-hybrid-job-discovery-and-ttop-formation.md) | 混合式職務發現：暫定職務框架＋開放工作敘事＋定向補漏；跨敘事形成 Task、再歸納 Duty，Task 穩定後共同定義 O/P，KSA 保留 linkage／支持度並由人確認 | **Accepted**（2026-08-03；owner確認） |
+| [0043](0043-real-employee-pilot-release-gate.md) | 第一版發布門檻：R8 只產生本機 Web release candidate；R9 必須由實際在職員工以本人工作完成端到端試用，合成 eval／高擬真 transcript／專家審閱不能取代；樣本與數值門檻於 pilot 前另決定 | **Accepted**（2026-08-03；owner確認） |
 
 完整脈絡見 [`../specs/2026-06-27-system-architecture-design.md`](../specs/2026-06-27-system-architecture-design.md)。
 契約怎麼選/怎麼交付的規範見 [`../contract-strategy.md`](../contract-strategy.md)（ADR 0004/0010 的一般化、預答契約 #3）。

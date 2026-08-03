@@ -28,8 +28,9 @@ Caliburn 現行目標是給員工使用的**本機 Web AI 職務分析與職務�
 
 ### 現行產品優先級（高於歷史 SaaS 架構慣性）
 
-- 先做員工可操作、可一鍵啟動的本機 Web 成品；可自動開啟 localhost UI，但不得要求員工設定 host／port，也不要引入
-  未被要求的 Electron／Tauri／原生桌面殼。
+- 先做員工可操作、可一鍵啟動的本機 Web release candidate；可自動開啟 localhost UI，但不得要求員工設定 host／port，
+  也不要引入未被要求的 Electron／Tauri／原生桌面殼。第一版只有通過真實在職員工的端到端 pilot gate 後，才能稱為
+  員工可用成品；合成 eval、高擬真 transcript 或內部自測不得替代（ADR 0043）。
 - 第一版 Current JD 是員工確認、可交主管／HR 審閱的草稿，不宣稱企業正式核准；未來多人審閱／中小企業平台只保留為
   future option，不是 active roadmap 或第一版後的既定下一階段，未另案排入前不得新增 reviewer role、SaaS、
   organization／tenant、ACL 或雲端部署。
@@ -64,7 +65,8 @@ Caliburn 現行目標是給員工使用的**本機 Web AI 職務分析與職務�
   不得直接promotion或接Web。現行切換/退役邊界見 `docs/design/professional-consultant-engine.md` 與ADR **0041**。
 - **新顧問主線**：先做R1 Task Discovery品質gate，再依R2–R5完成multi-turn、resume、Duty/O/P/K/S/A、
   proposal/current-row JD；職務發現採「暫定框架＋開放敘事＋定向補漏」，跨敘事形成Task後才歸納Duty與O/P/KSA
-  （ADR 0042）。通過後才建第一條local Web production vertical。禁止import/wrap v3
+  （ADR 0042）。通過後才建第一條local Web production vertical；Web release candidate 完成後仍須通過R9真實員工發布gate
+  （ADR 0043）。禁止import/wrap v3
   consultant/scribe/harvest/select，禁止重用舊vNext gold/schema/operation/state。
 - **契約**:#1 `packages/ocs-contract`(OCS 文件,JSON-schema→Pydantic+TS)、
   #2 `packages/indexer-contract`(indexer⇄api,共用 pydantic)、#3 web 吃 ocs-contract 生成的 TS。

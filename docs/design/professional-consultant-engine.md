@@ -11,7 +11,8 @@ updated: 2026-08-03
 > `job_authoring` 或 `local_workspace`。本文件在 R0 只記錄真實現況、未來切換不變量與退役 gate；
 > 不得把「PLANNED」內容當成已存在的端點。切換決策見
 > [ADR 0041](../adr/0041-document-boundary-single-writer-cutover.md)，職務發現語意見
-> [ADR 0042](../adr/0042-hybrid-job-discovery-and-ttop-formation.md)。
+> [ADR 0042](../adr/0042-hybrid-job-discovery-and-ttop-formation.md)，第一版發布門檻見
+> [ADR 0043](../adr/0043-real-employee-pilot-release-gate.md)。
 
 ## 1. 目前可達的正式路徑（ACTIVE／TRANSITIONAL）
 
@@ -77,6 +78,8 @@ R1 只驗證上述路徑中的 Task Discovery 與下一問，不得提早建立�
 7. OCS JSON 是 import/export projection；不得回到 live workspace persistence。
 8. Indexer 是 reference knowledge；不得把 reference candidate 當 employee Evidence 或直接寫正式 JD。
 9. 第一版 Current JD 是 employee-confirmed draft truth，不是企業正式核准；現行 route 不建立主管／HR approval authority。
+10. 完整 Web 與 technical cutover 只形成 release candidate；R9 必須由實際在職員工以本人工作完成端到端 pilot，才能稱為
+    第一個員工可用成品。模擬 persona、高擬真 transcript、內部自測或非操作者專家審閱不能取代。
 
 ## 5. 切換流程
 
@@ -97,6 +100,8 @@ R0 architecture lock
 ```
 
 不得跳過中間 gate，亦不得把 route cutover、code deletion、table deletion 合成一次 big-bang 變更。
+上述是 writer／route 的技術切換順序，不等於產品 release。整體 roadmap 完成 R6–R8 後只得到本機 Web release candidate；
+R9 真實員工 pilot gate 通過後，才到達第一個員工驗證成品。
 
 ## 6. 資料遷移與 rollback
 

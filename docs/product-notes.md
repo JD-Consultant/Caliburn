@@ -5,23 +5,25 @@
 
 ---
 
-## 現行產品範圍鎖定：本機 Web AI 職務分析應用程式
+## 現行產品範圍鎖定：伺服器部署、瀏覽器存取
 
-**狀態：已決定（2026-07-23）；只有 owner 明確指示才可改變。**
+**狀態：已決定（2026-08-03；取代 2026-07-23 的員工電腦 localhost 假設）。**決策見
+[ADR 0044](adr/0044-server-deployed-browser-product.md)。
 
-目前要交付的不是雲端網站或 SaaS，而是一個在員工電腦本機運行、以 Web UI 操作的應用程式。員工的實際體驗必須是：
+Caliburn 是由企業或我們操作伺服器、員工以瀏覽器使用的 Web application：
 
-- 啟動本機 Web app 後，直接與 AI 專業顧問訪談並同步編輯自己的職務說明書；
-- 不會收到或登入遠端產品網址；本機啟動流程可以自動開啟 browser／localhost UI，員工不必手動設定 host、port 或部署；
-- 不需要註冊、登入、帳號、密碼、公司代碼、workspace invitation 或 tenant 選擇；
-- 第一版只處理一名本機操作者，一次開啟並訪談一份職務說明書；同一台電腦可以建立、保存、關閉與重新開啟多份
-  彼此隔離的職務說明書。這是本機文件庫，不是帳號 workspace、公司管理或多人共同作業。
+- 企業可在自己的伺服器、內網或私有環境操作一套企業自管 deployment；
+- 我們也可操作彼此獨立的代管 deployment，讓企業使用者經核准網址存取；
+- Web、API、PostgreSQL、Qdrant、GPU embedder 與 OpenRouter key 都在 deployment 端，員工裝置只需瀏覽器；
+- 員工不負責 host／port、服務啟停、資料庫、GPU、備份或 deployment secret；
+- 第一個 production scope 是一個 deployment 服務一個企業，可保存多份彼此隔離的 JD；一次開啟一份文件的 UI 限制可保留，
+  但不再稱為「本機文件庫」。
 
-「本機 Web app」是產品交付邊界：Web UI、API、資料庫與必要服務皆在本機組合運行，不要求 Electron、Tauri 或原生桌面殼。
-可以沿用或重構現有 Web 技術，但不得把 port、服務啟停、資料庫或基礎設施設定暴露成員工的日常操作流程。
+企業自管或我們代管不等於立即建立共享多租戶 SaaS。本階段不做 tenant control plane、跨企業共享資料庫、organization/member、
+ACL、quota、billing 或 tenant admin。若 deployment 將由多名使用者或非受控網路存取，登入、企業 SSO、角色與 actor scope
+必須在 R8 暴露前另案固定；「部署在內網」不能自動被當成安全身分。
 
-本決策也**不等於完全離線**。LLM 可以由本機 Web app 呼叫 OpenRouter；模型 API key 由開發者／owner 在本機設定管理，不由員工建立
-模型供應商帳號或輸入 key。若未來需要真正離線模型，必須另案研究品質、硬體與封裝成本，不能默認降低職務分析品質。
+本產品不要求 Electron、Tauri 或原生桌面殼。開發者仍可使用 localhost；那只是 development profile，不是員工交付方式。
 
 ### 工程資源優先順序
 
@@ -29,9 +31,9 @@
 2. LLM 是否能正確分析工作任務、工作產出、行為指標、K／S，並保留 Evidence linkage；
 3. Context Engine、episode 工作分析、文件提案與員工接受／修改／拒絕的完整 loop；
 4. 職務說明書內容完整度、一致性、客製化程度與可匯出品質；
-5. 能讓員工實際操作、可一鍵啟動的最小本機 Web workspace。
+5. 能在 server deployment 上由員工透過瀏覽器完成主要旅程的最小 `job_workspace`。
 
-本機 Web workspace 的文件權威是 `app/job_authoring` current canonical relational state；畫面可採政府公版欄位排列，但舊
+`job_workspace` 的文件權威是 `app/job_authoring` current canonical relational state；畫面可採政府公版欄位排列，但舊
 `DocumentVersion`／OCS deep JSON／`_pending` 不得恢復為新產品真相。詳細裁決見
 [`ADR 0039`](adr/0039-local-multi-document-canonical-public-form-workspace.md)。
 
@@ -50,14 +52,13 @@
 這延伸 [ADR 0037](adr/0037-interview-vnext-question-frame-contextual-evidence-and-employee-authority.md) 的員工文件權威：
 「current draft truth」只回答目前草稿內容由誰決定，不等於建立企業 approval authority。
 
-現行本機單人產品不新增提交、退回、簽核、主管／HR reviewer role 或多人共編。**Owner 於 2026-08-03 確認：**未來可研究
-多人審閱流程或服務多家中小企業的平台，但只保留為 future option，**不列入現行 active roadmap，也不是本機第一版完成後的
-既定下一階段**。除非日後另案研究、ADR 與 owner 明確重新排入 roadmap，不得據此新增帳號、organization／tenant、ACL、
-雲端部署或 SaaS infrastructure。
+現行單企業 deployment 不新增提交、退回、簽核、主管／HR reviewer role 或多人共編。未來可研究多人審閱與共享平台，但
+未另案前不得據此新增 organization／tenant、ACL 或 SaaS control plane。企業自管與我們代管 deployment 已屬現行產品邊界，
+不得再把 server deployment 本身列為禁止項。
 
 ### 第一版發布門檻：真實員工試用
 
-**狀態：已決定（2026-08-03）。**完整本機 Web、工程測試與模型 eval 通過後，只能稱為 **release candidate**。
+**狀態：已決定（2026-08-03）。**完整 server-deployed Web、工程測試與模型 eval 通過後，只能稱為 **release candidate**。
 第一版在稱為「可供員工使用的成品」前，必須由實際在職、也是預期操作者的員工，以本人目前工作完成端到端試用，並驗證
 操作結果、互動理解、T–T–O–P／KSA 內容、安全／agency 與 provenance。高擬真 transcript、模擬 persona、產品團隊自測、
 合成 eval、LLM grader 或僅由主管／HR／SME 離線審閱，都不能取代此 gate。
@@ -74,10 +75,9 @@ release authority；無預先門檻或可追溯證據時不能判定通過。通
 低頻高風險任務仍可為 core；也不要求每項工時比重必填或全文件加總 100%。這些資料主要從自然工作敘事抽取，
 只針對高價值缺口追問，不按公版欄位逐格盤問。
 
-除非 owner 明確提出，**不得投入** organization、tenant product behavior、member／role／ACL、登入、密碼重設、計費、quota、
-admin console、雲端部署、多租戶測試矩陣、多人即時協作或其他 SaaS infrastructure。既有資料表的 `tenant_id` 是歷史／FK 相容
-細節，不是新增上述功能的授權。也不得因追求全面 hash、audit 或測試覆蓋而延後可操作成品；只保留直接保護文件正確性、
-Evidence provenance、員工決策與關鍵 transaction 的安全網。
+除非另案核准，**不得投入**共享多租戶、organization、tenant product behavior、member／role／ACL、密碼重設、計費、quota、
+tenant admin、多租戶測試矩陣或多人即時協作。這不禁止企業自管／我們代管的 server deployment，也不禁止在 R8 前研究必要的
+OIDC／SSO access seam。既有 `tenant_id` 是歷史／FK 相容細節，不是共享 SaaS 授權。
 
 ---
 

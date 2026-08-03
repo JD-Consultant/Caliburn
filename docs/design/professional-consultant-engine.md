@@ -8,11 +8,12 @@ updated: 2026-08-03
 # 專業顧問引擎與 current-row JD — production 切換邊界
 
 > **目前沒有新專業顧問 route／Web seam。** `apps/api/app/api/router.py` 未掛 `interview_vnext`、
-> `job_authoring` 或 `local_workspace`。本文件在 R0 只記錄真實現況、未來切換不變量與退役 gate；
+> `job_authoring` 或 `job_workspace`。本文件在 R0 只記錄真實現況、未來切換不變量與退役 gate；
 > 不得把「PLANNED」內容當成已存在的端點。切換決策見
 > [ADR 0041](../adr/0041-document-boundary-single-writer-cutover.md)，職務發現語意見
 > [ADR 0042](../adr/0042-hybrid-job-discovery-and-ttop-formation.md)，第一版發布門檻見
-> [ADR 0043](../adr/0043-real-employee-pilot-release-gate.md)。
+> [ADR 0043](../adr/0043-real-employee-pilot-release-gate.md)，deployment boundary 見
+> [ADR 0044](../adr/0044-server-deployed-browser-product.md)。
 
 ## 1. 目前可達的正式路徑（ACTIVE／TRANSITIONAL）
 
@@ -38,7 +39,7 @@ Web /documents/[id]/interview
 | `app/job_authoring` v1 | ISOLATED PROTOTYPE | 保留既有測試與三表，不擴張 | 新增 revision-scoped entity；讓 `snapshot_json` 成為 v2 truth |
 | current-row Authoring v2 | PLANNED／NOT IMPLEMENTED | 後續依核准 storage research 實作 | R0 建表、假裝 route 已存在 |
 | 新 professional consultant | PLANNED／NOT IMPLEMENTED | R1 起依 ADR 0040 greenfield 驗證 | import/wrap v3；直接 promotion 現有 vNext loop |
-| `local_workspace` seam | PLANNED／NOT IMPLEMENTED | R1–R5 過 gate 後組合第一條 production vertical | 在 R0 發明 request／response 或 route |
+| `job_workspace` seam | PLANNED／NOT IMPLEMENTED | R1–R5 過 gate 後組合第一條 production vertical | 在 R0 發明 request／response 或 route |
 
 ## 3. 第一條 production vertical（PV1，PLANNED）
 
@@ -100,7 +101,7 @@ R0 architecture lock
 ```
 
 不得跳過中間 gate，亦不得把 route cutover、code deletion、table deletion 合成一次 big-bang 變更。
-上述是 writer／route 的技術切換順序，不等於產品 release。整體 roadmap 完成 R6–R8 後只得到本機 Web release candidate；
+上述是 writer／route 的技術切換順序，不等於產品 release。整體 roadmap 完成 R6–R8 後只得到 server-deployed Web release candidate；
 R9 真實員工 pilot gate 通過後，才到達第一個員工驗證成品。
 
 ## 6. 資料遷移與 rollback
@@ -114,11 +115,11 @@ R9 真實員工 pilot gate 通過後，才到達第一個員工驗證成品。
 
 ## 7. 契約邊界
 
-PLANNED `local_workspace` 是 Python／TypeScript seam，因此依 `docs/contract-strategy.md` 使用獨立 JSON Schema SSOT，
+PLANNED `job_workspace` 是 Python／TypeScript seam，因此依 `docs/contract-strategy.md` 使用獨立 JSON Schema SSOT，
 生成 Pydantic 與 TypeScript。它與 `ocs-contract` 平行：
 
 ```text
-local-workspace-contract = 對話、Current Work／JD view、proposal decision 的 live contract
+job-workspace-contract   = 對話、Current Work／JD view、proposal decision 的 live contract
 ocs-contract             = PDF ingest／OCS import/export contract
 indexer-contract         = API 與 indexer 的 Python query contract
 ```
@@ -132,7 +133,8 @@ indexer-contract         = API 與 indexer 的 Python query contract
 - 不 import/wrap `app.interview.consultant`、`scribe`、`harvest`、`select`。
 - 不擴充 `_pending`、`DocumentVersion.content`、`snapshot_json` 或 revision entity。
 - 不做同文件 dual-write、雙向同步或自動 reverse migration。
-- 不為切換新增登入、tenant product behavior、organization、ACL、雲端 gateway、message bus 或 Graph framework。
+- 不在 consultant／Authoring domain 偷塞登入、共享 tenant control plane、organization、ACL、message bus 或 Graph framework；
+  R8 的 ingress／identity policy 由 deployment edge 的獨立決策承擔。
 - 不在沒有 inventory、備份與 owner 核准時刪 legacy data/table。
 
 ## 9. 指路
@@ -141,6 +143,7 @@ indexer-contract         = API 與 indexer 的 Python query contract
 - 顧問核心決策：[`../adr/0040-professional-consultant-engine-and-r1-validation-contract.md`](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md)
 - 切換決策：[`../adr/0041-document-boundary-single-writer-cutover.md`](../adr/0041-document-boundary-single-writer-cutover.md)
 - 職務發現決策：[`../adr/0042-hybrid-job-discovery-and-ttop-formation.md`](../adr/0042-hybrid-job-discovery-and-ttop-formation.md)
+- Deployment 決策：[`../adr/0044-server-deployed-browser-product.md`](../adr/0044-server-deployed-browser-product.md)
 - current-row storage：[`../specs/2026-07-24-job-authoring-v2-relational-storage-research.md`](../specs/2026-07-24-job-authoring-v2-relational-storage-research.md)
 - R0 研究：[`../specs/2026-08-02-r0-architecture-truth-and-production-cutover-research.md`](../specs/2026-08-02-r0-architecture-truth-and-production-cutover-research.md)
 - R0／PV1 plan：[`../plans/2026-08-02-professional-consultant-production-cutover-plan.md`](../plans/2026-08-02-professional-consultant-production-cutover-plan.md)

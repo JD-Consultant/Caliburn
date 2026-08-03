@@ -3,6 +3,24 @@
 Caliburn 由三個 bounded context 組成；各 context 只維護自己的領域語言，跨 context 關係與系統級決策由本檔與
 `docs/adr/` 指引。
 
+## System language
+
+**Caliburn deployment**：
+一套由同一營運方獨立操作、服務單一企業的 Caliburn 系統與資料邊界。
+_Avoid_：tenant、員工個人本機 app
+
+**企業自管部署（Enterprise-managed Deployment）**：
+由企業在自己的伺服器、內網或私有環境操作的 Caliburn deployment。
+_Avoid_：員工本機版、桌面版
+
+**我們代管部署（Provider-managed Deployment）**：
+由 Caliburn 團隊操作、企業使用者透過核准網址存取的 Caliburn deployment。
+_Avoid_：未區分 tenancy model 的 SaaS
+
+**瀏覽器使用者（Browser User）**：
+透過 Web UI 使用 Caliburn、但不負責操作 deployment 的人。
+_Avoid_：本機操作者、deployment operator
+
 ## Contexts
 
 - **PDF 解析**：OCS PDF 到結構化 JSON；glossary 尚未建立，預定位置為 `apps/pdf-to-json/CONTEXT.md`。

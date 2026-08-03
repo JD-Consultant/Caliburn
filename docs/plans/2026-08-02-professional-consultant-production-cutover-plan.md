@@ -5,7 +5,8 @@
 - 決策：[ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md)、
   [ADR 0041](../adr/0041-document-boundary-single-writer-cutover.md)、
   [ADR 0042](../adr/0042-hybrid-job-discovery-and-ttop-formation.md)、
-  [ADR 0043](../adr/0043-real-employee-pilot-release-gate.md)
+  [ADR 0043](../adr/0043-real-employee-pilot-release-gate.md)、
+  [ADR 0044](../adr/0044-server-deployed-browser-product.md)
 - 研究：[R0 架構真相與 production cutover](../specs/2026-08-02-r0-architecture-truth-and-production-cutover-research.md)
 
 ## 1. 交付目標
@@ -42,7 +43,7 @@ R9 真實員工 pilot。高擬真 transcript、合成 eval 或內部自測不得
 
 - Markdown links 指向存在檔案。
 - `rg` 不再在 active orientation 中把 ADR 0038 稱為 post-R5 authority，或把「接 Web」稱為下一步。
-- production router 仍無 vNext／job_authoring／local_workspace import。
+- production router 仍無 vNext／job_authoring／`job_workspace` import。
 - full no-network safety net green-before == green-after；本 task 不改 runtime。
 
 提交：一個 docs task commit，tag `r0-architecture-truth`。
@@ -54,7 +55,7 @@ R9 真實員工 pilot。高擬真 transcript、合成 eval 或內部自測不得
 變更：
 
 - 依 `docs/contract-strategy.md` 開 contract research 與 ADR。
-- 建立 `packages/local-workspace-contract` JSON Schema SSOT。
+- 建立 `packages/job-workspace-contract` JSON Schema SSOT。
 - 只定義 PV1 所需 document summary／workspace view／answer／direct edit／proposal decision／typed error。
 - 生成 Pydantic 與 TypeScript，加入 regen + diff guard。
 
@@ -76,7 +77,7 @@ R9 真實員工 pilot。高擬真 transcript、合成 eval 或內部自測不得
 - transaction 失敗時 Current State、proposal、Journal 全回滾。
 - 關閉／重開後狀態與 linkage 一致。
 
-### P3 — `local_workspace` application seam
+### P3 — `job_workspace` application seam
 
 變更：
 
@@ -97,13 +98,13 @@ R9 真實員工 pilot。高擬真 transcript、合成 eval 或內部自測不得
 
 驗證：API contract tests、real-PG vertical、OpenAPI snapshot／codegen guard；現行 legacy route characterization 仍綠。
 
-### P5 — 最小本機 Web
+### P5 — 最小瀏覽器 Web
 
 變更：
 
 - 新文件建立與 workspace page 只呼叫 PV1 API。
 - 同畫面顯示 conversation、Current JD Task canvas、proposal before/after 與 accept/edit/reject。
-- 一次只開一份文件；不顯示 user/profile/tenant/host/port。
+- 一次只開一份文件；不把 deployment host／port、資料庫、GPU 或 server secret 暴露成使用者流程。
 - 不重用 OCS cache-as-state、`_pending` helper 或手寫 API DTO。
 
 驗證：Vitest interaction、`npx tsc --noEmit`、lint；瀏覽器操作證明 create→answer→decision→reload。
@@ -147,25 +148,27 @@ R9 真實員工 pilot。高擬真 transcript、合成 eval 或內部自測不得
 - Web 必須讀 provider payload、ORM row、artifact 或 raw domain JSON。
 - proposal 可在未經員工決策時修改 Current JD。
 - mapping 只能靠靜默丟欄位才能完成。
-- 為完成本機切換需要登入、SaaS、organization、ACL、message bus、Graph runtime 或新服務。
+- 為完成 writer 切換而把 ingress、identity、shared tenancy、message bus 或 Graph runtime 塞進 consultant／Authoring domain。
 - R1–R5 任一 gate 失敗或只是與 baseline 持平。
 
 ## 5. 最終驗收
 
 本節驗收的是 production vertical 與 technical cutover，不是第一版產品 release gate。
 
-- PV1 可從一鍵本機啟動流程操作，不要求員工設定 host／port。
+- PV1 可由另一台使用者裝置透過瀏覽器操作；員工不負責設定 deployment host／port 或啟停服務。
 - create→answer→proposal→decision→restart→reload 端到端通過。
 - Current JD 是唯一可寫文件真相；OCS 只由 projector 匯出。
 - 每筆採用內容有合法 support／Evidence linkage；reference candidate 不冒充 employee Evidence。
 - legacy inventory 為零後，舊寫路徑與 `_pending` 已移除；legacy tables 的刪除有獨立 migration、備份與 tag。
 - living design 只描述真實存在的 route／contract／transaction／錯誤路徑，沒有預想 API。
 - 產物標示為 release candidate；只有 ADR 0043 的 R9 真實員工 pilot 通過後，才改稱第一個員工可用成品。
+- R8 前另案固定 production Compose、HTTPS ingress、identity/access、secret、backup／restore 與 upgrade／rollback；
+  本切換 plan 不以 development localhost 假裝 deployment gate 已通過。
 
 ## 6. R0 執行證據（2026-08-02）
 
 - 本機 Markdown links：`LOCAL_MARKDOWN_LINKS_OK`。
-- orientation stale phrase guard：通過；正式 router 對 `interview_vnext`／`job_authoring`／`local_workspace` 仍為零 import。
+- orientation stale phrase guard：當時通過；ADR 0044 後 planned seam 正名為 `job_workspace`，正式 router 仍為零 import。
 - `git diff --check`、trailing-whitespace、tracked runtime diff：通過；本 task 只有 Markdown 變更。
 - `npx.cmd turbo test`：OCS contract build、Web `67 passed`、pdf-to-json `23 passed`、ocs-indexer `53 passed`；
   API `1163 passed / 218 skipped / 5 failed`。五個失敗全是既有 historical JSON frozen-byte hash assertion；

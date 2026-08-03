@@ -5,29 +5,42 @@
 > [0040](docs/adr/0040-professional-consultant-engine-and-r1-validation-contract.md)／
 > [0041](docs/adr/0041-document-boundary-single-writer-cutover.md)／
 > [0042](docs/adr/0042-hybrid-job-discovery-and-ttop-formation.md)／
-> [0043](docs/adr/0043-real-employee-pilot-release-gate.md)。
+> [0043](docs/adr/0043-real-employee-pilot-release-gate.md)／
+> [0044](docs/adr/0044-server-deployed-browser-product.md)。
 
 ## 產品邊界
 
-Caliburn 是給員工使用的**本機 Web AI 職務分析與職務說明書應用程式**。Web UI、API、PostgreSQL、Qdrant 與必要服務
-在員工電腦本機組合運行；LLM 可由本機 API 呼叫 OpenRouter。員工不註冊、不登入、不選 tenant，不接觸 host／port。
-一名本機操作者可保存多份彼此隔離的 JD，但一次只開啟一份。
+Caliburn 是給員工使用的**伺服器部署、瀏覽器存取的 AI 職務分析與職務說明書 Web application**。Web、API、PostgreSQL、
+Qdrant、GPU embedder 與 server secrets 在 Caliburn deployment 執行；員工裝置只執行瀏覽器。deployment 可由企業在內網／
+私有環境自管，或由我們代管；開發者 `localhost` 不是產品交付邊界。
 
-repo 留有早期 user/profile/tenant 欄位與程式，僅屬歷史／FK 相容細節。SaaS、organization/member/ACL、計費、
-雲端部署與多人協作不在現行 roadmap。
+第一個 production scope 是一個 deployment 服務一個企業。repo 留有早期 user/profile/tenant 欄位與程式，僅屬歷史／FK
+相容細節；ADR 0006 的共享 Pool + RLS SaaS 模型沒有復活。共享多租戶、organization/member、ACL、計費與 tenant admin
+不在現行 roadmap；多人或非受控網路 exposure 所需的 identity/access policy 必須在 R8 前另案決定。
 
-## 現行 runtime（ACTIVE／TRANSITIONAL）
+## 現行 runtime（ACTIVE／TRANSITIONAL development composition）
 
 ```text
 PDF -> pdf-to-json -> OCS JSON -> ocs-indexer -> Qdrant
                                       |
                                       +-> embedder（BGE-M3 GPU）
 
-員工 -> Next.js Web -> FastAPI API -> PostgreSQL
-                         |    |
-                         |    +-> OpenRouter
-                         +------> ocs-indexer HTTP
+開發／過渡瀏覽器 -> Next.js Web -> FastAPI API -> PostgreSQL
+                                      |    |
+                                      |    +-> OpenRouter
+                                      +------> ocs-indexer HTTP
 ```
+
+目前可執行組合仍是 development ports，不代表 production ingress 已完成。ADR 0044 的 R8 target 是：
+
+```text
+瀏覽器使用者 -> HTTPS ingress -> Next.js Web -> FastAPI API -> PostgreSQL
+                                                |    |
+                                                |    +-> OpenRouter
+                                                +------> ocs-indexer HTTP -> Qdrant / embedder
+```
+
+企業自管與我們代管共用這個 target shape；production Compose、TLS、secret、backup／restore 與 access policy 尚未實作。
 
 現行 Web/API 寫入仍是過渡路徑：
 
@@ -51,11 +64,11 @@ PDF -> pdf-to-json -> OCS JSON -> ocs-indexer -> Qdrant
 | `app/job_authoring` v1 | ISOLATED PROTOTYPE | migration 0011 三表 revision core；不是 current-row v2 target，不得擴張 revision entities |
 | 專業顧問引擎 | PLANNED／NOT IMPLEMENTED | ADR 0040 greenfield；先跑 R1 Task Discovery，舊 v3/vNext 不作前提 |
 | current-row Authoring v2 | PLANNED／NOT IMPLEMENTED | Current Work Model／Current JD 唯一真相；AI 只提 proposal；Current State + Journal 同交易 |
-| `local_workspace` Web/API seam | PLANNED／NOT IMPLEMENTED | R1–R5 gate 後才建第一條 production vertical；目前沒有 route/package |
+| `job_workspace` Web/API seam | PLANNED／NOT IMPLEMENTED | R1–R5 gate 後才建第一條 production vertical；目前沒有 route/package |
 
 切換按整份 `document_id` 單寫者執行，不做同文件 dual-write。完整 gate、rollback 與退役順序見
 [`docs/design/professional-consultant-engine.md`](docs/design/professional-consultant-engine.md)。
-完整本機 Web 只形成 release candidate；通過 R9 真實在職員工端到端 pilot gate 後，才可稱為第一個員工可用成品。
+完整 server-deployed Web 只形成 release candidate；通過 R9 真實在職員工端到端 pilot gate 後，才可稱為第一個員工可用成品。
 
 ## Code map
 
@@ -71,7 +84,7 @@ PDF -> pdf-to-json -> OCS JSON -> ocs-indexer -> Qdrant
 
 ## 不常變的不變量
 
-- **Bounded contexts**：PDF 解析、OCS 知識檢索、JD 著作；各 context 是模組化單體，不為本機產品拆 SaaS 微服務。
+- **Bounded contexts**：PDF 解析、OCS 知識檢索、JD 著作；deployment topology 不改變 context ownership，也不為未驗證規模拆微服務。
 - **依賴方向**：API 採 Hexagonal/Clean + DDD，domain 不 import FastAPI、ORM、provider SDK 或 Web DTO。
 - **資料主權**：PostgreSQL 屬 API；Qdrant 屬 indexer；跨 owner 只走 typed API，不直接讀對方 datastore。
 - **嵌入隔離**：BGE-M3 dense+sparse 只在 `apps/embedder` Linux GPU 容器；禁止把 torch 放回 indexer/API 進程。

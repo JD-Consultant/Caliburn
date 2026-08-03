@@ -1,10 +1,10 @@
 # Caliburn — agent orientation
 
-Caliburn 現行目標是給員工使用的**本機 Web AI 職務分析與職務說明書應用程式**。Web UI/API/資料在員工電腦本機運行；
-員工不拿遠端產品網址、不註冊、不登入、
-沒有帳號密碼；第一版是一名本機操作者、一次開啟一份職務說明書，但可以保存並重新開啟多份彼此隔離的本機
-職務說明書。repo 不做多租戶 B2B SaaS 程式——owner 已明確指示，不得新增 SaaS、organization/member/ACL、
-登入、計費、tenant administration、雲端部署或多人協作。
+Caliburn 現行目標是給員工使用的**伺服器部署、瀏覽器存取的 AI 職務分析與職務說明書 Web 應用程式**。Web UI／API／資料
+由企業在內網／私有環境操作，或由我們代管；員工裝置只需瀏覽器，不在個人電腦執行完整 stack。第一個 production scope
+是一個 deployment 服務一個企業，可保存並重新開啟多份彼此隔離的職務說明書。這不等於立即建立共享多租戶 B2B SaaS：
+未另案前不得新增 tenant control plane、organization/member、ACL、計費、quota 或 tenant administration。多人角色、登入與
+企業 SSO 必須在 R8 對非受控網路或多名使用者開放前另案決定，不能再用「只跑 localhost」迴避。
 完整產品範圍鎖定見 `docs/product-notes.md`。Monorepo。維護者用**繁體中文**,請用繁中回應。
 
 > 記憶是 per-project 的,不會跨資料夾搬。**這個 repo 的 `AGENTS.md` + `docs/` 才是權威**;
@@ -28,14 +28,15 @@ Caliburn 現行目標是給員工使用的**本機 Web AI 職務分析與職務�
 
 ### 現行產品優先級（高於歷史 SaaS 架構慣性）
 
-- 先做員工可操作、可一鍵啟動的本機 Web release candidate；可自動開啟 localhost UI，但不得要求員工設定 host／port，
-  也不要引入未被要求的 Electron／Tauri／原生桌面殼。第一版只有通過真實在職員工的端到端 pilot gate 後，才能稱為
-  員工可用成品；合成 eval、高擬真 transcript 或內部自測不得替代（ADR 0043）。
-- 第一版 Current JD 是員工確認、可交主管／HR 審閱的草稿，不宣稱企業正式核准；未來多人審閱／中小企業平台只保留為
-  future option，不是 active roadmap 或第一版後的既定下一階段，未另案排入前不得新增 reviewer role、SaaS、
-  organization／tenant、ACL 或雲端部署。
+- 先做員工可用瀏覽器操作的 server-deployed Web release candidate；員工不得負責設定 host／port、資料庫、GPU 或服務啟停，
+  也不要引入未被要求的 Electron／Tauri／原生桌面殼。企業自管與我們代管共用同一套 deployable stack；開發者 localhost
+  只是 development profile。第一版只有通過真實在職員工的端到端 pilot gate 後，才能稱為員工可用成品；合成 eval、
+  高擬真 transcript 或內部自測不得替代（ADR 0043／0044）。
+- 第一版 Current JD 是員工確認、可交主管／HR 審閱的草稿，不宣稱企業正式核准。server deployment 本身不授權 reviewer role、
+  多人共編、共享多租戶 SaaS、organization／tenant 或 ACL；這些仍須另案。但不得再把企業自管／我們代管的 deployment
+  誤稱為 SaaS 擴張而禁止。
 - 時間、研究與設計優先投入訪談品質、Context Engine、LLM 工作分析、task/output/indicator/K/S 品質、Evidence linkage與JD成品品質。
-- 本機 Web app 可呼叫 OpenRouter，不代表必須完全離線；API key 是 owner／開發設定，不是員工帳號流程。
+- Server-side API 可呼叫 OpenRouter；API key 是 deployment secret，不得進瀏覽器或由員工日常輸入。
 - 不為未被要求的 SaaS、generic framework、全面 hash／audit 或測試排列拖延成品；仍保留會直接保護文件真相、員工決策、
   provenance與交易正確性的核心安全網。
 
@@ -65,8 +66,8 @@ Caliburn 現行目標是給員工使用的**本機 Web AI 職務分析與職務�
   不得直接promotion或接Web。現行切換/退役邊界見 `docs/design/professional-consultant-engine.md` 與ADR **0041**。
 - **新顧問主線**：先做R1 Task Discovery品質gate，再依R2–R5完成multi-turn、resume、Duty/O/P/K/S/A、
   proposal/current-row JD；職務發現採「暫定框架＋開放敘事＋定向補漏」，跨敘事形成Task後才歸納Duty與O/P/KSA
-  （ADR 0042）。通過後才建第一條local Web production vertical；Web release candidate 完成後仍須通過R9真實員工發布gate
-  （ADR 0043）。禁止import/wrap v3
+  （ADR 0042）。通過後才建第一條 `job_workspace` production vertical；server-deployed Web release candidate 完成後仍須通過
+  R9真實員工發布gate（ADR 0043／0044）。禁止import/wrap v3
   consultant/scribe/harvest/select，禁止重用舊vNext gold/schema/operation/state。
 - **契約**:#1 `packages/ocs-contract`(OCS 文件,JSON-schema→Pydantic+TS)、
   #2 `packages/indexer-contract`(indexer⇄api,共用 pydantic)、#3 web 吃 ocs-contract 生成的 TS。
@@ -115,6 +116,6 @@ Issue、spec 與 ticket 使用 `.scratch/<feature>/` 下的 Local Markdown 管�
 `docs/agents/domain.md`。
 
 ## 指路
-**`docs/README.md`(文檔系統:架構/規則/索引)** · `ARCHITECTURE.md` · `docs/adr/README.md`(0001–0042)·
+**`docs/README.md`(文檔系統:架構/規則/索引)** · `ARCHITECTURE.md` · `docs/adr/README.md`(0001–0044)·
 `docs/contract-strategy.md` · `CONTRIBUTING.md` · `docs/runbook.md` · `docs/specs/`(研究紀錄)·
 `docs/plans/` · `docs/design/`(子系統端到端設計,給 agent)。

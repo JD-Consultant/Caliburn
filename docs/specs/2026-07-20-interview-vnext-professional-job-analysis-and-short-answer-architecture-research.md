@@ -2,7 +2,7 @@
 title: Interview vNext 員工訪談、專業職務分析與即時 JD 共編架構研究
 status: accepted-research; R5 authority is ADR 0037 + amendment; post-R5 product authority is ADR 0038
 date: 2026-07-20
-revision: 8
+revision: 9
 audience: owner, architect, implementer, evaluator
 scope: R5 前置設計；員工訪談、短回答、即時共編、當下單一職務、document-local K/S 與交付 projection
 ---
@@ -44,6 +44,10 @@ scope: R5 前置設計；員工訪談、短回答、即時共編、當下單一�
 > 單人版 SaaS。啟動流程可開啟 localhost UI，但員工不拿遠端網址、不註冊、不登入、沒有帳號密碼，也不設定 host／port。
 > 這不強制完全離線：本機 Web app 可使用 owner 配置的 OpenRouter key。除非 owner 明確改變範圍，不做 organization、tenant
 > product behavior、ACL、計費、雲端部署或多人協作；研究與工程優先投入訪談品質、LLM 工作分析與 JD 成品品質。
+
+> **Revision 9（2026-08-03 server deployment correction）**：Revision 7 的員工電腦／localhost topology 已由
+> [ADR 0044](../adr/0044-server-deployed-browser-product.md) 取代。現行是單企業 server deployment，可由企業自管或我們代管，
+> 員工以瀏覽器存取；共享多租戶、多人角色與 identity 仍另案。Revision 7 的其他職務分析優先序不變。
 >
 > **Revision 8（no-history MVP correction）**：owner 於 2026-07-24 決定第一個成品不做 JD 版本歷史。active JD
 > persistence 只保存每份文件的目前內容；員工直接編輯或接受 AI proposal 時更新 current relational rows，不建立完整

@@ -15,15 +15,13 @@ New JD content persistence must follow
 and a new implementation plan. Existing v1 history code may remain until that
 cutover is implemented; do not create dual-write authority.
 
-Current product scope is a standalone/single-user deliverable. `tenant_id`
+Current product scope is a server-deployed browser application: one deployment
+serves one enterprise and may be operated by that enterprise or by us. `tenant_id`
 exists only because the vNext persistence parent and composite foreign keys
-already require that storage scope. Unless the owner explicitly asks for SaaS,
-do not add organization/member/ACL/quota/billing/admin behavior or tests. The
-employee uses a local Web app: startup may open localhost, but there is no
-remote product URL, registration, login, account, or password, and host/port
-setup is not an employee workflow. One local operator may save multiple
-documents, but only one document workspace is active in the UI at a time; this
-does not authorize account/workspace/SaaS behavior. The next engineering budget belongs to the R1 Task Discovery
+already require that storage scope; it does not authorize shared multitenancy,
+organization/member/ACL/quota/billing/admin behavior or tests. Browser access,
+ingress and a future identity policy stay outside this domain. One workspace may
+hold multiple documents while the UI opens one document at a time. The next engineering budget belongs to the R1 Task Discovery
 quality gate defined by ADR 0040, not a Web wiring of this prototype or platform generalization. Production cutover and
 retirement are governed by **[ADR 0041](../../../../docs/adr/0041-document-boundary-single-writer-cutover.md)** and
 **[the living boundary](../../../../docs/design/professional-consultant-engine.md)**.
@@ -44,6 +42,8 @@ retirement are governed by **[ADR 0041](../../../../docs/adr/0041-document-bound
   (`job_authoring_documents/revisions/proposals`). This is a historical slice
   constraint, not a ban on the approved v2 current Duty/Task/O/P/K/S tables.
   Do not add generic event/patch/ACL/framework tables.
+- **Deployment does not enter the write model.** Do not add server host, URL,
+  organization, session-auth or deployment-profile fields to Authoring contracts.
 
 ## Layering / dependencies (plan §4, §6.2, §14.9)
 

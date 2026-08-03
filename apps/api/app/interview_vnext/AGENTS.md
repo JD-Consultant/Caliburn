@@ -31,8 +31,9 @@ Context Builder、loader、grader、gold 與 suite hash 都不是新工作的 au
 - LLM 只能提出 proposal；application 產生 identity，deterministic verifier/reducer 決定是否合法。
 - employee Evidence 與 reference knowledge 分離；reference candidate 不得冒充 employee Evidence。
 - 新文件 authority 不可寫回 `DocumentVersion.content`、`_pending` 或 v1 `snapshot_json`。
-- 不新增登入、organization/member/ACL、quota、billing、tenant product behavior、Graph framework 或 multi-agent runtime。
-- 下一個產品工程階段是 **R1 Task Discovery fixture／CLI 品質 gate**，不是 localhost route／Web。
+- 不把 deployment ingress、登入、organization/member/ACL、quota、billing、tenant product behavior、Graph framework 或
+  multi-agent runtime 塞進本 donor package。
+- 下一個產品工程階段是 **R1 Task Discovery fixture／CLI 品質 gate**，不是直接掛 production route／Web。
 
 ## 歷史實作指路
 

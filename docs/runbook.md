@@ -1,4 +1,4 @@
-# Runbook — Caliburn(本地開發 / 維運操作)
+# Runbook — Caliburn（本地開發／部署維運）
 
 開發環境=四個服務 + 一個 DB。本檔記錄起停、重啟紀律、與踩過的故障排除。
 首次安裝/測試見 [`../CONTRIBUTING.md`](../CONTRIBUTING.md)。
@@ -57,10 +57,23 @@ cd apps/api && DATABASE_URL="postgresql+asyncpg://postgres:password@localhost:54
 TEST_DATABASE_URL="postgresql+asyncpg://postgres:password@localhost:5432/caliburn_test" uv run pytest
 ```
 
-## 部署(SaaS,後端我方託管)
+## Deployment profiles
 
-交付 = 客戶連網址,不交程式碼。各 app 獨立部署(monorepo affected-only):
-- `web` → Vercel 或容器;`api` → 容器;`ocs-indexer` → 容器(+持久卷,內部不對外);`pdf-to-json` → 離線 job(非服務)。
-- Postgres / Qdrant:**先自架**(見 [ADR 0006](adr/0006-multitenancy-pool-rls.md));有真實客戶資料後再評估託管。
-- 新客戶 = 建一個 Organization(租戶),**零額外部署**(多租戶 Pool + RLS)。
-> 詳細部署拓撲見 spec §部署章節;正式 CI/CD 與 silo 升級為後續工作。
+產品交付邊界見 [ADR 0044](adr/0044-server-deployed-browser-product.md)。`localhost` 指令只屬開發環境；產品使用者從其他
+裝置以瀏覽器存取 deployment。
+
+| Profile | 營運者 | 狀態 | 邊界 |
+|---|---|---|---|
+| Development | 開發者 | ACTIVE | 本頁既有 `turbo dev`／Compose 指令；可使用 `localhost` |
+| Enterprise-managed | 企業 | TARGET | 一個 deployment 服務一個企業，部署於企業伺服器、內網或私有環境 |
+| Provider-managed | 我們 | TARGET | 由我們操作彼此獨立的企業 deployment；目前不共享 tenant pool |
+
+正式 production bundle **尚未實作，不能把開發 Compose 當成已可交付部署**。R8 前至少要補：
+
+- Web、API、indexer、PostgreSQL、Qdrant、GPU embedder 的 immutable production images／Compose profile；
+- HTTPS ingress、DNS／certificate、server-side OpenRouter secret 與最小 exposed ports；
+- migration、persistent volumes、health/readiness、restart policy 與集中 log；
+- backup／restore、upgrade／rollback 與版本記錄；
+- 多名使用者或非受控網路 exposure 前另案核准的 authentication／authorization policy。
+
+第一階段不使用 ADR 0006 的共享 Pool + RLS onboarding，也不把「新增企業」實作成 application tenant control plane。

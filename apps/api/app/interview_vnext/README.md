@@ -6,11 +6,11 @@
 >
 > ADR 0040 已完整取代 ADR 0038 的 operation catalog／state authority。本 package 現在是 prototype／候選 donor，
 > **不得直接 promotion、掛 route 或接 Web**。下一步是新專業顧問引擎的 R1 Task Discovery fixture／CLI 品質 gate，
-> 不是沿用本 package 做 localhost conversation。
+> 不是沿用本 package 建 production conversation route。
 
 本 README 後續段落保存 V0～V3-5A、R5、Authoring v1、provider與paid-live的歷史實作證據。可候選重用的是
 provider／Capture／checkpoint／idempotency等基礎；舊 gold、schema、operation、Evidence/state、prompt、Context Builder、
-loader、grader與suite hash不得重用。現行產品／切換邊界以 ADR 0040、ADR 0041 與
+loader、grader與suite hash不得重用。現行產品／切換邊界以 ADR 0040、ADR 0041、ADR 0044 與
 `docs/design/professional-consultant-engine.md` 為準。
 
 現行與歷史指路（標為現行 authority 的項目優先；其餘是 prototype 實作證據）：
@@ -475,7 +475,8 @@ attempt claim在insert child row前鎖operation checkpoint，避免FK key-share�
 
 先做Capture/persistence、Context Engine與durable executor的歷史理由是：沒有可重播 execution record，就無法判斷
 品質差是模型、context selection、verifier 還是 reducer 所造成。舊文件曾要求 authenticated principal → tenant →
-profile ownership；該 SaaS 前提已被本機單人產品範圍取代，**不得據此新增登入或 tenant product behavior**。
+profile ownership；該共享 SaaS 前提沒有恢復。現行是單企業 deployment，identity/access 由 R8 前另案決定，
+**不得在本 donor package 新增登入或 tenant product behavior**。
 
 本階段明確未做 route、外部 Capture exporter、production OpenRouter/direct-vendor adapter、
 Web seam或模型 bake-off；production 行為仍為

@@ -3,7 +3,7 @@
 > 日期：2026-07-25  
 > 狀態：Task 粒度與混合式職務發現已確認；R1 逐檔案實作計畫尚未建立
 > 研究層級：R1 垂直切片的專業方法與程式責任，不是逐檔案施工計畫  
-> 產品範圍：本機 Web 職務分析產品；本階段只做 fixture／CLI 品質測試，不接 Web  
+> 產品範圍：伺服器部署、瀏覽器存取的職務分析產品；本階段只做 fixture／CLI 品質測試，不接 Web 或 deployment
 > 顧問流程權威：
 > [`2026-07-25-professional-job-analysis-consultant-process-final-red-team.md`](2026-07-25-professional-job-analysis-consultant-process-final-red-team.md)  
 > 程式架構權威：
@@ -74,7 +74,7 @@
 - 不做長期恢復；
 - 不做 Graph runtime、Planner Agent、Reviewer 群或多 Agent；
 - 不做 fine-tuning；
-- 不做 SaaS、帳號、權限、多人協作、雲端部署；
+- 不在 R1 做共享 SaaS、帳號／權限、多人協作或 production deployment；
 - 不以 schema、hash、log 數量冒充職務分析品質。
 
 ---

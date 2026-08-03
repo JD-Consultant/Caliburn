@@ -2,7 +2,7 @@
 
 > 日期：2026-07-25
 > 狀態：Proposed，供 owner 審核
-> 文件性質：從已核准顧問流程與最終程式架構，走到可測試核心、可恢復原型與本機 Web 成品的實現路線
+> 文件性質：從已核准顧問流程與最終程式架構，走到可測試核心、可恢復原型與 server-deployed Web 成品的實現路線
 > 顧問流程權威：
 > [`2026-07-25-professional-job-analysis-consultant-process-final-red-team.md`](2026-07-25-professional-job-analysis-consultant-process-final-red-team.md)
 > 程式架構權威：
@@ -28,9 +28,13 @@
 
 ---
 
-> **【2026-08-03 owner 修訂】** [ADR 0043](../adr/0043-real-employee-pilot-release-gate.md) 將 R8 明確改為
-> 「本機 Web 發布候選版」，R9 改為第一版發布前必須通過的真實員工試用 gate。合成案例、高擬真 transcript、內部自測、
-> LLM grader 或非操作者專家審閱都不能取代實際在職員工以本人工作完成端到端試用。
+> **【2026-08-03 owner 修訂】** [ADR 0043](../adr/0043-real-employee-pilot-release-gate.md) 將 R8 明確改為 Web
+> 發布候選版，R9 改為第一版發布前必須通過的真實員工試用 gate。合成案例、高擬真 transcript、內部自測、LLM grader
+> 或非操作者專家審閱都不能取代實際在職員工以本人工作完成端到端試用。
+>
+> [ADR 0044](../adr/0044-server-deployed-browser-product.md) 另取代「員工電腦 localhost」交付假設：R8 現為伺服器部署、
+> 瀏覽器存取的 release candidate，可由企業自管或我們代管；development localhost 不是產品 boundary。R1–R7 gate 不變，
+> 共享多租戶與 access model 仍須另案。
 
 ---
 
@@ -65,7 +69,7 @@
 
 第一個正式成品是：
 
-> 一個在員工電腦本機運行的 Web 應用。員工與 AI 專業顧問持續對話，逐步盤點與分析目前工作，AI 以提案方式協助
+> 一個由企業或我們操作伺服器、員工以瀏覽器存取的 Web 應用。員工與 AI 專業顧問持續對話，逐步盤點與分析目前工作，AI 以提案方式協助
 > 建立或修改 JD，員工可接受、修改、拒絕、延後或直接編輯；完整回合、顧問進度與多份 JD 可以保存、關閉並重新開啟。
 
 這個「正式成品」定義只有在 R9 真實員工發布 gate 通過後成立；R8 只產出具備上述能力的 release candidate。
@@ -88,8 +92,8 @@
 
 第一版成品不包含：
 
-- SaaS、帳號、密碼、登入；
-- organization、tenant、member、ACL、計費；
+- 共享多租戶 SaaS、tenant control plane、計費；
+- 未經另案決定的 organization／member／ACL、角色或自建帳號密碼系統；
 - 多人共編、主管或 HR 核准；
 - 招募、課程、訓練、考核、稽核或 KPI 模組；
 - Graph DB、通用 Graph runtime 或多 Agent 平台；
@@ -524,7 +528,7 @@ Revision 3：
 
 ---
 
-## 10. R3：本機保存、Pre-document Resume 與 Context State
+## 10. R3：持久化保存、Pre-document Resume 與 Context State
 
 ### 10.1 目的
 
@@ -591,7 +595,7 @@ R5 再加入：
 - 哪一份 state 是 authority，哪些摘要只作索引；【C-05 已定案，見本節修訂框】
 - 更正、否定與 supersession 如何在恢復後保持優先；
 - operation-specific context 如何從同一 state 重建；
-- 最小本機儲存與完整回合提交邊界；
+- 最小 server-side persistence 與完整回合提交邊界；
 - provider／parse 失敗時如何保留上一完整回合；
 - 如何避免過早建立 event sourcing、workflow checkpoint 或全面 hash。【C-05 已定案，見本節修訂框】
 
@@ -870,7 +874,7 @@ Retrieval node 只取得候選；`public.challenge` 只比較候選與 Work Mode
 
 ---
 
-## 15. R8：本機 Web 發布候選版
+## 15. R8：伺服器部署 Web 發布候選版
 
 ### 15.1 何時才接
 
@@ -879,7 +883,7 @@ Retrieval node 只取得候選；`public.challenge` 只比較候選與 Work Mode
 
 ### 15.2 最小 UI
 
-- 本機首頁：建立、開啟、重新命名、刪除多份本機 JD；
+- 瀏覽器首頁：建立、開啟、重新命名、刪除多份 JD；
 - 一次開啟一份 JD；
 - 左側或主要區域：顧問對話；
 - 同畫面：目前 JD canvas；
@@ -893,12 +897,11 @@ Retrieval node 只取得候選；`public.challenge` 只比較候選與 Work Mode
 
 ### 15.3 明確不加入
 
-- 帳號密碼；
-- 遠端網址與登入流程；
-- organization／member／role；
+- 自建帳號密碼與密碼重設；
+- 未經 access ADR 核准的 organization／member／role；
 - 管理後台；
 - 多人 presence／comment／approval；
-- 雲端部署；
+- 共享多租戶 control plane；
 - Electron／Tauri，除非 owner 之後明確要求。
 
 ### 15.4 建立 living 程式文檔
@@ -907,7 +910,7 @@ R8 的第一條真實 production vertical 通過後，建立：
 
 `docs/design/professional-consultant-engine.md`
 
-這裡的「第一條真實 production vertical」是指本機 Web 的 employee message：
+這裡的「第一條真實 production vertical」是指 server-deployed Web 的 employee message：
 
 ```text
 UI
@@ -924,9 +927,11 @@ R9 起，任何改變上述行為的程式變更都要同步更新此檔。
 
 ### 15.5 Exit gate
 
-- 一鍵啟動後可開啟 localhost UI；
-- 員工不需要設定 host／port；
-- 可以保存並重新開啟多份彼此隔離的本機 JD；
+- production deployment 可在單一伺服器重複建立，另一台使用者裝置可透過 HTTPS 瀏覽器開啟；
+- 員工不需要設定 host／port、啟停服務或接觸 deployment secret；
+- 可以保存並重新開啟多份彼此隔離的 JD；
+- migration、persistent data、health、backup／restore 與 upgrade／rollback 有可執行 runbook；
+- 多名使用者或非受控網路 exposure 已有另案核准的 authentication／authorization policy；
 - 對話、提案、Current JD 與顧問進度一致；
 - supporting artifacts 可選提供、查看、移除／替換，且不會自動覆蓋員工現況；
 - 完成主要使用旅程時不需要技術人員介入；
@@ -1105,7 +1110,7 @@ Harness 可以直接呼叫相同 operation 與 state transition，但不應被 p
 | M4：工作分析核心（R4） | Task、Duty、O/P/K/S/A 候選 | 專業 JD 內容可逐步形成 | AI 還不能安全寫入正式文件 |
 | M5：共編核心測試品（R5） | proposal、決策、Current JD、direct edit | 已可實際共同建立小型 JD | 尚未做公版與完成檢查 |
 | M6：完整 JD 核心（R6–R7） | 公版 challenge、反方檢查、完成與匯出 | 內容流程完整 | 尚未是員工友善成品 |
-| M7：本機 Web 發布候選版（R8） | 可操作、保存多份 JD、重開、匯出 | 可進入受控真實員工試用 | 尚不是員工可用成品 |
+| M7：伺服器部署 Web 發布候選版（R8） | 瀏覽器可操作、保存多份 JD、重開、匯出 | 可進入受控真實員工試用 | 尚不是員工可用成品 |
 | M8：真人驗證成品（R9） | 真實在職員工完成端到端旅程，已知 blocker 經處理與重測 | 第一個經真實員工驗證的可用產品 | 不自動取得企業核准或組織級正式效度 |
 
 ---

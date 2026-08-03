@@ -27,6 +27,10 @@ _Avoid_：KPI、操作步驟、只憑工作產出自動推導的正式答案
 完成特定工作任務與行為指標所需的工作者能力內涵；描述職務要求，不代表目前員工已具備。
 _Avoid_：脫離工作任務的形容詞清單、把員工接受候選當成能力證據
 
+**員工確認 JD 草稿（Employee-confirmed JD Draft）**：
+由員工直接編輯或確認 AI 提案後形成的目前職務說明書；可供後續審閱，但不代表企業正式核准或 SME 共識。
+_Avoid_：正式核准 JD、企業政策、把 current draft truth 稱為 organizational authority
+
 ### 發現與確認
 
 **工作故事（Work Story）**：

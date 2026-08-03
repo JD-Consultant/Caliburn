@@ -43,6 +43,17 @@
 通過後，以整份 `document_id` 單寫者切換到 current rows。禁止同文件 dual-write；退役順序與資料處理見
 [`ADR 0041`](adr/0041-document-boundary-single-writer-cutover.md)。
 
+### 第一版文件地位：員工確認的 JD 草稿
+
+**狀態：已決定（2026-08-03）。**第一版 Current JD 是員工直接編輯或接受／修改 AI proposal 後形成的
+**員工確認 JD 草稿**，可匯出後交主管／HR 審閱，但不宣稱已代表企業正式核准、組織政策或 SME 共識。
+這延伸 [ADR 0037](adr/0037-interview-vnext-question-frame-contextual-evidence-and-employee-authority.md) 的員工文件權威：
+「current draft truth」只回答目前草稿內容由誰決定，不等於建立企業 approval authority。
+
+現行本機單人產品不新增提交、退回、簽核、主管／HR reviewer role 或多人共編。未來可研究多人審閱流程或服務多家
+中小企業的平台，但目前只記為未決產品選項；除非另案研究、ADR 與 owner 明確排入 roadmap，不得據此新增帳號、
+organization／tenant、ACL、雲端部署或 SaaS infrastructure。
+
 ### 內部 Job Model 不等於政府公版
 
 **狀態：已決定（2026-07-24）。**政府公版是 UI／export profile，不是內部資料上限。內部 Task 可以保存

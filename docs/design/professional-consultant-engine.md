@@ -76,6 +76,7 @@ R1 只驗證上述路徑中的 Task Discovery 與下一問，不得提早建立�
 6. Journal 是歷史／診斷紀錄，不負責 replay 重建 Current State。
 7. OCS JSON 是 import/export projection；不得回到 live workspace persistence。
 8. Indexer 是 reference knowledge；不得把 reference candidate 當 employee Evidence 或直接寫正式 JD。
+9. 第一版 Current JD 是 employee-confirmed draft truth，不是企業正式核准；現行 route 不建立主管／HR approval authority。
 
 ## 5. 切換流程
 

@@ -30,6 +30,8 @@ Caliburn 現行目標是給員工使用的**本機 Web AI 職務分析與職務�
 
 - 先做員工可操作、可一鍵啟動的本機 Web 成品；可自動開啟 localhost UI，但不得要求員工設定 host／port，也不要引入
   未被要求的 Electron／Tauri／原生桌面殼。
+- 第一版 Current JD 是員工確認、可交主管／HR 審閱的草稿，不宣稱企業正式核准；未來多人審閱／中小企業平台只是未決
+  選項，未另案排入 roadmap 前不得新增 reviewer role、SaaS、organization／tenant、ACL 或雲端部署。
 - 時間、研究與設計優先投入訪談品質、Context Engine、LLM 工作分析、task/output/indicator/K/S 品質、Evidence linkage與JD成品品質。
 - 本機 Web app 可呼叫 OpenRouter，不代表必須完全離線；API key 是 owner／開發設定，不是員工帳號流程。
 - 不為未被要求的 SaaS、generic framework、全面 hash／audit 或測試排列拖延成品；仍保留會直接保護文件真相、員工決策、

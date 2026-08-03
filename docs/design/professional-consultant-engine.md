@@ -2,14 +2,16 @@
 title: 專業顧問引擎與 current-row JD — production 切換邊界
 audience: agent-primary（也給人）
 status: R0 architecture lock；新 production route 尚未實作
-updated: 2026-08-02
+updated: 2026-08-03
 ---
 
 # 專業顧問引擎與 current-row JD — production 切換邊界
 
 > **目前沒有新專業顧問 route／Web seam。** `apps/api/app/api/router.py` 未掛 `interview_vnext`、
 > `job_authoring` 或 `local_workspace`。本文件在 R0 只記錄真實現況、未來切換不變量與退役 gate；
-> 不得把「PLANNED」內容當成已存在的端點。決策見 [ADR 0041](../adr/0041-document-boundary-single-writer-cutover.md)。
+> 不得把「PLANNED」內容當成已存在的端點。切換決策見
+> [ADR 0041](../adr/0041-document-boundary-single-writer-cutover.md)，職務發現語意見
+> [ADR 0042](../adr/0042-hybrid-job-discovery-and-ttop-formation.md)。
 
 ## 1. 目前可達的正式路徑（ACTIVE／TRANSITIONAL）
 
@@ -55,6 +57,14 @@ PV1 的 outcome 已固定，介面尚未建立：
 
 PV1 不含公版 reference challenger、完整 O/P/K/S/A 品質宣稱、完成判斷或正式匯出；這些分別由 R6／R7 gate 承擔。
 PV1 只有在 R1–R5 gate 通過、實際 route 與 generated contract 落地後才可改標 ACTIVE。
+
+### 3.1 混合式職務發現（PLANNED）
+
+新顧問的分析順序固定為：暫定職務框架 → 開放工作敘事 → 週期／交接／例外／低頻高影響與 reference 定向補漏 →
+跨敘事形成 Task → 歸納 Duty → 共同定義 Output／Indicator → 逐項連結 KSA 候選 → 人員確認。暫定 Duty 與 reference
+只提供假說／覆蓋檢查，不是員工 Evidence；故事是材料，不直接成為 Task；Output 不得自動產生正式 Indicator。
+
+R1 只驗證上述路徑中的 Task Discovery 與下一問，不得提早建立完整 Duty／O／P／KSA 或把規劃中的順序寫成已存在 route。
 
 ## 4. 文件 ownership 與寫入不變量
 
@@ -124,6 +134,7 @@ indexer-contract         = API 與 indexer 的 Python query contract
 - 產品範圍：[`../product-notes.md`](../product-notes.md)
 - 顧問核心決策：[`../adr/0040-professional-consultant-engine-and-r1-validation-contract.md`](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md)
 - 切換決策：[`../adr/0041-document-boundary-single-writer-cutover.md`](../adr/0041-document-boundary-single-writer-cutover.md)
+- 職務發現決策：[`../adr/0042-hybrid-job-discovery-and-ttop-formation.md`](../adr/0042-hybrid-job-discovery-and-ttop-formation.md)
 - current-row storage：[`../specs/2026-07-24-job-authoring-v2-relational-storage-research.md`](../specs/2026-07-24-job-authoring-v2-relational-storage-research.md)
 - R0 研究：[`../specs/2026-08-02-r0-architecture-truth-and-production-cutover-research.md`](../specs/2026-08-02-r0-architecture-truth-and-production-cutover-research.md)
 - R0／PV1 plan：[`../plans/2026-08-02-professional-consultant-production-cutover-plan.md`](../plans/2026-08-02-professional-consultant-production-cutover-plan.md)

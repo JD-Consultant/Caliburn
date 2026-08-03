@@ -3,7 +3,8 @@
 - 日期：2026-08-02
 - 狀態：R0 accepted；P1–P8 是後續施工順序，尚未授權實作，且須等待 R1–R5 gate
 - 決策：[ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md)、
-  [ADR 0041](../adr/0041-document-boundary-single-writer-cutover.md)
+  [ADR 0041](../adr/0041-document-boundary-single-writer-cutover.md)、
+  [ADR 0042](../adr/0042-hybrid-job-discovery-and-ttop-formation.md)
 - 研究：[R0 架構真相與 production cutover](../specs/2026-08-02-r0-architecture-truth-and-production-cutover-research.md)
 
 ## 1. 交付目標
@@ -17,6 +18,7 @@
 本計畫的 P1 以前不得開始 PV1 product wiring：
 
 - ADR 0040 R1 Task Discovery exit gate 已通過並有固定 trial manifest／報告。
+- R1 依 ADR 0042 驗證混合式職務發現中的 Task Discovery；暫定 Duty／reference 只作假說與補漏，不作文件真相。
 - R2 multi-turn、R3 resume/context state、R4 Duty + O/P/K/S/A、R5 proposal/current-JD 各有自己的 plan、測試與完成 tag。
 - `JobDocumentDraft.v2` 與 current-row storage 已有獨立 contract research、ADR／amendment、migration plan。
 - `git status --short` 乾淨；baseline tests 記錄在開始實作的 plan execution section。

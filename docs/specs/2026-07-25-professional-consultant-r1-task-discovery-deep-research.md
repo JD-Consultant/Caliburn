@@ -1,7 +1,7 @@
 # AI 專業職務分析顧問 R1：Task Discovery 深入研究與候選設計
 
 > 日期：2026-07-25  
-> 狀態：Proposed for discussion；尚未核准實作  
+> 狀態：Task 粒度與混合式職務發現已確認；R1 逐檔案實作計畫尚未建立
 > 研究層級：R1 垂直切片的專業方法與程式責任，不是逐檔案施工計畫  
 > 產品範圍：本機 Web 職務分析產品；本階段只做 fixture／CLI 品質測試，不接 Web  
 > 顧問流程權威：
@@ -26,6 +26,11 @@
 > | C-03 | §11、§12 | 8 案例只作快速篩選；鎖架構前擴至 20–30；critical 跑 pass³；案例須帶 `case_family_id` 與 `source_type` |
 > | C-04 | §12.4 | 評審者拆三層：Rubric 資產／R1 blind grader／R7 product challenger |
 > | C-07 | §13.3 | Structured Output 契約：provider 保證不可攜；portable subset + deterministic verifier；endpoint pinning |
+
+> **【2026-08-03 owner 確認】** §16 決策一的 Task 粒度已接受；職務發現採「暫定職務框架＋開放工作敘事＋
+> 定向補漏」，跨敘事形成 Task 後才歸納 Duty，Task 穩定後共同定義 O/P 並連結 KSA。完整取捨見
+> [ADR 0042](../adr/0042-hybrid-job-discovery-and-ttop-formation.md)。先自由敘事、後顯示 taxonomy 的精確順序仍是
+> 待 R1 驗證的產品假說，不得寫成官方已證明事實；本確認不授權 runtime 實作。
 
 ---
 
@@ -1241,7 +1246,7 @@ openai/gpt-5.4-mini
 > 以「角色層級、可指派／檢核、有 meaningful outcome 的穩定責任」為 Task；不以每個動作、工具、故事或操作步驟
 > 建 Task。
 
-需要確認是否採用此粒度作第一版權威。
+**已確認（2026-08-03）**：採用此粒度作第一版權威；canonical 定義見 `apps/api/CONTEXT.md`。
 
 ### 決策二：~~兩次模型呼叫~~【C-01：降級為待實驗假說，由 ablation 裁決；持平時選一次呼叫】
 
@@ -1287,8 +1292,9 @@ unseen check 只能取自未用於調 prompt 的 constructed 或 human_manual_te
 
 ### 17.1 先討論，不立即施工
 
-先由 owner 確認第 16 節五項決策，尤其是 Task 粒度。**兩次模型呼叫不再是待確認的決策，
-而是待實驗的假說**（C-01）：由 R1 的 ablation 裁決，持平時選一次呼叫。
+Task 粒度與混合式職務發現已由 owner 確認；兩次模型呼叫不再是待確認的決策，而是待實驗的假說（C-01）：
+由 R1 的 ablation 裁決，持平時選一次呼叫。開始施工前仍須用獨立 plan 寫定案例清單、實質改善門檻、成本上限與
+停止條件；未有該 plan 前不實作 runtime。
 
 ### 17.2 確認後才寫 R1 實作計畫
 

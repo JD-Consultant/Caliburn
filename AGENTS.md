@@ -60,7 +60,8 @@ Caliburn 現行目標是給員工使用的**本機 Web AI 職務分析與職務�
   revision三表，也未掛route。ADR **0040** 已取代0038的operation/state authority；兩者只能逐項作donor，
   不得直接promotion或接Web。現行切換/退役邊界見 `docs/design/professional-consultant-engine.md` 與ADR **0041**。
 - **新顧問主線**：先做R1 Task Discovery品質gate，再依R2–R5完成multi-turn、resume、Duty/O/P/K/S/A、
-  proposal/current-row JD；通過後才建第一條local Web production vertical。禁止import/wrap v3
+  proposal/current-row JD；職務發現採「暫定框架＋開放敘事＋定向補漏」，跨敘事形成Task後才歸納Duty與O/P/KSA
+  （ADR 0042）。通過後才建第一條local Web production vertical。禁止import/wrap v3
   consultant/scribe/harvest/select，禁止重用舊vNext gold/schema/operation/state。
 - **契約**:#1 `packages/ocs-contract`(OCS 文件,JSON-schema→Pydantic+TS)、
   #2 `packages/indexer-contract`(indexer⇄api,共用 pydantic)、#3 web 吃 ocs-contract 生成的 TS。
@@ -109,6 +110,6 @@ Issue、spec 與 ticket 使用 `.scratch/<feature>/` 下的 Local Markdown 管�
 `docs/agents/domain.md`。
 
 ## 指路
-**`docs/README.md`(文檔系統:架構/規則/索引)** · `ARCHITECTURE.md` · `docs/adr/README.md`(0001–0041)·
+**`docs/README.md`(文檔系統:架構/規則/索引)** · `ARCHITECTURE.md` · `docs/adr/README.md`(0001–0042)·
 `docs/contract-strategy.md` · `CONTRIBUTING.md` · `docs/runbook.md` · `docs/specs/`(研究紀錄)·
 `docs/plans/` · `docs/design/`(子系統端到端設計,給 agent)。

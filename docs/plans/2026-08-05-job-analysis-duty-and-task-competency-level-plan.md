@@ -1,7 +1,7 @@
 # 主要職責（Duty）與 Task 職能級別結構切片實作計畫
 
 - 日期：2026-08-05
-- 狀態：PLANNED（尚未開工）
+- 狀態：T1 COMPLETE；T2–T7 尚未開工
 - 決策：[ADR 0052](../adr/0052-jd-readiness-assessment-and-official-code-boundaries.md) 決定 10／13、
   [ADR 0053](../adr/0053-jd-header-authority-boundary-and-readiness-scope.md) 決定 7；
   authority seam 沿用 [ADR 0045](../adr/0045-job-analysis-local-web-contract-and-shared-authority-commit.md)
@@ -77,6 +77,11 @@ display_order: int >= 0  # 文件內唯一
 | `duty_id` | `DutyId \| None` | **nullable 是硬需求**：既有文件的 Task 都還沒有 Duty，而 ADR 0052 決定 13 明令**不得自動合成假的 T1**。未指派是合法狀態，由 readiness 提示 |
 | `competency_level` | `int \| None`，1–6 | 員工手選；官方允許各 Task 不同級別 |
 
+> **T1 施工時的形狀調整**：兩個欄位都放進 `JdTaskFields`（而非只有 `JdTask`）。
+> 原計畫要另開 `assign_task_duty` use case 與 route，但兩者都是員工權威的 Task 內容，
+> 走既有的 `edit_jd_task` 就夠——少一條 use case、少一條 route、少一套冪等語意。
+> T4／T5 因此不再需要獨立的指派入口。
+
 `display_order` **維持文件層唯一**，不改成 Duty-scoped：位置碼 `T{i}.{j}` 由
 「Duty 的 display_order」與「該 Duty 底下 Task 依 display_order 的相對次序」決定性推出，
 既有 reorder route 與其冪等語意完全不用動。
@@ -143,8 +148,9 @@ display_order: int >= 0  # 文件內唯一
 ### T4 — authoring use cases
 
 1. `application/duty_authoring.py`：`add_duty`／`edit_duty`／`delete_duty`／`reorder_duties`，
-   以及 `assign_task_duty`（把 Task 指派到 Duty 或清空）與 Task 級別的既有 edit 路徑擴充。
    全部走 document lock → entry replay → `commit_authority_change()`，不呼叫 LLM。
+   **Task 的 `duty_id`／`competency_level` 不另開入口**：它們在 `JdTaskFields` 裡，
+   既有的 `edit_jd_task` 已經涵蓋（T1 形狀調整）。
 2. 刪除 Duty 時，其底下 Task 的 `duty_id` 在**同一交易**設回 `None`，並保留 Task 本身
    （Task 是員工權威內容，不因為職責重整而消失）。
 3. 測試：儲存、replay 同 key、conflict、未改內容拒絕、generation 遞增、
@@ -152,12 +158,12 @@ display_order: int >= 0  # 文件內唯一
 
 ### T5 — contract 與 route
 
-1. schema 新增 `DutyView`／`DutyWrite`、`TaskDutyAssignmentWrite`；
+1. schema 新增 `DutyView`／`DutyWrite`；
    `JdTaskView`／`JdTaskWrite` 增 `duty_id`／`competency_level`；
    `DocumentView` 增 `duties`；`ReadinessIssueView` 的 `code` enum 補三個新值。
 2. codegen 用 Python 3.13（見 `CLAUDE.local.md` 的環境雷），產物轉回 LF。
-3. route：`POST/PUT/DELETE …/duties`、`PUT …/duty-order`、`PUT …/tasks/{id}/duty`，
-   全部要求 `Idempotency-Key`，錯誤走既有 problem+json。
+3. route：`POST/PUT/DELETE …/duties` 與 `PUT …/duty-order`，全部要求 `Idempotency-Key`，
+   錯誤走既有 problem+json。Task 的兩個新欄位走既有 `PUT …/tasks/{id}`，不另開 route。
 4. 測試：route 行為、缺 key、無效級別、readiness 隨結構變動。
 
 ### T6 — Web 編輯
@@ -202,3 +208,27 @@ T5／T6 另跑 contract codegen 與 web 三件套。
 - 為了 Duty 重做 OPKS identity 或讓 O/P 改綁 Duty（決定 13）；
 - readiness 出現 `is_complete`／百分比，或開始阻止保存／訪談／匯出；
 - 做到第三層「工作活動」，或提前實作匯出。
+
+## 10. T1 執行證據（2026-08-05）
+
+- baseline：完整 API `2085 passed / 0 failed / 0 skipped`。
+- `Duty` 只有 `duty_id`／`statement`／`display_order`。測試逐一鎖定**沒有**級別欄位
+  （級別掛 Task）與**沒有**任何 `*code*` 欄位（`T1` 是匯出版面位置碼，不落庫）。
+- `duty_id` 與 `competency_level` 進 `JdTaskFields`（見上方形狀調整）。`duty_id` 本身只保證是
+  個 ID；**指向的 Duty 是否存在由 `JobAnalysisState` 驗**，因為只有那一層同時看得到兩者。
+- 未指派（`duty_id is None`）是**合法狀態**並有測試；指向不存在的 Duty 則不可表示。
+- **施工中被自己的新驗證抓到一個真 bug**：`apply_task_analysis_result()` 重建
+  `JobAnalysisState` 時沒有帶 `current_duties`，於是任何帶 `duty_id` 的 Current JD Task
+  都會變成 dangling reference，**整筆 transition 被擋掉**（`outcome=rejected`）。已修。
+  這正是本計畫 T3 第 4 點警告的那一類遺漏，只是因為 T1 先加了驗證而提早爆出來。
+- `_jd_task_from_fields()` 另補上兩個欄位的 carry-through：AI 的 `TaskFields` 沒有這兩欄，
+  模型填不了，但 revise 會**重建整個 `JdTask`**，不帶就等於一次回合把員工設的職責歸屬與級別
+  靜默清空。以 mutation check 驗證該測試有效：拿掉 carry-through 後測試確實變紅。
+- `validate_edited_jd_after()` 把 `duty_id`／`competency_level` 與既有的 `display_order` 並列
+  釘住：`edited` 是文字修改不是結構修改（§10.5），職責歸屬與級別各有自己的入口，
+  不得從「改提案文字」夾帶進來。
+- **其餘九個 `JobAnalysisState(...)` 建構點尚未帶 `current_duties`**：它們都從 persistence 水合，
+  而 duties repository 要 T3 才存在。目前無害（沒有任何路徑能設 `duty_id`），
+  但 T3 必須一次補齊，否則 duties 會在 reload 後靜默消失。
+- job_analysis targeted：`656 passed`（+17）。完整 API：**`2102 passed / 0 failed / 0 skipped`**（+17）。
+- 下一個可獨立 task 是 T2（readiness 擴充）。

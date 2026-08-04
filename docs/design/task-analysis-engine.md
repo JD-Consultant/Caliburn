@@ -331,6 +331,9 @@ JD 只在員工決定提案時才改。
 因此:**契約類改動在 Luna-Pro 上驗過即可;會影響判斷的改動(prompt 判準、schema description、
 context 取捨)在 Luna-Pro 上驗過只算「未在生產模型上驗過」,上線前要補一次 Opus／Sonnet run。**
 現有的一筆未清:commit `4b75190` 給 `disposition` 補的判準只在 Luna-Pro 上觀測過。
+**T5(JD header 進 packet)已於 2026-08-05 在 Opus 5 上複驗**,3/3 committed,且在刻意誘導的
+seeded-header 場景下模型 0 次把 header 的責任升格成 Task;紀錄見
+[`../experiments/2026-08-05-jd-header-packet-live-verification/`](../experiments/2026-08-05-jd-header-packet-live-verification/README.md)。
 | prompt 品質調校 | `llm/prompt.py` 已有 Task 判準與彈性顧問行為基線，但尚未用真實員工資料調校 | 有真實使用摩擦後以 rubric／eval 調整，不先加 planner 或第二次呼叫 |
 | duplicate／overlap identity 自動收斂 | 第一版刻意不做；模型保留 issue 並追問員工 | 有真實重複摩擦證據後再研究，不用相似度猜測 |
 | OPKS 真模型品質結論 | **第一切片已接通**：`OpksItem`／`CurrentJdOpks`／獨立六態 `OpksProposal`、0014 兩表、人工編輯、API、Web、單 Task Context、零 union `opks_result_v1`、deterministic verifier、一次 provider operation 與 durable generation receipt 均已落地。七情境 scripted vertical 以真 PostgreSQL 驗證同 key replay 零 call、四種員工決策、A 人工編輯、同一 K 跨 Task reuse、Task delete 清理與無 Evidence 在 provider 前停線；舊 OPKS hint 已退役。裁決見 [ADR 0048](../adr/0048-opks-evidence-axes-and-document-level-competencies.md)～[0051](../adr/0051-opks-proposal-status-machine-and-stable-entity-id.md)，**四份一起讀** | scripted provider 不回答真模型的 O/P/K/S 品質；需要品質結論時另做有預算上限的 live smoke，不重開本切片或加 eval framework |

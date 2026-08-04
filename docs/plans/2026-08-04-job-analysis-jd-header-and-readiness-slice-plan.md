@@ -311,6 +311,9 @@ T4／T6 另跑 contract codegen 與 web 三件套。
 - job_analysis targeted：`639 passed`（+10）。完整 API：**`2085 passed / 0 failed / 0 skipped`**（+10）。
 - 未跑 live／付費呼叫。T5 改了 packet 與 instructions，屬設計文件 §8.2 定義的「會影響判斷的改動」，
   **上線前要補一次 Opus／Sonnet run**，需 owner 另行授權。下一個可獨立 task 是 T6（Web UI）。
+- **後續（2026-08-05）**：owner 授權後已在 Opus 5 複驗完成，3/3 committed，seeded-header 誘導場景下
+  0 次把 header 責任升格成 Task；紀錄見
+  [`../experiments/2026-08-05-jd-header-packet-live-verification/`](../experiments/2026-08-05-jd-header-packet-live-verification/README.md)。**這筆帳已清。**
 
 ## 14. T6 執行證據（2026-08-05）
 

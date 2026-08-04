@@ -9,6 +9,7 @@ from .authoring import (
     list_documents,
     load_document,
     put_document_metadata,
+    put_jd_header,
     reorder_jd_tasks,
 )
 from .errors import (
@@ -17,6 +18,7 @@ from .errors import (
     IdempotencyConflict,
     InvalidJdTaskOrder,
     InvalidProposalDecision,
+    JdHeaderNotChanged,
     JdTaskNotFound,
     OpksItemNotFound,
     OpksProposalNotDecidable,
@@ -174,6 +176,7 @@ __all__ = [
     "IdempotencyConflict",
     "InvalidJdTaskOrder",
     "InvalidProposalDecision",
+    "JdHeaderNotChanged",
     "JobAnalysisState",
     "JobAnalysisUnitOfWork",
     "JobAnalysisUnitOfWorkFactory",
@@ -273,6 +276,7 @@ __all__ = [
     "prepare_opks_generation",
     "prune_opks_for_current_jd",
     "put_document_metadata",
+    "put_jd_header",
     "propose_task_for_jd",
     "reorder_jd_tasks",
     "render_opks_context_packet",

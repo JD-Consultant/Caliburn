@@ -10,6 +10,7 @@ import pytest
 from app.adapters.job_analysis_postgres import SqlAlchemyJobAnalysisUnitOfWork
 from app.job_analysis.application import (
     IdempotencyConflict,
+    JdHeaderNotChanged,
     add_jd_task,
     create_document,
     delete_jd_task,
@@ -17,6 +18,7 @@ from app.job_analysis.application import (
     list_documents,
     load_document,
     put_document_metadata,
+    put_jd_header,
     reorder_jd_tasks,
 )
 from app.job_analysis.domain import (
@@ -113,6 +115,123 @@ async def test_rename_changes_only_document_metadata(
             title="不存在的文件",
             updated_at=NOW,
         ) is False
+
+
+async def test_put_jd_header_persists_and_bumps_generation(
+    postgres_session_factory,
+    cleanup_job_analysis_rows,
+):
+    document_id = cleanup_job_analysis_rows
+    factory = lambda: SqlAlchemyJobAnalysisUnitOfWork(postgres_session_factory)
+    await create_document(factory, document_id=document_id, title="門市營運專員")
+    before = await load_document(factory, document_id)
+    assert before is not None
+    header = JdHeader(
+        competency_name="資訊安全維運人員",
+        work_description="維運企業資訊安全設備並處理資安事件。",
+        competency_level=4,
+    )
+
+    result = await put_jd_header(
+        factory,
+        document_id=document_id,
+        entry_id="header-1",
+        header=header,
+    )
+    after = await load_document(factory, document_id)
+
+    assert result == header
+    assert after is not None
+    assert after.state.jd_header == header
+    assert after.document.authority_generation == (
+        before.document.authority_generation + 1
+    )
+    # a header edit does not touch Task／Proposal／OPKS state
+    assert after.state.current_jd == before.state.current_jd
+    assert after.state.proposals == before.state.proposals
+    assert after.state.current_opks == before.state.current_opks
+    assert after.state.opks_proposals == before.state.opks_proposals
+    assert after.state.work_model == before.state.work_model
+
+    async with factory() as uow:
+        entry = await uow.journal.get(document_id, "header-1")
+        assert entry is not None
+        assert entry.payload.before == JdHeader()
+        assert entry.payload.after == header
+
+
+async def test_put_jd_header_replay_with_the_same_header_is_a_no_op(
+    postgres_session_factory,
+    cleanup_job_analysis_rows,
+):
+    document_id = cleanup_job_analysis_rows
+    factory = lambda: SqlAlchemyJobAnalysisUnitOfWork(postgres_session_factory)
+    await create_document(factory, document_id=document_id, title="門市營運專員")
+    header = JdHeader(competency_name="資訊安全維運人員")
+    first = await put_jd_header(
+        factory, document_id=document_id, entry_id="header-1", header=header
+    )
+
+    replay = await put_jd_header(
+        factory, document_id=document_id, entry_id="header-1", header=header
+    )
+
+    assert replay == first
+    loaded = await load_document(factory, document_id)
+    assert loaded is not None
+    assert loaded.document.authority_generation == 1
+
+
+async def test_put_jd_header_replayed_with_a_different_header_is_a_typed_conflict(
+    postgres_session_factory,
+    cleanup_job_analysis_rows,
+):
+    document_id = cleanup_job_analysis_rows
+    factory = lambda: SqlAlchemyJobAnalysisUnitOfWork(postgres_session_factory)
+    await create_document(factory, document_id=document_id, title="門市營運專員")
+    await put_jd_header(
+        factory,
+        document_id=document_id,
+        entry_id="same-entry",
+        header=JdHeader(competency_name="資訊安全維運人員"),
+    )
+
+    with pytest.raises(IdempotencyConflict):
+        await put_jd_header(
+            factory,
+            document_id=document_id,
+            entry_id="same-entry",
+            header=JdHeader(competency_name="另一個名稱"),
+        )
+
+    loaded = await load_document(factory, document_id)
+    assert loaded is not None
+    assert loaded.document.authority_generation == 1
+
+
+async def test_put_jd_header_rejects_a_no_op_edit_without_writing_the_journal(
+    postgres_session_factory,
+    cleanup_job_analysis_rows,
+):
+    """未改內容禁止儲存：避免製造空 Journal 與無關 generation bump。"""
+
+    document_id = cleanup_job_analysis_rows
+    factory = lambda: SqlAlchemyJobAnalysisUnitOfWork(postgres_session_factory)
+    await create_document(factory, document_id=document_id, title="門市營運專員")
+
+    with pytest.raises(JdHeaderNotChanged):
+        await put_jd_header(
+            factory,
+            document_id=document_id,
+            entry_id="no-op-entry",
+            header=JdHeader(),
+        )
+
+    loaded = await load_document(factory, document_id)
+    assert loaded is not None
+    assert loaded.document.authority_generation == 0
+    async with factory() as uow:
+        assert await uow.journal.get(document_id, "no-op-entry") is None
 
 
 async def test_add_edit_reorder_delete_reload_and_idempotent_replay(

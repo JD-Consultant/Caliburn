@@ -39,3 +39,7 @@ class ConcurrentAuthorityChange(JobAnalysisApplicationError):
 
 class InvalidJdTaskOrder(JobAnalysisApplicationError):
     pass
+
+
+class JdHeaderNotChanged(JobAnalysisApplicationError):
+    pass

@@ -1,7 +1,7 @@
 # JD 表頭（`JdHeader`）與 readiness 切片實作計畫
 
 - 日期：2026-08-04
-- 狀態：T1／T2 COMPLETE；T3–T7 尚未開工
+- 狀態：T1／T2／T3 COMPLETE；T4–T7 尚未開工
 - 決策：[ADR 0052](../adr/0052-jd-readiness-assessment-and-official-code-boundaries.md)、
   [ADR 0053](../adr/0053-jd-header-authority-boundary-and-readiness-scope.md)；
   authority seam 邊界沿用 [ADR 0045](../adr/0045-job-analysis-local-web-contract-and-shared-authority-commit.md)
@@ -216,3 +216,24 @@ T4／T6 另跑 contract codegen 與 web 三件套。
 - 兩處 alembic single-head 斷言（job_analysis 與 interview_vnext migration 測試）同步改為 `0015`。
 - 全 DB 測試實跑：job_analysis targeted `623 passed`（+13）；完整 API **`2069 passed / 0 failed / 0 skipped`**。
 - 尚未接 API、packet 或 UI，員工仍無法填表頭；未跑 live／付費呼叫。下一個可獨立 task 是 T3。
+
+## 11. T3 執行證據（2026-08-04）
+
+- baseline：job_analysis targeted `623 passed`、完整 API `2069 passed / 0 failed / 0 skipped`（T2 收尾值）。
+- `put_jd_header()` 落在 `application/authoring.py`，與 Task／OPKS 共用的 `_locked_document()` →
+  entry replay check → `commit_authority_change()` 三段模式一致，但**不需要**
+  `_stale_related_proposals()` 或 `prune_opks_for_current_jd()`——header 不影響
+  `current_jd`／Proposal／OPKS，commit 只動 header 與一筆 Journal entry。
+- 未改內容以新的 `JdHeaderNotChanged` 擋下，不寫 Journal、不 bump generation
+  （對應 ADR 0053 決定 3 與既有 Task 編輯的「未改內容禁止儲存」慣例）。這個 guard 經 mutation check
+  驗證是必要的：拿掉它之後，`JdHeaderDirectEditPayload` 自己的驗證器仍會擋下同一個 no-op，
+  但丟出的是未分類的 `ValidationError` 而不是可在 API 層映射成乾淨 `invalid-request` 的
+  typed error——因此保留明確的 application 層 guard。
+- 施工中發現一個 T2 遺漏的缺口：`adapters/job_analysis_postgres/serialization.py` 的
+  `_JOURNAL_PAYLOAD_TYPES` 沒有登記 `JD_HEADER_DIRECT_EDIT_SCHEMA_ID → JdHeaderDirectEditPayload`，
+  導致寫入的 header Journal entry 讀回時被 `load_journal()` fail-closed 判為
+  `PersistedJobAnalysisCorruption`。已補上映射；這屬於 T2 legacy 缺口的延伸修正，不是新決策，
+  一併在本 commit 修掉。
+- job_analysis targeted：`627 passed`（+4）。完整 API：**`2073 passed / 0 failed / 0 skipped`**（+4）。
+- 尚未接 API、packet 或 UI，員工仍無法透過任何入口填表頭；未跑 live／付費呼叫。
+  下一個可獨立 task 是 T4。

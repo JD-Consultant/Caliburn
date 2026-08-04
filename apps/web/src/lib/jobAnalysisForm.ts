@@ -11,6 +11,8 @@ export interface TaskFormValue {
   frequencyText: string;
   responsibilityRole: "" | "primary" | "shared" | "assist";
   enablers: Enabler[];
+  dutyId: string | null;
+  competencyLevel: number | null;
 }
 
 export function emptyTaskForm(): TaskFormValue {
@@ -21,6 +23,8 @@ export function emptyTaskForm(): TaskFormValue {
     frequencyText: "",
     responsibilityRole: "",
     enablers: [],
+    dutyId: null,
+    competencyLevel: null,
   };
 }
 
@@ -32,6 +36,8 @@ export function fromTaskView(task: JdTaskView): TaskFormValue {
     frequencyText: task.frequency_text ?? "",
     responsibilityRole: task.responsibility_role ?? "",
     enablers: task.enablers.map((item) => ({ ...item })),
+    dutyId: task.duty_id,
+    competencyLevel: task.competency_level,
   };
 }
 
@@ -49,6 +55,8 @@ export function toTaskWrite(value: TaskFormValue): JdTaskWrite {
     enablers: value.enablers
       .map((item) => ({ ...item, name: item.name.trim() }))
       .filter((item) => item.name.length > 0),
+    duty_id: value.dutyId,
+    competency_level: value.competencyLevel,
   };
 }
 

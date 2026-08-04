@@ -136,6 +136,8 @@ describe("Current JD Task client", () => {
     frequency_text: null,
     responsibility_role: null,
     enablers: [],
+    duty_id: null,
+    competency_level: null,
   };
 
   it("uses the caller-owned retry key for every mutation", async () => {

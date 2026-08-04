@@ -385,9 +385,11 @@ async def test_list_and_open_return_only_the_current_jd_projection(api_client):
         "updated_at",
         "jd_header",
         "readiness",
+        "duties",
         "tasks",
         "opks_items",
     }
+    assert opened.json()["duties"] == []
     assert opened.json()["tasks"][0]["statement"] == "每週彙整營運週報"
     assert opened.json()["opks_items"] == []
     forbidden = {"authority_generation", "work_model", "journal", "proposals"}
@@ -446,6 +448,8 @@ def _task_payload(statement: str = " 每週彙整營運週報 "):
         "frequency_text": " 每週一次 ",
         "responsibility_role": "primary",
         "enablers": [{"kind": "tool_system", "name": " Excel "}],
+        "duty_id": None,
+        "competency_level": None,
     }
 
 

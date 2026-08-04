@@ -18,6 +18,8 @@ describe("Current JD Task form mapping", () => {
       frequency_text: null,
       responsibility_role: null,
       enablers: [],
+      duty_id: null,
+      competency_level: null,
     });
   });
 
@@ -34,6 +36,8 @@ describe("Current JD Task form mapping", () => {
         { kind: "method", name: "交叉檢查" },
       ],
       display_order: 0,
+      duty_id: "duty-1",
+      competency_level: 4,
     });
 
     expect(toTaskWrite(form)).toEqual({
@@ -46,6 +50,10 @@ describe("Current JD Task form mapping", () => {
         { kind: "tool_system", name: "Excel" },
         { kind: "method", name: "交叉檢查" },
       ],
+      // T6 才有下拉，但往返現在就必須成立：少送一欄就等於送 null，
+      // 員工每改一次文字都會把職責歸屬與級別洗掉。
+      duty_id: "duty-1",
+      competency_level: 4,
     });
   });
 

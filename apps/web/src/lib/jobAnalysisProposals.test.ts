@@ -53,6 +53,8 @@ describe("proposal presentation", () => {
           responsibility_role: "primary",
           enablers: [],
           display_order: 0,
+          duty_id: null,
+          competency_level: null,
         },
       },
     ];

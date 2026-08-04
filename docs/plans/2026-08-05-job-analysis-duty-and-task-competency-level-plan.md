@@ -1,7 +1,7 @@
 # 主要職責（Duty）與 Task 職能級別結構切片實作計畫
 
 - 日期：2026-08-05
-- 狀態：T1–T4 COMPLETE；T5–T7 尚未開工
+- 狀態：T1–T5 COMPLETE；T6–T7 尚未開工
 - 決策：[ADR 0052](../adr/0052-jd-readiness-assessment-and-official-code-boundaries.md) 決定 10／13、
   [ADR 0053](../adr/0053-jd-header-authority-boundary-and-readiness-scope.md) 決定 7；
   authority seam 沿用 [ADR 0045](../adr/0045-job-analysis-local-web-contract-and-shared-authority-commit.md)
@@ -324,3 +324,33 @@ T5／T6 另跑 contract codegen 與 web 三件套。
 - 完整 API：**`2137 passed / 0 failed / 0 skipped`**（+19）。
 - 下一個可獨立 task 是 T5（contract 與 route）。註記：`DutyNotChanged` 與 `InvalidDutyOrder`
   需要各自的 problem+json 映射，比照 `JdHeaderNotChanged → 422 invalid-request`。
+
+## 14. T5 執行證據（2026-08-05）
+
+- baseline：完整 API `2137 passed`、contract `16 passed`、web `109 passed`。
+- **計畫外但必須做的一項：`ConsultationView` 也要有 `duties`。** 計畫只寫 `DocumentView.duties`，
+  但 `ConsultationPanel` 的 Current JD 讀的是 consultation 回應（送出回合、決策提案都回這個形狀），
+  不是 document。只加在 `DocumentView` 的話，T6 的職責分組會在每個回合之後對不起來。
+- **`toTaskWrite()` 現在就要帶兩個新欄位，不能等 T6。** 這是同一個資料遺失類別：
+  `JdTaskWrite` 兩個欄位是必填，少送就等於送 `null`，員工在既有編輯器改一次文字
+  就會把職責歸屬與級別洗掉。因此 `TaskFormValue` 先加 `dutyId`／`competencyLevel` 純往返，
+  T6 才加下拉；round-trip 測試把這件事鎖起來。
+- **兩個新 problem type 必須同時進 contract enum 與 problem 映射。** 只加映射的話
+  `ProblemDetail` 會在序列化時 `ValidationError`（實測：兩條測試變紅）；
+  `application_error_response()` 對沒映射的錯誤是 `raise TypeError`，所以只加 enum 會變 500。
+  兩邊都有測試守（`test_an_unknown_duty_is_404_not_500`）。
+- 新增一條機械不變量：`set(JdTaskWrite.model_fields) == set(JdTaskFields.model_fields)`。
+  `to_jd_task_fields()` 是逐欄手寫的，漏一欄就是員工存了卻沒生效；兩邊欄位集合相同是這個
+  切片才成立的性質（Duty 與級別刻意放進 `JdTaskFields` 而不另開 use case），把它鎖起來。
+- codegen 照 `CLAUDE.local.md` 用 Python 3.13；產物是純新增，既有型別未動。
+  **`npm run check-codegen` 會再跑一次 codegen，而它在這台機器上會重新寫出 CRLF**——
+  跑完要再轉一次 LF，否則 commit 進去的是 CRLF。
+- 測試：`test_job_analysis_api_postgres.py` 新增 9 條（建立／排序／投影、缺 `Idempotency-Key`、
+  空編輯 422 problem+json、未知 Duty 404、部分順序 422、Task 帶職責與級別且 readiness 跟著變、
+  越界級別被契約擋、刪職責後 Task 仍在且未指派、consultation 也投影 duties），
+  mapper 新增 1 條。
+- 完整 API：**`2147 passed / 0 failed / 0 skipped`**（+10）。contract `16 passed`；
+  web `109 passed`＋`tsc --noEmit`＋`lint` 全綠。
+- 下一個是 T6（Web 編輯）：`DutyEditor`、Task 的兩個下拉、Current JD 依 Duty 分組且
+  未指派 Task 要看得見。
+

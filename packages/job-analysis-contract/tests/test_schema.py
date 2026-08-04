@@ -31,9 +31,11 @@ SCHEMA_PATH = PACKAGE_ROOT / "schema" / "job-analysis-workspace.schema.json"
 PROBLEM_TYPES = {
     "https://caliburn.dev/problems/job-analysis/document-not-found",
     "https://caliburn.dev/problems/job-analysis/task-not-found",
+    "https://caliburn.dev/problems/job-analysis/duty-not-found",
     "https://caliburn.dev/problems/job-analysis/idempotency-conflict",
     "https://caliburn.dev/problems/job-analysis/authority-conflict",
     "https://caliburn.dev/problems/job-analysis/invalid-task-order",
+    "https://caliburn.dev/problems/job-analysis/invalid-duty-order",
     "https://caliburn.dev/problems/job-analysis/invalid-request",
     "https://caliburn.dev/problems/job-analysis/proposal-not-found",
     "https://caliburn.dev/problems/job-analysis/consultant-unavailable",
@@ -68,6 +70,9 @@ def test_schema_owns_only_the_workspace_wire_contract():
         "JdHeaderWrite",
         "JdTaskWrite",
         "JdTaskView",
+        "DutyWrite",
+        "DutyView",
+        "DutyOrderWrite",
         "ReadinessIssueView",
         "OpksItemView",
         "OpksItemWrite",
@@ -83,7 +88,7 @@ def test_schema_owns_only_the_workspace_wire_contract():
     }
 
 
-def test_problem_type_is_the_nine_value_machine_identifier():
+def test_problem_type_is_a_closed_machine_identifier():
     """Adding an untyped error branch must change the generated consumers."""
 
     problem = _schema()["$defs"]["ProblemDetail"]
@@ -103,6 +108,7 @@ def test_consultation_contract_exposes_only_product_views_and_supported_decision
         "conversation",
         "active_question",
         "proposals",
+        "duties",
         "tasks",
         "opks_items",
         "opks_proposals",
@@ -141,6 +147,8 @@ def test_proposal_view_can_preserve_null_snapshots_edits_stale_reason_and_quotes
                     "responsibility_role": None,
                     "enablers": [],
                     "display_order": 0,
+                    "duty_id": None,
+                    "competency_level": None,
                 },
             }
         ],
@@ -247,6 +255,15 @@ def test_document_view_accepts_one_complete_task_without_extra_fields():
                 "responsibility_role": "primary",
                 "enablers": [{"kind": "tool_system", "name": "Excel"}],
                 "display_order": 0,
+                "duty_id": "duty-1",
+                "competency_level": 4,
+            }
+        ],
+        "duties": [
+            {
+                "duty_id": "duty-1",
+                "statement": "維運門市營運系統",
+                "display_order": 0,
             }
         ],
         "opks_items": [],
@@ -313,6 +330,7 @@ def test_document_view_requires_jd_header_and_readiness():
         "title": "門市營運專員",
         "updated_at": "2026-07-30T09:00:00Z",
         "readiness": {"issues": []},
+        "duties": [],
         "tasks": [],
         "opks_items": [],
     }
@@ -333,6 +351,8 @@ def test_generated_models_keep_normalization_and_problem_extension_boundaries():
         frequency_text="",
         responsibility_role="",
         enablers=[],
+        duty_id=None,
+        competency_level=None,
     )
     problem = ProblemDetail.model_validate(
         {

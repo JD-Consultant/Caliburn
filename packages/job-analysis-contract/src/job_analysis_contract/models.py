@@ -115,6 +115,22 @@ class Enabler(BaseModel):
     name: str
 
 
+class DutyWrite(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    statement: str
+
+
+class DutyView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    duty_id: str
+    statement: str
+    display_order: conint(ge=0)
+
+
 class ResponsibilityRole(Enum):
     primary = 'primary'
     shared = 'shared'
@@ -133,6 +149,8 @@ class JdTaskWrite(BaseModel):
     frequency_text: str | None
     responsibility_role: ResponsibilityRole | None
     enablers: list[Enabler]
+    duty_id: str | None
+    competency_level: conint(ge=1, le=6) | None
 
 
 class ResponsibilityRole1(Enum):
@@ -154,6 +172,8 @@ class JdTaskView(BaseModel):
     responsibility_role: ResponsibilityRole1 | None
     enablers: list[Enabler]
     display_order: conint(ge=0)
+    duty_id: str | None
+    competency_level: conint(ge=1, le=6) | None
 
 
 class EntityKind(StrEnum):
@@ -240,6 +260,7 @@ class DocumentView(BaseModel):
     updated_at: AwareDatetime
     jd_header: JdHeaderView
     readiness: DocumentReadinessView
+    duties: list[DutyView]
     tasks: list[JdTaskView]
     opks_items: list[OpksItemView]
 
@@ -316,6 +337,7 @@ class ConsultationView(BaseModel):
     active_question: ActiveQuestionView | None
     proposals: list[ProposalView]
     opks_proposals: list[OpksProposalView]
+    duties: list[DutyView]
     tasks: list[JdTaskView]
     opks_items: list[OpksItemView]
 
@@ -359,6 +381,13 @@ class TaskOrderWrite(BaseModel):
     ordered_task_ids: list[str]
 
 
+class DutyOrderWrite(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    ordered_duty_ids: list[str]
+
+
 class ProblemFieldError(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -374,6 +403,9 @@ class Type(StrEnum):
     https___caliburn_dev_problems_job_analysis_task_not_found = (
         'https://caliburn.dev/problems/job-analysis/task-not-found'
     )
+    https___caliburn_dev_problems_job_analysis_duty_not_found = (
+        'https://caliburn.dev/problems/job-analysis/duty-not-found'
+    )
     https___caliburn_dev_problems_job_analysis_idempotency_conflict = (
         'https://caliburn.dev/problems/job-analysis/idempotency-conflict'
     )
@@ -382,6 +414,9 @@ class Type(StrEnum):
     )
     https___caliburn_dev_problems_job_analysis_invalid_task_order = (
         'https://caliburn.dev/problems/job-analysis/invalid-task-order'
+    )
+    https___caliburn_dev_problems_job_analysis_invalid_duty_order = (
+        'https://caliburn.dev/problems/job-analysis/invalid-duty-order'
     )
     https___caliburn_dev_problems_job_analysis_invalid_request = (
         'https://caliburn.dev/problems/job-analysis/invalid-request'

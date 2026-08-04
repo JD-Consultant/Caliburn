@@ -110,6 +110,8 @@ def task_payload(
     *,
     purpose_result: str | None = None,
     frequency_text: str | None = None,
+    duty_id: str | None = None,
+    competency_level: int | None = None,
 ):
     return {
         "statement": statement,
@@ -118,6 +120,8 @@ def task_payload(
         "frequency_text": frequency_text,
         "responsibility_role": None,
         "enablers": [],
+        "duty_id": duty_id,
+        "competency_level": competency_level,
     }
 
 
@@ -352,3 +356,239 @@ async def test_consultant_turn_proposal_decision_and_reload_use_real_postgres(
     assert persisted is not None
     assert len(persisted.conversation_turns) == 3
     assert journal_count == 3
+
+
+# -- 主要職責 routes（Duty 切片 T5）------------------------------------------
+
+
+async def _document(client, document_id) -> str:
+    root = f"/api/v1/job-analysis/documents/{document_id}"
+    assert (await client.put(root, json={"title": "門市營運專員"})).status_code == 201
+    return root
+
+
+async def _add_duty(client, root, *, key: str, statement: str) -> dict:
+    response = await client.post(
+        f"{root}/duties",
+        headers={"Idempotency-Key": key},
+        json={"statement": statement},
+    )
+    assert response.status_code == 201, response.text
+    return response.json()
+
+
+async def test_duty_routes_create_reorder_and_project_into_the_document(
+    postgres_api_client,
+    cleanup_job_analysis_rows,
+):
+    client, _, _ = postgres_api_client
+    root = await _document(client, cleanup_job_analysis_rows)
+
+    first = await _add_duty(client, root, key="duty-a", statement="維運門市營運系統")
+    second = await _add_duty(client, root, key="duty-b", statement="處理帳號權限")
+
+    assert first["display_order"] == 0
+    assert second["display_order"] == 1
+    document = (await client.get(root)).json()
+    assert [duty["duty_id"] for duty in document["duties"]] == [
+        first["duty_id"],
+        second["duty_id"],
+    ]
+
+    reordered = await client.put(
+        f"{root}/duty-order",
+        headers={"Idempotency-Key": "order-1"},
+        json={"ordered_duty_ids": [second["duty_id"], first["duty_id"]]},
+    )
+    assert reordered.status_code == 200
+    assert [duty["duty_id"] for duty in reordered.json()] == [
+        second["duty_id"],
+        first["duty_id"],
+    ]
+    assert [duty["display_order"] for duty in reordered.json()] == [0, 1]
+
+
+async def test_a_duty_route_without_an_idempotency_key_is_rejected(
+    postgres_api_client,
+    cleanup_job_analysis_rows,
+):
+    client, _, _ = postgres_api_client
+    root = await _document(client, cleanup_job_analysis_rows)
+
+    response = await client.post(f"{root}/duties", json={"statement": "維運門市系統"})
+
+    assert response.status_code == 422
+
+
+async def test_editing_a_duty_with_the_same_statement_is_a_problem_not_a_500(
+    postgres_api_client,
+    cleanup_job_analysis_rows,
+):
+    client, _, _ = postgres_api_client
+    root = await _document(client, cleanup_job_analysis_rows)
+    duty = await _add_duty(client, root, key="duty-a", statement="維運門市營運系統")
+
+    response = await client.put(
+        f"{root}/duties/" + duty["duty_id"],
+        headers={"Idempotency-Key": "edit-1"},
+        json={"statement": "維運門市營運系統"},
+    )
+
+    assert response.status_code == 422
+    assert response.headers["content-type"].startswith("application/problem+json")
+    assert response.json()["type"].endswith("/invalid-request")
+
+
+async def test_an_unknown_duty_is_404_not_500(
+    postgres_api_client,
+    cleanup_job_analysis_rows,
+):
+    """`application_error_response()` 對沒映射的錯誤是 `raise TypeError`,
+    所以漏掉 `DutyNotFound` 會變成 500——這條測試就是守那個。"""
+
+    client, _, _ = postgres_api_client
+    root = await _document(client, cleanup_job_analysis_rows)
+
+    edited = await client.put(
+        f"{root}/duties/duty-gone",
+        headers={"Idempotency-Key": "edit-1"},
+        json={"statement": "維運門市營運系統"},
+    )
+    deleted = await client.delete(
+        f"{root}/duties/duty-gone",
+        headers={"Idempotency-Key": "del-1"},
+    )
+
+    assert edited.status_code == 404
+    assert edited.json()["type"].endswith("/duty-not-found")
+    assert deleted.status_code == 404
+
+
+async def test_a_partial_duty_order_is_422_not_500(
+    postgres_api_client,
+    cleanup_job_analysis_rows,
+):
+    client, _, _ = postgres_api_client
+    root = await _document(client, cleanup_job_analysis_rows)
+    duty = await _add_duty(client, root, key="duty-a", statement="維運門市營運系統")
+    await _add_duty(client, root, key="duty-b", statement="處理帳號權限")
+
+    response = await client.put(
+        f"{root}/duty-order",
+        headers={"Idempotency-Key": "order-1"},
+        json={"ordered_duty_ids": [duty["duty_id"]]},
+    )
+
+    assert response.status_code == 422
+    assert response.json()["type"].endswith("/invalid-duty-order")
+
+
+async def test_a_task_carries_its_duty_and_level_and_readiness_follows(
+    postgres_api_client,
+    cleanup_job_analysis_rows,
+):
+    client, _, _ = postgres_api_client
+    root = await _document(client, cleanup_job_analysis_rows)
+    duty = await _add_duty(client, root, key="duty-a", statement="維運門市營運系統")
+    created = await client.post(
+        f"{root}/tasks",
+        headers={"Idempotency-Key": "task-a"},
+        json=task_payload("每週彙整營運週報"),
+    )
+    assert created.status_code == 201
+    task = created.json()
+    assert task["duty_id"] is None and task["competency_level"] is None
+
+    codes = {
+        issue["code"]
+        for issue in (await client.get(root)).json()["readiness"]["issues"]
+    }
+    assert {"task_duty_missing", "task_competency_level_missing"} <= codes
+
+    assigned = await client.put(
+        f"{root}/tasks/" + task["task_id"],
+        headers={"Idempotency-Key": "assign-1"},
+        json=task_payload(
+            "每週彙整營運週報",
+            duty_id=duty["duty_id"],
+            competency_level=4,
+        ),
+    )
+    assert assigned.status_code == 200
+    assert assigned.json()["duty_id"] == duty["duty_id"]
+    assert assigned.json()["competency_level"] == 4
+
+    codes = {
+        issue["code"]
+        for issue in (await client.get(root)).json()["readiness"]["issues"]
+    }
+    assert not {"task_duty_missing", "task_competency_level_missing"} & codes
+    assert "duty_without_task" not in codes
+
+
+async def test_an_out_of_range_competency_level_is_rejected_by_the_contract(
+    postgres_api_client,
+    cleanup_job_analysis_rows,
+):
+    client, _, _ = postgres_api_client
+    root = await _document(client, cleanup_job_analysis_rows)
+
+    response = await client.post(
+        f"{root}/tasks",
+        headers={"Idempotency-Key": "task-a"},
+        json=task_payload("每週彙整營運週報", competency_level=7),
+    )
+
+    assert response.status_code == 422
+
+
+async def test_deleting_a_duty_keeps_its_task_and_unassigns_it_over_http(
+    postgres_api_client,
+    cleanup_job_analysis_rows,
+):
+    client, _, _ = postgres_api_client
+    root = await _document(client, cleanup_job_analysis_rows)
+    duty = await _add_duty(client, root, key="duty-a", statement="維運門市營運系統")
+    task = (
+        await client.post(
+            f"{root}/tasks",
+            headers={"Idempotency-Key": "task-a"},
+            json=task_payload(
+                "每週彙整營運週報",
+                duty_id=duty["duty_id"],
+                competency_level=4,
+            ),
+        )
+    ).json()
+
+    deleted = await client.delete(
+        f"{root}/duties/" + duty["duty_id"],
+        headers={"Idempotency-Key": "del-1"},
+    )
+
+    assert deleted.status_code == 204
+    document = (await client.get(root)).json()
+    assert document["duties"] == []
+    assert len(document["tasks"]) == 1
+    assert document["tasks"][0]["task_id"] == task["task_id"]
+    assert document["tasks"][0]["duty_id"] is None
+    assert document["tasks"][0]["competency_level"] == 4
+
+
+async def test_the_consultation_view_projects_duties_too(
+    postgres_api_client,
+    cleanup_job_analysis_rows,
+):
+    """`ConsultationPanel` 的 Current JD 讀的是 consultation 回應，不是 document,
+    所以 duties 必須同時出現在兩個投影，否則一個回合之後分組就對不起來。"""
+
+    client, _, _ = postgres_api_client
+    root = await _document(client, cleanup_job_analysis_rows)
+    duty = await _add_duty(client, root, key="duty-a", statement="維運門市營運系統")
+
+    consultation = await client.get(f"{root}/consultation")
+
+    assert consultation.status_code == 200
+    assert [item["duty_id"] for item in consultation.json()["duties"]] == [
+        duty["duty_id"]
+    ]

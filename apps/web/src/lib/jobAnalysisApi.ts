@@ -261,6 +261,10 @@ function knownProblemMessage(type: KnownProblemType): string {
       return "內容已有更新";
     case "https://caliburn.dev/problems/job-analysis/invalid-task-order":
       return "工作順序不正確";
+    case "https://caliburn.dev/problems/job-analysis/duty-not-found":
+      return "找不到這項主要職責";
+    case "https://caliburn.dev/problems/job-analysis/invalid-duty-order":
+      return "主要職責順序不正確";
     case "https://caliburn.dev/problems/job-analysis/invalid-request":
       return "請檢查輸入內容";
     case "https://caliburn.dev/problems/job-analysis/proposal-not-found":
@@ -279,6 +283,8 @@ const KNOWN_PROBLEM_TYPES = new Set<string>([
   "https://caliburn.dev/problems/job-analysis/idempotency-conflict",
   "https://caliburn.dev/problems/job-analysis/authority-conflict",
   "https://caliburn.dev/problems/job-analysis/invalid-task-order",
+  "https://caliburn.dev/problems/job-analysis/duty-not-found",
+  "https://caliburn.dev/problems/job-analysis/invalid-duty-order",
   "https://caliburn.dev/problems/job-analysis/invalid-request",
   "https://caliburn.dev/problems/job-analysis/proposal-not-found",
   "https://caliburn.dev/problems/job-analysis/consultant-unavailable",

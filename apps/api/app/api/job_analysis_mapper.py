@@ -8,6 +8,7 @@ from job_analysis_contract import (
     DocumentReadinessView,
     DocumentSummary as WireDocumentSummary,
     DocumentView,
+    DutyView,
     JdHeaderView,
     JdHeaderWrite,
     JdTaskWrite,
@@ -32,6 +33,7 @@ from app.job_analysis.application import (
     assess_readiness,
 )
 from app.job_analysis.domain import (
+    Duty,
     Enabler,
     EnablerKind,
     JdHeader,
@@ -76,6 +78,16 @@ def to_jd_task_fields(body: JdTaskWrite) -> JdTaskFields:
             )
             for item in body.enablers
         ),
+        duty_id=_optional_text(body.duty_id),
+        competency_level=body.competency_level,
+    )
+
+
+def to_duty_view(duty: Duty) -> DutyView:
+    return DutyView(
+        duty_id=duty.duty_id,
+        statement=duty.statement,
+        display_order=duty.display_order,
     )
 
 
@@ -224,6 +236,8 @@ def to_jd_task_view(task: JdTask) -> JdTaskView:
                 for enabler in task.enablers
             ],
             "display_order": task.display_order,
+            "duty_id": task.duty_id,
+            "competency_level": task.competency_level,
         }
     )
 
@@ -282,6 +296,7 @@ def to_document_view(loaded: LoadedDocument) -> DocumentView:
                 tasks=loaded.state.current_jd,
             )
         ),
+        duties=[to_duty_view(duty) for duty in loaded.state.current_duties],
         tasks=[to_jd_task_view(task) for task in loaded.state.current_jd],
         opks_items=[
             to_opks_item_view(item) for item in loaded.state.current_opks.items
@@ -370,6 +385,7 @@ def to_consultation_view(loaded: LoadedDocument) -> ConsultationView:
             to_opks_proposal_view(proposal)
             for proposal in loaded.state.opks_proposals
         ],
+        duties=[to_duty_view(duty) for duty in loaded.state.current_duties],
         tasks=[to_jd_task_view(task) for task in loaded.state.current_jd],
         opks_items=[
             to_opks_item_view(item) for item in loaded.state.current_opks.items

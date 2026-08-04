@@ -1,7 +1,7 @@
 # JD 表頭（`JdHeader`）與 readiness 切片實作計畫
 
 - 日期：2026-08-04
-- 狀態：T1–T5 COMPLETE；T6 尚未開工（T7 併在各 commit 內）
+- 狀態：**切片完成**（T1–T6 COMPLETE，T7 併在各 commit 內）
 - 決策：[ADR 0052](../adr/0052-jd-readiness-assessment-and-official-code-boundaries.md)、
   [ADR 0053](../adr/0053-jd-header-authority-boundary-and-readiness-scope.md)；
   authority seam 邊界沿用 [ADR 0045](../adr/0045-job-analysis-local-web-contract-and-shared-authority-commit.md)
@@ -306,3 +306,30 @@ T4／T6 另跑 contract codegen 與 web 三件套。
 - job_analysis targeted：`639 passed`（+10）。完整 API：**`2085 passed / 0 failed / 0 skipped`**（+10）。
 - 未跑 live／付費呼叫。T5 改了 packet 與 instructions，屬設計文件 §8.2 定義的「會影響判斷的改動」，
   **上線前要補一次 Opus／Sonnet run**，需 owner 另行授權。下一個可獨立 task 是 T6（Web UI）。
+
+## 14. T6 執行證據（2026-08-05）
+
+- baseline：完整 API `2085 passed / 0 failed / 0 skipped`、web `97 passed`（T5 收尾值）。
+- 先讀 `apps/web/AGENTS.md`：該檔警告這版 Next.js 與訓練資料不同，要求動手前先讀
+  `node_modules/next/dist/docs/`。實際版本是 **Next 16.2.6**；已確認 `'use client'` 語意不變，
+  且本切片全部是既有 client 子樹內的 React 元件，沒有用到任何 Next 專屬 API。
+- `src/lib/jobAnalysisHeader.ts` 持有純映射與文案：表單一律用 string 持有、送出前 trim 成 `null`；
+  `competencyLevel` 也用 string，因為 `<select>` 的值是 string 且「未選」必須能表達成清空。
+  儲存後端回來的級別若超出 1–6（理論上不該發生），視為未設而不是猜一個值。
+- `readinessSummary()` 零 issue 時回 `null`，`ReadinessNotice` 因此**什麼都不渲染**——
+  不宣稱整份 JD 已完整，也沒有綠色「完成」（ADR 0053 決定 6）。文案固定
+  「iCAP 版型欄位尚有 X 項未填」，測試逐一擋掉「不完整／不合格／未通過／完成」四個詞
+  （ADR 0052 決定 7）。
+- UI **不自行重算 readiness**（ADR 0052 決定 3）：`ReadinessNotice` 只吃 `DocumentReadinessView`，
+  沒有任何判斷邏輯。
+- `JdHeaderForm` 沿用 `TaskEditor` 既有慣例：明確儲存、無 autosave、無 Server Action、
+  無第二份 store；`dirty` 上報給 `ConsultationWorkspace` 併進既有的離開守衛；
+  失敗後同內容重送沿用原 `Idempotency-Key`；未改內容時儲存鈕 disabled。
+- 表單**沒有** `職能基準代碼`／`職類別代碼` 輸入欄，並在表單內明寫那兩個代碼由 iCAP 配發
+  （ADR 0052 決定 8）。基準級別是 1–6 下拉、可清空、**沒有 AI 生成按鈕**（決定 12）。
+- web 三件套：`npm run test` **108 passed**（+11）、`npx tsc --noEmit` 綠、`npm run lint` 綠。
+  另跑 `npm run build` 確認 production build 通過（`/workspace/[document_id]` 正常產出）。
+- 完整 API 仍為 `2085 passed / 0 failed / 0 skipped`——T6 只動 web，未觸及後端。
+- **本切片到此完成**：員工現在可以在 `/workspace` 實際填寫表頭並看到缺漏提示。
+  未跑 live／付費呼叫；T5 的 packet／instructions 改動仍待一次 Opus／Sonnet 複驗（需 owner 授權）。
+  下一個切片是 ADR 0052 決定 13 的 Duty＋Task 職能級別結構切片，之後才是 deterministic 匯出。

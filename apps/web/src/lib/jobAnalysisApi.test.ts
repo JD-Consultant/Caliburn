@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type {
+  JdHeaderWrite,
   JdTaskWrite,
   OpksItemWrite,
   OpksProposalDecisionWrite,
@@ -22,6 +23,7 @@ import {
   jobAnalysisProblemMessage,
   listDocuments,
   putDocument,
+  putJdHeader,
   reorderTasks,
   submitEmployeeTurn,
   decideProposal,
@@ -159,6 +161,55 @@ describe("Current JD Task client", () => {
       ["PUT", `http://127.0.0.1:8001/api/v1/job-analysis/documents/${DOCUMENT_ID}/task-order`],
       ["DELETE", `http://127.0.0.1:8001/api/v1/job-analysis/documents/${DOCUMENT_ID}/tasks/task-1`],
     ]);
+  });
+});
+
+describe("JD header client", () => {
+  const header: JdHeaderWrite = {
+    competency_name: "資訊安全維運人員",
+    occupation_category_name: null,
+    occupation_name: null,
+    occupation_code: null,
+    industry_name: null,
+    industry_code: null,
+    work_description: "維運企業資訊安全設備並處理資安事件。",
+    competency_level: 4,
+    notes: null,
+  };
+
+  it("PUTs the header with the caller-owned retry key", async () => {
+    const fetchMock = vi.fn().mockResolvedValueOnce(response(header));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await putJdHeader(DOCUMENT_ID, header, "header-1");
+
+    const [url, init] = fetchMock.mock.calls[0];
+    expect(init.method).toBe("PUT");
+    expect(url).toBe(
+      `http://127.0.0.1:8001/api/v1/job-analysis/documents/${DOCUMENT_ID}/jd-header`,
+    );
+    expect(init.headers).toMatchObject({ "Idempotency-Key": "header-1" });
+    expect(JSON.parse(init.body)).toEqual(header);
+  });
+
+  it("surfaces a rejected no-op edit as a readable message", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValueOnce(
+        response(
+          {
+            type: "https://caliburn.dev/problems/job-analysis/invalid-request",
+            title: "Invalid request",
+            status: 422,
+          },
+          422,
+        ),
+      ),
+    );
+
+    await expect(putJdHeader(DOCUMENT_ID, header, "header-1")).rejects.toThrow(
+      "請檢查輸入內容",
+    );
   });
 });
 

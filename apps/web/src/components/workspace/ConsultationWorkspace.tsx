@@ -6,15 +6,17 @@ import { useState } from "react";
 
 import { consultationQueryOptions } from "@/lib/jobAnalysisQueries";
 import { ConsultationPanel } from "./ConsultationPanel";
+import { JdHeaderForm } from "./JdHeaderForm";
 import { OpksEditor } from "./OpksEditor";
 import { TaskEditor } from "./TaskEditor";
 import { GuardedLink } from "./UnsavedChangesGuard";
 
 export function ConsultationWorkspace({ documentId }: { documentId: string }) {
   const consultation = useQuery(consultationQueryOptions(documentId));
+  const [headerDraftDirty, setHeaderDraftDirty] = useState(false);
   const [taskDraftDirty, setTaskDraftDirty] = useState(false);
   const [opksDraftDirty, setOpksDraftDirty] = useState(false);
-  const dirty = taskDraftDirty || opksDraftDirty;
+  const dirty = headerDraftDirty || taskDraftDirty || opksDraftDirty;
 
   return (
     <div className="min-h-screen bg-muted/30">
@@ -42,6 +44,10 @@ export function ConsultationWorkspace({ documentId }: { documentId: string }) {
       <main className="mx-auto grid max-w-7xl gap-8 px-6 py-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
         <ConsultationPanel documentId={documentId} />
         <div className="space-y-8">
+          <JdHeaderForm
+            documentId={documentId}
+            onDirtyChange={setHeaderDraftDirty}
+          />
           <TaskEditor
             documentId={documentId}
             embedded

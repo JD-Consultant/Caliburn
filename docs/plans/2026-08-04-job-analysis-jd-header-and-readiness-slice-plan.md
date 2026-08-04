@@ -1,7 +1,7 @@
 # JD 表頭（`JdHeader`）與 readiness 切片實作計畫
 
 - 日期：2026-08-04
-- 狀態：PLANNED（尚未開工）
+- 狀態：T1 COMPLETE；T2–T7 尚未開工
 - 決策：[ADR 0052](../adr/0052-jd-readiness-assessment-and-official-code-boundaries.md)、
   [ADR 0053](../adr/0053-jd-header-authority-boundary-and-readiness-scope.md)；
   authority seam 邊界沿用 [ADR 0045](../adr/0045-job-analysis-local-web-contract-and-shared-authority-commit.md)
@@ -177,3 +177,19 @@ T4／T6 另跑 contract codegen 與 web 三件套。
 
 「所屬類別」三組是否要列入 readiness 缺漏。第 4 節目前**不發聲**（依 0052 決定 6 的保守側）。
 若 owner 認為官方版型要求必填，再補 issue code；這不影響其餘 task 的施工順序。
+
+## 9. T1 執行證據（2026-08-04）
+
+- RED：`tests/test_job_analysis_{jd_header,readiness}.py` 先因 `JdHeader` 與
+  `application.readiness` 缺失形成可重現 collection error；GREEN 後兩檔 `29 passed`。
+- `app/job_analysis/domain/jd_header.py`：九個欄位全 nullable，`competency_level` 以
+  `ge=1, le=6` 約束，文字欄位沿用 `NonEmptyText` 因此空字串與純空白一律拒收。測試另鎖定
+  **模型不存在任何 iCAP 配發代碼欄位**，`_code` 結尾的欄位只有職業別與行業別兩個分類代碼。
+- `app/job_analysis/application/readiness.py`：`assess_readiness()` 依官方表頭順序回三個
+  determinable issue，順序決定性；`DocumentReadiness.model_fields` 精確等於 `{"issues"}`，
+  測試逐一擋掉 `is_complete`／`ready`／`percent` 等欄位名。說明補充與所屬類別經測試證明不發聲。
+- AST 測試證明 `readiness.py` 不 import `job_analysis_contract`、FastAPI、SQLAlchemy 或 httpx。
+- job_analysis targeted：`551 passed / 59 skipped`。完整 API：`1779 passed / 277 skipped / 0 failed`，
+  相較本輪 baseline `1750 passed / 277 skipped / 0 failed` 恰好增加 29 個新測試，無 regression。
+- 尚未接 `JobAnalysisState`、persistence、migration、API、packet 或 UI；未跑 live／付費呼叫。
+  下一個可獨立 task 是 T2。

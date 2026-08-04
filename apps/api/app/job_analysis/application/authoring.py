@@ -7,6 +7,7 @@ from datetime import UTC, datetime
 from uuid import UUID
 
 from app.job_analysis.domain import (
+    JdHeader,
     CurrentJdOpks,
     CurrentWorkModel,
     JdTask,
@@ -208,6 +209,7 @@ async def _commit_direct_edit(
 ) -> None:
     now = _utcnow()
     state = JobAnalysisState(
+        jd_header=record.jd_header,
         work_model=work_model,
         current_jd=tasks,
         proposals=proposals,
@@ -294,6 +296,7 @@ async def put_document_metadata(
         record = DocumentRecord(
             document_id=document_id,
             title=title,
+            jd_header=JdHeader(),
             work_model=CurrentWorkModel(),
             active_question=ActiveQuestion(
                 turn_id=opening_turn.turn_id,
@@ -341,6 +344,7 @@ async def load_document(
         return LoadedDocument(
             document=record,
             state=JobAnalysisState(
+                jd_header=record.jd_header,
                 work_model=record.work_model,
                 current_jd=tasks,
                 proposals=proposals,

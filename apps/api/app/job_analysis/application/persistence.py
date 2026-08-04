@@ -20,6 +20,7 @@ from app.job_analysis.domain import (
     CurrentWorkModel,
     DomainModel,
     Identifier,
+    JdHeader,
     JdTask,
     NonEmptyText,
     OpksItem,
@@ -36,6 +37,8 @@ from .verifier import TurnSpeaker
 
 
 WORK_MODEL_SCHEMA_ID = "job-analysis-work-model/1"
+JD_HEADER_SCHEMA_ID = "job-analysis-jd-header/1"
+JD_HEADER_DIRECT_EDIT_SCHEMA_ID = "job-analysis-jd-header-direct-edit/1"
 PROPOSAL_SCHEMA_ID = "job-analysis-proposal/1"
 OPKS_ITEM_SCHEMA_ID = "job-analysis-opks-item/1"
 OPKS_PROPOSAL_SCHEMA_ID = "job-analysis-opks-proposal/1"
@@ -53,6 +56,7 @@ PROPOSAL_DECISION_SCHEMA_ID = "job-analysis-proposal-decision/1"
 class DocumentRecord:
     document_id: UUID
     title: str
+    jd_header: JdHeader
     work_model: CurrentWorkModel
     active_question: ActiveQuestion | None
     authority_generation: int
@@ -112,6 +116,20 @@ class ConsultantOpeningPayload(DomainModel):
 
 
 DirectEditKind = Literal["add", "edit", "delete", "reorder"]
+
+
+class JdHeaderDirectEditPayload(DomainModel):
+    """表頭直接編輯的前後快照；未改內容不得寫 Journal 也不得 bump generation。"""
+
+    before: JdHeader
+    after: JdHeader
+
+    @model_validator(mode="after")
+    def the_edit_must_change_something(self):
+        if self.before == self.after:
+            raise ValueError("a jd header direct edit must change the header")
+        return self
+
 
 
 class DirectEditPayload(DomainModel):
@@ -263,6 +281,7 @@ JournalPayload = (
     ConsultantOpeningPayload
     | CompletedTurnPayload
     | DirectEditPayload
+    | JdHeaderDirectEditPayload
     | OpksDirectEditPayload
     | OpksProposalDecisionPayload
     | OpksGenerationPayload
@@ -276,6 +295,10 @@ _JOURNAL_CONTRACT: dict[type[DomainModel], tuple[JournalKind, str]] = {
     ),
     CompletedTurnPayload: ("employee_turn", COMPLETED_TURN_SCHEMA_ID),
     DirectEditPayload: ("direct_edit", DIRECT_EDIT_SCHEMA_ID),
+    JdHeaderDirectEditPayload: (
+        "direct_edit",
+        JD_HEADER_DIRECT_EDIT_SCHEMA_ID,
+    ),
     OpksDirectEditPayload: ("direct_edit", OPKS_DIRECT_EDIT_SCHEMA_ID),
     OpksProposalDecisionPayload: (
         "proposal_decision",
@@ -335,6 +358,7 @@ class DocumentRepository(Protocol):
         document_id: UUID,
         *,
         expected_generation: int,
+        jd_header: JdHeader,
         work_model: CurrentWorkModel,
         active_question: ActiveQuestion | None,
         updated_at: datetime,

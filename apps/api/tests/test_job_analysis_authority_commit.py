@@ -17,6 +17,7 @@ from app.job_analysis.application import (
 )
 from app.job_analysis.application.authority_commit import commit_authority_change
 from app.job_analysis.domain import (
+    JdHeader,
     CurrentJdOpks,
     CurrentWorkModel,
     JdTask,
@@ -140,6 +141,7 @@ class _UnitOfWork:
         record = DocumentRecord(
             document_id=DOCUMENT_ID,
             title="門市營運專員",
+            jd_header=JdHeader(),
             work_model=CurrentWorkModel(),
             active_question=None,
             authority_generation=0,

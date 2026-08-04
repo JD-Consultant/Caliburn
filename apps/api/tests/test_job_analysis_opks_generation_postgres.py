@@ -19,6 +19,7 @@ from app.job_analysis.application import (
 from app.job_analysis.application.errors import IdempotencyConflict
 from app.job_analysis.domain import (
     CurrentWorkModel,
+    JdHeader,
     JdTask,
     OpksEntityKind,
     OpksEvidenceLink,
@@ -112,6 +113,7 @@ async def seed(
         updated = await uow.documents.update_authority(
             document_id,
             expected_generation=record.authority_generation,
+            jd_header=JdHeader(),
             work_model=CurrentWorkModel(tasks=tuple(tasks)),
             active_question=record.active_question,
             updated_at=record.updated_at + timedelta(seconds=1),

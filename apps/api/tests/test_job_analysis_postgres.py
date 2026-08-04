@@ -33,6 +33,7 @@ from app.job_analysis.domain import (
     Enabler,
     EnablerKind,
     JdEntry,
+    JdHeader,
     JdTask,
     OpksEntityKind,
     OpksEvidenceLink,
@@ -81,6 +82,7 @@ def document(document_id: UUID) -> DocumentRecord:
     return DocumentRecord(
         document_id=document_id,
         title="門市營運專員",
+        jd_header=JdHeader(),
         work_model=CurrentWorkModel(),
         active_question=ActiveQuestion(
             turn_id="turn-1",
@@ -329,6 +331,7 @@ async def test_document_for_update_really_holds_the_row_lock(
                 changed = await uow.documents.update_authority(
                     document_id,
                     expected_generation=0,
+                    jd_header=JdHeader(),
                     work_model=CurrentWorkModel(),
                     active_question=None,
                     updated_at=NOW + timedelta(minutes=1),

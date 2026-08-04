@@ -1,7 +1,7 @@
 # JD 表頭（`JdHeader`）與 readiness 切片實作計畫
 
 - 日期：2026-08-04
-- 狀態：T1 COMPLETE；T2–T7 尚未開工
+- 狀態：T1／T2 COMPLETE；T3–T7 尚未開工
 - 決策：[ADR 0052](../adr/0052-jd-readiness-assessment-and-official-code-boundaries.md)、
   [ADR 0053](../adr/0053-jd-header-authority-boundary-and-readiness-scope.md)；
   authority seam 邊界沿用 [ADR 0045](../adr/0045-job-analysis-local-web-contract-and-shared-authority-commit.md)
@@ -193,3 +193,26 @@ T4／T6 另跑 contract codegen 與 web 三件套。
   相較本輪 baseline `1750 passed / 277 skipped / 0 failed` 恰好增加 29 個新測試，無 regression。
 - 尚未接 `JobAnalysisState`、persistence、migration、API、packet 或 UI；未跑 live／付費呼叫。
   下一個可獨立 task 是 T2。
+
+## 10. T2 執行證據（2026-08-04）
+
+- 先發現本機 `caliburn` DB 停在 0011，DB 測試全部紅。套用 0012–0014 後取得**真正的** baseline：
+  job_analysis targeted `610 passed / 0 skipped`、完整 API `2068 passed`（此前的
+  `1750 passed / 277 skipped` 是 DB 未套用時的數字，不能當 baseline）。
+- RED：`tests/test_job_analysis_jd_header_persistence.py` 先因 `JD_HEADER_DIRECT_EDIT_SCHEMA_ID`
+  缺失形成 ImportError；GREEN 後 `13 passed`。
+- `jd_header` 在 `DocumentRecord` **保持必填、不給預設值**：全 repo 只有 2 個 production 建構點
+  （`load_document`、`create_document`）與 4 個測試檔，代價很小；給預設值等於讓未來新增的寫入點
+  可以靜默把員工填的表頭覆蓋成空。
+- migration 0015 只在 `job_analysis_documents` 加 `jd_header_schema_id`／`jd_header_json` 兩欄，
+  既有列以 `{}` 回填後轉 NOT NULL，並加兩個 CHECK。**不建新表**：header 與 `authority_generation`
+  同列，`update_authority()` 既有的 CAS 直接覆蓋 header，不需要第二次往返。
+- **本切片最大的風險是靜默資料遺失**：8 個 `JobAnalysisState(...)` 建構點若沒把 `record.jd_header`
+  帶過去，一次 AI 回合或一次 proposal 決策就會把員工填的表頭洗成空。八處全部補上，`durable_turn`
+  的 `update_authority()` 也改送 `transition.state.jd_header`。
+- 該風險以 `test_a_verified_ai_turn_preserves_the_employee_header` 上鎖，並以 mutation check 驗證
+  這個測試有效：暫時移除 `durable_turn` 的 carry-through 後測試確實變紅（header 全成 `None`），
+  還原後轉綠。
+- 兩處 alembic single-head 斷言（job_analysis 與 interview_vnext migration 測試）同步改為 `0015`。
+- 全 DB 測試實跑：job_analysis targeted `623 passed`（+13）；完整 API **`2069 passed / 0 failed / 0 skipped`**。
+- 尚未接 API、packet 或 UI，員工仍無法填表頭；未跑 live／付費呼叫。下一個可獨立 task 是 T3。

@@ -22,6 +22,7 @@ from app.job_analysis.application import (
 from app.job_analysis.domain import (
     CurrentWorkModel,
     JdEntry,
+    JdHeader,
     JdTask,
     JdTaskFields,
     OpenIssueKind,
@@ -266,6 +267,7 @@ async def seed_existing_authority(
         changed = await uow.documents.update_authority(
             document_id,
             expected_generation=record.authority_generation,
+            jd_header=JdHeader(),
             work_model=CurrentWorkModel(tasks=(work_model_task(),)),
             active_question=None,
             updated_at=record.updated_at + timedelta(seconds=1),

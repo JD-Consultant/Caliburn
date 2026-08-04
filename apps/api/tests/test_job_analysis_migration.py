@@ -1,4 +1,4 @@
-"""Migration 0014: greenfield local Current State and OPKS tables.
+"""Migration 0015: greenfield Current State, OPKS tables and the JD header.
 
 The cycle runs in a disposable database and proves the migration neither
 rewrites nor removes the older 0011 authoring tables.
@@ -34,6 +34,8 @@ EXPECTED_COLUMNS = {
     "job_analysis_documents": {
         "document_id": ("uuid", False),
         "title": ("text", False),
+        "jd_header_schema_id": ("text", False),
+        "jd_header_json": ("jsonb", False),
         "work_model_schema_id": ("text", False),
         "work_model_json": ("jsonb", False),
         "active_question_json": ("jsonb", True),
@@ -148,6 +150,8 @@ EXPECTED_CHECKS = {
     "job_analysis_documents": {
         "ja2_ck_documents_title",
         "ja2_ck_documents_work_model_schema",
+        "ja2_ck_documents_jd_header_schema",
+        "ja2_ck_documents_jd_header_json",
         "ja2_ck_documents_work_model_json",
         "ja2_ck_documents_active_question_json",
         "ja2_ck_documents_generation",
@@ -249,18 +253,18 @@ def _column_kind(column_type) -> str:
     return str(column_type).lower()
 
 
-def test_alembic_has_0014_as_its_single_head():
+def test_alembic_has_0015_as_its_single_head():
     from alembic.config import Config
     from alembic.script import ScriptDirectory
 
     config = Config(str(API_DIR / "alembic.ini"))
     config.set_main_option("script_location", str(API_DIR / "alembic"))
 
-    assert ScriptDirectory.from_config(config).get_heads() == ["0014"]
+    assert ScriptDirectory.from_config(config).get_heads() == ["0015"]
 
 
 @pytest.mark.usefixtures("require_postgres")
-def test_migration_0014_cycle_builds_greenfield_tables_and_preserves_0011():
+def test_migration_0015_cycle_builds_greenfield_tables_and_preserves_0011():
     admin = sa.create_engine(_sync_url("postgres"), isolation_level="AUTOCOMMIT")
     with admin.connect() as connection:
         connection.execute(sa.text(f"DROP DATABASE IF EXISTS {MIG_DB} WITH (FORCE)"))
@@ -279,7 +283,7 @@ def test_migration_0014_cycle_builds_greenfield_tables_and_preserves_0011():
             "job_authoring_proposals",
         }
 
-        _alembic("upgrade", "0014", _async_url(MIG_DB))
+        _alembic("upgrade", "0015", _async_url(MIG_DB))
         inspector = sa.inspect(engine)
         assert TABLES <= set(inspector.get_table_names(schema="public"))
 

@@ -28,6 +28,7 @@ from app.job_analysis.domain import (
     ExcludedSignal,
     Identifier,
     JdEntry,
+    JdHeader,
     JdTask,
     MergeTarget,
     NonEmptyText,
@@ -67,8 +68,13 @@ from .verifier import verify_task_analysis_result
 
 
 class JobAnalysisState(DomainModel):
-    """一名員工、一份職務說明書的目前狀態(§9.4 的兩層)。"""
+    """一名員工、一份職務說明書的目前狀態(§9.4 的兩層)。
 
+    `jd_header` 是 Current JD authority 的一部分(ADR 0053 決定 3):它與 Task／OPKS 走
+    同一條 `commit_authority_change` seam,不是 `DocumentMetadataWrite` 的 `title`。
+    """
+
+    jd_header: JdHeader = JdHeader()
     work_model: CurrentWorkModel = CurrentWorkModel()
     current_jd: tuple[JdTask, ...] = ()
     proposals: tuple[Proposal, ...] = ()
@@ -914,6 +920,7 @@ class _Writer:
         return TransitionResult(
             outcome=TransitionOutcome.APPLIED,
             state=JobAnalysisState(
+                jd_header=self._state.jd_header,
                 work_model=work_model,
                 current_jd=self._state.current_jd,
                 proposals=tuple(self._proposals.values()),

@@ -19,6 +19,7 @@ from pydantic import model_validator
 from app.job_analysis.domain import (
     CurrentWorkModel,
     DomainModel,
+    Duty,
     Identifier,
     JdHeader,
     JdTask,
@@ -365,6 +366,14 @@ class DocumentRepository(Protocol):
     ) -> bool: ...
 
 
+class JdDutyRepository(Protocol):
+    async def list(self, document_id: UUID) -> tuple[Duty, ...]: ...
+
+    async def replace(
+        self, document_id: UUID, duties: tuple[Duty, ...]
+    ) -> None: ...
+
+
 class JdTaskRepository(Protocol):
     async def list(self, document_id: UUID) -> tuple[JdTask, ...]: ...
 
@@ -423,6 +432,7 @@ class JournalRepository(Protocol):
 
 class JobAnalysisUnitOfWork(Protocol):
     documents: DocumentRepository
+    duties: JdDutyRepository
     tasks: JdTaskRepository
     proposals: ProposalRepository
     opks: OpksRepository

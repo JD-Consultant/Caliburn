@@ -66,6 +66,7 @@ async def _load_state(
 ) -> JobAnalysisState:
     return JobAnalysisState(
         jd_header=record.jd_header,
+        current_duties=await uow.duties.list(record.document_id),
         work_model=record.work_model,
         current_jd=await uow.tasks.list(record.document_id),
         proposals=await uow.proposals.list(record.document_id),

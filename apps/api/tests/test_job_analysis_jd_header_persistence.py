@@ -79,6 +79,9 @@ async def test_commit_authority_change_persists_the_header() -> None:
             return True
 
     class _Replace:
+        async def list(self, *args: object, **kwargs: object) -> tuple[()]:
+            return ()
+
         async def replace(self, *args: object, **kwargs: object) -> None:
             return None
 
@@ -88,6 +91,7 @@ async def test_commit_authority_change_persists_the_header() -> None:
 
     class _Uow:
         documents = _Documents()
+        duties = _Replace()
         tasks = _Replace()
         proposals = _Replace()
         opks = _Replace()

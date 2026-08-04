@@ -152,6 +152,7 @@ async def _locked_state(
         raise DocumentNotFound(f"document {document_id} was not found")
     state = JobAnalysisState(
         jd_header=record.jd_header,
+        current_duties=await uow.duties.list(document_id),
         work_model=record.work_model,
         current_jd=await uow.tasks.list(document_id),
         proposals=await uow.proposals.list(document_id),

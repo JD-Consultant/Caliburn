@@ -1,7 +1,7 @@
 # 主要職責（Duty）與 Task 職能級別結構切片實作計畫
 
 - 日期：2026-08-05
-- 狀態：T1／T2 COMPLETE；T3–T7 尚未開工
+- 狀態：T1／T2／T3 COMPLETE；T4–T7 尚未開工
 - 決策：[ADR 0052](../adr/0052-jd-readiness-assessment-and-official-code-boundaries.md) 決定 10／13、
   [ADR 0053](../adr/0053-jd-header-authority-boundary-and-readiness-scope.md) 決定 7；
   authority seam 沿用 [ADR 0045](../adr/0045-job-analysis-local-web-contract-and-shared-authority-commit.md)
@@ -260,3 +260,35 @@ T5／T6 另跑 contract codegen 與 web 三件套。
   contract 16 passed；web `109 passed`＋tsc＋lint 全綠。
 - 下一個可獨立 task 是 T3（persistence 與 migration 0016），**必須一次補齊九個
   `JobAnalysisState(...)` 建構點的 `current_duties`**。
+
+## 12. T3 執行證據（2026-08-05）
+
+- baseline：完整 API `2111 passed / 0 failed / 0 skipped`。
+- **偏離計畫：`jd_tasks.duty_id` 不建 FK，因此也沒有 `ON DELETE SET NULL`。**
+  第 1 點原本要求 FK＋`ON DELETE SET NULL`，實作時發現這在本 repo 會反過來造成資料遺失：
+  repository 用 delete-then-insert 的 `replace()` 寫整份 duties，加上 `ON DELETE SET NULL` 之後，
+  **每一次改任何一條 Duty 都會把所有 Task 的 `duty_id` 清成 `NULL`**——正是本切片要防的那個 bug。
+  改採既有 OPKS `task_refs` 的先例：child 關係的參照完整性由 `JobAnalysisState` 守。
+  完成條件因此改寫為：
+  1. domain 拒絕指向不存在 Duty 的 Task（T1 已有測試），髒資料**讀取時整份 fail-closed**
+     ——`test_a_dangling_duty_reference_fails_closed_on_read` 直接用 SQL 寫進 `duty-gone` 驗證；
+  2. T4 的 `delete_duty` 必須在**同一交易**把該 Duty 底下 Task 的 `duty_id` 設為 `None`。
+     這條是 T4 的驗收項，不是 T3 能代為保證的。
+  取捨與理由寫進 migration docstring，日後讀 schema 的人不會誤以為忘了加 FK。
+- 級別的 1–6 由 DB CHECK 擋在**寫入端**：原本想寫「存了 9 之後讀取要 fail-closed」的測試，
+  結果 `UPDATE ... SET competency_level = 9` 直接被 `ja2_ck_jd_tasks_competency_level` 拒絕，
+  根本造不出那個髒狀態。測試因此改成斷言 DB 自己就擋下來——比繞過約束再驗讀取更接近真相。
+- 第 4 點的「八個建構點」實際是**九個**：改完之後寫了一支腳本走訪每一個 `JobAnalysisState(`
+  呼叫點逐一核對，抓到 `put_jd_header()` 被前面的模式比對漏掉。這正是 header 切片同一類風險，
+  靠人眼掃過去會漏。
+- 寫入順序：`commit_authority_change()` **先 replace duties 再 replace tasks**，
+  同一交易內不會出現「Task 指向已被刪掉的 Duty」的中間狀態；既有的寫入順序斷言一併更新。
+- 測試：新增 `tests/test_job_analysis_duty_persistence.py`（7 條，全部跑真 PostgreSQL）——
+  往返、canonical 排序在 replace 後仍成立、**既有無 Duty 文件照常載入且不合成假的 T1**、
+  員工改表頭不會洗掉 Duty、員工改 Task 不會洗掉 Duty、DB 擋掉越界級別、髒 `duty_id` 讀取拒收。
+  `test_job_analysis_migration.py` 補上新表與兩欄的 PK／unique／FK／check 期望。
+- job_analysis targeted：`672 passed`（+7）。完整 API：**`2118 passed / 0 failed / 0 skipped`**（+7）。
+- 同 commit 更新 `docs/design/task-analysis-engine.md`：T1／T2 只改了 plan 沒改 design doc，
+  這次一次補齊 Duty 的 domain 形狀、readiness 的三條結構 issue、0016 與無 FK 的理由、
+  authority commit 的寫入順序，以及 transition carry-through 現在也涵蓋 `current_duties`。
+- 下一個可獨立 task 是 T4（authoring use cases），其中 `delete_duty` 必須承接上面第 2 點。

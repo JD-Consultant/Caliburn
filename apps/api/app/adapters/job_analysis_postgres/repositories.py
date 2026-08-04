@@ -25,6 +25,7 @@ from app.job_analysis.application import (
 )
 from app.job_analysis.domain import (
     CurrentWorkModel,
+    Duty,
     JdHeader,
     JdTask,
     OpksItem,
@@ -37,6 +38,7 @@ from app.job_analysis.domain import (
 from . import serialization as ser
 from .models import (
     JobAnalysisDocumentRow,
+    JobAnalysisJdDutyRow,
     JobAnalysisJdTaskRow,
     JobAnalysisJournalRow,
     JobAnalysisOpksItemRow,
@@ -195,10 +197,55 @@ class SqlAlchemyJdTaskRepository:
                     ),
                     enablers_json=ser.dump_jd_task_enablers(task),
                     display_order=task.display_order,
+                    duty_id=task.duty_id,
+                    competency_level=task.competency_level,
                     created_at=now,
                     updated_at=now,
                 )
                 for task in tasks
+            ]
+        )
+
+
+class SqlAlchemyJdDutyRepository:
+    def __init__(self, session: AsyncSession) -> None:
+        self._session = session
+
+    async def list(self, document_id: UUID) -> tuple[Duty, ...]:
+        rows = (
+            await self._session.scalars(
+                select(JobAnalysisJdDutyRow)
+                .where(JobAnalysisJdDutyRow.document_id == document_id)
+                .order_by(
+                    JobAnalysisJdDutyRow.display_order,
+                    JobAnalysisJdDutyRow.duty_id,
+                )
+            )
+        ).all()
+        return tuple(ser.load_jd_duty(row) for row in rows)
+
+    async def replace(
+        self,
+        document_id: UUID,
+        duties: tuple[Duty, ...],
+    ) -> None:
+        await self._session.execute(
+            delete(JobAnalysisJdDutyRow).where(
+                JobAnalysisJdDutyRow.document_id == document_id
+            )
+        )
+        now = datetime.now(UTC)
+        self._session.add_all(
+            [
+                JobAnalysisJdDutyRow(
+                    document_id=document_id,
+                    duty_id=duty.duty_id,
+                    statement=duty.statement,
+                    display_order=duty.display_order,
+                    created_at=now,
+                    updated_at=now,
+                )
+                for duty in duties
             ]
         )
 
@@ -475,6 +522,7 @@ class SqlAlchemyJobAnalysisUnitOfWork:
         self._session: AsyncSession | None = None
         self._committed = False
         self.documents: SqlAlchemyDocumentRepository
+        self.duties: SqlAlchemyJdDutyRepository
         self.tasks: SqlAlchemyJdTaskRepository
         self.proposals: SqlAlchemyProposalRepository
         self.opks: SqlAlchemyOpksRepository
@@ -487,6 +535,7 @@ class SqlAlchemyJobAnalysisUnitOfWork:
         self._session = self._session_factory()
         await self._session.begin()
         self.documents = SqlAlchemyDocumentRepository(self._session)
+        self.duties = SqlAlchemyJdDutyRepository(self._session)
         self.tasks = SqlAlchemyJdTaskRepository(self._session)
         self.proposals = SqlAlchemyProposalRepository(self._session)
         self.opks = SqlAlchemyOpksRepository(self._session)

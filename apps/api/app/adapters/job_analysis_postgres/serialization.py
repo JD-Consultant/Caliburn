@@ -35,6 +35,7 @@ from app.job_analysis.application import (
 )
 from app.job_analysis.domain import (
     CurrentWorkModel,
+    Duty,
     JdHeader,
     JdTask,
     OpksItem,
@@ -125,6 +126,19 @@ def dump_jd_task_enablers(task: JdTask) -> list[dict[str, Any]]:
     return [enabler.model_dump(mode="json") for enabler in task.enablers]
 
 
+def load_jd_duty(row: Any) -> Duty:
+    try:
+        return Duty.model_validate(
+            {
+                "duty_id": row.duty_id,
+                "statement": row.statement,
+                "display_order": row.display_order,
+            }
+        )
+    except (ValidationError, TypeError, ValueError) as exc:
+        _fail("JD Duty", exc, exc)
+
+
 def load_jd_task(row: Any) -> JdTask:
     try:
         return JdTask.model_validate(
@@ -137,6 +151,8 @@ def load_jd_task(row: Any) -> JdTask:
                 "responsibility_role": row.responsibility_role,
                 "enablers": row.enablers_json,
                 "display_order": row.display_order,
+                "duty_id": row.duty_id,
+                "competency_level": row.competency_level,
             }
         )
     except (ValidationError, TypeError, ValueError) as exc:

@@ -54,6 +54,7 @@ DOCUMENT_ID = UUID("00000000-0000-0000-0000-000000000045")
 class _Store:
     def __init__(self) -> None:
         self.document: DocumentRecord | None = None
+        self.duties = ()
         self.tasks: tuple[JdTask, ...] = ()
         self.proposals = ()
         self.opks = ()
@@ -128,6 +129,17 @@ class _Documents:
         return True
 
 
+class _Duties:
+    def __init__(self, store: _Store) -> None:
+        self.store = store
+
+    async def list(self, document_id: UUID):
+        return self.store.duties
+
+    async def replace(self, document_id: UUID, duties) -> None:
+        self.store.duties = duties
+
+
 class _Tasks:
     def __init__(self, store: _Store) -> None:
         self.store = store
@@ -198,6 +210,7 @@ class _Journal:
 class _UnitOfWork:
     def __init__(self, store: _Store) -> None:
         self.documents = _Documents(store)
+        self.duties = _Duties(store)
         self.tasks = _Tasks(store)
         self.proposals = _Proposals(store)
         self.opks = _Opks(store)

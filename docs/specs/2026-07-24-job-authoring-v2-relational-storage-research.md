@@ -1,13 +1,19 @@
 # Job Authoring v2：本機單一現況 JD 關聯式儲存設計
 
 - 日期：2026-07-24
-- 狀態：Owner 已核准產品範圍；尚未授權 migration／production 實作
+- 狀態：**已被 2026-07-29 `job_analysis` greenfield persistence 研究取代，勿據本文施工**
 - 目標：先交付可儲存、訪談、編輯與匯出的高品質本機 JD 成品
 - 不包含：版本歷史、還原、revision diff、SaaS、多租戶、帳號權限、公司共用職能庫、Graph DB
 - 上游研究：
   - [專業職務分析與共編研究](2026-07-20-interview-vnext-professional-job-analysis-and-short-answer-architecture-research.md)
   - [本機多文件工作區研究](2026-07-23-local-multi-document-jd-workspace-and-public-form-ui-research.md)
   - [ADR 0039](../adr/0039-local-multi-document-canonical-public-form-workspace.md)
+
+> **2026-07-29 supersession**
+>
+> 本文保留供追溯，但其 `app.job_authoring` bounded module、UUID-only Task identity、完整預建 O/P/K/S/A tables、
+> `core/supporting` 與欄位集合已不是現行施工 authority。新引擎不搬遷、整合或 dual-write 舊資料；現行決策見
+> [本機 JD 分層編輯與 `job_analysis` PostgreSQL 持久化研究](2026-07-29-local-jd-authoring-and-postgresql-persistence-research.md)。
 
 ## 1. 2026-07-24 Owner 裁決
 

@@ -63,6 +63,6 @@ R1–R7 的職務分析、Evidence、proposal、current-row 與真人 pilot gate
 ## 文件處理
 
 - 新 ADR 取代 ADR 0039、0041、0043 的「員工電腦 localhost」部署字句，但保留其文件權威、單寫者切換與真人 pilot 決策。
-- Accepted ADR 不回寫；以 ADR 0044 與索引標示 partial supersession。
-- 歷史研究保留原文；現行 orientation、living design、active roadmap 與 plan 直接校正並鏈回 ADR 0044。
+- Accepted ADR 不回寫；以 ADR 0057 與索引標示 partial supersession。
+- 歷史研究保留原文；現行 orientation、living design、active roadmap 與 plan 直接校正並鏈回 ADR 0057。
 - 規劃中的 `local_workspace` 改名 `job_workspace`，避免 deployment topology 滲入 domain/application seam。

@@ -1,0 +1,382 @@
+"""T5:one-stage operation ＋ 薄 OpenRouter adapter。
+
+全程 no-network:transport 是 mock,每個測試都斷言它**只被呼叫一次**——隱藏 retry
+會讓「一次 operation ＝ 一次呼叫」這條 wire invariant 悄悄失效,而且付費。
+"""
+
+from __future__ import annotations
+
+import json
+
+import httpx
+import pytest
+from pydantic import ValidationError
+
+from app.job_analysis.application import (
+    ConversationTurn,
+    OperationOutcome,
+    TurnSpeaker,
+    build_context_packet,
+    render_context_packet,
+    run_task_analysis_operation,
+)
+from app.job_analysis.domain import (
+    CurrentWorkModel,
+    SourceKind,
+    SourceRef,
+    SupportLink,
+    Task,
+    TaskFields,
+)
+from app.job_analysis.llm import (
+    TASK_ANALYSIS_INSTRUCTIONS,
+    TASK_ANALYSIS_WIRE_SCHEMA_NAME,
+    IdentityRelation,
+    SignalDisposition,
+    TaskAnalysisWire,
+    WireAnchor,
+    WireNextQuestion,
+    WireSignal,
+    WireTaskChange,
+    WireTaskFields,
+    task_analysis_wire_provider_schema,
+)
+from app.job_analysis.providers import (
+    CHAT_COMPLETIONS_URL,
+    OpenRouterAdapter,
+    OpenRouterConfig,
+    ProviderFailureKind,
+    TransportResponse,
+)
+
+
+EMPLOYEE_TEXT = "我每週要出一份營運週報"
+
+CONFIG = OpenRouterConfig(
+    model="anthropic/claude-opus-5",
+    provider_order=("anthropic",),
+    max_output_tokens=4096,
+    timeout_seconds=90.0,
+)
+
+
+class RecordingTransport:
+    """記錄每一次呼叫;`raises` 用來模擬 transport 層的例外。"""
+
+    def __init__(self, response: TransportResponse | None = None, raises=None):
+        self.response = response
+        self.raises = raises
+        self.calls: list[dict] = []
+
+    async def __call__(self, *, url, headers, body, timeout):
+        self.calls.append(
+            {"url": url, "headers": headers, "body": body, "timeout": timeout}
+        )
+        if self.raises is not None:
+            raise self.raises
+        return self.response
+
+
+def chat_response(
+    content: str, *, response_model: str | None = CONFIG.model, **overrides
+) -> TransportResponse:
+    choice = {"message": {"content": content, "refusal": None}, "finish_reason": "stop"}
+    choice.update(overrides)
+    body = {"choices": [choice]}
+    if response_model is not None:
+        body["model"] = response_model
+    return TransportResponse(status_code=200, body=body)
+
+
+def packet():
+    return build_context_packet(
+        transcript=(
+            ConversationTurn(
+                turn_id="turn-1", speaker=TurnSpeaker.CONSULTANT, text="說說你的一週?"
+            ),
+            ConversationTurn(
+                turn_id="turn-2", speaker=TurnSpeaker.EMPLOYEE, text=EMPLOYEE_TEXT
+            ),
+        ),
+        current_turn_id="turn-2",
+        work_model=CurrentWorkModel(
+            tasks=(
+                Task(
+                    task_id="task-1",
+                    statement="每週彙整營運週報",
+                    action="彙整",
+                    object="營運週報",
+                    support_links=(
+                        SupportLink(
+                            source_ref=SourceRef(
+                                kind=SourceKind.EMPLOYEE_TURN, id="turn-2"
+                            ),
+                            quote=EMPLOYEE_TEXT,
+                        ),
+                    ),
+                ),
+            )
+        ),
+    )
+
+
+def test_prompt_keeps_the_first_version_consultant_loop_flexible():
+    for rule in (
+        "先理解這個職位替誰解決什麼問題",
+        "辨識 0..N 個工作訊號",
+        "故事結束後",
+        "例行、週期與例外責任",
+        "會改變 Task 邊界的矛盾或責任問題",
+        "待決提案不妨礙繼續訪談",
+        "不得宣稱訪談或職務說明書已完成",
+    ):
+        assert rule in TASK_ANALYSIS_INSTRUCTIONS
+
+
+def valid_result_json(quote: str = EMPLOYEE_TEXT) -> str:
+    """模型送回來的是 wire 形狀,不是 domain 形狀。"""
+
+    return TaskAnalysisWire(
+        work_signals=(
+            WireSignal(
+                anchors=(WireAnchor(turn_ordinal=2, quote=quote),),
+                relation=IdentityRelation.NO_MATCH,
+                disposition=SignalDisposition.TASK_CHANGE,
+                change=WireTaskChange.ADD,
+                task=WireTaskFields(
+                    statement="每週追蹤缺料", action="追蹤", object="缺料狀況"
+                ),
+            ),
+        ),
+        next_question=WireNextQuestion(text="週報交給誰?"),
+    ).model_dump_json()
+
+
+async def run(transport) -> tuple:
+    adapter = OpenRouterAdapter(
+        config=CONFIG, api_key="sk-test", transport=transport
+    )
+    current = packet()
+    return await run_task_analysis_operation(packet=current, adapter=adapter), current
+
+
+# ── wire invariants(ADR 0040 決定 26)──────────────────────────────────────
+
+
+async def test_a_verified_round_makes_exactly_one_call_with_the_pinned_route():
+    transport = RecordingTransport(chat_response(valid_result_json()))
+    result, _ = await run(transport)
+
+    assert result.outcome is OperationOutcome.VERIFIED
+    assert result.report.is_valid
+    assert len(transport.calls) == 1
+
+    call = transport.calls[0]
+    body = call["body"]
+    assert call["url"] == CHAT_COMPLETIONS_URL
+    assert call["headers"]["Authorization"] == "Bearer sk-test"
+    assert body["model"] == "anthropic/claude-opus-5"
+    assert body["max_tokens"] == 4096
+    assert "max_completion_tokens" not in body
+    assert body["reasoning"] == {"effort": "high", "exclude": True}
+    assert body["stream"] is False
+    assert body["provider"] == {
+        "order": ["anthropic"],
+        "only": ["anthropic"],
+        "allow_fallbacks": False,
+        "require_parameters": True,
+    }
+    assert body["response_format"] == {
+        "type": "json_schema",
+        "json_schema": {
+            "name": TASK_ANALYSIS_WIRE_SCHEMA_NAME,
+            "strict": True,
+            "schema": task_analysis_wire_provider_schema(),
+        },
+    }
+
+
+def test_output_cap_parameter_name_comes_from_config_and_only_one_is_sent():
+    """OpenRouter 已 deprecate `max_tokens`,但 per-endpoint 的 supported_parameters 未必
+    跟著更名。request 帶 `require_parameters: true`,送一個沒宣告的名字會被拒或被靜默
+    丟掉——後者等於輸出上限消失。所以名字跟著 catalog 走,而且一次只送一個。"""
+
+    adapter = OpenRouterAdapter(
+        config=CONFIG.model_copy(
+            update={"output_cap_parameter": "max_completion_tokens"}
+        ),
+        api_key="sk-test",
+        transport=RecordingTransport(chat_response(valid_result_json())),
+    )
+
+    body = adapter.build_body(
+        instructions="x",
+        packet_text="y",
+        schema_name=TASK_ANALYSIS_WIRE_SCHEMA_NAME,
+        schema=task_analysis_wire_provider_schema(),
+    )
+
+    assert body["max_completion_tokens"] == 4096
+    assert "max_tokens" not in body
+
+
+@pytest.mark.parametrize(
+    "response_model",
+    [None, "anthropic/claude-opus-4.6"],
+)
+async def test_successful_content_must_be_attributed_to_the_configured_model(
+    response_model,
+):
+    transport = RecordingTransport(
+        chat_response(valid_result_json(), response_model=response_model)
+    )
+
+    result, _ = await run(transport)
+
+    assert result.outcome is OperationOutcome.FAILED
+    assert result.detail.startswith("model_mismatch")
+    assert len(transport.calls) == 1
+
+
+async def test_the_provider_only_ever_sees_the_rendered_packet():
+    """packet 的內部模型沒有路徑可以送出去,內部 ID 也就不會外洩。"""
+    transport = RecordingTransport(chat_response(valid_result_json()))
+    _, current = await run(transport)
+
+    messages = transport.calls[0]["body"]["messages"]
+    assert messages[0] == {"role": "system", "content": TASK_ANALYSIS_INSTRUCTIONS}
+    assert messages[1] == {"role": "user", "content": render_context_packet(current)}
+
+    wire = json.dumps(transport.calls[0]["body"], ensure_ascii=False)
+    for internal_id in ("task-1", "turn-1", "turn-2"):
+        assert internal_id not in wire
+
+
+@pytest.mark.parametrize(
+    ("model", "provider_order"),
+    [
+        ("openrouter/auto", ("anthropic",)),
+        ("anthropic/claude-opus-5:free", ("anthropic",)),
+        ("~anthropic/claude-opus-5", ("anthropic",)),
+        ("claude-opus-5", ("anthropic",)),
+        ("anthropic/claude-opus-5", ()),
+        # `order` 會依序嘗試清單內的 provider,allow_fallbacks:false 只擋清單外的;
+        # 放兩個等於 fallback 換了個位置,那輪實際跑在誰身上會不可知。
+        ("anthropic/claude-opus-5", ("anthropic", "google-vertex")),
+    ],
+)
+def test_the_route_must_be_exact(model, provider_order):
+    with pytest.raises(ValidationError):
+        OpenRouterConfig(
+            model=model,
+            provider_order=provider_order,
+            max_output_tokens=4096,
+            timeout_seconds=90.0,
+        )
+
+
+# ── 每種結局都有名字,而且都只呼叫一次 ────────────────────────────────────
+
+
+async def test_output_that_is_not_the_frozen_contract_is_invalid_output():
+    transport = RecordingTransport(chat_response('{"work_signals": []}'))
+    result, _ = await run(transport)
+    assert result.outcome is OperationOutcome.INVALID_OUTPUT
+    assert TASK_ANALYSIS_WIRE_SCHEMA_NAME in result.detail
+    assert result.result is None
+    assert len(transport.calls) == 1
+
+
+async def test_output_that_breaks_a_deterministic_rule_is_rejected_with_its_report():
+    transport = RecordingTransport(chat_response(valid_result_json("我從來沒說過這句")))
+    result, _ = await run(transport)
+    assert result.outcome is OperationOutcome.REJECTED
+    assert result.result is not None
+    assert not result.report.is_valid
+    assert not result.is_applicable
+    assert len(transport.calls) == 1
+
+
+async def test_a_refusal_is_not_a_failure():
+    transport = RecordingTransport(
+        TransportResponse(
+            status_code=200,
+            body={"choices": [{"message": {"refusal": "I can't help with that."}}]},
+        )
+    )
+    result, _ = await run(transport)
+    assert result.outcome is OperationOutcome.REFUSED
+    assert result.detail == "I can't help with that."
+    assert len(transport.calls) == 1
+
+
+async def test_partial_content_behind_finish_reason_error_never_reaches_the_verifier():
+    """非串流的 provider 錯誤可能維持 HTTP 200 並附上半截輸出。
+
+    這裡刻意讓 partial content 是**合法**的 wire 輸出:錯誤若晚一步才看,
+    它就會被當成一輪成功的分析寫進 Work Model。
+    """
+    transport = RecordingTransport(
+        chat_response(
+            valid_result_json(),
+            finish_reason="error",
+            error={"message": "upstream disconnected", "metadata": {"error_type": "provider_error"}},
+        )
+    )
+    result, _ = await run(transport)
+    assert result.outcome is OperationOutcome.FAILED
+    assert result.detail.startswith(ProviderFailureKind.PROVIDER_ERROR.value)
+    assert result.result is None
+    assert len(transport.calls) == 1
+
+
+async def test_a_typed_refusal_error_envelope_is_a_refusal_not_a_failure():
+    """refusal 是 typed error,不是只出現在 message.refusal;錯報成故障會讓呼叫端以為重試有用。"""
+    transport = RecordingTransport(
+        TransportResponse(
+            status_code=200,
+            body={
+                "error": {
+                    "message": "The model declined this request.",
+                    "metadata": {"error_type": "refusal"},
+                }
+            },
+        )
+    )
+    result, _ = await run(transport)
+    assert result.outcome is OperationOutcome.REFUSED
+    assert result.detail == "The model declined this request."
+    assert len(transport.calls) == 1
+
+
+@pytest.mark.parametrize(
+    ("make_transport", "expected"),
+    [
+        (
+            lambda: RecordingTransport(raises=httpx.TimeoutException("deadline")),
+            ProviderFailureKind.TIMEOUT,
+        ),
+        (
+            lambda: RecordingTransport(raises=httpx.ConnectError("refused")),
+            ProviderFailureKind.CONNECTION,
+        ),
+        (
+            lambda: RecordingTransport(TransportResponse(status_code=503, text="upstream")),
+            ProviderFailureKind.HTTP_STATUS,
+        ),
+        (
+            lambda: RecordingTransport(TransportResponse(status_code=200, body={})),
+            ProviderFailureKind.MALFORMED_RESPONSE,
+        ),
+        (
+            lambda: RecordingTransport(chat_response("{partial", finish_reason="length")),
+            ProviderFailureKind.TRUNCATED,
+        ),
+    ],
+)
+async def test_provider_failures_are_typed_and_never_retried(make_transport, expected):
+    transport = make_transport()
+    result, _ = await run(transport)
+    assert result.outcome is OperationOutcome.FAILED
+    assert result.detail.startswith(expected.value)
+    assert len(transport.calls) == 1

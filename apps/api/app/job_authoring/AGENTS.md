@@ -23,7 +23,7 @@ organization/member/ACL/quota/billing/admin behavior or tests. Browser access,
 ingress and a future identity policy stay outside this domain. One workspace may
 hold multiple documents while the UI opens one document at a time. The next engineering budget belongs to the R1 Task Discovery
 quality gate defined by ADR 0040, not a Web wiring of this prototype or platform generalization. Production cutover and
-retirement are governed by **[ADR 0041](../../../../docs/adr/0041-document-boundary-single-writer-cutover.md)** and
+retirement are governed by **[ADR 0054](../../../../docs/adr/0054-document-boundary-single-writer-cutover.md)** and
 **[the living boundary](../../../../docs/design/professional-consultant-engine.md)**.
 
 ## Non-negotiable invariants

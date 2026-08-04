@@ -3,14 +3,12 @@
 「著作」bounded context 的後端。提供 REST `/api/v1/*`(含訪談引擎 `interview:*`)。
 擁有 **Postgres**(users/job_profiles/document_versions + interview_*);知識一律
 透過 HTTP 消費 `ocs-indexer`,**不碰 Qdrant**(資料主權,見根 [`ARCHITECTURE.md`](../../ARCHITECTURE.md))。
-現行 production AI 共編端到端仍是 v3（一個大腦／追蹤修訂），但已標為 **ACTIVE／TRANSITIONAL／maintenance-only**，見
-[`docs/design/interview-engine.md`](../../docs/design/interview-engine.md)。隔離的 `interview_vnext` 已有0010 durable persistence、
-provider/Capture/checkpoint與production OpenRouter backend元件，`job_authoring` v1已有0011 revision三表；兩者都**沒有掛正式 router**，
-也不是ADR 0040新核心的前提。greenfield `professional_consultant` 已有 R1 T1/T2 pure core；eval 外圈另有 T3 的精確六臂
-registry、A1 minimal baseline、immutable Trial Manifest／三層 capture 與 48/80 offline harness，T4a 再加獨立 blind grader
-（無 rationale/arm 身分投影、盲測 verdict verifier、與 generator 分離的 capture root）。尚無 CLI、OpenRouter preflight、
-live provider/route。新引擎、current-row JD與切換／退役見
-[`docs/design/professional-consultant-engine.md`](../../docs/design/professional-consultant-engine.md)。
+既有 production AI 共編端到端（v3）見 [`docs/design/interview-engine.md`](../../docs/design/interview-engine.md)。
+新的專業顧問 Task Analysis 引擎位於 `app/job_analysis/`，是與既有 `interview`／`interview_vnext`
+隔離的現行 greenfield 工作面；目前已接 PostgreSQL、`/api/v1/job-analysis` 與 `/workspace` 本機 Web，
+端到端邊界見 [`docs/design/task-analysis-engine.md`](../../docs/design/task-analysis-engine.md)。
+舊 `interview` 與 `interview_vnext` 都不是新引擎的依賴，不搬資料、不整合、不雙寫。
+另有 `app/professional_consultant/` 與 `evals/professional_consultant/r1/`：是另一條離線分支在 ADR 0042 收束 R1 快篩前建的離線資產，**已封存、不是工作面**，未掛 route/DB/Web；不得據以恢復六臂快篩。
 
 - **import 套件名**:`app`(Phase 3 才改 `caliburn_api`;現由 `pytest.ini` 的 `pythonpath=.` 提供)。
 - **uv application 模式**(無 build-system,[ADR 0005](../../docs/adr/0005-per-app-uv-defer-workspace.md))。
@@ -39,11 +37,12 @@ uv run pytest -q                   # 無 DB 時 DB 相關測試自動 skip
 | `app/core/` | **純內圈**:`ports.py`(KnowledgePort/PersistPort/LlmPort Protocol)、`domain/ocs_doc.py`(OCS 文件純函式:skeleton/assemble_final/validate/completion)、`domain/knowledge_pack.py`(知識包組裝,ADR 0021)、`knowledge_dto.py`(re-export [`packages/indexer-contract`](../../packages/indexer-contract/)) | 不 import 任何外圈 |
 | `app/adapters/` | 邊緣實作:`knowledge_http.py`(indexer typed client)、`persistence.py`(ProfileRepo/DocRepo/LiveDbPersist)、`llm_openrouter.py`(per-role LLM + JSON 重試)、`stubs.py`(測試/demo 假件) | 實作 ports |
 | `app/services/` | use-case 純函式:`ai/`(recommend_ks/draft_op/extract_tasks/structure_task/clarify + prompts)、`knowledge/task_detail.py`(池→單任務切片) | 只吃 ports/DTO |
-| `app/interview/` | **現行但過渡的 production 訪談引擎**(ADR 0030)：`consultant.py`、`scribe.py`、`verify.py`、`ledger.py`、`backstop.py`、`skills/`、`service.py` | maintenance-only；不得擴充新產品能力或 `_pending` |
-| `app/interview_vnext/` | **隔離 prototype／donor**：0010八表、neutral runtime、Capture/checkpoint/outbox、OpenRouter adapter與舊question loop均已有實作；無正式route | production composition root不import；ADR0040禁止直接沿用舊operation/state/gold/schema |
-| `app/job_authoring/` | **隔離 v1 prototype**：0011 documents/revisions/proposals三表與employee proposal decision | revision/snapshot不是current-row v2 target；不掛route、不擴張revision entities |
-| `app/professional_consultant/` | **R1 T1/T2 pure core**：Task Discovery contracts/verifier、versioned prompts、light/heavy portable schema、once/two-stage runner | 只依賴stdlib/Pydantic/自身；neutral request不含provider wire；不import v3、vNext、Authoring、DB或eval；尚無live adapter/route |
-| `evals/professional_consultant/r1/` | **R1 T1–T3 offline eval**：8案/rubric、A1–A6 registry、minimal baseline、observed fake、三層 capture/manifest、48/80 harness | runtime input看不到expectations/adjudication；resolved facts只收response evidence；不import legacy/provider SDK；不是production route |
+| `app/interview/` | **既有 production 訪談引擎**(ADR 0030):`consultant.py`(對話+READ 工具)、`scribe.py`(op 化+落 `_pending`)、`verify.py`(六查,blocking)、`ledger.py`(覆蓋帳本)、`backstop.py`(確定性 sweep)、`skills/`(判準教材 8 檔+`skill_loader.py`)、`service.py`(回合編排) | 吃 ports;既有寫入路徑 op→verify→`_pending` |
+| `app/job_analysis/` | **現行 greenfield Task Analysis 工作面**(ADR 0040／0042):Task／Proposal／Context／one-stage operation／deterministic verifier／durable application use cases | domain 不 import `interview`、`interview_vnext`、`job_authoring`、DB 或 Web；外圈由 PostgreSQL adapter 與薄 API route 接入 composition root |
+| `app/interview_vnext/` | **隔離開發中的 greenfield vNext**（ADR 0034）：V1 domain lifecycle + V2-A provider-neutral LLM/Capture contracts/in-memory fakes/共 33 schemas 已完成；無 route、DB、live LLM | 不 import v3 internals；SDK只准在未來 provider adapter；production composition root 不 import此 package |
+| `app/job_authoring/` | **隔離 v1 prototype**：0011 documents/revisions/proposals 三表與 employee proposal decision | 不掛 route、不擴張 revision entities |
+| `app/professional_consultant/` | **ARCHIVED 離線 R1 core**：Task Discovery contracts/verifier、versioned prompts、light/heavy portable schema、once/two-stage runner | 只依賴 stdlib/Pydantic/自身；不 import v3、vNext、Authoring、DB 或 eval；無 route；ADR 0042 已收束快篩 |
+| `evals/professional_consultant/r1/` | **ARCHIVED 離線 R1 eval**：8案/rubric、A1–A6 registry、minimal baseline、三層 capture/manifest、48/80 harness、blind grader | runtime input 看不到 expectations/adjudication；resolved facts 只收 response evidence；不是 production route，不得用來恢復快篩 |
 | `app/observability.py` | OTel tracing 橫切(gen_ai.* 手埋;verify 拒收/審閱事件 span) | — |
 | `app/api/` | HTTP 面:`routes/{users,job_profiles,documents,occupations,ai}.py`、`router.py`(唯一聚合點)、`deps.py`(get_knowledge) | 薄轉接,邏輯下沉 |
 | `app/app_factory.py` | composition root:`configure()` 掛 router/CORS/healthz | — |

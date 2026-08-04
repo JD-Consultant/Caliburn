@@ -2,7 +2,7 @@
 title: 訪談引擎 × 文件工作台 — 端到端設計(v3 追蹤修訂/一個大腦)
 audience: agent-primary(也給人)
 scope: apps/api app/interview/* + skills/* + observability + routes/interview + apps/web 表格四態/側欄
-updated: 2026-07-14
+updated: 2026-08-02
 ---
 
 # 訪談引擎 × 文件工作台 — 端到端設計(v3:一個大腦 + op→verify→`_pending`)
@@ -10,7 +10,7 @@ updated: 2026-07-14
 > **生命周期：ACTIVE／TRANSITIONAL／maintenance-only。** 這仍是正式 router 的現行行為，但不是新產品 target。
 > 只修阻斷、安全與資料損毀；不得新增顧問 operation、擴充 `_pending` 或接 current-row Authoring。
 > 新引擎與退役 gate 見 [`professional-consultant-engine.md`](professional-consultant-engine.md)／
-> [ADR 0041](../adr/0041-document-boundary-single-writer-cutover.md)。
+> [ADR 0054](../adr/0054-document-boundary-single-writer-cutover.md)。
 >
 > **主讀者 = coding agent。** 目的:不看 code 也能改對這條線——不亂發明端點、不把信任
 > 機制交給 LLM、不繞過唯一寫入路徑。**living:動到這條線的碼,同 commit 更新本檔。**
@@ -177,8 +177,10 @@ updated: 2026-07-14
 
 雙指標:**Source Score**(程式算;分母=`_pending`∪accepted,分子=出處過 verify ②③)+
 Answer Score(rubric 裁判,Phase 2)。promptfoo:Python provider 包引擎回合+Simulated User
-四 persona(話少/跑題/自誇/矛盾);deterministic 斷言先行;CI=`.github/workflows/evals.yml`
-(prompts/skills/引擎碼變更觸發)。golden 第一題 `JD-golden-001`(**SME gate:維護者審**)。
+四 persona(話少/跑題/自誇/矛盾);deterministic 斷言先行。**v3 的 promptfoo PR workflow
+已隨舊引擎退役而移除；現行
+`job_analysis` 的測試與 attributed live smoke 不走這條線。** golden 第一題
+`JD-golden-001`(**SME gate:維護者審**)。
 
 ## 9. 指路
 

@@ -3,10 +3,10 @@
 - 日期：2026-08-02
 - 狀態：R0 accepted；P1–P8 是後續施工順序，尚未授權實作，且須等待 R1–R5 gate
 - 決策：[ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md)、
-  [ADR 0041](../adr/0041-document-boundary-single-writer-cutover.md)、
-  [ADR 0042](../adr/0042-hybrid-job-discovery-and-ttop-formation.md)、
-  [ADR 0043](../adr/0043-real-employee-pilot-release-gate.md)、
-  [ADR 0044](../adr/0044-server-deployed-browser-product.md)
+  [ADR 0054](../adr/0054-document-boundary-single-writer-cutover.md)、
+  [ADR 0055](../adr/0055-hybrid-job-discovery-and-ttop-formation.md)、
+  [ADR 0056](../adr/0056-real-employee-pilot-release-gate.md)、
+  [ADR 0057](../adr/0057-server-deployed-browser-product.md)
 - 研究：[R0 架構真相與 production cutover](../specs/2026-08-02-r0-architecture-truth-and-production-cutover-research.md)
 
 ## 1. 交付目標
@@ -22,7 +22,7 @@ R9 真實員工 pilot。高擬真 transcript、合成 eval 或內部自測不得
 本計畫的 P1 以前不得開始 PV1 product wiring：
 
 - ADR 0040 R1 Task Discovery exit gate 已通過並有固定 trial manifest／報告。
-- R1 依 ADR 0042 驗證混合式職務發現中的 Task Discovery；暫定 Duty／reference 只作假說與補漏，不作文件真相。
+- R1 依 ADR 0055 驗證混合式職務發現中的 Task Discovery；暫定 Duty／reference 只作假說與補漏，不作文件真相。
 - R2 multi-turn、R3 resume/context state、R4 Duty + O/P/K/S/A、R5 proposal/current-JD 各有自己的 plan、測試與完成 tag。
 - `JobDocumentDraft.v2` 與 current-row storage 已有獨立 contract research、ADR／amendment、migration plan。
 - `git status --short` 乾淨；baseline tests 記錄在開始實作的 plan execution section。
@@ -35,7 +35,7 @@ R9 真實員工 pilot。高擬真 transcript、合成 eval 或內部自測不得
 
 變更：
 
-- 新增 R0 research、ADR 0041、本 plan、`docs/design/professional-consultant-engine.md`。
+- 新增 R0 research、ADR 0054、本 plan、`docs/design/professional-consultant-engine.md`。
 - 校正 `ARCHITECTURE.md`、ADR／docs/design 索引與會誤導實作者的 AGENTS／README。
 - 明標現行 route、隔離 prototype、target、retirement gate。
 
@@ -161,14 +161,14 @@ R9 真實員工 pilot。高擬真 transcript、合成 eval 或內部自測不得
 - 每筆採用內容有合法 support／Evidence linkage；reference candidate 不冒充 employee Evidence。
 - legacy inventory 為零後，舊寫路徑與 `_pending` 已移除；legacy tables 的刪除有獨立 migration、備份與 tag。
 - living design 只描述真實存在的 route／contract／transaction／錯誤路徑，沒有預想 API。
-- 產物標示為 release candidate；只有 ADR 0043 的 R9 真實員工 pilot 通過後，才改稱第一個員工可用成品。
+- 產物標示為 release candidate；只有 ADR 0056 的 R9 真實員工 pilot 通過後，才改稱第一個員工可用成品。
 - R8 前另案固定 production Compose、HTTPS ingress、identity/access、secret、backup／restore 與 upgrade／rollback；
   本切換 plan 不以 development localhost 假裝 deployment gate 已通過。
 
 ## 6. R0 執行證據（2026-08-02）
 
 - 本機 Markdown links：`LOCAL_MARKDOWN_LINKS_OK`。
-- orientation stale phrase guard：當時通過；ADR 0044 後 planned seam 正名為 `job_workspace`，正式 router 仍為零 import。
+- orientation stale phrase guard：當時通過；ADR 0057 後 planned seam 正名為 `job_workspace`，正式 router 仍為零 import。
 - `git diff --check`、trailing-whitespace、tracked runtime diff：通過；本 task 只有 Markdown 變更。
 - `npx.cmd turbo test`：OCS contract build、Web `67 passed`、pdf-to-json `23 passed`、ocs-indexer `53 passed`；
   API `1163 passed / 218 skipped / 5 failed`。五個失敗全是既有 historical JSON frozen-byte hash assertion；

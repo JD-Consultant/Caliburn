@@ -20,7 +20,7 @@ loader、grader與suite hash不得重用。現行產品／切換邊界以 ADR 00
 - Runtime binding/Turn v2決策：[`../../../../docs/adr/0036-interview-vnext-provider-binding-conformance-and-idless-turn-v2.md`](../../../../docs/adr/0036-interview-vnext-provider-binding-conformance-and-idless-turn-v2.md)
 - Grounded short-answer／employee authority決策：[`../../../../docs/adr/0037-interview-vnext-question-frame-contextual-evidence-and-employee-authority.md`](../../../../docs/adr/0037-interview-vnext-question-frame-contextual-evidence-and-employee-authority.md)
 - 新專業顧問核心／R1 gate（**現行 authority；完整取代0038**）：[`../../../../docs/adr/0040-professional-consultant-engine-and-r1-validation-contract.md`](../../../../docs/adr/0040-professional-consultant-engine-and-r1-validation-contract.md)
-- production切換／退役：[`../../../../docs/adr/0041-document-boundary-single-writer-cutover.md`](../../../../docs/adr/0041-document-boundary-single-writer-cutover.md)
+- production切換／退役：[`../../../../docs/adr/0054-document-boundary-single-writer-cutover.md`](../../../../docs/adr/0054-document-boundary-single-writer-cutover.md)
 - living切換邊界：[`../../../../docs/design/professional-consultant-engine.md`](../../../../docs/design/professional-consultant-engine.md)
 - V3-5A實作交接：[`../../../../docs/plans/2026-07-18-interview-vnext-v3-5a-runtime-contract-reconstruction-plan.md`](../../../../docs/plans/2026-07-18-interview-vnext-v3-5a-runtime-contract-reconstruction-plan.md)
 - R5 grounded short-answer詳細交接（R5-BC已完成）：[`../../../../docs/plans/2026-07-20-interview-vnext-v3-5a-r5-grounded-short-answer-amendment-plan.md`](../../../../docs/plans/2026-07-20-interview-vnext-v3-5a-r5-grounded-short-answer-amendment-plan.md)

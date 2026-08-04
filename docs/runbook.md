@@ -59,7 +59,7 @@ TEST_DATABASE_URL="postgresql+asyncpg://postgres:password@localhost:5432/calibur
 
 ## Deployment profiles
 
-產品交付邊界見 [ADR 0044](adr/0044-server-deployed-browser-product.md)。`localhost` 指令只屬開發環境；產品使用者從其他
+產品交付邊界見 [ADR 0057](adr/0057-server-deployed-browser-product.md)。`localhost` 指令只屬開發環境；產品使用者從其他
 裝置以瀏覽器存取 deployment。
 
 | Profile | 營運者 | 狀態 | 邊界 |

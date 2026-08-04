@@ -2,12 +2,12 @@
 
 - 日期：2026-08-03
 - 狀態：已完成
-- 決策：[ADR 0044](../adr/0044-server-deployed-browser-product.md)
+- 決策：[ADR 0057](../adr/0057-server-deployed-browser-product.md)
 - 研究：[部署範圍校正](../specs/2026-08-03-server-deployed-browser-product-scope-research.md)
 
 ## Task 1 — 鎖定決策與語言
 
-- 新增研究紀錄與 ADR 0044。
+- 新增研究紀錄與 ADR 0057。
 - 在 `CONTEXT-MAP.md` 定義 deployment、企業自管部署、我們代管部署與瀏覽器使用者。
 - ADR 索引標示 0039／0041／0043 的部署字句由 0044 部分取代。
 
@@ -43,4 +43,4 @@
 - Changed Markdown local links：通過。
 - Active-scope phrase guard：不再出現把產品定義為員工電腦執行或把 planned seam 稱為 `local_workspace` 的敘述。
 - Tracked runtime diff：零；本 task 只改 Markdown authority／orientation。
-- Accepted ADR 0039／0041／0043 原文未修改；由 ADR 0044 與索引記錄 partial supersession。
+- Accepted ADR 0039／0054／0056 原文未修改；由 ADR 0057 與索引記錄 partial supersession。

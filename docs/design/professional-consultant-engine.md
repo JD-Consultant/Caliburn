@@ -12,10 +12,10 @@ updated: 2026-08-04
 > prompts/schema/runners、精確六臂 registry 與 immutable capture harness；T4a 再加獨立 blind grader（盲化投影、
 > verdict verifier、與 generator 分離的 capture root）。CLI、OpenRouter preflight、live provider 與 gate 仍未完成，
 > 不得把 partial implementation 當成端點或 R1 通過。切換決策見
-> [ADR 0041](../adr/0041-document-boundary-single-writer-cutover.md)，職務發現語意見
-> [ADR 0042](../adr/0042-hybrid-job-discovery-and-ttop-formation.md)，第一版發布門檻見
-> [ADR 0043](../adr/0043-real-employee-pilot-release-gate.md)，deployment boundary 見
-> [ADR 0044](../adr/0044-server-deployed-browser-product.md)。
+> [ADR 0054](../adr/0054-document-boundary-single-writer-cutover.md)，職務發現語意見
+> [ADR 0055](../adr/0055-hybrid-job-discovery-and-ttop-formation.md)，第一版發布門檻見
+> [ADR 0056](../adr/0056-real-employee-pilot-release-gate.md)，deployment boundary 見
+> [ADR 0057](../adr/0057-server-deployed-browser-product.md)。
 
 ## 1. 目前可達的正式路徑（ACTIVE／TRANSITIONAL）
 
@@ -216,9 +216,9 @@ indexer-contract         = API 與 indexer 的 Python query contract
 
 - 產品範圍：[`../product-notes.md`](../product-notes.md)
 - 顧問核心決策：[`../adr/0040-professional-consultant-engine-and-r1-validation-contract.md`](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md)
-- 切換決策：[`../adr/0041-document-boundary-single-writer-cutover.md`](../adr/0041-document-boundary-single-writer-cutover.md)
-- 職務發現決策：[`../adr/0042-hybrid-job-discovery-and-ttop-formation.md`](../adr/0042-hybrid-job-discovery-and-ttop-formation.md)
-- Deployment 決策：[`../adr/0044-server-deployed-browser-product.md`](../adr/0044-server-deployed-browser-product.md)
+- 切換決策：[`../adr/0054-document-boundary-single-writer-cutover.md`](../adr/0054-document-boundary-single-writer-cutover.md)
+- 職務發現決策：[`../adr/0055-hybrid-job-discovery-and-ttop-formation.md`](../adr/0055-hybrid-job-discovery-and-ttop-formation.md)
+- Deployment 決策：[`../adr/0057-server-deployed-browser-product.md`](../adr/0057-server-deployed-browser-product.md)
 - current-row storage：[`../specs/2026-07-24-job-authoring-v2-relational-storage-research.md`](../specs/2026-07-24-job-authoring-v2-relational-storage-research.md)
 - R0 研究：[`../specs/2026-08-02-r0-architecture-truth-and-production-cutover-research.md`](../specs/2026-08-02-r0-architecture-truth-and-production-cutover-research.md)
 - R0／PV1 plan：[`../plans/2026-08-02-professional-consultant-production-cutover-plan.md`](../plans/2026-08-02-professional-consultant-production-cutover-plan.md)

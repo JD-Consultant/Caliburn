@@ -2,7 +2,7 @@
 
 日期：2026-08-03
 狀態：支援已確認的產品決策——Caliburn 第一版 Web release candidate 在正式稱為「可供員工使用的成品」前，必須通過
-小規模真實員工試用。文內員工電腦／本機 Web 的 deployment 字句已由 ADR 0044 取代；pilot 方法與 gate 不變。
+小規模真實員工試用。文內員工電腦／本機 Web 的 deployment 字句已由 ADR 0057 取代；pilot 方法與 gate 不變。
 
 ## 結論
 

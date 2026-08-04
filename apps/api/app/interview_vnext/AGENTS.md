@@ -6,7 +6,7 @@
 ## 現行 authority
 
 - 新專業顧問核心與 R1 gate：`docs/adr/0040-professional-consultant-engine-and-r1-validation-contract.md`
-- R0 production cutover／退役：`docs/adr/0041-document-boundary-single-writer-cutover.md`
+- R0 production cutover／退役：`docs/adr/0054-document-boundary-single-writer-cutover.md`
 - R0 living boundary：`docs/design/professional-consultant-engine.md`
 - R0–R9 順序：`docs/specs/2026-07-25-professional-consultant-architecture-realization-roadmap.md`
 - current-row Authoring：`docs/specs/2026-07-24-job-authoring-v2-relational-storage-research.md`

@@ -3,7 +3,7 @@
 - 日期：2026-08-03（T4a 更新於 2026-08-04）
 - 狀態：T1/T2/T3 COMPLETE；T4a（blind grader）COMPLETE；T4b/T4c 尚未開始；R1 IN PROGRESS（尚未 OFFLINE-READY／GATE-PASSED）
 - 決策：[ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md)、
-  [ADR 0042](../adr/0042-hybrid-job-discovery-and-ttop-formation.md)
+  [ADR 0055](../adr/0055-hybrid-job-discovery-and-ttop-formation.md)
 - 研究：[R1 深入研究](../specs/2026-07-25-professional-consultant-r1-task-discovery-deep-research.md)、
   [R1 紅隊修訂](../specs/2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md)、
   [離線契約／verifier 實作研究](../specs/2026-08-03-r1-offline-contract-verifier-implementation-research.md)、

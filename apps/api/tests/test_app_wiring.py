@@ -4,6 +4,7 @@ run_live.py 直起 app.main:app,copilotkit_live_app 已退場)。"""
 from fastapi import FastAPI
 
 from app.app_factory import configure
+from app.config import Settings
 
 
 def _paths(app: FastAPI) -> list[str]:
@@ -20,3 +21,19 @@ def test_configure_mounts_all_rest_routers_and_health():
     assert any(p == "/api/v1/job-profiles/{profile_id}/document" for p in paths)
     assert "/api/v1/occupations" in paths  # root catalog search (ADR 0019)
     assert any(p.startswith("/api/v1/ai/") for p in paths)
+    assert "/api/v1/job-analysis/documents" in paths
+    assert any(path.endswith("/{document_id}/consultation") for path in paths)
+    assert any(path.endswith("/{document_id}/turns") for path in paths)
+    assert any(
+        path.endswith("/{document_id}/proposals/{proposal_id}/decisions")
+        for path in paths
+    )
+
+
+def test_job_analysis_consultant_defaults_pin_one_exact_a6_route():
+    fields = Settings.model_fields
+
+    assert fields["job_analysis_model"].default == "anthropic/claude-opus-5"
+    assert fields["job_analysis_provider"].default == "anthropic"
+    assert fields["job_analysis_max_output_tokens"].default == 4096
+    assert fields["job_analysis_timeout_s"].default == 90.0

@@ -2,7 +2,7 @@
 
 日期：2026-08-03
 
-狀態：Accepted research；決策見 [ADR 0042](../adr/0042-hybrid-job-discovery-and-ttop-formation.md)
+狀態：Accepted research；決策見 [ADR 0055](../adr/0055-hybrid-job-discovery-and-ttop-formation.md)
 
 ## 研究問題與結論
 

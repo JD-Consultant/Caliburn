@@ -9,7 +9,7 @@
 
 ---
 
-> **【2026-08-03 deployment scope correction】** [ADR 0044](../adr/0044-server-deployed-browser-product.md) 已取代本文
+> **【2026-08-03 deployment scope correction】** [ADR 0057](../adr/0057-server-deployed-browser-product.md) 已取代本文
 > 後段的員工電腦／遠端雲端排除字句。新顧問 domain 仍不承擔 ingress、identity 或 shared tenancy，但產品 target 是
 > 企業自管或我們代管的 server deployment，員工以瀏覽器存取；本文其他顧問與 LLM 邊界不變。
 

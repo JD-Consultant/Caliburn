@@ -46,7 +46,7 @@ scope: R5 前置設計；員工訪談、短回答、即時共編、當下單一�
 > product behavior、ACL、計費、雲端部署或多人協作；研究與工程優先投入訪談品質、LLM 工作分析與 JD 成品品質。
 
 > **Revision 9（2026-08-03 server deployment correction）**：Revision 7 的員工電腦／localhost topology 已由
-> [ADR 0044](../adr/0044-server-deployed-browser-product.md) 取代。現行是單企業 server deployment，可由企業自管或我們代管，
+> [ADR 0057](../adr/0057-server-deployed-browser-product.md) 取代。現行是單企業 server deployment，可由企業自管或我們代管，
 > 員工以瀏覽器存取；共享多租戶、多人角色與 identity 仍另案。Revision 7 的其他職務分析優先序不變。
 >
 > **Revision 8（no-history MVP correction）**：owner 於 2026-07-24 決定第一個成品不做 JD 版本歷史。active JD

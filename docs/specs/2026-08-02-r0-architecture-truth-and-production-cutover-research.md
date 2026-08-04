@@ -1,7 +1,7 @@
 # R0：架構真相與第一條 production vertical 切換／退役研究
 
 - 日期：2026-08-02
-- 狀態：Accepted research；決策見 [ADR 0041](../adr/0041-document-boundary-single-writer-cutover.md)
+- 狀態：Accepted research；決策見 [ADR 0054](../adr/0054-document-boundary-single-writer-cutover.md)
 - 範圍：現行 production、兩個隔離 prototype、新專業顧問引擎、current-row Authoring 與本機 Web 的切換邊界
 - 不包含：R1 operation/schema 實作、資料庫 migration、API route、Web UI、既有資料刪除
 
@@ -138,7 +138,7 @@ PV1 後與 Web 後段整合交錯；PV1 不得假裝代表完整產品品質。
 
 | Gate | 必須證明 | 未通過時 |
 |---|---|---|
-| G0 架構真相 | 本研究、ADR 0041、R0 plan、living design 與 orientation 一致 | 不開始 R1 |
+| G0 架構真相 | 本研究、ADR 0054、R0 plan、living design 與 orientation 一致 | 不開始 R1 |
 | G1 顧問核心 | ADR 0040 的 R1 exit gate 通過 | 不做 DB／Web product seam |
 | G2 共編核心 | R2–R5 的 multi-turn、resume、O/P/K/S/A、proposal／Current JD gate 通過 | 不掛 PV1 route |
 | G3 PV1 安全網 | generated contract、real PostgreSQL vertical、Web typecheck/lint、重啟重開、idempotency、stale proposal 測試全綠 | 不讓新文件走新 writer |

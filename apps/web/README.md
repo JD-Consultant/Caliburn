@@ -1,9 +1,15 @@
 # web — Caliburn 前端(Next.js 16)
 
-> **生命周期：ACTIVE／TRANSITIONAL／maintenance-only。** 目前 UI 仍是正式可操作路徑，但 OCS deep JSON、
-> `DocumentVersion`、`profile_id` 與 `_pending` 都不是新 workspace authority。只修阻斷、安全與資料損毀；
-> 不在這條線新增新顧問／current-row 功能。切換設計見
-> [`docs/design/professional-consultant-engine.md`](../../docs/design/professional-consultant-engine.md)。
+現行 greenfield 本機產品入口是 `/workspace`：不登入，直接讀寫
+`/api/v1/job-analysis/*`，可建立、改名並重新開啟多份彼此隔離的本機職務說明書；畫面任一時間只開一份。
+這條線使用 `@caliburn/job-analysis-contract` 生成型別與獨立 `jobAnalysisApi.ts`，不接舊
+user/profile/OCS 狀態。舊 `/dashboard` 與 `/documents/*` 暫留作歷史開發面，不是新路徑的依賴。
+Greenfield Task 編輯採「編輯 → 明確儲存／取消」；沒有 debounce autosave。下方 autosave 說明只描述舊 OCS 工作台。
+`/workspace/[document_id]` 同頁顯示可恢復的 AI 顧問訪談、待確認 Proposal 與 Current JD；
+AI 只能提出文件變更，員工接受／修改後接受才會更新 Current JD。人工 Task 編輯仍走同一組
+`/api/v1/job-analysis` application seam，沒有第二份前端 store、舊 AI 整合或舊資料雙寫。Current JD
+同頁另按 Task 顯示 O/P/K/S，態度與未連結 K/S 留在文件層；員工可明確儲存，或要求 AI 先產生
+逐項可接受／修改／拒絕／稍後處理的 OPKS Proposal。
 
 「著作」bounded context 的前端:職務說明書**工作台**(D27)。使用者在一張可編輯的官方
 職能基準表格上「選職類 → 選任務 → 填格」,所有變更自動儲存為 draft,最後 finalize 產
@@ -17,8 +23,8 @@
 
 ```bash
 npm run dev            # :3000(或 monorepo 根 npx turbo dev)
-npm run test           # vitest,只測 src/lib 純函式(ocsDoc/pack/urn)
-npx tsc --noEmit       # 型別檢查(UI 無單元測試,以 tsc + lint 為 gate)
+npm run test           # vitest；含 greenfield workspace/API client/Task editor 元件行為
+npx tsc --noEmit       # 型別檢查
 npm run lint
 ```
 
@@ -28,7 +34,9 @@ npm run lint
 
 | 路徑 | 是什麼 |
 |---|---|
-| `src/app/` | 路由:`/`(→dashboard)、`/dashboard`(職務檔案清單)、`/documents/[id]`(**工作台**,主畫面)、`/documents/[id]/intake`(3 題小表單,存 job_summary 供選職類預填)、`/documents/[id]/interview`(逐字稿稽核視圖) |
+| `src/app/` | 路由:`/`(→workspace)；舊 `/dashboard`、`/documents/[id]`、intake／interview 暫留但不被新入口依賴 |
+| `src/app/workspace/` | greenfield 本機工作區；Server Component shell + 小型 Client Components，不使用 Server Action 寫資料；顧問訪談、Proposal 與可直接編輯的 Current JD 同頁 |
+| `src/lib/jobAnalysisApi.ts` | 新 `/job-analysis` 唯一 fetch client；含 Consultation／Proposal 決策；Problem Details 只依 stable `type` 顯示，不解析 `detail` |
 | `src/components/interview/` | 工作台元件:`JobDocTable`(主表格,dnd 排序;**T8 `_pending` 四態渲染+✓✗?+批量工具列**)、`PendingMark`(追蹤修訂 UI:綠字/紅刪除線+出處卡;ADR 0030)、`AgendaList`(議程三態)、`DocHeader`(官方表頭)、`OccupationPicker`、`UnitPickerMenu`、`TaskPickerMenu`、`GlobalTaskPickerMenu`、`ConflictDialog`、`DocNotes`、`fields/*`(FieldCombobox/OfficialMenu/FieldText/SourceLine)、`InterviewPanel`(**AI 訪談側欄**:打字機對話+議程+收尾卡;ADR 0030) |
 | `src/hooks/` | 資料層 hooks:`useDocument`(文件 + autosave + 選職類)、`useKnowledge`(知識包 query,ADR 0021)、`useInterview`(start/turn/finish/view;turn 後 invalidate document→外部變化路徑重設 baseline)、`useProfiles`、`useHydrated` |
 | `src/lib/` | `api.ts`(唯一 fetch client,`/api/v1/*` + `ApiError`)、`ocsDoc.ts`(**純函式**文件編輯:clone→改→回傳 + 位置重編碼 + A4 文件級 K/S 重編 + **`_pending` 四態輔助 accept/reject/listPending**;ADR 0030)、`pack.ts`(知識包→選單選項純函式;ADR 0021/0022)、`interviewUi.ts`(側欄純邏輯:議程/chips/打字機)、`slots.ts`(槽標籤)、`urn.ts`、`download.ts` |

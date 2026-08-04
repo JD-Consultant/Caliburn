@@ -16,7 +16,10 @@ Caliburn 現行目標是給員工使用的**伺服器部署、瀏覽器存取的
 1. **先研究再動手** —— 重大變更前找**權威/主流/大廠/資深人物**的資料(官方文件、原作者、規範),
    寫一份**研究紀錄**到 `docs/specs/<date>-*.md`(含來源、診斷、選項、比對)。
 2. **決策寫 ADR** `docs/adr/00NN-*.md`(Nygard 式;Accepted 後不改內容,要翻案開新號),
-   並更新索引 `docs/adr/README.md`。
+   並更新索引 `docs/adr/README.md`。**狀態預設 `Proposed`**——審查中的修正一律直接改那份
+   Proposed ADR;**owner 核准後另開一個 commit** 把 ADR 與索引一起轉 `Accepted`。
+   只有 owner 事先明確核准具體內容才可一開始就寫 `Accepted`。先例:ADR 0045
+   (`820695a` Proposed → `f45b268` Accepted)。
 3. **plan** 寫到 `docs/plans/`(bite-size、可獨立驗證),再實作。
 4. **安全網優先** —— 盡量 **move-only** 重構;既有測試/golden 當 characterization net,
    **green-before == green-after**;**一個 task 一個 commit**,綠了才 commit;收尾打 git tag。
@@ -31,7 +34,7 @@ Caliburn 現行目標是給員工使用的**伺服器部署、瀏覽器存取的
 - 先做員工可用瀏覽器操作的 server-deployed Web release candidate；員工不得負責設定 host／port、資料庫、GPU 或服務啟停，
   也不要引入未被要求的 Electron／Tauri／原生桌面殼。企業自管與我們代管共用同一套 deployable stack；開發者 localhost
   只是 development profile。第一版只有通過真實在職員工的端到端 pilot gate 後，才能稱為員工可用成品；合成 eval、
-  高擬真 transcript 或內部自測不得替代（ADR 0043／0044）。
+  高擬真 transcript 或內部自測不得替代（ADR 0056／0057）。
 - 第一版 Current JD 是員工確認、可交主管／HR 審閱的草稿，不宣稱企業正式核准。server deployment 本身不授權 reviewer role、
   多人共編、共享多租戶 SaaS、organization／tenant 或 ACL；這些仍須另案。但不得再把企業自管／我們代管的 deployment
   誤稱為 SaaS 擴張而禁止。
@@ -57,18 +60,26 @@ Caliburn 現行目標是給員工使用的**伺服器部署、瀏覽器存取的
 - **3 個 bounded context**:`apps/pdf-to-json`(PDF→OCS JSON 解析)/ `apps/ocs-indexer`(檢索,Qdrant)/
   `apps/api` + `apps/web`(著作)。語言在這三處切換(對齊 DDD)。
 - **api = 六邊形**:`app/core`(ports + domain,純)、`app/adapters`(DB/LLM/knowledge 等邊緣)、
-  `app/services`(use-case)、`app/interview`(**現行但過渡的 production 路徑**:顧問+書記
-  op→verify→`_pending`)、`app/observability.py`(OTel 橫切)。v3 只修阻斷／安全／資料損毀，
-  **不得擴建新產品能力**；端到端見 `docs/design/interview-engine.md`。
-- **兩個隔離 prototype 不是新核心前提**：`app/interview_vnext` 已有0010 durable persistence、
-  provider/Capture/checkpoint 與production OpenRouter backend元件，但正式router不import；`app/job_authoring` v1已有0011
-  revision三表，也未掛route。ADR **0040** 已取代0038的operation/state authority；兩者只能逐項作donor，
-  不得直接promotion或接Web。現行切換/退役邊界見 `docs/design/professional-consultant-engine.md` 與ADR **0041**。
-- **新顧問主線**：先做R1 Task Discovery品質gate，再依R2–R5完成multi-turn、resume、Duty/O/P/K/S/A、
-  proposal/current-row JD；職務發現採「暫定框架＋開放敘事＋定向補漏」，跨敘事形成Task後才歸納Duty與O/P/KSA
-  （ADR 0042）。通過後才建第一條 `job_workspace` production vertical；server-deployed Web release candidate 完成後仍須通過
-  R9真實員工發布gate（ADR 0043／0044）。禁止import/wrap v3
-  consultant/scribe/harvest/select，禁止重用舊vNext gold/schema/operation/state。
+  `app/services`(use-case)、`app/interview`(**淘汰但暫留的舊 AI 路徑**:顧問+書記 op→verify→`_pending`
+  追蹤修訂;判準教材在 `app/interview/skills/`,調教首選改 skill 不改碼)、`app/observability.py`
+  (OTel 橫切)。ADR 0008 / **0030**(舊 LangGraph/CopilotKit 已退場,勿救回;端到端見
+  `docs/design/interview-engine.md`)。
+- **Task Analysis 引擎(現行新工作面)**：`app/job_analysis` 依 ADR **0040／0042** greenfield 實作
+  (domain／llm／application／providers)。durable vertical 已接通：文件/direct edit → PostgreSQL
+  Current State → packet → 一次 HTTP → verifier → identity gate → 候選/Proposal → 員工決策 → reload；
+  新 `/api/v1/job-analysis` routes 與 `/workspace` Web 已接通，conversation／Proposal／Current JD 同頁。
+  資料從新四表開始，不搬、不整合、不雙寫舊資料。禁止 import
+  `app.interview`／`app.interview_vnext`／`app.job_authoring`／`evals`(AST 測試強制)。
+  端到端見 `docs/design/task-analysis-engine.md`。
+- **AI vNext 隔離中**：`app/interview_vnext` 依 ADR **0034** greenfield 實作；V1 domain 與 V2-A
+  provider-neutral/Capture contracts 已完成，無 route/DB/live LLM，production 不 import。禁止 import/wrap v3 consultant/scribe/harvest/select；細節先讀
+  `app/interview_vnext/README.md`、其 `AGENTS.md` 與 `docs/plans/2026-07-16-interview-ai-vnext-implementation-plan.md`。
+- **離線 R1 harness 是封存資產,不是工作面**：`app/professional_consultant` 與
+  `evals/professional_consultant/r1` 是另一條離線分支在**尚未看到 ADR 0042 之前**建的六臂快篩資產
+  (contracts／verifier／prompts／runners／capture／blind grader)。ADR **0042** 已裁定 R1 架構快篩收束、
+  A6 作第一版預設,**合併進 main 不等於恢復快篩**;沒有 owner 新裁決不得續建、不得跑 48/80、
+  不得接 route/DB/Web。現行工作面一律是 `app/job_analysis`;與 `evals/professional_consultant_r1`
+  的取捨與退役見 `docs/design/professional-consultant-engine.md`。
 - **契約**:#1 `packages/ocs-contract`(OCS 文件,JSON-schema→Pydantic+TS)、
   #2 `packages/indexer-contract`(indexer⇄api,共用 pydantic)、#3 web 吃 ocs-contract 生成的 TS。
   ADR 0004 / 0010 / 0011。
@@ -116,6 +127,7 @@ Issue、spec 與 ticket 使用 `.scratch/<feature>/` 下的 Local Markdown 管�
 `docs/agents/domain.md`。
 
 ## 指路
-**`docs/README.md`(文檔系統:架構/規則/索引)** · `ARCHITECTURE.md` · `docs/adr/README.md`(0001–0044)·
+**`docs/README.md`(文檔系統:架構/規則/索引)** · `ARCHITECTURE.md` · `docs/adr/README.md`(0001–0057)·
 `docs/contract-strategy.md` · `CONTRIBUTING.md` · `docs/runbook.md` · `docs/specs/`(研究紀錄)·
+`docs/experiments/`(實證紀錄)·
 `docs/plans/` · `docs/design/`(子系統端到端設計,給 agent)。

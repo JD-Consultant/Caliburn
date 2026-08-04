@@ -37,6 +37,51 @@ export interface DocumentSummary {
 }
 /**
  * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "JdHeaderView".
+ */
+export interface JdHeaderView {
+  competency_name: string | null;
+  occupation_category_name: string | null;
+  occupation_name: string | null;
+  occupation_code: string | null;
+  industry_name: string | null;
+  industry_code: string | null;
+  work_description: string | null;
+  competency_level: number | null;
+  notes: string | null;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "JdHeaderWrite".
+ */
+export interface JdHeaderWrite {
+  competency_name: string | null;
+  occupation_category_name: string | null;
+  occupation_name: string | null;
+  occupation_code: string | null;
+  industry_name: string | null;
+  industry_code: string | null;
+  work_description: string | null;
+  competency_level: number | null;
+  notes: string | null;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "ReadinessIssueView".
+ */
+export interface ReadinessIssueView {
+  code: "competency_name_missing" | "work_description_missing" | "competency_level_missing";
+  field: string;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "DocumentReadinessView".
+ */
+export interface DocumentReadinessView {
+  issues: ReadinessIssueView[];
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
  * via the `definition` "Enabler".
  */
 export interface Enabler {
@@ -124,6 +169,8 @@ export interface DocumentView {
   document_id: string;
   title: string;
   updated_at: string;
+  jd_header: JdHeaderView;
+  readiness: DocumentReadinessView;
   tasks: JdTaskView[];
   opks_items: OpksItemView[];
 }

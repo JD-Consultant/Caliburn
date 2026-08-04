@@ -1,7 +1,7 @@
 # JD 表頭（`JdHeader`）與 readiness 切片實作計畫
 
 - 日期：2026-08-04
-- 狀態：T1／T2／T3 COMPLETE；T4–T7 尚未開工
+- 狀態：T1／T2／T3／T4 COMPLETE；T5–T7 尚未開工
 - 決策：[ADR 0052](../adr/0052-jd-readiness-assessment-and-official-code-boundaries.md)、
   [ADR 0053](../adr/0053-jd-header-authority-boundary-and-readiness-scope.md)；
   authority seam 邊界沿用 [ADR 0045](../adr/0045-job-analysis-local-web-contract-and-shared-authority-commit.md)
@@ -237,3 +237,38 @@ T4／T6 另跑 contract codegen 與 web 三件套。
 - job_analysis targeted：`627 passed`（+4）。完整 API：**`2073 passed / 0 failed / 0 skipped`**（+4）。
 - 尚未接 API、packet 或 UI，員工仍無法透過任何入口填表頭；未跑 live／付費呼叫。
   下一個可獨立 task 是 T4。
+
+## 12. T4 執行證據（2026-08-04）
+
+- baseline：job_analysis targeted `627 passed`、完整 API `2073 passed / 0 failed / 0 skipped`（T3 收尾值）。
+- **環境阻塞先於任何 schema 編輯**：`packages/job-analysis-contract` 的 `npm run codegen` 在這台機器上
+  對 Python 3.11 venv 必炸（`site.py` 讀 editable-install `.pth` 檔用系統 ANSI codepage `cp950`，
+  repo checkout 路徑含中文字，`.pth` 內容以 UTF-8 寫入，`PYTHONUTF8=1` 對這個特定讀取路徑無效）。
+  已實測 Python 3.13 不受影響；繞法與根因記在 `CLAUDE.local.md`（gitignored）。**先建立「先不改
+  schema、重新生成一次、確認與 commit 版本逐位元組相同」的乾淨 baseline**，才動手改 schema——
+  否則任何後續 diff 都分不清是我加的欄位還是環境雷。
+- schema 新增 `JdHeaderView`／`JdHeaderWrite`（九個欄位，形狀相同，`competency_level` 帶
+  `minimum:1, maximum:6`）、`ReadinessIssueView`／`DocumentReadinessView`；`DocumentView` 增
+  `jd_header`／`readiness` 兩個必填欄位。**沒有** `職能基準代碼`／`職類別代碼` 欄位，contract 測試
+  逐一鎖定（`test_jd_header_has_no_icap_assigned_code_field`）。**不擴充 `DocumentMetadataWrite`**。
+  重新生成的 `models.py`／`.ts` 對既有型別的 diff 是純新增，既有型別逐位元組不變。
+- 契約層 16 個測試（含新增 6 個）全綠；`apps/web` 端 `npx tsc --noEmit`／`npm run test`（97
+  passed）／`npm run lint` 全綠——但**先發現 `node_modules/@caliburn/job-analysis-contract` 的
+  workspace symlink從未生成**（其餘 workspace 套件都有），`npm install` 修復後 tsc 才通過；
+  這個修復產生的 `package-lock.json` diff（幾個 optional/peer 套件的 prune）與本切片無關，
+  已用 `git checkout -- package-lock.json` 撤掉，不進這個 commit。
+- API 層：`app/api/job_analysis_mapper.py` 新增 `to_jd_header()`（trim 空字串成 `null`）、
+  `to_jd_header_view()`、`to_document_readiness_view()`（呼叫既有 `assess_readiness()`），
+  `to_document_view()` 一併回填兩個新欄位。`PUT /{document_id}/jd-header` 要求 `Idempotency-Key`，
+  `JdHeaderNotChanged` 新映射到 `INVALID_REQUEST` 422（先前未映射的 application error 會被
+  `application_error_response()` 的 `raise TypeError` 擋成非預期 500，所以這個映射不是可選項）。
+- 施工中發現一個既有測試因為固定時間戳造成的 flaky：`test_a_verified_ai_turn_preserves_the_employee_header`
+  （T2 所寫）用寫死的 `NOW = datetime(2026, 8, 4, 9, 0, ...)` 呼叫 `commit_authority_change`，
+  但同一測試裡的 `create_document()` 用真實 `_utcnow()`；一旦這台機器實際 wall-clock 的
+  time-of-day 超過當天 09:00 UTC，`updated_at >= created_at` 的 DB CHECK constraint 就會炸。
+  現在 T3 已有 `put_jd_header()`，改用它取代手動呼叫 `commit_authority_change` 加寫死時間戳，
+  同時修掉 flaky 與過時的「T3 才會有 use case」註解。
+- job_analysis targeted：`629 passed`（+2，新增兩個 real-PostgreSQL HTTP route 測試）。
+  完整 API：**`2075 passed / 0 failed / 0 skipped`**（+2）。
+- 尚未把 header 送進 Task Analysis packet（T5），也還沒有 Web UI（T6）；未跑 live／付費呼叫。
+  下一個可獨立 task 是 T5。

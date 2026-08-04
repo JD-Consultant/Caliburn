@@ -9,7 +9,10 @@ from jsonschema import Draft202012Validator
 
 from job_analysis_contract import (
     ConsultationView,
+    DocumentReadinessView,
     EmployeeTurnWrite,
+    JdHeaderView,
+    JdHeaderWrite,
     JdTaskWrite,
     OpksItemView,
     OpksItemWrite,
@@ -19,6 +22,7 @@ from job_analysis_contract import (
     ProblemDetail,
     ProposalDecisionWrite,
     ProposalView,
+    ReadinessIssueView,
 )
 
 
@@ -58,9 +62,13 @@ def test_schema_owns_only_the_workspace_wire_contract():
         "ConsultationView",
         "ConversationTurnView",
         "EmployeeTurnWrite",
+        "DocumentReadinessView",
         "Enabler",
+        "JdHeaderView",
+        "JdHeaderWrite",
         "JdTaskWrite",
         "JdTaskView",
+        "ReadinessIssueView",
         "OpksItemView",
         "OpksItemWrite",
         "OpksGenerationView",
@@ -206,6 +214,19 @@ def test_optional_task_text_can_reach_the_mapper_as_blank_or_null():
     ]["enum"]
 
 
+_EMPTY_JD_HEADER = {
+    "competency_name": None,
+    "occupation_category_name": None,
+    "occupation_name": None,
+    "occupation_code": None,
+    "industry_name": None,
+    "industry_code": None,
+    "work_description": None,
+    "competency_level": None,
+    "notes": None,
+}
+
+
 def test_document_view_accepts_one_complete_task_without_extra_fields():
     """A closed allOf branch must not reject fields inherited by JdTaskView."""
 
@@ -214,6 +235,8 @@ def test_document_view_accepts_one_complete_task_without_extra_fields():
         "document_id": "00000000-0000-0000-0000-000000000045",
         "title": "門市營運專員",
         "updated_at": "2026-07-30T09:00:00Z",
+        "jd_header": _EMPTY_JD_HEADER,
+        "readiness": {"issues": []},
         "tasks": [
             {
                 "task_id": "task-1",
@@ -234,6 +257,69 @@ def test_document_view_accepts_one_complete_task_without_extra_fields():
             document
         )
     ) == []
+
+
+def test_jd_header_has_no_icap_assigned_code_field():
+    """ADR 0052 決定 8：`職能基準代碼`／`職類別代碼` 由 iCAP 配發，wire 契約不得開欄位。"""
+
+    for def_name in ("JdHeaderView", "JdHeaderWrite"):
+        header = _schema()["$defs"][def_name]
+        fields = set(header["properties"])
+        assert "competency_code" not in fields
+        assert "occupation_category_code" not in fields
+        assert fields - {"occupation_code", "industry_code"} == {
+            name for name in fields if not name.endswith("_code")
+        }
+
+
+def test_jd_header_every_field_is_nullable():
+    for def_name in ("JdHeaderView", "JdHeaderWrite"):
+        header = _schema()["$defs"][def_name]
+        assert set(header["required"]) == set(header["properties"])
+        for name, field in header["properties"].items():
+            if name == "competency_level":
+                assert set(field["type"]) == {"integer", "null"}
+                assert field["minimum"] == 1
+                assert field["maximum"] == 6
+            else:
+                assert set(field["type"]) == {"string", "null"}
+
+
+def test_readiness_issue_codes_match_the_first_version_header_checks():
+    issue = _schema()["$defs"]["ReadinessIssueView"]
+
+    assert set(issue["properties"]["code"]["enum"]) == {
+        "competency_name_missing",
+        "work_description_missing",
+        "competency_level_missing",
+    }
+
+
+def test_document_readiness_view_carries_no_completion_verdict():
+    """ADR 0053 決定 6：第一版不回 is_complete／ready／百分比。"""
+
+    readiness = _schema()["$defs"]["DocumentReadinessView"]
+
+    assert set(readiness["properties"]) == {"issues"}
+
+
+def test_document_view_requires_jd_header_and_readiness():
+    validator = Draft202012Validator(_schema())
+    document = {
+        "document_id": "00000000-0000-0000-0000-000000000045",
+        "title": "門市營運專員",
+        "updated_at": "2026-07-30T09:00:00Z",
+        "readiness": {"issues": []},
+        "tasks": [],
+        "opks_items": [],
+    }
+
+    errors = list(
+        validator.evolve(schema={"$ref": "#/$defs/DocumentView"}).iter_errors(
+            document
+        )
+    )
+    assert any("jd_header" in str(error) for error in errors)
 
 
 def test_generated_models_keep_normalization_and_problem_extension_boundaries():
@@ -278,6 +364,19 @@ def test_generated_consultation_models_are_exported_from_the_package():
     assert write.entity_kind.value == "knowledge"
     assert OpksItemView.__name__ == "OpksItemView"
     assert OpksProposalView.__name__ == "OpksProposalView"
+
+
+def test_jd_header_and_readiness_models_are_exported_from_the_package():
+    header = JdHeaderView(**_EMPTY_JD_HEADER)
+    write = JdHeaderWrite(**_EMPTY_JD_HEADER)
+    issue = ReadinessIssueView(
+        code="work_description_missing", field="work_description"
+    )
+    readiness = DocumentReadinessView(issues=[issue])
+
+    assert header.competency_level is None
+    assert write.competency_level is None
+    assert readiness.issues[0].code.value == "work_description_missing"
 
 
 def test_opks_generation_view_exposes_only_the_durable_product_result():

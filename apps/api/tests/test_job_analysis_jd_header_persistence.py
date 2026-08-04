@@ -285,6 +285,7 @@ async def test_a_verified_ai_turn_preserves_the_employee_header(
         create_document,
         load_document,
         prepare_turn,
+        put_jd_header,
     )
 
     from .test_job_analysis_durable_turn_postgres import (
@@ -295,17 +296,9 @@ async def test_a_verified_ai_turn_preserves_the_employee_header(
     document_id = cleanup_job_analysis_rows
     uow_factory = lambda: SqlAlchemyJobAnalysisUnitOfWork(postgres_session_factory)
     await create_document(uow_factory, document_id=document_id, title="門市營運專員")
-
-    # 以 authority seam 直接寫入 header（T3 才會有 use case）
-    async with uow_factory() as uow:
-        record = await uow.documents.get(document_id, for_update=True)
-        assert record is not None
-        await commit_authority_change(
-            uow,
-            record=record,
-            state=JobAnalysisState(jd_header=FILLED),
-            updated_at=NOW,
-        )
+    await put_jd_header(
+        uow_factory, document_id=document_id, entry_id="header-1", header=FILLED
+    )
 
     employee = employee_turn()
     snapshot = await prepare_turn(

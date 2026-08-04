@@ -200,6 +200,113 @@ async def test_local_web_task_editing_survives_reload_and_rename_is_metadata_onl
     assert journal_after == journal_before
 
 
+def header_payload(
+    *,
+    competency_name: str | None = None,
+    work_description: str | None = None,
+    competency_level: int | None = None,
+) -> dict:
+    return {
+        "competency_name": competency_name,
+        "occupation_category_name": None,
+        "occupation_name": None,
+        "occupation_code": None,
+        "industry_name": None,
+        "industry_code": None,
+        "work_description": work_description,
+        "competency_level": competency_level,
+        "notes": None,
+    }
+
+
+async def test_put_jd_header_persists_and_readiness_reflects_it_over_real_postgres(
+    postgres_api_client,
+    cleanup_job_analysis_rows,
+):
+    client, _, _ = postgres_api_client
+    document_id = cleanup_job_analysis_rows
+    root = f"/api/v1/job-analysis/documents/{document_id}"
+    assert (await client.put(root, json={"title": "門市營運專員"})).status_code == 201
+
+    empty_readiness = await client.get(root)
+    assert empty_readiness.status_code == 200
+    assert {
+        issue["code"] for issue in empty_readiness.json()["readiness"]["issues"]
+    } == {
+        "competency_name_missing",
+        "work_description_missing",
+        "competency_level_missing",
+    }
+
+    put = await client.put(
+        f"{root}/jd-header",
+        headers={"Idempotency-Key": "header-1"},
+        json=header_payload(
+            competency_name="資訊安全維運人員",
+            work_description="維運企業資訊安全設備並處理資安事件。",
+            competency_level=4,
+        ),
+    )
+    assert put.status_code == 200
+    assert put.json()["competency_name"] == "資訊安全維運人員"
+
+    reloaded = await client.get(root)
+    assert reloaded.status_code == 200
+    assert reloaded.json()["jd_header"]["competency_name"] == "資訊安全維運人員"
+    assert reloaded.json()["jd_header"]["competency_level"] == 4
+    assert reloaded.json()["readiness"]["issues"] == []
+
+    # replay with the same Idempotency-Key and the same body is a no-op success
+    replay = await client.put(
+        f"{root}/jd-header",
+        headers={"Idempotency-Key": "header-1"},
+        json=header_payload(
+            competency_name="資訊安全維運人員",
+            work_description="維運企業資訊安全設備並處理資安事件。",
+            competency_level=4,
+        ),
+    )
+    assert replay.status_code == 200
+    assert replay.json() == put.json()
+
+
+async def test_put_jd_header_rejects_a_no_op_edit_and_out_of_range_level(
+    postgres_api_client,
+    cleanup_job_analysis_rows,
+):
+    client, _, _ = postgres_api_client
+    document_id = cleanup_job_analysis_rows
+    root = f"/api/v1/job-analysis/documents/{document_id}"
+    assert (await client.put(root, json={"title": "門市營運專員"})).status_code == 201
+
+    no_op = await client.put(
+        f"{root}/jd-header",
+        headers={"Idempotency-Key": "no-op-1"},
+        json=header_payload(),
+    )
+    assert no_op.status_code == 422
+    assert no_op.headers["content-type"] == "application/problem+json"
+    assert no_op.json()["type"] == (
+        "https://caliburn.dev/problems/job-analysis/invalid-request"
+    )
+
+    out_of_range = await client.put(
+        f"{root}/jd-header",
+        headers={"Idempotency-Key": "level-1"},
+        json=header_payload(competency_level=7),
+    )
+    assert out_of_range.status_code == 422
+
+    missing_key = await client.put(
+        f"{root}/jd-header",
+        json=header_payload(competency_name="資訊安全維運人員"),
+    )
+    assert missing_key.status_code == 422
+
+    reloaded = await client.get(root)
+    assert reloaded.json()["jd_header"]["competency_name"] is None
+
+
 async def test_consultant_turn_proposal_decision_and_reload_use_real_postgres(
     postgres_api_client,
     postgres_session_factory,

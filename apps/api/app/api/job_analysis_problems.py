@@ -12,6 +12,7 @@ from app.job_analysis.application import (
     IdempotencyConflict,
     InvalidJdTaskOrder,
     InvalidProposalDecision,
+    JdHeaderNotChanged,
     JdTaskNotFound,
     OpksItemNotFound,
     OpksProposalNotDecidable,
@@ -127,6 +128,13 @@ def application_error_response(
             type_uri=INVALID_REQUEST,
             title="Invalid proposal decision",
             status=422,
+        )
+    if isinstance(error, JdHeaderNotChanged):
+        return problem_response(
+            type_uri=INVALID_REQUEST,
+            title="Invalid request",
+            status=422,
+            detail="JD header edit must change at least one field.",
         )
     raise TypeError(f"unmapped job-analysis error: {type(error).__name__}")
 

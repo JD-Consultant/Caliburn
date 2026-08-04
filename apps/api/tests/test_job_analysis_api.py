@@ -370,6 +370,8 @@ async def test_list_and_open_return_only_the_current_jd_projection(api_client):
         "document_id",
         "title",
         "updated_at",
+        "jd_header",
+        "readiness",
         "tasks",
         "opks_items",
     }

@@ -1,7 +1,7 @@
 # 主要職責（Duty）與 Task 職能級別結構切片實作計畫
 
 - 日期：2026-08-05
-- 狀態：T1／T2／T3 COMPLETE；T4–T7 尚未開工
+- 狀態：T1–T4 COMPLETE；T5–T7 尚未開工
 - 決策：[ADR 0052](../adr/0052-jd-readiness-assessment-and-official-code-boundaries.md) 決定 10／13、
   [ADR 0053](../adr/0053-jd-header-authority-boundary-and-readiness-scope.md) 決定 7；
   authority seam 沿用 [ADR 0045](../adr/0045-job-analysis-local-web-contract-and-shared-authority-commit.md)
@@ -292,3 +292,35 @@ T5／T6 另跑 contract codegen 與 web 三件套。
   這次一次補齊 Duty 的 domain 形狀、readiness 的三條結構 issue、0016 與無 FK 的理由、
   authority commit 的寫入順序，以及 transition carry-through 現在也涵蓋 `current_duties`。
 - 下一個可獨立 task 是 T4（authoring use cases），其中 `delete_duty` 必須承接上面第 2 點。
+
+## 13. T4 執行證據（2026-08-05）
+
+- baseline：完整 API `2118 passed / 0 failed / 0 skipped`。
+- 四支 use case 住 `application/duty_authoring.py`，與 JD Task 那四支同形。
+  新增 `DutyDirectEditPayload`／`job-analysis-duty-direct-edit/1`、`DutyNotFound`、
+  `DutyNotChanged`、`InvalidDutyOrder`。
+- **T3 欠下的保證在這裡補齊**：`delete_duty()` 在同一交易把底下 Task 的 `duty_id` 設回 `None`，
+  Task 本身留著。以 mutation check 證明是承重的——把那段 `model_copy` 拿掉，5 條測試變紅。
+- **施工中發現一個計畫沒寫、但非做不可的正確性問題**：刪掉職責必須同時把受影響 Task
+  仍在等待的 Task Proposal 轉 stale。理由不是整潔——`_apply_jd_entries()` 接受提案時是把
+  `jd_after` 的 `JdTask` **整份**寫回 Current JD，而那份快照還帶著剛被刪掉的 `duty_id`。
+  不轉 stale 的話，那筆提案會**永遠接受不了**（`JobAnalysisState` 擋下 dangling `duty_id`），
+  員工只剩「拒絕」一條路。同樣以 mutation check 鎖定。
+- **兩件刻意不做**：Duty 的四支都不動 Work Model（`_reconciled_work_model()` 是標記
+  「員工改了 Task 內容、AI 之後要對齊」，而 AI 對職責歸屬從頭到尾沒有權限，標了只是雜訊），
+  也不 prune OPKS（O/P/K/S 綁 `task_id`，刪職責不刪 Task；有測試斷言刪前刪後 OPKS 相同）。
+- **與 `edit_jd_task` 的一處刻意不一致**：`edit_duty()` 拒絕未改內容（`DutyNotChanged`），
+  `edit_jd_task()` 不拒絕。採用 `put_jd_header()` 的理由——空編輯寫一筆 before==after 的
+  Journal 又 bump generation，會平白讓別的 client 的 read-set 失效。這裡記下來，免得日後
+  被當成漏掉的不一致而「修正」掉。
+- `DutyDirectEditPayload.unassigned_task_ids` 只在 delete 出現，且不參與 replay 比對
+  （replay 比的是 `duty_id`）。它是 provenance：刪職責是唯一會改到別的列的操作，
+  日後回頭讀 Journal 必須能直接答出「那次刪除把哪幾條 Task 變成未指派」。
+- 測試：`tests/test_job_analysis_duty_authoring_postgres.py` 19 條，全部跑真 PostgreSQL——
+  四支的儲存、同 key replay 不重複生效且不 bump generation、同 key 換內容 conflict、
+  **同一個 `entry_id` 不得被 Duty 與 JD Task 兩種 direct edit 各認一次**、未改內容拒絕、
+  generation 遞增、刪職責後 Task 仍在且 `duty_id` 為 `None` 但級別留著、
+  不相干的 Task 維持指派、提案轉 stale、OPKS 不受影響、reorder 從 0 重編號且不斷開 Task 連結。
+- 完整 API：**`2137 passed / 0 failed / 0 skipped`**（+19）。
+- 下一個可獨立 task 是 T5（contract 與 route）。註記：`DutyNotChanged` 與 `InvalidDutyOrder`
+  需要各自的 problem+json 映射，比照 `JdHeaderNotChanged → 422 invalid-request`。

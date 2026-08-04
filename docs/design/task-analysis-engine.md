@@ -2,7 +2,7 @@
 title: Task Analysis 引擎 — 端到端設計(durable PostgreSQL + consultant Web)
 audience: agent-primary(也給人)
 scope: apps/api job_analysis + job_analysis_postgres + job_analysis routes + apps/web workspace
-updated: 2026-08-04
+updated: 2026-08-05
 ---
 
 # Task Analysis 引擎 — 端到端設計
@@ -42,11 +42,11 @@ OpenRouter 拿 `task_analysis_result_v2`(送出去的精簡形狀)→ **mapper**
 | 組件 | 是什麼 | 碼 | 權力 |
 |---|---|---|---|
 | domain | Task／SourceRef／SupportLink／open_issues／excluded_signals／Task Proposal，以及 OPKS 的 `OpksItem`／`CurrentJdOpks`／獨立 `OpksProposal` 凍結形狀 | `app/job_analysis/domain/`（OPKS：`opks.py`、`opks_proposal.py`） | 純 Pydantic,frozen;**非法狀態無法被表示**;只 import stdlib＋pydantic。OPKS 已進完整 authority state、人工編輯、Proposal 決策 API 與 Web editor |
-| JD header | `JdHeader`：iCAP 版型表頭語意欄位（職能基準名稱／所屬類別／工作描述／nullable 基準級別 1–6／說明補充） | `app/job_analysis/domain/jd_header.py` | 純 Pydantic,frozen;全欄位 nullable,空字串拒收(要 `null` 不要 `""`);**沒有 `職能基準代碼`／`職類別代碼` 欄位**(iCAP 配發,不生成)。**T4 已落地**:`PUT /{document_id}/jd-header` 與 `GET /{document_id}` 已接通 wire contract(`JdHeaderView`／`JdHeaderWrite`／`DocumentReadinessView`);尚未接 Task Analysis packet 或 UI |
-| readiness | `assess_readiness(header)` → 只有 issue 清單的 `DocumentReadiness` | `application/readiness.py` | 純函式,零 IO,**不 import transport contract**;第一版只查表頭三項(名稱／工作描述／基準級別),零 issue 時安靜;**沒有 `is_complete`／百分比**;說明補充與所屬類別刻意不發聲。**T1 已落地**,尚未接 API／UI |
+| JD header | `JdHeader`：iCAP 版型表頭語意欄位（職能基準名稱／所屬類別／工作描述／nullable 基準級別 1–6／說明補充） | `app/job_analysis/domain/jd_header.py` | 純 Pydantic,frozen;全欄位 nullable,空字串拒收(要 `null` 不要 `""`);**沒有 `職能基準代碼`／`職類別代碼` 欄位**(iCAP 配發,不生成)。**T5 已落地**:route、wire contract 與 Task Analysis packet 都已接通;尚未接 Web UI |
+| readiness | `assess_readiness(header)` → 只有 issue 清單的 `DocumentReadiness` | `application/readiness.py` | 純函式,零 IO,**不 import transport contract**;第一版只查表頭三項(名稱／工作描述／基準級別),零 issue 時安靜;**沒有 `is_complete`／百分比**;說明補充與所屬類別刻意不發聲。**T4 已落地**:`GET /{document_id}` 已回 `readiness`;尚未接 Web UI |
 | llm 契約 | Task：內部 `TaskAnalysisResult`＋`task_analysis_result_v2` wire；OPKS：獨立 `OpksResult`＋`opks_result_v1` wire；各自一份 Static Instructions | `app/job_analysis/llm/` | 只描述形狀與判準文字;**不做跨欄位驗證**。OPKS wire 只有 5 個 property、零 union，不擴充既有 Task schema |
 | wire mapper | 中性值 → `None` 的純還原 | `llm/wire.py` 的 `wire_to_task_analysis_result()` | **不做語意判斷**;沒有 domain 落點的夾帶內容一律拒絕,不靜默丟棄 |
-| assembler | Task 現況 → `TaskAnalysisPacket`；單一選定 Task → `OpksContextPacket`；兩者都有決定性 rendering | `application/context.py`、`application/opks_context.py` | 純函式;ordinal 的唯一產地。OPKS 只投影選定 Task、有效員工依據、該 Task O/P、全文件 K/S 與相關提案，不送完整 transcript／A／內部 ID |
+| assembler | Task 現況 → `TaskAnalysisPacket`；單一選定 Task → `OpksContextPacket`；兩者都有決定性 rendering | `application/context.py`、`application/opks_context.py` | 純函式;ordinal 的唯一產地。Task packet 另有 `employee_written_overview`（**只有**職能基準名稱與工作描述，無 ordinal／無 `SourceRef`）。OPKS 只投影選定 Task、有效員工依據、該 Task O/P、全文件 K/S 與相關提案，不送完整 transcript／A／內部 ID；`build_opks_context_packet()` **沒有 header 參數**，工作描述傳不進去 |
 | verifier | Task §9.5／§12.3 規則；OPKS decision／ordinal／refs 映射 | `application/verifier.py`、`application/opks_verifier.py` | 純函式；OPKS 會產出 application-side verified changes，但**不判必要性、可觀察性或文字品質** |
 | operation | 組 packet → 呼叫 → parse → verifier | `application/operation.py`、`application/opks_operation.py` | Task 與 OPKS 各自一條顯式流程;**不是 agent runner**,無 retry |
 | provider | 最小 OpenRouter Chat adapter | `providers/openrouter.py` | 一次 HTTP;固定 `reasoning=high` 且不回傳 reasoning;成功內容必須由 response `model` 證明來自 exact configured model;typed 失敗;**只收 render 過的文字** |
@@ -62,8 +62,9 @@ OpenRouter 拿 `task_analysis_result_v2`(送出去的精簡形狀)→ **mapper**
 
 ## 3. 一輪的資料流(每步標函式)
 
-1. `build_context_packet(transcript=…, current_turn_id=…, work_model=…, current_jd=…, active_question=…, proposals=…)`
-   → `TaskAnalysisPacket`。順序完全跟隨輸入,所以同輸入同輸出。
+1. `build_context_packet(transcript=…, current_turn_id=…, work_model=…, current_jd=…, active_question=…, proposals=…, jd_header=…)`
+   → `TaskAnalysisPacket`。順序完全跟隨輸入,所以同輸入同輸出。`jd_header` 只投影成
+   `employee_written_overview`(職能基準名稱＋工作描述),其餘表頭欄位不進 packet。
 2. `run_task_analysis_operation(packet=…, adapter=…)`:
    - `render_context_packet(packet)` → 純文字,當成 user message;
    - `TASK_ANALYSIS_INSTRUCTIONS` 當成 system message;
@@ -218,6 +219,7 @@ Consultation turn 不再重複呼叫它。
 | domain 型別 | 形狀不變量,**非法狀態無法被建構** | `active` Task 至少一條有效 SupportLink;`withdrawn` 必有 reason;lineage 不成環;staged delta 的 ID 不重複且欄位必須符合 action;Current JD／Proposal ID 不重複且 JD 投影順序 canonical;§10.5 的 `edited_jd_after` 四條硬規則；OPKS Evidence 非空且只收 employee turn/direct edit，O/P 恰連一個 Task、K/S 多對多、A 不帶 refs，OPKS Proposal 的 action/snapshot/status payload 不可矛盾 |
 | verifier | 需要 packet 才判斷得出的規則 | quote 必須是該員工回合的逐字子字串;ordinal 在範圍內;`no_match` 不得帶 target;merge ≥2;split child 只能沿用母 Task 的有效 support ordinal;withdraw 不得帶 `task_fields` 但必須帶 `withdraw_reason`;同一 target 被兩筆 `task_change` 指涉或兩筆 signal 逐欄完全相同 → **明確拒絕**;supersession 必須指向仍有效且被同一筆 signal 指涉的 support link |
 | transition | 需要 state 才判斷得出的規則 | identity gate;§9.5 三出口;Task／Proposal 的決定性 ID 採 insert-only,撞到不同內容即拒絕;retirement 來源只能取自該 signal 實際引用的 anchor;§10.8 stale disposition |
+| packet 形狀 | 「員工填寫的整體描述」不得成為 task_change 的依據 | 這條**不寫成語意規則**：該區沒有 ordinal，而 anchor 只能指向 packet 裡的 turn ordinal（§12.3），所以模型找不到合法 anchor，逐字 `quote` 檢查會直接擋掉。OPKS packet 連參數都沒有，工作描述無法繞過 0048／0049 的 Evidence 白名單支撐 K/S |
 | transition | `jd_header` 原樣帶過 | AI 對表頭沒有權限：`apply_task_analysis_result()` 與 durable turn 只把 `jd_header` 從既有 state 帶到新 state，永不修改；回歸測試以「拿掉 carry-through 就變紅」證明 |
 | **不在任何一層** | 語意判斷 | purpose 是否相同、該不該 merge／split、outcome 是否可理解、enabler 分類是否正確——**歸 rubric 與員工審核**(§9.5 末段) |
 
@@ -332,7 +334,7 @@ context 取捨)在 Luna-Pro 上驗過只算「未在生產模型上驗過」,上
 | prompt 品質調校 | `llm/prompt.py` 已有 Task 判準與彈性顧問行為基線，但尚未用真實員工資料調校 | 有真實使用摩擦後以 rubric／eval 調整，不先加 planner 或第二次呼叫 |
 | duplicate／overlap identity 自動收斂 | 第一版刻意不做；模型保留 issue 並追問員工 | 有真實重複摩擦證據後再研究，不用相似度猜測 |
 | OPKS 真模型品質結論 | **第一切片已接通**：`OpksItem`／`CurrentJdOpks`／獨立六態 `OpksProposal`、0014 兩表、人工編輯、API、Web、單 Task Context、零 union `opks_result_v1`、deterministic verifier、一次 provider operation 與 durable generation receipt 均已落地。七情境 scripted vertical 以真 PostgreSQL 驗證同 key replay 零 call、四種員工決策、A 人工編輯、同一 K 跨 Task reuse、Task delete 清理與無 Evidence 在 provider 前停線；舊 OPKS hint 已退役。裁決見 [ADR 0048](../adr/0048-opks-evidence-axes-and-document-level-competencies.md)～[0051](../adr/0051-opks-proposal-status-machine-and-stable-entity-id.md)，**四份一起讀** | scripted provider 不回答真模型的 O/P/K/S 品質；需要品質結論時另做有預算上限的 live smoke，不重開本切片或加 eval framework |
-| 完整 header、匯出 | **T1–T4 已落地**：`JdHeader` 與 readiness 純函式可用，header 是 `JobAnalysisState`／`DocumentRecord` 的一部分並經 0015 兩欄持久化，`put_jd_header()` 已接通 authority seam（entry replay、`JdHeaderNotChanged` 擋未改內容、與 Task／OPKS 同一個 generation CAS），且已有 `PUT /{document_id}/jd-header`／`GET /{document_id}` 兩條 HTTP route 與對應 `job-analysis-contract` wire 型別（`JdHeaderView`／`JdHeaderWrite`／`DocumentReadinessView`／`ReadinessIssueView`）。AI 沒有權限碰它——8 個 state 建構點與 `durable_turn` 的 `update_authority()` 都只把既有 `jd_header` 帶過去，回歸測試以 mutation check 鎖定。**還沒有 packet 或 UI**：header 尚未送進 Task Analysis packet（T5），員工也還不能在 `/workspace` 上操作它（T6）。其餘仍只有 Task 與較豐富的內部 JD Task 欄位（`DocumentMetadataWrite` 只有 `title`） | **已由 ADR [0052](../adr/0052-jd-readiness-assessment-and-official-code-boundaries.md) 裁決順序**：先 header／nullable 基準級別／說明補充＋readiness 純函式（**`app/job_analysis` 持有規則**，contract 只承載 view 與 issue codes；只提示不阻止保存／訪談／匯出），再 **Duty＋Task 職能級別的獨立結構切片（export-ready v1 必須完成）**，最後才 deterministic 匯出（不讓 LLM 參與）。**header 走 `JdHeader` 的 authority seam，不是擴充 `DocumentMetadataWrite`；readiness 第一版不回 `is_complete`**（ADR [0053](../adr/0053-jd-header-authority-boundary-and-readiness-scope.md)）。`職能基準代碼`／`職類別代碼` 由 iCAP 配發，不開欄位、不列缺漏、不得生成（0040 決定 33–34、0052 決定 8）；`T1`／`O1.1.1` 是匯出版面位置碼，非 identity（0052 決定 10） |
+| 完整 header、匯出 | **T1–T5 已落地**：`JdHeader` 與 readiness 純函式可用，header 是 `JobAnalysisState`／`DocumentRecord` 的一部分並經 0015 兩欄持久化，`put_jd_header()` 已接通 authority seam（entry replay、`JdHeaderNotChanged` 擋未改內容、與 Task／OPKS 同一個 generation CAS），且已有 `PUT /{document_id}/jd-header`／`GET /{document_id}` 兩條 HTTP route 與對應 `job-analysis-contract` wire 型別（`JdHeaderView`／`JdHeaderWrite`／`DocumentReadinessView`／`ReadinessIssueView`）。AI 沒有權限碰它——8 個 state 建構點與 `durable_turn` 的 `update_authority()` 都只把既有 `jd_header` 帶過去，回歸測試以 mutation check 鎖定。**還沒有 UI**：員工還不能在 `/workspace` 上操作它（T6）。header 已進 Task Analysis packet 的獨立「員工填寫的整體描述」區（只有職能基準名稱與工作描述）；該區沒有 ordinal，anchor 指不到它，所以「只憑 header 產生 task_change」由 §12.3 的逐字 quote 檢查結構性擋死，不靠語意規則。OPKS packet 不變，`build_opks_context_packet()` 連 header 參數都沒有。其餘仍只有 Task 與較豐富的內部 JD Task 欄位（`DocumentMetadataWrite` 只有 `title`） | **已由 ADR [0052](../adr/0052-jd-readiness-assessment-and-official-code-boundaries.md) 裁決順序**：先 header／nullable 基準級別／說明補充＋readiness 純函式（**`app/job_analysis` 持有規則**，contract 只承載 view 與 issue codes；只提示不阻止保存／訪談／匯出），再 **Duty＋Task 職能級別的獨立結構切片（export-ready v1 必須完成）**，最後才 deterministic 匯出（不讓 LLM 參與）。**header 走 `JdHeader` 的 authority seam，不是擴充 `DocumentMetadataWrite`；readiness 第一版不回 `is_complete`**（ADR [0053](../adr/0053-jd-header-authority-boundary-and-readiness-scope.md)）。`職能基準代碼`／`職類別代碼` 由 iCAP 配發，不開欄位、不列缺漏、不得生成（0040 決定 33–34、0052 決定 8）；`T1`／`O1.1.1` 是匯出版面位置碼，非 identity（0052 決定 10） |
 | revision-request replacement | revision request 可保存／reload，但不會自動重建 replacement | 後續模型流程 |
 | 一般瀏覽器完整跨埠 smoke | **HTTP 層已逐段驗過**（2026-07-31，api:8001 ＋ web:3000 同時在跑）：文件庫 `GET` 正確回報 `task_count`、consultation view 帶齊 conversation／proposals／tasks、**三筆 `add` 提案連續 `POST …/decisions` 全 200**（正是 `display_order` 缺陷會炸的路徑）、同 `Idempotency-Key` 重送 200 且不重複、reload 後 JD 排序正確；CORS preflight 200 且 `access-control-allow-headers` 含 `idempotency-key`。`/workspace` 與 `/workspace/{id}` 皆 HTTP 200。Web 90 tests／tsc／lint 通過 **已由維護者在一般瀏覽器完成**（2026-07-31）：文件 `b47d6717` 的三筆 `add` 提案**在 UI 上連續按 accept 全部成立**，Current JD 由 0 條變 3 條、`display_order` 0/1/2；同文件被 withdraw 的那筆提案維持 `stale` 且無法接受，因此 Luna-Pro 在 turn 1 誤建的「協助正式環境部署」**沒有進入 JD**——Proposal gate 當安全網首次被真流量驗證 | 本列已無待辦。持續維持:不為測試環境加入 proxy、fake production mode 或 E2E framework |
 

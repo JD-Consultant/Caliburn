@@ -89,6 +89,7 @@ async def _packet_for(
         current_jd=state.current_jd,
         active_question=record.active_question,
         proposals=state.proposals,
+        jd_header=state.jd_header,
     )
 
 

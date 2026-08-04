@@ -1,7 +1,7 @@
 # JD 表頭（`JdHeader`）與 readiness 切片實作計畫
 
 - 日期：2026-08-04
-- 狀態：T1／T2／T3／T4 COMPLETE；T5–T7 尚未開工
+- 狀態：T1–T5 COMPLETE；T6 尚未開工（T7 併在各 commit 內）
 - 決策：[ADR 0052](../adr/0052-jd-readiness-assessment-and-official-code-boundaries.md)、
   [ADR 0053](../adr/0053-jd-header-authority-boundary-and-readiness-scope.md)；
   authority seam 邊界沿用 [ADR 0045](../adr/0045-job-analysis-local-web-contract-and-shared-authority-commit.md)
@@ -272,3 +272,37 @@ T4／T6 另跑 contract codegen 與 web 三件套。
   完整 API：**`2075 passed / 0 failed / 0 skipped`**（+2）。
 - 尚未把 header 送進 Task Analysis packet（T5），也還沒有 Web UI（T6）；未跑 live／付費呼叫。
   下一個可獨立 task 是 T5。
+
+## 13. T5 執行證據（2026-08-05）
+
+- baseline：job_analysis targeted `629 passed`、完整 API `2075 passed / 0 failed / 0 skipped`（T4 收尾值）。
+- `TaskAnalysisPacket` 新增 `employee_written_overview`，**只帶職能基準名稱與工作描述**；
+  其餘 header 欄位（所屬類別、基準級別、說明補充）刻意不進 packet——它們對「這輪要問什麼」
+  沒有幫助，送進去只是擴大模型可以據以編造責任的表面積。測試逐一鎖定其餘欄位不出現在 rendering。
+- **本切片最重要的發現：ADR 0053 決定 4 的禁令不需要寫成語意規則，它已經是結構性的。**
+  anchor 只能指向 packet 裡的 turn ordinal（§12.3），而整體描述沒有 ordinal，
+  所以模型找不到任何合法 anchor 指向它；就算照抄工作描述的字，`quote` 也不會是任何員工回合的
+  逐字子字串，verifier 直接以 `QUOTE_NOT_VERBATIM` 擋掉。已用
+  `test_the_header_cannot_ground_a_task_change_because_no_anchor_can_reach_it` 上鎖。
+  這也解釋了 ADR 為什麼特別要求「沒有 ordinal 也沒有 SourceRef」——那不是排版選擇。
+- 因此**沒有**把「不得只憑本區產生 task_change」寫進 Static Instructions：
+  `prompt.py` 開頭明文禁止複述別處已保證的規則。prompt 只加了模型才做得到的判斷
+  （「那裡提到但訪談沒談過的責任，先追問怎麼做」）。
+- 同理，packet rendering 只標**資料性質**（誰寫的、算不算依據），不寫 Task policy——
+  §11.2 要求 policy 住 Static Instructions，不隨每輪 packet 重送。第一版寫法把整段禁令
+  放進 rendering，已改掉。
+- **`INSTRUCTIONS_BYTES_BUDGET` 由 5200 上調到 5300**（實測 5215）。這是刻意的、有記錄的調整：
+  T5 讓 packet 多了一個全新區域，顧問必須知道那不是員工做過的事，而該判斷無法搬到 verifier。
+  已把上調理由寫進測試檔的註解，budget guard 仍然守著「不得無聲膨脹」。
+- OPKS 隔離（T5 完成條件）用**簽章層**證明，而不是行為層：`build_opks_context_packet()`
+  的參數集合精確等於 `{selected_task, current_opks, proposals}`，header 連傳都傳不進去；
+  `OpksContextPacket` 也沒有任何 header／overview／competency／description 欄位。
+- `read_set` 納入 `employee_written_overview`：JD header 現在是 Current JD authority，
+  員工可在 LLM 呼叫期間改它。今天 `authority_generation` 的比對已經會擋下同一件事
+  （`put_jd_header()` 會 bump generation），但 read-set 的定義是「本輪送出的所有可變 authority
+  資料」，漏掉它等於讓不變量依賴另一層的實作細節。
+- 端到端接線另以真 PostgreSQL 測試證明：員工存的 header 會出現在下一輪 `prepare_turn()`
+  的 packet 與 rendering 裡，且只有那兩個高訊號欄位過去。
+- job_analysis targeted：`639 passed`（+10）。完整 API：**`2085 passed / 0 failed / 0 skipped`**（+10）。
+- 未跑 live／付費呼叫。T5 改了 packet 與 instructions，屬設計文件 §8.2 定義的「會影響判斷的改動」，
+  **上線前要補一次 Opus／Sonnet run**，需 owner 另行授權。下一個可獨立 task 是 T6（Web UI）。

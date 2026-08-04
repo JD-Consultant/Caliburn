@@ -316,3 +316,43 @@ async def test_a_verified_ai_turn_preserves_the_employee_header(
     assert loaded is not None
     assert loaded.state.jd_header == FILLED
     assert loaded.state.work_model.tasks  # 回合確實有做事，不是空跑
+
+
+@asyncio_test
+async def test_the_saved_header_reaches_the_next_task_analysis_packet(
+    postgres_session_factory,
+    cleanup_job_analysis_rows,
+) -> None:
+    """T5 的接線:員工存的 header 必須出現在下一輪送給模型的 packet 裡。"""
+
+    from app.adapters.job_analysis_postgres import SqlAlchemyJobAnalysisUnitOfWork
+    from app.job_analysis.application import (
+        create_document,
+        prepare_turn,
+        put_jd_header,
+        render_context_packet,
+    )
+
+    from .test_job_analysis_durable_turn_postgres import employee_turn
+
+    document_id = cleanup_job_analysis_rows
+    uow_factory = lambda: SqlAlchemyJobAnalysisUnitOfWork(postgres_session_factory)
+    await create_document(uow_factory, document_id=document_id, title="門市營運專員")
+    await put_jd_header(
+        uow_factory, document_id=document_id, entry_id="header-1", header=FILLED
+    )
+
+    snapshot = await prepare_turn(
+        uow_factory, document_id=document_id, employee_turn=employee_turn()
+    )
+    overview = snapshot.packet.employee_written_overview
+    rendered = render_context_packet(snapshot.packet)
+
+    assert overview.competency_name == FILLED.competency_name
+    assert overview.work_description == FILLED.work_description
+    assert "維運企業資訊安全設備並處理資安事件。" in rendered
+    # 只有兩個高訊號欄位過去；其餘 header 內容不得出現在送給模型的文字裡
+    assert FILLED.notes is not None
+    assert FILLED.notes not in rendered
+    assert FILLED.occupation_code is not None
+    assert FILLED.occupation_code not in rendered

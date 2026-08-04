@@ -14,6 +14,7 @@ from app.job_analysis.application import (
     ActiveQuestion,
     ConversationTurn,
     TurnSpeaker,
+    ViolationCode,
     build_context_packet,
     render_context_packet,
     verify_task_analysis_result,
@@ -26,6 +27,7 @@ from app.job_analysis.domain import (
     ExcludedSignal,
     ExclusionReason,
     JdEntry,
+    JdHeader,
     JdTask,
     MergeTarget,
     OpenIssue,
@@ -149,6 +151,119 @@ def build(**overrides):
     }
     base.update(overrides)
     return build_context_packet(**base)
+
+
+# ── 員工填寫的整體描述(ADR 0053 決定 4)────────────────────────────────────
+
+
+FILLED_HEADER = JdHeader(
+    competency_name="資訊安全維運人員",
+    occupation_category_name="資訊技術",
+    occupation_name="資訊安全分析師",
+    occupation_code="2529",
+    industry_name="電腦程式設計、諮詢及相關服務業",
+    industry_code="6201",
+    work_description="維運企業資訊安全設備並處理資安事件。",
+    competency_level=4,
+    notes="本文件為客製職務說明書。",
+)
+
+
+def test_only_the_two_high_signal_header_fields_reach_the_packet():
+    """其餘欄位對「這輪要問什麼」沒幫助,送進去只是擴大可被編造的表面積。"""
+
+    overview = build(jd_header=FILLED_HEADER).employee_written_overview
+
+    assert set(type(overview).model_fields) == {
+        "competency_name",
+        "work_description",
+    }
+    assert overview.competency_name == "資訊安全維運人員"
+    assert overview.work_description == "維運企業資訊安全設備並處理資安事件。"
+
+
+def test_the_overview_has_no_ordinal_and_no_source_ref():
+    """沒有 ordinal 正是禁令的執行機制:anchor 指不到它(§12.3)。"""
+
+    overview = build(jd_header=FILLED_HEADER).employee_written_overview
+
+    fields = set(type(overview).model_fields)
+    assert not {name for name in fields if "ordinal" in name}
+    assert not {name for name in fields if "source" in name or "ref" in name}
+    assert not {name for name in fields if "anchor" in name}
+
+
+def test_the_rendered_overview_is_labelled_as_not_being_interview_evidence():
+    rendered = render_context_packet(build(jd_header=FILLED_HEADER))
+
+    assert "## employee_written_overview(員工填寫的整體描述;不是訪談依據)" in rendered
+    assert "職能基準名稱: 資訊安全維運人員" in rendered
+    assert "工作描述: 維運企業資訊安全設備並處理資安事件。" in rendered
+    # 只送兩個欄位:其餘 header 內容不得出現在 rendering 裡
+    assert "資訊技術" not in rendered
+    assert "2529" not in rendered
+    assert "本文件為客製職務說明書。" not in rendered
+    # 整體描述排在 transcript 之前
+    assert rendered.index("employee_written_overview") < rendered.index(
+        "### transcript"
+    )
+
+
+def test_an_unfilled_header_renders_a_stable_placeholder():
+    assert build().employee_written_overview.is_empty is True
+    assert "(員工尚未填寫)" in render_context_packet(build())
+    assert render_context_packet(build()) == render_context_packet(build())
+
+
+def test_the_overview_never_enters_the_verification_context():
+    """verifier 只認 ordinal;整體描述沒有 ordinal,因此不進 verifier 的檢視。"""
+
+    context = build(jd_header=FILLED_HEADER).verification_context()
+
+    assert not {name for name in type(context).model_fields if "overview" in name}
+    assert all(
+        "資訊安全" not in turn.text for turn in context.turns
+    )
+
+
+def test_the_header_cannot_ground_a_task_change_because_no_anchor_can_reach_it():
+    """ADR 0053 決定 4 的禁令是結構性的,不靠語意規則。
+
+    模型只能把 anchor 指向 packet 裡的 turn ordinal,而整體描述沒有 ordinal。
+    就算它照抄工作描述的字,quote 也不會是任何員工回合的逐字子字串。
+    """
+
+    packet = build(jd_header=FILLED_HEADER)
+    quoting_the_header = TaskAnalysisResult(
+        work_signals=(
+            WorkSignal(
+                anchors=(
+                    SignalAnchor(
+                        turn_ordinal=2,
+                        quote="維運企業資訊安全設備並處理資安事件。",
+                    ),
+                ),
+                identity=IdentityAssessment(relation=IdentityRelation.NO_MATCH),
+                disposition=SignalDisposition.TASK_CHANGE,
+                task_change=TaskChangePayload(
+                    change=TaskChangeKind.ADD,
+                    task_fields={
+                        "statement": "維運資訊安全設備",
+                        "action": "維運",
+                        "object": "資訊安全設備",
+                    },
+                ),
+            ),
+        ),
+        next_question=NextQuestion(text="資安事件通常多久發生一次？"),
+    )
+
+    report = verify_task_analysis_result(
+        quoting_the_header, packet.verification_context()
+    )
+
+    assert not report.is_valid
+    assert ViolationCode.QUOTE_NOT_VERBATIM in report.codes
 
 
 # ── 決定性(§11 完成條件)──────────────────────────────────────────────────
@@ -643,4 +758,16 @@ def test_only_unresolved_revision_requests_are_carried():
 def test_read_set_is_the_projected_authority_data():
     """保守計入:當輪投影本身就是 read-set,不從模型輸出反推它讀了什麼。"""
     packet = build(proposals=(merge_proposal(),))
-    assert packet.read_set == (packet.current_authorities, packet.proposal_context)
+    assert packet.read_set == (
+        packet.employee_written_overview,
+        packet.current_authorities,
+        packet.proposal_context,
+    )
+
+
+def test_read_set_counts_the_jd_header_because_the_employee_can_edit_it_mid_turn():
+    """JD header 是 Current JD authority,員工可在 LLM 呼叫期間改它(ADR 0053 決定 3)。"""
+    before = build(jd_header=JdHeader(competency_name="資訊安全維運人員"))
+    after = build(jd_header=JdHeader(competency_name="資深資訊安全維運人員"))
+
+    assert before.read_set != after.read_set

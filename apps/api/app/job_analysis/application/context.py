@@ -28,6 +28,7 @@ from app.job_analysis.domain import (
     DomainModel,
     ExcludedSignal,
     Identifier,
+    JdHeader,
     JdTask,
     NonEmptyText,
     OpenIssue,
@@ -113,6 +114,26 @@ class PacketProposalView(DomainModel):
     task_ordinals: tuple[int | None, ...]
 
 
+class EmployeeWrittenOverview(DomainModel):
+    """員工自己填的 JD 表頭背景(ADR 0053 決定 4);**不是訪談依據**。
+
+    只帶職能基準名稱與工作描述,**沒有 ordinal 也沒有 `SourceRef`**。那不是排版偏好,
+    而是禁令的執行機制:anchor 只能指向 packet 裡的 turn ordinal,本區沒有 ordinal,
+    所以沒有任何合法 anchor 指得到這裡;verifier 的 `quote` 逐字檢查(§12.3)因此讓
+    「只憑 header 產生 task_change」在結構上不可能,不必再多一條語意規則去攔。
+
+    其餘的 header 欄位(所屬類別、基準級別、說明補充)不進 packet:它們對「這輪要問什麼」
+    沒有幫助,送進去只是擴大模型可以據以編造責任的表面積。
+    """
+
+    competency_name: NonEmptyText | None = None
+    work_description: NonEmptyText | None = None
+
+    @property
+    def is_empty(self) -> bool:
+        return self.competency_name is None and self.work_description is None
+
+
 class ConversationContext(DomainModel):
     transcript: tuple[PacketTurnView, ...] = ()
     active_question: ActiveQuestion | None = None
@@ -132,6 +153,7 @@ class ProposalContext(DomainModel):
 
 
 class TaskAnalysisPacket(DomainModel):
+    employee_written_overview: EmployeeWrittenOverview = EmployeeWrittenOverview()
     conversation_context: ConversationContext
     current_authorities: CurrentAuthorities
     proposal_context: ProposalContext
@@ -202,14 +224,25 @@ class TaskAnalysisPacket(DomainModel):
         return None
 
     @property
-    def read_set(self) -> tuple[CurrentAuthorities, ProposalContext]:
+    def read_set(
+        self,
+    ) -> tuple[EmployeeWrittenOverview, CurrentAuthorities, ProposalContext]:
         """§11.3:read-set ＝ 本輪送出的所有可變 authority 資料(保守計入)。
 
         不另建 framework、也不從模型輸出反推它「真正讀了什麼」:當輪投影本身就是
         read-set,寫入前比對這批值是否已變(§10.9)。怎麼比(generation、before-value)
         留給 persistence 決定。
+
+        JD header 現在是 Current JD authority(ADR 0053 決定 3),員工可在訪談中途改它,
+        所以本輪送出的那份也計入。今天 `authority_generation` 的比對已經會擋下同一件事
+        ——`put_jd_header()` 會 bump generation——但 read-set 的定義是「本輪送出的所有可變
+        authority 資料」,漏掉它就等於讓這條不變量依賴另一層的實作細節。
         """
-        return (self.current_authorities, self.proposal_context)
+        return (
+            self.employee_written_overview,
+            self.current_authorities,
+            self.proposal_context,
+        )
 
     def verification_context(self) -> VerificationContext:
         """交給 T3 verifier 的 ordinal 檢視;兩者的號段必然一致,因為都出自這裡。"""
@@ -263,6 +296,7 @@ def build_context_packet(
     current_jd: tuple[JdTask, ...] = (),
     active_question: ActiveQuestion | None = None,
     proposals: tuple[Proposal, ...] = (),
+    jd_header: JdHeader | None = None,
 ) -> TaskAnalysisPacket:
     """把當前現況投影成一份 packet。順序完全跟隨輸入,因此同輸入同輸出。"""
 
@@ -344,6 +378,14 @@ def build_context_packet(
     )
 
     return TaskAnalysisPacket(
+        employee_written_overview=(
+            EmployeeWrittenOverview(
+                competency_name=jd_header.competency_name,
+                work_description=jd_header.work_description,
+            )
+            if jd_header is not None
+            else EmployeeWrittenOverview()
+        ),
         conversation_context=ConversationContext(
             transcript=turn_views, active_question=active_question
         ),
@@ -410,7 +452,29 @@ def render_context_packet(packet: TaskAnalysisPacket) -> str:
     """
 
     turn_ordinals = packet.turn_ordinal_by_id
-    lines: list[str] = ["# Dynamic Context Packet", "", "## conversation_context", ""]
+    lines: list[str] = ["# Dynamic Context Packet", ""]
+
+    # 放在 transcript 之前:先知道這個職位大概在做什麼,才讀得懂員工的用語與省略。
+    # 標題只標**資料性質**(這是誰寫的、算不算依據),不寫 Task policy——§11.2 要求
+    # policy 住 Static Instructions,不隨每輪 packet 重送。
+    #
+    # 這一區沒有 ordinal,而 anchor 只能指向 packet 裡的 turn ordinal(§12.3),
+    # 所以「只憑 header 產生 task_change」不需要一條語意規則去攔:模型根本找不到
+    # 合法的 anchor,verifier 的逐字 quote 檢查會直接擋掉。
+    overview = packet.employee_written_overview
+    lines.append("## employee_written_overview(員工填寫的整體描述;不是訪談依據)")
+    lines.append("")
+    if overview.is_empty:
+        lines.append("(員工尚未填寫)")
+    else:
+        if overview.competency_name is not None:
+            lines.append(f"職能基準名稱: {overview.competency_name}")
+        if overview.work_description is not None:
+            lines.append(f"工作描述: {overview.work_description}")
+    lines.append("")
+
+    lines.append("## conversation_context")
+    lines.append("")
     lines.append("### transcript")
     for view in packet.conversation_context.transcript:
         marker = " ← 本次要分析的回合" if view.ordinal == packet.current_turn_ordinal else ""

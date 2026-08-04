@@ -14,8 +14,13 @@ from app.job_analysis.application.verifier import ViolationCode
 from app.job_analysis.llm import TASK_ANALYSIS_INSTRUCTIONS
 
 
-#: 5,090 實測 ＋ 少量修辭餘裕。再往下只能砍判準,那是砍產品。
-INSTRUCTIONS_BYTES_BUDGET = 5200
+#: 5,215 實測 ＋ 少量修辭餘裕。再往下只能砍判準,那是砍產品。
+#:
+#: 2026-08-05 由 5200 上調:T5 讓 packet 多了「員工填寫的整體描述」這一區,
+#: 顧問必須知道那不是員工做過的事。**只加了判斷部分**——「不得只憑它產生 task_change」
+#: 沒有寫進來,因為該區沒有 ordinal,anchor 指不到它,§12.3 的逐字 quote 檢查已在
+#: 結構上擋死,寫進來就是本檔案開頭禁止的那種重複。
+INSTRUCTIONS_BYTES_BUDGET = 5300
 
 #: 五段顧問判準的逐段位元組數。**這些數字改變就是判準被動到了。**
 #: 只有在確實要改判準文字時才更新,而且要在同一個 commit 說明改了什麼、為什麼。

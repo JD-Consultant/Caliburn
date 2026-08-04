@@ -1,14 +1,15 @@
 # R1 Task Discovery 離線實作計畫
 
-- 日期：2026-08-03
-- 狀態：T1/T2/T3 COMPLETE；R1 IN PROGRESS（尚未 OFFLINE-READY／GATE-PASSED）
+- 日期：2026-08-03（T4a 更新於 2026-08-04）
+- 狀態：T1/T2/T3 COMPLETE；T4a（blind grader）COMPLETE；T4b/T4c 尚未開始；R1 IN PROGRESS（尚未 OFFLINE-READY／GATE-PASSED）
 - 決策：[ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md)、
   [ADR 0042](../adr/0042-hybrid-job-discovery-and-ttop-formation.md)
 - 研究：[R1 深入研究](../specs/2026-07-25-professional-consultant-r1-task-discovery-deep-research.md)、
   [R1 紅隊修訂](../specs/2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md)、
   [離線契約／verifier 實作研究](../specs/2026-08-03-r1-offline-contract-verifier-implementation-research.md)、
   [T2 prompt/schema/runner 研究](../specs/2026-08-03-r1-t2-prompt-schema-scripted-runner-research.md)、
-  [T3 六臂／manifest／capture 研究](../specs/2026-08-03-r1-t3-ablation-manifest-capture-research.md)
+  [T3 六臂／manifest／capture 研究](../specs/2026-08-03-r1-t3-ablation-manifest-capture-research.md)、
+  [T4 blind grader／CLI／preflight 研究](../specs/2026-08-04-r1-t4-blind-grader-cli-openrouter-preflight-research.md)
 
 ## 1. 目標與現況
 
@@ -122,10 +123,54 @@ expectations／adjudication；writer 無覆寫路徑；reader 對缺 manifest、
 
 ### T4 — blind grader、CLI dry-run 與 OpenRouter preflight seam
 
-- blind grader 不讀 generator rationale，可逐維度回 `Unknown`；
-- CLI 能 validate fixtures、dry-run 六臂、輸出 manifest/report，預設不連網；
-- exact model slug／endpoint preflight、`require_parameters: true`、fallback off、portable schema 實送；
-- mock/offline tests 完整；任何 live call 都需另有明確授權。
+研究：[T4 實作研究](../specs/2026-08-04-r1-t4-blind-grader-cli-openrouter-preflight-research.md)。三個切片各自可獨立驗證，
+各一個 commit，全部留在 eval 外圈，不改 T1–T3 core。
+
+#### T4a — blind grader
+
+1. `evals/professional_consultant/r1/blind_projection.py`：`BlindTaskDiscoveryArtifact` 與相關 value **不含任何**
+   `boundary`／`limitations`／`unresolved_boundary`／`gaps`／`rationale`／`missing_information`／`significance`／
+   `action`／`target_gap` 欄位；`project_blind_artifact` 同時接受 full 與 A1 minimal output，不替 A1 補造結構。
+2. `evals/professional_consultant/r1/grader.py`：獨立的 `GraderProvider.grade()` port、`grader_id`／版本、
+   `GraderPromptArtifact`／`GraderSchemaArtifact`、`BlindGraderRequest`／`BlindGraderVerdict`（每維度可回 `unknown`）、
+   deterministic `verify_blind_grader_verdict`（維度與規則 code 必須恰好覆蓋 rubric）與四類 typed failure。
+3. `evals/professional_consultant/r1/grader_assets/r1-blind-grader.v1.txt`：只給 rubric 與評分責任，不給 expectations、
+   不給 arm 資訊，不要求 chain-of-thought。
+4. `evals/professional_consultant/r1/grader_capture.py`：與 generator capture **分離**的 root、two-layer artifact
+   （`grader-input.json`／`grader-evidence.json`）與 create-only `GraderManifest`；manifest 保存 `trial_id ↔ submission_id`
+   關聯，grader input 只有 `submission_id`。
+5. `tests/test_professional_consultant_blind_grader.py`：逐項鎖定盲化（位元組層不得出現 rationale 值與 arm ID）、
+   `unknown` 可用、verdict 覆蓋驗證、四類 failure、capture round-trip／tamper fail-closed，以及評分後 generator
+   trial evidence 位元組不變。
+
+#### T4b — OpenRouter preflight seam
+
+1. `evals/professional_consultant/r1/openrouter_preflight.py`：`OpenRouterRouteBinding`（exact `author/slug`、exact endpoint、
+   `order == only == (endpoint,)`、`allow_fallbacks: Literal[False]`、`require_parameters: Literal[True]`、
+   `accepted_resolved_models == (requested_model,)`、無任何 secret 欄位）；`build_preflight_payload` 把 T2 portable
+   `schema_text` **parse 後原樣**嵌入 `response_format.json_schema.schema`；`read_response_evidence` 只從 response／generation
+   讀事實；`attest_resolved_facts` 只有全部條件成立才產出帶 `resolved_endpoint` 的 `ResolvedResponseFacts`，
+   其餘一律 typed refusal code 且 `resolved is None`；`OpenRouterTransport` 只有 Protocol，T4 無實作。
+2. `tests/test_professional_consultant_openrouter_preflight.py`：slug／endpoint 驗證、literal 不變量、實送 schema 位元組相等、
+   payload 無 secret、attested 成功，以及 metadata 缺席／resolved model 不符／selected 不唯一／provider 不符／fallback 污染／
+   generation ID 缺失／provider error／schema rejection 全部 fail closed。
+
+#### T4c — offline CLI
+
+1. `evals/professional_consultant/r1/cli.py`：`main(argv) -> int`；`validate-fixtures`、`dry-run`、`report`、`preflight`
+   四個子命令，預設不連網；`preflight --live` 一律 exit 2 並指向 owner 授權。dry-run 以「記錄 request 後拒答」的 provider
+   走真實 runner，因此顯示的是實際會送的 request，且 two-stage 只會渲染 stage 1。
+2. report contracts 明確分離 planned 與 actual：`planned_observations: Literal[48]`、`planned_generator_calls: Literal[80]`、
+   `grader_calls_included: Literal[False]`、`ranking_claim: Literal["none"]`、`screening_only: Literal[True]`；
+   actual 一律從讀回的 manifest 計算。CLI **不寫 Trial Manifest**，只有實際執行過的 trial 能發布 manifest。
+3. `tests/test_professional_consultant_cli.py`：四個子命令 exit code、48 slots 與每臂 prompt/schema ID、
+   fixture 失敗非零、report 對成功與 stage-1 failure capture 的 actual 計數、create-only、socket 封鎖下仍全綠、
+   `--live` 被拒且未產生 payload。
+
+完成條件：T1～T4 targeted 與 dependency/cold-import guard 全綠；production `app/` 仍不 import eval；grader 不可見
+generator rationale 與 arm 身分；preflight 缺 exact endpoint evidence 時 fail closed；CLI 預設不連網且不宣稱勝出；
+完整 API 相較 T3 baseline 只增加 pass，既有五個 historical vNext frozen-byte mismatch 不變。同 commit 更新
+`apps/api/README.md`、`ARCHITECTURE.md`、`docs/README.md` 與 living design；三個 slice 各一個 commit，不打 tag、不進 T5。
 
 ### T5 — live eval、shortlist 與 R1 gate
 
@@ -196,3 +241,24 @@ expectations／adjudication；writer 無覆寫路徑；reader 對缺 manifest、
   requested model 與 response-supplied generation/resolved model/provider/endpoint 分欄，provider failure 不推測 resolved facts。
 - 未呼叫 live／paid provider，未選 exact model/endpoint，未建立 blind grader、CLI、OpenRouter adapter/preflight、DB、route、Web
   或 deployment；未打 tag。下一個可獨立 task 是 T4。
+
+## 8. T4a 執行證據（2026-08-04）
+
+- RED：`tests/test_professional_consultant_blind_grader.py` 先因 `blind_projection`／`grader`／`grader_capture` 缺失
+  形成可重現 collection error；GREEN 後同檔 `20 passed`。實作中另由 grader capture 第一版抓到 `grading_id` 寫在
+  `grader-input.json` 內會洩漏 `trial_id`（因此洩漏 arm），改成只由 bundle／manifest 承載該關聯。
+- professional consultant T1–T4a targeted／dependency guards：`60 passed`；加 app wiring、job-authoring/vNext architecture
+  guards 合跑 `77 passed`。
+- 完整 API no-network：`1223 passed / 218 skipped / 5 failed`；相較 T3 baseline
+  `1203 passed / 218 skipped / 5 failed` 新增 20 passed。五個 failure 仍是完全相同的 historical vNext frozen-byte hash
+  mismatch，沒有新 regression。
+- 盲化由型別承重：盲化模型不宣告任何 rationale／self-assessment 欄位；位元組層測試證明 8 個 sentinel 值、
+  `boundary` 鍵、六個 arm ID、`trial_id` 與 arm/model/schema/harness 欄位名都不出現在 grader input。
+  `expectations`／`adjudication`／`acceptable_task_examples` 同樣不進 grader。
+- verdict 可逐維度回 `unknown` 並通過驗證；submission 不符、維度／critical rule／question rule 少給、多給不存在的 code
+  與重複 code 全部 fail closed。四類 grader failure 各自 typed，只有 `verification_failed` 附 report。
+- grader capture 與 generator capture 分屬不同 root；評分後 generator `trial-evidence.json` 位元組不變且可原樣讀回；
+  grader manifest 是唯一 `submission_id ↔ trial_id` 對照處並標記 `counted_in_generator_budget: false`；
+  digest 竄改 fail closed。
+- 未呼叫 live／paid provider，未選 exact model/endpoint，未建立 CLI、OpenRouter preflight、DB、route、Web 或 deployment；
+  未打 tag。下一個可獨立 task 是 T4b。

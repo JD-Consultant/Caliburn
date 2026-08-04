@@ -7,7 +7,8 @@
 [`docs/design/interview-engine.md`](../../docs/design/interview-engine.md)。隔離的 `interview_vnext` 已有0010 durable persistence、
 provider/Capture/checkpoint與production OpenRouter backend元件，`job_authoring` v1已有0011 revision三表；兩者都**沒有掛正式 router**，
 也不是ADR 0040新核心的前提。greenfield `professional_consultant` 已有 R1 T1/T2 pure core；eval 外圈另有 T3 的精確六臂
-registry、A1 minimal baseline、immutable Trial Manifest／三層 capture 與 48/80 offline harness。尚無 blind grader、CLI、
+registry、A1 minimal baseline、immutable Trial Manifest／三層 capture 與 48/80 offline harness，T4a 再加獨立 blind grader
+（無 rationale/arm 身分投影、盲測 verdict verifier、與 generator 分離的 capture root）。尚無 CLI、OpenRouter preflight、
 live provider/route。新引擎、current-row JD與切換／退役見
 [`docs/design/professional-consultant-engine.md`](../../docs/design/professional-consultant-engine.md)。
 

@@ -134,7 +134,11 @@ def test_contracts_and_verifier_import_cleanly_in_a_cold_process() -> None:
         "from evals.professional_consultant.r1 import ablation, capture, harness\n"
         "from evals.professional_consultant.r1 import minimal_harness\n"
         "from evals.professional_consultant.r1 import observed_provider\n"
+        "from evals.professional_consultant.r1 import blind_projection, grader\n"
+        "from evals.professional_consultant.r1 import grader_capture\n"
         "assert len(ablation.ABLATION_ARMS) == 6\n"
+        "grader.blind_grader_prompt()\n"
+        "grader.blind_grader_output_schema()\n"
     )
     proc = subprocess.run(
         [sys.executable, "-c", script],

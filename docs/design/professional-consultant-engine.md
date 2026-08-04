@@ -1,15 +1,16 @@
 ---
 title: 專業顧問引擎與 current-row JD — production 切換邊界
 audience: agent-primary（也給人）
-status: R1 T3 implemented；R1 gate 未通過；新 production route 尚未實作
-updated: 2026-08-03
+status: R1 T4a（blind grader）implemented；R1 gate 未通過；新 production route 尚未實作
+updated: 2026-08-04
 ---
 
 # 專業顧問引擎與 current-row JD — production 切換邊界
 
 > **目前沒有新專業顧問 route／Web seam。** `apps/api/app/api/router.py` 未掛 `interview_vnext`、
 > `job_authoring`、`professional_consultant` 或 `job_workspace`。R1 T1–T3 已建立離線合約、八案、rubric、verifier、
-> prompts/schema/runners、精確六臂 registry 與 immutable capture harness；blind grader、CLI、live provider 與 gate 仍未完成，
+> prompts/schema/runners、精確六臂 registry 與 immutable capture harness；T4a 再加獨立 blind grader（盲化投影、
+> verdict verifier、與 generator 分離的 capture root）。CLI、OpenRouter preflight、live provider 與 gate 仍未完成，
 > 不得把 partial implementation 當成端點或 R1 通過。切換決策見
 > [ADR 0041](../adr/0041-document-boundary-single-writer-cutover.md)，職務發現語意見
 > [ADR 0042](../adr/0042-hybrid-job-discovery-and-ttop-formation.md)，第一版發布門檻見
@@ -39,7 +40,7 @@ Web /documents/[id]/interview
 | `app/interview_vnext` | ISOLATED PROTOTYPE／DONOR | 依 ADR 0040 逐項評估 provider、Capture、checkpoint 等基礎 | 直接掛 router；重用舊 gold/schema/operation/state |
 | `app/job_authoring` v1 | ISOLATED PROTOTYPE | 保留既有測試與三表，不擴張 | 新增 revision-scoped entity；讓 `snapshot_json` 成為 v2 truth |
 | current-row Authoring v2 | PLANNED／NOT IMPLEMENTED | 後續依核准 storage research 實作 | R0 建表、假裝 route 已存在 |
-| 新 professional consultant | R1 T3 IMPLEMENTED／R1 IN PROGRESS | T1 authority + T2 pure runners + T3 A1–A6/capture/offline harness；下一步 T4 blind grader/CLI/preflight | import/wrap v3；直接 promotion 現有 vNext loop；未有 live 證據宣稱 gate 通過 |
+| 新 professional consultant | R1 T4 IN PROGRESS | T1 authority + T2 pure runners + T3 A1–A6/capture/offline harness + T4a blind grader；下一步 T4b preflight seam/T4c CLI | import/wrap v3；直接 promotion 現有 vNext loop；未有 live 證據宣稱 gate 通過 |
 | `job_workspace` seam | PLANNED／NOT IMPLEMENTED | R1–R5 過 gate 後組合第一條 production vertical | 在 R0 發明 request／response 或 route |
 
 ## 3. 第一條 production vertical（PV1，PLANNED）
@@ -122,7 +123,24 @@ T3 新增的 runtime 外 eval 邊界：
 - 離線測試實際跑完成功的 48 manifests／80 attempts，另鎖定 stage-1 failure 只有 79 actual attempts 且 summary 不標完整；
   這只是 harness correctness，不是八案品質結果或架構勝出證據。
 
-此 bundle **尚不包含** blind grader、CLI、OpenRouter adapter/preflight 或 live eval。
+T4a 新增的獨立 blind grader 邊界：
+
+- `blind_projection.py` 把 `TaskDiscoveryOutput`／`MinimalTaskDiscoveryOutput` 投影成 `BlindTaskDiscoveryArtifact`；
+  盲化模型**根本沒有** `boundary`／`limitations`／`gaps`／`unresolved_boundary`／`rationale`／`missing_information`／
+  `significance`／`action`／`target_gap` 欄位，因此「忘記過濾」在型別層就不可能發生。`submission_id` 由 `trial_id` 的
+  SHA-256 導出，grader 看不到 trial／case／arm 身分。A1 的較小輸出直接投影，不補造 full harness 才有的結構。
+- `grader.py` 是與 T2 generator 完全分離的 seam：獨立 `GraderProvider.grade()` port、`GRADER_ID`／版本、
+  `GraderPromptArtifact`／`GraderSchemaArtifact`（唯讀 `evals/professional_consultant/r1/grader_assets/`）、
+  可逐維度回 `unknown` 的 `BlindGraderVerdict`、對 rubric 三組 code 做「恰好覆蓋」驗證的
+  `verify_blind_grader_verdict`，以及 `provider_failed`／`output_json_invalid`／`output_schema_invalid`／
+  `verification_failed` 四類 typed failure。grader 只讀不寫，任何函式都不回傳被修改的 generator product。
+- `grader_capture.py` 用**與 generator 分離的 capture root**：`grader-input.json`（grader 實際看到的 request，
+  不含 trial／arm 身分）、`grader-evidence.json`（terminal verdict 或 typed failure）與 create-only `GraderManifest`
+  （唯一把 `submission_id` 對回 `trial_id` 的地方，並記錄 `counted_in_generator_budget: false`）。
+  `grade_published_trial` 讀一個已發布的 generator trial、產生新的 grading，**不修改也不重寫** generator 的
+  `trial-evidence.json`。
+
+此 bundle **尚不包含** CLI、OpenRouter adapter/preflight 或 live eval。
 因此 R1 仍是 `IN PROGRESS`，不是 `OFFLINE-READY`、`GATE-PASSED` 或 production。
 
 ## 4. 文件 ownership 與寫入不變量
@@ -207,4 +225,5 @@ indexer-contract         = API 與 indexer 的 Python query contract
 - R1 離線研究：[`../specs/2026-08-03-r1-offline-contract-verifier-implementation-research.md`](../specs/2026-08-03-r1-offline-contract-verifier-implementation-research.md)
 - R1 T2 研究：[`../specs/2026-08-03-r1-t2-prompt-schema-scripted-runner-research.md`](../specs/2026-08-03-r1-t2-prompt-schema-scripted-runner-research.md)
 - R1 T3 研究：[`../specs/2026-08-03-r1-t3-ablation-manifest-capture-research.md`](../specs/2026-08-03-r1-t3-ablation-manifest-capture-research.md)
+- R1 T4 研究：[`../specs/2026-08-04-r1-t4-blind-grader-cli-openrouter-preflight-research.md`](../specs/2026-08-04-r1-t4-blind-grader-cli-openrouter-preflight-research.md)
 - R1 實作 plan：[`../plans/2026-08-03-r1-task-discovery-offline-implementation-plan.md`](../plans/2026-08-03-r1-task-discovery-offline-implementation-plan.md)

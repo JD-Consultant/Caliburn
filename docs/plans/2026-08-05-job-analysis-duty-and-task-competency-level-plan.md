@@ -1,7 +1,7 @@
 # 主要職責（Duty）與 Task 職能級別結構切片實作計畫
 
 - 日期：2026-08-05
-- 狀態：T1 COMPLETE；T2–T7 尚未開工
+- 狀態：T1／T2 COMPLETE；T3–T7 尚未開工
 - 決策：[ADR 0052](../adr/0052-jd-readiness-assessment-and-official-code-boundaries.md) 決定 10／13、
   [ADR 0053](../adr/0053-jd-header-authority-boundary-and-readiness-scope.md) 決定 7；
   authority seam 沿用 [ADR 0045](../adr/0045-job-analysis-local-web-contract-and-shared-authority-commit.md)
@@ -160,7 +160,8 @@ display_order: int >= 0  # 文件內唯一
 
 1. schema 新增 `DutyView`／`DutyWrite`；
    `JdTaskView`／`JdTaskWrite` 增 `duty_id`／`competency_level`；
-   `DocumentView` 增 `duties`；`ReadinessIssueView` 的 `code` enum 補三個新值。
+   `DocumentView` 增 `duties`。（`ReadinessIssueView` 的 `code` enum 已於 T2 補齊——
+   不補當下 API 就會炸，見 T2 執行證據。）
 2. codegen 用 Python 3.13（見 `CLAUDE.local.md` 的環境雷），產物轉回 LF。
 3. route：`POST/PUT/DELETE …/duties` 與 `PUT …/duty-order`，全部要求 `Idempotency-Key`，
    錯誤走既有 problem+json。Task 的兩個新欄位走既有 `PUT …/tasks/{id}`，不另開 route。
@@ -232,3 +233,30 @@ T5／T6 另跑 contract codegen 與 web 三件套。
   但 T3 必須一次補齊，否則 duties 會在 reload 後靜默消失。
 - job_analysis targeted：`656 passed`（+17）。完整 API：**`2102 passed / 0 failed / 0 skipped`**（+17）。
 - 下一個可獨立 task 是 T2（readiness 擴充）。
+
+## 11. T2 執行證據（2026-08-05）
+
+- baseline：完整 API `2102 passed`、web `108 passed`。
+- `assess_readiness()` 簽章改成**三個必填 keyword**（`header`／`duties`／`tasks`），
+  刻意不給預設值：漏傳 `tasks` 會是 `TypeError`，不會安靜地變成「這份文件沒有結構缺漏」
+  這種錯答案。有測試專門守這件事。
+- **結構缺漏一個 code 一則，不是一個 Task 一則。** 兩個理由：readiness 是提示不是待辦清單
+  （ADR 0053 決定 6），而且既有的 `ReadinessNotice` 用 `key={issue.code}` 渲染，
+  一個 code 多則會產生重複 React key。
+- **`field` 全部改成有前綴的路徑**（`jd_header.competency_level` vs `current_jd.competency_level`）：
+  header 與 Task 各有一個 `competency_level`，不加前綴分不出是哪一個。有測試鎖定兩者不同。
+- 輸出順序：header 三項在前，結構三項在後，決定性。
+- **T5 的 contract enum 提前到 T2**：不補 `ReadinessIssueView.code` 的三個新值，
+  `to_document_readiness_view()` 會在序列化時 `ValidationError`，三個既有 API 測試立刻紅。
+  每個 task 必須自己是綠的，所以 enum 跟著 T2 走；T5 只剩 `DutyView`／`DutyWrite` 與
+  `DocumentView.duties`。codegen 產物 diff 純新增，既有型別未動。
+- web 端補上三個標籤，並測試 header 的「基準級別」與 Task 的「職能級別」標籤**不相同**。
+- 施工中一個自我修正：`test_header_issues_come_before_structural_issues` 第一版預期錯了——
+  把唯一的 Task 抽離職責，那個職責也就變成空的，`duty_without_task` 本來就該一起報。
+  是測試的預期寫錯，不是實作錯。
+- 仍**不回** `is_complete`／百分比，仍**不阻止**任何操作；所屬類別仍不發聲（owner 已裁定非必填）。
+  另在 docstring 補記工作產出（O）缺席與態度（A）為空都不得機械判成缺漏（ADR 0052 決定 15／16）。
+- job_analysis targeted：`665 passed`（+9）。完整 API：**`2111 passed / 0 failed / 0 skipped`**（+9）。
+  contract 16 passed；web `109 passed`＋tsc＋lint 全綠。
+- 下一個可獨立 task 是 T3（persistence 與 migration 0016），**必須一次補齊九個
+  `JobAnalysisState(...)` 建構點的 `current_duties`**。

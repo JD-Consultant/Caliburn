@@ -292,6 +292,9 @@ def test_readiness_issue_codes_match_the_first_version_header_checks():
         "competency_name_missing",
         "work_description_missing",
         "competency_level_missing",
+        "task_duty_missing",
+        "task_competency_level_missing",
+        "duty_without_task",
     }
 
 

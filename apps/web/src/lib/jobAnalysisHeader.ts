@@ -107,6 +107,9 @@ const READINESS_FIELD_LABELS: Record<string, string> = {
   competency_name_missing: "職能基準名稱",
   work_description_missing: "工作描述",
   competency_level_missing: "基準級別",
+  task_duty_missing: "工作任務的所屬主要職責",
+  task_competency_level_missing: "工作任務的職能級別",
+  duty_without_task: "主要職責底下的工作任務",
 };
 
 export function readinessIssueLabel(code: string): string {

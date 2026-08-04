@@ -92,4 +92,16 @@ describe("readiness presentation", () => {
     expect(readinessIssueLabel("competency_level_missing")).toBe("基準級別");
     expect(readinessIssueLabel("work_description_missing")).toBe("工作描述");
   });
+
+  it("labels the structural gaps too, and distinguishes the two level codes", () => {
+    expect(readinessIssueLabel("task_duty_missing")).toBe("工作任務的所屬主要職責");
+    expect(readinessIssueLabel("task_competency_level_missing")).toBe(
+      "工作任務的職能級別",
+    );
+    expect(readinessIssueLabel("duty_without_task")).toBe("主要職責底下的工作任務");
+    // header 的基準級別與 Task 的職能級別是兩件事，標籤不得相同
+    expect(readinessIssueLabel("competency_level_missing")).not.toBe(
+      readinessIssueLabel("task_competency_level_missing"),
+    );
+  });
 });

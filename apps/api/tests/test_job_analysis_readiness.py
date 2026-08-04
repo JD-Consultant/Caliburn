@@ -9,7 +9,37 @@ from app.job_analysis.application.readiness import (
     ReadinessIssueCode,
     assess_readiness,
 )
-from app.job_analysis.domain import JdHeader
+from app.job_analysis.domain import Duty, JdHeader, JdTask
+
+
+def _duty(duty_id: str = "duty-1", *, order: int = 0) -> Duty:
+    return Duty(duty_id=duty_id, statement="維運門市系統", display_order=order)
+
+
+def _task(
+    task_id: str = "task-1",
+    *,
+    order: int = 0,
+    duty_id: str | None = "duty-1",
+    competency_level: int | None = 4,
+) -> JdTask:
+    return JdTask(
+        task_id=task_id,
+        statement="每週彙整營運週報",
+        display_order=order,
+        duty_id=duty_id,
+        competency_level=competency_level,
+    )
+
+
+def _assess(header=None, duties=None, tasks=None):
+    """完整結構的預設：一個 Duty、一個已歸屬且已填級別的 Task。"""
+
+    return assess_readiness(
+        header=_complete_header() if header is None else header,
+        duties=(_duty(),) if duties is None else duties,
+        tasks=(_task(),) if tasks is None else tasks,
+    )
 
 
 def _complete_header(**overrides: object) -> JdHeader:
@@ -23,7 +53,7 @@ def _complete_header(**overrides: object) -> JdHeader:
 
 
 def test_a_complete_header_stays_silent() -> None:
-    readiness = assess_readiness(_complete_header())
+    readiness = _assess()
 
     assert readiness.issues == ()
     assert readiness.issue_count == 0
@@ -40,13 +70,13 @@ def test_a_complete_header_stays_silent() -> None:
 def test_each_determinable_header_gap_raises_its_own_issue(
     field: str, expected: ReadinessIssueCode
 ) -> None:
-    readiness = assess_readiness(_complete_header(**{field: None}))
+    readiness = _assess(header=_complete_header(**{field: None}))
 
     assert tuple(issue.code for issue in readiness.issues) == (expected,)
 
 
 def test_an_empty_header_reports_every_first_version_issue() -> None:
-    readiness = assess_readiness(JdHeader())
+    readiness = _assess(header=JdHeader())
 
     assert tuple(issue.code for issue in readiness.issues) == (
         ReadinessIssueCode.COMPETENCY_NAME_MISSING,
@@ -59,7 +89,7 @@ def test_an_empty_header_reports_every_first_version_issue() -> None:
 def test_notes_are_conditional_and_never_reported_missing() -> None:
     """ADR 0053 決定 8：說明與補充事項空白不列缺漏。"""
 
-    readiness = assess_readiness(_complete_header(notes=None))
+    readiness = _assess(header=_complete_header(notes=None))
 
     assert readiness.issues == ()
 
@@ -67,8 +97,8 @@ def test_notes_are_conditional_and_never_reported_missing() -> None:
 def test_the_category_group_stays_silent_in_the_first_version() -> None:
     """ADR 0052 決定 6：官方規則無法確定必填的一律不提示。"""
 
-    readiness = assess_readiness(
-        _complete_header(
+    readiness = _assess(
+        header=_complete_header(
             occupation_category_name=None,
             occupation_name=None,
             occupation_code=None,
@@ -81,8 +111,8 @@ def test_the_category_group_stays_silent_in_the_first_version() -> None:
 
 
 def test_issue_order_is_deterministic_and_follows_the_official_form() -> None:
-    first = assess_readiness(JdHeader())
-    second = assess_readiness(JdHeader())
+    first = _assess(header=JdHeader())
+    second = _assess(header=JdHeader())
 
     assert first == second
     assert first.issues == second.issues
@@ -99,17 +129,17 @@ def test_readiness_reports_no_completion_verdict() -> None:
 
 
 def test_every_issue_carries_the_field_it_points_at() -> None:
-    readiness = assess_readiness(JdHeader())
+    readiness = _assess(header=JdHeader())
 
     assert tuple(issue.field for issue in readiness.issues) == (
-        "competency_name",
-        "work_description",
-        "competency_level",
+        "jd_header.competency_name",
+        "jd_header.work_description",
+        "jd_header.competency_level",
     )
 
 
 def test_readiness_is_a_frozen_value() -> None:
-    readiness = assess_readiness(JdHeader())
+    readiness = _assess(header=JdHeader())
 
     with pytest.raises(Exception):
         readiness.issues = ()  # type: ignore[misc]
@@ -144,3 +174,98 @@ def test_assessment_is_pure_and_does_not_touch_transport_or_io() -> None:
             "sqlalchemy",
             "httpx",
         }, module
+
+
+# ── Duty 與 Task 職能級別（Duty 切片 T2）──────────────────────────────────────
+
+
+def test_a_complete_structure_stays_silent():
+    assert _assess().issues == ()
+
+
+def test_an_unassigned_task_is_reported():
+    readiness = _assess(tasks=(_task(duty_id=None),))
+
+    assert ReadinessIssueCode.TASK_DUTY_MISSING in {
+        issue.code for issue in readiness.issues
+    }
+
+
+def test_a_task_without_a_competency_level_is_reported():
+    readiness = _assess(tasks=(_task(competency_level=None),))
+
+    assert ReadinessIssueCode.TASK_COMPETENCY_LEVEL_MISSING in {
+        issue.code for issue in readiness.issues
+    }
+
+
+def test_a_duty_with_no_task_under_it_is_reported():
+    """空職責在版型上推不出任何 `T{i}.{j}` 列。"""
+
+    readiness = _assess(duties=(_duty("duty-1"), _duty("duty-2", order=1)))
+
+    assert ReadinessIssueCode.DUTY_WITHOUT_TASK in {
+        issue.code for issue in readiness.issues
+    }
+
+
+def test_structural_gaps_are_reported_once_per_code_not_once_per_task():
+    """readiness 是提示不是待辦清單；UI 也用 code 當 key。"""
+
+    readiness = _assess(
+        tasks=(
+            _task("task-1", order=0, duty_id=None, competency_level=None),
+            _task("task-2", order=1, duty_id=None, competency_level=None),
+            _task("task-3", order=2, duty_id=None, competency_level=None),
+        ),
+    )
+    codes = [issue.code for issue in readiness.issues]
+
+    assert len(codes) == len(set(codes))
+    assert codes.count(ReadinessIssueCode.TASK_DUTY_MISSING) == 1
+    assert codes.count(ReadinessIssueCode.TASK_COMPETENCY_LEVEL_MISSING) == 1
+
+
+def test_header_issues_come_before_structural_issues():
+    """把唯一的 Task 抽離職責，也就讓那個職責變成空的——兩者都該報。"""
+
+    readiness = _assess(header=JdHeader(), tasks=(_task(duty_id=None),))
+
+    assert tuple(issue.code for issue in readiness.issues) == (
+        ReadinessIssueCode.COMPETENCY_NAME_MISSING,
+        ReadinessIssueCode.WORK_DESCRIPTION_MISSING,
+        ReadinessIssueCode.COMPETENCY_LEVEL_MISSING,
+        ReadinessIssueCode.TASK_DUTY_MISSING,
+        ReadinessIssueCode.DUTY_WITHOUT_TASK,
+    )
+
+
+def test_the_two_competency_level_codes_point_at_different_fields():
+    """header 與 Task 各有一個 competency_level;`field` 必須分得出來是哪一個。"""
+
+    header_gap = _assess(header=_complete_header(competency_level=None))
+    task_gap = _assess(tasks=(_task(competency_level=None),))
+
+    assert [i.field for i in header_gap.issues] == ["jd_header.competency_level"]
+    assert [i.field for i in task_gap.issues] == ["current_jd.competency_level"]
+
+
+def test_an_empty_document_reports_only_header_gaps():
+    """沒有 Task 就沒有 Task 層缺漏可談;也不新增計畫外的 issue。"""
+
+    readiness = assess_readiness(header=JdHeader(), duties=(), tasks=())
+
+    assert tuple(issue.code for issue in readiness.issues) == (
+        ReadinessIssueCode.COMPETENCY_NAME_MISSING,
+        ReadinessIssueCode.WORK_DESCRIPTION_MISSING,
+        ReadinessIssueCode.COMPETENCY_LEVEL_MISSING,
+    )
+
+
+def test_every_argument_is_required_so_a_caller_cannot_silently_skip_tasks():
+    """漏傳要炸,不能安靜地變成「這份文件沒有結構缺漏」。"""
+
+    with pytest.raises(TypeError):
+        assess_readiness(header=JdHeader())  # type: ignore[call-arg]
+    with pytest.raises(TypeError):
+        assess_readiness(JdHeader(), (), ())  # type: ignore[misc]

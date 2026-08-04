@@ -1,0 +1,204 @@
+# 主要職責（Duty）與 Task 職能級別結構切片實作計畫
+
+- 日期：2026-08-05
+- 狀態：PLANNED（尚未開工）
+- 決策：[ADR 0052](../adr/0052-jd-readiness-assessment-and-official-code-boundaries.md) 決定 10／13、
+  [ADR 0053](../adr/0053-jd-header-authority-boundary-and-readiness-scope.md) 決定 7；
+  authority seam 沿用 [ADR 0045](../adr/0045-job-analysis-local-web-contract-and-shared-authority-commit.md)
+- 版型權威：[iCAP 2026 手冊逐字核對](../specs/2026-08-02-icap-2026-quality-manual-form-authority.md)、
+  [2022 指引欄位標準](../specs/2026-07-13-ai-redesign-raw-icap-field-standards.md) §2／§6
+- 前一個切片：[JD header 與 readiness](2026-08-04-job-analysis-jd-header-and-readiness-slice-plan.md)（T1–T6 完成）
+- 現行設計：[`task-analysis-engine.md`](../design/task-analysis-engine.md)
+
+## 1. 目標與現況
+
+ADR 0052 決定 13 把「主要職責（Duty）＋每個 Task 的職能級別」列為**獨立結構切片**，並明定
+**export-ready v1 必須完成**。目前 `Duty` 在 `app/job_analysis` 的 domain、contract、route、Web
+**完全不存在**；`JdTask` 只有 `task_id` 與文件層唯一的 `display_order`，沒有職能級別。
+
+沒有這一層就無法匯出：官方產出完整性清單（2022 指引 p38）把「主要職責及工作任務」與
+「職能級別」列為必備內涵，而 `T1`／`T1.1` 位置碼要由 Duty→Task 的排序才推得出來。
+
+本輪前 baseline：完整 API `2085 passed / 0 failed / 0 skipped`、web `108 passed`。
+
+## 2. 官方語意（本切片的形狀來源）
+
+| 概念 | 官方原文重點 | 對實作的意義 |
+|---|---|---|
+| 主要職責 | 「分層展開主要職責、工作任務、工作活動（**建議以主要職責、工作任務 2 層為主**）」 | 只做兩層：Duty → Task。**不做工作活動第三層** |
+| 職責切分 | 「跨公司共通為原則，每項職責／任務的**大小要盡量一致**」 | 這是**語意判斷**，不進 verifier；留給員工與日後 rubric |
+| 職能級別 | 「指要完成此項職責/工作任務所須之能力層次」；「個別工作任務之職能級別，**可能涵蓋不只一個級別**」 | 級別掛在 **Task**，各 Task 可不同，不是文件層單一值 |
+| 與基準級別關係 | 「以**最主要或最多數**的工作任務所對應之職能級別，訂定為基準級別」 | 見 §7 待決 1：**本切片不自動推導**，因 ADR 0052 決定 12 已定 header 基準級別為員工手選 |
+| 位置碼 | `T1`／`T1.1` 由排序決定，「匯出時決定性產生，不持久化」 | 本切片**不做匯出**，但排序必須足以決定性推出位置碼 |
+
+## 3. 範圍
+
+做：`Duty` 值物件與持久化、`JdTask` 的 `duty_id`（nullable）與 `competency_level`（nullable 1–6）、
+Duty 的 add/edit/delete/reorder authoring use case、contract 與 route、Web 編輯、
+readiness 補上這一層的缺漏規則。
+
+不做：**匯出**（下一個切片）、工作活動第三層、AI 產生 Duty（見 §4）、
+重做 OPKS identity（ADR 0052 決定 13 明定 OPKS 繼續引用 `task_id`）、
+自動推導 header 基準級別（§7 待決 1）。
+
+## 4. 為什麼第一版 AI 不參與 Duty
+
+ADR 0052 決定 13 只要求「另開獨立結構切片」，沒有要求 AI 產生 Duty。第一版採**員工手動編輯**，
+理由有三，若日後要翻案需先有真實使用摩擦的證據：
+
+1. **ADR 0042 決定 7**：「每個新增欄位都讓形狀離 A6 的已驗證配置更遠，而第一版已無實驗預算校正。
+   因此只增加**可機械檢查，或能直接診斷核心錯誤**的欄位。」把 Duty 塞進
+   `task_analysis_result_v2` 是一大塊新的模型輸出面，且無預算驗證。
+2. **職責切分是純語意判斷**（大小一致、跨公司共通），verifier 攔不住，錯了只能靠員工看出來——
+   那正是先讓員工直接編輯的情境。
+3. 歸納 Duty 的前提是「跨敘事已形成穩定 Task」（ADR 0055）。目前訪談產出的 Task 數量與穩定度
+   都還沒有真實員工資料佐證，先做 AI 歸納會是在猜。
+
+因此本切片**不動 `task_analysis_result_v2` wire schema，不動 Static Instructions**，
+也就不需要再一次生產模型複驗。
+
+## 5. 形狀
+
+### 5.1 `Duty`
+
+```
+duty_id: DutyId          # application 配發，比照 direct-{entry_id}
+statement: NonEmptyText  # 主要職責敘述
+display_order: int >= 0  # 文件內唯一
+```
+
+刻意**沒有**：職能級別（掛 Task 不掛 Duty）、`T1` 位置碼（匯出時才算）、purpose/outcome
+（官方沒有這個欄位，加了就是發明版型）。
+
+### 5.2 `JdTask` 增兩個 nullable 欄位
+
+| 欄位 | 型別 | 理由 |
+|---|---|---|
+| `duty_id` | `DutyId \| None` | **nullable 是硬需求**：既有文件的 Task 都還沒有 Duty，而 ADR 0052 決定 13 明令**不得自動合成假的 T1**。未指派是合法狀態，由 readiness 提示 |
+| `competency_level` | `int \| None`，1–6 | 員工手選；官方允許各 Task 不同級別 |
+
+`display_order` **維持文件層唯一**，不改成 Duty-scoped：位置碼 `T{i}.{j}` 由
+「Duty 的 display_order」與「該 Duty 底下 Task 依 display_order 的相對次序」決定性推出，
+既有 reorder route 與其冪等語意完全不用動。
+
+### 5.3 readiness 新增 issue codes
+
+加進**同一個 `assess_readiness()` 純函式**，不新增 scope／version 欄位（ADR 0053 決定 7）。
+它的簽章會從 `(header)` 變成 `(header, duties, tasks)`。
+
+| issue code | 何時發聲 |
+|---|---|
+| `task_duty_missing` | 有 Task 未指派 Duty |
+| `task_competency_level_missing` | 有 Task 未填職能級別 |
+| `duty_without_task` | 有 Duty 底下沒有任何 Task |
+
+前兩者是官方產出完整性清單的必備內涵，可機械判定；第三者是版型上推不出
+`T{i}.{j}` 的空職責。**維持只提示不阻止**（ADR 0052 決定 5），措辭沿用
+「iCAP 版型欄位尚有 X 項未填」，不得用「不完整／不合格／未通過」。
+
+## 6. Task 切片（一個 task 一個 commit，綠了才 commit）
+
+### T1 — domain `Duty` 與 `JdTask` 兩個新欄位
+
+1. `domain/duty.py`：frozen `Duty`；`DutyId` 沿用 `Identifier`。
+2. `domain/proposal.py`：`JdTaskFields` 增 `competency_level`（`ge=1, le=6`），
+   `JdTask` 增 `duty_id`。
+3. `application/transition.py`：`JobAnalysisState` 增 `current_duties: tuple[Duty, ...]`；
+   驗證 duty ID 唯一、`display_order` 唯一且 canonical 排序、**Task 的 `duty_id` 必須指向存在的 Duty**
+   （指向不存在的 Duty 是不可表示的狀態）。
+4. `tests/test_job_analysis_duty_domain.py`：形狀、級別邊界、canonical 排序、
+   dangling `duty_id` 被拒、未指派（`None`）是合法狀態。
+
+完成條件：非法狀態無法被建構；`test_job_analysis_dependencies.py` AST guard 仍綠。
+
+### T2 — readiness 擴充
+
+1. `application/readiness.py`：簽章改 `(header, duties, tasks)`，新增三個 issue code，
+   輸出順序維持決定性（先 header 三項，再結構三項）。
+2. `tests/test_job_analysis_readiness.py`：各 issue 單獨觸發、全填時零 issue、
+   `DocumentReadiness.model_fields` 仍精確等於 `{"issues"}`、
+   **所屬類別仍不發聲**（owner 2026-08-05 已裁定非必填）。
+
+完成條件：仍不回 `is_complete`／百分比；仍不阻止任何操作。
+
+### T3 — persistence 與 migration 0016
+
+1. `alembic/versions/0016_job_analysis_jd_duties.py`：
+   - 新表 `job_analysis_jd_duties`（`document_id`、`duty_id`、`statement`、`display_order`、
+     時間欄；PK `(document_id, duty_id)`、`display_order` 文件內唯一）；
+   - `job_analysis_jd_tasks` 增 `duty_id`（nullable，FK 到上表，`ON DELETE SET NULL`）
+     與 `competency_level`（nullable，CHECK 1–6）。
+   - 既有列不回填任何 Duty——**不得自動合成假的 T1**。
+2. `application/persistence.py`：`DutyRepository` Protocol；`commit_authority_change()`
+   一併 replace duties。
+3. `adapters/job_analysis_postgres/{models,serialization,repositories}.py`：讀寫與 hydrate，
+   shape 壞掉 fail-closed。
+4. 八個 `JobAnalysisState(...)` 建構點全部帶 `current_duties`
+   （**與 T2 header 同一類風險：漏一個就會讓一次 AI 回合把 Duty 洗掉**）。
+5. 測試：往返、CAS、既有文件（無 Duty）照常載入、
+   **AI 回合與 proposal 決策不動 Duty**（比照 header 的 mutation check）。
+
+完成條件：真 PostgreSQL 測試綠；`ON DELETE SET NULL` 讓刪 Duty 不會孤兒化 Task。
+
+### T4 — authoring use cases
+
+1. `application/duty_authoring.py`：`add_duty`／`edit_duty`／`delete_duty`／`reorder_duties`，
+   以及 `assign_task_duty`（把 Task 指派到 Duty 或清空）與 Task 級別的既有 edit 路徑擴充。
+   全部走 document lock → entry replay → `commit_authority_change()`，不呼叫 LLM。
+2. 刪除 Duty 時，其底下 Task 的 `duty_id` 在**同一交易**設回 `None`，並保留 Task 本身
+   （Task 是員工權威內容，不因為職責重整而消失）。
+3. 測試：儲存、replay 同 key、conflict、未改內容拒絕、generation 遞增、
+   刪 Duty 後 Task 仍在且變成未指派、OPKS 的 O/P 不受影響（仍綁同一 `task_id`）。
+
+### T5 — contract 與 route
+
+1. schema 新增 `DutyView`／`DutyWrite`、`TaskDutyAssignmentWrite`；
+   `JdTaskView`／`JdTaskWrite` 增 `duty_id`／`competency_level`；
+   `DocumentView` 增 `duties`；`ReadinessIssueView` 的 `code` enum 補三個新值。
+2. codegen 用 Python 3.13（見 `CLAUDE.local.md` 的環境雷），產物轉回 LF。
+3. route：`POST/PUT/DELETE …/duties`、`PUT …/duty-order`、`PUT …/tasks/{id}/duty`，
+   全部要求 `Idempotency-Key`，錯誤走既有 problem+json。
+4. 測試：route 行為、缺 key、無效級別、readiness 隨結構變動。
+
+### T6 — Web 編輯
+
+1. `DutyEditor.tsx`：Duty 的新增／改名／排序／刪除；`TaskEditor` 增「所屬職責」下拉
+   （可清空）與「職能級別」1–6 下拉（可清空）。
+2. Current JD 依 Duty 分組呈現；**未指派 Task 集中在「尚未歸入主要職責」區**，
+   讓缺漏看得見而不是被藏起來（ADR 0052 決定 5：缺漏必須在成品上看得見）。
+3. 沿用明確儲存、無 autosave、dirty guard 併入 `ConsultationWorkspace`。
+4. **不顯示 `T1`／`T1.1`**：那是匯出版面位置碼，不是畫面上的 identity（ADR 0052 決定 10）。
+5. web 三件套＋`npm run build`。
+
+### T7 — 文檔同步（併在 T1–T6 各自 commit）
+
+`docs/design/task-analysis-engine.md` §2／§5／§8；`docs/README.md` 索引。
+
+## 7. 待決（開工前需 owner 一句話）
+
+1. **header 的「基準級別」要不要提示與 Task 級別不一致？**
+   官方（2022 指引 p49）說基準級別可由「最主要或最多數的工作任務」得出，但 ADR 0052 決定 12
+   已定它是**員工手選、LLM 不得推論**。本計畫**預設不自動推導、也不發不一致提示**（保守側）。
+   若 owner 要，最多做成 readiness 的一條提示，仍不自動填。
+2. **Duty 要不要有數量上限或建議數？** 官方只說「大小盡量一致」，沒有數字。
+   本計畫**不設限制**；若 owner 有實務偏好再加。
+
+兩題都不阻擋 T1–T4 施工。
+
+## 8. 驗證
+
+每個 task：targeted → 受影響 → AST guard → 完整 API 相較 baseline 只增加 pass → `git diff --check`。
+T5／T6 另跑 contract codegen 與 web 三件套。
+
+**不需要 live／付費呼叫**：本切片不動 wire schema、不動 Static Instructions、不動 packet
+（見 §4），因此沒有「會影響判斷的改動」。
+
+## 9. 停線條件
+
+- 自動合成 `T1` 或任何預設 Duty，讓既有文件憑空長出職責（ADR 0052 決定 13）；
+- 用 `ResponsibilityRole` 冒充主要職責（同上）；
+- 把 `T1`／`T1.1` 位置碼落庫或當成 identity（決定 10）；
+- 讓 LLM 產生 Duty 或推導職能級別／基準級別；
+- 為了 Duty 重做 OPKS identity 或讓 O/P 改綁 Duty（決定 13）；
+- readiness 出現 `is_complete`／百分比，或開始阻止保存／訪談／匯出；
+- 做到第三層「工作活動」，或提前實作匯出。

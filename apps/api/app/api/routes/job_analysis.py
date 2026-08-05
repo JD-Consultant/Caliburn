@@ -14,7 +14,6 @@ from job_analysis_contract import (
     EmployeeTurnWrite,
     JdTaskView,
     JdTaskWrite,
-    OpksGenerationView,
     OpksItemView,
     OpksItemWrite,
     OpksProposalDecisionWrite,
@@ -31,7 +30,6 @@ from app.api.job_analysis_mapper import (
     to_document_view,
     to_jd_task_fields,
     to_jd_task_view,
-    to_opks_generation_view,
     to_opks_item_view,
     to_opks_proposal_decision,
     to_opks_write,
@@ -48,8 +46,6 @@ from app.api.job_analysis_problems import (
 )
 from app.job_analysis.application import (
     JobAnalysisUnitOfWorkFactory,
-    OpksGenerationOutcome,
-    OpksGroundingUnavailable,
     TransitionCommitRejected,
     UncommittableOperationResult,
     add_jd_task,
@@ -58,7 +54,6 @@ from app.job_analysis.application import (
     delete_opks_item,
     edit_jd_task,
     edit_opks_item,
-    generate_opks_proposals,
     list_documents,
     load_document,
     decide_proposal,
@@ -199,41 +194,11 @@ async def post_employee_turn(
     return to_consultation_view(loaded)
 
 
-@router.post(
-    "/{document_id}/tasks/{task_id}/opks-proposals",
-    response_model=OpksGenerationView,
-)
-async def post_opks_generation(
-    document_id: UUID,
-    task_id: str,
-    idempotency_key: IdempotencyKey,
-    uow_factory: JobAnalysisUnitOfWorkFactory = Depends(
-        get_job_analysis_uow_factory
-    ),
-    adapter: OpenRouterAdapter = Depends(get_job_analysis_adapter),
-):
-    try:
-        result = await generate_opks_proposals(
-            uow_factory,
-            adapter=adapter,
-            document_id=document_id,
-            task_id=task_id,
-            operation_id=idempotency_key,
-        )
-    except (UncommittableOperationResult, OpksGroundingUnavailable) as error:
-        logger.warning(
-            "job-analysis OPKS generation was not committable: %s",
-            type(error).__name__,
-        )
-        return consultant_unavailable_response()
-    except JobAnalysisApplicationError as error:
-        return application_error_response(error)
-    if result.outcome is OpksGenerationOutcome.FAILED:
-        # terminal 失敗現在會寫一筆 `failed` receipt(ADR 0054 決定 29),但這個
-        # 手動端點對員工的既有契約仍是 503——receipt 是給排程用的,不是給人看的。
-        logger.warning("job-analysis OPKS generation failed for task %s", task_id)
-        return consultant_unavailable_response()
-    return to_opks_generation_view(result)
+# `POST /{document_id}/tasks/{task_id}/opks-proposals` 已退役(ADR 0054 決定 1)。
+#
+# **不得復活。** OPKS 的唯一 AI 入口是主回合排定的 child(`submit_employee_turn`);
+# 員工不需要理解 OPKS 階段的存在,也不該由他判斷哪個 Task 已經談夠、何時該按。
+# 員工手動新增／編輯／刪除 O/P/K/S 的端點保留——那不是 AI 入口。
 
 
 @router.post(

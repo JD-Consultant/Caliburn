@@ -16,7 +16,6 @@ import {
   deleteOpksItem,
   editTask,
   editOpksItem,
-  generateOpksProposals,
   getDocument,
   getConsultation,
   jobAnalysisProblemMessage,
@@ -170,15 +169,11 @@ describe("Current JD OPKS client", () => {
     indicator_refs: [],
   };
 
-  it("uses the explicit OPKS authoring, generation, and decision routes", async () => {
+  it("uses the explicit OPKS authoring and decision routes", async () => {
     const view = {
       ...item,
       entity_id: "knowledge-1",
       evidence_quotes: [],
-    };
-    const generation = {
-      outcome: "proposed",
-      proposal_ids: ["generation-1-op0"],
     };
     const consultation = {
       document: {
@@ -199,14 +194,12 @@ describe("Current JD OPKS client", () => {
       .mockResolvedValueOnce(response(view, 201))
       .mockResolvedValueOnce(response(view))
       .mockResolvedValueOnce(response(null, 204))
-      .mockResolvedValueOnce(response(generation))
       .mockResolvedValueOnce(response(consultation));
     vi.stubGlobal("fetch", fetchMock);
 
     await addOpksItem(DOCUMENT_ID, item, "opks-add");
     await editOpksItem(DOCUMENT_ID, "knowledge-1", item, "opks-edit");
     await deleteOpksItem(DOCUMENT_ID, "knowledge-1", "opks-delete");
-    await generateOpksProposals(DOCUMENT_ID, "task-1", "opks-generate");
     await decideOpksProposal(
       DOCUMENT_ID,
       "proposal-1",
@@ -218,15 +211,14 @@ describe("Current JD OPKS client", () => {
       ["POST", `http://127.0.0.1:8001/api/v1/job-analysis/documents/${DOCUMENT_ID}/opks`],
       ["PUT", `http://127.0.0.1:8001/api/v1/job-analysis/documents/${DOCUMENT_ID}/opks/knowledge-1`],
       ["DELETE", `http://127.0.0.1:8001/api/v1/job-analysis/documents/${DOCUMENT_ID}/opks/knowledge-1`],
-      ["POST", `http://127.0.0.1:8001/api/v1/job-analysis/documents/${DOCUMENT_ID}/tasks/task-1/opks-proposals`],
       ["POST", `http://127.0.0.1:8001/api/v1/job-analysis/documents/${DOCUMENT_ID}/opks-proposals/proposal-1/decisions`],
     ]);
     expect(fetchMock.mock.calls.map((call) => call[1].headers)).toEqual(
-      ["opks-add", "opks-edit", "opks-delete", "opks-generate", "opks-decide"].map(
+      ["opks-add", "opks-edit", "opks-delete", "opks-decide"].map(
         (key) => expect.objectContaining({ "Idempotency-Key": key }),
       ),
     );
-    expect(fetchMock.mock.calls[4][1].body).toBe(JSON.stringify(decision));
+    expect(fetchMock.mock.calls[3][1].body).toBe(JSON.stringify(decision));
   });
 });
 

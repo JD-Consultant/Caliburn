@@ -132,21 +132,6 @@ class OpksItemView(BaseModel):
     evidence_quotes: list[str]
 
 
-class Outcome(StrEnum):
-    proposed = 'proposed'
-    needs_clarification = 'needs_clarification'
-    no_change = 'no_change'
-    failed = 'failed'
-
-
-class OpksGenerationView(BaseModel):
-    model_config = ConfigDict(
-        extra='forbid',
-    )
-    outcome: Outcome
-    proposal_ids: list[str]
-
-
 class Action(StrEnum):
     add = 'add'
     revise = 'revise'

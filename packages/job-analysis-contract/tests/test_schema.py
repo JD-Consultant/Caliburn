@@ -13,7 +13,6 @@ from job_analysis_contract import (
     JdTaskWrite,
     OpksItemView,
     OpksItemWrite,
-    OpksGenerationView,
     OpksProposalDecisionWrite,
     OpksProposalView,
     ProblemDetail,
@@ -63,7 +62,6 @@ def test_schema_owns_only_the_workspace_wire_contract():
         "JdTaskView",
         "OpksItemView",
         "OpksItemWrite",
-        "OpksGenerationView",
         "OpksProposalDecisionWrite",
         "OpksProposalView",
         "ProblemDetail",
@@ -279,14 +277,3 @@ def test_generated_consultation_models_are_exported_from_the_package():
     assert OpksItemView.__name__ == "OpksItemView"
     assert OpksProposalView.__name__ == "OpksProposalView"
 
-
-def test_opks_generation_view_exposes_only_the_durable_product_result():
-    view = OpksGenerationView(
-        outcome="proposed",
-        proposal_ids=["opks-operation-1-op0"],
-    )
-
-    assert view.model_dump(mode="json") == {
-        "outcome": "proposed",
-        "proposal_ids": ["opks-operation-1-op0"],
-    }

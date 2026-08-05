@@ -41,7 +41,9 @@ OPKS_ITEM_SCHEMA_ID = "job-analysis-opks-item/1"
 OPKS_PROPOSAL_SCHEMA_ID = "job-analysis-opks-proposal/1"
 OPKS_DIRECT_EDIT_SCHEMA_ID = "job-analysis-opks-direct-edit/1"
 OPKS_PROPOSAL_DECISION_SCHEMA_ID = "job-analysis-opks-proposal-decision/1"
-OPKS_GENERATION_SCHEMA_ID = "job-analysis-opks-generation/1"
+# /2:`analysis_input_digest` 必填且 `outcome` 值域改變,舊 entry 讀不回來
+# (ADR 0054 決定 28)。依 owner 裁定不寫相容層、不搬舊資料。
+OPKS_GENERATION_SCHEMA_ID = "job-analysis-opks-generation/2"
 ACTIVE_QUESTION_SCHEMA_ID = "job-analysis-active-question/1"
 CONSULTANT_OPENING_SCHEMA_ID = "job-analysis-consultant-opening/1"
 COMPLETED_TURN_SCHEMA_ID = "job-analysis-completed-turn/1"
@@ -230,25 +232,58 @@ class OpksProposalDecisionPayload(DomainModel):
 
 
 class OpksGenerationOutcome(StrEnum):
+    """一次 OPKS 分析的終端結果(ADR 0054 決定 28–29)。
+
+    **四種全部是終端 receipt**,一律阻止相同 `analysis_input_digest` 自動重跑;
+    差別只在呈現與診斷,不在阻擋效果。digest 漂移是 abandon,**不寫 receipt**,
+    因此不在這個值域裡(決定 10)。
+    """
+
     PROPOSED = "proposed"
-    NO_GROUNDED_CANDIDATES = "no_grounded_candidates"
+    NEEDS_CLARIFICATION = "needs_clarification"
+    NO_CHANGE = "no_change"
+    FAILED = "failed"
 
 
 class OpksGenerationPayload(DomainModel):
     operation_id: Identifier
     selected_task_id: TaskId
+    analysis_input_digest: NonEmptyText
     outcome: OpksGenerationOutcome
     proposal_ids: tuple[Identifier, ...] = ()
+    gap_issue_ids: tuple[Identifier, ...] = ()
 
     @model_validator(mode="after")
-    def proposal_ids_match_outcome(self):
+    def payload_matches_outcome(self):
+        """決定 28 的一致性由 validator 寫死,不靠呼叫端自律。"""
+
+        if self.gap_issue_ids and (
+            self.outcome is not OpksGenerationOutcome.NEEDS_CLARIFICATION
+        ):
+            raise ValueError(
+                f"{self.outcome.value} OPKS generation must not carry gap issue ids; "
+                "gaps make the outcome needs_clarification"
+            )
         if self.outcome is OpksGenerationOutcome.PROPOSED:
             if not self.proposal_ids:
                 raise ValueError("proposed OPKS generation requires proposal ids")
+        elif self.outcome is OpksGenerationOutcome.NEEDS_CLARIFICATION:
+            if not self.gap_issue_ids:
+                raise ValueError(
+                    "needs_clarification OPKS generation requires gap issue ids"
+                )
+            # proposal_ids 刻意**不**限制:決定 18 的效力單位是 item,
+            # 有依據的候選照常提案,同時保留其他軸的缺口。
         elif self.proposal_ids:
-            raise ValueError("no-candidate OPKS generation must not carry proposal ids")
-        if len(set(self.proposal_ids)) != len(self.proposal_ids):
-            raise ValueError("OPKS generation proposal ids must be unique")
+            raise ValueError(
+                f"{self.outcome.value} OPKS generation must not carry proposal ids"
+            )
+        for label, values in (
+            ("proposal ids", self.proposal_ids),
+            ("gap issue ids", self.gap_issue_ids),
+        ):
+            if len(set(values)) != len(values):
+                raise ValueError(f"OPKS generation {label} must be unique")
         return self
 
 

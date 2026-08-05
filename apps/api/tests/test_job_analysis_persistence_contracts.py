@@ -15,6 +15,7 @@ from pydantic import ValidationError
 
 import app.job_analysis.application as application
 from app.job_analysis.application import (
+    OPKS_GENERATION_SCHEMA_ID,
     ActiveQuestion,
     CompletedTurnPayload,
     ConversationTurn,
@@ -24,6 +25,8 @@ from app.job_analysis.application import (
     JobAnalysisState,
     JobAnalysisUnitOfWork,
     JournalEntry,
+    OpksGenerationOutcome,
+    OpksGenerationPayload,
     OpksProposalRepository,
     OpksRepository,
     ProposalDecisionPayload,
@@ -318,6 +321,112 @@ def test_journal_kind_schema_and_payload_must_agree_and_round_trip():
                 **completed.model_dump(),
                 "payload_schema_id": "job-analysis-completed-turn/2",
             }
+        )
+
+
+# ── OPKS generation receipt(ADR 0054 決定 28–29)──────────────────────────────
+
+
+def opks_receipt(**overrides) -> OpksGenerationPayload:
+    return OpksGenerationPayload(
+        **{
+            "operation_id": "opks:auto:task-1:abc123",
+            "selected_task_id": "task-1",
+            "analysis_input_digest": "abc123",
+            "outcome": OpksGenerationOutcome.NO_CHANGE,
+            **overrides,
+        }
+    )
+
+
+def test_opks_generation_outcomes_are_the_four_terminal_receipts():
+    """決定 29:四種 outcome 全部是終端 receipt,一律阻止相同 digest 自動重跑。"""
+
+    assert {member.value for member in OpksGenerationOutcome} == {
+        "proposed",
+        "needs_clarification",
+        "no_change",
+        "failed",
+    }
+
+
+def test_needs_clarification_may_carry_proposals_alongside_gaps():
+    """決定 18／28:效力單位是 item,有 gap 不代表同軸或整個 Task 都扣住。"""
+
+    payload = opks_receipt(
+        outcome=OpksGenerationOutcome.NEEDS_CLARIFICATION,
+        proposal_ids=("op-1",),
+        gap_issue_ids=("op-1-gap0",),
+    )
+
+    assert payload.proposal_ids == ("op-1",)
+    assert payload.gap_issue_ids == ("op-1-gap0",)
+
+
+def test_needs_clarification_requires_at_least_one_gap():
+    with pytest.raises(ValidationError, match="gap issue ids"):
+        opks_receipt(
+            outcome=OpksGenerationOutcome.NEEDS_CLARIFICATION,
+            proposal_ids=("op-1",),
+        )
+
+
+def test_proposed_requires_proposals_and_forbids_gaps():
+    with pytest.raises(ValidationError, match="proposal ids"):
+        opks_receipt(outcome=OpksGenerationOutcome.PROPOSED)
+    with pytest.raises(ValidationError, match="needs_clarification"):
+        opks_receipt(
+            outcome=OpksGenerationOutcome.PROPOSED,
+            proposal_ids=("op-1",),
+            gap_issue_ids=("op-1-gap0",),
+        )
+
+
+@pytest.mark.parametrize(
+    "outcome",
+    [OpksGenerationOutcome.NO_CHANGE, OpksGenerationOutcome.FAILED],
+)
+def test_no_change_and_failed_carry_neither_proposals_nor_gaps(outcome):
+    assert opks_receipt(outcome=outcome).proposal_ids == ()
+    with pytest.raises(ValidationError, match="must not carry"):
+        opks_receipt(outcome=outcome, proposal_ids=("op-1",))
+    with pytest.raises(ValidationError, match="must not carry"):
+        opks_receipt(outcome=outcome, gap_issue_ids=("op-1-gap0",))
+
+
+def test_opks_generation_receipt_requires_the_analysis_input_digest():
+    """決定 28:digest 必填。這是 breaking 變更,schema id 因此升 /2。"""
+
+    with pytest.raises(ValidationError):
+        OpksGenerationPayload(
+            operation_id="opks:auto:task-1:abc123",
+            selected_task_id="task-1",
+            outcome=OpksGenerationOutcome.NO_CHANGE,
+        )
+
+
+def test_opks_generation_schema_id_is_v2():
+    """舊 journal entry 讀不回來,依 owner 裁定不寫相容層、不搬舊資料。"""
+
+    assert OPKS_GENERATION_SCHEMA_ID == "job-analysis-opks-generation/2"
+
+    entry = JournalEntry(
+        document_id=uuid4(),
+        entry_id="opks:auto:task-1:abc123",
+        kind="opks_generation",
+        payload_schema_id=OPKS_GENERATION_SCHEMA_ID,
+        payload=opks_receipt(),
+        created_at=NOW,
+    )
+
+    assert JournalEntry.model_validate(entry.model_dump()).payload == entry.payload
+
+
+def test_gap_issue_ids_must_be_unique():
+    with pytest.raises(ValidationError, match="unique"):
+        opks_receipt(
+            outcome=OpksGenerationOutcome.NEEDS_CLARIFICATION,
+            gap_issue_ids=("op-1-gap0", "op-1-gap0"),
         )
 
 

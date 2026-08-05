@@ -134,7 +134,9 @@ class OpksItemView(BaseModel):
 
 class Outcome(StrEnum):
     proposed = 'proposed'
-    no_grounded_candidates = 'no_grounded_candidates'
+    needs_clarification = 'needs_clarification'
+    no_change = 'no_change'
+    failed = 'failed'
 
 
 class OpksGenerationView(BaseModel):

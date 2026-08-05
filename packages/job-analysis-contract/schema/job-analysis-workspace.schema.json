@@ -163,7 +163,7 @@
       "properties": {
         "outcome": {
           "type": "string",
-          "enum": ["proposed", "no_grounded_candidates"]
+          "enum": ["proposed", "needs_clarification", "no_change", "failed"]
         },
         "proposal_ids": {
           "type": "array",

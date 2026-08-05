@@ -23,6 +23,7 @@ from .opks_context import (
     OpksGroundingUnavailable,
     build_opks_context_packet,
 )
+from .opks_digest import compute_analysis_input_digest
 from .opks_operation import OpksOperationResult, run_opks_operation
 from .persistence import (
     OPKS_GENERATION_SCHEMA_ID,
@@ -41,6 +42,7 @@ class OpksGenerationSnapshot:
     document_id: UUID
     authority_generation: int
     selected_task_id: str
+    analysis_input_digest: str
     state: JobAnalysisState
     packet: OpksContextPacket
 
@@ -150,6 +152,9 @@ async def prepare_opks_generation(
             document_id=document_id,
             authority_generation=record.authority_generation,
             selected_task_id=task_id,
+            analysis_input_digest=compute_analysis_input_digest(
+                _selected_task(state, task_id)
+            ),
             state=state,
             packet=_packet_for(state, task_id),
         )
@@ -223,11 +228,12 @@ async def commit_opks_generation(
         outcome = (
             OpksGenerationOutcome.PROPOSED
             if proposal_ids
-            else OpksGenerationOutcome.NO_GROUNDED_CANDIDATES
+            else OpksGenerationOutcome.NO_CHANGE
         )
         payload = OpksGenerationPayload(
             operation_id=operation_id,
             selected_task_id=snapshot.selected_task_id,
+            analysis_input_digest=snapshot.analysis_input_digest,
             outcome=outcome,
             proposal_ids=proposal_ids,
         )

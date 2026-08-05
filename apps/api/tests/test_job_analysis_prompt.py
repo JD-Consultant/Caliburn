@@ -1,7 +1,7 @@
 """T3:Static Instructions 的預算與**判準不得誤傷**。
 
 瘦身的風險不是刪太少,是刪到產品本身。所以這裡同時守兩件事:總量有上限,
-而五段顧問判準逐段位元組數必須一字不差。
+而六段顧問判準逐段位元組數必須一字不差。
 """
 
 from __future__ import annotations
@@ -14,10 +14,12 @@ from app.job_analysis.application.verifier import ViolationCode
 from app.job_analysis.llm import TASK_ANALYSIS_INSTRUCTIONS
 
 
-#: 5,090 實測 ＋ 少量修辭餘裕。再往下只能砍判準,那是砍產品。
-INSTRUCTIONS_BYTES_BUDGET = 5200
+#: 5,934 實測 ＋ 少量修辭餘裕。再往下只能砍判準,那是砍產品。
+#: 5,200 → 6,000:ADR 0054 決定 16 要求「K/S 不得問成認領題」只住主顧問 prompt 一處,
+#: 那段判準(844 bytes)沒有別的家可去。owner 於 2026-08-05 核准這次放寬。
+INSTRUCTIONS_BYTES_BUDGET = 6000
 
-#: 五段顧問判準的逐段位元組數。**這些數字改變就是判準被動到了。**
+#: 六段顧問判準的逐段位元組數。**這些數字改變就是判準被動到了。**
 #: 只有在確實要改判準文字時才更新,而且要在同一個 commit 說明改了什麼、為什麼。
 JUDGEMENT_SECTIONS = {
     "顧問訪談方式": 963,
@@ -25,6 +27,7 @@ JUDGEMENT_SECTIONS = {
     "Enabler 硬規則": 370,
     "Split 與 Merge(任一條成立就檢查,不是自動執行)": 834,
     "不成立的訊號怎麼放": 833,
+    "OPKS 缺口的追問": 844,
 }
 
 
@@ -117,3 +120,41 @@ def test_rules_guaranteed_elsewhere_are_not_restated(phrase: str, enforced_by):
 )
 def test_semantic_judgement_survives_the_slimming(rule: str):
     assert rule in TASK_ANALYSIS_INSTRUCTIONS
+
+
+# ── ADR 0054 決定 16:K/S 的問法只住這裡一處 ────────────────────────────────
+
+
+@pytest.mark.parametrize(
+    ("phrase", "authority"),
+    [
+        pytest.param(
+            "不得問「你需要什麼知識／技能」",
+            "ADR 0048 決定 14（Morgeson 的 ability-to 句式膨脹、OPM 明文禁止）",
+            id="no-ks-claim-question",
+        ),
+        pytest.param(
+            "你是否具備⋯⋯的能力",
+            "ADR 0048 決定 14",
+            id="no-ability-phrasing",
+        ),
+        pytest.param(
+            "還是你目前\n  剛好使用的工具或方法",
+            "ADR 0048 決定 17 的對比追問",
+            id="contrast-follow-up",
+        ),
+        pytest.param(
+            "`settled_issues`",
+            "ADR 0054 決定 20:已問過勿重問",
+            id="settled-memory",
+        ),
+    ],
+)
+def test_the_gap_questioning_rules_are_visible_to_the_model(phrase: str, authority):
+    """gap 本身不帶問句(決定 16),所以問法的權威只有這一份 prompt。
+
+    OPKS specialist 只寫「缺什麼」;問句在提問當下由主顧問生成。這讓 0048 決定 14
+    只需要維護一處,但也代表這裡刪掉就沒有第二道防線。
+    """
+
+    assert phrase in TASK_ANALYSIS_INSTRUCTIONS, f"required by {authority}"

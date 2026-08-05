@@ -21,7 +21,7 @@ OPKS_INSTRUCTIONS = """你是專業職務分析顧問。針對 packet 中唯一�
 - reuse_existing：只限 knowledge／skill，target_ordinal>0，text=""。
 - revise_existing：target_ordinal>0，text 填修正後的非空文字。
 - remove_existing：target_ordinal>0，text=""。
-- uncertain：target_ordinal=0，text 填缺口摘要（非空）。只寫這一軸還缺什麼依據，不要寫成問句，也不要寫成建議內容；追問由主顧問在對話中提出。同一軸最多一筆。
+- uncertain：target_ordinal=0，text 填缺口摘要（非空）。只寫這一軸還缺什麼依據，不要寫成問句，也不要寫成建議內容；追問由主顧問在對話中提出。同一軸缺好幾件不同的事就分開寫，但同一件事不要換句話說重複一次。
 - target_ordinal 只能使用同一 entity_kind 區段中的編號；不要輸出任何內部 ID。
 """
 

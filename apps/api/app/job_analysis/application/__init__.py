@@ -39,6 +39,7 @@ from .context import (
 )
 from .consultation import submit_employee_turn
 from .durable_turn import (
+    CommittedTurn,
     StaleAuthoritySnapshot,
     TransitionCommitRejected,
     TurnSnapshot,
@@ -68,7 +69,11 @@ from .opks_digest import (
     compute_analysis_input_digest,
     scheduled_opks_operation_id,
 )
-from .opks_scheduler import eligible_opks_candidates
+from .opks_scheduler import (
+    eligible_opks_candidates,
+    question_target_task_ids,
+    select_scheduled_opks,
+)
 from .opks_operation import OpksOperationResult, run_opks_operation
 from .opks_generation import (
     OpksGenerationResult,
@@ -157,6 +162,7 @@ __all__ = [
     "ACTIVE_QUESTION_SCHEMA_ID",
     "COMPLETED_TURN_SCHEMA_ID",
     "CONSULTANT_OPENING_SCHEMA_ID",
+    "CommittedTurn",
     "CompletedTurnPayload",
     "ConsultantOpeningPayload",
     "ConcurrentAuthorityChange",
@@ -250,7 +256,9 @@ __all__ = [
     "build_opks_context_packet",
     "compute_analysis_input_digest",
     "eligible_opks_candidates",
+    "question_target_task_ids",
     "scheduled_opks_operation_id",
+    "select_scheduled_opks",
     "create_document",
     "commit_verified_turn",
     "commit_opks_generation",

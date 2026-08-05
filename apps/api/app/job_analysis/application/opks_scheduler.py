@@ -19,6 +19,8 @@ readiness 放在純函式的同一條線。
 
 from __future__ import annotations
 
+from uuid import UUID
+
 from app.job_analysis.domain import (
     OpenIssue,
     OpksProposalStatus,
@@ -26,9 +28,20 @@ from app.job_analysis.domain import (
     TaskId,
     TaskState,
 )
+from app.job_analysis.llm import (
+    NextQuestionTargetKind,
+    TaskAnalysisResult,
+    TaskChangeKind,
+)
 
+from .context import TaskAnalysisPacket
 from .opks_context import proposal_references_task
-from .opks_digest import ScheduledOpks, compute_analysis_input_digest
+from .opks_digest import (
+    ScheduledOpks,
+    compute_analysis_input_digest,
+    scheduled_opks_operation_id,
+)
+from .persistence import JobAnalysisUnitOfWork
 from .transition import JobAnalysisState
 
 
@@ -99,6 +112,101 @@ def eligible_opks_candidates(
             )
         )
     return tuple(candidates)
+
+
+async def select_scheduled_opks(
+    uow: JobAnalysisUnitOfWork,
+    *,
+    document_id: UUID,
+    state: JobAnalysisState,
+    question_task_ids: frozenset[TaskId] = frozenset(),
+) -> ScheduledOpks | None:
+    """挑出這一輪要排定的唯一 child,或 `None`。
+
+    這是 pre-gate 的第二層:純函式給出排序好的候選,這裡對每個候選問
+    `journal.get()`「這個輸入分析過了嗎」。**四種 outcome 都是終端 receipt**
+    (決定 29),存在即跳過;abandon 不寫 receipt 所以不擋(決定 10)。
+    """
+
+    for candidate in eligible_opks_candidates(
+        state,
+        question_task_ids=question_task_ids,
+    ):
+        receipt = await uow.journal.get(
+            document_id,
+            scheduled_opks_operation_id(candidate),
+        )
+        if receipt is None:
+            return candidate
+    return None
+
+
+def question_target_task_ids(
+    *,
+    result: TaskAnalysisResult,
+    packet: TaskAnalysisPacket,
+    operation_id: str,
+) -> frozenset[TaskId]:
+    """本輪 `next_question` 問到了哪些 Task。
+
+    員工不該在同一輪同時被主顧問與 OPKS 問同一件事(決定 3 的最後一條)。兩種 target
+    都要解:`existing_open_issue` 走 packet ordinal 找回 issue 的 Task 指標;
+    `new_signal` 走該筆 signal 的 Task ordinal,**並算進本輪才鑄出來的 ID**——剛加進
+    Current JD 的 Task 當輪就可能 eligible,漏掉它就會問兩題。
+    """
+
+    target = result.next_question.target
+    if target is None:
+        return frozenset()
+
+    if target.kind is NextQuestionTargetKind.EXISTING_OPEN_ISSUE:
+        view = next(
+            (
+                candidate
+                for candidate in packet.current_authorities.open_issues
+                if candidate.ordinal == target.ordinal
+            ),
+            None,
+        )
+        if view is None:
+            return frozenset()
+        return frozenset(
+            task_id
+            for task_id in (
+                view.issue.subject_task_id,
+                view.issue.reconciliation_task_id,
+            )
+            if task_id is not None
+        )
+
+    if target.kind is not NextQuestionTargetKind.NEW_SIGNAL:
+        return frozenset()
+    index = target.index
+    if index is None or not 0 <= index < len(result.work_signals):
+        return frozenset()
+
+    signal = result.work_signals[index]
+    change = signal.task_change
+    if change is None:
+        return frozenset()
+
+    ids = {
+        view.task.task_id
+        for ordinal in change.target_task_ordinals
+        if (view := packet.task_view(ordinal)) is not None
+    }
+    # ID 配發規則住 `transition._Writer`;這裡照它推導,兩邊都由 operation_id + 位置
+    # 決定,所以不需要 transition 回報。
+    if change.change is TaskChangeKind.ADD:
+        ids.add(f"{operation_id}-t{index}")
+    elif change.change is TaskChangeKind.MERGE:
+        ids.add(f"{operation_id}-m{index}")
+    elif change.change is TaskChangeKind.SPLIT:
+        ids.update(
+            f"{operation_id}-s{index}-{position}"
+            for position in range(len(change.split_children))
+        )
+    return frozenset(ids)
 
 
 def _is_analysable(task: Task) -> bool:

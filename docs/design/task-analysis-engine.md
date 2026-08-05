@@ -90,7 +90,33 @@ OPKS 是另一個已接通 durable generation 的單 Task operation，不擴充�
    `commit_opks_generation()` 重鎖文件並比對 generation 與 packet read-set，最後才把 verified changes
    轉成 pending `OpksProposal`，和 generation receipt 一起經 `commit_authority_change()` 原子提交。
    同一 `Idempotency-Key` 重送不再呼叫 provider；零 change 也保存
-   `no_grounded_candidates` receipt。Provider failure、refusal、invalid 或 verifier rejected 都不改 Current JD。
+   `no_change` receipt。Provider failure、refusal、invalid 或 verifier rejected 都不改 Current JD。
+
+### 3.1 誰觸發 OPKS：主回合凍結的唯一 child（ADR 0054）
+
+**沒有「產生／重新分析 OPKS」按鈕，也沒有 background worker。** 員工不需要理解 OPKS 階段
+存在；哪個 Task 現在值得分析由 application 純函式決定，不交給模型 routing。
+
+- `eligible_opks_candidates(state, question_task_ids=…)`（`opks_scheduler.py`）是**純函式**：
+  Task 在 Current JD、Work Model Task 為 `ACTIVE`、有 ≥1 筆有效員工依據、沒有指向它的 **active**
+  issue（`OpenIssue.is_active`）、沒有它的 pending／deferred OPKS Proposal、本輪 `next_question`
+  沒問到它。依 Current JD `display_order` 排序回傳，每筆帶 `analysis_input_digest`。
+- **`purpose_result` 不是硬條件，也不得用引文數／字數／涵蓋度加強。** 前者因為工作產出可合法
+  缺省（ADR 0052 決定 15），後者是 0052 決定 6 禁止的完成百分比換皮。證據太薄時由 specialist
+  回全 `uncertain`，終端 receipt 讓浪費上限停在「每個輸入狀態一次呼叫」。
+- 「這個輸入分析過了嗎」由 `select_scheduled_opks()` 對每個候選問 `journal.get()` 回答——child
+  operation ID 是 `opks:auto:{task_id}:{digest}`，由 `scheduled_opks_operation_id()` 推導、**不另存**。
+  因此不需要新的 query port。
+- `commit_verified_turn()` 在同一交易內用 **post-transition** state 排定，寫進
+  `CompletedTurnPayload.scheduled_opks`（最多一筆）。**綁定在 receipt 寫入時凍結**：replay 一律
+  回傳既存 payload 那一筆，`_require_same_replay()` **刻意不比對** `scheduled_opks`。少了這一條，
+  replay 會重跑 scheduler 依當下 state 改選下一個 Task，同一個員工回合因此付兩次錢。
+- `analysis_input_digest`（`opks_digest.py`）只吃 Task：六個語意欄位 ＋
+  `Task.effective_employee_support_links`。**排除** `CurrentJdOpks`／`OpksProposal` 狀態（否則
+  接受 Proposal 就會 ping-pong）與 `rejection_reason`（REJECTED 強制帶 reason，進 digest 就是
+  付費 reject loop）。投影規則與 `build_opks_context_packet()` 共用同一個 domain property，
+  兩邊各寫一份遲早失步。canonical JSON + SHA-256，**不得改用內建 `hash()`**（PYTHONHASHSEED
+  隨機化會讓重開後同一輸入付兩次錢）。
 
 `TaskFields` 舊的兩個 OPKS hint 已退役；正式 O/P 的唯一資料來源是 `CurrentJdOpks`，不留第二份真相。
 

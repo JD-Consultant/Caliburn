@@ -363,3 +363,114 @@ def test_candidates_are_ordered_by_current_jd_display_order():
     )
 
     assert task_ids(eligible_opks_candidates(subject)) == ("task-b", "task-a")
+
+
+# ── 本輪已被問到的 Task(決定 3 的最後一條)──────────────────────────────────
+
+
+def packet_for(*tasks: Task, open_issues: tuple[OpenIssue, ...] = ()):
+    from app.job_analysis.application import ConversationTurn, TurnSpeaker, build_context_packet
+
+    return build_context_packet(
+        transcript=(
+            ConversationTurn(
+                turn_id="turn-1",
+                speaker=TurnSpeaker.CONSULTANT,
+                text="可以說說你的一週嗎？",
+            ),
+            ConversationTurn(
+                turn_id="turn-2",
+                speaker=TurnSpeaker.EMPLOYEE,
+                text="我每週彙整營運週報",
+            ),
+        ),
+        current_turn_id="turn-2",
+        work_model=CurrentWorkModel(tasks=tasks, open_issues=open_issues),
+    )
+
+
+def result_with_target(target):
+    from app.job_analysis.llm import NextQuestion, TaskAnalysisResult
+
+    return TaskAnalysisResult(
+        work_signals=(),
+        next_question=NextQuestion(text="這份週報交給誰？", target=target),
+    )
+
+
+def test_no_question_target_blocks_nothing():
+    from app.job_analysis.application import question_target_task_ids
+
+    assert question_target_task_ids(
+        result=result_with_target(None),
+        packet=packet_for(work_task()),
+        operation_id="operation-1",
+    ) == frozenset()
+
+
+def test_a_question_about_an_open_issue_blocks_its_subject_task():
+    from app.job_analysis.application import question_target_task_ids
+    from app.job_analysis.llm import NextQuestionTarget, NextQuestionTargetKind
+
+    gap = issue(subject_task_id="task-1", opks_axis=OpksGapAxis.OUTPUT)
+
+    assert question_target_task_ids(
+        result=result_with_target(
+            NextQuestionTarget(
+                kind=NextQuestionTargetKind.EXISTING_OPEN_ISSUE,
+                ordinal=1,
+            )
+        ),
+        packet=packet_for(work_task(), open_issues=(gap,)),
+        operation_id="operation-1",
+    ) == frozenset({"task-1"})
+
+
+def test_a_question_about_a_new_task_blocks_the_id_that_turn_will_mint():
+    """剛加進 Current JD 的 Task 當輪就可能 eligible;漏掉它就會問兩題。"""
+
+    from app.job_analysis.application import question_target_task_ids
+    from app.job_analysis.llm import (
+        IdentityAssessment,
+        IdentityRelation,
+        NextQuestion,
+        NextQuestionTarget,
+        NextQuestionTargetKind,
+        SignalAnchor,
+        SignalDisposition,
+        TaskAnalysisResult,
+        TaskChangeKind,
+        TaskChangePayload,
+        WorkSignal,
+    )
+
+    result = TaskAnalysisResult(
+        work_signals=(
+            WorkSignal(
+                anchors=(SignalAnchor(turn_ordinal=2, quote="我每週彙整營運週報"),),
+                identity=IdentityAssessment(relation=IdentityRelation.NO_MATCH),
+                disposition=SignalDisposition.TASK_CHANGE,
+                task_change=TaskChangePayload(
+                    change=TaskChangeKind.ADD,
+                    task_fields={
+                        "statement": "每週彙整營運週報",
+                        "action": "彙整",
+                        "object": "營運週報",
+                    },
+                ),
+            ),
+        ),
+        next_question=NextQuestion(
+            text="這份週報交給誰？",
+            target=NextQuestionTarget(
+                kind=NextQuestionTargetKind.NEW_SIGNAL,
+                index=0,
+            ),
+        ),
+    )
+
+    assert question_target_task_ids(
+        result=result,
+        packet=packet_for(work_task()),
+        operation_id="operation-1",
+    ) == frozenset({"operation-1-t0"})

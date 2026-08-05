@@ -1,5 +1,6 @@
 "use client";
 
+import type { JdTaskView } from "@caliburn/job-analysis-contract";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowDown, ArrowLeft, ArrowUp, Pencil, Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -20,6 +21,11 @@ import {
   type TaskFormValue,
   toTaskWrite,
 } from "@/lib/jobAnalysisForm";
+import {
+  competencyLevelLabel,
+  groupTasksByDuty,
+  UNASSIGNED_GROUP_LABEL,
+} from "@/lib/jobAnalysisDuties";
 import {
   documentQueryOptions,
   jobAnalysisInvalidationKeys,
@@ -181,6 +187,114 @@ export function TaskEditor({
 
   const busy =
     saveMutation.isPending || deleteMutation.isPending || reorderMutation.isPending;
+  const groups = groupTasksByDuty(document.data.duties, document.data.tasks);
+  const taskIndex = new Map(
+    document.data.tasks.map((task, index) => [task.task_id, index]),
+  );
+
+  const renderTaskCard = (task: JdTaskView, index: number) => (
+    <Card key={task.task_id} className="p-5">
+      {editingTaskId === task.task_id && draft ? (
+        <TaskForm
+          value={draft}
+          duties={document.data.duties}
+          onChange={setDraft}
+          onSave={save}
+          onCancel={cancel}
+          isSaving={saveMutation.isPending}
+          canSave={dirty}
+          error={saveMutation.isError ? errorText(saveMutation.error) : undefined}
+        />
+      ) : (
+        <div className="space-y-4">
+          <div className="flex items-start gap-3">
+            <div className="min-w-0 flex-1">
+              <h2 className="text-base font-semibold">{task.statement}</h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {task.purpose_result ?? "目的／結果尚未填寫"}
+              </p>
+            </div>
+            <div className="flex gap-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label="上移"
+                disabled={busy || index === 0 || editingTaskId !== null}
+                onClick={() => move(index, -1)}
+              >
+                <ArrowUp />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label="下移"
+                disabled={
+                  busy ||
+                  index === document.data.tasks.length - 1 ||
+                  editingTaskId !== null
+                }
+                onClick={() => move(index, 1)}
+              >
+                <ArrowDown />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label="編輯工作"
+                disabled={busy || editingTaskId !== null}
+                onClick={() => startEdit(task.task_id)}
+              >
+                <Pencil />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label="刪除工作"
+                disabled={busy || editingTaskId !== null}
+                onClick={() => remove(task.task_id)}
+              >
+                <Trash2 />
+              </Button>
+            </div>
+          </div>
+          <dl className="grid gap-3 text-sm sm:grid-cols-4">
+            <div>
+              <dt className="text-xs text-muted-foreground">職能級別</dt>
+              <dd>{competencyLevelLabel(task.competency_level)}</dd>
+            </div>
+            <div>
+              <dt className="text-xs text-muted-foreground">情境／條件</dt>
+              <dd>{task.context ?? "尚未填寫"}</dd>
+            </div>
+            <div>
+              <dt className="text-xs text-muted-foreground">頻率</dt>
+              <dd>{task.frequency_text ?? "尚未填寫"}</dd>
+            </div>
+            <div>
+              <dt className="text-xs text-muted-foreground">責任角色</dt>
+              <dd>
+                {task.responsibility_role === "primary"
+                  ? "主要負責"
+                  : task.responsibility_role === "shared"
+                    ? "共同負責"
+                    : task.responsibility_role === "assist"
+                      ? "協助"
+                      : "尚未填寫"}
+              </dd>
+            </div>
+          </dl>
+          <div className="text-sm">
+            <p className="text-xs text-muted-foreground">工具／方法／知識／技能</p>
+            <p>
+              {task.enablers.length
+                ? task.enablers.map((item) => item.name).join("、")
+                : "尚未填寫"}
+            </p>
+          </div>
+        </div>
+      )}
+    </Card>
+  );
 
   return (
     <div className={embedded ? "" : "min-h-screen bg-muted/30"}>
@@ -227,6 +341,7 @@ export function TaskEditor({
             <h2 className="text-base font-semibold">新增工作</h2>
             <TaskForm
               value={draft}
+              duties={document.data.duties}
               onChange={setDraft}
               onSave={save}
               onCancel={cancel}
@@ -246,103 +361,25 @@ export function TaskEditor({
           </div>
         ) : null}
 
-        {document.data.tasks.map((task, index) => (
-          <Card key={task.task_id} className="p-5">
-            {editingTaskId === task.task_id && draft ? (
-              <TaskForm
-                value={draft}
-                onChange={setDraft}
-                onSave={save}
-                onCancel={cancel}
-                isSaving={saveMutation.isPending}
-                canSave={dirty}
-                error={saveMutation.isError ? errorText(saveMutation.error) : undefined}
-              />
-            ) : (
-              <div className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <div className="min-w-0 flex-1">
-                    <h2 className="text-base font-semibold">{task.statement}</h2>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      {task.purpose_result ?? "目的／結果尚未填寫"}
-                    </p>
-                  </div>
-                  <div className="flex gap-1">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      aria-label="上移"
-                      disabled={busy || index === 0 || editingTaskId !== null}
-                      onClick={() => move(index, -1)}
-                    >
-                      <ArrowUp />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      aria-label="下移"
-                      disabled={
-                        busy ||
-                        index === document.data.tasks.length - 1 ||
-                        editingTaskId !== null
-                      }
-                      onClick={() => move(index, 1)}
-                    >
-                      <ArrowDown />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      aria-label="編輯工作"
-                      disabled={busy || editingTaskId !== null}
-                      onClick={() => startEdit(task.task_id)}
-                    >
-                      <Pencil />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      aria-label="刪除工作"
-                      disabled={busy || editingTaskId !== null}
-                      onClick={() => remove(task.task_id)}
-                    >
-                      <Trash2 />
-                    </Button>
-                  </div>
-                </div>
-                <dl className="grid gap-3 text-sm sm:grid-cols-3">
-                  <div>
-                    <dt className="text-xs text-muted-foreground">情境／條件</dt>
-                    <dd>{task.context ?? "尚未填寫"}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-xs text-muted-foreground">頻率</dt>
-                    <dd>{task.frequency_text ?? "尚未填寫"}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-xs text-muted-foreground">責任角色</dt>
-                    <dd>
-                      {task.responsibility_role === "primary"
-                        ? "主要負責"
-                        : task.responsibility_role === "shared"
-                          ? "共同負責"
-                          : task.responsibility_role === "assist"
-                            ? "協助"
-                            : "尚未填寫"}
-                    </dd>
-                  </div>
-                </dl>
-                <div className="text-sm">
-                  <p className="text-xs text-muted-foreground">工具／方法／知識／技能</p>
-                  <p>
-                    {task.enablers.length
-                      ? task.enablers.map((item) => item.name).join("、")
-                      : "尚未填寫"}
-                  </p>
-                </div>
-              </div>
+        {groups.map((group) => (
+          <section
+            key={group.duty?.duty_id ?? UNASSIGNED_GROUP_LABEL}
+            className="space-y-3"
+          >
+            <div className="flex items-baseline gap-2 pt-2">
+              <h3 className="text-sm font-semibold">
+                {group.duty?.statement ?? UNASSIGNED_GROUP_LABEL}
+              </h3>
+              {group.tasks.length === 0 ? (
+                <span className="text-xs text-muted-foreground">
+                  這項職責底下還沒有工作任務
+                </span>
+              ) : null}
+            </div>
+            {group.tasks.map((task) =>
+              renderTaskCard(task, taskIndex.get(task.task_id) ?? 0),
             )}
-          </Card>
+          </section>
         ))}
 
         <div aria-live="polite" className="min-h-5 text-sm text-destructive">

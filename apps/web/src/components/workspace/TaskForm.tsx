@@ -1,12 +1,15 @@
 "use client";
 
+import type { DutyView } from "@caliburn/job-analysis-contract";
 import { Plus, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { TASK_COMPETENCY_LEVELS } from "@/lib/jobAnalysisDuties";
 import type { TaskFormValue } from "@/lib/jobAnalysisForm";
 
 interface TaskFormProps {
   value: TaskFormValue;
+  duties: readonly DutyView[];
   onChange: (value: TaskFormValue) => void;
   onSave: () => void;
   onCancel: () => void;
@@ -17,6 +20,7 @@ interface TaskFormProps {
 
 export function TaskForm({
   value,
+  duties,
   onChange,
   onSave,
   onCancel,
@@ -99,6 +103,49 @@ export function TaskForm({
             <option value="primary">主要負責</option>
             <option value="shared">共同負責</option>
             <option value="assist">協助</option>
+          </select>
+        </label>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <label className="block space-y-1.5">
+          <span className="text-sm font-medium">所屬主要職責</span>
+          <select
+            className="w-full rounded-lg border bg-background px-3 py-2 text-sm"
+            value={value.dutyId ?? ""}
+            onChange={(event) => set("dutyId", event.target.value || null)}
+          >
+            <option value="">尚未歸入主要職責</option>
+            {duties.map((duty) => (
+              <option key={duty.duty_id} value={duty.duty_id}>
+                {duty.statement}
+              </option>
+            ))}
+          </select>
+          {duties.length === 0 ? (
+            <span className="block text-xs text-muted-foreground">
+              先在上方新增主要職責，才能歸入。
+            </span>
+          ) : null}
+        </label>
+        <label className="block space-y-1.5">
+          <span className="text-sm font-medium">職能級別</span>
+          <select
+            className="w-full rounded-lg border bg-background px-3 py-2 text-sm"
+            value={value.competencyLevel === null ? "" : String(value.competencyLevel)}
+            onChange={(event) =>
+              set(
+                "competencyLevel",
+                event.target.value ? Number(event.target.value) : null,
+              )
+            }
+          >
+            <option value="">尚未填寫</option>
+            {TASK_COMPETENCY_LEVELS.map((level) => (
+              <option key={level} value={level}>
+                第 {level} 級
+              </option>
+            ))}
           </select>
         </label>
       </div>

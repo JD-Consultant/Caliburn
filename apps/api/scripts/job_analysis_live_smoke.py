@@ -64,8 +64,10 @@ from app.job_analysis.application import (  # noqa: E402
     JobAnalysisUnitOfWorkFactory,
     create_document,
     load_document,
+    put_jd_header,
     submit_employee_turn,
 )
+from app.job_analysis.domain import JdHeader  # noqa: E402
 from app.job_analysis.llm import (  # noqa: E402
     TASK_ANALYSIS_WIRE_SCHEMA_NAME,
     task_analysis_wire_provider_schema,
@@ -114,6 +116,16 @@ class SmokeTurn:
 
 # 場景在 run 之前就凍結(研究紀錄 §4.3)。**不在 live run 中臨場改題**:
 # 1 多工作＋工具;2 更正責任歸屬;3 途中新增工作。
+#: 刻意寫進一項員工全程沒有描述的責任(「資安事件處理」)。ADR 0053 決定 4 的風險就是
+#: 顧問把 header 的字當成員工做過的事;空 header 測不到這件事。
+SMOKE_JD_HEADER = JdHeader(
+    competency_name="系統維運工程師",
+    work_description=(
+        "維運門市營運系統與資料匯入流程，並負責資安事件的偵測與處理。"
+    ),
+    competency_level=4,
+)
+
 SMOKE_TURNS: tuple[SmokeTurn, ...] = (
     SmokeTurn(
         operation_id="live-smoke-turn-01",
@@ -374,6 +386,7 @@ async def run_live_smoke(
     output_dir: Path,
     budget: LiveSmokeBudget,
     document_id: UUID,
+    seed_jd_header: bool = False,
 ) -> SmokeRunSummary:
     """跑固定三回合。每回合只呼叫產品自己的 `submit_employee_turn()`。
 
@@ -395,6 +408,13 @@ async def run_live_smoke(
     _write(output_dir / "catalog.json", endpoint)
 
     await create_document(uow_factory, document_id=document_id, title=DOCUMENT_TITLE)
+    if seed_jd_header:
+        await put_jd_header(
+            uow_factory,
+            document_id=document_id,
+            entry_id="smoke-jd-header",
+            header=SMOKE_JD_HEADER,
+        )
 
     outcomes: list[str] = []
     eligible = 0
@@ -596,6 +616,7 @@ async def _run(args: argparse.Namespace) -> int:
             output_dir=output_dir,
             budget=budget,
             document_id=uuid4(),
+            seed_jd_header=args.seed_jd_header,
         )
 
     print(
@@ -626,6 +647,14 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--budget-usd", type=Decimal, default=DEFAULT_BUDGET_USD)
     parser.add_argument("--max-generation-calls", type=int, default=MAX_GENERATION_CALLS)
     parser.add_argument("--output-root", type=Path, default=DEFAULT_OUTPUT_ROOT)
+    parser.add_argument(
+        "--seed-jd-header",
+        action="store_true",
+        help=(
+            "先存一份 JD header 再開始訪談。空 header 測不到 ADR 0053 決定 4 的風險"
+            "(顧問把 header 寫的責任當成員工做過的事)。"
+        ),
+    )
     args = parser.parse_args(argv)
 
     # 上限只能往下調。命令列不收 API key、資料庫位址或模型——那些只從既有設定讀。

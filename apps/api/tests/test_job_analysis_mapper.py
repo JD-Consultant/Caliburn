@@ -25,10 +25,12 @@ from app.job_analysis.application import (
     TurnSpeaker,
 )
 from app.job_analysis.domain import (
+    JdHeader,
     CurrentWorkModel,
     EnablerKind,
     JdEntry,
     JdTask,
+    JdTaskFields,
     OpksEntityKind,
     OpksEvidenceLink,
     OpksItem,
@@ -58,6 +60,8 @@ def test_write_mapper_covers_and_normalizes_every_employee_editable_field():
                 {"kind": "tool_system", "name": " Excel "},
                 {"kind": "method", "name": " 交叉檢查 "},
             ],
+            "duty_id": " duty-1 ",
+            "competency_level": 4,
         }
     )
 
@@ -72,6 +76,18 @@ def test_write_mapper_covers_and_normalizes_every_employee_editable_field():
         (EnablerKind.TOOL_SYSTEM, "Excel"),
         (EnablerKind.METHOD, "交叉檢查"),
     ]
+    assert fields.duty_id == "duty-1"
+    assert fields.competency_level == 4
+
+
+def test_the_write_contract_and_the_domain_fields_stay_in_lockstep():
+    """`to_jd_task_fields()` 是逐欄手寫的,漏一欄就是員工存了卻沒生效。
+
+    兩邊欄位集合相同是這個切片才成立的性質（Duty 與職能級別刻意放進 `JdTaskFields`
+    而不另開 use case),把它鎖起來,下一個欄位就不可能只加在單邊。
+    """
+
+    assert set(JdTaskWrite.model_fields) == set(JdTaskFields.model_fields)
 
 
 def test_empty_responsibility_role_normalizes_to_none():
@@ -83,6 +99,8 @@ def test_empty_responsibility_role_normalizes_to_none():
             "frequency_text": None,
             "responsibility_role": "",
             "enablers": [],
+            "duty_id": None,
+            "competency_level": None,
         }
     )
 
@@ -221,6 +239,7 @@ def test_consultation_view_keeps_history_without_leaking_internal_authority():
         document=DocumentRecord(
             document_id=UUID("00000000-0000-0000-0000-000000000045"),
             title="門市營運專員",
+            jd_header=JdHeader(),
             work_model=CurrentWorkModel(tasks=(task,)),
             active_question=ActiveQuestion(turn_id="turn-3", text="週報交給誰？"),
             authority_generation=7,

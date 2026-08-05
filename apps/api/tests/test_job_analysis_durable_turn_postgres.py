@@ -24,6 +24,7 @@ from app.job_analysis.application import (
 )
 from app.job_analysis.domain import (
     CurrentWorkModel,
+    JdHeader,
     JdTask,
     JdTaskFields,
     OpksEntityKind,
@@ -365,6 +366,7 @@ async def test_verified_revise_persists_the_proposal_with_the_completed_turn(
         changed = await uow.documents.update_authority(
             document_id,
             expected_generation=record.authority_generation,
+            jd_header=JdHeader(),
             work_model=CurrentWorkModel(tasks=(analysed,)),
             active_question=None,
             updated_at=record.updated_at + timedelta(seconds=1),

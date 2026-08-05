@@ -890,3 +890,39 @@ def test_state_rejects_duplicate_jd_and_proposal_ids():
 def test_ids_are_namespaced_by_operation(operation_id):
     outcome = apply(signal(), operation_id=operation_id)
     assert outcome.immediate_task_ids == (f"{operation_id}-t0",)
+
+
+# ── AI 沒有 Duty／級別的權限（ADR 0052 決定 13）────────────────────────────
+
+
+def test_an_ai_revise_preserves_the_employee_duty_and_competency_level():
+    """AI 的 TaskFields 沒有這兩個欄位，但 revise 會重建整個 JdTask。
+
+    不從既有 Task 帶過來，一次回合就會把員工設的職責歸屬與級別靜默清空。
+    """
+
+    from app.job_analysis.domain import Duty
+
+    assigned = JdTask(
+        task_id="task-1",
+        statement="每週彙整營運週報",
+        display_order=0,
+        duty_id="duty-1",
+        competency_level=4,
+    )
+    before = JobAnalysisState(
+        work_model=CurrentWorkModel(
+            tasks=(task("task-1", "每週彙整營運週報"), task("task-2", "每週追蹤缺料"))
+        ),
+        current_duties=(
+            Duty(duty_id="duty-1", statement="維運門市系統", display_order=0),
+        ),
+        current_jd=(assigned,),
+    )
+
+    after = apply(change_signal(TaskChangeKind.REVISE, (1,)), current=before)
+
+    proposed = jd_map(after.state.proposals[0].jd_after)["task-1"]
+    assert proposed.statement == "合併後的工作"  # 文字確實被模型改了
+    assert proposed.duty_id == "duty-1"          # 但結構欄位原樣保留
+    assert proposed.competency_level == 4

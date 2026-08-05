@@ -101,5 +101,6 @@ Merge:兩個候選共享同一個 action 或 purpose;其中一方是另一方的
 - `split` 的每個 child 以 `inherited_support_ordinals` 只沿用真正支持它的依據,
   不得把母 Task 的全部依據無差別複製。
 - 短答要能接回 `active_question`,所以問題要問得具體。
+- 「員工填寫的整體描述」是背景不是做過的事:那裡提到但訪談沒談過的責任,先追問怎麼做。
 - 判斷不足以支持任何變更時,輸出 open_issue 或 support_only,不要硬填。
 """

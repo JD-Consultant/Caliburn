@@ -28,6 +28,8 @@ from app.job_analysis.domain import (
     ExcludedSignal,
     Identifier,
     JdEntry,
+    Duty,
+    JdHeader,
     JdTask,
     MergeTarget,
     NonEmptyText,
@@ -67,8 +69,14 @@ from .verifier import verify_task_analysis_result
 
 
 class JobAnalysisState(DomainModel):
-    """一名員工、一份職務說明書的目前狀態(§9.4 的兩層)。"""
+    """一名員工、一份職務說明書的目前狀態(§9.4 的兩層)。
 
+    `jd_header` 是 Current JD authority 的一部分(ADR 0053 決定 3):它與 Task／OPKS 走
+    同一條 `commit_authority_change` seam,不是 `DocumentMetadataWrite` 的 `title`。
+    """
+
+    jd_header: JdHeader = JdHeader()
+    current_duties: tuple[Duty, ...] = ()
     work_model: CurrentWorkModel = CurrentWorkModel()
     current_jd: tuple[JdTask, ...] = ()
     proposals: tuple[Proposal, ...] = ()
@@ -97,7 +105,37 @@ class JobAnalysisState(DomainModel):
         ]
         if len(set(opks_proposal_ids)) != len(opks_proposal_ids):
             raise ValueError("duplicate OPKS proposal ids")
+        self._validate_duties(jd_ids)
         return self
+
+    def _validate_duties(self, jd_ids: list[TaskId]) -> None:
+        """Duty 與 Task 的結構不變量。
+
+        未指派(`duty_id is None`)是**合法狀態**:既有文件的 Task 本來就沒有 Duty,而
+        ADR 0052 決定 13 明令不得自動合成假的 T1。缺的是 readiness 的事,不是型別的事。
+        但指向**不存在**的 Duty 是另一回事——那會讓匯出算不出 `T{i}.{j}`,所以不可表示。
+        """
+
+        duty_ids = [duty.duty_id for duty in self.current_duties]
+        if len(set(duty_ids)) != len(duty_ids):
+            raise ValueError("duplicate current JD duty ids")
+        expected = sorted(
+            self.current_duties, key=lambda duty: (duty.display_order, duty.duty_id)
+        )
+        if list(self.current_duties) != expected:
+            raise ValueError(
+                "current duties must be sorted by display order and duty id"
+            )
+        duty_orders = [duty.display_order for duty in self.current_duties]
+        if len(set(duty_orders)) != len(duty_orders):
+            raise ValueError("current JD duty display orders must be unique")
+        known = set(duty_ids)
+        for task in self.current_jd:
+            if task.duty_id is not None and task.duty_id not in known:
+                raise ValueError(
+                    f"current JD task {task.task_id!r} references unknown duty "
+                    f"{task.duty_id!r}"
+                )
 
     @property
     def current_jd_task_ids(self) -> frozenset[TaskId]:
@@ -784,6 +822,12 @@ class _Writer:
             responsibility_role=(
                 existing.responsibility_role if existing is not None else None
             ),
+            # AI 的 TaskFields 沒有這兩個欄位,模型填不了;但 revise 會重建整個 JdTask,
+            # 不從 existing 帶過來就等於一次回合把員工設的職責歸屬與級別清空。
+            duty_id=(existing.duty_id if existing is not None else None),
+            competency_level=(
+                existing.competency_level if existing is not None else None
+            ),
             enablers=fields.enablers,
             display_order=(
                 existing.display_order
@@ -914,6 +958,10 @@ class _Writer:
         return TransitionResult(
             outcome=TransitionOutcome.APPLIED,
             state=JobAnalysisState(
+                jd_header=self._state.jd_header,
+                # AI 對主要職責沒有權限,原樣帶過。漏了它,任何帶 duty_id 的 Current JD
+                # Task 都會變成 dangling reference,整筆 transition 被 state 驗證擋掉。
+                current_duties=self._state.current_duties,
                 work_model=work_model,
                 current_jd=self._state.current_jd,
                 proposals=tuple(self._proposals.values()),

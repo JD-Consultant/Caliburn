@@ -12,6 +12,7 @@ from typing import Annotated, Literal
 from pydantic import Field, model_validator
 
 from .base import DomainModel, Identifier, NonEmptyText, TaskId
+from .duty import DutyId
 from .sources import SupportLink
 from .task import Enabler, Retirement, RetirementKind, TaskFields
 
@@ -139,7 +140,15 @@ class ResponsibilityRole(StrEnum):
 
 
 class JdTaskFields(DomainModel):
-    """員工可見、可編輯的 Current JD Task 欄位。"""
+    """員工可見、可編輯的 Current JD Task 欄位。
+
+    `duty_id` 與 `competency_level` 都是**員工權威**：AI 的 `TaskFields` 沒有這兩個欄位，
+    所以模型結構上填不了；`_jd_task_from_fields()` 在 revise 時從既有 Task 原樣帶過，
+    漏帶就等於讓一次 AI 回合把員工的職責歸屬與級別洗掉。
+
+    `duty_id` 只保證是個 ID，**指向的 Duty 是否存在由 `JobAnalysisState` 驗**——
+    只有那一層同時看得到 duties 與 tasks。
+    """
 
     statement: NonEmptyText
     purpose_result: NonEmptyText | None = None
@@ -147,6 +156,8 @@ class JdTaskFields(DomainModel):
     frequency_text: NonEmptyText | None = None
     responsibility_role: ResponsibilityRole | None = None
     enablers: tuple[Enabler, ...] = ()
+    duty_id: DutyId | None = None
+    competency_level: int | None = Field(default=None, ge=1, le=6)
 
 
 class JdTask(JdTaskFields):
@@ -200,14 +211,15 @@ def validate_edited_jd_after(
             raise ValueError(
                 f"edited_jd_after must keep the null position of {task_id!r}"
             )
-        if (
-            content is not None
-            and edited[task_id] is not None
-            and content.display_order != edited[task_id].display_order
-        ):
-            raise ValueError(
-                f"edited_jd_after must keep the display_order of {task_id!r}"
-            )
+        if content is None or edited[task_id] is None:
+            continue
+        # `edited` 是文字修改,不是結構修改(§10.5)。位置、職責歸屬與職能級別各有自己的
+        # 明確入口,不得由「改提案文字」這條路夾帶進來。
+        for field in ("display_order", "duty_id", "competency_level"):
+            if getattr(content, field) != getattr(edited[task_id], field):
+                raise ValueError(
+                    f"edited_jd_after must keep the {field} of {task_id!r}"
+                )
 
 
 # ── staged Work Model delta(§10.4)──────────────────────────────────────────

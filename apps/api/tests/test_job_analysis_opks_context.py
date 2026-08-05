@@ -249,3 +249,49 @@ def test_packet_refuses_to_call_the_model_without_effective_employee_grounding()
             ),
             current_opks=CurrentJdOpks(),
         )
+
+
+# ── JD header 不得進 OPKS packet(ADR 0053 決定 4 末段)──────────────────────
+
+
+def test_the_jd_header_cannot_reach_the_opks_packet_at_all():
+    """工作描述若進 OPKS,就會繞過 0048／0049 的 Evidence 白名單去支撐 K/S。
+
+    這裡守的不是「有沒有過濾掉」,而是**連傳都傳不進來**:builder 沒有 header 參數,
+    OPKS 的 Evidence 只收 employee_turn／direct_edit 兩種 SourceKind。
+    """
+
+    import inspect
+
+    signature = inspect.signature(build_opks_context_packet)
+
+    assert set(signature.parameters) == {
+        "selected_task",
+        "current_opks",
+        "proposals",
+    }
+    assert not {
+        name
+        for name in signature.parameters
+        if "header" in name or "overview" in name
+    }
+
+
+def test_the_opks_packet_shape_has_no_header_or_overview_field():
+    packet = build_opks_context_packet(
+        selected_task=task(
+            SupportLink(
+                source_ref=source(SourceKind.EMPLOYEE_TURN, "turn-1"),
+                quote="我每週彙整營運週報",
+            )
+        ),
+        current_opks=CurrentJdOpks(),
+    )
+
+    fields = set(type(packet).model_fields)
+    assert not {
+        name for name in fields if "header" in name or "overview" in name
+    }
+    assert not {
+        name for name in fields if "competency" in name or "description" in name
+    }

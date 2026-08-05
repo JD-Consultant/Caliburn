@@ -17,6 +17,7 @@ from app.job_analysis.application import (
 )
 from app.job_analysis.application.authority_commit import commit_authority_change
 from app.job_analysis.domain import (
+    JdHeader,
     CurrentJdOpks,
     CurrentWorkModel,
     JdTask,
@@ -134,12 +135,24 @@ class _Journal:
         self.writes.append("add_journal")
 
 
+class _Duties:
+    def __init__(self, writes: list[str]) -> None:
+        self.writes = writes
+
+    async def list(self, document_id: UUID):
+        return ()
+
+    async def replace(self, document_id: UUID, duties) -> None:
+        self.writes.append("replace_duties")
+
+
 class _UnitOfWork:
     def __init__(self) -> None:
         self.writes: list[str] = []
         record = DocumentRecord(
             document_id=DOCUMENT_ID,
             title="門市營運專員",
+            jd_header=JdHeader(),
             work_model=CurrentWorkModel(),
             active_question=None,
             authority_generation=0,
@@ -147,6 +160,7 @@ class _UnitOfWork:
             updated_at=NOW,
         )
         self.documents = _Documents(record, self.writes)
+        self.duties = _Duties(self.writes)
         self.tasks = _Tasks(self.writes)
         self.proposals = _Proposals(self.writes)
         self.opks = _Opks(self.writes)
@@ -265,7 +279,9 @@ async def test_authority_commit_writes_opks_in_the_same_transaction():
 
     assert uow.opks.values == (item,)
     assert uow.opks_proposals.values == (proposal,)
+    # duties 先於 tasks:Task 帶著 duty_id，先寫父層比較好讀。
     assert uow.writes == [
+        "replace_duties",
         "replace_tasks",
         "replace_proposals",
         "replace_opks",

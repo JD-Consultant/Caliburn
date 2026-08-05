@@ -54,6 +54,7 @@ DOCUMENT_ID = UUID("00000000-0000-0000-0000-000000000045")
 class _Store:
     def __init__(self) -> None:
         self.document: DocumentRecord | None = None
+        self.duties = ()
         self.tasks: tuple[JdTask, ...] = ()
         self.proposals = ()
         self.opks = ()
@@ -105,6 +106,7 @@ class _Documents:
         document_id: UUID,
         *,
         expected_generation: int,
+        jd_header,
         work_model,
         active_question,
         updated_at: datetime,
@@ -118,12 +120,24 @@ class _Documents:
             return False
         self.store.document = replace(
             record,
+            jd_header=jd_header,
             work_model=work_model,
             active_question=active_question,
             authority_generation=expected_generation + 1,
             updated_at=updated_at,
         )
         return True
+
+
+class _Duties:
+    def __init__(self, store: _Store) -> None:
+        self.store = store
+
+    async def list(self, document_id: UUID):
+        return self.store.duties
+
+    async def replace(self, document_id: UUID, duties) -> None:
+        self.store.duties = duties
 
 
 class _Tasks:
@@ -196,6 +210,7 @@ class _Journal:
 class _UnitOfWork:
     def __init__(self, store: _Store) -> None:
         self.documents = _Documents(store)
+        self.duties = _Duties(store)
         self.tasks = _Tasks(store)
         self.proposals = _Proposals(store)
         self.opks = _Opks(store)
@@ -368,9 +383,13 @@ async def test_list_and_open_return_only_the_current_jd_projection(api_client):
         "document_id",
         "title",
         "updated_at",
+        "jd_header",
+        "readiness",
+        "duties",
         "tasks",
         "opks_items",
     }
+    assert opened.json()["duties"] == []
     assert opened.json()["tasks"][0]["statement"] == "每週彙整營運週報"
     assert opened.json()["opks_items"] == []
     forbidden = {"authority_generation", "work_model", "journal", "proposals"}
@@ -429,6 +448,8 @@ def _task_payload(statement: str = " 每週彙整營運週報 "):
         "frequency_text": " 每週一次 ",
         "responsibility_role": "primary",
         "enablers": [{"kind": "tool_system", "name": " Excel "}],
+        "duty_id": None,
+        "competency_level": None,
     }
 
 

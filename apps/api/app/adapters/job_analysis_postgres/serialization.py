@@ -11,6 +11,7 @@ from app.job_analysis.application import (
     COMPLETED_TURN_SCHEMA_ID,
     CONSULTANT_OPENING_SCHEMA_ID,
     DIRECT_EDIT_SCHEMA_ID,
+    DUTY_DIRECT_EDIT_SCHEMA_ID,
     OPKS_ITEM_SCHEMA_ID,
     OPKS_DIRECT_EDIT_SCHEMA_ID,
     OPKS_PROPOSAL_DECISION_SCHEMA_ID,
@@ -18,11 +19,15 @@ from app.job_analysis.application import (
     OPKS_PROPOSAL_SCHEMA_ID,
     PROPOSAL_DECISION_SCHEMA_ID,
     PROPOSAL_SCHEMA_ID,
+    JD_HEADER_DIRECT_EDIT_SCHEMA_ID,
+    JD_HEADER_SCHEMA_ID,
     WORK_MODEL_SCHEMA_ID,
     ActiveQuestion,
     CompletedTurnPayload,
     ConsultantOpeningPayload,
     DirectEditPayload,
+    DutyDirectEditPayload,
+    JdHeaderDirectEditPayload,
     DocumentRecord,
     JournalEntry,
     OpksDirectEditPayload,
@@ -32,6 +37,8 @@ from app.job_analysis.application import (
 )
 from app.job_analysis.domain import (
     CurrentWorkModel,
+    Duty,
+    JdHeader,
     JdTask,
     OpksItem,
     OpksProposal,
@@ -63,6 +70,19 @@ def load_work_model(*, schema_id: str, payload: object) -> CurrentWorkModel:
         _fail("Work Model", exc, exc)
 
 
+def dump_jd_header(value: JdHeader) -> dict[str, Any]:
+    return value.model_dump(mode="json")
+
+
+def load_jd_header(*, schema_id: str, payload: object) -> JdHeader:
+    if schema_id != JD_HEADER_SCHEMA_ID:
+        _fail("jd header schema", schema_id)
+    try:
+        return JdHeader.model_validate(payload)
+    except (ValidationError, TypeError, ValueError) as exc:
+        _fail("JD Header", exc, exc)
+
+
 def dump_active_question(value: ActiveQuestion | None) -> dict[str, Any] | None:
     if value is None:
         return None
@@ -89,6 +109,10 @@ def load_document(row: Any) -> DocumentRecord:
     return DocumentRecord(
         document_id=row.document_id,
         title=row.title,
+        jd_header=load_jd_header(
+            schema_id=row.jd_header_schema_id,
+            payload=row.jd_header_json,
+        ),
         work_model=load_work_model(
             schema_id=row.work_model_schema_id,
             payload=row.work_model_json,
@@ -104,6 +128,19 @@ def dump_jd_task_enablers(task: JdTask) -> list[dict[str, Any]]:
     return [enabler.model_dump(mode="json") for enabler in task.enablers]
 
 
+def load_jd_duty(row: Any) -> Duty:
+    try:
+        return Duty.model_validate(
+            {
+                "duty_id": row.duty_id,
+                "statement": row.statement,
+                "display_order": row.display_order,
+            }
+        )
+    except (ValidationError, TypeError, ValueError) as exc:
+        _fail("JD Duty", exc, exc)
+
+
 def load_jd_task(row: Any) -> JdTask:
     try:
         return JdTask.model_validate(
@@ -116,6 +153,8 @@ def load_jd_task(row: Any) -> JdTask:
                 "responsibility_role": row.responsibility_role,
                 "enablers": row.enablers_json,
                 "display_order": row.display_order,
+                "duty_id": row.duty_id,
+                "competency_level": row.competency_level,
             }
         )
     except (ValidationError, TypeError, ValueError) as exc:
@@ -238,6 +277,8 @@ _JOURNAL_PAYLOAD_TYPES = {
     CONSULTANT_OPENING_SCHEMA_ID: ConsultantOpeningPayload,
     COMPLETED_TURN_SCHEMA_ID: CompletedTurnPayload,
     DIRECT_EDIT_SCHEMA_ID: DirectEditPayload,
+    DUTY_DIRECT_EDIT_SCHEMA_ID: DutyDirectEditPayload,
+    JD_HEADER_DIRECT_EDIT_SCHEMA_ID: JdHeaderDirectEditPayload,
     OPKS_DIRECT_EDIT_SCHEMA_ID: OpksDirectEditPayload,
     OPKS_PROPOSAL_DECISION_SCHEMA_ID: OpksProposalDecisionPayload,
     OPKS_GENERATION_SCHEMA_ID: OpksGenerationPayload,

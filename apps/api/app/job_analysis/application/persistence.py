@@ -19,7 +19,10 @@ from pydantic import model_validator
 from app.job_analysis.domain import (
     CurrentWorkModel,
     DomainModel,
+    Duty,
+    DutyId,
     Identifier,
+    JdHeader,
     JdTask,
     NonEmptyText,
     OpksItem,
@@ -36,6 +39,9 @@ from .verifier import TurnSpeaker
 
 
 WORK_MODEL_SCHEMA_ID = "job-analysis-work-model/1"
+JD_HEADER_SCHEMA_ID = "job-analysis-jd-header/1"
+JD_HEADER_DIRECT_EDIT_SCHEMA_ID = "job-analysis-jd-header-direct-edit/1"
+DUTY_DIRECT_EDIT_SCHEMA_ID = "job-analysis-duty-direct-edit/1"
 PROPOSAL_SCHEMA_ID = "job-analysis-proposal/1"
 OPKS_ITEM_SCHEMA_ID = "job-analysis-opks-item/1"
 OPKS_PROPOSAL_SCHEMA_ID = "job-analysis-opks-proposal/1"
@@ -53,6 +59,7 @@ PROPOSAL_DECISION_SCHEMA_ID = "job-analysis-proposal-decision/1"
 class DocumentRecord:
     document_id: UUID
     title: str
+    jd_header: JdHeader
     work_model: CurrentWorkModel
     active_question: ActiveQuestion | None
     authority_generation: int
@@ -112,6 +119,65 @@ class ConsultantOpeningPayload(DomainModel):
 
 
 DirectEditKind = Literal["add", "edit", "delete", "reorder"]
+
+
+class JdHeaderDirectEditPayload(DomainModel):
+    """表頭直接編輯的前後快照；未改內容不得寫 Journal 也不得 bump generation。"""
+
+    before: JdHeader
+    after: JdHeader
+
+    @model_validator(mode="after")
+    def the_edit_must_change_something(self):
+        if self.before == self.after:
+            raise ValueError("a jd header direct edit must change the header")
+        return self
+
+
+
+class DutyDirectEditPayload(DomainModel):
+    """主要職責的直接編輯。刪除會影響底下 Task，所以那些 `task_id` 也記進 Journal。
+
+    `unassigned_task_ids` 不是給 replay 用的（replay 比對的是 `duty_id`），而是
+    provenance：刪掉一條職責是唯一會改到別的列的操作，日後回頭看 Journal 必須能答出
+    「那次刪除把哪幾條 Task 變成未指派」，不必去 diff 兩個 snapshot。
+    """
+
+    edit_kind: DirectEditKind
+    duty_id: DutyId | None = None
+    after: Duty | None = None
+    ordered_duty_ids: tuple[DutyId, ...] = ()
+    unassigned_task_ids: tuple[TaskId, ...] = ()
+
+    @model_validator(mode="after")
+    def completed_value_matches_the_edit(self):
+        if self.edit_kind != "delete" and self.unassigned_task_ids:
+            raise ValueError(
+                f"{self.edit_kind} must not carry unassigned_task_ids"
+            )
+        if len(set(self.unassigned_task_ids)) != len(self.unassigned_task_ids):
+            raise ValueError("unassigned task ids must be distinct")
+        if self.edit_kind == "reorder":
+            if self.duty_id is not None or self.after is not None:
+                raise ValueError("reorder must not carry one duty or completed value")
+            if not self.ordered_duty_ids:
+                raise ValueError("reorder requires ordered_duty_ids")
+            if len(set(self.ordered_duty_ids)) != len(self.ordered_duty_ids):
+                raise ValueError("reorder duty ids must be distinct")
+            return self
+        if self.duty_id is None:
+            raise ValueError(f"{self.edit_kind} requires a duty id")
+        if self.ordered_duty_ids:
+            raise ValueError(f"{self.edit_kind} must not carry ordered_duty_ids")
+        if self.edit_kind == "delete":
+            if self.after is not None:
+                raise ValueError("delete direct edit must have a null completed duty")
+            return self
+        if self.after is None:
+            raise ValueError(f"{self.edit_kind} requires the completed duty")
+        if self.after.duty_id != self.duty_id:
+            raise ValueError("direct edit duty id must match its completed duty")
+        return self
 
 
 class DirectEditPayload(DomainModel):
@@ -263,6 +329,8 @@ JournalPayload = (
     ConsultantOpeningPayload
     | CompletedTurnPayload
     | DirectEditPayload
+    | DutyDirectEditPayload
+    | JdHeaderDirectEditPayload
     | OpksDirectEditPayload
     | OpksProposalDecisionPayload
     | OpksGenerationPayload
@@ -276,6 +344,11 @@ _JOURNAL_CONTRACT: dict[type[DomainModel], tuple[JournalKind, str]] = {
     ),
     CompletedTurnPayload: ("employee_turn", COMPLETED_TURN_SCHEMA_ID),
     DirectEditPayload: ("direct_edit", DIRECT_EDIT_SCHEMA_ID),
+    DutyDirectEditPayload: ("direct_edit", DUTY_DIRECT_EDIT_SCHEMA_ID),
+    JdHeaderDirectEditPayload: (
+        "direct_edit",
+        JD_HEADER_DIRECT_EDIT_SCHEMA_ID,
+    ),
     OpksDirectEditPayload: ("direct_edit", OPKS_DIRECT_EDIT_SCHEMA_ID),
     OpksProposalDecisionPayload: (
         "proposal_decision",
@@ -335,10 +408,19 @@ class DocumentRepository(Protocol):
         document_id: UUID,
         *,
         expected_generation: int,
+        jd_header: JdHeader,
         work_model: CurrentWorkModel,
         active_question: ActiveQuestion | None,
         updated_at: datetime,
     ) -> bool: ...
+
+
+class JdDutyRepository(Protocol):
+    async def list(self, document_id: UUID) -> tuple[Duty, ...]: ...
+
+    async def replace(
+        self, document_id: UUID, duties: tuple[Duty, ...]
+    ) -> None: ...
 
 
 class JdTaskRepository(Protocol):
@@ -399,6 +481,7 @@ class JournalRepository(Protocol):
 
 class JobAnalysisUnitOfWork(Protocol):
     documents: DocumentRepository
+    duties: JdDutyRepository
     tasks: JdTaskRepository
     proposals: ProposalRepository
     opks: OpksRepository

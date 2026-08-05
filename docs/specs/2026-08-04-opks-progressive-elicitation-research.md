@@ -141,9 +141,11 @@ Task ∈ Current JD
                                        已排除 PENDING_RECONCILIATION／RETIRED）
 ∧ 有 ≥1 筆仍有效的員工依據（employee_turn／direct_edit）
 ∧ 無指向此 Task 的未解 Task 邊界／矛盾／證據不足 issue
-∧ 無未回答的 OPKS gap
+∧ 無 active 的 OPKS gap                （active 的定義見 §4.7）
 ∧ 無 pending／deferred OPKS Proposal
-∧ 無相同 analysis_input_digest 的成功 receipt
+∧ 無相同 analysis_input_digest 的終端 receipt
+                                        （四種 outcome 皆為終端，見 §4.10／§4.11；
+                                          abandon 不寫 receipt，故不阻擋）
 ∧ 本輪 next_question 未指向該 Task
 ```
 
@@ -289,7 +291,24 @@ terminal_resolution: { kind: employee_unknown | not_applicable, source_ref } | N
 | resolution | 行為 |
 |---|---|
 | `answered` | **維持現行語意：移出 `open_issues`**。若 specialist 下次仍判定缺，會重新提出 |
-| `employee_unknown`／`not_applicable` | **不移除**，寫入 `terminal_resolution`；退出 agenda，但在 packet 投影成「已問過，勿重問」 |
+| `employee_unknown`／`not_applicable` | **不移除**，寫入 `terminal_resolution`；依下方定義轉為 context memory |
+
+**active／terminal 的定義（避免 terminal issue 留在 `open_issues` 造成歧義）：**
+
+```
+active issue  ≡ terminal_resolution is None
+```
+
+| | active | terminal |
+|---|---|---|
+| 進 agenda、可被追問 | ✅ | ❌ |
+| **配發 ordinal** | ✅ | **❌** |
+| 可被 `issue_resolutions[]` 指向 | ✅ | ❌（無 ordinal 可指） |
+| 阻擋 OPKS pre-gate | ✅ | ❌ |
+| 進 packet | ✅ | ✅，但在另一區，僅作「已問過，勿重問」 |
+
+**不配發 ordinal 是關鍵**：模型因此無法再次「解決」一個已終結的 gap，
+而它也不會擋住該 Task 後續的分析。
 
 **agenda 位置**：「Task 邊界矛盾／責任問題 → 一般 open issue → **OPKS gap** → 遺漏掃描」。
 這與 pre-gate 的「無指向此 Task 的未解 issue」是同一條規則的兩端，不需要新機制。
@@ -360,9 +379,12 @@ Proposal、OpenIssue 與 receipt **同一個 `commit_authority_change()` 交易*
 
 ### 4.11 失敗與 abandon 必須分開
 
-- **`failed` receipt**：只由 terminal 失敗寫入（provider error／invalid output／refused／verifier rejected）。
-  作用是阻止相同 digest 每回合重複付費，解除 head-of-line blocking。
-- **abandon**：digest 漂移（§4.3）**不寫任何 receipt**。用一次偶發競態永久壓住一個 digest 是錯的。
+- **四種 outcome 全部是終端 receipt**（`proposed`／`needs_clarification`／`no_change`／`failed`），
+  **在阻擋效果上等價**：一律阻止相同 `analysis_input_digest` 自動重跑，差別只在呈現與診斷。
+  `failed` 由 terminal 失敗寫入（provider error／invalid output／refused／verifier rejected），
+  作用是解除 head-of-line blocking。
+- **abandon**：digest 漂移（§4.3）**不寫任何 receipt，因此不阻擋**。
+  用一次偶發競態永久壓住一個 digest 是錯的。
 
 **第一版不做 backoff、attempt counter、circuit breaker。**
 

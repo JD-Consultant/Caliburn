@@ -20,17 +20,22 @@
 - 部分發布的效力單位是 **item**，不是軸、不是 Task（決定 18）。
 - 每個已提交的員工回合最多一筆自動 OPKS call；相同 `analysis_input_digest` 不自動重跑；**零隱藏 retry**（決定 31）。
 - OPKS child 失敗**不**回滾已提交的 Task Analysis，`/turns` 不得因此改回 5xx（決定 32）。
+- **沒有 background worker，因此單純 reload／GET 不會自行執行漏掉的 child。** 恢復只發生在兩個地方：同一個 `/turns` 以相同 Idempotency-Key replay，或後續回合的 scheduler 再次選到同一個 child ID（同 `task_id` ＋ 同 digest ⇒ 同 ID ⇒ 同一筆 receipt 空缺）。程式註解、docstring、UI 文案與文檔都不得暗示「開著就會自己補上」。
 - 不 import／搬移／雙寫 `app.interview`、`app.interview_vnext`、`app.job_authoring`、`evals`；既有 AST guard 保持綠。
 - 每個 Task 先紅測試再最小實作；一個 Task 一個 commit，綠了才 commit，**不 push**。
 - 動到可觀察行為的 commit 同時更新 `docs/design/task-analysis-engine.md`，不得留到最後補。
 
 ## 持久化形狀變更的統一處理
 
-`work_model` 與 journal payload 都是 JSONB + schema id（`WORK_MODEL_SCHEMA_ID` 等，見 `application/persistence.py:38-49`）。本計畫的所有欄位新增都是 **additive optional**，舊列反序列化時取 `None`／預設值，因此**不需要 Alembic migration**。動到形狀的 Task 必須：
+`work_model` 與 journal payload 都是 JSONB + schema id（`WORK_MODEL_SCHEMA_ID` 等，見 `application/persistence.py:38-49`）。**資料表不變，因此整個計畫不需要 Alembic migration。** 但**不是所有變更都 additive optional**，兩類要分開處理：
 
-1. 判斷是否 bump 對應的 `*_schema_id`（新增 optional 欄位可不 bump；改變既有欄位語意必須 bump）。
-2. 加一筆「舊 JSON 讀得回新模型」的 round-trip 測試。
-3. 在 commit message 說明選擇。
+**A. additive optional（`OpenIssue` 三個新欄位、`CompletedTurnPayload.scheduled_opks`）** —— 舊 JSON 取 `None`／預設值即可讀回，schema id 不 bump。加一筆舊 JSON round-trip 測試。
+
+**B. breaking（`OpksGenerationPayload`）** —— `analysis_input_digest` 是**必填**，`outcome` 的值域也變了，舊 JSON **讀不回來**。處理方式已定，不由實作者臨時裁量：
+
+- `OPKS_GENERATION_SCHEMA_ID` 升為 `"job-analysis-opks-generation/2"`。
+- **不做通用相容層、不寫 deserialize alias**。owner 已允許不搬舊資料（AGENTS：「資料從新四表開始，不搬、不整合、不雙寫舊資料」），本機既有 journal 直接放棄。
+- **不得以「查一下本機 DB 有沒有那個值」來決定契約形狀** —— 契約由 ADR 決定，不由某一台機器當下的資料決定。
 
 ## Phase 1 — domain 與 persistence 形狀
 
@@ -53,8 +58,10 @@
 
 **檔案：** `app/job_analysis/application/persistence.py:232-252`
 
-- `OpksGenerationOutcome` 從 2 值擴為 `proposed | needs_clarification | no_change | failed`（決定 28）。舊值 `no_grounded_candidates` 改名為 `no_change`：**先查本機 journal 是否已有該值**（`SELECT DISTINCT payload->>'outcome' FROM ... WHERE kind='opks_generation'`）；有就加一個 deserialize alias，沒有就直接改。決定寫進 commit message。
-- 新增 `analysis_input_digest: NonEmptyText`、`gap_issue_ids: tuple[Identifier, ...] = ()`。
+這是本計畫**唯一的 breaking payload 變更**（見上節 B 類）：`OPKS_GENERATION_SCHEMA_ID` 升為 `/2`，舊 journal entry 直接放棄，不寫相容層、不查本機 DB 決定契約。
+
+- `OpksGenerationOutcome` 從 2 值擴為 `proposed | needs_clarification | no_change | failed`（決定 28）。舊值 `no_grounded_candidates` 改名為 `no_change`，**不留 alias**。
+- 新增 `analysis_input_digest: NonEmptyText`（**必填**）、`gap_issue_ids: tuple[Identifier, ...] = ()`。
 - validator 寫死一致性（決定 28）：`proposed` 必須有 `proposal_ids` 且無 gap；`needs_clarification` 必須有 `gap_issue_ids`，**`proposal_ids` 仍可非空**；`no_change` 兩者皆空；`failed` 兩者皆空。`gap_issue_ids` 唯一。
 
 **紅測試：** 四種 outcome 的合法與非法組合；`needs_clarification` + 非空 `proposal_ids` 必須**通過**（這是決定 28 的重點，不要寫反）。
@@ -172,26 +179,38 @@
 
 ## Phase 4 — 追問與無副作用的解決通道
 
-### Task 10 — packet 的 active／terminal 分區與 agenda 順序
+### Task 10 — 兩個 packet 的 active／terminal 分區與 agenda 順序
 
-**檔案：** `application/context.py:99-105, 244-251`
+**檔案：** `application/context.py:99-105, 244-251`、`application/opks_context.py:63-101, 278-298`
+
+**兩個 packet 都要投影 terminal gap memory，不只主顧問那個。** 若 OPKS specialist 看不到「員工已回答不知道／不適用」，新 Evidence 讓 digest 改變、child 再次排定時，specialist 會對同一軸再建一次同一個 gap，員工就被重問一次已經答過答不出來的問題。
+
+**主顧問 packet（`context.py`）：**
 
 - **只有 active issue 進 `open_issues` 並取得 ordinal**（決定 20）。
 - terminal issue 留在 `work_model.open_issues`，但在 packet **另開一區呈現、不配發 ordinal** —— 這是關鍵：ordinal 是模型唯一的指認手段，不配發就結構性地讓模型無法再次「解決」它，也不用靠 prompt 約束。該區的語意只有一個：「已問過、勿重問」的 context memory。
 - agenda 順序（決定 21）：Task 邊界矛盾／責任問題 → 一般 open issue → **OPKS gap** → 遺漏掃描。
 - gap 呈現要讓主顧問看得到它綁哪個 Task、缺哪一軸，**但不給問句**（決定 16）。
 
-**紅測試：** terminal issue 不在 `open_issues`、不佔 ordinal、出現在 memory 區；active issue ordinal 連號；agenda 四段順序。
+**OPKS specialist packet（`opks_context.py`）：**
 
-**Gate：** `uv run pytest -k context` 綠。
+- `OpksContextPacket` 新增一區：該 Task 的 **terminal** gap memory（`subject_task_id` 相符且 `terminal_resolution` 非空者），帶軸與摘要與 `kind`（員工答不知道／不適用）。`build_opks_context_packet()` 需要多收一個 `open_issues` 參數。
+- **同樣不配發 ordinal** —— specialist 不解決 issue，這一區純粹是「這一軸問過了，員工給不出來，不要再開同一個缺口」。
+- render 時明說語意：已終結的缺口**不得**重新提出；有新證據時應直接產出候選，而不是再開一次 gap。
+- **不要放進 `read_set`（`opks_context.py:89-101`）。** OPKS child 的 freshness 契約是 `analysis_input_digest`（決定 12 的範圍：Task 語意欄位 + 有效員工 evidence）。terminal memory 是 context，不是 authority input；放進 read_set 會製造一個與分析輸入無關的新 abandon 觸發器。
+
+**紅測試：** 主顧問 packet —— terminal issue 不在 `open_issues`、不佔 ordinal、出現在 memory 區；active issue ordinal 連號；agenda 四段順序。OPKS packet —— 該 Task 的 terminal gap 出現在 memory 區、不佔 ordinal、**不改變 `read_set`**；別的 Task 的 terminal gap 不出現。
+
+**Gate：** `uv run pytest -k "context or opks_context"` 綠。
 
 ### Task 11 — 第三個頂層陣列 `issue_resolutions[]`
 
-**檔案：** `llm/result.py:145-147`、`llm/wire.py`、`llm/schemas/task_analysis_result_v2.json`、`application/verifier.py`、`application/transition.py:261-268, 309-322`
+**檔案：** `llm/result.py:145-147`、`llm/wire.py`、**新增** `llm/schemas/task_analysis_result_v3.json`、`application/verifier.py`、`application/transition.py:261-268, 309-322`
 
 - `IssueResolution { ordinal, resolution: answered | employee_unknown | not_applicable }`，扁平、每 issue 一筆（決定 22）。
 - 加成 `TaskAnalysisResult` 的**第三個頂層陣列**，與 `work_signals` 平行。**不**把 gap resolution 綁在 `WorkSignal.disposition`（那會拖著該筆 signal 的副作用），**不**把 `resolves_open_issue_ordinal` 複數化。
-- wire schema 維持 portable strict subset：改完重新量 property 數／anyOf 數／$defs 數／位元組數，記進 commit message（目前基準：2 props、0 anyOf、0 $defs、4,668 bytes）。
+- **wire 升 v3，不覆寫 v2。** 新增必填的頂層陣列已經改變模型看到的輸出形狀，覆寫 `task_analysis_result_v2.json` 會讓同一個版本號指向兩種契約。開 `task_analysis_result_v3.json` 與**對應的新 golden**，`TASK_ANALYSIS_RESULT_SCHEMA_NAME` 一併更新。這是既有的版本紀律，不是新框架。
+- wire schema 維持 portable strict subset：改完重新量 property 數／anyOf 數／$defs 數／位元組數，記進 commit message（v2 基準：2 props、0 anyOf、0 $defs、4,668 bytes；v3 應為 3 props、anyOf 與 $defs 仍為 0）。
 - **verifier 規則（決定 23）：`answered` 必須在同一輪有一筆與該 gap 的 `subject_task_id` 相關、且留下有效員工 Evidence 的 `WorkSignal`**，否則 digest 不變、OPKS 不會再分析，gap 會被假關閉。這是機械可判的跨欄位條件。
 - verifier 另外檢查：ordinal 必須指向 **active** issue（terminal 沒有 ordinal，指過去就是無效 ordinal）。
 - transition（決定 24）：`answered` 沿用現行語意（`_close_open_issue`，移出 `open_issues`）；`employee_unknown`／`not_applicable` **不移除**，寫入 `terminal_resolution` 後轉為 context memory。
@@ -223,9 +242,10 @@
 
 - **`prune_opks_for_current_jd()` 現行簽章只收／回 `CurrentJdOpks`，碰不到 `work_model.open_issues`**（決定 26）。加一個相鄰純函式 `prune_opks_gaps_for_current_jd(open_issues, current_jd) -> tuple[OpenIssue, ...]`，或擴充同一 seam——兩者擇一，不要兩套。
 - 在**同一個 authority transaction、同一批既有呼叫點**接上：Task delete、accepted withdraw、merge、split。
-- **merge／split 一律終結 gap，不遷移**（決定 27），沿用既有政策「不把舊 refs 猜接到 replacement Task」。
+- **這裡的「終結」是「從 `open_issues` 移除」，不是寫 `terminal_resolution`。** `terminal_resolution.kind` 只有 `employee_unknown` 與 `not_applicable` 兩個值，兩個都是**員工對某個問題的回答**。Task 被刪掉、撤回、合併或拆分時員工並沒有回答任何事，用這兩個值任一個都是偽造一筆不存在的員工回答，會污染 memory 區並讓 specialist 讀到假的訊息。gap 的 subject Task 不在 Current JD 了，這筆 gap 就不該存在——直接移除。
+- **merge／split 一律移除 gap，不遷移**（決定 27），沿用既有政策「不把舊 refs 猜接到 replacement Task」。
 
-**紅測試：** 四個呼叫點各一筆；merge／split 後 gap 被終結而非搬到 replacement Task；非 OPKS 的 open issue 不受影響。
+**紅測試：** 四個呼叫點各一筆；merge／split 後 gap 被**移除**而非搬到 replacement Task；**移除路徑不得寫入任何 `terminal_resolution`**（把這條釘成一筆獨立測試）；非 OPKS 的 open issue 不受影響。
 
 **Gate：** `uv run pytest -k "authoring or proposal_decisions"` 綠。
 
@@ -241,7 +261,7 @@
 - **`/turns` 最多執行主顧問 ＋ 一個 OPKS specialist**（決定 34），員工只看到一個「分析中」。
 - **child 失敗不改 `/turns` 狀態碼**（決定 32）。回傳最新 ConsultationView。
 
-**紅測試（fake adapter，不打 live）：** 排定 → child 跑完 → 同一回應看得到新 Proposal／gap；child 失敗 → `/turns` 仍 200 且主回合結果完好；同 Idempotency-Key replay 兩次只付一次；「主回合已 commit、child 未跑」的 crash 模擬在下一次 replay 恢復同一 child。
+**紅測試（fake adapter，不打 live）：** 排定 → child 跑完 → 同一回應看得到新 Proposal／gap；child 失敗 → `/turns` 仍 200 且主回合結果完好；同 Idempotency-Key replay 兩次只付一次；「主回合已 commit、child 未跑」的 crash 模擬在下一次 replay 恢復同一 child；**同一情境下只做 reload／GET 不會執行該 child**（把上節的誠實邊界釘成測試，避免有人日後加一個「順手補跑」的隱性 worker）。
 
 **Gate：** `uv run pytest -k "turns or job_analysis_routes"` 綠。
 

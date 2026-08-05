@@ -96,7 +96,7 @@ export interface OpksItemView {
  * via the `definition` "OpksGenerationView".
  */
 export interface OpksGenerationView {
-  outcome: "proposed" | "no_grounded_candidates";
+  outcome: "proposed" | "needs_clarification" | "no_change" | "failed";
   proposal_ids: string[];
 }
 /**

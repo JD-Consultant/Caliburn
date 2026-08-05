@@ -263,7 +263,7 @@ async def test_empty_verified_result_commits_a_no_candidate_receipt(
         operation_id="generate-empty",
     )
 
-    assert outcome.outcome is OpksGenerationOutcome.NO_GROUNDED_CANDIDATES
+    assert outcome.outcome is OpksGenerationOutcome.NO_CHANGE
     assert outcome.proposal_ids == ()
     assert transport.calls == 1
     async with uow_factory() as uow:
@@ -358,7 +358,7 @@ async def test_reuse_that_adds_nothing_is_recorded_without_an_empty_proposal(
     )
     loaded = await load_document(uow_factory, document_id)
 
-    assert outcome.outcome is OpksGenerationOutcome.NO_GROUNDED_CANDIDATES
+    assert outcome.outcome is OpksGenerationOutcome.NO_CHANGE
     assert loaded is not None
     assert loaded.state.opks_proposals == ()
     assert loaded.state.current_opks.items == (already_linked,)

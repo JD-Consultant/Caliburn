@@ -68,6 +68,7 @@ from .opks_digest import (
     compute_analysis_input_digest,
     scheduled_opks_operation_id,
 )
+from .opks_scheduler import eligible_opks_candidates
 from .opks_operation import OpksOperationResult, run_opks_operation
 from .opks_generation import (
     OpksGenerationResult,
@@ -248,6 +249,7 @@ __all__ = [
     "ScheduledOpks",
     "build_opks_context_packet",
     "compute_analysis_input_digest",
+    "eligible_opks_candidates",
     "scheduled_opks_operation_id",
     "create_document",
     "commit_verified_turn",

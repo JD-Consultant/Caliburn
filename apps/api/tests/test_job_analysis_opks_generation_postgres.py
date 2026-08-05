@@ -22,6 +22,7 @@ from app.job_analysis.domain import (
     JdTask,
     OpksEntityKind,
     OpksEvidenceLink,
+    OpksGapAxis,
     OpksItem,
     SourceKind,
     SourceRef,
@@ -397,3 +398,120 @@ async def test_authority_change_during_provider_call_discards_result_and_receipt
     assert loaded.state.opks_proposals == ()
     async with uow_factory() as uow:
         assert await uow.journal.get(document_id, "generate-stale") is None
+
+
+# ── gap 落地成 OpenIssue 與 needs_clarification receipt(ADR 0054 決定 19、28、30)──
+
+
+def gap_wire(*, with_proposal: bool = False) -> OpksResultWire:
+    items = []
+    if with_proposal:
+        items.append(
+            OpksWireItem(
+                entity_kind=OpksEntityKind.OUTPUT,
+                decision=OpksDecision.ADD_NEW,
+                target_ordinal=0,
+                text="營運週報",
+            )
+        )
+    items.append(
+        OpksWireItem(
+            entity_kind=OpksEntityKind.SKILL,
+            decision=OpksDecision.UNCERTAIN,
+            target_ordinal=0,
+            text="還看不出完成這件事需要哪些具體操作",
+        )
+    )
+    return OpksResultWire(items=tuple(items))
+
+
+async def test_a_gap_becomes_a_persisted_open_issue_with_its_task_and_axis(
+    postgres_session_factory,
+    cleanup_job_analysis_rows,
+):
+    document_id = cleanup_job_analysis_rows
+    uow_factory = await seed(postgres_session_factory, document_id)
+
+    result = await generate_opks_proposals(
+        uow_factory,
+        adapter=adapter(RecordingTransport(gap_wire())),
+        document_id=document_id,
+        task_id="task-1",
+        operation_id="generate-gap",
+    )
+    loaded = await load_document(uow_factory, document_id)
+
+    assert result.outcome is OpksGenerationOutcome.NEEDS_CLARIFICATION
+    assert result.gap_issue_ids == ("generate-gap-gap0",)
+    assert result.proposal_ids == ()
+    assert result.analysis_input_digest
+    assert loaded is not None
+    (issue,) = loaded.state.work_model.open_issues
+    assert issue.id == "generate-gap-gap0"
+    assert issue.subject_task_id == "task-1"
+    assert issue.opks_axis is OpksGapAxis.SKILL
+    assert issue.summary == "還看不出完成這件事需要哪些具體操作"
+    assert issue.is_active is True
+    assert issue.source_anchors
+
+
+async def test_proposals_and_gaps_are_published_together_in_one_transaction(
+    postgres_session_factory,
+    cleanup_job_analysis_rows,
+):
+    """決定 18／28／30:效力單位是 item,三者同一交易寫入。"""
+
+    document_id = cleanup_job_analysis_rows
+    uow_factory = await seed(postgres_session_factory, document_id)
+
+    result = await generate_opks_proposals(
+        uow_factory,
+        adapter=adapter(RecordingTransport(gap_wire(with_proposal=True))),
+        document_id=document_id,
+        task_id="task-1",
+        operation_id="generate-both",
+    )
+    loaded = await load_document(uow_factory, document_id)
+
+    assert result.outcome is OpksGenerationOutcome.NEEDS_CLARIFICATION
+    assert result.proposal_ids == ("generate-both-op0",)
+    assert result.gap_issue_ids == ("generate-both-gap1",)
+    assert loaded is not None
+    assert len(loaded.state.opks_proposals) == 1
+    assert len(loaded.state.work_model.open_issues) == 1
+    async with uow_factory() as uow:
+        receipt = await uow.journal.get(document_id, "generate-both")
+    assert receipt is not None
+    assert receipt.payload.gap_issue_ids == ("generate-both-gap1",)
+
+
+async def test_a_replayed_generation_does_not_duplicate_the_gap_issue(
+    postgres_session_factory,
+    cleanup_job_analysis_rows,
+):
+    """ID 決定性:同一個 operation 重跑必須產生同一批 ID,否則留下兩份缺口。"""
+
+    document_id = cleanup_job_analysis_rows
+    uow_factory = await seed(postgres_session_factory, document_id)
+    transport = RecordingTransport(gap_wire())
+
+    first = await generate_opks_proposals(
+        uow_factory,
+        adapter=adapter(transport),
+        document_id=document_id,
+        task_id="task-1",
+        operation_id="generate-gap",
+    )
+    replay = await generate_opks_proposals(
+        uow_factory,
+        adapter=adapter(transport),
+        document_id=document_id,
+        task_id="task-1",
+        operation_id="generate-gap",
+    )
+    loaded = await load_document(uow_factory, document_id)
+
+    assert first == replay
+    assert transport.calls == 1
+    assert loaded is not None
+    assert len(loaded.state.work_model.open_issues) == 1

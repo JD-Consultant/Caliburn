@@ -48,6 +48,7 @@ from app.api.job_analysis_problems import (
 )
 from app.job_analysis.application import (
     JobAnalysisUnitOfWorkFactory,
+    OpksGenerationOutcome,
     OpksGroundingUnavailable,
     TransitionCommitRejected,
     UncommittableOperationResult,
@@ -227,6 +228,11 @@ async def post_opks_generation(
         return consultant_unavailable_response()
     except JobAnalysisApplicationError as error:
         return application_error_response(error)
+    if result.outcome is OpksGenerationOutcome.FAILED:
+        # terminal 失敗現在會寫一筆 `failed` receipt(ADR 0054 決定 29),但這個
+        # 手動端點對員工的既有契約仍是 503——receipt 是給排程用的,不是給人看的。
+        logger.warning("job-analysis OPKS generation failed for task %s", task_id)
+        return consultant_unavailable_response()
     return to_opks_generation_view(result)
 
 

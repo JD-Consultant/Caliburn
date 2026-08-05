@@ -5,7 +5,7 @@ import type {
   OpksItemWrite,
 } from "@caliburn/job-analysis-contract";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Pencil, Plus, Sparkles, Trash2 } from "lucide-react";
+import { Pencil, Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,6 @@ import {
   addOpksItem,
   deleteOpksItem,
   editOpksItem,
-  generateOpksProposals,
   JobAnalysisApiError,
 } from "@/lib/jobAnalysisApi";
 import {
@@ -110,16 +109,6 @@ export function OpksEditor({
     onSuccess: invalidate,
   });
 
-  const generationMutation = useMutation({
-    mutationFn: (variables: { taskId: string; idempotencyKey: string }) =>
-      generateOpksProposals(
-        documentId,
-        variables.taskId,
-        variables.idempotencyKey,
-      ),
-    onSuccess: invalidate,
-  });
-
   const dirty = Boolean(editing && editing.draft !== editing.baseline);
   useEffect(() => {
     onDirtyChange?.(dirty);
@@ -195,15 +184,6 @@ export function OpksEditor({
     );
   };
 
-  const generate = (taskId: string) => {
-    const previous = generationMutation.variables;
-    generationMutation.mutate(
-      generationMutation.isError && previous?.taskId === taskId
-        ? previous
-        : { taskId, idempotencyKey: crypto.randomUUID() },
-    );
-  };
-
   if (document.isPending) {
     return <p className="text-sm text-muted-foreground">正在讀取工作內容…</p>;
   }
@@ -220,10 +200,7 @@ export function OpksEditor({
   const unlinkedCompetencies = documentUnlinkedCompetencies(
     document.data.opks_items,
   );
-  const busy =
-    saveMutation.isPending ||
-    deleteMutation.isPending ||
-    generationMutation.isPending;
+  const busy = saveMutation.isPending || deleteMutation.isPending;
 
   const formFor = (kind: ItemKind, taskId?: string, item?: OpksItemView) => {
     const matches =
@@ -263,18 +240,6 @@ export function OpksEditor({
               <h3 className="font-semibold">{task.statement}</h3>
               <p className="text-xs text-muted-foreground">這項工作的 O/P/K/S</p>
             </div>
-            <Button
-              size="sm"
-              variant="outline"
-              disabled={busy || editing !== null}
-              onClick={() => generate(task.task_id)}
-            >
-              <Sparkles />
-              {generationMutation.isPending &&
-              generationMutation.variables?.taskId === task.task_id
-                ? "產生中…"
-                : "產生建議"}
-            </Button>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
@@ -331,21 +296,6 @@ export function OpksEditor({
               );
             })}
           </div>
-
-          {generationMutation.isSuccess &&
-          generationMutation.variables?.taskId === task.task_id ? (
-            <p role="status" className="text-sm text-muted-foreground">
-              {generationMutation.data.outcome === "proposed"
-                ? `已建立 ${generationMutation.data.proposal_ids.length} 項待確認建議。`
-                : "目前沒有足夠依據產生新建議。"}
-            </p>
-          ) : null}
-          {generationMutation.isError &&
-          generationMutation.variables?.taskId === task.task_id ? (
-            <p role="alert" className="text-sm text-destructive">
-              {errorText(generationMutation.error)}
-            </p>
-          ) : null}
         </Card>
       ))}
 

@@ -161,8 +161,11 @@ RFC 9457 `application/problem+json`；path-scoped handler 會把舊 routes 的�
 Current JD Task 的 POST／PUT／DELETE 與排序 PUT 都要求 `Idempotency-Key`，原樣映射成
 Journal `entry_id`；沒有 middleware、隱藏 retry 或第二套寫入邏輯。員工清空 optional text 時，
 HTTP DTO mapper（與 LLM 的 `wire.py` 無關）先 trim 並轉成 `null`；必填 statement 變空則回 `invalid-request`，不讓半成品進 domain。
-`POST …/tasks/{task_id}/opks-proposals` 只回 durable `outcome` 與 `proposal_ids`；不回模型 raw output、
-Work Model、Evidence ID 或 provider detail。它只建立待員工決定的 Proposal，不直接寫 Current JD OPKS。
+**`POST …/tasks/{task_id}/opks-proposals` 已退役，不得復活**（ADR 0054 決定 1）。OPKS 的唯一 AI 入口是
+`POST …/turns` 排定的 child：員工不需要理解 OPKS 階段的存在，也不該由他判斷哪個 Task 已經談夠、
+何時該按。連帶退役的還有 `OpksGenerationView` 契約型別與 Web 的「產生建議」按鈕。
+**員工手動新增／編輯／刪除 O/P/K/S 的端點保留**——那不是 AI 入口。AI 仍然只建立待員工決定的
+Proposal，不直接寫 Current JD OPKS。
 Web 的 `/workspace` 用 `DocumentLibrary` 列出／建立／改名；`/workspace/[document_id]` 用
 `ConsultationWorkspace` 同頁組合 `ConsultationPanel`、Task／OPKS Proposal cards、`TaskEditor` 與
 `OpksEditor`，一次只開一份文件。OPKS 人工變更也採明確儲存，成功後只 invalidate document、

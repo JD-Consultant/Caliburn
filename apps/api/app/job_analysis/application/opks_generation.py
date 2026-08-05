@@ -94,6 +94,7 @@ def _packet_for(state: JobAnalysisState, task_id: str) -> OpksContextPacket:
         selected_task=_selected_task(state, task_id),
         current_opks=state.current_opks,
         proposals=state.opks_proposals,
+        open_issues=state.work_model.open_issues,
     )
 
 

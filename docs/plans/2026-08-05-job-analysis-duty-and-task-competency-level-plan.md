@@ -1,7 +1,7 @@
 # 主要職責（Duty）與 Task 職能級別結構切片實作計畫
 
 - 日期：2026-08-05
-- 狀態：T1–T5 COMPLETE；T6–T7 尚未開工
+- 狀態：T1–T6 COMPLETE（T7 文檔同步併在各 commit）
 - 決策：[ADR 0052](../adr/0052-jd-readiness-assessment-and-official-code-boundaries.md) 決定 10／13、
   [ADR 0053](../adr/0053-jd-header-authority-boundary-and-readiness-scope.md) 決定 7；
   authority seam 沿用 [ADR 0045](../adr/0045-job-analysis-local-web-contract-and-shared-authority-commit.md)
@@ -353,4 +353,33 @@ T5／T6 另跑 contract codegen 與 web 三件套。
   web `109 passed`＋`tsc --noEmit`＋`lint` 全綠。
 - 下一個是 T6（Web 編輯）：`DutyEditor`、Task 的兩個下拉、Current JD 依 Duty 分組且
   未指派 Task 要看得見。
+
+## 15. T6 執行證據（2026-08-05）
+
+- baseline：完整 API `2147 passed`、web `109 passed`。
+- **分組邏輯放進 `lib/jobAnalysisDuties.ts` 的純函式**，不寫在 component 裡：
+  這個 repo 的 vitest 只跑 `src/lib`，寫在 component 就沒有測試覆蓋。
+  `groupTasksByDuty()` 有三條刻意的行為，各有測試：
+  1. **空職責照樣顯示**——那正是 `duty_without_task` 要讓人看見的缺漏（ADR 0052 決定 5）；
+  2. **未指派區只在真的有未指派任務時出現**——沒有缺漏就不要憑空多一個空區塊；
+  3. **任何任務都不會消失**。指向不存在職責的任務在 API 那端是不可表示的狀態，
+     這裡仍歸進未指派區而不是丟掉：畫面少一條任務比多一條錯位的任務難發現得多。
+     有一條測試直接斷言「輸入的每條任務都恰好出現一次」。
+- 另有一條測試斷言分組結果裡**不含 `T\d` 形狀的位置碼**——`T1`／`T1.1` 是匯出版面位置碼，
+  不是畫面上的 identity（ADR 0052 決定 10）。
+- 排序仍吃**全域索引**：`move()` 拿的是整份 Current JD 的位置，不是分組內的位置。
+  順序是整份清單的性質，既有 reorder route 與其冪等語意完全不用動（§5.2 的決定）。
+- `TaskEditor` 的卡片抽成 `renderTaskCard()`：分組多兩層巢狀之後，原地縮排會爛掉，
+  而這個 repo 沒有 prettier，縮排要手動維持。抽函式比重排 90 行乾淨。
+- `DutyEditor` 沿用 Task／表頭同一條慣例：明確儲存、無 autosave、失敗重試沿用同一把
+  `Idempotency-Key`、dirty 併進 `ConsultationWorkspace` 的 guard。刪除確認明說
+  「底下的工作任務會保留，但會變成尚未歸入職責」——T4 的行為要在按下去之前就講清楚。
+- 唯讀卡片加上「職能級別」欄位；所屬職責不再重複顯示（任務已經在該職責的分組底下）。
+- 測試：`jobAnalysisDuties.test.ts` 8 條。web **`117 passed`**（+8）＋`tsc --noEmit`
+  ＋`lint`＋**`npm run build`** 全綠。完整 API 仍 `2147 passed / 0 failed / 0 skipped`。
+- **沒有做真人瀏覽器驗證**：本機 API dev server 早於 T5（backend reload 已關），
+  要看畫面得重啟使用者正在用的 dev server，沒有先問就不動。route 層有 9 條真 PostgreSQL
+  HTTP 測試覆蓋，但「員工實際點得動」這件事本切片未經眼睛確認。
+- 切片到此完成。下一個工作面是 **deterministic 匯出**（不讓 LLM 參與），
+  也是「可交付的 JD 成品」還缺的最後一塊。
 

@@ -3,6 +3,8 @@ import type {
   DocumentMetadataView,
   DocumentSummary,
   DocumentView,
+  DutyView,
+  DutyWrite,
   JdHeaderView,
   JdHeaderWrite,
   JdTaskView,
@@ -100,6 +102,54 @@ export function putJdHeader(
     method: "PUT",
     headers: mutationHeaders(idempotencyKey),
     body: JSON.stringify(header),
+  });
+}
+
+export function addDuty(
+  documentId: string,
+  duty: DutyWrite,
+  idempotencyKey: string,
+): Promise<DutyView> {
+  return request<DutyView>(`/documents/${documentId}/duties`, {
+    method: "POST",
+    headers: mutationHeaders(idempotencyKey),
+    body: JSON.stringify(duty),
+  });
+}
+
+export function editDuty(
+  documentId: string,
+  dutyId: string,
+  duty: DutyWrite,
+  idempotencyKey: string,
+): Promise<DutyView> {
+  return request<DutyView>(`/documents/${documentId}/duties/${dutyId}`, {
+    method: "PUT",
+    headers: mutationHeaders(idempotencyKey),
+    body: JSON.stringify(duty),
+  });
+}
+
+export function deleteDuty(
+  documentId: string,
+  dutyId: string,
+  idempotencyKey: string,
+): Promise<void> {
+  return request<void>(`/documents/${documentId}/duties/${dutyId}`, {
+    method: "DELETE",
+    headers: mutationHeaders(idempotencyKey),
+  });
+}
+
+export function reorderDuties(
+  documentId: string,
+  orderedDutyIds: string[],
+  idempotencyKey: string,
+): Promise<DutyView[]> {
+  return request<DutyView[]>(`/documents/${documentId}/duty-order`, {
+    method: "PUT",
+    headers: mutationHeaders(idempotencyKey),
+    body: JSON.stringify({ ordered_duty_ids: orderedDutyIds }),
   });
 }
 

@@ -156,6 +156,22 @@
         }
       }
     },
+    "OpksTaskStatusView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["task_id", "status"],
+      "properties": {
+        "task_id": { "type": "string" },
+        "status": {
+          "type": "string",
+          "enum": [
+            "awaiting_employee_answer",
+            "proposals_ready",
+            "not_ready_for_analysis"
+          ]
+        }
+      }
+    },
     "OpksProposalView": {
       "type": "object",
       "additionalProperties": false,
@@ -213,7 +229,14 @@
     "DocumentView": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["document_id", "title", "updated_at", "tasks", "opks_items"],
+      "required": [
+        "document_id",
+        "title",
+        "updated_at",
+        "tasks",
+        "opks_items",
+        "opks_task_status"
+      ],
       "properties": {
         "document_id": { "type": "string", "format": "uuid" },
         "title": { "type": "string" },
@@ -225,6 +248,10 @@
         "opks_items": {
           "type": "array",
           "items": { "$ref": "#/$defs/OpksItemView" }
+        },
+        "opks_task_status": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/OpksTaskStatusView" }
         }
       }
     },
@@ -323,7 +350,8 @@
         "proposals",
         "opks_proposals",
         "tasks",
-        "opks_items"
+        "opks_items",
+        "opks_task_status"
       ],
       "properties": {
         "document": { "$ref": "#/$defs/DocumentMetadataView" },
@@ -352,6 +380,10 @@
         "opks_items": {
           "type": "array",
           "items": { "$ref": "#/$defs/OpksItemView" }
+        },
+        "opks_task_status": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/OpksTaskStatusView" }
         }
       }
     },

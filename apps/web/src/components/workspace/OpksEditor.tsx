@@ -20,6 +20,8 @@ import {
   documentAttitudes,
   documentUnlinkedCompetencies,
   groupOpksByTask,
+  OPKS_STATUS_LABELS,
+  opksStatusByTask,
 } from "@/lib/jobAnalysisOpks";
 import {
   documentQueryOptions,
@@ -201,6 +203,8 @@ export function OpksEditor({
     document.data.opks_items,
   );
   const busy = saveMutation.isPending || deleteMutation.isPending;
+  const statusByTask = opksStatusByTask(document.data.opks_task_status);
+  const statusOf = (taskId: string) => statusByTask.get(taskId);
 
   const formFor = (kind: ItemKind, taskId?: string, item?: OpksItemView) => {
     const matches =
@@ -240,6 +244,14 @@ export function OpksEditor({
               <h3 className="font-semibold">{task.statement}</h3>
               <p className="text-xs text-muted-foreground">這項工作的 O/P/K/S</p>
             </div>
+            {statusOf(task.task_id) ? (
+              <span
+                role="status"
+                className="shrink-0 rounded-full border px-2.5 py-0.5 text-xs text-muted-foreground"
+              >
+                {OPKS_STATUS_LABELS[statusOf(task.task_id)!]}
+              </span>
+            ) : null}
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">

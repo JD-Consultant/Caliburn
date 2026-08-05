@@ -474,3 +474,89 @@ def test_a_question_about_a_new_task_blocks_the_id_that_turn_will_mint():
         packet=packet_for(work_task()),
         operation_id="operation-1",
     ) == frozenset({"operation-1-t0"})
+
+
+# ── 三態呈現(ADR 0054 決定 36 ＋ 0052 決定 1–3、6–7)──────────────────────────
+
+
+def status_of(subject, task_id: str = "task-1"):
+    from app.job_analysis.application import opks_task_status
+
+    return opks_task_status(subject, task_id)
+
+
+def test_an_unanalysable_task_says_it_is_not_ready():
+    from app.job_analysis.application import OpksTaskStatus
+
+    assert status_of(
+        state(tasks=(work_task("task-1", decision_link()),), jd=(jd_task(),))
+    ) is OpksTaskStatus.NOT_READY
+
+
+def test_a_task_with_an_unanswered_gap_says_information_is_still_needed():
+    from app.job_analysis.application import OpksTaskStatus
+
+    subject = state(
+        tasks=(work_task(),),
+        jd=(jd_task(),),
+        open_issues=(
+            issue(subject_task_id="task-1", opks_axis=OpksGapAxis.OUTPUT),
+        ),
+    )
+
+    assert status_of(subject) is OpksTaskStatus.AWAITING_ANSWER
+
+
+def test_a_task_with_pending_proposals_says_suggestions_are_ready():
+    from app.job_analysis.application import OpksTaskStatus
+
+    subject = state(
+        tasks=(work_task(),),
+        jd=(jd_task(),),
+        opks_proposals=(opks_proposal(OpksProposalStatus.PENDING),),
+    )
+
+    assert status_of(subject) is OpksTaskStatus.PROPOSALS_READY
+
+
+def test_an_unanswered_gap_outranks_pending_proposals():
+    """決定 18 的 item-level 部分發布讓兩者同時存在是常態。
+
+    這時只說「已可提出建議」會讓員工以為這個工作已經談完——那正是誠實邊界
+    「不宣稱完整」要擋的事。
+    """
+
+    from app.job_analysis.application import OpksTaskStatus
+
+    subject = state(
+        tasks=(work_task(),),
+        jd=(jd_task(),),
+        open_issues=(
+            issue(subject_task_id="task-1", opks_axis=OpksGapAxis.OUTPUT),
+        ),
+        opks_proposals=(opks_proposal(OpksProposalStatus.PENDING),),
+    )
+
+    assert status_of(subject) is OpksTaskStatus.AWAITING_ANSWER
+
+
+def test_a_settled_task_gets_no_label_at_all():
+    """ADR 0052 決定 6:「無法確定的一律不提示。」
+
+    資料夠、沒缺口、沒待審提案的工作,可能還沒分析,也可能已經分析完且都處理掉了
+    ——兩者無法從現況區分,所以不給第四個標籤,也不編一個出來。
+    """
+
+    assert status_of(ready()) is None
+
+
+def test_only_three_labels_exist():
+    """決定 36:狀態**僅**呈現這三種。多一個就是往完成度 dashboard 滑。"""
+
+    from app.job_analysis.application import OpksTaskStatus
+
+    assert {member.value for member in OpksTaskStatus} == {
+        "awaiting_employee_answer",
+        "proposals_ready",
+        "not_ready_for_analysis",
+    }

@@ -61,6 +61,7 @@ def test_schema_owns_only_the_workspace_wire_contract():
         "JdTaskWrite",
         "JdTaskView",
         "OpksItemView",
+        "OpksTaskStatusView",
         "OpksItemWrite",
         "OpksProposalDecisionWrite",
         "OpksProposalView",
@@ -96,6 +97,7 @@ def test_consultation_contract_exposes_only_product_views_and_supported_decision
         "tasks",
         "opks_items",
         "opks_proposals",
+        "opks_task_status",
     }
     assert set(decision["properties"]["decision"]["enum"]) == {
         "accepted",
@@ -225,6 +227,9 @@ def test_document_view_accepts_one_complete_task_without_extra_fields():
             }
         ],
         "opks_items": [],
+        "opks_task_status": [
+            {"task_id": "task-1", "status": "not_ready_for_analysis"}
+        ],
     }
 
     assert list(

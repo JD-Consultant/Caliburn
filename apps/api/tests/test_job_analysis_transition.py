@@ -160,6 +160,7 @@ def apply(
     transcript=TRANSCRIPT,
     current_turn_id="turn-2",
     next_question: NextQuestion | None = None,
+    issue_resolutions=(),
 ):
     current = current or state()
     packet = build_context_packet(
@@ -171,6 +172,7 @@ def apply(
     )
     result = TaskAnalysisResult(
         work_signals=signals,
+        issue_resolutions=issue_resolutions,
         next_question=next_question
         or NextQuestion(text="週報交給誰?"),
     )
@@ -890,3 +892,112 @@ def test_state_rejects_duplicate_jd_and_proposal_ids():
 def test_ids_are_namespaced_by_operation(operation_id):
     outcome = apply(signal(), operation_id=operation_id)
     assert outcome.immediate_task_ids == (f"{operation_id}-t0",)
+
+
+# ── issue_resolutions[] 的兩條終端路徑(ADR 0054 決定 24–25)──────────────────
+
+
+def gap_state(*, terminal=None) -> JobAnalysisState:
+    from app.job_analysis.domain import (
+        OpenIssue,
+        OpenIssueTerminalResolution,
+        OpksGapAxis,
+    )
+
+    return JobAnalysisState(
+        work_model=CurrentWorkModel(
+            tasks=(task("task-1", "每週彙整營運週報"),),
+            open_issues=(
+                OpenIssue(
+                    id="opks-1-gap0",
+                    kind=OpenIssueKind.INSUFFICIENT_EVIDENCE,
+                    summary="還看不出這項工作交出什麼",
+                    source_anchors=(link(),),
+                    subject_task_id="task-1",
+                    opks_axis=OpksGapAxis.OUTPUT,
+                    terminal_resolution=terminal,
+                ),
+            ),
+        ),
+        current_jd=(jd_task("task-1", "每週彙整營運週報"),),
+    )
+
+
+def resolution(kind: str, ordinal: int = 1):
+    from app.job_analysis.llm import IssueResolution, IssueResolutionKind
+
+    return IssueResolution(ordinal=ordinal, resolution=IssueResolutionKind(kind))
+
+
+def support_signal():
+    return signal(
+        identity=IdentityAssessment(
+            relation=IdentityRelation.DUPLICATE, target_task_ordinals=(1,)
+        ),
+        disposition=SignalDisposition.SUPPORT_ONLY,
+        task_change=None,
+    )
+
+
+def test_answered_removes_the_gap_so_the_specialist_may_raise_it_again():
+    """決定 24:`answered` 沿用現行語意。若下次分析仍判定缺,specialist 自己會重提。"""
+
+    applied = apply(
+        support_signal(),
+        current=gap_state(),
+        issue_resolutions=(resolution("answered"),),
+    )
+
+    assert applied.is_applied
+    assert applied.state.work_model.open_issues == ()
+
+
+@pytest.mark.parametrize("kind", ["employee_unknown", "not_applicable"])
+def test_the_two_terminal_answers_keep_the_issue_as_memory(kind):
+    """決定 24:**不移除**——移除等於下一輪把同一件事再問一次。"""
+
+    applied = apply(
+        current=gap_state(),
+        issue_resolutions=(resolution(kind),),
+    )
+
+    assert applied.is_applied
+    (issue,) = applied.state.work_model.open_issues
+    assert issue.is_active is False
+    assert issue.terminal_resolution.kind.value == kind
+
+
+def test_the_resolution_source_ref_is_stamped_by_the_application():
+    """決定 25:`source_ref` 不進 wire——模型不產生 ID,它發生在哪一輪由系統知道。"""
+
+    applied = apply(
+        current=gap_state(),
+        issue_resolutions=(resolution("employee_unknown"),),
+    )
+
+    (issue,) = applied.state.work_model.open_issues
+    assert issue.terminal_resolution.source_ref.kind is SourceKind.EMPLOYEE_TURN
+    assert issue.terminal_resolution.source_ref.id == "turn-2"
+
+
+def test_a_terminal_issue_is_not_offered_for_resolution_again():
+    """決定 20:terminal issue 不配發 ordinal,所以 ordinal 1 根本不存在。"""
+
+    from app.job_analysis.domain import (
+        OpenIssueTerminalResolution,
+        OpenIssueTerminalResolutionKind,
+    )
+
+    already = gap_state(
+        terminal=OpenIssueTerminalResolution(
+            kind=OpenIssueTerminalResolutionKind.EMPLOYEE_UNKNOWN,
+            source_ref=SourceRef(kind=SourceKind.EMPLOYEE_TURN, id="turn-0"),
+        )
+    )
+
+    applied = apply(
+        current=already,
+        issue_resolutions=(resolution("not_applicable"),),
+    )
+
+    assert not applied.is_applied

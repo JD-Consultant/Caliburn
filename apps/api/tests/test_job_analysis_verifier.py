@@ -965,3 +965,181 @@ def test_current_turn_must_be_an_employee_turn_in_the_packet():
         context(current_turn_ordinal=1)
     with pytest.raises(ValidationError, match="current turn must be an employee turn"):
         context(current_turn_ordinal=99)
+
+
+# ── issue_resolutions[](ADR 0054 決定 22–23)────────────────────────────────
+
+
+def resolution_context(*, subject_task_id="task-1"):
+    from app.job_analysis.application import (
+        PacketOpenIssue,
+        PacketTask,
+        PacketTurn,
+        TurnSpeaker,
+        VerificationContext,
+    )
+
+    return VerificationContext(
+        turns=(
+            PacketTurn(ordinal=1, turn_id="turn-1", speaker=TurnSpeaker.CONSULTANT, text="請說說你的一週"),
+            PacketTurn(ordinal=2, turn_id="turn-2", speaker=TurnSpeaker.EMPLOYEE, text="我每週彙整營運週報"),
+        ),
+        current_turn_ordinal=2,
+        tasks=(PacketTask(ordinal=1, task_id="task-1"),),
+        open_issues=(
+            PacketOpenIssue(
+                ordinal=1,
+                issue_id="op-1-gap0",
+                subject_task_id=subject_task_id,
+            ),
+        ),
+    )
+
+
+def support_only_signal(*, target=1, anchors=True):
+    from app.job_analysis.llm import (
+        IdentityAssessment,
+        IdentityRelation,
+        SignalAnchor,
+        SignalDisposition,
+        WorkSignal,
+    )
+
+    return WorkSignal(
+        anchors=(
+            (SignalAnchor(turn_ordinal=2, quote="我每週彙整營運週報"),) if anchors else ()
+        ),
+        identity=IdentityAssessment(
+            relation=IdentityRelation.DUPLICATE,
+            target_task_ordinals=(target,),
+        ),
+        disposition=SignalDisposition.SUPPORT_ONLY,
+    )
+
+
+def result_with_resolutions(*resolutions, signals=()):
+    from app.job_analysis.llm import (
+        IssueResolution,
+        IssueResolutionKind,
+        NextQuestion,
+        TaskAnalysisResult,
+    )
+
+    return TaskAnalysisResult(
+        work_signals=signals,
+        issue_resolutions=tuple(
+            IssueResolution(ordinal=ordinal, resolution=IssueResolutionKind(kind))
+            for ordinal, kind in resolutions
+        ),
+        next_question=NextQuestion(text="還有其他每週要做的事嗎？"),
+    )
+
+
+def codes_for(result, context):
+    return {
+        violation.code for violation in verify_task_analysis_result(result, context).violations
+    }
+
+
+def test_answered_needs_a_same_turn_signal_leaving_evidence_on_the_subject_task():
+    """決定 23:否則 digest 不變、OPKS 不會再分析,缺口被**假關閉**。
+
+    員工以為答過了,系統卻永遠不會用那個答案。
+    """
+
+    from app.job_analysis.application import ViolationCode
+
+    assert ViolationCode.ISSUE_RESOLUTION_ANSWER_NOT_RECORDED in codes_for(
+        result_with_resolutions((1, "answered")),
+        resolution_context(),
+    )
+
+
+def test_answered_is_accepted_when_the_same_turn_records_the_answer():
+    assert verify_task_analysis_result(
+        result_with_resolutions((1, "answered"), signals=(support_only_signal(),)),
+        resolution_context(),
+    ).is_valid
+
+
+def test_answered_rejects_a_signal_that_leaves_no_anchor():
+    """沒有 anchor 就沒有 SupportLink,digest 一樣不會變。"""
+
+    from app.job_analysis.application import ViolationCode
+
+    assert ViolationCode.ISSUE_RESOLUTION_ANSWER_NOT_RECORDED in codes_for(
+        result_with_resolutions(
+            (1, "answered"),
+            signals=(support_only_signal(anchors=False),),
+        ),
+        resolution_context(),
+    )
+
+
+@pytest.mark.parametrize("kind", ["employee_unknown", "not_applicable"])
+def test_the_two_terminal_answers_need_no_work_signal(kind):
+    """員工說不知道／不適用時本來就沒有新依據可留,要求 signal 等於逼模型編一個。"""
+
+    assert verify_task_analysis_result(
+        result_with_resolutions((1, kind)),
+        resolution_context(),
+    ).is_valid
+
+
+def test_an_unknown_issue_ordinal_is_rejected():
+    """決定 20:terminal issue 不配發 ordinal,指過去就是無效 ordinal。"""
+
+    from app.job_analysis.application import ViolationCode
+
+    assert ViolationCode.ISSUE_RESOLUTION_ORDINAL_UNKNOWN in codes_for(
+        result_with_resolutions((99, "employee_unknown")),
+        resolution_context(),
+    )
+
+
+def test_the_same_issue_cannot_be_resolved_twice_in_one_turn():
+    from app.job_analysis.application import ViolationCode
+
+    assert ViolationCode.ISSUE_RESOLUTION_REPEATED in codes_for(
+        result_with_resolutions((1, "employee_unknown"), (1, "not_applicable")),
+        resolution_context(),
+    )
+
+
+def test_one_answer_may_resolve_several_gaps_without_side_effects():
+    """決定 22:一個答案同時解 P／K／S 三個缺口就是三筆,每一筆都沒有處置。"""
+
+    from app.job_analysis.application import (
+        PacketOpenIssue,
+        PacketTask,
+        PacketTurn,
+        TurnSpeaker,
+        VerificationContext,
+    )
+
+    context = VerificationContext(
+        turns=(
+            PacketTurn(ordinal=1, turn_id="turn-1", speaker=TurnSpeaker.CONSULTANT, text="請說說你的一週"),
+            PacketTurn(ordinal=2, turn_id="turn-2", speaker=TurnSpeaker.EMPLOYEE, text="我每週彙整營運週報"),
+        ),
+        current_turn_ordinal=2,
+        tasks=(PacketTask(ordinal=1, task_id="task-1"),),
+        open_issues=tuple(
+            PacketOpenIssue(
+                ordinal=ordinal,
+                issue_id=f"op-1-gap{ordinal}",
+                subject_task_id="task-1",
+            )
+            for ordinal in (1, 2, 3)
+        ),
+    )
+
+    assert verify_task_analysis_result(
+        result_with_resolutions(
+            (1, "answered"),
+            (2, "answered"),
+            (3, "answered"),
+            signals=(support_only_signal(),),
+        ),
+        context,
+    ).is_valid

@@ -255,6 +255,7 @@ class TaskAnalysisPacket(DomainModel):
                     ordinal=view.ordinal,
                     issue_id=view.issue.id,
                     reconciliation_task_id=view.issue.reconciliation_task_id,
+                    subject_task_id=view.issue.subject_task_id,
                 )
                 for view in self.current_authorities.open_issues
             ),

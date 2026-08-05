@@ -249,3 +249,98 @@ def test_packet_refuses_to_call_the_model_without_effective_employee_grounding()
             ),
             current_opks=CurrentJdOpks(),
         )
+
+
+# ── specialist 也要看得到已終結的缺口(ADR 0054 決定 20)──────────────────────
+
+
+def settled_gap_issue(
+    issue_id: str = "op-1-gap0",
+    *,
+    task_id: str = "task-selected",
+    axis=None,
+    terminal=None,
+    summary: str = "還看不出完成這件事需要哪些具體操作",
+):
+    from app.job_analysis.domain import (
+        OpenIssue,
+        OpenIssueKind,
+        OpenIssueTerminalResolution,
+        OpenIssueTerminalResolutionKind,
+        OpksGapAxis,
+    )
+
+    return OpenIssue(
+        id=issue_id,
+        kind=OpenIssueKind.INSUFFICIENT_EVIDENCE,
+        summary=summary,
+        source_anchors=(
+            SupportLink(source_ref=source(SourceKind.EMPLOYEE_TURN, "turn-1"), quote="我每週彙整營運週報"),
+        ),
+        subject_task_id=task_id,
+        opks_axis=axis or OpksGapAxis.SKILL,
+        terminal_resolution=(
+            OpenIssueTerminalResolution(
+                kind=terminal or OpenIssueTerminalResolutionKind.EMPLOYEE_UNKNOWN,
+                source_ref=source(SourceKind.EMPLOYEE_TURN, "turn-9"),
+            )
+            if terminal is not False
+            else None
+        ),
+    )
+
+
+def test_the_specialist_sees_settled_gaps_for_the_selected_task():
+    """少了這一區,新 Evidence 讓 digest 改變後,specialist 會對同一軸再開一次同一個
+    缺口,員工就被重問一次已經答不出來的事。"""
+
+    from app.job_analysis.domain import OpksGapAxis
+
+    built = build_opks_context_packet(
+        selected_task=selected_task(),
+        current_opks=CurrentJdOpks(),
+        open_issues=(settled_gap_issue(),),
+    )
+
+    assert len(built.settled_gaps) == 1
+    assert built.settled_gaps[0].axis is OpksGapAxis.SKILL
+    assert "已終結的缺口" in render_opks_context_packet(built)
+    assert "員工表示不知道" in render_opks_context_packet(built)
+
+
+def test_an_active_gap_is_not_settled_memory():
+    built = build_opks_context_packet(
+        selected_task=selected_task(),
+        current_opks=CurrentJdOpks(),
+        open_issues=(settled_gap_issue(terminal=False),),
+    )
+
+    assert built.settled_gaps == ()
+
+
+def test_another_tasks_settled_gap_is_not_projected():
+    built = build_opks_context_packet(
+        selected_task=selected_task(),
+        current_opks=CurrentJdOpks(),
+        open_issues=(settled_gap_issue(task_id="task-other"),),
+    )
+
+    assert built.settled_gaps == ()
+
+
+def test_settled_gaps_do_not_change_the_read_set():
+    """決定 12:child 的 freshness 契約是 digest,終結記憶是 context 不是 authority
+    input。放進 read_set 會製造一個與分析輸入無關的 abandon 觸發器。"""
+
+    subject = selected_task()
+    without = build_opks_context_packet(
+        selected_task=subject,
+        current_opks=CurrentJdOpks(),
+    )
+    with_memory = build_opks_context_packet(
+        selected_task=subject,
+        current_opks=CurrentJdOpks(),
+        open_issues=(settled_gap_issue(),),
+    )
+
+    assert with_memory.read_set == without.read_set

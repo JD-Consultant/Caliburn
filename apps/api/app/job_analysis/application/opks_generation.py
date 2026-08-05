@@ -8,7 +8,10 @@ from uuid import UUID
 
 from app.job_analysis.domain import (
     CurrentJdOpks,
+    OpenIssue,
+    OpenIssueKind,
     OpksProposal,
+    SourceAnchor,
     Task,
     TaskState,
 )
@@ -25,6 +28,7 @@ from .opks_context import (
 )
 from .opks_digest import compute_analysis_input_digest
 from .opks_operation import OpksOperationResult, run_opks_operation
+from .opks_verifier import OpksGap
 from .persistence import (
     OPKS_GENERATION_SCHEMA_ID,
     DocumentRecord,
@@ -160,6 +164,46 @@ async def prepare_opks_generation(
         )
 
 
+def _gap_issues(
+    gaps: tuple[OpksGap, ...],
+    *,
+    packet: OpksContextPacket,
+    selected_task_id: str,
+    operation_id: str,
+) -> tuple[OpenIssue, ...]:
+    """把 specialist 的缺口落成可持久、可追問、可終結的 `OpenIssue`(決定 19)。
+
+    ID 決定性(`{operation_id}-gap{source_index}`),沿用本 repo 既有的
+    「ID 由 operation_id ＋ 位置決定」慣例,**不用 `uuid4()`**:同一個 operation
+    重跑必須產生同一批 ID,否則 replay 會留下兩份缺口。
+
+    anchors 用該 Task 目前投影給 specialist 的員工依據——`OpenIssue` 要求至少一筆,
+    而缺口正是「就這些依據還看不出這一軸」的意思。
+    """
+
+    if not gaps:
+        return ()
+    anchors = tuple(
+        SourceAnchor(
+            source_ref=view.support_link.source_ref,
+            quote=view.support_link.quote,
+            question_turn_id=view.support_link.question_turn_id,
+        )
+        for view in packet.evidence
+    )
+    return tuple(
+        OpenIssue(
+            id=f"{operation_id}-gap{gap.source_index}",
+            kind=OpenIssueKind.INSUFFICIENT_EVIDENCE,
+            summary=gap.summary,
+            source_anchors=anchors,
+            subject_task_id=selected_task_id,
+            opks_axis=gap.axis,
+        )
+        for gap in gaps
+    )
+
+
 def _require_verified(operation_result: OpksOperationResult) -> None:
     if (
         operation_result.outcome is not OperationOutcome.VERIFIED
@@ -225,20 +269,42 @@ async def commit_opks_generation(
             for change in operation_result.report.changes
         )
         proposal_ids = tuple(proposal.proposal_id for proposal in additions)
-        outcome = (
-            OpksGenerationOutcome.PROPOSED
-            if proposal_ids
-            else OpksGenerationOutcome.NO_CHANGE
+        gap_issues = _gap_issues(
+            operation_result.report.gaps,
+            packet=current_packet,
+            selected_task_id=snapshot.selected_task_id,
+            operation_id=operation_id,
         )
+        gap_issue_ids = tuple(issue.id for issue in gap_issues)
+        # 決定 28:有 gap 即 needs_clarification,`proposal_ids` 仍可非空。
+        if gap_issue_ids:
+            outcome = OpksGenerationOutcome.NEEDS_CLARIFICATION
+        elif proposal_ids:
+            outcome = OpksGenerationOutcome.PROPOSED
+        else:
+            outcome = OpksGenerationOutcome.NO_CHANGE
         payload = OpksGenerationPayload(
             operation_id=operation_id,
             selected_task_id=snapshot.selected_task_id,
             analysis_input_digest=snapshot.analysis_input_digest,
             outcome=outcome,
             proposal_ids=proposal_ids,
+            gap_issue_ids=gap_issue_ids,
         )
+        # 決定 30:Proposal、OpenIssue 與 receipt 在同一個 commit_authority_change()
+        # 交易寫入。open_issues 住 work_model,順著同一份 state 更新即可。
         next_state = state.model_copy(
-            update={"opks_proposals": (*state.opks_proposals, *additions)}
+            update={
+                "work_model": state.work_model.model_copy(
+                    update={
+                        "open_issues": (
+                            *state.work_model.open_issues,
+                            *gap_issues,
+                        )
+                    }
+                ),
+                "opks_proposals": (*state.opks_proposals, *additions),
+            }
         )
         await commit_authority_change(
             uow,

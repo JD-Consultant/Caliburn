@@ -111,6 +111,16 @@ OPKS 是另一個已接通 durable generation 的單 Task operation，不擴充�
   `CompletedTurnPayload.scheduled_opks`（最多一筆）。**綁定在 receipt 寫入時凍結**：replay 一律
   回傳既存 payload 那一筆，`_require_same_replay()` **刻意不比對** `scheduled_opks`。少了這一條，
   replay 會重跑 scheduler 依當下 state 改選下一個 Task，同一個員工回合因此付兩次錢。
+- **執行點是 `submit_employee_turn()`，不是背景工作。** 主回合提交後，若 payload 帶
+  `scheduled_opks` 就同步跑那一個 child；一次 `/turns` 最多主顧問 ＋ 一個 specialist，
+  員工只看到一個「分析中」。child 的失敗**不得**改變 `/turns` 的結果：四種終端失敗由
+  `generate_opks_proposals()` 自己寫 `failed` receipt，`StaleAuthoritySnapshot` 是
+  abandon（不寫 receipt、不擋下次），兩者都在 `_run_scheduled_opks()` 內被吞掉。
+- **沒有 background worker，因此單純 reload／GET 不會補跑漏掉的 child。** 恢復只發生在
+  兩個地方：同一個 `/turns` 以相同 `Idempotency-Key` replay（replay 分支會讀回既凍結的
+  `scheduled_opks`），或後續回合的 scheduler 再次選到同一個 child ID。程式註解、UI 文案
+  與文檔都不得暗示「開著就會自己補上」；`test_reloading_the_document_does_not_run_the_missing_child`
+  就是擋住日後有人在讀取路徑加隱性 worker 的那道牆。
 - `analysis_input_digest`（`opks_digest.py`）只吃 Task：六個語意欄位 ＋
   `Task.effective_employee_support_links`。**排除** `CurrentJdOpks`／`OpksProposal` 狀態（否則
   接受 Proposal 就會 ping-pong）與 `rejection_reason`（REJECTED 強制帶 reason，進 digest 就是

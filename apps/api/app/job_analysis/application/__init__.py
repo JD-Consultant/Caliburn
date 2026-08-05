@@ -57,6 +57,7 @@ from .opks_authoring import (
     delete_opks_item,
     edit_opks_item,
     prune_opks_for_current_jd,
+    prune_opks_gaps_for_current_jd,
 )
 from .opks_context import (
     OpksContextPacket,
@@ -276,6 +277,7 @@ __all__ = [
     "prepare_turn",
     "prepare_opks_generation",
     "prune_opks_for_current_jd",
+    "prune_opks_gaps_for_current_jd",
     "put_document_metadata",
     "propose_task_for_jd",
     "reorder_jd_tasks",

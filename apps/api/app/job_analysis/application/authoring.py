@@ -42,7 +42,10 @@ from .persistence import (
     JournalEntry,
     LoadedDocument,
 )
-from .opks_authoring import prune_opks_for_current_jd
+from .opks_authoring import (
+    prune_opks_for_current_jd,
+    prune_opks_gaps_for_current_jd,
+)
 from .opks_proposals import stale_invalid_opks_proposals
 from .transition import JobAnalysisState
 from .verifier import TurnSpeaker
@@ -505,6 +508,16 @@ async def delete_jd_task(
             keep_missing_task_issue=False,
         )
         next_tasks = tuple(task for task in tasks if task.task_id != task_id)
+        # ADR 0054 決定 26:OPKS 缺口與 OPKS items 在同一筆交易一起清,否則主顧問
+        # 下一輪還會拿一個已被刪掉的工作去追問員工。
+        work_model = work_model.model_copy(
+            update={
+                "open_issues": prune_opks_gaps_for_current_jd(
+                    work_model.open_issues,
+                    next_tasks,
+                )
+            }
+        )
         current_opks = CurrentJdOpks(
             items=await uow.opks.list(document_id)
         )

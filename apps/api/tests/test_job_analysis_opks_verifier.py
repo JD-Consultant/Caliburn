@@ -13,6 +13,7 @@ from app.job_analysis.domain import (
     CurrentJdOpks,
     OpksEntityKind,
     OpksEvidenceLink,
+    OpksGapAxis,
     OpksItem,
     OpksProposalAction,
     SourceKind,
@@ -274,12 +275,15 @@ def test_remove_knowledge_keeps_the_document_level_item_even_when_it_becomes_unl
 
 
 def test_uncertain_creates_no_proposal_change():
+    """`uncertain` 仍然不產生候選——但它不再被丟掉,而是留成一筆 gap(決定 15)。"""
+
     report = verify_opks_result(
         packet(),
         result(
             model_item(
                 OpksGenerationEntityKind.SKILL,
                 OpksDecision.UNCERTAIN,
+                text="還看不出完成這件事需要哪些操作",
             )
         ),
         operation_id="operation-1",
@@ -287,6 +291,7 @@ def test_uncertain_creates_no_proposal_change():
 
     assert report.is_valid
     assert report.changes == ()
+    assert len(report.gaps) == 1
 
 
 @pytest.mark.parametrize(
@@ -466,3 +471,125 @@ def test_semantic_quality_is_not_falsely_encoded_as_a_deterministic_rule():
     )
 
     assert report.is_valid
+
+
+# ── uncertain 從被丟棄變成 gap(ADR 0054 決定 15–18)──────────────────────────
+
+
+def gap_item(kind: OpksGenerationEntityKind, summary: str) -> OpksResultItem:
+    return OpksResultItem(
+        entity_kind=kind,
+        decision=OpksDecision.UNCERTAIN,
+        target_ordinal=None,
+        text=summary,
+    )
+
+
+def test_uncertain_now_requires_a_non_empty_gap_summary():
+    """決定 15:`text` 從強制空字串改為強制非空。
+
+    在此之前 verifier 直接 `continue`,缺口在契約層沒有形狀,系統因此不知道
+    「資料是否足以產出 O/P/K/S」,也無處保存缺什麼。
+    """
+
+    report = verify_opks_result(
+        packet(),
+        OpksResult(
+            items=(
+                OpksResultItem(
+                    entity_kind=OpksGenerationEntityKind.OUTPUT,
+                    decision=OpksDecision.UNCERTAIN,
+                    target_ordinal=None,
+                    text=None,
+                ),
+            )
+        ),
+        operation_id="opks-1",
+    )
+
+    assert not report.is_valid
+    assert report.violations[0].code is OpksViolationCode.DECISION_PAYLOAD_INVALID
+
+
+def test_a_gap_survives_verification_with_its_axis_and_summary():
+    report = verify_opks_result(
+        packet(),
+        OpksResult(
+            items=(gap_item(OpksGenerationEntityKind.OUTPUT, "還不知道這項工作交出什麼"),)
+        ),
+        operation_id="opks-1",
+    )
+
+    assert report.is_valid
+    assert report.changes == ()
+    assert len(report.gaps) == 1
+    assert report.gaps[0].axis is OpksGapAxis.OUTPUT
+    assert report.gaps[0].summary == "還不知道這項工作交出什麼"
+    assert report.gaps[0].source_index == 0
+
+
+def test_gaps_and_changes_can_be_published_together():
+    """決定 18:效力單位是 item,不是軸、不是整個 Task。
+
+    0048 決定 24 的 `source_refs[]` 非空是逐項規則——每一條候選的效力由它自己的
+    來源建立。用軸當扣留單位是範疇錯誤,而且會覆寫 specialist 的逐項判斷。
+    """
+
+    report = verify_opks_result(
+        packet(),
+        OpksResult(
+            items=(
+                OpksResultItem(
+                    entity_kind=OpksGenerationEntityKind.OUTPUT,
+                    decision=OpksDecision.ADD_NEW,
+                    target_ordinal=None,
+                    text="營運週報",
+                ),
+                gap_item(OpksGenerationEntityKind.SKILL, "還看不出完成這件事需要哪些操作"),
+            )
+        ),
+        operation_id="opks-1",
+    )
+
+    assert report.is_valid
+    assert len(report.changes) == 1
+    assert len(report.gaps) == 1
+
+
+def test_a_mechanical_violation_drops_gaps_as_well_as_changes():
+    """任一機械違規即整批不產生 change——gap 同樣不得漏出去。"""
+
+    report = verify_opks_result(
+        packet(),
+        OpksResult(
+            items=(
+                gap_item(OpksGenerationEntityKind.OUTPUT, "還不知道這項工作交出什麼"),
+                OpksResultItem(
+                    entity_kind=OpksGenerationEntityKind.KNOWLEDGE,
+                    decision=OpksDecision.REUSE_EXISTING,
+                    target_ordinal=99,
+                    text=None,
+                ),
+            )
+        ),
+        operation_id="opks-1",
+    )
+
+    assert not report.is_valid
+    assert report.gaps == ()
+    assert report.changes == ()
+
+
+def test_the_opks_wire_schema_is_unchanged_by_the_gap_contract():
+    """決定 15:`opks_result_v1` **零 schema 變更**。
+
+    非空是 verifier／mapper 層的約束,不是 wire 的約束;寫進 schema 會讓
+    `text=""` 的既有 decision(reuse／remove)也一併被 provider 端擋掉。
+    """
+
+    from app.job_analysis.llm import (
+        committed_opks_wire_schema,
+        opks_result_wire_provider_schema,
+    )
+
+    assert opks_result_wire_provider_schema() == committed_opks_wire_schema()

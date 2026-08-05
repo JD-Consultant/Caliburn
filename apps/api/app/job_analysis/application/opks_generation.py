@@ -18,7 +18,7 @@ from app.job_analysis.domain import (
 from app.job_analysis.providers import OpenRouterAdapter
 
 from .authority_commit import commit_authority_change
-from .durable_turn import StaleAuthoritySnapshot, UncommittableOperationResult
+from .durable_turn import StaleAuthoritySnapshot
 from .errors import DocumentNotFound, IdempotencyConflict, JdTaskNotFound
 from .operation import OperationOutcome
 from .opks_context import (
@@ -204,15 +204,61 @@ def _gap_issues(
     )
 
 
-def _require_verified(operation_result: OpksOperationResult) -> None:
-    if (
+def _is_terminal_failure(operation_result: OpksOperationResult) -> bool:
+    """provider error／invalid output／refused／verifier rejected 都是終端失敗。
+
+    第一版**不做 backoff、attempt counter、circuit breaker**(決定 29)。失敗寫一筆
+    `failed` receipt,作用是解除 head-of-line blocking——否則同一個 Task 每輪都會被
+    重新排定、每輪都再燒一次錢。
+
+    誠實代價已載明於 ADR 後果段:偶發 provider 抖動會**永久**壓住那個確切 digest,
+    直到出現新 Evidence 使 digest 改變。只在「該 Task 之後再也沒被提到」時才真的損失。
+    """
+
+    return (
         operation_result.outcome is not OperationOutcome.VERIFIED
         or operation_result.report is None
         or not operation_result.report.is_valid
-    ):
-        raise UncommittableOperationResult(
-            f"cannot commit OPKS operation outcome {operation_result.outcome.value!r}"
-        )
+    )
+
+
+async def _commit_failed_receipt(
+    uow: JobAnalysisUnitOfWork,
+    *,
+    record: DocumentRecord,
+    state: JobAnalysisState,
+    snapshot: OpksGenerationSnapshot,
+    operation_id: str,
+    now: datetime,
+) -> OpksGenerationResult:
+    """寫一筆 `failed` 終端 receipt,不改 Current JD 的任何內容。
+
+    四種 outcome **在阻擋效果上等價**(決定 29):差別只在呈現與診斷。
+    """
+
+    payload = OpksGenerationPayload(
+        operation_id=operation_id,
+        selected_task_id=snapshot.selected_task_id,
+        analysis_input_digest=snapshot.analysis_input_digest,
+        outcome=OpksGenerationOutcome.FAILED,
+    )
+    await commit_authority_change(
+        uow,
+        record=record,
+        state=state,
+        updated_at=now,
+        journal_entries=(
+            JournalEntry(
+                document_id=snapshot.document_id,
+                entry_id=operation_id,
+                kind="opks_generation",
+                payload_schema_id=OPKS_GENERATION_SCHEMA_ID,
+                payload=payload,
+                created_at=now,
+            ),
+        ),
+    )
+    return _result(payload)
 
 
 async def commit_opks_generation(
@@ -222,9 +268,6 @@ async def commit_opks_generation(
     operation_id: str,
     operation_result: OpksOperationResult,
 ) -> OpksGenerationResult:
-    _require_verified(operation_result)
-    assert operation_result.report is not None
-
     async with uow_factory() as uow:
         record = await uow.documents.get(snapshot.document_id, for_update=True)
         if record is None:
@@ -249,11 +292,25 @@ async def commit_opks_generation(
             record.authority_generation != snapshot.authority_generation
             or current_packet.read_set != snapshot.packet.read_set
         ):
+            # abandon(決定 10):**不寫任何 receipt,因此不阻擋**。漂移代表已有更新的
+            # 回合,由該回合排定自己的 child。用一次偶發競態永久壓住一個 digest 是錯的。
+            # 這一段刻意排在失敗處理之前:輸入已經不是當初那一份,為它留下終端 receipt
+            # 只會封鎖一個沒有人會再要求的 digest。
             raise StaleAuthoritySnapshot(
                 "the document changed after OPKS generation was prepared"
             )
 
         now = _utcnow()
+        if _is_terminal_failure(operation_result):
+            return await _commit_failed_receipt(
+                uow,
+                record=record,
+                state=state,
+                snapshot=snapshot,
+                operation_id=operation_id,
+                now=now,
+            )
+        assert operation_result.report is not None
         additions = tuple(
             OpksProposal(
                 proposal_id=f"{operation_id}-op{change.source_index}",

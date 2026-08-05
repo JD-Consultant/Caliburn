@@ -15,6 +15,8 @@ from app.job_analysis.application import (
     create_document,
     generate_opks_proposals,
     load_document,
+    scheduled_opks_operation_id,
+    select_scheduled_opks,
 )
 from app.job_analysis.application.errors import IdempotencyConflict
 from app.job_analysis.domain import (
@@ -515,3 +517,198 @@ async def test_a_replayed_generation_does_not_duplicate_the_gap_issue(
     assert transport.calls == 1
     assert loaded is not None
     assert len(loaded.state.work_model.open_issues) == 1
+
+
+# ── 終端失敗與 abandon 必須分開(ADR 0054 決定 10、29)────────────────────────
+
+
+class FailingTransport:
+    """provider 回非 200:terminal 失敗的其中一種。"""
+
+    def __init__(self):
+        self.calls = 0
+
+    async def __call__(self, *, url, headers, body, timeout):
+        self.calls += 1
+        return TransportResponse(status_code=503, body={"error": "upstream down"})
+
+
+def refusal_wire_response() -> TransportResponse:
+    return TransportResponse(
+        status_code=200,
+        body={
+            "model": CONFIG.model,
+            "choices": [
+                {
+                    "message": {"content": None, "refusal": "我無法協助這個請求"},
+                    "finish_reason": "stop",
+                }
+            ],
+        },
+    )
+
+
+class RefusingTransport:
+    def __init__(self):
+        self.calls = 0
+
+    async def __call__(self, *, url, headers, body, timeout):
+        self.calls += 1
+        return refusal_wire_response()
+
+
+class MalformedTransport:
+    """回 200 但不是合法的 opks_result_v1:invalid_output。"""
+
+    def __init__(self):
+        self.calls = 0
+
+    async def __call__(self, *, url, headers, body, timeout):
+        self.calls += 1
+        return TransportResponse(
+            status_code=200,
+            body={
+                "model": CONFIG.model,
+                "choices": [
+                    {
+                        "message": {"content": '{"items": "not a list"}', "refusal": None},
+                        "finish_reason": "stop",
+                    }
+                ],
+            },
+        )
+
+
+def rejected_wire() -> OpksResultWire:
+    """target ordinal 不存在:verifier rejected。"""
+
+    return OpksResultWire(
+        items=(
+            OpksWireItem(
+                entity_kind=OpksEntityKind.KNOWLEDGE,
+                decision=OpksDecision.REUSE_EXISTING,
+                target_ordinal=99,
+                text="",
+            ),
+        )
+    )
+
+
+@pytest.mark.parametrize(
+    "transport_factory",
+    [
+        FailingTransport,
+        RefusingTransport,
+        MalformedTransport,
+        lambda: RecordingTransport(rejected_wire()),
+    ],
+    ids=["provider_error", "refused", "invalid_output", "verifier_rejected"],
+)
+async def test_every_terminal_failure_writes_a_failed_receipt(
+    postgres_session_factory,
+    cleanup_job_analysis_rows,
+    transport_factory,
+):
+    """決定 29:四種 outcome 在阻擋效果上等價,差別只在呈現與診斷。
+
+    `failed` 的作用是解除 head-of-line blocking——否則同一個 Task 每輪都會被重新
+    排定、每輪都再燒一次錢。
+    """
+
+    document_id = cleanup_job_analysis_rows
+    uow_factory = await seed(postgres_session_factory, document_id)
+
+    result = await generate_opks_proposals(
+        uow_factory,
+        adapter=adapter(transport_factory()),
+        document_id=document_id,
+        task_id="task-1",
+        operation_id="generate-failed",
+    )
+    loaded = await load_document(uow_factory, document_id)
+
+    assert result.outcome is OpksGenerationOutcome.FAILED
+    assert result.proposal_ids == ()
+    assert result.gap_issue_ids == ()
+    assert result.analysis_input_digest
+    assert loaded is not None
+    assert loaded.state.opks_proposals == ()
+    assert loaded.state.work_model.open_issues == ()
+    async with uow_factory() as uow:
+        receipt = await uow.journal.get(document_id, "generate-failed")
+    assert receipt is not None
+    assert receipt.payload.outcome is OpksGenerationOutcome.FAILED
+
+
+async def test_a_failed_receipt_stops_the_same_input_from_being_rescheduled(
+    postgres_session_factory,
+    cleanup_job_analysis_rows,
+):
+    document_id = cleanup_job_analysis_rows
+    uow_factory = await seed(postgres_session_factory, document_id)
+    loaded = await load_document(uow_factory, document_id)
+    assert loaded is not None
+    async with uow_factory() as uow:
+        before = await select_scheduled_opks(
+            uow,
+            document_id=document_id,
+            state=loaded.state,
+        )
+    assert before is not None
+
+    await generate_opks_proposals(
+        uow_factory,
+        adapter=adapter(FailingTransport()),
+        document_id=document_id,
+        task_id="task-1",
+        operation_id=scheduled_opks_operation_id(before),
+    )
+
+    async with uow_factory() as uow:
+        after = await select_scheduled_opks(
+            uow,
+            document_id=document_id,
+            state=loaded.state,
+        )
+
+    assert after is None
+
+
+async def test_digest_drift_abandons_without_writing_any_receipt(
+    postgres_session_factory,
+    cleanup_job_analysis_rows,
+):
+    """決定 10:abandon 與 failed 必須分開。
+
+    漂移代表已有更新的回合,由該回合排定自己的 child。用一次偶發競態永久壓住一個
+    digest 是錯的——所以這條路徑**不寫 receipt**,同一個輸入之後仍排得到。
+    """
+
+    document_id = cleanup_job_analysis_rows
+    uow_factory = await seed(postgres_session_factory, document_id)
+
+    async def drift():
+        await add_opks_item(
+            uow_factory,
+            document_id=document_id,
+            entry_id="employee-edit-during-call",
+            entity_kind=OpksEntityKind.OUTPUT,
+            text="員工自己補的產出",
+            task_refs=("task-1",),
+        )
+
+    transport = RecordingTransport(add_output_wire(), before_return=drift)
+
+    with pytest.raises(StaleAuthoritySnapshot):
+        await generate_opks_proposals(
+            uow_factory,
+            adapter=adapter(transport),
+            document_id=document_id,
+            task_id="task-1",
+            operation_id="generate-abandoned",
+        )
+
+    async with uow_factory() as uow:
+        receipt = await uow.journal.get(document_id, "generate-abandoned")
+
+    assert receipt is None

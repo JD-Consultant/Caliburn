@@ -108,7 +108,7 @@ def _number(items: tuple[OpksItem, ...]) -> tuple[OpksItemView, ...]:
     )
 
 
-def _proposal_references_task(
+def proposal_references_task(
     proposal: OpksProposal,
     *,
     selected_task_id: str,
@@ -170,7 +170,7 @@ def build_opks_context_packet(
         for proposal in proposals
         if proposal.status in ACTIVE_OR_CONSTRAINING_PROPOSAL_STATUSES
         and proposal.entity_kind is not OpksEntityKind.ATTITUDE
-        and _proposal_references_task(
+        and proposal_references_task(
             proposal,
             selected_task_id=selected_task.task_id,
             selected_indicator_ids=selected_indicator_ids,

@@ -17,6 +17,7 @@ from app.job_analysis.llm import (
     ExcludePayload,
     IdentityAssessment,
     IdentityRelation,
+    IssueResolution,
     NextQuestion,
     NextQuestionTarget,
     NextQuestionTargetKind,
@@ -38,7 +39,14 @@ from app.job_analysis.llm import (
 
 
 def test_result_top_level_shape_is_frozen():
-    assert list(TaskAnalysisResult.model_fields) == ["work_signals", "next_question"]
+    assert list(TaskAnalysisResult.model_fields) == [
+        "work_signals",
+        "issue_resolutions",
+        "next_question",
+    ]
+    # ADR 0054 決定 22:issue_resolutions 是與 work_signals 平行的第三個頂層陣列,
+    # 結構上不可能夾帶工作副作用——沒有 disposition、沒有 task_change、沒有 support。
+    assert list(IssueResolution.model_fields) == ["ordinal", "resolution"]
     assert list(WorkSignal.model_fields) == [
         "anchors",
         "identity",

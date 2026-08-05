@@ -30,6 +30,7 @@ from pydantic import model_validator
 from app.job_analysis.domain import DomainModel, Identifier, NonEmptyText, TaskId
 from app.job_analysis.llm import (
     IdentityRelation,
+    IssueResolutionKind,
     SignalDisposition,
     TaskAnalysisResult,
     TaskChangeKind,
@@ -78,6 +79,8 @@ class PacketOpenIssue(DomainModel):
     ordinal: int
     issue_id: Identifier
     reconciliation_task_id: TaskId | None = None
+    subject_task_id: TaskId | None = None
+    """OPKS 缺口在問哪一個 Task(ADR 0054 決定 19),`answered` 的前提要用它。"""
 
 
 class VerificationContext(DomainModel):
@@ -182,6 +185,9 @@ class ViolationCode(StrEnum):
     SPLIT_SUPPORT_UNKNOWN = "split_support_unknown"
     OPEN_ISSUE_ANCHORS_INSUFFICIENT = "open_issue_anchors_insufficient"
     NEXT_QUESTION_TARGET_INVALID = "next_question_target_invalid"
+    ISSUE_RESOLUTION_ORDINAL_UNKNOWN = "issue_resolution_ordinal_unknown"
+    ISSUE_RESOLUTION_REPEATED = "issue_resolution_repeated"
+    ISSUE_RESOLUTION_ANSWER_NOT_RECORDED = "issue_resolution_answer_not_recorded"
     SUPERSESSION_UNKNOWN = "supersession_unknown"
     SUPERSESSION_ALREADY_SUPERSEDED = "supersession_already_superseded"
     SUPERSESSION_TASK_NOT_TARGETED = "supersession_task_not_targeted"
@@ -233,6 +239,7 @@ def verify_task_analysis_result(
     for index, signal in enumerate(result.work_signals):
         _verify_signal(index, signal, context, violations)
     _verify_open_issues_are_resolved_once(result, violations)
+    _verify_issue_resolutions(result, context, violations)
     _verify_task_change_targets_are_claimed_once(result, violations)
     _verify_work_signals_are_not_exact_duplicates(result, violations)
     _verify_next_question(result, context, violations)
@@ -262,6 +269,93 @@ def _verify_signal(
     _verify_open_issue(index, signal, violations)
     _verify_open_issue_resolution(index, signal, context, violations)
     _verify_supersessions(index, signal, context, violations)
+
+
+#: 會把本輪員工依據接到既有 Task 上、且讓那個 Task 繼續存在的兩種處置。
+#
+# `support_only` 與 `revise` 都會 append SupportLink 到 target Task,因此
+# `analysis_input_digest` 一定改變,OPKS 會重新分析。其他處置都不行:
+# `add` 建立的是**新** Task(缺口問的那個 Task 沒拿到任何依據);
+# `withdraw`／`merge`／`split` 讓 target 退場,那條路是把 gap 移除(T13)不是回答它;
+# `exclude`／`open_issue` 根本不碰 Task 的依據。
+_EVIDENCE_LEAVING_CHANGES = frozenset({TaskChangeKind.REVISE})
+
+
+def _leaves_employee_evidence_on(
+    signal: WorkSignal,
+    task_id: TaskId,
+    context: VerificationContext,
+) -> bool:
+    if not signal.anchors:
+        return False
+    if signal.disposition is SignalDisposition.SUPPORT_ONLY:
+        pass
+    elif (
+        signal.disposition is SignalDisposition.TASK_CHANGE
+        and signal.task_change is not None
+        and signal.task_change.change in _EVIDENCE_LEAVING_CHANGES
+    ):
+        pass
+    else:
+        return False
+    ordinals = {task.ordinal: task.task_id for task in context.tasks}
+    return any(
+        ordinals.get(ordinal) == task_id
+        for ordinal in signal.identity.target_task_ordinals
+    )
+
+
+def _verify_issue_resolutions(
+    result: TaskAnalysisResult,
+    context: VerificationContext,
+    violations: list[Violation],
+) -> None:
+    """ADR 0054 決定 22–23 的機械前提。
+
+    `answered` 若沒有同輪留下員工依據,`analysis_input_digest` 不會變,OPKS 不會再
+    分析,缺口就被**假關閉**——員工以為答過了,系統卻永遠不會用那個答案。這是跨欄位
+    但完全機械可判的條件,所以擋得住。
+
+    擋不住的是「模型把 employee_unknown 當成偷懶出口」:那要判斷員工到底有沒有回答,
+    是語意判斷。ADR 後果段已載明只能靠 rubric 與「specialist 下次仍會重提同一 gap」
+    的自我修正。
+    """
+
+    by_ordinal = {issue.ordinal: issue for issue in context.open_issues}
+    seen: set[int] = set()
+    for resolution in result.issue_resolutions:
+        issue = by_ordinal.get(resolution.ordinal)
+        if issue is None:
+            # terminal issue 不配發 ordinal(決定 20),指過去就是無效 ordinal。
+            _add(
+                violations,
+                ViolationCode.ISSUE_RESOLUTION_ORDINAL_UNKNOWN,
+                f"issue resolution targets unknown open issue ordinal "
+                f"{resolution.ordinal}",
+            )
+            continue
+        if resolution.ordinal in seen:
+            _add(
+                violations,
+                ViolationCode.ISSUE_RESOLUTION_REPEATED,
+                f"open issue ordinal {resolution.ordinal} is resolved more than once",
+            )
+            continue
+        seen.add(resolution.ordinal)
+        if resolution.resolution is not IssueResolutionKind.ANSWERED:
+            continue
+        if issue.subject_task_id is None:
+            continue
+        if not any(
+            _leaves_employee_evidence_on(signal, issue.subject_task_id, context)
+            for signal in result.work_signals
+        ):
+            _add(
+                violations,
+                ViolationCode.ISSUE_RESOLUTION_ANSWER_NOT_RECORDED,
+                f"open issue ordinal {resolution.ordinal} was marked answered without a "
+                "same-turn work signal leaving employee evidence on its subject task",
+            )
 
 
 def _verify_open_issue_resolution(

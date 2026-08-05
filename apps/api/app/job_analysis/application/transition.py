@@ -32,6 +32,8 @@ from app.job_analysis.domain import (
     MergeTarget,
     NonEmptyText,
     OpenIssue,
+    OpenIssueTerminalResolution,
+    OpenIssueTerminalResolutionKind,
     OpksProposal,
     Proposal,
     ProposalAction,
@@ -54,6 +56,8 @@ from app.job_analysis.domain import (
     withdraw_delta_matches_target_state,
 )
 from app.job_analysis.llm import (
+    IssueResolution,
+    IssueResolutionKind,
     NextQuestion,
     NextQuestionTargetKind,
     SignalDisposition,
@@ -148,6 +152,8 @@ def apply_task_analysis_result(
     try:
         for index, signal in enumerate(result.work_signals):
             writer.apply_signal(index, signal)
+        for resolution in result.issue_resolutions:
+            writer.apply_issue_resolution(resolution)
         writer.record_next_question(result.next_question)
         return writer.finish()
     except (_TransitionRejected, ValidationError) as rejection:
@@ -305,6 +311,48 @@ class _Writer:
     def _is_reconciliation(self, ordinal: int) -> bool:
         view = self._packet_issue(ordinal)
         return view is not None and view.issue.reconciliation_task_id is not None
+
+    def apply_issue_resolution(self, resolution: IssueResolution) -> None:
+        """ADR 0054 決定 24–25:兩條終端路徑,`source_ref` 由 application 蓋。
+
+        `answered` 沿用現行語意(移出 `open_issues`):若 specialist 下次仍判定缺,
+        它會自己重新提出。`employee_unknown`／`not_applicable` **不移除**,寫入
+        `terminal_resolution` 後依決定 20 轉為「已問過、勿重問」的 context memory
+        ——移除它們等於下一輪把同一件事再問一次。
+        """
+
+        if resolution.resolution is IssueResolutionKind.ANSWERED:
+            self._close_open_issue(resolution.ordinal)
+            return
+        view = self._packet_issue(resolution.ordinal)
+        if view is None:
+            raise _TransitionRejected(
+                f"open issue ordinal {resolution.ordinal} is not in the packet"
+            )
+        for position, issue in enumerate(self._open_issues):
+            if issue.id != view.issue.id:
+                continue
+            if issue.terminal_resolution is not None:
+                raise _TransitionRejected(
+                    f"open issue ordinal {resolution.ordinal} is already terminal"
+                )
+            self._open_issues[position] = issue.model_copy(
+                update={
+                    "terminal_resolution": OpenIssueTerminalResolution(
+                        kind=OpenIssueTerminalResolutionKind(
+                            resolution.resolution.value
+                        ),
+                        source_ref=SourceRef(
+                            kind=SourceKind.EMPLOYEE_TURN,
+                            id=self._current_turn_id,
+                        ),
+                    )
+                }
+            )
+            return
+        raise _TransitionRejected(
+            f"open issue ordinal {resolution.ordinal} was already resolved by this result"
+        )
 
     def _close_open_issue(self, ordinal: int) -> None:
         """ADR 0047:移除模型自己提出、本輪已被回答的 open issue。"""

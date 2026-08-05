@@ -222,6 +222,30 @@
       },
       "type": "array"
     },
+    "issue_resolutions": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "open_issue_ordinal": {
+            "type": "integer"
+          },
+          "resolution": {
+            "enum": [
+              "answered",
+              "employee_unknown",
+              "not_applicable"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "open_issue_ordinal",
+          "resolution"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
     "next_question": {
       "additionalProperties": false,
       "properties": {
@@ -252,6 +276,7 @@
   },
   "required": [
     "work_signals",
+    "issue_resolutions",
     "next_question"
   ],
   "type": "object"

@@ -33,6 +33,7 @@ from app.job_analysis.llm.wire import (
     WireNextQuestion,
     WireNextQuestionTargetKind,
     WireRejectionCode,
+    WireIssueResolution,
     WireSignal,
     WireSplitChild,
     WireTaskChange,
@@ -320,7 +321,15 @@ def test_wire_schema_name_survives_every_provider_naming_rule():
 
 
 def test_wire_shape_is_frozen():
-    assert list(TaskAnalysisWire.model_fields) == ["work_signals", "next_question"]
+    assert list(TaskAnalysisWire.model_fields) == [
+        "work_signals",
+        "issue_resolutions",
+        "next_question",
+    ]
+    assert list(WireIssueResolution.model_fields) == [
+        "open_issue_ordinal",
+        "resolution",
+    ]
     assert list(WireSignal.model_fields) == [
         "anchors",
         "relation",

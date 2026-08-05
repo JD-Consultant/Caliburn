@@ -30,7 +30,9 @@ from app.job_analysis.application import (
     OpksProposalRepository,
     OpksRepository,
     ProposalDecisionPayload,
+    ScheduledOpks,
     TurnSpeaker,
+    scheduled_opks_operation_id,
 )
 from app.job_analysis.domain import (
     CurrentWorkModel,
@@ -322,6 +324,45 @@ def test_journal_kind_schema_and_payload_must_agree_and_round_trip():
                 "payload_schema_id": "job-analysis-completed-turn/2",
             }
         )
+
+
+# ── 主回合凍結的唯一 child(ADR 0054 決定 7–8)────────────────────────────────
+
+
+def test_completed_turn_payload_carries_at_most_one_scheduled_child():
+    payload = CompletedTurnPayload(
+        operation_id="operation-1",
+        employee_turn=employee_turn(),
+        consultant_turn=consultant_turn(),
+        scheduled_opks=ScheduledOpks(
+            task_id="task-1",
+            analysis_input_digest="abc123",
+        ),
+    )
+
+    reparsed = CompletedTurnPayload.model_validate_json(payload.model_dump_json())
+
+    assert reparsed.scheduled_opks.task_id == "task-1"
+    assert scheduled_opks_operation_id(reparsed.scheduled_opks) == (
+        "opks:auto:task-1:abc123"
+    )
+
+
+def test_completed_turn_payload_reads_back_a_turn_that_scheduled_nothing():
+    """additive optional:舊 entry 沒有這個欄位,`None` 表示該回合沒排定 child。"""
+
+    legacy = CompletedTurnPayload(
+        operation_id="operation-1",
+        employee_turn=employee_turn(),
+        consultant_turn=consultant_turn(),
+    ).model_dump_json()
+
+    assert "scheduled_opks" in legacy
+    assert CompletedTurnPayload.model_validate_json(
+        '{"operation_id":"operation-1",'
+        f'"employee_turn":{employee_turn().model_dump_json()},'
+        f'"consultant_turn":{consultant_turn().model_dump_json()}}}'
+    ).scheduled_opks is None
 
 
 # ── OPKS generation receipt(ADR 0054 決定 28–29)──────────────────────────────

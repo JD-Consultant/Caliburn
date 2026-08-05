@@ -132,12 +132,9 @@ def build_opks_context_packet(
 ) -> OpksContextPacket:
     """投影單一 Task 的 OPKS operation 所需最小現況。"""
 
-    effective_employee_support = tuple(
-        link
-        for link in selected_task.effective_support_links
-        if link.source_ref.kind
-        in {SourceKind.EMPLOYEE_TURN, SourceKind.DIRECT_EDIT}
-    )
+    # 投影規則只有一個定義(`Task.effective_employee_support_links`),
+    # `compute_analysis_input_digest()` 吃的是同一組——見 ADR 0054 決定 12。
+    effective_employee_support = selected_task.effective_employee_support_links
     if not effective_employee_support:
         raise OpksGroundingUnavailable(
             "selected task requires effective employee evidence before OPKS generation"

@@ -63,6 +63,11 @@ from .opks_context import (
     build_opks_context_packet,
     render_opks_context_packet,
 )
+from .opks_digest import (
+    ScheduledOpks,
+    compute_analysis_input_digest,
+    scheduled_opks_operation_id,
+)
 from .opks_operation import OpksOperationResult, run_opks_operation
 from .opks_generation import (
     OpksGenerationResult,
@@ -240,7 +245,10 @@ __all__ = [
     "WORK_MODEL_SCHEMA_ID",
     "add_jd_task",
     "add_opks_item",
+    "ScheduledOpks",
     "build_opks_context_packet",
+    "compute_analysis_input_digest",
+    "scheduled_opks_operation_id",
     "create_document",
     "commit_verified_turn",
     "commit_opks_generation",

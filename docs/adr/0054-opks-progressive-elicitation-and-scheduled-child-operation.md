@@ -1,6 +1,6 @@
 # 0054. OPKS 漸進式蒐集：自動排定的 child operation 與可持久的缺口
 
-- 狀態：Proposed
+- 狀態：Accepted
 - 日期：2026-08-05
 - 依據：[`docs/specs/2026-08-04-opks-progressive-elicitation-research.md`](../specs/2026-08-04-opks-progressive-elicitation-research.md)
 - 延續：[0047](0047-model-owned-open-issue-closure.md)（模型自關 open issue）、

@@ -19,6 +19,7 @@ readiness 放在純函式的同一條線。
 
 from __future__ import annotations
 
+from enum import StrEnum
 from uuid import UUID
 
 from app.job_analysis.domain import (
@@ -79,12 +80,6 @@ def eligible_opks_candidates(
     """
 
     open_issues = state.work_model.open_issues
-    blocked_by_proposal = frozenset(
-        proposal.entity_id
-        for proposal in state.opks_proposals
-        if proposal.status in BLOCKING_PROPOSAL_STATUSES
-    )
-
     candidates: list[ScheduledOpks] = []
     # `current_jd` 的 state invariant 已保證依 (display_order, task_id) 排序。
     for entry in state.current_jd:
@@ -95,15 +90,7 @@ def eligible_opks_candidates(
             continue
         if any(_issue_blocks(issue, entry.task_id) for issue in open_issues):
             continue
-        if any(
-            proposal.entity_id in blocked_by_proposal
-            and proposal_references_task(
-                proposal,
-                selected_task_id=entry.task_id,
-                selected_indicator_ids=_indicator_ids_for(state, entry.task_id),
-            )
-            for proposal in state.opks_proposals
-        ):
+        if _has_blocking_proposal(state, entry.task_id):
             continue
         candidates.append(
             ScheduledOpks(
@@ -112,6 +99,51 @@ def eligible_opks_candidates(
             )
         )
     return tuple(candidates)
+
+
+class OpksTaskStatus(StrEnum):
+    """一個 Task 的 OPKS 現況,只有三個可說的值(ADR 0054 決定 36)。
+
+    這三個標籤存在的理由是**不宣稱完整**;因此每一個都必須是當下可查證的事實,
+    不是「接下來會分析」這種意圖宣告。判不出來就**不提示**——ADR 0052 決定 6:
+    「只有依現行官方規則能確定的缺漏才發聲;無法確定的一律不提示。」
+
+    措辭受 0052 決定 7 約束(不得用「不完整」「不合格」「未通過」);中文字串住 Web,
+    這裡只給固定 code——0052 決定 2:契約描述形狀,不描述政策。
+    """
+
+    AWAITING_ANSWER = "awaiting_employee_answer"
+    PROPOSALS_READY = "proposals_ready"
+    NOT_READY = "not_ready_for_analysis"
+
+
+def opks_task_status(
+    state: JobAnalysisState,
+    task_id: TaskId,
+) -> OpksTaskStatus | None:
+    """純函式(0052 決定 1);Web 直接呈現結果,不自行重算(0052 決定 3)。
+
+    **缺口優先於待審提案。** 兩者同時存在是常態(決定 18 的 item-level 部分發布),
+    這時只說「已可提出建議」會讓員工以為這個工作已經談完了——那正是 `不宣稱完整`
+    要擋的事。
+    """
+
+    if any(
+        issue.is_active
+        and issue.opks_axis is not None
+        and issue.subject_task_id == task_id
+        for issue in state.work_model.open_issues
+    ):
+        return OpksTaskStatus.AWAITING_ANSWER
+    if _has_blocking_proposal(state, task_id):
+        return OpksTaskStatus.PROPOSALS_READY
+    if not any(
+        candidate.task_id == task_id for candidate in eligible_opks_candidates(state)
+    ):
+        return OpksTaskStatus.NOT_READY
+    # 資料夠、沒缺口、沒待審提案:可能還沒分析,也可能已經分析完且都處理掉了。
+    # 兩者都無法從現況區分,依 0052 決定 6 一律不提示。
+    return None
 
 
 async def select_scheduled_opks(
@@ -207,6 +239,25 @@ def question_target_task_ids(
             for position in range(len(change.split_children))
         )
     return frozenset(ids)
+
+
+def _has_blocking_proposal(state: JobAnalysisState, task_id: TaskId) -> bool:
+    """這個 Task 有待員工決定的 OPKS 提案嗎。
+
+    pre-gate 與狀態呈現共用同一個判準:兩邊各寫一次,員工就會看到「已可提出建議」
+    卻同時被系統再分析一次。
+    """
+
+    indicator_ids = _indicator_ids_for(state, task_id)
+    return any(
+        proposal.status in BLOCKING_PROPOSAL_STATUSES
+        and proposal_references_task(
+            proposal,
+            selected_task_id=task_id,
+            selected_indicator_ids=indicator_ids,
+        )
+        for proposal in state.opks_proposals
+    )
 
 
 def _is_analysable(task: Task) -> bool:

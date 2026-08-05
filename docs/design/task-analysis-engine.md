@@ -166,6 +166,15 @@ HTTP DTO mapper（與 LLM 的 `wire.py` 無關）先 trim 並轉成 `null`；必
 何時該按。連帶退役的還有 `OpksGenerationView` 契約型別與 Web 的「產生建議」按鈕。
 **員工手動新增／編輯／刪除 O/P/K/S 的端點保留**——那不是 AI 入口。AI 仍然只建立待員工決定的
 Proposal，不直接寫 Current JD OPKS。
+
+`DocumentView` 與 `ConsultationView` 帶 `opks_task_status[]`，每筆 `{ task_id, status }`。
+規則是 `opks_task_status()` 純函式（ADR 0052 決定 1），contract 只承載結果（決定 2），
+**Web 直接呈現、不自行重算**（決定 3）。狀態只有三個值，對應 ADR 0054 決定 36 允許的**全部**
+措辭——`not_ready_for_analysis`／`awaiting_employee_answer`／`proposals_ready`，中文字串住
+`jobAnalysisOpks.ts`，受 0052 決定 7 約束（不得用「不完整」「不合格」「未通過」）。
+**缺口優先於待審提案**：兩者同時存在是常態（決定 18 的 item-level 部分發布），只說
+「已可提出建議」會讓員工以為已經談完。**判不出來的 Task 不出現在陣列裡**，因此沒有第四個
+標籤也沒有完成百分比——0052 決定 6：「無法確定的一律不提示。」
 Web 的 `/workspace` 用 `DocumentLibrary` 列出／建立／改名；`/workspace/[document_id]` 用
 `ConsultationWorkspace` 同頁組合 `ConsultationPanel`、Task／OPKS Proposal cards、`TaskEditor` 與
 `OpksEditor`，一次只開一份文件。OPKS 人工變更也採明確儲存，成功後只 invalidate document、

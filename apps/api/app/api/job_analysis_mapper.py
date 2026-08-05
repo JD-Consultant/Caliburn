@@ -10,6 +10,7 @@ from job_analysis_contract import (
     JdTaskWrite,
     JdTaskView,
     OpksItemView,
+    OpksTaskStatusView,
     OpksItemWrite,
     OpksProposalDecisionWrite,
     OpksProposalView,
@@ -21,7 +22,9 @@ from job_analysis_contract import (
 from app.job_analysis.application import (
     DocumentRecord,
     DocumentSummary,
+    JobAnalysisState,
     LoadedDocument,
+    opks_task_status,
 )
 from app.job_analysis.domain import (
     Enabler,
@@ -214,6 +217,23 @@ def to_proposal_decision(
     return body.decision.value, entries, _optional_text(body.reason)
 
 
+def _to_opks_task_status(state: JobAnalysisState) -> list[OpksTaskStatusView]:
+    """ADR 0052 決定 1–3:規則是 domain 純函式,contract 只承載結果,Web 不重算。
+
+    只列**有狀態**的 Task。判不出來就不出現在這個陣列裡——0052 決定 6
+    「無法確定的一律不提示」因此是結構事實,不是呼叫端要記得的約定。
+    """
+
+    result = []
+    for task in state.current_jd:
+        status = opks_task_status(state, task.task_id)
+        if status is not None:
+            result.append(
+                OpksTaskStatusView(task_id=task.task_id, status=status.value)
+            )
+    return result
+
+
 def to_document_view(loaded: LoadedDocument) -> DocumentView:
     return DocumentView(
         document_id=loaded.document.document_id,
@@ -223,6 +243,7 @@ def to_document_view(loaded: LoadedDocument) -> DocumentView:
         opks_items=[
             to_opks_item_view(item) for item in loaded.state.current_opks.items
         ],
+        opks_task_status=_to_opks_task_status(loaded.state),
     )
 
 
@@ -311,4 +332,5 @@ def to_consultation_view(loaded: LoadedDocument) -> ConsultationView:
         opks_items=[
             to_opks_item_view(item) for item in loaded.state.current_opks.items
         ],
+        opks_task_status=_to_opks_task_status(loaded.state),
     )

@@ -71,7 +71,9 @@ from .opks_digest import (
     scheduled_opks_operation_id,
 )
 from .opks_scheduler import (
+    OpksTaskStatus,
     eligible_opks_candidates,
+    opks_task_status,
     question_target_task_ids,
     select_scheduled_opks,
 )
@@ -209,6 +211,7 @@ __all__ = [
     "OpksProposalNotDecidable",
     "OpksProposalNotFound",
     "OpksGap",
+    "OpksTaskStatus",
     "OpksVerificationReport",
     "OpksViolation",
     "OpksViolationCode",
@@ -259,6 +262,7 @@ __all__ = [
     "build_opks_context_packet",
     "compute_analysis_input_digest",
     "eligible_opks_candidates",
+    "opks_task_status",
     "question_target_task_ids",
     "scheduled_opks_operation_id",
     "select_scheduled_opks",

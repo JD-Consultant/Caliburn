@@ -370,9 +370,15 @@ async def test_list_and_open_return_only_the_current_jd_projection(api_client):
         "updated_at",
         "tasks",
         "opks_items",
+        "opks_task_status",
     }
     assert opened.json()["tasks"][0]["statement"] == "每週彙整營運週報"
     assert opened.json()["opks_items"] == []
+    # 這個 JD Task 在 Work Model 裡沒有對應的已分析 Task,pre-gate 不通過
+    # (ADR 0054 決定 3);Web 直接呈現這個結果,不自行重算(0052 決定 3)。
+    assert opened.json()["opks_task_status"] == [
+        {"task_id": "task-1", "status": "not_ready_for_analysis"}
+    ]
     forbidden = {"authority_generation", "work_model", "journal", "proposals"}
     assert forbidden.isdisjoint(opened.json())
 

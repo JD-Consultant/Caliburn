@@ -88,6 +88,7 @@ from .opks_proposals import (
     stale_invalid_opks_proposals,
 )
 from .opks_verifier import (
+    OpksGap,
     OpksVerificationReport,
     OpksViolation,
     OpksViolationCode,
@@ -206,6 +207,7 @@ __all__ = [
     "OpksProposalDecisionPayload",
     "OpksProposalNotDecidable",
     "OpksProposalNotFound",
+    "OpksGap",
     "OpksVerificationReport",
     "OpksViolation",
     "OpksViolationCode",

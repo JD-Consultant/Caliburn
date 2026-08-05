@@ -9,6 +9,7 @@ from app.job_analysis.domain import (
     DomainModel,
     OpksEntityKind,
     OpksEvidenceLink,
+    OpksGapAxis,
     OpksItem,
     OpksProposalAction,
 )
@@ -40,9 +41,23 @@ class VerifiedOpksChange(DomainModel):
     after: OpksItem | None = None
 
 
+class OpksGap(DomainModel):
+    """specialist 說「這一軸的依據不足」(ADR 0054 決定 15)。
+
+    **不帶問句。** 問句在提問當下由主顧問生成——gap 在 T0 寫成、T1 才問出口,中間
+    上下文已變;而且這讓「不得把 K/S 問成認領題」(0048 決定 14)只住主顧問 prompt
+    一處,不必在兩個地方各維護一次。
+    """
+
+    source_index: int
+    axis: OpksGapAxis
+    summary: str
+
+
 class OpksVerificationReport(DomainModel):
     violations: tuple[OpksViolation, ...] = ()
     changes: tuple[VerifiedOpksChange, ...] = ()
+    gaps: tuple[OpksGap, ...] = ()
 
     @property
     def is_valid(self) -> bool:
@@ -65,7 +80,9 @@ def _payload_is_valid(item: OpksResultItem) -> bool:
         ),
         OpksDecision.REVISE_EXISTING: has_target and has_text,
         OpksDecision.REMOVE_EXISTING: has_target and not has_text,
-        OpksDecision.UNCERTAIN: not has_target and not has_text,
+        # 決定 15:`uncertain` 的 `text` 從強制空字串改為**強制非空的缺口摘要**。
+        # 缺口因此在契約層第一次有形狀,不再是被 verifier 丟掉的一個字。
+        OpksDecision.UNCERTAIN: not has_target and has_text,
     }[item.decision]
 
 
@@ -211,6 +228,7 @@ def verify_opks_result(
 
     violations: list[OpksViolation] = []
     candidates: list[VerifiedOpksChange] = []
+    gaps: list[OpksGap] = []
     seen_targets: set[tuple[OpksEntityKind, int]] = set()
     seen_add_candidates = {
         (kind, view.item.text.strip())
@@ -235,6 +253,13 @@ def verify_opks_result(
             continue
 
         if item.decision is OpksDecision.UNCERTAIN:
+            gaps.append(
+                OpksGap(
+                    source_index=item_index,
+                    axis=OpksGapAxis(item.entity_kind.value),
+                    summary=cast(str, item.text),
+                )
+            )
             continue
         if item.decision is OpksDecision.ADD_NEW:
             add_text = cast(str, item.text)  # _payload_is_valid() above proved non-null.
@@ -331,4 +356,6 @@ def verify_opks_result(
 
     if violations:
         return OpksVerificationReport(violations=tuple(violations))
-    return OpksVerificationReport(changes=tuple(candidates))
+    # 決定 18:效力單位是 item。有依據的候選照常提案,同時保留其他軸的缺口——
+    # 不做同軸一律扣住,也不做整個 Task 扣住。
+    return OpksVerificationReport(changes=tuple(candidates), gaps=tuple(gaps))

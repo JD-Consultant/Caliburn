@@ -31,6 +31,7 @@ from app.job_analysis.domain import (
 )
 
 from .context import ActiveQuestion, ConversationTurn
+from .opks_digest import ScheduledOpks
 from .transition import JobAnalysisState
 from .verifier import TurnSpeaker
 
@@ -93,6 +94,16 @@ class CompletedTurnPayload(DomainModel):
     operation_id: Identifier
     employee_turn: ConversationTurn
     consultant_turn: ConversationTurn
+
+    scheduled_opks: ScheduledOpks | None = None
+    """這個已提交的員工回合綁定的唯一 OPKS child(決定 7–8)。
+
+    **綁定在 receipt 寫入時凍結。** 沒有這一條,replay 會重跑 scheduler 並改選下一個
+    Task,使同一個員工回合付兩次錢——這是整條線最重要的單一不變量。
+
+    child operation ID 由 `scheduled_opks_operation_id()` 推導,**不另存**。
+    `None` 表示該回合沒有排定任何分析。
+    """
 
     @model_validator(mode="after")
     def roles_match_the_completed_turn(self):

@@ -49,6 +49,10 @@ class InvalidDutyOrder(JobAnalysisApplicationError):
     pass
 
 
+class InvalidOpksOrder(JobAnalysisApplicationError):
+    pass
+
+
 class JdHeaderNotChanged(JobAnalysisApplicationError):
     pass
 

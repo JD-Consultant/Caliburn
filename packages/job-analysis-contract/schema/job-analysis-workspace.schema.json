@@ -249,7 +249,8 @@
         "text",
         "task_refs",
         "indicator_refs",
-        "evidence_quotes"
+        "evidence_quotes",
+        "display_order"
       ],
       "properties": {
         "entity_id": { "type": "string" },
@@ -269,7 +270,8 @@
         "evidence_quotes": {
           "type": "array",
           "items": { "type": "string" }
-        }
+        },
+        "display_order": { "type": "integer", "minimum": 0 }
       }
     },
     "OpksGenerationView": {
@@ -566,6 +568,21 @@
         }
       }
     },
+    "OpksOrderWrite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["entity_kind", "ordered_entity_ids"],
+      "properties": {
+        "entity_kind": {
+          "type": "string",
+          "enum": ["output", "indicator", "knowledge", "skill", "attitude"]
+        },
+        "ordered_entity_ids": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
     "ProblemFieldError": {
       "type": "object",
       "additionalProperties": false,
@@ -590,6 +607,7 @@
             "https://caliburn.dev/problems/job-analysis/authority-conflict",
             "https://caliburn.dev/problems/job-analysis/invalid-task-order",
             "https://caliburn.dev/problems/job-analysis/invalid-duty-order",
+            "https://caliburn.dev/problems/job-analysis/invalid-opks-order",
             "https://caliburn.dev/problems/job-analysis/invalid-request",
             "https://caliburn.dev/problems/job-analysis/proposal-not-found",
             "https://caliburn.dev/problems/job-analysis/consultant-unavailable",

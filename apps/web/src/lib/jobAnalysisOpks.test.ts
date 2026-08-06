@@ -31,6 +31,7 @@ function item(
     task_refs: taskRefs,
     indicator_refs: indicatorRefs,
     evidence_quotes: [],
+    display_order: 0,
   };
 }
 

@@ -20,6 +20,7 @@ from .errors import (
     IdempotencyConflict,
     InvalidDutyOrder,
     InvalidJdTaskOrder,
+    InvalidOpksOrder,
     InvalidProposalDecision,
     JdHeaderNotChanged,
     JdTaskNotFound,
@@ -68,6 +69,7 @@ from .opks_authoring import (
     delete_opks_item,
     edit_opks_item,
     prune_opks_for_current_jd,
+    reorder_opks_items,
 )
 from .opks_context import (
     OpksContextPacket,
@@ -186,6 +188,7 @@ __all__ = [
     "DutyDirectEditPayload",
     "DUTY_DIRECT_EDIT_SCHEMA_ID",
     "InvalidDutyOrder",
+    "InvalidOpksOrder",
     "DocumentMetadataWriteResult",
     "DocumentRecord",
     "DocumentRepository",
@@ -300,6 +303,7 @@ __all__ = [
     "put_jd_header",
     "propose_task_for_jd",
     "reorder_duties",
+    "reorder_opks_items",
     "reorder_jd_tasks",
     "render_opks_context_packet",
     "run_opks_operation",

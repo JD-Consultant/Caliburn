@@ -22,6 +22,7 @@ from job_analysis_contract import (
     OpksGenerationView,
     OpksItemView,
     OpksItemWrite,
+    OpksOrderWrite,
     OpksProposalDecisionWrite,
     ProblemFieldError,
     ProposalDecisionWrite,
@@ -77,6 +78,7 @@ from app.job_analysis.application import (
     put_jd_header,
     reorder_duties,
     reorder_jd_tasks,
+    reorder_opks_items,
     submit_employee_turn,
 )
 from app.job_analysis.application.errors import JobAnalysisApplicationError
@@ -575,6 +577,32 @@ async def delete_opks(
     except JobAnalysisApplicationError as error:
         return application_error_response(error)
     return Response(status_code=204)
+
+
+@router.put("/{document_id}/opks-order", response_model=list[OpksItemView])
+async def reorder_opks(
+    document_id: UUID,
+    body: OpksOrderWrite,
+    idempotency_key: IdempotencyKey,
+    uow_factory: JobAnalysisUnitOfWorkFactory = Depends(
+        get_job_analysis_uow_factory
+    ),
+):
+    """重排單一 kind。O 只跟 O 換位置——範圍與 `display_order` 的唯一性一致。"""
+
+    try:
+        items = await reorder_opks_items(
+            uow_factory,
+            document_id=document_id,
+            entry_id=idempotency_key,
+            entity_kind=body.entity_kind.value,
+            ordered_entity_ids=tuple(body.ordered_entity_ids),
+        )
+    except ValidationError as error:
+        return domain_validation_error_response(error)
+    except JobAnalysisApplicationError as error:
+        return application_error_response(error)
+    return [to_opks_item_view(item) for item in items]
 
 
 @router.put("/{document_id}/task-order", response_model=list[JdTaskView])

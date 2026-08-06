@@ -25,6 +25,7 @@ from app.job_analysis.domain import (
     JdHeader,
     JdTask,
     NonEmptyText,
+    OpksEntityKind,
     OpksItem,
     OpksProposal,
     OpksProposalStatus,
@@ -211,16 +212,32 @@ class DirectEditPayload(DomainModel):
         return self
 
 
-OpksDirectEditAction = Literal["add", "edit", "delete"]
+OpksDirectEditAction = Literal["add", "edit", "delete", "reorder"]
 
 
 class OpksDirectEditPayload(DomainModel):
     action: OpksDirectEditAction
     before: OpksItem | None = None
     after: OpksItem | None = None
+    entity_kind: OpksEntityKind | None = None
+    ordered_entity_ids: tuple[Identifier, ...] = ()
 
     @model_validator(mode="after")
     def snapshots_match_action(self):
+        if self.action == "reorder":
+            if self.before is not None or self.after is not None:
+                raise ValueError("reorder must not carry item snapshots")
+            if self.entity_kind is None:
+                raise ValueError("reorder requires the entity kind it reordered")
+            if not self.ordered_entity_ids:
+                raise ValueError("reorder requires ordered_entity_ids")
+            if len(set(self.ordered_entity_ids)) != len(self.ordered_entity_ids):
+                raise ValueError("reorder entity ids must be distinct")
+            return self
+        if self.entity_kind is not None or self.ordered_entity_ids:
+            raise ValueError(
+                f"{self.action} must not carry reorder fields"
+            )
         valid = {
             "add": self.before is None and self.after is not None,
             "edit": self.before is not None and self.after is not None,

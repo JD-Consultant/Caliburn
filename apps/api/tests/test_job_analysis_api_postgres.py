@@ -592,3 +592,110 @@ async def test_the_consultation_view_projects_duties_too(
     assert [item["duty_id"] for item in consultation.json()["duties"]] == [
         duty["duty_id"]
     ]
+
+
+# -- OPKS 排序 route（切片 A T4）--------------------------------------------
+
+
+async def _document_with_two_outputs(client, document_id):
+    root = await _document(client, document_id)
+    task = (
+        await client.post(
+            f"{root}/tasks",
+            headers={"Idempotency-Key": "task-a"},
+            json=task_payload("每週彙整營運週報"),
+        )
+    ).json()
+    made = []
+    for key, text in (("o1", "營運週報"), ("o2", "異常追蹤表")):
+        response = await client.post(
+            f"{root}/opks",
+            headers={"Idempotency-Key": key},
+            json={
+                "entity_kind": "output",
+                "text": text,
+                "task_refs": [task["task_id"]],
+                "indicator_refs": [],
+            },
+        )
+        assert response.status_code == 201, response.text
+        made.append(response.json())
+    return root, made
+
+
+async def test_opks_items_expose_display_order_and_can_be_reordered(
+    postgres_api_client,
+    cleanup_job_analysis_rows,
+):
+    client, _, _ = postgres_api_client
+    root, made = await _document_with_two_outputs(client, cleanup_job_analysis_rows)
+
+    assert [item["display_order"] for item in made] == [0, 1]
+
+    response = await client.put(
+        f"{root}/opks-order",
+        headers={"Idempotency-Key": "order-1"},
+        json={
+            "entity_kind": "output",
+            "ordered_entity_ids": [made[1]["entity_id"], made[0]["entity_id"]],
+        },
+    )
+
+    assert response.status_code == 200, response.text
+    assert [item["entity_id"] for item in response.json()] == [
+        made[1]["entity_id"],
+        made[0]["entity_id"],
+    ]
+    assert [item["display_order"] for item in response.json()] == [0, 1]
+
+    document = (await client.get(root)).json()
+    outputs = [
+        item for item in document["opks_items"] if item["entity_kind"] == "output"
+    ]
+    assert [item["entity_id"] for item in outputs] == [
+        made[1]["entity_id"],
+        made[0]["entity_id"],
+    ]
+
+
+async def test_a_partial_opks_order_is_422_not_500(
+    postgres_api_client,
+    cleanup_job_analysis_rows,
+):
+    """`application_error_response()` 對沒映射的錯誤是 `raise TypeError`,
+    而 `ProblemDetail.type` 是封閉 enum——漏掉任一邊都不是 422。"""
+
+    client, _, _ = postgres_api_client
+    root, made = await _document_with_two_outputs(client, cleanup_job_analysis_rows)
+
+    response = await client.put(
+        f"{root}/opks-order",
+        headers={"Idempotency-Key": "order-1"},
+        json={
+            "entity_kind": "output",
+            "ordered_entity_ids": [made[0]["entity_id"]],
+        },
+    )
+
+    assert response.status_code == 422
+    assert response.headers["content-type"].startswith("application/problem+json")
+    assert response.json()["type"].endswith("/invalid-opks-order")
+
+
+async def test_reordering_opks_without_an_idempotency_key_is_rejected(
+    postgres_api_client,
+    cleanup_job_analysis_rows,
+):
+    client, _, _ = postgres_api_client
+    root, made = await _document_with_two_outputs(client, cleanup_job_analysis_rows)
+
+    response = await client.put(
+        f"{root}/opks-order",
+        json={
+            "entity_kind": "output",
+            "ordered_entity_ids": [made[1]["entity_id"], made[0]["entity_id"]],
+        },
+    )
+
+    assert response.status_code == 422
+

@@ -2,15 +2,24 @@
 
 from __future__ import annotations
 
+import io
+from urllib.parse import quote
+
 import httpx
 import pytest
 import pytest_asyncio
+from openpyxl import load_workbook
 from sqlalchemy import func, select
 
 from app.adapters.job_analysis_postgres import SqlAlchemyJobAnalysisUnitOfWork
 from app.adapters.job_analysis_postgres.models import JobAnalysisJournalRow
 from app.api.deps import get_job_analysis_adapter, get_job_analysis_uow_factory
 from app.job_analysis.application import load_document
+from app.job_analysis.application.export_xlsx import (
+    SHEET_FORM,
+    SHEET_READINESS,
+    XLSX_MEDIA_TYPE,
+)
 from app.job_analysis.domain import TaskFields
 from app.job_analysis.llm import (
     IdentityRelation,
@@ -698,4 +707,82 @@ async def test_reordering_opks_without_an_idempotency_key_is_rejected(
     )
 
     assert response.status_code == 422
+
+
+# -- 匯出 route（切片 B T3）---------------------------------------------------
+
+
+async def test_export_returns_an_xlsx_attachment_named_after_the_document(
+    postgres_api_client,
+    cleanup_job_analysis_rows,
+):
+    client, _, _ = postgres_api_client
+    root = await _document(client, cleanup_job_analysis_rows)
+
+    response = await client.get(f"{root}/export")
+
+    assert response.status_code == 200
+    assert response.headers["content-type"] == XLSX_MEDIA_TYPE
+    disposition = response.headers["content-disposition"]
+    assert disposition.startswith("attachment;")
+    # 中文標題必須走 RFC 5987 的 filename*，否則瀏覽器存成亂碼
+    assert "filename*=UTF-8''" in disposition
+    assert quote("門市營運專員.xlsx", safe="") in disposition
+    # 真的是一份可讀的 XLSX，不是空殼位元組
+    workbook = load_workbook(io.BytesIO(response.content))
+    assert workbook.sheetnames == [SHEET_FORM, SHEET_READINESS]
+
+
+async def test_export_is_never_blocked_by_missing_fields(
+    postgres_api_client,
+    cleanup_job_analysis_rows,
+):
+    """ADR 0052 決定 5／0058 決定 11：缺漏只提示不阻擋，匯出永遠放行。"""
+
+    client, _, _ = postgres_api_client
+    root = await _document(client, cleanup_job_analysis_rows)
+    document = (await client.get(root)).json()
+    assert document["readiness"]["issues"], "這份文件本來就該有缺漏,否則測不到重點"
+
+    response = await client.get(f"{root}/export")
+
+    assert response.status_code == 200
+    sheet = load_workbook(io.BytesIO(response.content))[SHEET_READINESS]
+    values = [
+        str(cell.value)
+        for row in sheet.iter_rows()
+        for cell in row
+        if cell.value is not None
+    ]
+    assert any("iCAP 版型欄位尚有" in value for value in values)
+
+
+async def test_exporting_an_unknown_document_is_404(
+    postgres_api_client,
+    cleanup_job_analysis_rows,
+):
+    client, _, _ = postgres_api_client
+
+    response = await client.get(
+        "/api/v1/job-analysis/documents/"
+        "00000000-0000-0000-0000-0000000000ff/export"
+    )
+
+    assert response.status_code == 404
+    assert response.json()["type"].endswith("/document-not-found")
+
+
+async def test_export_needs_no_idempotency_key(
+    postgres_api_client,
+    cleanup_job_analysis_rows,
+):
+    """GET 無副作用；連續兩次都該成功，且不會 bump generation。"""
+
+    client, _, _ = postgres_api_client
+    root = await _document(client, cleanup_job_analysis_rows)
+
+    first = await client.get(f"{root}/export")
+    second = await client.get(f"{root}/export")
+
+    assert first.status_code == 200 and second.status_code == 200
 

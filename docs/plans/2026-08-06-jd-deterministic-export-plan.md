@@ -1,7 +1,7 @@
 # JD deterministic export（切片 B）實作計畫
 
 - 日期：2026-08-06
-- 狀態：T1／T2 COMPLETE；T3–T5 尚未開工（切片 A 已完成）
+- 狀態：T1–T5 COMPLETE（切片 A 已完成）
 - 決策：[ADR 0058](../adr/0058-jd-deterministic-export-shape-and-format.md)（本切片的權威依據）；
   延續 [ADR 0052](../adr/0052-jd-readiness-assessment-and-official-code-boundaries.md) 決定 4／5／8／10／13／14
 - 研究：[`2026-08-06-jd-deterministic-export-research.md`](../specs/2026-08-06-jd-deterministic-export-research.md)
@@ -207,4 +207,26 @@ owner 於 2026-08-06 裁定**維持單一自由文字**（`JdHeader.notes`），
 第一版是員工確認的 JD 草稿，不是送審的職能基準，硬套子標題會讓員工以為必須填學歷條件。
 
 - 完整 API：**`2192 passed / 0 failed / 0 skipped`**（+8：assembly +3、xlsx +5）。
+
+## 9. T3–T5 執行證據（2026-08-06）
+
+- **T3 route**：`GET /{document_id}/export`，回 XLSX 位元組，無 `Idempotency-Key`（GET 無副作用）。
+  `Content-Disposition` 用 **RFC 6266／5987** 的雙寫法：ASCII fallback ＋ 百分比編碼的
+  `filename*`——中文標題直接塞 `filename=` 會被瀏覽器存成亂碼。檔名先清掉路徑字元，
+  清完是空的用固定 fallback，免得存出一個沒有名字的檔。
+  測試：200 帶正確 media type 與 `filename*`、**讀回位元組確認是可開啟的 XLSX**（不是空殼）、
+  未知文件 404、**readiness 有缺漏時仍 200**（匯出永遠放行的迴歸測試）、連續兩次 GET 都成功。
+- **T4 Web**：`ConsultationWorkspace` header 加匯出按鈕。**不需要 dirty guard**（純讀取，
+  不動任何權威狀態）。`downloadJson()` 是 JSON-only，另加 `downloadBlob()`；
+  `exportDocument()` 不能走 `request()`（那支預期 JSON），但失敗時後端仍回 problem+json，
+  所以錯誤路徑照樣解析成 `JobAnalysisApiError`。檔名組裝抽成 `lib/jobAnalysisExport.ts`
+  才有 vitest 覆蓋（Duty T6 的教訓），有測試守路徑字元與空標題 fallback。
+- **T5 文檔**：`contract-strategy.md` §5 契約 #4 那句「`ocs-contract` remains the
+  public/export shape」**以引用區塊標明已被 ADR 0058 決定 7 取代**——不刪歷史，
+  讓下一個讀者不會照舊文字重新犯錯。`docs/design/task-analysis-engine.md` §2 補上
+  匯出組裝與匯出渲染兩列，並把匯出狀態從「仍未做」改為完成。
+- **本切片沒有真人瀏覽器驗證**（比照 Duty T6 與切片 A 的坦白）——要驗證需重啟本機
+  dev server，動手前先問。route 層有真 PostgreSQL HTTP 測試覆蓋。
+- 完整 API：**`2196 passed / 0 failed / 0 skipped`**（+4）。
+  web **`125 passed`**（+3）＋tsc＋lint＋`npm run build` 全綠。
 

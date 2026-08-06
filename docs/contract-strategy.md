@@ -77,9 +77,17 @@ Same discipline used for Phases 1–3 and contracts #1/#2:
 - **#4 `job-analysis-contract` (ADR 0045):** the greenfield Local Web workspace is not
   an OCS document and has Python／TypeScript consumers ⇒ rubric row 2 ⇒ its own small JSON Schema
   SSOT + generated Pydantic/TS package. `app.job_analysis` domain must not import the transport
-  package; route mappers own the boundary. `ocs-contract` remains the public/export shape and
-  neither contract imports or redefines the other. The former ADR 0039-era
-  `local-workspace-contract` pre-answer is withdrawn and must not be used for new construction.
+  package; route mappers own the boundary. Neither contract imports or redefines the other. The
+  former ADR 0039-era `local-workspace-contract` pre-answer is withdrawn and must not be used for
+  new construction.
+  > **Superseded (2026-08-06):** this entry used to read "`ocs-contract` remains the
+  > public/export shape". [ADR 0058](adr/0058-jd-deterministic-export-shape-and-format.md)
+  > decision 7 overrides that for `app/job_analysis`: its export assembles its own
+  > `ExportDocument` and renders straight to file bytes. That sentence predates ADR 0048/0049
+  > (K/S/A became flat document-level and many-to-many, while `ocs-contract` nests them under
+  > each task's `CompetencyBlock`) and the Duty slice, and `OcsProfile.ocs_code` is required
+  > while ADR 0052 decision 8 forbids generating it. `ocs-contract` is still the contract for
+  > the `pdf-to-json`／`ocs-indexer` context — it is simply not this product's export target.
 
 ## 6. References
 - Alistair Cockburn — Hexagonal (ports define the contract). Chris Richardson — *Microservices

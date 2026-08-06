@@ -59,6 +59,24 @@ async function request<T>(path: string, init: RequestInit): Promise<T> {
   return response.json() as Promise<T>;
 }
 
+/**
+ * 匯出是二進位回應，不能走 `request()`——那支預期 JSON。
+ * 失敗時後端仍回 problem+json，所以錯誤路徑照樣解析成 `JobAnalysisApiError`。
+ */
+export async function exportDocument(documentId: string): Promise<Blob> {
+  const response = await fetch(`${API}/documents/${documentId}/export`, {
+    method: "GET",
+  });
+  if (!response.ok) {
+    const body: unknown = await response.json().catch(() => undefined);
+    throw new JobAnalysisApiError(
+      response.status,
+      isReceivedProblem(body) ? body : undefined,
+    );
+  }
+  return response.blob();
+}
+
 export function listDocuments(): Promise<DocumentSummary[]> {
   return request<DocumentSummary[]>("/documents", { method: "GET" });
 }

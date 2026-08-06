@@ -2,6 +2,7 @@
 
 import logging
 from typing import Annotated
+from urllib.parse import quote
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Header, Response
@@ -57,6 +58,8 @@ from app.api.job_analysis_problems import (
 )
 from app.job_analysis.application import (
     JobAnalysisUnitOfWorkFactory,
+    assemble_export_document,
+    assess_readiness,
     OpksGroundingUnavailable,
     TransitionCommitRejected,
     UncommittableOperationResult,
@@ -82,6 +85,7 @@ from app.job_analysis.application import (
     submit_employee_turn,
 )
 from app.job_analysis.application.errors import JobAnalysisApplicationError
+from app.job_analysis.application.export_xlsx import XLSX_MEDIA_TYPE, render_xlsx
 from app.job_analysis.providers import OpenRouterAdapter
 
 
@@ -150,6 +154,56 @@ async def get_document(
             status=404,
         )
     return to_document_view(loaded)
+
+
+def export_filename(title: str) -> str:
+    """`Content-Disposition` 的檔名。
+
+    中文標題不能直接放進 `filename=`——那個欄位只認 ASCII，瀏覽器會存成亂碼。
+    RFC 6266／5987 的做法是同時給 ASCII fallback 與百分比編碼的 `filename*`。
+    """
+
+    cleaned = "".join(
+        character
+        for character in title
+        if character not in '\\/:*?"<>|' and character.isprintable()
+    ).strip()
+    encoded = quote(f"{cleaned or 'job-description'}.xlsx", safe="")
+    return f"attachment; filename=\"export.xlsx\"; filename*=UTF-8\'\'{encoded}"
+
+
+@router.get("/{document_id}/export")
+async def export_document(
+    document_id: UUID,
+    uow_factory: JobAnalysisUnitOfWorkFactory = Depends(
+        get_job_analysis_uow_factory
+    ),
+):
+    """匯出 XLSX。**永遠放行**——缺漏不阻擋匯出（ADR 0052 決定 5／0058 決定 11），
+    缺漏由檔案裡的第二張工作表呈現。GET 無副作用，不需要 `Idempotency-Key`。
+    """
+
+    loaded = await load_document(uow_factory, document_id)
+    if loaded is None:
+        return problem_response(
+            type_uri=DOCUMENT_NOT_FOUND,
+            title="Document not found",
+            status=404,
+        )
+    state = loaded.state
+    payload = render_xlsx(
+        assemble_export_document(state, title=loaded.document.title),
+        assess_readiness(
+            header=state.jd_header,
+            duties=state.current_duties,
+            tasks=state.current_jd,
+        ),
+    )
+    return Response(
+        content=payload,
+        media_type=XLSX_MEDIA_TYPE,
+        headers={"Content-Disposition": export_filename(loaded.document.title)},
+    )
 
 
 @router.put("/{document_id}/jd-header", response_model=JdHeaderView)

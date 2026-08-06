@@ -37,6 +37,11 @@ from .export import ExportDocument, ExportOpksEntry, ExportTaskEntry
 from .readiness import DocumentReadiness, ReadinessIssueCode
 
 
+#: XLSX 的 media type。與版面同一處定義，換格式時不會漏改 route。
+XLSX_MEDIA_TYPE = (
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+)
+
 SHEET_FORM = "職能基準表"
 SHEET_READINESS = "iCAP 版型缺漏"
 
@@ -280,6 +285,7 @@ def render_xlsx(
 
 __all__ = [
     "ATTITUDE_HEADER",
+    "XLSX_MEDIA_TYPE",
     "DISCLAIMER",
     "ISSUED_BY_ICAP",
     "NOTES_HEADER",

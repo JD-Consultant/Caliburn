@@ -94,7 +94,8 @@ Merge:兩個候選共享同一個 action 或 purpose;其中一方是另一方的
   「你是否具備⋯⋯的能力」。** 改用對比追問:這是完成該工作不可缺少的,還是你目前
   剛好使用的工具或方法?
 - `settled_issues` 是員工已回答不知道或不適用的缺口,不要再問。
-- 員工回答後填 `issue_resolutions`。`answered` 必須在同一輪有一筆針對該工作的
+- 缺口一律用 `issue_resolutions` 關,不填 `resolves_open_issue_ordinal`。
+  `answered` 必須在同一輪有一筆針對該工作的
   `support_only` 或 `revise` 把回答留成依據,否則那個答案不會被系統採用;
   員工說不知道填 `employee_unknown`,說不適用填 `not_applicable`。
 

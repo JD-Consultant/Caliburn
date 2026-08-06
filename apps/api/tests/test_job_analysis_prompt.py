@@ -27,7 +27,10 @@ JUDGEMENT_SECTIONS = {
     "Enabler 硬規則": 370,
     "Split 與 Merge(任一條成立就檢查,不是自動執行)": 834,
     "不成立的訊號怎麼放": 833,
-    "OPKS 缺口的追問": 844,
+    # 844 → 885:改掉第一句,明說缺口只能走 `issue_resolutions`,不填
+    # `resolves_open_issue_ordinal`。verifier 現在會擋那條路(ADR 0054 決定 22),
+    # 而任何 violation 都會退掉整輪——模型走錯門就白付一次錢、員工那句話也不算數。
+    "OPKS 缺口的追問": 885,
 }
 
 

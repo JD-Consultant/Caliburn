@@ -312,7 +312,107 @@ proposals 照常提交。缺口的生死維持 0054 既有的三條出路——�
 - **G 的代價實際會不會發生**：新證據讓某個舊缺口不再成立、但主顧問仍照著問一次的頻率。
   這個數字是日後要不要做 F 的唯一判準——沒有它就不該動 wire schema。
 
-## 8. 建議的下一步
+## 8. 外部意見核對（2026-08-06，只看過 ADR 0055、沒看過本 repo）
+
+owner 取得一份外部意見。逐條核對後：**三處採納，兩處因該意見看不到本 repo 的實作而不成立，
+一處是它主推的方案有它沒察覺的漏洞。**
+
+### 8.1 採納：「能指認 ≠ 有權修改」——我的 ADR 決定 8 推理錯了
+
+> 目前 ADR 決定 8 把「給 specialist ordinal」＝「給 specialist 解 issue 的權力」，這個推論不成立。
+
+**對，我推錯了。** 0054 決定 20 的「不配發 ordinal」是針對**主顧問 packet**——那裡 ordinal 正是
+`issue_resolutions[]` 的指認手段，所以不配發＝結構上不可解決。但 `opks_result_v1`
+**根本沒有任何解決 issue 的欄位**，給 specialist ordinal 只是讓它能指認，拿不到寫入權。
+
+拒絕該方案的理由必須改寫，不能再說「它推翻決定 20」。
+
+### 8.2 採納：LangGraph 是第三個「明確 identity」的先例
+
+[LangGraph interrupts](https://docs.langchain.com/oss/python/langgraph/interrupts)（已核實）：
+
+> **map each interrupt ID to its resume value.** This ensures each response is paired with the
+> correct interrupt at runtime.
+
+> the node restarts from the beginning of the node where the interrupt was called when resumed
+> … **Side effects called before interrupt should (ideally) be idempotent**
+
+多個同時待答的 interrupt **以 ID 配對，不靠順序也不靠文字**——與 §5.1、§5.2 同向，
+補強「配對只能靠明確 identity」這條。（LangGraph 本身已由 ADR 0030 退場，此處只引其設計判準。）
+
+### 8.3 採納：決定 3「丟掉 uncertain」要改
+
+與我在 §6.1 之後自行得到的結論一致，不重複論證。
+
+### 8.4 不成立：「active gap 進 packet 會造成自我觸發」
+
+該意見擔心 gap 進 packet 後會 `分析 → 建 gap → digest 變 → 又符合條件 → 再建 gap`。
+
+**本 repo 不會。** `compute_analysis_input_digest(task)` 的**簽章只收一個 `Task`**，
+缺口住 `work_model.open_issues`，呼叫端沒有東西可以多傳——這是 `opks_digest.py` 開頭寫明的
+「簽章層事實」。缺口進 packet 不會改變 digest，**自我觸發在型別上不可能發生**。
+
+### 8.5 不成立：「應拆成 `trigger_digest` 與 `packet_digest`」
+
+該意見認為 packet 內容（含 known gaps）必須全部凍結，否則 replay 會送出不同的 packet。
+
+**這會反轉 0054 一個刻意的決定。** 缺口記憶不進 `read_set`，理由寫在 `opks_context.py`：
+
+> `settled_gaps` 刻意不在裡面。OPKS child 的 freshness 契約是 `analysis_input_digest`；
+> 終結記憶是 context，不是 authority input。放進來會製造一個**與分析輸入無關的 abandon 觸發器**
+> ——別的 Task 上有人回答「不知道」，就會讓這個 child 白跑一趟。
+
+實際後果也不嚴重：replay 時若某個缺口已轉 terminal（不需要新證據，所以 digest 不變），
+specialist 拿到的記憶區會多一則。它分析的**證據完全相同**，只是記憶更完整——
+**分析結果更好，不是更錯**，而付費邊界（同一 digest 一次）完全沒鬆動。
+反過來把它放進 read_set，那一輪會 abandon、下一輪再排一次，**反而多付一次錢**。
+
+不採納。
+
+### 8.6 它主推的方案有一個沒被察覺的失敗模式
+
+該意見主推：specialist 把 uncertainty 明確分成 `existing`（指向既有缺口 ordinal）與 `new`，
+application 只為 `new` 建 issue。它並宣稱「模型若判斷錯誤，錯誤會以重複缺口呈現，
+而不是靜默遺失」。
+
+**只有一半成立。** 兩個方向的誤判後果不對稱：
+
+| 模型誤判 | 該意見的方案 | 本文 §6.1 的 H（既有缺口只進記憶區、所有 uncertain 照常落地） |
+|---|---|---|
+| 把**既有**當成新的 | 產生重複缺口（**看得見**） | 產生重複缺口（**看得見**） |
+| 把**新的**當成既有（指向某個 ordinal） | **不建 issue → 靜默遺失** | 不可能發生——application 不看分類，一律落地 |
+
+該意見只考慮了第一列。第二列才是本文 §5.5 與 ADR 0044／0052 一路要擋的形狀：
+**一個新缺口在沒有人回答、也沒有人問過的情況下消失，而且沒有任何跡象。**
+
+兩個方案都在賭模型：H 賭它讀了記憶區就不重複，該方案賭它分類正確。
+**差別在賭輸時的樣子**——H 賭輸只會多一筆重複（員工被多問一次，顧問可以用同一個答案一次收掉
+兩筆，決定 22 明文支持），該方案賭輸會讓職務說明書永久少一項。
+
+依 0044「不得靜默刪除」、0052「缺漏必須在成品上看得見」，**選 H**。
+
+而且 H 的賭注 0054 已經下過一次：決定 20 讓已終結的缺口進 specialist packet，用意就是
+「不要再開同一個缺口」，靠的正是同一種 prompt 遵從。H 只是把同一個機制多蓋一區，
+不是新賭注。**該方案要新增 wire 欄位才能換到的東西，是把「重複」的風險換成「遺失」的風險。**
+
+### 8.7 該方案仍是有價值的升級路徑
+
+契約成本其實不高：`opks_result_v1` 目前 495 compact bytes、4 個 item property、
+**0 個 anyOf／oneOf／$defs**。加一個純量 `known_gap_ordinal`（0 ＝ 新缺口）就夠，
+不需要 discriminated union，離 2026-07-31 撞過的 grammar size 問題很遠。
+
+**所以它不是不可行，是現在沒有做的理由**：沒有任何測量顯示 H 的重複率高到值得用「遺失風險」
+去換。要做它的判準是**實測重複率**，寫進 ADR 決定 8。
+
+### 8.8 該意見的測試清單
+
+大致可用，兩點要調整：
+
+- 「建立 gap 不會自我觸發」——§8.4，型別上已不可能，測試仍值得留一筆當回歸網。
+- 「replay packet 不漂移」——§8.5，與 0054 刻意決定相反，**不要加這條測試**；
+  該加的是反向的：**缺口記憶改變不得造成 abandon**。
+
+## 9. 建議的下一步
 
 1. 開一份 **Proposed ADR**：拿掉 pre-gate 的「無 active OPKS gap」（§3、§6），
    採 G 處理舊缺口（§6.1），並在 ADR 裡裁決 §6.3 的 receipt outcome 寫法。

@@ -150,10 +150,12 @@ async def _run_scheduled_opks(
     「分析中」。四種終端失敗會由 `generate_opks_proposals()` 自己寫下 `failed`
     receipt,不會回到這裡。
 
-    唯一走到 except 的是 `StaleAuthoritySnapshot`:輸入在 provider 呼叫期間漂移了。
-    這是 **abandon**——不寫 receipt、不擋下次(決定 10),由更新的那一輪排定自己的
-    child。`generate_opks_proposals()` 內部已先查 receipt,所以 replay 時若 child
-    早就跑完,這裡不會再花錢。
+    唯一走到 except 的是 `StaleAuthoritySnapshot`:輸入漂移了——可能在 provider 呼叫
+    期間,也可能早在 child 開始之前(主回合 commit 之後員工又直接編輯了那個 Task)。
+    後者由 `expected_digest` 在 prepare 擋下,所以連 provider 都不會打。兩者都是
+    **abandon**——不寫 receipt、不擋下次(決定 10),由更新的那一輪排定自己的 child。
+    `generate_opks_proposals()` 內部已先查 receipt,所以 replay 時若 child 早就跑完,
+    這裡不會再花錢。
     """
 
     try:
@@ -163,6 +165,7 @@ async def _run_scheduled_opks(
             document_id=document_id,
             task_id=scheduled.task_id,
             operation_id=scheduled_opks_operation_id(scheduled),
+            expected_digest=scheduled.analysis_input_digest,
         )
     except StaleAuthoritySnapshot:
         logger.info(

@@ -1,7 +1,7 @@
 # JD deterministic export（切片 B）實作計畫
 
 - 日期：2026-08-06
-- 狀態：T1 COMPLETE；T2–T5 尚未開工（切片 A 已完成）
+- 狀態：T1／T2 COMPLETE；T3–T5 尚未開工（切片 A 已完成）
 - 決策：[ADR 0058](../adr/0058-jd-deterministic-export-shape-and-format.md)（本切片的權威依據）；
   延續 [ADR 0052](../adr/0052-jd-readiness-assessment-and-official-code-boundaries.md) 決定 4／5／8／10／13／14
 - 研究：[`2026-08-06-jd-deterministic-export-research.md`](../specs/2026-08-06-jd-deterministic-export-research.md)
@@ -136,4 +136,28 @@ dev server，動手前先問。
   空文件不拋錯、header 原樣帶過、同輸入同輸出。
 - 完整 API：**`2169 passed / 0 failed / 0 skipped`**（+11）。
 - 下一個是 T2（XLSX renderer，兩個工作表）。
+
+## 7. T2 執行證據（2026-08-06）
+
+- baseline：完整 API `2169 passed`。
+- 版面：一條 Task 佔 `max(1, |O|, |P|)` 列，職責／任務／級別只寫在第一列，
+  O 與 P 各自往下填。第二條工作產出因此落在 `O1.1.2` 那一列，不擠在同一格。
+- **兩個 iCAP 配發代碼固定印「（iCAP 計畫執行單位提供）」**，有測試斷言剛好出現兩次
+  ——不開輸入欄、不生成（ADR 0052 決定 8）。
+- **缺漏維持空白儲存格**：有測試斷言公版表上不出現「尚未填寫」「不完整」等字樣。
+  要交給主管／HR 的是這張表，不該被提示文字弄髒。
+- **缺漏工作表呼叫 `assess_readiness()`**（落實 ADR 0052 決定 4），措辭
+  「iCAP 版型欄位尚有 X 項未填」；另有測試斷言不出現「不完整／不合格／未通過」
+  （ADR 0052 決定 7）。零 issue 時該表仍存在並顯示 0 項。
+- `READINESS_LABELS` 有一條**機械守衛**：`set(READINESS_LABELS) == set(ReadinessIssueCode)`。
+  新增 issue code 卻忘了文案會直接變紅，不會默默把機器代碼印給主管看。
+  （Web 另有一份文案；兩個呈現面各自持有，但都不自行判斷缺漏——ADR 0052 決定 3。）
+- 未歸入主要職責的 Task 有自己的區塊且**保留 O/P 內容**（無位置碼）；
+  以 mutation check 證明是承重的（拿掉該區塊 → 測試變紅）。
+- 空職責照樣印出（`duty_without_task` 要讓人看見）；空文件仍產出合法 XLSX。
+- 位元組不保證穩定（XLSX 內含 zip timestamp），所以決定性測試比對的是**讀回的內容**。
+- 另跑了一次人工檢視：把兩張工作表印成文字方格核對版面，確認表頭空格、
+  `O1.1.2` 換列、空職責、未歸類區塊與缺漏表都如預期。
+- 完整 API：**`2184 passed / 0 failed / 0 skipped`**（+15）。
+- 下一個是 T3（HTTP route）。
 

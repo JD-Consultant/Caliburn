@@ -12,6 +12,7 @@ import type {
   OpksGenerationView,
   OpksItemView,
   OpksItemWrite,
+  OpksOrderWrite,
   OpksProposalDecisionWrite,
   ProblemDetail,
   ProposalDecisionWrite,
@@ -186,6 +187,18 @@ export function deleteTask(
   return request<void>(`/documents/${documentId}/tasks/${taskId}`, {
     method: "DELETE",
     headers: mutationHeaders(idempotencyKey),
+  });
+}
+
+export function reorderOpksItems(
+  documentId: string,
+  order: OpksOrderWrite,
+  idempotencyKey: string,
+): Promise<OpksItemView[]> {
+  return request<OpksItemView[]>(`/documents/${documentId}/opks-order`, {
+    method: "PUT",
+    headers: mutationHeaders(idempotencyKey),
+    body: JSON.stringify(order),
   });
 }
 

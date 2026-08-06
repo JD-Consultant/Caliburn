@@ -1,7 +1,7 @@
 # O/P/K/S/A 員工可控排序（匯出前置切片 A）實作計畫
 
 - 日期：2026-08-06
-- 狀態：T1–T6 尚未開工
+- 狀態：T1–T6 COMPLETE
 - 決策：[ADR 0058](../adr/0058-jd-deterministic-export-shape-and-format.md) 決定 5
 - 研究：[`2026-08-06-jd-deterministic-export-research.md`](../specs/2026-08-06-jd-deterministic-export-research.md) §4
 - 掛載形狀依據：[ADR 0048](../adr/0048-opks-evidence-axes-and-document-level-competencies.md) 決定 5–7
@@ -105,3 +105,71 @@ K/S/A 本來就是文件層，範圍一致，無額外處理。
 
 - 匯出時 K/S 要不要依「第一個引用它的 Task」再分組呈現？ADR 0048 決定 7 說「匯出時不必複製 K/S
   ——公版表格本來就是文件層編號」，所以第一版按文件層平坦列出即可；分組屬 UI 投影，不是匯出需求。
+
+## 5. 執行證據（2026-08-06）
+
+- baseline：完整 API `2147 passed`、web `117 passed`。
+
+### 計畫的 task 切分有一處不可行，已合併
+
+T1（domain）／T2（migration）／T3（persistence）**綠不起來**：對一個**已經持久化**的型別加
+**必填**欄位，domain 一改 serialization 就少一個欄位可填，直到 migration 加上欄位為止。
+Duty 切片沒遇到是因為 `Duty` 是全新型別、沒有既有列。三者合併成一個 commit——
+「綠了才 commit」是硬規則，「bite-size」是準則。
+
+### 施工中抓到兩個真的 bug
+
+1. **`_apply_item()` 會讓第二筆被接受的提案撞號。** 它把候選原樣接進 Current JD，
+   包含佔位的 `display_order`；而一次 operation 產出多筆 add 提案是常態。這與
+   `_apply_jd_entries()` 早就記錄過的 JdTask 問題是**同一條理由**（該 docstring 寫著
+   「提案帶的那個值不能照抄」）。改成接受當下才配位置、REVISE 保留原位。
+2. **`add_opks_item()` 的重播比對會誤判。** 它在讀 state 之前就建好 `expected` 並整個比對；
+   `display_order` 一旦來自 state，同一把 key 重播時清單可能已變，合法重播會被誤判成
+   `IdempotencyConflict`。改成比對**不含位置**的內容指紋——即 `add_jd_task` 只比
+   `JdTaskFields` 的既有作法。
+
+### 一處刻意沒做：`CurrentJdOpks` 的 canonical tuple 排序
+
+T1 第 2 點原本要求「同 kind 內唯一**且 tuple 本身依 `(entity_kind, display_order)` canonical 排序**」。
+**只做了唯一性，沒做 canonical 排序**，理由：
+
+- `current_duties[0]` 就是 `T1`，順序有單一意義，所以 Duty 值得要求 canonical；
+  但 `current_opks.items` 混了五種 kind，`items[0]` **沒有任何意義**，要求排序買不到對應的保證。
+- 位置碼的正確性由**匯出端明確排序**保證（切片 B 會有測試守），而不是靠 tuple 順序——
+  依賴 tuple 順序反而更脆弱。
+- 代價是要求所有測試的 tuple 必須按 kind 分組，churn 不小卻擋不到真的 bug。
+
+唯一性是承重的（同 kind 撞號就算不出唯一的 `O1.1.1`），canonical 排序不是。
+
+### 兩處結構調整
+
+- `next_display_order` 本來想放 application，但 `opks_authoring` 已經 import
+  `opks_proposals`，放哪一邊都循環。搬進 `CurrentJdOpks` 當 method——「這個 kind 的下一個位置」
+  本來就是集合自己的問題。
+- `OpksDirectEditPayload` 多了第四種 action。reorder 不帶 item 快照而帶
+  `entity_kind`＋`ordered_entity_ids`，validator 改成**雙向拒絕**（reorder 不得帶快照、
+  其餘三種不得帶 reorder 欄位），否則會出現「delete 帶著 ordered_entity_ids」這種無意義記錄。
+
+### migration 0017 唯一的資料風險已鎖住
+
+回填嚴格照 migration 前的 `(created_at, entity_id)` 讀取順序。
+`test_job_analysis_opks_backfill.py` 塞入順序刻意與 `created_at` 順序不同，
+斷言每個 kind 的相對順序不變、且各自從 0 連續編號。
+
+### Web
+
+分區顯示與文件層排序之間的落差由 `kindOrderAfterMove()` 這支純函式承接：畫面按 Task 分區，
+但 `display_order` 是文件層 per-kind，所以**相鄰以看得見的子集合為準、交換發生在完整清單上**。
+放 `src/lib/` 是因為本 repo 的 vitest 只跑 `src/lib`（Duty T6 的教訓）。有測試守
+「不會弄丟或重複任何 id」與「不在可見區塊內的 id 回 null」。
+
+### 數字
+
+- domain＋migration＋persistence：完整 API **`2148 passed`**（+1）。
+- T4 reorder use case＋route＋contract：完整 API **`2158 passed`**（+10）、contract 16、
+  web 117＋tsc＋lint。
+- T5 Web：web **`122 passed`**（+5）＋tsc＋lint＋`npm run build` 全綠。
+- **本切片沒有真人瀏覽器驗證**（比照 Duty T6 的坦白）；要驗證需重啟本機 dev server，動手前先問。
+
+下一個是切片 B（匯出）。
+

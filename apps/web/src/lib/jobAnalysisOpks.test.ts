@@ -10,6 +10,8 @@ import {
   documentUnlinkedCompetencies,
   groupOpksByTask,
   groupOpksProposals,
+  kindOrderAfterMove,
+  kindOrderedIds,
   opksDecisionPayload,
 } from "./jobAnalysisOpks";
 
@@ -23,6 +25,7 @@ function item(
   entityKind: OpksItemView["entity_kind"],
   taskRefs: string[],
   indicatorRefs: string[] = [],
+  displayOrder = 0,
 ): OpksItemView {
   return {
     entity_id: entityId,
@@ -31,7 +34,7 @@ function item(
     task_refs: taskRefs,
     indicator_refs: indicatorRefs,
     evidence_quotes: [],
-    display_order: 0,
+    display_order: displayOrder,
   };
 }
 
@@ -128,3 +131,56 @@ describe("OPKS product projection", () => {
     });
   });
 });
+
+describe("kind ordering", () => {
+  const items = [
+    item("out-a", "output", ["task-1"], [], 0),
+    item("out-b", "output", ["task-2"], [], 1),
+    item("out-c", "output", ["task-1"], [], 2),
+    item("know-a", "knowledge", ["task-1"], [], 0),
+  ];
+
+  it("orders a kind by display_order and ignores other kinds", () => {
+    expect(kindOrderedIds(items, "output")).toEqual([
+      "out-a",
+      "out-b",
+      "out-c",
+    ]);
+    expect(kindOrderedIds(items, "knowledge")).toEqual(["know-a"]);
+  });
+
+  it("swaps within the full kind list even when the neighbour is not adjacent globally", () => {
+    // 畫面上 task-1 只看得到 out-a 與 out-c（out-b 屬於 task-2 夾在中間）。
+    // 員工把 out-c 往上移一格,相鄰以看得見的為準,所以應與 out-a 交換。
+    const visible = ["out-a", "out-c"];
+
+    expect(kindOrderAfterMove(items, "output", visible, "out-c", -1)).toEqual([
+      "out-c",
+      "out-b",
+      "out-a",
+    ]);
+  });
+
+  it("returns null at the edges of the visible block", () => {
+    const visible = ["out-a", "out-c"];
+
+    expect(kindOrderAfterMove(items, "output", visible, "out-a", -1)).toBeNull();
+    expect(kindOrderAfterMove(items, "output", visible, "out-c", 1)).toBeNull();
+  });
+
+  it("never drops or duplicates an id", () => {
+    const visible = ["out-a", "out-b", "out-c"];
+    const next = kindOrderAfterMove(items, "output", visible, "out-b", 1);
+
+    expect(next).not.toBeNull();
+    expect(next!.slice().sort()).toEqual(["out-a", "out-b", "out-c"]);
+    expect(new Set(next!).size).toBe(3);
+  });
+
+  it("returns null for an id that is not in the visible block", () => {
+    expect(
+      kindOrderAfterMove(items, "output", ["out-a"], "know-a", 1),
+    ).toBeNull();
+  });
+});
+

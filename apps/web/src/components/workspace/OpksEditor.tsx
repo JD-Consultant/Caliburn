@@ -5,7 +5,14 @@ import type {
   OpksItemWrite,
 } from "@caliburn/job-analysis-contract";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Pencil, Plus, Sparkles, Trash2 } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowUp,
+  Pencil,
+  Plus,
+  Sparkles,
+  Trash2,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -16,11 +23,13 @@ import {
   editOpksItem,
   generateOpksProposals,
   JobAnalysisApiError,
+  reorderOpksItems,
 } from "@/lib/jobAnalysisApi";
 import {
   documentAttitudes,
   documentUnlinkedCompetencies,
   groupOpksByTask,
+  kindOrderAfterMove,
 } from "@/lib/jobAnalysisOpks";
 import {
   documentQueryOptions,
@@ -107,6 +116,23 @@ export function OpksEditor({
   const deleteMutation = useMutation({
     mutationFn: (variables: { entityId: string; idempotencyKey: string }) =>
       deleteOpksItem(documentId, variables.entityId, variables.idempotencyKey),
+    onSuccess: invalidate,
+  });
+
+  const reorderMutation = useMutation({
+    mutationFn: (variables: {
+      kind: ItemKind;
+      orderedEntityIds: string[];
+      idempotencyKey: string;
+    }) =>
+      reorderOpksItems(
+        documentId,
+        {
+          entity_kind: variables.kind,
+          ordered_entity_ids: variables.orderedEntityIds,
+        },
+        variables.idempotencyKey,
+      ),
     onSuccess: invalidate,
   });
 
@@ -223,7 +249,36 @@ export function OpksEditor({
   const busy =
     saveMutation.isPending ||
     deleteMutation.isPending ||
+    reorderMutation.isPending ||
     generationMutation.isPending;
+
+  // 畫面按 Task 分區，但 display_order 是文件層 per-kind——相鄰以看得見的為準，
+  // 交換發生在完整清單上（`kindOrderAfterMove`）。回 null 代表移不動。
+  const move = (
+    kind: ItemKind,
+    visibleIds: string[],
+    entityId: string,
+    offset: -1 | 1,
+  ) => {
+    if (!document.data) return;
+    const orderedEntityIds = kindOrderAfterMove(
+      document.data.opks_items,
+      kind,
+      visibleIds,
+      entityId,
+      offset,
+    );
+    if (orderedEntityIds === null) return;
+    const previous = reorderMutation.variables;
+    reorderMutation.mutate(
+      reorderMutation.isError &&
+        previous?.kind === kind &&
+        JSON.stringify(previous.orderedEntityIds) ===
+          JSON.stringify(orderedEntityIds)
+        ? previous
+        : { kind, orderedEntityIds, idempotencyKey: crypto.randomUUID() },
+    );
+  };
 
   const formFor = (kind: ItemKind, taskId?: string, item?: OpksItemView) => {
     const matches =
@@ -298,10 +353,46 @@ export function OpksEditor({
                     <p className="text-sm text-muted-foreground">尚未填寫</p>
                   ) : (
                     <ul className="space-y-2">
-                      {values.map((item) => (
+                      {values.map((item, index) => (
                         <li key={item.entity_id} className="space-y-2">
                           <div className="flex items-start gap-2 text-sm">
                             <span className="min-w-0 flex-1">{item.text}</span>
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              aria-label={`上移${KIND_LABELS[kind]}`}
+                              disabled={busy || index === 0 || editing !== null}
+                              onClick={() =>
+                                move(
+                                  kind,
+                                  values.map((each) => each.entity_id),
+                                  item.entity_id,
+                                  -1,
+                                )
+                              }
+                            >
+                              <ArrowUp />
+                            </Button>
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              aria-label={`下移${KIND_LABELS[kind]}`}
+                              disabled={
+                                busy ||
+                                index === values.length - 1 ||
+                                editing !== null
+                              }
+                              onClick={() =>
+                                move(
+                                  kind,
+                                  values.map((each) => each.entity_id),
+                                  item.entity_id,
+                                  1,
+                                )
+                              }
+                            >
+                              <ArrowDown />
+                            </Button>
                             <Button
                               size="icon"
                               variant="ghost"
@@ -412,10 +503,44 @@ export function OpksEditor({
           <p className="text-sm text-muted-foreground">尚未填寫</p>
         ) : (
           <ul className="space-y-2">
-            {attitudes.map((item) => (
+            {attitudes.map((item, index) => (
               <li key={item.entity_id} className="space-y-2">
                 <div className="flex items-start gap-2 text-sm">
                   <span className="min-w-0 flex-1">{item.text}</span>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    aria-label="上移態度"
+                    disabled={busy || index === 0 || editing !== null}
+                    onClick={() =>
+                      move(
+                        "attitude",
+                        attitudes.map((each) => each.entity_id),
+                        item.entity_id,
+                        -1,
+                      )
+                    }
+                  >
+                    <ArrowUp />
+                  </Button>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    aria-label="下移態度"
+                    disabled={
+                      busy || index === attitudes.length - 1 || editing !== null
+                    }
+                    onClick={() =>
+                      move(
+                        "attitude",
+                        attitudes.map((each) => each.entity_id),
+                        item.entity_id,
+                        1,
+                      )
+                    }
+                  >
+                    <ArrowDown />
+                  </Button>
                   <Button
                     size="icon"
                     variant="ghost"

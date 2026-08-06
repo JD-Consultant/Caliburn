@@ -2,7 +2,7 @@
 title: Task Analysis 引擎 — 端到端設計(durable PostgreSQL + consultant Web)
 audience: agent-primary(也給人)
 scope: apps/api job_analysis + job_analysis_postgres + job_analysis routes + apps/web workspace
-updated: 2026-08-02
+updated: 2026-08-06
 ---
 
 # Task Analysis 引擎 — 端到端設計
@@ -32,7 +32,7 @@ updated: 2026-08-02
 ## 1. 一句話
 
 員工回一句話 → **assembler** 把現況投影成一份只用 ordinal 說話的 packet → **一次 HTTP** 打
-OpenRouter 拿 `task_analysis_result_v2`(送出去的精簡形狀)→ **mapper** 還原成內部的
+OpenRouter 拿 `task_analysis_result_v3`(送出去的精簡形狀)→ **mapper** 還原成內部的
 `TaskAnalysisResult` → **verifier**(純函式、零 LLM)擋掉所有確定性違規 →
 **transition** 依 identity gate 決定「直接改 Work Model」還是「建立提案交給員工」→ 產出下一題。
 **模型只提候選,application 是唯一寫入者,Proposal 只 gate Current JD。**
@@ -42,7 +42,7 @@ OpenRouter 拿 `task_analysis_result_v2`(送出去的精簡形狀)→ **mapper**
 | 組件 | 是什麼 | 碼 | 權力 |
 |---|---|---|---|
 | domain | Task／SourceRef／SupportLink／open_issues／excluded_signals／Task Proposal，以及 OPKS 的 `OpksItem`／`CurrentJdOpks`／獨立 `OpksProposal` 凍結形狀 | `app/job_analysis/domain/`（OPKS：`opks.py`、`opks_proposal.py`） | 純 Pydantic,frozen;**非法狀態無法被表示**;只 import stdlib＋pydantic。OPKS 已進完整 authority state、人工編輯、Proposal 決策 API 與 Web editor |
-| llm 契約 | Task：內部 `TaskAnalysisResult`＋`task_analysis_result_v2` wire；OPKS：獨立 `OpksResult`＋`opks_result_v1` wire；各自一份 Static Instructions | `app/job_analysis/llm/` | 只描述形狀與判準文字;**不做跨欄位驗證**。OPKS wire 只有 5 個 property、零 union，不擴充既有 Task schema |
+| llm 契約 | Task：內部 `TaskAnalysisResult`＋`task_analysis_result_v3` wire（v3 相對 v2 只多了與 `work_signals` 平行的 `issue_resolutions[]`；**不覆寫 v2**，同一個版本號不得指向兩種契約）；OPKS：獨立 `OpksResult`＋`opks_result_v1` wire；各自一份 Static Instructions | `app/job_analysis/llm/` | 只描述形狀與判準文字;**不做跨欄位驗證**。OPKS wire 只有 5 個 property、零 union，不擴充既有 Task schema |
 | wire mapper | 中性值 → `None` 的純還原 | `llm/wire.py` 的 `wire_to_task_analysis_result()` | **不做語意判斷**;沒有 domain 落點的夾帶內容一律拒絕,不靜默丟棄 |
 | assembler | Task 現況 → `TaskAnalysisPacket`；單一選定 Task → `OpksContextPacket`；兩者都有決定性 rendering | `application/context.py`、`application/opks_context.py` | 純函式;ordinal 的唯一產地。OPKS 只投影選定 Task、有效員工依據、該 Task O/P、全文件 K/S 與相關提案，不送完整 transcript／A／內部 ID |
 | verifier | Task §9.5／§12.3 規則；OPKS decision／ordinal／refs 映射 | `application/verifier.py`、`application/opks_verifier.py` | 純函式；OPKS 會產出 application-side verified changes，但**不判必要性、可觀察性或文字品質** |
@@ -136,6 +136,26 @@ OPKS 是另一個已接通 durable generation 的單 Task operation，不擴充�
   兩邊各寫一份遲早失步。canonical JSON + SHA-256，**不得改用內建 `hash()`**（PYTHONHASHSEED
   隨機化會讓重開後同一輸入付兩次錢）。
 
+### 3.2 缺口只有一條解決通道（ADR 0054 決定 22–23）
+
+缺口走 `task_analysis_result_v3` 的第三個頂層陣列 `issue_resolutions[]`（`{ordinal,
+resolution}`，扁平、每 issue 一筆），**不走 `WorkSignal`**。三個值：`answered` 沿用現行語意
+（移出 `open_issues`）；`employee_unknown`／`not_applicable` 不移除，改寫入 `terminal_resolution`
+轉成「已問過、勿重問」的 context memory。`source_ref` 由 application 蓋，不進 wire。
+
+- **`answered` 的機械前提**：同一輪必須有一筆針對該 gap `subject_task_id` 的 `support_only`
+  或 `revise`（`_leaves_employee_evidence_on()`）。少了它 digest 不變、OPKS 不會再分析，
+  缺口被**假關閉**——員工以為答過了，系統卻永遠不會用那個答案。
+- **`resolves_open_issue_ordinal` 不得用來關缺口**（`RESOLUTION_OPKS_GAP_NEEDS_ISSUE_RESOLUTION`）。
+  ADR 0047 把那個欄位開放給「模型自己提出的」open issue，理由是只有主顧問知道自己上一輪問過
+  什麼；OPKS 缺口由 specialist 提出，且上面那條前提是機械可判的，所以不在 0047 的範圍內。
+  缺口在資料上長得跟一般 issue 一樣（沒有 `reconciliation_task_id`），**不擋就是一扇後門**：
+  模型送一筆帶當輪 anchor 的訊號即可整筆刪除缺口、什麼依據都不留。帶依據的訊號也一樣擋——
+  放行等於把前提複製到第二處。判別用 `subject_task_id`（domain 保證 `opks_axis` 非空必有它，
+  且全 repo 只有 `_gap_issues()` 會寫它）。**0047 對沒有 subject Task 的 issue 原樣有效。**
+- 主顧問 prompt 因此明寫「缺口一律用 `issue_resolutions` 關，不填
+  `resolves_open_issue_ordinal`」：任何 violation 都會退掉整輪，模型走錯門就白付一次錢。
+
 `TaskFields` 舊的兩個 OPKS hint 已退役；正式 O/P 的唯一資料來源是 `CurrentJdOpks`，不留第二份真相。
 
 員工直接編輯走另一條短路徑：`add_jd_task`／`edit_jd_task`／`delete_jd_task`／
@@ -199,7 +219,8 @@ Journal entry 並設為 `active_question`；不呼叫模型、不另建 chat tab
 transcript 同時供下一輪 packet 與之後的 Consultation View 使用。
 one-stage prompt 不把訪談寫成固定問卷：先理解職位的服務對象與目的，每段完整回答可辨識
 0..N 個工作訊號；故事仍有資訊時可深挖，故事結束後回到例行、週期與例外責任。下一題優先處理
-會改變 Task 邊界的矛盾／責任問題，再處理 open issue 與遺漏掃描。pending／deferred Proposal
+會改變 Task 邊界的矛盾／責任問題，再處理一般 open issue、**OPKS 缺口**與遺漏掃描
+（ADR 0054 決定 21 的 agenda 順序，實作住 `context.py` 的 `_agenda_rank()`）。pending／deferred Proposal
 只是待決假說，不會凍結訪談；第一版沒有完成 gate，模型不得宣稱訪談或 JD 已完成。這些是
 scripted smoke 保護的顧問行為基線，不代表模型品質已通過。
 既有 Task 在下一次 AI 互動時看到 JD/Work Model 差異；JD-only Task 先落一筆
@@ -251,7 +272,7 @@ Consultation turn 不再重複呼叫它。
 |---|---|---|
 | `verified` | 通過 verifier | 交給 transition |
 | `rejected` | parse 得出來但違反確定性規則 | 不得套用;`report.violations` 有逐條理由 |
-| `invalid_output` | 不是合法的 `task_analysis_result_v2` JSON,或還原不成 domain 契約(夾帶) | 重組 context 再來,不是 retry 同一份 |
+| `invalid_output` | 不是合法的 `task_analysis_result_v3` JSON,或還原不成 domain 契約(夾帶) | 重組 context 再來,不是 retry 同一份 |
 | `refused` | 模型拒答 | **不是錯誤,也不可重試** |
 | `failed` | timeout／連線／非 200／provider error／截斷／response model 不符 | 依 `detail` 的 kind 決定；`truncated` 要調 `max_tokens`，`model_mismatch` 不得拿來判斷產品品質 |
 

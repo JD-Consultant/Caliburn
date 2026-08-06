@@ -200,6 +200,9 @@ class ViolationCode(StrEnum):
     )
     RESOLUTION_MAPPING_INVALID = "resolution_mapping_invalid"
     RESOLUTION_OPEN_ISSUE_REPEATED = "resolution_open_issue_repeated"
+    RESOLUTION_OPKS_GAP_NEEDS_ISSUE_RESOLUTION = (
+        "resolution_opks_gap_needs_issue_resolution"
+    )
 
 
 class Violation(DomainModel):
@@ -368,6 +371,8 @@ def _verify_open_issue_resolution(
 
     ADR 0047 把適用範圍擴及一般 open issue——那些是模型自己提的待答問題,任何 disposition
     皆可關閉。0044 的 reconciliation 判準原樣保留。
+
+    **OPKS 缺口不在 0047 的範圍內**(見下方 `subject_task_id` 那一段)。
     """
 
     ordinal = signal.resolves_open_issue_ordinal
@@ -379,6 +384,29 @@ def _verify_open_issue_resolution(
             violations,
             ViolationCode.RESOLUTION_OPEN_ISSUE_UNKNOWN,
             f"open issue ordinal {ordinal} is outside the packet",
+            index,
+        )
+        return
+
+    if issue.subject_task_id is not None:
+        # ADR 0054 決定 22:gap resolution **不綁在 `WorkSignal.disposition` 上**,
+        # 它有自己的 `issue_resolutions[]` 通道。
+        #
+        # 0047 的「全部 open issue」指的是**主顧問自己提出**的那些(責任邊界不明／
+        # 證據不足／矛盾未解／task_boundary_uncertain),理由是只有它知道自己上一輪
+        # 問過什麼。OPKS 缺口由 specialist 提出,而且決定 23 給了它一個機械可判的
+        # 前提(同輪必須在該 Task 留下員工依據)。不擋這條路的話,模型送一筆帶當輪
+        # anchor 的訊號就能把缺口整筆刪掉、什麼依據都不留——digest 不變、OPKS 不再
+        # 分析,缺口被假關閉,而決定 23 的檢查只掛在新通道上,擋不到這裡。
+        #
+        # 帶依據的訊號也一樣擋:放行等於把決定 23 的前提複製到第二處,兩份遲早失步。
+        # `subject_task_id` 就是缺口的標記——domain 保證 `opks_axis` 非空必有它,而
+        # 全 repo 只有 `_gap_issues()` 會寫它。
+        _add(
+            violations,
+            ViolationCode.RESOLUTION_OPKS_GAP_NEEDS_ISSUE_RESOLUTION,
+            f"open issue ordinal {ordinal} is an OPKS gap and may only be resolved "
+            "through issue_resolutions[]",
             index,
         )
         return

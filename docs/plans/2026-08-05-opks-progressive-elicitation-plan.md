@@ -311,6 +311,8 @@
 
 觀察點：specialist 是否真的在證據薄時回 `uncertain` 而非硬編；gap 摘要是否寫成問句（違反決定 16）；主顧問是否把 K/S 問成認領題（違反 0048 決定 14）；`issue_resolutions[]` 是否被當成偷懶關閉的出口（ADR 後果段已承認 verifier 擋不住，只能靠實測看）。
 
+**已備妥（未執行）**：`apps/api/scripts/job_analysis_opks_elicitation_live_smoke.py`。既有的 `job_analysis_live_smoke.py` 不能用——它的三回合永遠不會有 Task 進 Current JD，pre-gate 一次都不會通過。新腳本把單一 Task 直接種進 Current JD，硬上限 5 次呼叫／US$1.80（CLI 只能往下調），逐 call 結算而非逐回合（一個 `/turns` 可能兩次呼叫）。免費重放已確認凍結場景在第 1 回合就排定 child、產出提案並落地一個 skill 缺口。第五個觀察點：修掉後門之後，模型會不會仍想用 `resolves_open_issue_ordinal` 關缺口。
+
 ## 執行順序摘要
 
 ```text

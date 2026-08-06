@@ -147,21 +147,41 @@ async def prepare_opks_generation(
     *,
     document_id: UUID,
     task_id: str,
+    expected_digest: str,
 ) -> OpksGenerationSnapshot:
+    """讀一份不可變 snapshot,並確認它就是被排定的那份輸入。
+
+    `expected_digest` 是主回合凍結進 receipt 的那一個(決定 7–8)。**不比對就會付兩次
+    錢**:主回合 commit 之後、這裡開始之前員工仍可能直接編輯該 Task,child 於是用新
+    輸入分析、卻把 receipt 寫在舊 digest 推導出來的 operation ID 上;下一輪 scheduler
+    算出新 digest、`journal.get()` 找不到,同一份輸入再分析一次。
+
+    對不上就 **abandon**(決定 10):raise `StaleAuthoritySnapshot`、不寫任何 receipt,
+    由更新的那一輪排定自己的 child。這一步刻意在 provider 呼叫之前——漂移這時已經看得
+    出來,沒有理由先付錢再丟掉。
+    """
+
     async with uow_factory() as uow:
         record = await uow.documents.get(document_id)
         if record is None:
             raise DocumentNotFound(f"document {document_id} was not found")
         state = await _load_state(uow, record)
+        # grounding 檢查排在 digest 比對之前:「這個 Task 沒有員工依據」是它自己的
+        # 狀態,不是漂移,兩者的呼叫端處置不同,不能被後者蓋掉。
+        packet = _packet_for(state, task_id)
+        # 用 packet 投影出的那一份 Task 算,digest 與 specialist 真正看到的輸入同源。
+        digest = compute_analysis_input_digest(packet.selected_task.task)
+        if digest != expected_digest:
+            raise StaleAuthoritySnapshot(
+                f"task {task_id!r} changed after this OPKS child was scheduled"
+            )
         return OpksGenerationSnapshot(
             document_id=document_id,
             authority_generation=record.authority_generation,
             selected_task_id=task_id,
-            analysis_input_digest=compute_analysis_input_digest(
-                _selected_task(state, task_id)
-            ),
+            analysis_input_digest=digest,
             state=state,
-            packet=_packet_for(state, task_id),
+            packet=packet,
         )
 
 
@@ -390,7 +410,14 @@ async def generate_opks_proposals(
     document_id: UUID,
     task_id: str,
     operation_id: str,
+    expected_digest: str,
 ) -> OpksGenerationResult:
+    """`expected_digest` 是必填的:少了它,漏比對就是靜默的雙重付費。
+
+    `operation_id` 由 `(task_id, expected_digest)` 推導(決定 7),所以這三個值必須是
+    同一筆 `ScheduledOpks` 來的;呼叫端拿不到凍結的 digest 就不該啟動 child。
+    """
+
     replay = await _committed_replay(
         uow_factory,
         document_id=document_id,
@@ -403,6 +430,7 @@ async def generate_opks_proposals(
         uow_factory,
         document_id=document_id,
         task_id=task_id,
+        expected_digest=expected_digest,
     )
     operation_result = await run_opks_operation(
         packet=snapshot.packet,

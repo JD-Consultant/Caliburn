@@ -116,6 +116,14 @@ OPKS 是另一個已接通 durable generation 的單 Task operation，不擴充�
   員工只看到一個「分析中」。child 的失敗**不得**改變 `/turns` 的結果：四種終端失敗由
   `generate_opks_proposals()` 自己寫 `failed` receipt，`StaleAuthoritySnapshot` 是
   abandon（不寫 receipt、不擋下次），兩者都在 `_run_scheduled_opks()` 內被吞掉。
+- **`generate_opks_proposals()` 的 `expected_digest` 是必填的，`prepare_opks_generation()`
+  一開工就比對。** 傳進去的一定是主回合凍結的那個 `ScheduledOpks.analysis_input_digest`——
+  `operation_id` 由 `(task_id, digest)` 推導，三個值必須同源。**不比對就是靜默的雙重付費**：
+  主回合 commit 之後、child 開始之前（crash 後重開、replay 之間）員工仍可能直接編輯那個
+  Task，child 於是用新輸入分析、卻把 receipt 寫在舊 digest 推導出的 ID 上；下一輪 scheduler
+  算出新 digest、`journal.get()` 找不到，同一份輸入再付一次。對不上就 abandon（決定 10），
+  而且發生在 provider 呼叫**之前**——漂移這時已經看得出來，沒有理由先付錢再丟掉。
+  grounding 檢查排在比對之前：「這個 Task 沒有員工依據」是它自己的狀態，不是漂移。
 - **沒有 background worker，因此單純 reload／GET 不會補跑漏掉的 child。** 恢復只發生在
   兩個地方：同一個 `/turns` 以相同 `Idempotency-Key` replay（replay 分支會讀回既凍結的
   `scheduled_opks`），或後續回合的 scheduler 再次選到同一個 child ID。程式註解、UI 文案

@@ -378,6 +378,29 @@ JD 只在員工決定提案時才改。
 - `--max-generation-calls 0` 只做 catalog preflight,不建文件、不花錢。working tree dirty 時 CLI 在付費前停止。
 - 它**不是**瀏覽器 E2E:不驗 UI 點擊、CORS 或前端錯誤顯示。單次 trial 也不能宣稱穩定品質或比較模型。
 
+**這支的場景永遠不會排定 OPKS child。** 訪談只產生 Proposal,沒有員工決策步驟,所以沒有
+Task 進得了 Current JD,pre-gate 一次都不會通過。要觀察 0054 那條線得用下面那一支。
+
+### 8.1.1 OPKS 漸進式蒐集的 live smoke(`scripts/job_analysis_opks_elicitation_live_smoke.py`)
+
+同樣是一次性診斷 CLI,差別只有場景:它把**單一** Task 直接種進 Current JD(走
+`commit_authority_change()`),訪談才走得到主回合 → 排定 child → 缺口 → 追問 → 回答 →
+再分析。只種一個 Task 是成本護欄——pre-gate 逐 Task,多一個就多一條 child。
+
+回答的是 scripted 測試回答不了的四件事(ADR 0054 計畫 T18):specialist 在證據薄時是否
+真的回 `uncertain`;gap 摘要是否被寫成問句(決定 16);主顧問是否把 K/S 問成認領題
+(ADR 0048 決定 14);`issue_resolutions[]` 是否被當成偷懶關閉的出口(0054 後果段已承認
+verifier 擋不住)。加一點:模型會不會仍想用 `resolves_open_issue_ordinal` 關缺口。
+
+- 硬上限 **5 次 generation call、US$1.80、零 retry**;3 回合主顧問 ＋ 最多 2 次 child
+  (缺口 active 期間 pre-gate 擋住同一個 Task,所以中間那回合不會再排)。CLI 只能往下調。
+- **逐 call 記錄與結算,不是逐回合。** 一個 `/turns` 可能有兩次呼叫,只取最後一次會漏掉
+  specialist 那次的成本與內容。capture 用送出的 schema 名字分辨主顧問與 specialist。
+- `observations.json` 只做**機械抽取**:缺口摘要、結尾是不是問號、主顧問問句原文、
+  送出的 `issue_resolutions`。K/S 有沒有問成認領題是語意判斷,只列原文給人讀,不自動判。
+- 已知不忠實:種下的依據不在 transcript 裡;員工回合預先凍結,接不上主顧問當下真正問的
+  那一題。這兩點寫在 manifest 的 `limitations`,不得在報告裡略過。
+
 ### 8.2 開發用便宜模型,生產用貴模型——以及哪些問題不准用便宜模型回答
 
 2026-07-31 owner 決定:**本機開發與測試跑 `openai/gpt-5.6-luna-pro`(實測約 Opus 的 10%),

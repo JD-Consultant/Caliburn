@@ -1,7 +1,7 @@
 # 0059. AI 輔助主要職責：只做暫定框架、獨立 operation、輕量候選、第一版不接 reference
 
-- 狀態：Proposed
-- 日期：2026-08-06
+- 狀態：Accepted
+- 日期：2026-08-06（owner 核准）
 - 依據：[`docs/specs/2026-08-06-ai-assisted-duty-research.md`](../specs/2026-08-06-ai-assisted-duty-research.md)
 - 操作化：[0055](0055-hybrid-job-discovery-and-ttop-formation.md) 決定 2（暫定職務框架）——
   0055 只固定分析語意與順序、明言「不建立 API、資料表或 Web route」，本 ADR 補上實作形狀

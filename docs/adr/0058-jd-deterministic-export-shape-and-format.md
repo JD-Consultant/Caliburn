@@ -1,7 +1,7 @@
 # 0058. JD 匯出：組裝與渲染分層、位置碼演算法、不重用 `ocs-contract`、XLSX 為第一版格式
 
-- 狀態：Proposed
-- 日期：2026-08-06
+- 狀態：Accepted
+- 日期：2026-08-06（owner 核准；審查中已依裁決改為 XLSX、員工可控排序、獨立缺漏工作表、三段 `P{i}.{j}.{k}`）
 - 依據：[`docs/specs/2026-08-06-jd-deterministic-export-research.md`](../specs/2026-08-06-jd-deterministic-export-research.md)
 - 延續：[0052](0052-jd-readiness-assessment-and-official-code-boundaries.md) 決定 4／5／8／10／14
   （exporter 呼叫同一套 assessment、缺漏只提示不阻擋、兩種代碼權責、位置碼定義、匯出留給本 ADR 實作）；

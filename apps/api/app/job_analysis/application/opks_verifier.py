@@ -115,6 +115,10 @@ def _add_change(
         entity_id=entity_id,
         entity_kind=kind,
         text=item.text,
+        # 佔位值。候選還不在文件裡,真正的位置由 `_apply_item()` 在員工接受當下依
+        # 當時的 Current JD 決定——比照 `_apply_jd_entries()` 不照抄提案帶的
+        # `display_order`（否則同一回合多筆 add 被接受時會全部撞號）。
+        display_order=0,
         task_refs=(packet.selected_task.task.task_id,),
         indicator_refs=(),
         evidence_links=evidence,

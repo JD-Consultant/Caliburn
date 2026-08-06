@@ -80,6 +80,7 @@ def output_item() -> OpksItem:
         entity_id="output-1",
         entity_kind=OpksEntityKind.OUTPUT,
         text="營運週報",
+        display_order=0,
         task_refs=("task-1",),
         evidence_links=(
             OpksEvidenceLink(

@@ -126,6 +126,7 @@ def test_opks_mapper_normalizes_employee_fields_and_exposes_only_quotes():
         entity_id="knowledge-1",
         entity_kind=kind,
         text=text,
+        display_order=0,
         task_refs=task_refs,
         indicator_refs=(),
         evidence_links=(
@@ -213,6 +214,7 @@ def test_consultation_view_keeps_history_without_leaking_internal_authority():
         entity_id="output-1",
         entity_kind=OpksEntityKind.OUTPUT,
         text="營運週報",
+        display_order=0,
         task_refs=("task-1",),
         evidence_links=(
             OpksEvidenceLink(

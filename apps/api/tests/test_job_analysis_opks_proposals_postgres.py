@@ -56,6 +56,7 @@ def item(
         entity_id=entity_id,
         entity_kind=kind,
         text=text,
+        display_order=0,
         task_refs=(task_id,),
         evidence_links=(evidence(),),
     )

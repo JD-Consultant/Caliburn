@@ -348,8 +348,8 @@ class SqlAlchemyOpksRepository:
                 select(JobAnalysisOpksItemRow)
                 .where(JobAnalysisOpksItemRow.document_id == document_id)
                 .order_by(
-                    JobAnalysisOpksItemRow.created_at,
-                    JobAnalysisOpksItemRow.entity_id,
+                    JobAnalysisOpksItemRow.entity_kind,
+                    JobAnalysisOpksItemRow.display_order,
                 )
             )
         ).all()
@@ -382,6 +382,7 @@ class SqlAlchemyOpksRepository:
                     document_id=document_id,
                     entity_id=item.entity_id,
                     entity_kind=item.entity_kind.value,
+                    display_order=item.display_order,
                     item_schema_id=OPKS_ITEM_SCHEMA_ID,
                     item_payload=ser.dump_opks_item_payload(item),
                     created_at=(

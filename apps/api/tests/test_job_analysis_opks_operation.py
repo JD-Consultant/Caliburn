@@ -78,6 +78,7 @@ def packet():
         entity_id="knowledge-private",
         entity_kind=OpksEntityKind.KNOWLEDGE,
         text="營運指標定義",
+        display_order=0,
         evidence_links=(
             OpksEvidenceLink(
                 source_ref=source("turn-old"),

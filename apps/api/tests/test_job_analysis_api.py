@@ -929,6 +929,7 @@ async def test_opks_proposal_decisions_use_the_independent_contract(
         entity_id="knowledge-1",
         entity_kind=OpksEntityKind.KNOWLEDGE,
         text="營運資料定義",
+        display_order=0,
         task_refs=("task-1",),
         evidence_links=(
             OpksEvidenceLink(
@@ -986,6 +987,7 @@ async def test_remove_opks_proposal_cannot_be_edited(api_client):
         entity_id="output-1",
         entity_kind=OpksEntityKind.OUTPUT,
         text="營運週報",
+        display_order=0,
         task_refs=("task-1",),
         evidence_links=(
             OpksEvidenceLink(

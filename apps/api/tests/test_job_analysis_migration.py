@@ -91,6 +91,7 @@ EXPECTED_COLUMNS = {
         "document_id": ("uuid", False),
         "entity_id": ("text", False),
         "entity_kind": ("text", False),
+        "display_order": ("bigint", False),
         "item_schema_id": ("text", False),
         "item_payload": ("jsonb", False),
         "created_at": ("timestamptz", False),
@@ -149,7 +150,7 @@ EXPECTED_UNIQUES = {
     "job_analysis_jd_duties": {"ja2_uq_jd_duties_order"},
     "job_analysis_proposals": set(),
     "job_analysis_journal": {"ja2_uq_journal_entry"},
-    "job_analysis_opks_items": set(),
+    "job_analysis_opks_items": {"ja2_uq_opks_items_order"},
     "job_analysis_opks_proposals": set(),
 }
 
@@ -211,6 +212,7 @@ EXPECTED_CHECKS = {
         "ja2_ck_opks_items_schema",
         "ja2_ck_opks_items_payload",
         "ja2_ck_opks_items_time_order",
+        "ja2_ck_opks_items_display_order",
     },
     "job_analysis_opks_proposals": {
         "ja2_ck_opks_proposals_id",
@@ -279,18 +281,18 @@ def _column_kind(column_type) -> str:
     return str(column_type).lower()
 
 
-def test_alembic_has_0016_as_its_single_head():
+def test_alembic_has_0017_as_its_single_head():
     from alembic.config import Config
     from alembic.script import ScriptDirectory
 
     config = Config(str(API_DIR / "alembic.ini"))
     config.set_main_option("script_location", str(API_DIR / "alembic"))
 
-    assert ScriptDirectory.from_config(config).get_heads() == ["0016"]
+    assert ScriptDirectory.from_config(config).get_heads() == ["0017"]
 
 
 @pytest.mark.usefixtures("require_postgres")
-def test_migration_0016_cycle_builds_greenfield_tables_and_preserves_0011():
+def test_migration_0017_cycle_builds_greenfield_tables_and_preserves_0011():
     admin = sa.create_engine(_sync_url("postgres"), isolation_level="AUTOCOMMIT")
     with admin.connect() as connection:
         connection.execute(sa.text(f"DROP DATABASE IF EXISTS {MIG_DB} WITH (FORCE)"))
@@ -309,7 +311,7 @@ def test_migration_0016_cycle_builds_greenfield_tables_and_preserves_0011():
             "job_authoring_proposals",
         }
 
-        _alembic("upgrade", "0016", _async_url(MIG_DB))
+        _alembic("upgrade", "0017", _async_url(MIG_DB))
         inspector = sa.inspect(engine)
         assert TABLES <= set(inspector.get_table_names(schema="public"))
 

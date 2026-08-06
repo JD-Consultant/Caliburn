@@ -105,6 +105,7 @@ def persisted_attitude() -> OpksItem:
         entity_id="attitude-1",
         entity_kind=OpksEntityKind.ATTITUDE,
         text="主動釐清異常",
+        display_order=0,
         evidence_links=(
             OpksEvidenceLink(
                 source_ref=SourceRef(

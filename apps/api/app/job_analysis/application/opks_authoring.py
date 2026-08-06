@@ -43,6 +43,24 @@ def _entity_id(entry_id: str, kind: OpksEntityKind) -> str:
     return f"direct-{entry_id}-{kind.value}"
 
 
+def opks_content(item: OpksItem) -> tuple:
+    """replay 比對用的內容指紋，**刻意不含 `display_order`**。
+
+    `display_order` 由當下的 Current JD 決定，同一把 key 重播時清單可能已經變了；
+    把位置算進比對會讓合法的重播被誤判成 `IdempotencyConflict`。比照 `add_jd_task`
+    只比 `JdTaskFields`（不含 `display_order`）的既有作法。
+    """
+
+    return (
+        item.entity_id,
+        item.entity_kind,
+        item.text,
+        item.task_refs,
+        item.indicator_refs,
+        item.evidence_links,
+    )
+
+
 def _item(
     *,
     entity_id: str,
@@ -51,11 +69,13 @@ def _item(
     task_refs: tuple[str, ...],
     indicator_refs: tuple[str, ...],
     entry_id: str,
+    display_order: int,
 ) -> OpksItem:
     return OpksItem(
         entity_id=entity_id,
         entity_kind=entity_kind,
         text=text,
+        display_order=display_order,
         task_refs=task_refs,
         indicator_refs=indicator_refs,
         evidence_links=(
@@ -210,24 +230,26 @@ async def add_opks_item(
     indicator_refs: tuple[str, ...] = (),
 ) -> OpksItem:
     kind = OpksEntityKind(entity_kind)
-    expected = _item(
-        entity_id=_entity_id(entry_id, kind),
-        entity_kind=kind,
-        text=text,
-        task_refs=task_refs,
-        indicator_refs=indicator_refs,
-        entry_id=entry_id,
-    )
     async with uow_factory() as uow:
         record, state = await _locked_state(uow, document_id)
+        expected = _item(
+            entity_id=_entity_id(entry_id, kind),
+            entity_kind=kind,
+            text=text,
+            task_refs=task_refs,
+            indicator_refs=indicator_refs,
+            entry_id=entry_id,
+            display_order=state.current_opks.next_display_order(kind),
+        )
         replay = await uow.journal.get(document_id, entry_id)
         if replay is not None:
             payload = _require_replay(replay, action="add")
-            if payload.after != expected:
+            if payload.after is None or opks_content(payload.after) != opks_content(
+                expected
+            ):
                 raise IdempotencyConflict(
                     f"entry {entry_id!r} was replayed with another OPKS item"
                 )
-            assert payload.after is not None
             return payload.after
         if state.current_opks.item_by_id(expected.entity_id) is not None:
             raise IdempotencyConflict(
@@ -256,26 +278,30 @@ async def edit_opks_item(
     indicator_refs: tuple[str, ...] = (),
 ) -> OpksItem:
     kind = OpksEntityKind(entity_kind)
-    expected = _item(
-        entity_id=entity_id,
-        entity_kind=kind,
-        text=text,
-        task_refs=task_refs,
-        indicator_refs=indicator_refs,
-        entry_id=entry_id,
-    )
     async with uow_factory() as uow:
         record, state = await _locked_state(uow, document_id)
+        existing = state.current_opks.item_by_id(entity_id)
+        # 編輯只改內容，位置留在原地（比照 `edit_jd_task` 沿用 `existing.display_order`）
+        expected = _item(
+            entity_id=entity_id,
+            entity_kind=kind,
+            text=text,
+            task_refs=task_refs,
+            indicator_refs=indicator_refs,
+            entry_id=entry_id,
+            display_order=existing.display_order if existing is not None else 0,
+        )
         replay = await uow.journal.get(document_id, entry_id)
         if replay is not None:
             payload = _require_replay(replay, action="edit")
-            if payload.after != expected:
+            if payload.after is None or opks_content(payload.after) != opks_content(
+                expected
+            ):
                 raise IdempotencyConflict(
                     f"entry {entry_id!r} was replayed with another OPKS edit"
                 )
-            assert payload.after is not None
             return payload.after
-        before = state.current_opks.item_by_id(entity_id)
+        before = existing
         if before is None:
             raise OpksItemNotFound(f"OPKS item {entity_id!r} was not found")
         if before.entity_kind is not kind:

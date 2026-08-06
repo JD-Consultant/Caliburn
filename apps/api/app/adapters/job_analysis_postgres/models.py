@@ -282,6 +282,7 @@ class JobAnalysisOpksItemRow(Base):
     document_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True))
     entity_id: Mapped[str] = mapped_column(Text)
     entity_kind: Mapped[str] = mapped_column(Text, nullable=False)
+    display_order: Mapped[int] = mapped_column(BigInteger, nullable=False)
     item_schema_id: Mapped[str] = mapped_column(Text, nullable=False)
     item_payload: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
@@ -292,6 +293,16 @@ class JobAnalysisOpksItemRow(Base):
             "document_id",
             "entity_id",
             name="ja2_pk_opks_items",
+        ),
+        UniqueConstraint(
+            "document_id",
+            "entity_kind",
+            "display_order",
+            name="ja2_uq_opks_items_order",
+        ),
+        CheckConstraint(
+            "display_order >= 0",
+            name="ja2_ck_opks_items_display_order",
         ),
         ForeignKeyConstraint(
             ["document_id"],

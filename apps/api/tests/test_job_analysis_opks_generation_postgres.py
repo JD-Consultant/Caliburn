@@ -78,6 +78,7 @@ def current_knowledge() -> OpksItem:
         entity_id="knowledge-existing",
         entity_kind=OpksEntityKind.KNOWLEDGE,
         text="營運指標定義",
+        display_order=0,
         evidence_links=(
             OpksEvidenceLink(
                 source_ref=source("source-existing"),
@@ -325,6 +326,7 @@ async def test_reuse_that_adds_nothing_is_recorded_without_an_empty_proposal(
         entity_id="knowledge-linked",
         entity_kind=OpksEntityKind.KNOWLEDGE,
         text="營運指標定義",
+        display_order=0,
         task_refs=("task-1",),
         evidence_links=(
             OpksEvidenceLink(

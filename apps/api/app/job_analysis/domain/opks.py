@@ -5,7 +5,7 @@ from __future__ import annotations
 from enum import StrEnum
 from typing import Literal
 
-from pydantic import model_validator
+from pydantic import Field, model_validator
 
 from .base import DomainModel, Identifier, NonEmptyText, TaskId
 from .sources import SourceAnchor, SourceKind
@@ -41,6 +41,7 @@ class OpksItem(DomainModel):
     entity_id: Identifier
     entity_kind: OpksEntityKind
     text: NonEmptyText
+    display_order: int = Field(ge=0)
     task_refs: tuple[TaskId, ...] = ()
     indicator_refs: tuple[Identifier, ...] = ()
     evidence_links: tuple[OpksEvidenceLink, ...]
@@ -96,6 +97,26 @@ class OpksItem(DomainModel):
 class CurrentJdOpks(DomainModel):
     items: tuple[OpksItem, ...] = ()
 
+    def next_display_order(self, kind: OpksEntityKind) -> int:
+        """該 kind 的下一個位置。位置是清單的性質，不是內容的性質。
+
+        住在 domain 是因為 application 有兩個呼叫點（直接新增與接受提案），
+        而它們之間已經有 import 方向約束（`opks_authoring` → `opks_proposals`），
+        放在任一邊都會製造循環。
+        """
+
+        return (
+            max(
+                (
+                    item.display_order
+                    for item in self.items
+                    if item.entity_kind is kind
+                ),
+                default=-1,
+            )
+            + 1
+        )
+
     def item_by_id(self, entity_id: str) -> OpksItem | None:
         for item in self.items:
             if item.entity_id == entity_id:
@@ -121,6 +142,25 @@ class CurrentJdOpks(DomainModel):
         ids = [item.entity_id for item in self.items]
         if len(set(ids)) != len(ids):
             raise ValueError("duplicate OPKS entity id")
+        return self
+
+    @model_validator(mode="after")
+    def display_orders_are_unique_within_each_kind(self):
+        """位置碼由排序推出（ADR 0058 決定 3／5），同 kind 撞號就算不出唯一的 `O1.1.1`。
+
+        唯一性範圍是 **kind**，不是 Task：`O{i}.{j}.{k}` 的 `{k}` 在該 Task 內重新從 1 編號，
+        比照 `JdTask.display_order` 文件層唯一而 `T{i}.{j}` 在 Duty 內重編（ADR 0058 決定 5）。
+        """
+
+        seen: dict[OpksEntityKind, set[int]] = {}
+        for item in self.items:
+            orders = seen.setdefault(item.entity_kind, set())
+            if item.display_order in orders:
+                raise ValueError(
+                    f"duplicate {item.entity_kind.value} display order "
+                    f"{item.display_order}"
+                )
+            orders.add(item.display_order)
         return self
 
     @model_validator(mode="after")

@@ -161,7 +161,7 @@ def load_jd_task(row: Any) -> JdTask:
         _fail("JD Task", exc, exc)
 
 
-_OPKS_ITEM_RELATIONAL_FIELDS = {"entity_id", "entity_kind"}
+_OPKS_ITEM_RELATIONAL_FIELDS = {"entity_id", "entity_kind", "display_order"}
 
 
 def dump_opks_item_payload(item: OpksItem) -> dict[str, Any]:
@@ -182,6 +182,7 @@ def load_opks_item(row: Any) -> OpksItem:
                 **row.item_payload,
                 "entity_id": row.entity_id,
                 "entity_kind": row.entity_kind,
+                "display_order": row.display_order,
             }
         )
     except (ValidationError, TypeError, ValueError) as exc:

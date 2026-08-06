@@ -155,14 +155,32 @@ def _apply_item(
     proposal: OpksProposal,
     item: OpksItem | None,
 ) -> CurrentJdOpks:
+    """**新進項目在這裡才拿到 `display_order`。**
+
+    提案帶的那個值不能照抄：候選建立當下用的是佔位值，而一次 operation 產出多筆 add
+    提案是常態，照抄會讓第二筆一被接受就撞上「同 kind 位置唯一」。這與
+    `_apply_jd_entries()` 對 JdTask 的處理是同一條理由。REVISE 只改內容，位置留原地。
+    """
+
     if proposal.action is OpksProposalAction.ADD:
         assert item is not None
-        return CurrentJdOpks(items=(*current_opks.items, item))
+        placed = item.model_copy(
+            update={
+                "display_order": current_opks.next_display_order(
+                    item.entity_kind
+                )
+            }
+        )
+        return CurrentJdOpks(items=(*current_opks.items, placed))
     if proposal.action is OpksProposalAction.REVISE:
         assert item is not None
         return CurrentJdOpks(
             items=tuple(
-                item if existing.entity_id == proposal.entity_id else existing
+                item.model_copy(
+                    update={"display_order": existing.display_order}
+                )
+                if existing.entity_id == proposal.entity_id
+                else existing
                 for existing in current_opks.items
             )
         )

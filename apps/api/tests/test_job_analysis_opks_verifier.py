@@ -63,11 +63,13 @@ def item(
     task_refs: tuple[str, ...] = (),
     indicator_refs: tuple[str, ...] = (),
     evidence_links: tuple[OpksEvidenceLink, ...] | None = None,
+    display_order: int = 0,
 ) -> OpksItem:
     return OpksItem(
         entity_id=entity_id,
         entity_kind=kind,
         text=text,
+        display_order=display_order,
         task_refs=task_refs,
         indicator_refs=indicator_refs,
         evidence_links=(employee_evidence("turn-old"),)
@@ -207,6 +209,7 @@ def test_remove_output_removes_it_but_remove_knowledge_only_unlinks_selected_tas
         OpksEntityKind.INDICATOR,
         "排班錯誤為零",
         task_refs=("task-other",),
+        display_order=1,
     )
     output = item(
         "output-1",

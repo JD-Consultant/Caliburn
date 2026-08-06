@@ -214,6 +214,7 @@ def _opks_item(*, task_id: str = "task-1") -> OpksItem:
         entity_id="output-1",
         entity_kind=OpksEntityKind.OUTPUT,
         text="營運週報",
+        display_order=0,
         task_refs=(task_id,),
         evidence_links=(
             OpksEvidenceLink(

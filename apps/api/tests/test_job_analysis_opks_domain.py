@@ -52,6 +52,7 @@ def opks_item(
         entity_id=entity_id,
         entity_kind=entity_kind,
         text=text,
+        display_order=0,
         task_refs=task_refs,
         indicator_refs=indicator_refs,
         evidence_links=(employee_evidence(),) if evidence_links is None else evidence_links,

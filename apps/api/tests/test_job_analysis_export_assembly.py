@@ -111,8 +111,12 @@ def test_output_and_indicator_are_three_segment_and_level_with_each_other():
     assert [item.position_code for item in entry.indicators] == ["P1.1.1"]
 
 
-def test_knowledge_skill_and_attitude_are_flat_document_level_codes():
-    """K/S/A 是文件層平坦編號，不分 Duty／Task（ADR 0048 決定 5）。"""
+def test_knowledge_and_skills_hang_under_each_task_with_document_level_codes():
+    """官方主表的最後兩欄是 K 與 S，**同一個 `K01` 會在多個 Task 列重複出現**。
+
+    這與 ADR 0048 決定 7 一致：「不必複製」講的是 identity（不鑄 `K01-a`／`K01-b`），
+    而同一條決定明文允許「UI 可把 K/S 投影在 Task 底下」。逐份核對七份官方範例確認。
+    """
 
     state = JobAnalysisState(
         current_duties=(duty("d1", 0),),
@@ -127,13 +131,96 @@ def test_knowledge_skill_and_attitude_are_flat_document_level_codes():
         },
     )
 
+    first, second = assemble(state).duties[0].tasks
+
+    # K01 同時出現在兩個 Task 底下,而且**是同一個碼**
+    assert [item.position_code for item in first.knowledge] == ["K01"]
+    assert [item.position_code for item in second.knowledge] == ["K01", "K02"]
+    assert [item.position_code for item in first.skills] == ["S01"]
+    assert second.skills == ()
+    assert [item.position_code for item in assemble(state).attitudes] == ["A01"]
+
+
+def test_knowledge_linked_only_through_an_indicator_still_reaches_its_task():
+    """ADR 0048 決定 6：K/S 與 Task／Indicator 多對多。只看 `task_refs` 會漏掉這些。"""
+
+    state = JobAnalysisState(
+        current_duties=(duty("d1", 0),),
+        current_jd=(task("t1", 0, duty_id="d1"),),
+        current_opks={
+            "items": (
+                opks("p1", OpksEntityKind.INDICATOR, 0, task_refs=("t1",)),
+                OpksItem(
+                    entity_id="k1",
+                    entity_kind=OpksEntityKind.KNOWLEDGE,
+                    text="營運指標定義",
+                    display_order=0,
+                    indicator_refs=("p1",),
+                    evidence_links=(evidence(),),
+                ),
+            )
+        },
+    )
+
     document = assemble(state)
 
-    assert [item.position_code for item in document.knowledge] == ["K01", "K02"]
-    assert [item.position_code for item in document.skills] == ["S01"]
-    assert [item.position_code for item in document.attitudes] == ["A01"]
-    # 同一條 K 支援兩個 Task,匯出時**不複製**（ADR 0048 決定 7）
-    assert len(document.knowledge) == 2
+    assert [item.position_code for item in document.duties[0].tasks[0].knowledge] == [
+        "K01"
+    ]
+    assert document.unlinked_knowledge == ()
+
+
+def test_knowledge_that_reaches_no_task_is_still_carried():
+    """主表放不下它，但不得從成品上消失。"""
+
+    state = JobAnalysisState(
+        current_duties=(duty("d1", 0),),
+        current_jd=(task("t1", 0, duty_id="d1"),),
+        current_opks={
+            "items": (
+                opks("k1", OpksEntityKind.KNOWLEDGE, 0, task_refs=("t1",)),
+                opks("k2", OpksEntityKind.KNOWLEDGE, 1, text="孤兒知識"),
+                opks("s1", OpksEntityKind.SKILL, 0, text="孤兒技能"),
+            )
+        },
+    )
+
+    document = assemble(state)
+
+    assert [item.position_code for item in document.unlinked_knowledge] == ["K02"]
+    assert [item.text for item in document.unlinked_skills] == ["孤兒技能"]
+    # 已連結的沒有被重複列進未連結區
+    assert "K01" not in [item.position_code for item in document.unlinked_knowledge]
+
+
+def test_no_competency_is_ever_lost():
+    state = JobAnalysisState(
+        current_duties=(duty("d1", 0),),
+        current_jd=(task("t1", 0, duty_id="d1"), task("t2", 1)),
+        current_opks={
+            "items": (
+                opks("k1", OpksEntityKind.KNOWLEDGE, 0, task_refs=("t1",)),
+                opks("k2", OpksEntityKind.KNOWLEDGE, 1, task_refs=("t2",)),
+                opks("k3", OpksEntityKind.KNOWLEDGE, 2, text="孤兒"),
+            )
+        },
+    )
+
+    document = assemble(state)
+    seen = {
+        item.position_code
+        for section in document.duties
+        for entry in section.tasks
+        for item in entry.knowledge
+    }
+    seen |= {
+        item.position_code
+        for entry in document.unassigned_tasks
+        for item in entry.knowledge
+    }
+    seen |= {item.position_code for item in document.unlinked_knowledge}
+
+    assert seen == {"K01", "K02", "K03"}
 
 
 def test_codes_follow_display_order_not_tuple_order():
@@ -222,7 +309,7 @@ def test_an_empty_document_assembles_without_raising():
 
     assert document.duties == ()
     assert document.unassigned_tasks == ()
-    assert document.knowledge == ()
+    assert document.unlinked_knowledge == ()
     assert document.attitudes == ()
     assert document.header == JdHeader()
 

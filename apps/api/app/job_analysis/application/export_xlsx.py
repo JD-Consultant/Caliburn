@@ -3,6 +3,15 @@
 渲染層。它只知道 `ExportDocument` 與 `DocumentReadiness`，**不知道 Current State、
 不碰 IO、不算位置碼**——那是 `assemble_export_document()` 的事。
 
+版面依 **2026-08-06 逐份核對的七份官方職能基準範例**（`.odt` 2023 版與 `.docx` 2025 版
+結構一致），不是照手冊散文推的：
+
+- 主表**七欄**：主要職責｜工作任務｜工作產出｜行為指標｜職能級別｜職能內涵（K）｜職能內涵（S）
+- 同一格內多筆以**換行**並列，不是一筆一列
+- 位置碼與文字**直接相連不留空格**（`O1.1.1提款單/匯款單`）
+- 主要職責格**跨其工作任務列垂直合併**
+- 態度與說明與補充事項**各自獨立表格**
+
 兩個工作表（決定 12）：
 
 1. **職能基準表** —— 公版版面。未填欄位維持**空白儲存格**：欄位必須在，只是空的。
@@ -12,7 +21,8 @@
    「未來 exporter 呼叫同一套 assessment」；若匯出完全不呼叫它，那條決定就成了死條文。
 
 `職能基準代碼`／`職類別代碼` 固定印「（iCAP 計畫執行單位提供）」——它們由 iCAP 配發，
-不開輸入欄、不生成（ADR 0052 決定 8）。
+不開輸入欄、不生成（ADR 0052 決定 8）。官方範例那兩格填的是官方核發的真實代碼，
+我們產出的是客製 JD，不是送審的職能基準（ADR 0040 決定 33–34）。
 """
 
 from __future__ import annotations
@@ -23,7 +33,7 @@ from openpyxl import Workbook
 from openpyxl.styles import Alignment, Font
 from openpyxl.worksheet.worksheet import Worksheet
 
-from .export import ExportDocument, ExportTaskEntry
+from .export import ExportDocument, ExportOpksEntry, ExportTaskEntry
 from .readiness import DocumentReadiness, ReadinessIssueCode
 
 
@@ -39,6 +49,21 @@ DISCLAIMER = (
 ISSUED_BY_ICAP = "（iCAP 計畫執行單位提供）"
 
 UNASSIGNED_LABEL = "（尚未歸入主要職責）"
+UNLINKED_LABEL = "（尚未連結工作任務）"
+
+#: 官方主表的七個欄位標題，逐字照抄範例。
+TABLE_HEADERS = (
+    "主要職責",
+    "工作任務",
+    "工作產出",
+    "行為指標",
+    "職能級別",
+    "職能內涵（K=knowledge知識）",
+    "職能內涵（S=skills技能）",
+)
+
+ATTITUDE_HEADER = "職能內涵（A=attitude態度）"
+NOTES_HEADER = "說明與補充事項"
 
 #: readiness issue 的呈現文案。Web 另有一份（`lib/jobAnalysisHeader.ts`）——
 #: 兩個呈現面各自持有文案，但**都不得自行判斷缺漏**（ADR 0052 決定 3）。
@@ -52,139 +77,165 @@ READINESS_LABELS: dict[ReadinessIssueCode, str] = {
     ReadinessIssueCode.DUTY_WITHOUT_TASK: "主要職責底下的工作任務",
 }
 
-_TABLE_HEADERS = (
-    "主要職責",
-    "工作任務",
-    "工作產出",
-    "行為指標",
-    "職能級別",
-)
-
 _BOLD = Font(bold=True)
 _WRAP = Alignment(vertical="top", wrap_text=True)
+_LAST_COLUMN = len(TABLE_HEADERS)
 
 
-def _label(sheet: Worksheet, row: int, text: str, value: object = None) -> int:
-    sheet.cell(row=row, column=1, value=text).font = _BOLD
-    if value is not None:
-        sheet.cell(row=row, column=2, value=value).alignment = _WRAP
-    return row + 1
+def _stack(entries: tuple[ExportOpksEntry, ...]) -> str | None:
+    """同一格內多筆以換行並列——官方版面就是這樣，不是一筆一列。"""
+
+    return "\n".join(entry.rendered for entry in entries) or None
+
+
+def _put(sheet: Worksheet, row: int, column: int, value: object, *, bold=False) -> None:
+    cell = sheet.cell(row=row, column=column, value=value)
+    cell.alignment = _WRAP
+    if bold:
+        cell.font = _BOLD
+
+
+def _merge(sheet: Worksheet, row: int, first: int, last: int) -> None:
+    if last > first:
+        sheet.merge_cells(start_row=row, start_column=first, end_row=row, end_column=last)
 
 
 def _write_header_block(sheet: Worksheet, document: ExportDocument) -> int:
     header = document.header
     row = 1
-    sheet.cell(row=row, column=1, value=document.title).font = Font(bold=True, size=14)
+    _put(sheet, row, 1, f"{header.competency_name or document.title}職能基準", bold=True)
+    _merge(sheet, row, 1, _LAST_COLUMN)
     row += 2
 
-    row = _label(sheet, row, "職能基準代碼", ISSUED_BY_ICAP)
-    row = _label(sheet, row, "職能基準名稱", header.competency_name)
-    row = _label(sheet, row, "職類別", header.occupation_category_name)
-    row = _label(sheet, row, "職類別代碼", ISSUED_BY_ICAP)
-    row = _label(sheet, row, "職業別", header.occupation_name)
-    row = _label(sheet, row, "職業別代碼", header.occupation_code)
-    row = _label(sheet, row, "行業別", header.industry_name)
-    row = _label(sheet, row, "行業別代碼", header.industry_code)
-    row = _label(sheet, row, "工作描述", header.work_description)
-    row = _label(sheet, row, "基準級別", header.competency_level)
-    return row + 1
+    _put(sheet, row, 1, "職能基準代碼", bold=True)
+    _put(sheet, row, 2, ISSUED_BY_ICAP)
+    _merge(sheet, row, 2, _LAST_COLUMN)
+    row += 1
+
+    # 官方是「職能基準名稱（擇一填寫）」＋職類／職業兩列。我們產出的是**特定職位**的
+    # 職務說明書，所以名稱填在「職業」列；「職類」列留空由員工自行判斷是否改填。
+    name_row = row
+    _put(sheet, row, 1, "職能基準名稱\n（擇一填寫）", bold=True)
+    _put(sheet, row, 2, "職類", bold=True)
+    _merge(sheet, row, 3, _LAST_COLUMN)
+    row += 1
+    _put(sheet, row, 2, "職業", bold=True)
+    _put(sheet, row, 3, header.competency_name)
+    _merge(sheet, row, 3, _LAST_COLUMN)
+    # 標籤跨兩列垂直合併，照官方版面
+    sheet.merge_cells(start_row=name_row, start_column=1, end_row=row, end_column=1)
+    row += 1
+
+    category_row = row
+    _put(sheet, row, 1, "所屬類別", bold=True)
+    for label, name, code_label, code in (
+        ("職類別", header.occupation_category_name, "職類別代碼", ISSUED_BY_ICAP),
+        ("職業別", header.occupation_name, "職業別代碼", header.occupation_code),
+        ("行業別", header.industry_name, "行業別代碼", header.industry_code),
+    ):
+        _put(sheet, row, 2, label, bold=True)
+        _put(sheet, row, 3, name)
+        _put(sheet, row, 5, code_label, bold=True)
+        _put(sheet, row, 6, code)
+        _merge(sheet, row, 3, 4)
+        _merge(sheet, row, 6, _LAST_COLUMN)
+        row += 1
+    sheet.merge_cells(
+        start_row=category_row, start_column=1, end_row=row - 1, end_column=1
+    )
+
+    _put(sheet, row, 1, "工作描述", bold=True)
+    _put(sheet, row, 2, header.work_description)
+    _merge(sheet, row, 2, _LAST_COLUMN)
+    row += 1
+    _put(sheet, row, 1, "基準級別", bold=True)
+    _put(sheet, row, 2, header.competency_level)
+    _merge(sheet, row, 2, _LAST_COLUMN)
+    return row + 2
 
 
-def _write_task_rows(
-    sheet: Worksheet,
-    row: int,
-    *,
-    duty_cell: str | None,
-    entry: ExportTaskEntry,
-) -> int:
-    """一條 Task 佔 max(1, |O|, |P|) 列；職責／任務／級別只寫在第一列。"""
-
-    span = max(1, len(entry.outputs), len(entry.indicators))
-    for offset in range(span):
-        current = row + offset
-        if offset == 0:
-            if duty_cell is not None:
-                sheet.cell(row=current, column=1, value=duty_cell).alignment = _WRAP
-            task_cell = (
-                f"{entry.position_code} {entry.statement}"
-                if entry.position_code is not None
-                else entry.statement
-            )
-            sheet.cell(row=current, column=2, value=task_cell).alignment = _WRAP
-            if entry.competency_level is not None:
-                sheet.cell(row=current, column=5, value=entry.competency_level)
-        for column, items in ((3, entry.outputs), (4, entry.indicators)):
-            if offset < len(items):
-                item = items[offset]
-                text = (
-                    f"{item.position_code} {item.text}"
-                    if item.position_code is not None
-                    else item.text
-                )
-                sheet.cell(row=current, column=column, value=text).alignment = _WRAP
-    return row + span
+def _write_task_row(sheet: Worksheet, row: int, entry: ExportTaskEntry) -> None:
+    task_cell = (
+        f"{entry.position_code}{entry.statement}"
+        if entry.position_code is not None
+        else entry.statement
+    )
+    _put(sheet, row, 2, task_cell)
+    _put(sheet, row, 3, _stack(entry.outputs))
+    _put(sheet, row, 4, _stack(entry.indicators))
+    _put(sheet, row, 5, entry.competency_level)
+    _put(sheet, row, 6, _stack(entry.knowledge))
+    _put(sheet, row, 7, _stack(entry.skills))
 
 
 def _write_table(sheet: Worksheet, row: int, document: ExportDocument) -> int:
-    for column, title in enumerate(_TABLE_HEADERS, start=1):
-        sheet.cell(row=row, column=column, value=title).font = _BOLD
+    for column, title in enumerate(TABLE_HEADERS, start=1):
+        _put(sheet, row, column, title, bold=True)
     row += 1
 
     for section in document.duties:
-        duty_cell = f"{section.position_code} {section.statement}"
         if not section.tasks:
             # 空職責照樣出現——那正是 readiness 的 `duty_without_task` 要讓人看見的缺漏
-            sheet.cell(row=row, column=1, value=duty_cell).alignment = _WRAP
+            _put(sheet, row, 1, section.rendered)
             row += 1
             continue
-        for index, entry in enumerate(section.tasks):
-            row = _write_task_rows(
-                sheet,
-                row,
-                duty_cell=duty_cell if index == 0 else None,
-                entry=entry,
+        first = row
+        _put(sheet, row, 1, section.rendered)
+        for entry in section.tasks:
+            _write_task_row(sheet, row, entry)
+            row += 1
+        # 主要職責格跨其工作任務列垂直合併，照官方版面
+        if row - first > 1:
+            sheet.merge_cells(
+                start_row=first, start_column=1, end_row=row - 1, end_column=1
             )
 
     # 未歸入主要職責的 Task 必須有自己的區塊——排不進表格不是讓它消失的理由
     # （ADR 0058 決定 3 的硬性要求）
-    for index, entry in enumerate(document.unassigned_tasks):
-        row = _write_task_rows(
-            sheet,
-            row,
-            duty_cell=UNASSIGNED_LABEL if index == 0 else None,
-            entry=entry,
-        )
+    if document.unassigned_tasks:
+        first = row
+        _put(sheet, row, 1, UNASSIGNED_LABEL)
+        for entry in document.unassigned_tasks:
+            _write_task_row(sheet, row, entry)
+            row += 1
+        if row - first > 1:
+            sheet.merge_cells(
+                start_row=first, start_column=1, end_row=row - 1, end_column=1
+            )
+
+    # 沒有連上任何 Task 的 K/S 同理：主表放不下，但不得從成品上消失
+    if document.unlinked_knowledge or document.unlinked_skills:
+        _put(sheet, row, 1, UNLINKED_LABEL)
+        _put(sheet, row, 6, _stack(document.unlinked_knowledge))
+        _put(sheet, row, 7, _stack(document.unlinked_skills))
+        row += 1
     return row + 1
 
 
-def _write_document_level(sheet: Worksheet, row: int, document: ExportDocument) -> int:
-    for title, entries in (
-        ("職能內涵：知識", document.knowledge),
-        ("職能內涵：技能", document.skills),
-        ("態度", document.attitudes),
-    ):
-        sheet.cell(row=row, column=1, value=title).font = _BOLD
-        row += 1
-        for entry in entries:
-            sheet.cell(row=row, column=1, value=entry.position_code)
-            sheet.cell(row=row, column=2, value=entry.text).alignment = _WRAP
-            row += 1
-        row += 1
-    return row
+def _write_block(sheet: Worksheet, row: int, title: str, body: object) -> int:
+    _put(sheet, row, 1, title, bold=True)
+    _merge(sheet, row, 1, _LAST_COLUMN)
+    row += 1
+    _put(sheet, row, 1, body)
+    _merge(sheet, row, 1, _LAST_COLUMN)
+    return row + 2
 
 
 def _render_form(sheet: Worksheet, document: ExportDocument) -> None:
-    sheet.column_dimensions["A"].width = 24
-    for letter in ("B", "C", "D"):
-        sheet.column_dimensions[letter].width = 40
-    sheet.column_dimensions["E"].width = 10
+    sheet.column_dimensions["A"].width = 22
+    sheet.column_dimensions["B"].width = 24
+    for letter in ("C", "D"):
+        sheet.column_dimensions[letter].width = 42
+    sheet.column_dimensions["E"].width = 8
+    for letter in ("F", "G"):
+        sheet.column_dimensions[letter].width = 30
 
     row = _write_header_block(sheet, document)
     row = _write_table(sheet, row, document)
-    row = _write_document_level(sheet, row, document)
-    row = _label(sheet, row, "說明與補充事項", document.header.notes)
-    row += 1
-    sheet.cell(row=row, column=1, value=DISCLAIMER).alignment = _WRAP
+    row = _write_block(sheet, row, ATTITUDE_HEADER, _stack(document.attitudes))
+    row = _write_block(sheet, row, NOTES_HEADER, document.header.notes)
+    _put(sheet, row, 1, DISCLAIMER)
+    _merge(sheet, row, 1, _LAST_COLUMN)
 
 
 def _render_readiness(sheet: Worksheet, readiness: DocumentReadiness) -> None:
@@ -192,20 +243,23 @@ def _render_readiness(sheet: Worksheet, readiness: DocumentReadiness) -> None:
 
     sheet.column_dimensions["A"].width = 32
     sheet.column_dimensions["B"].width = 40
-    sheet.cell(
-        row=1,
-        column=1,
-        value=f"iCAP 版型欄位尚有 {readiness.issue_count} 項未填",
-    ).font = _BOLD
-    sheet.cell(row=3, column=1, value="項目").font = _BOLD
-    sheet.cell(row=3, column=2, value="欄位").font = _BOLD
+    _put(
+        sheet,
+        1,
+        1,
+        f"iCAP 版型欄位尚有 {readiness.issue_count} 項未填",
+        bold=True,
+    )
+    _put(sheet, 3, 1, "項目", bold=True)
+    _put(sheet, 3, 2, "欄位", bold=True)
     for offset, issue in enumerate(readiness.issues):
-        sheet.cell(
-            row=4 + offset,
-            column=1,
-            value=READINESS_LABELS.get(issue.code, issue.code.value),
+        _put(
+            sheet,
+            4 + offset,
+            1,
+            READINESS_LABELS.get(issue.code, issue.code.value),
         )
-        sheet.cell(row=4 + offset, column=2, value=issue.field)
+        _put(sheet, 4 + offset, 2, issue.field)
 
 
 def render_xlsx(
@@ -225,11 +279,15 @@ def render_xlsx(
 
 
 __all__ = [
+    "ATTITUDE_HEADER",
     "DISCLAIMER",
     "ISSUED_BY_ICAP",
+    "NOTES_HEADER",
     "READINESS_LABELS",
     "SHEET_FORM",
     "SHEET_READINESS",
+    "TABLE_HEADERS",
     "UNASSIGNED_LABEL",
+    "UNLINKED_LABEL",
     "render_xlsx",
 ]

@@ -10,12 +10,16 @@ from openpyxl import load_workbook
 from app.job_analysis.application import JobAnalysisState, assess_readiness
 from app.job_analysis.application.export import assemble_export_document
 from app.job_analysis.application.export_xlsx import (
+    ATTITUDE_HEADER,
     DISCLAIMER,
     ISSUED_BY_ICAP,
+    NOTES_HEADER,
     READINESS_LABELS,
     SHEET_FORM,
     SHEET_READINESS,
+    TABLE_HEADERS,
     UNASSIGNED_LABEL,
+    UNLINKED_LABEL,
     render_xlsx,
 )
 from app.job_analysis.application.readiness import ReadinessIssueCode
@@ -114,21 +118,71 @@ def test_the_workbook_has_the_form_and_the_readiness_sheets():
     assert workbook.sheetnames == [SHEET_FORM, SHEET_READINESS]
 
 
+def test_the_main_table_has_the_seven_official_columns():
+    """逐字照 2026-08-06 核對的七份官方範例，K 與 S 是主表欄位不是底部清單。"""
+
+    values = cells(rendered(COMPLETE)[SHEET_FORM])
+
+    for title in TABLE_HEADERS:
+        assert title in values
+    assert len(TABLE_HEADERS) == 7
+
+
 def test_the_form_carries_the_header_the_codes_and_the_body():
     values = cells(rendered(COMPLETE)[SHEET_FORM])
 
-    assert "門市營運專員" in values
+    assert "門市營運專員職能基準" in values
     assert "維運門市日常營運並彙整營運資訊。" in values
-    assert "4" in values
     assert "本表由員工確認，尚未經主管核准。" in values
-    # 位置碼與敘述一起落在儲存格上
-    assert "T1 維運門市營運系統" in values
-    assert "T1.1 每週彙整營運週報" in values
-    assert "O1.1.1 營運週報" in values
-    assert "P1.1.1 準時交付" in values
-    assert "K01" in values and "營運指標定義" in values
-    assert "S01" in values and "資料彙整" in values
-    assert "A01" in values and "主動積極" in values
+    # 官方版面：位置碼與文字直接相連，**不留空格**
+    assert "T1維運門市營運系統" in values
+    assert "T1.1每週彙整營運週報" in values
+    assert "O1.1.1營運週報" in values
+    assert "P1.1.1準時交付" in values
+    assert "K01營運指標定義" in values
+    assert "S01資料彙整" in values
+    assert "A01主動積極" in values
+
+
+def test_the_header_offers_both_name_rows_and_pairs_each_category_with_its_code():
+    values = cells(rendered(COMPLETE)[SHEET_FORM])
+
+    assert "職能基準名稱\n（擇一填寫）" in values
+    assert "職類" in values and "職業" in values
+    for label in ("職類別", "職業別", "行業別"):
+        assert label in values
+        assert f"{label}代碼" in values
+
+
+def test_several_outputs_share_one_cell_separated_by_line_breaks():
+    """官方版面同一格內換行並列，不是一筆一列。"""
+
+    state = JobAnalysisState(
+        current_duties=(Duty(duty_id="d1", statement="維運門市系統", display_order=0),),
+        current_jd=(
+            JdTask(
+                task_id="t1",
+                statement="每週彙整營運週報",
+                display_order=0,
+                duty_id="d1",
+            ),
+        ),
+        current_opks={
+            "items": (
+                opks("o1", OpksEntityKind.OUTPUT, 0, task_refs=("t1",), text="營運週報"),
+                opks("o2", OpksEntityKind.OUTPUT, 1, task_refs=("t1",), text="異常追蹤表"),
+            )
+        },
+    )
+
+    assert "O1.1.1營運週報\nO1.1.2異常追蹤表" in cells(rendered(state)[SHEET_FORM])
+
+
+def test_the_attitude_and_notes_blocks_use_the_official_headings():
+    values = cells(rendered(COMPLETE)[SHEET_FORM])
+
+    assert ATTITUDE_HEADER in values
+    assert NOTES_HEADER in values
 
 
 def test_the_two_icap_issued_codes_are_marked_not_generated():
@@ -224,13 +278,29 @@ def test_an_unassigned_task_gets_its_own_block_and_keeps_its_outputs():
     assert "耗材清單" in values
 
 
+def test_a_competency_linked_to_no_task_still_reaches_the_sheet():
+    """主表放不下它，但不得從成品上消失。"""
+
+    state = JobAnalysisState(
+        current_opks={
+            "items": (
+                opks("k9", OpksEntityKind.KNOWLEDGE, 0, text="孤兒知識"),
+            )
+        },
+    )
+    values = cells(rendered(state)[SHEET_FORM])
+
+    assert UNLINKED_LABEL in values
+    assert "K01孤兒知識" in values
+
+
 def test_an_empty_duty_is_still_shown():
     state = JobAnalysisState(
         current_duties=(Duty(duty_id="d1", statement="維運門市系統", display_order=0),)
     )
     values = cells(rendered(state)[SHEET_FORM])
 
-    assert "T1 維運門市系統" in values
+    assert "T1維運門市系統" in values
 
 
 # ── 邊界 ───────────────────────────────────────────────────────────────────
@@ -240,7 +310,7 @@ def test_an_empty_document_still_renders_a_valid_workbook():
     workbook = rendered(JobAnalysisState(), title="尚未命名")
 
     assert workbook.sheetnames == [SHEET_FORM, SHEET_READINESS]
-    assert "尚未命名" in cells(workbook[SHEET_FORM])
+    assert "尚未命名職能基準" in cells(workbook[SHEET_FORM])
     assert DISCLAIMER in cells(workbook[SHEET_FORM])
 
 

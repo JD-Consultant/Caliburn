@@ -12,6 +12,13 @@ from .authoring import (
     put_jd_header,
     reorder_jd_tasks,
 )
+from .export import (
+    ExportDocument,
+    ExportDutySection,
+    ExportOpksEntry,
+    ExportTaskEntry,
+    assemble_export_document,
+)
 from .errors import (
     ConcurrentAuthorityChange,
     DocumentNotFound,
@@ -182,6 +189,11 @@ __all__ = [
     "DIRECT_EDIT_SCHEMA_ID",
     "DirectEditKind",
     "DirectEditPayload",
+    "ExportDocument",
+    "ExportDutySection",
+    "ExportOpksEntry",
+    "ExportTaskEntry",
+    "assemble_export_document",
     "DocumentNotFound",
     "DutyNotChanged",
     "DutyNotFound",

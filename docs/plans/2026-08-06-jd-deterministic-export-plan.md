@@ -1,7 +1,7 @@
 # JD deterministic export（切片 B）實作計畫
 
 - 日期：2026-08-06
-- 狀態：T1–T5 尚未開工；**依賴切片 A 完成**
+- 狀態：T1 COMPLETE；T2–T5 尚未開工（切片 A 已完成）
 - 決策：[ADR 0058](../adr/0058-jd-deterministic-export-shape-and-format.md)（本切片的權威依據）；
   延續 [ADR 0052](../adr/0052-jd-readiness-assessment-and-official-code-boundaries.md) 決定 4／5／8／10／13／14
 - 研究：[`2026-08-06-jd-deterministic-export-research.md`](../specs/2026-08-06-jd-deterministic-export-research.md)
@@ -119,3 +119,21 @@ dev server，動手前先問。
 - `JdTask` 內部欄位要不要以附錄工作表匯出
 - 職業別／行業別代碼格式檢查
 - O→P 參照連結（ADR 0058「不在本 ADR 範圍」已說明：匯出不需要，屬品質工作面）
+
+## 6. T1 執行證據（2026-08-06）
+
+- baseline：完整 API `2158 passed`。
+- **`ExportOpksEntry.position_code` 做成 nullable，這是初稿沒想到的。** 未指派主要職責的 Task
+  沒有 `T{i}.{j}`，也就推不出 `O{i}.{j}.{k}`。第一版寫成「未指派 Task 的 O/P 直接不帶出來」，
+  **那是靜默刪掉員工內容**——排不進表格不是把它從成品上刪掉的理由（ADR 0052 決定 5）。
+  改成位置碼為 `None` 但內容照帶，並以 mutation check 證明這條測試是承重的
+  （還原成回 `()` → `test_an_unassigned_task_keeps_its_content_but_gets_no_code` 變紅）。
+- **`_in_kind()` 明確依 `display_order` 排序，不依賴 tuple 既有順序。** 這正是切片 A 決定
+  不要求 `CurrentJdOpks` canonical 排序時所承諾的「位置碼正確性由匯出端負責」；
+  有專測把 tuple 故意亂序，斷言位置碼仍正確。
+- 另有測試守：Duty 內 Task 重新從 1 編號、O 與 P 三段同層、K/S/A 文件層平坦且**同一條 K
+  支援兩個 Task 時不複製**（ADR 0048 決定 7）、空職責照樣出現、**任何 Task 都不會遺失或重複**、
+  空文件不拋錯、header 原樣帶過、同輸入同輸出。
+- 完整 API：**`2169 passed / 0 failed / 0 skipped`**（+11）。
+- 下一個是 T2（XLSX renderer，兩個工作表）。
+

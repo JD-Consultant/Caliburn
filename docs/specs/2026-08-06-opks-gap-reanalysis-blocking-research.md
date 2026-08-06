@@ -309,8 +309,44 @@ proposals 照常提交。缺口的生死維持 0054 既有的三條出路——�
 - 真實訪談中一個 Task 平均會開幾個缺口（目前 n=2 次 synthetic run，Opus 開 4 個）。
 - 員工回答一個缺口時，順帶答到其他缺口的比例（Opus 這次是 1/4 精準命中，沒有溢出）。
 - 放寬後每份職務說明書實際多花多少錢（Opus 一次 specialist 呼叫本次量到 US$0.024）。
-- **G 的代價實際會不會發生**：新證據讓某個舊缺口不再成立、但主顧問仍照著問一次的頻率。
-  這個數字是日後要不要做 F 的唯一判準——沒有它就不該動 wire schema。
+### 7.1 決定 8 的兩個門檻怎麼量
+
+**application 不能自己判斷兩個缺口是不是語意重複**——那需要文字相似度，0044 與 0051 決定 8
+已經封死。因此兩個比率**一律離線量**：從 raw capture 與當時的 packet 取樣，由人工或獨立
+eval adjudicator 判定，**結果不寫回 domain state，eval 的相似度邏輯不得搬進 application**。
+
+**門檻 (a)——重複負擔。** 量兩個數字，後者才是真正的傷害：
+
+```text
+duplicate_gap_rate =
+  本次新建 gap 中，經離線審查判定「已被當時 packet 內 active／terminal gap 涵蓋」的數量
+  ÷ 本次新建 gap 總數
+
+duplicate_question_rate =
+  員工實際收到的問題中，語意上已問過、或已有 terminal resolution 的比例
+```
+
+有重複 gap 不代表它真的被排進 agenda（一次只問一題，訪談可能先結束）。
+**`duplicate_question_rate` 才是員工感受到的打擾**，`duplicate_gap_rate` 只是它的上界。
+
+**門檻 (b)——分類方案的召回損失。** 必須用 shadow evaluation 量，**不得直接上線試**：
+拿同一批 capture 重跑一次帶 `known_gap_ordinal` 的 specialist，比對它標成 `existing` 的項目
+是否真的被既有缺口涵蓋。
+
+```text
+false_existing_rate =
+  被模型標成 existing、但離線審查判定「不被任何既有 gap 涵蓋」的數量
+  ÷ 被標成 existing 的總數
+```
+
+這個比率直接對應「職務說明書永久少一項」的機率。**沒有這個數字就不該採用該方案**，
+因為門檻 (a) 再高也回答不了「換過去會不會更糟」。
+
+### 7.2 其他仍缺的資料
+
+- 真實訪談中一個 Task 平均會開幾個缺口（目前 n=2 次 synthetic run，Opus 開 4 個）。
+- 員工回答一個缺口時，順帶答到其他缺口的比例（Opus 這次是 1/4 精準命中，沒有溢出）。
+- 放寬後每份職務說明書實際多花多少錢（Opus 一次 specialist 呼叫本次量到 US$0.024）。
 
 ## 8. 外部意見核對（2026-08-06，只看過 ADR 0055、沒看過本 repo）
 
@@ -411,6 +447,11 @@ application 只為 `new` 建 issue。它並宣稱「模型若判斷錯誤，錯�
 - 「建立 gap 不會自我觸發」——§8.4，型別上已不可能，測試仍值得留一筆當回歸網。
 - 「replay packet 不漂移」——§8.5，與 0054 刻意決定相反，**不要加這條測試**；
   該加的是反向的：**缺口記憶改變不得造成 abandon**。
+
+它另外建議的「測 `subject_task_id` 是否只屬於 OPKS gap」值得採納：`_issue_blocks()` 與
+verifier 的 `RESOLUTION_OPKS_GAP_NEEDS_ISSUE_RESOLUTION` 都拿 `subject_task_id` 當缺口的判別式
+（domain 只保證 `opks_axis` 非空必有它，反向沒有保證，目前靠「全 repo 只有 `_gap_issues()` 會寫它」）。
+釘一筆 AST 或單元測試，日後有人給別種 issue 寫 `subject_task_id` 時會紅。
 
 ## 9. 建議的下一步
 

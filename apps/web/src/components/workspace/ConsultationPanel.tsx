@@ -37,13 +37,19 @@ export function ConsultationPanel({ documentId }: { documentId: string }) {
   const [draft, setDraft] = useState("");
 
   const applyView = async (view: ConsultationView) => {
-    queryClient.setQueryData(jobAnalysisKeys.consultation(documentId), view);
-    queryClient.setQueryData(jobAnalysisKeys.document(documentId), {
-      ...view.document,
-      tasks: view.tasks,
-      opks_items: view.opks_items,
-    });
-    await queryClient.invalidateQueries({ queryKey: jobAnalysisKeys.documents });
+    // consultation 的回應**就是**這個 query 的完整形狀，可以直接寫進快取。
+    queryClient.setQueryData(consultationQueryOptions(documentId).queryKey, view);
+    // document 則**必須重取**，不能從 `view` 拼。`ConsultationView.document` 只是
+    // `DocumentMetadataView`（id／title／updated_at），拼出來的物件會少掉
+    // `jd_header`、`readiness`、`duties`——讀那個快取的 `JdHeaderForm`／
+    // `ReadinessNotice`／`DutyEditor` 就會炸。而且 `readiness` 是伺服器依完整
+    // Current State 算的，本來就推不出來。
+    await Promise.all([
+      queryClient.invalidateQueries({
+        queryKey: jobAnalysisKeys.document(documentId),
+      }),
+      queryClient.invalidateQueries({ queryKey: jobAnalysisKeys.documents }),
+    ]);
   };
 
   const turnMutation = useMutation({

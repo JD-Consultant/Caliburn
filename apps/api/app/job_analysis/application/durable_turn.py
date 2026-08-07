@@ -141,8 +141,17 @@ def _require_verified(
         operation_result.outcome is not OperationOutcome.VERIFIED
         or operation_result.result is None
     ):
+        reasons = (
+            ", ".join(code.value for code in operation_result.report.codes)
+            if operation_result.report is not None
+            and operation_result.report.violations
+            else ""
+        )
         raise UncommittableOperationResult(
-            f"cannot commit operation outcome {operation_result.outcome.value!r}"
+            f"cannot commit operation outcome "
+            f"{operation_result.outcome.value!r}"
+            + (f"; detail={operation_result.detail}" if operation_result.detail else "")
+            + (f"; rejected={reasons}" if reasons else "")
         )
 
 

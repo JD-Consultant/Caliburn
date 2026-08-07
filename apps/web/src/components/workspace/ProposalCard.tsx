@@ -29,19 +29,31 @@ const STATUS_LABELS: Record<ProposalView["status"], string> = {
   stale: "已失效",
 };
 
+/**
+ * `value === null` 在兩邊的意思**相反**，所以文案不能共用：
+ *
+ * - `jd_before`（目前內容）的 null ＝ 這條**還不在**職務說明書裡（新增提案的常態）
+ * - `jd_after`（建議內容）的 null ＝ 建議**移除**這條
+ *
+ * 先前兩邊共用「從職務說明書移除」，害新增提案看起來像要刪東西。
+ */
 function EntryList({
   title,
   entries,
+  side,
 }: {
   title: string;
   entries: ProposalJdEntryView[];
+  side: "before" | "after";
 }) {
-  if (entries.length === 0) return null;
+  const shown =
+    side === "before" ? entries.filter((entry) => entry.value !== null) : entries;
+  if (shown.length === 0) return null;
   return (
     <div>
       <p className="text-xs font-medium text-muted-foreground">{title}</p>
       <ul className="mt-1 space-y-1 text-sm">
-        {entries.map((entry) => (
+        {shown.map((entry) => (
           <li key={entry.task_id}>
             {entry.value ? entry.value.statement : "從職務說明書移除"}
           </li>
@@ -77,8 +89,12 @@ export function ProposalCard({
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2">
-        <EntryList title="目前內容" entries={proposal.jd_before} />
-        <EntryList title="建議內容" entries={proposal.jd_after} />
+        <EntryList
+          title="目前內容"
+          entries={proposal.jd_before}
+          side="before"
+        />
+        <EntryList title="建議內容" entries={proposal.jd_after} side="after" />
       </div>
 
       {proposal.evidence_quotes.length ? (

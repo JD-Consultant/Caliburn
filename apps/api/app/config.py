@@ -43,7 +43,13 @@ class Settings(BaseSettings):
     # separate from the retired interview model lineup above.
     job_analysis_model: str = "anthropic/claude-opus-5"
     job_analysis_provider: str = "anthropic"
-    job_analysis_max_output_tokens: int = 4096
+    # 4096 是 ADR 0046 時代的預設，**從未針對 Task Analysis 實測過**。
+    # 2026-08-07 真人試跑撞到 `truncated: response hit the output token limit`：
+    # Task Analysis 一次要吐 work_signals（每條含逐字 anchor）＋ task_changes
+    # （完整 Task 欄位）＋ next_question，員工回答越詳細輸出越長。
+    # 註：`docs/experiments/2026-08-02-opks-attributed-live-smoke/` 曾記「4096 綽綽有餘」，
+    # 但那量的是 **OPKS** operation（單一 Task 的 O/P/K/S），輸出量小得多，不適用於此。
+    job_analysis_max_output_tokens: int = 16384
     job_analysis_timeout_s: float = 90.0
 
     # Document output

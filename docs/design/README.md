@@ -71,4 +71,5 @@ UI 動作 → 請求   點 X → GET/PATCH Y
 - [`editor-knowledge-pack.md`](./editor-knowledge-pack.md) — 編輯器 × 知識包(apps/web 著作 UI + apps/api knowledge/document 端點)
 - [`interview-engine.md`](./interview-engine.md) — 訪談引擎 × 文件工作台(v3 一個大腦/追蹤修訂;apps/api interview + apps/web 四態表格/側欄;ADR 0030)
 - [`task-analysis-engine.md`](./task-analysis-engine.md) — Task Analysis 引擎(apps/api `app/job_analysis`:packet → 一次 HTTP → verifier → identity gate → Proposal;第一條 vertical,無 DB／無 route;ADR 0040／0042)
+- [`job-analysis-web-ux-flow.md`](./job-analysis-web-ux-flow.md) — 職務分析 Web 使用者體驗流程(`task-analysis-engine.md` 的畫面／旅程視角:`/workspace` 文件庫 → 顧問訪談＋Proposal 決策 → Current JD 四段編輯 → 匯出)
 - [`professional-consultant-engine.md`](./professional-consultant-engine.md) — **ARCHIVED／離線分支**：R0 切換設計與 R1 離線 harness 邊界；R1 快篩已由 ADR 0042 收束，不得據以續建或恢復快篩

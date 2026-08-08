@@ -145,6 +145,7 @@ class TaskAnalysisPacket(DomainModel):
     current_authorities: CurrentAuthorities
     proposal_context: ProposalContext
     current_turn_ordinal: int
+    employee_written_overview: NonEmptyText | None = None
 
     @model_validator(mode="after")
     def transcript_turn_ids_are_unique(self):
@@ -211,14 +212,20 @@ class TaskAnalysisPacket(DomainModel):
         return None
 
     @property
-    def read_set(self) -> tuple[CurrentAuthorities, ProposalContext]:
+    def read_set(
+        self,
+    ) -> tuple[CurrentAuthorities, ProposalContext, NonEmptyText | None]:
         """§11.3:read-set ＝ 本輪送出的所有可變 authority 資料(保守計入)。
 
         不另建 framework、也不從模型輸出反推它「真正讀了什麼」:當輪投影本身就是
         read-set,寫入前比對這批值是否已變(§10.9)。怎麼比(generation、before-value)
         留給 persistence 決定。
         """
-        return (self.current_authorities, self.proposal_context)
+        return (
+            self.current_authorities,
+            self.proposal_context,
+            self.employee_written_overview,
+        )
 
     def verification_context(self) -> VerificationContext:
         """交給 T3 verifier 的 ordinal 檢視;兩者的號段必然一致,因為都出自這裡。"""
@@ -295,6 +302,7 @@ def build_context_packet(
     current_jd: tuple[JdTask, ...] = (),
     active_question: ActiveQuestion | None = None,
     proposals: tuple[Proposal, ...] = (),
+    employee_written_overview: str | None = None,
 ) -> TaskAnalysisPacket:
     """把當前現況投影成一份 packet。順序完全跟隨輸入,因此同輸入同輸出。"""
 
@@ -402,6 +410,7 @@ def build_context_packet(
             constraining_rejections=constraining_rejections,
         ),
         current_turn_ordinal=current_turn_ordinal,
+        employee_written_overview=employee_written_overview,
     )
 
 
@@ -418,6 +427,9 @@ def _revision_is_unresolved(proposal: Proposal) -> bool:
 _SPEAKER_LABEL = {TurnSpeaker.CONSULTANT: "顧問", TurnSpeaker.EMPLOYEE: "員工"}
 _PENDING_BANNER = "尚未成立,不得當作現況事實"
 _RETIRED_BANNER = "接在 active 之後編號;唯讀,不得出現在任何 target"
+_EMPLOYEE_OVERVIEW_RULE = (
+    "「員工填寫的整體描述」是背景不是做過的事；其中提到但訪談沒談過的責任，先追問怎麼做。"
+)
 
 
 def _render_turn_ref(turn_id: str | None, turn_ordinals: dict[str, int]) -> str | None:
@@ -470,6 +482,13 @@ def render_context_packet(packet: TaskAnalysisPacket) -> str:
         else "(無)"
     )
     lines.append("")
+
+    if packet.employee_written_overview is not None:
+        lines.append("## 員工填寫的整體描述")
+        lines.append("")
+        lines.append(packet.employee_written_overview)
+        lines.append(_EMPLOYEE_OVERVIEW_RULE)
+        lines.append("")
 
     authorities = packet.current_authorities
     lines.append("## current_authorities")

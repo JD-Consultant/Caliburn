@@ -13,7 +13,6 @@ from job_analysis_contract import (
     JdTaskWrite,
     OpksItemView,
     OpksItemWrite,
-    OpksGenerationView,
     OpksProposalDecisionWrite,
     OpksProposalView,
     ProblemDetail,
@@ -62,8 +61,8 @@ def test_schema_owns_only_the_workspace_wire_contract():
         "JdTaskWrite",
         "JdTaskView",
         "OpksItemView",
+        "OpksTaskStatusView",
         "OpksItemWrite",
-        "OpksGenerationView",
         "OpksProposalDecisionWrite",
         "OpksProposalView",
         "ProblemDetail",
@@ -98,6 +97,7 @@ def test_consultation_contract_exposes_only_product_views_and_supported_decision
         "tasks",
         "opks_items",
         "opks_proposals",
+        "opks_task_status",
     }
     assert set(decision["properties"]["decision"]["enum"]) == {
         "accepted",
@@ -227,6 +227,9 @@ def test_document_view_accepts_one_complete_task_without_extra_fields():
             }
         ],
         "opks_items": [],
+        "opks_task_status": [
+            {"task_id": "task-1", "status": "not_ready_for_analysis"}
+        ],
     }
 
     assert list(
@@ -279,14 +282,3 @@ def test_generated_consultation_models_are_exported_from_the_package():
     assert OpksItemView.__name__ == "OpksItemView"
     assert OpksProposalView.__name__ == "OpksProposalView"
 
-
-def test_opks_generation_view_exposes_only_the_durable_product_result():
-    view = OpksGenerationView(
-        outcome="proposed",
-        proposal_ids=["opks-operation-1-op0"],
-    )
-
-    assert view.model_dump(mode="json") == {
-        "outcome": "proposed",
-        "proposal_ids": ["opks-operation-1-op0"],
-    }

@@ -644,3 +644,118 @@ def test_read_set_is_the_projected_authority_data():
     """保守計入:當輪投影本身就是 read-set,不從模型輸出反推它讀了什麼。"""
     packet = build(proposals=(merge_proposal(),))
     assert packet.read_set == (packet.current_authorities, packet.proposal_context)
+
+
+# ── active／terminal 分區與 agenda 順序(ADR 0054 決定 20–21)──────────────────
+
+
+def gap_issue(
+    issue_id: str,
+    *,
+    task_id: str = "task-1",
+    axis=None,
+    kind=None,
+    terminal=None,
+    summary: str = "還看不出這一軸的依據",
+):
+    from app.job_analysis.domain import (
+        OpenIssue,
+        OpenIssueKind,
+        OpenIssueTerminalResolution,
+        SourceRef,
+    )
+
+    return OpenIssue(
+        id=issue_id,
+        kind=kind or OpenIssueKind.INSUFFICIENT_EVIDENCE,
+        summary=summary,
+        source_anchors=(SourceAnchor(source_ref=employee_ref(), quote=EMPLOYEE_TEXT),),
+        subject_task_id=task_id if axis is not None else None,
+        opks_axis=axis,
+        terminal_resolution=(
+            OpenIssueTerminalResolution(
+                kind=terminal,
+                source_ref=SourceRef(kind=SourceKind.EMPLOYEE_TURN, id="turn-2"),
+            )
+            if terminal is not None
+            else None
+        ),
+    )
+
+
+def test_only_active_issues_get_an_ordinal():
+    """決定 20:不配發 ordinal 是關鍵。
+
+    ordinal 是模型唯一的指認手段;不給,模型就結構性地無法再次「解決」一個員工已經
+    回答不出來的缺口——不必靠 prompt 約束。
+    """
+
+    from app.job_analysis.domain import OpenIssueTerminalResolutionKind, OpksGapAxis
+
+    packet = build(
+        work_model=CurrentWorkModel(
+            tasks=(make_task(),),
+            open_issues=(
+                gap_issue("still-open", axis=OpksGapAxis.OUTPUT),
+                gap_issue(
+                    "already-answered",
+                    axis=OpksGapAxis.SKILL,
+                    terminal=OpenIssueTerminalResolutionKind.EMPLOYEE_UNKNOWN,
+                ),
+            ),
+        )
+    )
+
+    assert [view.issue.id for view in packet.current_authorities.open_issues] == [
+        "still-open"
+    ]
+    assert [view.ordinal for view in packet.current_authorities.open_issues] == [1]
+    assert [issue.id for issue in packet.current_authorities.settled_issues] == [
+        "already-answered"
+    ]
+
+
+def test_agenda_puts_boundary_questions_before_gaps():
+    """決定 21:員工可隨時結束訪談,先問哪一類**會**影響最終覆蓋。"""
+
+    from app.job_analysis.domain import OpenIssueKind, OpksGapAxis
+
+    packet = build(
+        work_model=CurrentWorkModel(
+            tasks=(make_task(),),
+            open_issues=(
+                gap_issue("gap", axis=OpksGapAxis.OUTPUT),
+                gap_issue("general", kind=OpenIssueKind.INSUFFICIENT_EVIDENCE),
+                gap_issue("boundary", kind=OpenIssueKind.RESPONSIBILITY_UNCLEAR),
+            ),
+        )
+    )
+
+    assert [view.issue.id for view in packet.current_authorities.open_issues] == [
+        "boundary",
+        "general",
+        "gap",
+    ]
+
+
+def test_settled_issues_render_as_memory_without_an_ordinal():
+    from app.job_analysis.domain import OpenIssueTerminalResolutionKind, OpksGapAxis
+
+    packet = build(
+        work_model=CurrentWorkModel(
+            tasks=(make_task(),),
+            open_issues=(
+                gap_issue(
+                    "answered",
+                    axis=OpksGapAxis.SKILL,
+                    terminal=OpenIssueTerminalResolutionKind.NOT_APPLICABLE,
+                    summary="這項工作要用到哪些具體操作",
+                ),
+            ),
+        )
+    )
+    rendered = render_context_packet(packet)
+
+    assert "### settled_issues(已問過，勿重問)" in rendered
+    assert "這項工作要用到哪些具體操作 — 員工表示不適用" in rendered
+    assert "[1] 這項工作要用到哪些具體操作" not in rendered

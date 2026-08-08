@@ -31,6 +31,8 @@ from app.job_analysis.domain import (
     JdTask,
     NonEmptyText,
     OpenIssue,
+    OpenIssueKind,
+    OpenIssueTerminalResolutionKind,
     Proposal,
     ProposalStatus,
     SourceKind,
@@ -122,6 +124,13 @@ class CurrentAuthorities(DomainModel):
     tasks: tuple[PacketTaskView, ...] = ()
     retired_tasks: tuple[PacketRetiredTaskView, ...] = ()
     open_issues: tuple[PacketOpenIssueView, ...] = ()
+    settled_issues: tuple[OpenIssue, ...] = ()
+    """已終結、只作「已問過、勿重問」記憶的 issue(ADR 0054 決定 20)。
+
+    **刻意沒有 ordinal。** ordinal 是模型唯一的指認手段;不配發,模型就結構性地
+    無法再次「解決」一個員工已經回答不出來的缺口——不必靠 prompt 約束。
+    """
+
     excluded_signals: tuple[ExcludedSignal, ...] = ()
 
 
@@ -246,6 +255,7 @@ class TaskAnalysisPacket(DomainModel):
                     ordinal=view.ordinal,
                     issue_id=view.issue.id,
                     reconciliation_task_id=view.issue.reconciliation_task_id,
+                    subject_task_id=view.issue.subject_task_id,
                 )
                 for view in self.current_authorities.open_issues
             ),
@@ -253,6 +263,28 @@ class TaskAnalysisPacket(DomainModel):
 
 
 # ── 組裝 ────────────────────────────────────────────────────────────────────
+
+
+_AGENDA_RANK_BY_KIND = {
+    OpenIssueKind.UNRESOLVED_CONTRADICTION: 0,
+    OpenIssueKind.TASK_BOUNDARY_UNCERTAIN: 0,
+    OpenIssueKind.RESPONSIBILITY_UNCLEAR: 0,
+    OpenIssueKind.INSUFFICIENT_EVIDENCE: 1,
+}
+
+
+def _agenda_rank(issue: OpenIssue) -> int:
+    """決定 21 的 agenda 位置。
+
+    Task 邊界矛盾／責任問題最前——它們動搖的是「這件工作是什麼、是不是他的」,
+    在那之前先問 OPKS 缺口等於在還沒確定的東西上追細節。OPKS gap 最後,因為它
+    只在 Task 已經站穩之後才有意義(這與 pre-gate 的「無指向此 Task 的 active
+    issue」是同一條規則的兩端)。
+    """
+
+    if issue.opks_axis is not None:
+        return 2
+    return _AGENDA_RANK_BY_KIND[issue.kind]
 
 
 def build_context_packet(
@@ -293,6 +325,13 @@ def build_context_packet(
         PacketRetiredTaskView(ordinal=ordinal, task=task)
         for ordinal, task in enumerate(retired_tasks, start=len(active_tasks) + 1)
     )
+    # 決定 20–21:只有 active issue 進 open_issues 並取得 ordinal,並依 agenda 順序
+    # 排列(Task 邊界矛盾／責任問題 → 一般 open issue → OPKS gap)。員工可隨時結束
+    # 訪談,先問哪一類**會**影響最終覆蓋。
+    active_issues = sorted(
+        (issue for issue in work_model.open_issues if issue.is_active),
+        key=_agenda_rank,
+    )
     issue_views = tuple(
         PacketOpenIssueView(
             ordinal=ordinal,
@@ -303,7 +342,10 @@ def build_context_packet(
                 else None
             ),
         )
-        for ordinal, issue in enumerate(work_model.open_issues, start=1)
+        for ordinal, issue in enumerate(active_issues, start=1)
+    )
+    settled_issues = tuple(
+        issue for issue in work_model.open_issues if not issue.is_active
     )
 
     ordinal_by_task_id = {view.task.task_id: view.ordinal for view in task_views}
@@ -351,6 +393,7 @@ def build_context_packet(
             tasks=task_views,
             retired_tasks=retired_views,
             open_issues=issue_views,
+            settled_issues=settled_issues,
             excluded_signals=work_model.excluded_signals,
         ),
         proposal_context=ProposalContext(
@@ -537,6 +580,20 @@ def render_context_packet(packet: TaskAnalysisPacket) -> str:
             lines.append(f"    依據: {_render_anchor(anchor, turn_ordinals)}")
         asked = _render_turn_ref(view.issue.last_asked_turn_id, turn_ordinals)
         lines.append(f"    最近提問: {asked}" if asked else "    最近提問: (尚未問過)")
+    lines.append("")
+
+    # 決定 20:已終結的缺口只作記憶,**不配發 ordinal**,因此不可能被再次「解決」。
+    lines.append("### settled_issues(已問過，勿重問)")
+    if not authorities.settled_issues:
+        lines.append("(無)")
+    for issue in authorities.settled_issues:
+        resolution = issue.terminal_resolution
+        assert resolution is not None
+        answer = {
+            OpenIssueTerminalResolutionKind.EMPLOYEE_UNKNOWN: "員工表示不知道",
+            OpenIssueTerminalResolutionKind.NOT_APPLICABLE: "員工表示不適用",
+        }[resolution.kind]
+        lines.append(f"- {issue.summary} — {answer}")
     lines.append("")
 
     lines.append("### excluded_signals")

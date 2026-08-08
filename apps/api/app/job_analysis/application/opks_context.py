@@ -9,7 +9,10 @@ from __future__ import annotations
 from app.job_analysis.domain import (
     CurrentJdOpks,
     DomainModel,
+    OpenIssue,
+    OpenIssueTerminalResolutionKind,
     OpksEntityKind,
+    OpksGapAxis,
     OpksItem,
     OpksProposal,
     OpksProposalStatus,
@@ -60,6 +63,18 @@ class OpksProposalView(DomainModel):
     proposal: OpksProposal
 
 
+class OpksSettledGapView(DomainModel):
+    """這個 Task 上已終結的缺口(ADR 0054 決定 20)。
+
+    **specialist 也要看得到。** 少了這一區,員工回答「不知道」讓 digest 改變之後,
+    下一次分析會對同一軸再開一次同一個缺口,員工就被重問一次已經答不出來的事。
+    """
+
+    axis: OpksGapAxis
+    summary: str
+    kind: OpenIssueTerminalResolutionKind
+
+
 class OpksContextPacket(DomainModel):
     selected_task: OpksSelectedTaskView
     evidence: tuple[OpksEvidenceView, ...]
@@ -68,6 +83,8 @@ class OpksContextPacket(DomainModel):
     knowledge: tuple[OpksItemView, ...] = ()
     skills: tuple[OpksItemView, ...] = ()
     proposals: tuple[OpksProposalView, ...] = ()
+    settled_gaps: tuple[OpksSettledGapView, ...] = ()
+    """已終結的缺口記憶;**不配發 ordinal**,specialist 不解決 issue。"""
 
     def items_for(self, kind: OpksEntityKind) -> tuple[OpksItemView, ...]:
         return {
@@ -88,7 +105,13 @@ class OpksContextPacket(DomainModel):
 
     @property
     def read_set(self) -> tuple[Task, tuple[OpksItem, ...], tuple[OpksProposal, ...]]:
-        """本輪實際投影出的 authority input；持久層可拿它做 stale 檢查。"""
+        """本輪實際投影出的 authority input；持久層可拿它做 stale 檢查。
+
+        **`settled_gaps` 刻意不在裡面。** OPKS child 的 freshness 契約是
+        `analysis_input_digest`(ADR 0054 決定 12:Task 語意欄位 ＋ 有效員工 evidence);
+        終結記憶是 context,不是 authority input。放進來會製造一個與分析輸入無關的
+        abandon 觸發器——別的 Task 上有人回答「不知道」,就會讓這個 child 白跑一趟。
+        """
 
         return (
             self.selected_task.task,
@@ -108,7 +131,7 @@ def _number(items: tuple[OpksItem, ...]) -> tuple[OpksItemView, ...]:
     )
 
 
-def _proposal_references_task(
+def proposal_references_task(
     proposal: OpksProposal,
     *,
     selected_task_id: str,
@@ -129,15 +152,13 @@ def build_opks_context_packet(
     selected_task: Task,
     current_opks: CurrentJdOpks,
     proposals: tuple[OpksProposal, ...] = (),
+    open_issues: tuple[OpenIssue, ...] = (),
 ) -> OpksContextPacket:
     """投影單一 Task 的 OPKS operation 所需最小現況。"""
 
-    effective_employee_support = tuple(
-        link
-        for link in selected_task.effective_support_links
-        if link.source_ref.kind
-        in {SourceKind.EMPLOYEE_TURN, SourceKind.DIRECT_EDIT}
-    )
+    # 投影規則只有一個定義(`Task.effective_employee_support_links`),
+    # `compute_analysis_input_digest()` 吃的是同一組——見 ADR 0054 決定 12。
+    effective_employee_support = selected_task.effective_employee_support_links
     if not effective_employee_support:
         raise OpksGroundingUnavailable(
             "selected task requires effective employee evidence before OPKS generation"
@@ -173,14 +194,27 @@ def build_opks_context_packet(
         for proposal in proposals
         if proposal.status in ACTIVE_OR_CONSTRAINING_PROPOSAL_STATUSES
         and proposal.entity_kind is not OpksEntityKind.ATTITUDE
-        and _proposal_references_task(
+        and proposal_references_task(
             proposal,
             selected_task_id=selected_task.task_id,
             selected_indicator_ids=selected_indicator_ids,
         )
     )
 
+    settled_gaps = tuple(
+        OpksSettledGapView(
+            axis=issue.opks_axis,
+            summary=issue.summary,
+            kind=issue.terminal_resolution.kind,
+        )
+        for issue in open_issues
+        if issue.opks_axis is not None
+        and issue.subject_task_id == selected_task.task_id
+        and not issue.is_active
+    )
+
     return OpksContextPacket(
+        settled_gaps=settled_gaps,
         selected_task=OpksSelectedTaskView(task=selected_task),
         evidence=tuple(
             OpksEvidenceView(ordinal=index, support_link=link)
@@ -200,6 +234,7 @@ _ENTITY_LABELS = {
     OpksEntityKind.KNOWLEDGE: "知識",
     OpksEntityKind.SKILL: "技能",
 }
+_GAP_LABEL_KIND = {axis: OpksEntityKind(axis.value) for axis in OpksGapAxis}
 
 
 def _append_items(
@@ -273,6 +308,20 @@ def render_opks_context_packet(packet: OpksContextPacket) -> str:
             packet.items_for(kind),
             selected_task_id=task.task_id,
             selected_indicator_ids=selected_indicator_ids,
+        )
+
+    lines.append("## 已終結的缺口（已問過，勿重新提出）")
+    if not packet.settled_gaps:
+        lines.append("（目前沒有）")
+    for gap in packet.settled_gaps:
+        answer = {
+            OpenIssueTerminalResolutionKind.EMPLOYEE_UNKNOWN: "員工表示不知道",
+            OpenIssueTerminalResolutionKind.NOT_APPLICABLE: "員工表示不適用",
+        }[gap.kind]
+        lines.append(f"- {_ENTITY_LABELS[_GAP_LABEL_KIND[gap.axis]]}：{gap.summary} — {answer}")
+    if packet.settled_gaps:
+        lines.append(
+            "以上缺口不要再輸出 uncertain；若這次的員工依據已足以支撐該軸，直接提出候選。"
         )
 
     lines.append("## 相關提案與拒絕記憶")

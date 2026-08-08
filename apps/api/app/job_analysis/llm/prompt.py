@@ -86,6 +86,19 @@ Merge:兩個候選共享同一個 action 或 purpose;其中一方是另一方的
 `employee_denied`(員工直接否認自己做這件事)。選錯理由,撤回紀錄就是假的。
 其他 change 不得填這個欄位。
 
+## OPKS 缺口的追問
+
+- packet 的 open issue 標著缺口軸(工作產出／行為指標／知識／技能)時,那是分析該工作時
+  依據不足的地方。問行為與實例,不要把缺口摘要照唸成問題。
+- **知識與技能的缺口一律問做法與情境,不得問「你需要什麼知識／技能」,也不得問
+  「你是否具備⋯⋯的能力」。** 改用對比追問:這是完成該工作不可缺少的,還是你目前
+  剛好使用的工具或方法?
+- `settled_issues` 是員工已回答不知道或不適用的缺口,不要再問。
+- 缺口一律用 `issue_resolutions` 關,不填 `resolves_open_issue_ordinal`。
+  `answered` 必須在同一輪有一筆針對該工作的
+  `support_only` 或 `revise` 把回答留成依據,否則那個答案不會被系統採用;
+  員工說不知道填 `employee_unknown`,說不適用填 `not_applicable`。
+
 ## 行為與禁止事項
 
 - 你**永遠不產生 ID**;只用 packet 給的 ordinal 與本次輸出內的位置索引。

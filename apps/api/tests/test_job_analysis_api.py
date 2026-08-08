@@ -370,9 +370,15 @@ async def test_list_and_open_return_only_the_current_jd_projection(api_client):
         "updated_at",
         "tasks",
         "opks_items",
+        "opks_task_status",
     }
     assert opened.json()["tasks"][0]["statement"] == "每週彙整營運週報"
     assert opened.json()["opks_items"] == []
+    # 這個 JD Task 在 Work Model 裡沒有對應的已分析 Task,pre-gate 不通過
+    # (ADR 0054 決定 3);Web 直接呈現這個結果,不自行重算(0052 決定 3)。
+    assert opened.json()["opks_task_status"] == [
+        {"task_id": "task-1", "status": "not_ready_for_analysis"}
+    ]
     forbidden = {"authority_generation", "work_model", "journal", "proposals"}
     assert forbidden.isdisjoint(opened.json())
 
@@ -767,9 +773,27 @@ async def test_consultant_failure_does_not_leak_provider_details_or_change_state
     assert len(reloaded.json()["conversation"]) == 1
 
 
-async def test_opks_generation_creates_durable_proposals_and_replays_before_provider(
-    api_client,
-):
+async def test_the_manual_opks_generation_entry_is_retired(api_client):
+    """ADR 0054 決定 1:員工不需要理解 OPKS 階段的存在。
+
+    唯一的 AI 入口是主回合排定的 child;這個端點**不得復活**。
+    """
+
+    client, _, _ = api_client
+    root = f"/api/v1/job-analysis/documents/{DOCUMENT_ID}"
+    await client.put(root, json={"title": "門市營運專員"})
+
+    retired = await client.post(
+        f"{root}/tasks/task-1/opks-proposals",
+        headers={"Idempotency-Key": "opks-generate-1"},
+    )
+
+    assert retired.status_code in {404, 405}
+
+
+async def test_opks_proposals_now_arrive_from_the_employee_turn(api_client):
+    """接受工作之後,下一輪對話就會自動帶出 OPKS 提案——員工沒有按任何按鈕。"""
+
     client, _, provider = api_client
     root = f"/api/v1/job-analysis/documents/{DOCUMENT_ID}"
     await client.put(root, json={"title": "門市營運專員"})
@@ -779,65 +803,22 @@ async def test_opks_generation_creates_durable_proposals_and_replays_before_prov
         json={"text": "我每週彙整營運週報"},
     )
     proposal = consultation.json()["proposals"][0]
-    accepted = await client.post(
+    await client.post(
         f"{root}/proposals/{proposal['proposal_id']}/decisions",
         headers={"Idempotency-Key": "accept-task"},
         json={"decision": "accepted"},
     )
-    task_id = accepted.json()["tasks"][0]["task_id"]
+    calls_before = provider.calls
 
-    first = await client.post(
-        f"{root}/tasks/{task_id}/opks-proposals",
-        headers={"Idempotency-Key": "opks-generate-1"},
-    )
-    replay = await client.post(
-        f"{root}/tasks/{task_id}/opks-proposals",
-        headers={"Idempotency-Key": "opks-generate-1"},
-    )
-    reloaded = await client.get(f"{root}/consultation")
-
-    assert first.status_code == 200
-    assert first.json() == {
-        "outcome": "proposed",
-        "proposal_ids": ["opks-generate-1-op0"],
-    }
-    assert replay.json() == first.json()
-    assert provider.calls == 2
-    assert reloaded.json()["opks_items"] == []
-    assert reloaded.json()["opks_proposals"][0]["status"] == "pending"
-
-
-async def test_opks_generation_failure_is_generic_and_does_not_create_proposals(
-    api_client,
-):
-    client, _, provider = api_client
-    root = f"/api/v1/job-analysis/documents/{DOCUMENT_ID}"
-    await client.put(root, json={"title": "門市營運專員"})
-    consultation = await client.post(
+    second = await client.post(
         f"{root}/turns",
-        headers={"Idempotency-Key": "task-turn"},
-        json={"text": "我每週彙整營運週報"},
+        headers={"Idempotency-Key": "task-turn-2"},
+        json={"text": "週報會交給店長跟區經理"},
     )
-    proposal = consultation.json()["proposals"][0]
-    accepted = await client.post(
-        f"{root}/proposals/{proposal['proposal_id']}/decisions",
-        headers={"Idempotency-Key": "accept-task"},
-        json={"decision": "accepted"},
-    )
-    task_id = accepted.json()["tasks"][0]["task_id"]
-    provider.fail = True
 
-    failed = await client.post(
-        f"{root}/tasks/{task_id}/opks-proposals",
-        headers={"Idempotency-Key": "opks-failed"},
-    )
-    reloaded = await client.get(f"{root}/consultation")
-
-    assert failed.status_code == 503
-    assert failed.json()["type"].endswith("/consultant-unavailable")
-    assert "anthropic" not in failed.text.lower()
-    assert "provider" not in failed.text.lower()
-    assert reloaded.json()["opks_proposals"] == []
+    assert second.status_code == 200
+    assert second.json()["opks_proposals"][0]["status"] == "pending"
+    assert provider.calls == calls_before + 2, "主顧問一次 ＋ OPKS specialist 一次"
 
 
 @pytest.mark.parametrize("decision", ["accepted", "edited", "rejected", "deferred"])

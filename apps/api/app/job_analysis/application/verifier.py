@@ -30,6 +30,7 @@ from pydantic import model_validator
 from app.job_analysis.domain import DomainModel, Identifier, NonEmptyText, TaskId
 from app.job_analysis.llm import (
     IdentityRelation,
+    IssueResolutionKind,
     SignalDisposition,
     TaskAnalysisResult,
     TaskChangeKind,
@@ -78,6 +79,8 @@ class PacketOpenIssue(DomainModel):
     ordinal: int
     issue_id: Identifier
     reconciliation_task_id: TaskId | None = None
+    subject_task_id: TaskId | None = None
+    """OPKS 缺口在問哪一個 Task(ADR 0054 決定 19),`answered` 的前提要用它。"""
 
 
 class VerificationContext(DomainModel):
@@ -182,6 +185,9 @@ class ViolationCode(StrEnum):
     SPLIT_SUPPORT_UNKNOWN = "split_support_unknown"
     OPEN_ISSUE_ANCHORS_INSUFFICIENT = "open_issue_anchors_insufficient"
     NEXT_QUESTION_TARGET_INVALID = "next_question_target_invalid"
+    ISSUE_RESOLUTION_ORDINAL_UNKNOWN = "issue_resolution_ordinal_unknown"
+    ISSUE_RESOLUTION_REPEATED = "issue_resolution_repeated"
+    ISSUE_RESOLUTION_ANSWER_NOT_RECORDED = "issue_resolution_answer_not_recorded"
     SUPERSESSION_UNKNOWN = "supersession_unknown"
     SUPERSESSION_ALREADY_SUPERSEDED = "supersession_already_superseded"
     SUPERSESSION_TASK_NOT_TARGETED = "supersession_task_not_targeted"
@@ -194,6 +200,9 @@ class ViolationCode(StrEnum):
     )
     RESOLUTION_MAPPING_INVALID = "resolution_mapping_invalid"
     RESOLUTION_OPEN_ISSUE_REPEATED = "resolution_open_issue_repeated"
+    RESOLUTION_OPKS_GAP_NEEDS_ISSUE_RESOLUTION = (
+        "resolution_opks_gap_needs_issue_resolution"
+    )
 
 
 class Violation(DomainModel):
@@ -233,6 +242,7 @@ def verify_task_analysis_result(
     for index, signal in enumerate(result.work_signals):
         _verify_signal(index, signal, context, violations)
     _verify_open_issues_are_resolved_once(result, violations)
+    _verify_issue_resolutions(result, context, violations)
     _verify_task_change_targets_are_claimed_once(result, violations)
     _verify_work_signals_are_not_exact_duplicates(result, violations)
     _verify_next_question(result, context, violations)
@@ -264,6 +274,93 @@ def _verify_signal(
     _verify_supersessions(index, signal, context, violations)
 
 
+#: 會把本輪員工依據接到既有 Task 上、且讓那個 Task 繼續存在的兩種處置。
+#
+# `support_only` 與 `revise` 都會 append SupportLink 到 target Task,因此
+# `analysis_input_digest` 一定改變,OPKS 會重新分析。其他處置都不行:
+# `add` 建立的是**新** Task(缺口問的那個 Task 沒拿到任何依據);
+# `withdraw`／`merge`／`split` 讓 target 退場,那條路是把 gap 移除(T13)不是回答它;
+# `exclude`／`open_issue` 根本不碰 Task 的依據。
+_EVIDENCE_LEAVING_CHANGES = frozenset({TaskChangeKind.REVISE})
+
+
+def _leaves_employee_evidence_on(
+    signal: WorkSignal,
+    task_id: TaskId,
+    context: VerificationContext,
+) -> bool:
+    if not signal.anchors:
+        return False
+    if signal.disposition is SignalDisposition.SUPPORT_ONLY:
+        pass
+    elif (
+        signal.disposition is SignalDisposition.TASK_CHANGE
+        and signal.task_change is not None
+        and signal.task_change.change in _EVIDENCE_LEAVING_CHANGES
+    ):
+        pass
+    else:
+        return False
+    ordinals = {task.ordinal: task.task_id for task in context.tasks}
+    return any(
+        ordinals.get(ordinal) == task_id
+        for ordinal in signal.identity.target_task_ordinals
+    )
+
+
+def _verify_issue_resolutions(
+    result: TaskAnalysisResult,
+    context: VerificationContext,
+    violations: list[Violation],
+) -> None:
+    """ADR 0054 決定 22–23 的機械前提。
+
+    `answered` 若沒有同輪留下員工依據,`analysis_input_digest` 不會變,OPKS 不會再
+    分析,缺口就被**假關閉**——員工以為答過了,系統卻永遠不會用那個答案。這是跨欄位
+    但完全機械可判的條件,所以擋得住。
+
+    擋不住的是「模型把 employee_unknown 當成偷懶出口」:那要判斷員工到底有沒有回答,
+    是語意判斷。ADR 後果段已載明只能靠 rubric 與「specialist 下次仍會重提同一 gap」
+    的自我修正。
+    """
+
+    by_ordinal = {issue.ordinal: issue for issue in context.open_issues}
+    seen: set[int] = set()
+    for resolution in result.issue_resolutions:
+        issue = by_ordinal.get(resolution.ordinal)
+        if issue is None:
+            # terminal issue 不配發 ordinal(決定 20),指過去就是無效 ordinal。
+            _add(
+                violations,
+                ViolationCode.ISSUE_RESOLUTION_ORDINAL_UNKNOWN,
+                f"issue resolution targets unknown open issue ordinal "
+                f"{resolution.ordinal}",
+            )
+            continue
+        if resolution.ordinal in seen:
+            _add(
+                violations,
+                ViolationCode.ISSUE_RESOLUTION_REPEATED,
+                f"open issue ordinal {resolution.ordinal} is resolved more than once",
+            )
+            continue
+        seen.add(resolution.ordinal)
+        if resolution.resolution is not IssueResolutionKind.ANSWERED:
+            continue
+        if issue.subject_task_id is None:
+            continue
+        if not any(
+            _leaves_employee_evidence_on(signal, issue.subject_task_id, context)
+            for signal in result.work_signals
+        ):
+            _add(
+                violations,
+                ViolationCode.ISSUE_RESOLUTION_ANSWER_NOT_RECORDED,
+                f"open issue ordinal {resolution.ordinal} was marked answered without a "
+                "same-turn work signal leaving employee evidence on its subject task",
+            )
+
+
 def _verify_open_issue_resolution(
     index: int,
     signal: WorkSignal,
@@ -274,6 +371,8 @@ def _verify_open_issue_resolution(
 
     ADR 0047 把適用範圍擴及一般 open issue——那些是模型自己提的待答問題,任何 disposition
     皆可關閉。0044 的 reconciliation 判準原樣保留。
+
+    **OPKS 缺口不在 0047 的範圍內**(見下方 `subject_task_id` 那一段)。
     """
 
     ordinal = signal.resolves_open_issue_ordinal
@@ -285,6 +384,29 @@ def _verify_open_issue_resolution(
             violations,
             ViolationCode.RESOLUTION_OPEN_ISSUE_UNKNOWN,
             f"open issue ordinal {ordinal} is outside the packet",
+            index,
+        )
+        return
+
+    if issue.subject_task_id is not None:
+        # ADR 0054 決定 22:gap resolution **不綁在 `WorkSignal.disposition` 上**,
+        # 它有自己的 `issue_resolutions[]` 通道。
+        #
+        # 0047 的「全部 open issue」指的是**主顧問自己提出**的那些(責任邊界不明／
+        # 證據不足／矛盾未解／task_boundary_uncertain),理由是只有它知道自己上一輪
+        # 問過什麼。OPKS 缺口由 specialist 提出,而且決定 23 給了它一個機械可判的
+        # 前提(同輪必須在該 Task 留下員工依據)。不擋這條路的話,模型送一筆帶當輪
+        # anchor 的訊號就能把缺口整筆刪掉、什麼依據都不留——digest 不變、OPKS 不再
+        # 分析,缺口被假關閉,而決定 23 的檢查只掛在新通道上,擋不到這裡。
+        #
+        # 帶依據的訊號也一樣擋:放行等於把決定 23 的前提複製到第二處,兩份遲早失步。
+        # `subject_task_id` 就是缺口的標記——domain 保證 `opks_axis` 非空必有它,而
+        # 全 repo 只有 `_gap_issues()` 會寫它。
+        _add(
+            violations,
+            ViolationCode.RESOLUTION_OPKS_GAP_NEEDS_ISSUE_RESOLUTION,
+            f"open issue ordinal {ordinal} is an OPKS gap and may only be resolved "
+            "through issue_resolutions[]",
             index,
         )
         return

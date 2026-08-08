@@ -19,6 +19,8 @@ from .context import (
     build_context_packet,
 )
 from .operation import OperationOutcome, TaskAnalysisOperationResult
+from .opks_digest import ScheduledOpks
+from .opks_scheduler import question_target_task_ids, select_scheduled_opks
 from .persistence import (
     COMPLETED_TURN_SCHEMA_ID,
     CompletedTurnPayload,
@@ -54,6 +56,26 @@ class TurnSnapshot:
     authority_generation: int
     state: JobAnalysisState
     packet: TaskAnalysisPacket
+
+
+@dataclass(frozen=True)
+class CommittedTurn:
+    """一個已提交的員工回合,連同它凍結的唯一 OPKS child(決定 7–8)。
+
+    `scheduled_opks` 為 `None` 表示這一輪沒有排定分析。replay 回傳的是**既存**
+    payload 裡那一筆,不是重算的結果。
+    """
+
+    transition: TransitionResult
+    scheduled_opks: ScheduledOpks | None = None
+
+    @property
+    def is_applied(self) -> bool:
+        return self.transition.is_applied
+
+    @property
+    def state(self) -> JobAnalysisState:
+        return self.transition.state
 
 
 def _utcnow() -> datetime:
@@ -149,7 +171,14 @@ def _require_same_replay(
     operation_id: str,
     employee_turn: ConversationTurn,
     consultant_turn: ConversationTurn,
-) -> None:
+) -> CompletedTurnPayload:
+    """確認這是同一個回合的重播,並交回**已凍結**的 payload。
+
+    **刻意不比對 `scheduled_opks`。** 綁定在 receipt 寫入時就凍結了(決定 8);
+    replay 一律以既存 payload 為準,不重算——重算會讓 scheduler 依當下 state 改選
+    下一個 Task,同一個員工回合因此付兩次錢。
+    """
+
     if entry.kind != "employee_turn" or not isinstance(
         entry.payload,
         CompletedTurnPayload,
@@ -166,6 +195,7 @@ def _require_same_replay(
         raise IdempotencyConflict(
             f"operation {operation_id!r} was replayed with different turns"
         )
+    return payload
 
 
 async def commit_verified_turn(
@@ -175,7 +205,7 @@ async def commit_verified_turn(
     operation_id: str,
     employee_turn: ConversationTurn,
     operation_result: TaskAnalysisOperationResult,
-) -> TransitionResult:
+) -> CommittedTurn:
     """Apply a verified result only if the exact authority it read is still current."""
 
     _require_verified(operation_result)
@@ -189,16 +219,19 @@ async def commit_verified_turn(
 
         existing = await uow.journal.get(snapshot.document_id, operation_id)
         if existing is not None:
-            _require_same_replay(
+            frozen = _require_same_replay(
                 existing,
                 operation_id=operation_id,
                 employee_turn=employee_turn,
                 consultant_turn=consultant_turn,
             )
-            return TransitionResult(
-                outcome=TransitionOutcome.APPLIED,
-                state=state,
-                detail="operation was already committed",
+            return CommittedTurn(
+                transition=TransitionResult(
+                    outcome=TransitionOutcome.APPLIED,
+                    state=state,
+                    detail="operation was already committed",
+                ),
+                scheduled_opks=frozen.scheduled_opks,
             )
 
         current_packet = await _packet_for(
@@ -234,6 +267,18 @@ async def commit_verified_turn(
             turn_id=consultant_turn.turn_id,
             text=consultant_turn.text,
         )
+        # 用 **post-transition** state 排定:本輪剛加進 Current JD 的 Task 也該排得到。
+        assert operation_result.result is not None
+        scheduled_opks = await select_scheduled_opks(
+            uow,
+            document_id=snapshot.document_id,
+            state=transition.state,
+            question_task_ids=question_target_task_ids(
+                result=operation_result.result,
+                packet=snapshot.packet,
+                operation_id=operation_id,
+            ),
+        )
         await uow.proposals.replace(
             snapshot.document_id,
             transition.state.proposals,
@@ -248,6 +293,7 @@ async def commit_verified_turn(
                     operation_id=operation_id,
                     employee_turn=employee_turn,
                     consultant_turn=consultant_turn,
+                    scheduled_opks=scheduled_opks,
                 ),
                 created_at=now,
             )
@@ -264,4 +310,4 @@ async def commit_verified_turn(
                 "the document changed while this Task Analysis turn was committed"
             )
         await uow.commit()
-        return transition
+        return CommittedTurn(transition=transition, scheduled_opks=scheduled_opks)

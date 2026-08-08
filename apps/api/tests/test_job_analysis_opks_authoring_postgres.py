@@ -314,3 +314,97 @@ async def test_indicator_delete_unlinks_knowledge_and_skill_in_the_same_commit(
     assert indicator.entity_id not in by_id
     assert by_id[knowledge.entity_id].indicator_refs == ()
     assert by_id[skill.entity_id].indicator_refs == ()
+
+
+# ── Task 離開 Current JD 時移除 OPKS 缺口(ADR 0054 決定 26–27)────────────────
+
+
+def opks_gap_issue(issue_id: str, task_id: str, *, summary: str = "還看不出這項工作交出什麼"):
+    from app.job_analysis.domain import (
+        OpenIssue,
+        OpenIssueKind,
+        OpksGapAxis,
+        SourceAnchor,
+    )
+
+    return OpenIssue(
+        id=issue_id,
+        kind=OpenIssueKind.INSUFFICIENT_EVIDENCE,
+        summary=summary,
+        source_anchors=(
+            SourceAnchor(
+                source_ref=SourceRef(kind=SourceKind.EMPLOYEE_TURN, id="turn-1"),
+                quote="我每週彙整營運週報",
+            ),
+        ),
+        subject_task_id=task_id,
+        opks_axis=OpksGapAxis.OUTPUT,
+    )
+
+
+def general_issue(issue_id: str = "general-1"):
+    from app.job_analysis.domain import OpenIssue, OpenIssueKind, SourceAnchor
+
+    return OpenIssue(
+        id=issue_id,
+        kind=OpenIssueKind.RESPONSIBILITY_UNCLEAR,
+        summary="責任邊界還不清楚",
+        source_anchors=(
+            SourceAnchor(
+                source_ref=SourceRef(kind=SourceKind.EMPLOYEE_TURN, id="turn-1"),
+                quote="我每週彙整營運週報",
+            ),
+        ),
+    )
+
+
+async def test_deleting_a_jd_task_removes_its_gap_in_the_same_transaction(
+    postgres_session_factory,
+    cleanup_job_analysis_rows,
+):
+    """呼叫點驗收:純函式接上了 delete 這條路,不是只存在於單元測試裡。"""
+
+    from datetime import timedelta
+
+    from app.job_analysis.domain import CurrentWorkModel
+
+    document_id = cleanup_job_analysis_rows
+    uow_factory = lambda: SqlAlchemyJobAnalysisUnitOfWork(postgres_session_factory)
+    await create_document(
+        uow_factory,
+        document_id=document_id,
+        title="門市營運專員",
+    )
+    created = await add_jd_task(
+        uow_factory,
+        document_id=document_id,
+        entry_id="direct-1",
+        fields=JdTaskFields(statement="每週彙整營運週報"),
+    )
+    async with uow_factory() as uow:
+        record = await uow.documents.get(document_id, for_update=True)
+        assert record is not None
+        assert await uow.documents.update_authority(
+            document_id,
+            expected_generation=record.authority_generation,
+            work_model=CurrentWorkModel(
+                open_issues=(
+                    opks_gap_issue("gap-1", created.task_id),
+                    general_issue(),
+                )
+            ),
+            active_question=record.active_question,
+            updated_at=record.updated_at + timedelta(seconds=1),
+        )
+        await uow.commit()
+
+    await delete_jd_task(
+        uow_factory,
+        document_id=document_id,
+        entry_id="delete-1",
+        task_id=created.task_id,
+    )
+    loaded = await load_document(uow_factory, document_id)
+
+    assert loaded is not None
+    assert [issue.id for issue in loaded.state.work_model.open_issues] == ["general-1"]

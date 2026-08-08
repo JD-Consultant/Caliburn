@@ -21,6 +21,7 @@ from app.job_analysis.application import (
     create_document,
     load_document,
     prepare_turn,
+    select_scheduled_opks,
 )
 from app.job_analysis.domain import (
     CurrentWorkModel,
@@ -423,9 +424,230 @@ async def test_verified_revise_persists_the_proposal_with_the_completed_turn(
     )
     loaded = await load_document(uow_factory, document_id)
 
-    assert committed.created_proposal_ids == ("operation-revise-p0",)
+    assert committed.transition.created_proposal_ids == ("operation-revise-p0",)
     assert loaded is not None
     assert loaded.document.authority_generation == 2
     assert loaded.state.proposals[0].proposal_id == "operation-revise-p0"
     assert loaded.state.current_jd == (jd_task,)
     assert loaded.conversation_turns[-1].speaker is TurnSpeaker.CONSULTANT
+
+
+# ── 主回合凍結的唯一 OPKS child(ADR 0054 決定 7–9)────────────────────────────
+
+
+def analysed_task(task_id: str = "task-existing") -> Task:
+    return Task(
+        task_id=task_id,
+        statement="每週整理營運週報",
+        action="整理",
+        object="營運週報",
+        support_links=(
+            SupportLink(
+                source_ref=SourceRef(kind=SourceKind.EMPLOYEE_TURN, id="old-turn"),
+                quote="我每週會整理營運週報",
+            ),
+        ),
+    )
+
+
+async def seed_analysed_task(uow_factory, document_id, *tasks: Task) -> None:
+    async with uow_factory() as uow:
+        record = await uow.documents.get(document_id, for_update=True)
+        assert record is not None
+        changed = await uow.documents.update_authority(
+            document_id,
+            expected_generation=record.authority_generation,
+            work_model=CurrentWorkModel(tasks=tasks),
+            active_question=None,
+            updated_at=record.updated_at + timedelta(seconds=1),
+        )
+        assert changed
+        await uow.tasks.replace(
+            document_id,
+            tuple(
+                JdTask(
+                    task_id=task.task_id,
+                    statement=task.statement,
+                    display_order=order,
+                )
+                for order, task in enumerate(tasks)
+            ),
+        )
+        await uow.commit()
+
+
+def blocking_opks_proposal(task_id: str) -> OpksProposal:
+    """一筆待決的 O 提案,足以讓 pre-gate 擋住那個 Task。"""
+
+    item = OpksItem(
+        entity_id="output-1",
+        entity_kind=OpksEntityKind.OUTPUT,
+        text="營運週報",
+        task_refs=(task_id,),
+        evidence_links=(
+            OpksEvidenceLink(
+                source_ref=SourceRef(kind=SourceKind.EMPLOYEE_TURN, id="old-turn"),
+                quote="我每週會整理營運週報",
+            ),
+        ),
+    )
+    return OpksProposal(
+        proposal_id="opks-proposal-block",
+        operation_id="opks-operation-block",
+        entity_id=item.entity_id,
+        entity_kind=item.entity_kind,
+        action=OpksProposalAction.ADD,
+        after=item,
+        base_authority_generation=1,
+        created_at=OPKS_CREATED_AT,
+    )
+
+
+def verified_support_only_result() -> TaskAnalysisOperationResult:
+    """只補依據、不動 Task 的一輪。"""
+
+    result = TaskAnalysisResult(
+        work_signals=(
+            WorkSignal(
+                anchors=(
+                    SignalAnchor(turn_ordinal=2, quote="我每週會彙整營運週報"),
+                ),
+                identity=IdentityAssessment(
+                    relation=IdentityRelation.DUPLICATE,
+                    target_task_ordinals=(1,),
+                ),
+                disposition=SignalDisposition.SUPPORT_ONLY,
+            ),
+        ),
+        next_question=NextQuestion(text="這份週報主要交給誰？"),
+    )
+    return TaskAnalysisOperationResult(
+        outcome=OperationOutcome.VERIFIED,
+        result=result,
+        report=VerificationReport(),
+    )
+
+
+async def test_a_committed_turn_freezes_one_scheduled_opks_child(
+    postgres_session_factory,
+    cleanup_job_analysis_rows,
+):
+    document_id = cleanup_job_analysis_rows
+    uow_factory = factory(postgres_session_factory)
+    await create_document(
+        uow_factory,
+        document_id=document_id,
+        title="門市營運專員",
+    )
+    await seed_analysed_task(uow_factory, document_id, analysed_task())
+    employee = employee_turn()
+    snapshot = await prepare_turn(
+        uow_factory,
+        document_id=document_id,
+        employee_turn=employee,
+    )
+
+    committed = await commit_verified_turn(
+        uow_factory,
+        snapshot=snapshot,
+        operation_id="operation-1",
+        employee_turn=employee,
+        operation_result=verified_support_only_result(),
+    )
+
+    assert committed.scheduled_opks is not None
+    assert committed.scheduled_opks.task_id == "task-existing"
+    async with uow_factory() as uow:
+        entry = await uow.journal.get(document_id, "operation-1")
+    assert entry is not None
+    assert entry.payload.scheduled_opks == committed.scheduled_opks
+
+
+async def test_replay_returns_the_frozen_child_even_after_the_state_moved_on(
+    postgres_session_factory,
+    cleanup_job_analysis_rows,
+):
+    """決定 8:綁定在 receipt 寫入時凍結。
+
+    這是整條線最重要的不變量。沒有它,replay 會重跑 scheduler 並依當下 state 改選,
+    使**同一個員工回合付兩次錢**。這裡在第一次提交後放進一筆待決 OPKS Proposal,
+    讓 scheduler 現在會做出不同的選擇,再重播同一個 operation。
+    """
+
+    document_id = cleanup_job_analysis_rows
+    uow_factory = factory(postgres_session_factory)
+    await create_document(
+        uow_factory,
+        document_id=document_id,
+        title="門市營運專員",
+    )
+    await seed_analysed_task(uow_factory, document_id, analysed_task())
+    employee = employee_turn()
+    snapshot = await prepare_turn(
+        uow_factory,
+        document_id=document_id,
+        employee_turn=employee,
+    )
+    first = await commit_verified_turn(
+        uow_factory,
+        snapshot=snapshot,
+        operation_id="operation-1",
+        employee_turn=employee,
+        operation_result=verified_support_only_result(),
+    )
+    assert first.scheduled_opks is not None
+
+    async with uow_factory() as uow:
+        await uow.opks_proposals.replace(
+            document_id,
+            (blocking_opks_proposal(first.scheduled_opks.task_id),),
+        )
+        await uow.commit()
+    moved_on = await load_document(uow_factory, document_id)
+    assert moved_on is not None
+    async with uow_factory() as uow:
+        reselected = await select_scheduled_opks(
+            uow,
+            document_id=document_id,
+            state=moved_on.state,
+        )
+    assert reselected is None, "前置條件:scheduler 現在會做出不同的選擇"
+
+    replay = await commit_verified_turn(
+        uow_factory,
+        snapshot=snapshot,
+        operation_id="operation-1",
+        employee_turn=employee,
+        operation_result=verified_support_only_result(),
+    )
+
+    assert replay.scheduled_opks == first.scheduled_opks
+
+
+async def test_a_turn_with_nothing_analysable_schedules_no_child(
+    postgres_session_factory,
+    cleanup_job_analysis_rows,
+):
+    document_id = cleanup_job_analysis_rows
+    uow_factory = factory(postgres_session_factory)
+    await create_document(
+        uow_factory,
+        document_id=document_id,
+        title="門市營運專員",
+    )
+    employee = employee_turn()
+    snapshot = await prepare_turn(
+        uow_factory,
+        document_id=document_id,
+        employee_turn=employee,
+    )
+
+    committed = await commit_verified_turn(
+        uow_factory,
+        snapshot=snapshot,
+        operation_id="operation-1",
+        employee_turn=employee,
+        operation_result=verified_add_result(),
+    )
+
+    assert committed.scheduled_opks is None

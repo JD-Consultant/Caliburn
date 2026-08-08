@@ -3,7 +3,30 @@ import type {
   OpksItemView,
   OpksProposalDecisionWrite,
   OpksProposalView,
+  OpksTaskStatusView,
 } from "@caliburn/job-analysis-contract";
+
+export type OpksStatus = OpksTaskStatusView["status"];
+
+/**
+ * ADR 0054 決定 36 允許的**全部**措辭；措辭受 0052 決定 7 約束
+ * （不得使用「不完整」「不合格」「未通過」——我們產出的是客製 JD，
+ * 不是送審的職能基準）。
+ *
+ * 沒有第四個標籤是刻意的：分析完且都處理掉的工作與尚未分析的工作，從現況分不出來，
+ * 依 0052 決定 6「無法確定的一律不提示」。狀態由 API 帶來，Web 不自行重算（決定 3）。
+ */
+export const OPKS_STATUS_LABELS: Record<OpksStatus, string> = {
+  not_ready_for_analysis: "尚未適合分析",
+  awaiting_employee_answer: "尚有待確認資訊",
+  proposals_ready: "已可提出建議",
+};
+
+export function opksStatusByTask(
+  entries: OpksTaskStatusView[],
+): Map<string, OpksStatus> {
+  return new Map(entries.map((entry) => [entry.task_id, entry.status]));
+}
 
 const ACTIVE_PROPOSAL_STATUSES = new Set<OpksProposalView["status"]>([
   "pending",

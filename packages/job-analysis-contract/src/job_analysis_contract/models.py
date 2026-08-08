@@ -132,17 +132,18 @@ class OpksItemView(BaseModel):
     evidence_quotes: list[str]
 
 
-class Outcome(StrEnum):
-    proposed = 'proposed'
-    no_grounded_candidates = 'no_grounded_candidates'
+class Status(StrEnum):
+    awaiting_employee_answer = 'awaiting_employee_answer'
+    proposals_ready = 'proposals_ready'
+    not_ready_for_analysis = 'not_ready_for_analysis'
 
 
-class OpksGenerationView(BaseModel):
+class OpksTaskStatusView(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
-    outcome: Outcome
-    proposal_ids: list[str]
+    task_id: str
+    status: Status
 
 
 class Action(StrEnum):
@@ -151,7 +152,7 @@ class Action(StrEnum):
     remove = 'remove'
 
 
-class Status(StrEnum):
+class Status1(StrEnum):
     pending = 'pending'
     deferred = 'deferred'
     accepted = 'accepted'
@@ -169,7 +170,7 @@ class OpksProposalView(BaseModel):
     entity_id: str
     entity_kind: EntityKind
     action: Action
-    status: Status
+    status: Status1
     before: OpksItemView | None
     after: OpksItemView | None
     edited_after: OpksItemView | None
@@ -186,6 +187,7 @@ class DocumentView(BaseModel):
     updated_at: AwareDatetime
     tasks: list[JdTaskView]
     opks_items: list[OpksItemView]
+    opks_task_status: list[OpksTaskStatusView]
 
 
 class Speaker(StrEnum):
@@ -226,7 +228,7 @@ class Action1(StrEnum):
     split = 'split'
 
 
-class Status1(StrEnum):
+class Status2(StrEnum):
     pending = 'pending'
     deferred = 'deferred'
     accepted = 'accepted'
@@ -242,7 +244,7 @@ class ProposalView(BaseModel):
     )
     proposal_id: str
     action: Action1
-    status: Status1
+    status: Status2
     jd_before: list[ProposalJdEntryView]
     jd_after: list[ProposalJdEntryView]
     edited_jd_after: list[ProposalJdEntryView] | None
@@ -262,6 +264,7 @@ class ConsultationView(BaseModel):
     opks_proposals: list[OpksProposalView]
     tasks: list[JdTaskView]
     opks_items: list[OpksItemView]
+    opks_task_status: list[OpksTaskStatusView]
 
 
 class EmployeeTurnWrite(BaseModel):

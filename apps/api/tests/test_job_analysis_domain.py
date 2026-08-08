@@ -23,6 +23,9 @@ from app.job_analysis.domain import (
     MergeTarget,
     OpenIssue,
     OpenIssueKind,
+    OpenIssueTerminalResolution,
+    OpenIssueTerminalResolutionKind,
+    OpksGapAxis,
     Proposal,
     ProposalAction,
     ProposalStatus,
@@ -543,6 +546,131 @@ def test_open_issue_carries_an_optional_reconciliation_task_identity():
     reparsed = OpenIssue.model_validate_json(issue.model_dump_json())
 
     assert reparsed.reconciliation_task_id == "task-direct-1"
+
+
+# ── OPKS gap 欄位與 active 定義(ADR 0054 決定 19–20)──────────────────────────
+
+
+def gap_anchor() -> SourceAnchor:
+    return SourceAnchor(source_ref=employee_ref(), quote="我每天都要對帳")
+
+
+def test_opks_gap_axis_excludes_attitude():
+    """決定 19:`opks_axis` 只含 O／P／K／S。態度掛文件、不由 specialist 產缺口。"""
+
+    assert {member.value for member in OpksGapAxis} == {
+        "output",
+        "indicator",
+        "knowledge",
+        "skill",
+    }
+
+
+def test_open_issue_carries_the_opks_gap_fields():
+    issue = OpenIssue(
+        id="op-1-gap0",
+        kind=OpenIssueKind.INSUFFICIENT_EVIDENCE,
+        summary="無法判斷這項工作交出什麼具體成品",
+        source_anchors=(gap_anchor(),),
+        subject_task_id="task-1",
+        opks_axis=OpksGapAxis.OUTPUT,
+    )
+
+    reparsed = OpenIssue.model_validate_json(issue.model_dump_json())
+
+    assert reparsed.subject_task_id == "task-1"
+    assert reparsed.opks_axis is OpksGapAxis.OUTPUT
+    assert reparsed.terminal_resolution is None
+
+
+def test_opks_axis_requires_a_subject_task():
+    """gap 一定綁一個 Task;沒有 subject 的 gap 無法被 pre-gate 或 prune 對上。"""
+
+    with pytest.raises(ValidationError, match="opks_axis requires subject_task_id"):
+        OpenIssue(
+            id="op-1-gap0",
+            kind=OpenIssueKind.INSUFFICIENT_EVIDENCE,
+            summary="缺少工作產出",
+            source_anchors=(gap_anchor(),),
+            opks_axis=OpksGapAxis.OUTPUT,
+        )
+
+
+def test_subject_task_id_is_not_the_reconciliation_task_id():
+    """決定 19:`subject_task_id` 不得挪用 `reconciliation_task_id`,兩者用途不同。"""
+
+    issue = OpenIssue(
+        id="op-1-gap0",
+        kind=OpenIssueKind.INSUFFICIENT_EVIDENCE,
+        summary="缺少工作產出",
+        source_anchors=(gap_anchor(),),
+        subject_task_id="task-1",
+        opks_axis=OpksGapAxis.OUTPUT,
+    )
+
+    assert issue.reconciliation_task_id is None
+
+
+@pytest.mark.parametrize(
+    "kind",
+    [
+        OpenIssueTerminalResolutionKind.EMPLOYEE_UNKNOWN,
+        OpenIssueTerminalResolutionKind.NOT_APPLICABLE,
+    ],
+)
+def test_terminal_resolution_makes_an_issue_inactive(kind):
+    """決定 20:active issue ≡ `terminal_resolution is None`。"""
+
+    active = OpenIssue(
+        id="op-1-gap0",
+        kind=OpenIssueKind.INSUFFICIENT_EVIDENCE,
+        summary="缺少工作產出",
+        source_anchors=(gap_anchor(),),
+        subject_task_id="task-1",
+        opks_axis=OpksGapAxis.OUTPUT,
+    )
+    assert active.is_active is True
+
+    terminal = active.model_copy(
+        update={
+            "terminal_resolution": OpenIssueTerminalResolution(
+                kind=kind,
+                source_ref=SourceRef(kind=SourceKind.EMPLOYEE_TURN, id="turn-9"),
+            )
+        }
+    )
+
+    assert terminal.is_active is False
+    assert OpenIssue.model_validate_json(
+        terminal.model_dump_json()
+    ).terminal_resolution.kind is kind
+
+
+def test_terminal_resolution_kinds_are_exactly_the_two_employee_answers():
+    """兩個值都是員工的回答;Task 退出 JD 不得借用它們偽造一筆回答(計畫 T13)。"""
+
+    assert {member.value for member in OpenIssueTerminalResolutionKind} == {
+        "employee_unknown",
+        "not_applicable",
+    }
+
+
+def test_open_issue_reads_back_json_written_before_the_gap_fields_existed():
+    """additive optional:舊 `work_model_json` 不需要 migration 也讀得回。"""
+
+    legacy = (
+        '{"id":"issue-1","kind":"證據不足","summary":"無法判斷頻率",'
+        '"source_anchors":[{"source_ref":{"kind":"employee_turn","id":"turn-1"},'
+        '"quote":"我每天都要對帳","question_turn_id":null}],'
+        '"last_asked_turn_id":null,"reconciliation_task_id":null}'
+    )
+
+    issue = OpenIssue.model_validate_json(legacy)
+
+    assert issue.subject_task_id is None
+    assert issue.opks_axis is None
+    assert issue.terminal_resolution is None
+    assert issue.is_active is True
 
 
 def test_excluded_signal_requires_an_anchor():

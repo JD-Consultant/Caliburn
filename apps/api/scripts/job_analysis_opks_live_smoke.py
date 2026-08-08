@@ -201,6 +201,7 @@ async def _seed(
             record=record,
             state=JobAnalysisState(
                 jd_header=JdHeader(),
+                current_duties=(),
                 work_model=CurrentWorkModel(tasks=(_selected_task(), _other_task())),
                 current_jd=(
                     JdTask(

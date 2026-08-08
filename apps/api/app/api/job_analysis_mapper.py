@@ -284,7 +284,12 @@ def to_document_view(loaded: LoadedDocument) -> DocumentView:
         updated_at=loaded.document.updated_at,
         jd_header=to_jd_header_view(loaded.state.jd_header),
         readiness=to_document_readiness_view(
-            assess_readiness(loaded.state.jd_header)
+            assess_readiness(
+                header=loaded.state.jd_header,
+                duties=loaded.state.current_duties,
+                tasks=loaded.state.current_jd,
+                current_opks=loaded.state.current_opks,
+            )
         ),
         tasks=[to_jd_task_view(task) for task in loaded.state.current_jd],
         opks_items=[

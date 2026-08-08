@@ -8,9 +8,8 @@
 因此缺漏必須在成品上看得見是缺的——不自動補、不由 LLM 生成、不靜默省略。
 
 第一版**只回 issue 清單**：沒有 `is_complete`／`ready`／完成百分比，零 issue 時保持安靜，
-不宣稱整份 JD 已完整（ADR 0053 決定 6）。範圍僅限**目前 UI 可修復、且官方規則能確定**的
-表頭缺漏；Duty 與每個 Task 的職能級別規則等該結構切片完成時**加進本函式**，不新增
-scope／version 欄位（ADR 0053 決定 7）。
+不宣稱整份 JD 已完整（ADR 0053 決定 6）。範圍僅限**未來可由員工編輯欄位修復、且官方
+規則能確定**的表頭與 Duty／Task 結構缺漏；不新增 scope／version 欄位（ADR 0053 決定 7）。
 
 刻意不發聲的欄位：
 
@@ -24,13 +23,24 @@ from __future__ import annotations
 
 from enum import StrEnum
 
-from app.job_analysis.domain import DomainModel, JdHeader
+from app.job_analysis.domain import (
+    CurrentJdOpks,
+    DomainModel,
+    Duty,
+    JdHeader,
+    JdTask,
+    OpksEntityKind,
+)
 
 
 class ReadinessIssueCode(StrEnum):
     COMPETENCY_NAME_MISSING = "competency_name_missing"
     WORK_DESCRIPTION_MISSING = "work_description_missing"
     COMPETENCY_LEVEL_MISSING = "competency_level_missing"
+    TASK_DUTY_MISSING = "task_duty_missing"
+    TASK_COMPETENCY_LEVEL_MISSING = "task_competency_level_missing"
+    DUTY_WITHOUT_TASK = "duty_without_task"
+    OPKS_TASK_LINK_MISSING = "opks_task_link_missing"
 
 
 class ReadinessIssue(DomainModel):
@@ -55,13 +65,42 @@ _HEADER_CHECKS: tuple[tuple[str, ReadinessIssueCode], ...] = (
 )
 
 
-def assess_readiness(header: JdHeader) -> DocumentReadiness:
-    """回報目前可確定的表頭缺漏；沒有缺漏時回空清單。"""
+def assess_readiness(
+    *,
+    header: JdHeader,
+    duties: tuple[Duty, ...],
+    tasks: tuple[JdTask, ...],
+    current_opks: CurrentJdOpks,
+) -> DocumentReadiness:
+    """回報目前可確定的表頭與結構缺漏；每個 code 一次。"""
+
+    task_duty_missing = any(task.duty_id is None for task in tasks)
+    task_level_missing = any(task.competency_level is None for task in tasks)
+    assigned_duties = {task.duty_id for task in tasks if task.duty_id is not None}
+    duty_without_task = any(duty.duty_id not in assigned_duties for duty in duties)
+    unlinked_knowledge_or_skill = any(
+        item.entity_kind in {OpksEntityKind.KNOWLEDGE, OpksEntityKind.SKILL}
+        and not item.task_refs
+        and not item.indicator_refs
+        for item in current_opks.items
+    )
+
+    structure_checks = (
+        (task_duty_missing, ReadinessIssueCode.TASK_DUTY_MISSING),
+        (task_level_missing, ReadinessIssueCode.TASK_COMPETENCY_LEVEL_MISSING),
+        (duty_without_task, ReadinessIssueCode.DUTY_WITHOUT_TASK),
+        (unlinked_knowledge_or_skill, ReadinessIssueCode.OPKS_TASK_LINK_MISSING),
+    )
 
     return DocumentReadiness(
         issues=tuple(
             ReadinessIssue(code=code)
             for field, code in _HEADER_CHECKS
             if getattr(header, field) is None
+        )
+        + tuple(
+            ReadinessIssue(code=code)
+            for condition, code in structure_checks
+            if condition
         )
     )

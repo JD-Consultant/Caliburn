@@ -175,6 +175,7 @@ def test_loaded_state_keeps_complete_current_jd_and_opks_values():
     )
     state = JobAnalysisState(
         jd_header=JdHeader(),
+        current_duties=(),
         current_jd=(jd_task(),),
         current_opks=CurrentJdOpks(items=(output_item(),)),
         opks_proposals=(output_proposal(),),

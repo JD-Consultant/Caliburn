@@ -51,6 +51,7 @@ ACTIVE_QUESTION_SCHEMA_ID = "job-analysis-active-question/1"
 CONSULTANT_OPENING_SCHEMA_ID = "job-analysis-consultant-opening/1"
 COMPLETED_TURN_SCHEMA_ID = "job-analysis-completed-turn/1"
 DIRECT_EDIT_SCHEMA_ID = "job-analysis-direct-edit/1"
+JD_HEADER_DIRECT_EDIT_SCHEMA_ID = "job-analysis-jd-header-direct-edit/1"
 PROPOSAL_DECISION_SCHEMA_ID = "job-analysis-proposal-decision/1"
 
 
@@ -158,6 +159,19 @@ class DirectEditPayload(DomainModel):
             raise ValueError(f"{self.edit_kind} requires the completed task")
         if self.after.task_id != self.task_id:
             raise ValueError("direct edit task id must match its completed task")
+        return self
+
+
+class JdHeaderDirectEditPayload(DomainModel):
+    """Immutable before/after receipt for an employee Header replacement."""
+
+    before: JdHeader
+    after: JdHeader
+
+    @model_validator(mode="after")
+    def replacement_must_change_the_header(self):
+        if self.before == self.after:
+            raise ValueError("JD header direct edit must change at least one field")
         return self
 
 
@@ -312,6 +326,7 @@ JournalPayload = (
     ConsultantOpeningPayload
     | CompletedTurnPayload
     | DirectEditPayload
+    | JdHeaderDirectEditPayload
     | OpksDirectEditPayload
     | OpksProposalDecisionPayload
     | OpksGenerationPayload
@@ -325,6 +340,10 @@ _JOURNAL_CONTRACT: dict[type[DomainModel], tuple[JournalKind, str]] = {
     ),
     CompletedTurnPayload: ("employee_turn", COMPLETED_TURN_SCHEMA_ID),
     DirectEditPayload: ("direct_edit", DIRECT_EDIT_SCHEMA_ID),
+    JdHeaderDirectEditPayload: (
+        "direct_edit",
+        JD_HEADER_DIRECT_EDIT_SCHEMA_ID,
+    ),
     OpksDirectEditPayload: ("direct_edit", OPKS_DIRECT_EDIT_SCHEMA_ID),
     OpksProposalDecisionPayload: (
         "proposal_decision",

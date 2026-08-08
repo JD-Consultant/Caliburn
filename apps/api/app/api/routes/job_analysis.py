@@ -12,6 +12,8 @@ from job_analysis_contract import (
     DocumentView,
     ConsultationView,
     EmployeeTurnWrite,
+    JdHeaderView,
+    JdHeaderWrite,
     JdTaskView,
     JdTaskWrite,
     OpksItemView,
@@ -28,6 +30,8 @@ from app.api.job_analysis_mapper import (
     to_document_metadata_view,
     to_document_summary,
     to_document_view,
+    to_jd_header,
+    to_jd_header_view,
     to_jd_task_fields,
     to_jd_task_view,
     to_opks_item_view,
@@ -59,6 +63,7 @@ from app.job_analysis.application import (
     decide_proposal,
     decide_opks_proposal,
     put_document_metadata,
+    put_jd_header,
     reorder_jd_tasks,
     submit_employee_turn,
 )
@@ -131,6 +136,29 @@ async def get_document(
             status=404,
         )
     return to_document_view(loaded)
+
+
+@router.put("/{document_id}/jd-header", response_model=JdHeaderView)
+async def put_jd_header_route(
+    document_id: UUID,
+    body: JdHeaderWrite,
+    idempotency_key: IdempotencyKey,
+    uow_factory: JobAnalysisUnitOfWorkFactory = Depends(
+        get_job_analysis_uow_factory
+    ),
+):
+    try:
+        header = await put_jd_header(
+            uow_factory,
+            document_id=document_id,
+            entry_id=idempotency_key,
+            header=to_jd_header(body),
+        )
+    except ValidationError as error:
+        return domain_validation_error_response(error)
+    except JobAnalysisApplicationError as error:
+        return application_error_response(error)
+    return to_jd_header_view(header)
 
 
 @router.get("/{document_id}/consultation", response_model=ConsultationView)

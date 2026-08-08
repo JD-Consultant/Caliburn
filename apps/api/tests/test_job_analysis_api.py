@@ -344,7 +344,7 @@ async def test_put_creates_then_replaces_only_document_metadata(api_client):
     assert opening.kind == "consultant_opening"
 
 
-async def test_list_and_open_return_only_the_current_jd_projection(api_client):
+async def test_list_and_open_return_the_current_workspace_projection(api_client):
     client, store, _ = api_client
     await client.put(
         f"/api/v1/job-analysis/documents/{DOCUMENT_ID}",
@@ -370,6 +370,8 @@ async def test_list_and_open_return_only_the_current_jd_projection(api_client):
         "document_id",
         "title",
         "updated_at",
+        "jd_header",
+        "readiness",
         "tasks",
         "opks_items",
         "opks_task_status",

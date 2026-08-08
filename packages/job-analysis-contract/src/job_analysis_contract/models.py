@@ -45,6 +45,56 @@ class DocumentSummary(BaseModel):
     updated_at: AwareDatetime
 
 
+class JdHeaderView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    competency_name: str | None
+    occupation_category_name: str | None
+    occupation_name: str | None
+    occupation_code: str | None
+    industry_name: str | None
+    industry_code: str | None
+    work_description: str | None
+    competency_level: conint(ge=1, le=6) | None
+    notes: str | None
+
+
+class JdHeaderWrite(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    competency_name: str | None = None
+    occupation_category_name: str | None = None
+    occupation_name: str | None = None
+    occupation_code: str | None = None
+    industry_name: str | None = None
+    industry_code: str | None = None
+    work_description: str | None = None
+    competency_level: conint(ge=1, le=6) | None = None
+    notes: str | None = None
+
+
+class Code(StrEnum):
+    competency_name_missing = 'competency_name_missing'
+    work_description_missing = 'work_description_missing'
+    competency_level_missing = 'competency_level_missing'
+
+
+class ReadinessIssueView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    code: Code
+
+
+class DocumentReadinessView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    issues: list[ReadinessIssueView]
+
+
 class Kind(StrEnum):
     tool_system = 'tool_system'
     method = 'method'
@@ -185,6 +235,8 @@ class DocumentView(BaseModel):
     document_id: UUID
     title: str
     updated_at: AwareDatetime
+    jd_header: JdHeaderView
+    readiness: DocumentReadinessView
     tasks: list[JdTaskView]
     opks_items: list[OpksItemView]
     opks_task_status: list[OpksTaskStatusView]

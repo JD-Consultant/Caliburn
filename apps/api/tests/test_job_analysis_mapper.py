@@ -4,6 +4,7 @@ from datetime import UTC, datetime
 from uuid import UUID
 
 from job_analysis_contract import (
+    JdHeaderWrite,
     JdTaskWrite,
     OpksItemWrite,
     OpksProposalDecisionWrite,
@@ -11,6 +12,8 @@ from job_analysis_contract import (
 
 from app.api.job_analysis_mapper import (
     to_consultation_view,
+    to_document_view,
+    to_jd_header,
     to_jd_task_fields,
     to_opks_item_view,
     to_opks_proposal_decision,
@@ -88,6 +91,62 @@ def test_empty_responsibility_role_normalizes_to_none():
     )
 
     assert to_jd_task_fields(body).responsibility_role is None
+
+
+def test_jd_header_mapper_trims_text_and_converts_blank_optional_values_to_none():
+    body = JdHeaderWrite.model_validate(
+        {
+            "competency_name": " 門市營運專員 ",
+            "occupation_name": "   ",
+            "industry_code": " G47 ",
+            "notes": "  ",
+        }
+    )
+
+    header = to_jd_header(body)
+
+    assert header.competency_name == "門市營運專員"
+    assert header.occupation_name is None
+    assert header.industry_code == "G47"
+    assert header.notes is None
+    assert header.work_description is None
+    assert header.competency_level is None
+
+
+def test_document_view_carries_header_and_the_application_readiness_result():
+    now = datetime(2026, 8, 9, 9, 0, tzinfo=UTC)
+    header = JdHeader(
+        competency_name="門市營運專員",
+        competency_level=4,
+    )
+    loaded = LoadedDocument(
+        document=DocumentRecord(
+            document_id=UUID("00000000-0000-0000-0000-000000000046"),
+            title="門市營運專員",
+            jd_header=header,
+            work_model=CurrentWorkModel(),
+            active_question=None,
+            authority_generation=1,
+            created_at=now,
+            updated_at=now,
+        ),
+        state=JobAnalysisState(
+            jd_header=header,
+            work_model=CurrentWorkModel(),
+            current_jd=(),
+            proposals=(),
+            current_opks={"items": ()},
+            opks_proposals=(),
+        ),
+        conversation_turns=(),
+    )
+
+    view = to_document_view(loaded)
+
+    assert view.jd_header.competency_name == "門市營運專員"
+    assert [issue.code.value for issue in view.readiness.issues] == [
+        "work_description_missing"
+    ]
 
 
 def test_opks_mapper_normalizes_employee_fields_and_exposes_only_quotes():

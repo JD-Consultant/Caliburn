@@ -25,6 +25,7 @@ from app.job_analysis.application import (  # noqa: E402
     OpksGroundingUnavailable,
     add_jd_task,
     add_opks_item,
+    compute_analysis_input_digest,
     create_document,
     decide_opks_proposal,
     delete_jd_task,
@@ -68,6 +69,24 @@ CONFIG = OpenRouterConfig(
     max_output_tokens=1024,
     timeout_seconds=90,
 )
+
+
+async def _analysis_digest(
+    uow_factory: JobAnalysisUnitOfWorkFactory,
+    document_id,
+    task_id: str,
+) -> str:
+    """該 Task 目前的分析輸入指紋。
+
+    child 只跑被排定的那一份輸入(ADR 0054 決定 10),所以每個呼叫端都得指名它預期的
+    digest;production 的來源是主回合凍結進 receipt 的 `ScheduledOpks`。
+    """
+
+    loaded = await load_document(uow_factory, document_id)
+    assert loaded is not None
+    task = loaded.state.work_model.task_by_id(task_id)
+    assert task is not None
+    return compute_analysis_input_digest(task)
 
 
 @dataclass(frozen=True)
@@ -315,11 +334,13 @@ async def run_scripted_opks_smoke(
     journal_ids: list[str] = []
     scenarios: list[ScenarioMetrics] = []
 
+    task_1_digest = await _analysis_digest(uow_factory, document_id, "task-1")
     generated = await generate_opks_proposals(
         uow_factory,
         adapter=adapter,
         document_id=document_id,
         task_id="task-1",
+        expected_digest=task_1_digest,
         operation_id="opks-generate",
     )
     assert generated.proposal_ids == tuple(
@@ -356,6 +377,7 @@ async def run_scripted_opks_smoke(
         adapter=adapter,
         document_id=document_id,
         task_id="task-1",
+        expected_digest=task_1_digest,
         operation_id="opks-generate",
     )
     assert replay == generated
@@ -489,6 +511,7 @@ async def run_scripted_opks_smoke(
         adapter=adapter,
         document_id=document_id,
         task_id="task-2",
+        expected_digest=await _analysis_digest(uow_factory, document_id, "task-2"),
         operation_id="opks-reuse",
     )
     journal_ids.append("opks-reuse")
@@ -521,6 +544,7 @@ async def run_scripted_opks_smoke(
         adapter=adapter,
         document_id=document_id,
         task_id="task-1",
+        expected_digest=await _analysis_digest(uow_factory, document_id, "task-1"),
         operation_id="opks-pending",
     )
     journal_ids.append("opks-pending")
@@ -563,6 +587,9 @@ async def run_scripted_opks_smoke(
             adapter=adapter,
             document_id=document_id,
             task_id="direct-no-ground-task",
+            # 沒有員工依據是這個 Task 自己的狀態,不是漂移:grounding 在 digest 比對
+            # 之前就擋下來,所以這裡的值到不了比對那一步。
+            expected_digest="unreachable-grounding-fails-first",
             operation_id="opks-no-ground",
         )
     except OpksGroundingUnavailable:

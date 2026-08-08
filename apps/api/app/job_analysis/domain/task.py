@@ -7,7 +7,7 @@ from enum import StrEnum
 from pydantic import model_validator
 
 from .base import DomainModel, NonEmptyText, TaskId
-from .sources import SourceRef, SupportLink
+from .sources import SourceKind, SourceRef, SupportLink
 
 
 class EnablerKind(StrEnum):
@@ -101,6 +101,23 @@ class Task(TaskFields):
     @property
     def effective_support_links(self) -> tuple[SupportLink, ...]:
         return tuple(link for link in self.support_links if link.is_effective)
+
+    @property
+    def effective_employee_support_links(self) -> tuple[SupportLink, ...]:
+        """仍有效、且來自員工的依據。
+
+        這是 OPKS 的**唯一**投影規則:`build_opks_context_packet()` 用它決定
+        specialist 看得到什麼,`compute_analysis_input_digest()` 用它決定要不要
+        再花一次錢。兩邊各寫一份篩選遲早失步,gate 就會擋在跟真正送進模型的輸入
+        不同的東西上,所以只留這一個定義(ADR 0054 決定 12)。
+        """
+
+        return tuple(
+            link
+            for link in self.effective_support_links
+            if link.source_ref.kind
+            in {SourceKind.EMPLOYEE_TURN, SourceKind.DIRECT_EDIT}
+        )
 
     @model_validator(mode="after")
     def merged_into_pairs_with_a_merged_retirement(self):

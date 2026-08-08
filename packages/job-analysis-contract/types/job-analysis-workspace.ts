@@ -93,11 +93,11 @@ export interface OpksItemView {
 }
 /**
  * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
- * via the `definition` "OpksGenerationView".
+ * via the `definition` "OpksTaskStatusView".
  */
-export interface OpksGenerationView {
-  outcome: "proposed" | "no_grounded_candidates";
-  proposal_ids: string[];
+export interface OpksTaskStatusView {
+  task_id: string;
+  status: "awaiting_employee_answer" | "proposals_ready" | "not_ready_for_analysis";
 }
 /**
  * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
@@ -126,6 +126,7 @@ export interface DocumentView {
   updated_at: string;
   tasks: JdTaskView[];
   opks_items: OpksItemView[];
+  opks_task_status: OpksTaskStatusView[];
 }
 /**
  * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
@@ -179,6 +180,7 @@ export interface ConsultationView {
   opks_proposals: OpksProposalView[];
   tasks: JdTaskView[];
   opks_items: OpksItemView[];
+  opks_task_status: OpksTaskStatusView[];
 }
 /**
  * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema

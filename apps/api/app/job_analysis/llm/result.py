@@ -142,6 +142,28 @@ class NextQuestion(DomainModel):
     target: NextQuestionTarget | None = None
 
 
+class IssueResolutionKind(StrEnum):
+    ANSWERED = "answered"
+    EMPLOYEE_UNKNOWN = "employee_unknown"
+    NOT_APPLICABLE = "not_applicable"
+
+
+class IssueResolution(DomainModel):
+    """關掉一個 open issue,**不帶任何工作副作用**(ADR 0054 決定 22)。
+
+    現行 `WorkSignal.resolves_open_issue_ordinal` 與必填的 `disposition` 同層——要關
+    issue 就得鑄一個帶處置的工作訊號。把它複數化並不解決問題:一筆 signal 解三個
+    gap,仍掛著那一筆的副作用。
+
+    這個形狀沒有 disposition、沒有 task_change、沒有 support,**結構上不可能產生
+    工作副作用**;一個答案同時解 P／K／S 三個缺口就是三筆。
+    """
+
+    ordinal: int
+    resolution: IssueResolutionKind
+
+
 class TaskAnalysisResult(DomainModel):
     work_signals: tuple[WorkSignal, ...] = ()
+    issue_resolutions: tuple[IssueResolution, ...] = ()
     next_question: NextQuestion

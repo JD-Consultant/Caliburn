@@ -8,6 +8,7 @@ from uuid import UUID
 from app.job_analysis.domain import (
     CurrentJdOpks,
     JdTask,
+    OpenIssue,
     OpksEntityKind,
     OpksEvidenceLink,
     OpksItem,
@@ -66,6 +67,34 @@ def _item(
                 )
             ),
         ),
+    )
+
+
+def prune_opks_gaps_for_current_jd(
+    open_issues: tuple[OpenIssue, ...],
+    current_jd: tuple[JdTask, ...],
+) -> tuple[OpenIssue, ...]:
+    """移除指向已不在 Current JD 的 Task 的 OPKS 缺口(ADR 0054 決定 26–27)。
+
+    `prune_opks_for_current_jd()` 只收／回 `CurrentJdOpks`,**碰不到
+    `work_model.open_issues`**;缺口的清理需要這個相鄰函式,在同一個 authority
+    transaction、同一批呼叫點一起做。
+
+    **這裡是「移除」,不是寫 `terminal_resolution`。** 那個欄位的兩個值
+    (`employee_unknown`／`not_applicable`)都是**員工的回答**;Task 被刪除、撤回、
+    合併或拆分時員工並沒有回答任何事,借用它們等於偽造一筆不存在的回答,而那筆假
+    回答會進到 packet 的「已問過、勿重問」記憶區,被主顧問與 specialist 當真。
+
+    **merge／split 一律移除,不遷移。** 沿用既有政策「不把舊 refs 猜接到 replacement
+    Task」——沒有人知道新 Task 是不是還缺同一件事。真的還缺,下次分析會自己重新提出,
+    那是有依據的判斷而不是猜測。
+    """
+
+    task_ids = frozenset(task.task_id for task in current_jd)
+    return tuple(
+        issue
+        for issue in open_issues
+        if issue.opks_axis is None or issue.subject_task_id in task_ids
     )
 
 

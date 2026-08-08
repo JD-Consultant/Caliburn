@@ -23,8 +23,12 @@ domain 的 `TaskAnalysisResult`(`result.py`)是內部真相,這一份是**送出
   零消費者;三個 hint 的唯一消費者是下一回合的 packet 自己。domain 欄位保留,
   OPKS 開工時再設計它自己的取得路徑。
 
-名稱用 `task_analysis_result_v2`:模型看到的仍是「Task 分析結果」這個語意,
+名稱用 `task_analysis_result_v3`:模型看到的仍是「Task 分析結果」這個語意,
 版號說明送出去的形狀換了一版;domain 契約沒有跟著改版。
+
+v3 相對 v2 只加一件事:與 `work_signals` 平行的 `issue_resolutions[]`(ADR 0054
+決定 22)。**新增一個必填的頂層陣列已經改變模型看到的輸出形狀,所以升版而不是覆寫
+v2** ——同一個版本號指向兩種契約,凍結的 golden 就失去意義。
 
 **名稱只能用 `[A-Za-z0-9_-]`。** 這是 provider 的硬限制,不是風格:OpenAI 對
 `text.format.name` 就是這條 regex,帶點的 `…​.v2` 會在生成任何 token 之前被 HTTP 400
@@ -57,6 +61,8 @@ from .result import (
     ExcludePayload,
     IdentityAssessment,
     IdentityRelation,
+    IssueResolution,
+    IssueResolutionKind,
     NextQuestion,
     NextQuestionTarget,
     NextQuestionTargetKind,
@@ -72,7 +78,7 @@ from .result import (
 )
 
 
-TASK_ANALYSIS_WIRE_SCHEMA_NAME = "task_analysis_result_v2"
+TASK_ANALYSIS_WIRE_SCHEMA_NAME = "task_analysis_result_v3"
 
 #: 所有「這一格不適用」的中性值。不得與任何 domain enum 值相同。
 NEUTRAL = "none"
@@ -250,8 +256,21 @@ class WireNextQuestion(DomainModel):
     )
 
 
+# 與 work_signals 平行的第三個頂層陣列(ADR 0054 決定 22)。扁平、每 issue 一筆、
+# 零 union——結構上不可能夾帶工作副作用。
+#
+# 什麼時候該用哪一個值住 `TASK_ANALYSIS_INSTRUCTIONS`,不住這裡:schema 的
+# `description` 只承載中性值約定(見本檔開頭第 2 點與 wire schema 的描述預算)。
+class WireIssueResolution(DomainModel):
+    # 欄位名自己說出是哪一組 ordinal(沿用 `resolves_open_issue_ordinal` 的慣例),
+    # 因此不必花 description 預算去講一件名字講得完的事。
+    open_issue_ordinal: int
+    resolution: IssueResolutionKind
+
+
 class TaskAnalysisWire(DomainModel):
     work_signals: tuple[WireSignal, ...] = ()
+    issue_resolutions: tuple[WireIssueResolution, ...] = ()
     next_question: WireNextQuestion
 
 
@@ -281,6 +300,13 @@ def wire_to_task_analysis_result(wire: TaskAnalysisWire) -> TaskAnalysisResult:
     try:
         return TaskAnalysisResult(
             work_signals=tuple(_signal(signal) for signal in wire.work_signals),
+            issue_resolutions=tuple(
+                IssueResolution(
+                    ordinal=resolution.open_issue_ordinal,
+                    resolution=resolution.resolution,
+                )
+                for resolution in wire.issue_resolutions
+            ),
             next_question=_next_question(wire.next_question),
         )
     except ValidationError as error:

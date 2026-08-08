@@ -50,6 +50,7 @@ from app.config import settings  # noqa: E402
 from app.job_analysis.application import (  # noqa: E402
     JobAnalysisState,
     JobAnalysisUnitOfWorkFactory,
+    compute_analysis_input_digest,
     create_document,
     load_document,
 )
@@ -316,8 +317,17 @@ async def _run(args: argparse.Namespace) -> int:
     _write(output_dir / "catalog.json", endpoint)
 
     await _seed(uow_factory, document_id)
+    seeded = await load_document(uow_factory, document_id)
+    assert seeded is not None
+    seeded_task = seeded.state.work_model.task_by_id(SELECTED_TASK_ID)
+    assert seeded_task is not None
     snapshot = await prepare_opks_generation(
-        uow_factory, document_id=document_id, task_id=SELECTED_TASK_ID
+        uow_factory,
+        document_id=document_id,
+        task_id=SELECTED_TASK_ID,
+        # child 只跑被排定的那一份輸入(ADR 0054 決定 10)。這支 CLI 自己種資料、
+        # 種完立刻取,所以預期值就是剛落地的那份。
+        expected_digest=compute_analysis_input_digest(seeded_task),
     )
     _write(output_dir / "packet.json", snapshot.packet)
     (output_dir / "packet.txt").write_text(

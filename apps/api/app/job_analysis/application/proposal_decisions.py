@@ -42,7 +42,10 @@ from .persistence import (
     JournalEntry,
     ProposalDecisionPayload,
 )
-from .opks_authoring import prune_opks_for_current_jd
+from .opks_authoring import (
+    prune_opks_for_current_jd,
+    prune_opks_gaps_for_current_jd,
+)
 from .opks_proposals import stale_invalid_opks_proposals
 from .transition import JobAnalysisState
 
@@ -628,6 +631,16 @@ async def decide_proposal(
             work_model = _prune_missing_reconciliation_issues(
                 work_model,
                 next_jd,
+            )
+            # ADR 0054 決定 26–27:withdraw／merge／split 讓 Task 離開 Current JD 時,
+            # 指向它的 OPKS 缺口一併移除(不遷移到 replacement Task)。
+            work_model = work_model.model_copy(
+                update={
+                    "open_issues": prune_opks_gaps_for_current_jd(
+                        work_model.open_issues,
+                        next_jd,
+                    )
+                }
             )
             current_opks = prune_opks_for_current_jd(
                 CurrentJdOpks(items=await uow.opks.list(document_id)),

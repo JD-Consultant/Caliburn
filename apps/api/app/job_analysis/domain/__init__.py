@@ -55,6 +55,9 @@ from .work_model import (
     ExclusionReason,
     OpenIssue,
     OpenIssueKind,
+    OpenIssueTerminalResolution,
+    OpenIssueTerminalResolutionKind,
+    OpksGapAxis,
 )
 
 __all__ = [
@@ -76,7 +79,10 @@ __all__ = [
     "NonEmptyText",
     "OpenIssue",
     "OpenIssueKind",
+    "OpenIssueTerminalResolution",
+    "OpenIssueTerminalResolutionKind",
     "OpksEntityKind",
+    "OpksGapAxis",
     "OpksEvidenceLink",
     "OpksItem",
     "OpksProposal",

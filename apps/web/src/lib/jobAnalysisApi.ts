@@ -5,7 +5,6 @@ import type {
   DocumentView,
   JdTaskView,
   JdTaskWrite,
-  OpksGenerationView,
   OpksItemView,
   OpksItemWrite,
   OpksProposalDecisionWrite,
@@ -171,20 +170,6 @@ export function deleteOpksItem(
     method: "DELETE",
     headers: mutationHeaders(idempotencyKey),
   });
-}
-
-export function generateOpksProposals(
-  documentId: string,
-  taskId: string,
-  idempotencyKey: string,
-): Promise<OpksGenerationView> {
-  return request<OpksGenerationView>(
-    `/documents/${documentId}/tasks/${taskId}/opks-proposals`,
-    {
-      method: "POST",
-      headers: mutationHeaders(idempotencyKey),
-    },
-  );
 }
 
 export function submitEmployeeTurn(

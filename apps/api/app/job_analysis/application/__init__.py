@@ -39,6 +39,7 @@ from .context import (
 )
 from .consultation import submit_employee_turn
 from .durable_turn import (
+    CommittedTurn,
     StaleAuthoritySnapshot,
     TransitionCommitRejected,
     TurnSnapshot,
@@ -56,12 +57,25 @@ from .opks_authoring import (
     delete_opks_item,
     edit_opks_item,
     prune_opks_for_current_jd,
+    prune_opks_gaps_for_current_jd,
 )
 from .opks_context import (
     OpksContextPacket,
     OpksGroundingUnavailable,
     build_opks_context_packet,
     render_opks_context_packet,
+)
+from .opks_digest import (
+    ScheduledOpks,
+    compute_analysis_input_digest,
+    scheduled_opks_operation_id,
+)
+from .opks_scheduler import (
+    OpksTaskStatus,
+    eligible_opks_candidates,
+    opks_task_status,
+    question_target_task_ids,
+    select_scheduled_opks,
 )
 from .opks_operation import OpksOperationResult, run_opks_operation
 from .opks_generation import (
@@ -77,6 +91,7 @@ from .opks_proposals import (
     stale_invalid_opks_proposals,
 )
 from .opks_verifier import (
+    OpksGap,
     OpksVerificationReport,
     OpksViolation,
     OpksViolationCode,
@@ -151,6 +166,7 @@ __all__ = [
     "ACTIVE_QUESTION_SCHEMA_ID",
     "COMPLETED_TURN_SCHEMA_ID",
     "CONSULTANT_OPENING_SCHEMA_ID",
+    "CommittedTurn",
     "CompletedTurnPayload",
     "ConsultantOpeningPayload",
     "ConcurrentAuthorityChange",
@@ -194,6 +210,8 @@ __all__ = [
     "OpksProposalDecisionPayload",
     "OpksProposalNotDecidable",
     "OpksProposalNotFound",
+    "OpksGap",
+    "OpksTaskStatus",
     "OpksVerificationReport",
     "OpksViolation",
     "OpksViolationCode",
@@ -240,7 +258,14 @@ __all__ = [
     "WORK_MODEL_SCHEMA_ID",
     "add_jd_task",
     "add_opks_item",
+    "ScheduledOpks",
     "build_opks_context_packet",
+    "compute_analysis_input_digest",
+    "eligible_opks_candidates",
+    "opks_task_status",
+    "question_target_task_ids",
+    "scheduled_opks_operation_id",
+    "select_scheduled_opks",
     "create_document",
     "commit_verified_turn",
     "commit_opks_generation",
@@ -256,6 +281,7 @@ __all__ = [
     "prepare_turn",
     "prepare_opks_generation",
     "prune_opks_for_current_jd",
+    "prune_opks_gaps_for_current_jd",
     "put_document_metadata",
     "propose_task_for_jd",
     "reorder_jd_tasks",

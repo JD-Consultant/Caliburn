@@ -2,7 +2,7 @@
 title: Task Analysis 引擎 — 端到端設計(durable PostgreSQL + consultant Web)
 audience: agent-primary(也給人)
 scope: apps/api job_analysis + job_analysis_postgres + job_analysis routes + apps/web workspace
-updated: 2026-08-02
+updated: 2026-08-06
 ---
 
 # Task Analysis 引擎 — 端到端設計
@@ -32,7 +32,7 @@ updated: 2026-08-02
 ## 1. 一句話
 
 員工回一句話 → **assembler** 把現況投影成一份只用 ordinal 說話的 packet → **一次 HTTP** 打
-OpenRouter 拿 `task_analysis_result_v2`(送出去的精簡形狀)→ **mapper** 還原成內部的
+OpenRouter 拿 `task_analysis_result_v3`(送出去的精簡形狀)→ **mapper** 還原成內部的
 `TaskAnalysisResult` → **verifier**(純函式、零 LLM)擋掉所有確定性違規 →
 **transition** 依 identity gate 決定「直接改 Work Model」還是「建立提案交給員工」→ 產出下一題。
 **模型只提候選,application 是唯一寫入者,Proposal 只 gate Current JD。**
@@ -42,7 +42,7 @@ OpenRouter 拿 `task_analysis_result_v2`(送出去的精簡形狀)→ **mapper**
 | 組件 | 是什麼 | 碼 | 權力 |
 |---|---|---|---|
 | domain | Task／SourceRef／SupportLink／open_issues／excluded_signals／Task Proposal，以及 OPKS 的 `OpksItem`／`CurrentJdOpks`／獨立 `OpksProposal` 凍結形狀 | `app/job_analysis/domain/`（OPKS：`opks.py`、`opks_proposal.py`） | 純 Pydantic,frozen;**非法狀態無法被表示**;只 import stdlib＋pydantic。OPKS 已進完整 authority state、人工編輯、Proposal 決策 API 與 Web editor |
-| llm 契約 | Task：內部 `TaskAnalysisResult`＋`task_analysis_result_v2` wire；OPKS：獨立 `OpksResult`＋`opks_result_v1` wire；各自一份 Static Instructions | `app/job_analysis/llm/` | 只描述形狀與判準文字;**不做跨欄位驗證**。OPKS wire 只有 5 個 property、零 union，不擴充既有 Task schema |
+| llm 契約 | Task：內部 `TaskAnalysisResult`＋`task_analysis_result_v3` wire（v3 相對 v2 只多了與 `work_signals` 平行的 `issue_resolutions[]`；**不覆寫 v2**，同一個版本號不得指向兩種契約）；OPKS：獨立 `OpksResult`＋`opks_result_v1` wire；各自一份 Static Instructions | `app/job_analysis/llm/` | 只描述形狀與判準文字;**不做跨欄位驗證**。OPKS wire 只有 5 個 property、零 union，不擴充既有 Task schema |
 | wire mapper | 中性值 → `None` 的純還原 | `llm/wire.py` 的 `wire_to_task_analysis_result()` | **不做語意判斷**;沒有 domain 落點的夾帶內容一律拒絕,不靜默丟棄 |
 | assembler | Task 現況 → `TaskAnalysisPacket`；單一選定 Task → `OpksContextPacket`；兩者都有決定性 rendering | `application/context.py`、`application/opks_context.py` | 純函式;ordinal 的唯一產地。OPKS 只投影選定 Task、有效員工依據、該 Task O/P、全文件 K/S 與相關提案，不送完整 transcript／A／內部 ID |
 | verifier | Task §9.5／§12.3 規則；OPKS decision／ordinal／refs 映射 | `application/verifier.py`、`application/opks_verifier.py` | 純函式；OPKS 會產出 application-side verified changes，但**不判必要性、可觀察性或文字品質** |
@@ -90,7 +90,71 @@ OPKS 是另一個已接通 durable generation 的單 Task operation，不擴充�
    `commit_opks_generation()` 重鎖文件並比對 generation 與 packet read-set，最後才把 verified changes
    轉成 pending `OpksProposal`，和 generation receipt 一起經 `commit_authority_change()` 原子提交。
    同一 `Idempotency-Key` 重送不再呼叫 provider；零 change 也保存
-   `no_grounded_candidates` receipt。Provider failure、refusal、invalid 或 verifier rejected 都不改 Current JD。
+   `no_change` receipt。Provider failure、refusal、invalid 或 verifier rejected 都不改 Current JD。
+
+### 3.1 誰觸發 OPKS：主回合凍結的唯一 child（ADR 0054）
+
+**沒有「產生／重新分析 OPKS」按鈕，也沒有 background worker。** 員工不需要理解 OPKS 階段
+存在；哪個 Task 現在值得分析由 application 純函式決定，不交給模型 routing。
+
+- `eligible_opks_candidates(state, question_task_ids=…)`（`opks_scheduler.py`）是**純函式**：
+  Task 在 Current JD、Work Model Task 為 `ACTIVE`、有 ≥1 筆有效員工依據、沒有指向它的 **active**
+  issue（`OpenIssue.is_active`）、沒有它的 pending／deferred OPKS Proposal、本輪 `next_question`
+  沒問到它。依 Current JD `display_order` 排序回傳，每筆帶 `analysis_input_digest`。
+- **`purpose_result` 不是硬條件，也不得用引文數／字數／涵蓋度加強。** 前者因為工作產出可合法
+  缺省（ADR 0052 決定 15），後者是 0052 決定 6 禁止的完成百分比換皮。證據太薄時由 specialist
+  回全 `uncertain`，終端 receipt 讓浪費上限停在「每個輸入狀態一次呼叫」。
+- 「這個輸入分析過了嗎」由 `select_scheduled_opks()` 對每個候選問 `journal.get()` 回答——child
+  operation ID 是 `opks:auto:{task_id}:{digest}`，由 `scheduled_opks_operation_id()` 推導、**不另存**。
+  因此不需要新的 query port。
+- `commit_verified_turn()` 在同一交易內用 **post-transition** state 排定，寫進
+  `CompletedTurnPayload.scheduled_opks`（最多一筆）。**綁定在 receipt 寫入時凍結**：replay 一律
+  回傳既存 payload 那一筆，`_require_same_replay()` **刻意不比對** `scheduled_opks`。少了這一條，
+  replay 會重跑 scheduler 依當下 state 改選下一個 Task，同一個員工回合因此付兩次錢。
+- **執行點是 `submit_employee_turn()`，不是背景工作。** 主回合提交後，若 payload 帶
+  `scheduled_opks` 就同步跑那一個 child；一次 `/turns` 最多主顧問 ＋ 一個 specialist，
+  員工只看到一個「分析中」。child 的失敗**不得**改變 `/turns` 的結果：四種終端失敗由
+  `generate_opks_proposals()` 自己寫 `failed` receipt，`StaleAuthoritySnapshot` 是
+  abandon（不寫 receipt、不擋下次），兩者都在 `_run_scheduled_opks()` 內被吞掉。
+- **`generate_opks_proposals()` 的 `expected_digest` 是必填的，`prepare_opks_generation()`
+  一開工就比對。** 傳進去的一定是主回合凍結的那個 `ScheduledOpks.analysis_input_digest`——
+  `operation_id` 由 `(task_id, digest)` 推導，三個值必須同源。**不比對就是靜默的雙重付費**：
+  主回合 commit 之後、child 開始之前（crash 後重開、replay 之間）員工仍可能直接編輯那個
+  Task，child 於是用新輸入分析、卻把 receipt 寫在舊 digest 推導出的 ID 上；下一輪 scheduler
+  算出新 digest、`journal.get()` 找不到，同一份輸入再付一次。對不上就 abandon（決定 10），
+  而且發生在 provider 呼叫**之前**——漂移這時已經看得出來，沒有理由先付錢再丟掉。
+  grounding 檢查排在比對之前：「這個 Task 沒有員工依據」是它自己的狀態，不是漂移。
+- **沒有 background worker，因此單純 reload／GET 不會補跑漏掉的 child。** 恢復只發生在
+  兩個地方：同一個 `/turns` 以相同 `Idempotency-Key` replay（replay 分支會讀回既凍結的
+  `scheduled_opks`），或後續回合的 scheduler 再次選到同一個 child ID。程式註解、UI 文案
+  與文檔都不得暗示「開著就會自己補上」；`test_reloading_the_document_does_not_run_the_missing_child`
+  就是擋住日後有人在讀取路徑加隱性 worker 的那道牆。
+- `analysis_input_digest`（`opks_digest.py`）只吃 Task：六個語意欄位 ＋
+  `Task.effective_employee_support_links`。**排除** `CurrentJdOpks`／`OpksProposal` 狀態（否則
+  接受 Proposal 就會 ping-pong）與 `rejection_reason`（REJECTED 強制帶 reason，進 digest 就是
+  付費 reject loop）。投影規則與 `build_opks_context_packet()` 共用同一個 domain property，
+  兩邊各寫一份遲早失步。canonical JSON + SHA-256，**不得改用內建 `hash()`**（PYTHONHASHSEED
+  隨機化會讓重開後同一輸入付兩次錢）。
+
+### 3.2 缺口只有一條解決通道（ADR 0054 決定 22–23）
+
+缺口走 `task_analysis_result_v3` 的第三個頂層陣列 `issue_resolutions[]`（`{ordinal,
+resolution}`，扁平、每 issue 一筆），**不走 `WorkSignal`**。三個值：`answered` 沿用現行語意
+（移出 `open_issues`）；`employee_unknown`／`not_applicable` 不移除，改寫入 `terminal_resolution`
+轉成「已問過、勿重問」的 context memory。`source_ref` 由 application 蓋，不進 wire。
+
+- **`answered` 的機械前提**：同一輪必須有一筆針對該 gap `subject_task_id` 的 `support_only`
+  或 `revise`（`_leaves_employee_evidence_on()`）。少了它 digest 不變、OPKS 不會再分析，
+  缺口被**假關閉**——員工以為答過了，系統卻永遠不會用那個答案。
+- **`resolves_open_issue_ordinal` 不得用來關缺口**（`RESOLUTION_OPKS_GAP_NEEDS_ISSUE_RESOLUTION`）。
+  ADR 0047 把那個欄位開放給「模型自己提出的」open issue，理由是只有主顧問知道自己上一輪問過
+  什麼；OPKS 缺口由 specialist 提出，且上面那條前提是機械可判的，所以不在 0047 的範圍內。
+  缺口在資料上長得跟一般 issue 一樣（沒有 `reconciliation_task_id`），**不擋就是一扇後門**：
+  模型送一筆帶當輪 anchor 的訊號即可整筆刪除缺口、什麼依據都不留。帶依據的訊號也一樣擋——
+  放行等於把前提複製到第二處。判別用 `subject_task_id`（domain 保證 `opks_axis` 非空必有它，
+  且全 repo 只有 `_gap_issues()` 會寫它）。**0047 對沒有 subject Task 的 issue 原樣有效。**
+- 主顧問 prompt 因此明寫「缺口一律用 `issue_resolutions` 關，不填
+  `resolves_open_issue_ordinal`」：任何 violation 都會退掉整輪，模型走錯門就白付一次錢。
 
 `TaskFields` 舊的兩個 OPKS hint 已退役；正式 O/P 的唯一資料來源是 `CurrentJdOpks`，不留第二份真相。
 
@@ -125,8 +189,20 @@ RFC 9457 `application/problem+json`；path-scoped handler 會把舊 routes 的�
 Current JD Task 的 POST／PUT／DELETE 與排序 PUT 都要求 `Idempotency-Key`，原樣映射成
 Journal `entry_id`；沒有 middleware、隱藏 retry 或第二套寫入邏輯。員工清空 optional text 時，
 HTTP DTO mapper（與 LLM 的 `wire.py` 無關）先 trim 並轉成 `null`；必填 statement 變空則回 `invalid-request`，不讓半成品進 domain。
-`POST …/tasks/{task_id}/opks-proposals` 只回 durable `outcome` 與 `proposal_ids`；不回模型 raw output、
-Work Model、Evidence ID 或 provider detail。它只建立待員工決定的 Proposal，不直接寫 Current JD OPKS。
+**`POST …/tasks/{task_id}/opks-proposals` 已退役，不得復活**（ADR 0054 決定 1）。OPKS 的唯一 AI 入口是
+`POST …/turns` 排定的 child：員工不需要理解 OPKS 階段的存在，也不該由他判斷哪個 Task 已經談夠、
+何時該按。連帶退役的還有 `OpksGenerationView` 契約型別與 Web 的「產生建議」按鈕。
+**員工手動新增／編輯／刪除 O/P/K/S 的端點保留**——那不是 AI 入口。AI 仍然只建立待員工決定的
+Proposal，不直接寫 Current JD OPKS。
+
+`DocumentView` 與 `ConsultationView` 帶 `opks_task_status[]`，每筆 `{ task_id, status }`。
+規則是 `opks_task_status()` 純函式（ADR 0052 決定 1），contract 只承載結果（決定 2），
+**Web 直接呈現、不自行重算**（決定 3）。狀態只有三個值，對應 ADR 0054 決定 36 允許的**全部**
+措辭——`not_ready_for_analysis`／`awaiting_employee_answer`／`proposals_ready`，中文字串住
+`jobAnalysisOpks.ts`，受 0052 決定 7 約束（不得用「不完整」「不合格」「未通過」）。
+**缺口優先於待審提案**：兩者同時存在是常態（決定 18 的 item-level 部分發布），只說
+「已可提出建議」會讓員工以為已經談完。**判不出來的 Task 不出現在陣列裡**，因此沒有第四個
+標籤也沒有完成百分比——0052 決定 6：「無法確定的一律不提示。」
 Web 的 `/workspace` 用 `DocumentLibrary` 列出／建立／改名；`/workspace/[document_id]` 用
 `ConsultationWorkspace` 同頁組合 `ConsultationPanel`、Task／OPKS Proposal cards、`TaskEditor` 與
 `OpksEditor`，一次只開一份文件。OPKS 人工變更也採明確儲存，成功後只 invalidate document、
@@ -143,7 +219,8 @@ Journal entry 並設為 `active_question`；不呼叫模型、不另建 chat tab
 transcript 同時供下一輪 packet 與之後的 Consultation View 使用。
 one-stage prompt 不把訪談寫成固定問卷：先理解職位的服務對象與目的，每段完整回答可辨識
 0..N 個工作訊號；故事仍有資訊時可深挖，故事結束後回到例行、週期與例外責任。下一題優先處理
-會改變 Task 邊界的矛盾／責任問題，再處理 open issue 與遺漏掃描。pending／deferred Proposal
+會改變 Task 邊界的矛盾／責任問題，再處理一般 open issue、**OPKS 缺口**與遺漏掃描
+（ADR 0054 決定 21 的 agenda 順序，實作住 `context.py` 的 `_agenda_rank()`）。pending／deferred Proposal
 只是待決假說，不會凍結訪談；第一版沒有完成 gate，模型不得宣稱訪談或 JD 已完成。這些是
 scripted smoke 保護的顧問行為基線，不代表模型品質已通過。
 既有 Task 在下一次 AI 互動時看到 JD/Work Model 差異；JD-only Task 先落一筆
@@ -195,7 +272,7 @@ Consultation turn 不再重複呼叫它。
 |---|---|---|
 | `verified` | 通過 verifier | 交給 transition |
 | `rejected` | parse 得出來但違反確定性規則 | 不得套用;`report.violations` 有逐條理由 |
-| `invalid_output` | 不是合法的 `task_analysis_result_v2` JSON,或還原不成 domain 契約(夾帶) | 重組 context 再來,不是 retry 同一份 |
+| `invalid_output` | 不是合法的 `task_analysis_result_v3` JSON,或還原不成 domain 契約(夾帶) | 重組 context 再來,不是 retry 同一份 |
 | `refused` | 模型拒答 | **不是錯誤,也不可重試** |
 | `failed` | timeout／連線／非 200／provider error／截斷／response model 不符 | 依 `detail` 的 kind 決定；`truncated` 要調 `max_tokens`，`model_mismatch` 不得拿來判斷產品品質 |
 
@@ -300,6 +377,29 @@ JD 只在員工決定提案時才改。
   因此 API key 沒有進檔案的路徑。Git 只收 `docs/experiments/` 的精簡報告。
 - `--max-generation-calls 0` 只做 catalog preflight,不建文件、不花錢。working tree dirty 時 CLI 在付費前停止。
 - 它**不是**瀏覽器 E2E:不驗 UI 點擊、CORS 或前端錯誤顯示。單次 trial 也不能宣稱穩定品質或比較模型。
+
+**這支的場景永遠不會排定 OPKS child。** 訪談只產生 Proposal,沒有員工決策步驟,所以沒有
+Task 進得了 Current JD,pre-gate 一次都不會通過。要觀察 0054 那條線得用下面那一支。
+
+### 8.1.1 OPKS 漸進式蒐集的 live smoke(`scripts/job_analysis_opks_elicitation_live_smoke.py`)
+
+同樣是一次性診斷 CLI,差別只有場景:它把**單一** Task 直接種進 Current JD(走
+`commit_authority_change()`),訪談才走得到主回合 → 排定 child → 缺口 → 追問 → 回答 →
+再分析。只種一個 Task 是成本護欄——pre-gate 逐 Task,多一個就多一條 child。
+
+回答的是 scripted 測試回答不了的四件事(ADR 0054 計畫 T18):specialist 在證據薄時是否
+真的回 `uncertain`;gap 摘要是否被寫成問句(決定 16);主顧問是否把 K/S 問成認領題
+(ADR 0048 決定 14);`issue_resolutions[]` 是否被當成偷懶關閉的出口(0054 後果段已承認
+verifier 擋不住)。加一點:模型會不會仍想用 `resolves_open_issue_ordinal` 關缺口。
+
+- 硬上限 **5 次 generation call、US$1.80、零 retry**;3 回合主顧問 ＋ 最多 2 次 child
+  (缺口 active 期間 pre-gate 擋住同一個 Task,所以中間那回合不會再排)。CLI 只能往下調。
+- **逐 call 記錄與結算,不是逐回合。** 一個 `/turns` 可能有兩次呼叫,只取最後一次會漏掉
+  specialist 那次的成本與內容。capture 用送出的 schema 名字分辨主顧問與 specialist。
+- `observations.json` 只做**機械抽取**:缺口摘要、結尾是不是問號、主顧問問句原文、
+  送出的 `issue_resolutions`。K/S 有沒有問成認領題是語意判斷,只列原文給人讀,不自動判。
+- 已知不忠實:種下的依據不在 transcript 裡;員工回合預先凍結,接不上主顧問當下真正問的
+  那一題。這兩點寫在 manifest 的 `limitations`,不得在報告裡略過。
 
 ### 8.2 開發用便宜模型,生產用貴模型——以及哪些問題不准用便宜模型回答
 

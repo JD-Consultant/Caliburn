@@ -21,6 +21,7 @@ from app.job_analysis.application import (
 from app.job_analysis.domain import (
     CurrentWorkModel,
     JdEntry,
+    JdHeader,
     JdTask,
     MergeTarget,
     OpenIssue,
@@ -105,6 +106,7 @@ def jd_task(
 
 def state(*, jd: tuple[JdTask, ...] = (), proposals=()) -> JobAnalysisState:
     return JobAnalysisState(
+        jd_header=JdHeader(),
         work_model=CurrentWorkModel(
             tasks=(task("task-1", "每週彙整營運週報"), task("task-2", "每週追蹤缺料"))
         ),
@@ -187,6 +189,7 @@ IN_JD = (jd_task("task-1", "每週彙整營運週報"),)
 def partial_state(statement: str = "每週整理週報") -> JobAnalysisState:
     task_id = "task-direct-1"
     return JobAnalysisState(
+        jd_header=JdHeader(),
         work_model=CurrentWorkModel(
             open_issues=(
                 OpenIssue(
@@ -215,6 +218,7 @@ def partial_state(statement: str = "每週整理週報") -> JobAnalysisState:
 def model_raised_issue_state() -> JobAnalysisState:
     """turn 1 的模型提了一個責任邊界問題;turn 2 員工回答了它。"""
     return JobAnalysisState(
+        jd_header=JdHeader(),
         work_model=CurrentWorkModel(
             tasks=(task("task-1", "每週彙整營運週報"), task("task-2", "每週追蹤缺料")),
             open_issues=(
@@ -573,6 +577,7 @@ def test_merge_preserves_member_support_and_adds_the_current_signal():
         update={"support_links": (link("turn-old-2", "先前缺料故事"),)}
     )
     current = JobAnalysisState(
+        jd_header=JdHeader(),
         work_model=CurrentWorkModel(tasks=(first, second)),
     )
 
@@ -649,7 +654,9 @@ def test_split_assigns_only_the_selected_parent_support_to_each_child():
             )
         }
     )
-    current = JobAnalysisState(work_model=CurrentWorkModel(tasks=(parent,)))
+    current = JobAnalysisState(
+        jd_header=JdHeader(), work_model=CurrentWorkModel(tasks=(parent,))
+    )
     children = (
         SplitChildPayload(
             task_fields=fields("每週彙整營運週報"),
@@ -850,7 +857,9 @@ def test_id_allocation_is_deterministic_for_the_same_operation_and_state():
 
 def test_operation_id_collision_never_overwrites_a_different_task():
     existing = task("op-1-t0", "既有且不同的工作")
-    before = JobAnalysisState(work_model=CurrentWorkModel(tasks=(existing,)))
+    before = JobAnalysisState(
+        jd_header=JdHeader(), work_model=CurrentWorkModel(tasks=(existing,))
+    )
 
     outcome = apply(signal(), current=before, operation_id="op-1")
 
@@ -865,14 +874,15 @@ def test_state_rejects_duplicate_jd_and_proposal_ids():
         jd_task("task-1", "版本二", display_order=1),
     )
     with pytest.raises(ValidationError, match="duplicate current JD task ids"):
-        JobAnalysisState(current_jd=duplicate_jd)
+        JobAnalysisState(jd_header=JdHeader(), current_jd=duplicate_jd)
 
     duplicate = existing_withdraw_proposal()
     with pytest.raises(ValidationError, match="duplicate proposal ids"):
-        JobAnalysisState(proposals=(duplicate, duplicate))
+        JobAnalysisState(jd_header=JdHeader(), proposals=(duplicate, duplicate))
 
     with pytest.raises(ValidationError, match="current JD must be sorted"):
         JobAnalysisState(
+            jd_header=JdHeader(),
             current_jd=(
                 jd_task("task-2", "二", display_order=1),
                 jd_task("task-1", "一", display_order=0),
@@ -881,6 +891,7 @@ def test_state_rejects_duplicate_jd_and_proposal_ids():
 
     with pytest.raises(ValidationError, match="display orders must be unique"):
         JobAnalysisState(
+            jd_header=JdHeader(),
             current_jd=(
                 jd_task("task-1", "一", display_order=0),
                 jd_task("task-2", "二", display_order=0),
@@ -905,6 +916,7 @@ def gap_state(*, terminal=None) -> JobAnalysisState:
     )
 
     return JobAnalysisState(
+        jd_header=JdHeader(),
         work_model=CurrentWorkModel(
             tasks=(task("task-1", "每週彙整營運週報"),),
             open_issues=(

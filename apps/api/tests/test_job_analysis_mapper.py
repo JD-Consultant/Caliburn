@@ -28,6 +28,7 @@ from app.job_analysis.domain import (
     CurrentWorkModel,
     EnablerKind,
     JdEntry,
+    JdHeader,
     JdTask,
     OpksEntityKind,
     OpksEvidenceLink,
@@ -228,6 +229,7 @@ def test_consultation_view_keeps_history_without_leaking_internal_authority():
             updated_at=now,
         ),
         state=JobAnalysisState(
+            jd_header=JdHeader(),
             work_model=CurrentWorkModel(tasks=(task,)),
             current_jd=(jd_task,),
             proposals=(proposal,),

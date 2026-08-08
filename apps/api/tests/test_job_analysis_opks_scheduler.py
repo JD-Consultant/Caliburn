@@ -19,6 +19,7 @@ from app.job_analysis.application import (
 from app.job_analysis.domain import (
     CurrentJdOpks,
     CurrentWorkModel,
+    JdHeader,
     JdTask,
     OpenIssue,
     OpenIssueKind,
@@ -88,6 +89,7 @@ def state(
     current_opks: CurrentJdOpks | None = None,
 ) -> JobAnalysisState:
     return JobAnalysisState(
+        jd_header=JdHeader(),
         work_model=CurrentWorkModel(tasks=tasks, open_issues=open_issues),
         current_jd=jd,
         current_opks=current_opks or CurrentJdOpks(),

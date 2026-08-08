@@ -70,6 +70,7 @@ from app.job_analysis.application.opks_operation import (  # noqa: E402
 from app.job_analysis.domain import (  # noqa: E402
     CurrentJdOpks,
     CurrentWorkModel,
+    JdHeader,
     JdTask,
     OpksEntityKind,
     OpksEvidenceLink,
@@ -199,6 +200,7 @@ async def _seed(
             uow,
             record=record,
             state=JobAnalysisState(
+                jd_header=JdHeader(),
                 work_model=CurrentWorkModel(tasks=(_selected_task(), _other_task())),
                 current_jd=(
                     JdTask(

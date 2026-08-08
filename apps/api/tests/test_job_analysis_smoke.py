@@ -28,6 +28,7 @@ from app.job_analysis.domain import (
     Enabler,
     EnablerKind,
     ExclusionReason,
+    JdHeader,
     OpenIssueKind,
     RetirementReason,
     SourceKind,
@@ -110,7 +111,7 @@ async def run_round(
     active_question: ActiveQuestion | None = None,
     operation_id: str = "op-1",
 ) -> tuple[TransitionResult, str, str]:
-    state = state or JobAnalysisState()
+    state = state or JobAnalysisState(jd_header=JdHeader())
     packet = build_context_packet(
         transcript=transcript,
         current_turn_id=current_turn_id,
@@ -379,7 +380,9 @@ async def test_a_correction_withdraws_an_existing_task_and_supersedes_its_eviden
         ),
         current_turn_id="turn-4",
         scripted=scripted,
-        state=JobAnalysisState(work_model=CurrentWorkModel(tasks=(existing,))),
+        state=JobAnalysisState(
+            jd_header=JdHeader(), work_model=CurrentWorkModel(tasks=(existing,))
+        ),
     )
 
     withdrawn = transition.state.work_model.task_by_id("task-1")
@@ -431,7 +434,9 @@ async def test_a_short_answer_is_only_interpretable_through_the_active_question(
         current_turn_id="turn-4",
         scripted=scripted,
         active_question=ActiveQuestion(turn_id="turn-3", text=asked),
-        state=JobAnalysisState(work_model=CurrentWorkModel(tasks=(existing,))),
+        state=JobAnalysisState(
+            jd_header=JdHeader(), work_model=CurrentWorkModel(tasks=(existing,))
+        ),
     )
 
     # packet 明確告訴模型現在這一題是什麼,新依據也記下它回答的是哪一題。
@@ -490,6 +495,7 @@ async def test_a_pending_proposal_does_not_block_the_next_coverage_question():
         current_turn_id="turn-2",
         scripted=scripted,
         state=JobAnalysisState(
+            jd_header=JdHeader(),
             work_model=CurrentWorkModel(tasks=(existing,)),
             proposals=(proposal,),
         ),

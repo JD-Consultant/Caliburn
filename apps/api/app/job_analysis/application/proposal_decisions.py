@@ -12,6 +12,7 @@ from app.job_analysis.domain import (
     CurrentJdOpks,
     CurrentWorkModel,
     JdEntry,
+    JdHeader,
     JdTask,
     Proposal,
     ProposalAction,
@@ -357,6 +358,7 @@ async def _persist(
     current_opks: CurrentJdOpks | None = None,
 ) -> None:
     state = JobAnalysisState(
+        jd_header=JdHeader(),
         work_model=work_model,
         current_jd=current_jd,
         proposals=proposals,

@@ -29,15 +29,18 @@ from .errors import (
     DocumentNotFound,
     IdempotencyConflict,
     InvalidJdTaskOrder,
+    JdHeaderNotChanged,
     JdTaskNotFound,
 )
 from .persistence import (
     CONSULTANT_OPENING_SCHEMA_ID,
     DIRECT_EDIT_SCHEMA_ID,
+    JD_HEADER_DIRECT_EDIT_SCHEMA_ID,
     ConsultantOpeningPayload,
     DirectEditPayload,
     DocumentRecord,
     DocumentSummary,
+    JdHeaderDirectEditPayload,
     JobAnalysisUnitOfWork,
     JobAnalysisUnitOfWorkFactory,
     JournalEntry,
@@ -98,6 +101,19 @@ def _require_direct_edit(
         raise IdempotencyConflict(
             f"entry {entry.entry_id!r} already records "
             f"{entry.payload.edit_kind!r}"
+        )
+    return entry.payload
+
+
+def _require_jd_header_direct_edit(
+    entry: JournalEntry,
+) -> JdHeaderDirectEditPayload:
+    if entry.kind != "direct_edit" or not isinstance(
+        entry.payload,
+        JdHeaderDirectEditPayload,
+    ):
+        raise IdempotencyConflict(
+            f"entry {entry.entry_id!r} already belongs to another operation"
         )
     return entry.payload
 
@@ -356,6 +372,61 @@ async def load_document(
             ),
             conversation_turns=turns,
         )
+
+
+async def put_jd_header(
+    uow_factory: JobAnalysisUnitOfWorkFactory,
+    *,
+    document_id: UUID,
+    entry_id: str,
+    header: JdHeader,
+) -> JdHeader:
+    """Persist one employee-authored Header through the shared authority seam."""
+
+    async with uow_factory() as uow:
+        record = await _locked_document(uow, document_id)
+        existing_entry = await uow.journal.get(document_id, entry_id)
+        if existing_entry is not None:
+            payload = _require_jd_header_direct_edit(existing_entry)
+            if payload.after != header:
+                raise IdempotencyConflict(
+                    f"entry {entry_id!r} was replayed with another JD header"
+                )
+            return payload.after
+
+        if record.jd_header == header:
+            raise JdHeaderNotChanged(
+                "JD header edit must change at least one field"
+            )
+
+        now = _utcnow()
+        await commit_authority_change(
+            uow,
+            record=record,
+            state=JobAnalysisState(
+                jd_header=header,
+                work_model=record.work_model,
+                current_jd=await uow.tasks.list(document_id),
+                proposals=await uow.proposals.list(document_id),
+                current_opks={"items": await uow.opks.list(document_id)},
+                opks_proposals=await uow.opks_proposals.list(document_id),
+            ),
+            journal_entries=(
+                JournalEntry(
+                    document_id=document_id,
+                    entry_id=entry_id,
+                    kind="direct_edit",
+                    payload_schema_id=JD_HEADER_DIRECT_EDIT_SCHEMA_ID,
+                    payload=JdHeaderDirectEditPayload(
+                        before=record.jd_header,
+                        after=header,
+                    ),
+                    created_at=now,
+                ),
+            ),
+            updated_at=now,
+        )
+        return header
 
 
 async def add_jd_task(

@@ -192,6 +192,8 @@ git commit -m "feat(job-analysis): persist JD header with current authority"
 **Files:**
 - Modify: `apps/api/app/job_analysis/application/authoring.py`
 - Modify: `apps/api/app/job_analysis/application/errors.py`
+- Modify: `apps/api/app/job_analysis/application/persistence.py`
+- Modify: `apps/api/app/adapters/job_analysis_postgres/serialization.py`
 - Modify: `apps/api/app/api/job_analysis_mapper.py`
 - Modify: `apps/api/app/api/job_analysis_problems.py`
 - Modify: `apps/api/app/api/routes/job_analysis.py`
@@ -204,6 +206,7 @@ git commit -m "feat(job-analysis): persist JD header with current authority"
 
 **Interfaces:**
 - Produces: `put_jd_header(uow_factory, *, document_id: UUID, entry_id: str, header: JdHeader) -> JdHeader`.
+- Journal: `JdHeaderDirectEditPayload(before, after)` with schema id `job-analysis-jd-header-direct-edit/1`; Header edits are authority history, **not Task Evidence**, so they do not create a `SourceRef`.
 - HTTP: `PUT /api/v1/job-analysis/documents/{document_id}/jd-header`, requires `Idempotency-Key`.
 - Contract: `JdHeaderWrite`, `JdHeaderView`, `DocumentReadinessView`; `DocumentView` carries `jd_header` and `readiness`.
 
@@ -221,7 +224,7 @@ async def test_put_header_trims_and_maps_empty_optional_text_to_none(client):
     assert response.json()["notes"] is None
 ```
 
-另測 Journal 有 direct-edit receipt、generation +1、同 key 同 payload replay、同 key 不同 payload typed 409、值域錯誤 typed 422。
+另測 Journal 有 typed direct-edit receipt、generation +1、同 key 同 payload replay、同 key 不同 payload typed 409、no-op／值域錯誤 typed 422。
 
 - [ ] **Step 2: Run red tests**
 
@@ -231,7 +234,7 @@ Expected: FAIL because route and DTOs do not exist.
 
 - [ ] **Step 3: Implement `put_jd_header()` through `commit_authority_change()`**
 
-Use deterministic `SourceRef(kind=direct_edit, id=entry_id)` and no LLM call. The mapper owns `trim -> None`; blank optional text must never enter domain.
+新增最小 `JdHeaderDirectEditPayload(before, after)` 並接進既有 Journal payload deserializer；`before == after` 以 typed invalid request 拒絕。Header 是整體背景而非 Task Evidence，**不得建立 `SourceRef`**。不呼叫 LLM。The mapper owns `trim -> None`; blank optional text must never enter domain.
 
 - [ ] **Step 4: Extend schema and regenerate both languages**
 

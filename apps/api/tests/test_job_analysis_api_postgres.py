@@ -200,6 +200,119 @@ async def test_local_web_task_editing_survives_reload_and_rename_is_metadata_onl
     assert journal_after == journal_before
 
 
+async def test_put_jd_header_trims_optional_text_and_returns_server_readiness(
+    postgres_api_client,
+    cleanup_job_analysis_rows,
+):
+    client, factory, _ = postgres_api_client
+    document_id = cleanup_job_analysis_rows
+    root = f"/api/v1/job-analysis/documents/{document_id}"
+    assert (await client.put(root, json={"title": "門市營運專員"})).status_code == 201
+
+    put = await client.put(
+        f"{root}/jd-header",
+        headers={"Idempotency-Key": "header-1"},
+        json={
+            "competency_name": " 門市營運專員 ",
+            "notes": "   ",
+            "competency_level": 4,
+        },
+    )
+    reloaded = await client.get(root)
+    replay = await client.put(
+        f"{root}/jd-header",
+        headers={"Idempotency-Key": "header-1"},
+        json={
+            "competency_name": " 門市營運專員 ",
+            "notes": "   ",
+            "competency_level": 4,
+        },
+    )
+    persisted = await load_document(factory, document_id)
+
+    assert put.status_code == 200
+    assert put.json()["competency_name"] == "門市營運專員"
+    assert put.json()["notes"] is None
+    assert put.json()["occupation_name"] is None
+    assert reloaded.status_code == 200
+    assert reloaded.json()["jd_header"] == put.json()
+    assert reloaded.json()["readiness"]["issues"] == [
+        {"code": "work_description_missing"}
+    ]
+    assert replay.status_code == 200
+    assert replay.json() == put.json()
+    assert persisted is not None
+    assert persisted.document.authority_generation == 1
+
+
+async def test_put_jd_header_rejects_an_idempotency_collision_as_a_problem(
+    postgres_api_client,
+    cleanup_job_analysis_rows,
+):
+    client, _, _ = postgres_api_client
+    document_id = cleanup_job_analysis_rows
+    root = f"/api/v1/job-analysis/documents/{document_id}"
+    assert (await client.put(root, json={"title": "門市營運專員"})).status_code == 201
+
+    first = await client.put(
+        f"{root}/jd-header",
+        headers={"Idempotency-Key": "header-collision"},
+        json={"competency_name": "門市營運專員"},
+    )
+    collision = await client.put(
+        f"{root}/jd-header",
+        headers={"Idempotency-Key": "header-collision"},
+        json={"competency_name": "資深門市營運專員"},
+    )
+
+    assert first.status_code == 200
+    assert collision.status_code == 409
+    assert collision.headers["content-type"] == "application/problem+json"
+    assert collision.json()["type"] == (
+        "https://caliburn.dev/problems/job-analysis/idempotency-conflict"
+    )
+
+
+async def test_put_jd_header_reports_no_op_and_invalid_bodies_as_typed_422(
+    postgres_api_client,
+    cleanup_job_analysis_rows,
+):
+    client, factory, _ = postgres_api_client
+    document_id = cleanup_job_analysis_rows
+    root = f"/api/v1/job-analysis/documents/{document_id}"
+    assert (await client.put(root, json={"title": "門市營運專員"})).status_code == 201
+
+    no_op = await client.put(
+        f"{root}/jd-header",
+        headers={"Idempotency-Key": "header-no-op"},
+        json={},
+    )
+    invalid_level = await client.put(
+        f"{root}/jd-header",
+        headers={"Idempotency-Key": "header-invalid-level"},
+        json={"competency_level": 7},
+    )
+    invalid_body = await client.put(
+        f"{root}/jd-header",
+        headers={"Idempotency-Key": "header-invalid-body"},
+        json={"unknown_header_field": "nope"},
+    )
+    missing_key = await client.put(
+        f"{root}/jd-header",
+        json={"competency_name": "門市營運專員"},
+    )
+    persisted = await load_document(factory, document_id)
+
+    for response in (no_op, invalid_level, invalid_body, missing_key):
+        assert response.status_code == 422
+        assert response.headers["content-type"] == "application/problem+json"
+        assert response.json()["type"] == (
+            "https://caliburn.dev/problems/job-analysis/invalid-request"
+        )
+    assert persisted is not None
+    assert persisted.document.authority_generation == 0
+
+
 async def test_consultant_turn_proposal_decision_and_reload_use_real_postgres(
     postgres_api_client,
     postgres_session_factory,

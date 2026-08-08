@@ -36,6 +36,85 @@
         "updated_at": { "type": "string", "format": "date-time" }
       }
     },
+    "JdHeaderView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "competency_name",
+        "occupation_category_name",
+        "occupation_name",
+        "occupation_code",
+        "industry_name",
+        "industry_code",
+        "work_description",
+        "competency_level",
+        "notes"
+      ],
+      "properties": {
+        "competency_name": { "type": ["string", "null"] },
+        "occupation_category_name": { "type": ["string", "null"] },
+        "occupation_name": { "type": ["string", "null"] },
+        "occupation_code": { "type": ["string", "null"] },
+        "industry_name": { "type": ["string", "null"] },
+        "industry_code": { "type": ["string", "null"] },
+        "work_description": { "type": ["string", "null"] },
+        "competency_level": {
+          "type": ["integer", "null"],
+          "minimum": 1,
+          "maximum": 6
+        },
+        "notes": { "type": ["string", "null"] }
+      }
+    },
+    "JdHeaderWrite": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "competency_name": { "type": ["string", "null"], "default": null },
+        "occupation_category_name": {
+          "type": ["string", "null"],
+          "default": null
+        },
+        "occupation_name": { "type": ["string", "null"], "default": null },
+        "occupation_code": { "type": ["string", "null"], "default": null },
+        "industry_name": { "type": ["string", "null"], "default": null },
+        "industry_code": { "type": ["string", "null"], "default": null },
+        "work_description": { "type": ["string", "null"], "default": null },
+        "competency_level": {
+          "type": ["integer", "null"],
+          "minimum": 1,
+          "maximum": 6,
+          "default": null
+        },
+        "notes": { "type": ["string", "null"], "default": null }
+      }
+    },
+    "ReadinessIssueView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code"],
+      "properties": {
+        "code": {
+          "type": "string",
+          "enum": [
+            "competency_name_missing",
+            "work_description_missing",
+            "competency_level_missing"
+          ]
+        }
+      }
+    },
+    "DocumentReadinessView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["issues"],
+      "properties": {
+        "issues": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ReadinessIssueView" }
+        }
+      }
+    },
     "Enabler": {
       "type": "object",
       "additionalProperties": false,
@@ -233,6 +312,8 @@
         "document_id",
         "title",
         "updated_at",
+        "jd_header",
+        "readiness",
         "tasks",
         "opks_items",
         "opks_task_status"
@@ -241,6 +322,8 @@
         "document_id": { "type": "string", "format": "uuid" },
         "title": { "type": "string" },
         "updated_at": { "type": "string", "format": "date-time" },
+        "jd_header": { "$ref": "#/$defs/JdHeaderView" },
+        "readiness": { "$ref": "#/$defs/DocumentReadinessView" },
         "tasks": {
           "type": "array",
           "items": { "$ref": "#/$defs/JdTaskView" }

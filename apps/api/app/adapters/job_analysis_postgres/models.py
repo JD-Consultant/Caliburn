@@ -54,6 +54,8 @@ class JobAnalysisDocumentRow(Base):
 
     document_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True))
     title: Mapped[str] = mapped_column(Text, nullable=False)
+    jd_header_schema_id: Mapped[str] = mapped_column(Text, nullable=False)
+    jd_header_json: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
     work_model_schema_id: Mapped[str] = mapped_column(Text, nullable=False)
     work_model_json: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
     active_question_json: Mapped[dict[str, Any] | None] = mapped_column(

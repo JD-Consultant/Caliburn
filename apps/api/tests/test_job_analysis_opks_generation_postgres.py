@@ -23,6 +23,7 @@ from app.job_analysis.application import (
 from app.job_analysis.application.errors import IdempotencyConflict
 from app.job_analysis.domain import (
     CurrentWorkModel,
+    JdHeader,
     JdTask,
     OpksEntityKind,
     OpksEvidenceLink,
@@ -115,6 +116,7 @@ async def seed(
     *,
     include_second_task: bool = False,
     items: tuple[OpksItem, ...] = (),
+    jd_header: JdHeader | None = None,
 ):
     uow_factory = factory(session_factory)
     await create_document(
@@ -135,6 +137,7 @@ async def seed(
         updated = await uow.documents.update_authority(
             document_id,
             expected_generation=record.authority_generation,
+            jd_header=jd_header if jd_header is not None else record.jd_header,
             work_model=CurrentWorkModel(tasks=tuple(tasks)),
             active_question=record.active_question,
             updated_at=record.updated_at + timedelta(seconds=1),
@@ -198,7 +201,15 @@ async def test_generation_persists_one_proposal_and_receipt_then_replays_without
     cleanup_job_analysis_rows,
 ):
     document_id = cleanup_job_analysis_rows
-    uow_factory = await seed(postgres_session_factory, document_id)
+    header = JdHeader(
+        competency_name="門市營運管理",
+        work_description="負責門市日常營運與週報彙整。",
+    )
+    uow_factory = await seed(
+        postgres_session_factory,
+        document_id,
+        jd_header=header,
+    )
     transport = RecordingTransport(add_output_wire())
 
     first = await generate_opks_proposals(
@@ -225,6 +236,7 @@ async def test_generation_persists_one_proposal_and_receipt_then_replays_without
     assert transport.calls == 1
     assert loaded is not None
     assert loaded.document.authority_generation == 2
+    assert loaded.state.jd_header == header
     proposal = loaded.state.opks_proposals[0]
     assert proposal.proposal_id == "generate-1-op0"
     assert proposal.entity_id == "generate-1-o0"

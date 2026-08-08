@@ -20,6 +20,7 @@ from app.job_analysis.domain import (
     CurrentWorkModel,
     DomainModel,
     Identifier,
+    JdHeader,
     JdTask,
     NonEmptyText,
     OpksItem,
@@ -37,6 +38,7 @@ from .verifier import TurnSpeaker
 
 
 WORK_MODEL_SCHEMA_ID = "job-analysis-work-model/1"
+JD_HEADER_SCHEMA_ID = "job-analysis-jd-header/1"
 PROPOSAL_SCHEMA_ID = "job-analysis-proposal/1"
 OPKS_ITEM_SCHEMA_ID = "job-analysis-opks-item/1"
 OPKS_PROPOSAL_SCHEMA_ID = "job-analysis-opks-proposal/1"
@@ -56,6 +58,7 @@ PROPOSAL_DECISION_SCHEMA_ID = "job-analysis-proposal-decision/1"
 class DocumentRecord:
     document_id: UUID
     title: str
+    jd_header: JdHeader
     work_model: CurrentWorkModel
     active_question: ActiveQuestion | None
     authority_generation: int
@@ -381,6 +384,7 @@ class DocumentRepository(Protocol):
         document_id: UUID,
         *,
         expected_generation: int,
+        jd_header: JdHeader,
         work_model: CurrentWorkModel,
         active_question: ActiveQuestion | None,
         updated_at: datetime,

@@ -222,6 +222,7 @@ def test_consultation_view_keeps_history_without_leaking_internal_authority():
         document=DocumentRecord(
             document_id=UUID("00000000-0000-0000-0000-000000000045"),
             title="門市營運專員",
+            jd_header=JdHeader(),
             work_model=CurrentWorkModel(tasks=(task,)),
             active_question=ActiveQuestion(turn_id="turn-3", text="週報交給誰？"),
             authority_generation=7,

@@ -10,6 +10,7 @@ import {
   isJdHeaderFormDirty,
   readinessIssueLabel,
   readinessSummary,
+  shouldAdoptJdHeaderRefetch,
   toJdHeaderWrite,
 } from "./jobAnalysisHeader";
 
@@ -73,6 +74,23 @@ describe("JD header form mapping", () => {
     });
 
     expect(form.competencyLevel).toBe("");
+  });
+
+  it("adopts a refetch only for an already-editing clean form", () => {
+    const refetched = { ...FILLED_HEADER, competency_name: "更新後名稱" };
+
+    expect(
+      shouldAdoptJdHeaderRefetch(false, false, FILLED_HEADER, refetched),
+    ).toBe(false);
+    expect(
+      shouldAdoptJdHeaderRefetch(true, true, FILLED_HEADER, refetched),
+    ).toBe(false);
+    expect(
+      shouldAdoptJdHeaderRefetch(true, false, FILLED_HEADER, refetched),
+    ).toBe(true);
+    expect(
+      shouldAdoptJdHeaderRefetch(true, false, refetched, refetched),
+    ).toBe(false);
   });
 });
 

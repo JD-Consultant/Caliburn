@@ -15,7 +15,7 @@
 - 執行前用 `superpowers:using-git-worktrees` 從本計畫所在 HEAD 建立隔離 worktree；不得直接在未審遠端分支施工。
 - donor commits 只供人工比對：Header `47e2840..26cbe90`、Duty `7e1f9de..ac3d3ea`、OPKS order `c59d15c..b2ba8c6`、export `14feb32..80ed7cb`、混合修正 `42b7118`。**不得整顆 cherry-pick**，尤其不得帶入其舊 OPKS schema／scheduler 或 16K token 預設。
 - 保留現行 `task_analysis_result_v3`、ADR 0054 自動 OPKS child、gap／`issue_resolutions[]` 與 `4096` token 預設。
-- 唯一獲准的 Task Analysis prompt 新增句是：「`員工填寫的整體描述`是背景不是做過的事；其中提到但訪談沒談過的責任，先追問怎麼做。」不得順手改 Task、P、K/S 判準或 OPKS prompt。現行 prompt byte budget `6000` 不調高。
+- 唯一獲准新增的 Task Analysis 指示句是：「`員工填寫的整體描述`是背景不是做過的事；其中提到但訪談沒談過的責任，先追問怎麼做。」它緊貼有內容的 dynamic packet Header 區呈現，不放進已達 5,975 bytes 的 static instructions。不得順手改 Task、P、K/S 判準或 OPKS prompt；現行 static prompt byte budget `6000` 不調高。
 - `JdHeader` 只進 Task Analysis packet；不得進 OPKS packet，不配 ordinal／`SourceRef`，也不得單靠它產生任何 Task change。
 - Header、Duty、Task level 與 OPKS 排序全部是員工 authority；模型 wire schema 不新增這些可寫欄位。
 - 不做：reference／taxonomy、AI Duty 按鈕或 operation、per-Task 子對話、server／enterprise、舊 R1 harness、舊資料搬遷、PDF／DOCX、通用匯出 framework、登入／SaaS／多使用者。
@@ -269,14 +269,16 @@ git commit -m "feat(job-analysis): expose JD header and readiness"
 **Files:**
 - Modify: `apps/api/app/job_analysis/application/context.py:290`
 - Modify: `apps/api/app/job_analysis/application/durable_turn.py`
-- Modify: `apps/api/app/job_analysis/llm/prompt.py`
+- Verify unchanged: `apps/api/app/job_analysis/llm/prompt.py`
 - Test: `apps/api/tests/test_job_analysis_context.py`
 - Test: `apps/api/tests/test_job_analysis_prompt.py`
 - Test: `apps/api/tests/test_job_analysis_opks_context.py`
+- Test: `apps/api/tests/test_job_analysis_durable_turn_postgres.py`
 - Docs: `docs/design/task-analysis-engine.md`
 
 **Interfaces:**
-- `build_context_packet` 新增 keyword-only `employee_written_overview: str | None`，並渲染一個獨立背景區。
+- `build_context_packet` 新增 keyword-only `employee_written_overview: str | None = None`，並渲染一個獨立背景區；`durable_turn` 只由 `JdHeader.competency_name` 與 `work_description` 決定性組成此文字。
+- `employee_written_overview` 是 packet read-set 的一部分，但不進 ordinal／`SourceRef`／verifier context。
 - Header changes belong to Task Analysis authority read-set; OPKS packet stays byte-for-byte unchanged for the same Task state.
 
 - [ ] **Step 1: Write red boundary tests**
@@ -302,21 +304,19 @@ Run: `cd apps/api; uv run pytest tests/test_job_analysis_context.py tests/test_j
 
 Expected: FAIL before packet field is added.
 
-- [ ] **Step 3: Add exactly one prompt rule and no other prompt edits**
+- [ ] **Step 3: Add exactly one data-local instruction and keep static prompt unchanged**
 
-```text
-「員工填寫的整體描述」是背景不是做過的事；其中提到但訪談沒談過的責任，先追問怎麼做。
-```
+在有內容的 dynamic packet Header 區緊貼資料渲染：`「員工填寫的整體描述」是背景不是做過的事；其中提到但訪談沒談過的責任，先追問怎麼做。`
 
-Verifier 仍要求 Task change 的 evidence anchor 指向員工回合／direct edit；Header 沒有 `SourceRef`，因此不能單靠 Header 建 Task。保留 `INSTRUCTIONS_BYTES_BUDGET = 6000`。
+Verifier 仍要求 Task change 的 evidence anchor 指向員工回合／direct edit；Header 沒有 `SourceRef`，因此不能單靠 Header 建 Task。`TASK_ANALYSIS_INSTRUCTIONS` 逐字不變，保留 `INSTRUCTIONS_BYTES_BUDGET = 6000`。
 
 - [ ] **Step 4: Run prompt/context tests and inspect the exact diff**
 
 Run: `cd apps/api; uv run pytest tests/test_job_analysis_context.py tests/test_job_analysis_prompt.py tests/test_job_analysis_opks_context.py -q`
 
-Then: `git diff -- apps/api/app/job_analysis/llm/prompt.py`
+Then: `git diff --exit-code -- apps/api/app/job_analysis/llm/prompt.py`
 
-Expected: prompt diff only contains the approved background rule.
+Expected: static prompt zero diff；核准句只出現在有 Header 內容的 dynamic packet。
 
 - [ ] **Step 5: Commit**
 

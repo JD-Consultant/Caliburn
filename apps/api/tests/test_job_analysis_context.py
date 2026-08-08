@@ -643,7 +643,48 @@ def test_only_unresolved_revision_requests_are_carried():
 def test_read_set_is_the_projected_authority_data():
     """保守計入:當輪投影本身就是 read-set,不從模型輸出反推它讀了什麼。"""
     packet = build(proposals=(merge_proposal(),))
-    assert packet.read_set == (packet.current_authorities, packet.proposal_context)
+    assert packet.read_set == (
+        packet.current_authorities,
+        packet.proposal_context,
+        packet.employee_written_overview,
+    )
+
+
+def test_employee_written_overview_is_background_without_ordinal_or_source_ref():
+    """Header 是 coverage 背景,不是可被模型引用的 Evidence。"""
+
+    packet = build(
+        employee_written_overview=(
+            "職能基準名稱：門市營運管理\n工作描述：負責門市日常營運與週報彙整。"
+        )
+    )
+
+    rendered = render_context_packet(packet)
+
+    assert "## 員工填寫的整體描述" in rendered
+    overview = rendered.split("## 員工填寫的整體描述\n\n", 1)[1].split(
+        "## current_authorities", 1
+    )[0]
+    assert overview == (
+        "職能基準名稱：門市營運管理\n工作描述：負責門市日常營運與週報彙整。\n"
+        "「員工填寫的整體描述」是背景不是做過的事；其中提到但訪談沒談過的責任，先追問怎麼做。\n\n"
+    )
+    assert "[" not in overview
+    assert "SourceRef" not in overview
+    assert "task-" not in overview
+
+
+def test_empty_employee_written_overview_does_not_render_a_background_section():
+    rendered = render_context_packet(build())
+    assert "員工填寫的整體描述" not in rendered
+    assert "其中提到但訪談沒談過的責任" not in rendered
+
+
+def test_employee_written_overview_is_part_of_the_authority_read_set():
+    without_overview = build()
+    with_overview = build(employee_written_overview="工作描述：負責門市日常營運")
+
+    assert without_overview.read_set != with_overview.read_set
 
 
 # ── active／terminal 分區與 agenda 順序(ADR 0054 決定 20–21)──────────────────

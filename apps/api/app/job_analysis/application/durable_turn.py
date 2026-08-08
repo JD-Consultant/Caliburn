@@ -105,6 +105,22 @@ async def _packet_for(
     employee_turn: ConversationTurn,
 ) -> TaskAnalysisPacket:
     conversation = await uow.journal.list_conversation_turns(record.document_id)
+    overview_lines = tuple(
+        line
+        for line in (
+            (
+                f"職能基準名稱：{record.jd_header.competency_name}"
+                if record.jd_header.competency_name is not None
+                else None
+            ),
+            (
+                f"工作描述：{record.jd_header.work_description}"
+                if record.jd_header.work_description is not None
+                else None
+            ),
+        )
+        if line is not None
+    )
     return build_context_packet(
         transcript=(*conversation, employee_turn),
         current_turn_id=employee_turn.turn_id,
@@ -112,6 +128,7 @@ async def _packet_for(
         current_jd=state.current_jd,
         active_question=record.active_question,
         proposals=state.proposals,
+        employee_written_overview="\n".join(overview_lines) or None,
     )
 
 

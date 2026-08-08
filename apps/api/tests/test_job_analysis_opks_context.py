@@ -223,6 +223,7 @@ def test_packet_projects_only_the_selected_task_and_relevant_opks_authority():
     assert "未連到選定工作；另連 0 個工作／0 個指標" in rendered
     assert "待決提案（尚未成立）" in rendered
     assert "已拒絕提案（避免重提）" in rendered
+    assert "員工填寫的整體描述" not in rendered
 
     for hidden in (
         "task-selected",

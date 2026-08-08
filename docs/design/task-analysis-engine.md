@@ -42,7 +42,7 @@ OpenRouter 拿 `task_analysis_result_v3`(送出去的精簡形狀)→ **mapper**
 | 組件 | 是什麼 | 碼 | 權力 |
 |---|---|---|---|
 | domain | Task／SourceRef／SupportLink／open_issues／excluded_signals／Task Proposal，以及 OPKS 的 `OpksItem`／`CurrentJdOpks`／獨立 `OpksProposal` 凍結形狀 | `app/job_analysis/domain/`（OPKS：`opks.py`、`opks_proposal.py`） | 純 Pydantic,frozen;**非法狀態無法被表示**;只 import stdlib＋pydantic。OPKS 已進完整 authority state、人工編輯、Proposal 決策 API 與 Web editor |
-| JD header | `JdHeader`：iCAP 版型表頭語意欄位（職能基準名稱／所屬類別／工作描述／nullable 基準級別 1–6／說明補充） | `app/job_analysis/domain/jd_header.py` | 純 Pydantic,frozen;全欄位 nullable,空字串拒收(要 `null` 不要 `""`);**沒有 `職能基準代碼`／`職類別代碼` 欄位**(iCAP 配發,不生成)。Task 1–3 已落地：`put_jd_header()` 經 authority seam、typed before/after Journal receipt 與 `PUT /{document_id}/jd-header` 接通；尚未進 packet／Web UI |
+| JD header | `JdHeader`：iCAP 版型表頭語意欄位（職能基準名稱／所屬類別／工作描述／nullable 基準級別 1–6／說明補充） | `app/job_analysis/domain/jd_header.py` | 純 Pydantic,frozen;全欄位 nullable,空字串拒收(要 `null` 不要 `""`);**沒有 `職能基準代碼`／`職類別代碼` 欄位**(iCAP 配發,不生成)。Task 1–4 已落地：`put_jd_header()` 經 authority seam、typed before/after Journal receipt 與 `PUT /{document_id}/jd-header` 接通；Task Analysis packet 只投影職能基準名稱與工作描述為「員工填寫的整體描述」背景、納入 read-set，且只有該背景存在時才在相鄰處顯示資料本地的追問指示；它沒有 ordinal／`SourceRef`／Evidence，不能單靠它建立 Task，且絕不進 OPKS packet；Web UI 尚未接通 |
 | readiness | `assess_readiness(header)` → 只有 issue 清單的 `DocumentReadiness` | `app/job_analysis/application/readiness.py` | 純函式,零 IO,**不 import transport contract**;第一版只查表頭三項(名稱／工作描述／基準級別),零 issue 時安靜;**沒有 `is_complete`／百分比**;說明補充與所屬類別刻意不發聲。`DocumentView` 只承載此純函式的結果，Web 不重算 |
 | llm 契約 | Task：內部 `TaskAnalysisResult`＋`task_analysis_result_v3` wire（v3 相對 v2 只多了與 `work_signals` 平行的 `issue_resolutions[]`；**不覆寫 v2**，同一個版本號不得指向兩種契約）；OPKS：獨立 `OpksResult`＋`opks_result_v1` wire；各自一份 Static Instructions | `app/job_analysis/llm/` | 只描述形狀與判準文字;**不做跨欄位驗證**。OPKS wire 只有 5 個 property、零 union，不擴充既有 Task schema |
 | wire mapper | 中性值 → `None` 的純還原 | `llm/wire.py` 的 `wire_to_task_analysis_result()` | **不做語意判斷**;沒有 domain 落點的夾帶內容一律拒絕,不靜默丟棄 |
@@ -79,8 +79,8 @@ readiness 的輸入只有 `JdHeader`，輸出只有按固定表頭順序排列�
 
 ## 3. 一輪的資料流(每步標函式)
 
-1. `build_context_packet(transcript=…, current_turn_id=…, work_model=…, current_jd=…, active_question=…, proposals=…)`
-   → `TaskAnalysisPacket`。順序完全跟隨輸入,所以同輸入同輸出。
+1. `build_context_packet(transcript=…, current_turn_id=…, work_model=…, current_jd=…, active_question=…, proposals=…, employee_written_overview=…)`
+   → `TaskAnalysisPacket`。順序完全跟隨輸入,所以同輸入同輸出；`durable_turn` 只由 Header 的職能基準名稱與工作描述決定性組成 overview。overview 是協助 coverage／矛盾與下一題判斷的背景 authority read-set，不配 ordinal 或 `SourceRef`，也不進 verifier context 或 OPKS packet；其「背景不是做過的事」追問規則與資料相鄰渲染，`TASK_ANALYSIS_INSTRUCTIONS` 保持不變。
 2. `run_task_analysis_operation(packet=…, adapter=…)`:
    - `render_context_packet(packet)` → 純文字,當成 user message;
    - `TASK_ANALYSIS_INSTRUCTIONS` 當成 system message;

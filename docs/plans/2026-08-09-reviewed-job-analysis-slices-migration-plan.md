@@ -396,6 +396,11 @@ git commit -m "feat(web): let employees edit the JD header"
 - Modify: `apps/api/app/job_analysis/domain/__init__.py`
 - Modify: `apps/api/app/job_analysis/application/transition.py:73`
 - Modify: `apps/api/app/job_analysis/application/readiness.py`
+- Modify: `apps/api/app/api/job_analysis_mapper.py`
+- Modify: `packages/job-analysis-contract/schema/job-analysis-workspace.schema.json`
+- Regenerate: generated Python／TS contract files
+- Modify: `apps/web/src/lib/jobAnalysisHeader.ts`
+- Modify: `apps/web/src/lib/jobAnalysisHeader.test.ts`
 - Test: `apps/api/tests/test_job_analysis_duty_domain.py`
 - Modify: `apps/api/tests/test_job_analysis_readiness.py`
 - Modify: `apps/api/tests/test_job_analysis_transition.py`
@@ -433,6 +438,9 @@ def test_readiness_reports_employee_fixable_structure_gaps_only():
 
 新增 `OPKS_TASK_LINK_MISSING`：只針對沒有連到任何 Current JD Task／Indicator 的 K/S，供 Web 提醒「公版匯出不會包含」；不得把沒有 O、沒有 A 或空 notes 判成缺漏。
 
+每個 code 在一次 assessment 中最多出現一次：readiness 只回答「是否存在這類可修復缺漏」，
+不再複製 Task／Duty identity。Task／Duty editor 本身負責指出哪些項目是未分組、未填級別或空 Duty。
+
 - [ ] **Step 2: Run red tests**
 
 Run: `cd apps/api; uv run pytest tests/test_job_analysis_duty_domain.py tests/test_job_analysis_readiness.py tests/test_job_analysis_transition.py -q`
@@ -450,6 +458,10 @@ class Duty(DomainModel):
 
 `JobAnalysisState` enforces unique Duty order and valid nullable Task→Duty refs. `current_duties` is required, so every production reconstruction must preserve it explicitly. AI add defaults both Task fields to `None`; AI revise／merge／split must not silently overwrite employee-set Duty／level. No Duty or level field enters model output schema.
 
+同一步擴充既有 readiness code enum、重新 codegen，並補 Web exhaustive label；API mapper 改以完整
+`header／duties／tasks／current_opks` 呼叫同一支純函式。這不是提前做 Duty API/UI，而是維持
+Python→TS seam 與每個 commit 的完整性；本 feature branch 在 Task 8 完成可修復 UI 前不得合併。
+
 - [ ] **Step 4: Run domain gate**
 
 Run: `cd apps/api; uv run pytest tests/test_job_analysis_duty_domain.py tests/test_job_analysis_readiness.py tests/test_job_analysis_transition.py -q`
@@ -459,7 +471,7 @@ Expected: PASS.
 - [ ] **Step 5: Commit**
 
 ```powershell
-git add apps/api/app/job_analysis/domain apps/api/app/job_analysis/application/readiness.py apps/api/app/job_analysis/application/transition.py apps/api/tests docs/design/task-analysis-engine.md
+git add apps/api apps/web/src/lib/jobAnalysisHeader.ts apps/web/src/lib/jobAnalysisHeader.test.ts packages/job-analysis-contract docs/design/task-analysis-engine.md
 git commit -m "feat(job-analysis): add Duty and task competency level"
 ```
 
@@ -495,6 +507,9 @@ async def test_delete_duty_unassigns_tasks_without_deleting_them(pg_uow_factory)
 ```
 
 另測 deterministic ID、重送冪等、順序完整集合、invalid order typed error、Journal／generation 原子更新。
+再以真 PostgreSQL 覆蓋四種重建路徑：Task direct edit、Proposal decision、durable turn、OPKS
+operation 後，既有 Duties 與 Task 的 `duty_id`／`competency_level` 都必須原樣保留；任何一條
+loader 仍寫死 `current_duties=()` 都應使測試失敗。
 
 - [ ] **Step 2: Run red tests**
 

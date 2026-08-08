@@ -78,10 +78,20 @@ def assess_readiness(
     task_level_missing = any(task.competency_level is None for task in tasks)
     assigned_duties = {task.duty_id for task in tasks if task.duty_id is not None}
     duty_without_task = any(duty.duty_id not in assigned_duties for duty in duties)
+    current_task_ids = {task.task_id for task in tasks}
+    linked_indicator_ids = {
+        item.entity_id
+        for item in current_opks.items
+        if item.entity_kind is OpksEntityKind.INDICATOR
+        and any(task_ref in current_task_ids for task_ref in item.task_refs)
+    }
     unlinked_knowledge_or_skill = any(
         item.entity_kind in {OpksEntityKind.KNOWLEDGE, OpksEntityKind.SKILL}
-        and not item.task_refs
-        and not item.indicator_refs
+        and not any(task_ref in current_task_ids for task_ref in item.task_refs)
+        and not any(
+            indicator_ref in linked_indicator_ids
+            for indicator_ref in item.indicator_refs
+        )
         for item in current_opks.items
     )
 

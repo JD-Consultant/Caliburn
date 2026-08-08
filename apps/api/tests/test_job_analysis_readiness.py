@@ -220,6 +220,121 @@ def test_readiness_reports_unlinked_knowledge_or_skill_once() -> None:
     )
 
 
+def test_readiness_reports_stale_direct_task_refs_once() -> None:
+    duty = Duty(duty_id="d1", statement="門市營運", display_order=0)
+    task = JdTask(
+        task_id="t1",
+        statement="盤點庫存",
+        display_order=0,
+        duty_id="d1",
+        competency_level=4,
+    )
+    evidence = OpksEvidenceLink(
+        source_ref=SourceRef(kind=SourceKind.DIRECT_EDIT, id="edit-1")
+    )
+    knowledge = OpksItem(
+        entity_id="knowledge-1",
+        entity_kind=OpksEntityKind.KNOWLEDGE,
+        text="庫存差異成因",
+        task_refs=("retired-task",),
+        evidence_links=(evidence,),
+    )
+    skill = OpksItem(
+        entity_id="skill-1",
+        entity_kind=OpksEntityKind.SKILL,
+        text="盤點差異分析",
+        task_refs=("missing-task",),
+        evidence_links=(evidence,),
+    )
+
+    readiness = _assess(
+        _complete_header(),
+        duties=(duty,),
+        tasks=(task,),
+        current_opks=CurrentJdOpks(items=(knowledge, skill)),
+    )
+
+    assert tuple(issue.code for issue in readiness.issues) == (
+        ReadinessIssueCode.OPKS_TASK_LINK_MISSING,
+    )
+
+
+def test_readiness_accepts_an_indicator_linked_to_a_current_task() -> None:
+    duty = Duty(duty_id="d1", statement="門市營運", display_order=0)
+    task = JdTask(
+        task_id="t1",
+        statement="盤點庫存",
+        display_order=0,
+        duty_id="d1",
+        competency_level=4,
+    )
+    evidence = OpksEvidenceLink(
+        source_ref=SourceRef(kind=SourceKind.DIRECT_EDIT, id="edit-1")
+    )
+    indicator = OpksItem(
+        entity_id="indicator-1",
+        entity_kind=OpksEntityKind.INDICATOR,
+        text="帳實差異可追溯",
+        task_refs=("t1",),
+        evidence_links=(evidence,),
+    )
+    knowledge = OpksItem(
+        entity_id="knowledge-1",
+        entity_kind=OpksEntityKind.KNOWLEDGE,
+        text="庫存差異成因",
+        indicator_refs=("indicator-1",),
+        evidence_links=(evidence,),
+    )
+
+    readiness = _assess(
+        _complete_header(),
+        duties=(duty,),
+        tasks=(task,),
+        current_opks=CurrentJdOpks(items=(indicator, knowledge)),
+    )
+
+    assert readiness.issues == ()
+
+
+def test_readiness_reports_an_indicator_whose_task_ref_is_stale() -> None:
+    duty = Duty(duty_id="d1", statement="門市營運", display_order=0)
+    task = JdTask(
+        task_id="t1",
+        statement="盤點庫存",
+        display_order=0,
+        duty_id="d1",
+        competency_level=4,
+    )
+    evidence = OpksEvidenceLink(
+        source_ref=SourceRef(kind=SourceKind.DIRECT_EDIT, id="edit-1")
+    )
+    indicator = OpksItem(
+        entity_id="indicator-1",
+        entity_kind=OpksEntityKind.INDICATOR,
+        text="帳實差異可追溯",
+        task_refs=("retired-task",),
+        evidence_links=(evidence,),
+    )
+    knowledge = OpksItem(
+        entity_id="knowledge-1",
+        entity_kind=OpksEntityKind.KNOWLEDGE,
+        text="庫存差異成因",
+        indicator_refs=("indicator-1",),
+        evidence_links=(evidence,),
+    )
+
+    readiness = _assess(
+        _complete_header(),
+        duties=(duty,),
+        tasks=(task,),
+        current_opks=CurrentJdOpks(items=(indicator, knowledge)),
+    )
+
+    assert tuple(issue.code for issue in readiness.issues) == (
+        ReadinessIssueCode.OPKS_TASK_LINK_MISSING,
+    )
+
+
 def test_readiness_does_not_require_output_attitude_or_notes() -> None:
     duty = Duty(duty_id="d1", statement="門市營運", display_order=0)
     task = JdTask(

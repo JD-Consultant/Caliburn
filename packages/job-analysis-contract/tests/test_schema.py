@@ -5,7 +5,9 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
 from jsonschema import Draft202012Validator
+from pydantic import ValidationError
 
 from job_analysis_contract import (
     ConsultationView,
@@ -352,4 +354,12 @@ def test_generated_header_models_allow_partial_writes_and_export_code_only_issue
     assert write.notes is None
     assert view.competency_level is None
     assert readiness.issues[0].code.value == "work_description_missing"
+
+
+@pytest.mark.parametrize("invalid_level", ["4", True])
+def test_generated_header_write_rejects_non_integer_competency_levels(
+    invalid_level,
+):
+    with pytest.raises(ValidationError):
+        JdHeaderWrite(competency_level=invalid_level)
 

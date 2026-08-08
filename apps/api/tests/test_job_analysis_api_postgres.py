@@ -245,6 +245,55 @@ async def test_put_jd_header_trims_optional_text_and_returns_server_readiness(
     assert persisted.document.authority_generation == 1
 
 
+async def test_put_jd_header_is_a_full_replacement_that_nulls_omitted_fields(
+    postgres_api_client,
+    cleanup_job_analysis_rows,
+):
+    client, factory, _ = postgres_api_client
+    document_id = cleanup_job_analysis_rows
+    root = f"/api/v1/job-analysis/documents/{document_id}"
+    assert (await client.put(root, json={"title": "門市營運專員"})).status_code == 201
+
+    populated = await client.put(
+        f"{root}/jd-header",
+        headers={"Idempotency-Key": "header-populate"},
+        json={
+            "competency_name": "門市營運專員",
+            "occupation_name": "零售服務人員",
+            "work_description": "負責門市日常營運。",
+            "competency_level": 3,
+            "notes": "初版備註",
+        },
+    )
+    before = await load_document(factory, document_id)
+
+    replaced = await client.put(
+        f"{root}/jd-header",
+        headers={"Idempotency-Key": "header-replace"},
+        json={
+            "competency_name": "資深門市營運專員",
+            "work_description": "負責門市日常營運與人員帶領。",
+            "competency_level": 4,
+        },
+    )
+    reloaded = await client.get(root)
+    after = await load_document(factory, document_id)
+
+    assert populated.status_code == 200
+    assert before is not None
+    assert replaced.status_code == 200
+    assert replaced.json()["occupation_name"] is None
+    assert replaced.json()["notes"] is None
+    assert reloaded.status_code == 200
+    assert reloaded.json()["jd_header"] == replaced.json()
+    assert reloaded.json()["jd_header"]["occupation_name"] is None
+    assert after is not None
+    assert after.state.jd_header.occupation_name is None
+    assert after.document.authority_generation == (
+        before.document.authority_generation + 1
+    )
+
+
 async def test_put_jd_header_rejects_an_idempotency_collision_as_a_problem(
     postgres_api_client,
     cleanup_job_analysis_rows,
@@ -309,6 +358,33 @@ async def test_put_jd_header_reports_no_op_and_invalid_bodies_as_typed_422(
         assert response.json()["type"] == (
             "https://caliburn.dev/problems/job-analysis/invalid-request"
         )
+    assert persisted is not None
+    assert persisted.document.authority_generation == 0
+
+
+@pytest.mark.parametrize("invalid_level", ["4", True])
+async def test_put_jd_header_rejects_non_integer_levels_as_typed_422(
+    postgres_api_client,
+    cleanup_job_analysis_rows,
+    invalid_level,
+):
+    client, factory, _ = postgres_api_client
+    document_id = cleanup_job_analysis_rows
+    root = f"/api/v1/job-analysis/documents/{document_id}"
+    assert (await client.put(root, json={"title": "門市營運專員"})).status_code == 201
+
+    response = await client.put(
+        f"{root}/jd-header",
+        headers={"Idempotency-Key": "header-invalid-type"},
+        json={"competency_level": invalid_level},
+    )
+    persisted = await load_document(factory, document_id)
+
+    assert response.status_code == 422
+    assert response.headers["content-type"] == "application/problem+json"
+    assert response.json()["type"] == (
+        "https://caliburn.dev/problems/job-analysis/invalid-request"
+    )
     assert persisted is not None
     assert persisted.document.authority_generation == 0
 

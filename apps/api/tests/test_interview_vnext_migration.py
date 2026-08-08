@@ -305,7 +305,7 @@ def test_alembic_has_single_head():
     cfg = Config(str(API_DIR / "alembic.ini"))
     cfg.set_main_option("script_location", str(API_DIR / "alembic"))
     heads = ScriptDirectory.from_config(cfg).get_heads()
-    assert heads == ["0015"]
+    assert heads == ["0016"]
 
 
 @pytest.mark.usefixtures("require_postgres")
@@ -338,7 +338,7 @@ def test_migration_0010_cycle_preserves_v3_and_builds_exact_schema():
                 "'遷移前的逐字稿內容')"))
         before = _snapshot_v3(engine)
 
-        # 3. upgrade 0010(= head)
+        # 3. upgrade the vNext migration under test (not the repository head)
         _alembic("upgrade", "0010", _async_url(MIG_DB))
 
         # 4. introspection:八張表,不多不少

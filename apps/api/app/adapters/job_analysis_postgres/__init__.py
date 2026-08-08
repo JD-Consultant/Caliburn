@@ -2,6 +2,7 @@
 
 from .models import (
     JobAnalysisDocumentRow,
+    JobAnalysisJdDutyRow,
     JobAnalysisJdTaskRow,
     JobAnalysisJournalRow,
     JobAnalysisOpksItemRow,
@@ -13,6 +14,7 @@ from .serialization import PersistedJobAnalysisCorruption
 
 __all__ = [
     "JobAnalysisDocumentRow",
+    "JobAnalysisJdDutyRow",
     "JobAnalysisJdTaskRow",
     "JobAnalysisJournalRow",
     "JobAnalysisOpksItemRow",

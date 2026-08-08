@@ -175,7 +175,7 @@ def _reconciled_work_model(
     )
 
 
-def _stale_related_proposals(
+def stale_task_proposals_for_direct_edit(
     proposals: tuple[Proposal, ...],
     *,
     affected_task_ids: frozenset[TaskId],
@@ -229,7 +229,7 @@ async def _commit_direct_edit(
     now = _utcnow()
     state = JobAnalysisState(
         jd_header=record.jd_header,
-        current_duties=(),
+        current_duties=await uow.duties.list(record.document_id),
         work_model=work_model,
         current_jd=tasks,
         proposals=proposals,
@@ -365,7 +365,7 @@ async def load_document(
             document=record,
             state=JobAnalysisState(
                 jd_header=record.jd_header,
-                current_duties=(),
+                current_duties=await uow.duties.list(document_id),
                 work_model=record.work_model,
                 current_jd=tasks,
                 proposals=proposals,
@@ -407,7 +407,7 @@ async def put_jd_header(
             record=record,
             state=JobAnalysisState(
                 jd_header=header,
-                current_duties=(),
+                current_duties=await uow.duties.list(document_id),
                 work_model=record.work_model,
                 current_jd=await uow.tasks.list(document_id),
                 proposals=await uow.proposals.list(document_id),
@@ -478,7 +478,7 @@ async def add_jd_task(
             uow,
             record=record,
             tasks=(*tasks, created),
-            proposals=_stale_related_proposals(
+            proposals=stale_task_proposals_for_direct_edit(
                 proposals,
                 affected_task_ids=frozenset({task_id}),
             ),
@@ -540,7 +540,7 @@ async def edit_jd_task(
             uow,
             record=record,
             tasks=next_tasks,
-            proposals=_stale_related_proposals(
+            proposals=stale_task_proposals_for_direct_edit(
                 proposals,
                 affected_task_ids=frozenset({task_id}),
             ),
@@ -603,7 +603,7 @@ async def delete_jd_task(
             uow,
             record=record,
             tasks=next_tasks,
-            proposals=_stale_related_proposals(
+            proposals=stale_task_proposals_for_direct_edit(
                 proposals,
                 affected_task_ids=frozenset({task_id}),
             ),
@@ -673,7 +673,7 @@ async def reorder_jd_tasks(
             uow,
             record=record,
             tasks=reordered,
-            proposals=_stale_related_proposals(
+            proposals=stale_task_proposals_for_direct_edit(
                 proposals,
                 affected_task_ids=frozenset(ordered_task_ids),
             ),

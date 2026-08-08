@@ -94,6 +94,18 @@ class _Values:
         return ()
 
 
+class _Duties:
+    """Explicit empty Duty port for loaders that rebuild Current JD state."""
+
+    async def list(self, document_id: UUID):
+        assert document_id == DOCUMENT_ID
+        return ()
+
+    async def replace(self, document_id: UUID, duties) -> None:
+        assert document_id == DOCUMENT_ID
+        assert duties == ()
+
+
 class _Journal:
     async def list_conversation_turns(self, document_id: UUID):
         assert document_id == DOCUMENT_ID
@@ -103,6 +115,7 @@ class _Journal:
 class _ReadOnlyUnitOfWork:
     def __init__(self, record: DocumentRecord) -> None:
         self.documents = _Documents(record)
+        self.duties = _Duties()
         self.tasks = _Values()
         self.proposals = _Values()
         self.opks = _Values()

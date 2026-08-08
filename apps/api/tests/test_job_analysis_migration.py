@@ -1,4 +1,4 @@
-"""Migration 0014: greenfield local Current State and OPKS tables.
+"""Migration 0016: greenfield Current State with employee-owned Duties.
 
 The cycle runs in a disposable database and proves the migration neither
 rewrites nor removes the older 0011 authoring tables.
@@ -23,6 +23,7 @@ MIG_DB = "caliburn_ja2_mig"
 
 TABLES = {
     "job_analysis_documents",
+    "job_analysis_jd_duties",
     "job_analysis_jd_tasks",
     "job_analysis_proposals",
     "job_analysis_journal",
@@ -52,6 +53,16 @@ EXPECTED_COLUMNS = {
         "frequency_text": ("text", True),
         "responsibility_role": ("text", True),
         "enablers_json": ("jsonb", False),
+        "duty_id": ("text", True),
+        "competency_level": ("bigint", True),
+        "display_order": ("bigint", False),
+        "created_at": ("timestamptz", False),
+        "updated_at": ("timestamptz", False),
+    },
+    "job_analysis_jd_duties": {
+        "document_id": ("uuid", False),
+        "duty_id": ("text", False),
+        "statement": ("text", False),
         "display_order": ("bigint", False),
         "created_at": ("timestamptz", False),
         "updated_at": ("timestamptz", False),
@@ -110,6 +121,10 @@ EXPECTED_PK = {
         "ja2_pk_jd_tasks",
         ["document_id", "task_id"],
     ),
+    "job_analysis_jd_duties": (
+        "ja2_pk_jd_duties",
+        ["document_id", "duty_id"],
+    ),
     "job_analysis_proposals": (
         "ja2_pk_proposals",
         ["document_id", "proposal_id"],
@@ -131,6 +146,7 @@ EXPECTED_PK = {
 EXPECTED_UNIQUES = {
     "job_analysis_documents": set(),
     "job_analysis_jd_tasks": {"ja2_uq_jd_tasks_order"},
+    "job_analysis_jd_duties": {"ja2_uq_jd_duties_order"},
     "job_analysis_proposals": set(),
     "job_analysis_journal": {"ja2_uq_journal_entry"},
     "job_analysis_opks_items": set(),
@@ -139,7 +155,11 @@ EXPECTED_UNIQUES = {
 
 EXPECTED_FKS = {
     "job_analysis_documents": set(),
-    "job_analysis_jd_tasks": {"ja2_fk_jd_tasks_document"},
+    "job_analysis_jd_tasks": {
+        "ja2_fk_jd_tasks_document",
+        "ja2_fk_jd_tasks_duty",
+    },
+    "job_analysis_jd_duties": {"ja2_fk_jd_duties_document"},
     "job_analysis_proposals": {"ja2_fk_proposals_document"},
     "job_analysis_journal": {"ja2_fk_journal_document"},
     "job_analysis_opks_items": {"ja2_fk_opks_items_document"},
@@ -160,8 +180,16 @@ EXPECTED_CHECKS = {
         "ja2_ck_jd_tasks_statement",
         "ja2_ck_jd_tasks_role",
         "ja2_ck_jd_tasks_enablers_json",
+        "ja2_ck_jd_tasks_duty_id",
+        "ja2_ck_jd_tasks_competency_level",
         "ja2_ck_jd_tasks_display_order",
         "ja2_ck_jd_tasks_time_order",
+    },
+    "job_analysis_jd_duties": {
+        "ja2_ck_jd_duties_id",
+        "ja2_ck_jd_duties_statement",
+        "ja2_ck_jd_duties_display_order",
+        "ja2_ck_jd_duties_time_order",
     },
     "job_analysis_proposals": {
         "ja2_ck_proposals_id",
@@ -251,18 +279,18 @@ def _column_kind(column_type) -> str:
     return str(column_type).lower()
 
 
-def test_alembic_has_0015_as_its_single_head():
+def test_alembic_has_0016_as_its_single_head():
     from alembic.config import Config
     from alembic.script import ScriptDirectory
 
     config = Config(str(API_DIR / "alembic.ini"))
     config.set_main_option("script_location", str(API_DIR / "alembic"))
 
-    assert ScriptDirectory.from_config(config).get_heads() == ["0015"]
+    assert ScriptDirectory.from_config(config).get_heads() == ["0016"]
 
 
 @pytest.mark.usefixtures("require_postgres")
-def test_migration_0015_cycle_builds_greenfield_tables_and_preserves_0011():
+def test_migration_0016_cycle_builds_greenfield_tables_and_preserves_0011():
     admin = sa.create_engine(_sync_url("postgres"), isolation_level="AUTOCOMMIT")
     with admin.connect() as connection:
         connection.execute(sa.text(f"DROP DATABASE IF EXISTS {MIG_DB} WITH (FORCE)"))
@@ -297,6 +325,21 @@ def test_migration_0015_cycle_builds_greenfield_tables_and_preserves_0011():
             )
 
         _alembic("upgrade", "0015", _async_url(MIG_DB))
+        with engine.begin() as connection:
+            connection.execute(
+                sa.text(
+                    "INSERT INTO job_analysis_jd_tasks ("
+                    "document_id, task_id, statement, purpose_result, context, "
+                    "frequency_text, responsibility_role, enablers_json, "
+                    "display_order, created_at, updated_at"
+                    ") VALUES ("
+                    "'00000000-0000-0000-0000-000000000015', "
+                    "'legacy-task', '既有任務', NULL, NULL, NULL, NULL, "
+                    "'[]'::jsonb, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP"
+                    ")"
+                )
+            )
+        _alembic("upgrade", "0016", _async_url(MIG_DB))
         inspector = sa.inspect(engine)
         assert TABLES <= set(inspector.get_table_names(schema="public"))
 
@@ -320,8 +363,17 @@ def test_migration_0015_cycle_builds_greenfield_tables_and_preserves_0011():
                 for foreign_key in inspector.get_foreign_keys(table)
             }
             assert set(foreign_keys) == EXPECTED_FKS[table]
-            for foreign_key in foreign_keys.values():
-                assert foreign_key["options"].get("ondelete") == "CASCADE"
+            for name, foreign_key in foreign_keys.items():
+                if name == "ja2_fk_jd_tasks_duty":
+                    assert foreign_key["constrained_columns"] == [
+                        "document_id",
+                        "duty_id",
+                    ]
+                    assert foreign_key["referred_table"] == "job_analysis_jd_duties"
+                    assert foreign_key["options"].get("deferrable") is True
+                    assert foreign_key["options"].get("initially") == "DEFERRED"
+                else:
+                    assert foreign_key["options"].get("ondelete") == "CASCADE"
             assert {
                 check["name"] for check in inspector.get_check_constraints(table)
             } == EXPECTED_CHECKS[table]
@@ -351,6 +403,16 @@ def test_migration_0015_cycle_builds_greenfield_tables_and_preserves_0011():
             "job-analysis-jd-header/1"
         )
         assert migrated_document_row["jd_header_json"] == {}
+
+        with engine.connect() as connection:
+            legacy_task_row = connection.execute(
+                sa.text(
+                    "SELECT duty_id, competency_level FROM job_analysis_jd_tasks "
+                    "WHERE document_id = '00000000-0000-0000-0000-000000000015' "
+                    "AND task_id = 'legacy-task'"
+                )
+            ).mappings().one()
+        assert legacy_task_row == {"duty_id": None, "competency_level": None}
 
         with engine.connect() as connection:
             journal_kind_check = connection.scalar(
@@ -392,6 +454,17 @@ def test_migration_0015_cycle_builds_greenfield_tables_and_preserves_0011():
         assert opks_lifecycle_check is not None
         assert "resolved_at IS NULL" in opks_lifecycle_check
         assert "resolved_at IS NOT NULL" in opks_lifecycle_check
+
+        _alembic("downgrade", "0015", _async_url(MIG_DB))
+        downgraded_columns = {
+            column["name"]
+            for column in sa.inspect(engine).get_columns("job_analysis_jd_tasks")
+        }
+        assert "job_analysis_jd_duties" not in set(
+            sa.inspect(engine).get_table_names(schema="public")
+        )
+        assert "duty_id" not in downgraded_columns
+        assert "competency_level" not in downgraded_columns
 
         _alembic("downgrade", "0011", _async_url(MIG_DB))
         remaining = set(sa.inspect(engine).get_table_names(schema="public"))

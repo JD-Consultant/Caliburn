@@ -19,6 +19,7 @@ from app.job_analysis.application.authority_commit import commit_authority_chang
 from app.job_analysis.domain import (
     CurrentJdOpks,
     CurrentWorkModel,
+    Duty,
     JdHeader,
     JdTask,
     JdTaskFields,
@@ -100,6 +101,21 @@ class _Tasks:
         self.values = tasks
 
 
+class _Duties:
+    def __init__(self, writes: list[str]) -> None:
+        self.writes = writes
+        self.values: tuple[Duty, ...] = ()
+
+    async def list(self, document_id: UUID):
+        assert document_id == DOCUMENT_ID
+        return self.values
+
+    async def replace(self, document_id: UUID, duties) -> None:
+        assert document_id == DOCUMENT_ID
+        self.writes.append("replace_duties")
+        self.values = duties
+
+
 class _Proposals:
     def __init__(self, writes: list[str]) -> None:
         self.writes = writes
@@ -172,6 +188,7 @@ class _UnitOfWork:
         )
         self.documents = _Documents(record, self.writes)
         self.tasks = _Tasks(self.writes)
+        self.duties = _Duties(self.writes)
         self.proposals = _Proposals(self.writes)
         self.opks = _Opks(self.writes)
         self.opks_proposals = _OpksProposals(self.writes)
@@ -296,6 +313,7 @@ async def test_authority_commit_writes_opks_in_the_same_transaction():
     assert uow.opks_proposals.values == (proposal,)
     assert uow.documents.record.jd_header == header
     assert uow.writes == [
+        "replace_duties",
         "replace_tasks",
         "replace_proposals",
         "replace_opks",

@@ -4,6 +4,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Pencil } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
+import type { JdHeaderView } from "@caliburn/job-analysis-contract";
+
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { JobAnalysisApiError, putJdHeader } from "@/lib/jobAnalysisApi";
@@ -11,6 +13,7 @@ import {
   COMPETENCY_LEVELS,
   fromJdHeaderView,
   isJdHeaderFormDirty,
+  shouldAdoptJdHeaderRefetch,
   type JdHeaderFormValue,
   toJdHeaderWrite,
 } from "@/lib/jobAnalysisHeader";
@@ -41,23 +44,34 @@ export function JdHeaderForm({
 }) {
   const queryClient = useQueryClient();
   const document = useQuery(documentQueryOptions(documentId));
+  const [editing, setEditing] = useState(false);
   const [baseline, setBaseline] = useState<JdHeaderFormValue | null>(null);
   const [draft, setDraft] = useState<JdHeaderFormValue | null>(null);
-  const syncedHeader = useRef<object | null>(null);
+  const syncedHeader = useRef<JdHeaderView | null>(null);
 
   const dirty = Boolean(
-    baseline && draft && isJdHeaderFormDirty(baseline, draft),
+    editing && baseline && draft && isJdHeaderFormDirty(baseline, draft),
   );
 
   useEffect(() => {
-    const header = document.data?.jd_header;
-    if (!header || dirty || header === syncedHeader.current) return;
+    const nextHeader = document.data?.jd_header;
+    if (
+      !nextHeader ||
+      !shouldAdoptJdHeaderRefetch(
+        editing,
+        dirty,
+        syncedHeader.current,
+        nextHeader,
+      )
+    ) {
+      return;
+    }
 
-    syncedHeader.current = header;
-    const value = fromJdHeaderView(header);
+    syncedHeader.current = nextHeader;
+    const value = fromJdHeaderView(nextHeader);
     setBaseline(value);
     setDraft(value);
-  }, [document.data?.jd_header, dirty]);
+  }, [document.data?.jd_header, dirty, editing]);
 
   useEffect(() => {
     onDirtyChange?.(dirty);
@@ -78,8 +92,10 @@ export function JdHeaderForm({
     onSuccess: async (header) => {
       await invalidate();
       const value = fromJdHeaderView(header);
+      syncedHeader.current = header;
       setBaseline(value);
       setDraft(value);
+      setEditing(false);
     },
   });
 
@@ -96,17 +112,21 @@ export function JdHeaderForm({
 
   const header = document.data.jd_header;
   const readiness = document.data.readiness;
-  const editing = draft !== null;
 
   const startEdit = () => {
+    if (saveMutation.isPending) return;
     saveMutation.reset();
     const value = fromJdHeaderView(header);
+    syncedHeader.current = header;
     setBaseline(value);
     setDraft(value);
+    setEditing(true);
   };
 
   const cancel = () => {
+    if (saveMutation.isPending) return;
     if (dirty && !window.confirm("放棄尚未儲存的變更嗎？")) return;
+    setEditing(false);
     syncedHeader.current = null;
     setBaseline(null);
     setDraft(null);
@@ -164,6 +184,7 @@ export function JdHeaderForm({
             save();
           }}
           onKeyDown={(event) => {
+            if (saveMutation.isPending) return;
             if (event.key === "Escape") {
               event.preventDefault();
               cancel();
@@ -176,6 +197,7 @@ export function JdHeaderForm({
             }
           }}
         >
+          <fieldset disabled={saveMutation.isPending} className="space-y-5">
           <label className="block space-y-1.5">
             <span className="text-sm font-medium">職能基準名稱</span>
             <input
@@ -285,6 +307,7 @@ export function JdHeaderForm({
           <p className="text-xs text-muted-foreground">
             職能基準代碼與職類別代碼由 iCAP 配發，本頁不提供輸入欄位。
           </p>
+          </fieldset>
 
           {saveMutation.isError ? (
             <p className="text-sm text-destructive" role="alert">

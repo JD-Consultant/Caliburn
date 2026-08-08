@@ -86,6 +86,20 @@ export function isJdHeaderFormDirty(
   );
 }
 
+export function shouldAdoptJdHeaderRefetch(
+  editing: boolean,
+  dirty: boolean,
+  currentHeader: JdHeaderView | null,
+  nextHeader: JdHeaderView | null,
+): boolean {
+  return (
+    editing &&
+    !dirty &&
+    nextHeader !== null &&
+    nextHeader !== currentHeader
+  );
+}
+
 export function readinessSummary(
   readiness: DocumentReadinessView,
 ): string | null {

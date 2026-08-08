@@ -7,6 +7,7 @@ from uuid import UUID
 
 from app.job_analysis.domain import (
     CurrentJdOpks,
+    JdHeader,
     JdTask,
     OpksEntityKind,
     OpksEvidenceLink,
@@ -240,6 +241,7 @@ async def decide_opks_proposal(
                     uow,
                     record=record,
                     state=JobAnalysisState(
+                        jd_header=JdHeader(),
                         work_model=record.work_model,
                         current_jd=current_jd,
                         proposals=await uow.proposals.list(document_id),
@@ -341,6 +343,7 @@ async def decide_opks_proposal(
             uow,
             record=record,
             state=JobAnalysisState(
+                jd_header=JdHeader(),
                 work_model=record.work_model,
                 current_jd=current_jd,
                 proposals=await uow.proposals.list(document_id),

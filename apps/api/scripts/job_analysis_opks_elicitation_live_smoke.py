@@ -72,6 +72,7 @@ from app.job_analysis.application.authority_commit import (  # noqa: E402
 )
 from app.job_analysis.domain import (  # noqa: E402
     CurrentWorkModel,
+    JdHeader,
     JdTask,
     SourceKind,
     SourceRef,
@@ -195,6 +196,7 @@ async def _seed(uow_factory: JobAnalysisUnitOfWorkFactory, document_id: UUID) ->
             uow,
             record=record,
             state=JobAnalysisState(
+                jd_header=JdHeader(),
                 work_model=CurrentWorkModel(tasks=(_seeded_task(),)),
                 current_jd=(
                     JdTask(

@@ -6,6 +6,8 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from uuid import UUID
 
+from app.job_analysis.domain import JdHeader
+
 from .errors import (
     ConcurrentAuthorityChange,
     DocumentNotFound,
@@ -87,6 +89,7 @@ async def _load_state(
     record: DocumentRecord,
 ) -> JobAnalysisState:
     return JobAnalysisState(
+        jd_header=JdHeader(),
         work_model=record.work_model,
         current_jd=await uow.tasks.list(record.document_id),
         proposals=await uow.proposals.list(record.document_id),

@@ -2,7 +2,7 @@
 title: Task Analysis 引擎 — 端到端設計(durable PostgreSQL + consultant Web)
 audience: agent-primary(也給人)
 scope: apps/api job_analysis + job_analysis_postgres + job_analysis routes + apps/web workspace
-updated: 2026-08-06
+updated: 2026-08-09
 ---
 
 # Task Analysis 引擎 — 端到端設計
@@ -42,6 +42,8 @@ OpenRouter 拿 `task_analysis_result_v3`(送出去的精簡形狀)→ **mapper**
 | 組件 | 是什麼 | 碼 | 權力 |
 |---|---|---|---|
 | domain | Task／SourceRef／SupportLink／open_issues／excluded_signals／Task Proposal，以及 OPKS 的 `OpksItem`／`CurrentJdOpks`／獨立 `OpksProposal` 凍結形狀 | `app/job_analysis/domain/`（OPKS：`opks.py`、`opks_proposal.py`） | 純 Pydantic,frozen;**非法狀態無法被表示**;只 import stdlib＋pydantic。OPKS 已進完整 authority state、人工編輯、Proposal 決策 API 與 Web editor |
+| JD header | `JdHeader`：iCAP 版型表頭語意欄位（職能基準名稱／所屬類別／工作描述／nullable 基準級別 1–6／說明補充） | `app/job_analysis/domain/jd_header.py` | 純 Pydantic,frozen;全欄位 nullable,空字串拒收(要 `null` 不要 `""`);**沒有 `職能基準代碼`／`職類別代碼` 欄位**(iCAP 配發,不生成)。Task 1 已落地，尚未進 persistence／API／packet／Web |
+| readiness | `assess_readiness(header)` → 只有 issue 清單的 `DocumentReadiness` | `app/job_analysis/application/readiness.py` | 純函式,零 IO,**不 import transport contract**;第一版只查表頭三項(名稱／工作描述／基準級別),零 issue 時安靜;**沒有 `is_complete`／百分比**;說明補充與所屬類別刻意不發聲 |
 | llm 契約 | Task：內部 `TaskAnalysisResult`＋`task_analysis_result_v3` wire（v3 相對 v2 只多了與 `work_signals` 平行的 `issue_resolutions[]`；**不覆寫 v2**，同一個版本號不得指向兩種契約）；OPKS：獨立 `OpksResult`＋`opks_result_v1` wire；各自一份 Static Instructions | `app/job_analysis/llm/` | 只描述形狀與判準文字;**不做跨欄位驗證**。OPKS wire 只有 5 個 property、零 union，不擴充既有 Task schema |
 | wire mapper | 中性值 → `None` 的純還原 | `llm/wire.py` 的 `wire_to_task_analysis_result()` | **不做語意判斷**;沒有 domain 落點的夾帶內容一律拒絕,不靜默丟棄 |
 | assembler | Task 現況 → `TaskAnalysisPacket`；單一選定 Task → `OpksContextPacket`；兩者都有決定性 rendering | `application/context.py`、`application/opks_context.py` | 純函式;ordinal 的唯一產地。OPKS 只投影選定 Task、有效員工依據、該 Task O/P、全文件 K/S 與相關提案，不送完整 transcript／A／內部 ID |
@@ -57,6 +59,23 @@ OpenRouter 拿 `task_analysis_result_v3`(送出去的精簡形狀)→ **mapper**
 | Proposal use cases | Task 與 OPKS 各自送審、決策與 stale | `application/proposal_decisions.py`、`application/opks_proposals.py` | 兩種 Proposal 不抽通用 framework；決策由 document lock 序列化。OPKS accepted 套用候選但不偽造 Evidence；edited 只可改文字並另鑄 direct-edit Evidence；歷史 accepted 不會誤殺日後建立的新 revise |
 | Local Web API | 本機文件、Current JD、OPKS 與 Consultation routes | `app/api/routes/job_analysis.py` | 只做 generated wire DTO mapping；不暴露 Work Model、Journal、generation、內部 OPKS Source ID 或 provider detail；Consultation 會投影 Task 與 OPKS 兩種 Proposal，兩種 decision route 各自呼叫對應的 greenfield use case |
 | Local Web UI | 文件庫、顧問訪談、Proposal 審查與單一開啟文件的 Task／OPKS editor | `apps/web/src/app/workspace/`、`components/workspace/` | generated TS DTO + TanStack Query；conversation／Proposal／Current JD 同頁，一份本地編輯草稿、明確儲存，不用 Server Action／autosave／第二份 document store。O/P/K/S 按 Task 投影，同一 K/S 保留同一 entity identity；未連結 K/S 與 A 留在文件層 |
+
+### 2.1 Current State partition（Task 1）
+
+`JobAnalysisState` 是 application 內一名員工、一份職務說明書的 Current State 真相；各欄位的權力邊界不可互換：
+
+| partition | 欄位 | 意義與規則 |
+|---|---|---|
+| JD header authority | `jd_header: JdHeader` | 公版表頭語意欄位；**必填、沒有 state default**。後續員工寫入必須與 Current JD 同一條 authority seam；本 Task 只建立 domain 與 readiness，不做 persistence/API。 |
+| work-model authority | `work_model` | 由訪談證據形成的 Task／open issue／excluded signal；模型只能經 verifier＋transition 提出候選。 |
+| current-JD authority | `current_jd` | 員工可見的正式 JD Task 投影；Proposal 決策才可改，`apply_task_analysis_result()` 永遠不直接改它。 |
+| proposal memory | `proposals` | 待員工決策的 Task 假說與其 snapshot；不是 Current JD，也不能當成已成立工作。 |
+| OPKS authority | `current_opks` | O/P/K/S/A 文件內容與 Evidence linkage；OPKS packet 不讀 `jd_header`。 |
+| OPKS proposal memory | `opks_proposals` | 待員工決策的 OPKS 假說；與 Task Proposal 分開，不抽通用 Proposal contract。 |
+
+Task 1 的所有既有 state 建立／載入點都明確傳入 `JdHeader()`，刻意讓未來漏接 authority partition 立即成為 validation error；transition 產生新 state 時只轉送原有 `state.jd_header`。Task 2 才會將 header 從 persistence record 帶入並保存，不能在本 Task 以 default 或 `DocumentMetadataWrite.title` 掩蓋這條 seam。
+
+readiness 的輸入只有 `JdHeader`，輸出只有按固定表頭順序排列的 issue 清單：職能基準名稱、工作描述、基準級別。所屬類別、職業／行業分類、說明與補充事項空白不列 issue；不產生百分比、`ready` 或 `is_complete`，也不阻止保存、訪談或未來匯出。
 
 ## 3. 一輪的資料流(每步標函式)
 

@@ -9,6 +9,7 @@ from uuid import UUID
 from app.job_analysis.domain import (
     CurrentJdOpks,
     CurrentWorkModel,
+    JdHeader,
     JdTask,
     JdTaskFields,
     OpenIssue,
@@ -211,6 +212,7 @@ async def _commit_direct_edit(
 ) -> None:
     now = _utcnow()
     state = JobAnalysisState(
+        jd_header=JdHeader(),
         work_model=work_model,
         current_jd=tasks,
         proposals=proposals,
@@ -344,6 +346,7 @@ async def load_document(
         return LoadedDocument(
             document=record,
             state=JobAnalysisState(
+                jd_header=JdHeader(),
                 work_model=record.work_model,
                 current_jd=tasks,
                 proposals=proposals,

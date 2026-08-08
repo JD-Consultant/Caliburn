@@ -98,6 +98,12 @@ from .opks_verifier import (
     VerifiedOpksChange,
     verify_opks_result,
 )
+from .readiness import (
+    DocumentReadiness,
+    ReadinessIssue,
+    ReadinessIssueCode,
+    assess_readiness,
+)
 from .persistence import (
     ACTIVE_QUESTION_SCHEMA_ID,
     CONSULTANT_OPENING_SCHEMA_ID,
@@ -222,6 +228,10 @@ __all__ = [
     "ProposalNotDecidable",
     "ProposalNotFound",
     "ProposalRepository",
+    "DocumentReadiness",
+    "ReadinessIssue",
+    "ReadinessIssueCode",
+    "assess_readiness",
     "TaskAnalysisOperationResult",
     "StaleAuthoritySnapshot",
     "TransitionCommitRejected",

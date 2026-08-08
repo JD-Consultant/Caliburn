@@ -24,7 +24,7 @@ from __future__ import annotations
 
 from enum import StrEnum
 
-from app.job_analysis.domain import DomainModel, JdHeader, NonEmptyText
+from app.job_analysis.domain import DomainModel, JdHeader
 
 
 class ReadinessIssueCode(StrEnum):
@@ -35,7 +35,6 @@ class ReadinessIssueCode(StrEnum):
 
 class ReadinessIssue(DomainModel):
     code: ReadinessIssueCode
-    field: NonEmptyText
 
 
 class DocumentReadiness(DomainModel):
@@ -61,7 +60,7 @@ def assess_readiness(header: JdHeader) -> DocumentReadiness:
 
     return DocumentReadiness(
         issues=tuple(
-            ReadinessIssue(code=code, field=field)
+            ReadinessIssue(code=code)
             for field, code in _HEADER_CHECKS
             if getattr(header, field) is None
         )

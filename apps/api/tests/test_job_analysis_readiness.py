@@ -11,6 +11,7 @@ from pydantic import ValidationError
 from app.job_analysis.application import JobAnalysisState
 from app.job_analysis.application.readiness import (
     DocumentReadiness,
+    ReadinessIssue,
     ReadinessIssueCode,
     assess_readiness,
 )
@@ -104,14 +105,12 @@ def test_readiness_reports_no_completion_verdict() -> None:
         assert banned not in fields
 
 
-def test_every_issue_carries_the_field_it_points_at() -> None:
-    readiness = assess_readiness(JdHeader())
-
-    assert tuple(issue.field for issue in readiness.issues) == (
-        "competency_name",
-        "work_description",
-        "competency_level",
-    )
+def test_readiness_issue_rejects_a_redundant_field_locator() -> None:
+    with pytest.raises(ValidationError):
+        ReadinessIssue(
+            code=ReadinessIssueCode.COMPETENCY_NAME_MISSING,
+            field="work_description",
+        )
 
 
 def test_readiness_is_a_frozen_value() -> None:

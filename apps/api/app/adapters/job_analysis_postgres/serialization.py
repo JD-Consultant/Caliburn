@@ -1,4 +1,4 @@
-"""Fail-closed serialization for migration 0012 rows."""
+"""Fail-closed serialization for persisted job-analysis rows."""
 
 from __future__ import annotations
 
@@ -11,6 +11,7 @@ from app.job_analysis.application import (
     COMPLETED_TURN_SCHEMA_ID,
     CONSULTANT_OPENING_SCHEMA_ID,
     DIRECT_EDIT_SCHEMA_ID,
+    DUTY_DIRECT_EDIT_SCHEMA_ID,
     JD_HEADER_DIRECT_EDIT_SCHEMA_ID,
     JD_HEADER_SCHEMA_ID,
     OPKS_ITEM_SCHEMA_ID,
@@ -25,6 +26,7 @@ from app.job_analysis.application import (
     CompletedTurnPayload,
     ConsultantOpeningPayload,
     DirectEditPayload,
+    DutyDirectEditPayload,
     DocumentRecord,
     JdHeaderDirectEditPayload,
     JournalEntry,
@@ -35,6 +37,7 @@ from app.job_analysis.application import (
 )
 from app.job_analysis.domain import (
     CurrentWorkModel,
+    Duty,
     JdHeader,
     JdTask,
     OpksItem,
@@ -136,11 +139,26 @@ def load_jd_task(row: Any) -> JdTask:
                 "frequency_text": row.frequency_text,
                 "responsibility_role": row.responsibility_role,
                 "enablers": row.enablers_json,
+                "duty_id": row.duty_id,
+                "competency_level": row.competency_level,
                 "display_order": row.display_order,
             }
         )
     except (ValidationError, TypeError, ValueError) as exc:
         _fail("JD Task", exc, exc)
+
+
+def load_duty(row: Any) -> Duty:
+    try:
+        return Duty.model_validate(
+            {
+                "duty_id": row.duty_id,
+                "statement": row.statement,
+                "display_order": row.display_order,
+            }
+        )
+    except (ValidationError, TypeError, ValueError) as exc:
+        _fail("Duty", exc, exc)
 
 
 _OPKS_ITEM_RELATIONAL_FIELDS = {"entity_id", "entity_kind"}
@@ -260,6 +278,7 @@ _JOURNAL_PAYLOAD_TYPES = {
     COMPLETED_TURN_SCHEMA_ID: CompletedTurnPayload,
     DIRECT_EDIT_SCHEMA_ID: DirectEditPayload,
     JD_HEADER_DIRECT_EDIT_SCHEMA_ID: JdHeaderDirectEditPayload,
+    DUTY_DIRECT_EDIT_SCHEMA_ID: DutyDirectEditPayload,
     OPKS_DIRECT_EDIT_SCHEMA_ID: OpksDirectEditPayload,
     OPKS_PROPOSAL_DECISION_SCHEMA_ID: OpksProposalDecisionPayload,
     OPKS_GENERATION_SCHEMA_ID: OpksGenerationPayload,

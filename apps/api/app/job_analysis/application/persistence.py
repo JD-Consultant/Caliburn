@@ -19,6 +19,8 @@ from pydantic import model_validator
 from app.job_analysis.domain import (
     CurrentWorkModel,
     DomainModel,
+    Duty,
+    DutyId,
     Identifier,
     JdHeader,
     JdTask,
@@ -52,6 +54,7 @@ CONSULTANT_OPENING_SCHEMA_ID = "job-analysis-consultant-opening/1"
 COMPLETED_TURN_SCHEMA_ID = "job-analysis-completed-turn/1"
 DIRECT_EDIT_SCHEMA_ID = "job-analysis-direct-edit/1"
 JD_HEADER_DIRECT_EDIT_SCHEMA_ID = "job-analysis-jd-header-direct-edit/1"
+DUTY_DIRECT_EDIT_SCHEMA_ID = "job-analysis-duty-direct-edit/1"
 PROPOSAL_DECISION_SCHEMA_ID = "job-analysis-proposal-decision/1"
 
 
@@ -172,6 +175,48 @@ class JdHeaderDirectEditPayload(DomainModel):
     def replacement_must_change_the_header(self):
         if self.before == self.after:
             raise ValueError("JD header direct edit must change at least one field")
+        return self
+
+
+DutyDirectEditAction = Literal["add", "edit", "delete", "reorder"]
+
+
+class DutyDirectEditPayload(DomainModel):
+    """Immutable employee receipt for one Current-JD Duty edit.
+
+    A Duty is document authority, not Task evidence.  Its receipt deliberately
+    has no ``SourceRef`` and therefore cannot become Work Model support.
+    """
+
+    action: DutyDirectEditAction
+    before: Duty | None = None
+    after: Duty | None = None
+    ordered_duty_ids: tuple[DutyId, ...] = ()
+
+    @model_validator(mode="after")
+    def snapshots_match_action(self):
+        if self.action == "add":
+            if self.before is not None or self.after is None or self.ordered_duty_ids:
+                raise ValueError("add Duty edit must carry only an after snapshot")
+            return self
+        if self.action == "edit":
+            if self.before is None or self.after is None or self.ordered_duty_ids:
+                raise ValueError("edit Duty must carry before and after snapshots")
+            if self.before.duty_id != self.after.duty_id:
+                raise ValueError("edit Duty must preserve identity")
+            if self.before.display_order != self.after.display_order:
+                raise ValueError("edit Duty must preserve display order")
+            return self
+        if self.action == "delete":
+            if self.before is None or self.after is not None or self.ordered_duty_ids:
+                raise ValueError("delete Duty edit must carry only a before snapshot")
+            return self
+        if self.before is not None or self.after is not None:
+            raise ValueError("reorder Duty edit must not carry snapshots")
+        if not self.ordered_duty_ids:
+            raise ValueError("reorder Duty edit requires ordered_duty_ids")
+        if len(set(self.ordered_duty_ids)) != len(self.ordered_duty_ids):
+            raise ValueError("reorder Duty ids must be distinct")
         return self
 
 
@@ -327,6 +372,7 @@ JournalPayload = (
     | CompletedTurnPayload
     | DirectEditPayload
     | JdHeaderDirectEditPayload
+    | DutyDirectEditPayload
     | OpksDirectEditPayload
     | OpksProposalDecisionPayload
     | OpksGenerationPayload
@@ -343,6 +389,10 @@ _JOURNAL_CONTRACT: dict[type[DomainModel], tuple[JournalKind, str]] = {
     JdHeaderDirectEditPayload: (
         "direct_edit",
         JD_HEADER_DIRECT_EDIT_SCHEMA_ID,
+    ),
+    DutyDirectEditPayload: (
+        "direct_edit",
+        DUTY_DIRECT_EDIT_SCHEMA_ID,
     ),
     OpksDirectEditPayload: ("direct_edit", OPKS_DIRECT_EDIT_SCHEMA_ID),
     OpksProposalDecisionPayload: (
@@ -418,6 +468,16 @@ class JdTaskRepository(Protocol):
     ) -> None: ...
 
 
+class DutyRepository(Protocol):
+    async def list(self, document_id: UUID) -> tuple[Duty, ...]: ...
+
+    async def replace(
+        self,
+        document_id: UUID,
+        duties: tuple[Duty, ...],
+    ) -> None: ...
+
+
 class ProposalRepository(Protocol):
     async def list(
         self,
@@ -469,6 +529,7 @@ class JournalRepository(Protocol):
 class JobAnalysisUnitOfWork(Protocol):
     documents: DocumentRepository
     tasks: JdTaskRepository
+    duties: DutyRepository
     proposals: ProposalRepository
     opks: OpksRepository
     opks_proposals: OpksProposalRepository

@@ -13,6 +13,14 @@ class JdTaskNotFound(JobAnalysisApplicationError):
     pass
 
 
+class DutyNotFound(JobAnalysisApplicationError):
+    pass
+
+
+class InvalidDutyOrder(JobAnalysisApplicationError):
+    pass
+
+
 class OpksItemNotFound(JobAnalysisApplicationError):
     pass
 

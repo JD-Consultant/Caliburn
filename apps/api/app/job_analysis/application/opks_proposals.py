@@ -242,7 +242,7 @@ async def decide_opks_proposal(
                     record=record,
                     state=JobAnalysisState(
                         jd_header=record.jd_header,
-                        current_duties=(),
+                        current_duties=await uow.duties.list(document_id),
                         work_model=record.work_model,
                         current_jd=current_jd,
                         proposals=await uow.proposals.list(document_id),
@@ -345,7 +345,7 @@ async def decide_opks_proposal(
             record=record,
             state=JobAnalysisState(
                 jd_header=record.jd_header,
-                current_duties=(),
+                current_duties=await uow.duties.list(document_id),
                 work_model=record.work_model,
                 current_jd=current_jd,
                 proposals=await uow.proposals.list(document_id),

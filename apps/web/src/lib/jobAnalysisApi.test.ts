@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type {
+  JdHeaderWrite,
   JdTaskWrite,
   OpksItemWrite,
   OpksProposalDecisionWrite,
@@ -21,6 +22,7 @@ import {
   jobAnalysisProblemMessage,
   listDocuments,
   putDocument,
+  putJdHeader,
   reorderTasks,
   submitEmployeeTurn,
   decideProposal,
@@ -56,7 +58,27 @@ describe("job-analysis document client", () => {
           document_id: DOCUMENT_ID,
           title: "門市營運專員",
           updated_at: "2026-07-30T10:00:00Z",
+          jd_header: {
+            competency_name: null,
+            occupation_category_name: null,
+            occupation_name: null,
+            occupation_code: null,
+            industry_name: null,
+            industry_code: null,
+            work_description: null,
+            competency_level: null,
+            notes: null,
+          },
+          readiness: {
+            issues: [
+              { code: "competency_name_missing" },
+              { code: "work_description_missing" },
+              { code: "competency_level_missing" },
+            ],
+          },
           tasks: [],
+          opks_items: [],
+          opks_task_status: [],
         }),
       );
     vi.stubGlobal("fetch", fetchMock);
@@ -157,6 +179,37 @@ describe("Current JD Task client", () => {
       ["PUT", `http://127.0.0.1:8001/api/v1/job-analysis/documents/${DOCUMENT_ID}/tasks/task-1`],
       ["PUT", `http://127.0.0.1:8001/api/v1/job-analysis/documents/${DOCUMENT_ID}/task-order`],
       ["DELETE", `http://127.0.0.1:8001/api/v1/job-analysis/documents/${DOCUMENT_ID}/tasks/task-1`],
+    ]);
+  });
+});
+
+describe("JD header client", () => {
+  const header: JdHeaderWrite = {
+    competency_name: "資訊安全維運人員",
+    occupation_category_name: null,
+    occupation_name: null,
+    occupation_code: null,
+    industry_name: null,
+    industry_code: null,
+    work_description: "維運企業資訊安全設備並處理資安事件。",
+    competency_level: 4,
+    notes: null,
+  };
+
+  it("PUTs the complete header to the exact endpoint with the caller key", async () => {
+    const fetchMock = vi.fn().mockResolvedValueOnce(response(header));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await putJdHeader(DOCUMENT_ID, header, "header-1");
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock.mock.calls[0]).toEqual([
+      `http://127.0.0.1:8001/api/v1/job-analysis/documents/${DOCUMENT_ID}/jd-header`,
+      expect.objectContaining({
+        method: "PUT",
+        headers: expect.objectContaining({ "Idempotency-Key": "header-1" }),
+        body: JSON.stringify(header),
+      }),
     ]);
   });
 });

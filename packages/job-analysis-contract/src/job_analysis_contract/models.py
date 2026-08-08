@@ -41,7 +41,7 @@ class DocumentSummary(BaseModel):
     )
     document_id: UUID
     title: str
-    task_count: conint(ge=0)
+    task_count: conint(ge=0, strict=True)
     updated_at: AwareDatetime
 
 
@@ -56,7 +56,7 @@ class JdHeaderView(BaseModel):
     industry_name: str | None
     industry_code: str | None
     work_description: str | None
-    competency_level: conint(ge=1, le=6) | None
+    competency_level: conint(ge=1, le=6, strict=True) | None
     notes: str | None
 
 
@@ -71,7 +71,7 @@ class JdHeaderWrite(BaseModel):
     industry_name: str | None = None
     industry_code: str | None = None
     work_description: str | None = None
-    competency_level: conint(ge=1, le=6) | None = None
+    competency_level: conint(ge=1, le=6, strict=True) | None = None
     notes: str | None = None
 
 
@@ -149,7 +149,7 @@ class JdTaskView(BaseModel):
     frequency_text: str | None
     responsibility_role: ResponsibilityRole1 | None
     enablers: list[Enabler]
-    display_order: conint(ge=0)
+    display_order: conint(ge=0, strict=True)
 
 
 class EntityKind(StrEnum):
@@ -402,6 +402,6 @@ class ProblemDetail(BaseModel):
     )
     type: Type
     title: str
-    status: conint(ge=400, le=599)
+    status: conint(ge=400, le=599, strict=True)
     detail: str | None = None
     errors: list[ProblemFieldError] | None = None

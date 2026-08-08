@@ -262,6 +262,10 @@ def test_document_readiness_contract_is_code_only_without_a_completion_verdict()
         "competency_name_missing",
         "work_description_missing",
         "competency_level_missing",
+        "task_duty_missing",
+        "task_competency_level_missing",
+        "duty_without_task",
+        "opks_task_link_missing",
     }
 
 

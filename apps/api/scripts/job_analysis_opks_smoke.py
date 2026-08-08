@@ -204,6 +204,7 @@ async def _seed_grounded_document(
             record=record,
             state=JobAnalysisState(
                 jd_header=JdHeader(),
+                current_duties=(),
                 work_model=CurrentWorkModel(tasks=tasks),
                 current_jd=(
                     JdTask(

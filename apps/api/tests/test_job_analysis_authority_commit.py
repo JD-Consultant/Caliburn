@@ -241,6 +241,7 @@ async def test_authority_commit_rejects_dangling_opks_task_ref_before_any_write(
     uow = _UnitOfWork()
     invalid = JobAnalysisState.model_construct(
         jd_header=JdHeader(),
+        current_duties=(),
         work_model=CurrentWorkModel(),
         current_jd=(JdTask(task_id="task-1", statement="工作一", display_order=0),),
         proposals=(),
@@ -277,6 +278,7 @@ async def test_authority_commit_writes_opks_in_the_same_transaction():
     )
     state = JobAnalysisState(
         jd_header=header,
+        current_duties=(),
         current_jd=(task,),
         current_opks=CurrentJdOpks(items=(item,)),
         opks_proposals=(proposal,),

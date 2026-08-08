@@ -229,6 +229,7 @@ async def _commit_direct_edit(
     now = _utcnow()
     state = JobAnalysisState(
         jd_header=record.jd_header,
+        current_duties=(),
         work_model=work_model,
         current_jd=tasks,
         proposals=proposals,
@@ -364,6 +365,7 @@ async def load_document(
             document=record,
             state=JobAnalysisState(
                 jd_header=record.jd_header,
+                current_duties=(),
                 work_model=record.work_model,
                 current_jd=tasks,
                 proposals=proposals,
@@ -405,6 +407,7 @@ async def put_jd_header(
             record=record,
             state=JobAnalysisState(
                 jd_header=header,
+                current_duties=(),
                 work_model=record.work_model,
                 current_jd=await uow.tasks.list(document_id),
                 proposals=await uow.proposals.list(document_id),

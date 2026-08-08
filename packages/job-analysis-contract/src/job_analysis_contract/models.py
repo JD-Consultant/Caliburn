@@ -79,6 +79,10 @@ class Code(StrEnum):
     competency_name_missing = 'competency_name_missing'
     work_description_missing = 'work_description_missing'
     competency_level_missing = 'competency_level_missing'
+    task_duty_missing = 'task_duty_missing'
+    task_competency_level_missing = 'task_competency_level_missing'
+    duty_without_task = 'duty_without_task'
+    opks_task_link_missing = 'opks_task_link_missing'
 
 
 class ReadinessIssueView(BaseModel):

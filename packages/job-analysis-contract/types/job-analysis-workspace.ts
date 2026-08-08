@@ -70,7 +70,14 @@ export interface JdHeaderWrite {
  * via the `definition` "ReadinessIssueView".
  */
 export interface ReadinessIssueView {
-  code: "competency_name_missing" | "work_description_missing" | "competency_level_missing";
+  code:
+    | "competency_name_missing"
+    | "work_description_missing"
+    | "competency_level_missing"
+    | "task_duty_missing"
+    | "task_competency_level_missing"
+    | "duty_without_task"
+    | "opks_task_link_missing";
 }
 /**
  * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema

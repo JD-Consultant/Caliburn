@@ -111,7 +111,7 @@ async def run_round(
     active_question: ActiveQuestion | None = None,
     operation_id: str = "op-1",
 ) -> tuple[TransitionResult, str, str]:
-    state = state or JobAnalysisState(jd_header=JdHeader())
+    state = state or JobAnalysisState(jd_header=JdHeader(), current_duties=())
     packet = build_context_packet(
         transcript=transcript,
         current_turn_id=current_turn_id,
@@ -381,7 +381,9 @@ async def test_a_correction_withdraws_an_existing_task_and_supersedes_its_eviden
         current_turn_id="turn-4",
         scripted=scripted,
         state=JobAnalysisState(
-            jd_header=JdHeader(), work_model=CurrentWorkModel(tasks=(existing,))
+            jd_header=JdHeader(),
+            current_duties=(),
+            work_model=CurrentWorkModel(tasks=(existing,)),
         ),
     )
 
@@ -435,7 +437,9 @@ async def test_a_short_answer_is_only_interpretable_through_the_active_question(
         scripted=scripted,
         active_question=ActiveQuestion(turn_id="turn-3", text=asked),
         state=JobAnalysisState(
-            jd_header=JdHeader(), work_model=CurrentWorkModel(tasks=(existing,))
+            jd_header=JdHeader(),
+            current_duties=(),
+            work_model=CurrentWorkModel(tasks=(existing,)),
         ),
     )
 
@@ -496,6 +500,7 @@ async def test_a_pending_proposal_does_not_block_the_next_coverage_question():
         scripted=scripted,
         state=JobAnalysisState(
             jd_header=JdHeader(),
+            current_duties=(),
             work_model=CurrentWorkModel(tasks=(existing,)),
             proposals=(proposal,),
         ),

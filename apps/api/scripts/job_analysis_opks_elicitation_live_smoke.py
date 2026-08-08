@@ -197,6 +197,7 @@ async def _seed(uow_factory: JobAnalysisUnitOfWorkFactory, document_id: UUID) ->
             record=record,
             state=JobAnalysisState(
                 jd_header=JdHeader(),
+                current_duties=(),
                 work_model=CurrentWorkModel(tasks=(_seeded_task(),)),
                 current_jd=(
                     JdTask(

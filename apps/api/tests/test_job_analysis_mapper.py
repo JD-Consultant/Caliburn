@@ -132,6 +132,7 @@ def test_document_view_carries_header_and_the_application_readiness_result():
         ),
         state=JobAnalysisState(
             jd_header=header,
+            current_duties=(),
             work_model=CurrentWorkModel(),
             current_jd=(),
             proposals=(),
@@ -290,6 +291,7 @@ def test_consultation_view_keeps_history_without_leaking_internal_authority():
         ),
         state=JobAnalysisState(
             jd_header=JdHeader(),
+            current_duties=(),
             work_model=CurrentWorkModel(tasks=(task,)),
             current_jd=(jd_task,),
             proposals=(proposal,),

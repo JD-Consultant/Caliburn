@@ -117,6 +117,14 @@ export function readinessIssueLabel(
       return "工作描述";
     case "competency_level_missing":
       return "基準級別";
+    case "task_duty_missing":
+      return "Task 主要職責分組";
+    case "task_competency_level_missing":
+      return "Task 職能級別";
+    case "duty_without_task":
+      return "沒有工作的主要職責";
+    case "opks_task_link_missing":
+      return "未連結到工作的知識／技能";
     default:
       return assertNever(code);
   }

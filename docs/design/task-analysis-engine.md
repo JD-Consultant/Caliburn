@@ -313,10 +313,16 @@ Consultation turn 不再重複呼叫它。
 
 | 層 | 規則 | 例子 |
 |---|---|---|
-| domain 型別 | 形狀不變量,**非法狀態無法被建構** | `active` Task 至少一條有效 SupportLink;`withdrawn` 必有 reason;lineage 不成環;staged delta 的 ID 不重複且欄位必須符合 action;Current JD／Proposal ID 不重複且 JD 投影順序 canonical;§10.5 的 `edited_jd_after` 四條硬規則；OPKS Evidence 非空且只收 employee turn/direct edit，O/P 恰連一個 Task、K/S 多對多、A 不帶 refs，OPKS Proposal 的 action/snapshot/status payload 不可矛盾 |
+| domain 型別 | 形狀不變量,**非法狀態無法被建構** | `active` Task 至少一條有效 SupportLink;`withdrawn` 必有 reason;lineage 不成環;staged delta 的 ID 不重複且欄位必須符合 action;Current JD／Proposal ID 不重複且 JD 投影順序 canonical;`JobAnalysisState.current_duties` 的 Duty ID／順序唯一且 canonical、Task→Duty reference 必須存在；§10.5 的 `edited_jd_after` 四條硬規則；OPKS Evidence 非空且只收 employee turn/direct edit，O/P 恰連一個 Task、K/S 多對多、A 不帶 refs，OPKS Proposal 的 action/snapshot/status payload 不可矛盾 |
 | verifier | 需要 packet 才判斷得出的規則 | quote 必須是該員工回合的逐字子字串;ordinal 在範圍內;`no_match` 不得帶 target;merge ≥2;split child 只能沿用母 Task 的有效 support ordinal;withdraw 不得帶 `task_fields` 但必須帶 `withdraw_reason`;同一 target 被兩筆 `task_change` 指涉或兩筆 signal 逐欄完全相同 → **明確拒絕**;supersession 必須指向仍有效且被同一筆 signal 指涉的 support link |
 | transition | 需要 state 才判斷得出的規則 | identity gate;§9.5 三出口;Task／Proposal 的決定性 ID 採 insert-only,撞到不同內容即拒絕;retirement 來源只能取自該 signal 實際引用的 anchor;§10.8 stale disposition |
 | **不在任何一層** | 語意判斷 | purpose 是否相同、該不該 merge／split、outcome 是否可理解、enabler 分類是否正確——**歸 rubric 與員工審核**(§9.5 末段) |
+
+### 5.1 Duty 與 readiness（Task 6）
+
+- `Duty` 是員工擁有的 Task 上一層分組；`duty_id` 與 `competency_level`（1–6、可空）屬 Current JD，模型輸出沒有這兩欄。AI 新增、merge、split 的新 JD Task 保持未分組／未填級別；同 ID revise 只更新 AI 提出的語意文字，保留員工既有值。
+- `JobAnalysisState.current_duties` 是必填的 canonical tuple；Task 若帶 `duty_id` 必須指向現有 Duty。Task 6 只完成 domain invariant 與 pure readiness；Duty 的 PostgreSQL persistence／authoring 與 Web 編輯仍是後續 Task 7–8，這裡不宣稱已接通。
+- `assess_readiness(header, duties, tasks, current_opks)` 只回報可機械判定的固定 issue code；每個 code 一次，不帶 Task／Duty identity。除了表頭三碼，依固定順序檢查未分組 Task、未填 Task 級別、空 Duty，以及沒有任何 Task／Indicator reference 的 K/S；不把缺 O、缺 A 或 notes 判成缺漏。API／Web 只呈現結果，不自行重算。
 
 ## 6. Identity gate:什麼時候可以直接改 Work Model
 

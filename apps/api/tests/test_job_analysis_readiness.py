@@ -15,7 +15,32 @@ from app.job_analysis.application.readiness import (
     ReadinessIssueCode,
     assess_readiness,
 )
-from app.job_analysis.domain import JdHeader
+from app.job_analysis.domain import (
+    CurrentJdOpks,
+    Duty,
+    JdHeader,
+    JdTask,
+    OpksEntityKind,
+    OpksEvidenceLink,
+    OpksItem,
+    SourceKind,
+    SourceRef,
+)
+
+
+def _assess(
+    header: JdHeader,
+    *,
+    duties: tuple[Duty, ...] = (),
+    tasks: tuple[JdTask, ...] = (),
+    current_opks: CurrentJdOpks | None = None,
+) -> DocumentReadiness:
+    return assess_readiness(
+        header=header,
+        duties=duties,
+        tasks=tasks,
+        current_opks=current_opks or CurrentJdOpks(),
+    )
 
 
 def _complete_header(**overrides: object) -> JdHeader:
@@ -29,7 +54,7 @@ def _complete_header(**overrides: object) -> JdHeader:
 
 
 def test_a_complete_header_stays_silent() -> None:
-    readiness = assess_readiness(_complete_header())
+    readiness = _assess(_complete_header())
 
     assert readiness.issues == ()
     assert readiness.issue_count == 0
@@ -46,13 +71,13 @@ def test_a_complete_header_stays_silent() -> None:
 def test_each_determinable_header_gap_raises_its_own_issue(
     field: str, expected: ReadinessIssueCode
 ) -> None:
-    readiness = assess_readiness(_complete_header(**{field: None}))
+    readiness = _assess(_complete_header(**{field: None}))
 
     assert tuple(issue.code for issue in readiness.issues) == (expected,)
 
 
 def test_an_empty_header_reports_every_first_version_issue() -> None:
-    readiness = assess_readiness(JdHeader())
+    readiness = _assess(JdHeader())
 
     assert tuple(issue.code for issue in readiness.issues) == (
         ReadinessIssueCode.COMPETENCY_NAME_MISSING,
@@ -66,7 +91,7 @@ def test_an_empty_header_reports_every_first_version_issue() -> None:
 def test_notes_are_conditional_and_never_reported_missing() -> None:
     """ADR 0053 決定 8：說明與補充事項空白不列缺漏。"""
 
-    readiness = assess_readiness(_complete_header(notes=None))
+    readiness = _assess(_complete_header(notes=None))
 
     assert readiness.issues == ()
 
@@ -74,7 +99,7 @@ def test_notes_are_conditional_and_never_reported_missing() -> None:
 def test_the_category_group_stays_silent_in_the_first_version() -> None:
     """ADR 0052 決定 6：官方規則無法確定必填的一律不提示。"""
 
-    readiness = assess_readiness(
+    readiness = _assess(
         _complete_header(
             occupation_category_name=None,
             occupation_name=None,
@@ -88,8 +113,8 @@ def test_the_category_group_stays_silent_in_the_first_version() -> None:
 
 
 def test_issue_order_is_deterministic_and_follows_the_official_form() -> None:
-    first = assess_readiness(JdHeader())
-    second = assess_readiness(JdHeader())
+    first = _assess(JdHeader())
+    second = _assess(JdHeader())
 
     assert first == second
     assert first.issues == second.issues
@@ -114,7 +139,7 @@ def test_readiness_issue_rejects_a_redundant_field_locator() -> None:
 
 
 def test_readiness_is_a_frozen_value() -> None:
-    readiness = assess_readiness(JdHeader())
+    readiness = _assess(JdHeader())
 
     with pytest.raises(Exception):
         readiness.issues = ()  # type: ignore[misc]
@@ -151,3 +176,88 @@ def test_assessment_is_pure_and_does_not_touch_transport_or_io() -> None:
 def test_state_requires_an_explicit_header_partition() -> None:
     with pytest.raises(ValidationError):
         JobAnalysisState()
+
+
+def test_readiness_reports_each_structure_gap_once_without_task_identity() -> None:
+    duties = (
+        Duty(duty_id="d1", statement="門市營運", display_order=0),
+        Duty(duty_id="d2", statement="庫存管理", display_order=1),
+    )
+    tasks = (
+        JdTask(task_id="t1", statement="盤點庫存", display_order=0),
+        JdTask(task_id="t2", statement="整理週報", display_order=1),
+    )
+
+    readiness = _assess(_complete_header(), duties=duties, tasks=tasks)
+
+    assert tuple(issue.code for issue in readiness.issues) == (
+        ReadinessIssueCode.TASK_DUTY_MISSING,
+        ReadinessIssueCode.TASK_COMPETENCY_LEVEL_MISSING,
+        ReadinessIssueCode.DUTY_WITHOUT_TASK,
+    )
+    assert readiness.issue_count == 3
+
+
+def test_readiness_reports_unlinked_knowledge_or_skill_once() -> None:
+    item = OpksItem(
+        entity_id="knowledge-1",
+        entity_kind=OpksEntityKind.KNOWLEDGE,
+        text="庫存差異成因",
+        evidence_links=(
+            OpksEvidenceLink(
+                source_ref=SourceRef(kind=SourceKind.DIRECT_EDIT, id="edit-1")
+            ),
+        ),
+    )
+
+    readiness = _assess(
+        _complete_header(),
+        current_opks=CurrentJdOpks(items=(item,)),
+    )
+
+    assert tuple(issue.code for issue in readiness.issues) == (
+        ReadinessIssueCode.OPKS_TASK_LINK_MISSING,
+    )
+
+
+def test_readiness_does_not_require_output_attitude_or_notes() -> None:
+    duty = Duty(duty_id="d1", statement="門市營運", display_order=0)
+    task = JdTask(
+        task_id="t1",
+        statement="盤點庫存",
+        display_order=0,
+        duty_id="d1",
+        competency_level=4,
+    )
+    output = OpksItem(
+        entity_id="output-1",
+        entity_kind=OpksEntityKind.OUTPUT,
+        text="盤點結果",
+        task_refs=("t1",),
+        evidence_links=(
+            OpksEvidenceLink(
+                source_ref=SourceRef(kind=SourceKind.EMPLOYEE_TURN, id="turn-1"),
+                quote="員工說明盤點結果",
+            ),
+        ),
+    )
+    attitude = OpksItem(
+        entity_id="attitude-1",
+        entity_kind=OpksEntityKind.ATTITUDE,
+        text="謹慎",
+        evidence_links=(
+            OpksEvidenceLink(
+                source_ref=SourceRef(kind=SourceKind.EMPLOYEE_TURN, id="turn-1"),
+                quote="員工說明工作態度",
+            ),
+        ),
+    )
+
+    readiness = _assess(
+        _complete_header(notes=None),
+        duties=(duty,),
+        tasks=(task,),
+        current_opks=CurrentJdOpks(items=(output, attitude)),
+    )
+
+    assert readiness.issues == ()

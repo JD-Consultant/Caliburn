@@ -121,9 +121,21 @@ describe("readiness presentation", () => {
         "competency_name_missing",
         "work_description_missing",
         "competency_level_missing",
+        "task_duty_missing",
+        "task_competency_level_missing",
+        "duty_without_task",
+        "opks_task_link_missing",
       ].map((code) =>
         readinessIssueLabel(code as DocumentReadinessView["issues"][number]["code"]),
       ),
-    ).toEqual(["職能基準名稱", "工作描述", "基準級別"]);
+    ).toEqual([
+      "職能基準名稱",
+      "工作描述",
+      "基準級別",
+      "Task 主要職責分組",
+      "Task 職能級別",
+      "沒有工作的主要職責",
+      "未連結到工作的知識／技能",
+    ]);
   });
 });

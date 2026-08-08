@@ -495,6 +495,12 @@ git commit -m "feat(job-analysis): add Duty and task competency level"
 **Interfaces:**
 - Produces: `DutyRepository.list/replace` and `add_duty`／`edit_duty`／`delete_duty`／`reorder_duties`.
 - Deleting a Duty leaves Tasks active and sets their `duty_id=None` in the same transaction.
+- Journal uses a dedicated `DutyDirectEditPayload` (`add／edit／delete／reorder`) and
+  `job-analysis-duty-direct-edit/1`; Duty edits are Current JD authority, not Task Evidence, and never mint a
+  `SourceRef`.
+- `commit_authority_change()` replaces Duties and Tasks in the same transaction. Deleting a Duty stales only
+  pending/deferred Task Proposals whose affected Tasks were unassigned; it does not change Work Model,
+  create `pending_reconciliation`, or touch OPKS.
 
 - [ ] **Step 1: Write red persistence and authoring tests**
 
@@ -524,6 +530,10 @@ Create `job_analysis_jd_duties`; add nullable `duty_id` and `competency_level` t
 - [ ] **Step 4: Implement the four authoring use cases through the shared seam**
 
 `add_duty` derives `f"{entry_id}-d0"`; edit preserves identity/order; reorder requires the exact current ID set; delete clears Task refs and removes Duty atomically.
+
+The existing Task／Proposal JSON readers must round-trip pre-Duty payloads with the new optional fields defaulting
+to `None`. Do not invent a generic schema migration framework; if the existing schema IDs remain unchanged, record
+the additive/backward-compatible rationale in the commit and pin it with old-payload tests.
 
 - [ ] **Step 5: Run real PostgreSQL focused gate**
 

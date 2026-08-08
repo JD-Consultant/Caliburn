@@ -3,6 +3,8 @@ import type {
   DocumentMetadataView,
   DocumentSummary,
   DocumentView,
+  JdHeaderView,
+  JdHeaderWrite,
   JdTaskView,
   JdTaskWrite,
   OpksItemView,
@@ -86,6 +88,18 @@ export function getConsultation(documentId: string): Promise<ConsultationView> {
 
 function mutationHeaders(idempotencyKey: string) {
   return { "Idempotency-Key": idempotencyKey };
+}
+
+export function putJdHeader(
+  documentId: string,
+  header: JdHeaderWrite,
+  idempotencyKey: string,
+): Promise<JdHeaderView> {
+  return request<JdHeaderView>(`/documents/${documentId}/jd-header`, {
+    method: "PUT",
+    headers: mutationHeaders(idempotencyKey),
+    body: JSON.stringify(header),
+  });
 }
 
 export function addTask(

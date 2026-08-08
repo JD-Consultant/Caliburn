@@ -2,12 +2,11 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import UTC, datetime
 from uuid import UUID
 
-from app.job_analysis.domain import JdHeader
-
+from .authority_commit import commit_authority_change
 from .errors import (
     ConcurrentAuthorityChange,
     DocumentNotFound,
@@ -89,7 +88,7 @@ async def _load_state(
     record: DocumentRecord,
 ) -> JobAnalysisState:
     return JobAnalysisState(
-        jd_header=JdHeader(),
+        jd_header=record.jd_header,
         work_model=record.work_model,
         current_jd=await uow.tasks.list(record.document_id),
         proposals=await uow.proposals.list(record.document_id),
@@ -282,35 +281,30 @@ async def commit_verified_turn(
                 operation_id=operation_id,
             ),
         )
-        await uow.proposals.replace(
-            snapshot.document_id,
-            transition.state.proposals,
-        )
-        await uow.journal.add(
-            JournalEntry(
-                document_id=snapshot.document_id,
-                entry_id=operation_id,
-                kind="employee_turn",
-                payload_schema_id=COMPLETED_TURN_SCHEMA_ID,
-                payload=CompletedTurnPayload(
-                    operation_id=operation_id,
-                    employee_turn=employee_turn,
-                    consultant_turn=consultant_turn,
-                    scheduled_opks=scheduled_opks,
+        try:
+            await commit_authority_change(
+                uow,
+                record=replace(record, active_question=active_question),
+                state=transition.state,
+                updated_at=now,
+                journal_entries=(
+                    JournalEntry(
+                        document_id=snapshot.document_id,
+                        entry_id=operation_id,
+                        kind="employee_turn",
+                        payload_schema_id=COMPLETED_TURN_SCHEMA_ID,
+                        payload=CompletedTurnPayload(
+                            operation_id=operation_id,
+                            employee_turn=employee_turn,
+                            consultant_turn=consultant_turn,
+                            scheduled_opks=scheduled_opks,
+                        ),
+                        created_at=now,
+                    ),
                 ),
-                created_at=now,
             )
-        )
-        updated = await uow.documents.update_authority(
-            snapshot.document_id,
-            expected_generation=snapshot.authority_generation,
-            work_model=transition.state.work_model,
-            active_question=active_question,
-            updated_at=now,
-        )
-        if not updated:
+        except ConcurrentAuthorityChange as error:
             raise StaleAuthoritySnapshot(
                 "the document changed while this Task Analysis turn was committed"
-            )
-        await uow.commit()
+            ) from error
         return CommittedTurn(transition=transition, scheduled_opks=scheduled_opks)

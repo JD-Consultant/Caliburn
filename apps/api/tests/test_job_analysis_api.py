@@ -105,6 +105,7 @@ class _Documents:
         document_id: UUID,
         *,
         expected_generation: int,
+        jd_header,
         work_model,
         active_question,
         updated_at: datetime,
@@ -118,6 +119,7 @@ class _Documents:
             return False
         self.store.document = replace(
             record,
+            jd_header=jd_header,
             work_model=work_model,
             active_question=active_question,
             authority_generation=expected_generation + 1,

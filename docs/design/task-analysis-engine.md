@@ -52,28 +52,28 @@ OpenRouter 拿 `task_analysis_result_v3`(送出去的精簡形狀)→ **mapper**
 | provider | 最小 OpenRouter Chat adapter | `providers/openrouter.py` | 一次 HTTP;固定 `reasoning=high` 且不回傳 reasoning;成功內容必須由 response `model` 證明來自 exact configured model;typed 失敗;**只收 render 過的文字** |
 | transition | 結果 → Work Model 變更 ＋ Proposal | `application/transition.py` | **唯一寫入者**;全有或全無 |
 | persistence ports | Current State repositories／UoW／版本化 Journal payload | `application/persistence.py` | 純 Protocol 與 frozen contracts；不認 ORM／JSON row |
-| PostgreSQL adapter | 0012 四表＋0013 Journal kind＋0014 兩張 OPKS 表、serialization、repositories、UoW | `app/adapters/job_analysis_postgres/` | OPKS 五種 item 共用一張 typed JSONB 表、獨立 Proposal 共用另一張；不建五表或 refs join table。JSONB 讀取必須 hydrate；schema/shape 壞掉 fail-closed；repository 不 commit |
-| authority commit seam | 完整 Current State → 同一 UoW 原子寫入 | `application/authority_commit.py` | 先重驗完整 `JobAnalysisState`（含 OPKS refs），再 replace JD／Task Proposal／OPKS／OPKS Proposal、寫入 0..N 筆 Journal、generation CAS、單次 commit；edited OPKS 決策用同一 seam 原子寫 proposal-decision 與 direct-edit 兩筆 Journal |
+| PostgreSQL adapter | 0012 四表＋0013 Journal kind＋0014 兩張 OPKS 表＋0015 Document Header、serialization、repositories、UoW | `app/adapters/job_analysis_postgres/` | `job_analysis_documents` 的 Header schema／JSON 都是 non-null；OPKS 五種 item 共用一張 typed JSONB 表、獨立 Proposal 共用另一張；不建五表或 refs join table。JSONB 讀取必須 hydrate；schema/shape 壞掉 fail-closed；repository 不 commit |
+| authority commit seam | 完整 Current State → 同一 UoW 原子寫入 | `application/authority_commit.py` | **所有 authority writer（含 durable turn）**先重驗完整 `JobAnalysisState`（含 Header 與 OPKS refs），再 replace Header／JD／Task Proposal／OPKS／OPKS Proposal、寫入 0..N 筆 Journal、generation CAS、單次 commit；edited OPKS 決策用同一 seam 原子寫 proposal-decision 與 direct-edit 兩筆 Journal |
 | authoring use cases | 文件庫、JD Task 與 OPKS add/edit/delete/reorder | `application/authoring.py`、`application/opks_authoring.py` | document row lock → entry replay check → Current State/Journal/generation 同交易；Task 離開 Current JD 時，`prune_opks_for_current_jd()` 同交易移除其 O/P、清理 K/S refs，且不猜接 merge/split 新 Task；不呼叫 LLM |
 | consultation use case | provider 前 replay → authority snapshot → 交易外模型呼叫 → verified commit | `application/consultation.py`、`application/durable_turn.py` | 已提交的同 key／同回答零 provider call；commit 時重鎖並比對 generation/read-set；Work Model、Proposal、下一題與 completed-turn Journal 同交易 |
 | Proposal use cases | Task 與 OPKS 各自送審、決策與 stale | `application/proposal_decisions.py`、`application/opks_proposals.py` | 兩種 Proposal 不抽通用 framework；決策由 document lock 序列化。OPKS accepted 套用候選但不偽造 Evidence；edited 只可改文字並另鑄 direct-edit Evidence；歷史 accepted 不會誤殺日後建立的新 revise |
 | Local Web API | 本機文件、Current JD、OPKS 與 Consultation routes | `app/api/routes/job_analysis.py` | 只做 generated wire DTO mapping；不暴露 Work Model、Journal、generation、內部 OPKS Source ID 或 provider detail；Consultation 會投影 Task 與 OPKS 兩種 Proposal，兩種 decision route 各自呼叫對應的 greenfield use case |
 | Local Web UI | 文件庫、顧問訪談、Proposal 審查與單一開啟文件的 Task／OPKS editor | `apps/web/src/app/workspace/`、`components/workspace/` | generated TS DTO + TanStack Query；conversation／Proposal／Current JD 同頁，一份本地編輯草稿、明確儲存，不用 Server Action／autosave／第二份 document store。O/P/K/S 按 Task 投影，同一 K/S 保留同一 entity identity；未連結 K/S 與 A 留在文件層 |
 
-### 2.1 Current State partition（Task 1）
+### 2.1 Current State partition（Task 1–2）
 
 `JobAnalysisState` 是 application 內一名員工、一份職務說明書的 Current State 真相；各欄位的權力邊界不可互換：
 
 | partition | 欄位 | 意義與規則 |
 |---|---|---|
-| JD header authority | `jd_header: JdHeader` | 公版表頭語意欄位；**必填、沒有 state default**。後續員工寫入必須與 Current JD 同一條 authority seam；本 Task 只建立 domain 與 readiness，不做 persistence/API。 |
+| JD header authority | `jd_header: JdHeader` | 公版表頭語意欄位；**必填、沒有 state default**。`DocumentRecord` 以 `job-analysis-jd-header/1` 持久化它；所有 authority writer 與 Current JD 共用同一條 authority seam。 |
 | work-model authority | `work_model` | 由訪談證據形成的 Task／open issue／excluded signal；模型只能經 verifier＋transition 提出候選。 |
 | current-JD authority | `current_jd` | 員工可見的正式 JD Task 投影；Proposal 決策才可改，`apply_task_analysis_result()` 永遠不直接改它。 |
 | proposal memory | `proposals` | 待員工決策的 Task 假說與其 snapshot；不是 Current JD，也不能當成已成立工作。 |
 | OPKS authority | `current_opks` | O/P/K/S/A 文件內容與 Evidence linkage；OPKS packet 不讀 `jd_header`。 |
 | OPKS proposal memory | `opks_proposals` | 待員工決策的 OPKS 假說；與 Task Proposal 分開，不抽通用 Proposal contract。 |
 
-Task 1 的所有既有 state 建立／載入點都明確傳入 `JdHeader()`，刻意讓未來漏接 authority partition 立即成為 validation error；transition 產生新 state 時只轉送原有 `state.jd_header`。Task 2 才會將 header 從 persistence record 帶入並保存，不能在本 Task 以 default 或 `DocumentMetadataWrite.title` 掩蓋這條 seam。
+`DocumentRecord.jd_header` 是 frozen dataclass 的必填欄位。只有 `create_document()` 新建文件明確寫入 `JdHeader()`；0015 對既有文件以 `job-analysis-jd-header/1`／`{}` 回填。此後所有 state reconstruction 都從 `record.jd_header` 取得，transition 只轉送既有 `state.jd_header`，而 `commit_authority_change()` 以已驗證 state 在同一 authority transaction 保存它；不得以 default 或 `DocumentMetadataWrite.title` 掩蓋這條 seam。
 
 readiness 的輸入只有 `JdHeader`，輸出只有按固定表頭順序排列的 issue 清單：職能基準名稱、工作描述、基準級別。所屬類別、職業／行業分類、說明與補充事項空白不列 issue；不產生百分比、`ready` 或 `is_complete`，也不阻止保存、訪談或未來匯出。
 
@@ -180,10 +180,10 @@ resolution}`，扁平、每 issue 一筆），**不走 `WorkSignal`**。三個�
 員工直接編輯走另一條短路徑：`add_jd_task`／`edit_jd_task`／`delete_jd_task`／
 `reorder_jd_tasks` 先鎖 document，以 Journal `entry_id` 做 replay/conflict 判定，同交易保存
 Current JD、相關 Proposal stale、Work Model reconcile trigger、Journal 與 generation。**按儲存不呼叫 LLM**；
-它與 Proposal use cases 各自完成入口規則與狀態推導後，共用
-`commit_authority_change()` 做完整狀態驗證與最終寫入。Durable AI turn 不走這個 seam：
-`apply_task_analysis_result()` 已驗證新狀態，且 durable turn 另有 provider-outside-transaction 與
-snapshot revalidation 語意。
+它、Proposal use cases、OPKS use cases 與 durable AI turn 都在各自完成入口規則與狀態推導後，共用
+`commit_authority_change()` 做完整狀態驗證與最終寫入。`commit_verified_turn()` 仍保有
+provider-outside-transaction 與 snapshot revalidation 語意；重鎖成功後把 post-transition state 與
+下一題送入同一 seam，故 Header、Current JD、Proposal、Journal 與 generation 一起 CAS 提交。
 
 OPKS 人工編輯沿用同一條權威邊界：`add_opks_item`／`edit_opks_item`／`delete_opks_item`
 接受 `Idempotency-Key` 作為 Journal `entry_id`，由 application 配發 add ID；client 不得傳 Evidence 或
@@ -259,7 +259,7 @@ scripted smoke 保護的顧問行為基線，不代表模型品質已通過。
 
 持久 AI 回合由 `submit_employee_turn()` 先以 `operation_id` 查 Journal：已提交且回答相同就直接
 返回，回答不同則 `IdempotencyConflict`；只有尚未提交才依序呼叫 `prepare_turn()` →
-`run_task_analysis_operation()` → `commit_verified_turn()`。第一步讀完即關閉交易，LLM I/O
+`run_task_analysis_operation()` → `commit_verified_turn()` → `commit_authority_change()`。第一步讀完即關閉交易，LLM I/O
 期間不持有 PostgreSQL lock；最後一步才重鎖 document。generation、packet read-set 或
 conversation authority 任一不一致就回 `StaleAuthoritySnapshot`，舊結果不得套用。
 相同 `operation_id` 的已提交回合不會再打 provider，也不會新增 Task／Proposal／Journal。

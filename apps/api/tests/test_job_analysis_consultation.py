@@ -246,6 +246,7 @@ async def seed_task_in_jd(uow_factory, document_id):
         assert await uow.documents.update_authority(
             document_id,
             expected_generation=record.authority_generation,
+            jd_header=record.jd_header,
             work_model=CurrentWorkModel(tasks=(analysed,)),
             active_question=None,
             updated_at=record.updated_at + timedelta(seconds=1),

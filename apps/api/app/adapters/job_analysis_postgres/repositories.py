@@ -13,6 +13,7 @@ from app.job_analysis.application import (
     OPKS_ITEM_SCHEMA_ID,
     OPKS_PROPOSAL_SCHEMA_ID,
     PROPOSAL_SCHEMA_ID,
+    JD_HEADER_SCHEMA_ID,
     WORK_MODEL_SCHEMA_ID,
     ActiveQuestion,
     CompletedTurnPayload,
@@ -24,6 +25,7 @@ from app.job_analysis.application import (
 )
 from app.job_analysis.domain import (
     CurrentWorkModel,
+    JdHeader,
     JdTask,
     OpksItem,
     OpksProposal,
@@ -52,6 +54,8 @@ class SqlAlchemyDocumentRepository:
             JobAnalysisDocumentRow(
                 document_id=record.document_id,
                 title=record.title,
+                jd_header_schema_id=JD_HEADER_SCHEMA_ID,
+                jd_header_json=ser.dump_jd_header(record.jd_header),
                 work_model_schema_id=WORK_MODEL_SCHEMA_ID,
                 work_model_json=ser.dump_work_model(record.work_model),
                 active_question_json=ser.dump_active_question(record.active_question),
@@ -123,6 +127,7 @@ class SqlAlchemyDocumentRepository:
         document_id: UUID,
         *,
         expected_generation: int,
+        jd_header: JdHeader,
         work_model: CurrentWorkModel,
         active_question: ActiveQuestion | None,
         updated_at: datetime,
@@ -134,6 +139,8 @@ class SqlAlchemyDocumentRepository:
                 JobAnalysisDocumentRow.authority_generation == expected_generation,
             )
             .values(
+                jd_header_schema_id=JD_HEADER_SCHEMA_ID,
+                jd_header_json=ser.dump_jd_header(jd_header),
                 work_model_schema_id=WORK_MODEL_SCHEMA_ID,
                 work_model_json=ser.dump_work_model(work_model),
                 active_question_json=ser.dump_active_question(active_question),

@@ -47,8 +47,27 @@ class _Documents:
         assert for_update
         return self.record
 
-    async def update_authority(self, *args, **kwargs) -> bool:
+    async def update_authority(
+        self,
+        document_id: UUID,
+        *,
+        expected_generation: int,
+        jd_header: JdHeader,
+        work_model: CurrentWorkModel,
+        active_question,
+        updated_at: datetime,
+    ) -> bool:
+        assert document_id == DOCUMENT_ID
+        assert expected_generation == self.record.authority_generation
         self.writes.append("update_authority")
+        self.record = replace(
+            self.record,
+            jd_header=jd_header,
+            work_model=work_model,
+            active_question=active_question,
+            authority_generation=expected_generation + 1,
+            updated_at=updated_at,
+        )
         return True
 
     async def update_title(
@@ -141,6 +160,10 @@ class _UnitOfWork:
         record = DocumentRecord(
             document_id=DOCUMENT_ID,
             title="門市營運專員",
+            jd_header=JdHeader(
+                competency_name="門市營運管理",
+                work_description="負責門市日常營運與週報彙整。",
+            ),
             work_model=CurrentWorkModel(),
             active_question=None,
             authority_generation=0,
@@ -239,6 +262,7 @@ async def test_authority_commit_rejects_dangling_opks_task_ref_before_any_write(
 
 async def test_authority_commit_writes_opks_in_the_same_transaction():
     uow = _UnitOfWork()
+    header = uow.documents.record.jd_header
     task = JdTask(task_id="task-1", statement="工作一", display_order=0)
     item = _opks_item()
     proposal = OpksProposal(
@@ -252,7 +276,7 @@ async def test_authority_commit_writes_opks_in_the_same_transaction():
         created_at=NOW,
     )
     state = JobAnalysisState(
-        jd_header=JdHeader(),
+        jd_header=header,
         current_jd=(task,),
         current_opks=CurrentJdOpks(items=(item,)),
         opks_proposals=(proposal,),
@@ -268,6 +292,7 @@ async def test_authority_commit_writes_opks_in_the_same_transaction():
 
     assert uow.opks.values == (item,)
     assert uow.opks_proposals.values == (proposal,)
+    assert uow.documents.record.jd_header == header
     assert uow.writes == [
         "replace_tasks",
         "replace_proposals",
@@ -276,3 +301,20 @@ async def test_authority_commit_writes_opks_in_the_same_transaction():
         "update_authority",
         "commit",
     ]
+
+
+async def test_direct_edit_preserves_the_persisted_header():
+    """A Task-only authority change must not replace Header with its empty default."""
+
+    uow = _UnitOfWork()
+    uow.tasks.values = ()
+    header = uow.documents.record.jd_header
+
+    await add_jd_task(
+        lambda: uow,
+        document_id=DOCUMENT_ID,
+        entry_id="header-preserving-add",
+        fields=JdTaskFields(statement="每週彙整營運週報"),
+    )
+
+    assert uow.documents.record.jd_header == header

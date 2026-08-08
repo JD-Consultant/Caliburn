@@ -25,6 +25,7 @@ from app.job_analysis.application import (
 )
 from app.job_analysis.domain import (
     CurrentWorkModel,
+    JdHeader,
     JdTask,
     JdTaskFields,
     OpksEntityKind,
@@ -142,7 +143,22 @@ async def test_verified_turn_commits_state_question_journal_and_replays_once(
         document_id=document_id,
         title="門市營運專員",
     )
+    header = JdHeader(
+        competency_name="門市營運管理",
+        work_description="負責門市日常營運與週報彙整。",
+    )
     async with uow_factory() as uow:
+        record = await uow.documents.get(document_id, for_update=True)
+        assert record is not None
+        changed = await uow.documents.update_authority(
+            document_id,
+            expected_generation=record.authority_generation,
+            jd_header=header,
+            work_model=record.work_model,
+            active_question=record.active_question,
+            updated_at=record.updated_at + timedelta(seconds=1),
+        )
+        assert changed
         await uow.opks.replace(document_id, (persisted_attitude(),))
         await uow.opks_proposals.replace(
             document_id,
@@ -175,7 +191,8 @@ async def test_verified_turn_commits_state_question_journal_and_replays_once(
     assert first.is_applied
     assert replay.is_applied
     assert loaded is not None
-    assert loaded.document.authority_generation == 1
+    assert loaded.document.authority_generation == 2
+    assert loaded.state.jd_header == header
     assert [task.task_id for task in loaded.state.work_model.tasks] == [
         "operation-1-t0"
     ]
@@ -366,6 +383,7 @@ async def test_verified_revise_persists_the_proposal_with_the_completed_turn(
         changed = await uow.documents.update_authority(
             document_id,
             expected_generation=record.authority_generation,
+            jd_header=record.jd_header,
             work_model=CurrentWorkModel(tasks=(analysed,)),
             active_question=None,
             updated_at=record.updated_at + timedelta(seconds=1),
@@ -457,6 +475,7 @@ async def seed_analysed_task(uow_factory, document_id, *tasks: Task) -> None:
         changed = await uow.documents.update_authority(
             document_id,
             expected_generation=record.authority_generation,
+            jd_header=record.jd_header,
             work_model=CurrentWorkModel(tasks=tasks),
             active_question=None,
             updated_at=record.updated_at + timedelta(seconds=1),

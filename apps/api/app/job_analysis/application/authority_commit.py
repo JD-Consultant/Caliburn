@@ -36,6 +36,7 @@ async def commit_authority_change(
     updated = await uow.documents.update_authority(
         record.document_id,
         expected_generation=record.authority_generation,
+        jd_header=validated.jd_header,
         work_model=validated.work_model,
         active_question=record.active_question,
         updated_at=updated_at,

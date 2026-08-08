@@ -18,6 +18,7 @@ from app.job_analysis.application import (
 from app.job_analysis.domain import (
     CurrentWorkModel,
     JdEntry,
+    JdHeader,
     JdTask,
     MergeTarget,
     OpksEntityKind,
@@ -267,6 +268,7 @@ async def seed(
     proposal: Proposal | None,
     current_opks: tuple[OpksItem, ...] = (),
     opks_proposals: tuple[OpksProposal, ...] = (),
+    jd_header: JdHeader | None = None,
 ) -> None:
     uow_factory = factory(session_factory)
     await create_document(
@@ -280,6 +282,7 @@ async def seed(
         updated = await uow.documents.update_authority(
             document_id,
             expected_generation=record.authority_generation,
+            jd_header=jd_header if jd_header is not None else record.jd_header,
             work_model=work_model,
             active_question=None,
             updated_at=record.updated_at + timedelta(seconds=1),
@@ -338,12 +341,17 @@ async def test_accept_adds_the_task_to_current_jd_and_replay_is_a_noop(
 ):
     document_id = cleanup_job_analysis_rows
     work_model, current_jd, proposal = add_proposal()
+    header = JdHeader(
+        competency_name="門市營運管理",
+        work_description="負責門市日常營運與週報彙整。",
+    )
     await seed(
         postgres_session_factory,
         document_id,
         work_model=work_model,
         current_jd=current_jd,
         proposal=proposal,
+        jd_header=header,
     )
     uow_factory = factory(postgres_session_factory)
 
@@ -368,6 +376,7 @@ async def test_accept_adds_the_task_to_current_jd_and_replay_is_a_noop(
     assert loaded is not None
     assert [item.task_id for item in loaded.state.current_jd] == ["task-new"]
     assert loaded.document.authority_generation == 2
+    assert loaded.state.jd_header == header
 
 
 async def test_accepting_several_add_proposals_gives_each_task_its_own_position(

@@ -22,6 +22,7 @@ from app.job_analysis.application import (
 from app.job_analysis.domain import (
     CurrentWorkModel,
     JdEntry,
+    JdHeader,
     JdTask,
     JdTaskFields,
     OpenIssueKind,
@@ -238,7 +239,7 @@ def work_model_task() -> Task:
 async def seed_existing_authority(
     session_factory,
     document_id: UUID,
-) -> None:
+) -> JdHeader:
     factory = lambda: SqlAlchemyJobAnalysisUnitOfWork(session_factory)
     await create_document(factory, document_id=document_id, title="門市營運專員")
     task = JdTask(
@@ -263,9 +264,14 @@ async def seed_existing_authority(
     async with factory() as uow:
         record = await uow.documents.get(document_id, for_update=True)
         assert record is not None
+        header = JdHeader(
+            competency_name="門市營運管理",
+            work_description="負責門市日常營運與週報彙整。",
+        )
         changed = await uow.documents.update_authority(
             document_id,
             expected_generation=record.authority_generation,
+            jd_header=header,
             work_model=CurrentWorkModel(tasks=(work_model_task(),)),
             active_question=None,
             updated_at=record.updated_at + timedelta(seconds=1),
@@ -274,6 +280,7 @@ async def seed_existing_authority(
         await uow.tasks.replace(document_id, (task,))
         await uow.proposals.replace(document_id, (pending,))
         await uow.commit()
+    return header
 
 
 async def test_direct_edit_marks_work_model_for_reconciliation_and_stales_proposal(
@@ -282,7 +289,7 @@ async def test_direct_edit_marks_work_model_for_reconciliation_and_stales_propos
 ):
     document_id = cleanup_job_analysis_rows
     factory = lambda: SqlAlchemyJobAnalysisUnitOfWork(postgres_session_factory)
-    await seed_existing_authority(postgres_session_factory, document_id)
+    header = await seed_existing_authority(postgres_session_factory, document_id)
 
     await edit_jd_task(
         factory,
@@ -302,3 +309,4 @@ async def test_direct_edit_marks_work_model_for_reconciliation_and_stales_propos
     )
     assert loaded.state.proposals[0].status is ProposalStatus.STALE
     assert loaded.state.current_jd[0].statement == "員工修改後的週報工作"
+    assert loaded.state.jd_header == header

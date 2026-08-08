@@ -597,6 +597,10 @@ Run `npm run codegen && npm run check-codegen` in `packages/job-analysis-contrac
 
 Duty editor supports explicit add/edit/delete/reorder. Task form offers nullable Duty select and nullable level 1–6. Show an explicit「未分組」section; never add AI Duty suggestion or reference search.
 
+Task level selector must show the official six-level summaries (情境可預測性／監督與自主性／工作性質／
+判斷能力), not bare numbers. Employees may always clear or override the value; when evidence is insufficient it
+stays blank and readiness only提示、不阻擋. Do not add AI level inference in this slice.
+
 Task 的 Up／Down 以**目前可見 Duty group**為相鄰單位，再把那兩個 ID 在完整文件順序中交換；不得把 group 內 index 直接當全域 index。新增 interleaved fixture（`d1:t1, d2:t2, d1:t3`），在 d1 內把 t3 上移後，畫面與 reload 都得到 `d1:[t3,t1]`，且 t2 不被隱藏改位。
 
 - [ ] **Step 5: Run API／contract／Web gate**

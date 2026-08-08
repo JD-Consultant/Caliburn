@@ -1,6 +1,6 @@
 # 0060. 企業內部版 JD：行為指標判準修正、iCAP reference 接線、缺漏檢查涵蓋 O/P/K/S
 
-- 狀態：**Proposed**
+- 狀態：**Accepted**（owner 於 2026-08-07 審閱後核准）
 - 日期：2026-08-07
 - 依據：[`docs/specs/2026-08-07-behavioral-indicator-depth-and-icap-reference-flow-research.md`](../specs/2026-08-07-behavioral-indicator-depth-and-icap-reference-flow-research.md)
   （iCAP 全量 908 檔統計、owner 提供的 `企劃人員` 公版逐格核對、檢索準確度實測）

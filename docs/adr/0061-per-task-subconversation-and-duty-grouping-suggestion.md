@@ -1,6 +1,6 @@
 # 0061. 逐項任務子對話與主要職責歸納建議
 
-- 狀態：**Proposed**
+- 狀態：**Accepted**（owner 於 2026-08-07 審閱後核准）
 - 日期：2026-08-07
 - 依據：[`docs/specs/2026-08-07-behavioral-indicator-depth-and-icap-reference-flow-research.md`](../specs/2026-08-07-behavioral-indicator-depth-and-icap-reference-flow-research.md) §5.3／§5.5／§6
 - 延續：[0060](0060-enterprise-jd-indicator-depth-and-icap-reference.md)（同一批產品裁決的第二半；

@@ -470,6 +470,8 @@ context 取捨)在 Luna-Pro 上驗過只算「未在生產模型上驗過」,上
 | revision-request replacement | revision request 可保存／reload，但不會自動重建 replacement | 後續模型流程 |
 | 一般瀏覽器完整跨埠 smoke | **HTTP 層已逐段驗過**（2026-07-31，api:8001 ＋ web:3000 同時在跑）：文件庫 `GET` 正確回報 `task_count`、consultation view 帶齊 conversation／proposals／tasks、**三筆 `add` 提案連續 `POST …/decisions` 全 200**（正是 `display_order` 缺陷會炸的路徑）、同 `Idempotency-Key` 重送 200 且不重複、reload 後 JD 排序正確；CORS preflight 200 且 `access-control-allow-headers` 含 `idempotency-key`。`/workspace` 與 `/workspace/{id}` 皆 HTTP 200。Web 90 tests／tsc／lint 通過 **已由維護者在一般瀏覽器完成**（2026-07-31）：文件 `b47d6717` 的三筆 `add` 提案**在 UI 上連續按 accept 全部成立**，Current JD 由 0 條變 3 條、`display_order` 0/1/2；同文件被 withdraw 的那筆提案維持 `stale` 且無法接受，因此 Luna-Pro 在 turn 1 誤建的「協助正式環境部署」**沒有進入 JD**——Proposal gate 當安全網首次被真流量驗證 | 本列已無待辦。持續維持:不為測試環境加入 proxy、fake production mode 或 E2E framework |
 
+匯出安全補充：Workspace 的公版 XLSX 下載除了檢查四個 editor 的 draft dirty，也會在 Duty／Task／OPKS 的 save、delete 或 reorder mutation pending 時停用，待 server state reload 完成後才恢復。renderer 對含換行的 O/P/K/S 多值儲存格按實際行數估算列高，避免明確列高覆蓋換行內容。
+
 ## 9. 指路
 
 - 判準與凍結形狀:[研究稿 §4／§5／§9–§12](../specs/2026-07-28-task-boundary-merge-split-and-identity-research.md)

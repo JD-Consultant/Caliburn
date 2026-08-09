@@ -27,14 +27,19 @@ export function ConsultationWorkspace({ documentId }: { documentId: string }) {
   const [dutyDraftDirty, setDutyDraftDirty] = useState(false);
   const [taskDraftDirty, setTaskDraftDirty] = useState(false);
   const [opksDraftDirty, setOpksDraftDirty] = useState(false);
+  const [dutyMutationPending, setDutyMutationPending] = useState(false);
+  const [taskMutationPending, setTaskMutationPending] = useState(false);
+  const [opksMutationPending, setOpksMutationPending] = useState(false);
   const dirtyState = {
     header: headerDraftDirty,
     duty: dutyDraftDirty,
     task: taskDraftDirty,
     opks: opksDraftDirty,
   };
-  const exportAllowed = canExport(dirtyState);
-  const dirty = !exportAllowed;
+  const mutationPending =
+    dutyMutationPending || taskMutationPending || opksMutationPending;
+  const exportAllowed = canExport(dirtyState, mutationPending);
+  const dirty = !canExport(dirtyState);
   const [exporting, setExporting] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
 
@@ -93,7 +98,14 @@ export function ConsultationWorkspace({ documentId }: { documentId: string }) {
       </header>
 
       <div className="mx-auto max-w-7xl px-6 pt-6">
-        {dirty ? (
+        {mutationPending ? (
+          <p
+            className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm dark:border-amber-900 dark:bg-amber-950/40"
+            role="status"
+          >
+            目前變更尚未完成，請稍候再匯出。
+          </p>
+        ) : dirty ? (
           <p
             className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm dark:border-amber-900 dark:bg-amber-950/40"
             role="status"
@@ -138,15 +150,18 @@ export function ConsultationWorkspace({ documentId }: { documentId: string }) {
             documentId={documentId}
             embedded
             onDirtyChange={setDutyDraftDirty}
+            onBusyChange={setDutyMutationPending}
           />
           <TaskEditor
             documentId={documentId}
             embedded
             onDirtyChange={setTaskDraftDirty}
+            onBusyChange={setTaskMutationPending}
           />
           <OpksEditor
             documentId={documentId}
             onDirtyChange={setOpksDraftDirty}
+            onBusyChange={setOpksMutationPending}
           />
         </div>
       </main>

@@ -3,6 +3,9 @@ import type {
   DocumentMetadataView,
   DocumentSummary,
   DocumentView,
+  DutyOrderWrite,
+  DutyView,
+  DutyWrite,
   JdHeaderView,
   JdHeaderWrite,
   JdTaskView,
@@ -99,6 +102,55 @@ export function putJdHeader(
     method: "PUT",
     headers: mutationHeaders(idempotencyKey),
     body: JSON.stringify(header),
+  });
+}
+
+export function addDuty(
+  documentId: string,
+  duty: DutyWrite,
+  idempotencyKey: string,
+): Promise<DutyView> {
+  return request<DutyView>(`/documents/${documentId}/duties`, {
+    method: "POST",
+    headers: mutationHeaders(idempotencyKey),
+    body: JSON.stringify(duty),
+  });
+}
+
+export function editDuty(
+  documentId: string,
+  dutyId: string,
+  duty: DutyWrite,
+  idempotencyKey: string,
+): Promise<DutyView> {
+  return request<DutyView>(`/documents/${documentId}/duties/${dutyId}`, {
+    method: "PUT",
+    headers: mutationHeaders(idempotencyKey),
+    body: JSON.stringify(duty),
+  });
+}
+
+export function deleteDuty(
+  documentId: string,
+  dutyId: string,
+  idempotencyKey: string,
+): Promise<void> {
+  return request<void>(`/documents/${documentId}/duties/${dutyId}`, {
+    method: "DELETE",
+    headers: mutationHeaders(idempotencyKey),
+  });
+}
+
+export function reorderDuties(
+  documentId: string,
+  orderedDutyIds: string[],
+  idempotencyKey: string,
+): Promise<DutyView[]> {
+  const body: DutyOrderWrite = { ordered_duty_ids: orderedDutyIds };
+  return request<DutyView[]>(`/documents/${documentId}/duty-order`, {
+    method: "PUT",
+    headers: mutationHeaders(idempotencyKey),
+    body: JSON.stringify(body),
   });
 }
 
@@ -238,6 +290,8 @@ function knownProblemMessage(type: KnownProblemType): string {
       return "找不到這份職務說明書";
     case "https://caliburn.dev/problems/job-analysis/task-not-found":
       return "找不到這項工作";
+    case "https://caliburn.dev/problems/job-analysis/duty-not-found":
+      return "找不到這項主要職責";
     case "https://caliburn.dev/problems/job-analysis/opks-item-not-found":
       return "找不到這項職務內容";
     case "https://caliburn.dev/problems/job-analysis/idempotency-conflict":
@@ -246,6 +300,8 @@ function knownProblemMessage(type: KnownProblemType): string {
       return "內容已有更新";
     case "https://caliburn.dev/problems/job-analysis/invalid-task-order":
       return "工作順序不正確";
+    case "https://caliburn.dev/problems/job-analysis/invalid-duty-order":
+      return "主要職責順序不正確";
     case "https://caliburn.dev/problems/job-analysis/invalid-request":
       return "請檢查輸入內容";
     case "https://caliburn.dev/problems/job-analysis/proposal-not-found":
@@ -260,10 +316,12 @@ function knownProblemMessage(type: KnownProblemType): string {
 const KNOWN_PROBLEM_TYPES = new Set<string>([
   "https://caliburn.dev/problems/job-analysis/document-not-found",
   "https://caliburn.dev/problems/job-analysis/task-not-found",
+  "https://caliburn.dev/problems/job-analysis/duty-not-found",
   "https://caliburn.dev/problems/job-analysis/opks-item-not-found",
   "https://caliburn.dev/problems/job-analysis/idempotency-conflict",
   "https://caliburn.dev/problems/job-analysis/authority-conflict",
   "https://caliburn.dev/problems/job-analysis/invalid-task-order",
+  "https://caliburn.dev/problems/job-analysis/invalid-duty-order",
   "https://caliburn.dev/problems/job-analysis/invalid-request",
   "https://caliburn.dev/problems/job-analysis/proposal-not-found",
   "https://caliburn.dev/problems/job-analysis/consultant-unavailable",

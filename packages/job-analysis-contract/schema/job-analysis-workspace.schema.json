@@ -154,6 +154,13 @@
         "enablers": {
           "type": "array",
           "items": { "$ref": "#/$defs/Enabler" }
+        },
+        "duty_id": { "type": ["string", "null"], "default": null },
+        "competency_level": {
+          "type": ["integer", "null"],
+          "minimum": 1,
+          "maximum": 6,
+          "default": null
         }
       }
     },
@@ -184,6 +191,31 @@
           "type": "array",
           "items": { "$ref": "#/$defs/Enabler" }
         },
+        "duty_id": { "type": ["string", "null"], "default": null },
+        "competency_level": {
+          "type": ["integer", "null"],
+          "minimum": 1,
+          "maximum": 6,
+          "default": null
+        },
+        "display_order": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "DutyWrite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["statement"],
+      "properties": {
+        "statement": { "type": "string" }
+      }
+    },
+    "DutyView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["duty_id", "statement", "display_order"],
+      "properties": {
+        "duty_id": { "type": "string" },
+        "statement": { "type": "string" },
         "display_order": { "type": "integer", "minimum": 0 }
       }
     },
@@ -318,6 +350,7 @@
         "updated_at",
         "jd_header",
         "readiness",
+        "duties",
         "tasks",
         "opks_items",
         "opks_task_status"
@@ -328,6 +361,10 @@
         "updated_at": { "type": "string", "format": "date-time" },
         "jd_header": { "$ref": "#/$defs/JdHeaderView" },
         "readiness": { "$ref": "#/$defs/DocumentReadinessView" },
+        "duties": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/DutyView" }
+        },
         "tasks": {
           "type": "array",
           "items": { "$ref": "#/$defs/JdTaskView" }
@@ -523,6 +560,17 @@
         }
       }
     },
+    "DutyOrderWrite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ordered_duty_ids"],
+      "properties": {
+        "ordered_duty_ids": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
     "ProblemFieldError": {
       "type": "object",
       "additionalProperties": false,
@@ -545,6 +593,8 @@
             "https://caliburn.dev/problems/job-analysis/idempotency-conflict",
             "https://caliburn.dev/problems/job-analysis/authority-conflict",
             "https://caliburn.dev/problems/job-analysis/invalid-task-order",
+            "https://caliburn.dev/problems/job-analysis/duty-not-found",
+            "https://caliburn.dev/problems/job-analysis/invalid-duty-order",
             "https://caliburn.dev/problems/job-analysis/invalid-request",
             "https://caliburn.dev/problems/job-analysis/proposal-not-found",
             "https://caliburn.dev/problems/job-analysis/consultant-unavailable",

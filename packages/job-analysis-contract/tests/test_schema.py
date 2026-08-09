@@ -35,6 +35,8 @@ PROBLEM_TYPES = {
     "https://caliburn.dev/problems/job-analysis/idempotency-conflict",
     "https://caliburn.dev/problems/job-analysis/authority-conflict",
     "https://caliburn.dev/problems/job-analysis/invalid-task-order",
+    "https://caliburn.dev/problems/job-analysis/duty-not-found",
+    "https://caliburn.dev/problems/job-analysis/invalid-duty-order",
     "https://caliburn.dev/problems/job-analysis/invalid-request",
     "https://caliburn.dev/problems/job-analysis/proposal-not-found",
     "https://caliburn.dev/problems/job-analysis/consultant-unavailable",
@@ -59,6 +61,9 @@ def test_schema_owns_only_the_workspace_wire_contract():
         "DocumentMetadataView",
         "DocumentSummary",
         "DocumentView",
+        "DutyOrderWrite",
+        "DutyView",
+        "DutyWrite",
         "DocumentReadinessView",
         "ActiveQuestionView",
         "ConsultationView",
@@ -279,6 +284,7 @@ def test_document_view_accepts_one_complete_task_without_extra_fields():
         "updated_at": "2026-07-30T09:00:00Z",
         "jd_header": _EMPTY_JD_HEADER,
         "readiness": {"issues": []},
+        "duties": [],
         "tasks": [
             {
                 "task_id": "task-1",

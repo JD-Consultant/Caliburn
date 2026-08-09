@@ -8,6 +8,8 @@ from job_analysis_contract import (
     DocumentReadinessView,
     DocumentSummary as WireDocumentSummary,
     DocumentView,
+    DutyView,
+    DutyWrite,
     JdHeaderView,
     JdHeaderWrite,
     JdTaskWrite,
@@ -35,6 +37,7 @@ from app.job_analysis.application import (
 from app.job_analysis.domain import (
     Enabler,
     EnablerKind,
+    Duty,
     JdHeader,
     JdTask,
     JdTaskFields,
@@ -84,6 +87,18 @@ def to_jd_header_view(header: JdHeader) -> JdHeaderView:
     )
 
 
+def to_duty_statement(body: DutyWrite) -> str:
+    return body.statement.strip()
+
+
+def to_duty_view(duty: Duty) -> DutyView:
+    return DutyView(
+        duty_id=duty.duty_id,
+        statement=duty.statement,
+        display_order=duty.display_order,
+    )
+
+
 def to_document_readiness_view(
     readiness: DocumentReadiness,
 ) -> DocumentReadinessView:
@@ -113,6 +128,8 @@ def to_jd_task_fields(body: JdTaskWrite) -> JdTaskFields:
             )
             for item in body.enablers
         ),
+        duty_id=_optional_text(body.duty_id),
+        competency_level=body.competency_level,
     )
 
 
@@ -214,6 +231,8 @@ def to_jd_task_view(task: JdTask) -> JdTaskView:
                 {"kind": enabler.kind.value, "name": enabler.name}
                 for enabler in task.enablers
             ],
+            "duty_id": task.duty_id,
+            "competency_level": task.competency_level,
             "display_order": task.display_order,
         }
     )
@@ -235,6 +254,8 @@ def _to_domain_jd_task(task: JdTaskView) -> JdTask:
             Enabler(kind=EnablerKind(item.kind.value), name=item.name.strip())
             for item in task.enablers
         ),
+        duty_id=task.duty_id,
+        competency_level=task.competency_level,
         display_order=task.display_order,
     )
 
@@ -291,6 +312,7 @@ def to_document_view(loaded: LoadedDocument) -> DocumentView:
                 current_opks=loaded.state.current_opks,
             )
         ),
+        duties=[to_duty_view(duty) for duty in loaded.state.current_duties],
         tasks=[to_jd_task_view(task) for task in loaded.state.current_jd],
         opks_items=[
             to_opks_item_view(item) for item in loaded.state.current_opks.items

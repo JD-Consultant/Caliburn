@@ -105,6 +105,8 @@ export interface JdTaskWrite {
   frequency_text: string | null;
   responsibility_role: "primary" | "shared" | "assist" | "" | null;
   enablers: Enabler[];
+  duty_id?: string | null;
+  competency_level?: number | null;
 }
 /**
  * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
@@ -118,6 +120,24 @@ export interface JdTaskView {
   frequency_text: string | null;
   responsibility_role: "primary" | "shared" | "assist" | null;
   enablers: Enabler[];
+  duty_id?: string | null;
+  competency_level?: number | null;
+  display_order: number;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "DutyWrite".
+ */
+export interface DutyWrite {
+  statement: string;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "DutyView".
+ */
+export interface DutyView {
+  duty_id: string;
+  statement: string;
   display_order: number;
 }
 /**
@@ -177,6 +197,7 @@ export interface DocumentView {
   updated_at: string;
   jd_header: JdHeaderView;
   readiness: DocumentReadinessView;
+  duties: DutyView[];
   tasks: JdTaskView[];
   opks_items: OpksItemView[];
   opks_task_status: OpksTaskStatusView[];
@@ -269,6 +290,13 @@ export interface TaskOrderWrite {
 }
 /**
  * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "DutyOrderWrite".
+ */
+export interface DutyOrderWrite {
+  ordered_duty_ids: string[];
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
  * via the `definition` "ProblemFieldError".
  */
 export interface ProblemFieldError {
@@ -286,6 +314,8 @@ export interface ProblemDetail {
     | "https://caliburn.dev/problems/job-analysis/idempotency-conflict"
     | "https://caliburn.dev/problems/job-analysis/authority-conflict"
     | "https://caliburn.dev/problems/job-analysis/invalid-task-order"
+    | "https://caliburn.dev/problems/job-analysis/duty-not-found"
+    | "https://caliburn.dev/problems/job-analysis/invalid-duty-order"
     | "https://caliburn.dev/problems/job-analysis/invalid-request"
     | "https://caliburn.dev/problems/job-analysis/proposal-not-found"
     | "https://caliburn.dev/problems/job-analysis/consultant-unavailable"

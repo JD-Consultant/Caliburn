@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import pytest
+from sqlalchemy.exc import IntegrityError
 
 from app.adapters.job_analysis_postgres import SqlAlchemyJobAnalysisUnitOfWork
 from app.job_analysis.application import (
@@ -120,6 +121,36 @@ async def _seed_document_with_assigned_tasks(session_factory, document_id):
         ),
     )
     return factory, first_duty, second_duty, first_task, second_task
+
+
+async def test_postgres_rejects_a_task_with_a_dangling_duty_reference(
+    postgres_session_factory,
+    cleanup_job_analysis_rows,
+):
+    """The deferred FK must fail at commit, not merely exist in metadata."""
+
+    document_id = cleanup_job_analysis_rows
+    factory = _factory(postgres_session_factory)
+    await create_document(factory, document_id=document_id, title="門市營運專員")
+
+    with pytest.raises(IntegrityError):
+        async with factory() as uow:
+            await uow.tasks.replace(
+                document_id,
+                (
+                    JdTask(
+                        task_id="dangling-task",
+                        statement="盤點門市庫存",
+                        duty_id="missing-duty",
+                        display_order=0,
+                    ),
+                ),
+            )
+            await uow.commit()
+
+    loaded = await load_document(factory, document_id)
+    assert loaded is not None
+    assert loaded.state.current_jd == ()
 
 
 async def test_add_edit_reorder_and_replay_duties_through_authority_journal(

@@ -1041,11 +1041,11 @@ the Web suite passes 121/121, TypeScript and ESLint pass, and the binary client 
 **Interfaces:**
 - No new product interface; this task proves the assembled vertical and rejected-branch boundaries.
 
-- [ ] **Step 1: Write the real PostgreSQL vertical test**
+- [x] **Step 1: Write the real PostgreSQL vertical test**
 
 The test creates a document, writes Header, creates/reorders/deletes Duty, assigns Task level, reorders OPKS, reloads, exports, reloads workbook and asserts authority generation／Journal receipts／position codes／literal formula text／one official sheet.
 
-- [ ] **Step 2: Run migration from a clean database and the vertical**
+- [x] **Step 2: Run migration from a clean database and the vertical**
 
 Run:
 
@@ -1057,7 +1057,7 @@ uv run pytest tests/test_job_analysis_header_duty_export_vertical.py -q
 
 Expected: PASS.
 
-- [ ] **Step 3: Run full repository gates**
+- [x] **Step 3: Run full repository gates**
 
 Run:
 
@@ -1073,7 +1073,7 @@ Expected: all new tests PASS; any pre-existing unrelated baseline failure must b
 
 Start the local app with the repo runbook. Verify one document at a time: Header save/reload, Duty and Task assignment, nullable level, OPKS Up/Down, consultant turn preserving full document cache, add Proposal before-null copy, dirty export disabled, saved export downloads and opens as one-sheet public workbook.
 
-- [ ] **Step 5: Audit rejected scope is absent**
+- [x] **Step 5: Audit rejected scope is absent**
 
 Run:
 
@@ -1084,12 +1084,26 @@ rg -n "AI.*Duty|reference|enterprise|16384|subconversation" apps/api/app/job_ana
 
 Expected: no 16K default, no OPKS schema rollback, no AI Duty/reference/subconversation feature. Any legitimate documentation occurrence must not correspond to runtime code.
 
-- [ ] **Step 6: Commit verification record and tag**
+- [x] **Step 6: Commit verification record (tag deferred pending browser smoke)**
 
 ```powershell
 git add apps/api/tests/test_job_analysis_header_duty_export_vertical.py docs/design/task-analysis-engine.md docs/plans/2026-08-09-reviewed-job-analysis-slices-migration-plan.md
 git commit -m "test(job-analysis): verify reviewed authoring and XLSX vertical"
-git tag job-analysis-reviewed-slices-v1
+# Tag deferred until the browser smoke is actually performed.
 ```
 
 Do not push. Hand the branch back for owner review and comparison against `docs/specs/2026-08-08-unreviewed-branches-review.md` §16.
+
+Execution record: the real PostgreSQL vertical passes 1/1 after migration reaches head. It
+asserts Header／Duty／Task／OPKS receipts, 14 authority-generation changes plus the initial
+`consultant-opening` receipt, Duty deletion unassignment, render-time T/O/P/K/S/A codes, literal
+formula-shaped text and the single official sheet. The focused reviewed job-analysis suite passes
+41/41; contract codegen／tests pass 14/14; Web tests pass 121/121 with TypeScript and ESLint
+passing. The full API suite was attempted, but the pre-existing
+`tests/test_interview_v4_candidate_metrics.py::test_candidate_metrics_never_echoes_transcript_or_guard_text`
+`tmp_path` setup fails with Windows `PermissionError [WinError 5]` while scanning pytest's temp
+root; the suite also cannot produce a reliable final summary because pytest's temp cleanup hits
+the same ACL. No changed job-analysis test failed. Browser smoke was not claimed because this
+session has no callable browser／computer-control tool and no local dev server was started.
+The rejected-scope diff is empty; remaining `reference` matches are existing legacy/runtime
+domain references, not the rejected AI Duty／enterprise／subconversation features.

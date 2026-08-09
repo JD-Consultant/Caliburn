@@ -37,13 +37,16 @@ export function ConsultationPanel({ documentId }: { documentId: string }) {
   const [draft, setDraft] = useState("");
 
   const applyView = async (view: ConsultationView) => {
-    queryClient.setQueryData(jobAnalysisKeys.consultation(documentId), view);
-    queryClient.setQueryData(jobAnalysisKeys.document(documentId), {
-      ...view.document,
-      tasks: view.tasks,
-      opks_items: view.opks_items,
-    });
-    await queryClient.invalidateQueries({ queryKey: jobAnalysisKeys.documents });
+    // ConsultationView 是 consultation query 的完整形狀，可以直接寫回該快取。
+    queryClient.setQueryData(consultationQueryOptions(documentId).queryKey, view);
+    // DocumentView 還包含 jd_header、readiness、duties 等 ConsultationView 推不出的欄位，
+    // 因此只能讓完整 document query 重取，不能從 view 手工拼出半份資料。
+    await Promise.all([
+      queryClient.invalidateQueries({
+        queryKey: jobAnalysisKeys.document(documentId),
+      }),
+      queryClient.invalidateQueries({ queryKey: jobAnalysisKeys.documents }),
+    ]);
   };
 
   const turnMutation = useMutation({

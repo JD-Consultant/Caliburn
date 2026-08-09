@@ -311,10 +311,19 @@ async def post_employee_turn(
             text=text,
         )
     except (UncommittableOperationResult, TransitionCommitRejected) as error:
-        logger.warning(
-            "job-analysis consultant turn was not committable: %s",
-            type(error).__name__,
-        )
+        if isinstance(error, UncommittableOperationResult):
+            logger.warning(
+                "job-analysis consultant turn was not committable: %s "
+                "outcome=%s verifier_codes=%s",
+                type(error).__name__,
+                error.outcome.value,
+                ",".join(error.verifier_codes) or "none",
+            )
+        else:
+            logger.warning(
+                "job-analysis consultant turn was not committable: %s",
+                type(error).__name__,
+            )
         return consultant_unavailable_response()
     except JobAnalysisApplicationError as error:
         return application_error_response(error)

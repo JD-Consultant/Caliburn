@@ -236,7 +236,11 @@ Web 的 `/workspace` 用 `DocumentLibrary` 列出／建立／改名；`/workspac
 consultation 與文件庫 query；不手動維護第二份 cache。K/S 可投影到多個 Task 但 entity ID 不複製，
 Task 移除後保留的 unlinked K/S 仍在文件層可見；A 只在文件層手動編輯，不提供 AI 生成按鈕。
 顧問讀寫只走 `GET …/consultation`、`POST …/turns` 與 `POST …/proposals/{id}/decisions`；成功回應同步更新
-Consultation／Document query，人工 Task 編輯仍走同一組 Current JD routes，不另建 AI document store。
+Consultation query，並讓完整的 Document query 與文件庫 query 重取；不得從 ConsultationView 手工拼出部分
+DocumentView cache，人工 Task 編輯仍走同一組 Current JD routes，不另建 AI document store。Proposal 的
+`jd_before.value = null` 表示新增前尚不存在，Web 不顯示該列；`jd_after.value = null` 才表示建議移除。
+不可提交的顧問結果只以 exception class、typed outcome 與 verifier code values 寫安全診斷 log，不能寫入
+operation detail、拒答文字、prompt、transcript 或 provider response。
 Task form 的 draft 只在編輯期間存在；成功後 invalidate 文件、Consultation 與文件庫 query 並回讀 PostgreSQL 現況。相同失敗操作、相同 payload 的人工重送沿用原
 `Idempotency-Key`；未改內容禁止儲存，避免製造空 Journal 與無關 generation bump。
 新 document 建立時，`put_document_metadata()` 在同一個 UoW 建立固定 consultant opening

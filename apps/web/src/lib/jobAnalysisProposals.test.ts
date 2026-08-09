@@ -5,6 +5,7 @@ import {
   editableJdAfter,
   groupProposals,
   operationForDraft,
+  visibleProposalEntries,
 } from "./jobAnalysisProposals";
 
 function proposal(status: ProposalView["status"]): ProposalView {
@@ -22,6 +23,15 @@ function proposal(status: ProposalView["status"]): ProposalView {
 }
 
 describe("proposal presentation", () => {
+  it("hides null jd_before entries but labels null jd_after as removal", () => {
+    const entries: ProposalView["jd_after"] = [
+      { task_id: "task-1", value: null },
+    ];
+
+    expect(visibleProposalEntries(entries, "before")).toEqual([]);
+    expect(visibleProposalEntries(entries, "after")).toEqual(entries);
+  });
+
   it("keeps pending and deferred actionable while all terminal states are history", () => {
     const grouped = groupProposals([
       proposal("accepted"),

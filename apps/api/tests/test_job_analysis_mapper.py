@@ -93,6 +93,26 @@ def test_empty_responsibility_role_normalizes_to_none():
     assert to_jd_task_fields(body).responsibility_role is None
 
 
+def test_task_mapper_preserves_employee_duty_and_competency_level():
+    body = JdTaskWrite.model_validate(
+        {
+            "statement": "盤點耗材",
+            "purpose_result": None,
+            "context": None,
+            "frequency_text": None,
+            "responsibility_role": None,
+            "enablers": [],
+            "duty_id": "entry-1-d0",
+            "competency_level": 4,
+        }
+    )
+
+    fields = to_jd_task_fields(body)
+
+    assert fields.duty_id == "entry-1-d0"
+    assert fields.competency_level == 4
+
+
 def test_jd_header_mapper_trims_text_and_converts_blank_optional_values_to_none():
     body = JdHeaderWrite.model_validate(
         {

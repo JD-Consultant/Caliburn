@@ -110,6 +110,8 @@ def task_payload(
     *,
     purpose_result: str | None = None,
     frequency_text: str | None = None,
+    duty_id: str | None = None,
+    competency_level: int | None = None,
 ):
     return {
         "statement": statement,
@@ -118,7 +120,99 @@ def task_payload(
         "frequency_text": frequency_text,
         "responsibility_role": None,
         "enablers": [],
+        "duty_id": duty_id,
+        "competency_level": competency_level,
     }
+
+
+async def test_current_jd_duty_routes_author_and_unassign_tasks_on_delete(
+    postgres_api_client,
+    cleanup_job_analysis_rows,
+):
+    client, _, _ = postgres_api_client
+    document_id = cleanup_job_analysis_rows
+    root = f"/api/v1/job-analysis/documents/{document_id}"
+
+    assert (await client.put(root, json={"title": "門市營運專員"})).status_code == 201
+
+    duty = await client.post(
+        f"{root}/duties",
+        headers={"Idempotency-Key": "duty-add-1"},
+        json={"statement": "門市營運"},
+    )
+    assert duty.status_code == 201
+    assert duty.json()["duty_id"] == "duty-add-1-d0"
+
+    task = await client.post(
+        f"{root}/tasks",
+        headers={"Idempotency-Key": "duty-task-1"},
+        json=task_payload(
+            "盤點門市耗材",
+            duty_id=duty.json()["duty_id"],
+            competency_level=4,
+        ),
+    )
+    assert task.status_code == 201
+    task_id = task.json()["task_id"]
+    assert task.json()["duty_id"] == duty.json()["duty_id"]
+    assert task.json()["competency_level"] == 4
+
+    renamed = await client.put(
+        f"{root}/duties/{duty.json()['duty_id']}",
+        headers={"Idempotency-Key": "duty-edit-1"},
+        json={"statement": "門市日常營運"},
+    )
+    assert renamed.status_code == 200
+    assert renamed.json()["display_order"] == 0
+
+    reordered = await client.put(
+        f"{root}/duty-order",
+        headers={"Idempotency-Key": "duty-order-1"},
+        json={"ordered_duty_ids": [duty.json()["duty_id"]]},
+    )
+    assert reordered.status_code == 200
+
+    deleted = await client.delete(
+        f"{root}/duties/{duty.json()['duty_id']}",
+        headers={"Idempotency-Key": "duty-delete-1"},
+    )
+    reloaded = await client.get(root)
+
+    assert deleted.status_code == 204
+    assert reloaded.status_code == 200
+    assert reloaded.json()["tasks"] == [
+        {
+            **task.json(),
+            "duty_id": None,
+        }
+    ]
+    assert reloaded.json()["tasks"][0]["task_id"] == task_id
+
+
+async def test_current_jd_duty_routes_reject_missing_duty_and_invalid_order(
+    postgres_api_client,
+    cleanup_job_analysis_rows,
+):
+    client, _, _ = postgres_api_client
+    document_id = cleanup_job_analysis_rows
+    root = f"/api/v1/job-analysis/documents/{document_id}"
+
+    assert (await client.put(root, json={"title": "門市營運專員"})).status_code == 201
+    missing = await client.put(
+        f"{root}/duties/missing-duty",
+        headers={"Idempotency-Key": "duty-missing-1"},
+        json={"statement": "不存在"},
+    )
+    invalid_order = await client.put(
+        f"{root}/duty-order",
+        headers={"Idempotency-Key": "duty-order-invalid-1"},
+        json={"ordered_duty_ids": ["missing-duty"]},
+    )
+
+    assert missing.status_code == 404
+    assert missing.json()["type"].endswith("/duty-not-found")
+    assert invalid_order.status_code == 422
+    assert invalid_order.json()["type"].endswith("/invalid-duty-order")
 
 
 async def test_local_web_task_editing_survives_reload_and_rename_is_metadata_only(

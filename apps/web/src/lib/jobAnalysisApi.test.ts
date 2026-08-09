@@ -11,11 +11,14 @@ import {
   JobAnalysisApiError,
   createDocument,
   addOpksItem,
+  addDuty,
   addTask,
   decideOpksProposal,
   deleteTask,
+  deleteDuty,
   deleteOpksItem,
   editTask,
+  editDuty,
   editOpksItem,
   getDocument,
   getConsultation,
@@ -23,6 +26,7 @@ import {
   listDocuments,
   putDocument,
   putJdHeader,
+  reorderDuties,
   reorderTasks,
   submitEmployeeTurn,
   decideProposal,
@@ -180,6 +184,36 @@ describe("Current JD Task client", () => {
       ["PUT", `http://127.0.0.1:8001/api/v1/job-analysis/documents/${DOCUMENT_ID}/task-order`],
       ["DELETE", `http://127.0.0.1:8001/api/v1/job-analysis/documents/${DOCUMENT_ID}/tasks/task-1`],
     ]);
+  });
+});
+
+describe("Current JD Duty client", () => {
+  const duty = { statement: "門市營運" };
+  const view = { duty_id: "duty-1", statement: "門市營運", display_order: 0 };
+
+  it("uses the caller-owned retry key for every Duty mutation", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(response(view, 201))
+      .mockResolvedValueOnce(response({ ...view, statement: "門市日常營運" }))
+      .mockResolvedValueOnce(response([view]))
+      .mockResolvedValueOnce(response(null, 204));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await addDuty(DOCUMENT_ID, duty, "duty-operation-1");
+    await editDuty(DOCUMENT_ID, view.duty_id, { statement: "門市日常營運" }, "duty-operation-1");
+    await reorderDuties(DOCUMENT_ID, [view.duty_id], "duty-operation-1");
+    await deleteDuty(DOCUMENT_ID, view.duty_id, "duty-operation-1");
+
+    expect(fetchMock.mock.calls.map((call) => [call[1].method, call[0]])).toEqual([
+      ["POST", `http://127.0.0.1:8001/api/v1/job-analysis/documents/${DOCUMENT_ID}/duties`],
+      ["PUT", `http://127.0.0.1:8001/api/v1/job-analysis/documents/${DOCUMENT_ID}/duties/${view.duty_id}`],
+      ["PUT", `http://127.0.0.1:8001/api/v1/job-analysis/documents/${DOCUMENT_ID}/duty-order`],
+      ["DELETE", `http://127.0.0.1:8001/api/v1/job-analysis/documents/${DOCUMENT_ID}/duties/${view.duty_id}`],
+    ]);
+    for (const call of fetchMock.mock.calls) {
+      expect(call[1].headers).toMatchObject({ "Idempotency-Key": "duty-operation-1" });
+    }
   });
 });
 

@@ -570,7 +570,7 @@ git commit -m "feat(job-analysis): persist and author Duties"
 - Contract: `DutyWrite`, `DutyView`, `DutyOrderWrite`; Task write/view gains nullable `duty_id`／`competency_level`.
 - Routes: POST／PUT／DELETE `duties`, PUT `duty-order`; all mutations require `Idempotency-Key`.
 
-- [ ] **Step 1: Write red API and Web tests**
+- [x] **Step 1: Write red API and Web tests**
 
 ```ts
 it("serializes an unassigned task without inventing a Duty", () => {
@@ -581,7 +581,7 @@ it("serializes an unassigned task without inventing a Duty", () => {
 
 API tests assert add/edit/delete/reorder, missing Duty 404／invalid order 422, and deleting Duty returns the surviving unassigned Task on reload.
 
-- [ ] **Step 2: Run red gates**
+- [x] **Step 2: Run red gates**
 
 Run: `cd apps/api; uv run pytest tests/test_job_analysis_api_postgres.py tests/test_job_analysis_mapper.py -k "duty or competency" -q`
 
@@ -589,11 +589,11 @@ Run: `cd apps/web; npm run test -- src/lib/jobAnalysisDuties.test.ts src/lib/job
 
 Expected: FAIL before contract/routes/components exist.
 
-- [ ] **Step 3: Extend schema, codegen and routes**
+- [x] **Step 3: Extend schema, codegen and routes**
 
 Run `npm run codegen && npm run check-codegen` in `packages/job-analysis-contract`; route remains transport-only and maps existing typed application errors.
 
-- [ ] **Step 4: Implement employee UI**
+- [x] **Step 4: Implement employee UI**
 
 Duty editor supports explicit add/edit/delete/reorder. Task form offers nullable Duty select and nullable level 1–6. Show an explicit「未分組」section; never add AI Duty suggestion or reference search.
 
@@ -603,7 +603,7 @@ stays blank and readiness only提示、不阻擋. Do not add AI level inference 
 
 Task 的 Up／Down 以**目前可見 Duty group**為相鄰單位，再把那兩個 ID 在完整文件順序中交換；不得把 group 內 index 直接當全域 index。新增 interleaved fixture（`d1:t1, d2:t2, d1:t3`），在 d1 內把 t3 上移後，畫面與 reload 都得到 `d1:[t3,t1]`，且 t2 不被隱藏改位。
 
-- [ ] **Step 5: Run API／contract／Web gate**
+- [x] **Step 5: Run API／contract／Web gate**
 
 Run:
 
@@ -615,12 +615,18 @@ cd ../web; npm run test; npx tsc --noEmit; npm run lint
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```powershell
 git add apps/api apps/web packages/job-analysis-contract docs/design/task-analysis-engine.md
 git commit -m "feat(job-analysis): expose Duty authoring in the workspace"
 ```
+
+Execution record: red API／Web gates first failed on the missing Duty contract and helper; the
+implemented slice now passes the contract suite (14), related API／domain／PostgreSQL／Proposal
+suite (77), full Web suite (114), TypeScript check and lint. Codegen is reproducible by matching
+SHA-256 hashes before and after a second generation run. The official six-level summaries come
+from the local iCAP field-standard and level-judgment documents.
 
 ---
 

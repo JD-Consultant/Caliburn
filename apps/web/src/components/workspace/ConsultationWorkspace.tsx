@@ -6,6 +6,7 @@ import { useState } from "react";
 
 import { consultationQueryOptions } from "@/lib/jobAnalysisQueries";
 import { ConsultationPanel } from "./ConsultationPanel";
+import { DutyEditor } from "./DutyEditor";
 import { JdHeaderForm } from "./JdHeaderForm";
 import { OpksEditor } from "./OpksEditor";
 import { TaskEditor } from "./TaskEditor";
@@ -14,9 +15,11 @@ import { GuardedLink } from "./UnsavedChangesGuard";
 export function ConsultationWorkspace({ documentId }: { documentId: string }) {
   const consultation = useQuery(consultationQueryOptions(documentId));
   const [headerDraftDirty, setHeaderDraftDirty] = useState(false);
+  const [dutyDraftDirty, setDutyDraftDirty] = useState(false);
   const [taskDraftDirty, setTaskDraftDirty] = useState(false);
   const [opksDraftDirty, setOpksDraftDirty] = useState(false);
-  const dirty = headerDraftDirty || taskDraftDirty || opksDraftDirty;
+  const dirty =
+    headerDraftDirty || dutyDraftDirty || taskDraftDirty || opksDraftDirty;
 
   return (
     <div className="min-h-screen bg-muted/30">
@@ -47,6 +50,11 @@ export function ConsultationWorkspace({ documentId }: { documentId: string }) {
           <JdHeaderForm
             documentId={documentId}
             onDirtyChange={setHeaderDraftDirty}
+          />
+          <DutyEditor
+            documentId={documentId}
+            embedded
+            onDirtyChange={setDutyDraftDirty}
           />
           <TaskEditor
             documentId={documentId}

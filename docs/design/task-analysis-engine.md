@@ -54,7 +54,7 @@ OpenRouter 拿 `task_analysis_result_v3`(送出去的精簡形狀)→ **mapper**
 | persistence ports | Current State repositories／UoW／版本化 Journal payload | `application/persistence.py` | 純 Protocol 與 frozen contracts；不認 ORM／JSON row |
 | PostgreSQL adapter | 0012 四表＋0013 Journal kind＋0014 兩張 OPKS 表＋0015 Document Header＋**0016 Duty 表與 Task duty/level 欄位**、serialization、repositories、UoW | `app/adapters/job_analysis_postgres/` | `job_analysis_jd_duties` 與 Task 的複合 FK 以 `DEFERRABLE INITIALLY DEFERRED` 保住同一 authority transaction 的 replace；既有 Task 保持未分組／未填級別。JSONB 讀取必須 hydrate；schema/shape 壞掉 fail-closed；repository 不 commit |
 | authority commit seam | 完整 Current State → 同一 UoW 原子寫入 | `application/authority_commit.py` | **所有 authority writer（含 durable turn）**先重驗完整 `JobAnalysisState`（含 Header、Duty、OPKS refs），再 replace Duty／JD／Task Proposal／OPKS／OPKS Proposal、寫入 0..N 筆 Journal、generation CAS、單次 commit；edited OPKS 決策用同一 seam 原子寫 proposal-decision 與 direct-edit 兩筆 Journal |
-| authoring use cases | 文件庫、JD header、JD Task、**Duty** 與 OPKS add/edit/delete/reorder | `application/authoring.py`、`application/duty_authoring.py`、`application/opks_authoring.py` | document row lock → entry replay check → Current State/Journal/generation 同交易；Duty 的 add/edit/delete/reorder 已落地：delete 只解除相關 Task 的 `duty_id`、只 stale 相關 pending/deferred Task Proposal，**不**改 Work Model／reconciliation／OPKS，也不建立 SourceRef。Task 離開 Current JD 時，`prune_opks_for_current_jd()` 同交易移除其 O/P、清理 K/S refs，且不猜接 merge/split 新 Task；Duty API／Web editor 留待 Task 8 |
+| authoring use cases | 文件庫、JD header、JD Task、**Duty** 與 OPKS add/edit/delete/reorder | `application/authoring.py`、`application/duty_authoring.py`、`application/opks_authoring.py` | document row lock → entry replay check → Current State/Journal/generation 同交易；Duty 的 add/edit/delete/reorder 已落地：delete 只解除相關 Task 的 `duty_id`、只 stale 相關 pending/deferred Task Proposal，**不**改 Work Model／reconciliation／OPKS，也不建立 SourceRef。Task 離開 Current JD 時，`prune_opks_for_current_jd()` 同交易移除其 O/P、清理 K/S refs，且不猜接 merge/split 新 Task；Task 8 已接通 Duty contract、四個 API route、員工 Web editor 與 Task 的 Duty／level 編輯 |
 | consultation use case | provider 前 replay → authority snapshot → 交易外模型呼叫 → verified commit | `application/consultation.py`、`application/durable_turn.py` | 已提交的同 key／同回答零 provider call；commit 時重鎖並比對 generation/read-set；Work Model、Proposal、下一題與 completed-turn Journal 同交易 |
 | Proposal use cases | Task 與 OPKS 各自送審、決策與 stale | `application/proposal_decisions.py`、`application/opks_proposals.py` | 兩種 Proposal 不抽通用 framework；決策由 document lock 序列化。OPKS accepted 套用候選但不偽造 Evidence；edited 只可改文字並另鑄 direct-edit Evidence；歷史 accepted 不會誤殺日後建立的新 revise |
 | Local Web API | 本機文件、JD header、Current JD、OPKS 與 Consultation routes | `app/api/routes/job_analysis.py` | 只做 generated wire DTO mapping；`PUT …/jd-header` 要求 `Idempotency-Key`，回 `JdHeaderView`，未改內容回 typed `422 invalid-request`；不暴露 Work Model、Journal、generation、內部 OPKS Source ID 或 provider detail。Consultation 會投影 Task 與 OPKS 兩種 Proposal，兩種 decision route 各自呼叫對應的 greenfield use case |
@@ -211,6 +211,7 @@ RFC 9457 `application/problem+json`；path-scoped handler 會把舊 routes 的�
 Current JD Task 的 POST／PUT／DELETE 與排序 PUT 都要求 `Idempotency-Key`，原樣映射成
 Journal `entry_id`；沒有 middleware、隱藏 retry 或第二套寫入邏輯。員工清空 optional text 時，
 HTTP DTO mapper（與 LLM 的 `wire.py` 無關）先 trim 並轉成 `null`；必填 statement 變空則回 `invalid-request`，不讓半成品進 domain。
+Duty 的 POST／PUT／DELETE 與完整順序 PUT 同樣要求 `Idempotency-Key`；刪除只讓相關 Task 變成「未分組」，不刪除 Task。`DocumentView` 帶按 `display_order` 排列的 Duty。
 Web 的 `JdHeaderForm` 以 `JdHeaderView` 建立字串 baseline/draft，clean 時才採用 refetch 的 server state，dirty 時保留員工草稿；Save／Cancel 是明確操作，Esc 取消（dirty 時確認），Ctrl/Cmd+Enter 儲存。`ReadinessNotice` 只消費同一份 `DocumentView.readiness` 的 issue codes，不在 Web 複製 `assess_readiness()`，缺漏也不阻擋保存、訪談或匯出。
 **`POST …/tasks/{task_id}/opks-proposals` 已退役，不得復活**（ADR 0054 決定 1）。OPKS 的唯一 AI 入口是
 `POST …/turns` 排定的 child：員工不需要理解 OPKS 階段的存在，也不該由他判斷哪個 Task 已經談夠、
@@ -321,7 +322,7 @@ Consultation turn 不再重複呼叫它。
 ### 5.1 Duty 與 readiness（Task 6–7）
 
 - `Duty` 是員工擁有的 Task 上一層分組；`duty_id` 與 `competency_level`（1–6、可空）屬 Current JD，模型輸出沒有這兩欄。AI 新增、merge、split 的新 JD Task 保持未分組／未填級別；同 ID revise 只更新 AI 提出的語意文字，保留員工既有值。
-- `JobAnalysisState.current_duties` 是必填的 canonical tuple；Task 若帶 `duty_id` 必須指向現有 Duty。Task 7 已完成 PostgreSQL persistence 與 add/edit/delete/reorder authoring：所有 authority state loader 都讀回 Duties，shared seam 同交易 replace Duties 與 Tasks；**API／Web 編輯仍待 Task 8**，這裡不宣稱 UI 已接通。
+- `JobAnalysisState.current_duties` 是必填的 canonical tuple；Task 若帶 `duty_id` 必須指向現有 Duty。Task 7 已完成 PostgreSQL persistence 與 add/edit/delete/reorder authoring；Task 8 再以 contract／API／Web 接通員工明確編輯。Duty 刪除保留 Task 並清空 `duty_id`；Task level 1–6 可空，Web 顯示本地 iCAP 六級摘要，readiness 只提示、不阻擋。
 - `assess_readiness(header, duties, tasks, current_opks)` 只回報可機械判定的固定 issue code；每個 code 一次，不帶 Task／Duty identity。除了表頭三碼，依固定順序檢查未分組 Task、未填 Task 級別、空 Duty，以及沒有任何 Task／Indicator reference 的 K/S；不把缺 O、缺 A 或 notes 判成缺漏。API／Web 只呈現結果，不自行重算。
 
 ## 6. Identity gate:什麼時候可以直接改 Work Model

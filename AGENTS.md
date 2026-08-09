@@ -72,8 +72,9 @@ Caliburn 現行目標是給員工使用的**本機 Web AI 職務分析與職務�
   production 不 import。禁止 import/wrap v3 consultant/scribe/harvest/select；細節先讀
   `app/interview_vnext/README.md`、其 `AGENTS.md` 與 `docs/plans/2026-07-16-interview-ai-vnext-implementation-plan.md`。
 - **契約**:#1 `packages/ocs-contract`(OCS 文件,JSON-schema→Pydantic+TS)、
-  #2 `packages/indexer-contract`(indexer⇄api,共用 pydantic)、#3 `packages/job-analysis-contract`
-  (current job-analysis workspace,JSON-schema→Pydantic+TS)；legacy Web 仍消費 ocs-contract 生成的 TS。
+  #2 `packages/indexer-contract`(indexer⇄api,共用 pydantic)、#3 legacy OCS Web seam
+  (消費 ocs-contract 生成的 TS)、#4 `packages/job-analysis-contract`
+  (current job-analysis workspace,JSON-schema→Pydantic+TS)。
   ADR 0004 / 0010 / 0011。
 - **嵌入**:BGE-M3(dense+sparse)跑在 **GPU 容器 `apps/embedder`**(FastAPI+FlagEmbedding);
   indexer/api 走 HTTP 呼叫。**絕對不要把 torch 放回 app 進程**——Windows 上會 segfault/`_dynamo` 崩,

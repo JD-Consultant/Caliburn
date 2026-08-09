@@ -11,4 +11,7 @@ npm run codegen -w @caliburn/ocs-contract
 npm run check-codegen -w @caliburn/ocs-contract
 ```
 
+`check-codegen` 會呼叫 `bash scripts/check-codegen.sh`。Windows PowerShell 環境須可使用 Git Bash／
+WSL Bash（或直接從 Bash 執行）；這不是原生 PowerShell script。
+
 schema 變更後先執行 `codegen` 並檢查生成 diff；不要直接編輯 Python／TypeScript 生成檔。

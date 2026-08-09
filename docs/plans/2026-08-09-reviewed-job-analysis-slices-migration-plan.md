@@ -883,7 +883,7 @@ tests plus 3 dependency tests.
 - `render_xlsx(document: ExportDocument) -> bytes`.
 - `XLSX_MEDIA_TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"`.
 
-- [ ] **Step 1: Write red workbook structure and safety tests**
+- [x] **Step 1: Write red workbook structure and safety tests**
 
 ```python
 def test_workbook_has_only_the_official_form_sheet():
@@ -908,13 +908,13 @@ def test_formula_shaped_employee_text_stays_literal_text():
 
 另測：沒有「iCAP 版型缺漏」／產品聲明／未分組自創標籤；未分組 Task 仍在官方 Task 欄且 Duty cell 空白；長中文 wrap；K/S 共用同碼；空欄保持空；所有 used cells 有官方邊框；必要 merged ranges、landscape、fit-to-width=1、print area 與 repeated header row 正確。
 
-- [ ] **Step 2: Run red tests**
+- [x] **Step 2: Run red tests**
 
 Run: `cd apps/api; uv run pytest tests/test_job_analysis_export_xlsx.py -q`
 
 Expected: import failure before renderer exists.
 
-- [ ] **Step 3: Implement one local text writer and official layout**
+- [x] **Step 3: Implement one local text writer and official layout**
 
 ```python
 def _put_text(sheet: Worksheet, row: int, column: int, value: str | None) -> Cell:
@@ -928,11 +928,11 @@ def _put_text(sheet: Worksheet, row: int, column: int, value: str | None) -> Cel
 
 Employee／model strings all use `_put_text`; numeric competency levels use a separate numeric writer. Do not prefix apostrophes—the saved value must remain exactly the employee text. Add only official template labels and the official iCAP-provided-code notes shown in attachment 2-2.
 
-- [ ] **Step 4: Implement official visual properties without a theme framework**
+- [x] **Step 4: Implement official visual properties without a theme framework**
 
 Use local constants for thin borders, bold headers, centered code/level cells, top-aligned wrapped content, official seven-column widths, row heights, merges, landscape print setup, A4 paper, fit-to-width 1 and print area. No generic style registry.
 
-- [ ] **Step 5: Run workbook tests and inspect the produced file**
+- [x] **Step 5: Run workbook tests and inspect the produced file**
 
 Run: `cd apps/api; uv run pytest tests/test_job_analysis_export_xlsx.py -q`
 
@@ -940,12 +940,20 @@ Then generate one temporary workbook under the OS temp directory, open/render it
 
 Expected: automated tests PASS and full-sheet visual inspection shows no extra sheet/row, clipped long CJK text or broken merges.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```powershell
 git add apps/api/app/job_analysis/application/export_xlsx.py apps/api/tests/test_job_analysis_export_xlsx.py
 git commit -m "feat(job-analysis): render the strict public XLSX form"
 ```
+
+Execution record: the red import test confirmed the renderer seam was absent. The implementation
+keeps one `職能基準表` sheet, uses a local explicit string writer so formula-shaped employee text
+stays a string, renders the official seven-column table／attitude／notes sections, preserves
+unassigned Tasks with a blank Duty cell, and adds thin borders, wrapped alignment, merges, A4
+landscape, fit-to-width and repeated table headers. Automated workbook tests pass 7/7. Excel
+opened the generated workbook, exported a one-page PDF, and the rendered PNG was visually checked;
+no extra sheet, custom warning／product statement, clipped content or broken merge was observed.
 
 ---
 

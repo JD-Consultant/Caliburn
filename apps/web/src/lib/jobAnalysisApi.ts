@@ -12,6 +12,7 @@ import type {
   JdTaskWrite,
   OpksItemView,
   OpksItemWrite,
+  OpksOrderWrite,
   OpksProposalDecisionWrite,
   ProblemDetail,
   ProposalDecisionWrite,
@@ -238,6 +239,23 @@ export function deleteOpksItem(
   });
 }
 
+export function reorderOpksItems(
+  documentId: string,
+  entityKind: OpksOrderWrite["entity_kind"],
+  orderedEntityIds: string[],
+  idempotencyKey: string,
+): Promise<OpksItemView[]> {
+  const body: OpksOrderWrite = {
+    entity_kind: entityKind,
+    ordered_entity_ids: orderedEntityIds,
+  };
+  return request<OpksItemView[]>(`/documents/${documentId}/opks-order`, {
+    method: "PUT",
+    headers: mutationHeaders(idempotencyKey),
+    body: JSON.stringify(body),
+  });
+}
+
 export function submitEmployeeTurn(
   documentId: string,
   idempotencyKey: string,
@@ -302,6 +320,8 @@ function knownProblemMessage(type: KnownProblemType): string {
       return "工作順序不正確";
     case "https://caliburn.dev/problems/job-analysis/invalid-duty-order":
       return "主要職責順序不正確";
+    case "https://caliburn.dev/problems/job-analysis/invalid-opks-order":
+      return "職能內容順序不正確";
     case "https://caliburn.dev/problems/job-analysis/invalid-request":
       return "請檢查輸入內容";
     case "https://caliburn.dev/problems/job-analysis/proposal-not-found":
@@ -322,6 +342,7 @@ const KNOWN_PROBLEM_TYPES = new Set<string>([
   "https://caliburn.dev/problems/job-analysis/authority-conflict",
   "https://caliburn.dev/problems/job-analysis/invalid-task-order",
   "https://caliburn.dev/problems/job-analysis/invalid-duty-order",
+  "https://caliburn.dev/problems/job-analysis/invalid-opks-order",
   "https://caliburn.dev/problems/job-analysis/invalid-request",
   "https://caliburn.dev/problems/job-analysis/proposal-not-found",
   "https://caliburn.dev/problems/job-analysis/consultant-unavailable",

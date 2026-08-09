@@ -25,6 +25,10 @@ class OpksItemNotFound(JobAnalysisApplicationError):
     pass
 
 
+class InvalidOpksOrder(JobAnalysisApplicationError):
+    pass
+
+
 class OpksProposalNotFound(JobAnalysisApplicationError):
     pass
 

@@ -204,6 +204,7 @@ class OpksItemView(BaseModel):
     task_refs: list[str]
     indicator_refs: list[str]
     evidence_quotes: list[str]
+    display_order: conint(ge=0, strict=True)
 
 
 class Status(StrEnum):
@@ -383,6 +384,14 @@ class TaskOrderWrite(BaseModel):
     ordered_task_ids: list[str]
 
 
+class OpksOrderWrite(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    entity_kind: EntityKind
+    ordered_entity_ids: list[str]
+
+
 class DutyOrderWrite(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -419,6 +428,9 @@ class Type(StrEnum):
     )
     https___caliburn_dev_problems_job_analysis_invalid_duty_order = (
         'https://caliburn.dev/problems/job-analysis/invalid-duty-order'
+    )
+    https___caliburn_dev_problems_job_analysis_invalid_opks_order = (
+        'https://caliburn.dev/problems/job-analysis/invalid-opks-order'
     )
     https___caliburn_dev_problems_job_analysis_invalid_request = (
         'https://caliburn.dev/problems/job-analysis/invalid-request'

@@ -214,6 +214,7 @@ Current JD Task 的 POST／PUT／DELETE 與排序 PUT 都要求 `Idempotency-Key
 Journal `entry_id`；沒有 middleware、隱藏 retry 或第二套寫入邏輯。員工清空 optional text 時，
 HTTP DTO mapper（與 LLM 的 `wire.py` 無關）先 trim 並轉成 `null`；必填 statement 變空則回 `invalid-request`，不讓半成品進 domain。
 Duty 的 POST／PUT／DELETE 與完整順序 PUT 同樣要求 `Idempotency-Key`；刪除只讓相關 Task 變成「未分組」，不刪除 Task。`DocumentView` 帶按 `display_order` 排列的 Duty。
+OPKS 的完整 kind-local 順序 PUT 為 `PUT …/opks-order`，同樣以 `Idempotency-Key` 寫 direct-edit Journal；body 必須帶某一 `entity_kind` 的完整 entity ID 集合，不能跨 kind 或只送可見子集。
 Web 的 `JdHeaderForm` 以 `JdHeaderView` 建立字串 baseline/draft，clean 時才採用 refetch 的 server state，dirty 時保留員工草稿；Save／Cancel 是明確操作，Esc 取消（dirty 時確認），Ctrl/Cmd+Enter 儲存。`ReadinessNotice` 只消費同一份 `DocumentView.readiness` 的 issue codes，不在 Web 複製 `assess_readiness()`，缺漏也不阻擋保存、訪談或匯出。
 **`POST …/tasks/{task_id}/opks-proposals` 已退役，不得復活**（ADR 0054 決定 1）。OPKS 的唯一 AI 入口是
 `POST …/turns` 排定的 child：員工不需要理解 OPKS 階段的存在，也不該由他判斷哪個 Task 已經談夠、

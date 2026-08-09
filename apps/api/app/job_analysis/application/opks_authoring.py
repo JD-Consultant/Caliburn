@@ -20,6 +20,7 @@ from .authority_commit import commit_authority_change
 from .errors import (
     DocumentNotFound,
     IdempotencyConflict,
+    InvalidOpksOrder,
     OpksItemNotFound,
 )
 from .persistence import (
@@ -392,4 +393,89 @@ async def delete_opks_item(
                 action="delete",
                 before=before,
             ),
+        )
+
+
+async def reorder_opks_items(
+    uow_factory: JobAnalysisUnitOfWorkFactory,
+    *,
+    document_id: UUID,
+    entry_id: str,
+    entity_kind: OpksEntityKind,
+    ordered_entity_ids: tuple[str, ...],
+) -> tuple[OpksItem, ...]:
+    """Replace one OPKS kind's complete display order atomically."""
+
+    kind = OpksEntityKind(entity_kind)
+    async with uow_factory() as uow:
+        record, state = await _locked_state(uow, document_id)
+        current_ids = tuple(
+            item.entity_id
+            for item in state.current_opks.items
+            if item.entity_kind is kind
+        )
+        replay = await uow.journal.get(document_id, entry_id)
+        if replay is not None:
+            payload = _require_replay(replay, action="reorder")
+            if (
+                payload.entity_kind is not kind
+                or payload.ordered_entity_ids != ordered_entity_ids
+            ):
+                raise IdempotencyConflict(
+                    f"entry {entry_id!r} was replayed with another OPKS order"
+                )
+            if set(ordered_entity_ids) != set(current_ids):
+                raise IdempotencyConflict(
+                    "the reordered OPKS set changed after the original request"
+                )
+            return tuple(
+                next(
+                    item
+                    for item in state.current_opks.items
+                    if item.entity_id == entity_id
+                )
+                for entity_id in ordered_entity_ids
+            )
+
+        if len(set(ordered_entity_ids)) != len(ordered_entity_ids):
+            raise InvalidOpksOrder("ordered_entity_ids must be distinct")
+        if set(ordered_entity_ids) != set(current_ids):
+            raise InvalidOpksOrder(
+                "ordered_entity_ids must cover exactly the OPKS items of one kind"
+            )
+        by_id = {
+            item.entity_id: item
+            for item in state.current_opks.items
+            if item.entity_kind is kind
+        }
+        reordered_by_id = {
+            entity_id: by_id[entity_id].model_copy(
+                update={"display_order": index}
+            )
+            for index, entity_id in enumerate(ordered_entity_ids)
+        }
+        next_opks = CurrentJdOpks(
+            items=tuple(
+                reordered_by_id.get(item.entity_id, item)
+                for item in state.current_opks.items
+            )
+        )
+        await _commit(
+            uow,
+            record=record,
+            state=state.model_copy(update={"current_opks": next_opks}),
+            entry_id=entry_id,
+            payload=OpksDirectEditPayload(
+                action="reorder",
+                entity_kind=kind,
+                ordered_entity_ids=ordered_entity_ids,
+            ),
+        )
+        return tuple(
+            next(
+                item
+                for item in next_opks.items
+                if item.entity_id == entity_id
+            )
+            for entity_id in ordered_entity_ids
         )

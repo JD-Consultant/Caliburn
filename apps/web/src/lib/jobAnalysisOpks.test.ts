@@ -13,6 +13,7 @@ import {
   groupOpksByTask,
   groupOpksProposals,
   opksDecisionPayload,
+  moveOpksWithinVisibleGroup,
 } from "./jobAnalysisOpks";
 
 const tasks = [
@@ -25,6 +26,7 @@ function item(
   entityKind: OpksItemView["entity_kind"],
   taskRefs: string[],
   indicatorRefs: string[] = [],
+  displayOrder = 0,
 ): OpksItemView {
   return {
     entity_id: entityId,
@@ -33,6 +35,7 @@ function item(
     task_refs: taskRefs,
     indicator_refs: indicatorRefs,
     evidence_quotes: [],
+    display_order: displayOrder,
   };
 }
 
@@ -57,6 +60,21 @@ function proposal(
 }
 
 describe("OPKS product projection", () => {
+  it("swaps visible same-kind neighbors without moving hidden items", () => {
+    const values = [
+      item("output-1", "output", ["task-1"], [], 0),
+      item("output-2", "output", ["task-2"], [], 1),
+      item("output-3", "output", ["task-1"], [], 2),
+    ];
+
+    expect(
+      moveOpksWithinVisibleGroup(values, "output", "output-3", -1, [
+        "output-1",
+        "output-3",
+      ]),
+    ).toEqual(["output-3", "output-2", "output-1"]);
+  });
+
   it("projects O/P/K/S by Task while preserving shared K/S identity", () => {
     const sharedKnowledge = item("knowledge-1", "knowledge", ["task-1", "task-2"]);
     const indicator = item("indicator-1", "indicator", ["task-1"]);

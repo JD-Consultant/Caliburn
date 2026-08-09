@@ -18,6 +18,13 @@ from .duty_authoring import (
     edit_duty,
     reorder_duties,
 )
+from .export import (
+    ExportDocument,
+    ExportDutySection,
+    ExportOpksEntry,
+    ExportTaskEntry,
+    assemble_export_document,
+)
 from .errors import (
     ConcurrentAuthorityChange,
     DocumentNotFound,
@@ -202,6 +209,11 @@ __all__ = [
     "DutyDirectEditPayload",
     "DutyNotFound",
     "DutyRepository",
+    "ExportDocument",
+    "ExportDutySection",
+    "ExportOpksEntry",
+    "ExportTaskEntry",
+    "assemble_export_document",
     "DocumentNotFound",
     "DocumentMetadataWriteResult",
     "DocumentRecord",

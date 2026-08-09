@@ -52,11 +52,13 @@ def _item(
     task_refs: tuple[str, ...],
     indicator_refs: tuple[str, ...],
     entry_id: str,
+    display_order: int,
 ) -> OpksItem:
     return OpksItem(
         entity_id=entity_id,
         entity_kind=entity_kind,
         text=text,
+        display_order=display_order,
         task_refs=task_refs,
         indicator_refs=indicator_refs,
         evidence_links=(
@@ -239,25 +241,39 @@ async def add_opks_item(
     indicator_refs: tuple[str, ...] = (),
 ) -> OpksItem:
     kind = OpksEntityKind(entity_kind)
-    expected = _item(
-        entity_id=_entity_id(entry_id, kind),
-        entity_kind=kind,
-        text=text,
-        task_refs=task_refs,
-        indicator_refs=indicator_refs,
-        entry_id=entry_id,
-    )
     async with uow_factory() as uow:
         record, state = await _locked_state(uow, document_id)
         replay = await uow.journal.get(document_id, entry_id)
         if replay is not None:
             payload = _require_replay(replay, action="add")
+            if payload.after is None:
+                raise IdempotencyConflict(
+                    f"entry {entry_id!r} has no added OPKS item"
+                )
+            expected = _item(
+                entity_id=_entity_id(entry_id, kind),
+                entity_kind=kind,
+                text=text,
+                task_refs=task_refs,
+                indicator_refs=indicator_refs,
+                entry_id=entry_id,
+                display_order=payload.after.display_order,
+            )
             if payload.after != expected:
                 raise IdempotencyConflict(
                     f"entry {entry_id!r} was replayed with another OPKS item"
                 )
             assert payload.after is not None
             return payload.after
+        expected = _item(
+            entity_id=_entity_id(entry_id, kind),
+            entity_kind=kind,
+            text=text,
+            task_refs=task_refs,
+            indicator_refs=indicator_refs,
+            entry_id=entry_id,
+            display_order=state.current_opks.next_display_order(kind),
+        )
         if state.current_opks.item_by_id(expected.entity_id) is not None:
             raise IdempotencyConflict(
                 f"generated OPKS entity id {expected.entity_id!r} already exists"
@@ -285,19 +301,24 @@ async def edit_opks_item(
     indicator_refs: tuple[str, ...] = (),
 ) -> OpksItem:
     kind = OpksEntityKind(entity_kind)
-    expected = _item(
-        entity_id=entity_id,
-        entity_kind=kind,
-        text=text,
-        task_refs=task_refs,
-        indicator_refs=indicator_refs,
-        entry_id=entry_id,
-    )
     async with uow_factory() as uow:
         record, state = await _locked_state(uow, document_id)
         replay = await uow.journal.get(document_id, entry_id)
         if replay is not None:
             payload = _require_replay(replay, action="edit")
+            if payload.after is None:
+                raise IdempotencyConflict(
+                    f"entry {entry_id!r} has no edited OPKS item"
+                )
+            expected = _item(
+                entity_id=entity_id,
+                entity_kind=kind,
+                text=text,
+                task_refs=task_refs,
+                indicator_refs=indicator_refs,
+                entry_id=entry_id,
+                display_order=payload.after.display_order,
+            )
             if payload.after != expected:
                 raise IdempotencyConflict(
                     f"entry {entry_id!r} was replayed with another OPKS edit"
@@ -309,6 +330,15 @@ async def edit_opks_item(
             raise OpksItemNotFound(f"OPKS item {entity_id!r} was not found")
         if before.entity_kind is not kind:
             raise ValueError("OPKS edit must preserve entity kind")
+        expected = _item(
+            entity_id=entity_id,
+            entity_kind=kind,
+            text=text,
+            task_refs=task_refs,
+            indicator_refs=indicator_refs,
+            entry_id=entry_id,
+            display_order=before.display_order,
+        )
         next_opks = CurrentJdOpks(
             items=tuple(
                 expected if item.entity_id == entity_id else item

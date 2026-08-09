@@ -52,7 +52,7 @@ OpenRouter 拿 `task_analysis_result_v3`(送出去的精簡形狀)→ **mapper**
 | provider | 最小 OpenRouter Chat adapter | `providers/openrouter.py` | 一次 HTTP;固定 `reasoning=high` 且不回傳 reasoning;成功內容必須由 response `model` 證明來自 exact configured model;typed 失敗;**只收 render 過的文字** |
 | transition | 結果 → Work Model 變更 ＋ Proposal | `application/transition.py` | **唯一寫入者**;全有或全無 |
 | persistence ports | Current State repositories／UoW／版本化 Journal payload | `application/persistence.py` | 純 Protocol 與 frozen contracts；不認 ORM／JSON row |
-| PostgreSQL adapter | 0012 四表＋0013 Journal kind＋0014 兩張 OPKS 表＋0015 Document Header＋**0016 Duty 表與 Task duty/level 欄位**、serialization、repositories、UoW | `app/adapters/job_analysis_postgres/` | `job_analysis_jd_duties` 與 Task 的複合 FK 以 `DEFERRABLE INITIALLY DEFERRED` 保住同一 authority transaction 的 replace；既有 Task 保持未分組／未填級別。JSONB 讀取必須 hydrate；schema/shape 壞掉 fail-closed；repository 不 commit |
+| PostgreSQL adapter | 0012 四表＋0013 Journal kind＋0014 兩張 OPKS 表＋0015 Document Header＋0016 Duty 表與 Task duty/level 欄位＋**0017 OPKS display order**、serialization、repositories、UoW | `app/adapters/job_analysis_postgres/` | `job_analysis_jd_duties` 與 Task 的複合 FK 以 `DEFERRABLE INITIALLY DEFERRED` 保住同一 authority transaction 的 replace；OPKS order 只在 `(document, entity_kind)` 內唯一，0017 以既有 `(created_at, entity_id)` 讀取順序 backfill。JSONB 讀取必須 hydrate；schema/shape 壞掉 fail-closed；repository 不 commit |
 | authority commit seam | 完整 Current State → 同一 UoW 原子寫入 | `application/authority_commit.py` | **所有 authority writer（含 durable turn）**先重驗完整 `JobAnalysisState`（含 Header、Duty、OPKS refs），再 replace Duty／JD／Task Proposal／OPKS／OPKS Proposal、寫入 0..N 筆 Journal、generation CAS、單次 commit；edited OPKS 決策用同一 seam 原子寫 proposal-decision 與 direct-edit 兩筆 Journal |
 | authoring use cases | 文件庫、JD header、JD Task、**Duty** 與 OPKS add/edit/delete/reorder | `application/authoring.py`、`application/duty_authoring.py`、`application/opks_authoring.py` | document row lock → entry replay check → Current State/Journal/generation 同交易；Duty 的 add/edit/delete/reorder 已落地：delete 只解除相關 Task 的 `duty_id`、只 stale 相關 pending/deferred Task Proposal，**不**改 Work Model／reconciliation／OPKS，也不建立 SourceRef。Task 離開 Current JD 時，`prune_opks_for_current_jd()` 同交易移除其 O/P、清理 K/S refs，且不猜接 merge/split 新 Task；Task 8 已接通 Duty contract、四個 API route、員工 Web editor 與 Task 的 Duty／level 編輯 |
 | consultation use case | provider 前 replay → authority snapshot → 交易外模型呼叫 → verified commit | `application/consultation.py`、`application/durable_turn.py` | 已提交的同 key／同回答零 provider call；commit 時重鎖並比對 generation/read-set；Work Model、Proposal、下一題與 completed-turn Journal 同交易 |
@@ -70,7 +70,7 @@ OpenRouter 拿 `task_analysis_result_v3`(送出去的精簡形狀)→ **mapper**
 | work-model authority | `work_model` | 由訪談證據形成的 Task／open issue／excluded signal；模型只能經 verifier＋transition 提出候選。 |
 | current-JD authority | `current_jd` | 員工可見的正式 JD Task 投影；Proposal 決策才可改，`apply_task_analysis_result()` 永遠不直接改它。 |
 | proposal memory | `proposals` | 待員工決策的 Task 假說與其 snapshot；不是 Current JD，也不能當成已成立工作。 |
-| OPKS authority | `current_opks` | O/P/K/S/A 文件內容與 Evidence linkage；OPKS packet 不讀 `jd_header`。 |
+| OPKS authority | `current_opks` | O/P/K/S/A 文件內容、同 kind 內的 employee `display_order` 與 Evidence linkage；OPKS packet 不讀 `jd_header`。 |
 | OPKS proposal memory | `opks_proposals` | 待員工決策的 OPKS 假說；與 Task Proposal 分開，不抽通用 Proposal contract。 |
 
 `DocumentRecord.jd_header` 是 frozen dataclass 的必填欄位。只有 `create_document()` 新建文件明確寫入 `JdHeader()`；0015 對既有文件以 `job-analysis-jd-header/1`／`{}` 回填。此後所有 state reconstruction 都從 `record.jd_header` 取得，transition 只轉送既有 `state.jd_header`，而 `commit_authority_change()` 以已驗證 state 在同一 authority transaction 保存它；不得以 default 或 `DocumentMetadataWrite.title` 掩蓋這條 seam。
@@ -188,6 +188,8 @@ provider-outside-transaction 與 snapshot revalidation 語意；重鎖成功後�
 OPKS 人工編輯沿用同一條權威邊界：`add_opks_item`／`edit_opks_item`／`delete_opks_item`
 接受 `Idempotency-Key` 作為 Journal `entry_id`，由 application 配發 add ID；client 不得傳 Evidence 或
 內部 ID。`DocumentView`／`ConsultationView` 只投影可編輯欄位與可讀的 evidence quotes。
+直接新增與 accepted Proposal 由該 `entity_kind` 的 `CurrentJdOpks.next_display_order()` 配發 order；
+修訂保留原 order，刪除不補號，故 O/P/K/S/A 各自可有獨立的 employee 順序。
 Task delete 或 accepted／edited withdraw、merge、split 會在同一 authority transaction 呼叫
 `prune_opks_for_current_jd()`：O/P 隨擁有它的 Task 移除，K/S 只移除失效 refs 且可保留 unlinked，
 A 保留；系統不會把舊 refs 猜接到 replacement Task。員工直接刪除 Indicator 時，

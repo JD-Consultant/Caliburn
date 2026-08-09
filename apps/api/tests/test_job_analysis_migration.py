@@ -279,14 +279,14 @@ def _column_kind(column_type) -> str:
     return str(column_type).lower()
 
 
-def test_alembic_has_0016_as_its_single_head():
+def test_alembic_has_0017_as_its_single_head():
     from alembic.config import Config
     from alembic.script import ScriptDirectory
 
     config = Config(str(API_DIR / "alembic.ini"))
     config.set_main_option("script_location", str(API_DIR / "alembic"))
 
-    assert ScriptDirectory.from_config(config).get_heads() == ["0016"]
+    assert ScriptDirectory.from_config(config).get_heads() == ["0017"]
 
 
 @pytest.mark.usefixtures("require_postgres")

@@ -166,6 +166,72 @@ async def test_add_edit_delete_reload_and_idempotent_replay(
     assert delete_entry.payload.after is None
 
 
+async def test_direct_add_uses_next_kind_order_edit_preserves_and_delete_keeps_gap(
+    postgres_session_factory,
+    cleanup_job_analysis_rows,
+):
+    document_id = cleanup_job_analysis_rows
+    uow_factory = factory(postgres_session_factory)
+    task = await seed_task(
+        postgres_session_factory,
+        document_id,
+        entry_id="task-1",
+        statement="每週彙整營運週報",
+    )
+
+    first = await add_opks_item(
+        uow_factory,
+        document_id=document_id,
+        entry_id="opks-output-1",
+        entity_kind=OpksEntityKind.OUTPUT,
+        text="營運週報",
+        task_refs=(task.task_id,),
+    )
+    second = await add_opks_item(
+        uow_factory,
+        document_id=document_id,
+        entry_id="opks-output-2",
+        entity_kind=OpksEntityKind.OUTPUT,
+        text="營運月報",
+        task_refs=(task.task_id,),
+    )
+    knowledge = await add_opks_item(
+        uow_factory,
+        document_id=document_id,
+        entry_id="opks-knowledge-1",
+        entity_kind=OpksEntityKind.KNOWLEDGE,
+        text="營運數據定義",
+    )
+
+    assert (first.display_order, second.display_order, knowledge.display_order) == (
+        0,
+        1,
+        0,
+    )
+    edited = await edit_opks_item(
+        uow_factory,
+        document_id=document_id,
+        entry_id="opks-output-edit",
+        entity_id=first.entity_id,
+        entity_kind=first.entity_kind,
+        text="每週營運週報",
+        task_refs=(task.task_id,),
+    )
+    assert edited.display_order == first.display_order
+
+    await delete_opks_item(
+        uow_factory,
+        document_id=document_id,
+        entry_id="opks-output-delete",
+        entity_id=first.entity_id,
+    )
+    loaded = await load_document(uow_factory, document_id)
+
+    assert loaded is not None
+    assert loaded.state.current_opks.items == (knowledge, second)
+    assert second.display_order == 1
+
+
 async def test_invalid_manual_opks_edits_fail_before_writing(
     postgres_session_factory,
     cleanup_job_analysis_rows,

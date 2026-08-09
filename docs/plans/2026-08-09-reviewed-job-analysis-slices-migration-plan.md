@@ -826,7 +826,7 @@ TypeScript and lint.
 - Produces: `ExportOpksEntry`, `ExportTaskEntry`, `ExportDutySection`, `ExportDocument` and `assemble_export_document(state, *, title) -> ExportDocument`.
 - No IO, openpyxl or transport imports.
 
-- [ ] **Step 1: Write red projection tests**
+- [x] **Step 1: Write red projection tests**
 
 ```python
 def test_position_codes_are_render_time_only_and_follow_display_order():
@@ -839,28 +839,36 @@ def test_position_codes_are_render_time_only_and_follow_display_order():
 
 另測：K/S 文件層碼固定 `K01`／`S01`，同一 entity 可投影到多個 Task 而 entity ID 只一份；indicator refs 可解析回 Task；unassigned Task 保留、Duty/code 為 `None`；unlinked K/S 不進 `ExportDocument` 且 readiness 已有警示。
 
-- [ ] **Step 2: Run red test**
+- [x] **Step 2: Run red test**
 
 Run: `cd apps/api; uv run pytest tests/test_job_analysis_export_assembly.py -q`
 
 Expected: import failure before module exists.
 
-- [ ] **Step 3: Implement pure sorted projection**
+- [x] **Step 3: Implement pure sorted projection**
 
 Sort Duties／Tasks／each OPKS kind explicitly by `display_order`; never depend on tuple or database order. `ExportDocument` contains only fields the official table can render; no readiness list, product disclaimer or unlinked custom section.
 
-- [ ] **Step 4: Run test and dependency guard**
+- [x] **Step 4: Run test and dependency guard**
 
 Run: `cd apps/api; uv run pytest tests/test_job_analysis_export_assembly.py tests/test_job_analysis_dependencies.py -q`
 
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```powershell
 git add apps/api/app/job_analysis/application/export.py apps/api/app/job_analysis/application/__init__.py apps/api/tests/test_job_analysis_export_assembly.py
 git commit -m "feat(job-analysis): assemble deterministic public export"
 ```
+
+Execution record: the red import test confirmed the new application seam was absent. The
+implementation adds a pure `ExportDocument` projection with explicit Duty／Task／OPKS sorting,
+render-time T／O／P／K／S／A codes, shared K/S projection through direct Task or Indicator refs,
+and preserved unassigned Tasks with null Duty／position codes. Unlinked K/S are excluded from the
+public projection because readiness already warns that the official export will omit them; no
+readiness or custom warning section is added. Assembly and dependency gates pass: 7 projection
+tests plus 3 dependency tests.
 
 ---
 

@@ -703,11 +703,11 @@ order, revise preserves it, and delete leaves gaps untouched.
 - `reorder_opks_items(uow_factory, *, document_id: UUID, entry_id: str, entity_kind: OpksEntityKind, ordered_entity_ids: tuple[str, ...]) -> tuple[OpksItem, ...]`.
 - Contract `OpksOrderWrite { entity_kind, ordered_entity_ids }`; PUT `/{document_id}/opks-order`.
 
-- [ ] **Step 1: Write red reorder tests**
+- [x] **Step 1: Write red reorder tests**
 
 Require exact current IDs for one kind; reject duplicates, omissions, foreign-kind IDs and stale IDs; same key replay is idempotent. O can reorder independently of K even when both currently use order 0.
 
-- [ ] **Step 2: Run red tests**
+- [x] **Step 2: Run red tests**
 
 Run: `cd apps/api; uv run pytest tests/test_job_analysis_opks_reorder_postgres.py -q`
 
@@ -715,11 +715,11 @@ Run: `cd apps/web; npm run test -- src/lib/jobAnalysisOpks.test.ts`
 
 Expected: FAIL before use case and controls.
 
-- [ ] **Step 3: Implement API and Up／Down controls**
+- [x] **Step 3: Implement API and Up／Down controls**
 
 Keep simple buttons; no drag-and-drop framework. Disable Up at first item and Down at last item. O／P 在各 Task 卡片依可見相鄰項目重排；K／S 與 A 使用文件層清單，每個 entity 只出現一次，shared 與 unlinked K／S 都必須有唯一排序入口。Task 卡可繼續投影其 linked K/S，但不得放第二套會互相打架的排序按鈕。Dirty state participates in the workspace guard.
 
-- [ ] **Step 4: Run OPKS／contract／Web gate**
+- [x] **Step 4: Run OPKS／contract／Web gate**
 
 Run: `cd apps/api; uv run pytest -k opks -q`
 
@@ -729,12 +729,19 @@ Run: `cd apps/web; npm run test; npx tsc --noEmit; npm run lint`
 
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```powershell
 git add apps/api apps/web packages/job-analysis-contract docs/design/task-analysis-engine.md
 git commit -m "feat(job-analysis): let employees reorder OPKS items"
 ```
+
+Execution record: the red API route test returned 404 and the red Web helper test lacked
+the visible-group swap function. The implemented slice adds exact kind-scoped ID validation,
+same-key replay, direct-edit Journal receipts, `OpksOrderWrite`, and simple Up／Down controls.
+O/P controls use visible neighbors while sending the complete kind order; K/S and A each have
+one document-level ordering list. Gates pass: OPKS 172, contract 14, Web 116, TypeScript and
+lint; a second codegen run produced identical generated-file SHA-256 hashes.
 
 ---
 

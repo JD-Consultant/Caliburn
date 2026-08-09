@@ -27,6 +27,7 @@ import {
   putDocument,
   putJdHeader,
   reorderDuties,
+  reorderOpksItems,
   reorderTasks,
   submitEmployeeTurn,
   decideProposal,
@@ -261,6 +262,7 @@ describe("Current JD OPKS client", () => {
       ...item,
       entity_id: "knowledge-1",
       evidence_quotes: [],
+      display_order: 0,
     };
     const consultation = {
       document: {
@@ -281,12 +283,19 @@ describe("Current JD OPKS client", () => {
       .mockResolvedValueOnce(response(view, 201))
       .mockResolvedValueOnce(response(view))
       .mockResolvedValueOnce(response(null, 204))
+      .mockResolvedValueOnce(response([view]))
       .mockResolvedValueOnce(response(consultation));
     vi.stubGlobal("fetch", fetchMock);
 
     await addOpksItem(DOCUMENT_ID, item, "opks-add");
     await editOpksItem(DOCUMENT_ID, "knowledge-1", item, "opks-edit");
     await deleteOpksItem(DOCUMENT_ID, "knowledge-1", "opks-delete");
+    await reorderOpksItems(
+      DOCUMENT_ID,
+      "knowledge",
+      ["knowledge-1"],
+      "opks-reorder",
+    );
     await decideOpksProposal(
       DOCUMENT_ID,
       "proposal-1",
@@ -298,14 +307,21 @@ describe("Current JD OPKS client", () => {
       ["POST", `http://127.0.0.1:8001/api/v1/job-analysis/documents/${DOCUMENT_ID}/opks`],
       ["PUT", `http://127.0.0.1:8001/api/v1/job-analysis/documents/${DOCUMENT_ID}/opks/knowledge-1`],
       ["DELETE", `http://127.0.0.1:8001/api/v1/job-analysis/documents/${DOCUMENT_ID}/opks/knowledge-1`],
+      ["PUT", `http://127.0.0.1:8001/api/v1/job-analysis/documents/${DOCUMENT_ID}/opks-order`],
       ["POST", `http://127.0.0.1:8001/api/v1/job-analysis/documents/${DOCUMENT_ID}/opks-proposals/proposal-1/decisions`],
     ]);
     expect(fetchMock.mock.calls.map((call) => call[1].headers)).toEqual(
-      ["opks-add", "opks-edit", "opks-delete", "opks-decide"].map(
+      ["opks-add", "opks-edit", "opks-delete", "opks-reorder", "opks-decide"].map(
         (key) => expect.objectContaining({ "Idempotency-Key": key }),
       ),
     );
-    expect(fetchMock.mock.calls[3][1].body).toBe(JSON.stringify(decision));
+    expect(fetchMock.mock.calls[3][1].body).toBe(
+      JSON.stringify({
+        entity_kind: "knowledge",
+        ordered_entity_ids: ["knowledge-1"],
+      }),
+    );
+    expect(fetchMock.mock.calls[4][1].body).toBe(JSON.stringify(decision));
   });
 });
 
@@ -317,6 +333,7 @@ describe("jobAnalysisProblemMessage", () => {
     ["idempotency-conflict", "這次操作內容已經改變"],
     ["authority-conflict", "內容已有更新"],
     ["invalid-task-order", "工作順序不正確"],
+    ["invalid-opks-order", "職能內容順序不正確"],
     ["invalid-request", "請檢查輸入內容"],
     ["proposal-not-found", "找不到這項提案"],
     ["consultant-unavailable", "顧問暫時無法完成分析，請稍後重試"],

@@ -156,6 +156,7 @@ def to_opks_item_view(item: OpksItem) -> OpksItemView:
         task_refs=list(item.task_refs),
         indicator_refs=list(item.indicator_refs),
         evidence_quotes=quotes,
+        display_order=item.display_order,
     )
 
 

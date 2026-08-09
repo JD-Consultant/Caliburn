@@ -161,6 +161,7 @@ export interface OpksItemView {
   task_refs: string[];
   indicator_refs: string[];
   evidence_quotes: string[];
+  display_order: number;
 }
 /**
  * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
@@ -290,6 +291,14 @@ export interface TaskOrderWrite {
 }
 /**
  * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "OpksOrderWrite".
+ */
+export interface OpksOrderWrite {
+  entity_kind: "output" | "indicator" | "knowledge" | "skill" | "attitude";
+  ordered_entity_ids: string[];
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
  * via the `definition` "DutyOrderWrite".
  */
 export interface DutyOrderWrite {
@@ -316,6 +325,7 @@ export interface ProblemDetail {
     | "https://caliburn.dev/problems/job-analysis/invalid-task-order"
     | "https://caliburn.dev/problems/job-analysis/duty-not-found"
     | "https://caliburn.dev/problems/job-analysis/invalid-duty-order"
+    | "https://caliburn.dev/problems/job-analysis/invalid-opks-order"
     | "https://caliburn.dev/problems/job-analysis/invalid-request"
     | "https://caliburn.dev/problems/job-analysis/proposal-not-found"
     | "https://caliburn.dev/problems/job-analysis/consultant-unavailable"

@@ -12,6 +12,7 @@ from app.job_analysis.application import (
     DutyNotFound,
     IdempotencyConflict,
     InvalidDutyOrder,
+    InvalidOpksOrder,
     InvalidJdTaskOrder,
     InvalidProposalDecision,
     JdHeaderNotChanged,
@@ -44,6 +45,9 @@ INVALID_TASK_ORDER = (
 DUTY_NOT_FOUND = "https://caliburn.dev/problems/job-analysis/duty-not-found"
 INVALID_DUTY_ORDER = (
     "https://caliburn.dev/problems/job-analysis/invalid-duty-order"
+)
+INVALID_OPKS_ORDER = (
+    "https://caliburn.dev/problems/job-analysis/invalid-opks-order"
 )
 INVALID_REQUEST = "https://caliburn.dev/problems/job-analysis/invalid-request"
 PROPOSAL_NOT_FOUND = (
@@ -139,6 +143,12 @@ def application_error_response(
         return problem_response(
             type_uri=INVALID_DUTY_ORDER,
             title="Invalid Duty order",
+            status=422,
+        )
+    if isinstance(error, InvalidOpksOrder):
+        return problem_response(
+            type_uri=INVALID_OPKS_ORDER,
+            title="Invalid OPKS order",
             status=422,
         )
     if isinstance(error, InvalidProposalDecision):

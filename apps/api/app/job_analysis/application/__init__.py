@@ -25,6 +25,7 @@ from .errors import (
     IdempotencyConflict,
     InvalidDutyOrder,
     InvalidJdTaskOrder,
+    InvalidOpksOrder,
     InvalidProposalDecision,
     JdHeaderNotChanged,
     JdTaskNotFound,
@@ -68,6 +69,7 @@ from .opks_authoring import (
     edit_opks_item,
     prune_opks_for_current_jd,
     prune_opks_gaps_for_current_jd,
+    reorder_opks_items,
 )
 from .opks_context import (
     OpksContextPacket,
@@ -208,6 +210,7 @@ __all__ = [
     "IdempotencyConflict",
     "InvalidJdTaskOrder",
     "InvalidDutyOrder",
+    "InvalidOpksOrder",
     "InvalidProposalDecision",
     "JobAnalysisState",
     "JobAnalysisUnitOfWork",
@@ -231,6 +234,7 @@ __all__ = [
     "OpksRepository",
     "OpksDirectEditPayload",
     "OpksItemNotFound",
+    "reorder_opks_items",
     "OpksContextPacket",
     "OpksGroundingUnavailable",
     "OpksGenerationOutcome",

@@ -5,8 +5,11 @@ export type ExportDirtyState = {
   opks: boolean;
 };
 
-export function canExport(state: ExportDirtyState): boolean {
-  return !Object.values(state).some(Boolean);
+export function canExport(
+  state: ExportDirtyState,
+  mutationPending = false,
+): boolean {
+  return !mutationPending && !Object.values(state).some(Boolean);
 }
 
 export function exportFilename(title: string): string {

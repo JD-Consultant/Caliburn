@@ -191,15 +191,18 @@ def _write_block(sheet: Worksheet, row: int, title: str, body: str | None) -> in
 
 
 def _estimated_height(sheet: Worksheet, row: int) -> float:
-    longest = max(
+    required_lines = max(
         (
-            len(str(cell.value).split("\n", 1)[0])
+            sum(
+                max(1, ceil(len(line) / 24))
+                for line in str(cell.value).split("\n")
+            )
             for cell in sheet[row]
             if cell.value is not None
         ),
         default=1,
     )
-    return max(24.0, min(180.0, 18.0 * ceil(longest / 24)))
+    return max(24.0, min(180.0, 18.0 * required_lines))
 
 
 def _apply_layout(sheet: Worksheet, last_row: int) -> None:

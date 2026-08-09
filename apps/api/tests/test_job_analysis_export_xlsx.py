@@ -140,6 +140,36 @@ def test_long_text_is_wrapped_and_empty_fields_remain_blank():
     assert sheet.cell(occupation_code_label.row, occupation_code_label.column + 1).value is None
 
 
+def test_multiline_cells_receive_height_for_each_line():
+    base_task = _document().duties[0].tasks[0]
+    task = base_task.model_copy(
+        update={
+            "outputs": (
+                ExportOpksEntry(position_code="O1.1.1", text="營運週報"),
+                ExportOpksEntry(position_code="O1.1.2", text="異常清單"),
+                ExportOpksEntry(position_code="O1.1.3", text="改善追蹤"),
+            )
+        }
+    )
+    document = _document().model_copy(
+        update={
+            "duties": (
+                _document().duties[0].model_copy(update={"tasks": (task,)}),
+            )
+        }
+    )
+    sheet = _workbook(document).active
+
+    output_cell = next(
+        cell
+        for row in sheet.iter_rows()
+        for cell in row
+        if isinstance(cell.value, str) and cell.value.startswith("O1.1.1")
+    )
+
+    assert sheet.row_dimensions[output_cell.row].height >= 54
+
+
 def test_shared_knowledge_and_skill_codes_are_written_as_same_codes():
     document = _document().model_copy(
         update={

@@ -15,6 +15,15 @@ describe("job-analysis export", () => {
     ).toBe(true);
   });
 
+  it("disables export while an editor mutation is pending", () => {
+    expect(
+      canExport(
+        { header: false, duty: false, task: false, opks: false },
+        true,
+      ),
+    ).toBe(false);
+  });
+
   it("creates a safe xlsx filename from the document title", () => {
     expect(exportFilename("門市/營運專員 ")).toBe("門市_營運專員.xlsx");
     expect(exportFilename("   ")).toBe("職務說明書.xlsx");

@@ -45,10 +45,12 @@ export function TaskEditor({
   documentId,
   embedded = false,
   onDirtyChange,
+  onBusyChange,
 }: {
   documentId: string;
   embedded?: boolean;
   onDirtyChange?: (dirty: boolean) => void;
+  onBusyChange?: (busy: boolean) => void;
 }) {
   const queryClient = useQueryClient();
   const document = useQuery(documentQueryOptions(documentId));
@@ -101,6 +103,14 @@ export function TaskEditor({
   useEffect(() => {
     onDirtyChange?.(dirty);
   }, [dirty, onDirtyChange]);
+
+  const busy =
+    saveMutation.isPending || deleteMutation.isPending || reorderMutation.isPending;
+
+  useEffect(() => {
+    onBusyChange?.(busy);
+    return () => onBusyChange?.(false);
+  }, [busy, onBusyChange]);
 
   const startNew = () => {
     saveMutation.reset();
@@ -180,9 +190,6 @@ export function TaskEditor({
       </p>
     );
   }
-
-  const busy =
-    saveMutation.isPending || deleteMutation.isPending || reorderMutation.isPending;
 
   const taskGroups = [
     ...document.data.duties.map((duty) => ({

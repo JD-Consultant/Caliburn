@@ -75,9 +75,11 @@ function errorText(error: unknown) {
 export function OpksEditor({
   documentId,
   onDirtyChange,
+  onBusyChange,
 }: {
   documentId: string;
   onDirtyChange?: (dirty: boolean) => void;
+  onBusyChange?: (busy: boolean) => void;
 }) {
   const queryClient = useQueryClient();
   const document = useQuery(documentQueryOptions(documentId));
@@ -133,6 +135,16 @@ export function OpksEditor({
     onDirtyChange?.(dirty);
     return () => onDirtyChange?.(false);
   }, [dirty, onDirtyChange]);
+
+  const busy =
+    saveMutation.isPending ||
+    deleteMutation.isPending ||
+    reorderMutation.isPending;
+
+  useEffect(() => {
+    onBusyChange?.(busy);
+    return () => onBusyChange?.(false);
+  }, [busy, onBusyChange]);
 
   const startAdd = (kind: ItemKind, taskId?: string) => {
     saveMutation.reset();
@@ -233,10 +245,6 @@ export function OpksEditor({
     .slice()
     .sort((left, right) => left.display_order - right.display_order)
     .map((item) => item.entity_id);
-  const busy =
-    saveMutation.isPending ||
-    deleteMutation.isPending ||
-    reorderMutation.isPending;
   const statusByTask = opksStatusByTask(document.data.opks_task_status);
   const statusOf = (taskId: string) => statusByTask.get(taskId);
 

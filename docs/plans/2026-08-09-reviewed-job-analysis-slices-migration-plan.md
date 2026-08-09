@@ -1107,3 +1107,11 @@ the same ACL. No changed job-analysis test failed. Browser smoke was not claimed
 session has no callable browser／computer-control tool and no local dev server was started.
 The rejected-scope diff is empty; remaining `reference` matches are existing legacy/runtime
 domain references, not the rejected AI Duty／enterprise／subconversation features.
+
+### Review follow-up: export safety and multiline layout
+
+- [x] Block public XLSX export while Duty／Task／OPKS save, delete, or reorder mutations are pending.
+- [x] Estimate XLSX row height from all rendered lines, including newline-separated O/P/K/S values.
+
+Execution record: added regression coverage for both review findings; the focused API XLSX test,
+Web export policy test, and Web TypeScript check pass.

@@ -116,7 +116,7 @@ document endpoint；這些元件與 `_pending`／知識包規則只屬 legacy，
 `PersistQueryClientProvider`(localStorage `caliburn-rq-cache`,buster `ocs-v4-3`,maxAge 24h)
 只還原標了 `meta.persist === true` 的 query(= knowledge)。document 永遠重新 GET(of-record 即時)。
 
-## 不變量(從代碼讀不出來的規則)
+## Legacy OCS editor 不變量(historical reference)
 
 - **document 的 React Query cache 就是編輯器狀態**(cache-as-state):UI 讀 cache 的
   `envelope.content`,不另設 local state;`useAutosaveDocument` 依賴同頁掛著的 `useDocument`
@@ -136,7 +136,7 @@ document endpoint；這些元件與 `_pending`／知識包規則只屬 legacy，
   採 DDD 實體/值物件:有來源 code 比 provenance,無 code 比 name)。
 - 兩把 localStorage 鑰匙:`caliburn-rq-cache`(React Query)、`caliburn-user`(zustand userId)。
 
-## API 消費面(全部經 `lib/api.ts` → `/api/v1`)
+## Legacy OCS API 消費面(全部經 `lib/api.ts` → `/api/v1`)
 
 文件:`GET/PATCH …/document`、`POST …/document:finalize`、`GET …/document/export`。
 知識:`GET …/knowledge`(唯一池端點,ADR 0021)。職類:`GET /occupations?q=`、`PUT …/occupations`。

@@ -56,7 +56,7 @@ Gate 結果：
 | Web lint | `npm run lint` / `apps/web` | exit 0；無 lint error |
 | contract codegen | `npm run check-codegen -w @caliburn/job-analysis-contract` / repo root，並以 `UV_CACHE_DIR=S:\caliburn\.uv-cache-reviewed` 重跑 | 首次因預設 `C:\Users\chenb\AppData\Local\uv\cache` 存取被拒而失敗（npm lifecycle code 2；工具外層 exit 1）；repo cache 重跑 exit 0，無 codegen drift |
 | repository diff | `git diff --check` / repo root | exit 0；有既有 `LF will be replaced by CRLF` warning（`packages/job-analysis-contract/types/job-analysis-workspace.ts`），不是 diff error |
-| repository status | `git status --short` / repo root | 提交前執行結果為乾淨；本節寫入後只允許本 inventory 變更 |
+| repository status | `git status --short` / repo root | 編輯前乾淨；寫入本節後、提交前只有本 inventory modified/staged |
 
 本輪實際刪除的 tracked source/component 數：**0**。這是基於 zero-consumer 證據的安全裁決，不是未執行或清理未完成：所有剩餘候選仍有 runtime、migration、persistence、test 或 codegen consumer；已退役且無 consumer 的路徑已由既有 negative import tests 證明不存在。
 

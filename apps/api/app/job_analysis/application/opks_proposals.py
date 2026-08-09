@@ -158,13 +158,29 @@ def _apply_item(
 ) -> CurrentJdOpks:
     if proposal.action is OpksProposalAction.ADD:
         assert item is not None
-        return CurrentJdOpks(items=(*current_opks.items, item))
+        return CurrentJdOpks(
+            items=(
+                *current_opks.items,
+                item.model_copy(
+                    update={
+                        "display_order": current_opks.next_display_order(
+                            item.entity_kind
+                        )
+                    }
+                ),
+            )
+        )
     if proposal.action is OpksProposalAction.REVISE:
         assert item is not None
+        existing = current_opks.item_by_id(proposal.entity_id)
+        if existing is None:
+            return current_opks
         return CurrentJdOpks(
             items=tuple(
-                item if existing.entity_id == proposal.entity_id else existing
-                for existing in current_opks.items
+                item.model_copy(update={"display_order": existing.display_order})
+                if current.entity_id == proposal.entity_id
+                else current
+                for current in current_opks.items
             )
         )
     return remove_opks_item_and_indicator_refs(

@@ -156,6 +156,7 @@ async def test_opks_serialization_round_trip_and_corruption_fail_closed():
     item_row = SimpleNamespace(
         entity_id=item.entity_id,
         entity_kind=item.entity_kind.value,
+        display_order=item.display_order,
         item_schema_id=OPKS_ITEM_SCHEMA_ID,
         item_payload=ser.dump_opks_item_payload(item),
     )

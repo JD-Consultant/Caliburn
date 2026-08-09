@@ -643,7 +643,7 @@ from the local iCAP field-standard and level-judgment documents.
 - `OpksItem.display_order: int >= 0` unique within `(document, entity_kind)`.
 - `CurrentJdOpks.next_display_order(kind) -> int` supplies every add/accept path.
 
-- [ ] **Step 1: Write red invariant and backfill tests**
+- [x] **Step 1: Write red invariant and backfill tests**
 
 ```python
 def test_display_order_is_unique_only_within_kind():
@@ -654,28 +654,35 @@ def test_display_order_is_unique_only_within_kind():
 
 Migration test seeds rows with tied timestamps and asserts backfill order equals prior `(created_at, entity_id)` read order, partitioned by document and kind.
 
-- [ ] **Step 2: Run red tests**
+- [x] **Step 2: Run red tests**
 
 Run: `cd apps/api; uv run pytest -k "opks and (domain or backfill or generation or proposal)" -q`
 
 Expected: FAIL before field/migration.
 
-- [ ] **Step 3: Add migration and preserve all current OPKS v3 behavior**
+- [x] **Step 3: Add migration and preserve all current OPKS v3 behavior**
 
 Do not touch `task_analysis_result_v3`, gap fields, `issue_resolutions[]`, scheduler or child IDs. Direct add and accepted proposals use `next_display_order`; edit/revise preserves order; delete does not renumber.
 
-- [ ] **Step 4: Run OPKS regression gate**
+- [x] **Step 4: Run OPKS regression gate**
 
 Run: `cd apps/api; uv run pytest -k opks -q`
 
 Expected: PASS, including progressive elicitation tests.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```powershell
 git add apps/api/alembic/versions/0017_job_analysis_opks_display_order.py apps/api/app apps/api/tests docs/design/task-analysis-engine.md
 git commit -m "feat(job-analysis): persist employee OPKS display order"
 ```
+
+Execution record: the red domain test rejected the not-yet-supported field and the red
+backfill test rejected the missing 0017 revision. The implemented migration ranks existing
+rows by `(document_id, entity_kind, created_at, entity_id)` and enforces non-negative,
+kind-scoped uniqueness. Full OPKS regression passes 171 tests; migration／repository／authority
+regression passes 82 tests. Direct add and accepted add proposals receive the next kind-local
+order, revise preserves it, and delete leaves gaps untouched.
 
 ---
 

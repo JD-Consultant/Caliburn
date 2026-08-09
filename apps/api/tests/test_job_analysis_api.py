@@ -11,7 +11,18 @@ import pytest
 import pytest_asyncio
 
 from app.api import deps
+from app.api.routes import job_analysis as job_analysis_routes
 from app.job_analysis.application import DocumentRecord, DocumentSummary
+from app.job_analysis.application.durable_turn import _require_verified
+from app.job_analysis.application.operation import (
+    OperationOutcome,
+    TaskAnalysisOperationResult,
+)
+from app.job_analysis.application.verifier import (
+    VerificationReport,
+    Violation,
+    ViolationCode,
+)
 from app.job_analysis.domain import (
     CurrentWorkModel,
     JdTask,
@@ -387,6 +398,7 @@ async def test_list_and_open_return_the_current_workspace_projection(api_client)
         "updated_at",
         "jd_header",
         "readiness",
+        "duties",
         "tasks",
         "opks_items",
         "opks_task_status",
@@ -790,6 +802,44 @@ async def test_consultant_failure_does_not_leak_provider_details_or_change_state
     assert "anthropic" not in failed.text.lower()
     assert "provider" not in failed.text.lower()
     assert len(reloaded.json()["conversation"]) == 1
+
+
+async def test_not_committable_diagnostics_log_codes_without_operation_detail(
+    api_client, monkeypatch, caplog
+):
+    client, _, _ = api_client
+    root = f"/api/v1/job-analysis/documents/{DOCUMENT_ID}"
+    await client.put(root, json={"title": "門市營運專員"})
+    sentinel = "employee/provider secret must never reach logs"
+    operation_result = TaskAnalysisOperationResult(
+        outcome=OperationOutcome.FAILED,
+        detail=sentinel,
+        report=VerificationReport(
+            violations=(
+                Violation(
+                    code=ViolationCode.ANCHOR_MISSING,
+                    detail="internal verifier detail",
+                ),
+            )
+        ),
+    )
+
+    async def fail_submit(*args, **kwargs):
+        _require_verified(operation_result)
+
+    monkeypatch.setattr(job_analysis_routes, "submit_employee_turn", fail_submit)
+    with caplog.at_level("WARNING", logger="app.api.routes.job_analysis"):
+        failed = await client.post(
+            f"{root}/turns",
+            headers={"Idempotency-Key": "unsafe-diagnostics"},
+            json={"text": "我每週彙整營運週報"},
+        )
+
+    assert failed.status_code == 503
+    assert "UncommittableOperationResult" in caplog.text
+    assert "outcome=failed" in caplog.text
+    assert "anchor_missing" in caplog.text
+    assert sentinel not in caplog.text
 
 
 async def test_the_manual_opks_generation_entry_is_retired(api_client):

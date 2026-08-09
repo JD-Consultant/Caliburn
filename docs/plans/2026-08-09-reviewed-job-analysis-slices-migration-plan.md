@@ -760,7 +760,7 @@ lint; a second codegen run produced identical generated-file SHA-256 hashes.
 - Consultation success sets only the complete consultation cache and invalidates the full document query; it never hand-builds a partial `DocumentView`.
 - `UncommittableOperationResult` exposes only typed `outcome` and verifier code values for logging.
 
-- [ ] **Step 1: Write red tests for before/after semantics and safe logging**
+- [x] **Step 1: Write red tests for before/after semantics and safe logging**
 
 ```ts
 it("hides null jd_before entries but labels null jd_after as removal", () => {
@@ -771,7 +771,7 @@ it("hides null jd_before entries but labels null jd_after as removal", () => {
 
 Python `caplog` test makes `operation_result.detail` contain a sentinel employee/provider string and asserts the log contains outcome/verifier codes but **not** the sentinel.
 
-- [ ] **Step 2: Run red tests**
+- [x] **Step 2: Run red tests**
 
 Run: `cd apps/web; npm run test -- src/lib/jobAnalysisProposals.test.ts`
 
@@ -779,11 +779,11 @@ Run: `cd apps/api; uv run pytest tests/test_job_analysis_api.py -k "not_committa
 
 Expected: at least the new assertions fail.
 
-- [ ] **Step 3: Apply only the approved fixes from donor `42b7118`**
+- [x] **Step 3: Apply only the approved fixes from donor `42b7118`**
 
 Use `consultationQueryOptions(documentId).queryKey` for the complete consultation result; invalidate `jobAnalysisKeys.document(documentId)` and document list. For Proposal, null on `before` means “not yet in JD” and is hidden; null on `after` means removal. Log only exception class, operation outcome and verifier violation codes—never raw `detail`, refusal text, prompt, transcript or provider response.
 
-- [ ] **Step 4: Verify token config and AI files are untouched**
+- [x] **Step 4: Verify token config and AI files are untouched**
 
 Run:
 
@@ -793,7 +793,7 @@ git diff -- apps/api/app/config.py apps/api/tests/test_app_wiring.py apps/api/ap
 
 Expected: no diff.
 
-- [ ] **Step 5: Run gates and commit**
+- [x] **Step 5: Run gates and commit**
 
 Run: `cd apps/web; npm run test; npx tsc --noEmit; npm run lint`
 
@@ -803,6 +803,15 @@ Run: `cd apps/api; uv run pytest tests/test_job_analysis_api.py -q`
 git add apps/web/src apps/api/app/job_analysis/application/durable_turn.py apps/api/app/api/routes/job_analysis.py apps/api/tests/test_job_analysis_api.py
 git commit -m "fix(job-analysis): preserve workspace cache and safe diagnostics"
 ```
+
+Execution record: the red Web test confirmed the missing before／after projection helper; the
+red API test confirmed that the route logged neither the operation outcome nor verifier codes.
+The implementation writes only the complete consultation cache, refetches the complete document
+and document-list queries, hides null `jd_before` entries, labels null `jd_after` entries as
+removal, and carries only typed outcome／verifier code values into diagnostics. The stale API
+field-set assertion was also aligned with the already-current `DocumentView.duties` contract;
+the donor's token／prompt changes were not imported. Gates pass: API route 32, Web 117,
+TypeScript and lint.
 
 ---
 

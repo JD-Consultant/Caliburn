@@ -9,7 +9,10 @@ import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { editableJdAfter } from "@/lib/jobAnalysisProposals";
+import {
+  editableJdAfter,
+  visibleProposalEntries,
+} from "@/lib/jobAnalysisProposals";
 
 const ACTION_LABELS: Record<ProposalView["action"], string> = {
   add: "新增工作",
@@ -32,16 +35,19 @@ const STATUS_LABELS: Record<ProposalView["status"], string> = {
 function EntryList({
   title,
   entries,
+  side,
 }: {
   title: string;
   entries: ProposalJdEntryView[];
+  side: "before" | "after";
 }) {
-  if (entries.length === 0) return null;
+  const shown = visibleProposalEntries(entries, side);
+  if (shown.length === 0) return null;
   return (
     <div>
       <p className="text-xs font-medium text-muted-foreground">{title}</p>
       <ul className="mt-1 space-y-1 text-sm">
-        {entries.map((entry) => (
+        {shown.map((entry) => (
           <li key={entry.task_id}>
             {entry.value ? entry.value.statement : "從職務說明書移除"}
           </li>
@@ -77,8 +83,12 @@ export function ProposalCard({
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2">
-        <EntryList title="目前內容" entries={proposal.jd_before} />
-        <EntryList title="建議內容" entries={proposal.jd_after} />
+        <EntryList
+          title="目前內容"
+          entries={proposal.jd_before}
+          side="before"
+        />
+        <EntryList title="建議內容" entries={proposal.jd_after} side="after" />
       </div>
 
       {proposal.evidence_quotes.length ? (

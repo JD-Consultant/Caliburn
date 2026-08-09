@@ -46,6 +46,18 @@ class StaleAuthoritySnapshot(ConcurrentAuthorityChange):
 class UncommittableOperationResult(JobAnalysisApplicationError):
     """Only a verified operation result may change Current State."""
 
+    def __init__(self, operation_result: TaskAnalysisOperationResult) -> None:
+        self.outcome = operation_result.outcome
+        self.verifier_codes = (
+            tuple(code.value for code in operation_result.report.codes)
+            if operation_result.report is not None
+            else ()
+        )
+        # detail 可能包含 provider／employee 原文，只保留可供安全診斷的 typed 欄位。
+        super().__init__(
+            f"cannot commit operation outcome {self.outcome.value!r}"
+        )
+
 
 class TransitionCommitRejected(JobAnalysisApplicationError):
     """The pure transition rejected a result before persistence."""
@@ -180,9 +192,7 @@ def _require_verified(
         operation_result.outcome is not OperationOutcome.VERIFIED
         or operation_result.result is None
     ):
-        raise UncommittableOperationResult(
-            f"cannot commit operation outcome {operation_result.outcome.value!r}"
-        )
+        raise UncommittableOperationResult(operation_result)
 
 
 def _require_same_replay(

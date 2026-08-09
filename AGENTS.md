@@ -52,8 +52,9 @@ Caliburn 現行目標是給員工使用的**本機 Web AI 職務分析與職務�
 ## 架構(權威:`ARCHITECTURE.md` + `docs/adr/README.md`)
 
 - **monorepo**:Turborepo + **per-app uv**(各自 `uv.lock`)+ 契約用 **path-dep 套件**(`packages/`)。
-- **3 個 bounded context**:`apps/pdf-to-json`(PDF→OCS JSON 解析)/ `apps/ocs-indexer`(檢索,Qdrant)/
-  `apps/api` + `apps/web`(著作)。語言在這三處切換(對齊 DDD)。
+- **monorepo deployables**:`apps/pdf-to-json`(PDF→OCS JSON 解析)、`apps/ocs-indexer`(檢索,Qdrant)、
+  `apps/embedder`(GPU 嵌入)、`apps/api`(FastAPI)與`apps/web`(Next.js)。DDD 的語言切換發生在這些
+  deployable 內的模組邊界；不要把 deployable 清單誤當成 domain bounded context 清單。
 - **api = 六邊形**:`app/core`(ports + domain,純)、`app/adapters`(DB/LLM/knowledge 等邊緣)、
   `app/services`(use-case)、`app/interview`(**淘汰但暫留的舊 AI 路徑**:顧問+書記 op→verify→`_pending`
   追蹤修訂;判準教材在 `app/interview/skills/`,調教首選改 skill 不改碼)、`app/observability.py`
@@ -66,11 +67,13 @@ Caliburn 現行目標是給員工使用的**本機 Web AI 職務分析與職務�
   資料從新四表開始，不搬、不整合、不雙寫舊資料。禁止 import
   `app.interview`／`app.interview_vnext`／`app.job_authoring`／`evals`(AST 測試強制)。
   端到端見 `docs/design/task-analysis-engine.md`。
-- **AI vNext 隔離中**：`app/interview_vnext` 依 ADR **0034** greenfield 實作；V1 domain 與 V2-A
-  provider-neutral/Capture contracts 已完成，無 route/DB/live LLM，production 不 import。禁止 import/wrap v3 consultant/scribe/harvest/select；細節先讀
+- **AI vNext 隔離中**：`app/interview_vnext` 依 ADR **0034** greenfield 實作；沒有 production route
+  或現行產品 authority，但已包含 durable persistence、Alembic migration、OpenRouter provider 與 tests。
+  production 不 import。禁止 import/wrap v3 consultant/scribe/harvest/select；細節先讀
   `app/interview_vnext/README.md`、其 `AGENTS.md` 與 `docs/plans/2026-07-16-interview-ai-vnext-implementation-plan.md`。
 - **契約**:#1 `packages/ocs-contract`(OCS 文件,JSON-schema→Pydantic+TS)、
-  #2 `packages/indexer-contract`(indexer⇄api,共用 pydantic)、#3 web 吃 ocs-contract 生成的 TS。
+  #2 `packages/indexer-contract`(indexer⇄api,共用 pydantic)、#3 `packages/job-analysis-contract`
+  (current job-analysis workspace,JSON-schema→Pydantic+TS)；legacy Web 仍消費 ocs-contract 生成的 TS。
   ADR 0004 / 0010 / 0011。
 - **嵌入**:BGE-M3(dense+sparse)跑在 **GPU 容器 `apps/embedder`**(FastAPI+FlagEmbedding);
   indexer/api 走 HTTP 呼叫。**絕對不要把 torch 放回 app 進程**——Windows 上會 segfault/`_dynamo` 崩,

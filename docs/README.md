@@ -76,7 +76,7 @@ Monorepo:Turborepo + per-app uv。
 
 ### 中央系統文檔
 
-- [`specs/2026-06-27-system-architecture-design.md`](specs/2026-06-27-system-architecture-design.md) — 大框架(monorepo / 契約優先 / 3 bounded context / Hexagonal+DDD / 多租戶)。
+- [`specs/2026-06-27-system-architecture-design.md`](specs/2026-06-27-system-architecture-design.md) — **Historical baseline**(早期 monorepo / 契約優先 / 3 bounded context / Hexagonal+DDD / 多租戶研究)。其中三-context／SaaS 邊界已被現行本機產品取代，不是施工 authority；現行地圖以根 [`ARCHITECTURE.md`](../ARCHITECTURE.md)、本節 current specs 與 Accepted ADR 為準。
 - [`specs/2026-07-18-interview-vnext-llm-runtime-architecture-review.md`](specs/2026-07-18-interview-vnext-llm-runtime-architecture-review.md) — **已核准的vNext LLM runtime 2026架構研究 authority**：交叉核對 OpenAI、Anthropic、Google、Microsoft、OpenRouter 與 OpenTelemetry 官方資料及真live診斷，確認deterministic workflow + Context Engine + own LLM Port + provider adapters主線；D1–D8已固化為ADR 0036。
 - [`specs/2026-07-20-interview-vnext-professional-job-analysis-and-short-answer-architecture-research.md`](specs/2026-07-20-interview-vnext-professional-job-analysis-and-short-answer-architecture-research.md) — **已核准研究（Revision 6；R5 authority 見 ADR 0037／amendment。⚠ 原「post-R5 product authority 見 ADR 0038」已由 [ADR 0040](adr/0040-professional-consultant-engine-and-r1-validation-contract.md)（Accepted，2026-07-26）完整取代；post-R5 方向以0040與2026-07-25／26四份顧問文件為準，**本文件的post-R5段落已失效**）**：產品是「員工與 AI 顧問對話 + 同步 JD canvas」，員工 direct edit 是 draft truth，AI 只能建立可接受／修改／拒絕的 proposal；第一版不做 SaaS、公司 catalog 或多人協作。R5 使用 QuestionFrame + AnswerBinding + Evidence.v3 literal/contextual support與 frequency/current 分離。
 - [`specs/2026-07-23-interview-vnext-question-selection-context-loop-research.md`](specs/2026-07-23-interview-vnext-question-selection-context-loop-research.md) — **已核准並落地的下一題選擇研究**：以2026現行OpenAI prompt guidance、Anthropic context/workflow/eval與Microsoft workflow官方方向核對，固定deterministic Agenda＋bounded Context＋typed question.select＋application QuestionFrame／command materialization；明確不採mega-prompt、planner agent、完整transcript、通用graph或SaaS。
@@ -86,6 +86,7 @@ Monorepo:Turborepo + per-app uv。
 - [`specs/2026-08-02-icap-2026-quality-manual-form-authority.md`](specs/2026-08-02-icap-2026-quality-manual-form-authority.md) — **現行 iCAP 版型 authority**：2026-01-27 官方《職能基準品質認證作業手冊》逐字核對；`職能基準代碼`／`職類別代碼` 由 iCAP 配發（免填、不得生成），`T1`／`O1.1.1` 是匯出版面位置碼而非 identity；2022 指引仍為方法與欄位定義來源。裁決見 ADR [0052](adr/0052-jd-readiness-assessment-and-official-code-boundaries.md)＋[0053](adr/0053-jd-header-authority-boundary-and-readiness-scope.md)。
 - [`specs/2026-08-04-opks-progressive-elicitation-research.md`](specs/2026-08-04-opks-progressive-elicitation-research.md) — **已收斂，裁決見 [ADR 0054](adr/0054-opks-progressive-elicitation-and-scheduled-child-operation.md)（Accepted）**：OPKS 從一次性建議器改為會追問的顧問。核對 2026 官方資料（Anthropic workflow-vs-agent、OpenAI manager/specialist 與 Deep Research clarifier、Microsoft Agent Framework HITL 的 pending-request 持久化、Temporal child workflow、Azure Durable Task at-least-once）與三篇 clarification 研究，收斂為 **application-controlled workflow**：主回合提交後由純函式 pre-gate 排定最多一筆獨立 OPKS child，綁定凍結在 `CompletedTurnPayload.scheduled_opks`；`uncertain` 承載缺口摘要（零 schema 變更）、gap 不帶問句、item-level 部分發布、`issue_resolutions[]` 無副作用解多 gap。明確淘汰模型動態 routing／tool loop 與常駐按鈕。**含被撤回主張表**（跨軸依賴、`purpose_result` 硬條件、`prune_opks_for_current_jd()` 已能清理 gap、rejection_reason 進 digest、HDSR 引用等六項）與來源查證層級表。
 - [`specs/2026-08-08-unreviewed-branches-review.md`](specs/2026-08-08-unreviewed-branches-review.md) — **未審分支審查與 owner 核准的選擇性移植白名單**：拒絕整支 merge，區分 stale omission 與 branch-owned 修改；核准 Header／Readiness、員工手動 Duty／Task level、OPKS 顯示順序、嚴格公版 XLSX 與兩項 Web 修正，明確排除 16K、OPKS prompt/schema 回退、AI Duty、per-Task 子對話、server scope 與舊 runtime。
+- [`specs/2026-08-10-legacy-cleanup-inventory.md`](specs/2026-08-10-legacy-cleanup-inventory.md) — **Task 1 清理盤點**：以 route／import／test／migration／codegen consumer 證據分類 KEEP、另開 hard cut 與 zero-consumer；本輪沒有可安全直接刪除的 tracked 元件。
 - [`specs/2026-08-10-legacy-cleanup-and-monorepo-boundary-design.md`](specs/2026-08-10-legacy-cleanup-and-monorepo-boundary-design.md) — **已核准執行的第一階段清理設計**：只移除 zero-consumer 淘汰物；保留仍被 route 使用的 `app/interview`、隔離中的 `interview_vnext`／`job_authoring`，並整理現行／legacy／vNext 的 monorepo 與依賴邊界。
 - [`specs/2026-07-29-job-analysis-partial-jd-task-reconciliation-research.md`](specs/2026-07-29-job-analysis-partial-jd-task-reconciliation-research.md) — **已核准的直接編輯對齊研究**：Current JD 只要求 Task 名稱／描述，其餘欄位可留空；不建假 Work Model Task、不用文字相似度猜 identity，改由 OpenIssue 明確持有 stable JD Task ID，後續訪談可追問、同 ID materialize Work Model Task 或提出員工確認的移除；第一版不自動合併 duplicate identity。
 - [`specs/2026-07-30-job-analysis-local-web-contract-and-authority-commit-seam-research.md`](specs/2026-07-30-job-analysis-local-web-contract-and-authority-commit-seam-research.md) — **Accepted Local Web 第一切片研究**：多份可保存但一次只開一份；先收斂人／AI 共用 authority commit seam，再以 JSON Schema 生成 Python／TypeScript workspace DTO，greenfield 接文件庫與 Task 編輯，不接舊 user/profile/OCS 資料流。
@@ -171,6 +172,8 @@ Monorepo:Turborepo + per-app uv。
 - [`plans/`](plans/) — bite-size 實作計畫。
 - [`ocs-schema.md`](ocs-schema.md) — OCS **著作產出**文件 JSON 結構與代碼規則(T/P/O/K/S/A);`packages/ocs-contract` 依據。
 - [`ocs-source-json.md`](ocs-source-json.md) — OCS **來源**(PDF→JSON)契約注意事項:欄位基數、indexer 取用。
+- [`../packages/ocs-contract/README.md`](../packages/ocs-contract/README.md) — OCS JSON Schema → Python／TypeScript codegen 規則與 pdf-to-json／indexer／legacy Web consumers。
+- [`../packages/job-analysis-contract/README.md`](../packages/job-analysis-contract/README.md) — current job-analysis workspace JSON Schema → Python／TypeScript codegen 規則與 API／workspace consumers。
 - [`contract-strategy.md`](contract-strategy.md) — 替 seam 選契約機制的判準與登記（#1 OCS JSON Schema、#2 共用 Pydantic、#3 legacy OCS Web、#4 `job-analysis-contract`）。
 - [`service-split-framework.md`](service-split-framework.md) — 何時拆「服務」vs 拆「repo」vs 留模組。
 - [`product-notes.md`](product-notes.md) — 產品/UX 決策與延後項。
@@ -182,8 +185,9 @@ Monorepo:Turborepo + per-app uv。
 各 app 的 README 含:定位一句 / 跑・測試 / codemap / 關鍵流程(runtime view)/ 不變量 /
 介面 reference / 指路(embedder 服務簡單,README 亦精簡)。寫法依據見 [`specs/2026-07-03-app-developer-docs-research.md`](specs/2026-07-03-app-developer-docs-research.md)。
 
-- [`apps/api/README.md`](../apps/api/README.md) — FastAPI + 訪談引擎:六邊形 codemap、REST 端點面、文件 of-record 生命週期。
-- [`apps/web/README.md`](../apps/web/README.md) — Next.js:query 資料層、autosave/409 流程、選擇性持久化。
+- [`apps/api/README.md`](../apps/api/README.md) — FastAPI current job-analysis、legacy interview 與六邊形 codemap／REST 端點面。
+- [`apps/api/app/job_analysis/AGENTS.md`](../apps/api/app/job_analysis/AGENTS.md) — current job-analysis layered dependency direction、authority、forbidden imports 與 focused checks。
+- [`apps/web/README.md`](../apps/web/README.md) — Next.js current `/workspace` 與 legacy OCS editor 的 query／autosave reference。
 - [`apps/ocs-indexer/README.md`](../apps/ocs-indexer/README.md) — Qdrant 知識/查詢服務:v4 payload、index/查詢流程、查詢 API 面。
 - [`apps/embedder/README.md`](../apps/embedder/README.md) — BGE-M3 GPU 嵌入容器(ADR 0012)。
 - [`apps/pdf-to-json/README.md`](../apps/pdf-to-json/README.md) — OCS PDF→JSON ETL(Pipes-and-Filters);其 §1–10 亦為**權威 OCS 來源 JSON 契約**。

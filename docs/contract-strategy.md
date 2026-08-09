@@ -80,6 +80,12 @@ Same discipline used for Phases 1–3 and contracts #1/#2:
   package; route mappers own the boundary. `ocs-contract` remains the public/export shape and
   neither contract imports or redefines the other. The former ADR 0039-era
   `local-workspace-contract` pre-answer is withdrawn and must not be used for new construction.
+- **#5 `job-analysis` public XLSX download:** the official workbook is a binary HTTP
+  representation owned by `job_analysis`, not a Python⇄TypeScript data contract and not an OCS
+  reuse seam. The API assembles and renders the workbook; the Web consumes it as a `Blob` and
+  chooses the local filename. The guard is the PostgreSQL route test plus Web client tests for
+  the binary request and dirty export policy. If another language or an external consumer needs
+  the workbook's internal shape, open a new ADR rather than treating XLSX cells as a schema.
 
 ## 6. References
 - Alistair Cockburn — Hexagonal (ports define the contract). Chris Richardson — *Microservices

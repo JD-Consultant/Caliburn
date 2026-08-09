@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
+from io import BytesIO
+
 import httpx
 import pytest
 import pytest_asyncio
+from openpyxl import load_workbook
 from sqlalchemy import func, select
 
 from app.adapters.job_analysis_postgres import SqlAlchemyJobAnalysisUnitOfWork
@@ -337,6 +340,65 @@ async def test_put_jd_header_trims_optional_text_and_returns_server_readiness(
     assert replay.json() == put.json()
     assert persisted is not None
     assert persisted.document.authority_generation == 1
+
+
+async def test_export_returns_one_sheet_xlsx_without_mutating_authority_or_journal(
+    postgres_api_client,
+    postgres_session_factory,
+    cleanup_job_analysis_rows,
+):
+    client, factory, _ = postgres_api_client
+    document_id = cleanup_job_analysis_rows
+    root = f"/api/v1/job-analysis/documents/{document_id}"
+    assert (await client.put(root, json={"title": "門市營運專員"})).status_code == 201
+
+    before = await load_document(factory, document_id)
+    assert before is not None
+    async with postgres_session_factory() as session:
+        journal_before = await session.scalar(
+            select(func.count())
+            .select_from(JobAnalysisJournalRow)
+            .where(JobAnalysisJournalRow.document_id == document_id)
+        )
+
+    exported = await client.get(f"{root}/export")
+    after = await load_document(factory, document_id)
+    async with postgres_session_factory() as session:
+        journal_after = await session.scalar(
+            select(func.count())
+            .select_from(JobAnalysisJournalRow)
+            .where(JobAnalysisJournalRow.document_id == document_id)
+        )
+
+    assert exported.status_code == 200
+    assert exported.headers["content-type"] == (
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+    assert "filename*=UTF-8''" in exported.headers["content-disposition"]
+    assert "%E9%96%80%E5%B8%82%E7%87%9F%E9%81%8B%E5%B0%88%E5%93%A1.xlsx" in (
+        exported.headers["content-disposition"]
+    )
+    workbook = load_workbook(BytesIO(exported.content), read_only=True)
+    assert workbook.sheetnames == ["職能基準表"]
+    workbook.close()
+    assert after is not None
+    assert after.document.authority_generation == before.document.authority_generation
+    assert after.state == before.state
+    assert journal_after == journal_before
+
+
+async def test_export_returns_document_not_found_problem(
+    postgres_api_client,
+):
+    client, _, _ = postgres_api_client
+
+    response = await client.get(
+        "/api/v1/job-analysis/documents/00000000-0000-0000-0000-000000000099/export"
+    )
+
+    assert response.status_code == 404
+    assert response.headers["content-type"].startswith("application/problem+json")
+    assert response.json()["type"].endswith("/document-not-found")
 
 
 async def test_put_jd_header_is_a_full_replacement_that_nulls_omitted_fields(

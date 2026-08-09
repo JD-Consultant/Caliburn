@@ -31,6 +31,7 @@ import {
   reorderTasks,
   submitEmployeeTurn,
   decideProposal,
+  exportDocument,
 } from "./jobAnalysisApi";
 
 const DOCUMENT_ID = "00000000-0000-0000-0000-000000000045";
@@ -185,6 +186,29 @@ describe("Current JD Task client", () => {
       ["PUT", `http://127.0.0.1:8001/api/v1/job-analysis/documents/${DOCUMENT_ID}/task-order`],
       ["DELETE", `http://127.0.0.1:8001/api/v1/job-analysis/documents/${DOCUMENT_ID}/tasks/task-1`],
     ]);
+  });
+});
+
+describe("public XLSX export client", () => {
+  it("gets the binary export without an idempotency key", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response("xlsx-bytes", {
+        status: 200,
+        headers: {
+          "Content-Type":
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        },
+      }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    const blob = await exportDocument(DOCUMENT_ID);
+
+    expect(await blob.text()).toBe("xlsx-bytes");
+    expect(fetchMock).toHaveBeenCalledWith(
+      `http://127.0.0.1:8001/api/v1/job-analysis/documents/${DOCUMENT_ID}/export`,
+      { method: "GET" },
+    );
   });
 });
 

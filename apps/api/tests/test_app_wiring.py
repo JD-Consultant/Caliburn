@@ -30,6 +30,32 @@ def test_configure_mounts_all_rest_routers_and_health():
     )
 
 
+def test_configure_locks_legacy_interview_routes_and_retired_route_absence():
+    paths = set(_paths(configure(FastAPI())))
+
+    live_interview_paths = {
+        "/api/v1/job-profiles/{profile_id}/interview:start",
+        "/api/v1/job-profiles/{profile_id}/interview:turn",
+        "/api/v1/job-profiles/{profile_id}/interview:finish",
+        "/api/v1/job-profiles/{profile_id}/interview",
+        "/api/v1/job-profiles/{profile_id}/interview:review-events",
+    }
+    assert live_interview_paths <= paths
+
+    retired_suffixes = (
+        "interview:curation",
+        "interview:review",
+        "task-candidates",
+        "task-catalogs",
+        "document:buildTasks",
+    )
+    assert not any(
+        path.endswith(suffix)
+        for path in paths
+        for suffix in retired_suffixes
+    )
+
+
 def test_job_analysis_consultant_defaults_pin_one_exact_a6_route():
     fields = Settings.model_fields
 

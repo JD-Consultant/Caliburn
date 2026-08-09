@@ -1,6 +1,14 @@
 # job_authoring — agent rules
 
-Canonical employee/AI co-authored job document core. Greenfield module from
+This is a **vNext supporting module**, not the current product's canonical
+Current JD. Current product authority is `app/job_analysis` plus
+`/api/v1/job-analysis` and `/workspace`, as fixed by
+[ADR 0043](../../../../docs/adr/0043-job-analysis-local-current-state-persistence-and-authoring-authority.md).
+Keep this module's own domain/persistence invariants for its isolated vNext
+work; do not redirect current routes or data into it.
+
+The module is the historical/vNext employee/AI co-authored job document core.
+Greenfield module from
 **[ADR 0038](../../../../docs/adr/0038-interview-vnext-context-engine-and-professional-consultant-workflow.md)**;
 exact build spec is
 **[2026-07-23 minimal authoring core plan](../../../../docs/plans/2026-07-23-interview-vnext-minimal-authoring-core-plan.md)**.
@@ -28,8 +36,10 @@ LLM job-analysis loop and minimal local Web workspace, not platform generalizati
 
 ## Non-negotiable invariants
 
-- **Canonical truth lives here.** Do not re-derive document truth from the old
-  editor `_pending`, `DocumentVersion.content`, or `InterviewState.candidates`.
+- **Within this isolated vNext slice, accepted authoring state is authoritative
+  for that slice only.** Do not re-derive it from the old editor `_pending`,
+  `DocumentVersion.content`, or `InterviewState.candidates`; this does not make
+  `job_authoring` the current product's Current JD authority.
 - **AI only proposes.** A model output never mutates accepted truth. Every
   document change flows through an employee `add`/`replace` command or an
   employee `accept`/`edit`/`reject` decision on a pending proposal.

@@ -11,13 +11,25 @@ AI 只能提出文件變更，員工接受／修改後接受才會更新 Current
 同頁另按 Task 顯示 O/P/K/S，態度與未連結 K/S 留在文件層；員工可明確儲存，或要求 AI 先產生
 逐項可接受／修改／拒絕／稍後處理的 OPKS Proposal。
 
-「著作」bounded context 的前端:職務說明書**工作台**(D27)。使用者在一張可編輯的官方
-職能基準表格上「選職類 → 選任務 → 填格」,所有變更自動儲存為 draft,最後 finalize 產
-正式版本。只跟 `apps/api`(:8001)講話;**不直接碰 indexer / DB**。
+## Current workspace flow
+
+`/workspace` 先列出本機文件；`/workspace/[document_id]` 同頁載入 Current JD、conversation 與
+Proposal。員工可直接編輯 header／Duty／Task／OPKS，按明確的儲存或取消；`ConsultationPanel` 送出
+員工回合後只顯示 AI Proposal，`ProposalCard`／`OpksProposalCard` 讓員工接受、修改、拒絕或稍後處理，
+決策完成後重新載入 Current JD。這條線只經 `jobAnalysisApi.ts` 呼叫 `/api/v1/job-analysis/*`，不讀舊
+user/profile/OCS state，也沒有第二份 store 或雙寫。
 
 - 埠:`:3000`(api CORS 白名單只有 :3000/127.0.0.1:3000)。
-- OCS 文件型別由 [`packages/ocs-contract`](../../packages/ocs-contract/) 生成的 TS 為底,
-  web 疊 UI-only 欄位(契約 #3 Part A,ADR 0011)。
+- 現行 workspace 型別由 [`packages/job-analysis-contract`](../../packages/job-analysis-contract/) 生成的 TS 提供。
+
+## Legacy OCS Web reference
+
+下列路徑仍可執行，但只是 historical/legacy seam，不是現行 `/workspace` 的 authority：舊 `/dashboard`、
+`/documents/**`、`/intake` 與 legacy interview editor。它們仍只跟 `apps/api`(:8001)講話、不直接碰
+indexer／DB；若要退役，須另開 hard-cut 計畫並移除 route、client、hook、測試與文件入口。
+
+- OCS 文件型別由 [`packages/ocs-contract`](../../packages/ocs-contract/) 生成的 TS 為底，legacy Web 疊 UI-only 欄位。
+
 
 ## 跑 / 測試
 
@@ -34,17 +46,17 @@ npm run lint
 
 | 路徑 | 是什麼 |
 |---|---|
-| `src/app/` | 路由:`/`(→workspace)；舊 `/dashboard`、`/documents/[id]`、intake／interview 暫留但不被新入口依賴 |
+| `src/app/` | 路由:`/`(→workspace)；`/workspace` 是 current，`/dashboard`、`/documents/[id]`、intake／interview 是 legacy |
 | `src/app/workspace/` | greenfield 本機工作區；Server Component shell + 小型 Client Components，不使用 Server Action 寫資料；顧問訪談、Proposal 與可直接編輯的 Current JD 同頁 |
-| `src/lib/jobAnalysisApi.ts` | 新 `/job-analysis` 唯一 fetch client；含 Consultation／Proposal 決策；Problem Details 只依 stable `type` 顯示，不解析 `detail` |
-| `src/components/interview/` | 工作台元件:`JobDocTable`(主表格,dnd 排序;**T8 `_pending` 四態渲染+✓✗?+批量工具列**)、`PendingMark`(追蹤修訂 UI:綠字/紅刪除線+出處卡;ADR 0030)、`AgendaList`(議程三態)、`DocHeader`(官方表頭)、`OccupationPicker`、`UnitPickerMenu`、`TaskPickerMenu`、`GlobalTaskPickerMenu`、`ConflictDialog`、`DocNotes`、`fields/*`(FieldCombobox/OfficialMenu/FieldText/SourceLine)、`InterviewPanel`(**AI 訪談側欄**:打字機對話+議程+收尾卡;ADR 0030) |
-| `src/hooks/` | 資料層 hooks:`useDocument`(文件 + autosave + 選職類)、`useKnowledge`(知識包 query,ADR 0021)、`useInterview`(start/turn/finish/view;turn 後 invalidate document→外部變化路徑重設 baseline)、`useProfiles`、`useHydrated` |
-| `src/lib/` | `api.ts`(唯一 fetch client,`/api/v1/*` + `ApiError`)、`ocsDoc.ts`(**純函式**文件編輯:clone→改→回傳 + 位置重編碼 + A4 文件級 K/S 重編 + **`_pending` 四態輔助 accept/reject/listPending**;ADR 0030)、`pack.ts`(知識包→選單選項純函式;ADR 0021/0022)、`interviewUi.ts`(側欄純邏輯:議程/chips/打字機)、`slots.ts`(槽標籤)、`urn.ts`、`download.ts` |
-| `src/store/user.ts` | zustand + persist:匿名 userId(localStorage `caliburn-user`;404 時自動重建) |
-| `src/types/index.ts` | 契約型別(生成底 + UI 欄位)+ 各端點回應型別 |
-| `src/components/layout/Providers.tsx` | QueryClient + **選擇性持久化**(CopilotKitProvider 已退場,T12) |
+| `src/lib/jobAnalysis*.ts` | current `/job-analysis` API、query、表單、Proposal、header、duty 與 OPKS 邏輯；只供 workspace 使用 |
+| `src/components/workspace/` | current editor、conversation、Proposal 與明確儲存 UI |
+| `src/components/interview/` | **legacy OCS editor**：`JobDocTable`、`InterviewPanel`、`PendingMark`、`fields/*` 等；不供 workspace import |
+| `src/hooks/` | **legacy data hooks**：`useDocument`、`useKnowledge`、`useInterview`、`useProfiles` 等；不供 workspace import |
+| `src/lib/api.ts`、`ocsDoc.ts`、`pack.ts`、`interviewUi.ts`、`slots.ts`、`urn.ts`、`download.ts` | **legacy OCS client/editor helpers**；不供 current job-analysis flow import |
+| `src/store/user.ts`、`src/types/index.ts` | legacy OCS/user/profile 型別與狀態；current contract 由 `job-analysis-contract` 提供 |
+| `src/components/layout/Providers.tsx` | QueryClient 與現行頁面共用的 provider；legacy OCS cache 規則不視為 workspace authority |
 
-## 資料層:兩個 query、兩種性質(P3 收斂,ADR 0021)
+## Legacy OCS editor data layer (historical reference)
 
 | queryKey | 內容 | staleTime | 持久化 |
 |---|---|---|---|
@@ -57,9 +69,9 @@ npm run lint
 **核心不變量:document 是「可寫的工作狀態」,其餘全是「唯讀參考池」。** 這條線決定一切:
 誰能持久化(只有唯讀池)、誰走 invalidate 重抓、誰的 cache 允許本地先寫。
 
-## 關鍵流程
+## Legacy OCS editor flow (historical reference)
 
-### 1. 編輯 → 自動儲存(主線)
+### 1. Legacy OCS 編輯 → 自動儲存
 
 ```
 UI 編輯(表格/填格/拖拉)
@@ -94,12 +106,10 @@ baseline = 最後已知 server 狀態快照,是 dirty 判定 / no-op skip / 樂�
 (回到流程 1 的 autosave PATCH)。**盤永遠人開**(ADR 0032):AI 不彈窗、不預勾——
 訪談 intake 邀請卡「開任務盤」一鍵開全域盤(受控 open),婉拒=`task_board_dismissed` 記帳。
 
-### 4. 填格(O/P/K/S)
+### 4. Legacy OCS field editing
 
-點格 → `CellFillerPanel` → 讀**知識包大池**(`useKnowledge`;選單=全池可跨職類借用,
-序號顯示+每列引用行)→ 空格首開自動帶入該任務官方配套(source_tasks 的 o/p/k/s_refs 聯集;
-「自動勾選」鈕重套)→ 勾官方(帶 `_ref` 溯源,own-first:引用對到本任務)/加自訂 →
-`setKS`/`setOp` → commit(回到流程 1)。任務級別下拉同源(官方值帶引用,選中存 `_levelSrc`)。
+Legacy `JobDocTable` 與 `fields/*` 直接編輯 OCS document，經 `ocsDoc.ts`／`useDocument` 寫入舊
+document endpoint；這些元件與 `_pending`／知識包規則只屬 legacy，不是 current workspace 的替代實作。
 
 ### 5. 重載還原(持久化)
 

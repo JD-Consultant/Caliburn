@@ -5,6 +5,7 @@
 - 範圍：第一階段安全清理與架構規範整理
 
 實作步驟見 [`../plans/2026-08-10-legacy-cleanup-and-monorepo-boundary-plan.md`](../plans/2026-08-10-legacy-cleanup-and-monorepo-boundary-plan.md)。
+Task 1 的逐項 consumer 盤點見 [`2026-08-10-legacy-cleanup-inventory.md`](2026-08-10-legacy-cleanup-inventory.md)。
 
 ## 1. 目標與不變量
 
@@ -22,7 +23,7 @@
 | `apps/web/src/components/workspace/` | 現行文件工作台，消費 `job-analysis-contract` | 標為現行 UI；不與 legacy OCS editor 混用 |
 | `packages/job-analysis-contract/` | 現行 job-analysis seam，schema 生成 Python／TypeScript | 標為單一契約來源 |
 | `apps/api/app/interview/`、`apps/web/src/components/interview/` | 文件與 `/job-profiles/.../interview:*` route 仍直接使用；雖標為淘汰暫留，仍是可執行 legacy seam | 不刪；加 legacy 禁令與 consumer 清單 |
-| `apps/api/app/interview_vnext/` | greenfield 隔離實作；尚無 production route／live LLM，且有自己的測試與 schema | 不刪、不接回舊 runtime；保留為建設中 bounded module |
+| `apps/api/app/interview_vnext/` | greenfield 隔離實作；沒有 production route／現行產品 authority，但已有 durable persistence、Alembic migration、OpenRouter provider、schema 與 tests | 不刪、不接回舊 runtime；保留為建設中 bounded module |
 | `apps/api/app/job_authoring/` | 被 `interview_vnext` 的 contract／persistence 讀取；另有 `job_authoring_*` 表與測試 | 不刪；標為 vNext supporting module |
 | 已明確退役的 endpoint／UI 名稱 | 例如 `task-candidates`、`task-catalogs`、`document:buildTasks`、CopilotKit／SuggestionReview 等，部分已由程式移除、部分只剩歷史註記 | 逐項查 zero consumer；只刪確實仍留在 source 的 dead asset，歷史文檔移至 archive 或修正索引 |
 

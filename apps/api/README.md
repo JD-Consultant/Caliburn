@@ -1,13 +1,13 @@
-# api — Caliburn 後端(FastAPI + 訪談引擎)
+# api — Caliburn 後端(FastAPI)
 
-「著作」bounded context 的後端。提供 REST `/api/v1/*`(含訪談引擎 `interview:*`)。
-擁有 **Postgres**(users/job_profiles/document_versions + interview_*);知識一律
-透過 HTTP 消費 `ocs-indexer`,**不碰 Qdrant**(資料主權,見根 [`ARCHITECTURE.md`](../../ARCHITECTURE.md))。
-既有 production AI 共編端到端（v3）見 [`docs/design/interview-engine.md`](../../docs/design/interview-engine.md)。
-新的專業顧問 Task Analysis 引擎位於 `app/job_analysis/`，是與既有 `interview`／`interview_vnext`
-隔離的現行 greenfield 工作面；目前已接 PostgreSQL、`/api/v1/job-analysis` 與 `/workspace` 本機 Web，
+現行產品 authority 是 `app/job_analysis`、`/api/v1/job-analysis` 與 `/workspace`：它使用獨立
+Current JD／Proposal persistence，提供直接編輯、顧問 conversation、員工決策與 reload。
 端到端邊界見 [`docs/design/task-analysis-engine.md`](../../docs/design/task-analysis-engine.md)。
-舊 `interview` 與 `interview_vnext` 都不是新引擎的依賴，不搬資料、不整合、不雙寫。
+
+本 app 也保留兩條非 current 的開發／相容路徑：`app/interview` 是仍可執行的 legacy OCS／訪談 seam，
+`app/interview_vnext` 是沒有 production route／現行產品 authority 的隔離 future path；兩者都不是
+`job_analysis` 的依賴，不搬資料、不整合、不雙寫。知識一律透過 HTTP 消費 `ocs-indexer`，**不碰 Qdrant**。
+Legacy interview engine 的端到端說明見 [`docs/design/interview-engine.md`](../../docs/design/interview-engine.md)。
 
 - **import 套件名**:`app`(Phase 3 才改 `caliburn_api`;現由 `pytest.ini` 的 `pythonpath=.` 提供)。
 - **uv application 模式**(無 build-system,[ADR 0005](../../docs/adr/0005-per-app-uv-defer-workspace.md))。
@@ -37,14 +37,22 @@ uv run pytest -q                   # 無 DB 時 DB 相關測試自動 skip
 | `app/adapters/` | 邊緣實作:`knowledge_http.py`(indexer typed client)、`persistence.py`(ProfileRepo/DocRepo/LiveDbPersist)、`llm_openrouter.py`(per-role LLM + JSON 重試)、`stubs.py`(測試/demo 假件) | 實作 ports |
 | `app/services/` | use-case 純函式:`ai/`(recommend_ks/draft_op/extract_tasks/structure_task/clarify + prompts)、`knowledge/task_detail.py`(池→單任務切片) | 只吃 ports/DTO |
 | `app/interview/` | **既有 production 訪談引擎**(ADR 0030):`consultant.py`(對話+READ 工具)、`scribe.py`(op 化+落 `_pending`)、`verify.py`(六查,blocking)、`ledger.py`(覆蓋帳本)、`backstop.py`(確定性 sweep)、`skills/`(判準教材 8 檔+`skill_loader.py`)、`service.py`(回合編排) | 吃 ports;既有寫入路徑 op→verify→`_pending` |
-| `app/job_analysis/` | **現行 greenfield Task Analysis 工作面**(ADR 0040／0042):Task／Proposal／Context／one-stage operation／deterministic verifier／durable application use cases | domain 不 import `interview`、`interview_vnext`、`job_authoring`、DB 或 Web；外圈由 PostgreSQL adapter 與薄 API route 接入 composition root |
-| `app/interview_vnext/` | **隔離開發中的 greenfield vNext**（ADR 0034）：V1 domain lifecycle + V2-A provider-neutral LLM/Capture contracts/in-memory fakes/共 33 schemas 已完成；無 route、DB、live LLM | 不 import v3 internals；SDK只准在未來 provider adapter；production composition root 不 import此 package |
+| `app/job_analysis/` | **現行 greenfield Task Analysis 工作面**(ADR 0040／0042):Task／Proposal／Context／one-stage operation／deterministic verifier／durable application use cases | domain 不 import legacy／future modules、DB 或 Web；外圈由 PostgreSQL adapter、provider 與薄 API route 接入 composition root |
+| `app/interview_vnext/` | **隔離開發中的 greenfield vNext**（ADR 0034）：沒有 production route／現行產品 authority，但已有 durable persistence、Alembic migration、OpenRouter provider 與 tests | 不 import v3 internals；SDK只准在 provider adapter；production composition root 不 import 此 package |
+| `app/job_authoring/` | `interview_vnext` 的 vNext supporting module；保留自己的 domain／persistence invariants，不是 current `job_analysis` 的 Current JD truth | 不由 current route 使用；切換、資料遷移與 rollback 未完成前不刪 |
 | `app/observability.py` | OTel tracing 橫切(gen_ai.* 手埋;verify 拒收/審閱事件 span) | — |
-| `app/api/` | HTTP 面:`routes/{users,job_profiles,documents,occupations,ai}.py`、`router.py`(唯一聚合點)、`deps.py`(get_knowledge) | 薄轉接,邏輯下沉 |
+| `app/api/` | HTTP 面:`routes/{users,job_profiles,documents,occupations,ai,job_analysis}.py`、`router.py`(唯一聚合點)、`deps.py`(shared/legacy `get_knowledge`)、`job_analysis_deps.py`(current composition) | 薄轉接,邏輯下沉；current 與 legacy dependencies 分開 |
 | `app/app_factory.py` | composition root:`configure()` 掛 router/CORS/healthz | — |
 | `app/{config,database,models,schemas}.py` | Settings(.env)/engine/ORM 三表/pydantic in-out | — |
 
-## 資料模型(Postgres,Alembic 管 schema)
+## Current `job_analysis` persistence
+
+`app/job_analysis` 從獨立的 current tables 開始保存 Current JD、conversation 與 Proposal；它不讀取、
+不搬移也不雙寫 legacy `users`／`job_profiles`／`document_versions`／`interview_*` 資料。資料讀寫經
+`app/adapters/job_analysis_postgres.py`，API composition 經 `app/api/job_analysis_deps.py`；具體端到端
+不變量見 [`docs/design/task-analysis-engine.md`](../../docs/design/task-analysis-engine.md)。
+
+## Legacy OCS／interview 資料模型(Postgres,Alembic 管 schema)
 
 ```
 users ─1:N─ job_profiles ─1:N─ document_versions
@@ -55,7 +63,17 @@ users ─1:N─ job_profiles ─1:N─ document_versions
   **revision = 同一列的編輯回合**(SQLAlchemy `version_id_col`,每次 UPDATE 自動 CAS +1)。
   雙 token 構成 PATCH 樂觀鎖(ADR 0015)。`content` = 整份 OCS JSON(JSONB,draft 含 `_` UI 欄位)。
 
-## REST 端點 reference(`/api/v1`)
+## Current REST endpoint reference(`/api/v1/job-analysis`)
+
+| Method Path | 用途 |
+|---|---|
+| `GET /job-analysis/documents`、`PUT /job-analysis/documents/{id}`、`GET /job-analysis/documents/{id}` | 建立／改名、列出與載入本機文件 |
+| `PUT /job-analysis/documents/{id}/jd-header`、`POST/PUT/DELETE …/duties`、`…/tasks`、`…/opks` | 員工直接編輯 Current JD 與 OPKS |
+| `GET/POST /job-analysis/documents/{id}/consultation`、`…/turns` | 讀取 conversation、送出員工回合；AI 只能產生候選／Proposal |
+| `POST …/proposals/{proposal_id}/decisions`、`…/opks-proposals/{proposal_id}/decisions` | 員工接受／修改／拒絕／延後 Proposal，決策後 reload Current JD |
+| `GET /job-analysis/documents/{id}/export` | 由 current state 產出匯出檔，不讀 legacy document_versions |
+
+## Legacy OCS／interview REST endpoint reference(`/api/v1`)
 
 依賴降級政策(ADR 0018):**critical** = indexer 掛 → 502 快錯;**enrichment** = 略過壞的部分
 → 200 + `meta.partial=true`。

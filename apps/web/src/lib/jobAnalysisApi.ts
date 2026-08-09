@@ -84,6 +84,20 @@ export function getDocument(documentId: string): Promise<DocumentView> {
   return request<DocumentView>(`/documents/${documentId}`, { method: "GET" });
 }
 
+export async function exportDocument(documentId: string): Promise<Blob> {
+  const response = await fetch(`${API}/documents/${documentId}/export`, {
+    method: "GET",
+  });
+  if (!response.ok) {
+    const body: unknown = await response.json().catch(() => undefined);
+    throw new JobAnalysisApiError(
+      response.status,
+      isReceivedProblem(body) ? body : undefined,
+    );
+  }
+  return response.blob();
+}
+
 export function getConsultation(documentId: string): Promise<ConsultationView> {
   return request<ConsultationView>(`/documents/${documentId}/consultation`, {
     method: "GET",

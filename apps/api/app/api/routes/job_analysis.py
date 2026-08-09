@@ -2,6 +2,7 @@
 
 import logging
 from typing import Annotated
+from urllib.parse import quote
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Header, Response
@@ -61,6 +62,7 @@ from app.job_analysis.application import (
     add_duty,
     add_jd_task,
     add_opks_item,
+    assemble_export_document,
     delete_duty,
     delete_jd_task,
     delete_opks_item,
@@ -79,6 +81,7 @@ from app.job_analysis.application import (
     submit_employee_turn,
 )
 from app.job_analysis.application.errors import JobAnalysisApplicationError
+from app.job_analysis.application.export_xlsx import XLSX_MEDIA_TYPE, render_xlsx
 from app.job_analysis.providers import OpenRouterAdapter
 
 
@@ -147,6 +150,48 @@ async def get_document(
             status=404,
         )
     return to_document_view(loaded)
+
+
+def _export_filename(title: str) -> str:
+    safe_title = "".join(
+        "_"
+        if character in '<>:/\\|?*\"\r\n'
+        else character
+        for character in title.strip()
+    ).rstrip(" .") or "職務說明書"
+    return f"{safe_title}.xlsx"
+
+
+@router.get("/{document_id}/export")
+async def export_document_route(
+    document_id: UUID,
+    uow_factory: JobAnalysisUnitOfWorkFactory = Depends(
+        get_job_analysis_uow_factory
+    ),
+):
+    loaded = await load_document(uow_factory, document_id)
+    if loaded is None:
+        return problem_response(
+            type_uri=DOCUMENT_NOT_FOUND,
+            title="Document not found",
+            status=404,
+        )
+
+    export_document = assemble_export_document(
+        loaded.state,
+        title=loaded.document.title,
+    )
+    filename = _export_filename(loaded.document.title)
+    return Response(
+        content=render_xlsx(export_document),
+        media_type=XLSX_MEDIA_TYPE,
+        headers={
+            "Content-Disposition": (
+                'attachment; filename="job-description.xlsx"; '
+                f"filename*=UTF-8''{quote(filename, safe='')}"
+            )
+        },
+    )
 
 
 @router.put("/{document_id}/jd-header", response_model=JdHeaderView)

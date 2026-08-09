@@ -1,10 +1,18 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Download } from "lucide-react";
 import { useState } from "react";
 
-import { consultationQueryOptions } from "@/lib/jobAnalysisQueries";
+import { Button } from "@/components/ui/button";
+import { downloadBlob } from "@/lib/download";
+import { exportDocument, JobAnalysisApiError } from "@/lib/jobAnalysisApi";
+import { documentUnlinkedCompetencies } from "@/lib/jobAnalysisOpks";
+import { canExport, exportFilename } from "@/lib/jobAnalysisExport";
+import {
+  consultationQueryOptions,
+  documentQueryOptions,
+} from "@/lib/jobAnalysisQueries";
 import { ConsultationPanel } from "./ConsultationPanel";
 import { DutyEditor } from "./DutyEditor";
 import { JdHeaderForm } from "./JdHeaderForm";
@@ -14,12 +22,44 @@ import { GuardedLink } from "./UnsavedChangesGuard";
 
 export function ConsultationWorkspace({ documentId }: { documentId: string }) {
   const consultation = useQuery(consultationQueryOptions(documentId));
+  const document = useQuery(documentQueryOptions(documentId));
   const [headerDraftDirty, setHeaderDraftDirty] = useState(false);
   const [dutyDraftDirty, setDutyDraftDirty] = useState(false);
   const [taskDraftDirty, setTaskDraftDirty] = useState(false);
   const [opksDraftDirty, setOpksDraftDirty] = useState(false);
-  const dirty =
-    headerDraftDirty || dutyDraftDirty || taskDraftDirty || opksDraftDirty;
+  const dirtyState = {
+    header: headerDraftDirty,
+    duty: dutyDraftDirty,
+    task: taskDraftDirty,
+    opks: opksDraftDirty,
+  };
+  const exportAllowed = canExport(dirtyState);
+  const dirty = !exportAllowed;
+  const [exporting, setExporting] = useState(false);
+  const [exportError, setExportError] = useState<string | null>(null);
+
+  const handleExport = async () => {
+    if (!exportAllowed || exporting || !document.data) return;
+    setExportError(null);
+    setExporting(true);
+    try {
+      const blob = await exportDocument(documentId);
+      downloadBlob(exportFilename(document.data.title), blob);
+    } catch (error) {
+      setExportError(
+        error instanceof JobAnalysisApiError
+          ? error.message
+          : "匯出失敗，請稍後再試",
+      );
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const readinessIssues = document.data?.readiness.issues ?? [];
+  const unlinkedCompetencies = document.data
+    ? documentUnlinkedCompetencies(document.data.opks_items)
+    : [];
 
   return (
     <div className="min-h-screen bg-muted/30">
@@ -41,8 +81,51 @@ export function ConsultationWorkspace({ documentId }: { documentId: string }) {
               AI 顧問訪談與目前文件
             </p>
           </div>
+          <Button
+            variant="outline"
+            disabled={!exportAllowed || exporting || !document.data}
+            onClick={handleExport}
+          >
+            <Download />
+            {exporting ? "準備匯出…" : "匯出 XLSX"}
+          </Button>
         </div>
       </header>
+
+      <div className="mx-auto max-w-7xl px-6 pt-6">
+        {dirty ? (
+          <p
+            className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm dark:border-amber-900 dark:bg-amber-950/40"
+            role="status"
+          >
+            請先儲存或取消目前編輯，再匯出。
+          </p>
+        ) : null}
+        {!dirty &&
+        (readinessIssues.length > 0 || unlinkedCompetencies.length > 0) ? (
+          <div
+            className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm dark:border-amber-900 dark:bg-amber-950/40"
+            role="status"
+          >
+            <p className="font-medium">匯出前提醒（不會阻擋匯出）</p>
+            <ul className="mt-1 list-disc pl-5 text-muted-foreground">
+              {readinessIssues.length > 0 ? (
+                <li>表頭仍有 {readinessIssues.length} 項欄位缺漏。</li>
+              ) : null}
+              {unlinkedCompetencies.length > 0 ? (
+                <li>
+                  有 {unlinkedCompetencies.length} 筆未連結的知識／技能，公版匯出不會包含。
+                </li>
+              ) : null}
+            </ul>
+          </div>
+        ) : null}
+        {exportError ? (
+          <p className="mt-3 text-sm text-destructive" role="alert">
+            {exportError}
+          </p>
+        ) : null}
+      </div>
 
       <main className="mx-auto grid max-w-7xl gap-8 px-6 py-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
         <ConsultationPanel documentId={documentId} />

@@ -974,7 +974,7 @@ no extra sheet, custom warning／product statement, clipped content or broken me
 - GET `/api/v1/job-analysis/documents/{document_id}/export`, no `Idempotency-Key`.
 - `exportDocument(documentId) -> Promise<Blob>` and `exportFilename(title) -> string`.
 
-- [ ] **Step 1: Write red route and Web tests**
+- [x] **Step 1: Write red route and Web tests**
 
 API test asserts 200, XLSX media type, RFC 5987 UTF-8 filename, one-sheet workbook, 404 problem response and no Journal/generation mutation.
 
@@ -984,7 +984,7 @@ it("disables export while any editor is dirty", () => {
 });
 ```
 
-- [ ] **Step 2: Run red tests**
+- [x] **Step 2: Run red tests**
 
 Run: `cd apps/api; uv run pytest tests/test_job_analysis_api_postgres.py -k export -q`
 
@@ -992,15 +992,15 @@ Run: `cd apps/web; npm run test -- src/lib/jobAnalysisExport.test.ts`
 
 Expected: FAIL before route/helper exists.
 
-- [ ] **Step 3: Add the thin GET route**
+- [x] **Step 3: Add the thin GET route**
 
 Load one validated state, call `assemble_export_document`, then `render_xlsx`. Do not pass readiness into renderer; Web already received readiness in `DocumentView`. No provider dependency and no write transaction.
 
-- [ ] **Step 4: Add download UI with warnings and dirty guard**
+- [x] **Step 4: Add download UI with warnings and dirty guard**
 
 When dirty, disable button and show「請先儲存或取消目前編輯，再匯出」。When saved readiness issues or unlinked K/S exist, show them before download but do not block. Do not auto-save and do not put warning text into workbook.
 
-- [ ] **Step 5: Register the seam and run gates**
+- [x] **Step 5: Register the seam and run gates**
 
 Update `docs/contract-strategy.md` to record XLSX as a binary HTTP representation owned by `job_analysis`, not a Python⇄TS schema contract and not OCS reuse.
 
@@ -1013,12 +1013,21 @@ cd ../web; npm run test; npx tsc --noEmit; npm run lint
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```powershell
 git add apps/api/app/api/routes/job_analysis.py apps/api/tests/test_job_analysis_api_postgres.py apps/web docs/contract-strategy.md docs/design/task-analysis-engine.md
 git commit -m "feat(job-analysis): download strict XLSX from the workspace"
 ```
+
+Execution record: the red API tests first observed a missing route and generic JSON 404, while
+the Web test observed the absent export helper. The final route loads one validated document,
+assembles and renders the strict workbook without a provider or mutation receipt, and returns a
+RFC 5987 UTF-8 filename. The Web client consumes the response as a `Blob`; the workspace disables
+export for any dirty Header／Duty／Task／OPKS editor, shows the required dirty instruction, and
+shows saved readiness／unlinked K/S warnings without blocking. Focused API export tests pass 2/2;
+the Web suite passes 121/121, TypeScript and ESLint pass, and the binary client test verifies no
+`Idempotency-Key` is sent.
 
 ---
 

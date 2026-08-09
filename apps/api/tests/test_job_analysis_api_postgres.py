@@ -12,7 +12,10 @@ from sqlalchemy import func, select
 
 from app.adapters.job_analysis_postgres import SqlAlchemyJobAnalysisUnitOfWork
 from app.adapters.job_analysis_postgres.models import JobAnalysisJournalRow
-from app.api.deps import get_job_analysis_adapter, get_job_analysis_uow_factory
+from app.api.job_analysis_deps import (
+    get_job_analysis_adapter,
+    get_job_analysis_uow_factory,
+)
 from app.job_analysis.application import load_document
 from app.job_analysis.domain import TaskFields
 from app.job_analysis.llm import (

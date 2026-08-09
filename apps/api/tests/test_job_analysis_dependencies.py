@@ -14,6 +14,12 @@ from pathlib import Path
 API_DIR = Path(__file__).parents[1]
 ROOT = API_DIR / "app" / "job_analysis"
 DOMAIN_ROOT = ROOT / "domain"
+SHARED_API_DEPS = API_DIR / "app" / "api" / "deps.py"
+JOB_ANALYSIS_COMPOSITION_SURFACES = (
+    API_DIR / "app" / "api" / "job_analysis_deps.py",
+    API_DIR / "app" / "api" / "routes" / "job_analysis.py",
+    API_DIR / "app" / "adapters" / "job_analysis_postgres.py",
+)
 
 FORBIDDEN_ROOTS = (
     "app.interview",
@@ -21,6 +27,13 @@ FORBIDDEN_ROOTS = (
     "app.job_authoring",
     "evals",
     "job_analysis_contract",
+)
+
+JOB_ANALYSIS_COMPOSITION_FORBIDDEN_ROOTS = (
+    "app.interview",
+    "app.interview_vnext",
+    "app.job_authoring",
+    "evals",
 )
 
 
@@ -33,6 +46,39 @@ def _imports(path: Path) -> list[tuple[int, str]]:
         elif isinstance(node, ast.ImportFrom) and node.level == 0 and node.module:
             found.append((node.lineno, node.module))
     return found
+
+
+def _existing_paths(paths: tuple[Path, ...]) -> tuple[Path, ...]:
+    """Skip a planned seam until its implementation exists; never hide real files."""
+
+    return tuple(path for path in paths if path.is_file())
+
+
+def test_shared_api_deps_does_not_own_job_analysis_composition():
+    forbidden_roots = {
+        "app.job_analysis",
+        "app.adapters.job_analysis_postgres",
+    }
+    violations = [
+        f"{SHARED_API_DEPS.relative_to(API_DIR)}:{line} imports {module}"
+        for line, module in _imports(SHARED_API_DEPS)
+        if module in forbidden_roots or any(
+            module.startswith(f"{forbidden}.") for forbidden in forbidden_roots
+        )
+    ]
+    assert violations == []
+
+
+def test_job_analysis_composition_surfaces_never_import_legacy_paths():
+    violations: list[str] = []
+    for path in _existing_paths(JOB_ANALYSIS_COMPOSITION_SURFACES):
+        for line, module in _imports(path):
+            for forbidden in JOB_ANALYSIS_COMPOSITION_FORBIDDEN_ROOTS:
+                if module == forbidden or module.startswith(f"{forbidden}."):
+                    violations.append(
+                        f"{path.relative_to(API_DIR)}:{line} imports {module}"
+                    )
+    assert violations == []
 
 
 def test_job_analysis_never_imports_legacy_ai_paths():

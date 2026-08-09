@@ -41,8 +41,62 @@ class DocumentSummary(BaseModel):
     )
     document_id: UUID
     title: str
-    task_count: conint(ge=0)
+    task_count: conint(ge=0, strict=True)
     updated_at: AwareDatetime
+
+
+class JdHeaderView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    competency_name: str | None
+    occupation_category_name: str | None
+    occupation_name: str | None
+    occupation_code: str | None
+    industry_name: str | None
+    industry_code: str | None
+    work_description: str | None
+    competency_level: conint(ge=1, le=6, strict=True) | None
+    notes: str | None
+
+
+class JdHeaderWrite(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    competency_name: str | None = None
+    occupation_category_name: str | None = None
+    occupation_name: str | None = None
+    occupation_code: str | None = None
+    industry_name: str | None = None
+    industry_code: str | None = None
+    work_description: str | None = None
+    competency_level: conint(ge=1, le=6, strict=True) | None = None
+    notes: str | None = None
+
+
+class Code(StrEnum):
+    competency_name_missing = 'competency_name_missing'
+    work_description_missing = 'work_description_missing'
+    competency_level_missing = 'competency_level_missing'
+    task_duty_missing = 'task_duty_missing'
+    task_competency_level_missing = 'task_competency_level_missing'
+    duty_without_task = 'duty_without_task'
+    opks_task_link_missing = 'opks_task_link_missing'
+
+
+class ReadinessIssueView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    code: Code
+
+
+class DocumentReadinessView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    issues: list[ReadinessIssueView]
 
 
 class Kind(StrEnum):
@@ -79,6 +133,8 @@ class JdTaskWrite(BaseModel):
     frequency_text: str | None
     responsibility_role: ResponsibilityRole | None
     enablers: list[Enabler]
+    duty_id: str | None = None
+    competency_level: conint(ge=1, le=6, strict=True) | None = None
 
 
 class ResponsibilityRole1(Enum):
@@ -99,7 +155,25 @@ class JdTaskView(BaseModel):
     frequency_text: str | None
     responsibility_role: ResponsibilityRole1 | None
     enablers: list[Enabler]
-    display_order: conint(ge=0)
+    duty_id: str | None = None
+    competency_level: conint(ge=1, le=6, strict=True) | None = None
+    display_order: conint(ge=0, strict=True)
+
+
+class DutyWrite(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    statement: str
+
+
+class DutyView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    duty_id: str
+    statement: str
+    display_order: conint(ge=0, strict=True)
 
 
 class EntityKind(StrEnum):
@@ -130,6 +204,7 @@ class OpksItemView(BaseModel):
     task_refs: list[str]
     indicator_refs: list[str]
     evidence_quotes: list[str]
+    display_order: conint(ge=0, strict=True)
 
 
 class Status(StrEnum):
@@ -185,6 +260,9 @@ class DocumentView(BaseModel):
     document_id: UUID
     title: str
     updated_at: AwareDatetime
+    jd_header: JdHeaderView
+    readiness: DocumentReadinessView
+    duties: list[DutyView]
     tasks: list[JdTaskView]
     opks_items: list[OpksItemView]
     opks_task_status: list[OpksTaskStatusView]
@@ -306,6 +384,21 @@ class TaskOrderWrite(BaseModel):
     ordered_task_ids: list[str]
 
 
+class OpksOrderWrite(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    entity_kind: EntityKind
+    ordered_entity_ids: list[str]
+
+
+class DutyOrderWrite(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    ordered_duty_ids: list[str]
+
+
 class ProblemFieldError(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -330,6 +423,15 @@ class Type(StrEnum):
     https___caliburn_dev_problems_job_analysis_invalid_task_order = (
         'https://caliburn.dev/problems/job-analysis/invalid-task-order'
     )
+    https___caliburn_dev_problems_job_analysis_duty_not_found = (
+        'https://caliburn.dev/problems/job-analysis/duty-not-found'
+    )
+    https___caliburn_dev_problems_job_analysis_invalid_duty_order = (
+        'https://caliburn.dev/problems/job-analysis/invalid-duty-order'
+    )
+    https___caliburn_dev_problems_job_analysis_invalid_opks_order = (
+        'https://caliburn.dev/problems/job-analysis/invalid-opks-order'
+    )
     https___caliburn_dev_problems_job_analysis_invalid_request = (
         'https://caliburn.dev/problems/job-analysis/invalid-request'
     )
@@ -350,6 +452,6 @@ class ProblemDetail(BaseModel):
     )
     type: Type
     title: str
-    status: conint(ge=400, le=599)
+    status: conint(ge=400, le=599, strict=True)
     detail: str | None = None
     errors: list[ProblemFieldError] | None = None

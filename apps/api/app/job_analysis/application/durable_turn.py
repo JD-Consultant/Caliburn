@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import UTC, datetime
 from uuid import UUID
 
+from .authority_commit import commit_authority_change
 from .errors import (
     ConcurrentAuthorityChange,
     DocumentNotFound,
@@ -44,6 +45,18 @@ class StaleAuthoritySnapshot(ConcurrentAuthorityChange):
 
 class UncommittableOperationResult(JobAnalysisApplicationError):
     """Only a verified operation result may change Current State."""
+
+    def __init__(self, operation_result: TaskAnalysisOperationResult) -> None:
+        self.outcome = operation_result.outcome
+        self.verifier_codes = (
+            tuple(code.value for code in operation_result.report.codes)
+            if operation_result.report is not None
+            else ()
+        )
+        # detail 可能包含 provider／employee 原文，只保留可供安全診斷的 typed 欄位。
+        super().__init__(
+            f"cannot commit operation outcome {self.outcome.value!r}"
+        )
 
 
 class TransitionCommitRejected(JobAnalysisApplicationError):
@@ -87,6 +100,8 @@ async def _load_state(
     record: DocumentRecord,
 ) -> JobAnalysisState:
     return JobAnalysisState(
+        jd_header=record.jd_header,
+        current_duties=await uow.duties.list(record.document_id),
         work_model=record.work_model,
         current_jd=await uow.tasks.list(record.document_id),
         proposals=await uow.proposals.list(record.document_id),
@@ -103,6 +118,22 @@ async def _packet_for(
     employee_turn: ConversationTurn,
 ) -> TaskAnalysisPacket:
     conversation = await uow.journal.list_conversation_turns(record.document_id)
+    overview_lines = tuple(
+        line
+        for line in (
+            (
+                f"職能基準名稱：{record.jd_header.competency_name}"
+                if record.jd_header.competency_name is not None
+                else None
+            ),
+            (
+                f"工作描述：{record.jd_header.work_description}"
+                if record.jd_header.work_description is not None
+                else None
+            ),
+        )
+        if line is not None
+    )
     return build_context_packet(
         transcript=(*conversation, employee_turn),
         current_turn_id=employee_turn.turn_id,
@@ -110,6 +141,7 @@ async def _packet_for(
         current_jd=state.current_jd,
         active_question=record.active_question,
         proposals=state.proposals,
+        employee_written_overview="\n".join(overview_lines) or None,
     )
 
 
@@ -160,9 +192,7 @@ def _require_verified(
         operation_result.outcome is not OperationOutcome.VERIFIED
         or operation_result.result is None
     ):
-        raise UncommittableOperationResult(
-            f"cannot commit operation outcome {operation_result.outcome.value!r}"
-        )
+        raise UncommittableOperationResult(operation_result)
 
 
 def _require_same_replay(
@@ -279,35 +309,30 @@ async def commit_verified_turn(
                 operation_id=operation_id,
             ),
         )
-        await uow.proposals.replace(
-            snapshot.document_id,
-            transition.state.proposals,
-        )
-        await uow.journal.add(
-            JournalEntry(
-                document_id=snapshot.document_id,
-                entry_id=operation_id,
-                kind="employee_turn",
-                payload_schema_id=COMPLETED_TURN_SCHEMA_ID,
-                payload=CompletedTurnPayload(
-                    operation_id=operation_id,
-                    employee_turn=employee_turn,
-                    consultant_turn=consultant_turn,
-                    scheduled_opks=scheduled_opks,
+        try:
+            await commit_authority_change(
+                uow,
+                record=replace(record, active_question=active_question),
+                state=transition.state,
+                updated_at=now,
+                journal_entries=(
+                    JournalEntry(
+                        document_id=snapshot.document_id,
+                        entry_id=operation_id,
+                        kind="employee_turn",
+                        payload_schema_id=COMPLETED_TURN_SCHEMA_ID,
+                        payload=CompletedTurnPayload(
+                            operation_id=operation_id,
+                            employee_turn=employee_turn,
+                            consultant_turn=consultant_turn,
+                            scheduled_opks=scheduled_opks,
+                        ),
+                        created_at=now,
+                    ),
                 ),
-                created_at=now,
             )
-        )
-        updated = await uow.documents.update_authority(
-            snapshot.document_id,
-            expected_generation=snapshot.authority_generation,
-            work_model=transition.state.work_model,
-            active_question=active_question,
-            updated_at=now,
-        )
-        if not updated:
+        except ConcurrentAuthorityChange as error:
             raise StaleAuthoritySnapshot(
                 "the document changed while this Task Analysis turn was committed"
-            )
-        await uow.commit()
+            ) from error
         return CommittedTurn(transition=transition, scheduled_opks=scheduled_opks)

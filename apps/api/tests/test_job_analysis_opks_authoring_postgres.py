@@ -19,6 +19,7 @@ from app.job_analysis.application import (
     load_document,
 )
 from app.job_analysis.domain import (
+    JdHeader,
     JdTaskFields,
     OpksEntityKind,
     SourceKind,
@@ -33,13 +34,34 @@ def factory(session_factory):
     return lambda: SqlAlchemyJobAnalysisUnitOfWork(session_factory)
 
 
-async def seed_task(session_factory, document_id, *, entry_id: str, statement: str):
+async def seed_task(
+    session_factory,
+    document_id,
+    *,
+    entry_id: str,
+    statement: str,
+    jd_header: JdHeader | None = None,
+):
     uow_factory = factory(session_factory)
     await create_document(
         uow_factory,
         document_id=document_id,
         title="門市營運專員",
     )
+    if jd_header is not None:
+        async with uow_factory() as uow:
+            record = await uow.documents.get(document_id, for_update=True)
+            assert record is not None
+            changed = await uow.documents.update_authority(
+                document_id,
+                expected_generation=record.authority_generation,
+                jd_header=jd_header,
+                work_model=record.work_model,
+                active_question=record.active_question,
+                updated_at=record.updated_at,
+            )
+            assert changed
+            await uow.commit()
     return await add_jd_task(
         uow_factory,
         document_id=document_id,
@@ -54,11 +76,16 @@ async def test_add_edit_delete_reload_and_idempotent_replay(
 ):
     document_id = cleanup_job_analysis_rows
     uow_factory = factory(postgres_session_factory)
+    header = JdHeader(
+        competency_name="門市營運管理",
+        work_description="負責門市日常營運與週報彙整。",
+    )
     task = await seed_task(
         postgres_session_factory,
         document_id,
         entry_id="task-1",
         statement="每週彙整營運週報",
+        jd_header=header,
     )
 
     created = await add_opks_item(
@@ -123,7 +150,8 @@ async def test_add_edit_delete_reload_and_idempotent_replay(
     loaded = await load_document(uow_factory, document_id)
     assert loaded is not None
     assert loaded.state.current_opks.items == ()
-    assert loaded.document.authority_generation == 4
+    assert loaded.document.authority_generation == 5
+    assert loaded.state.jd_header == header
 
     async with uow_factory() as uow:
         add_entry = await uow.journal.get(document_id, "opks-add-1")
@@ -136,6 +164,72 @@ async def test_add_edit_delete_reload_and_idempotent_replay(
     assert edit_entry.payload.after == edited
     assert delete_entry.payload.before == edited
     assert delete_entry.payload.after is None
+
+
+async def test_direct_add_uses_next_kind_order_edit_preserves_and_delete_keeps_gap(
+    postgres_session_factory,
+    cleanup_job_analysis_rows,
+):
+    document_id = cleanup_job_analysis_rows
+    uow_factory = factory(postgres_session_factory)
+    task = await seed_task(
+        postgres_session_factory,
+        document_id,
+        entry_id="task-1",
+        statement="每週彙整營運週報",
+    )
+
+    first = await add_opks_item(
+        uow_factory,
+        document_id=document_id,
+        entry_id="opks-output-1",
+        entity_kind=OpksEntityKind.OUTPUT,
+        text="營運週報",
+        task_refs=(task.task_id,),
+    )
+    second = await add_opks_item(
+        uow_factory,
+        document_id=document_id,
+        entry_id="opks-output-2",
+        entity_kind=OpksEntityKind.OUTPUT,
+        text="營運月報",
+        task_refs=(task.task_id,),
+    )
+    knowledge = await add_opks_item(
+        uow_factory,
+        document_id=document_id,
+        entry_id="opks-knowledge-1",
+        entity_kind=OpksEntityKind.KNOWLEDGE,
+        text="營運數據定義",
+    )
+
+    assert (first.display_order, second.display_order, knowledge.display_order) == (
+        0,
+        1,
+        0,
+    )
+    edited = await edit_opks_item(
+        uow_factory,
+        document_id=document_id,
+        entry_id="opks-output-edit",
+        entity_id=first.entity_id,
+        entity_kind=first.entity_kind,
+        text="每週營運週報",
+        task_refs=(task.task_id,),
+    )
+    assert edited.display_order == first.display_order
+
+    await delete_opks_item(
+        uow_factory,
+        document_id=document_id,
+        entry_id="opks-output-delete",
+        entity_id=first.entity_id,
+    )
+    loaded = await load_document(uow_factory, document_id)
+
+    assert loaded is not None
+    assert loaded.state.current_opks.items == (knowledge, second)
+    assert second.display_order == 1
 
 
 async def test_invalid_manual_opks_edits_fail_before_writing(
@@ -387,6 +481,7 @@ async def test_deleting_a_jd_task_removes_its_gap_in_the_same_transaction(
         assert await uow.documents.update_authority(
             document_id,
             expected_generation=record.authority_generation,
+            jd_header=record.jd_header,
             work_model=CurrentWorkModel(
                 open_issues=(
                     opks_gap_issue("gap-1", created.task_id),

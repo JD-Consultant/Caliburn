@@ -36,6 +36,7 @@ from app.job_analysis.application import (
 )
 from app.job_analysis.domain import (
     CurrentWorkModel,
+    JdHeader,
     JdTask,
     CurrentJdOpks,
     OpksEntityKind,
@@ -125,6 +126,7 @@ def test_document_records_are_frozen_and_reject_negative_generation():
     record = DocumentRecord(
         document_id=document_id,
         title="門市營運專員",
+        jd_header=JdHeader(),
         work_model=CurrentWorkModel(),
         active_question=ActiveQuestion(
             turn_id="turn-3",
@@ -149,6 +151,7 @@ def test_document_records_are_frozen_and_reject_negative_generation():
         DocumentRecord(
             document_id=document_id,
             title="門市營運專員",
+            jd_header=JdHeader(),
             work_model=CurrentWorkModel(),
             active_question=None,
             authority_generation=-1,
@@ -163,6 +166,7 @@ def test_loaded_state_keeps_complete_current_jd_and_opks_values():
     document = DocumentRecord(
         document_id=uuid4(),
         title="門市營運專員",
+        jd_header=JdHeader(),
         work_model=CurrentWorkModel(),
         active_question=None,
         authority_generation=0,
@@ -170,6 +174,8 @@ def test_loaded_state_keeps_complete_current_jd_and_opks_values():
         updated_at=NOW,
     )
     state = JobAnalysisState(
+        jd_header=JdHeader(),
+        current_duties=(),
         current_jd=(jd_task(),),
         current_opks=CurrentJdOpks(items=(output_item(),)),
         opks_proposals=(output_proposal(),),

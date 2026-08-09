@@ -5,11 +5,16 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
 from jsonschema import Draft202012Validator
+from pydantic import ValidationError
 
 from job_analysis_contract import (
     ConsultationView,
+    DocumentReadinessView,
     EmployeeTurnWrite,
+    JdHeaderView,
+    JdHeaderWrite,
     JdTaskWrite,
     OpksItemView,
     OpksItemWrite,
@@ -18,6 +23,7 @@ from job_analysis_contract import (
     ProblemDetail,
     ProposalDecisionWrite,
     ProposalView,
+    ReadinessIssueView,
 )
 
 
@@ -29,6 +35,9 @@ PROBLEM_TYPES = {
     "https://caliburn.dev/problems/job-analysis/idempotency-conflict",
     "https://caliburn.dev/problems/job-analysis/authority-conflict",
     "https://caliburn.dev/problems/job-analysis/invalid-task-order",
+    "https://caliburn.dev/problems/job-analysis/duty-not-found",
+    "https://caliburn.dev/problems/job-analysis/invalid-duty-order",
+    "https://caliburn.dev/problems/job-analysis/invalid-opks-order",
     "https://caliburn.dev/problems/job-analysis/invalid-request",
     "https://caliburn.dev/problems/job-analysis/proposal-not-found",
     "https://caliburn.dev/problems/job-analysis/consultant-unavailable",
@@ -53,16 +62,23 @@ def test_schema_owns_only_the_workspace_wire_contract():
         "DocumentMetadataView",
         "DocumentSummary",
         "DocumentView",
+        "DutyOrderWrite",
+        "DutyView",
+        "DutyWrite",
+        "DocumentReadinessView",
         "ActiveQuestionView",
         "ConsultationView",
         "ConversationTurnView",
         "EmployeeTurnWrite",
         "Enabler",
+        "JdHeaderView",
+        "JdHeaderWrite",
         "JdTaskWrite",
         "JdTaskView",
         "OpksItemView",
         "OpksTaskStatusView",
         "OpksItemWrite",
+        "OpksOrderWrite",
         "OpksProposalDecisionWrite",
         "OpksProposalView",
         "ProblemDetail",
@@ -70,6 +86,7 @@ def test_schema_owns_only_the_workspace_wire_contract():
         "ProposalDecisionWrite",
         "ProposalJdEntryView",
         "ProposalView",
+        "ReadinessIssueView",
         "TaskOrderWrite",
     }
 
@@ -165,6 +182,7 @@ def test_opks_proposal_view_preserves_operation_grouping_and_snapshots():
             "task_refs": [],
             "indicator_refs": [],
             "evidence_quotes": ["我會整理營運資料"],
+            "display_order": 0,
         },
         "after": {
             "entity_id": "knowledge-1",
@@ -173,6 +191,7 @@ def test_opks_proposal_view_preserves_operation_grouping_and_snapshots():
             "task_refs": [],
             "indicator_refs": [],
             "evidence_quotes": ["我會整理營運資料"],
+            "display_order": 0,
         },
         "edited_after": None,
         "rejection_reason": None,
@@ -206,6 +225,59 @@ def test_optional_task_text_can_reach_the_mapper_as_blank_or_null():
     ]["enum"]
 
 
+_EMPTY_JD_HEADER = {
+    "competency_name": None,
+    "occupation_category_name": None,
+    "occupation_name": None,
+    "occupation_code": None,
+    "industry_name": None,
+    "industry_code": None,
+    "work_description": None,
+    "competency_level": None,
+    "notes": None,
+}
+
+
+def test_jd_header_contract_keeps_iCAP_assigned_codes_out_and_accepts_partial_writes():
+    expected_fields = set(_EMPTY_JD_HEADER)
+
+    view = _schema()["$defs"]["JdHeaderView"]
+    write = _schema()["$defs"]["JdHeaderWrite"]
+
+    assert set(view["properties"]) == expected_fields
+    assert set(view["required"]) == expected_fields
+    assert write.get("required", []) == []
+    assert set(write["properties"]) == expected_fields
+    for definition in (view, write):
+        for field, shape in definition["properties"].items():
+            if field == "competency_level":
+                assert set(shape["type"]) == {"integer", "null"}
+                assert shape["minimum"] == 1
+                assert shape["maximum"] == 6
+            else:
+                assert set(shape["type"]) == {"string", "null"}
+                assert "minLength" not in shape
+    for forbidden in ("competency_code", "occupation_category_code"):
+        assert forbidden not in expected_fields
+
+
+def test_document_readiness_contract_is_code_only_without_a_completion_verdict():
+    readiness = _schema()["$defs"]["DocumentReadinessView"]
+    issue = _schema()["$defs"]["ReadinessIssueView"]
+
+    assert set(readiness["properties"]) == {"issues"}
+    assert set(issue["properties"]) == {"code"}
+    assert set(issue["properties"]["code"]["enum"]) == {
+        "competency_name_missing",
+        "work_description_missing",
+        "competency_level_missing",
+        "task_duty_missing",
+        "task_competency_level_missing",
+        "duty_without_task",
+        "opks_task_link_missing",
+    }
+
+
 def test_document_view_accepts_one_complete_task_without_extra_fields():
     """A closed allOf branch must not reject fields inherited by JdTaskView."""
 
@@ -214,6 +286,9 @@ def test_document_view_accepts_one_complete_task_without_extra_fields():
         "document_id": "00000000-0000-0000-0000-000000000045",
         "title": "門市營運專員",
         "updated_at": "2026-07-30T09:00:00Z",
+        "jd_header": _EMPTY_JD_HEADER,
+        "readiness": {"issues": []},
+        "duties": [],
         "tasks": [
             {
                 "task_id": "task-1",
@@ -281,4 +356,24 @@ def test_generated_consultation_models_are_exported_from_the_package():
     assert write.entity_kind.value == "knowledge"
     assert OpksItemView.__name__ == "OpksItemView"
     assert OpksProposalView.__name__ == "OpksProposalView"
+
+
+def test_generated_header_models_allow_partial_writes_and_export_code_only_issues():
+    write = JdHeaderWrite(competency_name=" 門市營運專員 ")
+    view = JdHeaderView(**_EMPTY_JD_HEADER)
+    issue = ReadinessIssueView(code="work_description_missing")
+    readiness = DocumentReadinessView(issues=[issue])
+
+    assert write.competency_name == " 門市營運專員 "
+    assert write.notes is None
+    assert view.competency_level is None
+    assert readiness.issues[0].code.value == "work_description_missing"
+
+
+@pytest.mark.parametrize("invalid_level", ["4", True])
+def test_generated_header_write_rejects_non_integer_competency_levels(
+    invalid_level,
+):
+    with pytest.raises(ValidationError):
+        JdHeaderWrite(competency_level=invalid_level)
 

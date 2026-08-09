@@ -17,6 +17,7 @@ import {
   emptyTaskForm,
   fromTaskView,
   isTaskFormDirty,
+  moveTaskWithinDuty,
   type TaskFormValue,
   toTaskWrite,
 } from "@/lib/jobAnalysisForm";
@@ -44,10 +45,12 @@ export function TaskEditor({
   documentId,
   embedded = false,
   onDirtyChange,
+  onBusyChange,
 }: {
   documentId: string;
   embedded?: boolean;
   onDirtyChange?: (dirty: boolean) => void;
+  onBusyChange?: (busy: boolean) => void;
 }) {
   const queryClient = useQueryClient();
   const document = useQuery(documentQueryOptions(documentId));
@@ -101,6 +104,14 @@ export function TaskEditor({
     onDirtyChange?.(dirty);
   }, [dirty, onDirtyChange]);
 
+  const busy =
+    saveMutation.isPending || deleteMutation.isPending || reorderMutation.isPending;
+
+  useEffect(() => {
+    onBusyChange?.(busy);
+    return () => onBusyChange?.(false);
+  }, [busy, onBusyChange]);
+
   const startNew = () => {
     saveMutation.reset();
     const value = emptyTaskForm();
@@ -152,13 +163,14 @@ export function TaskEditor({
     );
   };
 
-  const move = (index: number, offset: -1 | 1) => {
+  const move = (taskId: string, dutyId: string | null, offset: -1 | 1) => {
     if (!document.data) return;
-    const next = [...document.data.tasks];
-    const target = index + offset;
-    if (target < 0 || target >= next.length) return;
-    [next[index], next[target]] = [next[target], next[index]];
-    const orderedTaskIds = next.map((task) => task.task_id);
+    const orderedTaskIds = moveTaskWithinDuty(
+      document.data.tasks,
+      taskId,
+      dutyId,
+      offset,
+    );
     const previous = reorderMutation.variables;
     reorderMutation.mutate(
       reorderMutation.isError &&
@@ -179,8 +191,20 @@ export function TaskEditor({
     );
   }
 
-  const busy =
-    saveMutation.isPending || deleteMutation.isPending || reorderMutation.isPending;
+  const taskGroups = [
+    ...document.data.duties.map((duty) => ({
+      dutyId: duty.duty_id as string | null,
+      title: duty.statement,
+      tasks: document.data.tasks.filter(
+        (task) => task.duty_id === duty.duty_id,
+      ),
+    })),
+    {
+      dutyId: null,
+      title: "未分組",
+      tasks: document.data.tasks.filter((task) => (task.duty_id ?? null) === null),
+    },
+  ];
 
   return (
     <div className={embedded ? "" : "min-h-screen bg-muted/30"}>
@@ -232,6 +256,7 @@ export function TaskEditor({
               onCancel={cancel}
               isSaving={saveMutation.isPending}
               canSave={dirty}
+              duties={document.data.duties}
               error={saveMutation.isError ? errorText(saveMutation.error) : undefined}
             />
           </Card>
@@ -246,17 +271,31 @@ export function TaskEditor({
           </div>
         ) : null}
 
-        {document.data.tasks.map((task, index) => (
+        {taskGroups.map((group) => (
+          <section key={group.dutyId ?? "unassigned"} className="space-y-3">
+            <div className="flex items-baseline justify-between">
+              <h2 className="text-base font-semibold">{group.title}</h2>
+              <span className="text-xs text-muted-foreground">
+                {group.tasks.length} 項工作
+              </span>
+            </div>
+            {group.tasks.length === 0 ? (
+              <p className="rounded-lg border border-dashed px-4 py-3 text-sm text-muted-foreground">
+                尚無工作
+              </p>
+            ) : null}
+            {group.tasks.map((task, index) => (
           <Card key={task.task_id} className="p-5">
             {editingTaskId === task.task_id && draft ? (
               <TaskForm
                 value={draft}
                 onChange={setDraft}
-                onSave={save}
-                onCancel={cancel}
-                isSaving={saveMutation.isPending}
-                canSave={dirty}
-                error={saveMutation.isError ? errorText(saveMutation.error) : undefined}
+              onSave={save}
+              onCancel={cancel}
+              isSaving={saveMutation.isPending}
+              canSave={dirty}
+              duties={document.data.duties}
+              error={saveMutation.isError ? errorText(saveMutation.error) : undefined}
               />
             ) : (
               <div className="space-y-4">
@@ -273,7 +312,7 @@ export function TaskEditor({
                       size="icon"
                       aria-label="上移"
                       disabled={busy || index === 0 || editingTaskId !== null}
-                      onClick={() => move(index, -1)}
+                      onClick={() => move(task.task_id, group.dutyId, -1)}
                     >
                       <ArrowUp />
                     </Button>
@@ -283,10 +322,10 @@ export function TaskEditor({
                       aria-label="下移"
                       disabled={
                         busy ||
-                        index === document.data.tasks.length - 1 ||
+                        index === group.tasks.length - 1 ||
                         editingTaskId !== null
                       }
-                      onClick={() => move(index, 1)}
+                      onClick={() => move(task.task_id, group.dutyId, 1)}
                     >
                       <ArrowDown />
                     </Button>
@@ -331,6 +370,15 @@ export function TaskEditor({
                             : "尚未填寫"}
                     </dd>
                   </div>
+                  <div>
+                    <dt className="text-xs text-muted-foreground">職能級別</dt>
+                    <dd>
+                      {task.competency_level === null ||
+                      task.competency_level === undefined
+                        ? "尚未判定"
+                        : `第 ${task.competency_level} 級`}
+                    </dd>
+                  </div>
                 </dl>
                 <div className="text-sm">
                   <p className="text-xs text-muted-foreground">工具／方法／知識／技能</p>
@@ -343,6 +391,8 @@ export function TaskEditor({
               </div>
             )}
           </Card>
+            ))}
+          </section>
         ))}
 
         <div aria-live="polite" className="min-h-5 text-sm text-destructive">

@@ -22,6 +22,7 @@ output/
 Thumbs.db
 .claude/
 .codex-remote-attachments/
+.worktrees/
 
 # personal, local-only agent notes (shared orientation lives in the tracked CLAUDE.md / AGENTS.md)
 CLAUDE.local.md

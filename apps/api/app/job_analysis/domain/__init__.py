@@ -1,6 +1,8 @@
 """Pure immutable Task（§9/§10）與 OPKS（ADR 0048–0051）contracts。"""
 
 from .base import DomainModel, Identifier, NonEmptyText, TaskId
+from .duty import Duty, DutyId
+from .jd_header import JdHeader
 from .opks import (
     CurrentJdOpks,
     OpksEntityKind,
@@ -67,12 +69,15 @@ __all__ = [
     "CurrentJdOpks",
     "CurrentWorkModel",
     "DomainModel",
+    "Duty",
+    "DutyId",
     "Enabler",
     "EnablerKind",
     "ExcludedSignal",
     "ExclusionReason",
     "Identifier",
     "JdEntry",
+    "JdHeader",
     "JdTask",
     "JdTaskFields",
     "MergeTarget",

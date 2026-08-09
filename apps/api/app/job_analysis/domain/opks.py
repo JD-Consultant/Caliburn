@@ -5,7 +5,7 @@ from __future__ import annotations
 from enum import StrEnum
 from typing import Literal
 
-from pydantic import model_validator
+from pydantic import Field, model_validator
 
 from .base import DomainModel, Identifier, NonEmptyText, TaskId
 from .sources import SourceAnchor, SourceKind
@@ -41,6 +41,7 @@ class OpksItem(DomainModel):
     entity_id: Identifier
     entity_kind: OpksEntityKind
     text: NonEmptyText
+    display_order: int = Field(default=0, ge=0)
     task_refs: tuple[TaskId, ...] = ()
     indicator_refs: tuple[Identifier, ...] = ()
     evidence_links: tuple[OpksEvidenceLink, ...]
@@ -122,6 +123,28 @@ class CurrentJdOpks(DomainModel):
         if len(set(ids)) != len(ids):
             raise ValueError("duplicate OPKS entity id")
         return self
+
+    @model_validator(mode="after")
+    def display_orders_are_unique_within_entity_kind(self):
+        seen: set[tuple[OpksEntityKind, int]] = set()
+        for item in self.items:
+            key = (item.entity_kind, item.display_order)
+            if key in seen:
+                raise ValueError(
+                    "duplicate OPKS display order within entity kind"
+                )
+            seen.add(key)
+        return self
+
+    def next_display_order(self, entity_kind: OpksEntityKind) -> int:
+        return max(
+            (
+                item.display_order
+                for item in self.items
+                if item.entity_kind is entity_kind
+            ),
+            default=-1,
+        ) + 1
 
     @model_validator(mode="after")
     def indicator_refs_target_indicators(self):

@@ -36,6 +36,89 @@
         "updated_at": { "type": "string", "format": "date-time" }
       }
     },
+    "JdHeaderView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "competency_name",
+        "occupation_category_name",
+        "occupation_name",
+        "occupation_code",
+        "industry_name",
+        "industry_code",
+        "work_description",
+        "competency_level",
+        "notes"
+      ],
+      "properties": {
+        "competency_name": { "type": ["string", "null"] },
+        "occupation_category_name": { "type": ["string", "null"] },
+        "occupation_name": { "type": ["string", "null"] },
+        "occupation_code": { "type": ["string", "null"] },
+        "industry_name": { "type": ["string", "null"] },
+        "industry_code": { "type": ["string", "null"] },
+        "work_description": { "type": ["string", "null"] },
+        "competency_level": {
+          "type": ["integer", "null"],
+          "minimum": 1,
+          "maximum": 6
+        },
+        "notes": { "type": ["string", "null"] }
+      }
+    },
+    "JdHeaderWrite": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "competency_name": { "type": ["string", "null"], "default": null },
+        "occupation_category_name": {
+          "type": ["string", "null"],
+          "default": null
+        },
+        "occupation_name": { "type": ["string", "null"], "default": null },
+        "occupation_code": { "type": ["string", "null"], "default": null },
+        "industry_name": { "type": ["string", "null"], "default": null },
+        "industry_code": { "type": ["string", "null"], "default": null },
+        "work_description": { "type": ["string", "null"], "default": null },
+        "competency_level": {
+          "type": ["integer", "null"],
+          "minimum": 1,
+          "maximum": 6,
+          "default": null
+        },
+        "notes": { "type": ["string", "null"], "default": null }
+      }
+    },
+    "ReadinessIssueView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code"],
+      "properties": {
+        "code": {
+          "type": "string",
+          "enum": [
+            "competency_name_missing",
+            "work_description_missing",
+            "competency_level_missing",
+            "task_duty_missing",
+            "task_competency_level_missing",
+            "duty_without_task",
+            "opks_task_link_missing"
+          ]
+        }
+      }
+    },
+    "DocumentReadinessView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["issues"],
+      "properties": {
+        "issues": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ReadinessIssueView" }
+        }
+      }
+    },
     "Enabler": {
       "type": "object",
       "additionalProperties": false,
@@ -71,6 +154,13 @@
         "enablers": {
           "type": "array",
           "items": { "$ref": "#/$defs/Enabler" }
+        },
+        "duty_id": { "type": ["string", "null"], "default": null },
+        "competency_level": {
+          "type": ["integer", "null"],
+          "minimum": 1,
+          "maximum": 6,
+          "default": null
         }
       }
     },
@@ -101,6 +191,31 @@
           "type": "array",
           "items": { "$ref": "#/$defs/Enabler" }
         },
+        "duty_id": { "type": ["string", "null"], "default": null },
+        "competency_level": {
+          "type": ["integer", "null"],
+          "minimum": 1,
+          "maximum": 6,
+          "default": null
+        },
+        "display_order": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "DutyWrite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["statement"],
+      "properties": {
+        "statement": { "type": "string" }
+      }
+    },
+    "DutyView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["duty_id", "statement", "display_order"],
+      "properties": {
+        "duty_id": { "type": "string" },
+        "statement": { "type": "string" },
         "display_order": { "type": "integer", "minimum": 0 }
       }
     },
@@ -133,7 +248,8 @@
         "text",
         "task_refs",
         "indicator_refs",
-        "evidence_quotes"
+        "evidence_quotes",
+        "display_order"
       ],
       "properties": {
         "entity_id": { "type": "string" },
@@ -153,7 +269,8 @@
         "evidence_quotes": {
           "type": "array",
           "items": { "type": "string" }
-        }
+        },
+        "display_order": { "type": "integer", "minimum": 0 }
       }
     },
     "OpksTaskStatusView": {
@@ -233,6 +350,9 @@
         "document_id",
         "title",
         "updated_at",
+        "jd_header",
+        "readiness",
+        "duties",
         "tasks",
         "opks_items",
         "opks_task_status"
@@ -241,6 +361,12 @@
         "document_id": { "type": "string", "format": "uuid" },
         "title": { "type": "string" },
         "updated_at": { "type": "string", "format": "date-time" },
+        "jd_header": { "$ref": "#/$defs/JdHeaderView" },
+        "readiness": { "$ref": "#/$defs/DocumentReadinessView" },
+        "duties": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/DutyView" }
+        },
         "tasks": {
           "type": "array",
           "items": { "$ref": "#/$defs/JdTaskView" }
@@ -436,6 +562,32 @@
         }
       }
     },
+    "OpksOrderWrite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["entity_kind", "ordered_entity_ids"],
+      "properties": {
+        "entity_kind": {
+          "type": "string",
+          "enum": ["output", "indicator", "knowledge", "skill", "attitude"]
+        },
+        "ordered_entity_ids": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "DutyOrderWrite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ordered_duty_ids"],
+      "properties": {
+        "ordered_duty_ids": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
     "ProblemFieldError": {
       "type": "object",
       "additionalProperties": false,
@@ -458,6 +610,9 @@
             "https://caliburn.dev/problems/job-analysis/idempotency-conflict",
             "https://caliburn.dev/problems/job-analysis/authority-conflict",
             "https://caliburn.dev/problems/job-analysis/invalid-task-order",
+            "https://caliburn.dev/problems/job-analysis/duty-not-found",
+            "https://caliburn.dev/problems/job-analysis/invalid-duty-order",
+            "https://caliburn.dev/problems/job-analysis/invalid-opks-order",
             "https://caliburn.dev/problems/job-analysis/invalid-request",
             "https://caliburn.dev/problems/job-analysis/proposal-not-found",
             "https://caliburn.dev/problems/job-analysis/consultant-unavailable",

@@ -25,9 +25,11 @@ from app.job_analysis.domain import (
     CurrentJdOpks,
     CurrentWorkModel,
     DomainModel,
+    Duty,
     ExcludedSignal,
     Identifier,
     JdEntry,
+    JdHeader,
     JdTask,
     MergeTarget,
     NonEmptyText,
@@ -73,6 +75,8 @@ from .verifier import verify_task_analysis_result
 class JobAnalysisState(DomainModel):
     """一名員工、一份職務說明書的目前狀態(§9.4 的兩層)。"""
 
+    jd_header: JdHeader
+    current_duties: tuple[Duty, ...]
     work_model: CurrentWorkModel = CurrentWorkModel()
     current_jd: tuple[JdTask, ...] = ()
     proposals: tuple[Proposal, ...] = ()
@@ -81,6 +85,17 @@ class JobAnalysisState(DomainModel):
 
     @model_validator(mode="after")
     def ids_are_unique_and_jd_is_canonical(self):
+        duty_ids = [duty.duty_id for duty in self.current_duties]
+        if len(set(duty_ids)) != len(duty_ids):
+            raise ValueError("duplicate Duty ids")
+        expected_duties = sorted(
+            self.current_duties, key=lambda duty: (duty.display_order, duty.duty_id)
+        )
+        if list(self.current_duties) != expected_duties:
+            raise ValueError("Duties must be sorted by display order and duty id")
+        duty_display_orders = [duty.display_order for duty in self.current_duties]
+        if len(set(duty_display_orders)) != len(duty_display_orders):
+            raise ValueError("Duty display orders must be unique")
         jd_ids = [entry.task_id for entry in self.current_jd]
         if len(set(jd_ids)) != len(jd_ids):
             raise ValueError("duplicate current JD task ids")
@@ -92,6 +107,16 @@ class JobAnalysisState(DomainModel):
         display_orders = [task.display_order for task in self.current_jd]
         if len(set(display_orders)) != len(display_orders):
             raise ValueError("current JD task display orders must be unique")
+        known_duties = set(duty_ids)
+        unknown_duties = sorted(
+            {
+                task.duty_id
+                for task in self.current_jd
+                if task.duty_id is not None and task.duty_id not in known_duties
+            }
+        )
+        if unknown_duties:
+            raise ValueError(f"unknown Duty ids: {unknown_duties}")
         proposal_ids = [proposal.proposal_id for proposal in self.proposals]
         if len(set(proposal_ids)) != len(proposal_ids):
             raise ValueError("duplicate proposal ids")
@@ -833,6 +858,10 @@ class _Writer:
                 existing.responsibility_role if existing is not None else None
             ),
             enablers=fields.enablers,
+            duty_id=(existing.duty_id if existing is not None else None),
+            competency_level=(
+                existing.competency_level if existing is not None else None
+            ),
             display_order=(
                 existing.display_order
                 if existing is not None
@@ -962,6 +991,8 @@ class _Writer:
         return TransitionResult(
             outcome=TransitionOutcome.APPLIED,
             state=JobAnalysisState(
+                jd_header=self._state.jd_header,
+                current_duties=self._state.current_duties,
                 work_model=work_model,
                 current_jd=self._state.current_jd,
                 proposals=tuple(self._proposals.values()),

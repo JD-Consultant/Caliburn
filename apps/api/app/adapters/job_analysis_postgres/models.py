@@ -54,6 +54,8 @@ class JobAnalysisDocumentRow(Base):
 
     document_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True))
     title: Mapped[str] = mapped_column(Text, nullable=False)
+    jd_header_schema_id: Mapped[str] = mapped_column(Text, nullable=False)
+    jd_header_json: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
     work_model_schema_id: Mapped[str] = mapped_column(Text, nullable=False)
     work_model_json: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
     active_question_json: Mapped[dict[str, Any] | None] = mapped_column(
@@ -107,6 +109,8 @@ class JobAnalysisJdTaskRow(Base):
     frequency_text: Mapped[str | None] = mapped_column(Text, nullable=True)
     responsibility_role: Mapped[str | None] = mapped_column(Text, nullable=True)
     enablers_json: Mapped[list[dict[str, Any]]] = mapped_column(JSONB, nullable=False)
+    duty_id: Mapped[str | None] = mapped_column(Text, nullable=True)
+    competency_level: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
     display_order: Mapped[int] = mapped_column(BigInteger, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
@@ -122,6 +126,16 @@ class JobAnalysisJdTaskRow(Base):
             ["job_analysis_documents.document_id"],
             name="ja2_fk_jd_tasks_document",
             ondelete="CASCADE",
+        ),
+        ForeignKeyConstraint(
+            ["document_id", "duty_id"],
+            [
+                "job_analysis_jd_duties.document_id",
+                "job_analysis_jd_duties.duty_id",
+            ],
+            name="ja2_fk_jd_tasks_duty",
+            deferrable=True,
+            initially="DEFERRED",
         ),
         UniqueConstraint(
             "document_id",
@@ -146,12 +160,66 @@ class JobAnalysisJdTaskRow(Base):
             name="ja2_ck_jd_tasks_enablers_json",
         ),
         CheckConstraint(
+            "duty_id IS NULL OR btrim(duty_id) <> ''",
+            name="ja2_ck_jd_tasks_duty_id",
+        ),
+        CheckConstraint(
+            "competency_level IS NULL OR competency_level BETWEEN 1 AND 6",
+            name="ja2_ck_jd_tasks_competency_level",
+        ),
+        CheckConstraint(
             "display_order >= 0",
             name="ja2_ck_jd_tasks_display_order",
         ),
         CheckConstraint(
             "updated_at >= created_at",
             name="ja2_ck_jd_tasks_time_order",
+        ),
+    )
+
+
+class JobAnalysisJdDutyRow(Base):
+    __tablename__ = "job_analysis_jd_duties"
+
+    document_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True))
+    duty_id: Mapped[str] = mapped_column(Text)
+    statement: Mapped[str] = mapped_column(Text, nullable=False)
+    display_order: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+
+    __table_args__ = (
+        PrimaryKeyConstraint(
+            "document_id",
+            "duty_id",
+            name="ja2_pk_jd_duties",
+        ),
+        ForeignKeyConstraint(
+            ["document_id"],
+            ["job_analysis_documents.document_id"],
+            name="ja2_fk_jd_duties_document",
+            ondelete="CASCADE",
+        ),
+        UniqueConstraint(
+            "document_id",
+            "display_order",
+            name="ja2_uq_jd_duties_order",
+        ),
+        CheckConstraint(
+            "btrim(duty_id) <> ''",
+            name="ja2_ck_jd_duties_id",
+        ),
+        CheckConstraint(
+            "btrim(statement) <> ''",
+            name="ja2_ck_jd_duties_statement",
+        ),
+        CheckConstraint(
+            "display_order >= 0",
+            name="ja2_ck_jd_duties_display_order",
+        ),
+        CheckConstraint(
+            "updated_at >= created_at",
+            name="ja2_ck_jd_duties_time_order",
         ),
     )
 
@@ -228,6 +296,7 @@ class JobAnalysisOpksItemRow(Base):
     document_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True))
     entity_id: Mapped[str] = mapped_column(Text)
     entity_kind: Mapped[str] = mapped_column(Text, nullable=False)
+    display_order: Mapped[int] = mapped_column(BigInteger, nullable=False)
     item_schema_id: Mapped[str] = mapped_column(Text, nullable=False)
     item_payload: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
@@ -247,6 +316,16 @@ class JobAnalysisOpksItemRow(Base):
         ),
         CheckConstraint("btrim(entity_id) <> ''", name="ja2_ck_opks_items_id"),
         CheckConstraint(_OPKS_ENTITY_KINDS, name="ja2_ck_opks_items_kind"),
+        CheckConstraint(
+            "display_order >= 0",
+            name="ja2_ck_opks_items_display_order",
+        ),
+        UniqueConstraint(
+            "document_id",
+            "entity_kind",
+            "display_order",
+            name="ja2_uq_opks_items_kind_order",
+        ),
         CheckConstraint(
             "btrim(item_schema_id) <> ''",
             name="ja2_ck_opks_items_schema",

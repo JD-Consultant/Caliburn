@@ -357,6 +357,8 @@ async def _persist(
     current_opks: CurrentJdOpks | None = None,
 ) -> None:
     state = JobAnalysisState(
+        jd_header=record.jd_header,
+        current_duties=await uow.duties.list(record.document_id),
         work_model=work_model,
         current_jd=current_jd,
         proposals=proposals,

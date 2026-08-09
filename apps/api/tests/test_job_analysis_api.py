@@ -11,7 +11,18 @@ import pytest
 import pytest_asyncio
 
 from app.api import deps
+from app.api.routes import job_analysis as job_analysis_routes
 from app.job_analysis.application import DocumentRecord, DocumentSummary
+from app.job_analysis.application.durable_turn import _require_verified
+from app.job_analysis.application.operation import (
+    OperationOutcome,
+    TaskAnalysisOperationResult,
+)
+from app.job_analysis.application.verifier import (
+    VerificationReport,
+    Violation,
+    ViolationCode,
+)
 from app.job_analysis.domain import (
     CurrentWorkModel,
     JdTask,
@@ -54,6 +65,7 @@ DOCUMENT_ID = UUID("00000000-0000-0000-0000-000000000045")
 class _Store:
     def __init__(self) -> None:
         self.document: DocumentRecord | None = None
+        self.duties = ()
         self.tasks: tuple[JdTask, ...] = ()
         self.proposals = ()
         self.opks = ()
@@ -105,6 +117,7 @@ class _Documents:
         document_id: UUID,
         *,
         expected_generation: int,
+        jd_header,
         work_model,
         active_question,
         updated_at: datetime,
@@ -118,6 +131,7 @@ class _Documents:
             return False
         self.store.document = replace(
             record,
+            jd_header=jd_header,
             work_model=work_model,
             active_question=active_question,
             authority_generation=expected_generation + 1,
@@ -135,6 +149,19 @@ class _Tasks:
 
     async def replace(self, document_id: UUID, tasks) -> None:
         self.store.tasks = tasks
+
+
+class _Duties:
+    """Explicit empty Duty port; production state may not silently omit it."""
+
+    def __init__(self, store: _Store) -> None:
+        self.store = store
+
+    async def list(self, document_id: UUID):
+        return self.store.duties
+
+    async def replace(self, document_id: UUID, duties) -> None:
+        self.store.duties = duties
 
 
 class _Proposals:
@@ -196,6 +223,7 @@ class _Journal:
 class _UnitOfWork:
     def __init__(self, store: _Store) -> None:
         self.documents = _Documents(store)
+        self.duties = _Duties(store)
         self.tasks = _Tasks(store)
         self.proposals = _Proposals(store)
         self.opks = _Opks(store)
@@ -342,7 +370,7 @@ async def test_put_creates_then_replaces_only_document_metadata(api_client):
     assert opening.kind == "consultant_opening"
 
 
-async def test_list_and_open_return_only_the_current_jd_projection(api_client):
+async def test_list_and_open_return_the_current_workspace_projection(api_client):
     client, store, _ = api_client
     await client.put(
         f"/api/v1/job-analysis/documents/{DOCUMENT_ID}",
@@ -368,6 +396,9 @@ async def test_list_and_open_return_only_the_current_jd_projection(api_client):
         "document_id",
         "title",
         "updated_at",
+        "jd_header",
+        "readiness",
+        "duties",
         "tasks",
         "opks_items",
         "opks_task_status",
@@ -771,6 +802,44 @@ async def test_consultant_failure_does_not_leak_provider_details_or_change_state
     assert "anthropic" not in failed.text.lower()
     assert "provider" not in failed.text.lower()
     assert len(reloaded.json()["conversation"]) == 1
+
+
+async def test_not_committable_diagnostics_log_codes_without_operation_detail(
+    api_client, monkeypatch, caplog
+):
+    client, _, _ = api_client
+    root = f"/api/v1/job-analysis/documents/{DOCUMENT_ID}"
+    await client.put(root, json={"title": "門市營運專員"})
+    sentinel = "employee/provider secret must never reach logs"
+    operation_result = TaskAnalysisOperationResult(
+        outcome=OperationOutcome.FAILED,
+        detail=sentinel,
+        report=VerificationReport(
+            violations=(
+                Violation(
+                    code=ViolationCode.ANCHOR_MISSING,
+                    detail="internal verifier detail",
+                ),
+            )
+        ),
+    )
+
+    async def fail_submit(*args, **kwargs):
+        _require_verified(operation_result)
+
+    monkeypatch.setattr(job_analysis_routes, "submit_employee_turn", fail_submit)
+    with caplog.at_level("WARNING", logger="app.api.routes.job_analysis"):
+        failed = await client.post(
+            f"{root}/turns",
+            headers={"Idempotency-Key": "unsafe-diagnostics"},
+            json={"text": "我每週彙整營運週報"},
+        )
+
+    assert failed.status_code == 503
+    assert "UncommittableOperationResult" in caplog.text
+    assert "outcome=failed" in caplog.text
+    assert "anchor_missing" in caplog.text
+    assert sentinel not in caplog.text
 
 
 async def test_the_manual_opks_generation_entry_is_retired(api_client):

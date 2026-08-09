@@ -13,6 +13,7 @@ from app.job_analysis.application import (
     OPKS_ITEM_SCHEMA_ID,
     OPKS_PROPOSAL_SCHEMA_ID,
     PROPOSAL_SCHEMA_ID,
+    JD_HEADER_SCHEMA_ID,
     WORK_MODEL_SCHEMA_ID,
     ActiveQuestion,
     CompletedTurnPayload,
@@ -24,7 +25,9 @@ from app.job_analysis.application import (
 )
 from app.job_analysis.domain import (
     CurrentWorkModel,
+    JdHeader,
     JdTask,
+    Duty,
     OpksItem,
     OpksProposal,
     OpksProposalStatus,
@@ -35,6 +38,7 @@ from app.job_analysis.domain import (
 from . import serialization as ser
 from .models import (
     JobAnalysisDocumentRow,
+    JobAnalysisJdDutyRow,
     JobAnalysisJdTaskRow,
     JobAnalysisJournalRow,
     JobAnalysisOpksItemRow,
@@ -52,6 +56,8 @@ class SqlAlchemyDocumentRepository:
             JobAnalysisDocumentRow(
                 document_id=record.document_id,
                 title=record.title,
+                jd_header_schema_id=JD_HEADER_SCHEMA_ID,
+                jd_header_json=ser.dump_jd_header(record.jd_header),
                 work_model_schema_id=WORK_MODEL_SCHEMA_ID,
                 work_model_json=ser.dump_work_model(record.work_model),
                 active_question_json=ser.dump_active_question(record.active_question),
@@ -123,6 +129,7 @@ class SqlAlchemyDocumentRepository:
         document_id: UUID,
         *,
         expected_generation: int,
+        jd_header: JdHeader,
         work_model: CurrentWorkModel,
         active_question: ActiveQuestion | None,
         updated_at: datetime,
@@ -134,6 +141,8 @@ class SqlAlchemyDocumentRepository:
                 JobAnalysisDocumentRow.authority_generation == expected_generation,
             )
             .values(
+                jd_header_schema_id=JD_HEADER_SCHEMA_ID,
+                jd_header_json=ser.dump_jd_header(jd_header),
                 work_model_schema_id=WORK_MODEL_SCHEMA_ID,
                 work_model_json=ser.dump_work_model(work_model),
                 active_question_json=ser.dump_active_question(active_question),
@@ -187,11 +196,70 @@ class SqlAlchemyJdTaskRepository:
                         else None
                     ),
                     enablers_json=ser.dump_jd_task_enablers(task),
+                    duty_id=task.duty_id,
+                    competency_level=task.competency_level,
                     display_order=task.display_order,
                     created_at=now,
                     updated_at=now,
                 )
                 for task in tasks
+            ]
+        )
+
+
+class SqlAlchemyDutyRepository:
+    def __init__(self, session: AsyncSession) -> None:
+        self._session = session
+
+    async def list(self, document_id: UUID) -> tuple[Duty, ...]:
+        rows = (
+            await self._session.scalars(
+                select(JobAnalysisJdDutyRow)
+                .where(JobAnalysisJdDutyRow.document_id == document_id)
+                .order_by(
+                    JobAnalysisJdDutyRow.display_order,
+                    JobAnalysisJdDutyRow.duty_id,
+                )
+            )
+        ).all()
+        return tuple(ser.load_duty(row) for row in rows)
+
+    async def replace(
+        self,
+        document_id: UUID,
+        duties: tuple[Duty, ...],
+    ) -> None:
+        existing = {
+            row.duty_id: row
+            for row in (
+                await self._session.scalars(
+                    select(JobAnalysisJdDutyRow).where(
+                        JobAnalysisJdDutyRow.document_id == document_id
+                    )
+                )
+            ).all()
+        }
+        await self._session.execute(
+            delete(JobAnalysisJdDutyRow).where(
+                JobAnalysisJdDutyRow.document_id == document_id
+            )
+        )
+        now = datetime.now(UTC)
+        self._session.add_all(
+            [
+                JobAnalysisJdDutyRow(
+                    document_id=document_id,
+                    duty_id=duty.duty_id,
+                    statement=duty.statement,
+                    display_order=duty.display_order,
+                    created_at=(
+                        existing[duty.duty_id].created_at
+                        if duty.duty_id in existing
+                        else now
+                    ),
+                    updated_at=now,
+                )
+                for duty in duties
             ]
         )
 
@@ -294,7 +362,8 @@ class SqlAlchemyOpksRepository:
                 select(JobAnalysisOpksItemRow)
                 .where(JobAnalysisOpksItemRow.document_id == document_id)
                 .order_by(
-                    JobAnalysisOpksItemRow.created_at,
+                    JobAnalysisOpksItemRow.entity_kind,
+                    JobAnalysisOpksItemRow.display_order,
                     JobAnalysisOpksItemRow.entity_id,
                 )
             )
@@ -328,6 +397,7 @@ class SqlAlchemyOpksRepository:
                     document_id=document_id,
                     entity_id=item.entity_id,
                     entity_kind=item.entity_kind.value,
+                    display_order=item.display_order,
                     item_schema_id=OPKS_ITEM_SCHEMA_ID,
                     item_payload=ser.dump_opks_item_payload(item),
                     created_at=(
@@ -469,6 +539,7 @@ class SqlAlchemyJobAnalysisUnitOfWork:
         self._committed = False
         self.documents: SqlAlchemyDocumentRepository
         self.tasks: SqlAlchemyJdTaskRepository
+        self.duties: SqlAlchemyDutyRepository
         self.proposals: SqlAlchemyProposalRepository
         self.opks: SqlAlchemyOpksRepository
         self.opks_proposals: SqlAlchemyOpksProposalRepository
@@ -481,6 +552,7 @@ class SqlAlchemyJobAnalysisUnitOfWork:
         await self._session.begin()
         self.documents = SqlAlchemyDocumentRepository(self._session)
         self.tasks = SqlAlchemyJdTaskRepository(self._session)
+        self.duties = SqlAlchemyDutyRepository(self._session)
         self.proposals = SqlAlchemyProposalRepository(self._session)
         self.opks = SqlAlchemyOpksRepository(self._session)
         self.opks_proposals = SqlAlchemyOpksProposalRepository(self._session)

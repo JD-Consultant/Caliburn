@@ -37,6 +37,57 @@ export interface DocumentSummary {
 }
 /**
  * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "JdHeaderView".
+ */
+export interface JdHeaderView {
+  competency_name: string | null;
+  occupation_category_name: string | null;
+  occupation_name: string | null;
+  occupation_code: string | null;
+  industry_name: string | null;
+  industry_code: string | null;
+  work_description: string | null;
+  competency_level: number | null;
+  notes: string | null;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "JdHeaderWrite".
+ */
+export interface JdHeaderWrite {
+  competency_name?: string | null;
+  occupation_category_name?: string | null;
+  occupation_name?: string | null;
+  occupation_code?: string | null;
+  industry_name?: string | null;
+  industry_code?: string | null;
+  work_description?: string | null;
+  competency_level?: number | null;
+  notes?: string | null;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "ReadinessIssueView".
+ */
+export interface ReadinessIssueView {
+  code:
+    | "competency_name_missing"
+    | "work_description_missing"
+    | "competency_level_missing"
+    | "task_duty_missing"
+    | "task_competency_level_missing"
+    | "duty_without_task"
+    | "opks_task_link_missing";
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "DocumentReadinessView".
+ */
+export interface DocumentReadinessView {
+  issues: ReadinessIssueView[];
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
  * via the `definition` "Enabler".
  */
 export interface Enabler {
@@ -54,6 +105,8 @@ export interface JdTaskWrite {
   frequency_text: string | null;
   responsibility_role: "primary" | "shared" | "assist" | "" | null;
   enablers: Enabler[];
+  duty_id?: string | null;
+  competency_level?: number | null;
 }
 /**
  * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
@@ -67,6 +120,24 @@ export interface JdTaskView {
   frequency_text: string | null;
   responsibility_role: "primary" | "shared" | "assist" | null;
   enablers: Enabler[];
+  duty_id?: string | null;
+  competency_level?: number | null;
+  display_order: number;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "DutyWrite".
+ */
+export interface DutyWrite {
+  statement: string;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "DutyView".
+ */
+export interface DutyView {
+  duty_id: string;
+  statement: string;
   display_order: number;
 }
 /**
@@ -90,6 +161,7 @@ export interface OpksItemView {
   task_refs: string[];
   indicator_refs: string[];
   evidence_quotes: string[];
+  display_order: number;
 }
 /**
  * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
@@ -124,6 +196,9 @@ export interface DocumentView {
   document_id: string;
   title: string;
   updated_at: string;
+  jd_header: JdHeaderView;
+  readiness: DocumentReadinessView;
+  duties: DutyView[];
   tasks: JdTaskView[];
   opks_items: OpksItemView[];
   opks_task_status: OpksTaskStatusView[];
@@ -216,6 +291,21 @@ export interface TaskOrderWrite {
 }
 /**
  * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "OpksOrderWrite".
+ */
+export interface OpksOrderWrite {
+  entity_kind: "output" | "indicator" | "knowledge" | "skill" | "attitude";
+  ordered_entity_ids: string[];
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "DutyOrderWrite".
+ */
+export interface DutyOrderWrite {
+  ordered_duty_ids: string[];
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
  * via the `definition` "ProblemFieldError".
  */
 export interface ProblemFieldError {
@@ -233,6 +323,9 @@ export interface ProblemDetail {
     | "https://caliburn.dev/problems/job-analysis/idempotency-conflict"
     | "https://caliburn.dev/problems/job-analysis/authority-conflict"
     | "https://caliburn.dev/problems/job-analysis/invalid-task-order"
+    | "https://caliburn.dev/problems/job-analysis/duty-not-found"
+    | "https://caliburn.dev/problems/job-analysis/invalid-duty-order"
+    | "https://caliburn.dev/problems/job-analysis/invalid-opks-order"
     | "https://caliburn.dev/problems/job-analysis/invalid-request"
     | "https://caliburn.dev/problems/job-analysis/proposal-not-found"
     | "https://caliburn.dev/problems/job-analysis/consultant-unavailable"

@@ -12,6 +12,15 @@ export function groupProposals(proposals: ProposalView[]) {
   };
 }
 
+export function visibleProposalEntries(
+  entries: ProposalJdEntryView[],
+  side: "before" | "after",
+): ProposalJdEntryView[] {
+  return side === "before"
+    ? entries.filter((entry) => entry.value !== null)
+    : entries;
+}
+
 export function editableJdAfter(
   entries: ProposalJdEntryView[],
 ): ProposalJdEntryView[] {

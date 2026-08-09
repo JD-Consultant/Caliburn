@@ -1,8 +1,10 @@
 # Legacy Cleanup 與 Monorepo 邊界整理設計
 
 - 日期：2026-08-10
-- 狀態：Proposed，待 owner review
+- 狀態：Approved for implementation（owner 於 2026-08-10 指示研究後直接執行）
 - 範圍：第一階段安全清理與架構規範整理
+
+實作步驟見 [`../plans/2026-08-10-legacy-cleanup-and-monorepo-boundary-plan.md`](../plans/2026-08-10-legacy-cleanup-and-monorepo-boundary-plan.md)。
 
 ## 1. 目標與不變量
 

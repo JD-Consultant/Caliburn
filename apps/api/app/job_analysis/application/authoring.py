@@ -9,6 +9,7 @@ from uuid import UUID
 from app.job_analysis.domain import (
     CurrentJdOpks,
     CurrentWorkModel,
+    JdHeader,
     JdTask,
     JdTaskFields,
     OpenIssue,
@@ -28,15 +29,18 @@ from .errors import (
     DocumentNotFound,
     IdempotencyConflict,
     InvalidJdTaskOrder,
+    JdHeaderNotChanged,
     JdTaskNotFound,
 )
 from .persistence import (
     CONSULTANT_OPENING_SCHEMA_ID,
     DIRECT_EDIT_SCHEMA_ID,
+    JD_HEADER_DIRECT_EDIT_SCHEMA_ID,
     ConsultantOpeningPayload,
     DirectEditPayload,
     DocumentRecord,
     DocumentSummary,
+    JdHeaderDirectEditPayload,
     JobAnalysisUnitOfWork,
     JobAnalysisUnitOfWorkFactory,
     JournalEntry,
@@ -101,6 +105,19 @@ def _require_direct_edit(
     return entry.payload
 
 
+def _require_jd_header_direct_edit(
+    entry: JournalEntry,
+) -> JdHeaderDirectEditPayload:
+    if entry.kind != "direct_edit" or not isinstance(
+        entry.payload,
+        JdHeaderDirectEditPayload,
+    ):
+        raise IdempotencyConflict(
+            f"entry {entry.entry_id!r} already belongs to another operation"
+        )
+    return entry.payload
+
+
 def _reconciled_work_model(
     work_model: CurrentWorkModel,
     *,
@@ -158,7 +175,7 @@ def _reconciled_work_model(
     )
 
 
-def _stale_related_proposals(
+def stale_task_proposals_for_direct_edit(
     proposals: tuple[Proposal, ...],
     *,
     affected_task_ids: frozenset[TaskId],
@@ -211,6 +228,8 @@ async def _commit_direct_edit(
 ) -> None:
     now = _utcnow()
     state = JobAnalysisState(
+        jd_header=record.jd_header,
+        current_duties=await uow.duties.list(record.document_id),
         work_model=work_model,
         current_jd=tasks,
         proposals=proposals,
@@ -297,6 +316,7 @@ async def put_document_metadata(
         record = DocumentRecord(
             document_id=document_id,
             title=title,
+            jd_header=JdHeader(),
             work_model=CurrentWorkModel(),
             active_question=ActiveQuestion(
                 turn_id=opening_turn.turn_id,
@@ -344,6 +364,8 @@ async def load_document(
         return LoadedDocument(
             document=record,
             state=JobAnalysisState(
+                jd_header=record.jd_header,
+                current_duties=await uow.duties.list(document_id),
                 work_model=record.work_model,
                 current_jd=tasks,
                 proposals=proposals,
@@ -352,6 +374,62 @@ async def load_document(
             ),
             conversation_turns=turns,
         )
+
+
+async def put_jd_header(
+    uow_factory: JobAnalysisUnitOfWorkFactory,
+    *,
+    document_id: UUID,
+    entry_id: str,
+    header: JdHeader,
+) -> JdHeader:
+    """Persist one employee-authored Header through the shared authority seam."""
+
+    async with uow_factory() as uow:
+        record = await _locked_document(uow, document_id)
+        existing_entry = await uow.journal.get(document_id, entry_id)
+        if existing_entry is not None:
+            payload = _require_jd_header_direct_edit(existing_entry)
+            if payload.after != header:
+                raise IdempotencyConflict(
+                    f"entry {entry_id!r} was replayed with another JD header"
+                )
+            return payload.after
+
+        if record.jd_header == header:
+            raise JdHeaderNotChanged(
+                "JD header edit must change at least one field"
+            )
+
+        now = _utcnow()
+        await commit_authority_change(
+            uow,
+            record=record,
+            state=JobAnalysisState(
+                jd_header=header,
+                current_duties=await uow.duties.list(document_id),
+                work_model=record.work_model,
+                current_jd=await uow.tasks.list(document_id),
+                proposals=await uow.proposals.list(document_id),
+                current_opks={"items": await uow.opks.list(document_id)},
+                opks_proposals=await uow.opks_proposals.list(document_id),
+            ),
+            journal_entries=(
+                JournalEntry(
+                    document_id=document_id,
+                    entry_id=entry_id,
+                    kind="direct_edit",
+                    payload_schema_id=JD_HEADER_DIRECT_EDIT_SCHEMA_ID,
+                    payload=JdHeaderDirectEditPayload(
+                        before=record.jd_header,
+                        after=header,
+                    ),
+                    created_at=now,
+                ),
+            ),
+            updated_at=now,
+        )
+        return header
 
 
 async def add_jd_task(
@@ -400,7 +478,7 @@ async def add_jd_task(
             uow,
             record=record,
             tasks=(*tasks, created),
-            proposals=_stale_related_proposals(
+            proposals=stale_task_proposals_for_direct_edit(
                 proposals,
                 affected_task_ids=frozenset({task_id}),
             ),
@@ -462,7 +540,7 @@ async def edit_jd_task(
             uow,
             record=record,
             tasks=next_tasks,
-            proposals=_stale_related_proposals(
+            proposals=stale_task_proposals_for_direct_edit(
                 proposals,
                 affected_task_ids=frozenset({task_id}),
             ),
@@ -525,7 +603,7 @@ async def delete_jd_task(
             uow,
             record=record,
             tasks=next_tasks,
-            proposals=_stale_related_proposals(
+            proposals=stale_task_proposals_for_direct_edit(
                 proposals,
                 affected_task_ids=frozenset({task_id}),
             ),
@@ -595,7 +673,7 @@ async def reorder_jd_tasks(
             uow,
             record=record,
             tasks=reordered,
-            proposals=_stale_related_proposals(
+            proposals=stale_task_proposals_for_direct_edit(
                 proposals,
                 affected_task_ids=frozenset(ordered_task_ids),
             ),

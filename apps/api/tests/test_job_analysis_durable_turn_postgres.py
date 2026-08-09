@@ -21,10 +21,12 @@ from app.job_analysis.application import (
     create_document,
     load_document,
     prepare_turn,
+    put_jd_header,
     select_scheduled_opks,
 )
 from app.job_analysis.domain import (
     CurrentWorkModel,
+    JdHeader,
     JdTask,
     JdTaskFields,
     OpksEntityKind,
@@ -142,7 +144,22 @@ async def test_verified_turn_commits_state_question_journal_and_replays_once(
         document_id=document_id,
         title="門市營運專員",
     )
+    header = JdHeader(
+        competency_name="門市營運管理",
+        work_description="負責門市日常營運與週報彙整。",
+    )
     async with uow_factory() as uow:
+        record = await uow.documents.get(document_id, for_update=True)
+        assert record is not None
+        changed = await uow.documents.update_authority(
+            document_id,
+            expected_generation=record.authority_generation,
+            jd_header=header,
+            work_model=record.work_model,
+            active_question=record.active_question,
+            updated_at=record.updated_at + timedelta(seconds=1),
+        )
+        assert changed
         await uow.opks.replace(document_id, (persisted_attitude(),))
         await uow.opks_proposals.replace(
             document_id,
@@ -175,7 +192,8 @@ async def test_verified_turn_commits_state_question_journal_and_replays_once(
     assert first.is_applied
     assert replay.is_applied
     assert loaded is not None
-    assert loaded.document.authority_generation == 1
+    assert loaded.document.authority_generation == 2
+    assert loaded.state.jd_header == header
     assert [task.task_id for task in loaded.state.work_model.tasks] == [
         "operation-1-t0"
     ]
@@ -224,6 +242,68 @@ async def test_authority_change_after_prepare_rejects_the_old_model_result(
     assert loaded is not None
     assert loaded.document.authority_generation == 1
     assert len(loaded.conversation_turns) == 1
+    assert loaded.state.work_model.tasks == ()
+
+
+async def test_header_change_after_prepare_rejects_the_old_model_result(
+    postgres_session_factory,
+    cleanup_job_analysis_rows,
+):
+    """Header 是本輪讀取的背景 authority，不能讓舊結果覆蓋新描述。"""
+
+    document_id = cleanup_job_analysis_rows
+    uow_factory = factory(postgres_session_factory)
+    await create_document(
+        uow_factory,
+        document_id=document_id,
+        title="門市營運專員",
+    )
+    initial_header = JdHeader(
+        competency_name="門市營運管理",
+        occupation_category_name="商業服務類",
+        work_description="負責門市日常營運與週報彙整。",
+        competency_level=4,
+        notes="只作表頭說明",
+    )
+    await put_jd_header(
+        uow_factory,
+        document_id=document_id,
+        entry_id="header-before-provider",
+        header=initial_header,
+    )
+    employee = employee_turn()
+    snapshot = await prepare_turn(
+        uow_factory,
+        document_id=document_id,
+        employee_turn=employee,
+    )
+    assert snapshot.packet.employee_written_overview == (
+        "職能基準名稱：門市營運管理\n工作描述：負責門市日常營運與週報彙整。"
+    )
+
+    changed_header = initial_header.model_copy(
+        update={"work_description": "改為負責門市巡檢與異常處理。"}
+    )
+    await put_jd_header(
+        uow_factory,
+        document_id=document_id,
+        entry_id="header-during-provider",
+        header=changed_header,
+    )
+
+    with pytest.raises(StaleAuthoritySnapshot):
+        await commit_verified_turn(
+            uow_factory,
+            snapshot=snapshot,
+            operation_id="stale-header-operation",
+            employee_turn=employee,
+            operation_result=verified_add_result(),
+        )
+
+    loaded = await load_document(uow_factory, document_id)
+    assert loaded is not None
+    assert loaded.document.authority_generation == 2
+    assert loaded.state.jd_header == changed_header
     assert loaded.state.work_model.tasks == ()
 
 
@@ -366,6 +446,7 @@ async def test_verified_revise_persists_the_proposal_with_the_completed_turn(
         changed = await uow.documents.update_authority(
             document_id,
             expected_generation=record.authority_generation,
+            jd_header=record.jd_header,
             work_model=CurrentWorkModel(tasks=(analysed,)),
             active_question=None,
             updated_at=record.updated_at + timedelta(seconds=1),
@@ -457,6 +538,7 @@ async def seed_analysed_task(uow_factory, document_id, *tasks: Task) -> None:
         changed = await uow.documents.update_authority(
             document_id,
             expected_generation=record.authority_generation,
+            jd_header=record.jd_header,
             work_model=CurrentWorkModel(tasks=tasks),
             active_question=None,
             updated_at=record.updated_at + timedelta(seconds=1),

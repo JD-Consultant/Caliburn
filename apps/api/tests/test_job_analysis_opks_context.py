@@ -62,11 +62,13 @@ def item(
     *,
     task_refs: tuple[str, ...] = (),
     indicator_refs: tuple[str, ...] = (),
+    display_order: int = 0,
 ) -> OpksItem:
     return OpksItem(
         entity_id=entity_id,
         entity_kind=kind,
         text=text,
+        display_order=display_order,
         task_refs=task_refs,
         indicator_refs=indicator_refs,
         evidence_links=(evidence(),),
@@ -129,6 +131,7 @@ def test_packet_projects_only_the_selected_task_and_relevant_opks_authority():
         OpksEntityKind.OUTPUT,
         "排班表",
         task_refs=("task-other",),
+        display_order=1,
     )
     indicator = item(
         "indicator-selected",
@@ -223,6 +226,7 @@ def test_packet_projects_only_the_selected_task_and_relevant_opks_authority():
     assert "未連到選定工作；另連 0 個工作／0 個指標" in rendered
     assert "待決提案（尚未成立）" in rendered
     assert "已拒絕提案（避免重提）" in rendered
+    assert "員工填寫的整體描述" not in rendered
 
     for hidden in (
         "task-selected",

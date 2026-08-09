@@ -9,9 +9,13 @@ from pydantic import ValidationError
 from app.job_analysis.application import (
     ConcurrentAuthorityChange,
     DocumentNotFound,
+    DutyNotFound,
     IdempotencyConflict,
+    InvalidDutyOrder,
+    InvalidOpksOrder,
     InvalidJdTaskOrder,
     InvalidProposalDecision,
+    JdHeaderNotChanged,
     JdTaskNotFound,
     OpksItemNotFound,
     OpksProposalNotDecidable,
@@ -37,6 +41,13 @@ AUTHORITY_CONFLICT = (
 )
 INVALID_TASK_ORDER = (
     "https://caliburn.dev/problems/job-analysis/invalid-task-order"
+)
+DUTY_NOT_FOUND = "https://caliburn.dev/problems/job-analysis/duty-not-found"
+INVALID_DUTY_ORDER = (
+    "https://caliburn.dev/problems/job-analysis/invalid-duty-order"
+)
+INVALID_OPKS_ORDER = (
+    "https://caliburn.dev/problems/job-analysis/invalid-opks-order"
 )
 INVALID_REQUEST = "https://caliburn.dev/problems/job-analysis/invalid-request"
 PROPOSAL_NOT_FOUND = (
@@ -86,6 +97,12 @@ def application_error_response(
             title="Task not found",
             status=404,
         )
+    if isinstance(error, DutyNotFound):
+        return problem_response(
+            type_uri=DUTY_NOT_FOUND,
+            title="Duty not found",
+            status=404,
+        )
     if isinstance(error, OpksItemNotFound):
         return problem_response(
             type_uri=OPKS_ITEM_NOT_FOUND,
@@ -122,11 +139,30 @@ def application_error_response(
             title="Invalid Task order",
             status=422,
         )
+    if isinstance(error, InvalidDutyOrder):
+        return problem_response(
+            type_uri=INVALID_DUTY_ORDER,
+            title="Invalid Duty order",
+            status=422,
+        )
+    if isinstance(error, InvalidOpksOrder):
+        return problem_response(
+            type_uri=INVALID_OPKS_ORDER,
+            title="Invalid OPKS order",
+            status=422,
+        )
     if isinstance(error, InvalidProposalDecision):
         return problem_response(
             type_uri=INVALID_REQUEST,
             title="Invalid proposal decision",
             status=422,
+        )
+    if isinstance(error, JdHeaderNotChanged):
+        return problem_response(
+            type_uri=INVALID_REQUEST,
+            title="Invalid request",
+            status=422,
+            detail="JD header edit must change at least one field.",
         )
     raise TypeError(f"unmapped job-analysis error: {type(error).__name__}")
 

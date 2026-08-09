@@ -33,6 +33,7 @@ from app.job_analysis.domain import (
     Enabler,
     EnablerKind,
     JdEntry,
+    JdHeader,
     JdTask,
     OpksEntityKind,
     OpksEvidenceLink,
@@ -81,6 +82,7 @@ def document(document_id: UUID) -> DocumentRecord:
     return DocumentRecord(
         document_id=document_id,
         title="門市營運專員",
+        jd_header=JdHeader(),
         work_model=CurrentWorkModel(),
         active_question=ActiveQuestion(
             turn_id="turn-1",
@@ -154,6 +156,7 @@ async def test_opks_serialization_round_trip_and_corruption_fail_closed():
     item_row = SimpleNamespace(
         entity_id=item.entity_id,
         entity_kind=item.entity_kind.value,
+        display_order=item.display_order,
         item_schema_id=OPKS_ITEM_SCHEMA_ID,
         item_payload=ser.dump_opks_item_payload(item),
     )
@@ -329,6 +332,7 @@ async def test_document_for_update_really_holds_the_row_lock(
                 changed = await uow.documents.update_authority(
                     document_id,
                     expected_generation=0,
+                    jd_header=JdHeader(),
                     work_model=CurrentWorkModel(),
                     active_question=None,
                     updated_at=NOW + timedelta(minutes=1),

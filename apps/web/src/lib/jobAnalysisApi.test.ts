@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type {
+  JdHeaderWrite,
   JdTaskWrite,
   OpksItemWrite,
   OpksProposalDecisionWrite,
@@ -10,20 +11,27 @@ import {
   JobAnalysisApiError,
   createDocument,
   addOpksItem,
+  addDuty,
   addTask,
   decideOpksProposal,
   deleteTask,
+  deleteDuty,
   deleteOpksItem,
   editTask,
+  editDuty,
   editOpksItem,
   getDocument,
   getConsultation,
   jobAnalysisProblemMessage,
   listDocuments,
   putDocument,
+  putJdHeader,
+  reorderDuties,
+  reorderOpksItems,
   reorderTasks,
   submitEmployeeTurn,
   decideProposal,
+  exportDocument,
 } from "./jobAnalysisApi";
 
 const DOCUMENT_ID = "00000000-0000-0000-0000-000000000045";
@@ -56,7 +64,27 @@ describe("job-analysis document client", () => {
           document_id: DOCUMENT_ID,
           title: "門市營運專員",
           updated_at: "2026-07-30T10:00:00Z",
+          jd_header: {
+            competency_name: null,
+            occupation_category_name: null,
+            occupation_name: null,
+            occupation_code: null,
+            industry_name: null,
+            industry_code: null,
+            work_description: null,
+            competency_level: null,
+            notes: null,
+          },
+          readiness: {
+            issues: [
+              { code: "competency_name_missing" },
+              { code: "work_description_missing" },
+              { code: "competency_level_missing" },
+            ],
+          },
           tasks: [],
+          opks_items: [],
+          opks_task_status: [],
         }),
       );
     vi.stubGlobal("fetch", fetchMock);
@@ -161,6 +189,90 @@ describe("Current JD Task client", () => {
   });
 });
 
+describe("public XLSX export client", () => {
+  it("gets the binary export without an idempotency key", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response("xlsx-bytes", {
+        status: 200,
+        headers: {
+          "Content-Type":
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        },
+      }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    const blob = await exportDocument(DOCUMENT_ID);
+
+    expect(await blob.text()).toBe("xlsx-bytes");
+    expect(fetchMock).toHaveBeenCalledWith(
+      `http://127.0.0.1:8001/api/v1/job-analysis/documents/${DOCUMENT_ID}/export`,
+      { method: "GET" },
+    );
+  });
+});
+
+describe("Current JD Duty client", () => {
+  const duty = { statement: "門市營運" };
+  const view = { duty_id: "duty-1", statement: "門市營運", display_order: 0 };
+
+  it("uses the caller-owned retry key for every Duty mutation", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(response(view, 201))
+      .mockResolvedValueOnce(response({ ...view, statement: "門市日常營運" }))
+      .mockResolvedValueOnce(response([view]))
+      .mockResolvedValueOnce(response(null, 204));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await addDuty(DOCUMENT_ID, duty, "duty-operation-1");
+    await editDuty(DOCUMENT_ID, view.duty_id, { statement: "門市日常營運" }, "duty-operation-1");
+    await reorderDuties(DOCUMENT_ID, [view.duty_id], "duty-operation-1");
+    await deleteDuty(DOCUMENT_ID, view.duty_id, "duty-operation-1");
+
+    expect(fetchMock.mock.calls.map((call) => [call[1].method, call[0]])).toEqual([
+      ["POST", `http://127.0.0.1:8001/api/v1/job-analysis/documents/${DOCUMENT_ID}/duties`],
+      ["PUT", `http://127.0.0.1:8001/api/v1/job-analysis/documents/${DOCUMENT_ID}/duties/${view.duty_id}`],
+      ["PUT", `http://127.0.0.1:8001/api/v1/job-analysis/documents/${DOCUMENT_ID}/duty-order`],
+      ["DELETE", `http://127.0.0.1:8001/api/v1/job-analysis/documents/${DOCUMENT_ID}/duties/${view.duty_id}`],
+    ]);
+    for (const call of fetchMock.mock.calls) {
+      expect(call[1].headers).toMatchObject({ "Idempotency-Key": "duty-operation-1" });
+    }
+  });
+});
+
+describe("JD header client", () => {
+  const header: JdHeaderWrite = {
+    competency_name: "資訊安全維運人員",
+    occupation_category_name: null,
+    occupation_name: null,
+    occupation_code: null,
+    industry_name: null,
+    industry_code: null,
+    work_description: "維運企業資訊安全設備並處理資安事件。",
+    competency_level: 4,
+    notes: null,
+  };
+
+  it("PUTs the complete header to the exact endpoint with the caller key", async () => {
+    const fetchMock = vi.fn().mockResolvedValueOnce(response(header));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await putJdHeader(DOCUMENT_ID, header, "header-1");
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock.mock.calls[0]).toEqual([
+      `http://127.0.0.1:8001/api/v1/job-analysis/documents/${DOCUMENT_ID}/jd-header`,
+      expect.objectContaining({
+        method: "PUT",
+        headers: expect.objectContaining({ "Idempotency-Key": "header-1" }),
+        body: JSON.stringify(header),
+      }),
+    ]);
+  });
+});
+
 describe("Current JD OPKS client", () => {
   const item: OpksItemWrite = {
     entity_kind: "knowledge",
@@ -174,6 +286,7 @@ describe("Current JD OPKS client", () => {
       ...item,
       entity_id: "knowledge-1",
       evidence_quotes: [],
+      display_order: 0,
     };
     const consultation = {
       document: {
@@ -194,12 +307,19 @@ describe("Current JD OPKS client", () => {
       .mockResolvedValueOnce(response(view, 201))
       .mockResolvedValueOnce(response(view))
       .mockResolvedValueOnce(response(null, 204))
+      .mockResolvedValueOnce(response([view]))
       .mockResolvedValueOnce(response(consultation));
     vi.stubGlobal("fetch", fetchMock);
 
     await addOpksItem(DOCUMENT_ID, item, "opks-add");
     await editOpksItem(DOCUMENT_ID, "knowledge-1", item, "opks-edit");
     await deleteOpksItem(DOCUMENT_ID, "knowledge-1", "opks-delete");
+    await reorderOpksItems(
+      DOCUMENT_ID,
+      "knowledge",
+      ["knowledge-1"],
+      "opks-reorder",
+    );
     await decideOpksProposal(
       DOCUMENT_ID,
       "proposal-1",
@@ -211,14 +331,21 @@ describe("Current JD OPKS client", () => {
       ["POST", `http://127.0.0.1:8001/api/v1/job-analysis/documents/${DOCUMENT_ID}/opks`],
       ["PUT", `http://127.0.0.1:8001/api/v1/job-analysis/documents/${DOCUMENT_ID}/opks/knowledge-1`],
       ["DELETE", `http://127.0.0.1:8001/api/v1/job-analysis/documents/${DOCUMENT_ID}/opks/knowledge-1`],
+      ["PUT", `http://127.0.0.1:8001/api/v1/job-analysis/documents/${DOCUMENT_ID}/opks-order`],
       ["POST", `http://127.0.0.1:8001/api/v1/job-analysis/documents/${DOCUMENT_ID}/opks-proposals/proposal-1/decisions`],
     ]);
     expect(fetchMock.mock.calls.map((call) => call[1].headers)).toEqual(
-      ["opks-add", "opks-edit", "opks-delete", "opks-decide"].map(
+      ["opks-add", "opks-edit", "opks-delete", "opks-reorder", "opks-decide"].map(
         (key) => expect.objectContaining({ "Idempotency-Key": key }),
       ),
     );
-    expect(fetchMock.mock.calls[3][1].body).toBe(JSON.stringify(decision));
+    expect(fetchMock.mock.calls[3][1].body).toBe(
+      JSON.stringify({
+        entity_kind: "knowledge",
+        ordered_entity_ids: ["knowledge-1"],
+      }),
+    );
+    expect(fetchMock.mock.calls[4][1].body).toBe(JSON.stringify(decision));
   });
 });
 
@@ -230,6 +357,7 @@ describe("jobAnalysisProblemMessage", () => {
     ["idempotency-conflict", "這次操作內容已經改變"],
     ["authority-conflict", "內容已有更新"],
     ["invalid-task-order", "工作順序不正確"],
+    ["invalid-opks-order", "職能內容順序不正確"],
     ["invalid-request", "請檢查輸入內容"],
     ["proposal-not-found", "找不到這項提案"],
     ["consultant-unavailable", "顧問暫時無法完成分析，請稍後重試"],

@@ -24,6 +24,7 @@ async def commit_authority_change(
     """Validate the complete state, then persist it in the caller's UoW."""
 
     validated = JobAnalysisState.model_validate(state.model_dump())
+    await uow.duties.replace(record.document_id, validated.current_duties)
     await uow.tasks.replace(record.document_id, validated.current_jd)
     await uow.proposals.replace(record.document_id, validated.proposals)
     await uow.opks.replace(record.document_id, validated.current_opks.items)
@@ -36,6 +37,7 @@ async def commit_authority_change(
     updated = await uow.documents.update_authority(
         record.document_id,
         expected_generation=record.authority_generation,
+        jd_header=validated.jd_header,
         work_model=validated.work_model,
         active_question=record.active_question,
         updated_at=updated_at,

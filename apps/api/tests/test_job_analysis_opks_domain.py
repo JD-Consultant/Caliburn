@@ -47,6 +47,7 @@ def opks_item(
     task_refs: tuple[str, ...] = (),
     indicator_refs: tuple[str, ...] = (),
     evidence_links: tuple[OpksEvidenceLink, ...] | None = None,
+    display_order: int = 0,
 ) -> OpksItem:
     return OpksItem(
         entity_id=entity_id,
@@ -55,6 +56,7 @@ def opks_item(
         task_refs=task_refs,
         indicator_refs=indicator_refs,
         evidence_links=(employee_evidence(),) if evidence_links is None else evidence_links,
+        display_order=display_order,
     )
 
 
@@ -204,6 +206,32 @@ def test_current_jd_opks_validates_item_and_reference_identities():
         )
     with pytest.raises(ValueError, match="unknown Current JD task"):
         current.validate_against_tasks(frozenset({"task-2"}))
+
+
+def test_display_order_is_unique_only_within_entity_kind():
+    output = opks_item(
+        entity_id="output-1",
+        entity_kind=OpksEntityKind.OUTPUT,
+        task_refs=("task-1",),
+        display_order=0,
+    )
+    knowledge = opks_item(
+        entity_id="knowledge-1",
+        entity_kind=OpksEntityKind.KNOWLEDGE,
+        display_order=0,
+    )
+    current = CurrentJdOpks(items=(output, knowledge))
+
+    assert current.next_display_order(OpksEntityKind.OUTPUT) == 1
+    assert current.next_display_order(OpksEntityKind.SKILL) == 0
+
+    with pytest.raises(ValidationError, match="display order"):
+        CurrentJdOpks(
+            items=(
+                output,
+                output.model_copy(update={"entity_id": "output-2"}),
+            )
+        )
 
 
 def test_derived_axes_do_not_create_serialized_second_truths():

@@ -1,4 +1,4 @@
-"""Fail-closed serialization for migration 0012 rows."""
+"""Fail-closed serialization for persisted job-analysis rows."""
 
 from __future__ import annotations
 
@@ -11,6 +11,9 @@ from app.job_analysis.application import (
     COMPLETED_TURN_SCHEMA_ID,
     CONSULTANT_OPENING_SCHEMA_ID,
     DIRECT_EDIT_SCHEMA_ID,
+    DUTY_DIRECT_EDIT_SCHEMA_ID,
+    JD_HEADER_DIRECT_EDIT_SCHEMA_ID,
+    JD_HEADER_SCHEMA_ID,
     OPKS_ITEM_SCHEMA_ID,
     OPKS_DIRECT_EDIT_SCHEMA_ID,
     OPKS_PROPOSAL_DECISION_SCHEMA_ID,
@@ -23,7 +26,9 @@ from app.job_analysis.application import (
     CompletedTurnPayload,
     ConsultantOpeningPayload,
     DirectEditPayload,
+    DutyDirectEditPayload,
     DocumentRecord,
+    JdHeaderDirectEditPayload,
     JournalEntry,
     OpksDirectEditPayload,
     OpksProposalDecisionPayload,
@@ -32,6 +37,8 @@ from app.job_analysis.application import (
 )
 from app.job_analysis.domain import (
     CurrentWorkModel,
+    Duty,
+    JdHeader,
     JdTask,
     OpksItem,
     OpksProposal,
@@ -63,6 +70,19 @@ def load_work_model(*, schema_id: str, payload: object) -> CurrentWorkModel:
         _fail("Work Model", exc, exc)
 
 
+def dump_jd_header(value: JdHeader) -> dict[str, Any]:
+    return value.model_dump(mode="json")
+
+
+def load_jd_header(*, schema_id: str, payload: object) -> JdHeader:
+    if schema_id != JD_HEADER_SCHEMA_ID:
+        _fail("JD Header schema", schema_id)
+    try:
+        return JdHeader.model_validate(payload)
+    except (ValidationError, TypeError, ValueError) as exc:
+        _fail("JD Header", exc, exc)
+
+
 def dump_active_question(value: ActiveQuestion | None) -> dict[str, Any] | None:
     if value is None:
         return None
@@ -89,6 +109,10 @@ def load_document(row: Any) -> DocumentRecord:
     return DocumentRecord(
         document_id=row.document_id,
         title=row.title,
+        jd_header=load_jd_header(
+            schema_id=row.jd_header_schema_id,
+            payload=row.jd_header_json,
+        ),
         work_model=load_work_model(
             schema_id=row.work_model_schema_id,
             payload=row.work_model_json,
@@ -115,6 +139,8 @@ def load_jd_task(row: Any) -> JdTask:
                 "frequency_text": row.frequency_text,
                 "responsibility_role": row.responsibility_role,
                 "enablers": row.enablers_json,
+                "duty_id": row.duty_id,
+                "competency_level": row.competency_level,
                 "display_order": row.display_order,
             }
         )
@@ -122,7 +148,20 @@ def load_jd_task(row: Any) -> JdTask:
         _fail("JD Task", exc, exc)
 
 
-_OPKS_ITEM_RELATIONAL_FIELDS = {"entity_id", "entity_kind"}
+def load_duty(row: Any) -> Duty:
+    try:
+        return Duty.model_validate(
+            {
+                "duty_id": row.duty_id,
+                "statement": row.statement,
+                "display_order": row.display_order,
+            }
+        )
+    except (ValidationError, TypeError, ValueError) as exc:
+        _fail("Duty", exc, exc)
+
+
+_OPKS_ITEM_RELATIONAL_FIELDS = {"entity_id", "entity_kind", "display_order"}
 
 
 def dump_opks_item_payload(item: OpksItem) -> dict[str, Any]:
@@ -143,6 +182,7 @@ def load_opks_item(row: Any) -> OpksItem:
                 **row.item_payload,
                 "entity_id": row.entity_id,
                 "entity_kind": row.entity_kind,
+                "display_order": row.display_order,
             }
         )
     except (ValidationError, TypeError, ValueError) as exc:
@@ -238,6 +278,8 @@ _JOURNAL_PAYLOAD_TYPES = {
     CONSULTANT_OPENING_SCHEMA_ID: ConsultantOpeningPayload,
     COMPLETED_TURN_SCHEMA_ID: CompletedTurnPayload,
     DIRECT_EDIT_SCHEMA_ID: DirectEditPayload,
+    JD_HEADER_DIRECT_EDIT_SCHEMA_ID: JdHeaderDirectEditPayload,
+    DUTY_DIRECT_EDIT_SCHEMA_ID: DutyDirectEditPayload,
     OPKS_DIRECT_EDIT_SCHEMA_ID: OpksDirectEditPayload,
     OPKS_PROPOSAL_DECISION_SCHEMA_ID: OpksProposalDecisionPayload,
     OPKS_GENERATION_SCHEMA_ID: OpksGenerationPayload,

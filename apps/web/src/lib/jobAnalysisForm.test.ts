@@ -4,7 +4,9 @@ import {
   emptyTaskForm,
   fromTaskView,
   isTaskFormDirty,
+  moveTaskWithinDuty,
   toTaskWrite,
+  type TaskFormValue,
 } from "./jobAnalysisForm";
 
 describe("Current JD Task form mapping", () => {
@@ -17,7 +19,23 @@ describe("Current JD Task form mapping", () => {
       context: null,
       frequency_text: null,
       responsibility_role: null,
+      duty_id: null,
+      competency_level: null,
       enablers: [],
+    });
+  });
+
+  it("serializes an unassigned Task without inventing a Duty or level", () => {
+    const form: TaskFormValue = {
+      ...emptyTaskForm(),
+      statement: "盤點耗材",
+      dutyId: "",
+      competencyLevel: "",
+    };
+
+    expect(toTaskWrite(form)).toMatchObject({
+      duty_id: null,
+      competency_level: null,
     });
   });
 
@@ -29,6 +47,8 @@ describe("Current JD Task form mapping", () => {
       context: "每週結束時",
       frequency_text: "每週一次",
       responsibility_role: "shared",
+      duty_id: null,
+      competency_level: null,
       enablers: [
         { kind: "tool_system", name: "Excel" },
         { kind: "method", name: "交叉檢查" },
@@ -42,6 +62,8 @@ describe("Current JD Task form mapping", () => {
       context: "每週結束時",
       frequency_text: "每週一次",
       responsibility_role: "shared",
+      duty_id: null,
+      competency_level: null,
       enablers: [
         { kind: "tool_system", name: "Excel" },
         { kind: "method", name: "交叉檢查" },
@@ -60,5 +82,28 @@ describe("Current JD Task form mapping", () => {
     expect(toTaskWrite(edited).enablers).toEqual([]);
     expect(isTaskFormDirty(initial, edited)).toBe(true);
     expect(isTaskFormDirty(edited, { ...edited })).toBe(false);
+  });
+
+  it("moves within the visible Duty group while preserving interleaved Tasks", () => {
+    const tasks = [
+      {
+        task_id: "t1",
+        duty_id: "d1",
+      },
+      {
+        task_id: "t2",
+        duty_id: "d2",
+      },
+      {
+        task_id: "t3",
+        duty_id: "d1",
+      },
+    ];
+
+    expect(moveTaskWithinDuty(tasks, "t3", "d1", -1)).toEqual([
+      "t3",
+      "t2",
+      "t1",
+    ]);
   });
 });

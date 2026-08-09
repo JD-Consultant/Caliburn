@@ -12,6 +12,7 @@ from typing import Annotated, Literal
 from pydantic import Field, model_validator
 
 from .base import DomainModel, Identifier, NonEmptyText, TaskId
+from .duty import DutyId
 from .sources import SupportLink
 from .task import Enabler, Retirement, RetirementKind, TaskFields
 
@@ -147,6 +148,8 @@ class JdTaskFields(DomainModel):
     frequency_text: NonEmptyText | None = None
     responsibility_role: ResponsibilityRole | None = None
     enablers: tuple[Enabler, ...] = ()
+    duty_id: DutyId | None = None
+    competency_level: int | None = Field(default=None, ge=1, le=6)
 
 
 class JdTask(JdTaskFields):

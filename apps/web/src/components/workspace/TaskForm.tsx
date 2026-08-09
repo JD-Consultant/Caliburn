@@ -3,6 +3,8 @@
 import { Plus, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import type { DutyView } from "@caliburn/job-analysis-contract";
+import { COMPETENCY_LEVEL_OPTIONS } from "@/lib/jobAnalysisDuties";
 import type { TaskFormValue } from "@/lib/jobAnalysisForm";
 
 interface TaskFormProps {
@@ -13,6 +15,7 @@ interface TaskFormProps {
   isSaving: boolean;
   canSave: boolean;
   error?: string;
+  duties: DutyView[];
 }
 
 export function TaskForm({
@@ -23,6 +26,7 @@ export function TaskForm({
   isSaving,
   canSave,
   error,
+  duties,
 }: TaskFormProps) {
   const set = <K extends keyof TaskFormValue>(key: K, next: TaskFormValue[K]) =>
     onChange({ ...value, [key]: next });
@@ -100,6 +104,44 @@ export function TaskForm({
             <option value="shared">共同負責</option>
             <option value="assist">協助</option>
           </select>
+        </label>
+        <label className="block space-y-1.5">
+          <span className="text-sm font-medium">主要職責</span>
+          <select
+            className="w-full rounded-lg border bg-background px-3 py-2 text-sm"
+            value={value.dutyId}
+            onChange={(event) => set("dutyId", event.target.value)}
+          >
+            <option value="">未分組</option>
+            {duties.map((duty) => (
+              <option key={duty.duty_id} value={duty.duty_id}>
+                {duty.statement}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="block space-y-1.5">
+          <span className="text-sm font-medium">職能級別</span>
+          <select
+            className="w-full rounded-lg border bg-background px-3 py-2 text-sm"
+            value={value.competencyLevel}
+            onChange={(event) =>
+              set(
+                "competencyLevel",
+                event.target.value as TaskFormValue["competencyLevel"],
+              )
+            }
+          >
+            <option value="">尚未判定</option>
+            {COMPETENCY_LEVEL_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}：{option.summary}
+              </option>
+            ))}
+          </select>
+          <span className="text-xs text-muted-foreground">
+            依情境可預測性、監督程度、工作性質與判斷能力對照 iCAP 六級；可保留空白或由員工覆寫。
+          </span>
         </label>
       </div>
 

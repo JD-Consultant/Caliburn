@@ -161,6 +161,46 @@ async def test_accept_adds_exact_candidate_without_forging_employee_evidence(
     assert loaded.document.authority_generation == 2
 
 
+async def test_accept_add_uses_next_display_order_within_kind(
+    postgres_session_factory,
+    cleanup_job_analysis_rows,
+):
+    document_id = cleanup_job_analysis_rows
+    first = add_proposal(
+        item("output-1", "營運週報", task_id="direct-seed-task"),
+        proposal_id="opks-proposal-first",
+    )
+    second = add_proposal(
+        item("output-2", "營運月報", task_id="direct-seed-task"),
+        proposal_id="opks-proposal-second",
+    )
+    await seed(
+        postgres_session_factory,
+        document_id,
+        proposals=(first, second),
+    )
+    uow_factory = factory(postgres_session_factory)
+
+    await decide_opks_proposal(
+        uow_factory,
+        document_id=document_id,
+        proposal_id=first.proposal_id,
+        decision_id="accept-opks-first",
+        decision="accepted",
+    )
+    await decide_opks_proposal(
+        uow_factory,
+        document_id=document_id,
+        proposal_id=second.proposal_id,
+        decision_id="accept-opks-second",
+        decision="accepted",
+    )
+    loaded = await load_document(uow_factory, document_id)
+
+    assert loaded is not None
+    assert [item.display_order for item in loaded.state.current_opks.items] == [0, 1]
+
+
 async def test_edited_decision_adds_one_direct_edit_source_and_two_journal_entries(
     postgres_session_factory,
     cleanup_job_analysis_rows,

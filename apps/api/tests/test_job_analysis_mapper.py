@@ -4,6 +4,7 @@ from datetime import UTC, datetime
 from uuid import UUID
 
 from job_analysis_contract import (
+    JdHeaderWrite,
     JdTaskWrite,
     OpksItemWrite,
     OpksProposalDecisionWrite,
@@ -11,6 +12,8 @@ from job_analysis_contract import (
 
 from app.api.job_analysis_mapper import (
     to_consultation_view,
+    to_document_view,
+    to_jd_header,
     to_jd_task_fields,
     to_opks_item_view,
     to_opks_proposal_decision,
@@ -28,6 +31,7 @@ from app.job_analysis.domain import (
     CurrentWorkModel,
     EnablerKind,
     JdEntry,
+    JdHeader,
     JdTask,
     OpksEntityKind,
     OpksEvidenceLink,
@@ -87,6 +91,83 @@ def test_empty_responsibility_role_normalizes_to_none():
     )
 
     assert to_jd_task_fields(body).responsibility_role is None
+
+
+def test_task_mapper_preserves_employee_duty_and_competency_level():
+    body = JdTaskWrite.model_validate(
+        {
+            "statement": "盤點耗材",
+            "purpose_result": None,
+            "context": None,
+            "frequency_text": None,
+            "responsibility_role": None,
+            "enablers": [],
+            "duty_id": "entry-1-d0",
+            "competency_level": 4,
+        }
+    )
+
+    fields = to_jd_task_fields(body)
+
+    assert fields.duty_id == "entry-1-d0"
+    assert fields.competency_level == 4
+
+
+def test_jd_header_mapper_trims_text_and_converts_blank_optional_values_to_none():
+    body = JdHeaderWrite.model_validate(
+        {
+            "competency_name": " 門市營運專員 ",
+            "occupation_name": "   ",
+            "industry_code": " G47 ",
+            "notes": "  ",
+        }
+    )
+
+    header = to_jd_header(body)
+
+    assert header.competency_name == "門市營運專員"
+    assert header.occupation_name is None
+    assert header.industry_code == "G47"
+    assert header.notes is None
+    assert header.work_description is None
+    assert header.competency_level is None
+
+
+def test_document_view_carries_header_and_the_application_readiness_result():
+    now = datetime(2026, 8, 9, 9, 0, tzinfo=UTC)
+    header = JdHeader(
+        competency_name="門市營運專員",
+        competency_level=4,
+    )
+    loaded = LoadedDocument(
+        document=DocumentRecord(
+            document_id=UUID("00000000-0000-0000-0000-000000000046"),
+            title="門市營運專員",
+            jd_header=header,
+            work_model=CurrentWorkModel(),
+            active_question=None,
+            authority_generation=1,
+            created_at=now,
+            updated_at=now,
+        ),
+        state=JobAnalysisState(
+            jd_header=header,
+            current_duties=(),
+            work_model=CurrentWorkModel(),
+            current_jd=(),
+            proposals=(),
+            current_opks={"items": ()},
+            opks_proposals=(),
+        ),
+        conversation_turns=(),
+    )
+
+    view = to_document_view(loaded)
+
+    assert view.jd_header.competency_name == "門市營運專員"
+    assert [issue.code.value for issue in view.readiness.issues] == [
+        "work_description_missing"
+    ]
 
 
 def test_opks_mapper_normalizes_employee_fields_and_exposes_only_quotes():
@@ -221,6 +302,7 @@ def test_consultation_view_keeps_history_without_leaking_internal_authority():
         document=DocumentRecord(
             document_id=UUID("00000000-0000-0000-0000-000000000045"),
             title="門市營運專員",
+            jd_header=JdHeader(),
             work_model=CurrentWorkModel(tasks=(task,)),
             active_question=ActiveQuestion(turn_id="turn-3", text="週報交給誰？"),
             authority_generation=7,
@@ -228,6 +310,8 @@ def test_consultation_view_keeps_history_without_leaking_internal_authority():
             updated_at=now,
         ),
         state=JobAnalysisState(
+            jd_header=JdHeader(),
+            current_duties=(),
             work_model=CurrentWorkModel(tasks=(task,)),
             current_jd=(jd_task,),
             proposals=(proposal,),

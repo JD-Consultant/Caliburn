@@ -8,6 +8,37 @@ import type {
 
 export type OpksStatus = OpksTaskStatusView["status"];
 
+export function moveOpksWithinVisibleGroup(
+  items: OpksItemView[],
+  entityKind: OpksItemView["entity_kind"],
+  entityId: string,
+  offset: -1 | 1,
+  visibleEntityIds: readonly string[],
+): string[] {
+  const ordered = items
+    .filter((item) => item.entity_kind === entityKind)
+    .sort(
+      (left, right) =>
+        left.display_order - right.display_order ||
+        left.entity_id.localeCompare(right.entity_id),
+    )
+    .map((item) => item.entity_id);
+  const visible = ordered.filter((id) => visibleEntityIds.includes(id));
+  const currentIndex = visible.indexOf(entityId);
+  const targetIndex = currentIndex + offset;
+  if (currentIndex < 0 || targetIndex < 0 || targetIndex >= visible.length) {
+    return ordered;
+  }
+  const targetId = visible[targetIndex];
+  const sourcePosition = ordered.indexOf(entityId);
+  const targetPosition = ordered.indexOf(targetId);
+  [ordered[sourcePosition], ordered[targetPosition]] = [
+    ordered[targetPosition],
+    ordered[sourcePosition],
+  ];
+  return ordered;
+}
+
 /**
  * ADR 0054 決定 36 允許的**全部**措辭；措辭受 0052 決定 7 約束
  * （不得使用「不完整」「不合格」「未通過」——我們產出的是客製 JD，

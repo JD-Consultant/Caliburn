@@ -1,7 +1,7 @@
 """job analysis local Current State persistence
 
 Revision ID: 0012
-Revises: 0011
+Revises: None
 Create Date: 2026-07-29
 
 Greenfield tables only: no old-row migration, dual write, tenant seam,
@@ -16,7 +16,7 @@ from sqlalchemy.dialects.postgresql import JSONB, UUID
 
 
 revision = "0012"
-down_revision = "0011"
+down_revision = None
 branch_labels = None
 depends_on = None
 

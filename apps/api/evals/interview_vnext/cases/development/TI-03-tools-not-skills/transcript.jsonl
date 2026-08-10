@@ -1,2 +1,0 @@
-{"schema_version":"turn_eval_transcript_turn.v2","turn_key":"consultant-01","sequence":1,"role":"consultant","locale":"zh-TW","text":"你平常用哪些系統或工具?","occurred_offset_seconds":2}
-{"schema_version":"turn_eval_transcript_turn.v2","turn_key":"employee-target","sequence":2,"role":"employee","locale":"zh-TW","text":"我主要用 SAP 和 Excel。","occurred_offset_seconds":4}

@@ -1,97 +1,25 @@
-# Caliburn Contract Strategy（契約作法規範）
+# Caliburn Contract Strategy
 
-> Standing standard for **how we choose and deliver a contract** at any seam between Caliburn
-> components. Authored 2026-06-28. Generalizes the decisions in ADR 0004 (contract #1) and
-> ADR 0010 (contract #2), and records contracts #3/#4. This is the "作法規範" — read it before
-> opening a new contract.
+## 現行規則
 
-## 1. Why
+Current-only monorepo 目前只有一個跨語言 contract：`packages/job-analysis-contract`。其 JSON Schema 是 SSOT，生成 Python／TypeScript DTO，消費者是 `apps/api` 與 `apps/web`。改 schema 必須先研究、更新 ADR／plan，再執行 codegen、schema diff 與兩端測試。
 
-A "seam" is any boundary where one component's output is another's input (HTTP API, a shared
-document format, an event). The failure mode is **drift**: one side changes the shape, the other
-keeps assuming the old one — silently (especially with `extra="ignore"`). A contract makes the
-shape a **single source of truth (SSOT)** so drift is caught structurally or in CI, not in prod.
+API 內部的 domain／application model 不直接 import transport contract；mapper 是 HTTP DTO 與 domain 之間唯一的轉換邊界。Web 不手寫重複的 Current State、Evidence、Proposal 或 readiness shape。
 
-Drift happens in **both directions** — code changes without the spec, or spec changes without the
-code (TotalShiftLeft 2026). Pick the lightest mechanism that closes the directions that can
-actually bite *this* seam.
+## 選擇判準
 
-## 2. The decision rubric
+| seam | 機制 |
+|---|---|
+| 跨語言或對外的 JSON shape | JSON Schema SSOT + generated models；在 CI 驗證生成物無 diff |
+| 純 Python、同 repo、少數消費者的內部 port | shared typed module 或明確 Protocol；不另建泛用契約 package |
+| 未來出現外部／隱藏消費者 | 另開研究與 ADR，評估 OpenAPI-first 或 consumer-driven contract |
 
-Answer top-to-bottom; take the first row that matches.
+不要為已移除的 OCS、indexer、PDF ETL 或舊 Web seam 新增 contract。歷史 ADR 0004／0010／0011 的機制只作背景，不代表那些 package 仍存在。
 
-| If the seam is… | Use | Why | Precedent |
-|---|---|---|---|
-| **External / partner-facing**, or has hidden/many independent consumers | **Consumer-Driven Contracts (Pact)** + schema baseline | makes hidden consumer deps visible; spec-compliance alone too weak | (none yet) |
-| Internal, but has a **non-Python consumer** (web/TS, mobile, another lang) **or** the data is a **language-neutral domain artifact / real-world standard** | **JSON-Schema SSOT + codegen** (pydantic + TS), schema-diff in CI | one neutral schema → typed models in every language; survives language boundaries | **#1 `ocs-contract`** (OCS document; web/TS renders it) |
-| Internal, **all-Python**, one or few in-repo consumers | **Shared typed package** (pydantic, editable path dep) | both ends import the *same classes* → drift impossible; zero codegen | **#2 `indexer-contract`** (indexer⇄api query API) |
-| Internal, all-Python, but provider wants **decoupled/independent evolution** or a non-Python consumer is **imminent** | **OpenAPI-first codegen** (provider spec → generated client), regen + diff CI | provider stays authoritative; consumer regenerated; easy later language fan-out | (escalation path for #2) |
+## 交付流程
 
-**Escalation, not rework:** these are ordered by power/cost. Start at the lowest matching row;
-promote only when a new force appears (e.g. a shared-package seam gains a TS consumer → promote
-its shapes to JSON-Schema). Record the promotion as a new ADR.
-
-### The two axes that decide it
-1. **Consumer language set** — any non-Python consumer ⇒ you need a language-neutral artifact
-   (JSON-Schema/OpenAPI), not a Python package.
-2. **External vs internal** — external/partner ⇒ consumer-driven (Pact); internal ⇒
-   provider-driven schema/package is enough (Pactflow/Speakeasy/TotalShiftLeft all converge on
-   this split).
-Secondary: is the payload a **domain artifact** (a real standard, e.g. the OCS document) or an
-**internal RPC wire format**? Domain artifacts justify a standalone schema even when current
-consumers are all-Python (future-proofing + documentation value).
-
-## 3. The mechanisms (use-when, in one line each)
-- **Shared typed package** (`packages/*-contract`, pydantic, `[tool.uv.sources]` editable path
-  dep): all-Python seams. Guard = both ends import the same class (assert `A is B`). No CI codegen.
-- **JSON-Schema + codegen** (`schema/*.json` SSOT → datamodel-code-generator pydantic +
-  json-schema-to-typescript): cross-language / domain-artifact seams. Guard =
-  `scripts/check-codegen.sh` (regen + `git diff`, `--disable-timestamp`).
-- **OpenAPI-first codegen** (commit provider `openapi.json` → `openapi-python-client` /
-  datamodel-codegen): provider-authoritative with future language fan-out. Guard = regen + diff.
-- **Pact / CDC**: external/partner APIs. Guard = consumer tests publish, provider verifies.
-
-## 4. Delivery lifecycle (every contract follows this)
-Same discipline used for Phases 1–3 and contracts #1/#2:
-1. **Research record** → `docs/specs/<date>-contract-N-<name>-research.md`: diagnosis of the
-   drift surface, authoritative sources, the rubric row chosen + why, design options.
-2. **Decision** → an **ADR** (`docs/adr/00NN-*.md`, Chinese, Nygard-style) recording the chosen
-   mechanism, the rejected ones, and the escalation trigger. Index it in `docs/adr/README.md`.
-3. **Plan** → `docs/plans/<date>-contract-N-<name>.md`: bite-size, move-only where possible.
-4. **Execute against a safety net** — existing test suites (and golden tests) are the
-   characterization net; consolidation must be **green-before == green-after**. One commit per
-   task; back-compat re-export shims are fine (definitions live only in the SSOT).
-5. **Guard + tag** — wire the mechanism's CI guard (§3); tag `contractN-<name>`.
-
-## 5. Worked precedents and registered seams
-- **#1 `ocs-contract`** (ADR 0004): the OCS document. Non-Python consumer (web/TS renders it) +
-  real-world standard ⇒ **JSON-Schema + codegen**. ✔ rubric row 2.
-- **#2 `indexer-contract`** (ADR 0010): indexer query API. All-Python, single consumer ⇒
-  **shared pydantic package**. ✔ rubric row 3.
-- **#3 legacy api⇄web OCS authored document:** the authored document **is an OCS document**,
-  and the **web/TS consumer renders it** ⇒ rubric row 2 ⇒ **JSON-Schema + codegen, and reuse
-  `ocs-contract`'s schema**: add the TS generation target (`json-schema-to-typescript`) for the
-  web, and define the thin api⇄web REST *envelope* (request/response wrapper around the OCS
-  document) as its own small schema or shared types. Do **not** hand-write TS document types in
-  the web app. This remains the legacy OCS editor/export seam.
-- **#4 `job-analysis-contract` (ADR 0045):** the greenfield Local Web workspace is not
-  an OCS document and has Python／TypeScript consumers ⇒ rubric row 2 ⇒ its own small JSON Schema
-  SSOT + generated Pydantic/TS package. `app.job_analysis` domain must not import the transport
-  package; route mappers own the boundary. `ocs-contract` remains the public/export shape and
-  neither contract imports or redefines the other. The former ADR 0039-era
-  `local-workspace-contract` pre-answer is withdrawn and must not be used for new construction.
-- **#5 `job-analysis` public XLSX download:** the official workbook is a binary HTTP
-  representation owned by `job_analysis`, not a Python⇄TypeScript data contract and not an OCS
-  reuse seam. The API assembles and renders the workbook; the Web consumes it as a `Blob` and
-  chooses the local filename. The guard is the PostgreSQL route test plus Web client tests for
-  the binary request and dirty export policy. If another language or an external consumer needs
-  the workbook's internal shape, open a new ADR rather than treating XLSX cells as a schema.
-
-## 6. References
-- Alistair Cockburn — Hexagonal (ports define the contract). Chris Richardson — *Microservices
-  Patterns* (API-first). Percival & Gregory — *Architecture Patterns with Python*.
-- FastAPI — *Generating Clients/SDKs* (OpenAPI-native). Pactflow / Pact docs — consumer-driven
-  contracts. Speakeasy — *Pact vs OpenAPI*. TotalShiftLeft (2026) — *API Contract Testing* &
-  *Schema-First Strategy* (internal⇒schema-first, external⇒Pact; drift is bidirectional;
-  colocate spec with impl in a monorepo).
-- Local: ADR 0004, ADR 0010, and the two contract research records in `docs/specs/`.
+1. 研究 seam 的 drift surface 與 authoritative source，寫入 `docs/specs/`。
+2. 在 `docs/adr/` 記錄選擇、拒絕選項與升級條件，並更新索引。
+3. 在 `docs/plans/` 拆出可驗證切片。
+4. 先跑現有測試，再改 codegen／consumer；一個 task 一個 commit。
+5. 跑 `npm run check-codegen -w @caliburn/job-analysis-contract`、API／Web 測試與 `git diff --check`。

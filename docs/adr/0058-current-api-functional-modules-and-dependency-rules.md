@@ -1,7 +1,8 @@
 # 0058. Current API 採功能模組與可執行依賴規則
 
-- **狀態**：Proposed
+- **狀態**：Accepted
 - **日期**：2026-08-10
+- **核准**：2026-08-10，owner 核准交付實作者執行
 - **研究**：[`2026-08-10-job-analysis-module-boundaries-research.md`](../specs/2026-08-10-job-analysis-module-boundaries-research.md)
 
 ## Context

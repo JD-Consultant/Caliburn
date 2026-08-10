@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from uuid import UUID
 
-from app.job_analysis.domain import (
+from app.core.domain import (
     CurrentJdOpks,
     OpenIssue,
     OpenIssueKind,

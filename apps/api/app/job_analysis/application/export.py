@@ -6,7 +6,7 @@
 
 from __future__ import annotations
 
-from app.job_analysis.domain import (
+from app.core.domain import (
     CurrentJdOpks,
     DomainModel,
     JdHeader,

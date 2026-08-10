@@ -21,7 +21,7 @@ from collections.abc import Mapping
 from decimal import Decimal, InvalidOperation
 from typing import Any
 
-from app.job_analysis.domain import DomainModel, NonEmptyText
+from app.core.domain import DomainModel, NonEmptyText
 
 
 # endpoint 陣列只有「list endpoints for a model」這條路徑會回;`/models/{author}/{slug}`

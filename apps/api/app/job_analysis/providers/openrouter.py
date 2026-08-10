@@ -24,7 +24,7 @@ from typing import Any, Literal, Protocol
 import httpx
 from pydantic import Field, model_validator
 
-from app.job_analysis.domain import DomainModel, NonEmptyText
+from app.core.domain import DomainModel, NonEmptyText
 
 
 CHAT_COMPLETIONS_URL = "https://openrouter.ai/api/v1/chat/completions"

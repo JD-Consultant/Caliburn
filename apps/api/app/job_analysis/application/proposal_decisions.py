@@ -8,7 +8,7 @@ from uuid import UUID
 
 from pydantic import ValidationError
 
-from app.job_analysis.domain import (
+from app.core.domain import (
     CurrentJdOpks,
     CurrentWorkModel,
     JdEntry,

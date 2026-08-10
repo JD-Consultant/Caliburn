@@ -12,7 +12,7 @@ from app.job_analysis.application import (
     ExportOpksEntry,
     ExportTaskEntry,
 )
-from app.job_analysis.domain import JdHeader
+from app.core.domain import JdHeader
 from app.job_analysis.application.export_xlsx import render_xlsx
 
 

@@ -26,7 +26,7 @@ from app.job_analysis.application.verifier import (
     Violation,
     ViolationCode,
 )
-from app.job_analysis.domain import (
+from app.core.domain import (
     CurrentWorkModel,
     JdTask,
     OpksEntityKind,

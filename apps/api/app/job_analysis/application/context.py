@@ -23,7 +23,7 @@ from __future__ import annotations
 
 from pydantic import model_validator
 
-from app.job_analysis.domain import (
+from app.core.domain import (
     CurrentWorkModel,
     DomainModel,
     ExcludedSignal,

@@ -24,7 +24,7 @@ from app.job_analysis.application import (
     put_jd_header,
     select_scheduled_opks,
 )
-from app.job_analysis.domain import (
+from app.core.domain import (
     CurrentWorkModel,
     JdHeader,
     JdTask,

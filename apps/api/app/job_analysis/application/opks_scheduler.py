@@ -22,7 +22,7 @@ from __future__ import annotations
 from enum import StrEnum
 from uuid import UUID
 
-from app.job_analysis.domain import (
+from app.core.domain import (
     OpenIssue,
     OpksProposalStatus,
     Task,
@@ -268,7 +268,7 @@ def _is_analysable(task: Task) -> bool:
 
 
 def _indicator_ids_for(state: JobAnalysisState, task_id: TaskId) -> frozenset[str]:
-    from app.job_analysis.domain import OpksEntityKind
+    from app.core.domain import OpksEntityKind
 
     return frozenset(
         item.entity_id

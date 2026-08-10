@@ -16,7 +16,7 @@ from app.job_analysis.application import (
     create_document,
 )
 from app.job_analysis.application.authority_commit import commit_authority_change
-from app.job_analysis.domain import (
+from app.core.domain import (
     CurrentJdOpks,
     CurrentWorkModel,
     Duty,

@@ -9,7 +9,7 @@ from pathlib import Path
 
 API_DIR = Path(__file__).parents[1]
 ROOT = API_DIR / "app" / "job_analysis"
-DOMAIN_ROOT = ROOT / "domain"
+CORE_ROOT = API_DIR / "app" / "core"
 COMPOSITION_SURFACES = (
     API_DIR / "app" / "api" / "job_analysis_deps.py",
     API_DIR / "app" / "api" / "routes" / "job_analysis.py",
@@ -46,7 +46,6 @@ def test_current_composition_does_not_import_removed_paths():
         "app.interview",
         "app.interview_vnext",
         "app.job_authoring",
-        "app.core",
         "app.services",
         "app.schemas",
         "indexer_contract",
@@ -60,19 +59,24 @@ def test_current_composition_does_not_import_removed_paths():
     assert violations == []
 
 
-def test_job_analysis_domain_imports_only_stdlib_pydantic_or_itself():
+def test_core_imports_only_stdlib_pydantic_or_itself():
+    """`app.core`（含 `app.core.domain`）是 shared kernel:只能 import stdlib、pydantic
+    或自己。這已隱含禁止 FastAPI、SQLAlchemy、HTTPX、OpenPyXL,以及任何
+    `app.job_analysis.application`／feature／adapter 模組(ADR 0058 規則 1)。
+    """
+    assert CORE_ROOT.exists(), f"missing shared kernel: {CORE_ROOT}"
     violations = []
-    for path in DOMAIN_ROOT.rglob("*.py"):
+    for path in CORE_ROOT.rglob("*.py"):
         for line, module in _imports(path):
             root = module.split(".", 1)[0]
             allowed = (
                 root in sys.stdlib_module_names
                 or root == "pydantic"
-                or module == "app.job_analysis.domain"
-                or module.startswith("app.job_analysis.domain.")
+                or module == "app.core"
+                or module.startswith("app.core.")
             )
             if not allowed:
-                violations.append(f"{path.relative_to(DOMAIN_ROOT)}:{line} imports {module}")
+                violations.append(f"{path.relative_to(CORE_ROOT)}:{line} imports {module}")
     assert violations == []
 
 

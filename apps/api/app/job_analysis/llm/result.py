@@ -29,9 +29,9 @@ from __future__ import annotations
 
 from enum import StrEnum
 
-from app.job_analysis.domain import DomainModel, NonEmptyText
-from app.job_analysis.domain.task import RetirementReason, TaskFields
-from app.job_analysis.domain.work_model import ExclusionReason, OpenIssueKind
+from app.core.domain import DomainModel, NonEmptyText
+from app.core.domain.task import RetirementReason, TaskFields
+from app.core.domain.work_model import ExclusionReason, OpenIssueKind
 
 
 TASK_ANALYSIS_RESULT_SCHEMA_NAME = "task_analysis_result.v1"

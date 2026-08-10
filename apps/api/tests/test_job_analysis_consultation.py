@@ -175,7 +175,7 @@ def support_only_text() -> ProviderText:
 
 
 def opks_text() -> ProviderText:
-    from app.job_analysis.domain import OpksEntityKind
+    from app.core.domain import OpksEntityKind
     from app.job_analysis.llm import OpksDecision, OpksResultWire, OpksWireItem
 
     wire = OpksResultWire(
@@ -219,7 +219,7 @@ class ScriptedAdapter:
 async def seed_task_in_jd(uow_factory, document_id):
     from datetime import timedelta
 
-    from app.job_analysis.domain import (
+    from app.core.domain import (
         CurrentWorkModel,
         JdTask,
         SourceKind,

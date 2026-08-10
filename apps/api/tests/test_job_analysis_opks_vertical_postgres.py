@@ -9,7 +9,7 @@ from sqlalchemy import text
 
 from app.adapters.job_analysis_postgres import SqlAlchemyJobAnalysisUnitOfWork
 from app.job_analysis.application import load_document
-from app.job_analysis.domain import OpksEntityKind, OpksProposalStatus
+from app.core.domain import OpksEntityKind, OpksProposalStatus
 from scripts.job_analysis_opks_smoke import run_scripted_opks_smoke
 
 

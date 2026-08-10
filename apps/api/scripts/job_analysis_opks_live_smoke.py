@@ -67,7 +67,7 @@ from app.job_analysis.application.opks_context import (  # noqa: E402
 from app.job_analysis.application.opks_operation import (  # noqa: E402
     run_opks_operation,
 )
-from app.job_analysis.domain import (  # noqa: E402
+from app.core.domain import (  # noqa: E402
     CurrentJdOpks,
     CurrentWorkModel,
     JdHeader,

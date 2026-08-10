@@ -24,7 +24,7 @@ from app.job_analysis.application import (
     load_document,
     submit_employee_turn,
 )
-from app.job_analysis.domain import OpksEntityKind, OpksGapAxis
+from app.core.domain import OpksEntityKind, OpksGapAxis
 from app.job_analysis.llm import (
     IdentityRelation,
     IssueResolutionKind,

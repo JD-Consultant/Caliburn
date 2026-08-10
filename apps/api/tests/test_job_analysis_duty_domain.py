@@ -6,7 +6,7 @@ import pytest
 from pydantic import ValidationError
 
 from app.job_analysis.application import JobAnalysisState
-from app.job_analysis.domain import CurrentWorkModel, Duty, JdHeader, JdTask
+from app.core.domain import CurrentWorkModel, Duty, JdHeader, JdTask
 
 
 def _task(*, duty_id: str | None = None) -> JdTask:

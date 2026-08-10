@@ -15,7 +15,7 @@ from app.job_analysis.application.readiness import (
     ReadinessIssueCode,
     assess_readiness,
 )
-from app.job_analysis.domain import (
+from app.core.domain import (
     CurrentJdOpks,
     Duty,
     JdHeader,

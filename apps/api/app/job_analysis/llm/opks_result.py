@@ -6,7 +6,7 @@ from enum import StrEnum
 
 from pydantic import Field
 
-from app.job_analysis.domain import DomainModel, NonEmptyText
+from app.core.domain import DomainModel, NonEmptyText
 
 
 class OpksGenerationEntityKind(StrEnum):

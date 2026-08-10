@@ -20,7 +20,7 @@ from app.job_analysis.application import (
     prepare_turn,
     reorder_jd_tasks,
 )
-from app.job_analysis.domain import JdTaskFields, ProposalStatus
+from app.core.domain import JdTaskFields, ProposalStatus
 from app.job_analysis.llm import (
     IdentityAssessment,
     IdentityRelation,

@@ -5,7 +5,7 @@ from __future__ import annotations
 from enum import StrEnum
 from typing import cast
 
-from app.job_analysis.domain import (
+from app.core.domain import (
     DomainModel,
     OpksEntityKind,
     OpksEvidenceLink,

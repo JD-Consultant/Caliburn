@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import re
 
-from app.job_analysis.domain import OpksEntityKind
+from app.core.domain import OpksEntityKind
 from app.job_analysis.llm import (
     OPKS_RESULT_WIRE_SCHEMA_NAME,
     OPKS_WIRE_SCHEMA_PATH,

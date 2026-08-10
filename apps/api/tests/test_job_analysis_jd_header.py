@@ -5,7 +5,7 @@ from __future__ import annotations
 import pytest
 from pydantic import ValidationError
 
-from app.job_analysis.domain import JdHeader
+from app.core.domain import JdHeader
 
 
 def test_an_empty_header_is_valid_because_every_field_is_optional() -> None:

@@ -46,7 +46,7 @@ from typing import Any
 
 from pydantic import Field, ValidationError
 
-from app.job_analysis.domain import (
+from app.core.domain import (
     DomainModel,
     Enabler,
     EnablerKind,

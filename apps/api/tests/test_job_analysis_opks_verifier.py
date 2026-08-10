@@ -9,7 +9,7 @@ from app.job_analysis.application import (
     build_opks_context_packet,
     verify_opks_result,
 )
-from app.job_analysis.domain import (
+from app.core.domain import (
     CurrentJdOpks,
     OpksEntityKind,
     OpksEvidenceLink,

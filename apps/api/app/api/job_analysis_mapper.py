@@ -34,7 +34,7 @@ from app.job_analysis.application import (
     assess_readiness,
     opks_task_status,
 )
-from app.job_analysis.domain import (
+from app.core.domain import (
     Enabler,
     EnablerKind,
     Duty,

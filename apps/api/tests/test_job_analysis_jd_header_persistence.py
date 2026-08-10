@@ -20,7 +20,7 @@ from app.job_analysis.application.opks_authoring import _locked_state
 from app.job_analysis.application.opks_generation import (
     _load_state as load_opks_generation_state,
 )
-from app.job_analysis.domain import CurrentWorkModel, JdHeader
+from app.core.domain import CurrentWorkModel, JdHeader
 
 
 NOW = datetime(2026, 8, 9, 9, 0, tzinfo=UTC)

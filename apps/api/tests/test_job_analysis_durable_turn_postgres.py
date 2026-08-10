@@ -16,8 +16,8 @@ from app.job_analysis.application import (
     UncommittableOperationResult,
     commit_verified_turn,
     prepare_turn,
-    select_scheduled_opks,
 )
+from app.opks import select_scheduled_opks
 from app.task_analysis import TaskAnalysisOperationResult, VerificationReport
 from app.core.domain import (
     CurrentWorkModel,

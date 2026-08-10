@@ -15,9 +15,14 @@ from app.core.domain import (
     Task,
     TaskState,
 )
-from app.job_analysis.providers import OpenRouterAdapter
 
 from app.core.authority import commit_authority_change
+from app.core.errors import (
+    DocumentNotFound,
+    IdempotencyConflict,
+    JdTaskNotFound,
+    StaleAuthoritySnapshot,
+)
 from app.core.journal import (
     OPKS_GENERATION_SCHEMA_ID,
     JournalEntry,
@@ -32,16 +37,15 @@ from app.core.persistence import (
 )
 from app.core.state import JobAnalysisState
 
-from .durable_turn import StaleAuthoritySnapshot
-from .errors import DocumentNotFound, IdempotencyConflict, JdTaskNotFound
-from .opks_context import (
+from .context import (
     OpksContextPacket,
     OpksGroundingUnavailable,
     build_opks_context_packet,
 )
-from .opks_digest import compute_analysis_input_digest
-from .opks_operation import OpksOperationResult, run_opks_operation
-from .opks_verifier import OpksGap
+from .digest import compute_analysis_input_digest
+from .operation import OpksOperationResult, run_opks_operation
+from .ports import OpksModelPort
+from .verifier import OpksGap
 
 
 @dataclass(frozen=True)
@@ -411,7 +415,7 @@ async def commit_opks_generation(
 async def generate_opks_proposals(
     uow_factory: JobAnalysisUnitOfWorkFactory,
     *,
-    adapter: OpenRouterAdapter,
+    adapter: OpksModelPort,
     document_id: UUID,
     task_id: str,
     operation_id: str,

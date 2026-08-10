@@ -4,11 +4,6 @@ from __future__ import annotations
 
 import pytest
 
-from app.job_analysis.application import (
-    OpksViolationCode,
-    build_opks_context_packet,
-    verify_opks_result,
-)
 from app.core.domain import (
     CurrentJdOpks,
     OpksEntityKind,
@@ -21,7 +16,9 @@ from app.core.domain import (
     SupportLink,
     Task,
 )
-from app.job_analysis.llm import (
+from app.opks import build_opks_context_packet, verify_opks_result
+from app.opks.verifier import OpksViolationCode
+from app.opks.llm import (
     OpksDecision,
     OpksGenerationEntityKind,
     OpksResult,
@@ -590,7 +587,7 @@ def test_the_opks_wire_schema_is_unchanged_by_the_gap_contract():
     `text=""` 的既有 decision(reuse／remove)也一併被 provider 端擋掉。
     """
 
-    from app.job_analysis.llm import (
+    from app.opks.llm import (
         committed_opks_wire_schema,
         opks_result_wire_provider_schema,
     )

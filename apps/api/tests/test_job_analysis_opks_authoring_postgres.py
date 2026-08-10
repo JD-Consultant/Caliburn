@@ -11,11 +11,8 @@ from app.documents.authoring import create_document
 from app.job_analysis.application import (
     IdempotencyConflict,
     OpksDirectEditPayload,
-    OpksItemNotFound,
-    add_opks_item,
-    delete_opks_item,
-    edit_opks_item,
 )
+from app.opks import OpksItemNotFound, add_opks_item, delete_opks_item, edit_opks_item
 from app.core.domain import (
     JdHeader,
     JdTaskFields,

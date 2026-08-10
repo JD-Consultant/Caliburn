@@ -11,7 +11,7 @@ from pydantic import Field
 from app.core.domain import DomainModel
 from app.core.portable_schema import compact_strict_output_schema
 
-from .opks_result import (
+from .result import (
     OpksDecision,
     OpksGenerationEntityKind,
     OpksResult,

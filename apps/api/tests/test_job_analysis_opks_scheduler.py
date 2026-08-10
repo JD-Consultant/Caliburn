@@ -13,7 +13,7 @@ from __future__ import annotations
 from datetime import UTC, datetime
 
 from app.core.state import JobAnalysisState
-from app.job_analysis.application import eligible_opks_candidates
+from app.opks import eligible_opks_candidates
 from app.core.domain import (
     CurrentJdOpks,
     CurrentWorkModel,
@@ -401,7 +401,7 @@ def result_with_target(target):
 
 
 def test_no_question_target_blocks_nothing():
-    from app.job_analysis.application import question_target_task_ids
+    from app.task_analysis import question_target_task_ids
 
     assert question_target_task_ids(
         result=result_with_target(None),
@@ -411,7 +411,7 @@ def test_no_question_target_blocks_nothing():
 
 
 def test_a_question_about_an_open_issue_blocks_its_subject_task():
-    from app.job_analysis.application import question_target_task_ids
+    from app.task_analysis import question_target_task_ids
     from app.task_analysis.llm import NextQuestionTarget, NextQuestionTargetKind
 
     gap = issue(subject_task_id="task-1", opks_axis=OpksGapAxis.OUTPUT)
@@ -431,7 +431,7 @@ def test_a_question_about_an_open_issue_blocks_its_subject_task():
 def test_a_question_about_a_new_task_blocks_the_id_that_turn_will_mint():
     """剛加進 Current JD 的 Task 當輪就可能 eligible;漏掉它就會問兩題。"""
 
-    from app.job_analysis.application import question_target_task_ids
+    from app.task_analysis import question_target_task_ids
     from app.task_analysis.llm import (
         IdentityAssessment,
         IdentityRelation,
@@ -482,13 +482,13 @@ def test_a_question_about_a_new_task_blocks_the_id_that_turn_will_mint():
 
 
 def status_of(subject, task_id: str = "task-1"):
-    from app.job_analysis.application import opks_task_status
+    from app.opks import opks_task_status
 
     return opks_task_status(subject, task_id)
 
 
 def test_an_unanalysable_task_says_it_is_not_ready():
-    from app.job_analysis.application import OpksTaskStatus
+    from app.opks import OpksTaskStatus
 
     assert status_of(
         state(tasks=(work_task("task-1", decision_link()),), jd=(jd_task(),))
@@ -496,7 +496,7 @@ def test_an_unanalysable_task_says_it_is_not_ready():
 
 
 def test_a_task_with_an_unanswered_gap_says_information_is_still_needed():
-    from app.job_analysis.application import OpksTaskStatus
+    from app.opks import OpksTaskStatus
 
     subject = state(
         tasks=(work_task(),),
@@ -510,7 +510,7 @@ def test_a_task_with_an_unanswered_gap_says_information_is_still_needed():
 
 
 def test_a_task_with_pending_proposals_says_suggestions_are_ready():
-    from app.job_analysis.application import OpksTaskStatus
+    from app.opks import OpksTaskStatus
 
     subject = state(
         tasks=(work_task(),),
@@ -528,7 +528,7 @@ def test_an_unanswered_gap_outranks_pending_proposals():
     「不宣稱完整」要擋的事。
     """
 
-    from app.job_analysis.application import OpksTaskStatus
+    from app.opks import OpksTaskStatus
 
     subject = state(
         tasks=(work_task(),),
@@ -555,7 +555,7 @@ def test_a_settled_task_gets_no_label_at_all():
 def test_only_three_labels_exist():
     """決定 36:狀態**僅**呈現這三種。多一個就是往完成度 dashboard 滑。"""
 
-    from app.job_analysis.application import OpksTaskStatus
+    from app.opks import OpksTaskStatus
 
     assert {member.value for member in OpksTaskStatus} == {
         "awaiting_employee_answer",

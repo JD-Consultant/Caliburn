@@ -1,4 +1,4 @@
-"""OPKS v1 的固定模型指示。動態產品現況由 opks_context 提供。"""
+"""OPKS v1 的固定模型指示。動態產品現況由 `app.opks.context` 提供。"""
 
 
 OPKS_INSTRUCTIONS = """你是專業職務分析顧問。針對 packet 中唯一的選定工作，提出必要且可追溯的工作產出、行為指標、知識與技能。

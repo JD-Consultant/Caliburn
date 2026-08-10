@@ -22,15 +22,6 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.documents import add_jd_task, delete_jd_task, load_document  # noqa: E402
 from app.documents.authoring import create_document  # noqa: E402
-from app.job_analysis.application import (  # noqa: E402
-    OpksGroundingUnavailable,
-    add_opks_item,
-    compute_analysis_input_digest,
-    decide_opks_proposal,
-    delete_opks_item,
-    edit_opks_item,
-    generate_opks_proposals,
-)
 from app.core.authority import commit_authority_change  # noqa: E402
 from app.core.persistence import JobAnalysisUnitOfWorkFactory  # noqa: E402
 from app.core.state import JobAnalysisState  # noqa: E402
@@ -46,7 +37,16 @@ from app.core.domain import (  # noqa: E402
     SupportLink,
     Task,
 )
-from app.job_analysis.llm import (  # noqa: E402
+from app.opks import (  # noqa: E402
+    OpksGroundingUnavailable,
+    add_opks_item,
+    compute_analysis_input_digest,
+    decide_opks_proposal,
+    delete_opks_item,
+    edit_opks_item,
+    generate_opks_proposals,
+)
+from app.opks.llm import (  # noqa: E402
     OpksDecision,
     OpksResultWire,
     OpksWireItem,

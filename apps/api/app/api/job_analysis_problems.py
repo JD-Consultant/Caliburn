@@ -16,14 +16,16 @@ from app.job_analysis.application import (
     ConcurrentAuthorityChange,
     DocumentNotFound,
     IdempotencyConflict,
-    InvalidOpksOrder,
     InvalidProposalDecision,
     JdTaskNotFound,
+)
+from app.job_analysis.application.errors import JobAnalysisApplicationError
+from app.opks import (
+    InvalidOpksOrder,
     OpksItemNotFound,
     OpksProposalNotDecidable,
     OpksProposalNotFound,
 )
-from app.job_analysis.application.errors import JobAnalysisApplicationError
 from app.task_analysis import ProposalNotDecidable, ProposalNotFound
 
 

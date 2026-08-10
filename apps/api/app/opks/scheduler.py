@@ -15,6 +15,12 @@ readiness 放在純函式的同一條線。
 純函式。分兩層:這裡回傳已排序、含 digest 的候選,application 端再逐一
 `journal.get(scheduled_opks_operation_id(candidate))`,取第一個沒有 receipt 的。
 `journal.get()` 因此就是完整答案,不需要新 query port。
+
+**`question_target_task_ids()` 不在這裡。** 它只解析 `TaskAnalysisResult`／
+`TaskAnalysisPacket`(`task_analysis` 的契約),`opks` 不 import `app.task_analysis`
+(ADR 0058 rule 2),所以那個函式移到 `app.task_analysis.question_targets`——它回傳
+的 `frozenset[TaskId]` 才是這裡 `question_task_ids` 參數吃的橋接資料,由呼叫端
+(未來的 `consultation`)接手兩邊。
 """
 
 from __future__ import annotations
@@ -31,15 +37,9 @@ from app.core.domain import (
 )
 from app.core.persistence import JobAnalysisUnitOfWork
 from app.core.state import JobAnalysisState
-from app.task_analysis import TaskAnalysisPacket
-from app.task_analysis.llm import (
-    NextQuestionTargetKind,
-    TaskAnalysisResult,
-    TaskChangeKind,
-)
 
-from .opks_context import proposal_references_task
-from .opks_digest import (
+from .context import proposal_references_task
+from .digest import (
     ScheduledOpks,
     compute_analysis_input_digest,
     scheduled_opks_operation_id,
@@ -171,74 +171,6 @@ async def select_scheduled_opks(
         if receipt is None:
             return candidate
     return None
-
-
-def question_target_task_ids(
-    *,
-    result: TaskAnalysisResult,
-    packet: TaskAnalysisPacket,
-    operation_id: str,
-) -> frozenset[TaskId]:
-    """本輪 `next_question` 問到了哪些 Task。
-
-    員工不該在同一輪同時被主顧問與 OPKS 問同一件事(決定 3 的最後一條)。兩種 target
-    都要解:`existing_open_issue` 走 packet ordinal 找回 issue 的 Task 指標;
-    `new_signal` 走該筆 signal 的 Task ordinal,**並算進本輪才鑄出來的 ID**——剛加進
-    Current JD 的 Task 當輪就可能 eligible,漏掉它就會問兩題。
-    """
-
-    target = result.next_question.target
-    if target is None:
-        return frozenset()
-
-    if target.kind is NextQuestionTargetKind.EXISTING_OPEN_ISSUE:
-        view = next(
-            (
-                candidate
-                for candidate in packet.current_authorities.open_issues
-                if candidate.ordinal == target.ordinal
-            ),
-            None,
-        )
-        if view is None:
-            return frozenset()
-        return frozenset(
-            task_id
-            for task_id in (
-                view.issue.subject_task_id,
-                view.issue.reconciliation_task_id,
-            )
-            if task_id is not None
-        )
-
-    if target.kind is not NextQuestionTargetKind.NEW_SIGNAL:
-        return frozenset()
-    index = target.index
-    if index is None or not 0 <= index < len(result.work_signals):
-        return frozenset()
-
-    signal = result.work_signals[index]
-    change = signal.task_change
-    if change is None:
-        return frozenset()
-
-    ids = {
-        view.task.task_id
-        for ordinal in change.target_task_ordinals
-        if (view := packet.task_view(ordinal)) is not None
-    }
-    # ID 配發規則住 `transition._Writer`;這裡照它推導,兩邊都由 operation_id + 位置
-    # 決定,所以不需要 transition 回報。
-    if change.change is TaskChangeKind.ADD:
-        ids.add(f"{operation_id}-t{index}")
-    elif change.change is TaskChangeKind.MERGE:
-        ids.add(f"{operation_id}-m{index}")
-    elif change.change is TaskChangeKind.SPLIT:
-        ids.update(
-            f"{operation_id}-s{index}-{position}"
-            for position in range(len(change.split_children))
-        )
-    return frozenset(ids)
 
 
 def _has_blocking_proposal(state: JobAnalysisState, task_id: TaskId) -> bool:

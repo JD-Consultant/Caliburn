@@ -7,7 +7,7 @@
 
 from __future__ import annotations
 
-from app.job_analysis.application import prune_opks_gaps_for_current_jd
+from app.core.opks_integrity import prune_opks_gaps_for_current_jd
 from app.core.domain import (
     JdTask,
     OpenIssue,

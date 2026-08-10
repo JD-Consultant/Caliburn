@@ -23,12 +23,14 @@ from app.core.state import JobAnalysisState
 from app.job_analysis.application import (
     DutyDirectEditPayload,
     IdempotencyConflict,
+    commit_verified_turn,
+    prepare_turn,
+)
+from app.opks import (
     OpksOperationResult,
     commit_opks_generation,
-    commit_verified_turn,
     compute_analysis_input_digest,
     prepare_opks_generation,
-    prepare_turn,
 )
 from app.task_analysis import (
     TaskAnalysisOperationResult,

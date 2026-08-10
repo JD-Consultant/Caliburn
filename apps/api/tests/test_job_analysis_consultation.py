@@ -176,7 +176,7 @@ def support_only_text() -> ProviderText:
 
 def opks_text() -> ProviderText:
     from app.core.domain import OpksEntityKind
-    from app.job_analysis.llm import OpksDecision, OpksResultWire, OpksWireItem
+    from app.opks.llm import OpksDecision, OpksResultWire, OpksWireItem
 
     wire = OpksResultWire(
         items=(

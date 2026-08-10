@@ -12,13 +12,7 @@ from app.documents.authoring import create_document
 from app.job_analysis.application import (
     OpksGenerationOutcome,
     OpksGenerationPayload,
-    ScheduledOpks,
     StaleAuthoritySnapshot,
-    add_opks_item,
-    compute_analysis_input_digest,
-    generate_opks_proposals,
-    scheduled_opks_operation_id,
-    select_scheduled_opks,
 )
 from app.job_analysis.application.errors import IdempotencyConflict
 from app.core.domain import (
@@ -34,7 +28,15 @@ from app.core.domain import (
     SupportLink,
     Task,
 )
-from app.job_analysis.llm import (
+from app.core.journal import ScheduledOpks
+from app.opks import (
+    add_opks_item,
+    compute_analysis_input_digest,
+    generate_opks_proposals,
+    scheduled_opks_operation_id,
+    select_scheduled_opks,
+)
+from app.opks.llm import (
     OpksDecision,
     OpksResultWire,
     OpksWireItem,

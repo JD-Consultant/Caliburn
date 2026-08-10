@@ -31,6 +31,7 @@ from .proposal_decisions import (
     decide_proposal,
     propose_task_for_jd,
 )
+from .question_targets import question_target_task_ids
 from .transition import (
     TransitionOutcome,
     TransitionResult,
@@ -52,6 +53,7 @@ __all__ = [
     "build_context_packet",
     "decide_proposal",
     "propose_task_for_jd",
+    "question_target_task_ids",
     "render_context_packet",
     "run_task_analysis_operation",
     "verify_task_analysis_result",

@@ -76,17 +76,19 @@ from app.job_analysis.application import (
     JobAnalysisUnitOfWorkFactory,
     TransitionCommitRejected,
     UncommittableOperationResult,
-    add_opks_item,
     assemble_export_document,
-    delete_opks_item,
-    edit_opks_item,
-    decide_opks_proposal,
-    reorder_opks_items,
     submit_employee_turn,
 )
 from app.job_analysis.application.errors import JobAnalysisApplicationError
 from app.job_analysis.application.export_xlsx import XLSX_MEDIA_TYPE, render_xlsx
 from app.job_analysis.providers import OpenRouterAdapter
+from app.opks import (
+    add_opks_item,
+    decide_opks_proposal,
+    delete_opks_item,
+    edit_opks_item,
+    reorder_opks_items,
+)
 from app.task_analysis import decide_proposal
 
 

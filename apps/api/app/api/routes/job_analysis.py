@@ -357,7 +357,8 @@ async def post_employee_turn(
     try:
         await submit_employee_turn(
             uow_factory,
-            adapter=adapter,
+            task_analysis_adapter=adapter,
+            opks_adapter=adapter,
             document_id=document_id,
             operation_id=idempotency_key,
             text=text,

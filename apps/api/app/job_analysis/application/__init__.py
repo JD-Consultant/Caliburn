@@ -1,4 +1,4 @@
-"""Use-case 層：consultation 協調層與純 persistence ports。
+"""Use-case 層：export assembly 與純 persistence ports。
 
 Document/header/Duty/Task direct-edit use cases and readiness moved to
 `app.documents` (ADR 0058). `create_document` is re-exported here from
@@ -9,18 +9,29 @@ public API.
 Task Proposal analysis (packet building, the analysis operation, proposal
 decisions, transition, verifier) moved to `app.task_analysis`; OPKS(item
 authoring, context, generation, scheduler, proposals, verifier)moved to
-`app.opks`(both ADR 0058); this module no longer re-exports either. What
-remains here — `consultation.py`／`durable_turn.py` — is the not-yet-carved
-`consultation` module(Task 6),which imports both feature modules' curated
-public APIs directly. `JobAnalysisState`／`ConversationTurn`／
+`app.opks`; consultation orchestration(`submit_employee_turn`／
+`commit_verified_turn`／`prepare_turn`)moved to `app.consultation`(all three
+ADR 0058); this module no longer re-exports any of them at their own source
+— it re-imports the consultation surface from `app.consultation` below only
+because `app.api` still consumes it through this package until Task 7
+dissolves `app.job_analysis` entirely. `JobAnalysisState`／`ConversationTurn`／
 `ActiveQuestion`／`TurnSpeaker`／`OperationOutcome` are core-owned types this
 package still consumes internally, imported straight from `app.core` rather
-than through `task_analysis`／`opks`.
+than through `task_analysis`／`opks`／`consultation`.
 """
 
 from app.core.journal import ActiveQuestion, ConversationTurn, TurnSpeaker
 from app.core.model_outcome import OperationOutcome
 from app.core.state import JobAnalysisState
+from app.consultation import (
+    CommittedTurn,
+    TransitionCommitRejected,
+    TurnSnapshot,
+    UncommittableOperationResult,
+    commit_verified_turn,
+    prepare_turn,
+    submit_employee_turn,
+)
 from app.documents.authoring import create_document
 from .export import (
     ExportDocument,
@@ -36,15 +47,6 @@ from .errors import (
     IdempotencyConflict,
     InvalidProposalDecision,
     JdTaskNotFound,
-)
-from .consultation import submit_employee_turn
-from .durable_turn import (
-    CommittedTurn,
-    TransitionCommitRejected,
-    TurnSnapshot,
-    UncommittableOperationResult,
-    commit_verified_turn,
-    prepare_turn,
 )
 from app.core.journal import (
     CONSULTANT_OPENING_SCHEMA_ID,

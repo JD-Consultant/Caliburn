@@ -87,14 +87,16 @@ async def test_committed_turn_replay_skips_the_provider_before_prepare(
 
     await submit(
         uow_factory,
-        adapter=adapter,
+        task_analysis_adapter=adapter,
+        opks_adapter=adapter,
         document_id=document_id,
         operation_id="turn-1",
         text="我每週會彙整營運週報",
     )
     await submit(
         uow_factory,
-        adapter=adapter,
+        task_analysis_adapter=adapter,
+        opks_adapter=adapter,
         document_id=document_id,
         operation_id="turn-1",
         text="我每週會彙整營運週報",
@@ -113,7 +115,8 @@ async def test_committed_turn_replay_skips_the_provider_before_prepare(
     with pytest.raises(IdempotencyConflict):
         await submit(
             uow_factory,
-            adapter=adapter,
+            task_analysis_adapter=adapter,
+            opks_adapter=adapter,
             document_id=document_id,
             operation_id="turn-1",
             text="其實我每月才做一次",
@@ -137,7 +140,8 @@ async def test_provider_failure_leaves_only_the_opening(
     with pytest.raises(UncommittableOperationResult):
         await submit(
             uow_factory,
-            adapter=adapter,
+            task_analysis_adapter=adapter,
+            opks_adapter=adapter,
             document_id=document_id,
             operation_id="turn-failed",
             text="我每週會彙整營運週報",
@@ -267,7 +271,8 @@ async def seed_task_in_jd(uow_factory, document_id):
 async def submit(uow_factory, adapter, document_id, operation_id="turn-1"):
     return await application.submit_employee_turn(
         uow_factory,
-        adapter=adapter,
+        task_analysis_adapter=adapter,
+        opks_adapter=adapter,
         document_id=document_id,
         operation_id=operation_id,
         text="我每週會彙整營運週報",

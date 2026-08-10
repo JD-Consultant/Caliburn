@@ -10,9 +10,11 @@ from __future__ import annotations
 import logging
 from uuid import UUID
 
-from app.job_analysis.providers import OpenRouterAdapter
-
-from app.core.errors import StaleAuthoritySnapshot
+from app.core.errors import (
+    IdempotencyConflict,
+    JobAnalysisApplicationError,
+    StaleAuthoritySnapshot,
+)
 from app.core.journal import (
     CompletedTurnPayload,
     ConversationTurn,
@@ -21,11 +23,14 @@ from app.core.journal import (
     TurnSpeaker,
 )
 from app.core.persistence import JobAnalysisUnitOfWorkFactory
-from app.opks import generate_opks_proposals, scheduled_opks_operation_id
-from app.task_analysis import run_task_analysis_operation
+from app.opks import (
+    OpksModelPort,
+    generate_opks_proposals,
+    scheduled_opks_operation_id,
+)
+from app.task_analysis import TaskAnalysisModelPort, run_task_analysis_operation
 
 from .durable_turn import commit_verified_turn, prepare_turn
-from .errors import IdempotencyConflict, JobAnalysisApplicationError
 
 
 logger = logging.getLogger(__name__)
@@ -90,12 +95,21 @@ async def _committed_replay(
 async def submit_employee_turn(
     uow_factory: JobAnalysisUnitOfWorkFactory,
     *,
-    adapter: OpenRouterAdapter,
+    task_analysis_adapter: TaskAnalysisModelPort,
+    opks_adapter: OpksModelPort,
     document_id: UUID,
     operation_id: str,
     text: str,
 ) -> None:
     """Run at most one provider call for a not-yet-committed sequential request.
+
+    Takes both model ports explicitly rather than one shared adapter type:
+    `consultation` is the only module that coordinates `task_analysis` and
+    `opks`, and it never imports the concrete `OpenRouterAdapter`. The
+    composition root may hand the same adapter instance to both parameters —
+    it already satisfies both Protocols structurally — but this signature
+    keeps that an implementation detail of the caller, not something
+    `consultation` depends on.
 
     This intentionally does not deduplicate two requests that are already in flight.
     The local Web disables duplicate submission while its mutation is pending.
@@ -118,7 +132,7 @@ async def submit_employee_turn(
         )
         operation_result = await run_task_analysis_operation(
             packet=snapshot.packet,
-            adapter=adapter,
+            adapter=task_analysis_adapter,
         )
         committed = await commit_verified_turn(
             uow_factory,
@@ -132,7 +146,7 @@ async def submit_employee_turn(
     if scheduled is not None:
         await _run_scheduled_opks(
             uow_factory,
-            adapter=adapter,
+            adapter=opks_adapter,
             document_id=document_id,
             scheduled=scheduled,
         )
@@ -141,7 +155,7 @@ async def submit_employee_turn(
 async def _run_scheduled_opks(
     uow_factory: JobAnalysisUnitOfWorkFactory,
     *,
-    adapter: OpenRouterAdapter,
+    adapter: OpksModelPort,
     document_id: UUID,
     scheduled: ScheduledOpks,
 ) -> None:

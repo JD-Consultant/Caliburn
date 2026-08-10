@@ -7,7 +7,13 @@ from datetime import UTC, datetime
 from uuid import UUID
 
 from app.core.authority import commit_authority_change
-from app.core.errors import ConcurrentAuthorityChange, StaleAuthoritySnapshot
+from app.core.errors import (
+    ConcurrentAuthorityChange,
+    DocumentNotFound,
+    IdempotencyConflict,
+    JobAnalysisApplicationError,
+    StaleAuthoritySnapshot,
+)
 from app.core.journal import (
     COMPLETED_TURN_SCHEMA_ID,
     ActiveQuestion,
@@ -33,12 +39,6 @@ from app.task_analysis import (
     apply_task_analysis_result,
     build_context_packet,
     question_target_task_ids,
-)
-
-from .errors import (
-    DocumentNotFound,
-    IdempotencyConflict,
-    JobAnalysisApplicationError,
 )
 
 

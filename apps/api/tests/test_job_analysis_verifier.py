@@ -19,7 +19,7 @@ from app.job_analysis.application import (
     ViolationCode,
     verify_task_analysis_result,
 )
-from app.job_analysis.domain import (
+from app.core.domain import (
     ExclusionReason,
     OpenIssueKind,
     RetirementReason,

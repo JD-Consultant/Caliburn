@@ -14,7 +14,7 @@ from enum import StrEnum
 
 from pydantic import ValidationError
 
-from app.job_analysis.domain import DomainModel, NonEmptyText
+from app.core.domain import DomainModel, NonEmptyText
 from app.job_analysis.llm import (
     TASK_ANALYSIS_WIRE_SCHEMA_NAME,
     TaskAnalysisResult,

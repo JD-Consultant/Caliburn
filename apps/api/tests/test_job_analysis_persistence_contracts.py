@@ -34,7 +34,7 @@ from app.job_analysis.application import (
     TurnSpeaker,
     scheduled_opks_operation_id,
 )
-from app.job_analysis.domain import (
+from app.core.domain import (
     CurrentWorkModel,
     JdHeader,
     JdTask,

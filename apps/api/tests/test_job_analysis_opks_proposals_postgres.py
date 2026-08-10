@@ -17,7 +17,7 @@ from app.job_analysis.application import (
     edit_opks_item,
     load_document,
 )
-from app.job_analysis.domain import (
+from app.core.domain import (
     JdTaskFields,
     OpksEntityKind,
     OpksEvidenceLink,

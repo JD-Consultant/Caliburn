@@ -23,7 +23,7 @@ from app.job_analysis.application import (
     render_context_packet,
     run_task_analysis_operation,
 )
-from app.job_analysis.domain import (
+from app.core.domain import (
     CurrentWorkModel,
     Enabler,
     EnablerKind,

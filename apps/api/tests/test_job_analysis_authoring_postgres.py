@@ -24,7 +24,7 @@ from app.job_analysis.application import (
     put_jd_header,
     reorder_jd_tasks,
 )
-from app.job_analysis.domain import (
+from app.core.domain import (
     CurrentWorkModel,
     JdEntry,
     JdHeader,

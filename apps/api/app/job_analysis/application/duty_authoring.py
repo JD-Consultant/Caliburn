@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from uuid import UUID
 
-from app.job_analysis.domain import CurrentJdOpks, Duty, DutyId, JdTask, Proposal
+from app.core.domain import CurrentJdOpks, Duty, DutyId, JdTask, Proposal
 
 from .authoring import stale_task_proposals_for_direct_edit
 from .authority_commit import commit_authority_change

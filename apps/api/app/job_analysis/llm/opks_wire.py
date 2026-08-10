@@ -8,7 +8,7 @@ from typing import Any
 
 from pydantic import Field
 
-from app.job_analysis.domain import DomainModel
+from app.core.domain import DomainModel
 
 from .opks_result import (
     OpksDecision,

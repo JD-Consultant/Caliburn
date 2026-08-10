@@ -12,7 +12,7 @@ from app.job_analysis.application import (
     render_opks_context_packet,
     run_opks_operation,
 )
-from app.job_analysis.domain import (
+from app.core.domain import (
     CurrentJdOpks,
     OpksEntityKind,
     OpksEvidenceLink,

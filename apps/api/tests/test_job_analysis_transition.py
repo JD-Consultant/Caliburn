@@ -18,7 +18,7 @@ from app.job_analysis.application import (
     apply_task_analysis_result,
     build_context_packet,
 )
-from app.job_analysis.domain import (
+from app.core.domain import (
     CurrentWorkModel,
     Duty,
     JdEntry,
@@ -60,7 +60,7 @@ from app.job_analysis.llm import (
     TaskChangePayload,
     WorkSignal,
 )
-from app.job_analysis.domain import ExclusionReason, OpenIssueKind, Retirement
+from app.core.domain import ExclusionReason, OpenIssueKind, Retirement
 
 
 EMPLOYEE_TEXT = "我每週要出一份營運週報,也要追蹤缺料"
@@ -986,7 +986,7 @@ def test_ids_are_namespaced_by_operation(operation_id):
 
 
 def gap_state(*, terminal=None) -> JobAnalysisState:
-    from app.job_analysis.domain import (
+    from app.core.domain import (
         OpenIssue,
         OpenIssueTerminalResolution,
         OpksGapAxis,
@@ -1073,7 +1073,7 @@ def test_the_resolution_source_ref_is_stamped_by_the_application():
 def test_a_terminal_issue_is_not_offered_for_resolution_again():
     """決定 20:terminal issue 不配發 ordinal,所以 ordinal 1 根本不存在。"""
 
-    from app.job_analysis.domain import (
+    from app.core.domain import (
         OpenIssueTerminalResolution,
         OpenIssueTerminalResolutionKind,
     )

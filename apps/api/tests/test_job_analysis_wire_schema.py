@@ -12,7 +12,7 @@ import re
 
 import pytest
 
-from app.job_analysis.domain import (
+from app.core.domain import (
     EnablerKind,
     ExclusionReason,
     OpenIssueKind,

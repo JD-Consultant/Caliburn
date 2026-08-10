@@ -35,7 +35,7 @@ from app.job_analysis.application import (
     OpksGenerationPayload,
     ProposalDecisionPayload,
 )
-from app.job_analysis.domain import (
+from app.core.domain import (
     CurrentWorkModel,
     Duty,
     JdHeader,

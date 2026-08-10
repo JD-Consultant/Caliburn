@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import pytest
 
-from app.job_analysis.domain import (
+from app.core.domain import (
     EnablerKind,
     ExclusionReason,
     OpenIssueKind,

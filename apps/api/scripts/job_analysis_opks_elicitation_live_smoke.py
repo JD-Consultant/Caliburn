@@ -70,7 +70,7 @@ from app.job_analysis.application import (  # noqa: E402
 from app.job_analysis.application.authority_commit import (  # noqa: E402
     commit_authority_change,
 )
-from app.job_analysis.domain import (  # noqa: E402
+from app.core.domain import (  # noqa: E402
     CurrentWorkModel,
     JdHeader,
     JdTask,

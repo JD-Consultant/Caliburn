@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 import pytest
 from pydantic import ValidationError
 
-from app.job_analysis.domain import (
+from app.core.domain import (
     OPKS_ALLOWED_STATUS_TRANSITIONS,
     OPKS_TERMINAL_STATUSES,
     CurrentJdOpks,

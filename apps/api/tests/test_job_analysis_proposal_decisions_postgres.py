@@ -15,7 +15,7 @@ from app.job_analysis.application import (
     load_document,
     propose_task_for_jd,
 )
-from app.job_analysis.domain import (
+from app.core.domain import (
     CurrentWorkModel,
     JdEntry,
     JdHeader,

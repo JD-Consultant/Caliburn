@@ -27,7 +27,7 @@ from enum import StrEnum
 
 from pydantic import model_validator
 
-from app.job_analysis.domain import DomainModel, Identifier, NonEmptyText, TaskId
+from app.core.domain import DomainModel, Identifier, NonEmptyText, TaskId
 from app.job_analysis.llm import (
     IdentityRelation,
     IssueResolutionKind,
@@ -37,7 +37,7 @@ from app.job_analysis.llm import (
     WorkSignal,
 )
 from app.job_analysis.llm.result import NextQuestionTargetKind
-from app.job_analysis.domain.work_model import OpenIssueKind
+from app.core.domain.work_model import OpenIssueKind
 
 
 # ── Context Packet 的 ordinal 檢視(§11.2:mapping 存在該輪呼叫紀錄側)──────

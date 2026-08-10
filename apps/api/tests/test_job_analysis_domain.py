@@ -9,7 +9,7 @@ from __future__ import annotations
 import pytest
 from pydantic import ValidationError
 
-from app.job_analysis.domain import (
+from app.core.domain import (
     ALLOWED_STATUS_TRANSITIONS,
     TERMINAL_STATUSES,
     CurrentWorkModel,

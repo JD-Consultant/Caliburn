@@ -18,7 +18,7 @@ from __future__ import annotations
 import hashlib
 import json
 
-from app.job_analysis.domain import DomainModel, Identifier, NonEmptyText, Task, TaskId
+from app.core.domain import DomainModel, Identifier, NonEmptyText, Task, TaskId
 
 
 class ScheduledOpks(DomainModel):

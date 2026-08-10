@@ -11,7 +11,7 @@ from app.job_analysis.application import (
     build_opks_context_packet,
     render_opks_context_packet,
 )
-from app.job_analysis.domain import (
+from app.core.domain import (
     CurrentJdOpks,
     OpksEntityKind,
     OpksEvidenceLink,
@@ -266,7 +266,7 @@ def settled_gap_issue(
     terminal=None,
     summary: str = "還看不出完成這件事需要哪些具體操作",
 ):
-    from app.job_analysis.domain import (
+    from app.core.domain import (
         OpenIssue,
         OpenIssueKind,
         OpenIssueTerminalResolution,
@@ -298,7 +298,7 @@ def test_the_specialist_sees_settled_gaps_for_the_selected_task():
     """少了這一區,新 Evidence 讓 digest 改變後,specialist 會對同一軸再開一次同一個
     缺口,員工就被重問一次已經答不出來的事。"""
 
-    from app.job_analysis.domain import OpksGapAxis
+    from app.core.domain import OpksGapAxis
 
     built = build_opks_context_packet(
         selected_task=selected_task(),

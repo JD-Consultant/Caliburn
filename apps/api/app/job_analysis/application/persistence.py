@@ -16,7 +16,7 @@ from uuid import UUID
 
 from pydantic import model_validator
 
-from app.job_analysis.domain import (
+from app.core.domain import (
     CurrentWorkModel,
     DomainModel,
     Duty,

@@ -21,7 +21,7 @@ from app.job_analysis.application import (
     JobAnalysisUnitOfWork,
     PROPOSAL_SCHEMA_ID,
 )
-from app.job_analysis.domain import (
+from app.core.domain import (
     Duty,
     JdEntry,
     JdTask,

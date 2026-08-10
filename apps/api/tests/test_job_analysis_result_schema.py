@@ -11,7 +11,7 @@ import json
 
 import pytest
 
-from app.job_analysis.domain import ExclusionReason, OpenIssueKind, TaskFields
+from app.core.domain import ExclusionReason, OpenIssueKind, TaskFields
 from app.job_analysis.llm import (
     TASK_ANALYSIS_INSTRUCTIONS,
     ExcludePayload,

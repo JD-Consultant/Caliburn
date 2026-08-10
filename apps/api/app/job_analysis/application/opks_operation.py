@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pydantic import ValidationError
 
-from app.job_analysis.domain import DomainModel, NonEmptyText
+from app.core.domain import DomainModel, NonEmptyText
 from app.job_analysis.llm import (
     OPKS_INSTRUCTIONS,
     OPKS_RESULT_WIRE_SCHEMA_NAME,

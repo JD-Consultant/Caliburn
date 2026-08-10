@@ -60,11 +60,11 @@ import httpx
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.config import settings  # noqa: E402
+from app.documents import load_document  # noqa: E402
+from app.documents.authoring import create_document  # noqa: E402
 from app.job_analysis.application import (  # noqa: E402
     JobAnalysisState,
     JobAnalysisUnitOfWorkFactory,
-    create_document,
-    load_document,
     submit_employee_turn,
 )
 from app.core.authority import commit_authority_change  # noqa: E402

@@ -1,6 +1,6 @@
 """iCAP 版型缺漏評估（ADR 0052 決定 1–7、ADR 0053 決定 6–8）。
 
-純函式，住 `app/job_analysis`：規則是 domain 的事，**不依賴 transport contract、不碰 IO**
+純函式，住 `app/documents`：規則是 domain 的事，**不依賴 transport contract、不碰 IO**
 （ADR 0052 決定 1）。transport 只承載結果與固定 issue code（決定 2），Web 直接呈現、
 不自行重算（決定 3），未來 exporter 呼叫同一支（決定 4）。
 

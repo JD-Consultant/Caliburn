@@ -7,6 +7,8 @@ from datetime import UTC, datetime, timedelta
 import pytest
 
 from app.adapters.job_analysis_postgres import SqlAlchemyJobAnalysisUnitOfWork
+from app.documents import load_document
+from app.documents.authoring import create_document
 from app.job_analysis.application import (
     OpksGenerationOutcome,
     OpksGenerationPayload,
@@ -14,9 +16,7 @@ from app.job_analysis.application import (
     StaleAuthoritySnapshot,
     add_opks_item,
     compute_analysis_input_digest,
-    create_document,
     generate_opks_proposals,
-    load_document,
     scheduled_opks_operation_id,
     select_scheduled_opks,
 )

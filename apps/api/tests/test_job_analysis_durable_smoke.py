@@ -5,20 +5,17 @@ from __future__ import annotations
 import pytest
 
 from app.adapters.job_analysis_postgres import SqlAlchemyJobAnalysisUnitOfWork
+from app.documents import add_jd_task, edit_jd_task, load_document, reorder_jd_tasks
+from app.documents.authoring import create_document
 from app.job_analysis.application import (
     ConversationTurn,
     OperationOutcome,
     TaskAnalysisOperationResult,
     TurnSpeaker,
     VerificationReport,
-    add_jd_task,
     commit_verified_turn,
-    create_document,
     decide_proposal,
-    edit_jd_task,
-    load_document,
     prepare_turn,
-    reorder_jd_tasks,
 )
 from app.core.domain import JdTaskFields, ProposalStatus
 from app.job_analysis.llm import (

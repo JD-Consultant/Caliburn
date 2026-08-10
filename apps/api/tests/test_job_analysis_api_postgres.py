@@ -16,7 +16,7 @@ from app.api.job_analysis_deps import (
     get_job_analysis_adapter,
     get_job_analysis_uow_factory,
 )
-from app.job_analysis.application import load_document
+from app.documents import load_document
 from app.core.domain import TaskFields
 from app.job_analysis.llm import (
     IdentityRelation,

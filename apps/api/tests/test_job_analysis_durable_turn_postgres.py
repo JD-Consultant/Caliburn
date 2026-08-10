@@ -7,6 +7,8 @@ from datetime import UTC, datetime, timedelta
 import pytest
 
 from app.adapters.job_analysis_postgres import SqlAlchemyJobAnalysisUnitOfWork
+from app.documents import add_jd_task, load_document, put_jd_header
+from app.documents.authoring import create_document
 from app.job_analysis.application import (
     CompletedTurnPayload,
     ConversationTurn,
@@ -16,12 +18,8 @@ from app.job_analysis.application import (
     TurnSpeaker,
     UncommittableOperationResult,
     VerificationReport,
-    add_jd_task,
     commit_verified_turn,
-    create_document,
-    load_document,
     prepare_turn,
-    put_jd_header,
     select_scheduled_opks,
 )
 from app.core.domain import (

@@ -8,8 +8,8 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from app.job_analysis.application import JobAnalysisState
-from app.job_analysis.application.readiness import (
+from app.core.state import JobAnalysisState
+from app.documents.readiness import (
     DocumentReadiness,
     ReadinessIssue,
     ReadinessIssueCode,
@@ -146,13 +146,12 @@ def test_readiness_is_a_frozen_value() -> None:
 
 
 def test_assessment_is_pure_and_does_not_touch_transport_or_io() -> None:
-    """ADR 0052 決定 1：規則住 app/job_analysis，不依賴 transport contract。"""
+    """ADR 0052 決定 1：規則住 app/documents，不依賴 transport contract。"""
 
     source = (
         Path(__file__).parents[1]
         / "app"
-        / "job_analysis"
-        / "application"
+        / "documents"
         / "readiness.py"
     )
     tree = ast.parse(source.read_text(encoding="utf-8"), filename=str(source))

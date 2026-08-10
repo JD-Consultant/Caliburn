@@ -6,31 +6,33 @@ import pytest
 from sqlalchemy.exc import IntegrityError
 
 from app.adapters.job_analysis_postgres import SqlAlchemyJobAnalysisUnitOfWork
+from app.documents import (
+    InvalidDutyOrder,
+    add_duty,
+    add_jd_task,
+    delete_duty,
+    edit_duty,
+    edit_jd_task,
+    load_document,
+    reorder_duties,
+)
+from app.documents.authoring import create_document
 from app.job_analysis.application import (
     ConversationTurn,
     DutyDirectEditPayload,
     IdempotencyConflict,
-    InvalidDutyOrder,
     JobAnalysisState,
     OperationOutcome,
     OpksOperationResult,
     TaskAnalysisOperationResult,
     TurnSpeaker,
     VerificationReport,
-    add_duty,
-    add_jd_task,
     commit_opks_generation,
     commit_verified_turn,
     compute_analysis_input_digest,
-    create_document,
     decide_proposal,
-    delete_duty,
-    edit_duty,
-    edit_jd_task,
-    load_document,
     prepare_opks_generation,
     prepare_turn,
-    reorder_duties,
 )
 from app.core.authority import commit_authority_change
 from app.core.domain import (

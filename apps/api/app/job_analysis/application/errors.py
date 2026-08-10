@@ -1,9 +1,10 @@
 """Typed application failures shared by job-analysis use cases.
 
 The six failures consumed by more than one future feature module now live in
-`app.core.errors` (ADR 0058 rule 7); this module re-exports them alongside the
-feature-specific errors that still belong here until their owning feature module
-is carved out.
+`app.core.errors` (ADR 0058 rule 7); Duty/Task/JD-header direct-edit failures
+moved to `app.documents.errors` when the `documents` feature module was
+carved out. This module re-exports the remaining feature-specific errors that
+still belong here until their owning feature module is carved out.
 """
 
 from app.core.errors import (
@@ -14,14 +15,6 @@ from app.core.errors import (
     JdTaskNotFound,
     JobAnalysisApplicationError,
 )
-
-
-class DutyNotFound(JobAnalysisApplicationError):
-    pass
-
-
-class InvalidDutyOrder(JobAnalysisApplicationError):
-    pass
 
 
 class OpksItemNotFound(JobAnalysisApplicationError):
@@ -37,12 +30,4 @@ class OpksProposalNotFound(JobAnalysisApplicationError):
 
 
 class OpksProposalNotDecidable(JobAnalysisApplicationError):
-    pass
-
-
-class InvalidJdTaskOrder(JobAnalysisApplicationError):
-    pass
-
-
-class JdHeaderNotChanged(JobAnalysisApplicationError):
     pass

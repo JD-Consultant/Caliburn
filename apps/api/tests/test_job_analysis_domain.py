@@ -1,4 +1,4 @@
-"""T1:`app/job_analysis/domain` 的凍結形狀(研究稿 §9、§10)。
+"""T1:`app/core/domain` 的凍結形狀(研究稿 §9、§10)。
 
 測試對著凍結文件寫,不是對著實作寫:enum 值域逐字比對、必填/可空、§10.5 的
 `edited_jd_after` 四條硬規則、lineage 不成環。

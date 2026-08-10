@@ -2,7 +2,7 @@
 title: Task Analysis 引擎 — 端到端設計(durable PostgreSQL + consultant Web)
 audience: agent-primary(也給人)
 scope: apps/api core + task_analysis + opks + consultation + documents + export + adapters/{postgres,openrouter,xlsx} + api routes + apps/web workspace
-updated: 2026-08-09
+updated: 2026-08-11
 ---
 
 # Task Analysis 引擎 — 端到端設計
@@ -58,7 +58,7 @@ OpenRouter 拿 `task_analysis_result_v3`(送出去的精簡形狀)→ **mapper**
 | consultation use case | provider 前 replay → authority snapshot → 交易外模型呼叫 → verified commit | `app/consultation/turn.py`、`app/consultation/durable_turn.py` | 已提交的同 key／同回答零 provider call；commit 時重鎖並比對 generation/read-set；Work Model、Proposal、下一題與 completed-turn Journal 同交易 |
 | Proposal use cases | Task 與 OPKS 各自送審、決策與 stale | `app/task_analysis/proposal_decisions.py`、`app/opks/proposals.py` | 兩種 Proposal 不抽通用 framework；決策由 document lock 序列化。OPKS accepted 套用候選但不偽造 Evidence；edited 只可改文字並另鑄 direct-edit Evidence；歷史 accepted 不會誤殺日後建立的新 revise |
 | Local Web API | 本機文件、JD header、Current JD、OPKS 與 Consultation routes | `app/api/routes/documents.py`、`consultation.py`、`opks.py`、`export.py`（共用 `/job-analysis/documents` prefix） | 只做 generated wire DTO mapping；`PUT …/jd-header` 要求 `Idempotency-Key`，回 `JdHeaderView`，未改內容回 typed `422 invalid-request`；不暴露 Work Model、Journal、generation、內部 OPKS Source ID 或 provider detail。Consultation 會投影 Task 與 OPKS 兩種 Proposal，兩種 decision route 各自呼叫對應的 greenfield use case |
-| Local Web UI | 文件庫、顧問訪談、Proposal 審查、JD 基本資料與單一開啟文件的 Task／OPKS editor | `apps/web/src/app/workspace/`、`components/workspace/` | generated TS DTO + TanStack Query；conversation／Proposal／Current JD 同頁，一份本地編輯草稿、明確 Save／Cancel，不用 Server Action／autosave／第二份 document store。`JdHeaderForm` 位於右欄 Current JD Task editor 上方，九個員工可編輯欄位都可留白；成功後以回傳 Header 重設 baseline/draft 並 invalidate 既有 document／consultation keys。`ReadinessNotice` 只呈現 API 回傳的三種 issue code，零 issue 時不渲染，不重算、不顯示百分比或完成宣告；不提供 iCAP 配發代碼輸入欄。O/P/K/S 按 Task 投影，同一 K/S 保留同一 entity identity；未連結 K/S 與 A 留在文件層 |
+| Local Web UI | 文件庫、顧問訪談、Proposal 審查、JD 基本資料與單一開啟文件的 Task／OPKS editor | `apps/web/src/app/workspace/`、`apps/web/src/features/`、`apps/web/src/shared/` | generated TS DTO + TanStack Query；conversation／Proposal／Current JD 同頁，一份本地編輯草稿、明確 Save／Cancel，不用 Server Action／autosave／第二份 document store。`JdHeaderForm` 位於右欄 Current JD Task editor 上方，九個員工可編輯欄位都可留白；成功後以回傳 Header 重設 baseline/draft 並 invalidate 既有 document／consultation keys。`ReadinessNotice` 只呈現 API 回傳的三種 issue code，零 issue 時不渲染，不重算、不顯示百分比或完成宣告；不提供 iCAP 配發代碼輸入欄。O/P/K/S 按 Task 投影，同一 K/S 保留同一 entity identity；未連結 K/S 與 A 留在文件層 |
 
 ### 2.1 Current State partition（Task 1–2）
 

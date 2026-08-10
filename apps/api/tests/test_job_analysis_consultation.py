@@ -2,16 +2,14 @@
 
 from __future__ import annotations
 
-import app.job_analysis.application as application
+import app.consultation as consultation
 import pytest
 
-from app.adapters.job_analysis_postgres import SqlAlchemyJobAnalysisUnitOfWork
+from app.adapters.postgres import SqlAlchemyJobAnalysisUnitOfWork
+from app.consultation import UncommittableOperationResult
+from app.core.errors import IdempotencyConflict
 from app.documents import load_document
 from app.documents.authoring import create_document
-from app.job_analysis.application import (
-    IdempotencyConflict,
-    UncommittableOperationResult,
-)
 from app.task_analysis.llm import (
     IdentityRelation,
     SignalDisposition,
@@ -22,7 +20,7 @@ from app.task_analysis.llm import (
     WireTaskChange,
     WireTaskFields,
 )
-from app.job_analysis.providers import (
+from app.adapters.openrouter import (
     ProviderFailure,
     ProviderFailureKind,
     ProviderText,
@@ -78,7 +76,7 @@ async def test_committed_turn_replay_skips_the_provider_before_prepare(
     postgres_session_factory,
     cleanup_job_analysis_rows,
 ):
-    submit = getattr(application, "submit_employee_turn", None)
+    submit = getattr(consultation, "submit_employee_turn", None)
     assert submit is not None
     document_id = cleanup_job_analysis_rows
     uow_factory = factory(postgres_session_factory)
@@ -128,7 +126,7 @@ async def test_provider_failure_leaves_only_the_opening(
     postgres_session_factory,
     cleanup_job_analysis_rows,
 ):
-    submit = getattr(application, "submit_employee_turn", None)
+    submit = getattr(consultation, "submit_employee_turn", None)
     assert submit is not None
     document_id = cleanup_job_analysis_rows
     uow_factory = factory(postgres_session_factory)
@@ -269,7 +267,7 @@ async def seed_task_in_jd(uow_factory, document_id):
 
 
 async def submit(uow_factory, adapter, document_id, operation_id="turn-1"):
-    return await application.submit_employee_turn(
+    return await consultation.submit_employee_turn(
         uow_factory,
         task_analysis_adapter=adapter,
         opks_adapter=adapter,

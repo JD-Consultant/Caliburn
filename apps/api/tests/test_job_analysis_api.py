@@ -10,13 +10,13 @@ import httpx
 import pytest
 import pytest_asyncio
 
-from app.api.job_analysis_deps import (
+from app.api.deps import (
     get_job_analysis_adapter,
     get_job_analysis_uow_factory,
 )
-from app.api.routes import job_analysis as job_analysis_routes
+from app.api.routes import consultation as consultation_routes
 from app.core.model_outcome import OperationOutcome
-from app.job_analysis.application import DocumentRecord, DocumentSummary
+from app.core.persistence import DocumentRecord, DocumentSummary
 from app.consultation.durable_turn import _require_verified
 from app.task_analysis.operation import TaskAnalysisOperationResult
 from app.task_analysis.verifier import (
@@ -52,7 +52,7 @@ from app.task_analysis.llm import (
     WireTaskChange,
     WireTaskFields,
 )
-from app.job_analysis.providers import (
+from app.adapters.openrouter import (
     OpenRouterAdapter,
     OpenRouterConfig,
     TransportResponse,
@@ -825,8 +825,8 @@ async def test_not_committable_diagnostics_log_codes_without_operation_detail(
     async def fail_submit(*args, **kwargs):
         _require_verified(operation_result)
 
-    monkeypatch.setattr(job_analysis_routes, "submit_employee_turn", fail_submit)
-    with caplog.at_level("WARNING", logger="app.api.routes.job_analysis"):
+    monkeypatch.setattr(consultation_routes, "submit_employee_turn", fail_submit)
+    with caplog.at_level("WARNING", logger="app.api.routes.consultation"):
         failed = await client.post(
             f"{root}/turns",
             headers={"Idempotency-Key": "unsafe-diagnostics"},

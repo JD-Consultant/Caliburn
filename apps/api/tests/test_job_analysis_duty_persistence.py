@@ -10,14 +10,16 @@ from uuid import uuid4
 import pytest
 from pydantic import ValidationError
 
-from app.adapters.job_analysis_postgres import serialization as ser
-from app.job_analysis.application import (
+from app.adapters.postgres import serialization as ser
+from app.core.journal import (
     DIRECT_EDIT_SCHEMA_ID,
     DUTY_DIRECT_EDIT_SCHEMA_ID,
     DirectEditPayload,
     DutyDirectEditPayload,
-    DutyRepository,
     JournalEntry,
+)
+from app.core.persistence import (
+    DutyRepository,
     JobAnalysisUnitOfWork,
     PROPOSAL_SCHEMA_ID,
 )

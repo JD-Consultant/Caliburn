@@ -15,9 +15,9 @@ from typing import Any
 import httpx
 import pytest
 
-from app.adapters.job_analysis_postgres import SqlAlchemyJobAnalysisUnitOfWork
+from app.adapters.postgres import SqlAlchemyJobAnalysisUnitOfWork
 from app.documents import load_document
-from app.job_analysis.application import submit_employee_turn
+from app.consultation import submit_employee_turn
 from app.task_analysis.llm import (
     IdentityRelation,
     SignalDisposition,
@@ -28,7 +28,7 @@ from app.task_analysis.llm import (
     WireTaskChange,
     WireTaskFields,
 )
-from app.job_analysis.providers import (
+from app.adapters.openrouter import (
     OpenRouterAdapter,
     OpenRouterConfig,
     OpenRouterCatalogError,

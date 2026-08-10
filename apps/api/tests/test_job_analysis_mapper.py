@@ -10,23 +10,16 @@ from job_analysis_contract import (
     OpksProposalDecisionWrite,
 )
 
-from app.api.job_analysis_mapper import (
-    to_consultation_view,
-    to_document_view,
-    to_jd_header,
-    to_jd_task_fields,
+from app.api.consultation_mapper import to_consultation_view
+from app.api.documents_mapper import to_document_view, to_jd_header, to_jd_task_fields
+from app.api.opks_mapper import (
     to_opks_item_view,
     to_opks_proposal_decision,
     to_opks_write,
 )
-from app.job_analysis.application import (
-    ActiveQuestion,
-    ConversationTurn,
-    DocumentRecord,
-    JobAnalysisState,
-    LoadedDocument,
-    TurnSpeaker,
-)
+from app.core.journal import ActiveQuestion, ConversationTurn, TurnSpeaker
+from app.core.persistence import DocumentRecord, LoadedDocument
+from app.core.state import JobAnalysisState
 from app.core.domain import (
     CurrentWorkModel,
     EnablerKind,

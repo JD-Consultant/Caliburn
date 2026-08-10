@@ -5,7 +5,7 @@ from __future__ import annotations
 import pytest
 from pydantic import ValidationError
 
-from app.job_analysis.application import JobAnalysisState
+from app.core.state import JobAnalysisState
 from app.core.domain import CurrentWorkModel, Duty, JdHeader, JdTask
 
 

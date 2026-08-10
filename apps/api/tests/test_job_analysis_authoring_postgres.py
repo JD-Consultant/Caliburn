@@ -8,8 +8,8 @@ from uuid import UUID
 import pytest
 from sqlalchemy import func, select
 
-from app.adapters.job_analysis_postgres import SqlAlchemyJobAnalysisUnitOfWork
-from app.adapters.job_analysis_postgres.models import JobAnalysisJournalRow
+from app.adapters.postgres import SqlAlchemyJobAnalysisUnitOfWork
+from app.adapters.postgres.models import JobAnalysisJournalRow
 from app.documents import (
     JdHeaderNotChanged,
     add_jd_task,
@@ -22,10 +22,8 @@ from app.documents import (
     reorder_jd_tasks,
 )
 from app.documents.authoring import create_document
-from app.job_analysis.application import (
-    IdempotencyConflict,
-    JdHeaderDirectEditPayload,
-)
+from app.core.errors import IdempotencyConflict
+from app.core.journal import JdHeaderDirectEditPayload
 from app.core.domain import (
     CurrentWorkModel,
     JdEntry,

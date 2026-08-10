@@ -49,9 +49,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from app.config import settings  # noqa: E402
 from app.documents import load_document  # noqa: E402
 from app.documents.authoring import create_document  # noqa: E402
-from app.job_analysis.application import (  # noqa: E402
-    JobAnalysisUnitOfWorkFactory,
-)
+from app.core.persistence import JobAnalysisUnitOfWorkFactory  # noqa: E402
 from app.core.authority import commit_authority_change  # noqa: E402
 from app.core.state import JobAnalysisState  # noqa: E402
 from app.opks import (  # noqa: E402
@@ -79,7 +77,7 @@ from app.opks.llm import (  # noqa: E402
     OPKS_RESULT_WIRE_SCHEMA_NAME,
     opks_result_wire_provider_schema,
 )
-from app.job_analysis.providers import (  # noqa: E402
+from app.adapters.openrouter import (  # noqa: E402
     OpenRouterAdapter,
     OpenRouterCatalogError,
     OpenRouterConfig,
@@ -290,7 +288,7 @@ async def _run(args: argparse.Namespace) -> int:
         return 1
 
     from app.database import AsyncSessionLocal
-    from app.adapters.job_analysis_postgres import SqlAlchemyJobAnalysisUnitOfWork
+    from app.adapters.postgres import SqlAlchemyJobAnalysisUnitOfWork
 
     run_id = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
     output_dir = Path(args.output_root) / run_id

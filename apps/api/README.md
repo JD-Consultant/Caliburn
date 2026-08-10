@@ -4,21 +4,27 @@
 
 ## 結構
 
+現行 API 拆成功能模組（ADR 0058），不再有單一 `job_analysis` 大 namespace：
+
 ```text
 app/
-  job_analysis/
-    domain/         純 domain、Current State、Evidence、Proposal、不變量
-    application/    use cases、authority commit、consultation、OPKS、export
-    llm/            prompt、wire schema、result mapper、verifier
-    providers/      OpenRouter adapter
+  core/             共同 Current State、authority transaction／port、journal、domain language
+  documents/        文件生命週期、header、readiness、Duty／Task 員工直接編輯
+  task_analysis/    Task context、LLM wire／prompt、operation、verifier、Task Proposal
+  opks/             OPKS context、child operation、scheduler、員工編輯、verifier、OPKS Proposal
+  consultation/     員工回合 orchestration（只透過 task_analysis／opks 的 public API 協調）
+  export/           純 deterministic Current State → 公版表格投影
   adapters/
-    job_analysis_postgres/  SQLAlchemy model、repository、serialization
-  api/              route、mapper、problem response、dependency composition
+    postgres/       SQLAlchemy model、repository、serialization
+    openrouter/     OpenRouter adapter（唯一 LLM provider）
+    xlsx/           OpenPyXL renderer（唯一存在 OpenPyXL 的地方）
+  api/              route（documents／consultation／opks／export）、mapper、problem response、
+                    dependency composition、`router.py` 是唯一 composition root
   database.py       async SQLAlchemy engine/session
   observability.py  OTel 橫切
 ```
 
-`domain` 不依賴 FastAPI、SQLAlchemy 或 provider；HTTP 只在 `app/api`；PostgreSQL 只在 adapter。AI 呼叫在 transaction 外執行，寫入前重新驗證 authority snapshot，員工決策才會改 Current JD。
+`core` 與各 feature module 不依賴 FastAPI、SQLAlchemy 或 provider；HTTP 只在 `app/api`；PostgreSQL／OpenRouter／OpenPyXL 只在對應 adapter。AI 呼叫在 transaction 外執行，寫入前重新驗證 authority snapshot，員工決策才會改 Current JD。
 
 ## 資料庫
 
@@ -31,4 +37,4 @@ cd apps/api && uv run pytest -q
 
 本機啟動：`cd apps/api && uv run python run_live.py`。API 設定由 `app/config.py` 讀取，LLM provider 使用本機設定的 OpenRouter key；員工不需帳號或登入。
 
-跨 app 流程見 [`docs/design/task-analysis-engine.md`](../../docs/design/task-analysis-engine.md)，API 邊界與測試指引見 [`app/job_analysis/AGENTS.md`](app/job_analysis/AGENTS.md)。
+跨 app 流程見 [`docs/design/task-analysis-engine.md`](../../docs/design/task-analysis-engine.md)，API 邊界與測試指引見根目錄 [`AGENTS.md`](../../AGENTS.md)。

@@ -2,15 +2,15 @@
 
 import httpx
 
-from app.adapters.job_analysis_postgres import SqlAlchemyJobAnalysisUnitOfWork
-from app.config import settings
-from app.database import AsyncSessionLocal
-from app.job_analysis.application import JobAnalysisUnitOfWorkFactory
-from app.job_analysis.providers import (
+from app.adapters.openrouter import (
     OpenRouterAdapter,
     OpenRouterConfig,
     httpx_chat_transport,
 )
+from app.adapters.postgres import SqlAlchemyJobAnalysisUnitOfWork
+from app.config import settings
+from app.core.persistence import JobAnalysisUnitOfWorkFactory
+from app.database import AsyncSessionLocal
 
 
 def get_job_analysis_uow_factory() -> JobAnalysisUnitOfWorkFactory:

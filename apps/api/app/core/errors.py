@@ -11,8 +11,9 @@ module(`durable_turn.py`)whenever a read-outside-transaction snapshot has drifte
 before the provider-before-replay write lands — the same "read authority is no
 longer current" fact, just observed from two different call sites (ADR 0058 rule 7).
 
-Feature-specific errors (e.g. `DutyNotFound`, `OpksItemNotFound`) stay in
-`app.job_analysis.application.errors` until their owning feature module exists.
+Feature-specific errors (e.g. `DutyNotFound`) live in `app.documents.errors`;
+`OpksItemNotFound`, `InvalidOpksOrder`, `OpksProposalNotFound`, and
+`OpksProposalNotDecidable` live in `app.opks.errors` (ADR 0058).
 """
 
 from __future__ import annotations

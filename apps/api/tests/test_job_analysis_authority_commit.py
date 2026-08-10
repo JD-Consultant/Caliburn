@@ -11,7 +11,8 @@ from pydantic import ValidationError
 
 from app.documents import add_jd_task
 from app.documents.authoring import create_document
-from app.job_analysis.application import DocumentRecord, JobAnalysisState
+from app.core.persistence import DocumentRecord
+from app.core.state import JobAnalysisState
 from app.core.authority import commit_authority_change
 from app.core.domain import (
     CurrentJdOpks,

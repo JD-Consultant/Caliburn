@@ -16,10 +16,10 @@ from __future__ import annotations
 
 import pytest
 
-from app.adapters.job_analysis_postgres import SqlAlchemyJobAnalysisUnitOfWork
+from app.adapters.postgres import SqlAlchemyJobAnalysisUnitOfWork
 from app.documents import load_document
 from app.documents.authoring import create_document
-from app.job_analysis.application import submit_employee_turn
+from app.consultation import submit_employee_turn
 from app.opks import decide_opks_proposal
 from app.task_analysis import decide_proposal
 from app.core.domain import OpksEntityKind, OpksGapAxis
@@ -40,7 +40,7 @@ from app.task_analysis.llm import (
     WireTaskChange,
     WireTaskFields,
 )
-from app.job_analysis.providers import ProviderText
+from app.adapters.openrouter import ProviderText
 
 
 pytestmark = pytest.mark.asyncio

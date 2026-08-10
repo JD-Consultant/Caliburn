@@ -55,7 +55,7 @@ from app.task_analysis.llm import (
     WireTaskFields,
     WireWithdrawReason,
 )
-from app.job_analysis.providers import (
+from app.adapters.openrouter import (
     OpenRouterAdapter,
     OpenRouterConfig,
     TransportResponse,

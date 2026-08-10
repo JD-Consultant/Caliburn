@@ -1,3 +1,0 @@
-[
-  {"name": "situation_purpose", "prompt": "用繁體中文、只輸出 JSON：{\"situation\":\"…\",\"purpose\":\"…\"}，描述「設備巡檢」這個任務的情境與目的。", "keys": ["situation", "purpose"]}
-]

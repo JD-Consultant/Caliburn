@@ -10,7 +10,10 @@ import httpx
 import pytest
 import pytest_asyncio
 
-from app.api import deps
+from app.api.job_analysis_deps import (
+    get_job_analysis_adapter,
+    get_job_analysis_uow_factory,
+)
 from app.api.routes import job_analysis as job_analysis_routes
 from app.job_analysis.application import DocumentRecord, DocumentSummary
 from app.job_analysis.application.durable_turn import _require_verified
@@ -331,12 +334,10 @@ async def api_client():
         api_key="sk-test",
         transport=provider,
     )
-    dependency = getattr(deps, "get_job_analysis_uow_factory", None)
-    if dependency is not None:
-        app.dependency_overrides[dependency] = lambda: lambda: _UnitOfWork(store)
-    adapter_dependency = getattr(deps, "get_job_analysis_adapter", None)
-    if adapter_dependency is not None:
-        app.dependency_overrides[adapter_dependency] = lambda: adapter
+    app.dependency_overrides[get_job_analysis_uow_factory] = (
+        lambda: lambda: _UnitOfWork(store)
+    )
+    app.dependency_overrides[get_job_analysis_adapter] = lambda: adapter
     transport = httpx.ASGITransport(app=app)
     async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
         yield client, store, provider
@@ -447,15 +448,12 @@ async def test_invalid_document_metadata_uses_problem_details(api_client, payloa
     assert response.json()["errors"]
 
 
-async def test_legacy_validation_error_shape_is_unchanged(api_client):
+async def test_retired_legacy_route_is_not_mounted(api_client):
     client, _, _ = api_client
 
     response = await client.get("/api/v1/occupations")
 
-    assert response.status_code == 422
-    assert response.headers["content-type"].startswith("application/json")
-    assert "type" not in response.json()
-    assert isinstance(response.json()["detail"], list)
+    assert response.status_code == 404
 
 
 def _task_payload(statement: str = " 每週彙整營運週報 "):

@@ -8,15 +8,7 @@ from alembic import context
 
 from app.config import settings
 from app.models.base import Base
-import app.models  # noqa: F401  確保所有 model 被 import 進 metadata
-# vNext persistence rows(V2-B):只註冊 metadata 供 autogenerate diff 輔助;
-# production route 不接線(composition root 不 import)。
-import app.interview_vnext.persistence.models  # noqa: F401
-# UI-independent canonical Authoring Core (migration 0011).  Import only for
-# metadata registration; production composition remains unwired.
-import app.job_authoring.postgres_models  # noqa: F401
-# Greenfield local Current State persistence (migration 0012). Adapter metadata
-# registration only; no composition with old authoring/vNext paths.
+# Current-only metadata used by autogenerate; migrations remain the schema authority.
 import app.adapters.job_analysis_postgres.models  # noqa: F401
 
 if sys.platform == "win32":

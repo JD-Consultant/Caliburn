@@ -3,6 +3,8 @@
 > 不夠「架構」到要開 ADR、但需要被記住的產品 / UX 決策與**刻意延後**的項目。
 > 每項標清楚:**現況是不是刻意的**、**為什麼延後**、**未定的取捨**。
 
+> **Current-only 狀態（2026-08-10）**：owner 已授權只保留新的 Job Analysis API、Web `/workspace`、`job-analysis-contract` 與 PostgreSQL。舊 OCS editor、知識索引、PDF ETL、embedder、舊訪談與 `job_authoring` 已移除；本檔後續舊 OCS 段落只作歷史 UX 討論，不能作為新實作入口。
+
 ---
 
 ## 現行產品範圍鎖定：本機 Web AI 職務分析應用程式

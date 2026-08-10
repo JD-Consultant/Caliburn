@@ -18,14 +18,16 @@ from app.core.domain import (
 from app.job_analysis.providers import OpenRouterAdapter
 
 from app.core.authority import commit_authority_change
-from app.core.persistence import (
+from app.core.journal import (
     OPKS_GENERATION_SCHEMA_ID,
-    DocumentRecord,
-    JobAnalysisUnitOfWork,
-    JobAnalysisUnitOfWorkFactory,
     JournalEntry,
     OpksGenerationOutcome,
     OpksGenerationPayload,
+)
+from app.core.persistence import (
+    DocumentRecord,
+    JobAnalysisUnitOfWork,
+    JobAnalysisUnitOfWorkFactory,
 )
 
 from .durable_turn import StaleAuthoritySnapshot

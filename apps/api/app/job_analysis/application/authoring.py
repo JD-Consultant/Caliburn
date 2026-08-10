@@ -24,18 +24,20 @@ from app.core.domain import (
 )
 
 from app.core.authority import commit_authority_change
-from app.core.persistence import (
+from app.core.journal import (
     CONSULTANT_OPENING_SCHEMA_ID,
     DIRECT_EDIT_SCHEMA_ID,
     JD_HEADER_DIRECT_EDIT_SCHEMA_ID,
     ConsultantOpeningPayload,
     DirectEditPayload,
+    JdHeaderDirectEditPayload,
+    JournalEntry,
+)
+from app.core.persistence import (
     DocumentRecord,
     DocumentSummary,
-    JdHeaderDirectEditPayload,
     JobAnalysisUnitOfWork,
     JobAnalysisUnitOfWorkFactory,
-    JournalEntry,
     LoadedDocument,
 )
 

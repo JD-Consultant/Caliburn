@@ -19,15 +19,15 @@ from app.core.domain import (
     is_allowed_opks_transition,
 )
 from app.core.authority import commit_authority_change
-from app.core.opks_integrity import stale_invalid_opks_proposals
-from app.core.persistence import (
+from app.core.journal import (
     OPKS_DIRECT_EDIT_SCHEMA_ID,
     OPKS_PROPOSAL_DECISION_SCHEMA_ID,
-    JobAnalysisUnitOfWorkFactory,
     JournalEntry,
     OpksDirectEditPayload,
     OpksProposalDecisionPayload,
 )
+from app.core.opks_integrity import stale_invalid_opks_proposals
+from app.core.persistence import JobAnalysisUnitOfWorkFactory
 
 from .errors import (
     DocumentNotFound,

@@ -28,13 +28,15 @@ from app.core.domain import (
 )
 
 from app.core.authority import commit_authority_change
-from app.core.persistence import (
+from app.core.journal import (
     PROPOSAL_DECISION_SCHEMA_ID,
+    JournalEntry,
+    ProposalDecisionPayload,
+)
+from app.core.persistence import (
     DocumentRecord,
     JobAnalysisUnitOfWork,
     JobAnalysisUnitOfWorkFactory,
-    JournalEntry,
-    ProposalDecisionPayload,
 )
 
 from .errors import (

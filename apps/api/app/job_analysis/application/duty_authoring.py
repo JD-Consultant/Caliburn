@@ -8,13 +8,15 @@ from uuid import UUID
 from app.core.domain import CurrentJdOpks, Duty, DutyId, JdTask, Proposal
 
 from app.core.authority import commit_authority_change
-from app.core.persistence import (
+from app.core.journal import (
     DUTY_DIRECT_EDIT_SCHEMA_ID,
-    DocumentRecord,
     DutyDirectEditPayload,
+    JournalEntry,
+)
+from app.core.persistence import (
+    DocumentRecord,
     JobAnalysisUnitOfWork,
     JobAnalysisUnitOfWorkFactory,
-    JournalEntry,
 )
 
 from .authoring import stale_task_proposals_for_direct_edit

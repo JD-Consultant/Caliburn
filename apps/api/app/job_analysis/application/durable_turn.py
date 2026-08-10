@@ -7,13 +7,15 @@ from datetime import UTC, datetime
 from uuid import UUID
 
 from app.core.authority import commit_authority_change
-from app.core.persistence import (
+from app.core.journal import (
     COMPLETED_TURN_SCHEMA_ID,
     CompletedTurnPayload,
+    JournalEntry,
+)
+from app.core.persistence import (
     DocumentRecord,
     JobAnalysisUnitOfWork,
     JobAnalysisUnitOfWorkFactory,
-    JournalEntry,
 )
 
 from .errors import (

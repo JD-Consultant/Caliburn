@@ -18,7 +18,7 @@ SHARED_API_DEPS = API_DIR / "app" / "api" / "deps.py"
 JOB_ANALYSIS_COMPOSITION_SURFACES = (
     API_DIR / "app" / "api" / "job_analysis_deps.py",
     API_DIR / "app" / "api" / "routes" / "job_analysis.py",
-    API_DIR / "app" / "adapters" / "job_analysis_postgres.py",
+    API_DIR / "app" / "adapters" / "job_analysis_postgres",
 )
 
 FORBIDDEN_ROOTS = (
@@ -48,10 +48,21 @@ def _imports(path: Path) -> list[tuple[int, str]]:
     return found
 
 
-def _existing_paths(paths: tuple[Path, ...]) -> tuple[Path, ...]:
-    """Skip a planned seam until its implementation exists; never hide real files."""
+def _composition_surface_files(roots: tuple[Path, ...]) -> tuple[Path, ...]:
+    """Expand declared composition roots and fail loudly on a stale declaration."""
 
-    return tuple(path for path in paths if path.is_file())
+    files: list[Path] = []
+    for root in roots:
+        assert root.exists(), f"Declared composition surface root is missing: {root}"
+        if root.is_file():
+            files.append(root)
+        elif root.is_dir():
+            files.extend(root.rglob("*.py"))
+        else:
+            raise AssertionError(
+                f"Declared composition surface root is neither a file nor directory: {root}"
+            )
+    return tuple(sorted(files, key=lambda path: path.as_posix()))
 
 
 def test_shared_api_deps_does_not_own_job_analysis_composition():
@@ -71,7 +82,7 @@ def test_shared_api_deps_does_not_own_job_analysis_composition():
 
 def test_job_analysis_composition_surfaces_never_import_legacy_paths():
     violations: list[str] = []
-    for path in _existing_paths(JOB_ANALYSIS_COMPOSITION_SURFACES):
+    for path in _composition_surface_files(JOB_ANALYSIS_COMPOSITION_SURFACES):
         for line, module in _imports(path):
             for forbidden in JOB_ANALYSIS_COMPOSITION_FORBIDDEN_ROOTS:
                 if module == forbidden or module.startswith(f"{forbidden}."):

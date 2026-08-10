@@ -9,6 +9,7 @@ from typing import Any
 from pydantic import Field
 
 from app.core.domain import DomainModel
+from app.core.portable_schema import compact_strict_output_schema
 
 from .opks_result import (
     OpksDecision,
@@ -16,7 +17,6 @@ from .opks_result import (
     OpksResult,
     OpksResultItem,
 )
-from .portable_schema import compact_strict_output_schema
 
 
 OPKS_RESULT_WIRE_SCHEMA_NAME = "opks_result_v1"

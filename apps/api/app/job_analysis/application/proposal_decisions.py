@@ -27,20 +27,21 @@ from app.core.domain import (
     withdraw_delta_matches_target_state,
 )
 
-from .authority_commit import commit_authority_change
-from .errors import (
-    DocumentNotFound,
-    IdempotencyConflict,
-    InvalidProposalDecision,
-    JobAnalysisApplicationError,
-)
-from .persistence import (
+from app.core.authority import commit_authority_change
+from app.core.persistence import (
     PROPOSAL_DECISION_SCHEMA_ID,
     DocumentRecord,
     JobAnalysisUnitOfWork,
     JobAnalysisUnitOfWorkFactory,
     JournalEntry,
     ProposalDecisionPayload,
+)
+
+from .errors import (
+    DocumentNotFound,
+    IdempotencyConflict,
+    InvalidProposalDecision,
+    JobAnalysisApplicationError,
 )
 from .opks_authoring import (
     prune_opks_for_current_jd,

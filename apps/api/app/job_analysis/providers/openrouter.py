@@ -18,13 +18,19 @@ portable structured output(`response_format.json_schema`,`strict: true`)。
 from __future__ import annotations
 
 from collections.abc import Mapping
-from enum import StrEnum
 from typing import Any, Literal, Protocol
 
 import httpx
 from pydantic import Field, model_validator
 
 from app.core.domain import DomainModel, NonEmptyText
+from app.core.model_outcome import (
+    ProviderFailure,
+    ProviderFailureKind,
+    ProviderOutcome,
+    ProviderRefusal,
+    ProviderText,
+)
 
 
 CHAT_COMPLETIONS_URL = "https://openrouter.ai/api/v1/chat/completions"
@@ -89,34 +95,6 @@ class ChatTransport(Protocol):
         body: Mapping[str, Any],
         timeout: float,
     ) -> TransportResponse: ...
-
-
-class ProviderFailureKind(StrEnum):
-    TIMEOUT = "timeout"
-    CONNECTION = "connection"
-    HTTP_STATUS = "http_status"
-    PROVIDER_ERROR = "provider_error"
-    MALFORMED_RESPONSE = "malformed_response"
-    MODEL_MISMATCH = "model_mismatch"
-    TRUNCATED = "truncated"
-
-
-class ProviderText(DomainModel):
-    text: NonEmptyText
-
-
-class ProviderRefusal(DomainModel):
-    """模型拒答。這不是錯誤,也不得被當成可重試的失敗。"""
-
-    message: str = ""
-
-
-class ProviderFailure(DomainModel):
-    kind: ProviderFailureKind
-    detail: NonEmptyText
-
-
-ProviderOutcome = ProviderText | ProviderRefusal | ProviderFailure
 
 
 class OpenRouterAdapter:

@@ -20,7 +20,7 @@ from app.core.domain import (
 )
 from app.job_analysis.application.verifier import ViolationCode
 from app.job_analysis.llm import IdentityRelation, SignalDisposition, TaskChangeKind
-from app.job_analysis.llm.portable_schema import (
+from app.core.portable_schema import (
     assert_portable_strict_output_schema,
     compact_strict_output_schema,
     schema_complexity,

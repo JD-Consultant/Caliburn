@@ -27,7 +27,6 @@ from app.core.domain import (
     CurrentWorkModel,
     DomainModel,
     ExcludedSignal,
-    Identifier,
     JdTask,
     NonEmptyText,
     OpenIssue,
@@ -40,31 +39,15 @@ from app.core.domain import (
     TaskId,
     jd_map,
 )
+from app.core.journal import ActiveQuestion, ConversationTurn, TurnSpeaker
 from .verifier import (
     PacketOpenIssue,
     PacketRetiredTask,
     PacketSupportLink,
     PacketTask,
     PacketTurn,
-    TurnSpeaker,
     VerificationContext,
 )
-
-
-# ── 輸入(conversation 尚未凍結,§9 前言把它留給後續垂直切片)──────────────
-
-
-class ConversationTurn(DomainModel):
-    turn_id: Identifier
-    speaker: TurnSpeaker
-    text: NonEmptyText
-
-
-class ActiveQuestion(DomainModel):
-    """產生 `support_links.question_turn_id` 的來源(§11.4);缺它短答無法解讀。"""
-
-    turn_id: Identifier
-    text: NonEmptyText
 
 
 # ── packet 投影 ─────────────────────────────────────────────────────────────

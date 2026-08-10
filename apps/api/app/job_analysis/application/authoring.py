@@ -23,16 +23,8 @@ from app.core.domain import (
     TaskId,
 )
 
-from .authority_commit import commit_authority_change
-from .context import ActiveQuestion, ConversationTurn
-from .errors import (
-    DocumentNotFound,
-    IdempotencyConflict,
-    InvalidJdTaskOrder,
-    JdHeaderNotChanged,
-    JdTaskNotFound,
-)
-from .persistence import (
+from app.core.authority import commit_authority_change
+from app.core.persistence import (
     CONSULTANT_OPENING_SCHEMA_ID,
     DIRECT_EDIT_SCHEMA_ID,
     JD_HEADER_DIRECT_EDIT_SCHEMA_ID,
@@ -45,6 +37,15 @@ from .persistence import (
     JobAnalysisUnitOfWorkFactory,
     JournalEntry,
     LoadedDocument,
+)
+
+from .context import ActiveQuestion, ConversationTurn
+from .errors import (
+    DocumentNotFound,
+    IdempotencyConflict,
+    InvalidJdTaskOrder,
+    JdHeaderNotChanged,
+    JdTaskNotFound,
 )
 from .opks_authoring import (
     prune_opks_for_current_jd,

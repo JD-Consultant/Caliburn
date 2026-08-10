@@ -54,9 +54,7 @@ from app.job_analysis.application import (  # noqa: E402
     create_document,
     load_document,
 )
-from app.job_analysis.application.authority_commit import (  # noqa: E402
-    commit_authority_change,
-)
+from app.core.authority import commit_authority_change  # noqa: E402
 from app.job_analysis.application.opks_generation import (  # noqa: E402
     commit_opks_generation,
     prepare_opks_generation,

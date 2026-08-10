@@ -4,13 +4,13 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from .errors import ConcurrentAuthorityChange
-from .persistence import (
+from app.core.errors import ConcurrentAuthorityChange
+from app.core.persistence import (
     DocumentRecord,
     JobAnalysisUnitOfWork,
     JournalEntry,
 )
-from .transition import JobAnalysisState
+from app.core.state import JobAnalysisState
 
 
 async def commit_authority_change(

@@ -17,7 +17,17 @@ from app.core.domain import (
 )
 from app.job_analysis.providers import OpenRouterAdapter
 
-from .authority_commit import commit_authority_change
+from app.core.authority import commit_authority_change
+from app.core.persistence import (
+    OPKS_GENERATION_SCHEMA_ID,
+    DocumentRecord,
+    JobAnalysisUnitOfWork,
+    JobAnalysisUnitOfWorkFactory,
+    JournalEntry,
+    OpksGenerationOutcome,
+    OpksGenerationPayload,
+)
+
 from .durable_turn import StaleAuthoritySnapshot
 from .errors import DocumentNotFound, IdempotencyConflict, JdTaskNotFound
 from .operation import OperationOutcome
@@ -29,15 +39,6 @@ from .opks_context import (
 from .opks_digest import compute_analysis_input_digest
 from .opks_operation import OpksOperationResult, run_opks_operation
 from .opks_verifier import OpksGap
-from .persistence import (
-    OPKS_GENERATION_SCHEMA_ID,
-    DocumentRecord,
-    JobAnalysisUnitOfWork,
-    JobAnalysisUnitOfWorkFactory,
-    JournalEntry,
-    OpksGenerationOutcome,
-    OpksGenerationPayload,
-)
 from .transition import JobAnalysisState
 
 

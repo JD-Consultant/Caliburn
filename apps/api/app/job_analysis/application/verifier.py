@@ -28,6 +28,7 @@ from enum import StrEnum
 from pydantic import model_validator
 
 from app.core.domain import DomainModel, Identifier, NonEmptyText, TaskId
+from app.core.journal import TurnSpeaker
 from app.job_analysis.llm import (
     IdentityRelation,
     IssueResolutionKind,
@@ -41,11 +42,6 @@ from app.core.domain.work_model import OpenIssueKind
 
 
 # ── Context Packet 的 ordinal 檢視(§11.2:mapping 存在該輪呼叫紀錄側)──────
-
-
-class TurnSpeaker(StrEnum):
-    EMPLOYEE = "employee"
-    CONSULTANT = "consultant"
 
 
 class PacketTurn(DomainModel):

@@ -7,28 +7,30 @@ from uuid import UUID
 
 from app.core.domain import (
     CurrentJdOpks,
-    JdTask,
-    OpenIssue,
     OpksEntityKind,
     OpksEvidenceLink,
     OpksItem,
     SourceKind,
     SourceRef,
 )
-
-from .authority_commit import commit_authority_change
-from .errors import (
-    DocumentNotFound,
-    IdempotencyConflict,
-    InvalidOpksOrder,
-    OpksItemNotFound,
+from app.core.authority import commit_authority_change
+from app.core.opks_integrity import (
+    prune_opks_for_current_jd,
+    prune_opks_gaps_for_current_jd,
 )
-from .persistence import (
+from app.core.persistence import (
     OPKS_DIRECT_EDIT_SCHEMA_ID,
     JobAnalysisUnitOfWork,
     JobAnalysisUnitOfWorkFactory,
     JournalEntry,
     OpksDirectEditPayload,
+)
+
+from .errors import (
+    DocumentNotFound,
+    IdempotencyConflict,
+    InvalidOpksOrder,
+    OpksItemNotFound,
 )
 from .opks_proposals import (
     remove_opks_item_and_indicator_refs,
@@ -71,88 +73,6 @@ def _item(
             ),
         ),
     )
-
-
-def prune_opks_gaps_for_current_jd(
-    open_issues: tuple[OpenIssue, ...],
-    current_jd: tuple[JdTask, ...],
-) -> tuple[OpenIssue, ...]:
-    """移除指向已不在 Current JD 的 Task 的 OPKS 缺口(ADR 0054 決定 26–27)。
-
-    `prune_opks_for_current_jd()` 只收／回 `CurrentJdOpks`,**碰不到
-    `work_model.open_issues`**;缺口的清理需要這個相鄰函式,在同一個 authority
-    transaction、同一批呼叫點一起做。
-
-    **這裡是「移除」,不是寫 `terminal_resolution`。** 那個欄位的兩個值
-    (`employee_unknown`／`not_applicable`)都是**員工的回答**;Task 被刪除、撤回、
-    合併或拆分時員工並沒有回答任何事,借用它們等於偽造一筆不存在的回答,而那筆假
-    回答會進到 packet 的「已問過、勿重問」記憶區,被主顧問與 specialist 當真。
-
-    **merge／split 一律移除,不遷移。** 沿用既有政策「不把舊 refs 猜接到 replacement
-    Task」——沒有人知道新 Task 是不是還缺同一件事。真的還缺,下次分析會自己重新提出,
-    那是有依據的判斷而不是猜測。
-    """
-
-    task_ids = frozenset(task.task_id for task in current_jd)
-    return tuple(
-        issue
-        for issue in open_issues
-        if issue.opks_axis is None or issue.subject_task_id in task_ids
-    )
-
-
-def prune_opks_for_current_jd(
-    current_opks: CurrentJdOpks,
-    current_jd: tuple[JdTask, ...],
-) -> CurrentJdOpks:
-    """Remove invalid Task-owned items and unlink shared K/S without guessing.
-
-    O/P belong to one Task and disappear when that Task leaves Current JD. K/S
-    survive as document-level items; only references to removed Tasks and the
-    Indicators removed with them are pruned. Attitude is document-level and is
-    unchanged. No old reference is guessed onto a merge/split replacement.
-    """
-
-    task_ids = frozenset(task.task_id for task in current_jd)
-    retained = tuple(
-        item
-        for item in current_opks.items
-        if item.entity_kind not in {
-            OpksEntityKind.OUTPUT,
-            OpksEntityKind.INDICATOR,
-        }
-        or item.task_refs[0] in task_ids
-    )
-    indicator_ids = frozenset(
-        item.entity_id
-        for item in retained
-        if item.entity_kind is OpksEntityKind.INDICATOR
-    )
-    normalized: list[OpksItem] = []
-    for item in retained:
-        if item.entity_kind in {
-            OpksEntityKind.KNOWLEDGE,
-            OpksEntityKind.SKILL,
-        }:
-            normalized.append(
-                item.model_copy(
-                    update={
-                        "task_refs": tuple(
-                            task_id
-                            for task_id in item.task_refs
-                            if task_id in task_ids
-                        ),
-                        "indicator_refs": tuple(
-                            indicator_id
-                            for indicator_id in item.indicator_refs
-                            if indicator_id in indicator_ids
-                        ),
-                    }
-                )
-            )
-        else:
-            normalized.append(item)
-    return CurrentJdOpks(items=tuple(normalized))
 
 
 def _require_replay(

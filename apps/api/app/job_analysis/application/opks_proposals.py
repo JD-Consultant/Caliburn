@@ -8,7 +8,6 @@ from uuid import UUID
 from app.core.domain import (
     CurrentJdOpks,
     JdHeader,
-    JdTask,
     OpksEntityKind,
     OpksEvidenceLink,
     OpksItem,
@@ -19,16 +18,9 @@ from app.core.domain import (
     SourceRef,
     is_allowed_opks_transition,
 )
-
-from .authority_commit import commit_authority_change
-from .errors import (
-    DocumentNotFound,
-    IdempotencyConflict,
-    InvalidProposalDecision,
-    OpksProposalNotDecidable,
-    OpksProposalNotFound,
-)
-from .persistence import (
+from app.core.authority import commit_authority_change
+from app.core.opks_integrity import stale_invalid_opks_proposals
+from app.core.persistence import (
     OPKS_DIRECT_EDIT_SCHEMA_ID,
     OPKS_PROPOSAL_DECISION_SCHEMA_ID,
     JobAnalysisUnitOfWorkFactory,
@@ -36,12 +28,15 @@ from .persistence import (
     OpksDirectEditPayload,
     OpksProposalDecisionPayload,
 )
-from .transition import JobAnalysisState
 
-
-ACTIVE_OPKS_PROPOSAL_STATUSES = frozenset(
-    {OpksProposalStatus.PENDING, OpksProposalStatus.DEFERRED}
+from .errors import (
+    DocumentNotFound,
+    IdempotencyConflict,
+    InvalidProposalDecision,
+    OpksProposalNotDecidable,
+    OpksProposalNotFound,
 )
+from .transition import JobAnalysisState
 
 
 def _utcnow() -> datetime:
@@ -76,69 +71,6 @@ def remove_opks_item_and_indicator_refs(
             )
         remaining.append(item)
     return CurrentJdOpks(items=tuple(remaining))
-
-
-def stale_invalid_opks_proposals(
-    proposals: tuple[OpksProposal, ...],
-    *,
-    current_opks: CurrentJdOpks,
-    current_jd: tuple[JdTask, ...],
-    now: datetime | None = None,
-) -> tuple[OpksProposal, ...]:
-    """Mark only active proposals whose stable inputs no longer hold."""
-
-    resolved_at = now or _utcnow()
-    current_task_ids = frozenset(task.task_id for task in current_jd)
-    accepted = tuple(
-        proposal
-        for proposal in proposals
-        if proposal.status
-        in {OpksProposalStatus.ACCEPTED, OpksProposalStatus.EDITED}
-    )
-    result: list[OpksProposal] = []
-    for proposal in proposals:
-        if proposal.status not in ACTIVE_OPKS_PROPOSAL_STATUSES:
-            result.append(proposal)
-            continue
-
-        current = current_opks.item_by_id(proposal.entity_id)
-        reason: str | None = None
-        if proposal.action is OpksProposalAction.ADD and current is not None:
-            reason = "同一項職務內容已經建立，舊提案不再適用。"
-        elif proposal.action in {
-            OpksProposalAction.REVISE,
-            OpksProposalAction.REMOVE,
-        } and current != proposal.before:
-            reason = "職務內容已由員工修改或移除，舊提案不再適用。"
-
-        referenced = proposal.after or proposal.before
-        if reason is None and referenced is not None and not set(
-            referenced.task_refs
-        ).issubset(current_task_ids):
-            reason = "提案引用的工作已不在目前職務說明書中。"
-
-        if reason is None and any(
-            decided.entity_id == proposal.entity_id
-            and decided.resolved_at is not None
-            and decided.resolved_at >= proposal.created_at
-            for decided in accepted
-        ):
-            reason = "同一項職務內容已有其他提案生效。"
-
-        if reason is None:
-            result.append(proposal)
-            continue
-        result.append(
-            OpksProposal.model_validate(
-                {
-                    **proposal.model_dump(),
-                    "status": OpksProposalStatus.STALE,
-                    "stale_reason": reason,
-                    "resolved_at": resolved_at,
-                }
-            )
-        )
-    return tuple(result)
 
 
 def _replace_proposal(

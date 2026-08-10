@@ -35,6 +35,8 @@ from app.job_analysis.llm import (
     TaskChangeKind,
 )
 
+from app.core.persistence import JobAnalysisUnitOfWork
+
 from .context import TaskAnalysisPacket
 from .opks_context import proposal_references_task
 from .opks_digest import (
@@ -42,7 +44,6 @@ from .opks_digest import (
     compute_analysis_input_digest,
     scheduled_opks_operation_id,
 )
-from .persistence import JobAnalysisUnitOfWork
 from .transition import JobAnalysisState
 
 

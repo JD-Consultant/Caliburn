@@ -10,11 +10,10 @@ packet 的內部模型從來沒有離開這一層——`adapter.complete()` 的�
 
 from __future__ import annotations
 
-from enum import StrEnum
-
 from pydantic import ValidationError
 
 from app.core.domain import DomainModel, NonEmptyText
+from app.core.model_outcome import OperationOutcome
 from app.job_analysis.llm import (
     TASK_ANALYSIS_WIRE_SCHEMA_NAME,
     TaskAnalysisResult,
@@ -33,23 +32,6 @@ from app.job_analysis.providers import (
 
 from .context import TaskAnalysisPacket, render_context_packet
 from .verifier import VerificationReport, verify_task_analysis_result
-
-
-class OperationOutcome(StrEnum):
-    VERIFIED = "verified"
-    """通過 verifier;可以交給 transition service 套用。"""
-
-    REJECTED = "rejected"
-    """parse 得出來,但違反確定性規則(§9.5／§12.3);不得套用。"""
-
-    INVALID_OUTPUT = "invalid_output"
-    """不是合法的 `task_analysis_result.v2` JSON,或還原不成 domain 契約。"""
-
-    REFUSED = "refused"
-    """模型拒答。不是錯誤,也不是可重試的失敗。"""
-
-    FAILED = "failed"
-    """provider 端失敗(timeout／連線／非 200／截斷)。"""
 
 
 class TaskAnalysisOperationResult(DomainModel):

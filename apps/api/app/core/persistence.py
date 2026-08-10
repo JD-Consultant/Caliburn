@@ -34,10 +34,8 @@ from app.core.domain import (
     TaskId,
 )
 
-from .context import ActiveQuestion, ConversationTurn
-from .opks_digest import ScheduledOpks
-from .transition import JobAnalysisState
-from .verifier import TurnSpeaker
+from app.core.journal import ActiveQuestion, ConversationTurn, ScheduledOpks, TurnSpeaker
+from app.core.state import JobAnalysisState
 
 
 WORK_MODEL_SCHEMA_ID = "job-analysis-work-model/1"

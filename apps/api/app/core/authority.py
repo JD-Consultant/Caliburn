@@ -5,10 +5,10 @@ from __future__ import annotations
 from datetime import datetime
 
 from app.core.errors import ConcurrentAuthorityChange
+from app.core.journal import JournalEntry
 from app.core.persistence import (
     DocumentRecord,
     JobAnalysisUnitOfWork,
-    JournalEntry,
 )
 from app.core.state import JobAnalysisState
 

@@ -18,12 +18,14 @@ from app.core.opks_integrity import (
     prune_opks_for_current_jd,
     prune_opks_gaps_for_current_jd,
 )
-from app.core.persistence import (
+from app.core.journal import (
     OPKS_DIRECT_EDIT_SCHEMA_ID,
-    JobAnalysisUnitOfWork,
-    JobAnalysisUnitOfWorkFactory,
     JournalEntry,
     OpksDirectEditPayload,
+)
+from app.core.persistence import (
+    JobAnalysisUnitOfWork,
+    JobAnalysisUnitOfWorkFactory,
 )
 
 from .errors import (

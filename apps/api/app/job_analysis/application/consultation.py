@@ -12,11 +12,8 @@ from uuid import UUID
 
 from app.job_analysis.providers import OpenRouterAdapter
 
-from app.core.persistence import (
-    CompletedTurnPayload,
-    JobAnalysisUnitOfWorkFactory,
-    JournalEntry,
-)
+from app.core.journal import CompletedTurnPayload, JournalEntry
+from app.core.persistence import JobAnalysisUnitOfWorkFactory
 
 from .context import ConversationTurn
 from .durable_turn import StaleAuthoritySnapshot, commit_verified_turn, prepare_turn

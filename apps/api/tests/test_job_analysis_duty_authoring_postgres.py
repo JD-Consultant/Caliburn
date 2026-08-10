@@ -5,7 +5,7 @@ from __future__ import annotations
 import pytest
 from sqlalchemy.exc import IntegrityError
 
-from app.adapters.job_analysis_postgres import SqlAlchemyJobAnalysisUnitOfWork
+from app.adapters.postgres import SqlAlchemyJobAnalysisUnitOfWork
 from app.documents import (
     InvalidDutyOrder,
     add_duty,
@@ -20,12 +20,9 @@ from app.documents.authoring import create_document
 from app.core.journal import ConversationTurn, TurnSpeaker
 from app.core.model_outcome import OperationOutcome
 from app.core.state import JobAnalysisState
-from app.job_analysis.application import (
-    DutyDirectEditPayload,
-    IdempotencyConflict,
-    commit_verified_turn,
-    prepare_turn,
-)
+from app.consultation import commit_verified_turn, prepare_turn
+from app.core.errors import IdempotencyConflict
+from app.core.journal import DutyDirectEditPayload
 from app.opks import (
     OpksOperationResult,
     commit_opks_generation,

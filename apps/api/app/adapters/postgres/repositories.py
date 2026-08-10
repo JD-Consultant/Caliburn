@@ -9,19 +9,21 @@ from uuid import UUID
 from sqlalchemy import delete, func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from app.job_analysis.application import (
+from app.core.journal import (
+    ActiveQuestion,
+    CompletedTurnPayload,
+    ConsultantOpeningPayload,
+    ConversationTurn,
+    JournalEntry,
+)
+from app.core.persistence import (
     OPKS_ITEM_SCHEMA_ID,
     OPKS_PROPOSAL_SCHEMA_ID,
     PROPOSAL_SCHEMA_ID,
     JD_HEADER_SCHEMA_ID,
     WORK_MODEL_SCHEMA_ID,
-    ActiveQuestion,
-    CompletedTurnPayload,
-    ConsultantOpeningPayload,
-    ConversationTurn,
     DocumentRecord,
     DocumentSummary,
-    JournalEntry,
 )
 from app.core.domain import (
     CurrentWorkModel,

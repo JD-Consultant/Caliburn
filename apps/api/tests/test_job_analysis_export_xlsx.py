@@ -6,14 +6,14 @@ import io
 
 from openpyxl import load_workbook
 
-from app.job_analysis.application import (
+from app.export import (
     ExportDocument,
     ExportDutySection,
     ExportOpksEntry,
     ExportTaskEntry,
 )
 from app.core.domain import JdHeader
-from app.job_analysis.application.export_xlsx import render_xlsx
+from app.adapters.xlsx.renderer import render_xlsx
 
 
 def _document(*, header: JdHeader | None = None) -> ExportDocument:

@@ -6,20 +6,20 @@ from fastapi.responses import JSONResponse
 from job_analysis_contract import ProblemDetail, ProblemFieldError
 from pydantic import ValidationError
 
+from app.core.errors import (
+    ConcurrentAuthorityChange,
+    DocumentNotFound,
+    IdempotencyConflict,
+    InvalidProposalDecision,
+    JdTaskNotFound,
+    JobAnalysisApplicationError,
+)
 from app.documents import (
     DutyNotFound,
     InvalidDutyOrder,
     InvalidJdTaskOrder,
     JdHeaderNotChanged,
 )
-from app.job_analysis.application import (
-    ConcurrentAuthorityChange,
-    DocumentNotFound,
-    IdempotencyConflict,
-    InvalidProposalDecision,
-    JdTaskNotFound,
-)
-from app.job_analysis.application.errors import JobAnalysisApplicationError
 from app.opks import (
     InvalidOpksOrder,
     OpksItemNotFound,

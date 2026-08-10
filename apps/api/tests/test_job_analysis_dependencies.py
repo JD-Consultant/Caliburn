@@ -8,16 +8,19 @@ from pathlib import Path
 
 
 API_DIR = Path(__file__).parents[1]
-ROOT = API_DIR / "app" / "job_analysis"
 CORE_ROOT = API_DIR / "app" / "core"
 DOCUMENTS_ROOT = API_DIR / "app" / "documents"
 TASK_ANALYSIS_ROOT = API_DIR / "app" / "task_analysis"
 OPKS_ROOT = API_DIR / "app" / "opks"
 CONSULTATION_ROOT = API_DIR / "app" / "consultation"
+EXPORT_ROOT = API_DIR / "app" / "export"
+XLSX_ADAPTER_ROOT = API_DIR / "app" / "adapters" / "xlsx"
+# 兩者才是真正的 composition root(ADR 0058):`app/api` 組裝 HTTP 與 transport
+# mapping,`app/adapters` 實作各 feature module 擁有的 port——兩者都可以 import
+# FastAPI／SQLAlchemy／HTTPX／OpenPyXL 與任何 feature module 的 public API。
 COMPOSITION_SURFACES = (
-    API_DIR / "app" / "api" / "job_analysis_deps.py",
-    API_DIR / "app" / "api" / "routes" / "job_analysis.py",
-    API_DIR / "app" / "adapters" / "job_analysis_postgres",
+    API_DIR / "app" / "api",
+    API_DIR / "app" / "adapters",
 )
 
 
@@ -63,9 +66,15 @@ def _surface_files(roots: tuple[Path, ...]) -> tuple[Path, ...]:
     return tuple(sorted(files, key=lambda path: path.as_posix()))
 
 
-def test_only_current_api_route_modules_exist():
+def test_only_current_route_modules_exist():
     route_names = {path.name for path in (API_DIR / "app" / "api" / "routes").glob("*.py")}
-    assert route_names == {"__init__.py", "job_analysis.py"}
+    assert route_names == {
+        "__init__.py",
+        "documents.py",
+        "consultation.py",
+        "opks.py",
+        "export.py",
+    }
 
 
 def test_current_composition_does_not_import_removed_paths():
@@ -86,10 +95,32 @@ def test_current_composition_does_not_import_removed_paths():
     assert violations == []
 
 
+def test_api_only_imports_feature_module_roots():
+    """`app/api`(routes、mappers、problems、deps)只能 import feature module 的
+    root public API,不得直接 reach 進 `app.documents.xxx`／`app.opks.xxx`／
+    `app.task_analysis.xxx`／`app.consultation.xxx`／`app.export.xxx` 的
+    implementation file(ADR 0058 規則 4)。`app.core` 的 submodule(例如
+    `app.core.persistence`)不在這條規則內——`core` 是共享 kernel,沒有單一
+    curated root 收斂全部型別,直接 import submodule 是既有、被接受的慣例。
+    """
+    api_root = API_DIR / "app" / "api"
+    feature_roots = ("documents", "opks", "task_analysis", "consultation", "export")
+    violations = []
+    for path in api_root.rglob("*.py"):
+        for line, module in _imports(path):
+            for root in feature_roots:
+                prefix = f"app.{root}."
+                if module.startswith(prefix):
+                    violations.append(
+                        f"{path.relative_to(API_DIR)}:{line} imports {module}"
+                    )
+    assert violations == []
+
+
 def test_core_imports_only_stdlib_pydantic_or_itself():
     """`app.core`（含 `app.core.domain`）是 shared kernel:只能 import stdlib、pydantic
     或自己。這已隱含禁止 FastAPI、SQLAlchemy、HTTPX、OpenPyXL,以及任何
-    `app.job_analysis.application`／feature／adapter 模組(ADR 0058 規則 1)。
+    feature／adapter 模組(ADR 0058 規則 1)。
     """
     assert CORE_ROOT.exists(), f"missing shared kernel: {CORE_ROOT}"
     violations = []
@@ -110,7 +141,7 @@ def test_core_imports_only_stdlib_pydantic_or_itself():
 def test_documents_imports_only_core_stdlib_pydantic_or_itself():
     """`app.documents` 是 feature module:只能 import stdlib、pydantic、`app.core`
     或自己。這已隱含禁止 FastAPI、SQLAlchemy、HTTPX、OpenPyXL,以及任何
-    `app.job_analysis`／adapter 模組(ADR 0058 規則 2)。
+    adapter 模組(ADR 0058 規則 2)。
     """
     assert DOCUMENTS_ROOT.exists(), f"missing feature module: {DOCUMENTS_ROOT}"
     violations = []
@@ -133,8 +164,7 @@ def test_documents_imports_only_core_stdlib_pydantic_or_itself():
 def test_task_analysis_imports_only_core_stdlib_pydantic_or_itself():
     """`app.task_analysis` 是 feature module:只能 import stdlib、pydantic、`app.core`
     或自己。這已隱含禁止 FastAPI、SQLAlchemy、HTTPX、OpenPyXL、具體的
-    `OpenRouterAdapter`,以及任何 `app.job_analysis`／`app.opks`／adapter 模組
-    (ADR 0058 規則 2)。
+    `OpenRouterAdapter`,以及任何 `app.opks`／adapter 模組(ADR 0058 規則 2)。
     """
     assert TASK_ANALYSIS_ROOT.exists(), f"missing feature module: {TASK_ANALYSIS_ROOT}"
     violations = []
@@ -159,9 +189,9 @@ def test_task_analysis_imports_only_core_stdlib_pydantic_or_itself():
 def test_opks_imports_only_core_stdlib_pydantic_or_itself():
     """`app.opks` 是 feature module:只能 import stdlib、pydantic、`app.core`
     或自己。這已隱含禁止 FastAPI、SQLAlchemy、HTTPX、OpenPyXL、具體的
-    `OpenRouterAdapter`,以及任何 `app.job_analysis`／`app.task_analysis`／
-    `app.documents`／adapter 模組(ADR 0058 規則 2)——`opks` 與 `task_analysis`
-    互不 import 對方,即使兩者都會被 `consultation`(Task 6)一起消費。
+    `OpenRouterAdapter`,以及任何 `app.task_analysis`／`app.documents`／
+    adapter 模組(ADR 0058 規則 2)——`opks` 與 `task_analysis` 互不 import
+    對方,即使兩者都會被 `consultation` 一起消費。
     """
     assert OPKS_ROOT.exists(), f"missing feature module: {OPKS_ROOT}"
     violations = []
@@ -178,6 +208,30 @@ def test_opks_imports_only_core_stdlib_pydantic_or_itself():
             )
             if not allowed:
                 violations.append(f"{path.relative_to(OPKS_ROOT)}:{line} imports {module}")
+    assert violations == []
+
+
+def test_export_imports_only_core_stdlib_pydantic_or_itself():
+    """`app.export` 是 feature module:純 deterministic Current State 投影,只能
+    import stdlib、pydantic、`app.core` 或自己。這已隱含禁止 FastAPI、
+    SQLAlchemy、HTTPX、以及最重要的——OpenPyXL(render-time adapter 屬於
+    `app.adapters.xlsx`,不屬於這個 feature module,ADR 0058 規則 2、3)。
+    """
+    assert EXPORT_ROOT.exists(), f"missing feature module: {EXPORT_ROOT}"
+    violations = []
+    for path in EXPORT_ROOT.rglob("*.py"):
+        for line, module in _imports(path):
+            root = module.split(".", 1)[0]
+            allowed = (
+                root in sys.stdlib_module_names
+                or root == "pydantic"
+                or module == "app.core"
+                or module.startswith("app.core.")
+                or module == "app.export"
+                or module.startswith("app.export.")
+            )
+            if not allowed:
+                violations.append(f"{path.relative_to(EXPORT_ROOT)}:{line} imports {module}")
     assert violations == []
 
 
@@ -267,11 +321,16 @@ def test_consultation_imports_only_core_task_analysis_opks_stdlib_pydantic_or_it
     assert violations == []
 
 
-def test_job_analysis_never_imports_persistence_or_web_frameworks():
-    forbidden = {"alembic", "asyncpg", "fastapi", "psycopg", "sqlalchemy", "starlette"}
+def test_openpyxl_is_confined_to_the_xlsx_adapter():
+    """ADR 0058:OpenPyXL 是 render-time 細節,只能住在 `app.adapters.xlsx`——
+    不得洩漏進 `app.export`(純投影)、其他 feature module,或 `app/api`。
+    """
+    assert XLSX_ADAPTER_ROOT.exists(), f"missing xlsx adapter: {XLSX_ADAPTER_ROOT}"
     violations = []
-    for path in ROOT.rglob("*.py"):
+    for path in (API_DIR / "app").rglob("*.py"):
+        if XLSX_ADAPTER_ROOT in path.parents:
+            continue
         for line, module in _imports(path):
-            if module.split(".", 1)[0] in forbidden:
-                violations.append(f"{path.relative_to(ROOT)}:{line} imports {module}")
+            if module == "openpyxl" or module.startswith("openpyxl."):
+                violations.append(f"{path.relative_to(API_DIR)}:{line} imports {module}")
     assert violations == []

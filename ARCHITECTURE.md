@@ -24,14 +24,18 @@ PostgreSQL 是唯一基礎服務，資料表由 `apps/api/alembic/versions/0012`
 
 ## API 邊界
 
-- `app/job_analysis/domain/`：純 domain、state、Evidence、Proposal 與不變量。
-- `app/job_analysis/application/`：文件、Current JD、顧問回合、OPKS、Proposal 決策、export 與 authority commit。
-- `app/job_analysis/llm/`：prompt、wire schema、結果映射與 verifier 邊界。
-- `app/job_analysis/providers/`：目前唯一的 OpenRouter provider。
-- `app/adapters/job_analysis_postgres/`：SQLAlchemy models、repository、serialization。
-- `app/api/`：HTTP route、dependency composition、mapper 與 problem response。
+API 依 ADR 0058 拆成功能模組（不再有單一 `app/job_analysis` namespace），依賴方向是 DAG：
 
-唯一 production route prefix 是 `/api/v1/job-analysis`；`/healthz` 是服務健康檢查。AI 只能提出 Proposal，員工決策或直接編輯才可改變 Current JD；所有 authority writer 經同一個 transaction seam。
+- `app/core/`：共同 Current State、authority transaction／port、journal、識別碼與跨模組共享的穩定 domain language；不得 import FastAPI、SQLAlchemy、HTTPX、OpenPyXL 或任何 feature／adapter 模組。
+- `app/documents/`：文件生命週期、header、readiness、Duty／Task 員工直接編輯。
+- `app/task_analysis/`：Task context、LLM wire／prompt、operation、verifier、Task Proposal。
+- `app/opks/`：OPKS context、child operation、scheduler、員工編輯、verifier、OPKS Proposal；與 `task_analysis` 互不 import 對方。
+- `app/consultation/`：員工回合 orchestration；唯一允許的跨功能方向——只能透過 `task_analysis`／`opks` 的 root public API 協調，不得 reach 進對方 implementation file。
+- `app/export/`：純 deterministic Current State → 公版表格投影；不知道任何具體 render 格式。
+- `app/adapters/`：具體 IO 實作——`postgres/`（SQLAlchemy models、repository、serialization）、`openrouter/`（唯一 LLM provider）、`xlsx/`（OpenPyXL renderer；OpenPyXL 只存在這裡）。
+- `app/api/`：HTTP route（`routes/documents.py`／`consultation.py`／`opks.py`／`export.py`，共用 `/job-analysis/documents` prefix）、對應 mapper、problem response、dependency composition（`deps.py`）；`router.py` 是唯一 composition root。只能 import 各 feature module 的 root public API 與 `app/adapters/*`，不得直接 reach 進 feature module 的 implementation file。
+
+唯一 production route prefix 是 `/api/v1/job-analysis`；`/healthz` 是服務健康檢查。AI 只能提出 Proposal，員工決策或直接編輯才可改變 Current JD；所有 authority writer 經同一個 transaction seam，provider 呼叫在 transaction 外執行。依賴規則由 `apps/api/tests/test_job_analysis_dependencies.py` 的 AST guard 強制。
 
 ## 文檔與退役邊界
 

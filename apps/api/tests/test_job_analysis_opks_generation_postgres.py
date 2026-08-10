@@ -6,15 +6,11 @@ from datetime import UTC, datetime, timedelta
 
 import pytest
 
-from app.adapters.job_analysis_postgres import SqlAlchemyJobAnalysisUnitOfWork
+from app.adapters.postgres import SqlAlchemyJobAnalysisUnitOfWork
 from app.documents import load_document
 from app.documents.authoring import create_document
-from app.job_analysis.application import (
-    OpksGenerationOutcome,
-    OpksGenerationPayload,
-    StaleAuthoritySnapshot,
-)
-from app.job_analysis.application.errors import IdempotencyConflict
+from app.core.errors import IdempotencyConflict, StaleAuthoritySnapshot
+from app.core.journal import OpksGenerationOutcome, OpksGenerationPayload
 from app.core.domain import (
     CurrentWorkModel,
     JdHeader,
@@ -41,7 +37,7 @@ from app.opks.llm import (
     OpksResultWire,
     OpksWireItem,
 )
-from app.job_analysis.providers import (
+from app.adapters.openrouter import (
     OpenRouterAdapter,
     OpenRouterConfig,
     TransportResponse,

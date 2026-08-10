@@ -40,7 +40,7 @@ from app.task_analysis.llm import (
     WireTaskFields,
     task_analysis_wire_provider_schema,
 )
-from app.job_analysis.providers import (
+from app.adapters.openrouter import (
     CHAT_COMPLETIONS_URL,
     OpenRouterAdapter,
     OpenRouterConfig,

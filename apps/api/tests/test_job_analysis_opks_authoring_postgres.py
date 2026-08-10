@@ -5,13 +5,11 @@ from __future__ import annotations
 import pytest
 from pydantic import ValidationError
 
-from app.adapters.job_analysis_postgres import SqlAlchemyJobAnalysisUnitOfWork
+from app.adapters.postgres import SqlAlchemyJobAnalysisUnitOfWork
 from app.documents import add_jd_task, delete_jd_task, load_document
 from app.documents.authoring import create_document
-from app.job_analysis.application import (
-    IdempotencyConflict,
-    OpksDirectEditPayload,
-)
+from app.core.errors import IdempotencyConflict
+from app.core.journal import OpksDirectEditPayload
 from app.opks import OpksItemNotFound, add_opks_item, delete_opks_item, edit_opks_item
 from app.core.domain import (
     JdHeader,

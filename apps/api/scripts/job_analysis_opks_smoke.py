@@ -51,7 +51,7 @@ from app.opks.llm import (  # noqa: E402
     OpksResultWire,
     OpksWireItem,
 )
-from app.job_analysis.providers import (  # noqa: E402
+from app.adapters.openrouter import (  # noqa: E402
     OpenRouterAdapter,
     OpenRouterConfig,
     TransportResponse,
@@ -624,7 +624,7 @@ async def run_scripted_opks_smoke(
 
 
 async def _run() -> OpksSmokeReport:
-    from app.adapters.job_analysis_postgres import SqlAlchemyJobAnalysisUnitOfWork
+    from app.adapters.postgres import SqlAlchemyJobAnalysisUnitOfWork
     from app.database import AsyncSessionLocal
 
     return await run_scripted_opks_smoke(

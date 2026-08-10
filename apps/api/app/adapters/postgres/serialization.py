@@ -6,34 +6,36 @@ from typing import Any
 
 from pydantic import ValidationError
 
-from app.job_analysis.application import (
-    ACTIVE_QUESTION_SCHEMA_ID,
+from app.core.journal import (
     COMPLETED_TURN_SCHEMA_ID,
     CONSULTANT_OPENING_SCHEMA_ID,
     DIRECT_EDIT_SCHEMA_ID,
     DUTY_DIRECT_EDIT_SCHEMA_ID,
     JD_HEADER_DIRECT_EDIT_SCHEMA_ID,
-    JD_HEADER_SCHEMA_ID,
-    OPKS_ITEM_SCHEMA_ID,
     OPKS_DIRECT_EDIT_SCHEMA_ID,
     OPKS_PROPOSAL_DECISION_SCHEMA_ID,
     OPKS_GENERATION_SCHEMA_ID,
-    OPKS_PROPOSAL_SCHEMA_ID,
     PROPOSAL_DECISION_SCHEMA_ID,
-    PROPOSAL_SCHEMA_ID,
-    WORK_MODEL_SCHEMA_ID,
     ActiveQuestion,
     CompletedTurnPayload,
     ConsultantOpeningPayload,
     DirectEditPayload,
     DutyDirectEditPayload,
-    DocumentRecord,
     JdHeaderDirectEditPayload,
     JournalEntry,
     OpksDirectEditPayload,
     OpksProposalDecisionPayload,
     OpksGenerationPayload,
     ProposalDecisionPayload,
+)
+from app.core.persistence import (
+    ACTIVE_QUESTION_SCHEMA_ID,
+    JD_HEADER_SCHEMA_ID,
+    OPKS_ITEM_SCHEMA_ID,
+    OPKS_PROPOSAL_SCHEMA_ID,
+    PROPOSAL_SCHEMA_ID,
+    WORK_MODEL_SCHEMA_ID,
+    DocumentRecord,
 )
 from app.core.domain import (
     CurrentWorkModel,

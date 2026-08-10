@@ -10,7 +10,7 @@ from openpyxl.cell.cell import Cell
 from openpyxl.styles import Alignment, Border, Font, Side
 from openpyxl.worksheet.worksheet import Worksheet
 
-from .export import ExportDocument, ExportOpksEntry, ExportTaskEntry
+from app.export import ExportDocument, ExportOpksEntry, ExportTaskEntry
 
 
 XLSX_MEDIA_TYPE = (

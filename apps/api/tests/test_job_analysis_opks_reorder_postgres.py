@@ -6,8 +6,8 @@ import httpx
 import pytest
 import pytest_asyncio
 
-from app.adapters.job_analysis_postgres import SqlAlchemyJobAnalysisUnitOfWork
-from app.api.job_analysis_deps import get_job_analysis_uow_factory
+from app.adapters.postgres import SqlAlchemyJobAnalysisUnitOfWork
+from app.api.deps import get_job_analysis_uow_factory
 from app.main import app
 
 

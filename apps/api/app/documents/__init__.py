@@ -5,7 +5,7 @@ JD's header, Duties, and Tasks, plus the pure readiness assessment consumed by
 transport. LLM-driven Task Proposal analysis and OPKS stay in other feature
 modules (ADR 0058).
 
-Only what `app/api` routes and `app/api/job_analysis_mapper.py` actually
+Only what `app/api` routes and `app/api/documents_mapper.py` actually
 consume is re-exported here. Helpers such as `create_document`,
 `DocumentMetadataWriteResult`, and `stale_task_proposals_for_direct_edit`
 remain reachable via `app.documents.authoring` for tests and scripts, but are

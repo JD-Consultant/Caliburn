@@ -9,7 +9,7 @@ from alembic import context
 from app.config import settings
 from app.models.base import Base
 # Current-only metadata used by autogenerate; migrations remain the schema authority.
-import app.adapters.job_analysis_postgres.models  # noqa: F401
+import app.adapters.postgres.models  # noqa: F401
 
 if sys.platform == "win32":
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())

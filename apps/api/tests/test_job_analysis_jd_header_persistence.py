@@ -13,8 +13,8 @@ from app.adapters.job_analysis_postgres import (
     SqlAlchemyJobAnalysisUnitOfWork,
 )
 from app.adapters.job_analysis_postgres import serialization as ser
+from app.documents.authoring import load_document
 from app.job_analysis.application import ActiveQuestion, DocumentRecord
-from app.job_analysis.application.authoring import load_document
 from app.job_analysis.application.durable_turn import _load_state as load_turn_state
 from app.job_analysis.application.opks_authoring import _locked_state
 from app.job_analysis.application.opks_generation import (

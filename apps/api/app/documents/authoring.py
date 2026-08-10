@@ -24,14 +24,23 @@ from app.core.domain import (
 )
 
 from app.core.authority import commit_authority_change
+from app.core.errors import DocumentNotFound, IdempotencyConflict, JdTaskNotFound
 from app.core.journal import (
     CONSULTANT_OPENING_SCHEMA_ID,
     DIRECT_EDIT_SCHEMA_ID,
     JD_HEADER_DIRECT_EDIT_SCHEMA_ID,
+    ActiveQuestion,
     ConsultantOpeningPayload,
+    ConversationTurn,
     DirectEditPayload,
     JdHeaderDirectEditPayload,
     JournalEntry,
+    TurnSpeaker,
+)
+from app.core.opks_integrity import (
+    prune_opks_for_current_jd,
+    prune_opks_gaps_for_current_jd,
+    stale_invalid_opks_proposals,
 )
 from app.core.persistence import (
     DocumentRecord,
@@ -40,22 +49,9 @@ from app.core.persistence import (
     JobAnalysisUnitOfWorkFactory,
     LoadedDocument,
 )
+from app.core.state import JobAnalysisState
 
-from .context import ActiveQuestion, ConversationTurn
-from .errors import (
-    DocumentNotFound,
-    IdempotencyConflict,
-    InvalidJdTaskOrder,
-    JdHeaderNotChanged,
-    JdTaskNotFound,
-)
-from .opks_authoring import (
-    prune_opks_for_current_jd,
-    prune_opks_gaps_for_current_jd,
-)
-from .opks_proposals import stale_invalid_opks_proposals
-from .transition import JobAnalysisState
-from .verifier import TurnSpeaker
+from .errors import InvalidJdTaskOrder, JdHeaderNotChanged
 
 
 CONSULTANT_OPENING_ENTRY_ID = "consultant-opening"

@@ -8,6 +8,7 @@ from uuid import UUID
 from app.core.domain import CurrentJdOpks, Duty, DutyId, JdTask, Proposal
 
 from app.core.authority import commit_authority_change
+from app.core.errors import DocumentNotFound, IdempotencyConflict
 from app.core.journal import (
     DUTY_DIRECT_EDIT_SCHEMA_ID,
     DutyDirectEditPayload,
@@ -18,15 +19,10 @@ from app.core.persistence import (
     JobAnalysisUnitOfWork,
     JobAnalysisUnitOfWorkFactory,
 )
+from app.core.state import JobAnalysisState
 
 from .authoring import stale_task_proposals_for_direct_edit
-from .errors import (
-    DocumentNotFound,
-    DutyNotFound,
-    IdempotencyConflict,
-    InvalidDutyOrder,
-)
-from .transition import JobAnalysisState
+from .errors import DutyNotFound, InvalidDutyOrder
 
 
 def _utcnow() -> datetime:

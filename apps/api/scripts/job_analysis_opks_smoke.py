@@ -20,19 +20,17 @@ from uuid import UUID, uuid4
 # 直接執行 scripts/ 下檔案時，apps/api 尚未在 sys.path。
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+from app.documents import add_jd_task, delete_jd_task, load_document  # noqa: E402
+from app.documents.authoring import create_document  # noqa: E402
 from app.job_analysis.application import (  # noqa: E402
     JobAnalysisState,
     OpksGroundingUnavailable,
-    add_jd_task,
     add_opks_item,
     compute_analysis_input_digest,
-    create_document,
     decide_opks_proposal,
-    delete_jd_task,
     delete_opks_item,
     edit_opks_item,
     generate_opks_proposals,
-    load_document,
 )
 from app.core.authority import commit_authority_change  # noqa: E402
 from app.core.persistence import JobAnalysisUnitOfWorkFactory  # noqa: E402

@@ -10,12 +10,9 @@ from sqlalchemy import func, select
 
 from app.adapters.job_analysis_postgres import SqlAlchemyJobAnalysisUnitOfWork
 from app.adapters.job_analysis_postgres.models import JobAnalysisJournalRow
-from app.job_analysis.application import (
-    IdempotencyConflict,
-    JdHeaderDirectEditPayload,
+from app.documents import (
     JdHeaderNotChanged,
     add_jd_task,
-    create_document,
     delete_jd_task,
     edit_jd_task,
     list_documents,
@@ -23,6 +20,11 @@ from app.job_analysis.application import (
     put_document_metadata,
     put_jd_header,
     reorder_jd_tasks,
+)
+from app.documents.authoring import create_document
+from app.job_analysis.application import (
+    IdempotencyConflict,
+    JdHeaderDirectEditPayload,
 )
 from app.core.domain import (
     CurrentWorkModel,

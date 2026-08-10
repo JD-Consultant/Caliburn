@@ -6,11 +6,11 @@ import app.job_analysis.application as application
 import pytest
 
 from app.adapters.job_analysis_postgres import SqlAlchemyJobAnalysisUnitOfWork
+from app.documents import load_document
+from app.documents.authoring import create_document
 from app.job_analysis.application import (
     IdempotencyConflict,
     UncommittableOperationResult,
-    create_document,
-    load_document,
 )
 from app.job_analysis.llm import (
     IdentityRelation,

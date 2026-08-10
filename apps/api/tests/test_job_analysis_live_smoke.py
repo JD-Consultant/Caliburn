@@ -16,7 +16,8 @@ import httpx
 import pytest
 
 from app.adapters.job_analysis_postgres import SqlAlchemyJobAnalysisUnitOfWork
-from app.job_analysis.application import load_document, submit_employee_turn
+from app.documents import load_document
+from app.job_analysis.application import submit_employee_turn
 from app.job_analysis.llm import (
     IdentityRelation,
     SignalDisposition,

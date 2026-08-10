@@ -6,17 +6,15 @@ import pytest
 from pydantic import ValidationError
 
 from app.adapters.job_analysis_postgres import SqlAlchemyJobAnalysisUnitOfWork
+from app.documents import add_jd_task, delete_jd_task, load_document
+from app.documents.authoring import create_document
 from app.job_analysis.application import (
     IdempotencyConflict,
     OpksDirectEditPayload,
     OpksItemNotFound,
-    add_jd_task,
     add_opks_item,
-    create_document,
-    delete_jd_task,
     delete_opks_item,
     edit_opks_item,
-    load_document,
 )
 from app.core.domain import (
     JdHeader,

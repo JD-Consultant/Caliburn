@@ -25,13 +25,12 @@ from job_analysis_contract import (
     ReadinessIssueView,
 )
 
+from app.documents import DocumentReadiness, assess_readiness
 from app.job_analysis.application import (
-    DocumentReadiness,
     DocumentRecord,
     DocumentSummary,
     JobAnalysisState,
     LoadedDocument,
-    assess_readiness,
     opks_task_status,
 )
 from app.core.domain import (

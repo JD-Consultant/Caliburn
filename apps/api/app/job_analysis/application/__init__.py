@@ -1,23 +1,13 @@
-"""Use-case 層：context、operation、transition 與純 persistence ports。"""
+"""Use-case 層：context、operation、transition 與純 persistence ports。
 
-from .authoring import (
-    DocumentMetadataWriteResult,
-    add_jd_task,
-    create_document,
-    delete_jd_task,
-    edit_jd_task,
-    list_documents,
-    load_document,
-    put_document_metadata,
-    put_jd_header,
-    reorder_jd_tasks,
-)
-from .duty_authoring import (
-    add_duty,
-    delete_duty,
-    edit_duty,
-    reorder_duties,
-)
+Document/header/Duty/Task direct-edit use cases and readiness moved to
+`app.documents` (ADR 0058). `create_document` is re-exported here from
+`app.documents.authoring` only because scripts outside the composition root
+still consume it directly; it is not part of `app.documents`'s curated
+public API.
+"""
+
+from app.documents.authoring import create_document
 from .export import (
     ExportDocument,
     ExportDutySection,
@@ -28,13 +18,9 @@ from .export import (
 from .errors import (
     ConcurrentAuthorityChange,
     DocumentNotFound,
-    DutyNotFound,
     IdempotencyConflict,
-    InvalidDutyOrder,
-    InvalidJdTaskOrder,
     InvalidOpksOrder,
     InvalidProposalDecision,
-    JdHeaderNotChanged,
     JdTaskNotFound,
     OpksItemNotFound,
     OpksProposalNotDecidable,
@@ -116,12 +102,6 @@ from .opks_verifier import (
     OpksViolationCode,
     VerifiedOpksChange,
     verify_opks_result,
-)
-from .readiness import (
-    DocumentReadiness,
-    ReadinessIssue,
-    ReadinessIssueCode,
-    assess_readiness,
 )
 from app.core.journal import (
     CONSULTANT_OPENING_SCHEMA_ID,
@@ -209,7 +189,6 @@ __all__ = [
     "DirectEditKind",
     "DirectEditPayload",
     "DutyDirectEditPayload",
-    "DutyNotFound",
     "DutyRepository",
     "ExportDocument",
     "ExportDutySection",
@@ -217,13 +196,10 @@ __all__ = [
     "ExportTaskEntry",
     "assemble_export_document",
     "DocumentNotFound",
-    "DocumentMetadataWriteResult",
     "DocumentRecord",
     "DocumentRepository",
     "DocumentSummary",
     "IdempotencyConflict",
-    "InvalidJdTaskOrder",
-    "InvalidDutyOrder",
     "InvalidOpksOrder",
     "InvalidProposalDecision",
     "JobAnalysisState",
@@ -231,7 +207,6 @@ __all__ = [
     "JobAnalysisUnitOfWorkFactory",
     "JdTaskRepository",
     "JdHeaderDirectEditPayload",
-    "JdHeaderNotChanged",
     "JD_HEADER_SCHEMA_ID",
     "JdTaskNotFound",
     "JournalEntry",
@@ -271,10 +246,6 @@ __all__ = [
     "ProposalNotDecidable",
     "ProposalNotFound",
     "ProposalRepository",
-    "DocumentReadiness",
-    "ReadinessIssue",
-    "ReadinessIssueCode",
-    "assess_readiness",
     "TaskAnalysisOperationResult",
     "StaleAuthoritySnapshot",
     "TransitionCommitRejected",
@@ -309,8 +280,6 @@ __all__ = [
     "Violation",
     "ViolationCode",
     "WORK_MODEL_SCHEMA_ID",
-    "add_jd_task",
-    "add_duty",
     "add_opks_item",
     "ScheduledOpks",
     "build_opks_context_packet",
@@ -323,26 +292,16 @@ __all__ = [
     "create_document",
     "commit_verified_turn",
     "commit_opks_generation",
-    "delete_jd_task",
-    "delete_duty",
     "delete_opks_item",
     "decide_opks_proposal",
     "decide_proposal",
-    "edit_jd_task",
-    "edit_duty",
     "edit_opks_item",
-    "list_documents",
     "generate_opks_proposals",
-    "load_document",
     "prepare_turn",
     "prepare_opks_generation",
     "prune_opks_for_current_jd",
     "prune_opks_gaps_for_current_jd",
-    "put_document_metadata",
-    "put_jd_header",
     "propose_task_for_jd",
-    "reorder_jd_tasks",
-    "reorder_duties",
     "render_opks_context_packet",
     "run_opks_operation",
     "remove_opks_item_and_indicator_refs",

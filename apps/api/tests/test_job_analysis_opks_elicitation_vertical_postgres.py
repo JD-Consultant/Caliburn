@@ -17,11 +17,11 @@ from __future__ import annotations
 import pytest
 
 from app.adapters.job_analysis_postgres import SqlAlchemyJobAnalysisUnitOfWork
+from app.documents import load_document
+from app.documents.authoring import create_document
 from app.job_analysis.application import (
-    create_document,
     decide_opks_proposal,
     decide_proposal,
-    load_document,
     submit_employee_turn,
 )
 from app.core.domain import OpksEntityKind, OpksGapAxis

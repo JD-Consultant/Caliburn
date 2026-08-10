@@ -4,6 +4,7 @@ from job_analysis_contract import (
     ActiveQuestionView,
     ConsultationView,
     ConversationTurnView,
+    JdTaskView,
     ProposalDecisionWrite,
     ProposalJdEntryView,
     ProposalView,
@@ -35,7 +36,7 @@ def _optional_text(value: str | None) -> str | None:
     return normalized or None
 
 
-def _to_domain_jd_task(task: JdTask) -> JdTask:
+def _to_domain_jd_task(task: JdTaskView) -> JdTask:
     return JdTask(
         task_id=task.task_id,
         statement=task.statement.strip(),

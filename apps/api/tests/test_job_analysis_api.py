@@ -448,15 +448,12 @@ async def test_invalid_document_metadata_uses_problem_details(api_client, payloa
     assert response.json()["errors"]
 
 
-async def test_legacy_validation_error_shape_is_unchanged(api_client):
+async def test_retired_legacy_route_is_not_mounted(api_client):
     client, _, _ = api_client
 
     response = await client.get("/api/v1/occupations")
 
-    assert response.status_code == 422
-    assert response.headers["content-type"].startswith("application/json")
-    assert "type" not in response.json()
-    assert isinstance(response.json()["detail"], list)
+    assert response.status_code == 404
 
 
 def _task_payload(statement: str = " 每週彙整營運週報 "):

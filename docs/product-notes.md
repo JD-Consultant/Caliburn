@@ -33,7 +33,7 @@
 4. 職務說明書內容完整度、一致性、客製化程度與可匯出品質；
 5. 能讓員工實際操作、可一鍵啟動的最小本機 Web workspace。
 
-本機 Web workspace 的新文件權威是 greenfield `app/job_analysis`：Current JD 保存員工確認或直接編輯的文件內容，
+本機 Web workspace 的新文件權威是現行 `app/core`（Current State domain／authority，ADR 0058）：Current JD 保存員工確認或直接編輯的文件內容，
 Current Work Model 保存 AI 可修正的分析。第一版不整合、不雙寫，也不搬遷舊 `job_authoring`／vNext 資料；舊
 `DocumentVersion`／OCS deep JSON／`_pending` 不得恢復為新產品真相。詳細裁決見
 [`ADR 0043`](adr/0043-job-analysis-local-current-state-persistence-and-authoring-authority.md)與

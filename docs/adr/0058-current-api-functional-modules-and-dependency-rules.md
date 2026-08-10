@@ -47,3 +47,5 @@ Web 依實際 UI responsibility 對齊能力邊界，採 `features/documents`、
 功能名稱會直接反映產品能力，`job_analysis` 不再暗示仍有平行舊 runtime；Task／OPKS／文件／匯出的內聚、公開面與允許依賴可被測試。provider port 與 XLSX renderer 回到正確內外層後，換 adapter 不會迫使 application 依賴具體框架。
 
 代價是大量 import、tests、docs 與 composition 路徑需要分批 move，且 shared core 必須持續防止膨脹。由於 public HTTP、contract 與 table names 保持不變，這是 source-level refactor，不建立相容 shim、第二套路徑或雙軌 runtime。
+
+`core/opks_integrity.py` 是規則 7「型別／port」判準下一個已知且被接受、但需持續留意的例外：它裝的是 OPKS 專屬的 staleness／pruning 政策（含使用者可見的繁中文案），不是純型別或 port，理由是替代方案（讓 `documents → opks` 多一條 edge）更差——這正是未來 `core` 膨脹會長成的樣子，需要持續觀察。

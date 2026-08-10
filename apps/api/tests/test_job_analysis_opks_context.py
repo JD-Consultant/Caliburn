@@ -6,7 +6,7 @@ from datetime import UTC, datetime
 
 import pytest
 
-from app.job_analysis.application import (
+from app.opks import (
     OpksGroundingUnavailable,
     build_opks_context_packet,
     render_opks_context_packet,

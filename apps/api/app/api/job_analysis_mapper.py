@@ -31,8 +31,8 @@ from app.job_analysis.application import (
     DocumentRecord,
     DocumentSummary,
     LoadedDocument,
-    opks_task_status,
 )
+from app.opks import opks_task_status
 from app.core.domain import (
     Enabler,
     EnablerKind,

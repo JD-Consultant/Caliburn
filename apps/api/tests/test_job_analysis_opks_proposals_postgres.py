@@ -9,12 +9,8 @@ import pytest
 from app.adapters.job_analysis_postgres import SqlAlchemyJobAnalysisUnitOfWork
 from app.documents import add_jd_task, delete_jd_task, load_document
 from app.documents.authoring import create_document
-from app.job_analysis.application import (
-    IdempotencyConflict,
-    OpksProposalNotDecidable,
-    decide_opks_proposal,
-    edit_opks_item,
-)
+from app.job_analysis.application import IdempotencyConflict
+from app.opks import OpksProposalNotDecidable, decide_opks_proposal, edit_opks_item
 from app.core.domain import (
     JdTaskFields,
     OpksEntityKind,

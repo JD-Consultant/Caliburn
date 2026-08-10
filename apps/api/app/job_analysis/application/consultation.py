@@ -12,14 +12,20 @@ from uuid import UUID
 
 from app.job_analysis.providers import OpenRouterAdapter
 
-from app.core.journal import CompletedTurnPayload, ConversationTurn, JournalEntry, TurnSpeaker
+from app.core.errors import StaleAuthoritySnapshot
+from app.core.journal import (
+    CompletedTurnPayload,
+    ConversationTurn,
+    JournalEntry,
+    ScheduledOpks,
+    TurnSpeaker,
+)
 from app.core.persistence import JobAnalysisUnitOfWorkFactory
+from app.opks import generate_opks_proposals, scheduled_opks_operation_id
 from app.task_analysis import run_task_analysis_operation
 
-from .durable_turn import StaleAuthoritySnapshot, commit_verified_turn, prepare_turn
+from .durable_turn import commit_verified_turn, prepare_turn
 from .errors import IdempotencyConflict, JobAnalysisApplicationError
-from .opks_digest import ScheduledOpks, scheduled_opks_operation_id
-from .opks_generation import generate_opks_proposals
 
 
 logger = logging.getLogger(__name__)

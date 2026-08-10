@@ -7,12 +7,14 @@ from datetime import UTC, datetime
 from uuid import UUID
 
 from app.core.authority import commit_authority_change
+from app.core.errors import ConcurrentAuthorityChange, StaleAuthoritySnapshot
 from app.core.journal import (
     COMPLETED_TURN_SCHEMA_ID,
     ActiveQuestion,
     CompletedTurnPayload,
     ConversationTurn,
     JournalEntry,
+    ScheduledOpks,
     TurnSpeaker,
 )
 from app.core.model_outcome import OperationOutcome
@@ -22,6 +24,7 @@ from app.core.persistence import (
     JobAnalysisUnitOfWorkFactory,
 )
 from app.core.state import JobAnalysisState
+from app.opks import select_scheduled_opks
 from app.task_analysis import (
     TaskAnalysisOperationResult,
     TaskAnalysisPacket,
@@ -29,20 +32,14 @@ from app.task_analysis import (
     TransitionResult,
     apply_task_analysis_result,
     build_context_packet,
+    question_target_task_ids,
 )
 
 from .errors import (
-    ConcurrentAuthorityChange,
     DocumentNotFound,
     IdempotencyConflict,
     JobAnalysisApplicationError,
 )
-from .opks_digest import ScheduledOpks
-from .opks_scheduler import question_target_task_ids, select_scheduled_opks
-
-
-class StaleAuthoritySnapshot(ConcurrentAuthorityChange):
-    """The model read authority that is no longer current."""
 
 
 class UncommittableOperationResult(JobAnalysisApplicationError):

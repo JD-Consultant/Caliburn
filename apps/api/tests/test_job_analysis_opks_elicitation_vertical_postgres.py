@@ -19,13 +19,11 @@ import pytest
 from app.adapters.job_analysis_postgres import SqlAlchemyJobAnalysisUnitOfWork
 from app.documents import load_document
 from app.documents.authoring import create_document
-from app.job_analysis.application import (
-    decide_opks_proposal,
-    submit_employee_turn,
-)
+from app.job_analysis.application import submit_employee_turn
+from app.opks import decide_opks_proposal
 from app.task_analysis import decide_proposal
 from app.core.domain import OpksEntityKind, OpksGapAxis
-from app.job_analysis.llm import (
+from app.opks.llm import (
     OpksDecision,
     OpksResultWire,
     OpksWireItem,

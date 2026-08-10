@@ -13,9 +13,9 @@ from app.core.domain import (
     OpksItem,
     OpksProposalAction,
 )
-from app.job_analysis.llm import OpksDecision, OpksResult, OpksResultItem
 
-from .opks_context import OpksContextPacket
+from .context import OpksContextPacket
+from .llm import OpksDecision, OpksResult, OpksResultItem
 
 
 class OpksViolationCode(StrEnum):

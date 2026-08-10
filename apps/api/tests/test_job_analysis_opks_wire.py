@@ -6,7 +6,7 @@ import json
 import re
 
 from app.core.domain import OpksEntityKind
-from app.job_analysis.llm import (
+from app.opks.llm import (
     OPKS_RESULT_WIRE_SCHEMA_NAME,
     OPKS_WIRE_SCHEMA_PATH,
     OpksDecision,

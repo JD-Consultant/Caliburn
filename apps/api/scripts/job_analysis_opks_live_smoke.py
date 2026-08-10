@@ -51,18 +51,14 @@ from app.documents import load_document  # noqa: E402
 from app.documents.authoring import create_document  # noqa: E402
 from app.job_analysis.application import (  # noqa: E402
     JobAnalysisUnitOfWorkFactory,
-    compute_analysis_input_digest,
 )
 from app.core.authority import commit_authority_change  # noqa: E402
 from app.core.state import JobAnalysisState  # noqa: E402
-from app.job_analysis.application.opks_generation import (  # noqa: E402
+from app.opks import (  # noqa: E402
     commit_opks_generation,
+    compute_analysis_input_digest,
     prepare_opks_generation,
-)
-from app.job_analysis.application.opks_context import (  # noqa: E402
     render_opks_context_packet,
-)
-from app.job_analysis.application.opks_operation import (  # noqa: E402
     run_opks_operation,
 )
 from app.core.domain import (  # noqa: E402
@@ -78,7 +74,7 @@ from app.core.domain import (  # noqa: E402
     SupportLink,
     Task,
 )
-from app.job_analysis.llm import (  # noqa: E402
+from app.opks.llm import (  # noqa: E402
     OPKS_INSTRUCTIONS,
     OPKS_RESULT_WIRE_SCHEMA_NAME,
     opks_result_wire_provider_schema,

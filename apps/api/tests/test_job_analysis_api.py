@@ -36,7 +36,7 @@ from app.core.domain import (
     SourceRef,
     TaskFields,
 )
-from app.job_analysis.llm import (
+from app.opks.llm import (
     OpksDecision,
     OpksGenerationEntityKind,
     OpksResultWire,

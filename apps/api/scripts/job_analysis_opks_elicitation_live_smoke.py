@@ -77,7 +77,7 @@ from app.core.domain import (  # noqa: E402
     Task,
 )
 from app.core.state import JobAnalysisState  # noqa: E402
-from app.job_analysis.llm import (  # noqa: E402
+from app.opks.llm import (  # noqa: E402
     OPKS_INSTRUCTIONS,
     OPKS_RESULT_WIRE_SCHEMA_NAME,
     opks_result_wire_provider_schema,

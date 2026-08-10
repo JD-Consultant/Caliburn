@@ -5,8 +5,15 @@ from __future__ import annotations
 from pydantic import ValidationError
 
 from app.core.domain import DomainModel, NonEmptyText
-from app.core.model_outcome import OperationOutcome
-from app.job_analysis.llm import (
+from app.core.model_outcome import (
+    OperationOutcome,
+    ProviderFailure,
+    ProviderRefusal,
+    ProviderText,
+)
+
+from .context import OpksContextPacket, render_opks_context_packet
+from .llm import (
     OPKS_INSTRUCTIONS,
     OPKS_RESULT_WIRE_SCHEMA_NAME,
     OpksResult,
@@ -14,15 +21,8 @@ from app.job_analysis.llm import (
     opks_result_wire_provider_schema,
     opks_wire_to_result,
 )
-from app.job_analysis.providers import (
-    OpenRouterAdapter,
-    ProviderFailure,
-    ProviderRefusal,
-    ProviderText,
-)
-
-from .opks_context import OpksContextPacket, render_opks_context_packet
-from .opks_verifier import OpksVerificationReport, verify_opks_result
+from .ports import OpksModelPort
+from .verifier import OpksVerificationReport, verify_opks_result
 
 
 class OpksOperationResult(DomainModel):
@@ -39,7 +39,7 @@ class OpksOperationResult(DomainModel):
 async def run_opks_operation(
     *,
     packet: OpksContextPacket,
-    adapter: OpenRouterAdapter,
+    adapter: OpksModelPort,
     operation_id: str,
 ) -> OpksOperationResult:
     provider_outcome = await adapter.complete(

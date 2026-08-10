@@ -30,10 +30,10 @@ from app.job_analysis.application import (
     OpksProposalRepository,
     OpksRepository,
     ProposalDecisionPayload,
-    ScheduledOpks,
     TurnSpeaker,
-    scheduled_opks_operation_id,
 )
+from app.core.journal import ScheduledOpks
+from app.opks import scheduled_opks_operation_id
 from app.core.domain import (
     CurrentWorkModel,
     JdHeader,

@@ -14,10 +14,8 @@ from app.core.domain import (
     SourceRef,
 )
 from app.core.authority import commit_authority_change
-from app.core.opks_integrity import (
-    prune_opks_for_current_jd,
-    prune_opks_gaps_for_current_jd,
-)
+from app.core.errors import DocumentNotFound, IdempotencyConflict
+from app.core.opks_integrity import stale_invalid_opks_proposals
 from app.core.journal import (
     OPKS_DIRECT_EDIT_SCHEMA_ID,
     JournalEntry,
@@ -29,16 +27,8 @@ from app.core.persistence import (
 )
 from app.core.state import JobAnalysisState
 
-from .errors import (
-    DocumentNotFound,
-    IdempotencyConflict,
-    InvalidOpksOrder,
-    OpksItemNotFound,
-)
-from .opks_proposals import (
-    remove_opks_item_and_indicator_refs,
-    stale_invalid_opks_proposals,
-)
+from .errors import InvalidOpksOrder, OpksItemNotFound
+from .proposals import remove_opks_item_and_indicator_refs
 
 
 def _utcnow() -> datetime:

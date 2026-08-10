@@ -17,6 +17,7 @@
 - [`plans/2026-08-10-current-only-hard-cut-plan.md`](plans/2026-08-10-current-only-hard-cut-plan.md) — 執行切片與 hard gates。
 - [`specs/2026-08-10-job-analysis-module-boundaries-research.md`](specs/2026-08-10-job-analysis-module-boundaries-research.md) — current system 完成隔離後的功能模組、shared kernel、port ownership 與 Web 邊界研究。
 - [`adr/0058-current-api-functional-modules-and-dependency-rules.md`](adr/0058-current-api-functional-modules-and-dependency-rules.md) — **Accepted** current API／Web 模組與可執行依賴規範；後續 move-only 重構的權威邊界。
+- [`plans/2026-08-10-current-application-modularization-plan.md`](plans/2026-08-10-current-application-modularization-plan.md) — 可交付實作者逐 task 搬移、驗證與 commit 的 current application 模組化計畫。
 - [`contract-strategy.md`](contract-strategy.md) — 現行 `job-analysis-contract` 的契約規範。
 - [`adr/README.md`](adr/README.md) — ADR 索引；0057 記錄 current-only hard cut。
 

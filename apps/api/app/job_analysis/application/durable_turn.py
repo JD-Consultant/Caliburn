@@ -6,7 +6,16 @@ from dataclasses import dataclass, replace
 from datetime import UTC, datetime
 from uuid import UUID
 
-from .authority_commit import commit_authority_change
+from app.core.authority import commit_authority_change
+from app.core.persistence import (
+    COMPLETED_TURN_SCHEMA_ID,
+    CompletedTurnPayload,
+    DocumentRecord,
+    JobAnalysisUnitOfWork,
+    JobAnalysisUnitOfWorkFactory,
+    JournalEntry,
+)
+
 from .errors import (
     ConcurrentAuthorityChange,
     DocumentNotFound,
@@ -22,14 +31,6 @@ from .context import (
 from .operation import OperationOutcome, TaskAnalysisOperationResult
 from .opks_digest import ScheduledOpks
 from .opks_scheduler import question_target_task_ids, select_scheduled_opks
-from .persistence import (
-    COMPLETED_TURN_SCHEMA_ID,
-    CompletedTurnPayload,
-    DocumentRecord,
-    JobAnalysisUnitOfWork,
-    JobAnalysisUnitOfWorkFactory,
-    JournalEntry,
-)
 from .transition import (
     JobAnalysisState,
     TransitionOutcome,

@@ -34,12 +34,8 @@ from app.job_analysis.application import (  # noqa: E402
     generate_opks_proposals,
     load_document,
 )
-from app.job_analysis.application.authority_commit import (  # noqa: E402
-    commit_authority_change,
-)
-from app.job_analysis.application.persistence import (  # noqa: E402
-    JobAnalysisUnitOfWorkFactory,
-)
+from app.core.authority import commit_authority_change  # noqa: E402
+from app.core.persistence import JobAnalysisUnitOfWorkFactory  # noqa: E402
 from app.core.domain import (  # noqa: E402
     CurrentWorkModel,
     JdHeader,

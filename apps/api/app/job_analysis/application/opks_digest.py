@@ -18,18 +18,8 @@ from __future__ import annotations
 import hashlib
 import json
 
-from app.core.domain import DomainModel, Identifier, NonEmptyText, Task, TaskId
-
-
-class ScheduledOpks(DomainModel):
-    """主回合 receipt 凍結的唯一 child(決定 7–8)。
-
-    child operation ID 由這兩個值推導,**不重複持久化**——多存一份 ID 就多一個
-    會與推導結果不一致的真相。
-    """
-
-    task_id: TaskId
-    analysis_input_digest: NonEmptyText
+from app.core.domain import Identifier, Task
+from app.core.journal import ScheduledOpks
 
 
 def scheduled_opks_operation_id(scheduled: ScheduledOpks) -> Identifier:

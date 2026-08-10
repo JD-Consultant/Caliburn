@@ -1,16 +1,19 @@
-"""Typed application failures shared by job-analysis use cases."""
+"""Typed application failures shared by job-analysis use cases.
 
+The six failures consumed by more than one future feature module now live in
+`app.core.errors` (ADR 0058 rule 7); this module re-exports them alongside the
+feature-specific errors that still belong here until their owning feature module
+is carved out.
+"""
 
-class JobAnalysisApplicationError(RuntimeError):
-    pass
-
-
-class DocumentNotFound(JobAnalysisApplicationError):
-    pass
-
-
-class JdTaskNotFound(JobAnalysisApplicationError):
-    pass
+from app.core.errors import (
+    ConcurrentAuthorityChange,
+    DocumentNotFound,
+    IdempotencyConflict,
+    InvalidProposalDecision,
+    JdTaskNotFound,
+    JobAnalysisApplicationError,
+)
 
 
 class DutyNotFound(JobAnalysisApplicationError):
@@ -34,18 +37,6 @@ class OpksProposalNotFound(JobAnalysisApplicationError):
 
 
 class OpksProposalNotDecidable(JobAnalysisApplicationError):
-    pass
-
-
-class InvalidProposalDecision(JobAnalysisApplicationError):
-    pass
-
-
-class IdempotencyConflict(JobAnalysisApplicationError):
-    pass
-
-
-class ConcurrentAuthorityChange(JobAnalysisApplicationError):
     pass
 
 

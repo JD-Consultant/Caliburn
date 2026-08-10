@@ -56,7 +56,8 @@ from app.core.domain import (
     TaskFields,
 )
 
-from .portable_schema import compact_strict_output_schema
+from app.core.portable_schema import compact_strict_output_schema
+
 from .result import (
     ExcludePayload,
     IdentityAssessment,

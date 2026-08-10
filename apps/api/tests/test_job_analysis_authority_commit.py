@@ -15,7 +15,7 @@ from app.job_analysis.application import (
     add_jd_task,
     create_document,
 )
-from app.job_analysis.application.authority_commit import commit_authority_change
+from app.core.authority import commit_authority_change
 from app.core.domain import (
     CurrentJdOpks,
     CurrentWorkModel,

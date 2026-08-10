@@ -32,7 +32,7 @@ from app.job_analysis.application import (
     prepare_turn,
     reorder_duties,
 )
-from app.job_analysis.application.authority_commit import commit_authority_change
+from app.core.authority import commit_authority_change
 from app.core.domain import (
     CurrentJdOpks,
     CurrentWorkModel,

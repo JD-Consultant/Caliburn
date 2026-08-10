@@ -123,7 +123,7 @@ from .readiness import (
     ReadinessIssueCode,
     assess_readiness,
 )
-from .persistence import (
+from app.core.persistence import (
     ACTIVE_QUESTION_SCHEMA_ID,
     CONSULTANT_OPENING_SCHEMA_ID,
     COMPLETED_TURN_SCHEMA_ID,

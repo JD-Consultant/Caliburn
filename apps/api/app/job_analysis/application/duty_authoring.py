@@ -7,21 +7,22 @@ from uuid import UUID
 
 from app.core.domain import CurrentJdOpks, Duty, DutyId, JdTask, Proposal
 
-from .authoring import stale_task_proposals_for_direct_edit
-from .authority_commit import commit_authority_change
-from .errors import (
-    DocumentNotFound,
-    DutyNotFound,
-    IdempotencyConflict,
-    InvalidDutyOrder,
-)
-from .persistence import (
+from app.core.authority import commit_authority_change
+from app.core.persistence import (
     DUTY_DIRECT_EDIT_SCHEMA_ID,
     DocumentRecord,
     DutyDirectEditPayload,
     JobAnalysisUnitOfWork,
     JobAnalysisUnitOfWorkFactory,
     JournalEntry,
+)
+
+from .authoring import stale_task_proposals_for_direct_edit
+from .errors import (
+    DocumentNotFound,
+    DutyNotFound,
+    IdempotencyConflict,
+    InvalidDutyOrder,
 )
 from .transition import JobAnalysisState
 

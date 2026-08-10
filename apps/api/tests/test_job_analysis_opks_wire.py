@@ -17,7 +17,7 @@ from app.job_analysis.llm import (
     opks_wire_to_result,
     render_opks_wire_schema_file,
 )
-from app.job_analysis.llm.portable_schema import (
+from app.core.portable_schema import (
     assert_portable_strict_output_schema,
     schema_complexity,
 )

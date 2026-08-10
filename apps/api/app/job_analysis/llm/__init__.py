@@ -5,13 +5,14 @@
 `wire_to_task_analysis_result()` 相接。
 """
 
-from .portable_schema import (
+from app.core.portable_schema import (
     ProviderSchemaPortabilityError,
     assert_portable_strict_output_schema,
     compact_strict_output_schema,
     expand_refs,
     schema_complexity,
 )
+
 from .prompt import TASK_ANALYSIS_INSTRUCTIONS
 from .opks_result import (
     OpksDecision,

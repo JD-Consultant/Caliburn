@@ -12,17 +12,18 @@ from uuid import UUID
 
 from app.job_analysis.providers import OpenRouterAdapter
 
+from app.core.persistence import (
+    CompletedTurnPayload,
+    JobAnalysisUnitOfWorkFactory,
+    JournalEntry,
+)
+
 from .context import ConversationTurn
 from .durable_turn import StaleAuthoritySnapshot, commit_verified_turn, prepare_turn
 from .errors import IdempotencyConflict, JobAnalysisApplicationError
 from .operation import run_task_analysis_operation
 from .opks_digest import ScheduledOpks, scheduled_opks_operation_id
 from .opks_generation import generate_opks_proposals
-from .persistence import (
-    CompletedTurnPayload,
-    JobAnalysisUnitOfWorkFactory,
-    JournalEntry,
-)
 from .verifier import TurnSpeaker
 
 

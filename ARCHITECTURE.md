@@ -1,44 +1,40 @@
-# Architecture
+# Caliburn 架構
 
-> 高層地圖,**刻意簡短**(只寫不常變的)。完整設計見 [`docs/specs/2026-06-27-system-architecture-design.md`](docs/specs/2026-06-27-system-architecture-design.md);決策見 [`docs/adr/`](docs/adr/)。
+> 現行架構只描述可執行的新系統。歷史 OCS、indexer、PDF ETL、embedder、舊訪談與 `job_authoring` 已在 current-only 硬切中移除；相關 ADR／研究只保留作決策歷史，不能作為新程式入口。
 
 ## 鳥瞰
 
-Caliburn 是給員工使用的**本機 Web AI 職務分析與職務說明書應用程式**。第一版是一名本機操作者、
-無登入／帳密／多租戶 SaaS；OCS／iCAP 等公版資料只作參考與匯出格式，不取代員工訪談所得的
-客製工作分析。一個 monorepo,三個 bounded context + 一個前端:
+Caliburn 是給員工使用的本機 Web AI 職務分析與職務說明書應用程式。單一本機操作者可保存多份彼此隔離的職務說明書，不提供登入、多租戶、權限、計費或多人協作。
 
 ```
-PDF ──▶ pdf-to-json ──(OCS JSON)──▶ ocs-indexer ──(HTTP 查詢)──▶ api ──▶ web ──▶ 使用者
-        解析(ETL)                  檢索(Qdrant+ML)            著作(FastAPI+訪談引擎)   (Next.js)
+本機 Web ──HTTP──▶ FastAPI job-analysis ──▶ PostgreSQL
+                         │
+                         └────────一次 LLM request──▶ OpenRouter
 ```
 
-## Code map
+## Monorepo 成員
 
-| 路徑 | 是什麼 | 內部風格 |
+| 路徑 | 職責 | 埠位 |
 |---|---|---|
-| [`apps/pdf-to-json/`](apps/pdf-to-json/README.md) | PDF→OCS JSON 的 ETL(CLI) | Pipes-and-Filters(parser→transformer→writer) |
-| [`apps/ocs-indexer/`](apps/ocs-indexer/README.md) | Qdrant 知識/查詢服務(:8000) | ingest 管線 + 無狀態查詢 API;嵌入走 embedder 服務 |
-| [`apps/embedder/`](apps/embedder/README.md) | BGE-M3 GPU 嵌入容器(:8082) | FastAPI + FlagEmbedding(torch 只住這裡,ADR 0012) |
-| [`apps/api/`](apps/api/README.md) | FastAPI 後端+訪談引擎(:8001) | Hexagonal(core/ports + adapters + services + interview,ADR 0008/0030) |
-| [`apps/web/`](apps/web/README.md) | Next.js 16 前端(:3000) | React Query cache-as-state + 選擇性持久化;文件工作台 |
-| `packages/` | 共用契約套件 | `ocs-contract`(#1/#3)、`indexer-contract`(#2) |
-| `docs/` | 系統文檔 / ADR / runbook | 見 `docs/README.md`(文檔分層原則也在那) |
+| [`apps/api/`](apps/api/README.md) | FastAPI；Job Analysis domain、application、OpenRouter provider、PostgreSQL adapter | `8001` |
+| [`apps/web/`](apps/web/README.md) | Next.js 本機工作台；文件庫、顧問回合、Proposal 與 Current JD 編輯 | `3000` |
+| [`packages/job-analysis-contract/`](packages/job-analysis-contract/) | Job Analysis JSON Schema 生成的 Python／TypeScript 契約 | — |
 
-**文檔分層(monorepo)**:本檔管**跨 app** 鳥瞰;各 app 內部地圖/流程/不變量在
-**該 app 的 `README.md`**(colocation);「為什麼」在 `docs/adr/`。互連不互抄。
+PostgreSQL 是唯一基礎服務，資料表由 `apps/api/alembic/versions/0012`–`0017` 建立。API 與 Web 在 host 執行；Docker 只負責資料庫。
 
-## 跨切原則(不常變的)
+## API 邊界
 
-- **Hexagonal/Clean + DDD,每 context 一個模組化單體**(非微服務)。依賴往內指向 domain core。
-- **資料主權**:Postgres 屬 api、Qdrant 屬 indexer;別的服務只經其 API 取資料,不直接碰倉庫。
-- **契約優先**(Phase 2):OCS 結構由 `packages/ocs-contract` 的 JSON-Schema 單一定義。
-- **產品資料**:第一版是單機、單操作者、一次開啟一份 JD；repo 早期 RLS／tenant 程式不是新工作的
-  架構前提，不新增登入、ACL、計費或多人協作。
-- **AI 工作面**:`apps/api/app/interview/` 是淘汰但暫留的舊訪談路徑；
-  `apps/api/app/job_analysis/` 是 ADR 0040／0042 下的現行 greenfield Task Analysis 引擎，
-  已接 PostgreSQL、`/api/v1/job-analysis` 與 `/workspace` 本機 Web。兩者不得互相 import、搬資料或雙寫；舊 LangGraph／CopilotKit
-  已退場勿救回。
-- **依賴降級**:對 indexer 等外部依賴**逐端點分類**——critical(掛→快錯 5xx)vs enrichment(掛→回部分資料 + `meta.partial`,不擋主流程)。見 [ADR 0018](docs/adr/0018-indexer-dependency-degradation-policy.md)。
+- `app/job_analysis/domain/`：純 domain、state、Evidence、Proposal 與不變量。
+- `app/job_analysis/application/`：文件、Current JD、顧問回合、OPKS、Proposal 決策、export 與 authority commit。
+- `app/job_analysis/llm/`：prompt、wire schema、結果映射與 verifier 邊界。
+- `app/job_analysis/providers/`：目前唯一的 OpenRouter provider。
+- `app/adapters/job_analysis_postgres/`：SQLAlchemy models、repository、serialization。
+- `app/api/`：HTTP route、dependency composition、mapper 與 problem response。
 
-決策史與取捨:[`docs/adr/`](docs/adr/)。維運:[`docs/runbook.md`](docs/runbook.md)。上手:[`CONTRIBUTING.md`](CONTRIBUTING.md)。
+唯一 production route prefix 是 `/api/v1/job-analysis`；`/healthz` 是服務健康檢查。AI 只能提出 Proposal，員工決策或直接編輯才可改變 Current JD；所有 authority writer 經同一個 transaction seam。
+
+## 文檔與退役邊界
+
+跨 app 流程見 [`docs/design/task-analysis-engine.md`](docs/design/task-analysis-engine.md)，決策見 [`docs/adr/README.md`](docs/adr/README.md)，操作見 [`docs/runbook.md`](docs/runbook.md)。current-only 硬切見 [ADR 0057](docs/adr/0057-current-only-runtime-and-data-boundary.md)。
+
+不要新增或恢復 `app.interview`、`app.interview_vnext`、`app.job_authoring`、OCS contract、indexer、Qdrant、embedder 或 PDF→JSON pipeline；它們已不在 repo 的 runtime／schema 邊界內。

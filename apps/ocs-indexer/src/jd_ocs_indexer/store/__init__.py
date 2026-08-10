@@ -1,1 +1,0 @@
-"""Qdrant collection / writer modules."""

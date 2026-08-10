@@ -1,8 +1,0 @@
-{
-  "name": "@caliburn/pdf-to-json",
-  "private": true,
-  "scripts": {
-    "test": "uv run --extra dev pytest -q",
-    "build": "echo \"no build\""
-  }
-}

@@ -1,8 +1,4 @@
-"""Greenfield 邊界的結構檢查(計畫 §0、ADR 0040 決定 3)。
-
-`app/job_analysis` 不得 import 舊 AI 路徑;宣示寫在文件裡會腐化,寫成 AST 測試才會在
-有人真的接上去的那一刻紅燈。
-"""
+"""Static guards for the current-only API and engine boundaries."""
 
 from __future__ import annotations
 
@@ -14,13 +10,10 @@ from pathlib import Path
 API_DIR = Path(__file__).parents[1]
 ROOT = API_DIR / "app" / "job_analysis"
 DOMAIN_ROOT = ROOT / "domain"
-
-FORBIDDEN_ROOTS = (
-    "app.interview",
-    "app.interview_vnext",
-    "app.job_authoring",
-    "evals",
-    "job_analysis_contract",
+COMPOSITION_SURFACES = (
+    API_DIR / "app" / "api" / "job_analysis_deps.py",
+    API_DIR / "app" / "api" / "routes" / "job_analysis.py",
+    API_DIR / "app" / "adapters" / "job_analysis_postgres",
 )
 
 
@@ -35,20 +28,40 @@ def _imports(path: Path) -> list[tuple[int, str]]:
     return found
 
 
-def test_job_analysis_never_imports_legacy_ai_paths():
-    violations: list[str] = []
-    for path in ROOT.rglob("*.py"):
+def _surface_files(roots: tuple[Path, ...]) -> tuple[Path, ...]:
+    files: list[Path] = []
+    for root in roots:
+        assert root.exists(), f"missing current composition root: {root}"
+        files.extend(root.rglob("*.py") if root.is_dir() else [root])
+    return tuple(sorted(files, key=lambda path: path.as_posix()))
+
+
+def test_only_current_api_route_modules_exist():
+    route_names = {path.name for path in (API_DIR / "app" / "api" / "routes").glob("*.py")}
+    assert route_names == {"__init__.py", "job_analysis.py"}
+
+
+def test_current_composition_does_not_import_removed_paths():
+    forbidden = (
+        "app.interview",
+        "app.interview_vnext",
+        "app.job_authoring",
+        "app.core",
+        "app.services",
+        "app.schemas",
+        "indexer_contract",
+        "ocs_contract",
+    )
+    violations = []
+    for path in _surface_files(COMPOSITION_SURFACES):
         for line, module in _imports(path):
-            for forbidden in FORBIDDEN_ROOTS:
-                if module == forbidden or module.startswith(f"{forbidden}."):
-                    violations.append(
-                        f"{path.relative_to(ROOT)}:{line} imports {module}"
-                    )
+            if any(module == root or module.startswith(f"{root}.") for root in forbidden):
+                violations.append(f"{path.relative_to(API_DIR)}:{line} imports {module}")
     assert violations == []
 
 
-def test_domain_imports_only_stdlib_pydantic_or_itself():
-    violations: list[str] = []
+def test_job_analysis_domain_imports_only_stdlib_pydantic_or_itself():
+    violations = []
     for path in DOMAIN_ROOT.rglob("*.py"):
         for line, module in _imports(path):
             root = module.split(".", 1)[0]
@@ -64,18 +77,10 @@ def test_domain_imports_only_stdlib_pydantic_or_itself():
 
 
 def test_job_analysis_never_imports_persistence_or_web_frameworks():
-    """核心 package 只認 ports；DB adapter 住在 app/adapters，不得反向滲入。"""
-    forbidden_roots = {
-        "alembic",
-        "asyncpg",
-        "fastapi",
-        "psycopg",
-        "sqlalchemy",
-        "starlette",
-    }
-    violations: list[str] = []
+    forbidden = {"alembic", "asyncpg", "fastapi", "psycopg", "sqlalchemy", "starlette"}
+    violations = []
     for path in ROOT.rglob("*.py"):
         for line, module in _imports(path):
-            if module.split(".", 1)[0] in forbidden_roots:
+            if module.split(".", 1)[0] in forbidden:
                 violations.append(f"{path.relative_to(ROOT)}:{line} imports {module}")
     assert violations == []

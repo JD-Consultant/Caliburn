@@ -1,105 +1,40 @@
 # Caliburn — agent orientation
 
-Caliburn 現行目標是給員工使用的**本機 Web AI 職務分析與職務說明書應用程式**。Web UI/API/資料在員工電腦本機運行；
-員工不拿遠端產品網址、不註冊、不登入、
-沒有帳號密碼；第一版是一名本機操作者、一次開啟一份職務說明書，但可以保存並重新開啟多份彼此隔離的本機
-職務說明書。repo 不做多租戶 B2B SaaS 程式——owner 已明確指示，不得新增 SaaS、organization/member/ACL、
-登入、計費、tenant administration、雲端部署或多人協作。
-完整產品範圍鎖定見 `docs/product-notes.md`。Monorepo。維護者用**繁體中文**,請用繁中回應。
+Caliburn 是給員工使用的**本機 Web AI 職務分析與職務說明書應用程式**。目前只保留新的 Job Analysis 系統：本機單一操作者、可保存多份彼此隔離的職務說明書，不做登入、帳密、多租戶、organization/member/ACL、計費、雲端部署或多人協作。維護者使用繁體中文，回覆也用繁中。
 
-> 記憶是 per-project 的,不會跨資料夾搬。**這個 repo 的 `AGENTS.md` + `docs/` 才是權威**;
-> 不確定就讀下面指的文件,別憑空猜。
-> 本檔是唯一來源:`CLAUDE.md` 只做 `@AGENTS.md` import,**要改 orientation 就改這裡**,別在 `CLAUDE.md` 抄一份。
+`AGENTS.md` 與 `docs/` 是本 repo 權威；`CLAUDE.md` 只 import 本檔。若歷史文檔與本檔衝突，以現行 code、current-only ADR 0057 與本檔為準。
 
-## 最重要:工作紀律(每個變更都照這個)
+## 工作紀律
 
-1. **先研究再動手** —— 重大變更前找**權威/主流/大廠/資深人物**的資料(官方文件、原作者、規範),
-   寫一份**研究紀錄**到 `docs/specs/<date>-*.md`(含來源、診斷、選項、比對)。
-2. **決策寫 ADR** `docs/adr/00NN-*.md`(Nygard 式;Accepted 後不改內容,要翻案開新號),
-   並更新索引 `docs/adr/README.md`。**狀態預設 `Proposed`**——審查中的修正一律直接改那份
-   Proposed ADR;**owner 核准後另開一個 commit** 把 ADR 與索引一起轉 `Accepted`。
-   只有 owner 事先明確核准具體內容才可一開始就寫 `Accepted`。先例:ADR 0045
-   (`820695a` Proposed → `f45b268` Accepted)。
-3. **plan** 寫到 `docs/plans/`(bite-size、可獨立驗證),再實作。
-4. **安全網優先** —— 盡量 **move-only** 重構;既有測試/golden 當 characterization net,
-   **green-before == green-after**;**一個 task 一個 commit**,綠了才 commit;收尾打 git tag。
-5. **新 seam(API/共用格式)選契約機制** —— 照 `docs/contract-strategy.md` 的判準(已預答 #3)。
-6. **不要 push、不做對外動作**,除非使用者明確要求。先研究、不懂就問。
-7. **改子系統就更文檔** —— 文檔架構/擺放/寫作/維護的**權威總則見 `docs/README.md`**。跨 app/seam 的
-   端到端說明住 `docs/design/`(單一 app 的住該 app 底下);**動到那條線的碼 → 同 commit 更新該文檔**
-   (fossilization 是頭號壞味道);寫法照 dual-audience 清單(動作→請求、真名、不變量、退役禁令)。
+1. 重大變更先研究，將來源、診斷、選項與取捨寫入 `docs/specs/<date>-*.md`。
+2. 架構決策寫 Nygard 式 ADR，預設 `Proposed`，並更新 `docs/adr/README.md`；翻案開新號。
+3. 多步變更先寫 `docs/plans/`，拆成可獨立驗證的工作。
+4. 保留測試作安全網；綠燈後一個 task 一個 commit，收尾建立本地 tag。
+5. 新 API／共用格式依 [`docs/contract-strategy.md`](docs/contract-strategy.md) 選契約機制。
+6. 不 push、不做對外動作，除非 owner 明確要求。
+7. 改跨 app seam 或子系統時，同 commit 更新對應 `docs/design/` 或 app README。
 
-### 現行產品優先級（高於歷史 SaaS 架構慣性）
+## 現行架構
 
-- 先做員工可操作、可一鍵啟動的本機 Web 成品；可自動開啟 localhost UI，但不得要求員工設定 host／port，也不要引入
-  未被要求的 Electron／Tauri／原生桌面殼。
-- 時間、研究與設計優先投入訪談品質、Context Engine、LLM 工作分析、task/output/indicator/K/S 品質、Evidence linkage與JD成品品質。
-- 本機 Web app 可呼叫 OpenRouter，不代表必須完全離線；API key 是 owner／開發設定，不是員工帳號流程。
-- 不為未被要求的 SaaS、generic framework、全面 hash／audit 或測試排列拖延成品；仍保留會直接保護文件真相、員工決策、
-  provenance與交易正確性的核心安全網。
+- Monorepo 只有 `apps/api`、`apps/web` 與 `packages/job-analysis-contract`；PostgreSQL 是唯一 Docker 基礎服務。
+- API 的 Job Analysis 是唯一 production AI 工作面：`domain` → `application` → `llm/providers`，資料庫邊界在 `app/adapters/job_analysis_postgres`，HTTP 組裝在 `app/api`。
+- Web 只提供 `/workspace` 與文件詳情頁，吃 `job-analysis-contract` 生成的 TypeScript 契約。
+- 新資料從 current-only migration 0012–0017 建立，舊資料不搬移、不雙寫、不相容。若需開發環境，直接依 runbook 重建資料庫。
+- 已刪除的 `app.interview`、`app.interview_vnext`、`app.job_authoring`、OCS／indexer／embedder／PDF ETL 不得重新 import、wrapper 或接回 production。
 
-### 輸出風格
+## 本地開發與驗證
 
-- **文檔長度照任務給** —— `docs/specs/`、ADR、`docs/plans/` 講清楚實質內容就停;不要補填充章節、
-  重複摘要、樣板段落。ADR 就是 Nygard 那幾段(context / decision / consequences),不是論文。
-- **回應精簡** —— 動手前一句話說要做什麼;過程中只在有發現或改方向時回報;收尾第一句先講結果,
-  細節放後面。但書與免責從簡。
-- **少開 subagent** —— 只有大型、真正獨立可平行的工作(例如跨多檔案的橫向調查)才委派。幾個 tool call
-  能做完的不要委派;**不要開 subagent 複查自己的工作**;一個能做完就別開多個。
-- 規則 4 的測試綠燈、一 task 一 commit 是工程紀律,留著。但**不要再加「做完自己再複查一遍」這類自我複查
-  指令** —— 模型本來就會自查,重複下令只會多燒 token 而不提升品質。
+```text
+npm install
+npm run up              # PostgreSQL + API/Web dev
+npm run db:migrate      # apps/api Alembic head
+npx turbo test
+```
 
-## 架構(權威:`ARCHITECTURE.md` + `docs/adr/README.md`)
+API：`cd apps/api && uv sync && uv run pytest -q`。Web：`cd apps/web && npm run test && npx tsc --noEmit && npm run lint`。改契約後執行 `npm run check-codegen -w @caliburn/job-analysis-contract`。
 
-- **monorepo**:Turborepo + **per-app uv**(各自 `uv.lock`)+ 契約用 **path-dep 套件**(`packages/`)。
-- **3 個 bounded context**:`apps/pdf-to-json`(PDF→OCS JSON 解析)/ `apps/ocs-indexer`(檢索,Qdrant)/
-  `apps/api` + `apps/web`(著作)。語言在這三處切換(對齊 DDD)。
-- **api = 六邊形**:`app/core`(ports + domain,純)、`app/adapters`(DB/LLM/knowledge 等邊緣)、
-  `app/services`(use-case)、`app/interview`(**淘汰但暫留的舊 AI 路徑**:顧問+書記 op→verify→`_pending`
-  追蹤修訂;判準教材在 `app/interview/skills/`,調教首選改 skill 不改碼)、`app/observability.py`
-  (OTel 橫切)。ADR 0008 / **0030**(舊 LangGraph/CopilotKit 已退場,勿救回;端到端見
-  `docs/design/interview-engine.md`)。
-- **Task Analysis 引擎(現行新工作面)**：`app/job_analysis` 依 ADR **0040／0042** greenfield 實作
-  (domain／llm／application／providers)。durable vertical 已接通：文件/direct edit → PostgreSQL
-  Current State → packet → 一次 HTTP → verifier → identity gate → 候選/Proposal → 員工決策 → reload；
-  新 `/api/v1/job-analysis` routes 與 `/workspace` Web 已接通，conversation／Proposal／Current JD 同頁。
-  資料從新四表開始，不搬、不整合、不雙寫舊資料。禁止 import
-  `app.interview`／`app.interview_vnext`／`app.job_authoring`／`evals`(AST 測試強制)。
-  端到端見 `docs/design/task-analysis-engine.md`。
-- **AI vNext 隔離中**：`app/interview_vnext` 依 ADR **0034** greenfield 實作；V1 domain 與 V2-A
-  provider-neutral/Capture contracts 已完成，無 route/DB/live LLM，production 不 import。禁止 import/wrap v3 consultant/scribe/harvest/select；細節先讀
-  `app/interview_vnext/README.md`、其 `AGENTS.md` 與 `docs/plans/2026-07-16-interview-ai-vnext-implementation-plan.md`。
-- **契約**:#1 `packages/ocs-contract`(OCS 文件,JSON-schema→Pydantic+TS)、
-  #2 `packages/indexer-contract`(indexer⇄api,共用 pydantic)、#3 web 吃 ocs-contract 生成的 TS。
-  ADR 0004 / 0010 / 0011。
-- **嵌入**:BGE-M3(dense+sparse)跑在 **GPU 容器 `apps/embedder`**(FastAPI+FlagEmbedding);
-  indexer/api 走 HTTP 呼叫。**絕對不要把 torch 放回 app 進程**——Windows 上會 segfault/`_dynamo` 崩,
-  已根治(ADR 0012;細節 `docs/specs/2026-06-29-embedder-service-bge-m3-research.md`)。
-
-## 本地開發(`CONTRIBUTING.md` / `docs/runbook.md`)
-
-- **一鍵**:`npm run up` = `docker compose up -d`(db:5432 + qdrant:6333 + **embedder:8082(GPU)**)
-  `&& turbo dev`(api:8001 + web:3000 + indexer:8000)。正常收 dev server 用 Ctrl-C;
-  `npm run down` = `docker compose down` + `kill-port 3000/8000/8001`(停 infra **且**補收 dev server 孤兒進程
-  ——視窗被硬關沒 Ctrl-C 時,uvicorn/next 會殘留占著 port,down 會清掉)。
-- 首次/改 schema:`npm run db:migrate`。Qdrant 空要建一次索引:
-  `cd apps/ocs-indexer && uv run jd-ocs-indexer index ./data/jd-json`(走 embedder,**不需本機 torch**)。
-- **測試**:`npx turbo test`。各 app:api `uv run pytest`、ocs-indexer `uv run --all-extras pytest`、
-  pdf-to-json `uv run --extra dev pytest`;web `npm run test`(vitest,src/lib)+ `npx tsc --noEmit` + `npm run lint`。
-
-## Windows / 環境踩雷(重要)
-
-- **Bash/PowerShell 工具的 cwd 未必是你以為的 repo**——Bash 工具每次 reset cwd,且可能落在別的
-  checkout(封存的舊 repo,或 worktree 開發時落回主 checkout `main`);徵狀似是而非(grep 找不到明明
-  存在的欄位)。**動手前 `pwd` + `git branch --show-current` 驗證**;docker compose 用 `-p caliburn`
-  並從 repo 根跑。**本機絕對路徑 / 封存舊 repo 位置 / GPU 型號見 `CLAUDE.local.md`**(gitignored;
-  Codex 讀者另有 `Codex.local.md` 位置,兩者都在 `.gitignore`)。
-- GPU-in-Docker 已驗證可用(Docker Desktop + WSL2、`nvidia` runtime);embedder 容器用 `gpus: all`。
-- `run_live.py` 的 reload 已關(改後端碼要手動重啟);git autocrlf(比對 codegen 用 `git diff` 不要用
-  原始 diff);uv venv 沒有 pip,用 `uv pip`;CJK 用 `PYTHONUTF8=1`。
+Windows 上動手前確認 `pwd` 與 `git branch --show-current`；後端 reload 已關閉，改碼要重啟。`uv` 環境不用 pip；CJK 指令設定 `PYTHONUTF8=1`。
 
 ## 指路
-**`docs/README.md`(文檔系統:架構/規則/索引)** · `ARCHITECTURE.md` · `docs/adr/README.md`(0001–0056)·
-`docs/contract-strategy.md` · `CONTRIBUTING.md` · `docs/runbook.md` · `docs/specs/`(研究紀錄)·
-`docs/experiments/`(實證紀錄)·
-`docs/plans/` · `docs/design/`(子系統端到端設計,給 agent)。
+
+[`ARCHITECTURE.md`](ARCHITECTURE.md) · [`docs/README.md`](docs/README.md) · [`CONTRIBUTING.md`](CONTRIBUTING.md) · [`docs/runbook.md`](docs/runbook.md) · [`docs/design/task-analysis-engine.md`](docs/design/task-analysis-engine.md) · [`docs/adr/0057-current-only-runtime-and-data-boundary.md`](docs/adr/0057-current-only-runtime-and-data-boundary.md)

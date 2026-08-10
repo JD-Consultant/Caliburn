@@ -30,7 +30,10 @@ from job_analysis_contract import (
 )
 from pydantic import ValidationError
 
-from app.api.deps import get_job_analysis_adapter, get_job_analysis_uow_factory
+from app.api.job_analysis_deps import (
+    get_job_analysis_adapter,
+    get_job_analysis_uow_factory,
+)
 from app.api.job_analysis_mapper import (
     to_document_metadata_view,
     to_document_summary,

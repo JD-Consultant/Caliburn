@@ -1,6 +1,0 @@
-{
-  "schema_version": "unavailable_fixture.v0.1",
-  "available": false,
-  "fixture": "reference_snapshot",
-  "reason": "The immutable reference snapshot used by the historical run was not persisted."
-}

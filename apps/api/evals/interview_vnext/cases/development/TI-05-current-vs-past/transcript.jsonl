@@ -1,2 +1,0 @@
-{"schema_version":"turn_eval_transcript_turn.v2","turn_key":"consultant-01","sequence":1,"role":"consultant","locale":"zh-TW","text":"教育訓練相關的工作你負責哪些?","occurred_offset_seconds":2}
-{"schema_version":"turn_eval_transcript_turn.v2","turn_key":"employee-target","sequence":2,"role":"employee","locale":"zh-TW","text":"去年我負責安排教育訓練,現在這項工作由人資負責;我目前只提供名單。","occurred_offset_seconds":4}

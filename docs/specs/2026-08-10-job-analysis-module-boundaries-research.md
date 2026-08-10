@@ -40,7 +40,21 @@ Spring Modulith 的驗證規則要求模組依賴無 cycle、跨模組只能走 
 
 這支持「功能模組作外框、每個模組內再守 Clean／Hexagonal」，而不是全 application 只切成一層 `domain`、一層 `application`、一層 `adapters`。
 
-### 3.3 FastAPI 的 delivery layer 應薄且按功能拆 route
+### 3.3 大型 monolith 的實務：先依真實內聚切，再以工具封邊
+
+Shopify 將大型 Rails monolith 按業務能力整理成 components，並用 Packwerk 檢查 declared dependency 與 private implementation；其重點不是把程式分散部署，而是在同一 codebase 建立 public entrypoint、低耦合與可執行邊界。Shopify 的後續回顧也提醒：若只依理想化 domain 名稱先畫邊界，卻不符合程式實際如何一起變更與呼叫，會產生大量不自然的例外與待辦。
+
+來源：[Shopify — Enforcing Modularity with Packwerk](https://shopify.engineering/enforcing-modularity-rails-apps-packwerk)、[A Packwerk Retrospective](https://shopify.engineering/a-packwerk-retrospective)
+
+因此本案不把目錄名稱直接宣稱為可獨立部署的 bounded context，而是依現有 use case、共同 Current State／transaction 與實際依賴切功能模組，再用 public API 與 AST checks 把邊界變成事實。
+
+GitLab 2026 的 modular monolith 設計同樣採「廣泛模組化、ROI 明確才抽服務」，要求 transport 成為 adapter、domain 只透過 public API 存取，並以 one-way dependency／hexagonal architecture 隔離內層；它也明確指出資料表、外鍵與 ORM 關聯才是實際 extraction 的主要耦合。
+
+來源：[GitLab — Rails Monolith Decomposition](https://handbook.gitlab.com/handbook/engineering/architecture/design-documents/modular_monolith/)
+
+這支持 Caliburn 保留一個 authority kernel 與單一 transaction，不為目錄對稱假造 Task／OPKS 的獨立資料所有權。
+
+### 3.4 FastAPI 的 delivery layer 應薄且按功能拆 route
 
 FastAPI 官方的 Bigger Applications 範例把 users、items、admin 分成 router modules，再由 `main.py` 組裝；router 仍屬同一個 application，不代表要拆成多個服務。
 
@@ -48,7 +62,15 @@ FastAPI 官方的 Bigger Applications 範例把 users、items、admin 分成 rou
 
 因此本 repo 應拆 API route／mapper 的功能責任，但保留單一 FastAPI process 與既有 public prefix。
 
-### 3.4 邊界要能被機械驗證
+### 3.5 Next.js 允許按 feature／route 組織，但不替產品決定邊界
+
+Next.js 官方列出的合法組織策略包含：將 routing 留在 `app`、把程式放在 `src` 的 top-level folders，或按 feature／route colocate；route groups 與 private folders 可在不改 URL 的情況下表達組織邊界。官方同時明說框架不替團隊規定唯一目錄法。
+
+來源：[Next.js — Project Structure and Organization](https://nextjs.org/docs/app/getting-started/project-structure)
+
+因此 Web 採 feature-first，但不機械複製 backend package：只有具備實際 UI responsibility 的能力才建 feature，`app` 保持 composition，真正跨 feature 的 transport／UI primitive 才進 `shared`。
+
+### 3.6 邊界要能被機械驗證
 
 Import Linter 提供的架構契約類型正好對應本次需求：`layers`、`forbidden`、`independence`、`acyclic siblings`。它也說明 layers 可套在同一 package 的子模組或多個 root package 上。
 
@@ -64,6 +86,9 @@ Import Linter 提供的架構契約類型正好對應本次需求：`layers`、`
 - `transition.py` 約 1000 行、`verifier.py` 約 940 行、`authoring.py`／`proposal_decisions.py`／`context.py` 各約 670–690 行；技術層名稱掩蓋了功能責任。
 - `app/api/routes/job_analysis.py` 約 650 行，`job_analysis_mapper.py` 約 410 行；HTTP delivery、文件、顧問、OPKS 與 export 還在同一 route seam。
 - PostgreSQL adapter 與 API mapper 直接 import `app.job_analysis.application` 的大 facade；小幅變更容易觸發整個 application import surface。
+- `application/operation.py`、`opks_operation.py`、`consultation.py` 與 `opks_generation.py` 直接依賴具體 `OpenRouterAdapter`；provider outcome／port 被放在外層 adapter package，形成 application → provider 的反向邊。
+- `application/export_xlsx.py` 直接 import OpenPyXL；純 export assembly 與 framework renderer 沒有保持內外層分離。
+- Web 的 workspace component／helper 仍按技術形狀平鋪，且原研究目標樹只畫 API，與本文件宣告的 API／Web scope 不一致。
 - Task、OPKS、文件編輯雖可按功能分，但都必須經同一份 Current State 與 authority commit；它們不是三個可獨立持有資料真相的 bounded context。
 
 ## 5. 方案比較
@@ -103,32 +128,50 @@ app/export/{application}
 
 ```text
 apps/api/app/
-  core/                    # shared kernel：state、ids、domain primitives、ports
+  core/                    # shared kernel：state、ids、authority 與真正共用的 domain
   documents/               # 文件生命週期、header、readiness、員工直接編輯
-  consultation/            # employee turn、context、Task analysis operation
+  task_analysis/            # context、wire、operation、verifier、transition、Task proposal
   opks/                    # OPKS child operation、scheduler、authoring、proposal
-  export/                  # deterministic assembly、XLSX renderer
+  consultation/            # employee turn orchestration；只走上述模組的 public API
+  export/                  # deterministic assembly
   adapters/
     postgres/              # SQLAlchemy／serialization／repositories
     openrouter/            # provider transport 與 execution evidence
+    xlsx/                  # OpenPyXL renderer
   api/
     routes/                # 按 documents／consultation／opks／export 拆薄 route
     mappers/               # transport ↔ internal DTO
+
+apps/web/src/
+  features/
+    documents/
+    consultation/
+    opks/
+    export/
+  shared/                  # HTTP transport、query client、通用 UI；不放 domain policy
+  app/                     # Next.js pages，只負責 composition
 ```
 
-`core` 不是新的業務大雜燴，只保留多個功能都必須共享的 authority kernel。若某型別只有單一功能使用，就留在該功能模組；不能因為它是 Pydantic model 就搬進 core。
+`core` 不是新的業務大雜燴。型別或 port 只有同時符合下列條件才可進 core：至少兩個功能模組真的消費、代表穩定的共同業務語言或 authority seam、且不依賴 IO／framework／transport。其餘一律由使用它的功能模組擁有；不能因為它是 Pydantic model、Protocol 或「可能共用」就搬進 core。
+
+新增第一層功能模組也不是純命名決定；它必須有可一句話說明的主要責任、可列舉的 public use cases、能隱藏的 internal implementation，且放入依賴圖後不造成 cycle。若仍共享同一 aggregate／transaction，目錄分開不等於另建資料所有權或 bounded context。
+
+`JobAnalysisState`／authority transaction 是共同 aggregate seam，因此留在 core；Task Analysis／OPKS 的 model-call port 由各功能模組的 application 端定義，OpenRouter adapter 只實作 port，不能讓 application 型別依賴 `OpenRouterAdapter`。純 `ExportDocument` assembly 留在 export，OpenPyXL renderer 移到外層 xlsx adapter。
 
 依賴規則：
 
 ```text
 api composition → feature public APIs → core
-adapters → core ports／internal contracts
-feature internals → own feature + core only
+consultation → task_analysis public API + opks public API + core
+documents／task_analysis／opks／export → own internals + core only
+adapters → owning feature ports + core boundary types
 feature A -/> feature B internals
 core -/> api／adapters／FastAPI／SQLAlchemy／provider
 ```
 
 功能模組之間若未來真的需要協作，只能新增明確的 public application API／typed internal contract；不以共用 `__init__.py` 或 wildcard export 偷開後門。
+
+Python 的 `__init__.py` 只提供可讀的 public facade，本身不構成 access control。外部模組不得 import `internal`／底層實作檔，並由 AST architecture tests 強制 no-cycle、API-only access 與 allowed dependency graph。
 
 ## 7. 不變量與非目標
 
@@ -142,7 +185,7 @@ core -/> api／adapters／FastAPI／SQLAlchemy／provider
 
 `app/job_analysis` 應從「greenfield 隔離容器」提升為「現行 API 內的功能模組集合」。最適切的分法不是把所有程式直接攤平成單一 `core/application`，也不是把 Task／OPKS 拆成互不共享資料的服務，而是：
 
-1. 以 documents、consultation、opks、export 作功能模組外框。
+1. 以 documents、task_analysis、opks、consultation、export 作功能模組外框。
 2. 以小型 shared kernel 保留 Current State／authority／ports。
 3. 每個模組內仍遵守 Clean／Hexagonal 依賴向內。
 4. 用明確 public API、禁止跨模組 internal import、無 cycle 與既有 AST tests 固化規範。

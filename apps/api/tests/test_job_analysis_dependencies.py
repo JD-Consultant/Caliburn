@@ -96,23 +96,87 @@ def test_current_composition_does_not_import_removed_paths():
 
 
 def test_api_only_imports_feature_module_roots():
-    """`app/api`(routes、mappers、problems、deps)只能 import feature module 的
-    root public API,不得直接 reach 進 `app.documents.xxx`／`app.opks.xxx`／
+    """composition-root／infrastructure 檔案(`app/api`、`app/adapters`、
+    `app_factory.py`、`main.py`、`database.py`、`config.py`、`observability.py`、
+    `logging_config.py`、`models/**`)只能 import feature module 的 root public
+    API,不得直接 reach 進 `app.documents.xxx`／`app.opks.xxx`／
     `app.task_analysis.xxx`／`app.consultation.xxx`／`app.export.xxx` 的
     implementation file(ADR 0058 規則 4)。`app.core` 的 submodule(例如
     `app.core.persistence`)不在這條規則內——`core` 是共享 kernel,沒有單一
     curated root 收斂全部型別,直接 import submodule 是既有、被接受的慣例。
+
+    掃描範圍是 `app/` 整棵樹扣掉 `core`／`documents`／`task_analysis`／`opks`／
+    `consultation`／`export` 六個 feature/core package,而不是只掃 `app/api`——
+    之前 `app_factory.py`／`main.py`／`database.py`／`config.py`／
+    `observability.py`／`models/**` 這些檔案完全沒有任何 guard 覆蓋,一次意外的
+    rename 或搬移也不會被任何測試擋下。`app/adapters` 現在也落在這條規則內;
+    既有 adapter 只 import `app.core.*`(允許,不受這條規則約束)與
+    `app.export` 的 curated root(`ExportDocument`／`ExportOpksEntry`／
+    `ExportTaskEntry` 都在 `app.export.__all__` 內),不會被誤判。
+
+    跟 consultation guard(`da83d9c`)同一個理由:只檢查 `node.module` 的
+    prefix 不夠——`from app.documents import authoring` 的 `node.module` 恰好是
+    `"app.documents"`,不 `startswith("app.documents.")`,但 `authoring` 其實是
+    `documents/__init__.py` 自己 `from .authoring import ...` side effect 綁上去
+    的真實 submodule,不是 curated export。所以這裡額外用 `_imported_names()`
+    檢查每個被 import 的名字是否真的在對應 feature root 的 `__all__` 裡。
     """
-    api_root = API_DIR / "app" / "api"
+    import app.consultation as consultation_module
+    import app.documents as documents_module
+    import app.export as export_module
+    import app.opks as opks_module
+    import app.task_analysis as task_analysis_module
+
     feature_roots = ("documents", "opks", "task_analysis", "consultation", "export")
+    curated_surfaces: dict[str, frozenset[str]] = {
+        "app.documents": frozenset(documents_module.__all__),
+        "app.opks": frozenset(opks_module.__all__),
+        "app.task_analysis": frozenset(task_analysis_module.__all__),
+        "app.consultation": frozenset(consultation_module.__all__),
+        "app.export": frozenset(export_module.__all__),
+    }
+
+    # Canary — proves the loophole this guard closes actually exists. `authoring`
+    # is a real submodule that `documents/__init__.py` binds onto `app.documents`
+    # (via its own `from .authoring import ...`), so `from app.documents import
+    # authoring` reports the exact same `node.module` ("app.documents") as any
+    # legitimate curated import — the old prefix-only check could not tell them
+    # apart. It must not be part of the curated `__all__` surface, and the
+    # name-level check below (not the prefix check above it) is what flags it.
+    synthetic = ast.parse("from app.documents import authoring\n").body[0]
+    assert isinstance(synthetic, ast.ImportFrom)
+    assert synthetic.module == "app.documents"  # same as a legitimate import
+    canary_name = synthetic.names[0].name
+    assert canary_name == "authoring"
+    assert canary_name not in curated_surfaces["app.documents"]
+
+    app_root = API_DIR / "app"
+    assert app_root.exists(), f"missing app package: {app_root}"
+    excluded_roots = {"core", "documents", "task_analysis", "opks", "consultation", "export"}
+    scan_files: list[Path] = []
+    for entry in sorted(app_root.iterdir()):
+        if entry.is_dir():
+            if entry.name in excluded_roots or entry.name == "__pycache__":
+                continue
+            scan_files.extend(entry.rglob("*.py"))
+        elif entry.suffix == ".py":
+            scan_files.append(entry)
+
     violations = []
-    for path in api_root.rglob("*.py"):
+    for path in scan_files:
         for line, module in _imports(path):
             for root in feature_roots:
                 prefix = f"app.{root}."
                 if module.startswith(prefix):
                     violations.append(
                         f"{path.relative_to(API_DIR)}:{line} imports {module}"
+                    )
+        for module_name, curated in curated_surfaces.items():
+            for line, name in _imported_names(path, module_name):
+                if name not in curated:
+                    violations.append(
+                        f"{path.relative_to(API_DIR)}:{line} imports "
+                        f"non-curated name {name!r} from {module_name}"
                     )
     assert violations == []
 

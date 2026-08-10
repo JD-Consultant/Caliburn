@@ -1,6 +1,6 @@
 # Current-only hard cut 設計研究
 
-日期：2026-08-10  
+日期：2026-08-10
 狀態：owner 已決定只保留新 `job_analysis` 系統；本稿供 ADR 0057 與施工計畫使用。
 
 ## 1. 裁決與前提
@@ -55,4 +55,3 @@ owner 已確認現有本機資料庫可以重建，舊資料不需要保留或�
 施工順序是先固定 current route／table／import 護欄，再移除 source 與 workspace members，最後重建 migration chain、更新 Compose／文件並跑完整 monorepo gates。每個 task 獨立 commit；不 push。
 
 回復不是 runtime 雙軌：若驗證失敗，以 Git commit 邊界回復 source；若要回復舊本機資料，需使用 owner 自行保留的 Postgres volume／backup。施工前不會自動把舊 volume 當成可相容資料庫繼續使用；current-only 啟動要求新 DB 跑 `alembic upgrade head`。
-

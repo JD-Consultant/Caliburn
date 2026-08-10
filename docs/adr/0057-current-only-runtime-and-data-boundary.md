@@ -23,4 +23,3 @@ owner 已明確決定只需要新系統，並確認本機資料庫可以重建�
 ## Consequences
 
 好處是啟動、依賴、資料表與程式邊界都直接對齊第一版產品，current engine 不再被舊路徑污染，DB 可從空白狀態驗證。代價是舊本機資料、舊 URL 與舊 OCS／訪談流程不再可用；需要重建 Postgres volume 或建立新資料庫並重新執行 migration。未來若要恢復任何舊能力，必須開新 ADR 與新 bounded context，不得從 Git 歷史直接復活 deleted runtime。
-

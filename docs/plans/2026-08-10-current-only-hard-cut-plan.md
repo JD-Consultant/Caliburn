@@ -51,4 +51,3 @@
 ### Task 6: 完整 gates、審核與交接
 
 **Verification:** `npx turbo test --force --env-mode=loose`、Web typecheck/lint、contract codegen check、API migration focused test、`git diff --check`、clean status；以 reviewer 審查 deletion list、路由與 migration 風險，再建立 task tag。除非 owner 另行要求，不 push。
-

@@ -12,7 +12,7 @@ from app.job_analysis.application import (
     IdempotencyConflict,
     UncommittableOperationResult,
 )
-from app.job_analysis.llm import (
+from app.task_analysis.llm import (
     IdentityRelation,
     SignalDisposition,
     TaskAnalysisWire,

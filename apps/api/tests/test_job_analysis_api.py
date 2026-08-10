@@ -15,13 +15,11 @@ from app.api.job_analysis_deps import (
     get_job_analysis_uow_factory,
 )
 from app.api.routes import job_analysis as job_analysis_routes
+from app.core.model_outcome import OperationOutcome
 from app.job_analysis.application import DocumentRecord, DocumentSummary
 from app.job_analysis.application.durable_turn import _require_verified
-from app.job_analysis.application.operation import (
-    OperationOutcome,
-    TaskAnalysisOperationResult,
-)
-from app.job_analysis.application.verifier import (
+from app.task_analysis.operation import TaskAnalysisOperationResult
+from app.task_analysis.verifier import (
     VerificationReport,
     Violation,
     ViolationCode,
@@ -39,11 +37,13 @@ from app.core.domain import (
     TaskFields,
 )
 from app.job_analysis.llm import (
-    IdentityRelation,
     OpksDecision,
     OpksGenerationEntityKind,
     OpksResultWire,
     OpksWireItem,
+)
+from app.task_analysis.llm import (
+    IdentityRelation,
     SignalDisposition,
     TaskAnalysisWire,
     WireAnchor,

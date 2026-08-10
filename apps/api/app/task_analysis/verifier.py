@@ -28,8 +28,10 @@ from enum import StrEnum
 from pydantic import model_validator
 
 from app.core.domain import DomainModel, Identifier, NonEmptyText, TaskId
+from app.core.domain.work_model import OpenIssueKind
 from app.core.journal import TurnSpeaker
-from app.job_analysis.llm import (
+
+from .llm import (
     IdentityRelation,
     IssueResolutionKind,
     SignalDisposition,
@@ -37,8 +39,7 @@ from app.job_analysis.llm import (
     TaskChangeKind,
     WorkSignal,
 )
-from app.job_analysis.llm.result import NextQuestionTargetKind
-from app.core.domain.work_model import OpenIssueKind
+from .llm.result import NextQuestionTargetKind
 
 
 # ── Context Packet 的 ordinal 檢視(§11.2:mapping 存在該輪呼叫紀錄側)──────

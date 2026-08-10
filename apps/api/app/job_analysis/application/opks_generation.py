@@ -24,15 +24,16 @@ from app.core.journal import (
     OpksGenerationOutcome,
     OpksGenerationPayload,
 )
+from app.core.model_outcome import OperationOutcome
 from app.core.persistence import (
     DocumentRecord,
     JobAnalysisUnitOfWork,
     JobAnalysisUnitOfWorkFactory,
 )
+from app.core.state import JobAnalysisState
 
 from .durable_turn import StaleAuthoritySnapshot
 from .errors import DocumentNotFound, IdempotencyConflict, JdTaskNotFound
-from .operation import OperationOutcome
 from .opks_context import (
     OpksContextPacket,
     OpksGroundingUnavailable,
@@ -41,7 +42,6 @@ from .opks_context import (
 from .opks_digest import compute_analysis_input_digest
 from .opks_operation import OpksOperationResult, run_opks_operation
 from .opks_verifier import OpksGap
-from .transition import JobAnalysisState
 
 
 @dataclass(frozen=True)

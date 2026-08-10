@@ -80,7 +80,6 @@ from app.job_analysis.application import (
     assemble_export_document,
     delete_opks_item,
     edit_opks_item,
-    decide_proposal,
     decide_opks_proposal,
     reorder_opks_items,
     submit_employee_turn,
@@ -88,6 +87,7 @@ from app.job_analysis.application import (
 from app.job_analysis.application.errors import JobAnalysisApplicationError
 from app.job_analysis.application.export_xlsx import XLSX_MEDIA_TYPE, render_xlsx
 from app.job_analysis.providers import OpenRouterAdapter
+from app.task_analysis import decide_proposal
 
 
 logger = logging.getLogger(__name__)

@@ -11,6 +11,7 @@ API_DIR = Path(__file__).parents[1]
 ROOT = API_DIR / "app" / "job_analysis"
 CORE_ROOT = API_DIR / "app" / "core"
 DOCUMENTS_ROOT = API_DIR / "app" / "documents"
+TASK_ANALYSIS_ROOT = API_DIR / "app" / "task_analysis"
 COMPOSITION_SURFACES = (
     API_DIR / "app" / "api" / "job_analysis_deps.py",
     API_DIR / "app" / "api" / "routes" / "job_analysis.py",
@@ -101,6 +102,32 @@ def test_documents_imports_only_core_stdlib_pydantic_or_itself():
             )
             if not allowed:
                 violations.append(f"{path.relative_to(DOCUMENTS_ROOT)}:{line} imports {module}")
+    assert violations == []
+
+
+def test_task_analysis_imports_only_core_stdlib_pydantic_or_itself():
+    """`app.task_analysis` 是 feature module:只能 import stdlib、pydantic、`app.core`
+    或自己。這已隱含禁止 FastAPI、SQLAlchemy、HTTPX、OpenPyXL、具體的
+    `OpenRouterAdapter`,以及任何 `app.job_analysis`／`app.opks`／adapter 模組
+    (ADR 0058 規則 2)。
+    """
+    assert TASK_ANALYSIS_ROOT.exists(), f"missing feature module: {TASK_ANALYSIS_ROOT}"
+    violations = []
+    for path in TASK_ANALYSIS_ROOT.rglob("*.py"):
+        for line, module in _imports(path):
+            root = module.split(".", 1)[0]
+            allowed = (
+                root in sys.stdlib_module_names
+                or root == "pydantic"
+                or module == "app.core"
+                or module.startswith("app.core.")
+                or module == "app.task_analysis"
+                or module.startswith("app.task_analysis.")
+            )
+            if not allowed:
+                violations.append(
+                    f"{path.relative_to(TASK_ANALYSIS_ROOT)}:{line} imports {module}"
+                )
     assert violations == []
 
 

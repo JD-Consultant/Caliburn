@@ -1,8 +1,8 @@
-"""Task 分析的兩份契約(§12)。
+"""OPKS 的模型契約(§13)。
 
-`result.py` 是 verifier 與下游吃的**內部**形狀;`wire.py` 的
-`task_analysis_result.v2` 才是**送給模型**的形狀,兩者以
-`wire_to_task_analysis_result()` 相接。
+Task Analysis 的 `prompt.py`／`result.py`／`wire.py` 搬到 `app.task_analysis.llm`
+（ADR 0058）；這裡只剩 OPKS specialist 的 prompt、result 與 wire 形狀，直到
+`app.opks`（Task 5）把它們接手為止。
 """
 
 from app.core.portable_schema import (
@@ -13,7 +13,6 @@ from app.core.portable_schema import (
     schema_complexity,
 )
 
-from .prompt import TASK_ANALYSIS_INSTRUCTIONS
 from .opks_result import (
     OpksDecision,
     OpksGenerationEntityKind,
@@ -31,52 +30,8 @@ from .opks_wire import (
     opks_wire_to_result,
     render_opks_wire_schema_file,
 )
-from .result import (
-    TASK_ANALYSIS_RESULT_SCHEMA_NAME,
-    ExcludePayload,
-    IdentityAssessment,
-    IdentityRelation,
-    IssueResolution,
-    IssueResolutionKind,
-    NextQuestion,
-    NextQuestionTarget,
-    NextQuestionTargetKind,
-    OpenIssuePayload,
-    SignalAnchor,
-    SignalDisposition,
-    SplitChildPayload,
-    SupportOrdinalRef,
-    TaskAnalysisResult,
-    TaskChangeKind,
-    TaskChangePayload,
-    WorkSignal,
-)
-from .wire import (
-    NEUTRAL,
-    WireMappingError,
-    TASK_ANALYSIS_WIRE_SCHEMA_NAME,
-    WIRE_SCHEMA_PATH,
-    TaskAnalysisWire,
-    WireAnchor,
-    WireEnabler,
-    WireIssueResolution,
-    WireNextQuestion,
-    WireNextQuestionTargetKind,
-    WireRejectionCode,
-    WireSignal,
-    WireSplitChild,
-    WireSupersession,
-    WireTaskChange,
-    WireTaskFields,
-    WireWithdrawReason,
-    committed_wire_schema,
-    render_wire_schema_file,
-    task_analysis_wire_provider_schema,
-    wire_to_task_analysis_result,
-)
 
 __all__ = [
-    "NEUTRAL",
     "OPKS_RESULT_WIRE_SCHEMA_NAME",
     "OPKS_INSTRUCTIONS",
     "OPKS_WIRE_SCHEMA_PATH",
@@ -86,52 +41,13 @@ __all__ = [
     "OpksResultItem",
     "OpksResultWire",
     "OpksWireItem",
-    "TASK_ANALYSIS_INSTRUCTIONS",
-    "TASK_ANALYSIS_RESULT_SCHEMA_NAME",
-    "TASK_ANALYSIS_WIRE_SCHEMA_NAME",
-    "WIRE_SCHEMA_PATH",
-    "ExcludePayload",
-    "IdentityAssessment",
-    "IdentityRelation",
-    "IssueResolution",
-    "IssueResolutionKind",
-    "NextQuestion",
-    "NextQuestionTarget",
-    "NextQuestionTargetKind",
-    "OpenIssuePayload",
     "ProviderSchemaPortabilityError",
-    "SignalAnchor",
-    "SignalDisposition",
-    "SplitChildPayload",
-    "SupportOrdinalRef",
-    "TaskAnalysisResult",
-    "TaskAnalysisWire",
-    "TaskChangeKind",
-    "TaskChangePayload",
-    "WireAnchor",
-    "WireEnabler",
-    "WireIssueResolution",
-    "WireMappingError",
-    "WireNextQuestion",
-    "WireNextQuestionTargetKind",
-    "WireRejectionCode",
-    "WireSignal",
-    "WireSplitChild",
-    "WireSupersession",
-    "WireTaskChange",
-    "WireTaskFields",
-    "WireWithdrawReason",
-    "WorkSignal",
     "assert_portable_strict_output_schema",
     "committed_opks_wire_schema",
-    "committed_wire_schema",
     "compact_strict_output_schema",
     "expand_refs",
     "opks_result_wire_provider_schema",
     "opks_wire_to_result",
-    "render_wire_schema_file",
     "render_opks_wire_schema_file",
     "schema_complexity",
-    "task_analysis_wire_provider_schema",
-    "wire_to_task_analysis_result",
 ]

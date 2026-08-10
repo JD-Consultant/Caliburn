@@ -8,16 +8,16 @@ from __future__ import annotations
 import pytest
 from pydantic import ValidationError
 
-from app.job_analysis.application import (
+from app.core.journal import TurnSpeaker
+from app.task_analysis import verify_task_analysis_result
+from app.task_analysis.verifier import (
     PacketOpenIssue,
     PacketRetiredTask,
     PacketSupportLink,
     PacketTask,
     PacketTurn,
-    TurnSpeaker,
     VerificationContext,
     ViolationCode,
-    verify_task_analysis_result,
 )
 from app.core.domain import (
     ExclusionReason,
@@ -25,7 +25,7 @@ from app.core.domain import (
     RetirementReason,
     TaskFields,
 )
-from app.job_analysis.llm import (
+from app.task_analysis.llm import (
     ExcludePayload,
     IdentityAssessment,
     IdentityRelation,
@@ -971,11 +971,11 @@ def test_current_turn_must_be_an_employee_turn_in_the_packet():
 
 
 def resolution_context(*, subject_task_id="task-1"):
-    from app.job_analysis.application import (
+    from app.core.journal import TurnSpeaker
+    from app.task_analysis.verifier import (
         PacketOpenIssue,
         PacketTask,
         PacketTurn,
-        TurnSpeaker,
         VerificationContext,
     )
 
@@ -997,7 +997,7 @@ def resolution_context(*, subject_task_id="task-1"):
 
 
 def support_only_signal(*, target=1, anchors=True):
-    from app.job_analysis.llm import (
+    from app.task_analysis.llm import (
         IdentityAssessment,
         IdentityRelation,
         SignalAnchor,
@@ -1018,7 +1018,7 @@ def support_only_signal(*, target=1, anchors=True):
 
 
 def result_with_resolutions(*resolutions, signals=()):
-    from app.job_analysis.llm import (
+    from app.task_analysis.llm import (
         IssueResolution,
         IssueResolutionKind,
         NextQuestion,
@@ -1047,7 +1047,7 @@ def test_answered_needs_a_same_turn_signal_leaving_evidence_on_the_subject_task(
     員工以為答過了,系統卻永遠不會用那個答案。
     """
 
-    from app.job_analysis.application import ViolationCode
+    from app.task_analysis.verifier import ViolationCode
 
     assert ViolationCode.ISSUE_RESOLUTION_ANSWER_NOT_RECORDED in codes_for(
         result_with_resolutions((1, "answered")),
@@ -1065,7 +1065,7 @@ def test_answered_is_accepted_when_the_same_turn_records_the_answer():
 def test_answered_rejects_a_signal_that_leaves_no_anchor():
     """沒有 anchor 就沒有 SupportLink,digest 一樣不會變。"""
 
-    from app.job_analysis.application import ViolationCode
+    from app.task_analysis.verifier import ViolationCode
 
     assert ViolationCode.ISSUE_RESOLUTION_ANSWER_NOT_RECORDED in codes_for(
         result_with_resolutions(
@@ -1089,7 +1089,7 @@ def test_the_two_terminal_answers_need_no_work_signal(kind):
 def test_an_unknown_issue_ordinal_is_rejected():
     """決定 20:terminal issue 不配發 ordinal,指過去就是無效 ordinal。"""
 
-    from app.job_analysis.application import ViolationCode
+    from app.task_analysis.verifier import ViolationCode
 
     assert ViolationCode.ISSUE_RESOLUTION_ORDINAL_UNKNOWN in codes_for(
         result_with_resolutions((99, "employee_unknown")),
@@ -1098,7 +1098,7 @@ def test_an_unknown_issue_ordinal_is_rejected():
 
 
 def test_the_same_issue_cannot_be_resolved_twice_in_one_turn():
-    from app.job_analysis.application import ViolationCode
+    from app.task_analysis.verifier import ViolationCode
 
     assert ViolationCode.ISSUE_RESOLUTION_REPEATED in codes_for(
         result_with_resolutions((1, "employee_unknown"), (1, "not_applicable")),
@@ -1109,11 +1109,11 @@ def test_the_same_issue_cannot_be_resolved_twice_in_one_turn():
 def test_one_answer_may_resolve_several_gaps_without_side_effects():
     """決定 22:一個答案同時解 P／K／S 三個缺口就是三筆,每一筆都沒有處置。"""
 
-    from app.job_analysis.application import (
+    from app.core.journal import TurnSpeaker
+    from app.task_analysis.verifier import (
         PacketOpenIssue,
         PacketTask,
         PacketTurn,
-        TurnSpeaker,
         VerificationContext,
     )
 

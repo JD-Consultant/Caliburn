@@ -18,7 +18,7 @@ from app.api.job_analysis_deps import (
 )
 from app.documents import load_document
 from app.core.domain import TaskFields
-from app.job_analysis.llm import (
+from app.task_analysis.llm import (
     IdentityRelation,
     SignalDisposition,
     TaskAnalysisWire,

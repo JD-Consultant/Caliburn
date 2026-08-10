@@ -10,11 +10,10 @@ from __future__ import annotations
 import pytest
 from pydantic import ValidationError
 
-from app.job_analysis.application import (
-    ConversationTurn,
-    JobAnalysisState,
+from app.core.journal import ConversationTurn, TurnSpeaker
+from app.core.state import JobAnalysisState
+from app.task_analysis import (
     TransitionOutcome,
-    TurnSpeaker,
     apply_task_analysis_result,
     build_context_packet,
 )
@@ -43,7 +42,7 @@ from app.core.domain import (
     TaskState,
     jd_map,
 )
-from app.job_analysis.llm import (
+from app.task_analysis.llm import (
     ExcludePayload,
     IdentityAssessment,
     IdentityRelation,
@@ -1014,7 +1013,7 @@ def gap_state(*, terminal=None) -> JobAnalysisState:
 
 
 def resolution(kind: str, ordinal: int = 1):
-    from app.job_analysis.llm import IssueResolution, IssueResolutionKind
+    from app.task_analysis.llm import IssueResolution, IssueResolutionKind
 
     return IssueResolution(ordinal=ordinal, resolution=IssueResolutionKind(kind))
 

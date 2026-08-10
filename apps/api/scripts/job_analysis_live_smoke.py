@@ -66,11 +66,11 @@ from app.job_analysis.application import (  # noqa: E402
     JobAnalysisUnitOfWorkFactory,
     submit_employee_turn,
 )
-from app.job_analysis.llm import (  # noqa: E402
+from app.task_analysis.llm import (  # noqa: E402
     TASK_ANALYSIS_WIRE_SCHEMA_NAME,
     task_analysis_wire_provider_schema,
 )
-from app.job_analysis.llm.prompt import TASK_ANALYSIS_INSTRUCTIONS  # noqa: E402
+from app.task_analysis.llm.prompt import TASK_ANALYSIS_INSTRUCTIONS  # noqa: E402
 from app.job_analysis.providers import (  # noqa: E402
     MODEL_ENDPOINTS_URL_TEMPLATE,
     OpenRouterAdapter,

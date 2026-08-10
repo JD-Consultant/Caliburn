@@ -1,12 +1,22 @@
-"""Use-case 層：context、operation、transition 與純 persistence ports。
+"""Use-case 層：OPKS use cases 與純 persistence ports。
 
 Document/header/Duty/Task direct-edit use cases and readiness moved to
 `app.documents` (ADR 0058). `create_document` is re-exported here from
 `app.documents.authoring` only because scripts outside the composition root
 still consume it directly; it is not part of `app.documents`'s curated
 public API.
+
+Task Proposal analysis (packet building, the analysis operation, proposal
+decisions, transition, verifier) moved to `app.task_analysis` (ADR 0058);
+this module no longer re-exports it. `JobAnalysisState`／`ConversationTurn`／
+`ActiveQuestion`／`TurnSpeaker`／`OperationOutcome` are core-owned types this
+package still consumes internally, imported straight from `app.core` rather
+than through `task_analysis`.
 """
 
+from app.core.journal import ActiveQuestion, ConversationTurn, TurnSpeaker
+from app.core.model_outcome import OperationOutcome
+from app.core.state import JobAnalysisState
 from app.documents.authoring import create_document
 from .export import (
     ExportDocument,
@@ -26,21 +36,6 @@ from .errors import (
     OpksProposalNotDecidable,
     OpksProposalNotFound,
 )
-from .context import (
-    ActiveQuestion,
-    ConversationContext,
-    ConversationTurn,
-    CurrentAuthorities,
-    PacketOpenIssueView,
-    PacketProposalView,
-    PacketRetiredTaskView,
-    PacketTaskView,
-    PacketTurnView,
-    ProposalContext,
-    TaskAnalysisPacket,
-    build_context_packet,
-    render_context_packet,
-)
 from .consultation import submit_employee_turn
 from .durable_turn import (
     CommittedTurn,
@@ -50,11 +45,6 @@ from .durable_turn import (
     UncommittableOperationResult,
     commit_verified_turn,
     prepare_turn,
-)
-from .operation import (
-    OperationOutcome,
-    TaskAnalysisOperationResult,
-    run_task_analysis_operation,
 )
 from .opks_authoring import (
     add_opks_item,
@@ -147,32 +137,6 @@ from app.core.persistence import (
     OpksRepository,
     ProposalRepository,
 )
-from .proposal_decisions import (
-    ProposalDecision,
-    ProposalNotDecidable,
-    ProposalNotFound,
-    decide_proposal,
-    propose_task_for_jd,
-)
-from .transition import (
-    JobAnalysisState,
-    TransitionOutcome,
-    TransitionResult,
-    apply_task_analysis_result,
-)
-from .verifier import (
-    PacketOpenIssue,
-    PacketRetiredTask,
-    PacketSupportLink,
-    PacketTask,
-    PacketTurn,
-    TurnSpeaker,
-    VerificationContext,
-    VerificationReport,
-    Violation,
-    ViolationCode,
-    verify_task_analysis_result,
-)
 
 __all__ = [
     "ActiveQuestion",
@@ -242,43 +206,15 @@ __all__ = [
     "PROPOSAL_DECISION_SCHEMA_ID",
     "PROPOSAL_SCHEMA_ID",
     "ProposalDecisionPayload",
-    "ProposalDecision",
-    "ProposalNotDecidable",
-    "ProposalNotFound",
     "ProposalRepository",
-    "TaskAnalysisOperationResult",
     "StaleAuthoritySnapshot",
     "TransitionCommitRejected",
     "TurnSnapshot",
     "UncommittableOperationResult",
-    "TransitionOutcome",
-    "TransitionResult",
-    "apply_task_analysis_result",
-    "run_task_analysis_operation",
-    "ConversationContext",
     "ConversationTurn",
-    "CurrentAuthorities",
-    "PacketOpenIssueView",
-    "PacketProposalView",
-    "PacketRetiredTaskView",
-    "PacketTaskView",
-    "PacketTurnView",
-    "ProposalContext",
-    "TaskAnalysisPacket",
-    "build_context_packet",
-    "render_context_packet",
     "submit_employee_turn",
-    "PacketOpenIssue",
-    "PacketRetiredTask",
-    "PacketSupportLink",
-    "PacketTask",
-    "PacketTurn",
     "TurnSpeaker",
-    "VerificationContext",
-    "VerificationReport",
     "VerifiedOpksChange",
-    "Violation",
-    "ViolationCode",
     "WORK_MODEL_SCHEMA_ID",
     "add_opks_item",
     "ScheduledOpks",
@@ -294,18 +230,15 @@ __all__ = [
     "commit_opks_generation",
     "delete_opks_item",
     "decide_opks_proposal",
-    "decide_proposal",
     "edit_opks_item",
     "generate_opks_proposals",
     "prepare_turn",
     "prepare_opks_generation",
     "prune_opks_for_current_jd",
     "prune_opks_gaps_for_current_jd",
-    "propose_task_for_jd",
     "render_opks_context_packet",
     "run_opks_operation",
     "remove_opks_item_and_indicator_refs",
     "stale_invalid_opks_proposals",
-    "verify_task_analysis_result",
     "verify_opks_result",
 ]

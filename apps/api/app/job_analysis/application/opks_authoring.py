@@ -27,6 +27,7 @@ from app.core.persistence import (
     JobAnalysisUnitOfWork,
     JobAnalysisUnitOfWorkFactory,
 )
+from app.core.state import JobAnalysisState
 
 from .errors import (
     DocumentNotFound,
@@ -38,7 +39,6 @@ from .opks_proposals import (
     remove_opks_item_and_indicator_refs,
     stale_invalid_opks_proposals,
 )
-from .transition import JobAnalysisState
 
 
 def _utcnow() -> datetime:

@@ -17,22 +17,23 @@ from app.documents import (
     reorder_duties,
 )
 from app.documents.authoring import create_document
+from app.core.journal import ConversationTurn, TurnSpeaker
+from app.core.model_outcome import OperationOutcome
+from app.core.state import JobAnalysisState
 from app.job_analysis.application import (
-    ConversationTurn,
     DutyDirectEditPayload,
     IdempotencyConflict,
-    JobAnalysisState,
-    OperationOutcome,
     OpksOperationResult,
-    TaskAnalysisOperationResult,
-    TurnSpeaker,
-    VerificationReport,
     commit_opks_generation,
     commit_verified_turn,
     compute_analysis_input_digest,
-    decide_proposal,
     prepare_opks_generation,
     prepare_turn,
+)
+from app.task_analysis import (
+    TaskAnalysisOperationResult,
+    VerificationReport,
+    decide_proposal,
 )
 from app.core.authority import commit_authority_change
 from app.core.domain import (
@@ -50,7 +51,7 @@ from app.core.domain import (
     SupportLink,
     Task,
 )
-from app.job_analysis.llm import NextQuestion, TaskAnalysisResult
+from app.task_analysis.llm import NextQuestion, TaskAnalysisResult
 
 
 pytestmark = pytest.mark.asyncio

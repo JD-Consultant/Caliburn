@@ -5,6 +5,7 @@ from __future__ import annotations
 from pydantic import ValidationError
 
 from app.core.domain import DomainModel, NonEmptyText
+from app.core.model_outcome import OperationOutcome
 from app.job_analysis.llm import (
     OPKS_INSTRUCTIONS,
     OPKS_RESULT_WIRE_SCHEMA_NAME,
@@ -20,7 +21,6 @@ from app.job_analysis.providers import (
     ProviderText,
 )
 
-from .operation import OperationOutcome
 from .opks_context import OpksContextPacket, render_opks_context_packet
 from .opks_verifier import OpksVerificationReport, verify_opks_result
 

@@ -21,16 +21,18 @@ from app.documents import load_document
 from app.documents.authoring import create_document
 from app.job_analysis.application import (
     decide_opks_proposal,
-    decide_proposal,
     submit_employee_turn,
 )
+from app.task_analysis import decide_proposal
 from app.core.domain import OpksEntityKind, OpksGapAxis
 from app.job_analysis.llm import (
-    IdentityRelation,
-    IssueResolutionKind,
     OpksDecision,
     OpksResultWire,
     OpksWireItem,
+)
+from app.task_analysis.llm import (
+    IdentityRelation,
+    IssueResolutionKind,
     SignalDisposition,
     TaskAnalysisWire,
     WireAnchor,

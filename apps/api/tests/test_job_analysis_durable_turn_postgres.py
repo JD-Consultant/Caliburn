@@ -9,19 +9,16 @@ import pytest
 from app.adapters.job_analysis_postgres import SqlAlchemyJobAnalysisUnitOfWork
 from app.documents import add_jd_task, load_document, put_jd_header
 from app.documents.authoring import create_document
+from app.core.journal import CompletedTurnPayload, ConversationTurn, TurnSpeaker
+from app.core.model_outcome import OperationOutcome
 from app.job_analysis.application import (
-    CompletedTurnPayload,
-    ConversationTurn,
-    OperationOutcome,
     StaleAuthoritySnapshot,
-    TaskAnalysisOperationResult,
-    TurnSpeaker,
     UncommittableOperationResult,
-    VerificationReport,
     commit_verified_turn,
     prepare_turn,
     select_scheduled_opks,
 )
+from app.task_analysis import TaskAnalysisOperationResult, VerificationReport
 from app.core.domain import (
     CurrentWorkModel,
     JdHeader,
@@ -37,7 +34,7 @@ from app.core.domain import (
     SupportLink,
     Task,
 )
-from app.job_analysis.llm import (
+from app.task_analysis.llm import (
     IdentityAssessment,
     IdentityRelation,
     NextQuestion,

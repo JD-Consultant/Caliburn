@@ -15,8 +15,7 @@ from app.core.domain import (
     OpksEntityKind,
     OpksItem,
 )
-
-from .transition import JobAnalysisState
+from app.core.state import JobAnalysisState
 
 
 class ExportOpksEntry(DomainModel):

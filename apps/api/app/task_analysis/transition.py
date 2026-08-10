@@ -54,7 +54,9 @@ from app.core.domain import (
     withdraw_delta_matches_target_state,
 )
 from app.core.state import JobAnalysisState
-from app.job_analysis.llm import (
+
+from .context import TaskAnalysisPacket
+from .llm import (
     IssueResolution,
     IssueResolutionKind,
     NextQuestion,
@@ -64,8 +66,6 @@ from app.job_analysis.llm import (
     TaskChangeKind,
     WorkSignal,
 )
-
-from .context import TaskAnalysisPacket
 from .verifier import verify_task_analysis_result
 
 

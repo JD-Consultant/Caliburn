@@ -22,10 +22,9 @@ from app.job_analysis.application import (
     OpksItemNotFound,
     OpksProposalNotDecidable,
     OpksProposalNotFound,
-    ProposalNotDecidable,
-    ProposalNotFound,
 )
 from app.job_analysis.application.errors import JobAnalysisApplicationError
+from app.task_analysis import ProposalNotDecidable, ProposalNotFound
 
 
 DOCUMENT_NOT_FOUND = (

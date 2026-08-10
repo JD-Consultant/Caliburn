@@ -9,12 +9,8 @@ import pytest
 from app.adapters.job_analysis_postgres import SqlAlchemyJobAnalysisUnitOfWork
 from app.documents import load_document
 from app.documents.authoring import create_document
-from app.job_analysis.application import (
-    IdempotencyConflict,
-    ProposalNotDecidable,
-    decide_proposal,
-    propose_task_for_jd,
-)
+from app.job_analysis.application import IdempotencyConflict
+from app.task_analysis import ProposalNotDecidable, decide_proposal, propose_task_for_jd
 from app.core.domain import (
     CurrentWorkModel,
     JdEntry,

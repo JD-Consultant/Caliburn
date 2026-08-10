@@ -9,13 +9,26 @@ from uuid import UUID
 from app.core.authority import commit_authority_change
 from app.core.journal import (
     COMPLETED_TURN_SCHEMA_ID,
+    ActiveQuestion,
     CompletedTurnPayload,
+    ConversationTurn,
     JournalEntry,
+    TurnSpeaker,
 )
+from app.core.model_outcome import OperationOutcome
 from app.core.persistence import (
     DocumentRecord,
     JobAnalysisUnitOfWork,
     JobAnalysisUnitOfWorkFactory,
+)
+from app.core.state import JobAnalysisState
+from app.task_analysis import (
+    TaskAnalysisOperationResult,
+    TaskAnalysisPacket,
+    TransitionOutcome,
+    TransitionResult,
+    apply_task_analysis_result,
+    build_context_packet,
 )
 
 from .errors import (
@@ -24,22 +37,8 @@ from .errors import (
     IdempotencyConflict,
     JobAnalysisApplicationError,
 )
-from .context import (
-    ActiveQuestion,
-    ConversationTurn,
-    TaskAnalysisPacket,
-    build_context_packet,
-)
-from .operation import OperationOutcome, TaskAnalysisOperationResult
 from .opks_digest import ScheduledOpks
 from .opks_scheduler import question_target_task_ids, select_scheduled_opks
-from .transition import (
-    JobAnalysisState,
-    TransitionOutcome,
-    TransitionResult,
-    apply_task_analysis_result,
-)
-from .verifier import TurnSpeaker
 
 
 class StaleAuthoritySnapshot(ConcurrentAuthorityChange):

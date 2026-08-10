@@ -12,10 +12,8 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 
-from app.job_analysis.application import (
-    JobAnalysisState,
-    eligible_opks_candidates,
-)
+from app.core.state import JobAnalysisState
+from app.job_analysis.application import eligible_opks_candidates
 from app.core.domain import (
     CurrentJdOpks,
     CurrentWorkModel,
@@ -372,7 +370,8 @@ def test_candidates_are_ordered_by_current_jd_display_order():
 
 
 def packet_for(*tasks: Task, open_issues: tuple[OpenIssue, ...] = ()):
-    from app.job_analysis.application import ConversationTurn, TurnSpeaker, build_context_packet
+    from app.core.journal import ConversationTurn, TurnSpeaker
+    from app.task_analysis import build_context_packet
 
     return build_context_packet(
         transcript=(
@@ -393,7 +392,7 @@ def packet_for(*tasks: Task, open_issues: tuple[OpenIssue, ...] = ()):
 
 
 def result_with_target(target):
-    from app.job_analysis.llm import NextQuestion, TaskAnalysisResult
+    from app.task_analysis.llm import NextQuestion, TaskAnalysisResult
 
     return TaskAnalysisResult(
         work_signals=(),
@@ -413,7 +412,7 @@ def test_no_question_target_blocks_nothing():
 
 def test_a_question_about_an_open_issue_blocks_its_subject_task():
     from app.job_analysis.application import question_target_task_ids
-    from app.job_analysis.llm import NextQuestionTarget, NextQuestionTargetKind
+    from app.task_analysis.llm import NextQuestionTarget, NextQuestionTargetKind
 
     gap = issue(subject_task_id="task-1", opks_axis=OpksGapAxis.OUTPUT)
 
@@ -433,7 +432,7 @@ def test_a_question_about_a_new_task_blocks_the_id_that_turn_will_mint():
     """剛加進 Current JD 的 Task 當輪就可能 eligible;漏掉它就會問兩題。"""
 
     from app.job_analysis.application import question_target_task_ids
-    from app.job_analysis.llm import (
+    from app.task_analysis.llm import (
         IdentityAssessment,
         IdentityRelation,
         NextQuestion,

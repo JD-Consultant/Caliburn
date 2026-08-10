@@ -7,18 +7,19 @@ import pytest
 from app.adapters.job_analysis_postgres import SqlAlchemyJobAnalysisUnitOfWork
 from app.documents import add_jd_task, edit_jd_task, load_document, reorder_jd_tasks
 from app.documents.authoring import create_document
+from app.core.journal import ConversationTurn, TurnSpeaker
+from app.core.model_outcome import OperationOutcome
 from app.job_analysis.application import (
-    ConversationTurn,
-    OperationOutcome,
-    TaskAnalysisOperationResult,
-    TurnSpeaker,
-    VerificationReport,
     commit_verified_turn,
-    decide_proposal,
     prepare_turn,
 )
+from app.task_analysis import (
+    TaskAnalysisOperationResult,
+    VerificationReport,
+    decide_proposal,
+)
 from app.core.domain import JdTaskFields, ProposalStatus
-from app.job_analysis.llm import (
+from app.task_analysis.llm import (
     IdentityAssessment,
     IdentityRelation,
     NextQuestion,

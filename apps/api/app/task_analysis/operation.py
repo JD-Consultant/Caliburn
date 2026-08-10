@@ -13,8 +13,15 @@ from __future__ import annotations
 from pydantic import ValidationError
 
 from app.core.domain import DomainModel, NonEmptyText
-from app.core.model_outcome import OperationOutcome
-from app.job_analysis.llm import (
+from app.core.model_outcome import (
+    OperationOutcome,
+    ProviderFailure,
+    ProviderRefusal,
+    ProviderText,
+)
+
+from .context import TaskAnalysisPacket, render_context_packet
+from .llm import (
     TASK_ANALYSIS_WIRE_SCHEMA_NAME,
     TaskAnalysisResult,
     TaskAnalysisWire,
@@ -22,15 +29,8 @@ from app.job_analysis.llm import (
     task_analysis_wire_provider_schema,
     wire_to_task_analysis_result,
 )
-from app.job_analysis.llm.prompt import TASK_ANALYSIS_INSTRUCTIONS
-from app.job_analysis.providers import (
-    OpenRouterAdapter,
-    ProviderFailure,
-    ProviderRefusal,
-    ProviderText,
-)
-
-from .context import TaskAnalysisPacket, render_context_packet
+from .llm.prompt import TASK_ANALYSIS_INSTRUCTIONS
+from .ports import TaskAnalysisModelPort
 from .verifier import VerificationReport, verify_task_analysis_result
 
 
@@ -46,7 +46,7 @@ class TaskAnalysisOperationResult(DomainModel):
 
 
 async def run_task_analysis_operation(
-    *, packet: TaskAnalysisPacket, adapter: OpenRouterAdapter
+    *, packet: TaskAnalysisPacket, adapter: TaskAnalysisModelPort
 ) -> TaskAnalysisOperationResult:
     outcome = await adapter.complete(
         instructions=TASK_ANALYSIS_INSTRUCTIONS,

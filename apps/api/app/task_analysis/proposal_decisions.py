@@ -28,29 +28,29 @@ from app.core.domain import (
 )
 
 from app.core.authority import commit_authority_change
+from app.core.errors import (
+    DocumentNotFound,
+    IdempotencyConflict,
+    InvalidProposalDecision,
+)
 from app.core.journal import (
     PROPOSAL_DECISION_SCHEMA_ID,
     JournalEntry,
     ProposalDecisionPayload,
+)
+from app.core.opks_integrity import (
+    prune_opks_for_current_jd,
+    prune_opks_gaps_for_current_jd,
+    stale_invalid_opks_proposals,
 )
 from app.core.persistence import (
     DocumentRecord,
     JobAnalysisUnitOfWork,
     JobAnalysisUnitOfWorkFactory,
 )
+from app.core.state import JobAnalysisState
 
-from .errors import (
-    DocumentNotFound,
-    IdempotencyConflict,
-    InvalidProposalDecision,
-    JobAnalysisApplicationError,
-)
-from .opks_authoring import (
-    prune_opks_for_current_jd,
-    prune_opks_gaps_for_current_jd,
-)
-from .opks_proposals import stale_invalid_opks_proposals
-from .transition import JobAnalysisState
+from .errors import ProposalNotDecidable, ProposalNotFound
 
 
 ProposalDecision = Literal[
@@ -60,14 +60,6 @@ ProposalDecision = Literal[
     "deferred",
     "revision_requested",
 ]
-
-
-class ProposalNotFound(JobAnalysisApplicationError):
-    pass
-
-
-class ProposalNotDecidable(JobAnalysisApplicationError):
-    pass
 
 
 def _utcnow() -> datetime:

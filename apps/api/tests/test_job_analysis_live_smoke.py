@@ -18,7 +18,7 @@ import pytest
 from app.adapters.job_analysis_postgres import SqlAlchemyJobAnalysisUnitOfWork
 from app.documents import load_document
 from app.job_analysis.application import submit_employee_turn
-from app.job_analysis.llm import (
+from app.task_analysis.llm import (
     IdentityRelation,
     SignalDisposition,
     TaskAnalysisWire,

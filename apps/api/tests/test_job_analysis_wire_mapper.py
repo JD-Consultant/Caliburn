@@ -18,13 +18,13 @@ from app.core.domain import (
     OpenIssueKind,
     RetirementReason,
 )
-from app.job_analysis.llm import (
+from app.task_analysis.llm import (
     IdentityRelation,
     NextQuestionTargetKind,
     SignalDisposition,
     TaskChangeKind,
 )
-from app.job_analysis.llm.wire import (
+from app.task_analysis.llm.wire import (
     TaskAnalysisWire,
     WireAnchor,
     WireEnabler,

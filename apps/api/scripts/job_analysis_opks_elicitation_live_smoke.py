@@ -63,7 +63,6 @@ from app.config import settings  # noqa: E402
 from app.documents import load_document  # noqa: E402
 from app.documents.authoring import create_document  # noqa: E402
 from app.job_analysis.application import (  # noqa: E402
-    JobAnalysisState,
     JobAnalysisUnitOfWorkFactory,
     submit_employee_turn,
 )
@@ -77,14 +76,17 @@ from app.core.domain import (  # noqa: E402
     SupportLink,
     Task,
 )
+from app.core.state import JobAnalysisState  # noqa: E402
 from app.job_analysis.llm import (  # noqa: E402
     OPKS_INSTRUCTIONS,
     OPKS_RESULT_WIRE_SCHEMA_NAME,
-    TASK_ANALYSIS_WIRE_SCHEMA_NAME,
     opks_result_wire_provider_schema,
+)
+from app.task_analysis.llm import (  # noqa: E402
+    TASK_ANALYSIS_WIRE_SCHEMA_NAME,
     task_analysis_wire_provider_schema,
 )
-from app.job_analysis.llm.prompt import TASK_ANALYSIS_INSTRUCTIONS  # noqa: E402
+from app.task_analysis.llm.prompt import TASK_ANALYSIS_INSTRUCTIONS  # noqa: E402
 from app.job_analysis.providers import (  # noqa: E402
     OpenRouterAdapter,
     OpenRouterCatalogError,

@@ -28,6 +28,7 @@ from app.core.journal import (
 )
 from app.core.opks_integrity import stale_invalid_opks_proposals
 from app.core.persistence import JobAnalysisUnitOfWorkFactory
+from app.core.state import JobAnalysisState
 
 from .errors import (
     DocumentNotFound,
@@ -36,7 +37,6 @@ from .errors import (
     OpksProposalNotDecidable,
     OpksProposalNotFound,
 )
-from .transition import JobAnalysisState
 
 
 def _utcnow() -> datetime:

@@ -29,22 +29,21 @@ from app.core.domain import (
     TaskId,
     TaskState,
 )
-from app.job_analysis.llm import (
+from app.core.persistence import JobAnalysisUnitOfWork
+from app.core.state import JobAnalysisState
+from app.task_analysis import TaskAnalysisPacket
+from app.task_analysis.llm import (
     NextQuestionTargetKind,
     TaskAnalysisResult,
     TaskChangeKind,
 )
 
-from app.core.persistence import JobAnalysisUnitOfWork
-
-from .context import TaskAnalysisPacket
 from .opks_context import proposal_references_task
 from .opks_digest import (
     ScheduledOpks,
     compute_analysis_input_digest,
     scheduled_opks_operation_id,
 )
-from .transition import JobAnalysisState
 
 
 BLOCKING_PROPOSAL_STATUSES = frozenset(

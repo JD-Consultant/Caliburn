@@ -10,10 +10,8 @@ import pytest
 from pydantic import ValidationError
 
 from app.core import domain as domain_package
-from app.job_analysis.application import (
-    ActiveQuestion,
-    ConversationTurn,
-    TurnSpeaker,
+from app.core.journal import ActiveQuestion, ConversationTurn, TurnSpeaker
+from app.task_analysis import (
     build_context_packet,
     render_context_packet,
     verify_task_analysis_result,
@@ -49,7 +47,7 @@ from app.core.domain import (
     Task,
     TaskFields,
 )
-from app.job_analysis.llm import (
+from app.task_analysis.llm import (
     IdentityAssessment,
     IdentityRelation,
     NextQuestion,

@@ -9,8 +9,17 @@ import * as ts from "typescript";
 //   1. `shared/**` may never import from `features/*`.
 //   2. `features/<A>/**` may never import from `features/<B>/**` (sibling
 //      features may only be composed at the app layer).
-//   3. `app/**` may reach a feature only through that feature's `index.ts`
-//      barrel (`@/features/<name>`), never a deep path that reaches past it.
+//   3. Anything outside a feature (`app/**` or an "other" zone file, e.g. a
+//      future `src/hooks/**`) may reach a feature only through that
+//      feature's `index.ts` barrel (`@/features/<name>`), never a deep path
+//      that reaches past it. This intentionally covers `"other"` too, not
+//      just `"app"`: a file outside `app/`, `features/`, `shared/` is
+//      otherwise invisible to every rule below — nothing today lives there,
+//      but `components.json` reserves `@/shared/hooks` for a not-yet-created
+//      directory, and the classifier must fail closed rather than silently
+//      exempting whatever lands there next.
+//   4. `features/*` and `shared/*` may never import from the `app` zone —
+//      the dependency only ever flows app → feature/shared, never back.
 //
 // This is a static import-graph check using the TypeScript compiler API, not
 // a type-checker: it only classifies which top-level zone (`shared`,
@@ -111,7 +120,8 @@ const allEdges = allFiles.flatMap(collectImportEdges);
 
 const sharedImportsFeature: string[] = [];
 const featureImportsSiblingFeature: string[] = [];
-const appDeepImportsFeature: string[] = [];
+const deepImportsPastFeatureBarrel: string[] = [];
+const featureOrSharedImportsApp: string[] = [];
 
 for (const edge of allEdges) {
   const fromRel = toSrcRelative(edge.fromFile);
@@ -119,24 +129,33 @@ for (const edge of allEdges) {
   const targetRel = resolveSpecifier(edge.fromFile, edge.specifier);
   if (targetRel === null) continue;
   const targetZone = classify(targetRel);
-  if (targetZone.kind !== "features") continue;
 
-  if (fromZone.kind === "shared") {
-    sharedImportsFeature.push(
-      `${fromRel} imports "${edge.specifier}" (feature "${targetZone.name}")`,
-    );
-  } else if (fromZone.kind === "features") {
-    if (fromZone.name !== targetZone.name) {
-      featureImportsSiblingFeature.push(
-        `${fromRel} (feature "${fromZone.name}") imports "${edge.specifier}" (feature "${targetZone.name}")`,
+  if (targetZone.kind === "features") {
+    if (fromZone.kind === "shared") {
+      sharedImportsFeature.push(
+        `${fromRel} imports "${edge.specifier}" (feature "${targetZone.name}")`,
       );
+    } else if (fromZone.kind === "features") {
+      if (fromZone.name !== targetZone.name) {
+        featureImportsSiblingFeature.push(
+          `${fromRel} (feature "${fromZone.name}") imports "${edge.specifier}" (feature "${targetZone.name}")`,
+        );
+      }
+    } else if (fromZone.kind === "app" || fromZone.kind === "other") {
+      // Only `features/<name>` (exactly two segments) is the barrel; anything
+      // deeper reaches past `index.ts` into feature internals. This fires for
+      // both `app` and `other` zones — a file outside app/features/shared is
+      // not exempt just because it isn't `app`.
+      if (targetZone.segments.length !== 2) {
+        deepImportsPastFeatureBarrel.push(
+          `${fromRel} imports "${edge.specifier}" — must import "@/features/${targetZone.name}" (its index.ts), not a deep path`,
+        );
+      }
     }
-  } else if (fromZone.kind === "app") {
-    // Only `features/<name>` (exactly two segments) is the barrel; anything
-    // deeper reaches past `index.ts` into feature internals.
-    if (targetZone.segments.length !== 2) {
-      appDeepImportsFeature.push(
-        `${fromRel} imports "${edge.specifier}" — must import "@/features/${targetZone.name}" (its index.ts), not a deep path`,
+  } else if (targetZone.kind === "app") {
+    if (fromZone.kind === "features" || fromZone.kind === "shared") {
+      featureOrSharedImportsApp.push(
+        `${fromRel} (zone "${fromZone.kind}") imports "${edge.specifier}" — features/shared must not import from app`,
       );
     }
   }
@@ -160,7 +179,17 @@ describe("architecture boundaries (feature-first)", () => {
     ).toEqual([]);
   });
 
-  it("app/** may only reach a feature through its index.ts barrel", () => {
-    expect(appDeepImportsFeature, appDeepImportsFeature.join("\n")).toEqual([]);
+  it("app/** and non-zone files may only reach a feature through its index.ts barrel", () => {
+    expect(
+      deepImportsPastFeatureBarrel,
+      deepImportsPastFeatureBarrel.join("\n"),
+    ).toEqual([]);
+  });
+
+  it("features/* and shared/* must not import from the app zone", () => {
+    expect(
+      featureOrSharedImportsApp,
+      featureOrSharedImportsApp.join("\n"),
+    ).toEqual([]);
   });
 });

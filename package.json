@@ -7,9 +7,9 @@
     "packages/*"
   ],
   "scripts": {
-    "up": "docker compose up -d && turbo dev",
-    "down": "docker compose down && kill-port 3000 8000 8001",
-    "infra": "docker compose up -d",
+    "up": "docker compose up -d db && turbo dev",
+    "down": "docker compose down && kill-port 3000 8001",
+    "infra": "docker compose up -d db",
     "db:migrate": "npm run migrate -w @caliburn/api",
     "dev": "turbo dev",
     "build": "turbo build",

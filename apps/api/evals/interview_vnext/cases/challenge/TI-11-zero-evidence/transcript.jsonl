@@ -1,2 +1,0 @@
-{"schema_version":"turn_eval_transcript_turn.v2","turn_key":"consultant-01","sequence":1,"role":"consultant","locale":"zh-TW","text":"這項流程的例外情況你怎麼處理?","occurred_offset_seconds":2}
-{"schema_version":"turn_eval_transcript_turn.v2","turn_key":"employee-target","sequence":2,"role":"employee","locale":"zh-TW","text":"這個我不清楚,可以先跳過嗎?對了,午餐要訂什麼?","occurred_offset_seconds":4}

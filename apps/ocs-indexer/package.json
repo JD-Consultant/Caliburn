@@ -1,9 +1,0 @@
-{
-  "name": "@caliburn/ocs-indexer",
-  "private": true,
-  "scripts": {
-    "test": "uv run --all-extras pytest -q",
-    "dev": "uv run --extra api jd-ocs-indexer serve --host 127.0.0.1 --port 8000",
-    "build": "echo \"no build\""
-  }
-}

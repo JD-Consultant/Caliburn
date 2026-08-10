@@ -1,4 +1,4 @@
-"""Persist employee OPKS display order with a deterministic legacy backfill.
+"""Persist employee OPKS display order with a deterministic existing-row backfill.
 
 The order is scoped to one document and one OPKS entity kind.  Existing rows
 are ranked by the repository's former read order, ``created_at, entity_id``;

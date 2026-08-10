@@ -1,2 +1,0 @@
-{"schema_version":"turn_eval_transcript_turn.v2","turn_key":"consultant-01","sequence":1,"role":"consultant","locale":"zh-TW","text":"未來有沒有可能承接新的工作?","occurred_offset_seconds":2}
-{"schema_version":"turn_eval_transcript_turn.v2","turn_key":"employee-target","sequence":2,"role":"employee","locale":"zh-TW","text":"如果明年導入新系統,我可能會協助測試,但目前還沒有做。","occurred_offset_seconds":4}

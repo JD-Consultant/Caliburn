@@ -1,27 +1,3 @@
 from app.models.base import Base
-from app.models.interview import (
-    InterviewEvalArtifact,
-    InterviewEvalCapture,
-    InterviewLlmCall,
-    InterviewReviewEvent,
-    InterviewSession,
-    InterviewTurn,
-)
-from app.models.job_profile import (
-    DocumentVersion,
-    JobProfile,
-    User,
-)
 
-__all__ = [
-    "Base",
-    "User",
-    "JobProfile",
-    "DocumentVersion",
-    "InterviewSession",
-    "InterviewEvalCapture",
-    "InterviewEvalArtifact",
-    "InterviewTurn",
-    "InterviewLlmCall",
-    "InterviewReviewEvent",
-]
+__all__ = ["Base"]

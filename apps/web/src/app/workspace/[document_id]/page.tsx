@@ -1,4 +1,4 @@
-import { ConsultationWorkspace } from "@/components/workspace/ConsultationWorkspace";
+import { ConsultationWorkspace } from "./_components/ConsultationWorkspace";
 
 export default async function DocumentWorkspacePage({
   params,

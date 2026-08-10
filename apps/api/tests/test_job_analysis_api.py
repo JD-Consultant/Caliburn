@@ -17,7 +17,7 @@ from app.api.job_analysis_deps import (
 from app.api.routes import job_analysis as job_analysis_routes
 from app.core.model_outcome import OperationOutcome
 from app.job_analysis.application import DocumentRecord, DocumentSummary
-from app.job_analysis.application.durable_turn import _require_verified
+from app.consultation.durable_turn import _require_verified
 from app.task_analysis.operation import TaskAnalysisOperationResult
 from app.task_analysis.verifier import (
     VerificationReport,

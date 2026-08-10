@@ -514,7 +514,8 @@ async def test_three_turn_vertical_runs_the_product_path_on_postgresql(
     # 重送同一個 operation ID 由產品的 replay 短路,不得多花一次呼叫。
     await submit_employee_turn(
         uow_factory,
-        adapter=adapter,
+        task_analysis_adapter=adapter,
+        opks_adapter=adapter,
         document_id=document_id,
         operation_id=SMOKE_TURNS[-1].operation_id,
         text=SMOKE_TURNS[-1].employee_text,

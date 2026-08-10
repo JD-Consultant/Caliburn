@@ -406,7 +406,8 @@ async def run_live_smoke(
         try:
             await submit_employee_turn(
                 uow_factory,
-                adapter=adapter,
+                task_analysis_adapter=adapter,
+                opks_adapter=adapter,
                 document_id=document_id,
                 operation_id=turn.operation_id,
                 text=turn.employee_text,

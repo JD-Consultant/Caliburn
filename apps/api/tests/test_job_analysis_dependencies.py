@@ -13,6 +13,7 @@ CORE_ROOT = API_DIR / "app" / "core"
 DOCUMENTS_ROOT = API_DIR / "app" / "documents"
 TASK_ANALYSIS_ROOT = API_DIR / "app" / "task_analysis"
 OPKS_ROOT = API_DIR / "app" / "opks"
+CONSULTATION_ROOT = API_DIR / "app" / "consultation"
 COMPOSITION_SURFACES = (
     API_DIR / "app" / "api" / "job_analysis_deps.py",
     API_DIR / "app" / "api" / "routes" / "job_analysis.py",
@@ -154,6 +155,48 @@ def test_opks_imports_only_core_stdlib_pydantic_or_itself():
             )
             if not allowed:
                 violations.append(f"{path.relative_to(OPKS_ROOT)}:{line} imports {module}")
+    assert violations == []
+
+
+def test_consultation_imports_only_core_task_analysis_opks_stdlib_pydantic_or_itself():
+    """`app.consultation` 是 ADR 0058 規則 2 唯一的具名例外:orchestrator 可以同時
+    import `app.task_analysis`／`app.opks`,但只能拿它們的 root public API
+    (`__init__.py` curated 的 surface),不得直接 reach into 對方的 implementation
+    file(例如 `app.task_analysis.operation`／`app.opks.generation`)。
+
+    這條規則在 `ast.ImportFrom` 層是可以精確檢查的:`from app.task_analysis import X`
+    的 `node.module` 一律恰好是字串 `"app.task_analysis"`,不管 `X` 是什麼名字;
+    `from app.task_analysis.operation import X` 的 `node.module` 則是
+    `"app.task_analysis.operation"`。所以「只准 root、禁止 submodule」不是用
+    `startswith` 判斷(那會兩者都放行),而是用「必須恰好等於 root 字串」判斷——這與
+    `documents`／`task_analysis`／`opks` 三個既有 guard 對『自己』用
+    `== root or startswith(f"{root}.")`(自己允許 submodule)刻意不同:consultation
+    對外只信任兩個 feature module 的 curated `__init__`,對自己(`app.consultation`)
+    才允許 submodule(`durable_turn.py`／`turn.py` 互相 import)。
+
+    這個檢查不覆蓋 `import app.task_analysis`(不透過 `from`)之後改用屬性存取
+    reach 進 submodule 的邊界案例——repo 現行慣例一律用 `from X import Y`,沒有這種
+    寫法;若未來出現,需要另外補 `ast.Attribute` 層的檢查。
+    """
+    assert CONSULTATION_ROOT.exists(), f"missing feature module: {CONSULTATION_ROOT}"
+    violations = []
+    for path in CONSULTATION_ROOT.rglob("*.py"):
+        for line, module in _imports(path):
+            root = module.split(".", 1)[0]
+            allowed = (
+                root in sys.stdlib_module_names
+                or root == "pydantic"
+                or module == "app.core"
+                or module.startswith("app.core.")
+                or module == "app.consultation"
+                or module.startswith("app.consultation.")
+                or module == "app.task_analysis"
+                or module == "app.opks"
+            )
+            if not allowed:
+                violations.append(
+                    f"{path.relative_to(CONSULTATION_ROOT)}:{line} imports {module}"
+                )
     assert violations == []
 
 

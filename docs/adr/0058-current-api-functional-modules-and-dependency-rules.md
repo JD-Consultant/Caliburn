@@ -47,5 +47,3 @@ Web 依實際 UI responsibility 對齊能力邊界，採 `features/documents`、
 功能名稱會直接反映產品能力，`job_analysis` 不再暗示仍有平行舊 runtime；Task／OPKS／文件／匯出的內聚、公開面與允許依賴可被測試。provider port 與 XLSX renderer 回到正確內外層後，換 adapter 不會迫使 application 依賴具體框架。
 
 代價是大量 import、tests、docs 與 composition 路徑需要分批 move，且 shared core 必須持續防止膨脹。由於 public HTTP、contract 與 table names 保持不變，這是 source-level refactor，不建立相容 shim、第二套路徑或雙軌 runtime。
-
-施工過程中發現的 `core` root-only import 例外、`core/opks_integrity.py` 的規則 7 例外、與 `scripts`／`tests` 的 guard 掃描範圍，三者由 [ADR 0059](0059-core-shared-kernel-boundary-clarifications.md) 正式記錄，不在本 ADR 追記。

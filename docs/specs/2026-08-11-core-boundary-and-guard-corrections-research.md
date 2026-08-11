@@ -114,14 +114,17 @@ Accepted ADR。理由與 ADR 0058 原文已經寫的一致（替代方案 `docum
    有單一聚合 facade。** 這是 Python 生態系「shared kernel」package 常見模式
    （例如 stdlib 的 `os.path`、`collections.abc`、`xml.etree.ElementTree`、
    `urllib.parse` 都是直接 import submodule，沒有一個把全部型別攤平到頂層
-   `__init__.py` 的 facade）；ADR 0058 自己在規則 3 也有「檔案超過 500
-   行、單一 facade 超過 25 個 public names … 必須觸發拆分審查」的門檛，
-   `core` 目前橫跨 domain／state／authority／persistence／journal／errors／
-   model_outcome／opks_integrity 八個子模組、上百個名字，硬塞進一個 facade
-   只會製造一個超大 facade，跟規則 3 的精神衝突。
-2. **建立 `core/__init__.py` root facade**，把八個子模組的 public 型別全部
+   `__init__.py` 的 facade）；ADR 0058 規則 11 後方緊接著的 review-trigger
+   段落訂了「檔案超過 500 行、單一 facade 超過 25 個 public names … 必須
+   觸發拆分審查」的門檛（這段沒有編號，不是規則 3——規則 3 講的是 port
+   ownership，跟這裡無關），`core` 目前橫跨 domain／state／authority／
+   persistence／journal／errors／model_outcome／opks_integrity／
+   portable_schema 九個子模組（`domain` 自己底下還有 task／work_model 等
+   更深的具名 submodule）、上百個名字，硬塞進一個 facade 只會製造一個超大
+   facade，跟這段門檛的精神衝突。
+2. **建立 `core/__init__.py` root facade**，把九個子模組的 public 型別全部
    re-export。會製造一個遠超過 25 個 public names 的巨型 facade，且每次
-   `core` 新增型別都要同步兩處，維護成本高，跟規則 3 的門檛直接衝突。
+   `core` 新增型別都要同步兩處，維護成本高，跟上述門檛直接衝突。
 
 **建議：選項 1**，但一樣要用新 ADR 正式記錄——這是「refine 規則 4，讓 `core`
 比照 shared kernel 慣例免除 root-only 限制」的決策，不是可以只寫在 test

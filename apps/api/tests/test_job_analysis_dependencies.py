@@ -43,9 +43,19 @@ def _resolve_relative_module(package: str, level: int, module: str | None) -> st
     """Resolve a relative `ast.ImportFrom` (`level > 0`) to an absolute dotted
     module string, using the same algorithm as `importlib._bootstrap._resolve_name`
     (PEP 328): walk `level - 1` dots up from `package`, then append `module` (if
-    any — `from . import x` has `module is None`).
+    any — `from . import x` has `module is None`). Raises `ValueError` for a
+    relative import that climbs above the top-level package, mirroring
+    `_resolve_name`'s `ImportError("attempted relative import beyond top-level
+    package")` — such source is unimportable at runtime, so a guard that
+    silently mis-resolved it instead of failing loudly would be worse than
+    useless.
     """
     bits = package.rsplit(".", level - 1)
+    if len(bits) < level:
+        raise ValueError(
+            f"relative import beyond top-level package: package={package!r} "
+            f"level={level} module={module!r}"
+        )
     base = bits[0]
     return f"{base}.{module}" if module else base
 
@@ -236,16 +246,18 @@ def test_api_only_imports_feature_module_roots():
     API,不得直接 reach 進 `app.documents.xxx`／`app.opks.xxx`／
     `app.task_analysis.xxx`／`app.consultation.xxx`／`app.export.xxx` 的
     implementation file(ADR 0058 規則 4)。`app.core` 的 submodule(例如
-    `app.core.persistence`)不在這條規則內——依
+    `app.core.persistence`、`app.core.domain.task`)不在這條規則內——依
     [ADR 0059](../../../docs/adr/0059-core-shared-kernel-boundary-clarifications.md)
     Decision 1,`core` 免除規則 4 的 root-only 限制:它是 shared kernel 而非
-    功能模組,天生要被所有功能模組消費,若把八個子模組的型別全部攤平進單一
-    `core/__init__.py` 會製造巨型 facade;具名 submodule(`core.domain`／
-    `core.state`／`core.authority`／`core.persistence`／`core.journal`／
-    `core.errors`／`core.model_outcome`／`core.opks_integrity`)本身就是
-    public interface,這是 Python 生態系 shared-kernel package 的常見模式
-    (stdlib 的 `os.path`、`collections.abc`、`xml.etree.ElementTree`、
-    `urllib.parse` 皆是直接 import submodule)。
+    功能模組,天生要被所有功能模組消費,若把 `core` 底下所有子模組(含
+    `core.domain` 自己再往下的 `core.domain.task`／`core.domain.work_model`
+    等)的型別全部攤平進單一 `core/__init__.py` 會製造巨型 facade;`core`
+    任意深度的具名 submodule 本身就是 public interface,不是只有列舉在案
+    的才算——這是 Python 生態系 shared-kernel package 的常見模式(stdlib 的
+    `os.path`、`collections.abc`、`xml.etree.ElementTree`、`urllib.parse`
+    皆是直接 import submodule)。下面的檢查邏輯本來就是對 `app.core` 做
+    prefix 比對(`module == "app.core" or module.startswith("app.core.")`),
+    已經涵蓋任意深度,不需要另外維護一份允許的 core submodule 清單。
 
     掃描範圍是 `app/` 整棵樹扣掉 `core`／`documents`／`task_analysis`／`opks`／
     `consultation`／`export` 六個 feature/core package,而不是只掃 `app/api`——

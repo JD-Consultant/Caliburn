@@ -1,7 +1,9 @@
 # Current Application Modularization — 完成報告
 
 **分支：** `refactor/current-application-modules`（分出自 `refactor/current-only-architecture` @ `af7d732`）
-**Tag：** `current-application-modules-v1`（指向 `93f6c7b`，第二輪外部審查修正後重建）
+**Tag：** `current-application-modules-v1`（每輪外部審查修正完都會重新指向當時
+HEAD；執行 `git rev-parse current-application-modules-v1` 取得目前實際指向，
+不在本文件寫死 SHA 以免過期）
 **依據計畫：** [`docs/plans/2026-08-10-current-application-modularization-plan.md`](../plans/2026-08-10-current-application-modularization-plan.md)（8 個 task 全數勾選完成）
 **權威 ADR：** [`docs/adr/0058-current-api-functional-modules-and-dependency-rules.md`](../adr/0058-current-api-functional-modules-and-dependency-rules.md)
 **研究依據：** [`docs/specs/2026-08-10-job-analysis-module-boundaries-research.md`](2026-08-10-job-analysis-module-boundaries-research.md)
@@ -57,8 +59,7 @@ subagent 修正、再審一輪，直到 clean 才進下一個 task。8 個 task 
   規則 7「型別／port」判準的單一已知例外（見下方「第二輪外部審查」）、以及
   `scripts/`／`tests/` 在功能模組依賴圖之外。
 
-共 20 個 commit（模組化本體 15 個 + 第二輪外部審查修正 5 個），205 個檔案，
-+4302/-2972 行。完整 commit 列表：
+模組化本體（8 個 task）固定為 15 個 commit，`af7d732..44bab11`：
 
 ```
 8926248 refactor: extract current authority domain core
@@ -76,11 +77,12 @@ c7a13e7 refactor: organize workspace by feature
 ef090a5 docs: sweep stale paths, tick plan checkboxes, note core watch item
 095dc9c test: close remaining import-guard gaps found in whole-branch review
 44bab11 docs: fix stale jobAnalysisQueries.ts path in web data-layer doc
-1b1d648 docs: write completion report for current application modularization
-648b611 docs: revert improper ADR 0058 edit, add ADR 0059 for core boundary decisions
-1f4fa09 test: resolve relative imports in AST guards, cite ADR 0059 for core's root-only exemption
-93f6c7b test: prove relative-import resolution is wired into _imports/_imported_names, not just correct in isolation
 ```
+
+`44bab11` 之後是完成報告與外部審查修正的 commit，數量隨審查輪次增加，本文件
+不逐一列舉、不重複維護一份會過期的清單——需要目前完整列表時執行
+`git log --oneline 44bab11..HEAD`，或直接看 `git log --oneline af7d732..HEAD`
+看全部。
 
 ## 審查結果
 
@@ -147,8 +149,39 @@ P1（阻塞）與 1 個 P2 發現，逐一驗證後全部屬實：
   完整 pipeline；施工者實際還原修正、確認新測試會紅、再還原修正確認轉綠，證明
   這個測試真的會抓到迴歸，不只是形式上存在。
 
-兩輪修正各自再審一次，全數 Critical／Important 清零，`current-application-modules-v1`
-tag 重新指向修正後的 HEAD（`93f6c7b`）。
+兩個修正各自再審一次，全數 Critical／Important 清零。
+
+### 第三輪外部審查
+
+第二輪修正完成、報告更新後，同一位審核者再核一次，結論「guard 修正有效，
+但仍未通過 merge gate」，指出四點，全部驗證屬實：
+
+1. **P1：ADR 0058 仍被修改。** `648b611` 撤掉了原本的例外文字，但改成加一句
+   指向 ADR 0059 的說明——跟 Accepted 版本 `b9440fd` 比仍有 2 行 diff，不算
+   完全撤回。修正：`git checkout b9440fd -- docs/adr/0058-....md`，確認
+   `git diff b9440fd HEAD -- <file>` 完全乾淨；successor 關係只留在
+   ADR 0059 本文與 `docs/adr/README.md` 索引。
+2. **P2：ADR 0059 的 core 公開介面清單不完整。** 列出的八個子模組漏了
+   production 實際在用的 `core.portable_schema`，也沒講清楚 `core.domain`
+   自己底下的 `core.domain.task`／`core.domain.work_model` 算不算數；第 43
+   行還把 25-public-names 門檛誤稱為「0058 規則 3」（那段其實在規則 11
+   後面，沒有編號，規則 3 講的是完全不相干的 port ownership）。修正：確認
+   guard 對 `app.core` 本來就是 prefix 比對、已涵蓋任意深度，把 ADR 0059
+   的清單改為明講「例子、非窮舉，任意深度的具名 submodule 都算」，補上
+   `portable_schema`，改正規則編號的說法；同一批術語錯誤在
+   `docs/specs/2026-08-11-core-boundary-and-guard-corrections-research.md`
+   與 guard test docstring 裡也一併修正。
+3. **P3：relative resolver 少了 beyond-top 檢查。** `_resolve_relative_module()`
+   對合法 relative import 算得對，但沒有 `len(bits) < level` 邊界檢查，超出
+   top-level package 的 relative import（`importlib` 會丟 `ImportError`）目前
+   會被靜默算出一個錯的 module path，跟 docstring 宣稱的「與 importlib 同款
+   演算法」不完全一致。修正：加上邊界檢查，超界時丟 `ValueError`，寧可guard
+   本身壞掉也不要靜默算錯。
+4. **P3：完成報告有舊資料。** 報告開頭與結尾都寫死 tag 指向 `93f6c7b`，但
+   `4f66079`（更新報告本身那個 commit）已經讓 tag 指向自己，造成報告一寫完
+   立刻過期；「第二輪修正 5 個 commit」的算法也把 `1b1d648`（第一版報告）
+   誤算進第二輪。修正：拿掉文件裡寫死的 tag SHA 與 commit 清單，改成指向
+   `git rev-parse`／`git log` 指令本身，這樣往後每輪都不會再過期。
 
 ## 驗證證據（Final Gate，`docs/plans/...-plan.md` 最後一節）
 
@@ -167,8 +200,12 @@ tag 重新指向修正後的 HEAD（`93f6c7b`）。
   （`test_postgres_rejects_a_task_with_a_dangling_duty_reference`，經 Task
   3／5／6／7 四個獨立 reviewer 各自從 diff 內容確認與本分支任何 commit 無
   因果關係——沒有任何 commit 動過 migration／FK／schema）。
-- `git diff --check`：整條分支（`af7d732..HEAD`，含第二輪修正）乾淨。
+- `git diff --check`：整條分支（`af7d732..HEAD`，含全部審查修正回合）乾淨。
 - 工作樹只剩使用者原有未追蹤檔，無殘留。
+- ADR 0058 對 Accepted 版本 `b9440fd` 的 `git diff`：完全空白（零 diff）。
+
+以上數字（12/12 guard tests、820 passed、717 passed/104 skipped、60 web
+tests）已在第三輪修正後重新全部跑過一次，非沿用第二輪的舊結果。
 
 ## 已知延後項目（非阻塞，供審核者知悉）
 
@@ -202,5 +239,8 @@ npm run check-codegen -w @caliburn/job-analysis-contract
 ## 目前狀態
 
 分支與 worktree（`S:\caliburn\.worktrees\current-application-modules`）保留，
-尚未 merge、未 push。第二輪外部審查的三個發現（2 P1、1 P2）已全數修正並各自
-再審通過；`ADR 0059` 待 owner 核准。等候下一輪人工審核。
+尚未 merge、未 push。三輪外部審查的發現（第二輪 2 P1＋1 P2、第三輪 2 P1＋2 P3）
+已全數修正並逐項重新驗證；`ADR 0058` 對 Accepted 版本零 diff，`ADR 0059`
+待 owner 核准為 `Accepted`——核准後應以獨立 commit 同步把 ADR 狀態與
+`docs/adr/README.md` 索引改為 `Accepted`，之後再做一次簡短的收尾 review。
+等候下一輪人工審核。

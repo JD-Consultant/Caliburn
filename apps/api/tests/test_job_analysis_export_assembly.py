@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from app.job_analysis.application import JobAnalysisState
-from app.job_analysis.application.export import assemble_export_document
-from app.job_analysis.domain import (
+from app.core.state import JobAnalysisState
+from app.export.assembly import assemble_export_document
+from app.core.domain import (
     CurrentJdOpks,
     Duty,
     JdHeader,

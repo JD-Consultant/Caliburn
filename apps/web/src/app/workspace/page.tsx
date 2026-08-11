@@ -1,4 +1,4 @@
-import { DocumentLibrary } from "@/components/workspace/DocumentLibrary";
+import { DocumentLibrary } from "@/features/documents";
 
 export default function WorkspacePage() {
   return <DocumentLibrary />;

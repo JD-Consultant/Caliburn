@@ -4,7 +4,7 @@
 
 ## 現行設計
 
-- [`task-analysis-engine.md`](task-analysis-engine.md) — API `app/job_analysis`、PostgreSQL adapter、`/api/v1/job-analysis` 與 Web `/workspace` 的 durable vertical；它是唯一 active design。
+- [`task-analysis-engine.md`](task-analysis-engine.md) — API `app/core`、`app/documents`、`app/task_analysis`、`app/opks`、`app/consultation`、`app/export`、adapters(`app/adapters/{postgres,openrouter,xlsx}`)、`/api/v1/job-analysis` 與 Web `/workspace` 的 durable vertical；它是唯一 active design。
 
 ## 歷史設計
 

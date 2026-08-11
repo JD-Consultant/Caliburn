@@ -17,7 +17,8 @@ Caliburn 是給員工使用的**本機 Web AI 職務分析與職務說明書應�
 ## 現行架構
 
 - Monorepo 只有 `apps/api`、`apps/web` 與 `packages/job-analysis-contract`；PostgreSQL 是唯一 Docker 基礎服務。
-- API 的 Job Analysis 是唯一 production AI 工作面：`domain` → `application` → `llm/providers`，資料庫邊界在 `app/adapters/job_analysis_postgres`，HTTP 組裝在 `app/api`。
+- API 的 Job Analysis 是唯一 production AI 工作面，依 ADR 0058 拆成功能模組（`core`／`documents`／`task_analysis`／`opks`／`consultation`／`export`）＋ `adapters`（`postgres`／`openrouter`／`xlsx`）＋ `api`（route／mapper／composition root）；細節與依賴規則見 [`ARCHITECTURE.md`](ARCHITECTURE.md#api-邊界) 與 `apps/api/tests/test_job_analysis_dependencies.py`。
+- Authority 規則：員工直接編輯與 AI Proposal 都經同一個 authority commit seam；AI 只能提出候選，員工決策後才能改變 Current JD。provider 呼叫在 transaction 外，commit 前重鎖文件並驗證 generation／read-set。不建立第二份 document store，不把 transport DTO 當 domain truth，不讓 Web 重算 domain invariant。
 - Web 只提供 `/workspace` 與文件詳情頁，吃 `job-analysis-contract` 生成的 TypeScript 契約。
 - 新資料從 current-only migration 0012–0017 建立，舊資料不搬移、不雙寫、不相容。若需開發環境，直接依 runbook 重建資料庫。
 - 已刪除的 `app.interview`、`app.interview_vnext`、`app.job_authoring`、OCS／indexer／embedder／PDF ETL 不得重新 import、wrapper 或接回 production。

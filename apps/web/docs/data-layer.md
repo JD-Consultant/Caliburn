@@ -4,7 +4,7 @@
 
 ## Query keys
 
-`src/lib/jobAnalysisQueries.ts` 定義三組 key：
+`src/shared/query/jobAnalysisQueries.ts` 定義三組 key：
 
 - `job-analysis/documents`：文件庫。
 - `job-analysis/documents/{id}`：單一文件與 Current JD。

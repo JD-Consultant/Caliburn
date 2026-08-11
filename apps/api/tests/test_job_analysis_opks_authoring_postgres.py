@@ -5,20 +5,13 @@ from __future__ import annotations
 import pytest
 from pydantic import ValidationError
 
-from app.adapters.job_analysis_postgres import SqlAlchemyJobAnalysisUnitOfWork
-from app.job_analysis.application import (
-    IdempotencyConflict,
-    OpksDirectEditPayload,
-    OpksItemNotFound,
-    add_jd_task,
-    add_opks_item,
-    create_document,
-    delete_jd_task,
-    delete_opks_item,
-    edit_opks_item,
-    load_document,
-)
-from app.job_analysis.domain import (
+from app.adapters.postgres import SqlAlchemyJobAnalysisUnitOfWork
+from app.documents import add_jd_task, delete_jd_task, load_document
+from app.documents.authoring import create_document
+from app.core.errors import IdempotencyConflict
+from app.core.journal import OpksDirectEditPayload
+from app.opks import OpksItemNotFound, add_opks_item, delete_opks_item, edit_opks_item
+from app.core.domain import (
     JdHeader,
     JdTaskFields,
     OpksEntityKind,
@@ -414,7 +407,7 @@ async def test_indicator_delete_unlinks_knowledge_and_skill_in_the_same_commit(
 
 
 def opks_gap_issue(issue_id: str, task_id: str, *, summary: str = "還看不出這項工作交出什麼"):
-    from app.job_analysis.domain import (
+    from app.core.domain import (
         OpenIssue,
         OpenIssueKind,
         OpksGapAxis,
@@ -437,7 +430,7 @@ def opks_gap_issue(issue_id: str, task_id: str, *, summary: str = "還看不出�
 
 
 def general_issue(issue_id: str = "general-1"):
-    from app.job_analysis.domain import OpenIssue, OpenIssueKind, SourceAnchor
+    from app.core.domain import OpenIssue, OpenIssueKind, SourceAnchor
 
     return OpenIssue(
         id=issue_id,
@@ -460,7 +453,7 @@ async def test_deleting_a_jd_task_removes_its_gap_in_the_same_transaction(
 
     from datetime import timedelta
 
-    from app.job_analysis.domain import CurrentWorkModel
+    from app.core.domain import CurrentWorkModel
 
     document_id = cleanup_job_analysis_rows
     uow_factory = lambda: SqlAlchemyJobAnalysisUnitOfWork(postgres_session_factory)

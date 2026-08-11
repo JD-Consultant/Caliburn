@@ -5,8 +5,8 @@ from __future__ import annotations
 import json
 import re
 
-from app.job_analysis.domain import OpksEntityKind
-from app.job_analysis.llm import (
+from app.core.domain import OpksEntityKind
+from app.opks.llm import (
     OPKS_RESULT_WIRE_SCHEMA_NAME,
     OPKS_WIRE_SCHEMA_PATH,
     OpksDecision,
@@ -17,7 +17,7 @@ from app.job_analysis.llm import (
     opks_wire_to_result,
     render_opks_wire_schema_file,
 )
-from app.job_analysis.llm.portable_schema import (
+from app.core.portable_schema import (
     assert_portable_strict_output_schema,
     schema_complexity,
 )

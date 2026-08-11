@@ -15,9 +15,10 @@ from typing import Any
 import httpx
 import pytest
 
-from app.adapters.job_analysis_postgres import SqlAlchemyJobAnalysisUnitOfWork
-from app.job_analysis.application import load_document, submit_employee_turn
-from app.job_analysis.llm import (
+from app.adapters.postgres import SqlAlchemyJobAnalysisUnitOfWork
+from app.documents import load_document
+from app.consultation import submit_employee_turn
+from app.task_analysis.llm import (
     IdentityRelation,
     SignalDisposition,
     TaskAnalysisWire,
@@ -27,7 +28,7 @@ from app.job_analysis.llm import (
     WireTaskChange,
     WireTaskFields,
 )
-from app.job_analysis.providers import (
+from app.adapters.openrouter import (
     OpenRouterAdapter,
     OpenRouterConfig,
     OpenRouterCatalogError,
@@ -513,7 +514,8 @@ async def test_three_turn_vertical_runs_the_product_path_on_postgresql(
     # 重送同一個 operation ID 由產品的 replay 短路,不得多花一次呼叫。
     await submit_employee_turn(
         uow_factory,
-        adapter=adapter,
+        task_analysis_adapter=adapter,
+        opks_adapter=adapter,
         document_id=document_id,
         operation_id=SMOKE_TURNS[-1].operation_id,
         text=SMOKE_TURNS[-1].employee_text,

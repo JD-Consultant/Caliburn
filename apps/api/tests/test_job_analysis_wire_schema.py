@@ -12,20 +12,20 @@ import re
 
 import pytest
 
-from app.job_analysis.domain import (
+from app.core.domain import (
     EnablerKind,
     ExclusionReason,
     OpenIssueKind,
     RetirementReason,
 )
-from app.job_analysis.application.verifier import ViolationCode
-from app.job_analysis.llm import IdentityRelation, SignalDisposition, TaskChangeKind
-from app.job_analysis.llm.portable_schema import (
+from app.task_analysis.verifier import ViolationCode
+from app.task_analysis.llm import IdentityRelation, SignalDisposition, TaskChangeKind
+from app.core.portable_schema import (
     assert_portable_strict_output_schema,
     compact_strict_output_schema,
     schema_complexity,
 )
-from app.job_analysis.llm.wire import (
+from app.task_analysis.llm.wire import (
     NEUTRAL,
     TASK_ANALYSIS_WIRE_SCHEMA_NAME,
     WIRE_SCHEMA_PATH,
@@ -121,7 +121,7 @@ def test_wire_schema_carries_no_generated_titles():
 
 def visible_to_the_model() -> str:
     """模型實際看得到的全部文字:schema 的 description ＋ Static Instructions。"""
-    from app.job_analysis.llm import TASK_ANALYSIS_INSTRUCTIONS
+    from app.task_analysis.llm import TASK_ANALYSIS_INSTRUCTIONS
 
     found: list[str] = [TASK_ANALYSIS_INSTRUCTIONS]
 
@@ -455,7 +455,7 @@ def test_next_question_target_sentinel_is_carried_by_the_kind_not_the_number():
 def test_committed_wire_schema_matches_the_contract():
     """送給模型的形狀改變時,diff 必須在 review 裡看得見。
 
-    重新產生:`uv run python -c "from app.job_analysis.llm.wire import
+    重新產生:`uv run python -c "from app.task_analysis.llm.wire import
     WIRE_SCHEMA_PATH, render_wire_schema_file;
     WIRE_SCHEMA_PATH.write_text(render_wire_schema_file(), encoding='utf-8',
     newline='\\n')"`

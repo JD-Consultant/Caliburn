@@ -9,16 +9,14 @@ from __future__ import annotations
 import pytest
 from pydantic import ValidationError
 
-from app.job_analysis import domain as domain_package
-from app.job_analysis.application import (
-    ActiveQuestion,
-    ConversationTurn,
-    TurnSpeaker,
+from app.core import domain as domain_package
+from app.core.journal import ActiveQuestion, ConversationTurn, TurnSpeaker
+from app.task_analysis import (
     build_context_packet,
     render_context_packet,
     verify_task_analysis_result,
 )
-from app.job_analysis.domain import (
+from app.core.domain import (
     CurrentWorkModel,
     DomainModel,
     Enabler,
@@ -49,7 +47,7 @@ from app.job_analysis.domain import (
     Task,
     TaskFields,
 )
-from app.job_analysis.llm import (
+from app.task_analysis.llm import (
     IdentityAssessment,
     IdentityRelation,
     NextQuestion,
@@ -699,7 +697,7 @@ def gap_issue(
     terminal=None,
     summary: str = "還看不出這一軸的依據",
 ):
-    from app.job_analysis.domain import (
+    from app.core.domain import (
         OpenIssue,
         OpenIssueKind,
         OpenIssueTerminalResolution,
@@ -731,7 +729,7 @@ def test_only_active_issues_get_an_ordinal():
     回答不出來的缺口——不必靠 prompt 約束。
     """
 
-    from app.job_analysis.domain import OpenIssueTerminalResolutionKind, OpksGapAxis
+    from app.core.domain import OpenIssueTerminalResolutionKind, OpksGapAxis
 
     packet = build(
         work_model=CurrentWorkModel(
@@ -759,7 +757,7 @@ def test_only_active_issues_get_an_ordinal():
 def test_agenda_puts_boundary_questions_before_gaps():
     """決定 21:員工可隨時結束訪談,先問哪一類**會**影響最終覆蓋。"""
 
-    from app.job_analysis.domain import OpenIssueKind, OpksGapAxis
+    from app.core.domain import OpenIssueKind, OpksGapAxis
 
     packet = build(
         work_model=CurrentWorkModel(
@@ -780,7 +778,7 @@ def test_agenda_puts_boundary_questions_before_gaps():
 
 
 def test_settled_issues_render_as_memory_without_an_ordinal():
-    from app.job_analysis.domain import OpenIssueTerminalResolutionKind, OpksGapAxis
+    from app.core.domain import OpenIssueTerminalResolutionKind, OpksGapAxis
 
     packet = build(
         work_model=CurrentWorkModel(

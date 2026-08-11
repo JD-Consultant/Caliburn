@@ -4,10 +4,18 @@ Next.js 本機工作台，只服務現行 Job Analysis API。`/` 導向 `/worksp
 
 ## 結構
 
-- `src/components/workspace/`：文件庫、JD header、Task／Duty／OPKS 編輯、顧問對話與 Proposal 決策。
-- `src/lib/jobAnalysisApi.ts`：唯一 API client。
-- `src/lib/jobAnalysis*.ts`：query、form、export 與 contract mapping 純函式。
-- `src/components/layout/Providers.tsx`：TanStack Query client。
+Web 依 UI responsibility 採 feature-first；`shared` 只放 HTTP／query／通用 UI，不放 domain policy；跨 feature 組裝只在 Next.js app workspace composition（`app/workspace/[document_id]/_components/`）。
+
+- `src/features/documents/`：文件庫、JD header、Duty／Task 員工直接編輯與 readiness 提示。
+- `src/features/consultation/`：Task Proposal 卡片與決策 helper。
+- `src/features/opks/`：OPKS 編輯、Proposal 卡片與 helper。
+- `src/features/export/`：匯出 dirty-state／檔名純函式（無獨立 UI）。
+- `src/shared/api/jobAnalysisApi.ts`：唯一 API client。
+- `src/shared/query/jobAnalysisQueries.ts`：TanStack Query options／keys。
+- `src/shared/ui/`：shadcn-style 通用元件。
+- `src/shared/providers/Providers.tsx`：TanStack Query client。
+- `src/app/workspace/[document_id]/_components/`：`ConsultationPanel`／`ConsultationWorkspace`，因同時協調 Task／OPKS proposal，留在 app 層組裝而非任一 feature 內。
+- `src/architecture.test.ts`：AST 掃 import，擋 `shared → feature`、`feature ↔ feature`、`app` 繞過 feature `index.ts` 的深路徑 import。
 - `packages/job-analysis-contract/`：生成的 TypeScript DTO 來源。
 
 Web 不保留舊 dashboard、OCS editor、interview component、舊 store 或 OCS contract；新功能只能接 `/api/v1/job-analysis` 與現有 Job Analysis contract。

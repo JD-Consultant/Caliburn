@@ -55,7 +55,7 @@ RAG 服務**不在** `npm run up`／`npm run dev` 的預設啟動範圍——那
 
 ```bash
 npm run rag:up      # docker compose --profile rag up -d（qdrant + embedder，GPU）
-npm run rag:down    # docker compose --profile rag down
+npm run rag:down    # docker compose stop qdrant embedder（只停 RAG，db 不動）
 npm run rag:dev     # turbo dev --filter=@caliburn/ocs-indexer（查詢 API :8000）
 ```
 

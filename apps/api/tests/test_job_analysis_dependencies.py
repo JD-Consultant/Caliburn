@@ -157,6 +157,41 @@ def test_relative_imports_resolve_to_absolute_module_path():
     assert _package_for(OPKS_ROOT / "scheduler.py") == "app.opks"
 
 
+def test_imports_and_imported_names_resolve_relative_imports_end_to_end(
+    tmp_path, monkeypatch
+):
+    """Regression proof that `_imports()`/`_imported_names()` — the two
+    functions every guard in this file actually calls — resolve relative
+    imports through the whole pipeline, not just that `_resolve_relative_module()`
+    and `_package_for()` are individually correct (that's
+    `test_relative_imports_resolve_to_absolute_module_path` above, which never
+    calls either of these two functions).
+
+    Without this test, someone could revert `_imports()`/`_imported_names()`
+    to their pre-fix bodies (`node.level == 0`-only, silently dropping every
+    relative `ast.ImportFrom`) while leaving `_resolve_relative_module()` and
+    `_package_for()` fully intact, and every test in this suite — including
+    the canary above — would still pass, because nothing else in the file
+    exercises the two resolver helpers through `_imports()`/`_imported_names()`
+    themselves. `assert violations == []` stays green either way.
+
+    Writes a throwaway `app/opks/scheduler.py` under `tmp_path` containing a
+    real cross-package relative import (`from ..task_analysis import
+    SomePort`, mirroring the hypothetical in the canary above), points
+    `API_DIR` at `tmp_path` for the duration of the test, and asserts the
+    resolved module/name come back through `_imports()`/`_imported_names()`
+    exactly as they would for the absolute-import spelling.
+    """
+    scheduler = tmp_path / "app" / "opks" / "scheduler.py"
+    scheduler.parent.mkdir(parents=True)
+    scheduler.write_text("from ..task_analysis import SomePort\n", encoding="utf-8")
+
+    monkeypatch.setattr(sys.modules[__name__], "API_DIR", tmp_path)
+
+    assert _imports(scheduler) == [(1, "app.task_analysis")]
+    assert _imported_names(scheduler, "app.task_analysis") == [(1, "SomePort")]
+
+
 def _surface_files(roots: tuple[Path, ...]) -> tuple[Path, ...]:
     files: list[Path] = []
     for root in roots:

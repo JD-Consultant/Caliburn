@@ -31,7 +31,7 @@ RAG 供應鏈（`apps/pdf-to-json`／`apps/ocs-indexer`／`apps/embedder`／`pac
 
 ```bash
 npm run rag:up      # docker compose --profile rag up -d（Qdrant + GPU embedder）
-npm run rag:down    # docker compose --profile rag down
+npm run rag:down    # docker compose stop qdrant embedder（只停 RAG，db 不動）
 npm run rag:dev     # turbo dev --filter=@caliburn/ocs-indexer（查詢 API :8000）
 ```
 

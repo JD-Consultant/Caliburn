@@ -48,4 +48,4 @@ Web 依實際 UI responsibility 對齊能力邊界，採 `features/documents`、
 
 代價是大量 import、tests、docs 與 composition 路徑需要分批 move，且 shared core 必須持續防止膨脹。由於 public HTTP、contract 與 table names 保持不變，這是 source-level refactor，不建立相容 shim、第二套路徑或雙軌 runtime。
 
-`core/opks_integrity.py` 是規則 7「型別／port」判準下一個已知且被接受、但需持續留意的例外：它裝的是 OPKS 專屬的 staleness／pruning 政策（含使用者可見的繁中文案），不是純型別或 port，理由是替代方案（讓 `documents → opks` 多一條 edge）更差——這正是未來 `core` 膨脹會長成的樣子，需要持續觀察。
+施工過程中發現的 `core` root-only import 例外、`core/opks_integrity.py` 的規則 7 例外、與 `scripts`／`tests` 的 guard 掃描範圍，三者由 [ADR 0059](0059-core-shared-kernel-boundary-clarifications.md) 正式記錄，不在本 ADR 追記。

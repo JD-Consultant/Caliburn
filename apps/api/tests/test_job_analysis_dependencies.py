@@ -24,38 +24,137 @@ COMPOSITION_SURFACES = (
 )
 
 
+def _package_for(path: Path) -> str:
+    """Dotted package name that `path`'s relative imports resolve against.
+
+    This is `path`'s `__package__` at import time. For a regular submodule
+    (e.g. `app/opks/scheduler.py`) that's its containing directory's dotted
+    name (`"app.opks"`). For a package's own `__init__.py` (e.g.
+    `app/documents/__init__.py`) it's *also* its containing directory's
+    dotted name (`"app.documents"`) — same formula both ways, because
+    Python's `__package__` for a package equals the package's own name, and
+    for a plain module equals its parent package's name, and in both cases
+    that's exactly `path.parent`'s dotted path under `API_DIR`.
+    """
+    return ".".join(path.parent.relative_to(API_DIR).parts)
+
+
+def _resolve_relative_module(package: str, level: int, module: str | None) -> str:
+    """Resolve a relative `ast.ImportFrom` (`level > 0`) to an absolute dotted
+    module string, using the same algorithm as `importlib._bootstrap._resolve_name`
+    (PEP 328): walk `level - 1` dots up from `package`, then append `module` (if
+    any — `from . import x` has `module is None`).
+    """
+    bits = package.rsplit(".", level - 1)
+    base = bits[0]
+    return f"{base}.{module}" if module else base
+
+
 def _imports(path: Path) -> list[tuple[int, str]]:
     tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
     found: list[tuple[int, str]] = []
     for node in ast.walk(tree):
         if isinstance(node, ast.Import):
             found.extend((node.lineno, alias.name) for alias in node.names)
-        elif isinstance(node, ast.ImportFrom) and node.level == 0 and node.module:
-            found.append((node.lineno, node.module))
+        elif isinstance(node, ast.ImportFrom):
+            if node.level == 0:
+                if node.module:
+                    found.append((node.lineno, node.module))
+            else:
+                resolved = _resolve_relative_module(
+                    _package_for(path), node.level, node.module
+                )
+                found.append((node.lineno, resolved))
     return found
 
 
 def _imported_names(path: Path, module_name: str) -> list[tuple[int, str]]:
-    """Names bound by `from <module_name> import X, Y` (level-0 only) in `path`.
+    """Names bound by `from <module_name> import X, Y` in `path`.
 
-    `_imports()` collapses an `ast.ImportFrom` down to its `node.module` string,
-    which is exactly what makes `from app.task_analysis import operation` and
-    `from app.task_analysis import TaskAnalysisModelPort` indistinguishable at
-    that level — both report `module == "app.task_analysis"`. This helper stays
-    static-AST-only like `_imports()`, but also surfaces `node.names` so a
-    caller can check each imported name against a curated surface (e.g.
-    `__all__`), not just the module string.
+    `_imports()` collapses an `ast.ImportFrom` down to its resolved module
+    string, which is exactly what makes `from app.task_analysis import
+    operation` and `from app.task_analysis import TaskAnalysisModelPort`
+    indistinguishable at that level — both report module
+    `"app.task_analysis"`. This helper stays static-AST-only like
+    `_imports()`, but also surfaces `node.names` so a caller can check each
+    imported name against a curated surface (e.g. `__all__`), not just the
+    module string. Relative imports (`node.level > 0`) are resolved via
+    `_resolve_relative_module()` exactly like `_imports()` does, so a
+    relative import that targets `module_name` is not missed just because it
+    was spelled with dots instead of the absolute path.
     """
     tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
     found: list[tuple[int, str]] = []
     for node in ast.walk(tree):
-        if (
-            isinstance(node, ast.ImportFrom)
-            and node.level == 0
-            and node.module == module_name
-        ):
+        if not isinstance(node, ast.ImportFrom):
+            continue
+        if node.level == 0:
+            resolved = node.module
+        else:
+            resolved = _resolve_relative_module(
+                _package_for(path), node.level, node.module
+            )
+        if resolved == module_name:
             found.extend((node.lineno, alias.name) for alias in node.names)
     return found
+
+
+def test_relative_imports_resolve_to_absolute_module_path():
+    """Canary proving `_resolve_relative_module()` correctly resolves relative
+    `ast.ImportFrom` nodes (`node.level > 0`) to the absolute dotted module
+    path that `_imports()`/`_imported_names()` now use for every boundary
+    check in this file — see
+    `docs/specs/2026-08-11-core-boundary-and-guard-corrections-research.md`
+    發現 3(P2)。Before this fix, `node.level > 0` was skipped entirely (the
+    `elif` guarded on `node.level == 0`), so a relative import crossing a
+    forbidden module boundary — e.g. `app/opks/scheduler.py` doing
+    `from ..task_analysis import SomePort` — would pass every guard in this
+    file undetected, because the import never got recorded at all.
+
+    Case 1 is a self-package relative import (matches the real
+    `app/documents/__init__.py` shape): it must resolve to a legitimate
+    `app.documents.*` self-import, not become a new false-positive violation.
+
+    Case 2 is a hypothetical cross-package relative import inside
+    `app/opks/scheduler.py` (package `"app.opks"`): it must resolve to
+    exactly `"app.task_analysis"` — the same module string the opks guard
+    (`test_opks_imports_only_core_stdlib_pydantic_or_itself`) already flags
+    for the equivalent *absolute* import, proving the fix closes the real
+    gap rather than just changing what gets recorded.
+    """
+    documents_init = ast.parse("from .authoring import create_document\n").body[0]
+    assert isinstance(documents_init, ast.ImportFrom)
+    assert (
+        _resolve_relative_module(
+            "app.documents", documents_init.level, documents_init.module
+        )
+        == "app.documents.authoring"
+    )
+
+    opks_scheduler_import = ast.parse(
+        "from ..task_analysis import SomePort\n"
+    ).body[0]
+    assert isinstance(opks_scheduler_import, ast.ImportFrom)
+    assert (
+        _resolve_relative_module(
+            "app.opks", opks_scheduler_import.level, opks_scheduler_import.module
+        )
+        == "app.task_analysis"
+    )
+
+    # Bare `from . import x` (no module segment) resolves to the base package
+    # itself — this is the `module is None` branch of `_resolve_relative_module`.
+    bare_import = ast.parse("from . import x\n").body[0]
+    assert isinstance(bare_import, ast.ImportFrom)
+    assert (
+        _resolve_relative_module("app.documents", bare_import.level, bare_import.module)
+        == "app.documents"
+    )
+
+    # `_package_for()` derives the same two packages from real filesystem
+    # paths without needing the files to exist (it's pure path arithmetic).
+    assert _package_for(DOCUMENTS_ROOT / "__init__.py") == "app.documents"
+    assert _package_for(OPKS_ROOT / "scheduler.py") == "app.opks"
 
 
 def _surface_files(roots: tuple[Path, ...]) -> tuple[Path, ...]:
@@ -102,8 +201,16 @@ def test_api_only_imports_feature_module_roots():
     API,不得直接 reach 進 `app.documents.xxx`／`app.opks.xxx`／
     `app.task_analysis.xxx`／`app.consultation.xxx`／`app.export.xxx` 的
     implementation file(ADR 0058 規則 4)。`app.core` 的 submodule(例如
-    `app.core.persistence`)不在這條規則內——`core` 是共享 kernel,沒有單一
-    curated root 收斂全部型別,直接 import submodule 是既有、被接受的慣例。
+    `app.core.persistence`)不在這條規則內——依
+    [ADR 0059](../../../docs/adr/0059-core-shared-kernel-boundary-clarifications.md)
+    Decision 1,`core` 免除規則 4 的 root-only 限制:它是 shared kernel 而非
+    功能模組,天生要被所有功能模組消費,若把八個子模組的型別全部攤平進單一
+    `core/__init__.py` 會製造巨型 facade;具名 submodule(`core.domain`／
+    `core.state`／`core.authority`／`core.persistence`／`core.journal`／
+    `core.errors`／`core.model_outcome`／`core.opks_integrity`)本身就是
+    public interface,這是 Python 生態系 shared-kernel package 的常見模式
+    (stdlib 的 `os.path`、`collections.abc`、`xml.etree.ElementTree`、
+    `urllib.parse` 皆是直接 import submodule)。
 
     掃描範圍是 `app/` 整棵樹扣掉 `core`／`documents`／`task_analysis`／`opks`／
     `consultation`／`export` 六個 feature/core package,而不是只掃 `app/api`——

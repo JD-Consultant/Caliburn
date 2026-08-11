@@ -1,0 +1,253 @@
+{
+  "version_info": {
+    "versions": [
+      {
+        "version": "V4",
+        "ocs_code": "FSI2412-004v4",
+        "ocs_name": "期貨信託基金經理人",
+        "status": "最新版本",
+        "update_note": "因應產業需求，檢視更新職能內涵。",
+        "update_date": "2023/11/15"
+      },
+      {
+        "version": "V3",
+        "ocs_code": "FSI2412-004v3",
+        "ocs_name": "期貨信託基金經理人",
+        "status": "歷史版本",
+        "update_note": "已被《FSI2412-004v4》取代",
+        "update_date": "2020/11/27"
+      },
+      {
+        "version": "V2",
+        "ocs_code": "FSI2412-004v2",
+        "ocs_name": "期貨信託基金經理人",
+        "status": "歷史版本",
+        "update_note": "已被《FSI2412-004v3》取代",
+        "update_date": "2017/12/31"
+      },
+      {
+        "version": "V1",
+        "ocs_code": "FSI2412-004v1",
+        "ocs_name": "期貨信託基金經理人",
+        "status": "歷史版本",
+        "update_note": "已被《FSI2412-004v2》取代",
+        "update_date": "2015/12/31"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "ocs_code": "FSI2412-004v4",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "期貨信託基金經理人"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "金融財務/證券及投資",
+          "code": "FSI"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "期貨信託基金經理人",
+          "code": "2412"
+        }
+      ],
+      "industries": [
+        {
+          "name": "金融及保險業/證券期貨及金融輔助業(俗稱「期貨業」)",
+          "code": "K6640"
+        }
+      ]
+    },
+    "job_description": "基金管理及操作運用",
+    "ocs_level": 4
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "基金資產配置與管理",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "交易研究、分析、決定、執行、風險\n控管及交\n易檢討等\n各項工作"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "訂定管理基金規模長幅度。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.1.1",
+                    "name": "撰寫研究分析、交易決定報告及交易執行工作"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K04",
+                    "name": "金融市場"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "法律/法規"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "風險管理"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "投資管理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "外部環境認知與評估"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "策略性思考"
+                  },
+                  {
+                    "code": "S22",
+                    "name": "閱讀能力"
+                  },
+                  {
+                    "code": "S24",
+                    "name": "資訊科技應用能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.2",
+                "name": "量化交易策略及交易標的研究"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "訂定基金淨值及績效表現。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.1.1",
+                    "name": "撰寫虧損預警與檢討報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K06",
+                    "name": "金融商品"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "產業分析"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "外語能力"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S07",
+                    "name": "品質導向"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "成果導向"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "分析與解讀能力"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "時間管理"
+                  },
+                  {
+                    "code": "S13",
+                    "name": "問題分析"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "問題解決"
+                  },
+                  {
+                    "code": "S16",
+                    "name": "創新能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "主動積極"
+      },
+      {
+        "code": "A02",
+        "name": "正直誠實"
+      },
+      {
+        "code": "A04",
+        "name": "持續學習"
+      },
+      {
+        "code": "A07",
+        "name": "追求卓越"
+      },
+      {
+        "code": "A08",
+        "name": "團隊意識"
+      },
+      {
+        "code": "A10",
+        "name": "壓力容忍"
+      },
+      {
+        "code": "A11",
+        "name": "應對不確定性"
+      },
+      {
+        "code": "A12",
+        "name": "好奇開放"
+      },
+      {
+        "code": "A14",
+        "name": "謹慎細心"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "擔任此職類／職業之學歷／經歷／或能力條件：無"
+    ],
+    "supplements": []
+  }
+}

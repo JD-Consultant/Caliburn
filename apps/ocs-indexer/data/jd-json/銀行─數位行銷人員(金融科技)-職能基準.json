@@ -1,0 +1,511 @@
+{
+  "version_info": {
+    "versions": [
+      {
+        "version": "V3",
+        "ocs_code": "FFN2412-002v3",
+        "ocs_name": "銀行─數位行銷人員",
+        "status": "最新版本",
+        "update_note": "略",
+        "update_date": "2023/01/06"
+      },
+      {
+        "version": "V2",
+        "ocs_code": "FFN2412-002v2",
+        "ocs_name": "銀行─數位行銷人員",
+        "status": "歷史版本",
+        "update_note": "已被《FFN2412-002v3》取代",
+        "update_date": "2020/01/16"
+      },
+      {
+        "version": "V1",
+        "ocs_code": "FFN2412-002v1",
+        "ocs_name": "銀行─數位行銷人員",
+        "status": "歷史版本",
+        "update_note": "已被《FFN2412-002v2》取代",
+        "update_date": "2016/12/31"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "ocs_code": "FFN2412-002v3",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "銀行─數位行銷人員（屬金融科技*人才）"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "金融財務/財務",
+          "code": "FFN"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "財務及投資顧問",
+          "code": "2412"
+        }
+      ],
+      "industries": [
+        {
+          "name": "金融及保險業/金融服務業(銀行業)",
+          "code": "K6412"
+        }
+      ]
+    },
+    "job_description": "針對數據分析所提供的客群資料，對每一個客群構思、發想適當的行銷策略與活動，提高客戶向心力並提升銷售績效，以促進業務關係發展，\n進而降低銷售成本。",
+    "ocs_level": 3
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "針對目標客群進行策略規劃及目標市場定位",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "確認目標客群與推行商品之關聯性與合理性"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "客戶詢問或購買商品之頻率及比率。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.1.1",
+                    "name": "提出配合目標客群之建議商品"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K04",
+                    "name": "金融市場"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "金融商品"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "行銷策略"
+                  },
+                  {
+                    "code": "K14",
+                    "name": "統計"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "外部環境認知與評估"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "有效連結"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "分析與解讀能力"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "規劃與組織能力"
+                  },
+                  {
+                    "code": "S26",
+                    "name": "量化分析技術"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.2",
+                "name": "整合市場和客戶的商品需求，提出新客群\n之規劃方向或改\n良現有產品"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.2.1",
+                    "text": "執行商品與目標客戶群間之行銷規劃。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.2.1",
+                    "name": "目標客群商品組合改進報告或現有商品調整建議"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K04",
+                    "name": "金融市場"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "金融商品"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "產業分析"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "行銷策略"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "外部環境認知與評估"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "價值判斷"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "分析與解讀能力"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "規劃與組織能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "依據數據分析資料,整合商品與通路端的資源運用",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "對跨部門間進行溝通協調,達成資源整合與提供最佳解決方案"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "擬定各商品線透過數位通路之發展策略及新商品開發方向。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.1.1",
+                    "name": "跨部門行銷規劃方案"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K04",
+                    "name": "金融市場"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "金融商品"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "企業管理"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "行銷策略"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S08",
+                    "name": "成果導向"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "規劃與組織能力"
+                  },
+                  {
+                    "code": "S18",
+                    "name": "溝通能力"
+                  },
+                  {
+                    "code": "S19",
+                    "name": "協調能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.2",
+                "name": "監督商品與通路合作之銷售過程及成果"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.2.1",
+                    "text": "落實行銷與商品面之各種配合行動。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.2.1",
+                    "name": "行銷規劃方案成果追蹤"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K02",
+                    "name": "財務分析"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "金融商品"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "企業管理"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "行銷策略"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S06",
+                    "name": "影響力"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "成果導向"
+                  },
+                  {
+                    "code": "S15",
+                    "name": "團隊合作"
+                  },
+                  {
+                    "code": "S20",
+                    "name": "說服能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T3",
+        "ocu_name": "透過數位通路的開展、改良,保持良好客戶關係與銷售體驗",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T3.1",
+                "name": "經營媒體社群,推廣良好銷售經驗分享與行銷活動宣達"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.1.1",
+                    "text": "透過媒體社群行銷活動之有效性與成本效益分析。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.1.1",
+                    "name": "媒體社群經營計畫與經費預估"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K06",
+                    "name": "金融商品"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "企業管理"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "行銷策略"
+                  },
+                  {
+                    "code": "K15",
+                    "name": "科技發展"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "人脈拓展"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "價值判斷"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "品質導向"
+                  },
+                  {
+                    "code": "S23",
+                    "name": "文書撰寫能力"
+                  },
+                  {
+                    "code": "S24",
+                    "name": "資訊科技應用能力"
+                  },
+                  {
+                    "code": "S25",
+                    "name": "績效管理"
+                  },
+                  {
+                    "code": "S27",
+                    "name": "預算編制"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.2",
+                "name": "從事行內與行外有關數位金融宣導之行銷活動或教育訓練"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.2.1",
+                    "text": "外部客戶與內部員工對於數位金融概念之建立與運用。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.2.1",
+                    "name": "數位金融概念宣導與產品教育訓練"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K06",
+                    "name": "金融商品"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "人力資源"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "行銷策略"
+                  },
+                  {
+                    "code": "K15",
+                    "name": "科技發展"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "人脈拓展"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "價值判斷"
+                  },
+                  {
+                    "code": "S17",
+                    "name": "正確傾聽"
+                  },
+                  {
+                    "code": "S18",
+                    "name": "溝通能力"
+                  },
+                  {
+                    "code": "S23",
+                    "name": "文書撰寫能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "主動積極"
+      },
+      {
+        "code": "A02",
+        "name": "正直誠實"
+      },
+      {
+        "code": "A03",
+        "name": "親和力"
+      },
+      {
+        "code": "A04",
+        "name": "持續學習"
+      },
+      {
+        "code": "A08",
+        "name": "團隊意識"
+      },
+      {
+        "code": "A11",
+        "name": "應對不確定性"
+      },
+      {
+        "code": "A12",
+        "name": "好奇開放"
+      },
+      {
+        "code": "A14",
+        "name": "謹慎細心"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "金融科技（Financial technology, 縮寫: FinTech）：企業（包括金融與非金融機構）運用各種科技型態，以增進金融服務管理、業務效率及風險控制所形成的一",
+      "種經濟模式。",
+      "對銀行商品及運作有充分瞭解，具備探究數字背後成因及相當程度之行銷經驗者。"
+    ],
+    "supplements": []
+  }
+}

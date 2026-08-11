@@ -1,0 +1,1615 @@
+{
+  "version_info": {
+    "versions": [
+      {
+        "version": "V4",
+        "ocs_code": "SET1223-001v4",
+        "ocs_name": "醫療器材產業醫療電子器材研發工程師",
+        "status": "最新版本",
+        "update_note": "因應產業需求，檢視更新職能內涵。",
+        "update_date": "2023/12/31"
+      },
+      {
+        "version": "V3",
+        "ocs_code": "SET1223-001v3",
+        "ocs_name": "醫療器材產業醫療電子器材研發工程師",
+        "status": "歷史版本",
+        "update_note": "SET1223-001v4",
+        "update_date": "2021/01/18"
+      },
+      {
+        "version": "V2",
+        "ocs_code": "SET1223-001v2",
+        "ocs_name": "醫療器材產業醫療電子器材研發工程師",
+        "status": "歷史版本",
+        "update_note": "SET1223-001v3",
+        "update_date": "2017/12/31"
+      },
+      {
+        "version": "V1",
+        "ocs_code": "SET1223-001v1",
+        "ocs_name": "醫療器材產業醫療電子器材研發工程師",
+        "status": "歷史版本",
+        "update_note": "SET1223-001v2",
+        "update_date": "2012/06/30"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "ocs_code": "SET1223-001v4",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "醫療器材產業醫療電子器材研發工程師"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "科學",
+          "code": "SET"
+        },
+        {
+          "name": "技術",
+          "code": "SET"
+        },
+        {
+          "name": "工程",
+          "code": "SET"
+        },
+        {
+          "name": "數學/工程及技術",
+          "code": "SET"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "醫療器材產業醫療電子器材研發工程師",
+          "code": "1223"
+        }
+      ],
+      "industries": [
+        {
+          "name": "製造業/其他製造業",
+          "code": "C3329"
+        }
+      ]
+    },
+    "job_description": "依據臨床及法規要求，應用工程學、生物學與生物物理原理等知識來設計與開發醫療電子器材【註 1】，在品質管理系統規範下執行設計規劃、設計\n活動、設計審查、設計查證、設計確認、設計移轉與設計變更，完成安全性與功效性測試與評估，建立設計相關文件與資料。",
+    "ocs_level": 4
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "設計規劃",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "瞭解醫療器材法規、產品相關標\n準指引及\n各國法規\n驗證要求"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "可完整地蒐集法規、標準與驗證資料,並分析市場、專利及使用者特性,根據分析結果訂定出具體可行的產品開發方向與目標(定義產品規格)。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.1.1",
+                    "name": "設計可行性分析報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "各國醫療器材法規:如我國 醫療器材法規...等、美國醫療器材 法規USFD&CAct...等、歐盟醫療"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "品質管理系統法規標準:如 ISO13485:2016醫療器材品質 管理系統標準...等及QMS...等"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "蒐集醫療器材法規資料的能 力"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "懂得相關語言能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.2",
+                "name": "收集目標市場產品資訊"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.2.1",
+                    "text": "可完整地蒐集市場及產品資訊並分析產品特性,根據分析結果訂定新產品設計開發計畫書。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.2.1",
+                    "name": "新產品設計開發計畫書"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "各國醫療器材法規:如我國 醫療器材法規...等、美國醫療器材 法規USFD&CAct...等、歐盟醫療 器材法規EU2017/745 (MDR)...等"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "懂得相關語言能力"
+                  },
+                  {
+                    "code": "S18",
+                    "name": "收集市場產品資訊"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.3",
+                "name": "分析臨床使用者特性"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.3.1",
+                    "text": "可與臨床使用者溝通,瞭解臨床上未被滿足的需求,並提出需求報告。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.3.1",
+                    "name": "臨床需求報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "各國醫療器材法規:如我國 醫療器材法規...等、美國醫療器材 法規USFD&CAct...等、歐盟醫療 器材法規EU2017/745 (MDR)...等"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S17",
+                    "name": "臨床使用者意見調查、分析 及彙整"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.4",
+                "name": "專利分析與佈局"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.4.1",
+                    "text": "孰悉專利檢所與特徵分析鑑別新產品專利與規格資訊,以了解該技術之技術特徵,並提出分析專利結果報告以訂定出具體可行的產品開發方向與目標。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.4.1",
+                    "name": "專利分析報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K03",
+                    "name": "具有鑑別專利、專利侵權分 析與其開發產品之專利與規格資 訊"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S19",
+                    "name": "專利智財檢索能力"
+                  },
+                  {
+                    "code": "S20",
+                    "name": "專案管理"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "設計輸入",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "訂定產品開發/改良目標"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 4,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "能清楚地定義新產品預期用途、法規、風險、性能與安全需求。"
+                  },
+                  {
+                    "code": "P2.1.2",
+                    "text": "分析競爭產品。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.1.1",
+                    "name": "產品描述包括預期用途、人因/可使用性要求、安全性要求、可靠度要求"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K04",
+                    "name": "具備市場競爭產品資料蒐集 及產品臨床應用需求重點【註2】"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S03",
+                    "name": "醫療器材風險分析:如 ISO14971: 2019,ISO/TR24971: 2020,IEC60812 (FMEA),IEC61025 (FTA),IEC61882,Hazardando perabilitystudies (HAZOPstudies)"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "醫療器材可使用性分析:如 IEC62366-1:2021"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.2",
+                "name": "制定設計輸入包括功能、性能、規格、製造流程"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 4,
+                "indicators": [
+                  {
+                    "code": "P2.2.1",
+                    "text": "能夠設計出符合顧客需求的產品功能、性能、規格,並設計其製造流程。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.2.1",
+                    "name": "產品適用法規、標準與類似品技術文件"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K05",
+                    "name": "電性安全標準:如 IEC60601-1...等"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "電磁相容性標準:如 IEC60601-1-2...等"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "醫電設備警報系統(Alarm- System):如IEC60601-1-8: 2006、醫療器材符號標示 ISO15223-1:2021"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "軟體驗證標準:如 IEC62304...等"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "醫療資料傳輸交換標準:如 IEEE11073-X,HL7,DICOM...等"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "輻射安全:如IEC60601-1- 3...等"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "生物相容性標準:如 ISO10993-1:2018),FDA"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "滅菌標準:如ISO11135: 2014...等"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "IEEE標準"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S05",
+                    "name": "醫療器材人因工程:如 IEC62366-1,IEC62366-2,FDA人 因工程指引"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.3",
+                "name": "訂定安全性與功效性評估標準"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 4,
+                "indicators": [
+                  {
+                    "code": "P2.3.1",
+                    "text": "訂定出符合顧客需求的產品安全及功效評估標準。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.3.1",
+                    "name": "風險分析與評估報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K05",
+                    "name": "電性安全標準:如 IEC60601-1...等"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "電磁相容性標準:如 IEC60601-1-2...等"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "醫電設備警報系統 (AlarmSystem):如 IEC60601-1-8:2006、醫療器材 符號標示ISO15223-1:2021"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "軟體驗證標準:如 IEC62304...等"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "醫療資料傳輸交換標準:如 IEEE11073-X,HL7,DICOM...等"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "輻射安全:如IEC60601-1- 3...等"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "生物相容性標準:如 ISO10993-1:2018),FDA"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "滅菌標準:如ISO11135: 2014...等"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "IEEE標準"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S05",
+                    "name": "醫療器材人因工程:如 IEC62366-1,IEC62366-2,FDA人 因工程指引"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.4",
+                "name": "執行風險評估"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 4,
+                "indicators": [
+                  {
+                    "code": "P2.4.1",
+                    "text": "依據不同風險思維,評估產品功能風險及使用者風險。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.4.1",
+                    "name": "風險評估報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K14",
+                    "name": "人因工程學"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S05",
+                    "name": "醫療器材人因工程:如 IEC62366-1,IEC62366-2,FDA人 因工程指引"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T3",
+        "ocu_name": "設計輸出",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T3.1",
+                "name": "進行系統與模組設計,例如人機介面等"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 2,
+                "indicators": [
+                  {
+                    "code": "P3.1.1",
+                    "text": "能夠正確組裝出符合系統與模組設計規格之原型機。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.1.1",
+                    "name": "原料/組件/半成品規格、圖樣、零件與材料清單、製程流程與規格、檢驗規格與允收基準、包裝規格、仿單標籤與說明書草稿"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K15",
+                    "name": "產品個別標準"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S06",
+                    "name": "可製造性分析 (Designformanufacturing)"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "技術文件閱讀/撰寫能力:如 label撰寫,醫療器材中文說明書編 寫原則...等"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.2",
+                "name": "開發及驗證(查證)軟體"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 2,
+                "indicators": [
+                  {
+                    "code": "P3.2.1",
+                    "text": "能夠開發驗證軟體。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.2.1",
+                    "name": "軟體程式(原始碼)"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K16",
+                    "name": "具備系統與模組設計開發能 力,如IEC62304,TFDA醫療確校 指引,FDA醫療軟體指引,韌體與軟 體、執行軟體驗證及軟體驗證 (查證)標準...等"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S06",
+                    "name": "可製造性分析 (Designformanufacturing)"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "程式語言軟體實務"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "電腦繪圖軟體使用能力:如 CAD,CAM...等"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "技術文件閱讀/撰寫能力:如 label撰寫,醫療器材中文說明書編 寫原則...等"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.3",
+                "name": "確認產品設計規格、測試計畫、測試流程"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 2,
+                "indicators": [
+                  {
+                    "code": "P3.3.1",
+                    "text": "能夠訂定系統整合之流程,包括產品設計規格、測試計畫、測試流程,並提出設計開發紀錄報告。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.3.1",
+                    "name": "設計開發紀錄"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K15",
+                    "name": "產品個別標準"
+                  },
+                  {
+                    "code": "K17",
+                    "name": "可靠度分析:如可靠度設計... 等"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S06",
+                    "name": "可製造性分析 (Designformanufacturing)"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "技術文件閱讀/撰寫能力:如 label撰寫,醫療器材中文說明書編 寫原則...等"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.4",
+                "name": "組裝原型機"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 2,
+                "indicators": [
+                  {
+                    "code": "P3.4.1",
+                    "text": "依標準作業程序組裝原型機,並進行功能及產品可行性分析報告。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.4.1",
+                    "name": "製造標準作業程序"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K17",
+                    "name": "可靠度分析:如可靠度設計... 等"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S06",
+                    "name": "可製造性分析 (Designformanufacturing)"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "性能最佳化設計"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "技術文件閱讀/撰寫能力:如 label撰寫,醫療器材中文說明書編 寫原則...等"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.5",
+                "name": "建立製造流程包括程序書、工藝標準書"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 2,
+                "indicators": [
+                  {
+                    "code": "P3.5.1",
+                    "text": "依據產品設計規劃,完成可供製造的標準作業程序報告書。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.5.1",
+                    "name": "檢驗標準作業程序"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K17",
+                    "name": "可靠度分析:如可靠度設計... 等"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S06",
+                    "name": "可製造性分析 (Designformanufacturing)"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "性能最佳化設計"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "技術文件閱讀/撰寫能力:如 label撰寫,醫療器材中文說明書編 寫原則...等"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T4",
+        "ocu_name": "設計審查",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T4.1",
+                "name": "審查產品設計週期的要求、規格與開發計畫進度"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 5,
+                "indicators": [
+                  {
+                    "code": "P4.1.1",
+                    "text": "依據設計審查會議標準,維持設計輸入與輸出的一致性,定期完成設計要求、規格與開發計畫進度成果報告。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.1.1",
+                    "name": "設計審查會議資料"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K03",
+                    "name": "具有鑑別專利、專利侵權分 析與其開發產品之專利與規格資 訊"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S11",
+                    "name": "溝通/會議技巧"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T4.2",
+                "name": "驗證(查證)原型機"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 5,
+                "indicators": [
+                  {
+                    "code": "P4.2.1",
+                    "text": "確認原型機的安全性及功能。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.2.1",
+                    "name": "查驗報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K03",
+                    "name": "具有鑑別專利、專利侵權分 析與其開發產品之專利與規格資 訊"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S21",
+                    "name": "運用醫工知識操作儀器"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T4.3",
+                "name": "審查風險分析與評估報告"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 5,
+                "indicators": [
+                  {
+                    "code": "P4.3.1",
+                    "text": "確保所有生產規格與文件均經過審查,產出風險分析與評估報告審查紀錄。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.3.1",
+                    "name": "產出風險分析與評估報告審查紀錄"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K05",
+                    "name": "電性安全標準:如 IEC60601-1...等"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S03",
+                    "name": "醫療器材風險分析:如 ISO14971: 2019,ISO/TR24971: 2020,IEC60812 (FMEA),IEC61025 (FTA),IEC61882,Hazardando perabilitystudies (HAZOPstudies)"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "醫療器材可使用性分析:如 IEC62366-1:2021"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T4.4",
+                "name": "決定設計改善措施"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 5,
+                "indicators": [
+                  {
+                    "code": "P4.4.1",
+                    "text": "具設計改善執行能力。"
+                  },
+                  {
+                    "code": "P4.4.2",
+                    "text": "依設計改善建議,進行系統診斷與分析提出具可行性的解決方案。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.4.1",
+                    "name": "產出設計改善報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K05",
+                    "name": "電性安全標準:如 IEC60601-1...等"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "電磁相容性標準:如 IEC60601-1-2...等"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "軟體驗證標準:如 IEC62304...等"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "醫療資料傳輸交換標準:如 IEEE11073-X,HL7,DICOM...等"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "輻射安全:如IEC60601-1- 3...等"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "生物相容性標準:如 ISO10993-1:2018),FDA"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "滅菌標準:如ISO11135: 2014...等"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "IEEE標準"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S04",
+                    "name": "醫療器材可使用性分析:如 IEC62366-1:2021"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "醫療器材人因工程:如 IEC62366-1,IEC62366-2,FDA人 因工程指引"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T5",
+        "ocu_name": "設計驗證(查證)",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T5.1",
+                "name": "執行安全性與功效性比對測試、查證"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 4,
+                "indicators": [
+                  {
+                    "code": "P5.1.1",
+                    "text": "能夠依據相關標準,確實完成產品安全與功效性測試,並確認產品符合設計輸入要求。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O5.1.1",
+                    "name": "產品查證計畫及測試報告【註3】"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K15",
+                    "name": "產品個別標準"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S12",
+                    "name": "品管技巧:如 Taguchimethod...等"
+                  },
+                  {
+                    "code": "S13",
+                    "name": "基本統計及計算能力"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "資料統計分析軟體應用"
+                  },
+                  {
+                    "code": "S15",
+                    "name": "實驗設計"
+                  },
+                  {
+                    "code": "S22",
+                    "name": "同類產品比對分析"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T5.2",
+                "name": "評估實際或實驗室模擬使用環境的安全與功效"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 4,
+                "indicators": [
+                  {
+                    "code": "P5.2.1",
+                    "text": "能進行系統診斷與分析提出具可行性的解決方案。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O5.2.1",
+                    "name": "實際或實驗室模擬使用報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K15",
+                    "name": "產品個別標準"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S12",
+                    "name": "品管技巧:如 Taguchimethod...等"
+                  },
+                  {
+                    "code": "S13",
+                    "name": "基本統計及計算能力"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "資料統計分析軟體應用"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T6",
+        "ocu_name": "設計確校",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T6.1",
+                "name": "確認類似設計與材質具臨床安全\n性及符合\n預定功能"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 5,
+                "indicators": [
+                  {
+                    "code": "P6.1.1",
+                    "text": "可於臨床試驗或評估的過程中,確認產品符合使用者的需求,並協助完成臨床試驗或評估報告。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O6.1.1",
+                    "name": "臨床資料包括臨床試驗程序/計畫、臨床試驗報告、性能評估報告等"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K18",
+                    "name": "臨床試驗:如ISO14155: 2020標準"
+                  },
+                  {
+                    "code": "K19",
+                    "name": "臨床評估:如GHT- FSG5docu- ments&MEDDEV2.7.1Rev4"
+                  },
+                  {
+                    "code": "K20",
+                    "name": "醫學倫理:如個人資料保護 法,DeclarationofHelsinki,TFDA 醫療器材臨床試驗規範...等"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S10",
+                    "name": "技術文件閱讀/撰寫能力:如 label撰寫,醫療器材中文說明書編 寫原則...等"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "溝通/會議技巧"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "品管技巧:如 Taguchimethod...等"
+                  },
+                  {
+                    "code": "S13",
+                    "name": "基本統計及計算能力"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "資料統計分析軟體應用"
+                  },
+                  {
+                    "code": "S15",
+                    "name": "實驗設計"
+                  },
+                  {
+                    "code": "S16",
+                    "name": "臨床評估計劃與執行"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T6.2",
+                "name": "協助臨床試驗或評估"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 5,
+                "indicators": [
+                  {
+                    "code": "P6.2.1",
+                    "text": "具備臨床試驗(IRB)文件撰寫能力或510K測試規劃能力。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O6.2.1",
+                    "name": "臨床試驗(IRB)文件或510K測試規劃書"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K18",
+                    "name": "臨床試驗:如ISO14155: 2020標準"
+                  },
+                  {
+                    "code": "K19",
+                    "name": "臨床評估:如GHT- FSG5docu- ments&MEDDEV2.7.1Rev4"
+                  },
+                  {
+                    "code": "K20",
+                    "name": "醫學倫理:如個人資料保護 法,DeclarationofHelsinki,TFDA 醫療器材臨床試驗規範...等"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S10",
+                    "name": "技術文件閱讀/撰寫能力:如 label撰寫,醫療器材中文說明書編 寫原則...等"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "溝通/會議技巧"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "品管技巧:如 Taguchimethod...等"
+                  },
+                  {
+                    "code": "S13",
+                    "name": "基本統計及計算能力"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "資料統計分析軟體應用"
+                  },
+                  {
+                    "code": "S15",
+                    "name": "實驗設計"
+                  },
+                  {
+                    "code": "S16",
+                    "name": "臨床評估計劃與執行"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T7",
+        "ocu_name": "設計移轉",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T7.1",
+                "name": "規劃生產線及品管程序"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P7.1.1",
+                    "text": "能撰寫符合訓練目標的教材,協助製程與檢驗人員順利執行產品生產製造。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O7.1.1",
+                    "name": "製造環境與設備規劃書"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K15",
+                    "name": "產品個別標準"
+                  },
+                  {
+                    "code": "K21",
+                    "name": "制定生產QC標準與標準品"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S10",
+                    "name": "技術文件閱讀/撰寫能力:如 label撰寫,醫療器材中文說明書編 寫原則...等"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T7.2",
+                "name": "開發與製作治夾具"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P7.2.1",
+                    "text": "能夠開發出適用於產品的製具。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O7.2.1",
+                    "name": "生產製具"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K15",
+                    "name": "產品個別標準"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S06",
+                    "name": "可製造性分析 (Designformanufacturing)"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T7.3",
+                "name": "協助設備確效"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P7.3.1",
+                    "text": "能夠規劃高效能及高品質之生產流程。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O7.3.1",
+                    "name": "製程確效計畫書與報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K15",
+                    "name": "產品個別標準"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S11",
+                    "name": "溝通/會議技巧"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T7.4",
+                "name": "執行製程與檢驗人員訓練"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P7.4.1",
+                    "text": "協助維持生產設備的效能,使產品順利生產。"
+                  },
+                  {
+                    "code": "P7.4.2",
+                    "text": "能夠確實掌握適用的軟硬體版本。"
+                  },
+                  {
+                    "code": "P7.4.3",
+                    "text": "能夠隨著設計流程各階段產出設計過程的技術文件。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O7.4.1",
+                    "name": "訓練教材"
+                  },
+                  {
+                    "code": "O7.4.2",
+                    "name": "製造標準作業程序"
+                  },
+                  {
+                    "code": "O7.4.3",
+                    "name": "檢驗標準作業程序"
+                  },
+                  {
+                    "code": "O7.4.4",
+                    "name": "QC工程表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K15",
+                    "name": "產品個別標準"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S12",
+                    "name": "品管技巧:如 Taguchimethod...等"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T8",
+        "ocu_name": "設計變更",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T8.1",
+                "name": "執行風險評估"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 4,
+                "indicators": [
+                  {
+                    "code": "P8.1.1",
+                    "text": "能廣泛收集生產與生產後資訊的顧客回饋及風險評估、不良事件等資訊來改良產品。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O8.1.1",
+                    "name": "設計變更審查紀錄"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "各國醫療器材法規:如我國 醫療器材法規...等、美國醫療器材 法規USFD&CAct...等、歐盟醫療 器材法規EU2017/745(MDR)...等"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S03",
+                    "name": "醫療器材風險分析:如 ISO14971: 2019,ISO/TR24971: 2020,IEC60812"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "醫療器材可使用性分析:如 IEC62366-1:2021"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T8.2",
+                "name": "執行法規符合性審查"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 4,
+                "indicators": [
+                  {
+                    "code": "P8.2.1",
+                    "text": "能夠評估法規要求及考量風險分析結果,進行最佳化設計變更。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O8.2.1",
+                    "name": "風險分析與評估報告"
+                  },
+                  {
+                    "code": "O8.2.2",
+                    "name": "製造標準作業程序"
+                  },
+                  {
+                    "code": "O8.2.3",
+                    "name": "檢驗標準作業程序"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K02",
+                    "name": "品質管理系統法規標準:如 ISO13485:2016醫療器材品質 管理系統標準...等及QMS...等"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S04",
+                    "name": "醫療器材可使用性分析:如 IEC62366-1:2021"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "醫療器材人因工程:如 IEC62366-1,IEC62366-2,FDA人 因工程指引"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T9",
+        "ocu_name": "設計開發檔案",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T9.1",
+                "name": "建立與維持設計相關檔案與紀錄"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P9.1.1",
+                    "text": "能建立符合目標市場法規要求的文件與紀錄。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O9.1.1",
+                    "name": "醫療器材檔案(DeviceMasterRecord)"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K02",
+                    "name": "品質管理系統法規標準:如 ISO13485:2016醫療器材品質 管理系統標準...等及QMS...等"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S10",
+                    "name": "技術文件閱讀/撰寫能力:如 label撰寫,醫療器材中文說明書編 寫原則...等"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T9.2",
+                "name": "協助準備法規審查資料文件"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P9.2.1",
+                    "text": "能夠準備符合驗證法規所需之審查資料,協助產品通過法規驗證。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O9.2.1",
+                    "name": "設計開發檔案(DesignHistoryFile)"
+                  },
+                  {
+                    "code": "O9.2.2",
+                    "name": "醫療器材技術文件(TechnicalFile)"
+                  },
+                  {
+                    "code": "O9.2.3",
+                    "name": "產品申請上市審查文件,如STED、510Ksubmission、查驗登記...等"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K02",
+                    "name": "品質管理系統法規標準:如 ISO13485:2016醫療器材品質 管理系統標準...等及QMS...等"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S10",
+                    "name": "技術文件閱讀/撰寫能力:如 label撰寫,醫療器材中文說明書編 寫原則...等"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T9.3",
+                "name": "配合組織要求,於時程內完成\n設計開發"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 5,
+                "indicators": [
+                  {
+                    "code": "P9.3.1",
+                    "text": "能確實掌握產品設計開發進度。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O9.3.1",
+                    "name": "風險管理檔案"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K02",
+                    "name": "品質管理系統法規標準:如 ISO13485:2016醫療器材品質 管理系統標準...等及QMS...等"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S11",
+                    "name": "溝通/會議技巧"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "問題解決"
+      },
+      {
+        "code": "A02",
+        "name": "顧客導向"
+      },
+      {
+        "code": "A03",
+        "name": "正直誠實"
+      },
+      {
+        "code": "A04",
+        "name": "創新"
+      },
+      {
+        "code": "A05",
+        "name": "團隊合作"
+      },
+      {
+        "code": "A06",
+        "name": "溝通"
+      },
+      {
+        "code": "A07",
+        "name": "主動積極"
+      },
+      {
+        "code": "A08",
+        "name": "壓力容忍"
+      },
+      {
+        "code": "A09",
+        "name": "分析推理"
+      },
+      {
+        "code": "A10",
+        "name": "成果導向"
+      },
+      {
+        "code": "A11",
+        "name": "自我管"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "醫工、醫技、電子、機械、資訊、電機、化學、化工、材料、光電等相關科系大學（含）以上學歷或具醫療器材或電子領域5年以上實務經驗。",
+      "全民英檢中級或同等語言能力以上。"
+    ],
+    "supplements": [
+      "【註1】有關醫療電子器材（MedicalElectricalEquipment）釋義：其代表具有觸身零件（appliedpart），或在患者與設備間傳送能量，或偵測在患者與設",
+      "備間傳送的能量，a）提供不超過一個主電源供應及b）製造廠預期用於1）診斷、治療或監控患者，或2）用於補償或減緩疾病、傷害或殘障的設備。包含",
+      "製造廠界定使設備能正常使用所需的附件，不包含某些體外診斷設備。醫療電子系統為使用數個電器插座，結合至少一個醫療電子器材功能上的連結。（依",
+      "據：IEC60601-1：2005Medicalelectricalequipment-Part1：Generalrequirementsforbasicsafetyandessentialperformance）。",
+      "【註2】產品臨床應用包括：醫工概論、人因工程、電性/電磁相容性要求、軟體生命週期、限制/容許誤差、製造過程、使用環境、附（配）件、微生物管",
+      "制要求、經濟/成本分析、產品效期、服務需求...等。",
+      "【註3】產品查證計畫及測試報告：包括功能研究、實驗室分析報告、材質證明、生物性測試報告、電性安全測試與合格證明、電磁相容性測試與合格證",
+      "明、包裝性能測試、運送測試報告、環境測試報告、老化試驗報告、相容性研究（連結其他器材）、風險評估報告、類似品比對測試報告等。"
+    ]
+  }
+}

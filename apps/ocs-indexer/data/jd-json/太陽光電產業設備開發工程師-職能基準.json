@@ -1,0 +1,555 @@
+{
+  "version_info": {
+    "versions": [
+      {
+        "version": "MEM2151-001v4",
+        "ocs_code": "MEM2151-001v4",
+        "ocs_name": "太陽光電產業設備開發工程師",
+        "status": "最新版本",
+        "update_note": "因應產業需求，檢視更新職能內涵。",
+        "update_date": "2023/12/31"
+      },
+      {
+        "version": "MEM2151-001v3",
+        "ocs_code": "MEM2151-001v3",
+        "ocs_name": "太陽光電產業設備開發工程師",
+        "status": "最新版本",
+        "update_note": "已被《MEM2151-001v4》取代",
+        "update_date": "2021/01/18"
+      },
+      {
+        "version": "MEM2151-001v2",
+        "ocs_code": "MEM2151-001v2",
+        "ocs_name": "太陽光電產業設備開發工程師",
+        "status": "歷史版本",
+        "update_note": "已被《MEM2151-001v3》取代",
+        "update_date": "2017/12/31"
+      },
+      {
+        "version": "MEM2151-001v1",
+        "ocs_code": "MEM2151-001v1",
+        "ocs_name": "太陽光電產業設備開發工程師",
+        "status": "歷史版本",
+        "update_note": "已被《MEM2151-001v2》取代",
+        "update_date": "2012/06/30"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "ocs_code": "MEM2151-001v4",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "太陽光電產業設備開發工程師"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "製造/設備安裝維護",
+          "code": "MEM"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "太陽光電產業設備開發工程師",
+          "code": "2151"
+        }
+      ],
+      "industries": [
+        {
+          "name": "製造業/電力設備製造業",
+          "code": "C2810"
+        }
+      ]
+    },
+    "job_description": "依據客戶及市場需求，設計開發能使用於量產或研發的產品，不僅能夠有效的繪製出機械設備的組立及相關零組件裝配圖，並能夠在產品設\n計與開發過程中，有效的與客戶、協力廠商及公司內部進行溝通，並負責在產品組裝完成後的測試與改善工作。",
+    "ocs_level": 4
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "需求規劃與配置",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "需求規劃"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "依業主需求配置所需生產設備。"
+                  },
+                  {
+                    "code": "P1.1.2",
+                    "text": "依生產設備需求規劃作業流程。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.1.1",
+                    "name": "設備清單"
+                  },
+                  {
+                    "code": "O1.1.2",
+                    "name": "作業流程圖"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "職業安全衛生相關規範"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "運送與裝配流程規劃"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "道路交通安全規則"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "搬運及拆裝安全"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "以專業用語進行溝通能力"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "作業協調能力"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "規劃作業流程"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "安全標示設置規劃"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.2",
+                "name": "安裝配置規劃"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.2.1",
+                    "text": "依職業安全衛生相關規範,規劃運送路線、安全防護區與設備安裝。"
+                  },
+                  {
+                    "code": "P1.2.2",
+                    "text": "依生產需求,規劃場地及安全配置圖,並能完成安裝程序與水、電等周邊設施的規劃。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.2.1",
+                    "name": "場地及安全配置圖"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K05",
+                    "name": "機械機構原理"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "管線配置"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "生產設備工作原理"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "電子電路學"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "資通訊與網路概論"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S05",
+                    "name": "交通運輸與搬運規劃"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "生產設備安裝與操作"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "訂定產品開發目標",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "生產設備安裝"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "依據職業安全衛生規範實施現場安全防護。"
+                  },
+                  {
+                    "code": "P2.1.2",
+                    "text": "依安裝/操作手冊及安全配置圖,完成設備及水電安裝。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "職業安全衛生相關規範"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "搬運及拆裝安全"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "機械機構原理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S04",
+                    "name": "安全標示設置規劃"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "交通運輸與搬運規劃"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "生產設備安裝與操作"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.2",
+                "name": "生產設備測試"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.2.1",
+                    "text": "依操作手冊及作業流程測試生產設備。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K06",
+                    "name": "管線配置"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "生產設備工作原理"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "電子電路學"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "資通訊與網路概論"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "機電整合概論"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S07",
+                    "name": "測試調整"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "工具儀表使用"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "資通訊網路設備操作"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "資通訊安全設定"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T3",
+        "ocu_name": "業主/客戶服務",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T3.1",
+                "name": "操作指導"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.1.1",
+                    "text": "指導業主操作人員依據操作流程,完成標準開/關機操作。"
+                  },
+                  {
+                    "code": "P3.1.2",
+                    "text": "指導各項功能操作與應用。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "職業安全衛生相關規範"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "管線配置"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "生產設備工作原理"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "電子電路學"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "資通訊與網路概論"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "機電整合概論"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S06",
+                    "name": "生產設備安裝與操作"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "測試調整"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "資通訊網路設備操作"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "資通訊安全設定"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.2",
+                "name": "保養與檢修"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.2.1",
+                    "text": "依照保養程序,進行生產設備維護與保"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.2.1",
+                    "name": "保"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "職業安全衛生相關規範"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "以專業用語進行溝通能力"
+                  }
+                ]
+              },
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.2.2",
+                    "text": "依照保養維修手冊完成故障檢修。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.2.2",
+                    "name": "維修紀錄表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K05",
+                    "name": "機械機構原理"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "管線配置"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "生產設備工作原理"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "電子電路學"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "資通訊與網路概論"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "機電整合概論"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "安裝操作程序"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "作業協調能力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "生產設備安裝與操作"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "測試調整"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "工具儀表使用"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "資通訊網路設備操作"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "資通訊安全設定"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "生產設備保養"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "故障檢修"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "溝通協調能力"
+      },
+      {
+        "code": "A02",
+        "name": "團隊合作"
+      },
+      {
+        "code": "A03",
+        "name": "問題分析與解決能力"
+      },
+      {
+        "code": "A04",
+        "name": "主動積極"
+      },
+      {
+        "code": "A05",
+        "name": "自我管理"
+      },
+      {
+        "code": "A06",
+        "name": "分析推理"
+      },
+      {
+        "code": "A07",
+        "name": "創新"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "職能級別之主要目的，在於透過級別標示，區分能力層次以做為培訓規劃的參考。",
+      "機械、電控、光機電、材料、化學、化工、物理等相關科系，大專以上學歷。",
+      "基本機械識圖、拆圖、繪圖能力。"
+    ],
+    "supplements": []
+  }
+}

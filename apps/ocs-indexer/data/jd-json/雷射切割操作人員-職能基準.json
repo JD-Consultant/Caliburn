@@ -1,0 +1,483 @@
+{
+  "version_info": {
+    "versions": [
+      {
+        "version": "V3",
+        "ocs_code": "MPM7223-005v3",
+        "ocs_name": "雷射切割操作人員",
+        "status": "最新版本",
+        "update_note": "略",
+        "update_date": "2024/12/15"
+      },
+      {
+        "version": "V2",
+        "ocs_code": "MPM7223-005v2",
+        "ocs_name": "雷射切割技術人員",
+        "status": "歷史版本",
+        "update_note": "已被《MPM7223-005v3》取代",
+        "update_date": "2021/12/31"
+      },
+      {
+        "version": "V1",
+        "ocs_code": "MPM7223-005v1",
+        "ocs_name": "雷射切割技術人員",
+        "status": "歷史版本",
+        "update_note": "已被《MPM7223-005v2》取代",
+        "update_date": "2019/12/19"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "ocs_code": "MPM7223-005v3",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "雷射切割操作人員"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "製造/生產管理",
+          "code": "MPM"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "雷射切割操作人員",
+          "code": "7223"
+        }
+      ],
+      "industries": [
+        {
+          "name": "製造業/金屬製品製造業",
+          "code": "C2511"
+        }
+      ]
+    },
+    "job_description": "從事金屬雷射切割相關技術工作及切割機保修等工作",
+    "ocs_level": 3
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "工作圖判讀",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "圖樣及材料表檢查"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "依照工作圖面及材料需求,選用及確認合適的雷射切割組件規格。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "材料規格"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "識圖與製圖"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "公差配合"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "表面織構符號"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "工作圖判讀能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.2",
+                "name": "加工資訊蒐集"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.2.1",
+                    "text": "統整加工資訊的蒐集與分類,並運用於加工作業。"
+                  },
+                  {
+                    "code": "P1.2.2",
+                    "text": "學習運用新技術於工作領域。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K05",
+                    "name": "機具切割能力判讀原則"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "科技發展概論"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "加工資訊蒐集能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "切割模擬測試與雷射切割",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "料件雷射切割機台模擬測試"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "評估切割料件後,進行光路架設並確認電腦模擬操作。"
+                  },
+                  {
+                    "code": "P2.1.2",
+                    "text": "進行光路架設完成模擬並進行驗證。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K07",
+                    "name": "雷射加工特性分析方法"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "光學料件概論"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "光路架設概論"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S03",
+                    "name": "文書撰寫能力"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "雷射切割模擬測試操作能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.2",
+                "name": "切割機台定位"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.2.1",
+                    "text": "機台原點復歸及定位工作原點。"
+                  },
+                  {
+                    "code": "P2.2.2",
+                    "text": "判定機台或鏡頭的堪用程度。"
+                  },
+                  {
+                    "code": "P2.2.3",
+                    "text": "設定氣體壓力進給速度切削功率等切割條件。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K10",
+                    "name": "切割機台調校概論"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S05",
+                    "name": "切割機台操作能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.3",
+                "name": "雷射切割打樣操作"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.3.1",
+                    "text": "依據客戶提供產品各種材質,進行材料切割條件的判定。"
+                  },
+                  {
+                    "code": "P2.3.2",
+                    "text": "根據實驗測試結果,分析實驗數據。"
+                  },
+                  {
+                    "code": "P2.3.3",
+                    "text": "根據擬定的實驗規劃,執行產品打樣及測試並產出測試報告書。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.3.1",
+                    "name": "打樣測試報告書"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K07",
+                    "name": "雷射加工特性分析方法"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "光學料件概論"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "光路架設概論"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "職業安全衛生相關規範"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "品質管制方法"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S06",
+                    "name": "料件打樣操作能力"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "文書撰寫能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.4",
+                "name": "雷射切割製程操作"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.4.1",
+                    "text": "依據工作圖面進行工作分析與操作。"
+                  },
+                  {
+                    "code": "P2.4.2",
+                    "text": "依製程進行實務切割作業。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K06",
+                    "name": "雷射加工特性分析方法"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "光學料件概論"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "光路架設概論"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "職業安全衛生相關規範"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "品質管制方法"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "精密量測概論"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S07",
+                    "name": "製作夾(治)具能力"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "雷射切割操作能力"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "個人防護裝備使用能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T3",
+        "ocu_name": "切割機台保養作業",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T3.1",
+                "name": "切割機台保養"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.1.1",
+                    "text": "依雷射切割製程進行檢討與改善。"
+                  },
+                  {
+                    "code": "P3.1.2",
+                    "text": "按照雷射切割組件或模組,進行維護保養作業。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K14",
+                    "name": "機具維修與保養概要"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S10",
+                    "name": "切割機台維修與保養能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.2",
+                "name": "異常狀況維修"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.2.1",
+                    "text": "排除雷射切割生產製作產生的問題。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K14",
+                    "name": "機具維修與保養概要"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S11",
+                    "name": "異常狀況初步研判與解決能 力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "自我管理：設立定義明確且實際可行的個人目標；對於及時完成任務展現高度進取、努力、承諾及負責任的行為。"
+      },
+      {
+        "code": "A02",
+        "name": "主動積極：不需他人指示或要求能自動自發做事，面臨問題立即採取行動加以解決，且為達目標願意主動承擔額外責任。"
+      },
+      {
+        "code": "A03",
+        "name": "團隊意識：積極參與並支持團隊，能彼此鼓勵共同達成團隊目標。"
+      },
+      {
+        "code": "A04",
+        "name": "壓力容忍：冷靜且有效地應對及處理高度緊張的情況或壓力，如緊迫的時間、不友善的人、各類突發事件及危急狀況，並能以適當的方式紓解自身壓力。"
+      },
+      {
+        "code": "A05",
+        "name": "正直誠實：展現高道德標準及值得信賴的行為，且能以維持組織誠信為行事原則，瞭解違反組織、自己及他人的道德標準之影響。"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "高中(職)以上畢業。",
+      "具一年以上的相關工作經驗。"
+    ],
+    "supplements": [
+      "金屬雷射切割相關技術工作：指利用雷射光束與物質相互作用的特性對材料進行切割、表面處理、打孔、微加工等工作。"
+    ]
+  }
+}

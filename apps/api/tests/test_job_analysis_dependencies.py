@@ -286,6 +286,15 @@ def test_only_current_route_modules_exist():
 
 
 def test_current_composition_does_not_import_removed_paths():
+    """`app/api`／`app/adapters` 的 composition surfaces 不得 import 兩類模組：
+    (a) 已刪除的 `app.interview`／`app.interview_vnext`／`app.job_authoring`／
+    `app.services`／`app.schemas`（current-only hard cut 移除，不得復活）；
+    (b) 已依 ADR 0057 Decision 5 保留、但與 current API/Web 隔離的 RAG bounded
+    context 執行期模組——`ocs_contract`／`indexer_contract`（packages）與
+    `jd_pdf_to_json`／`jd_ocs_indexer`／`embedder`（apps；資料流與邊界見
+    `docs/design/rag-pipeline.md`）。RAG app 之間互相 import 對方 contract
+    不受這條規則約束——掃描範圍只有 current API 的 composition surfaces。
+    """
     forbidden = (
         "app.interview",
         "app.interview_vnext",
@@ -294,6 +303,9 @@ def test_current_composition_does_not_import_removed_paths():
         "app.schemas",
         "indexer_contract",
         "ocs_contract",
+        "jd_ocs_indexer",
+        "jd_pdf_to_json",
+        "embedder",
     )
     violations = []
     for path in _surface_files(COMPOSITION_SURFACES):

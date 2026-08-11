@@ -1,6 +1,8 @@
 # Caliburn API
 
-現行 API 是本機 Job Analysis 後端。唯一 production route prefix 是 `/api/v1/job-analysis`，健康檢查是 `/healthz`；舊 OCS、interview、vNext 與 job-authoring routes 已移除。
+現行 API 是本機 Job Analysis 後端。唯一 production route prefix 是 `/api/v1/job-analysis`，健康檢查是 `/healthz`；舊 OCS editor、interview、vNext 與 job-authoring routes 已移除，不在本 app 恢復。
+
+repo 另外保留與本 app 完全隔離的 RAG bounded context（`apps/pdf-to-json`／`apps/ocs-indexer`／`apps/embedder`／`ocs-contract`／`indexer-contract`，見 [`docs/design/rag-pipeline.md`](../../docs/design/rag-pipeline.md)）；本 app 不得 import 它們的任何 runtime 模組，由 `tests/test_job_analysis_dependencies.py` 的 AST guard 強制。
 
 ## 結構
 

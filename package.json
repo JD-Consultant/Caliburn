@@ -7,14 +7,17 @@
     "packages/*"
   ],
   "scripts": {
-    "up": "docker compose up -d db && turbo dev",
+    "up": "docker compose up -d db && turbo dev --filter=@caliburn/api --filter=@caliburn/web",
     "down": "docker compose down && kill-port 3000 8001",
     "infra": "docker compose up -d db",
     "db:migrate": "npm run migrate -w @caliburn/api",
-    "dev": "turbo dev",
+    "dev": "turbo dev --filter=@caliburn/api --filter=@caliburn/web",
     "build": "turbo build",
     "test": "turbo test",
-    "lint": "turbo lint"
+    "lint": "turbo lint",
+    "rag:up": "docker compose --profile rag up -d",
+    "rag:down": "docker compose --profile rag down",
+    "rag:dev": "turbo dev --filter=@caliburn/ocs-indexer"
   },
   "devDependencies": {
     "kill-port": "^2.0.1",

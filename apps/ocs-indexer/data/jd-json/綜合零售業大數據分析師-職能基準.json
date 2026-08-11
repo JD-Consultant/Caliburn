@@ -1,0 +1,686 @@
+{
+  "version_info": {
+    "versions": [
+      {
+        "version": "V3",
+        "ocs_code": "綜合零售業大數據分析師",
+        "ocs_name": "綜合零售業大數據分析師",
+        "status": "最新版本",
+        "update_note": "因應產業需求，檢視更新職能基準之內容",
+        "update_date": "2023/11/16"
+      },
+      {
+        "version": "V2",
+        "ocs_code": "綜合零售業大數據分析師",
+        "ocs_name": "綜合零售業大數據分析師",
+        "status": "歷史版本",
+        "update_note": "已被《KRM2521-001v3》取代",
+        "update_date": "2020/11/13"
+      },
+      {
+        "version": "V1",
+        "ocs_code": "綜合零售業大數據分析師",
+        "ocs_name": "綜合零售業大數據分析師",
+        "status": "歷史版本",
+        "update_note": "已被《KRM2521-001v2》取代",
+        "update_date": "2017/11/13"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "ocs_code": "綜合零售業大數據分析師",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "綜合零售業大數據分析師"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "行銷與銷售/零售與通路管理",
+          "code": "KRM"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "綜合零售業大數據分析師",
+          "code": "2521"
+        }
+      ],
+      "industries": [
+        {
+          "name": "批發及零售業/零售業",
+          "code": "G471"
+        }
+      ]
+    },
+    "job_description": "能有效針對綜合零售業之相關資料進行擷取、管理、處理，並運用分析方法整合資訊，協助零售業進行重要關鍵決策。",
+    "ocs_level": 3
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "熟悉產業屬性",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "了解產業屬性"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "能充份瞭解產業屬性、產品或服務性質。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.1.1",
+                    "name": "產業屬性分析"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "市場研究原則與實務"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "質化與量化分析知識"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "報告撰寫知識"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "行銷學基礎知識"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "商管知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "蒐集市場資訊技能"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "整理與分析報告技能"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "訪談技能"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "問卷設計與分析技能"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "產業定位與競爭者比較分析"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.2",
+                "name": "了解理解產業需求"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.2.1",
+                    "text": "能掌握或尋找合適管道或資料,充份掌握產業需求,進而瞭解消費者需求及習性。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.2.1",
+                    "name": "產業與消費者需求分析"
+                  }
+                ],
+                "knowledge": [],
+                "skills": [
+                  {
+                    "code": "S06",
+                    "name": "產業問題解析能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": ".數據處理與資料儲存管理",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "數據處理與資料儲存"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "能依據開放資料、網路資料,結合日常營運報表、顧客資料等進行統計與整理。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.1.1",
+                    "name": "定期數據搜集或匯入"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K02",
+                    "name": "質化與量化分析知識"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "營運報表內涵知識"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "公司內外部資料庫知識"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "資料庫管理知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S07",
+                    "name": "統計軟體操作技能"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "交叉分析技能"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "資料篩選分析能力"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "資料庫管理與操作能力"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "資料庫軟體調整技能"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.2",
+                "name": "利用結構查詢語言整理數據"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.2.1",
+                    "text": "能利用結構查詢語言(SQL)整理數據,找出有用的資料庫。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.2.1",
+                    "name": "儲存資料表"
+                  }
+                ],
+                "knowledge": [],
+                "skills": []
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.3",
+                "name": "交叉比對資料相關性"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.3.1",
+                    "text": "能依據內外部資料,如銷售、會員、網路等進行交叉比對,探索出合適之欄位。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.3",
+                    "name": "交叉比對資料"
+                  }
+                ],
+                "knowledge": [],
+                "skills": []
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.4",
+                "name": "整理與分析產品或服務數據資料"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.4.1",
+                    "text": "能擷取、管理、處理,並運用分析能力整合資訊。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.4.1",
+                    "name": "產品數據分析與挖掘"
+                  }
+                ],
+                "knowledge": [],
+                "skills": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T3",
+        "ocu_name": "支援經營管理專案",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T3.1",
+                "name": "瞭解經營管理專案目標"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.1.1",
+                    "text": "能快速掌握經營管理專案之目標、KPI與負責任務。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.1.1",
+                    "name": "目標確認"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K09",
+                    "name": "專案管理知識"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "決策支援知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S12",
+                    "name": "專案管理技能"
+                  },
+                  {
+                    "code": "S13",
+                    "name": "績效與評估技能"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.2",
+                "name": "擬訂專案計畫"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.2.1",
+                    "text": "能瞭解各項資料集或數據本質,並依據專案目標撰寫數據分析計畫。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.2.1",
+                    "name": "專案數據分析計畫"
+                  }
+                ],
+                "knowledge": [],
+                "skills": []
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.3",
+                "name": "效益分析"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.3.1",
+                    "text": "進行專案計畫之效益分析。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.3.1",
+                    "name": "效益分析報告"
+                  }
+                ],
+                "knowledge": [],
+                "skills": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T4",
+        "ocu_name": "操作資料分析與呈現",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T4.1",
+                "name": "操作統計軟體、資料探勘與機器學習工具等工作進行分析"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.1.1",
+                    "text": "能利用分析軟體,視覺化工具軟體,操作資料輸入、處理、輸出與統計分析。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.1.1",
+                    "name": "資料輸入、處理、輸出與分析"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K02",
+                    "name": "質化與量化分析知識"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "營運報表內涵知識"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "資料視覺化知識"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "資料探勘及機器學習軟體知 識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "整理與分析報告技能"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "統計軟體操作技能"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "視覺化套件操作技能"
+                  },
+                  {
+                    "code": "S15",
+                    "name": "資料探勘及機器學習軟體操 作技能"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T4.2",
+                "name": "進行資料建模、分析與驗證"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.2.1",
+                    "text": "能確認分析資料之標的,進行消費習慣與族群分類,並將資料進行建模、分析、驗證與調整。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.2.1",
+                    "name": "資料建模"
+                  }
+                ],
+                "knowledge": [],
+                "skills": []
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T4.3",
+                "name": "分析資料呈現"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.3.1",
+                    "text": "能將分析完的資料透過統計軟體之視覺化套件呈現。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.3.1",
+                    "name": "視覺化分析報告"
+                  }
+                ],
+                "knowledge": [],
+                "skills": []
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T4.4",
+                "name": "協助場域實務\n驗證"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.4.1",
+                    "text": "能協助場域驗證行銷、模型、不同行銷方案的有效性,建立行銷績效的評估體系。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.4.1",
+                    "name": "場域協助實務驗證"
+                  }
+                ],
+                "knowledge": [],
+                "skills": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T5",
+        "ocu_name": "協同專案執行與檢討",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T5.1",
+                "name": "協同專案執行"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P5.1.1",
+                    "text": "能依據專案之目標與規劃確實執行專案工作,有效掌並適時依據消費狀況檢討或因應控品質。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O5.1.1",
+                    "name": "專案執行"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K03",
+                    "name": "報告撰寫知識"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "專案管理知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S12",
+                    "name": "專案管理技能"
+                  },
+                  {
+                    "code": "S16",
+                    "name": "問題分析與改善"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T5.2",
+                "name": "協同專案檢討"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P5.2.1",
+                    "text": "能依據行銷專案之執行情形,提出檢討報告與建議。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O5.2.1",
+                    "name": "專案檢討報告與建議"
+                  }
+                ],
+                "knowledge": [],
+                "skills": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "謹慎細心"
+      },
+      {
+        "code": "A02",
+        "name": "具學習力"
+      },
+      {
+        "code": "A03",
+        "name": "對資料分析有創造力"
+      },
+      {
+        "code": "A04",
+        "name": "具完成力（能將賦予之工作計畫與專案有效落實，以達到既定的工作目標）"
+      },
+      {
+        "code": "A05",
+        "name": "驗證能力"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "擔任此職類／職業之學歷／經驗／或能力條件：",
+      "商管學系、統計系所、資訊相關學系或數學系所畢業尤佳。",
+      "熟悉分析軟體及分析設計能力，從數據集發掘使用者行為模式與偏好，提出資料描述、預測模型或建議方案。",
+      "有2年以上數據分析相關實務經驗。"
+    ],
+    "supplements": []
+  }
+}

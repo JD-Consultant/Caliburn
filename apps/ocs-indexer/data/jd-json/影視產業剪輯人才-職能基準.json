@@ -1,0 +1,545 @@
+{
+  "version_info": {
+    "versions": [
+      {
+        "version": "V4",
+        "ocs_code": "ATC3521-001v4",
+        "ocs_name": "影視產業剪輯人才",
+        "status": "最新版本",
+        "update_note": "經發展單位檢視評估結果；維持原內容",
+        "update_date": "2023/12/06"
+      },
+      {
+        "version": "V3",
+        "ocs_code": "ATC3521-001v3",
+        "ocs_name": "影視產業剪輯人才",
+        "status": "歷史版本",
+        "update_note": "已被《ATC3521-001v4》取代",
+        "update_date": "2020/10/08"
+      },
+      {
+        "version": "V2",
+        "ocs_code": "ATC3521-001v2",
+        "ocs_name": "影視產業剪輯人才",
+        "status": "歷史版本",
+        "update_note": "已被《ATC3521-001v3》取代",
+        "update_date": "2017/12/24"
+      },
+      {
+        "version": "V1",
+        "ocs_code": "ATC3521-001v1",
+        "ocs_name": "影視產業剪輯人才",
+        "status": "歷史版本",
+        "update_note": "已被《ATC3521-001v2》取代",
+        "update_date": "2014/12/24"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "ocs_code": "ATC3521-001v4",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "影視產業剪輯人才"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "藝文與影音傳播/影視傳播",
+          "code": "ATC"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "影視產業剪輯人才",
+          "code": "3521"
+        }
+      ],
+      "industries": [
+        {
+          "name": "出版、影音製作、傳播及資通訊服務業/影片及電視節目業;聲",
+          "code": "J592"
+        }
+      ]
+    },
+    "job_description": "整理電影或電視拍攝之原始影片，依劇本或導演意見選擇或修改片段，將選擇或修改後的片段組合成完整影片。",
+    "ocs_level": 3
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "原始素材整理",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "原始素材存檔歸類"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "影音同步(sync)原始拍攝素材。"
+                  },
+                  {
+                    "code": "P1.1.2",
+                    "text": "分類整理原始拍攝素材,依場記表或劇本記錄之拍攝日期、場次順序、空鏡。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.1.1",
+                    "name": "影片歸檔表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "戲劇概念"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "文學概念"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "劇本分析"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "資料歸納整理"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.2",
+                "name": "彙整素材和看毛片"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.2.1",
+                    "text": "依照日後剪輯或特效之需要轉換原始素材格式。"
+                  },
+                  {
+                    "code": "P1.2.2",
+                    "text": "根據場記板的板號與場記表的紀錄,影音同步各場次的影像與聲音素材。"
+                  },
+                  {
+                    "code": "P1.2.3",
+                    "text": "與相關人員一起討論適合的鏡頭。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.2.1",
+                    "name": "統一素材格式"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K03",
+                    "name": "剪輯軟體知識"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "攝影器材知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S03",
+                    "name": "影音軟體使用能力"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "溝通能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "初剪",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "照劇本剪出初步的版本"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "初步編輯根據劇本、導演創意與場記表選出的鏡頭。"
+                  },
+                  {
+                    "code": "P2.1.2",
+                    "text": "將選出的鏡頭編輯成順場影片。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.1.1",
+                    "name": "初剪影片"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "戲劇概念"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "文學概念"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "剪輯軟體知識"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "影像美學"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "音樂概念"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "美術概念"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "剪接概念"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "劇本分析"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "影音軟體使用能力"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "溝通能力"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "時間管理"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "創意思考"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "美學傳達"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "文字轉換畫面能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T3",
+        "ocu_name": "影片結構與相關細部調整",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T3.1",
+                "name": "將篩選過後的片段進行細部調整"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.1.1",
+                    "text": "依照故事、導演與剪輯師意見,針對人物情感、故事發展細部調整畫面長度與場次調度。"
+                  },
+                  {
+                    "code": "P3.1.2",
+                    "text": "篩選需要特效之鏡頭與長度。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.1.1",
+                    "name": "調整後片段"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "戲劇概念"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "文學概念"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "剪輯軟體知識"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "影像美學"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "音樂概念"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "美術概念"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "剪接概念"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "劇本分析"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "影音軟體使用能力"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "溝通能力"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "時間管理"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "創意思考"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "美學傳達"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "文字轉換畫面能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T4",
+        "ocu_name": "影片定剪與輸出",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T4.1",
+                "name": "確定最後版本"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.1.1",
+                    "text": "依據劇本走向和導演想法組織調整最後的版本。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.1.1",
+                    "name": "完整影片"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "戲劇概念"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "文學概念"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "剪輯軟體知識"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "影像美學"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "音樂概念"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "美術概念"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "剪接概念"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S03",
+                    "name": "影音軟體使用能力"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "時間管理"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "創意思考"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "美學傳達"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "文字轉換畫面能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T4.2",
+                "name": "輸出工作參數與檔案"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.2.1",
+                    "text": "輸出定剪版本與工作參數,供相關後製部門處理。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.2.1",
+                    "name": "配上基本特殊效果的完整影片"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K03",
+                    "name": "剪輯軟體知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S03",
+                    "name": "影音軟體使用能力"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "時間管理"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "主動積極"
+      },
+      {
+        "code": "A02",
+        "name": "自我管理"
+      },
+      {
+        "code": "A03",
+        "name": "自我提升"
+      },
+      {
+        "code": "A04",
+        "name": "壓力容忍"
+      },
+      {
+        "code": "A05",
+        "name": "謹慎細心"
+      },
+      {
+        "code": "A06",
+        "name": "應對不明狀況"
+      },
+      {
+        "code": "A07",
+        "name": "積極求知"
+      },
+      {
+        "code": "A08",
+        "name": "溝通協調"
+      },
+      {
+        "code": "A09",
+        "name": "耐心"
+      },
+      {
+        "code": "A10",
+        "name": "專業倫理"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "影視相關學系畢業，或接受過影片剪輯、擁有電影電視製作基礎概念，經過至少200小時實習或擁有剪接經驗者。",
+      "基準更新紀錄：",
+      "件】。"
+    ],
+    "supplements": []
+  }
+}

@@ -1,0 +1,839 @@
+{
+  "version_info": {
+    "versions": [
+      {
+        "version": "V4",
+        "ocs_code": "ATC3521-003v4",
+        "ocs_name": "影視產業視覺效果人才",
+        "status": "最新版本",
+        "update_note": "經發展單位檢視評估結果；維持原內容",
+        "update_date": "2023/12/06"
+      },
+      {
+        "version": "V3",
+        "ocs_code": "ATC3521-003v3",
+        "ocs_name": "影視產業視覺效果人才",
+        "status": "歷史版本",
+        "update_note": "已被《ATC3521-003v4》取代",
+        "update_date": "2020/10/08"
+      },
+      {
+        "version": "V2",
+        "ocs_code": "ATC3521-003v2",
+        "ocs_name": "影視產業視覺效果人才",
+        "status": "歷史版本",
+        "update_note": "已被《ATC3521-003v3》取代",
+        "update_date": "2017/12/24"
+      },
+      {
+        "version": "V1",
+        "ocs_code": "ATC3521-003v1",
+        "ocs_name": "影視產業視覺效果人才",
+        "status": "歷史版本",
+        "update_note": "已被《ATC3521-003v2》取代",
+        "update_date": "2014/12/24"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "ocs_code": "ATC3521-003v4",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "影視產業視覺效果人才"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "藝文與影音傳播/影視傳播",
+          "code": "ATC"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "影視產業視覺效果人才",
+          "code": "3521"
+        }
+      ],
+      "industries": [
+        {
+          "name": "出版、影音製作、傳播及資通訊服務業/影片及電視節目業;聲音錄製及音樂",
+          "code": "J592"
+        }
+      ]
+    },
+    "job_description": "分析影片主題，使用電腦軟體設計與製作影片所需影像，與拍攝影片結合為完整作品。",
+    "ocs_level": 3
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "設計整體影片視覺效果",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "分析劇本所需視覺效果"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "拍攝前分析劇本。"
+                  },
+                  {
+                    "code": "P1.1.2",
+                    "text": "與導演或製片溝通想法。"
+                  },
+                  {
+                    "code": "P1.1.3",
+                    "text": "參考特效畫面,設計符合影片主題視覺效果。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.1.1",
+                    "name": "視覺效果設計圖表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "戲劇概念"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "影像美學"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "美術概念"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "視覺設計軟體知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "劇本分析"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "視覺設計軟體使用能力"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "溝通能力"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "文字轉換畫面能力"
+                  },
+                  {
+                    "code": "S1",
+                    "name": "1創造能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.2",
+                "name": "設計拍攝已完成影片所需之視覺效果"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.2.1",
+                    "text": "分析拍攝完成影片需要的視覺效果。"
+                  },
+                  {
+                    "code": "P1.2.2",
+                    "text": "規劃特效鏡頭拍攝計劃與技術。"
+                  },
+                  {
+                    "code": "P1.2.3",
+                    "text": "估算後製成本。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.2.1",
+                    "name": "視覺效果設計圖表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "戲劇概念"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "影像美學"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "美術概念"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "視覺設計軟體知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S10",
+                    "name": "視覺設計軟體使用能力"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "溝通能力"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "創造能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "製作2D視覺效果",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "製作背景圖"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "與導演、攝影師溝通方向。"
+                  },
+                  {
+                    "code": "P2.1.2",
+                    "text": "依主題來設計視覺風格及其搭配的背景。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.1.1",
+                    "name": "背景圖"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K05",
+                    "name": "影像美學"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "美術概念"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "視覺設計軟體知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S06",
+                    "name": "創意思考"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "美學傳達"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "溝通能力"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "視覺設計軟體使用能力"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "創造能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.2",
+                "name": "去背合成和Tracking追蹤"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.2.1",
+                    "text": "去背。"
+                  },
+                  {
+                    "code": "P2.2.2",
+                    "text": "檢查相關的合成物是否與背景視覺融合。"
+                  },
+                  {
+                    "code": "P2.2.3",
+                    "text": "合成影片與影像追蹤。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.2.1",
+                    "name": "合成後的影片"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K05",
+                    "name": "影像美學"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "視覺設計軟體知識"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "美術概念"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S04",
+                    "name": "溝通能力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "創意思考"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "美學傳達"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "視覺設計軟體使用能力"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "創造能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.3",
+                "name": "影片調光調色"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.3.1",
+                    "text": "色彩校正合成物或實拍素材。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.3.1",
+                    "name": "調整後的影片"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K05",
+                    "name": "影像美學"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "美術概念"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "視覺設計軟體知識"
+                  },
+                  {
+                    "code": "K21",
+                    "name": "燈光概念"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S04",
+                    "name": "溝通能力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "創意思考"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "美學傳達"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "視覺設計軟體使用能力"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "創造能力"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "色彩學"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.4",
+                "name": "影片字體及片頭、尾設計"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.4.1",
+                    "text": "設計字幕、片頭、片尾和動態追蹤。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.4.1",
+                    "name": "設計完成字幕、片頭、片尾和特殊文字之檔案"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K05",
+                    "name": "影像美學"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "美術概念"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "視覺設計軟體知識"
+                  },
+                  {
+                    "code": "K22",
+                    "name": "基礎動畫概念"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S04",
+                    "name": "溝通能力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "創意思考"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "美學傳達"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "視覺設計軟體使用能力"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "創造能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T3",
+        "ocu_name": "製作3D視覺效果",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T3.1",
+                "name": "建立模型"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.1.1",
+                    "text": "溝通與確認製作方向。"
+                  },
+                  {
+                    "code": "P3.1.2",
+                    "text": "針對鏡頭角度進行調整。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.1.1",
+                    "name": "模型檔"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K05",
+                    "name": "影像美學"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "美術概念"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "視覺設計軟體知識"
+                  },
+                  {
+                    "code": "K23",
+                    "name": "空間概念"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S04",
+                    "name": "溝通能力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "創意思考"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "美學傳達"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "創造能力"
+                  },
+                  {
+                    "code": "S13",
+                    "name": "觀察能力"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "視覺設計軟體使用能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.2",
+                "name": "貼圖製作與材質設定"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.2.1",
+                    "text": "溝通與確認製作方向。"
+                  },
+                  {
+                    "code": "P3.2.2",
+                    "text": "設定材質。"
+                  },
+                  {
+                    "code": "P3.2.3",
+                    "text": "貼材質圖。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.2.1",
+                    "name": "材質設定之檔案"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K05",
+                    "name": "影像美學"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "美術概念"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "視覺設計軟體知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S04",
+                    "name": "溝通能力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "創意思考"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "美學傳達"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "視覺設計軟體使用能力"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "創造能力"
+                  },
+                  {
+                    "code": "S13",
+                    "name": "觀察能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.3",
+                "name": "燈光設定"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.3.1",
+                    "text": "溝通與確認製作方向。"
+                  },
+                  {
+                    "code": "P3.3.2",
+                    "text": "設定燈光參數。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.3.1",
+                    "name": "影片光影效果設定之檔案"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K05",
+                    "name": "影像美學"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "美術概念"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "視覺設計軟體知識"
+                  },
+                  {
+                    "code": "K21",
+                    "name": "燈光概念"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S04",
+                    "name": "溝通能力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "創意思考"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "美學傳達"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "視覺設計軟體使用能力"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "創造能力"
+                  },
+                  {
+                    "code": "S13",
+                    "name": "觀察能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.4",
+                "name": "動畫設定"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.4.1",
+                    "text": "溝通與確認製作方向。"
+                  },
+                  {
+                    "code": "P3.4.2",
+                    "text": "依照劇情設定動作。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.4.1",
+                    "name": "物體或人物的動作設定之檔案"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K05",
+                    "name": "影像美學"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "美術概念"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "視覺設計軟體知識"
+                  },
+                  {
+                    "code": "K22",
+                    "name": "基礎動畫概念"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S04",
+                    "name": "溝通能力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "創意思考"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "美學傳達"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "視覺設計軟體使用能力"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "創造能力"
+                  },
+                  {
+                    "code": "S13",
+                    "name": "觀察能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "主動積極"
+      },
+      {
+        "code": "A02",
+        "name": "自我管理"
+      },
+      {
+        "code": "A03",
+        "name": "自我提升"
+      },
+      {
+        "code": "A04",
+        "name": "壓力容忍"
+      },
+      {
+        "code": "A05",
+        "name": "謹慎細心"
+      },
+      {
+        "code": "A06",
+        "name": "應對不明狀況"
+      },
+      {
+        "code": "A07",
+        "name": "積極求知"
+      },
+      {
+        "code": "A08",
+        "name": "溝通協調"
+      },
+      {
+        "code": "A09",
+        "name": "耐心"
+      },
+      {
+        "code": "A10",
+        "name": "專業倫理"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "視覺設計和影視相關科系畢業，或有實際視覺設計工作經驗一年以上。",
+      "基準更新紀錄：",
+      "件】。"
+    ],
+    "supplements": []
+  }
+}

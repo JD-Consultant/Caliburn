@@ -1,0 +1,744 @@
+{
+  "version_info": {
+    "versions": [
+      {
+        "version": "V3",
+        "ocs_code": "SMS2521-001v3",
+        "ocs_name": "巨量資料分析師",
+        "status": "最新版本",
+        "update_note": "略",
+        "update_date": "2022/12/30"
+      },
+      {
+        "version": "V2",
+        "ocs_code": "SMS2521-001v2",
+        "ocs_name": "巨量資料分析師",
+        "status": "歷史版本",
+        "update_note": "已被《",
+        "update_date": "2020/02/07"
+      },
+      {
+        "version": "V1",
+        "ocs_code": "SMS2521-001v1",
+        "ocs_name": "巨量資料分析師",
+        "status": "歷史版本",
+        "update_note": "已被《",
+        "update_date": "2019/12/31"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "ocs_code": "SMS2521-001v3",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "巨量資料分析師"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "科學",
+          "code": "SMS"
+        },
+        {
+          "name": "技術",
+          "code": "SMS"
+        },
+        {
+          "name": "工程",
+          "code": "SMS"
+        },
+        {
+          "name": "數學/數學及科學",
+          "code": "SMS"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "巨量資料分析師",
+          "code": "2511"
+        }
+      ],
+      "industries": [
+        {
+          "name": "出版影音及資通訊業/資訊服務業",
+          "code": "J63"
+        }
+      ]
+    },
+    "job_description": "依客戶或公司自訂目標，能依據商業需求進行分析並提出洞見，執行巨量資料加值的各項工程作業，協助產品建構與決策最佳化。",
+    "ocs_level": 4
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "理解與準備資料",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "描述與瞭解資料收集流程"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 4,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "根據業務痛點擬定業務目標。"
+                  },
+                  {
+                    "code": "P1.1.2",
+                    "text": "能從業務流程中敏銳地理解各式資料(結構與非結構)生成的方式與商業邏輯。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.1.1",
+                    "name": "定義商業問題"
+                  },
+                  {
+                    "code": "O1.1.2",
+                    "name": "流程圖、報告或相關資料表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "資料盤點"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "企業資訊系統(如企業資源規劃、顧客關係管理、供應鏈管理、產品/服務研發管理、人力資源管理等資訊系統等)"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "商業與營運模式"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "應用機率與統計"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "業務流程分析"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "商業模式分析"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.2",
+                "name": "整合與資料前處理（含\n清理）"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.2.1",
+                    "text": "能運用各式資料結構與圖表工具,整合出合適的資料物件。"
+                  },
+                  {
+                    "code": "P1.1.1",
+                    "text": "根據業務痛點擬定業務目標。"
+                  },
+                  {
+                    "code": "P1.1.2",
+                    "text": "能從業務流程中敏銳地理解各式資料（結"
+                  },
+                  {
+                    "code": "P1.2.1",
+                    "text": "能運用各式資料結構與圖表工具，整合出"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.2.1",
+                    "name": "降低雜訊後的整合資料表或資料物件"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "資料盤點"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "應用機率與統計"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "資料庫"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "資訊網路(含網際網路與物 聯網)"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "網頁資料擷取概念"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "自然語言處理"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "視覺音訊處理"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "分散式運算與儲存概念"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "資訊網路(含網際網路與物"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "自然語言處理 NoSQL等)"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "分散式運算與儲存概念 字、影音、影像與機器資料處理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S03",
+                    "name": "資料分析工具(如SAS, SPSS等)"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "資料分析工具(如SAS"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "程式語言(如R, Python"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "資料庫技術(如SQL"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "非結構化資料處理(如文"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "資料探索技術"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "版本控制(如Git, SVN等)"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.3",
+                "name": "轉換資料、挑選與萃取資料屬性"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 1,
+                "indicators": [
+                  {
+                    "code": "P1.3.1",
+                    "text": "能從偽、雜、速、龐的巨量資料中，根據\n業務目標，運用資料解析思維，抓出關鍵\n的數據。\n5\nK04應用機率與統計\nK08自然語言處理\nK09視覺音訊處理\nK11資料探勘基礎知識（如多變\n量統計、機器學習、資料探勘\n等）\nS03資料分析工具（如SAS"
+                  },
+                  {
+                    "code": "P1.3.1",
+                    "text": "能從偽、雜、速、龐的巨量資料中，根據"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.3.1",
+                    "name": "屬性合宜且校準後的資料物件"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K04",
+                    "name": "應用機率與統計"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "自然語言處理"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "視覺音訊處理"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "資料探勘基礎知識(如多變 量統計、機器學習、資料探勘 等)"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "資料探勘基礎知識(如多變"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S03",
+                    "name": "資料分析工具(如SAS"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "程式語言(如R, Python"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "版本控制(如Git, SVN等)"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "資料視覺化技術"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "資料縮減技術"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "時空資料分析(如時間序列"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "進行資料分析與建模",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "選擇資料建模技術與快速雛形化"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 2,
+                "indicators": [
+                  {
+                    "code": "P1.1",
+                    "text": "巨量資料分析專案各模型開發邏輯說明書"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K04",
+                    "name": "應用機率與統計"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "分散式運算與儲存概念"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "資料探勘基礎知識(如多變 量統計、機器學習、資料探勘 等)"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S03",
+                    "name": "資料分析工具(如SAS"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "程式語言(如R, Python"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "資料視覺化技術"
+                  }
+                ]
+              },
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.2",
+                    "text": "能就解決方案中"
+                  },
+                  {
+                    "code": "P2.1.1",
+                    "text": "能針對不同業務目標，運用各種資料建模"
+                  },
+                  {
+                    "code": "T2.2",
+                    "text": "調校與測試資料模型"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K04",
+                    "name": "應用機率與統計"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "分散式運算與儲存概念"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "資料探勘基礎知識(如多變"
+                  },
+                  {
+                    "code": "K01",
+                    "name": "資料盤點"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "資料探勘基礎知識(如多變 量統計、機器學習、資料探勘 等)"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "資料結構與演算法"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "特徵工程"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S11",
+                    "name": "時空資料分析(如時間序列"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "AutoML操作能力"
+                  },
+                  {
+                    "code": "S13",
+                    "name": "機器學習框架(如"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "資料探勘技術(如集群分"
+                  },
+                  {
+                    "code": "S15",
+                    "name": "資料串流分析"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "資料分析工具(如SAS"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "程式語言(如R, Python"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "資料視覺化技術"
+                  },
+                  {
+                    "code": "S16",
+                    "name": "模型績效評估"
+                  },
+                  {
+                    "code": "S17",
+                    "name": "模型訓練與測試機制"
+                  },
+                  {
+                    "code": "S18",
+                    "name": "重抽樣方法"
+                  },
+                  {
+                    "code": "S19",
+                    "name": "集成學習(如拔靴集成、效"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3",
+                "name": "參與系統部署與商業應用"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "T3.1",
+                    "text": "協助部署巨量"
+                  },
+                  {
+                    "code": "P3.1.2",
+                    "text": "巨量資料串流處理與模型生命週期管理。\nK15雲端運算概念"
+                  },
+                  {
+                    "code": "P2.2.1",
+                    "text": "能避免模型過度配適，以有效與效率的機"
+                  },
+                  {
+                    "code": "P2.2.2",
+                    "text": "能避免模型配適不佳，當發生時進行資料"
+                  },
+                  {
+                    "code": "P2.2.3",
+                    "text": "設計或組合資料分析演算法，以建置資料"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K10",
+                    "name": "分散式運算與儲存概念"
+                  },
+                  {
+                    "code": "K14",
+                    "name": "系統分析與設計 等)"
+                  },
+                  {
+                    "code": "K15",
+                    "name": "雲端運算概念"
+                  },
+                  {
+                    "code": "K01",
+                    "name": "資料盤點"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "資料探勘基礎知識(如多變"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "資料結構與演算法"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "特徵工程"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S04",
+                    "name": "程式語言(如R, Python 等)"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "程式語言(如R, Python"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T3",
+        "ocu_name": ".1協助",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.2",
+                "name": ""
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.2",
+                    "text": "使用資料導向程式語言(如R,Python),協助開發系統雛型"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [],
+                "skills": [
+                  {
+                    "code": "S09",
+                    "name": "資料視覺化技術"
+                  },
+                  {
+                    "code": "S13",
+                    "name": "機器學習框架(如"
+                  },
+                  {
+                    "code": "S20",
+                    "name": "單元與整合測試能力"
+                  },
+                  {
+                    "code": "S21",
+                    "name": "MLOps工具操作"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.2",
+                "name": "進行商業溝通"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.1",
+                    "text": "領域別營運模式彙整報告與業務流程圖"
+                  },
+                  {
+                    "code": "P2.2",
+                    "text": "領域別市場發展趨勢分析"
+                  },
+                  {
+                    "code": "P2.3",
+                    "text": "解決方案與業務目標達成說明書或視覺化圖表"
+                  },
+                  {
+                    "code": "P3.2.1",
+                    "text": "能夠協助營運團隊分析比較不同領域的業"
+                  },
+                  {
+                    "code": "P3.2.2",
+                    "text": "能夠協助營運團隊了解巨量資料分析於不"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "資料盤點"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "企業資訊系統(如企業資源 規劃、顧客關係管理、供應鏈管 理、產品/服務研發管理、人力資 源管理等資訊系統)"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "企業資訊系統(如企業資源"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "業務流程分析"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "商業模式分析"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "資料視覺化技術"
+                  },
+                  {
+                    "code": "S22",
+                    "name": "簡報技巧"
+                  },
+                  {
+                    "code": "S23",
+                    "name": "成本效益分析"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "溝通協調"
+      },
+      {
+        "code": "A02",
+        "name": "團隊合作"
+      },
+      {
+        "code": "A03",
+        "name": "通盤思考"
+      },
+      {
+        "code": "A04",
+        "name": "成果導向"
+      },
+      {
+        "code": "A05",
+        "name": "跨領域學習"
+      },
+      {
+        "code": "A06",
+        "name": "細心謹慎"
+      },
+      {
+        "code": "A07",
+        "name": "彈性應變"
+      },
+      {
+        "code": "A08",
+        "name": "追求卓越"
+      },
+      {
+        "code": "A09",
+        "name": "主動積極"
+      },
+      {
+        "code": "A10",
+        "name": "自我管理"
+      },
+      {
+        "code": "A11",
+        "name": "自我學習"
+      },
+      {
+        "code": "A12",
+        "name": "抗壓性"
+      },
+      {
+        "code": "A13",
+        "name": "職業道德"
+      },
+      {
+        "code": "A14",
+        "name": "法遵與風險"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "大學或專科以上學歷，資訊或統計相關科系尤佳。",
+      "具備英文閱讀能力與跨領域學習興趣。"
+    ],
+    "supplements": []
+  }
+}

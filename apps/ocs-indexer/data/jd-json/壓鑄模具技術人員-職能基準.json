@@ -1,0 +1,454 @@
+{
+  "version_info": {
+    "versions": [
+      {
+        "version": "MPM7222-005v3",
+        "ocs_code": "MPM7222-005v3",
+        "ocs_name": "壓鑄模具技術人員",
+        "status": "最新版本",
+        "update_note": "略",
+        "update_date": "Unknown"
+      },
+      {
+        "version": "MPM7222-005v2",
+        "ocs_code": "MPM7222-005v2",
+        "ocs_name": "壓鑄模具技術人員",
+        "status": "歷史版本",
+        "update_note": "已被《MPM7222-005v3》取代",
+        "update_date": "Unknown"
+      },
+      {
+        "version": "MPM7222-005v1",
+        "ocs_code": "MPM7222-005v1",
+        "ocs_name": "壓鑄模具技術人員",
+        "status": "歷史版本",
+        "update_note": "已被《MPM7222-005v2》取代",
+        "update_date": "Unknown"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "ocs_code": "MPM7222-005v3",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "壓鑄模具技術人員"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "製造/生產管理",
+          "code": "MPM"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "壓鑄模具技術人員",
+          "code": "7222"
+        }
+      ],
+      "industries": [
+        {
+          "name": "製造業/金屬製品製造業",
+          "code": "C2512"
+        }
+      ]
+    },
+    "job_description": "從事壓鑄用金屬模具之製作及維修等工作。",
+    "ocs_level": 3
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "工作圖判讀",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "圖樣及零件表檢查"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "依照設計圖面及材料表、零件表,確認正確的模具零組件及規格。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "材料規格"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "標準元件規格"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "公差配合概論"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "表面織構符號"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "圖學與識圖"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "工作圖判讀能力"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "零件規格選用能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.2",
+                "name": "加工資訊蒐集"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.2.1",
+                    "text": "統整加工資訊的蒐集與分類,並運用於加工作業。"
+                  },
+                  {
+                    "code": "P1.2.2",
+                    "text": "學習運用新技術於工作領域。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K06",
+                    "name": "科技發展概論"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S03",
+                    "name": "加工資訊蒐集能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "壓鑄模具製作",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "壓鑄模具零組件加工製作"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "操作各種工具機,並選擇正確加工程序製作壓鑄模具零件。"
+                  },
+                  {
+                    "code": "P2.1.2",
+                    "text": "使用各種工具、儀器、量具,完成壓鑄模具的加工與測量。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K07",
+                    "name": "機械製造程序"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "精密量具概論"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "夾(治)具概論"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "手工具概論"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "品質管制方法"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "零件規格選用能力"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "工具機操作能力"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "手工具運用能力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "量具操作能力"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "模具製作能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.2",
+                "name": "壓鑄模具組立與試模"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.2.1",
+                    "text": "清潔零組件,運用正確方法組合壓鑄模具,並予以修整。"
+                  },
+                  {
+                    "code": "P2.2.2",
+                    "text": "轉移模具並協助安裝架模在壓鑄成形機上,及協助試模和參數設定建議。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K07",
+                    "name": "機械製造程序"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "精密量具概論"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "夾(治)具概論"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "品質管制方法"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "模具組立與拆解作業注意事 項"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S06",
+                    "name": "量具操作能力"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "零組件清潔能力"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "模具組立與拆解能力"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "模具修整能力"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "鉗工(組立)能力"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "模具安裝與調整能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T3",
+        "ocu_name": "壓鑄模具保修作業",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T3.1",
+                "name": "壓鑄模具維修及保養作業"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.1.1",
+                    "text": "協助生產單位,進行壓鑄模具之維修與定期保養作業。"
+                  },
+                  {
+                    "code": "P3.1.2",
+                    "text": "判定壓鑄模具零組件堪用程度。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.1.1",
+                    "name": "維修保養紀錄"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K08",
+                    "name": "精密量具概論"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "模具維修與保養概要"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S08",
+                    "name": "零組件清潔能力"
+                  },
+                  {
+                    "code": "S13",
+                    "name": "模具維修與保養能力"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "零組件堪用程度之判定能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.2",
+                "name": "模具異常狀況報修"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.2.1",
+                    "text": "協助生產單位處理模具異常狀況。"
+                  },
+                  {
+                    "code": "P3.2.2",
+                    "text": "協助排除壓鑄模具製作及生產的簡易問題。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.2.1",
+                    "name": "異常處理單"
+                  },
+                  {
+                    "code": "O3.2.2",
+                    "name": "模具轉移單"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K07",
+                    "name": "機械製造程序"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "零件規格選用能力"
+                  },
+                  {
+                    "code": "S15",
+                    "name": "異常狀況解決能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "謹慎細心：對於任務的執行過程，能謹慎考量及處理所有細節，精確地檢視每個程序，並持續對其保持高度關注。"
+      },
+      {
+        "code": "A02",
+        "name": "主動積極：不需他人指示或要求能自動自發做事，面臨問題立即採取行動加以解決，且為達目標願意主動承擔額外責任。"
+      },
+      {
+        "code": "A03",
+        "name": "自我管理：設立定義明確且實際可行的個人目標；對於及時完成任務展現高度進取、努力、承諾及負責任的行為。"
+      },
+      {
+        "code": "A04",
+        "name": "團隊意識：積極參與並支持團隊，能彼此鼓勵共同達成團隊目標。"
+      },
+      {
+        "code": "A05",
+        "name": "追求卓越：會為自己設定具挑戰性的工作目標並全力以赴，願意主動投注心力達成或超越既定目標，不斷尋求突破。"
+      },
+      {
+        "code": "A06",
+        "name": "壓力容忍：冷靜且有效地應對及處理高度緊張的情況或壓力，如緊迫的時間、不友善的人、各類突發事件及危急狀況，並能以適當的方式紓解自身壓力。"
+      },
+      {
+        "code": "A07",
+        "name": "持續學習：能夠展現自我提升的企圖心，利用且積極參與各種機會，學習任務所需的新知識與技能，並能有效應用在特定任務。"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "高中（職）機械相關科系畢業。",
+      "具1年以上的機械相關工作經驗。"
+    ],
+    "supplements": [
+      "製作及維修：如模具加工、工具機操作、模具清理、校模及修整等作業。",
+      "表面織構符號：係指加工零組件之表面粗糙度、表面加工符號等內容。",
+      "機械製造程序：如鉗工、車床、銑床、磨床、EDM、WC及CNC工具機等機械工作法。"
+    ]
+  }
+}

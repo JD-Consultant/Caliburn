@@ -1,0 +1,324 @@
+{
+  "version_info": {
+    "versions": [
+      {
+        "version": "V2",
+        "ocs_code": "SET4130-001v2",
+        "ocs_name": "AI標註人員",
+        "status": "最新版本",
+        "update_note": "略",
+        "update_date": "2024/12/15"
+      },
+      {
+        "version": "V1",
+        "ocs_code": "SET4130-001v1",
+        "ocs_name": "AI標註人員",
+        "status": "歷史版本",
+        "update_note": "已被《SET4130-001v2》取代",
+        "update_date": "2021/11/29"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "ocs_code": "SET4130-001v2",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "AI標註人員"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "科學",
+          "code": "SET"
+        },
+        {
+          "name": "技術",
+          "code": "SET"
+        },
+        {
+          "name": "工程",
+          "code": "SET"
+        },
+        {
+          "name": "數學/工程及技術",
+          "code": "SET"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "AI標註人員",
+          "code": "4130"
+        }
+      ],
+      "industries": [
+        {
+          "name": "出版影音及資通訊業/資訊服務業",
+          "code": "J6312"
+        }
+      ]
+    },
+    "job_description": "依據標註流程及任務要求，執行資料蒐集、彙整、分類、切割與標記工作。",
+    "ocs_level": 2
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "資訊彙整與分類",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "蒐集及彙整資料"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "熟悉任務標註系統及流程。"
+                  },
+                  {
+                    "code": "P1.1.2",
+                    "text": "依據任務要求及資料來源蒐集及彙整資料。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.1.1",
+                    "name": "資料彙整文件"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "所屬領域知識及資料概念"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "智慧財產權法規"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "資訊安全相關法規"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "個人資料保護法規"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "資料蒐集能力"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "資料判斷能力"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "資料彙整能力"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "電腦基礎操作能力"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "標註系統操作能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.2",
+                "name": "分類及切割資料"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.2.1",
+                    "text": "依據指定任務要求,進行資料分類。"
+                  },
+                  {
+                    "code": "P1.2.2",
+                    "text": "依據標註流程,並視語音、影像、資料來源等,進行初步資料切割處理。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.2.1",
+                    "name": "資料文件"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "所屬領域知識及資料概念"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S04",
+                    "name": "電腦基礎操作能力"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "標註系統操作能力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "資料分類能力"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "資料切割能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "資料標註及校對",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "資料標註"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "依據標註流程、標註模式及任務要求,操作標註系統。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.1.1",
+                    "name": "標註成果"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "所屬領域知識及資料概念"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "資料標註類型"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S04",
+                    "name": "電腦基礎操作能力"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "標註系統操作能力"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "資料標註能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.2",
+                "name": "資料校對及匯入"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.2.1",
+                    "text": "依據標註流程及品質檢查模式,搭配抽檢,進行標註後資料驗證作業,並確認品質。"
+                  },
+                  {
+                    "code": "P2.2.2",
+                    "text": "將標註後資料提供相關人員或依指示匯入AI系統。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "所屬領域知識及資料概念"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "標註資料檢核流程"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S04",
+                    "name": "電腦基礎操作能力"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "標註系統操作能力"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "資料匯入技巧"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "主動積極：不需他人指示或要求能自動自發做事，面臨問題立即採取行動加以解決，且為達目標願意主動承擔額外責任。"
+      },
+      {
+        "code": "A02",
+        "name": "自我管理：設立定義明確且實際可行的個人目標；對於及時完成任務展現高度進取、努力、承諾及負責任的行為。"
+      },
+      {
+        "code": "A03",
+        "name": "謹慎細心：對於任務的執行過程，能謹慎考量及處理所有細節，精確地檢視每個程序，並持續對其保持高度關注。"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "高中職以上畢業，具備電腦基礎操作能力。"
+    ],
+    "supplements": [
+      "【註1】標註：包含做標記、標重點、打標籤、框物件、做註釋等方式。",
+      "【註2】標註模式：如人工模式、人機協作模式（同時使用Auto labelling及人工優化）。",
+      "【註3】資料標註類型：包含拼音標註、韻律標註、詞性標註、音素時間點標註、語音轉寫、分類標註、打點標註、標框標註、區域標註等。"
+    ]
+  }
+}

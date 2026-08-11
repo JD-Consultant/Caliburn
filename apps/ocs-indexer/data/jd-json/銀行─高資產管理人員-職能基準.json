@@ -1,0 +1,484 @@
+{
+  "version_info": {
+    "versions": []
+  },
+  "ocs_profile": {
+    "ocs_code": "FFN2412-004v1",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "銀行─高資產管理人員"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "金融財務/財務",
+          "code": "FFN"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "財務及投資顧問",
+          "code": "2412"
+        }
+      ],
+      "industries": [
+        {
+          "name": "金融及保險業/金融服務業(「銀行業」)",
+          "code": "K6412"
+        }
+      ]
+    },
+    "job_description": "充分運用行內資源，滿足全行高資產客戶商品與服務需求，並兼顧客戶利益及風險平衡，設定、規劃及執行銀行高資產客戶營運策略，遵\n循相關法令，以達成整體營運績效目標。",
+    "ocs_level": 3
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "就高資產客戶條件,提供對應之金融商品與服務",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "蒐集國內外資料,確定行內高資產客戶之條件"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "以符合主管機關要求或特定之高資產客戶條件,分析行內高資產客戶數量、比例以及年度成長情況。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.1.1",
+                    "name": "全行高資產客戶名單與客戶現況"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K02",
+                    "name": "財務分析"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "金融市場"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "金融商品"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "外語能力"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S10",
+                    "name": "分析與解讀能力"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "規劃與組織能力"
+                  },
+                  {
+                    "code": "S16",
+                    "name": "創新能力"
+                  },
+                  {
+                    "code": "S19",
+                    "name": "協調能力"
+                  },
+                  {
+                    "code": "S27",
+                    "name": "預算編制"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.2",
+                "name": "了解高資產客戶的商品與服務需求，制定計劃\n提供相關商品\n與服務"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.2.1",
+                    "text": "滿足高資產客戶商品與服務之可行性與執行規劃。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.2.1",
+                    "name": "高資產客戶商品與服務分析與策略報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K03",
+                    "name": "經濟"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "金融市場"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "金融商品"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "行銷策略"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "人脈拓展"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "策略性思考"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "規劃與組織能力"
+                  },
+                  {
+                    "code": "S20",
+                    "name": "說服能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "評估對高資產客戶之金融商品與服務需求",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "對高資產客戶所需商品與服務提供解決方案"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "協調全行各部門組建任務團隊,擬定高資產客戶各商品線及創新服務發展方向策略。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.1.1",
+                    "name": "年度高資產客戶商品與服務發展時程及規劃"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K04",
+                    "name": "金融市場"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "法律/法規"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "金融商品"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "行銷策略"
+                  },
+                  {
+                    "code": "K14",
+                    "name": "統計"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S08",
+                    "name": "成果導向"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "顧客導向"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "規劃與組織能力"
+                  },
+                  {
+                    "code": "S16",
+                    "name": "創新能力"
+                  },
+                  {
+                    "code": "S26",
+                    "name": "量化分析技術"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.2",
+                "name": "監督新商品開發過程及成果"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.2.1",
+                    "text": "落實高資產客戶商品與服務開發進度,以及時程、效益分析。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.2.1",
+                    "name": "新商品開發成果"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K04",
+                    "name": "金融市場"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "金融商品"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "企業管理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S07",
+                    "name": "品質導向"
+                  },
+                  {
+                    "code": "S15",
+                    "name": "團隊合作"
+                  },
+                  {
+                    "code": "S16",
+                    "name": "創新能力"
+                  },
+                  {
+                    "code": "S20",
+                    "name": "說服能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T3",
+        "ocu_name": "對全行高資產客戶進行業務開發、追蹤及活動執行",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T3.1",
+                "name": "確立高資產客戶各項業務目標"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.1.1",
+                    "text": "分析市場數據,規劃對高資產客戶進行開發、追蹤及活動目標,以及商品及服務開發規格。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.1.1",
+                    "name": "新商品開發及執行成果說明及數據統計表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K04",
+                    "name": "金融市場"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "法律/法規"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "金融商品"
+                  },
+                  {
+                    "code": "K14",
+                    "name": "統計"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S07",
+                    "name": "品質導向"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "成果導向"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "時間管理"
+                  },
+                  {
+                    "code": "S26",
+                    "name": "量化分析技術"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.2",
+                "name": "協調任務團隊評估整體成效"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.2.1",
+                    "text": "蒐集業務數字及客戶意見回饋,定期召開會議討論對高資產客戶商品及服務品質和可靠性,並擬定對應作法。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.2.1",
+                    "name": "金融商品品質和可靠性政策"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K04",
+                    "name": "金融市場"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "法律/法規"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "金融商品"
+                  },
+                  {
+                    "code": "K14",
+                    "name": "統計"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S07",
+                    "name": "品質導向"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "顧客導向"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "問題解決"
+                  },
+                  {
+                    "code": "S16",
+                    "name": "創新能力"
+                  },
+                  {
+                    "code": "S24",
+                    "name": "資訊科技應用能力"
+                  },
+                  {
+                    "code": "S26",
+                    "name": "量化分析技術"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "主動積極"
+      },
+      {
+        "code": "A02",
+        "name": "正直誠實"
+      },
+      {
+        "code": "A03",
+        "name": "親和力"
+      },
+      {
+        "code": "A04",
+        "name": "持續學習"
+      },
+      {
+        "code": "A07",
+        "name": "追求卓越"
+      },
+      {
+        "code": "A08",
+        "name": "團隊意識"
+      },
+      {
+        "code": "A09",
+        "name": "彈性"
+      },
+      {
+        "code": "A10",
+        "name": "壓力容忍"
+      },
+      {
+        "code": "A14",
+        "name": "謹慎細心"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "對銀行金融商品及運作有基本瞭解，並具備相當程度管理經驗者。"
+    ],
+    "supplements": []
+  }
+}

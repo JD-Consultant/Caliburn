@@ -1,0 +1,169 @@
+{
+  "version_info": {
+    "versions": []
+  },
+  "ocs_profile": {
+    "ocs_code": "LLS2619-006",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "產險業-法務人員"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "司法",
+          "code": "LLS"
+        },
+        {
+          "name": "法律與公共安全/法律服務",
+          "code": "LLS"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "產險業-法務人員",
+          "code": "2619"
+        }
+      ],
+      "industries": [
+        {
+          "name": "金融及保險業/保險業",
+          "code": "K65"
+        }
+      ]
+    },
+    "job_description": "1.配合公司各項營運活動，提供法律意見諮詢與服務；\n2.法律及訴訟制度規劃、執行與管理。",
+    "ocs_level": 4
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "契約審查及修訂",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "協助各類契約之審查及修訂。"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "協助契約之草擬與審閱、保單條款及要保書之審核。"
+                  },
+                  {
+                    "code": "P1.1.2",
+                    "text": "提供個案法律意見及針對法律風險提出分析、建議。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.1",
+                    "name": "各項契約、條款、要保書"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "熟悉民法、刑法、保險 法、洗錢防制法、個人資料保 護法、金融消費者保護法等基 本觀念;金融保險經營基本概 念"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "契約、訴狀、意見書撰寫、訴訟能 力、office軟體操作能力、英文閱讀、書 寫能力、金融保險經營基本概念能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "法律訴訟",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "協助或代表公司進行法律訴訟等法律相關業務。"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "協助處理民事、刑事、行政訴訟,及非訟事件。"
+                  },
+                  {
+                    "code": "P2.1.2",
+                    "text": "協助處理強制執行及消債事件。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.1",
+                    "name": "訴訟案件"
+                  }
+                ],
+                "knowledge": [],
+                "skills": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "主動積極"
+      },
+      {
+        "code": "A02",
+        "name": "顧客導向"
+      },
+      {
+        "code": "A03",
+        "name": "溝通協調"
+      },
+      {
+        "code": "A04",
+        "name": "通力合作"
+      },
+      {
+        "code": "A05",
+        "name": "追求卓越"
+      },
+      {
+        "code": "A06",
+        "name": "持續學習"
+      },
+      {
+        "code": "A07",
+        "name": "問題分析與解決"
+      },
+      {
+        "code": "A08",
+        "name": "促進團隊成功"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "大學以上，保險、法律相關系所，具民法及保險法令專業知識。",
+      "基準更新紀錄"
+    ],
+    "supplements": []
+  }
+}

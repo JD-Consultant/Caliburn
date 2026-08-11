@@ -10,8 +10,8 @@ import re
 
 import pytest
 
-from app.job_analysis.application.verifier import ViolationCode
-from app.job_analysis.llm import TASK_ANALYSIS_INSTRUCTIONS
+from app.task_analysis.verifier import ViolationCode
+from app.task_analysis.llm import TASK_ANALYSIS_INSTRUCTIONS
 
 
 #: 5,934 實測 ＋ 少量修辭餘裕。再往下只能砍判準,那是砍產品。

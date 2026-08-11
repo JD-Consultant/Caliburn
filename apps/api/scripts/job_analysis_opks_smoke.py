@@ -20,27 +20,12 @@ from uuid import UUID, uuid4
 # 直接執行 scripts/ 下檔案時，apps/api 尚未在 sys.path。
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from app.job_analysis.application import (  # noqa: E402
-    JobAnalysisState,
-    OpksGroundingUnavailable,
-    add_jd_task,
-    add_opks_item,
-    compute_analysis_input_digest,
-    create_document,
-    decide_opks_proposal,
-    delete_jd_task,
-    delete_opks_item,
-    edit_opks_item,
-    generate_opks_proposals,
-    load_document,
-)
-from app.job_analysis.application.authority_commit import (  # noqa: E402
-    commit_authority_change,
-)
-from app.job_analysis.application.persistence import (  # noqa: E402
-    JobAnalysisUnitOfWorkFactory,
-)
-from app.job_analysis.domain import (  # noqa: E402
+from app.documents import add_jd_task, delete_jd_task, load_document  # noqa: E402
+from app.documents.authoring import create_document  # noqa: E402
+from app.core.authority import commit_authority_change  # noqa: E402
+from app.core.persistence import JobAnalysisUnitOfWorkFactory  # noqa: E402
+from app.core.state import JobAnalysisState  # noqa: E402
+from app.core.domain import (  # noqa: E402
     CurrentWorkModel,
     JdHeader,
     JdTask,
@@ -52,12 +37,21 @@ from app.job_analysis.domain import (  # noqa: E402
     SupportLink,
     Task,
 )
-from app.job_analysis.llm import (  # noqa: E402
+from app.opks import (  # noqa: E402
+    OpksGroundingUnavailable,
+    add_opks_item,
+    compute_analysis_input_digest,
+    decide_opks_proposal,
+    delete_opks_item,
+    edit_opks_item,
+    generate_opks_proposals,
+)
+from app.opks.llm import (  # noqa: E402
     OpksDecision,
     OpksResultWire,
     OpksWireItem,
 )
-from app.job_analysis.providers import (  # noqa: E402
+from app.adapters.openrouter import (  # noqa: E402
     OpenRouterAdapter,
     OpenRouterConfig,
     TransportResponse,
@@ -630,7 +624,7 @@ async def run_scripted_opks_smoke(
 
 
 async def _run() -> OpksSmokeReport:
-    from app.adapters.job_analysis_postgres import SqlAlchemyJobAnalysisUnitOfWork
+    from app.adapters.postgres import SqlAlchemyJobAnalysisUnitOfWork
     from app.database import AsyncSessionLocal
 
     return await run_scripted_opks_smoke(

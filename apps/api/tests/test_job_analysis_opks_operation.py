@@ -6,13 +6,8 @@ import json
 
 import pytest
 
-from app.job_analysis.application import (
-    OperationOutcome,
-    build_opks_context_packet,
-    render_opks_context_packet,
-    run_opks_operation,
-)
-from app.job_analysis.domain import (
+from app.core.model_outcome import OperationOutcome
+from app.core.domain import (
     CurrentJdOpks,
     OpksEntityKind,
     OpksEvidenceLink,
@@ -22,7 +17,12 @@ from app.job_analysis.domain import (
     SupportLink,
     Task,
 )
-from app.job_analysis.llm import (
+from app.opks import (
+    build_opks_context_packet,
+    render_opks_context_packet,
+    run_opks_operation,
+)
+from app.opks.llm import (
     OPKS_INSTRUCTIONS,
     OPKS_RESULT_WIRE_SCHEMA_NAME,
     OpksDecision,
@@ -30,7 +30,7 @@ from app.job_analysis.llm import (
     OpksWireItem,
     opks_result_wire_provider_schema,
 )
-from app.job_analysis.providers import (
+from app.adapters.openrouter import (
     OpenRouterAdapter,
     OpenRouterConfig,
     TransportResponse,

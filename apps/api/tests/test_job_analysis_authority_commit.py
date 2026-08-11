@@ -9,14 +9,12 @@ from uuid import UUID
 import pytest
 from pydantic import ValidationError
 
-from app.job_analysis.application import (
-    DocumentRecord,
-    JobAnalysisState,
-    add_jd_task,
-    create_document,
-)
-from app.job_analysis.application.authority_commit import commit_authority_change
-from app.job_analysis.domain import (
+from app.documents import add_jd_task
+from app.documents.authoring import create_document
+from app.core.persistence import DocumentRecord
+from app.core.state import JobAnalysisState
+from app.core.authority import commit_authority_change
+from app.core.domain import (
     CurrentJdOpks,
     CurrentWorkModel,
     Duty,

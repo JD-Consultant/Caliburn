@@ -6,16 +6,12 @@ from datetime import UTC, datetime, timedelta
 
 import pytest
 
-from app.adapters.job_analysis_postgres import SqlAlchemyJobAnalysisUnitOfWork
-from app.job_analysis.application import (
-    IdempotencyConflict,
-    ProposalNotDecidable,
-    create_document,
-    decide_proposal,
-    load_document,
-    propose_task_for_jd,
-)
-from app.job_analysis.domain import (
+from app.adapters.postgres import SqlAlchemyJobAnalysisUnitOfWork
+from app.documents import load_document
+from app.documents.authoring import create_document
+from app.core.errors import IdempotencyConflict
+from app.task_analysis import ProposalNotDecidable, decide_proposal, propose_task_for_jd
+from app.core.domain import (
     CurrentWorkModel,
     JdEntry,
     JdHeader,

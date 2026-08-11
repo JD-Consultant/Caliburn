@@ -1,6 +1,6 @@
 """OPKS prompt 只承載模型必須知道、程式無法代判的規則。"""
 
-from app.job_analysis.llm import OPKS_INSTRUCTIONS
+from app.opks.llm import OPKS_INSTRUCTIONS
 
 
 def test_prompt_is_behavior_first_grounded_and_allows_abstention():

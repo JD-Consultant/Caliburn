@@ -2,17 +2,15 @@
 
 from __future__ import annotations
 
-import app.job_analysis.application as application
+import app.consultation as consultation
 import pytest
 
-from app.adapters.job_analysis_postgres import SqlAlchemyJobAnalysisUnitOfWork
-from app.job_analysis.application import (
-    IdempotencyConflict,
-    UncommittableOperationResult,
-    create_document,
-    load_document,
-)
-from app.job_analysis.llm import (
+from app.adapters.postgres import SqlAlchemyJobAnalysisUnitOfWork
+from app.consultation import UncommittableOperationResult
+from app.core.errors import IdempotencyConflict
+from app.documents import load_document
+from app.documents.authoring import create_document
+from app.task_analysis.llm import (
     IdentityRelation,
     SignalDisposition,
     TaskAnalysisWire,
@@ -22,7 +20,7 @@ from app.job_analysis.llm import (
     WireTaskChange,
     WireTaskFields,
 )
-from app.job_analysis.providers import (
+from app.adapters.openrouter import (
     ProviderFailure,
     ProviderFailureKind,
     ProviderText,
@@ -78,7 +76,7 @@ async def test_committed_turn_replay_skips_the_provider_before_prepare(
     postgres_session_factory,
     cleanup_job_analysis_rows,
 ):
-    submit = getattr(application, "submit_employee_turn", None)
+    submit = getattr(consultation, "submit_employee_turn", None)
     assert submit is not None
     document_id = cleanup_job_analysis_rows
     uow_factory = factory(postgres_session_factory)
@@ -87,14 +85,16 @@ async def test_committed_turn_replay_skips_the_provider_before_prepare(
 
     await submit(
         uow_factory,
-        adapter=adapter,
+        task_analysis_adapter=adapter,
+        opks_adapter=adapter,
         document_id=document_id,
         operation_id="turn-1",
         text="我每週會彙整營運週報",
     )
     await submit(
         uow_factory,
-        adapter=adapter,
+        task_analysis_adapter=adapter,
+        opks_adapter=adapter,
         document_id=document_id,
         operation_id="turn-1",
         text="我每週會彙整營運週報",
@@ -113,7 +113,8 @@ async def test_committed_turn_replay_skips_the_provider_before_prepare(
     with pytest.raises(IdempotencyConflict):
         await submit(
             uow_factory,
-            adapter=adapter,
+            task_analysis_adapter=adapter,
+            opks_adapter=adapter,
             document_id=document_id,
             operation_id="turn-1",
             text="其實我每月才做一次",
@@ -125,7 +126,7 @@ async def test_provider_failure_leaves_only_the_opening(
     postgres_session_factory,
     cleanup_job_analysis_rows,
 ):
-    submit = getattr(application, "submit_employee_turn", None)
+    submit = getattr(consultation, "submit_employee_turn", None)
     assert submit is not None
     document_id = cleanup_job_analysis_rows
     uow_factory = factory(postgres_session_factory)
@@ -137,7 +138,8 @@ async def test_provider_failure_leaves_only_the_opening(
     with pytest.raises(UncommittableOperationResult):
         await submit(
             uow_factory,
-            adapter=adapter,
+            task_analysis_adapter=adapter,
+            opks_adapter=adapter,
             document_id=document_id,
             operation_id="turn-failed",
             text="我每週會彙整營運週報",
@@ -175,8 +177,8 @@ def support_only_text() -> ProviderText:
 
 
 def opks_text() -> ProviderText:
-    from app.job_analysis.domain import OpksEntityKind
-    from app.job_analysis.llm import OpksDecision, OpksResultWire, OpksWireItem
+    from app.core.domain import OpksEntityKind
+    from app.opks.llm import OpksDecision, OpksResultWire, OpksWireItem
 
     wire = OpksResultWire(
         items=(
@@ -219,7 +221,7 @@ class ScriptedAdapter:
 async def seed_task_in_jd(uow_factory, document_id):
     from datetime import timedelta
 
-    from app.job_analysis.domain import (
+    from app.core.domain import (
         CurrentWorkModel,
         JdTask,
         SourceKind,
@@ -265,9 +267,10 @@ async def seed_task_in_jd(uow_factory, document_id):
 
 
 async def submit(uow_factory, adapter, document_id, operation_id="turn-1"):
-    return await application.submit_employee_turn(
+    return await consultation.submit_employee_turn(
         uow_factory,
-        adapter=adapter,
+        task_analysis_adapter=adapter,
+        opks_adapter=adapter,
         document_id=document_id,
         operation_id=operation_id,
         text="我每週會彙整營運週報",

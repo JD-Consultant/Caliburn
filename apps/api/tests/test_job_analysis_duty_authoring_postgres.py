@@ -5,35 +5,37 @@ from __future__ import annotations
 import pytest
 from sqlalchemy.exc import IntegrityError
 
-from app.adapters.job_analysis_postgres import SqlAlchemyJobAnalysisUnitOfWork
-from app.job_analysis.application import (
-    ConversationTurn,
-    DutyDirectEditPayload,
-    IdempotencyConflict,
+from app.adapters.postgres import SqlAlchemyJobAnalysisUnitOfWork
+from app.documents import (
     InvalidDutyOrder,
-    JobAnalysisState,
-    OperationOutcome,
-    OpksOperationResult,
-    TaskAnalysisOperationResult,
-    TurnSpeaker,
-    VerificationReport,
     add_duty,
     add_jd_task,
-    commit_opks_generation,
-    commit_verified_turn,
-    compute_analysis_input_digest,
-    create_document,
-    decide_proposal,
     delete_duty,
     edit_duty,
     edit_jd_task,
     load_document,
-    prepare_opks_generation,
-    prepare_turn,
     reorder_duties,
 )
-from app.job_analysis.application.authority_commit import commit_authority_change
-from app.job_analysis.domain import (
+from app.documents.authoring import create_document
+from app.core.journal import ConversationTurn, TurnSpeaker
+from app.core.model_outcome import OperationOutcome
+from app.core.state import JobAnalysisState
+from app.consultation import commit_verified_turn, prepare_turn
+from app.core.errors import IdempotencyConflict
+from app.core.journal import DutyDirectEditPayload
+from app.opks import (
+    OpksOperationResult,
+    commit_opks_generation,
+    compute_analysis_input_digest,
+    prepare_opks_generation,
+)
+from app.task_analysis import (
+    TaskAnalysisOperationResult,
+    VerificationReport,
+    decide_proposal,
+)
+from app.core.authority import commit_authority_change
+from app.core.domain import (
     CurrentJdOpks,
     CurrentWorkModel,
     JdEntry,
@@ -48,7 +50,7 @@ from app.job_analysis.domain import (
     SupportLink,
     Task,
 )
-from app.job_analysis.llm import NextQuestion, TaskAnalysisResult
+from app.task_analysis.llm import NextQuestion, TaskAnalysisResult
 
 
 pytestmark = pytest.mark.asyncio

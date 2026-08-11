@@ -16,21 +16,21 @@ from __future__ import annotations
 
 import pytest
 
-from app.adapters.job_analysis_postgres import SqlAlchemyJobAnalysisUnitOfWork
-from app.job_analysis.application import (
-    create_document,
-    decide_opks_proposal,
-    decide_proposal,
-    load_document,
-    submit_employee_turn,
-)
-from app.job_analysis.domain import OpksEntityKind, OpksGapAxis
-from app.job_analysis.llm import (
-    IdentityRelation,
-    IssueResolutionKind,
+from app.adapters.postgres import SqlAlchemyJobAnalysisUnitOfWork
+from app.documents import load_document
+from app.documents.authoring import create_document
+from app.consultation import submit_employee_turn
+from app.opks import decide_opks_proposal
+from app.task_analysis import decide_proposal
+from app.core.domain import OpksEntityKind, OpksGapAxis
+from app.opks.llm import (
     OpksDecision,
     OpksResultWire,
     OpksWireItem,
+)
+from app.task_analysis.llm import (
+    IdentityRelation,
+    IssueResolutionKind,
     SignalDisposition,
     TaskAnalysisWire,
     WireAnchor,
@@ -40,7 +40,7 @@ from app.job_analysis.llm import (
     WireTaskChange,
     WireTaskFields,
 )
-from app.job_analysis.providers import ProviderText
+from app.adapters.openrouter import ProviderText
 
 
 pytestmark = pytest.mark.asyncio
@@ -209,7 +209,8 @@ async def test_the_full_progressive_elicitation_loop_is_durable_and_paid_once(
     # ── 1. 訪談找到一件工作;它還不在 Current JD,所以還不會排定分析 ──────────
     await submit_employee_turn(
         uow_factory,
-        adapter=adapter,
+        task_analysis_adapter=adapter,
+        opks_adapter=adapter,
         document_id=document_id,
         operation_id="turn-1",
         text=FIRST_ANSWER,
@@ -234,7 +235,8 @@ async def test_the_full_progressive_elicitation_loop_is_durable_and_paid_once(
     # ── 3. 下一輪對話自動排定 OPKS:有依據的出提案、缺的留缺口 ────────────────
     await submit_employee_turn(
         uow_factory,
-        adapter=adapter,
+        task_analysis_adapter=adapter,
+        opks_adapter=adapter,
         document_id=document_id,
         operation_id="turn-2",
         text=SECOND_ANSWER,
@@ -259,7 +261,8 @@ async def test_the_full_progressive_elicitation_loop_is_durable_and_paid_once(
     # 付費邊界一:同一回合重播不重打任何一次。
     await submit_employee_turn(
         uow_factory,
-        adapter=adapter,
+        task_analysis_adapter=adapter,
+        opks_adapter=adapter,
         document_id=document_id,
         operation_id="turn-2",
         text=SECOND_ANSWER,
@@ -292,7 +295,8 @@ async def test_the_full_progressive_elicitation_loop_is_durable_and_paid_once(
     # ── 6. 員工回答缺口 → 缺口關閉、新證據使 digest 改變 → 自動重新分析 ───────
     await submit_employee_turn(
         uow_factory,
-        adapter=adapter,
+        task_analysis_adapter=adapter,
+        opks_adapter=adapter,
         document_id=document_id,
         operation_id="turn-3",
         text=THIRD_ANSWER,
@@ -328,7 +332,8 @@ async def test_the_full_progressive_elicitation_loop_is_durable_and_paid_once(
     # 若把 reason 放進 digest,每次拒絕都會產生新 digest ＝ 付費 reject loop。
     await submit_employee_turn(
         uow_factory,
-        adapter=adapter,
+        task_analysis_adapter=adapter,
+        opks_adapter=adapter,
         document_id=document_id,
         operation_id="turn-4",
         text="其他就是一些臨時交辦的事",

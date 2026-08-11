@@ -13,28 +13,30 @@ from uuid import uuid4
 import pytest
 from pydantic import ValidationError
 
-import app.job_analysis.application as application
-from app.job_analysis.application import (
+import app.core.journal as journal_module
+from app.core.journal import (
     OPKS_GENERATION_SCHEMA_ID,
     ActiveQuestion,
     CompletedTurnPayload,
     ConversationTurn,
     DirectEditPayload,
-    DocumentRecord,
-    DocumentSummary,
-    JobAnalysisState,
-    JobAnalysisUnitOfWork,
     JournalEntry,
     OpksGenerationOutcome,
     OpksGenerationPayload,
-    OpksProposalRepository,
-    OpksRepository,
     ProposalDecisionPayload,
     ScheduledOpks,
     TurnSpeaker,
-    scheduled_opks_operation_id,
 )
-from app.job_analysis.domain import (
+from app.core.persistence import (
+    DocumentRecord,
+    DocumentSummary,
+    JobAnalysisUnitOfWork,
+    OpksProposalRepository,
+    OpksRepository,
+)
+from app.core.state import JobAnalysisState
+from app.opks import scheduled_opks_operation_id
+from app.core.domain import (
     CurrentWorkModel,
     JdHeader,
     JdTask,
@@ -112,7 +114,7 @@ def output_proposal() -> OpksProposal:
 
 
 def test_consultant_opening_is_a_typed_consultant_journal_payload():
-    payload_type = getattr(application, "ConsultantOpeningPayload", None)
+    payload_type = getattr(journal_module, "ConsultantOpeningPayload", None)
     assert payload_type is not None
     payload = payload_type(consultant_turn=consultant_turn())
     assert payload.consultant_turn == consultant_turn()
@@ -161,7 +163,7 @@ def test_document_records_are_frozen_and_reject_negative_generation():
 
 
 def test_loaded_state_keeps_complete_current_jd_and_opks_values():
-    from app.job_analysis.application import LoadedDocument
+    from app.core.persistence import LoadedDocument
 
     document = DocumentRecord(
         document_id=uuid4(),

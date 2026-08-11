@@ -11,7 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from job_analysis_contract import ProblemFieldError
 from sqlalchemy import text
 
-from app.api.job_analysis_problems import INVALID_REQUEST, problem_response
+from app.api.problems import INVALID_REQUEST, problem_response
 from app.api.router import api_router
 from app.config import settings
 from app.database import AsyncSessionLocal

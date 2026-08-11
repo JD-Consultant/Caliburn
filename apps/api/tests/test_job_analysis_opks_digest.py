@@ -12,13 +12,13 @@ import sys
 
 import pytest
 
-from app.job_analysis.application import (
-    ScheduledOpks,
+from app.core.journal import ScheduledOpks
+from app.opks import (
     build_opks_context_packet,
     compute_analysis_input_digest,
     scheduled_opks_operation_id,
 )
-from app.job_analysis.domain import (
+from app.core.domain import (
     CurrentJdOpks,
     Enabler,
     EnablerKind,
@@ -155,8 +155,8 @@ def test_the_digest_is_stable_across_processes():
     """PYTHONHASHSEED 隨機化:內建 `hash()` 每個行程不同,會讓同一輸入付兩次錢。"""
 
     script = (
-        "from app.job_analysis.application import compute_analysis_input_digest;"
-        "from app.job_analysis.domain import SourceKind, SourceRef, SupportLink, Task;"
+        "from app.opks import compute_analysis_input_digest;"
+        "from app.core.domain import SourceKind, SourceRef, SupportLink, Task;"
         "link=SupportLink(source_ref=SourceRef(kind=SourceKind.EMPLOYEE_TURN,"
         " id='turn-1'), quote='我每週彙整營運週報');"
         "print(compute_analysis_input_digest(Task(task_id='task-1',"

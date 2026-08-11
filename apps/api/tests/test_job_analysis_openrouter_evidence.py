@@ -16,7 +16,7 @@ from typing import Any
 
 import pytest
 
-from app.job_analysis.providers import (
+from app.adapters.openrouter import (
     LIMITATION_COST_UNUSABLE,
     LIMITATION_METADATA_MISSING,
     LIMITATION_REQUESTED_MISMATCH,

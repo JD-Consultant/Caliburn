@@ -11,19 +11,17 @@ provider 是 scripted 的(不打真 API、不付費),所以**這裡證明的是�
 
 from __future__ import annotations
 
-from app.job_analysis.application import (
-    ActiveQuestion,
-    ConversationTurn,
-    JobAnalysisState,
-    OperationOutcome,
+from app.core.journal import ActiveQuestion, ConversationTurn, TurnSpeaker
+from app.core.model_outcome import OperationOutcome
+from app.core.state import JobAnalysisState
+from app.task_analysis import (
     TransitionResult,
-    TurnSpeaker,
     apply_task_analysis_result,
     build_context_packet,
     render_context_packet,
     run_task_analysis_operation,
 )
-from app.job_analysis.domain import (
+from app.core.domain import (
     CurrentWorkModel,
     Enabler,
     EnablerKind,
@@ -43,7 +41,7 @@ from app.job_analysis.domain import (
     ProposalAction,
     SingleTaskTarget,
 )
-from app.job_analysis.llm import (
+from app.task_analysis.llm import (
     IdentityRelation,
     SignalDisposition,
     TaskAnalysisWire,
@@ -57,7 +55,7 @@ from app.job_analysis.llm import (
     WireTaskFields,
     WireWithdrawReason,
 )
-from app.job_analysis.providers import (
+from app.adapters.openrouter import (
     OpenRouterAdapter,
     OpenRouterConfig,
     TransportResponse,

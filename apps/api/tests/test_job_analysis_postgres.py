@@ -10,25 +10,27 @@ from uuid import UUID, uuid4
 import pytest
 from sqlalchemy import text
 
-from app.adapters.job_analysis_postgres import (
+from app.adapters.postgres import (
     PersistedJobAnalysisCorruption,
     SqlAlchemyJobAnalysisUnitOfWork,
 )
-from app.adapters.job_analysis_postgres import serialization as ser
-from app.job_analysis.application import (
+from app.adapters.postgres import serialization as ser
+from app.core.journal import (
     COMPLETED_TURN_SCHEMA_ID,
     CONSULTANT_OPENING_SCHEMA_ID,
-    OPKS_ITEM_SCHEMA_ID,
-    OPKS_PROPOSAL_SCHEMA_ID,
     ActiveQuestion,
     CompletedTurnPayload,
     ConsultantOpeningPayload,
     ConversationTurn,
-    DocumentRecord,
     JournalEntry,
     TurnSpeaker,
 )
-from app.job_analysis.domain import (
+from app.core.persistence import (
+    OPKS_ITEM_SCHEMA_ID,
+    OPKS_PROPOSAL_SCHEMA_ID,
+    DocumentRecord,
+)
+from app.core.domain import (
     CurrentWorkModel,
     Enabler,
     EnablerKind,

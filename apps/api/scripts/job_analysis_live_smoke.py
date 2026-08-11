@@ -60,18 +60,16 @@ from pydantic import BaseModel
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.config import settings  # noqa: E402
-from app.job_analysis.application import (  # noqa: E402
-    JobAnalysisUnitOfWorkFactory,
-    create_document,
-    load_document,
-    submit_employee_turn,
-)
-from app.job_analysis.llm import (  # noqa: E402
+from app.documents import load_document  # noqa: E402
+from app.documents.authoring import create_document  # noqa: E402
+from app.consultation import submit_employee_turn  # noqa: E402
+from app.core.persistence import JobAnalysisUnitOfWorkFactory  # noqa: E402
+from app.task_analysis.llm import (  # noqa: E402
     TASK_ANALYSIS_WIRE_SCHEMA_NAME,
     task_analysis_wire_provider_schema,
 )
-from app.job_analysis.llm.prompt import TASK_ANALYSIS_INSTRUCTIONS  # noqa: E402
-from app.job_analysis.providers import (  # noqa: E402
+from app.task_analysis.llm.prompt import TASK_ANALYSIS_INSTRUCTIONS  # noqa: E402
+from app.adapters.openrouter import (  # noqa: E402
     MODEL_ENDPOINTS_URL_TEMPLATE,
     OpenRouterAdapter,
     OpenRouterCatalogError,
@@ -406,7 +404,8 @@ async def run_live_smoke(
         try:
             await submit_employee_turn(
                 uow_factory,
-                adapter=adapter,
+                task_analysis_adapter=adapter,
+                opks_adapter=adapter,
                 document_id=document_id,
                 operation_id=turn.operation_id,
                 text=turn.employee_text,
@@ -561,7 +560,7 @@ async def _run(args: argparse.Namespace) -> int:
 
     # asyncpg 在 Windows 的 Proactor loop 上不穩;和測試設定保持一致。
     from app.database import AsyncSessionLocal
-    from app.adapters.job_analysis_postgres import SqlAlchemyJobAnalysisUnitOfWork
+    from app.adapters.postgres import SqlAlchemyJobAnalysisUnitOfWork
 
     run_id = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
     output_dir = Path(args.output_root) / run_id

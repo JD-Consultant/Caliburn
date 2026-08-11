@@ -6,25 +6,20 @@ from datetime import UTC, datetime, timedelta
 
 import pytest
 
-from app.adapters.job_analysis_postgres import SqlAlchemyJobAnalysisUnitOfWork
-from app.job_analysis.application import (
-    CompletedTurnPayload,
-    ConversationTurn,
-    OperationOutcome,
-    StaleAuthoritySnapshot,
-    TaskAnalysisOperationResult,
-    TurnSpeaker,
+from app.adapters.postgres import SqlAlchemyJobAnalysisUnitOfWork
+from app.documents import add_jd_task, load_document, put_jd_header
+from app.documents.authoring import create_document
+from app.core.journal import CompletedTurnPayload, ConversationTurn, TurnSpeaker
+from app.core.model_outcome import OperationOutcome
+from app.consultation import (
     UncommittableOperationResult,
-    VerificationReport,
-    add_jd_task,
     commit_verified_turn,
-    create_document,
-    load_document,
     prepare_turn,
-    put_jd_header,
-    select_scheduled_opks,
 )
-from app.job_analysis.domain import (
+from app.core.errors import StaleAuthoritySnapshot
+from app.opks import select_scheduled_opks
+from app.task_analysis import TaskAnalysisOperationResult, VerificationReport
+from app.core.domain import (
     CurrentWorkModel,
     JdHeader,
     JdTask,
@@ -39,7 +34,7 @@ from app.job_analysis.domain import (
     SupportLink,
     Task,
 )
-from app.job_analysis.llm import (
+from app.task_analysis.llm import (
     IdentityAssessment,
     IdentityRelation,
     NextQuestion,

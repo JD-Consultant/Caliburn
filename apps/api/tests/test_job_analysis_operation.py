@@ -12,15 +12,14 @@ import httpx
 import pytest
 from pydantic import ValidationError
 
-from app.job_analysis.application import (
-    ConversationTurn,
-    OperationOutcome,
-    TurnSpeaker,
+from app.core.journal import ConversationTurn, TurnSpeaker
+from app.core.model_outcome import OperationOutcome
+from app.task_analysis import (
     build_context_packet,
     render_context_packet,
     run_task_analysis_operation,
 )
-from app.job_analysis.domain import (
+from app.core.domain import (
     CurrentWorkModel,
     SourceKind,
     SourceRef,
@@ -28,7 +27,7 @@ from app.job_analysis.domain import (
     Task,
     TaskFields,
 )
-from app.job_analysis.llm import (
+from app.task_analysis.llm import (
     TASK_ANALYSIS_INSTRUCTIONS,
     TASK_ANALYSIS_WIRE_SCHEMA_NAME,
     IdentityRelation,
@@ -41,7 +40,7 @@ from app.job_analysis.llm import (
     WireTaskFields,
     task_analysis_wire_provider_schema,
 )
-from app.job_analysis.providers import (
+from app.adapters.openrouter import (
     CHAT_COMPLETIONS_URL,
     OpenRouterAdapter,
     OpenRouterConfig,

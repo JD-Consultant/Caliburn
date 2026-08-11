@@ -10,15 +10,15 @@ import pytest_asyncio
 from openpyxl import load_workbook
 from sqlalchemy import func, select
 
-from app.adapters.job_analysis_postgres import SqlAlchemyJobAnalysisUnitOfWork
-from app.adapters.job_analysis_postgres.models import JobAnalysisJournalRow
-from app.api.job_analysis_deps import (
+from app.adapters.postgres import SqlAlchemyJobAnalysisUnitOfWork
+from app.adapters.postgres.models import JobAnalysisJournalRow
+from app.api.deps import (
     get_job_analysis_adapter,
     get_job_analysis_uow_factory,
 )
-from app.job_analysis.application import load_document
-from app.job_analysis.domain import TaskFields
-from app.job_analysis.llm import (
+from app.documents import load_document
+from app.core.domain import TaskFields
+from app.task_analysis.llm import (
     IdentityRelation,
     SignalDisposition,
     TaskAnalysisWire,
@@ -28,7 +28,7 @@ from app.job_analysis.llm import (
     WireTaskChange,
     WireTaskFields,
 )
-from app.job_analysis.providers import (
+from app.adapters.openrouter import (
     OpenRouterAdapter,
     OpenRouterConfig,
     TransportResponse,

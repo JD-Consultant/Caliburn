@@ -8,19 +8,20 @@ from uuid import UUID
 
 import pytest
 
-from app.adapters.job_analysis_postgres import (
+from app.adapters.postgres import (
     PersistedJobAnalysisCorruption,
     SqlAlchemyJobAnalysisUnitOfWork,
 )
-from app.adapters.job_analysis_postgres import serialization as ser
-from app.job_analysis.application import ActiveQuestion, DocumentRecord
-from app.job_analysis.application.authoring import load_document
-from app.job_analysis.application.durable_turn import _load_state as load_turn_state
-from app.job_analysis.application.opks_authoring import _locked_state
-from app.job_analysis.application.opks_generation import (
+from app.adapters.postgres import serialization as ser
+from app.documents.authoring import load_document
+from app.core.journal import ActiveQuestion
+from app.core.persistence import DocumentRecord
+from app.consultation.durable_turn import _load_state as load_turn_state
+from app.opks.authoring import _locked_state
+from app.opks.generation import (
     _load_state as load_opks_generation_state,
 )
-from app.job_analysis.domain import CurrentWorkModel, JdHeader
+from app.core.domain import CurrentWorkModel, JdHeader
 
 
 NOW = datetime(2026, 8, 9, 9, 0, tzinfo=UTC)

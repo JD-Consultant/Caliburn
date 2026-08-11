@@ -1,0 +1,1538 @@
+{
+  "version_info": {
+    "versions": [
+      {
+        "version": "V4",
+        "ocs_code": "AVA7317-001v4",
+        "ocs_name": "工藝產業竹工藝師",
+        "status": "最新版本",
+        "update_note": "略",
+        "update_date": "2023/07/24"
+      },
+      {
+        "version": "V3",
+        "ocs_code": "AVA7317-001v3",
+        "ocs_name": "工藝產業竹工藝師",
+        "status": "歷史版本",
+        "update_note": "已被《AVA7317-001v4》取代",
+        "update_date": "2021/04/06"
+      },
+      {
+        "version": "V2",
+        "ocs_code": "AVA7317-001v2",
+        "ocs_name": "工藝產業竹工藝師",
+        "status": "歷史版本",
+        "update_note": "已被《AVA7317-001v3》取代",
+        "update_date": "2017/12/31"
+      },
+      {
+        "version": "V1",
+        "ocs_code": "AVA7317-001v1",
+        "ocs_name": "工藝產業竹工藝師",
+        "status": "歷史版本",
+        "update_note": "已被《AVA7317-001v2》取代",
+        "update_date": "2014/10/02"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "ocs_code": "AVA7317-001v4",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "工藝產業竹工藝師"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "藝文與影音傳播/視覺藝術",
+          "code": "AVA"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "工藝產業竹工藝師",
+          "code": "7317"
+        }
+      ],
+      "industries": [
+        {
+          "name": "藝術、娛樂及休閒服務業/創作及藝術表演業",
+          "code": "R9010"
+        }
+      ]
+    },
+    "job_description": "熟悉竹材特性，善用手與機器加工技術，瞭解竹藝市場環境與趨勢，運用創意構想，設計、製作、生產竹製品，建立銷售通路。",
+    "ocs_level": 4
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "構想設計產品",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "掌握市場趨勢"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "能夠掌握目標市場流行趨勢或者結合文化特色與流行趨勢。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.1.1",
+                    "name": "市場調查資料"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K004",
+                    "name": "工藝產業發展脈絡"
+                  },
+                  {
+                    "code": "K301",
+                    "name": "地方文化特色與資源"
+                  },
+                  {
+                    "code": "K302",
+                    "name": "生活型態研究"
+                  },
+                  {
+                    "code": "K303",
+                    "name": "國際流行時尚"
+                  },
+                  {
+                    "code": "K327",
+                    "name": "竹工藝產業與市場概況"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S301",
+                    "name": "觀察分析"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.2",
+                "name": "溝通產品需求\n（來自客\n戶或市\n場）"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.2.1",
+                    "text": "能夠快速與確實掌握客戶(含潛力客戶)對產品的需求。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.2.1",
+                    "name": "客戶需求調查資料"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K002",
+                    "name": "美學涵養"
+                  },
+                  {
+                    "code": "K003",
+                    "name": "材料特性"
+                  },
+                  {
+                    "code": "K004",
+                    "name": "工藝產業發展脈絡"
+                  },
+                  {
+                    "code": "K304",
+                    "name": "竹材加工"
+                  },
+                  {
+                    "code": "K326",
+                    "name": "進階竹材特性與應用"
+                  },
+                  {
+                    "code": "K327",
+                    "name": "竹工藝產業與市場概況"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S302",
+                    "name": "掌握顧客需求"
+                  },
+                  {
+                    "code": "S303",
+                    "name": "溝通"
+                  },
+                  {
+                    "code": "S304",
+                    "name": "提出設計建議"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.3",
+                "name": "完成產品設計及打樣"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.3.1",
+                    "text": "能夠完成滿足需求之設計或打樣並完成性能測試。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.3.1",
+                    "name": "樣品"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K001",
+                    "name": "工藝設計基礎"
+                  },
+                  {
+                    "code": "K002",
+                    "name": "美學涵養"
+                  },
+                  {
+                    "code": "K003",
+                    "name": "材料特性"
+                  },
+                  {
+                    "code": "K004",
+                    "name": "工藝產業發展脈絡"
+                  },
+                  {
+                    "code": "K005",
+                    "name": "工藝產業設計策略"
+                  },
+                  {
+                    "code": "K007",
+                    "name": "造型原理"
+                  },
+                  {
+                    "code": "K008",
+                    "name": "色彩學"
+                  },
+                  {
+                    "code": "K304",
+                    "name": "竹材加工"
+                  },
+                  {
+                    "code": "K326",
+                    "name": "進階竹材特性與應用"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S305",
+                    "name": "竹材加工技術"
+                  },
+                  {
+                    "code": "S306",
+                    "name": "創新導向"
+                  },
+                  {
+                    "code": "S307",
+                    "name": "手繪或電腦繪圖"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "製作產品-T2a製作竹管產品",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2",
+                "name": "a.1構思產品形式、規格"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "能夠將構想轉換為產品規格。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2",
+                    "name": "a.1.1竹管產品規格書"
+                  },
+                  {
+                    "code": "O2",
+                    "name": "a.1.2設計草圖"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K003",
+                    "name": "材料特性"
+                  },
+                  {
+                    "code": "K009",
+                    "name": "製圖方法"
+                  },
+                  {
+                    "code": "K304",
+                    "name": "竹材加工"
+                  },
+                  {
+                    "code": "K305",
+                    "name": "成本概念"
+                  },
+                  {
+                    "code": "K326",
+                    "name": "進階竹材特性與應用"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S308",
+                    "name": "制定竹管產品規格的能力"
+                  },
+                  {
+                    "code": "S319",
+                    "name": "建構三視圖或3D模擬繪圖"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2",
+                "name": "a.2準備材料(含開材料單)"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2",
+                    "text": "a.2.1能夠依不同產品的規格,購買及處理出最佳材料。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2",
+                    "name": "a.2.1初步整理的竹材"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K304",
+                    "name": "竹材加工"
+                  },
+                  {
+                    "code": "K306",
+                    "name": "瞭解材料供應商的能力與 品質"
+                  },
+                  {
+                    "code": "K307",
+                    "name": "竹材取得途徑"
+                  },
+                  {
+                    "code": "K308",
+                    "name": "竹材機具種類與功能 青、煙燻、炭化等)"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S310",
+                    "name": "材料表面清潔與處理:除 油、乾燥、防腐防蛀、漂白、刮 青、染色等"
+                  },
+                  {
+                    "code": "S311",
+                    "name": "竹管表面加工處理(保"
+                  },
+                  {
+                    "code": "S312",
+                    "name": "竹材加工機具操作"
+                  },
+                  {
+                    "code": "S313",
+                    "name": "竹管劈、剖、鋸、切等手 法"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2",
+                "name": "a.3組件加工"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2",
+                    "text": "a.3.1做出尺寸精準的零組件。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2",
+                    "name": "a.3.1產品零組件"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K309",
+                    "name": "組件加工"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S314",
+                    "name": "竹管鑿、削、鑽、烘烤、 坳彎、矯直等技法"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2",
+                "name": "a.4組裝成型"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2",
+                    "text": "a.4.1能夠依不同產品的規格,以最佳的加工技巧完成。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2",
+                    "name": "a.4.1成型"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K007",
+                    "name": "造型原理"
+                  },
+                  {
+                    "code": "K310",
+                    "name": "材質美學"
+                  },
+                  {
+                    "code": "K311",
+                    "name": "人體工學"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S315",
+                    "name": "竹材包管(哈圍)、組合手 法"
+                  },
+                  {
+                    "code": "S316",
+                    "name": "製作模具、輔助工具、器 具"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2",
+                "name": "a.5塗裝"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2",
+                    "text": "a.5.1能夠依產品的特性選擇塗裝表現(如質感與光澤)。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2",
+                    "name": "a.5.1成品"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K008",
+                    "name": "色彩學"
+                  },
+                  {
+                    "code": "K312",
+                    "name": "塗料與塗裝美學"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S323",
+                    "name": "塗裝技術"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2",
+                "name": "b.1構思產品形式、規格"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2",
+                    "text": "b.1.1能夠將構想轉換為產品規格。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2",
+                    "name": "b.1.1層積竹產品規格書"
+                  },
+                  {
+                    "code": "O2",
+                    "name": "b.1.2設計草圖"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K003",
+                    "name": "竹材特性與應用"
+                  },
+                  {
+                    "code": "K009",
+                    "name": "製圖方法"
+                  },
+                  {
+                    "code": "K304",
+                    "name": "竹材加工"
+                  },
+                  {
+                    "code": "K305",
+                    "name": "成本概念"
+                  },
+                  {
+                    "code": "K326",
+                    "name": "進階竹材特性與應用"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S318",
+                    "name": "制定層積竹產品規格的能 力"
+                  },
+                  {
+                    "code": "S319",
+                    "name": "建構三視圖或3D模擬繪圖"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2",
+                "name": "b.2準備材料"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2",
+                    "text": "b.2.1能夠依不同產品的規格,購買及處理出最佳材料。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2",
+                    "name": "b.2.1初步整理的竹材"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K304",
+                    "name": "竹材加工"
+                  },
+                  {
+                    "code": "K306",
+                    "name": "瞭解材料供應商的能力與 品質"
+                  },
+                  {
+                    "code": "K307",
+                    "name": "竹材取得途徑"
+                  },
+                  {
+                    "code": "K308",
+                    "name": "竹材機具種類與功能"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S316",
+                    "name": "輔助器具製作能力"
+                  },
+                  {
+                    "code": "S320",
+                    "name": "竹材加工器具操作能力"
+                  },
+                  {
+                    "code": "S321",
+                    "name": "竹材鋸切、劈、鉋、乾燥"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2",
+                "name": "b.3竹板/片造形膠合"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2",
+                    "text": "b.3.1能夠依不同產品的規格,以最佳的加工技巧完成。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2",
+                    "name": "b.3.1成型"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K007",
+                    "name": "造型原理"
+                  },
+                  {
+                    "code": "K310",
+                    "name": "材質美學"
+                  },
+                  {
+                    "code": "K311",
+                    "name": "人體工學"
+                  },
+                  {
+                    "code": "K313",
+                    "name": "膠合材料及加工技術的知 識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S316",
+                    "name": "製作模具、輔助器具"
+                  },
+                  {
+                    "code": "S322",
+                    "name": "膠合材料及技術"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2",
+                "name": "b.4塗裝"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2",
+                    "text": "b.4.1能夠依產品的特性選擇塗裝表現(如質感與光澤)。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2",
+                    "name": "b.4.1成品"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K312",
+                    "name": "塗料與塗裝美學"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S323",
+                    "name": "塗裝技術"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2",
+                "name": "c.1構思產品形式、規格"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2",
+                    "text": "c.1.1能夠將構想轉換為產品規格。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2",
+                    "name": "c.1.1竹雕產品規格書"
+                  },
+                  {
+                    "code": "O2",
+                    "name": "c.1.2設計草圖"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K003",
+                    "name": "材料特性"
+                  },
+                  {
+                    "code": "K009",
+                    "name": "製圖方法"
+                  },
+                  {
+                    "code": "K304",
+                    "name": "竹材加工"
+                  },
+                  {
+                    "code": "K305",
+                    "name": "成本概念"
+                  },
+                  {
+                    "code": "K326",
+                    "name": "進階竹材特性與應用"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S324",
+                    "name": "制定竹雕產品規格的能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2",
+                "name": "c.2準備材料"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2",
+                    "text": "c.2.1能夠依不同產品的規格,購買及處理出最佳材料。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2",
+                    "name": "c.2.1初步可用的竹材"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K304",
+                    "name": "竹材加工"
+                  },
+                  {
+                    "code": "K306",
+                    "name": "瞭解材料供應商的能力與 品質"
+                  },
+                  {
+                    "code": "K307",
+                    "name": "竹材取得途徑"
+                  },
+                  {
+                    "code": "K308",
+                    "name": "竹材機具種類與功能"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S310",
+                    "name": "材料表面清潔與處理:除 油、乾燥、防腐防蛀、漂白、刮 青、染色等"
+                  },
+                  {
+                    "code": "S320",
+                    "name": "竹材切割等加工器具操作 能力"
+                  },
+                  {
+                    "code": "S313",
+                    "name": "竹材劈、剖、鑿、削、 鑽、烘烤、坳彎、砂磨等手法"
+                  },
+                  {
+                    "code": "S316",
+                    "name": "輔助器具製作能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2",
+                "name": "c.3竹雕刻"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2",
+                    "text": "c.3.1能夠依不同產品的規格,以最佳的加工技巧完成。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2",
+                    "name": "c.3.1成型"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K007",
+                    "name": "造型原理"
+                  },
+                  {
+                    "code": "K310",
+                    "name": "材質美學"
+                  },
+                  {
+                    "code": "K311",
+                    "name": "人體工學"
+                  },
+                  {
+                    "code": "K314",
+                    "name": "繪畫、書法與雕刻"
+                  },
+                  {
+                    "code": "K315",
+                    "name": "裝飾美學"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S325",
+                    "name": "手繪能力"
+                  },
+                  {
+                    "code": "S326",
+                    "name": "手工雕刻技法"
+                  },
+                  {
+                    "code": "S327",
+                    "name": "雷射雕刻技法"
+                  },
+                  {
+                    "code": "S328",
+                    "name": "噴沙雕刻技法"
+                  },
+                  {
+                    "code": "S329",
+                    "name": "電動(氣動)雕刻技法"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2",
+                "name": "c.4塗裝"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2",
+                    "text": "c.4.1能夠依產品的特性選擇塗裝表現(如質感與光澤)。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2",
+                    "name": "c.4.1成品"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K008",
+                    "name": "色彩學"
+                  },
+                  {
+                    "code": "K312",
+                    "name": "塗料與塗裝美學"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S323",
+                    "name": "塗裝技術"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2",
+                "name": "d.1構思產品形式、規格"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2",
+                    "text": "d.1.1能夠將設計構想轉換為產品規格。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2",
+                    "name": "d.1.1竹編產品規格書設計草圖"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K009",
+                    "name": "製圖方法"
+                  },
+                  {
+                    "code": "K003",
+                    "name": "材料特性"
+                  },
+                  {
+                    "code": "K304",
+                    "name": "竹材加工"
+                  },
+                  {
+                    "code": "K305",
+                    "name": "成本概念"
+                  },
+                  {
+                    "code": "K326",
+                    "name": "進階竹材特性與應用"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S309",
+                    "name": "建構三視圖或模擬繪圖"
+                  },
+                  {
+                    "code": "S329",
+                    "name": "制定竹編產品規格"
+                  },
+                  {
+                    "code": "S330",
+                    "name": "制定竹篾尺寸規格"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2",
+                "name": "d.2準備材料"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2",
+                    "text": "d.2.1能夠依不同產品的規格,購買及處理出最佳材料。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2",
+                    "name": "d.2.1初步可用的竹材"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K306",
+                    "name": "瞭解材料供應商的能力與 品質"
+                  },
+                  {
+                    "code": "K307",
+                    "name": "竹材取得途徑"
+                  },
+                  {
+                    "code": "K304",
+                    "name": "竹材加工"
+                  },
+                  {
+                    "code": "K308",
+                    "name": "竹材機具種類與功能"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S310",
+                    "name": "材料表面清潔與處理:除 油、乾燥、防腐防蛀、漂白、刮 青、染色等"
+                  },
+                  {
+                    "code": "S316",
+                    "name": "製作輔助工具、器具"
+                  },
+                  {
+                    "code": "S321",
+                    "name": "竹管鋸、刮、劈、剖"
+                  },
+                  {
+                    "code": "S322",
+                    "name": "竹蔑定寬、倒角、修厚薄"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2",
+                "name": "d.3編製"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2",
+                    "text": "d.3.1能夠依不同產品的規格運用最佳編製技法。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2",
+                    "name": "d.3.1成型"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K007",
+                    "name": "造型原理"
+                  },
+                  {
+                    "code": "K310",
+                    "name": "材質美學"
+                  },
+                  {
+                    "code": "K315",
+                    "name": "裝飾美學"
+                  },
+                  {
+                    "code": "K311",
+                    "name": "人體工學"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S331",
+                    "name": "竹篾基本編織技法"
+                  },
+                  {
+                    "code": "S332",
+                    "name": "塑形立體編織技法"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2",
+                "name": "d.4塗裝"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2",
+                    "text": "d.4.1能夠依產品的特性選擇塗裝表現(如質感與光澤)。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2",
+                    "name": "d.4.1成品"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K008",
+                    "name": "色彩學"
+                  },
+                  {
+                    "code": "K312",
+                    "name": "塗料與塗裝美學"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S323",
+                    "name": "塗裝技術"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T3",
+        "ocu_name": "規畫與監督量產",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T3.1",
+                "name": "規畫量產實施方式並評\n估成本"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.1.1",
+                    "text": "能夠採取效率高的量產方式。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.1.1",
+                    "name": "量產規畫書"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K317",
+                    "name": "竹藝產業供應鏈概況"
+                  },
+                  {
+                    "code": "K318",
+                    "name": "熟悉各種加工與所需成本"
+                  },
+                  {
+                    "code": "K319",
+                    "name": "成本分析與控管"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S333",
+                    "name": "成本估算"
+                  },
+                  {
+                    "code": "S334",
+                    "name": "生產規畫"
+                  },
+                  {
+                    "code": "S335",
+                    "name": "機具與原物料採買"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.2",
+                "name": "監督機具、模具維護管理與安全"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.2.1",
+                    "text": "能夠採購最合適操作、安全可靠且符合預算的機器與工具,保持機具最佳狀態。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.2.1",
+                    "name": "管理辦法"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K308",
+                    "name": "加工機具種類與操作須知"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S320",
+                    "name": "正確操作與維護各項工具 及機器"
+                  },
+                  {
+                    "code": "S336",
+                    "name": "工廠安全管理"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.3",
+                "name": "監督排程"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.3.1",
+                    "text": "能夠準時交給客戶品質達到期望的產品。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.3.1",
+                    "name": "生產排程表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K006",
+                    "name": "工藝產品製造程序"
+                  },
+                  {
+                    "code": "K320",
+                    "name": "生產管理"
+                  },
+                  {
+                    "code": "K321",
+                    "name": "人力資源管理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S337",
+                    "name": "人力、物力調度"
+                  },
+                  {
+                    "code": "S338",
+                    "name": "時間管理"
+                  },
+                  {
+                    "code": "S339",
+                    "name": "問題分析與解決"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.4",
+                "name": "產品品質檢核"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.4.1",
+                    "text": "能夠快速檢出瑕疵品並做性能測試。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.4.1",
+                    "name": "檢核表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K322",
+                    "name": "品管"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S340",
+                    "name": "品質檢核"
+                  },
+                  {
+                    "code": "S341",
+                    "name": "產品性能測試"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T4",
+        "ocu_name": "銷售產品",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T4.1",
+                "name": "參加展售與競賽"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.1.1",
+                    "text": "能夠設計吸引人的包裝或令人感動的故事。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.1.1",
+                    "name": "宣傳資料"
+                  },
+                  {
+                    "code": "O4.1.2",
+                    "name": "展品包裝"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K323",
+                    "name": "國內外工藝展覽與競賽資 訊"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S303",
+                    "name": "溝通"
+                  },
+                  {
+                    "code": "S342",
+                    "name": "展品包裝設計"
+                  },
+                  {
+                    "code": "S343",
+                    "name": "表達說服"
+                  },
+                  {
+                    "code": "S344",
+                    "name": "價值判斷"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T4.2",
+                "name": "建立行銷通路"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.2.1",
+                    "text": "能夠與優良通路合作。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.2.1",
+                    "name": "合約"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K324",
+                    "name": "藝術行銷"
+                  },
+                  {
+                    "code": "K325",
+                    "name": "工藝產業通路概况"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S345",
+                    "name": "掌握通路商"
+                  },
+                  {
+                    "code": "S346",
+                    "name": "評估合作通路"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "親和關係"
+      },
+      {
+        "code": "A02",
+        "name": "主動積極"
+      },
+      {
+        "code": "A04",
+        "name": "自我管理"
+      },
+      {
+        "code": "A06",
+        "name": "自信心"
+      },
+      {
+        "code": "A07",
+        "name": "壓力容忍"
+      },
+      {
+        "code": "A08",
+        "name": "謹慎細心"
+      },
+      {
+        "code": "A09",
+        "name": "追求卓越"
+      },
+      {
+        "code": "A10",
+        "name": "團隊意識"
+      },
+      {
+        "code": "A11",
+        "name": "彈性"
+      },
+      {
+        "code": "A12",
+        "name": "應對不明狀況"
+      },
+      {
+        "code": "A13",
+        "name": "好奇開放"
+      },
+      {
+        "code": "A30",
+        "name": "1美感意識"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "學經歷初中以上或從事竹工藝產業三年以上。",
+      "基本能力：瞭解竹材特性與加工技術並應用三年以上。",
+      "對竹工藝有熱情者。",
+      "件】。"
+    ],
+    "supplements": []
+  }
+}

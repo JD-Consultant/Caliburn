@@ -1,0 +1,1404 @@
+{
+  "version_info": {
+    "versions": [
+      {
+        "version": "V4",
+        "ocs_code": "APA3521-003v4",
+        "ocs_name": "表演藝術產業音響工程師",
+        "status": "最新版本",
+        "update_note": "略",
+        "update_date": "2023/12/05"
+      },
+      {
+        "version": "V3",
+        "ocs_code": "APA3521-003v3",
+        "ocs_name": "表演藝術產業音響工程師",
+        "status": "歷史版本",
+        "update_note": "已被《APA3521-003v4》取代",
+        "update_date": "2020/11/10"
+      },
+      {
+        "version": "V2",
+        "ocs_code": "APA3521-003v2",
+        "ocs_name": "表演藝術產業音響工程師",
+        "status": "歷史版本",
+        "update_note": "已被《APA3521-003v3》取代",
+        "update_date": "2017/12/31"
+      },
+      {
+        "version": "V1",
+        "ocs_code": "APA3521-003v1",
+        "ocs_name": "表演藝術產業音響工程師",
+        "status": "歷史版本",
+        "update_note": "已被《APA3521-003v2》取代",
+        "update_date": "2014/12/05"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "ocs_code": "APA3521-003v4",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "表演藝術產業音響工程師"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "藝文與影音傳播/表演藝術",
+          "code": "APA"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "表演藝術產業音響工程師",
+          "code": "3521"
+        }
+      ],
+      "industries": [
+        {
+          "name": "藝術、娛樂及休閒服務業/創作及藝術表演業",
+          "code": "R9030"
+        }
+      ]
+    },
+    "job_description": "負責表演藝術現場演出的音響器材規劃、演出混音執行、測試、監控與調整、舞台音響器材施工、現場側錄、音響器材管理與檢測。",
+    "ocs_level": 4
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "製作階段規劃與評估",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "音響需求分析"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "能依不同演出內容和規模等,評估需求的音響設備、預算和人力,擬定音響需求分析表。"
+                  },
+                  {
+                    "code": "P1.1.2",
+                    "text": "將音響需求分析表回報給業主或製作團隊,能視其回覆再加以調整。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.1.1",
+                    "name": "音響需求分析表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K13",
+                    "name": "場館資訊知識"
+                  },
+                  {
+                    "code": "K29",
+                    "name": "著作權規範知識"
+                  },
+                  {
+                    "code": "K44",
+                    "name": "電學知識"
+                  },
+                  {
+                    "code": "K50",
+                    "name": "表演藝術知識"
+                  },
+                  {
+                    "code": "K54",
+                    "name": "樂器知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S04",
+                    "name": "正確傾聽"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "合作協調"
+                  },
+                  {
+                    "code": "S16",
+                    "name": "溝通能力"
+                  },
+                  {
+                    "code": "S31",
+                    "name": "專案管理能力"
+                  },
+                  {
+                    "code": "S52",
+                    "name": "企劃編寫能力"
+                  },
+                  {
+                    "code": "S53",
+                    "name": "施工規劃能力"
+                  },
+                  {
+                    "code": "S54",
+                    "name": "談判能力"
+                  },
+                  {
+                    "code": "S77",
+                    "name": "業主需求分析能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.2",
+                "name": "場地探勘與擬定音響系統設計"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.2.1",
+                    "text": "能執行場地探勘,評估發聲條件、空間結構、走線空間和需求、進出場機制等。"
+                  },
+                  {
+                    "code": "P1.2.2",
+                    "text": "依場地探勘結果設計音響系統和設備,擬定揚聲soundreinforcement(SR)系統圖和器材及線路配置圖。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.2.1",
+                    "name": "系統圖"
+                  },
+                  {
+                    "code": "O1.2.2",
+                    "name": "器材與線路配置圖"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K12",
+                    "name": "勞工安全衛生知識"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "場館資訊知識"
+                  },
+                  {
+                    "code": "K14",
+                    "name": "消防安全及公共安全知識"
+                  },
+                  {
+                    "code": "K44",
+                    "name": "電學知識"
+                  },
+                  {
+                    "code": "K45",
+                    "name": "聲學知識"
+                  },
+                  {
+                    "code": "K63",
+                    "name": "器材知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S41",
+                    "name": "空間規劃能力"
+                  },
+                  {
+                    "code": "S53",
+                    "name": "施工規劃能力"
+                  },
+                  {
+                    "code": "S55",
+                    "name": "聲學軟體運用"
+                  },
+                  {
+                    "code": "S56",
+                    "name": "規劃SR系統能力"
+                  },
+                  {
+                    "code": "S57",
+                    "name": "音壓計與電壓計使用能力"
+                  },
+                  {
+                    "code": "S58",
+                    "name": "諮商能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.3",
+                "name": "調整系統規劃"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.3.1",
+                    "text": "能將現場探勘評估後擬定的系統規劃,進行聲學量測軟體模擬測試,以確認系統規劃是否能滿足表演需求與克服場館限制。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.3.1",
+                    "name": "音響系統與配置規劃修正表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K13",
+                    "name": "場館資訊知識"
+                  },
+                  {
+                    "code": "K44",
+                    "name": "電學知識"
+                  },
+                  {
+                    "code": "K45",
+                    "name": "聲學知識"
+                  },
+                  {
+                    "code": "K46",
+                    "name": "SR系統應用知識"
+                  },
+                  {
+                    "code": "K47",
+                    "name": "聲學專業軟體知識"
+                  },
+                  {
+                    "code": "K50",
+                    "name": "表演藝術知識"
+                  },
+                  {
+                    "code": "K63",
+                    "name": "器材知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S05",
+                    "name": "合作協調"
+                  },
+                  {
+                    "code": "S13",
+                    "name": "組織計畫"
+                  },
+                  {
+                    "code": "S16",
+                    "name": "溝通能力"
+                  },
+                  {
+                    "code": "S41",
+                    "name": "空間規劃能力"
+                  },
+                  {
+                    "code": "S53",
+                    "name": "施工規劃能力"
+                  },
+                  {
+                    "code": "S55",
+                    "name": "聲學軟體運用"
+                  },
+                  {
+                    "code": "S56",
+                    "name": "規劃SR系統能力"
+                  },
+                  {
+                    "code": "S57",
+                    "name": "音壓計與電壓計使用能力"
+                  },
+                  {
+                    "code": "S59",
+                    "name": "音效編輯能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.4",
+                "name": "參與製作及設計會議"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.4.1",
+                    "text": "參與製作會議或設計會議,能與創作者及製作團隊討論音響相關需求、器材組成、工作安排、施工規劃及人員配置。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.4.1",
+                    "name": "音響系統設計圖"
+                  },
+                  {
+                    "code": "O1.4.2",
+                    "name": "音響工作規劃表"
+                  },
+                  {
+                    "code": "O1.4.3",
+                    "name": "人員配置規劃表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "演出需求知識"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "場館資訊知識"
+                  },
+                  {
+                    "code": "K44",
+                    "name": "電學知識"
+                  },
+                  {
+                    "code": "K45",
+                    "name": "聲學知識"
+                  },
+                  {
+                    "code": "K46",
+                    "name": "SR系統應用知識"
+                  },
+                  {
+                    "code": "K48",
+                    "name": "intercom知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S05",
+                    "name": "合作協調"
+                  },
+                  {
+                    "code": "S13",
+                    "name": "組織計畫"
+                  },
+                  {
+                    "code": "S16",
+                    "name": "溝通能力"
+                  },
+                  {
+                    "code": "S41",
+                    "name": "空間規劃能力"
+                  },
+                  {
+                    "code": "S53",
+                    "name": "施工規劃能力"
+                  },
+                  {
+                    "code": "S56",
+                    "name": "規劃SR系統能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "參與排練與相關會議",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "參與排練"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "參與演出團隊排練了解演出流程,能掌握音樂及音效執行需求,並製作工作執行紀錄。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.1.1",
+                    "name": "工作執行紀錄"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "演出需求知識"
+                  },
+                  {
+                    "code": "K31",
+                    "name": "演出製作內容、進度與期程 知識"
+                  },
+                  {
+                    "code": "K49",
+                    "name": "音控臺知識"
+                  },
+                  {
+                    "code": "K63",
+                    "name": "器材知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S05",
+                    "name": "合作協調"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "時間管理"
+                  },
+                  {
+                    "code": "S16",
+                    "name": "溝通能力"
+                  },
+                  {
+                    "code": "S60",
+                    "name": "器材安裝、架設、使用與測 試能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.2",
+                "name": "參與技術測試"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.2.1",
+                    "text": "能協助製作團隊進行表演舞台技術測試,提供測試結果讓製作團隊參考。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.2.1",
+                    "name": "音效技術測試報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "演出需求知識"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "勞工安全衛生知識"
+                  },
+                  {
+                    "code": "K14",
+                    "name": "消防安全及公共安全知識"
+                  },
+                  {
+                    "code": "K46",
+                    "name": "SR系統應用知識"
+                  },
+                  {
+                    "code": "K50",
+                    "name": "表演藝術知識"
+                  },
+                  {
+                    "code": "K51",
+                    "name": "大氣知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S05",
+                    "name": "合作協調"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "時間管理"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "問題分析"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "問題解決"
+                  },
+                  {
+                    "code": "S16",
+                    "name": "溝通能力"
+                  },
+                  {
+                    "code": "S61",
+                    "name": "SR系統操作能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T3",
+        "ocu_name": "演出前的前置作業",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T3.1",
+                "name": "執行裝台、測試與音控臺調音"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.1.1",
+                    "text": "參與裝拆臺會議,能了解或協商裝拆臺作業時程安排與相關規定。"
+                  },
+                  {
+                    "code": "P3.1.2",
+                    "text": "能安全有效率的執行裝台作業。"
+                  },
+                  {
+                    "code": "P3.1.3",
+                    "text": "完成器材架設後,能迅速執行設備功能測試。"
+                  },
+                  {
+                    "code": "P3.1.4",
+                    "text": "在表演者未進場前,能操作音控臺和音響系統,評估音效與收音效果並排除聲音問題。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.1.1",
+                    "name": "裝拆臺會議記錄"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "演出需求知識"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "勞工安全衛生知識"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "場館資訊知識"
+                  },
+                  {
+                    "code": "K45",
+                    "name": "聲學知識"
+                  },
+                  {
+                    "code": "K46",
+                    "name": "SR系統應用知識"
+                  },
+                  {
+                    "code": "K48",
+                    "name": "intercom知識"
+                  },
+                  {
+                    "code": "K52",
+                    "name": "器材問題排除知識"
+                  },
+                  {
+                    "code": "K63",
+                    "name": "器材知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S05",
+                    "name": "合作協調"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "時間管理"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "問題分析"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "問題解決"
+                  },
+                  {
+                    "code": "S16",
+                    "name": "溝通能力"
+                  },
+                  {
+                    "code": "S29",
+                    "name": "危機處理"
+                  },
+                  {
+                    "code": "S60",
+                    "name": "器材安裝、架設、使用與測 試能力"
+                  },
+                  {
+                    "code": "S62",
+                    "name": "音控臺使用與測試能力"
+                  },
+                  {
+                    "code": "S63",
+                    "name": "解決音頻干擾迴授能力"
+                  },
+                  {
+                    "code": "S87",
+                    "name": "規畫圖施工能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.2",
+                "name": "參與彩排"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.2.1",
+                    "text": "能與演出團隊協調彩排曲目與流程,了解與彩排相關的音響配合事項。"
+                  },
+                  {
+                    "code": "P3.2.2",
+                    "text": "能計算彩排時間與流程是否能在預定時間內完聲音響系統設定。"
+                  },
+                  {
+                    "code": "P3.2.3",
+                    "text": "能隨彩排進行,將場景曲目分段執行音效控制。"
+                  },
+                  {
+                    "code": "P3.2.4",
+                    "text": "能隨採排進行,記錄修正數位音控的場景紀錄(scenememory),作為正式演出的參考。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.2.1",
+                    "name": "彩排曲目與流程表"
+                  },
+                  {
+                    "code": "O3.2.2",
+                    "name": "彩排場景記錄"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "演出需求知識"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "場館資訊知識"
+                  },
+                  {
+                    "code": "K45",
+                    "name": "聲學知識"
+                  },
+                  {
+                    "code": "K49",
+                    "name": "音控臺知識"
+                  },
+                  {
+                    "code": "K50",
+                    "name": "表演藝術知識"
+                  },
+                  {
+                    "code": "K52",
+                    "name": "器材問題排除知識"
+                  },
+                  {
+                    "code": "K53",
+                    "name": "彩排知識"
+                  },
+                  {
+                    "code": "K54",
+                    "name": "樂器知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S05",
+                    "name": "合作協調"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "時間管理"
+                  },
+                  {
+                    "code": "S16",
+                    "name": "溝通能力"
+                  },
+                  {
+                    "code": "S29",
+                    "name": "危機處理"
+                  },
+                  {
+                    "code": "S61",
+                    "name": "SR系統操作能力"
+                  },
+                  {
+                    "code": "S64",
+                    "name": "聲學軟硬體資料判讀能力"
+                  },
+                  {
+                    "code": "S65",
+                    "name": "聲音問題排除能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.3",
+                "name": "參與技術工作會議"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.3.1",
+                    "text": "參與進場館後每日工作會議,能與技術團隊及舞台監督等檢討工作狀況,能提出音響工作相關建議修正案。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.3.1",
+                    "name": "技術工作會議紀錄"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "演出需求知識"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "場館資訊知識"
+                  },
+                  {
+                    "code": "K45",
+                    "name": "聲學知識"
+                  },
+                  {
+                    "code": "K49",
+                    "name": "音控臺知識"
+                  },
+                  {
+                    "code": "K54",
+                    "name": "樂器知識"
+                  },
+                  {
+                    "code": "K63",
+                    "name": "器材知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S05",
+                    "name": "合作協調"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "問題分析"
+                  },
+                  {
+                    "code": "S16",
+                    "name": "溝通能力"
+                  },
+                  {
+                    "code": "S29",
+                    "name": "危機處理"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T4",
+        "ocu_name": "演出音效執行",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T4.1",
+                "name": "前場音控臺操控"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.1.1",
+                    "text": "以彩排時的數位音控紀錄為基礎,能依據正式演出狀況執行前場音控臺的音控調整。"
+                  },
+                  {
+                    "code": "P4.1.2",
+                    "text": "能即時排除演出中發生的音響技術問題。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "演出需求知識"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "場館資訊知識"
+                  },
+                  {
+                    "code": "K45",
+                    "name": "聲學知識"
+                  },
+                  {
+                    "code": "K54",
+                    "name": "樂器知識"
+                  },
+                  {
+                    "code": "K55",
+                    "name": "前場控臺應用知識"
+                  },
+                  {
+                    "code": "K63",
+                    "name": "器材知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S25",
+                    "name": "應變能力"
+                  },
+                  {
+                    "code": "S64",
+                    "name": "聲學軟硬體資料判讀能力"
+                  },
+                  {
+                    "code": "S65",
+                    "name": "聲音問題排除能力"
+                  },
+                  {
+                    "code": "S66",
+                    "name": "前場控臺系統操控能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T4.2",
+                "name": "執行監聽返送"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.2.1",
+                    "text": "能操作監聽返送系統,提供不同表演者的演出監聽需求。"
+                  },
+                  {
+                    "code": "P4.2.2",
+                    "text": "能迅速排除演出中表演者監聽問題或突發狀況。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K13",
+                    "name": "場館資訊知識"
+                  },
+                  {
+                    "code": "K54",
+                    "name": "樂器知識"
+                  },
+                  {
+                    "code": "K56",
+                    "name": "監聽系統與監聽需求知識"
+                  },
+                  {
+                    "code": "K63",
+                    "name": "器材知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S25",
+                    "name": "應變能力"
+                  },
+                  {
+                    "code": "S29",
+                    "name": "危機處理"
+                  },
+                  {
+                    "code": "S65",
+                    "name": "聲音問題排除能力"
+                  },
+                  {
+                    "code": "S67",
+                    "name": "操控舞台監聽系統能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T4.3",
+                "name": "轉播系統音訊支援"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.3.1",
+                    "text": "若有轉播需求時,能執行音訊支援。"
+                  },
+                  {
+                    "code": "P4.3.2",
+                    "text": "能快速排除轉播系統突發狀況。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K48",
+                    "name": "intercom知識"
+                  },
+                  {
+                    "code": "K58",
+                    "name": "轉播系統知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S68",
+                    "name": "轉播系統操控能力"
+                  },
+                  {
+                    "code": "S69",
+                    "name": "聲音訊號及響度問題排除能 力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T4.4",
+                "name": "現場側錄"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.4.1",
+                    "text": "能執行表演的現場節目側錄,監控錄音訊號來源,產出錄音資料。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.4.1",
+                    "name": "錄音資料"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K59",
+                    "name": "錄音系統知識"
+                  },
+                  {
+                    "code": "K60",
+                    "name": "業主錄音需求與音檔後製需 求知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S70",
+                    "name": "錄音相關問題分析與排除能 力"
+                  },
+                  {
+                    "code": "S71",
+                    "name": "雙軌錄音系統操作能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T5",
+        "ocu_name": "演出善後工作與執行歸檔",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T5.1",
+                "name": "執行器材測試"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P5.1.1",
+                    "text": "表演結束後,能快速的測試音響器材或線材是否有損壞。"
+                  },
+                  {
+                    "code": "P5.1.2",
+                    "text": "能將損壞的器材加以標示與記錄。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O5.1.1",
+                    "name": "損壞器材的標示與記錄表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K62",
+                    "name": "設備與線材配置知識"
+                  },
+                  {
+                    "code": "K63",
+                    "name": "器材知識"
+                  },
+                  {
+                    "code": "K64",
+                    "name": "三用電表應用知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S42",
+                    "name": "觀察力"
+                  },
+                  {
+                    "code": "S94",
+                    "name": "器材檢測能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T5.2",
+                "name": "器材搬運裝車"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P5.2.1",
+                    "text": "能依器材紀錄表確認所有設備是否確實裝車,並將損壞器材分開放置,將所有器材完整運回。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K65",
+                    "name": "器材清單知識"
+                  },
+                  {
+                    "code": "K66",
+                    "name": "空間運用知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S73",
+                    "name": "箱櫃堆疊技巧"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T5.3",
+                "name": "執行歸檔"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P5.3.1",
+                    "text": "能製作結案報告,交予業主。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O5.3.1",
+                    "name": "結案報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K43",
+                    "name": "結案報告知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S38",
+                    "name": "報告彙整能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T6",
+        "ocu_name": "日常器材管理",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T6.1",
+                "name": "設備管理"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P6.1.1",
+                    "text": "能清點所有在庫音響器材的儲存位置、使用狀況和檢測功能。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O6.1.1",
+                    "name": "器材清點清單"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K63",
+                    "name": "器材知識"
+                  },
+                  {
+                    "code": "K64",
+                    "name": "三用電表應用知識"
+                  },
+                  {
+                    "code": "K67",
+                    "name": "音壓與音學應用知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S42",
+                    "name": "觀察力"
+                  },
+                  {
+                    "code": "S72",
+                    "name": "器材清點能力"
+                  },
+                  {
+                    "code": "S74",
+                    "name": "系統化控管器材使用與進出"
+                  },
+                  {
+                    "code": "S75",
+                    "name": "文件管理能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T6.2",
+                "name": "器材檢測保養"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P6.2.1",
+                    "text": "能針對表演活動後發現故障的器材進行後續細部檢測,分析故障原因。"
+                  },
+                  {
+                    "code": "P6.2.2",
+                    "text": "能針對久未使用器材進行功能效果檢測,分析是否有故障和可能原因。"
+                  },
+                  {
+                    "code": "P6.2.3",
+                    "text": "能依器材檢測結果判別損壞故障器材是否能自行維修,並執行基礎維修作業或送廠維修。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O6.2.1",
+                    "name": "器材維修檢測清單"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K63",
+                    "name": "器材知識"
+                  },
+                  {
+                    "code": "K64",
+                    "name": "三用電表應用知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S11",
+                    "name": "問題分析"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "問題解決"
+                  },
+                  {
+                    "code": "S76",
+                    "name": "基礎維修能力"
+                  },
+                  {
+                    "code": "S94",
+                    "name": "器材檢測能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A02",
+        "name": "主動積極。"
+      },
+      {
+        "code": "A05",
+        "name": "自我提升。"
+      },
+      {
+        "code": "A07",
+        "name": "壓力容忍。"
+      },
+      {
+        "code": "A08",
+        "name": "謹慎細心。"
+      },
+      {
+        "code": "A10",
+        "name": "團隊意識。"
+      },
+      {
+        "code": "A12",
+        "name": "應對不明狀況。"
+      },
+      {
+        "code": "A13",
+        "name": "好奇開放。"
+      },
+      {
+        "code": "A16",
+        "name": "對表演藝術的興趣與熱忱。"
+      },
+      {
+        "code": "A17",
+        "name": "配合度高。"
+      },
+      {
+        "code": "A18",
+        "name": "耐心。"
+      },
+      {
+        "code": "A20",
+        "name": "開放性思維。"
+      },
+      {
+        "code": "A21",
+        "name": "敬業態度。"
+      },
+      {
+        "code": "A22",
+        "name": "主動學習。"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "高中職以上學歷（或同等學力）且具3年以上音響技術相關工作經驗者。",
+      "件】。"
+    ],
+    "supplements": []
+  }
+}

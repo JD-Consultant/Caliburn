@@ -1,6 +1,6 @@
 # Caliburn 文檔索引
 
-本目錄是 repo 的文檔權威。現行產品是本機 Web Job Analysis；current-only 硬切後，只有現行 code、ADR 0057、current design 與 runbook 可指導新施工。舊 OCS／indexer／embedder／訪談／job_authoring 內容保留在歷史研究與 ADR 中供追溯，不代表仍有 runtime 或 schema。
+本目錄是 repo 的文檔權威。現行產品是本機 Web Job Analysis；current-only 硬切後，只有現行 code、ADR 0057、current design 與 runbook 可指導 current 產品的新施工。repo 另外保留一組與 current 完全隔離的 RAG bounded context（`pdf-to-json`／`ocs-indexer`／`embedder`／`ocs-contract`／`indexer-contract`），設計見 [`design/rag-pipeline.md`](design/rag-pipeline.md)；它們有自己可獨立驗證的 runtime 與 schema，只是不屬於 current API/Web。已刪除的舊訪談／`job_authoring` 內容則保留在歷史研究與 ADR 中供追溯，不代表仍有 runtime 或 schema。
 
 ## 先讀
 
@@ -20,6 +20,7 @@
 - [`plans/2026-08-10-current-application-modularization-plan.md`](plans/2026-08-10-current-application-modularization-plan.md) — 可交付實作者逐 task 搬移、驗證與 commit 的 current application 模組化計畫。
 - [`contract-strategy.md`](contract-strategy.md) — 現行 `job-analysis-contract` 的契約規範。
 - [`adr/README.md`](adr/README.md) — ADR 索引；0057 記錄 current-only hard cut。
+- [`design/rag-pipeline.md`](design/rag-pipeline.md) — PDF → OCS contract → indexer → embedder/Qdrant 的 RAG 供應鏈；保留但與 current API/Web 完全隔離的獨立 bounded context，非 current 產品 runtime。
 
 ## 文檔分層
 

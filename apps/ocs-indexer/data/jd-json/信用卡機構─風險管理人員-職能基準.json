@@ -1,0 +1,569 @@
+{
+  "version_info": {
+    "versions": [
+      {
+        "version": "V4",
+        "ocs_code": "BLM2412-002v4",
+        "ocs_name": "信用卡機構─風險管理人員",
+        "status": "最新版本",
+        "update_note": "略",
+        "update_date": "2023/01/06"
+      },
+      {
+        "version": "V3",
+        "ocs_code": "BLM2412-002v3",
+        "ocs_name": "信用卡機構─風險管理人員",
+        "status": "歷史版本",
+        "update_note": "已被《BLM2412-002v4》取代",
+        "update_date": "2020/01/16"
+      },
+      {
+        "version": "V2",
+        "ocs_code": "BLM2412-002v2",
+        "ocs_name": "信用卡機構─風險管理人員",
+        "status": "歷史版本",
+        "update_note": "已被《BLM2412-002v3》取代",
+        "update_date": "2016/12/31"
+      },
+      {
+        "version": "V1",
+        "ocs_code": "BLM2412-002v1",
+        "ocs_name": "信用卡機構-風險管理人員",
+        "status": "歷史版本",
+        "update_note": "已被《BLM2412-002v2》取代",
+        "update_date": "2014/12/31"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "ocs_code": "BLM2412-002v4",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "信用卡機構─風險管理人員"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "企業經營管理/運籌管理",
+          "code": "BLM"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "信用卡機構─風險管理人員",
+          "code": "2412"
+        }
+      ],
+      "industries": [
+        {
+          "name": "金融及保險業/金融服務業(信用卡發卡機構)",
+          "code": "K6499"
+        }
+      ]
+    },
+    "job_description": "有效規劃、監督與執行信用卡機構風險管理政策及事務，以促進公司策略目標之達成。",
+    "ocs_level": 4
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "擬訂風險管理政策",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "掌握風險管理政策之訂定與執行成果"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "評估資產組合依照風險管理政策與風險評估作業之執行狀況。"
+                  },
+                  {
+                    "code": "P1.1.2",
+                    "text": "提升風險管理成效。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.1.1",
+                    "name": "風險管理政策"
+                  },
+                  {
+                    "code": "O1.1.2",
+                    "name": "風險管理政策執行成果"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K03",
+                    "name": "經濟"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "金融市場"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "風險管理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S03",
+                    "name": "策略性思考"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "規劃與組織能力"
+                  },
+                  {
+                    "code": "S18",
+                    "name": "溝通能力"
+                  },
+                  {
+                    "code": "S25",
+                    "name": "績效管理"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.2",
+                "name": "建立衡量、監控及評估可量化之風險整體架構"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.2.1",
+                    "text": "注意國際與國內風險管理制度發展情形。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.2.1",
+                    "name": "風險管理整體架構"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K04",
+                    "name": "金融市場"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "法律/法規"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "風險管理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S03",
+                    "name": "策略性思考"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "規劃與組織能力"
+                  },
+                  {
+                    "code": "S13",
+                    "name": "問題分析"
+                  },
+                  {
+                    "code": "S18",
+                    "name": "溝通能力"
+                  },
+                  {
+                    "code": "S24",
+                    "name": "資訊科技應用能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "提升風險管理技術",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "提供風險管理作業人員技術支援"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "確認風險管理技術符合內部管理及外部監管的需求程度。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.1.1",
+                    "name": "風險管理技術需求文件"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K03",
+                    "name": "經濟"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "金融市場"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "風險管理"
+                  },
+                  {
+                    "code": "K14",
+                    "name": "統計"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S07",
+                    "name": "品質導向"
+                  },
+                  {
+                    "code": "S13",
+                    "name": "問題分析"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "問題解決"
+                  },
+                  {
+                    "code": "S24",
+                    "name": "資訊科技應用能力"
+                  },
+                  {
+                    "code": "S26",
+                    "name": "量化分析技術"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.2",
+                "name": "對風險模型進行有效性之評估與回溯測試"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.2.1",
+                    "text": "保持風險模型有效性。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.2.1",
+                    "name": "風險模型評估測試報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K03",
+                    "name": "經濟"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "金融市場"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "風險管理"
+                  },
+                  {
+                    "code": "K14",
+                    "name": "統計"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S10",
+                    "name": "分析與解讀能力"
+                  },
+                  {
+                    "code": "S13",
+                    "name": "問題分析"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "問題解決"
+                  },
+                  {
+                    "code": "S24",
+                    "name": "資訊科技應用能力"
+                  },
+                  {
+                    "code": "S26",
+                    "name": "量化分析技術"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.3",
+                "name": "擬定風險管理相關作業辦法及程序"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.3.1",
+                    "text": "改善風險管理方案對業務績效之影響。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "會計"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "金融市場"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "法律/法規"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "風險管理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S11",
+                    "name": "規劃與組織能力"
+                  },
+                  {
+                    "code": "S18",
+                    "name": "溝通能力"
+                  },
+                  {
+                    "code": "S20",
+                    "name": "說服能力"
+                  },
+                  {
+                    "code": "S30",
+                    "name": "決斷力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T3",
+        "ocu_name": "執行風險管理程序",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T3.1",
+                "name": "信用卡商品風險管理日常報表之監控與分析"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.1.1",
+                    "text": "定期衡量、監控個別資產類別風險及限額。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.1.1",
+                    "name": "風險管理日常報表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "會計"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "金融市場"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "法律/法規"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "風險管理"
+                  },
+                  {
+                    "code": "K14",
+                    "name": "統計"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S10",
+                    "name": "分析與解讀能力"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "時間管理"
+                  },
+                  {
+                    "code": "S18",
+                    "name": "溝通能力"
+                  },
+                  {
+                    "code": "S26",
+                    "name": "量化分析技術"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.2",
+                "name": "確切了解各業務單位之風險限額及使用狀況"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.2.1",
+                    "text": "分析公司整體風險變動狀況,落實執行風險超限之處理原則。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.2.1",
+                    "name": "各項業務風險限額使用狀況表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K04",
+                    "name": "金融市場"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "法律/法規"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "風險管理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S12",
+                    "name": "時間管理"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "問題解決"
+                  },
+                  {
+                    "code": "S18",
+                    "name": "溝通能力"
+                  },
+                  {
+                    "code": "S20",
+                    "name": "說服能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "主動積極"
+      },
+      {
+        "code": "A02",
+        "name": "正直誠實"
+      },
+      {
+        "code": "A03",
+        "name": "親和力"
+      },
+      {
+        "code": "A04",
+        "name": "持續學習"
+      },
+      {
+        "code": "A07",
+        "name": "追求卓越"
+      },
+      {
+        "code": "A08",
+        "name": "團隊意識"
+      },
+      {
+        "code": "A09",
+        "name": "彈性"
+      },
+      {
+        "code": "A10",
+        "name": "壓力容忍"
+      },
+      {
+        "code": "A14",
+        "name": "謹慎細心"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "對信用卡商品及運作有基本瞭解，並具備相當程度風險管理業務經驗者。"
+    ],
+    "supplements": []
+  }
+}

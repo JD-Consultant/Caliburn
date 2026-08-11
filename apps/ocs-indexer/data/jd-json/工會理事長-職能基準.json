@@ -1,0 +1,437 @@
+{
+  "version_info": {
+    "versions": [
+      {
+        "version": "BGM1113-001v4",
+        "ocs_code": "BGM1113-001v4",
+        "ocs_name": "工會理事長",
+        "status": "最新版本",
+        "update_note": "略",
+        "update_date": "Unknown"
+      },
+      {
+        "version": "BGM1113-001v3",
+        "ocs_code": "BGM1113-001v3",
+        "ocs_name": "工會理事長",
+        "status": "歷史版本",
+        "update_note": "已被《BGM1113-001v4》取代",
+        "update_date": "Unknown"
+      },
+      {
+        "version": "BGM1113-001v2",
+        "ocs_code": "BGM1113-001v2",
+        "ocs_name": "工會理事長",
+        "status": "歷史版本",
+        "update_note": "已被《BGM1113-001v3》取代",
+        "update_date": "Unknown"
+      },
+      {
+        "version": "BGM1113-001v1",
+        "ocs_code": "BGM1113-001v1",
+        "ocs_name": "工會管理幹部",
+        "status": "歷史版本",
+        "update_note": "已被《BGM1113-001v2》取代",
+        "update_date": "Unknown"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "ocs_code": "BGM1113-001v4",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "工會理事長"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "企業經營管理/一般管理",
+          "code": "BGM"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "工會理事長",
+          "code": "1113"
+        }
+      ],
+      "industries": [
+        {
+          "name": "其他服務業/宗教、職業及類似組織",
+          "code": "S9423"
+        }
+      ]
+    },
+    "job_description": "依據組織宗旨與任務，進行對內溝通、對外協商、爭取會員權益、資源及風險管理。",
+    "ocs_level": 5
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "工會組",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "評估組織政策"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 5,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "依相關法規、組織章程及內外部環境分析\n5\n5\nK01相關法規\nK02內外部環境分析\nK03組織章程\nK04多元文化概念\nK01相關法規\nS01溝通與協調能力\nS02問題解決能力\nS03內外部環境認知與評估\nS04策略性思考\nS05價值判斷\nS01溝通與協調能力"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "相關法規"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "內外部環境分析"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "組織章程"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "溝通與協調能力"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "問題解決能力"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "內外部環境認知與評估"
+                  }
+                ]
+              },
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.1.2",
+                    "text": "與利益關係人溝通，確認組織政策與制度\nK04多元文化概念\nS04策略性思考"
+                  },
+                  {
+                    "code": "P1.1.3",
+                    "text": "與組織代表成員達成共識。"
+                  },
+                  {
+                    "code": "T1.2",
+                    "text": "主持會議"
+                  },
+                  {
+                    "code": "P1.2.2",
+                    "text": "透過會議，確認並宣導組織政策與會務資\nS07說服能力"
+                  },
+                  {
+                    "code": "T1.3",
+                    "text": "督導會務"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K04",
+                    "name": "多元文化概念"
+                  },
+                  {
+                    "code": "K01",
+                    "name": "相關法規"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "組織章程"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S04",
+                    "name": "策略性思考"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "價值判斷"
+                  },
+                  {
+                    "code": "S01",
+                    "name": "溝通與協調能力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "表達能力"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "說服能力"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "決策能力"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "領導能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "工會組織對外協商",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "T3.風險評估與決策"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.1.2",
+                    "text": "基於組織及成員立場，正確引用相關法規\nS07說服能力"
+                  },
+                  {
+                    "code": "P2.1.3",
+                    "text": "運用媒體或相關管道，推廣組織正面形\nS10談判協商能力"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [],
+                "skills": [
+                  {
+                    "code": "S07",
+                    "name": "說服能力"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "領導能力"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "談判協商能力"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "策略性思考能力"
+                  }
+                ]
+              },
+              {
+                "competency_level": 2,
+                "indicators": [
+                  {
+                    "code": "T2.2",
+                    "text": "爭取權益與資源"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "相關法規"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "內外部環境分析"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "組織章程"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "公共關係"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "溝通與協調能力"
+                  }
+                ]
+              },
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.2.2",
+                    "text": "協助組織及成員爭取會員權益及資源。\nS06表達能力"
+                  },
+                  {
+                    "code": "P3.1.1",
+                    "text": "邀請利益關係人進行風險辨識。\n5\nK01相關法規\nS03內外部環境認知與評估"
+                  },
+                  {
+                    "code": "P3.1.2",
+                    "text": "依據環境分析，評估及確認組織風險。\nK03組織章程\nS13風險評估能力"
+                  },
+                  {
+                    "code": "P3.1.3",
+                    "text": "評估風險發生之可能性與衝擊。\nK06風險管理"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "相關法規"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "組織章程"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "內外部環境分析"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "公共關係"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "風險管理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S06",
+                    "name": "表達能力"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "說服能力"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "談判協商能力"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "策略性思考能力"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "人脈拓展"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "內外部環境認知與評估"
+                  },
+                  {
+                    "code": "S13",
+                    "name": "風險評估能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.2",
+                "name": "風險決策"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.2.1",
+                    "text": "依風險評估結果，確認風險應對方案。\n5\nK05公共關係\nK06風險管理\nK05公共關係\nS02問題解決能力\nS14危機處理能力\nS02問題解決能力"
+                  },
+                  {
+                    "code": "P3.2.2",
+                    "text": "督導組織成員執行風險管理。\nK06風險管理\nS14危機處理能力"
+                  },
+                  {
+                    "code": "P3.2.3",
+                    "text": "依風險問題，進行危機處理。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K05",
+                    "name": "公共關係"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "風險管理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "問題解決能力"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "危機處理能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "壓力容忍：冷靜且有效地應對及處理高度緊張的情況或壓力，如緊迫的時間、不友善的人、各類突發事件及危急狀況，並能以適當的方式紓解自身壓力。"
+      },
+      {
+        "code": "A02",
+        "name": "團隊意識：積極參與並支持團隊，能彼此鼓勵共同達成團隊目標。"
+      },
+      {
+        "code": "A03",
+        "name": "追求卓越：會為自己設定具挑戰性的工作目標並全力以赴，願意主動投注心力達成或超越既定目標，不斷尋求突破。"
+      },
+      {
+        "code": "A04",
+        "name": "應對不確定性：當狀況不明或問題不夠具體的情況下，能在必要時採取行動，以有效釐清模糊不清的態勢，完成任務。"
+      },
+      {
+        "code": "A05",
+        "name": "持續學習：能夠展現持續學習的企圖心，利用且積極參與各種機會，學習任務所需的新知識與技能，並能有效應用在特定任務。"
+      },
+      {
+        "code": "A06",
+        "name": "親和力：對他人表現理解、友善、同理心、關心和禮貌，並能與不同背景的人發展及維持良好關係。"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "依工會法及組織章程規定。"
+    ],
+    "supplements": [
+      "相關法規：如工會法、勞工保險條例、全民健康保險法、勞動基準法、勞資爭議處理法、職業安全衛生法、媒體法及遊說法等。",
+      "組織政策：確保組織內部的一致性、效率和合規性。"
+    ]
+  }
+}

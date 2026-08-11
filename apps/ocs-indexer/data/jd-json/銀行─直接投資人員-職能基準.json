@@ -1,0 +1,529 @@
+{
+  "version_info": {
+    "versions": [
+      {
+        "version": "V4",
+        "ocs_code": "FSI2412-002v4",
+        "ocs_name": "銀行─直接投資人員",
+        "status": "最新版本",
+        "update_note": "略",
+        "update_date": "2023/01/06"
+      },
+      {
+        "version": "V3",
+        "ocs_code": "FSI2412-002v3",
+        "ocs_name": "銀行─直接投資人員",
+        "status": "歷史版本",
+        "update_note": "已被《BLM2412-002v4》取代",
+        "update_date": "2020/01/16"
+      },
+      {
+        "version": "V2",
+        "ocs_code": "FSI2412-002v2",
+        "ocs_name": "銀行─直接投資人員",
+        "status": "歷史版本",
+        "update_note": "已被《BLM2412-002v3》取代",
+        "update_date": "2016/12/31"
+      },
+      {
+        "version": "V1",
+        "ocs_code": "FSI2412-002v1",
+        "ocs_name": "銀行業直接投資人員",
+        "status": "歷史版本",
+        "update_note": "已被《BLM2412-002v2》取代",
+        "update_date": "2014/12/31"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "ocs_code": "FSI2412-002v4",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "銀行─直接投資人員"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "金融財務/證券及投資",
+          "code": "FSI"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "銀行─直接投資人員",
+          "code": "2412"
+        }
+      ],
+      "industries": [
+        {
+          "name": "金融及保險業/金融服務業(銀行業)",
+          "code": "K6412"
+        }
+      ]
+    },
+    "job_description": "負責財務調度制度規劃，分析產業市場發展，投資風險評估，投資組合操作管理，達成專案投資績效目標。",
+    "ocs_level": 4
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "擬訂產業投資專案計畫、專案績效考核及目標控管",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "投資專案策略及績效制定"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "整體投資替代性方案策略之擬定。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.1.1",
+                    "name": "投資策略規劃書製作"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K03",
+                    "name": "經濟"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "金融商品"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "企業管理"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "風險管理"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "外語能力"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S03",
+                    "name": "策略性思考"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "規劃與組織能力"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "問題解決"
+                  },
+                  {
+                    "code": "S18",
+                    "name": "溝通能力"
+                  },
+                  {
+                    "code": "S20",
+                    "name": "說服能力"
+                  },
+                  {
+                    "code": "S25",
+                    "name": "績效管理"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.2",
+                "name": "投資專案風險規範的制定"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.2.1",
+                    "text": "有效風險機制之規劃及下行風險控管。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.2.1",
+                    "name": "投資專案風險機制評估文件"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K03",
+                    "name": "經濟"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "金融商品"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "企業管理"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "風險管理"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "外語能力"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S03",
+                    "name": "策略性思考"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "規劃與組織能力"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "問題解決"
+                  },
+                  {
+                    "code": "S18",
+                    "name": "溝通能力"
+                  },
+                  {
+                    "code": "S20",
+                    "name": "說服能力"
+                  },
+                  {
+                    "code": "S23",
+                    "name": "文書撰寫能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "投資專案計畫執行規劃",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "負責執行投資專案的可行性方案及策略"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "投資方案的進度流程管控及各市場之調查。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.1.1",
+                    "name": "投資方案執行規劃書"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K03",
+                    "name": "經濟"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "金融市場"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "法律/法規"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "產業分析"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S10",
+                    "name": "分析與解讀能力"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "規劃與組織能力"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "問題解決"
+                  },
+                  {
+                    "code": "S23",
+                    "name": "文書撰寫能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.2",
+                "name": "投資專案的資金運用進度管控執行"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.2.1",
+                    "text": "負責投資專案財務調度及資金規劃運用。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.2.1",
+                    "name": "投資方案財務差異性分析報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K03",
+                    "name": "經濟"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "金融市場"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "法律/法規"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "產業分析"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S10",
+                    "name": "分析與解讀能力"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "規劃與組織能力"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "問題解決"
+                  },
+                  {
+                    "code": "S23",
+                    "name": "文書撰寫能力"
+                  },
+                  {
+                    "code": "S27",
+                    "name": "預算編制"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T3",
+        "ocu_name": "督導執行各競爭產業研究分析及總體經濟市場研判",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T3.1",
+                "name": "產業組織分析及總體經濟分析"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.1.1",
+                    "text": "個別產業發展分析、經濟景氣判讀力培養。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.1.1",
+                    "name": "產業及總經分析文件"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "會計"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "財務分析"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "金融市場"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "產業分析"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S10",
+                    "name": "分析與解讀能力"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "時間管理"
+                  },
+                  {
+                    "code": "S13",
+                    "name": "問題分析"
+                  },
+                  {
+                    "code": "S24",
+                    "name": "資訊科技應用能力"
+                  },
+                  {
+                    "code": "S26",
+                    "name": "量化分析技術"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.2",
+                "name": "公司財務會計數據研讀"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.2.1",
+                    "text": "上市/櫃公司會計報表的閱讀理解。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.2.1",
+                    "name": "上市/櫃公司財務報表的分析報告書"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "會計"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "財務分析"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "金融市場"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "產業分析"
+                  },
+                  {
+                    "code": "K14",
+                    "name": "統計"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S10",
+                    "name": "分析與解讀能力"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "時間管理"
+                  },
+                  {
+                    "code": "S13",
+                    "name": "問題分析"
+                  },
+                  {
+                    "code": "S24",
+                    "name": "資訊科技應用能力"
+                  },
+                  {
+                    "code": "S26",
+                    "name": "量化分析技術"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "主動積極"
+      },
+      {
+        "code": "A03",
+        "name": "親和力"
+      },
+      {
+        "code": "A07",
+        "name": "追求卓越"
+      },
+      {
+        "code": "A09",
+        "name": "彈性"
+      },
+      {
+        "code": "A10",
+        "name": "壓力容忍"
+      },
+      {
+        "code": "A14",
+        "name": "謹慎細心"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "在銀行、投資機構或其他金融服務機構或企業財務部門具有相當程度工作經驗，且有豐富市場投資實績可供追蹤者。"
+    ],
+    "supplements": []
+  }
+}

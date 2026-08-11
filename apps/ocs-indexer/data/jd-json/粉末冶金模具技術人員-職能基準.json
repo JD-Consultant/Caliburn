@@ -1,0 +1,480 @@
+{
+  "version_info": {
+    "versions": [
+      {
+        "version": "V3",
+        "ocs_code": "MPM7222-004v3",
+        "ocs_name": "粉末冶金模具技術人員",
+        "status": "最新版本",
+        "update_note": "略",
+        "update_date": "2024/12/15"
+      },
+      {
+        "version": "V2",
+        "ocs_code": "MPM7222-004v2",
+        "ocs_name": "粉末冶金模具技術人員",
+        "status": "歷史版本",
+        "update_note": "已被《MPM7222-004v3》取代",
+        "update_date": "2021/12/31"
+      },
+      {
+        "version": "V1",
+        "ocs_code": "MPM7222-004v1",
+        "ocs_name": "粉末冶金模具技術人員",
+        "status": "歷史版本",
+        "update_note": "已被《MPM7222-004v2》取代",
+        "update_date": "2019/12/19"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "ocs_code": "MPM7222-004v3",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "粉末冶金模具技術人員"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "製造/生產管理",
+          "code": "MPM"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "粉末冶金模具技術人員",
+          "code": "7222"
+        }
+      ],
+      "industries": [
+        {
+          "name": "製造業/金屬製品製造業",
+          "code": "C2512"
+        }
+      ]
+    },
+    "job_description": "從事粉末冶金模具之製作及維修工作。",
+    "ocs_level": 3
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "工作圖判讀",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "圖面及材料表檢查"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "依照工作圖面及材料表,確認模具零組件及規格。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.1.1",
+                    "name": "領料單"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "材料規格"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "標準元件規格"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "公差配合與幾何公差符號"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "工程圖學"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "工作圖判讀能力"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "辨別表面織構符號與公差配 合能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.2",
+                "name": "加工資訊蒐集"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.2.1",
+                    "text": "整合加工資訊的蒐集與分類,並運用於加工作業。"
+                  },
+                  {
+                    "code": "P1.2.2",
+                    "text": "學習運用新技術於工作領域。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K05",
+                    "name": "科技發展趨勢"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S03",
+                    "name": "加工資訊蒐集能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "粉末冶金模具製作與協助試模",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "鉗工作業"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "確認物料來源:粉末材料、添加劑的物理特性、化學特性,機械性質及製造程序。"
+                  },
+                  {
+                    "code": "P2.1.2",
+                    "text": "選用適切工具進行手動加工作業。"
+                  },
+                  {
+                    "code": "P2.1.3",
+                    "text": "依工件需求進行適切的刀具選用、研磨及配置等工作。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K06",
+                    "name": "機械製造程序"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "職業安全衛生相關規範"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S04",
+                    "name": "基本手動加工作業之操作能 力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.2",
+                "name": "模具製作"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.2.1",
+                    "text": "進行工作分析。"
+                  },
+                  {
+                    "code": "P2.2.2",
+                    "text": "依工件及粉末材質、燒結、完工製程之需求,操作各種機械並選擇正確加工程序,製作粉末冶金模具。"
+                  },
+                  {
+                    "code": "P2.2.3",
+                    "text": "使用各種量具完成粉末冶金模具的測量,以符合設計需求。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.2.1",
+                    "name": "模具零組件"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K06",
+                    "name": "機械製造程序"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "職業安全衛生相關規範"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "粉末冶金概論"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "工作分析概論"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "精密量測概論"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "品質管理概論"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S05",
+                    "name": "粉末冶金製程分析能力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "模具製作及修整能力"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "量具操作能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.3",
+                "name": "模具組立與協助試模"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.3.1",
+                    "text": "依據組立圖組合模具,並予以修整。"
+                  },
+                  {
+                    "code": "P2.3.2",
+                    "text": "協助架設模具試模,以達成試模要求。"
+                  },
+                  {
+                    "code": "P2.3.3",
+                    "text": "使用各種量測儀器、檢驗治具、量具完成試模成品的精度測量。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.3.1",
+                    "name": "試模成品"
+                  },
+                  {
+                    "code": "O2.3.2",
+                    "name": "粗胚尺度檢測表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K10",
+                    "name": "精密量測概論"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "品質管理概論"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "夾具及治具"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S07",
+                    "name": "量具操作能力"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "夾具及治具製作能力"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "模具安裝與組立修整能力"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "檢驗治具製作能力"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "試模操作與成品量測能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T3",
+        "ocu_name": "模具保修作業",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T3.1",
+                "name": "模具維修及保養作業"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.1.1",
+                    "text": "模具維修及定期保養作業。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.1.1",
+                    "name": "維修保養紀錄"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K13",
+                    "name": "模具維修與保養概要"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S12",
+                    "name": "模具維修與保養能力"
+                  },
+                  {
+                    "code": "S13",
+                    "name": "零組件堪用程度之判定能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.2",
+                "name": "協助模具異常處理"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.2.1",
+                    "text": "協助生產單位處理模具異常狀況。"
+                  },
+                  {
+                    "code": "P3.2.2",
+                    "text": "協助排除模具生產製作之問題。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K11",
+                    "name": "品質管理概論"
+                  },
+                  {
+                    "code": "K14",
+                    "name": "問題分析與探討"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S14",
+                    "name": "異常狀況初步研判與處理能 力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "主動積極：不需他人指示或要求能自動自發做事，面臨問題立即採取行動加以解決，且為達目標願意主動承擔額外責任。"
+      },
+      {
+        "code": "A02",
+        "name": "自我管理：設立定義明確且實際可行的個人目標；對於及時完成任務展現高度進取、努力、承諾及負責任的行為。"
+      },
+      {
+        "code": "A03",
+        "name": "團隊意識：積極參與並支持團隊，能彼此鼓勵共同達成團隊目標。"
+      },
+      {
+        "code": "A04",
+        "name": "壓力容忍：冷靜且有效地應對及處理高度緊張的情況或壓力，如緊迫的時間、不友善的人、各類突發事件及危急狀況，並能以適當的方式紓解自身壓力。"
+      },
+      {
+        "code": "A05",
+        "name": "正直誠實：展現高道德標準及值得信賴的行為，且能以維持組織誠信為行事原則，瞭解違反組織、自己及他人的道德標準之影響。"
+      },
+      {
+        "code": "A06",
+        "name": "持續學習：能夠展現自我提升的企圖心，利用且積極參與各種機會，學習任務所需的新知識與技能，並能有效應用在特定任務。"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "高中（職）機械相關科系畢業或同等學歷，或具1年以上的機械相關工作經驗。"
+    ],
+    "supplements": [
+      "手動加工作業：如劃線、鋸切、銼削、攻鉸螺絲、鉸孔、手動研磨等作業。",
+      "機械製造程序：如鉗工、車床、銑床、磨床、EDM、WEDM、CNC工具機等機械工作法。",
+      "工作分析：如混料、成形、燒結、完成加工法等。",
+      "量測儀器：如密度機、實務投影機、萬能試驗機、硬度機等。"
+    ]
+  }
+}

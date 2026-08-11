@@ -1,0 +1,648 @@
+{
+  "version_info": {
+    "versions": [
+      {
+        "version": "V4",
+        "ocs_code": "BHR3333-004v4",
+        "ocs_name": "就業服務人員",
+        "status": "最新版本",
+        "update_note": "略",
+        "update_date": "2024/12/15"
+      },
+      {
+        "version": "V3",
+        "ocs_code": "BHR3333-004v3",
+        "ocs_name": "就業服務人員",
+        "status": "歷史版本",
+        "update_note": "已被《BHR3333-004v4》取代",
+        "update_date": "2021/12/21"
+      },
+      {
+        "version": "V2",
+        "ocs_code": "BHR3333-004v2",
+        "ocs_name": "就業服務人員",
+        "status": "歷史版本",
+        "update_note": "已被《BHR3333-004v3》取代",
+        "update_date": "2018/12/21"
+      },
+      {
+        "version": "V1",
+        "ocs_code": "BHR3333-004v1",
+        "ocs_name": "就業安置人員",
+        "status": "歷史版本",
+        "update_note": "已被《BHR3333-004v2》取代",
+        "update_date": "2015/12/31"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "ocs_code": "BHR3333-004v4",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "就業服務人員"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "企業經營管理/人力資源管理",
+          "code": "BHR"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "就業服務人員",
+          "code": "3333"
+        }
+      ],
+      "industries": [
+        {
+          "name": "支援服務業/人力仲介及供應業",
+          "code": "N78"
+        }
+      ]
+    },
+    "job_description": "提供就業資訊及協助求職者規劃就業計畫，並進行就業服務管理作業。",
+    "ocs_level": 3
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "探尋就業需求",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "開發就業服務需求"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "依機構政策及市場需求,發佈就業服務資訊,開發現有或潛在求職者。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "就業服務相關法規與政策"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "職業安全衛生法相關知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "表達能力"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "溝通協調能力"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "開發需求者能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.2",
+                "name": "評估就業服務需求"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.2.1",
+                    "text": "透過求職者諮詢,向求職者說明就業服務諮詢內容與方式,並引導求職者說明需要"
+                  },
+                  {
+                    "code": "P1.2.2",
+                    "text": "透過晤談方式,了解求職者背景(如專長、經濟狀況、工作經歷等)。"
+                  },
+                  {
+                    "code": "P1.2.3",
+                    "text": "依據就業市場需求,評估求職者職能內涵與工作需求。"
+                  },
+                  {
+                    "code": "P1.2.4",
+                    "text": "依機構程序記錄評估內容。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.2.1",
+                    "name": "就業服務需求表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K03",
+                    "name": "職業倫理與保密原則"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "就業市場趨勢"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "產業及職業概況"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "組織規範與求職者權責"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "職涯評估方法"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "多元文化認知"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "溝通協調能力"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "提問技巧"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "需求評估能力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "評估紀錄撰寫能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.3",
+                "name": "確認就業服務需求"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.3.1",
+                    "text": "與求職者討論並確認符合實際需求的就業目標。"
+                  },
+                  {
+                    "code": "P1.3.2",
+                    "text": "確認求職者所需訓練、提供求職活動及資源相關資訊。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K07",
+                    "name": "職涯評估方法"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S04",
+                    "name": "提問技巧"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "需求評估能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "規劃求職活動",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "規劃求職活動"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "與求職者確認合適的產業、職業及地點,並將個人狀況納入考量。"
+                  },
+                  {
+                    "code": "P2.1.2",
+                    "text": "協助求職者完成就業計畫,包含接觸求職市場的策略及需求。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "就業服務相關法規與政策"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "職業安全衛生法相關知識"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "職業倫理與保密原則"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "就業市場趨勢"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "產業及職業概況"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "表達能力"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "溝通協調能力"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "提問技巧"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "需求評估能力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "評估紀錄撰寫能力"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "引導啟發技巧"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.2",
+                "name": "協助求職者發展求職技能"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.2.1",
+                    "text": "評估求職者目前的求職技能及資源,以確認可發展及改善範圍。"
+                  },
+                  {
+                    "code": "P2.2.2",
+                    "text": "透過正式及非正式的發展活動,改善求職者之求職技巧。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K09",
+                    "name": "個人職涯決策影響因素"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "求職管道"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "職業職務概念"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "履歷撰寫及面試技巧"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "求職策略(如自我行銷、人 脈經營等)"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S08",
+                    "name": "文書處理能力"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "資料蒐集與分析能力"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "資訊科技應用能力"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "說服技巧"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "求職活動規劃能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T3",
+        "ocu_name": "就業服務管理",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T3.1",
+                "name": "提供就業資訊"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.1.1",
+                    "text": "依據就業市場資訊,協助求職者判斷與決定。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K02",
+                    "name": "職業安全衛生法相關知識"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "就業市場趨勢"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "組織規範與求職者權責"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "溝通協調能力"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "引導啟發技巧"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "文書處理能力"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "資訊科技應用能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.2",
+                "name": "就業媒合"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.2.1",
+                    "text": "依雇主需求,提供求職者相關資訊。"
+                  },
+                  {
+                    "code": "P3.2.2",
+                    "text": "確認求職者優勢與能力,並協助推薦給雇主。"
+                  },
+                  {
+                    "code": "P3.2.3",
+                    "text": "運用說服溝通技巧,協助進行就業媒合。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K04",
+                    "name": "就業市場趨勢"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "職業職務概念"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "溝通協調能力"
+                  },
+                  {
+                    "code": "S13",
+                    "name": "就業追蹤能力"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "問題分析與解決能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.3",
+                "name": "就業轉介"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.3.1",
+                    "text": "評估求職者就業狀況或需求,與相關單位或專業人員確認轉介需求。"
+                  },
+                  {
+                    "code": "P3.3.2",
+                    "text": "向求職者說明轉介流程,並簽署轉介同意書。"
+                  },
+                  {
+                    "code": "P3.3.3",
+                    "text": "完成轉介相關表單與流程。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.3.1",
+                    "name": "轉介評估表"
+                  },
+                  {
+                    "code": "O3.3.2",
+                    "name": "轉介同意書"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K09",
+                    "name": "個人職涯決策影響因素"
+                  },
+                  {
+                    "code": "K14",
+                    "name": "勞動相關法規"
+                  },
+                  {
+                    "code": "K15",
+                    "name": "個人資料保護法"
+                  },
+                  {
+                    "code": "K16",
+                    "name": "轉介資源之社群網絡"
+                  },
+                  {
+                    "code": "K17",
+                    "name": "轉介流程"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "溝通協調能力"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "文書處理能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.4",
+                "name": "就業成效追蹤"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.4.1",
+                    "text": "檢視並記錄就業服務成效,並完成結案紀錄及改善策略。"
+                  },
+                  {
+                    "code": "P3.4.2",
+                    "text": "彙整結案報告,並依相關法規進行資料維護與保密。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.4.1",
+                    "name": "結案紀錄"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K03",
+                    "name": "職業倫理與保密原則"
+                  },
+                  {
+                    "code": "K15",
+                    "name": "個人資料保護法"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S08",
+                    "name": "文書處理能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "壓力容忍：冷靜且有效地應對及處理高度緊張的情況或壓力，如緊迫的時間、不友善的人、各類突發事件及危急狀況，並能以適當的方式紓解自身壓力。"
+      },
+      {
+        "code": "A02",
+        "name": "謹慎細心：對於任務的執行過程，能謹慎考量及處理所有細節，精確地檢視每個程序，並持續對其保持高度關注。"
+      },
+      {
+        "code": "A03",
+        "name": "應對不確定性：當狀況不明或問題不夠具體的情況下，能在必要時採取行動，以有效釐清模糊不清的態勢，完成任務。"
+      },
+      {
+        "code": "A04",
+        "name": "主動積極：不需他人指示或要求能自動自發做事，面臨問題立即採取行動加以解決，且為達目標願意主動承擔額外責任。"
+      },
+      {
+        "code": "A05",
+        "name": "自我管理：設立定義明確且實際可行的個人目標；對於及時完成任務展現高度進取、努力、承諾及負責任的行為。"
+      },
+      {
+        "code": "A06",
+        "name": "親和力：對他人表現理解、友善、同理心、關心和禮貌，並能與不同背景的人發展及維持良好關係。"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "社會、企管、人資、心理、勞工等大專以上相關科系（所）畢業，或具1年以上就業服務相關經歷。"
+    ],
+    "supplements": [
+      "轉介：如工作轉換、申請補助方案及參與訓練課程等。"
+    ]
+  }
+}

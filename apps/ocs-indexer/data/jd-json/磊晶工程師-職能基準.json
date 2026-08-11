@@ -1,0 +1,882 @@
+{
+  "version_info": {
+    "versions": [
+      {
+        "version": "V4",
+        "ocs_code": "SET3114-001v4",
+        "ocs_name": "磊晶工程師",
+        "status": "最新版本",
+        "update_note": "因應產業需求，檢視更新職能基準內容。",
+        "update_date": "2023/12/31"
+      },
+      {
+        "version": "V3",
+        "ocs_code": "SET3114-001v3",
+        "ocs_name": "磊晶工程師",
+        "status": "歷史版本",
+        "update_note": "已被《SET3114-001v4》取代",
+        "update_date": "2021/01/18"
+      },
+      {
+        "version": "V2",
+        "ocs_code": "SET3114-001v2",
+        "ocs_name": "LED光電產業磊晶工程師",
+        "status": "歷史版本",
+        "update_note": "已被《SET3114-001v3》取代",
+        "update_date": "2017/12/31"
+      },
+      {
+        "version": "V1",
+        "ocs_code": "SET3114-001v1",
+        "ocs_name": "LED光電產業磊晶工程師",
+        "status": "歷史版本",
+        "update_note": "已被《SET3114-001v2》取代",
+        "update_date": "2012/06/30"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "ocs_code": "SET3114-001v4",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "磊晶工程師"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "科學",
+          "code": "SET"
+        },
+        {
+          "name": "技術",
+          "code": "SET"
+        },
+        {
+          "name": "工程",
+          "code": "SET"
+        },
+        {
+          "name": "數學/工程及技術",
+          "code": "SET"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "磊晶工程師",
+          "code": "2141"
+        }
+      ],
+      "industries": [
+        {
+          "name": "製造業/電子零組件製造業",
+          "code": "C2642"
+        }
+      ]
+    },
+    "job_description": "根據顧客或市場需求，從事磊晶製成設定與調整，包含磊晶參數（Epitaxy Recipe）、基板樣式（Substrate Type）、基板磊晶\n（Substrate Epi）、及安排生產流程及製程設備的改善，開發出符合客戶要求的磊晶片（EPI Wafers）。",
+    "ocs_level": 4
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "確認產品開發目標",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "提供磊晶所需規格、尺寸、性能、用\n途、特\n色、差異\n化"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "能夠量化來佐證產品開發各項指標,確認合理的開發目標,有效掌握公司自我技術能力,並依據產品目標,選用最佳開發方案。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.1.1",
+                    "name": "磊晶規格說明書"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "自有核心技術能力"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "資訊進階的學習"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "規格文件撰寫能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.2",
+                "name": "技術可行性評估:含工程實驗、技術、成本、生產時程"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 4,
+                "indicators": [
+                  {
+                    "code": "P1.2.1",
+                    "text": "能夠明確規劃各階段開發時程,並充分掌握關鍵製程與技術相關資訊。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.2.1",
+                    "name": "產品開發規劃書(進度表,可行性評估)"
+                  },
+                  {
+                    "code": "O1.2.2",
+                    "name": "試量產評估報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K03",
+                    "name": "半導體市場應用面知識"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "成本管控知識"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "光電半導體元件及電子電路 知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "半導體相關知識熟知能力(半 導體元件物理與製作技術、近代 物理、量子力學、材料工程、化 合物半導體、固態物理)"
+                  },
+                  {
+                    "code": "S20",
+                    "name": "產品結構用料表BOM"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.3",
+                "name": "提出最佳方案,並蒐集產業動態資訊"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 4,
+                "indicators": [
+                  {
+                    "code": "P1.3.1",
+                    "text": "明確分析習知技術,能夠評估有效資源最佳化運用方案。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.3.1",
+                    "name": "資源需求配套規劃"
+                  },
+                  {
+                    "code": "O1.3.2",
+                    "name": "市場競爭資訊分析"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K22",
+                    "name": "半導體技術現況與趨勢"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S21",
+                    "name": "資料蒐集與分析能力"
+                  },
+                  {
+                    "code": "S22",
+                    "name": "新產品提案能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "協助安排生產流程",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "檢驗進料"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 2,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "於產品生產過程中,能夠卻摁進料規格及掌握進度,避免缺料情形發生。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.1.1",
+                    "name": "進料規格書"
+                  },
+                  {
+                    "code": "O2.1.2",
+                    "name": "進料進度表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K23",
+                    "name": "品質管理"
+                  },
+                  {
+                    "code": "K24",
+                    "name": "抽樣檢驗"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S03",
+                    "name": "進場材料報表製作"
+                  },
+                  {
+                    "code": "S23",
+                    "name": "抽樣計劃表製作"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.2",
+                "name": "規劃配料"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.2.1",
+                    "text": "能夠善用分析軟體,完成最佳化磊晶產線流程規劃設計,以準時交貨。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.2.1",
+                    "name": "物料盤點表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K25",
+                    "name": "物料管理與存貨控管"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S09",
+                    "name": "物料需求規劃計算"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.3",
+                "name": "佈置生產設備"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.3.1",
+                    "text": "能夠有效率的管理備料,以減少冗多的材料堆積。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.3.1",
+                    "name": "佈置生產設備規劃書"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K06",
+                    "name": "機台產能知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S04",
+                    "name": "計算機台生產量"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.4",
+                "name": "規劃生產排程"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 4,
+                "indicators": [
+                  {
+                    "code": "P2.4.1",
+                    "text": "依據各種不同產品設計,能夠迅速調配生產流程,達到高效能生產。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.4.1",
+                    "name": "生產材料倉儲管理表"
+                  },
+                  {
+                    "code": "O2.4.2",
+                    "name": "生產排程表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K04",
+                    "name": "成本管控知識"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "生產管理與規劃知識"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "倉儲管理知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S05",
+                    "name": "生產時間估算表"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "生產排程表製作"
+                  },
+                  {
+                    "code": "S25",
+                    "name": "生產管制計畫"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T3",
+        "ocu_name": "磊晶生產",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T3.1",
+                "name": "設計與模擬磊晶結構"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 4,
+                "indicators": [
+                  {
+                    "code": "P3.1.1",
+                    "text": "依據KPI達成生產指標(良率)。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.1.1",
+                    "name": "Recipe導入報告書"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K10",
+                    "name": "半導體原理與結構(半導體材 技術、固態物理科學)"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "半導體磊晶技術"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "夾治具設計原理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S07",
+                    "name": "模擬軟體的使用與分析能力"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "磊晶結構設計能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.2",
+                "name": "制定標準作業程序(SOP)"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.2.1",
+                    "text": "制定準確流程之相關SOP,以利生產流程順暢。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.2.1",
+                    "name": "生產SOP報告書"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K13",
+                    "name": "撰寫標準作業程序步驟及要 領"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S26",
+                    "name": "標準作業程序文件製作"
+                  },
+                  {
+                    "code": "S27",
+                    "name": "標準作業流程圖製作"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.3",
+                "name": "磊晶生產及抽測"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.3.1",
+                    "text": "針對磊晶異常分析資料,提出具體的改善對策。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.3.1",
+                    "name": "磊晶產量報表"
+                  },
+                  {
+                    "code": "O3.3.2",
+                    "name": "磊晶特性報表"
+                  },
+                  {
+                    "code": "O3.3.3",
+                    "name": "專案KPI列表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K26",
+                    "name": "生產異常管理標準與處理流 程"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S24",
+                    "name": "生產異常報告單製作"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.4",
+                "name": "特性分析:應力分析、X-ray、EL、PL、摻雜分析及缺陷分析"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 5,
+                "indicators": [
+                  {
+                    "code": "P3.4.1",
+                    "text": "提出磊晶最佳化結構,解釋其結構之用途以及物理機制原因。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.4.1",
+                    "name": "磊晶異常分析表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K14",
+                    "name": "材料分析知識(SEM,X- ray,TEM分析原理)"
+                  },
+                  {
+                    "code": "K15",
+                    "name": "良率統計分析"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S10",
+                    "name": "元件失效分析"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "統計分析能力"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "技術文件撰寫能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T4",
+        "ocu_name": "磊晶設備改善與維護",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T4.1",
+                "name": "磊晶設備操作維護"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 2,
+                "indicators": [
+                  {
+                    "code": "P4.1.1",
+                    "text": "定期進行設備維護,降低機台運作錯誤率。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.1.1",
+                    "name": "設備稼動率"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K16",
+                    "name": "磊晶機台設備結構知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S12",
+                    "name": "技術文件撰寫能力"
+                  },
+                  {
+                    "code": "S13",
+                    "name": "磊晶設備操作能力"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "管路閥件拆裝能力"
+                  },
+                  {
+                    "code": "S15",
+                    "name": "機台測漏能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T4.2",
+                "name": "腔體溫度分析"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.2.1",
+                    "text": "制定相關操作SOP,並掌握異常排除,維持設備運轉。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.2.1",
+                    "name": "設備操作SOP"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K17",
+                    "name": "反應腔體知識(流場概念、熱 力學分析)"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S16",
+                    "name": "定期維護、保養生產設備機 台"
+                  },
+                  {
+                    "code": "S28",
+                    "name": "進行腔體故障排除、異常分 析與追蹤處理"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T4.3",
+                "name": "異常排除"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 4,
+                "indicators": [
+                  {
+                    "code": "P4.3.1",
+                    "text": "檢視元件量測結果,半段腔體內外溫度均勻性,改善設備溫度參數設定。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.3.1",
+                    "name": "設備異常排除報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K18",
+                    "name": "安全防護知識(粉塵、設備管 路、特殊氣體等)"
+                  },
+                  {
+                    "code": "K19",
+                    "name": "機械設備檢修知識(各閥件功 能特性)"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S17",
+                    "name": "設備異常分析及排除能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T5",
+        "ocu_name": "改善製程",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T5.1",
+                "name": "改善製作流程"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 5,
+                "indicators": [
+                  {
+                    "code": "P5.1.1",
+                    "text": "根據試量產或客訴報告,設計提升產能及良率的製程。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O5.1.1",
+                    "name": "工程實驗報告單"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K20",
+                    "name": "生產線流程(生產管理、統計 學)"
+                  },
+                  {
+                    "code": "K21",
+                    "name": "機台稼動率知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S18",
+                    "name": "製程整合能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T5.2",
+                "name": "提出客訴對策"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 4,
+                "indicators": [
+                  {
+                    "code": "P5.2.1",
+                    "text": "熟悉了解設備製程極限,並訂製最佳化之磊晶製作流程。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O5.2.1",
+                    "name": "客訴對策報告書"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K08",
+                    "name": "FMEA失效模式與效應分析"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S19",
+                    "name": "客訴分析除錯能力(良率、波 長均勻性、抗靜電、亮度、電 性、發光效率等)"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "團隊合作"
+      },
+      {
+        "code": "A02",
+        "name": "分析推理"
+      },
+      {
+        "code": "A03",
+        "name": "問題解決"
+      },
+      {
+        "code": "A04",
+        "name": "正直誠實"
+      },
+      {
+        "code": "A05",
+        "name": "謹慎細心"
+      },
+      {
+        "code": "A06",
+        "name": "溝通"
+      },
+      {
+        "code": "A07",
+        "name": "應對不確定性"
+      },
+      {
+        "code": "A08",
+        "name": "壓力容忍"
+      },
+      {
+        "code": "A09",
+        "name": "創新"
+      },
+      {
+        "code": "A10",
+        "name": "追求卓越"
+      },
+      {
+        "code": "A11",
+        "name": "持"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "大學以上學歷，電機工程學類、物理學系、化學系、化學工程學類、材料工程學類、電子工程學類及相關工程科系。",
+      "具備半導體元件物理學及電子電路等專業知識與能力，修過相關課程如：半導體元件物理與製作技術、材料科學導論、近代物理等。"
+    ],
+    "supplements": [
+      "此基準包含助理工程師。"
+    ]
+  }
+}

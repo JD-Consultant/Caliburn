@@ -1,0 +1,618 @@
+{
+  "version_info": {
+    "versions": [
+      {
+        "version": "BAS4999-001v4",
+        "ocs_code": "BAS4999-001v4",
+        "ocs_name": "工會總幹事／秘書長",
+        "status": "最新版本",
+        "update_note": "略",
+        "update_date": "Unknown"
+      },
+      {
+        "version": "BAS4999-001v3",
+        "ocs_code": "BAS4999-001v3",
+        "ocs_name": "工會總幹事／秘書長",
+        "status": "歷史版本",
+        "update_note": "已被《BAS4999-001v4》取代",
+        "update_date": "Unknown"
+      },
+      {
+        "version": "BAS4999-001v2",
+        "ocs_code": "BAS4999-001v2",
+        "ocs_name": "工會總幹事",
+        "status": "歷史版本",
+        "update_note": "已被《BAS4999-001v3》取代",
+        "update_date": "Unknown"
+      },
+      {
+        "version": "BAS4999-001v1",
+        "ocs_code": "BAS4999-001v1",
+        "ocs_name": "工會幹部",
+        "status": "歷史版本",
+        "update_note": "已被《BAS4999-001v2》取代",
+        "update_date": "Unknown"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "ocs_code": "BAS4999-001v4",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "工會總幹事／秘書長"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "企業經營管理/行政支援",
+          "code": "BAS"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "工會總幹事/秘書長",
+          "code": "4999"
+        }
+      ],
+      "industries": [
+        {
+          "name": "其他服務業/宗教、職業及類似組織",
+          "code": "S9423"
+        }
+      ]
+    },
+    "job_description": "依組織規範，綜理會務並督導協調整合各部門規劃與執行會務活動。",
+    "ocs_level": 4
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "綜理工",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "規劃組織會務"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 4,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "蒐集組織內外部資訊，並分析影響組織發\n4\n4\nK01相關法規\nK02組織章程\nK03環境分析\nK04教育訓練品質管理\nK05財務管理概念\nK01相關法規\nS01資料蒐集與分析能力\nS02環境認知與評估\nS03規劃與組織能力\nS04計畫撰寫能力\nS01資料蒐集與分析能力"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.1.1",
+                    "name": "年度工作計畫"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "相關法規"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "組織章程"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "資料蒐集與分析能力"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "環境認知與評估"
+                  }
+                ]
+              },
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.1.2",
+                    "text": "諮詢利益關係人，依組織章程，協助規劃\nK03環境分析\nS03規劃與組織能力"
+                  },
+                  {
+                    "code": "P1.1.3",
+                    "text": "依組織章程，規劃與調整會務，並擬定年\nK05財務管理概念"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.1.1",
+                    "name": "年度工作計畫"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K03",
+                    "name": "環境分析"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "教育訓練品質管理"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "財務管理概念"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S03",
+                    "name": "規劃與組織能力"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "計畫撰寫能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.2",
+                "name": "管理組織會員"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 4,
+                "indicators": [
+                  {
+                    "code": "P1.2.1",
+                    "text": "依組織章程，招募會員與收取會費。\n4\n4\nK01相關法規\nK02組織章程\nK01相關法規\nS05溝通協調能力\nS06領導能力\nS07人脈拓展能力\nS05溝通協調能力"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.2.1",
+                    "name": "會籍管理文件"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "相關法規"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S05",
+                    "name": "溝通協調能力"
+                  }
+                ]
+              },
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.2.2",
+                    "text": "督導會籍資料之建立與管理，並依據組織\nK02組織章程\nS06領導能力"
+                  },
+                  {
+                    "code": "P1.2.3",
+                    "text": "辦理相關會議及活動，宣導組織訊息及重"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.2.1",
+                    "name": "會籍管理文件"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K02",
+                    "name": "組織章程"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S06",
+                    "name": "領導能力"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "人脈拓展能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.3",
+                "name": "督導會務執行"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.3.1",
+                    "text": "依據相關規範與組織業務發展需求，督導\n4\nK01相關法規\nK02組織章程\nK04教育訓練品質管理\nS05溝通協調能力\nS06領導能力\nS08品質導向"
+                  },
+                  {
+                    "code": "P1.3.2",
+                    "text": "依據相關規範與組織業務發展需求，統籌"
+                  },
+                  {
+                    "code": "P1.3.3",
+                    "text": "依據相關規範與組織業務發展需求，協助"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.3.1",
+                    "name": "年度計畫執行管控文件度計畫執行管控表件"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "相關法規"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "組織章程"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "教育訓練品質管理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S05",
+                    "name": "溝通協調能力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "領導能力"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "品質導向"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.2",
+                "name": "協助處理會員反映問題"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 1,
+                "indicators": [
+                  {
+                    "code": "P3.2.1",
+                    "text": "協助處理會員與工會爭端、會員間之爭議及勞資爭議等相關事宜。"
+                  },
+                  {
+                    "code": "P3.2.2",
+                    "text": "彙整會員反映問題,轉知相關單位協調處理。"
+                  },
+                  {
+                    "code": "P3.2.3",
+                    "text": "督導職業災害處理、勞健保補助及相關給付。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.2.1",
+                    "name": "會員問題處理報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "相關法規"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "組織章程"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S05",
+                    "name": "溝通協調能力"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "表達及說服能力"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "顧客導向"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "談判協商能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.3",
+                "name": "執行危機處理"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.3.1",
+                    "text": "依組織現況,確認潛在之危機擬定應對之處理方案。"
+                  },
+                  {
+                    "code": "P3.3.2",
+                    "text": "依擬定應對之處理方案,進行危機處理與管控。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K07",
+                    "name": "公共關係"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "危機管理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S13",
+                    "name": "問題解決能力"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "危機處理能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "規劃與督導活動",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "規劃活動"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "依組織年度工作計畫,規劃活動。"
+                  },
+                  {
+                    "code": "P2.1.2",
+                    "text": "申請外部計畫之補助。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.1.1",
+                    "name": "活動規劃書"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "相關法規"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "組織章程"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "專案管理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S04",
+                    "name": "計畫撰寫能力"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "人脈拓展能力"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "品質導向"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "活動規劃能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.2",
+                "name": "督導活動執行"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.2.1",
+                    "text": "督導與評估活動執行及成效,並提出改善建議。"
+                  },
+                  {
+                    "code": "P2.2.2",
+                    "text": "審查活動結案報告與核銷資料。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.2.1",
+                    "name": "活動成果報告書"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K05",
+                    "name": "財務管理概念"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "專案管理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S05",
+                    "name": "溝通協調能力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "領導能力"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "品質導向"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T3",
+        "ocu_name": "溝通與協調",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T3.1",
+                "name": "推廣組織理念與活動"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.1.1",
+                    "text": "依據組織章程推廣組織宗旨、任務及相關活動。"
+                  },
+                  {
+                    "code": "P3.1.2",
+                    "text": "傳達會員權利、義務及福利。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.1.1",
+                    "name": "年度工作計畫"
+                  },
+                  {
+                    "code": "O3.1.2",
+                    "name": "年"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "相關法規"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "組織章程"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S05",
+                    "name": "溝通協調能力"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "表達及說服能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "謹慎細心：對於任務的執行過程，能謹慎考量及處理所有細節，精確地檢視每個程序，並持續對其保持高度關注。"
+      },
+      {
+        "code": "A02",
+        "name": "親和力：對他人表現理解、友善、同理心、關心和禮貌，並能與不同背景的人發展及維持良好關係。"
+      },
+      {
+        "code": "A03",
+        "name": "主動積極：不需他人指示或要求能自動自發做事，面臨問題立即採取行動加以解決，且為達目標願意主動承擔額外責任。"
+      },
+      {
+        "code": "A04",
+        "name": "團隊意識：積極參與並支持團隊，能彼此鼓勵共同達成團隊目標。"
+      },
+      {
+        "code": "A05",
+        "name": "正直誠實：展現高道德標準及值得信賴的行為，且能以維持組織誠信為行事原則，瞭解違反組織、自己及他人的道德標準之影響。"
+      },
+      {
+        "code": "A06",
+        "name": "壓力容忍：冷靜且有效地應對及處理高度緊張的情況或壓力，如緊迫的時間、不友善的人、各類突發事件及危急狀況，並能以適當的方式紓解自身壓力。"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "依工會組織章程規定。"
+    ],
+    "supplements": [
+      "相關法規：如工會法、勞工保險條例、全民健康保險法、勞動基準法、勞資爭議處理法、職業安全衛生法、媒體法及遊說法等。"
+    ]
+  }
+}

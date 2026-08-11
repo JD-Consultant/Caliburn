@@ -1,0 +1,1095 @@
+{
+  "version_info": {
+    "versions": [
+      {
+        "version": "V4",
+        "ocs_code": "AVA1221-001v4",
+        "ocs_name": "工藝產業行銷經紀",
+        "status": "最新版本",
+        "update_note": "略",
+        "update_date": "2023/07/24"
+      },
+      {
+        "version": "V3",
+        "ocs_code": "AVA1221-001v3",
+        "ocs_name": "工藝產業行銷經紀",
+        "status": "歷史版本",
+        "update_note": "已被《AVA1221-001v4》取代",
+        "update_date": "2021/04/06"
+      },
+      {
+        "version": "V2",
+        "ocs_code": "AVA1221-001v2",
+        "ocs_name": "工藝產業行銷經紀",
+        "status": "歷史版本",
+        "update_note": "已被《AVA1221-001v3》取代",
+        "update_date": "2017/12/31"
+      },
+      {
+        "version": "V1",
+        "ocs_code": "AVA1221-001v1",
+        "ocs_name": "工藝產業行銷經紀",
+        "status": "歷史版本",
+        "update_note": "已被《AVA1221-001v2》取代",
+        "update_date": "2014/10/02"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "ocs_code": "AVA1221-001v4",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "工藝產業行銷經紀"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "藝文與影音傳播/視覺藝術",
+          "code": "AVA"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "工藝產業行銷經紀",
+          "code": "1221"
+        }
+      ],
+      "industries": [
+        {
+          "name": "藝術、娛樂及休閒服務業/創作及藝術表演業",
+          "code": "R9010"
+        }
+      ]
+    },
+    "job_description": "評估與創造產品（被經紀對象）價值，進一步談判取得授權，媒合介接開發產品，規劃及行銷推廣，進而建立通路並經營顧客關係。",
+    "ocs_level": 4
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "蒐集市場情報資訊及分析產業趨勢",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "掌握市場情報與分析趨勢"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "熟悉並瞭解工藝產業市場,並具備評析產業動態與開創未來發展趨勢之能力。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.1.1",
+                    "name": "產業市場評估分析報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K601",
+                    "name": "工藝設計趨勢"
+                  },
+                  {
+                    "code": "K602",
+                    "name": "工藝產業概況"
+                  },
+                  {
+                    "code": "K603",
+                    "name": "在地文化涵養"
+                  },
+                  {
+                    "code": "K004",
+                    "name": "工藝產業發展脈絡"
+                  },
+                  {
+                    "code": "K002",
+                    "name": "美學涵養"
+                  },
+                  {
+                    "code": "K001",
+                    "name": "工藝設計基礎 S"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S03",
+                    "name": "外部意識"
+                  },
+                  {
+                    "code": "S601",
+                    "name": "產業資訊蒐集"
+                  },
+                  {
+                    "code": "S602",
+                    "name": "市場分析"
+                  },
+                  {
+                    "code": "S603",
+                    "name": "流行趨勢"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.2",
+                "name": "評估被經紀對象之市場潛力"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.2.1",
+                    "text": "具評估與辨識工藝師及相關從業人員之發展潛力與作品(產品)價值或其應用方式。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.2.1",
+                    "name": "經紀個案評估報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K604",
+                    "name": "工藝評論"
+                  },
+                  {
+                    "code": "K002",
+                    "name": "美學涵養"
+                  },
+                  {
+                    "code": "K001",
+                    "name": "工藝設計基礎 S"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S21",
+                    "name": "顧客導向"
+                  },
+                  {
+                    "code": "S604",
+                    "name": "評價能力"
+                  },
+                  {
+                    "code": "S605",
+                    "name": "觀察力"
+                  },
+                  {
+                    "code": "S606",
+                    "name": "分析顧客需求"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "授權與財務規劃",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "品牌授權"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "洽談品牌授與被使用、交易之權利義務範疇並簽訂合約。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.1.1",
+                    "name": "品牌授權合約"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K605",
+                    "name": "授權機制"
+                  },
+                  {
+                    "code": "K606",
+                    "name": "智財權法規"
+                  },
+                  {
+                    "code": "K607",
+                    "name": "談判溝通技巧學"
+                  },
+                  {
+                    "code": "K608",
+                    "name": "藝術管理"
+                  },
+                  {
+                    "code": "K609",
+                    "name": "品牌營運概念"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S607",
+                    "name": "智權保護與應用"
+                  },
+                  {
+                    "code": "S608",
+                    "name": "品牌評估"
+                  },
+                  {
+                    "code": "S609",
+                    "name": "談判技巧"
+                  },
+                  {
+                    "code": "S610",
+                    "name": "風險評估"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.2",
+                "name": "產品授權"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.2.1",
+                    "text": "洽談產品(作品)授與被使用、銷售之權利義務範疇並簽訂合約。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.2.1",
+                    "name": "產品授權合約"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K605",
+                    "name": "授權機制"
+                  },
+                  {
+                    "code": "K606",
+                    "name": "智財權法規"
+                  },
+                  {
+                    "code": "K607",
+                    "name": "談判溝通技巧學"
+                  },
+                  {
+                    "code": "K608",
+                    "name": "藝術管理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S611",
+                    "name": "產品評估與規劃"
+                  },
+                  {
+                    "code": "S607",
+                    "name": "智權保護與應用"
+                  },
+                  {
+                    "code": "S609",
+                    "name": "談判技巧"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.3",
+                "name": "經紀合約"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.3.1",
+                    "text": "洽談與被經紀人間之合作項目、工作職掌、排除參與等權利義務範疇並簽訂合約。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.3.1",
+                    "name": "經紀合約"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K610",
+                    "name": "經紀範疇"
+                  },
+                  {
+                    "code": "K606",
+                    "name": "智財權法規"
+                  },
+                  {
+                    "code": "K607",
+                    "name": "談判溝通技巧學"
+                  },
+                  {
+                    "code": "K608",
+                    "name": "藝術管理"
+                  },
+                  {
+                    "code": "K611",
+                    "name": "活動管到"
+                  },
+                  {
+                    "code": "K612",
+                    "name": "經紀倫理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S612",
+                    "name": "經紀評估與規劃"
+                  },
+                  {
+                    "code": "S607",
+                    "name": "智權保護與應用"
+                  },
+                  {
+                    "code": "S609",
+                    "name": "談判技巧"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.4",
+                "name": "財務諮詢及資源規劃"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.4.1",
+                    "text": "協助財務相關資源整合與獲利模式規劃。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.4.1",
+                    "name": "營運評估諮詢報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K613",
+                    "name": "獲利模式"
+                  },
+                  {
+                    "code": "K614",
+                    "name": "藝術財管"
+                  },
+                  {
+                    "code": "K607",
+                    "name": "談判溝通技巧學 S"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S08",
+                    "name": "表達說服"
+                  },
+                  {
+                    "code": "S613",
+                    "name": "資源營運"
+                  },
+                  {
+                    "code": "S614",
+                    "name": "贊助提案能力"
+                  },
+                  {
+                    "code": "S615",
+                    "name": "規劃獲利模式"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T3",
+        "ocu_name": "產品開發與資源整合",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T3.1",
+                "name": "媒合與合作(異業/異質/異技)"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.1.1",
+                    "text": "協助建立異業合作關係並建構跨域整合之價值網絡,創造產業創新價值。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.1.1",
+                    "name": "可行性分析提案"
+                  },
+                  {
+                    "code": "O3.1.2",
+                    "name": "合作說明書與合約(備忘錄)"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K615",
+                    "name": "策略聯盟規劃"
+                  },
+                  {
+                    "code": "K616",
+                    "name": "創新思考"
+                  },
+                  {
+                    "code": "K005",
+                    "name": "工藝產品設計策略"
+                  },
+                  {
+                    "code": "K006",
+                    "name": "工藝產品製造程序"
+                  },
+                  {
+                    "code": "K003",
+                    "name": "工藝材料特性 S"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "人脈建立 S"
+                  },
+                  {
+                    "code": "S16",
+                    "name": "溝通"
+                  },
+                  {
+                    "code": "S616",
+                    "name": "產品創新策略思考"
+                  },
+                  {
+                    "code": "S617",
+                    "name": "跨領域資源整合"
+                  },
+                  {
+                    "code": "S618",
+                    "name": "設計整合能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.2",
+                "name": "開發與設計產品"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.2.1",
+                    "text": "協助整合工藝師和生產協力網絡之廠商共同開發具市場價值之產品。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.2.1",
+                    "name": "產品企劃提案"
+                  },
+                  {
+                    "code": "O3.2.2",
+                    "name": "產品製造規劃報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K617",
+                    "name": "產品策略規劃"
+                  },
+                  {
+                    "code": "K005",
+                    "name": "工藝產品設計策略"
+                  },
+                  {
+                    "code": "K006",
+                    "name": "工藝產品製造程序"
+                  },
+                  {
+                    "code": "K618",
+                    "name": "生產管理網絡"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S616",
+                    "name": "產品創新策略思考"
+                  },
+                  {
+                    "code": "S619",
+                    "name": "產品化評估"
+                  },
+                  {
+                    "code": "S620",
+                    "name": "生產規劃"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T4",
+        "ocu_name": "行銷與推廣",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T4.1",
+                "name": "行銷策略擬定"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.1.1",
+                    "text": "行銷策略規劃書。"
+                  },
+                  {
+                    "code": "P4.2.1",
+                    "text": "品牌/產品識別系統。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.1.1",
+                    "name": "行銷策略規劃書"
+                  },
+                  {
+                    "code": "O4.1.2",
+                    "name": "品牌/產品識別系統"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K619",
+                    "name": "行銷策略理論"
+                  },
+                  {
+                    "code": "K620",
+                    "name": "消費市場分析"
+                  },
+                  {
+                    "code": "K621",
+                    "name": "消費者行為"
+                  },
+                  {
+                    "code": "K622",
+                    "name": "品牌識別概論"
+                  },
+                  {
+                    "code": "K002",
+                    "name": "美學涵養"
+                  },
+                  {
+                    "code": "K604",
+                    "name": "工藝評論"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S621",
+                    "name": "規劃行銷策略"
+                  },
+                  {
+                    "code": "S622",
+                    "name": "塑造建立形象"
+                  },
+                  {
+                    "code": "S623",
+                    "name": "背景意涵表達"
+                  },
+                  {
+                    "code": "S624",
+                    "name": "建立品牌識別"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T4.2",
+                "name": "公共關係與媒\n體經營"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.2.1",
+                    "text": "掌握媒體公關資源與屬性,強化被經紀對象的形象。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.2.1",
+                    "name": "行"
+                  },
+                  {
+                    "code": "O4.2.2",
+                    "name": "公關活動"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K623",
+                    "name": "公共關係概論 S"
+                  },
+                  {
+                    "code": "K624",
+                    "name": "傳播概論"
+                  },
+                  {
+                    "code": "K625",
+                    "name": "媒體識讀"
+                  },
+                  {
+                    "code": "K626",
+                    "name": "行銷概論"
+                  },
+                  {
+                    "code": "K627",
+                    "name": "廣告學概論"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "人脈建立"
+                  },
+                  {
+                    "code": "S625",
+                    "name": "傳播技能"
+                  },
+                  {
+                    "code": "S626",
+                    "name": "媒體溝通"
+                  },
+                  {
+                    "code": "S627",
+                    "name": "語文能力"
+                  },
+                  {
+                    "code": "S628",
+                    "name": "危機與議題處理"
+                  },
+                  {
+                    "code": "S629",
+                    "name": "議題設定能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T4.3",
+                "name": "參與展覽與活動策劃"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.3.1",
+                    "text": "能夠評選合適展覽活動,確實傳達被經紀對象訊息理念。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.3.1",
+                    "name": "展覽(活動)規劃書"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K628",
+                    "name": "國內外展覽資訊與類別型 態"
+                  },
+                  {
+                    "code": "K629",
+                    "name": "策展論述"
+                  },
+                  {
+                    "code": "K630",
+                    "name": "展場規劃概念"
+                  },
+                  {
+                    "code": "K631",
+                    "name": "視覺規劃概念 S"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S15",
+                    "name": "策略性思考"
+                  },
+                  {
+                    "code": "S630",
+                    "name": "蒐集與分析展覽資訊"
+                  },
+                  {
+                    "code": "S631",
+                    "name": "主題設定與規劃"
+                  },
+                  {
+                    "code": "S632",
+                    "name": "展場與視覺規劃"
+                  },
+                  {
+                    "code": "S633",
+                    "name": "資源整合"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T4.4",
+                "name": "產品行銷與推廣"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.4.1",
+                    "text": "有效規劃、執行被經紀對象之推廣,強化顧客關係。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.4.1",
+                    "name": "行銷方案企劃書"
+                  },
+                  {
+                    "code": "O4.4.2",
+                    "name": "媒體推廣計畫"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K632",
+                    "name": "行銷管理"
+                  },
+                  {
+                    "code": "K621",
+                    "name": "消費者行為"
+                  },
+                  {
+                    "code": "K633",
+                    "name": "品牌經營管理概念 S"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "人脈建立 S"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "表達說服"
+                  },
+                  {
+                    "code": "S634",
+                    "name": "顧客分析與開發"
+                  },
+                  {
+                    "code": "S635",
+                    "name": "設計行銷方案"
+                  },
+                  {
+                    "code": "S636",
+                    "name": "企劃撰寫"
+                  },
+                  {
+                    "code": "S637",
+                    "name": "品牌管理"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T5",
+        "ocu_name": "市場拓展",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T5.1",
+                "name": "評估與拓展通路"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P5.1.1",
+                    "text": "能夠評估並開拓新銷售管道,增加產品曝光率,提升市佔與銷售。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O5.1.1",
+                    "name": "商圈分析報告"
+                  },
+                  {
+                    "code": "O5.1.2",
+                    "name": "通路布局與規劃報告"
+                  },
+                  {
+                    "code": "O5.1.3",
+                    "name": "銷售合約"
+                  },
+                  {
+                    "code": "O5.1.4",
+                    "name": "動線規劃圖"
+                  },
+                  {
+                    "code": "O5.1.5",
+                    "name": "陳列規劃圖"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K634",
+                    "name": "商圈評估指標"
+                  },
+                  {
+                    "code": "K635",
+                    "name": "通路策略學"
+                  },
+                  {
+                    "code": "K636",
+                    "name": "營運策略規劃"
+                  },
+                  {
+                    "code": "K637",
+                    "name": "動線設計概念"
+                  },
+                  {
+                    "code": "K638",
+                    "name": "陳列設計概念"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S638",
+                    "name": "商圈評估"
+                  },
+                  {
+                    "code": "S639",
+                    "name": "通路分析與開發"
+                  },
+                  {
+                    "code": "S640",
+                    "name": "營銷策略制定"
+                  },
+                  {
+                    "code": "S641",
+                    "name": "動線設計"
+                  },
+                  {
+                    "code": "S642",
+                    "name": "陳列設計"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T5.2",
+                "name": "銷售"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P5.2.1",
+                    "text": "確實傳達產品資訊,促成購買行為,維持忠誠度。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O5.2.1",
+                    "name": "銷售報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K639",
+                    "name": "銷售與服務模式"
+                  },
+                  {
+                    "code": "K621",
+                    "name": "消費者行為"
+                  },
+                  {
+                    "code": "K640",
+                    "name": "銷售話術"
+                  },
+                  {
+                    "code": "K641",
+                    "name": "顧客關係管理"
+                  },
+                  {
+                    "code": "K642",
+                    "name": "工藝產品趨勢 S"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S08",
+                    "name": "表達說服"
+                  },
+                  {
+                    "code": "S643",
+                    "name": "產品解說"
+                  },
+                  {
+                    "code": "S644",
+                    "name": "銷售技巧"
+                  },
+                  {
+                    "code": "S645",
+                    "name": "設計售後服務流程"
+                  },
+                  {
+                    "code": "S646",
+                    "name": "設計訓練銷售人員"
+                  },
+                  {
+                    "code": "S647",
+                    "name": "服務應變能力"
+                  },
+                  {
+                    "code": "S648",
+                    "name": "銷售分析"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "親和關係"
+      },
+      {
+        "code": "A02",
+        "name": "主動積極"
+      },
+      {
+        "code": "A08",
+        "name": "謹慎細心"
+      },
+      {
+        "code": "A11",
+        "name": "彈性"
+      },
+      {
+        "code": "A13",
+        "name": "好奇開放"
+      },
+      {
+        "code": "A00",
+        "name": "1工藝倫理"
+      },
+      {
+        "code": "A60",
+        "name": "1耐心"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "商管、行銷管理、藝術管理領域系所大學畢業，或相關經歷3年以上。",
+      "專案管理相關經驗2年以上。",
+      "件】。"
+    ],
+    "supplements": []
+  }
+}

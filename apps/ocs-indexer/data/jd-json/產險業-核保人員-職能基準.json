@@ -1,0 +1,612 @@
+{
+  "version_info": {
+    "versions": []
+  },
+  "ocs_profile": {
+    "ocs_code": "FIS4312-003v1",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "產險業-核保人員"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "金融財務/保險",
+          "code": "FIS"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "統計、財務及保險事務人員",
+          "code": "4312"
+        }
+      ],
+      "industries": [
+        {
+          "name": "金融及保險業/保險業/財產保險業",
+          "code": "K6520"
+        }
+      ]
+    },
+    "job_description": "為保險人或受其委任，負責保險核保作業，評估風險並決定承保條件與費率。",
+    "ocs_level": 3
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "審核要保書",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "執行新契約保件與保全件審核、核保等相關作業"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "選擇良質之保險標的。"
+                  },
+                  {
+                    "code": "P1.1.2",
+                    "text": "評定危險程度,決定應否承保。"
+                  },
+                  {
+                    "code": "P1.1.3",
+                    "text": "確保核保作業效率與正確性。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.1.1",
+                    "name": "核保準則"
+                  },
+                  {
+                    "code": "O1.1.2",
+                    "name": "財務核保機制"
+                  },
+                  {
+                    "code": "O1.1.3",
+                    "name": "保險標的風險評估指引"
+                  },
+                  {
+                    "code": "O1.1.4",
+                    "name": "保險通報機"
+                  },
+                  {
+                    "code": "O1.1.5",
+                    "name": "分層負責授權限表"
+                  },
+                  {
+                    "code": "O1.1.6",
+                    "name": "各險種費率表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "財產保險法規"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "財產保險實務"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "保險業招攬及核保作業控管 自律規範"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "分析與解讀能力"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "時間管理"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "問題解決"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "有效連結"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "價值判斷"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "品質導向"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "自我管理"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "案件溝通協調",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "核保問題諮詢"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "建立並維持與業務單位的互動管道,以有效宣導核保觀念、維護核保品質。"
+                  },
+                  {
+                    "code": "P2.1.2",
+                    "text": "回應業務單位核保相關諮詢,透過邏輯性解釋與良好的溝通方式,協助相關人員瞭解風險評估標準。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.1.1",
+                    "name": "照會統計表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "財產保險法規"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "財產保險實務"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "保險業招攬及核保作業控管 自律規範"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "保險業務員管理規則"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "分析與解讀能力"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "時間管理"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "問題解決"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "溝通能力"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "正確傾聽"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "協調能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T3",
+        "ocu_name": "保單行政作業",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T3.1",
+                "name": "核保後所衍生之相關行政工作"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.1.1",
+                    "text": "進度控管、照會追蹤。"
+                  },
+                  {
+                    "code": "P3.1.2",
+                    "text": "核保保費確認。"
+                  },
+                  {
+                    "code": "P3.1.3",
+                    "text": "要保文件歸檔作業。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.1.1",
+                    "name": "檢核統計報表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "財產保險法規"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "財產保險實務"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "保險業招攬及核保作業控管 自律規範"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "分析與解讀能力"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "時間管理"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "問題解決"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "品質導向"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "溝通能力"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "規劃與組織能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T4",
+        "ocu_name": "核保e化系統開",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T4.1",
+                "name": "降低人工及紙本核保作\n業"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.1.1",
+                    "text": "透過系統優化,有效地簡化核保流程。"
+                  },
+                  {
+                    "code": "P4.1.2",
+                    "text": "實踐「無紙化」節能減碳的綠色保險願景。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.1.1",
+                    "name": "自動核保規"
+                  },
+                  {
+                    "code": "O4.1.2",
+                    "name": "電子保單"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "財產保險法規"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "財產保險實務"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "保險業招攬及核保作業控管 自律規範"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "保險業務員管理規則"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "保險業辦理電子商務應注意 事項"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "保險業辦理電子保單簽發及 辦理電子化保險契約條款保單作 業自律規範"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "保險商品"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "分析與解讀能力"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "時間管理"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "問題解決"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "價值判斷"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "溝通能力"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "協調能力"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "規劃與組織能力"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "資訊科技應用能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T5",
+        "ocu_name": "執行法令遵循及稽核事項",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T5.1",
+                "name": "執行法令或洗錢防制、FATCA、CRS、資安、個資等相關作業要求與內控查核。"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P5.1.1",
+                    "text": "確保所有保單的承保決策是根據公平且符合規範的程序進行的。"
+                  },
+                  {
+                    "code": "P5.1.2",
+                    "text": "適時配合法令規範異動修訂相關核保規定。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O5.1.1",
+                    "name": "法遵手冊"
+                  },
+                  {
+                    "code": "O5.1.2",
+                    "name": "自行查核明細表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "財產保險法規"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "財產保險實務"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "保險業招攬及核保作業控管 自律規範"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "保險業辦理電子商務應注意 事項"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "保險業辦理電子保單簽發及 辦理電子化保險契約條款保單作 業自律規範"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "風險管理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "分析與解讀能力"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "時間管理"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "問題解決"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "品質導向"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "溝通能力"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "規劃與組織能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T6",
+        "ocu_name": "核保內控作業",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T6.1",
+                "name": "規劃各項核保作業流程配合新商\n品上市、\n執行各項\n政策及營\n運計畫、\n製作各項\n核保統計\n與管理分\n析報表"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 4,
+                "indicators": [
+                  {
+                    "code": "P6.1.1",
+                    "text": "依法令制訂與修訂核保相關作業流程、規劃完善的核保分析報表及統計功能。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O6.1.1",
+                    "name": "完成核保專案工作"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K07",
+                    "name": "保險商品"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "風險管理"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "法律/法規"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "金融商品"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "統計"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "時間管理"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "有效連結"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "價值判斷"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "品質導向"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "溝通能力"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "正確傾聽"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "協調能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "正直誠實"
+      },
+      {
+        "code": "A02",
+        "name": "持續學習"
+      },
+      {
+        "code": "A03",
+        "name": "追求卓越"
+      },
+      {
+        "code": "A04",
+        "name": "團隊意識"
+      },
+      {
+        "code": "A05",
+        "name": "壓力容忍"
+      },
+      {
+        "code": "A06",
+        "name": "謹慎細心"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "具備產險核保相關經驗，能熟練運用數位工具或系統進行風險評估尤佳。"
+    ],
+    "supplements": [
+      "無"
+    ]
+  }
+}

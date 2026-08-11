@@ -1,0 +1,703 @@
+{
+  "version_info": {
+    "versions": [
+      {
+        "version": "V3",
+        "ocs_code": "KPS5220-002v3",
+        "ocs_name": "系統家具規劃銷售人員",
+        "status": "最新版本",
+        "update_note": "略",
+        "update_date": "2025/12/15"
+      },
+      {
+        "version": "V2",
+        "ocs_code": "KPS5220-002v2",
+        "ocs_name": "系統家具規劃銷售人員",
+        "status": "歷史版本",
+        "update_note": "已被《KPS5220-002v3》取代",
+        "update_date": "2021/12/31"
+      },
+      {
+        "version": "V1",
+        "ocs_code": "KPS5220-002v1",
+        "ocs_name": "系統家具規劃銷售人員",
+        "status": "歷史版本",
+        "update_note": "已被《KPS5220-002v2》取代",
+        "update_date": "2018/12/31"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "ocs_code": "KPS5220-002v3",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "系統家具規劃銷售人員"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "行銷與銷售/專業銷售",
+          "code": "KPS"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "系統家具規劃銷售人員",
+          "code": "5220"
+        }
+      ],
+      "industries": [
+        {
+          "name": "批發及零售業/零售業",
+          "code": "G4742"
+        }
+      ]
+    },
+    "job_description": "依組織規範與需求，進行案源開發，提供客戶空間規劃與建議，進行系統家具配置、銷售、監工及驗收工作，並維繫良好客戶關係。",
+    "ocs_level": 3
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "系統家具開發案源與產品介紹",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "蒐集市場資訊"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "蒐集與比較同業資訊。"
+                  },
+                  {
+                    "code": "P1.1.2",
+                    "text": "蒐集客戶需求,開發現有與潛在客戶。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "系統家具產業發展"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "消費者行為"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "資料蒐集與分析能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.2",
+                "name": "產品導覽與需求分析"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.2.1",
+                    "text": "依客戶需求,引導瀏覽產品陳列及案例介紹。"
+                  },
+                  {
+                    "code": "P1.2.2",
+                    "text": "彙整客戶需求與預算。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.2.1",
+                    "name": "客戶需求表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K02",
+                    "name": "消費者行為"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "系統家具板材知識"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "行銷概念"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "產業專業術語"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "溝通協調能力"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "銷售能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "進行空間規劃與",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "確認客戶需求"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "與客戶確認預算、工期及項目等需求。"
+                  },
+                  {
+                    "code": "P2.1.2",
+                    "text": "依客戶需求進行空間丈量與相關規劃。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.1.13",
+                    "name": "D透視圖"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K03",
+                    "name": "系統家具板材知識"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "量測知識"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "圖學概念"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "水電常識"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "系統櫃加工概念"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "美學與時尚趨勢"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "五金配件相關常識"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "木工常識"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "建築物室內裝修管理辦法"
+                  },
+                  {
+                    "code": "K14",
+                    "name": "消防相關法規"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "溝通協調能力"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "量測能力"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "繪圖能力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "資訊科技工具應用能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.2",
+                "name": "空間規劃與報價"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.2.1",
+                    "text": "完成空間規劃與系統家具配置圖面。"
+                  },
+                  {
+                    "code": "P2.2.2",
+                    "text": "依據圖面估算價格。"
+                  },
+                  {
+                    "code": "P2.2.3",
+                    "text": "與客戶溝通需求,調整配置圖及報價。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.2.1",
+                    "name": "配置圖"
+                  },
+                  {
+                    "code": "O2.2.2",
+                    "name": "報價單"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K03",
+                    "name": "系統家具板材知識"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "圖學概念"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "水電常識"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "系統櫃加工概念"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "美學與時尚趨勢"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "五金配件相關常識"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "木工常識"
+                  },
+                  {
+                    "code": "K15",
+                    "name": "人體工學相關知識"
+                  },
+                  {
+                    "code": "K16",
+                    "name": "色彩學相關知識"
+                  },
+                  {
+                    "code": "K17",
+                    "name": "安全結構概念"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "溝通協調能力"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "繪圖能力"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "拆料能力"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "估價能力"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "施工流程規劃能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.3",
+                "name": "簽訂合約"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.3.1",
+                    "text": "與客戶確認配置圖、工期及價格,並進行簽約。"
+                  },
+                  {
+                    "code": "P2.3.2",
+                    "text": "依規劃之配置圖進行訂貨。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.3.1",
+                    "name": "合約書"
+                  },
+                  {
+                    "code": "O2.3.2",
+                    "name": "訂貨單"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K18",
+                    "name": "定型化契約概念"
+                  },
+                  {
+                    "code": "K19",
+                    "name": "個資保護相關法規"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "溝通協調能力"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "文書處理能力"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "談判議價技巧"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T3",
+        "ocu_name": "監工與驗收",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T3.1",
+                "name": "現場監工"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.1.1",
+                    "text": "施工工期協調安排。"
+                  },
+                  {
+                    "code": "P3.1.2",
+                    "text": "依現場狀況協調板材、五金或成品等派送。"
+                  },
+                  {
+                    "code": "P3.1.3",
+                    "text": "依據規劃圖面進行現場監工與工期管控。"
+                  },
+                  {
+                    "code": "P3.1.4",
+                    "text": "視需要與客戶或施工人員,進行溝通及調整施工程序。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.1.1",
+                    "name": "施工進度表"
+                  },
+                  {
+                    "code": "O3.1.2",
+                    "name": "派車單"
+                  },
+                  {
+                    "code": "O3.1.3",
+                    "name": "監工紀錄表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K05",
+                    "name": "產業專業術語"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "水電常識"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "系統櫃加工概念"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "建築物室內裝修管理辦法"
+                  },
+                  {
+                    "code": "K14",
+                    "name": "消防相關法規"
+                  },
+                  {
+                    "code": "K20",
+                    "name": "職業安全與衛生相關規範"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "溝通協調能力"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "施工流程規劃能力"
+                  },
+                  {
+                    "code": "S13",
+                    "name": "專案管理能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.2",
+                "name": "驗收"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.2.1",
+                    "text": "依據規劃圖面,與客戶完成竣工驗收作業。"
+                  },
+                  {
+                    "code": "P3.2.2",
+                    "text": "交付或解說使用與保養產品之方法。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.2.1",
+                    "name": "驗收檢核表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K03",
+                    "name": "系統家具板材知識"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "量測知識"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "圖學概念"
+                  },
+                  {
+                    "code": "K21",
+                    "name": "驗收流程"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "溝通協調能力"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "問題解決能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T4",
+        "ocu_name": "執行客戶管理",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T4.1",
+                "name": "售後服務與客訴處理"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.1.1",
+                    "text": "依客戶反映之問題,進行協調處理。"
+                  },
+                  {
+                    "code": "P4.1.2",
+                    "text": "依客訴作業流程,完成客訴處理與紀錄。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.1.1",
+                    "name": "客服紀錄表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K22",
+                    "name": "售後服務流程"
+                  },
+                  {
+                    "code": "K23",
+                    "name": "衝突管理概念"
+                  },
+                  {
+                    "code": "K24",
+                    "name": "客訴處理方法"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "溝通協調能力"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "問題解決能力"
+                  },
+                  {
+                    "code": "S15",
+                    "name": "衝突管理與客訴處理能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T4.2",
+                "name": "維繫客戶關係"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.2.1",
+                    "text": "維護客戶資料與互動機制,並蒐集客戶回饋意見,提供企業改善依據。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K25",
+                    "name": "客戶關係管理概念"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "溝通協調能力"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "文書處理能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "主動積極：不需他人指示或要求能自動自發做事，面臨問題立即採取行動加以解決，且為達目標願意主動承擔額外責任。"
+      },
+      {
+        "code": "A02",
+        "name": "正直誠實：展現高道德標準及值得信賴的行為，且能以維持組織誠信為行事原則，瞭解違反組織、自己及他人的道德標準之影響。"
+      },
+      {
+        "code": "A03",
+        "name": "壓力容忍：冷靜且有效地應對及處理高度緊張的情況或壓力，如緊迫的時間、不友善的人、各類突發事件及危急狀況，並能以適當的方式紓解自身壓力。"
+      },
+      {
+        "code": "A04",
+        "name": "謹慎細心：對於任務的執行過程，能謹慎考量及處理所有細節，精確地檢視每個程序，並持續對其保持高度關注。"
+      },
+      {
+        "code": "A05",
+        "name": "團隊意識：積極參與並支持團隊，能彼此鼓勵共同達成團隊目標。"
+      },
+      {
+        "code": "A06",
+        "name": "親和力：對他人表現理解、友善、同理心、關心和禮貌，並能與不同背景的人發展及維持良好關係。"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "高中（職）以上畢業。"
+    ],
+    "supplements": [
+      "相關規劃：如平面圖、立面圖、3D彩圖及虛擬動線等。",
+      "驗收作業：如客戶點收、驗收文件及款項收取等。"
+    ]
+  }
+}

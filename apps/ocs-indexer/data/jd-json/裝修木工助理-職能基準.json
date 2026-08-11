@@ -1,0 +1,700 @@
+{
+  "version_info": {
+    "versions": [
+      {
+        "version": "V3",
+        "ocs_code": "CCM7922-002v3",
+        "ocs_name": "裝修木工助理",
+        "status": "最新版本",
+        "update_note": "略",
+        "update_date": "2024/12/15"
+      },
+      {
+        "version": "V2",
+        "ocs_code": "CCM7922-002v2",
+        "ocs_name": "木工裝修助理",
+        "status": "歷史版本",
+        "update_note": "已被《CCM7922-002v3》取代",
+        "update_date": "2020/12/21"
+      },
+      {
+        "version": "V1",
+        "ocs_code": "CCM7922-002v1",
+        "ocs_name": "木工裝修助理",
+        "status": "歷史版本",
+        "update_note": "已被《CCM7922-002v2》取代",
+        "update_date": "2018/12/20"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "ocs_code": "CCM7922-002v3",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "裝修木工助理"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "建築與營造/營造及維護",
+          "code": "CCM"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "家具木工及有關工作人員",
+          "code": "7922"
+        }
+      ],
+      "industries": [
+        {
+          "name": "營建工程業/建物完工裝修工程業",
+          "code": "F4340"
+        }
+      ]
+    },
+    "job_description": "協助裝修木工人員依據設計圖說，進行備料及裝修施工等工作。",
+    "ocs_level": 3
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "協助材料及器具準備",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "材料準備"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "依設計圖說協助準備各式板材、角料及五金零件等。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "木工概念"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "圖學概念"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "器具設備概念"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "五金零件概念"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "材料知識"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "職業安全衛生相關規範"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "溝通協調能力"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "器具設備使用"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "刀具研磨更換"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.2",
+                "name": "器具準備"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 2,
+                "indicators": [
+                  {
+                    "code": "P1.2.1",
+                    "text": "依設計圖說協助準備手動、氣動及電動等工具。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "木工概念"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "圖學概念"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "器具設備概念"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "五金零件概念"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "材料知識"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "職業安全衛生相關規範"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "溝通協調能力"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "器具設備使用"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "刀具研磨更換"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.3",
+                "name": "協助職業安全衛生維護"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 2,
+                "indicators": [
+                  {
+                    "code": "P1.3.1",
+                    "text": "依職業安全衛生相關規範協助實施安全防護。"
+                  },
+                  {
+                    "code": "P1.3.2",
+                    "text": "維護施工環境安全與衛生。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "木工概念"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "圖學概念"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "器具設備概念"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "五金零件概念"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "材料知識"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "職業安全衛生相關規範"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "量測知識"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "產業專業用語"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "溝通協調能力"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "器具設備使用"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "刀具研磨更換"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "現場施工放樣"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "單位、尺寸換算能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.4",
+                "name": "材料基本處理"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.4.1",
+                    "text": "依材料清單清點、搬運及堆放。"
+                  },
+                  {
+                    "code": "P1.4.2",
+                    "text": "辨識材料並依指示標註裁切及成形記號。"
+                  },
+                  {
+                    "code": "P1.4.3",
+                    "text": "依指示加工各式板材、角料及五金零件。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.4.1",
+                    "name": "材料清單"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "木工概念"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "圖學概念"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "器具設備概念"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "五金零件概念"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "材料知識"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "職業安全衛生相關規範"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "量測知識"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "產業專業用語"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "溝通協調能力"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "器具設備使用"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "刀具研磨更換"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "現場施工放樣"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "單位、尺寸換算能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "協助裝修施工",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "協助圖說判讀"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "辨別設計圖說相關工作內容。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K02",
+                    "name": "圖學概念"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "器具設備概念"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "五金零件概念"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "材料知識"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "量測知識"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "產業專業用語"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "電工概念"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "木構造力學概念"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "溝通協調能力"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "器具設備使用"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "刀具研磨更換"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "現場施工放樣"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "單位、尺寸換算能力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "器具維護保養"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "裝修木作構件組合"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.2",
+                "name": "協助木工裝修施工"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.2.1",
+                    "text": "依據施作流程,完成施工前置作業。"
+                  },
+                  {
+                    "code": "P2.2.2",
+                    "text": "協助檢查材料及器具設備。"
+                  },
+                  {
+                    "code": "P2.2.3",
+                    "text": "施工前依指示完成牆面及地面保護作業。"
+                  },
+                  {
+                    "code": "P2.2.4",
+                    "text": "搬運及傳遞工具與材料。"
+                  },
+                  {
+                    "code": "P2.2.5",
+                    "text": "依指示備妥各式板材、角料及五金零件。"
+                  },
+                  {
+                    "code": "P2.2.6",
+                    "text": "依照設計圖說協助木工裝修施作。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "木工概念"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "圖學概念"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "器具設備概念"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "五金零件概念"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "材料知識"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "職業安全衛生相關規範"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "量測知識"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "產業專業用語"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "電工概念"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "木構造力學概念"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "溝通協調能力"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "器具設備使用"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "刀具研磨更換"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "現場施工放樣"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "單位、尺寸換算能力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "器具維護保養"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "裝修木作構件組合"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T3",
+        "ocu_name": "器具設備維護與場地清潔",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T3.1",
+                "name": "器具設備維護"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 2,
+                "indicators": [
+                  {
+                    "code": "P3.1.1",
+                    "text": "廢、餘料處理"
+                  },
+                  {
+                    "code": "P3.2.2",
+                    "text": "器具設備維護保養。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.1.1",
+                    "name": "器具設備維護保養單"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K03",
+                    "name": "器具設備概念"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "五金零件概念"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "材料知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "溝通協調能力"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "刀具研磨更換"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "器具維護保養"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.2",
+                "name": "場地清潔"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 2,
+                "indicators": [
+                  {
+                    "code": "P3.2.1",
+                    "text": "施工場地清潔整理。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.2.1",
+                    "name": "清潔紀錄表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K03",
+                    "name": "器具設備概念"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "五金零件概念"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "材料知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S03",
+                    "name": "刀具研磨更換"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "器具維護保養"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "主動積極：不需他人指示或要求能自動自發做事，面臨問題立即採取行動加以解決，且為達目標願意主動承擔額外責任。"
+      },
+      {
+        "code": "A02",
+        "name": "持續學習：能夠展現自我提升的企圖心，利用且積極參與各種機會，學習任務所需的新知識與技能，並能有效應用在特定任務。"
+      },
+      {
+        "code": "A03",
+        "name": "壓力容忍：冷靜且有效地應對及處理高度緊張的情況或壓力，如緊迫的時間、不友善的人、各類突發事件及危急狀況，並能以適當的方式紓解自身壓力。"
+      },
+      {
+        "code": "A04",
+        "name": "謹慎細心：對於任務的執行過程，能謹慎考量及處理所有細節，精確地檢視每個程序，並持續對其保持高度關注。"
+      },
+      {
+        "code": "A05",
+        "name": "團隊意識：積極參與並支持團隊，能彼此鼓勵共同達成團隊目標。"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [],
+    "supplements": []
+  }
+}

@@ -1,0 +1,2581 @@
+{
+  "version_info": {
+    "versions": [
+      {
+        "version": "V4",
+        "ocs_code": "TRM1499-001v4",
+        "ocs_name": "文資場域經營管理人員",
+        "status": "最新版本",
+        "update_note": "略",
+        "update_date": "2025/08/14"
+      },
+      {
+        "version": "V3",
+        "ocs_code": "TRM1499-001v3",
+        "ocs_name": "文資場域經營",
+        "status": "歷史版本",
+        "update_note": "已被《TRM1499-001v4》取代",
+        "update_date": "2022/10/31"
+      },
+      {
+        "version": "V2",
+        "ocs_code": "TRM1499-001v2",
+        "ocs_name": "文資場域經營",
+        "status": "歷史版本",
+        "update_note": "已被《TRM1499-001v3》取代",
+        "update_date": "2019/12/12"
+      },
+      {
+        "version": "V1",
+        "ocs_code": "TRM1499-001v1",
+        "ocs_name": "文資場域經營",
+        "status": "歷史版本",
+        "update_note": "已被《TRM1499-001v2》取代",
+        "update_date": "2017/01/19"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "ocs_code": "TRM1499-001v4",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "文資場域經營管理人員"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "休閒與觀光旅遊/休閒遊憩管理",
+          "code": "TRM"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "文資場域經營管理人員",
+          "code": "1499"
+        }
+      ],
+      "industries": [
+        {
+          "name": "本基準可能跨屬下列行業別:",
+          "code": "Unknown"
+        },
+        {
+          "name": " 藝術、娛樂及休閒服務業",
+          "code": "Unknown"
+        },
+        {
+          "name": " 批發及零售業",
+          "code": "Unknown"
+        },
+        {
+          "name": " 住宿及餐飲類",
+          "code": "Unknown"
+        }
+      ]
+    },
+    "job_description": "負責文化資產場域經營管理、創新經營模式與建構品牌價值。",
+    "ocs_level": 5
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "管理文資場域【註2】相關資源",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "掌握文資場域資源"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "解釋文資場域及環境資源,永續發展文資場域。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.1.1",
+                    "name": "建立文資場域資源文件"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K32",
+                    "name": "環境規劃"
+                  },
+                  {
+                    "code": "K56",
+                    "name": "資源盤點與運用"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S58",
+                    "name": "創新導向"
+                  },
+                  {
+                    "code": "S65",
+                    "name": "資源評估"
+                  },
+                  {
+                    "code": "S67",
+                    "name": "價值判斷"
+                  },
+                  {
+                    "code": "S76",
+                    "name": "環境配置評估"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.2",
+                "name": "掌握文化政策與法規"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.2.1",
+                    "text": "解釋文化資產法規及相關政策,能夠依法維護文資場域環境。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.2.1",
+                    "name": "文化資產場域經營計畫書"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K07",
+                    "name": "文化資產保存法"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "文化資產政策"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S08",
+                    "name": "文資利用及市場評估"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.3",
+                "name": "分析文資場域環境及設備"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.3.1",
+                    "text": "根據文化資產場域價值,規劃預測經營特色。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.3.1",
+                    "name": "設施安全維護工作流程文件"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K33",
+                    "name": "空間美學"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S18",
+                    "name": "安全及環境維護"
+                  },
+                  {
+                    "code": "S56",
+                    "name": "設施規劃設計"
+                  },
+                  {
+                    "code": "S76",
+                    "name": "環境配置評估"
+                  }
+                ]
+              },
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.3.2",
+                    "text": "根據文化資產場域與環境資源預測經營空間及設施配置。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.3.2",
+                    "name": "空間規劃與配置(F)"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K34",
+                    "name": "空間設計"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S28",
+                    "name": "空間規劃技巧"
+                  },
+                  {
+                    "code": "S29",
+                    "name": "品牌市場資訊掌握與建立"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.4",
+                "name": "文資文物審查和更新維護和保存的程序"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.4.1",
+                    "text": "評估特別收藏品的照顧與維護需求,建立於對於不同材料型式知識需求。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.4.1",
+                    "name": "文資文物資料表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K07",
+                    "name": "文化資產保存法"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "文化資產維護與保存"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S05",
+                    "name": "文化資產法規運用"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "文化資產維護與保存知識之 建立"
+                  }
+                ]
+              },
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.4.2",
+                    "text": "評估需要,及組織連接適當的專家專門知識。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.4.2",
+                    "name": "建立專家資料庫"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K07",
+                    "name": "文化資產保存法"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "文化資產概論"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S03",
+                    "name": "人際關係技巧"
+                  },
+                  {
+                    "code": "S62",
+                    "name": "溝通協調"
+                  }
+                ]
+              },
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.4.3",
+                    "text": "確保在可應用的情況下,保存程序符合組織化數位保存政策。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.4.3",
+                    "name": "保存程序組織化"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K07",
+                    "name": "文化資產保存法"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "文化資產維護與保存"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S07",
+                    "name": "文化資產維護與保存知識之 建立"
+                  },
+                  {
+                    "code": "S34",
+                    "name": "建立程序流程"
+                  }
+                ]
+              },
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.4.4",
+                    "text": "審查和更新材料照顧、維護、保存的政策,預測與回應問題及可能增加的挑戰。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.4.4",
+                    "name": "審查維護資料表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K12",
+                    "name": "文化資產維護與保存"
+                  },
+                  {
+                    "code": "K46",
+                    "name": "策略分析"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S07",
+                    "name": "文化資產維護與保存知識之 建立"
+                  },
+                  {
+                    "code": "S46",
+                    "name": "問題分析與解決"
+                  }
+                ]
+              },
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.4.5",
+                    "text": "當發展新的及修正已存在的程序,能合併組織的優先與限制事項。"
+                  },
+                  {
+                    "code": "P1.4.6",
+                    "text": "與有關的工作人員溝通維護與保存程序。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.4.5",
+                    "name": "程序更新表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K12",
+                    "name": "文化資產維護與保存"
+                  },
+                  {
+                    "code": "K42",
+                    "name": "組織分析"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "人際關係管理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S07",
+                    "name": "文化資產維護與保存知識之 建立"
+                  },
+                  {
+                    "code": "S46",
+                    "name": "問題分析與解決"
+                  },
+                  {
+                    "code": "S62",
+                    "name": "溝通協調"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "文資場域經營調查",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "分析文資場域經營定位"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "掌握文資場域特性,區分經營空間的定位,並辨別行銷方案的使用效益。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.1.1",
+                    "name": "製作文資場域經營定位與行銷方案表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K14",
+                    "name": "文資場域經營"
+                  },
+                  {
+                    "code": "K26",
+                    "name": "行銷研究與環境"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S43",
+                    "name": "區分行銷方案"
+                  },
+                  {
+                    "code": "S64",
+                    "name": "資料蒐集與詮釋並分析整合"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.2",
+                "name": "分析文資場域經營趨勢"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.2.1",
+                    "text": "蒐集並區別文資場域需求與發展趨勢。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.2.1",
+                    "name": "市場調查報告分析"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K15",
+                    "name": "市場發展分析與研究"
+                  },
+                  {
+                    "code": "K46",
+                    "name": "策略分析"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S64",
+                    "name": "資料蒐集與詮釋並分析整合"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T3",
+        "ocu_name": "營運管理",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T3.1",
+                "name": "營運管理計畫"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.1.1",
+                    "text": "依企業經營方向,規劃年度營運計畫與執行方案,達成企業預定目標。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.1.1",
+                    "name": "營運管理計畫書"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K18",
+                    "name": "企業營運分析管理"
+                  },
+                  {
+                    "code": "K19",
+                    "name": "企業營運財務應用"
+                  },
+                  {
+                    "code": "K20",
+                    "name": "企業營運業務計畫"
+                  },
+                  {
+                    "code": "K21",
+                    "name": "企業營運管理應用"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S12",
+                    "name": "企業現金量預測與控制"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "企業預算成本編列應用與分 析"
+                  },
+                  {
+                    "code": "S75",
+                    "name": "營運收入與費用分析、銷存 整合管理分析"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.2",
+                "name": "營運分析"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.2.1",
+                    "text": "理解營運報表,發覺異常數字或狀況,並針對差異提出解決方法。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.2.1",
+                    "name": "營運報表分析"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K39",
+                    "name": "財務管理"
+                  },
+                  {
+                    "code": "K47",
+                    "name": "會計知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S46",
+                    "name": "問題分析與解決"
+                  },
+                  {
+                    "code": "S59",
+                    "name": "報表解讀與分析能力"
+                  }
+                ]
+              },
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.2.2",
+                    "text": "針對上述報表,能提出改善方案或目標達成對策。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.2.2",
+                    "name": "改善方案提出"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K39",
+                    "name": "財務管理"
+                  },
+                  {
+                    "code": "K47",
+                    "name": "會計知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S46",
+                    "name": "問題分析與解決"
+                  },
+                  {
+                    "code": "S59",
+                    "name": "報表解讀與分析能力"
+                  }
+                ]
+              },
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.2.3",
+                    "text": "能落實改善對策,以達成業績目標。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.2.3",
+                    "name": "業績目標達成"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K39",
+                    "name": "財務管理"
+                  },
+                  {
+                    "code": "K47",
+                    "name": "會計知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S46",
+                    "name": "問題分析與解決"
+                  },
+                  {
+                    "code": "S59",
+                    "name": "報表解讀與分析能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.3",
+                "name": "管理財務"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.3.1",
+                    "text": "根據各項經營需求進行成本分析與收支管理。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.3.1",
+                    "name": "成本分析文件"
+                  },
+                  {
+                    "code": "O3.3.2",
+                    "name": "收支分析文件"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K25",
+                    "name": "行政資源管理"
+                  },
+                  {
+                    "code": "K39",
+                    "name": "財務管理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S19",
+                    "name": "成本分析與損益分析"
+                  },
+                  {
+                    "code": "S42",
+                    "name": "財務風險評估"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.4",
+                "name": "預算規劃"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.4.1",
+                    "text": "根據銷售預算,規劃部門業績與預算分配。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.4.1",
+                    "name": "預算分配表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K39",
+                    "name": "財務管理"
+                  },
+                  {
+                    "code": "K47",
+                    "name": "會計知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S59",
+                    "name": "報表解讀與分析能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.5",
+                "name": "目標設定與監控"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.5.1",
+                    "text": "根據業績達成狀況,說明達成與未達成原因,並提出目標修正方法。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.5.1",
+                    "name": "業績達成表與差異分析"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K39",
+                    "name": "財務管理"
+                  },
+                  {
+                    "code": "K59",
+                    "name": "業績管理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S19",
+                    "name": "成本分析與損益分析"
+                  },
+                  {
+                    "code": "S46",
+                    "name": "問題分析與解決"
+                  },
+                  {
+                    "code": "S60",
+                    "name": "策略性思考"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.6",
+                "name": "管理工作流程"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.6.1",
+                    "text": "根據經營計畫書規劃各項工作之標準作業流程,提升經營效率。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.6.1",
+                    "name": "標準作業流程文件"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K25",
+                    "name": "行政資源管理"
+                  },
+                  {
+                    "code": "K44",
+                    "name": "設施維護與管理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S65",
+                    "name": "資源評估"
+                  },
+                  {
+                    "code": "S70",
+                    "name": "標準作業流程訂定能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.7",
+                "name": "管理及提升服務品質"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.7.1",
+                    "text": "管理員工執行各項工作。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.7.1",
+                    "name": "服務品質標準作業流程文件"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "人力資源管理"
+                  },
+                  {
+                    "code": "K38",
+                    "name": "消費者心理學"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S31",
+                    "name": "品質導向"
+                  },
+                  {
+                    "code": "S80",
+                    "name": "顧客導向"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T4",
+        "ocu_name": "業務管理",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T4.1",
+                "name": "業務規劃"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.1.1",
+                    "text": "依營運計畫目的,分析目標群體與業務範圍定位分配資源,規劃年度期程。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.1.1",
+                    "name": "年度期程計畫(週、月、年度計畫)"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K41",
+                    "name": "專案管理"
+                  },
+                  {
+                    "code": "K57",
+                    "name": "營運規劃與資源整合"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S50",
+                    "name": "專案人力規劃與時程安排"
+                  },
+                  {
+                    "code": "S64",
+                    "name": "資料蒐集與詮釋並分析整合"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T4.2",
+                "name": "業務會議"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.2.1",
+                    "text": "敘明業務達成狀況與績效管理。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.2.1",
+                    "name": "定期業務會報"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K59",
+                    "name": "業績管理"
+                  },
+                  {
+                    "code": "K60",
+                    "name": "績效管理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S19",
+                    "name": "成本分析與損益分析"
+                  },
+                  {
+                    "code": "S37",
+                    "name": "計算能力"
+                  },
+                  {
+                    "code": "S64",
+                    "name": "資料蒐集與詮釋並分析整合"
+                  }
+                ]
+              },
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.2.2",
+                    "text": "針對營運狀況,在定期會議上提出修正策略。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.2.2",
+                    "name": "臨時議題提案"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K46",
+                    "name": "策略分析"
+                  },
+                  {
+                    "code": "K49",
+                    "name": "腦力激盪"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S46",
+                    "name": "問題分析與解決"
+                  },
+                  {
+                    "code": "S47",
+                    "name": "問題設計與引導"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T4.3",
+                "name": "業績管理"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.3.1",
+                    "text": "判斷業績報表各項目之意義,發現異常數字或狀況,並針對異常狀況及原因進行分析,提出修正方案。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.3.1",
+                    "name": "業績報表分析與差異修正"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K39",
+                    "name": "財務管理"
+                  },
+                  {
+                    "code": "K47",
+                    "name": "會計知識"
+                  },
+                  {
+                    "code": "K50",
+                    "name": "電子商務知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S10",
+                    "name": "目標導向管理能力"
+                  },
+                  {
+                    "code": "S46",
+                    "name": "問題分析與解決"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T5",
+        "ocu_name": "文資場域經營行銷",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T5.1",
+                "name": "重組文資場域歷史與文化元素"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "T5.1.1",
+                    "text": "掌握空間歷史背景,將文化符號,重組文化元素,聚焦行銷重點,設計行銷策略,提身文化資場價值,並產生商業性價值。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O5.1.1",
+                    "name": "重組文化元素轉換成行銷策略"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K13",
+                    "name": "文資場域再利用"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S38",
+                    "name": "重組文化元素轉換利用"
+                  },
+                  {
+                    "code": "S49",
+                    "name": "將文化資產符號轉化成商業 價值商品"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T5.2",
+                "name": "經營與行銷的策略規劃"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P5.2.1",
+                    "text": "根據文化資場空間特性提出行銷策略與行銷活動推展,達成預定目標。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O5.2.1",
+                    "name": "製作經營與行銷的策略規劃"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K16",
+                    "name": "企業形象策略規劃"
+                  },
+                  {
+                    "code": "K28",
+                    "name": "行銷規劃與策略"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S21",
+                    "name": "行銷執行與控制"
+                  },
+                  {
+                    "code": "S23",
+                    "name": "行銷環境分析"
+                  },
+                  {
+                    "code": "S74",
+                    "name": "整合行銷與策略規劃"
+                  }
+                ]
+              },
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P5.2.2",
+                    "text": "文資場域空間特性規劃風格定位,有效利用行銷組合,並依企業計畫期程調整行銷比重。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O5.2.2",
+                    "name": "選擇文資空間與產品風格定位,籌劃行銷組合"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K29",
+                    "name": "品牌經營行銷"
+                  },
+                  {
+                    "code": "K35",
+                    "name": "風格設計"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S20",
+                    "name": "行銷回饋資料分析與數據解 讀"
+                  },
+                  {
+                    "code": "S73",
+                    "name": "銷售數據分析"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T5.3",
+                "name": "執行行銷策略"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P5.3.1",
+                    "text": "根據文資場域資源及客群設定,執行相關行銷策略。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O5.3.1",
+                    "name": "行銷規劃文件"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K28",
+                    "name": "行銷規劃與策略"
+                  },
+                  {
+                    "code": "K56",
+                    "name": "資源盤點與運用"
+                  },
+                  {
+                    "code": "K61",
+                    "name": "顧客關係管理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S09",
+                    "name": "市場分析技術"
+                  },
+                  {
+                    "code": "S22",
+                    "name": "行銷規劃執行"
+                  },
+                  {
+                    "code": "S79",
+                    "name": "顧客需求分析"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T5.4",
+                "name": "建立品牌與企業形象"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P5.4.1",
+                    "text": "根據營運目標與目的規劃文資場域品牌,建立企業形象與文資場域經營理念。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O5.4.1",
+                    "name": "製作品牌分析與企業價值建構表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K16",
+                    "name": "企業形象策略規劃"
+                  },
+                  {
+                    "code": "K17",
+                    "name": "社會企業與責任"
+                  },
+                  {
+                    "code": "K29",
+                    "name": "品牌經營行銷"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S11",
+                    "name": "企業形象經營方法運用"
+                  },
+                  {
+                    "code": "S30",
+                    "name": "品牌行銷企劃"
+                  },
+                  {
+                    "code": "S60",
+                    "name": "策略性思考"
+                  }
+                ]
+              },
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P5.4.2",
+                    "text": "掌握企業核心價值與企業內部文化資產,設計企業故事。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O5.4.2",
+                    "name": "製作企業故事腳本"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K08",
+                    "name": "文化資產概論"
+                  },
+                  {
+                    "code": "K16",
+                    "name": "企業形象策略規劃"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S64",
+                    "name": "資料蒐集與詮釋並分析整合"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T6",
+        "ocu_name": "商品企劃",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T6.1",
+                "name": "文化商品分析"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P6.1.1",
+                    "text": "區別文化商品與一般商品設計的差異,對文資場域特性,規劃文化商品。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O6.1.1",
+                    "name": "文化商品與一般商品的差異分析"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K15",
+                    "name": "市場發展分析與研究"
+                  },
+                  {
+                    "code": "K36",
+                    "name": "文化商品消費符號"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S09",
+                    "name": "市場分析技術"
+                  },
+                  {
+                    "code": "S45",
+                    "name": "商品類型與損益分析"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T6.2",
+                "name": "文化商品通路分析"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P6.2.1",
+                    "text": "區別文化商品通路與一般商品差異,與消費模式,建立夥伴群體。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O6.2.1",
+                    "name": "商品通路分析"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K15",
+                    "name": "市場發展分析與研究"
+                  },
+                  {
+                    "code": "K45",
+                    "name": "通路管理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S33",
+                    "name": "建立供應商關係"
+                  },
+                  {
+                    "code": "S57",
+                    "name": "通路調查與分析"
+                  }
+                ]
+              },
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P6.2.2",
+                    "text": "解釋消費者問卷回饋資料分析與商品行銷策略調整。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O6.2.2",
+                    "name": "消費者資料分析與修改策略"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K39",
+                    "name": "財務管理"
+                  },
+                  {
+                    "code": "K61",
+                    "name": "顧客關係管理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S03",
+                    "name": "人際關係技巧"
+                  },
+                  {
+                    "code": "S69",
+                    "name": "數據分析與解讀"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T6.3",
+                "name": "規劃行銷組合"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P6.3.1",
+                    "text": "預測目標市場與客戶需求,在最佳銷售與利潤間,設計行銷組合。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O6.3.1",
+                    "name": "行銷組合規劃"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K15",
+                    "name": "市場發展分析與研究"
+                  },
+                  {
+                    "code": "K27",
+                    "name": "行銷成本分析"
+                  },
+                  {
+                    "code": "K30",
+                    "name": "定價決策與成本分析"
+                  },
+                  {
+                    "code": "K38",
+                    "name": "消費者心理學"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S24",
+                    "name": "協調產品執行層面的規劃與 組織技能"
+                  },
+                  {
+                    "code": "S64",
+                    "name": "資料蒐集與詮釋並分析整合"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T6.4",
+                "name": "官方數位平台規劃"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P6.4.1",
+                    "text": "了解官方數位平台功能,規劃網站內容與社群媒體,提供線上服務。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O6.4.1",
+                    "name": "官方數位平台功能與效益彙整"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K06",
+                    "name": "智慧財產權相關法規"
+                  },
+                  {
+                    "code": "K51",
+                    "name": "數位平台分析"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S17",
+                    "name": "回饋資料分析(點擊率、下 單狀況等)"
+                  },
+                  {
+                    "code": "S44",
+                    "name": "商品銷售數據分析"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T6.5",
+                "name": "電子商務規劃"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P6.5.1",
+                    "text": "規劃電子商務,執行銷售策略提供數位消費平台,提升整體業績。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O6.5.1",
+                    "name": "電子商務發展計畫"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K50",
+                    "name": "電子商務知識"
+                  },
+                  {
+                    "code": "K52",
+                    "name": "電子商務顧客關係"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S13",
+                    "name": "企業資源規劃與網站流量分 析"
+                  },
+                  {
+                    "code": "S66",
+                    "name": "電子商務網路資源與流量分 析"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T7",
+        "ocu_name": "商品管理",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T7.1",
+                "name": "掌握商品庫存狀況"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P7.1.1",
+                    "text": "掌握商品庫存數量,針對年度計畫調依商品類型,調整進出貨時間與商品把放位置。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O7.1.1",
+                    "name": "商品庫存表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K34",
+                    "name": "空間設計"
+                  },
+                  {
+                    "code": "K37",
+                    "name": "倉儲管理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S28",
+                    "name": "空間規劃技巧"
+                  },
+                  {
+                    "code": "S69",
+                    "name": "數據分析與解讀"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T7.2",
+                "name": "商品供給與價格管理"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P7.2.1",
+                    "text": "掌握商品庫存量與價格,估算成本利潤,提供消費者商品需求上的滿足。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O7.2.1",
+                    "name": "商品庫存與售價、損益表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K19",
+                    "name": "企業營運財務應用"
+                  },
+                  {
+                    "code": "K30",
+                    "name": "定價決策與成本分析"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S19",
+                    "name": "成本分析與損益分析"
+                  },
+                  {
+                    "code": "S26",
+                    "name": "定價法運用與因素分系"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T8",
+        "ocu_name": "關係建立",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T8.1",
+                "name": "建立合作關係,開發新通路"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P8.1.1",
+                    "text": "建立協力廠商網絡,新通路開發策略,開拓新市場。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O8.1.1",
+                    "name": "建立廠商合作契約"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K55",
+                    "name": "談判技巧"
+                  },
+                  {
+                    "code": "K61",
+                    "name": "顧客關係管理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S03",
+                    "name": "人際關係技巧"
+                  },
+                  {
+                    "code": "S62",
+                    "name": "溝通協調"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T8.2",
+                "name": "契約談判溝通"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P8.2.1",
+                    "text": "判斷商品特性、庫存、銷售行銷運用,將雙方效益最大化,建立合作契約。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O8.2.1",
+                    "name": "建立產品合作契約"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K05",
+                    "name": "契約相關法規"
+                  },
+                  {
+                    "code": "K55",
+                    "name": "談判技巧"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S19",
+                    "name": "成本分析與損益分析"
+                  },
+                  {
+                    "code": "S27",
+                    "name": "法規解讀與運用能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T8.3",
+                "name": "建立網路顧客關係"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P8.3.1",
+                    "text": "使用社群平台,提供消費資訊,建立網路顧客關係,增加行銷通路,提高活動訊息曝光。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O8.3.1",
+                    "name": "社群平台操作"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K53",
+                    "name": "社群引力"
+                  },
+                  {
+                    "code": "K54",
+                    "name": "社群平台運用"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S68",
+                    "name": "數位平台關係維護與服務技 巧"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T8.4",
+                "name": "顧客關係經營"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P8.4.1",
+                    "text": "落實門市顧客服務,即時回應並紀錄顧客建議。"
+                  },
+                  {
+                    "code": "P8.4.2",
+                    "text": "配合社區友善活動辦理,以維持顧客關係。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O8.4.1",
+                    "name": "顧客建議處理"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K40",
+                    "name": "商品服務知識"
+                  },
+                  {
+                    "code": "K61",
+                    "name": "顧客關係管理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S03",
+                    "name": "人際關係技巧"
+                  },
+                  {
+                    "code": "S25",
+                    "name": "協調與說服能力"
+                  },
+                  {
+                    "code": "S35",
+                    "name": "政府部門溝通能力"
+                  },
+                  {
+                    "code": "S36",
+                    "name": "政策解決與預判"
+                  },
+                  {
+                    "code": "S46",
+                    "name": "問題分析與解決"
+                  },
+                  {
+                    "code": "S48",
+                    "name": "問題管理能力"
+                  },
+                  {
+                    "code": "S51",
+                    "name": "專業溝通能力(機電、室 內、裝修、材料、消防清潔)"
+                  },
+                  {
+                    "code": "S62",
+                    "name": "溝通協調"
+                  },
+                  {
+                    "code": "S78",
+                    "name": "顧客服務能力"
+                  }
+                ]
+              },
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P8.4.3",
+                    "text": "處理、紀錄及呈報該門市客訴事件,並教導門市人員客訴處理能力。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O8.4.2",
+                    "name": "客訴處理紀錄"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K24",
+                    "name": "客訴處理知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S32",
+                    "name": "客訴處理能力"
+                  },
+                  {
+                    "code": "S62",
+                    "name": "溝通協調"
+                  },
+                  {
+                    "code": "S71",
+                    "name": "衝突管理能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T9",
+        "ocu_name": "風險評估與危機管理",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T9.1",
+                "name": "建立經營風險評估、管控與危機管理"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P9.1.1",
+                    "text": "根據整體經營,進行風險評估、管控及危機管理規劃,降低相關風險危害。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O9.1.1",
+                    "name": "風險評估、管控及危機管理文件"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K22",
+                    "name": "風險管理"
+                  },
+                  {
+                    "code": "K23",
+                    "name": "危機處理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S15",
+                    "name": "危機應變能力"
+                  },
+                  {
+                    "code": "S40",
+                    "name": "風險評估、控管能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T9.2",
+                "name": "建立文化資產風險管理策略與程序"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P9.2.1",
+                    "text": "確認收藏品關鍵風險因子,包括數位收藏品、評估定位風險的組織能力。"
+                  },
+                  {
+                    "code": "P9.2.2",
+                    "text": "制定合適的風險管理策略,以防止或盡量減少在關鍵領域的損失或損害,包括數位環境。"
+                  },
+                  {
+                    "code": "P9.2.3",
+                    "text": "制定合適的遷移策略,以確保數據的保存。"
+                  },
+                  {
+                    "code": "P9.2.4",
+                    "text": "實行策略,預測與回應問題及可能增加的挑戰。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O9.2.1",
+                    "name": "各項文化資產管理規約辦法("
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K11",
+                    "name": "文化資產風險管理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S04",
+                    "name": "分析風險,制訂因應策略"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "文化資產風險評估、控管能 力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T9.3",
+                "name": "危安狀況之通報與處理"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P9.3.1",
+                    "text": "危安通報處理流程。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O9.3.1",
+                    "name": "危安通報處理流程"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K22",
+                    "name": "風險管理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S04",
+                    "name": "分析風險,制訂因應策略"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T10",
+        "ocu_name": "人員管理",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T10.1",
+                "name": "組織規劃"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P10.1.1",
+                    "text": "針對經營空間特性與企業經營目的,設計組織結構行,規劃人力需求並建立人力資料庫與供需平衡對策。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O10.1.1",
+                    "name": "組織分配與人事組成"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "人力資源管理"
+                  },
+                  {
+                    "code": "K43",
+                    "name": "組織設計與工作職責"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "人力資源規劃與供需平衡對 策"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "人力需求預測與建立人才庫"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T10.2",
+                "name": "人員招募與培育"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P10.2.1",
+                    "text": "依組織人力需求,招募徵選適合人才。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O10.2.1",
+                    "name": "人員招募"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K04",
+                    "name": "勞動基準法及人事相關管理 法規"
+                  },
+                  {
+                    "code": "K31",
+                    "name": "招募與遴選方法"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S39",
+                    "name": "面談技巧"
+                  },
+                  {
+                    "code": "S47",
+                    "name": "問題設計與引導"
+                  }
+                ]
+              },
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P10.2.2",
+                    "text": "依單位需求進行工作業務教育訓練與組織核心價值傳遞。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O10.2.2",
+                    "name": "基礎人事教育規劃"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "人力資源管理"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "人格特質"
+                  },
+                  {
+                    "code": "K58",
+                    "name": "賣場管理"
+                  },
+                  {
+                    "code": "K60",
+                    "name": "績效管理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S72",
+                    "name": "賣場管理技巧"
+                  }
+                ]
+              },
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P10.2.3",
+                    "text": "依文化資產場域特性提供標的物相關人文歷史教育,並提供未來職涯發展計畫。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O10.2.3",
+                    "name": "在職教育規劃"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K07",
+                    "name": "文化資產保存法"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "文化資產與在地歷史文化"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "文化資產政策"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S52",
+                    "name": "授課技巧"
+                  },
+                  {
+                    "code": "S62",
+                    "name": "溝通協調"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T10.3",
+                "name": "管理人事"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P10.3.1",
+                    "text": "建立員工招聘、訓用、考核、薪酬及升遷制度,促進組織發展。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O10.3.1",
+                    "name": "人事管考文件"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "人力資源管理"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "勞動基準法及人事相關管理 法規"
+                  },
+                  {
+                    "code": "K25",
+                    "name": "行政資源管理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S16",
+                    "name": "合作協調"
+                  },
+                  {
+                    "code": "S53",
+                    "name": "組織管理能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T10.4",
+                "name": "評量人員表現績效與程序"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P10.4.1",
+                    "text": "使用內部績效評量,以針企業組織與發展,評估個人表現,規劃成員職涯與發展計畫。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O10.4.1",
+                    "name": "職涯發展規劃"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "人力資源管理"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "人格特質"
+                  },
+                  {
+                    "code": "K60",
+                    "name": "績效管理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S41",
+                    "name": "個人職涯發展計畫評估與執 行"
+                  },
+                  {
+                    "code": "S62",
+                    "name": "溝通協調"
+                  },
+                  {
+                    "code": "S77",
+                    "name": "績效評量"
+                  }
+                ]
+              },
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P10.4.2",
+                    "text": "檢視工作業務、促銷、行銷、策略計畫與拜訪程序、業務達成狀況。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O10.4.2",
+                    "name": "人員工作報告(G)"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K48",
+                    "name": "會議管理"
+                  },
+                  {
+                    "code": "K60",
+                    "name": "績效管理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S54",
+                    "name": "統籌會議與簡報技巧"
+                  },
+                  {
+                    "code": "S61",
+                    "name": "評量預算與額度分配,並給 予指正"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "文化資產保存使命：了解文化資產價值，對維護這份價值充滿使命，願意依文化資產保存核心精神執行推廣、活化、保存等行動。"
+      },
+      {
+        "code": "A02",
+        "name": "產業認同：認同文化資產場域精神價值，以場域最佳利益、文化資場優先思考再利用與活化。"
+      },
+      {
+        "code": "A03",
+        "name": "尊重文化資產：了解文化資產自身價值性，並以尊重、虔敬的態度面對。"
+      },
+      {
+        "code": "A04",
+        "name": "深思熟慮的領導統御：以卓越的影響力、沈著應變的態度、豐富的專業知識，啟發群眾的智慧、能力，鼓舞群眾的責任心、榮譽感，齊一群眾的心志、步調，以"
+      },
+      {
+        "code": "A05",
+        "name": "在地觀與國際視野：了解在地特色與自身文化價值，並以此作為國際多元文化價值上的觀察基礎。"
+      },
+      {
+        "code": "A06",
+        "name": "團隊合作：積極參與並支持團隊，能彼此鼓勵共同達成團隊目標。"
+      },
+      {
+        "code": "A07",
+        "name": "誠實正直：展現高道德標準及值得信賴的行為，且能以維持組織誠信為行事原則，瞭解違反組織、自己及他人的道德標準之影響。"
+      },
+      {
+        "code": "A08",
+        "name": "親和力：對他人表現理解、友善、同理心、關心和禮貌，並能與不同背景的人發展及維持良好關係。"
+      },
+      {
+        "code": "A09",
+        "name": "洞察力：以多方面觀察事物，從多種問題中把握其核心的能力。"
+      },
+      {
+        "code": "A10",
+        "name": "執行力：幫助團隊成員與組織達成預定目標，並持續推動改變行為的策略。"
+      },
+      {
+        "code": "A11",
+        "name": "創意思考與創造力：運用創意思考的方法，激發創造力解決問題。"
+      },
+      {
+        "code": "A12",
+        "name": "抗壓力：冷靜且有效地應對及處理高度緊張的情況或壓力，如緊迫的時間、不友善的人、各類突發事件及危急狀況，並能以適當的方式紓解自身壓力。"
+      },
+      {
+        "code": "A13",
+        "name": "親和關係：對顧客表現理解、友善、同理心、關心和禮貌，並能與不同背景的人發展及維持良好關係。"
+      },
+      {
+        "code": "A14",
+        "name": "主動積極：不需他人指示或要求能自動自發做事，遭遇問題會立即採取行動解決，為達目標願意主動承擔額外責任。"
+      },
+      {
+        "code": "A15",
+        "name": "正直誠實：能在工作中展現高道德標準及值得信賴的行為，且維護組織誠信行事原則。"
+      },
+      {
+        "code": "A16",
+        "name": "自我管理：能定義明確且實際可行的個人目標（符合組織目標）；能展現高度進取、努力、承諾及負責任的工作行為。"
+      },
+      {
+        "code": "A17",
+        "name": "團隊意識：積極參與並配合工作團隊，並透過團隊成員彼此鼓勵，以達成團隊目標。"
+      },
+      {
+        "code": "A18",
+        "name": "彈性思考：能夠敞開心胸，調整行為或工作方法，以適應內、外在環境的變化。"
+      },
+      {
+        "code": "A19",
+        "name": "服務熱忱：喜愛顧客，並願意提供各種服務以滿足顧客需求。"
+      },
+      {
+        "code": "A20",
+        "name": "應對不明狀況：工作中遭遇狀況不明或問題模糊（不具體）情況下，能採取必要行動，有效釐清現況並完成任務。"
+      },
+      {
+        "code": "A21",
+        "name": "謹慎細心：對於任務的執行過程，能謹慎考量及處理所有細節，精確地檢視每個程序，並持續對其保持高度關注。"
+      },
+      {
+        "code": "A22",
+        "name": "追求卓越：會為自己設定具挑戰性的工作目標並全力以赴，願意主動投注心力達成或超越既定目標，不斷尋求突破。"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "大專以上畢業且具備1年以上經營行銷實務工作經驗或文化資產相關課程訓練。"
+    ],
+    "supplements": [
+      "【註１】文資場域經營：意指文化資產場域空間經營管理人才，以文化資產場域空間結合文化創意的經營行為職能為目標，包括點狀的公有及私有古蹟、",
+      "歷史建築的承租、所有權人，以及面狀的聚落、文創園區、產業文化資產、眷村保存文化園區中的相關人員與組織、社區發展協會幹部與志工、地方文史",
+      "工作者等人員，或文化資產保存相關公部門人員、公有機關文化資產維護經營管理人。",
+      "【註２】文資場域：即「文化資產場域空間」簡稱。"
+    ]
+  }
+}

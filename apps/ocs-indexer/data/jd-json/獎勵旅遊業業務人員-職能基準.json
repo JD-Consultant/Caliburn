@@ -1,0 +1,993 @@
+{
+  "version_info": {
+    "versions": [
+      {
+        "version": "V3",
+        "ocs_code": "TTM4221-004v3",
+        "ocs_name": "獎勵旅遊業業務人員",
+        "status": "最新版本",
+        "update_note": "略",
+        "update_date": "2023/12/29"
+      },
+      {
+        "version": "V2",
+        "ocs_code": "TTM4221-004v2",
+        "ocs_name": "獎勵旅遊業業務人員",
+        "status": "歷史版本",
+        "update_note": "已被《TTM4221-004v3》取代",
+        "update_date": "2021/01/14"
+      },
+      {
+        "version": "V1",
+        "ocs_code": "TTM4221-004v1",
+        "ocs_name": "獎勵旅遊業業務人員",
+        "status": "歷史版本",
+        "update_note": "已被《TTM4221-004v2》取代",
+        "update_date": "2017/12/31"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "ocs_code": "TTM4221-004v3",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "獎勵旅遊業業務人員"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "休閒與觀光旅遊/旅遊管理",
+          "code": "TTM"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "獎勵旅遊業業務人員",
+          "code": "4221"
+        }
+      ],
+      "industries": [
+        {
+          "name": "支援服務業/旅行及相關服務業",
+          "code": "N7900"
+        }
+      ]
+    },
+    "job_description": "平時與客戶保持良好聯繫；提案競標時依主管指示，根據客戶需求提出符合所需的活動企劃案；接獲獎勵旅遊案後，遵照主管與資深業務人員指示",
+    "ocs_level": 3
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "業務拓展",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "維護客戶關係"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "按照資料庫中的資訊,協助以電話或電郵聯繫客戶。"
+                  },
+                  {
+                    "code": "P1.1.2",
+                    "text": "陪同主管定期拜訪客戶,維持客戶關係。"
+                  },
+                  {
+                    "code": "P1.1.3",
+                    "text": "透過社群媒體、公司網站、APP、搜索引擎關鍵字等數位行銷拓展業務、推廣公司成功案例與形象。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.1.1",
+                    "name": "客戶紀錄表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K05",
+                    "name": "溝通協調與人際關係"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "數位行銷"
+                  },
+                  {
+                    "code": "K19",
+                    "name": "會展科技應用"
+                  },
+                  {
+                    "code": "K28",
+                    "name": "品牌管理"
+                  },
+                  {
+                    "code": "K35",
+                    "name": "顧客關係管理"
+                  },
+                  {
+                    "code": "K48",
+                    "name": "國際商務禮儀"
+                  },
+                  {
+                    "code": "K54",
+                    "name": "各國文化特色"
+                  },
+                  {
+                    "code": "K65",
+                    "name": "歐盟一般資料保護規則 (GDPR)相關規定"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S06",
+                    "name": "溝通"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "資訊科技應用能力"
+                  },
+                  {
+                    "code": "S21",
+                    "name": "正確傾聽"
+                  },
+                  {
+                    "code": "S22",
+                    "name": "客戶服務與聯繫能力"
+                  },
+                  {
+                    "code": "S23",
+                    "name": "有效聯結"
+                  },
+                  {
+                    "code": "S26",
+                    "name": "成果導向"
+                  },
+                  {
+                    "code": "S27",
+                    "name": "顧客導向"
+                  },
+                  {
+                    "code": "S29",
+                    "name": "業務拓展與客戶開發"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "市場調查",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "了解客戶背景"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "協助主管進行市場調查,蒐集客戶的企業文化、預算、過去旅程資料等訊息。"
+                  },
+                  {
+                    "code": "P2.1.2",
+                    "text": "整理客戶特別需求。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.1.1",
+                    "name": "客戶紀錄表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K02",
+                    "name": "市場調查"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "溝通協調與人際關係"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "企劃書撰寫"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "商業套裝軟體"
+                  },
+                  {
+                    "code": "K21",
+                    "name": "產業趨勢分析"
+                  },
+                  {
+                    "code": "K23",
+                    "name": "國際視野"
+                  },
+                  {
+                    "code": "K29",
+                    "name": "簡報企劃與表達技巧"
+                  },
+                  {
+                    "code": "K35",
+                    "name": "顧客關係管理"
+                  },
+                  {
+                    "code": "K57",
+                    "name": "市場趨勢分析"
+                  },
+                  {
+                    "code": "K63",
+                    "name": "城市行銷"
+                  },
+                  {
+                    "code": "K66",
+                    "name": "永續會展"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "問題分析"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "資料彙整能力"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "活動企劃能力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "溝通"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "文書處理能力"
+                  },
+                  {
+                    "code": "S16",
+                    "name": "邏輯思考能力"
+                  },
+                  {
+                    "code": "S21",
+                    "name": "正確傾聽"
+                  },
+                  {
+                    "code": "S27",
+                    "name": "顧客導向"
+                  },
+                  {
+                    "code": "S33",
+                    "name": "提案與簡報技巧"
+                  },
+                  {
+                    "code": "S44",
+                    "name": "資訊蒐集能力"
+                  },
+                  {
+                    "code": "S40",
+                    "name": "統計分析能力"
+                  },
+                  {
+                    "code": "S42",
+                    "name": "文案寫作能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.2",
+                "name": "了解市場現況"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.2.1",
+                    "text": "了解獎旅市場的發展狀況。"
+                  },
+                  {
+                    "code": "P2.2.2",
+                    "text": "了解客戶所屬國家的文化差異。"
+                  },
+                  {
+                    "code": "P2.2.3",
+                    "text": "掌握各地方政府或機構、團體可提供辦理獎勵旅遊活動之資源。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.2.1",
+                    "name": "市場報告"
+                  }
+                ],
+                "knowledge": [],
+                "skills": []
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.3",
+                "name": "編列活動企劃書"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.3.1",
+                    "text": "於確認客戶需求,按照主管指示提出活動企劃書。"
+                  },
+                  {
+                    "code": "P2.3.2",
+                    "text": "活動企劃書納入永續會展之規劃與執行作法。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.3.1",
+                    "name": "活動企劃書"
+                  }
+                ],
+                "knowledge": [],
+                "skills": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T3",
+        "ocu_name": "活動提案",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T3.1",
+                "name": "提案"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.1.1",
+                    "text": "協助主管製作提案簡報。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.1.1",
+                    "name": "提案報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K05",
+                    "name": "溝通協調與人際關係"
+                  },
+                  {
+                    "code": "K29",
+                    "name": "簡報企劃與表達技巧"
+                  },
+                  {
+                    "code": "K60",
+                    "name": "公共安全"
+                  },
+                  {
+                    "code": "K66",
+                    "name": "永續會展"
+                  },
+                  {
+                    "code": "K73",
+                    "name": "公共衛生"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S04",
+                    "name": "合作協調能力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "溝通"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "時間管理"
+                  },
+                  {
+                    "code": "S16",
+                    "name": "邏輯思考能力"
+                  },
+                  {
+                    "code": "S20",
+                    "name": "緊急應變能力"
+                  },
+                  {
+                    "code": "S22",
+                    "name": "客戶服務與聯繫能力"
+                  },
+                  {
+                    "code": "S27",
+                    "name": "顧客導向"
+                  },
+                  {
+                    "code": "S45",
+                    "name": "安全意識"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.2",
+                "name": "製作任務分配表"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.2.1",
+                    "text": "確定接案後,協助製作任務分配工作手冊。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.2.1",
+                    "name": "任務分配手冊"
+                  }
+                ],
+                "knowledge": [],
+                "skills": []
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.3",
+                "name": "場勘"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.3.1",
+                    "text": "隨同主管陪客戶進行場勘。"
+                  },
+                  {
+                    "code": "P3.3.2",
+                    "text": "於場勘時負責紀錄狀況。"
+                  },
+                  {
+                    "code": "P3.3.3",
+                    "text": "按照主管指示,進行活動修正。"
+                  },
+                  {
+                    "code": "P3.3.4",
+                    "text": "瞭解場館、景區、餐廳、飯店等地公共衛生工作之落實狀況。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.3.1",
+                    "name": "場勘紀錄"
+                  }
+                ],
+                "knowledge": [],
+                "skills": []
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.4",
+                "name": "收款"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.4.1",
+                    "text": "向客戶預收訂金,並於活動前收訖尾款。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.4.1",
+                    "name": "收據/發票"
+                  }
+                ],
+                "knowledge": [],
+                "skills": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T4",
+        "ocu_name": "執行現場活動",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T4.1",
+                "name": "行前教育"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.1.1",
+                    "text": "協助主管準備行前教育時所需要的相關資料。"
+                  },
+                  {
+                    "code": "P4.1.2",
+                    "text": "參與行前簡報,了解自己在活動過程中應當要負責的事項。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.1.1",
+                    "name": "簡報"
+                  },
+                  {
+                    "code": "O4.1.2",
+                    "name": "行程說明"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K05",
+                    "name": "溝通協調與人際關係"
+                  },
+                  {
+                    "code": "K32",
+                    "name": "危機處理"
+                  },
+                  {
+                    "code": "K33",
+                    "name": "情緒與衝突管理"
+                  },
+                  {
+                    "code": "K42",
+                    "name": "活動現場管理"
+                  },
+                  {
+                    "code": "K60",
+                    "name": "公共安全"
+                  },
+                  {
+                    "code": "K66",
+                    "name": "永續會展"
+                  },
+                  {
+                    "code": "K71",
+                    "name": "活動管理"
+                  },
+                  {
+                    "code": "K73",
+                    "name": "公共衛生"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "問題分析"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "合作協調能力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "溝通"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "品質導向"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "時間管理"
+                  },
+                  {
+                    "code": "S17",
+                    "name": "衝突管理"
+                  },
+                  {
+                    "code": "S19",
+                    "name": "問題解決"
+                  },
+                  {
+                    "code": "S20",
+                    "name": "緊急應變能力"
+                  },
+                  {
+                    "code": "S26",
+                    "name": "成果導向"
+                  },
+                  {
+                    "code": "S27",
+                    "name": "顧客導向"
+                  },
+                  {
+                    "code": "S45",
+                    "name": "安全意識"
+                  },
+                  {
+                    "code": "S46",
+                    "name": "團隊合作"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T4.2",
+                "name": "回報現場狀況"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.2.1",
+                    "text": "確認訂房、車、餐的狀況是否正確。"
+                  },
+                  {
+                    "code": "P4.2.2",
+                    "text": "落實現場公共衛生及安"
+                  },
+                  {
+                    "code": "P4.2.3",
+                    "text": "向現場主管回報相關資訊。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.2.1",
+                    "name": "確認訂房、車、餐...之紀錄"
+                  }
+                ],
+                "knowledge": [],
+                "skills": []
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T4.3",
+                "name": "處理突發狀況"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.3.1",
+                    "text": "協助排除現場常見之即時需求。"
+                  },
+                  {
+                    "code": "P4.3.2",
+                    "text": "客戶如有特殊需求,立即請示主管,並協助主管處理現場狀況。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.3.1",
+                    "name": "突發狀況記錄"
+                  }
+                ],
+                "knowledge": [],
+                "skills": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T5",
+        "ocu_name": "結案",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T5.1",
+                "name": "滿意度調查"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P5.1.1",
+                    "text": "行程結束後,進行滿意度調查。"
+                  },
+                  {
+                    "code": "P5.1.2",
+                    "text": "紀錄客戶抱怨並回報給主管。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O5.1.1",
+                    "name": "滿意度問卷"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K08",
+                    "name": "商業套裝軟體"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "財務管理"
+                  },
+                  {
+                    "code": "K19",
+                    "name": "會展科技應用"
+                  },
+                  {
+                    "code": "K35",
+                    "name": "顧客關係管理"
+                  },
+                  {
+                    "code": "K65",
+                    "name": "歐盟一般資料保護規則 (GDPR)相關規定"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S06",
+                    "name": "溝通"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "文書處理能力"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "資訊科技應用能力"
+                  },
+                  {
+                    "code": "S16",
+                    "name": "邏輯思考能力"
+                  },
+                  {
+                    "code": "S22",
+                    "name": "客戶服務與聯繫能力"
+                  },
+                  {
+                    "code": "S40",
+                    "name": "統計分析能力"
+                  },
+                  {
+                    "code": "S41",
+                    "name": "數據解讀能力"
+                  },
+                  {
+                    "code": "S42",
+                    "name": "文案寫作能力"
+                  },
+                  {
+                    "code": "S48",
+                    "name": "代收款處理"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T5.2",
+                "name": "結算金額"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P5.2.1",
+                    "text": "協助結算總金額,客戶確認後收取尾款。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O5.2.1",
+                    "name": "收據/發票"
+                  }
+                ],
+                "knowledge": [],
+                "skills": []
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T5.3",
+                "name": "活動紀錄"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P5.3.1",
+                    "text": "整理活動內容,若有發生相關問題,須提出流程記錄。"
+                  },
+                  {
+                    "code": "P5.3.2",
+                    "text": "製作圖片、剪輯影音記錄呈主管審閱無誤後備份存檔,並交予客戶活動成果影片。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O5.3.1",
+                    "name": "活動紀錄"
+                  }
+                ],
+                "knowledge": [],
+                "skills": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "壓力容忍"
+      },
+      {
+        "code": "A09",
+        "name": "對工作的熱情"
+      },
+      {
+        "code": "A23",
+        "name": "喜愛與人接觸"
+      },
+      {
+        "code": "A02",
+        "name": "團隊意識"
+      },
+      {
+        "code": "A10",
+        "name": "責任感"
+      },
+      {
+        "code": "A25",
+        "name": "吃苦耐勞"
+      },
+      {
+        "code": "A03",
+        "name": "謹慎細心"
+      },
+      {
+        "code": "A15",
+        "name": "耐心"
+      },
+      {
+        "code": "A26",
+        "name": "彈性"
+      },
+      {
+        "code": "A05",
+        "name": "主動積極"
+      },
+      {
+        "code": "A16",
+        "name": "學習力強"
+      },
+      {
+        "code": "A28",
+        "name": "熱心服務"
+      },
+      {
+        "code": "A06",
+        "name": "自我管理"
+      },
+      {
+        "code": "A18",
+        "name": "應對不明狀況"
+      },
+      {
+        "code": "A29",
+        "name": "正直誠實"
+      },
+      {
+        "code": "A07",
+        "name": "喜愛創新求變"
+      },
+      {
+        "code": "A20",
+        "name": "親和力"
+      },
+      {
+        "code": "A31",
+        "name": "傾聽"
+      },
+      {
+        "code": "A08",
+        "name": "情緒(EQ)管理"
+      },
+      {
+        "code": "A21",
+        "name": "自信心"
+      },
+      {
+        "code": "A35",
+        "name": "互助合作"
+      },
+      {
+        "code": "A22",
+        "name": "外向活潑"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "學歷：大學以上，不限科系，以會展、行銷、傳播、國際貿易、餐旅、應用外語、觀光休閒等科系尤佳，或修習過上述相關課程者，優先錄取。",
+      "經歷：無經驗可，如具有1年以上相關行銷活動工作經驗、實習經驗或社團活動經驗，有國際觀、產業背景、撰寫新聞稿能力更佳。",
+      "語言能力：",
+      "承辦國外團體來台獎勵旅遊之業務者，需精熟英文(建議多益750分以上，或其他同等英語能力檢定)；",
+      "具備英文書信、口語溝通等能力，另具第二外語能力者面試予以加分。",
+      "文書軟體：須精熟Word、PowerPoint、Excel等能力，若能具備影音剪輯、設計軟體執行能力者更佳。",
+      "會展認證：通過初階會議展覽專業人員認證，若曾修習過若干國際獎勵旅遊(CertifiedIncentiveSpecialist,CIS)相關課程，建議面試時予以加分。"
+    ],
+    "supplements": []
+  }
+}

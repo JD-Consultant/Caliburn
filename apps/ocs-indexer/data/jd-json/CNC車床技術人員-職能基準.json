@@ -1,0 +1,1020 @@
+{
+  "version_info": {
+    "versions": [
+      {
+        "version": "V3",
+        "ocs_code": "MPM7223-002v3",
+        "ocs_name": "CNC車床技術人員",
+        "status": "最新版本",
+        "update_note": "略",
+        "update_date": "2024/12/15"
+      },
+      {
+        "version": "V2",
+        "ocs_code": "MPM7223-002v2",
+        "ocs_name": "CNC車床技術人員",
+        "status": "歷史版本",
+        "update_note": "已被《MPM7223-002v3》取代",
+        "update_date": "2020/12/21"
+      },
+      {
+        "version": "V1",
+        "ocs_code": "MPM7223-002v1",
+        "ocs_name": "CNC車床技術人員",
+        "status": "歷史版本",
+        "update_note": "已被《MPM7223-002v2》取代",
+        "update_date": "2018/12/20"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "ocs_code": "MPM7223-002v3",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "CNC車床技術人員"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "製造/產管理",
+          "code": "MPM"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "CNC車床技術人員",
+          "code": "7223"
+        }
+      ],
+      "industries": [
+        {
+          "name": "製造業/金屬切削工具機製造業",
+          "code": "C2912"
+        }
+      ]
+    },
+    "job_description": "使用CAD／CAM軟體編輯程式及操作數值控制車床機台，車削圓形相關等工作。",
+    "ocs_level": 4
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "加工程序規劃",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "工作圖判讀與匯入程式編輯"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "根據工作圖辨別工件徑向、軸向尺寸、表面織構符號與幾何公差。"
+                  },
+                  {
+                    "code": "P1.1.2",
+                    "text": "依材質及工件形狀,編輯刀具及加工程序。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "工程識圖"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "工程材料"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "車床工作法"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "計算機概論"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "螺紋規格"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "職業安全衛生相關規範"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "工作圖判讀能力"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "程式編輯能力"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "依據工件判斷加工條件設定能力"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "刀具選用及研磨能力"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "工程計算能力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "CAD/CAM軟體操作能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.2",
+                "name": "加工程式編寫及轉出"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.2.1",
+                    "text": "設定工作物原點座標。"
+                  },
+                  {
+                    "code": "P1.2.2",
+                    "text": "依工件加工特徵,選擇適當刀具並編寫階級、"
+                  },
+                  {
+                    "code": "P1.2.3",
+                    "text": "配合工具機控制器輸出程式。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.2.1",
+                    "name": "加工程式"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "工程識圖"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "工程材料"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "車床工作法"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "計算機概論"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "螺紋規格"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "職業安全衛生相關規範"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "工作圖判讀能力"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "程式編輯能力"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "依據工件判斷加工條件設定能力"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "刀具選用及研磨能力"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "工程計算能力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "CAD/CAM軟體操作能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.3",
+                "name": "估算加工工時"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.3.1",
+                    "text": "依據工作圖、刀具路徑模擬及車削條件估算加工工時。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "工程識圖"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "工程材料"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "車床工作法"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "計算機概論"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "螺紋規格"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "職業安全衛生相關規範"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "工作圖判讀能力"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "程式編輯能力"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "依據工件判斷加工條件設定能力"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "刀具選用及研磨能力"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "工程計算能力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "CAD/CAM軟體操作能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "CNC車床基本操作",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "工件夾持固定方式與精度校正"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.1.2",
+                    "text": "使用車床夾頭或其他夾、治具夾持工件,設定工件原點,並檢測夾持力。"
+                  },
+                  {
+                    "code": "P2.1.1",
+                    "text": "使用量錶及其他量具,校正同心度、偏心量及其他部位夾持精度。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K03",
+                    "name": "車床工作法"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "計算機概論"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "職業安全衛生相關規範"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "精密量測概論"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S07",
+                    "name": "夾(治)具使用能力"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "使用不同量具進行量測能力"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "CNC車床操作能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.2",
+                "name": "程式編輯及傳輸"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.2.1",
+                    "text": "以人工或電腦傳輸、搜尋、刪除及編修程式等。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K03",
+                    "name": "車床工作法"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "計算機概論"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "職業安全衛生相關規範"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "精密量測概論"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S07",
+                    "name": "夾(治)具使用能力"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "使用不同量具進行量測能力"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "CNC車床操作能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.3",
+                "name": "工具機面板操作"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.3.1",
+                    "text": "清楚使用面板各功能鍵操作及控制。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K03",
+                    "name": "車床工作法"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "計算機概論"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "職業安全衛生相關規範"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "精密量測概論"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S07",
+                    "name": "夾(治)具使用能力"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "使用不同量具進行量測能力"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "CNC車床操作能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T3",
+        "ocu_name": "加工條件設定",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T3.1",
+                "name": "刀具選擇與安裝"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.1.1",
+                    "text": "刀具選擇並依刀具號碼安裝於刀具庫。"
+                  },
+                  {
+                    "code": "P3.1.2",
+                    "text": "設定刀具座標位置及半徑補正,刀具形狀設定。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K03",
+                    "name": "車床工作法"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "職業安全衛生相關規範"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S09",
+                    "name": "CNC車床操作能力"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "刀具安裝及補正"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "異常狀況排除與問題解決能力"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "刀具選用及研磨能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.2",
+                "name": "主軸轉速設定與調整"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.2.1",
+                    "text": "依照工件加工面粗糙度、直徑大小及切削排屑狀況調整適當轉速。"
+                  },
+                  {
+                    "code": "P3.2.2",
+                    "text": "調整轉速、進給率以維持適當切削率。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K03",
+                    "name": "車床工作法"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "職業安全衛生相關規範"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S09",
+                    "name": "CNC車床操作能力"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "刀具安裝及補正"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "異常狀況排除與問題解決能力"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "刀具選用及研磨能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.3",
+                "name": "車削加工"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.3.1",
+                    "text": "啟動程式完成加工。"
+                  },
+                  {
+                    "code": "P3.3.2",
+                    "text": "加工過程異常狀況排除。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K03",
+                    "name": "車床工作法"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "職業安全衛生相關規範"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S09",
+                    "name": "CNC車床操作能力"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "刀具安裝及補正"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "異常狀況排除與問題解決能力"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "刀具選用及研磨能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T4",
+        "ocu_name": "工件尺度量測",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T4.1",
+                "name": "內外部尺度量測"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.1.1",
+                    "text": "使用游標卡尺、內外徑分厘卡等量具,量測工件各種內外部尺寸。"
+                  },
+                  {
+                    "code": "P4.1.2",
+                    "text": "使用圓弧規等量具量測工件內外圓弧尺寸。"
+                  },
+                  {
+                    "code": "P4.1.3",
+                    "text": "以2D投影儀器量測各種內外部尺度。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.1.1",
+                    "name": "量測紀錄表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K06",
+                    "name": "職業安全衛生相關規範"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "精密量測概論"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S05",
+                    "name": "工程計算能力"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "夾(治)具使用能力"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "使用不同量具進行量測能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T4.2",
+                "name": "錐度量測"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.2.1",
+                    "text": "使用量錶配合機台作動量測。"
+                  },
+                  {
+                    "code": "P4.2.2",
+                    "text": "使用塊規、圓棒、外徑分厘卡等量具組合量測工件錐度。"
+                  },
+                  {
+                    "code": "P4.2.3",
+                    "text": "使用正弦桿、塊規、量表等量具組合量測工件錐度。"
+                  },
+                  {
+                    "code": "P4.2.4",
+                    "text": "以2D投影儀器量測錐度。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K06",
+                    "name": "職業安全衛生相關規範"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "精密量測概論"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S05",
+                    "name": "工程計算能力"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "夾(治)具使用能力"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "使用不同量具進行量測能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T4.3",
+                "name": "螺紋量測"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.3.1",
+                    "text": "使用螺紋節距規檢驗工件螺紋節距。"
+                  },
+                  {
+                    "code": "P4.3.2",
+                    "text": "三線量規配合外徑分厘卡、螺紋塞規、環規及螺紋分厘卡檢驗工件螺紋節徑。"
+                  },
+                  {
+                    "code": "P4.3.3",
+                    "text": "以2D投影儀器進行外螺紋量測。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K06",
+                    "name": "職業安全衛生相關規範"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "精密量測概論"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S05",
+                    "name": "工程計算能力"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "夾(治)具使用能力"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "使用不同量具進行量測能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T4.4",
+                "name": "表面粗糙度量測"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.4.1",
+                    "text": "使用表面粗糙度標準板比較工件表面粗糙度。"
+                  },
+                  {
+                    "code": "P4.4.2",
+                    "text": "依需求使用表面粗糙度量測儀器進行量測。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K06",
+                    "name": "職業安全衛生相關規範"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "精密量測概論"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S05",
+                    "name": "工程計算能力"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "夾(治)具使用能力"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "使用不同量具進行量測能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T5",
+        "ocu_name": "保養及簡易故障排除",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T5.1",
+                "name": "日常基本保養"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P5.1.1",
+                    "text": "依使用手冊執行機台與工具日常保養,並完成相關紀錄。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O5.1.1",
+                    "name": "保養紀錄表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K03",
+                    "name": "車床工作法"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "職業安全衛生相關規範"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "機械原理"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "氣油壓概論"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "加工設備故障概論"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S13",
+                    "name": "溝通協調能力"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "機台保養與維護"
+                  },
+                  {
+                    "code": "S15",
+                    "name": "簡易故障檢修"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T5.2",
+                "name": "故障判斷與排除"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P5.2.1",
+                    "text": "依機台顯示代碼確認故障原因。"
+                  },
+                  {
+                    "code": "P5.2.2",
+                    "text": "進行故障排除並完成紀錄。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O5.2.1",
+                    "name": "故障紀錄表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K03",
+                    "name": "車床工作法"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "職業安全衛生相關規範"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "機械原理"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "氣油壓概論"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "加工設備故障概論"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S13",
+                    "name": "溝通協調能力"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "機台保養與維護"
+                  },
+                  {
+                    "code": "S15",
+                    "name": "簡易故障檢修"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "應對不確定性：當狀況不明或問題不夠具體的情況下，能在必要時採取行動，以有效釐清模糊不清的態勢。"
+      },
+      {
+        "code": "A02",
+        "name": "主動積極：不需他人指示或要求能自動自發做事，面臨問題立即採取行動加以解決，且為達目標願意主動承擔額外責任。"
+      },
+      {
+        "code": "A03",
+        "name": "自我管理：設立定義明確且實際可行的個人目標；對於及時完成任務展現高度進取、努力、承諾及負責任的行為。"
+      },
+      {
+        "code": "A04",
+        "name": "持續學習：能夠展現自我提升的企圖心，利用且積極參與各種機會，學習任務所需的新知識與技能，並能有效應用在特定任務。"
+      },
+      {
+        "code": "A05",
+        "name": "壓力容忍：冷靜且有效地應對及處理高度緊張的情況或壓力，如緊迫的時間、不友善的人、各類突發事件及危急狀況，並能以適當的方式紓解自身壓力。"
+      },
+      {
+        "code": "A06",
+        "name": "謹慎細心：對於任務的執行過程，能謹慎考量及處理所有細節，精確地檢視每個程序，並持續對其保持高度關注。"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "高中（職）以上相關科系畢業。",
+      "具1年以上機械產業相關工作經驗。"
+    ],
+    "supplements": [
+      "程式編輯能力：人工編輯CNC車床程式或CAD/CAM軟體轉出程式。",
+      "車削程式：如固定程式、複循環程式、副程式及巨指令程式等。",
+      "各功能鍵操作控制：如起動、停止、程式空跑、路徑模擬、程式單節控制操作、過行程復歸、警報解除、機台手動操作等。"
+    ]
+  }
+}

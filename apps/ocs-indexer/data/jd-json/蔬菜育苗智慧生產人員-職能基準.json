@@ -1,0 +1,715 @@
+{
+  "version_info": {
+    "versions": [
+      {
+        "version": "V3",
+        "ocs_code": "NAO6010-003v3",
+        "ocs_name": "蔬菜育苗智慧生產人員",
+        "status": "最新版本",
+        "update_note": "略",
+        "update_date": "2025/12/11"
+      },
+      {
+        "version": "V2",
+        "ocs_code": "NAO6010-003v2",
+        "ocs_name": "蔬菜育苗智慧生產人員",
+        "status": "歷史版本",
+        "update_note": "已被《NAO6010-003v3》取代",
+        "update_date": "2023/01/31"
+      },
+      {
+        "version": "V1",
+        "ocs_code": "NAO6010-003v1",
+        "ocs_name": "蔬菜育苗智慧生產人員",
+        "status": "歷史版本",
+        "update_note": "已被《NAO6010-003v2》取代",
+        "update_date": "2020/01/31"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "ocs_code": "NAO6010-003v3",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "蔬菜育苗智慧生產人員"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "天然資源",
+          "code": "NAO"
+        },
+        {
+          "name": "食品與農業/農業經營",
+          "code": "NAO"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "農藝及園藝作物栽培人員",
+          "code": "6010"
+        }
+      ],
+      "industries": [
+        {
+          "name": "農、林、漁、牧業/農、牧業",
+          "code": "A01"
+        }
+      ]
+    },
+    "job_description": "依育苗生產流程及運用栽培技術，訂定與管理生產計畫，提升產品品質以滿足客戶需求。",
+    "ocs_level": 4
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "育苗場智慧生產",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "種子處理與播種"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 4,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "能夠辨識及精選種子。"
+                  },
+                  {
+                    "code": "P1.1.2",
+                    "text": "操縱自動化播種機,進行穴盤裝填、種子供給。"
+                  },
+                  {
+                    "code": "P1.1.3",
+                    "text": "瞭解播種機具工作原理,並能夠進行故障排除以及保養。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.1.1",
+                    "name": "播種排程表"
+                  },
+                  {
+                    "code": "O1.1.2",
+                    "name": "作物苗種植計畫表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K02",
+                    "name": "瞭解種子型態、構造、結 構、分類"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "農業機具操作原理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "園藝種苗生產技術"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "生產監控管理"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.2",
+                "name": "育苗"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 4,
+                "indicators": [
+                  {
+                    "code": "P1.2.1",
+                    "text": "穴盤苗培養能力。"
+                  },
+                  {
+                    "code": "P1.2.2",
+                    "text": "接穗與根砧苗培育能力。"
+                  },
+                  {
+                    "code": "P1.2.3",
+                    "text": "操縱自動化灌溉系統,供給作物苗水分與養液。"
+                  },
+                  {
+                    "code": "P1.2.4",
+                    "text": "能夠配合嫁接機操作,確認穗、砧固定良好,增加嫁接成活率。"
+                  },
+                  {
+                    "code": "P1.2.5",
+                    "text": "瞭解嫁接機具工作原理,並能夠進行故障排除以及保養。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.2.1",
+                    "name": "技術評估報告"
+                  },
+                  {
+                    "code": "O1.2.2",
+                    "name": "灌溉紀錄表"
+                  },
+                  {
+                    "code": "O1.2.3",
+                    "name": "肥培紀錄表"
+                  },
+                  {
+                    "code": "O1.2.4",
+                    "name": "嫁接紀錄表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "瞭解種苗生產技術與操作"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "穴盤育苗於園藝種苗上之應 用"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "植物水養分管理"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "農業機具操作原理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "園藝種苗生產技術"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "作物田間操作實務"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "栽培管理技術"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.3",
+                "name": "掌握種苗生長狀態"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 4,
+                "indicators": [
+                  {
+                    "code": "P1.3.1",
+                    "text": "能夠判定優質種苗及巡檢溫室種苗生長情形,並淘汰異型株,提升產品品質與產量,確保生產良率,達成生產目標。"
+                  },
+                  {
+                    "code": "P1.3.2",
+                    "text": "針對苗期的不同階段進行不同的水養分管理,並能夠判斷穴盤苗之生長狀況。"
+                  },
+                  {
+                    "code": "P.1.3.3",
+                    "text": "能夠判斷癒合室內作物苗生長需求,並操作癒合室系統,精準調整環境溫濕度。"
+                  },
+                  {
+                    "code": "P1.3.4",
+                    "text": "將作物苗移出癒合室外後,能夠掌握作物苗馴化與健化階段的溫溼度控制與與水養分管理。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.3.1",
+                    "name": "種苗生長檢視紀錄表"
+                  },
+                  {
+                    "code": "O1.3.2",
+                    "name": "溫度、光度紀錄表"
+                  },
+                  {
+                    "code": "O1.3.3",
+                    "name": "癒合室監控表"
+                  },
+                  {
+                    "code": "O1.3.4",
+                    "name": "肥培紀錄表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "瞭解種苗生產技術與操作"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "穴盤育苗於園藝種苗上之應 用"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "植物水養分管理"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "掌控苗期的營養生理並瞭解 各類蔬菜的營養特性與施肥技術"
+                  },
+                  {
+                    "code": "K14",
+                    "name": "掌握種苗各階段生長情形"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "園藝種苗生產技術"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "作物田間操作實務"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "栽培管理技術"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "生產監控管理"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.4",
+                "name": "操作溫室設施\n與智慧化\n系統"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 4,
+                "indicators": [
+                  {
+                    "code": "P1.4.1",
+                    "text": "能夠操作及熟悉溫室環控設備運作,並能"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.4.1",
+                    "name": "設"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K08",
+                    "name": "利用網路通訊與雲端技術之"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S05",
+                    "name": "智慧生產管理"
+                  }
+                ]
+              },
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.4.2",
+                    "text": "能夠操作多功能系統,全時監控生長時程,隨時精準調整營養管控與肥培管理。"
+                  },
+                  {
+                    "code": "P1.4.3",
+                    "text": "能夠操作節能分析運算智慧化自動環控系統,以調節最適化之栽培環境條件。"
+                  },
+                  {
+                    "code": "P1.4.4",
+                    "text": "能夠進行設備之智慧節能操作。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.4.2",
+                    "name": "設備保養紀錄表"
+                  },
+                  {
+                    "code": "O1.4.3",
+                    "name": "工作日誌"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K09",
+                    "name": "操縱植物環控自動化的相關 技術,進行感測、監視、記錄與 控制等不同層次的自動化工程"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S07",
+                    "name": "智慧溫室環控設備操作能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.5",
+                "name": "處理環境數據"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 5,
+                "indicators": [
+                  {
+                    "code": "P1.5.1",
+                    "text": "利用合適的檔案和/或應用程式來儲存與取得數據。"
+                  },
+                  {
+                    "code": "P1.5.2",
+                    "text": "利用清楚的表格、圖表和/或簡單的地圖來呈現數據。"
+                  },
+                  {
+                    "code": "P1.5.3",
+                    "text": "使用合適的單位與數據圖表來表現一系列的數據趨勢。"
+                  },
+                  {
+                    "code": "P1.5.4",
+                    "text": "有邏輯的歸檔全部參考文件,並更新與安全保存。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.5.1",
+                    "name": "相關數據報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K10",
+                    "name": "理解大數據在農業中的應 用,並能夠蒐集、分類、整理相 關的數據資料"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S09",
+                    "name": "環境數據處理"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "數據分析判讀"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "植株病蟲害防治",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "發現或分辨病蟲害種類"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 4,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "使用病蟲害影像辨識與監測技術提供施藥決策之依據,即早通報防治,以提升產品良率及維持產量。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.1.1",
+                    "name": "病蟲害分布登錄表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K11",
+                    "name": "瞭解作物病害蟲辨識與管理 方法"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S11",
+                    "name": "智慧化設備操作與判讀能力"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "病蟲害防治工作安排"
+                  },
+                  {
+                    "code": "S19",
+                    "name": "問題分析與解決"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.2",
+                "name": "評估並選用適當病蟲害\n防治方法"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 4,
+                "indicators": [
+                  {
+                    "code": "P2.2.1",
+                    "text": "依據作物病蟲害、作物生長障礙等知識,有效利用防治藥劑及整合性管理方法,評估選用最佳的防治方法。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.2.1",
+                    "name": "藥劑施用登錄表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K12",
+                    "name": "瞭解農藥健康危害預防與安 全防護措施、農藥管理法規及農藥標示介紹"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S13",
+                    "name": "病蟲害診斷"
+                  },
+                  {
+                    "code": "S19",
+                    "name": "問題分析與解決"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T3",
+        "ocu_name": "產品出貨前管理",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T3.1",
+                "name": "確認出貨前的準備與處理"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.1.1",
+                    "text": "能夠識讀並操作智慧物流系統,確認出貨條件,協調完成產品限水、施藥、包裝資材等準備。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.1.1",
+                    "name": "出貨前準備確認單"
+                  },
+                  {
+                    "code": "O3.1.2",
+                    "name": "出貨檢查表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K05",
+                    "name": "植物水養分管理"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "掌握種苗作物出貨前之生理 狀態"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S14",
+                    "name": "確認產品規格與標準"
+                  },
+                  {
+                    "code": "S15",
+                    "name": "出貨前之產品處理要則"
+                  },
+                  {
+                    "code": "S19",
+                    "name": "問題分析與解決"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.2",
+                "name": "規劃並確認產品的包裝作業"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 4,
+                "indicators": [
+                  {
+                    "code": "P3.2.1",
+                    "text": "能夠操作出貨系統,依照出貨條件要求,進行產品相關包裝作業。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.2.1",
+                    "name": "出貨各項指標標準表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K05",
+                    "name": "植物水養分管理"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "掌握種苗作物出貨前之生理 狀態"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S16",
+                    "name": "貯運技術"
+                  },
+                  {
+                    "code": "S19",
+                    "name": "問題分析與解決"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T4",
+        "ocu_name": "異常通報",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T4.1",
+                "name": "植株異常通報"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.1.1",
+                    "text": "能夠整合智慧系統,研判植株異常程度,依照程序處理及通報。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.1.1",
+                    "name": "工作紀錄表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K11",
+                    "name": "瞭解作物病害蟲辨識與管理 方法"
+                  },
+                  {
+                    "code": "K14",
+                    "name": "掌握種苗各階段生長情形"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S04",
+                    "name": "栽培管理技術"
+                  },
+                  {
+                    "code": "S13",
+                    "name": "病蟲害診斷"
+                  },
+                  {
+                    "code": "S17",
+                    "name": "危機意識"
+                  },
+                  {
+                    "code": "S18",
+                    "name": "應變能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "專業實踐"
+      },
+      {
+        "code": "A02",
+        "name": "自我管理"
+      },
+      {
+        "code": "A03",
+        "name": "壓力容忍"
+      },
+      {
+        "code": "A04",
+        "name": "應對不明狀況"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "具備作物育苗工作經驗1年以上。",
+      "高中職相關科系以上畢業，或從事農業生產管理相關經驗1年以上，且曾接受作物栽培與生產管理相關課程訓練時數40小時以上。"
+    ],
+    "supplements": []
+  }
+}

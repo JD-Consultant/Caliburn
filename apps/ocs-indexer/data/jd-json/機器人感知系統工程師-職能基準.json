@@ -1,0 +1,1363 @@
+{
+  "version_info": {
+    "versions": [
+      {
+        "version": "V5",
+        "ocs_code": "SET2149-001v5",
+        "ocs_name": "機器人感知系統工程師",
+        "status": "最新版本",
+        "update_note": "略",
+        "update_date": "2024/12/31"
+      },
+      {
+        "version": "V4",
+        "ocs_code": "SET2149-001v4",
+        "ocs_name": "機器人感知系統工程師",
+        "status": "歷史版本",
+        "update_note": "已被《SET2149-001v5》取代",
+        "update_date": "2022/04/06"
+      },
+      {
+        "version": "V3",
+        "ocs_code": "SET2149-001v3",
+        "ocs_name": "機器人感知系統工程師",
+        "status": "歷史版本",
+        "update_note": "已被《SET2149-001v4》取代",
+        "update_date": "2019/04/11"
+      },
+      {
+        "version": "V2",
+        "ocs_code": "SET2149-001v2",
+        "ocs_name": "機器人產業感知系統工程師",
+        "status": "歷史版本",
+        "update_note": "已被《SET2149-001v3》取代",
+        "update_date": "2015/12/31"
+      },
+      {
+        "version": "V1",
+        "ocs_code": "SET2149-001",
+        "ocs_name": "機械產業機器人感知系統工程師",
+        "status": "歷史版本",
+        "update_note": "已被《SET2149-001v2》取代",
+        "update_date": "2013/06/30"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "ocs_code": "SET2149-001v5",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "機器人感知系統工程師"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "科學",
+          "code": "SET"
+        },
+        {
+          "name": "技術",
+          "code": "SET"
+        },
+        {
+          "name": "工程",
+          "code": "SET"
+        },
+        {
+          "name": "數學/工程及技術",
+          "code": "SET"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "機器人感知系統工程師",
+          "code": "2149"
+        }
+      ],
+      "industries": [
+        {
+          "name": "製造業/機械設備製造業",
+          "code": "C29"
+        }
+      ]
+    },
+    "job_description": "依據機器人任務目的與特性，選用機器人手臂及/或搭載適當的感測元件；將感測元件擷取之訊號轉換為可用資料，運用高效能法則（演算法）\n的架構進行處理並運用，令機器人感知系統具備環境感知能力，達成空間定位、避障規劃、路徑規劃、人機互動或協作及安全防護等設計目標與\n實作能量。",
+    "ocs_level": 4
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "確立專案目標",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "分析產品需求"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "依據任務(專案)目標與需求功能,收集包括產業發展、材料特性、各國安規等相關資訊,據以完成產品及相關規格書。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.1.1",
+                    "name": "產品規格書(包括產品應用情境說明)"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "電子學"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "最新感測元件及材料資訊"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "感測器原理"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "電路設計"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "訊號處理"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "量度儀表知識"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "各國安規標準"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "機器人概論"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "成本分析"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "資料收集及分析"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "電路設計"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "文件檔統整能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.2",
+                "name": "評估可行性"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.2.1",
+                    "text": "針對專案目標,考量技術、時程與成本等影響條件,進行任務可行性分析說明,並完成書面報告。"
+                  },
+                  {
+                    "code": "P1.2.2",
+                    "text": "依據自有核心技術之限制及研發能量客觀分析,提出系統功能及專案管理等建議報告。"
+                  },
+                  {
+                    "code": "P1.2.3",
+                    "text": "評估採用零組件之性能、規格及價格因素,提出可行方案。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.2.1",
+                    "name": "可行性評估報告書(專案目標規劃與執行步驟說明)"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K02",
+                    "name": "最新感測元件及材料資訊"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "感測器原理"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "電路設計"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "量度儀表知識"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "各國安規標準"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "基本電學"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "介面電路設計原理"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "訊號與系統"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "機器視覺"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "機器人通信介面種類"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "成本分析"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "資料收集及分析"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "電路設計"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "專利與標準檢索分析"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "選用感測器",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "熟悉產品控制系統與電路介面"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "充分瞭解產品的應用情境及功能需求,並熟悉產品規劃之控制系統與電路介面。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.1.1",
+                    "name": "產品功能規劃控制系統、電路介面規劃、與元件選用評估報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "電子學"
+                  },
+                  {
+                    "code": "K14",
+                    "name": "電路學"
+                  },
+                  {
+                    "code": "K15",
+                    "name": "電磁學"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S05",
+                    "name": "專利與標準檢索分析"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "介面電路設計"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.2",
+                "name": "選擇適當的感測元件"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.2.1",
+                    "text": "依據專案目標,考量感測元件的採購成本及取得難易程度,選擇適當的感測元件。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.2.1",
+                    "name": "感測元件規格與型號之物料清單"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K02",
+                    "name": "最新感測元件及材料資訊"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "感測器原理"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "機器人通信介面種類"
+                  },
+                  {
+                    "code": "K16",
+                    "name": "光學原理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "成本分析"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "感測器訊號擷取技術"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.3",
+                "name": "性能驗證"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.3.1",
+                    "text": "將選用之感測元件,依據專案目標進行性能驗證及功能調整。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.3.1",
+                    "name": "感測器檢驗調校紀錄"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "電子學"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "感測器原理"
+                  },
+                  {
+                    "code": "K14",
+                    "name": "電路學"
+                  },
+                  {
+                    "code": "K15",
+                    "name": "電磁學"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S08",
+                    "name": "雜訊干擾防範處理"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "元件性能驗證"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T3",
+        "ocu_name": "設計電路",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T3.1",
+                "name": "設計感測元件之連接電路"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.1.1",
+                    "text": "應用各種電路原理及設計技巧,並配合系統規劃之通訊方式,進行感測器電路和介面設計。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.1.1",
+                    "name": "電路圖"
+                  },
+                  {
+                    "code": "O3.1.2",
+                    "name": "介面或電路設計說明"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "電子學"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "電路設計"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "訊號處理"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "介面電路設計原理"
+                  },
+                  {
+                    "code": "K14",
+                    "name": "電路學"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S03",
+                    "name": "電路設計"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "介面電路設計"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "電子電路設計"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "電路板製作流程"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "電路焊接"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.2",
+                "name": "選擇控制器"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.2.1",
+                    "text": "選擇適當的控制器及訊號處理器,包含適合之硬體介面與感測器連接,並編寫合適的驅動與感知程式。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.2.1",
+                    "name": "控制器功能、機器人動作語法說明、與選用評估報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K10",
+                    "name": "介面電路設計原理"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "機器人通信介面種類"
+                  },
+                  {
+                    "code": "K17",
+                    "name": "機器人程式設計"
+                  },
+                  {
+                    "code": "K18",
+                    "name": "通訊原理"
+                  },
+                  {
+                    "code": "K19",
+                    "name": "元件產品資訊"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S06",
+                    "name": "介面電路設計"
+                  },
+                  {
+                    "code": "S13",
+                    "name": "機器人軌跡設定"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "類比數位轉換技術"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.3",
+                "name": "選擇訊號處理器"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.3.1",
+                    "text": "選擇適當的訊號處理器,並編寫合適的驅動程式。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.3.1",
+                    "name": "訊號處理器輸入與輸出規劃、與選用評估報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K05",
+                    "name": "訊號處理"
+                  },
+                  {
+                    "code": "K20",
+                    "name": "程式設計"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S15",
+                    "name": "微處理器技術"
+                  },
+                  {
+                    "code": "S16",
+                    "name": "儀表操作"
+                  },
+                  {
+                    "code": "S17",
+                    "name": "程式設計"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.4",
+                "name": "進行測試與調整"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.4.1",
+                    "text": "能針對電路圖及介面電路之設計,進行測試與調整,包括歸零、調整、校正等工作。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.4.1",
+                    "name": "元件測試紀錄"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "電子學"
+                  },
+                  {
+                    "code": "K14",
+                    "name": "電路學"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S13",
+                    "name": "機器人軌跡設定"
+                  },
+                  {
+                    "code": "S18",
+                    "name": "量度儀表操作"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T4",
+        "ocu_name": "處理訊號",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T4.1",
+                "name": "將感測器資料轉換成符合專案目標之標準訊號"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.1.1",
+                    "text": "可將各種感測器所產出的類比或數位訊號,轉換成專案規劃目標之統一規格。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.1.1",
+                    "name": "標準訊號規範建立"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K21",
+                    "name": "數位訊號處理"
+                  },
+                  {
+                    "code": "K22",
+                    "name": "軟體設計"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S17",
+                    "name": "程式設計"
+                  },
+                  {
+                    "code": "S19",
+                    "name": "類比與數位訊號轉換"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T4.2",
+                "name": "處理雜訊"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.2.1",
+                    "text": "應用有效的方法防止或濾除雜訊的產生,並有效提升訊號分析的可靠度。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.2.1",
+                    "name": "雜訊處理報告"
+                  },
+                  {
+                    "code": "O4.2.2",
+                    "name": "殘差預測圖"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K21",
+                    "name": "數位訊號處理"
+                  },
+                  {
+                    "code": "K22",
+                    "name": "軟體設計"
+                  },
+                  {
+                    "code": "K23",
+                    "name": "機率、與統計估測理論"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S18",
+                    "name": "量度儀表操作"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T4.3",
+                "name": "機器視覺與影像處理"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.3.1",
+                    "text": "進行視覺資訊處理與程式撰寫,有效偵測環境、物體辨識與姿態估測。"
+                  },
+                  {
+                    "code": "P4.3.2",
+                    "text": "進行點雲資料擷取、程式撰寫、模型分析。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.3.1",
+                    "name": "影像辨識準確性測試報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K24",
+                    "name": "光源與影像感測原理"
+                  },
+                  {
+                    "code": "K25",
+                    "name": "影像處理"
+                  },
+                  {
+                    "code": "K26",
+                    "name": "機器人自動物品/人員辨識"
+                  },
+                  {
+                    "code": "K27",
+                    "name": "3D點雲處理"
+                  },
+                  {
+                    "code": "K28",
+                    "name": "3D環境感知"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S17",
+                    "name": "程式設計"
+                  },
+                  {
+                    "code": "S20",
+                    "name": "影像處理系統軟體設計/操作 能力"
+                  },
+                  {
+                    "code": "S21",
+                    "name": "影像辨識軟體開發"
+                  },
+                  {
+                    "code": "S22",
+                    "name": "環境模型建立"
+                  },
+                  {
+                    "code": "S23",
+                    "name": "視覺與機器人校正設定"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T4.4",
+                "name": "其他感知(振動感測、力與力矩\n感測、聲\n音感測、\n壓力感測\n等）"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.4.1",
+                    "text": "進行感測資訊處理、程式撰寫,與有效偵測環境測試。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.4.1",
+                    "name": "各種感測訊號擷取、與識別報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K03",
+                    "name": "感測器原理"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "訊號處理"
+                  },
+                  {
+                    "code": "K19",
+                    "name": "元件產品資訊"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S17",
+                    "name": "程式設計"
+                  },
+                  {
+                    "code": "S19",
+                    "name": "類比與數位訊號轉換"
+                  },
+                  {
+                    "code": "S24",
+                    "name": "訊號處理"
+                  },
+                  {
+                    "code": "S25",
+                    "name": "電路配線"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T5",
+        "ocu_name": "規劃感知訊號軟體架構",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T5.1",
+                "name": "選擇適當的演算法"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P5.1.1",
+                    "text": "依據產品功能規格及感測元件特性,使用或發展適當的演算法,並架構演算流程。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O5.1.1",
+                    "name": "建立通用資料格式"
+                  },
+                  {
+                    "code": "O5.1.2",
+                    "name": "演算流程說明文件"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K29",
+                    "name": "工程數學"
+                  },
+                  {
+                    "code": "K30",
+                    "name": "資料結構"
+                  },
+                  {
+                    "code": "K31",
+                    "name": "資料處理演算法"
+                  },
+                  {
+                    "code": "K32",
+                    "name": "人工智慧"
+                  },
+                  {
+                    "code": "K33",
+                    "name": "機器視覺"
+                  },
+                  {
+                    "code": "K34",
+                    "name": "任務規劃"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S17",
+                    "name": "程式設計"
+                  },
+                  {
+                    "code": "S26",
+                    "name": "系統分析"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T5.2",
+                "name": "進行軟體架構設計"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P5.2.1",
+                    "text": "能完善地規劃軟體架構,並有效率地完成程式碼撰寫。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O5.2.1",
+                    "name": "軟體架構建模"
+                  },
+                  {
+                    "code": "O5.2.2",
+                    "name": "機器人通訊格式或協議說明"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K35",
+                    "name": "軟體工程"
+                  },
+                  {
+                    "code": "K36",
+                    "name": "感測器訊號融合"
+                  },
+                  {
+                    "code": "K37",
+                    "name": "機率與統計"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S17",
+                    "name": "程式設計"
+                  },
+                  {
+                    "code": "S26",
+                    "name": "系統分析"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T5.3",
+                "name": "智慧聯網軟體系統開發"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P5.3.1",
+                    "text": "能夠有效設計網路程式連結感測器及上層資料庫與雲端計算架構。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O5.3.1",
+                    "name": "建立聯網架構圖"
+                  },
+                  {
+                    "code": "O5.3.2",
+                    "name": "資料庫實體關連圖"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K38",
+                    "name": "物聯網智慧感知系統程式規 劃"
+                  },
+                  {
+                    "code": "K39",
+                    "name": "機器人智慧感知互動學習系 統設計"
+                  },
+                  {
+                    "code": "K40",
+                    "name": "雲端資料庫與雲端計算"
+                  },
+                  {
+                    "code": "K41",
+                    "name": "資料庫管理系統"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S17",
+                    "name": "程式設計"
+                  },
+                  {
+                    "code": "S26",
+                    "name": "系統分析"
+                  },
+                  {
+                    "code": "S27",
+                    "name": "系統連線"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T5.4",
+                "name": "進行軟體測試工作"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P5.4.1",
+                    "text": "進行軟體測試並進行除錯。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O5.4.1",
+                    "name": "執行軟體測試程式與分析報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K35",
+                    "name": "軟體工程"
+                  },
+                  {
+                    "code": "K36",
+                    "name": "感測器訊號融合"
+                  },
+                  {
+                    "code": "K37",
+                    "name": "機率與統計"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S17",
+                    "name": "程式設計"
+                  },
+                  {
+                    "code": "S26",
+                    "name": "系統分析"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T6",
+        "ocu_name": "測試及驗證",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T6.1",
+                "name": "規劃測試流程"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P6.1.1",
+                    "text": "依據感知元件特性規劃可行的測試流程,並備妥測試之夾治具或儀表。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O6.1.1",
+                    "name": "測試規劃書"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K07",
+                    "name": "各國安規標準"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S18",
+                    "name": "量度儀表操作"
+                  },
+                  {
+                    "code": "S19",
+                    "name": "類比與數位訊號轉換"
+                  },
+                  {
+                    "code": "S28",
+                    "name": "校準測試"
+                  },
+                  {
+                    "code": "S29",
+                    "name": "空間配置"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T6.2",
+                "name": "進行整機測試"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P6.2.1",
+                    "text": "執行模組或整機測試,並完整記錄各項測試數據。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O6.2.1",
+                    "name": "執行整機運作測試結果並產出分析報告書"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K03",
+                    "name": "感測器原理"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "訊號處理"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "基本電學"
+                  },
+                  {
+                    "code": "K42",
+                    "name": "最新產品及材料資訊"
+                  },
+                  {
+                    "code": "K43",
+                    "name": "介面設計"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S18",
+                    "name": "量度儀表操作"
+                  },
+                  {
+                    "code": "S19",
+                    "name": "類比與數位訊號轉換"
+                  },
+                  {
+                    "code": "S23",
+                    "name": "視覺與機器人校正設定"
+                  },
+                  {
+                    "code": "S28",
+                    "name": "校準測試"
+                  },
+                  {
+                    "code": "S30",
+                    "name": "空間定位精度量測與校正"
+                  },
+                  {
+                    "code": "S31",
+                    "name": "誤差分析"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T6.3",
+                "name": "分析測試結果並提出解決方案"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P6.3.1",
+                    "text": "正確地判讀測試報告數據,並提出修正方案。直至問題修正完畢。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O6.3.1",
+                    "name": "測試報告(含改善方案)"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K03",
+                    "name": "感測器原理"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "訊號處理"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "各國安規標準"
+                  },
+                  {
+                    "code": "K43",
+                    "name": "介面設計"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S04",
+                    "name": "文件檔統整能力"
+                  },
+                  {
+                    "code": "S32",
+                    "name": "可靠度分析"
+                  },
+                  {
+                    "code": "S33",
+                    "name": "性能評估"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "問題解決"
+      },
+      {
+        "code": "A02",
+        "name": "分析推理"
+      },
+      {
+        "code": "A03",
+        "name": "創新思考"
+      },
+      {
+        "code": "A04",
+        "name": "品質導向"
+      },
+      {
+        "code": "A05",
+        "name": "謹慎細心"
+      },
+      {
+        "code": "A06",
+        "name": "外部意識"
+      },
+      {
+        "code": "A07",
+        "name": "溝通協調"
+      },
+      {
+        "code": "A08",
+        "name": "主動積極"
+      },
+      {
+        "code": "A09",
+        "name": "團隊合作"
+      },
+      {
+        "code": "A10",
+        "name": "顧客導向"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "機器人、智慧製造、資工、電機、電子、自動控制與機械等相關理工科系（或學程）大學畢業。",
+      "具備英文能力達多益測驗（TOEIC）至少550分以上。",
+      "具從事一年以上相關工作經驗尤佳。"
+    ],
+    "supplements": []
+  }
+}

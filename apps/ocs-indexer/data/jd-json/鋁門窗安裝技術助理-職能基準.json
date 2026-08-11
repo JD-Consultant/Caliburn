@@ -1,0 +1,463 @@
+{
+  "version_info": {
+    "versions": [
+      {
+        "version": "V3",
+        "ocs_code": "CCM7119-004v3",
+        "ocs_name": "鋁門窗安裝技術助理",
+        "status": "最新版本",
+        "update_note": "略",
+        "update_date": "2024/12/15"
+      },
+      {
+        "version": "V2",
+        "ocs_code": "CCM7119-004v2",
+        "ocs_name": "鋁門窗安裝技術助理",
+        "status": "歷史版本",
+        "update_note": "已被《CCM7119-004v3》取代",
+        "update_date": "2022/12/13"
+      },
+      {
+        "version": "V1",
+        "ocs_code": "CCM7119-004v1",
+        "ocs_name": "鋁門窗安裝技術助理",
+        "status": "歷史版本",
+        "update_note": "已被《CCM7119-004v2》取代",
+        "update_date": "2019/12/19"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "ocs_code": "CCM7119-004v3",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "鋁門窗安裝技術助理"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "建築與營造/營造及維護",
+          "code": "CCM"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "鋁門窗安裝技術助理",
+          "code": "7119"
+        }
+      ],
+      "industries": [
+        {
+          "name": "營建工程業/專門營造業",
+          "code": "F4340"
+        }
+      ]
+    },
+    "job_description": "協助鋁門窗安裝施工、清潔與維護等工作。",
+    "ocs_level": 3
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "協助安裝前置作業",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "瞭解鋁門窗規格"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "閱讀工程圖說與施工規範。"
+                  },
+                  {
+                    "code": "P1.1.2",
+                    "text": "協助現場丈量與記錄。"
+                  },
+                  {
+                    "code": "P1.1.3",
+                    "text": "協助提出合約書、圖說及項目疑義,請設計單位釋疑。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "鋁門窗材料知識"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "CNS與工程會相關規範"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "五金零配件相關知識"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "建築相關法規知識"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "基礎結構工程知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "選用CNS鋁門窗能力"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "識圖基本能力"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "單位、尺寸換算能力"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "丈量、測量與放樣能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.2",
+                "name": "準備機具及材料"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.2.1",
+                    "text": "協助機具設備準備作業。"
+                  },
+                  {
+                    "code": "P1.2.2",
+                    "text": "協助施工材料準備作業。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "鋁門窗材料知識"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "鋁門窗施工流程"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "職業安全衛生相關知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S05",
+                    "name": "材料數量管控能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "協助鋁門窗安裝施工",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "整理場地"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "依據職業安全衛生相關規範,進行施工場地清潔。"
+                  },
+                  {
+                    "code": "P2.1.2",
+                    "text": "協助維護工作現場安全。"
+                  },
+                  {
+                    "code": "P2.1.3",
+                    "text": "協助確認開口位置、尺寸及門窗安裝位置,進行墨線放樣作業。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "鋁門窗材料知識"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "CNS與工程會相關規範"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "鋁門窗施工流程"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "職業安全衛生相關知識"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "施工測量知識"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "現場放樣知識"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "工程圖說相關知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "選用CNS鋁門窗能力"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "識圖基本能力"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "單位、尺寸換算能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.2",
+                "name": "協助確認規格與需求"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.2.1",
+                    "text": "協助確認鋁門窗規格、尺寸及數量。"
+                  },
+                  {
+                    "code": "P2.2.2",
+                    "text": "協助確認五金零配件規格與數量。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "鋁門窗材料知識"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "CNS與工程會相關規範"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "工程圖說相關知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S03",
+                    "name": "單位、尺寸換算能力"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "材料數量管控能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.3",
+                "name": "協助安裝施工"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.3.1",
+                    "text": "依據職業安全衛生相關規範,協助放樣位置,臨時固定施作。"
+                  },
+                  {
+                    "code": "P2.3.2",
+                    "text": "協助鋁門窗框與牆體的連接固定施作。"
+                  },
+                  {
+                    "code": "P2.3.3",
+                    "text": "協助鋁門窗框與牆體間填縫、崁縫及防水施作。"
+                  },
+                  {
+                    "code": "P2.3.4",
+                    "text": "進行鋁門窗框清潔整理。"
+                  },
+                  {
+                    "code": "P2.3.5",
+                    "text": "協助其他配合工程施作。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K07",
+                    "name": "職業安全衛生相關知識"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "泥水工作業知識"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "防水工程知識"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "塗料特性知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S06",
+                    "name": "鋁門窗安裝施工能力"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "機具設備使用能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T3",
+        "ocu_name": "清潔與維護",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T3.1",
+                "name": "清潔與維護作業"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.1.1",
+                    "text": "依據職業安全衛生相關規範,進行施工場地與鋁門窗清潔與維護。"
+                  },
+                  {
+                    "code": "P3.1.2",
+                    "text": "協助驗收。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K07",
+                    "name": "職業安全衛生相關知識"
+                  },
+                  {
+                    "code": "K14",
+                    "name": "防護材料選用知識"
+                  },
+                  {
+                    "code": "K15",
+                    "name": "機具、工具保養常識"
+                  },
+                  {
+                    "code": "K16",
+                    "name": "環保相關法規"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S08",
+                    "name": "環境清潔維護能力"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "鋁門窗清潔維護能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "主動積極：不需他人指示或要求能自動自發做事，面臨問題立即採取行動加以解決，且為達目標願意主動承擔額外責任。"
+      },
+      {
+        "code": "A02",
+        "name": "持續學習：能夠展現自我提升的企圖心，利用且積極參與各種機會，學習任務所需的新知識與技能，並能有效應用在特定任務。"
+      },
+      {
+        "code": "A03",
+        "name": "壓力容忍：冷靜且有效地應對及處理高度緊張的情況或壓力，如緊迫的時間、不友善的人、各類突發事件及危急狀況，並能以適當的方式紓解自身壓力。"
+      },
+      {
+        "code": "A04",
+        "name": "謹慎細心：對於任務的執行過程，能謹慎考量及處理所有細節，精確地檢視每個程序，並持續對其保持高度關注。"
+      },
+      {
+        "code": "A05",
+        "name": "親和力：對他人表現理解、友善、同理心、關心和禮貌，並能與不同背景的人發展及維持良好關係。"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "具一年以上建築物施工相關工作經驗。"
+    ],
+    "supplements": [
+      "鋁門窗規格：如鋁門窗的品牌、規格、開啟形式、表面處理方式及五金零配件等。",
+      "鋁門窗設計需求：如鋁門窗的功能、規格、開啟形式、表面處理方式、填縫材料、密封材料、保護材料、清潔考量等。",
+      "配合工程施作：如玻璃與紗窗等安裝工程等。"
+    ]
+  }
+}

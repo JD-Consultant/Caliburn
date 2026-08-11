@@ -1,0 +1,632 @@
+{
+  "version_info": {
+    "versions": [
+      {
+        "version": "IIS3513-008v3",
+        "ocs_code": "IIS3513-008v3",
+        "ocs_name": "網路管理助理",
+        "status": "最新版本",
+        "update_note": "略",
+        "update_date": "2023/12/15"
+      },
+      {
+        "version": "IIS3513-008v2",
+        "ocs_code": "IIS3513-008v2",
+        "ocs_name": "網路管理助理",
+        "status": "歷史版本",
+        "update_note": "已被《IIS3513-008v3》取代",
+        "update_date": "2020/12/31"
+      },
+      {
+        "version": "IIS3513-008v1",
+        "ocs_code": "IIS3513-008v1",
+        "ocs_name": "網路管理助理",
+        "status": "歷史版本",
+        "update_note": "已被《IIS3513-008v2》取代",
+        "update_date": "2017/12/31"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "ocs_code": "IIS3513-008v3",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "網路管理助理"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "資訊科技/資訊支援與服務",
+          "code": "IIS"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "網路管理助理",
+          "code": "3513"
+        }
+      ],
+      "industries": [
+        {
+          "name": "出版、影音製作、傳播及資通訊服務業/資訊服務業",
+          "code": "J6312"
+        }
+      ]
+    },
+    "job_description": "協助維護及管理組織網路系統。",
+    "ocs_level": 3
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "作業系統(OS)【註1】的安裝、配置",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "找出適合的OS"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "研究OS廠商網站來取得技術規格與系統要求。"
+                  },
+                  {
+                    "code": "P1.1.2",
+                    "text": "協助比較不同的OS,並產出比較紀錄。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.1.1",
+                    "name": "OS比較紀錄"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "電腦與網路概念"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "作業系統之軟硬體產品"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "組織目前使用中的OS功能 與特性"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "溝通協調能力"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "工作文件撰寫"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "資料蒐集與分析能力"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "研究能力"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "軟體操作能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.2",
+                "name": "安裝、設定與最佳化OS"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.2.1",
+                    "text": "安裝與設定OS可用功能、特性,例如網際網路資訊服務(IIS)。"
+                  },
+                  {
+                    "code": "P1.2.2",
+                    "text": "協助進行系統最佳化以符合組織要求。"
+                  },
+                  {
+                    "code": "P1.2.3",
+                    "text": "依照組織要求記錄系統文件。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.2.1",
+                    "name": "系統文件"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "電腦與網路概念"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "OS的功能與特性"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "OS的規格與安裝條件"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "OS的診斷軟體與工具"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "溝通協調能力"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "研究能力"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "軟體操作能力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "工作表單與報告撰寫"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "問題解決能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.3",
+                "name": "利用工具解決問題"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.3.1",
+                    "text": "使用可用的系統工具來排除問題。"
+                  },
+                  {
+                    "code": "P1.3.2",
+                    "text": "若有無法解決的障礙,呈報主管並依指示解決問題。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "電腦與網路概念"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "OS的功能與特性"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "OS的規格與安裝條件"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "OS的診斷軟體與工具"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "溝通協調能力"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "問題解決能力"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "研究能力"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "軟體操作能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.4",
+                "name": "提供新版本OS執行說明"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.4.1",
+                    "text": "依照需求為用戶端與使用者提供有關作業系統變更的指導。"
+                  },
+                  {
+                    "code": "P1.4.2",
+                    "text": "利用適當的回饋機制取得用戶端對新系統的意見,以確保符合用戶端要求。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "電腦與網路概念"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "OS的功能與特性"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "OS的規格與安裝條件"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "OS的診斷軟體與工具"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "客戶支援與維護實務"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "溝通協調能力"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "軟體操作能力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "工作表單與報告撰寫"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "問題解決能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "解決OS與軟、硬體問題",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "蒐集及整理應解決的問題"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "蒐集與整理系統相關運行問題。"
+                  },
+                  {
+                    "code": "P2.1.2",
+                    "text": "確認及彙整OS軟、硬體錯誤訊息。"
+                  },
+                  {
+                    "code": "P2.1.3",
+                    "text": "交付整理報告予相關人員,進行資料分析,確定問題性質並產出問題報告。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.1.1",
+                    "name": "問題報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "電腦與網路概念"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "OS的功能與特性"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "OS的診斷軟體與工具"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "客戶支援與維護實務"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "變更管理工具"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "網路線路檢測工具知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "溝通協調能力"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "資料蒐集與分析能力"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "研究能力"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "軟體操作能力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "工作表單與報告撰寫"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "問題解決能力"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "規劃與組織能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.2",
+                "name": "協助挑選最適切的問題解決方案或工具"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.2.1",
+                    "text": "協助研擬疑難排除流程來協助解決問題。"
+                  },
+                  {
+                    "code": "P2.2.2",
+                    "text": "針對問題,依照主管交付最適切解決方案需求,找尋可用的工具。"
+                  },
+                  {
+                    "code": "P2.2.3",
+                    "text": "找出與問題領域相關的法規及職業安全衛"
+                  },
+                  {
+                    "code": "P2.2.4",
+                    "text": "以流程文件記錄前述過程之相關資訊。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.2.1",
+                    "name": "疑難排除流程文件與紀錄"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "電腦與網路概念"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "OS的功能與特性"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "OS的診斷軟體與工具"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "客戶支援與維護實務"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "變更管理工具"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "網路線路檢測工具知識"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "OS架構相關知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "溝通協調能力"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "資料蒐集與分析能力"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "研究能力"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "軟體操作能力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "工作表單與報告撰寫"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "問題解決能力"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "規劃與組織能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.3",
+                "name": "測試系統並完成各項文件"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.3.1",
+                    "text": "依據最適解決方案,進行測試系統並填寫系統測試記錄。"
+                  },
+                  {
+                    "code": "P2.3.2",
+                    "text": "測試完成,通知相關人員進行驗收流程,並確認完成各項文件記錄。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.3.1",
+                    "name": "系統測試紀錄"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "電腦與網路概念"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "OS的功能與特性"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "OS的診斷軟體與工具"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "客戶支援與維護實務"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "變更管理工具"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "網路線路檢測工具知識"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "OS架構相關知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "溝通協調能力"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "軟體操作能力"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "問題解決能力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "工作表單與報告撰寫"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "規劃與組織能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "自我管理：設立定義明確且實際可行的個人目標；對於及時完成任務展現高度進取、努力、承諾及負責任的行為。"
+      },
+      {
+        "code": "A02",
+        "name": "壓力容忍：冷靜且有效地應對及處理高度緊張的情況或壓力，如緊迫的時間、不友善的人、各類突發事件及危急狀況，並能以適當的方式紓解自身壓力。"
+      },
+      {
+        "code": "A03",
+        "name": "謹慎細心：對於任務的執行過程，能謹慎考量及處理所有細節，精確地檢視每個程序，並持續對其保持高度關注。"
+      },
+      {
+        "code": "A04",
+        "name": "自我提升：能夠展現持續學習的企圖心，利用且積極參與各種機會，學習任務所需的新知識與技能，並能有效應用在特定任務。"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "專科以上資訊相關科系畢業或相關工作1年以上經驗或取得相關證照。"
+    ],
+    "supplements": [
+      "【註1】作業系統（OS）：與伺服器運行相關之作業系統。"
+    ]
+  }
+}

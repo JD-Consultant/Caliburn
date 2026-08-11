@@ -1,0 +1,858 @@
+{
+  "version_info": {
+    "versions": [
+      {
+        "version": "V5",
+        "ocs_code": "NAO2132-001v5",
+        "ocs_name": "休閒農場經營管理師",
+        "status": "最新版本",
+        "update_note": "略",
+        "update_date": "2024/12/31"
+      },
+      {
+        "version": "V4",
+        "ocs_code": "NAO2132-001v4",
+        "ocs_name": "休閒農場經營管理師",
+        "status": "歷史版本",
+        "update_note": "已被《NAO2132-001v5》取代",
+        "update_date": "2022/01/28"
+      },
+      {
+        "version": "V3",
+        "ocs_code": "NAO2132-001v3",
+        "ocs_name": "休閒農場經營管理師",
+        "status": "歷史版本",
+        "update_note": "已被《NAO2132-001v4》取代",
+        "update_date": "2019/02/01"
+      },
+      {
+        "version": "V2",
+        "ocs_code": "NAO2132-001v2",
+        "ocs_name": "休閒農場經營管理師",
+        "status": "歷史版本",
+        "update_note": "已被《NAO2132-001v3》取代",
+        "update_date": "2015/11/30"
+      },
+      {
+        "version": "V1",
+        "ocs_code": "NAO2132-001",
+        "ocs_name": "休閒農場經營管理師",
+        "status": "歷史版本",
+        "update_note": "已被《NAO2132-001v2》取代",
+        "update_date": "2014/12/31"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "ocs_code": "NAO2132-001v5",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "休閒農場經營管理師"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "天然資源",
+          "code": "NAO"
+        },
+        {
+          "name": "食品與農業/農業經營",
+          "code": "NAO"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "休閒農場經營管理師",
+          "code": "2132"
+        }
+      ],
+      "industries": [
+        {
+          "name": "本基準可能跨屬下列行業別:",
+          "code": "A01"
+        }
+      ]
+    },
+    "job_description": "負責休閒農場經營管理、創新經營模式與建構品牌價值。",
+    "ocs_level": 4
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "管理休閒農場資",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "管理農業資源"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "了解並運用農業及環境資源,永續發展休閒農場。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.1.1",
+                    "name": "農業資源規劃與管理文件"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "K01"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "休閒遊憩觀光概論"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "環境倫理"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "休閒產業趨勢"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "資源盤點與運用 S"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "環境配置評估"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "資源評估"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "外部意識 S"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "創新導向 S"
+                  },
+                  {
+                    "code": "S17",
+                    "name": "價值判斷"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.2",
+                "name": "掌握休閒農業相關政策及法規"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.2.1",
+                    "text": "了解並執行休閒農業及相關產業推動政策與法規,規劃休閒農場整體經營運作模式。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.2.1",
+                    "name": "休閒農場經營計畫書"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K06",
+                    "name": "休閒農場相關政策與法規"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "農地管理相關政策與法規"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "休閒農場經營管理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S03",
+                    "name": "農地利用及市場評估"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "成本分析 S"
+                  },
+                  {
+                    "code": "S13",
+                    "name": "組織計畫 S"
+                  },
+                  {
+                    "code": "S15",
+                    "name": "策略性思考"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.3",
+                "name": "規劃及維護場域環境"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.3.1",
+                    "text": "根據經營項目與作業流程,規劃休閒農場特色景觀及設施配置,確保場域安全及環境整潔。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.3.1",
+                    "name": "設施安全維護工作流程文件"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K02",
+                    "name": "環境規劃理論"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "環境倫理"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "農業美學"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "設施維護與管理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "環境配置評估"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "安全及環境維護"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "設施規劃設計"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "管理休閒農場組織",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "管理財務"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "根據各項經營需求進行成本分析與收支管理。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.1.1",
+                    "name": "成本分析文件"
+                  },
+                  {
+                    "code": "O2.1.2",
+                    "name": "收支分析文件"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K11",
+                    "name": "財務管理"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "行政資源管理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S04",
+                    "name": "成本分析"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "財務風險評估"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.2",
+                "name": "管理工作流程"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.2.1",
+                    "text": "根據經營計畫書規劃各項工作之標準作業流程,提升經營效率。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.2.1",
+                    "name": "標準作業流程文件"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K10",
+                    "name": "設施維護與管理"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "行政資源管理"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "餐飲管理"
+                  },
+                  {
+                    "code": "K14",
+                    "name": "住宿管理"
+                  },
+                  {
+                    "code": "K15",
+                    "name": "體驗及活動管理"
+                  },
+                  {
+                    "code": "K16",
+                    "name": "顧客關係與管理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "資源評估"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "標準作業流程訂定能力 S"
+                  },
+                  {
+                    "code": "S23",
+                    "name": "詞彙編撰能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.3",
+                "name": "管理人事"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.3.1",
+                    "text": "建立員工招聘、訓用、考核、薪酬及升遷制度,促進組織發展。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.3.1",
+                    "name": "人事管考文件"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K12",
+                    "name": "行政資源管理"
+                  },
+                  {
+                    "code": "K17",
+                    "name": "人力資源管理"
+                  },
+                  {
+                    "code": "K18",
+                    "name": "勞動基準法及人事相關管理 法規"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S09",
+                    "name": "組織管理能力 S"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "合作協調 S"
+                  },
+                  {
+                    "code": "S16",
+                    "name": "溝通 S"
+                  },
+                  {
+                    "code": "S23",
+                    "name": "詞彙編撰能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.4",
+                "name": "評估風險及管理危機"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.4.1",
+                    "text": "根據休閒農場整體經營,進行風險評估及危機管理規劃,降低相關風險危害。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.4.1",
+                    "name": "休閒農場經營風險評估及危機管理文件"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K19",
+                    "name": "風險管理理論"
+                  },
+                  {
+                    "code": "K20",
+                    "name": "危機處理理論"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S10",
+                    "name": "危機應變能力"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "風險評估能力"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "風險控制管理"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T3",
+        "ocu_name": "管理休閒農場研發與行銷",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T3.1",
+                "name": "管理及提升服務品質"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.1.1",
+                    "text": "管理員工執行各項工作。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.1.1",
+                    "name": "服務品質標準作業流程文件"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K17",
+                    "name": "人力資源管理"
+                  },
+                  {
+                    "code": "K21",
+                    "name": "消費者行為"
+                  },
+                  {
+                    "code": "K22",
+                    "name": "顧客體驗管理"
+                  },
+                  {
+                    "code": "K23",
+                    "name": "服務行銷管理 S"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S09",
+                    "name": "品質導向 S"
+                  },
+                  {
+                    "code": "S19",
+                    "name": "影響力 S"
+                  },
+                  {
+                    "code": "S21",
+                    "name": "顧客導向"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.2",
+                "name": "分析及掌握市場發展趨勢"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.2.1",
+                    "text": "蒐集並分析休閒產業發展趨勢,據以為經營策略調整方向。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.2.1",
+                    "name": "消費市場發展趨勢分析文件"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K04",
+                    "name": "休閒產業趨勢"
+                  },
+                  {
+                    "code": "K21",
+                    "name": "消費者行為"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S13",
+                    "name": "產業資訊蒐集及分析 S"
+                  },
+                  {
+                    "code": "S15",
+                    "name": "策略性思考 S"
+                  },
+                  {
+                    "code": "S17",
+                    "name": "價值判斷"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.3",
+                "name": "企劃及研發農業旅遊產品"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.3.1",
+                    "text": "規劃農業旅遊產品,串連地方農產業一級生產、二級加工及三級體驗服務,加以創新運用促進地產地消,創造農業新市場。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.3.1",
+                    "name": "農業旅遊產品研發企劃文件"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K05",
+                    "name": "資源盤點與運用"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "財務管理"
+                  },
+                  {
+                    "code": "K21",
+                    "name": "消費者行為"
+                  },
+                  {
+                    "code": "K24",
+                    "name": "產品創新研發管理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S14",
+                    "name": "產品規劃策略"
+                  },
+                  {
+                    "code": "S15",
+                    "name": "產品研發能力 S"
+                  },
+                  {
+                    "code": "S01",
+                    "name": "人脈建立 S"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "創新導向 S"
+                  },
+                  {
+                    "code": "S21",
+                    "name": "顧客導向"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.4",
+                "name": "規劃及執行行銷策略"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.4.1",
+                    "text": "依據休閒農場資源及客群設定,規劃並執行相關行銷策略。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.4.1",
+                    "name": "行銷規劃文件"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K04",
+                    "name": "休閒產業趨勢"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "財務管理"
+                  },
+                  {
+                    "code": "K16",
+                    "name": "顧客關係與管理"
+                  },
+                  {
+                    "code": "K25",
+                    "name": "行銷規劃與策略"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S16",
+                    "name": "市場分析"
+                  },
+                  {
+                    "code": "S17",
+                    "name": "顧客需求分析"
+                  },
+                  {
+                    "code": "S18",
+                    "name": "新市場開發"
+                  },
+                  {
+                    "code": "S19",
+                    "name": "行銷規劃執行"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.5",
+                "name": "建構品牌價值"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.5.1",
+                    "text": "強化休閒農業經營理念,提升品牌價值。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.5.1",
+                    "name": "品牌價值提升規劃文件"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K16",
+                    "name": "顧客關係與管理"
+                  },
+                  {
+                    "code": "K26",
+                    "name": "策略管理"
+                  },
+                  {
+                    "code": "K27",
+                    "name": "品牌管理"
+                  },
+                  {
+                    "code": "K28",
+                    "name": "社會企業與責任"
+                  },
+                  {
+                    "code": "K29",
+                    "name": "休閒農業哲學 S"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S15",
+                    "name": "策略性思考"
+                  },
+                  {
+                    "code": "S20",
+                    "name": "品牌行銷企劃"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "農業使命"
+      },
+      {
+        "code": "A02",
+        "name": "產業認同"
+      },
+      {
+        "code": "A03",
+        "name": "尊重自然"
+      },
+      {
+        "code": "A04",
+        "name": "領導統御"
+      },
+      {
+        "code": "A05",
+        "name": "國際視野"
+      },
+      {
+        "code": "A06",
+        "name": "團隊合作"
+      },
+      {
+        "code": "A07",
+        "name": "積極熱忱"
+      },
+      {
+        "code": "A08",
+        "name": "誠實正直"
+      },
+      {
+        "code": "A09",
+        "name": "親和力"
+      },
+      {
+        "code": "A10",
+        "name": "洞察力"
+      },
+      {
+        "code": "A11",
+        "name": "執行力"
+      },
+      {
+        "code": "A12",
+        "name": "創造力"
+      },
+      {
+        "code": "A13",
+        "name": "抗壓力"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "從事農業相關產業3年以上工作經驗，具基礎經營管理能力。"
+    ],
+    "supplements": [
+      "本職能基準適用行業別，包含：「A大類-農林漁牧業、I大類-住宿及餐飲類、R大類-藝術、娛樂及休閒服務業」。",
+      "有關職能內涵（技能）：S表示專業上之hard skill、SS表示soft skill。"
+    ]
+  }
+}

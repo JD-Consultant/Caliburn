@@ -1,0 +1,414 @@
+{
+  "version_info": {
+    "versions": []
+  },
+  "ocs_profile": {
+    "ocs_code": "ISD2519-004v1",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "AI演算法應用工程人員"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "資訊科技/軟體開發及程式設計",
+          "code": "ISD"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "AI演算法應用工程人員",
+          "code": "2519"
+        }
+      ],
+      "industries": [
+        {
+          "name": "出版影音及資通訊業/電腦程式設計、諮詢及相關服務業",
+          "code": "J6201"
+        }
+      ]
+    },
+    "job_description": "依據需求分析結果，分析與設計系統，並在選擇適當演算法後，進行系統的測試、驗收以及管理維運。",
+    "ocs_level": 4
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "可行性評估",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "需求分析"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 4,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "依據使用情境需求,協助進行開發可行性與技術評估。"
+                  },
+                  {
+                    "code": "P1.1.1",
+                    "text": "依據使用情境需求，協助進行開發可行性"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.1.1",
+                    "name": "可行性分析報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "AI演算法"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "分析技巧"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "可行性評估"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "問題解決能力"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "溝通協商技巧"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "系統分析與設計",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": ""
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "建立系統資料流程圖等系統分析文件，以\n4\nK02系統資料分析工具\nS05系統分析\nS05系統分析"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K02",
+                    "name": "系統資料分析工具"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S05",
+                    "name": "系統分析"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.2",
+                "name": "系統設計"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.2.1",
+                    "text": "依據使用情境需求進行各項作業流程、程\n4\nK03應用系統架構\nK04驗證流程\nS06系統設計能力\nS07流程驗證能力\nS06系統設計能力"
+                  },
+                  {
+                    "code": "P2.2.2",
+                    "text": "設計機器學習或深度學習模型驗證流程。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.2.1",
+                    "name": "模型驗證腳本或報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K03",
+                    "name": "應用系統架構"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "驗證流程"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S06",
+                    "name": "系統設計能力"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "流程驗證能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T3",
+        "ocu_name": "演算法選擇",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T3.1",
+                "name": "協助開發與設計演算法"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.1.1",
+                    "text": "與相關人員依據可行性分析結果,協作設計與選擇演算法的模型應用方案。"
+                  },
+                  {
+                    "code": "P3.1.2",
+                    "text": "定期分析與追蹤演算法版本。"
+                  },
+                  {
+                    "code": "P3.1.2",
+                    "text": "定期分析與追蹤演算法版本。\nS08邏輯運算能力"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "AI演算法"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "機器學習/深度學習"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "數學統計"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S03",
+                    "name": "問題解決能力"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "溝通協商技巧"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "邏輯運算能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T4",
+        "ocu_name": "應用系統測試與驗收",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T4.1",
+                "name": ""
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.1.1",
+                    "text": "依據使用情境需求，以測試是否符合驗證\n４\nK07應用程式測試程序與規範\nS09測試技巧\nS09測試技巧"
+                  },
+                  {
+                    "code": "P4.2.1",
+                    "text": "進行壓力測試,並驗證系統的效能。"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K07",
+                    "name": "應用程式測試程序與規範"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S09",
+                    "name": "測試技巧"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "驗證能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T5",
+        "ocu_name": "系統管理及維運",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T5.1",
+                "name": "模型校正與更新"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 1,
+                "indicators": [
+                  {
+                    "code": "P5.1.1",
+                    "text": "運用新資料觸發模型重新訓練，以改善模\n4\nK01 AI演算法\nK05機器學習/深度學習\nK08訓練模型\nS03問題解決能力\nS11模型參數調整\nS12效能評估\nS03問題解決能力"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "AI演算法"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "機器學習/深度學習"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "訓練模型"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S03",
+                    "name": "問題解決能力"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "模型參數調整"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "效能評估"
+                  }
+                ]
+              },
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P5.1.2",
+                    "text": "評估重新訓練後的模型成效，確保模型符\nS12效能評估"
+                  }
+                ],
+                "outputs": [],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "AI演算法"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "機器學習/深度學習"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "訓練模型"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S12",
+                    "name": "效能評估"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "正直誠實：展現高道德標準及值得信賴的行為，且能以維持組織誠信為行事原則，瞭解違反組織、自己及他人的道德標準之影響。"
+      },
+      {
+        "code": "A02",
+        "name": "持續學習 ：能夠展現自我提升的企圖心，利用且積極參與各種機會，學習任務所需的新知識與技能，並能有效應用在特定任務。"
+      },
+      {
+        "code": "A03",
+        "name": "自我管理 ：設立定義明確且實際可行的個人目標；對於及時完成任務展現高度進取、努力、承諾及負責任的行為。"
+      },
+      {
+        "code": "A04",
+        "name": "團隊意識：積極參與並支持團隊，能彼此鼓勵共同達成團隊目標。"
+      },
+      {
+        "code": "A05",
+        "name": "彈性：能夠敞開心胸，調整行為或工作方法以適應新資訊、變化的外在環境或突如其來的阻礙。"
+      },
+      {
+        "code": "A06",
+        "name": "壓力容忍：冷靜且有效地應對及處理高度緊張的情況或壓力，如緊迫的時間、不友善的人、各類突發事件及危急狀況，並能以適當的方式紓解自身壓力。"
+      },
+      {
+        "code": "A07",
+        "name": "應對不確定性：當狀況不明或問題不夠具體的情況下，能在必要時採取行動，以有效釐清模糊不清的態勢。"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "大專以上資訊相關科系畢業或具3年以程式設計相關工作經驗。"
+    ],
+    "supplements": []
+  }
+}

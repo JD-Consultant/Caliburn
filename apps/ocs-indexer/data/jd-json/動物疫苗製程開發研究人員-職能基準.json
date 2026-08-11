@@ -1,0 +1,928 @@
+{
+  "version_info": {
+    "versions": [
+      {
+        "version": "V4",
+        "ocs_code": "NAR2131-001v4",
+        "ocs_name": "動物疫苗製程開發研究人員",
+        "status": "最新版本",
+        "update_note": "略",
+        "update_date": "2024/12/31"
+      },
+      {
+        "version": "V3",
+        "ocs_code": "NAR2131-001v3",
+        "ocs_name": "動物疫苗製程開發研究人員",
+        "status": "歷史版本",
+        "update_note": "已被《NAR2131-001v4》取代",
+        "update_date": "2022/01/28"
+      },
+      {
+        "version": "V2",
+        "ocs_code": "NAR2131-001v2",
+        "ocs_name": "動物疫苗製程開發研究人員",
+        "status": "歷史版本",
+        "update_note": "已被《NAR2131-001v3》取代",
+        "update_date": "2019/02/01"
+      },
+      {
+        "version": "V1",
+        "ocs_code": "NAR2131-001",
+        "ocs_name": "動物疫苗製程開發研究人員",
+        "status": "歷史版本",
+        "update_note": "已被《NAR2131-001v2》取代",
+        "update_date": "2015/11/30"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "ocs_code": "NAR2131-001v4",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "動物疫苗製程開發研究人員"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "天然資源",
+          "code": "NAR"
+        },
+        {
+          "name": "食品與農業/動物研究發展與應用",
+          "code": "NAR"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "動物疫苗製程開發研究人員",
+          "code": "2131"
+        }
+      ],
+      "industries": [
+        {
+          "name": "製造業/藥品及醫用化學製品製造業",
+          "code": "C200"
+        }
+      ]
+    },
+    "job_description": "負責將產品或技術之實驗室規模與製程轉換為工業可生產之製程，解決品質、製程之問題，並且合理及有效控制時間、成本、安全、穩定性等製\n程因素，制訂標準化製程，並持續進行製程優化循環等相關工作。",
+    "ocs_level": 4
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "技術評估",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "產業技術情報分析與評估"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "能夠依據公司策略方向掌握技術水準、臨床試驗文獻,使技術、儀器設備符合產業發展,提升開發效率。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.1.1",
+                    "name": "技術評估報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "製程開發流程"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "產業概況"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "科技新訊"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "產業資訊蒐集"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "外語閱讀能力"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "外語能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "疫苗抗原生產",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "篩選生產原料"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "試驗以找到可使目標抗原增殖最適的生產原料。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.1.1",
+                    "name": "工作日誌"
+                  },
+                  {
+                    "code": "O2.1.2",
+                    "name": "研究結果報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K04",
+                    "name": "微生物學"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "發酵工程"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "細胞生物學"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "生物化學"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "GMP概念"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "單元操作概念"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "實驗設計原理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S04",
+                    "name": "無菌操作"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "發酵技術"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "培養技術"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "滅菌操作"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "生物反應器操作"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "問題分析與解決"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "品質導向"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.2",
+                "name": "篩選培養條件"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.2.1",
+                    "text": "能夠配合公司策略與開發時程規劃,操作發酵槽或生物反應器,設計目標抗原生產的最好條件,使抗原產量最大化。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.2.1",
+                    "name": "工作日誌"
+                  },
+                  {
+                    "code": "O2.2.2",
+                    "name": "研究結果報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K04",
+                    "name": "微生物學"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "發酵工程"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "細胞生物學"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "生物化學"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "GMP概念"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "單元操作概念"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "實驗設計原理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S04",
+                    "name": "無菌操作"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "發酵技術"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "培養技術"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "滅菌操作"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "生物反應器操作"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "問題分析與解決"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "品質導向"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T3",
+        "ocu_name": "純化製程開發",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T3.1",
+                "name": "純化"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.1.1",
+                    "text": "根據目標定位,利用純化機、製備級層析設備與濃縮置換排列組合運用,使標的物回收率最大化,並兼顧品質。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.1.1",
+                    "name": "流程圖操作紀錄"
+                  },
+                  {
+                    "code": "O3.1.2",
+                    "name": "批次實驗紀錄"
+                  },
+                  {
+                    "code": "O3.1.3",
+                    "name": "測試時間點紀錄"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K07",
+                    "name": "生物化學"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "有機化學"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S09",
+                    "name": "問題分析與解決"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "分析推理"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "分析化學儀器操作"
+                  },
+                  {
+                    "code": "S13",
+                    "name": "微生物管控"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.2",
+                "name": "品質分析"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.2.1",
+                    "text": "利用分析方法鑑定安定性、毒理反應、生化特性,以確認抗原品質。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.2.1",
+                    "name": "安定性試驗紀錄"
+                  },
+                  {
+                    "code": "O3.2.2",
+                    "name": "去毒性檢測紀錄"
+                  },
+                  {
+                    "code": "O3.2.3",
+                    "name": "抗原生化性分析紀錄"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K07",
+                    "name": "生物化學"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "分析化學"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "免疫學"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S10",
+                    "name": "品質導向"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "分析化學儀器操作"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "動物實驗技術"
+                  },
+                  {
+                    "code": "S15",
+                    "name": "免疫化學技術"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T4",
+        "ocu_name": "產品試量產",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T4.1",
+                "name": "製程放大設計"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.1.1",
+                    "text": "能夠配合工廠設備與空間設計與決定放大培養之條件參數,使生產規模從實驗室到商業化規模。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.1.1",
+                    "name": "製程放大條件規劃表"
+                  },
+                  {
+                    "code": "O4.1.2",
+                    "name": "製程方法報告書"
+                  },
+                  {
+                    "code": "O4.1.3",
+                    "name": "製程放大實驗紀錄"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K08",
+                    "name": "GMP概念"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "單元操作概念"
+                  },
+                  {
+                    "code": "K14",
+                    "name": "生物反應器工程"
+                  },
+                  {
+                    "code": "K15",
+                    "name": "品質管制概念"
+                  },
+                  {
+                    "code": "K16",
+                    "name": "成本概念"
+                  },
+                  {
+                    "code": "K17",
+                    "name": "工程計算"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S04",
+                    "name": "無菌操作"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "發酵技術"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "培養技術"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "滅菌操作"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "生物反應器操作"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "問題分析與解決"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "品質導向"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "分析推理"
+                  },
+                  {
+                    "code": "S16",
+                    "name": "壓力容器操作"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T4.2",
+                "name": "取樣與分析"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P4.2.1",
+                    "text": "能夠正確進行試驗及取樣,擬訂製程放大問題解決方案,找到符合量產與成本的製程條件,提高生產效率。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.2.1",
+                    "name": "品質控管(in-processcontrol)確認書"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K07",
+                    "name": "生物化學"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "分析化學"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "免疫學"
+                  },
+                  {
+                    "code": "K15",
+                    "name": "品質管制概念"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S09",
+                    "name": "問題分析與解決"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "品質導向"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "分析化學儀器操作"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "動物實驗技術"
+                  },
+                  {
+                    "code": "S15",
+                    "name": "免疫化學技術"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T5",
+        "ocu_name": "製程標準化",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T5.1",
+                "name": "確效性試製"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P5.1.1",
+                    "text": "能夠在相同可量產之製程條件下重複試驗(3批次),確保成品之鑑別、純度及效價,以及批次間製程一致、穩定與再現性。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O5.1.1",
+                    "name": "重複試驗紀錄"
+                  },
+                  {
+                    "code": "O5.1.2",
+                    "name": "試驗一致性報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K08",
+                    "name": "GMP概念"
+                  },
+                  {
+                    "code": "K15",
+                    "name": "品質管制概念"
+                  },
+                  {
+                    "code": "K18",
+                    "name": "品質檢驗概念"
+                  },
+                  {
+                    "code": "K19",
+                    "name": "生物藥品製造概念"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S05",
+                    "name": "發酵技術"
+                  },
+                  {
+                    "code": "S17",
+                    "name": "純化技術"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T5.2",
+                "name": "制定標準化規格與程序"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P5.2.1",
+                    "text": "可將確定之量產製程條件規格(原料、製造紀錄、抽樣檢驗點及方法等)文件化。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O5.2.1",
+                    "name": "製造標準管制書"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K08",
+                    "name": "GMP概念"
+                  },
+                  {
+                    "code": "K15",
+                    "name": "品質管制概念"
+                  },
+                  {
+                    "code": "K20",
+                    "name": "製造程序"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S18",
+                    "name": "操作手冊撰寫能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T6",
+        "ocu_name": "製程優化",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T6.1",
+                "name": "設計優化條件"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P6.1.1",
+                    "text": "能夠具體制訂製程優化指標(降低生產成本、增加產率、引進新技術...),以創造生產價值,提高製程生產效益。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O6.1.1",
+                    "name": "製程優化計畫書"
+                  },
+                  {
+                    "code": "O6.1.2",
+                    "name": "優化實驗紀錄"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K08",
+                    "name": "GMP概念"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "實驗設計原理"
+                  },
+                  {
+                    "code": "K15",
+                    "name": "品質管制概念"
+                  },
+                  {
+                    "code": "K20",
+                    "name": "製造程序"
+                  },
+                  {
+                    "code": "K21",
+                    "name": "統計分析"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S05",
+                    "name": "發酵技術"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "問題分析與解決"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "品質導向"
+                  },
+                  {
+                    "code": "S17",
+                    "name": "純化技術"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T6.2",
+                "name": "執行與確認優化條件"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P6.2.1",
+                    "text": "重複試驗優化條件,達成製程優化指標,並確認優化後之品質符合品質規格確認書。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O6.2.1",
+                    "name": "重複優化試驗紀錄"
+                  },
+                  {
+                    "code": "O6.2.2",
+                    "name": "品質規格確認書"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K07",
+                    "name": "生物化學"
+                  },
+                  {
+                    "code": "K12",
+                    "name": "分析化學"
+                  },
+                  {
+                    "code": "K13",
+                    "name": "免疫學"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S05",
+                    "name": "發酵技術"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "品質導向"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "分析化學儀器操作"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "動物實驗技術"
+                  },
+                  {
+                    "code": "S15",
+                    "name": "免疫化學技術"
+                  },
+                  {
+                    "code": "S17",
+                    "name": "純化技術"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "主動積極"
+      },
+      {
+        "code": "A02",
+        "name": "任勞任怨"
+      },
+      {
+        "code": "A03",
+        "name": "細心仔細"
+      },
+      {
+        "code": "A04",
+        "name": "壓力容忍"
+      },
+      {
+        "code": "A05",
+        "name": "創新思維"
+      },
+      {
+        "code": "A06",
+        "name": "可靠性"
+      },
+      {
+        "code": "A07",
+        "name": "持久性"
+      },
+      {
+        "code": "A08",
+        "name": "誠信"
+      },
+      {
+        "code": "A09",
+        "name": "時間管理"
+      },
+      {
+        "code": "A10",
+        "name": "團隊合作"
+      },
+      {
+        "code": "A11",
+        "name": "溝通協調"
+      },
+      {
+        "code": "A12",
+        "name": "熱忱"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "生物科技、生命科學、化學化工、獸醫、醫藥與食品等相關科系碩士以上尤佳，或相關工作經驗3年以上。"
+    ],
+    "supplements": []
+  }
+}

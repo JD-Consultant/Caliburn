@@ -1,0 +1,539 @@
+{
+  "version_info": {
+    "versions": [
+      {
+        "version": "V3",
+        "ocs_code": "APA2654-004v3",
+        "ocs_name": "演唱會助理導播",
+        "status": "最新版本",
+        "update_note": "略",
+        "update_date": "2023/04/13"
+      },
+      {
+        "version": "V2",
+        "ocs_code": "APA2654-004v2",
+        "ocs_name": "演唱會助理導播",
+        "status": "歷史版本",
+        "update_note": "已被《APA2654-004v3》取代",
+        "update_date": "2020/04/10"
+      },
+      {
+        "version": "V1",
+        "ocs_code": "APA2654-004v1",
+        "ocs_name": "演唱會助理導播",
+        "status": "歷史版本",
+        "update_note": "已被《APA2654-004v2》取代",
+        "update_date": "2017/04/10"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "ocs_code": "APA2654-004v3",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "演唱會助理導播"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "藝文與影音傳播/表演藝術",
+          "code": "Unknown"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "電影、舞台及有關導演與製作人",
+          "code": "2654"
+        }
+      ],
+      "industries": [
+        {
+          "name": "藝術、娛樂及休閒服務業/創作及藝術表演業",
+          "code": "R9030"
+        }
+      ]
+    },
+    "job_description": "",
+    "ocs_level": 3
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "演唱會需求安排規劃",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "紀錄演出團隊及技術需求"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "協助導播紀錄演出藝人或團隊之活動內容與技術需求。"
+                  },
+                  {
+                    "code": "P1.1.2",
+                    "text": "理解演出並協助導播紀錄演出藝人或團隊之活動內容與技術需求。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.1.1",
+                    "name": "演唱會前置會議需求紀錄"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "節目製作流程"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "舞台知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "彙整能力"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "了解活動需求及器材設施的 能力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "電腦文書處理能力:使用基 本文件,例如資料表、文件夾和 檔案,以書寫筆記、總結和記錄 資訊"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.2",
+                "name": "彙整拍攝流程表"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.2.1",
+                    "text": "依據演唱會性質及主題,彙整拍攝流程表,協助導播進行拍攝規畫。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.2.1",
+                    "name": "拍攝流程表"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K02",
+                    "name": "舞台知識"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "音樂概論"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "視覺設計常識"
+                  },
+                  {
+                    "code": "K05",
+                    "name": "基礎視聽"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "演唱會流程知識"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "基礎燈光"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "轉播器材用途與組合知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "彙整能力"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "速記能力:運用符號標示及 紀錄演唱會畫面、人物進出、燈 光等相關事項的能力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "電腦文書處理能力:使用基 本文件,例如資料表、文件夾和 檔案,以書寫筆記、總結和記錄 資訊"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "演唱會執行內容",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "執行技術彩排"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "每次彩排需協助導播紀錄重點注意事項,重點包含要呈現的畫面、聲音、人物、燈光、舞台特效與時間長度、人物進出位置、舞台地面標記、主奏樂器、攝影運鏡重點等。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.1.1",
+                    "name": "彩排紀錄"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K02",
+                    "name": "舞台知識"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "演唱會流程知識"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "轉播器材用途與組合知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "彙整能力"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "速記能力:運用符號標示及 紀錄演唱會畫面、人物進出、燈 光等相關事項的能力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "電腦文書處理能力:使用基 本文件,例如資料表、文件夾和 檔案,以書寫筆記、總結和記錄 資訊"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.2",
+                "name": "執行總彩排"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.2.1",
+                    "text": "協助導播確認與紀錄演唱會每個環節的拍攝需求,並於正式演出前進行討論或調整。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.2.1",
+                    "name": "演出總彩"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K08",
+                    "name": "演唱會流程知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S03",
+                    "name": "問題分析與解決能力"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "溝通與協調能力"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "藉由清楚有效的溝通,與內 外部團隊表達導播的訊息"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T3",
+        "ocu_name": "演唱會演出",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T3.1",
+                "name": "演唱會演出"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.1.1",
+                    "text": "協助導播依照流程表並配合現場狀況【註1】,依照導播指令,進行相關器材應用人員提示,完成所有的拍攝需求。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.1.1",
+                    "name": "前台監控規劃與反應"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K02",
+                    "name": "舞台知識"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "視覺設計常識"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "音樂常識"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "演唱會流程知識"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "基礎燈光"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "轉播器材用途與組合知 識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S05",
+                    "name": "速記能力:運用符號標示及 紀錄演唱會畫面、人物進出、燈 光等相關事項的能力"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "衝突管理:發展突發事件應 變計畫的解決問題技能"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "藉由清楚有效的溝通,與內 外部團隊表達導播的訊息"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "時間掌控的能力"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.2",
+                "name": "控台監控"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.2.1",
+                    "text": "視導播需求,能夠透過intercom(內部通話系統),隨時掌控控台的情況,並協助導播給出指令。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.2.1",
+                    "name": "控台監控規劃與反應"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K02",
+                    "name": "舞台知識"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "音樂常識"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "演唱會流程知識"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "基礎燈光"
+                  },
+                  {
+                    "code": "K11",
+                    "name": "轉播器材用途與組合知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S05",
+                    "name": "速記能力:運用符號標示及 紀錄演唱會畫面、人物進出、燈 光等相關事項的能力"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "藉由清楚有效的溝通,與內 外部團隊表達導播的訊息"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "衝突管理:發展突發事件應 變計畫的解決問題技能"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "時間掌控的能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T4",
+        "ocu_name": "演出後檢討",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T4.1",
+                "name": "演出後檢討會議"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 4,
+                "indicators": [
+                  {
+                    "code": "P4.1.1",
+                    "text": "若為巡迴演出,參加檢討會議,能與導播共同檢視演唱會拍攝錄影之內容,並做紀錄與修正。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O4.1.1",
+                    "name": "錄影內容"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K07",
+                    "name": "基礎錄影知識"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S09",
+                    "name": "紀錄處理溝通過程與想法的 技能"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "謹慎細心"
+      },
+      {
+        "code": "A02",
+        "name": "良好的職業道德"
+      },
+      {
+        "code": "A03",
+        "name": "溝通能力"
+      },
+      {
+        "code": "A04",
+        "name": "應變能力"
+      },
+      {
+        "code": "A05",
+        "name": "主動積極"
+      },
+      {
+        "code": "A06",
+        "name": "自我管理"
+      },
+      {
+        "code": "A07",
+        "name": "抗壓性高"
+      },
+      {
+        "code": "A08",
+        "name": "勇於承擔"
+      },
+      {
+        "code": "A09",
+        "name": "具自信心"
+      },
+      {
+        "code": "A10",
+        "name": "心態開放"
+      },
+      {
+        "code": "A11",
+        "name": "情緒管理佳"
+      },
+      {
+        "code": "A12",
+        "name": "口齒清晰"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "大學影視相關科系或具備相關經驗至少2年以上。",
+      "對流行音樂有興趣者。2.具良好溝通能力。3.具基本之英語聽說讀寫之能力為佳。"
+    ],
+    "supplements": [
+      "【註１】現場狀況：現場狀況可能包含歌手走位、歌曲快慢起伏、現場觀眾氣氛、視覺需求等。"
+    ]
+  }
+}

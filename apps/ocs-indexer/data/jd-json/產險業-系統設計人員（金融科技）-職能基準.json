@@ -1,0 +1,515 @@
+{
+  "version_info": {
+    "versions": [
+      {
+        "version": "V2",
+        "ocs_code": "FIS2511-002v2",
+        "ocs_name": "產險業-系統設計人員（金融科技）",
+        "status": "最新版本",
+        "update_note": "略",
+        "update_date": "2025/12/23"
+      },
+      {
+        "version": "V1",
+        "ocs_code": "FIS2511-002v1",
+        "ocs_name": "產險業-系統設計人員（金融科技）",
+        "status": "歷史版本",
+        "update_note": "已被《FIS2511-002v2》取代",
+        "update_date": "2022/11/30"
+      }
+    ]
+  },
+  "ocs_profile": {
+    "ocs_code": "FIS2511-002v2",
+    "ocs_name": {
+      "job_category_name": null,
+      "occupation_name": "產險業-系統設計人員（金融科技）"
+    },
+    "category": {
+      "job_categories": [
+        {
+          "name": "金融財務/保險",
+          "code": "FIS"
+        }
+      ],
+      "occupations": [
+        {
+          "name": "系統分析及設計師",
+          "code": "2511"
+        }
+      ],
+      "industries": [
+        {
+          "name": "金融及保險業/保險業/財產保險業",
+          "code": "K6520"
+        }
+      ]
+    },
+    "job_description": "評估產險業發展數位保險的設備需要，運用內部建置、外包及後續管理等方式，協助運用金融科技完成業務發展目標。",
+    "ocs_level": 3
+  },
+  "ocs_content": {
+    "ocu_units": [
+      {
+        "ocu_code": "T1",
+        "ocu_name": "從事網路平台規劃、建置、運行管理及優化",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T1.1",
+                "name": "基於保險數位保險發展策略,規劃並執行相關之電子平台建\n置與管理"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.1.1",
+                    "text": "評量客戶對數位保險平台的使用度與協助分擔傳統通路客源之有效性。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.1.1",
+                    "name": "數位保險平台發展規劃"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "金融商品"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "產業分析"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "科技發展"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S01",
+                    "name": "策略性思考"
+                  },
+                  {
+                    "code": "S02",
+                    "name": "規劃與組織能力"
+                  },
+                  {
+                    "code": "S03",
+                    "name": "團隊合作"
+                  },
+                  {
+                    "code": "S04",
+                    "name": "溝通能力"
+                  },
+                  {
+                    "code": "S05",
+                    "name": "領導管理"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T1.2",
+                "name": "管理數位保險平台,進行後續優化改良,確保平台運行的穩定性與可靠性"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P1.2.1",
+                    "text": "重視使用者體驗,應用新金融科技優化保險商品。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O1.2.1",
+                    "name": "平台日常管理程序與優化方向"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K01",
+                    "name": "金融商品"
+                  },
+                  {
+                    "code": "K02",
+                    "name": "產業分析"
+                  },
+                  {
+                    "code": "K03",
+                    "name": "科技發展"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "風險管理"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S02",
+                    "name": "規劃與組織能力"
+                  },
+                  {
+                    "code": "S06",
+                    "name": "顧客導向"
+                  },
+                  {
+                    "code": "S07",
+                    "name": "問題分析"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "問題解決"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "資訊科技應用能力"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T2",
+        "ocu_name": "運用現有資料建置與維護資料庫,供業務單位進行後續分析",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T2.1",
+                "name": "整建現有客戶及各種交易資料,導入資料庫進行運用"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.1.1",
+                    "text": "資料庫內資料品質與可用性。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.1.1",
+                    "name": "資料整理與資料導入"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K03",
+                    "name": "科技發展"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "風險管理"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "金融市場"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "法律/法規"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S07",
+                    "name": "問題分析"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "問題解決"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "資訊科技應用能力"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "有效連結"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "分析與解讀能力"
+                  },
+                  {
+                    "code": "S13",
+                    "name": "品質導向"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T2.2",
+                "name": "協助內部人員完成各種表單、程\n式設計，\n提升資料\n取得及分\n析效率"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P2.2.1",
+                    "text": "表單及程式對於資料分析取得之便利性。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O2.2.1",
+                    "name": "表單完成及程式開發數量"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K03",
+                    "name": "科技發展"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "風險管理"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "金融市場"
+                  },
+                  {
+                    "code": "K07",
+                    "name": "統計"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S07",
+                    "name": "問題分析"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "問題解決"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "資訊科技應用能力"
+                  },
+                  {
+                    "code": "S10",
+                    "name": "有效連結"
+                  },
+                  {
+                    "code": "S11",
+                    "name": "分析與解讀能力"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "量化分析技術"
+                  },
+                  {
+                    "code": "S13",
+                    "name": "品質導向"
+                  },
+                  {
+                    "code": "S16",
+                    "name": "時間管理"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "ocu_code": "T3",
+        "ocu_name": "執行資訊安全保障程序與日常管理",
+        "tasks": [
+          {
+            "task_codes": [
+              {
+                "code": "T3.1",
+                "name": "持續蒐集數位保險相關資安資訊,提出防範策略並執行"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.1.1",
+                    "text": "持續衡量、監控數位金融業務相關資訊風險,維持系統穩定並發現早期警訊。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.1.1",
+                    "name": "數位保險業務資訊安全分析報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K02",
+                    "name": "產業分析"
+                  },
+                  {
+                    "code": "K04",
+                    "name": "風險管理"
+                  },
+                  {
+                    "code": "K06",
+                    "name": "金融市場"
+                  },
+                  {
+                    "code": "K08",
+                    "name": "法律/法規"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S04",
+                    "name": "溝通能力"
+                  },
+                  {
+                    "code": "S08",
+                    "name": "問題解決"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "資訊科技應用能力"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "量化分析技術"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "外部環境認知與評估"
+                  },
+                  {
+                    "code": "S15",
+                    "name": "成果導向"
+                  },
+                  {
+                    "code": "S16",
+                    "name": "時間管理"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "task_codes": [
+              {
+                "code": "T3.2",
+                "name": "調整及改善主機系統,防範外部入侵或內部程序錯誤所致之資安風險"
+              }
+            ],
+            "competency_blocks": [
+              {
+                "competency_level": 3,
+                "indicators": [
+                  {
+                    "code": "P3.2.1",
+                    "text": "系統發生資安問題之頻率與影響性。"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "code": "O3.2.1",
+                    "name": "系統改善工程報告"
+                  }
+                ],
+                "knowledge": [
+                  {
+                    "code": "K02",
+                    "name": "產業分析"
+                  },
+                  {
+                    "code": "K09",
+                    "name": "財務分析"
+                  },
+                  {
+                    "code": "K10",
+                    "name": "經濟"
+                  }
+                ],
+                "skills": [
+                  {
+                    "code": "S08",
+                    "name": "問題解決"
+                  },
+                  {
+                    "code": "S09",
+                    "name": "資訊科技應用能力"
+                  },
+                  {
+                    "code": "S12",
+                    "name": "量化分析技術"
+                  },
+                  {
+                    "code": "S14",
+                    "name": "外部環境認知與評估"
+                  },
+                  {
+                    "code": "S15",
+                    "name": "成果導向"
+                  },
+                  {
+                    "code": "S16",
+                    "name": "時間管理"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ocs_attitude": {
+    "attitudes": [
+      {
+        "code": "A01",
+        "name": "主動積極"
+      },
+      {
+        "code": "A02",
+        "name": "持續學習"
+      },
+      {
+        "code": "A03",
+        "name": "團隊意識"
+      },
+      {
+        "code": "A04",
+        "name": "應對不確定性"
+      },
+      {
+        "code": "A05",
+        "name": "謹慎細心"
+      }
+    ]
+  },
+  "notes": {
+    "prerequisites": [
+      "具產險商品及運作有充分瞭解，並具備相當程度資訊工程或系統設計、管理相關經驗者。",
+      "具金融科技或人工智慧相關規劃與專案導入經驗。",
+      "具良好溝通協調與問題分析解決能力。"
+    ],
+    "supplements": []
+  }
+}

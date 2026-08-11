@@ -6,6 +6,8 @@ import ast
 import sys
 from pathlib import Path
 
+import pytest
+
 
 API_DIR = Path(__file__).parents[1]
 CORE_ROOT = API_DIR / "app" / "core"
@@ -58,6 +60,30 @@ def _resolve_relative_module(package: str, level: int, module: str | None) -> st
         )
     base = bits[0]
     return f"{base}.{module}" if module else base
+
+
+def _is_public_core_import(module: str) -> bool:
+    """`module` is `app.core` itself, or a `core` submodule whose every
+    dotted segment (after `app.core.`) is non-underscore-prefixed.
+
+    ADR 0059 Decision 1: `core` has no root facade, but a leading-underscore
+    segment still marks that submodule as private to `core` itself, not part
+    of the shared-kernel public surface a feature module may depend on.
+    `app.core._internal` and `app.core.domain._helpers` must NOT satisfy this
+    check even though they start with `"app.core."` — a plain `startswith`
+    check (what every guard used before this fix) cannot tell them apart from
+    `app.core.persistence`. Callers outside `core` (the five feature guards
+    and the composition-root guard) use this instead of `startswith`; `core`'s
+    own guard (`test_core_imports_only_stdlib_pydantic_or_itself`) does NOT —
+    a file inside `core` importing its own private internals is normal and
+    not a boundary violation, only an *external* module reaching for them is.
+    """
+    if module == "app.core":
+        return True
+    if not module.startswith("app.core."):
+        return False
+    segments = module[len("app.core.") :].split(".")
+    return not any(segment.startswith("_") for segment in segments)
 
 
 def _imports(path: Path) -> list[tuple[int, str]]:
@@ -202,6 +228,44 @@ def test_imports_and_imported_names_resolve_relative_imports_end_to_end(
     assert _imported_names(scheduler, "app.task_analysis") == [(1, "SomePort")]
 
 
+def test_resolve_relative_module_rejects_beyond_top_level_import():
+    """`_resolve_relative_module()` must fail loudly, not silently mis-resolve,
+    for a relative import that climbs above the top-level package — mirroring
+    `importlib._bootstrap._resolve_name`'s own `ImportError`. Before this
+    test, the bounds check (`if len(bits) < level: raise ValueError(...)`) had
+    no assertion actually exercising the case it exists for — a regression
+    that dropped the check back to silently returning a truncated (wrong)
+    module path would not have turned anything red.
+
+    `package="app.opks"` has 2 dot-separated segments; `level=3` asks to climb
+    3 packages up (`rsplit(".", 2)` on a 2-segment string), which is beyond
+    what `"app.opks"` has — exactly the shape `importlib` itself rejects.
+    """
+    with pytest.raises(ValueError, match="beyond top-level package"):
+        _resolve_relative_module("app.opks", 3, "authoring")
+
+
+def test_is_public_core_import_rejects_underscore_segments():
+    """`_is_public_core_import()` is the shared judgment every guard that
+    consumes `core` (the five feature guards and the composition-root guard)
+    uses instead of a bare `startswith("app.core.")` check. ADR 0059
+    Decision 1 says only *non*-underscore-prefixed `core` submodules are
+    public; a plain prefix check cannot express that distinction — it would
+    let `app.core._internal` (or `app.core.domain._helpers`, an underscore
+    segment nested two levels deep) through as if it were as public as
+    `app.core.persistence`. No such private submodule exists in the tree
+    today, so this is a regression guard for a currently-latent gap, not a
+    currently-failing scan — proven directly against the helper, not by
+    planting a real private module under `apps/api/app/core/`.
+    """
+    assert _is_public_core_import("app.core") is True
+    assert _is_public_core_import("app.core.persistence") is True
+    assert _is_public_core_import("app.core.domain.task") is True
+    assert _is_public_core_import("app.core._internal") is False
+    assert _is_public_core_import("app.core.domain._helpers") is False
+    assert _is_public_core_import("app.documents") is False
+
+
 def _surface_files(roots: tuple[Path, ...]) -> tuple[Path, ...]:
     files: list[Path] = []
     for root in roots:
@@ -255,9 +319,11 @@ def test_api_only_imports_feature_module_roots():
     任意深度的具名 submodule 本身就是 public interface,不是只有列舉在案
     的才算——這是 Python 生態系 shared-kernel package 的常見模式(stdlib 的
     `os.path`、`collections.abc`、`xml.etree.ElementTree`、`urllib.parse`
-    皆是直接 import submodule)。下面的檢查邏輯本來就是對 `app.core` 做
-    prefix 比對(`module == "app.core" or module.startswith("app.core.")`),
-    已經涵蓋任意深度,不需要另外維護一份允許的 core submodule 清單。
+    皆是直接 import submodule)。但 ADR 0059 Decision 1 同時也講清楚:只有
+    「非底線開頭」的具名 submodule 才算 public,`core` 自己底下的私有實作
+    (若存在 `core._xxx`／`core.domain._xxx` 這種)不算——所以下面用共用的
+    `_is_public_core_import()` 判斷,不是單純 `startswith("app.core.")`
+    (那樣會連底線開頭的私有 submodule 都放行,等於這條規則沒真的落地)。
 
     掃描範圍是 `app/` 整棵樹扣掉 `core`／`documents`／`task_analysis`／`opks`／
     `consultation`／`export` 六個 feature/core package,而不是只掃 `app/api`——
@@ -325,6 +391,11 @@ def test_api_only_imports_feature_module_roots():
                     violations.append(
                         f"{path.relative_to(API_DIR)}:{line} imports {module}"
                     )
+            if module.startswith("app.core.") and not _is_public_core_import(module):
+                violations.append(
+                    f"{path.relative_to(API_DIR)}:{line} imports private core "
+                    f"module {module}"
+                )
         for module_name, curated in curated_surfaces.items():
             for line, name in _imported_names(path, module_name):
                 if name not in curated:
@@ -369,8 +440,7 @@ def test_documents_imports_only_core_stdlib_pydantic_or_itself():
             allowed = (
                 root in sys.stdlib_module_names
                 or root == "pydantic"
-                or module == "app.core"
-                or module.startswith("app.core.")
+                or _is_public_core_import(module)
                 or module == "app.documents"
                 or module.startswith("app.documents.")
             )
@@ -392,8 +462,7 @@ def test_task_analysis_imports_only_core_stdlib_pydantic_or_itself():
             allowed = (
                 root in sys.stdlib_module_names
                 or root == "pydantic"
-                or module == "app.core"
-                or module.startswith("app.core.")
+                or _is_public_core_import(module)
                 or module == "app.task_analysis"
                 or module.startswith("app.task_analysis.")
             )
@@ -419,8 +488,7 @@ def test_opks_imports_only_core_stdlib_pydantic_or_itself():
             allowed = (
                 root in sys.stdlib_module_names
                 or root == "pydantic"
-                or module == "app.core"
-                or module.startswith("app.core.")
+                or _is_public_core_import(module)
                 or module == "app.opks"
                 or module.startswith("app.opks.")
             )
@@ -443,8 +511,7 @@ def test_export_imports_only_core_stdlib_pydantic_or_itself():
             allowed = (
                 root in sys.stdlib_module_names
                 or root == "pydantic"
-                or module == "app.core"
-                or module.startswith("app.core.")
+                or _is_public_core_import(module)
                 or module == "app.export"
                 or module.startswith("app.export.")
             )
@@ -518,8 +585,7 @@ def test_consultation_imports_only_core_task_analysis_opks_stdlib_pydantic_or_it
             allowed = (
                 root in sys.stdlib_module_names
                 or root == "pydantic"
-                or module == "app.core"
-                or module.startswith("app.core.")
+                or _is_public_core_import(module)
                 or module == "app.consultation"
                 or module.startswith("app.consultation.")
                 or module == "app.task_analysis"

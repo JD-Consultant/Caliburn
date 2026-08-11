@@ -183,19 +183,51 @@ P1（阻塞）與 1 個 P2 發現，逐一驗證後全部屬實：
    誤算進第二輪。修正：拿掉文件裡寫死的 tag SHA 與 commit 清單，改成指向
    `git rev-parse`／`git log` 指令本身，這樣往後每輪都不會再過期。
 
+### 第四輪外部審查
+
+第三輪修正完再審一次，結論「暫時仍不建議 merge」，指出三點，全部驗證屬實：
+
+1. **P2：private core submodule 規則沒有被任何 guard 實際執行。** ADR 0059
+   Decision 1 講「只有非底線開頭的具名 submodule 才算 public」，但六個
+   consumer guard（`documents`／`task_analysis`／`opks`／`export`／
+   `consultation`／composition-root）原本全部用 `module.startswith("app.core.")`
+   這種單純 prefix 比對，沒有任何地方檢查底線——`app.core._internal` 會
+   無條件通過。目前 `core` 底下沒有任何真的底線開頭的 submodule（只有
+   `__init__.py`／`__pycache__`），所以是潛在缺口，不是現存違規。修正：
+   加共用判斷式 `_is_public_core_import()`，拒絕路徑中任一 segment 以 `_`
+   開頭；五個 feature guard 改用它，composition-root guard（原本完全沒檢查
+   `app.core` 的 import）也一併補上這個檢查；`core` 自己的 guard
+   （`test_core_imports_only_stdlib_pydantic_or_itself`）維持原樣——`core`
+   內部檔案互相 import 私有實作是正常的，只有「外部模組」reach 進 `core`
+   的私有 submodule 才是違規。加一支獨立 canary
+   （`test_is_public_core_import_rejects_underscore_segments`）直接驗證
+   helper 本身：`app.core.persistence`／`app.core.domain.task` 通過、
+   `app.core._internal`／`app.core.domain._helpers` 被拒。
+2. **P3：bounds check 沒有 regression assertion。** `_resolve_relative_module()`
+   的 `len(bits) < level` 檢查邏輯正確，但沒有任何測試真的呼叫超界情境——
+   單獨還原這個檢查的話所有測試仍會綠燈，跟前一輪修正 `_imports()`／
+   `_imported_names()` wiring 時同一類問題。修正：加
+   `test_resolve_relative_module_rejects_beyond_top_level_import`，用
+   `pytest.raises(ValueError, match="beyond top-level package")` 直接呼叫
+   `_resolve_relative_module("app.opks", 3, "authoring")` 觸發超界情境。
+3. **P3：報告的第三輪 finding 優先級統計寫錯。** 寫「第三輪 2 P1＋2 P3」，
+   實際是 1 P1（ADR 0058 仍被修改）＋1 P2（core 公開介面清單不完整）＋2 P3
+   （bounds check、報告舊資料）。修正：改正統計數字。
+
 ## 驗證證據（Final Gate，`docs/plans/...-plan.md` 最後一節）
 
 - `rg` 掃描 `apps AGENTS.md ARCHITECTURE.md` 找不到任何現行 source 的舊路徑
   （`app.job_analysis`／`components/workspace`／`@/lib/jobAnalysis`）。
-- 後端 AST 依賴契約：`test_job_analysis_dependencies.py` 12/12 通過（six 模組
+- 後端 AST 依賴契約：`test_job_analysis_dependencies.py` 14/14 通過（six 模組
   guard + api/composition-root guard + openpyxl 隔離 + 舊路徑禁用 + relative
-  import 解析與其 wiring 迴歸測試，第二輪審查後新增兩支）。
+  import 解析／wiring／beyond-top-level 迴歸測試 + core 底線 submodule
+  隱私測試）。
 - `npm run check-codegen -w @caliburn/job-analysis-contract`：零真實差異
-  （唯一一次 diff 是換行符號雜訊，已還原）。
-- `npx turbo test --force --env-mode=loose`：api 717 passed/104 skipped
+  （每次重跑都會有一次換行符號雜訊，已還原，不影響內容）。
+- `npx turbo test --force --env-mode=loose`：api 719 passed/104 skipped
   （無 DB 模式）、web 9 files/60 tests passed。
 - Web `npx tsc --noEmit` 與 `npm run lint`：乾淨。
-- 對本機 PostgreSQL（migration head = 0017）跑完整 API suite：820 passed，
+- 對本機 PostgreSQL（migration head = 0017）跑完整 API suite：822 passed，
   1 個已知、與本次改動無關的既存失敗
   （`test_postgres_rejects_a_task_with_a_dangling_duty_reference`，經 Task
   3／5／6／7 四個獨立 reviewer 各自從 diff 內容確認與本分支任何 commit 無
@@ -204,8 +236,8 @@ P1（阻塞）與 1 個 P2 發現，逐一驗證後全部屬實：
 - 工作樹只剩使用者原有未追蹤檔，無殘留。
 - ADR 0058 對 Accepted 版本 `b9440fd` 的 `git diff`：完全空白（零 diff）。
 
-以上數字（12/12 guard tests、820 passed、717 passed/104 skipped、60 web
-tests）已在第三輪修正後重新全部跑過一次，非沿用第二輪的舊結果。
+以上數字（14/14 guard tests、822 passed、719 passed/104 skipped、60 web
+tests）是第四輪修正後重新全部跑過一次的結果，非沿用前一輪的舊數字。
 
 ## 已知延後項目（非阻塞，供審核者知悉）
 
@@ -239,8 +271,9 @@ npm run check-codegen -w @caliburn/job-analysis-contract
 ## 目前狀態
 
 分支與 worktree（`S:\caliburn\.worktrees\current-application-modules`）保留，
-尚未 merge、未 push。三輪外部審查的發現（第二輪 2 P1＋1 P2、第三輪 2 P1＋2 P3）
-已全數修正並逐項重新驗證；`ADR 0058` 對 Accepted 版本零 diff，`ADR 0059`
+尚未 merge、未 push。四輪外部審查的發現（第二輪 2 P1＋1 P2、第三輪 1 P1＋
+1 P2＋2 P3、第四輪 1 P2＋2 P3）已全數修正並逐項重新驗證；`ADR 0058` 對
+Accepted 版本零 diff，`ADR 0059`
 待 owner 核准為 `Accepted`——核准後應以獨立 commit 同步把 ADR 狀態與
 `docs/adr/README.md` 索引改為 `Accepted`，之後再做一次簡短的收尾 review。
 等候下一輪人工審核。

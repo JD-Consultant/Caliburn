@@ -214,6 +214,13 @@ P1（阻塞）與 1 個 P2 發現，逐一驗證後全部屬實：
    實際是 1 P1（ADR 0058 仍被修改）＋1 P2（core 公開介面清單不完整）＋2 P3
    （bounds check、報告舊資料）。修正：改正統計數字。
 
+### 第五輪外部審查與 ADR 0059 核准
+
+第四輪修正複審通過，無新增 finding。owner 隨後明確核准 ADR 0059 的三個決策，
+以獨立 commit（`8fc2fc9`）把 ADR 狀態與 `docs/adr/README.md` 索引同步轉為
+`Accepted`，附上核准日期與「guard 已同步落地、非僅文件宣告」的註記。這是
+唯一剩下的 gate，核准後沒有其他已知阻塞項。
+
 ## 驗證證據（Final Gate，`docs/plans/...-plan.md` 最後一節）
 
 - `rg` 掃描 `apps AGENTS.md ARCHITECTURE.md` 找不到任何現行 source 的舊路徑
@@ -255,7 +262,8 @@ tests）是第四輪修正後重新全部跑過一次的結果，非沿用前一
   非本次引入。
 - 沒有一支專門的「route snapshot」測試會在未來的路由拆分中自動抓漏；
   這次是靠 reviewer 手動逐一比對 21 個 endpoint 確認一致，值得之後補一支。
-- `ADR 0059` 目前狀態是 `Proposed`，尚待 owner 核准為 `Accepted`。
+- ~~`ADR 0059` 待 owner 核准為 `Accepted`~~——2026-08-11 owner 已核准，`ADR 0059`
+  與 `docs/adr/README.md` 索引已同步轉為 `Accepted`。
 
 ## 如何在本機重跑驗證
 
@@ -272,8 +280,7 @@ npm run check-codegen -w @caliburn/job-analysis-contract
 
 分支與 worktree（`S:\caliburn\.worktrees\current-application-modules`）保留，
 尚未 merge、未 push。四輪外部審查的發現（第二輪 2 P1＋1 P2、第三輪 1 P1＋
-1 P2＋2 P3、第四輪 1 P2＋2 P3）已全數修正並逐項重新驗證；`ADR 0058` 對
-Accepted 版本零 diff，`ADR 0059`
-待 owner 核准為 `Accepted`——核准後應以獨立 commit 同步把 ADR 狀態與
-`docs/adr/README.md` 索引改為 `Accepted`，之後再做一次簡短的收尾 review。
-等候下一輪人工審核。
+1 P2＋2 P3、第四輪 1 P2＋2 P3）已全數修正並逐項重新驗證，第五輪複審通過、
+無新增 finding；`ADR 0058` 對 Accepted 版本零 diff，`ADR 0059` 已於
+2026-08-11 由 owner 核准，狀態與 `docs/adr/README.md` 索引同步轉為
+`Accepted`（`8fc2fc9`）。目前沒有已知阻塞項；等候 owner 決定 merge／PR。

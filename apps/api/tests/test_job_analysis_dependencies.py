@@ -17,12 +17,33 @@ OPKS_ROOT = API_DIR / "app" / "opks"
 CONSULTATION_ROOT = API_DIR / "app" / "consultation"
 EXPORT_ROOT = API_DIR / "app" / "export"
 XLSX_ADAPTER_ROOT = API_DIR / "app" / "adapters" / "xlsx"
-# 兩者才是真正的 composition root(ADR 0058):`app/api` 組裝 HTTP 與 transport
-# mapping,`app/adapters` 實作各 feature module 擁有的 port——兩者都可以 import
-# FastAPI／SQLAlchemy／HTTPX／OpenPyXL 與任何 feature module 的 public API。
+# `app/api`／`app/adapters` 才是真正的 composition root(ADR 0058):`app/api`
+# 組裝 HTTP 與 transport mapping,`app/adapters` 實作各 feature module 擁有的
+# port——兩者都可以 import FastAPI／SQLAlchemy／HTTPX／OpenPyXL 與任何 feature
+# module 的 public API。其餘九個 composition-root-adjacent 檔案
+# (`app/__init__.py`、`app_factory.py`、`config.py`、`database.py`、
+# `logging_config.py`、`main.py`、`models/__init__.py`、`models/base.py`、
+# `observability.py`)不屬於任何 feature module,原本不在本檔案任何 guard 的
+# 掃描範圍內——`app_factory.py`／`main.py` 正是 startup-time import 最可能被
+# 接線進來的位置。final review 把它們併入這裡,讓
+# `test_current_composition_does_not_import_removed_paths` 真的覆蓋整個 API
+# 的組裝入口;不影響、也不縮小既有六個 feature/core guard
+# (`core`／`documents`／`task_analysis`／`opks`／`consultation`／`export`)
+# 各自的掃描範圍。`models/` 目錄下只有 `__init__.py`／`base.py` 兩個檔案,直接
+# 以目錄形式併入(`_surface_files()` 會用 `rglob("*.py")` 展開);其餘七個是
+# `app/` 根目錄下的單一檔案,`_surface_files()` 對非目錄的 root 直接視為單一
+# 檔案(見下方實作),不需要額外改動。
 COMPOSITION_SURFACES = (
     API_DIR / "app" / "api",
     API_DIR / "app" / "adapters",
+    API_DIR / "app" / "models",
+    API_DIR / "app" / "__init__.py",
+    API_DIR / "app" / "app_factory.py",
+    API_DIR / "app" / "config.py",
+    API_DIR / "app" / "database.py",
+    API_DIR / "app" / "logging_config.py",
+    API_DIR / "app" / "main.py",
+    API_DIR / "app" / "observability.py",
 )
 
 
@@ -286,7 +307,9 @@ def test_only_current_route_modules_exist():
 
 
 def test_current_composition_does_not_import_removed_paths():
-    """`app/api`／`app/adapters` 的 composition surfaces 不得 import 兩類模組：
+    """`COMPOSITION_SURFACES`（`app/api`、`app/adapters`、`app/models`，與
+    `app/` 根目錄下的九個 composition-root-adjacent 檔案——見上方常數定義的
+    註解）不得 import 兩類模組：
     (a) 已刪除的 `app.interview`／`app.interview_vnext`／`app.job_authoring`／
     `app.services`／`app.schemas`（current-only hard cut 移除，不得復活）；
     (b) 已依 ADR 0057 Decision 5 保留、但與 current API/Web 隔離的 RAG bounded

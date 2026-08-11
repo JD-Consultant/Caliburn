@@ -20,6 +20,10 @@ npm run db:migrate
 - `apps/web`：Next.js 文件庫、顧問、Proposal 與 Current JD 工作台。
 - `packages/job-analysis-contract`：API／Web 共用的 JSON Schema 生成契約。
 
+## RAG 供應鏈（保留、隔離，非 current runtime）
+
+repo 另外保留一組與 current 產品完全隔離的 RAG bounded context：`apps/pdf-to-json`、`apps/ocs-indexer`、`apps/embedder`、`packages/ocs-contract`、`packages/indexer-contract`。可獨立安裝、測試、執行，但不是 current API/Web 的 runtime 依賴；`npm run up`／`npm run dev` 不啟動它們，Qdrant／embedder 需 `npm run rag:up` 才啟動。細節見 [`docs/design/rag-pipeline.md`](docs/design/rag-pipeline.md)。
+
 ## 文件與測試
 
 - 架構：[`ARCHITECTURE.md`](ARCHITECTURE.md)
@@ -33,4 +37,4 @@ cd apps/api && uv run pytest -q
 cd ../web && npm run test && npx tsc --noEmit && npm run lint
 ```
 
-舊 OCS、PDF→JSON、indexer、Qdrant、embedder、interview 與 job-authoring 已移除；舊資料不搬移，既有本機 DB 需依 runbook 重建。
+interview 與 job-authoring 已移除；OCS、PDF→JSON、indexer、Qdrant、embedder 已依 ADR 0057 保留為獨立 RAG bounded context（見上方）。current 產品舊資料不搬移，既有本機 DB 需依 runbook 重建。

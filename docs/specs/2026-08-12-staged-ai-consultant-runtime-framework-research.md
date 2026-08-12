@@ -6,6 +6,8 @@
 - 需求來源：owner 提供的階段表、現行 Job Analysis／OPKS 研究與本 repo 現行程式
 - 核心問題：哪些通用 LLM 元件應由主流框架替代；哪些職務分析能力必須保留；如何在正確時機放入正確 context，同時控制成本
 
+> 2026-08-12 後續澄清：owner 已先收斂產品流程、動態 Skills、記憶權威與 Context Engine 的產品層方向；以 [`AI 專業職務分析顧問：產品流程工作研究稿`](2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md) 為優先。本文的「stage」、固定 Context lanes／budget、LangGraph／LangChain 組合與欄位名稱都是待 spike／eval 的 framework 候選，不是已核准產品狀態機或實作決策；兩份文件衝突時以前者為準。
+
 ## 0. 結論先行
 
 建議採用「framework-first、domain-owned authority」：
@@ -329,15 +331,15 @@ Pydantic Evals：
 
 ### 7.2 ContextRequest
 
-每次模型呼叫前由 StageGraph 建立 typed request，至少包含：
+每次模型呼叫前由 application runtime 建立 typed request。以下只示意責任，不是最終 schema：
 
 ~~~json
 {
   "document_id": "doc",
-  "stage_id": "task_deep_dive",
   "operation": "consultation.decide",
+  "focus_refs": ["task:..."],
+  "active_skills": ["task-boundary", "output"],
   "objective": "選擇單一最高價值追問",
-  "target_refs": ["task:..."],
   "authority_generation": 42,
   "required_source_kinds": ["employee_turn", "direct_edit"],
   "allowed_reference_kinds": [],
@@ -352,28 +354,30 @@ Pydantic Evals：
 
 ### 7.3 Context 選取管線
 
-Context Engine 的 deterministic 主流程：
+Context Engine 採 hybrid 流程：application deterministic 保證 scope、authority 與必帶核心；retrieval 與受控按需工具補足語意相關資料。
 
 ~~~text
 1. Scope
-   document / stage / operation / target
+   document / operation / focus / target
 2. Eligibility
    來源種類、Current/Past、speaker、Proposal 狀態、是否 superseded
 3. Authority partition
    Source / Work Model / Proposal / Current JD / Reference 分區
 4. Required facts
-   stage 必帶的 target、矛盾、未決 gap、最新更正
+   operation 必帶的 target、當輪回答、矛盾、未決 gap、最新更正
 5. Retrieval
-   structured filter → lexical → semantic（僅未來且經 eval）
+   structured filter → lexical → semantic（各分支都必須經 eval）
 6. Rank
-   stage relevance、target linkage、recency、contradiction、information value
+   operation/focus relevance、target linkage、recency、contradiction、information value
 7. Deduplicate
-   同一 source 不重複；summary 與原話不雙重付費
+   不重複送同一份內容；summary 可作導覽，必要原話仍可作 evidence
 8. Budget allocation
-   先保留 output/schema/tool budget，再按 lane 配額
+   先保留 output/schema/tool 與不可省略核心；其餘類別不預設固定比例
 9. Render
    結構化 state + 少量逐字 quote + 未載入提示
-10. Manifest
+10. Just-in-time read
+   模型只可透過受 scope／budget 控制的唯讀工具補查
+11. Manifest
    保存實際載入項目、理由、版本、hash、tokens
 ~~~
 
@@ -387,16 +391,16 @@ Context Engine 的 deterministic 主流程：
 
 ### 7.4 Context lanes 與預算順序
 
-建議 lane：
+以下 lane 是第一輪 eval 候選，不是固定 prompt 版型或配額：
 
-1. Guardrail lane：極短、穩定的產品角色、authority 與本 stage 禁令。
-2. Skill lane：Stage Skill metadata；完整方法按需載入。
+1. Guardrail lane：極短、穩定的產品角色、authority 與本 operation 禁令。
+2. Skill lane：相關 Skill metadata；完整方法按需載入。
 3. Target lane：目前 Duty／Task／O/P/K/S 與必要 Current JD before。
 4. Evidence lane：支持、反證、最新更正與 speaker-attributed quotes。
 5. Agenda lane：open gaps、contradictions、ask count、declined／unknown。
 6. Proposal lane：相關 pending／rejected／revision history。
 7. Recent-turn lane：最近少量自然對話，維持連續性。
-8. Reference lane：只有 stage 允許且使用者選擇時載入。
+8. Reference lane：只有 operation 允許且符合 blind-first／員工選擇規則時載入。
 
 預算優先序：
 

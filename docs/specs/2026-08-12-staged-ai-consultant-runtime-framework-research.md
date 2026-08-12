@@ -6,7 +6,7 @@
 - 需求來源：owner 提供的階段表、現行 Job Analysis／OPKS 研究與本 repo 現行程式
 - 核心問題：哪些通用 LLM 元件應由主流框架替代；哪些職務分析能力必須保留；如何在正確時機放入正確 context，同時控制成本
 
-> 2026-08-12 後續澄清：owner 已先收斂產品流程、動態 Skills、記憶權威與 Context Engine 的產品層方向；以 [`AI 專業職務分析顧問：產品流程工作研究稿`](2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md) 為優先。本文的「stage」、固定 Context lanes／budget、LangGraph／LangChain 組合與欄位名稱都是待 spike／eval 的 framework 候選，不是已核准產品狀態機或實作決策；兩份文件衝突時以前者為準。
+> 2026-08-12 後續澄清：owner 已先收斂產品流程、動態 Skills、記憶權威與 Context Engine 的產品層方向；以 [`AI 專業職務分析顧問：產品流程工作研究稿`](2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md) 為優先。本文的「stage」、固定 Context lanes／budget、LangGraph／LangChain 組合與欄位名稱都是待 spike／後續 eval 的 framework 候選，不是已核准產品狀態機或實作決策；兩份文件衝突時以前者為準。正式 eval、benchmark、A／B 與量化品質 gate 已裁示延至可用成品完成後；開發期只保留既有工程測試、authority safety、介面 conformance、簡單人工 smoke 與可回溯紀錄。
 
 ## 0. 結論先行
 
@@ -16,7 +16,7 @@
 2. LangChain 管理 model interface、tools、structured output 與 context lifecycle；需要工具迴圈的單一階段才使用 bounded agent node。
 3. langchain-openrouter 優先取代自寫 OpenRouter HTTP／structured-output plumbing，但必須先通過 Caliburn 的 exact-model、單一 endpoint、零 retry／fallback 與 execution evidence 相容測試。
 4. Agent Skills 規格保存已研究驗證的 Task／Duty／OPKS 方法；優先使用唯讀 SkillsMiddleware 做 progressive disclosure，不採整套 Deep Agents。
-5. Pydantic Evals 作為 repo-owned eval runner；資料集與 rubric 不綁供應商 dashboard。
+5. 可用成品完成後，再評估以 Pydantic Evals 作為 repo-owned eval runner；目前不建立資料集、grader 或 eval release gate。
 6. 未來 RAG 以 read-only tool／MCP 形式接入；在 ADR 0057 邊界被新 ADR 翻案前，不得接入 current production。
 
 保留的不是目前每一行自寫程式，而是下列產品行為：
@@ -259,7 +259,7 @@ Production Skills 必須 repo versioned、唯讀、由程式或 owner 更新；�
 
 本研究不建議採整套 Deep Agents。它同時帶入 filesystem、planning、subagents、summarization、memory 等較強預設，會與 current-only domain authority 重疊。第一個 spike 應驗證 SkillsMiddleware 能否獨立組合；若 dependency surface 過大，仍採 Agent Skills 標準，僅自寫最小唯讀 loader。
 
-### 4.5 Pydantic Evals：評測 runner 首選
+### 4.5 Pydantic Evals：成品後的評測 runner 候選
 
 Pydantic Evals：
 
@@ -269,7 +269,7 @@ Pydantic Evals：
 - 不依賴 PydanticAI；
 - 不強迫使用雲端 Logfire。
 
-它能替代通用 eval runner，但不能替代 Caliburn 的 task-specific dataset、工作分析 rubric 或人類專家標註。
+它未來可替代通用 eval runner，但不能替代 Caliburn 的 task-specific dataset、工作分析 rubric 或人類專家標註。依 owner 的時間優先裁示，本能力不進第一版成品開發 critical path。
 
 ## 5. 候選方案比較
 
@@ -309,7 +309,7 @@ Pydantic Evals：
 1. 既有成功案例不退步；
 2. hidden retry／fallback／summary／state copy 沒有出現；
 3. failure、refusal、model mismatch 與 stale snapshot 仍可歸因；
-4. 代表性 eval 的品質、成本與延遲達標；
+4. 開發期既有測試、authority safety、介面 conformance 與人工 smoke 通過；成品後再補品質、成本與延遲 eval；
 5. 被框架覆蓋的舊 code 與測試才刪除，不保留雙路徑。
 
 ## 7. Context Engine：最大問題的具體設計
@@ -643,12 +643,10 @@ StageProfile 指向 ModelProfile，不直接寫任意 model string。
 新增候選 ModelProfile
 → capability probe
 → provider/conformance tests
-→ fixed replay eval
-→ branching simulation
-→ 人工 pairwise review
-→ 品質 / tokens / latency / cost gate
+→ 簡單人工 smoke
 → owner 核准
 → 版本化切換
+→ 成品後補 fixed replay／branching／pairwise／成本品質 gate
 ~~~
 
 不能因 framework 宣稱 provider-neutral 就假設模型等價。
@@ -700,7 +698,7 @@ StageProfile 指向 ModelProfile，不直接寫任意 model string。
 - Reference 只在員工選擇或後段 coverage challenge 使用；
 - 工具 metadata 與 stable Skill prefix 才考慮 prompt cache；
 - 每個 stage 有 input/output budget 與超額降級路徑；
-- cheap model 只處理 eval 證明可機械化的工作。
+- 成品前不為省 token 額外導入未驗證的 cheap-model routing；模型分級與自動 routing 留到正式 eval。
 
 ### 13.3 降級順序
 
@@ -724,11 +722,13 @@ context 超預算時：
 - context duplication rate；
 - 未命中 context 造成的重問與人工 edit 成本。
 
-## 14. 評測與 release gate
+## 14. 成品後的評測與 release gate
 
-### 14.1 Baseline 先行
+本章保留未來評測設計，但不是第一版成品的前置 Phase 或 release blocker。正式 eval 在可用端到端成品完成後啟動；開發期間只收集可回溯資料並維持一般工程安全網，不先建 dataset、grader、A／B、LLM judge 或評測平台。
 
-導入框架前先凍結：
+### 14.1 成品完成後建立 baseline
+
+以可用成品的真實操作形狀凍結：
 
 - 現行代表性 transcript／state fixtures；
 - 現行 output、Proposal 與 verifier 結果；
@@ -736,7 +736,7 @@ context 超預算時：
 - 已知 failure；
 - 人工 Task／OPKS 品質標註。
 
-沒有 baseline，就無法知道刪碼後是改善還是退化。
+沒有 baseline，就無法判斷後續模型、context、retrieval 與 prompt 調優是改善還是退化；但不為建立此 baseline 阻塞第一版成品。框架替代期間仍須以既有測試與 conformance 證明機械語意沒有退化。
 
 ### 14.2 Context Engine 指標
 
@@ -798,13 +798,14 @@ Human／LLM rubric（需人校準）：
 
 ## 15. 建議遷移順序
 
-### Phase 0：baseline 與 contracts
+### Phase 0：contracts 與可回溯性（不建立正式 eval）
 
-- 建立 framework-neutral eval dataset；
 - 凍結 ModelProfile／StageProfile／ContextManifest 候選 contract；
-- 記錄現行 cost／latency／quality。
+- 保留既有 unit／integration／contract tests 與 authority invariants；
+- 記錄 operation、model、prompt／Skill／tool version、source refs、tokens、latency 與結果 lineage；
+- 每個垂直切片只做簡單人工 happy-path／resume／approval smoke。
 
-Gate：同一資料可重播，人工標註與 deterministic grader 可執行。
+Gate：既有測試通過、authority 與 document isolation 不退步、紀錄足以在成品後建立 replay；不要求 dataset、人工標註或 grader。
 
 ### Phase 1：ChatOpenRouter conformance spike
 
@@ -844,7 +845,7 @@ Gate：restart、duplicate resume、stale generation、checkpoint loss 與 autho
 - stage-specific tool allowlist；
 - 不啟用自動 summary 或 cross-document memory。
 
-Gate：context recall/precision、tokens、重問率與品質優於 baseline。
+Gate：必帶核心、document scope、最新更正與 Manifest 的 deterministic tests 通過，人工 smoke 可完成主流程；recall／precision、重問率、品質與最佳 token 配置延至成品後評測。
 
 ### Phase 5：說話者記憶
 
@@ -867,9 +868,9 @@ Gate：多人陳述案例零誤歸屬、零跨文件洩漏、矛盾不被靜默�
 - 先開新 ADR 翻案或擴充 ADR 0057；
 - 以 read-only tool／MCP 接入；
 - reference 與 employee evidence 分 lane；
-- retrieval／citation 用 Ragas 等離線 eval。
+- 先完成 read-only retrieval／citation 與 source boundary；Ragas 等離線 eval 延至可用成品完成後。
 
-Gate：公版不自動升格、來源可追溯、成本與 coverage challenge 有實證收益。
+Gate：開發期只要求公版不自動升格、來源可追溯與人工 smoke 可用；成本與 coverage challenge 的實證收益成品後再量測。
 
 ## 16. 明確不做
 
@@ -883,7 +884,7 @@ Gate：公版不自動升格、來源可追溯、成本與 coverage challenge �
 - 不為框架整潔而刪除 exact model/provider execution evidence。
 - 不在新 ADR 前把隔離 RAG bounded context 接入 current API/Web。
 - 不以 schema 合規或 citation 存在宣稱內容正確。
-- 不在沒有 baseline/eval 時重寫全部流程。
+- 不因 eval 後置就一次重寫全部流程；仍採可回退的垂直切片與介面 conformance。
 
 ## 17. 已收斂與仍需討論
 
@@ -896,7 +897,7 @@ Gate：公版不自動升格、來源可追溯、成本與 coverage challenge �
 - speaker-attributed、document-local、原話優先；
 - Skills progressive disclosure；
 - 不採 full Deep Agents 或多 Agent 起步；
-- eval-first、先 spike 後擴張。
+- product-first、先做可回退 spike 後擴張；正式 eval 在可用成品後補上。
 
 ### 17.2 討論者需裁決
 
@@ -907,7 +908,7 @@ Gate：公版不自動升格、來源可追溯、成本與 coverage challenge �
 5. Context Engine 第一版只用 relational／lexical，還是同時實驗 semantic retrieval。
 6. ModelProfile 由設定檔、資料庫或 versioned Python registry 管理。
 7. 哪些現行 verifier 規則可安全下沉到 Pydantic，哪些必須維持獨立純函式。
-8. 第一個真人 pilot 的職務樣本、專家 reviewer 與 release threshold。
+8. 成品完成後第一個真人 pilot 的職務樣本、專家 reviewer 與 release threshold。
 
 ## 18. 後續 ADR 建議
 
@@ -985,7 +986,7 @@ ADR Accepted 後才寫 docs/plans/；不得直接據本研究全文施工。
 
 推薦的是：
 
-> LangGraph 管可恢復的階段執行；LangChain/OpenRouter 管模型、工具、structured output 與 context lifecycle；Agent Skills 管專業方法的按需載入；Pydantic Evals 管評測；Caliburn 只保留專業分析、來源權威、deterministic domain invariants 與員工決策。
+> LangGraph 管可恢復的階段執行；LangChain/OpenRouter 管模型、工具、structured output 與 context lifecycle；Agent Skills 管專業方法的按需載入；成品完成後再由 Pydantic Evals 等候選承接評測 plumbing；Caliburn 只保留專業分析、來源權威、deterministic domain invariants 與員工決策。
 
 最大的品質槓桿不是再加一個 Agent，而是 Context Engine：
 

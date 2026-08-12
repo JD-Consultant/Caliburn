@@ -558,7 +558,7 @@ iCAP、O*NET、公司 SOP、表單、既有 JD 與產業資料保存自己的來
 完整來源與狀態留在本地可恢復 store；應用程式先提供一個小而可靠的必要核心，再以結構化關聯、lexical／semantic retrieval 形成候選；模型若仍需要更多資料，只能透過 document-scoped、read-only 工具按需取得。
 
 - 優點：保留 authority、來源與重播能力，又讓模型能處理程式無法預列的語意關聯；可替換模型與檢索實作；
-- 缺點：需要明確工具契約、budget、停止規則與 context eval；若工具設計不良，模型會漏查、重查或追逐無關內容；
+- 缺點：需要明確工具契約、budget 與停止規則；正式 context eval 後置期間，若工具設計不良，較可能到人工使用時才發現漏查、重查或追逐無關內容；
 - 結論：最符合本產品「前景專注、背景全域吸收、長期可恢復、員工核准」的需求，先作研究候選，不直接授權 production 實作。
 
 推薦方案不是「都交給模型」。程式仍決定 scope、authority、必帶資訊、可用工具、token 上限與降級；模型只在這些邊界內判斷還需要讀什麼。
@@ -584,7 +584,7 @@ iCAP、O*NET、公司 SOP、表單、既有 JD 與產業資料保存自己的來
 | 候選 context | 較早原話、相鄰 Task／Duty／OPKS、open gap、未映射線索、少量近期對話 | 結構化 filter＋retrieval＋rerank | 可依可解釋順序降級 |
 | 按需 context | 更遠來源、完整歷史片段、額外 Skill、Reference、低頻 lineage | 模型經受控唯讀工具請求，程式驗 scope／budget | 可拒絕並回報理由 |
 
-第一版不先規定例如「Evidence 40%、Recent 20%」的固定比例。不同 operation、模型窗口、輸出 schema 與資料密度不同；應先定不可省略類別與整體上限，再由 eval 決定各類 floor／ceiling。
+第一版不先規定例如「Evidence 40%、Recent 20%」的固定比例。不同 operation、模型窗口、輸出 schema 與資料密度不同；開發期先使用可設定、可觀測、可回退的保守上限，不為了等調參資料阻塞成品，成品完成後再由 eval 決定各類 floor／ceiling。
 
 ### 7.11 檢索不是只有向量搜尋
 
@@ -596,7 +596,7 @@ iCAP、O*NET、公司 SOP、表單、既有 JD 與產業資料保存自己的來
 4. context expansion：補上 speaker、原回合、相鄰句、所屬 Task／Duty 與修正關係；
 5. rerank／budget selection：只把最高價值且不重複的候選送入模型。
 
-Anthropic 的 Contextual Retrieval 實驗中，contextual embeddings 加 BM25 在其資料集將 top-20 retrieval failure 由 5.7% 降至 2.9%；這只能證明 hybrid retrieval 值得成為實驗候選，不能證明相同 chunk、top-k、embedding 或 reranker 對 Caliburn 最佳。正式採用前必須用繁中長訪談與本產品 domain eval 重跑。
+Anthropic 的 Contextual Retrieval 實驗中，contextual embeddings 加 BM25 在其資料集將 top-20 retrieval failure 由 5.7% 降至 2.9%；這只能證明 hybrid retrieval 值得成為實驗候選，不能證明相同 chunk、top-k、embedding 或 reranker 對 Caliburn 最佳。若第一版為完成產品而先採用，必須包在可替換設定後、保留檢索與來源紀錄；繁中長訪談 domain eval 延至可用成品完成後再做。
 
 Reference 必須使用獨立 namespace／lane 與 source label。員工來源與公版內容即使語意相似，也不得因去重而合併；semantic score、rerank score 與 memory confidence 都不是 authority。
 
@@ -622,7 +622,24 @@ LangGraph／LangChain 目前提供的 persistence、HITL、Store、middleware �
 
 框架選型必須後於這份產品 policy，並以小型 conformance spike 驗證；不得為了使用框架而建立第二份 JD、第二份 Work Model 或另一條 AI 直接寫入路徑。
 
-### 7.14 第一輪 Context eval
+### 7.14 正式 Context eval 後置；開發期只留最小安全網
+
+Owner 已於 2026-08-12 裁示：時間優先，先完成可用的端到端成品，再建立正式 eval。成品完成前不另開以下工作：
+
+- framework-neutral eval dataset、golden transcript 與人工標註計畫；
+- A／B、context ablation、LLM-as-a-judge、Pydantic Evals／Ragas runner；
+- required-context recall、品質、成本與延遲的量化 release gate；
+- 為了建立 baseline 而延後已可垂直交付的產品能力。
+
+開發期仍保留下列最低安全網；它們是一般工程正確性與未來可回溯性，不是正式 eval 專案：
+
+- 現有 unit／integration／contract tests 與 domain invariants 繼續通過；
+- authority、document isolation、proposal commit seam、generation／read-set 等 deterministic safety 不得因趕工取消；
+- 每個垂直切片做一次簡單人工 happy-path／resume／approval smoke check，不建立評分資料集；
+- ContextManifest 或等價紀錄保留 model／prompt／Skill／tool／source refs／tokens／結果 lineage，避免成品後無法重播；
+- 新框架只做它要取代之介面的 conformance test，不比較模型回答分數。
+
+可用成品完成後，再建立下列正式 Context eval 情境：
 
 至少建立下列長訪談情境：
 
@@ -635,7 +652,7 @@ LangGraph／LangChain 目前提供的 persistence、HITL、Store、middleware �
 - 長歷史中同時存在 active、rejected、retired 與 superseded candidate；
 - context 超預算，需要降級但不可丟掉 correction 或 authority。
 
-比較方案 A、B、C 及其變體，至少量測：
+屆時比較方案 A、B、C 及其變體，至少量測：
 
 - required-context recall；
 - irrelevant-context precision／duplicate rate；
@@ -647,7 +664,7 @@ LangGraph／LangChain 目前提供的 persistence、HITL、Store、middleware �
 - proposal 正確性與員工 edit／reject 率；
 - input／output／reasoning tokens、cache hit、額外 tool call、延遲與成本。
 
-不能只用「token 變少」判定成功。接受候選的最低條件是：domain 品質與 required evidence 不劣於 baseline、authority 錯誤為零，且成本／延遲至少一項有可重現改善。具體門檻待建立 baseline 後再定。
+正式 eval 啟動後，不能只用「token 變少」判定成功。接受候選的最低條件是：domain 品質與 required evidence 不劣於 baseline、authority 錯誤為零，且成本／延遲至少一項有可重現改善。具體門檻屆時依可用成品與真實操作形狀建立，不回頭阻塞第一版開發。
 
 ### 7.15 本節仍未決定
 
@@ -658,7 +675,7 @@ LangGraph／LangChain 目前提供的 persistence、HITL、Store、middleware �
 - provider conversation state、compaction、prompt cache 的啟用條件；
 - ContextRequest／ContextPack／ContextManifest 的最終 schema 與資料表。
 
-上述都必須由 capability spike、長訪談 eval、current-only 邊界與成本數據決定，不由「大廠有提供」直接決定。
+上述第一版實作細節先由 current-only 邊界、可逆設定、介面 conformance 與人工 smoke 決定，不由「大廠有提供」直接決定；模型品質、最佳參數與成本調優延至可用成品完成後，以長訪談 eval 與實際數據收斂。
 
 ## 8. 已識別的流程風險與優化方向
 
@@ -666,7 +683,7 @@ LangGraph／LangChain 目前提供的 persistence、HITL、Store、middleware �
 
 風險：AI 專注當前 Task 後漏掉回答中的其他工作。
 
-方向：每輪先做全域理解，再做焦點追問；保存未映射線索與新 Task 候選；以 capability eval 驗證「旁支線索不丟失」。
+方向：每輪先做全域理解，再做焦點追問；保存未映射線索與新 Task 候選；開發期以人工 smoke 確認基本保存路徑，成品完成後再以 capability eval 量測「旁支線索不丟失」。
 
 ### 8.2 Duty 過早定型
 
@@ -704,7 +721,7 @@ LangGraph／LangChain 目前提供的 persistence、HITL、Store、middleware �
 
 > 在已確認的顧問流程、記憶權威與 Context Engine 候選方向下，下一個最小 capability spike 應驗證哪一項通用元件可由框架接手，又不破壞 Current JD authority、來源追溯與可替換模型？
 
-優先候選是 checkpoint／resume／HITL、model／structured-output interface、Skills progressive disclosure 與 context middleware hook。先選一個垂直切片做 conformance，不一次全面導入多套框架，也不在產品 eval 前接回 Reference／RAG production runtime。
+優先候選是 checkpoint／resume／HITL、model／structured-output interface、Skills progressive disclosure 與 context middleware hook。先選一個垂直切片做 conformance，不一次全面導入多套框架；Reference／RAG 仍依產品流程成熟度與 ADR 0057 邊界另行接入，不等待正式 eval 才開始其他產品工作。
 
 ## 10. 本稿依據
 

@@ -108,6 +108,14 @@
 - `no-match`、拒絕與其他已裁決結果必須被記住；沒有新員工 evidence、實質來源變更或工作邊界改變時，不得只因重跑檢索、更換模型／embedding 或分數變動而重開。
 - Reference challenge 的裁決仍不是 Current JD；只有員工來源能改變 Work Model，只有 authority seam 能改變正式內容。
 
+### 2.10 職務資料可送外部模型，但產品權威留在本地
+
+- Owner 於 2026-08-13 確認：員工訪談、JD、Task／Duty、OPKS、Reference 與其他職務分析內容都可送給外部 LLM；第一版不做欄位遮罩、敏感資料分類、本機模型模式或逐回合同意。
+- 產品只需在設定／開始使用時清楚告知內容會送往外部 AI 服務，不以每輪彈窗打斷訪談。
+- 「可以送」不等於每輪傳入全部內容；Context Engine 仍依焦點與資訊價值選擇最小充分 context，避免成本、延遲與無關資訊干擾。
+- Source、Work Model、Proposal、Current JD、進度與恢復依據仍由 Caliburn 保存；provider／gateway 的 conversation state、logging 或 cache 不得成為唯一權威。
+- 第一版不要求 ZDR，但不主動加入模型訓練、資料折扣 logging 或完整遠端 prompt／response logging；模型與 provider 路由必須明確，不能以不透明 fallback 偷換模型。
+
 ## 3. 白話產品流程 v0.1
 
 ### 3.1 開始或恢復
@@ -954,6 +962,34 @@ Microsoft Agent Framework 保留為追蹤候選；OpenAI、Google、Anthropic SD
 
 若之後 conformance spike 選定 LangGraph，可把 `UnderstandingCheckpoint` 映射到 interrupt／`useStream`；若未來真的出現多 client、remote agent 或大量動態表單，再評估 AG-UI／A2UI。這樣跟上「declarative、typed、trusted component、server-validated action」的主流方向，又不為尚未存在的跨平台需求提早付出協定與狀態同步成本。
 
+### 7.19 外部 LLM 資料、保存與路由邊界（2026-08-13 已確認）
+
+本節處理的不是「職務資料能不能送」，而是資料送出後由誰處理、是否建立遠端長期狀態，以及更換模型或路由時是否仍能追溯。Owner 已確認所有職務分析內容都可交給外部 LLM，因此第一版不需要 PII classifier、欄位遮罩、逐次 consent、本機模型或 per-document privacy mode。API key、credential 與系統 secret 不屬於職務資料，仍不得進入 prompt、模型工具結果或內容紀錄。
+
+官方政策顯示「不拿 API 資料訓練」與「完全不保存」是兩件不同的事：OpenAI API 預設不以資料訓練模型，但一般 abuse-monitoring log 最長可保留 30 天，Responses／Conversations／Files 等功能另有 application-state 規則；Anthropic 商業 API 預設不訓練且通常在 30 天內刪除輸入輸出；Gemini 付費 API 不以 prompts／responses 改善產品，但 Interactions、Files、明確 cache 與 Search grounding 仍有各自的保存行為。這些差異說明產品不能只寫「使用商業 API」就假設所有狀態語意相同。
+
+OpenRouter 又多一層 routing：它本身預設不保存 prompts，除非使用者主動開啟 prompt logging；但實際請求仍會交給某個 provider endpoint。OpenRouter 可依 `only`／`order`／`allow_fallbacks` 鎖定路由，也提供 provider data-policy 與 ZDR 篩選。完整 Input／Output Logging 是獨立 opt-in，啟用後內容至少保存三個月；因此它不應被當成一般 telemetry 的無成本預設。
+
+本產品比較三種政策：
+
+| 方案 | 優點 | 主要問題 | 裁決 |
+|---|---|---|---|
+| 完全交給 gateway 預設路由與 logging | 設定最少、可取得最大可用性 | 實際 provider、保存政策、fallback 與模型品質可能漂移；難以重播與歸因 | 不採用 |
+| 全部職務資料可送＋明確路由＋本地權威 | 不增加使用阻力；保留模型選擇、可替換性、追溯與既有 authority seam | 仍需少量 provider policy、route receipt 與設定管理 | **採用** |
+| ZDR-only／本機模型優先 | 保存面最小 | 不符合目前需求，且會縮小模型／endpoint 選擇、增加費用或資格門檻 | 第一版不採用；未來若客戶要求再加 |
+
+收斂後的第一版規則如下：
+
+1. **全內容可送。** 員工原話、目前理解、JD、Task／Duty、OPKS、必要 Reference 與 quote anchor 都可依 Context Engine 判斷送出；不另做欄位級允許清單。
+2. **只做一次清楚揭露。** 產品在設定或首次使用時說明會使用外部 AI provider；不對每輪 inference、Skill 或 read-only tool 重複詢問。
+3. **本地是可恢復權威。** provider 端預設採不依賴持久 conversation 的推理方式；即使使用短期 cache、compaction 或 session 優化，也必須能從本地 Source、Work Model、workflow state 與 ContextManifest 重建，不得成為 resume 的唯一條件。
+4. **不主動擴大遠端保存。** 接受商業 API 的標準 abuse／safety retention，不要求 ZDR；但不主動 opt in 訓練、data-discount sharing、完整遠端 Input／Output Logging，或為了方便除錯建立第二份長期 transcript。
+5. **路由必須可說清楚。** 第一版維持一個明確 model ID 與 provider allow-list，不做無聲跨模型 fallback。至少記錄設定模型與設定 provider；若未來允許 gateway fallback，該次 run 必須記錄實際 model／provider、attempt chain、成本與停止原因，候選也必須來自明確設定，而不是任意 router alias。
+6. **內容選擇仍由 Context Engine 控制。** 不限制外傳不代表把完整歷史、所有 Evidence 與全部 OPKS 每輪重送；仍採必要核心、受限全域索引、焦點細節與按需展開，以品質與成本為理由控制 context。
+7. **provider-specific state 是可替換優化。** `store=false`、ZDR、region、cache TTL 等能力可由 adapter profile 映射，但 domain 與 use case 不依賴任一廠商欄位。某 provider 不支援某項控制時，回到已核准的標準商業 API 政策，不偽裝成 ZDR。
+
+這項裁決不等於永遠拒絕 fallback、provider state 或遠端 observability；它要求這些能力未來以顯式、可追溯、可關閉的 adapter／runtime 設定加入。第一版不需要建立讓員工挑選 retention policy 的複雜 UI，也不需要為尚未存在的企業合規需求預做多套資料模式。
+
 ## 8. 已識別的流程風險與優化方向
 
 ### 8.1 焦點隧道效應
@@ -1000,11 +1036,11 @@ Microsoft Agent Framework 保留為追蹤候選；OpenAI、Google、Anthropic SD
 
 ## 9. 下一輪待討論
 
-按產品優先、元件後置的順序，下一輪建議只討論：
+外部模型資料邊界已確認。按產品優先、元件後置的順序，下一輪建議只討論：
 
-> 在已確認的顧問流程、記憶權威與 Context Engine 候選方向下，下一個最小 capability spike 應驗證哪一項通用元件可由框架接手，又不破壞 Current JD authority、來源追溯與可替換模型？
+> 在已確認的顧問流程、記憶權威與 Context Engine 候選方向下，哪些通用責任應交給框架，哪些產品／domain 責任必須留在 Caliburn？
 
-優先候選是 checkpoint／resume／HITL、model／structured-output interface、Skills progressive disclosure 與 context middleware hook。先選一個垂直切片做 conformance，不一次全面導入多套框架；Reference／RAG 仍依產品流程成熟度與 ADR 0057 邊界另行接入，不等待正式 eval 才開始其他產品工作。
+先收斂責任分界，再選最小 capability spike。優先候選是 checkpoint／resume／HITL、model／structured-output interface、Skills progressive disclosure、context middleware hook、tool loop 與 tracing；Source、Work Model、Proposal、Current JD authority、職務分析方法與進度語意則不能因框架已有 state／memory 類別就直接外包。
 
 ## 10. 本稿依據
 
@@ -1036,6 +1072,8 @@ Stakeholder 草稿（非權威，只作需求來源）：
 - [Anthropic Docs — Structured outputs](https://platform.claude.com/docs/en/build-with-claude/structured-outputs)
 - [Anthropic — Contextual Retrieval](https://www.anthropic.com/engineering/contextual-retrieval)
 - [Anthropic — Equipping agents for the real world with Agent Skills](https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills)
+- [Anthropic Privacy Center — Commercial API model-training policy](https://privacy.claude.com/en/articles/7996885-how-do-you-use-personal-data-in-model-training)
+- [Anthropic Privacy Center — Commercial API data retention](https://privacy.claude.com/en/articles/7996866-how-long-do-you-store-my-organization-s-data)
 - [OpenAI Docs — Model guidance（lean prompts、relevant tools、approval boundaries）](https://developers.openai.com/api/docs/guides/latest-model)
 - [OpenAI Docs — Running agents（application turn、inner loop、session、resume）](https://developers.openai.com/api/docs/guides/agents/running-agents)
 - [OpenAI Docs — Orchestration and handoffs（manager ownership、bounded specialists）](https://developers.openai.com/api/docs/guides/agents/orchestration)
@@ -1050,6 +1088,7 @@ Stakeholder 草稿（非權威，只作需求來源）：
 - [OpenAI Docs — Compaction](https://developers.openai.com/api/docs/guides/compaction)
 - [OpenAI Docs — Counting tokens](https://developers.openai.com/api/docs/guides/token-counting)
 - [OpenAI Docs — Prompt caching](https://developers.openai.com/api/docs/guides/prompt-caching)
+- [OpenAI Docs — Data controls in the OpenAI platform](https://developers.openai.com/api/docs/guides/your-data#default-usage-policies-by-endpoint)
 - [OpenAI Docs — File Search（citation、結果顯式 include、metadata filter）](https://developers.openai.com/api/docs/guides/tools-file-search)
 - [OpenAI Docs — Skills](https://developers.openai.com/api/docs/guides/tools-skills)
 - [OpenAI Docs — Tool search](https://developers.openai.com/api/docs/guides/tools-tool-search)
@@ -1069,6 +1108,7 @@ Stakeholder 草稿（非權威，只作需求來源）：
 - [Google Cloud — Gemini Enterprise Agent Platform（Sessions、Memory Bank、evaluation、observability）](https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale)
 - [Google Cloud — Choose your agentic AI architecture components（state、memory、progressive disclosure）](https://docs.cloud.google.com/architecture/choose-agentic-ai-architecture-components)
 - [Google Cloud — Choose a design pattern for your agentic AI system](https://docs.cloud.google.com/architecture/choose-design-pattern-agentic-ai-system?hl=en)
+- [Google AI for Developers — Zero data retention in the Gemini Developer API](https://ai.google.dev/gemini-api/docs/zdr)
 - [Google Research — Sufficient Context: A New Lens on RAG Systems](https://research.google/blog/deeper-insights-into-retrieval-augmented-generation-the-role-of-sufficient-context/)
 - [LangGraph — Overview](https://docs.langchain.com/oss/python/langgraph/overview)
 - [LangGraph — Workflows and agents（predetermined workflow 與 dynamic loop）](https://docs.langchain.com/oss/python/langgraph/workflows-agents)
@@ -1080,6 +1120,9 @@ Stakeholder 草稿（非權威，只作需求來源）：
 - [LangChain — Short-term memory](https://docs.langchain.com/oss/python/langchain/short-term-memory)
 - [LangChain — Memory overview](https://docs.langchain.com/oss/python/concepts/memory)
 - [PydanticAI — Deferred tools and human-in-the-loop approval](https://pydantic.dev/docs/ai/tools-toolsets/deferred-tools/)
+- [OpenRouter — Zero Data Retention](https://openrouter.ai/docs/guides/features/zdr)
+- [OpenRouter — Provider routing and data-policy controls](https://openrouter.ai/docs/guides/routing/provider-selection)
+- [OpenRouter — Input & Output Logging](https://openrouter.ai/docs/guides/features/input-output-logging)
 - [Microsoft — Agent Framework overview](https://learn.microsoft.com/en-us/agent-framework/overview/)
 - [Microsoft — Agent Framework workflows human-in-the-loop](https://learn.microsoft.com/en-us/agent-framework/workflows/human-in-the-loop)
 - [Microsoft — Agent Framework AG-UI integration](https://learn.microsoft.com/en-us/agent-framework/integrations/by-component/ui/ag-ui/)

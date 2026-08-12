@@ -225,6 +225,18 @@ Proposal 採「有意義檢查點」節奏，不採每句回答都要求核准�
 - 員工修改任一項後，系統重新檢查剩餘變更是否仍成立，不提交失去前提或留下無效 linkage 的內容；
 - 分組依據是 domain dependency，不是由哪一個 Skill 產生，也不把整批不相關的變更綁成全收全退。
 
+#### 3.7.1 Proposal 依「是否改變後續分析前提」分級阻擋（已確認）
+
+不是所有 Proposal 都中斷訪談。阻擋判斷依它是否為目前或後續焦點的語意前提，不只看 action 名稱：
+
+- Task merge／split、Duty 建立或重組、Task reassignment、本人／他人責任與其他會改變分析邊界的結構性 Proposal，若後續問題、OPKS linkage 或 Duty grouping 依賴該結果，先暫停受影響的分析，請員工接受、修改、拒絕或改道；
+- 改名、文字潤飾、排序與不改變分析前提的一般 OPKS 補充，可以維持 pending，訪談繼續；
+- 「阻擋」只作用於依賴該未決前提的 focus／agenda branch，不封鎖整份文件、其他不相關工作、直接編輯、Proposal review 或匯出決策；
+- 員工暫不處理結構性 Proposal 時，AI 保存返回點與 blocked reason，改選不依賴它的焦點；若沒有可安全前進的焦點，才明確提示需要先決定；
+- Proposal 解決後，系統重新檢查其下游候選、gap、linkage 與 agenda；不得把 proposal 前的推論直接當成仍然有效，也不得因拒絕而偷偷採用同一假設繼續分析。
+
+UI 與進度投影應說明「哪個分析目前被什麼未決前提擋住」，而不是只顯示一個無法理解的全域 blocked 狀態。
+
 ### 3.8 O／P／K／S 按需漸進分析
 
 不需要等 Task 已穩定、已被員工接受或已進入 Current JD，才開始看 O／P／K／S。只要目前的工作故事、Work Unit 或 Task hypothesis 已出現足以分析某一軸的證據，顧問就能按需載入該 Skill；沒有需要時不載入，也不是每回合都分析 OPKS。

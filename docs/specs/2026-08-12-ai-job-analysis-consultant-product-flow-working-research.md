@@ -116,6 +116,20 @@
 - Source、Work Model、Proposal、Current JD、進度與恢復依據仍由 Caliburn 保存；provider／gateway 的 conversation state、logging 或 cache 不得成為唯一權威。
 - 第一版不要求 ZDR，但不主動加入模型訓練、資料折扣 logging 或完整遠端 prompt／response logging；模型與 provider 路由必須明確，不能以不透明 fallback 偷換模型。
 
+### 2.11 框架承接工程機制，Caliburn 保留產品語意（2026-08-13 已確認）
+
+Owner 已確認：保留 Source、Work Model、Proposal、Current JD、Task／Duty／OPKS 方法、deterministic verifier 與員工 authority，不代表這些責任的所有底層程式都必須自行維護。判斷原則改為：
+
+- 框架可以取代或包裝通用的 model／tool interface、structured output、checkpoint／resume、Skills progressive disclosure、context lifecycle、token／usage、tracing、欄位與模型形狀驗證；
+- 成熟標準可以改善現有 domain 元件的資料形狀，例如 quote anchor 可借用 W3C Web Annotation 的文字引用與位置選取模型，lineage 可借用 W3C PROV 語彙；
+- 現有 Pydantic、SQLAlchemy 與 PostgreSQL 本身就是框架／平台，應先評估是否能以 validator、constraint、transaction、versioning 與 ORM 能力減少自寫 plumbing，再決定是否增加新套件；
+- memory／agent／workflow 框架可以產生候選、保存執行 checkpoint 或組裝 context，但不得成為 Source、Work Model、Proposal 或 Current JD 的第二份權威；
+- framework HITL 可以承接通用 pause／resume 與互動傳輸，但 Proposal 是 durable domain object，員工決策是獨立 domain command，最後仍須通過 Caliburn authority commit seam；
+- 採用標準是語意覆蓋、可靠度、維護成熟度、遷移成本、可替換性與是否減少總維護面，不是套件功能數或刪除行數；
+- 目前推薦分層組合主流框架，而不是要求一套框架全包，也不以 big-bang event-sourcing／agent-platform 重寫作為預設路徑。
+
+因此產品流程仍是本文定義的顧問流程；framework 只能忠實承接它，不能因框架已有 `memory`、`state`、`approval` 或 `agent` 類別，就重新定義員工回合、資料權威、進度或正式修改權。
+
 ## 3. 白話產品流程 v0.1
 
 ### 3.1 開始或恢復
@@ -1036,11 +1050,11 @@ OpenRouter 又多一層 routing：它本身預設不保存 prompts，除非使�
 
 ## 9. 下一輪待討論
 
-外部模型資料邊界已確認。按產品優先、元件後置的順序，下一輪建議只討論：
+外部模型資料邊界與「框架承接工程機制、Caliburn 保留產品語意」的責任分界已確認。按產品優先、元件後置的順序，下一輪建議討論：
 
-> 在已確認的顧問流程、記憶權威與 Context Engine 候選方向下，哪些通用責任應交給框架，哪些產品／domain 責任必須留在 Caliburn？
+> 在不改變本文顧問流程的前提下，LangGraph／LangChain／Agent Skills／既有 Pydantic＋SQLAlchemy＋PostgreSQL／W3C anchor 與 provenance 標準應如何組成最小而完整的目標架構？
 
-先收斂責任分界，再選最小 capability spike。優先候選是 checkpoint／resume／HITL、model／structured-output interface、Skills progressive disclosure、context middleware hook、tool loop 與 tracing；Source、Work Model、Proposal、Current JD authority、職務分析方法與進度語意則不能因框架已有 state／memory 類別就直接外包。
+下一步先確認元件邊界與資料流，再選最小 capability spike；仍不得直接據研究稿實作。LangGraph 是目前外層 runtime 的推薦候選，不是 Accepted 決策；必須與現有 durable turn／Journal 及 PostgreSQL transaction 做 conformance，證明沒有第二份權威、重複副作用或新的 durability 缺口後才可採用。
 
 ## 10. 本稿依據
 

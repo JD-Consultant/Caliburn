@@ -1,4 +1,4 @@
-# 階段式 AI 職務分析顧問：framework-first runtime、Context Engine 與記憶研究
+# AI 專業職務分析顧問：framework-first runtime、Context Engine 與記憶研究
 
 - 日期：2026-08-12
 - 狀態：Research / Proposed；供 owner、架構討論者與後續實作者評估
@@ -6,18 +6,22 @@
 - 需求來源：owner 提供的階段表、現行 Job Analysis／OPKS 研究與本 repo 現行程式
 - 核心問題：哪些通用 LLM 元件應由主流框架替代；哪些職務分析能力必須保留；如何在正確時機放入正確 context，同時控制成本
 
-> 2026-08-12 後續澄清：owner 已先收斂產品流程、動態 Skills、記憶權威與 Context Engine 的產品層方向；以 [`AI 專業職務分析顧問：產品流程工作研究稿`](2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md) 為優先。本文的「stage」、固定 Context lanes／budget、LangGraph／LangChain 組合與欄位名稱都是待 spike／後續 eval 的 framework 候選，不是已核准產品狀態機或實作決策；兩份文件衝突時以前者為準。正式 eval、benchmark、A／B 與量化品質 gate 已裁示延至可用成品完成後；開發期只保留既有工程測試、authority safety、介面 conformance、簡單人工 smoke 與可回溯紀錄。
+> 2026-08-12 後續澄清：owner 已先收斂產品流程、動態 Skills、記憶權威與 Context Engine 的產品層方向；以 [`AI 專業職務分析顧問：產品流程工作研究稿`](2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md) 為優先。本文的「stage」一律只表示可回跳的 attention／operation mode；固定 Context lanes／budget、LangGraph／LangChain 組合與欄位名稱都是待 conformance spike／後續 eval 的 framework 候選，不是已核准產品狀態機或實作決策；兩份文件衝突時以前者為準。正式 eval、benchmark、A／B 與量化品質 gate 已裁示延至可用成品完成後；開發期只保留既有工程測試、authority safety、介面 conformance、簡單人工 smoke 與可回溯紀錄。
+>
+> 2026-08-13 責任分界確認：框架可以取代或包裝通用工程機制，Caliburn 保留產品語意與 authority；「保留」不等於所有底層程式都自行維護。LangGraph 是目前推薦的外層 runtime 候選，但仍須先證明它能忠實承接既有 durable input、Journal、generation／read-set 與 authority transaction，不能把推薦寫成已 Accepted 的框架決策。
 
 ## 0. 結論先行
 
-建議採用「framework-first、domain-owned authority」：
+建議採用「framework-first、domain-owned authority」的**目標候選**：
 
-1. LangGraph 1.x 管理外層 deterministic workflow、checkpoint、resume、interrupt 與 failure boundary。
-2. LangChain 管理 model interface、tools、structured output 與 context lifecycle；需要工具迴圈的單一階段才使用 bounded agent node。
+1. LangGraph 1.x 候選管理外層 bounded application run、checkpoint、resume、必要 interrupt 與 failure boundary；採用前須與現有 durable turn 做 conformance。
+2. LangChain 管理 model interface、tools、structured output 與 context lifecycle；需要工具迴圈的單一 operation 才使用 bounded agent node。
 3. langchain-openrouter 優先取代自寫 OpenRouter HTTP／structured-output plumbing，但必須先通過 Caliburn 的 exact-model、單一 endpoint、零 retry／fallback 與 execution evidence 相容測試。
 4. Agent Skills 規格保存已研究驗證的 Task／Duty／OPKS 方法；優先使用唯讀 SkillsMiddleware 做 progressive disclosure，不採整套 Deep Agents。
-5. 可用成品完成後，再評估以 Pydantic Evals 作為 repo-owned eval runner；目前不建立資料集、grader 或 eval release gate。
-6. 未來 RAG 以 read-only tool／MCP 形式接入；在 ADR 0057 邊界被新 ADR 翻案前，不得接入 current production。
+5. Pydantic、SQLAlchemy 與 PostgreSQL 繼續負責 typed domain model、transaction、constraint 與 persistence；先深化既有框架能力，再增加新 state／event framework。
+6. W3C Web Annotation 候選改善 quote anchor；W3C PROV 語彙候選改善 lineage mapping，但不導入第二份 RDF／evidence truth。
+7. 可用成品完成後，再評估以 Pydantic Evals 作為 repo-owned eval runner；目前不建立資料集、grader 或 eval release gate。
+8. 未來 RAG 以 read-only tool／MCP 形式接入；在 ADR 0057 邊界被新 ADR 翻案前，不得接入 current production。
 
 保留的不是目前每一行自寫程式，而是下列產品行為：
 
@@ -96,9 +100,9 @@ owner 的階段表至少包含：
 
 ~~~text
 固定分析責任
-  + 可回跳的 deterministic graph
-  + 每階段有限 model judgment
-  + employee approval interrupt
+  + 可回跳的 bounded application run
+  + 每個 focus／operation 有限 model judgment
+  + durable Proposal 與獨立 employee decision command
 ~~~
 
 不是：
@@ -116,21 +120,25 @@ Web / API
 Application command
    │
    ▼
-LangGraph StageGraph
+ConsultantRunGraph（LangGraph 候選）
    ├─ 讀 domain authority snapshot
    ├─ 建立 ContextRequest
    ├─ Context Engine 產生 ContextPack + ContextManifest
    ├─ 選擇 direct structured call 或 bounded agent node
    ├─ Pydantic parse + deterministic verifier
    ├─ 產生 Work Model delta / Proposal / gap
-   ├─ interrupt 等員工 accept / edit / return / reject
-   └─ 經既有 authority commit seam 寫入
+   ├─ 原子保存成功結果／durable Proposal 後結束本次 run
+   └─ 只有 run 內真的需要人工輸入時才 optional interrupt
           │
           ▼
 PostgreSQL domain state（唯一業務真相）
 
+員工稍後審核 durable Proposal
+   └─ accept / edit / return / reject domain command
+          └─ 經既有 authority commit seam 寫入
+
 橫切：
-- Stage Skills
+- Analysis Skills
 - Model Profiles
 - Tool Registry / allowlist
 - speaker-attributed memory
@@ -139,10 +147,10 @@ PostgreSQL domain state（唯一業務真相）
 
 ### 3.1 StateGraph 管執行，不管業務真相
 
-LangGraph checkpoint 只應保存：
+LangGraph checkpoint 若採用，只應保存：
 
 - thread／run／node cursor；
-- stage ID 與 pending interrupt；
+- operation／focus mode 與 pending interrupt；
 - domain revision／generation／read-set digest；
 - operation／tool call ID；
 - model result 或 domain artifact 的穩定 reference；
@@ -150,9 +158,9 @@ LangGraph checkpoint 只應保存：
 
 不得把完整 Current JD、完整 Work Model、Proposal 或 Evidence 複製成第二份 authoritative store。checkpoint 刪除後，Current JD 與 Proposal 的真相仍必須能從 domain tables 判定。
 
-### 3.2 兩種 stage execution mode
+### 3.2 兩種 operation execution mode
 
-每個 StageProfile 明確選一種：
+每個 OperationProfile 明確選一種：
 
 1. Direct structured operation：
    - 不需要工具探索；
@@ -164,13 +172,13 @@ LangGraph checkpoint 只應保存：
    - tool／model call budget 有硬上限；
    - 不能取得 authority mutation tool。
 
-不是每個 stage 都需要 agent loop。使用框架不代表每個 operation 都要變成 Agent。
+不是每個 attention mode／operation 都需要 agent loop。使用框架不代表每個 operation 都要變成 Agent。
 
 ## 4. 為什麼選這組框架
 
 主流性只能支持「這類通用問題已有成熟解法」，不能證明同一模型會因此寫出更好的 JD。目前沒有可信的公開 benchmark 能證明 LangGraph、LangChain 或其他 Agent framework 對專業職務分析有直接品質優勢；品質仍須由 Caliburn 自己的 transcript、Task／OPKS rubric 與真人 pilot 驗證。框架的直接價值是少維護通用 runtime、收斂預設行為、提高可恢復性與可觀測性。
 
-### 4.1 LangGraph：外層 runtime 首選
+### 4.1 LangGraph：外層 runtime 推薦候選
 
 官方能力符合需求：
 
@@ -181,19 +189,23 @@ LangGraph checkpoint 只應保存：
 - graph／functional API 可包住既有函式；
 - node、edge、stop condition 與 state transition 可測。
 
-官方也明確指出 interrupt resume 會從該 node 開頭重跑，interrupt 前副作用必須 idempotent。這與 Caliburn 既有 operation ID、Journal replay、generation/read-set 及 authority seam 高度相容，但節點必須切開：
+官方也明確指出 interrupt resume 會從該 node 開頭重跑，interrupt 前副作用必須 idempotent。這與 Caliburn 既有 operation ID、Journal replay、generation/read-set 及 authority seam 高度相容，但「相容」不等於 checkpoint 與 domain transaction 自動原子化。預設 Proposal 路徑應切成兩個各自 durable 的 application command：
 
 ~~~text
+consultant run:
 prepare snapshot
 → provider/tool work
 → verify
 → persist Proposal
-→ interrupt
-→ employee decision
-→ authority commit
+→ finish run
+
+later employee decision command:
+load durable Proposal
+→ validate decision / stale state
+→ authority commit or return
 ~~~
 
-不能在同一 node 中先寫入不可重播副作用，再 interrupt。
+只有同一個 in-flight run 確實需要人工補充才能繼續時，才使用 `interrupt`；不能為了使用 framework HITL，把本來可獨立審核的 durable Proposal 綁在一個長時間懸停的 graph 上。任何 interrupt node 都不能先寫入不可重播副作用。
 
 ### 4.2 LangChain：model、tool 與 context lifecycle
 
@@ -205,10 +217,10 @@ LangChain 現行 context engineering 把 model context 分為：
 - model；
 - response format。
 
-並以 middleware 控制 model context、tool context 與 lifecycle context。這正好能讓 StageProfile 在每次 call：
+並以 middleware 控制 model context、tool context 與 lifecycle context。這正好能讓 OperationProfile 在每次 call：
 
 - 切換 instructions；
-- 只暴露本 stage tools；
+- 只暴露本 operation tools；
 - 解析 ModelProfile；
 - 固定 output strategy；
 - 注入 ContextPack；
@@ -275,9 +287,11 @@ Pydantic Evals：
 
 | 方案 | 通用能力覆蓋 | 主要代價 | 判斷 |
 |---|---|---|---|
-| LangGraph + selective LangChain + ChatOpenRouter + Skills + Pydantic Evals | workflow、resume、HITL、tools、model、context lifecycle、structured output、skills、eval | 需治理 framework defaults；有整合學習成本 | 首選 |
-| 只用 LangGraph，其他全部保留自寫 | durable workflow 好；provider/context/tool/eval 仍自維護 | 刪除量有限，重複基礎設施仍多 | 可作保守 spike，不是終局 |
+| LangGraph + selective LangChain + ChatOpenRouter + Agent Skills + 現有 Pydantic／SQLAlchemy／PostgreSQL | workflow、resume、必要 HITL、tools、model、context lifecycle、structured output、skills、domain persistence | 需治理 framework defaults；LangGraph checkpoint 與 domain transaction 不是天然同一提交 | **推薦目標候選**；先做最小 conformance vertical，不是已 Accepted 決策 |
+| 現有 durable turn／Journal + selective LangChain／Skills | model、tool、context、structured output 與 skills 可減碼；不新增 graph persistence | 跨請求 resume、分支與 in-flight checkpoint 仍自維護 | 保守 baseline；若 LangGraph 沒有淨收益，可採此路徑 |
 | PydanticAI + Pydantic Graph | typed model/tool/output 很好，與現有 Pydantic 自然 | graph/durable ecosystem 與本需求貼合度較低；和 LangGraph 全疊會重複 | 次選；若 LangChain model layer conformance 失敗再比較 |
+| DBOS + 現有 domain | PostgreSQL-native durable workflow、idempotency 與 transaction integration | 缺少本需求重視的 context／Skills／agent middleware 生態；要改用 DBOS datasource 才能取得共同 transaction | durability 成為主要痛點時再 spike；不作目前預設 runtime |
+| Python eventsourcing 全面重建 domain | event store、aggregate replay、snapshot、notification log | 重寫既有 Current State、Journal、repository、migration 與 authority seam；仍不理解員工 authority | 功能完整但目前不划算；除非產品明確改採 event-sourced domain |
 | 全面 Deep Agents | skills、memory、planning、subagents、filesystem 一次齊全 | 自治與預設過多；authority、state、summary 與工具面難收斂 | 不採 |
 | 多 Agent 對應八階段 | 每個專家 prompt 清楚 | handoff、context 漂移、成本與責任歸因增加 | 除非 eval 證明單一 bounded consultant 不足，否則不採 |
 | 全部自寫 | 控制最大 | checkpoint、resume、tools、memory、skills、eval、provider compatibility 都自行維護 | 不再划算 |
@@ -291,15 +305,17 @@ Pydantic Evals：
 | OpenRouter HTTP、structured output、reasoning、usage | openrouter.py 301 行；openrouter_evidence.py 373 行 | ChatOpenRouter | exact model、單 endpoint、零 retry/fallback、typed refusal/error、raw execution evidence conformance | Replace 大部分；保留薄 adapter／profile resolver |
 | 一次 operation 的 render→call→parse→verify | task operation 94 行；OPKS operation 89 行 | structured model runnable／bounded agent node | operation-specific domain verifier 與 outcome mapping | Replace orchestration，Retain domain callback |
 | model-facing wire boilerplate | task wire 475 行 | Pydantic schema + explicit ProviderStrategy／ToolStrategy | ordinal mapping、portable neutral values、domain mapper | Wrap；可望顯著縮小，不保證全刪 |
-| prompt 與所有方法規則 | task prompt 118 行及各研究文件 | Stage Skills + dynamic prompt | Task／Duty／OPKS rubric | Replace載入機制；Retain內容 |
+| prompt 與所有方法規則 | task prompt 118 行及各研究文件 | Agent Skills + dynamic prompt | Task／Duty／OPKS rubric | Replace 載入機制；Retain 內容 |
 | context lifecycle | task context 659 行；OPKS context 349 行 | LangChain middleware／ToolRuntime | domain selection、authority、ordinal、token lane policy、manifest | Wrap；框架管生命週期，Caliburn 管選取 |
-| durable turn、pause/resume、child orchestration | durable_turn.py 337 行；turn.py 196 行；opks generation 454 行 | LangGraph + Postgres checkpointer | operation id、authority snapshot、read-set、Journal、commit seam | Replace workflow mechanics；Retain authority protocol |
+| durable turn、pause/resume、child orchestration | durable_turn.py 337 行；turn.py 196 行；opks generation 454 行 | LangGraph + Postgres checkpointer；DBOS 作 durability 對照 | operation id、authority snapshot、read-set、Journal、commit seam | 先 Wrap／conformance；只有證明淨減碼且無 durability 退步才 Replace workflow mechanics |
 | verifier 形狀與交叉欄位規則 | task verifier 938 行；OPKS verifier 361 行 | Pydantic validators、typed structured output、middleware guard | quote 來源、ordinal、lineage、identity、Current JD／Proposal 不變量 | Wrap；只刪純 shape／boilerplate |
-| Work Model transition | transition.py 941 行 | 無通用框架可正確理解 Caliburn authority | Task identity gate、staged delta、Proposal、Current JD 禁寫 | Retain |
-| Evidence／SourceAnchor／SupportLink | core/domain/sources.py 等 | W3C PROV 可作命名參考；無 drop-in runtime | speaker、quote、supersession、document scope、employee authority | Retain／擴充 |
-| generic memory／resume | transcript、Journal 與自組 packet | LangGraph checkpointer/store | 業務記憶與事實狀態 | Wrap；不可把 Store 當 truth |
+| Work Model transition | transition.py 941 行 | Pydantic model、SQLAlchemy UoW／constraint 可減少局部 plumbing；LangMem 只可產生 typed 候選 | Task identity gate、delta、Proposal、Current JD 禁寫、retirement／supersession | Retain domain reducer；框架只 Wrap 輸入與持久化機制 |
+| Evidence／SourceAnchor／SupportLink | core/domain/sources.py 等 | W3C Web Annotation 的 TextQuote／TextPosition Selector + W3C PROV lineage vocabulary | speaker、quote validity、supersession、document scope、employee authority、語意支持 | 升級 anchor 標準與 lineage mapping；Retain domain truth／verifier |
+| Current JD／Proposal persistence | PostgreSQL repositories、authority commit | SQLAlchemy transaction／constraint／versioning；Pydantic discriminated union | 跨 entity generation／read-set、before-state stale、員工決策語意 | 深化既有框架；不以 generic JSON Patch、memory store 或 workflow state 取代 |
+| generic memory／resume | transcript、Journal 與自組 packet | LangGraph checkpointer/store；LangMem 僅作候選抽取／非權威 recall | 原話、業務記憶、正式 Work Model 與事實狀態 | Wrap；checkpoint／store 只存 execution 或可重建 artifact，不當 truth |
 | Skill 發現與按需載入 | 尚未正式元件化 | Agent Skills／SkillsMiddleware | 專業內容與版本核准 | Replace 通用 loader |
-| eval runner、報表與 trajectory capture | 分散腳本／fixture | Pydantic Evals + OTel | dataset、grader、release gate | Replace runner，Retain rubric |
+| runtime observability | 現有 OTel 與 provider evidence | OpenTelemetry GenAI conventions；未來需要本機 trace UI 時再評估 MLflow | 產品 evidence、quote lineage、員工決策 authority | Wrap；trace_id／span_id 只作 correlation，不作產品真相 |
+| eval runner、報表與 trajectory capture | 分散腳本／fixture | Pydantic Evals + OTel | dataset、grader、release gate | 成品後 Replace runner，Retain rubric；目前不進 critical path |
 | RAG retrieval/citation | 隔離 bounded context | 未來 MCP／retriever／LlamaIndex 可選 | source authority、employee confirmation、ADR 0057 邊界 | 延後；先不接 production |
 
 ### 6.1 刪碼成功的定義
@@ -322,7 +338,7 @@ Pydantic Evals：
 |---|---|---:|---:|
 | Domain state | Current JD、Work Model、Proposal、open issue | 高，但各層權威不同 | 否，只投影相關 slice |
 | Transcript | 每位說話者原話 | 來源真相 | 否，按需載入 |
-| Evidence | 經 quote／speaker／scope 驗證的原子主張 | 可追溯，不等於客觀正確 | 依 stage/target |
+| Evidence | 經 quote／speaker／scope 驗證的原子主張 | 可追溯，不等於客觀正確 | 依 operation／target |
 | Graph checkpoint | 執行 cursor 與 resume metadata | 只屬 execution | 不直接送 |
 | Skill | 方法、rubric、例子 | 程序知識 | 命中才讀 |
 | Reference | ICAP／公版／文件候選 | 外部候選 | opt-in、後段 |
@@ -421,7 +437,7 @@ Context Engine 採 hybrid 流程：application deterministic 保證 scope、auth
 
 每次 operation 保存：
 
-- stage／operation／policy／skill／prompt／schema／model profile version；
+- attention mode／operation／policy／skill／prompt／schema／model profile version；
 - domain generation 與 read-set；
 - 每個 context item 的 source ID、kind、speaker、target、revision/hash；
 - selected reason 與 excluded reason；
@@ -496,9 +512,9 @@ namespace 至少為 document_id。第一版：
 - LangGraph long-term Store 不承載 speaker truth；
 - 若未來要跨文件個人記憶，必須另開產品／隱私 ADR。
 
-## 9. 各階段 Context 配方
+## 9. 各 attention mode／operation 的 Context 配方
 
-| 階段 | Always include | On demand | 預設排除 | 主要輸出 |
+| attention mode／operation | Always include | On demand | 預設排除 | 主要輸出 |
 |---|---|---|---|---|
 | Reference 搜尋 | 使用者搜尋意圖、角色假說摘要、Reference Skill、read-only tools | ICAP／公版 metadata，再取候選全文 | 未確認候選不得混入工作事實 | reference candidates + source refs |
 | 工作骨架 | 本輪完整回答、active question、近期必要 turn、未映射訊號、Current Work Model 摘要 | 相關舊故事／更正 | 大量公版、完整 OPKS、無關 transcript | work signals、初步 Duty/Task、gaps |
@@ -513,11 +529,11 @@ namespace 至少為 document_id。第一版：
 
 ## 10. Skill、Tool 與 Agent 的邊界
 
-### 10.1 StageProfile
+### 10.1 OperationProfile
 
-每個 stage 具有版本化 contract：
+每個 operation 具有版本化 contract；可見的 attention mode 只用於說明目前焦點，不要求與 graph node 一一對應：
 
-- stage_id 與可見 UI mode；
+- operation_id 與可見 attention／UI mode；
 - objective；
 - entry、completion、return、stop conditions；
 - ContextRequest builder；
@@ -529,7 +545,7 @@ namespace 至少為 document_id。第一版：
 - max model／tool calls；
 - output schema；
 - verifier；
-- possible next stages。
+- possible next operations／focus transitions。
 
 ### 10.2 Tools 三級
 
@@ -549,7 +565,7 @@ namespace 至少為 document_id。第一版：
    - 不提供給模型；
    - 只由 employee command 進 authority commit seam。
 
-tool description 只寫一次，schema 自帶權限與輸入限制。每個 stage 只暴露必要工具，避免所有工具永久佔 context。
+tool description 只寫一次，schema 自帶權限與輸入限制。每個 operation 只暴露必要工具，避免所有工具永久佔 context。
 
 ### 10.3 不採多 Agent 的理由
 
@@ -564,7 +580,7 @@ tool description 只寫一次，schema 自帶權限與輸入限制。每個 stag
 只有當 eval 證明某個 specialist：
 
 - contract、tool、policy 明顯獨立；
-- 以 agent-as-tool 比同模型單一 StageProfile 顯著提升；
+- 以 agent-as-tool 比同模型單一 OperationProfile 顯著提升；
 - 成本／延遲可接受；
 
 才拆出，且不得取得 Current JD authority。
@@ -576,6 +592,7 @@ tool description 只寫一次，schema 自帶權限與輸入限制。每個 stag
 | 問題 | 現成能力 | 能解決 | 不能解決 |
 |---|---|---|---|
 | output shape | Pydantic／LangChain structured output | JSON／type／部分欄位組合 | 語意真實性 |
+| exact text anchor shape | W3C Web Annotation TextQuoteSelector／TextPositionSelector | `exact`、`prefix`、`suffix`、`start`、`end` 與可互通的文字片段定位 | speaker authority、來源是否未被竄改、引文是否支持 claim |
 | citation source chunks | LlamaIndex CitationQueryEngine 等 | 建立可引用 source nodes、控制 chunk granularity | 引文是否真的支持職務判斷 |
 | provenance schema | W3C PROV-O | Entity／Activity／Agent、quoted/derived/primary-source 關係詞彙 | Caliburn 的員工 authority 與信任政策 |
 | RAG quality eval | Ragas | context precision／recall、faithfulness、tool metrics | production commit gate |
@@ -585,7 +602,7 @@ tool description 只寫一次，schema 自帶權限與輸入限制。每個 stag
 
 結論：
 
-- 可用框架取代 citation transport、retrieval、provenance vocabulary 與 eval plumbing；
+- 可用框架／標準取代 citation transport、anchor shape、retrieval、provenance vocabulary 與 eval plumbing；
 - exact quote、speaker attribution、supersession、source authority 與 Current JD gate 必須保留；
 - citations 只證明「指到某段」，不證明 claim 被支持；
 - source credibility 不應是一個神秘 confidence 0.83，而應拆成 source validity、speaker、capture mode、claim status、task linkage 與 employee decision。
@@ -611,6 +628,36 @@ tool description 只寫一次，schema 自帶權限與輸入限制。每個 stag
 - 多人衝突該如何澄清；
 - 最終 JD 是否代表員工工作。
 
+### 11.3 2026-08-13 保留核心的 framework 化裁決
+
+Owner 的要求不是「五個核心全部自寫」，而是保留其產品責任。逐項裁決如下：
+
+| 產品責任 | 可直接採用／深化的框架或標準 | Caliburn 必須保留 |
+|---|---|---|
+| 員工原話、來源、speaker、更正、quote anchor | W3C Web Annotation anchor shape；W3C PROV lineage vocabulary；Pydantic shape validation；PostgreSQL durability | speaker／capture mode 權威、source revision、逐字驗證、correction／supersession、document isolation |
+| Work Model、Current JD、Proposal | Pydantic typed models；SQLAlchemy UoW、transaction、constraint、必要時 row-level versioning；PostgreSQL | hypothesis identity／lifecycle、generation／read-set、cross-entity stale、Proposal action 語意、employee authority |
+| Task／Duty／OPKS 分析方法 | Agent Skills 規格、SkillsMiddleware、dynamic prompt／tool allowlist | 研究過的方法、rubric、觸發語意、共同 work hypothesis 與跨 Skill 對帳 |
+| deterministic verifier、來源可信度 | Pydantic field／model validators、typed output、可組合 validation pipeline | transcript-backed quote、speaker、ordinal、lineage、identity、domain invariant；可信度仍拆成可解釋政策，不採神秘單一分數 |
+| 員工核准與 authority commit | LangGraph／其他 runtime 可承接通用 pause／resume 與 payload transport；SQLAlchemy 承接 transaction | durable Proposal、accept／edit／return／reject domain command、stale checks、原子 authority commit |
+
+補充邊界：
+
+- SQLAlchemy `version_id_col` 只能協助 ORM row flush 的 stale detection，不能取代跨 Document／Task／Duty／OPKS／Proposal 的 generation＋read-set；
+- LangMem、Pydantic Harness Memory、Mem0 等模型驅動記憶若採用，只能產生可丟棄摘要、非權威 recall 或 typed hypothesis candidate，不能自行 create／update／delete canonical Work Model；
+- event-sourcing framework 的 aggregate／snapshot／notification log 比現有 Journal 更完整，但採用代表重寫 persistence model，不因功能較多就自動更好；目前先深化既有 PostgreSQL／SQLAlchemy／Journal；
+- framework approval 通常批准的是一次 tool call／run interruption；Caliburn 員工核准的是有來源、before／after、revision 與 domain dependency 的 Proposal，兩者不可混為同一狀態。
+
+quote anchor 的推薦升級形狀是：
+
+```text
+source_id + source_revision_hash
++ exact quote + prefix/suffix
++ Unicode code-point start/end + normalization policy
++ speaker/capture mode + document scope
+```
+
+Web Annotation 提供的是成熟 selector 模型，不要求 Caliburn 使用 JSON-LD 或 RDF 作內部 truth；可保留 Pydantic／relational domain model，只在命名、驗證與對外 projection 對齊標準。
+
 ## 12. 通用模型接口與可替換模型
 
 ### 12.1 ModelProfile
@@ -618,7 +665,7 @@ tool description 只寫一次，schema 自帶權限與輸入限制。每個 stag
 模型不應散落成環境變數與 if/else。每個已核准 profile 至少包含：
 
 - profile_id／version；
-- operation/stage allowlist；
+- operation／attention-mode allowlist；
 - provider adapter；
 - exact model slug；
 - exact provider／endpoint policy；
@@ -635,7 +682,7 @@ tool description 只寫一次，schema 自帶權限與輸入限制。每個 stag
 - pricing snapshot reference；
 - capability/eval suite version。
 
-StageProfile 指向 ModelProfile，不直接寫任意 model string。
+OperationProfile 指向 ModelProfile，不直接寫任意 model string。
 
 ### 12.2 換模型流程
 
@@ -690,14 +737,14 @@ StageProfile 指向 ModelProfile，不直接寫任意 model string。
 ### 13.2 第一版硬控制
 
 - 一個 employee turn 預設最多一次主要 consultant call；
-- OPKS 仍維持最多一個 single-Task child；
+- 遷移期間現行 OPKS child 仍維持最多一個 single-Task child；終局是否在主要顧問同一次 inference 內按需組合 O／P／K／S Skills，依 operation contract 與後續成品 eval 決定，不把現行 child topology 升格成產品流程；
 - bounded agent 設 max model calls、max tool calls、max tokens；
 - retry=0、fallback=false；
 - 不開自動 summary call；
 - 不開 background memory extraction；
 - Reference 只在員工選擇或後段 coverage challenge 使用；
 - 工具 metadata 與 stable Skill prefix 才考慮 prompt cache；
-- 每個 stage 有 input/output budget 與超額降級路徑；
+- 每個 operation 有 input/output budget 與超額降級路徑；
 - 成品前不為省 token 額外導入未驗證的 cheap-model routing；模型分級與自動 routing 留到正式 eval。
 
 ### 13.3 降級順序
@@ -774,7 +821,7 @@ Human／LLM rubric（需人校準）：
 
 ### 14.4 Runtime 與框架品質
 
-- stage／tool／authority violation = 0；
+- operation／tool／authority violation = 0；
 - duplicate resume 不重複 side effect；
 - restart 可恢復；
 - checkpoint 遺失不破壞 domain truth；
@@ -800,7 +847,7 @@ Human／LLM rubric（需人校準）：
 
 ### Phase 0：contracts 與可回溯性（不建立正式 eval）
 
-- 凍結 ModelProfile／StageProfile／ContextManifest 候選 contract；
+- 凍結 ModelProfile／OperationProfile／ContextManifest 候選 contract；
 - 保留既有 unit／integration／contract tests 與 authority invariants；
 - 記錄 operation、model、prompt／Skill／tool version、source refs、tokens、latency 與結果 lineage；
 - 每個垂直切片只做簡單人工 happy-path／resume／approval smoke。
@@ -830,19 +877,23 @@ Gate：現行 adapter 的必要語意全部通過；否則只採部分框架。
 ~~~text
 待訪談項目
 → consultant operation
-→ Proposal
-→ interrupt
+→ durable Proposal / no-op / gap
+→ consultant run 結束
+
+稍後獨立 employee decision command
 → accept / edit / return / reject
 → authority commit / return
 ~~~
 
-Gate：restart、duplicate resume、stale generation、checkpoint loss 與 authority violation 全通過。
+這個 vertical 先驗證 checkpoint／resume 是否真的減少 orchestration；不把 Proposal 審核硬改成 interrupt。另選一個「run 內確實需要人工輸入」的窄案例，才測 optional interrupt。
 
-### Phase 4：Stage Skills 與 Context Engine
+Gate：restart、duplicate resume、stale generation、checkpoint loss、Proposal 在沒有 graph checkpoint 時仍可審核，以及 authority violation 全通過。若 LangGraph 不能比現有 durable turn 明確減少總維護面，保留現有 runtime 並只採 model／Skills／context framework。
+
+### Phase 4：Analysis Skills 與 Context Engine
 
 - 將 Task／Duty／OPKS 方法拆成少數不重疊 Skills；
 - 實作 ContextRequest、lanes、Manifest；
-- stage-specific tool allowlist；
+- operation-specific tool allowlist；
 - 不啟用自動 summary 或 cross-document memory。
 
 Gate：必帶核心、document scope、最新更正與 Manifest 的 deterministic tests 通過，人工 smoke 可完成主流程；recall／precision、重問率、品質與最佳 token 配置延至成品後評測。
@@ -875,7 +926,7 @@ Gate：開發期只要求公版不自動升格、來源可追溯與人工 smoke 
 ## 16. 明確不做
 
 - 不把八階段做成八個 Agent。
-- 不讓 LLM 自行決定跨 stage 或寫 Current JD。
+- 不讓 LLM 自行放寬 operation／focus boundary 或寫 Current JD。
 - 不把 LangGraph checkpoint／Store 當第二份 document store。
 - 不用 generic vector memory 當工作事實。
 - 不用 summary 取代 transcript 或 Evidence。
@@ -890,10 +941,13 @@ Gate：開發期只要求公版不自動升格、來源可追溯與人工 smoke 
 
 ### 17.1 本研究建議視為已收斂
 
-- deterministic graph 包 bounded model step；
+- bounded application run 包有限 model／tool step，不採自由 Agent loop；
 - framework-first 替代通用機械碼；
-- domain authority、Task／OPKS 方法與 source policy 保留；
-- stage-specific context，不送完整歷史；
+- 「保留產品責任」不等於所有底層程式自寫；先深化 Pydantic／SQLAlchemy／PostgreSQL，再選擇性導入新框架；
+- domain authority、Task／Duty／OPKS 方法、source policy 與進度語意保留；
+- durable Proposal 與 employee decision command 不依賴 graph interrupt；
+- W3C Web Annotation／PROV 可改善 anchor 與 lineage 形狀，但不取代 domain truth；
+- operation-specific context，不送完整歷史；
 - speaker-attributed、document-local、原話優先；
 - Skills progressive disclosure；
 - 不採 full Deep Agents 或多 Agent 起步；
@@ -903,18 +957,19 @@ Gate：開發期只要求公版不自動升格、來源可追溯與人工 smoke 
 
 1. ChatOpenRouter conformance 若缺 endpoint execution evidence，是否接受混合薄 adapter。
 2. SkillsMiddleware 的 dependency surface 是否可接受；否則是否只採 Agent Skills 標準。
-3. StageGraph 的最小節點邊界與 UI stage 名稱是否一一對應。
+3. LangGraph 最小 vertical 是否比現有 durable turn／Journal 產生可證明的淨減碼；若沒有，是否只採 model／Skills／context framework。UI attention mode 已確認不與 graph node 一一對應。
 4. speaker_kind／capture_mode 第一版是否直接進 domain，或先以 artifact/source metadata 形式實驗。
 5. Context Engine 第一版只用 relational／lexical，還是同時實驗 semantic retrieval。
 6. ModelProfile 由設定檔、資料庫或 versioned Python registry 管理。
 7. 哪些現行 verifier 規則可安全下沉到 Pydantic，哪些必須維持獨立純函式。
-8. 成品完成後第一個真人 pilot 的職務樣本、專家 reviewer 與 release threshold。
+8. W3C anchor 升級是否與 runtime vertical 同批，或先作獨立 source-contract slice。
+9. 成品完成後第一個真人 pilot 的職務樣本、專家 reviewer 與 release threshold。
 
 ## 18. 後續 ADR 建議
 
 若 owner 與討論者接受方向，至少需要：
 
-1. Staged consultant runtime 與 LangGraph authority boundary ADR。
+1. Consultant application run、runtime 選型與 LangGraph authority boundary ADR。
 2. ModelProfile、provider conformance 與 framework default policy ADR。
 3. Context Engine、ContextManifest 與 memory scope ADR。
 4. Agent Skills 儲存、版本、唯讀與 activation ADR。
@@ -955,9 +1010,19 @@ ADR Accepted 後才寫 docs/plans/；不得直接據本研究全文施工。
 
 - [Agent Skills — Specification](https://agentskills.io/specification)
 - [Deep Agents — Skills](https://docs.langchain.com/oss/python/deepagents/skills)
+- [LangMem — Memory conceptual guide](https://langchain-ai.github.io/langmem/concepts/conceptual_guide/)
+- [Pydantic — Validators](https://pydantic.dev/docs/validation/latest/concepts/validators/)
+- [Pydantic AI Harness — Memory](https://pydantic.dev/docs/ai/harness/memory/)
 - [Pydantic Evals](https://pydantic.dev/docs/ai/evals/evals/)
 - [Pydantic AI repository and MIT License](https://github.com/pydantic/pydantic-ai)
+- [SQLAlchemy — Configuring a Version Counter](https://docs.sqlalchemy.org/en/20/orm/versioning.html)
+- [W3C — Web Annotation Data Model](https://www.w3.org/TR/annotation-model/)
 - [W3C — PROV-O](https://www.w3.org/TR/prov-o/)
+- [OpenTelemetry — Generative AI semantic conventions](https://opentelemetry.io/docs/specs/semconv/gen-ai/)
+- [MLflow — GenAI tracing](https://mlflow.org/docs/latest/genai/tracing/)
+- [DBOS — Workflow communication](https://docs.dbos.dev/python/tutorials/workflow-communication)
+- [DBOS — Transactions](https://docs.dbos.dev/python/tutorials/transaction-tutorial)
+- [Python eventsourcing — Applications](https://eventsourcing.readthedocs.io/en/stable/topics/application.html)
 - [LlamaIndex — CitationQueryEngine](https://developers.llamaindex.ai/python/framework-api-reference/query_engine/citation/)
 - [Ragas — Available metrics](https://docs.ragas.io/en/latest/concepts/metrics/available_metrics/)
 
@@ -984,13 +1049,15 @@ ADR Accepted 後才寫 docs/plans/；不得直接據本研究全文施工。
 
 對 Caliburn 的專業職務說明書顧問，最好的終局不是「所有東西自己寫」，也不是「把產品交給一個功能最多的 Agent framework」。
 
-推薦的是：
+推薦的目標候選是：
 
-> LangGraph 管可恢復的階段執行；LangChain/OpenRouter 管模型、工具、structured output 與 context lifecycle；Agent Skills 管專業方法的按需載入；成品完成後再由 Pydantic Evals 等候選承接評測 plumbing；Caliburn 只保留專業分析、來源權威、deterministic domain invariants 與員工決策。
+> LangGraph 候選管可恢復的 bounded application run；LangChain/OpenRouter 候選管模型、工具、structured output 與 context lifecycle；Agent Skills 管專業方法的按需載入；Pydantic／SQLAlchemy／PostgreSQL 管 typed domain 與 transaction；W3C Web Annotation／PROV 改善 anchor 與 lineage；成品完成後再由 Pydantic Evals 等候選承接評測 plumbing。Caliburn 保留的是專業分析、來源權威、deterministic domain invariants、進度語意與員工決策，不是保留所有自寫機械碼。
+
+這仍是一個待 conformance 的目標架構，不是已 Accepted 的 framework ADR。若 LangGraph 無法比現有 durable turn／Journal 明確降低總維護面，應保留現有 runtime，只採 model／Skills／context／anchor 等有淨收益的部分；不為「全框架」重寫已正確的 authority。
 
 最大的品質槓桿不是再加一個 Agent，而是 Context Engine：
 
-- 在正確 stage；
+- 在正確 focus／operation；
 - 對正確 Duty／Task；
 - 載入最新更正、必要原話、矛盾與 gap；
 - 清楚區分誰說的、是直接說還是轉述；

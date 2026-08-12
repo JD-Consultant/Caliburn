@@ -90,6 +90,15 @@
 - 重試必須沿用同一個 input event，不重複建立來源；失敗期間 Work Model、Proposal 與 Current JD 都不得改變。
 - 這項產品裁決取代 2026-07-30 最小完整迴圈中「模型失敗時 Journal 完全不變、只由 Web 保留草稿」的舊假設；實作前仍須以 ADR／plan 補齊交易、idempotency 與 migration 邊界。
 
+### 2.8 一個員工回合可包含受限的內部工作，但仍由同一位顧問負責
+
+- 一次員工送出與一次模型 inference 不是同一個概念；產品以一個可保存、可重試的 application run 承接一個員工回合。
+- 預設先走一次主要顧問 inference 的快速路徑；資訊足夠時直接結束，不為了「可能更好」固定增加 planner、critic、extractor 或 OPKS 呼叫。
+- 只有缺少本輪必要 context、需要唯讀工具結果，或有邊界明確且確實不同的專業判斷時，才在同一個 run 內增加受限步驟。
+- 載入 Skill 不等於另開人格化 Agent，也不必然增加一次模型呼叫；同一位主要顧問仍擁有最後語意整合與員工回覆。
+- application 決定 scope、工具權限、最大步數、token／時間／成本與停止規則；不得讓模型自由無限循環。
+- 員工只看到一個連貫結果、必要 Proposal 與一個主要問題；內部 Manifest 可供重播與除錯，但不把 chain-of-thought 當成產品輸出。
+
 ## 3. 白話產品流程 v0.1
 
 ### 3.1 開始或恢復
@@ -193,7 +202,7 @@ AI 應告訴員工：現在談什麼、為什麼現在談、要釐清到什麼�
 
 例如，員工描述某項工作時同時說出主要成果與驗收方式，當輪可一起使用 `task-boundary`、`output` 與 `performance-indicator`；若沒有能力需求的證據，就不載入 `knowledge`／`skill`。若 Indicator 顯示原 Task 包含兩種不同成果，也能回頭提出 Task 拆分。
 
-這是產品的語意循環，不預先規定模型呼叫拓撲。日後可依 eval 實作為單次模型工具循環、先路由再呼叫，或少數受控子分析；不得反過來因框架或呼叫形式改變上述顧問責任。
+這是產品的語意循環。2026-08-13 已確認其高階執行形狀為「預設單次 inference 快速路徑＋必要時受限補查／再判斷」：不固定每輪多呼叫，也不允許自由 Agent loop。至於同一 run 內的 tool loop、少數 specialist、final submit contract 與框架映射仍是實作選擇；不得反過來因框架或呼叫形式改變上述顧問責任。
 
 ### 3.7 小段落收束、重整與提案
 
@@ -775,9 +784,10 @@ Owner 已於 2026-08-12 裁示：時間優先，先完成可用的端到端成�
 ### 7.15 本節仍未決定
 
 - 每種 operation 的確切 token floor／ceiling；
+- adaptive bounded run 的最大 inference／tool step、elapsed time／成本上限，以及哪些 operation 允許 partial semantic result；
 - 受限全域工作索引的最終 schema、大小門檻、摘要層級與不同 model profile 的降級參數；
 - 是否第一版就使用 embedding、哪個 embedding／reranker 與 top-k；
-- 是否增加獨立的 model-based context planner call；
+- 哪些具體條件值得增加獨立 model-based context planner 或 specialist call；預設不得固定每輪增加；
 - 主要 runtime 採 LangGraph、OpenAI Agents SDK、PydanticAI 或薄型自有 orchestration；
 - provider conversation state、compaction、prompt cache 的啟用條件；
 - ContextRequest／ContextPack／ContextManifest 的最終 schema 與資料表。
@@ -814,6 +824,42 @@ Owner 於 2026-08-12 確認：員工回答即使遇到 AI 失敗也必須保存�
 application／framework 應自行產生並保存 operation ID、event ID、時間、model／prompt／Skill／tool version、generation、read-set、state revision、ContextManifest、token／成本、驗證結果與 audit。LLM 不得自行宣稱這些欄位，也不得直接產生 authority commit outcome。LangGraph／LangChain／provider session 可以承接 checkpoint、tool loop、typed output 與 tracing plumbing，但 framework state 不能成為第二份 Source、Work Model、Proposal 或 Current JD。
 
 這項分離與外部主流做法一致：OpenAI 將 final output、history、interruptions 與 resumable state 分開，並區分 function calling 與 user-facing structured response；Anthropic 將 session 定義為 harness 外的 append-only event log，工具呼叫只代表模型提出結構化要求、由 application 執行；Google ADK 也把 event content、tool event 與 state delta 分開；LangGraph 則把 message stream、state snapshot、interrupt 與 final output 分開。這些框架只證明通用責任邊界，不替 Caliburn 決定職務分析語意與 authority。
+
+#### 7.16.1 一個員工回合採 adaptive bounded run（2026-08-13 已確認）
+
+外部主流做法沒有支持「每一輪固定多跑幾次模型」是普遍較好的方案。OpenAI 建議在一次工具呼叫已足夠時維持直接路徑，只有 bounded filtering、ranking、aggregation、validation 等工作才增加受控流程，並先定義 evidence、retry 與 stopping limits；Anthropic 建議從單次 LLM＋retrieval／examples 等最簡單可行方案開始，只有可清楚分解且品質改善值得延遲與成本時才加入 chaining、routing 或 evaluator loop；Google 與 Microsoft 也都把已知順序、business rule 與 function 留給 deterministic workflow，把真正開放的語意判斷留給 agent。這些是跨產品的工程模式，不是職務分析品質已被公開 benchmark 驗證的證據。
+
+本產品比較三種方案後的裁決如下：
+
+| 方案 | 優點 | 主要問題 | 裁決 |
+|---|---|---|---|
+| 固定單次模型呼叫 | 最低延遲、成本與操作複雜度 | 模型缺少必要遠端 context 或工具結果時，只能猜測、失敗或把所有資料預塞入 prompt | 保留為預設快速路徑，不作唯一能力 |
+| 自由 Agent loop | 能動態規劃、反覆查詢與自我修正 | 步數、成本與完成時間不可預測；可能重複工具、無進展循環、累積錯誤或模糊 authority | 不採用 |
+| adaptive bounded run | 簡單回合維持直接，複雜回合才按需增加工具或模型判斷 | 需要明確權限、budget、停止與失敗契約 | 採用為產品方向 |
+
+`employee turn`、`application run`、`model inference` 與 `tool call` 必須分開：員工送出一次回答後，application 先保存 durable input event，再啟動一個可觀測、可恢復的 run。這個 run 預設只讓主要顧問 inference 一次；主要顧問若已能提交合格 typed result 就立即結束。只有下列條件之一成立，才允許在同一 run 內增加步驟：
+
+1. Context Engine 明示尚有本輪可查但未載入的必要來源，主要顧問提出 scope 明確的 document-scoped read-only request；
+2. deterministic tool／verifier 的結果會改變本輪語意判斷，需要交回同一位主要顧問整合；
+3. 某項工作具有與主回答明確不同的輸入、方法與 typed contract，值得呼叫少數 specialist；specialist 只回傳受限結果，不接管員工對話；
+4. provider／schema 的一次可重試失敗符合 application policy，且不會建立重複來源或半套業務狀態。
+
+相反地，「Skill 被命中」「本輪可能有 OPKS」「想讓答案再漂亮一點」或「框架支援 multi-agent」都不足以自動增加模型呼叫。Task、Duty、O、P、K、S Skill 是 progressive-disclosure 的方法邊界，可以在同一次主要 inference 中組合；只有實際 context、工具結果或獨立 contract 需要時才拆步。
+
+每個 run 至少具有以下終止條件，且由 application／framework harness 強制執行：
+
+- 主要顧問已提交通過 schema 與 deterministic checks 的 typed semantic result；
+- 必要資訊只能由員工補充，轉成一個主要問題後停止；
+- 工具結果沒有新增資訊、模型重複相同 request，或連續步驟沒有可辨識進展；
+- 工具、provider、schema 或 verifier 失敗已達可設定重試邊界；
+- 達到最大 inference／tool step、token、elapsed time 或成本上限；
+- application 發現 scope、document、authority 或 approval boundary 不允許繼續。
+
+停止時不得偽裝成功：已保存的員工回答維持 durable；若尚無可安全提交的語意結果，記錄 structured processing failure 或向員工提出必要問題，不更新 Work Model、agenda、Proposal 或 Current JD。若已有可驗證的部分結果，是否允許 partial semantic result 必須由各 operation contract 明定，不能由模型臨時決定。
+
+對員工而言，這仍是一位顧問的一次回合：主要顧問負責最後整合、必要摘要、Proposal 與一個主要問題。read-only context／Skill／tool activity 在既定 capability boundary 內可自動進行；任何 Current JD authority 變更仍只經 Proposal 與員工 accept／edit／reject。內部只保存結構化 event、tool request／result、ContextManifest、版本、usage、validation 與 lineage，不要求或暴露模型私有 chain-of-thought。
+
+這項裁決仍是 framework-neutral。LangGraph、OpenAI Agents SDK、Google ADK 或 Microsoft Agent Framework 可以承接 loop、checkpoint、pause／resume、typed tool 與 tracing plumbing；薄型自有 orchestration 也可以。後續 conformance spike 應比較誰能忠實承接上述 `application run` contract，而不是讓框架重新定義員工回合、記憶權威或 Current JD commit seam。
 
 ### 7.17 理解校準／可編輯假說的框架調查（2026-08-12）
 
@@ -914,6 +960,12 @@ Microsoft Agent Framework 保留為追蹤候選；OpenAI、Google、Anthropic SD
 
 方向：使用「目前已知」的 coverage、sufficiency、具體 gap、待決 Proposal 與停止理由；完成是可解釋的條件組合，不是填滿率。
 
+### 8.7 內部 Agent loop 膨脹
+
+風險：因框架可用或希望回答更完整，讓每輪固定經過 planner、extractor、critic、OPKS coder 與多個 specialist，導致延遲、成本與錯誤路徑快速增加；員工仍只看到一個答案，反而難以理解為何卡住或失敗。
+
+方向：預設單次主要顧問 inference；只因必要 context、工具結果或邊界明確的專業 contract 增加步驟；由 application 強制 no-progress、重複 request、步數、token、時間、成本與 authority 終止條件。每輪保存實際 topology 與 usage，成品完成後再由長訪談 eval 判斷哪些額外步驟值得保留。
+
 ## 9. 下一輪待討論
 
 按產品優先、元件後置的順序，下一輪建議只討論：
@@ -945,6 +997,7 @@ Stakeholder 草稿（非權威，只作需求來源）：
 - [Anthropic — Building effective agents](https://www.anthropic.com/engineering/building-effective-agents)
 - [Anthropic — Effective context engineering for AI agents](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)
 - [Anthropic — Scaling Managed Agents: Decoupling the brain from the hands](https://www.anthropic.com/engineering/managed-agents)
+- [Anthropic — How we contain Claude across our consumer products](https://www.anthropic.com/engineering/how-we-contain-claude)
 - [Anthropic Docs — How tool use works](https://platform.claude.com/docs/en/agents-and-tools/tool-use/how-tool-use-works)
 - [Anthropic Docs — Tool runner（自動 loop 與 custom HITL 邊界）](https://platform.claude.com/docs/en/agents-and-tools/tool-use/tool-runner)
 - [Anthropic Docs — Managed Agents permission policies](https://platform.claude.com/docs/en/managed-agents/permission-policies)
@@ -952,6 +1005,8 @@ Stakeholder 草稿（非權威，只作需求來源）：
 - [Anthropic — Contextual Retrieval](https://www.anthropic.com/engineering/contextual-retrieval)
 - [Anthropic — Equipping agents for the real world with Agent Skills](https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills)
 - [OpenAI Docs — Model guidance（lean prompts、relevant tools、approval boundaries）](https://developers.openai.com/api/docs/guides/latest-model)
+- [OpenAI Docs — Running agents（application turn、inner loop、session、resume）](https://developers.openai.com/api/docs/guides/agents/running-agents)
+- [OpenAI Docs — Orchestration and handoffs（manager ownership、bounded specialists）](https://developers.openai.com/api/docs/guides/agents/orchestration)
 - [OpenAI Cookbook — Context Engineering for Personalization（structured state、relevant slices、memory precedence）](https://developers.openai.com/cookbook/examples/agents_sdk/context_personalization/)
 - [OpenAI Docs — ChatKit widgets](https://developers.openai.com/api/docs/guides/chatkit-widgets)
 - [OpenAI Docs — ChatKit actions](https://developers.openai.com/api/docs/guides/chatkit-actions)
@@ -983,6 +1038,7 @@ Stakeholder 草稿（非權威，只作需求來源）：
 - [Google Cloud — Choose a design pattern for your agentic AI system](https://docs.cloud.google.com/architecture/choose-design-pattern-agentic-ai-system?hl=en)
 - [Google Research — Sufficient Context: A New Lens on RAG Systems](https://research.google/blog/deeper-insights-into-retrieval-augmented-generation-the-role-of-sufficient-context/)
 - [LangGraph — Overview](https://docs.langchain.com/oss/python/langgraph/overview)
+- [LangGraph — Workflows and agents（predetermined workflow 與 dynamic loop）](https://docs.langchain.com/oss/python/langgraph/workflows-agents)
 - [LangGraph — Persistence](https://docs.langchain.com/oss/python/langgraph/persistence)
 - [LangGraph — Interrupts](https://docs.langchain.com/oss/python/langgraph/interrupts)
 - [LangGraph — Time travel](https://docs.langchain.com/oss/python/langgraph/use-time-travel)

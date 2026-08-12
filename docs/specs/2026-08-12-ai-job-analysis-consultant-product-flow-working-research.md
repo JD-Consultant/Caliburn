@@ -101,9 +101,10 @@
 
 ### 2.9 Reference challenge 要記得員工裁決，但不永久化所有檢索命中
 
+- 第一版 Reference 內容只使用 repo 已有的 iCAP 資產；不納入 O*NET、一般網路搜尋、公司文件、表單或既有 JD，也不把這些列為本輪延後需求。
 - 一般檢索命中只是技術候選；只有真正被拿來詢問員工、影響訪談焦點／Proposal，或形成 coverage 判斷的內容，才成為持久的 Reference challenge。
 - challenge 要保留被挑戰的工作範圍、提出原因、來源／版本／引用、員工回答連結、match／partial／no-match／conflict／unknown／deferred 裁決，以及後續是否仍有效。
-- 同一個語意主張即使出現在多個來源，也只問一次；來源可以增加，但不得把同義公版內容包裝成新的問題反覆詢問。
+- 同一個語意主張即使出現在多個 iCAP 片段，也只問一次；支持片段可以增加，但不得把同義公版內容包裝成新的問題反覆詢問。
 - `no-match`、拒絕與其他已裁決結果必須被記住；沒有新員工 evidence、實質來源變更或工作邊界改變時，不得只因重跑檢索、更換模型／embedding 或分數變動而重開。
 - Reference challenge 的裁決仍不是 Current JD；只有員工來源能改變 Work Model，只有 authority seam 能改變正式內容。
 
@@ -343,7 +344,7 @@ Work Model 是 AI 隨證據持續修正的分析層；員工不需要逐筆審�
 
 ### 3.9 Reference coverage challenge
 
-在已經有員工工作模型後，才以少量、按需的公版資料做 coverage challenge：
+在已經有員工工作模型後，AI 才以少量、按需的既有 iCAP 內容做 coverage challenge：
 
 - 是否漏掉常見但員工尚未談到的責任；
 - 是否有可以追問的 Output、Indicator、K/S 方向；
@@ -352,9 +353,11 @@ Work Model 是 AI 隨證據持續修正的分析層；員工不需要逐筆審�
 
 公版內容只產生參考候選、問題或差異，不自動成為員工的工作事實。
 
+這不是員工要操作的搜尋頁，也不是固定的 Reference 階段。主要顧問在盤點、Task／Duty 或 OPKS 訪談中判斷當下確實有補漏價值時，才按需查詢 iCAP，將命中內容改寫成一個中立問題；沒有明確價值就不查。員工可以回答、略過或稍後處理，但不需要自行挑選 iCAP 項目。
+
 產品不保存每個 RAG 命中作為正式分析狀態。只有當候選真的被呈現給員工、改變當前／後續焦點、影響 Proposal 或形成 coverage 結論時，才保存一筆可追溯的 challenge receipt。receipt 記住「問過什麼、為何問、依據哪個版本的來源、員工如何裁決」，並連回原始員工回答，不複製或改寫員工來源。
 
-同一 challenge 以「被挑戰的語意主張＋工作範圍」去重，不以 chunk id 或單一來源去重。多份公版資料可共同支持一次中立詢問；相關度、rerank 分數與來源數量都不會提高為員工事實。
+同一 challenge 以「被挑戰的語意主張＋工作範圍」去重，不以 chunk id 去重。多個 iCAP 片段可共同支持一次中立詢問；相關度、rerank 分數與片段數量都不會提高為員工事實。
 
 已裁決 challenge 原則上不重問。只有以下情況可重新開啟：
 
@@ -511,7 +514,7 @@ Task、Duty、OPKS 與 Proposal 的狀態不能全部壓成一個總分。例如
 | 待訪談清單的來源、狀態、最近更新、暫停／恢復 | 保留並擴充 | 改為跨 Story、Work Unit、Task、Duty、OPKS gap、矛盾與 Proposal 的 agenda projection，不建立第二份 authority store |
 | 候選區與正式 JD 分離；可接受、修改、拒絕、退回補訪 | 保留並對齊 Proposal seam | 符合員工 authority；Proposal 採有意義檢查點與 dependency-aware changeset |
 | 右側 JD 可直接編輯、排序與重新啟動訪談 | 保留 | 員工直接編輯與 AI Proposal 都回到同一 authority seam |
-| Reference 不直接定義員工工作 | 保留並改成 blind-first | 員工可主動搜尋／略過；AI 預設在已有 employee-first work model 後才做 just-in-time coverage challenge |
+| Reference 不直接定義員工工作 | 保留並改成 blind-first | 員工不需操作檢索；AI 預設在已有 employee-first work model 後才按需查詢現有 iCAP，形成 just-in-time coverage challenge，員工可略過 |
 | 「骨架／Duty／Task／OPKS」狀態機 | 改寫 | 僅作可見的 focus／attention mode 與 durable checkpoint，不限制當輪可載入哪些 Skills，也不是資料生命週期通關門 |
 | 完成條件與狀態提示 | 改寫 | 從固定階段完成改成 focus sufficiency、global readiness、具體 gap 與 terminal reason |
 | 新線索先保存、不任意打斷 | 改寫 | 一般線索先停放；會推翻 Task 邊界、本人責任或重大結論者必須先澄清，並保存返回點 |
@@ -555,9 +558,9 @@ owner 提到「公版 RAG 讓 LLM 知道可以問什麼方向」，需拆成兩�
 
 Skill 採 progressive disclosure：平時只保留短名稱與用途，當輪命中才載入完整方法。這解決的是方法 prompt 膨脹；當輪需要哪些員工原話、工作狀態與 Reference，仍是 Context Engine 的另一個問題。
 
-### 6.2 後段按需使用：職業／產業公版內容
+### 6.2 有初步工作模型後按需使用：既有 iCAP 內容
 
-例如 iCAP、O*NET、公司 SOP、表單、既有 JD 或產業資料。它們可以：
+第一版只使用 repo 已有的 iCAP 資產，不新增其他公版、一般網路搜尋或公司文件來源。iCAP 可以：
 
 - 協助回憶；
 - 做 coverage challenge；
@@ -573,7 +576,7 @@ Skill 採 progressive disclosure：平時只保留短名稱與用途，當輪命
 - 把「公版常見」說成「員工本人負責」；
 - 一次整包塞入每輪 context。
 
-技術上是否使用向量檢索、hybrid search、MCP 或其他 RAG framework，等產品流程與來源政策核准後再決定。
+主要顧問自行判斷當下是否需要查詢，員工不必進入獨立搜尋流程或手動挑選 iCAP。查詢可以發生在 Task、Duty、O、P、K、S 或收尾 coverage 檢查中，但不是每輪必做，也不是固定階段。
 
 ## 7. 記憶責任、權威分層與 Context Engine v0.2
 
@@ -617,14 +620,14 @@ Skill 採 progressive disclosure：平時只保留短名稱與用途，當輪命
 
 ### 7.5 Reference 是獨立知識來源，不是第五種員工事實
 
-iCAP、O*NET、公司 SOP、表單、既有 JD 與產業資料保存自己的來源、版本、片段與 citation。它們可以支持 coverage challenge、術語與追問，但不能和員工原話混成同一 evidence authority，也不能因檢索相關度高就直接提高為工作事實。
+第一版 Reference lane 只包含既有 iCAP 內容，並保存其來源、版本、片段與 citation。iCAP 可以支持 coverage challenge、術語與追問，但不能和員工原話混成同一 evidence authority，也不能因檢索相關度高就直接提高為工作事實。O*NET、一般網路搜尋、公司文件、表單與既有 JD 不在目前需求範圍，也不預先列為 backlog。
 
 Reference 記憶分成兩種不同用途：
 
 1. **檢索技術軌跡**：query、候選來源、實際送入模型的片段與排序等可放在 bounded run trace／ContextManifest，供重播、成本與除錯使用；它不是 Work Model 或正式分析結論，也不要求所有命中永久留在產品狀態。
 2. **具產品意義的 challenge receipt**：只有被拿來詢問、改變議程／Proposal 或形成 coverage 裁決的候選才持久保存。它連結來源版本、challenge fingerprint、目標範圍、提出理由、員工 source event、裁決與生命週期。
 
-receipt 的裁決歷史採追加與 supersession，不以覆寫抹除員工先前說法；員工更正時保留舊裁決與新 evidence 的關係。同一 challenge 可掛多個來源，但不能因新增近義來源而繞過已存在的 no-match／拒絕紀錄。來源彼此衝突時也不合併成一個假共識，而是保留各自版本並在有實質影響時中立詢問。
+receipt 的裁決歷史採追加與 supersession，不以覆寫抹除員工先前說法；員工更正時保留舊裁決與新 evidence 的關係。同一 challenge 可掛多個 iCAP 片段或版本，但不能因另一個近義片段而繞過已存在的 no-match／拒絕紀錄。不同片段或版本有實質衝突時不合併成假共識，而是保留差異並在確有影響時中立詢問。
 
 ### 7.6 摘要、embedding 與模型 reasoning 都不是 authority
 
@@ -1094,6 +1097,5 @@ Stakeholder 草稿（非權威，只作需求來源）：
 - [U.S. OPM — Job Analysis](https://www.opm.gov/policy-data-oversight/assessment-and-selection/job-analysis/)
 - [U.S. OPM — Job analysis evidence and methodology FAQ](https://www.opm.gov/frequently-asked-questions/assessment-policy-faq/job-analysis/when-conducting-a-job-analysis-do-i-have-to-collect-ratings-eg-importance-required-at-entry-from-the-subject-matter-experts-sme-for-the-tasks-and-competencies/)
 - [U.S. OPM — Six Steps to Conducting a Job Analysis for Multiple Grades](https://www.opm.gov/policy-data-oversight/assessment-and-selection/job-analysis/six-steps-to-conducting-a-job-analysis-for-multiple-grades/)
-- [O*NET Resource Center — Data Collection Overview](https://www.onetcenter.org/content.html/dataCollection.html)
 - [iCAP — 職能發展及應用推動要點（職能基準審查與更新）](https://icap.wda.gov.tw/Quality/quality_specification.aspx)
 - [NIST — AI Risk Management Framework Core](https://airc.nist.gov/airmf-resources/airmf/5-sec-core/)

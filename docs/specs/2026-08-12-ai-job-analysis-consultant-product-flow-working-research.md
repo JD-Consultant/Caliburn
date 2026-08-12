@@ -99,6 +99,14 @@
 - application 決定 scope、工具權限、最大步數、token／時間／成本與停止規則；不得讓模型自由無限循環。
 - 員工只看到一個連貫結果、必要 Proposal 與一個主要問題；內部 Manifest 可供重播與除錯，但不把 chain-of-thought 當成產品輸出。
 
+### 2.9 Reference challenge 要記得員工裁決，但不永久化所有檢索命中
+
+- 一般檢索命中只是技術候選；只有真正被拿來詢問員工、影響訪談焦點／Proposal，或形成 coverage 判斷的內容，才成為持久的 Reference challenge。
+- challenge 要保留被挑戰的工作範圍、提出原因、來源／版本／引用、員工回答連結、match／partial／no-match／conflict／unknown／deferred 裁決，以及後續是否仍有效。
+- 同一個語意主張即使出現在多個來源，也只問一次；來源可以增加，但不得把同義公版內容包裝成新的問題反覆詢問。
+- `no-match`、拒絕與其他已裁決結果必須被記住；沒有新員工 evidence、實質來源變更或工作邊界改變時，不得只因重跑檢索、更換模型／embedding 或分數變動而重開。
+- Reference challenge 的裁決仍不是 Current JD；只有員工來源能改變 Work Model，只有 authority seam 能改變正式內容。
+
 ## 3. 白話產品流程 v0.1
 
 ### 3.1 開始或恢復
@@ -343,6 +351,20 @@ Work Model 是 AI 隨證據持續修正的分析層；員工不需要逐筆審�
 - 是否需要中立追問，而不是直接採用公版答案。
 
 公版內容只產生參考候選、問題或差異，不自動成為員工的工作事實。
+
+產品不保存每個 RAG 命中作為正式分析狀態。只有當候選真的被呈現給員工、改變當前／後續焦點、影響 Proposal 或形成 coverage 結論時，才保存一筆可追溯的 challenge receipt。receipt 記住「問過什麼、為何問、依據哪個版本的來源、員工如何裁決」，並連回原始員工回答，不複製或改寫員工來源。
+
+同一 challenge 以「被挑戰的語意主張＋工作範圍」去重，不以 chunk id 或單一來源去重。多份公版資料可共同支持一次中立詢問；相關度、rerank 分數與來源數量都不會提高為員工事實。
+
+已裁決 challenge 原則上不重問。只有以下情況可重新開啟：
+
+- 新的員工 evidence 會實質改變先前裁決；
+- Task／Duty／OPKS 邊界、歸屬或責任範圍改變；
+- 員工主動要求重查；
+- 原本是 unknown／deferred，且現在進入適合確認的焦點；
+- 來源內容或版本真的改變了被挑戰的主張。
+
+單純更換模型、embedding、reranker、索引，或檢索排名改變，不構成重開理由。來源版本更新只先形成「可能過期」狀態；確認相關主張有實質差異後才重問，不能每次資料更新都打擾員工。
 
 ### 3.10 收尾與匯出
 
@@ -596,6 +618,13 @@ Skill 採 progressive disclosure：平時只保留短名稱與用途，當輪命
 ### 7.5 Reference 是獨立知識來源，不是第五種員工事實
 
 iCAP、O*NET、公司 SOP、表單、既有 JD 與產業資料保存自己的來源、版本、片段與 citation。它們可以支持 coverage challenge、術語與追問，但不能和員工原話混成同一 evidence authority，也不能因檢索相關度高就直接提高為工作事實。
+
+Reference 記憶分成兩種不同用途：
+
+1. **檢索技術軌跡**：query、候選來源、實際送入模型的片段與排序等可放在 bounded run trace／ContextManifest，供重播、成本與除錯使用；它不是 Work Model 或正式分析結論，也不要求所有命中永久留在產品狀態。
+2. **具產品意義的 challenge receipt**：只有被拿來詢問、改變議程／Proposal 或形成 coverage 裁決的候選才持久保存。它連結來源版本、challenge fingerprint、目標範圍、提出理由、員工 source event、裁決與生命週期。
+
+receipt 的裁決歷史採追加與 supersession，不以覆寫抹除員工先前說法；員工更正時保留舊裁決與新 evidence 的關係。同一 challenge 可掛多個來源，但不能因新增近義來源而繞過已存在的 no-match／拒絕紀錄。來源彼此衝突時也不合併成一個假共識，而是保留各自版本並在有實質影響時中立詢問。
 
 ### 7.6 摘要、embedding 與模型 reasoning 都不是 authority
 
@@ -950,9 +979,9 @@ Microsoft Agent Framework 保留為追蹤候選；OpenAI、Google、Anthropic SD
 
 ### 8.5 Reference 錨定
 
-風險：公版文字專業完整，使 AI 與員工把「可能有」誤認成「本人有」。
+風險：公版文字專業完整，使 AI 與員工把「可能有」誤認成「本人有」；若每個檢索命中都成為持久狀態，還會造成重複詢問、來源噪音與假權威。
 
-方向：blind-first；Reference 分 lane；先顯示差異與中立問題；公版來源永遠不自動提高事實權威。
+方向：blind-first；Reference 分 lane；先顯示差異與中立問題；只持久化有產品影響的 challenge receipt；以語意主張與工作範圍去重；公版來源永遠不自動提高事實權威。
 
 ### 8.6 假進度與假完成
 
@@ -1018,6 +1047,7 @@ Stakeholder 草稿（非權威，只作需求來源）：
 - [OpenAI Docs — Compaction](https://developers.openai.com/api/docs/guides/compaction)
 - [OpenAI Docs — Counting tokens](https://developers.openai.com/api/docs/guides/token-counting)
 - [OpenAI Docs — Prompt caching](https://developers.openai.com/api/docs/guides/prompt-caching)
+- [OpenAI Docs — File Search（citation、結果顯式 include、metadata filter）](https://developers.openai.com/api/docs/guides/tools-file-search)
 - [OpenAI Docs — Skills](https://developers.openai.com/api/docs/guides/tools-skills)
 - [OpenAI Docs — Tool search](https://developers.openai.com/api/docs/guides/tools-tool-search)
 - [Google — Why we built ADK 2.0](https://developers.googleblog.com/en/why-we-built-adk-20/)
@@ -1056,10 +1086,14 @@ Stakeholder 草稿（非權威，只作需求來源）：
 - [Microsoft HAX — Guidelines for Human-AI Interaction](https://www.microsoft.com/en-us/haxtoolkit/ai-guidelines/)
 - [Microsoft HAX — Time services based on context](https://www.microsoft.com/en-us/haxtoolkit/guideline/time-services-based-on-context/)
 - [Microsoft HAX — Support efficient correction](https://www.microsoft.com/en-us/haxtoolkit/guideline/support-efficient-correction/)
+- [Microsoft HAX — Remember recent interactions](https://www.microsoft.com/en-us/haxtoolkit/guideline/remember-recent-interactions/)
 - [Microsoft HAX — Make clear why the system did what it did](https://www.microsoft.com/en-us/haxtoolkit/guideline/make-clear-why-the-system-did-what-it-did/)
 - [Microsoft HAX — Convey the consequences of user actions](https://www.microsoft.com/en-us/haxtoolkit/guideline/convey-the-consequences-of-user-actions/)
 - [Microsoft — Adaptive Cards for agent design](https://learn.microsoft.com/en-us/agents/design-guidelines/adaptive-cards-for-agent-design)
 - [Apple HIG — Generative AI](https://developer.apple.com/design/human-interface-guidelines/generative-ai)
 - [U.S. OPM — Job Analysis](https://www.opm.gov/policy-data-oversight/assessment-and-selection/job-analysis/)
+- [U.S. OPM — Job analysis evidence and methodology FAQ](https://www.opm.gov/frequently-asked-questions/assessment-policy-faq/job-analysis/when-conducting-a-job-analysis-do-i-have-to-collect-ratings-eg-importance-required-at-entry-from-the-subject-matter-experts-sme-for-the-tasks-and-competencies/)
 - [U.S. OPM — Six Steps to Conducting a Job Analysis for Multiple Grades](https://www.opm.gov/policy-data-oversight/assessment-and-selection/job-analysis/six-steps-to-conducting-a-job-analysis-for-multiple-grades/)
 - [O*NET Resource Center — Data Collection Overview](https://www.onetcenter.org/content.html/dataCollection.html)
+- [iCAP — 職能發展及應用推動要點（職能基準審查與更新）](https://icap.wda.gov.tw/Quality/quality_specification.aspx)
+- [NIST — AI Risk Management Framework Core](https://airc.nist.gov/airmf-resources/airmf/5-sec-core/)

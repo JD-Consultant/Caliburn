@@ -266,6 +266,35 @@ Work Model 是 AI 隨證據持續修正的分析層；員工不需要逐筆審�
 
 因此產品不設「核准整份 Work Model」，也不每回合跳 modal。理解校準是防止 AI 假說漂移的可見修正點；Proposal 才是改變 Current JD 的 authority gate。
 
+#### 3.7.3 「目前理解」採常駐投影＋情境式校準卡（已確認）
+
+員工不應只能從長對話猜 AI 目前怎麼理解，也不應被迫在每一輪停下來審核。第一版採兩層互動：
+
+1. **常駐但不打斷的「AI 目前理解」側欄**：跟著目前焦點更新，可收合；窄畫面改成可隨時叫出的 drawer。它是 Work Model 的可讀投影，不是第二份資料、不是核准清單，也不等於 Current JD。
+2. **只在 §3.7.2 trigger 發生時出現的校準卡**：預設放在對話流內，不用 modal；只有受未決前提影響的分析 branch 需要阻擋時，才要求先處理。
+
+側欄預設只顯示與員工當前任務有關的高訊號內容：
+
+- 目前焦點、為何現在談這件事，以及「探索中／需要釐清／足以形成提案／受未決前提阻擋」等可行動狀態；
+- 2–4 點白話的目前理解，必要時顯示 Task／Duty／OPKS 關係；
+- 最重要的未確定、矛盾與尚未訪談項目，超過上限只顯示數量並可展開；
+- 本輪先保存、稍後再談的新線索或其他 Task；
+- 可展開的來源與最後更新時間，員工原話和 Reference 必須分開；
+- 一個隨時可用的「修正目前理解」入口。
+
+不要顯示沒有經過產品驗證的 LLM 數字信心或假精確的完成百分比。改用有明確資料語意的標籤，例如「員工已確認」、「依員工說法暫定理解」、「只有 Reference、尚未向員工確認」、「來源矛盾」與「尚未訪談」。最後更新也不得偽裝成最後確認。
+
+校準卡預設只顯示**自上次校準後有意義的變化**及其影響，不重複整份 Work Model。它至少要說明：
+
+- AI 新增、修正或不再採用哪一項理解；
+- 依據哪些員工原話或 Reference，以及為何現在需要確認；
+- 若不處理，哪個下一步、Duty grouping、OPKS 或 Proposal 會依賴它；
+- 「正確，繼續」、「直接修正」、「目前不確定／稍後再談」三種固定動作。
+
+一般焦點切換、久後恢復或大幅修訂屬 soft checkpoint：員工可略過、稍後處理，AI 保存未校準狀態與返回點。矛盾、高風險責任邊界或結構性 Proposal 的必要前提屬 branch-blocking checkpoint：只暫停依賴它的分析，不封鎖整份文件。相同內容未變時不得重複跳卡；相關變更應合併呈現，員工主動要求則不受節流限制。
+
+員工修正後，介面要立即回報「已更新什麼、哪些後續分析會重算、Current JD 是否仍未改變」，並同步刷新側欄。這是對修正效果的可見回饋，不是揭露模型 chain-of-thought；解釋只提供來源、重要推論與影響。所有 action payload 都視為不可信輸入，由 server 依 document、revision、generation／read-set 與 domain invariant 驗證。
+
 ### 3.8 O／P／K／S 按需漸進分析
 
 不需要等 Task 已穩定、已被員工接受或已進入 Current JD，才開始看 O／P／K／S。只要目前的工作故事、Work Unit 或 Task hypothesis 已出現足以分析某一軸的證據，顧問就能按需載入該 Skill；沒有需要時不載入，也不是每回合都分析 OPKS。
@@ -784,6 +813,39 @@ application／framework 應自行產生並保存 operation ID、event ID、時�
 
 Microsoft Agent Framework 保留為追蹤候選；OpenAI、Google、Anthropic SDK 作 provider 能力與介面 conformance 來源，不以它們的託管 session 取代 current-only 本地 authority。若第一版每輪都是短而原子的 request／response，PydanticAI 路徑可能更省；若很快需要跨請求的多步中斷、可編輯 state、分支與恢復，LangGraph 的收益才會明顯高於薄型 orchestration。
 
+### 7.18 「目前理解」UI 與 agent-interface 框架調查（2026-08-12）
+
+這次調查以仍在維護的 Microsoft HAX、Google PAIR v2、Apple HIG，以及 2026 年的 OpenAI ChatKit、Google A2UI、Microsoft Agent Framework／AG-UI 與 LangGraph frontend 為主。HAX 的原始研究較早，但目前仍由 Microsoft 維護並提供近期 GenAI 產品案例；因此用它作經驗證的人機互動原則，再用較新的官方 UI／protocol 文件確認技術趨勢，不把單一廠商元件當成產品需求。
+
+官方資料共同支持的方向如下：
+
+- Microsoft HAX 要求依使用者當前工作決定何時打斷、只顯示情境相關資訊，並讓錯誤理解容易忽略、修正或復原；解釋應按需要提供，過多解釋反而可能造成過度信任。
+- Google PAIR v2 建議說明 AI 使用了哪些來源、把解釋連到當下行動、以 progressive disclosure 提供更多細節，並在收到回饋後說明它何時、如何改變體驗；其官方也提醒數字 confidence 容易被誤解，只有在能改善決策且經使用者研究後才適合顯示。
+- Apple HIG 要求保留人的控制權，把 Edit／Undo／Retry／Adjust 放在生成內容附近，並在修正生效後給清楚回饋；回饋入口應容易找到但不打斷工作。
+- OpenAI 最新 model guidance 要求集中定義 autonomy／approval boundary，讓安全範圍內工作持續進行，避免重複「先詢問」造成不必要停頓。ChatKit 已提供 card、可收合內容、editable text、form、confirm／cancel、型別化 action 與 server handler，證明結構化校準卡不必退回純對話文字；官方同時要求 server 把 client action 當不可信資料。
+- OPM 的職務分析流程要求 preliminary task／competency 保留來源，並由 SME 評定 task 的重要性、頻率與 linkage。這支持在重大語意與結構節點向員工校準，但不支持把每個中間假說都變成正式核准。
+
+#### 可借用的 UI／protocol 候選
+
+| 候選 | 已提供能力 | 適配判斷 |
+|---|---|---|
+| 現有 Next／React＋framework-neutral typed contract | 完全控制固定側欄、校準卡、來源展開、revision 與無障礙；可直接沿用現行契約與 authority seam | **第一版建議**。元件少且語意固定，沒有必要先引入新的 agent UI protocol；代價是自行寫少量 presentation 與 action glue |
+| LangGraph frontend `useStream`／HITL | interrupt payload、durable pause／resume、React 等 client hook；review card 可放 transcript、queue、dashboard 或 modal，也支援 edit／respond 與自訂表單 | 若 runtime 選 LangGraph，最值得直接借用；仍由 Caliburn 渲染 `UnderstandingCheckpoint`，不可把通用 approval card 當成 Work Model／Proposal 語意 |
+| OpenAI ChatKit widgets／actions | card、list、badge、editable text、form、typed action、server/client handler 與 loading state | 元件形狀符合，但綁 ChatKit／OpenAI conversation surface，且常駐產品側欄仍需自訂；不值得只為一張卡提高 provider／UI lock-in，可作 contract 與互動範例 |
+| AG-UI＋CopilotKit／Microsoft Agent Framework | SSE、HITL、shared state、custom／generative UI、前後端 tool calling；Microsoft 2026 官方整合已支援 Python FastAPI，但目前安裝指令仍帶 `--pre` | 適合 agent 以遠端服務供多個 client、需要跨框架 state sync 時。Caliburn 是本機單一 Web 產品，現在引入會增加第二套 session／state protocol、authority 對映與 preview 成熟度風險，先不採用 |
+| Google A2UI 0.9 | declarative JSON、受信任元件 catalog、incremental update、React renderer、client-defined validation 與多 transport | 是 2026 年重要趨勢，但仍是 pre-1.0，主要解決跨 agent／跨平台的動態 generative UI。Caliburn 的核心校準 UI 應固定且可審查，不需要讓 LLM 自由組版；目前只借用「白名單元件、資料與呈現分離、增量更新」原則 |
+| Microsoft Adaptive Cards | JSON card、跨 host responsive rendering、inputs／actions、視覺層級與 progressive disclosure 指南 | 適合 Teams／Outlook／M365 多 host；目前不是 Caliburn 的部署面。可借設計原則，不引入 runtime |
+
+#### 收斂後的第一版邊界
+
+先定義三個 framework-neutral 契約，再由現有 Web 原生元件呈現：
+
+1. `UnderstandingProjection`：由 application 依 Work Model、來源、Current JD 與 workflow state 組裝側欄；status、source type、revision 與 blocked reason 不由 LLM 自報。
+2. `UnderstandingCheckpoint`：由 deterministic trigger policy 產生 soft／branch-blocking 校準請求，攜帶變更摘要、source refs、受影響範圍與允許動作。
+3. `UnderstandingCorrection`：員工的確認、修正或稍後處理命令；server 驗證 revision 後保存 durable source event，再由 reducer 重算。
+
+若之後 conformance spike 選定 LangGraph，可把 `UnderstandingCheckpoint` 映射到 interrupt／`useStream`；若未來真的出現多 client、remote agent 或大量動態表單，再評估 AG-UI／A2UI。這樣跟上「declarative、typed、trusted component、server-validated action」的主流方向，又不為尚未存在的跨平台需求提早付出協定與狀態同步成本。
+
 ## 8. 已識別的流程風險與優化方向
 
 ### 8.1 焦點隧道效應
@@ -860,6 +922,8 @@ Stakeholder 草稿（非權威，只作需求來源）：
 - [Anthropic — Contextual Retrieval](https://www.anthropic.com/engineering/contextual-retrieval)
 - [Anthropic — Equipping agents for the real world with Agent Skills](https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills)
 - [OpenAI Docs — Model guidance（lean prompts、relevant tools、approval boundaries）](https://developers.openai.com/api/docs/guides/latest-model)
+- [OpenAI Docs — ChatKit widgets](https://developers.openai.com/api/docs/guides/chatkit-widgets)
+- [OpenAI Docs — ChatKit actions](https://developers.openai.com/api/docs/guides/chatkit-actions)
 - [OpenAI Docs — Results and state](https://developers.openai.com/api/docs/guides/agents/results)
 - [OpenAI Docs — Guardrails and human review](https://developers.openai.com/api/docs/guides/agents/guardrails-approvals)
 - [OpenAI Docs — Structured model outputs](https://developers.openai.com/api/docs/guides/structured-outputs)
@@ -873,6 +937,11 @@ Stakeholder 草稿（非權威，只作需求來源）：
 - [Google — Why we built ADK 2.0](https://developers.googleblog.com/en/why-we-built-adk-20/)
 - [Google — Build long-running AI agents that pause, resume, and never lose context with ADK](https://developers.googleblog.com/build-long-running-ai-agents-that-pause-resume-and-never-lose-context-with-adk/)
 - [Google — Developer's Guide to Building ADK Agents with Skills](https://developers.googleblog.com/en/developers-guide-to-building-adk-agents-with-skills/)
+- [Google — Introducing A2UI](https://developers.googleblog.com/en/introducing-a2ui-an-open-project-for-agent-driven-interfaces/)
+- [Google — A2UI v0.9](https://developers.googleblog.com/en/a2ui-v0-9-generative-ui/)
+- [Google PAIR v2 — Mental Models](https://pair.withgoogle.com/guidebook-v2/chapter/mental-models/)
+- [Google PAIR v2 — Explainability + Trust](https://pair.withgoogle.com/guidebook-v2/chapter/explainability-trust/)
+- [Google PAIR v2 — Feedback + Control](https://pair.withgoogle.com/guidebook-v2/chapter/feedback-controls/)
 - [Google ADK — Session](https://adk.dev/sessions/session/)
 - [Google ADK — Human input for graph workflows](https://adk.dev/graphs/human-input/)
 - [Google ADK — State](https://adk.dev/sessions/state/)
@@ -884,11 +953,21 @@ Stakeholder 草稿（非權威，只作需求來源）：
 - [LangGraph — Persistence](https://docs.langchain.com/oss/python/langgraph/persistence)
 - [LangGraph — Interrupts](https://docs.langchain.com/oss/python/langgraph/interrupts)
 - [LangGraph — Time travel](https://docs.langchain.com/oss/python/langgraph/use-time-travel)
+- [LangGraph frontend — Human-in-the-loop](https://docs.langchain.com/oss/python/langchain/frontend/human-in-the-loop)
 - [LangChain — Context engineering in agents](https://docs.langchain.com/oss/python/langchain/context-engineering)
 - [LangChain — Short-term memory](https://docs.langchain.com/oss/python/langchain/short-term-memory)
 - [LangChain — Memory overview](https://docs.langchain.com/oss/python/concepts/memory)
 - [PydanticAI — Deferred tools and human-in-the-loop approval](https://pydantic.dev/docs/ai/tools-toolsets/deferred-tools/)
 - [Microsoft — Agent Framework overview](https://learn.microsoft.com/en-us/agent-framework/overview/)
 - [Microsoft — Agent Framework workflows human-in-the-loop](https://learn.microsoft.com/en-us/agent-framework/workflows/human-in-the-loop)
+- [Microsoft — Agent Framework AG-UI integration](https://learn.microsoft.com/en-us/agent-framework/integrations/by-component/ui/ag-ui/)
+- [Microsoft HAX — Guidelines for Human-AI Interaction](https://www.microsoft.com/en-us/haxtoolkit/ai-guidelines/)
+- [Microsoft HAX — Time services based on context](https://www.microsoft.com/en-us/haxtoolkit/guideline/time-services-based-on-context/)
+- [Microsoft HAX — Support efficient correction](https://www.microsoft.com/en-us/haxtoolkit/guideline/support-efficient-correction/)
+- [Microsoft HAX — Make clear why the system did what it did](https://www.microsoft.com/en-us/haxtoolkit/guideline/make-clear-why-the-system-did-what-it-did/)
+- [Microsoft HAX — Convey the consequences of user actions](https://www.microsoft.com/en-us/haxtoolkit/guideline/convey-the-consequences-of-user-actions/)
+- [Microsoft — Adaptive Cards for agent design](https://learn.microsoft.com/en-us/agents/design-guidelines/adaptive-cards-for-agent-design)
+- [Apple HIG — Generative AI](https://developer.apple.com/design/human-interface-guidelines/generative-ai)
 - [U.S. OPM — Job Analysis](https://www.opm.gov/policy-data-oversight/assessment-and-selection/job-analysis/)
+- [U.S. OPM — Six Steps to Conducting a Job Analysis for Multiple Grades](https://www.opm.gov/policy-data-oversight/assessment-and-selection/job-analysis/six-steps-to-conducting-a-job-analysis-for-multiple-grades/)
 - [O*NET Resource Center — Data Collection Overview](https://www.onetcenter.org/content.html/dataCollection.html)

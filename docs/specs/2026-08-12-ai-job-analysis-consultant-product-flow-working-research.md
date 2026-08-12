@@ -237,6 +237,35 @@ Proposal 採「有意義檢查點」節奏，不採每句回答都要求核准�
 
 UI 與進度投影應說明「哪個分析目前被什麼未決前提擋住」，而不是只顯示一個無法理解的全域 blocked 狀態。
 
+#### 3.7.2 Work Model 採觸發式理解校準，不把每次假說更新變成核准（已確認）
+
+Work Model 是 AI 隨證據持續修正的分析層；員工不需要逐筆審核每一個內部假說變化。但若 AI 長時間在錯誤理解上繼續追問，後面的焦點、Duty grouping、OPKS 與 Proposal 都可能一起偏掉。因此產品需要「理解校準」，但它和正式 Proposal 是兩種不同的互動。
+
+平常的低影響 Work Model 更新可以在背景累積，並在畫面上隨時可查看；只有下列有意義時機才由 AI 主動顯示校準卡：
+
+- 準備收束或切換目前焦點；
+- 即將提出結構性 Proposal，或後續問題將依賴某個尚未校準的工作假說；
+- 新回答與既有理解矛盾，或涉及本人／他人責任、決策權、低頻高影響工作等高風險邊界；
+- 暫停較久後恢復，或 Work Model 自上次向員工顯示後已有重大修訂；
+- 員工主動要求查看或修正 AI 的目前理解。
+
+校準卡應以員工看得懂的白話呈現，而不是暴露內部 schema：
+
+- 現在談的是什麼、AI 為何這樣理解；
+- 一段簡短的目前理解，必要時列出 Task／Duty／OPKS 關係；
+- 可展開的員工原話與 Reference 來源，並清楚區分兩者；
+- 仍不確定、互相衝突或尚未訪談的部分；
+- AI 建議的下一步，以及這張卡所依據的 Work Model revision。
+
+員工至少可以選擇「正確，繼續」、「直接修正」與「目前不確定／稍後再談」。其語意必須固定：
+
+- 「正確」形成員工確認的來源事件，可提高或補強 Work Model，但**不等於接受正式 JD 變更**；
+- 「直接修正」保存新的 durable employee source，由 reducer 修正、反駁或取代相關假說；若因此需要改 Current JD，另行形成 Proposal；
+- 「目前不確定」保留明確 gap 或返回點，不得被解讀為肯定或否定；
+- 提交時若 Work Model revision 已過期，應重新組裝校準內容，不把對舊理解的回覆套到新狀態。
+
+因此產品不設「核准整份 Work Model」，也不每回合跳 modal。理解校準是防止 AI 假說漂移的可見修正點；Proposal 才是改變 Current JD 的 authority gate。
+
 ### 3.8 O／P／K／S 按需漸進分析
 
 不需要等 Task 已穩定、已被員工接受或已進入 Current JD，才開始看 O／P／K／S。只要目前的工作故事、Work Unit 或 Task hypothesis 已出現足以分析某一軸的證據，顧問就能按需載入該 Skill；沒有需要時不載入，也不是每回合都分析 OPKS。
@@ -298,7 +327,7 @@ UI 與進度投影應說明「哪個分析目前被什麼未決前提擋住」�
 
 1. **先建立工作地圖。** AI 請員工用自己的話說明一個月內主要工作，不要求 JD 用語。員工提到請購下單、供應商交期、缺料協調與偶爾整理庫存報表後，AI 顯示「目前已知四個工作範圍」，並說明先深入請購到下單的原因。
 2. **專注但不漏線索。** 員工在下單故事中順帶提到新供應商評估與替代料；AI 把兩者顯示為稍後處理線索，仍用一個主要問題釐清下單責任，不立即換題。
-3. **先理解，後提案。** AI 經數輪確認主管核准邊界、採購單內容與供應商回覆後，才提出 Task、Output 與 Indicator 候選；第一句補充不會立即跳核准卡。
+3. **先理解，後提案。** AI 經數輪釐清主管核准邊界、採購單內容與供應商回覆，準備切換焦點前先用校準卡說明目前理解；員工可直接修正「交期只是追蹤，不是我決定」。修正先更新來源與 Work Model，證據足夠後才提出 Task、Output 與 Indicator 候選；第一句補充不會立即跳正式核准卡。
 4. **員工保留 authority。** 員工指出「不是每次都要比價」，AI 修正 Task 後再讓員工接受。若目前只有一個 Task，可以先不建立 Duty。
 5. **重大責任先澄清。** 訪談缺料處理時，員工說「決定哪些工單先拿到料」。因這可能改變正式權責，AI 暫停原焦點，確認員工只是提出建議、最後由生產主管決定，再回到原返回點。
 6. **結構隨證據演化。** 當已有下單、缺料協調、供應商績效三項 Task，AI 可提出兩個 Duty 與 Task reassignment 的結構變更組；員工能修改 Duty 名稱。可獨立成立的 K／S 候選仍可逐項決定，不因接受 Duty 就被迫全收。
@@ -727,6 +756,34 @@ application／framework 應自行產生並保存 operation ID、event ID、時�
 
 這項分離與外部主流做法一致：OpenAI 將 final output、history、interruptions 與 resumable state 分開，並區分 function calling 與 user-facing structured response；Anthropic 將 session 定義為 harness 外的 append-only event log，工具呼叫只代表模型提出結構化要求、由 application 執行；Google ADK 也把 event content、tool event 與 state delta 分開；LangGraph 則把 message stream、state snapshot、interrupt 與 final output 分開。這些框架只證明通用責任邊界，不替 Caliburn 決定職務分析語意與 authority。
 
+### 7.17 理解校準／可編輯假說的框架調查（2026-08-12）
+
+主流框架沒有一個現成功能叫做「專業職務分析的目前理解」，但已共同提供組成它的通用元件：顯式 state、可序列化的人工輸入請求、pause／resume、事件或 checkpoint 歷史，以及把人工回覆送回原流程。這證明 Caliburn 不必自行重寫整套 durable HITL runtime；同時也證明不能把框架的 approval 直接等同於員工核准 JD。
+
+| 候選 | 可直接借用的能力 | 對 Caliburn 的判斷 |
+|---|---|---|
+| LangGraph | `interrupt()` 可送出結構化 payload、暫停並保存 state；官方直接示範 review／edit state；checkpoints、`update_state` 與 time travel 保留舊路徑並可從修訂後狀態繼續 | **最接近理解校準的 runtime 形狀**。但 node resume 會從節點開頭重跑，前置副作用必須 idempotent；graph state 只能承接執行，不得成為第二份 Work Model 或 Current JD |
+| PydanticAI | model／provider abstraction、typed output、deferred tools、人工 approve／deny，且可覆寫待執行 tool arguments；外部 UI 可在取得結果後以 message history 與 correlation 繼續 | **較薄、較符合現有 Python／Pydantic 技術面的候選**。適合把「提交 Work Model correction／Proposal」建成 typed command；但 stop-the-world 是新的 agent run，不是通用 state review/checkpoint，durable 業務狀態仍要由 Caliburn 保存 |
+| Google ADK 2.0 | graph `RequestInput` 可攜帶 message、structured payload 與 response schema；Session 分 events 與可變 state；rewind 恢復 session state 且保留被 rewind 的事件供稽核 | 技術形狀相容，但 ADK 2.0 graph HITL 很新，且 Google 託管 runtime／memory 不符合本機預設邊界；目前只作設計對照，不構成換框架理由 |
+| OpenAI Agents SDK | approval interruption 與 resumable state 分離；run 暫停時回傳 interruptions＋state，人工決定後恢復同一 run | 適合 provider-specific tool approval，不能直接提供可編輯 Work Model；若作主 runtime 會提高 provider lock-in，較適合作 adapter 或 conformance 對照 |
+| Microsoft Agent Framework | provider clients、session、context providers、memory、middleware、graph workflows、typed request／response HITL 與 checkpoint；官方定位為 Semantic Kernel／AutoGen 的直接後繼 | 是 2026 年最新且功能完整的候選，但框架本身仍新；不能因功能表完整就優先遷移，需先證明 Python 成熟度、Postgres／本機適配與 authority seam 不重複 |
+| Anthropic SDK／Managed Agents | tool runner 處理 tool loop、conversation state 與 validation；需要自訂 HITL／logging 時使用 manual loop；Managed Agents 可把 tool 設為 `always_ask` | 支持「敏感副作用由人決定」與 structured notes／外部 memory，但沒有現成的可編輯 domain hypothesis workflow；不值得只為本功能綁定 Anthropic runtime |
+
+共同限制很明確：框架不知道何時一項 Work Model 變化「重要到必須讓員工看見」，也不知道員工更正應如何影響 Story、Task、Duty、OPKS、gap、agenda 與 Proposal。下列內容仍必須是 Caliburn 的 domain contract：
+
+- 理解校準的 trigger policy 與 blocking／non-blocking 規則；
+- `UnderstandingReview` 的 focus、摘要、uncertainty、source refs、next move 與 revision；
+- `WorkModelCorrection` 如何保存員工原話、supersede／rebut 舊假說並重算下游；
+- 校準與 Proposal／Current JD authority 的硬邊界；
+- stale revision、document isolation、generation／read-set 與原子提交。
+
+本輪建議不是立即全面導入框架，而是把上述 contract 保持 framework-neutral，第一個 conformance spike 只比較兩條最有價值的路徑：
+
+1. **PydanticAI＋既有 Postgres domain state**：驗證較薄 model／tool／typed-result 層能否承接校準與 Proposal 命令；
+2. **LangGraph interrupt＋Postgres domain state**：驗證 checkpoint／review-edit／resume 能否減少 orchestration 程式，又不產生第二份權威狀態。
+
+Microsoft Agent Framework 保留為追蹤候選；OpenAI、Google、Anthropic SDK 作 provider 能力與介面 conformance 來源，不以它們的託管 session 取代 current-only 本地 authority。若第一版每輪都是短而原子的 request／response，PydanticAI 路徑可能更省；若很快需要跨請求的多步中斷、可編輯 state、分支與恢復，LangGraph 的收益才會明顯高於薄型 orchestration。
+
 ## 8. 已識別的流程風險與優化方向
 
 ### 8.1 焦點隧道效應
@@ -797,11 +854,14 @@ Stakeholder 草稿（非權威，只作需求來源）：
 - [Anthropic — Effective context engineering for AI agents](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)
 - [Anthropic — Scaling Managed Agents: Decoupling the brain from the hands](https://www.anthropic.com/engineering/managed-agents)
 - [Anthropic Docs — How tool use works](https://platform.claude.com/docs/en/agents-and-tools/tool-use/how-tool-use-works)
+- [Anthropic Docs — Tool runner（自動 loop 與 custom HITL 邊界）](https://platform.claude.com/docs/en/agents-and-tools/tool-use/tool-runner)
+- [Anthropic Docs — Managed Agents permission policies](https://platform.claude.com/docs/en/managed-agents/permission-policies)
 - [Anthropic Docs — Structured outputs](https://platform.claude.com/docs/en/build-with-claude/structured-outputs)
 - [Anthropic — Contextual Retrieval](https://www.anthropic.com/engineering/contextual-retrieval)
 - [Anthropic — Equipping agents for the real world with Agent Skills](https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills)
 - [OpenAI Docs — Model guidance（lean prompts、relevant tools、approval boundaries）](https://developers.openai.com/api/docs/guides/latest-model)
 - [OpenAI Docs — Results and state](https://developers.openai.com/api/docs/guides/agents/results)
+- [OpenAI Docs — Guardrails and human review](https://developers.openai.com/api/docs/guides/agents/guardrails-approvals)
 - [OpenAI Docs — Structured model outputs](https://developers.openai.com/api/docs/guides/structured-outputs)
 - [OpenAI Docs — Function calling](https://developers.openai.com/api/docs/guides/function-calling)
 - [OpenAI Docs — Conversation state](https://developers.openai.com/api/docs/guides/conversation-state)
@@ -814,14 +874,21 @@ Stakeholder 草稿（非權威，只作需求來源）：
 - [Google — Build long-running AI agents that pause, resume, and never lose context with ADK](https://developers.googleblog.com/build-long-running-ai-agents-that-pause-resume-and-never-lose-context-with-adk/)
 - [Google — Developer's Guide to Building ADK Agents with Skills](https://developers.googleblog.com/en/developers-guide-to-building-adk-agents-with-skills/)
 - [Google ADK — Session](https://adk.dev/sessions/session/)
+- [Google ADK — Human input for graph workflows](https://adk.dev/graphs/human-input/)
+- [Google ADK — State](https://adk.dev/sessions/state/)
+- [Google ADK — Rewind sessions](https://adk.dev/sessions/session/rewind/)
 - [Google ADK — Events](https://adk.dev/events/)
 - [Google Cloud — Gemini Enterprise Agent Platform（Sessions、Memory Bank、evaluation、observability）](https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale)
 - [Google Cloud — Choose a design pattern for your agentic AI system](https://docs.cloud.google.com/architecture/choose-design-pattern-agentic-ai-system?hl=en)
 - [LangGraph — Overview](https://docs.langchain.com/oss/python/langgraph/overview)
 - [LangGraph — Persistence](https://docs.langchain.com/oss/python/langgraph/persistence)
 - [LangGraph — Interrupts](https://docs.langchain.com/oss/python/langgraph/interrupts)
+- [LangGraph — Time travel](https://docs.langchain.com/oss/python/langgraph/use-time-travel)
 - [LangChain — Context engineering in agents](https://docs.langchain.com/oss/python/langchain/context-engineering)
 - [LangChain — Short-term memory](https://docs.langchain.com/oss/python/langchain/short-term-memory)
 - [LangChain — Memory overview](https://docs.langchain.com/oss/python/concepts/memory)
+- [PydanticAI — Deferred tools and human-in-the-loop approval](https://pydantic.dev/docs/ai/tools-toolsets/deferred-tools/)
+- [Microsoft — Agent Framework overview](https://learn.microsoft.com/en-us/agent-framework/overview/)
+- [Microsoft — Agent Framework workflows human-in-the-loop](https://learn.microsoft.com/en-us/agent-framework/workflows/human-in-the-loop)
 - [U.S. OPM — Job Analysis](https://www.opm.gov/policy-data-oversight/assessment-and-selection/job-analysis/)
 - [O*NET Resource Center — Data Collection Overview](https://www.onetcenter.org/content.html/dataCollection.html)

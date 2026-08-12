@@ -87,7 +87,7 @@
 
 - 員工送出的回答先以穩定 input event／turn identity 保存為來源記憶，再交給 AI 分析；它不是等模型成功後才附帶寫入的欄位。
 - provider timeout、拒答、parse、schema 或 verifier 失敗時，該回答仍保留並標示尚未成功分析；員工不必重新輸入。
-- 重試必須沿用同一個 input event，不重複建立來源；失敗期間 Work Model、Proposal 與 Current JD 都不得改變。
+- 重試必須沿用同一個 input event，不重複建立來源；每次實際 provider 嘗試另有 attempt identity。失敗期間 Work Model、Proposal 與 Current JD 都不得改變，但已完成的 model／tool result、verification report 與成本等**執行證據**可以先成為可恢復 artifact，避免 crash 後盲目重打 provider。
 - 這項產品裁決取代 2026-07-30 最小完整迴圈中「模型失敗時 Journal 完全不變、只由 Web 保留草稿」的舊假設；實作前仍須以 ADR／plan 補齊交易、idempotency 與 migration 邊界。
 
 ### 2.8 一個員工回合可包含受限的內部工作，但仍由同一位顧問負責
@@ -129,6 +129,27 @@ Owner 已確認：保留 Source、Work Model、Proposal、Current JD、Task／Du
 - 目前推薦分層組合主流框架，而不是要求一套框架全包，也不以 big-bang event-sourcing／agent-platform 重寫作為預設路徑。
 
 因此產品流程仍是本文定義的顧問流程；framework 只能忠實承接它，不能因框架已有 `memory`、`state`、`approval` 或 `agent` 類別，就重新定義員工回合、資料權威、進度或正式修改權。
+
+### 2.12 一個員工回合採三層持久化，不把 network call 偽裝成資料庫交易（2026-08-13 審核後確認）
+
+本節把「員工原話先保存、衍生結果整包提交」說得更精確。它不是只有兩個模糊的 save，也不是把 provider call 包在長時間 PostgreSQL transaction 裡：
+
+1. **Source acceptance transaction**：先以 client／application 提供的穩定 `input_event_id` 保存員工原話、speaker、document scope、canonical payload hash 與 processing status，再回報「回答已保存」。相同 ID＋相同 hash 回既有結果；相同 ID＋不同 hash 是 idempotency conflict。
+2. **Execution durability**：transaction 外執行 Context、Skill、tool 與 model；每個不可免費重做的重要結果以 run／attempt checkpoint 或 immutable artifact 保存，例如 resolved model profile、ContextManifest、tool result、provider result、usage、parse／verification report。這些是恢復與診斷依據，不是 Work Model、Proposal 或 Current JD。
+3. **Semantic commit transaction**：deterministic application layer 把通過檢查的候選編成一份 `VerifiedCommitPlan`；再於單一 PostgreSQL transaction 中重讀 document、驗 generation／read-set，並一起寫入 Work Model delta、agenda／progress、durable Proposal、可見 consultant turn 與 idempotent result receipt。這批業務變更要嘛全部可見，要嘛全部 rollback；Current JD 仍完全不動。
+4. **Independent employee decision command**：員工日後接受、修改、退回、拒絕或延後 Proposal，是另一個有自己 idempotency／stale check 的 command；只有它能經 authority seam 改變 Current JD。正常 Proposal review 不依賴 consultant graph checkpoint 存活。
+
+因此「原子」描述的是**已驗證業務 CommitPlan 的資料庫可見性**，不是要求整個 LLM run 只有一次 commit。provider 已成功但 process 在 semantic commit 前崩潰時，恢復流程應讀取已保存的 provider／verification artifact；若 authority snapshot 仍相符，可以繼續 verify／commit，不應自動再付一次模型費。若 snapshot 已 stale，舊結果可保留作執行證據，但不得硬套到新 state，必須依 operation policy 重新組裝或重跑。
+
+模型輸出的逐項驗證與資料庫原子性也不是同一題。建議 verifier 產生 granular verdict 與 dependency：
+
+- envelope、document／speaker／source identity、authority boundary、read-set、跨項不變量、next question／visible response 所依賴的 finding 發生錯誤時，視為 fatal，整份 semantic commit 不成立；
+- 只有不被其他結果引用、也不影響員工可見回覆的附帶候選，才可被明確 drop／quarantine 並留下 reason code，其餘有效項目再組成 CommitPlan；
+- 第一版若尚未有穩定 dependency contract，寧可沿用整輪 fail-closed，不以猜測判斷「這個錯誤大概不重要」。先保存 granular report，之後有真實 failure evidence 再放寬，不必改寫權威模型。
+
+UI 只可在 semantic commit 成功後把 consultant turn 當正式本輪回覆；commit 前可以顯示「已保存／分析中／驗證中」等 processing status，但不可先把尚未驗證的串流文字當成已成立的分析。失敗時顯示「原話已保存、分析尚未完成」與可重試狀態，而不是要求員工重新輸入。
+
+這項分層符合多個官方來源的共同模式，但外部來源不替 Caliburn 決定 domain 語意：PostgreSQL 將 transaction 定義為多步驟 all-or-nothing；AWS 的 idempotent API 指引要求 caller-provided request ID，並指出去重紀錄、mutation 與結果應在同一 ACID operation 中一致提交；LangGraph 建議把 API call 放進可 checkpoint、可重播且 idempotent 的 task，保存已完成 task result 以免 resume 時重算；OpenAI Agents SDK 的 output guardrail 也明確區分「已完成的 tool result 可持久化」與「被拒絕的 final output 不進 session」；DBOS datasource 則證明 workflow checkpoint 與 application transaction 可以在同一資料庫交易中原子記錄，但它是替代 runtime 候選，不代表應與 LangGraph 疊兩套 durable engine。[PostgreSQL — Transactions](https://www.postgresql.org/docs/current/tutorial-transactions.html)、[AWS Builders' Library — Making retries safe with idempotent APIs](https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/)、[LangGraph — Functional API](https://docs.langchain.com/oss/python/langgraph/functional-api)、[OpenAI Agents SDK — Guardrails](https://openai.github.io/openai-agents-python/guardrails/)、[DBOS — Transactions and Datasources](https://docs.dbos.dev/python/tutorials/transaction-tutorial)
 
 ## 3. 白話產品流程 v0.1
 
@@ -709,7 +730,7 @@ receipt 的裁決歷史採追加與 supersession，不以覆寫抹除員工先�
 
 ### 7.9 每輪的白話 Context 流程
 
-1. **保存，不等於傳入**：先把本輪員工原話、AI 回應、tool event、Work Model 變化與 workflow event 完整保存；不得先摘要才保存。
+1. **保存，不等於傳入**：員工原話先以 source transaction 完整保存；model／tool 原始結果與 verification 依 execution boundary 保存為可恢復 artifact；只有通過驗證並完成 semantic commit 的 consultant turn 才成為正式對話。Work Model 變化與 workflow event 依各自交易保存，不得用摘要取代原始來源。
 2. **建立不可省略核心**：放入精簡 authority 規則、本輪 operation／focus／完成目標、員工當輪完整文字回答、受限全域工作索引、焦點相關 Current JD／Work Model，以及會影響本輪判斷的最新更正／矛盾／待決 Proposal。
 3. **走直接關聯**：先依 document、穩定 ID、Task／Duty／OPKS linkage、source receipt、speaker、generation 與狀態查詢，不先用向量猜。
 4. **找較遠候選**：對較早原話與未映射線索使用 lexical 與 semantic retrieval；結果保留 speaker、原回合、entity、前後片段與 authority metadata，再視需要 rerank。
@@ -838,7 +859,7 @@ Owner 已於 2026-08-12 裁示：時間優先，先完成可用的端到端成�
 ### 7.15 本節仍未決定
 
 - 每種 operation 的確切 token floor／ceiling；
-- adaptive bounded run 的最大 inference／tool step、elapsed time／成本上限，以及哪些 operation 允許 partial semantic result；
+- adaptive bounded run 的最大 inference／tool step、elapsed time／成本上限，以及哪些 optional result group 能建立足以安全 drop 的 typed dependency contract；在此之前維持 fail-closed；
 - 受限全域工作索引的最終 schema、大小門檻、摘要層級與不同 model profile 的降級參數；
 - 是否第一版就使用 embedding、哪個 embedding／reranker 與 top-k；
 - 哪些具體條件值得增加獨立 model-based context planner 或 specialist call；預設不得固定每輪增加；
@@ -859,12 +880,13 @@ Owner 於 2026-08-12 確認：員工回答即使遇到 AI 失敗也必須保存�
 ② Context Engine 依 document／focus／authority 組裝本輪 context
 ③ 主要顧問按需載入 Skills 與 document-scoped read-only tools
 ④ 模型提交 typed semantic result
-⑤ application 驗證、對帳並以 reducer 形成 Work Model／agenda／Proposal 變化
-⑥ derived state 與成功的 consultant turn 原子提交後才回給員工
-⑦ Proposal 仍須等員工 accept／edit／reject，才可經 authority seam 改 Current JD
+⑤ runtime 保存已完成的 model／tool result 與 execution evidence，application 驗證、對帳
+⑥ deterministic reducer 只從通過的候選形成 VerifiedCommitPlan
+⑦ Work Model／agenda／Proposal／成功 consultant turn／result receipt 原子提交後才回給員工
+⑧ Proposal 仍須等員工 accept／edit／reject，才可經 authority seam 改 Current JD
 ```
 
-若 ③–⑥ 任一步失敗：employee input event 保留為 durable source，記錄可重試的 processing failure；Work Model、agenda、Proposal、Current JD 與成功 consultant turn 不得出現半套變更。重試沿用同一 input event／operation identity，避免來源重複與重複付費造成不同結果競爭。
+若 ③–⑦ 任一步失敗：employee input event 保留為 durable source，記錄 typed processing failure；已成功的 provider／tool／verification artifact 可以保留作恢復與診斷，但 Work Model、agenda、Proposal、Current JD 與成功 consultant turn 不得出現半套變更。重試沿用同一 input event／operation identity；已存在可安全重播的 provider result 時不得盲目重打，新的 wire attempt 才分配新的 attempt identity。
 
 模型只負責必須由語意判斷產生、且有真實下游消費者的內容。邏輯上包含：
 

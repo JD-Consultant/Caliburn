@@ -118,6 +118,8 @@ Web / API
    │
    ▼
 Application command
+   ├─ Source acceptance transaction
+   └─ durable input_event_id / payload hash / processing status
    │
    ▼
 ConsultantRunGraph（LangGraph 候選）
@@ -125,9 +127,11 @@ ConsultantRunGraph（LangGraph 候選）
    ├─ 建立 ContextRequest
    ├─ Context Engine 產生 ContextPack + ContextManifest
    ├─ 選擇 direct structured call 或 bounded agent node
+   ├─ phase checkpoint / immutable execution artifacts
    ├─ Pydantic parse + deterministic verifier
-   ├─ 產生 Work Model delta / Proposal / gap
-   ├─ 原子保存成功結果／durable Proposal 後結束本次 run
+   ├─ 產生 VerifiedCommitPlan
+   ├─ 原子保存 Work Model delta / agenda / Proposal / consultant turn
+   ├─ 寫入 idempotent result receipt 後結束本次 run
    └─ 只有 run 內真的需要人工輸入時才 optional interrupt
           │
           ▼
@@ -173,6 +177,21 @@ LangGraph checkpoint 若採用，只應保存：
    - 不能取得 authority mutation tool。
 
 不是每個 attention mode／operation 都需要 agent loop。使用框架不代表每個 operation 都要變成 Agent。
+
+### 3.3 Source、execution 與 semantic commit 是三種不同的 durable boundary
+
+2026-08-13 依 owner 確認的白話回合重新審核後，不能再用「整輪原子保存」含糊涵蓋所有 persistence：
+
+1. `input_event` 先獨立 commit，保證 provider、parse 或 verifier 失敗不會吃掉員工原話；
+2. run／attempt checkpoint 與 immutable artifact 分階段保存 provider／tool 結果及 verification，避免已付費工作在 crash recovery 時被重做；
+3. 只有 deterministic verifier／reducer 產生的 `VerifiedCommitPlan` 能進 domain transaction；Work Model、agenda／progress、Proposal、consultant turn 與 result receipt 同生共死；
+4. Proposal decision 是稍後獨立 command，Current JD 不在 consultant semantic commit 中。
+
+這不是 distributed transaction。network I/O 永遠在 PostgreSQL transaction 外；application 以 input／run／attempt identity、checkpoint、CAS generation／read-set 與 idempotent result 把數個短 transaction 串成可恢復 operation。LangGraph 可管理第 2 層的 execution cursor／task result，但預設 checkpointer 不會自動與第 3 層的 Caliburn UoW 共用同一 atomic commit。DBOS datasource 能把 transaction output 與 application mutation 原子記錄，代表它值得作 durability 對照；但 LangGraph＋DBOS 同時接管同一條 run 會形成雙 runtime，預設不採。若 LangGraph vertical 需要大量自寫 exactly-once plumbing，應比較「DBOS 作替代外層 runtime＋selective LangChain」而不是再疊一層。
+
+模型輸出可以有 item-level verifier verdict，但 commit 的單位仍是 coherent CommitPlan。只有完全獨立、未被可見回覆／下一題／其他 finding 引用的 invalid optional item 才能被 drop 並留下 reason；任何 source identity、scope、authority、stale、dependency 或跨 entity invariant 錯誤都 fail closed。現行 `task_analysis.transition` 採整輪 all-or-nothing，可作保守 baseline；沒有 typed dependency contract 前不得擅自改成 partial semantic commit。
+
+現行 code 仍未符合新的 source-first 裁決：`consultation.submit_employee_turn()` 在 employee turn 只存在記憶體時先呼叫 provider，`commit_verified_turn()` 才把 employee turn、consultant turn 與 state 一起寫入；provider 失敗時員工來源不會 durable。這是後續 ADR／plan 要處理的已確認 gap，不在研究稿階段直接修改。
 
 ## 4. 為什麼選這組框架
 
@@ -889,6 +908,8 @@ Gate：現行 adapter 的必要語意全部通過；否則只採部分框架。
 
 Gate：restart、duplicate resume、stale generation、checkpoint loss、Proposal 在沒有 graph checkpoint 時仍可審核，以及 authority violation 全通過。若 LangGraph 不能比現有 durable turn 明確減少總維護面，保留現有 runtime 並只採 model／Skills／context framework。
 
+這個 Gate 另須包含四個 crash seam：source commit 後、provider result checkpoint 後、verification checkpoint 後、domain commit acknowledgment 前。已保存 provider result 的 recovery 不得再呼叫模型；domain transaction 中任一 write 注入失敗時，Work Model／agenda／Proposal／consultant turn／result receipt 必須全部 rollback；同一 input ID＋同 payload 回既有狀態或結果，同一 ID＋不同 payload 穩定 conflict。
+
 ### Phase 4：Analysis Skills 與 Context Engine
 
 - 將 Task／Duty／OPKS 方法拆成少數不重疊 Skills；
@@ -987,6 +1008,8 @@ ADR Accepted 後才寫 docs/plans/；不得直接據本研究全文施工。
 - [Anthropic — Effective context engineering for AI agents](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)
 - [OpenAI — Latest model guidance](https://developers.openai.com/api/docs/guides/latest-model)
 - [OpenAI — Agents SDK](https://developers.openai.com/api/docs/guides/agents)
+- [OpenAI Agents SDK — Guardrails](https://openai.github.io/openai-agents-python/guardrails/)
+- [OpenAI Agents SDK — Human in the loop](https://openai.github.io/openai-agents-python/human_in_the_loop/)
 - [OpenAI — Evaluation best practices](https://developers.openai.com/api/docs/guides/evaluation-best-practices)
 - [Google ADK — Workflow agents](https://adk.dev/agents/workflow-agents/)
 - [Microsoft Agent Framework — Workflows](https://learn.microsoft.com/en-us/agent-framework/workflows/)
@@ -1022,6 +1045,9 @@ ADR Accepted 後才寫 docs/plans/；不得直接據本研究全文施工。
 - [MLflow — GenAI tracing](https://mlflow.org/docs/latest/genai/tracing/)
 - [DBOS — Workflow communication](https://docs.dbos.dev/python/tutorials/workflow-communication)
 - [DBOS — Transactions](https://docs.dbos.dev/python/tutorials/transaction-tutorial)
+- [DBOS — Workflows and idempotent workflow IDs](https://docs.dbos.dev/python/tutorials/workflow-tutorial)
+- [PostgreSQL — Transactions](https://www.postgresql.org/docs/current/tutorial-transactions.html)
+- [AWS Builders' Library — Making retries safe with idempotent APIs](https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/)
 - [Python eventsourcing — Applications](https://eventsourcing.readthedocs.io/en/stable/topics/application.html)
 - [LlamaIndex — CitationQueryEngine](https://developers.llamaindex.ai/python/framework-api-reference/query_engine/citation/)
 - [Ragas — Available metrics](https://docs.ragas.io/en/latest/concepts/metrics/available_metrics/)

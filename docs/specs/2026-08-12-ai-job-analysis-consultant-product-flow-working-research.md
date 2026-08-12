@@ -608,6 +608,10 @@ iCAP、O*NET、公司 SOP、表單、既有 JD 與產業資料保存自己的來
 - compaction、summary、provider conversation state 與長期 memory 可提高連續性，但都不能取代原始來源與業務 authority；
 - context selection 沒有通用最佳值，必須以本產品的長訪談、修正、跨題線索、Task／Duty／OPKS 與 Reference 情境評測。
 
+2026-08-12 進一步核對 OpenAI、Anthropic、Google、Microsoft Research 與 OPM 第一手資料後，新增一項較精確的產品結論：**全域結構要持續存在，但不等於每輪傳入全域細節。** Anthropic 的最新工程指引主張最小高訊號 context 與「少量預載＋just-in-time 探索」的 hybrid；OpenAI 建議注入當下相關的 structured-state slices，並精簡重複 prompt／tools；Google 將 durable state、session memory 與本輪 working context 分開，且其 Sufficient Context 研究顯示「相關」不等於「足以判斷」，額外但不充分的 context 也可能提高幻覺；Microsoft 的 GraphRAG／DRIFT 研究則支持先有全域概觀再深入局部，但 dynamic community selection 也說明靜態送入全部全域摘要昂貴且低效。OPM 的職務分析方法要求先維持可追溯的 preliminary Task／competency inventory，再由 SME 評定、修正與建立 linkage，支持本產品不能只把每個焦點孤立分析。
+
+上述資料共同支持的是「**受限全域定位＋焦點細節＋按需展開**」的架構模式，不是「每輪把完整 JD／Work Model／OPKS／歷史全部塞入」。Microsoft 的量化結果來自 AP News corpus，Google 的 Sufficient Context 主要是 RAG QA；目前仍沒有公開 benchmark 直接證明同一配方能提高繁中職務訪談品質。以下產品裁決是依這些共同模式與 Caliburn 的跨 Task 線索、Duty 重組、OPKS linkage、員工更正和進度需求所作的領域推論，不能宣稱為外部研究已直接驗證的成效。
+
 這些來源也形成一個重要限制：框架可以提供 session、checkpoint、store、summary middleware、retrieval hook、tracing 與 token accounting，但無法自行知道「哪句員工原話是必要證據」「哪項更正優先於舊說法」或「Reference 何時不得混入員工事實」。這些仍是 Caliburn 的產品與 domain policy。
 
 外部證據的可轉移性也有限：Anthropic 的主要案例包含 coding／research agent，Google 的長流程案例是 HR onboarding，Contextual Retrieval 的量化資料集也不是繁中職務訪談。目前沒有可信公開 benchmark 證明任何 Context framework 或固定配方會直接提高專業職務說明書品質；本節只能把共同架構模式轉成待驗證假說，不能把別的產品結果當成 Caliburn 成效。
@@ -630,20 +634,20 @@ iCAP、O*NET、公司 SOP、表單、既有 JD 與產業資料保存自己的來
 - 缺點：規則難預知某句舊話何時重新重要；固定 lane／比例容易隨模型進步而過時；選漏後模型沒有補救能力；
 - 結論：適合 authority floor、document scope 與不可省略項，不適合承擔全部語意相關性判斷。
 
-#### 方案 C：可恢復記憶＋必要核心＋受控按需檢索（推薦候選）
+#### 方案 C：可恢復記憶＋必要核心＋受控按需檢索（產品方向已確認）
 
 完整來源與狀態留在本地可恢復 store；應用程式先提供一個小而可靠的必要核心，再以結構化關聯、lexical／semantic retrieval 形成候選；模型若仍需要更多資料，只能透過 document-scoped、read-only 工具按需取得。
 
 - 優點：保留 authority、來源與重播能力，又讓模型能處理程式無法預列的語意關聯；可替換模型與檢索實作；
 - 缺點：需要明確工具契約、budget 與停止規則；正式 context eval 後置期間，若工具設計不良，較可能到人工使用時才發現漏查、重查或追逐無關內容；
-- 結論：最符合本產品「前景專注、背景全域吸收、長期可恢復、員工核准」的需求，先作研究候選，不直接授權 production 實作。
+- 結論：最符合本產品「前景專注、背景全域吸收、長期可恢復、員工核准」的需求；owner 已於 2026-08-12 確認採此產品方向，但這不直接裁決 framework、schema、token 門檻或 production 實作。
 
 推薦方案不是「都交給模型」。程式仍決定 scope、authority、必帶資訊、可用工具、token 上限與降級；模型只在這些邊界內判斷還需要讀什麼。
 
 ### 7.9 每輪的白話 Context 流程
 
 1. **保存，不等於傳入**：先把本輪員工原話、AI 回應、tool event、Work Model 變化與 workflow event 完整保存；不得先摘要才保存。
-2. **建立不可省略核心**：放入精簡 authority 規則、本輪 operation／focus／完成目標、員工當輪完整文字回答、焦點相關 Current JD／Work Model、會影響本輪判斷的最新更正／矛盾／待決 Proposal。
+2. **建立不可省略核心**：放入精簡 authority 規則、本輪 operation／focus／完成目標、員工當輪完整文字回答、受限全域工作索引、焦點相關 Current JD／Work Model，以及會影響本輪判斷的最新更正／矛盾／待決 Proposal。
 3. **走直接關聯**：先依 document、穩定 ID、Task／Duty／OPKS linkage、source receipt、speaker、generation 與狀態查詢，不先用向量猜。
 4. **找較遠候選**：對較早原話與未映射線索使用 lexical 與 semantic retrieval；結果保留 speaker、原回合、entity、前後片段與 authority metadata，再視需要 rerank。
 5. **按需載入方法**：平時只讓模型知道可用 Skill 的名稱與用途；命中 task-boundary、duty-grouping、O、P、K、S 或 Reference challenge 時才讀完整方法。
@@ -653,11 +657,36 @@ iCAP、O*NET、公司 SOP、表單、既有 JD 與產業資料保存自己的來
 
 附件、長文件與大型 Reference 不保證整份放入；當輪員工文字回答原則上完整傳入，附件則以可追溯片段或按需工具讀取。若單一回答本身超過模型安全預算，系統必須明示分段或 context budget 問題，不可無聲截斷。
 
+#### 7.9.1 每輪全域定位的裁決：受限索引，不是完整資料
+
+每輪模型需要知道「目前整份職務大致長什麼樣、現在在哪裡」，否則只靠焦點 retrieval 容易重複建立 Task、把旁支線索歸錯位置、錯過跨 Task 矛盾，或延遲 Duty regroup。反過來，完整傳入所有 Task 描述、Evidence、OPKS、Proposal 與歷史，會讓過時假說和無關資訊反覆佔用注意力。
+
+因此每輪必帶一份 **bounded global orientation index（受限全域工作索引）**。它是從 Current JD、Current Work Model 與 workflow state 產生的 deterministic、versioned、可重建投影；不是 LLM 自由摘要、RAG 搜尋結果、第五份 authority store，也不因被放進 prompt 就改變任何項目的權威。
+
+索引至少讓模型辨識：
+
+- document／generation 與目前 focus；
+- active Duty／Task 的穩定 ID、短名稱、基本歸屬與生命週期狀態；
+- 每個項目屬於已授權 Current JD、可變 Work Model hypothesis，或 workflow gap／待決狀態，三者不得混成同一權威；
+- 未歸類 Task、重大矛盾、blocking dependency 與待決 Proposal 的存在及可查詢指標；
+- 目前已知範圍的摘要數量，使模型與員工介面的進度投影能指向同一組可解釋對象。
+
+索引平時不攜帶完整 Task 敘述、全部原話／Evidence、完整 OPKS、完整 Proposal payload、Reference 內容、整段歷史，或已退休／已否認候選的細節；這些依焦點、直接關聯與受控工具按需取得。最新有效更正、會推翻本輪判斷的矛盾與其他 authority floor 仍由必帶核心另行保證，不能因索引精簡而遺失。
+
+索引也不能無限成長：
+
+- 小型職務在預算內可列出全部 active Duty／Task headers；
+- 超出預算後，確定性降級為全部 Duty 摘要、目前焦點及相鄰 Task、其他區域的數量／狀態／查詢指標；
+- 模型需要遠端細節時，透過 document-scoped read-only lookup 展開，不把所有區域預先載入；
+- 降級規則、被省略區域與實際載入內容寫入 ContextManifest，不可靜默假裝索引完整。
+
+這項裁決把「前景專注、背景全域吸收」轉成可實作邊界：前景得到足以完成當輪判斷的細節；背景保有結構定位與異常訊號，而不是保有所有細節。它同時支援 Task／Duty 隨訪談演化、OPKS 按需分析、旁支線索停放與可解釋進度，不要求第一版先導入 GraphRAG、向量記憶或額外 planner model。
+
 ### 7.10 必帶、候選與按需三層
 
 | 層級 | 內容 | 誰決定 | 可否因 budget 直接省略 |
 |---|---|---|---|
-| 必帶核心 | authority、operation／focus、當輪回答、焦點 target、最新有效更正、blocking contradiction、相關待決 Proposal | deterministic application policy | 不可；不足時明確失敗或分段 |
+| 必帶核心 | authority、operation／focus、當輪回答、受限全域工作索引、焦點 target、最新有效更正、blocking contradiction、相關待決 Proposal | deterministic application policy | 索引本體不可省略；可依已記錄規則降低索引細節，仍超額才明確失敗或分段 |
 | 候選 context | 較早原話、相鄰 Task／Duty／OPKS、open gap、未映射線索、少量近期對話 | 結構化 filter＋retrieval＋rerank | 可依可解釋順序降級 |
 | 按需 context | 更遠來源、完整歷史片段、額外 Skill、Reference、低頻 lineage | 模型經受控唯讀工具請求，程式驗 scope／budget | 可拒絕並回報理由 |
 
@@ -746,6 +775,7 @@ Owner 已於 2026-08-12 裁示：時間優先，先完成可用的端到端成�
 ### 7.15 本節仍未決定
 
 - 每種 operation 的確切 token floor／ceiling；
+- 受限全域工作索引的最終 schema、大小門檻、摘要層級與不同 model profile 的降級參數；
 - 是否第一版就使用 embedding、哪個 embedding／reranker 與 top-k；
 - 是否增加獨立的 model-based context planner call；
 - 主要 runtime 採 LangGraph、OpenAI Agents SDK、PydanticAI 或薄型自有 orchestration；
@@ -922,6 +952,7 @@ Stakeholder 草稿（非權威，只作需求來源）：
 - [Anthropic — Contextual Retrieval](https://www.anthropic.com/engineering/contextual-retrieval)
 - [Anthropic — Equipping agents for the real world with Agent Skills](https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills)
 - [OpenAI Docs — Model guidance（lean prompts、relevant tools、approval boundaries）](https://developers.openai.com/api/docs/guides/latest-model)
+- [OpenAI Cookbook — Context Engineering for Personalization（structured state、relevant slices、memory precedence）](https://developers.openai.com/cookbook/examples/agents_sdk/context_personalization/)
 - [OpenAI Docs — ChatKit widgets](https://developers.openai.com/api/docs/guides/chatkit-widgets)
 - [OpenAI Docs — ChatKit actions](https://developers.openai.com/api/docs/guides/chatkit-actions)
 - [OpenAI Docs — Results and state](https://developers.openai.com/api/docs/guides/agents/results)
@@ -948,7 +979,9 @@ Stakeholder 草稿（非權威，只作需求來源）：
 - [Google ADK — Rewind sessions](https://adk.dev/sessions/session/rewind/)
 - [Google ADK — Events](https://adk.dev/events/)
 - [Google Cloud — Gemini Enterprise Agent Platform（Sessions、Memory Bank、evaluation、observability）](https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale)
+- [Google Cloud — Choose your agentic AI architecture components（state、memory、progressive disclosure）](https://docs.cloud.google.com/architecture/choose-agentic-ai-architecture-components)
 - [Google Cloud — Choose a design pattern for your agentic AI system](https://docs.cloud.google.com/architecture/choose-design-pattern-agentic-ai-system?hl=en)
+- [Google Research — Sufficient Context: A New Lens on RAG Systems](https://research.google/blog/deeper-insights-into-retrieval-augmented-generation-the-role-of-sufficient-context/)
 - [LangGraph — Overview](https://docs.langchain.com/oss/python/langgraph/overview)
 - [LangGraph — Persistence](https://docs.langchain.com/oss/python/langgraph/persistence)
 - [LangGraph — Interrupts](https://docs.langchain.com/oss/python/langgraph/interrupts)
@@ -961,6 +994,9 @@ Stakeholder 草稿（非權威，只作需求來源）：
 - [Microsoft — Agent Framework overview](https://learn.microsoft.com/en-us/agent-framework/overview/)
 - [Microsoft — Agent Framework workflows human-in-the-loop](https://learn.microsoft.com/en-us/agent-framework/workflows/human-in-the-loop)
 - [Microsoft — Agent Framework AG-UI integration](https://learn.microsoft.com/en-us/agent-framework/integrations/by-component/ui/ag-ui/)
+- [Microsoft Research — From Local to Global: A Graph RAG Approach](https://www.microsoft.com/en-us/research/publication/from-local-to-global-a-graph-rag-approach-to-query-focused-summarization/)
+- [Microsoft Research — DRIFT Search: Combining global and local search](https://www.microsoft.com/en-us/research/blog/introducing-drift-search-combining-global-and-local-search-methods-to-improve-quality-and-efficiency/)
+- [Microsoft Research — GraphRAG dynamic community selection](https://www.microsoft.com/en-us/research/blog/graphrag-improving-global-search-via-dynamic-community-selection/)
 - [Microsoft HAX — Guidelines for Human-AI Interaction](https://www.microsoft.com/en-us/haxtoolkit/ai-guidelines/)
 - [Microsoft HAX — Time services based on context](https://www.microsoft.com/en-us/haxtoolkit/guideline/time-services-based-on-context/)
 - [Microsoft HAX — Support efficient correction](https://www.microsoft.com/en-us/haxtoolkit/guideline/support-efficient-correction/)

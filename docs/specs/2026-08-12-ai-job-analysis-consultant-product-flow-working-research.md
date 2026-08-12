@@ -83,6 +83,13 @@
 - 員工可以在看過缺口後強制匯出。
 - 強制匯出不會自動接受 Proposal、補造 OPKS、隱藏孤立 Task 或改變 Current JD。
 
+### 2.7 員工回答先成為 durable source，AI 失敗不應讓原話消失
+
+- 員工送出的回答先以穩定 input event／turn identity 保存為來源記憶，再交給 AI 分析；它不是等模型成功後才附帶寫入的欄位。
+- provider timeout、拒答、parse、schema 或 verifier 失敗時，該回答仍保留並標示尚未成功分析；員工不必重新輸入。
+- 重試必須沿用同一個 input event，不重複建立來源；失敗期間 Work Model、Proposal 與 Current JD 都不得改變。
+- 這項產品裁決取代 2026-07-30 最小完整迴圈中「模型失敗時 Journal 完全不變、只由 Web 保留草稿」的舊假設；實作前仍須以 ADR／plan 補齊交易、idempotency 與 migration 邊界。
+
 ## 3. 白話產品流程 v0.1
 
 ### 3.1 開始或恢復
@@ -677,6 +684,37 @@ Owner 已於 2026-08-12 裁示：時間優先，先完成可用的端到端成�
 
 上述第一版實作細節先由 current-only 邊界、可逆設定、介面 conformance 與人工 smoke 決定，不由「大廠有提供」直接決定；模型品質、最佳參數與成本調優延至可用成品完成後，以長訪談 eval 與實際數據收斂。
 
+### 7.16 Durable input、模型語意結果與業務狀態分離（已確認方向）
+
+Owner 於 2026-08-12 確認：員工回答即使遇到 AI 失敗也必須保存，之後以同一個 input event 重試分析。這項裁決同時收斂一輪處理的責任邊界：**來源事件、模型語意結果、業務狀態與稽核不是同一個 LLM output。**
+
+建議的邏輯順序是：
+
+```text
+① application 保存 immutable employee input event
+② Context Engine 依 document／focus／authority 組裝本輪 context
+③ 主要顧問按需載入 Skills 與 document-scoped read-only tools
+④ 模型提交 typed semantic result
+⑤ application 驗證、對帳並以 reducer 形成 Work Model／agenda／Proposal 變化
+⑥ derived state 與成功的 consultant turn 原子提交後才回給員工
+⑦ Proposal 仍須等員工 accept／edit／reject，才可經 authority seam 改 Current JD
+```
+
+若 ③–⑥ 任一步失敗：employee input event 保留為 durable source，記錄可重試的 processing failure；Work Model、agenda、Proposal、Current JD 與成功 consultant turn 不得出現半套變更。重試沿用同一 input event／operation identity，避免來源重複與重複付費造成不同結果競爭。
+
+模型只負責必須由語意判斷產生、且有真實下游消費者的內容。邏輯上包含：
+
+1. source-anchored findings：本輪明示內容、更正、矛盾、新線索、候選與 gap；
+2. change intents：對 Work Model 或 Proposal 的新增、修正、合併、拆分、重新分組、連結或淘汰建議；
+3. next move：維持／切換焦點、reason codes、停止建議與最多一個主要問題；
+4. employee-facing reply：簡短承接、必要摘要與問題，不得宣稱尚未提交的正式變更已生效。
+
+上述是**語意表面**，不要求第一版必須把四類塞入一個巨大 JSON。可以由一次 bounded tool loop、少數按需 specialist result 或一個 final submit contract 實現；實際 topology 仍須以 provider conformance、schema 複雜度、延遲與可維護性決定。固定每輪跑 Extractor／Consultant／OPKS Coder／Projector，或讓罕見 Duty／split／OPKS 結構永久污染常見 schema，都不因本節而成立。
+
+application／framework 應自行產生並保存 operation ID、event ID、時間、model／prompt／Skill／tool version、generation、read-set、state revision、ContextManifest、token／成本、驗證結果與 audit。LLM 不得自行宣稱這些欄位，也不得直接產生 authority commit outcome。LangGraph／LangChain／provider session 可以承接 checkpoint、tool loop、typed output 與 tracing plumbing，但 framework state 不能成為第二份 Source、Work Model、Proposal 或 Current JD。
+
+這項分離與外部主流做法一致：OpenAI 將 final output、history、interruptions 與 resumable state 分開，並區分 function calling 與 user-facing structured response；Anthropic 將 session 定義為 harness 外的 append-only event log，工具呼叫只代表模型提出結構化要求、由 application 執行；Google ADK 也把 event content、tool event 與 state delta 分開；LangGraph 則把 message stream、state snapshot、interrupt 與 final output 分開。這些框架只證明通用責任邊界，不替 Caliburn 決定職務分析語意與 authority。
+
 ## 8. 已識別的流程風險與優化方向
 
 ### 8.1 焦點隧道效應
@@ -746,9 +784,14 @@ Stakeholder 草稿（非權威，只作需求來源）：
 - [Anthropic — Building effective agents](https://www.anthropic.com/engineering/building-effective-agents)
 - [Anthropic — Effective context engineering for AI agents](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)
 - [Anthropic — Scaling Managed Agents: Decoupling the brain from the hands](https://www.anthropic.com/engineering/managed-agents)
+- [Anthropic Docs — How tool use works](https://platform.claude.com/docs/en/agents-and-tools/tool-use/how-tool-use-works)
+- [Anthropic Docs — Structured outputs](https://platform.claude.com/docs/en/build-with-claude/structured-outputs)
 - [Anthropic — Contextual Retrieval](https://www.anthropic.com/engineering/contextual-retrieval)
 - [Anthropic — Equipping agents for the real world with Agent Skills](https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills)
 - [OpenAI Docs — Model guidance（lean prompts、relevant tools、approval boundaries）](https://developers.openai.com/api/docs/guides/latest-model)
+- [OpenAI Docs — Results and state](https://developers.openai.com/api/docs/guides/agents/results)
+- [OpenAI Docs — Structured model outputs](https://developers.openai.com/api/docs/guides/structured-outputs)
+- [OpenAI Docs — Function calling](https://developers.openai.com/api/docs/guides/function-calling)
 - [OpenAI Docs — Conversation state](https://developers.openai.com/api/docs/guides/conversation-state)
 - [OpenAI Docs — Compaction](https://developers.openai.com/api/docs/guides/compaction)
 - [OpenAI Docs — Counting tokens](https://developers.openai.com/api/docs/guides/token-counting)
@@ -758,10 +801,13 @@ Stakeholder 草稿（非權威，只作需求來源）：
 - [Google — Why we built ADK 2.0](https://developers.googleblog.com/en/why-we-built-adk-20/)
 - [Google — Build long-running AI agents that pause, resume, and never lose context with ADK](https://developers.googleblog.com/build-long-running-ai-agents-that-pause-resume-and-never-lose-context-with-adk/)
 - [Google — Developer's Guide to Building ADK Agents with Skills](https://developers.googleblog.com/en/developers-guide-to-building-adk-agents-with-skills/)
+- [Google ADK — Session](https://adk.dev/sessions/session/)
+- [Google ADK — Events](https://adk.dev/events/)
 - [Google Cloud — Gemini Enterprise Agent Platform（Sessions、Memory Bank、evaluation、observability）](https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale)
 - [Google Cloud — Choose a design pattern for your agentic AI system](https://docs.cloud.google.com/architecture/choose-design-pattern-agentic-ai-system?hl=en)
 - [LangGraph — Overview](https://docs.langchain.com/oss/python/langgraph/overview)
 - [LangGraph — Persistence](https://docs.langchain.com/oss/python/langgraph/persistence)
+- [LangGraph — Interrupts](https://docs.langchain.com/oss/python/langgraph/interrupts)
 - [LangChain — Context engineering in agents](https://docs.langchain.com/oss/python/langchain/context-engineering)
 - [LangChain — Short-term memory](https://docs.langchain.com/oss/python/langchain/short-term-memory)
 - [LangChain — Memory overview](https://docs.langchain.com/oss/python/concepts/memory)

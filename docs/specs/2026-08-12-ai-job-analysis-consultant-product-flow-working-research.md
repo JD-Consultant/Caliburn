@@ -4,8 +4,9 @@
 - 狀態：Working Research；隨 owner 討論持續修訂
 - 決策狀態：只記錄已確認的產品方向與待討論問題；不是 ADR，不授權 production 實作
 - 優先順序：本稿先定義「產品如何像專業顧問工作」；元件、Context Engine、RAG 技術與 framework 選型後置
-- 外部資料查核：Context Engine 小節依截至 2026-08-12 可取得的官方／第一手資料整理；大廠做法是設計證據，不是免評測的產品決策
-- 相關研究：[`階段式 AI 職務分析顧問 runtime/framework 研究`](2026-08-12-staged-ai-consultant-runtime-framework-research.md)只能在本產品流程核准後評估，不得反向用框架能力定義顧問流程
+- 外部資料查核：截至 2026-08-13 可取得的官方／第一手資料整理；大廠做法是設計證據，不是免評測的產品決策
+- Framework 現況：§9.7–§9.9 的三個 Gate 4 conformance slice 只證明 persistence／runtime、Context／Skills／provider 與 frontend transport 的工程可行性；它們**沒有完成同目的元件的最終選型**。§9.10 因重新沿用 Work Model／Focus／Progress／Proposal／Current JD 等現行概念切割 state，已於 2026-08-13 撤回為過早收斂，不得進 ADR／plan。§9.11 已完成既有研究覆蓋稽核，不再重查已研究元件；目前只補四個目的切片：「動態訪談控制＋可見待處理議程＋可信進度」、「可修正理解＋來源」、「可審核文件變更＋核准成品」與「必要結構化澄清」。選型先看效果、功能完整、可靠性與員工體驗；只有效果相當時才比較自寫量
+- 相關研究：[`階段式 AI 職務分析顧問 runtime/framework 研究`](2026-08-12-staged-ai-consultant-runtime-framework-research.md) 只能在本產品流程核准後評估，不得反向用框架能力定義顧問流程
 
 ## 0. 這份工作稿怎麼使用
 
@@ -31,6 +32,20 @@
 2. 員工如何知道 AI 現在為何發問、訪談進度到哪裡？
 3. Task、Duty、OPKS 與 Reference 在流程中如何互相影響？
 4. 長訪談中哪些內容必須完整保存、哪些每輪必帶、哪些應按需取用？
+
+### 0.2 不得再遺失的「同目的框架替代」硬規則（2026-08-13 owner 再確認）
+
+本次升級不是替 Work Model、Focus、Progress、Proposal、Current JD、operation 等現行概念更換底層，也不是先保留這些名稱再找容器。研究與選型必須遵守：
+
+1. **先把需求寫成中立目的**，例如「持續記住並修正目前理解」、「決定現在與稍後訪談什麼」、「呈現已知與缺口」、「讓 AI 提議、員工裁決」、「保存目前核准成品」、「讓處理可恢復」；不得以現行 class、資料表、module 或概念名稱當比較單位。
+2. **框架元件只要完成相同目的就有資格整體替代**，即使名稱、資料模型、API、生命週期或操作方式完全不同；通過後，原概念可以消失，不必保留 facade、mirror 或相容 schema。
+3. **優先研究截至決策日最新 stable／LTS、主流且有官方或第一手證據的框架與大廠作法**；star、行銷功能表與舊版本文章不能代替版本政策、production persistence、failure semantics 與實際 conformance。
+4. **框架優先不是單一 runtime 優先**。先逐目的選出真正可承接的成熟元件，再評估能否組成較少、相容且可操作的組合；不得因先選 LangGraph、PydanticAI 或其他主 runtime，就把其餘目的全部降成自訂 state 欄位。
+5. **自寫只允許補已證明的產品差額**。每一段保留程式都要列出框架缺少的具體行為、證據與驗收；「這是 domain」、「現行已有」或「名稱不同」都不是保留理由。
+6. **真正不可被改寫的是產品效果與權威條件**：專業職務分析方法、員工原話／更正不遺失、AI 不得偷改核准內容、員工能理解焦點／進度／缺口，以及最後產出可靠職務說明書。這些也可以借成熟框架與標準實現，不等於保留現有元件。
+7. **conformance 必須驗同目的結果，不只驗能否儲存欄位**。把 `work_model`、`focus` 或 `proposal` 放入 framework state，只能證明容器可用；除非 framework primitive 已承接其更新、持久化、恢復、互動與失敗生命週期，否則不能宣稱該目的已被替代。
+
+因此 §9.5 的目的層候選盤點仍有效；§9.6 與 §9.10 把候選過早壓回 LangGraph `DocumentState` 的架構收斂失效，§9.7–§9.9 的工程探針證據仍可使用，但不能被當成完整替代已證明。後續以 §9.11 的覆蓋稽核為準，不從頭發明需求或重做市場調查，只補四個未完成的直接替代驗證，再重新形成目標架構。
 
 下列內容不在產品方向段落預先鎖定，而是依 §9 的關卡逐步收斂：
 
@@ -127,7 +142,7 @@
 - Owner 於 2026-08-13 確認：員工訪談、JD、Task／Duty、OPKS、Reference 與其他職務分析內容都可送給外部 LLM；第一版不做欄位遮罩、敏感資料分類、本機模型模式或逐回合同意。
 - 產品只需在設定／開始使用時清楚告知內容會送往外部 AI 服務，不以每輪彈窗打斷訪談。
 - 「可以送」不等於每輪傳入全部內容；Context Engine 仍依焦點與資訊價值選擇最小充分 context，避免成本、延遲與無關資訊干擾。
-- Source、Work Model、Proposal、Current JD、進度與恢復依據仍由 Caliburn 保存；provider／gateway 的 conversation state、logging 或 cache 不得成為唯一權威。
+- Source、Work Model、Proposal、Current JD、進度與恢復依據必須由**本機產品控制的一份唯一權威**保存；具體機制可以是通過 conformance 的 framework state／checkpointer，也可以是單一 PostgreSQL aggregate，不預設必須沿用 Caliburn 現行自寫 store。provider／gateway 的遠端 conversation state、logging 或 cache 不得成為唯一權威。
 - 第一版不要求 ZDR，但不主動加入模型訓練、資料折扣 logging 或完整遠端 prompt／response logging；模型與 provider 路由必須明確，不能以不透明 fallback 偷換模型。
 
 ### 2.11 框架承接工程機制，Caliburn 保留產品語意（2026-08-13 已確認）
@@ -137,10 +152,10 @@ Owner 已確認：保留 Source、Work Model、Proposal、Current JD、Task／Du
 - 框架可以取代或包裝通用的 model／tool interface、structured output、checkpoint／resume、Skills progressive disclosure、context lifecycle、token／usage、tracing、欄位與模型形狀驗證；
 - 成熟標準可以改善現有 domain 元件的資料形狀，例如 quote anchor 可借用 W3C Web Annotation 的文字引用與位置選取模型，lineage 可借用 W3C PROV 語彙；
 - 現有 Pydantic、SQLAlchemy 與 PostgreSQL 本身就是框架／平台，應先評估是否能以 validator、constraint、transaction、versioning 與 ORM 能力減少自寫 plumbing，再決定是否增加新套件；
-- memory／agent／workflow 框架可以產生候選、保存執行 checkpoint 或組裝 context，但不得成為 Source、Work Model、Proposal 或 Current JD 的第二份權威；
+- memory／agent／workflow 框架不只可以包裝外圍，也可以在通過 conformance 後成為 Focus、Work Model、agenda／gap、conversation state 甚至整份 per-document state 的**唯一實作**；採用時必須刪除或降成可重建 projection 的舊 store，不能同時維持兩份可各自修改的權威；
 - framework HITL 可以承接通用 pause／resume 與互動傳輸，但 Proposal 是 durable domain object，員工決策是獨立 domain command，最後仍須通過 Caliburn authority commit seam；
 - 採用標準是語意覆蓋、可靠度、維護成熟度、遷移成本、可替換性與是否減少總維護面，不是套件功能數或刪除行數；
-- 目前推薦依責任分層組合主流框架，而不是要求一套框架全包；遷移邊界依 §2.15 採 AI 顧問子系統受限 Big-bang，但不擴張成整個 Caliburn 的 event-sourcing／agent-platform 重寫。
+- 目前推薦先找能覆蓋最多核心責任的**單一主 runtime**，再只為它確實缺少的能力補一個成熟元件；若一套框架能完整承接多項責任且讓舊機制退場，功能重疊是替代證據，不是扣分。遷移邊界依 §2.15 採 AI 顧問子系統受限 Big-bang，但不擴張成整個 Caliburn 的 event-sourcing／agent-platform 重寫。
 
 因此產品流程仍是本文定義的顧問流程；framework 只能忠實承接它，不能因框架已有 `memory`、`state`、`approval` 或 `agent` 類別，就重新定義員工回合、資料權威、進度或正式修改權。
 
@@ -152,10 +167,10 @@ Owner 已確認：保留 Source、Work Model、Proposal、Current JD、Task／Du
 
 1. **Source acceptance transaction**：先以 client／application 提供的穩定 `input_event_id` 保存員工原話、speaker、document scope、canonical payload hash 與 processing status，再回報「回答已保存」。相同 ID＋相同 hash 回既有結果；相同 ID＋不同 hash 是 idempotency conflict。
 2. **Execution durability**：transaction 外執行 Context、Skill、tool 與 model；每個不可免費重做的重要結果以 run／attempt checkpoint 或 immutable artifact 保存，例如 resolved execution snapshot、ContextManifest、tool result、provider result、usage、parse／verification report。這些是恢復與診斷依據，不是 Work Model、Proposal 或 Current JD。
-3. **Semantic commit transaction**：deterministic application layer 把通過檢查的候選編成一份 `VerifiedCommitPlan`；再於單一 PostgreSQL transaction 中重讀 document、驗 generation／read-set，並一起寫入 Work Model delta、agenda／progress、durable Proposal、可見 consultant turn 與 idempotent result receipt。這批業務變更要嘛全部可見，要嘛全部 rollback；Current JD 仍完全不動。
-4. **Independent employee decision command**：員工日後接受、修改、退回、拒絕或延後 Proposal，是另一個有自己 idempotency／stale check 的 command；只有它能經 authority seam 改變 Current JD。正常 Proposal review 不依賴 consultant graph checkpoint 存活。
+3. **Semantic commit transition**：deterministic application／framework node 把通過檢查的候選編成一份概念上的 `VerifiedCommitPlan`，重讀 document、驗 generation／read-set，並在**一個可證明原子的本機 transition** 中一起成立 Work Model delta、agenda／progress、durable Proposal、可見 consultant turn 與 idempotent result receipt。它可由一個具備所需 CAS／serialization 的 graph checkpoint 實作，也可由單一 PostgreSQL aggregate transaction 實作；不得為兩邊各寫一份。這批業務變更要嘛全部可見，要嘛全部不成立；Current JD 仍完全不動。
+4. **Independent employee decision command**：員工日後接受、修改、退回、拒絕或延後 Proposal，是另一個有自己 idempotency／stale check 的 command；只有它能經 authority seam 改變 Current JD。正常 Proposal review 不得依賴仍在執行中的 model call、暫時 interrupt 或 process memory；若 framework thread 是唯一文件權威，該 durable thread 本身就必須能獨立承接 review 與日後恢復。
 
-因此「原子」描述的是**已驗證業務 CommitPlan 的資料庫可見性**，不是要求整個 LLM run 只有一次 commit。provider 已成功但 process 在 semantic commit 前崩潰時，恢復流程應讀取已保存的 provider／verification artifact；若 authority snapshot 仍相符，可以繼續 verify／commit，不應自動再付一次模型費。若 snapshot 已 stale，舊結果可保留作執行證據，但不得硬套到新 state，必須依 operation policy 重新組裝或重跑。
+因此「原子」描述的是**已驗證業務 CommitPlan 的本機權威可見性**，不是要求整個 LLM run 只有一次 commit，也不先指定一定由自寫 repository 或 framework checkpoint 完成。provider 已成功但 process 在 semantic commit 前崩潰時，恢復流程應讀取已保存的 provider／verification artifact；若 authority snapshot 仍相符，可以繼續 verify／commit，不應自動再付一次模型費。若 snapshot 已 stale，舊結果可保留作執行證據，但不得硬套到新 state，必須依 operation policy 重新組裝或重跑。
 
 模型輸出的逐項驗證與資料庫原子性也不是同一題。建議 verifier 產生 granular verdict 與 dependency：
 
@@ -193,6 +208,8 @@ Owner 確認第一版產品的產出定位為：
 - 若成熟框架能完整承接同一目的、維護性更好且不建立第二份權威，優先移植、包裝或替換，不因「這是 domain 元件」就假設底層必須自寫；
 - 目標流程不因現行系統暫時缺少 Duty hypothesis、Task reassignment、Duty Proposal、typed composite changeset 或按需 OPKS Skills 而縮小；
 - 與 Accepted ADR 衝突的目標改變必須由 successor ADR 明確取代後才可施工，不能偷偷繞過，也不能反過來用舊 ADR 凍結已由 owner 確認的新產品方向。
+
+為防止選型再回到保護舊系統的前提，後續任何「狀態重疊」判定都必須明列**同時存在的兩個 write owner**。若舊 mechanism 會隨切換刪除或降為可重建 read projection，新框架覆蓋相同責任是 `Replace` 證據，不是重疊風險；不得再以「現行 Work Model／Proposal／Current JD 已存在」作為扣分理由。
 
 進入 plan 前必須建立「目標能力／現況／框架候選／`Replace|Wrap|Retain`／仍需自寫語意／successor ADR／驗收情境」差距矩陣。這張矩陣以產品責任為列，不以舊 module 為列，避免框架研究退化成替舊系統逐檔換套件。
 
@@ -839,7 +856,7 @@ Owner 已確認採用「**typed、evidence-linked、可持續修訂的工作假�
 | [U.S. OPM — Assessment and Selection](https://www.opm.gov/policy-data-oversight/assessment-and-selection/) | Job analysis 要辨識 Task、role／responsibility、competency、resources 與 context，向具直接且當前工作經驗的 SME 蒐集資料，並記錄 Task－competency linkage | OPM 沒有規定 LLM Work Model、graph schema、OPKS ontology 或資料庫技術 |
 | [OpenAI Cookbook — Context Engineering for Personalization](https://developers.openai.com/cookbook/examples/agents_sdk/context_personalization/) | 以 local-first structured state 保存可修訂資訊、處理衝突與 precedence，推理時只注入相關 slice | 案例是個人化／旅遊助理，不直接證明其狀態欄位適合職務分析 |
 | [Google Cloud — Choose agentic AI architecture components](https://docs.cloud.google.com/architecture/choose-agentic-ai-architecture-components) 與 [Microsoft Agent Framework — Memory & Persistence](https://learn.microsoft.com/en-us/agent-framework/get-started/memory) | 區分 session／history、application state、long-term memory 與外部 persistence；context provider 可承接 application-specific memory | 這些是 runtime／deployment 指引，不知道 Task、Duty、OPKS、員工更正與 JD authority 的產品語意 |
-| [Anthropic — Effective context engineering for AI agents](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents) 與 [LangGraph — Persistence](https://docs.langchain.com/oss/python/langgraph/persistence) | 長流程可把 structured notes／durable store 留在 context 外按需取用；LangGraph 明確區分 thread checkpoint 與 cross-thread Store | structured note、Store 或 graph state 不會自動成為可信 evidence，也不應變成第二份 Work Model／Current JD |
+| [Anthropic — Effective context engineering for AI agents](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents) 與 [LangGraph — Persistence](https://docs.langchain.com/oss/python/langgraph/persistence) | 長流程可把 structured notes／durable store 留在 context 外按需取用；LangGraph 明確區分 thread checkpoint 與 cross-thread Store | 被框架保存不會讓 structured note、Store 或 graph state 自動成為可信 evidence；若 State 通過 conformance 並直接成為唯一 document authority，它可以承接 Work Model／Current JD，可信性來自 source、schema、reducer 與 authority policy，不是來自儲存容器本身 |
 | [W3C PROV-O](https://www.w3.org/TR/prov-o/) 與 [W3C Web Annotation Data Model](https://www.w3.org/TR/annotation-model/) | 提供 derived-from、revision、quotation、primary source、invalidation，以及 quote／position selector 等可借鏡的來源與修訂語意 | W3C 不要求 Caliburn 採 RDF，也沒有定義職務分析的 domain model；position anchor 單獨使用對內容變更很脆弱 |
 
 因此，外部資料直接支持的是「**結構化狀態、可追溯來源、明確修訂、分離 runtime checkpoint、按需傳入 context**」；把它們組成上述 Work Model，是 Caliburn 結合 OPM 的職務分析原則、既有 Task／Duty／OPKS 研究與員工 authority 所作的產品推論。現階段尚無可信公開 benchmark 證明某個 memory／agent framework 能直接提升繁中職務訪談或 JD 品質，後續不得把框架功能表當成效果證據。
@@ -1097,18 +1114,21 @@ Owner 已確認「少量最近對話維持自然銜接；完整保存並可按�
 
 因此「最新更正優先」與「Current JD 未核准前不變」可以同時成立：前者決定顧問如何理解與下一步要處理的差異，後者決定正式文件目前仍是什麼。ContextPack 必須把這種 divergence 明示給模型，不能先把兩者合併成一個看似一致的欄位。
 
-### 7.13 框架能接手與不能接手的部分
+### 7.13 框架可替代的機制與不能遺失的產品語意
 
-| 能交給成熟框架的通用能力 | Caliburn 仍須保留 |
+| 成熟框架可直接承接／替代的機制 | 不論由誰實作都必須成立的產品語意 |
 |---|---|
-| checkpoint／resume、thread state、interrupt／HITL、retry boundary、streaming、tracing | Current JD authority、generation／read-set、proposal commit seam |
-| model interface、structured output、tool schema、dynamic prompt／middleware hook | ContextPolicy：scope、必帶核心、來源資格、最新更正與 retired exclusion |
-| session／store 介面、summary middleware、retrieval connector、token／usage telemetry | 員工原話與 Reference 分權、quote anchor、evidence lineage、ContextManifest |
-| Skills loader／tool discovery、按需載入機制 | Task／Duty／OPKS 專業方法、Skill 版本核准與觸發語意 |
+| checkpoint／resume、thread state、interrupt／HITL、retry boundary、streaming、tracing | 員工是 Current JD authority；AI 只能提出可審核變更；stale／generation／read-set 不得失效 |
+| typed state／reducer、session／store、history、summary、retrieval hook | Work Model 是可修訂假說而非員工原話；最新有效更正、retire／lineage、文件隔離與可解釋進度必須保留 |
+| model interface、structured output、tool schema、dynamic prompt／middleware hook | ContextPolicy 的 scope、必帶核心、來源資格、Reference 分權與最小充分 context |
+| Skills loader／tool discovery、按需載入機制 | Task／Duty／OPKS 的專業分析方法、版本、eligible-set 與何時不該載入 |
+| schema validator、ORM、constraint、transaction、標準 provenance／anchor 型別 | quote 必須能回到有效員工來源；Proposal／Current JD 的多實體原子變更與 deterministic verifier 不可被一般 approval 偷換 |
 
-LangGraph／LangChain 目前提供的 persistence、HITL、Store、middleware 與 tracing 與本需求相容；OpenAI Agents SDK 也有 session、compaction 與可序列化 HITL；Google Agent Platform 提供 Sessions／Memory Bank。它們證明目前已有多個由主流團隊維護的通用 plumbing 候選，不代表候選在 Caliburn 已驗證成熟，也不代表本產品應同時採用或直接交出 authority。Google 的託管 Memory Bank 也不符合 current-only 本機產品的預設部署邊界，現階段只學習其「session、memory、explicit state 分離」架構。
+本節最初曾把 LangGraph typed state 接管整份 document authority 列為可證偽假說：若它能通過 Source-first、revision／lineage、原子變更、並行 stale check、查詢／匯出、schema evolution 與刪除／保留，舊 store 就應刪除。§9.4–§9.5 曾誤把 checkpointer 與現行 store 並存視為 LangGraph 固有問題；§9.6 依直接替換原則修正，§9.7 又以實測把唯一 owner 細分為 Postgres Store 的 Source 與 Postgres checkpointer 的其餘 DocumentState。舊 Source／Work Model／Current JD write store 仍全部退出；Store 與 State 不寫同一事實，所以不是重疊。
 
-框架選型必須後於這份產品 policy，並以小型 conformance spike 驗證；不得為了使用框架而建立第二份 JD、第二份 Work Model 或另一條 AI 直接寫入路徑。
+LangGraph／LangChain 目前提供 persistence、HITL、typed state、Store、middleware 與 tracing；Microsoft Agent Framework 提供 session、context provider、Skills 與 workflow checkpoint；PydanticAI／DBOS 分別提供 typed agent capability 與 PostgreSQL durable transaction。它們證明已有多個主流候選可接手大量 plumbing，不代表應同時採用。Google 的託管 Memory Bank 也不符合 current-only 本機產品的預設部署邊界，現階段只學習其「session、memory、explicit state 分離」架構。
+
+框架選型必須後於這份產品 policy，並以小型 conformance spike 驗證；可完整替代就讓舊機制退場，不完整就放在 port 後承接局部責任，任何情況都不得建立第二份 JD、第二份 Work Model 或另一條 AI 直接寫入路徑。
 
 ### 7.14 正式 Context eval 後置；開發期只留最小安全網
 
@@ -1161,7 +1181,7 @@ Owner 已於 2026-08-12 裁示：時間優先，先完成可用的端到端成�
 - 受限全域工作索引的最終 schema、大小門檻、摘要層級，以及 active consultant model profile 的 context window／能力改變時的降級參數；
 - 是否第一版就使用 embedding、哪個 embedding／reranker 與 top-k；
 - 哪些具體條件值得增加獨立 model-based context planner 或 specialist call；預設不得固定每輪增加；
-- 主要 runtime 採 LangGraph、OpenAI Agents SDK、PydanticAI 或薄型自有 orchestration；
+- 主 runtime 的正式 dependency pin、FastAPI 升級相容 gate、Store／Saver lifespan 與 production schema 細節；LangChain／LangGraph-first 的三個最小 conformance 已由 §9.7–§9.9 完成，PydanticAI＋Harness＋DBOS 只保留為硬缺口時整套切換的 fallback；
 - provider conversation state、compaction、prompt cache 的啟用條件；
 - ContextRequest／ContextPack／ContextManifest 的最終 schema 與資料表。
 
@@ -1195,7 +1215,7 @@ Owner 於 2026-08-12 確認：員工回答即使遇到 AI 失敗也必須保存�
 
 上述是**語意表面**，不要求第一版必須把四類塞入一個巨大 JSON。可以由一次 bounded tool loop、少數按需 specialist result 或一個 final submit contract 實現；實際 topology 仍須以 provider conformance、schema 複雜度、延遲與可維護性決定。固定每輪跑 Extractor／Consultant／OPKS Coder／Projector，或讓罕見 Duty／split／OPKS 結構永久污染常見 schema，都不因本節而成立。
 
-application／framework 應自行產生並保存 operation ID、event ID、時間、model／prompt／Skill／tool version、generation、read-set、state revision、ContextManifest、token／成本、驗證結果與 audit。LLM 不得自行宣稱這些欄位，也不得直接產生 authority commit outcome。LangGraph／LangChain／provider session 可以承接 checkpoint、tool loop、typed output 與 tracing plumbing，但 framework state 不能成為第二份 Source、Work Model、Proposal 或 Current JD。
+application／framework 應自行產生並保存 operation ID、event ID、時間、model／prompt／Skill／tool version、generation、read-set、state revision、ContextManifest、token／成本、驗證結果與 audit。LLM 不得自行宣稱這些欄位，也不得直接產生 authority commit outcome。§9.7–§9.10 的現行主方案由 LangChain／LangGraph 接 tool loop、typed output、checkpoint／resume 與 tracing，以 Postgres Store 單獨擁有完整 Source、Postgres Saver 單獨擁有其餘 DocumentState；任何舊 relational writer 或 frontend cache 都不得鏡射成第二份可寫 Work Model、Proposal 或 Current JD。
 
 這項分離與外部主流做法一致：OpenAI 將 final output、history、interruptions 與 resumable state 分開，並區分 function calling 與 user-facing structured response；Anthropic 將 session 定義為 harness 外的 append-only event log，工具呼叫只代表模型提出結構化要求、由 application 執行；Google ADK 也把 event content、tool event 與 state delta 分開；LangGraph 則把 message stream、state snapshot、interrupt 與 final output 分開。這些框架只證明通用責任邊界，不替 Caliburn 決定職務分析語意與 authority。
 
@@ -1268,14 +1288,14 @@ Google 2026 年 ADK 2.0 的方向更接近本產品：已知 routing、固定 bu
 
 | 候選 | 可直接借用的能力 | 對 Caliburn 的判斷 |
 |---|---|---|
-| LangGraph | `interrupt()` 可送出結構化 payload、暫停並保存 state；官方直接示範 review／edit state；checkpoints、`update_state` 與 time travel 保留舊路徑並可從修訂後狀態繼續 | **最接近理解校準的 runtime 形狀**。但 node resume 會從節點開頭重跑，前置副作用必須 idempotent；graph state 只能承接執行，不得成為第二份 Work Model 或 Current JD |
-| PydanticAI | model／provider abstraction、typed output、deferred tools、人工 approve／deny，且可覆寫待執行 tool arguments；外部 UI 可在取得結果後以 message history 與 correlation 繼續 | **較薄、較符合現有 Python／Pydantic 技術面的候選**。適合把「提交 Work Model correction／Proposal」建成 typed command；但 stop-the-world 是新的 agent run，不是通用 state review/checkpoint，durable 業務狀態仍要由 Caliburn 保存 |
+| LangGraph | `interrupt()` 可送出結構化 payload、暫停並保存 state；官方直接示範 review／edit state；checkpoints、`update_state` 與 time travel 保留舊路徑並可從修訂後狀態繼續 | **§9.7 v0.6 的主方案，核心 state／HITL 已通過探針**。StateGraph 可直接成為 Work Model／Focus／Proposal／Current JD 的唯一 write owner；Source 則由同一家族 Postgres Store 單獨擁有；node resume 仍會從節點開頭重跑，前置副作用必須 idempotent |
+| PydanticAI V2＋Harness＋DBOS | model／provider abstraction、typed output、Capabilities／hooks、Agent Skills、compaction、deferred tools、dynamic model 與官方 durable-execution integration；DBOS 補 workflow／queue／transaction recovery | **§9.7 v0.6 的整套 fallback**。V2 已不是薄 wrapper，但若另以 SQLAlchemy／`eventsourcing` 重建 Work Model／Proposal／JD，對本案的同目的元件直接替換率低於 LangGraph-first；Gate 4-A 未觸發切換條件 |
 | Google ADK 2.0 | graph `RequestInput` 可攜帶 message、structured payload 與 response schema；Session 分 events 與可變 state；rewind 恢復 session state 且保留被 rewind 的事件供稽核 | 技術形狀相容，但 ADK 2.0 graph HITL 很新，且 Google 託管 runtime／memory 不符合本機預設邊界；目前只作設計對照，不構成換框架理由 |
 | OpenAI Agents SDK | approval interruption 與 resumable state 分離；run 暫停時回傳 interruptions＋state，人工決定後恢復同一 run | 適合 provider-specific tool approval，不能直接提供可編輯 Work Model；若作主 runtime 會提高 provider lock-in，較適合作 adapter 或 conformance 對照 |
-| Microsoft Agent Framework | provider clients、session、context providers、memory、middleware、graph workflows、typed request／response HITL 與 checkpoint；官方定位為 Semantic Kernel／AutoGen 的直接後繼 | 是 2026 年最新且功能完整的候選，但框架本身仍新；不能因功能表完整就優先遷移，需先證明 Python 成熟度、Postgres／本機適配與 authority seam 不重複 |
+| Microsoft Agent Framework | provider clients、session、context providers、memory、middleware、Agent Skills、graph workflows、typed request／response HITL 與 checkpoint；官方定位為 Semantic Kernel／AutoGen 的直接後繼 | 不是「整套 experimental」：graph workflow 與核心 agent 能力已有正式文件，Functional Workflow API 等局部仍 experimental；但 2026-07 官方 self-host 文件也明列 Python hosting helpers 仍 prerelease，且 application 自行負責 `SessionStore`、checkpoint mapping 與 durable storage。需先證明本機 PostgreSQL adapter 的淨成本，不能只看功能表判定成熟度 |
 | Anthropic SDK／Managed Agents | tool runner 處理 tool loop、conversation state 與 validation；需要自訂 HITL／logging 時使用 manual loop；Managed Agents 可把 tool 設為 `always_ask` | 支持「敏感副作用由人決定」與 structured notes／外部 memory，但沒有現成的可編輯 domain hypothesis workflow；不值得只為本功能綁定 Anthropic runtime |
 
-共同限制很明確：框架不知道何時一項 Work Model 變化「重要到必須讓員工看見」，也不知道員工更正應如何影響 Story、Task、Duty、OPKS、gap、agenda 與 Proposal。下列內容仍必須是 Caliburn 的 domain contract：
+共同限制很明確：框架不知道何時一項 Work Model 變化「重要到必須讓員工看見」，也不知道員工更正應如何影響 Story、Task、Duty、OPKS、gap、agenda 與 Proposal。下列內容仍必須是產品 contract；可用 framework state、Pydantic、SQL constraint 或純函式實作，不等於必須保留現行 class／table：
 
 - 理解校準的 trigger policy 與 blocking／non-blocking 規則；
 - `UnderstandingReview` 的 focus、摘要、uncertainty、source refs、next move 與 revision；
@@ -1283,12 +1303,7 @@ Google 2026 年 ADK 2.0 的方向更接近本產品：已知 routing、固定 bu
 - 校準與 Proposal／Current JD authority 的硬邊界；
 - stale revision、document isolation、generation／read-set 與原子提交。
 
-本輪建議不是立即全面導入框架，而是把上述 contract 保持 framework-neutral，第一個 conformance spike 只比較兩條最有價值的路徑：
-
-1. **PydanticAI＋既有 Postgres domain state**：驗證較薄 model／tool／typed-result 層能否承接校準與 Proposal 命令；
-2. **LangGraph interrupt＋Postgres domain state**：驗證 checkpoint／review-edit／resume 能否減少 orchestration 程式，又不產生第二份權威狀態。
-
-Microsoft Agent Framework 保留為追蹤候選；OpenAI、Google、Anthropic SDK 作 provider 能力與介面 conformance 來源，不以它們的託管 session 取代 current-only 本地 authority。若第一版每輪都是短而原子的 request／response，PydanticAI 路徑可能更省；若很快需要跨請求的多步中斷、可編輯 state、分支與恢復，LangGraph 的收益才會明顯高於薄型 orchestration。
+本節原先把「graph state 與 Work Model 重疊」本身當成 LangGraph 扣分，這與 §2.11／§2.14 的 owner 裁決不一致。§9.4–§9.5 雖然擴大了候選面，仍反覆把既有 relational business store 當隱性前提；owner 於 2026-08-13 再次糾正後，由 §9.6 修正替代原則、§9.7 補上實測：DocumentState 直接成為 Work Model／Focus／Proposal／Current JD owner，Postgres Store 直接取代 Source journal。舊 writer 退出；兩個機制同時可改同一事實才叫重疊，按事實分工的直接替換不叫重疊。
 
 ### 7.18 「目前理解」UI 與 agent-interface 框架調查（2026-08-12）
 
@@ -1306,8 +1321,8 @@ Microsoft Agent Framework 保留為追蹤候選；OpenAI、Google、Anthropic SD
 
 | 候選 | 已提供能力 | 適配判斷 |
 |---|---|---|
-| 現有 Next／React＋framework-neutral typed contract | 完全控制固定側欄、校準卡、來源展開、revision 與無障礙；可直接沿用現行契約與 authority seam | **第一版建議**。元件少且語意固定，沒有必要先引入新的 agent UI protocol；代價是自行寫少量 presentation 與 action glue |
-| LangGraph frontend `useStream`／HITL | interrupt payload、durable pause／resume、React 等 client hook；review card 可放 transcript、queue、dashboard 或 modal，也支援 edit／respond 與自訂表單 | 若 runtime 選 LangGraph，最值得直接借用；仍由 Caliburn 渲染 `UnderstandingCheckpoint`，不可把通用 approval card 當成 Work Model／Proposal 語意 |
+| 現有 Next／React＋framework-neutral typed contract | 完全控制固定側欄、校準卡、來源展開、revision 與無障礙；可作 LangGraph state／interrupt 的自訂呈現 | 保留產品 UI 語意，不代表必須保留舊 UI state plumbing；若不採 LangGraph Agent Streaming Protocol，仍需一個薄 transport adapter |
+| LangGraph frontend `useStream`／HITL | interrupt payload、durable pause／resume、React 等 client hook；review card 可放 transcript、queue、dashboard 或 modal，也支援 edit／respond 與自訂表單 | **§9.9 已完成實測後未選第一版**。若完整採用，它能直接替換 thread／run／replay／interrupt frontend；但本產品只需 verified product status、typed input 與 durable view，完整 protocol 會多出未使用的 agent surface，自建 compatible backend 又需自行承擔 replay／filter contract。由 Caliburn 定義並渲染 `UnderstandingCheckpoint`，runtime interrupt 仍由 LangGraph 承接 |
 | OpenAI ChatKit widgets／actions | card、list、badge、editable text、form、typed action、server/client handler 與 loading state | 元件形狀符合，但綁 ChatKit／OpenAI conversation surface，且常駐產品側欄仍需自訂；不值得只為一張卡提高 provider／UI lock-in，可作 contract 與互動範例 |
 | AG-UI＋CopilotKit／Microsoft Agent Framework | SSE、HITL、shared state、custom／generative UI、前後端 tool calling；Microsoft 2026 官方整合已支援 Python FastAPI，但目前安裝指令仍帶 `--pre` | 適合 agent 以遠端服務供多個 client、需要跨框架 state sync 時。Caliburn 是本機單一 Web 產品，現在引入會增加第二套 session／state protocol、authority 對映與 preview 成熟度風險，先不採用 |
 | Google A2UI 0.9 | declarative JSON、受信任元件 catalog、incremental update、React renderer、client-defined validation 與多 transport | 是 2026 年重要趨勢，但仍是 pre-1.0，主要解決跨 agent／跨平台的動態 generative UI。Caliburn 的核心校準 UI 應固定且可審查，不需要讓 LLM 自由組版；目前只借用「白名單元件、資料與呈現分離、增量更新」原則 |
@@ -1321,7 +1336,7 @@ Microsoft Agent Framework 保留為追蹤候選；OpenAI、Google、Anthropic SD
 2. `UnderstandingCheckpoint`：由 deterministic trigger policy 產生 soft／branch-blocking 校準請求，攜帶變更摘要、source refs、受影響範圍與允許動作。
 3. `UnderstandingCorrection`：員工的確認、修正或稍後處理命令；server 驗證 revision 後保存 durable source event，再由 reducer 重算。
 
-若之後 conformance spike 選定 LangGraph，可把 `UnderstandingCheckpoint` 映射到 interrupt／`useStream`；若未來真的出現多 client、remote agent 或大量動態表單，再評估 AG-UI／A2UI。這樣跟上「declarative、typed、trusted component、server-validated action」的主流方向，又不為尚未存在的跨平台需求提早付出協定與狀態同步成本。
+依 §9.7 v0.6，`UnderstandingCheckpoint` 由 LangGraph state／interrupt 承接，不另建舊式 durable domain queue；backend restart 已實測。§9.9 再比較 Agent Server、compatible custom backend 與產品 typed SSE：第一版由 FastAPI 原生 SSE 只投影 durable operation／interrupt 狀態，瀏覽器另以 typed command resume；不把完整 LangGraph Agent Protocol 搬進產品 wire。這不是保留舊 transport，而是用 FastAPI／瀏覽器標準直接替換 framing、heartbeat 與 reconnect plumbing；AG-UI／A2UI 仍只在跨框架、多 client 或動態 generative UI 需求成立時評估。[LangChain frontend overview](https://docs.langchain.com/oss/python/langchain/frontend/overview)、[FastAPI SSE](https://fastapi.tiangolo.com/tutorial/server-sent-events/)
 
 ### 7.19 外部 LLM 資料、保存與路由邊界（2026-08-13 已確認）
 
@@ -1445,9 +1460,9 @@ framework-neutral 控制面必須先分開四項責任，避免把「這輪要�
 |---|---|---|---|
 | 0. 產品北極星 | 已收斂 | 顧問是誰、員工有何權力、何謂完成 | §1–§6 的大方向無已知根本衝突 |
 | 1. 端到端情境 | 已收斂 | 正常、改道／更正與失敗恢復時，員工和顧問各自看到、知道、做什麼 | 情境能涵蓋焦點、全域吸收、動態 Task／Duty／OPKS、進度、Proposal、暫停／恢復與匯出，且沒有未揭露的權威跳躍 |
-| 2. 目標能力地圖 | **內部複核完成，待 owner 確認** | 為了實現情境，系統必須具備哪些能力與不變條件 | 每項能力都有輸入、輸出、authority、持久化責任、失敗語意與 `Replace／Wrap／Retain` 判準 |
-| 3. 框架組合選型 | 待研究 | 哪些成熟元件可承接能力，哪些產品語意仍由 Caliburn 擁有 | 比較 2–3 組可落地組合；逐項記相容證據、版本／授權／供應商鎖定、成本與不採用理由，不用「主流」代替 conformance |
-| 4. 目標架構 | 待研究 | 元件如何合作，資料／API／Web／Context／恢復／切換如何落地 | 形成完整設計，通過大方向回歸審查、反方審查與 owner 核准；所有關鍵來源重新查核 |
+| 2. 目標能力地圖 | **已收斂（2026-08-13 owner 確認）** | 為了實現情境，系統必須具備哪些能力與不變條件 | 每項能力都有輸入、輸出、authority、持久化責任、失敗語意與 `Replace／Wrap／Retain` 判準 |
+| 3. 框架組合選型 | **重新開啟：目的層直接替代稽核** | 哪些最新、主流、成熟元件可完整承接中立產品目的，哪些差額才需最薄自寫 | 保留 §9.7–§9.9 三個工程 conformance 證據；回到 §9.5 候選盤點，補「持續理解、焦點／待辦／進度、員工審核、核准成品」的直接替代比較，不因主 runtime 先定就全部改寫成自訂 state |
+| 4. 目標架構 | **撤回 v0.9，等待目的層選型重做** | 勝出的成熟元件如何合作，資料／API／Web／Context／恢復／切換如何落地 | 每個目的都有 framework owner、可刪除的現行概念、只剩的證明差額與端到端驗收；新 §9.10 經 owner 核准後才開 successor ADR 與刪除帳本 |
 | 5. 實作計畫 | 待研究 | 如何在隔離 worktree 內完成受限 Big-bang 並可驗證地切換 | 任務可獨立驗證、列明依賴與回滾點；正式 eval 依 owner 裁示延後到成品完成後，不得因此刪除必要 trace／usage／驗證邊界 |
 | 6. 實作與切換 | 未授權 | 依核准計畫施工、審核、驗證與切換 | 另由 owner 明確授權；本研究稿本身不構成施工授權 |
 
@@ -1461,7 +1476,7 @@ framework-neutral 控制面必須先分開四項責任，避免把「這輪要�
 - **專業分析未被框架取代**：Task 仍是跨故事形成、有 meaningful outcome 的角色責任；Duty 是可重整的共同目的／責任分組；O／P／K／S 必須連回工作與行為證據，不能靠 schema、taxonomy 或 Reference 自動補滿。
 - **流程未回到剛性階段**：廣度盤點與深度訪談可反覆切換；Task、Duty、O、P、K、S 都按當輪焦點與證據載入方法 Skill 並互相校正。2026-07-24 的 Phase 5／6 與 2026-08-04 的獨立 per-Task OPKS child 只描述當時的 prompt／operation 限制；§3.6、§3.8 與 §5.3 是本次升級的 successor 產品方向。保留的是 evidence linkage、gap、unknown／not applicable、輸出量控制與失敗邊界，不保留固定順序或呼叫拓撲。
 - **員工 authority 未弱化**：AI 更新 Work Model、agenda 與候選；只有可編輯 Proposal／changeset 經員工決策，或員工直接編輯，才能透過 authority seam 改 Current JD。
-- **記憶與 Context 未變成第二份真相**：同一員工的原話、最新有效更正與來源關係完整保存；模型只取得本輪必要 context，framework checkpoint／provider state／summary 都不能取代本地 Source、Work Model 或 Current JD。
+- **記憶與 Context 未變成第二份真相**：同一員工的原話、最新有效更正與來源關係完整保存；模型只取得本輪必要 context，provider state／summary／旁路 memory 不得取代 document authority。通過 conformance 的 Postgres Store 單獨擁有 Source、framework State／checkpointer 單獨擁有其餘 DocumentState；它們不是同一事實的雙寫，舊 Source／Work Model／Current JD write store 必須退出。
 - **進度與完成沒有假精確**：顯示目前已知 coverage、各範圍分析深度、具體 gap 與待決 Proposal；AI 解釋是否足夠，員工決定繼續、暫停或在看過缺口後強制匯出。
 - **正常、改道、更正、失敗與恢復均有權威邊界**：旁支線索保存但不任意打斷；更正只使受影響依賴失效並重查；未完成模型處理不產生半套 Work Model／Proposal；正常重開只需恢復既有狀態，不建立專用子系統。
 - **範圍仍受控**：不新增登入、多租戶、公司文件／SOP、多人協作或先期完整 eval；RAG 是核心顧問完成後的 final integration gate，不反向定義員工事實。
@@ -1500,16 +1515,16 @@ Gate 1 的離開條件已有對應情境與裁決，因此進度移到 Gate 2。
 | ID | 核心能力與 `input → output` | Authority／持久化責任 | 失敗語意 | 第一輪處置方向 |
 |---|---|---|---|---|
 | C1 | **員工來源接收與更正**：回答／直接修正／取代意圖＋idempotency identity → immutable source event、來源關係與已保存回執 | 員工原話是來源 authority；模型前先存 PostgreSQL；framework history 不是權威 | 重送不重複來源；AI 失敗不遺失原話，維持 pending／failed processing | `Retain` 來源語意；fresh schema 可 `Replace` 舊資料形狀；session／memory framework 只能 `Wrap` |
-| C2 | **Context 與記憶選擇**：operation／focus、Source、Work Model、Current JD、gap／Proposal、budget → 必要核心、受限全域索引、按需候選與可追溯 manifest | 不產生業務 authority；完整資料仍在本地 domain store，manifest 是 execution artifact | 必帶核心缺失或超出安全 budget 時 fail-closed；optional context 不足形成 visible gap，不偷補 | `Retain` scope／precedence／來源資格 policy；以 context provider、retrieval、cache、compaction `Wrap`；`Replace` 現行固定 packet 拼裝 |
-| C3 | **受控顧問 run／orchestration**：已保存 input、Context、可用 Skills、execution profile → typed semantic result、tool receipts、整合回覆與一個主要下一題 | runtime 無 domain write authority；run／attempt／checkpoint 是執行證據 | 同一 run 受限 retry／resume；無合格完整結果就不做 semantic commit，不偽裝成功 | `Retain` adaptive bounded run contract；候選框架 `Wrap`；`Replace` 現行 consultation＋Task／OPKS 固定 child 拓撲 |
+| C2 | **Context 與記憶選擇**：operation／focus、Source、Work Model、Current JD、gap／Proposal、budget → 必要核心、受限全域索引、按需候選與可追溯 manifest | 不產生新的業務 authority；完整資料留在本機唯一 PostgreSQL document aggregate；manifest 是 execution artifact，framework history／memory 不是 truth | 必帶核心缺失或超出安全 budget 時 fail-closed；optional context 不足形成 visible gap，不偷補 | `Retain` scope／precedence／來源資格 policy；Capabilities、retrieval、cache、compaction 可 `Replace` 大部分組裝／生命週期 plumbing，不只外包一層；刪除現行固定 packet 拼裝 |
+| C3 | **受控顧問 run／orchestration**：已保存 input、Context、可用 Skills、execution profile → typed semantic result、tool receipts、整合回覆與一個主要下一題 | model／tool step 無 domain write authority；通過 verifier 的 datasource transaction 才可產生 semantic transition；run／attempt／checkpoint 只屬執行證據 | 同一短 run 受限 retry／resume；無合格完整結果就不做 semantic transition，不偽裝成功 | `Retain` adaptive bounded run contract；成熟 runtime 可 `Replace` consultation＋Task／OPKS 固定 child、retry／resume／HITL 拓撲，而非只 `Wrap` 外圍 |
 | C4 | **職務分析方法 Skills**：焦點證據／工作假說／gap → Task／Duty／O／P／K／S typed finding、linkage、gap、reopen／no-op 理由 | Skill 只提候選；版本、prompt／schema 與實際載入集合進 run snapshot | 沒有足夠證據可回 no-op／gap；不合法、無 anchor 或越權候選被拒絕，不因 schema 必填補造 | `Retain` 已研究的分析方法；Skill registry／progressive loading 可 `Wrap`；`Replace` monolithic prompt、固定階段與 per-axis 呼叫假設 |
-| C5 | **可演化 Work Model 與依賴對帳**：verified findings＋現有假說／lineage → 新增、修正、retire、merge／split／reassign、gap 與 dependency invalidation | Work Model 是本地分析 authority，不是 Current JD；持久保存穩定 ID、來源與 revision | 與 agenda／Proposal 一次 semantic commit；更正只使受影響分支 stale／challenged，界線不安全才擴大重算 | `Retain` 語意與 dependency policy；因目標含 Duty hypothesis／跨軸 linkage，預期 `Replace` 現有 schema／reducer；framework state 不得成為第二份真相 |
-| C6 | **焦點、agenda、三層進度與 readiness**：員工改道／延後意圖＋Work Model、Current JD、gap、Proposal、challenge → 建議焦點、返回點、稍後線索、coverage／depth／decision 投影與停止理由 | focus／agenda 的必要 workflow state 持久保存；進度／readiness 優先為可重建投影，不取得 JD authority | 投影故障不改 domain truth；blocked 只作用於相依 branch；未知與不適用明示保留；員工改道不能遺失原焦點或旁支線索 | `Retain` 產品語意；`Replace` 舊窄 agenda／固定 readiness 假設；workflow framework 只可 `Wrap` checkpoint／scheduling |
-| C7 | **typed changeset、審核與 Current JD authority**：verified change intents＋before／after／dependencies → 可編輯 review bundle；員工 decision → Current JD commit／stale disposition | 只有員工 accept／edit 或直接編輯可經 authority seam 改 Current JD；Proposal 是 durable domain object | stale、部分原子群組失敗或 generation／read-set 改變時整組不硬套；決策命令 idempotent | `Retain` 員工 authority；建立跨 Task／Duty／OPKS typed changeset 以 `Replace` 分裂的舊 Proposal 拓撲；framework HITL 只 `Wrap` 暫停／呈現／回傳 |
-| C8 | **deterministic verification、semantic commit 與恢復**：model result、anchors、generation／read-set、domain invariant → verified commit plan 或 typed rejection／receipt | application 驗證資格；PostgreSQL 單一 semantic transaction 寫 Work Model／agenda／Proposal／顧問回合，員工 decision 另交易 | 已安全保存的 provider artifact 可重播而不盲目重打；semantic commit 冪等且半套業務結果不可見；外部呼叫 outcome 未知的 crash window 仍可能重複計費；transaction 失敗 rollback | `Retain` invariants、transaction 與 idempotency seam；Pydantic／SQLAlchemy 等成熟庫深化；checkpoint framework `Wrap` execution，重複 verifier plumbing 可 `Replace` |
+| C5 | **可演化 Work Model 與依賴對帳**：verified findings＋現有假說／lineage → 新增、修正、retire、merge／split／reassign、gap 與 dependency invalidation | Work Model 是本地分析 authority，不是 Current JD；新 aggregate 持久保存穩定 ID、來源與 revision | 與 agenda／Proposal 一次 semantic commit；更正只使受影響分支 stale／challenged，界線不安全才擴大重算 | `Retain` 語意與 dependency policy；因目標含 Duty hypothesis／跨軸 linkage，預期用 Pydantic／SQLAlchemy／PostgreSQL `Replace` 現有 schema／reducer；舊 Work Model 不雙寫、不保留相容層 |
+| C6 | **焦點、agenda、三層進度與 readiness**：員工改道／延後意圖＋Work Model、Current JD、gap、Proposal、challenge → 建議焦點、返回點、稍後線索、coverage／depth／decision 投影與停止理由 | focus／agenda 的必要狀態保存於同一 aggregate；進度／readiness 優先為可重建投影，不取得 JD authority | 投影故障不改 domain truth；blocked 只作用於相依 branch；未知與不適用明示保留；員工改道不能遺失原焦點或旁支線索 | `Retain` 產品語意；Capabilities、context provider、DBOS short-turn execution 與新 aggregate 可 `Replace` 舊 focus／agenda／progress persistence 與 scheduling，不只 `Wrap` |
+| C7 | **typed changeset、審核與 Current JD authority**：verified change intents＋before／after／dependencies → 可編輯 review bundle；員工 decision → Current JD commit／stale disposition | 只有員工 accept／edit 或直接編輯可經 authority seam 改 Current JD；Proposal 是 durable domain object | stale、部分原子群組失敗或 generation／read-set 改變時整組不硬套；決策命令 idempotent | `Retain` 員工 authority；建立跨 Task／Duty／OPKS typed changeset 以 `Replace` 分裂的舊 Proposal 拓撲；UI decision 是獨立 typed command，不需要暫停長 workflow |
+| C8 | **deterministic verification、semantic commit 與恢復**：model result、anchors、generation／read-set、domain invariant → verified commit plan 或 typed rejection／receipt | application 驗證資格；一個 PostgreSQL aggregate transaction 原子成立 Work Model／agenda／Proposal／顧問回合，員工 decision 另作原子 transition；DBOS checkpoint 只承接 execution | 已安全保存的 provider artifact 可重播而不盲目重打；semantic transition 冪等且半套業務結果不可見；外部呼叫 outcome 未知的 crash window 仍可能重複計費；本機 transition 失敗不留下半套 authority | `Retain` invariants、原子性與 idempotency 語意；DBOS／Pydantic／SQLAlchemy `Replace` execution／validation／commit plumbing，舊實作退出 |
 | C9 | **iCAP Reference／RAG coverage challenge**：目前工作模型／gap＋versioned corpus → retrieval candidates、中立問題、challenge receipt／no-match | Reference 無員工事實 authority；只保存真正呈現、改變 agenda／Proposal 或形成 coverage 裁決的 receipt | 檢索失敗不汙染 Source／Current JD；核心訪談可繼續，切換前 final integration gate 必須通過 | `Retain` 已隔離 PDF／OCS／indexer／embedder assets 與 challenge policy；retriever／reranker／tooling 可 `Wrap`；第一版不先建 GraphRAG |
 | C10 | **模型／provider 控制與可觀測性**：active consultant model profile＋operation execution policy＋Context → provider result、actual model、usage／cost／latency、route／attempt receipt | 無 domain authority；本地保存 profile version、resolved snapshot 與 receipts | timeout、rate limit、schema、refusal、truncation、model mismatch 分型；只對 transient failure 受限重試 | `Retain` Caliburn routing／成本／資料政策；以通用 model interface／gateway／SDK `Wrap`，並 `Replace` OpenRouter-only adapter 與散落參數 |
-| C11 | **API／Web／匯出產品面**：server commands／projections／Current JD → 一頁顧問工作區、來源／進度／Proposal／JD 操作、generated contracts 與 deterministic XLSX | server 重新驗 domain rules；Web 不重算 invariant、不建第二份 store；匯出只讀 Current JD | 顯示 durable saved／processing／failed／stale 狀態；dirty edit 不被覆蓋；匯出前揭露具體缺口並允許員工強制匯出；匯出失敗不改 authority | `Retain` 文件庫、契約策略、Current JD direct edit、deterministic assembly／XLSX；`Replace` 顧問 API／UI 舊流程；framework frontend hook 只有 conformance 後才 `Wrap` |
+| C11 | **API／Web／匯出產品面**：server commands／projections／Current JD → 一頁顧問工作區、來源／進度／Proposal／JD 操作、generated contracts 與 deterministic XLSX | server 重新驗 domain rules；Web 不重算 invariant、不建第二份 store；匯出只讀 Current JD | 顯示 durable saved／processing／failed／stale 狀態；dirty edit 不被覆蓋；匯出前揭露具體缺口並允許員工強制匯出；匯出失敗不改 authority | `Retain` 文件庫、契約策略、Current JD direct edit、deterministic assembly／XLSX；`Replace` 顧問 API／UI 舊流程；Gate 4-C 已選 FastAPI typed SSE＋`EventSource`＋TanStack Query 接手通用 transport／reconnect／cache 機制，產品只保留 typed event／command、authority 與 dirty-edit policy |
 
 #### 9.3.1 Gate 2 的完成證據
 
@@ -1542,7 +1557,775 @@ Gate 2 不要求先決定 class、table 或框架。完成時必須能從每個 
 
 未發現需要新增產品功能才能完成既定情境。登入／多租戶、公司文件／SOP、多人協作、自由多 Agent、GraphRAG、獨立 planner model、第二份 memory store、專用 Resume 子系統與成品前正式 eval 仍不進第一版。安全、資料政策、prompt injection、授權、版本／授權條款、operability 與成本不是新產品功能，但必須成為 Gate 3 每個框架組合的橫向淘汰條件。
 
-**Gate 2 研究結論**：能力地圖已通過內部覆蓋與範圍審核；目前只待 owner 確認這個邊界。確認後進入 Gate 3，不再追加產品角色或流程；若後續框架 conformance 暴露能力衝突，回報衝突並回到本表處理，不靜默改北極星。
+**Gate 2 研究結論**：能力地圖已通過內部覆蓋與範圍審核，owner 於 2026-08-13 確認後進入 Gate 3。後續不再追加產品角色或流程；若 framework conformance 暴露能力衝突，回報衝突並回到本表處理，不靜默改北極星。
+
+### 9.4 Gate 3：框架組合研究 v0.3（歷史方案；已由 §9.6 取代）
+
+> **版本註記（2026-08-13）**：本節保留為選型推理紀錄，但其中「不取 Harness Planning」、「Focus／agenda／progress 必須和所有 business state 一起重寫成一個自有 aggregate」，以及「只先測 Pydantic、失敗才測 LangGraph」先被 §9.5 逐元件重驗，再由 §9.6 的直接替換判準取代。本節所載 PydanticAI-first 只是歷史結論；目前主方案與正式理由以 §9.6 為準。
+
+v0.2 修正「不可因舊系統已存在就保留舊機制」是對的，但把「替代率最高」過度等同於「讓 graph checkpoint 接管最多業務 state」，因此又被框架形狀帶偏。正確判準仍是：**保留職務分析目的、產品語意與不變量；成熟框架若能完整承接機制，就讓它成為唯一 owner 並刪除舊實作。** 但「使用最多框架功能」不是目的，把不適合的 framework state 當 Current JD／Proposal 業務資料庫也不算升級。
+
+本輪重查 2026-06-23 正式發布的 PydanticAI V2、第一方 Pydantic AI Harness 與最新 DBOS integration 後，v0.2 有三個已失效的技術前提：
+
+1. PydanticAI V2 core 已是 stable major，Capabilities／hooks、provider、typed output、dynamic model 與 on-demand loading 是核心設計，不再只是「薄 LLM wrapper」。[PydanticAI version policy](https://pydantic.dev/docs/ai/project/version-policy/)、[PydanticAI V2](https://pydantic.dev/articles/pydantic-ai-v2)
+2. 第一方 Harness 已有 Agent Skills progressive disclosure、conversation compaction 與 tool-output limits；因此 Context／Skill 機制不必大多自寫。不過 Harness 仍是 0.x，minor 可 breaking，只能精準 pin 並選配，不可整套引入。[Pydantic AI Harness](https://pydantic.dev/docs/ai/harness/)、[Harness Skills](https://pydantic.dev/docs/ai/harness/skills/)、[Harness Compaction](https://pydantic.dev/docs/ai/harness/compaction/)
+3. 最新 DBOS integration／API reference 已明列 `DynamicToolset` 與 `DynamicCapability` 可被 durable wrapper 接手，只要求 stable ID 與 deterministic factory；v0.2 所寫「動態 capability 自帶 toolset 不支援」已過時。由於較舊 capability 頁仍可搜尋到相反敘述，這是明確的版本漂移風險，必須以精準版本＋canary 驗證，不能只信文件摘要。[PydanticAI DBOS integration](https://pydantic.dev/docs/ai/capabilities/durable_execution/dbos/)、[DynamicCapability API](https://pydantic.dev/docs/ai/api/pydantic-ai/capabilities/)
+
+現行 Python 3.13、FastAPI、Pydantic 2、SQLAlchemy async、PostgreSQL 與 OpenTelemetry 只作執行環境、可刪碼與相容證據；`consultation`、Task／OPKS child、Work Model、provider adapter、class 或資料表拓撲都不是目標架構模板。這次改判不是「保守地包住舊系統」，而是把通用機制交給 PydanticAI／Harness／DBOS，把 Source／Work Model／Proposal／Current JD **整體重寫成一個新的 PostgreSQL authority boundary**，再刪除舊 runtime 與舊 store。這裡的「一個 aggregate」指單一權威與 transaction seam，不是強迫塞進一個 JSONB row。
+
+#### 9.4.1 橫向淘汰條件
+
+候選組合必須同時通過：
+
+1. 忠實承接「一位主要顧問＋受限內部 loop＋動態焦點」，不能強迫改成員工可見多 Agent、固定 wizard 或每輪固定多模型流水線；
+2. 每項產品責任只有一個 authoritative owner；若 framework 接手 Work Model／memory／Proposal／Current JD，舊實作必須刪除或只留可重建 projection，禁止雙寫與雙向同步；
+3. 支援 typed state／structured output，且 deterministic verifier 能在 framework schema validation 後獨立拒絕來源、authority、引用與跨實體語意錯誤；
+4. Task／Duty／O／P／K／S 採 Agent Skills progressive disclosure；eligible set 先由 deterministic focus／gap policy 縮小，再讓模型於該集合選用，不能把全部方法與工具常駐 context；
+5. model、provider、reasoning、token、timeout、fallback 與 route 由版本化 application profile 決定，可保存 requested／actual model、provider、usage、refusal、truncation 與 request receipt；
+6. 員工輸入必須在 model call 前 durable；crash／resume、HITL、重試與 side effect 的語意可證明，不能把 at-least-once 外部呼叫誤寫成 exactly-once；
+7. 第一版沿用本地 PostgreSQL，無強制雲端控制面、向量 memory service、graph database 或額外 workflow cluster；
+8. framework 版本、state schema、node／workflow 變更、checkpoint retention、document delete 與資料加密／反序列化安全均有明確升級路徑；
+9. 可沿用 OpenTelemetry 或輸出標準 OTel；員工原話、prompt、tool result 與 JD 內容預設不進 telemetry，因 OTel GenAI semantic conventions 明確警告這些欄位可能含敏感資料。[OpenTelemetry GenAI attributes](https://opentelemetry.io/docs/specs/semconv/registry/attributes/gen-ai/)
+10. 以「刪除的自寫責任與概念－新增 adapter／migration／操作負擔」衡量淨複雜度；只有套件功能多、star 多或 LOC 看起來少都不算通過。
+
+本輪官方資料呈現的共同趨勢不是「一切都交給自由 Agent」，而是把 agent 分成可組合責任：LangGraph／LangChain 分為 runtime、agent framework、middleware 與可選 harness；Microsoft Agent Framework 分 agent、Skills、context provider、session 與 deterministic workflow；Google ADK／AWS Strands 也各自分 state／session、tools、HITL 與 observability。Agent Skills 又把 domain instructions／references／scripts 收斂成跨產品的 progressive-disclosure 格式。這些大廠／主流實作共同支持「一位顧問＋顯式 durable state＋按需專業能力＋application-controlled side effects」，不支持把 Task、Duty、O、P、K、S 各拆成長駐 agent。[LangGraph product layers](https://docs.langchain.com/oss/python/concepts/products)、[Microsoft Agent Framework overview](https://learn.microsoft.com/en-us/agent-framework/overview/)、[Agent Skills overview](https://agentskills.io/home)、[Anthropic — Building effective agents](https://www.anthropic.com/engineering/building-effective-agents)
+
+因此選型的分水嶺已不是誰有基本 agent loop，也不是誰能把最多欄位塞進 graph state，而是：誰能用最少新增概念承接**短回合 agent execution＋一份長期 document authority**，可靠升級、限制 context／tool／model 成本，並保留可審核 provider 與 authority receipt。Microsoft 也明確建議先用能滿足需求的最簡單 agent／Skill／context pattern，只有已知步驟與順序本身需要保證時才升級成 workflow graph；本產品的訪談路徑恰好是動態、不是固定流程。[Microsoft — Skills vs. workflows](https://learn.microsoft.com/en-us/agent-framework/agents/skills)、[Microsoft — Workflows](https://learn.microsoft.com/en-us/agent-framework/journey/workflows)
+
+#### 9.4.2 產品責任替代矩陣
+
+| 產品責任 | v0.3 選定的成熟機制 | 處置 | 仍屬產品的語意／待驗證 |
+|---|---|---|---|
+| model／provider／參數／fallback／typed response | PydanticAI V2 model/provider、OpenRouter settings、typed output／output validator、`SelectModel`／`ResolveModelId` | **Replace** 現行 provider ports、固定 child model 設定、wire parser 與 output repair plumbing | application profile 仍決定 model／provider／reasoning／budget，不讓 LLM 或 Skill 自行換模型；須驗 actual route、usage、refusal、truncation、cache 與 `allow_fallbacks=False`。[PydanticAI OpenRouter](https://pydantic.dev/docs/ai/models/openrouter/)、[PydanticAI output](https://pydantic.dev/docs/ai/core-concepts/output/) |
+| bounded agent loop、tool loop、dynamic capabilities | PydanticAI V2 Agent＋Capabilities／hooks／toolsets | **Replace** 自寫 operation wrapper、agent loop、tool dispatch、一般 retry 與模型生命週期 | 仍由 application 設定最大 request／tool／token／timeout；同一員工回合只是一位主顧問的受限 loop，不產生員工可見多 Agent |
+| Task／Duty／O／P／K／S 方法按需載入 | Agent Skills 規格＋精準 pin 的 Harness `Skills`／core on-demand Capability | **Replace** 自寫 Skill discovery、frontmatter validation、catalog 與 progressive disclosure | Caliburn 只保留研究過的方法內容、版本核准、deterministic eligible set 與資源授權。Harness `include` 是 construction-time filter，per-run 過濾須以 stable `DynamicCapability` 或有限 profile registry 證明；`Skills` 不讀 bundled resources，仍需一個只讀且鎖在核准 roots 的小型 resource tool。[Harness Skills](https://pydantic.dev/docs/ai/harness/skills/)、[On-demand capabilities](https://pydantic.dev/docs/ai/capabilities/on-demand/) |
+| Context Engine／對話窗／token 與大 tool result | PydanticAI hooks／history processor、Harness Compaction／Tool Output Limits、provider prompt cache | **Replace** 訊息窗、tool-pair 安全裁切、compaction、超大結果 spill／paging、token／request accounting 與 cache plumbing | 仍需很薄的產品 `ContextPolicy`：來源資格、更正 precedence、focus slice、global index、Reference 分權、必帶核心與 `ContextManifest`。先採 zero-LLM compaction；summary 只能作 hint、不能取代 Source。[Harness Compaction](https://pydantic.dev/docs/ai/harness/compaction/)、[Tool Output Limits](https://pydantic.dev/docs/ai/harness/tool-output-limits/) |
+| source-first durable execution、重試、queue、recovery | PydanticAI `DBOSDurability`＋DBOS workflow／partition queue／workflow ID／SQLAlchemy datasource | **Replace** `consultation/durable_turn`、自寫 replay／lease／operation receipt 與大部分 retry orchestration | 一份文件一個 queue partition、`concurrency=1`；`workflow_id` 由 `input_event_id` 推導。provider call 仍是 at-least-once，禁用重複 HTTP retry；只有同 DB datasource transaction 的業務 commit 可宣稱 exactly-once。[PydanticAI DBOS](https://pydantic.dev/docs/ai/capabilities/durable_execution/dbos/)、[DBOS queues](https://docs.dbos.dev/python/tutorials/queue-tutorial)、[DBOS datasource transactions](https://docs.dbos.dev/python/tutorials/transaction-tutorial) |
+| 員工原話、correction、Work Model、Focus、agenda／gap、progress、Proposal、Current JD | PostgreSQL＋SQLAlchemy＋Pydantic 的**新單一 document aggregate boundary** | **整體 Rewrite 並刪除舊 store／class 拓撲**，不是保留現行 domain implementation | 通用 agent memory／checkpoint 不知道 source lineage、Task identity、Duty／OPKS dependency、retire、read-set、stale 與 authority。可用成熟 DB／validation framework 重寫機制，但這些產品語意必須顯式建模；可跨多表，只有一個可寫 authority |
+| 員工 Proposal review／authority commit | typed changeset＋PostgreSQL transaction／constraint＋aggregate revision CAS | **重寫機制、保留產品決策權**；不把 Proposal 當暫停中的 tool call | AI 回合完成時保存 Proposal；員工接受／修改／退回／拒絕／延後是之後的獨立 idempotent command。這避免為等待數小時／數天的 UI 決策保留長 workflow，也減少 workflow 升版負擔 |
+| deterministic verifier／quote anchor／provenance | Pydantic schema／output validator、DB constraints、W3C TextQuote／TextPosition／PROV-O，加產品純函式 verifier | **Replace 通用 validation plumbing，重寫並保留 domain rule**；不另加 Guardrails framework | 框架可驗形狀、型別與局部限制，不能判斷員工來源是否支持 claim、最新更正、Task／Duty／OPKS 語意或跨實體 authority；這些規則是產品本體，不是重複造框架。[W3C Web Annotation](https://www.w3.org/TR/annotation-model/)、[W3C PROV-O](https://www.w3.org/TR/prov-o/) |
+| telemetry／usage／cost | PydanticAI Instrumentation＋DBOS OpenTelemetry | **Replace** 散落 tracing、usage 與 request correlation | 只記 ID、版本、workflow／step、model／provider、token、耗時、錯誤與 decision code；員工原話、prompt、JD 與 tool raw result 預設關閉或遮罩 |
+| iCAP／Reference RAG | 現有隔離 bounded context；LlamaIndex ingestion／retriever／citation 與 Harness Tool Output Limits 是後續候選 | 最後整合關卡再 **Replace／Wrap** retrieval plumbing，不讓 RAG 先定義顧問核心 | RAG 只提供 Reference challenge／候選 context，不能建立員工事實、Work Model authority 或自行改 JD；第一版不加 GraphRAG |
+
+這張表仍不寫「Caliburn domain 一律保留」。真正保留的是右欄的產品語意；現行 class、module、repo、table 與 packet 都可刪。另一方面，PostgreSQL／SQLAlchemy／Pydantic 本身也是成熟框架；讓它們重寫一個業務 aggregate，不等於「什麼都自己寫」，也比把 Current JD 硬塞進 agent checkpoint 更符合各框架原本的責任。
+
+#### 9.4.3 Finalist A：PydanticAI V2 core＋選配 Harness＋DBOS＋新 PostgreSQL aggregate（優先 conformance）
+
+這是目前產品吻合度與淨刪碼最平衡的組合，不是薄 fallback：
+
+- **一位主顧問**：PydanticAI Agent 承接 model／tool loop、typed output、provider、usage、hooks 與有限 retry；Task／Duty／O／P／K／S 是同一 agent 可按需載入的 Capabilities／Skills，不拆成長駐 agent，也不建立固定 wizard；
+- **穩定 core、窄用 Harness**：PydanticAI V2 core 依 stable major 使用；Harness 只先取 `Skills` 與必要的 zero-LLM compaction，精準 pin 0.x。Tool Output Limits 等到 Reference／RAG 真的接入再開。明確不取 Harness Memory、StepPersistence、ConversationSearch、Planning、Subagents、Dynamic Workflow、FileSystem、Shell 與 Code Mode；
+- **短回合 durable workflow**：每次員工輸入是一個會正常結束的 DBOS workflow，不把整場數天訪談做成一條永不結束的 workflow。`workflow_id` 由 `input_event_id` 推導；partitioned queue 以 `document_id` 分區且 `concurrency=1`，同文件 AI 回合串行，不同文件可平行。[DBOS workflow IDs](https://docs.dbos.dev/python/tutorials/workflow-tutorial)、[DBOS partitioned queues](https://docs.dbos.dev/python/reference/queues)
+- **一份長期業務 authority**：Source ledger、有效更正、Work Model、focus、agenda／gap、progress、Proposal、Current JD 與 revision/read-set 由新的 PostgreSQL aggregate boundary 擁有。DBOS 只保存 execution／step／queue 狀態，PydanticAI message history 只保存模型執行歷史；兩者都不是第二份可寫 Work Model／JD；
+- **Proposal 不等於 suspended tool**：AI 回合輸出 Proposal 後就結束。員工稍後的 accept／edit／revision-request／reject／defer 是獨立 application command，透過 aggregate revision CAS 原子提交；不為 UI 等待濫用 deferred-tool resume；
+- **可換模型但不自由漂移**：PydanticAI `SelectModel`／`ResolveModelId` 與 OpenRouter provider settings 讓主顧問、未來的受限結構化分析或 Reference operation 可使用不同 profile；是否換模型由版本化 application policy 決定，不是把產品拆成多 Agent，也不是讓 LLM 自己選最貴模型；
+- **安全序列化與短資料**：DBOS 預設 Python serializer 是 pickle，目標架構改用 custom JSON／portable serializer，workflow input／step output 只傳小型 ID 與 typed DTO，原始文件與 aggregate 從 PostgreSQL 依 ID 讀取。PydanticAI 官方也建議 durable input／output 保持約 2 MB 以下。[DBOS custom serialization](https://docs.dbos.dev/python/reference/contexts)、[PydanticAI DBOS considerations](https://pydantic.dev/docs/ai/capabilities/durable_execution/dbos/)
+
+同一個員工回合的參考執行如下；這是責任映射，不是新增固定產品階段：
+
+1. API 以 `input_event_id` 冪等接受員工回答；首選讓 Source insert 與 DBOS enqueue 在同一 PostgreSQL transaction 成功，或以同等 outbox seam 證明兩者不會一半成功。DBOS Client 已支援在同一 system database 的 SQLAlchemy transaction 內 enqueue，conformance 必須驗現行 async stack 是否可直接採用。[DBOS enqueue in transaction](https://docs.dbos.dev/python/reference/client)
+2. DBOS 依 `document_id` partition queue 啟動短 workflow；第一個 datasource transaction 讀取 expected aggregate revision 與本輪 Source ID，建立不可變 execution snapshot／receipt。
+3. application 的 `ContextPolicy` 依目前焦點、具體 gap、未決 Proposal、有效更正與 token budget，選出 source／Work Model／Current JD／Reference slices，並產生 `ContextManifest`；framework 處理訊息生命週期與裁切，不替產品決定何者是合格證據。
+4. application 先算 deterministic `eligible_skill_ids`；stable DynamicCapability 或有限 profile registry 只暴露該集合的 Skill metadata。模型需要時載入 Task／Duty／O／P／K／S 方法；global ingestion／source handling 規則永遠存在。
+5. PydanticAI 在固定 request／tool／token／timeout 上限內執行同一主顧問 loop，按 application profile 選 model／provider／settings，產生 typed `ConsultantTurnResult`。
+6. Pydantic schema／output validator 先擋形狀錯誤；產品純函式 verifier 再查 quote anchor、最新更正、來源資格、stable identity、Task／Duty／OPKS dependency 與 authority rule。驗證失敗只留下 Source 與 execution receipt，不產生半套業務結果。
+7. `AsyncSQLAlchemyDatasource` transaction 重讀 aggregate revision／read-set，將 verified findings、Work Model、focus／agenda／progress、Proposal 與 visible turn 原子寫入；Current JD 只有員工 decision command 才可改。[DBOS datasource transactions](https://docs.dbos.dev/python/tutorials/transaction-tutorial)
+8. workflow 正常結束並發布可查詢狀態；下一回合從 aggregate 取回最近對話＋相關 Source／Work Model／JD／gap，而不是相信模型自行維護的 notebook。
+
+這個組合仍有真實風險：Harness 0.x 需精準 pin；最新動態 capability 文件與較舊頁面有版本差異；DBOS workflow code 必須 deterministic，model／network／DB I/O 要落在正確 step／datasource；step retry 不能區分所有 non-retryable misconfiguration；workflow code 改變 step 順序仍需 patch／version。採「每回合短 workflow、Proposal 決策另開 command」可讓絕大部分 workflow 在部署前自然 drain，大幅降低升版負擔，但不能宣稱風險消失。[DBOS workflow upgrades](https://docs.dbos.dev/python/tutorials/upgrading-workflows)
+
+#### 9.4.4 Finalist B：LangChain Agent／middleware＋LangGraph runtime＋新 PostgreSQL aggregate（v0.3 當時的 fallback；已失效）
+
+LangGraph 仍是成熟且功能完整的 graph runtime，但本輪不再優先測 graph-native authority：
+
+- **A1 graph-native document state 淘汰為第一版目標**：LangGraph 官方把 checkpointer 定義成每個 superstep 的 thread state snapshot／short-term memory，不是具業務 CAS、任意查詢、跨表 constraint 與 domain migration 的 document database；預設又會在每個 superstep 寫各 channel 完整新值，`DeltaChannel` 仍是 beta。把 Source／Current JD 塞進 checkpoint 只是為了追求表面替代率，並不比 PostgreSQL aggregate 更成熟。[LangGraph persistence](https://docs.langchain.com/oss/python/langgraph/persistence)
+- **A2 仍可成立**：LangGraph 可接手 agent loop、middleware、checkpoint／resume、HITL 與 execution history，PostgreSQL aggregate 保持唯一業務 authority；這不是雙 truth。但與 Finalist A 相比，還要維護 LangChain＋LangGraph＋SkillsMiddleware、graph checkpoint schema／retention，以及另一個 per-document serialization 機制；
+- **OSS 併發缺口**：reject／enqueue／interrupt／rollback 等「double texting」是 LangSmith Deployment 功能，不在 LangGraph OSS；本地產品仍要自建 queue／lease。DBOS partition queue 已直接提供此責任。[LangSmith double texting](https://docs.langchain.com/langsmith/double-texting)
+- **升版與長 history 成本**：LangGraph 以最新 graph code 讀既有 checkpoint；node／state schema 是 persisted API，`update_state` 會 fork history、不是業務 rollback／CAS。這些能力若產品需要 time travel／長 interrupt 很有價值，但目前只會多一套生命週期。[LangGraph backward compatibility](https://docs.langchain.com/oss/python/langgraph/backward-compatibility)、[LangGraph time travel](https://docs.langchain.com/oss/python/langgraph/use-time-travel)
+
+只有在 Finalist A 的 conformance 證明以下任一**核心缺口**無法以小型 adapter 補齊時，才切到 B：per-run eligible Skills 無法 durable replay、PydanticAI agent loop 無法表達必要 bounded control、DBOS 無法在現行 async PostgreSQL seam 保證 source-first／atomic commit，或實測淨刪碼沒有下降。若未來產品真的出現固定多節點流程、必須跨數天原地 resume 的非 Proposal 工作、graph time travel／fork 成為正式產品能力，也應重評 LangGraph。不能把 DBOS 與 LangGraph 同時放進 production 做兩套 durable runtime。
+
+#### 9.4.5 大廠與其他主流候選的具體定位
+
+- **Microsoft Agent Framework**：不是「整套仍 experimental」。目前 agent、graph workflow、session、context provider、middleware、OpenTelemetry 與 Agent Skills 都有正式能力文件；Python Functional Workflow API 等局部仍 experimental。它的 Skills 實作最完整之一，包含四階段 progressive disclosure、filter／dedupe／cache 與 file／inline／class／MCP sources。[Agent Skills](https://learn.microsoft.com/en-us/agent-framework/agents/skills) 但 2026-07 self-host 文件同時明示 Python hosting helpers 仍 prerelease、`SessionStore` 預設只在 process memory，application 自己擁有 session／checkpoint mapping 與 durable storage；官方還建議長對話把 append-only history 與 session object 分開，避免每輪重寫持續增長的 session。這正好佐證 Caliburn 不應只因「一個 state object 什麼都放得下」就省略 storage-growth conformance。[Self-hosting](https://learn.microsoft.com/en-us/agent-framework/hosting/self-hosting/)、[Workflows](https://learn.microsoft.com/en-us/agent-framework/workflows/) 因缺少 first-class 本機 PostgreSQL persistence，列為本次正式 benchmark，不先成 finalist。
+- **AWS Strands Agents**：AWS 宣稱已在內部 production 使用，SDK 走 model-first、tool／hook／session／OTel 路線，足以作大廠實務對照；但 Python built-in session persistence 主要是 local file／S3，自訂 repository 才能接 PostgreSQL，而且 session manager 有 thread-safety／locking 要求。對本地單機不比 LangGraph 少 glue，因此列 watchlist。[AWS — Introducing Strands Agents](https://aws.amazon.com/blogs/opensource/introducing-strands-agents-an-open-source-ai-agents-sdk/)、[Strands session management](https://strandsagents.com/docs/user-guide/concepts/agents/session-management/)
+- **Google ADK 2.0**：已 GA，`DatabaseSessionService` 支援 PostgreSQL、graph／session／compaction 完整；但 Skills 仍 experimental，非 Google model 常再經 LiteLLM，多一層 provider／參數翻譯。對既定 OpenRouter、多模型 profile 與本機單一 authority 而言，淨整合成本高於 A，暫不列 finalist。[ADK 2.0](https://adk.dev/2.0/)、[ADK Session](https://adk.dev/sessions/session/)
+- **OpenAI Agents SDK**：官方 Agents 文件支援 backend orchestration、tool loop、session／resume 與 approval，走 OpenAI Responses path 時整合直接；但以 OpenRouter／多 provider 為既定需求時鎖定較高，也沒有比 PydanticAI＋DBOS 更直接的本機 PostgreSQL aggregate／queue 組合。因此作 provider／agent-loop baseline，不作主 runtime。[OpenAI — Running agents](https://developers.openai.com/api/docs/guides/agents/running-agents)
+- **LlamaIndex Workflows／Agents**：typed Pydantic events、state、branch／loop／concurrency 與 HITL 很適合 document／RAG workflow；預設 Context 是 ephemeral，跨程序 durability 要自行 snapshot／restore 或加 DBOS，主顧問又需補 model／Skill／context layer，淨套件數較多。最適合在最後 RAG 關卡接管 ingestion、retrieval、citation，而不是第一個核心 runtime。[LlamaIndex Workflows](https://developers.llamaindex.ai/python/llamaagents/workflows/)、[Durable workflows](https://developers.llamaindex.ai/python/llamaagents/workflows/durable_workflows/)
+
+#### 9.4.6 不另外引入的「記憶／證據／驗證」框架
+
+- **Pydantic AI Harness Memory** 是本輪最接近「成熟元件可替換自寫記憶」的候選：它已有 PostgreSQL store、optimistic CAS、idempotency、namespace 與 bounded search，機制上確實比臨時自寫 notebook 完整。但官方也明確定義它是模型可寫的 Markdown notebook，內容是不可信的、沒有 source citation／verified provenance，CAS 只防 lost update、不能證明記憶是真的；DBOS 下其普通 function tools 還需 application 自行包 durable step。因此它可用於未來非權威偏好筆記，**不能替代員工原話、有效更正、Work Model、gap 或 Current JD**，第一版不引入。[Harness Memory — security and provenance](https://pydantic.dev/docs/ai/harness/memory/)
+- **Harness StepPersistence／ConversationSearch** 不與 DBOS 並用。官方明列 StepPersistence 不是完整 graph-state checkpoint，PostgreSQL backend 也不在本版內建範圍；若同時採用會形成另一套 run history／resume owner。[Harness StepPersistence](https://pydantic.dev/docs/ai/harness/step-persistence/)
+- **Mem0／Letta** 會讓模型抽取、衝突解決或自行編輯長期 memory；這適合偏好與個人化，不適合把員工原話變成另一份 LLM 維護的記憶。Mem0 的預設 `add` 會用 LLM 推論要保存／更新／刪除的 memory；Letta memory blocks 則是 agent 可自行編輯、常駐 context 的狀態。[Mem0 memory operations](https://docs.mem0.ai/core-concepts/memory-operations/add)、[Letta memory blocks](https://docs.letta.com/guides/core-concepts/memory/memory-blocks) 第一版用同一 document aggregate 的 Source ledger＋typed Work Model＋targeted retrieval 即可。
+- **Graphiti／knowledge graph memory** 會新增 temporal knowledge graph、hybrid retrieval 與 GraphRAG 路徑；產品目前只需單份 JD 內的穩定 ID／typed relation，不需要全域 knowledge graph。[Graphiti overview](https://help.getzep.com/graphiti/getting-started/overview)
+- **Guardrails AI 等通用 validator** 可以承接格式與常見 safety check，但 Pydantic、DB constraint 與 framework structured output 已涵蓋通用部分；來源資格、quote 支持度、Task／Duty／OPKS 與 authority 是 Caliburn 特有規則，再加一層框架不會消除這些 code。
+- **對話 compaction** 只作模型工作窗壓縮，不能取代 Source。第一版先用 Harness 的 zero-LLM 策略清除舊 tool result／保留 recent tail；只有 token threshold 真的逼近且 targeted retrieval 不足時才啟用 `SummarizingCompaction`。官方會把 summary call 納入 request／token usage，且任何 history rewrite 都可能打破 provider prompt cache，成本必須可見。[Harness Compaction](https://pydantic.dev/docs/ai/harness/compaction/)
+
+因此「記得員工之前說過什麼」不是買一個 memory notebook 就完成：它是 Source ledger、correction precedence、typed Work Model、operation-specific retrieval、recent conversation tail 與可重建 ContextManifest 的組合。框架接手 history、compaction、bounded search 與 token accounting；Caliburn 只保留「哪一段是有效員工證據、何時該取回」的產品政策。新的通用 memory 套件只有在成品後出現非權威偏好或跨文件需求時才重評。
+
+#### 9.4.7 淨覆蓋與成本比較
+
+| 判準 | A. PydanticAI V2＋Harness（選配）＋DBOS | B. LangChain＋LangGraph A2 | Microsoft Agent Framework benchmark |
+|---|---|---|---|
+| 與產品控制流吻合 | **高**；單一 adaptive agent＋短 durable turn，Proposal decision 另作 command | 中；能做，但 explicit graph／long interrupt／time travel 不是目前核心需求 | 中至高；single agent／Skills／context 完整，workflow 亦可選 |
+| Context／Skill 機制替代 | **高**；Capabilities、Harness Skills、compaction、tool-output limits、prompt cache | 高；middleware、SkillsMiddleware、summarization、context editing | **高**；Skills provider／filter／dedupe／cache、context provider 完整 |
+| 記得員工內容 | **高且不增第二 truth**；Source aggregate＋targeted retrieval，framework 管 history／compaction | 高；thread memory＋aggregate，但多一套 checkpoint history | 高；session/context provider，但 durable PG adapter 要補 |
+| model／provider 可換 | **強**；原生 OpenRouter model/settings、dynamic model、typed output | 強；model middleware、OpenRouter integration，但 `ChatOpenRouter` 仍 beta | 強；多 provider，但 OpenRouter exact-route 須自訂／驗證 |
+| PostgreSQL durable runtime／queue | **最貼合**；DBOS workflow ID、partition queue、async datasource transaction | 強 checkpoint；OSS per-document enqueue／reject 仍要自建 | 弱至中；production SessionStore／CheckpointStorage 要自行接 PG |
+| 業務 transaction／CAS | **最強**；SQLAlchemy datasource outcome 與 app write 同 transaction | 強但另寫 transaction node；checkpointer 不提供 business CAS | 待 storage adapter 後再證明 |
+| 必要新服務 | 無；既有 PostgreSQL，可分 `dbos` schema，無強制 Conductor／Logfire | 無；既有 PostgreSQL，但 LangSmith Deployment 不採，queue 自建 | 無強制服務，但 durable storage glue 較多 |
+| 預期可刪舊機制 | **高**：provider、wire、operation、durable-turn、scheduler／receipt、Skill loader、history／compaction、context lifecycle；舊 domain store 整體重寫後退出 | 高：多數 runtime 可退場；另增 graph/checkpoint／queue lifecycle | 中至高；功能完整但 PG glue 可能吃回收益 |
+| 主要風險 | Harness 0.x、動態 capability 版本漂移、DBOS deterministic workflow／serializer／retry 配置 | checkpoint growth／schema evolution、graph abstraction、OSS concurrency、skills 套件組合 | Python hosting／部分 API 仍演進、storage adapter 與 provider fit |
+
+主流程度不能只看 star：LangGraph 仍是較成熟、較廣泛的 graph runtime；PydanticAI V2／Harness 是 2026 年較新的 capability-first 路線，DBOS 也比傳統 workflow 平台輕。此處選 A 是**產品 fit 與淨概念較少**，不是宣稱它絕對最流行。LangChain 自己也把 LangGraph 定位在 long-running stateful／complex deterministic＋agentic workflow，把一般 agent abstraction 放在 LangChain；Pydantic 與 Microsoft 最新文件同樣建議先用能完成需求的最簡單組合。[LangChain product layers](https://docs.langchain.com/oss/python/concepts/products)、[Pydantic Graph — when not to use a graph](https://pydantic.dev/docs/ai/graph/graph/)
+
+模型成本方面，A 不需額外 planner／selector model：eligible set 先由 deterministic policy 縮小；真正載入 Skill 可能增加一個 tool iteration，`SummarizingCompaction` 也會增加一次模型 request，所以兩者都只能按需啟用並計入 PydanticAI usage。zero-LLM compaction、靜態 prefix prompt cache、有限 tool result 與較小 ContextPack 是第一順位。DBOS 會增加 PostgreSQL step writes，但不增加模型 call；conformance 要記錄 request 次數、input／output token、cache read/write、DB rows／bytes、resume latency 與新增 glue。
+
+2026-08-13 現況盤點顯示候選重寫面約有 `consultation` 577 行、`task_analysis` 4,372 行、`opks` 2,542 行、OpenRouter adapter 741 行、PostgreSQL adapter 1,393 行，共約 9,625 行 Python。這不是可全部刪除的承諾：其中包含大量職務分析規則；它證明的是「包住舊系統」很容易留下兩套抽象。Gate 4 必須產出逐 module 的刪除帳本：
+
+- **框架直接替代後刪除**：provider／wire parser、operation wrapper、durable-turn orchestration、一般 scheduler／retry／receipt、Skill discovery、message compaction 與 tool-output lifecycle；
+- **用成熟資料框架重寫後刪除舊拓撲**：Work Model、focus／agenda／progress、Proposal／Current JD repository 與 split persistence seam；
+- **移植成新 Skill／domain verifier 的產品資產**：Task／Duty／O／P／K／S 分析方法、Source／correction／quote anchor 語意、identity／dependency／authority 規則；
+- **不得發生**：為了安全感保留舊 class／table 再加 adapter 雙寫，或因框架沒有產品語意就把該語意刪掉。
+
+#### 9.4.8 歷史初步裁決與 conformance 清單（勿據此施工）
+
+**v0.3 的研究建議是「PydanticAI-first conformance」，尚待 owner 確認，且不等於核准 production 實作。** PydanticAI V2＋窄用 Harness 接手 agent／provider／Skill／context mechanics，DBOS 接手短回合 durability／queue／transaction tracking，PostgreSQL／SQLAlchemy／Pydantic 重寫唯一 business aggregate。LangGraph A2 是核心能力失敗時的正式 fallback；Microsoft Agent Framework 是同級功能 benchmark；LlamaIndex 留給最後 RAG 關卡。
+
+以下保留 v0.3 當時的淘汰條件供追溯，但「先只測 Finalist A」已由 §9.5.6–9.5.7 取代，Gate 4 應以兩個 finalist 的共用小情境比較，不得照本段直接施工。v0.3 原訂至少證明：
+
+1. **Source-first submit seam**：相同 `input_event_id` 冪等；Source＋enqueue 同 transaction 或等價 outbox；source durable 後才可呼叫 model。在 enqueue 後、source 後、model 前、model 後與 semantic commit 前各 kill process，員工原話都不遺失；
+2. **單一 business authority**：DBOS system state、PydanticAI history 與 aggregate schema 清楚分離；只有 aggregate 可寫 Work Model／Proposal／Current JD，API query／export 不讀 DBOS step blob 當業務 truth，另一份文件完全不可見；
+3. **每文件序列化＋CAS**：partition queue `document_id`／`concurrency=1` 生效；不同文件可平行。直接員工編輯仍可能與 AI workflow 競爭，所以 semantic commit 必須重驗 expected aggregate revision／read-set；重複 submit、兩個 stale decision 與 workflow replay 不產生 duplicate Source／Proposal／JD mutation；
+4. **原子 domain transition**：verified findings＋Work Model＋focus／agenda／progress＋Proposal＋visible turn 要嘛在一個 datasource transaction 全成功，要嘛全部不成立；employee accept／edit／revision-request／reject／defer 以獨立 command 原子更新 Proposal／Current JD；
+5. **Dynamic Skills durability**：application 先算 eligible set，PydanticAI 只揭露該集合；同一主 agent 可按需載入 Task／Duty／O／P／K／S，未啟用 Skill 的完整內容不進 context。kill／resume 後 stable Capability／Toolset ID 不漂移，最新文件所述 DynamicCapability 行為要由 canary 鎖住；
+6. **Skill resource boundary**：Harness `Skills` 只讀核准 `SKILL.md`；補充 resource tool 不可越出核准 roots、不追 symlink 越界，也不提供 write／shell／script。Skill 版本與實際載入 ID 寫進 receipt；
+7. **Context／記憶／成本**：`ContextManifest` 列出實際 source／state／reference IDs、eligible／loaded Skills、token、cache 與排除 reason；zero-LLM compaction 保留 tool-call pair，summary 不取代 Source；員工更正後不再注入已失效 claim；
+8. **provider contract**：OpenRouter exact model、provider order／only、reasoning、temperature／max tokens、timeout、usage、cache、refusal、truncation、actual route 與禁用 fallback 可 round-trip；DBOS runtime model registry／resolver 可忠實重建 custom provider profile，不完整才加窄 adapter；
+9. **重試語意**：provider SDK HTTP retry 與 DBOS step retry 不相乘；misconfiguration 不浪費大量 retry；外部 model call 可能重打時 receipt 明確記錄，不宣稱 exactly-once；datasource transaction replay 則不得重複業務 write；
+10. **schema／workflow evolution 與安全**：DBOS 使用 custom JSON／portable serializer，不用 pickle；workflow inputs／outputs 維持小型。以保存中的舊 workflow 測 patch／application version／drain；completed workflow retention 與刪除 document 時的 DBOS history 清理有 runbook；
+11. **OTel／隱私與操作性**：HTTP、source event、workflow／step、model、Skill／tool、verifier、semantic commit 以 ID 串接；預設 span 不含員工原話、prompt、JD 或 tool raw result。以代表性假資料記錄 model／tool calls、tokens、cache、DBOS rows／bytes、resume latency、API query 與本機啟停；
+12. **淨刪除門檻**：列出可刪的現行 module／class／table／concept，另列新增 Capability adapter、aggregate schema／migration、serializer、queue config、runbook 與 failure mode。只有產品語意完整且淨概念明顯下降才通過；若 PydanticAI／DBOS 的核心缺口需要另一套 runtime 或大量自寫 replay，停止 A，改用同一 slice 測 LangGraph A2，不雙疊。
+
+這些是 framework conformance 與一般工程安全，不是 owner 已後置的模型品質 eval：不建立 golden dataset、不比較回答分數、不做 LLM-as-a-judge。它只回答「成熟框架能否忠實接手並讓舊機制退場」，避免真正施工後才發現又多了一套 state、memory 或 retry engine。
+
+#### 9.4.9 北極星回歸審核
+
+把 v0.3 重新逐項對照 §2、§3.11 與 C1–C11，框架研究目前沒有改寫產品方向：
+
+- 仍是一位 AI 專業職務說明書顧問，不新增員工可見多 Agent、planner 角色或固定狀態機 wizard；
+- 仍先大致理解工作全貌，再以明確焦點深入訪談；旁支線索先保存並排入 agenda，Task、Duty 與 OPKS 隨訪談動態修正；
+- Task／Duty／O／P／K／S 仍是可組合的專業 Skills，不是固定串行階段，也不要求 Task 完全穩定後才做 OPKS；
+- 「記憶」仍指同一份文件內記得員工之前說過的有效內容與更正，不是多 speaker、跨文件個人化或另一份模型自行維護的 memory；
+- AI 仍只能提出候選；員工可接受、修改、退回、拒絕或延後，所有正式 Current JD 變更都要通過 authority rule；
+- 進度仍以 coverage、深度、待決 Proposal 與具體 gap 說明，不造假百分比；單一匯出仍揭露缺口並允許員工強制匯出；
+- iCAP／RAG 仍是 Reference challenge，最後才接入，不替員工建立工作事實；正式模型／context 品質 eval 仍在成品後；
+- 受限 Big-bang 仍只涵蓋 AI 顧問子系統；登入、多租戶、公司文件／SOP、多人協作、GraphRAG、自由 Agent loop 與新雲端控制面沒有因框架功能表被偷渡進第一版。
+
+本輪特別檢查了兩種偏離：一是因舊系統已有 Work Model／Proposal 就原封不動包住它，二是因 LangGraph 能存 typed state 就反過來把產品變成 graph。v0.3 兩者都不採：舊實作可整批重寫並刪除，但 Source／Work Model／Focus／gap／Proposal／Current JD 的產品語意仍由新的單一 aggregate 顯式承接；PydanticAI／Harness／DBOS 接手的是 agent、Skill、context lifecycle、durability、queue、retry、transaction tracking 與 observability 機制。
+
+目前只剩可由 conformance 回答的實作問題：PydanticAI V2＋精準 pin Harness 是否能穩定做到 per-run eligible Skills；DBOS 與現行 async PostgreSQL 是否能完成 source-first atomic enqueue、partition queue、JSON serializer 與 datasource commit；完成同一 vertical slice 後淨概念是否真的下降。這些都不改產品需求。若其中有核心硬缺口，才測 LangGraph A2；任何結果都不得縮小產品流程、把員工 authority 交給模型、或保留兩套可寫機制。
+
+### 9.5 Gate 3 v0.4：同目的元件替代稽核（2026-08-13）
+
+> **版本註記**：本節正確擴大了替代範圍，但最後仍把「LangGraph state 直接承接 business authority」誤寫成容易重疊的風險，因而沒有完成同目的直接替換的比較。選型先由 §9.6 v0.5 修正，再由 §9.7 v0.6 的實測收斂；本節只保留候選盤點與錯誤如何被發現的研究歷史。
+
+本節直接回應 owner 的修正：`Focus`、`Work Model`、`Proposal`、`Context Engine` 等只是目前對產品責任的命名，不是必須保護的自寫元件。只要成熟元件完成相同目的、保留已確認的職務分析流程與 authority，且導入後能刪掉舊機制，就應優先替代。反過來，框架只有相似名稱、卻讓來源、更正、員工核准或 Current JD 權威消失，不算替代。
+
+#### 9.5.1 替代判準
+
+每個候選都必須回答六題：
+
+1. 它承接的是哪一項產品責任，不只是哪個現行 class？
+2. 它提供哪些已完成的機制：資料型別、工具、持久化、並行控制、恢復、事件、UI 或可觀測性？
+3. 哪些 Caliburn 特有語意仍要以薄 policy／validator／adapter 表達？
+4. 採用後可以刪除哪些現行 module、table、store 或 orchestration concept？
+5. 它能否成為該責任的唯一 owner；若只能建立 mirror／cache，該 mirror 是否可完全重建且不可反向寫入？
+6. 新增的 adapter、服務、資料庫、升級與操作成本，是否小於刪掉的自寫複雜度？
+
+「唯一權威」不等於所有責任必須塞進同一個 framework object 或一列 JSON。Source、Work Model、Focus／agenda、Proposal 與 Current JD 可以由不同成熟機制承接，但每個欄位只能有一個可寫 owner；需要同時成立的 semantic transition 仍必須在同一 PostgreSQL transaction、同一可證明的 framework state transition，或 staging 後的一次原子 commit 中完成。
+
+#### 9.5.2 完整元件矩陣
+
+| 產品責任／現行主要自寫面 | 成熟機制候選 | v0.4 判斷 | Caliburn 最後仍需保留的薄層 |
+|---|---|---|---|
+| model／provider／參數／usage；`adapters/openrouter/*` | PydanticAI V2 provider／dynamic model／typed usage；LangChain `init_chat_model`／model middleware；LiteLLM SDK／Router 作跨 100+ provider 備選 | **Replace**。兩個 finalist 都測 OpenRouter exact route；不先疊 LiteLLM Proxy，只有 finalist 無法忠實 round-trip provider order、ZDR、fallback、reasoning、cache 或 actual route 時才測 LiteLLM SDK | 版本化 application model profile、允許的 provider／model、成本與資料政策 |
+| tool loop、structured output、wire parser；Task／OPKS `llm/wire.py`、`operation.py` | PydanticAI typed output、output validator、toolset／Capabilities、retry taxonomy | **Replace** 通用 schema 產生、解析、tool loop 與格式 repair；現行 wire／operation 拓撲應退出 | Task／Duty／OPKS 的專業 output schema、no-op／gap 語意與跨實體 invariant |
+| prompt／專業方法載入 | Agent Skills open specification＋Harness Skills／on-demand Capabilities | **Replace** discovery、progressive disclosure、版本化載入與大部分 prompt 拼裝；**Retain** 方法內容 | 已研究的 Task／Duty／O／P／K／S 分析方法、eligible-set policy、Skill 核准版本 |
+| conversation history、context window、過大 tool result；`task_analysis/context.py`、`opks/context.py` 的通用部分 | PydanticAI messages/hooks＋Harness Compaction／Tool Output Limits；或 LangChain dynamic prompt／Summarization／Context Editing／LLM Tool Selector；必要時 bounded conversation search | **Replace** history lifecycle、裁切／摘要、spill、tool selection、token／cache bookkeeping；**Rewrite thin policy** 取代固定 ContextPacket 組裝 | scope、來源資格、更正 precedence、Focus 必帶核心、Reference 分權、ContextManifest；summary 永不取代 Source |
+| 員工原話、correction、append-only journal；`core/domain/sources.py`、`core/journal.py` 與 persistence plumbing | PostgreSQL／SQLAlchemy versioning＋append-only rows；`eventsourcing` 9.5.4 stable event store／outbox／snapshot／projection／DCB；W3C PROV-O／Web Annotation 作資料語彙 | **正式雙候選**。關聯式基線最貼合既有 async transaction；`eventsourcing` 能替代更多 journal、revision、outbox 與 projection code，必須做小型 conformance 後才選 | 「哪句員工原話有效」、更正取代範圍、document isolation、speaker 固定為員工／系統、quote support 規則 |
+| Work Model 的新增、修正、retire、merge／split、lineage 與 dependency invalidation；`core/domain/work_model.py`、`task_analysis/transition.py` | Graphiti OSS temporal knowledge graph；LangGraph typed state／checkpoint／Store＋LangMem reducer；`eventsourcing` aggregate／DCB；SQLAlchemy／Pydantic relational model | **沒有單一現成元件已證明全覆蓋，四條路徑都不得先排除。** Graphiti 最接近 temporal facts＋episode provenance；LangGraph 最接近同 runtime 的 checkpointed typed state；`eventsourcing` 最接近版本、條件 append 與 projection；關聯式基線最容易直接查詢、編輯與匯出 | Task／Duty／OPKS identity、員工來源 linkage、retire／reopen、跨軸依賴、verified commit；任何 LLM memory update 先是候選，不可直接成真 |
+| Focus／agenda／旁支／blocked／返回；`ActiveQuestion`、`ScheduledOpks`、`scheduler.py`、`question_targets.py` | **Pydantic AI Harness Planning**；LangChain `TodoListMiddleware`／LangGraph custom state；Microsoft Harness todo＋mode；Rasa CALM dialogue stack 作中斷返回設計對照 | **Pydantic Planning 升為優先 Replace 候選**。它已有 stable ID、ordered plan、subtask、dependency／blocked、progress summary、events、SQLite／Postgres／Redis store 與跨 run persistence；不再合理全部自寫 | work-unit ID 映射、焦點資格、員工改道／延後、gap reason、來源／Work Model linkage、semantic commit 前驗證 |
+| 三層進度與 readiness | Pydantic Planning progress summary／events、framework streaming；SQL query／projection | **部分 Replace**。框架直接提供「目前 plan 做到哪裡」；產品仍從 Work Model／Current JD／Proposal 投影 coverage、depth、decision 與具體 gap | 禁止假百分比；「完成」是員工可理解的 coverage／depth／decision 狀態，不是 tool-call 數量 |
+| Proposal／review bundle／員工 accept、edit、reject、revision request、defer；`proposal*.py`、部分 API/UI | Pydantic deferred tools＋`ToolApproved.override_args`／`ToolDenied`；AG-UI interrupts；Vercel AI SDK approval；LangChain HITL approve／edit／reject／respond | **Wrap／大幅 Replace 互動 plumbing，不直接刪除 durable domain lifecycle**。框架已能承接 typed args、暫停／續跑、編輯與審核傳輸；Caliburn Proposal 可改為「已保存的待核准 typed tool request／changeset」，但不能只存在 client history 或暫停中的 process | 多 proposal 並存、繼續訪談、defer／revision-request、跨實體原子群組、before／after、read-set、stale、獨立 decision command |
+| durable turn、retry、queue、resume、idempotency；`consultation/durable_turn.py`、`opks/generation.py` 的通用部分 | DBOS workflow／step／queue／datasource transaction；LangGraph Functional API 是正式替代組合 | **Replace**。PydanticAI-first 組合用 DBOS；若改 LangGraph family 就只用 LangGraph durability，兩套不可並存 | source-first、每 document serialization、外部 model call at-least-once 事實、semantic commit CAS 與 receipt |
+| verifier／guard；Task／OPKS `verifier.py`、`portable_schema.py`、DB constraint | Pydantic field／model／output validators、Harness Guardrails、SQLAlchemy／PostgreSQL constraint、W3C anchor／provenance 型別 | **Replace** 通用型別、格式、常見 input/output/tool guard 與 wiring；**Retain／重寫** domain verifier | source 是否有效、quote 是否真的被 anchor 支持、Task／Duty／OPKS identity／dependency、authority、read-set、stale；這些沒有通用框架可自動知道 |
+| API chat streaming、tool／approval UI、shared run state；部分 Web hook／SSE／DTO | PydanticAI native Vercel AI adapter＋AI SDK `useChat`；或 LangGraph streaming／frontend hooks；需要 edited tool args／richer shared state 時用 AG-UI snapshot／delta／interrupt | **Replace** 大部分 chat stream、tool event、approve／deny round-trip 與前端 hook。Pydantic finalist 先試 Vercel AI，LangGraph finalist 用其原生 stream；任一路徑若 Proposal edit／Focus shared-state 的自寫量仍高，就整體改用 AG-UI，不疊兩套 protocol | server-side authority、generated product contracts、未信任 client history 清洗、Proposal／JD projection 與 dirty-edit 保護 |
+| observability／usage／成本／trace | PydanticAI instrumentation＋DBOS OTel，或 LangSmith／LangGraph tracing；共同輸出 OpenTelemetry GenAI semantic conventions | **Replace** tracing plumbing；不因採 LangGraph 就強制使用 LangSmith cloud | 隱私預設、ID correlation、actual provider receipt、不能把員工原話／prompt／JD 默認送到 telemetry |
+| Reference ingestion／dedup／retrieval／citation；隔離 RAG bounded context | LlamaIndex IngestionPipeline／doc hash／cache／async／Qdrant connector／CitationQueryEngine；Haystack pipeline／AnswerBuilder 作備選 | **最後關卡 Replace／Wrap 候選**。可替代大部分 ingestion、chunking、dedup、retrieval 與 citation assembly；既有 PDF／OCS assets 只作 input，不保護自寫 pipeline | iCAP corpus version、Reference 無員工事實 authority、實際呈現 receipt、exact quote anchor 與 no-match／challenge policy |
+| Current JD、直接編輯、查詢、generated API contract、deterministic XLSX | SQLAlchemy／Pydantic／PostgreSQL、既有 contract strategy、XLSX library | **Retain 產品責任並可重寫實作，不交給 agent memory／checkpoint**。這本來已使用成熟框架；新 agent framework 不會比關聯式模型更適合 CRUD、FK、排序、匯出與 direct edit | 員工 authority、跨 Task／Duty／OPKS invariant、強制匯出時揭露 gap、deterministic assembly |
+
+這張表修正了 v0.3 過度粗糙的二分法：框架不只承接 agent 外圍；Planning、HITL、UI、event store、memory reducer 等都能深入替代現行機制。另一方面，「產品語意仍需存在」也不等於保留舊 class。最終程式可以只剩少量 Caliburn policy／validator／mapping，而讓框架管理生命週期、持久化協定與 UI 事件。
+
+#### 9.5.2.1 現行程式盤點與替代後可退出面
+
+2026-08-13 重新查了 production manifest 與實際 imports：`apps/api/pyproject.toml` 目前直接依賴的是 Pydantic／SQLAlchemy 等基礎框架，`apps/web/package.json` 與 production source 沒有直接使用 LangChain、LangGraph、PydanticAI、DBOS、AG-UI、Graphiti、LlamaIndex 或 `eventsourcing`。`apps/api/uv.lock` 即使出現 LangChain／LangGraph 名稱，也只構成 lock-only evidence，可能是 transitive dependency 或歷史殘留，不能當成已採用或應沿用的架構。這代表新選型可從產品責任出發，不必保護一套其實已在 production 使用的 agent framework。
+
+| 現行可重寫／刪除面 | 成熟元件接手的機制 | 通過後的處置；不是先包住舊碼 |
+|---|---|---|
+| `adapters/openrouter/*`、Task／OPKS `llm/wire.py`、`operation.py`、部分 `ports.py` | PydanticAI 或 LangChain 的 model/provider、typed output、tool loop、retry／fallback middleware | 刪除自寫 provider request／response normalization、JSON wire repair 與 operation loop；只留 application model profile、provider receipt 與專業 schema |
+| `task_analysis/context.py`、`opks/context.py` 的 history／裁切／prompt 拼裝 | Harness Compaction／Tool Output Limits／Skills，或 LangChain dynamic prompt／summarization／context editing／tool selector | 刪除通用 message lifecycle、token 裁切與所有 Skill 常駐 prompt；重寫一個薄 `ContextPolicy` 與可重播 `ContextManifest` |
+| `task_analysis/question_targets.py`、`opks/scheduler.py`、journal 內的排程狀態、舊 `ActiveQuestion`／`ScheduledOpks` | Pydantic Planning，或 LangChain `TodoListMiddleware`＋LangGraph state／checkpoint | 在 Focus slice 通過後刪除舊 scheduler／question-target state；只留 work-unit eligibility、gap reason、員工改道與 plan-item mapping policy |
+| `consultation/durable_turn.py`、`opks/generation.py` 的 run／receipt／retry／resume 通用部分 | DBOS workflow／partition queue／datasource transaction，或 LangGraph Functional API／checkpoint／task | 只選一個 durable runtime；刪除自寫 lease、replay、一般 retry 與 execution receipt plumbing，保留 source-first、CAS 與 provider at-least-once 語意 |
+| `core/domain/sources.py`、`core/journal.py`、`core/domain/work_model.py`、`task_analysis/transition.py`、`adapters/postgres/*` 的舊 persistence 拆法 | SQLAlchemy relational write model、`eventsourcing` DCB／projection、LangGraph typed state，必要時 Graphiti temporal facts | 不是保留舊 aggregate；由 Work Model／Source slice 選出唯一 write owner 後重寫 schema／repository，舊 store 與雙寫 seam 全退場。職務 identity、source lineage、更正與 dependency policy 移植到薄 domain 層 |
+| `core/domain/proposal.py`、`core/domain/opks_proposal.py`、`task_analysis/proposal_decisions.py`、`opks/proposals.py` 與部分 API／Web review plumbing | Pydantic deferred tools、LangChain HITL／interrupt、Vercel AI 或 AG-UI | 刪除通用 approval transport、typed args round-trip 與暫停／恢復 glue；以新 durable changeset schema 保留多 pending、defer、revision request、stale/read-set 與 authority commit |
+| Task／OPKS `verifier.py`、`portable_schema.py` 與散落 shape checks | framework structured output／validator、Pydantic、PostgreSQL constraint、W3C selector／provenance types | 刪除重複格式與 schema plumbing；把真正的 quote support、source authority、Task／Duty／OPKS invariant 收斂成少量 deterministic domain rules |
+| `api/*mapper.py`、chat stream DTO、Web 自寫 streaming／tool／approval hooks | Pydantic Vercel adapter＋AI SDK，或 LangGraph frontend／AG-UI | 選一條 wire protocol 後刪除重複事件模型與前端狀態機；generated product contract、server authority 與 dirty-edit protection 保留 |
+| Current JD direct edit／query、readiness、deterministic export | SQLAlchemy／Pydantic／PostgreSQL 與 XLSX library 已是成熟框架底座 | 可重寫舊 class／repository，但不改由 agent memory 或 checkpoint 擁有；這部分主要保留產品 authority 與輸出 invariant，不為提高「替代率」硬搬 |
+
+因此「幾乎所有元件都納入替代研究」不代表每個檔案都換一個新套件。相同 framework middleware 能同時刪除多個現行 module；反之，若引入一個套件只多出 mirror、adapter 與同步工作，卻刪不掉任何 write owner，就不算升級。
+
+#### 9.5.2.2 覆蓋率與成熟度分開判斷
+
+| 家族／元件 | 2026-08-13 官方成熟度證據 | 對本產品的判斷 |
+|---|---|---|
+| PydanticAI core | V2.0 已於 2026-06-23 stable，公開版本政策承諾 major 內不故意 breaking。[Version policy](https://pydantic.dev/docs/ai/project/version-policy/) | provider、typed output、tool loop 與 validators 可直接列 production 候選 |
+| Pydantic AI Harness Planning／Skills／Compaction | 第一方官方能力、Planning 已有 persistent store／stable item ID／dependency／event；但頁面明示 API 仍可能跨 release 改變。[Harness](https://pydantic.dev/docs/ai/harness/)、[Planning](https://pydantic.dev/docs/ai/harness/planning/) | 功能覆蓋高、成熟度低於 core；必須 pin 精確 release／commit、加 canary 與 staging adapter，未通過前不能直接成 authority |
+| LangChain 1.x＋LangGraph 1.0 | LangChain 1.0 採 semver；LangGraph 1.0 是 LTS，官方 Postgres checkpointer 用於 production。[Release policy](https://docs.langchain.com/oss/python/release-policy)、[Persistence](https://docs.langchain.com/oss/python/langgraph/persistence) | runtime 成熟度是決賽者中最高；Todo／Deep Agents middleware 的局部成熟度仍要分開看，不能把整包 coding-agent 預設全引入 |
+| Microsoft Agent Framework | Microsoft 的 AutoGen／Semantic Kernel successor，Agents／Harness／Workflows 能力完整；Python hosting／部分 API 仍快速演進。[Overview](https://learn.microsoft.com/en-us/agent-framework/overview/) | 作大廠同級 benchmark；目前不能只因廠牌就略過本機 PostgreSQL storage／versioning conformance |
+| Graphiti、LangMem、`eventsourcing` | 都是活躍且有明確專長的 OSS；沒有一個是跨產品通用的「職務分析 Work Model 標準」 | 只能以同一 Source／correction／lineage 情境證明能成為唯一 owner；功能多或名稱像 memory 不足以採用 |
+
+成熟度重查後，不能誠實地把 LangGraph 留到 Pydantic 組合失敗才測：**PydanticAI V2＋Harness＋DBOS** 的 product fit 與 transaction seam 較好，**LangChain／LangGraph 1.x** 的 runtime 穩定度與同一家族覆蓋較高。兩者都成為 Gate 4 正式決賽者，以同一情境比較語意忠實、可刪舊碼、glue、資料生命週期與本機操作成本；Microsoft 維持 benchmark。這不是模型品質 eval，也不要求開發成品兩次，而是先做最小可丟棄 conformance，避免用整次 Big-bang 賭文件描述。
+
+#### 9.5.3 Focus／agenda 的具體替代方式
+
+> **版本漂移註記（2026-08-13）**：下列判斷描述較早研究到的 Planning API，已由 §9.11.4 的 0.13.0 實際匯入檢查推翻。0.13.0 的公開 `PlanItem` 只剩 `content／status`，plan 是每個 run 隔離的 ephemeral model-owned reminder；本節只保留研究歷史，不得再拿來選型。
+
+Pydantic Harness Planning 的最新完整官方頁與 source 顯示：每個 `PlanItem` 有 stable `id`、`content`、`status`、`active_form`、`parent_id`、`depends_on`；可啟用 `blocked`、subtask 與 dependency，`read_plan()` 會回 progress summary，並有 granular events 與 `PostgresPlanStore`。[Planning](https://pydantic.dev/docs/ai/harness/planning/)、[PlanItem source](https://github.com/pydantic/pydantic-ai-harness/blob/main/pydantic_ai_harness/planning/_types.py)
+
+可先把產品概念映射成：
+
+- `in_progress`：目前主要訪談焦點，正常只保留一個；
+- `pending`：待訪談 work unit／旁支線索／員工延後的焦點；延後不是 `cancelled`；
+- `blocked`＋dependency：真的被另一個未澄清 work unit 封鎖的分支；一般「資料還不夠」仍是 Work Model gap，不濫用 dependency；
+- `completed`：該焦點目前已達可說明的停止條件，未來有新證據仍可 reopen；
+- `cancelled`：確認不適用或已被 merge／retire，不代表刪除歷史；
+- `parent_id`：Task 下的 OPKS／子問題或 Duty 下的 Task 訪談層級；
+- `depends_on`：只表達真正的 branch dependency，不拿來表示所有相關性。
+
+但官方 source 也揭露三個不能忽略的限制：
+
+1. `PlanItem` 欄位固定，沒有 evidence IDs、work-unit kind、gap reason、revision、return reason 或 employee-defer metadata；這些應由它所引用的 Work Model work unit 擁有，不能塞進自然語言 `content` 後再解析。
+2. 內建 `PostgresPlanStore` 的 `set_items()` 是 transaction，但 granular `add_item()` 以 `MAX(seq)+1`、`update_item()`／`remove_item()` 是 read-modify-write；官方 source 明示同一 session 的 concurrent writers 可 race。因此不能原封不動拿來承接 Caliburn 的 semantic CAS。[PostgresPlanStore source](https://github.com/pydantic/pydantic-ai-harness/blob/main/pydantic_ai_harness/planning/_postgres.py)
+3. `write_plan()` 是整份覆寫且不發 granular event；若 UI 只吃 event 會漏更新。每輪後必須讀 authoritative plan，或限制模型使用 granular tools。
+4. Planning 沒有現成的「被旁支中斷後回到哪裡」stack，也沒有 employee defer／return reason。返回規則可由有序 pending plan＋最近 focus transition 推導；若仍需要 durable LIFO stack，就由很薄的 transition metadata 補足，不能假裝 dependency 已等價承接。
+
+因此建議不是退回自寫 scheduler，而是實作一個很薄的 **staging `PlanStore` adapter**：model run 期間由 Planning 管 tool schema、plan ID、排序、dependency、reminder、progress 與事件，但變更先留在 run staging；新增 domain work unit 仍先經 typed finding／verifier，再由 application 配發 work-unit ID 並建立明確的 plan-item mapping，不從 `content` 解析。最後與 Work Model／Proposal 一起在 semantic transaction commit。commit 後的 table 是 Planning 的唯一 durable plan store，舊 `ActiveQuestion`／`ScheduledOpks`／scheduler 不雙寫。這個 adapter 是為了 identity 與 transaction seam，不是重做 Planning。
+
+Rasa CALM 的 LIFO dialogue stack 很適合驗證「被重大旁支中斷後返回原焦點」的 UX；但它的 flow／slot 是事先定義的業務流程，而 Caliburn 的 work unit 是訪談中動態出現、可 merge／split／reassign 的假說。現階段借用 stack pattern 與 conversation repair，不把產品改成 Rasa flow wizard。[Rasa FlowPolicy](https://rasa.com/docs/reference/config/policies/flow-policy/)
+
+#### 9.5.4 Work Model：四種成熟機制的實際差異
+
+| 候選 | 真正可替代的機制 | 無法自動解決的問題 | v0.4 定位 |
+|---|---|---|---|
+| SQLAlchemy／Pydantic／PostgreSQL | typed rows、relationship、constraint、async UoW、`version_id_col` stale detection、transaction、直接 query／edit | event replay、projection／upcast、跨 entity lineage 仍要建模；`version_id_col` 只在 ORM flush 檢查該 row，document-wide read-set 仍要顯式設計 | **基準實作**；不是「全部自己寫」，而是以成熟資料框架承接機制，產品只寫 domain policy |
+| `eventsourcing` 9.5.4 stable／DCB | immutable events、snapshot、event versioning、optimistic concurrency、atomic multi-aggregate save、outbox notification、projection、Postgres、Pydantic examples；DCB 可依 typed tags／read position 做 conditional append | 使用 Psycopg v3 與自己的 application／repository model；async FastAPI、DBOS datasource transaction、同步 read model／export 及 schema 操作成本要實測 | **優先資料層 conformance 對手**；若淨刪除 journal／revision／projection／CAS 明顯，允許取代關聯式 Work Model 寫入模型 |
+| Graphiti OSS | raw episode、episode-to-fact provenance、temporal valid／invalid facts、incremental invalidation、custom entity／edge ontology、hybrid retrieval | 需要 Neo4j／其他 graph DB；entity／fact 由 LLM 抽取；無 Current JD authority、Proposal stale／read-set、精確 Task ID 保證；bulk ingest 不做 edge invalidation | **高覆蓋但高代價候選**。只有能成為唯一 Work Model store、保留 exact source linkage 且淨收益大於新增 graph service 才採用；不能只做第二份 graph mirror |
+| LangGraph typed state／Postgres checkpointer／Store＋可選 LangMem | 每步 state snapshot、thread resume／history、typed custom fields、pending writes、namespace store；LangMem 可做 profile／collection 的 LLM insert／update／delete reconciliation | checkpoint 是 agent execution／short-term state，不自帶任意 domain query、Current JD FK／constraint 或與 direct edit 的 transaction；Store 與 state 若都可寫同一事實會成雙 truth。LangMem 更新仍是模型判斷，可能 over／under-extract | **LangGraph finalist 的完整替代路徑**；只有能讓 Work Model 成為唯一可寫 state、並提供 direct edit／export projection 與 atomic authority seam 才採用。否則 LangGraph 只擁有 execution state，Work Model 留在 relational write model |
+
+Graphiti 不能再只因名稱含 knowledge graph 就直接淘汰：它的 episode provenance、temporal fact invalidation 與自訂 ontology，目的確實接近「記得員工說過什麼，遇到更正後更新工作假說」。但「目的接近」仍需證明它能保留穩定 Task／Duty／OPKS ID、exact source anchor、employee correction precedence、文件隔離與 deterministic commit；否則只是功能很多的第二份推測資料。[Graphiti episodes](https://help.getzep.com/graphiti/core-concepts/adding-episodes)、[Graphiti custom ontology](https://help.getzep.com/graphiti/core-concepts/custom-entity-and-edge-types/)、[Zep temporal facts](https://help.getzep.com/facts)
+
+同樣地，`eventsourcing` 不是因為「event sourcing 聽起來正規」就全域採用。PyPI 目前最新正式版是 9.5.4；9.6.0b1 與 10.0.0a* 都是 pre-release。官方 `stable` 文件頁首一度顯示 9.5.5，與 PyPI 可安裝發行版不一致，因此 conformance 必須精確鎖 9.5.4，不以文件頁首猜版本。[PyPI release history](https://pypi.org/project/eventsourcing/) 9.5.x 已提供 PostgreSQL、Pydantic、projection、atomic multi-aggregate save、outbox 與 optimistic concurrency，DCB conditional append 也與 source ledger／read-set 的目的高度重疊；但它是專門化 OSS library，不是大廠 agent 標準，而且會新增一套 persistence mental model。[eventsourcing application／outbox／multi-aggregate save](https://eventsourcing.readthedocs.io/en/stable/topics/application.html)、[projections](https://eventsourcing.readthedocs.io/en/stable/topics/projection.html)、[DCB](https://eventsourcing.readthedocs.io/en/stable/topics/dcb.html) 若它無法讓持續理解、訪談控制、待審決策、可見回合與核准成品在同一 write model 原子成立，或只能靠另一個 SQLAlchemy write transaction 雙寫，就直接淘汰；不能只把 Source 放進 event store，其他狀態仍各自提交。
+
+#### 9.5.5 Proposal、證據與 verifier 的框架邊界
+
+Pydantic deferred tools 已支援 validated arguments、唯一 tool-call ID、approve／deny，以及 `ToolApproved.override_args`；AG-UI adapter 又把 edited args、reject reason 與 cancel 映射回這套 primitive。這足以讓「AI 提一份 typed changeset，員工看完修改或拒絕」不必自寫一套通用 tool-approval protocol。[Pydantic deferred tools](https://pydantic.dev/docs/ai/tools-toolsets/deferred-tools/)、[Pydantic AG-UI approval](https://pydantic.dev/docs/ai/integrations/ui/ag-ui/)
+
+它仍不能直接等同完整 Proposal，原因不是保護舊設計，而是產品行為不同：員工可以暫時不審、繼續訪談、同時有多份 pending bundle、日後 revision-request／defer，accept 時還要重驗 Current JD generation／read-set。Pydantic 的 stop-the-world approval 是一個 run 結束後由另一個 run 延續；Vercel adapter 也明示 client history 是未信任輸入，敏感 approval 需要 server-side record。因此 v0.4 採「框架 typed approval request＋本機 durable proposal record＋獨立 decision command」，並以新 schema 重寫舊 Proposal，不保留舊 class 拓撲。[Vercel AI trust／approval](https://pydantic.dev/docs/ai/integrations/ui/vercel-ai)
+
+證據層也有成熟元件可借：
+
+- W3C Web Annotation 提供 `TextQuoteSelector`／position selector 的可攜 anchor 形狀；PROV-O 提供 derived／revision／invalidation lineage；
+- Graphiti episode association 可把 derived fact 追回 raw episode；
+- LlamaIndex CitationQueryEngine 與 Haystack `AnswerBuilder` 可把回答連到 retrieved document／source node；
+- Pydantic／Harness Guardrails／PostgreSQL constraint 可承接格式、欄位、常見 safety 與 DB invariant。
+
+但沒有一個框架能僅憑 citation object 就判定「這句員工原話真的支持這個 Task／Duty／OPKS claim」。exact quote boundary、有效更正、來源權威與職務分析語意仍需要 deterministic verifier；應把它縮成 framework validator／constraint 上的少量 domain rules，而不是保留現行近千行 verifier 的結構。
+
+#### 9.5.6 修正後的兩個正式決賽組合
+
+Gate 3 不能只靠文件宣告唯一勝者。PydanticAI core 與 LangGraph core 都有 production 級版本政策，但 Pydantic 的 Planning／Harness 比 core 新，LangGraph 要承接 Work Model 又可能把 business authority 拖進 checkpoint／Store。故以下兩套都進 Gate 4；不是先完整做 A、失敗後才重做 B，而是共用同一組很小的 domain fixture／情境，各做最薄 adapter 後立即淘汰較差者。
+
+**Finalist A：PydanticAI V2＋Harness＋DBOS**
+
+1. PydanticAI V2 core 承接 model／OpenRouter／structured output／tool loop／usage；
+2. 精選並精準 pin Harness Skills、Planning、Compaction、Tool Output Limits、Guardrails；Memory、StepPersistence、Subagents、Shell／FileSystem 不因功能表存在就引入；
+3. DBOS 是唯一 durable execution／partition queue／retry runtime，並用 async datasource transaction 驗 semantic commit；不與 LangGraph checkpoint 或 Harness StepPersistence 疊用；
+4. Focus 優先交給 Planning＋staging `PlanStore`；Work Model／Source 以 SQLAlchemy relational baseline 對 `eventsourcing` 做 conformance；
+5. Pydantic Vercel AI adapter＋AI SDK 先接 chat／tool／approval UI；edited args／shared state 若需要大量 glue，則整體改用 AG-UI。
+
+**Finalist B：LangChain 1.x＋LangGraph 1.0 LTS 家族**
+
+1. `create_agent` 承接 model／tool loop／structured response，選配 Skills、TodoList、Summarization、Context Editing、Tool Selector、retry／fallback 與 HITL middleware；不直接採完整 Deep Agents 的 filesystem／shell／subagent 預設；
+2. LangGraph Functional API＋`AsyncPostgresSaver` 是唯一 durable runtime，承接 checkpoint／resume／pending writes／thread history；不再引入 DBOS；
+3. Focus 由 Todo state＋checkpoint 承接。Work Model 有兩個互斥作法：成為同一 typed graph state 的唯一 owner，或留在 relational write model、讓 checkpoint 只保存 execution state；Gate 4 必須證明前者的 direct edit／query／export／migration／authority transaction，不能以 Store mirror 補洞；
+4. Proposal 先用 LangChain HITL approve／edit／reject＋interrupt／resume，另存 durable domain changeset；Web 用 LangGraph streaming／frontend，若仍需 richer shared state 才整體採 AG-UI；
+5. LangMem 只有在它能刪掉自寫 reconcile 且所有更新仍先經 source／verifier 時才加入，不因同一家族就預設啟用。
+
+兩套共用的非 runtime 選擇是：本機 PostgreSQL 的單一 authority、LlamaIndex 作 final RAG gate、W3C selector／provenance vocabulary，以及 Caliburn 的 Task／Duty／OPKS Skills 與最薄 deterministic policy。兩套不得彼此混裝成 Pydantic agent＋LangGraph checkpoint＋DBOS queue 的三重 runtime。
+
+| 判準 | Finalist A | Finalist B |
+|---|---|---|
+| 穩定核心 | PydanticAI V2 stable；Harness 個別能力仍需 pin／canary | LangChain 1.x semver＋LangGraph 1.0 LTS；Deep Agents／個別 middleware 仍逐項 pin |
+| 一家族覆蓋 | 中高；durability 由 DBOS 補齊 | 高；agent、middleware、checkpoint、memory、HITL、stream 同家族 |
+| 與既有 async PostgreSQL authority 的吻合 | 較高；DBOS datasource 明確提供同 transaction outcome tracking | 待證明；checkpointer 很成熟，但不是 business transaction／CAS API |
+| Focus 替代 | Planning 的 ID／dependency／store 較直接，但 API 仍可能變 | Todo 與 checkpoint 整合較自然，但產品 metadata／排序／返回仍需 mapping |
+| 最大風險 | 新元件版本漂移、框架組合較多 | checkpoint growth／schema evolution、OSS 同 thread 併發與本機 run admission；只有錯誤保留第二個 relational writer 時才會重疊，不能把它算成直接替換的固有缺點 |
+
+Microsoft Agent Framework Harness 已把 loop、per-call history、compaction、todo、mode、memory、approval、OTel、Skills 包在同一套，證明「這些不是都要自己寫」；但 Python self-host persistence／hosting 仍需要 application store adapter，且 framework 在快速演進，現階段維持同級 benchmark。Rasa CALM 只保留為 conversation stack／repair benchmark。
+
+#### 9.5.7 Gate 4 要驗的三個小切片
+
+這不是成品前模型品質 eval；不建立 golden dataset、不打分回答，只驗成熟元件能否忠實替代並減少程式碼。
+
+1. **Focus slice**：同一份 fixture 建立三個 work units，切換焦點、插入旁支、建立 dependency、延後後返回、完成後因更正 reopen。A 用 Pydantic Planning＋staging store，B 用 TodoList／typed state＋Postgres checkpoint；兩邊都證明 stable ID、跨 run persistence、原子 semantic commit、UI event、無雙寫，並量出能刪除的 scheduler／question-target／journal state。
+2. **Work Model／Source slice**：保存一句員工原話，建立 Task＋Duty＋OPKS lineage，再送入更正，使只受影響分支 stale／retire，未受影響分支不變；比較 SQLAlchemy baseline、`eventsourcing` DCB／projection，以及 LangGraph typed state／Store 路徑，只有在前三者皆不能合理承接時才加 Graphiti。檢查 exact source、stable ID、read-set conflict、直接 edit／query／export、process restart、document delete、依賴與新增服務。
+3. **Proposal／UI slice**：同一 typed review bundle 橫跨 Duty／Task／OPKS，員工修改 args、defer、繼續訪談、日後 accept。A 測 Pydantic deferred tools＋Vercel AI／AG-UI，B 測 LangChain HITL＋LangGraph interrupt／stream；兩邊都驗 server-side pending record、stale rejection、Current JD 原子 commit、未信任 client history 與可刪 Web/API plumbing。
+
+每個 slice 都要交付「舊責任 → 新元件 → 剩餘 policy → 可刪 module／table → 新增 glue／服務 → failure modes」帳本。比較只到足以暴露 authority、persistence 與 UI seam，不做兩套成品；一旦某候選只能再做一份 mirror、無法維持產品語意，或比關聯式基線新增更多概念，就立即淘汰，不因它最新、最流行或來自大廠而保留。
+
+#### 9.5.8 北極星自審
+
+本輪擴大框架替代面後，產品方向仍未改變：
+
+- 員工看到的仍是一位專業職務說明書顧問，不是 Planning UI 裡的工程專案 agent，也不是多 Agent 組織；
+- 先建立大致工作地圖，再以明確 Focus 深訪；旁支保存、稍後返回，Task／Duty／OPKS 隨證據動態調整；
+- Task／Duty／O／P／K／S 是按需 Skills，不是固定階段，也不要求 Task 穩定後才分析 OPKS；
+- 「記憶」仍是記得這位員工在該文件中說過的有效內容與更正；Graphiti／LangMem／eventsourcing 都只是候選機制；
+- AI 可更新 Work Model、Focus 與 agenda 候選，但不能偷偷改 Current JD；正式變更仍由員工 accept／edit 或直接編輯；
+- Progress 仍顯示 coverage、depth、decision 與具體 gap，不拿 plan 完成數製造假百分比；
+- Reference／RAG 仍最後接入、只補漏與挑戰，不替員工創造事實；
+- 仍先完成產品核心、後做正式 eval；未新增登入、多租戶、公司 SOP、多人協作、自由多 Agent 或雲端控制面。
+
+**v0.4 結論**：幾乎每一塊自寫機制都有成熟元件可替代一部分，Focus／agenda 的替代甚至已相當直接；但 Work Model、Source、Proposal 與 deterministic evidence authority 沒有一個 agent framework 能零政策接管。最佳升級不是保護舊元件，也不是把所有 state 交給同一套展示用 memory；Gate 4 應讓 PydanticAI／Harness／DBOS 組合與 LangChain／LangGraph LTS 組合正面比較，讓勝出的 runtime、UI、資料與 RAG 元件接手通用機制。最後只留下 Caliburn 已研究驗證的職務分析方法與最薄的 authority policy，而不是現行 class／table／packet 拓撲。
+
+### 9.6 Gate 3 v0.5：直接替換原則下改選 LangChain／LangGraph（2026-08-13）
+
+#### 9.6.1 Owner 糾正與錯誤診斷
+
+Owner 再次指出：如果 LangGraph 的 checkpoint／state／Store 能完成 Work Model、Focus、Proposal 或 Current JD 的目的，就應讓它**直接替換**現行機制；只有保留兩套都可寫的 owner 才叫重疊。v0.4 口頭選擇 PydanticAI-first 時又用了「LangGraph 容易和 relational authority 重疊」作扣分，實際上等於暗中保護舊系統，違反 §2.11、§2.14 與 §9.5.1 的替代判準。
+
+驗證後這項糾正技術上成立：LangGraph 官方把 `State` 定義為 application 的目前快照；schema 可用 `TypedDict`、dataclass 或 Pydantic model，node 只回傳變更，reducers 決定各欄位如何套用。checkpointer 會把 thread state 保存成 checkpoints，支援 `get_state()`、`update_state()`、history、pending writes、replay 與 production `AsyncPostgresSaver`；`interrupt()` 會保存 state 並可無限期等待外部輸入。[Graph API](https://docs.langchain.com/oss/python/langgraph/graph-api)、[Persistence](https://docs.langchain.com/oss/python/langgraph/persistence)、[PostgreSQL checkpointer](https://reference.langchain.com/python/langgraph/checkpoints)、[Interrupts](https://docs.langchain.com/oss/python/langgraph/interrupts)
+
+因此正確問題不是「graph state 會不會跟 Work Model 重疊」，而是：**讓 graph state 成為唯一 owner 後，能否忠實承接來源、更正、職務 identity、員工 authority、直接編輯、查詢、匯出、併發與升級。** 若能，舊 tables／repositories／scheduler／proposal lifecycle 必須退出；若不能，才以實際缺口淘汰 LangGraph，不能拿自己選擇保留的第二套 writer 當框架缺點。
+
+#### 9.6.2 選型修正
+
+**目前主方案改為 LangChain 1.x＋LangGraph 1.0 LTS；PydanticAI V2＋Harness＋DBOS 降為整套 fallback。兩套不並用。**
+
+改選理由不是 LangGraph 名氣較大，而是套用 owner 的真正優先序後，它勝在：
+
+1. **直接替換覆蓋較高**：同一家族已有 agent／model／tools、structured response、custom typed state、reducers、Postgres checkpoint、durable execution、HITL、memory、context middleware、todo、streaming 與 frontend hooks；不必再以 Harness 管 Focus、DBOS 管 run、另一套 persistence 管 Work Model。[Prebuilt middleware](https://docs.langchain.com/oss/python/langchain/middleware/built-in)、[Context engineering](https://docs.langchain.com/oss/python/langchain/context-engineering)、[HITL](https://docs.langchain.com/oss/python/langchain/human-in-the-loop)
+2. **成熟度較高**：LangChain 1.x 採 semver，LangGraph 1.0 是 LTS；PydanticAI V2 core 雖 stable，但本案會高度依賴的 Harness Planning／Skills／Compaction 仍明示 API 可能跨 release 改變。[LangChain／LangGraph release policy](https://docs.langchain.com/oss/python/release-policy)、[Pydantic Harness](https://pydantic.dev/docs/ai/harness/)
+3. **產品形狀相容**：graph 不代表固定 wizard。可只保留少量技術 node 與動態 agent loop，下一個 Focus 仍由當下 Work Model／gap／員工改道決定；StateGraph 的 edges 是執行安全邊界，不是把員工訪談切成不可回跳階段。
+4. **可讓舊 business state 機制退場**：每份 JD 一個 `thread_id`；§9.7 實測後由同一家族的 Postgres Store 單獨保存完整 Source，DocumentState 保存 Source refs、Work Model、Focus／agenda、Progress、Proposal 與 Current JD。員工直接編輯與 Proposal decision 都是 deterministic graph command／node，不再另寫一份 relational aggregate。
+5. **Web 狀態與 HITL 機制也有直接替換路徑**：LangGraph streaming 與 frontend SDK 已支援 typed state、interrupt、approve／edit／reject 與 resume，不需要另選 Vercel adapter 或 AG-UI 才有這些語意。但 `useStream` 需 LangGraph server／Agent Streaming Protocol-compatible endpoint；官方 custom-backend 範例證明現有 FastAPI 可對接，Gate 4 仍要計入 transport adapter 與 protocol 版本成本，不宣稱 UI 完全零 glue。[LangGraph frontend HITL](https://docs.langchain.com/oss/python/langchain/frontend/human-in-the-loop)、[LangChain frontend overview](https://docs.langchain.com/oss/python/langchain/frontend/overview)、[official custom-backend example](https://github.com/langchain-ai/streaming-cookbook/tree/main/typescript/react-custom-backend)
+
+Pydantic 本身仍可用來定義 Task／Duty／OPKS／changeset／source 等 value object 與 validators；被撤回的是 **PydanticAI＋Harness＋DBOS 作主 runtime**，不是丟掉 Pydantic 資料驗證。
+
+#### 9.6.3 唯一 document state 的建議形狀
+
+本段是 v0.5 進入 Gate 4 前的初始假說；§9.7 的容量與崩潰實測已否定「完整 `source_events` 也放一般 State channel」，並以**按事實類型分配唯一 owner**取代。這不是保留兩套舊系統：每項事實仍只有一個可寫 owner。
+
+- **DocumentState** 是可演化顧問狀態的 typed schema；包含 `work_model`、`focus_plan`、`progress_and_gaps`、`pending_proposals`、`current_jd`、必要 conversation／context receipts、Source refs 與 revision，但不複製完整員工原話 journal；
+- **AsyncPostgresSaver** 是 DocumentState 的唯一 durable persistence／history mechanism，不另保留可寫的 Work Model／Focus／Proposal／Current JD tables；
+- **AsyncPostgresStore 是 Source payload 的唯一 owner**。每份文件使用 `("job-analysis", document_id, "sources")` namespace，穩定 `input_event_id` 作 key，保存不可變原話／speaker／document scope 與可變 processing envelope；State、Work Model 與 Proposal 只保存 Source ID／receipt，不再存第二份原話；
+- **Store＋Saver 不是單一 ACID transaction**，因此 Source row 先以 `pending` durable inbox 寫入，再進 graph；兩個崩潰窗口都以同 ID 重試與 reconciliation 收斂。這是通用 source-first plumbing，不是第二份業務 authority；
+- 文件列表保留只擁有 `document_id`、title、thread pointer、刪除 tombstone、狀態與時間的 catalog，或建立可重建 read projection；它不得反向修改 Source／Work Model／Proposal／Current JD。刪除先 tombstone，再冪等清除 Store namespace 與 thread checkpoints，避免清到一半重新露出文件。
+
+LangGraph 官方以跨 thread memory 說明 Store 的主要用途，但 namespace 可以是任意長度與任意應用 scope，Postgres 實作提供 key lookup、filter、search、delete 與持久化；Gate 4-A 已直接驗證 per-document Source journal。故「Store 只能放跨文件偏好」是 v0.5 過度限縮，不再採用。[LangGraph persistence／Store](https://docs.langchain.com/oss/python/langgraph/persistence)、[Postgres Store](https://reference.langchain.com/python/langgraph.store.postgres/aio)
+
+建議的責任映射如下：
+
+| 產品責任 | LangChain／LangGraph 直接承接 | Caliburn 保留的最薄內容 |
+|---|---|---|
+| 模型／OpenRouter／參數／tool loop／structured output | LangChain model abstraction、tools、structured response、retry／fallback／call-limit middleware | 版本化 model profile、實際 route／usage receipt、成本與資料政策 |
+| Task／Duty／OPKS Skills | 獨立 `SkillsMiddleware`／Agent Skills progressive disclosure；只載入當下 eligible skills | 已研究的分析方法內容與 deterministic eligibility |
+| Context／記憶 | thread state、messages、dynamic prompt、summarization、context editing、tool selector；Postgres Store 依 Source ID／filter 取回必要原話 | 哪些 Source／更正／Focus／JD／Reference 應進本次 context 的 policy 與 `ContextManifest` |
+| Focus／agenda／旁支／Progress | typed `focus_plan` state、reducers、Todo middleware、checkpoint history | work-unit schema、選焦點與停止條件、gap reason、員工改道／延後語意 |
+| Source | `AsyncPostgresStore` namespace／key／filter／delete 與 application-lifetime batching；`pending` row 作 source-first durable inbox | immutable payload hash、相同 ID 衝突、correction／supersede、pending reconciliation、document tombstone 與 Source ID 引用規則 |
+| Work Model／Current JD | 同一 `DocumentState` 的獨立 channels；deterministic reducer／node 套用更新；Postgres checkpoint 持久化 | stable identity、lineage、Task／Duty／OPKS invariant 與 Current JD authority |
+| Proposal | state 中的 durable typed changesets；blocking case 用 interrupt，non-blocking case 保存後正常結束；員工日後以新 graph command 決策 | bundle／atomic subgroup、before／after、defer／revision request、stale／read-set 與 accept 後 authority rule |
+| durable run／恢復 | checkpointer、tasks、pending writes、interrupt／resume、thread history；Store pending inbox | source-first reconciliation、同 document run admission、外部 provider at-least-once 與 idempotency key |
+| API／Web | LangGraph state／interrupt；FastAPI 0.135+ 原生 typed SSE；瀏覽器 `EventSource` 自動重連；TanStack Query 管 server projection | generated product contract、server validation、只投影 verified product status、dirty edit 與匯出 UX；不實作完整 Agent Protocol |
+| RAG | 最後關卡可比較 LangChain retriever／Qdrant 與 LlamaIndex；不因主 runtime 已選就硬綁 | iCAP corpus、Reference challenge、來源版本與無員工事實 authority |
+
+模型不能因為 state 由 LangGraph 保存就直接改 Current JD。正確結構是：模型只能呼叫「提出 finding／changeset」工具；deterministic verifier node 決定哪些更新可進 Work Model／Focus／Proposal；只有員工 direct-edit 或 accept／edit command 會經 authority node 更新 `current_jd`。框架取代的是 state、persistence、resume、middleware 與 UI 機制，產品的分析方法和權限仍以 schema／node policy 表達。
+
+#### 9.6.4 真正要驗的風險（不再列「重疊」）
+
+1. **source-first durability**：必須證明員工輸入已進 Store 的 durable `pending` inbox 後才打 provider；graph 只在後續 checkpoint 保存 Source receipt／處理狀態。model 前後 kill process 都不遺失原話，也不產生半套 Work Model／Proposal。
+2. **同 thread 併發**：LangGraph OSS 不含 LangSmith Deployment 的 double-text enqueue／reject；本機單 process 第一版先用很薄的 per-document run-admission lock＋durable active-operation reconciliation，確保回答、直接編輯與 Proposal decision 不並行寫同一 thread；部署變成多 process 時才升級成 PostgreSQL advisory lock／queue。這是缺少 queue 的實際風險，不是 state 重疊。[Double texting scope](https://docs.langchain.com/langsmith/double-texting)
+3. **checkpoint visibility／atomicity**：要證明已驗證的 Source refs／processing receipt、Work Model、Focus、Proposal 與可見 consultant turn 在同一 semantic checkpoint 一起可見，失敗時一起不成立；完整 Source payload 仍只在 Store，Current JD decision 亦同。
+4. **state growth**：官方預設每個 super-step 對每個 state channel 寫完整新值；Source／messages／history 不能無限複製。要測代表性長訪談，調整 channel 粒度、node 粒度、retention 與 compaction；summary 永不取代原始 Source。[Checkpoint model](https://docs.langchain.com/oss/python/langgraph/persistence)
+5. **schema／graph evolution**：LangGraph 會以最新 graph code 讀既有 checkpoint，node／state 欄位是 persisted API；需版本欄位、upcaster／migration、drain 規則與 document delete。第一版可 fresh schema，不代表未來不用升級策略。[Backward compatibility](https://docs.langchain.com/oss/python/langgraph/backward-compatibility)
+6. **直接 edit／query／export**：必須從最新 state 完成員工直接編輯、文件重開、readiness 與 deterministic export；不能為方便查詢又建立可寫的第二份 JD。read projection 必須可刪除重建。
+7. **side-effect replay**：官方要求非確定性與 I/O 放進 task 並自行做到 idempotent；provider call 仍可能在 crash window 重打，不能宣稱 exactly-once。[Functional API](https://docs.langchain.com/oss/python/langgraph/functional-api)
+8. **本機操作、授權與 frontend transport**：主 runtime 以 OSS LangChain／LangGraph library 與 `AsyncPostgresSaver` 嵌入 FastAPI／PostgreSQL。§9.9 已實測後選擇更薄的 product typed SSE：新版 FastAPI 接手 SSE framing／heartbeat，瀏覽器 `EventSource` 接手重連，LangGraph checkpoint 接手恢復；不採需 license key、Redis 與額外 container 的 standalone Agent Server，也不自行重寫它的 Agent Protocol。未來若產品真的需要多 worker queue、exact run replay、token／tool／multimodal stream 或多 client，再整體重新評估 Agent Server＋`@langchain/react`。[Standalone Agent Server requirements](https://docs.langchain.com/langsmith/deploy-standalone-server)、[Agent Server architecture](https://docs.langchain.com/langsmith/agent-server)、[FastAPI SSE](https://fastapi.tiangolo.com/tutorial/server-sent-events/)
+
+#### 9.6.5 Gate 4 與目前裁決
+
+Gate 4 不再平行開發兩套完整 slice。先在隔離 worktree 做一個可丟棄的 **LangGraph-first vertical conformance**：一份 JD、三個 work units、一則旁支、一則員工更正、一份可延後 Proposal，以及一次直接編輯／accept／export；同時測 restart、同 thread 競爭、state migration、delete，以及瀏覽器中斷後重連／interrupt 恢復。frontend 至少比較 Agent Server-compatible 與 custom FastAPI transport 的總成本。交付物必須列出舊 module／table／concept 可刪清單與新增 glue，且不做模型品質 eval。
+
+只有出現以下核心硬缺口才整套切回 PydanticAI＋Harness＋DBOS：OSS checkpointer 無法提供所需 semantic checkpoint、長訪談 state growth 無法以合理 channel／retention 控制、direct edit／export 必須建立第二個可寫 authority，或本機 run admission／升級成本使 LangGraph 的淨複雜度反而更高。不能因 adapter 還沒寫就保留舊 store，也不能把 DBOS 疊在 LangGraph 上補洞。
+
+**v0.5 當時選擇：LangChain 1.x＋LangGraph 1.0 LTS 作主 runtime 與 document-state mechanism；PydanticAI＋Harness＋DBOS 是硬缺口時的整套 fallback。** 主方案已由 §9.7 v0.6 實測保留，但 Source mechanism 改由 Postgres Store 單獨承接。這個裁決遵守「目的與方法保留、機制可直接替換」：Task／Duty／OPKS 分析方法、來源與員工 authority 繼續存在，但現行 Work Model、Focus、Proposal、Context、durable-turn、provider、wire、repository 與 UI state plumbing 都不預設保留。
+
+### 9.7 Gate 4-A v0.6：LangGraph document-authority conformance 實測（2026-08-13）
+
+#### 9.7.1 範圍、版本與可重現邊界
+
+Owner 核准後，在 `spike/langgraph-document-authority` 隔離 worktree 建立可丟棄探針；沒有修改 production dependency、現行資料表、API／Web 或模型 prompt。探針使用 Python 3.13.12、LangGraph 1.2.11、`langgraph-checkpoint` 4.1.1、`langgraph-checkpoint-postgres` 3.1.0 與獨立 PostgreSQL 16 資料庫；版本以 `uv run --with` 暫時解析，並在 Gate 4-B 解析出更新版本後重跑全部 14 項，沒有偷改產品 lockfile。這一關只驗工程語意，不呼叫 LLM、不建立 golden dataset、不比較回答品質。
+
+最終探針共 14 個測試，涵蓋：
+
+1. Source 先保存、後續分析崩潰時原話仍可恢復；
+2. 穩定 `input_event_id` 的重送去重與不同 payload 衝突拒絕；
+3. Work Model、Focus、Progress／gap、Proposal 與可見 consultant turn 在同一 semantic checkpoint 出現，AI 路徑不改 Current JD；
+4. Proposal `interrupt()` 跨 graph／database connection restart 後仍可 approve／defer，只有 approve 改 Current JD；
+5. 直接編輯以 revision CAS 拒絕 stale writer，query／deterministic export 直接讀最新 State，`adelete_thread()` 可清除 checkpoints；
+6. 本機單 process 的 per-document run admission 可把同 revision 競爭序列化成一成功、一 stale；
+7. 完成中的 checkpoint 可由新增 state 欄位與改過 node topology 的新 graph 開啟，非 additive 演化仍保留 migration 要求；
+8. 普通累積 State、官方 beta `DeltaChannel` 與 Postgres Store 三種 Source 保存方式的實際 PostgreSQL 成長；
+9. Store 已寫、source-receipt checkpoint 未寫，以及 analysis checkpoint 已寫、Store completion 未寫的兩個崩潰窗口；
+10. Store namespace＋thread checkpoints 的完整、可重試、冪等刪除。
+
+這不是完整產品 vertical slice：尚未接真模型、Task／Duty／OPKS Skills、Context token budget、OpenRouter profile、Web streaming 或瀏覽器重連。它回答的是「成熟框架能否取代核心 state／journal／HITL／恢復機制」，不能被誤報成產品已可施工或品質已驗證。
+
+#### 9.7.2 State growth 的反例與替代結果
+
+官方文件明確說明：一般 checkpoint 預設在每個 super-step 保存各 channel 的完整值，長期累積資料可能持續膨脹；1.2 新增 `DeltaChannel` 只保存增量並從 ancestor writes 重建，但目前仍標示 beta。[Persistence — Optimize checkpoint storage](https://docs.langchain.com/oss/python/langgraph/persistence)、[`DeltaChannel` reference](https://reference.langchain.com/python/langgraph/channels/delta)
+
+探針各建立 25 與 50 回合、每回合一則唯一中文長原話的 thread，計算 `checkpoints`、`checkpoint_blobs`、`checkpoint_writes`，Store 方案另加 `store` row bytes。結果如下：
+
+| Source mechanism | 25 回合 | 50 回合 | 50／25 | 判斷 |
+|---|---:|---:|---:|---|
+| 一般 reducer，把完整 `source_events` 累積在 State | 1,199,355 bytes | 3,935,508 bytes | **3.281×** | 淘汰；`source_events` blob 本身由 798,245 增至 3,131,520 bytes，是主要膨脹來源 |
+| `AsyncPostgresStore` 每則 Source 一個 key，State 只留 receipt／狀態 | 366,154 bytes | 732,349 bytes | **2.000×** | 通過；完整原話只保存一次，可依 ID／namespace／filter 查詢 |
+| beta `DeltaChannel` 保存 append delta | 321,440 bytes | 643,560 bytes | **2.002×** | 容量通過，但仍在開 thread 時重建整份 journal，且官方 on-disk／周邊 API 尚未 stable |
+
+這組數據只比較 persistence mechanics，不預測真實模型 token 或品質。它足以否定 v0.5 的一般 `source_events` channel，也顯示不能只因 Delta 容量略小就讓 beta 元件承接唯一 Source authority。
+
+#### 9.7.3 Source owner 與崩潰語意的修正裁決
+
+**v0.6 選擇 `AsyncPostgresStore` 作完整 Source payload 的唯一 owner；`DocumentState`＋`AsyncPostgresSaver` 作 Work Model、Focus、Progress、Proposal、Current JD 與執行 receipts 的唯一 owner。** 兩者保存的是不同事實，不是相同 Work Model／JD 的雙寫：
+
+- Source key 是 caller-provided `input_event_id`；不可變部分包含 document scope、speaker、原話與 canonical hash，狀態 envelope 可由 `pending` 轉 `complete`；
+- 相同 ID＋相同 payload 回既有結果且不重跑分析；相同 ID＋不同 payload 拒絕，不由 Store 的 upsert 靜默覆寫；
+- Store 先寫 `pending`，graph 才建立 source receipt 並分析。若 Store put 後、checkpoint 前崩潰，namespace query 可找回 pending Source；若 analysis checkpoint 後、completion 前崩潰，重送只補 completion，不再分析；
+- Work Model、Proposal 與 ContextManifest 只引用 Source ID；Context Engine 按當輪 Focus／gap 查回必要原話，不把全部 Store 內容自動塞給模型；
+- correction 是新的 Source event 並明列 supersedes／rebuts 關係，不改寫舊原話；processing envelope 的更新不改變 immutable employee payload。
+
+這個 pending／reconciliation seam 是 Store 與 checkpointer 未提供跨元件單一 ACID commit 的必要薄 glue。探針已證明兩個窗口都不遺失 Source、可重試且不重跑已完成分析；因此不構成切回 DBOS 的硬缺口。若未來改成多 process／多 worker，單 process `asyncio.Lock` 不再足夠，屆時須以 PostgreSQL advisory lock／lease 或 Agent Server run queue 取代，不能假裝目前測試已覆蓋分散式併發。
+
+文件刪除也不是只呼叫 `adelete_thread()`：catalog 必須先 tombstone 文件，再冪等清除 Source namespace 與 checkpoints；探針已驗 cleanup 重跑安全，但 catalog tombstone／crash sweep 尚待目標架構正式設計。`AsyncPostgresStore` 在本次版本採 application-lifetime background batch task，測試環境因沒有公開 close API 而需在 fixture 收尾；FastAPI lifespan／graceful shutdown 必須列入下一關 conformance，不能把這個套件生命週期細節藏掉。
+
+#### 9.7.4 其他通過與仍需自寫的最薄政策
+
+探針支持 LangGraph 直接替換現行機制，而不是包住舊系統：
+
+| 責任 | 探針結論 | production 仍需的薄政策 |
+|---|---|---|
+| Work Model／Focus／Progress／Proposal／Current JD | typed State＋reducers／nodes＋Postgres checkpoint 足以成為唯一 owner | Caliburn schema、職務 identity、dependency invalidation、read-set／revision 與 authority 規則 |
+| Proposal HITL | `interrupt()`／`Command(resume=...)` 跨 restart 可恢復；defer 不改 JD，approve 才改 | review bundle、edit／reject／revision request、atomic subgroup 與 UI wording |
+| direct edit／query／export | latest State 可直接承接，不需第二份可寫 JD | deterministic readiness／assembly、generated API contract 與 stale UX |
+| run admission | current local-only 單 process 可用薄 per-document lock＋revision CAS | lock ownership、timeout、取消與未來多 worker successor |
+| schema evolution | additive state／graph topology change可開舊 checkpoint | persisted schema version、non-additive upcaster、drain／rollback 規則 |
+| Source | 穩定 Postgres Store 已通過容量、查詢、衝突與 recovery | immutable payload contract、pending sweep、更正關係、刪除 tombstone |
+
+`DeltaChannel` 不作 Source owner，但不是全面禁用。若 messages、operation receipts 或其他 append-heavy State 未來實測也膨脹，可在版本 pin、restart、prune、migration 與 restore conformance 後個別採用；不能因它是新功能就先把所有 list 換掉。
+
+#### 9.7.5 v0.6 選型與下一關
+
+**LangChain 1.x＋LangGraph 1.x 繼續作主 runtime；PydanticAI＋Harness＋DBOS 維持整套 fallback，這次沒有觸發切換條件。** 原因是核心 semantic checkpoint、HITL、restart、direct edit／query／export、local concurrency、additive evolution、Source lifecycle 與線性容量都有可行機制，而且沒有留下第二份 Work Model、Proposal 或 Current JD writer。
+
+Gate 4-B 只做尚未被本探針回答的下一個最小 slice，不重新討論產品北極星：
+
+1. 以 LangChain model／tool／structured output 組一個「主顧問快速路徑＋最多兩波唯讀補查」的 bounded run，驗證可替換 OpenRouter model／provider／參數 profile、usage 與錯誤映射；
+2. 以 Task／Duty／O／P／K／S 六個小型測試 Skill 驗證 deterministic eligible set、progressive disclosure、當輪可組合載入與 durable replay；
+3. 由 Postgres Store Source＋DocumentState 組裝受 token budget 約束的 ContextPack／ContextManifest，證明會記得早先原話與更正，但不每輪傳整份歷史；
+4. 比較現有 FastAPI typed SSE 與 Agent Streaming Protocol-compatible transport 的 interrupt／重連／dirty-edit 成本；不因 `useStream` 存在就重寫半個 Agent Server；
+5. 把 Gate 4-A／B 結果收斂成目標架構、successor ADR 與受限 Big-bang plan，回看本稿北極星後才請 owner 核准實作。
+
+正式長訪談 eval 仍依 owner 裁示延後到成品完成後；Gate 4-B 只做 framework conformance、固定 fixture 與人工 smoke，不偷偷擴張成模型品質專案。
+
+### 9.8 Gate 4-B v0.7：Context／Skills／provider bounded-loop conformance（2026-08-13）
+
+#### 9.8.1 範圍、版本與測試結果
+
+同一隔離 worktree 增加第二個可丟棄探針；仍未修改 production dependency、現行 API／Web、產品資料庫或模型 prompt。探針使用 Python 3.13.12、LangChain 1.3.15、`langchain-core` 1.5.4、LangGraph 1.2.11、`langchain-openrouter` 0.2.7 與 Deep Agents 0.7.5；以 deterministic tool-capable fake model 驗工程契約，不呼叫付費模型、不做回答品質 eval。
+
+最新版套件下共 5 項測試通過：
+
+1. 版本化 model profile 可直接映射 OpenRouter model ID、temperature、max completion tokens、reasoning、provider order、fallback 與 `require_parameters`；應用不需再自己拼 provider request wire；
+2. 同一 bounded run 只預載當輪有效的員工更正、Focus、Progress、Current JD 與可用 Source ID；舊說法與旁支原話不先塞入，模型需要旁支時才透過唯讀工具取回；
+3. Task／Duty／O／P／K／S 六個獨立 Skill 可由 deterministic eligible set 篩選；初始 context 只含 eligible metadata，完整 `SKILL.md` 在需要時才讀取；同一 thread 下一輪改變 Focus 後，上一輪 eligible Skill 不會殘留到新 prompt；
+4. framework `ModelCallLimitMiddleware` 與 `ToolCallLimitMiddleware` 能把失控循環硬停在 3 次 model call、1 次 Skill read、最多 2 次 Source lookup；測試故意讓模型持續查詢，第三次嘗試即被停止；
+5. structured output 之外再跑 deterministic verifier，未列入當輪 eligibility 的 Skill 或 ContextManifest 未授權的 Source 都會被拒絕，不能只相信模型自行申報。
+
+主成功情境實際是 3 次 model call：第一次決定讀取 `opks-o`、第二次決定補查旁支 Source、第三次提交 typed `ConsultantTurn`。這正好是「快速路徑＋最多兩波唯讀補查」的上限形狀；若當輪已具 sufficient context，實際產品可以直接一次產出，不必為使用框架固定多跑兩次。LangChain 官方也把 context engineering 定義為在每一步選擇正確資訊與工具，而不是把所有可得資料塞進 prompt；middleware 是其控制 prompt、messages、tools、model 與 response format 的正式擴充面。[Context engineering](https://docs.langchain.com/oss/python/langchain/context-engineering)、[Agents](https://docs.langchain.com/oss/python/langchain/agents)、[Structured output](https://docs.langchain.com/oss/python/langchain/structured-output)
+
+#### 9.8.2 成熟元件實際替代了什麼
+
+| 產品責任 | 探針採用的成熟元件 | Caliburn 最後只留的薄政策 |
+|---|---|---|
+| 模型／provider／參數切換 | `ChatOpenRouter`＋LangChain model/tool binding | 版本化 profile、允許清單、資料政策、成本／route receipt |
+| bounded consultant loop | `create_agent` 編譯出的 LangGraph＋model／tool call limit middleware | 每輪最多幾波補查、錯誤映射與產品可見訊息 |
+| typed 顧問結果 | `ToolStrategy(Pydantic schema)` | 職務分析欄位、authority 與 domain verifier |
+| Context 組裝生命週期 | custom middleware hook＋LangGraph Store／State | 哪些 Source 是有效更正、Focus 核心、token budget、ContextManifest |
+| Skill registry／progressive disclosure | 單獨使用 Deep Agents `SkillsMiddleware`＋read-only `FilesystemMiddleware` | Task／Duty／OPKS 研究內容、當輪 eligibility、使用後驗證 |
+| 失控保護 | `ModelCallLimitMiddleware`＋`ToolCallLimitMiddleware` | 第一版的具體上限與不同操作的政策 |
+
+這證明「保留產品目的、替換自寫機制」可落地：Focus／Work Model／Progress／Proposal／Current JD 由 Gate 4-A 的 typed State 與 Store 機制承接；Gate 4-B 再讓框架接手 provider、tool loop、structured output、middleware lifecycle、Skill discovery/read 與 call limits。Caliburn 不必保留舊 ContextPacket、provider wire、operation wrapper 或 Skill 常駐 prompt，只需重寫少量可測的選擇與驗證規則。
+
+#### 9.8.3 沒有盲目採用完整 Deep Agents
+
+Deep Agents 的 `SkillsMiddleware` 是可單獨組裝的成熟元件，因此本案不必自己重寫 YAML metadata discovery、progressive disclosure prompt 與 `SKILL.md` 讀取協定；但完整 `create_deep_agent` 預設同時帶入 todo planning、檔案系統寫入、subagent、通用 summarization 與 coding-agent 式工作方式，這些不是本產品第一版需求，會把一位受限職務分析顧問改造成自由代理。因此裁決是：
+
+- **採用元件，不採用整包產品形狀**：只評估／pin `SkillsMiddleware` 與唯讀 `read_file`；不開放 write、shell、subagent、自由 todo；
+- **補一個必要且合理的薄 adapter**：原生 Skills middleware 會先載入 static source 的全部 metadata，本案需依 Focus／gap 在每輪 request 前篩出 eligible set。這不是重寫 Skill framework，而是 Caliburn 特有 eligibility policy；
+- **成本仍需產品化時量測**：progressive read 會多一個 model round trip；若某個短 Skill 幾乎每輪都 eligible，直接由 middleware 確定性預載全文可能更便宜。第一版應保留兩種載入模式，以實際 token／latency telemetry 決定，不先做模型品質 eval，也不把所有六個 Skill 常駐 prompt。
+
+官方文件將 Skills 定位為 metadata 先行、完整指示按需讀取；`SkillsMiddleware` 可獨立使用，支持目前的元件級採用，而不是要求採完整 Deep Agents。[Agent Skills specification](https://agentskills.io/specification)、[Deep Agents Skills](https://docs.langchain.com/oss/python/deepagents/skills)、[`SkillsMiddleware` reference](https://reference.langchain.com/python/deepagents/middleware/skills/SkillsMiddleware)
+
+#### 9.8.4 大方向回歸與下一步
+
+本輪沒有改變產品流程：仍是一位專業顧問；先建立可修正的工作全貌，再以明確 Focus 深訪；旁支先保存、必要時返回；Task／Duty／O／P／K／S 是同一訪談中的按需分析方法；員工原話與更正可長期找回；AI 只能提出 typed 候選，Current JD 仍只由員工 direct edit 或核准後的 authority command 改變；進度仍顯示 coverage、depth、decision 與具體 gap，不改成 agent tool-call 百分比。正式品質 eval 仍後置。
+
+本段當時剩餘的 frontend transport 已由 §9.9 完成；三個探針合併後的目標架構見 §9.10。探針仍不是 production 施工授權；successor ADR、刪除帳本與受限 Big-bang plan 必須等 owner 審核 §9.10 後另開。
+
+### 9.9 Gate 4-C v0.8：frontend transport／斷線恢復 conformance（2026-08-13）
+
+#### 9.9.1 問題、現況與證據層級
+
+這一關不是問「哪套 UI framework 功能最多」，而是問：**在不改變產品北極星的前提下，哪個成熟組合能讓員工送出的原話先保存、AI 在瀏覽器斷線後繼續、重開頁面能恢復、typed interrupt 能安全回覆、Current JD 編輯草稿不被背景更新蓋掉，且不用重寫半個 agent platform？**
+
+現行 production `POST /job-analysis/documents/{id}/turns` 會同步等完整 LLM 回合完成，再回整份 `ConsultationView`；Web 以 TanStack Query 寫回 consultation cache 並 invalidate document。repo 沒有 SSE／WebSocket。另一方面，現行 Web 已有成熟的 header／Duty／Task／OPKS local draft、dirty flag 與離頁保護；新 transport 可重寫舊 consultation plumbing，但不能讓背景 state snapshot 覆蓋員工尚未儲存的文字。
+
+證據分三層，避免把文件宣告寫成本機實測：
+
+1. **官方 production 能力**：LangSmith Agent Server 有 PostgreSQL thread／run／checkpoint／store、Redis pub-sub／streaming、背景 queue、reconnect／replay 與 double-texting；standalone production 仍要求 Redis、PostgreSQL、LangSmith API key、`LANGGRAPH_CLOUD_LICENSE_KEY` 與 license egress。[Agent Server](https://docs.langchain.com/langsmith/agent-server)、[standalone requirements](https://docs.langchain.com/langsmith/deploy-standalone-server)、[reconnect streaming](https://docs.langchain.com/langsmith/streaming)
+2. **官方 custom-backend 參考實作**：2026-07-16 的 LangChain streaming cookbook commit [`8c63965`](https://github.com/langchain-ai/streaming-cookbook/commit/8c63965f48d0c0a9da6485bdf119906cfaa79ea9) 使用 `@langchain/react`、`HttpAgentServerAdapter`、LangGraph 1.2 與 HTTP／SSE，證明不必採託管服務也能接 SDK；但 Python 範例的 `server.py`／`session.py`／`threads.py` 已有 873 行，另有 213 行 frontend thread bootstrap，且 `LocalThreadSession` 自己明示是 process-local demo，production 必須持久化 thread 並協調跨 worker replay。其 Python bridge 還抑制「v3 streaming protocol is experimental」警告；cookbook 首頁也把相關 event-streaming API 標為 preview。[Official cookbook](https://github.com/langchain-ai/streaming-cookbook)、[custom backend](https://github.com/langchain-ai/streaming-cookbook/tree/main/python/react-custom-backend)
+3. **本機產品語意探針**：在隔離 worktree 新增不進 production 的 `frontend_transport_spike.py` 與 6 項固定測試，驗證 durable snapshot、idempotency、interrupt scope／revision、restart resume、wire allowlist 與 dirty-draft 行為。這不是 HTTP framework benchmark，也不是 production LOC 估算；其 in-memory operation store 只代替目標設計中的 LangGraph DocumentState，不能演變成第二個資料表。
+
+FastAPI 本身在 0.135.0 起已原生支援 typed SSE；截至查核日 PyPI 最新為 0.141.1。官方介面直接以 Pydantic／JSON 產生 `data`，支援 `event`、`id`、`retry`、`Last-Event-ID`，並預設 heartbeat、`Cache-Control: no-cache` 與 `X-Accel-Buffering: no`。這些正好替代手寫 SSE framing。現行 API 仍是 FastAPI 0.115.0／Starlette 0.38.6，因此這是**待完整 API gate 驗證的升級候選**，不能直接在研究稿宣稱相容。[FastAPI SSE](https://fastapi.tiangolo.com/tutorial/server-sent-events/)、[FastAPI 0.141.1 source](https://github.com/fastapi/fastapi/blob/0.141.1/fastapi/sse.py)、[FastAPI PyPI](https://pypi.org/project/fastapi/)
+
+另查了 `sse-starlette` 3.4.8：它是 production/stable、BSD-3-Clause，提供 disconnect、ping、send timeout 與 graceful shutdown；但最新版要求 Starlette >=0.49.1，仍會迫使現行 stack 升級。既然新版 FastAPI 已把本產品需要的 SSE 能力收進 core，第一版不再額外增加這個依賴。[sse-starlette 3.4.8](https://pypi.org/project/sse-starlette/)、[dependency source](https://github.com/sysid/sse-starlette/blob/v3.4.8/pyproject.toml)
+
+嘗試以 `uv run --with fastapi==0.141.1` 做真正 HTTP smoke 時，隔離快取沒有套件，外部下載又被執行環境的 usage limit 拒絕；因此本節只把 FastAPI wire 行為列為**官方文件／原始碼確認**，不冒充本機跑過。進入 implementation plan 後，FastAPI 升級與 SSE route smoke 必須是第一個 prerequisite gate。
+
+#### 9.9.2 三條正式候選比較
+
+| 路徑 | 能直接替換的成熟機制 | 為本產品完整替換後的代價 | v0.8 裁決 |
+|---|---|---|---|
+| Agent Server＋`@langchain/react useStream` | thread／run API、queue、serialization、exact replay、join／rejoin、HITL、state/history、token／tool／multimodal stream、frontend projections | 新 Agent Server container、Redis、另一組 server resource／route、license key／egress；本機單一使用者仍須操作這些元件。這不是「與舊 state 重疊」：舊 mechanism 可全刪；問題是替換後產品仍承擔大量目前不用的能力與運維 | **第一版不採**；未來若需求真的變成 remote／multi-worker／多 client／exact replay，再整體評估，不在 FastAPI 上疊半套 |
+| 自建 Agent Streaming Protocol-compatible FastAPI＋`HttpAgentServerAdapter` | frontend `useStream`、message／tool／interrupt projections、filtered subscriptions、replay／dedupe | 官方 adapter contract 要 backend buffer／replay 完整 run、處理 commands、state/history、filter／namespace、late subscription；官方最小 demo 仍是 process-local。SDK 1.9.20–1.9.29 連續修正 hydration、heartbeat reconnect、`since`、HITL resume 與 nested interrupt，表示能力成熟度快速提高，但 protocol edge 仍在密集硬化。[Transport contract](https://reference.langchain.com/javascript/langchain-react/transports)、[SDK changelog](https://github.com/langchain-ai/langgraphjs/blob/main/libs/sdk/CHANGELOG.md) | **第一版不採**；只為 4–6 種產品狀態實作完整 Agent Protocol，新增碼與風險大於刪除碼 |
+| LangGraph embedded runtime＋FastAPI typed SSE＋browser `EventSource`＋TanStack Query | LangGraph 接 durable run／interrupt；FastAPI 接 typed encoding／heartbeat／headers；瀏覽器標準接 reconnect／`Last-Event-ID`；TanStack Query 接 durable view hydration／invalidation | 仍需一個很薄的 product operation contract、run-admission 與 dirty-draft 協調；沒有 Agent Server 的 exact event history、distributed queue 或 token／tool projection | **第一版採用**；它是多個成熟框架元件的組合，不是手寫 SSE。缺少的都是本機單人第一版不需要的能力 |
+
+`@langchain/react` 的功能確實完整，而且可直接替換一整套 agent frontend；未選它不是保護現行 Web。官方 v1 root hook 會擁有 thread lifecycle、`values`、messages、tool calls、interrupts 與 history；若 Caliburn 完整採用，就也應把文件讀取／direct edit／Proposal／dirty draft 全改成其 thread／command shape。若只拿 loading 與 interrupt，backend 仍被迫履行完整 replay contract，反而不是節省程式。第一版選擇較窄的產品 contract，未來 switch trigger 成立時再整條換掉，不維持兩套同事實 writer。
+
+#### 9.9.3 目標 transport 契約
+
+第一版不把 LLM token stream 當產品輸出。模型產生的自由文字、tool args、Skill 名稱、reasoning 與未驗證 structured result 都不送到員工畫面；它們通過 schema／deterministic verifier 後，才以完整的顧問訊息、Work Model／Progress projection 或 Proposal 出現。SSE 只傳產品級狀態：
+
+- `operation.accepted`：員工原話已 durable 保存；
+- `operation.progress`：有限 enum，例如「理解回答／更新工作全貌／準備下一題」，不顯示虛構百分比；
+- `input.required`：typed `UnderstandingCheckpoint`，含 interrupt ID、允許動作與 revision；
+- `operation.completed`：已驗證顧問回合成立，附新的 document revision；
+- `operation.failed`：員工原話仍在，畫面只顯示安全且可重試的錯誤；
+- `operation.snapshot`：重開／重連時的最新 durable 狀態，而不是重播所有短暫 animation。
+
+建議 public contract 由現有 JSON Schema SSOT 生成 Python／TypeScript，不直接暴露 LangGraph internal event：
+
+1. `POST /documents/{document_id}/turns`：驗文字與 `Idempotency-Key`，先完成 Source acceptance，再回 `202 OperationAccepted`；同 ID＋同 payload 回既有 operation，不同 payload 回 conflict。瀏覽器在這一步成功後即可清空送出框，不必等模型完成。
+2. `GET /documents/{document_id}/operations/{operation_id}`：回 durable `OperationView`；重開頁面先 hydrate，若仍 running 才開 SSE。
+3. `GET /documents/{document_id}/operations/{operation_id}/events`：原生 `EventSource`。event ID 是 server 產生的 operation revision；`Last-Event-ID` 只作提示，server 仍以 route scope 與 durable snapshot 驗證，不信任 client cursor。
+4. `POST /documents/{document_id}/operations/{operation_id}/inputs/{interrupt_id}/responses`：typed response＋idempotency key＋expected operation revision；server 驗 scope／interrupt／revision 後才轉成 `Command(resume=...)`。
+5. non-blocking Proposal 仍是 DocumentState 中可日後審核的 durable changeset，以獨立 decision command 處理；不能把所有 Proposal 都誤做成會停止訪談的 interrupt。
+6. `GET document／consultation projection` 仍是員工可見的完整 durable view；SSE 的 `document_revision` 只要求 refetch，不攜帶一份可直接覆寫 editor 的 Current JD。
+
+WHATWG `EventSource` 標準會在連線中斷後自動重連，並以 `Last-Event-ID` 回報最後 event ID；它沒有替 server 保存 replay buffer。Caliburn 不需要重播每個「正在整理」短暫事件，因為恢復依據是 LangGraph checkpoint 的最新 operation snapshot；waiting／completed／failed 都必須 durable，遺失中間 progress animation 不影響業務事實。[WHATWG EventSource](https://html.spec.whatwg.org/multipage/server-sent-events.html)、[MDN SSE](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events)
+
+#### 9.9.4 可丟棄探針與結果
+
+探針先寫測試並看過預期紅燈，再補最小實作；最後以 Python warnings 當 error 執行，共 6 項通過：
+
+1. UI 關閉 async stream 不會取消 background operation；另一個 transport instance 只靠同一 durable store 就能 hydrate completed snapshot；
+2. operation ID＋payload hash 冪等，不同 payload 無法借同一 ID 覆蓋；
+3. interrupt response 必須同時符合 document scope、interrupt ID 與最新 operation revision；
+4. 模擬 server restart 後，新 transport 會把 durable interrupt 交給 thin graph-resume port；真正 LangGraph `Command(resume)` 的 restart 行為已由 §9.7 驗證；
+5. wire allowlist 只含 operation ID／status／phase／revision／typed input／verified visible message，不含員工原文、input hash、Skill、tool、reasoning 或 Current JD；
+6. background document revision 到達時，dirty editor 保留 local draft 並標記 clean 後 refetch；clean editor 才立即前進 revision。
+
+重跑命令：
+
+```powershell
+$env:PYTHONUTF8='1'
+$env:UV_CACHE_DIR='S:\caliburn\.uv-cache-langgraph-spike'
+uv run --offline pytest tests/test_frontend_transport_spike.py -q -W error -p no:cacheprovider
+```
+
+探針沒有建立 HTTP route，也沒有把 in-memory store 宣稱為 production persistence；它只證明 product transport semantics。正式實作必須直接讀 LangGraph state／interrupt，用 FastAPI 新版 SSE 做 wire，不能照抄探針造新的 operation authority。
+
+#### 9.9.5 UI、失敗與切換規則
+
+- 員工送出後先看到「已保存」，不是把一個長 HTTP request 當資料是否存在的唯一證據；provider 失敗時原話仍可重試。
+- 瀏覽器關頁、換頁或 SSE 暫斷不取消 graph；員工明確按「停止本次分析」才是 cancel command。LangGraph JS SDK 1.9.8 已把 `stop()` 與 `disconnect()` 分開，支持這個區分，但本產品以自己的 typed command 表達，不引入整套 SDK。[SDK changelog](https://github.com/langchain-ai/langgraphjs/blob/main/libs/sdk/CHANGELOG.md)
+- background revision 不直接 `setQueryData` 覆寫整份 DocumentView。若任一 editor dirty，只顯示「背景有新版本，儲存／放棄後更新」；save 本身需 expected revision，stale 時讓員工選擇重載或重新套用，不偷偷 merge。
+- client conversation history、Current JD、interrupt payload、operation ID 與 `Last-Event-ID` 都是不可信 transport input；server 只以 document scope 下的 Store／checkpoint 重建 context。
+- 第一版不做 token-by-token consultant answer。這避免未通過 schema／quote／authority verifier 的半句話先成為員工可見事實，也讓 retry 不必處理半段訊息。
+
+未來同時出現下列任一類需求時，重新評估 **Agent Server＋`@langchain/react` 整體替換**，而不是在產品 SSE 上逐項仿造：多 worker／remote deployment、多人或多 client 同看一個 thread、需要 exact event replay、token／tool／multimodal streaming、server queue／double-text策略、time-travel／branch UI。單純「想少寫幾行 hook」不構成切換理由。
+
+### 9.10 目標架構 v0.9（已撤回：同目的替代尚未完成，勿據此施工）
+
+> **撤回註記（2026-08-13）**：本節雖選用了成熟 persistence／runtime／transport，卻又以 Work Model、Focus／agenda、Progress、Proposal、Current JD 與 operation 等現行概念切割 `DocumentState`，只證明能儲存這些欄位，沒有完成 §0.2 要求的同目的整體替代。下文保留為錯誤如何形成的研究紀錄，不是候選目標架構、ADR 輸入或實作授權。後續須回到 §9.5，逐目的重驗 memory／temporal state、planning／todo、progress、HITL／approval、approved artifact 與 durable run 等成熟元件後，另寫新版本取代本節。
+
+#### 9.10.1 架構裁決摘要
+
+三個 conformance slice 合併後，推薦組合是：
+
+- **LangChain 1.x＋LangGraph 1.x**：主顧問 bounded loop、typed State／reducers、checkpoint／resume、interrupt、Store、middleware、structured output 與 tool limits；
+- **`AsyncPostgresStore`**：每份文件的 immutable Source／更正與必要的大型 immutable artifact，按 namespace 隔離；
+- **`AsyncPostgresSaver`**：Work Model、Focus／agenda、Progress／gap ledger、Proposal、Current JD、可見顧問回合與 operation status 的唯一 DocumentState；
+- **LangChain OpenRouter＋Deep Agents `SkillsMiddleware`**：model／provider profile、按需 Task／Duty／O／P／K／S Skill；不採完整 `create_deep_agent`、subagent、shell、write-file 或自由 todo；
+- **FastAPI 0.141.1 升級候選＋原生 typed SSE**：product command／view／operation stream；正式 pin 以前先跑完整 API 相容 gate；
+- **Next／React＋TanStack Query＋現有 generated contract**：固定顧問工作區、durable view cache、local draft、dirty protection、Proposal／JD 操作；第一版不增加 `@langchain/react`、AG-UI 或 A2UI；
+- **PostgreSQL 仍是唯一預設基礎服務**：不新增 Redis、Agent Server container、LangSmith license dependency 或另一個 graph database。
+
+這不是「LangGraph 在外面包現行 Job Analysis」。AI 顧問子系統會受限 Big-bang：現行 Work Model／Focus／Proposal persistence、durable-turn orchestration、provider wire、Context packet、Task／OPKS 固定 prompt 與 consultation transport 都退出。保留的是經研究驗證的職務分析語意、來源／更正、員工 authority、deterministic verifier、generated contract 與匯出行為，不是舊 class／table／module 拓撲。
+
+#### 9.10.2 每項事實的唯一 owner
+
+| 事實 | 唯一可寫 owner | 其他層只能做什麼 |
+|---|---|---|
+| document catalog／title／tombstone／thread pointer | 現有 PostgreSQL catalog（可重寫 schema） | Web list、API route 與 cleanup workflow 讀取；不得反向寫 DocumentState 內容 |
+| 員工原話、明確更正、Reference receipt／quote anchor | `AsyncPostgresStore` document namespace | DocumentState 只存 Source ID／lineage／選用結果；Context 按需取回，不複製整份 journal |
+| Work Model、Focus／agenda、coverage／depth／decision／gap ledger | `AsyncPostgresSaver` 的 typed `DocumentState` | Web 看 generated projection；LLM 只能產候選，deterministic node 套用 |
+| Proposal | 同一 `DocumentState` 的 typed changeset channel | UI 可審核；non-blocking Proposal 不依賴 process memory 或暫時 stream |
+| Current JD | 同一 `DocumentState` 的 authority channel | 只有 direct-edit 或 employee decision node 可更新；AI node 永遠無 write edge |
+| current operation／phase／pending interrupt／visible result | 同一 `DocumentState` 的 operation channels | FastAPI SSE 只投影；transport spike 的 operation store 不進 production |
+| read projection／SSE／TanStack cache／editor draft | 非權威、可重建或 local-only | 不得在 background event 中覆寫 dirty draft，也不得被模型當 Source |
+
+Store 與 Saver 同時存在不是重疊，因為它們不寫同一事實；若 implementation 又建立 `job_analysis_*` 舊表保存另一份 Work Model／Proposal／Current JD，就違反本架構。大型 append-heavy channel（visible conversation、operation receipt）仍須在 plan 中加容量 canary；若也出現 §9.7 的平方成長，應個別移到 Store reference 或經 migration/restart 實測的 delta channel，不因此重建完整 relational mirror。
+
+#### 9.10.3 一個員工回合的實際資料流
+
+1. API 驗 document scope、idempotency key 與 payload hash；Source 先寫 Store `pending`，DocumentState 建立 accepted operation，才回 202。
+2. per-document run admission 只允許一個會改 DocumentState 的 graph run；本機單 process 先以薄 lock＋durable active-operation reconciliation 實作，不在 provider call 期間持有資料庫 transaction。
+3. graph 讀最新 DocumentState 與有效 Source／更正，先更新可修訂 Work Model，再由 deterministic policy 選本輪 Focus／gap；旁支被保存但不搶走當前焦點，除非員工改道或它構成 blocking contradiction。
+4. Context middleware 只帶最近自然對話、當前 Focus、必要 Work Model／Progress／Current JD、有效更正與少量高價值 Source；其餘原話與 Reference 由 allowlisted read-only tool 按需取回，每輪保存 `ContextManifest`。
+5. deterministic eligible set 只暴露本輪可能需要的 Task／Duty／O／P／K／S Skill metadata；短且幾乎必用的 Skill 可預載，其他由 `SkillsMiddleware` 按需讀全文。模型最多快速路徑＋兩波唯讀補查，call limit 硬停。
+6. model 回傳 typed `ConsultantTurn`／finding／changeset；schema 只保證形狀，domain verifier 另驗 Source、quote anchor、identity、dependency、authority、read-set 與 Skill／ContextManifest eligibility。
+7. 通過後，一個 semantic checkpoint 原子更新 Work Model、Focus／Progress、Proposal、可見顧問回合與 operation completed；AI 路徑不改 Current JD。失敗則 operation failed，Source 保留。
+8. FastAPI SSE 投影 durable operation snapshot；Web refetch verified consultation／document projection。若 editor dirty，只記錄 server 有新 revision，等待員工儲存／放棄後再更新。
+9. 員工日後接受、修改、拒絕、退回或延後 Proposal，是新的 typed graph command；重新驗 stale／read-set 後才由 authority node 改 Current JD。可繼續訪談，不必先清空 Proposal。
+
+#### 9.10.4 Focus、Progress、記憶與 Context 沒有偏掉
+
+- **Focus** 仍是「現在深入哪個 work unit、為何、完成條件與返回點」，不是 agent 自由 todo。成熟替代機制是 LangGraph typed state／reducer／checkpoint；選焦點、旁支是否升級與何時返回仍是 Caliburn 專業 policy。
+- **Progress** 仍呈現 coverage、depth、decision 與具體 gap，例如「這個 Task 的 P 已清楚，O 的時間／品質標準仍缺」；不顯示 graph node 數、tool-call 數或虛構百分比。
+- **記憶** 是能找回員工先前原話與最新有效更正，不是多 speaker profile。Store 保存完整 Source，State 保存目前理解與 lineage；模型每輪不必重吃完整歷史。
+- **Context** 是 application 在每個 model call 依 Focus／gap 組成的最小充分 context；framework middleware 管生命週期、summary／tool exposure 與 token limit，Caliburn policy 決定哪些事實有資格進入。
+- **Task／Duty／OPKS** 不是先後固定階段。它們是同一顧問回合可組合的按需 Skills；Task 尚未「穩定」也可在證據需要時分析 O／P／K／S，Duty 也可隨訪談重命名、merge／split／reassign，但每個正式變更都要 employee proposal decision。
+
+#### 9.10.5 反方審查
+
+| 反方問題 | 審查結果 |
+|---|---|
+| 沒用 `@langchain/react` 是否又回到全自寫？ | 否。LangGraph、FastAPI、EventSource、TanStack Query 與 generated contract 已分別接手 durability、SSE wire、reconnect、server cache 與型別。自寫只剩產品 event enum、command validation 與 dirty policy；完整 Agent Protocol 的未用能力不應算「省碼」 |
+| product SSE 沒有 exact replay，斷線會不會遺失進度？ | 中間 animation 可能不重播，但 accepted／waiting／completed／failed 是 durable snapshot；業務狀態不遺失。若未來要求逐 token／逐 tool exact replay，switch trigger 直接重評 Agent Server |
+| 單 process lock 是否不夠「大廠」？ | 對目前明確限定的本機單一操作者／單 API process 足夠，並有 durable active-operation／restart reconciliation。不能為不存在的多 worker 需求預先引入 Redis queue；部署邊界改變時再升級 |
+| 把 Current JD 放 checkpoint 是否不利 CRUD／export？ | §9.7 已用 direct edit、query、export、stale、delete 與 schema evolution fixture 實測可行；API projection／XLSX mapper 可直接讀最新 state，不需要第二份可寫 JD |
+| Store Source 與 State Work Model 是否會失去 transaction 原子性？ | Source-first 本來就是兩階段：原話先 durable，分析 semantic state 後成立；pending Source reconciliation 已實測兩個 crash window。它不是同一事實雙寫，失敗時寧可保留未處理原話，不可遺失原話 |
+| 不先做正式 eval 是否無法保證效果？ | 是，不能宣稱模型品質已證明；但 owner 已裁示先完成產品。第一版仍保留 deterministic fixture、schema／authority／restart／usage trace，成品完成後才做長訪談 eval，不以此為由刪掉可觀測性 |
+| 會不會被舊系統帶偏成只換 adapter？ | 目標架構明確要求 AI 顧問子系統舊 writer／orchestrator／wire 退出；計畫必須有逐 module／table／concept 刪除帳本。若新 runtime 只是呼叫舊 consultation engine，直接判定不合格 |
+
+這輪回看 §1–§8 與 Task／Duty／OPKS 研究，沒有改變產品角色、流程或員工 authority：仍是一位專業顧問，先建立可修訂工作全貌，再以清楚 Focus 深訪；旁支保存、原話可找回；Task／Duty／OPKS 按需組合；AI 只能提出 typed Proposal；員工知道目前焦點、進度、gap 與下一步。框架決策只替換工程機制。
+
+#### 9.10.6 當時規劃的下一關（已失效）
+
+下列內容是 v0.9 當時預定的下一步，已隨本節撤回而失效；目前不得開 ADR、刪除帳本或實作 plan，必須先完成 §0.2 所述目的層直接替代稽核：
+
+1. 開 successor ADR，記錄 LangChain／LangGraph-first、Store／Saver 唯一 owner、FastAPI product SSE、不採 Agent Server 與 Pydantic fallback trigger；
+2. 建逐 module／table／concept 的 `Replace／Delete／Retain` 帳本，特別防止舊 Work Model／Proposal／Current JD writer 殘留；
+3. 寫受限 Big-bang implementation plan，第一個 task 先做 FastAPI 0.141.1 候選升級與完整 API/SSE gate，失敗才評估原生 `StreamingResponse` 或相容版本，不先加 `sse-starlette`；
+4. 在新的隔離 worktree 施工，一個 task 一個 commit；完成前不 merge／push，不把可丟棄 spike 搬進 production；
+5. 產品端到端完成後另開正式 eval plan；本次施工只做 deterministic conformance、人工情境 smoke 與完整現有 gate。
+
+### 9.11 既有研究覆蓋稽核 v1.1：效果優先，只補真正未研究處（2026-08-13）
+
+本節回應 owner 的兩次校正：§9.3–§9.9 已做過廣泛官方資料研究與 25 項工程探針，不能再從頭比較所有框架；同時，框架選型不能把「少寫程式」當主要目的。這次先把需求改寫成**中立產品目的**，再標示「官方資料已覆蓋／已有 conformance／仍只有推論」。現行名詞只供研究歷史追溯，不是新架構必須保留、包裝或相容的元件、schema 或生命週期。
+
+#### 9.11.1 選型與驗證的優先順序（2026-08-13 owner 已確認）
+
+框架候選依下列順序判斷；前一層不合格，不能靠後一層補分：
+
+1. **產品效果與專業方法忠實度**：能否支撐本文確認的顧問流程、Task／Duty／O／P／K／S 按需分析、動態重整、來源與更正，以及可靠的職務說明書，而不是只提供名稱相似的 state／todo／approval。
+2. **功能完整性**：能否完整承接目前焦點、可見待處理問題、必要澄清、文件變更審核、核准成品、恢復與匯出；不得因框架缺功能而縮小產品。
+3. **正確性、authority 與可靠性**：AI 不偷改核准文件，員工原話不遺失，衝突／stale／崩潰可安全處理，每項事實只有一個可寫 owner。
+4. **員工體驗**：員工能分辨現在在訪談什麼、哪些只是待處理 Gap、哪些必須先回答、哪些是待審文件變更，且關頁後能恢復。
+5. **成熟度、版本穩定、操作與成本**：最新 stable／LTS、官方 persistence／failure semantics、本機安裝、資料服務與升級成本。
+6. **自寫量與可維護性**：只有前五項效果相當時，才比較能刪除多少舊機制、還需多少 glue 與長期維護。淨刪碼可證明框架真的接手通用機制，但不是犧牲效果的主要目標。
+
+本輪 conformance 仍不是正式模型品質 eval；它先驗證框架是否**有能力忠實實現產品效果**。長訪談回答品質、分析正確率與最終成品效果仍依 owner 裁示在產品完成後評測，不能因此把本輪退化成 LOC 競賽。
+
+#### 9.11.2 三種人機互動不得混成同一個 HITL
+
+1. **可審核的文件變更**：凡是 LLM 產生、準備寫入核准職務文件的 Task、Duty、O、P、K、S、名稱、分組、排序或文字，都先成為可檢查的 patch／changeset。員工可接受、修改後接受、拒絕或暫不處理；只有接受或修改後接受的部分才真正進入文件。它通常不阻塞訪談，可同時保留多筆待審。這個產品目的不要求物件名稱叫 `Proposal`，也不要求沿用現行 proposal class／table／API。
+2. **必要的結構化澄清**：當來源互相衝突、責任邊界重大不明、缺少只有員工能決定的事實，或繼續推論會把後續分析建立在不安全前提上時，顧問必須像 Claude 的結構化提問卡一樣，說明問題、目前理解、衝突與可選回答，先取得員工回覆再繼續受影響的分析。這是 clarification／decision request，不是文件變更審核；回答成為新的員工來源，也不等於接受任何文件文字。只阻塞依賴該答案的分支；若沒有其他安全焦點，整個顧問回合才等待。
+3. **可見的待處理問題與 Gap**：尚未深入的 Task、OPKS 缺口、旁支、新線索、可延後的問題與尚未分類事項，要形成 durable、可排序、可返回的待處理集合。它們不自動跳成 modal、不等於待審文件變更，也不阻塞目前焦點；員工可看見「還有什麼沒有分析、為何重要、之後可處理什麼」。目前焦點從這個集合與新證據中動態選出，而不是依固定 wizard 前進。
+
+AI 可在內部持續形成、修正或撤回暫時理解，不需要員工逐筆核准；但這層永遠不是核准文件。若理解更新導致正式文件應修改，仍須產生第一類可審核變更。框架可以用完全不同的 primitive 承接三種目的，但若一個 interrupt／approval API 只能完成其中一種，就不能宣稱三者已全部替代。
+
+#### 9.11.3 覆蓋表
+
+| 中立產品目的 | 既有研究與證據 | 目前狀態 | 唯一還要補的工作 |
+|---|---|---|---|
+| 可換模型／provider／參數，限制 tool loop，取得 structured output、usage 與錯誤 | §4.8、§8、§9.5；LangChain／OpenRouter bounded run 已由 §9.8 五項探針驗證 | **已研究、已實測；關閉廣泛選型** | production pin 與 provider canary 留到實作，不再做框架市場調查 |
+| 按當輪需要載入 Task／Duty／O／P／K／S 方法 | §4.7、§9.5；Agent Skills／`SkillsMiddleware` 的 eligible set、progressive disclosure 與 durable replay 已由 §9.8 驗證 | **已研究、已實測** | 只需把已驗證分析方法拆成正式 Skills；不再研究另一套 prompt framework |
+| 每次模型呼叫取得最小充分 context，能找回早先原話與更正但不重送整段歷史 | §4.9–§4.13、§9.5；Store＋state 組裝、token budget、按需 lookup 已由 §9.7–§9.8 驗證 | **已研究、工程路徑已實測** | 成品完成後再用長訪談 eval 驗品質；目前不重開 Context Engine 選型 |
+| 執行可 durable、restart、冪等、stream／reconnect，頁面離開不遺失工作 | §9.4–§9.9；LangGraph checkpoint／Store、FastAPI typed SSE、`EventSource`、dirty-editor policy 已有 20 項探針 | **已研究、已實測** | production lifecycle／migration／多 process trigger 留到實作；不再比較一般 agent runtime |
+| 動態決定現在深入什麼、保存旁支、延後返回、更正後重開；同時維持可見待處理集合與可信 coverage／depth／decision／gap | §2–§3、§5–§7 定義產品語意；§9.5 已研究 Pydantic Planning、LangChain Todo、Microsoft Harness todo、Rasa stack | **官方機制已研究，但完整目的尚未 conformance** | 驗動態訪談控制、待處理議程與有意義進度；不得把 plan item 計數當產品進度 |
+| 持續形成、修正與撤回對工作事實的理解，保留穩定 identity、來源 lineage、correction 與選擇性失效 | §2、§4.10、§9.5 已比較 SQLAlchemy、`eventsourcing`、Graphiti、LangGraph／LangMem；§9.7 只驗了 LangGraph 的簡化 state／Source 路徑 | **候選與語意已研究，缺直接比較** | 驗可修正理解與來源；比較完整效果、查詢、修正、失效與恢復，不再列新的 memory 產品清單 |
+| LLM 產生的文件內容先供員工接受、修改、拒絕或延後；多筆待審可與訪談並行；接受時原子更新核准成品 | §2.4、§3.7、§4.5、§9.5 已研究 Pydantic deferred tools、LangChain HITL／interrupt、Microsoft workflow HITL、AG-UI；§9.7／§9.9 只驗單一 interrupt 與 transport | **單一 blocking approval 已實測；可延後、多待審文件變更仍缺** | 驗可審核 patch／changeset 的完整生命週期；不保留舊名稱或 class，只保留員工 authority 效果 |
+| 發現重大衝突或安全推論缺口時，以結構化問題取得員工答案後再續跑 | §3.3、§3.7.1、§3.7.2 已定義 branch-blocking 規則；框架 interrupt／request-response primitive 已研究 | **產品語意已確認，尚未獨立 conformance** | 驗問題內容、blocking scope、answer-as-source、restart／resume，以及不誤當文件接受 |
+| Reference／RAG 補 coverage、術語與挑戰，但不創造員工事實 | §4.11–§4.12、§9.5 已研究 LlamaIndex、Haystack、Qdrant 與既有 bounded context | **已研究、依討論刻意排最後** | 核心顧問完成後做 final RAG gate，不在本輪重查 ingestion framework |
+| 模型回答品質與長訪談效果 | §7、§8 已定義之後要觀察的結果 | **owner 明確延後** | 成品完成後另開 eval plan；本輪不得偷做大型評測拖慢產品 |
+
+所以不是「還要研究全部元件」。現在只補四個產品目的切片，其餘進入實作時的版本 pin／canary，不再消耗討論時間。
+
+#### 9.11.4 只新增的版本與能力差異
+
+1. **Pydantic Planning 的既有結論已被 0.13.0 推翻。** 本機以暫時環境實際安裝官方 0.13.0 後，公開模組只有 `Planning／PlanningToolset／PlanItem／TaskStatus`；`PlanItem` 只有 `content／status`，`Planning.for_run()` 每次建立隔離狀態，plan 只作 model-owned ephemeral reminder，不再提供先前研究到的 stable item ID、dependency／blocked、subtask 或 durable PlanStore。它仍可協助單一 run 的短期模型規劃，但不能直接承接跨回合訪談焦點、待處理 Gap、返回與可信進度，因此從這個目的的正式候選淘汰；不為保留舊結論而鎖舊版。[Pydantic AI Harness 0.13.0 release](https://github.com/pydantic/pydantic-ai-harness/releases/tag/v0.13.0)、[0.13.0 Planning source](https://github.com/pydantic/pydantic-ai-harness/blob/v0.13.0/pydantic_ai_harness/planning/_capability.py)
+2. **LangChain Todo 不能因同一家族就視為等價替代。** 目前 `Todo` 主要只有 `content` 與 `pending`／`in_progress`／`completed` status，`write_todos` 是整份 list replacement；它適合讓 agent 分解短期任務與顯示進度，但沒有 product-stable ID、dependency、blocked、cancelled、defer／return reason 或 correction-reopen 語意。若用 LangGraph-first，這些仍要在 typed state 中建模；若它不能忠實承接產品效果，就不能只因整合較方便或少寫程式而勝出。[LangChain Todo schema](https://reference.langchain.com/python/langchain/agents/middleware/todo/Todo)、[Todo middleware](https://docs.langchain.com/oss/python/langchain/middleware/built-in)
+3. **一般 HITL 都偏向暫停目前 run，不能同時代表三種互動。** LangChain HITL、Pydantic deferred tools 與 Microsoft Workflow request／response 都能 durable 暫停、編輯或回應外部 request；Microsoft checkpoint 也會保存 pending requests。它們適合必要澄清或立即工具核准，卻不自動等於可延後、多筆並存的文件 patch review，也不等於待處理 Gap。產品應依目的選 primitive，不要求三者共享同一名稱或 storage shape。[LangChain HITL](https://docs.langchain.com/oss/python/langchain/human-in-the-loop)、[Pydantic deferred tools](https://pydantic.dev/docs/ai/tools-toolsets/deferred-tools/)、[Microsoft Agent Framework HITL](https://learn.microsoft.com/en-us/agent-framework/workflows/human-in-the-loop)
+4. **成熟 durable workflow 可承接生命週期，但不會自動提供職務分析語意。** DBOS 已有 persisted workflow message queue、topic、idempotency key、workflow event 與 background workflow；Camunda User Task 更有完整 lifecycle、pause／resume／approve／reject action 與 audit，但對本機單一操作者新增獨立流程平台可能過重。兩者作機制 benchmark；先看能否完整實現員工互動與 authority，再看是否減少維護，不以刪碼數先淘汰功能較完整者。[DBOS workflow communication](https://docs.dbos.dev/python/tutorials/workflow-communication)、[Camunda user-task lifecycle](https://docs.camunda.io/docs/apis-tools/frontend-development/task-applications/user-task-lifecycle/)
+5. **`eventsourcing` 候選版本已校正。** 截至 2026-08-13，PyPI 最新 stable 是 9.5.4；9.6.0b1 與 10.0.0a* 是 pre-release。官方 stable 文件顯示 9.5.5 的差異要視為文件／發行漂移，探針只鎖實際可安裝的 9.5.4。[PyPI release history](https://pypi.org/project/eventsourcing/)
+
+#### 9.11.5 接下來只做四個目的切片
+
+1. **動態訪談控制＋可見待處理議程＋可信進度**：三個動態工作單位，插入旁支、切換、employee defer、返回、dependency、完成後因更正 reopen；另保存多個不阻塞的 Gap，讓員工看見尚未分析什麼。Pydantic Planning 0.13.0 已因缺 stable identity、dependency 與跨 run persistence 淘汰；最小 probe 先驗 LangGraph typed state／reducers／checkpoint 能否完整承接。只有出現產品效果硬缺口，才針對該缺口加入 Microsoft Harness 或專門 workflow／planning 候選。先驗功能效果、恢復與可理解進度；只有效果相當才比較 glue。
+2. **可修正理解＋來源**：一句早期原話形成 Task／Duty／OPKS 關係，後續更正只使受影響推論失效，未受影響部分與 exact quote anchor 保留；同時驗查詢、stale、restart 與 delete。只比較已列候選：LangGraph Store／state 路徑、SQLAlchemy 基線、`eventsourcing` 9.5.4；只有這三者都無法合理承接 temporal fact retrieval 時才加入 Graphiti，不再廣搜 memory framework。
+3. **可審核文件變更＋核准成品**：一份 patch／changeset 橫跨 Duty／Task／OPKS，員工可 edit、defer、繼續訪談、再產生第二份待審，日後任意順序 accept／reject；accept 前重驗 read-set／stale，核准成品一次原子改變，直接編輯、查詢與匯出仍一致。候選可以使用 framework approval、durable state、user-task 或 message primitive，但新設計不需要出現 `Proposal`／`Current JD` 等舊元件名稱。
+4. **必要結構化澄清**：製造一個員工說法衝突與一個重大責任邊界不明情境；框架必須保存 typed question、原因、選項與 affected branch，先暫停受影響推論，重啟後仍能等待；員工回答成為新來源後才恢復，且絕不被誤記為接受文件 patch。比較 LangGraph interrupt、Pydantic deferred／AG-UI 與 Microsoft RequestPort 等已研究 primitive，不再廣搜一般表單框架。
+
+四個切片都必須交付同一份帳本：`產品目的與情境 → 效果／功能驗收 → 採用的成熟元件 → 仍需的最薄職務分析／authority policy → failure modes → 新增依賴與操作成本 → 可刪的舊機制`。可刪項放最後；通過後的新架構以產品目的與勝出的框架 primitive 命名，舊元件、舊名稱、舊 schema 與相容 adapter 原則上全部退出。只有框架無法完成且已由 conformance 證明的產品差額，才允許自寫。
+
+#### 9.11.6 北極星複核
+
+本次校正後沒有偏離產品大方向：員工仍面對一位專業職務分析顧問；先建立可修訂的工作全貌，再以清楚焦點深入訪談；旁支與 Gap 被記住但不任意搶焦；Task／Duty／O／P／K／S 是按需組合方法。AI 內部理解可以隨證據修正，但 LLM 產生、準備進入正式文件的內容都必須讓員工接受、修改或拒絕；重大衝突則以另一條結構化澄清互動先問員工，不能偷猜；進度顯示尚未分析、待處理、待審與受阻原因。框架的任務是以成熟能力忠實完成這些效果，省碼與維護收益只在效果相當後比較。
 
 ## 10. 本稿依據
 
@@ -1617,30 +2400,119 @@ Stakeholder 草稿（非權威，只作需求來源）：
 - [Google AI for Developers — Gemini Models（stable／preview／latest／experimental）](https://ai.google.dev/gemini-api/docs/models)
 - [Google Research — Sufficient Context: A New Lens on RAG Systems](https://research.google/blog/deeper-insights-into-retrieval-augmented-generation-the-role-of-sufficient-context/)
 - [LangGraph — Overview](https://docs.langchain.com/oss/python/langgraph/overview)
+- [LangGraph — Graph API（typed application state、reducer、node update）](https://docs.langchain.com/oss/python/langgraph/graph-api)
+- [LangChain — Frameworks, runtimes, and harnesses](https://docs.langchain.com/oss/python/concepts/products)
+- [LangChain／LangGraph — Release policy（LangChain semver、LangGraph 1.0 LTS）](https://docs.langchain.com/oss/python/release-policy)
 - [LangGraph — Workflows and agents（predetermined workflow 與 dynamic loop）](https://docs.langchain.com/oss/python/langgraph/workflows-agents)
 - [LangGraph — Persistence](https://docs.langchain.com/oss/python/langgraph/persistence)
+- [LangGraph Reference — Checkpointing／AsyncPostgresSaver／serialization](https://reference.langchain.com/python/langgraph/checkpoints)
+- [LangGraph — Functional API（determinism、idempotent side effects）](https://docs.langchain.com/oss/python/langgraph/functional-api)
+- [LangGraph — Backward compatibility（latest code 對 persisted checkpoint 的責任）](https://docs.langchain.com/oss/python/langgraph/backward-compatibility)
 - [LangGraph — Interrupts](https://docs.langchain.com/oss/python/langgraph/interrupts)
 - [LangGraph — Time travel](https://docs.langchain.com/oss/python/langgraph/use-time-travel)
+- [LangGraph — Subgraph persistence／same-thread checkpoint conflicts](https://docs.langchain.com/oss/python/langgraph/use-subgraphs)
 - [LangGraph frontend — Human-in-the-loop](https://docs.langchain.com/oss/python/langchain/frontend/human-in-the-loop)
+- [LangChain frontend — Overview（typed state、interrupt、checkpoint、`useStream`）](https://docs.langchain.com/oss/python/langchain/frontend/overview)
+- [LangChain React reference — Transports／AgentServerAdapter replay contract](https://reference.langchain.com/javascript/langchain-react/transports)
+- [LangGraph JS SDK changelog — reconnect／replay／HITL fixes](https://github.com/langchain-ai/langgraphjs/blob/main/libs/sdk/CHANGELOG.md)
+- [LangChain official streaming cookbook — React custom backend（Agent Streaming Protocol over HTTP／SSE）](https://github.com/langchain-ai/streaming-cookbook/tree/main/typescript/react-custom-backend)
+- [LangSmith — Agent Server architecture（PostgreSQL、task queue、per-thread run serialization）](https://docs.langchain.com/langsmith/agent-server)
+- [LangSmith — Double texting scope](https://docs.langchain.com/langsmith/double-texting)
+- [LangSmith — Standalone Agent Server requirements](https://docs.langchain.com/langsmith/deploy-standalone-server)
+- [LangSmith — Streaming API／reconnect](https://docs.langchain.com/langsmith/streaming)
+- [LangGraph frontend — Join／rejoin requires Agent Server](https://docs.langchain.com/oss/python/langchain/frontend/join-rejoin)
+- [FastAPI — Server-Sent Events](https://fastapi.tiangolo.com/tutorial/server-sent-events/)
+- [FastAPI 0.141.1 — SSE source](https://github.com/fastapi/fastapi/blob/0.141.1/fastapi/sse.py)
+- [FastAPI — PyPI release history](https://pypi.org/project/fastapi/)
+- [WHATWG HTML — Server-sent events](https://html.spec.whatwg.org/multipage/server-sent-events.html)
+- [MDN — Using server-sent events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events)
+- [sse-starlette 3.4.8 — PyPI](https://pypi.org/project/sse-starlette/)
 - [LangChain — Context engineering in agents](https://docs.langchain.com/oss/python/langchain/context-engineering)
 - [LangChain — Agents（model、tools、structured output 的組合邊界）](https://docs.langchain.com/oss/python/langchain/agents)
+- [LangChain — Structured output（ProviderStrategy／ToolStrategy 與 schema 驗證）](https://docs.langchain.com/oss/python/langchain/structured-output)
 - [LangChain — Custom middleware（dynamic model selection 是可選 middleware）](https://docs.langchain.com/oss/python/langchain/middleware/custom#dynamic-model-selection)
 - [LangChain — Prebuilt middleware（model／tool call limits、retry、HITL）](https://docs.langchain.com/oss/python/langchain/middleware/built-in)
+- [LangChain — Todo schema／TodoListMiddleware](https://reference.langchain.com/python/langchain/agents/middleware/todo/Todo)
+- [LangChain — OpenRouter integration](https://docs.langchain.com/oss/python/integrations/chat/openrouter)
+- [OpenRouter — Provider routing（order、fallback、required parameters）](https://openrouter.ai/docs/guides/routing/provider-selection)
+- [LangSmith — OpenTelemetry tracing／OTel backend routing](https://docs.langchain.com/langsmith/trace-with-opentelemetry)
 - [LangChain — Short-term memory](https://docs.langchain.com/oss/python/langchain/short-term-memory)
 - [LangChain — Memory overview](https://docs.langchain.com/oss/python/concepts/memory)
+- [Deep Agents — Overview（planning、context、store）](https://docs.langchain.com/oss/python/deepagents/overview)
+- [Deep Agents — Skills（metadata discovery 與按需讀取完整 `SKILL.md`）](https://docs.langchain.com/oss/python/deepagents/skills)
+- [Deep Agents frontend — Todo list／shared state](https://docs.langchain.com/oss/python/deepagents/frontend/todo-list)
+- [LangMem — Long-term memory concepts／profile／collection](https://langchain-ai.github.io/langmem/concepts/conceptual_guide/)
+- [Agent Skills — Open specification（SKILL.md 與 progressive disclosure）](https://agentskills.io/specification)
+- [Agent Skills — Overview／client ecosystem](https://agentskills.io/home)
+- [Deep Agents Reference — 可單獨組裝的 SkillsMiddleware](https://reference.langchain.com/python/deepagents/middleware/skills/SkillsMiddleware)
+- [PydanticAI — Version policy（V2 stable 與相容承諾）](https://pydantic.dev/docs/ai/project/version-policy/)
+- [Pydantic — PydanticAI V2 capability-first／Harness 設計](https://pydantic.dev/articles/pydantic-ai-v2)
+- [PydanticAI — Capabilities](https://pydantic.dev/docs/ai/capabilities/overview/)
+- [PydanticAI — DynamicCapability API／durable stable ID](https://pydantic.dev/docs/ai/api/pydantic-ai/capabilities/)
+- [PydanticAI — On-demand capabilities](https://pydantic.dev/docs/ai/capabilities/on-demand/)
+- [PydanticAI — Typed output／output validators](https://pydantic.dev/docs/ai/core-concepts/output/)
+- [PydanticAI — OpenRouter model／routing／cache settings](https://pydantic.dev/docs/ai/models/openrouter/)
+- [PydanticAI — Graph 使用界線](https://pydantic.dev/docs/ai/graph/graph/)
+- [Pydantic AI Harness — Overview／0.x version policy](https://pydantic.dev/docs/ai/harness/)
+- [Pydantic AI Harness — Agent Skills](https://pydantic.dev/docs/ai/harness/skills/)
+- [Pydantic AI Harness — Compaction](https://pydantic.dev/docs/ai/harness/compaction/)
+- [Pydantic AI Harness — Tool Output Limits](https://pydantic.dev/docs/ai/harness/tool-output-limits/)
+- [Pydantic AI Harness — Planning（stable ID、dependency、store、event）](https://pydantic.dev/docs/ai/harness/planning/)
+- [Pydantic AI Harness source — PlanItem fields](https://github.com/pydantic/pydantic-ai-harness/blob/main/pydantic_ai_harness/planning/_types.py)
+- [Pydantic AI Harness source — PostgresPlanStore concurrency boundary](https://github.com/pydantic/pydantic-ai-harness/blob/main/pydantic_ai_harness/planning/_postgres.py)
+- [Pydantic AI Harness — Guardrails](https://pydantic.dev/docs/ai/harness/guardrails/)
+- [Pydantic AI Harness — Memory security／provenance](https://pydantic.dev/docs/ai/harness/memory/)
+- [Pydantic AI Harness — StepPersistence scope](https://pydantic.dev/docs/ai/harness/step-persistence/)
+- [PydanticAI — Durable execution with DBOS](https://pydantic.dev/docs/ai/capabilities/durable_execution/dbos/)
 - [PydanticAI — Deferred tools and human-in-the-loop approval](https://pydantic.dev/docs/ai/tools-toolsets/deferred-tools/)
+- [PydanticAI UI — Vercel AI adapter／trust／approval](https://pydantic.dev/docs/ai/integrations/ui/vercel-ai)
+- [PydanticAI UI — AG-UI shared state／interrupt](https://pydantic.dev/docs/ai/integrations/ui/ag-ui/)
+- [DBOS — Workflows／recovery guarantees](https://docs.dbos.dev/python/tutorials/workflow-tutorial)
+- [DBOS — SQLAlchemy Datasource transactions](https://docs.dbos.dev/python/tutorials/transaction-tutorial)
+- [DBOS — Queues／concurrency／deduplication](https://docs.dbos.dev/python/tutorials/queue-tutorial)
+- [DBOS — Partitioned queue reference](https://docs.dbos.dev/python/reference/queues)
+- [DBOS — Atomic enqueue in application transaction](https://docs.dbos.dev/python/reference/client)
+- [DBOS — Custom／portable serialization](https://docs.dbos.dev/python/reference/contexts)
+- [DBOS — Workflow messages／events／streaming](https://docs.dbos.dev/python/tutorials/workflow-communication)
+- [DBOS — Upgrading workflow code](https://docs.dbos.dev/python/tutorials/upgrading-workflows)
 - [OpenRouter — Zero Data Retention](https://openrouter.ai/docs/guides/features/zdr)
 - [OpenRouter — Provider routing and data-policy controls](https://openrouter.ai/docs/guides/routing/provider-selection)
 - [OpenRouter — Input & Output Logging](https://openrouter.ai/docs/guides/features/input-output-logging)
 - [Microsoft — Agent Framework overview](https://learn.microsoft.com/en-us/agent-framework/overview/)
+- [Microsoft — Agent Framework Agent Skills](https://learn.microsoft.com/en-us/agent-framework/agents/skills)
+- [Microsoft — Agent Framework Workflows](https://learn.microsoft.com/en-us/agent-framework/workflows/)
+- [Microsoft — Agent Framework Checkpoints](https://learn.microsoft.com/en-us/agent-framework/workflows/checkpoints)
 - [Microsoft — Agent Framework Memory & Persistence（history、context provider、session state）](https://learn.microsoft.com/en-us/agent-framework/get-started/memory)
 - [Microsoft — Self-host Agent Framework applications（session 與 history 分離）](https://learn.microsoft.com/en-us/agent-framework/hosting/self-hosting/)
 - [Microsoft — Agent Framework Harness](https://learn.microsoft.com/en-us/agent-framework/concepts/harness)
+- [Microsoft — Agent Framework Harness quick start（plan／todo／history across turns）](https://learn.microsoft.com/en-us/agent-framework/get-started/harness)
 - [Microsoft — Agent looping（completion condition、bounded iteration、approval escape）](https://learn.microsoft.com/en-us/agent-framework/agents/looping)
 - [Microsoft — Agent Framework workflows human-in-the-loop](https://learn.microsoft.com/en-us/agent-framework/workflows/human-in-the-loop)
 - [Microsoft — Agent Framework AG-UI integration](https://learn.microsoft.com/en-us/agent-framework/integrations/by-component/ui/ag-ui/)
 - [Microsoft Azure Architecture Center — Strangler Fig pattern](https://learn.microsoft.com/en-us/azure/architecture/patterns/strangler-fig)
 - [AWS Prescriptive Guidance — The strangler fig pattern](https://docs.aws.amazon.com/prescriptive-guidance/latest/modernization-aspnet-web-services/fig-pattern.html)
+- [AWS Strands Agents — Session management](https://strandsagents.com/docs/user-guide/concepts/agents/session-management/)
+- [AWS — Introducing Strands Agents](https://aws.amazon.com/blogs/opensource/introducing-strands-agents-an-open-source-ai-agents-sdk/)
+- [LlamaIndex — Workflows](https://developers.llamaindex.ai/python/llamaagents/workflows/)
+- [LlamaIndex — Durable Workflows](https://developers.llamaindex.ai/python/llamaagents/workflows/durable_workflows/)
+- [LlamaIndex — Ingestion Pipeline（cache、hash／dedup、async）](https://developers.llamaindex.ai/python/framework/module_guides/loading/ingestion_pipeline/)
+- [LlamaIndex — CitationQueryEngine](https://developers.llamaindex.ai/python/examples/query_engine/citation_query_engine/)
+- [Haystack — AnswerBuilder／referenced documents](https://docs.haystack.deepset.ai/docs/answerbuilder)
+- [LiteLLM — Provider interface／Router／cost tracking](https://docs.litellm.ai/)
+- [Mem0 — Memory add／LLM inference behavior](https://docs.mem0.ai/core-concepts/memory-operations/add)
+- [Letta — Memory blocks](https://docs.letta.com/guides/core-concepts/memory/memory-blocks)
+- [Graphiti — Temporal knowledge graph overview](https://help.getzep.com/graphiti/getting-started/overview)
+- [Graphiti — Episodes／provenance](https://help.getzep.com/graphiti/core-concepts/adding-episodes)
+- [Graphiti — Custom entity and edge types](https://help.getzep.com/graphiti/core-concepts/custom-entity-and-edge-types/)
+- [Zep — Temporal facts／invalidation](https://help.getzep.com/facts)
+- [eventsourcing 9.5.4 stable — PyPI release history](https://pypi.org/project/eventsourcing/)
+- [eventsourcing stable docs — Application／outbox／multi-aggregate save](https://eventsourcing.readthedocs.io/en/stable/topics/application.html)
+- [eventsourcing stable docs — Projections](https://eventsourcing.readthedocs.io/en/stable/topics/projection.html)
+- [eventsourcing stable docs — Dynamic consistency boundaries](https://eventsourcing.readthedocs.io/en/stable/topics/dcb.html)
+- [SQLAlchemy 2.0 — Version counter／stale detection](https://docs.sqlalchemy.org/en/20/orm/versioning.html)
+- [Rasa CALM — FlowPolicy／dialogue stack](https://rasa.com/docs/reference/config/policies/flow-policy/)
+- [Camunda 8 — User task lifecycle／custom actions](https://docs.camunda.io/docs/apis-tools/frontend-development/task-applications/user-task-lifecycle/)
+- [OpenTelemetry — Generative AI semantic conventions／sensitive-content warning](https://opentelemetry.io/docs/specs/semconv/registry/attributes/gen-ai/)
 - [Microsoft Research — From Local to Global: A Graph RAG Approach](https://www.microsoft.com/en-us/research/publication/from-local-to-global-a-graph-rag-approach-to-query-focused-summarization/)
 - [Microsoft Research — DRIFT Search: Combining global and local search](https://www.microsoft.com/en-us/research/blog/introducing-drift-search-combining-global-and-local-search-methods-to-improve-quality-and-efficiency/)
 - [Microsoft Research — GraphRAG dynamic community selection](https://www.microsoft.com/en-us/research/blog/graphrag-improving-global-search-via-dynamic-community-selection/)

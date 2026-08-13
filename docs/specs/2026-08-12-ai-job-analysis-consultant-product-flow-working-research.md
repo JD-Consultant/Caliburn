@@ -139,9 +139,11 @@ Owner 已確認：保留 Source、Work Model、Proposal、Current JD、Task／Du
 - memory／agent／workflow 框架可以產生候選、保存執行 checkpoint 或組裝 context，但不得成為 Source、Work Model、Proposal 或 Current JD 的第二份權威；
 - framework HITL 可以承接通用 pause／resume 與互動傳輸，但 Proposal 是 durable domain object，員工決策是獨立 domain command，最後仍須通過 Caliburn authority commit seam；
 - 採用標準是語意覆蓋、可靠度、維護成熟度、遷移成本、可替換性與是否減少總維護面，不是套件功能數或刪除行數；
-- 目前推薦分層組合主流框架，而不是要求一套框架全包，也不以 big-bang event-sourcing／agent-platform 重寫作為預設路徑。
+- 目前推薦依責任分層組合主流框架，而不是要求一套框架全包；遷移邊界依 §2.15 採 AI 顧問子系統受限 Big-bang，但不擴張成整個 Caliburn 的 event-sourcing／agent-platform 重寫。
 
 因此產品流程仍是本文定義的顧問流程；framework 只能忠實承接它，不能因框架已有 `memory`、`state`、`approval` 或 `agent` 類別，就重新定義員工回合、資料權威、進度或正式修改權。
+
+這裡的「保留」指**保留目的、專業方法、產品語意與可驗證的不變量，不是保護目前自寫的 class、module、schema、資料表或 orchestration code**。`Focus`、`Work Model`、`Current JD`、`gap／agenda`、`Proposal` 與 `Context Engine` 是目前用來描述產品責任的名稱；若成熟框架能以更完整、可維護的機制承接同一責任，原則上優先 `Replace` 或 `Wrap`，只為 Caliburn 特有的職務分析與 authority 差異保留自寫程式。後續框架研究必須逐項回答「承接哪項產品責任、框架提供什麼、Caliburn 還要補什麼、能刪除哪些舊碼、如何證明語意不變」，不能只因框架有同名功能就直接採用。
 
 ### 2.12 一個員工回合採三層持久化，不把 network call 偽裝成資料庫交易（2026-08-13 審核後確認）
 
@@ -163,6 +165,59 @@ Owner 已確認：保留 Source、Work Model、Proposal、Current JD、Task／Du
 UI 只可在 semantic commit 成功後把 consultant turn 當正式本輪回覆；commit 前可以顯示「已保存／分析中／驗證中」等 processing status，但不可先把尚未驗證的串流文字當成已成立的分析。失敗時顯示「原話已保存、分析尚未完成」與可重試狀態，而不是要求員工重新輸入。
 
 這項分層符合多個官方來源的共同模式，但外部來源不替 Caliburn 決定 domain 語意：PostgreSQL 將 transaction 定義為多步驟 all-or-nothing；AWS 的 idempotent API 指引要求 caller-provided request ID，並指出去重紀錄、mutation 與結果應在同一 ACID operation 中一致提交；LangGraph 建議把 API call 放進可 checkpoint、可重播且 idempotent 的 task，保存已完成 task result 以免 resume 時重算；OpenAI Agents SDK 的 output guardrail 也明確區分「已完成的 tool result 可持久化」與「被拒絕的 final output 不進 session」；DBOS datasource 則證明 workflow checkpoint 與 application transaction 可以在同一資料庫交易中原子記錄，但它是替代 runtime 候選，不代表應與 LangGraph 疊兩套 durable engine。[PostgreSQL — Transactions](https://www.postgresql.org/docs/current/tutorial-transactions.html)、[AWS Builders' Library — Making retries safe with idempotent APIs](https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/)、[LangGraph — Functional API](https://docs.langchain.com/oss/python/langgraph/functional-api)、[OpenAI Agents SDK — Guardrails](https://openai.github.io/openai-agents-python/guardrails/)、[DBOS — Transactions and Datasources](https://docs.dbos.dev/python/tutorials/transaction-tutorial)
+
+### 2.13 產品產出與不可宣稱的範圍（2026-08-13 已確認）
+
+Owner 確認第一版產品的產出定位為：
+
+> Caliburn 透過專業職務分析方法，由 AI 主導訪談、交叉檢查並持續修正，再由員工逐項審核，形成反映該員工目前實際職務的客製化職務說明書。
+
+它不是聊天摘要或填表結果，但單一員工訪談與員工對文件的 authority 也不能自動升格為其他種類的效度。因此產品不得宣稱該文件：
+
+- 已代表公司對此職位的正式定義；
+- 已由主管、HR 或外部職務分析專家核准；
+- 可直接作為招募甄選、績效考核、薪酬或法規判定標準；
+- 已證明該員工具備文件列出的所有能力；
+- 已通過 iCAP、法規或其他外部效度審查。
+
+未來若組織要正式採用，可把本產品成果送入另一個組織核准或效度程序；目前不因此加入主管帳號、HR workflow、多人核准或外部認證功能。這延續[`專業顧問流程最終反方審查`](2026-07-25-professional-job-analysis-consultant-process-final-red-team.md#12-成品能合理宣稱什麼)的聲明上限，避免「專業顧問」被誤讀成已完成組織或甄選效度驗證。
+
+### 2.14 目標優先、成熟框架優先承接、遷移受控（2026-08-13 已確認）
+
+本次是**升級現有產品**，不是保留舊碼的小修，也不是把既有職務分析研究一起推倒重來：
+
+- 新產品目標以本文已確認的白話流程為準；現行 code 是遷移起點與安全證據，不是產品天花板；
+- 優先保留已研究驗證的職務分析、Task boundary、Duty grouping、OPKS、Reference challenge 方法，以及來源追溯與員工 authority；
+- 現有 Focus、Work Model、Current JD、gap、Proposal、Context、memory、operation、provider adapter 與 verifier 實作都可成為框架替代候選；
+- 若成熟框架能完整承接同一目的、維護性更好且不建立第二份權威，優先移植、包裝或替換，不因「這是 domain 元件」就假設底層必須自寫；
+- 目標流程不因現行系統暫時缺少 Duty hypothesis、Task reassignment、Duty Proposal、typed composite changeset 或按需 OPKS Skills 而縮小；
+- 與 Accepted ADR 衝突的目標改變必須由 successor ADR 明確取代後才可施工，不能偷偷繞過，也不能反過來用舊 ADR 凍結已由 owner 確認的新產品方向。
+
+進入 plan 前必須建立「目標能力／現況／框架候選／`Replace|Wrap|Retain`／仍需自寫語意／successor ADR／驗收情境」差距矩陣。這張矩陣以產品責任為列，不以舊 module 為列，避免框架研究退化成替舊系統逐檔換套件。
+
+### 2.15 AI 顧問子系統採受限 Big-bang，一次切換但不重寫整個 Caliburn（2026-08-13 已確認）
+
+2026-08-13 repo 稽核顯示，目標升級會同時改變 consultation runtime、Context／memory、Focus／agenda、Work Model、Duty、Proposal、OPKS Skills、durable run 與對應 API／UI。若逐一包裝舊 Task Analysis／OPKS child 元件，必須長期維護兩套狀態語意、轉接契約與一次性 adapter，橋接成本很可能高於直接建立新垂直切片。Owner 確認可在隔離 worktree 完成新系統後再切換，因此採：
+
+1. 在隔離 worktree 內建立新的完整 AI 顧問垂直切片；中間 commit 不需要把半套新流程接到主工作面；
+2. 將 AI 顧問子系統視為一次重寫與一次切換的邊界，不替舊 Task Analysis／OPKS child 逐元件建立長期相容層；
+3. 新 runtime 直接依本文產品語意、成熟框架與新的統一 contract 設計；完成後一次切換 API／Web，並刪除被取代的舊 AI runtime；
+4. 不做 production 雙軌、雙寫或永久 façade；只有 Current JD、文件、匯出、RAG 等真正穩定的外部 seam 才可成為新舊交界；
+5. PostgreSQL、SQLAlchemy、Pydantic、文件庫、Current JD 員工編輯與 authority 原則、deterministic export／XLSX、隔離 RAG 資產優先保留或深化，但若後續研究證明具體實作不再合適，仍以產品語意與驗收為準，不因已存在而免審；
+6. 正式 context／model 品質 eval 仍依 §7.14 後置；切換前至少通過 authority／來源／文件隔離等 deterministic safety，以及本文 §3.11 的端到端人工情境。
+
+這不是整個 repo 的無邊界 Big-bang。Microsoft 的 Strangler Fig 指引也明示，漸進 façade 是有暫時基礎設施與跨系統依賴成本的 transitional architecture，對小型系統或需要快速淘汰原解法時可能不適用；AWS 則把它定位為降低大型 monolith 改寫風險的方法。Caliburn 是本機單一操作者產品、已有清楚 bounded context、可使用隔離 worktree，且本次主要變更集中在一個高度耦合的 AI 顧問子系統，因此採「子系統 Big-bang、repo 邊界保留」是依本地條件作出的選擇，不宣稱是所有系統的通用最佳實務。[Microsoft — Strangler Fig pattern](https://learn.microsoft.com/en-us/azure/architecture/patterns/strangler-fig)、[AWS — The strangler fig pattern](https://docs.aws.amazon.com/prescriptive-guidance/latest/modernization-aspnet-web-services/fig-pattern.html)
+
+為防止框架與舊系統帶偏，新系統的**目標設計權威順序**是：
+
+1. 本文經 owner 確認的產品北極星、白話流程與產品語意；
+2. 已研究驗證的職務分析、Task、Duty、OPKS 與 iCAP 方法；
+3. 後續核准的新目標架構與 successor ADR；
+4. 舊 ADR 中仍未被取代的 authority、安全與資料不變量；
+5. 現行 code／tests，只作已踩失敗、可保留 seam、安全網與刪除範圍的證據；
+6. 更舊歷史文件，只作追溯。
+
+現行 Accepted ADR 在 successor ADR 核准前仍是 production authority；上述順序描述的是**新目標如何形成**，不授權研究稿直接越過 ADR 修改 production。現有測試也要依產品語意分類：保留 authority、來源、文件隔離與 deterministic export 類安全網；以新流程重寫 Task／Duty／OPKS 與端到端情境；淘汰只鎖定舊 prompt、wire schema、operation 拆法、OPKS child、舊 Work Model／Proposal 形狀或固定呼叫次數的拓撲測試。新系統不以舊內部 API／class／schema 的行為相容為完成條件。
 
 ## 3. 白話產品流程 v0.1
 
@@ -505,6 +560,14 @@ Task、Duty、OPKS 與 Proposal 的狀態不能全部壓成一個總分。例如
 
 所有數字都應標明「目前已知」，並可展開看到具體內容與原因。
 
+Owner 於 2026-08-13 確認：員工需要同時知道「大致談了多少」、「每一塊分析到哪裡」與「還有什麼等自己決定」。因此進度是三個並列視角，不可混成一個分數：
+
+1. **工作 coverage**：目前辨識出哪些工作範圍，哪些已深入、正在談、尚未深入、被排除或只留下線索。這回答「我的工作大致談到哪裡」。
+2. **分析深度**：對每個工作範圍分別顯示 Task 邊界、Duty 歸組與 O／P／K／S 的 sufficiency／gap。Task 已足以成案，不代表其 Duty 或 OPKS 已經足夠；OPKS 也不必等 Task 永久穩定後才開始。
+3. **員工決策**：顯示待接受、待修改、待退回、待拒絕或已延後的 Proposal／結構調整。這回答「AI 已分析但還有哪些事情等我裁決」。
+
+「工作範圍」是給員工導航與計算 coverage 的產品概念，可由 Current JD、可變 Work Model、來源與 workflow state 產生可重建投影；它不是把 Task、Duty、OPKS、gap 與 Proposal 混算的新權威實體，也不先要求新增第二份工作清單。UI 與模型的受限全域索引應由同一組 domain projection 語意產生，但可使用不同 representation。新線索使地圖擴張時，系統應說明新增了什麼，而不是讓一個百分比無故倒退。
+
 ### 4.3 三種不同的停止感
 
 介面與 AI 說法要區分：
@@ -651,11 +714,13 @@ Skill 採 progressive disclosure：平時只保留短名稱與用途，當輪命
 
 ### 7.1 來源記憶：員工真正說過什麼
 
-保存員工原話、來源回合、時間、附件／引用位置，以及後續更正、否認或撤回的關係。它是回答「這項理解根據哪一句話」的 evidence layer。
+保存**同一位員工**在整段訪談與日後恢復時真正說過的原話、來源回合、時間、附件／引用位置，以及後續更正、否認或撤回的關係。它是回答「這項理解根據哪一句話」的 evidence layer，也是避免長訪談中忘記員工先前答案、反覆詢問同一件事的長期記憶。
 
 - 摘要不得覆寫或取代原始來源；
 - AI 不得改寫員工原話後冒充 source；
 - 更正保留前後歷史並標示目前效力，不以刪除舊句偽造一致性；
+- 準備再次詢問前，應先按焦點、穩定 ID、關聯與語意從該員工的完整歷史取回可能答案；只有找不到、彼此衝突、已過時或確實需要重新確認時才詢問；
+- `speaker` 是來源識別與防止內容混淆的 metadata，不代表第一版要做多位受訪者、主管／同事訪談或多人 authority；
 - 後續所有 Work Model、Proposal 與正式內容應可追溯到來源或明確的員工直接編輯。
 
 ### 7.2 工作模型記憶：AI 目前怎麼理解
@@ -813,9 +878,9 @@ Owner 確認 AI 在深入單一 Task 時，仍可持續看到整份職務的精�
 
 這項裁決把「前景專注、背景全域吸收」轉成可實作邊界：前景得到足以完成當輪判斷的細節；背景保有結構定位與異常訊號，而不是保有所有細節。它同時支援 Task／Duty 隨訪談演化、OPKS 按需分析、旁支線索停放與可解釋進度，不要求第一版先導入 GraphRAG、向量記憶或額外 planner model。確切欄位、大小、不同 model profile 的降級門檻仍屬 §7.15 未決實作參數，成品後再用真實長訪談 eval 調整。
 
-#### 7.9.2 資料不足時的補查與詢問順序（2026-08-13 研究後候選，待 owner 最終確認）
+#### 7.9.2 資料不足時的補查與詢問順序（2026-08-13 研究後已確認）
 
-Owner 已大致同意「不要把能自行查到的內容反覆問員工」，但要求先以最新、主流與權威資料反證後再收斂。研究後需要修正原本較粗略的說法：**本文件內可直接定位的相關資料原則上先自動查；iCAP 不是每次詢問員工前都必須經過的固定關卡；只有員工或其他具當前直接工作經驗者能確定的事實、意圖與裁決，應直接問人，不得由 Reference 補值。**
+Owner 已確認「不要把能自行查到的內容反覆問員工」，並要求先以最新、主流與權威資料反證後再收斂。研究後的正式方向是：**本文件內可直接定位的相關資料原則上先自動查；iCAP 不是每次詢問員工前都必須經過的固定關卡；只有這位員工能確定的當前工作事實、意圖與裁決，應直接問員工，不得由 Reference 補值。**
 
 外部資料支持的是這個分流原則，而不是一條固定的「local RAG → iCAP RAG → 問員工」流水線：
 
@@ -883,9 +948,9 @@ Reference 必須使用獨立 namespace／lane 與 source label。員工來源與
 - 使用 provider 原生 token counting 或經 conformance 驗證的 tokenizer，在送出前估算，在回應後保存實際 usage；
 - 換 provider／model 後可以重建 ContextPack；不得因 provider reasoning state 遺失而失去來源、正式內容或訪談進度。
 
-#### 7.12.1 近期對話、結構化狀態與來源優先序（2026-08-13 研究後方向）
+#### 7.12.1 近期對話、結構化狀態與來源優先序（2026-08-13 研究後已確認）
 
-Owner 大致同意「少量最近對話維持自然銜接；事實判斷仍以結構化狀態、原始來源與最新更正為準」，並要求以最新主流資料佐證。交叉查核後，這個方向成立，但必須避免把它簡化成固定保留 N 則訊息或全域 `latest wins`：
+Owner 已確認「少量最近對話維持自然銜接；完整保存並可按需找回同一位員工先前說過的話；事實判斷仍以原始來源、結構化目前狀態與最新有效更正為準」，並要求以最新主流資料佐證。交叉查核後，這個方向成立，但必須避免把它簡化成固定保留 N 則訊息、把完整歷史常駐 prompt，或使用全域 `latest wins`：
 
 - OpenAI 2026 年 Context Engineering Cookbook 將 local-first structured state、session notes 與本輪注入分開，只注入相關 state slices，並示範 latest user input／session override／global default 的衝突優先序；OpenAI 最新 model guidance 也允許依過往 reasoning 是否仍相關選擇 `all_turns` 或 `current_turn`，沒有要求所有產品固定重送完整歷史。
 - Anthropic 將 message history 也視為有限 attention budget，建議使用最小高訊號 context、compaction、外部 structured notes 與 just-in-time retrieval；完整保存不等於完整常駐 context。
@@ -1220,11 +1285,20 @@ OpenRouter 又多一層 routing：它本身預設不保存 prompts，除非使�
 
 ## 9. 下一輪待討論
 
-外部模型資料邊界與「框架承接工程機制、Caliburn 保留產品語意」的責任分界已確認。按產品優先、元件後置的順序，下一輪建議討論：
+產品北極星、白話流程、進度、記憶／Context、員工 authority、框架替換原則與「AI 顧問子系統受限 Big-bang」已確認。下一輪先完成**與舊 module 無關的目標能力地圖與切換邊界**，再研究框架：
 
-> 在不改變本文顧問流程的前提下，LangGraph／LangChain／Agent Skills／既有 Pydantic＋SQLAlchemy＋PostgreSQL／W3C anchor 與 provenance 標準應如何組成最小而完整的目標架構？
+1. 顧問互動與受控 orchestration；
+2. 同一員工的來源記憶、Context selection 與可恢復長流程；
+3. 可演化的工作假說、焦點／agenda 與三層進度投影；
+4. Task／Duty／O／P／K／S 按需 Skills 與 deterministic verification；
+5. 跨 Task／Duty 的 typed changeset、員工審核與 Current JD authority；
+6. iCAP Reference／RAG coverage challenge；
+7. 可替換 model／provider、參數 profile、usage、trace 與失敗恢復；
+8. 支援上述流程的 API／Web 體驗。
 
-下一步先確認元件邊界與資料流，再選最小 capability spike；仍不得直接據研究稿實作。LangGraph 是目前外層 runtime 的推薦候選，不是 Accepted 決策；必須與現有 durable turn／Journal 及 PostgreSQL transaction 做 conformance，證明沒有第二份權威、重複副作用或新的 durability 缺口後才可採用。
+第一個待 owner 對齊的切換問題是：**iCAP Reference／RAG 必須與新核心顧問一起完成才切換，還是可在核心顧問切換後作下一個垂直能力？** 這會決定受限 Big-bang 的真實邊界，但不改變最終產品需要 Reference challenge 的方向。
+
+能力地圖確認後，再逐列建立「目標能力／現況／框架候選／`Replace|Wrap|Retain`／仍需自寫語意／successor ADR／驗收情境」矩陣，回答哪些成熟元件能真正取代現有實作。LangGraph／LangChain、OpenAI Agents SDK、Microsoft Agent Framework、Google ADK、Agent Skills、Pydantic＋SQLAlchemy＋PostgreSQL、W3C anchor／provenance 等目前都只是候選或標準；任何框架都不得以舊 module 拓撲作為新設計目標，也不得在 conformance 前取得產品 authority。研究稿仍不能直接當施工授權。
 
 ## 10. 本稿依據
 
@@ -1316,6 +1390,8 @@ Stakeholder 草稿（非權威，只作需求來源）：
 - [Microsoft — Agent looping（completion condition、bounded iteration、approval escape）](https://learn.microsoft.com/en-us/agent-framework/agents/looping)
 - [Microsoft — Agent Framework workflows human-in-the-loop](https://learn.microsoft.com/en-us/agent-framework/workflows/human-in-the-loop)
 - [Microsoft — Agent Framework AG-UI integration](https://learn.microsoft.com/en-us/agent-framework/integrations/by-component/ui/ag-ui/)
+- [Microsoft Azure Architecture Center — Strangler Fig pattern](https://learn.microsoft.com/en-us/azure/architecture/patterns/strangler-fig)
+- [AWS Prescriptive Guidance — The strangler fig pattern](https://docs.aws.amazon.com/prescriptive-guidance/latest/modernization-aspnet-web-services/fig-pattern.html)
 - [Microsoft Research — From Local to Global: A Graph RAG Approach](https://www.microsoft.com/en-us/research/publication/from-local-to-global-a-graph-rag-approach-to-query-focused-summarization/)
 - [Microsoft Research — DRIFT Search: Combining global and local search](https://www.microsoft.com/en-us/research/blog/introducing-drift-search-combining-global-and-local-search-methods-to-improve-quality-and-efficiency/)
 - [Microsoft Research — GraphRAG dynamic community selection](https://www.microsoft.com/en-us/research/blog/graphrag-improving-global-search-via-dynamic-community-selection/)

@@ -265,28 +265,13 @@ Owner 確認第一版產品的產出定位為：
 
 **產品裁決**：owner 於 2026-08-13 確認採方案 2。它只建立員工對訪談方式、動態重整、核准權與可恢復性的預期；不建立完整訪談計畫、不形成固定問題分母，也不要求開場核准。實作文案與視覺形式留到目標架構／Web 體驗關卡，不在此鎖定。
 
-#### 3.1.2 正常暫停後的返回體驗（研究候選；owner 待確認）
+#### 3.1.2 正常暫停只保證可接續，不建立專用子系統（2026-08-13 owner 已確認）
 
-**問題**：§3.1 已說恢復時要交代上次焦點、目前理解、待處理事項與建議下一步，但尚未決定員工離開數天後重新開啟文件時，要直接接著問舊問題、先核准完整摘要，或以較輕量的方式恢復情境。這裡討論的是上一個顧問回合已正常提交後的暫停；尚未分析完成的回答依 §3.12 恢復同一 run，等待 Proposal 決策也仍是獨立 domain command，三者不能混成同一種「繼續」。
+「正常暫停」只指上一個顧問回合已完整提交，員工關閉頁面後稍後重開同一文件；它不同於 §3.12 的未完成 input run，也不同於等待員工決策的 Proposal。第一版核心只要求 Source、Work Model、Current JD、focus／agenda、progress 與 Proposal 都持久保存，重開後由既有畫面顯示原本焦點與進度，員工可以繼續或使用既有控制改道。
 
-**直接來源與實際支持**（最近查核：2026-08-13）：
+不新增 `Resume Brief` domain object、專用返回 wizard、固定離開天數門檻或開頁即觸發的模型呼叫，也不要求重新核准整份 Work Model。若成品使用後證明員工經常無法接回脈絡，再從既有投影增加短摘要；在此之前屬延後 UX，不是核心能力。
 
-- [OpenAI 官方 Running agents](https://developers.openai.com/api/docs/guides/agents/running-agents)把一個 SDK run 視為一個 application-level turn，並將 application-controlled session 列為 persistent state、resumable run 與可控儲存的預設；若 run 因 approval 或中止而暫停，應從既有 state 繼續，不建立新的假回合。這支持保存清楚的 continuation identity，不直接規定員工返回頁面的摘要或按鈕。
-- [Google — Build long-running AI agents that pause, resume, and never lose context with ADK](https://developers.googleblog.com/build-long-running-ai-agents-that-pause-resume-and-never-lose-context-with-adk/)示範從 durable session 還原既有狀態並由正確 checkpoint 接回，而不是重播全部聊天或猜測中間步驟。它是固定 onboarding state machine 的工程示例，不是動態職務訪談的 UX 研究。
-- [Microsoft HAX — Remember recent interactions](https://www.microsoft.com/en-us/haxtoolkit/guideline/remember-recent-interactions/)要求跨互動攜帶近期情境，讓使用者能有效引用先前內容；[Show contextually relevant information](https://www.microsoft.com/en-us/haxtoolkit/guideline/show-contextually-relevant-information/)則要求依當前工作顯示相關資訊。這支持恢復時先呈現焦點與必要缺口，而不是要求員工自己翻長聊天。
-- [Google PAIR — Feedback + Control](https://pair.withgoogle.com/guidebook-v2/chapter/feedback-controls/)把追蹤進度、稍後返回與「自動化和控制的平衡」列為個人效用，並提醒產品通常不是使用者生活的唯一焦點，互動要求應少而可略過。這支持 AI 給明確建議但員工能立即改道，不支持強制重新核准整份訪談計畫。
-
-**可轉移限制**：OpenAI 與 Google ADK 主要支持 runtime continuity，不證明任何返回 UI 的效果；HAX 與 PAIR 是通用 AI UX 指引，沒有直接比較繁中職務訪談的三種返回方案。以下方案 2 是把 durable source、focus／agenda、三層進度、Work Model／Current JD 分離與員工控制套入這些共同原則後的產品設計。
-
-**研究選項**：
-
-1. **開頁後直接續問上次問題**：操作最少，但員工可能已忘記脈絡、想先看進度或改談別件事；光是開啟文件也不應自動產生一次付費模型回合。不採用。
-2. **簡短接續摘要＋建議焦點＋可立即改道（建議）**：先由持久狀態產生可檢查的 `Resume Brief`，說明「上次停在哪裡、已確認什麼、目前焦點還差什麼、旁支線索／待決 Proposal 有哪些、AI 建議接哪裡以及理由」。主要動作是「繼續建議焦點」，另提供「改選其他已知工作／缺口」與「先看或修正目前理解」。員工採取動作後才開始新的正常顧問回合；不核准整份 Work Model、不重播完整聊天，也不因經過固定天數就把既有內容判成失效。
-3. **每次返回先重看並核准完整摘要／訪談計畫**：最明確，但把正常恢復變成高摩擦 checkpoint，也會重新引入固定 wizard 與假分母；不採用。
-
-方案 2 的 Resume Brief 是從最新已提交的 Source、Work Model、Current JD、focus／agenda、progress 與 Proposal 投影而來，不能只依 provider 聊天記憶自由生成。若文件另有未完成 input run，優先呈現 §3.12 的恢復狀態；若建議焦點依賴未決結構性 Proposal，只阻擋該 branch，仍可處理 Proposal 或改選不相依焦點。員工若表示工作已大幅改變，則把它當新的 durable correction／coverage signal 重新盤點，不靠「離開多久」自動猜測工作已變。
-
-**待 owner 裁決**：是否採方案 2；Resume Brief 的最終欄位、何時需要額外校準、Web 呈現與是否需要模型潤飾，留到能力地圖／目標架構關卡。
+[OpenAI 官方 Running agents](https://developers.openai.com/api/docs/guides/agents/running-agents)、[Google ADK 長流程示例](https://developers.googleblog.com/build-long-running-ai-agents-that-pause-resume-and-never-lose-context-with-adk/)與 [Microsoft HAX — Remember recent interactions](https://www.microsoft.com/en-us/haxtoolkit/guideline/remember-recent-interactions/)只支持持久狀態與跨互動連續性，不足以證明本產品需要專門的返回介面；因此只採最小 durability 要求，不由框架能力反推產品功能。
 
 ### 3.2 廣度盤點：建立「目前已知的工作地圖」
 
@@ -1450,7 +1435,7 @@ framework-neutral 控制面必須先分開四項責任，避免把「這輪要�
 
 方向：預設單次主要顧問 inference；只因必要 context、工具結果或邊界明確的專業 contract 增加步驟；由 application 強制 no-progress、重複 request、步數、token、時間、成本與 authority 終止條件。每輪保存實際 topology 與 usage，成品完成後再由長訪談 eval 判斷哪些額外步驟值得保留。
 
-## 9. 下一輪待討論
+## 9. 升級進度與下一步
 
 ### 9.1 討論與設計關卡（2026-08-13 owner 已確認）
 
@@ -1459,8 +1444,8 @@ framework-neutral 控制面必須先分開四項責任，避免把「這輪要�
 | 關卡 | 狀態 | 要回答的問題 | 離開條件 |
 |---|---|---|---|
 | 0. 產品北極星 | 已收斂 | 顧問是誰、員工有何權力、何謂完成 | §1–§6 的大方向無已知根本衝突 |
-| 1. 端到端情境 | **當前** | 正常、改道／更正與失敗恢復時，員工和顧問各自看到、知道、做什麼 | 情境能涵蓋焦點、全域吸收、動態 Task／Duty／OPKS、進度、Proposal、暫停／恢復與匯出，且沒有未揭露的權威跳躍 |
-| 2. 目標能力地圖 | 待研究 | 為了實現情境，系統必須具備哪些能力與不變條件 | 每項能力都有輸入、輸出、authority、持久化責任、失敗語意與 `Replace／Wrap／Retain` 判準 |
+| 1. 端到端情境 | 已收斂 | 正常、改道／更正與失敗恢復時，員工和顧問各自看到、知道、做什麼 | 情境能涵蓋焦點、全域吸收、動態 Task／Duty／OPKS、進度、Proposal、暫停／恢復與匯出，且沒有未揭露的權威跳躍 |
+| 2. 目標能力地圖 | **當前** | 為了實現情境，系統必須具備哪些能力與不變條件 | 每項能力都有輸入、輸出、authority、持久化責任、失敗語意與 `Replace／Wrap／Retain` 判準 |
 | 3. 框架組合選型 | 待研究 | 哪些成熟元件可承接能力，哪些產品語意仍由 Caliburn 擁有 | 比較 2–3 組可落地組合；逐項記相容證據、版本／授權／供應商鎖定、成本與不採用理由，不用「主流」代替 conformance |
 | 4. 目標架構 | 待研究 | 元件如何合作，資料／API／Web／Context／恢復／切換如何落地 | 形成完整設計，通過大方向回歸審查、反方審查與 owner 核准；所有關鍵來源重新查核 |
 | 5. 實作計畫 | 待研究 | 如何在隔離 worktree 內完成受限 Big-bang 並可驗證地切換 | 任務可獨立驗證、列明依賴與回滾點；正式 eval 依 owner 裁示延後到成品完成後，不得因此刪除必要 trace／usage／驗證邊界 |
@@ -1468,9 +1453,26 @@ framework-neutral 控制面必須先分開四項責任，避免把「這輪要�
 
 每關卡收斂後應更新本表、在相鄰段落補齊 §0.1 的決策帳本，並以只包含該關卡文件變更的 commit 保存。若細節研究發現較佳方向但會改變已確認北極星，必須先回到產品層與 owner 討論；不得在 framework matrix、schema 或實作計畫中悄悄翻案。
 
+#### 9.1.1 Gate 1 北極星回歸審核（2026-08-13）
+
+本輪重新對照 §1–§8、Task discovery／boundary、Duty／iCAP 欄位與 OPKS 裁決研究。結論是：移除 §3.1.2 的專用 `Resume Brief` 過度設計後，沒有發現會阻止進入能力地圖的產品層衝突。
+
+- **產品角色未偏移**：仍是一位 AI 專業職務分析顧問主動帶路，不是填表器、固定 wizard 或員工可見的多 Agent 組織。
+- **專業分析未被框架取代**：Task 仍是跨故事形成、有 meaningful outcome 的角色責任；Duty 是可重整的共同目的／責任分組；O／P／K／S 必須連回工作與行為證據，不能靠 schema、taxonomy 或 Reference 自動補滿。
+- **流程未回到剛性階段**：廣度盤點與深度訪談可反覆切換；Task、Duty、O、P、K、S 都按當輪焦點與證據載入方法 Skill 並互相校正。2026-07-24 的 Phase 5／6 與 2026-08-04 的獨立 per-Task OPKS child 只描述當時的 prompt／operation 限制；§3.6、§3.8 與 §5.3 是本次升級的 successor 產品方向。保留的是 evidence linkage、gap、unknown／not applicable、輸出量控制與失敗邊界，不保留固定順序或呼叫拓撲。
+- **員工 authority 未弱化**：AI 更新 Work Model、agenda 與候選；只有可編輯 Proposal／changeset 經員工決策，或員工直接編輯，才能透過 authority seam 改 Current JD。
+- **記憶與 Context 未變成第二份真相**：同一員工的原話、最新有效更正與來源關係完整保存；模型只取得本輪必要 context，framework checkpoint／provider state／summary 都不能取代本地 Source、Work Model 或 Current JD。
+- **進度與完成沒有假精確**：顯示目前已知 coverage、各範圍分析深度、具體 gap 與待決 Proposal；AI 解釋是否足夠，員工決定繼續、暫停或在看過缺口後強制匯出。
+- **正常、改道、更正、失敗與恢復均有權威邊界**：旁支線索保存但不任意打斷；更正只使受影響依賴失效並重查；未完成模型處理不產生半套 Work Model／Proposal；正常重開只需恢復既有狀態，不建立專用子系統。
+- **範圍仍受控**：不新增登入、多租戶、公司文件／SOP、多人協作或先期完整 eval；RAG 是核心顧問完成後的 final integration gate，不反向定義員工事實。
+
+Gate 1 的離開條件已有對應情境與裁決，因此進度移到 Gate 2。現在仍未決的 §7.15 項目皆是 framework／architecture／operation policy 參數，不是要求繼續發明產品功能。後續若框架研究發現無法滿足既有不變量，先報告衝突；不得直接縮小產品目標或增加框架現成功能。
+
+**防止再次過度設計的停止規則**：能力地圖只列端到端情境真正需要的責任；框架選型只比較能刪除／承接實作的成熟元件；沒有具體情境、失敗語意或可刪舊碼的能力不進第一版。GraphRAG、自由多 Agent、額外 planner model、專用返回流程與第二份 memory store 都維持不採用／延後，除非後續 conformance 證明核心情境無法以較簡單方案完成。
+
 ### 9.2 已知切換邊界與下一批能力
 
-產品北極星、白話流程、進度、記憶／Context、員工 authority、框架替換原則與「AI 顧問子系統受限 Big-bang」已確認。完成關卡 1 後，關卡 2 建立**與舊 module 無關的目標能力地圖與切換邊界**：
+產品北極星、白話流程、進度、記憶／Context、員工 authority、框架替換原則與「AI 顧問子系統受限 Big-bang」已確認。關卡 2 現在建立**與舊 module 無關的目標能力地圖與切換邊界**：
 
 1. 顧問互動與受控 orchestration；
 2. 同一員工的來源記憶、Context selection 與可恢復長流程；
@@ -1481,7 +1483,7 @@ framework-neutral 控制面必須先分開四項責任，避免把「這輪要�
 7. 可替換 model／provider、參數 profile、usage、trace 與失敗恢復；
 8. 支援上述流程的 API／Web 體驗。
 
-切換邊界已於 2026-08-13 收斂：iCAP Reference／RAG 是 final gate，worktree 內先做核心顧問、後接 RAG，完成後一次切換；目前也沒有需保留的真實 JD／訪談資料，因此採 fresh-schema hard cut，不做舊 AI 狀態 migration。跨 Task／Duty／OPKS 的 Proposal 粒度已確認為「可編輯 review bundle＋必要原子子群組」；「可演化工作假說」已於 §7.2.1 收斂；模型／provider／參數的維護者控制權、版本化 profile、run snapshot 與 route receipt 亦已於 §7.20 收斂，第一版採單一 active consultant model profile，operation 只配置 execution policy。下一步回到 framework capability matrix，不能再以 Skill、structured output 或 Reference 的名稱預先切出多模型拓撲。
+切換邊界已於 2026-08-13 收斂：iCAP Reference／RAG 是 final gate，worktree 內先做核心顧問、後接 RAG，完成後一次切換；目前也沒有需保留的真實 JD／訪談資料，因此採 fresh-schema hard cut，不做舊 AI 狀態 migration。跨 Task／Duty／OPKS 的 Proposal 粒度已確認為「可編輯 review bundle＋必要原子子群組」；「可演化工作假說」已於 §7.2.1 收斂；模型／provider／參數的維護者控制權、版本化 profile、run snapshot 與 route receipt 亦已於 §7.20 收斂，第一版採單一 active consultant model profile，operation 只配置 execution policy。現在先完成 framework-neutral capability map；確認後才建立 framework matrix，不能再以 Skill、structured output 或 Reference 的名稱預先切出多模型拓撲。
 
 能力地圖確認後，再逐列建立「目標能力／現況／框架候選／`Replace|Wrap|Retain`／仍需自寫語意／successor ADR／驗收情境」矩陣，回答哪些成熟元件能真正取代現有實作。LangGraph／LangChain、OpenAI Agents SDK、Microsoft Agent Framework、Google ADK、Agent Skills、Pydantic＋SQLAlchemy＋PostgreSQL、W3C anchor／provenance 等目前都只是候選或標準；任何框架都不得以舊 module 拓撲作為新設計目標，也不得在 conformance 前取得產品 authority。研究稿仍不能直接當施工授權。
 

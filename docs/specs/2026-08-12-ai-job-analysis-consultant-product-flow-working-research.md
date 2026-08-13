@@ -1445,7 +1445,7 @@ framework-neutral 控制面必須先分開四項責任，避免把「這輪要�
 |---|---|---|---|
 | 0. 產品北極星 | 已收斂 | 顧問是誰、員工有何權力、何謂完成 | §1–§6 的大方向無已知根本衝突 |
 | 1. 端到端情境 | 已收斂 | 正常、改道／更正與失敗恢復時，員工和顧問各自看到、知道、做什麼 | 情境能涵蓋焦點、全域吸收、動態 Task／Duty／OPKS、進度、Proposal、暫停／恢復與匯出，且沒有未揭露的權威跳躍 |
-| 2. 目標能力地圖 | **當前** | 為了實現情境，系統必須具備哪些能力與不變條件 | 每項能力都有輸入、輸出、authority、持久化責任、失敗語意與 `Replace／Wrap／Retain` 判準 |
+| 2. 目標能力地圖 | **內部複核完成，待 owner 確認** | 為了實現情境，系統必須具備哪些能力與不變條件 | 每項能力都有輸入、輸出、authority、持久化責任、失敗語意與 `Replace／Wrap／Retain` 判準 |
 | 3. 框架組合選型 | 待研究 | 哪些成熟元件可承接能力，哪些產品語意仍由 Caliburn 擁有 | 比較 2–3 組可落地組合；逐項記相容證據、版本／授權／供應商鎖定、成本與不採用理由，不用「主流」代替 conformance |
 | 4. 目標架構 | 待研究 | 元件如何合作，資料／API／Web／Context／恢復／切換如何落地 | 形成完整設計，通過大方向回歸審查、反方審查與 owner 核准；所有關鍵來源重新查核 |
 | 5. 實作計畫 | 待研究 | 如何在隔離 worktree 內完成受限 Big-bang 並可驗證地切換 | 任務可獨立驗證、列明依賴與回滾點；正式 eval 依 owner 裁示延後到成品完成後，不得因此刪除必要 trace／usage／驗證邊界 |
@@ -1486,6 +1486,63 @@ Gate 1 的離開條件已有對應情境與裁決，因此進度移到 Gate 2。
 切換邊界已於 2026-08-13 收斂：iCAP Reference／RAG 是 final gate，worktree 內先做核心顧問、後接 RAG，完成後一次切換；目前也沒有需保留的真實 JD／訪談資料，因此採 fresh-schema hard cut，不做舊 AI 狀態 migration。跨 Task／Duty／OPKS 的 Proposal 粒度已確認為「可編輯 review bundle＋必要原子子群組」；「可演化工作假說」已於 §7.2.1 收斂；模型／provider／參數的維護者控制權、版本化 profile、run snapshot 與 route receipt 亦已於 §7.20 收斂，第一版採單一 active consultant model profile，operation 只配置 execution policy。現在先完成 framework-neutral capability map；確認後才建立 framework matrix，不能再以 Skill、structured output 或 Reference 的名稱預先切出多模型拓撲。
 
 能力地圖確認後，再逐列建立「目標能力／現況／框架候選／`Replace|Wrap|Retain`／仍需自寫語意／successor ADR／驗收情境」矩陣，回答哪些成熟元件能真正取代現有實作。LangGraph／LangChain、OpenAI Agents SDK、Microsoft Agent Framework、Google ADK、Agent Skills、Pydantic＋SQLAlchemy＋PostgreSQL、W3C anchor／provenance 等目前都只是候選或標準；任何框架都不得以舊 module 拓撲作為新設計目標，也不得在 conformance 前取得產品 authority。研究稿仍不能直接當施工授權。
+
+### 9.3 目標能力地圖 v0.1（Gate 2 研究候選）
+
+這張地圖只從 §3.11 端到端情境與既有產品裁決倒推能力，不加入框架展示頁上看起來有趣、但沒有產品失敗要解決的功能。三種處置的意思是：
+
+- `Retain`：保留產品目的、專業方法、不變量或穩定 seam；不等於保留現有 class／table／module；
+- `Wrap`：讓成熟框架承接通用機制，但放在 Caliburn port／adapter 後，不能取得 domain authority；
+- `Replace`：conformance 通過後刪除現有重複 plumbing／舊拓撲，不長期雙軌。
+
+同一能力可以同時「Retain 語意、Wrap 框架、Replace 舊實作」。這不是含糊，而是把產品責任與工程機制分開。
+
+| ID | 核心能力與 `input → output` | Authority／持久化責任 | 失敗語意 | 第一輪處置方向 |
+|---|---|---|---|---|
+| C1 | **員工來源接收與更正**：回答／直接修正／取代意圖＋idempotency identity → immutable source event、來源關係與已保存回執 | 員工原話是來源 authority；模型前先存 PostgreSQL；framework history 不是權威 | 重送不重複來源；AI 失敗不遺失原話，維持 pending／failed processing | `Retain` 來源語意；fresh schema 可 `Replace` 舊資料形狀；session／memory framework 只能 `Wrap` |
+| C2 | **Context 與記憶選擇**：operation／focus、Source、Work Model、Current JD、gap／Proposal、budget → 必要核心、受限全域索引、按需候選與可追溯 manifest | 不產生業務 authority；完整資料仍在本地 domain store，manifest 是 execution artifact | 必帶核心缺失或超出安全 budget 時 fail-closed；optional context 不足形成 visible gap，不偷補 | `Retain` scope／precedence／來源資格 policy；以 context provider、retrieval、cache、compaction `Wrap`；`Replace` 現行固定 packet 拼裝 |
+| C3 | **受控顧問 run／orchestration**：已保存 input、Context、可用 Skills、execution profile → typed semantic result、tool receipts、整合回覆與一個主要下一題 | runtime 無 domain write authority；run／attempt／checkpoint 是執行證據 | 同一 run 受限 retry／resume；無合格完整結果就不做 semantic commit，不偽裝成功 | `Retain` adaptive bounded run contract；候選框架 `Wrap`；`Replace` 現行 consultation＋Task／OPKS 固定 child 拓撲 |
+| C4 | **職務分析方法 Skills**：焦點證據／工作假說／gap → Task／Duty／O／P／K／S typed finding、linkage、gap、reopen／no-op 理由 | Skill 只提候選；版本、prompt／schema 與實際載入集合進 run snapshot | 沒有足夠證據可回 no-op／gap；不合法、無 anchor 或越權候選被拒絕，不因 schema 必填補造 | `Retain` 已研究的分析方法；Skill registry／progressive loading 可 `Wrap`；`Replace` monolithic prompt、固定階段與 per-axis 呼叫假設 |
+| C5 | **可演化 Work Model 與依賴對帳**：verified findings＋現有假說／lineage → 新增、修正、retire、merge／split／reassign、gap 與 dependency invalidation | Work Model 是本地分析 authority，不是 Current JD；持久保存穩定 ID、來源與 revision | 與 agenda／Proposal 一次 semantic commit；更正只使受影響分支 stale／challenged，界線不安全才擴大重算 | `Retain` 語意與 dependency policy；因目標含 Duty hypothesis／跨軸 linkage，預期 `Replace` 現有 schema／reducer；framework state 不得成為第二份真相 |
+| C6 | **焦點、agenda、三層進度與 readiness**：員工改道／延後意圖＋Work Model、Current JD、gap、Proposal、challenge → 建議焦點、返回點、稍後線索、coverage／depth／decision 投影與停止理由 | focus／agenda 的必要 workflow state 持久保存；進度／readiness 優先為可重建投影，不取得 JD authority | 投影故障不改 domain truth；blocked 只作用於相依 branch；未知與不適用明示保留；員工改道不能遺失原焦點或旁支線索 | `Retain` 產品語意；`Replace` 舊窄 agenda／固定 readiness 假設；workflow framework 只可 `Wrap` checkpoint／scheduling |
+| C7 | **typed changeset、審核與 Current JD authority**：verified change intents＋before／after／dependencies → 可編輯 review bundle；員工 decision → Current JD commit／stale disposition | 只有員工 accept／edit 或直接編輯可經 authority seam 改 Current JD；Proposal 是 durable domain object | stale、部分原子群組失敗或 generation／read-set 改變時整組不硬套；決策命令 idempotent | `Retain` 員工 authority；建立跨 Task／Duty／OPKS typed changeset 以 `Replace` 分裂的舊 Proposal 拓撲；framework HITL 只 `Wrap` 暫停／呈現／回傳 |
+| C8 | **deterministic verification、semantic commit 與恢復**：model result、anchors、generation／read-set、domain invariant → verified commit plan 或 typed rejection／receipt | application 驗證資格；PostgreSQL 單一 semantic transaction 寫 Work Model／agenda／Proposal／顧問回合，員工 decision 另交易 | 已安全保存的 provider artifact 可重播而不盲目重打；semantic commit 冪等且半套業務結果不可見；外部呼叫 outcome 未知的 crash window 仍可能重複計費；transaction 失敗 rollback | `Retain` invariants、transaction 與 idempotency seam；Pydantic／SQLAlchemy 等成熟庫深化；checkpoint framework `Wrap` execution，重複 verifier plumbing 可 `Replace` |
+| C9 | **iCAP Reference／RAG coverage challenge**：目前工作模型／gap＋versioned corpus → retrieval candidates、中立問題、challenge receipt／no-match | Reference 無員工事實 authority；只保存真正呈現、改變 agenda／Proposal 或形成 coverage 裁決的 receipt | 檢索失敗不汙染 Source／Current JD；核心訪談可繼續，切換前 final integration gate 必須通過 | `Retain` 已隔離 PDF／OCS／indexer／embedder assets 與 challenge policy；retriever／reranker／tooling 可 `Wrap`；第一版不先建 GraphRAG |
+| C10 | **模型／provider 控制與可觀測性**：active consultant model profile＋operation execution policy＋Context → provider result、actual model、usage／cost／latency、route／attempt receipt | 無 domain authority；本地保存 profile version、resolved snapshot 與 receipts | timeout、rate limit、schema、refusal、truncation、model mismatch 分型；只對 transient failure 受限重試 | `Retain` Caliburn routing／成本／資料政策；以通用 model interface／gateway／SDK `Wrap`，並 `Replace` OpenRouter-only adapter 與散落參數 |
+| C11 | **API／Web／匯出產品面**：server commands／projections／Current JD → 一頁顧問工作區、來源／進度／Proposal／JD 操作、generated contracts 與 deterministic XLSX | server 重新驗 domain rules；Web 不重算 invariant、不建第二份 store；匯出只讀 Current JD | 顯示 durable saved／processing／failed／stale 狀態；dirty edit 不被覆蓋；匯出前揭露具體缺口並允許員工強制匯出；匯出失敗不改 authority | `Retain` 文件庫、契約策略、Current JD direct edit、deterministic assembly／XLSX；`Replace` 顧問 API／UI 舊流程；framework frontend hook 只有 conformance 後才 `Wrap` |
+
+#### 9.3.1 Gate 2 的完成證據
+
+Gate 2 不要求先決定 class、table 或框架。完成時必須能從每個 §3.11 情境追到上表至少一項能力，且每項都有 authority、持久化與失敗語意；同時形成下面三組可供 Gate 3 查核的初始範圍：
+
+1. **優先保留／深化的穩定 seam**：PostgreSQL、Pydantic／SQLAlchemy、文件庫、Current JD direct edit 與 authority 原則、generated contract strategy、deterministic export／XLSX、隔離 RAG 資產；
+2. **優先用框架取代或包裝的 plumbing**：consultant loop、checkpoint／resume、model／provider interface、tool／Skill registry、structured result、context provider／retrieval hook、HITL 傳輸、trace／usage；
+3. **必須保留產品語意但可重寫實作的 domain**：Source precedence、Work Model、Task／Duty／OPKS 方法與 linkage、focus／agenda／progress、dependency invalidation、typed changeset、Proposal 與 employee authority、deterministic verifier。
+
+**Gate 2 複核規則**：確認上表沒有缺少核心能力，也沒有把可延後功能偷放進第一版；通過後才以官方文件與最小 conformance spike 比較框架，不再回到功能腦力激盪。
+
+#### 9.3.2 Gate 2 反向覆蓋與範圍審核（2026-08-13）
+
+以 §3.11 十個員工情境反向追查後，所有情境都有能力承接，且 C1–C11 沒有孤立能力：
+
+| §3.11 情境 | 必要能力 |
+|---|---|
+| 1. 導航與建立工作地圖 | C3、C4、C5、C6、C11 |
+| 2. 專注但不漏線索 | C1、C3、C5、C6 |
+| 3. 更正與受影響範圍重查 | C1、C5、C6、C7、C8 |
+| 4. 員工保留 authority | C4、C7、C8 |
+| 5. 重大責任先澄清再返回 | C1、C3、C5、C6、C8 |
+| 6. Task／Duty／OPKS 隨證據演化 | C4、C5、C7、C8 |
+| 7. Reference 只做補漏 | C2、C4、C9 |
+| 8. 可解釋進度 | C5、C6、C7、C11 |
+| 9. 員工決定完成與強制匯出 | C6、C7、C11 |
+| 10. 失敗不吃回答、不產生半套結果 | C1、C3、C8、C10、C11 |
+
+本次反方審核修正三點：C6 明列員工改道／延後與旁支返回；C11 明列缺口揭露後的單一強制匯出；C8 移除「重試不重複付費」的不實 exactly-once 暗示。PostgreSQL 可以保證本地 semantic commit 原子與冪等，但在外部 provider 已完成、結果尚未安全保存的 crash window，應用程式無法保證供應商不重複計費；框架只能縮小與觀測這個窗口，不能把它宣稱消失。
+
+未發現需要新增產品功能才能完成既定情境。登入／多租戶、公司文件／SOP、多人協作、自由多 Agent、GraphRAG、獨立 planner model、第二份 memory store、專用 Resume 子系統與成品前正式 eval 仍不進第一版。安全、資料政策、prompt injection、授權、版本／授權條款、operability 與成本不是新產品功能，但必須成為 Gate 3 每個框架組合的橫向淘汰條件。
+
+**Gate 2 研究結論**：能力地圖已通過內部覆蓋與範圍審核；目前只待 owner 確認這個邊界。確認後進入 Gate 3，不再追加產品角色或流程；若後續框架 conformance 暴露能力衝突，回報衝突並回到本表處理，不靜默改北極星。
 
 ## 10. 本稿依據
 

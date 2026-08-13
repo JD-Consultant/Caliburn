@@ -737,6 +737,33 @@ Skill 採 progressive disclosure：平時只保留短名稱與用途，當輪命
 - `employee_denied`、過去工作、他人工作、一次性支援等 retired reason 不應被一般檢索重新當成 active candidate；
 - Work Model 的變化可以影響焦點與 Proposal，但不得直接改變正式 JD。
 
+#### 7.2.1 可演化工作假說的 framework-neutral contract（2026-08-13 已確認）
+
+Owner 已確認採用「**typed、evidence-linked、可持續修訂的工作假說關係模型**」作為目標語意。它不是一份長得像 JD 的 AI 草稿，也不是把聊天紀錄壓成一段 memory summary；它保存的是 AI 對這位員工工作的**目前理解及其依據**。新證據可以改變任務邊界、Duty 分組、O／P／K／S linkage 與 gap，所以早期結構不能被誤當成永久分類。
+
+第一版先鎖定下列邏輯契約，不在研究階段鎖資料表、class、序列化格式或供應商：
+
+1. **可不完整的 typed item**：Story、Work Unit、Task／Duty hypothesis、O／P／K／S 候選、gap、矛盾與未映射線索都可先存在；尚未判定為 Task／Duty／OPKS 的內容以「未映射線索」類型保留，尚未分組或尚未連到 Task 也不等於非法狀態。
+2. **穩定 identity 與修訂生命週期**：後續改名、補充、合併、拆分、重新分組或淘汰不能只靠文字相似度判斷同一性，也不能以覆寫抹除舊理解；至少要能分辨目前有效、被挑戰、被取代與有理由 retired 的版本。
+3. **一級 evidence linkage**：每項重要理解可連回一個或多個員工 source anchor，並區分支持、反對、更正或不確定；模型信心、embedding score 或 Reference 相似度不能取代來源關係。
+4. **typed domain relation**：能表達工作故事如何形成 Work Unit／Task、Task 如何暫時歸於 Duty、O／P 如何連到 Task、K／S 如何跨 Task 關聯，以及新證據如何造成 regroup、gap 或 contradiction。這些是關係語意的例子，不是先決定一套封閉 edge enum。
+5. **與 authority 分離**：Work Model item 可以比 Current JD 早出現、持續演化，也可以與 Current JD 暫時不同；只有 typed Proposal／changeset 經員工 accept／edit 後，authority seam 才能改變 Current JD。員工修正 Work Model 不等於核准正式文件變更。
+6. **以 delta 更新、以 projection 使用**：主要顧問或按需 Skill 只能產生 typed change intent；application 驗證來源、document scope、revision／read-set 與 domain invariant 後才提交 Work Model delta。側欄、進度、agenda、受限全域索引與 ContextPack 都由此投影，不各自保存一份競爭真相。
+
+「關係模型／graph」在這裡只描述**邏輯上可沿穩定 ID 與 typed relation 走訪**，不代表採用 graph database、GraphRAG、RDF ontology，亦不等於 LangGraph／其他框架的 execution graph。PostgreSQL 關聯模型、typed application model 或成熟框架的 store 都可能承接機制；是否採用要等 capability matrix 與 conformance spike，不能從 `graph` 一字反推技術選型。
+
+研究佐證與可轉移限制如下：
+
+| 第一手來源 | 直接支持 | 不能據此宣稱 |
+| --- | --- | --- |
+| [U.S. OPM — Assessment and Selection](https://www.opm.gov/policy-data-oversight/assessment-and-selection/) | Job analysis 要辨識 Task、role／responsibility、competency、resources 與 context，向具直接且當前工作經驗的 SME 蒐集資料，並記錄 Task－competency linkage | OPM 沒有規定 LLM Work Model、graph schema、OPKS ontology 或資料庫技術 |
+| [OpenAI Cookbook — Context Engineering for Personalization](https://developers.openai.com/cookbook/examples/agents_sdk/context_personalization/) | 以 local-first structured state 保存可修訂資訊、處理衝突與 precedence，推理時只注入相關 slice | 案例是個人化／旅遊助理，不直接證明其狀態欄位適合職務分析 |
+| [Google Cloud — Choose agentic AI architecture components](https://docs.cloud.google.com/architecture/choose-agentic-ai-architecture-components) 與 [Microsoft Agent Framework — Memory & Persistence](https://learn.microsoft.com/en-us/agent-framework/get-started/memory) | 區分 session／history、application state、long-term memory 與外部 persistence；context provider 可承接 application-specific memory | 這些是 runtime／deployment 指引，不知道 Task、Duty、OPKS、員工更正與 JD authority 的產品語意 |
+| [Anthropic — Effective context engineering for AI agents](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents) 與 [LangGraph — Persistence](https://docs.langchain.com/oss/python/langgraph/persistence) | 長流程可把 structured notes／durable store 留在 context 外按需取用；LangGraph 明確區分 thread checkpoint 與 cross-thread Store | structured note、Store 或 graph state 不會自動成為可信 evidence，也不應變成第二份 Work Model／Current JD |
+| [W3C PROV-O](https://www.w3.org/TR/prov-o/) 與 [W3C Web Annotation Data Model](https://www.w3.org/TR/annotation-model/) | 提供 derived-from、revision、quotation、primary source、invalidation，以及 quote／position selector 等可借鏡的來源與修訂語意 | W3C 不要求 Caliburn 採 RDF，也沒有定義職務分析的 domain model；position anchor 單獨使用對內容變更很脆弱 |
+
+因此，外部資料直接支持的是「**結構化狀態、可追溯來源、明確修訂、分離 runtime checkpoint、按需傳入 context**」；把它們組成上述 Work Model，是 Caliburn 結合 OPM 的職務分析原則、既有 Task／Duty／OPKS 研究與員工 authority 所作的產品推論。現階段尚無可信公開 benchmark 證明某個 memory／agent framework 能直接提升繁中職務訪談或 JD 品質，後續不得把框架功能表當成效果證據。
+
 ### 7.3 正式文件記憶：員工已授權的 Current JD
 
 只包含員工直接編輯，或經 Proposal 決策後由 authority commit seam 寫入的正式內容。
@@ -1301,7 +1328,7 @@ OpenRouter 又多一層 routing：它本身預設不保存 prompts，除非使�
 7. 可替換 model／provider、參數 profile、usage、trace 與失敗恢復；
 8. 支援上述流程的 API／Web 體驗。
 
-切換邊界已於 2026-08-13 收斂：iCAP Reference／RAG 是 final gate，worktree 內先做核心顧問、後接 RAG，完成後一次切換；目前也沒有需保留的真實 JD／訪談資料，因此採 fresh-schema hard cut，不做舊 AI 狀態 migration。跨 Task／Duty／OPKS 的 Proposal 粒度也已確認為「可編輯 review bundle＋必要原子子群組」。下一個產品語意問題是把「可演化工作假說」說成 framework-neutral contract，再進入框架比較。
+切換邊界已於 2026-08-13 收斂：iCAP Reference／RAG 是 final gate，worktree 內先做核心顧問、後接 RAG，完成後一次切換；目前也沒有需保留的真實 JD／訪談資料，因此採 fresh-schema hard cut，不做舊 AI 狀態 migration。跨 Task／Duty／OPKS 的 Proposal 粒度也已確認為「可編輯 review bundle＋必要原子子群組」；「可演化工作假說」亦已於 §7.2.1 收斂成 framework-neutral contract。下一個產品語意問題是模型／provider／參數 profile 的控制權、變更時機與 run 可追溯性，再進入完整框架比較。
 
 能力地圖確認後，再逐列建立「目標能力／現況／框架候選／`Replace|Wrap|Retain`／仍需自寫語意／successor ADR／驗收情境」矩陣，回答哪些成熟元件能真正取代現有實作。LangGraph／LangChain、OpenAI Agents SDK、Microsoft Agent Framework、Google ADK、Agent Skills、Pydantic＋SQLAlchemy＋PostgreSQL、W3C anchor／provenance 等目前都只是候選或標準；任何框架都不得以舊 module 拓撲作為新設計目標，也不得在 conformance 前取得產品 authority。研究稿仍不能直接當施工授權。
 
@@ -1416,3 +1443,5 @@ Stakeholder 草稿（非權威，只作需求來源）：
 - [U.S. OPM — Delegated Examining Operations Handbook（Job Analysis 與 SME）](https://www.opm.gov/policy-data-oversight/hiring-information/competitive-hiring/deo_handbook.pdf)
 - [iCAP — 職能發展及應用推動要點（職能基準審查與更新）](https://icap.wda.gov.tw/Quality/quality_specification.aspx)
 - [NIST — AI Risk Management Framework Core](https://airc.nist.gov/airmf-resources/airmf/5-sec-core/)
+- [W3C — PROV-O: The PROV Ontology（來源、衍生、修訂與失效）](https://www.w3.org/TR/prov-o/)
+- [W3C — Web Annotation Data Model（quote／position anchor）](https://www.w3.org/TR/annotation-model/)

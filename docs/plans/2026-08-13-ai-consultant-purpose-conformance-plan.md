@@ -105,15 +105,15 @@ git commit -m "test: probe consultant product purposes"
 - Consumes: four test results plus existing §9.7–§9.9 evidence.
 - Produces: one architecture decision input and the exact boundary for the production implementation plan.
 
-- [ ] **Step 1: Record pass/fail per product purpose**
+- [x] **Step 1: Record pass/fail per product purpose**
 
 Add one compact result table: purpose, framework primitive, observed effect, remaining product policy, hard gap. Explicitly record the Pydantic Planning 0.13.0 API drift and do not reopen broad framework research.
 
-- [ ] **Step 2: Apply the stop rule**
+- [x] **Step 2: Apply the stop rule**
 
 If all four effects pass, select the LangChain/LangGraph family for these mechanisms and immediately write the successor ADR plus product implementation plan. If one effect fails, test exactly one second candidate for that failed purpose only; do not rebuild the other three slices.
 
-- [ ] **Step 3: Verify and commit research conclusion**
+- [x] **Step 3: Verify and commit research conclusion**
 
 Run `git diff --check`, inspect branch status, and commit only the research conclusion. Do not push or merge.
 

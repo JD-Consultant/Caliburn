@@ -2297,10 +2297,10 @@ AI 可在內部持續形成、修正或撤回暫時理解，不需要員工逐�
 | 按當輪需要載入 Task／Duty／O／P／K／S 方法 | §4.7、§9.5；Agent Skills／`SkillsMiddleware` 的 eligible set、progressive disclosure 與 durable replay 已由 §9.8 驗證 | **已研究、已實測** | 只需把已驗證分析方法拆成正式 Skills；不再研究另一套 prompt framework |
 | 每次模型呼叫取得最小充分 context，能找回早先原話與更正但不重送整段歷史 | §4.9–§4.13、§9.5；Store＋state 組裝、token budget、按需 lookup 已由 §9.7–§9.8 驗證 | **已研究、工程路徑已實測** | 成品完成後再用長訪談 eval 驗品質；目前不重開 Context Engine 選型 |
 | 執行可 durable、restart、冪等、stream／reconnect，頁面離開不遺失工作 | §9.4–§9.9；LangGraph checkpoint／Store、FastAPI typed SSE、`EventSource`、dirty-editor policy 已有 20 項探針 | **已研究、已實測** | production lifecycle／migration／多 process trigger 留到實作；不再比較一般 agent runtime |
-| 動態決定現在深入什麼、保存旁支、延後返回、更正後重開；同時維持可見待處理集合與可信 coverage／depth／decision／gap | §2–§3、§5–§7 定義產品語意；§9.5 已研究 Pydantic Planning、LangChain Todo、Microsoft Harness todo、Rasa stack | **官方機制已研究，但完整目的尚未 conformance** | 驗動態訪談控制、待處理議程與有意義進度；不得把 plan item 計數當產品進度 |
-| 持續形成、修正與撤回對工作事實的理解，保留穩定 identity、來源 lineage、correction 與選擇性失效 | §2、§4.10、§9.5 已比較 SQLAlchemy、`eventsourcing`、Graphiti、LangGraph／LangMem；§9.7 只驗了 LangGraph 的簡化 state／Source 路徑 | **候選與語意已研究，缺直接比較** | 驗可修正理解與來源；比較完整效果、查詢、修正、失效與恢復，不再列新的 memory 產品清單 |
-| LLM 產生的文件內容先供員工接受、修改、拒絕或延後；多筆待審可與訪談並行；接受時原子更新核准成品 | §2.4、§3.7、§4.5、§9.5 已研究 Pydantic deferred tools、LangChain HITL／interrupt、Microsoft workflow HITL、AG-UI；§9.7／§9.9 只驗單一 interrupt 與 transport | **單一 blocking approval 已實測；可延後、多待審文件變更仍缺** | 驗可審核 patch／changeset 的完整生命週期；不保留舊名稱或 class，只保留員工 authority 效果 |
-| 發現重大衝突或安全推論缺口時，以結構化問題取得員工答案後再續跑 | §3.3、§3.7.1、§3.7.2 已定義 branch-blocking 規則；框架 interrupt／request-response primitive 已研究 | **產品語意已確認，尚未獨立 conformance** | 驗問題內容、blocking scope、answer-as-source、restart／resume，以及不誤當文件接受 |
+| 動態決定現在深入什麼、保存旁支、延後返回、更正後重開；同時維持可見待處理集合與可信 coverage／depth／decision／gap | §2–§3、§5–§7 定義產品語意；§9.5 已研究 Pydantic Planning、LangChain Todo、Microsoft Harness todo、Rasa stack；§9.12 已驗 LangGraph typed state／checkpoint | **已研究、最小產品語意已實測** | production 實作 work-unit eligibility、gap reason 與語意進度 projection；不得把 plan item／tool call 計數當產品進度 |
+| 持續形成、修正與撤回對工作事實的理解，保留穩定 identity、來源 lineage、correction 與選擇性失效 | §2、§4.10、§9.5 已比較 SQLAlchemy、`eventsourcing`、Graphiti、LangGraph／LangMem；§9.7 與 §9.12 已驗 LangGraph state／Source、選擇性失效與 quote 保留 | **已研究、最小產品語意已實測** | production Skill 輸出明確 source dependency；長訪談 retrieval 品質留到成品後 eval |
+| LLM 產生的文件內容先供員工接受、修改、拒絕或延後；多筆待審可與訪談並行；接受時原子更新核准成品 | §2.4、§3.7、§4.5、§9.5 已研究 Pydantic deferred tools、LangChain HITL／interrupt、Microsoft workflow HITL、AG-UI；§9.7、§9.9、§9.12 已驗生命週期與 transport | **已研究；多待審、任意順序、edit／defer／stale 已實測** | production 定義 typed operation／path read-set 與 deterministic verifier；不沿用舊 Proposal／Current JD 元件 |
+| 發現重大衝突或安全推論缺口時，以結構化問題取得員工答案後再續跑 | §3.3、§3.7.1、§3.7.2 已定義 branch-blocking 規則；§9.12 已驗 LangGraph interrupt／resume | **已研究；typed card、answer-as-source、重建後恢復已實測** | production 定義必問門檻與 affected-branch eligibility；不得把答案誤當文件接受 |
 | Reference／RAG 補 coverage、術語與挑戰，但不創造員工事實 | §4.11–§4.12、§9.5 已研究 LlamaIndex、Haystack、Qdrant 與既有 bounded context | **已研究、依討論刻意排最後** | 核心顧問完成後做 final RAG gate，不在本輪重查 ingestion framework |
 | 模型回答品質與長訪談效果 | §7、§8 已定義之後要觀察的結果 | **owner 明確延後** | 成品完成後另開 eval plan；本輪不得偷做大型評測拖慢產品 |
 
@@ -2326,6 +2326,28 @@ AI 可在內部持續形成、修正或撤回暫時理解，不需要員工逐�
 #### 9.11.6 北極星複核
 
 本次校正後沒有偏離產品大方向：員工仍面對一位專業職務分析顧問；先建立可修訂的工作全貌，再以清楚焦點深入訪談；旁支與 Gap 被記住但不任意搶焦；Task／Duty／O／P／K／S 是按需組合方法。AI 內部理解可以隨證據修正，但 LLM 產生、準備進入正式文件的內容都必須讓員工接受、修改或拒絕；重大衝突則以另一條結構化澄清互動先問員工，不能偷猜；進度顯示尚未分析、待處理、待審與受阻原因。框架的任務是以成熟能力忠實完成這些效果，省碼與維護收益只在效果相當後比較。
+
+### 9.12 最小目的驗證結果與停止研究決定（2026-08-13）
+
+依 owner 要求，本輪沒有做真實模型品質 eval、效能競賽或再跑市場調查。使用 LangGraph 1.2.11、`StateGraph`、typed state、`InMemorySaver` 與 `interrupt()/Command(resume=...)`，以固定採購訪談情境執行四個 deterministic tests；結果為 `4 passed in 1.21s`。既有 PostgreSQL Saver／Store probe 已於同一工作階段先重跑 `14 passed in 96.06s`，因此新 probe 未修改共用程式後不再重跑昂貴持久化套件。驗證程式是可丟棄證據，不得直接搬進 production：[`consultant_purpose_conformance_spike.py`](../../apps/api/consultant_purpose_conformance_spike.py)、[`test_consultant_purpose_conformance_spike.py`](../../apps/api/tests/test_consultant_purpose_conformance_spike.py)。
+
+| 產品目的 | 採用的成熟 primitive | 實際觀察到的效果 | production 仍需的最薄產品政策 | 機制硬缺口 |
+|---|---|---|---|---|
+| 動態訪談、旁支、延後返回、更正重開、可見 Gap | LangGraph typed state、graph transition、checkpoint | 旁支不搶目前焦點；defer 後可返回；完成單位可因更正 reopen；Gap 持續可見，且沒有假百分比 | work-unit eligibility、優先理由、coverage／depth／decision／gap projection | 無 |
+| 可修正理解與來源記憶 | checkpointed state、穩定 source reference | 更正只 challenge 依賴舊來源的理解；無關理解、舊原話與 exact quote anchor 保留；受影響訪談單位重開 | Skill 必須輸出 source dependency；來源可信度與 deterministic verifier | 無；語意檢索品質留待成品後 eval |
+| LLM 文件變更由員工審核 | checkpointed review queue、typed operation、graph transition | 多筆 patch 可並存；defer 不阻塞訪談；可任意順序 accept；可 edit-accept；同一路徑被直接改過時會 stale；只有接受內容改變核准成品 | operation contract、path read-set、原子 authority 驗證與 UI | 無 |
+| 必要結構化澄清 | LangGraph `interrupt`／`Command(resume)`／checkpoint | 卡片保留原因、選項與 affected branch；同一 Saver 重建 graph 後可續答；答案成為員工 evidence，沒有變成文件接受 | 何時必問、哪些分支可繼續、答案如何觸發重新分析 | 無 |
+
+這個結果只證明**框架機制能忠實承接產品語意**，不證明 LLM 已能做好職務分析，也不代表 probe 的欄位就是 production schema。每列仍需的政策是 Caliburn 的專業方法或 authority invariant，不是把舊 Work Model、Focus、Progress、Proposal、Current JD class／table／生命週期改名後保留。
+
+#### 9.12.1 選型收斂
+
+1. **主 runtime 收斂為 LangChain 1.x＋LangGraph 1.2.x family。** LangChain 承接 provider、tool loop、structured output、Skills／middleware 與最小 context 組裝；LangGraph 承接可恢復流程、動態訪談狀態、來源依賴、待審文件變更、必要澄清與核准 artifact 的單一 durable owner。正式版本在施工 ADR pin 到當時 stable patch。
+2. **不再為這四個目的加入 DBOS、Camunda、Microsoft Agent Framework 或另一套 memory／planning framework。** 四個效果皆通過，依 §9.11.5 stop rule，不以「可能功能更多」再堆第二個 workflow owner。若 production 才發現明確硬缺口，只針對該缺口重開候選，不翻掉已通過部分。
+3. **Pydantic AI Harness Planning 0.13.0 不進主路徑。** 它可作單次 run 的短期提醒，但實際 API 不具本產品跨回合訪談所需的 identity、dependency、blocked／defer／reopen 與 durable store。這是版本實查結果，不是偏好。
+4. **停止 spike，進入產品升級。** 下一份文件只做 successor ADR 與受限 Big-bang implementation plan：以本文產品目的為驗收基準，在新 worktree 建第一條「員工回答 → 動態分析／按需 Skills → 可見焦點與 Gap → 文件 patch 審核／必要澄清 → 核准 artifact」production vertical slice；不移植 spike，也不加舊元件 compatibility layer。
+
+本節機制判斷依據為 LangGraph 官方的 [Graph API](https://docs.langchain.com/oss/python/langgraph/graph-api)、[Persistence](https://docs.langchain.com/oss/python/langgraph/persistence)、[Interrupts](https://docs.langchain.com/oss/python/langgraph/interrupts) 與 [Durable execution](https://docs.langchain.com/oss/python/langgraph/durable-execution)；版本淘汰依據仍是 [Pydantic AI Harness 0.13.0 release](https://github.com/pydantic/pydantic-ai-harness/releases/tag/v0.13.0) 與 [0.13.0 Planning source](https://github.com/pydantic/pydantic-ai-harness/blob/v0.13.0/pydantic_ai_harness/planning/_capability.py)。
 
 ## 10. 本稿依據
 

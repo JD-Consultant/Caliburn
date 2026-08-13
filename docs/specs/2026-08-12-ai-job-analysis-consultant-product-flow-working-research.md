@@ -741,11 +741,26 @@ receipt 的裁決歷史採追加與 supersession，不以覆寫抹除員工先�
 
 附件、長文件與大型 Reference 不保證整份放入；當輪員工文字回答原則上完整傳入，附件則以可追溯片段或按需工具讀取。若單一回答本身超過模型安全預算，系統必須明示分段或 context budget 問題，不可無聲截斷。
 
-#### 7.9.1 每輪全域定位的裁決：受限索引，不是完整資料
+#### 7.9.1 主要顧問回合的全域定位：受限索引，不是完整資料（2026-08-13 研究後確認）
 
-每輪模型需要知道「目前整份職務大致長什麼樣、現在在哪裡」，否則只靠焦點 retrieval 容易重複建立 Task、把旁支線索歸錯位置、錯過跨 Task 矛盾，或延遲 Duty regroup。反過來，完整傳入所有 Task 描述、Evidence、OPKS、Proposal 與歷史，會讓過時假說和無關資訊反覆佔用注意力。
+Owner 確認 AI 在深入單一 Task 時，仍可持續看到整份職務的精簡地圖，並要求以最新權威資料反證。研究支持這個**混合架構方向**，但沒有任何來源直接證明「繁中職務訪談的每一個模型呼叫固定帶同一張地圖」就是最佳值：
 
-因此每輪必帶一份 **bounded global orientation index（受限全域工作索引）**。它是從 Current JD、Current Work Model 與 workflow state 產生的 deterministic、versioned、可重建投影；不是 LLM 自由摘要、RAG 搜尋結果、第五份 authority store，也不因被放進 prompt 就改變任何項目的權威。
+- OpenAI 2026 Context Engineering Cookbook 建議保存 coherent structured state、在每次 run 只注入當下相關 slices；最新 model guidance 也要求精簡重複 prompt／tools、追蹤成長中的 context，並保留完成工作所需的 facts、decisions、constraints 與 evidence。
+- Anthropic Applied AI 團隊指出只靠 pre-inference retrieval 不足，主流方向正加入 just-in-time context；其資料認為部分場景可能以 hybrid 最有效：預載少量資料取得速度，再用輕量 identifier 與工具逐層展開，最終目標仍是最小高訊號 token 集合。
+- Google Cloud 2026 架構指引把 progressive disclosure 列為 agent context／capability 的設計策略：相關內容需要時才解鎖，不預先載入全部；session、state 與 long-term memory 也分開處理。
+- Microsoft Research 的 DRIFT／GraphRAG 顯示，局部問題可從高階 community information 取得更廣的起點，再向局部原文深入；其 AP News 實驗中 DRIFT 對 local questions 的 comprehensiveness／diversity 勝過 local search，但這是新聞語料與 LLM-judge 指標，只能支持「全域導向＋局部展開」值得採用，不能直接當成本產品效果證明，也不要求導入 GraphRAG。
+
+三種產品方案比較如下：
+
+| 方案 | 優點 | 主要問題 | 裁決 |
+|---|---|---|---|
+| 只帶目前焦點與 retrieval 結果 | token 最少、實作直觀 | 容易重複建立 Task、把旁支歸錯位置、錯過跨 Task 矛盾或延遲 Duty regroup | 不採用 |
+| 每輪帶完整職務、原話、OPKS 與歷史 | 單次模型表面上資訊最多 | 成本與延遲隨訪談成長；過時假說、重複內容與無關細節持續污染 attention | 不採用 |
+| 受限全域索引＋焦點細節＋按需展開 | 保留全局定位，同時控制成本並取得原始證據 | 需要明確索引、authority label、降級與唯讀 lookup 契約 | **採用** |
+
+這裡的「每輪」只指**可能產生 Work Model／agenda／Proposal 變更候選，或決定下一個訪談方向的主要顧問 inference**；候選仍須通過既有 verifier、reducer 與 semantic commit，模型不直接寫入。deterministic verifier／projection 不需要模型 context；唯讀工具只接受 scope 明確的查詢；Task／Duty／OPKS specialist 只取得其 typed contract 所需的焦點資料與必要 orientation，不自動複製整份主要顧問 ContextPack。
+
+因此主要顧問 inference 必帶一份 **bounded global orientation index（受限全域工作索引）**。它是從 Current JD、Current Work Model 與 workflow state 產生的 deterministic、versioned、可重建投影；不是 LLM 自由摘要、RAG 搜尋結果、第五份 authority store，也不因被放進 prompt 就改變任何項目的權威。
 
 索引至少讓模型辨識：
 
@@ -757,6 +772,14 @@ receipt 的裁決歷史採追加與 supersession，不以覆寫抹除員工先�
 
 索引平時不攜帶完整 Task 敘述、全部原話／Evidence、完整 OPKS、完整 Proposal payload、Reference 內容、整段歷史，或已退休／已否認候選的細節；這些依焦點、直接關聯與受控工具按需取得。最新有效更正、會推翻本輪判斷的矛盾與其他 authority floor 仍由必帶核心另行保證，不能因索引精簡而遺失。
 
+全域地圖本身也可能造成定錨：模型可能把目前 Duty／Task 分組誤認成完整且固定的世界。第一版必須同時施加以下邊界：
+
+- 明示索引是「目前可修改的正式內容／假說／缺口投影」，不是完整 ontology 或員工已全部確認的清單；
+- 當輪員工來源、最新有效更正與 blocking contradiction 不得被索引摘要覆蓋；
+- 索引保留未歸類 Task、未映射線索、open gap、矛盾、待決 Proposal 的數量、狀態與查詢指標，讓「目前結構以外仍有東西」保持可見；
+- 主要顧問可以提出新 Task／Duty、重新分組或重新開啟假說，不能因現有 header 沒有對應位置就捨棄新線索；
+- UI 進度與模型索引應由同一組 domain projection 語意產生，但各自使用適合人與模型的 representation，不共享一份由 LLM 生成的摘要文字。
+
 索引也不能無限成長：
 
 - 小型職務在預算內可列出全部 active Duty／Task headers；
@@ -764,7 +787,7 @@ receipt 的裁決歷史採追加與 supersession，不以覆寫抹除員工先�
 - 模型需要遠端細節時，透過 document-scoped read-only lookup 展開，不把所有區域預先載入；
 - 降級規則、被省略區域與實際載入內容寫入 ContextManifest，不可靜默假裝索引完整。
 
-這項裁決把「前景專注、背景全域吸收」轉成可實作邊界：前景得到足以完成當輪判斷的細節；背景保有結構定位與異常訊號，而不是保有所有細節。它同時支援 Task／Duty 隨訪談演化、OPKS 按需分析、旁支線索停放與可解釋進度，不要求第一版先導入 GraphRAG、向量記憶或額外 planner model。
+這項裁決把「前景專注、背景全域吸收」轉成可實作邊界：前景得到足以完成當輪判斷的細節；背景保有結構定位與異常訊號，而不是保有所有細節。它同時支援 Task／Duty 隨訪談演化、OPKS 按需分析、旁支線索停放與可解釋進度，不要求第一版先導入 GraphRAG、向量記憶或額外 planner model。確切欄位、大小、不同 model profile 的降級門檻仍屬 §7.15 未決實作參數，成品後再用真實長訪談 eval 調整。
 
 #### 7.9.2 資料不足時的補查與詢問順序（2026-08-13 研究後候選，待 owner 最終確認）
 

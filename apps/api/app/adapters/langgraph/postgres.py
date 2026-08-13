@@ -8,11 +8,11 @@ the only Caliburn-owned table is a minimal document catalog/tombstone.
 from __future__ import annotations
 
 import asyncio
-from collections.abc import AsyncIterator, Awaitable, Callable, Iterable
+from collections.abc import AsyncIterator, Awaitable, Callable, Iterable, Mapping, Sequence
 from contextlib import asynccontextmanager
 from copy import deepcopy
 from datetime import UTC, datetime
-from typing import Any
+from typing import Any, Literal
 from uuid import UUID
 
 import psycopg
@@ -20,13 +20,20 @@ from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
 from langgraph.store.base import PutOp
 from langgraph.store.postgres.aio import AsyncPostgresStore
+from langgraph.types import Command
+from pydantic import JsonValue
 from psycopg import AsyncConnection
 from psycopg.rows import DictRow, dict_row
 
 from app.consultant.graph import StaleThreadRevision, build_consultant_graph
+from app.consultant.clarification import ClarificationAnswer
+from app.consultant.document_authority import edited_action_source_payload
+from app.consultant.document_review import apply_review_command
 from app.consultant.interview import VerifiedConsultantCommit
 from app.consultant.state import (
     ApprovedJobDocument,
+    DocumentChangeSet,
+    DocumentChangeStatus,
     EmployeeSource,
     EmployeeSourceKind,
     QuoteAnchor,
@@ -34,6 +41,7 @@ from app.consultant.state import (
     SourcePositionAnchor,
     SourceReference,
     SourceValidity,
+    RequiredClarification,
 )
 from app.consultant.views import ConsultantSnapshot, snapshot_from_state
 
@@ -622,6 +630,247 @@ class PostgresConsultantRuntime:
             if source is not None:
                 await self._after_source_checkpoint(source)
                 await self._mark_source_committed(source)
+            return result
+
+    @staticmethod
+    def _review_replay_matches(
+        bundle: DocumentChangeSet,
+        *,
+        action: str,
+        action_ids: Sequence[UUID],
+        edited_after_by_action_id: Mapping[UUID, JsonValue | None],
+        rejection_reason: str | None,
+    ) -> bool:
+        selected = [
+            item for item in bundle.actions if item.action_id in set(action_ids)
+        ]
+        if len(selected) != len(set(action_ids)):
+            return False
+        if action == "accept_changes":
+            return all(
+                item.status is DocumentChangeStatus.ACCEPTED for item in selected
+            )
+        if action == "edit_and_accept_changes":
+            return all(
+                item.status is DocumentChangeStatus.EDIT_ACCEPTED
+                and item.employee_after
+                == edited_after_by_action_id.get(item.action_id)
+                for item in selected
+            )
+        if action == "reject_changes":
+            reason = (rejection_reason or "").strip()
+            return bool(reason) and all(
+                item.status is DocumentChangeStatus.REJECTED
+                and item.rejection_reason == reason
+                for item in selected
+            )
+        if action == "defer_changes":
+            return all(
+                item.status is DocumentChangeStatus.DEFERRED for item in selected
+            )
+        return False
+
+    async def decide_document_changes(
+        self,
+        *,
+        document_id: UUID,
+        expected_revision: int,
+        action: Literal[
+            "accept_changes",
+            "edit_and_accept_changes",
+            "reject_changes",
+            "defer_changes",
+        ],
+        changeset_id: UUID,
+        action_ids: Sequence[UUID],
+        edited_after_by_action_id: Mapping[UUID, JsonValue | None] | None = None,
+        rejection_reason: str | None = None,
+        source_id: UUID | None = None,
+    ) -> ConsultantSnapshot:
+        """Apply one employee review decision without invoking a provider."""
+
+        async with self._lock_for(document_id):
+            await self._require_active_catalog(document_id)
+            snapshot = await self._snapshot(document_id)
+            raw_state = await self.raw_state(document_id)
+            raw_bundle = raw_state.get("review_queue", {}).get(str(changeset_id))
+            if raw_bundle is None:
+                raise KeyError(f"changeset {changeset_id} was not found")
+            bundle = DocumentChangeSet.model_validate(raw_bundle)
+            edited = dict(edited_after_by_action_id or {})
+            if snapshot.revision != expected_revision:
+                if self._review_replay_matches(
+                    bundle,
+                    action=action,
+                    action_ids=action_ids,
+                    edited_after_by_action_id=edited,
+                    rejection_reason=rejection_reason,
+                ):
+                    if source_id is not None:
+                        source = await self.get_source_or_none(document_id, source_id)
+                        if (
+                            source is not None
+                            and source.processing_status
+                            is SourceProcessingStatus.PENDING
+                        ):
+                            await self._mark_source_committed(source)
+                    return snapshot
+                raise StaleRevision(
+                    f"expected revision {expected_revision}, found {snapshot.revision}"
+                )
+            selected = tuple(
+                item for item in bundle.actions if item.action_id in set(action_ids)
+            )
+            if len(selected) != len(set(action_ids)):
+                raise ValueError("review decision references an unknown patch action")
+            employee_payload = (
+                edited_action_source_payload(selected, edited)
+                if action == "edit_and_accept_changes"
+                else None
+            )
+            source: EmployeeSource | None = None
+            source_reference: SourceReference | None = None
+            if employee_payload is not None:
+                if source_id is None:
+                    raise ValueError(
+                        "employee text edit requires an application-issued source_id"
+                    )
+                text, positions = employee_payload
+                requested = EmployeeSource.pending(
+                    source_id=source_id,
+                    document_id=document_id,
+                    kind=EmployeeSourceKind.DIRECT_EDIT,
+                    text=text,
+                    positions=positions,
+                )
+                source = await self._load_or_prepare_source(requested)
+                source_reference = SourceReference(
+                    source_id=source.source_id,
+                    kind=source.kind,
+                    created_at=source.created_at,
+                )
+            elif source_id is not None:
+                raise ValueError(
+                    "review decision without employee-authored text must not mint evidence"
+                )
+
+            preflight = apply_review_command(
+                raw_state,
+                action=action,
+                changeset_id=changeset_id,
+                action_ids=action_ids,
+                revision=expected_revision + 1,
+                edited_after_by_action_id=edited,
+                rejection_reason=rejection_reason,
+                source_reference=source_reference,
+            )
+            prospective_document = ApprovedJobDocument.model_validate(
+                preflight["approved_document"]
+            )
+            await self._require_known_evidence_sources(
+                prospective_document,
+                pending_direct_edit_source_id=(
+                    source.source_id if source is not None else None
+                ),
+            )
+            if source is not None and source.processing_status is SourceProcessingStatus.PENDING:
+                await self._after_source_store(source)
+
+            command: dict[str, Any] = {
+                "action": action,
+                "document_id": str(document_id),
+                "expected_revision": expected_revision,
+                "changeset_id": str(changeset_id),
+                "action_ids": [str(item) for item in action_ids],
+                "edited_after_by_action_id": {
+                    str(key): value for key, value in edited.items()
+                },
+            }
+            if rejection_reason is not None:
+                command["rejection_reason"] = rejection_reason
+            if source_reference is not None:
+                command["source_reference"] = source_reference.model_dump(mode="json")
+            try:
+                await self.graph.ainvoke(
+                    {}, self.graph_config(document_id), context=command
+                )
+            except StaleThreadRevision as error:
+                raise StaleRevision(str(error)) from error
+            result = await self._snapshot(document_id)
+            await self._touch_catalog(document_id)
+            if source is not None:
+                await self._after_source_checkpoint(source)
+                await self._mark_source_committed(source)
+            return result
+
+    async def answer_required_clarification(
+        self,
+        *,
+        document_id: UUID,
+        expected_revision: int,
+        clarification_id: UUID,
+        choice: str,
+        text: str,
+        source_id: UUID,
+    ) -> ConsultantSnapshot:
+        """Resume a durable interrupt with employee evidence, never document authority."""
+
+        async with self._lock_for(document_id):
+            await self._require_active_catalog(document_id)
+            snapshot = await self._snapshot(document_id)
+            existing_source = await self.get_source_or_none(document_id, source_id)
+            if snapshot.required_clarification is None:
+                if snapshot.latest_source_id == source_id and existing_source is not None:
+                    if (
+                        existing_source.processing_status
+                        is SourceProcessingStatus.PENDING
+                    ):
+                        await self._mark_source_committed(existing_source)
+                    return snapshot
+                raise ValueError("no required clarification is waiting")
+            request = RequiredClarification.model_validate(
+                snapshot.required_clarification
+            )
+            if request.clarification_id != clarification_id:
+                raise ValueError("clarification answer targets a different request")
+            if snapshot.revision != expected_revision:
+                raise StaleRevision(
+                    f"expected revision {expected_revision}, found {snapshot.revision}"
+                )
+            normalized_text = text if text.strip() else choice
+            requested = EmployeeSource.pending(
+                source_id=source_id,
+                document_id=document_id,
+                kind=EmployeeSourceKind.EMPLOYEE_TURN,
+                text=normalized_text,
+                positions=(
+                    SourcePositionAnchor(
+                        document_path=f"/clarifications/{clarification_id}/answer",
+                        start=0,
+                        end=len(normalized_text),
+                    ),
+                ),
+            )
+            source = await self._load_or_prepare_source(requested)
+            if source.processing_status is SourceProcessingStatus.PENDING:
+                await self._after_source_store(source)
+            answer = ClarificationAnswer(
+                choice=choice,
+                text=normalized_text,
+                source_reference=SourceReference(
+                    source_id=source.source_id,
+                    kind=source.kind,
+                    created_at=source.created_at,
+                ),
+            )
+            await self.graph.ainvoke(
+                Command(resume=answer.model_dump(mode="json")),
+                self.graph_config(document_id),
+            )
+            result = await self._snapshot(document_id)
+            await self._touch_catalog(document_id)
+            await self._after_source_checkpoint(source)
+            await self._mark_source_committed(source)
             return result
 
     async def export_approved_document(

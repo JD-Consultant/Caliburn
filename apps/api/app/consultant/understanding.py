@@ -28,6 +28,7 @@ from app.consultant.state import (
     CalibrationStatus,
     CalibrationTrigger,
     ConsultantThreadState,
+    DocumentChangeSet,
     DocumentChangeStatus,
     DurableModel,
     EmployeeSourceKind,
@@ -411,8 +412,9 @@ def semantic_progress_from_state(
         depth.append(WorkDepthProjection(work_id=item.work_id, **values))
 
     decisions = Counter(
-        value.get("status", DocumentChangeStatus.PENDING.value)
+        action.status.value
         for value in state.get("review_queue", {}).values()
+        for action in DocumentChangeSet.model_validate(value).actions
     )
     return SemanticProgressProjection(
         currently_known_work_count=len(work),
@@ -444,13 +446,13 @@ def semantic_progress_from_state(
 def _structural_decision_count(state: ConsultantThreadState) -> int:
     count = 0
     for value in state.get("review_queue", {}).values():
-        if value.get("status") not in {
-            DocumentChangeStatus.PENDING.value,
-            DocumentChangeStatus.DEFERRED.value,
-        }:
-            continue
-        actions = value.get("actions", ())
-        if any(action.get("operation") in _STRUCTURAL_OPERATIONS for action in actions):
+        bundle = DocumentChangeSet.model_validate(value)
+        if any(
+            action.status
+            in {DocumentChangeStatus.PENDING, DocumentChangeStatus.DEFERRED}
+            and action.operation.value in _STRUCTURAL_OPERATIONS
+            for action in bundle.actions
+        ):
             count += 1
     return count
 
@@ -655,6 +657,33 @@ def create_calibration(
             calibrations[key] = existing.model_copy(
                 update={"status": CalibrationStatus.SUPERSEDED}
             ).model_dump(mode="json")
+            for work_id in existing.affected_work_ids:
+                raw = work.get(str(work_id))
+                if raw is None:
+                    continue
+                item = InterviewWorkItem.model_validate(raw)
+                blockers = tuple(
+                    blocker
+                    for blocker in item.blocked_by_decision_ids
+                    if blocker != existing.calibration_id
+                )
+                update: dict[str, Any] = {
+                    "blocked_by_decision_ids": blockers,
+                }
+                if (
+                    item.status is InterviewWorkStatus.BLOCKED
+                    and not blockers
+                    and item.resume_status is not None
+                ):
+                    update.update(
+                        {
+                            "status": item.resume_status,
+                            "resume_status": None,
+                        }
+                    )
+                work[str(work_id)] = item.model_copy(update=update).model_dump(
+                    mode="json"
+                )
     calibrations[str(calibration_id)] = calibration.model_dump(mode="json")
     if kind is CalibrationKind.BRANCH_BLOCKING:
         for work_id in affected_work_ids:
@@ -666,9 +695,22 @@ def create_calibration(
                 InterviewWorkStatus.RETIRED,
                 InterviewWorkStatus.NOT_APPLICABLE,
             }:
+                resume_status = item.resume_status
+                if resume_status is None:
+                    resume_status = (
+                        item.status
+                        if item.status is not InterviewWorkStatus.BLOCKED
+                        else InterviewWorkStatus.AVAILABLE
+                    )
                 work[str(work_id)] = item.model_copy(
                     update={
                         "status": InterviewWorkStatus.BLOCKED,
+                        "blocked_by_decision_ids": tuple(
+                            dict.fromkeys(
+                                (*item.blocked_by_decision_ids, calibration_id)
+                            )
+                        ),
+                        "resume_status": resume_status,
                         "last_changed_revision": revision,
                     }
                 ).model_dump(mode="json")
@@ -730,14 +772,30 @@ def decide_calibration(
             if value is None:
                 continue
             item = InterviewWorkItem.model_validate(value)
-            if item.status is InterviewWorkStatus.BLOCKED:
+            if calibration.calibration_id in item.blocked_by_decision_ids:
+                blockers = tuple(
+                    blocker
+                    for blocker in item.blocked_by_decision_ids
+                    if blocker != calibration.calibration_id
+                )
+                update: dict[str, Any] = {
+                    "blocked_by_decision_ids": blockers,
+                    "last_changed_revision": revision,
+                }
+                if not blockers:
+                    update.update(
+                        {
+                            "status": item.resume_status
+                            or InterviewWorkStatus.AVAILABLE,
+                            "resume_status": None,
+                        }
+                    )
                 work[str(work_id)] = item.model_copy(
-                    update={
-                        "status": InterviewWorkStatus.AVAILABLE,
-                        "last_changed_revision": revision,
-                    }
+                    update=update
                 ).model_dump(mode="json")
     else:
+        if source_reference is not None:
+            raise ValueError("deferring understanding must not create evidence")
         calibration = calibration.model_copy(update={"status": CalibrationStatus.LATER})
     calibrations[str(calibration_id)] = calibration.model_dump(mode="json")
     latest = str(calibration_id) if decision is CalibrationDecision.LATER else None

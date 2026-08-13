@@ -19,6 +19,7 @@ from pydantic import (
     BaseModel,
     ConfigDict,
     Field,
+    JsonValue,
     StringConstraints,
     model_validator,
 )
@@ -344,7 +345,24 @@ class InterviewWorkItem(DurableModel):
     missing_before_enough: NonEmptyText | None = None
     recommended_next_step: NonEmptyText | None = None
     source_ids: tuple[UUID, ...] = ()
+    blocked_by_decision_ids: tuple[UUID, ...] = ()
+    resume_status: InterviewWorkStatus | None = None
     last_changed_revision: int = Field(ge=0)
+
+    @model_validator(mode="after")
+    def blocking_metadata_matches_status(self) -> InterviewWorkItem:
+        if len(self.blocked_by_decision_ids) != len(
+            set(self.blocked_by_decision_ids)
+        ):
+            raise ValueError("duplicate blocked_by_decision_ids")
+        if self.blocked_by_decision_ids:
+            if self.status is not InterviewWorkStatus.BLOCKED:
+                raise ValueError("decision-dependent work must be blocked")
+            if self.resume_status in {None, InterviewWorkStatus.BLOCKED}:
+                raise ValueError("blocked interview work requires a resumable status")
+        elif self.status is not InterviewWorkStatus.BLOCKED and self.resume_status is not None:
+            raise ValueError("unblocked interview work cannot retain blocking metadata")
+        return self
 
 
 class UnderstandingStatus(StrEnum):
@@ -445,20 +463,119 @@ class DocumentChangeStatus(StrEnum):
     STALE = "stale"
 
 
+class DocumentPatchOperation(StrEnum):
+    ADD = "add"
+    REVISE = "revise"
+    WITHDRAW = "withdraw"
+    MERGE = "merge"
+    SPLIT = "split"
+    REASSIGN = "reassign"
+    REORDER = "reorder"
+
+
+class DocumentPathRead(DurableModel):
+    path: NonEmptyText
+    value_sha256: Annotated[str, StringConstraints(pattern=r"^[0-9a-f]{64}$")]
+
+
+class DocumentPatchAction(DurableModel):
+    """One application-identified review action, not a model authority write."""
+
+    action_id: UUID
+    operation: DocumentPatchOperation
+    path: NonEmptyText
+    target_key: NonEmptyText
+    before: JsonValue | None = None
+    after: JsonValue | None = None
+    source_ids: tuple[UUID, ...] = Field(min_length=1)
+    quote_anchors: tuple[QuoteAnchor, ...] = ()
+    read_set: tuple[DocumentPathRead, ...] = Field(min_length=1)
+    target_ids: tuple[UUID, ...] = ()
+    depends_on_action_ids: tuple[UUID, ...] = ()
+    atomic_subgroup_id: UUID | None = None
+    affected_work_ids: tuple[UUID, ...] = ()
+    blocks_dependent_analysis: bool = False
+    status: DocumentChangeStatus = DocumentChangeStatus.PENDING
+    employee_after: JsonValue | None = None
+    rejection_reason: NonEmptyText | None = None
+    stale_reason: NonEmptyText | None = None
+
+    @model_validator(mode="after")
+    def review_metadata_is_consistent(self) -> DocumentPatchAction:
+        for label, values in (
+            ("source_ids", self.source_ids),
+            ("target_ids", self.target_ids),
+            ("depends_on_action_ids", self.depends_on_action_ids),
+            ("affected_work_ids", self.affected_work_ids),
+        ):
+            if len(values) != len(set(values)):
+                raise ValueError(f"duplicate {label}")
+        read_paths = [item.path for item in self.read_set]
+        if len(read_paths) != len(set(read_paths)):
+            raise ValueError("duplicate document read-set path")
+        if self.operation is DocumentPatchOperation.WITHDRAW:
+            if self.after is not None:
+                raise ValueError("withdraw patch must not carry an after value")
+        elif self.after is None:
+            raise ValueError("non-withdraw patch requires an after value")
+        if self.status is DocumentChangeStatus.REJECTED and not self.rejection_reason:
+            raise ValueError("rejected patch requires an employee reason")
+        if self.status is DocumentChangeStatus.STALE and not self.stale_reason:
+            raise ValueError("stale patch requires a presentable reason")
+        if (
+            self.status is DocumentChangeStatus.EDIT_ACCEPTED
+            and self.employee_after is None
+        ):
+            raise ValueError("edit-accepted patch requires the employee value")
+        if self.action_id in self.depends_on_action_ids:
+            raise ValueError("a patch action cannot depend on itself")
+        return self
+
+
 class DocumentChangeSet(DurableModel):
     changeset_id: UUID
-    status: DocumentChangeStatus = DocumentChangeStatus.PENDING
-    actions: tuple[dict[str, Any], ...]
-    source_ids: tuple[UUID, ...]
-    read_revision: int = Field(ge=0)
-    blocked_work_ids: tuple[UUID, ...] = ()
+    summary: NonEmptyText
+    actions: tuple[DocumentPatchAction, ...] = Field(min_length=1)
+    source_ids: tuple[UUID, ...] = Field(min_length=1)
+    created_revision: int = Field(ge=0)
+
+    @model_validator(mode="after")
+    def action_identity_and_evidence_are_consistent(self) -> DocumentChangeSet:
+        action_ids = [item.action_id for item in self.actions]
+        if len(action_ids) != len(set(action_ids)):
+            raise ValueError("duplicate patch action_id")
+        if len(self.source_ids) != len(set(self.source_ids)):
+            raise ValueError("duplicate changeset source_id")
+        if set(self.source_ids) != {
+            source_id for action in self.actions for source_id in action.source_ids
+        }:
+            raise ValueError("changeset evidence must equal its action evidence")
+        known_actions = set(action_ids)
+        for action in self.actions:
+            if not set(action.depends_on_action_ids) <= known_actions:
+                raise ValueError("patch dependency crosses its changeset")
+        return self
 
 
 class RequiredClarification(DurableModel):
     clarification_id: UUID
     question: NonEmptyText
     reason: NonEmptyText
+    current_understanding: NonEmptyText
+    choices: tuple[NonEmptyText, ...] = Field(min_length=2, max_length=3)
     affected_work_ids: tuple[UUID, ...] = ()
+    affected_branch: NonEmptyText
+    source_ids: tuple[UUID, ...] = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def choices_and_dependencies_are_unique(self) -> RequiredClarification:
+        if len(self.choices) != len(set(self.choices)):
+            raise ValueError("duplicate clarification choices")
+        if len(self.affected_work_ids) != len(set(self.affected_work_ids)):
+            raise ValueError("duplicate clarification affected_work_ids")
+        if len(self.source_ids) != len(set(self.source_ids)):
+            raise ValueError("duplicate clarification source_ids")
+        return self
 
 
 class RunStatus(StrEnum):
@@ -507,6 +624,10 @@ class ConsultantCommandContext(TypedDict, total=False):
         "direct_edit",
         "commit_consultant_result",
         "decide_understanding_calibration",
+        "accept_changes",
+        "edit_and_accept_changes",
+        "reject_changes",
+        "defer_changes",
     ]
     document_id: str
     expected_revision: int
@@ -515,6 +636,10 @@ class ConsultantCommandContext(TypedDict, total=False):
     semantic_commit: dict[str, Any]
     calibration_id: str
     calibration_decision: Literal["confirm", "later"]
+    changeset_id: str
+    action_ids: list[str]
+    edited_after_by_action_id: dict[str, Any]
+    rejection_reason: str
 
 
 def initial_thread_state(document_id: UUID) -> ConsultantThreadState:

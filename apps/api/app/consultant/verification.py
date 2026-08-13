@@ -185,6 +185,7 @@ def verify_consultant_result(
         if change.path.startswith("/opks"):
             if change.opks_kind is None:
                 raise ConsultantVerificationError("OPKS change requires an OPKS kind")
+            _verify_opks_payload_kind(change.after, change.opks_kind.value)
             if change.opks_kind in {OpksKind.OUTPUT, OpksKind.PERFORMANCE_INDICATOR}:
                 if len(change.task_ids) != 1:
                     raise ConsultantVerificationError(
@@ -245,6 +246,17 @@ def _verify_document_payload(value: object) -> None:
             _verify_document_payload(nested)
 
 
+def _verify_opks_payload_kind(value: object, expected_kind: str) -> None:
+    payloads = value if isinstance(value, list) else [value]
+    for payload in payloads:
+        if not isinstance(payload, dict) or "kind" not in payload:
+            continue
+        if payload["kind"] != expected_kind:
+            raise ConsultantVerificationError(
+                "OPKS payload kind does not match the typed OPKS kind"
+            )
+
+
 def _verify_change_operation(operation: str, path: str) -> None:
     entity_path = re.fullmatch(rf"/(?:duties|tasks|opks)/{_UUID}", path) is not None
     collection_path = path in {"/duties", "/tasks", "/opks"}
@@ -252,9 +264,9 @@ def _verify_change_operation(operation: str, path: str) -> None:
         raise ConsultantVerificationError("add operation requires a collection path")
     if operation == "withdraw" and not entity_path:
         raise ConsultantVerificationError("withdraw operation requires an entity path")
-    if operation in {"merge", "split"} and not (collection_path or entity_path):
+    if operation in {"merge", "split"} and not collection_path:
         raise ConsultantVerificationError(
-            f"{operation} operation requires a Duty, Task or OPKS entity path"
+            f"{operation} operation requires a collection path"
         )
     if operation == "reassign" and not re.fullmatch(
         rf"/tasks/{_UUID}/duty_id", path
@@ -265,4 +277,13 @@ def _verify_change_operation(operation: str, path: str) -> None:
     if operation == "reorder" and not path.endswith("/display_order"):
         raise ConsultantVerificationError(
             "reorder operation requires a display_order path"
+        )
+    if operation == "revise" and (
+        collection_path
+        or entity_path
+        or path.endswith("/duty_id")
+        or path.endswith("/display_order")
+    ):
+        raise ConsultantVerificationError(
+            "revise operation requires one non-structural document field path"
         )

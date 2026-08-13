@@ -340,12 +340,17 @@ async def test_semantic_progress_is_explainable_and_has_no_percentage_or_pause_s
     result = result.model_copy(
         update={
             "reviewable_document_changes": (
-                ReviewableDocumentChange(
-                    operation=DocumentChangeOperation.ADD,
-                    path="/tasks",
-                    after={"statement": "依缺料狀況建立請購單"},
-                    basis=_basis(source_id),
-                ),
+                    ReviewableDocumentChange(
+                        operation=DocumentChangeOperation.ADD,
+                        path="/tasks",
+                        after={
+                            "statement": "依缺料狀況建立請購單",
+                            "action": "建立",
+                            "object": "請購單",
+                            "display_order": 0,
+                        },
+                        basis=_basis(source_id),
+                    ),
             )
         }
     )

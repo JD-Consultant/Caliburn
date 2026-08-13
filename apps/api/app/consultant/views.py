@@ -10,8 +10,13 @@ from pydantic import Field
 
 from app.consultant.state import (
     ApprovedJobDocument,
-    DurableModel,
     ConsultantThreadState,
+    DocumentChangeSet,
+    DocumentChangeStatus,
+    DurableModel,
+    InterviewWorkItem,
+    InterviewWorkStatus,
+    RequiredClarification,
 )
 from app.consultant.understanding import (
     CurrentInterviewProjection,
@@ -35,6 +40,22 @@ class ConsultantTurnProjection(DurableModel):
     next_question: dict[str, Any] | None = None
 
 
+class BlockedInterviewBranchProjection(DurableModel):
+    work_id: UUID
+    title: str
+    decision_action_ids: tuple[UUID, ...]
+    reason: str
+
+
+class DocumentReviewProjection(DurableModel):
+    bundles: tuple[DocumentChangeSet, ...] = ()
+    unresolved_action_count: int = Field(ge=0)
+    blocked_branches: tuple[BlockedInterviewBranchProjection, ...] = ()
+    safe_interview_work_available: bool
+    decision_required_before_more_interview: bool
+    explanation: str | None = None
+
+
 class ConsultantSnapshot(DurableModel):
     document_id: UUID
     revision: int = Field(ge=0)
@@ -50,8 +71,9 @@ class ConsultantSnapshot(DurableModel):
     gaps: dict[str, dict] = Field(default_factory=dict)
     semantic_progress: SemanticProgressProjection
     review_queue: dict[str, dict] = Field(default_factory=dict)
+    document_review: DocumentReviewProjection
     approved_document: ApprovedJobDocument
-    required_clarification: dict | None = None
+    required_clarification: RequiredClarification | None = None
     sufficiency: SufficiencyProjection
     latest_run: dict | None = None
 
@@ -78,6 +100,74 @@ def _consultant_turns(state: ConsultantThreadState) -> tuple[ConsultantTurnProje
     return tuple(turns)
 
 
+def document_review_projection_from_state(
+    state: ConsultantThreadState,
+) -> DocumentReviewProjection:
+    bundles = tuple(
+        DocumentChangeSet.model_validate(raw)
+        for _, raw in sorted(state.get("review_queue", {}).items())
+    )
+    unresolved_actions = [
+        action
+        for bundle in bundles
+        for action in bundle.actions
+        if action.status
+        in {DocumentChangeStatus.PENDING, DocumentChangeStatus.DEFERRED}
+    ]
+    unresolved_structural_action_ids = {
+        action.action_id
+        for action in unresolved_actions
+        if action.blocks_dependent_analysis
+    }
+    work = tuple(
+        InterviewWorkItem.model_validate(raw)
+        for raw in state.get("interview_work", {}).values()
+    )
+    safe_available = any(
+        item.status
+        in {
+            InterviewWorkStatus.ACTIVE,
+            InterviewWorkStatus.AVAILABLE,
+            InterviewWorkStatus.PARKED,
+        }
+        for item in work
+    )
+    blocked_items: list[BlockedInterviewBranchProjection] = []
+    for item in sorted(work, key=lambda value: str(value.work_id)):
+        if item.status is not InterviewWorkStatus.BLOCKED:
+            continue
+        review_blockers = tuple(
+            blocker
+            for blocker in item.blocked_by_decision_ids
+            if blocker in unresolved_structural_action_ids
+        )
+        if not review_blockers:
+            continue
+        blocked_items.append(
+            BlockedInterviewBranchProjection(
+                work_id=item.work_id,
+                title=item.title,
+                decision_action_ids=review_blockers,
+                reason=item.priority_reason,
+            )
+        )
+    blocked = tuple(blocked_items)
+    requires_decision = bool(blocked) and not safe_available
+    explanation = None
+    if requires_decision:
+        explanation = "目前沒有其他可安全深入的工作，需先處理所列文件結構決定。"
+    elif blocked:
+        explanation = "部分分析等待文件結構決定；其他不相依工作仍可繼續。"
+    return DocumentReviewProjection(
+        bundles=bundles,
+        unresolved_action_count=len(unresolved_actions),
+        blocked_branches=blocked,
+        safe_interview_work_available=safe_available,
+        decision_required_before_more_interview=requires_decision,
+        explanation=explanation,
+    )
+
+
 def snapshot_from_state(state: ConsultantThreadState) -> ConsultantSnapshot:
     if not state or "document_id" not in state:
         raise ValueError("consultant thread state is empty")
@@ -97,6 +187,7 @@ def snapshot_from_state(state: ConsultantThreadState) -> ConsultantSnapshot:
             "gaps": state.get("gaps", {}),
             "semantic_progress": semantic_progress_from_state(state),
             "review_queue": state.get("review_queue", {}),
+            "document_review": document_review_projection_from_state(state),
             "approved_document": state["approved_document"],
             "required_clarification": state.get("required_clarification"),
             "sufficiency": sufficiency_projection_from_state(state),

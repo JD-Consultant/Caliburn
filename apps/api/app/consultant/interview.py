@@ -9,6 +9,13 @@ from uuid import UUID, uuid5
 from langchain_core.messages import AIMessage
 from pydantic import model_validator
 
+from app.consultant.clarification import create_required_clarification
+from app.consultant.document_review import (
+    block_review_dependent_work,
+    create_document_changeset,
+    revalidate_review_work,
+    stale_review_queue_for_source_correction,
+)
 from app.consultant.results import (
     AttentionOperation,
     ConsultantResult,
@@ -16,15 +23,16 @@ from app.consultant.results import (
     UnderstandingOperation,
 )
 from app.consultant.state import (
+    ApprovedJobDocument,
     CalibrationStatus,
     ConsultantThreadState,
-    DocumentChangeSet,
     DurableModel,
     GapItem,
     GapStatus,
     InterviewPriority,
     InterviewWorkItem,
     InterviewWorkStatus,
+    RequiredClarification,
     RunReceipt,
     RunStatus,
     UnderstandingCalibration,
@@ -339,33 +347,28 @@ def _apply_reviewable_changes(
     read_revision: int,
     state: ConsultantThreadState,
     result: ConsultantResult,
-) -> dict[str, dict[str, Any]]:
+    interview_work: dict[str, dict[str, Any]],
+) -> tuple[dict[str, dict[str, Any]], dict[str, dict[str, Any]]]:
     review_queue = dict(state.get("review_queue", {}))
     if not result.reviewable_document_changes:
-        return review_queue
-    changeset_id = uuid5(document_id, f"consultant:{run_id}:document-changes")
-    source_ids = tuple(
-        sorted(
-            {
-                source_id
-                for change in result.reviewable_document_changes
-                for source_id in change.basis.source_ids
-            },
-            key=str,
-        )
+        return review_queue, interview_work
+    changeset = create_document_changeset(
+        document_id=document_id,
+        run_id=run_id,
+        summary=result.visible_reply,
+        read_revision=read_revision,
+        document=ApprovedJobDocument.model_validate(state["approved_document"]),
+        changes=result.reviewable_document_changes,
+        existing_review_queue=review_queue,
+        interview_work=interview_work,
     )
-    review_queue[str(changeset_id)] = _dump(
-        DocumentChangeSet(
-            changeset_id=changeset_id,
-            actions=tuple(
-                change.model_dump(mode="json")
-                for change in result.reviewable_document_changes
-            ),
-            source_ids=source_ids,
-            read_revision=read_revision,
-        )
+    review_queue[str(changeset.changeset_id)] = _dump(changeset)
+    interview_work = block_review_dependent_work(
+        interview_work,
+        changeset.actions,
+        revision=read_revision + 1,
     )
-    return review_queue
+    return review_queue, interview_work
 
 
 def apply_verified_consultant_commit(
@@ -397,12 +400,13 @@ def apply_verified_consultant_commit(
         state=state,
         result=commit.result,
     )
-    review_queue = _apply_reviewable_changes(
+    review_queue, work = _apply_reviewable_changes(
         document_id=document_id,
         run_id=commit.run_id,
         read_revision=revision - 1,
         state=state,
         result=commit.result,
+        interview_work=work,
     )
     prospective: ConsultantThreadState = {
         **state,
@@ -423,6 +427,23 @@ def apply_verified_consultant_commit(
         focus_changed=focus_changed,
         returning_after_long_gap=commit.returning_after_long_gap,
     )
+    required_clarification = (
+        RequiredClarification.model_validate(state["required_clarification"])
+        if state.get("required_clarification") is not None
+        else None
+    )
+    if commit.result.required_clarification is not None:
+        if required_clarification is not None:
+            raise ValueError(
+                "an unresolved required clarification cannot be replaced"
+            )
+        required_clarification, work, _ = create_required_clarification(
+            document_id=document_id,
+            run_id=commit.run_id,
+            draft=commit.result.required_clarification,
+            interview_work=work,
+            revision=revision,
+        )
     work, current_work_id_string = normalize_current_work(
         work,
         preferred_work_id=current_work_id,
@@ -475,6 +496,11 @@ def apply_verified_consultant_commit(
         "latest_calibration_id": latest_calibration_id,
         "gaps": gaps,
         "review_queue": review_queue,
+        "required_clarification": (
+            required_clarification.model_dump(mode="json")
+            if required_clarification is not None
+            else None
+        ),
         "sufficiency": sufficiency.model_dump(mode="json"),
         "latest_run": receipt.model_dump(mode="json"),
     }
@@ -488,6 +514,21 @@ def apply_source_correction(
     correction_source_id: UUID,
     revision: int,
 ) -> ConsultantThreadState:
+    review_queue = stale_review_queue_for_source_correction(
+        state.get("review_queue", {}),
+        superseded_source_id=superseded_source_id,
+    )
+    clarification = (
+        RequiredClarification.model_validate(state["required_clarification"])
+        if state.get("required_clarification") is not None
+        else None
+    )
+    retired_clarification_id = (
+        clarification.clarification_id
+        if clarification is not None
+        and superseded_source_id in clarification.source_ids
+        else None
+    )
     understanding = dict(state.get("understanding", {}))
     affected_work_ids: set[UUID] = set()
     newly_challenged_understanding_ids: set[UUID] = set()
@@ -531,19 +572,42 @@ def apply_source_correction(
             affected_work_ids.add(item.work_id)
         if item.work_id not in affected_work_ids:
             continue
+        blockers = tuple(
+            blocker
+            for blocker in item.blocked_by_decision_ids
+            if blocker != retired_clarification_id
+        )
+        if blockers:
+            status = InterviewWorkStatus.BLOCKED
+            resume_status = item.resume_status or InterviewWorkStatus.AVAILABLE
+            priority_reason = (
+                "關聯的員工原話已更正；此分支仍有其他未決前提。"
+            )
+        else:
+            status = InterviewWorkStatus.AVAILABLE
+            resume_status = None
+            priority_reason = "關聯的員工原話已更正，需重查受影響理解。"
         work[key] = _dump(
             item.model_copy(
                 update={
-                    "status": InterviewWorkStatus.AVAILABLE,
+                    "status": status,
                     "priority": InterviewPriority.CORRECTION,
-                    "priority_reason": "關聯的員工原話已更正，需重查受影響理解。",
+                    "priority_reason": priority_reason,
                     "source_ids": tuple(
                         dict.fromkeys((*item.source_ids, correction_source_id))
                     ),
+                    "blocked_by_decision_ids": blockers,
+                    "resume_status": resume_status,
                     "last_changed_revision": revision,
                 }
             )
         )
+    work = revalidate_review_work(
+        work,
+        review_queue,
+        revision=revision,
+        resolved_reason="員工已更正舊來源，這個工作需依最新說法重新檢查。",
+    )
 
     gaps = dict(state.get("gaps", {}))
     for key, value in tuple(gaps.items()):
@@ -594,4 +658,10 @@ def apply_source_correction(
             else state.get("latest_calibration_id")
         ),
         "gaps": gaps,
+        "review_queue": review_queue,
+        **(
+            {"required_clarification": None}
+            if retired_clarification_id is not None
+            else {}
+        ),
     }

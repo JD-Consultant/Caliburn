@@ -150,7 +150,7 @@ Owner 已確認：保留 Source、Work Model、Proposal、Current JD、Task／Du
 本節把「員工原話先保存、衍生結果整包提交」說得更精確。它不是只有兩個模糊的 save，也不是把 provider call 包在長時間 PostgreSQL transaction 裡：
 
 1. **Source acceptance transaction**：先以 client／application 提供的穩定 `input_event_id` 保存員工原話、speaker、document scope、canonical payload hash 與 processing status，再回報「回答已保存」。相同 ID＋相同 hash 回既有結果；相同 ID＋不同 hash 是 idempotency conflict。
-2. **Execution durability**：transaction 外執行 Context、Skill、tool 與 model；每個不可免費重做的重要結果以 run／attempt checkpoint 或 immutable artifact 保存，例如 resolved model profile、ContextManifest、tool result、provider result、usage、parse／verification report。這些是恢復與診斷依據，不是 Work Model、Proposal 或 Current JD。
+2. **Execution durability**：transaction 外執行 Context、Skill、tool 與 model；每個不可免費重做的重要結果以 run／attempt checkpoint 或 immutable artifact 保存，例如 resolved execution snapshot、ContextManifest、tool result、provider result、usage、parse／verification report。這些是恢復與診斷依據，不是 Work Model、Proposal 或 Current JD。
 3. **Semantic commit transaction**：deterministic application layer 把通過檢查的候選編成一份 `VerifiedCommitPlan`；再於單一 PostgreSQL transaction 中重讀 document、驗 generation／read-set，並一起寫入 Work Model delta、agenda／progress、durable Proposal、可見 consultant turn 與 idempotent result receipt。這批業務變更要嘛全部可見，要嘛全部 rollback；Current JD 仍完全不動。
 4. **Independent employee decision command**：員工日後接受、修改、退回、拒絕或延後 Proposal，是另一個有自己 idempotency／stale check 的 command；只有它能經 authority seam 改變 Current JD。正常 Proposal review 不依賴 consultant graph checkpoint 存活。
 
@@ -625,7 +625,7 @@ Owner 於 2026-08-13 確認：員工需要同時知道「大致談了多少」�
 
 依 [`OPKS 設計裁決`](2026-08-01-opks-design-decisions-research.md)、[`OPKS 漸進蒐集`](2026-08-04-opks-progressive-elicitation-research.md)與[`OPKS gap 再分析研究`](2026-08-06-opks-gap-reanalysis-blocking-research.md)：
 
-- 既有「以單一 Current JD Task 為一次 OPKS operation」是控制輸出量、prompt/schema 大小與 durable failure boundary 的現行實作決策，不應升格成產品流程必須等待 Task 穩定的證據；
+- 既有「以單一 Current JD Task 為一次 OPKS operation」是控制輸出量、prompt/schema 大小與 durable failure boundary 的現行實作決策，不應升格成產品流程必須等待 Task 穩定的證據；2026-08-04 研究中的獨立 OPKS child 也是當時架構限制下的方案，不是新顧問必須保留的模型呼叫或 profile 邊界；
 - 未來可把 O、P、K、S 拆成各自的 Skill，根據當輪證據與焦點按需載入；Skill 是否獨立，不預先決定是否另開模型呼叫；
 - 正式資料關係仍是 O/P 綁 Task，K/S 是文件層項目並與相關行為指標／Task 建立多對多 linkage，A 是文件層；但分析期間可以先連到 Work Unit／Task hypothesis，形成 Proposal 前再完成 identity reconciliation；
 - K/S 應由實際 Task 與行為證據反推，不直接要求員工自列能力；
@@ -908,7 +908,7 @@ Owner 確認 AI 在深入單一 Task 時，仍可持續看到整份職務的精�
 - 模型需要遠端細節時，透過 document-scoped read-only lookup 展開，不把所有區域預先載入；
 - 降級規則、被省略區域與實際載入內容寫入 ContextManifest，不可靜默假裝索引完整。
 
-這項裁決把「前景專注、背景全域吸收」轉成可實作邊界：前景得到足以完成當輪判斷的細節；背景保有結構定位與異常訊號，而不是保有所有細節。它同時支援 Task／Duty 隨訪談演化、OPKS 按需分析、旁支線索停放與可解釋進度，不要求第一版先導入 GraphRAG、向量記憶或額外 planner model。確切欄位、大小、不同 model profile 的降級門檻仍屬 §7.15 未決實作參數，成品後再用真實長訪談 eval 調整。
+這項裁決把「前景專注、背景全域吸收」轉成可實作邊界：前景得到足以完成當輪判斷的細節；背景保有結構定位與異常訊號，而不是保有所有細節。它同時支援 Task／Duty 隨訪談演化、OPKS 按需分析、旁支線索停放與可解釋進度，不要求第一版先導入 GraphRAG、向量記憶或額外 planner model。確切欄位、大小，以及 active consultant model profile 的 context window／能力改變時如何確定性降級，仍屬 §7.15 未決實作參數，成品後再用真實長訪談 eval 調整。
 
 #### 7.9.2 資料不足時的補查與詢問順序（2026-08-13 研究後已確認）
 
@@ -999,7 +999,7 @@ Owner 已確認「少量最近對話維持自然銜接；完整保存並可按�
 
 概念上採三個不同責任的 runtime artifact；本節只定責任，不提前鎖定最終資料表或 JSON schema：
 
-1. **ContextRequest**：application 產生的本輪需求與政策，包含 document、operation、focus、generation／read-set、authority floor、允許的 Skill／tool／Reference、model profile 與 budget。LLM 不能擴張 scope 或自行降低必帶內容。
+1. **ContextRequest**：application 產生的本輪需求與政策，包含 document、operation、focus、generation／read-set、authority floor、允許的 Skill／tool／Reference、model profile reference、operation policy 與 budget。LLM 不能擴張 scope 或自行降低必帶內容。
 2. **ContextPack**：送入某次 inference 的 immutable snapshot，包含必帶核心、近期連續性、受限全域索引、焦點細節、候選來源、載入的 Skill 與可用工具目錄。每個 item 保留 authority／source／revision 標籤；它不是新的 Work Model 或 authoritative store。
 3. **ContextManifest**：記錄每次 inference／tool wave 實際載入、按需取得、拒絕或省略的 refs／revision／hash、選取理由、tokens／成本、model／prompt／Skill／tool version、停止原因與結果 lineage。原始內容仍由原 store 保存，Manifest 不複製另一份員工原話。
 
@@ -1078,7 +1078,7 @@ Owner 已於 2026-08-12 裁示：時間優先，先完成可用的端到端成�
 
 - 每種 operation 的確切 token floor／ceiling；
 - adaptive bounded run 的最大 inference／tool step、elapsed time／成本上限，以及哪些 optional result group 能建立足以安全 drop 的 typed dependency contract；在此之前維持 fail-closed；
-- 受限全域工作索引的最終 schema、大小門檻、摘要層級與不同 model profile 的降級參數；
+- 受限全域工作索引的最終 schema、大小門檻、摘要層級，以及 active consultant model profile 的 context window／能力改變時的降級參數；
 - 是否第一版就使用 embedding、哪個 embedding／reranker 與 top-k；
 - 哪些具體條件值得增加獨立 model-based context planner 或 specialist call；預設不得固定每輪增加；
 - 主要 runtime 採 LangGraph、OpenAI Agents SDK、PydanticAI 或薄型自有 orchestration；
@@ -1170,15 +1170,15 @@ Google 2026 年 ADK 2.0 的方向更接近本產品：已知 routing、固定 bu
 - **no-progress budget**：重複 request fingerprint、相同結果 hash、沒有新 source／revision，或 sufficiency reason 沒有可解釋變化時提早停止；
 - **human-interrupt boundary**：只有員工能回答、需要員工判斷或涉及 authority 時立即退出自動 loop，不消耗剩餘額度硬猜。
 
-第一版可採下列**候選執行 profile**，作為 conformance／人工 smoke 的保守起點，而不是不可變 domain policy：
+第一版可採下列**候選 operation execution policy**，作為 conformance／人工 smoke 的保守起點，而不是不可變 domain policy：
 
 1. 正常快速路徑：一次主要顧問 inference，能提交合格 typed result 就結束。
 2. 補查路徑：第一個 inference 可提出一批 scope 明確的唯讀查詢；工具結果回來後由同一主要顧問整合。
 3. 只有第一批結果揭露新的穩定 ID、source receipt、矛盾或先前不可知的明確指標，而且確實對 unresolved reason code 有預期貢獻時，才允許第二波。
-4. 互動式正常回合的起始 hard ceiling 可設為 **三次 model inference（初始＋兩次結果整合）與兩波 lookup**；數值放在可替換 operation／model profile，不寫進 Task／Duty／OPKS domain invariant。一次 wave 可批次多個獨立 read-only request，因此不以「兩波」誤限成只能查兩筆資料。
+4. 互動式正常回合的起始 hard ceiling 可設為 **三次 model inference（初始＋兩次結果整合）與兩波 lookup**；數值放在可替換的 operation execution policy，模型與 provider 仍取自全域 consultant model profile，不寫進 Task／Duty／OPKS domain invariant。一次 wave 可批次多個獨立 read-only request，因此不以「兩波」誤限成只能查兩筆資料。
 5. 到達上限、重複查詢或沒有新資訊時，不啟動額外 evaluator／judge loop；輸出 `EMPLOYEE_CLARIFICATION_REQUIRED`、`DEFER_WITH_VISIBLE_GAP` 或 structured processing limit。不能安全形成語意結果時不更新 Work Model。
 
-這個 profile 選擇三次 inference／兩波 lookup，不是因為外部 benchmark 證明它最佳，而是它完整容納「初始判斷 → 一般補查 → 新指標例外補查 → 最終整合」，同時比 SDK 常見的 10-turn 通用上限更符合即時員工訪談的延遲、成本與可理解性。未來若某個 operation（例如獨立 Reference coverage audit）確實需要更深探索，應建立另一個有自己 success criteria 與 budget 的 operation profile，不默默放寬所有員工回合。
+這個 operation execution policy 選擇三次 inference／兩波 lookup，不是因為外部 benchmark 證明它最佳，而是它完整容納「初始判斷 → 一般補查 → 新指標例外補查 → 最終整合」，同時比 SDK 常見的 10-turn 通用上限更符合即時員工訪談的延遲、成本與可理解性。未來若某個 operation（例如獨立 Reference coverage audit）確實需要更深探索，應建立另一個有自己 success criteria 與 budget 的 execution policy，不默默放寬所有員工回合；這仍不自動代表要換模型。
 
 這也收斂框架需求：候選 runtime 至少要能分別限制 model／tool calls、攔截重複或錯誤工具、批次安全的唯讀查詢、在 limit／HITL 時保存可恢復 state，並輸出完整 trace／usage。框架若只提供一個總迴圈次數，仍需由 Caliburn harness 補上 operation、authority、progress 與成本政策。
 
@@ -1267,31 +1267,49 @@ OpenRouter 又多一層 routing：它本身預設不保存 prompts，除非使�
 4. **不主動擴大遠端保存。** 接受商業 API 的標準 abuse／safety retention，不要求 ZDR；但不主動 opt in 訓練、data-discount sharing、完整遠端 Input／Output Logging，或為了方便除錯建立第二份長期 transcript。
 5. **路由必須可說清楚。** 第一版維持一個明確 model ID 與 provider allow-list，不做無聲跨模型 fallback。至少記錄設定模型與設定 provider；若未來允許 gateway fallback，該次 run 必須記錄實際 model／provider、attempt chain、成本與停止原因，候選也必須來自明確設定，而不是任意 router alias。
 6. **內容選擇仍由 Context Engine 控制。** 不限制外傳不代表把完整歷史、所有 Evidence 與全部 OPKS 每輪重送；仍採必要核心、受限全域索引、焦點細節與按需展開，以品質與成本為理由控制 context。
-7. **provider-specific state 是可替換優化。** `store=false`、ZDR、region、cache TTL 等能力可由 adapter profile 映射，但 domain 與 use case 不依賴任一廠商欄位。某 provider 不支援某項控制時，回到已核准的標準商業 API 政策，不偽裝成 ZDR。
+7. **provider-specific state 是可替換優化。** `store=false`、ZDR、region、cache TTL 等能力可由 adapter 顯式映射，但 domain 與 use case 不依賴任一廠商欄位。某 provider 不支援某項控制時，回到已核准的標準商業 API 政策，不偽裝成 ZDR。
 
 這項裁決不等於永遠拒絕 fallback、provider state 或遠端 observability；它要求這些能力未來以顯式、可追溯、可關閉的 adapter／runtime 設定加入。第一版不需要建立讓員工挑選 retention policy 的複雜 UI，也不需要為尚未存在的企業合規需求預做多套資料模式。
 
-### 7.20 模型、provider 與參數 profile 控制面（2026-08-13 已確認）
+### 7.20 模型、provider 與參數 profile 控制面（2026-08-13 維護者控制與第一版粒度已確認）
 
 Owner 已確認：**模型、provider 與底層參數由本機維護者透過版本化 profile 管理；受訪員工不在訪談介面直接操作 `temperature`、reasoning effort、token limit 或 routing 等原始旋鈕。** 第一版可以由設定檔或維護者設定面承接，尚不要求獨立管理 UI。即使維護者與受訪員工在本機上可能是同一個人，產品責任仍分開：前者配置執行環境，後者提供工作事實並決定 JD 內容。
 
-framework-neutral 控制面包含三項不同責任：
+framework-neutral 控制面必須先分開四項責任，避免把「這輪要做什麼」誤寫成「這輪要換哪個模型」：
 
-1. **Versioned profile definition**：保存人可讀名稱、用途、requested provider／model、能力需求、品質／延遲／成本意圖、context／output budget、允許的 routing／fallback 與 provider-specific 選項；修改產生新 revision，不回寫舊 run 的設定歷史。API key 只保存 secret reference，不進 profile 內容、trace 或 prompt。
-2. **Resolved profile snapshot**：每個 operation／run 開始前，由 adapter 依 profile revision 與當時模型能力解析成 immutable snapshot，至少記錄 requested provider／model、可在送出前確定的 resolved model ID／provider allow-list、實際送出的有效參數、能力檢查、budget、route policy 與 adapter version。動態 gateway 最後選到的 endpoint 留給 attempt receipt 記錄；LLM 不得自行改模型、提高預算或放寬 fallback。
-3. **Run／attempt receipt**：回應後保存 provider 回報的實際 model／endpoint（若供應商提供）、attempt chain、usage、成本、latency、cache／state 使用情況、停止原因與錯誤。這是重播、歸因與日後比較的執行證據，不是 Work Model 或 Current JD。
+1. **Versioned consultant model profile**：保存人可讀名稱、requested provider／model、模型能力需求、品質／延遲／成本意圖、共同模型參數預設、允許的 routing／fallback 與 provider-specific 選項；修改產生新 revision，不回寫舊 run 的設定歷史。API key 只保存 secret reference，不進 profile 內容、trace 或 prompt。
+2. **Versioned operation execution policy**：依 operation 保存允許的 Skills／tools、typed input／output contract、context／output／model-call／tool／時間／成本上限、retry 與停止規則。不同 operation 可以有不同 policy，但這只改變工作範圍與執行預算，**不等於不同模型**。
+3. **Resolved execution snapshot**：每個 model-bearing run 開始前，由 application／adapter 合併 model profile revision、operation policy revision 與當時模型能力，解析成 immutable snapshot；至少記錄 requested provider／model、可在送出前確定的 resolved model ID／provider allow-list、實際送出的有效參數、能力檢查、budget、route policy 與 adapter version。動態 gateway 最後選到的 endpoint 留給 attempt receipt 記錄；LLM 不得自行改模型、提高預算或放寬 fallback。
+4. **Run／attempt receipt**：回應後保存 provider 回報的實際 model／endpoint（若供應商提供）、attempt chain、usage、成本、latency、cache／state 使用情況、停止原因與錯誤。這是重播、歸因與日後比較的執行證據，不是 Work Model 或 Current JD。
+
+第一版的模型粒度收斂為：**整個生成式職務分析顧問只有一個 active consultant model profile。** 一個員工回合即使因補查而有多次 inference，或載入不同 Skill／tool，仍沿用該 run 開始時解析出的同一份 model profile snapshot。這裡的「一個」不是說整個 monorepo 只能出現一種 AI 模型；embedding、reranker、OCR 等非顧問型技術模型可以有各自的版本化設定，但不得被包裝成另一位職務分析顧問或取得產品 authority。
+
+| 產品能力 | 第一版模型邊界 |
+|---|---|
+| 主要顧問、工具結果回來後的再整合 | 使用同一個 active consultant model profile |
+| Task／Duty／O／P／K／S Skills | 是方法與 context 的 progressive-disclosure 邊界；不擁有 model profile，也不因載入而另開模型呼叫 |
+| structured semantic result | 是 output contract，不是模型角色；無論最後由一次或受限多次呼叫形成，都使用同一個顧問 profile，schema／verifier 也不是另一個「結構化分析模型」 |
+| iCAP Reference | 檢索是 read-only tool／RAG pipeline；需要語意挑戰或整合時仍由同一位主要顧問判斷 |
+| embedding／reranker | 是 Reference pipeline 的技術模型，可獨立版本化；不等於可見顧問或分析 authority |
+| 未來 bounded specialist | 只有實際建立獨立 model call 與 typed contract 時才算呼叫邊界；預設仍繼承全域顧問 profile，第一版不配置 per-specialist model override |
+
+框架即使提供 dynamic model selection，也只代表**可以實作**，不代表產品應啟用。未來若要讓某個 model-bearing operation override 全域 profile，至少要同時滿足：它具有獨立 input／output／evidence／success criteria；所需 modality／capability 無法由全域模型提供，或成品後代表性評測證明替換能在品質不退步下改善成本／延遲；路由由 application 的版本化政策決定並留下 receipt，而不是由 Skill、LLM 或 gateway 自由挑選。未達這些條件時，只調整 Skill、tool、schema 或 execution policy，不拆模型。
 
 生效與失敗規則如下：
 
-- profile 變更只影響之後新建立的 operation；已開始的 run 與可安全恢復的 attempt 沿用原 resolved snapshot，不在中途偷偷換模型；
+- model profile 或 operation policy 變更只影響之後新建立的 run；已開始的 run 與可安全恢復的 attempt 沿用原 resolved snapshot，不在中途偷偷換模型或預算；
 - 若原模型已退役或原能力無法再取得，不假裝精確 resume：保留舊 artifact，建立帶新 snapshot 的新 attempt，重新檢查 authority generation／read-set，並讓 route change 可追溯；
-- 不建立一組假裝跨廠商完全等價的 raw parameter bag。profile 表達共同意圖與能力要求，各 adapter 顯式映射；不支援的參數在啟動／解析時拒絕或明確省略並留下原因，不可靜默接受後假裝已生效；
+- 不建立一組假裝跨廠商完全等價的 raw parameter bag。consultant model profile 表達共同意圖與能力要求，各 adapter 顯式映射；不支援的參數在啟動／解析時拒絕或明確省略並留下原因，不可靜默接受後假裝已生效；
 - 第一版不允許 gateway alias、動態 router 或 provider fallback 在沒有 receipt 的情況下改變實際模型。若使用可漂移 alias，必須同時保存 requested alias 與 provider 可回報的實際 model ID；production 預設優先使用供應商建議的固定／stable ID；
 - 員工可以看到目前使用的 profile／模型名稱與必要揭露，但不需要理解廠商特有參數。未來若提供「較快／平衡／品質優先」等核准 preset，仍由維護者把 preset 映射到版本化 profile，而不是把原始旋鈕放進每回合訪談。
 
-這些規則有明確的一手資料背景：[OpenAI Model guidance](https://developers.openai.com/api/docs/guides/latest-model) 要求依 workload 明確選模型與 reasoning effort，並以代表性工作比較品質、延遲與成本；[Anthropic model versioning](https://platform.claude.com/docs/en/about-claude/models/model-ids-and-versions) 區分 pinned model ID 與會指向較新 snapshot 的舊式 alias，其 [Messages API](https://platform.claude.com/docs/en/api/typescript/messages/create) 也顯示新模型可能不再接受 `temperature`／`top_p`；[Gemini Models](https://ai.google.dev/gemini-api/docs/models) 明確建議 production 使用 specific stable model，而 `latest` alias 會隨版本熱切換；[OpenRouter routing](https://openrouter.ai/docs/guides/routing/provider-selection) 則顯示 provider order、fallback 與參數支援都需要顯式控制。這些來源支持「版本化、能力感知、實際路由可追溯」，但**不會替 Caliburn 決定誰有設定權**；維護者／員工分工與不暴露 raw knobs 是本產品裁決。
+這些規則有明確的一手資料背景：[OpenAI Model guidance](https://developers.openai.com/api/docs/guides/latest-model) 要求依 workload 明確選模型與 reasoning effort，以代表性工作比較品質、延遲與成本，並指出「有多個呼叫」本身不足以證明需要另一種工具編排路徑；其 [Skills 文件](https://developers.openai.com/api/docs/guides/tools-skills) 直接示範在一個指定 model 的 Responses request 掛載多個 Skills。[Anthropic Agent Skills](https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills) 把 Skills 定義為同一個 general-purpose agent 按需載入的可組合知識；[Google ADK Skills](https://developers.googleblog.com/en/developers-guide-to-building-adk-agents-with-skills/) 也以一個設定單一 model 的 root agent 掛載整組 SkillToolset。[LangChain Agents](https://docs.langchain.com/oss/python/langchain/agents) 把 model、tools 與 structured output 列為同一 agent 的不同元件，而 [dynamic model selection](https://docs.langchain.com/oss/python/langchain/middleware/custom#dynamic-model-selection) 是可選 middleware；[Microsoft Agent Framework](https://learn.microsoft.com/en-us/agent-framework/overview/) 則明示單次 LLM call（可含 tools）足夠時使用 agent，只有多個 agent／function 必須協調時才需要 workflow。
 
-本節仍不選定預設模型、profile 數量、確切參數值、價格門檻或設定 UI。這些要在 operation 分流策略與 framework capability matrix 收斂後配置；品質／成本最佳值仍依既定決定，等可用成品完成後再用代表性長訪談 eval 調整。
+另一組來源處理版本與路由追溯：[Anthropic model versioning](https://platform.claude.com/docs/en/about-claude/models/model-ids-and-versions) 區分 pinned model ID 與會指向較新 snapshot 的舊式 alias，其 [Messages API](https://platform.claude.com/docs/en/api/typescript/messages/create) 也顯示新模型可能不再接受 `temperature`／`top_p`；[Gemini Models](https://ai.google.dev/gemini-api/docs/models) 明確建議 production 使用 specific stable model，而 `latest` alias 會隨版本熱切換；[OpenRouter routing](https://openrouter.ai/docs/guides/routing/provider-selection) 則顯示 provider order、fallback 與參數支援都需要顯式控制。
+
+可轉移限制：上述資料證明「同一模型可組合 Skills／tools／structured output」「動態換模型只是可選能力」以及「實際路由要可追溯」，**沒有公開 benchmark 證明單一模型或多模型對繁中職務訪談何者效果最佳**。因此第一版單一顧問 profile 是依本產品「一位顧問、按需 Skills、避免過早增加路由與失敗面」做出的保守裁決，不冒充外部研究結論。
+
+本節仍不選定預設模型 ID、確切參數值、價格門檻或設定 UI；但第一版 profile 數量已定為**一個 active consultant model profile**，不再等待 operation 分流策略決定。品質／成本最佳值仍依既定決定，等可用成品完成後再用代表性長訪談 eval 調整。
 
 ## 8. 已識別的流程風險與優化方向
 
@@ -1350,7 +1368,7 @@ framework-neutral 控制面包含三項不同責任：
 7. 可替換 model／provider、參數 profile、usage、trace 與失敗恢復；
 8. 支援上述流程的 API／Web 體驗。
 
-切換邊界已於 2026-08-13 收斂：iCAP Reference／RAG 是 final gate，worktree 內先做核心顧問、後接 RAG，完成後一次切換；目前也沒有需保留的真實 JD／訪談資料，因此採 fresh-schema hard cut，不做舊 AI 狀態 migration。跨 Task／Duty／OPKS 的 Proposal 粒度已確認為「可編輯 review bundle＋必要原子子群組」；「可演化工作假說」已於 §7.2.1 收斂；模型／provider／參數的維護者控制權、版本化 profile、run snapshot 與 route receipt 亦已於 §7.20 收斂。下一個產品語意問題是第一版採單一全域 active profile，或依 operation 類型選用不同 profile。
+切換邊界已於 2026-08-13 收斂：iCAP Reference／RAG 是 final gate，worktree 內先做核心顧問、後接 RAG，完成後一次切換；目前也沒有需保留的真實 JD／訪談資料，因此採 fresh-schema hard cut，不做舊 AI 狀態 migration。跨 Task／Duty／OPKS 的 Proposal 粒度已確認為「可編輯 review bundle＋必要原子子群組」；「可演化工作假說」已於 §7.2.1 收斂；模型／provider／參數的維護者控制權、版本化 profile、run snapshot 與 route receipt 亦已於 §7.20 收斂，第一版採單一 active consultant model profile，operation 只配置 execution policy。下一步回到 framework capability matrix，不能再以 Skill、structured output 或 Reference 的名稱預先切出多模型拓撲。
 
 能力地圖確認後，再逐列建立「目標能力／現況／框架候選／`Replace|Wrap|Retain`／仍需自寫語意／successor ADR／驗收情境」矩陣，回答哪些成熟元件能真正取代現有實作。LangGraph／LangChain、OpenAI Agents SDK、Microsoft Agent Framework、Google ADK、Agent Skills、Pydantic＋SQLAlchemy＋PostgreSQL、W3C anchor／provenance 等目前都只是候選或標準；任何框架都不得以舊 module 拓撲作為新設計目標，也不得在 conformance 前取得產品 authority。研究稿仍不能直接當施工授權。
 
@@ -1433,6 +1451,8 @@ Stakeholder 草稿（非權威，只作需求來源）：
 - [LangGraph — Time travel](https://docs.langchain.com/oss/python/langgraph/use-time-travel)
 - [LangGraph frontend — Human-in-the-loop](https://docs.langchain.com/oss/python/langchain/frontend/human-in-the-loop)
 - [LangChain — Context engineering in agents](https://docs.langchain.com/oss/python/langchain/context-engineering)
+- [LangChain — Agents（model、tools、structured output 的組合邊界）](https://docs.langchain.com/oss/python/langchain/agents)
+- [LangChain — Custom middleware（dynamic model selection 是可選 middleware）](https://docs.langchain.com/oss/python/langchain/middleware/custom#dynamic-model-selection)
 - [LangChain — Prebuilt middleware（model／tool call limits、retry、HITL）](https://docs.langchain.com/oss/python/langchain/middleware/built-in)
 - [LangChain — Short-term memory](https://docs.langchain.com/oss/python/langchain/short-term-memory)
 - [LangChain — Memory overview](https://docs.langchain.com/oss/python/concepts/memory)

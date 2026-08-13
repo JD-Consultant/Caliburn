@@ -974,6 +974,33 @@ application／framework 應自行產生並保存 operation ID、event ID、時�
 
 這項裁決仍是 framework-neutral。LangGraph、OpenAI Agents SDK、Google ADK 或 Microsoft Agent Framework 可以承接 loop、checkpoint、pause／resume、typed tool 與 tracing plumbing；薄型自有 orchestration 也可以。後續 conformance spike 應比較誰能忠實承接上述 `application run` contract，而不是讓框架重新定義員工回合、記憶權威或 Current JD commit seam。
 
+#### 7.16.2 迭代與補查 budget：沒有通用最佳次數（2026-08-13 研究結論）
+
+進一步查核截至 2026-08-13 的官方實作後，不能把「最多補查兩波」宣稱成大廠標準或研究證明的最佳值。OpenAI 最新 guidance 要求依 bounded stage 明定 concurrency、retry、stopping limits 與 required evidence，但不給通用次數；Anthropic Tool Runner 提供 `max_iterations`，範例使用 10，官方同時允許 application 隨時 `break`；Microsoft Agent Framework 的 loop 預設上限也是 10，但明確警告 completion predicate 可能失敗、模型可能停滯、evaluator 也具有機率性，因此 autonomous loop 永遠要有上限，而且該 looping 功能仍標為 experimental；LangChain 則把 model-call 與 tool-call limit 拆成 run／thread／per-tool middleware。這些「10」是 runtime 安全預設或文件範例，不是互相獨立的職務訪談品質證據，不能直接複製成產品規則。
+
+Google 2026 年 ADK 2.0 的方向更接近本產品：已知 routing、固定 business rule、錯誤與 HITL 用 deterministic workflow；只有模糊自然語言與動態判斷交給 LLM。其官方示例把 LLM node 設成 single-turn，並指出讓模型反覆執行可預知流程會增加 tokens、latency、prompt noise、重複工具與脫軌風險。OpenAI 也建議能由 bounded code 完成的 filtering／ranking／dedup／aggregation 由程式處理，語意判斷、approval 與最終驗證保留直接 model turn。共同趨勢不是「更長的自由 Agent loop」，而是 **hybrid agentic workflow：程式控制邊界與完成條件，模型只處理不可預先寫死的認知工作。**
+
+因此 Caliburn 應把 budget 拆開，不使用單一 `max_steps` 混算所有事情：
+
+- **model inference budget**：限制主要顧問與必要 specialist 的模型回合；
+- **lookup-wave budget**：一次模型判斷可以提出多個彼此獨立的唯讀 request，由 application 安全批次／平行執行；一波不是一個 tool call；
+- **per-tool／total tool budget**：限制高成本 Reference、semantic search 或大型來源讀取，直接 relational lookup 可有不同上限；
+- **technical retry budget**：網路／rate-limit／schema 等可重試失敗與語意探索分開計數，但仍累計 elapsed time、tokens 與成本；
+- **no-progress budget**：重複 request fingerprint、相同結果 hash、沒有新 source／revision，或 sufficiency reason 沒有可解釋變化時提早停止；
+- **human-interrupt boundary**：只有員工能回答、需要員工判斷或涉及 authority 時立即退出自動 loop，不消耗剩餘額度硬猜。
+
+第一版可採下列**候選執行 profile**，作為 conformance／人工 smoke 的保守起點，而不是不可變 domain policy：
+
+1. 正常快速路徑：一次主要顧問 inference，能提交合格 typed result 就結束。
+2. 補查路徑：第一個 inference 可提出一批 scope 明確的唯讀查詢；工具結果回來後由同一主要顧問整合。
+3. 只有第一批結果揭露新的穩定 ID、source receipt、矛盾或先前不可知的明確指標，而且確實對 unresolved reason code 有預期貢獻時，才允許第二波。
+4. 互動式正常回合的起始 hard ceiling 可設為 **三次 model inference（初始＋兩次結果整合）與兩波 lookup**；數值放在可替換 operation／model profile，不寫進 Task／Duty／OPKS domain invariant。一次 wave 可批次多個獨立 read-only request，因此不以「兩波」誤限成只能查兩筆資料。
+5. 到達上限、重複查詢或沒有新資訊時，不啟動額外 evaluator／judge loop；輸出 `EMPLOYEE_CLARIFICATION_REQUIRED`、`DEFER_WITH_VISIBLE_GAP` 或 structured processing limit。不能安全形成語意結果時不更新 Work Model。
+
+這個 profile 選擇三次 inference／兩波 lookup，不是因為外部 benchmark 證明它最佳，而是它完整容納「初始判斷 → 一般補查 → 新指標例外補查 → 最終整合」，同時比 SDK 常見的 10-turn 通用上限更符合即時員工訪談的延遲、成本與可理解性。未來若某個 operation（例如獨立 Reference coverage audit）確實需要更深探索，應建立另一個有自己 success criteria 與 budget 的 operation profile，不默默放寬所有員工回合。
+
+這也收斂框架需求：候選 runtime 至少要能分別限制 model／tool calls、攔截重複或錯誤工具、批次安全的唯讀查詢、在 limit／HITL 時保存可恢復 state，並輸出完整 trace／usage。框架若只提供一個總迴圈次數，仍需由 Caliburn harness 補上 operation、authority、progress 與成本政策。
+
 ### 7.17 理解校準／可編輯假說的框架調查（2026-08-12）
 
 主流框架沒有一個現成功能叫做「專業職務分析的目前理解」，但已共同提供組成它的通用元件：顯式 state、可序列化的人工輸入請求、pause／resume、事件或 checkpoint 歷史，以及把人工回覆送回原流程。這證明 Caliburn 不必自行重寫整套 durable HITL runtime；同時也證明不能把框架的 approval 直接等同於員工核准 JD。
@@ -1191,6 +1218,7 @@ Stakeholder 草稿（非權威，只作需求來源）：
 - [LangGraph — Time travel](https://docs.langchain.com/oss/python/langgraph/use-time-travel)
 - [LangGraph frontend — Human-in-the-loop](https://docs.langchain.com/oss/python/langchain/frontend/human-in-the-loop)
 - [LangChain — Context engineering in agents](https://docs.langchain.com/oss/python/langchain/context-engineering)
+- [LangChain — Prebuilt middleware（model／tool call limits、retry、HITL）](https://docs.langchain.com/oss/python/langchain/middleware/built-in)
 - [LangChain — Short-term memory](https://docs.langchain.com/oss/python/langchain/short-term-memory)
 - [LangChain — Memory overview](https://docs.langchain.com/oss/python/concepts/memory)
 - [PydanticAI — Deferred tools and human-in-the-loop approval](https://pydantic.dev/docs/ai/tools-toolsets/deferred-tools/)
@@ -1198,6 +1226,8 @@ Stakeholder 草稿（非權威，只作需求來源）：
 - [OpenRouter — Provider routing and data-policy controls](https://openrouter.ai/docs/guides/routing/provider-selection)
 - [OpenRouter — Input & Output Logging](https://openrouter.ai/docs/guides/features/input-output-logging)
 - [Microsoft — Agent Framework overview](https://learn.microsoft.com/en-us/agent-framework/overview/)
+- [Microsoft — Agent Framework Harness](https://learn.microsoft.com/en-us/agent-framework/concepts/harness)
+- [Microsoft — Agent looping（completion condition、bounded iteration、approval escape）](https://learn.microsoft.com/en-us/agent-framework/agents/looping)
 - [Microsoft — Agent Framework workflows human-in-the-loop](https://learn.microsoft.com/en-us/agent-framework/workflows/human-in-the-loop)
 - [Microsoft — Agent Framework AG-UI integration](https://learn.microsoft.com/en-us/agent-framework/integrations/by-component/ui/ag-ui/)
 - [Microsoft Research — From Local to Global: A Graph RAG Approach](https://www.microsoft.com/en-us/research/publication/from-local-to-global-a-graph-rag-approach-to-query-focused-summarization/)

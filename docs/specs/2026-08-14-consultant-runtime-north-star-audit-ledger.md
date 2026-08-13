@@ -1,7 +1,7 @@
 # AI 職務顧問 runtime：北極星審核與逐 Task 防偏帳本
 
 - 日期：2026-08-14
-- 狀態：Pre-implementation audit **Passed**；Tasks 1–2 **Passed**
+- 狀態：Pre-implementation audit **Passed**；Tasks 1–3 **Passed**
 - 決策：ADR 0060 Accepted
 - 施工計畫：[`2026-08-13-langgraph-consultant-runtime-big-bang-plan.md`](../plans/2026-08-13-langgraph-consultant-runtime-big-bang-plan.md)
 - 產品 SSOT：[`2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md`](2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md) §1–§8、§9.12–§9.13
@@ -159,6 +159,18 @@ Big-bang 只描述最終切換，不表示做到最後才審核。之後每完�
 - 尚未誤稱已完成：`interview_work`、`understanding`、`gaps`、`review_queue` 與 run receipt 目前只是 durable channel/schema foundation，尚無模型或員工面功能；Task 3–6 必須各自把 context、Skills、routing、typed patch action／read-set／review command 做完。當前 generic changeset action payload 不可接 production，Task 6 的 typed contract gate 仍有效。
 - TDD／驗證：最初以缺少 `app.adapters.langgraph` 呈現預期紅燈；複審又分別以缺少 evidence error、catalog `updated_at` 不變、原話／quote 被 trim 呈現紅燈。修正後 focused foundation／PostgreSQL suite 為 `17 passed`；含 migration cycle 的完整 API 為 `849 passed`。全新空 DB 由 Alembic 升到 0018，再由官方 Saver／Store `.setup()` 建 framework tables；catalog 有預期 PK／unique／check constraints 與 updated index。測試後專用 DB 的 catalog、consultant Store rows 與 checkpoints 均為 0；一次性 fresh DB 已刪除。
 - 北極星回歸：沒有模型呼叫、RAG／Reference、Skill、能力級別／A 生成、pause／finish、品質 eval、舊 writer bridge、雙寫或第二 authority。員工原話與核准文件仍是不同 owner；direct edit 是員工 authority，不經 LLM review。結果 **Pass**。
+
+### Task 3：可替換模型執行與最小充分 Context
+
+- 狀態：**Pass**；同一 task commit 為 `feat: add consultant model and context runtime`。
+- 員工效果：本 Task 尚未開放 production 對話，但已建立之後每次訪談都會共用的安全底座：維護者可用 versioned profile 換 model／provider／參數；每個實際 provider attempt 都有 route／usage／cost／latency／error receipt；模型每次只取得整份工作方向、當前焦點、必要澄清、具體 Gap、待審 handles 與本輪所需原話，不把全部歷史 transcript 反覆送出。
+- 成熟 primitive：`ChatOpenRouter` 承接 wire；LangChain `create_agent`／`response_format` 承接 agent loop 與 structured output；`ModelCallLimitMiddleware`、`ToolCallLimitMiddleware`、`ModelRetryMiddleware`、`ToolRetryMiddleware`、`SummarizationMiddleware`、`ContextEditingMiddleware` 承接通用控制；LangChain callback＋既有 OpenTelemetry 承接 attempt observability；LangGraph Store／Saver 是 Context 唯一來源。沒有重寫 provider client、通用 retry loop、摘要器、tool-result compactor 或第二份 memory／Context store。
+- Caliburn 薄政策：只保留框架不知道的單一 route／no-silent-fallback、可重試錯誤集合、run budget、來源 current／superseded 規則、required evidence、焦點核准 slice、necessary clarification、global orientation、同文件 lookup scope、明確降級順序與 payload-free selection receipt。
+- 複審抓到並修正：原版把非權威 dialogue summary 一律丟掉、完全漏掉 required clarification、tool loop 第二次推論會把員工回答追加到 ToolMessage 後、LangChain 摘要可能移除 tagged source 而讓下一次推論失敗、每次模型 callback 會洩漏一個未結束 span、原始 provider exception 可能把員工內容帶進 telemetry、successful receipt 可缺 route／usage／cost、agent 可傳入 policy 外工具、把歷史中所有有效更正全文與所有 source ID 每輪載入，以及 `SummarizationMiddleware` 會暗中建立自己的三次 retry chain。現在 summary 在有預算時保留但明標非證據；necessary clarification 必帶；checkpoint 只留 source-ID placeholder，逐字本輪來源每次由 Store 重建；每個 primary／summarization／retry actual call 各一張 receipt／一個 span；錯誤只存安全分類；tool／metadata eligibility fail closed；框架的獨立摘要 retry 關閉；只有本輪＋required evidence 必帶，近期候選依預算加入，舊來源由同文件 search 按需找回。
+- Context 成本／記憶邊界：完整員工原話與 correction lineage 永久留在 `AsyncPostgresStore`；`ContextSelectionReceipt` 不含文字。無關更正的全文與 ID 都不再每輪傳給模型，但仍可由同文件 lexical search 找到，再按 stable ID／lineage 取回。沒有配置 semantic index、外部 corpus、iCAP Reference 或 ADR 0057 RAG consumer。
+- TDD／驗證：新增缺口都先以失敗測試重現；最終 model＋Context focused suite `17 passed`，其中涵蓋實際 LangChain retry 產生兩張 attempt receipt、摘要＋主推論各自有 receipt 且摘要無 hidden retry、OpenRouter route／cost round-trip、policy 外 tool 拒絕、payload-free provider error、摘要後重建逐字來源、必要澄清、summary 權限、tool-loop 訊息順序、無關更正不入 prompt 與 context 降級。最終含 PostgreSQL 的完整 API suite `866 passed`；沒有執行真實 LLM，也沒有宣稱模型品質。
+- 舊機制狀態：本 Task 新 runtime 沒有呼叫舊 OpenRouter wire、舊 ContextPacket、舊 operation／Proposal writer 或 RAG；production composition 尚未切換，故舊模組會到 Task 9 hard cut 才刪除，不雙寫。
+- 北極星回歸：單一顧問、自然停止／續談、LLM 文件內容先審核、能力級別／A 暫不生成、RAG 延後、正式 eval 延後、員工原話／核准文件權威與可強制匯出方向均未改。結果 **Pass**。
 
 ## 8. 本次直接使用的一手來源
 

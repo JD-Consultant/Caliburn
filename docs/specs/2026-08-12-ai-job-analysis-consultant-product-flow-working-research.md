@@ -464,7 +464,7 @@ Work Model 是 AI 隨證據持續修正的分析層；員工不需要逐筆審�
 
 員工修正後，介面要立即回報「已更新什麼、哪些後續分析會重算、Current JD 是否仍未改變」，並同步刷新側欄。這是對修正效果的可見回饋，不是揭露模型 chain-of-thought；解釋只提供來源、重要推論與影響。所有 action payload 都視為不可信輸入，由 server 依 document、revision、generation／read-set 與 domain invariant 驗證。
 
-#### 3.7.4 更正後的影響傳播範圍（研究候選；owner 待確認）
+#### 3.7.4 更正後的影響傳播範圍（2026-08-13 owner 已確認）
 
 **問題**：既有裁決已決定最新有效員工更正優先、舊來源保留、Work Model 可修正而 Current JD 未核准前不變；但尚未明確選擇一則更正如何傳播。只改眼前欄位可能留下依賴舊說法的 Duty／OPKS／Proposal；每次整份文件重算則浪費成本，還可能讓無關且已確認的內容無故漂移。
 
@@ -478,15 +478,15 @@ Work Model 是 AI 隨證據持續修正的分析層；員工不需要逐筆審�
 
 **可轉移限制**：OpenAI Cookbook 是 travel concierge 的實作示例，不是 API 保證或職務分析研究；Microsoft 多輪研究使用模擬對話與生成任務，沒有比較本產品三種重算策略；HAX 是通用 UX；PROV-O 只定義 provenance 語彙；OPM 主要面向正式甄選職務分析。以下方案 3 是把共同原則套入 Caliburn 穩定 ID、evidence linkage、Work Model／Current JD 分離與 Proposal authority 後的產品設計，不得宣稱已由外部 benchmark 證明成本或品質最佳。
 
-**候選方案**：
+**研究選項與裁決**：
 
 1. **只修員工指出的欄位**：最快，但可能保留依賴舊責任邊界的 Task、Duty、OPKS、gap、agenda 或 pending Proposal；不採用。
 2. **每次更正都重建整份 Work Model**：最不容易漏掉遠端影響，但成本、延遲與無關內容漂移最高，也會讓員工難以理解為何一個小修正改動整份文件；不建議作預設。
-3. **來源錨定＋依賴導向失效／重算（目前建議）**：更正先成為新的 durable employee source，明示 `supersedes／rebuts／qualifies` 哪項舊來源或理解；application 依 evidence／derivation／stable ID／read-set 找出受影響的 Work Model hypothesis、Task／Duty／OPKS linkage、gap、agenda 與 pending Proposal，先標示 stale／challenged，再只對受影響範圍做 deterministic 對帳與必要語意重分析。無關且依據未變的內容保持原 revision。若重大更正的影響無法安全界定，才升級成較廣的 scope／document reconciliation，不能假裝局部修補已完整。
+3. **來源錨定＋依賴導向失效／重算（採用）**：更正先成為新的 durable employee source，明示 `supersedes／rebuts／qualifies` 哪項舊來源或理解；application 依 evidence／derivation／stable ID／read-set 找出受影響的 Work Model hypothesis、Task／Duty／OPKS linkage、gap、agenda 與 pending Proposal，先標示 stale／challenged，再只對受影響範圍做 deterministic 對帳與必要語意重分析。無關且依據未變的內容保持原 revision。若重大更正的影響無法安全界定，才升級成較廣的 scope／document reconciliation，不能假裝局部修補已完整。
 
 方案 3 仍不讓更正直接改 Current JD：若正式內容受影響，產生可編輯 Proposal／撤回既有 Proposal，交員工決定。介面先立即確認更正已保存，再顯示「目前理解改了什麼、哪些工作範圍正在重新檢查、哪些未受影響、Current JD 是否仍未改變」；branch-blocking 只作用於依賴舊前提的分析，不封鎖整份文件。
 
-**待 owner 裁決**：是否採方案 3；具體 dependency graph、失效 reason code、reconciliation operation 與框架映射留到能力地圖／目標架構關卡。
+**產品裁決**：owner 於 2026-08-13 確認採方案 3。這裡確認的是產品語意與員工體驗；具體 dependency graph、失效 reason code、reconciliation operation 與框架映射留到能力地圖／目標架構關卡，不在產品流程層預先綁定實作。
 
 ### 3.8 O／P／K／S 按需漸進分析
 
@@ -565,7 +565,7 @@ Work Model 是 AI 隨證據持續修正的分析層；員工不需要逐筆審�
 
 1. **先知道怎麼進行，再建立工作地圖。** AI 先用 3–4 句白話說明會大致盤點工作、一次深入一個焦點、保存旁支線索、隨證據調整 Task／Duty／OPKS，且正式修改都由員工決定；不要求核准固定訪談計畫。接著請員工用自己的話說明一個月內主要工作，不要求 JD 用語。員工提到請購下單、供應商交期、缺料協調與偶爾整理庫存報表後，AI 顯示「目前已知四個工作範圍」，並說明先深入請購到下單的原因。
 2. **專注但不漏線索。** 員工在下單故事中順帶提到新供應商評估與替代料；AI 把兩者顯示為稍後處理線索，仍用一個主要問題釐清下單責任，不立即換題。
-3. **先理解，後提案。** AI 經數輪釐清主管核准邊界、採購單內容與供應商回覆，準備切換焦點前先用校準卡說明目前理解；員工可直接修正「交期只是追蹤，不是我決定」。修正先更新來源與 Work Model，證據足夠後才提出 Task、Output 與 Indicator 候選；第一句補充不會立即跳正式核准卡。
+3. **先理解，後提案；更正只重查受影響範圍。** AI 經數輪釐清主管核准邊界、採購單內容與供應商回覆，準備切換焦點前先用校準卡說明目前理解；員工可直接把「我決定供應商交期」修正為「我追蹤並提出建議，主管才決定」。系統保存新原話與取代關係，只重查依賴這項責任邊界的 Task、Duty、OPKS、gap、agenda 與 pending Proposal，並說明哪些無關內容維持不變；Current JD 未經接受仍不改。第一句補充不會立即跳正式核准卡。
 4. **員工保留 authority。** 員工指出「不是每次都要比價」，AI 修正 Task 後再讓員工接受。若目前只有一個 Task，可以先不建立 Duty。
 5. **重大責任先澄清。** 訪談缺料處理時，員工說「決定哪些工單先拿到料」。因這可能改變正式權責，AI 暫停原焦點，確認員工只是提出建議、最後由生產主管決定，再回到原返回點。
 6. **結構隨證據演化。** 當已有下單、缺料協調、供應商績效三項 Task，AI 可提出兩個 Duty 與 Task reassignment 的結構變更組；員工能修改 Duty 名稱。可獨立成立的 K／S 候選仍可逐項決定，不因接受 Duty 就被迫全收。

@@ -5,6 +5,7 @@
     "test": "uv run pytest -q",
     "dev": "uv run python run_live.py",
     "migrate": "uv run alembic upgrade head",
+    "consultant-storage:setup": "uv run python -m scripts.setup_consultant_storage",
     "build": "echo \"no build\""
   }
 }

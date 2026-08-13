@@ -5,6 +5,7 @@
 ## 現行設計
 
 - [`task-analysis-engine.md`](task-analysis-engine.md) — API `app/core`、`app/documents`、`app/task_analysis`、`app/opks`、`app/consultation`、`app/export`、adapters(`app/adapters/{postgres,openrouter,xlsx}`)、`/api/v1/job-analysis` 與 Web `/workspace` 的 durable vertical；它是唯一 active design。
+- [`consultant-runtime.md`](consultant-runtime.md) — ADR 0060 的 LangChain／LangGraph Big-bang target；migration branch 建構中，切換前不接 production composition root。
 
 ## 歷史設計
 

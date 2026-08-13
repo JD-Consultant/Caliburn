@@ -1,7 +1,7 @@
 # AI 職務顧問 runtime：北極星審核與逐 Task 防偏帳本
 
 - 日期：2026-08-14
-- 狀態：Pre-implementation audit **Passed**；Task 1 **Passed**
+- 狀態：Pre-implementation audit **Passed**；Tasks 1–2 **Passed**
 - 決策：ADR 0060 Accepted
 - 施工計畫：[`2026-08-13-langgraph-consultant-runtime-big-bang-plan.md`](../plans/2026-08-13-langgraph-consultant-runtime-big-bang-plan.md)
 - 產品 SSOT：[`2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md`](2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md) §1–§8、§9.12–§9.13
@@ -147,6 +147,18 @@ Big-bang 只描述最終切換，不表示做到最後才審核。之後每完�
 - 既有機制：尚未接入 production composition root，也尚未刪除舊 writer；這符合 Task 1 僅建底座的界線，Task 2 才建立唯一 durable state owner。
 - TDD／驗證：舊 FastAPI 先如預期因 `ModuleNotFoundError: fastapi.sse` 失敗；升級後 Task 1 canary `5 passed`，加 wiring regression 為 `8 passed`；無 DB 全套 `728 passed, 104 skipped`；新建並 migration 專用 `caliburn_consultant_runtime_test` 後，含 PostgreSQL 全套 `832 passed`；`git diff --check` clean。鎖檔與 runtime metadata 均精確回報核准版本。
 - 北極星回歸：沒有 RAG／Reference、能力級別／A model generation、品質 eval、pause／finish、silent fallback、第二個 workflow owner 或 AI 直寫核准文件；自然續談與 authority 行為未更動。結果 **Pass**。
+
+### Task 2：framework-owned durable source 與文件狀態
+
+- 狀態：**Pass**；同一 task commit 為 `feat: establish durable consultant state`。
+- 員工效果：本 Task 尚未切 production route／Web，因此沒有假裝已交付完整訪談 UI；它先保證日後員工送出的原話、更正與 direct edit 可在 process 重啟後精確恢復，模型失敗不必要求重打，且核准文件只有 authority graph command 能改。
+- 成熟 primitive：LangGraph `StateGraph`＋`AsyncPostgresSaver` 直接持有唯一 semantic checkpoint；`AsyncPostgresStore` 直接持有完整 employee source；Pydantic 驗 durable schema；Alembic 管最小 catalog schema。沒有另寫 checkpoint engine、event store、第二份 artifact table、ORM mirror 或舊 writer adapter。
+- Caliburn 薄政策：只補 framework 不知道的 employee-only source kind、exact-text hash、修正 supersession、quote／position anchor、同文件 evidence lookup、document invariant、stable UUID namespace、semantic revision、單 process admission、Store→checkpoint→committed crash reconciliation、direct-edit 員工文字欄位白名單與 tombstone／namespace cleanup。
+- 詳細複審修正：原先 generic direct-edit diff 會把 UUID／enum 誤存成員工原話，已改成只擷取允許的員工文字欄位；employee turn／quote 不再 trim；未知或跨文件 OPKS evidence ID 在寫 source 前拒絕；catalog 改用 Alembic `create_table`／具名 constraint／index，且 semantic revision 會更新 `updated_at`。這些都是來源權威修正，不是新增舊元件。
+- 框架邊界：production foundation 直接 import LangGraph graph／Saver／Store，AST guard 證明沒有 import 舊 `core`／`documents`／`task_analysis`／`opks`／`consultation` writers、舊 OpenRouter adapter或任何 RAG package；target state channel 也沒有舊 Work Model／Focus／Progress／Proposal／Current JD 名稱。
+- 尚未誤稱已完成：`interview_work`、`understanding`、`gaps`、`review_queue` 與 run receipt 目前只是 durable channel/schema foundation，尚無模型或員工面功能；Task 3–6 必須各自把 context、Skills、routing、typed patch action／read-set／review command 做完。當前 generic changeset action payload 不可接 production，Task 6 的 typed contract gate 仍有效。
+- TDD／驗證：最初以缺少 `app.adapters.langgraph` 呈現預期紅燈；複審又分別以缺少 evidence error、catalog `updated_at` 不變、原話／quote 被 trim 呈現紅燈。修正後 focused foundation／PostgreSQL suite 為 `17 passed`；含 migration cycle 的完整 API 為 `849 passed`。全新空 DB 由 Alembic 升到 0018，再由官方 Saver／Store `.setup()` 建 framework tables；catalog 有預期 PK／unique／check constraints 與 updated index。測試後專用 DB 的 catalog、consultant Store rows 與 checkpoints 均為 0；一次性 fresh DB 已刪除。
+- 北極星回歸：沒有模型呼叫、RAG／Reference、Skill、能力級別／A 生成、pause／finish、品質 eval、舊 writer bridge、雙寫或第二 authority。員工原話與核准文件仍是不同 owner；direct edit 是員工 authority，不經 LLM review。結果 **Pass**。
 
 ## 8. 本次直接使用的一手來源
 

@@ -11,6 +11,7 @@
     "down": "docker compose down && kill-port 3000 8001",
     "infra": "docker compose up -d db",
     "db:migrate": "npm run migrate -w @caliburn/api",
+    "consultant-storage:setup": "npm run consultant-storage:setup -w @caliburn/api",
     "dev": "turbo dev --filter=@caliburn/api --filter=@caliburn/web",
     "build": "turbo build",
     "test": "turbo test",

@@ -83,7 +83,8 @@ Big-bang 只代表最後一次硬切，不允許累積十個 Task 後才發現�
 - Create: `apps/api/app/adapters/langgraph/postgres.py`
 - Create: `apps/api/scripts/setup_consultant_storage.py`
 - Create: `apps/api/tests/test_consultant_durable_authority_postgres.py`
-- Create at cutover: `apps/api/alembic/versions/0018_consultant_runtime_root.py`
+- Create during branch construction: `apps/api/alembic/versions/0018_consultant_runtime_catalog.py` (`down_revision = "0017"`)
+- Rewrite the same 0018 revision at cutover as the fresh `down_revision = None` root after removing 0012–0017
 
 **Interfaces:**
 
@@ -91,14 +92,14 @@ Big-bang 只代表最後一次硬切，不允許累積十個 Task 後才發現�
 - `AsyncPostgresStore` owns complete `EmployeeSource` payloads; `ConsultantThreadState` stores only source IDs／lineage.
 - 第一版只有已保存的 employee turn 與 employee direct edit 能成為工作事實來源；每筆來源保存 stable ID、原文、speaker＝employee、quote／position anchor、建立時間、修訂／取代 lineage 與 validity。模型輸出、accept／reject／defer 等審核事件不是新事實來源。
 
-- [ ] Write PostgreSQL tests for create／reopen／delete, immutable input＋correction, same-ID hash conflict, pending-source reconciliation, checkpoint restart, stale same-thread writers, direct edit, quote-anchor lookup, superseded-source validity, export projection, additive schema evolution and linear storage growth. Assert no second writable artifact table exists.
-- [ ] Add source-authority tests proving model text and accept／reject／defer decisions cannot mint evidence; an employee edit creates a direct-edit source only for the text the employee actually changed. Reject unknown source kinds so a future Reference source cannot be enabled accidentally.
-- [ ] Run the focused tests and confirm they fail because the framework-owned state does not exist.
-- [ ] Define purpose-first typed state. Do not create fields or classes named after the old Work Model／Focus／Progress／Proposal／Current JD components.
-- [ ] Implement `AsyncPostgresSaver`／`AsyncPostgresStore`, minimal document catalog, idempotent framework storage setup and one-process per-document admission. Set `LANGGRAPH_STRICT_MSGPACK=true` or an explicit module allowlist; use application-issued UUID namespaces; if connections are manual, enforce `autocommit=True`＋`row_factory=dict_row`. Provider calls remain absent.
-- [ ] Add security／setup tests for strict deserialization, `.setup()` rerun, connection options and cross-document namespace isolation.
-- [ ] Replace migrations 0012–0017 only at the final hard cut with a fresh root `0018_consultant_runtime_root.py` (`down_revision = None`); before that, keep branch commits runnable against isolated test DBs. The new root creates catalog only; the setup script initializes framework tables idempotently.
-- [ ] Run focused PostgreSQL tests plus fresh-DB Alembic／framework setup, run the common north-star gate, append the Task 2 ledger entry and commit `feat: establish durable consultant state`.
+- [x] Write PostgreSQL tests for create／reopen／delete, immutable input＋correction, same-ID hash conflict, pending-source reconciliation, checkpoint restart, stale same-thread writers, direct edit, quote-anchor lookup, superseded-source validity, export projection, additive schema evolution and linear storage growth. Assert no second writable artifact table exists.
+- [x] Add source-authority tests proving model text and accept／reject／defer decisions cannot mint evidence; an employee edit creates a direct-edit source only for the text the employee actually changed. Reject unknown source kinds so a future Reference source cannot be enabled accidentally.
+- [x] Run the focused tests and confirm they fail because the framework-owned state does not exist.
+- [x] Define purpose-first typed state. Do not create fields or classes named after the old Work Model／Focus／Progress／Proposal／Current JD components.
+- [x] Implement `AsyncPostgresSaver`／`AsyncPostgresStore`, minimal document catalog, idempotent framework storage setup and one-process per-document admission. Set `LANGGRAPH_STRICT_MSGPACK=true` or an explicit module allowlist; use application-issued UUID namespaces; if connections are manual, enforce `autocommit=True`＋`row_factory=dict_row`. Provider calls remain absent.
+- [x] Add security／setup tests for strict deserialization, `.setup()` rerun, connection options and cross-document namespace isolation.
+- [x] During branch construction, add 0018 incrementally above 0017 so every task stays runnable. Replace migrations 0012–0017 only at the final hard cut and rewrite 0018 as the fresh root (`down_revision = None`). The new root creates catalog only; the setup script initializes framework tables idempotently.
+- [x] Run focused PostgreSQL tests plus fresh-DB Alembic／framework setup, run the common north-star gate, append the Task 2 ledger entry and commit `feat: establish durable consultant state`.
 
 ### Task 3: Implement model profile, receipts and minimal-sufficient context
 

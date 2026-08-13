@@ -36,7 +36,7 @@
 - 要不要採 LangGraph、LangChain、PydanticAI 或其他框架；
 - Context Engine、memory、RAG、tool、skill 的最終 schema；
 - API、資料表、畫面與 migration；
-- 模型、參數、價格與 provider 選型；
+- 具體模型、價格、provider 選型與數值參數調優（但 §7.20 已定義控制權與追溯契約）；
 - 實作切片與工期。
 
 ## 1. 產品北極星
@@ -1271,6 +1271,28 @@ OpenRouter 又多一層 routing：它本身預設不保存 prompts，除非使�
 
 這項裁決不等於永遠拒絕 fallback、provider state 或遠端 observability；它要求這些能力未來以顯式、可追溯、可關閉的 adapter／runtime 設定加入。第一版不需要建立讓員工挑選 retention policy 的複雜 UI，也不需要為尚未存在的企業合規需求預做多套資料模式。
 
+### 7.20 模型、provider 與參數 profile 控制面（2026-08-13 已確認）
+
+Owner 已確認：**模型、provider 與底層參數由本機維護者透過版本化 profile 管理；受訪員工不在訪談介面直接操作 `temperature`、reasoning effort、token limit 或 routing 等原始旋鈕。** 第一版可以由設定檔或維護者設定面承接，尚不要求獨立管理 UI。即使維護者與受訪員工在本機上可能是同一個人，產品責任仍分開：前者配置執行環境，後者提供工作事實並決定 JD 內容。
+
+framework-neutral 控制面包含三項不同責任：
+
+1. **Versioned profile definition**：保存人可讀名稱、用途、requested provider／model、能力需求、品質／延遲／成本意圖、context／output budget、允許的 routing／fallback 與 provider-specific 選項；修改產生新 revision，不回寫舊 run 的設定歷史。API key 只保存 secret reference，不進 profile 內容、trace 或 prompt。
+2. **Resolved profile snapshot**：每個 operation／run 開始前，由 adapter 依 profile revision 與當時模型能力解析成 immutable snapshot，至少記錄 requested provider／model、可在送出前確定的 resolved model ID／provider allow-list、實際送出的有效參數、能力檢查、budget、route policy 與 adapter version。動態 gateway 最後選到的 endpoint 留給 attempt receipt 記錄；LLM 不得自行改模型、提高預算或放寬 fallback。
+3. **Run／attempt receipt**：回應後保存 provider 回報的實際 model／endpoint（若供應商提供）、attempt chain、usage、成本、latency、cache／state 使用情況、停止原因與錯誤。這是重播、歸因與日後比較的執行證據，不是 Work Model 或 Current JD。
+
+生效與失敗規則如下：
+
+- profile 變更只影響之後新建立的 operation；已開始的 run 與可安全恢復的 attempt 沿用原 resolved snapshot，不在中途偷偷換模型；
+- 若原模型已退役或原能力無法再取得，不假裝精確 resume：保留舊 artifact，建立帶新 snapshot 的新 attempt，重新檢查 authority generation／read-set，並讓 route change 可追溯；
+- 不建立一組假裝跨廠商完全等價的 raw parameter bag。profile 表達共同意圖與能力要求，各 adapter 顯式映射；不支援的參數在啟動／解析時拒絕或明確省略並留下原因，不可靜默接受後假裝已生效；
+- 第一版不允許 gateway alias、動態 router 或 provider fallback 在沒有 receipt 的情況下改變實際模型。若使用可漂移 alias，必須同時保存 requested alias 與 provider 可回報的實際 model ID；production 預設優先使用供應商建議的固定／stable ID；
+- 員工可以看到目前使用的 profile／模型名稱與必要揭露，但不需要理解廠商特有參數。未來若提供「較快／平衡／品質優先」等核准 preset，仍由維護者把 preset 映射到版本化 profile，而不是把原始旋鈕放進每回合訪談。
+
+這些規則有明確的一手資料背景：[OpenAI Model guidance](https://developers.openai.com/api/docs/guides/latest-model) 要求依 workload 明確選模型與 reasoning effort，並以代表性工作比較品質、延遲與成本；[Anthropic model versioning](https://platform.claude.com/docs/en/about-claude/models/model-ids-and-versions) 區分 pinned model ID 與會指向較新 snapshot 的舊式 alias，其 [Messages API](https://platform.claude.com/docs/en/api/typescript/messages/create) 也顯示新模型可能不再接受 `temperature`／`top_p`；[Gemini Models](https://ai.google.dev/gemini-api/docs/models) 明確建議 production 使用 specific stable model，而 `latest` alias 會隨版本熱切換；[OpenRouter routing](https://openrouter.ai/docs/guides/routing/provider-selection) 則顯示 provider order、fallback 與參數支援都需要顯式控制。這些來源支持「版本化、能力感知、實際路由可追溯」，但**不會替 Caliburn 決定誰有設定權**；維護者／員工分工與不暴露 raw knobs 是本產品裁決。
+
+本節仍不選定預設模型、profile 數量、確切參數值、價格門檻或設定 UI。這些要在 operation 分流策略與 framework capability matrix 收斂後配置；品質／成本最佳值仍依既定決定，等可用成品完成後再用代表性長訪談 eval 調整。
+
 ## 8. 已識別的流程風險與優化方向
 
 ### 8.1 焦點隧道效應
@@ -1328,7 +1350,7 @@ OpenRouter 又多一層 routing：它本身預設不保存 prompts，除非使�
 7. 可替換 model／provider、參數 profile、usage、trace 與失敗恢復；
 8. 支援上述流程的 API／Web 體驗。
 
-切換邊界已於 2026-08-13 收斂：iCAP Reference／RAG 是 final gate，worktree 內先做核心顧問、後接 RAG，完成後一次切換；目前也沒有需保留的真實 JD／訪談資料，因此採 fresh-schema hard cut，不做舊 AI 狀態 migration。跨 Task／Duty／OPKS 的 Proposal 粒度也已確認為「可編輯 review bundle＋必要原子子群組」；「可演化工作假說」亦已於 §7.2.1 收斂成 framework-neutral contract。下一個產品語意問題是模型／provider／參數 profile 的控制權、變更時機與 run 可追溯性，再進入完整框架比較。
+切換邊界已於 2026-08-13 收斂：iCAP Reference／RAG 是 final gate，worktree 內先做核心顧問、後接 RAG，完成後一次切換；目前也沒有需保留的真實 JD／訪談資料，因此採 fresh-schema hard cut，不做舊 AI 狀態 migration。跨 Task／Duty／OPKS 的 Proposal 粒度已確認為「可編輯 review bundle＋必要原子子群組」；「可演化工作假說」已於 §7.2.1 收斂；模型／provider／參數的維護者控制權、版本化 profile、run snapshot 與 route receipt 亦已於 §7.20 收斂。下一個產品語意問題是第一版採單一全域 active profile，或依 operation 類型選用不同 profile。
 
 能力地圖確認後，再逐列建立「目標能力／現況／框架候選／`Replace|Wrap|Retain`／仍需自寫語意／successor ADR／驗收情境」矩陣，回答哪些成熟元件能真正取代現有實作。LangGraph／LangChain、OpenAI Agents SDK、Microsoft Agent Framework、Google ADK、Agent Skills、Pydantic＋SQLAlchemy＋PostgreSQL、W3C anchor／provenance 等目前都只是候選或標準；任何框架都不得以舊 module 拓撲作為新設計目標，也不得在 conformance 前取得產品 authority。研究稿仍不能直接當施工授權。
 
@@ -1361,6 +1383,8 @@ Stakeholder 草稿（非權威，只作需求來源）：
 - [Anthropic Docs — Tool runner（自動 loop 與 custom HITL 邊界）](https://platform.claude.com/docs/en/agents-and-tools/tool-use/tool-runner)
 - [Anthropic Docs — Managed Agents permission policies](https://platform.claude.com/docs/en/managed-agents/permission-policies)
 - [Anthropic Docs — Structured outputs](https://platform.claude.com/docs/en/build-with-claude/structured-outputs)
+- [Anthropic Docs — Model IDs and versioning（pinned ID 與 alias）](https://platform.claude.com/docs/en/about-claude/models/model-ids-and-versions)
+- [Anthropic API — Create a Message（model-specific parameter support）](https://platform.claude.com/docs/en/api/typescript/messages/create)
 - [Anthropic — Contextual Retrieval](https://www.anthropic.com/engineering/contextual-retrieval)
 - [Anthropic — Equipping agents for the real world with Agent Skills](https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills)
 - [Anthropic Privacy Center — Commercial API model-training policy](https://privacy.claude.com/en/articles/7996885-how-do-you-use-personal-data-in-model-training)
@@ -1400,6 +1424,7 @@ Stakeholder 草稿（非權威，只作需求來源）：
 - [Google Cloud — Choose your agentic AI architecture components（state、memory、progressive disclosure）](https://docs.cloud.google.com/architecture/choose-agentic-ai-architecture-components)
 - [Google Cloud — Choose a design pattern for your agentic AI system](https://docs.cloud.google.com/architecture/choose-design-pattern-agentic-ai-system?hl=en)
 - [Google AI for Developers — Zero data retention in the Gemini Developer API](https://ai.google.dev/gemini-api/docs/zdr)
+- [Google AI for Developers — Gemini Models（stable／preview／latest／experimental）](https://ai.google.dev/gemini-api/docs/models)
 - [Google Research — Sufficient Context: A New Lens on RAG Systems](https://research.google/blog/deeper-insights-into-retrieval-augmented-generation-the-role-of-sufficient-context/)
 - [LangGraph — Overview](https://docs.langchain.com/oss/python/langgraph/overview)
 - [LangGraph — Workflows and agents（predetermined workflow 與 dynamic loop）](https://docs.langchain.com/oss/python/langgraph/workflows-agents)

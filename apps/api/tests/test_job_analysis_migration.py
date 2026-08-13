@@ -17,6 +17,7 @@ TEST_DATABASE_URL = os.getenv("TEST_DATABASE_URL", "")
 MIG_DB = "caliburn_current_only_mig"
 
 CURRENT_TABLES = {
+    "consultant_documents",
     "job_analysis_documents",
     "job_analysis_jd_duties",
     "job_analysis_jd_tasks",
@@ -26,6 +27,14 @@ CURRENT_TABLES = {
     "job_analysis_opks_proposals",
 }
 CURRENT_COLUMNS = {
+    "consultant_documents": {
+        "document_id",
+        "thread_id",
+        "title",
+        "created_at",
+        "updated_at",
+        "deleted_at",
+    },
     "job_analysis_documents": {
         "document_id", "title", "work_model_schema_id", "work_model_json",
         "active_question_json", "authority_generation", "created_at", "updated_at",
@@ -96,11 +105,20 @@ def test_alembic_has_current_only_root_and_single_head():
     config.set_main_option("script_location", str(API_DIR / "alembic"))
     scripts = ScriptDirectory.from_config(config)
 
-    assert scripts.get_heads() == ["0017"]
+    assert scripts.get_heads() == ["0018"]
     assert scripts.get_revision("0012").down_revision is None
-    assert set(scripts.revision_map._revision_map) >= {"0012", "0013", "0014", "0015", "0016", "0017"}
+    current_revisions = {
+        "0012",
+        "0013",
+        "0014",
+        "0015",
+        "0016",
+        "0017",
+        "0018",
+    }
+    assert set(scripts.revision_map._revision_map) >= current_revisions
     assert not any(
-        revision and revision not in {"0012", "0013", "0014", "0015", "0016", "0017"}
+        revision and revision not in current_revisions
         for revision in scripts.revision_map._revision_map
         if revision != "<base>"
     )
@@ -124,7 +142,7 @@ def test_current_only_migration_cycle_builds_and_drops_current_tables():
             assert {column["name"] for column in inspector.get_columns(table)} == expected_columns
 
         with engine.connect() as connection:
-            assert connection.scalar(sa.text("SELECT version_num FROM alembic_version")) == "0017"
+            assert connection.scalar(sa.text("SELECT version_num FROM alembic_version")) == "0018"
 
         _alembic("downgrade", "base", _async_url(MIG_DB))
         assert set(sa.inspect(engine).get_table_names(schema="public")) == {"alembic_version"}

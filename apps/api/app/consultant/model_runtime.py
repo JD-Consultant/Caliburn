@@ -571,6 +571,7 @@ def build_consultant_middleware(
     model: BaseChatModel,
     execution: ResolvedExecution,
     context_middleware: AgentMiddleware | None = None,
+    additional_middleware: Sequence[AgentMiddleware] = (),
 ) -> tuple[AgentMiddleware, ...]:
     middleware: list[AgentMiddleware] = [
         ModelCallLimitMiddleware(
@@ -620,6 +621,7 @@ def build_consultant_middleware(
     ]
     if context_middleware is not None:
         middleware.append(context_middleware)
+    middleware.extend(additional_middleware)
     return tuple(middleware)
 
 
@@ -630,6 +632,7 @@ def build_consultant_agent(
     response_schema: type[ResponseModelT],
     tools: Sequence[BaseTool | Any] = (),
     context_middleware: AgentMiddleware | None = None,
+    additional_middleware: Sequence[AgentMiddleware] = (),
     context_schema: type[Any] | None = None,
     checkpointer: Any = None,
     store: Any = None,
@@ -661,6 +664,7 @@ def build_consultant_agent(
             model=model,
             execution=execution,
             context_middleware=context_middleware,
+            additional_middleware=additional_middleware,
         ),
         context_schema=context_schema,
         checkpointer=checkpointer,

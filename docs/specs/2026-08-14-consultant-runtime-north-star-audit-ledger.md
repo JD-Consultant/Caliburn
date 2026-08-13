@@ -1,7 +1,7 @@
 # AI 職務顧問 runtime：北極星審核與逐 Task 防偏帳本
 
 - 日期：2026-08-14
-- 狀態：Pre-implementation audit **Passed**；Tasks 1–3 **Passed**
+- 狀態：Pre-implementation audit **Passed**；Tasks 1–4 **Passed**
 - 決策：ADR 0060 Accepted
 - 施工計畫：[`2026-08-13-langgraph-consultant-runtime-big-bang-plan.md`](../plans/2026-08-13-langgraph-consultant-runtime-big-bang-plan.md)
 - 產品 SSOT：[`2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md`](2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md) §1–§8、§9.12–§9.13
@@ -171,6 +171,18 @@ Big-bang 只描述最終切換，不表示做到最後才審核。之後每完�
 - TDD／驗證：新增缺口都先以失敗測試重現；最終 model＋Context focused suite `17 passed`，其中涵蓋實際 LangChain retry 產生兩張 attempt receipt、摘要＋主推論各自有 receipt 且摘要無 hidden retry、OpenRouter route／cost round-trip、policy 外 tool 拒絕、payload-free provider error、摘要後重建逐字來源、必要澄清、summary 權限、tool-loop 訊息順序、無關更正不入 prompt 與 context 降級。最終含 PostgreSQL 的完整 API suite `866 passed`；沒有執行真實 LLM，也沒有宣稱模型品質。
 - 舊機制狀態：本 Task 新 runtime 沒有呼叫舊 OpenRouter wire、舊 ContextPacket、舊 operation／Proposal writer 或 RAG；production composition 尚未切換，故舊模組會到 Task 9 hard cut 才刪除，不雙寫。
 - 北極星回歸：單一顧問、自然停止／續談、LLM 文件內容先審核、能力級別／A 暫不生成、RAG 延後、正式 eval 延後、員工原話／核准文件權威與可強制匯出方向均未改。結果 **Pass**。
+
+### Task 4：按需專業方法 Skills 與 typed semantic result
+
+- 狀態：**Pass**；同一 task commit 為 `feat: add professional consultant skills`。
+- 員工效果：同一位顧問可依當輪問題載入工作盤點、故事、Task、Duty、O、P、K、S 或 completion red-team 方法；員工仍只看到一段連貫回覆、可見理解／Gap／待審文件內容與至多一個主要問題。Task 不必先永久穩定，局部證據足夠時可同輪整理相關 OPKS，後續結構變動再重新驗證。
+- 成熟 primitive：Deep Agents `SkillsMiddleware` 直接承接 metadata discovery／progressive disclosure，`FilesystemMiddleware(tools=["read_file"])` 直接承接模型全文讀取；LangChain `response_format`＋Pydantic 直接承接 structured output；既有 LangChain call／tool limit 續管總量。沒有自寫 prompt router、Skill parser、agent loop、host filesystem 工具或多 Agent harness。
+- Caliburn 薄政策：只保留框架不知道的九種職務分析方法、當輪 eligibility、package-resource 路徑白名單、一次完整載入、lookup wave 定義、Task／Duty／OPKS 語意、employee source／quote requirement、可修改文件 path 與 anti-fabrication gate。typed output 使用 `UnderstandingChange`／`AttentionChange`／`VisibleGap`／`ReviewableDocumentChange` 等 purpose-first 名稱，不搬舊 Work Model／Focus／Progress／Proposal class 或相容層。
+- 詳細複審修正：最初若直接使用框架預設 cache，前一輪 checkpoint 的 Skill metadata／ToolMessage 可能流進下一輪；現在互動 agent 不另擁有 checkpointer／Store，durable product graph只保存 semantic result／receipt，每次 run 依本輪 backend 強制重投影、清除 stale warning，並拒絕外部輸入夾帶舊 `read_file` ToolMessage。最初把兩次 lookup 限制套成「最多讀兩個 Skill」也會破壞多 Skill 組合；現在同一 model response 的平行 reads 算一波，三個以上 Skill 可在一波載入。backend 另拒絕 partial read、重複 read、traversal 與未選 Skill；結果 verifier 補上同文件 scope、實際 loaded Skill、nested payload、path／operation matching、O／P／K／S linkage 及可查核主張的 quote gate。A 從 model-facing enum 直接移除，不只依事後 verifier 擋。
+- 方法回歸：九份 Skill 均有 eligibility、required evidence、outputs、gaps、anti-hallucination 與 reopen 規則。Story／Work Unit／Task 非一對一；Task 要有 action／object／meaningful outcome／current responsibility，工具／步驟／他人／過去／一次性不自動成 Task；Duty 可動態重組；O 可合法空白；P 必須可觀察且非人格；K 是名詞性、S 是應用動作，兩者皆為文件層多對多且須有 employee quote，不使用 `ability to`／「具備…之能力」或能力級別。
+- Authority／範圍：`ConsultantResult` 沒有 `ApprovedJobDocument` 寫入欄位；模型只輸出待員工審核的語意變更，Task 6 才建立 stable patch action／read-set／decision command。沒有 Reference／RAG Skill、能力級別、A、分類／iCAP code、pause／finish、正式品質 eval、舊 writer bridge或 production composition 切換。
+- TDD／驗證：預期紅燈先由缺少 `app.consultant.agent` 呈現；最終 Task 4 focused suite `33 passed`；上一輪 consultant foundation 組合 gate `53 passed, 17 skipped`（DB tests 在該次 focused command未注入 URL）；新增 stale Skill ToolMessage 防線後，指定既有隔離測試 DB `caliburn_consultant_runtime_test`、repo basetemp並在 sandbox 外重跑最終完整 API suite為 `899 passed`。較早的完整 command曾指到已不存在的 DB，另一次暴露 Windows sandbox tmp ACL；兩者均以正確 DB／隔離 basetemp重跑，未把環境錯誤當綠燈。`git diff --check` 於提交前另行重驗。
+- 北極星回歸：一位顧問、前景單一焦點／背景全域吸收、Task／Duty／OPKS 動態演化、LLM 文件內容先審核、自然離開／續談、語意進度、單一可強制匯出，以及 RAG／能力級別／A／正式 eval 延後均未偏移。結果 **Pass**。
 
 ## 8. 本次直接使用的一手來源
 

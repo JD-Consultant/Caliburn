@@ -204,7 +204,9 @@ Owner 確認第一版產品的產出定位為：
 3. 新 runtime 直接依本文產品語意、成熟框架與新的統一 contract 設計；完成後一次切換 API／Web，並刪除被取代的舊 AI runtime；
 4. 不做 production 雙軌、雙寫或永久 façade；只有 Current JD、文件、匯出、RAG 等真正穩定的外部 seam 才可成為新舊交界；
 5. PostgreSQL、SQLAlchemy、Pydantic、文件庫、Current JD 員工編輯與 authority 原則、deterministic export／XLSX、隔離 RAG 資產優先保留或深化，但若後續研究證明具體實作不再合適，仍以產品語意與驗收為準，不因已存在而免審；
-6. 正式 context／model 品質 eval 仍依 §7.14 後置；切換前至少通過 authority／來源／文件隔離等 deterministic safety，以及本文 §3.11 的端到端人工情境。
+6. iCAP Reference／RAG 納入同一次最終切換的完成條件，但在 worktree 內的實作順序是先完成核心顧問與 framework-neutral Reference contract，再接現有隔離 RAG bounded context；它是最後一個垂直能力，不先反向定義顧問核心；
+7. Owner 於 2026-08-13 確認目前沒有必須保留的真實 JD 或訪談資料，因此新系統採 fresh-schema hard cut：不遷移舊 Work Model、agenda、Proposal、checkpoint、turn 或 Current JD，不寫 compatibility converter，也不雙寫；開發資料庫依新 migration head 重建；
+8. 正式 context／model 品質 eval 仍依 §7.14 後置；切換前至少通過 authority／來源／文件隔離等 deterministic safety，以及本文 §3.11 的端到端人工情境。
 
 這不是整個 repo 的無邊界 Big-bang。Microsoft 的 Strangler Fig 指引也明示，漸進 façade 是有暫時基礎設施與跨系統依賴成本的 transitional architecture，對小型系統或需要快速淘汰原解法時可能不適用；AWS 則把它定位為降低大型 monolith 改寫風險的方法。Caliburn 是本機單一操作者產品、已有清楚 bounded context、可使用隔離 worktree，且本次主要變更集中在一個高度耦合的 AI 顧問子系統，因此採「子系統 Big-bang、repo 邊界保留」是依本地條件作出的選擇，不宣稱是所有系統的通用最佳實務。[Microsoft — Strangler Fig pattern](https://learn.microsoft.com/en-us/azure/architecture/patterns/strangler-fig)、[AWS — The strangler fig pattern](https://docs.aws.amazon.com/prescriptive-guidance/latest/modernization-aspnet-web-services/fig-pattern.html)
 
@@ -1296,7 +1298,7 @@ OpenRouter 又多一層 routing：它本身預設不保存 prompts，除非使�
 7. 可替換 model／provider、參數 profile、usage、trace 與失敗恢復；
 8. 支援上述流程的 API／Web 體驗。
 
-第一個待 owner 對齊的切換問題是：**iCAP Reference／RAG 必須與新核心顧問一起完成才切換，還是可在核心顧問切換後作下一個垂直能力？** 這會決定受限 Big-bang 的真實邊界，但不改變最終產品需要 Reference challenge 的方向。
+切換邊界已於 2026-08-13 收斂：iCAP Reference／RAG 是 final gate，worktree 內先做核心顧問、後接 RAG，完成後一次切換；目前也沒有需保留的真實 JD／訪談資料，因此採 fresh-schema hard cut，不做舊 AI 狀態 migration。下一個產品語意問題是把「可演化工作假說」與「跨 Task／Duty／OPKS 的 typed changeset」說成 framework-neutral contract，再進入框架比較。
 
 能力地圖確認後，再逐列建立「目標能力／現況／框架候選／`Replace|Wrap|Retain`／仍需自寫語意／successor ADR／驗收情境」矩陣，回答哪些成熟元件能真正取代現有實作。LangGraph／LangChain、OpenAI Agents SDK、Microsoft Agent Framework、Google ADK、Agent Skills、Pydantic＋SQLAlchemy＋PostgreSQL、W3C anchor／provenance 等目前都只是候選或標準；任何框架都不得以舊 module 拓撲作為新設計目標，也不得在 conformance 前取得產品 authority。研究稿仍不能直接當施工授權。
 

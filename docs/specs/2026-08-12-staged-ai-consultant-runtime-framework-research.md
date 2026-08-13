@@ -9,6 +9,8 @@
 > 2026-08-12 後續澄清：owner 已先收斂產品流程、動態 Skills、記憶權威與 Context Engine 的產品層方向；以 [`AI 專業職務分析顧問：產品流程工作研究稿`](2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md) 為優先。本文的「stage」一律只表示可回跳的 attention／operation mode；固定 Context lanes／budget、LangGraph／LangChain 組合與欄位名稱都是待 conformance spike／後續 eval 的 framework 候選，不是已核准產品狀態機或實作決策；兩份文件衝突時以前者為準。正式 eval、benchmark、A／B 與量化品質 gate 已裁示延至可用成品完成後；開發期只保留既有工程測試、authority safety、介面 conformance、簡單人工 smoke 與可回溯紀錄。
 >
 > 2026-08-13 責任分界確認：框架可以取代或包裝通用工程機制，Caliburn 保留產品語意與 authority；「保留」不等於所有底層程式都自行維護。LangGraph 是目前推薦的外層 runtime 候選，但仍須先證明它能忠實承接既有 durable input、Journal、generation／read-set 與 authority transaction，不能把推薦寫成已 Accepted 的框架決策。
+>
+> **2026-08-13 後續取代警示：**產品工作稿已確認 AI 顧問子系統採隔離 worktree 內的受限 Big-bang、fresh-schema hard cut，並把 iCAP Reference／RAG 納入同一次 final gate；先完成核心顧問、後接 RAG，再一次切換。本文原先的漸進 phase、`Wrap` 既有 runtime、LangGraph 優先順序與「RAG 延後到未來」只能作候選能力與風險研究，**不再是現行遷移順序或實作者 plan**。後續應先依產品工作稿建立 framework-neutral 目標能力與 `Replace／Wrap／Retain` 矩陣，再重寫本研究結論；在此之前不得依本文 §15 直接施工。
 
 ## 0. 結論先行
 

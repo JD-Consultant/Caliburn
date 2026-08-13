@@ -1,7 +1,7 @@
 # AI 職務顧問 runtime：北極星審核與逐 Task 防偏帳本
 
 - 日期：2026-08-14
-- 狀態：Pre-implementation audit **Passed**；Task 1 尚未開始
+- 狀態：Pre-implementation audit **Passed**；Task 1 **Passed**
 - 決策：ADR 0060 Accepted
 - 施工計畫：[`2026-08-13-langgraph-consultant-runtime-big-bang-plan.md`](../plans/2026-08-13-langgraph-consultant-runtime-big-bang-plan.md)
 - 產品 SSOT：[`2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md`](2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md) §1–§8、§9.12–§9.13
@@ -52,7 +52,7 @@ Big-bang 只描述最終切換，不表示做到最後才審核。之後每完�
 | 動態訪談重點、旁支、延後返回、更正重開 | typed state／reducers／routing／checkpoint | work-unit eligibility、priority reason、reopen rule | 已覆蓋；不是舊 Focus／agenda |
 | 可修訂 AI 理解 | typed state／reducers＋source references | Task／Duty／OPKS identity、dependency、選擇性失效 | 已覆蓋；不是舊 Work Model |
 | coverage／depth／decision／Gap 與足夠性 | typed state＋deterministic projection | 職務分析 reason code、足夠性 rubric、白話說明 | 已覆蓋；不是舊 Progress |
-| 按需專業方法 | Deep Agents `SkillsMiddleware` progressive disclosure | repo 已驗證方法、eligibility 與輸出契約 | 已覆蓋；Beta 窄介面需 canary |
+| 按需專業方法 | Deep Agents `SkillsMiddleware`＋`FilesystemMiddleware(read_file only)` | repo 已驗證方法、eligibility、限縮 package-resource backend 與輸出契約 | 已覆蓋；不使用 host filesystem，Beta 窄介面需 canary |
 | 最小充分 context | LangChain middleware＋Store read tools＋token budget | 必帶來源、降級順序與 selection receipt | 已覆蓋 |
 | 長 context 壓縮 | `SummarizationMiddleware`＋`ContextEditingMiddleware` | 只壓縮非權威副本；exact source／correction 必須重載 | 已覆蓋；plan 已補明 |
 | 多筆、非阻塞文件變更審核 | LangGraph checkpointed typed queue＋`Command` | patch path、read-set、atomic subgroup、stale／reject memory | 通用生命週期已覆蓋；精確業務政策無現成替代 |
@@ -110,7 +110,7 @@ Big-bang 只描述最終切換，不表示做到最後才審核。之後每完�
 - LangChain `HumanInTheLoopMiddleware`：適合暫停當前 tool call；不能直接表達可延後、多筆並存、任意順序決策且訪談可繼續的文件 changeset。只在 required clarification 使用 LangGraph interrupt。
 - LangChain `LLMToolSelectorMiddleware`：本輪 deterministic eligibility 已先把 Skill／tool surface 縮小，再花一次 inference 選 tool 沒有已知效果收益。
 - `ModelFallbackMiddleware`：預設不啟用，避免 silent model drift；日後只有 versioned allowlist＋完整 attempt receipt 才能開。
-- 完整 `create_deep_agent`：會帶入 subagent、filesystem、shell、todo 與自由長任務 harness；本產品只取 `SkillsMiddleware`。
+- 完整 `create_deep_agent`：會帶入 subagent、廣泛 filesystem、shell、todo 與自由長任務 harness；本產品只取 `SkillsMiddleware` 與只暴露 `read_file` 的 `FilesystemMiddleware`。
 - Agent Server／LangSmith 服務：本機單一操作者不需要第二個 runtime service；使用 FastAPI SSE 與本機 OpenTelemetry。
 - DBOS／Camunda／Microsoft Agent Framework／另一套 memory framework：四個核心目的已由 LangGraph conformance 通過，再加入會形成第二個 workflow owner。
 - RAG／Reference：owner 明確延後，不是框架缺口。
@@ -118,7 +118,7 @@ Big-bang 只描述最終切換，不表示做到最後才審核。之後每完�
 ## 6. 施工前風險與已加的 gate
 
 1. `langgraph-checkpoint-postgres` 3.1.2 精確 pin；啟用 strict msgpack／allowlist、idempotent `.setup()`、正確 psycopg connection options 與 UUID namespace isolation tests。
-2. Deep Agents 0.7.5 與 `langchain-openrouter` 0.2.7 仍標示 Beta；只使用窄 public API，Task 1 加 import／behavior canary，不能因此接入完整 harness。
+2. Deep Agents 0.7.5 與 `langchain-openrouter` 0.2.7 仍標示 Beta；只使用窄 public API，Task 1 加 import／behavior canary。`SkillsMiddleware` 不會自己提供全文讀取工具，故明確搭配 `FilesystemMiddleware(tools=["read_file"])`；production backend 只允許版本化 `/skills` package resources，不能因此接入完整 harness 或 host filesystem。
 3. FastAPI 0.141.1 先跑完整 API compatibility gate；不相容只回退 FastAPI，不引入第二個 agent server。
 4. `SummarizationMiddleware`／`ContextEditingMiddleware` 不得成為 authority；來源、更正、矛盾與核准文件 slice 必須由 ID 重載。
 5. 每個功能一律先寫行為測試，再實作、跑 focused/full gate、做本帳本北極星回歸，最後才 commit。
@@ -134,7 +134,19 @@ Big-bang 只描述最終切換，不表示做到最後才審核。之後每完�
 - 框架覆蓋：§3 所列通用機制均有成熟 primitive；§4 只剩框架無法知道的職務分析與 authority policy。
 - 修正：施工計畫補入 built-in retry／limits／structured output、非權威 context 壓縮、OpenTelemetry、checkpointer security/setup、Beta canary、方法 conformance tests，以及每 Task 回歸 gate。
 - 機制回歸：`UV_CACHE_DIR=S:\caliburn\.uv-cache-langgraph-spike uv run --offline --with langgraph==1.2.11 pytest tests/test_consultant_purpose_conformance_spike.py -q` → `4 passed in 0.92s`；只重驗動態工作／更正、非阻塞 review queue 與 required clarification，不是模型品質 eval。
+- production worktree 基線：API `723 passed, 104 skipped`（未設定 PostgreSQL test URL）；Web `60 passed`、TypeScript、ESLint 全綠；contract codegen zero diff。首次命令暴露 `DEBUG=release` 與 sandbox temp/cache 權限，明確設 `DEBUG=false`、repo-scoped cache／basetemp 後重跑通過，沒有把環境錯誤當產品綠燈。
 - owner decision：2026-08-14 明確表示審核通過即可開始；ADR 0060 因此 Accepted。
+
+### Task 1：框架版本與 transport 相容性
+
+- 狀態：**Pass**；同一 task commit 為 `build: add consultant runtime framework stack`。
+- 員工效果：本 Task 不改顧問流程與文件內容，只建立後續 durable snapshot 所需的 FastAPI 原生 typed SSE，以及可替換 model／workflow／Skill 的鎖定框架底座。
+- 成熟 primitive：FastAPI `EventSourceResponse`／`ServerSentEvent`、LangChain 1.3.15、LangGraph 1.2.11、PostgreSQL checkpoint package 3.1.2、`ChatOpenRouter`、Deep Agents `SkillsMiddleware`＋只讀 `FilesystemMiddleware`。沒有建立自寫 SSE parser、agent loop 或 Skill lifecycle。
+- 實作中修正：resolver 證明 `langchain-openrouter` 需要 HTTPX ≥0.28.1，故明確 pin 0.28.1；`SkillsMiddleware` 只注入 metadata／提示而不提供全文讀取工具，故補成只暴露 `read_file` 的正式組合；FastAPI 0.141 對 included router 採 lazy representation，wiring test 改驗公開 OpenAPI 路由契約，實際 18 條 current routes 均存在。
+- Beta 安全面：canary 的完整 tool set 僅 `{read_file}`；沒有 `execute`、write／edit／delete、subagent `task` 或 `write_todos`。Task 4 仍須實作 traversal-safe package-resource backend，不能使用 host `FilesystemBackend`。
+- 既有機制：尚未接入 production composition root，也尚未刪除舊 writer；這符合 Task 1 僅建底座的界線，Task 2 才建立唯一 durable state owner。
+- TDD／驗證：舊 FastAPI 先如預期因 `ModuleNotFoundError: fastapi.sse` 失敗；升級後 Task 1 canary `5 passed`，加 wiring regression 為 `8 passed`；無 DB 全套 `728 passed, 104 skipped`；新建並 migration 專用 `caliburn_consultant_runtime_test` 後，含 PostgreSQL 全套 `832 passed`；`git diff --check` clean。鎖檔與 runtime metadata 均精確回報核准版本。
+- 北極星回歸：沒有 RAG／Reference、能力級別／A model generation、品質 eval、pause／finish、silent fallback、第二個 workflow owner 或 AI 直寫核准文件；自然續談與 authority 行為未更動。結果 **Pass**。
 
 ## 8. 本次直接使用的一手來源
 
@@ -144,6 +156,7 @@ Big-bang 只描述最終切換，不表示做到最後才審核。之後每完�
 - [LangGraph persistence](https://docs.langchain.com/oss/python/langgraph/persistence)
 - [LangGraph interrupts](https://docs.langchain.com/oss/python/langgraph/interrupts)
 - [Deep Agents `SkillsMiddleware`](https://reference.langchain.com/python/deepagents/middleware/skills/SkillsMiddleware)
+- [Deep Agents `FilesystemMiddleware`](https://reference.langchain.com/python/deepagents/middleware/filesystem/FilesystemMiddleware)
 - [FastAPI Server-Sent Events](https://fastapi.tiangolo.com/tutorial/server-sent-events/)
 - [LangChain 1.3.15 PyPI](https://pypi.org/project/langchain/1.3.15/)
 - [LangGraph 1.2.11 PyPI](https://pypi.org/project/langgraph/1.2.11/)
@@ -151,3 +164,4 @@ Big-bang 只描述最終切換，不表示做到最後才審核。之後每完�
 - [`langchain-openrouter` 0.2.7 PyPI](https://pypi.org/project/langchain-openrouter/0.2.7/)
 - [Deep Agents 0.7.5 PyPI](https://pypi.org/project/deepagents/0.7.5/)
 - [FastAPI 0.141.1 PyPI](https://pypi.org/project/fastapi/0.141.1/)
+- [HTTPX 0.28.1 PyPI](https://pypi.org/project/httpx/0.28.1/)

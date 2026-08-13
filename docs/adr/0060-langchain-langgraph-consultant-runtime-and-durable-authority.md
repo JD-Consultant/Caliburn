@@ -46,11 +46,11 @@ Owner 於 2026-08-14 另外確認：本次核心升級不串接 iCAP Reference�
 - LangChain 1.x：model／tool binding、`create_agent` bounded loop、structured output、middleware 與 call limits；
 - LangGraph 1.2.x：`StateGraph`、typed state／reducers、routing、PostgreSQL checkpointer、Store、interrupt／resume、command 與 durable execution；
 - `langchain-openrouter`：OpenRouter model／provider／參數 profile；
-- Deep Agents 只取可獨立使用的 `SkillsMiddleware` 與唯讀 Skill loader，不採 `create_deep_agent`、自由 todo、subagent、shell 或寫檔；
-- FastAPI 0.141.x stable 作升級候選並先跑完整 API gate；若不相容，保留現行 FastAPI 並用 `StreamingResponse`，不增加第二個 agent server；
+- Deep Agents 只取可獨立使用的 `SkillsMiddleware`，並搭配 `FilesystemMiddleware(tools=["read_file"])` 與限縮在版本化 `/skills` package resources 的唯讀 `BackendProtocol` adapter；不採 host `FilesystemBackend`、`create_deep_agent`、自由 todo、subagent、shell 或寫檔；
+- FastAPI 0.141.1 stable 已在 Task 1 通過原生 SSE、既有 route／problem／health 與含 PostgreSQL 的完整 API gate，因此正式採用；不增加 `sse-starlette` 或第二個 agent server；
 - PostgreSQL 仍是唯一預設基礎服務，不新增 Redis、graph database、DBOS、Camunda、Agent Server 或 LangSmith 服務依賴。
 
-2026-08-14 已直接核對官方 PyPI 指定版本端點：production 候選精確 pin 為 LangChain 1.3.15、LangGraph 1.2.11、`langgraph-checkpoint-postgres` 3.1.2、`langchain-openrouter` 0.2.7、Deep Agents 0.7.5 與 FastAPI 0.141.1；均存在且未被 yank。LangChain／LangGraph 是 Production/Stable，Deep Agents 與 `langchain-openrouter` 仍標示 Beta，因此只使用窄介面並加 import／behavior canary。任何套件升級都不能順便更換架構或產品語意。[LangChain 1.3.15](https://pypi.org/project/langchain/1.3.15/) · [LangGraph 1.2.11](https://pypi.org/project/langgraph/1.2.11/) · [Postgres checkpointer 3.1.2](https://pypi.org/project/langgraph-checkpoint-postgres/3.1.2/) · [OpenRouter integration 0.2.7](https://pypi.org/project/langchain-openrouter/0.2.7/) · [Deep Agents 0.7.5](https://pypi.org/project/deepagents/0.7.5/) · [FastAPI 0.141.1](https://pypi.org/project/fastapi/0.141.1/)
+2026-08-14 已直接核對官方 PyPI 指定版本端點：production 候選精確 pin 為 LangChain 1.3.15、LangGraph 1.2.11、`langgraph-checkpoint-postgres` 3.1.2、`langchain-openrouter` 0.2.7、Deep Agents 0.7.5、FastAPI 0.141.1 與 HTTPX 0.28.1；均存在且未被 yank。LangChain／LangGraph 是 Production/Stable，Deep Agents 與 `langchain-openrouter` 仍標示 Beta，因此只使用窄介面並加 import／behavior canary。任何套件升級都不能順便更換架構或產品語意。[LangChain 1.3.15](https://pypi.org/project/langchain/1.3.15/) · [LangGraph 1.2.11](https://pypi.org/project/langgraph/1.2.11/) · [Postgres checkpointer 3.1.2](https://pypi.org/project/langgraph-checkpoint-postgres/3.1.2/) · [OpenRouter integration 0.2.7](https://pypi.org/project/langchain-openrouter/0.2.7/) · [Deep Agents 0.7.5](https://pypi.org/project/deepagents/0.7.5/) · [FastAPI 0.141.1](https://pypi.org/project/fastapi/0.141.1/) · [HTTPX 0.28.1](https://pypi.org/project/httpx/0.28.1/)
 
 ### 3. 每項持久事實只有一個 framework owner
 
@@ -74,7 +74,7 @@ Store 與 Saver 保存不同事實：前者保存 append-heavy immutable source�
 | 顯示 coverage／depth／decision／gap 與「目前已足夠」 | typed state＋deterministic projection | reason code、足夠性證據與 LLM 白話解釋；禁止假百分比 | 刪除舊 Progress／open-issue writer |
 | 記得員工原話與更正 | `AsyncPostgresStore`＋state references | source validity、supersession、quote／可信度規則 | 刪除舊 Journal-as-memory 與全文 context copy |
 | 最小充分 context | LangChain middleware＋Store read tools＋token budget | 受限全域索引、最新更正、當輪 eligibility、context-selection receipt | 刪除舊 ContextPacket builders |
-| 盤點、故事、Task、Duty、O／P／K／S、完成度方法 | `SkillsMiddleware`＋唯讀 Skill source | repo 內已驗證方法與當輪 eligibility | 刪除固定巨型 prompt 與固定 Task→OPKS scheduler |
+| 盤點、故事、Task、Duty、O／P／K／S、完成度方法 | `SkillsMiddleware`＋`FilesystemMiddleware(read_file only)`＋限縮 Skill backend | repo 內已驗證方法與當輪 eligibility | 刪除固定巨型 prompt 與固定 Task→OPKS scheduler |
 | 可換 model／provider／參數 | `ChatOpenRouter`／LangChain binding＋versioned profile | allowlist、資料政策、resolved snapshot、usage／route receipt | 刪除手寫 OpenRouter wire 與舊 use-case wrapper |
 | bounded model／tool loop、重試與結構化輸出 | LangChain `create_agent`、`response_format`、`ModelCallLimitMiddleware`、`ToolCallLimitMiddleware`、`ModelRetryMiddleware`、`ToolRetryMiddleware` | retry eligibility、總 budget、idempotency、每次 attempt receipt | 刪除自寫 loop／wire parser／通用 retry plumbing |
 | LLM 文件內容由員工審核 | checkpointed typed changeset／review queue＋command | change contract、dependency subgroup、path read-set、stale、verifier | 刪除分立 Proposal class、table、writer |
@@ -85,6 +85,7 @@ Store 與 Saver 保存不同事實：前者保存 append-heavy immutable source�
 
 #### 4.1 成熟 middleware 的使用邊界
 
+- `SkillsMiddleware` 只負責列出 metadata 與 progressive-disclosure 提示，本身不提供載入全文的 tool。實作必須共享同一個限縮 backend，另加只暴露 `read_file` 的 `FilesystemMiddleware`；backend 只讀版本化 `/skills` package resources，拒絕 traversal 與其他 namespace。官方明示 host `FilesystemBackend` 不適合 Web/API production，因此不得以 permissions 假裝成真正 sandbox，也不得暴露 `ls`／`glob`／`grep`／write／delete／execute。[Skills middleware](https://reference.langchain.com/python/deepagents/middleware/skills/SkillsMiddleware) · [Filesystem middleware](https://reference.langchain.com/python/deepagents/middleware/filesystem/FilesystemMiddleware)
 - structured output 以 LangChain `response_format`／自動 provider-or-tool strategy 為第一層，再由 Pydantic 與 deterministic domain verifier 驗證；不得重寫通用 JSON repair loop。
 - `SummarizationMiddleware`／`ContextEditingMiddleware` 只能壓縮非權威的近期對話副本與大型唯讀 tool result；員工逐字來源、最新更正、blocking contradiction、source lineage 與核准文件 slice 必須由 Store／state 依 ID 重新載入，不能被摘要取代。
 - `ModelFallbackMiddleware` 預設不啟用。若維護者日後在 versioned profile 明確開啟，只能在 allowlist 內執行，且每次失敗與實際 route 都要寫入 attempt receipt；不能 silent fallback。

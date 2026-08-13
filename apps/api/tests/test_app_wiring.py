@@ -6,7 +6,9 @@ from app.config import Settings
 
 
 def _paths(app: FastAPI) -> list[str]:
-    return [getattr(r, "path", "") for r in app.routes]
+    # FastAPI 0.141 keeps included routers lazy; OpenAPI is the public flattened
+    # route contract and therefore the stable wiring assertion surface.
+    return list(app.openapi()["paths"])
 
 
 def test_configure_mounts_current_job_analysis_api_and_health():

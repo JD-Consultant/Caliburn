@@ -6,9 +6,9 @@
 
 **Prerequisite（已滿足）:** Owner 於 2026-08-14 完成產品方向／成熟元件覆蓋審核後授權施工，ADR 0060 已改為 Accepted。
 
-**Architecture:** 新建 `app/consultant` purpose-first runtime。LangGraph PostgreSQL Saver 是可修訂理解、動態訪談工作、缺口、待審文件變更與核准文件的唯一 semantic-state owner；Store 是員工原話／更正／quote 的唯一 source owner。LangChain bounded agent、middleware、OpenRouter binding 與 `SkillsMiddleware` 承接 model loop、最小充分 context 與專業方法。API 以 generated contract＋typed SSE 投影 durable state；完成垂直切片後一次硬切並刪除舊 writer，不做 compatibility adapter 或雙寫。
+**Architecture:** 新建 `app/consultant` purpose-first runtime。LangGraph PostgreSQL Saver 是可修訂理解、動態訪談工作、缺口、待審文件變更與核准文件的唯一 semantic-state owner；Store 是員工原話／更正／quote 的唯一 source owner。LangChain bounded agent、middleware、OpenRouter binding，以及 Deep Agents `SkillsMiddleware`＋read-file-only middleware 承接 model loop、最小充分 context 與專業方法。API 以 generated contract＋typed SSE 投影 durable state；完成垂直切片後一次硬切並刪除舊 writer，不做 compatibility adapter 或雙寫。
 
-**Tech Stack:** Python 3.13、FastAPI 0.141.1 stable upgrade candidate、LangChain 1.3.15、LangGraph 1.2.11、`langgraph-checkpoint-postgres` 3.1.2、`langchain-openrouter` 0.2.7、Deep Agents 0.7.5（只取 Skills middleware）、PostgreSQL 16、Pydantic 2、JSON Schema codegen、Next／React、TanStack Query、OpenTelemetry、pytest／Vitest。版本已於 2026-08-14 以官方 PyPI 指定版本端點確認存在且未被 yank；兩個 Beta integration 必須有窄介面 canary。
+**Tech Stack:** Python 3.13、FastAPI 0.141.1、HTTPX 0.28.1、LangChain 1.3.15、LangGraph 1.2.11、`langgraph-checkpoint-postgres` 3.1.2、`langchain-openrouter` 0.2.7、Deep Agents 0.7.5（只取 Skills＋read-only file middleware）、PostgreSQL 16、Pydantic 2、JSON Schema codegen、Next／React、TanStack Query、OpenTelemetry、pytest／Vitest。版本已於 2026-08-14 以官方 PyPI 指定版本端點確認存在且未被 yank；兩個 Beta integration 必須有窄介面 canary。
 
 **Spec:** [`2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md`](../specs/2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md) §0–§8、§9.12–§9.13；[ADR 0060](../adr/0060-langchain-langgraph-consultant-runtime-and-durable-authority.md)；Task／Duty／OPKS 方法依研究稿 §10 所列 repo 研究。
 
@@ -60,16 +60,16 @@ Big-bang 只代表最後一次硬切，不允許累積十個 Task 後才發現�
 - Modify: `apps/api/pyproject.toml`
 - Modify: `apps/api/uv.lock`
 - Create: `apps/api/tests/test_native_sse_compatibility.py`
-- Modify only if required: `apps/api/app/app_factory.py`
+- Modify only if required: `apps/api/app/app_factory.py`, `apps/api/tests/test_app_wiring.py`
 
 **Produces:** A locked framework stack and a verified typed-SSE path without changing product behavior.
 
-- [ ] Write a failing SSE compatibility test that creates a minimal endpoint and asserts `event`, JSON `data`, stable `id`, heartbeat, disconnect-safe completion, `Last-Event-ID` parsing, `/healthz`, and existing RFC 9457 responses.
-- [ ] Run `uv run pytest tests/test_native_sse_compatibility.py -q`; expect failure because the target FastAPI/framework versions are not installed.
-- [ ] Pin LangChain 1.3.15, LangGraph 1.2.11, `langgraph-checkpoint-postgres` 3.1.2, `langchain-openrouter` 0.2.7 and Deep Agents 0.7.5. Upgrade FastAPI to stable 0.141.1 and resolve Starlette／httpx with `uv lock`; assert the lock contains these exact, non-yanked distributions.
-- [ ] Run the SSE test and entire API suite. If FastAPI 0.141.1 breaks an existing product contract, capture the exact failure, revert only FastAPI, and implement SSE with current FastAPI＋`StreamingResponse`; do not add `sse-starlette` or Agent Server.
-- [ ] Add narrow import／behavior canaries for the Beta `langchain-openrouter` and standalone `SkillsMiddleware`; prove no Deep Agents filesystem／shell／subagent／todo tool is exposed.
-- [ ] Verify exact imported versions, run the common north-star gate, append the Task 1 ledger entry and commit `build: add consultant runtime framework stack`.
+- [x] Write a failing SSE compatibility test that creates a minimal endpoint and asserts `event`, JSON `data`, stable `id`, heartbeat, disconnect-safe completion, `Last-Event-ID` parsing, `/healthz`, and existing RFC 9457 responses.
+- [x] Run `uv run pytest tests/test_native_sse_compatibility.py -q`; expect failure because the target FastAPI/framework versions are not installed.
+- [x] Pin LangChain 1.3.15, LangGraph 1.2.11, `langgraph-checkpoint-postgres` 3.1.2, `langchain-openrouter` 0.2.7 and Deep Agents 0.7.5. Upgrade FastAPI to stable 0.141.1 and HTTPX to stable 0.28.1, resolve Starlette with `uv lock`; assert the lock contains these exact, non-yanked distributions.
+- [x] Run the SSE test and entire API suite. If FastAPI 0.141.1 breaks an existing product contract, capture the exact failure, revert only FastAPI, and implement SSE with current FastAPI＋`StreamingResponse`; do not add `sse-starlette` or Agent Server.
+- [x] Add narrow import／behavior canaries for the Beta `langchain-openrouter` and `SkillsMiddleware`＋`FilesystemMiddleware(tools=["read_file"])`; prove only `read_file` is exposed and no host filesystem／write／delete／shell／subagent／todo tool enters the agent.
+- [x] Verify exact imported versions, run the common north-star gate, append the Task 1 ledger entry and commit `build: add consultant runtime framework stack`.
 
 ### Task 2: Establish framework-owned durable source and document state
 
@@ -132,6 +132,7 @@ Big-bang 只代表最後一次硬切，不允許累積十個 Task 後才發現�
 
 - Create: `apps/api/app/consultant/agent.py`
 - Create: `apps/api/app/consultant/results.py`
+- Create: `apps/api/app/consultant/skill_backend.py`
 - Create: `apps/api/app/consultant/skills/work-discovery/SKILL.md`
 - Create: `apps/api/app/consultant/skills/story-interview/SKILL.md`
 - Create: `apps/api/app/consultant/skills/task-boundary/SKILL.md`
@@ -152,7 +153,7 @@ Big-bang 只代表最後一次硬切，不允許累積十個 Task 後才發現�
 - [ ] Add method-conformance tests from the accepted research: Story／Work Unit／Task are not one-to-one; Task requires action／object／meaningful outcome／current responsibility and is not merely a tool、step or one-off; Duty stays revisable and cannot become an early fixed box; K/S are inferred from concrete Task／story／O/P evidence rather than a leading “你需要什麼能力” question; K is noun-like, S is applied action, neither uses `ability to`／「具備…之能力」、empty degree adjectives or per-skill proficiency; P is observable and not a personality label.
 - [ ] Add completion-red-team tests covering routine-work omission, dramatic-story bias, other-person／past／one-off work, over-merge／over-split／duplicate Task, unsupported O/P/K/S and unresolved high-impact contradiction. One employee-facing turn still asks only one main question.
 - [ ] Convert the researched methods—not old prompt wrappers—into the nine Skills above. Each Skill states eligibility, required evidence, outputs, gaps, anti-hallucination rules and when to reopen another analysis direction.
-- [ ] Bind Skills through `SkillsMiddleware` with one read per selected Skill and framework call limits: at most three model calls and two lookup waves per interactive run.
+- [ ] Bind Skills through `SkillsMiddleware` and a shared `FilesystemMiddleware(tools=["read_file"])`. Implement only a traversal-safe, read-only `BackendProtocol` adapter over versioned `/skills` package resources; do not use host `FilesystemBackend` in the API. Load each selected Skill at most once and enforce at most three model calls and two lookup waves per interactive run.
 - [ ] Require source dependencies and allowed Skill IDs in typed output; verifier rejects unauthorized source／Skill IDs, invalid quote anchors and unsupported document change paths. Run focused tests, run the common north-star gate, append the Task 4 ledger entry and commit `feat: add professional consultant skills`.
 
 ### Task 5: Deliver adaptive interview, visible understanding and truthful sufficiency

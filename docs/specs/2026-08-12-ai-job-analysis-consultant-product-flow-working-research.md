@@ -265,6 +265,29 @@ Owner 確認第一版產品的產出定位為：
 
 **產品裁決**：owner 於 2026-08-13 確認採方案 2。它只建立員工對訪談方式、動態重整、核准權與可恢復性的預期；不建立完整訪談計畫、不形成固定問題分母，也不要求開場核准。實作文案與視覺形式留到目標架構／Web 體驗關卡，不在此鎖定。
 
+#### 3.1.2 正常暫停後的返回體驗（研究候選；owner 待確認）
+
+**問題**：§3.1 已說恢復時要交代上次焦點、目前理解、待處理事項與建議下一步，但尚未決定員工離開數天後重新開啟文件時，要直接接著問舊問題、先核准完整摘要，或以較輕量的方式恢復情境。這裡討論的是上一個顧問回合已正常提交後的暫停；尚未分析完成的回答依 §3.12 恢復同一 run，等待 Proposal 決策也仍是獨立 domain command，三者不能混成同一種「繼續」。
+
+**直接來源與實際支持**（最近查核：2026-08-13）：
+
+- [OpenAI 官方 Running agents](https://developers.openai.com/api/docs/guides/agents/running-agents)把一個 SDK run 視為一個 application-level turn，並將 application-controlled session 列為 persistent state、resumable run 與可控儲存的預設；若 run 因 approval 或中止而暫停，應從既有 state 繼續，不建立新的假回合。這支持保存清楚的 continuation identity，不直接規定員工返回頁面的摘要或按鈕。
+- [Google — Build long-running AI agents that pause, resume, and never lose context with ADK](https://developers.googleblog.com/build-long-running-ai-agents-that-pause-resume-and-never-lose-context-with-adk/)示範從 durable session 還原既有狀態並由正確 checkpoint 接回，而不是重播全部聊天或猜測中間步驟。它是固定 onboarding state machine 的工程示例，不是動態職務訪談的 UX 研究。
+- [Microsoft HAX — Remember recent interactions](https://www.microsoft.com/en-us/haxtoolkit/guideline/remember-recent-interactions/)要求跨互動攜帶近期情境，讓使用者能有效引用先前內容；[Show contextually relevant information](https://www.microsoft.com/en-us/haxtoolkit/guideline/show-contextually-relevant-information/)則要求依當前工作顯示相關資訊。這支持恢復時先呈現焦點與必要缺口，而不是要求員工自己翻長聊天。
+- [Google PAIR — Feedback + Control](https://pair.withgoogle.com/guidebook-v2/chapter/feedback-controls/)把追蹤進度、稍後返回與「自動化和控制的平衡」列為個人效用，並提醒產品通常不是使用者生活的唯一焦點，互動要求應少而可略過。這支持 AI 給明確建議但員工能立即改道，不支持強制重新核准整份訪談計畫。
+
+**可轉移限制**：OpenAI 與 Google ADK 主要支持 runtime continuity，不證明任何返回 UI 的效果；HAX 與 PAIR 是通用 AI UX 指引，沒有直接比較繁中職務訪談的三種返回方案。以下方案 2 是把 durable source、focus／agenda、三層進度、Work Model／Current JD 分離與員工控制套入這些共同原則後的產品設計。
+
+**研究選項**：
+
+1. **開頁後直接續問上次問題**：操作最少，但員工可能已忘記脈絡、想先看進度或改談別件事；光是開啟文件也不應自動產生一次付費模型回合。不採用。
+2. **簡短接續摘要＋建議焦點＋可立即改道（建議）**：先由持久狀態產生可檢查的 `Resume Brief`，說明「上次停在哪裡、已確認什麼、目前焦點還差什麼、旁支線索／待決 Proposal 有哪些、AI 建議接哪裡以及理由」。主要動作是「繼續建議焦點」，另提供「改選其他已知工作／缺口」與「先看或修正目前理解」。員工採取動作後才開始新的正常顧問回合；不核准整份 Work Model、不重播完整聊天，也不因經過固定天數就把既有內容判成失效。
+3. **每次返回先重看並核准完整摘要／訪談計畫**：最明確，但把正常恢復變成高摩擦 checkpoint，也會重新引入固定 wizard 與假分母；不採用。
+
+方案 2 的 Resume Brief 是從最新已提交的 Source、Work Model、Current JD、focus／agenda、progress 與 Proposal 投影而來，不能只依 provider 聊天記憶自由生成。若文件另有未完成 input run，優先呈現 §3.12 的恢復狀態；若建議焦點依賴未決結構性 Proposal，只阻擋該 branch，仍可處理 Proposal 或改選不相依焦點。員工若表示工作已大幅改變，則把它當新的 durable correction／coverage signal 重新盤點，不靠「離開多久」自動猜測工作已變。
+
+**待 owner 裁決**：是否採方案 2；Resume Brief 的最終欄位、何時需要額外校準、Web 呈現與是否需要模型潤飾，留到能力地圖／目標架構關卡。
+
 ### 3.2 廣度盤點：建立「目前已知的工作地圖」
 
 AI 從不同角度協助員工回想工作：

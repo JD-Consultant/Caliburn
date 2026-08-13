@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -21,6 +23,28 @@ class Settings(BaseSettings):
     job_analysis_provider: str = "anthropic"
     job_analysis_max_output_tokens: int = 4096
     job_analysis_timeout_s: float = 90.0
+
+    # Versioned target consultant profile and interactive run policy (ADR 0060).
+    consultant_profile_id: str = "primary-consultant"
+    consultant_profile_revision: int = 1
+    consultant_model: str = "anthropic/claude-opus-5"
+    consultant_provider: str = "Anthropic"
+    consultant_temperature: float | None = None
+    consultant_top_p: float | None = None
+    consultant_max_output_tokens: int = 4096
+    consultant_output_token_parameter: str = "max_tokens"
+    consultant_reasoning_effort: str | None = "high"
+    consultant_timeout_seconds: float = 90.0
+    consultant_policy_revision: int = 1
+    consultant_max_context_tokens: int = 24_000
+    consultant_max_model_calls: int = 3
+    consultant_max_lookup_waves: int = 2
+    consultant_max_total_tool_calls: int = 12
+    consultant_model_retry_count: int = 1
+    consultant_tool_retry_count: int = 1
+    consultant_max_elapsed_seconds: float = 180.0
+    consultant_max_total_tokens: int = 32_000
+    consultant_max_cost_usd: Decimal | None = Decimal("2.00")
 
 
 settings = Settings()

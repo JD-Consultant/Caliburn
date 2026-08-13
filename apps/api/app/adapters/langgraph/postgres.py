@@ -232,6 +232,23 @@ class PostgresConsultantRuntime:
             raise KeyError(f"employee source {source_id} was not found")
         return source
 
+    async def list_sources(self, document_id: UUID) -> tuple[EmployeeSource, ...]:
+        await self._require_active_catalog(document_id)
+        namespace = self.source_namespace(document_id)
+        sources: list[EmployeeSource] = []
+        offset = 0
+        while items := await self.store.asearch(
+            namespace,
+            limit=100,
+            offset=offset,
+        ):
+            sources.extend(EmployeeSource.model_validate(item.value) for item in items)
+            if len(items) < 100:
+                break
+            offset += len(items)
+        sources.sort(key=lambda item: (item.created_at, str(item.source_id)))
+        return tuple(sources)
+
     @staticmethod
     def _same_immutable_source(
         persisted: EmployeeSource, requested: EmployeeSource

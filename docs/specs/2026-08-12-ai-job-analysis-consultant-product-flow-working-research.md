@@ -337,7 +337,7 @@ AI 應告訴員工：現在談什麼、為什麼現在談、要釐清到什麼�
 
 這是產品的語意循環。2026-08-13 已確認其高階執行形狀為「預設單次 inference 快速路徑＋必要時受限補查／再判斷」：不固定每輪多呼叫，也不允許自由 Agent loop。至於同一 run 內的 tool loop、少數 specialist、final submit contract 與框架映射仍是實作選擇；不得反過來因框架或呼叫形式改變上述顧問責任。
 
-### 3.7 小段落收束、重整與提案
+### 3.7 小段落收束、重整與提案（2026-08-13 review bundle 粒度已確認）
 
 完成一小段有意義的訪談後，AI 可以整理：
 
@@ -361,11 +361,14 @@ Proposal 採「有意義檢查點」節奏，不採每句回答都要求核准�
 
 關聯變更採「共同脈絡、依相依性分組」：
 
+Owner 於 2026-08-13 明確選擇**可編輯的 review bundle＋必要的原子子群組**，不採每個欄位各跳一張 Proposal，也不把整批變更綁成全收全退。`review bundle` 是員工看到的一次審核脈絡；底層 `typed changeset` 仍保存每項操作、目標、before／after、來源、相依關係與 stale/read-set。框架的一般 HITL／approval 只能承接呈現、暫停與回傳選擇，不能把這個 domain grouping 壓成單一布林核准。
+
 - 員工先看到這組建議的共同理由、來源證據與整體影響；
 - 可以獨立成立的文字、名稱或 OPKS 候選，允許逐項接受、修改或拒絕；
 - 只有必須一起成立才不會破壞結構的操作，才組成不可拆的子決策，例如建立 Duty 並完成必要的 Task reassignment；
 - 員工修改任一項後，系統重新檢查剩餘變更是否仍成立，不提交失去前提或留下無效 linkage 的內容；
-- 分組依據是 domain dependency，不是由哪一個 Skill 產生，也不把整批不相關的變更綁成全收全退。
+- 分組依據是 domain dependency，不是由哪一個 Skill 產生，也不把整批不相關的變更綁成全收全退；
+- 拒絕、修改與暫不處理都要留下可追溯裁決；若沒有新員工來源、實質工作邊界變化或其他會推翻原理由的新證據，AI 不得換個措辭重複提出同一變更。
 
 #### 3.7.1 Proposal 依「是否改變後續分析前提」分級阻擋（已確認）
 
@@ -1298,7 +1301,7 @@ OpenRouter 又多一層 routing：它本身預設不保存 prompts，除非使�
 7. 可替換 model／provider、參數 profile、usage、trace 與失敗恢復；
 8. 支援上述流程的 API／Web 體驗。
 
-切換邊界已於 2026-08-13 收斂：iCAP Reference／RAG 是 final gate，worktree 內先做核心顧問、後接 RAG，完成後一次切換；目前也沒有需保留的真實 JD／訪談資料，因此採 fresh-schema hard cut，不做舊 AI 狀態 migration。下一個產品語意問題是把「可演化工作假說」與「跨 Task／Duty／OPKS 的 typed changeset」說成 framework-neutral contract，再進入框架比較。
+切換邊界已於 2026-08-13 收斂：iCAP Reference／RAG 是 final gate，worktree 內先做核心顧問、後接 RAG，完成後一次切換；目前也沒有需保留的真實 JD／訪談資料，因此採 fresh-schema hard cut，不做舊 AI 狀態 migration。跨 Task／Duty／OPKS 的 Proposal 粒度也已確認為「可編輯 review bundle＋必要原子子群組」。下一個產品語意問題是把「可演化工作假說」說成 framework-neutral contract，再進入框架比較。
 
 能力地圖確認後，再逐列建立「目標能力／現況／框架候選／`Replace|Wrap|Retain`／仍需自寫語意／successor ADR／驗收情境」矩陣，回答哪些成熟元件能真正取代現有實作。LangGraph／LangChain、OpenAI Agents SDK、Microsoft Agent Framework、Google ADK、Agent Skills、Pydantic＋SQLAlchemy＋PostgreSQL、W3C anchor／provenance 等目前都只是候選或標準；任何框架都不得以舊 module 拓撲作為新設計目標，也不得在 conformance 前取得產品 authority。研究稿仍不能直接當施工授權。
 

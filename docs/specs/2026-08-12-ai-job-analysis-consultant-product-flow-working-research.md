@@ -11,6 +11,19 @@
 
 這份文件用來避免長期討論遺失已確認的大方向。每次只把已對齊的內容寫成明確規則；尚未討論或仍可能翻案的內容列在「待討論」，不假裝已定案。
 
+### 0.1 研究來源與決策追溯規則
+
+文末參考資料只作來源總索引，不能取代決策附近的研究紀錄。從 2026-08-13 起，每項由外部研究支持的產品方向應在相鄰段落保留：
+
+1. **裁決與狀態**：是研究候選、owner 已確認、未決參數或已被後續決策取代，並記錄日期；
+2. **直接來源**：優先連到官方文件、原始研究、標準或本 repo 權威研究，不只寫廠商名稱或二手結論；
+3. **來源實際支持的內容**：區分來源明說、來源實驗結果與 Caliburn 的領域推論；
+4. **可轉移限制**：說明原資料的任務、語言、使用者、資料集、評量方式與本產品有何不同，不能把「大廠採用」寫成已驗證本產品效果；
+5. **產品理由與取捨**：記錄為何適用到 Caliburn、保留哪些 authority／安全邊界，以及不採用方案的主要理由；
+6. **修訂關係**：後續若反證或翻案，追加新結論與取代關係；保留舊理由供審核，不用無痕改寫讓歷史消失。
+
+同一來源可在文末只列一次，但使用它作裁決的段落必須直接連結或明確指向來源項目。Stakeholder 草稿、owner 偏好、現行 code／ADR、通用工程建議與領域實證必須分開標示；它們提供的權威種類不同。連結內容可能更新時，紀錄最近查核日期與當時採用的具體主張；進入 ADR／實作計畫前應重新開啟關鍵來源查核，而不是只相信本稿摘要。
+
 目前先回答四個問題：
 
 1. 這個 LLM 專業職務說明書顧問，從開始到匯出大致怎麼工作？
@@ -188,7 +201,7 @@ AI 從不同角度協助員工回想工作：
 
 廣度盤點與深入訪談不是先後通關。當某項工作已值得深入，就可以進入焦點訪談；深入時若發現新範圍，也可以回到盤點。
 
-### 3.3 選擇本輪焦點
+### 3.3 選擇本輪焦點與處理新線索（2026-08-13 研究後確認）
 
 AI 根據最新狀態選一個最值得處理的問題。優先考量：
 
@@ -204,11 +217,22 @@ AI 應告訴員工：現在談什麼、為什麼現在談、要釐清到什麼�
 
 焦點採分級切換，不採「一定問完才換題」，也不追著每個新線索跳轉：
 
-- 與目前工作相關的新資訊，直接吸收到當前分析；
-- 不影響當前判斷的新 Task、Duty 或 OPKS 線索，保存到待處理清單；
-- 若新資訊會推翻目前 Task 邊界、改變本人責任、揭露重大矛盾或高風險遺漏，AI 應說明原因後暫停並切換；
-- 員工明確要求換題時立即尊重，但保留尚未處理的焦點；
-- 每次中斷都要保存返回點，之後能說明原焦點談到哪裡、為何中斷、還差什麼。
+- **吸收到目前焦點**：與目前工作直接相關、能回答當前問題或補充其 Task／Duty／OPKS 的資訊，直接納入當前分析；換用相關 Skill 不等於換題。
+- **停放到可見議程**：獨立且不影響當前判斷的新 Task、Duty、OPKS 或未分類線索，保存到待處理清單；顧問用一句話回報已記錄與稍後處理，不立刻展開第二個主要問題。
+- **修正或切換焦點**：只有新資訊使當前問題前提失效、改變本人／他人責任、會實質改變 Task 邊界、形成重大來源矛盾，或延後會讓後續分析建立在錯誤理解上時，AI 才說明原因、暫停並詢問一個必要問題。
+- **員工主動改道**：員工明確要求換題、返回或暫停時立即尊重，不要求先完成 AI 原定問題；尚未處理的焦點仍保留。
+- **可恢復中斷**：每次中斷都保存返回點，之後能說明原焦點談到哪裡、為何中斷、還差什麼。
+
+「新線索看起來重要」本身不足以立即打斷。判斷標準是它是否**現在就阻塞或推翻當前合法分析**，不是它最終可能有多高價值；高價值但不阻塞的線索先提高 agenda 優先序，在當前焦點暫時收束後再選取。
+
+研究依據與轉用（最近查核：2026-08-13）：
+
+- [OpenAI 官方 Model guidance](https://developers.openai.com/api/docs/guides/latest-model)要求提供目前目標、相關 context、限制與核准邊界，並在重要歧義時提問；同時應讓安全且在 scope 內的工作持續，不因重複 approval 指令造成不必要停頓。這支持「一般線索不中斷，重要歧義才停」。
+- [Anthropic — Trustworthy agents in practice（2026-04-09）](https://www.anthropic.com/research/trustworthy-agents)明確把過度詢問與一律自行假設都列為問題：可自行解決的缺口繼續處理，只有使用者才能決定的偏好、意圖或重大不確定才交還使用者。這支持分級處理，而不是每個新線索都切換。
+- [Microsoft HAX — Time services based on context](https://www.microsoft.com/en-us/haxtoolkit/guideline/time-services-based-on-context/)要求依使用者當前 task／attention 決定何時打斷；[Support efficient correction](https://www.microsoft.com/en-us/haxtoolkit/guideline/support-efficient-correction/)與[Convey the consequences of user actions](https://www.microsoft.com/en-us/haxtoolkit/guideline/convey-the-consequences-of-user-actions/)則支持讓員工容易修正，並立即回饋「已保存、稍後會怎麼處理」，而不是靜默停放。
+- [U.S. OPM — Assessment and Selection](https://www.opm.gov/policy-data-oversight/assessment-and-selection/)要求 job analysis 保存 Task、角色／責任、competency、資源與工作情境的 linkage，並由具有直接、最新工作經驗的 SME 提供資訊。這支持責任與 Task 邊界矛盾要向員工釐清，不能由 Reference 或模型猜測。
+
+可轉移限制：OpenAI／Anthropic 資料是通用 agent 行為，Microsoft HAX 是跨產品人機互動指引，OPM 說明職務分析證據與 SME，但沒有規定 LLM 訪談的 topic-switch 演算法；目前也沒有公開研究直接比較繁中單一員工職務訪談的三種切換策略。因此上述三級模型是將共同原則套入 Caliburn「一個主要焦點、完整吸收回答、員工 authority、可恢復 agenda」後的產品裁決，不得宣稱已由外部 benchmark 證明效果最佳。
 
 當目前證據已足以形成 Proposal、確認 `no-op`、留下具體 gap，或以有理由的 unknown／not applicable 暫時停止時，焦點才算暫時收束。這不是永久完成；後續證據仍可重新開啟。
 
@@ -1305,6 +1329,7 @@ Stakeholder 草稿（非權威，只作需求來源）：
 - [Microsoft — Adaptive Cards for agent design](https://learn.microsoft.com/en-us/agents/design-guidelines/adaptive-cards-for-agent-design)
 - [Apple HIG — Generative AI](https://developer.apple.com/design/human-interface-guidelines/generative-ai)
 - [U.S. OPM — Job Analysis](https://www.opm.gov/policy-data-oversight/assessment-and-selection/job-analysis/)
+- [U.S. OPM — Assessment and Selection（Task／responsibility／competency linkage 與 current SME）](https://www.opm.gov/policy-data-oversight/assessment-and-selection/)
 - [U.S. OPM — Job analysis evidence and methodology FAQ](https://www.opm.gov/frequently-asked-questions/assessment-policy-faq/job-analysis/when-conducting-a-job-analysis-do-i-have-to-collect-ratings-eg-importance-required-at-entry-from-the-subject-matter-experts-sme-for-the-tasks-and-competencies/)
 - [U.S. OPM — Six Steps to Conducting a Job Analysis for Multiple Grades](https://www.opm.gov/policy-data-oversight/assessment-and-selection/job-analysis/six-steps-to-conducting-a-job-analysis-for-multiple-grades/)
 - [U.S. OPM — Delegated Examining Operations Handbook（Job Analysis 與 SME）](https://www.opm.gov/policy-data-oversight/hiring-information/competitive-hiring/deo_handbook.pdf)

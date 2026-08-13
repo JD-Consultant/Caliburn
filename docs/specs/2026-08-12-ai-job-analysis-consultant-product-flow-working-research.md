@@ -551,6 +551,29 @@ Work Model 是 AI 隨證據持續修正的分析層；員工不需要逐筆審�
 
 此情境的驗收效果是：AI 主動帶路，員工不用理解分析方法；每輪知道正在談什麼與為什麼；旁支線索不遺失；正式內容只在有意義檢查點由員工決定。
 
+### 3.12 AI 中斷與失敗時的員工體驗（研究候選；owner 待確認）
+
+**問題**：§2.7、§2.12 與 §7.16 已確認「員工原話先保存、執行可恢復、業務結果整批提交」，但還需要把 timeout、斷線、provider／schema／verifier 失敗轉成員工看得懂的流程。尤其要決定：短暫失敗是否自動重試、重試用盡後員工能做什麼，以及能否越過一則尚未分析的回答繼續產生新訪談回合。
+
+**直接來源與實際支持**（最近查核：2026-08-13）：
+
+- [OpenAI 官方 Running agents](https://developers.openai.com/api/docs/guides/agents/running-agents)把一個 SDK run 視為一個 application-level turn，建議持久會話使用 application-controlled session；串流要完成後才算 settled，中止的同一回合應從保存的 state 恢復，而不是建立新的使用者回合。它也要求區分 runtime／validation failure 與預期的人工作業暫停。這支持「同一回答恢復同一 run、未完成不能偽裝成成功回覆」。
+- [AWS Builders' Library — Making retries safe with idempotent APIs](https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/)說明 timeout 後無法知道操作是否已完成，盲目重試可能造成重複副作用；可自動重試的前提是穩定 caller-provided request ID、idempotent contract 與一致的結果語意。這直接支持沿用同一 `input_event_id／operation_id`，不把 retry 當新來源。
+- [Microsoft HAX — Support efficient correction](https://www.microsoft.com/en-us/haxtoolkit/guideline/support-efficient-correction/)要求 AI 出錯時讓使用者容易 edit、refine 或 recover。這支持失敗狀態必須有清楚的重試／修正／稍後返回入口，而不是只顯示技術錯誤或要求重打全文。
+- [Google — Build long-running AI agents that pause, resume, and never lose context with ADK](https://developers.googleblog.com/build-long-running-ai-agents-that-pause-resume-and-never-lose-context-with-adk/)主張長流程使用顯式 durable state，與原始聊天歷史分離，才能跨重啟與等待恢復。這支持本地保存明確 run／processing state，不支持把 Google 範例的固定 onboarding state machine 複製成 Caliburn 的訪談階段。
+
+**可轉移限制**：OpenAI、AWS 與 Google 資料主要證明 runtime／distributed-system 恢復形狀；Microsoft HAX 是通用人機互動指引。沒有來源直接研究繁中職務訪談中「前一則回答分析失敗時，是否允許繼續送出後續回答」。下列順序約束是依 Caliburn 必須全域吸收每則回答、後續問題依賴最新 Work Model、且不可產生半套 Proposal 的產品推論，不冒充大廠 UX 標準。
+
+**候選方案**：
+
+1. **只在背景持續自動重試**：員工一直看到分析中，直到成功。操作最少，但 provider 長時間故障時沒有清楚停止點，可能累積成本，也無法讓員工修正造成 validation failure 的輸入。
+2. **短暫錯誤受限自動重試，之後轉成可恢復待處理（目前建議）**：送出後先回報「回答已保存」；網路、rate limit 等明確 transient failure 在同一 run／attempt policy 內短暫自動重試。成功才出現正式顧問回覆。用盡上限後顯示「原話已保存、AI 尚未完成分析、正式 JD 未改變」，提供「重試分析」「修正／取代這則回答」「離開並稍後回來」。重整頁面或重啟程式仍回到同一狀態；若結果其實已提交，依 result receipt 顯示既有成功結果，不重打模型。
+3. **允許後續回答越過失敗項目排隊**：訪談看似不中斷，但後面的顧問問題與分析可能沒有讀到前一則來源，之後還要處理跨回合重排、stale Context 與相互衝突的 semantic commit；第一版不建議。
+
+採方案 2 時，第一版預設不讓同一文件產生新的 **AI 訪談回答**，直到該 input 已完成 semantic commit，或員工以新的 correction／withdraw intent 明確取代它；否則系統無法保證下一題建立在完整來源上。這只暫停該文件的 AI 訪談鏈：員工仍可查看來源與進度、處理既有 Proposal、直接編輯 Current JD、匯出或離開。這些其他動作若改變 authority generation，恢復時依既定 stale／read-set 規則重新組裝，不把舊結果硬套到新狀態。
+
+**待 owner 裁決**：是否採方案 2，以及是否同意「未分析回答暫停同一文件的新 AI 訪談回答，但不封鎖其他既有功能」；技術 retry 次數、backoff 與 UI 文案留到 operation policy／目標架構關卡。
+
 ## 4. 焦點與進度 v0.1
 
 ### 4.1 焦點有兩層

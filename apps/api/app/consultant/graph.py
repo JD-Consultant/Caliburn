@@ -8,6 +8,11 @@ from uuid import UUID
 from langgraph.graph import END, START, StateGraph
 from langgraph.runtime import Runtime
 
+from app.consultant.clarification import interrupt_for_required_clarification
+from app.consultant.document_review import (
+    apply_review_command,
+    revalidate_after_direct_edit,
+)
 from app.consultant.interview import (
     VerifiedConsultantCommit,
     apply_source_correction,
@@ -49,6 +54,24 @@ def _require_revision(state: ConsultantThreadState, expected: int) -> None:
         raise StaleThreadRevision(expected, actual)
 
 
+def _source_state_update(
+    state: ConsultantThreadState,
+    source_reference: SourceReference | None,
+) -> ConsultantThreadState:
+    if source_reference is None:
+        return {}
+    supersessions = dict(state.get("source_supersessions", {}))
+    if source_reference.supersedes_source_id is not None:
+        supersessions[str(source_reference.supersedes_source_id)] = str(
+            source_reference.source_id
+        )
+    return {
+        "source_count": state.get("source_count", 0) + 1,
+        "latest_source_id": str(source_reference.source_id),
+        "source_supersessions": supersessions,
+    }
+
+
 def _apply_command(
     state: ConsultantThreadState,
     runtime: Runtime[ConsultantCommandContext],
@@ -73,26 +96,13 @@ def _apply_command(
         if source_reference_payload is not None
         else None
     )
-    source_count = state.get("source_count", 0)
-    latest_source_id = state.get("latest_source_id")
-    supersessions = dict(state.get("source_supersessions", {}))
-    if source_reference is not None:
-        source_count += 1
-        latest_source_id = str(source_reference.source_id)
-        if source_reference.supersedes_source_id is not None:
-            supersessions[str(source_reference.supersedes_source_id)] = str(
-                source_reference.source_id
-            )
-
     update: ConsultantThreadState = {
         "revision": expected_revision + 1,
-        "source_count": source_count,
-        "latest_source_id": latest_source_id,
-        "source_supersessions": supersessions,
     }
     if action == "register_source":
         if source_reference is None:
             raise ValueError("register_source requires a source reference")
+        update.update(_source_state_update(state, source_reference))
         if source_reference.supersedes_source_id is not None:
             update.update(
                 apply_source_correction(
@@ -111,10 +121,72 @@ def _apply_command(
             update["sufficiency"] = invalidated
         return update
     if action == "direct_edit":
+        before = ApprovedJobDocument.model_validate(state["approved_document"])
         approved = ApprovedJobDocument.model_validate(command["approved_document"])
         if approved.document_id != document_id:
             raise ValueError("approved document does not match thread document_id")
+        update.update(_source_state_update(state, source_reference))
         update["approved_document"] = approved.model_dump(mode="json")
+        update.update(
+            revalidate_after_direct_edit(
+                state,
+                before=before,
+                after=approved,
+                revision=expected_revision + 1,
+            )
+        )
+        work, current_work_id = normalize_current_work(
+            update.get("interview_work", state.get("interview_work", {})),
+            preferred_work_id=(
+                UUID(state["current_work_id"])
+                if state.get("current_work_id") is not None
+                else None
+            ),
+            revision=expected_revision + 1,
+        )
+        update["interview_work"] = work
+        update["current_work_id"] = current_work_id
+        invalidated = invalidate_sufficiency(
+            state,
+            revision=expected_revision + 1,
+        )
+        if invalidated is not None:
+            update["sufficiency"] = invalidated
+        return update
+    if action in {
+        "accept_changes",
+        "edit_and_accept_changes",
+        "reject_changes",
+        "defer_changes",
+    }:
+        reviewed = apply_review_command(
+            state,
+            action=action,
+            changeset_id=UUID(command["changeset_id"]),
+            action_ids=tuple(UUID(item) for item in command["action_ids"]),
+            revision=expected_revision + 1,
+            edited_after_by_action_id={
+                UUID(key): value
+                for key, value in command.get(
+                    "edited_after_by_action_id", {}
+                ).items()
+            },
+            rejection_reason=command.get("rejection_reason"),
+            source_reference=source_reference,
+        )
+        update.update(_source_state_update(state, source_reference))
+        update.update(reviewed)
+        work, current_work_id = normalize_current_work(
+            reviewed["interview_work"],
+            preferred_work_id=(
+                UUID(state["current_work_id"])
+                if state.get("current_work_id") is not None
+                else None
+            ),
+            revision=expected_revision + 1,
+        )
+        update["interview_work"] = work
+        update["current_work_id"] = current_work_id
         invalidated = invalidate_sufficiency(
             state,
             revision=expected_revision + 1,
@@ -123,6 +195,8 @@ def _apply_command(
             update["sufficiency"] = invalidated
         return update
     if action == "commit_consultant_result":
+        if source_reference is not None:
+            raise ValueError("model semantic commit cannot mint employee evidence")
         commit = VerifiedConsultantCommit.model_validate(command["semantic_commit"])
         update.update(
             apply_verified_consultant_commit(
@@ -143,6 +217,7 @@ def _apply_command(
             source_reference=source_reference,
             revision=expected_revision + 1,
         )
+        update.update(_source_state_update(state, source_reference))
         work, current_work_id = normalize_current_work(
             work,
             preferred_work_id=(
@@ -171,6 +246,11 @@ def build_consultant_graph(checkpointer: Any, store: Any) -> Any:
         context_schema=ConsultantCommandContext,
     )
     builder.add_node("apply_command", _apply_command)
+    builder.add_node(
+        "required_clarification",
+        interrupt_for_required_clarification,
+    )
     builder.add_edge(START, "apply_command")
-    builder.add_edge("apply_command", END)
+    builder.add_edge("apply_command", "required_clarification")
+    builder.add_edge("required_clarification", END)
     return builder.compile(checkpointer=checkpointer, store=store)

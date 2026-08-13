@@ -180,6 +180,7 @@ class ReviewableDocumentChange(ResultModel):
     operation: DocumentChangeOperation
     path: NonEmptyText
     after: JsonValue | None = None
+    target_ids: tuple[UUID, ...] = ()
     opks_kind: OpksKind | None = None
     task_ids: tuple[UUID, ...] = ()
     indicator_ids: tuple[UUID, ...] = ()
@@ -187,12 +188,25 @@ class ReviewableDocumentChange(ResultModel):
 
     @model_validator(mode="after")
     def references_are_unique(self) -> ReviewableDocumentChange:
-        if len(self.task_ids) != len(set(self.task_ids)):
-            raise ValueError("duplicate task_ids")
-        if len(self.indicator_ids) != len(set(self.indicator_ids)):
-            raise ValueError("duplicate indicator_ids")
+        for label, values in (
+            ("target_ids", self.target_ids),
+            ("task_ids", self.task_ids),
+            ("indicator_ids", self.indicator_ids),
+        ):
+            if len(values) != len(set(values)):
+                raise ValueError(f"duplicate {label}")
         if self.operation is not DocumentChangeOperation.WITHDRAW and self.after is None:
             raise ValueError("non-withdraw document change requires an after value")
+        if self.operation in {
+            DocumentChangeOperation.MERGE,
+            DocumentChangeOperation.SPLIT,
+        } and not self.target_ids:
+            raise ValueError("merge or split requires stable target_ids")
+        if self.operation not in {
+            DocumentChangeOperation.MERGE,
+            DocumentChangeOperation.SPLIT,
+        } and self.target_ids:
+            raise ValueError("target_ids are only valid for merge or split")
         return self
 
 
@@ -203,6 +217,26 @@ class NextQuestion(ResultModel):
     answer_target: NonEmptyText
     reason: NonEmptyText
     basis: AnalysisBasis
+
+
+class RequiredClarificationDraft(ResultModel):
+    """A rare ambiguity only the employee can resolve before safe inference."""
+
+    reason: NonEmptyText
+    question: NonEmptyText
+    current_understanding: NonEmptyText
+    choices: tuple[NonEmptyText, ...] = Field(min_length=2, max_length=3)
+    affected_work_ids: tuple[UUID, ...] = Field(min_length=1)
+    affected_branch: NonEmptyText
+    basis: AnalysisBasis
+
+    @model_validator(mode="after")
+    def choices_and_work_are_unique(self) -> RequiredClarificationDraft:
+        if len(self.choices) != len(set(self.choices)):
+            raise ValueError("duplicate clarification choices")
+        if len(self.affected_work_ids) != len(set(self.affected_work_ids)):
+            raise ValueError("duplicate clarification affected_work_ids")
+        return self
 
 
 class SufficiencyRecommendation(ResultModel):
@@ -234,6 +268,7 @@ class ConsultantResult(ResultModel):
     gaps: tuple[VisibleGap, ...] = ()
     reviewable_document_changes: tuple[ReviewableDocumentChange, ...] = ()
     next_question: NextQuestion | None = None
+    required_clarification: RequiredClarificationDraft | None = None
     sufficiency: SufficiencyRecommendation
 
     @model_validator(mode="after")
@@ -246,6 +281,10 @@ class ConsultantResult(ResultModel):
                 raise ValueError("semantic claim depends on an undeclared used Skill")
         if sum(item.make_current for item in self.attention_changes) > 1:
             raise ValueError("one consultant result can select only one current work item")
+        if self.next_question is not None and self.required_clarification is not None:
+            raise ValueError(
+                "required clarification replaces the ordinary next question"
+            )
         return self
 
     def analysis_bases(self) -> tuple[AnalysisBasis, ...]:
@@ -259,6 +298,8 @@ class ConsultantResult(ResultModel):
         ]
         if self.next_question is not None:
             values.append(self.next_question.basis)
+        if self.required_clarification is not None:
+            values.append(self.required_clarification.basis)
         return tuple(values)
 
     def factual_texts(self) -> tuple[tuple[str, AnalysisBasis], ...]:
@@ -290,6 +331,23 @@ class ConsultantResult(ResultModel):
                 (
                     (self.next_question.text, self.next_question.basis),
                     (self.next_question.reason, self.next_question.basis),
+                )
+            )
+        if self.required_clarification is not None:
+            values.extend(
+                (
+                    (
+                        self.required_clarification.reason,
+                        self.required_clarification.basis,
+                    ),
+                    (
+                        self.required_clarification.current_understanding,
+                        self.required_clarification.basis,
+                    ),
+                    (
+                        self.required_clarification.question,
+                        self.required_clarification.basis,
+                    ),
                 )
             )
         return tuple(values)

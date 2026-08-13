@@ -66,7 +66,21 @@ checkpoint 不複製員工逐字來源；Store 不保存第二份核准文件。
 - 每個語意 claim 明列 employee source IDs、quote anchors 與實際使用的 Skill IDs。commit 前 deterministic verifier 驗同文件 scope、current source、quote byte-range、selected／loaded Skill、允許的 document path／operation／payload、O／P 單 Task、K／S 文件層多對多 refs，以及具體數量、法規、SOP、公司規則與外部主張的逐字 anchor。模型文字本身永遠不是 evidence。
 - K／S 必須有有效員工 quote anchor；O 可以在操作型工作沒有獨立產出時保持空白，顧問改留下 Task-boundary gap，不為填表補造文件。能力級別與 A 連 model-facing enum 都不提供；職業／行業分類與 iCAP 配發代碼也不在允許的模型文件路徑。
 
-`ConsultantResult.reviewable_document_changes` 仍只是 Task 4 的語意草稿，不是可提交 patch。Task 6 會為每項操作配置 stable action ID、before／after、path read-set、dependency／atomic subgroup 與完整 review lifecycle；在那之前沒有任何路徑能把模型結果直接寫入核准文件。
+`ConsultantResult.reviewable_document_changes` 是模型語意輸出；application 會把它轉成可審核的 typed patch action，配置 stable action ID、before／after、path read-set、dependency 與必要時的 atomic subgroup。模型仍不能直接寫入核准文件；只有員工 review command 或 direct edit 能進入 document authority graph command。
+
+## 文件審核、authority 與必要澄清
+
+LangGraph checkpoint、`StateGraph` command 與 `interrupt()`／`Command(resume)` 直接承接持久化佇列、流程恢復與必要澄清的暫停點；Pydantic 直接承接 typed action／command validation。Caliburn 不再維護另一套 Proposal workflow engine，僅保留框架不知道的文件與職務分析政策：
+
+- 每個模型文件變更都可接受、員工修改後接受、拒絕或延後；同一展示 bundle 內的無關 action 可獨立決定，只有會造成非法中間態的明示 atomic subgroup 才全有或全無。
+- `ADD`／`REVISE`／`WITHDRAW`／`MERGE`／`SPLIT`／`REASSIGN`／`REORDER` 都經 stable-ID path、before／after 與 path read-set 驗證。模型可處理職稱、工作描述、Duty、Task、順序與 O／P／K／S；能力級別、A 與官方代碼不在 model-authored path。
+- unresolved Duty 結構或 Task 歸類只阻擋相依工作；安全旁支可繼續。審核結束只移除自己的 blocker，不會誤清必要澄清或理解校準 blocker。
+- dependency 表示先後條件，不自動等於 atomic；例如新 Task 可先接受，依賴它的 OPKS 後接受。Duty 建立與對應 reassignment、merge／split 清理及必要排序交換才組成 atomic subgroup。
+- direct edit 與 edit-accept 只有員工實際改寫的 delta 會成為新的 employee source。單純接受、拒絕或延後不是工作事實，不製造 evidence。
+- 員工更正來源時，只把直接依賴該來源的 pending action 標 stale，並連帶失效同一 atomic subgroup；其他待審內容、其他 blocker 與核准文件不變。被拒內容沒有新相關 evidence 時不能換句話重新提案。
+- 必要澄清只用在模型無法安全自行消解的重大歧義。它有原因、目前理解、選項與 affected branch；回答會成為員工 evidence，但不會順便接受文件變更。既有澄清未答前不得被下一輪模型替換，員工仍可直接編輯、補來源或繼續不相依的訪談。
+
+真正的文件權威仍是一份 `ApprovedJobDocument`，但它不是舊 Current JD 元件的相容層：它是新 graph state 中由 deterministic authority command 唯一可修改的核准產物。框架負責 durable execution；Caliburn 只定義這份職務說明書什麼變更合法、誰有權核准，以及 evidence 如何約束變更。
 
 ## Adaptive interview、理解校準與可信進度
 
@@ -92,4 +106,4 @@ LangGraph `StateGraph`、typed checkpoint、`add_messages` reducer 與 PostgreSQ
 
 ## 當前邊界
 
-這個 foundation 已有可替換模型 profile、LangChain agent harness、attempt receipt、Context middleware、真實顧問 Skills、adaptive interview routing、可見理解／Gap／語意進度與 typed semantic result，但尚未接完整文件 patch／review command、required-clarification interrupt、production route 或 Web。它沒有 RAG／Reference、能力級別／A 生成、品質 eval 或舊 writer bridge。舊 production composition 會維持到垂直切片完成，最終硬切才刪除，不雙寫。
+這個新 runtime 已有可替換模型 profile、LangChain agent harness、attempt receipt、Context middleware、真實顧問 Skills、adaptive interview routing、可見理解／Gap／語意進度、完整文件 patch／review command、deterministic authority 與 required-clarification interrupt。尚未完成的是 production API／跨語言契約、員工 Web 工作面、匯出接線與舊 production composition 的最終 hard cut。它沒有 RAG／Reference、能力級別／A 生成或正式品質 eval；舊 production composition 只維持到垂直切片完成，最終硬切後刪除，不雙寫。

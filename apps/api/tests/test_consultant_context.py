@@ -22,10 +22,16 @@ from app.consultant.context import (
     SourceLookupMode,
     build_consultant_context,
 )
+from app.consultant.document_review import create_document_changeset
 from app.consultant.model_runtime import (
     ConsultantModelProfile,
     RunPolicy,
     resolve_execution,
+)
+from app.consultant.results import (
+    AnalysisBasis,
+    DocumentChangeOperation,
+    ReviewableDocumentChange,
 )
 from app.consultant.state import (
     ApprovedDuty,
@@ -180,6 +186,26 @@ async def test_main_context_has_global_orientation_focus_and_exact_current_sourc
                 kind=EmployeeSourceKind.EMPLOYEE_TURN,
                 text="  我還會追蹤緊急缺料，必要時通知業務。\n",
             )
+            review_bundle = create_document_changeset(
+                document_id=document_id,
+                run_id=uuid4(),
+                summary="建議補充緊急缺料處理 Task。",
+                read_revision=latest.revision,
+                document=document,
+                changes=(
+                    ReviewableDocumentChange(
+                        operation=DocumentChangeOperation.REVISE,
+                        path=f"/tasks/{document.tasks[0].task_id}/statement",
+                        after="辨識並追蹤緊急缺料",
+                        basis=AnalysisBasis(
+                            source_ids=(current_source_id,),
+                            skill_ids=("task-boundary",),
+                        ),
+                    ),
+                ),
+                existing_review_queue={},
+                interview_work={},
+            )
             snapshot = ConsultantSnapshot.model_validate(
                 {
                     **latest.model_dump(mode="json"),
@@ -213,16 +239,19 @@ async def test_main_context_has_global_orientation_focus_and_exact_current_sourc
                         }
                     },
                     "review_queue": {
-                        "c-1": {
-                            "status": "pending",
-                            "summary": "建議補充緊急缺料處理 Task",
-                        }
+                        str(review_bundle.changeset_id): review_bundle.model_dump(
+                            mode="json"
+                        )
                     },
                     "required_clarification": {
                         "clarification_id": str(uuid4()),
                         "question": "緊急缺料時由誰決定通知業務？",
                         "reason": "員工說法與核准文件的責任邊界衝突",
+                        "current_understanding": "目前可能由員工或主管決定。",
+                        "choices": ["員工", "主管", "視情況"],
                         "affected_work_ids": [str(work_id)],
+                        "affected_branch": "緊急缺料／通知責任",
+                        "source_ids": [str(current_source_id)],
                     },
                     "messages": [
                         {

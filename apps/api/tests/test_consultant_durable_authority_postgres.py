@@ -29,7 +29,10 @@ from app.consultant.results import (
     AttentionChange,
     AttentionOperation,
     ConsultantResult,
+    DocumentChangeOperation,
     GapReason,
+    RequiredClarificationDraft,
+    ReviewableDocumentChange,
     SufficiencyRecommendation,
     UnderstandingChange,
     UnderstandingOperation,
@@ -474,6 +477,174 @@ async def test_direct_edit_mints_only_changed_employee_text_and_exports_checkpoi
         ]
         assert first_document.job_title not in second_source.text
         assert exported == revised_document
+
+
+@pytest.mark.asyncio
+async def test_document_review_and_clarification_survive_postgres_restart(
+    consultant_database_url: str,
+) -> None:
+    document_id = uuid4()
+    seed_source_id = uuid4()
+    answer_source_id = uuid4()
+    edit_source_id = uuid4()
+    clarification_basis_source_id = uuid4()
+    clarification_answer_source_id = uuid4()
+    document = _document(document_id)
+    task_id = document.tasks[0].task_id
+
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        initial = await runtime.create_document(document_id, title="採購職務")
+        await runtime.apply_direct_edit(
+            document_id=document_id,
+            expected_revision=initial.revision,
+            document=document,
+            source_id=seed_source_id,
+        )
+        sourced = await runtime.record_employee_source(
+            document_id=document_id,
+            source_id=answer_source_id,
+            kind=EmployeeSourceKind.EMPLOYEE_TURN,
+            text="我會建立並覆核請購單。",
+        )
+        basis = AnalysisBasis(
+            source_ids=(answer_source_id,),
+            skill_ids=("task-boundary",),
+        )
+        now = datetime.now(UTC)
+        committed = await runtime.commit_verified_consultant_result(
+            document_id=document_id,
+            expected_revision=sourced.revision,
+            commit=VerifiedConsultantCommit(
+                run_id=uuid4(),
+                answer_source_id=answer_source_id,
+                started_at=now,
+                completed_at=now,
+                result=ConsultantResult(
+                    visible_reply="我整理了一項任務文字更新供您審核。",
+                    reply_basis=basis,
+                    used_skill_ids=("task-boundary",),
+                    attention_changes=(
+                        AttentionChange(
+                            operation=AttentionOperation.ADD,
+                            kind="task_boundary",
+                            title="請購下單",
+                            subject_id=task_id,
+                            reason="需要確認請購責任邊界。",
+                            priority=InterviewPriority.TASK_BOUNDARY,
+                            make_current=True,
+                            basis=basis,
+                        ),
+                    ),
+                    reviewable_document_changes=(
+                        ReviewableDocumentChange(
+                            operation=DocumentChangeOperation.REVISE,
+                            path=f"/tasks/{task_id}/statement",
+                            after="建立並覆核請購單",
+                            basis=basis,
+                        ),
+                    ),
+                    sufficiency=SufficiencyRecommendation(
+                        currently_enough=False,
+                        reason="其他採購工作尚待盤點。",
+                        remaining_gap_reasons=(GapReason.WORK_COVERAGE_MISSING,),
+                        continuing_benefit="繼續訪談可補齊其他工作。",
+                        basis=basis,
+                    ),
+                ),
+            ),
+        )
+        bundle = committed.document_review.bundles[0]
+        action = bundle.actions[0]
+        reviewed = await runtime.decide_document_changes(
+            document_id=document_id,
+            expected_revision=committed.revision,
+            action="edit_and_accept_changes",
+            changeset_id=bundle.changeset_id,
+            action_ids=(action.action_id,),
+            edited_after_by_action_id={
+                action.action_id: "建立、覆核並送出請購單"
+            },
+            source_id=edit_source_id,
+        )
+        edit_source = await runtime.get_source(document_id, edit_source_id)
+
+        assert reviewed.approved_document.tasks[0].statement == (
+            "建立、覆核並送出請購單"
+        )
+        assert edit_source.text == "建立、覆核並送出請購單"
+        assert edit_source.positions[0].document_path == (
+            f"/tasks/{task_id}/statement"
+        )
+        assert "建立並覆核請購單" not in edit_source.text
+
+        sourced_again = await runtime.record_employee_source(
+            document_id=document_id,
+            source_id=clarification_basis_source_id,
+            kind=EmployeeSourceKind.EMPLOYEE_TURN,
+            text="有時是我建立，有時是主管建立。",
+        )
+        clarification_basis = AnalysisBasis(
+            source_ids=(clarification_basis_source_id,),
+            skill_ids=("story-interview",),
+        )
+        now = datetime.now(UTC)
+        waiting = await runtime.commit_verified_consultant_result(
+            document_id=document_id,
+            expected_revision=sourced_again.revision,
+            commit=VerifiedConsultantCommit(
+                run_id=uuid4(),
+                answer_source_id=clarification_basis_source_id,
+                started_at=now,
+                completed_at=now,
+                result=ConsultantResult(
+                    visible_reply="責任邊界互相衝突，需要先請您確認。",
+                    reply_basis=clarification_basis,
+                    used_skill_ids=("story-interview",),
+                    required_clarification=RequiredClarificationDraft(
+                        reason="兩次說法對建立請購單的責任不同",
+                        question="通常由誰建立請購單？",
+                        current_understanding="可能由員工或主管建立。",
+                        choices=("由我建立", "由主管建立", "視情況"),
+                        affected_work_ids=(
+                            reviewed.current_interview.work_id,
+                        ),
+                        affected_branch="請購下單／責任邊界",
+                        basis=clarification_basis,
+                    ),
+                    sufficiency=SufficiencyRecommendation(
+                        currently_enough=False,
+                        reason="請購責任仍有衝突。",
+                        remaining_gap_reasons=(GapReason.SOURCE_CONTRADICTION,),
+                        continuing_benefit="確認後才能安全繼續該分支。",
+                        basis=clarification_basis,
+                    ),
+                ),
+            ),
+        )
+        assert waiting.required_clarification is not None
+        waiting_document = waiting.approved_document
+
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        reopened = await runtime.reopen_document(document_id)
+        assert reopened.required_clarification is not None
+        resumed = await runtime.answer_required_clarification(
+            document_id=document_id,
+            expected_revision=reopened.revision,
+            clarification_id=reopened.required_clarification.clarification_id,
+            choice="由我建立",
+            text="通常由我建立請購單，主管只在例外時協助。",
+            source_id=clarification_answer_source_id,
+        )
+        clarification_source = await runtime.get_source(
+            document_id, clarification_answer_source_id
+        )
+
+        assert resumed.required_clarification is None
+        assert resumed.approved_document == waiting_document
+        assert clarification_source.kind is EmployeeSourceKind.EMPLOYEE_TURN
+        assert clarification_source.text == (
+            "通常由我建立請購單，主管只在例外時協助。"
+        )
 
 
 @pytest.mark.asyncio

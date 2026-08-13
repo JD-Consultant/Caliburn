@@ -674,6 +674,166 @@ def test_result_schema_makes_attitude_generation_unrepresentable() -> None:
         )
 
 
+def test_verifier_rejects_attitude_smuggled_through_full_opks_replacement() -> None:
+    source = _employee_source("我整理採購需求。")
+    task_id = uuid4()
+    item_id = uuid4()
+    result = _minimal_result(source).model_copy(
+        update={
+            "reviewable_document_changes": (
+                ReviewableDocumentChange(
+                    operation=DocumentChangeOperation.MERGE,
+                    path="/opks",
+                    target_ids=(item_id,),
+                    after={
+                        "item_id": str(item_id),
+                        "kind": "attitude",
+                        "text": "主動積極",
+                        "display_order": 0,
+                        "task_ids": [],
+                        "indicator_ids": [],
+                    },
+                    opks_kind=OpksKind.KNOWLEDGE,
+                    task_ids=(task_id,),
+                    basis=_basis(
+                        source,
+                        "knowledge",
+                        quote="整理採購需求",
+                    ),
+                ),
+            )
+        }
+    )
+
+    with pytest.raises(ConsultantVerificationError, match="OPKS payload kind"):
+        verify_consultant_result(
+            result,
+            execution=_execution(),
+            document_id=source.document_id,
+            selected_skill_ids=("task-boundary", "knowledge"),
+            loaded_skill_ids=("task-boundary", "knowledge"),
+            employee_sources=(source,),
+        )
+
+
+@pytest.mark.parametrize(
+    "operation",
+    [DocumentChangeOperation.MERGE, DocumentChangeOperation.SPLIT],
+)
+def test_verifier_requires_merge_and_split_collection_paths(
+    operation: DocumentChangeOperation,
+) -> None:
+    source = _employee_source("我整理採購需求。")
+    item_id = uuid4()
+    replacement_id = uuid4()
+    result = _minimal_result(source).model_copy(
+        update={
+            "reviewable_document_changes": (
+                ReviewableDocumentChange(
+                    operation=operation,
+                    path=f"/tasks/{item_id}",
+                    target_ids=(item_id,),
+                    after={
+                        "task_id": str(replacement_id),
+                        "statement": "整理採購需求",
+                        "action": "整理",
+                        "object": "採購需求",
+                        "display_order": 0,
+                    },
+                    basis=_basis(
+                        source,
+                        "task-boundary",
+                        quote="整理採購需求",
+                    ),
+                ),
+            )
+        }
+    )
+
+    with pytest.raises(ConsultantVerificationError, match="collection path"):
+        verify_consultant_result(
+            result,
+            execution=_execution(),
+            document_id=source.document_id,
+            selected_skill_ids=("task-boundary",),
+            loaded_skill_ids=("task-boundary",),
+            employee_sources=(source,),
+        )
+
+
+def test_non_merge_change_cannot_carry_merge_target_ids() -> None:
+    source = _employee_source("我整理採購需求。")
+    with pytest.raises(ValidationError, match="target_ids"):
+        ReviewableDocumentChange(
+            operation=DocumentChangeOperation.REVISE,
+            path="/job_title",
+            after="採購專員",
+            target_ids=(uuid4(),),
+            basis=_basis(
+                source,
+                "task-boundary",
+                quote="整理採購需求",
+            ),
+        )
+
+
+@pytest.mark.parametrize(
+    ("path", "after"),
+    [
+        ("/tasks", []),
+        (
+            "/tasks/00000000-0000-0000-0000-000000000001",
+            {
+                "task_id": "00000000-0000-0000-0000-000000000001",
+                "statement": "整理採購需求",
+                "action": "整理",
+                "object": "採購需求",
+                "display_order": 0,
+            },
+        ),
+        (
+            "/tasks/00000000-0000-0000-0000-000000000001/duty_id",
+            "00000000-0000-0000-0000-000000000002",
+        ),
+        (
+            "/tasks/00000000-0000-0000-0000-000000000001/display_order",
+            1,
+        ),
+    ],
+)
+def test_revise_cannot_bypass_granular_structural_operations(
+    path: str,
+    after: object,
+) -> None:
+    source = _employee_source("我整理採購需求。")
+    result = _minimal_result(source).model_copy(
+        update={
+            "reviewable_document_changes": (
+                ReviewableDocumentChange(
+                    operation=DocumentChangeOperation.REVISE,
+                    path=path,
+                    after=after,
+                    basis=_basis(
+                        source,
+                        "task-boundary",
+                        quote="整理採購需求",
+                    ),
+                ),
+            )
+        }
+    )
+
+    with pytest.raises(ConsultantVerificationError, match="revise operation"):
+        verify_consultant_result(
+            result,
+            execution=_execution(),
+            document_id=source.document_id,
+            selected_skill_ids=("task-boundary",),
+            loaded_skill_ids=("task-boundary",),
+            employee_sources=(source,),
+        )
+
+
 def test_risky_specific_claim_requires_an_exact_employee_quote_anchor() -> None:
     source = _employee_source("主管只說要整理採購需求。")
     unanchored = ConsultantResult(

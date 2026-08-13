@@ -1,7 +1,7 @@
 # AI 職務顧問 runtime：北極星審核與逐 Task 防偏帳本
 
 - 日期：2026-08-14
-- 狀態：Pre-implementation audit **Passed**；Tasks 1–4 **Passed**
+- 狀態：Pre-implementation audit **Passed**；Tasks 1–6 **Passed**
 - 決策：ADR 0060 Accepted
 - 施工計畫：[`2026-08-13-langgraph-consultant-runtime-big-bang-plan.md`](../plans/2026-08-13-langgraph-consultant-runtime-big-bang-plan.md)
 - 產品 SSOT：[`2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md`](2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md) §1–§8、§9.12–§9.13
@@ -196,6 +196,18 @@ Big-bang 只描述最終切換，不表示做到最後才審核。之後每完�
 - TDD／驗證：行為紅燈先由缺少 `app.consultant.interview` 顯示；後續再用「首次焦點誤跳校準」「確認沒有來源 lineage」「深度多軸灌水」「superseded 理解進 prompt」「global index 漏工作範圍」「缺上一個顧問問題」逐項建立紅／綠回歸。focused consultant suite 為 `75 passed`；真正透過 PostgreSQL Saver 寫入 semantic result、關閉 runtime、重開後恢復 message／重點／理解／足夠性為 `1 passed`。完整 API 第一次因 sandbox basetemp `WinError 5` 無法完成 pytest session cleanup；改用新的 sandbox 外隔離 basetemp 重跑為 `907 passed`，不是沿用失敗結果。`git diff --check` 另於提交前重驗。
 - 來源與裁決依據：產品語意沿用本研究稿 §3.1–§4.4、§7.2–§7.4、§7.9、§7.16 及 ADR 0060；外部機制依據仍是 LangGraph persistence／messages、LangChain context engineering、Google PAIR feedback／control、Microsoft multi-turn correction risk 與 OPM SME／job-analysis 原則。這些來源支持 durable state、可見控制、按需 context 與 SME 校準；職務分析 priority／OPKS linkage／足夠性 reason code 是 Caliburn 依既有研究作的 domain policy，未宣稱框架自動提供。
 - 北極星回歸：一位主要顧問、先工作全貌再一個焦點、旁支保留、Task／Duty／OPKS 可反覆調整、AI 文件內容先審核、自然離開／續談、無假百分比、足夠性只是建議、單一可強制匯出，以及 RAG／能力級別／A／正式品質 eval 延後均未偏移。結果 **Pass**。
+
+### Task 6：員工文件審核、結構依賴與必要澄清
+
+- 狀態：**Pass**；同一 task commit 為 `feat: add employee document authority`。
+- 員工效果：模型提出的職稱、工作描述、Duty、Task、排序、重新歸類與 O／P／K／S 內容都先進入可見審核；員工可逐項接受、修改後接受、拒絕或延後。無關項目不因同一 bundle 被綁死，真正不可拆的結構變更才原子處理。遇到只有員工能回答的重大歧義時顯示一個必要澄清；安全旁支、direct edit 與新來源仍可繼續。
+- 成熟 primitive：LangGraph typed checkpoint／`StateGraph` command 直接承接持久化 review queue、決策與重啟後恢復；`interrupt()`／`Command(resume)` 直接承接必要澄清；Pydantic 直接驗 typed changeset／command。沒有建立舊 Proposal service、另一套 workflow engine、第二份文件 store 或自寫 pause／resume lifecycle。
+- Caliburn 薄政策：只保留框架不知道的 stable document path、before／after、path read-set、來源／quote anchor、dependency、atomic subgroup、拒絕後新證據門檻、文件 invariant、員工可編輯欄位與 deterministic authority operation。`ApprovedJobDocument` 是新 graph state 的核准產物，不是舊 Current JD 相容 adapter。
+- 詳細複審修正：審核決策原先可能誤清必要澄清／校準 blocker；atomic subgroup 一員 stale 時其餘成員未連帶 stale；OPKS payload 可偽裝 A；merge／split path 與 authority 不一致；一般 revise 可繞過 reassignment／reorder；既有必要澄清可能被安全新回合洗掉；來源更正未 selective-stale 相依 action且可能誤解鎖其他 blocker；一般 dependency 被錯升成 atomic；responsibility-role／withdraw 結構影響漏判；非法 edit-accept 可能在文件未提交時製造 evidence；同來源的 K／S rejection key 互相碰撞；既有 A item 可被偽裝成 K／S revise。上述均已以 deterministic gate 與回歸測試修正。
+- 互動邊界：required clarification 的 answer 只建立員工 evidence，不接受文件變更；未回答的 request 不得被下一輪模型取代。accept／reject／defer 不製造工作事實，edit-accept 與 direct edit 只為員工實際改寫的 delta 建 source。結構決策只阻擋 affected work，決策後重驗 downstream gap／linkage；員工離開仍只是停止傳訊息，下次從 checkpoint 自然繼續。
+- 範圍防線：model-facing patch 支援 job title／work description／Duty／Task／order／reassignment／O／P／K／S；能力級別、A 與官方代碼被 deterministic verifier 拒絕。沒有接 RAG／Reference、正式 eval、production route／Web 或舊 writer bridge。
+- TDD／驗證：Task 6 focused consultant suite 為 `129 passed`，另有 foundation boundary canary `3 passed`；完整 PostgreSQL API gate 為 `936 passed`。第一次完整命令與後續 `-x` 診斷都在 pytest session cleanup 遭遇 sandbox 建立之 Windows basetemp `WinError 5`，其中第一個受影響的臨時 package 測試在正常 Windows 暫存環境單獨為 `1 passed`；同環境重跑全套才取得上述 `936 passed`，沒有把 ACL 中止當產品結果。Python compileall 與 `git diff --check` 於提交前另行重驗。
+- 北極星回歸：單一顧問、動態 Task／Duty／OPKS、員工文件 authority、一般 Gap 與 required clarification 分流、自然離開／續談、無假完成狀態，以及 RAG／能力級別／A／正式 eval 延後均未偏移。結果 **Pass**。
 
 ## 8. 本次直接使用的一手來源
 

@@ -836,6 +836,43 @@ Reference 必須使用獨立 namespace／lane 與 source label。員工來源與
 - 使用 provider 原生 token counting 或經 conformance 驗證的 tokenizer，在送出前估算，在回應後保存實際 usage；
 - 換 provider／model 後可以重建 ContextPack；不得因 provider reasoning state 遺失而失去來源、正式內容或訪談進度。
 
+#### 7.12.1 近期對話、結構化狀態與來源優先序（2026-08-13 研究後方向）
+
+Owner 大致同意「少量最近對話維持自然銜接；事實判斷仍以結構化狀態、原始來源與最新更正為準」，並要求以最新主流資料佐證。交叉查核後，這個方向成立，但必須避免把它簡化成固定保留 N 則訊息或全域 `latest wins`：
+
+- OpenAI 2026 年 Context Engineering Cookbook 將 local-first structured state、session notes 與本輪注入分開，只注入相關 state slices，並示範 latest user input／session override／global default 的衝突優先序；OpenAI 最新 model guidance 也允許依過往 reasoning 是否仍相關選擇 `all_turns` 或 `current_turn`，沒有要求所有產品固定重送完整歷史。
+- Anthropic 將 message history 也視為有限 attention budget，建議使用最小高訊號 context、compaction、外部 structured notes 與 just-in-time retrieval；完整保存不等於完整常駐 context。
+- Google 2026 年 ADK 長流程指引直接指出，持續重播全部聊天會造成 context pollution、成本增長與虛構未發生步驟；production agent 應使用 durable memory schema 與 explicit state，並從 state 讀取目前位置，而不是從舊訊息猜。
+- Microsoft HAX 要求記住近期互動，讓使用者可以自然地說「他」「剛才那個」；最新 Agent Framework 同時把 conversation `HistoryProvider`、application-specific `ContextProvider` 與輕量 session state 分開，長對話建議逐訊息保存 history，不把全部聊天塞進 session state。
+
+這些來源共同支持的是**短期連續性＋結構化長期狀態＋按需來源**，不是某個固定訊息數。公開資料也沒有直接證明「最近 4 則」或「最近 8 則」對繁中職務訪談最好，因此第一版應按語意回合選取：
+
+- 當輪員工完整輸入與他正在回答的顧問問題／校準卡必帶；
+- 為理解代名詞、省略語、修正語氣或「剛才」引用所需的最短相鄰對話可帶；
+- 更早對話不因時間接近就自動取得事實權威，依 source receipt、穩定 ID、lexical／semantic retrieval 按需取回；
+- 若最近對話已被員工更正，仍可為對話連續性保留，但必須標示已 superseded，不能讓模型誤當現況；
+- 實際帶入多少、為何帶入及被省略區域寫入 ContextManifest，之後再由成品 eval 調整，不先把 `last_n_messages` 寫成 domain invariant。
+
+概念上採三個不同責任的 runtime artifact；本節只定責任，不提前鎖定最終資料表或 JSON schema：
+
+1. **ContextRequest**：application 產生的本輪需求與政策，包含 document、operation、focus、generation／read-set、authority floor、允許的 Skill／tool／Reference、model profile 與 budget。LLM 不能擴張 scope 或自行降低必帶內容。
+2. **ContextPack**：送入某次 inference 的 immutable snapshot，包含必帶核心、近期連續性、受限全域索引、焦點細節、候選來源、載入的 Skill 與可用工具目錄。每個 item 保留 authority／source／revision 標籤；它不是新的 Work Model 或 authoritative store。
+3. **ContextManifest**：記錄每次 inference／tool wave 實際載入、按需取得、拒絕或省略的 refs／revision／hash、選取理由、tokens／成本、model／prompt／Skill／tool version、停止原因與結果 lineage。原始內容仍由原 store 保存，Manifest 不複製另一份員工原話。
+
+衝突不能用一條總排序解決，必須依問題的 authority 類型判斷：
+
+| 問題 | 生效規則 |
+|---|---|
+| 員工目前對實際工作的說法 | 最新有效員工更正優先於較舊員工說法、摘要與模型記憶；舊來源保留但標示 superseded |
+| AI 目前如何理解 | 最新 Work Model revision 優先於舊 hypothesis／summary，但仍須連回原始來源，不能把推論偽裝成員工原話 |
+| 目前正式 JD 是什麼 | Current JD 仍是正式 authority；新的員工更正只先形成差異、Work Model 更新、gap 或 Proposal，未經 accept／edit 不得直接覆寫 |
+| 對話如何自然銜接 | 近期訊息與 provider state 可協助理解指涉及語氣，但不能覆蓋員工更正、Work Model revision、Current JD 或 domain policy |
+| iCAP 提供什麼 | 只能作 Reference／coverage challenge；不論多新、多相關或分數多高，都不能覆蓋員工來源或建立本人工作事實 |
+
+當輪員工輸入具有雙重角色：在互動上是近期對話，在成功保存後也是 durable employee source。前者可以為節省 context 而縮減相鄰對話，後者則必須依既有 source identity、document scope、correction linkage 與 idempotency 規則持久化；框架不得因 compaction、summary 或 message-window policy 把它降級成只有暫時效力的聊天文字。
+
+因此「最新更正優先」與「Current JD 未核准前不變」可以同時成立：前者決定顧問如何理解與下一步要處理的差異，後者決定正式文件目前仍是什麼。ContextPack 必須把這種 divergence 明示給模型，不能先把兩者合併成一個看似一致的欄位。
+
 ### 7.13 框架能接手與不能接手的部分
 
 | 能交給成熟框架的通用能力 | Caliburn 仍須保留 |
@@ -1226,6 +1263,8 @@ Stakeholder 草稿（非權威，只作需求來源）：
 - [OpenRouter — Provider routing and data-policy controls](https://openrouter.ai/docs/guides/routing/provider-selection)
 - [OpenRouter — Input & Output Logging](https://openrouter.ai/docs/guides/features/input-output-logging)
 - [Microsoft — Agent Framework overview](https://learn.microsoft.com/en-us/agent-framework/overview/)
+- [Microsoft — Agent Framework Memory & Persistence（history、context provider、session state）](https://learn.microsoft.com/en-us/agent-framework/get-started/memory)
+- [Microsoft — Self-host Agent Framework applications（session 與 history 分離）](https://learn.microsoft.com/en-us/agent-framework/hosting/self-hosting/)
 - [Microsoft — Agent Framework Harness](https://learn.microsoft.com/en-us/agent-framework/concepts/harness)
 - [Microsoft — Agent looping（completion condition、bounded iteration、approval escape）](https://learn.microsoft.com/en-us/agent-framework/agents/looping)
 - [Microsoft — Agent Framework workflows human-in-the-loop](https://learn.microsoft.com/en-us/agent-framework/workflows/human-in-the-loop)

@@ -13,6 +13,8 @@ from hashlib import sha256
 from typing import Any, Literal, TypedDict
 from uuid import UUID
 
+from langchain_core.messages import AnyMessage
+from langgraph.graph.message import add_messages
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -313,23 +315,125 @@ class InterviewWorkStatus(StrEnum):
     PARKED = "parked"
     BLOCKED = "blocked"
     SUFFICIENT_FOR_NOW = "sufficient_for_now"
+    UNKNOWN = "unknown"
+    NOT_APPLICABLE = "not_applicable"
+    RETIRED = "retired"
+
+
+class InterviewPriority(StrEnum):
+    EMPLOYEE_REQUEST = "employee_request"
+    CORRECTION = "correction"
+    CONTRADICTION_OR_RESPONSIBILITY = "contradiction_or_responsibility"
+    TASK_BOUNDARY = "task_boundary"
+    HIGH_IMPACT = "high_impact"
+    DESCRIPTION = "description"
+    DUTY_GROUPING = "duty_grouping"
+    OPKS = "opks"
+    COVERAGE = "coverage"
+    OTHER = "other"
 
 
 class InterviewWorkItem(DurableModel):
     work_id: UUID
     kind: NonEmptyText
+    title: NonEmptyText
     subject_id: UUID | None = None
     status: InterviewWorkStatus
+    priority: InterviewPriority = InterviewPriority.OTHER
     priority_reason: NonEmptyText
+    missing_before_enough: NonEmptyText | None = None
+    recommended_next_step: NonEmptyText | None = None
     source_ids: tuple[UUID, ...] = ()
+    last_changed_revision: int = Field(ge=0)
+
+
+class UnderstandingStatus(StrEnum):
+    ACTIVE = "active"
+    CHALLENGED = "challenged"
+    EMPLOYEE_CONFIRMED = "employee_confirmed"
+    SUPERSEDED = "superseded"
+    RETIRED = "retired"
+
+
+class UnderstandingImpact(StrEnum):
+    ROUTINE = "routine"
+    MEANINGFUL_SHIFT = "meaningful_shift"
+    STRUCTURAL_PREMISE = "structural_premise"
+    HIGH_RISK_RESPONSIBILITY = "high_risk_responsibility"
+    CONTRADICTION = "contradiction"
+    EMPLOYEE_REQUEST = "employee_request"
 
 
 class UnderstandingItem(DurableModel):
     understanding_id: UUID
+    version_id: UUID
     kind: NonEmptyText
     text: NonEmptyText
+    status: UnderstandingStatus = UnderstandingStatus.ACTIVE
+    impact: UnderstandingImpact = UnderstandingImpact.ROUTINE
     source_ids: tuple[UUID, ...]
-    superseded_by_id: UUID | None = None
+    work_ids: tuple[UUID, ...] = ()
+    created_revision: int = Field(ge=0)
+    supersedes_version_id: UUID | None = None
+    superseded_by_version_id: UUID | None = None
+
+
+class GapStatus(StrEnum):
+    ACTIVE = "active"
+    HELD_WITH_REASON = "held_with_reason"
+    RESOLVED = "resolved"
+
+
+class GapItem(DurableModel):
+    gap_id: UUID
+    reason: NonEmptyText
+    description: NonEmptyText
+    subject_kind: NonEmptyText
+    subject_id: UUID | None = None
+    blocks_dependent_analysis: bool = False
+    status: GapStatus = GapStatus.ACTIVE
+    source_ids: tuple[UUID, ...]
+    last_changed_revision: int = Field(ge=0)
+
+
+class CalibrationKind(StrEnum):
+    SOFT = "soft"
+    BRANCH_BLOCKING = "branch_blocking"
+
+
+class CalibrationTrigger(StrEnum):
+    FOCUS_TRANSITION = "focus_transition"
+    MEANINGFUL_SHIFT = "meaningful_shift"
+    LONG_RETURN = "long_return"
+    STRUCTURAL_PREMISE = "structural_premise"
+    HIGH_RISK_RESPONSIBILITY = "high_risk_responsibility"
+    CONTRADICTION = "contradiction"
+    EMPLOYEE_REQUEST = "employee_request"
+
+
+class CalibrationStatus(StrEnum):
+    PENDING = "pending"
+    LATER = "later"
+    CONFIRMED = "confirmed"
+    SUPERSEDED = "superseded"
+
+
+class CalibrationDecision(StrEnum):
+    CONFIRM = "confirm"
+    LATER = "later"
+
+
+class UnderstandingCalibration(DurableModel):
+    calibration_id: UUID
+    kind: CalibrationKind
+    trigger: CalibrationTrigger
+    status: CalibrationStatus = CalibrationStatus.PENDING
+    understanding_ids: tuple[UUID, ...]
+    affected_work_ids: tuple[UUID, ...] = ()
+    source_ids: tuple[UUID, ...]
+    decision_source_id: UUID | None = None
+    content_digest: Annotated[str, StringConstraints(pattern=r"^[0-9a-f]{64}$")]
+    created_revision: int = Field(ge=0)
 
 
 class DocumentChangeStatus(StrEnum):
@@ -374,7 +478,7 @@ class RunReceipt(DurableModel):
 
 
 class ConsultantThreadState(TypedDict, total=False):
-    """JSON-safe LangGraph state; no employee source text is allowed here."""
+    """LangGraph-owned state; employee source text still lives only in Store."""
 
     schema_version: int
     document_id: str
@@ -382,21 +486,35 @@ class ConsultantThreadState(TypedDict, total=False):
     source_count: int
     latest_source_id: str | None
     source_supersessions: dict[str, str]
+    messages: Annotated[list[AnyMessage], add_messages]
+    current_work_id: str | None
     interview_work: dict[str, dict[str, Any]]
     understanding: dict[str, dict[str, Any]]
+    understanding_calibrations: dict[str, dict[str, Any]]
+    latest_calibration_id: str | None
     gaps: dict[str, dict[str, Any]]
     review_queue: dict[str, dict[str, Any]]
     approved_document: dict[str, Any]
     required_clarification: dict[str, Any] | None
+    sufficiency: dict[str, Any] | None
     latest_run: dict[str, Any] | None
 
 
 class ConsultantCommandContext(TypedDict, total=False):
-    action: Literal["initialize", "register_source", "direct_edit"]
+    action: Literal[
+        "initialize",
+        "register_source",
+        "direct_edit",
+        "commit_consultant_result",
+        "decide_understanding_calibration",
+    ]
     document_id: str
     expected_revision: int
     source_reference: dict[str, Any] | None
     approved_document: dict[str, Any]
+    semantic_commit: dict[str, Any]
+    calibration_id: str
+    calibration_decision: Literal["confirm", "later"]
 
 
 def initial_thread_state(document_id: UUID) -> ConsultantThreadState:
@@ -407,13 +525,18 @@ def initial_thread_state(document_id: UUID) -> ConsultantThreadState:
         "source_count": 0,
         "latest_source_id": None,
         "source_supersessions": {},
+        "messages": [],
+        "current_work_id": None,
         "interview_work": {},
         "understanding": {},
+        "understanding_calibrations": {},
+        "latest_calibration_id": None,
         "gaps": {},
         "review_queue": {},
         "approved_document": ApprovedJobDocument(
             document_id=document_id
         ).model_dump(mode="json"),
         "required_clarification": None,
+        "sufficiency": None,
         "latest_run": None,
     }

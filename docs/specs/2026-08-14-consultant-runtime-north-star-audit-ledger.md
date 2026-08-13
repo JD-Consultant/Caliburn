@@ -184,6 +184,19 @@ Big-bang 只描述最終切換，不表示做到最後才審核。之後每完�
 - TDD／驗證：預期紅燈先由缺少 `app.consultant.agent` 呈現；最終 Task 4 focused suite `33 passed`；上一輪 consultant foundation 組合 gate `53 passed, 17 skipped`（DB tests 在該次 focused command未注入 URL）；新增 stale Skill ToolMessage 防線後，指定既有隔離測試 DB `caliburn_consultant_runtime_test`、repo basetemp並在 sandbox 外重跑最終完整 API suite為 `899 passed`。較早的完整 command曾指到已不存在的 DB，另一次暴露 Windows sandbox tmp ACL；兩者均以正確 DB／隔離 basetemp重跑，未把環境錯誤當綠燈。`git diff --check` 於提交前另行重驗。
 - 北極星回歸：一位顧問、前景單一焦點／背景全域吸收、Task／Duty／OPKS 動態演化、LLM 文件內容先審核、自然離開／續談、語意進度、單一可強制匯出，以及 RAG／能力級別／A／正式 eval 延後均未偏移。結果 **Pass**。
 
+### Task 5：adaptive interview、可見理解與可信足夠性
+
+- 狀態：**Pass**；同一 task commit 為 `feat: implement adaptive consultant interview`。
+- 員工效果：首次進入可先看四句白話導航；顧問把完整回答整理成目前已知工作範圍，只維持一個清楚訪談重點並說明 why-now／還差什麼／下一步，旁支線索保持可見。員工可直接改談別題；Task、Duty、O／P／K／S 理解隨證據動態修訂。關頁或久後返回不需要 pause／resume／finish；同一 checkpoint 自然恢復。
+- 成熟 primitive：LangGraph `StateGraph`／typed checkpoint／routing、`add_messages` reducer、`AsyncPostgresSaver` restart recovery 與既有 Store source lineage 直接承接跨回合狀態；Pydantic typed result／projection 承接 validation。沒有自寫 workflow engine、session manager、事件溯源器、Todo middleware wrapper、舊 Focus／Progress／Work Model store 或第二份 authority。
+- Caliburn 薄政策：只保留框架不知道的職務訪談 priority、Task／Duty／OPKS work kind、source-dependent selective reopen、理解校準 trigger、branch dependency、Gap reason code、coverage／depth／employee-decision 投影與 sufficiency rubric。這些是產品語意，不是重寫 persistence／history／checkpoint 機制。
+- 理解與校準：可修訂理解有 stable identity、version、source／work dependency 與 active／challenged／employee-confirmed／superseded／retired 生命週期。一般第一個焦點與低影響更新不跳卡；meaningful shift／long return／真正焦點切換為 soft card，contradiction／high-risk responsibility／structural premise 才只阻擋相依 branch。確認另記 employee source 且不動核准文件；later 不等於結束；direct correction 仍以新 employee source 進入。
+- 進度與足夠性：進度只顯示「目前已知」coverage、每個工作範圍分軸的 Task／Duty／O／P／K／S depth、員工待決文件變更與具體 Gap。複審抓到 active Task 訪談曾錯把所有分析軸一起標成 interviewing、Task sufficient 曾錯把 Duty／OPKS 一起標成 sufficient；現已限定到實際 work kind，避免灌水。足夠性由 checkpoint 中可查的 work／blocking Gap／structural decision 證據與 LLM 理由／剩餘缺口／continuing benefit 共同產生；新 evidence 或 direct edit 使它立即待重算，不建立完成狀態。
+- Context 複審修正：新版理解保存版本歷史後，舊 middleware 一度會把 superseded／retired 版本重新送入模型，而且 global orientation 只看核准 Duty／Task，漏掉訪談中新發現的工作範圍／假說；另缺少員工正在回答的上一個顧問問題。現在 global orientation 同時含 bounded work／current hypothesis／approved structure，細節只載 active／challenged 與焦點必要 slice，最近顧問回合最多兩筆並可降級為上一筆。完整來源仍在 Store，沒有把整段 transcript 每輪重送，也沒有接 RAG。
+- TDD／驗證：行為紅燈先由缺少 `app.consultant.interview` 顯示；後續再用「首次焦點誤跳校準」「確認沒有來源 lineage」「深度多軸灌水」「superseded 理解進 prompt」「global index 漏工作範圍」「缺上一個顧問問題」逐項建立紅／綠回歸。focused consultant suite 為 `75 passed`；真正透過 PostgreSQL Saver 寫入 semantic result、關閉 runtime、重開後恢復 message／重點／理解／足夠性為 `1 passed`。完整 API 第一次因 sandbox basetemp `WinError 5` 無法完成 pytest session cleanup；改用新的 sandbox 外隔離 basetemp 重跑為 `907 passed`，不是沿用失敗結果。`git diff --check` 另於提交前重驗。
+- 來源與裁決依據：產品語意沿用本研究稿 §3.1–§4.4、§7.2–§7.4、§7.9、§7.16 及 ADR 0060；外部機制依據仍是 LangGraph persistence／messages、LangChain context engineering、Google PAIR feedback／control、Microsoft multi-turn correction risk 與 OPM SME／job-analysis 原則。這些來源支持 durable state、可見控制、按需 context 與 SME 校準；職務分析 priority／OPKS linkage／足夠性 reason code 是 Caliburn 依既有研究作的 domain policy，未宣稱框架自動提供。
+- 北極星回歸：一位主要顧問、先工作全貌再一個焦點、旁支保留、Task／Duty／OPKS 可反覆調整、AI 文件內容先審核、自然離開／續談、無假百分比、足夠性只是建議、單一可強制匯出，以及 RAG／能力級別／A／正式品質 eval 延後均未偏移。結果 **Pass**。
+
 ## 8. 本次直接使用的一手來源
 
 - [LangChain agents](https://docs.langchain.com/oss/python/langchain/agents)

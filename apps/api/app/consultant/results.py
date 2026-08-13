@@ -15,7 +15,12 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict, Field, JsonValue, StringConstraints, model_validator
 from typing_extensions import Annotated
 
-from app.consultant.state import QuoteAnchor
+from app.consultant.state import (
+    InterviewPriority,
+    InterviewWorkStatus,
+    QuoteAnchor,
+    UnderstandingImpact,
+)
 
 
 NonEmptyText = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]
@@ -66,7 +71,20 @@ class UnderstandingChange(ResultModel):
     understanding_id: UUID | None = None
     kind: NonEmptyText
     text: NonEmptyText
+    impact: UnderstandingImpact = UnderstandingImpact.ROUTINE
+    work_ids: tuple[UUID, ...] = ()
     basis: AnalysisBasis
+
+    @model_validator(mode="after")
+    def existing_identity_is_required_for_non_add(self) -> UnderstandingChange:
+        if (
+            self.operation is not UnderstandingOperation.ADD
+            and self.understanding_id is None
+        ):
+            raise ValueError("revising or retiring understanding requires its ID")
+        if len(self.work_ids) != len(set(self.work_ids)):
+            raise ValueError("duplicate understanding work_ids")
+        return self
 
 
 class AttentionOperation(StrEnum):
@@ -80,9 +98,26 @@ class AttentionChange(ResultModel):
     operation: AttentionOperation
     attention_id: UUID | None = None
     kind: NonEmptyText
+    title: NonEmptyText | None = None
     subject_id: UUID | None = None
     reason: NonEmptyText
+    missing_before_enough: NonEmptyText | None = None
+    recommended_next_step: NonEmptyText | None = None
+    priority: InterviewPriority = InterviewPriority.OTHER
+    disposition: InterviewWorkStatus | None = None
+    make_current: bool = False
     basis: AnalysisBasis
+
+    @model_validator(mode="after")
+    def operation_and_attention_identity_are_consistent(self) -> AttentionChange:
+        if self.operation is not AttentionOperation.ADD and self.attention_id is None:
+            raise ValueError("updating interview work requires its ID")
+        if self.operation in {AttentionOperation.PARK, AttentionOperation.RETIRE}:
+            if self.make_current:
+                raise ValueError("parked or retired work cannot become current")
+        if self.disposition is InterviewWorkStatus.ACTIVE and not self.make_current:
+            raise ValueError("active disposition requires make_current")
+        return self
 
 
 class GapReason(StrEnum):
@@ -99,13 +134,27 @@ class GapReason(StrEnum):
     ROUTINE_WORK_MAY_BE_MISSING = "routine_work_may_be_missing"
 
 
+class GapOperation(StrEnum):
+    UPSERT = "upsert"
+    HOLD = "hold"
+    RESOLVE = "resolve"
+
+
 class VisibleGap(ResultModel):
+    operation: GapOperation = GapOperation.UPSERT
+    gap_id: UUID | None = None
     reason: GapReason
     description: NonEmptyText
     subject_kind: NonEmptyText
     subject_id: UUID | None = None
     blocks_dependent_analysis: bool = False
     basis: AnalysisBasis
+
+    @model_validator(mode="after")
+    def existing_identity_is_required_to_resolve(self) -> VisibleGap:
+        if self.operation is GapOperation.RESOLVE and self.gap_id is None:
+            raise ValueError("resolving a gap requires its ID")
+        return self
 
 
 class DocumentChangeOperation(StrEnum):
@@ -162,14 +211,15 @@ class SufficiencyRecommendation(ResultModel):
     currently_enough: bool
     reason: NonEmptyText
     remaining_gap_reasons: tuple[GapReason, ...] = ()
+    continuing_benefit: NonEmptyText
     basis: AnalysisBasis
 
     @model_validator(mode="after")
     def gaps_match_recommendation(self) -> SufficiencyRecommendation:
-        if self.currently_enough and self.remaining_gap_reasons:
-            raise ValueError("currently sufficient result cannot list unresolved gaps")
         if not self.currently_enough and not self.remaining_gap_reasons:
             raise ValueError("insufficient result requires at least one concrete gap")
+        if len(self.remaining_gap_reasons) != len(set(self.remaining_gap_reasons)):
+            raise ValueError("duplicate remaining sufficiency gap reasons")
         return self
 
 
@@ -194,6 +244,8 @@ class ConsultantResult(ResultModel):
         for basis in self.analysis_bases():
             if not set(basis.skill_ids) <= used:
                 raise ValueError("semantic claim depends on an undeclared used Skill")
+        if sum(item.make_current for item in self.attention_changes) > 1:
+            raise ValueError("one consultant result can select only one current work item")
         return self
 
     def analysis_bases(self) -> tuple[AnalysisBasis, ...]:
@@ -219,6 +271,7 @@ class ConsultantResult(ResultModel):
             *((item.reason, item.basis) for item in self.attention_changes),
             *((item.description, item.basis) for item in self.gaps),
             *((item.reason, item.basis) for item in (self.sufficiency,)),
+            ((self.sufficiency.continuing_benefit, self.sufficiency.basis)),
         ]
         for change in self.reviewable_document_changes:
             if change.after is not None and not (

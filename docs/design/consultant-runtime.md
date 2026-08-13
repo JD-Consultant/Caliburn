@@ -1,7 +1,7 @@
 # AI 職務顧問 runtime 設計
 
 - 決策：[ADR 0060](../adr/0060-langchain-langgraph-consultant-runtime-and-durable-authority.md)
-- 狀態：Big-bang migration 建構中；目前完成框架底座、durable authority、模型執行、最小充分 Context 與專業分析 Skills／typed result foundation，production composition root 尚未切換
+- 狀態：Big-bang migration 建構中；目前完成框架底座、durable authority、模型執行、最小充分 Context、專業分析 Skills，以及 adaptive interview／可見理解／語意進度／足夠性，production composition root 尚未切換
 - 實作：`apps/api/app/consultant`、`apps/api/app/adapters/langgraph`、`apps/api/app/adapters/openrouter/langchain.py`
 
 ## 儲存權威
@@ -47,13 +47,13 @@ checkpoint 不複製員工逐字來源；Store 不保存第二份核准文件。
 
 每次實際模型推論都由 middleware 依目前 checkpoint snapshot 與 Store 重建 Context，不持久化第二份 Context packet：
 
-1. bounded global orientation 讓模型知道整份文件有哪些 Duty／Task、目前工作、Gap 與待審數量；
-2. 載入目前焦點的核准文件 slice、可修訂理解、具體 Gap、待審 handles 與必要澄清；
+1. bounded global orientation 讓模型知道目前已辨識的工作範圍、有效工作假說、核准 Duty／Task、目前工作、Gap 與待審數量；它不是只看核准文件，也不把舊版／retired 理解重新送回模型；
+2. 載入目前焦點的核准文件 slice、目前有效且與焦點相關的可修訂理解、具體 Gap、待審 handles、最近有界顧問回合與必要澄清；
 3. checkpoint message 只留帶 stable source ID 的 placeholder；本輪員工原話每次從 Store 逐字重載到明標「不可信 evidence」的 authority Context，明確 required evidence 必帶，相關近期來源在 token budget 內加入；
 4. 只有本輪、required 與近期相關來源的 stable lookup handle 進 prompt；更早來源不列出全部 ID，模型可透過同文件 lexical search 再以 ID／correction lineage 按需讀取。現階段沒有設定 semantic index，也沒有連接 Reference／RAG bounded context；
 5. Context selection receipt 只存 ID、hash、原因、revision、Skills、token 與降級資訊，不複製員工文字。
 
-明確降級順序是：先捨棄非權威 dialogue summary，再壓縮 global orientation，再略過超出預算的近期候選來源。本輪原話、required evidence、必要澄清、blocking Gap 與焦點核准 slice 不會被摘要取代；這些 mandatory 內容本身超出 budget 時直接回 typed error。即使 LangChain 已把舊 message history 摘要化，middleware 仍會從 Store 重建 authority Context；tool loop 後續推論不會把員工回答重複追加到 ToolMessage 後面。
+明確降級順序是：先捨棄非權威 dialogue summary，再壓縮 global orientation，再把最近兩個顧問回合縮成正在回答的上一回合，再略過超出預算的近期候選來源。本輪原話、required evidence、必要澄清、blocking Gap、焦點理解與焦點核准 slice 不會被摘要取代；這些 mandatory 內容本身超出 budget 時直接回 typed error。即使 LangChain 已把舊 message history 摘要化，middleware 仍會從 Store 重建 authority Context；tool loop 後續推論不會把員工回答重複追加到 ToolMessage 後面。
 
 ## 專業分析 Skills 與模型結果閘門
 
@@ -68,6 +68,28 @@ checkpoint 不複製員工逐字來源；Store 不保存第二份核准文件。
 
 `ConsultantResult.reviewable_document_changes` 仍只是 Task 4 的語意草稿，不是可提交 patch。Task 6 會為每項操作配置 stable action ID、before／after、path read-set、dependency／atomic subgroup 與完整 review lifecycle；在那之前沒有任何路徑能把模型結果直接寫入核准文件。
 
+## Adaptive interview、理解校準與可信進度
+
+LangGraph `StateGraph`、typed checkpoint、`add_messages` reducer 與 PostgreSQL Saver 直接承接跨回合 routing、自然恢復、可見顧問回覆與 semantic transition；沒有另建自寫 session／pause／resume／finish engine。每個通過驗證的 `ConsultantResult` 由一個 deterministic node 在同一 checkpoint 一起提交：
+
+- 一段可見顧問回覆與 run receipt；
+- 有 stable identity／version／source dependency 的可修訂理解；
+- 一個當前訪談重點、可見旁支與待處理工作；
+- 具 reason code 的 Gap 與待審文件語意草稿；
+- 可重算的理解校準與足夠性投影。
+
+員工更正來源時，只把直接依賴舊 source 的理解標成 challenged、把相依工作提高為 correction priority，並使既有足夠性失效；無關理解、工作與來源歷史保持不變。工作或假說可以在 Task 尚未永久穩定時同時出現 Duty／O／P／K／S 變化，模型不能藉此改寫核准文件。
+
+「AI 目前理解」是常駐、可收合 projection，不是第二份文件。一般新線索不跳卡；有意義修訂、久後返回或真正焦點切換可出 soft calibration，矛盾、高風險責任與結構前提才只阻擋相依 branch。確認會建立 employee source lineage 並把理解標成 employee-confirmed，但不接受任何文件變更；直接修正仍走新的員工來源，稍後處理不會變成完成或暫停狀態。
+
+進度由同一 checkpoint 重建三個並列視角，不存假百分比：
+
+1. 目前已知工作 coverage 與各自狀態；
+2. 每個工作範圍的 Task boundary、Duty、O、P、K、S 分軸 depth；只把實際正在分析的軸標成 interviewing，Task 足夠不會連帶把 Duty／OPKS 標成足夠；
+3. 待員工決定的文件變更，以及可展開的 Gap／reason code。
+
+「目前已足夠」是 deterministic evidence 與模型白話判斷的交集：至少不能有 active／unvisited 工作、blocking Gap 或未決結構變更，且模型要說明理由、剩餘缺口與繼續訪談最可能改善之處。它不關閉對話、不建立 close／reopen lifecycle，也不等於匯出 readiness；新員工來源或 direct edit 會立刻標記需重新計算。
+
 ## 當前邊界
 
-這個 foundation 已有可替換模型 profile、LangChain agent harness、attempt receipt、Context middleware、真實顧問 Skills 與 typed semantic result，但尚未接 production route、adaptive interview routing、員工 review command 或 Web。它沒有 RAG／Reference、能力級別／A 生成、品質 eval 或舊 writer bridge。舊 production composition 會維持到垂直切片完成，最終硬切才刪除，不雙寫。
+這個 foundation 已有可替換模型 profile、LangChain agent harness、attempt receipt、Context middleware、真實顧問 Skills、adaptive interview routing、可見理解／Gap／語意進度與 typed semantic result，但尚未接完整文件 patch／review command、required-clarification interrupt、production route 或 Web。它沒有 RAG／Reference、能力級別／A 生成、品質 eval 或舊 writer bridge。舊 production composition 會維持到垂直切片完成，最終硬切才刪除，不雙寫。

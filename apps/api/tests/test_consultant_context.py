@@ -197,7 +197,12 @@ async def test_main_context_has_global_orientation_focus_and_exact_current_sourc
                         "u-1": {
                             "text": "員工負責辨識並追蹤緊急缺料",
                             "source_ids": [str(current_source_id)],
-                        }
+                        },
+                        "u-old": {
+                            "text": "過時理解：員工只負責例行採購",
+                            "status": "superseded",
+                            "source_ids": [str(old_source_id)],
+                        },
                     },
                     "gaps": {
                         "g-1": {
@@ -219,6 +224,24 @@ async def test_main_context_has_global_orientation_focus_and_exact_current_sourc
                         "reason": "員工說法與核准文件的責任邊界衝突",
                         "affected_work_ids": [str(work_id)],
                     },
+                    "messages": [
+                        {
+                            "run_id": str(uuid4()),
+                            "answer_source_id": str(correction_id),
+                            "text": "我先確認缺料通知的責任邊界。",
+                            "used_skill_ids": ["task-boundary"],
+                            "next_question": {
+                                "text": "緊急缺料時，誰決定要通知業務？",
+                                "answer_target": "缺料通知責任",
+                                "reason": "釐清本人責任。",
+                                "basis": {
+                                    "source_ids": [str(correction_id)],
+                                    "skill_ids": ["task-boundary"],
+                                    "quote_anchors": [],
+                                },
+                            },
+                        }
+                    ],
                 }
             )
             bundle = await build_consultant_context(
@@ -238,6 +261,9 @@ async def test_main_context_has_global_orientation_focus_and_exact_current_sourc
             )
 
             assert bundle.orientation.document_id == document_id
+            assert {item.item_id for item in bundle.orientation.work_items} == {
+                work_id
+            }
             assert {item.item_id for item in bundle.orientation.tasks} == {
                 task.task_id for task in document.tasks
             }
@@ -249,6 +275,9 @@ async def test_main_context_has_global_orientation_focus_and_exact_current_sourc
             assert "供應商窗口改由李小姐負責。" not in bundle.system_prompt
             assert str(unrelated_correction_id) not in bundle.system_prompt
             assert "舊摘要誤寫成每週整理。" in bundle.system_prompt
+            assert "過時理解：員工只負責例行採購" not in bundle.system_prompt
+            assert "我先確認缺料通知的責任邊界。" in bundle.system_prompt
+            assert "緊急缺料時，誰決定要通知業務？" in bundle.system_prompt
             assert "non_authoritative_dialogue_summary" not in (
                 bundle.receipt.degraded_sections
             )

@@ -169,11 +169,11 @@ Big-bang 只代表最後一次硬切，不允許累積十個 Task 後才發現�
 
 **Produces:** Graph transitions and projections for dynamic interview work, persistent “AI 目前理解”, concrete gaps and advisory sufficiency.
 
-- [ ] Recreate the approved procurement scenario as behavior tests: initial navigation, broad work map, one clear interview focus, side clue remains visible, employee changes topic, Task／Duty／OPKS revise dynamically, and a correction selectively reopens affected work.
-- [ ] Test `UnderstandingProjection` and calibration triggers: always-available collapsible view; soft card after meaningful shift／long return; branch-blocking card only for contradiction, high-risk responsibility or structural premise. Actions are confirm, direct correction and later; confirmation never accepts document text.
-- [ ] Test semantic progress as coverage／depth／employee-decision／concrete gap with reason codes. Assert no percentage, tool-call progress, “本輪可停”, pause command, finish-interview state or required completion click exists.
-- [ ] Test sufficiency recommendation: deterministic evidence＋LLM explanation states why enough, remaining gaps and likely benefit of continuing; employee may keep chatting or leave, and new evidence recalculates it without requiring any session close／reopen lifecycle.
-- [ ] Implement graph routing／reducers／projections and natural close／reopen behavior. Run focused tests, run the common north-star gate, append the Task 5 ledger entry and commit `feat: implement adaptive consultant interview`.
+- [x] Recreate the approved procurement scenario as behavior tests: initial navigation, broad work map, one clear interview focus, side clue remains visible, employee changes topic, Task／Duty／OPKS revise dynamically, and a correction selectively reopens affected work.
+- [x] Test `UnderstandingProjection` and calibration triggers: always-available collapsible view; soft card after meaningful shift／long return; branch-blocking card only for contradiction, high-risk responsibility or structural premise. Actions are confirm, direct correction and later; confirmation never accepts document text.
+- [x] Test semantic progress as coverage／depth／employee-decision／concrete gap with reason codes. Assert no percentage, tool-call progress, “本輪可停”, pause command, finish-interview state or required completion click exists.
+- [x] Test sufficiency recommendation: deterministic evidence＋LLM explanation states why enough, remaining gaps and likely benefit of continuing; employee may keep chatting or leave, and new evidence recalculates it without requiring any session close／reopen lifecycle.
+- [x] Implement graph routing／reducers／projections and natural close／reopen behavior. Run focused tests, run the common north-star gate, append the Task 5 ledger entry and commit `feat: implement adaptive consultant interview`.
 
 ### Task 6: Implement document review, structural dependency blocking and required clarification
 

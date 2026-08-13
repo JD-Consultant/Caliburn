@@ -8,13 +8,21 @@ from uuid import UUID
 from langgraph.graph import END, START, StateGraph
 from langgraph.runtime import Runtime
 
+from app.consultant.interview import (
+    VerifiedConsultantCommit,
+    apply_source_correction,
+    apply_verified_consultant_commit,
+    normalize_current_work,
+)
 from app.consultant.state import (
     ApprovedJobDocument,
+    CalibrationDecision,
     ConsultantCommandContext,
     ConsultantThreadState,
     SourceReference,
     initial_thread_state,
 )
+from app.consultant.understanding import decide_calibration, invalidate_sufficiency
 
 
 class StaleThreadRevision(RuntimeError):
@@ -50,7 +58,7 @@ def _apply_command(
     document_id = UUID(command["document_id"])
 
     if action == "initialize":
-        if state:
+        if state.get("document_id") is not None:
             _require_document(state, document_id)
             return {}
         return initial_thread_state(document_id)
@@ -83,12 +91,76 @@ def _apply_command(
         "source_supersessions": supersessions,
     }
     if action == "register_source":
+        if source_reference is None:
+            raise ValueError("register_source requires a source reference")
+        if source_reference.supersedes_source_id is not None:
+            update.update(
+                apply_source_correction(
+                    state,
+                    document_id=document_id,
+                    superseded_source_id=source_reference.supersedes_source_id,
+                    correction_source_id=source_reference.source_id,
+                    revision=expected_revision + 1,
+                )
+            )
+        invalidated = invalidate_sufficiency(
+            state,
+            revision=expected_revision + 1,
+        )
+        if invalidated is not None:
+            update["sufficiency"] = invalidated
         return update
     if action == "direct_edit":
         approved = ApprovedJobDocument.model_validate(command["approved_document"])
         if approved.document_id != document_id:
             raise ValueError("approved document does not match thread document_id")
         update["approved_document"] = approved.model_dump(mode="json")
+        invalidated = invalidate_sufficiency(
+            state,
+            revision=expected_revision + 1,
+        )
+        if invalidated is not None:
+            update["sufficiency"] = invalidated
+        return update
+    if action == "commit_consultant_result":
+        commit = VerifiedConsultantCommit.model_validate(command["semantic_commit"])
+        update.update(
+            apply_verified_consultant_commit(
+                state,
+                document_id=document_id,
+                revision=expected_revision + 1,
+                commit=commit,
+            )
+        )
+        return update
+    if action == "decide_understanding_calibration":
+        calibration_id = UUID(command["calibration_id"])
+        decision = CalibrationDecision(command["calibration_decision"])
+        calibrations, understanding, work, latest = decide_calibration(
+            state=state,
+            calibration_id=calibration_id,
+            decision=decision,
+            source_reference=source_reference,
+            revision=expected_revision + 1,
+        )
+        work, current_work_id = normalize_current_work(
+            work,
+            preferred_work_id=(
+                UUID(state["current_work_id"])
+                if state.get("current_work_id") is not None
+                else None
+            ),
+            revision=expected_revision + 1,
+        )
+        update.update(
+            {
+                "understanding_calibrations": calibrations,
+                "latest_calibration_id": latest,
+                "understanding": understanding,
+                "interview_work": work,
+                "current_work_id": current_work_id,
+            }
+        )
         return update
     raise ValueError(f"unsupported consultant command: {action}")
 

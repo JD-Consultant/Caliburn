@@ -766,6 +766,43 @@ receipt 的裁決歷史採追加與 supersession，不以覆寫抹除員工先�
 
 這項裁決把「前景專注、背景全域吸收」轉成可實作邊界：前景得到足以完成當輪判斷的細節；背景保有結構定位與異常訊號，而不是保有所有細節。它同時支援 Task／Duty 隨訪談演化、OPKS 按需分析、旁支線索停放與可解釋進度，不要求第一版先導入 GraphRAG、向量記憶或額外 planner model。
 
+#### 7.9.2 資料不足時的補查與詢問順序（2026-08-13 研究後候選，待 owner 最終確認）
+
+Owner 已大致同意「不要把能自行查到的內容反覆問員工」，但要求先以最新、主流與權威資料反證後再收斂。研究後需要修正原本較粗略的說法：**本文件內可直接定位的相關資料原則上先自動查；iCAP 不是每次詢問員工前都必須經過的固定關卡；只有員工或其他具當前直接工作經驗者能確定的事實、意圖與裁決，應直接問人，不得由 Reference 補值。**
+
+外部資料支持的是這個分流原則，而不是一條固定的「local RAG → iCAP RAG → 問員工」流水線：
+
+- OpenAI 最新 model guidance 建議只暴露當下相關工具、追蹤成長中的 context，並明示重要歧義何時必須提問；安全、唯讀且在範圍內的查詢可持續進行，重要歧義與核准邊界則停止並交還使用者。
+- Anthropic 的 Context Engineering 建議以少量預載資料加 just-in-time 探索取得最小高訊號 context；其 Trustworthy Agents 研究進一步區分「可自行研究的缺口」與「只有使用者能決定的偏好／意圖」，並指出過度詢問與一律自行假設都會降低可靠性。
+- Google Research 的 Sufficient Context 研究顯示，retrieval 的「相關」不等於「足以回答」；額外但不足的 context 可能提高模型信心與幻覺，因此不能把「查過 iCAP」當成資料已充分。
+- Microsoft Research 在超過 20 萬段模擬對話中觀察到，模型會受早期錯誤假設牽制且難以恢復；這支持優先注入最新更正、保存結構化目前理解，並在會改變工作邊界時釐清，而不是讓模型沿長對話自行猜。
+- OPM 將 job analysis 定義為系統性蒐集、記錄與分析工作內容、情境及要求，並以具有直接、近期工作經驗的 incumbent／supervisor 作為 SME 來源。這支持 iCAP 可提供比較框架與 coverage 候選，但不能取代員工對「本人現在實際做什麼」的確認。OPM 並未替 Caliburn 決定單一員工 authority；後者仍是本產品既有裁決。
+
+因此，第一版 Context Policy 採下列**缺口分類與查詢階梯**；階梯是依缺口類型選路，不要求每輪走完所有步驟：
+
+1. **先判斷缺口類型，不先盲目搜尋。** 區分為本文件可檢索事實、Reference 可協助的 coverage／術語、員工專屬工作事實／意圖／裁決，以及本輪不阻塞的延後 gap。這可作為同一次主要 inference 的 typed sufficiency／next-action 欄位，不要求固定增加一個 planner call。
+2. **本文件的直接關聯先自動讀。** 若答案可能已存在於當輪回答、最新更正、穩定 ID linkage、焦點 Task／Duty／OPKS、相關 Proposal 或明確 source receipt，Context Engine 應在 document scope 與 budget 內先查，不把內部查得到的內容原封不動再問員工。
+3. **只有直接關聯不足時，才擴展本文件檢索。** 依 lexical／semantic 候選、相鄰回合與來源關係補查；若找到的只是舊假說、已否認內容或相互矛盾來源，仍視為不足，不得用相似度決勝。
+4. **iCAP 只在它能改進 coverage、術語或中立追問時按需查。** 例如確認是否漏問常見產出、控制點或能力面向。若缺的是「這名員工是否負責核准、頻率是多少、實際例外怎麼處理」，iCAP 在設計上不可能回答，就不必為了形式先查一次。
+5. **員工專屬或高影響歧義直接詢問員工。** 包含責任歸屬、實際做法、決策權、頻率／條件、本人意圖、來源衝突，以及會實質改變 Task 邊界、Duty 分組、OPKS 或 Proposal 的未決事項。問題應聚焦一個主要判斷，說明目前理解與缺口，不要求員工重述系統已知內容。
+6. **非阻塞缺口可以明示延後。** 若不影響當前焦點、補查成本超過本輪 budget，或員工選擇稍後回答，就以 reason code 與可恢復 agenda item 保存；不得偷偷補值，也不得因未查遍所有可能資料而阻止本輪產生有效的理解更新、gap 或下一個問題。
+
+可先使用下列語意 reason code，名稱與 schema 之後仍可調整：
+
+- `SUFFICIENT_FOR_CURRENT_ACTION`：對本輪合法產出已充分；
+- `LOCAL_LOOKUP_NEEDED`：本文件仍有明確可查來源；
+- `REFERENCE_LOOKUP_HELPFUL`：iCAP 可能改善 coverage／術語／問題品質，但不能建立員工事實；
+- `EMPLOYEE_CLARIFICATION_REQUIRED`：只有員工能回答，或影響重大到不能假設；
+- `DEFER_WITH_VISIBLE_GAP`：本輪不阻塞，保留可恢復缺口。
+
+「充分」是相對於**本輪合法 action**，不是整份職務已完整。例如現有證據可能足以提出一個 Task 候選，但不足以提出其完整 OPKS；此時可以更新 Work Model 並留下 OPKS gap，不必為了追求全域完整而無限補查。每次 read-only lookup 應有目標、理由、預期補足的缺口、scope、budget 與停止條件，實際讀取內容寫入 ContextManifest；停止條件是已足以產生 Proposal／no-op／visible gap／一個主要問題之一，而不是「所有可能 Context 都載入完成」。
+
+Reference 形成問題時要降低 anchoring：介面或顧問話術應表明它是公版常見可能性，允許員工回答 match／partial／no-match／conflict／unknown／deferred，不能用「標準上應該有」暗示員工接受。員工否認或更正後，以員工來源更新 Work Model 並保留 challenge receipt；不得因 iCAP 分數較高而覆蓋。
+
+白話例子：訪談「月結」時，系統若已在舊回合記錄員工每月整理差異表，就先讀回該原話，不再問「你是否整理差異表」。若 iCAP 顯示同類工作常見覆核控制，AI 可以中立追問「有些相近職務會做覆核；你的工作也包含嗎？」但若真正缺的是「你本人能不能核准調整」，應直接問員工，不先拿 iCAP 猜答案。若員工順帶提到偶爾教同事 SAP，系統可保存為旁支線索；只要它不阻塞月結焦點，就不必立刻展開完整訪談。
+
+此結論仍有可轉移限制：OpenAI／Anthropic 的材料主要是通用 agent 工程，Google 的量化研究是 RAG QA，Microsoft 的研究任務不是繁中職務訪談，OPM 也不是 AI Context Engine 規格。公開資料沒有直接比較「先查 iCAP」與「直接問員工」何者能提高本產品成效；上述順序是把多方共同原則套入 Caliburn 的 authority、成本與訪談負擔後形成的產品假說，成品完成後仍需用真實訪談情境驗證。
+
 ### 7.10 必帶、候選與按需三層
 
 | 層級 | 內容 | 誰決定 | 可否因 budget 直接省略 |
@@ -1100,6 +1137,7 @@ Stakeholder 草稿（非權威，只作需求來源）：
 - [Anthropic — Introducing Anthropic Interviewer](https://www.anthropic.com/research/anthropic-interviewer)
 - [Anthropic — Building effective agents](https://www.anthropic.com/engineering/building-effective-agents)
 - [Anthropic — Effective context engineering for AI agents](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)
+- [Anthropic — Trustworthy agents in practice（可自行研究的缺口與必須詢問使用者的意圖）](https://www.anthropic.com/research/trustworthy-agents)
 - [Anthropic — Scaling Managed Agents: Decoupling the brain from the hands](https://www.anthropic.com/engineering/managed-agents)
 - [Anthropic — How we contain Claude across our consumer products](https://www.anthropic.com/engineering/how-we-contain-claude)
 - [Anthropic Docs — How tool use works](https://platform.claude.com/docs/en/agents-and-tools/tool-use/how-tool-use-works)
@@ -1165,6 +1203,7 @@ Stakeholder 草稿（非權威，只作需求來源）：
 - [Microsoft Research — From Local to Global: A Graph RAG Approach](https://www.microsoft.com/en-us/research/publication/from-local-to-global-a-graph-rag-approach-to-query-focused-summarization/)
 - [Microsoft Research — DRIFT Search: Combining global and local search](https://www.microsoft.com/en-us/research/blog/introducing-drift-search-combining-global-and-local-search-methods-to-improve-quality-and-efficiency/)
 - [Microsoft Research — GraphRAG dynamic community selection](https://www.microsoft.com/en-us/research/blog/graphrag-improving-global-search-via-dynamic-community-selection/)
+- [Microsoft Research — LLMs Get Lost in Multi-Turn Conversation](https://www.microsoft.com/en-us/research/publication/llms-get-lost-in-multi-turn-conversation/)
 - [Microsoft HAX — Guidelines for Human-AI Interaction](https://www.microsoft.com/en-us/haxtoolkit/ai-guidelines/)
 - [Microsoft HAX — Time services based on context](https://www.microsoft.com/en-us/haxtoolkit/guideline/time-services-based-on-context/)
 - [Microsoft HAX — Support efficient correction](https://www.microsoft.com/en-us/haxtoolkit/guideline/support-efficient-correction/)
@@ -1176,5 +1215,6 @@ Stakeholder 草稿（非權威，只作需求來源）：
 - [U.S. OPM — Job Analysis](https://www.opm.gov/policy-data-oversight/assessment-and-selection/job-analysis/)
 - [U.S. OPM — Job analysis evidence and methodology FAQ](https://www.opm.gov/frequently-asked-questions/assessment-policy-faq/job-analysis/when-conducting-a-job-analysis-do-i-have-to-collect-ratings-eg-importance-required-at-entry-from-the-subject-matter-experts-sme-for-the-tasks-and-competencies/)
 - [U.S. OPM — Six Steps to Conducting a Job Analysis for Multiple Grades](https://www.opm.gov/policy-data-oversight/assessment-and-selection/job-analysis/six-steps-to-conducting-a-job-analysis-for-multiple-grades/)
+- [U.S. OPM — Delegated Examining Operations Handbook（Job Analysis 與 SME）](https://www.opm.gov/policy-data-oversight/hiring-information/competitive-hiring/deo_handbook.pdf)
 - [iCAP — 職能發展及應用推動要點（職能基準審查與更新）](https://icap.wda.gov.tw/Quality/quality_specification.aspx)
 - [NIST — AI Risk Management Framework Core](https://airc.nist.gov/airmf-resources/airmf/5-sec-core/)

@@ -24,6 +24,7 @@ from psycopg import AsyncConnection
 from psycopg.rows import DictRow, dict_row
 
 from app.consultant.graph import StaleThreadRevision, build_consultant_graph
+from app.consultant.interview import VerifiedConsultantCommit
 from app.consultant.state import (
     ApprovedJobDocument,
     EmployeeSource,
@@ -627,6 +628,47 @@ class PostgresConsultantRuntime:
         self, document_id: UUID
     ) -> ApprovedJobDocument:
         return (await self.reopen_document(document_id)).approved_document
+
+    async def commit_verified_consultant_result(
+        self,
+        *,
+        document_id: UUID,
+        expected_revision: int,
+        commit: VerifiedConsultantCommit,
+    ) -> ConsultantSnapshot:
+        """Atomically publish one already-verified semantic consultant result."""
+
+        async with self._lock_for(document_id):
+            await self._require_active_catalog(document_id)
+            source = await self.get_source(document_id, commit.answer_source_id)
+            if source.processing_status is not SourceProcessingStatus.COMMITTED:
+                raise PendingSourceRequiresReconciliation(
+                    f"source {source.source_id} is not committed"
+                )
+            if source.validity is not SourceValidity.CURRENT:
+                raise SourceConflict(
+                    f"source {source.source_id} was superseded before semantic commit"
+                )
+            snapshot = await self._snapshot(document_id)
+            if snapshot.revision != expected_revision:
+                raise StaleRevision(
+                    f"expected revision {expected_revision}, found {snapshot.revision}"
+                )
+            try:
+                await self.graph.ainvoke(
+                    {},
+                    self.graph_config(document_id),
+                    context={
+                        "action": "commit_consultant_result",
+                        "document_id": str(document_id),
+                        "expected_revision": expected_revision,
+                        "semantic_commit": commit.model_dump(mode="json"),
+                    },
+                )
+            except StaleThreadRevision as error:
+                raise StaleRevision(str(error)) from error
+            await self._touch_catalog(document_id)
+            return await self._snapshot(document_id)
 
     async def resolve_quote(
         self,

@@ -23,6 +23,17 @@ from app.adapters.langgraph.postgres import (
     UnknownEvidenceSource,
     open_postgres_consultant_runtime,
 )
+from app.consultant.interview import VerifiedConsultantCommit
+from app.consultant.results import (
+    AnalysisBasis,
+    AttentionChange,
+    AttentionOperation,
+    ConsultantResult,
+    GapReason,
+    SufficiencyRecommendation,
+    UnderstandingChange,
+    UnderstandingOperation,
+)
 from app.consultant.state import (
     ApprovedDuty,
     ApprovedEnabler,
@@ -34,6 +45,7 @@ from app.consultant.state import (
     ApprovedTask,
     EmployeeSource,
     EmployeeSourceKind,
+    InterviewPriority,
     SourceProcessingStatus,
     SourceValidity,
 )
@@ -236,6 +248,91 @@ async def test_source_is_immutable_and_correction_supersedes_without_quote_copy(
         checkpoint_json = json.dumps(raw_state, ensure_ascii=False, default=str)
         assert original_text not in checkpoint_json
         assert correction_text not in checkpoint_json
+
+
+@pytest.mark.asyncio
+async def test_verified_consultant_commit_survives_postgres_runtime_restart(
+    consultant_database_url: str,
+) -> None:
+    document_id = uuid4()
+    source_id = uuid4()
+    run_id = uuid4()
+    now = datetime.now(UTC)
+    basis = AnalysisBasis(
+        source_ids=(source_id,),
+        skill_ids=("work-discovery",),
+    )
+    result = ConsultantResult(
+        visible_reply="我先整理出請購下單，接著釐清觸發條件。",
+        reply_basis=basis,
+        used_skill_ids=("work-discovery",),
+        understanding_changes=(
+            UnderstandingChange(
+                operation=UnderstandingOperation.ADD,
+                kind="task_hypothesis",
+                text="員工依缺料狀況建立請購單。",
+                basis=basis,
+            ),
+        ),
+        attention_changes=(
+            AttentionChange(
+                operation=AttentionOperation.ADD,
+                kind="task_boundary",
+                title="請購下單",
+                reason="這是目前最清楚且可深入的工作故事。",
+                priority=InterviewPriority.TASK_BOUNDARY,
+                make_current=True,
+                basis=basis,
+            ),
+        ),
+        sufficiency=SufficiencyRecommendation(
+            currently_enough=False,
+            reason="其他例行工作尚未盤點。",
+            remaining_gap_reasons=(GapReason.WORK_COVERAGE_MISSING,),
+            continuing_benefit="繼續盤點可避免漏掉例行工作。",
+            basis=basis,
+        ),
+    )
+    commit = VerifiedConsultantCommit(
+        run_id=run_id,
+        answer_source_id=source_id,
+        started_at=now,
+        completed_at=now,
+        result=result,
+    )
+
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        await runtime.create_document(document_id, title="採購職務")
+        sourced = await runtime.record_employee_source(
+            document_id=document_id,
+            source_id=source_id,
+            kind=EmployeeSourceKind.EMPLOYEE_TURN,
+            text="我會先看缺料，再建立請購單。",
+        )
+        committed = await runtime.commit_verified_consultant_result(
+            document_id=document_id,
+            expected_revision=sourced.revision,
+            commit=commit,
+        )
+
+        assert committed.revision == sourced.revision + 1
+        assert committed.messages[0].run_id == run_id
+        assert committed.approved_document.tasks == ()
+
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        reopened = await runtime.reopen_document(document_id)
+        raw = await runtime.raw_state(document_id)
+
+        assert reopened.revision == committed.revision
+        assert reopened.messages[0].text == result.visible_reply
+        assert reopened.current_interview is not None
+        assert reopened.current_interview.title == "請購下單"
+        assert reopened.understanding_projection.items[0].text == (
+            "員工依缺料狀況建立請購單。"
+        )
+        assert reopened.sufficiency.currently_enough is False
+        assert raw["latest_run"]["run_id"] == str(run_id)
+        assert raw["approved_document"]["tasks"] == []
 
 
 @pytest.mark.asyncio

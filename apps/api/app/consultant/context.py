@@ -61,16 +61,22 @@ class OrientationItem(ContextModel):
 
 
 class GlobalOrientationIndex(ContextModel):
-    schema_version: int = 1
+    schema_version: int = 2
     document_id: UUID
     state_revision: int = Field(ge=0)
     current_work_id: UUID | None = None
+    work_items: tuple[OrientationItem, ...] = ()
+    hypotheses: tuple[OrientationItem, ...] = ()
     duties: tuple[OrientationItem, ...] = ()
     tasks: tuple[OrientationItem, ...] = ()
+    total_work_count: int = Field(ge=0)
+    total_hypothesis_count: int = Field(ge=0)
     total_duty_count: int = Field(ge=0)
     total_task_count: int = Field(ge=0)
     gap_count: int = Field(ge=0)
     pending_review_count: int = Field(ge=0)
+    omitted_work_count: int = Field(ge=0)
+    omitted_hypothesis_count: int = Field(ge=0)
     omitted_duty_count: int = Field(ge=0)
     omitted_task_count: int = Field(ge=0)
     degraded: bool = False
@@ -256,6 +262,82 @@ async def _gather_sources(
     return tuple(values)
 
 
+def _current_understanding_values(
+    values: dict[str, dict[str, Any]],
+) -> list[tuple[str, dict[str, Any]]]:
+    current = [
+        (key, value)
+        for key, value in values.items()
+        if value.get("superseded_by_version_id") is None
+        and value.get("status") not in {"superseded", "retired"}
+    ]
+    current.sort(
+        key=lambda item: (
+            int(item[1].get("created_revision", 0)),
+            item[0],
+        ),
+        reverse=True,
+    )
+    return current
+
+
+def _understanding_slice(
+    values: dict[str, dict[str, Any]],
+    *,
+    current_work_id: UUID | None,
+    max_items: int,
+) -> tuple[dict[str, dict[str, Any]], bool]:
+    current = _current_understanding_values(values)
+
+    def is_mandatory(item: tuple[str, dict[str, Any]]) -> bool:
+        work_ids = {str(value) for value in item[1].get("work_ids", ())}
+        return (
+            item[1].get("status") == "challenged"
+            or (
+                current_work_id is not None
+                and str(current_work_id) in work_ids
+            )
+        )
+
+    mandatory = [item for item in current if is_mandatory(item)]
+    optional = [item for item in current if not is_mandatory(item)]
+    optional.sort(key=lambda item: -int(item[1].get("created_revision", 0)))
+    selected = [
+        *mandatory,
+        *optional[: max(0, max_items - len(mandatory))],
+    ]
+    return dict(selected), len(selected) != len(current)
+
+
+def _gap_slice(
+    values: dict[str, dict[str, Any]],
+    *,
+    current_work_id: UUID | None,
+    max_items: int,
+) -> tuple[dict[str, dict[str, Any]], bool]:
+    active = [
+        (key, value)
+        for key, value in values.items()
+        if value.get("status") != "resolved"
+    ]
+
+    def is_mandatory(item: tuple[str, dict[str, Any]]) -> bool:
+        value = item[1]
+        if value.get("blocks_dependent_analysis") or value.get("blocking"):
+            return True
+        subject_id = value.get("subject_id")
+        return current_work_id is not None and subject_id == str(current_work_id)
+
+    mandatory = [item for item in active if is_mandatory(item)]
+    optional = [item for item in active if not is_mandatory(item)]
+    optional.sort(key=lambda item: item[0])
+    selected = [
+        *mandatory,
+        *optional[: max(0, max_items - len(mandatory))],
+    ]
+    return dict(selected), len(selected) != len(active)
+
+
 def _orientation(
     snapshot: ConsultantSnapshot,
     request: ContextRequest,
@@ -264,6 +346,36 @@ def _orientation(
     max_items: int,
 ) -> GlobalOrientationIndex:
     document = snapshot.approved_document
+    work_items = [
+        OrientationItem(
+            item_id=value.get("work_id", key),
+            kind=value.get("kind", "work_scope"),
+            label=value.get("title") or value.get("kind", "已知工作範圍"),
+            parent_id=value.get("subject_id"),
+            authority="consultant_state",
+            status=value.get("status", "available"),
+        )
+        for key, value in snapshot.interview_work.items()
+        if value.get("status") != "retired"
+    ]
+    hypothesis_items = []
+    for key, value in _current_understanding_values(snapshot.understanding):
+        raw_id = value.get("understanding_id", key)
+        try:
+            item_id = UUID(str(raw_id))
+        except (TypeError, ValueError):
+            continue
+        work_ids = value.get("work_ids", ())
+        hypothesis_items.append(
+            OrientationItem(
+                item_id=item_id,
+                kind=value.get("kind", "work_hypothesis"),
+                label=value.get("text", "可修訂工作理解"),
+                parent_id=(work_ids[0] if work_ids else None),
+                authority="consultant_state",
+                status=value.get("status", "active"),
+            )
+        )
     duty_items = [
         OrientationItem(
             item_id=duty.duty_id,
@@ -285,8 +397,26 @@ def _orientation(
         )
         for task in document.tasks
     ]
-    if compact:
-        focus_ids = {item for item in (request.focus_subject_id,) if item is not None}
+    all_work = tuple(work_items)
+    all_hypotheses = tuple(hypothesis_items)
+    all_duties = tuple(duty_items)
+    all_tasks = tuple(task_items)
+    total_items = len(all_work) + len(all_hypotheses) + len(all_duties) + len(all_tasks)
+    if compact or total_items > max_items:
+        focus_ids = {
+            item
+            for item in (
+                request.current_work_id,
+                request.focus_subject_id,
+            )
+            if item is not None
+        }
+        focused_work = [item for item in work_items if item.item_id in focus_ids]
+        focused_hypotheses = [
+            item
+            for item in hypothesis_items
+            if item.item_id in focus_ids or item.parent_id in focus_ids
+        ]
         focused_tasks = [item for item in task_items if item.item_id in focus_ids]
         focused_duty_ids = {
             item.parent_id for item in focused_tasks if item.parent_id is not None
@@ -296,39 +426,54 @@ def _orientation(
             for item in duty_items
             if item.item_id in focus_ids or item.item_id in focused_duty_ids
         ]
-        remaining = max(0, max_items - len(focused_tasks) - len(focused_duties))
-        duty_items = focused_duties + [
-            item for item in duty_items if item not in focused_duties
-        ][:remaining]
-        remaining = max(0, max_items - len(focused_tasks) - len(duty_items))
-        task_items = focused_tasks + [
-            item for item in task_items if item not in focused_tasks
-        ][:remaining]
-    elif len(duty_items) + len(task_items) > max_items:
-        return _orientation(
-            snapshot,
-            request,
-            compact=True,
-            max_items=max_items,
-        )
+        ordered = [
+            *(("work", item) for item in focused_work),
+            *(("hypothesis", item) for item in focused_hypotheses),
+            *(("task", item) for item in focused_tasks),
+            *(("duty", item) for item in focused_duties),
+            *(("work", item) for item in work_items if item not in focused_work),
+            *(
+                ("hypothesis", item)
+                for item in hypothesis_items
+                if item not in focused_hypotheses
+            ),
+            *(("duty", item) for item in duty_items if item not in focused_duties),
+            *(("task", item) for item in task_items if item not in focused_tasks),
+        ][:max_items]
+        work_items = [item for kind, item in ordered if kind == "work"]
+        hypothesis_items = [
+            item for kind, item in ordered if kind == "hypothesis"
+        ]
+        duty_items = [item for kind, item in ordered if kind == "duty"]
+        task_items = [item for kind, item in ordered if kind == "task"]
     return GlobalOrientationIndex(
         document_id=snapshot.document_id,
         state_revision=snapshot.revision,
         current_work_id=request.current_work_id,
+        work_items=tuple(work_items),
+        hypotheses=tuple(hypothesis_items),
         duties=tuple(duty_items),
         tasks=tuple(task_items),
+        total_work_count=len(all_work),
+        total_hypothesis_count=len(all_hypotheses),
         total_duty_count=len(document.duties),
         total_task_count=len(document.tasks),
-        gap_count=len(snapshot.gaps),
+        gap_count=sum(
+            value.get("status") != "resolved" for value in snapshot.gaps.values()
+        ),
         pending_review_count=sum(
             item.get("status") in {"pending", "deferred"}
             for item in snapshot.review_queue.values()
         ),
-        omitted_duty_count=len(document.duties) - len(duty_items),
-        omitted_task_count=len(document.tasks) - len(task_items),
+        omitted_work_count=len(all_work) - len(work_items),
+        omitted_hypothesis_count=len(all_hypotheses) - len(hypothesis_items),
+        omitted_duty_count=len(all_duties) - len(duty_items),
+        omitted_task_count=len(all_tasks) - len(task_items),
         degraded=(
-            len(document.duties) != len(duty_items)
-            or len(document.tasks) != len(task_items)
+            len(all_work) != len(work_items)
+            or len(all_hypotheses) != len(hypothesis_items)
+            or len(all_duties) != len(duty_items)
+            or len(all_tasks) != len(task_items)
         ),
     )
 
@@ -394,6 +539,7 @@ def _prompt(
     orientation: GlobalOrientationIndex,
     approved_slice: ApprovedDocumentSlice,
     current_work: dict[str, Any] | None,
+    recent_consultant_turns: Sequence[dict[str, Any]],
     required_clarification: dict[str, Any] | None,
     understanding: dict[str, dict],
     gaps: dict[str, dict],
@@ -413,6 +559,9 @@ def _prompt(
         + _json(approved_slice)
         + "</approved_document_slice>",
         "<current_interview_work>" + _json(current_work) + "</current_interview_work>",
+        "<recent_consultant_turns authority=\"none\" evidence=\"false\">"
+        + _json(recent_consultant_turns)
+        + "</recent_consultant_turns>",
         "<required_clarification>"
         + _json(required_clarification)
         + "</required_clarification>",
@@ -546,7 +695,29 @@ async def build_consultant_context(
         if request.current_work_id is not None
         else None
     )
+    recent_consultant_turns = tuple(
+        {
+            "text": item.text,
+            "answer_source_id": str(item.answer_source_id),
+            "next_question": item.next_question,
+        }
+        for item in snapshot.messages[-2:]
+    )
     degraded: list[str] = []
+    understanding, understanding_degraded = _understanding_slice(
+        snapshot.understanding,
+        current_work_id=request.current_work_id,
+        max_items=execution.max_orientation_items,
+    )
+    gaps, gaps_degraded = _gap_slice(
+        snapshot.gaps,
+        current_work_id=request.current_work_id,
+        max_items=execution.max_orientation_items,
+    )
+    if understanding_degraded:
+        degraded.append("revisable_understanding")
+    if gaps_degraded:
+        degraded.append("visible_gaps")
 
     dialogue_summary = request.non_authoritative_dialogue_summary
 
@@ -555,9 +726,10 @@ async def build_consultant_context(
             orientation=orientation,
             approved_slice=approved_slice,
             current_work=current_work,
+            recent_consultant_turns=recent_consultant_turns,
             required_clarification=snapshot.required_clarification,
-            understanding=snapshot.understanding,
-            gaps=snapshot.gaps,
+            understanding=understanding,
+            gaps=gaps,
             review_queue=snapshot.review_queue,
             current_source=current_source,
             sources=(
@@ -592,6 +764,10 @@ async def build_consultant_context(
         system_prompt, messages, token_count = render(mandatory)
     elif orientation.degraded:
         degraded.append("global_orientation")
+    if token_count > execution.max_context_tokens and len(recent_consultant_turns) > 1:
+        recent_consultant_turns = recent_consultant_turns[-1:]
+        degraded.append("recent_consultant_turns")
+        system_prompt, messages, token_count = render(mandatory)
 
     if token_count > execution.max_context_tokens:
         raise ContextBudgetExceeded(

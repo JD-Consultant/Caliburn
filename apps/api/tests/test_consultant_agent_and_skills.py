@@ -177,6 +177,7 @@ def _minimal_result(
             currently_enough=False,
             reason="Task 邊界仍缺少有意義結果。",
             remaining_gap_reasons=(GapReason.TASK_BOUNDARY_UNCLEAR,),
+            continuing_benefit="繼續訪談可釐清 Task 的實際結果。",
             basis=_basis(source, *skills),
         ),
     )
@@ -267,6 +268,7 @@ async def test_agent_composes_selected_skills_without_leaking_ineligible_content
             "currently_enough": False,
             "reason": "還需要確認完成標準。",
             "remaining_gap_reasons": ["completion_standard_missing"],
+            "continuing_benefit": "繼續訪談可確認完成標準。",
             "basis": {
                 "source_ids": [str(source_id)],
                 "quote_anchors": [],
@@ -552,6 +554,7 @@ def test_verifier_accepts_anchored_source_and_selected_skill_dependencies() -> N
             currently_enough=False,
             reason="仍缺完成標準。",
             remaining_gap_reasons=(GapReason.COMPLETION_STANDARD_MISSING,),
+            continuing_benefit="繼續訪談可確認完成標準。",
             basis=_basis(source, "task-boundary", quote=quote),
         ),
     )
@@ -776,6 +779,7 @@ def test_opks_axes_allow_early_output_and_document_level_many_to_many_ks() -> No
             currently_enough=False,
             reason="仍需確認行為指標。",
             remaining_gap_reasons=(GapReason.PERFORMANCE_EVIDENCE_MISSING,),
+            continuing_benefit="繼續訪談可補齊可觀察的行為指標。",
             basis=_basis(
                 source, "task-boundary", "output", "knowledge", "skill"
             ),
@@ -816,6 +820,7 @@ def test_no_meaningful_output_is_a_visible_task_boundary_gap_not_a_fabricated_o(
             currently_enough=False,
             reason="仍缺有意義結果。",
             remaining_gap_reasons=(GapReason.TASK_BOUNDARY_UNCLEAR,),
+            continuing_benefit="繼續訪談可確認這項操作是否構成 Task。",
             basis=_basis(source, "task-boundary", "output"),
         ),
     )

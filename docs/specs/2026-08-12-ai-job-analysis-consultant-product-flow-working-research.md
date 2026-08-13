@@ -242,6 +242,29 @@ Owner 確認第一版產品的產出定位為：
 
 角色定位只提供方向，不根據職稱套用公版 JD。
 
+#### 3.1.1 是否在第一次訪談前提供簡短導航（研究候選；owner 待確認）
+
+**問題**：目前流程會在每輪顯示焦點、理由與進度，但 §3.11 的正常情境一開始就直接請員工盤點工作。員工可能要談過數輪才知道 AI 會先做什麼、過程中為何重整 Task／Duty／OPKS，以及自己何時需要決定正式變更。這不是缺少內部 workflow state，而是可能缺少一個開始時的共同心理模型。
+
+**直接來源與實際支持**（最近查核：2026-08-13）：
+
+- [Anthropic — Introducing Anthropic Interviewer](https://www.anthropic.com/research/anthropic-interviewer)將方法分成 planning、adaptive interviewing 與 analysis；其 interview rubric 維持共同研究問題，但允許個別訪談的變化與旁支。這支持「先有目標與涵蓋責任、路徑仍可動態調整」，不支持固定 wizard。
+- [U.S. OPM — Job Analysis](https://www.opm.gov/policy-data-oversight/assessment-and-selection/job-analysis/)把 Task、所需 competency 與兩者 linkage 視為 job analysis 的核心。這支持顧問一開始可白話說明會逐步理解工作與必要能力關係，但 OPM 沒有規定 AI 訪談 UI 或提問順序。
+- [Google PAIR — Feedback + Control](https://pair.withgoogle.com/guidebook-v2/chapter/feedback-controls/)建議清楚傳達使用者投入的價值與影響時間、保留調整控制，並把追蹤進度列為可提供個人效用的方式。這支持在員工投入訪談前說明「回答會如何變成可檢查成果」，以及之後讓員工看見進度與修正效果。
+- [OpenAI 官方 Model guidance](https://developers.openai.com/api/docs/guides/latest-model)要求提供 domain context、硬限制、approval boundaries 與 success criteria。這直接支持主要顧問 runtime 必須取得這些控制資訊；把其中與員工有關的部分轉成啟程說明，是 Caliburn 的 UX 推論，不是 OpenAI 明定的畫面規格。
+
+**可轉移限制**：Anthropic 的公開案例是大規模質性研究訪談，研究計畫由研究者審閱，且不是繁中單一員工的 iCAP 職務分析；其 10–15 分鐘訪談長度不能轉用成本產品時限。OPM 是職務分析方法權威，不是生成式 AI 互動研究。Google PAIR 與 OpenAI 是通用 AI UX／模型控制指引。四者共同支持的是「目標明確、路徑可適應、員工知道控制與成果如何變化」，尚未直接證明任何啟程文案能改善 Caliburn 的完成率或品質。
+
+**與既有設計的關係**：若採用，不新增 `InterviewPlan`、第二份 agenda 或固定問題表。內容由版本化顧問方法、當前文件狀態與既有 focus／agenda／progress 投影組成；之後仍由 §3.3 的動態焦點與 §4 的可解釋進度更新。它只建立員工的預期，不限制顧問只能依開場順序行動。
+
+**候選方案**：
+
+1. **不另外說明**：直接開始角色定位與工作盤點；畫面較短，但員工要從後續互動自行推測流程。
+2. **一次性的簡短導航（目前建議）**：第一次開始時用 3–4 句說明「先大致盤點工作，再一次深入一個焦點；新線索會先記住，Task／Duty／OPKS 會隨證據調整；正式修改都要你接受；你可隨時暫停，系統會顯示目前已知範圍、缺口與下一步」。隨後立刻開始第一個自然問題，不要求員工核准一份計畫。
+3. **先產生並核准完整訪談計畫**：員工可預覽所有預定主題，但容易形成固定階段與假分母，增加開場負擔，也會讓後續動態重整看起來像偏離計畫；目前不建議。
+
+**待 owner 裁決**：是否採方案 2；若採用，實作文案與視覺形式留到目標架構／Web 體驗關卡，不在此鎖定。
+
 ### 3.2 廣度盤點：建立「目前已知的工作地圖」
 
 AI 從不同角度協助員工回想工作：

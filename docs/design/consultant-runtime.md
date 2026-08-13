@@ -1,7 +1,7 @@
 # AI 職務顧問 runtime 設計
 
 - 決策：[ADR 0060](../adr/0060-langchain-langgraph-consultant-runtime-and-durable-authority.md)
-- 狀態：Big-bang migration 建構中；目前完成框架底座、durable authority、模型執行與最小充分 Context foundation，production composition root 尚未切換
+- 狀態：Big-bang migration 建構中；目前完成框架底座、durable authority、模型執行、最小充分 Context 與專業分析 Skills／typed result foundation，production composition root 尚未切換
 - 實作：`apps/api/app/consultant`、`apps/api/app/adapters/langgraph`、`apps/api/app/adapters/openrouter/langchain.py`
 
 ## 儲存權威
@@ -55,6 +55,19 @@ checkpoint 不複製員工逐字來源；Store 不保存第二份核准文件。
 
 明確降級順序是：先捨棄非權威 dialogue summary，再壓縮 global orientation，再略過超出預算的近期候選來源。本輪原話、required evidence、必要澄清、blocking Gap 與焦點核准 slice 不會被摘要取代；這些 mandatory 內容本身超出 budget 時直接回 typed error。即使 LangChain 已把舊 message history 摘要化，middleware 仍會從 Store 重建 authority Context；tool loop 後續推論不會把員工回答重複追加到 ToolMessage 後面。
 
+## 專業分析 Skills 與模型結果閘門
+
+同一位主要顧問按當輪 eligibility 組合九個版本化方法 Skill：工作盤點、故事訪談、Task 邊界、Duty 分組、O、P、K、S 與完成度反方檢查。Skill 是方法與 context 載入邊界，不是多 Agent、固定 stage 或各自擁有狀態的子系統；Task 不必先永久穩定，已有局部證據即可同輪分析相關 O／P／K／S，後續結構變動再重驗 linkage。
+
+- Deep Agents `SkillsMiddleware` 只掃描本輪選定 Skill 的 frontmatter；`FilesystemMiddleware(tools=["read_file"])` 提供唯一模型工具。production 使用自訂 `BackendProtocol` adapter 直接讀 package resources，不使用 host `FilesystemBackend`，也不暴露 ls／glob／grep／write／edit／delete／execute／subagent。
+- `/skills/<id>/SKILL.md` 是唯一可讀路徑。backend 拒絕 traversal、未選 Skill、分頁式不完整讀取與同 run 第二次讀取；metadata discovery 不算模型讀取。互動 agent 不另接 checkpointer／Store，durable product graph只保存 semantic result／receipt；每次 invocation 重新投影 eligible metadata，並拒絕外部輸入夾帶舊 `read_file` ToolMessage，因此前一輪 Skill 全文、metadata 或 load warning 都不能流入本輪。
+- interactive policy 最多三次 model call、兩個 lookup wave；同一個模型回應中平行載入數個 Skill 算一波，不把「多個方法可組合」錯誤限制成最多兩個 Skill。LangChain 既有 `ModelCallLimitMiddleware`／`ToolCallLimitMiddleware` 繼續管 call／tool 總量，Caliburn 只補框架沒有的「wave」語意。
+- LangChain `response_format` 直接產生 Pydantic `ConsultantResult`：員工可見回覆、可修訂理解 delta、動態注意力／待處理 delta、具體 Gap、待員工審核的文件變更、至多一個主要問題與可重算充分性建議。這個 schema 沒有核准文件欄位、pause／finish lifecycle、Reference、能力級別或 A。
+- 每個語意 claim 明列 employee source IDs、quote anchors 與實際使用的 Skill IDs。commit 前 deterministic verifier 驗同文件 scope、current source、quote byte-range、selected／loaded Skill、允許的 document path／operation／payload、O／P 單 Task、K／S 文件層多對多 refs，以及具體數量、法規、SOP、公司規則與外部主張的逐字 anchor。模型文字本身永遠不是 evidence。
+- K／S 必須有有效員工 quote anchor；O 可以在操作型工作沒有獨立產出時保持空白，顧問改留下 Task-boundary gap，不為填表補造文件。能力級別與 A 連 model-facing enum 都不提供；職業／行業分類與 iCAP 配發代碼也不在允許的模型文件路徑。
+
+`ConsultantResult.reviewable_document_changes` 仍只是 Task 4 的語意草稿，不是可提交 patch。Task 6 會為每項操作配置 stable action ID、before／after、path read-set、dependency／atomic subgroup 與完整 review lifecycle；在那之前沒有任何路徑能把模型結果直接寫入核准文件。
+
 ## 當前邊界
 
-這個 foundation 已有可替換模型 profile、LangChain agent harness、attempt receipt 與 Context middleware，但尚未接 production route、真實顧問 Skill／結果 schema、訪談 routing、員工 review command 或 Web。它沒有 RAG／Reference、能力級別／A 生成、品質 eval 或舊 writer bridge。舊 production composition 會維持到垂直切片完成，最終硬切才刪除，不雙寫。
+這個 foundation 已有可替換模型 profile、LangChain agent harness、attempt receipt、Context middleware、真實顧問 Skills 與 typed semantic result，但尚未接 production route、adaptive interview routing、員工 review command 或 Web。它沒有 RAG／Reference、能力級別／A 生成、品質 eval 或舊 writer bridge。舊 production composition 會維持到垂直切片完成，最終硬切才刪除，不雙寫。

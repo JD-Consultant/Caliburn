@@ -247,12 +247,12 @@ Big-bang 只代表最後一次硬切，不允許累積十個 Task 後才發現�
 - Create: `apps/api/alembic/versions/0018_consultant_runtime_root.py`
 - Modify: `ARCHITECTURE.md`, `AGENTS.md`, `docs/design/**`, `docs/runbook.md`, dependency guards
 
-- [ ] Add characterization tests proving the new approved document preserves all required XLSX fields and deterministic position codes, including manually editable competency level／A and employee-entered occupation／industry classification; iCAP-assigned code cells remain blank. Preserve O as optional, O／P as Task-level and K／S as document-level many-to-many rather than flattening them into per-Task duplicates.
-- [ ] Add one-export behavior tests: reveal concrete gaps, allow explicit force export, and never accept pending changes, fabricate values, hide orphan Tasks or alter approved content.
-- [ ] Switch composition root to the new runtime and delete old writers in the same task. AST／`rg` guards must prove production cannot import them, no old table remains writable, and new target modules／schema do not reintroduce banned legacy component names.
-- [ ] Delete migrations 0012–0017 and install fresh root 0018; run migration on an empty database and assert only catalog＋framework persistence exist. No migration, dual-write or compatibility converter for old local data.
-- [ ] Verify ADR 0057 still holds: no RAG package import、HTTP consumer、route、tool、compose default or contract dependency was introduced.
-- [ ] Update architecture／runbook docs in the same commit; run API／Web／contract／turbo gates, run the common north-star gate, append the Task 9 ledger entry and commit `refactor: hard-cut to consultant runtime`.
+- [x] Add characterization tests proving the new approved document preserves all required XLSX fields and deterministic position codes, including manually editable competency level／A and employee-entered occupation／industry classification; iCAP-assigned code cells remain blank. Preserve O as optional, O／P as Task-level and K／S as document-level many-to-many rather than flattening them into per-Task duplicates.
+- [x] Add one-export behavior tests: reveal concrete gaps, allow explicit force export, and never accept pending changes, fabricate values, hide orphan Tasks or alter approved content.
+- [x] Switch composition root to the new runtime and delete old writers in the same task. AST／`rg` guards must prove production cannot import them, no old table remains writable, and new target modules／schema do not reintroduce banned legacy component names.
+- [x] Delete migrations 0012–0017 and install fresh root 0018; run migration on an empty database and assert only catalog＋framework persistence exist. No migration, dual-write or compatibility converter for old local data.
+- [x] Verify ADR 0057 still holds: no RAG package import、HTTP consumer、route、tool、compose default or contract dependency was introduced.
+- [x] Update architecture／runbook docs in the same commit; run API／Web／contract／turbo gates, run the common north-star gate, append the Task 9 ledger entry and commit `refactor: hard-cut to consultant runtime`.
 
 ### Task 10: Final product verification, one smoke and handoff
 

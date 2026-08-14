@@ -1,7 +1,7 @@
 # AI 職務顧問 runtime 設計
 
 - 決策：[ADR 0060](../adr/0060-langchain-langgraph-consultant-runtime-and-durable-authority.md)
-- 狀態：Big-bang migration 建構中；目前完成框架底座、durable authority、模型執行、最小充分 Context、專業分析 Skills、adaptive interview／可見理解／語意進度／足夠性、新跨語言契約／production API transport，以及員工顧問工作區；最終 composition hard cut 尚未完成
+- 狀態：Task 9 composition hard cut 已完成；目前 production 僅保留 LangChain／LangGraph 顧問 runtime、purpose-first API／Web、fresh-root storage 與 deterministic export。Task 10 尚待真實模型／UI smoke、最終複審與交付標記。
 - 實作：`apps/api/app/consultant`、`apps/api/app/adapters/langgraph`、`apps/api/app/adapters/openrouter/langchain.py`
 
 ## 儲存權威
@@ -90,7 +90,7 @@ LangGraph checkpoint、`StateGraph` command 與 `interrupt()`／`Command(resume)
 - 建立／讀取／刪除文件、202 source-first answer admission、snapshot、review、calibration、required clarification、direct edit 與單一 export 都走同一 application-scoped runtime；同文件 admission lock 不再因 request-local dependency 而失效。
 - model factory 只在 composition root 注入；`app.consultant` 不直接依賴 OpenRouter adapter。LangChain source lookup tools 已接到真正 agent tool surface，且只允許同文件 exact source／lineage／lexical search；沒有 semantic retrieval、Reference 或 RAG tool。
 - export readiness 有具體 gap 時回 409，員工以同一入口 `force=true` 明確確認後仍可匯出；pending changeset 不會被匯出或暗中接受。
-- migration 中間態暫時讓新 route 與舊 route 同時存在，以便 Task 8 完成垂直切片；兩者不雙寫，也沒有 DTO alias。Task 9 必須在同一 hard-cut commit 移除舊 route／舊契約定義／舊 writer，不能把這個 staging surface 當最終雙軌架構。
+- production 只保留 `/consultant-documents` surface；舊 route、舊契約定義與舊 writer 已在 Task 9 同一 hard-cut 移除。沒有 DTO alias、雙寫或 compatibility layer。
 
 ## Adaptive interview、理解校準與可信進度
 
@@ -130,4 +130,4 @@ Next App Router 頁面只負責掛載 purpose-first Client Component；TanStack 
 
 ## 當前邊界
 
-這個新 runtime 已有可替換模型 profile、LangChain agent harness、attempt receipt、Context middleware、真實顧問 Skills、adaptive interview routing、可見理解／Gap／語意進度、完整文件 patch／review command、deterministic authority、required-clarification interrupt、generated contract／production API transport，以及員工顧問工作區。尚未完成的是舊 composition 的最終 hard cut與 fresh-root migration；新 export transport 已接到既有成熟 XLSX renderer，但舊 export modules 的最終 dependency cleanup 留在 Task 9。它沒有 RAG／Reference、能力級別／A 生成或正式品質 eval；舊 production composition 只維持到 Task 9，最終硬切後刪除，不雙寫。
+這個 runtime 已有可替換模型 profile、LangChain agent harness、attempt receipt、Context middleware、真實顧問 Skills、adaptive interview routing、可見理解／Gap／語意進度、完整文件 patch／review command、deterministic authority、required-clarification interrupt、generated contract／production API transport、員工顧問工作區與 deterministic XLSX export。Task 9 已完成舊 composition／writer／route／contract／migration hard cut；fresh root 只建立最小 catalog，LangGraph 官方 setup 擁有 Saver／Store tables。它沒有 RAG／Reference consumer、能力級別／A 生成或正式品質 eval，也沒有雙寫或 compatibility layer。

@@ -1,4 +1,4 @@
-"""Temporary composition-edge projection from new authority to retained XLSX."""
+"""Deterministically project one approved consultant document for rendering."""
 
 from __future__ import annotations
 
@@ -10,10 +10,11 @@ from app.consultant.state import (
     ApprovedOpksKind,
     ApprovedTask,
 )
-from app.core.domain import JdHeader
-from app.export import (
+
+from .models import (
     ExportDocument,
     ExportDutySection,
+    ExportHeader,
     ExportOpksEntry,
     ExportTaskEntry,
 )
@@ -24,6 +25,8 @@ def assemble_approved_export_document(
     *,
     title: str,
 ) -> ExportDocument:
+    """Build the public template view without mutating approved authority."""
+
     def in_kind(kind: ApprovedOpksKind) -> tuple[ApprovedOpksItem, ...]:
         return tuple(
             sorted(
@@ -49,8 +52,17 @@ def assemble_approved_export_document(
             )
         )
 
-    knowledge = in_kind(ApprovedOpksKind.KNOWLEDGE)
-    skills = in_kind(ApprovedOpksKind.SKILL)
+    current_task_ids = frozenset(item.task_id for item in document.tasks)
+    knowledge = tuple(
+        item
+        for item in in_kind(ApprovedOpksKind.KNOWLEDGE)
+        if linked_task_ids(item) & current_task_ids
+    )
+    skills = tuple(
+        item
+        for item in in_kind(ApprovedOpksKind.SKILL)
+        if linked_task_ids(item) & current_task_ids
+    )
     knowledge_codes = {
         item.item_id: ExportOpksEntry(position_code=f"K{index:02d}", text=item.text)
         for index, item in enumerate(knowledge, start=1)
@@ -142,13 +154,11 @@ def assemble_approved_export_document(
 
     return ExportDocument(
         title=title,
-        header=JdHeader(
+        header=ExportHeader(
             competency_name=document.job_title,
             occupation_category_name=document.occupation_category_name,
             occupation_name=document.occupation_name,
-            occupation_code=document.occupation_code,
             industry_name=document.industry_name,
-            industry_code=document.industry_code,
             work_description=document.work_description,
             competency_level=document.competency_level,
             notes=document.notes,

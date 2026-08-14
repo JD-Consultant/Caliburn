@@ -4,10 +4,7 @@ import { queryOptions, type QueryClient } from "@tanstack/react-query";
 import {
   getConsultantDocument,
   getConsultantSnapshot,
-  getConsultation,
-  getDocument,
   listConsultantDocuments,
-  listDocuments,
 } from "../api/jobAnalysisApi";
 
 export const jobAnalysisKeys = {
@@ -16,11 +13,6 @@ export const jobAnalysisKeys = {
     ["job-analysis", "consultant-documents", documentId] as const,
   consultantSnapshot: (documentId: string) =>
     ["job-analysis", "consultant-documents", documentId, "snapshot"] as const,
-  documents: ["job-analysis", "documents"] as const,
-  document: (documentId: string) =>
-    ["job-analysis", "documents", documentId] as const,
-  consultation: (documentId: string) =>
-    ["job-analysis", "documents", documentId, "consultation"] as const,
 };
 
 export function consultantDocumentListQueryOptions() {
@@ -79,33 +71,4 @@ export async function refreshConsultantQueries(
       queryClient.invalidateQueries({ queryKey }),
     ),
   );
-}
-
-export function documentListQueryOptions() {
-  return queryOptions({
-    queryKey: jobAnalysisKeys.documents,
-    queryFn: listDocuments,
-  });
-}
-
-export function consultationQueryOptions(documentId: string) {
-  return queryOptions({
-    queryKey: jobAnalysisKeys.consultation(documentId),
-    queryFn: () => getConsultation(documentId),
-  });
-}
-
-export function documentQueryOptions(documentId: string) {
-  return queryOptions({
-    queryKey: jobAnalysisKeys.document(documentId),
-    queryFn: () => getDocument(documentId),
-  });
-}
-
-export function jobAnalysisInvalidationKeys(documentId: string) {
-  return [
-    jobAnalysisKeys.document(documentId),
-    jobAnalysisKeys.documents,
-    jobAnalysisKeys.consultation(documentId),
-  ] as const;
 }

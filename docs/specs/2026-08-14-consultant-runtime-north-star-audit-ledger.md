@@ -236,6 +236,19 @@ Big-bang 只描述最終切換，不表示做到最後才審核。之後每完�
 - 舊機制誠實性：新 App Router 頁面只掛載 `features/consultant`，但舊 `_components`、舊 route／contract／writer 仍暫留 repo，沒有被新頁面引用也不雙寫。Task 9 必須 hard cut 刪除並以 AST／`rg`／fresh-root migration 證明關閉；Task 8 不能提前宣稱 Big-bang 完成。
 - 北極星回歸：一位顧問、前景焦點／背景吸收、Task／Duty／OPKS 動態演化、員工原話記憶、AI 文件先審後入、澄清／Gap／審核分流、可信語意進度、自然離開／續談與單一可強制匯出均符合。沒有 RAG／Reference consumer、能力級別／A 生成、multi-agent、假百分比、pause／finish、第二 authority或 framework internals UI。結果 **Pass**。
 
+### Task 9：唯一匯出、舊機制 hard cut 與 fresh-root 切換
+
+- 狀態：**Pass**；預定同一 task commit 為 `refactor: hard-cut to consultant runtime`。
+- 員工效果：產品現在只有一個匯出入口；有具體 readiness gap 時先回 409 並顯示問題，員工明確確認 `force=true` 後仍可取得目前核准內容。匯出只讀 `ApprovedJobDocument`，不接受、混入或暗示 pending changeset；未分 Duty 的 Task 仍出現在正式 Task 欄且 Duty 留白。
+- 匯出政策：新的 frozen Pydantic export model 是 renderer-neutral projection，OpenPyXL 只負責公版 XLSX。Duty／Task 依 display order＋stable ID 決定代碼；O／P 保持 Task 層，K／S 只建立一組文件層 stable code 再多對多投影到相依 Task；O 可空白。員工直接維護的能力級別、A 與職類／職業／行業名稱保留；模型不能生成這些欄位，官方 iCAP code cells 固定留白。員工輸入一律寫成 string cell，公式形狀文字不會被 XLSX 執行。
+- 成熟 primitive 與薄政策：LangGraph Saver／Store 仍是 semantic state／員工原話唯一 owner，JSON Schema codegen 仍是跨語言契約 owner，Pydantic 承接 export shape，OpenPyXL 承接 renderer。Caliburn 只保留框架不知道的 iCAP 欄位權限、OPKS linkage、deterministic position code、孤立 Task 可見性與 force-export 規則；沒有重建第二個 Work Model、Focus、Progress、Proposal、Current JD、workflow、memory 或 document store。
+- hard cut：production filesystem 只剩 `app/consultant`、`adapters/langgraph`、`adapters/openrouter`、`export`／`adapters/xlsx` 與 `api`。舊 `app.core`、`documents`、`task_analysis`、`opks`、`consultation`、`models`、`adapters.postgres`、舊 OpenRouter wire、routes／mappers／scripts、舊 Web features、舊 contract definitions 與對應 tests 已刪除；沒有 compatibility alias、雙寫或舊 table writer。AST、schema、migration 與 import canary 為 `21 passed`；混合目錄殘留的舊 `.pyc`／`__pycache__` 已在驗證根路徑後清除，重跑後確認零 legacy bytecode。
+- fresh root：Alembic 只保留 `0018_consultant_runtime_root.py`，`down_revision=None`，只建立最小 `consultant_documents` catalog。另在全新 `caliburn_consultant_fresh_root_20260814_task9` 實跑 Alembic＋官方 `consultant-storage:setup`，public schema 精確只有 `alembic_version`、`consultant_documents`、Saver 的 `checkpoint_blobs`／`checkpoint_migrations`／`checkpoint_writes`／`checkpoints` 與 Store 的 `store`／`store_migrations`；沒有舊 Job Analysis table，驗證後刪除一次性 DB。舊本機 DB 不作成功證據，也不提供 migration／converter。
+- 文件與邊界：`AGENTS.md`、`ARCHITECTURE.md`、API／Web README、runbook、contract README 與 active design 已同步 ADR 0060；自審另抓到並修正 active design 開頭仍宣稱 hard cut 未完成，以及 `AGENTS.md` 權威順序漏列 ADR 0060。ADR 0057 的 RAG bounded context 仍只保留在 monorepo，current API／Web／contract 沒有 RAG import、HTTP consumer、route、tool、compose default 或 UI hook；同文件原話 lookup 不是外部 RAG。
+- 獨立複審：只讀 reviewer 依 ADR 0060、active design、Task 9、新 export／migration／hard-cut guard 與 current tree 檢查北極星、成熟 primitive、唯一 authority、匯出與零 RAG。它最初把 `Path(__file__).resolve().parents[3]` 誤讀為 `API_ROOT.parents[3]` 並回報 guard 可能指向外層 checkout；主審依實際 expression 重算後要求複核，reviewer 正式撤回，確認 root 正是目前 worktree。除此之外沒有已確認 P1／P2；未為假 finding 製造無效修改。
+- 驗證：含真 PostgreSQL 的完整 API `169 passed`；Web `5 files／27 passed`、TypeScript、ESLint 全綠；contract `8 passed`；正式 codegen 連續重跑 SHA-256 不變；`npx turbo test --env-mode=loose --output-logs=errors-only --force` 為 `5 successful／0 cached`；`git diff --check` clean。fresh-root table 證據與上述 gate 分開取得，沒有用 cached Turbo 取代 API／Web／contract 實跑。
+- 北極星回歸：一位自適應專業顧問、員工原話記憶、前景焦點／背景吸收、Task／Duty／OPKS 動態演化、AI 文件先審後入、必要澄清／Gap／審核分流、可信語意進度、自然離開／續談及單一可強制匯出均未偏移。能力級別／A 仍僅員工直接編輯，RAG／Reference、正式品質 eval、multi-agent、pause／finish、假百分比與第二 authority 均未引入。結果 **Pass**。
+
 ## 8. 本次直接使用的一手來源
 
 - [LangChain agents](https://docs.langchain.com/oss/python/langchain/agents)

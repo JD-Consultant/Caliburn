@@ -467,6 +467,7 @@ def test_typed_scalar_document_payloads_map_to_existing_review_changes(
 def test_typed_entity_payloads_preserve_duty_task_and_opks_proposals() -> None:
     source_id = uuid4()
     task_id = uuid4()
+    redundant_item_task_id = uuid4()
     changes = (
         _document_change(
             source_id,
@@ -509,7 +510,7 @@ def test_typed_entity_payloads_preserve_duty_task_and_opks_proposals() -> None:
                     item_id="",
                     text="完成的請購單",
                     display_order=-1,
-                    task_ids=(),
+                    task_ids=(redundant_item_task_id,),
                     indicator_ids=(),
                 ),
             ),
@@ -530,6 +531,54 @@ def test_typed_entity_payloads_preserve_duty_task_and_opks_proposals() -> None:
     assert "display_order" not in mapped[1].after
     assert mapped[2].path == "/opks"
     assert mapped[2].after == "完成的請購單"
+    assert mapped[2].task_ids == (task_id,)
+
+
+def test_unambiguous_model_wire_aliases_normalize_before_domain_mapping() -> None:
+    source_id = uuid4()
+    mapped = map_consultant_model_output(
+        _output(
+            source_id,
+            reviewable_document_changes=(
+                _document_change(
+                    source_id,
+                    operation=DocumentChangeOperation.ADD,
+                    target=OutputDocumentTarget.JOB_TITLE,
+                    field=OutputDocumentField.ENTITY,
+                    text_value="採購專員",
+                ),
+                _document_change(
+                    source_id,
+                    operation=DocumentChangeOperation.ADD,
+                    target=OutputDocumentTarget.TASK,
+                    field=OutputDocumentField.VALUE,
+                    text_value="",
+                    tasks=(
+                        OutputTask(
+                            task_id="",
+                            duty_id="",
+                            statement="確認採購需求",
+                            action="確認",
+                            object="採購需求",
+                            purpose_result="",
+                            context="",
+                            frequency_text="",
+                            responsibility_role=OutputResponsibilityRole.NONE,
+                            enablers=(),
+                            display_order=-1,
+                        ),
+                    ),
+                ),
+            ),
+        )
+    ).reviewable_document_changes
+
+    assert mapped[0].operation is DocumentChangeOperation.REVISE
+    assert mapped[0].path == "/job_title"
+    assert mapped[0].after == "採購專員"
+    assert mapped[1].operation is DocumentChangeOperation.ADD
+    assert mapped[1].path == "/tasks"
+    assert mapped[1].after["statement"] == "確認採購需求"
 
 
 def test_required_clarification_maps_to_the_employee_form_instead_of_next_question() -> None:

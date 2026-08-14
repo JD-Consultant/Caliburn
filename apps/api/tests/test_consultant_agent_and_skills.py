@@ -78,6 +78,7 @@ ALL_FIRST_RELEASE_SKILLS = (
 class RecordingToolModel(FakeMessagesListChatModel):
     _seen_messages: list[list[BaseMessage]] = PrivateAttr(default_factory=list)
     _bound_tool_names: list[str] = PrivateAttr(default_factory=list)
+    _bound_tool_descriptions: dict[str, str] = PrivateAttr(default_factory=dict)
 
     @property
     def seen_messages(self) -> list[list[BaseMessage]]:
@@ -87,6 +88,10 @@ class RecordingToolModel(FakeMessagesListChatModel):
     def bound_tool_names(self) -> list[str]:
         return self._bound_tool_names
 
+    @property
+    def bound_tool_descriptions(self) -> dict[str, str]:
+        return self._bound_tool_descriptions
+
     def bind_tools(
         self,
         tools: Any,
@@ -95,12 +100,22 @@ class RecordingToolModel(FakeMessagesListChatModel):
         **kwargs: Any,
     ) -> RecordingToolModel:
         del tool_choice, kwargs
-        self._bound_tool_names = [
-            getattr(candidate, "name", None)
-            or getattr(candidate, "__name__", None)
-            or candidate.get("name", "")
-            for candidate in tools
-        ]
+        self._bound_tool_names = []
+        self._bound_tool_descriptions = {}
+        for candidate in tools:
+            if isinstance(candidate, dict):
+                function = candidate.get("function", candidate)
+                name = str(function.get("name", ""))
+                description = str(function.get("description", ""))
+            else:
+                name = str(
+                    getattr(candidate, "name", None)
+                    or getattr(candidate, "__name__", None)
+                    or ""
+                )
+                description = str(getattr(candidate, "description", ""))
+            self._bound_tool_names.append(name)
+            self._bound_tool_descriptions[name] = description
         return self
 
     def _generate(self, messages: list[BaseMessage], *args: Any, **kwargs: Any):
@@ -443,11 +458,23 @@ async def test_agent_composes_selected_skills_without_leaking_ineligible_content
         "read_file",
         "ConsultantModelOutput",
     }
+    read_description = model.bound_tool_descriptions["read_file"]
+    assert "eligible Caliburn analysis Skill" in read_description
+    assert "/skills/<skill-id>/SKILL.md" in read_description
+    assert "Omit offset and limit" in read_description
+    lowered_description = read_description.casefold()
+    assert all(
+        term not in lowered_description
+        for term in ("pdf", "image", "editing", "pagination")
+    )
     first_call = _text_seen(model.seen_messages[0])
     assert "task-boundary" in first_call
     assert "output" in first_call
     assert "knowledge" not in first_call
     assert "Task 邊界" not in first_call  # metadata only; full method is progressive
+    assert "context 是否已足夠" in first_call
+    assert "同一波平行" in first_call
+    assert "不固定先後" in first_call
 
     second_call = _text_seen(model.seen_messages[1])
     assert "Task 邊界" in second_call
@@ -475,7 +502,7 @@ def test_agent_rejects_skill_or_read_tool_outside_resolved_policy() -> None:
 @pytest.mark.asyncio
 async def test_agent_receives_document_scoped_source_tools_from_the_runtime() -> None:
     @tool(description="Read one employee source.")
-    async def source_by_id(source_id: UUID) -> dict[str, str]:
+    async def employee_source_get(source_id: UUID) -> dict[str, str]:
         return {"source_id": str(source_id)}
 
     source = _employee_source("我每週整理採購需求。")
@@ -494,7 +521,7 @@ async def test_agent_receives_document_scoped_source_tools_from_the_runtime() ->
                         "type": "tool_call",
                     },
                     {
-                        "name": "source_by_id",
+                        "name": "employee_source_get",
                         "args": {"source_id": str(source.source_id)},
                         "id": "read-source",
                         "type": "tool_call",
@@ -516,9 +543,9 @@ async def test_agent_receives_document_scoped_source_tools_from_the_runtime() ->
     )
     assembly = build_professional_consultant_agent(
         model=model,
-        execution=_execution(tools=("read_file", "source_by_id")),
+        execution=_execution(tools=("read_file", "employee_source_get")),
         selected_skill_ids=("task-boundary",),
-        source_tools=(source_by_id,),
+        source_tools=(employee_source_get,),
     )
     await assembly.ainvoke(
         {"messages": [HumanMessage(content=f"[employee source {source.source_id}]")]}
@@ -526,7 +553,7 @@ async def test_agent_receives_document_scoped_source_tools_from_the_runtime() ->
 
     assert set(model.bound_tool_names) == {
         "read_file",
-        "source_by_id",
+        "employee_source_get",
         "ConsultantModelOutput",
     }
 
@@ -547,9 +574,16 @@ def test_interactive_agent_rejects_policy_above_product_call_caps() -> None:
         )
 
 
-def test_parallel_skill_reads_are_one_lookup_wave() -> None:
+def test_parallel_skill_and_employee_source_reads_are_one_lookup_wave() -> None:
     middleware = LookupWaveLimitMiddleware(
-        tool_names=frozenset({"read_file", "source_by_id"}),
+        tool_names=frozenset(
+            {
+                "read_file",
+                "employee_source_get",
+                "employee_source_lineage",
+                "employee_source_search",
+            }
+        ),
         run_limit=2,
     )
     first = middleware.after_model(
@@ -564,11 +598,7 @@ def test_parallel_skill_reads_are_one_lookup_wave() -> None:
                             "id": f"read-{skill_id}",
                             "type": "tool_call",
                         }
-                        for skill_id in (
-                            "task-boundary",
-                            "output",
-                            "performance-indicator",
-                        )
+                        for skill_id in ("task-boundary", "output")
                     ],
                 )
             ]
@@ -577,6 +607,32 @@ def test_parallel_skill_reads_are_one_lookup_wave() -> None:
     )
     assert first == {"run_lookup_wave_count": 1}
 
+    same_wave = middleware.after_model(
+        {
+            "messages": [
+                AIMessage(
+                    content="",
+                    tool_calls=[
+                        {
+                            "name": "read_file",
+                            "args": {"file_path": skill_path("task-boundary")},
+                            "id": "read-task-boundary",
+                            "type": "tool_call",
+                        },
+                        {
+                            "name": "employee_source_get",
+                            "args": {"source_id": str(uuid4())},
+                            "id": "lookup-source",
+                            "type": "tool_call",
+                        },
+                    ],
+                )
+            ]
+        },
+        runtime=None,  # type: ignore[arg-type] - middleware does not use runtime
+    )
+    assert same_wave == {"run_lookup_wave_count": 1}
+
     second = middleware.after_model(
         {
             "messages": [
@@ -584,9 +640,9 @@ def test_parallel_skill_reads_are_one_lookup_wave() -> None:
                     content="",
                     tool_calls=[
                         {
-                            "name": "source_by_id",
-                            "args": {"source_id": str(uuid4())},
-                            "id": "lookup-source",
+                            "name": "employee_source_search",
+                            "args": {"query": "採購需求"},
+                            "id": "search-source",
                             "type": "tool_call",
                         }
                     ],
@@ -606,7 +662,7 @@ def test_parallel_skill_reads_are_one_lookup_wave() -> None:
                         content="",
                         tool_calls=[
                             {
-                                "name": "source_by_id",
+                                "name": "employee_source_lineage",
                                 "args": {"source_id": str(uuid4())},
                                 "id": "third-wave",
                                 "type": "tool_call",

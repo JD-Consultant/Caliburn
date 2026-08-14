@@ -1,10 +1,10 @@
 # AI 職務顧問 runtime：北極星審核與逐 Task 防偏帳本
 
 - 日期：2026-08-14
-- 狀態：Pre-implementation audit **Passed**；Tasks 1–8 **Passed**
-- 決策：ADR 0060 Accepted
+- 狀態：Pre-implementation audit **Passed**；Tasks 1–9 **Passed**；Task 10 schema-only 修正已通過 focused gates，Tool／live canary／最終交付仍待後續
+- 決策：ADR 0060 **Accepted**；ADR 0061 **Accepted（schema-only；Tool 另議）**
 - 施工計畫：[`2026-08-13-langgraph-consultant-runtime-big-bang-plan.md`](../plans/2026-08-13-langgraph-consultant-runtime-big-bang-plan.md)
-- 產品 SSOT：[`2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md`](2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md) §1–§8、§9.12–§9.13
+- 產品 SSOT：[`2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md`](2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md) §1–§8、§9.12–§9.16
 
 ## 1. 審核目的
 
@@ -44,11 +44,13 @@ Big-bang 只描述最終切換，不表示做到最後才審核。之後每完�
 | 中立產品／工程目的 | 採用的成熟元件 | Caliburn 尚留的最薄政策 | 審核 |
 |---|---|---|---|
 | 模型／provider／參數可換 | `ChatOpenRouter`＋LangChain model binding | provider/model allowlist、資料政策與 versioned profile | 已覆蓋 |
-| bounded agent loop | LangChain `create_agent` | run kind 與總 budget | 已覆蓋 |
-| structured output | LangChain `response_format`＋Pydantic | 職務文件 schema 與 domain error reason | 已覆蓋 |
+| bounded consultant loop＋按需工具 | LangChain `create_agent`＋Skills／source tools | lookup wave、總 budget、typed availability | 框架已覆蓋；schema 本輪不改工具集合、description 或 wave，Tool／Skill loading 另議 |
+| compact model-facing result | Pydantic compact DTO＋LangChain structured output | 職務語意、pure mapper 的 fail-closed 規則 | **已實作**；LangChain-facing schema 為 0 optional／0 union／0 open object、depth 4，rich framework state 不直接送 provider |
+| contingency finalization | 只在 exact canary 失敗時使用 LangChain tool-free `response_format` | 同 run handoff 與三次總上限 | 非預設；未證實需要前不增加 node／call |
 | call limit／retry | `ModelCallLimitMiddleware`、`ToolCallLimitMiddleware`、`ModelRetryMiddleware`、`ToolRetryMiddleware` | 哪些錯可重試、idempotency、每次 attempt receipt | 已覆蓋；plan 已補明 |
 | durable execution／restart | LangGraph `StateGraph`＋`AsyncPostgresSaver` | node 的 deterministic／idempotent side-effect 邊界 | 已覆蓋 |
 | 員工來源記憶 | LangGraph `AsyncPostgresStore` | employee-only source kind、validity、supersession、quote anchor | 已覆蓋 |
+| citation transport／來源定位／lineage | LangChain `Citation`、W3C Web Annotation selectors、W3C PROV vocabulary | adapter conformance、source revision、speaker／document authority、語意支持判斷 | 通用形狀已覆蓋；原生 citation 非必要且不得成為第二份 evidence truth |
 | 動態訪談重點、旁支、延後返回、更正重開 | typed state／reducers／routing／checkpoint | work-unit eligibility、priority reason、reopen rule | 已覆蓋；不是舊 Focus／agenda |
 | 可修訂 AI 理解 | typed state／reducers＋source references | Task／Duty／OPKS identity、dependency、選擇性失效 | 已覆蓋；不是舊 Work Model |
 | coverage／depth／decision／Gap 與足夠性 | typed state＋deterministic projection | 職務分析 reason code、足夠性 rubric、白話說明 | 已覆蓋；不是舊 Progress |
@@ -122,6 +124,7 @@ Big-bang 只描述最終切換，不表示做到最後才審核。之後每完�
 3. FastAPI 0.141.1 先跑完整 API compatibility gate；不相容只回退 FastAPI，不引入第二個 agent server。
 4. `SummarizationMiddleware`／`ContextEditingMiddleware` 不得成為 authority；來源、更正、矛盾與核准文件 slice 必須由 ID 重載。
 5. 每個功能一律先寫行為測試，再實作、跑 focused/full gate、做本帳本北極星回歸，最後才 commit。
+6. Task 10 真模型已證明完整 read tools＋約 10 KB minified `ConsultantResult` schema 同一 request 會撞 provider grammar complexity；當時曾推論 finalization 必須移除 Skill／source read tools。後續找回 compact-wire 實證並把 provider schema 降成 0 optional／0 union 後，這個「必須」已撤回：tool-free finalization 只是在 exact conformance 仍失敗時才評估的 contingency，不能在 Tool 討論前先施工。ToolStrategy 曾產生錯誤的多重輸出工具呼叫，所以 strategy 仍須由 versioned profile 依 conformance 明確選擇，不可自動 fallback。Anthropic citations 與 structured outputs 不相容，`langchain-openrouter==0.2.7` 也未保存 citation annotations，因此 native citation 只能在 conformance 後作選配，不能取代 provider-neutral quote anchor。
 
 ## 7. 逐 Task 北極星紀錄
 
@@ -249,8 +252,27 @@ Big-bang 只描述最終切換，不表示做到最後才審核。之後每完�
 - 驗證：含真 PostgreSQL 的完整 API `169 passed`；Web `5 files／27 passed`、TypeScript、ESLint 全綠；contract `8 passed`；正式 codegen 連續重跑 SHA-256 不變；`npx turbo test --env-mode=loose --output-logs=errors-only --force` 為 `5 successful／0 cached`；`git diff --check` clean。fresh-root table 證據與上述 gate 分開取得，沒有用 cached Turbo 取代 API／Web／contract 實跑。
 - 北極星回歸：一位自適應專業顧問、員工原話記憶、前景焦點／背景吸收、Task／Duty／OPKS 動態演化、AI 文件先審後入、必要澄清／Gap／審核分流、可信語意進度、自然離開／續談及單一可強制匯出均未偏移。能力級別／A 仍僅員工直接編輯，RAG／Reference、正式品質 eval、multi-agent、pause／finish、假百分比與第二 authority 均未引入。結果 **Pass**。
 
+### Task 10：真模型 smoke 診斷與施工前再次回歸
+
+- 狀態：**Stop and correct confirmed P1；schema mechanism corrected**。產品北極星未退回；owner 已核准 ADR 0061 的 schema-only 範圍，Task 10 的 Tool／live canary／最終交付尚未完成。
+- 真實觀察：現行 `create_agent` 同一 request 同時帶 Skill／source tools 與完整 `ConsultantResult` strict schema。schema 約 `10,317 bytes`，離線量測為 18 defs、68 object properties、**28 optional、20 union／`anyOf` sites、最深約 15 層**；在不計 tools 前已超過 Anthropic 公開的 24 optional／16 union 合併上限。真模型在生成 token 前拒絕；ToolStrategy 另產生錯誤的多重輸出工具呼叫。byte 數不是通用閾值。
+- 補回的 repo 證據：2026-07-31 同類錯誤已用 compact provider wire＋pure mapper 修正；union 17→0、properties 54→32、nesting 9→6、wire 6,818→4,084 bytes 後 Opus 5 真 request HTTP 200，後續三個模型的三回合場景完成。前一輪只看到 tool-free rich-schema 成功就直接選兩段式，漏掉這份較直接的既有證據。
+- 當時 Proposed 修正同時混合 schema 與 Tool／Skill 排程。owner 後續明確收斂為「先解 schema，Tool 之後討論」；因此本輪只落 compact provider DTO＋pure mapper，未更改工具集合、Tool Search、selector、provider beta、`read_file` contract 或 lookup wave 排程。
+- Evidence 複核：LangGraph Store、LangChain `Citation`、W3C selectors／PROV、Pydantic、LangChain callbacks／OpenTelemetry與 LangGraph command 已分別承接 persistence、citation transport、anchor／lineage shape、typed validation、execution evidence與 review durability。Caliburn 只留 employee authority、correction、document scope、exact quote與「引文是否支持 Task／Duty／OPKS」政策。Anthropic native citations 與 structured output 不相容，且目前 OpenRouter adapter不保留 annotations，因此不列第一版核心依賴、不提前接 RAG。
+- schema 實作：新增 Pydantic `ConsultantModelOutput`，所有欄位 required；文件候選由 typed target／stable ID／field／fixed payload 表達，不再暴露自由 JSON Pointer／任意 `after`。employee source／quote／Skill basis 正規化成單一 `analysis_bases` 表，以 1-based ordinal 引用；越界、未引用、sentinel／payload、application-owned ID 與 OPKS linkage 矛盾皆 fail closed。pure mapper 還原完整 `ConsultantResult` 後，既有 deterministic verifier／authority seam 繼續執行。
+- schema 證據：LangChain 實際轉換後量測為 **0 optional、0 union、0 open object、object depth 4、約 9,754 minified bytes**；bytes 只記錄粗略訊號，不作 provider 上限。compact schema／mapper、LangChain conversion、agent wiring、model runtime 與 run-service focused suite 為 `86 passed`；完整 `test_consultant*.py` 面為 `137 passed, 26 skipped`（未注入 PostgreSQL URL 的 durable tests 依既有條件跳過）。付費 Opus 5 canary 未獲本輪授權、未執行。
+- 北極星回歸：一位顧問、動態 Task／Duty／OPKS、員工原話記憶、文件先審後入、必要澄清／Gap／審核分流、自然續談、可信進度、單一強制匯出、能力級別／A／RAG／eval 延後均未改。判定是**provider contract 形狀修正，無產品偏移**；Tool／Skill loading 應另議，不得從 schema 接線推定已核准。
+
 ## 8. 本次直接使用的一手來源
 
+- [Anthropic — Prompting Claude Opus 5](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5)
+- [Anthropic — What's new in Claude Opus 5](https://platform.claude.com/docs/en/about-claude/models/whats-new-opus-5)
+- [Anthropic — Mid-conversation system messages and tool changes](https://platform.claude.com/docs/en/build-with-claude/mid-conversation-system-messages)
+- [Anthropic — Citations](https://platform.claude.com/docs/en/build-with-claude/citations)
+- [Anthropic — Effective context engineering for AI agents](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)
+- [LangChain `Citation`](https://reference.langchain.com/python/langchain-core/messages/content/Citation)
+- [W3C Web Annotation Data Model](https://www.w3.org/TR/annotation-model/)
+- [W3C PROV-O](https://www.w3.org/TR/prov-o/)
 - [LangChain agents](https://docs.langchain.com/oss/python/langchain/agents)
 - [LangChain built-in middleware](https://docs.langchain.com/oss/python/langchain/middleware/built-in)
 - [LangChain structured output](https://docs.langchain.com/oss/python/langchain/structured-output)

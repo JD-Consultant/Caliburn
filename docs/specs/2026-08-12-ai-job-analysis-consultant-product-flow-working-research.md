@@ -5,7 +5,7 @@
 - 決策狀態：只記錄已確認的產品方向與待討論問題；不是 ADR，不授權 production 實作
 - 優先順序：先以「產品如何像專業顧問工作」約束架構；核心 runtime 已選 LangChain 1.x＋LangGraph 1.2.x，RAG 明確留待後續另案研究
 - 外部資料查核：截至 2026-08-13 可取得的官方／第一手資料整理；大廠做法是設計證據，不是免評測的產品決策
-- Framework 現況：§9.7–§9.12 已完成 persistence／runtime、Context／Skills／provider、frontend transport 與四個中立產品目的的 conformance，主方案收斂為 LangChain 1.x＋LangGraph 1.2.x。§9.10 因重新沿用 Work Model／Focus／Progress／Proposal／Current JD 等舊概念切割 target state，已撤回並只保留為錯誤案例；successor ADR 0060 與施工計畫必須以「可修訂理解、動態訪談重點、可信進度、待審文件變更、員工核准成品」等目的與 framework primitive 命名。選型先看效果、功能完整、可靠性與員工體驗；只有效果相當時才比較自寫量
+- Framework 現況：§9.7–§9.12 已完成 persistence／runtime、Context／Skills／provider、frontend transport 與四個中立產品目的的 conformance，主方案收斂為 LangChain 1.x＋LangGraph 1.2.x。§9.10 因重新沿用 Work Model／Focus／Progress／Proposal／Current JD 等舊概念切割 target state，已撤回並只保留為錯誤案例；ADR 0060 與 Task 10 successor ADR 0061、施工計畫必須以「可修訂理解、動態訪談重點、可信進度、待審文件變更、員工核准成品」等目的與 framework primitive 命名。選型先看效果、功能完整、可靠性與員工體驗；只有效果相當時才比較自寫量
 - 相關研究：[`階段式 AI 職務分析顧問 runtime/framework 研究`](2026-08-12-staged-ai-consultant-runtime-framework-research.md) 只能在本產品流程核准後評估，不得反向用框架能力定義顧問流程
 
 ## 0. 這份工作稿怎麼使用
@@ -72,7 +72,7 @@
 
 - 第一版以同一個主要 AI 顧問維持對話責任。
 - 本次核心升級的第一版方法至少涵蓋「盤點工作、深入故事、釐清 Task 邊界、整理 Duty、分析 O／P／K／S、完成度／反方收尾檢查」，並以可按需載入的 Skills 承接；它們不是多個人格化 Agent，也不是固定通關階段。Reference challenge 保留為後續 RAG 階段，能力級別與 A 則等研究與 Skill 完成後再加入。
-- 一輪可依焦點同時載入一個或數個相關 Skill；沒有必要的 Skill 不進當輪 prompt／context。
+- 一輪可依焦點同時載入一個或數個相關 Skill。為讓模型能發現回答中的意外線索，第一版九個方法的短 metadata catalog 可以常駐；只有實際需要的方法才完整讀入 `SKILL.md`，未使用的 Skill 正文不進當輪 prompt／context。這是 Agent Skills progressive disclosure，不等於每回合執行全部方法。
 - 新證據可讓系統換用其他 Skill，也可重新開啟已暫時收束的 Task、Duty、O、P、K 或 S。
 - 注意力模式只描述 AI 當下主要目標，不限制同一輪可進行哪些分析，也不控制資料必須依固定順序通關。
 - Skill 的獨立是「方法與載入邊界」獨立，不代表分析結果彼此隔離；所有 Skill 仍需在同一份工作假說、來源與權威模型中互相校正。
@@ -124,8 +124,8 @@
 ### 2.8 一個員工回合可包含受限的內部工作，但仍由同一位顧問負責
 
 - 一次員工送出與一次模型 inference 不是同一個概念；產品以一個可保存、可重試的 application run 承接一個員工回合。
-- 預設先走一次主要顧問 inference 的快速路徑；資訊足夠時直接結束，不為了「可能更好」固定增加 planner、critic、extractor 或 OPKS 呼叫。
-- 只有缺少本輪必要 context、需要唯讀工具結果，或有邊界明確且確實不同的專業判斷時，才在同一個 run 內增加受限步驟。
+- 預設走同一位顧問的最短可行 bounded-agent 路徑：不需工具時一次 inference 直接回 compact typed result；需要按需載入 Skill 或找回員工原話時，由同一 agent loop 呼叫唯讀工具後再回 compact result。provider-facing wire 與 rich application result 分離，不能把 framework state／rich schema 原樣當 provider contract；仍是一個 application run、同一模型 profile 與同一顧問責任，不是 planner／writer 多 Agent。
+- 整個員工回合仍以三次 inference、兩波唯讀補查為 hard ceiling；只有 compact wire＋四個 production tools 的 exact conformance 仍失敗，才在同一 run 內拆 tool-enabled analysis 與 tool-free finalization。不得為了「可能更好」固定增加 finalization、critic、extractor 或 OPKS 呼叫。
 - 載入 Skill 不等於另開人格化 Agent，也不必然增加一次模型呼叫；同一位主要顧問仍擁有最後語意整合與員工回覆。
 - application 決定 scope、工具權限、最大步數、token／時間／成本與停止規則；不得讓模型自由無限循環。
 - 員工只看到一個連貫結果、必要的待審文件變更與一個主要問題；內部 Manifest 可供重播與除錯，但不把 chain-of-thought 當成產品輸出。
@@ -1271,10 +1271,10 @@ Google 2026 年 ADK 2.0 的方向更接近本產品：已知 routing、固定 bu
 
 第一版可採下列**候選 run execution policy**，作為人工 smoke 的保守起點，而不是不可變 domain policy：
 
-1. 正常快速路徑：一次主要顧問 inference，能提交合格 typed result 就結束。
-2. 補查路徑：第一個 inference 可提出一批 scope 明確的唯讀查詢；工具結果回來後由同一主要顧問整合。
+1. 直接快速路徑：deterministic context 已足夠且不需補查時，同一主要顧問一次 inference 直接提交 compact typed result。
+2. 補查路徑：同一 bounded agent inference 可提出一批 scope 明確的唯讀查詢；工具結果回到同一 run 後，由同一主要顧問在後續 inference 提交 compact typed result，不新增 planner／scribe／critic 或第二位顧問。
 3. 只有第一批結果揭露新的穩定 ID、source receipt、矛盾或先前不可知的明確指標，而且確實對 unresolved reason code 有預期貢獻時，才允許第二波。
-4. 互動式正常回合的起始 hard ceiling 可設為 **三次 model inference（初始＋兩次結果整合）與兩波 lookup**；數值放在可替換的 run execution policy，模型與 provider 仍取自全域 consultant model profile，不寫進 Task／Duty／OPKS domain invariant。一次 wave 可批次多個獨立 read-only request，因此不以「兩波」誤限成只能查兩筆資料。
+4. 互動式正常回合的起始 hard ceiling 可設為 **三次 model inference 與兩波 lookup**；數值放在可替換的 run execution policy，模型與 provider 仍取自同一 consultant model profile，不寫進 Task／Duty／OPKS domain invariant。一次 wave 可批次多個獨立 read-only request，因此不以「兩波」誤限成只能查兩筆資料；不需補查時仍只做一次 inference。只有 exact conformance 失敗才把最後一次明確切成 tool-free finalization。
 5. 到達上限、重複查詢或沒有新資訊時，不啟動額外 evaluator／judge loop；輸出 `EMPLOYEE_CLARIFICATION_REQUIRED`、`DEFER_WITH_VISIBLE_GAP` 或 structured processing limit。不能安全形成語意結果時不更新可修訂理解。
 
 這個 run execution policy 選擇三次 inference／兩波 lookup，不是因為外部 benchmark 證明它最佳，而是它完整容納「初始判斷 → 一般補查 → 新指標例外補查 → 最終整合」，同時比 SDK 常見的 10-turn 通用上限更符合即時員工訪談的延遲、成本與可理解性。日後若某類核心 run 有獨立 success criteria 且確實需要更深探索，才另設 budget；不能默默放寬所有員工回合，也不因拆出 Skill 就自動換模型。
@@ -1454,7 +1454,7 @@ Owner 已確認：**模型、provider 與底層參數由本機維護者透過版
 
 ## 9. 升級進度與下一步
 
-> **現況與閱讀順序（2026-08-14）**：產品大方向以 §1–§8 為準；框架選擇以 §9.12 為準；自然續談、舊名稱不得回流、第一版 LLM 範圍與「本次不做 RAG」以 §9.13 為最新 owner 裁決；施工前覆蓋審核與後續逐 Task 防偏規則見 §9.14。§9.1.1–§9.11 是按時間保留的研究／反證歷程，其中 `Work Model`、`Focus`、`Progress`、`Proposal`、`Current JD` 等只描述被替換的舊機制，任何「RAG 是本次 final gate」敘述都已被 §9.13 取代，不得拿來施工。目標架構與施工順序分別見已 Accepted 的 ADR 0060 及 `docs/plans/2026-08-13-langgraph-consultant-runtime-big-bang-plan.md`。
+> **現況與閱讀順序（2026-08-14）**：產品大方向以 §1–§8 為準；框架選擇以 §9.12 為準；自然續談、舊名稱不得回流、第一版 LLM 範圍與「本次不做 RAG」以 §9.13 為最新 owner 裁決；施工前覆蓋審核與後續逐 Task 防偏規則見 §9.14；Task 10 真模型與 Evidence 修正見 §9.15。§9.1.1–§9.11 是按時間保留的研究／反證歷程，其中 `Work Model`、`Focus`、`Progress`、`Proposal`、`Current JD` 等只描述被替換的舊機制，任何「RAG 是本次 final gate」敘述都已被 §9.13 取代，不得拿來施工。目標架構見已 Accepted 的 ADR 0060 與其部分 successor ADR 0061；施工順序見 `docs/plans/2026-08-13-langgraph-consultant-runtime-big-bang-plan.md`。
 
 ### 9.1 討論與設計關卡（2026-08-14 現況）
 
@@ -1466,9 +1466,9 @@ Owner 已確認：**模型、provider 與底層參數由本機維護者透過版
 | 1. 端到端情境 | 已收斂 | 正常、改道／更正與失敗恢復時，員工和顧問各自看到、知道、做什麼 | 情境涵蓋訪談重點、全域吸收、動態 Task／Duty／OPKS、進度、待審文件變更、自然離開／續談與匯出，且沒有未揭露的權威跳躍 |
 | 2. 目標能力地圖 | **已收斂（2026-08-13 owner 確認）** | 為了實現情境，系統必須具備哪些能力與不變條件 | 每項能力都有輸入、輸出、authority、持久化責任、失敗語意與 `Replace／Wrap／Retain` 判準 |
 | 3. 框架組合選型 | **已收斂（§9.12）** | 哪些成熟元件直接承接中立產品目的 | LangChain 1.x＋LangGraph 1.2.x 通過目的層與工程 conformance；其他候選只作歷史／fallback，不平行施工 |
-| 4. 目標架構 | **研究已收斂；ADR 0060 Accepted** | framework primitive 如何合作，資料／API／Web／context／恢復／切換如何落地 | 每個目的都有 framework owner、可刪除舊機制、最薄產品 policy 與驗收；施工中逐 Task 回歸北極星 |
-| 5. 實作計畫 | **草案已完成，待架構核准與施工授權** | 如何在隔離 worktree 內完成受限 Big-bang 並可驗證地切換 | 十個 task 有獨立驗證、依賴與 hard-cut gate；RAG、能力級別／A 的 LLM 分析及正式 eval 均不在本階段 |
-| 6. 實作與切換 | 未授權 | 依核准計畫施工、審核、驗證與切換 | 另由 owner 明確授權；本研究稿本身不構成施工授權 |
+| 4. 目標架構 | **ADR 0060 Accepted；ADR 0061 Accepted（schema-only）** | framework primitive 如何合作，資料／API／Web／context／恢復／切換如何落地 | 每個目的都有 framework owner、可刪除舊機制、最薄產品 policy 與驗收；compact wire 已核准，Tool／Skill loading 另議 |
+| 5. 實作計畫 | **Tasks 1–9 已完成；Task 10 已依 §9.16 修訂** | 如何在隔離 worktree 內完成受限 Big-bang 並可驗證地切換 | Task 10 先 compact wire 與 deterministic gate，owner 授權後跑一次 exact live canary；RAG、能力級別／A 的 LLM 分析及正式 eval 均不在本階段 |
+| 6. 實作與切換 | **進行中；Task 10 暫停於決策 gate** | 依核准計畫施工、審核、驗證與切換 | ADR 0061 核准、focused/full gate、真模型 smoke 與 owner review 完成後才可交付 |
 
 每關卡收斂後應更新本表、在相鄰段落補齊 §0.1 的決策帳本，並以只包含該關卡文件變更的 commit 保存。若細節研究發現較佳方向但會改變已確認北極星，必須先回到產品層與 owner 討論；不得在 framework matrix、schema 或實作計畫中悄悄翻案。
 
@@ -2080,13 +2080,15 @@ Gate 4-B 只做尚未被本探針回答的下一個最小 slice，不重新討�
 
 主成功情境實際是 3 次 model call：第一次決定讀取 `opks-o`、第二次決定補查旁支 Source、第三次提交 typed `ConsultantTurn`。這正好是「快速路徑＋最多兩波唯讀補查」的上限形狀；若當輪已具 sufficient context，實際產品可以直接一次產出，不必為使用框架固定多跑兩次。LangChain 官方也把 context engineering 定義為在每一步選擇正確資訊與工具，而不是把所有可得資料塞進 prompt；middleware 是其控制 prompt、messages、tools、model 與 response format 的正式擴充面。[Context engineering](https://docs.langchain.com/oss/python/langchain/context-engineering)、[Agents](https://docs.langchain.com/oss/python/langchain/agents)、[Structured output](https://docs.langchain.com/oss/python/langchain/structured-output)
 
+時序註記：本節記錄 Gate 4-B 探針當時證明「成熟 framework primitive 足以承接機制」的結果，不是現行 Opus 5 output-strategy 裁決。Task 10 後續量測確認 rich output schema 本身超過 optional／union 公開限制，故現行修正見 §9.16：先 compact provider wire＋pure mapper、保留 bounded agent與 provider-native strategy，不沿用探針的 `ToolStrategy`，也不自動 fallback；exact canary 仍失敗才拆 tool-free finalization。產品目的、三次總上限與同一位主要顧問不變。
+
 #### 9.8.2 成熟元件實際替代了什麼
 
 | 產品責任 | 探針採用的成熟元件 | Caliburn 最後只留的薄政策 |
 |---|---|---|
 | 模型／provider／參數切換 | `ChatOpenRouter`＋LangChain model/tool binding | 版本化 profile、允許清單、資料政策、成本／route receipt |
 | bounded consultant loop | `create_agent` 編譯出的 LangGraph＋model／tool call limit middleware | 每輪最多幾波補查、錯誤映射與產品可見訊息 |
-| typed 顧問結果 | `ToolStrategy(Pydantic schema)` | 職務分析欄位、authority 與 domain verifier |
+| typed 顧問結果 | `ToolStrategy(Pydantic schema)`（僅 Gate 4-B 探針；現行裁決見上方時序註記與 §9.15） | 職務分析欄位、authority 與 domain verifier |
 | Context 組裝生命週期 | custom middleware hook＋LangGraph Store／State | 哪些 Source 是有效更正、Focus 核心、token budget、ContextManifest |
 | Skill registry／progressive disclosure | 單獨使用 Deep Agents `SkillsMiddleware`＋read-only `FilesystemMiddleware` | Task／Duty／OPKS 研究內容、當輪 eligibility、使用後驗證 |
 | 失控保護 | `ModelCallLimitMiddleware`＋`ToolCallLimitMiddleware` | 第一版的具體上限與不同操作的政策 |
@@ -2378,6 +2380,105 @@ Owner 要求施工前最後一次詳細確認：產品方向必須優先於舊�
 
 Owner 已明確表示審核通過即可開始，故 ADR 0060 改為 Accepted。Big-bang 只代表最終硬切；每完成一個功能仍須回到帳本做產品效果與框架替代覆蓋審核。若實作中發現更好的方法，先討論並更新本研究／successor ADR，不能暗中改變北極星。
 
+### 9.15 Task 10 真模型診斷後的 Opus 5／Evidence 回歸審核（歷史判斷；model-topology 結論由 §9.16 取代）
+
+本輪重新從 §1–§8 的產品效果往下審核，而不是用目前程式替自己辯護。結論是：**產品北極星沒有偏移，但模型執行拓撲有一項已證實的 P1 機制偏差，Evidence 的成熟元件覆蓋也需要寫得更精確。**
+
+#### 9.15.1 同一顧問不等於同一個巨大 provider request
+
+Task 10 真模型診斷發現，production 仍把所有唯讀工具與完整 `ConsultantResult` strict schema 同時交給一個 `create_agent(response_format=...)`。目前 schema minified 後約 **10,317 bytes**，尚未計入 Skill／source tools；本 repo 2026-07-31 的 Opus 5 live smoke 已在 **6,818 bytes** strict schema 出現 `compiled grammar is too large`，而本輪真實路徑再次得到同類 provider request rejection。byte 數只作診斷，**不是通用上限**：同一 `ConsultantResult` 在不帶 read tools 的 provider-native structured-output 呼叫已成功；改用 LangChain ToolStrategy 則觀察到多個錯誤的輸出工具呼叫。這證明問題在 request 的 grammar／strategy 組合，不是單看 schema 大小，也不是 prompt 或職務分析品質問題：
+
+1. **lookup／analysis** 需要 Skills、員工來源工具與自由但受限的專業推理；
+2. **typed finalization** 需要完整 schema adherence，但不需要再看到工具定義。
+
+修正後仍是一位顧問、一個 application run、一個模型 profile 與一個員工可見回覆：
+
+```text
+employee source
+  -> tool-enabled lookup / analysis（最多 2 model calls、2 lookup waves）
+  -> typed finalization without Skill / Source read tools（最多 1 structured-output call）
+  -> deterministic verifier
+  -> one semantic checkpoint
+```
+
+這不是加入 planner、scribe、critic 或多 Agent，也不讓 Skill 自行選模型。兩段共用同一份 context selection、source IDs、已讀 Skill IDs、run／attempt budget 與 lineage；finalization 只能把已取得的分析材料編成 typed result，不能偷偷再查資料。第一版 Opus 5 profile 明確使用已通過 live conformance 的 provider-native finalization，不讓 LangChain 自動改成 ToolStrategy；未來換模型／provider時，versioned profile 必須選擇自己已實測通過的 structured-output strategy，不能 silent fallback。若 context 與方法已由 deterministic path 充分載入，可直接走不帶 read tools 的 typed finalization 快速路徑。最多三次 inference 的原裁決不變。
+
+Anthropic 的 Opus 5 官方指引支持的是**減少過時 scaffolding、明確控制輸出長度與 scope、以 effort 調整推理成本**，不是把所有 context／tools／schema 塞進一個 request。Opus 5 預設啟用 thinking，官方也警告舊式重複 verification 指令會造成過度驗證；因此 prompt 應刪除重複「再檢查一次」文字，真正不可省的 source／authority／document invariant 繼續由 deterministic verifier 負責。1M context 也不推翻 §7 的最小充分 context；Anthropic 的 context-engineering 指引仍主張 just-in-time retrieval。Mid-conversation tool changes 可在未來 direct-Claude adapter 保留 cache 時評估，但它是 beta 且目前主路徑是 OpenRouter，不列第一版必要條件。[Prompting Claude Opus 5](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5) · [What's new in Claude Opus 5](https://platform.claude.com/docs/en/about-claude/models/whats-new-opus-5) · [Mid-conversation system messages and tool changes](https://platform.claude.com/docs/en/build-with-claude/mid-conversation-system-messages) · [Effective context engineering](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)
+
+#### 9.15.2 Evidence 沒有單一套件，但通用機制已有成熟 primitive
+
+不再把 Evidence 當成一個必須保留或重建的舊巨型元件。依目的拆開後，正式對照如下：
+
+| 中立目的 | 成熟 primitive／標準 | Caliburn 只保留的產品差額 |
+|---|---|---|
+| 員工逐字來源、更正與找回 | LangGraph `AsyncPostgresStore`＋checkpoint source refs | 哪些輸入可成為 employee evidence、document scope、supersession／correction policy |
+| 模型回覆中的 citation transport | LangChain v1 `Citation` content annotation | 是否啟用、provider adapter conformance、如何映射回本機 source ID |
+| 原始來源內的精確文字定位 | W3C Web Annotation `TextQuoteSelector`＋`TextPositionSelector` | Unicode／normalization policy、source revision hash、逐字與 speaker 驗證 |
+| quotation／revision／invalidation lineage | W3C PROV 語彙 | 不要求 RDF；只借成熟關係語意並保持單一 Store／checkpoint authority |
+| typed claim／引用形狀 | LangChain structured output＋Pydantic validators | Task／Duty／OPKS 語意支持、employee-only authority 與跨實體 invariant |
+| provider／tool 執行證據 | LangChain callbacks＋OpenTelemetry GenAI conventions | 本機 correlation、payload-free receipt、route／usage／cost fail-closed policy |
+| 員工文件裁決與恢復 | LangGraph checkpoint／`Command`／必要時 `interrupt` | 哪些變更需審、affected branch、read-set、stale 與 atomic subgroup |
+
+兩項限制不可省略：
+
+1. LangChain `Citation.start_index／end_index` 指向的是**模型回覆文字**，不是員工來源內的位置；所以它可取代 citation transport boilerplate，不能單獨取代 source quote anchor。Caliburn 的 employee source 是 immutable 且已有 `source_id + text_sha256`，核心 anchor 只需 W3C-aligned exact quote＋start/end；prefix／suffix 可留作未來跨格式 projection 的可選 re-anchoring 資訊，不應為形式對齊增加第一版狀態。[LangChain `Citation`](https://reference.langchain.com/python/langchain-core/messages/content/Citation)
+2. Anthropic 原生 citations 比純 prompt 引用更可靠，但官方明確說它與 structured outputs **不能在同一 request 使用**。目前 pin 的 `langchain-openrouter 0.2.7` response converter 也沒有保存任意 citation annotations。因此第一版核心仍由 provider-neutral `source_id + W3C-aligned selector + Pydantic result + deterministic verifier` 承接；原生 citation 只能在 adapter conformance 通過後，作 lookup／analysis 段的選配能力，不能成為唯一 evidence truth，也不藉此提前接 RAG。[Anthropic Citations](https://platform.claude.com/docs/en/build-with-claude/citations) · [W3C Web Annotation](https://www.w3.org/TR/annotation-model/) · [W3C PROV-O](https://www.w3.org/TR/prov-o/)
+
+#### 9.15.3 北極星裁決
+
+- **不變**：一位專業顧問、前景專注／背景吸收、Task／Duty／OPKS 動態演化、員工原話可找回、文件先審後入、必要澄清／Gap／審核分流、自然離開／續談、可信語意進度、單一可強制匯出，以及 RAG／能力級別／A／正式 eval 延後。
+- **當時的必修判斷（已由 §9.16 修正）**：曾判定必須把「工具＋完整 strict schema 同一 request」改成 tool-enabled analysis＋不帶 read tools 的 typed finalization；後續補回 compact-wire 既有證據後，兩段式已降為 exact canary 仍失敗時的 contingency。
+- **成熟元件校正**：Evidence 的 persistence、citation transport、anchor shape、lineage vocabulary、typed validation、execution tracing 與 review durability 都由框架／標準承接；Caliburn 不重建 Evidence framework，只保留來源 authority 與職務分析支持規則。
+- **不採**：為此新增第二模型人格、multi-agent、RAG、另一套 memory／evidence store、自由 JSON repair loop，或移除 deterministic verifier。
+
+當時曾規劃以 successor ADR 0061 同時裁決 schema 與 Tool；§9.16 後續審核先把它退回 Proposed 並改採 compact wire 優先。owner 此後只核准 schema 範圍，故現行 ADR 0061 為 Accepted（schema-only），沒有授權任何 Tool／Skill loading 變更；ADR 0060 本體保持 Accepted 版本零差異。
+
+### 9.16 strict schema、Skill／Tool 按需載入的更正審核（2026-08-14）
+
+本節依 owner 要求再查官方限制、Opus 5 精簡方式與 repo 既有研究，**取代 §9.15.1、§9.15.3 對「預設拆成兩段 request」的機制結論**；§9.15.2 的 Evidence primitive 分工維持。這次不是重新討論產品大方向，而是發現前一輪漏看 2026-07-31 已完成的 compact-wire 研究與 live 證據。
+
+#### 9.16.1 為什麼 schema 會超過
+
+`10,317 bytes` 只是症狀，不是 Anthropic 的硬上限。對目前 `ConsultantResult.model_json_schema()` 的離線結構量測為：18 defs、68 object properties、**28 optional parameters、20 個 `anyOf`／union sites、最深約 15 層**。Anthropic Structured Outputs 官方目前明列：單一 request 內 JSON output 與 strict tools 合計最多 **24 optional、16 union parameters**，而且即使個別數字不超標，optional／union／巢狀／tools 的交互組合仍可能超過內部 compiled-grammar limit。故本次 output schema 在不計 tools 前已同時超過兩個公開維度；「tool-free 某 route 成功」不能推翻公開限制，最多只說明 route、轉換、cache 或 endpoint enforcement 可能不同。[Anthropic Structured Outputs](https://platform.claude.com/docs/en/build-with-claude/structured-outputs)
+
+repo 已有直接可重用的成功模式：2026-07-31 的 6,818-byte rich schema 也收到相同錯誤；改成 model-facing compact wire＋pure mapper，把 union 17→0、properties 54→32、nesting 9→6、wire 6,818→4,084 bytes 後，Opus 5 真 request HTTP 200，後續 Opus 5／Luna-Pro／Sonnet 5 三回合場景完成。這證明「保留 rich 產品能力，但換 provider contract 形狀」不是理論猜測。相關權威紀錄是 [`strict schema 研究`](2026-07-31-anthropic-strict-schema-grammar-limit-research.md)、[`model-facing contract 研究`](2026-07-31-context-engineering-model-facing-contract-research.md)、[`compact wire plan`](../plans/2026-07-31-task-analysis-compact-wire-contract-plan.md) 與 [`live smoke`](../experiments/2026-07-31-job-analysis-attributed-live-smoke/README.md)。
+
+因此 Anthropic 官方建議的修正順序也應照做：先降低 optional、簡化 nesting／union，再考慮 split requests；不能因 tool-free 呼叫成功就直接把最後一招升格成預設架構。第一版修法改為：
+
+1. rich application result 不直接送 provider；建立 compact provider wire，優先零 optional、零或極少 union、required fields＋明確中性值／空陣列；
+2. pure mapper 遇到 discriminator／sentinel／payload 矛盾必須拒絕，不靜默補值；source／quote／authority／職務分析 invariant 繼續由 deterministic verifier 驗；
+3. 先以 compact wire＋現有四個真工具保留單一 bounded agent loop；只有 exact live conformance 仍失敗，才拆 tool-enabled analysis＋tool-free finalization；
+4. live canary 是付費外部動作，需另經 owner 授權。structured-output strategy 仍由 model profile 明選，不 silent fallback 到已觀察到錯誤多重輸出工具呼叫的 `ToolStrategy`。
+
+#### 9.16.2 Skill 按需載入：目前機制大致正確，名稱需校正
+
+Agent Skills／Deep Agents 的主流方式不是把所有 Skill 隱藏到模型無從發現，而是三層 progressive disclosure：短 name／description metadata 常駐、相關 `SKILL.md` instructions 被模型讀取時才進 context、額外 resources 再按需取。現行九個 Skill metadata 約 1.7 KB，完整正文合計約 16.6 KB；真正節省的是後者沒有全部常駐。這與官方 Agent Skills 與 Deep Agents 實作一致，不需再自寫 Skill router。[Agent Skills specification](https://agentskills.io/specification) · [Anthropic Agent Skills engineering](https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills) · [Deep Agents Skills](https://docs.langchain.com/oss/python/deepagents/skills)
+
+但目前程式把九個 catalog entries 同時稱為 `selected` 與 allowed，容易讓人誤以為九份正文都載入。產品語意應校正為：
+
+- `eligible`：本輪可被模型發現的短 metadata；第一版可包含九項，以免錯過員工回答中的跨焦點 Task／Duty／OPKS 線索；
+- `loaded`：模型真的完整讀過 `SKILL.md`，由 backend receipt 記錄；只有 loaded Skill 才能被結果引用；
+- 日後 metadata 若有可量測品質／成本問題，才依 typed state deterministic narrowing；不先加 keyword router 或另一個 LLM selector。
+
+Opus 5 可借鑑的精簡不是刪除分析方法，而是把重複 scaffolding 移出 base prompt：角色／產品邊界／當輪目標常駐，Task／Duty／O／P／K／S 方法留在 Skills；移除模型已自帶或 verifier 已保證的重複「再驗證一次」指令；員工歷史與來源用 stable handles 即時取回。官方 1M context 仍強調 context 有限，應保留最小高訊號 context 與 just-in-time retrieval。[Prompting Claude Opus 5](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5) · [Effective context engineering](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)
+
+#### 9.16.3 Tool 按需載入研究：候選方向，尚未裁決
+
+現行只有 `read_file` 加三個 source lookup tools，全部定義約 2.9 KB；三個 source tools 合計約 1.0 KB，較大的單項是 framework 通用 `read_file` 約 1.2 KB description，描述了本產品沒有的 editing、PDF、paging 等。`FilesystemMiddleware` 已提供 `custom_tool_descriptions`，所以「縮成只描述完整讀取 eligible `/skills/<id>/SKILL.md`」是後續 Tool 討論的候選，不需要為此重寫工具 framework；本輪沒有核准或實作這項變更。
+
+Anthropic Tool Search 官方建議在約 10 個以上工具、tool definitions 超過 10k tokens、選擇品質下降或多 MCP server 時使用；目前四個小工具不符合。`defer_loading` 也不解本次 strict schema 問題，因為 grammar 仍根據完整 deferred tool set 建立。研究上較合適的候選仍是 standard tool calling：definitions 小且穩定，**實際 tool call 與 tool result 才按需進 context**；只有 typed state 明確表示某工具不可能成功時，才考慮 LangChain 原生 dynamic tool filtering。Opus 5 mid-conversation tool changes 仍是 provider beta，OpenRouter／LangChain 端到端尚未驗證，不列核心依賴。以上只供下一輪 Tool 討論，不由 schema 決策自動生效。[Anthropic Tool Search](https://platform.claude.com/docs/en/agents-and-tools/tool-use/tool-search-tool) · [LangChain dynamic tools](https://docs.langchain.com/oss/python/langchain/agents#dynamic-tools) · [Anthropic mid-conversation tool changes](https://platform.claude.com/docs/en/build-with-claude/mid-conversation-system-messages)
+
+現行 prompt 還把「第一波讀 Skill、第二波查 Source」寫死；研究上它不屬於產品需求，因為員工更正可能要先查 lineage，某些回答也可在同一波平行取得 Skill 與 source。是否保留兩波、如何排序與是否改為 typed availability，全部留待下一輪 Tool 討論；本輪維持現況。
+
+#### 9.16.4 北極星與施工裁決
+
+- **產品方向沒有偏**：一位顧問、前景焦點／背景吸收、動態 Task／Duty／OPKS、記得並可找回員工原話、LLM 文件內容先審後入、必要澄清／一般 Gap／文件審核分流、可信進度、自然離開／續談與單一可強制匯出皆不變。
+- **修正的是 provider contract，不是刪產品能力**：rich result／framework state 可完整；只有送給模型的 wire 必須 compact，再映回產品結構。
+- **Skill 已是按需正文**：保留成熟 middleware；把 selected／eligible／loaded 名詞與驗證分清。
+- **Tool 尚未裁決**：本節保留 standard calling、縮 description、調整 wave 與 dynamic filtering 的研究證據，但 owner 已把 Tool／Skill loading 排除於 schema 本輪；工具集合、description 與排程維持現況，下一輪另議。
+- **兩段式降為 contingency**：compact wire exact canary 仍失敗才啟用，不預先增加一次 inference 與 handoff。
+- **決策狀態**：[ADR 0061](../adr/0061-compact-consultant-wire-progressive-skills-and-tools.md) 已由 owner 以 **schema-only** 範圍核准為 Accepted；compact provider wire 生效，Tool／Skill loading 沒有隨之獲得授權。ADR 0060 仍是 runtime 主決策。
+
 ## 10. 本稿依據
 
 Repo 研究：
@@ -2399,6 +2500,7 @@ Stakeholder 草稿（非權威，只作需求來源）：
 
 - [Anthropic — Introducing Anthropic Interviewer](https://www.anthropic.com/research/anthropic-interviewer)
 - [Anthropic — Building effective agents](https://www.anthropic.com/engineering/building-effective-agents)
+- [Anthropic — Harness design for long-running application development](https://www.anthropic.com/engineering/harness-design-long-running-apps)
 - [Anthropic — Effective context engineering for AI agents](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)
 - [Anthropic — Trustworthy agents in practice（可自行研究的缺口與必須詢問使用者的意圖）](https://www.anthropic.com/research/trustworthy-agents)
 - [Anthropic — Scaling Managed Agents: Decoupling the brain from the hands](https://www.anthropic.com/engineering/managed-agents)
@@ -2407,6 +2509,10 @@ Stakeholder 草稿（非權威，只作需求來源）：
 - [Anthropic Docs — Tool runner（自動 loop 與 custom HITL 邊界）](https://platform.claude.com/docs/en/agents-and-tools/tool-use/tool-runner)
 - [Anthropic Docs — Managed Agents permission policies](https://platform.claude.com/docs/en/managed-agents/permission-policies)
 - [Anthropic Docs — Structured outputs](https://platform.claude.com/docs/en/build-with-claude/structured-outputs)
+- [Anthropic Docs — Prompting Claude Opus 5](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5)
+- [Anthropic Docs — What's new in Claude Opus 5](https://platform.claude.com/docs/en/about-claude/models/whats-new-opus-5)
+- [Anthropic Docs — Mid-conversation system messages and tool changes](https://platform.claude.com/docs/en/build-with-claude/mid-conversation-system-messages)
+- [Anthropic Docs — Citations](https://platform.claude.com/docs/en/build-with-claude/citations)
 - [Anthropic Docs — Model IDs and versioning（pinned ID 與 alias）](https://platform.claude.com/docs/en/about-claude/models/model-ids-and-versions)
 - [Anthropic API — Create a Message（model-specific parameter support）](https://platform.claude.com/docs/en/api/typescript/messages/create)
 - [Anthropic — Contextual Retrieval](https://www.anthropic.com/engineering/contextual-retrieval)
@@ -2481,6 +2587,7 @@ Stakeholder 草稿（非權威，只作需求來源）：
 - [LangChain — Context engineering in agents](https://docs.langchain.com/oss/python/langchain/context-engineering)
 - [LangChain — Agents（model、tools、structured output 的組合邊界）](https://docs.langchain.com/oss/python/langchain/agents)
 - [LangChain — Structured output（ProviderStrategy／ToolStrategy 與 schema 驗證）](https://docs.langchain.com/oss/python/langchain/structured-output)
+- [LangChain Reference — `Citation` content annotation](https://reference.langchain.com/python/langchain-core/messages/content/Citation)
 - [LangChain — Custom middleware（dynamic model selection 是可選 middleware）](https://docs.langchain.com/oss/python/langchain/middleware/custom#dynamic-model-selection)
 - [LangChain — Prebuilt middleware（model／tool call limits、retry、HITL）](https://docs.langchain.com/oss/python/langchain/middleware/built-in)
 - [LangChain — Todo schema／TodoListMiddleware](https://reference.langchain.com/python/langchain/agents/middleware/todo/Todo)

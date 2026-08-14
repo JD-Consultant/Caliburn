@@ -1,7 +1,7 @@
 # AI 職務顧問 runtime 設計
 
-- 決策：[ADR 0060](../adr/0060-langchain-langgraph-consultant-runtime-and-durable-authority.md)
-- 狀態：Task 9 composition hard cut 已完成；目前 production 僅保留 LangChain／LangGraph 顧問 runtime、purpose-first API／Web、fresh-root storage 與 deterministic export。Task 10 尚待真實模型／UI smoke、最終複審與交付標記。
+- 決策：[ADR 0060](../adr/0060-langchain-langgraph-consultant-runtime-and-durable-authority.md)；Task 10 schema 修正：[ADR 0061](../adr/0061-compact-consultant-wire-progressive-skills-and-tools.md)
+- 狀態：Task 9 composition hard cut 已完成；目前 production 僅保留 LangChain／LangGraph 顧問 runtime、purpose-first API／Web、fresh-root storage 與 deterministic export。Task 10 已把 28 optional／20 union 的 rich provider schema 換成 0 optional／0 union／0 open object、depth 4 的 compact Pydantic wire＋pure mapper；Tool／Skill loading 邊界尚待下一輪討論，付費 exact conformance、UI smoke、最終複審與交付標記仍未執行。
 - 實作：`apps/api/app/consultant`、`apps/api/app/adapters/langgraph`、`apps/api/app/adapters/openrouter/langchain.py`
 
 ## 儲存權威
@@ -40,7 +40,9 @@ checkpoint 不複製員工逐字來源；Store 不保存第二份核准文件。
 ## 模型執行
 
 - Versioned model profile 只決定 requested model、唯一 provider、有效參數與 timeout；versioned run policy 只決定 eligible Skills／tools、context／call／token／time／cost budget 與 retry。兩者在每次 run 前解析成 immutable `ResolvedExecution`，Skill 不能選模型。
-- `ChatOpenRouter` 承接 provider wire，`create_agent`／`response_format` 承接 bounded loop 與 structured output；model／tool call limit、retry、非權威摘要與唯讀工具結果清理由 LangChain built-in middleware 承接。OpenRouter SDK 自己的通用 retry 關閉；LangChain 1.3.15 `SummarizationMiddleware` 內建的獨立三次 retry 也由窄 subclass 關閉，所有主推論與摘要共用同一個 run attempt budget，避免框架內部出現無紀錄重試。
+- `ChatOpenRouter` 承接 provider wire。rich application result 不直接送 provider；LangChain `response_format` 使用 compact Pydantic `ConsultantModelOutput`，再由 fail-closed pure mapper 還原 rich `ConsultantResult`。Evidence 只在 `analysis_bases` 出現一次，回覆與各 effect 用 1-based ordinal 引用；越界、未引用與矛盾 payload 都拒絕。同一位顧問、同一 model profile 的 bounded `create_agent` loop 維持不變；Tool／Skill loading 與是否需要 contingency finalization 尚未在 schema 決策中定案。
+- structured-output strategy 是 versioned model profile 的已解析能力，不由 LangChain 自動猜測或 fallback。現行 `ToolStrategy` 曾產生錯誤的多重輸出工具呼叫，因此 Opus 5／OpenRouter profile 只能選通過 exact conformance 的 provider-native strategy；換模型／provider 也必須重跑窄 canary。這保留可換模型，同時避免把所有 strategy 假定為可互換。
+- model／tool call limit、retry、非權威摘要與唯讀工具結果清理由 LangChain built-in middleware 承接。OpenRouter SDK 自己的通用 retry 關閉；LangChain 1.3.15 `SummarizationMiddleware` 內建的獨立三次 retry也由窄 subclass關閉，所有 primary／必要 contingency finalization／摘要共用同一個 run attempt budget，避免框架內部出現無紀錄重試。
 - 第一版固定單一 route 且禁止 fallback。adapter 保留 OpenRouter 回傳的實際 provider、model 與 cost；LangChain callback 對每個真實 attempt 各寫一張含 primary／summarization kind 的 payload-free receipt與 OpenTelemetry span。成功 attempt 若缺 route、usage，或在啟用 cost budget 時缺 cost，deterministic verifier 會在 semantic commit 前 fail closed。provider error 只保留安全分類／HTTP status，不把原始例外訊息或可能回顯的員工內容寫入 receipt／telemetry。
 - `SummarizationMiddleware` 與 `ContextEditingMiddleware` 只處理非權威對話副本／舊唯讀 tool result；不能成為員工原話、核准文件或顧問理解的 owner。
 
@@ -60,14 +62,34 @@ checkpoint 不複製員工逐字來源；Store 不保存第二份核准文件。
 
 同一位主要顧問按當輪 eligibility 組合九個版本化方法 Skill：工作盤點、故事訪談、Task 邊界、Duty 分組、O、P、K、S 與完成度反方檢查。Skill 是方法與 context 載入邊界，不是多 Agent、固定 stage 或各自擁有狀態的子系統；Task 不必先永久穩定，已有局部證據即可同輪分析相關 O／P／K／S，後續結構變動再重驗 linkage。
 
-- Deep Agents `SkillsMiddleware` 只掃描本輪選定 Skill 的 frontmatter；`FilesystemMiddleware(tools=["read_file"])` 提供唯一模型工具。production 使用自訂 `BackendProtocol` adapter 直接讀 package resources，不使用 host `FilesystemBackend`，也不暴露 ls／glob／grep／write／edit／delete／execute／subagent。
+第一版可把九個方法的短 metadata catalog 交給 `SkillsMiddleware`，讓同一模型依完整員工回答發現意外的 Task／Duty／OPKS 線索；progressive disclosure 的節省點是只有實際使用的 `SKILL.md` 正文進 context。catalog 中的 Skill 是 **eligible／可發現**，不是 selected／已載入；`PackageSkillBackend.loaded_skill_ids` 與 verifier 必須證明 result 只引用真正完整讀過的方法。若日後 metadata catalog 本身造成可量測的品質／成本問題，再用 typed state narrowing；不得先用脆弱關鍵字 router 或另一個 LLM selector 阻止跨焦點發現。
+
+- Deep Agents `SkillsMiddleware` 只掃描本輪 eligible Skill 的 frontmatter；`FilesystemMiddleware(tools=["read_file"])` 提供唯一 Skill 讀取工具，並以原生 `custom_tool_descriptions` 改成只描述完整讀取 `/skills/<id>/SKILL.md` 的短產品 contract，不把 editing／PDF／paging 等未開放能力送給模型。production 使用自訂 `BackendProtocol` adapter 直接讀 package resources，不使用 host `FilesystemBackend`，也不暴露 ls／glob／grep／write／edit／delete／execute／subagent。
 - `/skills/<id>/SKILL.md` 是唯一可讀路徑。backend 拒絕 traversal、未選 Skill、分頁式不完整讀取與同 run 第二次讀取；metadata discovery 不算模型讀取。互動 agent 不另接 checkpointer／Store，durable product graph只保存 semantic result／receipt；每次 invocation 重新投影 eligible metadata，並拒絕外部輸入夾帶舊 `read_file` ToolMessage，因此前一輪 Skill 全文、metadata 或 load warning 都不能流入本輪。
-- interactive policy 最多三次 model call、兩個 lookup wave；同一個模型回應中平行載入數個 Skill 算一波，不把「多個方法可組合」錯誤限制成最多兩個 Skill。LangChain 既有 `ModelCallLimitMiddleware`／`ToolCallLimitMiddleware` 繼續管 call／tool 總量，Caliburn 只補框架沒有的「wave」語意。
-- LangChain `response_format` 直接產生 Pydantic `ConsultantResult`：員工可見回覆、可修訂理解 delta、動態注意力／待處理 delta、具體 Gap、待員工審核的文件變更、至多一個主要問題與可重算充分性建議。這個 schema 沒有核准文件欄位、pause／finish lifecycle、Reference、能力級別或 A。
+- interactive policy 最多三次 model call、兩個 lookup wave；同一個模型回應中平行載入數個 Skill／source 算一波，不把「多個方法可組合」錯誤限制成最多兩個 Skill，也不固定第一波 Skill、第二波 Source。LangChain 既有 `ModelCallLimitMiddleware`／`ToolCallLimitMiddleware` 繼續管 call／tool 總量，Caliburn 只補框架沒有的「wave」語意。
+- compact provider wire 保留員工可見回覆、可修訂理解 delta、動態注意力／待處理 delta、具體 Gap、待員工審核的文件變更、至多一個主要問題與可重算充分性建議；全欄 required，以明確 enum、中性 payload／空陣列降低 grammar，而不是刪能力。模型不再組自由 JSON Pointer 或任意 `after`；typed target／stable ID／field／payload 經 pure mapper 還原，sentinel、ordinal、payload 或 OPKS linkage 矛盾即拒絕。provider wire 沒有核准文件欄位、pause／finish lifecycle、Reference、能力級別或 A。
 - 每個語意 claim 明列 employee source IDs、quote anchors 與實際使用的 Skill IDs。commit 前 deterministic verifier 驗同文件 scope、current source、quote byte-range、selected／loaded Skill、允許的 document path／operation／payload、O／P 單 Task、K／S 文件層多對多 refs，以及具體數量、法規、SOP、公司規則與外部主張的逐字 anchor。模型文字本身永遠不是 evidence。
 - K／S 必須有有效員工 quote anchor；O 可以在操作型工作沒有獨立產出時保持空白，顧問改留下 Task-boundary gap，不為填表補造文件。能力級別與 A 連 model-facing enum 都不提供；職業／行業分類與 iCAP 配發代碼也不在允許的模型文件路徑。
 
-`ConsultantResult.reviewable_document_changes` 是模型語意輸出；application 會把它轉成可審核的 typed patch action，配置 stable action ID、before／after、path read-set、dependency 與必要時的 atomic subgroup。模型仍不能直接寫入核准文件；只有員工 review command 或 direct edit 能進入 document authority graph command。
+`ConsultantModelOutput.reviewable_document_changes` 是 provider-facing typed semantic target／field／payload；pure mapper 先轉成 `ConsultantResult.reviewable_document_changes`，application 再建立可審核的 typed patch action，配置 stable action ID、before／after、path read-set、dependency 與必要時的 atomic subgroup。模型仍不能直接寫入核准文件；只有員工 review command 或 direct edit 能進入 document authority graph command。
+
+## 來源支持、引用與執行證據
+
+新 runtime 不建立單一 `EvidenceEngine`。通用責任直接使用成熟 primitive，只有產品無法外包的來源 authority／語意支持規則留在 `app.consultant`：
+
+| 目的 | 機制 |
+|---|---|
+| 員工原話、更正與精確找回 | LangGraph `AsyncPostgresStore`＋checkpoint source refs |
+| 模型回覆 citation transport | LangChain v1 `Citation` annotation；只在 adapter conformance 通過時啟用 |
+| 員工來源內文字位置 | W3C Web Annotation `TextQuoteSelector`＋`TextPositionSelector` 對齊的 selector shape |
+| quotation／revision／invalidation lineage | W3C PROV 語彙；不新增 RDF store |
+| typed claim 與引用形狀 | LangChain structured output＋Pydantic validators |
+| provider／tool 執行證據 | LangChain callbacks＋OpenTelemetry GenAI＋payload-free attempt receipt |
+| 員工文件決策／恢復 | LangGraph checkpoint／`Command`／必要時 `interrupt` |
+
+LangChain `Citation.start_index／end_index` 指向模型**回覆**文字，不能冒充來源內 offset。employee source 是 immutable，已有 stable source ID 與 `text_sha256`；核心 anchor 以 W3C-aligned exact quote＋Unicode start/end＋document scope 即可重驗，prefix／suffix 只作未來跨格式 projection 的選配。Anthropic 原生 citations 與 structured outputs 不能在同一 request 使用，剛好再次支持 analysis／finalization 分離；但目前 `langchain-openrouter==0.2.7` 的 response converter 未保留 citation annotations，所以第一版不依賴原生 citation。核心 truth 仍是 Store source＋W3C-aligned selector＋Pydantic result＋deterministic verifier；原生 citation 日後只能作可驗證的 analysis-stage enhancement，不能成為第二份來源或提前接 RAG。
+
+deterministic verifier 仍判定：source 是否存在且 current、quote 是否逐字且同 document、speaker／capture mode 是否有權威、claim 是否使用已載 Skill、官方代碼與 document path 是否允許、Task／Duty／OPKS linkage 是否合法。框架 citation 只證明「指到哪裡」，不替產品判斷該段是否真的支持職務分析 claim。
 
 ## 文件審核、authority 與必要澄清
 
@@ -130,4 +152,4 @@ Next App Router 頁面只負責掛載 purpose-first Client Component；TanStack 
 
 ## 當前邊界
 
-這個 runtime 已有可替換模型 profile、LangChain agent harness、attempt receipt、Context middleware、真實顧問 Skills、adaptive interview routing、可見理解／Gap／語意進度、完整文件 patch／review command、deterministic authority、required-clarification interrupt、generated contract／production API transport、員工顧問工作區與 deterministic XLSX export。Task 9 已完成舊 composition／writer／route／contract／migration hard cut；fresh root 只建立最小 catalog，LangGraph 官方 setup 擁有 Saver／Store tables。它沒有 RAG／Reference consumer、能力級別／A 生成或正式品質 eval，也沒有雙寫或 compatibility layer。
+這個 runtime 已有可替換模型 profile、LangChain agent harness、attempt receipt、Context middleware、真實顧問 Skills、adaptive interview routing、可見理解／Gap／語意進度、完整文件 patch／review command、deterministic authority、required-clarification interrupt、generated contract／production API transport、員工顧問工作區與 deterministic XLSX export。Task 9 已完成舊 composition／writer／route／contract／migration hard cut；fresh root 只建立最小 catalog，LangGraph 官方 setup 擁有 Saver／Store tables。Task 10 的 compact provider wire＋pure mapper 已完成離線 gates；Tool／Skill loading、付費 live conformance 與是否需要 contingency finalization仍待後續討論／授權。它沒有 RAG／Reference consumer、能力級別／A 生成或正式品質 eval，也沒有雙寫或 compatibility layer。

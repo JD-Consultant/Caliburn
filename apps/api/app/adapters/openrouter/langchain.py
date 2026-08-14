@@ -38,12 +38,22 @@ def build_openrouter_chat_model(
 ) -> ReceiptChatOpenRouter:
     if not api_key.strip():
         raise ValueError("OpenRouter API key is required")
+    import openrouter
+
     parameters = execution.effective_parameters
+    timeout_ms = int(execution.timeout_seconds * 1_000)
+    sdk_client = openrouter.OpenRouter(
+        api_key=api_key,
+        server_url=base_url,
+        timeout_ms=timeout_ms,
+        retry_config=None,
+    )
     return ReceiptChatOpenRouter(
+        client=sdk_client,
         model=execution.requested_model,
         api_key=api_key,
         base_url=base_url,
-        timeout=int(execution.timeout_seconds),
+        timeout=timeout_ms,
         max_retries=0,
         temperature=parameters.temperature,
         top_p=parameters.top_p,

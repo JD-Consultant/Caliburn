@@ -25,6 +25,10 @@ from app.consultant.context import (
     build_source_lookup_tools,
 )
 from app.consultant.interview import VerifiedConsultantCommit
+from app.consultant.model_output import (
+    ConsultantModelOutput,
+    map_consultant_model_output,
+)
 from app.consultant.model_runtime import (
     AttemptReceiptCallback,
     ConsultantModelProfile,
@@ -34,7 +38,6 @@ from app.consultant.model_runtime import (
     classify_consultant_failure,
     resolve_execution,
 )
-from app.consultant.results import ConsultantResult
 from app.consultant.skill_backend import CONSULTANT_SKILL_IDS
 from app.consultant.state import (
     RunReceipt,
@@ -195,29 +198,44 @@ async def execute_admitted_consultant_turn(
             product_run_id=run_id,
             execution=execution,
         )
-        response = await agent.ainvoke(
-            {
-                "messages": [
-                    HumanMessage(
-                        content=f"[employee source {source_id}]",
-                        additional_kwargs={
-                            "employee_source_id": str(source_id),
-                        },
-                    )
-                ]
-            },
-            context=runtime_context,
-            config={
-                "callbacks": [callback],
-                "metadata": {
-                    "consultant_run_id": str(run_id),
-                    "consultant_document_id": str(document_id),
-                    "profile_id": execution.profile_id,
-                    "profile_revision": execution.profile_revision,
-                },
-            },
+        elapsed_seconds = max(
+            0.0,
+            (datetime.now(UTC) - latest.started_at).total_seconds(),
         )
-        result = ConsultantResult.model_validate(response["structured_response"])
+        remaining_seconds = execution.max_elapsed_seconds - elapsed_seconds
+        if remaining_seconds <= 0:
+            raise TimeoutError("consultant run exceeded elapsed-time budget")
+        async with asyncio.timeout(remaining_seconds):
+            response = await agent.ainvoke(
+                {
+                    "messages": [
+                        HumanMessage(
+                            content=f"[employee source {source_id}]",
+                            additional_kwargs={
+                                "employee_source_id": str(source_id),
+                            },
+                        )
+                    ]
+                },
+                context=runtime_context,
+                config={
+                    "callbacks": [callback],
+                    "metadata": {
+                        "consultant_run_id": str(run_id),
+                        "consultant_document_id": str(document_id),
+                        "profile_id": execution.profile_id,
+                        "profile_revision": execution.profile_revision,
+                    },
+                },
+            )
+        if (
+            datetime.now(UTC) - latest.started_at
+        ).total_seconds() > execution.max_elapsed_seconds:
+            raise TimeoutError("consultant run exceeded elapsed-time budget")
+        model_output = ConsultantModelOutput.model_validate(
+            response["structured_response"]
+        )
+        result = map_consultant_model_output(model_output)
         if not runtime_context.context_receipts:
             raise ValueError("consultant run emitted no context-selection receipt")
         for receipt in runtime_context.context_receipts:
@@ -265,6 +283,8 @@ async def execute_admitted_consultant_turn(
         if isinstance(error, (KeyboardInterrupt, SystemExit, asyncio.CancelledError)):
             raise
         try:
+            if callback is not None:
+                await callback.close_open_attempts(error)
             await runtime.mark_consultant_run_failed(
                 document_id=document_id,
                 run_id=run_id,

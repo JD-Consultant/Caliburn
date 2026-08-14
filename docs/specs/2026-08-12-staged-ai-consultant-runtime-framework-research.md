@@ -11,6 +11,8 @@
 > 2026-08-13 責任分界確認：框架可以取代或包裝通用工程機制，Caliburn 保留產品語意與 authority；「保留」不等於所有底層程式都自行維護。LangGraph 是目前推薦的外層 runtime 候選，但仍須先證明它能忠實承接既有 durable input、Journal、generation／read-set 與 authority transaction，不能把推薦寫成已 Accepted 的框架決策。
 >
 > **2026-08-13 後續取代警示：**產品工作稿已確認 AI 顧問子系統採隔離 worktree 內的受限 Big-bang、fresh-schema hard cut，並把 iCAP Reference／RAG 納入同一次 final gate；先完成核心顧問、後接 RAG，再一次切換。本文原先的漸進 phase、`Wrap` 既有 runtime、LangGraph 優先順序與「RAG 延後到未來」只能作候選能力與風險研究，**不再是現行遷移順序或實作者 plan**。後續應先依產品工作稿建立 framework-neutral 目標能力與 `Replace／Wrap／Retain` 矩陣，再重寫本研究結論；在此之前不得依本文 §15 直接施工。
+>
+> **2026-08-14 現行 successor 警示：**上段本身又被後續 owner 裁決取代。現行權威是產品工作稿 §9.12–§9.16、Accepted ADR 0060、Accepted ADR 0061（schema-only）、`docs/design/consultant-runtime.md` 與北極星帳本：主 runtime 已定 LangChain／LangGraph，舊 Work Model／Focus／Progress／Proposal／Current JD lifecycle 已 hard cut，**本次不接 RAG**。本文仍保存市場研究與 Evidence 標準盤點，但凡出現「保留舊 domain tables／SQLAlchemy aggregate」「RAG 納入同次 final gate」或舊元件名稱，皆只作歷史候選，不得據此施工；Tool／Skill loading 尚未因 ADR 0061 獲得變更授權。
 
 ## 0. 結論先行
 
@@ -679,6 +681,14 @@ source_id + source_revision_hash
 
 Web Annotation 提供的是成熟 selector 模型，不要求 Caliburn 使用 JSON-LD 或 RDF 作內部 truth；可保留 Pydantic／relational domain model，只在命名、驗證與對外 projection 對齊標準。
 
+### 11.4 2026-08-14 現行 Evidence 與 Opus 5 補充裁決
+
+現行 runtime 不再有一個待保留的 `Evidence` 大元件；同目的機制已拆給成熟 primitive：LangGraph Store 保存員工逐字來源與更正，LangChain `Citation` 承接回覆 citation annotation，W3C TextQuote／TextPosition selectors 承接來源位置形狀，PROV vocabulary 承接 quotation／revision／invalidation 語彙，Pydantic 承接 typed validation，LangChain callbacks＋OpenTelemetry 承接 execution evidence，LangGraph command／checkpoint 承接員工審核 durability。Caliburn 只保留 framework 無法判斷的 employee authority、source revision／document scope、exact quote、correction 失效與 Task／Duty／OPKS semantic support。
+
+需特別區分：LangChain `Citation.start_index／end_index` 指向模型回覆，不是來源文字；Anthropic 原生 citations 與 structured outputs 不能同 request 使用；目前 pin 的 `langchain-openrouter==0.2.7` response converter 也未保留 citation annotations。因此第一版核心仍使用 provider-neutral source ID＋W3C-aligned selector＋Pydantic result＋deterministic verifier，native citation 只可在 adapter conformance 通過後作 tool-enabled analysis 段的選配能力。
+
+Task 10 真模型另證明，完整 tools＋大型 strict `ConsultantResult` 綁在同一 request 會撞 grammar complexity；後續結構量測又確認 output schema 自身已有 28 optional／20 union sites，超過 Anthropic 公開的 24／16 合併上限。產品工作稿 §9.16 因此修正先前過早的兩段式結論：先恢復 repo 已以 Opus 5 live smoke 證明的 compact provider wire＋pure mapper，保留單一 bounded agent；只有 compact wire exact conformance 仍失敗，才評估 tool-free finalization。owner 已核准 ADR 0061 的 schema-only 範圍；Skill／Tool 的集合、description、載入與排程維持現況，另行討論。完整裁決與來源見產品工作稿 §9.16 與 Accepted ADR 0061。
+
 ## 12. 通用模型接口與可替換模型
 
 ### 12.1 ModelProfile
@@ -1008,6 +1018,9 @@ ADR Accepted 後才寫 docs/plans/；不得直接據本研究全文施工。
 
 - [Anthropic — Building effective agents](https://www.anthropic.com/engineering/building-effective-agents)
 - [Anthropic — Effective context engineering for AI agents](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)
+- [Anthropic — Prompting Claude Opus 5](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5)
+- [Anthropic — Mid-conversation system messages and tool changes](https://platform.claude.com/docs/en/build-with-claude/mid-conversation-system-messages)
+- [Anthropic — Citations](https://platform.claude.com/docs/en/build-with-claude/citations)
 - [OpenAI — Latest model guidance](https://developers.openai.com/api/docs/guides/latest-model)
 - [OpenAI — Agents SDK](https://developers.openai.com/api/docs/guides/agents)
 - [OpenAI Agents SDK — Guardrails](https://openai.github.io/openai-agents-python/guardrails/)
@@ -1027,6 +1040,7 @@ ADR Accepted 後才寫 docs/plans/；不得直接據本研究全文施工。
 - [LangChain — Memory](https://docs.langchain.com/oss/python/concepts/memory)
 - [LangChain — Tools](https://docs.langchain.com/oss/python/langchain/tools)
 - [LangChain — Structured output](https://docs.langchain.com/oss/python/langchain/structured-output)
+- [LangChain — `Citation` content annotation](https://reference.langchain.com/python/langchain-core/messages/content/Citation)
 - [LangChain — ChatOpenRouter](https://docs.langchain.com/oss/python/integrations/chat/openrouter)
 - [LangGraph — MIT License](https://github.com/langchain-ai/langgraph/blob/main/LICENSE)
 - [LangChain — MIT License](https://github.com/langchain-ai/langchain/blob/master/LICENSE)

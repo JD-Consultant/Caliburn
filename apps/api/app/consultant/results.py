@@ -9,7 +9,7 @@ turns accepted changes into durable authority commands.
 from __future__ import annotations
 
 from enum import StrEnum
-from typing import Literal
+from typing import Literal, TypeAlias
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, JsonValue, StringConstraints, model_validator
@@ -35,6 +35,21 @@ SkillId = Literal[
     "skill",
     "completion-red-team",
 ]
+DocumentScalar: TypeAlias = str | int | bool
+DocumentNestedObject: TypeAlias = dict[str, DocumentScalar | None]
+DocumentObject: TypeAlias = dict[
+    str,
+    DocumentScalar
+    | None
+    | list[DocumentScalar]
+    | list[DocumentNestedObject],
+]
+DocumentAfterValue: TypeAlias = (
+    DocumentScalar
+    | list[DocumentScalar]
+    | DocumentObject
+    | list[DocumentObject]
+)
 
 
 class ResultModel(BaseModel):
@@ -179,7 +194,7 @@ class ReviewableDocumentChange(ResultModel):
 
     operation: DocumentChangeOperation
     path: NonEmptyText
-    after: JsonValue | None = None
+    after: DocumentAfterValue | None = None
     target_ids: tuple[UUID, ...] = ()
     opks_kind: OpksKind | None = None
     task_ids: tuple[UUID, ...] = ()

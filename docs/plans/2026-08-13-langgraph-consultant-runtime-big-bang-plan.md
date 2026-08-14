@@ -4,13 +4,13 @@
 
 **Goal:** 以 LangChain／LangGraph 成熟元件直接取代 current AI／document-state 自寫機制，交付一位可自然續談、記得員工原話、動態選擇訪談重點、按需分析 Task／Duty／O／P／K／S、呈現可信缺口、讓員工審核所有 LLM 文件內容並可靠匯出的專業職務顧問。
 
-**Prerequisite（已滿足）:** Owner 於 2026-08-14 完成產品方向／成熟元件覆蓋審核後授權施工，ADR 0060 已改為 Accepted。
+**Prerequisite（核心已滿足）:** Owner 於 2026-08-14 完成產品方向／成熟元件覆蓋審核後授權施工，ADR 0060 已 Accepted；owner 隨後核准 ADR 0061 的 schema-only 修正，Tool 邊界另議。
 
 **Architecture:** 新建 `app/consultant` purpose-first runtime。LangGraph PostgreSQL Saver 是可修訂理解、動態訪談工作、缺口、待審文件變更與核准文件的唯一 semantic-state owner；Store 是員工原話／更正／quote 的唯一 source owner。LangChain bounded agent、middleware、OpenRouter binding，以及 Deep Agents `SkillsMiddleware`＋read-file-only middleware 承接 model loop、最小充分 context 與專業方法。API 以 generated contract＋typed SSE 投影 durable state；完成垂直切片後一次硬切並刪除舊 writer，不做 compatibility adapter 或雙寫。
 
 **Tech Stack:** Python 3.13、FastAPI 0.141.1、HTTPX 0.28.1、LangChain 1.3.15、LangGraph 1.2.11、`langgraph-checkpoint-postgres` 3.1.2、`langchain-openrouter` 0.2.7、Deep Agents 0.7.5（只取 Skills＋read-only file middleware）、PostgreSQL 16、Pydantic 2、JSON Schema codegen、Next／React、TanStack Query、OpenTelemetry、pytest／Vitest。版本已於 2026-08-14 以官方 PyPI 指定版本端點確認存在且未被 yank；兩個 Beta integration 必須有窄介面 canary。
 
-**Spec:** [`2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md`](../specs/2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md) §0–§8、§9.12–§9.13；[ADR 0060](../adr/0060-langchain-langgraph-consultant-runtime-and-durable-authority.md)；Task／Duty／OPKS 方法依研究稿 §10 所列 repo 研究。
+**Spec:** [`2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md`](../specs/2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md) §0–§8、§9.12–§9.16；[ADR 0060](../adr/0060-langchain-langgraph-consultant-runtime-and-durable-authority.md)；[ADR 0061](../adr/0061-compact-consultant-wire-progressive-skills-and-tools.md)；Task／Duty／OPKS 方法依研究稿 §10 所列 repo 研究。
 
 ## Global constraints
 
@@ -259,12 +259,18 @@ Big-bang 只代表最後一次硬切，不允許累積十個 Task 後才發現�
 **Files:**
 
 - Create: `docs/specs/2026-08-14-consultant-runtime-upgrade-completion.md`
-- Modify only for confirmed P1／P2 corrections discovered by final review
+- Create for schema correction: `apps/api/app/consultant/model_output.py`, `apps/api/tests/test_consultant_model_output.py`
+- Modify for the confirmed live-smoke P1: `apps/api/app/consultant/agent.py`, `model_runtime.py`, `run_service.py` and focused tests
+- Modify authority docs／design／audit only for confirmed P1／P2 corrections discovered by final review
 
+- [x] Replace the provider-facing rich `ConsultantResult` with compact Pydantic `ConsultantModelOutput` plus fail-closed pure mapper. Preserve every first-version product effect; normalize Evidence into one basis table with 1-based references; replace arbitrary document path／JSON with typed target／field／payload. Committed LangChain-facing metrics are 0 optional、0 union、0 open object、depth 4; contradiction and runtime mapping tests are green. No JSON repair or custom parser was added.
+- [ ] Discuss Tool／Skill loading separately with the owner. Until that decision, keep the current bounded loop, nine-Skill catalog／on-demand bodies and four read-only tools unchanged; do not infer approval for Tool Search、selector、provider beta、description changes or wave reordering from the schema decision.
+- [ ] After deterministic gates, request explicit owner authorization for one paid exact conformance canary using the real Opus 5／OpenRouter profile, compact wire and all four production tools. If it passes, keep one loop. Only if it still fails may the same run split into tool-enabled analysis＋tool-free typed finalization; then share the existing three-call／timeout／cost／retry budget, attempt receipts, loaded-Skill/source lineage and verifier, and add no planner／scribe personas、multi-agent、hidden-chain-of-thought handoff or second state owner. The profile must never silently fallback to `ToolStrategy`.
+- [ ] Keep Evidence provider-neutral: Store source＋W3C-aligned quote selector＋Pydantic result＋deterministic verifier remain the required path. Treat LangChain `Citation`／Anthropic native citations as optional adapter capabilities only after annotation-preservation conformance; do not make them a new store, RAG dependency or substitute for semantic support checks.
 - [ ] Run fresh-DB migration and every deterministic gate: API, Web test／typecheck／lint, contract codegen, turbo, dependency guards and `git diff --check`.
 - [ ] Manually simulate one procurement session through the real UI with one configured OpenRouter model: establish work map, deepen one focus, capture side clue, inspect／correct AI understanding, generate and defer a changeset, resolve structural dependency, answer required clarification, edit-accept, reopen after correction, observe sufficiency advice, close／reopen naturally and force export with a visible gap.
 - [ ] Record the versioned profile, resolved execution snapshot, actual attempt receipt／usage and observed failures. This is a smoke, not an eval; make no model-quality claim.
-- [ ] Perform one concise external review against ADR 0060 and product-flow §9.13. Fix confirmed P1/P2 findings; do not redesign the framework for speculative improvements.
+- [ ] Perform one concise external review against ADR 0060、accepted successor decision if any, and product-flow §9.13–§9.16. Fix confirmed P1/P2 findings; do not redesign the framework for speculative improvements.
 - [ ] Record exact commands, known failures and Replace／Delete／Retain closure. Run the common north-star gate, append the final Task 10 ledger entry, create local tag `consultant-runtime-v1`; keep branch/worktree unmerged and unpushed for owner review.
 
 ## Final gate

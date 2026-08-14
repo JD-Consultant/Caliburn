@@ -494,6 +494,7 @@ async def test_agent_composes_selected_skills_without_leaking_ineligible_content
     assert "current_understanding、choices、affected_work_ids、affected_branch 全部留空" in first_call
     assert "不要提交無 Task linkage 的 O／P／K／S 文件變更" in first_call
     assert "每個 ADD 只提交一個" in first_call
+    assert "field=whole_entity" in first_call
 
     second_call = _text_seen(model.seen_messages[1])
     assert "Task 邊界" in second_call

@@ -46,6 +46,7 @@ SKILLS_SYSTEM_PROMPT = """## Caliburn 專業分析方法
 **提交前的最小契約：**
 - 不得自行編造 UUID。只有 context 明列的既有 ID 才可引用；新理解、新焦點、新 Gap、新 Duty／Task／OPKS 的 ID 或關聯先留空，由應用程式配置。
 - 新增 Duty／Task 時 `display_order=-1`，由應用程式配置排序；每個 ADD 只提交一個實體，讓員工可逐項接受、修改或拒絕。
+- 新增／合併／拆分完整 Duty、Task 或 OPKS 時使用 `field=whole_entity`；`field=top_level_value` 只用於 job_title／work_description。
 - quote anchor 可留空；一般事實可只列 `source_ids`。若使用 anchor，`quote` 必須逐字存在於該來源，`start` 是 0-based 起點、`end` 是 exclusive 終點且等於 `start + len(quote)`；不得填 999 等占位值。
 - O／P／K／S 文件變更必須連到 context 已有的 Task ID；若本輪只有尚待配置 ID 的新 Task，可先分析成理解／Gap，**不要提交無 Task linkage 的 O／P／K／S 文件變更**。
 - `question.kind=none` 時其他 question 欄位全為空、`basis_ordinal=0`。

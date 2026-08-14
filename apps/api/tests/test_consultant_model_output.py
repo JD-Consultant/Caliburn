@@ -212,6 +212,14 @@ def test_model_facing_id_anchor_and_question_fields_explain_safe_sentinels() -> 
     )
 
 
+def test_model_facing_document_field_discriminators_are_unambiguous() -> None:
+    assert OutputDocumentField.VALUE.value == "top_level_value"
+    assert OutputDocumentField.ENTITY.value == "whole_entity"
+    description = OutputDocumentChange.model_fields["field"].description or ""
+    assert "job_title" in description
+    assert "whole_entity" in description
+
+
 def test_langchain_converts_the_same_closed_union_free_pydantic_contract() -> None:
     converted = convert_to_openai_tool(ConsultantModelOutput)
     assert converted["function"]["name"] == "ConsultantModelOutput"

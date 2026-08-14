@@ -187,6 +187,7 @@ def test_openrouter_adapter_round_trips_only_resolved_parameters() -> None:
     assert model.client.sdk_configuration.timeout_ms == 90_000
     assert model.client.sdk_configuration.retry_config is None
     assert model.max_retries == 0
+    assert model.default_headers == {"X-OpenRouter-Metadata": "enabled"}
     assert "test-secret" not in repr(model.metadata)
 
 
@@ -204,7 +205,17 @@ def test_openrouter_adapter_preserves_actual_route_and_cost_metadata() -> None:
             "object": "chat.completion",
             "created": 1,
             "model": "anthropic/claude-opus-5-20260801",
-            "provider": "Anthropic",
+            "openrouter_metadata": {
+                "endpoints": {
+                    "available": [
+                        {
+                            "provider": "Anthropic",
+                            "model": "anthropic/claude-opus-5-20260801",
+                            "selected": True,
+                        }
+                    ]
+                }
+            },
             "choices": [
                 {
                     "index": 0,

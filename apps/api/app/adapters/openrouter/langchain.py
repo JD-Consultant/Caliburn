@@ -9,6 +9,24 @@ from langchain_openrouter import ChatOpenRouter
 from app.consultant.model_runtime import ResolvedExecution
 
 
+def _selected_router_endpoint(payload: dict[str, Any]) -> dict[str, Any]:
+    metadata = payload.get("openrouter_metadata")
+    if not isinstance(metadata, dict):
+        return {}
+    endpoints = metadata.get("endpoints")
+    available = endpoints.get("available") if isinstance(endpoints, dict) else None
+    if not isinstance(available, list):
+        return {}
+    return next(
+        (
+            endpoint
+            for endpoint in available
+            if isinstance(endpoint, dict) and endpoint.get("selected") is True
+        ),
+        {},
+    )
+
+
 class ReceiptChatOpenRouter(ChatOpenRouter):
     """Keep route facts that langchain-openrouter 0.2.7 otherwise discards."""
 
@@ -19,8 +37,9 @@ class ReceiptChatOpenRouter(ChatOpenRouter):
             else response.model_dump(by_alias=True)
         )
         result = super()._create_chat_result(response)
-        provider = payload.get("provider")
-        model = payload.get("model")
+        selected = _selected_router_endpoint(payload)
+        provider = payload.get("provider") or selected.get("provider")
+        model = selected.get("model") or payload.get("model")
         for generation in result.generations:
             message = generation.message
             if provider is not None:
@@ -38,13 +57,20 @@ def build_openrouter_chat_model(
 ) -> ReceiptChatOpenRouter:
     if not api_key.strip():
         raise ValueError("OpenRouter API key is required")
+    import httpx
     import openrouter
 
     parameters = execution.effective_parameters
     timeout_ms = int(execution.timeout_seconds * 1_000)
+    router_headers = {"X-OpenRouter-Metadata": "enabled"}
     sdk_client = openrouter.OpenRouter(
         api_key=api_key,
         server_url=base_url,
+        client=httpx.Client(headers=router_headers, follow_redirects=True),
+        async_client=httpx.AsyncClient(
+            headers=router_headers,
+            follow_redirects=True,
+        ),
         timeout_ms=timeout_ms,
         retry_config=None,
     )
@@ -55,6 +81,7 @@ def build_openrouter_chat_model(
         base_url=base_url,
         timeout=timeout_ms,
         max_retries=0,
+        default_headers=router_headers,
         temperature=parameters.temperature,
         top_p=parameters.top_p,
         frequency_penalty=parameters.frequency_penalty,

@@ -53,7 +53,7 @@
 
   Expected: exit 0；ADR 0061 維持 schema-only，Tool 決策只在新 ADR 0062。
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
   ```powershell
   git add docs/adr/0062-bounded-consultant-read-tools-and-structured-authority.md docs/adr/README.md docs/specs/2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md docs/specs/2026-08-14-consultant-runtime-north-star-audit-ledger.md docs/plans/2026-08-14-consultant-tool-surface-upgrade-plan.md
@@ -111,7 +111,7 @@
 
   Expected: PASS。
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
   ```powershell
   git add apps/api/app/consultant/context.py apps/api/app/consultant/run_service.py apps/api/tests/test_consultant_context.py apps/api/tests/test_consultant_run_service.py
@@ -168,7 +168,7 @@
 
   Expected: PASS；同一 AI message 的 `read_file` 與 `employee_source_get` 只計一個 lookup wave。
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
   ```powershell
   git add apps/api/app/consultant/agent.py apps/api/tests/test_consultant_agent_and_skills.py
@@ -179,6 +179,7 @@
 
 **Files:**
 - Modify: `docs/design/consultant-runtime.md`
+- Modify: `docs/specs/2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md`（同步關卡狀態）
 - Modify: `docs/specs/2026-08-14-consultant-runtime-north-star-audit-ledger.md`
 - Modify: `docs/plans/2026-08-13-langgraph-consultant-runtime-big-bang-plan.md`
 
@@ -186,19 +187,19 @@
 - Consumes: Tasks 1–3 的 Tool 名稱、排程與 authority 邊界。
 - Produces: 實作者可依循的 current runtime 設計，並記錄本輪沒有偏離產品北極星。
 
-- [ ] **Step 1: 更新 runtime 設計**
+- [x] **Step 1: 更新 runtime 設計**
 
   寫明四個 Tool 都唯讀，structured result 不是 business Tool，employee review command 不得由模型呼叫。
 
-- [ ] **Step 2: 回查七個產品不變量**
+- [x] **Step 2: 回查七個產品不變量**
 
   逐項對照：單一顧問、前景焦點/背景吸收、動態 Task/Duty/OPKS、記得員工原話、LLM 內容先審後入、必要澄清/一般 Gap 分流、自然離開後續談。
 
-- [ ] **Step 3: 確認本輪沒有偷渡延後範圍**
+- [x] **Step 3: 確認本輪沒有偷渡延後範圍**
 
   文件明記：沒有 RAG、沒有能力級別/A、沒有正式 eval、沒有 Tool Search/MCP、沒有多 Agent。
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
   ```powershell
   git add docs/design/consultant-runtime.md docs/specs/2026-08-14-consultant-runtime-north-star-audit-ledger.md docs/plans/2026-08-13-langgraph-consultant-runtime-big-bang-plan.md

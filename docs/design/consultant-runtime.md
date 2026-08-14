@@ -1,7 +1,7 @@
 # AI 職務顧問 runtime 設計
 
-- 決策：[ADR 0060](../adr/0060-langchain-langgraph-consultant-runtime-and-durable-authority.md)；Task 10 schema 修正：[ADR 0061](../adr/0061-compact-consultant-wire-progressive-skills-and-tools.md)
-- 狀態：Task 9 composition hard cut 已完成；目前 production 僅保留 LangChain／LangGraph 顧問 runtime、purpose-first API／Web、fresh-root storage 與 deterministic export。Task 10 已把 28 optional／20 union 的 rich provider schema 換成 0 optional／0 union／0 open object、depth 4 的 compact Pydantic wire＋pure mapper；Tool／Skill loading 邊界尚待下一輪討論，付費 exact conformance、UI smoke、最終複審與交付標記仍未執行。
+- 決策：[ADR 0060](../adr/0060-langchain-langgraph-consultant-runtime-and-durable-authority.md)；Task 10 schema 修正：[ADR 0061](../adr/0061-compact-consultant-wire-progressive-skills-and-tools.md)；Tool 邊界：[ADR 0062](../adr/0062-bounded-consultant-read-tools-and-structured-authority.md)
+- 狀態：Task 9 composition hard cut 已完成；目前 production 僅保留 LangChain／LangGraph 顧問 runtime、purpose-first API／Web、fresh-root storage 與 deterministic export。Task 10 已把 28 optional／20 union 的 rich provider schema 換成 0 optional／0 union／0 open object、depth 4 的 compact Pydantic wire＋pure mapper；ADR 0062 已把 model-facing surface 收斂為四個唯讀 Tool 與依賴驅動 lookup。付費 exact conformance、UI smoke、最終複審與交付標記仍未執行。
 - 實作：`apps/api/app/consultant`、`apps/api/app/adapters/langgraph`、`apps/api/app/adapters/openrouter/langchain.py`
 
 ## 儲存權威
@@ -40,7 +40,7 @@ checkpoint 不複製員工逐字來源；Store 不保存第二份核准文件。
 ## 模型執行
 
 - Versioned model profile 只決定 requested model、唯一 provider、有效參數與 timeout；versioned run policy 只決定 eligible Skills／tools、context／call／token／time／cost budget 與 retry。兩者在每次 run 前解析成 immutable `ResolvedExecution`，Skill 不能選模型。
-- `ChatOpenRouter` 承接 provider wire。rich application result 不直接送 provider；LangChain `response_format` 使用 compact Pydantic `ConsultantModelOutput`，再由 fail-closed pure mapper 還原 rich `ConsultantResult`。Evidence 只在 `analysis_bases` 出現一次，回覆與各 effect 用 1-based ordinal 引用；越界、未引用與矛盾 payload 都拒絕。同一位顧問、同一 model profile 的 bounded `create_agent` loop 維持不變；Tool／Skill loading 與是否需要 contingency finalization 尚未在 schema 決策中定案。
+- `ChatOpenRouter` 承接 provider wire。rich application result 不直接送 provider；LangChain `response_format` 使用 compact Pydantic `ConsultantModelOutput`，再由 fail-closed pure mapper 還原 rich `ConsultantResult`。Evidence 只在 `analysis_bases` 出現一次，回覆與各 effect 用 1-based ordinal 引用；越界、未引用與矛盾 payload 都拒絕。同一位顧問、同一 model profile 的 bounded `create_agent` loop 維持不變；四個唯讀 Tool 與 Skill progressive disclosure 依 ADR 0062，tool-free contingency finalization 只有 exact conformance 仍失敗時才評估。
 - structured-output strategy 是 versioned model profile 的已解析能力，不由 LangChain 自動猜測或 fallback。現行 `ToolStrategy` 曾產生錯誤的多重輸出工具呼叫，因此 Opus 5／OpenRouter profile 只能選通過 exact conformance 的 provider-native strategy；換模型／provider 也必須重跑窄 canary。這保留可換模型，同時避免把所有 strategy 假定為可互換。
 - model／tool call limit、retry、非權威摘要與唯讀工具結果清理由 LangChain built-in middleware 承接。OpenRouter SDK 自己的通用 retry 關閉；LangChain 1.3.15 `SummarizationMiddleware` 內建的獨立三次 retry也由窄 subclass關閉，所有 primary／必要 contingency finalization／摘要共用同一個 run attempt budget，避免框架內部出現無紀錄重試。
 - 第一版固定單一 route 且禁止 fallback。adapter 保留 OpenRouter 回傳的實際 provider、model 與 cost；LangChain callback 對每個真實 attempt 各寫一張含 primary／summarization kind 的 payload-free receipt與 OpenTelemetry span。成功 attempt 若缺 route、usage，或在啟用 cost budget 時缺 cost，deterministic verifier 會在 semantic commit 前 fail closed。provider error 只保留安全分類／HTTP status，不把原始例外訊息或可能回顯的員工內容寫入 receipt／telemetry。
@@ -53,10 +53,27 @@ checkpoint 不複製員工逐字來源；Store 不保存第二份核准文件。
 1. bounded global orientation 讓模型知道目前已辨識的工作範圍、有效工作假說、核准 Duty／Task、目前工作、Gap 與待審數量；它不是只看核准文件，也不把舊版／retired 理解重新送回模型；
 2. 載入目前焦點的核准文件 slice、目前有效且與焦點相關的可修訂理解、具體 Gap、待審 handles、最近有界顧問回合與必要澄清；
 3. checkpoint message 只留帶 stable source ID 的 placeholder；本輪員工原話每次從 Store 逐字重載到明標「不可信 evidence」的 authority Context，明確 required evidence 必帶，相關近期來源在 token budget 內加入；
-4. 只有本輪、required 與近期相關來源的 stable lookup handle 進 prompt；更早來源不列出全部 ID，模型可透過同文件 lexical search 再以 ID／correction lineage 按需讀取。現階段沒有設定 semantic index，也沒有連接 Reference／RAG bounded context；
+4. 只有本輪、required 與近期相關來源的 stable lookup handle 進 prompt；更早來源不列出全部 ID，模型可透過同文件 `employee_source_search`，再以 `employee_source_get`／`employee_source_lineage` 按需讀取。model-facing 名稱不綁 lexical backend，但現階段沒有 semantic index，也沒有連接 Reference／RAG bounded context；
 5. Context selection receipt 只存 ID、hash、原因、revision、Skills、token 與降級資訊，不複製員工文字。
 
 明確降級順序是：先捨棄非權威 dialogue summary，再壓縮 global orientation，再把最近兩個顧問回合縮成正在回答的上一回合，再略過超出預算的近期候選來源。本輪原話、required evidence、必要澄清、blocking Gap、焦點理解與焦點核准 slice 不會被摘要取代；這些 mandatory 內容本身超出 budget 時直接回 typed error。即使 LangChain 已把舊 message history 摘要化，middleware 仍會從 Store 重建 authority Context；tool loop 後續推論不會把員工回答重複追加到 ToolMessage 後面。
+
+## Model-facing Tool 與 authority 邊界
+
+第一版只暴露四個小型、靜態、唯讀 Tool：
+
+| Tool | 唯一目的 | 模型提供的輸入 |
+|---|---|---|
+| `read_file` | 完整讀取一份本輪 eligible 的職務分析 Skill | exact `/skills/<skill-id>/SKILL.md` path；`offset`／`limit` 省略 |
+| `employee_source_get` | 已知 stable ID 時取回一筆員工原話 | `source_id` |
+| `employee_source_lineage` | 原話被更正／取代時取回完整 lineage | `source_id` |
+| `employee_source_search` | 不知道 ID 時搜尋同文件目前有效原話 | `query` |
+
+`document_id`、權限、source namespace 與搜尋上限由 application 注入。來源回傳保留 stable ID、exact text、speaker、validity、timestamp 及 correction pointers；跨文件與不存在來源 fail closed。Tool 定義數只有四個，沒有 Tool Search、MCP catalog、keyword router、另一個 LLM selector 或 provider beta。
+
+Tool Calling 不承載文件 authority：ADD／REVISE／WITHDRAW／MERGE／SPLIT、重新歸類與排序都在 provider-native Structured Output 中成為 typed review draft；accept／edit-accept／reject／defer 是員工透過 API 發出的 LangGraph command，模型不能呼叫。必要澄清同樣由 Structured Output 表達，再用 `interrupt()`／`Command(resume=...)` 處理；Focus、Gap 與 Progress 是 durable state／projection，不是 Tool。
+
+lookup 由當下資料依賴決定：context 足夠可零呼叫；彼此獨立的 Skill／員工來源可在同一 model response 平行讀取；只有前一波結果產生新依賴才用第二波。最多三次 model call、兩個 lookup waves 與總 Tool／token／time／cost budget 不變。
 
 ## 專業分析 Skills 與模型結果閘門
 
@@ -110,7 +127,7 @@ LangGraph checkpoint、`StateGraph` command 與 `interrupt()`／`Command(resume)
 新 `/api/v1/job-analysis/consultant-documents` surface 只輸出 purpose-first projection，不暴露 checkpoint raw state、command receipt、Context selection 或 model attempt 內部資料。JSON Schema 生成 Pydantic 與 TypeScript 型別；FastAPI native SSE 只發送帶 revision／run ID 的 refetch notification， durable snapshot 才是狀態權威。
 
 - 建立／讀取／刪除文件、202 source-first answer admission、snapshot、review、calibration、required clarification、direct edit 與單一 export 都走同一 application-scoped runtime；同文件 admission lock 不再因 request-local dependency 而失效。
-- model factory 只在 composition root 注入；`app.consultant` 不直接依賴 OpenRouter adapter。LangChain source lookup tools 已接到真正 agent tool surface，且只允許同文件 exact source／lineage／lexical search；沒有 semantic retrieval、Reference 或 RAG tool。
+- model factory 只在 composition root 注入；`app.consultant` 不直接依賴 OpenRouter adapter。三個 LangChain employee-source tools 已接到真正 agent surface，且只允許同文件 stable-ID get／correction lineage／bounded search；目前 search backend 仍是 lexical，沒有 semantic retrieval、Reference 或 RAG tool。
 - export readiness 有具體 gap 時回 409，員工以同一入口 `force=true` 明確確認後仍可匯出；pending changeset 不會被匯出或暗中接受。
 - production 只保留 `/consultant-documents` surface；舊 route、舊契約定義與舊 writer 已在 Task 9 同一 hard-cut 移除。沒有 DTO alias、雙寫或 compatibility layer。
 
@@ -152,4 +169,4 @@ Next App Router 頁面只負責掛載 purpose-first Client Component；TanStack 
 
 ## 當前邊界
 
-這個 runtime 已有可替換模型 profile、LangChain agent harness、attempt receipt、Context middleware、真實顧問 Skills、adaptive interview routing、可見理解／Gap／語意進度、完整文件 patch／review command、deterministic authority、required-clarification interrupt、generated contract／production API transport、員工顧問工作區與 deterministic XLSX export。Task 9 已完成舊 composition／writer／route／contract／migration hard cut；fresh root 只建立最小 catalog，LangGraph 官方 setup 擁有 Saver／Store tables。Task 10 的 compact provider wire＋pure mapper 已完成離線 gates；Tool／Skill loading、付費 live conformance 與是否需要 contingency finalization仍待後續討論／授權。它沒有 RAG／Reference consumer、能力級別／A 生成或正式品質 eval，也沒有雙寫或 compatibility layer。
+這個 runtime 已有可替換模型 profile、LangChain agent harness、attempt receipt、Context middleware、真實顧問 Skills、四個受限唯讀 Tool、adaptive interview routing、可見理解／Gap／語意進度、完整文件 patch／review command、deterministic authority、required-clarification interrupt、generated contract／production API transport、員工顧問工作區與 deterministic XLSX export。Task 9 已完成舊 composition／writer／route／contract／migration hard cut；fresh root 只建立最小 catalog，LangGraph 官方 setup 擁有 Saver／Store tables。Task 10 的 compact provider wire＋pure mapper 與 ADR 0062 Tool surface 已完成 focused gates；付費 live conformance 與是否需要 contingency finalization 仍待後續授權／證據。它沒有 RAG／Reference consumer、能力級別／A 生成或正式品質 eval，也沒有雙寫或 compatibility layer。

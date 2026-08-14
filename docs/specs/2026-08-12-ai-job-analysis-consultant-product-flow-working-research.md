@@ -1466,9 +1466,9 @@ Owner 已確認：**模型、provider 與底層參數由本機維護者透過版
 | 1. 端到端情境 | 已收斂 | 正常、改道／更正與失敗恢復時，員工和顧問各自看到、知道、做什麼 | 情境涵蓋訪談重點、全域吸收、動態 Task／Duty／OPKS、進度、待審文件變更、自然離開／續談與匯出，且沒有未揭露的權威跳躍 |
 | 2. 目標能力地圖 | **已收斂（2026-08-13 owner 確認）** | 為了實現情境，系統必須具備哪些能力與不變條件 | 每項能力都有輸入、輸出、authority、持久化責任、失敗語意與 `Replace／Wrap／Retain` 判準 |
 | 3. 框架組合選型 | **已收斂（§9.12）** | 哪些成熟元件直接承接中立產品目的 | LangChain 1.x＋LangGraph 1.2.x 通過目的層與工程 conformance；其他候選只作歷史／fallback，不平行施工 |
-| 4. 目標架構 | **ADR 0060 Accepted；ADR 0061 Accepted（schema-only）** | framework primitive 如何合作，資料／API／Web／context／恢復／切換如何落地 | 每個目的都有 framework owner、可刪除舊機制、最薄產品 policy 與驗收；compact wire 已核准，Tool／Skill loading 另議 |
-| 5. 實作計畫 | **Tasks 1–9 已完成；Task 10 已依 §9.16 修訂** | 如何在隔離 worktree 內完成受限 Big-bang 並可驗證地切換 | Task 10 先 compact wire 與 deterministic gate，owner 授權後跑一次 exact live canary；RAG、能力級別／A 的 LLM 分析及正式 eval 均不在本階段 |
-| 6. 實作與切換 | **進行中；Task 10 暫停於決策 gate** | 依核准計畫施工、審核、驗證與切換 | ADR 0061 核准、focused/full gate、真模型 smoke 與 owner review 完成後才可交付 |
+| 4. 目標架構 | **ADR 0060／0061／0062 Accepted** | framework primitive 如何合作，資料／API／Web／context／恢復／切換如何落地 | 每個目的都有 framework owner、可刪除舊機制、最薄產品 policy 與驗收；compact wire 與四個受限唯讀 Tool 均已核准 |
+| 5. 實作計畫 | **Tasks 1–9 已完成；Task 10 schema 與 Task 11 Tool surface 已施工** | 如何在隔離 worktree 內完成受限 Big-bang 並可驗證地切換 | compact wire、bounded Tool 與 deterministic focused gates 完成；owner 另授權後才跑 exact live canary；RAG、能力級別／A 的 LLM 分析及正式 eval 均不在本階段 |
+| 6. 實作與切換 | **進行中；等待完整 gates 與交付決策** | 依核准計畫施工、審核、驗證與切換 | 完整 gate、必要的真模型 smoke 與 owner review 完成後才可交付 |
 
 每關卡收斂後應更新本表、在相鄰段落補齊 §0.1 的決策帳本，並以只包含該關卡文件變更的 commit 保存。若細節研究發現較佳方向但會改變已確認北極星，必須先回到產品層與 owner 討論；不得在 framework matrix、schema 或實作計畫中悄悄翻案。
 

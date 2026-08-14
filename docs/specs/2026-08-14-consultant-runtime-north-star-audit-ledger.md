@@ -1,8 +1,8 @@
 # AI 職務顧問 runtime：北極星審核與逐 Task 防偏帳本
 
 - 日期：2026-08-14
-- 狀態：Pre-implementation audit **Passed**；Tasks 1–9 **Passed**；Task 10 schema-only 修正已通過 focused gates，Tool／live canary／最終交付仍待後續
-- 決策：ADR 0060 **Accepted**；ADR 0061 **Accepted（schema-only；Tool 另議）**
+- 狀態：Pre-implementation audit **Passed**；Tasks 1–9 **Passed**；Task 10 schema-only 修正與 Task 11 Tool surface 已通過 focused gates，live canary／完整 gates／最終交付仍待後續
+- 決策：ADR 0060 **Accepted**；ADR 0061 **Accepted（schema-only）**；ADR 0062 **Accepted（四個受限唯讀 Tool）**
 - 施工計畫：[`2026-08-13-langgraph-consultant-runtime-big-bang-plan.md`](../plans/2026-08-13-langgraph-consultant-runtime-big-bang-plan.md)
 - 產品 SSOT：[`2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md`](2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md) §1–§8、§9.12–§9.16
 
@@ -44,7 +44,7 @@ Big-bang 只描述最終切換，不表示做到最後才審核。之後每完�
 | 中立產品／工程目的 | 採用的成熟元件 | Caliburn 尚留的最薄政策 | 審核 |
 |---|---|---|---|
 | 模型／provider／參數可換 | `ChatOpenRouter`＋LangChain model binding | provider/model allowlist、資料政策與 versioned profile | 已覆蓋 |
-| bounded consultant loop＋按需工具 | LangChain `create_agent`＋Skills／source tools | lookup wave、總 budget、typed availability | 框架已覆蓋；schema 本輪不改工具集合、description 或 wave，Tool／Skill loading 另議 |
+| bounded consultant loop＋按需工具 | LangChain `create_agent`＋Deep Agents Skills／Filesystem middleware＋三個 LangChain source tools | document scope、lookup wave、總 budget、typed availability | **已實作**；四個唯讀 Tool、精簡 description、application-bound args 與依賴驅動 lookup 依 ADR 0062 |
 | compact model-facing result | Pydantic compact DTO＋LangChain structured output | 職務語意、pure mapper 的 fail-closed 規則 | **已實作**；LangChain-facing schema 為 0 optional／0 union／0 open object、depth 4，rich framework state 不直接送 provider |
 | contingency finalization | 只在 exact canary 失敗時使用 LangChain tool-free `response_format` | 同 run handoff 與三次總上限 | 非預設；未證實需要前不增加 node／call |
 | call limit／retry | `ModelCallLimitMiddleware`、`ToolCallLimitMiddleware`、`ModelRetryMiddleware`、`ToolRetryMiddleware` | 哪些錯可重試、idempotency、每次 attempt receipt | 已覆蓋；plan 已補明 |
@@ -263,14 +263,15 @@ Big-bang 只描述最終切換，不表示做到最後才審核。之後每完�
 - schema 證據：LangChain 實際轉換後量測為 **0 optional、0 union、0 open object、object depth 4、約 9,754 minified bytes**；bytes 只記錄粗略訊號，不作 provider 上限。compact schema／mapper、LangChain conversion、agent wiring、model runtime 與 run-service focused suite 為 `86 passed`；完整 `test_consultant*.py` 面為 `137 passed, 26 skipped`（未注入 PostgreSQL URL 的 durable tests 依既有條件跳過）。付費 Opus 5 canary 未獲本輪授權、未執行。
 - 北極星回歸：一位顧問、動態 Task／Duty／OPKS、員工原話記憶、文件先審後入、必要澄清／Gap／審核分流、自然續談、可信進度、單一強制匯出、能力級別／A／RAG／eval 延後均未改。判定是**provider contract 形狀修正，無產品偏移**；Tool／Skill loading 應另議，不得從 schema 接線推定已核准。
 
-### Task 11：Tool surface 正式裁決與施工前北極星回歸
+### Task 11：Tool surface 正式裁決、實作與北極星回歸
 
-- 狀態：**Decision accepted；implementation in progress**。owner 在 schema-only ADR 0061 完成後，另行核准依最新主流 Tool Calling 做法直接施工；決策記於 ADR 0062，沒有事後改寫 ADR 0060／0061。
+- 狀態：**Focused implementation gates passed；full gates pending**。owner 在 schema-only ADR 0061 完成後，另行核准依最新主流 Tool Calling 做法直接施工；決策記於 ADR 0062，沒有事後改寫 ADR 0060／0061。
 - 官方共識：OpenAI、Anthropic、Google 都把 Tool Calling 用於外部資料、系統或動作，把 typed final response 留給 Structured Output；LangChain 對應為 Tool／middleware 與 provider-native response format。Anthropic 強調少量高價值、目的清楚、回傳高訊號且受限的 Tool，Google 建議清楚名稱與強型別，OpenAI 建議不要讓模型填 application 已知參數。
 - Tool Search 更正：先前「約 10 個 Tool 就建議」不是官方通用門檻。Anthropic 目前以數百至數千 Tool catalog 為主要情境，並指出選擇品質常在約 30–50 個才開始下降；OpenAI Tool Search 亦有大型 namespace 與 model/provider 前提。現行四個 Tool 不啟用 Tool Search、MCP catalog、dynamic LLM selector 或 provider beta。
 - 正式 surface：`read_file`、`employee_source_get`、`employee_source_lineage`、`employee_source_search`。全部唯讀且 document-scoped；application 注入 document ID、權限與搜尋上限。source payload 保留 stable ID、exact text、speaker、validity、timestamp 與 correction lineage。
 - primitive 分工：ADD／REVISE／WITHDRAW／MERGE／SPLIT 等是 Structured Output 的 typed review draft，不是模型 write Tool；accept／edit-accept／reject／defer 是 employee authority command；必要澄清是 typed result＋LangGraph interrupt；Focus／Gap／Progress 是 durable graph state／projection。
 - lookup 政策：context 足夠時零呼叫；獨立 Skill／source 可同波平行；只有前一結果產生新依賴才用第二波。保留三次 model call／兩波 lookup 的硬上限，不保留固定「先 Skill、後 Source」順序。
+- 實作證據：source builder 的 TDD 紅燈先由缺少 `build_employee_source_tools` 呈現；加入新名稱、server-bound `limit=5`、speaker 與 correction metadata 後，真 PostgreSQL targeted `2 passed`，`context`＋`run_service` 回歸 `10 passed`。`read_file` description 的紅燈實際捕捉到 framework 通用 PDF／image／edit／pagination 文案；改用 `FilesystemMiddleware.custom_tool_descriptions` 後，agent＋model runtime 回歸 `56 passed`。沒有重寫 Tool loop 或 Skill loader。
 - 北極星回歸：這次只替換／收斂通用讀取機制，沒有把產品變成 Tool 操作台或多 Agent，也沒有改動動態 Task／Duty／OPKS、員工原話記憶、文件先審後入、澄清／Gap／審核分流、自然離開／續談與單一強制匯出。沒有接 RAG、能力級別／A 或正式 eval。施工前判定 **Pass**。
 
 ## 8. 本次直接使用的一手來源

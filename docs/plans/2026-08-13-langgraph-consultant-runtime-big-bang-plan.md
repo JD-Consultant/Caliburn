@@ -4,7 +4,7 @@
 
 **Goal:** 以 LangChain／LangGraph 成熟元件直接取代 current AI／document-state 自寫機制，交付一位可自然續談、記得員工原話、動態選擇訪談重點、按需分析 Task／Duty／O／P／K／S、呈現可信缺口、讓員工審核所有 LLM 文件內容並可靠匯出的專業職務顧問。
 
-**Prerequisite（核心已滿足）:** Owner 於 2026-08-14 完成產品方向／成熟元件覆蓋審核後授權施工，ADR 0060 已 Accepted；owner 隨後核准 ADR 0061 的 schema-only 修正，Tool 邊界另議。
+**Prerequisite（核心已滿足）:** Owner 於 2026-08-14 完成產品方向／成熟元件覆蓋審核後授權施工，ADR 0060 已 Accepted；owner 隨後分別核准 ADR 0061 的 schema-only 修正與 ADR 0062 的四個受限唯讀 Tool 邊界。
 
 **Architecture:** 新建 `app/consultant` purpose-first runtime。LangGraph PostgreSQL Saver 是可修訂理解、動態訪談工作、缺口、待審文件變更與核准文件的唯一 semantic-state owner；Store 是員工原話／更正／quote 的唯一 source owner。LangChain bounded agent、middleware、OpenRouter binding，以及 Deep Agents `SkillsMiddleware`＋read-file-only middleware 承接 model loop、最小充分 context 與專業方法。API 以 generated contract＋typed SSE 投影 durable state；完成垂直切片後一次硬切並刪除舊 writer，不做 compatibility adapter 或雙寫。
 
@@ -264,7 +264,7 @@ Big-bang 只代表最後一次硬切，不允許累積十個 Task 後才發現�
 - Modify authority docs／design／audit only for confirmed P1／P2 corrections discovered by final review
 
 - [x] Replace the provider-facing rich `ConsultantResult` with compact Pydantic `ConsultantModelOutput` plus fail-closed pure mapper. Preserve every first-version product effect; normalize Evidence into one basis table with 1-based references; replace arbitrary document path／JSON with typed target／field／payload. Committed LangChain-facing metrics are 0 optional、0 union、0 open object、depth 4; contradiction and runtime mapping tests are green. No JSON repair or custom parser was added.
-- [ ] Discuss Tool／Skill loading separately with the owner. Until that decision, keep the current bounded loop, nine-Skill catalog／on-demand bodies and four read-only tools unchanged; do not infer approval for Tool Search、selector、provider beta、description changes or wave reordering from the schema decision.
+- [x] Discuss Tool／Skill loading separately with the owner. ADR 0062 now fixes four read-only tools (`read_file`、`employee_source_get`、`employee_source_lineage`、`employee_source_search`), application-bound scope／limit, concise framework-native `read_file` description and dependency-driven zero-to-two lookup waves. Structured document drafts remain provider-native output and employee decisions remain authority commands. No Tool Search、selector、provider beta、MCP、RAG or business write tool was introduced.
 - [ ] After deterministic gates, request explicit owner authorization for one paid exact conformance canary using the real Opus 5／OpenRouter profile, compact wire and all four production tools. If it passes, keep one loop. Only if it still fails may the same run split into tool-enabled analysis＋tool-free typed finalization; then share the existing three-call／timeout／cost／retry budget, attempt receipts, loaded-Skill/source lineage and verifier, and add no planner／scribe personas、multi-agent、hidden-chain-of-thought handoff or second state owner. The profile must never silently fallback to `ToolStrategy`.
 - [ ] Keep Evidence provider-neutral: Store source＋W3C-aligned quote selector＋Pydantic result＋deterministic verifier remain the required path. Treat LangChain `Citation`／Anthropic native citations as optional adapter capabilities only after annotation-preservation conformance; do not make them a new store, RAG dependency or substitute for semantic support checks.
 - [ ] Run fresh-DB migration and every deterministic gate: API, Web test／typecheck／lint, contract codegen, turbo, dependency guards and `git diff --check`.

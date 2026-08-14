@@ -242,11 +242,11 @@ def test_configured_execution_has_all_methods_and_only_non_rag_source_tools() ->
     assert execution.allowed_skill_ids == CONSULTANT_SKILL_IDS
     assert execution.allowed_tool_ids == (
         "read_file",
-        "source_by_id",
-        "source_lineage",
-        "source_lexical_search",
+        "employee_source_get",
+        "employee_source_lineage",
+        "employee_source_search",
     )
-    assert "source_semantic_search" not in execution.allowed_tool_ids
+    assert "employee_reference_search" not in execution.allowed_tool_ids
 
 
 @pytest.mark.asyncio

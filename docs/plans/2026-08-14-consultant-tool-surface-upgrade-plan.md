@@ -67,22 +67,23 @@
 - Modify: `apps/api/tests/test_consultant_run_service.py`
 - Modify: `apps/api/app/consultant/context.py`
 - Modify: `apps/api/app/consultant/run_service.py`
+- Modify: `apps/api/app/consultant/agent.py`（同步 lookup budget allowlist，避免新名稱繞過上限）
 
 **Interfaces:**
 - Consumes: `DocumentSourceLookup.by_id/lineage/search`、server-bound `document_id`。
 - Produces: `build_employee_source_tools(lookup, *, document_id) -> tuple[BaseTool, ...]`，Tool IDs 為 `employee_source_get`、`employee_source_lineage`、`employee_source_search`。
 
-- [ ] **Step 1: 先寫會失敗的 Tool 契約測試**
+- [x] **Step 1: 先寫會失敗的 Tool 契約測試**
 
   測試要求：Tool 名稱為新的 domain names；`employee_source_search` 只暴露 `query`；結果包含 `source_id`、`kind`、`speaker`、`text`、`created_at`、`validity`與 correction pointers；他文件 ID 無法讀取。
 
-- [ ] **Step 2: 執行紅燈**
+- [x] **Step 2: 執行紅燈**
 
   Run: `cd apps/api; uv run pytest -p no:cacheprovider tests/test_consultant_context.py::test_langchain_source_tools_are_document_scoped_and_expose_exact_evidence tests/test_consultant_run_service.py::test_configured_execution_has_all_methods_and_only_non_rag_source_tools -q`
 
   Expected: FAIL，原因是 production 仍暴露 `source_by_id/source_lineage/source_lexical_search` 與 model-controlled `limit`。
 
-- [ ] **Step 3: 實作最小 Tool 契約**
+- [x] **Step 3: 實作最小 Tool 契約**
 
   ```python
   EMPLOYEE_SOURCE_TOOL_IDS = (
@@ -104,7 +105,7 @@
 
   `document_id` 與 `limit=5` 都留在 closure/application，不進 model schema。
 
-- [ ] **Step 4: 執行綠燈與 context regression**
+- [x] **Step 4: 執行綠燈與 context regression**
 
   Run: `cd apps/api; uv run pytest -p no:cacheprovider tests/test_consultant_context.py tests/test_consultant_run_service.py -q`
 

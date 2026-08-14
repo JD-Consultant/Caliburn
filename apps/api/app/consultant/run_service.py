@@ -22,7 +22,7 @@ from app.consultant.context import (
     ConsultantContextMiddleware,
     ContextRequest,
     DocumentSourceLookup,
-    build_source_lookup_tools,
+    build_employee_source_tools,
 )
 from app.consultant.interview import VerifiedConsultantCommit
 from app.consultant.model_output import (
@@ -52,10 +52,10 @@ from app.consultant.verification import (
 )
 
 
-SOURCE_TOOL_IDS = (
-    "source_by_id",
-    "source_lineage",
-    "source_lexical_search",
+EMPLOYEE_SOURCE_TOOL_IDS = (
+    "employee_source_get",
+    "employee_source_lineage",
+    "employee_source_search",
 )
 logger = logging.getLogger(__name__)
 
@@ -105,7 +105,7 @@ def build_configured_execution(config: Settings) -> ResolvedExecution:
         revision=config.consultant_policy_revision,
         run_kind="interactive_consultation",
         allowed_skill_ids=CONSULTANT_SKILL_IDS,
-        allowed_tool_ids=("read_file", *SOURCE_TOOL_IDS),
+        allowed_tool_ids=("read_file", *EMPLOYEE_SOURCE_TOOL_IDS),
         max_context_tokens=config.consultant_max_context_tokens,
         max_model_calls=config.consultant_max_model_calls,
         max_lookup_waves=config.consultant_max_lookup_waves,
@@ -182,7 +182,7 @@ async def execute_admitted_consultant_turn(
             execution=execution,
             request=request,
         )
-        source_tools = build_source_lookup_tools(
+        source_tools = build_employee_source_tools(
             DocumentSourceLookup(runtime),
             document_id=document_id,
         )

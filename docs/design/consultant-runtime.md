@@ -1,7 +1,7 @@
 # AI 職務顧問 runtime 設計
 
 - 決策：[ADR 0060](../adr/0060-langchain-langgraph-consultant-runtime-and-durable-authority.md)；Task 10 schema 修正：[ADR 0061](../adr/0061-compact-consultant-wire-progressive-skills-and-tools.md)；Tool 邊界：[ADR 0062](../adr/0062-bounded-consultant-read-tools-and-structured-authority.md)
-- 狀態：Task 9 composition hard cut 已完成；目前 production 僅保留 LangChain／LangGraph 顧問 runtime、purpose-first API／Web、fresh-root storage 與 deterministic export。Task 10 已把 28 optional／20 union 的 rich provider schema 換成 0 optional／0 union／0 open object、depth 4 的 compact Pydantic wire＋pure mapper；ADR 0062 已把 model-facing surface 收斂為四個唯讀 Tool 與依賴驅動 lookup。付費 exact conformance、UI smoke、最終複審與交付標記仍未執行。
+- 狀態：Task 9 composition hard cut 已完成；目前 production 僅保留 LangChain／LangGraph 顧問 runtime、purpose-first API／Web、fresh-root storage 與 deterministic export。Task 10 已把 28 optional／20 union 的 rich provider schema 換成 0 optional／0 union／0 open object、depth 4 的 compact Pydantic wire＋pure mapper；ADR 0062 已把 model-facing surface 收斂為四個唯讀 Tool 與依賴驅動 lookup。GPT-5.6 Luna 第一輪付費 smoke、員工校準／文件審核及 live 缺口修復已完成；同 source 第二輪最終重跑仍待重新注入本機 OpenRouter key，UI smoke、正式品質 eval、最終複審與交付標記也尚未完成。
 - 實作：`apps/api/app/consultant`、`apps/api/app/adapters/langgraph`、`apps/api/app/adapters/openrouter/langchain.py`
 
 ## 儲存權威
@@ -169,4 +169,4 @@ Next App Router 頁面只負責掛載 purpose-first Client Component；TanStack 
 
 ## 當前邊界
 
-這個 runtime 已有可替換模型 profile、LangChain agent harness、attempt receipt、Context middleware、真實顧問 Skills、四個受限唯讀 Tool、adaptive interview routing、可見理解／Gap／語意進度、完整文件 patch／review command、deterministic authority、required-clarification interrupt、generated contract／production API transport、員工顧問工作區與 deterministic XLSX export。Task 9 已完成舊 composition／writer／route／contract／migration hard cut；fresh root 只建立最小 catalog，LangGraph 官方 setup 擁有 Saver／Store tables。Task 10 的 compact provider wire＋pure mapper 與 ADR 0062 Tool surface 已完成 focused gates；付費 live conformance 與是否需要 contingency finalization 仍待後續授權／證據。它沒有 RAG／Reference consumer、能力級別／A 生成或正式品質 eval，也沒有雙寫或 compatibility layer。
+這個 runtime 已有可替換模型 profile、LangChain agent harness、attempt receipt、Context middleware、真實顧問 Skills、四個受限唯讀 Tool、adaptive interview routing、可見理解／Gap／語意進度、完整文件 patch／review command、deterministic authority、required-clarification interrupt、generated contract／production API transport、員工顧問工作區與 deterministic XLSX export。Task 9 已完成舊 composition／writer／route／contract／migration hard cut；fresh root 只建立最小 catalog，LangGraph 官方 setup 擁有 Saver／Store tables。Task 10 的 compact provider wire＋pure mapper 與 ADR 0062 Tool surface 已完成 focused gates；GPT-5.6 Luna 第一輪付費 smoke 已驗證真實 route、使用量、員工審核與文件 authority，第二輪則實際找出並修正 OPKS wire 缺口，最終同 source retry 仍待本機 key。它沒有 RAG／Reference consumer、能力級別／A 生成或正式品質 eval，也沒有雙寫或 compatibility layer。

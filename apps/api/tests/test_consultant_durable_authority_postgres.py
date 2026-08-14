@@ -1599,15 +1599,18 @@ async def test_candidate_lifecycle_preserves_failed_retry_and_clears_on_correcti
             source_id=source_id,
             text="我負責管理採購作業。",
         )
-        await runtime.stage_candidate_revision(
+        first_request = _candidate_stage_request(
+            run_id=run_id,
+            source_id=source_id,
+            baseline_revision=admitted.revision,
+        )
+        first_receipt = await runtime.stage_candidate_revision(
             document_id=document_id,
-            request=_candidate_stage_request(
-                run_id=run_id,
-                source_id=source_id,
-                baseline_revision=admitted.revision,
-            ),
+            request=first_request,
         )
         staged = (await runtime.raw_state(document_id))["active_candidate"]
+        approved_before = admitted.approved_document
+        queue_before = admitted.review_queue
 
         await runtime.mark_consultant_run_failed(
             document_id=document_id,
@@ -1623,6 +1626,33 @@ async def test_candidate_lifecycle_preserves_failed_retry_and_clears_on_correcti
         )
         assert should_process is True
         assert (await runtime.raw_state(document_id))["active_candidate"] == staged
+
+        replay = await runtime.stage_candidate_revision(
+            document_id=document_id,
+            request=first_request,
+        )
+        replacement = await runtime.stage_candidate_revision(
+            document_id=document_id,
+            request=_candidate_stage_request(
+                run_id=run_id,
+                source_id=source_id,
+                baseline_revision=admitted.revision,
+                base_candidate_revision=1,
+                tool_call_id="candidate-tool-2",
+                summary="重新整理同一 run 的候選文件。",
+            ),
+        )
+        after_replacement = await runtime.reopen_document(document_id)
+        active_replacement = CandidateWorkspace.model_validate(
+            (await runtime.raw_state(document_id))["active_candidate"]
+        )
+
+        assert replay == first_receipt
+        assert replacement.candidate_revision == 2
+        assert active_replacement.candidate_revision == 2
+        assert active_replacement.baseline_revision == admitted.revision
+        assert after_replacement.approved_document == approved_before
+        assert after_replacement.review_queue == queue_before
 
         await runtime.mark_consultant_run_failed(
             document_id=document_id,

@@ -15,6 +15,7 @@ from app.consultant.document_review import (
     apply_review_command,
     block_review_dependent_work,
     create_document_changeset,
+    revalidate_review_queue,
     stale_superseded_review_actions,
     stale_review_queue_for_direct_edit,
 )
@@ -627,19 +628,20 @@ async def test_direct_edit_stales_only_conflicting_action_and_keeps_independent_
     assert approved.tasks[0].statement == "員工直接修改 A"
     assert approved.tasks[1].statement == "AI 修改 B"
 
-    state = await graph.ainvoke(
-        {},
-        _config(document_id),
-        context={
-            "action": "accept_changes",
-            "document_id": str(document_id),
-            "expected_revision": state["revision"],
-            "changeset_id": str(bundle.changeset_id),
-            "action_ids": [str(action_a.action_id)],
-        },
-    )
-    approved = ApprovedJobDocument.model_validate(state["approved_document"])
-    assert approved.tasks[0].statement == "員工直接修改 A"
+    with pytest.raises(DocumentReviewError, match="pending or deferred"):
+        await graph.ainvoke(
+            {},
+            _config(document_id),
+            context={
+                "action": "accept_changes",
+                "document_id": str(document_id),
+                "expected_revision": state["revision"],
+                "changeset_id": str(bundle.changeset_id),
+                "action_ids": [str(action_a.action_id)],
+            },
+        )
+    unchanged = ApprovedJobDocument.model_validate(state["approved_document"])
+    assert unchanged == approved
 
 
 @pytest.mark.asyncio
@@ -1626,6 +1628,303 @@ def test_duty_merge_and_split_are_atomic_with_task_reassignment(
     assert {item.duty_id for item in approved.duties} == {
         UUID(item["duty_id"]) for item in new_duties
     }
+
+
+def test_stale_local_prerequisite_cannot_be_plain_accepted_with_dependent() -> None:
+    document_id = uuid4()
+    source_id = uuid4()
+    document = ApprovedJobDocument(document_id=document_id)
+    bundle = create_document_changeset(
+        document_id=document_id,
+        run_id=uuid4(),
+        summary="具本地依賴的建議。",
+        read_revision=1,
+        document=document,
+        changes=(
+            _change(
+                source_id=source_id,
+                path="/duties",
+                operation=DocumentChangeOperation.ADD,
+                after={"statement": "管理採購作業"},
+            ).model_copy(update={"change_ref": "prerequisite"}),
+            _change(
+                source_id=source_id,
+                path="/job_title",
+                after="採購專員",
+            ).model_copy(
+                update={
+                    "change_ref": "dependent",
+                    "depends_on_change_refs": ("prerequisite",),
+                }
+            ),
+        ),
+        existing_review_queue={},
+        interview_work={},
+    )
+    prerequisite, dependent = bundle.actions
+    stale_prerequisite = prerequisite.model_copy(
+        update={
+            "status": DocumentChangeStatus.STALE,
+            "stale_reason": "前提已失效。",
+        }
+    )
+    stale_bundle = bundle.model_copy(
+        update={"actions": (stale_prerequisite, dependent)}
+    )
+    approved_before = document.model_dump(mode="json")
+    state = {
+        "approved_document": approved_before,
+        "review_queue": {
+            str(stale_bundle.changeset_id): stale_bundle.model_dump(mode="json")
+        },
+        "interview_work": {},
+        "understanding": {},
+        "gaps": {},
+    }
+
+    with pytest.raises(DocumentReviewError, match="pending or deferred"):
+        apply_review_command(
+            state,
+            action="accept_changes",
+            changeset_id=stale_bundle.changeset_id,
+            action_ids=(stale_prerequisite.action_id, dependent.action_id),
+            revision=2,
+        )
+
+    assert state["approved_document"] == approved_before
+
+
+def test_revalidation_stales_only_action_with_failed_external_dependency() -> None:
+    document_id = uuid4()
+    source_id = uuid4()
+    document = ApprovedJobDocument(document_id=document_id)
+    prerequisite = create_document_changeset(
+        document_id=document_id,
+        run_id=uuid4(),
+        summary="外部前提。",
+        read_revision=1,
+        document=document,
+        changes=(
+            _change(
+                source_id=source_id,
+                path="/duties",
+                operation=DocumentChangeOperation.ADD,
+                after={"statement": "管理採購作業"},
+            ),
+        ),
+        existing_review_queue={},
+        interview_work={},
+    )
+    prerequisite_action = prerequisite.actions[0]
+    conditional_document = apply_document_actions(document, prerequisite.actions)
+    duty_id = UUID(str(prerequisite_action.after["duty_id"]))  # type: ignore[index]
+    mixed = create_document_changeset(
+        document_id=document_id,
+        run_id=uuid4(),
+        summary="相依與獨立建議共存。",
+        read_revision=1,
+        document=conditional_document,
+        changes=(
+            _change(
+                source_id=source_id,
+                path=f"/duties/{duty_id}/statement",
+                after="管理國內外採購作業",
+            ).model_copy(
+                update={
+                    "depends_on_action_ids": (prerequisite_action.action_id,)
+                }
+            ),
+            _change(
+                source_id=source_id,
+                path="/job_title",
+                after="採購專員",
+            ),
+        ),
+        existing_review_queue={
+            str(prerequisite.changeset_id): prerequisite.model_dump(mode="json")
+        },
+        interview_work={},
+        external_dependency_action_ids=(prerequisite_action.action_id,),
+    )
+    rejected_prerequisite = prerequisite.model_copy(
+        update={
+            "actions": (
+                prerequisite_action.model_copy(
+                    update={
+                        "status": DocumentChangeStatus.REJECTED,
+                        "rejection_reason": "這不是我的工作。",
+                    }
+                ),
+            )
+        }
+    )
+
+    updated = revalidate_review_queue(
+        document,
+        {
+            str(rejected_prerequisite.changeset_id): rejected_prerequisite.model_dump(
+                mode="json"
+            ),
+            str(mixed.changeset_id): mixed.model_dump(mode="json"),
+        },
+        stale_reason="核准文件已變更。",
+    )
+
+    updated_mixed = DocumentChangeSet.model_validate(
+        updated[str(mixed.changeset_id)]
+    )
+    assert updated_mixed.actions[0].status is DocumentChangeStatus.STALE
+    assert updated_mixed.actions[1].status is DocumentChangeStatus.PENDING
+
+
+def test_revalidation_propagates_local_dependency_failure_without_touching_independent_action() -> None:
+    document_id = uuid4()
+    source_id = uuid4()
+    document = ApprovedJobDocument(document_id=document_id)
+    bundle = create_document_changeset(
+        document_id=document_id,
+        run_id=uuid4(),
+        summary="本地依賴與獨立建議。",
+        read_revision=1,
+        document=document,
+        changes=(
+            _change(
+                source_id=source_id,
+                path="/duties",
+                operation=DocumentChangeOperation.ADD,
+                after={"statement": "管理採購作業"},
+            ).model_copy(update={"change_ref": "local-root"}),
+            _change(
+                source_id=source_id,
+                path="/job_title",
+                after="採購專員",
+            ).model_copy(
+                update={
+                    "change_ref": "local-dependent",
+                    "depends_on_change_refs": ("local-root",),
+                }
+            ),
+            _change(
+                source_id=source_id,
+                path="/work_description",
+                after="執行採購相關工作。",
+            ).model_copy(update={"change_ref": "independent"}),
+        ),
+        existing_review_queue={},
+        interview_work={},
+    )
+    root, dependent, independent = bundle.actions
+    rejected_root = root.model_copy(
+        update={
+            "status": DocumentChangeStatus.REJECTED,
+            "rejection_reason": "這不是我的工作。",
+        }
+    )
+    rejected_bundle = bundle.model_copy(
+        update={"actions": (rejected_root, dependent, independent)}
+    )
+
+    updated = revalidate_review_queue(
+        document,
+        {str(bundle.changeset_id): rejected_bundle.model_dump(mode="json")},
+        stale_reason="核准文件已變更。",
+    )
+
+    actions = DocumentChangeSet.model_validate(
+        updated[str(bundle.changeset_id)]
+    ).actions
+    assert actions[0].status is DocumentChangeStatus.REJECTED
+    assert actions[1].status is DocumentChangeStatus.STALE
+    assert actions[2].status is DocumentChangeStatus.PENDING
+
+
+def test_revalidation_reaches_fixed_point_after_atomic_and_three_level_cascade() -> None:
+    document_id = uuid4()
+    source_id = uuid4()
+    document = ApprovedJobDocument(document_id=document_id)
+    bundle = create_document_changeset(
+        document_id=document_id,
+        run_id=uuid4(),
+        summary="三層依賴與原子群組。",
+        read_revision=1,
+        document=document,
+        changes=(
+            _change(
+                source_id=source_id,
+                path="/duties",
+                operation=DocumentChangeOperation.ADD,
+                after={"statement": "第一層前提"},
+            ).model_copy(update={"change_ref": "level-one"}),
+            _change(
+                source_id=source_id,
+                path="/duties",
+                operation=DocumentChangeOperation.ADD,
+                after={"statement": "第二層相依"},
+            ).model_copy(
+                update={
+                    "change_ref": "level-two",
+                    "depends_on_change_refs": ("level-one",),
+                    "atomic_group_ref": "level-two-group",
+                }
+            ),
+            _change(
+                source_id=source_id,
+                path="/duties",
+                operation=DocumentChangeOperation.ADD,
+                after={"statement": "第二層原子同伴"},
+            ).model_copy(
+                update={
+                    "change_ref": "level-two-sibling",
+                    "atomic_group_ref": "level-two-group",
+                }
+            ),
+            _change(
+                source_id=source_id,
+                path="/job_title",
+                after="採購專員",
+            ).model_copy(
+                update={
+                    "change_ref": "level-three",
+                    "depends_on_change_refs": ("level-two-sibling",),
+                }
+            ),
+        ),
+        existing_review_queue={},
+        interview_work={},
+    )
+    level_one, level_two, atomic_sibling, level_three = bundle.actions
+    rejected_level_one = level_one.model_copy(
+        update={
+            "status": DocumentChangeStatus.REJECTED,
+            "rejection_reason": "前提不成立。",
+        }
+    )
+    rejected_bundle = bundle.model_copy(
+        update={
+            "actions": (
+                rejected_level_one,
+                level_two,
+                atomic_sibling,
+                level_three,
+            )
+        }
+    )
+
+    updated = revalidate_review_queue(
+        document,
+        {str(bundle.changeset_id): rejected_bundle.model_dump(mode="json")},
+        stale_reason="核准文件已變更。",
+    )
+
+    actions = DocumentChangeSet.model_validate(
+        updated[str(bundle.changeset_id)]
+    ).actions
+    assert actions[0].status is DocumentChangeStatus.REJECTED
+    assert tuple(action.status for action in actions[1:]) == (
+        DocumentChangeStatus.STALE,
+        DocumentChangeStatus.STALE,
+        DocumentChangeStatus.STALE,
+    )
 
 
 def test_external_dependency_must_be_employee_accepted_before_dependent_action() -> None:

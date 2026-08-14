@@ -32,6 +32,10 @@ _UNRESOLVED = {
     DocumentChangeStatus.PENDING,
     DocumentChangeStatus.DEFERRED,
 }
+_SATISFIED = {
+    DocumentChangeStatus.ACCEPTED,
+    DocumentChangeStatus.EDIT_ACCEPTED,
+}
 
 
 class CandidateWorkspaceError(ValueError):
@@ -159,6 +163,27 @@ def candidate_revision_digest(changeset: DocumentChangeSet) -> str:
     return _canonical_digest(changeset.model_dump(mode="json"))
 
 
+def candidate_staging_baseline(
+    state: Mapping[str, Any],
+    *,
+    run_id: UUID,
+) -> int:
+    """Return the application-verified baseline retained for one active run."""
+
+    actual_revision = int(state.get("revision", 0))
+    active_payload = state.get("active_candidate")
+    if active_payload is None:
+        return actual_revision
+    active = CandidateWorkspace.model_validate(active_payload)
+    if active.run_id != run_id:
+        raise CandidateRevisionConflict("active candidate belongs to another run")
+    if actual_revision < active.baseline_revision:
+        raise CandidateRevisionConflict(
+            "thread revision predates the active candidate baseline"
+        )
+    return active.baseline_revision
+
+
 def _receipt_from_tool(receipt: CandidateToolReceipt) -> CandidateEditReceipt:
     return CandidateEditReceipt(
         candidate_revision=receipt.candidate_revision,
@@ -188,15 +213,8 @@ def _dependency_closure(
     roots: Sequence[UUID],
     actions: Mapping[UUID, DocumentPatchAction],
 ) -> tuple[DocumentPatchAction, ...]:
-    ordered: list[DocumentPatchAction] = []
-    visiting: set[UUID] = set()
-    visited: set[UUID] = set()
-
-    def visit(action_id: UUID) -> None:
-        if action_id in visiting:
-            raise CandidateDependencyError("external dependency cycle")
-        if action_id in visited:
-            return
+    root_ids = tuple(sorted(set(roots), key=str))
+    for action_id in root_ids:
         action = actions.get(action_id)
         if action is None:
             raise CandidateDependencyError(
@@ -206,15 +224,70 @@ def _dependency_closure(
             raise CandidateDependencyError(
                 f"external dependency {action_id} is {action.status.value}"
             )
+
+    members_by_group: dict[UUID, tuple[DocumentPatchAction, ...]] = {}
+    for action in actions.values():
+        if action.atomic_subgroup_id is None:
+            continue
+        members_by_group[action.atomic_subgroup_id] = (
+            *members_by_group.get(action.atomic_subgroup_id, ()),
+            action,
+        )
+
+    selected: set[UUID] = set()
+    pending = list(reversed(root_ids))
+    while pending:
+        action_id = pending.pop()
+        action = actions.get(action_id)
+        if action is None:
+            raise CandidateDependencyError(
+                f"external dependency {action_id} does not exist"
+            )
+        if action.status in _SATISFIED:
+            continue
+        if action.status not in _UNRESOLVED:
+            raise CandidateDependencyError(
+                f"external dependency {action_id} is {action.status.value}"
+            )
+        if action_id in selected:
+            continue
+        selected.add(action_id)
+        pending.extend(reversed(action.depends_on_action_ids))
+        if action.atomic_subgroup_id is not None:
+            for member in members_by_group[action.atomic_subgroup_id]:
+                if member.status in _SATISFIED:
+                    continue
+                if member.status not in _UNRESOLVED:
+                    raise CandidateDependencyError(
+                        "external atomic subgroup contains terminal action "
+                        f"{member.action_id} ({member.status.value})"
+                    )
+                if member.action_id not in selected:
+                    pending.append(member.action_id)
+
+    ordered: list[DocumentPatchAction] = []
+    visiting: set[UUID] = set()
+    visited: set[UUID] = set()
+
+    def visit(action_id: UUID) -> None:
+        if action_id in visiting:
+            raise CandidateDependencyError("external dependency cycle")
+        if action_id in visited:
+            return
         visiting.add(action_id)
+        action = actions[action_id]
         for dependency_id in action.depends_on_action_ids:
-            visit(dependency_id)
+            if dependency_id in selected:
+                visit(dependency_id)
         visiting.remove(action_id)
         visited.add(action_id)
         ordered.append(action)
 
-    for root in sorted(set(roots), key=str):
-        visit(root)
+    for action_id in root_ids:
+        if action_id in selected:
+            visit(action_id)
+    for action_id in sorted(selected, key=str):
+        visit(action_id)
     return tuple(ordered)
 
 
@@ -308,10 +381,11 @@ def materialize_candidate_workspace(
 ) -> tuple[CandidateWorkspace, CandidateEditReceipt]:
     """Purely validate and replace one candidate revision; never mutate input state."""
 
-    actual_revision = int(state.get("revision", 0))
-    if actual_revision != stage.baseline_revision:
+    expected_baseline = candidate_staging_baseline(state, run_id=stage.run_id)
+    if stage.baseline_revision != expected_baseline:
         raise CandidateRevisionConflict(
-            f"expected baseline revision {stage.baseline_revision}, found {actual_revision}"
+            f"expected baseline revision {expected_baseline}, "
+            f"found {stage.baseline_revision}"
         )
     existing_payload = state.get("active_candidate")
     existing = (
@@ -320,6 +394,10 @@ def materialize_candidate_workspace(
         else None
     )
     if existing is not None:
+        if existing.run_id != stage.run_id:
+            raise CandidateRevisionConflict("active candidate belongs to another run")
+        if existing.baseline_revision != stage.baseline_revision:
+            raise CandidateRevisionConflict("active candidate baseline changed")
         replay = existing.tool_receipts.get(stage.tool_call_id)
         if replay is not None:
             if replay.request_sha256 != stage.request_sha256:
@@ -327,10 +405,6 @@ def materialize_candidate_workspace(
                     f"candidate tool call {stage.tool_call_id} was reused with another payload"
                 )
             return existing, _receipt_from_tool(replay)
-        if existing.run_id != stage.run_id:
-            raise CandidateRevisionConflict("active candidate belongs to another run")
-        if existing.baseline_revision != stage.baseline_revision:
-            raise CandidateRevisionConflict("active candidate baseline changed")
     current_candidate_revision = existing.candidate_revision if existing else 0
     if stage.base_candidate_revision != current_candidate_revision:
         raise CandidateRevisionConflict(

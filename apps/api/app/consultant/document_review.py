@@ -826,20 +826,15 @@ def _selected_actions(
     selected = tuple(
         item for item in bundle.actions if item.action_id in set(action_ids)
     )
-    terminal = [
+    unselectable = [
         item.action_id
         for item in selected
-        if item.status
-        in {
-            DocumentChangeStatus.ACCEPTED,
-            DocumentChangeStatus.EDIT_ACCEPTED,
-            DocumentChangeStatus.REJECTED,
-        }
+        if item.status not in _UNRESOLVED_STATUSES
     ]
-    if terminal:
+    if unselectable:
         raise DocumentReviewError(
-            "patch actions already have a final decision: "
-            + ", ".join(map(str, terminal))
+            "only pending or deferred patch actions can be selected: "
+            + ", ".join(map(str, unselectable))
         )
     return selected
 
@@ -943,61 +938,71 @@ def revalidate_review_queue(
     *,
     stale_reason: str,
 ) -> dict[str, dict[str, Any]]:
-    action_statuses: dict[UUID, DocumentChangeStatus] = {}
-    for raw in review_queue.values():
-        candidate_bundle = DocumentChangeSet.model_validate(raw)
-        for candidate in candidate_bundle.actions:
-            if candidate.action_id in action_statuses:
+    bundles = {
+        key: DocumentChangeSet.model_validate(raw)
+        for key, raw in review_queue.items()
+    }
+    actions_by_id: dict[UUID, DocumentPatchAction] = {}
+    for bundle in bundles.values():
+        for action in bundle.actions:
+            if action.action_id in actions_by_id:
                 raise DocumentReviewError(
-                    f"duplicate review action identity {candidate.action_id}"
+                    f"duplicate review action identity {action.action_id}"
                 )
-            action_statuses[candidate.action_id] = candidate.status
+            actions_by_id[action.action_id] = action
+
+    dependency_reason = (
+        "前置審核動作已被拒絕、失效或不存在，請重新建立這項建議。"
+    )
+    while True:
+        changed = False
+        next_actions = dict(actions_by_id)
+        for action_id, action in actions_by_id.items():
+            if action.status not in _UNRESOLVED_STATUSES:
+                continue
+            dependencies = tuple(
+                actions_by_id.get(dependency_id)
+                for dependency_id in action.depends_on_action_ids
+            )
+            has_failed_dependency = any(
+                dependency is None
+                or dependency.status
+                in {
+                    DocumentChangeStatus.REJECTED,
+                    DocumentChangeStatus.STALE,
+                }
+                for dependency in dependencies
+            )
+            has_unresolved_dependency = any(
+                dependency is not None
+                and dependency.status in _UNRESOLVED_STATUSES
+                for dependency in dependencies
+            )
+            if has_failed_dependency:
+                next_actions[action_id] = _stale_action(action, dependency_reason)
+                changed = True
+            elif not has_unresolved_dependency and not _read_set_is_current(
+                document, action
+            ):
+                next_actions[action_id] = _stale_action(action, stale_reason)
+                changed = True
+
+        for bundle in bundles.values():
+            current_actions = tuple(
+                next_actions[action.action_id] for action in bundle.actions
+            )
+            cascaded = _cascade_atomic_staleness(current_actions, stale_reason)
+            for before, after in zip(current_actions, cascaded, strict=True):
+                if before != after:
+                    next_actions[after.action_id] = after
+                    changed = True
+        actions_by_id = next_actions
+        if not changed:
+            break
+
     updated: dict[str, dict[str, Any]] = {}
-    for key, raw in review_queue.items():
-        bundle = DocumentChangeSet.model_validate(raw)
-        external_statuses = {
-            action_statuses.get(action_id)
-            for action_id in bundle.external_dependency_action_ids
-        }
-        terminal_external_dependency = bool(
-            external_statuses
-            & {
-                None,
-                DocumentChangeStatus.REJECTED,
-                DocumentChangeStatus.STALE,
-            }
-        )
-        unresolved_external_dependency = bool(
-            external_statuses
-            & {
-                DocumentChangeStatus.PENDING,
-                DocumentChangeStatus.DEFERRED,
-            }
-        )
-        actions = tuple(
-            _stale_action(
-                action,
-                (
-                    "前置審核動作已被拒絕、失效或不存在，請重新建立這項建議。"
-                    if terminal_external_dependency
-                    else stale_reason
-                ),
-            )
-            if action.status in {
-                DocumentChangeStatus.PENDING,
-                DocumentChangeStatus.DEFERRED,
-            }
-            and (
-                terminal_external_dependency
-                or (
-                    not unresolved_external_dependency
-                    and not _read_set_is_current(document, action)
-                )
-            )
-            else action
-            for action in bundle.actions
-        )
-        actions = _cascade_atomic_staleness(actions, stale_reason)
+    for key, bundle in bundles.items():
+        actions = tuple(actions_by_id[action.action_id] for action in bundle.actions)
         updated[key] = bundle.model_copy(update={"actions": actions}).model_dump(
             mode="json"
         )

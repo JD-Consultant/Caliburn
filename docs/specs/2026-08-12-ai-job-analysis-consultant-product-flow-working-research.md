@@ -4,8 +4,8 @@
 - 狀態：Working Research；隨 owner 討論持續修訂
 - 決策狀態：只記錄已確認的產品方向與待討論問題；不是 ADR，不授權 production 實作
 - 優先順序：先以「產品如何像專業顧問工作」約束架構；核心 runtime 已選 LangChain 1.x＋LangGraph 1.2.x，RAG 明確留待後續另案研究
-- 外部資料查核：截至 2026-08-13 可取得的官方／第一手資料整理；大廠做法是設計證據，不是免評測的產品決策
-- Framework 現況：§9.7–§9.12 已完成 persistence／runtime、Context／Skills／provider、frontend transport 與四個中立產品目的的 conformance，主方案收斂為 LangChain 1.x＋LangGraph 1.2.x。§9.10 因重新沿用 Work Model／Focus／Progress／Proposal／Current JD 等舊概念切割 target state，已撤回並只保留為錯誤案例；ADR 0060 與 Task 10 successor ADR 0061、施工計畫必須以「可修訂理解、動態訪談重點、可信進度、待審文件變更、員工核准成品」等目的與 framework primitive 命名。選型先看效果、功能完整、可靠性與員工體驗；只有效果相當時才比較自寫量
+- 外部資料查核：截至 2026-08-15 可取得的官方／第一手資料整理；大廠做法是設計證據，不是免評測的產品決策
+- Framework 現況：§9.7–§9.12 已完成 persistence／runtime、Context／Skills／provider、frontend transport 與四個中立產品目的的 conformance，主方案收斂為 LangChain 1.x＋LangGraph 1.2.x。§9.10 因重新沿用 Work Model／Focus／Progress／Proposal／Current JD 等舊概念切割 target state，已撤回並只保留為錯誤案例；ADR 0060 與 successor ADR 0061–0063、施工計畫必須以「可修訂理解、動態訪談重點、可信進度、待審文件變更、員工核准成品」等目的與 framework primitive 命名。選型先看效果、功能完整、可靠性與員工體驗；只有效果相當時才比較自寫量
 - 相關研究：[`階段式 AI 職務分析顧問 runtime/framework 研究`](2026-08-12-staged-ai-consultant-runtime-framework-research.md) 只能在本產品流程核准後評估，不得反向用框架能力定義顧問流程
 
 ## 0. 這份工作稿怎麼使用
@@ -516,6 +516,35 @@ AI 的目前理解是隨證據持續修正的分析狀態；員工不需要逐�
 方案 3 仍不讓更正直接改核准文件：若正式內容受影響，產生、撤回或標記 stale 的待審文件變更，交員工決定。介面先立即確認更正已保存，再顯示「目前理解改了什麼、哪些工作範圍正在重新檢查、哪些未受影響、核准文件是否仍未改變」；branch-blocking 只作用於依賴舊前提的分析，不封鎖整份文件。
 
 **產品裁決**：owner 於 2026-08-13 確認採方案 3。這裡確認的是產品語意與員工體驗；具體 dependency graph、失效 reason code 與 reconciliation run 由 LangGraph state／node／command 承接，production schema 留到施工 task 決定，不在產品流程層先發明第二套元件。
+
+#### 3.7.5 候選職務文件採「受限成果工作區」，不是 Coding Agent 模仿（2026-08-15 owner 已確認）
+
+**問題**：LLM 應能像成熟 Agent 一樣反覆新增、修改、刪除與重整成果，並看到每次操作的實際結果；但職務文件不是程式碼，員工也不應被迫理解 Git、patch、shell 或每一步工具權限。另一方面，若員工尚未處理待審內容，下一輪 AI 只看核准文件會忘記自己正在準備什麼；若把待審內容無標記地併入正式 context，又會把未核准候選誤認為事實。
+
+**直接來源與實際支持**（最近查核：2026-08-15）：
+
+- [OpenAI 官方 Use Cases](https://learn.chatgpt.com/use-cases)已把「多來源整理成可審核成果」、「不影響原始資料地清理資料」與「產生可繼續編輯的工作簿」列為非 coding 工作；這支持可審核 artifact／working copy 是通用知識工作模式，不是只有程式碼才能採用。
+- [Codex Worktrees](https://learn.chatgpt.com/docs/environments/git-worktrees)把 Agent 工作隔離在不干擾 local checkout 的工作區，準備好後才移回供人檢查；可轉移的是「核准基線與 AI 工作副本隔離」，不是 Git branch、檔案或 commit UI。
+- [Codex Agent approvals & security](https://learn.chatgpt.com/docs/agent-approvals-security)明確區分 sandbox mode（技術上能碰什麼）與 approval policy（何時必須詢問）；workspace 內的安全工作可持續，越界才詢問。這支持 AI 可在候選區內反覆整理，不要求員工核准每個內部動作；但「工具執行許可」不等於 Caliburn 的「職務內容核准」。
+- [Codex Long-running work](https://learn.chatgpt.com/docs/long-running-work)讓工作可暫停、恢復、補充限制與詢問進度，而且長期目標不會擴張既有 sandbox／approval 邊界；這支持員工關閉後續談時，候選工作與審核邊界都持續有效。
+- [Anthropic — Building effective agents](https://www.anthropic.com/engineering/building-effective-agents)要求 Agent 在 action loop 中取得環境的 ground truth，並在 checkpoint／blocker 交還人判斷；[Trustworthy agents in practice](https://www.anthropic.com/research/trustworthy-agents)也把 Agent 描述為 plan／act／observe／adjust，遇到只能由人決定的事項才詢問。這支持系統每次都回傳「實際套用後的候選 revision／錯誤」，不能讓模型只相信自己原本打算寫的內容。
+- [Anthropic — How we contain Claude](https://www.anthropic.com/engineering/how-we-contain-claude)說明 Claude Cowork 面向一般知識工作者，只掛載使用者選定的 workspace，且不假設非技術使用者能判讀 bash permission；[Managed Agents](https://www.anthropic.com/engineering/managed-agents)則把 session、harness 與實際執行工具分成可替換介面。這支持 Caliburn 使用職務語意介面與強制邊界，並把模型、session 與文件操作機制解耦。
+
+**可轉移限制**：Codex Worktree 與 Claude Code 的主要實證仍來自軟體工程；OpenAI Use Cases 是產品工作流說明，不是職務分析成效 benchmark；Claude Cowork 的 sandbox 解決 host 安全，不替 Caliburn 定義 Task／Duty／OPKS 或員工 authority。以下裁決只移植隔離、實際結果回饋、可恢復 session 與人工提交模式，不宣稱 Git／檔案編輯器就是本產品 domain model。
+
+**產品裁決**：正式採用「受限候選成果工作區」作為 Agent 心智模型，規則如下：
+
+1. **核准基線受保護**：員工已核准的職務文件是唯一正式成品。LLM 沒有直接改寫路徑；候選區不是第二份正式文件。
+2. **候選區可反覆編輯**：AI 可在隔離、document-scoped、durable 的候選成果中新增、修改、刪除、移動與重整職務內容，並在每次操作後取得實際 candidate revision、驗證結果與失敗原因。它可以由 structured artifact／typed reducer／framework virtual backend 實作，不要求在磁碟上建立真實檔案。
+3. **下一輪 context 分層而不暗中合併**：模型取得相關範圍的核准基線，以及另行標示為 `pending／deferred／stale` 的候選 overlay、依賴群組與 decision history。候選可作條件式推理前提，但不得被表述成員工已確認的事實；不相關候選仍留在 durable state，按需載入，不因 context budget 全量送入。
+4. **可依未決候選繼續，但必須留下依賴**：若 AI 在尚未核准的 Task 拆分或 Duty 重組上繼續準備下游內容，新的候選必須顯式依賴該未決前提。前提被拒絕、修改或失效時，下游候選自動重驗、標 stale 或撤回，不能靜默保留。
+5. **審核看職務語意，不看程式 patch**：員工看到共同理由、來源、Task／Duty／OPKS 的 before／after 與影響。獨立項目可逐項接受、修改後接受、拒絕或暫不處理；只有 domain invariant 或語意依賴要求一起成立時，才綁成原子子群組。
+6. **實際決定回到 Agent**：接受後，實際通過 verifier／stale check 的結果才進入核准基線；修改後接受時，AI 下一輪看到的是員工最後提交的內容，不是 AI 原稿；拒絕時原候選不出現在核准文件，拒絕裁決留作 durable feedback。單純 accept／reject 仍不是工作事實；只有員工理由中新增的事實或改寫內容才另存為 employee source。
+7. **局部拒絕會重算關聯**：例如十項候選中九項接受、一個 O 被拒絕，核准文件只取得九項；被拒絕的 O 不會殘留在工作視圖。任何依賴該 O 的 P／K／S、Task boundary、進度或後續候選都要依 dependency／read-set 重驗。模型收到的是新的實際基線、裁決與受影響範圍。
+8. **必要澄清與文件審核仍分流**：來源衝突、重大責任邊界或缺少只能由員工決定的事實，才用結構化問題阻擋受影響 branch；它不是接受文件變更。一般候選可 pending，員工也可關閉產品後再回來處理。
+9. **第一版沒有自動提交模式**：AI 可在受限候選區內自主整理，但所有 LLM 產生、準備進入職務文件的內容仍須員工決定；sandbox 內部自由不等於自動核准。
+
+這項裁決補足 §3.7 的審核模型，也收斂「員工一直不按」時的 context：AI 看到**核准基線＋明確標記的相關候選層＋實際裁決結果**，不是只看其中一邊，也不把兩者壓成一份真假不分的文件。
 
 ### 3.8 O／P／K／S 按需漸進分析
 
@@ -1454,7 +1483,7 @@ Owner 已確認：**模型、provider 與底層參數由本機維護者透過版
 
 ## 9. 升級進度與下一步
 
-> **現況與閱讀順序（2026-08-14）**：產品大方向以 §1–§8 為準；框架選擇以 §9.12 為準；自然續談、舊名稱不得回流、第一版 LLM 範圍與「本次不做 RAG」以 §9.13 為最新 owner 裁決；施工前覆蓋審核與後續逐 Task 防偏規則見 §9.14；Task 10 真模型與 Evidence 修正見 §9.15。§9.1.1–§9.11 是按時間保留的研究／反證歷程，其中 `Work Model`、`Focus`、`Progress`、`Proposal`、`Current JD` 等只描述被替換的舊機制，任何「RAG 是本次 final gate」敘述都已被 §9.13 取代，不得拿來施工。目標架構見已 Accepted 的 ADR 0060 與其部分 successor ADR 0061；施工順序見 `docs/plans/2026-08-13-langgraph-consultant-runtime-big-bang-plan.md`。
+> **現況與閱讀順序（2026-08-15）**：產品大方向以 §1–§8 為準；框架選擇以 §9.12 為準；自然續談、舊名稱不得回流、第一版 LLM 範圍與「本次不做 RAG」以 §9.13 為準；schema／read Tool 修正見 §9.15–§9.16；候選工作區與 Tool＋Structured Output 混合裁決以 §9.17–§9.18 為最新 owner 決定。§9.1.1–§9.11 是按時間保留的研究／反證歷程，其中 `Work Model`、`Focus`、`Progress`、`Proposal`、`Current JD` 等只描述被替換的舊機制，任何「RAG 是本次 final gate」或「文件候選永遠只能放 final Structured Output」敘述都已被後續裁決取代，不得拿來施工。目標架構見已 Accepted 的 ADR 0060–0063；既有 Big-bang 計畫完成 Task 10 前的施工，0063 另開增量計畫。
 
 ### 9.1 討論與設計關卡（2026-08-14 現況）
 
@@ -1466,7 +1495,7 @@ Owner 已確認：**模型、provider 與底層參數由本機維護者透過版
 | 1. 端到端情境 | 已收斂 | 正常、改道／更正與失敗恢復時，員工和顧問各自看到、知道、做什麼 | 情境涵蓋訪談重點、全域吸收、動態 Task／Duty／OPKS、進度、待審文件變更、自然離開／續談與匯出，且沒有未揭露的權威跳躍 |
 | 2. 目標能力地圖 | **已收斂（2026-08-13 owner 確認）** | 為了實現情境，系統必須具備哪些能力與不變條件 | 每項能力都有輸入、輸出、authority、持久化責任、失敗語意與 `Replace／Wrap／Retain` 判準 |
 | 3. 框架組合選型 | **已收斂（§9.12）** | 哪些成熟元件直接承接中立產品目的 | LangChain 1.x＋LangGraph 1.2.x 通過目的層與工程 conformance；其他候選只作歷史／fallback，不平行施工 |
-| 4. 目標架構 | **ADR 0060／0061／0062 Accepted** | framework primitive 如何合作，資料／API／Web／context／恢復／切換如何落地 | 每個目的都有 framework owner、可刪除舊機制、最薄產品 policy 與驗收；compact wire 與四個受限唯讀 Tool 均已核准 |
+| 4. 目標架構 | **ADR 0060／0061／0062／0063 Accepted** | framework primitive 如何合作，資料／API／Web／context／恢復／切換如何落地 | 每個目的都有 framework owner、可刪除舊機制、最薄產品 policy 與驗收；compact wire、四個受限唯讀 Tool 與一個隔離 candidate-edit Tool 均已核准 |
 | 5. 實作計畫 | **Tasks 1–9 已完成；Task 10 schema 與 Task 11 Tool surface 已施工** | 如何在隔離 worktree 內完成受限 Big-bang 並可驗證地切換 | compact wire、bounded Tool 與 deterministic focused gates 完成；owner 另授權後才跑 exact live canary；RAG、能力級別／A 的 LLM 分析及正式 eval 均不在本階段 |
 | 6. 實作與切換 | **進行中；等待完整 gates 與交付決策** | 依核准計畫施工、審核、驗證與切換 | 完整 gate、必要的真模型 smoke 與 owner review 完成後才可交付 |
 
@@ -2479,7 +2508,7 @@ Opus 5 可借鑑的精簡不是刪除分析方法，而是把重複 scaffolding 
 
 `document_id`、權限與搜尋 `limit=5` 由 application 注入，不要求模型填已知參數。source result 保留 source ID、exact text、speaker、validity、timestamps 與 correction pointers。ADD／REVISE／WITHDRAW／MERGE／SPLIT 等文件候選維持 provider-native Structured Output；員工 accept／edit-accept／reject／defer 維持 LangGraph authority command；必要澄清維持 Structured Output＋interrupt。Focus、Gap 與 Progress 是 graph state／projection，都不為湊 Tool 而 Tool 化。[OpenAI Function Calling](https://developers.openai.com/api/docs/guides/function-calling) · [OpenAI Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs) · [Google Function Calling](https://ai.google.dev/gemini-api/docs/function-calling) · [Google Structured Outputs](https://ai.google.dev/gemini-api/docs/structured-output) · [LangChain Tools](https://docs.langchain.com/oss/python/langchain/tools) · [LangChain Structured Output](https://docs.langchain.com/oss/python/langchain/structured-output)
 
-lookup 不再固定「第一波 Skill、第二波 Source」。context 足夠時可以零 Tool call；彼此獨立的 Skill／source 讀取可在同一波平行；只有第一波結果產生新的資料依賴時才使用第二波。原有最多三次 model call、兩個 lookup waves 與總 Tool／token／timeout budget 不變。完整裁決見 [ADR 0062](../adr/0062-bounded-consultant-read-tools-and-structured-authority.md)。
+lookup 不再固定「第一波 Skill、第二波 Source」。context 足夠時可以零 Tool call；彼此獨立的 Skill／source 讀取可在同一波平行；只有第一波結果產生新的資料依賴時才使用第二波。此節當時保留最多三次 model call、兩個 lookup waves 與總 Tool／token／timeout budget；其中固定三次上限其後已由 §9.18／ADR 0063 取代，兩個 lookup waves 與其他總預算仍保留。當時完整裁決見 [ADR 0062](../adr/0062-bounded-consultant-read-tools-and-structured-authority.md)。
 
 #### 9.16.4 北極星與施工裁決
 
@@ -2489,6 +2518,92 @@ lookup 不再固定「第一波 Skill、第二波 Source」。context 足夠時�
 - **Tool 已在 schema 修正後另行裁決**：ADR 0062 收斂為四個唯讀 Tool、精簡 `read_file` 說明與依賴驅動 lookup；沒有 Tool Search、LLM selector 或 business write Tool。
 - **兩段式降為 contingency**：compact wire exact canary 仍失敗才啟用，不預先增加一次 inference 與 handoff。
 - **決策狀態**：[ADR 0061](../adr/0061-compact-consultant-wire-progressive-skills-and-tools.md) 維持 **schema-only**；後續 Tool 授權與實作範圍由 [ADR 0062](../adr/0062-bounded-consultant-read-tools-and-structured-authority.md) 獨立承接。ADR 0060 仍是 runtime 主決策。
+
+### 9.17 受限候選成果工作區的框架映射與 ADR 邊界（2026-08-15）
+
+Owner 已確認 §3.7.5：參考 Claude／Codex 的是「隔離工作副本、實際結果回饋、可恢復 session、人工提交」的通用 Agent pattern，不是把職務文件偽裝成程式碼。這沒有恢復任何舊 `Proposal`／`Current JD` 元件，也不新增第二個 document authority。
+
+目前可由成熟框架直接承接的通用機制是：
+
+- LangGraph checkpoint／Postgres Store 保存 document-scoped session、核准基線 reference、候選 overlay、decision event、dependency、revision 與 resume；
+- typed state／reducer／Command 承接候選操作的實際套用結果、stale／read-set、局部失效與員工提交；
+- interrupt 只承接真正 required clarification，不拿來代替可延後、多筆並存的文件審核；
+- LangChain context middleware 按目前訪談重點載入最小充分的核准 slice、相關 pending overlay、裁決與員工來源；
+- Web 呈現 domain-semantic review bundle／atomic subgroup，不暴露 graph state、JSON patch、虛擬路徑或 provider Tool schema。
+
+Caliburn 仍只補框架不知道的最薄產品政策：哪些職務變更相依、何時候選可支持條件式下游分析、什麼裁決算 employee source、哪些 verifier／authority command 才能提升為核准成品，以及 Task／Duty／OPKS 的專業方法。
+
+**當時識別的 ADR 影響**：Accepted ADR 0062 決定 5 把文件候選限定為 provider-native Structured Output，不提供 business write Tool。§3.7.5 本身沒有自動推翻它，因此必須另開 successor ADR 比較後取代相應決定；不得事後改寫 0062，也不得把 host filesystem 或可寫核准文件的萬用 Tool 接進 production。下節 §9.18 已完成比較並由 owner 裁決，正式結果以 ADR 0063 為準，本段不再表示仍待決。
+
+當時待比較的同目的成熟機制是：`Structured Output → deterministic candidate reducer → result feedback`，以及 `受限 candidate-edit Tool／virtual backend → result feedback`。比較順序是產品效果、功能完整、模型可靠性、員工審核體驗與安全邊界；只有前述相當時才比較程式量。結果記錄於下節，不為此提前建立完整 eval 平台。
+
+### 9.18 候選編輯機制的權威資料研究與裁決（2026-08-15，owner 已確認）
+
+#### 9.18.1 最新官方做法的共同形狀
+
+OpenAI、Anthropic、Google 與 Microsoft 的目前官方資料對「模型要改一個外部成果」有一致分工：
+
+1. 模型以 Tool／Function Calling 提出一個受 schema 約束的動作；
+2. application 或 framework 真正執行，驗證範圍與權限；
+3. 把成功、實際結果或可修正的錯誤送回模型；
+4. 模型可依結果繼續呼叫 Tool，最後才產生面向使用者的回覆；
+5. consequential authority 另由 application 的 human-in-the-loop／approval 邊界控制。
+
+OpenAI Apply Patch 與 Anthropic Text Editor 都採「模型提出編輯、application 執行、回傳 tool result、模型再修正」；它們證明這不是只適用於一次性函數的舊式 function calling。Google 目前更直接把 Structured Outputs 定位為格式化最終回覆，把 Function Calling 定位為最終回答前要 application 執行的動作。Microsoft Agent Framework 也由框架自動管理 model → tool → result → model loop，並把 checkpoint／resume 與 HITL 分開提供。[OpenAI Apply Patch](https://developers.openai.com/api/docs/guides/tools-apply-patch) · [OpenAI Function Calling](https://developers.openai.com/api/docs/guides/function-calling) · [OpenAI Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs) · [Anthropic Text Editor](https://platform.claude.com/docs/en/agents-and-tools/tool-use/text-editor-tool) · [Anthropic Tool Use](https://platform.claude.com/docs/en/agents-and-tools/tool-use/how-tool-use-works) · [Google Function Calling](https://ai.google.dev/gemini-api/docs/function-calling) · [Google Structured Outputs](https://ai.google.dev/gemini-api/docs/structured-output) · [Microsoft Adding Tools](https://learn.microsoft.com/en-us/agent-framework/journey/adding-tools) · [Microsoft Workflow capabilities](https://learn.microsoft.com/en-us/agent-framework/workflows/)
+
+LangChain／LangGraph 已有相同成熟 primitive：agent tool loop 會在 final structured response 前重複執行 Tool；Tool 可回傳 `Command` 更新 graph state，並用 `ToolMessage` 把實際結果交回模型，同一 run 的後續步驟立即可見；checkpointer 保存 thread state、pending work 與恢復點。因此 Caliburn 不應再自寫 model/tool while-loop、暫存 session 或恢復器。[LangChain Context Engineering](https://docs.langchain.com/oss/python/langchain/context-engineering) · [LangChain Tools](https://docs.langchain.com/oss/python/langchain/tools) · [LangChain Structured Output](https://docs.langchain.com/oss/python/langchain/structured-output) · [LangGraph Persistence](https://docs.langchain.com/oss/python/langgraph/persistence)
+
+Anthropic 的工具工程研究另支持「少數、目的清楚、能整併高影響工作流的 Tool」，並要求只回傳高訊號 context 與可行動的錯誤，不要把每個內部 API 都一比一暴露給模型。故不應建立 `add_task`、`split_task`、`merge_duty`、`revise_opks` 等一串互相重疊 Tool。[Anthropic — Writing effective tools for agents](https://www.anthropic.com/engineering/writing-tools-for-agents)
+
+#### 9.18.2 三種方案比較
+
+| 機制 | 效果與功能 | 主要限制 | 結論 |
+|---|---|---|---|
+| 只有 final Structured Output → reducer | 型別清楚、跨 provider、最少 tool round trip；現行 compact wire 已證明可承載 Duty／Task／OPKS | verifier 只在整輪最後執行；模型當輪看不到實際 candidate revision、部分失敗或 invariant error，無法像編輯器 Agent 一樣立即修正 | 保留作 final response 與 fallback，不再單獨承擔候選編輯 |
+| 一個受限 candidate-edit Tool → LangGraph reducer／Command → Tool result | 同一 run 可反覆編輯、驗證、觀察、修正；可原子承載跨 Duty／Task／OPKS 的一組變更；跨模型 Function Calling 已是共同能力 | 多一次或數次 tool round trip；仍需 Caliburn 定義職務文件 invariant 與 evidence 規則 | **建議主方案** |
+| provider-native Apply Patch／Text Editor 或完整 Deep Agents virtual filesystem | 對程式碼／文字檔編輯成熟，部分模型對原生 schema 有訓練優勢；Deep Agents 可用 `StateBackend`／custom `BackendProtocol` 跨 provider | provider lock-in，或把結構化 JD 偽裝成檔案；`ls／grep／read／write／edit` 多數不是產品動作，custom backend 仍要自己做 domain reducer | 只作真模型對照備選，不作第一版 production 主介面 |
+
+Deep Agents 的 `StateBackend` 確實能把虛擬檔案存在 LangGraph state 並隨 checkpoint 跨 turn 保存，custom `BackendProtocol` 也能映射資料庫；但官方定位是 scratchpad、context offload 與 file-oriented agent，完整 protocol 包含 `ls／read／write／edit／glob／grep`。本產品已使用 `FilesystemMiddleware` 讀 Skill，不代表核准文件也應被改成文字檔。若未來對照測試顯示原生 edit-file ergonomics 明顯更好，只能接 `StateBackend`／受限 custom backend，不能使用 host `FilesystemBackend` 或 shell。[Deep Agents Backends](https://docs.langchain.com/oss/python/deepagents/backends) · [Deep Agents overview](https://docs.langchain.com/oss/python/deepagents/overview)
+
+#### 9.18.3 建議的第一版框架映射
+
+1. **新增一個 model-facing `edit_candidate_document` 類型 Tool，而不是每種編輯一個 Tool。** 名稱可在實作前再定；它表達的產品能力是「在隔離候選成果中編輯」，不是直接寫正式文件。模型可在一個 atomic batch 內新增、修改、撤回、移動、重新歸類與重排 Duty／Task／OPKS；split／merge 可由一般多步編輯組合表達，不需要各自成為 Tool。batch 的 deterministic 套用是全成或全敗；成功後的 action 則依語意 dependency 分成員工可獨立審核的 atomic subgroup，split 等不可分割重組仍整組決定。若保留 split／merge intent label，也只用於語意 diff／audit，不是額外權限。
+2. **Tool 只更新 LangGraph candidate overlay。** document scope、核准 baseline revision、權限與 ID 配置由 application 注入；模型不能提供另一個 `document_id`，也沒有到 approved artifact 的 write edge。Tool 透過既有 framework ToolNode／reducer／`Command` 更新 thread state，checkpointer 負責 durable resume。
+3. **每次 Tool call 都由 deterministic reducer 真正試套。** 成功回傳 candidate revision、實際 semantic diff、受影響 entity／dependency；失敗回傳具體 path／reason／可修正提示。模型只能根據這個實際結果繼續，不能把「想要改」當成「已改成功」。
+4. **沿用已驗證的 compact typed wire 原則，不沿用舊元件身分。** candidate Tool 應使用固定 target／field／payload slots 或同等的 union-free typed contract；不接受任意 JSON Pointer、open object、SQL 或 host path。可重用現有 pure mapper／verifier 的語意與測試安全網，但 production API 不因相容而必須保留舊 class／欄位名稱。
+5. **final Structured Output 繼續存在，但職責縮小。** 它承載員工可見回覆、可修訂理解、Gap／充分性建議、進度投影所需的受驗證 inputs、下一題或必要澄清，以及已成功 staged 的候選 group／action handles 與 evidence binding；不再重送一份可能與 Tool 實際結果不一致的完整文件草稿。只有 final verifier 通過的 staged actions 才能進 durable review queue；實際進度仍由 durable state 確定性投影。
+6. **員工審核不是 Tool approval。** candidate Tool 在隔離 overlay 內可自動執行；員工的 accept／edit-accept／reject／defer 仍是 UI/API 發出的獨立 LangGraph command。只有 accept／edit-accept 或員工 direct edit 能更新核准文件。這避免每次 AI 草擬都先跳確認，也避免模型自我核准。
+7. **context 明示三層。** 後續 run 取得相關 approved baseline、明確標示的 pending／deferred／stale candidate overlay，以及 employee decision history；被拒絕內容不得偷偷回到 active candidate，依賴它的下游候選必須 revalidate／stale。
+8. **Tool surface 仍很小。** 由目前四個唯讀 Tool 增為四個唯讀＋一個候選編輯 Tool；遠低於需要 Tool Search 的大型 catalog，不新增 Tool router。Skill 與來源仍按依賴讀取，candidate editor 只在需要產生或修正文件候選時呼叫。
+9. **不把舊三次 model-call 拓撲當產品 invariant。** 一輪若先讀 Skill／來源、再編輯、收到失敗後修正並產生 final response，可能需要四次以上 model step。初始 hard ceiling 採五個 model step，另以 LangGraph recursion／step、總 token、elapsed time、Tool 次數與 provider timeout 設硬 budget；下節 canary 可支持下調 profile，但不能為保留舊呼叫數而取消同輪修正，也不能無上限循環。
+
+第一版 hybrid 中各輸出邊界如下；不能把「模型最後要說的內容」與「application 真正要執行或確定性投影的狀態」再混成一類：
+
+| 內容 | 最適 primitive | 邊界 |
+|---|---|---|
+| 員工可見的一般回覆 | final Structured Output 的自然語言欄位 | 只固定 transport shape，不把顧問說話切成僵硬表單 |
+| 可修訂理解、具體 Gap、充分性建議與 remaining-gap reasons | final Structured Output → verifier／reducer | 是模型分析 effect，不是員工已確認事實；驗證後才更新 framework state |
+| 員工看到的 coverage／depth／decision／gap 進度 | deterministic projection，**不是模型宣告的 Structured Output truth** | 模型可提供受證據約束的充分性建議，但不得自己報完成百分比或把 tool-call 數當進度 |
+| 一般下一題／必要結構化澄清 | final Structured Output | 下一題由 UI 顯示；必要澄清再由 LangGraph interrupt／resume 執行，只阻擋相依 branch |
+| 已成功 staged 的候選 action／group handles 與 evidence binding | final Structured Output | 只引用 Tool 實際建立的候選，不再重送另一份文件內容 |
+| Duty／Task／OPKS 候選內容的新增、修改、撤回、移動或重組 | candidate-edit Tool | 需要執行、驗證、取得結果並可能在 final response 前修正 |
+| Skill／員工來源查詢 | read Tool | 是按需取得外部 context，不是 final response |
+| accept／edit-accept／reject／defer 與核准文件 commit | employee／application LangGraph command | 不是模型 Tool，也不是模型 Structured Output；模型永遠不能自我核准 |
+
+這個建議不是因為「程式比較少」，而是它比 only-Structured-Output 多出產品需要的**同輪觀察與修正能力**，同時比完整虛擬檔案系統更符合 JD 的 typed invariant、員工審核與跨模型需求。Schema 也不能先宣稱一定更小：實作前須量測 LangChain 轉換後「四個 read Tool＋一個 candidate Tool＋縮小後 final schema」的合併 grammar；目標是維持 zero optional／zero union／zero open object，不能靠拆位置掩蓋同一份複雜度。
+
+#### 9.18.4 最小驗證與 ADR 邊界
+
+不先建完整 eval 平台，只做四個高資訊 canary：
+
+1. 新增 Task 並補 O／P，確認 Tool result 與 final review bundle 完全一致；
+2. 把一個過大的 Task 原子重組成兩個，故意放入一個無效關聯，確認 reducer 拒絕後模型可在同一 run 修正；
+3. 十項候選中接受九項、拒絕一項 O，確認下一輪只把九項視為核准，拒絕項與依賴項不會被偷偷復活；
+4. candidate 建立後員工直接改同一欄，確認 read-set stale、rebase／澄清與員工 authority 均正確。
+
+比較記錄只看任務是否完成、semantic diff 正確性、工具錯誤後能否修復、authority 是否零繞過、員工審核是否清楚，以及 token／latency；不以 Tool call 越多越好，也不提前做完整品質 eval。
+
+Owner 已接受主方案；[ADR 0063](../adr/0063-hybrid-candidate-edit-tool-and-structured-final-response.md) 因此正式取代 Accepted ADR 0062 決定 5 的「文件候選不是 business Tool」，並把固定三次 model call 改為受總預算約束、初始上限五步的可驗證 profile。ADR 0062 的四個 read Tool、員工 decision command、必要澄清與 no-RAG 邊界保持有效；Accepted ADR 0061／0062 原文不事後修改。
 
 ## 10. 本稿依據
 
@@ -2531,6 +2646,11 @@ Stakeholder 草稿（非權威，只作需求來源）：
 - [Anthropic Privacy Center — Commercial API model-training policy](https://privacy.claude.com/en/articles/7996885-how-do-you-use-personal-data-in-model-training)
 - [Anthropic Privacy Center — Commercial API data retention](https://privacy.claude.com/en/articles/7996866-how-long-do-you-store-my-organization-s-data)
 - [OpenAI Docs — Model guidance（lean prompts、relevant tools、approval boundaries）](https://developers.openai.com/api/docs/guides/latest-model)
+- [OpenAI／Codex 官方 Use Cases（可審核成果、保留原始資料、可編輯工作簿）](https://learn.chatgpt.com/use-cases)
+- [Codex — Git Worktrees（隔離工作副本與 Handoff）](https://learn.chatgpt.com/docs/environments/git-worktrees)
+- [Codex — Agent approvals & security（sandbox 與 approval policy 分層）](https://learn.chatgpt.com/docs/agent-approvals-security)
+- [Codex — Long-running work（pause／resume／steer 與邊界不擴張）](https://learn.chatgpt.com/docs/long-running-work)
+- [OpenAI Docs — Apply Patch（結構化變更與 application 回傳實際結果）](https://developers.openai.com/api/docs/guides/tools-apply-patch)
 - [OpenAI Docs — Running agents（application turn、inner loop、session、resume）](https://developers.openai.com/api/docs/guides/agents/running-agents)
 - [OpenAI Docs — Orchestration and handoffs（manager ownership、bounded specialists）](https://developers.openai.com/api/docs/guides/agents/orchestration)
 - [OpenAI Cookbook — Context Engineering for Personalization（structured state、relevant slices、memory precedence）](https://developers.openai.com/cookbook/examples/agents_sdk/context_personalization/)

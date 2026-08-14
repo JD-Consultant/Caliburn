@@ -108,6 +108,7 @@ class CandidateToolReceipt(DurableModel):
     candidate_revision: int = Field(ge=1)
     revision_digest: Digest
     changeset_id: UUID
+    source_ids: tuple[UUID, ...] = Field(min_length=1)
     action_ids: tuple[UUID, ...] = Field(min_length=1)
     external_dependency_action_ids: tuple[UUID, ...] = ()
     actions: tuple[CandidateEditAction, ...] = Field(min_length=1)
@@ -163,6 +164,7 @@ class CandidateWorkspace(DurableModel):
             receipt.request_sha256 != self.request_sha256
             or receipt.revision_digest != self.revision_digest
             or receipt.changeset_id != self.changeset.changeset_id
+            or receipt.source_ids != self.changeset.source_ids
             or receipt.action_ids
             != tuple(action.action_id for action in self.changeset.actions)
             or receipt.actions
@@ -517,6 +519,7 @@ def materialize_candidate_workspace(
         candidate_revision=next_candidate_revision,
         revision_digest=revision_digest,
         changeset_id=changeset.changeset_id,
+        source_ids=changeset.source_ids,
         action_ids=tuple(action.action_id for action in changeset.actions),
         external_dependency_action_ids=external_dependencies,
         actions=tuple(_edit_action(action) for action in changeset.actions),

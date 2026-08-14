@@ -5,11 +5,13 @@ from datetime import UTC, datetime
 from uuid import UUID, uuid4
 
 import pytest
+from pydantic import ValidationError
 
 from app.consultant.candidate_workspace import (
     CandidateDependencyError,
     CandidateRevisionConflict,
     CandidateToolCallConflict,
+    CandidateWorkspace,
     VerifiedCandidateStage,
     candidate_mapping_authority,
     candidate_revision_digest,
@@ -186,7 +188,27 @@ def test_first_candidate_revision_is_materialized_without_mutating_semantic_stat
     assert receipt.actions[0].atomic_subgroup_id == (
         workspace.changeset.actions[0].atomic_subgroup_id
     )
+    assert workspace.tool_receipts["tool-call-1"].source_ids == (
+        workspace.changeset.source_ids
+    )
+    assert "source_ids" not in receipt.model_dump(mode="json")
     assert state == semantic_before
+
+
+def test_workspace_rejects_latest_receipt_with_mismatched_source_projection() -> None:
+    document_id = uuid4()
+    run_id = uuid4()
+    source_id = uuid4()
+    state = _state(document_id)
+    workspace, _ = materialize_candidate_workspace(
+        state,
+        _stage(run_id=run_id, source_id=source_id),
+    )
+    tampered = workspace.model_dump(mode="json")
+    tampered["tool_receipts"]["tool-call-1"]["source_ids"] = [str(uuid4())]
+
+    with pytest.raises(ValidationError, match="latest receipt does not match changeset"):
+        CandidateWorkspace.model_validate(tampered)
 
 
 def test_replacement_revision_replaces_changeset_and_retains_tool_receipts() -> None:

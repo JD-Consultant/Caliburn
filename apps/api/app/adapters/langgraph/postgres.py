@@ -823,7 +823,7 @@ class PostgresConsultantRuntime:
                     try:
                         await self._require_current_committed_sources(
                             document_id,
-                            active.changeset.source_ids,
+                            replay.source_ids,
                         )
                     except (
                         UnknownEvidenceSource,

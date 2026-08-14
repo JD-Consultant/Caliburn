@@ -9,6 +9,11 @@ from langgraph.graph import END, START, StateGraph
 from langgraph.runtime import Runtime
 
 from app.consultant.clarification import interrupt_for_required_clarification
+from app.consultant.candidate_workspace import (
+    CandidateWorkspace,
+    VerifiedCandidateStage,
+    materialize_candidate_workspace,
+)
 from app.consultant.document_review import (
     apply_review_command,
     revalidate_after_direct_edit,
@@ -92,6 +97,16 @@ def _apply_command(
         return initial_thread_state(document_id)
 
     _require_document(state, document_id)
+    if action == "stage_candidate_revision":
+        stage = VerifiedCandidateStage.model_validate(command["candidate_stage"])
+        latest_payload = state.get("latest_run")
+        if latest_payload is None:
+            raise ValueError("candidate staging requires an active consultant run")
+        latest = RunReceipt.model_validate(latest_payload)
+        if latest.run_id != stage.run_id or latest.status is not RunStatus.SOURCE_SAVED:
+            raise ValueError("candidate staging does not match the active consultant run")
+        workspace, _ = materialize_candidate_workspace(state, stage)
+        return {"active_candidate": workspace.model_dump(mode="json")}
     receipt_payload = command.get("command_receipt")
     command_receipt = (
         CommandReceipt.model_validate(receipt_payload)
@@ -151,6 +166,7 @@ def _apply_command(
                     "registered answer requires a source-saved run receipt"
                 )
             update["latest_run"] = receipt.model_dump(mode="json")
+        update["active_candidate"] = None
         return update
     if action == "restart_consultant_run":
         receipt = RunReceipt.model_validate(command["run_receipt"])
@@ -166,6 +182,11 @@ def _apply_command(
         ):
             raise ValueError("consultant retry does not match the failed run")
         update["latest_run"] = receipt.model_dump(mode="json")
+        active_payload = state.get("active_candidate")
+        if active_payload is not None:
+            active = CandidateWorkspace.model_validate(active_payload)
+            if active.run_id != receipt.run_id:
+                update["active_candidate"] = None
         return update
     if action == "mark_consultant_run_failed":
         receipt = RunReceipt.model_validate(command["run_receipt"])
@@ -191,6 +212,7 @@ def _apply_command(
             raise ValueError("approved document does not match thread document_id")
         update.update(_source_state_update(state, source_reference))
         update["approved_document"] = approved.model_dump(mode="json")
+        update["active_candidate"] = None
         update.update(
             revalidate_after_direct_edit(
                 state,
@@ -240,6 +262,7 @@ def _apply_command(
         )
         update.update(_source_state_update(state, source_reference))
         update.update(reviewed)
+        update["active_candidate"] = None
         work, current_work_id = normalize_current_work(
             reviewed["interview_work"],
             preferred_work_id=(

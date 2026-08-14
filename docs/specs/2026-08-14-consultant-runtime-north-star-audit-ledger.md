@@ -283,6 +283,17 @@ Big-bang 只描述最終切換，不表示做到最後才審核。之後每完�
 - Authority／北極星：沒有新增 agent Tool、approved-document write、RAG、A、UI、第二 authority、workflow 或文件 store；模型仍只提出待審候選，不能直接改變核准文件。單一顧問、動態 Task／Duty／OPKS、員工原話與先審後入方向均未偏移。結果 **Pass**。
 - 驗證：candidate Tool input schema 為 0 defs、62 properties、depth 4、5,669 bytes、0 optional、0 union／`anyOf`、0 open object；bytes 僅作比較訊號，非 provider 官方上限。focused suite 為 `84 passed`。
 
+### ADR 0063 Task 2：唯一 product graph 的 durable candidate workspace
+
+- 狀態：**Pass**；同一 task commit 為 `feat: add durable consultant candidate workspace`。
+- 員工效果：同一顧問 run 可在 LangGraph checkpoint 內反覆建立、替換並於 runtime reopen 後恢復候選文件；候選尚未發布時，核准文件、review queue、semantic revision、catalog `updated_at`、export 與一般 snapshot 完全不變。模型失敗後以相同 run 重試會保留最後成功候選；新來源／更正、direct edit 或任一員工 review decision 都會清除舊候選。
+- 成熟 primitive：沿用唯一 `StateGraph` typed state／command／checkpoint、既有 `AsyncPostgresSaver` 與 `AsyncPostgresStore`，並在既有 per-document adapter lock 內重讀 checkpoint、驗證、映射與 `graph.ainvoke`。durable candidate 只是 framework checkpoint 的 run-scoped 暫存 channel，不是員工文件、第二份文件 authority、第二個 graph／Saver／Store、transaction table、event store 或 candidate table。
+- Caliburn 薄政策：pure reducer 管 first／replacement revision、canonical changeset digest、payload-bound tool-call replay／conflict、stale base 與失敗不寫入；application 在 lock 內由 current approved document／明示 conditional baseline，以及 pending／deferred review dependency closure 推導 entity／action allowlists，再交給 strict candidate mapper，同批 local refs 仍只由 application 生成。未明列 dependency 時絕不混入 pending candidate。
+- 依賴與審核：明示外部 action dependency 會建立完整、拓撲順序的 pending／deferred closure並套到核准文件 copy；不存在、rejected、stale、cycle 或無效 conditional baseline fail closed。local dependency、explicit atomic group、merge／split grouping 與 supersession metadata 進入既有 `DocumentChangeSet`／`DocumentPatchAction`；前置未核准時 dependent subgroup不能接受，前置 rejected／stale 使下游 stale，明確 superseded 的 unresolved action於後續 publication seam 原子標 stale並保留理由。
+- Evidence：從既有 result verifier 抽出 candidate document path／payload／operation／OPKS linkage／source scope／current validity／exact quote anchor／selected-loaded Skill gate；adapter 只從既有 Store載入 batch basis引用的 committed employee sources。修正 extraction 時排除 application-owned UUID／display order等結構 metadata，仍只對真正語意文字執行數量、具名規範與外部主張的 quote 規則。
+- TDD／驗證：初始 exact RED 因缺少 `app.consultant.candidate_workspace` 於 collection 得到 `2 errors in 0.78s`；Docker Desktop 未啟動曾使 PostgreSQL連線逾時，環境恢復後由 repo migration升到 0018並執行官方 storage setup。candidate PostgreSQL逐案證據為 `9 passed, 21 deselected`、無 skip；brief指定完整 focused authority gate為 `118 passed in 81.86s`、無 skip。autouse fixture刪除本次建立的 document namespace，驗後 `consultant_documents`、`checkpoints`、`checkpoint_blobs`、`checkpoint_writes`、`store` 均為 0。
+- 北極星回歸：AI仍只能建立待後續發布的候選，不能改核准文件或繞過員工裁決；沒有 RAG／Reference、能力級別／A、品質 eval、Web contract、舊 writer bridge、雙寫、第二 workflow owner或第二 persistence authority。單一顧問、動態 Task／Duty／OPKS、員工原話、先審後入、自然離開／續談與單一可強制匯出方向均未偏移。結果 **Pass**。
+
 ## 8. 本次直接使用的一手來源
 
 - [Anthropic — Prompting Claude Opus 5](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5)

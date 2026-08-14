@@ -1,10 +1,4 @@
-"""Add the minimal consultant document catalog during branch construction.
-
-This is intentionally incremental while the old production composition root
-still runs.  At the final hard cut, this revision becomes the fresh
-``down_revision = None`` current-only root and migrations 0012–0017 leave the
-tree, as required by ADR 0060.
-"""
+"""Fresh current-only root for the durable consultant document catalog."""
 
 from __future__ import annotations
 
@@ -14,7 +8,7 @@ from sqlalchemy.dialects.postgresql import UUID
 
 
 revision = "0018"
-down_revision = "0017"
+down_revision = None
 branch_labels = None
 depends_on = None
 
@@ -38,14 +32,8 @@ def upgrade() -> None:
             server_default=sa.text("now()"),
         ),
         sa.Column("deleted_at", sa.DateTime(timezone=True), nullable=True),
-        sa.PrimaryKeyConstraint(
-            "document_id",
-            name="consultant_pk_documents",
-        ),
-        sa.UniqueConstraint(
-            "thread_id",
-            name="consultant_uq_documents_thread",
-        ),
+        sa.PrimaryKeyConstraint("document_id", name="consultant_pk_documents"),
+        sa.UniqueConstraint("thread_id", name="consultant_uq_documents_thread"),
         sa.CheckConstraint(
             "btrim(title) <> ''",
             name="consultant_ck_documents_title",

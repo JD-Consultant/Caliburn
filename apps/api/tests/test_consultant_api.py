@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime
+from io import BytesIO
 from uuid import UUID, uuid4
 
 import httpx
 import pytest
 import pytest_asyncio
 from fastapi import FastAPI
+from openpyxl import load_workbook
 
 from app.adapters.langgraph.postgres import (
     ActiveConsultantRun,
@@ -17,6 +19,10 @@ from app.api.routes import consultant
 from app.consultant.state import (
     EmployeeSource,
     EmployeeSourceKind,
+    DocumentChangeSet,
+    DocumentPatchAction,
+    DocumentPatchOperation,
+    DocumentPathRead,
     RunReceipt,
     RunStatus,
     initial_thread_state,
@@ -384,8 +390,36 @@ async def test_direct_edit_server_mints_opks_evidence_instead_of_trusting_the_br
 
 
 async def test_export_requires_explicit_force_when_readiness_has_gaps(api) -> None:
-    client, _, _ = api
+    client, runtime, _ = api
     document_id = UUID((await _create(client)).json()["document_id"])
+
+    source_id = uuid4()
+    changeset_id = uuid4()
+    action = DocumentPatchAction(
+        action_id=uuid4(),
+        operation=DocumentPatchOperation.REVISE,
+        path="/job_title",
+        target_key="/job_title",
+        before="已核准名稱",
+        after="尚待審核名稱",
+        source_ids=(source_id,),
+        read_set=(
+            DocumentPathRead(path="/job_title", value_sha256="0" * 64),
+        ),
+    )
+    changeset = DocumentChangeSet(
+        changeset_id=changeset_id,
+        summary="修改職務名稱",
+        actions=(action,),
+        source_ids=(source_id,),
+        created_revision=0,
+    )
+    state = initial_thread_state(document_id)
+    state["approved_document"]["job_title"] = "已核准名稱"
+    state["review_queue"] = {
+        str(changeset_id): changeset.model_dump(mode="json")
+    }
+    runtime.snapshot = snapshot_from_state(state)
 
     blocked = await client.get(f"{BASE}/{document_id}/export")
     assert blocked.status_code == 409
@@ -396,6 +430,15 @@ async def test_export_requires_explicit_force_when_readiness_has_gaps(api) -> No
     assert forced.headers["content-type"].startswith(
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
+    workbook = load_workbook(BytesIO(forced.content), data_only=False)
+    values = {
+        str(cell.value)
+        for row in workbook.active.iter_rows()
+        for cell in row
+        if cell.value is not None
+    }
+    assert any("已核准名稱" in value for value in values)
+    assert all("尚待審核名稱" not in value for value in values)
 
 
 async def test_invalid_client_fields_and_pause_finish_routes_are_rejected(api) -> None:

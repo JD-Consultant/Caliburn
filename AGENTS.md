@@ -2,7 +2,7 @@
 
 Caliburn 是給員工使用的**本機 Web AI 職務分析與職務說明書應用程式**。目前只保留新的 Job Analysis 系統：本機單一操作者、可保存多份彼此隔離的職務說明書，不做登入、帳密、多租戶、organization/member/ACL、計費、雲端部署或多人協作。維護者使用繁體中文，回覆也用繁中。
 
-`AGENTS.md` 與 `docs/` 是本 repo 權威；`CLAUDE.md` 只 import 本檔。若歷史文檔與本檔衝突，以現行 code、current-only ADR 0057 與本檔為準。
+`AGENTS.md` 與 `docs/` 是本 repo 權威；`CLAUDE.md` 只 import 本檔。若歷史文檔與本檔衝突，以現行 code、顧問 runtime ADR 0060、current／RAG 邊界 ADR 0057 與本檔為準。
 
 ## 工作紀律
 
@@ -17,18 +17,20 @@ Caliburn 是給員工使用的**本機 Web AI 職務分析與職務說明書應�
 ## 現行架構
 
 - Current 產品 monorepo 成員是 `apps/api`、`apps/web` 與 `packages/job-analysis-contract`；PostgreSQL 是唯一預設 Docker 基礎服務。repo 另外保留一組與 current 完全隔離的 RAG bounded context（`apps/pdf-to-json`、`apps/ocs-indexer`、`apps/embedder`、`packages/ocs-contract`、`packages/indexer-contract`），各自可獨立安裝／測試／執行，但不是 current 產品的 runtime 依賴；`npm run up`／`npm run dev` 不啟動它們，要用才 `npm run rag:up`（Qdrant／embedder，opt-in）；細節見 [`docs/design/rag-pipeline.md`](docs/design/rag-pipeline.md)。
-- API 的 Job Analysis 是唯一 production AI 工作面，依 ADR 0058 拆成功能模組（`core`／`documents`／`task_analysis`／`opks`／`consultation`／`export`）＋ `adapters`（`postgres`／`openrouter`／`xlsx`）＋ `api`（route／mapper／composition root）；細節與依賴規則見 [`ARCHITECTURE.md`](ARCHITECTURE.md#api-邊界) 與 `apps/api/tests/test_job_analysis_dependencies.py`。
-- Authority 規則：員工直接編輯與 AI Proposal 都經同一個 authority commit seam；AI 只能提出候選，員工決策後才能改變 Current JD。provider 呼叫在 transaction 外，commit 前重鎖文件並驗證 generation／read-set。不建立第二份 document store，不把 transport DTO 當 domain truth，不讓 Web 重算 domain invariant。
+- API 的 Job Analysis 是唯一 production AI 工作面，依 ADR 0060 由 `app/consultant`（職務分析政策、Skills、typed state／command／projection）＋ `adapters/langgraph`（PostgreSQL Saver／Store durable owner）＋ `adapters/openrouter`（LangChain model binding）＋ `export`／`adapters/xlsx`（deterministic export）＋ `api`（唯一 composition root）組成；依賴規則由 `tests/test_consultant_foundation_boundaries.py` 與 `tests/test_consultant_hard_cut.py` 強制。
+- Authority 規則：LangGraph checkpoint 是可修訂理解、訪談工作、Gap、待審 changeset 與核准文件的唯一 semantic-state owner；Store 是員工逐字來源與更正 lineage 的唯一 owner。LLM 只能產生待審 changeset，員工接受或修改後接受才改核准文件；員工直接編輯則立即走 deterministic authority command。不得建立第二份 workflow／memory／document store，也不得讓 Web 重算 domain invariant。
 - Web 只提供 `/workspace` 與文件詳情頁，吃 `job-analysis-contract` 生成的 TypeScript 契約。
-- 新資料從 current-only migration 0012–0017 建立，舊資料不搬移、不雙寫、不相容。若需開發環境，直接依 runbook 重建資料庫。
-- 已刪除的 `app.interview`、`app.interview_vnext`、`app.job_authoring` 不得重新 import、wrapper 或接回 production——它們已從 repo 移除。OCS／indexer／embedder／PDF ETL 則已依 ADR 0057 保留為獨立 RAG bounded context，但邊界不變：同樣不得被 import、wrapper 或接回 current API/Web production composition root。
+- 新資料從 fresh root migration `0018_consultant_runtime_root` 建立最小 catalog，再由 `npm run consultant-storage:setup` 初始化 LangGraph 官方 Saver／Store tables。舊資料不搬移、不雙寫、不相容；若需開發環境，依 runbook 重建資料庫。
+- 已刪除的 `app.interview`、`app.interview_vnext`、`app.job_authoring`、`app.core`、`app.documents`、`app.task_analysis`、`app.opks`、`app.consultation` 與舊 `adapters.postgres` 不得重新 import、wrapper 或接回 production。OCS／indexer／embedder／PDF ETL 依 ADR 0057 保留為獨立 RAG bounded context，但本次產品尚未接 RAG／Reference；同樣不得 import、wrapper 或接回 current API/Web composition root。
 
 ## 本地開發與驗證
 
 ```text
 npm install
-npm run up              # PostgreSQL + API/Web dev
-npm run db:migrate      # apps/api Alembic head
+npm run infra                       # fresh DB 時先只啟動 PostgreSQL
+npm run db:migrate                  # fresh root 0018
+npm run consultant-storage:setup    # LangGraph Saver／Store tables
+npm run dev                         # API/Web dev；不含 RAG
 npx turbo test
 ```
 
@@ -38,4 +40,4 @@ Windows 上動手前確認 `pwd` 與 `git branch --show-current`；後端 reload
 
 ## 指路
 
-[`ARCHITECTURE.md`](ARCHITECTURE.md) · [`docs/README.md`](docs/README.md) · [`CONTRIBUTING.md`](CONTRIBUTING.md) · [`docs/runbook.md`](docs/runbook.md) · [`docs/design/task-analysis-engine.md`](docs/design/task-analysis-engine.md) · [`docs/adr/0057-current-only-runtime-and-data-boundary.md`](docs/adr/0057-current-only-runtime-and-data-boundary.md)
+[`ARCHITECTURE.md`](ARCHITECTURE.md) · [`docs/README.md`](docs/README.md) · [`CONTRIBUTING.md`](CONTRIBUTING.md) · [`docs/runbook.md`](docs/runbook.md) · [`docs/design/consultant-runtime.md`](docs/design/consultant-runtime.md) · [`docs/adr/0060-langchain-langgraph-consultant-runtime-and-durable-authority.md`](docs/adr/0060-langchain-langgraph-consultant-runtime-and-durable-authority.md)

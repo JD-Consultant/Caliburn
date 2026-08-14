@@ -1,48 +1,63 @@
 # Caliburn 架構
 
-> 現行架構分兩層：current 產品（`apps/api`／`apps/web`／`packages/job-analysis-contract`）是唯一可執行、被 production 消費的系統；OCS、indexer、PDF ETL、embedder 已依 [ADR 0057](docs/adr/0057-current-only-runtime-and-data-boundary.md) 保留為與 current 完全隔離的獨立 RAG bounded context（見下方「RAG 供應鏈」與 [`docs/design/rag-pipeline.md`](docs/design/rag-pipeline.md)），不是已刪除的歷史架構。舊訪談（`app.interview`／`app.interview_vnext`）與 `job_authoring` 才是真正在 current-only 硬切中移除、不得恢復的部分；相關 ADR／研究只保留作決策歷史，不能作為新程式入口。
+> 現行產品是 `apps/api`、`apps/web` 與 `packages/job-analysis-contract`。repo 另保留 ADR 0057 的 RAG bounded context，但尚未接入 current API／Web；兩者必須保持 runtime、contract 與啟動邊界隔離。
 
 ## 鳥瞰
 
-Caliburn 是給員工使用的本機 Web AI 職務分析與職務說明書應用程式。單一本機操作者可保存多份彼此隔離的職務說明書，不提供登入、多租戶、權限、計費或多人協作。
+Caliburn 是給員工使用的本機 Web AI 職務分析與職務說明書顧問。單一本機操作者可保存多份彼此隔離的文件，不提供登入、多租戶、權限、計費、雲端或多人協作。
 
+```text
+Next.js workspace ──HTTP／SSE──▶ FastAPI consultant API
+                                      │
+                                      ├── LangGraph PostgreSQL Saver／Store
+                                      ├── consultant_documents 最小 catalog
+                                      ├── LangChain bounded agent ──▶ OpenRouter
+                                      └── deterministic projection ──▶ XLSX
 ```
-本機 Web ──HTTP──▶ FastAPI job-analysis ──▶ PostgreSQL
-                         │
-                         └────────一次 LLM request──▶ OpenRouter
-```
+
+PostgreSQL 是唯一預設基礎服務。API／Web 在 host 執行；OpenRouter model call 在資料庫交易外執行。Qdrant、embedder 與 indexer 不在 current 啟動路徑。
 
 ## Monorepo 成員
 
 | 路徑 | 職責 | 埠位 |
 |---|---|---|
-| [`apps/api/`](apps/api/README.md) | FastAPI；Job Analysis domain、application、OpenRouter provider、PostgreSQL adapter | `8001` |
-| [`apps/web/`](apps/web/README.md) | Next.js 本機工作台；文件庫、顧問回合、Proposal 與 Current JD 編輯 | `3000` |
-| [`packages/job-analysis-contract/`](packages/job-analysis-contract/) | Job Analysis JSON Schema 生成的 Python／TypeScript 契約 | — |
-
-PostgreSQL 是唯一基礎服務，資料表由 `apps/api/alembic/versions/0012`–`0017` 建立。API 與 Web 在 host 執行；Docker 只負責資料庫。
-
-## RAG 供應鏈（保留、隔離，非 current runtime）
-
-repo 另外保留一組與 current 產品完全隔離的 RAG bounded context——`apps/pdf-to-json`、`apps/ocs-indexer`、`apps/embedder` 與 `packages/ocs-contract`、`packages/indexer-contract`（PDF → OCS contract → OCS JSON → indexer → embedder/Qdrant）。它們是可獨立安裝、測試、執行的 monorepo 成員，但**不是** current API/Web 的 runtime dependency：`npm run up`／`npm run dev` 不啟動它們，Qdrant／embedder 只在 Compose `rag` profile 下啟動（`npm run rag:up`）。完整資料流、package 責任與資料落地見 [`docs/design/rag-pipeline.md`](docs/design/rag-pipeline.md)；決策依據見 [ADR 0057](docs/adr/0057-current-only-runtime-and-data-boundary.md) Decision 5。
+| [`apps/api/`](apps/api/README.md) | FastAPI、LangChain／LangGraph 顧問、OpenRouter、PostgreSQL、XLSX | `8001` |
+| [`apps/web/`](apps/web/README.md) | Next.js 員工顧問工作區 | `3000` |
+| [`packages/job-analysis-contract/`](packages/job-analysis-contract/) | durable consultant JSON Schema 生成的 Python／TypeScript 契約 | — |
 
 ## API 邊界
 
-API 依 ADR 0058 拆成功能模組（不再有單一 `app/job_analysis` namespace），依賴方向是 DAG：
+ADR 0060 的 production 依賴方向如下：
 
-- `app/core/`：共同 Current State、authority transaction／port、journal、識別碼與跨模組共享的穩定 domain language；不得 import FastAPI、SQLAlchemy、HTTPX、OpenPyXL 或任何 feature／adapter 模組。
-- `app/documents/`：文件生命週期、header、readiness、Duty／Task 員工直接編輯。
-- `app/task_analysis/`：Task context、LLM wire／prompt、operation、verifier、Task Proposal。
-- `app/opks/`：OPKS context、child operation、scheduler、員工編輯、verifier、OPKS Proposal；與 `task_analysis` 互不 import 對方。
-- `app/consultation/`：員工回合 orchestration；唯一允許的跨功能方向——只能透過 `task_analysis`／`opks` 的 root public API 協調，不得 reach 進對方 implementation file。
-- `app/export/`：純 deterministic Current State → 公版表格投影；不知道任何具體 render 格式。
-- `app/adapters/`：具體 IO 實作——`postgres/`（SQLAlchemy models、repository、serialization）、`openrouter/`（唯一 LLM provider）、`xlsx/`（OpenPyXL renderer；OpenPyXL 只存在這裡）。
-- `app/api/`：HTTP route（`routes/documents.py`／`consultation.py`／`opks.py`／`export.py`，共用 `/job-analysis/documents` prefix）、對應 mapper、problem response、dependency composition（`deps.py`）；`router.py` 是唯一 composition root。只能 import 各 feature module 的 root public API 與 `app/adapters/*`，不得直接 reach 進 feature module 的 implementation file。
+- `app/consultant/`：職務分析政策、Task／Duty／O／P／K／S Skills、typed result、deterministic verifier、adaptive interview、required clarification、document review／authority 與 purpose-first projection。它不 import FastAPI、OpenRouter adapter、XLSX 或 RAG。
+- `app/adapters/langgraph/`：以 `AsyncPostgresSaver` 與 `AsyncPostgresStore` 承接 durable state、員工逐字來源、checkpoint command、crash reconciliation 與 catalog 存取。
+- `app/adapters/openrouter/`：把 versioned model profile／run policy 綁到 LangChain `ChatOpenRouter`；不擁有產品狀態或職務分析方法。
+- `app/export/`：只把核准文件組成 deterministic export model；pending changeset 不可進入。
+- `app/adapters/xlsx/`：唯一使用 OpenPyXL 的 renderer；官方 iCAP code cells 固定留白。
+- `app/api/`：唯一 HTTP composition root、purpose-first mapper、RFC 9457 problem response 與 `/api/v1/job-analysis/consultant-documents` routes。
+- `app/database.py`：只供 app lifespan／health check 使用的 SQLAlchemy connection；不是 document store。
 
-唯一 production route prefix 是 `/api/v1/job-analysis`；`/healthz` 是服務健康檢查。AI 只能提出 Proposal，員工決策或直接編輯才可改變 Current JD；所有 authority writer 經同一個 transaction seam，provider 呼叫在 transaction 外執行。依賴規則由 `apps/api/tests/test_job_analysis_dependencies.py` 的 AST guard 強制。
+舊 `app.core`、`app.documents`、`app.task_analysis`、`app.opks`、`app.consultation`、`app.adapters.postgres` 及其 routes／DTO／writers 已刪除。`apps/api/tests/test_consultant_hard_cut.py` 以 AST、migration 與 schema guard 防止復活；`test_consultant_foundation_boundaries.py` 驗證 framework 與 RAG 邊界。
 
-## 文檔與退役邊界
+## Durable authority
 
-跨 app 流程見 [`docs/design/task-analysis-engine.md`](docs/design/task-analysis-engine.md)（current 產品）與 [`docs/design/rag-pipeline.md`](docs/design/rag-pipeline.md)（RAG 供應鏈，隔離），決策見 [`docs/adr/README.md`](docs/adr/README.md)，操作見 [`docs/runbook.md`](docs/runbook.md)。current-only 硬切見 [ADR 0057](docs/adr/0057-current-only-runtime-and-data-boundary.md)。
+- Alembic fresh root `0018_consultant_runtime_root` 只建立 `consultant_documents` 與 `alembic_version`。
+- `npm run consultant-storage:setup` 再由 LangGraph 官方 `.setup()` 建立 Saver／Store tables；Caliburn 不鏡像 framework state。
+- Store 保存員工逐字來源與 correction lineage；checkpoint 保存可修訂理解、訪談工作、Gap、待審 changeset、核准文件與 command receipts。每項持久事實只有一個 owner。
+- LLM 產生的內容一律先進 typed changeset。只有員工 accept／edit-accept command 能寫入核准文件；reject／defer 不改文件。員工直接編輯走同一 deterministic invariant，但不必假裝成 AI 提案。
+- 必要澄清使用 LangGraph interrupt／resume，只阻擋 affected branch；一般 Gap 留在待處理投影。關閉頁面不是 pause／finish command，重開直接讀 durable snapshot。
+- 模型 profile、provider、參數與 run policy 可版本化替換；Skills 不選模型。能力級別與 A 暫不由 LLM 產生，官方 iCAP 代碼也不由模型或 export 補造。
 
-不要新增或恢復 `app.interview`、`app.interview_vnext` 或 `app.job_authoring`；它們已從 repo 移除，不在 runtime／schema 邊界內。OCS contract、indexer、Qdrant、embedder 與 PDF→JSON pipeline 已依 ADR 0057 保留為獨立 RAG bounded context（monorepo 成員、可獨立執行），但同一條邊界仍然成立：不要把它們 import、wrapper 或接回 current API/Web 的 production composition root。
+## Contract 與 Web
+
+`packages/job-analysis-contract/schema/job-analysis-workspace.schema.json` 是唯一 transport source。它只發布 consultant catalog、snapshot、review／clarification／direct-edit commands、approved document、export readiness 與 problem models；不發布舊 document／consultation／Proposal surface。
+
+Web 只有 `/workspace` 與 `/workspace/[document_id]`，以 TanStack Query 管 server cache、原生 `EventSource` 接 refetch notification、本機草稿保護 dirty editor。UI 不解析 raw checkpoint、framework interrupt、context receipt 或 model attempt，也不保存第二份 server authority。
+
+## RAG 供應鏈（保留、隔離）
+
+`apps/pdf-to-json`、`apps/ocs-indexer`、`apps/embedder`、`packages/ocs-contract` 與 `packages/indexer-contract` 是可獨立安裝／測試／執行的 RAG bounded context。它們不是 current runtime dependency；`npm run up`／`npm run dev` 不啟動，只有 `npm run rag:up`／`rag:dev` 明確 opt-in。current API 不得 import、呼叫或發布它們的 contract／route／tool。詳見 [`docs/design/rag-pipeline.md`](docs/design/rag-pipeline.md)。
+
+## 指路
+
+現行跨 app 真相見 [`docs/design/consultant-runtime.md`](docs/design/consultant-runtime.md)，決策見 [ADR 0060](docs/adr/0060-langchain-langgraph-consultant-runtime-and-durable-authority.md)，本機操作見 [`docs/runbook.md`](docs/runbook.md)。

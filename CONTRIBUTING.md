@@ -24,6 +24,7 @@ docs/       架構、ADR、研究、計畫與 runbook
 - `npm install`
 - `cd apps/api && uv sync`
 - `npm run db:migrate`
+- `npm run consultant-storage:setup`
 
 RAG bounded context 不在上面的預設安裝路徑內；要用才 `cd apps/pdf-to-json && uv sync`／`cd apps/ocs-indexer && uv sync --all-extras`（各自獨立 `uv.lock`），細節見 [`docs/design/rag-pipeline.md`](docs/design/rag-pipeline.md)。
 
@@ -49,7 +50,7 @@ cd apps/web && npm run test && npx tsc --noEmit && npm run lint
 npm run check-codegen -w @caliburn/job-analysis-contract
 ```
 
-未加 `--filter` 的 `npx turbo test` 會連 RAG app（`pdf-to-json`／`ocs-indexer`，兩者都定義了 `test` script）一起跑，但這不代表它們是 current 產品的一部分；current API/Web 的邊界測試（`apps/api/tests/test_job_analysis_dependencies.py`）會擋下任何把 RAG 模組 import 進 current composition surface 的變更。
+未加 `--filter` 的 `npx turbo test` 會連 RAG app（`pdf-to-json`／`ocs-indexer`，兩者都定義了 `test` script）一起跑，但這不代表它們是 current 產品的一部分；`apps/api/tests/test_consultant_foundation_boundaries.py` 與 `test_consultant_hard_cut.py` 會擋下 RAG import 與舊 runtime 復活。
 
 使用 Conventional Commits，例如 `feat(api): ...`、`refactor(web): ...`、`docs: ...`。一個 task 一個 commit；不要 push，除非 owner 明確要求。破壞性資料庫動作須有明確授權（本次 current-only 硬切已授權）。
 

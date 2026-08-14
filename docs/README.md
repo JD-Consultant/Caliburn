@@ -12,12 +12,10 @@
 
 ## 現行設計與決策
 
-- [`design/task-analysis-engine.md`](design/task-analysis-engine.md) — Job Analysis packet → OpenRouter → verifier → transition → PostgreSQL／Proposal → Web 的端到端真相。
-- [`specs/2026-08-10-current-only-hard-cut-design.md`](specs/2026-08-10-current-only-hard-cut-design.md) — 本次淘汰範圍、fresh DB 與驗證證據。
-- [`plans/2026-08-10-current-only-hard-cut-plan.md`](plans/2026-08-10-current-only-hard-cut-plan.md) — 執行切片與 hard gates。
-- [`specs/2026-08-10-job-analysis-module-boundaries-research.md`](specs/2026-08-10-job-analysis-module-boundaries-research.md) — current system 完成隔離後的功能模組、shared kernel、port ownership 與 Web 邊界研究。
-- [`adr/0058-current-api-functional-modules-and-dependency-rules.md`](adr/0058-current-api-functional-modules-and-dependency-rules.md) — **Accepted** current API／Web 模組與可執行依賴規範；後續 move-only 重構的權威邊界。
-- [`plans/2026-08-10-current-application-modularization-plan.md`](plans/2026-08-10-current-application-modularization-plan.md) — 可交付實作者逐 task 搬移、驗證與 commit 的 current application 模組化計畫。
+- [`design/consultant-runtime.md`](design/consultant-runtime.md) — LangChain／LangGraph durable consultant、context、Skills、文件審核／authority、API、Web 與 export 的端到端真相。
+- [`adr/0060-langchain-langgraph-consultant-runtime-and-durable-authority.md`](adr/0060-langchain-langgraph-consultant-runtime-and-durable-authority.md) — **Accepted** framework replacement、單一 durable authority、Big-bang 與延後 RAG 的決策。
+- [`plans/2026-08-13-langgraph-consultant-runtime-big-bang-plan.md`](plans/2026-08-13-langgraph-consultant-runtime-big-bang-plan.md) — 逐 task 驗證與 hard-cut 計畫。
+- [`specs/2026-08-14-consultant-runtime-north-star-audit-ledger.md`](specs/2026-08-14-consultant-runtime-north-star-audit-ledger.md) — 每個功能切片回看產品大方向與 framework 覆蓋的證據。
 - [`contract-strategy.md`](contract-strategy.md) — 現行 `job-analysis-contract` 的契約規範。
 - [`adr/README.md`](adr/README.md) — ADR 索引；0057 記錄 current-only hard cut。
 - [`design/rag-pipeline.md`](design/rag-pipeline.md) — PDF → OCS contract → indexer → embedder/Qdrant 的 RAG 供應鏈；保留但與 current API/Web 完全隔離的獨立 bounded context，非 current 產品 runtime。
@@ -38,4 +36,4 @@
 
 ## 歷史材料使用規則
 
-`docs/adr/0001`–`0056`、舊 OCS schema、舊 interview／vNext research、舊 monorepo plans 與 archive 都是決策歷史。閱讀它們是為了理解取捨或避免誤判，不是恢復實作的授權。若要改變 current-only 邊界，必須另開研究與 ADR，不能直接從歷史文件抽 code。
+被 ADR 0060 取代的 0058–0059 模組切割、`docs/design/task-analysis-engine.md` 的 Git 歷史、`docs/adr/0001`–`0056`、舊 interview／vNext research、舊 plans 與 archive 都是決策歷史。閱讀它們是為了理解取捨，不是恢復實作的授權。若要改變 current／RAG 邊界或 authority，必須另開研究與 successor ADR。

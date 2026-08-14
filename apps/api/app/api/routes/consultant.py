@@ -29,7 +29,6 @@ from job_analysis_contract import (
 from app.adapters.langgraph.postgres import DocumentNotFound, PostgresConsultantRuntime
 from app.adapters.xlsx import XLSX_MEDIA_TYPE, render_xlsx
 from app.api.consultant_mapper import to_consultant_snapshot_view
-from app.api.consultant_export_mapper import assemble_approved_export_document
 from app.api.deps import get_consultant_runtime, get_consultant_turn_processor
 from app.api.problems import (
     EXPORT_CONFIRMATION_REQUIRED,
@@ -39,6 +38,7 @@ from app.api.problems import (
 )
 from app.consultant.run_service import ConsultantTurnProcessor
 from app.consultant.state import ApprovedJobDocument, CommandReceipt, RunReceipt
+from app.export import assemble_approved_export_document
 
 
 router = APIRouter(

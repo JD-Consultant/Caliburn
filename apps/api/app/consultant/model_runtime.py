@@ -48,7 +48,7 @@ class OutputTokenParameter(StrEnum):
 
 
 class ReasoningParameters(RuntimeModel):
-    effort: Literal["low", "medium", "high"]
+    effort: Literal["low", "medium", "high", "max"]
     exclude: bool = True
 
 
@@ -83,7 +83,7 @@ class ConsultantModelProfile(RuntimeModel):
     seed: int | None = None
     max_output_tokens: int = Field(default=4096, ge=256)
     output_token_parameter: OutputTokenParameter = OutputTokenParameter.MAX_TOKENS
-    reasoning_effort: Literal["low", "medium", "high"] | None = None
+    reasoning_effort: Literal["low", "medium", "high", "max"] | None = None
     exclude_reasoning_from_response: bool = True
     timeout_seconds: float = Field(default=90, gt=0, le=600)
 

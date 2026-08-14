@@ -11,10 +11,12 @@ from app.consultant.candidate_workspace import (
     CandidateRevisionConflict,
     CandidateToolCallConflict,
     VerifiedCandidateStage,
+    candidate_mapping_authority,
     candidate_revision_digest,
     materialize_candidate_workspace,
 )
 from app.consultant.document_authority import apply_document_actions
+from app.consultant.document_review import create_document_changeset
 from app.consultant.results import (
     AnalysisBasis,
     DocumentChangeOperation,
@@ -251,6 +253,39 @@ def test_exact_tool_call_replay_returns_original_receipt_without_new_revision() 
     assert replay.candidate_revision == 1
 
 
+def test_preserved_workspace_baseline_allows_replay_and_replacement_after_metadata_revisions() -> None:
+    document_id = uuid4()
+    run_id = uuid4()
+    source_id = uuid4()
+    state = _state(document_id)
+    first_stage = _stage(run_id=run_id, source_id=source_id)
+    first, first_receipt = materialize_candidate_workspace(state, first_stage)
+    state["active_candidate"] = first.model_dump(mode="json")
+    state["revision"] = 5
+
+    replayed, replay_receipt = materialize_candidate_workspace(state, first_stage)
+    replacement, replacement_receipt = materialize_candidate_workspace(
+        state,
+        _stage(
+            run_id=run_id,
+            source_id=source_id,
+            baseline_revision=3,
+            base_candidate_revision=1,
+            tool_call_id="tool-call-2",
+            request_sha256="b" * 64,
+            changes=(
+                _change(source_id, statement="管理國內外採購作業"),
+            ),
+        ),
+    )
+
+    assert replayed == first
+    assert replay_receipt == first_receipt
+    assert replacement.baseline_revision == 3
+    assert replacement.candidate_revision == 2
+    assert replacement_receipt.candidate_revision == 2
+
+
 def test_tool_call_id_reuse_with_another_digest_is_a_conflict() -> None:
     document_id = uuid4()
     run_id = uuid4()
@@ -434,6 +469,128 @@ def test_rejected_or_stale_external_dependency_is_rejected(
                 ),
             ),
         )
+
+
+def test_pending_external_dependency_accepts_already_applied_ancestor() -> None:
+    document_id = uuid4()
+    run_id = uuid4()
+    source_id = uuid4()
+    ancestor_id = uuid4()
+    root_id = uuid4()
+    original = ApprovedJobDocument(document_id=document_id)
+    ancestor = _pending_bundle(
+        original,
+        source_id=source_id,
+        action_id=ancestor_id,
+    )
+    approved = apply_document_actions(original, ancestor.actions)
+    accepted_ancestor = ancestor.model_copy(
+        update={
+            "actions": (
+                ancestor.actions[0].model_copy(
+                    update={"status": DocumentChangeStatus.ACCEPTED}
+                ),
+            )
+        }
+    )
+    root = _pending_bundle(
+        approved,
+        source_id=source_id,
+        action_id=root_id,
+        depends_on_action_ids=(ancestor_id,),
+    )
+    root_duty_id = UUID(str(root.actions[0].after["duty_id"]))  # type: ignore[index]
+    queue = {
+        str(accepted_ancestor.changeset_id): accepted_ancestor.model_dump(mode="json"),
+        str(root.changeset_id): root.model_dump(mode="json"),
+    }
+    dependent = ReviewableDocumentChange(
+        operation=DocumentChangeOperation.REVISE,
+        path=f"/duties/{root_duty_id}/statement",
+        after="依待審前提修訂職責",
+        basis=_basis(source_id),
+        change_ref="dependent-change",
+        depends_on_action_ids=(root_id,),
+    )
+
+    workspace, _ = materialize_candidate_workspace(
+        _state(document_id, document=approved, review_queue=queue),
+        _stage(
+            run_id=run_id,
+            source_id=source_id,
+            changes=(dependent,),
+        ),
+    )
+
+    assert workspace.changeset.external_dependency_action_ids == (root_id,)
+    assert workspace.changeset.actions[0].depends_on_action_ids == (root_id,)
+
+
+def test_external_atomic_subgroup_expands_complete_conditional_baseline() -> None:
+    document_id = uuid4()
+    run_id = uuid4()
+    source_id = uuid4()
+    document = ApprovedJobDocument(document_id=document_id)
+    external = create_document_changeset(
+        document_id=document_id,
+        run_id=uuid4(),
+        summary="不可拆分的外部前提。",
+        read_revision=3,
+        document=document,
+        changes=(
+            _change(
+                source_id,
+                statement="管理採購作業",
+                change_ref="external-first",
+                atomic_group_ref="external-group",
+            ),
+            _change(
+                source_id,
+                statement="管理供應商作業",
+                change_ref="external-second",
+                atomic_group_ref="external-group",
+            ),
+        ),
+        existing_review_queue={},
+        interview_work={},
+    )
+    first_action, sibling_action = external.actions
+    sibling_duty_id = UUID(str(sibling_action.after["duty_id"]))  # type: ignore[index]
+    state = _state(
+        document_id,
+        document=document,
+        review_queue={
+            str(external.changeset_id): external.model_dump(mode="json")
+        },
+    )
+    dependent = ReviewableDocumentChange(
+        operation=DocumentChangeOperation.REVISE,
+        path=f"/duties/{sibling_duty_id}/statement",
+        after="修訂完整原子前提中的職責",
+        basis=_basis(source_id),
+        change_ref="dependent-change",
+        depends_on_action_ids=(first_action.action_id,),
+    )
+
+    allowed_entities, allowed_actions = candidate_mapping_authority(
+        state,
+        depends_on_action_ids=(first_action.action_id,),
+        supersedes_action_ids=(),
+    )
+    workspace, _ = materialize_candidate_workspace(
+        state,
+        _stage(
+            run_id=run_id,
+            source_id=source_id,
+            changes=(dependent,),
+        ),
+    )
+
+    expected_action_ids = {first_action.action_id, sibling_action.action_id}
+    assert allowed_actions == expected_action_ids
+    assert sibling_duty_id in allowed_entities
+    assert set(workspace.changeset.external_dependency_action_ids) == expected_action_ids
+    assert set(workspace.changeset.actions[0].depends_on_action_ids) == expected_action_ids
 
 
 def test_local_dependencies_and_explicit_atomic_group_become_review_metadata() -> None:

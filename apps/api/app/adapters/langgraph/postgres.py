@@ -37,6 +37,7 @@ from app.consultant.candidate_workspace import (
     VerifiedCandidateStage,
     candidate_mapping_authority,
     candidate_request_sha256,
+    candidate_staging_baseline,
     materialize_candidate_workspace,
 )
 from app.consultant.document_authority import edited_action_source_payload
@@ -715,11 +716,14 @@ class PostgresConsultantRuntime:
                 raise ActiveConsultantRun(
                     "candidate staging does not match the active consultant run"
                 )
-            actual_revision = int(raw_state.get("revision", 0))
-            if actual_revision != request.baseline_revision:
+            expected_baseline = candidate_staging_baseline(
+                raw_state,
+                run_id=request.run_id,
+            )
+            if request.baseline_revision != expected_baseline:
                 raise CandidateRevisionConflict(
-                    f"expected baseline revision {request.baseline_revision}, "
-                    f"found {actual_revision}"
+                    f"expected baseline revision {expected_baseline}, "
+                    f"found {request.baseline_revision}"
                 )
             request_sha256 = candidate_request_sha256(request)
             active_payload = raw_state.get("active_candidate")

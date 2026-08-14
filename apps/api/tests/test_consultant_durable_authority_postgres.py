@@ -1673,6 +1673,158 @@ async def test_candidate_lifecycle_preserves_failed_retry_and_clears_on_correcti
 
 
 @pytest.mark.asyncio
+async def test_store_first_correction_blocks_old_failed_run_until_retry_reconciles(
+    consultant_database_url: str,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    document_id = uuid4()
+    failed_run_id = uuid4()
+    failed_source_id = uuid4()
+    correction_run_id = uuid4()
+    correction_source_id = uuid4()
+
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        await runtime.create_document(document_id, title="採購職務")
+        admitted, _ = await runtime.admit_employee_answer(
+            document_id=document_id,
+            run_id=failed_run_id,
+            source_id=failed_source_id,
+            text="我負責管理採購作業。",
+        )
+        request = _candidate_stage_request(
+            run_id=failed_run_id,
+            source_id=failed_source_id,
+            baseline_revision=admitted.revision,
+        )
+        await runtime.stage_candidate_revision(
+            document_id=document_id,
+            request=request,
+        )
+        await runtime.mark_consultant_run_failed(
+            document_id=document_id,
+            run_id=failed_run_id,
+            error_code="invalid_employee_input",
+        )
+        failed_state = await runtime.raw_state(document_id)
+        active_candidate = failed_state["active_candidate"]
+        approved_before = admitted.approved_document
+        queue_before = admitted.review_queue
+
+        async def fail_after_store(_source: EmployeeSource) -> None:
+            raise RuntimeError("correction-after-store")
+
+        monkeypatch.setattr(runtime, "_after_source_store", fail_after_store)
+        with pytest.raises(RuntimeError, match="correction-after-store"):
+            await runtime.admit_employee_answer(
+                document_id=document_id,
+                run_id=correction_run_id,
+                source_id=correction_source_id,
+                text="更正：我是每週管理採購作業。",
+                supersedes_source_id=failed_source_id,
+            )
+
+        failed_source = await runtime.get_source(document_id, failed_source_id)
+        pending_correction = await runtime.get_source(
+            document_id, correction_source_id
+        )
+        assert failed_source.validity is SourceValidity.SUPERSEDED
+        assert pending_correction.processing_status is SourceProcessingStatus.PENDING
+
+        with pytest.raises(PendingSourceRequiresReconciliation):
+            await runtime.admit_employee_answer(
+                document_id=document_id,
+                run_id=failed_run_id,
+                source_id=failed_source_id,
+                text="我負責管理採購作業。",
+            )
+
+        rejected_restart_state = await runtime.raw_state(document_id)
+        rejected_restart = await runtime.reopen_document(document_id)
+        assert rejected_restart_state["latest_run"]["status"] == RunStatus.FAILED.value
+        assert rejected_restart_state["active_candidate"] == active_candidate
+        assert rejected_restart.approved_document == approved_before
+        assert rejected_restart.review_queue == queue_before
+        with pytest.raises(ActiveConsultantRun):
+            await runtime.stage_candidate_revision(
+                document_id=document_id,
+                request=request,
+            )
+
+        monkeypatch.setattr(runtime, "_after_source_store", runtime._noop_source_hook)
+        corrected, should_process = await runtime.admit_employee_answer(
+            document_id=document_id,
+            run_id=correction_run_id,
+            source_id=correction_source_id,
+            text="更正：我是每週管理採購作業。",
+            supersedes_source_id=failed_source_id,
+        )
+
+        assert should_process is True
+        assert corrected.latest_run is not None
+        assert corrected.latest_run["run_id"] == str(correction_run_id)
+        assert corrected.approved_document == approved_before
+        assert corrected.review_queue == queue_before
+        assert (await runtime.raw_state(document_id))["active_candidate"] is None
+        assert (
+            await runtime.get_source(document_id, correction_source_id)
+        ).processing_status is SourceProcessingStatus.COMMITTED
+
+
+@pytest.mark.asyncio
+async def test_candidate_exact_replay_revalidates_persisted_evidence_source(
+    consultant_database_url: str,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    document_id = uuid4()
+    run_id = uuid4()
+    source_id = uuid4()
+    correction_source_id = uuid4()
+
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        await runtime.create_document(document_id, title="採購職務")
+        admitted, _ = await runtime.admit_employee_answer(
+            document_id=document_id,
+            run_id=run_id,
+            source_id=source_id,
+            text="我負責管理採購作業。",
+        )
+        request = _candidate_stage_request(
+            run_id=run_id,
+            source_id=source_id,
+            baseline_revision=admitted.revision,
+        )
+        await runtime.stage_candidate_revision(
+            document_id=document_id,
+            request=request,
+        )
+        staged = (await runtime.raw_state(document_id))["active_candidate"]
+
+        async def fail_after_store(_source: EmployeeSource) -> None:
+            raise RuntimeError("correction-after-store")
+
+        monkeypatch.setattr(runtime, "_after_source_store", fail_after_store)
+        with pytest.raises(RuntimeError, match="correction-after-store"):
+            await runtime.record_employee_source(
+                document_id=document_id,
+                source_id=correction_source_id,
+                kind=EmployeeSourceKind.EMPLOYEE_TURN,
+                text="更正：我是每週管理採購作業。",
+                supersedes_source_id=source_id,
+            )
+
+        with pytest.raises(SourceConflict, match="superseded"):
+            await runtime.stage_candidate_revision(
+                document_id=document_id,
+                request=request,
+            )
+
+        after_replay = await runtime.reopen_document(document_id)
+        assert (await runtime.raw_state(document_id))["active_candidate"] == staged
+        assert after_replay.approved_document == admitted.approved_document
+        assert after_replay.review_queue == admitted.review_queue
+
+
+@pytest.mark.asyncio
 async def test_direct_edit_clears_candidate_workspace(
     consultant_database_url: str,
 ) -> None:

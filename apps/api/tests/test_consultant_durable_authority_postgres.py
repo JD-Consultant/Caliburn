@@ -35,8 +35,8 @@ from app.consultant.candidate_wire import (
     OutputOpksKind,
 )
 from app.consultant.candidate_workspace import (
+    CandidateEditRejected,
     CandidateStageRequest,
-    CandidateToolCallConflict,
     CandidateWorkspace,
 )
 from app.consultant.interview import VerifiedConsultantCommit
@@ -1560,9 +1560,10 @@ async def test_candidate_stage_is_payload_bound_and_failed_stage_keeps_last_succ
             request=request,
         )
         raw_before_failure = await runtime.raw_state(document_id)
+        snapshot_before_failure = await runtime.reopen_document(document_id)
 
         assert replay == first
-        with pytest.raises(CandidateToolCallConflict):
+        with pytest.raises(CandidateEditRejected) as rejected:
             await runtime.stage_candidate_revision(
                 document_id=document_id,
                 request=_candidate_stage_request(
@@ -1573,6 +1574,12 @@ async def test_candidate_stage_is_payload_bound_and_failed_stage_keeps_last_succ
                     summary="同一 tool-call ID 的不同內容。",
                 ),
             )
+        assert rejected.value.baseline_revision == admitted.revision
+        assert rejected.value.candidate_revision == first.candidate_revision
+        assert rejected.value.issues == (
+            "candidate tool call candidate-tool-1 was reused with another payload",
+        )
+        assert rejected.value.__cause__ is None
         invalid_change = _candidate_wire_change(
             change_ref="invalid",
             operation=DocumentChangeOperation.REVISE,
@@ -1581,7 +1588,7 @@ async def test_candidate_stage_is_payload_bound_and_failed_stage_keeps_last_succ
             text_value="不可引用未知 Duty",
             duties=(),
         )
-        with pytest.raises(CandidateWireMappingError, match="unbound entity handle"):
+        with pytest.raises(CandidateEditRejected) as invalid_rejected:
             await runtime.stage_candidate_revision(
                 document_id=document_id,
                 request=_candidate_stage_request(
@@ -1593,8 +1600,16 @@ async def test_candidate_stage_is_payload_bound_and_failed_stage_keeps_last_succ
                     changes=(invalid_change,),
                 ),
             )
+        assert invalid_rejected.value.baseline_revision == admitted.revision
+        assert invalid_rejected.value.candidate_revision == first.candidate_revision
+        assert invalid_rejected.value.issues == ("unbound entity handle",)
+        assert isinstance(invalid_rejected.value.__cause__, CandidateWireMappingError)
+        assert str(invalid_rejected.value.__cause__) == "unbound entity handle"
 
         assert (await runtime.raw_state(document_id))["active_candidate"] == raw_before_failure["active_candidate"]
+        snapshot_after_failure = await runtime.reopen_document(document_id)
+        assert snapshot_after_failure.approved_document == snapshot_before_failure.approved_document
+        assert snapshot_after_failure.review_queue == snapshot_before_failure.review_queue
 
 
 @pytest.mark.asyncio
@@ -1826,11 +1841,22 @@ async def test_candidate_exact_replay_revalidates_persisted_evidence_source(
                 supersedes_source_id=source_id,
             )
 
-        with pytest.raises(SourceConflict, match="superseded"):
+        with pytest.raises(CandidateEditRejected) as rejected:
             await runtime.stage_candidate_revision(
                 document_id=document_id,
                 request=request,
             )
+        assert rejected.value.baseline_revision == admitted.revision
+        assert rejected.value.candidate_revision == CandidateWorkspace.model_validate(
+            staged
+        ).candidate_revision
+        assert rejected.value.issues == (
+            f"source {source_id} was superseded before candidate staging",
+        )
+        assert isinstance(rejected.value.__cause__, SourceConflict)
+        assert str(rejected.value.__cause__) == (
+            f"source {source_id} was superseded before candidate staging"
+        )
 
         after_replay = await runtime.reopen_document(document_id)
         assert (await runtime.raw_state(document_id))["active_candidate"] == staged

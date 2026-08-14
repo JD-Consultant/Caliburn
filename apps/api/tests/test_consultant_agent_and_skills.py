@@ -286,6 +286,11 @@ def _output_document_change(
     task_ids: tuple[UUID, ...] = (),
 ) -> OutputDocumentChange:
     return OutputDocumentChange(
+        change_ref="change-1",
+        depends_on_change_refs=(),
+        depends_on_action_ids=(),
+        supersedes_action_ids=(),
+        atomic_group_ref="",
         operation=operation,
         target=target,
         target_id=target_id,
@@ -400,10 +405,13 @@ async def test_agent_composes_selected_skills_without_leaking_ineligible_content
                 opks_items=(
                     OutputOpksItem(
                         item_id="",
+                        entity_ref="",
                         text="採購需求文件",
                         display_order=-1,
                         task_ids=(),
                         indicator_ids=(),
+                        task_refs=(),
+                        indicator_refs=(),
                     ),
                 ),
                 opks_kind=OutputOpksKind.OUTPUT,

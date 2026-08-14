@@ -304,6 +304,13 @@ Big-bang 只描述最終切換，不表示做到最後才審核。之後每完�
 - TDD／驗證：baseline `tests/test_consultant_agent_and_skills.py tests/test_consultant_model_runtime.py` 為 `65 passed in 1.50s`；RED command 因 candidate Tool module不存在得到預期 `1 error in 1.12s`。brief GREEN command `tests/test_consultant_candidate_tool.py tests/test_consultant_agent_and_skills.py tests/test_consultant_model_runtime.py` 為 `70 passed in 1.49s`。workspace／durable receipt focused command為 `18 passed, 30 skipped in 0.63s`；skip 是未提供 PostgreSQL test URL 的既有條件，未把它當成 PostgreSQL integration 綠燈。LangChain schema adapter 的 injection/subset 行為以 ToolRuntime graph test覆蓋，沒有用自寫 agent loop繞過。
 - 北極星回歸：一位顧問、動態 Task／Duty／OPKS、employee source memory、必要澄清／Gap、員工唯一 authority、自然離開／續談與單一可強制匯出均未更動；本 task 未開始 Task 4 的 run-service hard switch。RAG／Reference、能力級別／A generation、正式 eval、multi-agent與 auto-accept仍明確延後。結果 **Pass**。
 
+### ADR 0063 Task 3：pre-review PostgreSQL regression alignment
+
+- 狀態：**Pass**；follow-up 只修正 integration regression assertion 與 Task 3 證據，沒有改 production behavior，也未開始 Task 4。
+- 契約：payload-bound 同一 tool-call ID 換 payload、unbound entity handle，以及 exact replay 遇到已 superseded source，均應由 adapter 回傳 framework-neutral `CandidateEditRejected`（含 current baseline／candidate revision 與 actionable issue）；source replay 保留窄 `SourceConflict` 為 `__cause__`，wire mapping 保留 `CandidateWireMappingError` 為 `__cause__`。候選、核准文件與 review queue 在拒絕後仍不變。
+- concurrency 診斷與清理：先前 07:25–07:28 重疊 pytest 導致 local disposable DB 留下 8 個已列舉的孤立 checkpoint thread及 1 個已列舉 source prefix/key；`consultant_documents=0` 且 metadata 集合沒有額外目標。owner 明確授權後，以 parameterized SQL 只刪除這些目標，FK-safe 順序為 writes（77）→ blobs（29）→ checkpoints（22）→ 單一 Store row（1）；沒有 truncate、drop、catalog或其他 namespace刪除。
+- 順序驗證：Task 3 non-DB focused gate `70 passed in 1.48s`；其後唯一的 real PostgreSQL gate `48 passed in 86.45s`、零 skip。post-gate 查詢 `consultant_documents`、`checkpoints`、`checkpoint_blobs`、`checkpoint_writes`、`store` 全為 0，因此沒有把 concurrency residue 誤判成產品 cleanup defect。
+
 ## 8. 本次直接使用的一手來源
 
 - [Anthropic — Prompting Claude Opus 5](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5)

@@ -164,6 +164,60 @@ async def test_catalog_and_source_first_run_admission_are_durable_and_idempotent
 
 
 @pytest.mark.asyncio
+async def test_failed_run_allows_explicit_employee_correction_but_not_unrelated_answer(
+    consultant_database_url: str,
+) -> None:
+    document_id = uuid4()
+    failed_run_id = uuid4()
+    failed_source_id = uuid4()
+    correction_run_id = uuid4()
+    correction_source_id = uuid4()
+
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        await runtime.create_document(document_id, title="採購職務")
+        await runtime.admit_employee_answer(
+            document_id=document_id,
+            run_id=failed_run_id,
+            source_id=failed_source_id,
+            text="我每天整理採購需求。",
+        )
+        await runtime.mark_consultant_run_failed(
+            document_id=document_id,
+            run_id=failed_run_id,
+            error_code="invalid_employee_input",
+        )
+
+        with pytest.raises(ActiveConsultantRun):
+            await runtime.admit_employee_answer(
+                document_id=document_id,
+                run_id=uuid4(),
+                source_id=uuid4(),
+                text="另一項不相干的工作。",
+            )
+
+        corrected, should_process = await runtime.admit_employee_answer(
+            document_id=document_id,
+            run_id=correction_run_id,
+            source_id=correction_source_id,
+            text="更正：我是每週整理採購需求。",
+            supersedes_source_id=failed_source_id,
+        )
+
+        assert should_process is True
+        assert corrected.latest_run is not None
+        assert corrected.latest_run["run_id"] == str(correction_run_id)
+        assert corrected.latest_run["source_id"] == str(correction_source_id)
+        assert corrected.latest_run["status"] == RunStatus.SOURCE_SAVED.value
+        failed_source = await runtime.get_source(document_id, failed_source_id)
+        correction_source = await runtime.get_source(document_id, correction_source_id)
+        assert failed_source.validity is SourceValidity.SUPERSEDED
+        assert failed_source.superseded_by_source_id == correction_source_id
+        assert correction_source.supersedes_source_id == failed_source_id
+
+        await runtime.delete_document(document_id)
+
+
+@pytest.mark.asyncio
 async def test_calibration_confirmation_is_employee_evidence_and_idempotent(
     consultant_database_url: str,
 ) -> None:
@@ -964,6 +1018,90 @@ async def test_document_review_and_clarification_survive_postgres_restart(
         assert clarification_source.text == (
             "通常由我建立請購單，主管只在例外時協助。"
         )
+
+
+@pytest.mark.asyncio
+async def test_structural_edit_accept_uses_candidate_source_without_minting_evidence(
+    consultant_database_url: str,
+) -> None:
+    document_id = uuid4()
+    seed_source_id = uuid4()
+    answer_source_id = uuid4()
+    candidate_edit_source_id = uuid4()
+    document = _document(document_id)
+    duty_id = document.duties[0].duty_id
+
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        initial = await runtime.create_document(document_id, title="採購職務")
+        seeded = await runtime.apply_direct_edit(
+            document_id=document_id,
+            expected_revision=initial.revision,
+            document=document,
+            source_id=seed_source_id,
+        )
+        sourced = await runtime.record_employee_source(
+            document_id=document_id,
+            source_id=answer_source_id,
+            kind=EmployeeSourceKind.EMPLOYEE_TURN,
+            text="這項工作可能不屬於原本的主要職責。",
+        )
+        basis = AnalysisBasis(
+            source_ids=(answer_source_id,),
+            skill_ids=("duty-grouping",),
+        )
+        now = datetime.now(UTC)
+        proposed = await runtime.commit_verified_consultant_result(
+            document_id=document_id,
+            expected_revision=sourced.revision,
+            commit=VerifiedConsultantCommit(
+                run_id=uuid4(),
+                answer_source_id=answer_source_id,
+                started_at=now,
+                completed_at=now,
+                result=ConsultantResult(
+                    visible_reply="我整理了一項工作歸類建議供你確認。",
+                    reply_basis=basis,
+                    used_skill_ids=("duty-grouping",),
+                    reviewable_document_changes=(
+                        ReviewableDocumentChange(
+                            operation=DocumentChangeOperation.REORDER,
+                            path=f"/duties/{duty_id}/display_order",
+                            after=1,
+                            basis=basis,
+                        ),
+                    ),
+                    sufficiency=SufficiencyRecommendation(
+                        currently_enough=False,
+                        reason="仍有其他工作待確認。",
+                        remaining_gap_reasons=(GapReason.WORK_COVERAGE_MISSING,),
+                        continuing_benefit="繼續訪談可確認職責分組。",
+                        basis=basis,
+                    ),
+                ),
+            ),
+        )
+        bundle = proposed.document_review.bundles[0]
+        action = bundle.actions[0]
+
+        reviewed = await runtime.decide_document_changes(
+            document_id=document_id,
+            expected_revision=proposed.revision,
+            action="edit_and_accept_changes",
+            changeset_id=bundle.changeset_id,
+            action_ids=(action.action_id,),
+            edited_after_by_action_id={action.action_id: 0},
+            source_id=candidate_edit_source_id,
+        )
+
+        assert next(
+            duty for duty in reviewed.approved_document.duties if duty.duty_id == duty_id
+        ).display_order == 0
+        assert (
+            await runtime.get_source_or_none(document_id, candidate_edit_source_id)
+        ) is None
+        assert reviewed.source_count == seeded.source_count + 1
+
+        await runtime.delete_document(document_id)
 
 
 @pytest.mark.asyncio

@@ -1,7 +1,7 @@
 # AI 職務顧問 runtime 設計
 
 - 決策：[ADR 0060](../adr/0060-langchain-langgraph-consultant-runtime-and-durable-authority.md)
-- 狀態：Big-bang migration 建構中；目前完成框架底座、durable authority、模型執行、最小充分 Context、專業分析 Skills、adaptive interview／可見理解／語意進度／足夠性，以及新跨語言契約／production API transport；員工 Web 與最終 composition hard cut 尚未完成
+- 狀態：Big-bang migration 建構中；目前完成框架底座、durable authority、模型執行、最小充分 Context、專業分析 Skills、adaptive interview／可見理解／語意進度／足夠性、新跨語言契約／production API transport，以及員工顧問工作區；最終 composition hard cut 尚未完成
 - 實作：`apps/api/app/consultant`、`apps/api/app/adapters/langgraph`、`apps/api/app/adapters/openrouter/langchain.py`
 
 ## 儲存權威
@@ -114,6 +114,20 @@ LangGraph `StateGraph`、typed checkpoint、`add_messages` reducer 與 PostgreSQ
 
 「目前已足夠」是 deterministic evidence 與模型白話判斷的交集：至少不能有 active／unvisited 工作、blocking Gap 或未決結構變更，且模型要說明理由、剩餘缺口與繼續訪談最可能改善之處。它不關閉對話、不建立 close／reopen lifecycle，也不等於匯出 readiness；新員工來源或 direct edit 會立刻標記需重新計算。
 
+## 員工顧問工作區
+
+Next App Router 頁面只負責掛載 purpose-first Client Component；TanStack Query 管文件庫與 durable snapshot 的 server cache、mutation 與 invalidation，瀏覽器標準 `EventSource` 只負責斷線重連與通知 refetch。Web 不保存第二份訪談狀態，也不解讀 raw LangGraph checkpoint、interrupt、attempt receipt 或 Context receipt。
+
+- 首頁建立或重開彼此隔離的職務文件；關閉頁面只是停止互動，下次直接由 durable snapshot 恢復，沒有 pause／resume／finish 操作。
+- 同一工作區清楚分開「訪談對話」「AI 目前理解／焦點／Gap／語意進度」「AI 待審文件變更」「員工核准正式文件」。必要澄清只顯示 affected branch，回答區與不相依操作不被整頁鎖住。
+- 員工逐字回答與更正 lineage 都會在重開後重建為可見對話；`source_saved`、`completed`、`failed` 取自 durable run。相同內容重試沿用原 run／source；若員工要改掉失敗回答，則用明確 `supersedes_source_id` 建立新來源，不能以無關回答繞過 failed-run admission。
+- 待審 changeset 支援 accept、edit-accept、reject、defer；atomic subgroup 與 accept 時必要 dependency 由 typed contract 決定。結構化 Duty／Task／OPKS 變更以員工欄位、職責名稱與工作名稱編輯，穩定 ID、來源與內部排序欄位由系統原樣保留，不要求員工修改 JSON。純重新歸類或排序的 edit-accept 不假裝產生員工文字 evidence。UI 不把 JSON pointer、framework state 或內部 enum 當員工進度。
+- 正式文件 local draft 是 document-scoped、可在離開／返回後恢復的瀏覽器本機草稿，不是 authority 或第二份 server document store；background refetch 不覆蓋 dirty draft。所有 mutation response 依 semantic revision 單調寫入 TanStack cache，409 會重抓 durable snapshot 並保留本機選取／草稿。送出前會清理已刪 Task／indicator 造成的懸空 OPKS 關聯，server 仍重驗完整 invariant。能力級別與 A 只有員工可直接編輯。
+- server 投影的 blocked branch 會顯示實際原因；只有在沒有安全旁支時停用一般 AI 訪談回答。更正原話、文件審核、員工直接編輯與匯出仍可使用，避免把 branch-level blocker 誤做成整頁鎖定。
+- 匯出只有一個入口；有具體 readiness gap 時先顯示問題，員工明確確認才以 `force=true` 匯出目前核准內容。待審變更不會暗中被接受。
+
+目前 UI 沒有 RAG／Reference 控制、consumer 或提示；同文件 stable-ID 原話查詢仍是顧問記憶的一部分，不等於外部知識檢索。
+
 ## 當前邊界
 
-這個新 runtime 已有可替換模型 profile、LangChain agent harness、attempt receipt、Context middleware、真實顧問 Skills、adaptive interview routing、可見理解／Gap／語意進度、完整文件 patch／review command、deterministic authority、required-clarification interrupt，以及 generated contract／production API transport。尚未完成的是員工 Web 工作面、舊 composition 的最終 hard cut與 fresh-root migration；新 export transport 已接到既有成熟 XLSX renderer，但舊 export modules 的最終 dependency cleanup 留在 Task 9。它沒有 RAG／Reference、能力級別／A 生成或正式品質 eval；舊 production composition 只維持到垂直切片完成，最終硬切後刪除，不雙寫。
+這個新 runtime 已有可替換模型 profile、LangChain agent harness、attempt receipt、Context middleware、真實顧問 Skills、adaptive interview routing、可見理解／Gap／語意進度、完整文件 patch／review command、deterministic authority、required-clarification interrupt、generated contract／production API transport，以及員工顧問工作區。尚未完成的是舊 composition 的最終 hard cut與 fresh-root migration；新 export transport 已接到既有成熟 XLSX renderer，但舊 export modules 的最終 dependency cleanup 留在 Task 9。它沒有 RAG／Reference、能力級別／A 生成或正式品質 eval；舊 production composition 只維持到 Task 9，最終硬切後刪除，不雙寫。

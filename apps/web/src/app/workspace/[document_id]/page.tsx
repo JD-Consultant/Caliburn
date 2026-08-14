@@ -1,4 +1,4 @@
-import { ConsultationWorkspace } from "./_components/ConsultationWorkspace";
+import { ConsultantWorkspace } from "@/features/consultant";
 
 export default async function DocumentWorkspacePage({
   params,
@@ -6,5 +6,5 @@ export default async function DocumentWorkspacePage({
   params: Promise<{ document_id: string }>;
 }) {
   const { document_id } = await params;
-  return <ConsultationWorkspace documentId={document_id} />;
+  return <ConsultantWorkspace documentId={document_id} />;
 }

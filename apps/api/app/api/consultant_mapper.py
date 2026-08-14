@@ -10,6 +10,7 @@ from job_analysis_contract import (
     DocumentChangeSetView,
     DocumentReviewView,
     DurableRunView,
+    EmployeeMessageView,
     ExportReadinessIssueView,
     ExportReadinessView,
     NextQuestionView,
@@ -27,6 +28,8 @@ from app.consultant.state import (
     GapStatus,
     InterviewWorkItem,
     InterviewWorkStatus,
+    EmployeeSource,
+    EmployeeSourceKind,
 )
 from app.consultant.views import ConsultantSnapshot
 
@@ -123,6 +126,8 @@ def _readiness(snapshot: ConsultantSnapshot) -> ExportReadinessView:
 
 def to_consultant_snapshot_view(
     snapshot: ConsultantSnapshot,
+    *,
+    employee_sources: tuple[EmployeeSource, ...] = (),
 ) -> ConsultantSnapshotView:
     visible_work = []
     for _, raw in sorted(snapshot.interview_work.items()):
@@ -174,6 +179,21 @@ def to_consultant_snapshot_view(
         semantic_progress=SemanticProgressView.model_validate(
             snapshot.semantic_progress.model_dump(mode="json")
         ),
+        employee_messages=[
+            EmployeeMessageView.model_validate(
+                {
+                    "source_id": source.source_id,
+                    "text": source.text,
+                    "created_at": source.created_at,
+                    "processing_status": source.processing_status.value,
+                    "validity": source.validity.value,
+                    "supersedes_source_id": source.supersedes_source_id,
+                    "superseded_by_source_id": source.superseded_by_source_id,
+                }
+            )
+            for source in employee_sources
+            if source.kind is EmployeeSourceKind.EMPLOYEE_TURN
+        ],
         messages=messages,
         document_review=DocumentReviewView.model_validate(
             {

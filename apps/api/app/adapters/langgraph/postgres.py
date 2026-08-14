@@ -550,39 +550,46 @@ class PostgresConsultantRuntime:
                 RunStatus.SOURCE_SAVED,
                 RunStatus.FAILED,
             }:
-                if latest.run_id != run_id or latest.source_id != source_id:
-                    raise ActiveConsultantRun(
-                        f"consultant run {latest.run_id} must be resolved first"
-                    )
-                if existing is None:
-                    raise ConsultantPersistenceError(
-                        "recoverable run is missing its employee source"
-                    )
-                if existing.processing_status is SourceProcessingStatus.PENDING:
-                    await self._mark_source_committed(existing)
-                if latest.status is RunStatus.SOURCE_SAVED:
-                    return snapshot, False
-                receipt = RunReceipt(
-                    run_id=run_id,
-                    status=RunStatus.SOURCE_SAVED,
-                    source_id=source_id,
-                    started_at=datetime.now(UTC),
+                replaces_failed_source = (
+                    latest.status is RunStatus.FAILED
+                    and supersedes_source_id == latest.source_id
+                    and source_id != latest.source_id
+                    and run_id != latest.run_id
                 )
-                try:
-                    await self.graph.ainvoke(
-                        {},
-                        self.graph_config(document_id),
-                        context={
-                            "action": "restart_consultant_run",
-                            "document_id": str(document_id),
-                            "expected_revision": snapshot.revision,
-                            "run_receipt": receipt.model_dump(mode="json"),
-                        },
+                if not replaces_failed_source:
+                    if latest.run_id != run_id or latest.source_id != source_id:
+                        raise ActiveConsultantRun(
+                            f"consultant run {latest.run_id} must be resolved first"
+                        )
+                    if existing is None:
+                        raise ConsultantPersistenceError(
+                            "recoverable run is missing its employee source"
+                        )
+                    if existing.processing_status is SourceProcessingStatus.PENDING:
+                        await self._mark_source_committed(existing)
+                    if latest.status is RunStatus.SOURCE_SAVED:
+                        return snapshot, False
+                    receipt = RunReceipt(
+                        run_id=run_id,
+                        status=RunStatus.SOURCE_SAVED,
+                        source_id=source_id,
+                        started_at=datetime.now(UTC),
                     )
-                except StaleThreadRevision as error:
-                    raise StaleRevision(str(error)) from error
-                await self._touch_catalog(document_id)
-                return await self._snapshot(document_id), True
+                    try:
+                        await self.graph.ainvoke(
+                            {},
+                            self.graph_config(document_id),
+                            context={
+                                "action": "restart_consultant_run",
+                                "document_id": str(document_id),
+                                "expected_revision": snapshot.revision,
+                                "run_receipt": receipt.model_dump(mode="json"),
+                            },
+                        )
+                    except StaleThreadRevision as error:
+                        raise StaleRevision(str(error)) from error
+                    await self._touch_catalog(document_id)
+                    return await self._snapshot(document_id), True
             if (
                 latest is not None
                 and latest.status is RunStatus.COMPLETED
@@ -1011,10 +1018,6 @@ class PostgresConsultantRuntime:
                     source_id=source.source_id,
                     kind=source.kind,
                     created_at=source.created_at,
-                )
-            elif source_id is not None:
-                raise ValueError(
-                    "review decision without employee-authored text must not mint evidence"
                 )
 
             preflight = apply_review_command(

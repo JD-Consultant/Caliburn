@@ -354,6 +354,47 @@ class PostgresConsultantRuntime:
         )
         return [EmployeeSource.model_validate(item.value) for item in items]
 
+    async def _require_current_committed_sources(
+        self,
+        document_id: UUID,
+        source_ids: Iterable[UUID],
+    ) -> tuple[EmployeeSource, ...]:
+        ordered_ids = tuple(source_ids)
+        loaded = await asyncio.gather(
+            *(self.get_source_or_none(document_id, source_id) for source_id in ordered_ids)
+        )
+        unknown = [
+            source_id
+            for source_id, source in zip(ordered_ids, loaded)
+            if source is None or source.document_id != document_id
+        ]
+        if unknown:
+            raise UnknownEvidenceSource(
+                "unknown employee evidence source "
+                + ", ".join(str(source_id) for source_id in unknown)
+            )
+        sources = tuple(source for source in loaded if source is not None)
+        if any(
+            source.processing_status is not SourceProcessingStatus.COMMITTED
+            for source in sources
+        ):
+            raise PendingSourceRequiresReconciliation(
+                "candidate evidence includes an uncommitted employee source"
+            )
+        superseded = next(
+            (
+                source
+                for source in sources
+                if source.validity is not SourceValidity.CURRENT
+            ),
+            None,
+        )
+        if superseded is not None:
+            raise SourceConflict(
+                f"source {superseded.source_id} was superseded before candidate staging"
+            )
+        return sources
+
     async def _put_source(self, source: EmployeeSource) -> None:
         await self.store.aput(
             self.source_namespace(source.document_id),
@@ -579,10 +620,27 @@ class PostgresConsultantRuntime:
                         raise ConsultantPersistenceError(
                             "recoverable run is missing its employee source"
                         )
-                    if existing.processing_status is SourceProcessingStatus.PENDING:
-                        await self._mark_source_committed(existing)
                     if latest.status is RunStatus.SOURCE_SAVED:
+                        if existing.processing_status is SourceProcessingStatus.PENDING:
+                            await self._mark_source_committed(existing)
                         return snapshot, False
+                    pending = await self._pending_sources(document_id)
+                    if pending:
+                        raise PendingSourceRequiresReconciliation(
+                            f"source {pending[0].source_id} must be reconciled before "
+                            "restarting the failed run"
+                        )
+                    if (
+                        existing.processing_status
+                        is not SourceProcessingStatus.COMMITTED
+                    ):
+                        raise PendingSourceRequiresReconciliation(
+                            f"source {existing.source_id} is not committed"
+                        )
+                    if existing.validity is not SourceValidity.CURRENT:
+                        raise SourceConflict(
+                            f"source {existing.source_id} was superseded before restart"
+                        )
                     receipt = RunReceipt(
                         run_id=run_id,
                         status=RunStatus.SOURCE_SAVED,
@@ -740,6 +798,10 @@ class PostgresConsultantRuntime:
                             f"candidate tool call {request.tool_call_id} was reused "
                             "with another payload"
                         )
+                    await self._require_current_committed_sources(
+                        document_id,
+                        active.changeset.source_ids,
+                    )
                     return CandidateEditReceipt(
                         candidate_revision=replay.candidate_revision,
                         revision_digest=replay.revision_digest,
@@ -793,18 +855,10 @@ class PostgresConsultantRuntime:
                     key=str,
                 )
             )
-            sources = tuple(
-                await asyncio.gather(
-                    *(self.get_source(document_id, source_id) for source_id in source_ids)
-                )
+            sources = await self._require_current_committed_sources(
+                document_id,
+                source_ids,
             )
-            if any(
-                source.processing_status is not SourceProcessingStatus.COMMITTED
-                for source in sources
-            ):
-                raise PendingSourceRequiresReconciliation(
-                    "candidate evidence includes an uncommitted employee source"
-                )
             used_skill_ids = verify_candidate_document_changes(
                 changes,
                 document_id=document_id,

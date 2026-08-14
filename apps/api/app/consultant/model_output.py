@@ -468,6 +468,7 @@ _FIELDS_BY_TARGET = {
 def _map_document_change(
     value: OutputDocumentChange, bases: _BasisTable
 ) -> ReviewableDocumentChange:
+    value = _normalize_document_wire_aliases(value)
     path = _document_path(value)
     after = _document_after(value)
     opks_kind = (
@@ -492,6 +493,40 @@ def _map_document_change(
         indicator_ids=value.indicator_ids,
         basis=bases.resolve(value.basis_ordinal, "document change basis_ordinal"),
     )
+
+
+def _normalize_document_wire_aliases(
+    value: OutputDocumentChange,
+) -> OutputDocumentChange:
+    """Canonicalize only combinations whose domain intent is unambiguous."""
+
+    if value.target in {
+        OutputDocumentTarget.JOB_TITLE,
+        OutputDocumentTarget.WORK_DESCRIPTION,
+    }:
+        if (
+            value.operation in {
+                DocumentChangeOperation.ADD,
+                DocumentChangeOperation.REVISE,
+            }
+            and not value.target_id
+            and not value.target_ids
+        ):
+            return value.model_copy(
+                update={
+                    "operation": DocumentChangeOperation.REVISE,
+                    "field": OutputDocumentField.VALUE,
+                }
+            )
+        return value
+    if value.operation in {
+        DocumentChangeOperation.ADD,
+        DocumentChangeOperation.WITHDRAW,
+        DocumentChangeOperation.MERGE,
+        DocumentChangeOperation.SPLIT,
+    }:
+        return value.model_copy(update={"field": OutputDocumentField.ENTITY})
+    return value
 
 
 def _document_path(value: OutputDocumentChange) -> str:
@@ -715,15 +750,18 @@ def _map_task(value: OutputTask) -> dict[str, Any]:
 def _map_opks_after(value: OutputDocumentChange) -> Any:
     if not value.opks_items:
         raise ConsultantOutputMappingError("OPKS entity change requires a payload")
+    single_item = value.opks_items[0] if len(value.opks_items) == 1 else None
     if (
         value.operation is DocumentChangeOperation.ADD
-        and len(value.opks_items) == 1
-        and value.opks_items[0].item_id == ""
-        and value.opks_items[0].display_order == NEUTRAL_INTEGER
-        and not value.opks_items[0].task_ids
-        and not value.opks_items[0].indicator_ids
+        and single_item is not None
+        and single_item.item_id == ""
+        and single_item.display_order == NEUTRAL_INTEGER
     ):
-        return _required_text(value.opks_items[0].text, "OPKS text")
+        # The review change owns ADD linkage.  The strict provider schema keeps
+        # item-level linkage slots for merge/split replacements, but they are
+        # redundant placeholders for a single application-owned ADD and must
+        # never become a second authority.
+        return _required_text(single_item.text, "OPKS text")
     if value.opks_kind is OutputOpksKind.NONE:
         raise ConsultantOutputMappingError("OPKS entity requires opks_kind")
     payload_task_ids = {

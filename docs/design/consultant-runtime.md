@@ -1,7 +1,7 @@
 # AI 職務顧問 runtime 設計
 
 - 決策：[ADR 0060](../adr/0060-langchain-langgraph-consultant-runtime-and-durable-authority.md)
-- 狀態：Big-bang migration 建構中；目前完成框架底座、durable authority、模型執行、最小充分 Context、專業分析 Skills，以及 adaptive interview／可見理解／語意進度／足夠性，production composition root 尚未切換
+- 狀態：Big-bang migration 建構中；目前完成框架底座、durable authority、模型執行、最小充分 Context、專業分析 Skills、adaptive interview／可見理解／語意進度／足夠性，以及新跨語言契約／production API transport；員工 Web 與最終 composition hard cut 尚未完成
 - 實作：`apps/api/app/consultant`、`apps/api/app/adapters/langgraph`、`apps/api/app/adapters/openrouter/langchain.py`
 
 ## 儲存權威
@@ -33,6 +33,7 @@ checkpoint 不複製員工逐字來源；Store 不保存第二份核准文件。
 - Saver／Store `.setup()` 可重跑；Caliburn catalog schema 只由 Alembic 管理。
 - Catalog migration 使用 Alembic schema primitives 與具名 constraint／index，不以 `IF NOT EXISTS` 掩蓋 schema drift；每次成功寫入 semantic revision 後更新 catalog `updated_at`。
 - 同一 process 以 document UUID admission lock 序列化 semantic writer；revision 再阻止 stale command。
+- 每個 HTTP authority command 另有 checkpoint-owned command receipt。receipt 綁定 stable command ID、command kind 與 canonical payload hash；精確重送在 revision 檢查前回放成功，同 key 換 payload 直接拒絕。receipt 與 authority update 在同一 LangGraph checkpoint，不另建 idempotency table；若 Store source 已先寫但 committed status 尚未補完，精確重送只完成該 crash reconciliation。
 - 刪除先 tombstone catalog，再清 checkpoint thread 與完整 Store namespace；重跑仍安全。
 - Store namespace 不接受自由字串，只能由 application-issued UUID 組成。
 
@@ -82,6 +83,15 @@ LangGraph checkpoint、`StateGraph` command 與 `interrupt()`／`Command(resume)
 
 真正的文件權威仍是一份 `ApprovedJobDocument`，但它不是舊 Current JD 元件的相容層：它是新 graph state 中由 deterministic authority command 唯一可修改的核准產物。框架負責 durable execution；Caliburn 只定義這份職務說明書什麼變更合法、誰有權核准，以及 evidence 如何約束變更。
 
+## 跨語言契約與 API transport
+
+新 `/api/v1/job-analysis/consultant-documents` surface 只輸出 purpose-first projection，不暴露 checkpoint raw state、command receipt、Context selection 或 model attempt 內部資料。JSON Schema 生成 Pydantic 與 TypeScript 型別；FastAPI native SSE 只發送帶 revision／run ID 的 refetch notification， durable snapshot 才是狀態權威。
+
+- 建立／讀取／刪除文件、202 source-first answer admission、snapshot、review、calibration、required clarification、direct edit 與單一 export 都走同一 application-scoped runtime；同文件 admission lock 不再因 request-local dependency 而失效。
+- model factory 只在 composition root 注入；`app.consultant` 不直接依賴 OpenRouter adapter。LangChain source lookup tools 已接到真正 agent tool surface，且只允許同文件 exact source／lineage／lexical search；沒有 semantic retrieval、Reference 或 RAG tool。
+- export readiness 有具體 gap 時回 409，員工以同一入口 `force=true` 明確確認後仍可匯出；pending changeset 不會被匯出或暗中接受。
+- migration 中間態暫時讓新 route 與舊 route 同時存在，以便 Task 8 完成垂直切片；兩者不雙寫，也沒有 DTO alias。Task 9 必須在同一 hard-cut commit 移除舊 route／舊契約定義／舊 writer，不能把這個 staging surface 當最終雙軌架構。
+
 ## Adaptive interview、理解校準與可信進度
 
 LangGraph `StateGraph`、typed checkpoint、`add_messages` reducer 與 PostgreSQL Saver 直接承接跨回合 routing、自然恢復、可見顧問回覆與 semantic transition；沒有另建自寫 session／pause／resume／finish engine。每個通過驗證的 `ConsultantResult` 由一個 deterministic node 在同一 checkpoint 一起提交：
@@ -106,4 +116,4 @@ LangGraph `StateGraph`、typed checkpoint、`add_messages` reducer 與 PostgreSQ
 
 ## 當前邊界
 
-這個新 runtime 已有可替換模型 profile、LangChain agent harness、attempt receipt、Context middleware、真實顧問 Skills、adaptive interview routing、可見理解／Gap／語意進度、完整文件 patch／review command、deterministic authority 與 required-clarification interrupt。尚未完成的是 production API／跨語言契約、員工 Web 工作面、匯出接線與舊 production composition 的最終 hard cut。它沒有 RAG／Reference、能力級別／A 生成或正式品質 eval；舊 production composition 只維持到垂直切片完成，最終硬切後刪除，不雙寫。
+這個新 runtime 已有可替換模型 profile、LangChain agent harness、attempt receipt、Context middleware、真實顧問 Skills、adaptive interview routing、可見理解／Gap／語意進度、完整文件 patch／review command、deterministic authority、required-clarification interrupt，以及 generated contract／production API transport。尚未完成的是員工 Web 工作面、舊 composition 的最終 hard cut與 fresh-root migration；新 export transport 已接到既有成熟 XLSX renderer，但舊 export modules 的最終 dependency cleanup 留在 Task 9。它沒有 RAG／Reference、能力級別／A 生成或正式品質 eval；舊 production composition 只維持到垂直切片完成，最終硬切後刪除，不雙寫。

@@ -330,6 +330,12 @@ def _safe_error_details(error: BaseException) -> tuple[str, str]:
     return "model_error", f"model call failed ({type(error).__name__})"
 
 
+def classify_consultant_failure(error: BaseException) -> str:
+    """Return a payload-free durable failure code for product recovery."""
+
+    return _safe_error_details(error)[0]
+
+
 class _AttemptStart:
     def __init__(
         self,

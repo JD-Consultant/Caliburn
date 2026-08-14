@@ -585,6 +585,14 @@ class RunStatus(StrEnum):
     FAILED = "failed"
 
 
+class RunExecutionEvidence(DurableModel):
+    """Payload-free resolved route, Context and model-attempt evidence."""
+
+    resolved_execution: dict[str, JsonValue]
+    context_selection_receipts: tuple[dict[str, JsonValue], ...] = ()
+    attempt_receipts: tuple[dict[str, JsonValue], ...] = ()
+
+
 class RunReceipt(DurableModel):
     run_id: UUID
     status: RunStatus
@@ -592,6 +600,40 @@ class RunReceipt(DurableModel):
     started_at: datetime
     completed_at: datetime | None = None
     error_code: str | None = None
+    execution_evidence: RunExecutionEvidence | None = None
+
+    @model_validator(mode="after")
+    def lifecycle_fields_match_status(self) -> RunReceipt:
+        if self.status is RunStatus.SOURCE_SAVED:
+            if (
+                self.source_id is None
+                or self.completed_at is not None
+                or self.error_code
+                or self.execution_evidence is not None
+            ):
+                raise ValueError("source-saved run requires only its source and start time")
+        elif self.status is RunStatus.COMPLETED:
+            if self.source_id is None or self.completed_at is None or self.error_code:
+                raise ValueError("completed run requires source and completion time")
+        elif self.status is RunStatus.FAILED:
+            if self.source_id is None or self.completed_at is None or not self.error_code:
+                raise ValueError("failed run requires source, completion time and error code")
+        return self
+
+
+class CommandReceipt(DurableModel):
+    """Durable identity for one employee command and its canonical payload."""
+
+    command_id: UUID
+    command_kind: NonEmptyText
+    payload_sha256: Annotated[
+        str,
+        StringConstraints(pattern=r"^[0-9a-f]{64}$"),
+    ]
+
+
+class CommandReceiptConflict(ValueError):
+    """A durable command identity was reused for another semantic payload."""
 
 
 class ConsultantThreadState(TypedDict, total=False):
@@ -615,12 +657,15 @@ class ConsultantThreadState(TypedDict, total=False):
     required_clarification: dict[str, Any] | None
     sufficiency: dict[str, Any] | None
     latest_run: dict[str, Any] | None
+    command_receipts: dict[str, dict[str, Any]]
 
 
 class ConsultantCommandContext(TypedDict, total=False):
     action: Literal[
         "initialize",
         "register_source",
+        "restart_consultant_run",
+        "mark_consultant_run_failed",
         "direct_edit",
         "commit_consultant_result",
         "decide_understanding_calibration",
@@ -640,6 +685,8 @@ class ConsultantCommandContext(TypedDict, total=False):
     action_ids: list[str]
     edited_after_by_action_id: dict[str, Any]
     rejection_reason: str
+    run_receipt: dict[str, Any]
+    command_receipt: dict[str, Any]
 
 
 def initial_thread_state(document_id: UUID) -> ConsultantThreadState:
@@ -664,4 +711,33 @@ def initial_thread_state(document_id: UUID) -> ConsultantThreadState:
         "required_clarification": None,
         "sufficiency": None,
         "latest_run": None,
+        "command_receipts": {},
     }
+
+
+def inspect_command_receipt(
+    state: ConsultantThreadState,
+    requested: CommandReceipt,
+) -> Literal["new", "replay"]:
+    """Classify a command before revision checks so exact retries stay safe."""
+
+    existing_payload = state.get("command_receipts", {}).get(
+        str(requested.command_id)
+    )
+    if existing_payload is None:
+        return "new"
+    existing = CommandReceipt.model_validate(existing_payload)
+    if existing != requested:
+        raise CommandReceiptConflict(
+            f"command {requested.command_id} was reused with another payload"
+        )
+    return "replay"
+
+
+def attach_command_receipt(
+    state: ConsultantThreadState,
+    requested: CommandReceipt,
+) -> dict[str, dict[str, Any]]:
+    receipts = dict(state.get("command_receipts", {}))
+    receipts[str(requested.command_id)] = requested.model_dump(mode="json")
+    return receipts

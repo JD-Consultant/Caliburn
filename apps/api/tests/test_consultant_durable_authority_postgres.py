@@ -15,7 +15,9 @@ from langgraph.graph import END, START, StateGraph
 from pydantic import ValidationError
 
 from app.adapters.langgraph.postgres import (
+    ActiveConsultantRun,
     DocumentNotFound,
+    IdempotencyConflict,
     PendingSourceRequiresReconciliation,
     QuoteAnchorMismatch,
     SourceConflict,
@@ -46,12 +48,249 @@ from app.consultant.state import (
     ApprovedOpksKind,
     ApprovedResponsibilityRole,
     ApprovedTask,
+    CommandReceipt,
     EmployeeSource,
     EmployeeSourceKind,
     InterviewPriority,
+    RunStatus,
+    RunExecutionEvidence,
     SourceProcessingStatus,
     SourceValidity,
+    UnderstandingImpact,
 )
+
+
+@pytest.mark.asyncio
+async def test_catalog_and_source_first_run_admission_are_durable_and_idempotent(
+    consultant_database_url: str,
+) -> None:
+    first_document_id = uuid4()
+    second_document_id = uuid4()
+    run_id = uuid4()
+    source_id = uuid4()
+
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        await runtime.create_document(first_document_id, title="採購職務")
+        await runtime.create_document(second_document_id, title="倉儲職務")
+        replayed_create = await runtime.create_document(
+            first_document_id, title="採購職務"
+        )
+        assert replayed_create.document_id == first_document_id
+        with pytest.raises(IdempotencyConflict):
+            await runtime.create_document(first_document_id, title="另一個標題")
+
+        catalog = await runtime.list_documents()
+        assert [item.document_id for item in catalog] == [
+            first_document_id,
+            second_document_id,
+        ]
+        assert [item.title for item in catalog] == ["採購職務", "倉儲職務"]
+
+        admitted, should_process = await runtime.admit_employee_answer(
+            document_id=first_document_id,
+            run_id=run_id,
+            source_id=source_id,
+            text="我每天整理採購需求。",
+        )
+        assert should_process is True
+        assert admitted.latest_run is not None
+        assert admitted.latest_run["run_id"] == str(run_id)
+        assert admitted.latest_run["status"] == RunStatus.SOURCE_SAVED.value
+
+        replay, should_process = await runtime.admit_employee_answer(
+            document_id=first_document_id,
+            run_id=run_id,
+            source_id=source_id,
+            text="我每天整理採購需求。",
+        )
+        assert should_process is False
+        assert replay.revision == admitted.revision
+
+        with pytest.raises(SourceConflict):
+            await runtime.admit_employee_answer(
+                document_id=first_document_id,
+                run_id=run_id,
+                source_id=source_id,
+                text="同一 key 卻換了內容。",
+            )
+        with pytest.raises(ActiveConsultantRun):
+            await runtime.admit_employee_answer(
+                document_id=first_document_id,
+                run_id=uuid4(),
+                source_id=uuid4(),
+                text="這則回答不能越過待處理回合。",
+            )
+
+        failed = await runtime.mark_consultant_run_failed(
+            document_id=first_document_id,
+            run_id=run_id,
+            error_code="model_unavailable",
+        )
+        assert failed.latest_run is not None
+        assert failed.latest_run["status"] == RunStatus.FAILED.value
+        editable_document = failed.approved_document.model_copy(
+            update={"job_title": "採購專員"}
+        )
+        edited_while_failed = await runtime.apply_direct_edit(
+            document_id=first_document_id,
+            expected_revision=failed.revision,
+            document=editable_document,
+            source_id=uuid4(),
+        )
+        assert edited_while_failed.approved_document.job_title == "採購專員"
+        assert (
+            await runtime.export_approved_document(first_document_id)
+        ).job_title == "採購專員"
+        with pytest.raises(ActiveConsultantRun):
+            await runtime.admit_employee_answer(
+                document_id=first_document_id,
+                run_id=uuid4(),
+                source_id=uuid4(),
+                text="失敗回合未處理前仍不能加下一則。",
+            )
+
+        retried, should_process = await runtime.admit_employee_answer(
+            document_id=first_document_id,
+            run_id=run_id,
+            source_id=source_id,
+            text="我每天整理採購需求。",
+        )
+        assert should_process is True
+        assert retried.latest_run is not None
+        assert retried.latest_run["status"] == RunStatus.SOURCE_SAVED.value
+
+        await runtime.delete_document(first_document_id)
+        await runtime.delete_document(second_document_id)
+
+
+@pytest.mark.asyncio
+async def test_calibration_confirmation_is_employee_evidence_and_idempotent(
+    consultant_database_url: str,
+) -> None:
+    document_id = uuid4()
+    source_id = uuid4()
+    decision_source_id = uuid4()
+    run_id = uuid4()
+    now = datetime.now(UTC)
+    basis = AnalysisBasis(
+        source_ids=(source_id,),
+        skill_ids=("work-discovery",),
+    )
+    result = ConsultantResult(
+        visible_reply="我目前理解你負責建立請購單，請確認。",
+        reply_basis=basis,
+        used_skill_ids=("work-discovery",),
+        understanding_changes=(
+            UnderstandingChange(
+                operation=UnderstandingOperation.ADD,
+                kind="responsibility_hypothesis",
+                text="員工負責建立請購單。",
+                impact=UnderstandingImpact.EMPLOYEE_REQUEST,
+                basis=basis,
+            ),
+        ),
+        sufficiency=SufficiencyRecommendation(
+            currently_enough=True,
+            reason="目前理解可供員工校準。",
+            continuing_benefit="繼續可深入細節。",
+            basis=basis,
+        ),
+    )
+
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        await runtime.create_document(document_id, title="採購職務")
+        sourced = await runtime.record_employee_source(
+            document_id=document_id,
+            source_id=source_id,
+            kind=EmployeeSourceKind.EMPLOYEE_TURN,
+            text="我負責建立請購單。",
+        )
+        proposed = await runtime.commit_verified_consultant_result(
+            document_id=document_id,
+            expected_revision=sourced.revision,
+            commit=VerifiedConsultantCommit(
+                run_id=run_id,
+                answer_source_id=source_id,
+                started_at=now,
+                completed_at=now,
+                result=result,
+            ),
+        )
+        calibration = proposed.understanding_projection.calibration
+        assert calibration is not None
+
+        confirmed = await runtime.decide_understanding_calibration(
+            document_id=document_id,
+            expected_revision=proposed.revision,
+            calibration_id=calibration.calibration_id,
+            decision="confirm",
+            employee_text="我確認上述理解正確。",
+            source_id=decision_source_id,
+        )
+        replay = await runtime.decide_understanding_calibration(
+            document_id=document_id,
+            expected_revision=proposed.revision,
+            calibration_id=calibration.calibration_id,
+            decision="confirm",
+            employee_text="我確認上述理解正確。",
+            source_id=decision_source_id,
+        )
+
+        assert confirmed.revision == replay.revision
+        assert confirmed.understanding_projection.calibration is None
+        assert (
+            confirmed.understanding_projection.items[0].status.value
+            == "employee_confirmed"
+        )
+        evidence = await runtime.get_source(document_id, decision_source_id)
+        assert evidence.text == "我確認上述理解正確。"
+        assert evidence.processing_status is SourceProcessingStatus.COMMITTED
+
+
+@pytest.mark.asyncio
+async def test_authority_command_idempotency_is_payload_bound_and_revision_independent(
+    consultant_database_url: str,
+) -> None:
+    document_id = uuid4()
+    command_id = uuid4()
+    source_id = uuid4()
+    receipt = CommandReceipt(
+        command_id=command_id,
+        command_kind="direct_document_edit",
+        payload_sha256="a" * 64,
+    )
+
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        initial = await runtime.create_document(document_id, title="採購職務")
+        document = initial.approved_document.model_copy(
+            update={"job_title": "採購專員"}
+        )
+        edited = await runtime.apply_direct_edit(
+            document_id=document_id,
+            expected_revision=initial.revision,
+            document=document,
+            source_id=source_id,
+            command_receipt=receipt,
+        )
+        replay = await runtime.apply_direct_edit(
+            document_id=document_id,
+            expected_revision=initial.revision,
+            document=document,
+            source_id=source_id,
+            command_receipt=receipt,
+        )
+
+        assert replay.revision == edited.revision
+        with pytest.raises(IdempotencyConflict):
+            await runtime.apply_direct_edit(
+                document_id=document_id,
+                expected_revision=edited.revision,
+                document=document.model_copy(update={"job_title": "採購管理師"}),
+                source_id=source_id,
+                command_receipt=receipt.model_copy(
+                    update={"payload_sha256": "b" * 64}
+                ),
+            )
 
 
 def _psycopg_url() -> str:
@@ -301,6 +540,14 @@ async def test_verified_consultant_commit_survives_postgres_runtime_restart(
         answer_source_id=source_id,
         started_at=now,
         completed_at=now,
+        execution_evidence=RunExecutionEvidence(
+            resolved_execution={
+                "profile_id": "primary-consultant",
+                "requested_model": "anthropic/claude-opus-5",
+            },
+            context_selection_receipts=({"loaded_source_ids": [str(source_id)]},),
+            attempt_receipts=({"actual_provider": "Anthropic"},),
+        ),
         result=result,
     )
 
@@ -335,6 +582,13 @@ async def test_verified_consultant_commit_survives_postgres_runtime_restart(
         )
         assert reopened.sufficiency.currently_enough is False
         assert raw["latest_run"]["run_id"] == str(run_id)
+        assert raw["latest_run"]["execution_evidence"]["resolved_execution"][
+            "requested_model"
+        ] == "anthropic/claude-opus-5"
+        assert "我會先看缺料" not in json.dumps(
+            raw["latest_run"]["execution_evidence"],
+            ensure_ascii=False,
+        )
         assert raw["approved_document"]["tasks"] == []
 
 
@@ -414,6 +668,71 @@ async def test_pending_source_reconciles_both_crash_windows(
         )
         assert reconciled.source_count == 1
         assert reconciled.revision == checkpointed.revision
+
+
+@pytest.mark.asyncio
+async def test_answer_admission_reconciles_both_source_first_crash_windows(
+    consultant_database_url: str,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    before_checkpoint_document = uuid4()
+    after_checkpoint_document = uuid4()
+    before_run, before_source = uuid4(), uuid4()
+    after_run, after_source = uuid4(), uuid4()
+
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        await runtime.create_document(before_checkpoint_document, title="A")
+        await runtime.create_document(after_checkpoint_document, title="B")
+
+        async def fail_after_store(_source: EmployeeSource) -> None:
+            raise RuntimeError("answer-after-store")
+
+        monkeypatch.setattr(runtime, "_after_source_store", fail_after_store)
+        with pytest.raises(RuntimeError, match="answer-after-store"):
+            await runtime.admit_employee_answer(
+                document_id=before_checkpoint_document,
+                run_id=before_run,
+                source_id=before_source,
+                text="先保存員工回答再啟動模型",
+            )
+        monkeypatch.setattr(runtime, "_after_source_store", runtime._noop_source_hook)
+        resumed, should_process = await runtime.admit_employee_answer(
+            document_id=before_checkpoint_document,
+            run_id=before_run,
+            source_id=before_source,
+            text="先保存員工回答再啟動模型",
+        )
+        assert should_process is True
+        assert resumed.latest_run["status"] == RunStatus.SOURCE_SAVED.value
+        assert (
+            await runtime.get_source(before_checkpoint_document, before_source)
+        ).processing_status is SourceProcessingStatus.COMMITTED
+
+        async def fail_after_checkpoint(_source: EmployeeSource) -> None:
+            raise RuntimeError("answer-after-checkpoint")
+
+        monkeypatch.setattr(runtime, "_after_source_checkpoint", fail_after_checkpoint)
+        with pytest.raises(RuntimeError, match="answer-after-checkpoint"):
+            await runtime.admit_employee_answer(
+                document_id=after_checkpoint_document,
+                run_id=after_run,
+                source_id=after_source,
+                text="checkpoint 已記住可恢復 run",
+            )
+        monkeypatch.setattr(
+            runtime, "_after_source_checkpoint", runtime._noop_source_hook
+        )
+        reconciled, should_process = await runtime.admit_employee_answer(
+            document_id=after_checkpoint_document,
+            run_id=after_run,
+            source_id=after_source,
+            text="checkpoint 已記住可恢復 run",
+        )
+        assert should_process is False
+        assert reconciled.latest_run["status"] == RunStatus.SOURCE_SAVED.value
+        assert (
+            await runtime.get_source(after_checkpoint_document, after_source)
+        ).processing_status is SourceProcessingStatus.COMMITTED
 
 
 @pytest.mark.asyncio

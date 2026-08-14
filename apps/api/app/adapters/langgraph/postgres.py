@@ -32,8 +32,13 @@ from app.consultant.document_review import apply_review_command
 from app.consultant.interview import VerifiedConsultantCommit
 from app.consultant.state import (
     ApprovedJobDocument,
+    CalibrationDecision,
+    CalibrationStatus,
+    CommandReceipt,
+    CommandReceiptConflict,
     DocumentChangeSet,
     DocumentChangeStatus,
+    DurableModel,
     EmployeeSource,
     EmployeeSourceKind,
     QuoteAnchor,
@@ -42,6 +47,11 @@ from app.consultant.state import (
     SourceReference,
     SourceValidity,
     RequiredClarification,
+    RunReceipt,
+    RunExecutionEvidence,
+    RunStatus,
+    UnderstandingCalibration,
+    inspect_command_receipt,
 )
 from app.consultant.views import ConsultantSnapshot, snapshot_from_state
 
@@ -61,6 +71,10 @@ class SourceConflict(ConsultantPersistenceError):
     pass
 
 
+class IdempotencyConflict(ConsultantPersistenceError):
+    pass
+
+
 class PendingSourceRequiresReconciliation(ConsultantPersistenceError):
     pass
 
@@ -75,6 +89,17 @@ class QuoteAnchorMismatch(ConsultantPersistenceError):
 
 class UnknownEvidenceSource(ConsultantPersistenceError):
     pass
+
+
+class ActiveConsultantRun(ConsultantPersistenceError):
+    pass
+
+
+class ConsultantDocumentCatalogEntry(DurableModel):
+    document_id: UUID
+    title: str
+    created_at: datetime
+    updated_at: datetime
 
 
 def psycopg_connection_string(database_url: str) -> str:
@@ -162,6 +187,32 @@ class PostgresConsultantRuntime:
             raise ConsultantPersistenceError("catalog thread scope is inconsistent")
         return row
 
+    async def list_documents(self) -> tuple[ConsultantDocumentCatalogEntry, ...]:
+        async with self._catalog_connection.cursor() as cursor:
+            await cursor.execute(
+                """
+                SELECT document_id, title, created_at, updated_at
+                FROM consultant_documents
+                WHERE deleted_at IS NULL
+                ORDER BY created_at, document_id
+                """
+            )
+            rows = await cursor.fetchall()
+        return tuple(
+            ConsultantDocumentCatalogEntry.model_validate(row) for row in rows
+        )
+
+    async def get_document_catalog_entry(
+        self, document_id: UUID
+    ) -> ConsultantDocumentCatalogEntry:
+        row = await self._require_active_catalog(document_id)
+        return ConsultantDocumentCatalogEntry(
+            document_id=row["document_id"],
+            title=row["title"],
+            created_at=row["created_at"],
+            updated_at=row["updated_at"],
+        )
+
     async def _touch_catalog(self, document_id: UUID) -> None:
         async with self._catalog_connection.cursor() as cursor:
             await cursor.execute(
@@ -194,7 +245,12 @@ class PostgresConsultantRuntime:
                     """,
                     (document_id, document_id, normalized_title),
                 )
-            await self._require_active_catalog(document_id)
+                created = cursor.rowcount == 1
+            catalog = await self._require_active_catalog(document_id)
+            if not created and catalog["title"] != normalized_title:
+                raise IdempotencyConflict(
+                    "document idempotency key was reused with another title"
+                )
             config = self.graph_config(document_id)
             state = await self.graph.aget_state(config)
             if not state.values:
@@ -352,8 +408,9 @@ class PostgresConsultantRuntime:
         snapshot: ConsultantSnapshot,
         action: str,
         approved_document: ApprovedJobDocument | None = None,
+        command_fields: Mapping[str, Any] | None = None,
     ) -> ConsultantSnapshot:
-        if snapshot.latest_source_id == source.source_id:
+        if snapshot.latest_source_id == source.source_id and not command_fields:
             return snapshot
         reference = SourceReference(
             source_id=source.source_id,
@@ -369,6 +426,8 @@ class PostgresConsultantRuntime:
         }
         if approved_document is not None:
             command["approved_document"] = approved_document.model_dump(mode="json")
+        if command_fields is not None:
+            command.update(command_fields)
         try:
             await self.graph.ainvoke(
                 {},
@@ -387,6 +446,34 @@ class PostgresConsultantRuntime:
                 update={"processing_status": SourceProcessingStatus.COMMITTED}
             )
         )
+
+    @staticmethod
+    def _inspect_command_receipt(
+        raw_state: Mapping[str, Any],
+        receipt: CommandReceipt | None,
+    ) -> Literal["new", "replay"]:
+        if receipt is None:
+            return "new"
+        try:
+            return inspect_command_receipt(raw_state, receipt)
+        except CommandReceiptConflict as error:
+            raise IdempotencyConflict(str(error)) from error
+
+    async def _reconcile_replayed_command_source(
+        self,
+        document_id: UUID,
+        source_id: UUID | None,
+    ) -> None:
+        """Finish Store status after a checkpoint-first crash on exact replay."""
+
+        if source_id is None:
+            return
+        source = await self.get_source_or_none(document_id, source_id)
+        if (
+            source is not None
+            and source.processing_status is SourceProcessingStatus.PENDING
+        ):
+            await self._mark_source_committed(source)
 
     async def record_employee_source(
         self,
@@ -424,6 +511,165 @@ class PostgresConsultantRuntime:
             await self._after_source_checkpoint(source)
             await self._mark_source_committed(source)
             return snapshot
+
+    async def admit_employee_answer(
+        self,
+        *,
+        document_id: UUID,
+        run_id: UUID,
+        source_id: UUID,
+        text: str,
+        supersedes_source_id: UUID | None = None,
+    ) -> tuple[ConsultantSnapshot, bool]:
+        """Persist the exact answer before allowing any model-bearing work."""
+
+        async with self._lock_for(document_id):
+            await self._require_active_catalog(document_id)
+            requested = EmployeeSource.pending(
+                source_id=source_id,
+                document_id=document_id,
+                kind=EmployeeSourceKind.EMPLOYEE_TURN,
+                text=text,
+                supersedes_source_id=supersedes_source_id,
+            )
+            existing = await self.get_source_or_none(document_id, source_id)
+            if existing is not None and not self._same_immutable_source(
+                existing, requested
+            ):
+                raise SourceConflict(
+                    f"source {source_id} immutable payload conflicts"
+                )
+
+            snapshot = await self._snapshot(document_id)
+            latest = (
+                RunReceipt.model_validate(snapshot.latest_run)
+                if snapshot.latest_run is not None
+                else None
+            )
+            if latest is not None and latest.status in {
+                RunStatus.SOURCE_SAVED,
+                RunStatus.FAILED,
+            }:
+                if latest.run_id != run_id or latest.source_id != source_id:
+                    raise ActiveConsultantRun(
+                        f"consultant run {latest.run_id} must be resolved first"
+                    )
+                if existing is None:
+                    raise ConsultantPersistenceError(
+                        "recoverable run is missing its employee source"
+                    )
+                if existing.processing_status is SourceProcessingStatus.PENDING:
+                    await self._mark_source_committed(existing)
+                if latest.status is RunStatus.SOURCE_SAVED:
+                    return snapshot, False
+                receipt = RunReceipt(
+                    run_id=run_id,
+                    status=RunStatus.SOURCE_SAVED,
+                    source_id=source_id,
+                    started_at=datetime.now(UTC),
+                )
+                try:
+                    await self.graph.ainvoke(
+                        {},
+                        self.graph_config(document_id),
+                        context={
+                            "action": "restart_consultant_run",
+                            "document_id": str(document_id),
+                            "expected_revision": snapshot.revision,
+                            "run_receipt": receipt.model_dump(mode="json"),
+                        },
+                    )
+                except StaleThreadRevision as error:
+                    raise StaleRevision(str(error)) from error
+                await self._touch_catalog(document_id)
+                return await self._snapshot(document_id), True
+            if (
+                latest is not None
+                and latest.status is RunStatus.COMPLETED
+                and latest.run_id == run_id
+                and latest.source_id == source_id
+            ):
+                if existing is None:
+                    raise ConsultantPersistenceError(
+                        "completed run is missing its employee source"
+                    )
+                return snapshot, False
+            if (
+                existing is not None
+                and existing.processing_status is SourceProcessingStatus.COMMITTED
+            ):
+                raise SourceConflict(
+                    f"source {source_id} already belongs to an earlier run"
+                )
+
+            source = await self._load_or_prepare_source(requested)
+            receipt = RunReceipt(
+                run_id=run_id,
+                status=RunStatus.SOURCE_SAVED,
+                source_id=source_id,
+                started_at=datetime.now(UTC),
+            )
+            await self._after_source_store(source)
+            snapshot = await self._commit_source_reference(
+                source=source,
+                snapshot=snapshot,
+                action="register_source",
+                command_fields={
+                    "run_receipt": receipt.model_dump(mode="json"),
+                },
+            )
+            await self._touch_catalog(document_id)
+            await self._after_source_checkpoint(source)
+            await self._mark_source_committed(source)
+            return snapshot, True
+
+    async def mark_consultant_run_failed(
+        self,
+        *,
+        document_id: UUID,
+        run_id: UUID,
+        error_code: str,
+        execution_evidence: RunExecutionEvidence | None = None,
+    ) -> ConsultantSnapshot:
+        safe_error_code = error_code.strip()
+        if not safe_error_code:
+            raise ValueError("consultant failure requires a safe error code")
+        async with self._lock_for(document_id):
+            await self._require_active_catalog(document_id)
+            snapshot = await self._snapshot(document_id)
+            latest = (
+                RunReceipt.model_validate(snapshot.latest_run)
+                if snapshot.latest_run is not None
+                else None
+            )
+            if latest is None or latest.run_id != run_id:
+                raise ActiveConsultantRun("consultant failure targets another run")
+            if latest.status in {RunStatus.FAILED, RunStatus.COMPLETED}:
+                return snapshot
+            receipt = RunReceipt(
+                run_id=run_id,
+                status=RunStatus.FAILED,
+                source_id=latest.source_id,
+                started_at=latest.started_at,
+                completed_at=datetime.now(UTC),
+                error_code=safe_error_code,
+                execution_evidence=execution_evidence,
+            )
+            try:
+                await self.graph.ainvoke(
+                    {},
+                    self.graph_config(document_id),
+                    context={
+                        "action": "mark_consultant_run_failed",
+                        "document_id": str(document_id),
+                        "expected_revision": snapshot.revision,
+                        "run_receipt": receipt.model_dump(mode="json"),
+                    },
+                )
+            except StaleThreadRevision as error:
+                raise StaleRevision(str(error)) from error
+            await self._touch_catalog(document_id)
+            return await self._snapshot(document_id)
 
     @staticmethod
     def _changed_employee_text(
@@ -552,17 +798,25 @@ class PostgresConsultantRuntime:
         expected_revision: int,
         document: ApprovedJobDocument,
         source_id: UUID,
+        command_receipt: CommandReceipt | None = None,
     ) -> ConsultantSnapshot:
         async with self._lock_for(document_id):
             await self._require_active_catalog(document_id)
             snapshot = await self._snapshot(document_id)
+            raw_state = await self.raw_state(document_id)
+            if self._inspect_command_receipt(raw_state, command_receipt) == "replay":
+                await self._reconcile_replayed_command_source(
+                    document_id,
+                    source_id,
+                )
+                return snapshot
             document = ApprovedJobDocument.model_validate(
                 document.model_dump(mode="json")
             )
             if document.document_id != document_id:
                 raise ValueError("edited document does not match document_id")
             existing_source = await self.get_source_or_none(document_id, source_id)
-            if snapshot.approved_document == document:
+            if snapshot.approved_document == document and command_receipt is None:
                 if existing_source is not None:
                     if existing_source.kind is not EmployeeSourceKind.DIRECT_EDIT:
                         raise SourceConflict(
@@ -613,6 +867,8 @@ class PostgresConsultantRuntime:
                 "source_reference": None,
                 "approved_document": document.model_dump(mode="json"),
             }
+            if command_receipt is not None:
+                command["command_receipt"] = command_receipt.model_dump(mode="json")
             if source is not None:
                 command["source_reference"] = SourceReference(
                     source_id=source.source_id,
@@ -686,6 +942,7 @@ class PostgresConsultantRuntime:
         edited_after_by_action_id: Mapping[UUID, JsonValue | None] | None = None,
         rejection_reason: str | None = None,
         source_id: UUID | None = None,
+        command_receipt: CommandReceipt | None = None,
     ) -> ConsultantSnapshot:
         """Apply one employee review decision without invoking a provider."""
 
@@ -693,6 +950,12 @@ class PostgresConsultantRuntime:
             await self._require_active_catalog(document_id)
             snapshot = await self._snapshot(document_id)
             raw_state = await self.raw_state(document_id)
+            if self._inspect_command_receipt(raw_state, command_receipt) == "replay":
+                await self._reconcile_replayed_command_source(
+                    document_id,
+                    source_id,
+                )
+                return snapshot
             raw_bundle = raw_state.get("review_queue", {}).get(str(changeset_id))
             if raw_bundle is None:
                 raise KeyError(f"changeset {changeset_id} was not found")
@@ -705,7 +968,7 @@ class PostgresConsultantRuntime:
                     action_ids=action_ids,
                     edited_after_by_action_id=edited,
                     rejection_reason=rejection_reason,
-                ):
+                ) and command_receipt is None:
                     if source_id is not None:
                         source = await self.get_source_or_none(document_id, source_id)
                         if (
@@ -790,6 +1053,8 @@ class PostgresConsultantRuntime:
                 command["rejection_reason"] = rejection_reason
             if source_reference is not None:
                 command["source_reference"] = source_reference.model_dump(mode="json")
+            if command_receipt is not None:
+                command["command_receipt"] = command_receipt.model_dump(mode="json")
             try:
                 await self.graph.ainvoke(
                     {}, self.graph_config(document_id), context=command
@@ -812,12 +1077,20 @@ class PostgresConsultantRuntime:
         choice: str,
         text: str,
         source_id: UUID,
+        command_receipt: CommandReceipt | None = None,
     ) -> ConsultantSnapshot:
         """Resume a durable interrupt with employee evidence, never document authority."""
 
         async with self._lock_for(document_id):
             await self._require_active_catalog(document_id)
             snapshot = await self._snapshot(document_id)
+            raw_state = await self.raw_state(document_id)
+            if self._inspect_command_receipt(raw_state, command_receipt) == "replay":
+                await self._reconcile_replayed_command_source(
+                    document_id,
+                    source_id,
+                )
+                return snapshot
             existing_source = await self.get_source_or_none(document_id, source_id)
             if snapshot.required_clarification is None:
                 if snapshot.latest_source_id == source_id and existing_source is not None:
@@ -862,6 +1135,7 @@ class PostgresConsultantRuntime:
                     kind=source.kind,
                     created_at=source.created_at,
                 ),
+                command_receipt=command_receipt,
             )
             await self.graph.ainvoke(
                 Command(resume=answer.model_dump(mode="json")),
@@ -871,6 +1145,122 @@ class PostgresConsultantRuntime:
             await self._touch_catalog(document_id)
             await self._after_source_checkpoint(source)
             await self._mark_source_committed(source)
+            return result
+
+    async def decide_understanding_calibration(
+        self,
+        *,
+        document_id: UUID,
+        expected_revision: int,
+        calibration_id: UUID,
+        decision: Literal["confirm", "later"],
+        employee_text: str | None = None,
+        source_id: UUID | None = None,
+        command_receipt: CommandReceipt | None = None,
+    ) -> ConsultantSnapshot:
+        """Apply an employee calibration action without invoking a model."""
+
+        async with self._lock_for(document_id):
+            await self._require_active_catalog(document_id)
+            snapshot = await self._snapshot(document_id)
+            raw_state = await self.raw_state(document_id)
+            if self._inspect_command_receipt(raw_state, command_receipt) == "replay":
+                await self._reconcile_replayed_command_source(
+                    document_id,
+                    source_id,
+                )
+                return snapshot
+            raw_calibration = raw_state.get(
+                "understanding_calibrations", {}
+            ).get(str(calibration_id))
+            if raw_calibration is None:
+                raise KeyError(
+                    f"understanding calibration {calibration_id} was not found"
+                )
+            calibration = UnderstandingCalibration.model_validate(raw_calibration)
+            expected_status = (
+                CalibrationStatus.CONFIRMED
+                if decision == "confirm"
+                else CalibrationStatus.LATER
+            )
+            if calibration.status is expected_status and command_receipt is None:
+                if source_id is not None:
+                    source = await self.get_source_or_none(document_id, source_id)
+                    if source is None:
+                        raise SourceConflict(
+                            "calibration replay is missing its employee source"
+                        )
+                    if source.processing_status is SourceProcessingStatus.PENDING:
+                        await self._mark_source_committed(source)
+                return snapshot
+            if snapshot.revision != expected_revision:
+                raise StaleRevision(
+                    f"expected revision {expected_revision}, found {snapshot.revision}"
+                )
+
+            source: EmployeeSource | None = None
+            source_reference: SourceReference | None = None
+            if decision == "confirm":
+                normalized_text = (employee_text or "").strip()
+                if not normalized_text or source_id is None:
+                    raise ValueError(
+                        "confirming understanding requires employee text and source_id"
+                    )
+                requested = EmployeeSource.pending(
+                    source_id=source_id,
+                    document_id=document_id,
+                    kind=EmployeeSourceKind.EMPLOYEE_TURN,
+                    text=normalized_text,
+                    positions=(
+                        SourcePositionAnchor(
+                            document_path=(
+                                f"/understanding_calibrations/{calibration_id}/decision"
+                            ),
+                            start=0,
+                            end=len(normalized_text),
+                        ),
+                    ),
+                )
+                source = await self._load_or_prepare_source(requested)
+                source_reference = SourceReference(
+                    source_id=source.source_id,
+                    kind=source.kind,
+                    created_at=source.created_at,
+                )
+                if source.processing_status is SourceProcessingStatus.PENDING:
+                    await self._after_source_store(source)
+            elif employee_text is not None or source_id is not None:
+                raise ValueError(
+                    "deferring understanding must not create employee evidence"
+                )
+
+            command: dict[str, Any] = {
+                "action": "decide_understanding_calibration",
+                "document_id": str(document_id),
+                "expected_revision": expected_revision,
+                "calibration_id": str(calibration_id),
+                "calibration_decision": CalibrationDecision(decision).value,
+                "source_reference": (
+                    source_reference.model_dump(mode="json")
+                    if source_reference is not None
+                    else None
+                ),
+            }
+            if command_receipt is not None:
+                command["command_receipt"] = command_receipt.model_dump(mode="json")
+            try:
+                await self.graph.ainvoke(
+                    {},
+                    self.graph_config(document_id),
+                    context=command,
+                )
+            except StaleThreadRevision as error:
+                raise StaleRevision(str(error)) from error
+            result = await self._snapshot(document_id)
+            await self._touch_catalog(document_id)
+            if source is not None:
+                await self._after_source_checkpoint(source)
+                await self._mark_source_committed(source)
             return result
 
     async def export_approved_document(

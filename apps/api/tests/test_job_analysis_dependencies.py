@@ -301,6 +301,7 @@ def test_only_current_route_modules_exist():
         "__init__.py",
         "documents.py",
         "consultation.py",
+        "consultant.py",
         "opks.py",
         "export.py",
     }

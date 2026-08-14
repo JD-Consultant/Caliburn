@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from decimal import Decimal
 import inspect
+import json
 from pathlib import Path
 import subprocess
 from typing import Any
@@ -445,15 +446,7 @@ async def test_agent_composes_selected_skills_without_leaking_ineligible_content
                 ],
             ),
             AIMessage(
-                content="",
-                tool_calls=[
-                    {
-                        "name": "ConsultantModelOutput",
-                        "args": result_payload,
-                        "id": "structured-result",
-                        "type": "tool_call",
-                    }
-                ],
+                content=json.dumps(result_payload, ensure_ascii=False),
             ),
         ]
     )
@@ -477,7 +470,6 @@ async def test_agent_composes_selected_skills_without_leaking_ineligible_content
     )
     assert set(model.bound_tool_names) == {
         "read_file",
-        "ConsultantModelOutput",
     }
     read_description = model.bound_tool_descriptions["read_file"]
     assert "eligible Caliburn analysis Skill" in read_description
@@ -496,6 +488,12 @@ async def test_agent_composes_selected_skills_without_leaking_ineligible_content
     assert "context 是否已足夠" in first_call
     assert "同一波平行" in first_call
     assert "不固定先後" in first_call
+    assert "不得自行編造 UUID" in first_call
+    assert "quote anchor 可留空" in first_call
+    assert "一般下一題（next）" in first_call
+    assert "current_understanding、choices、affected_work_ids、affected_branch 全部留空" in first_call
+    assert "不要提交無 Task linkage 的 O／P／K／S 文件變更" in first_call
+    assert "每個 ADD 只提交一個" in first_call
 
     second_call = _text_seen(model.seen_messages[1])
     assert "Task 邊界" in second_call
@@ -550,15 +548,7 @@ async def test_agent_receives_document_scoped_source_tools_from_the_runtime() ->
                 ],
             ),
             AIMessage(
-                content="",
-                tool_calls=[
-                    {
-                        "name": "ConsultantModelOutput",
-                        "args": _minimal_model_output(source).model_dump(mode="json"),
-                        "id": "structured-result",
-                        "type": "tool_call",
-                    }
-                ],
+                content=_minimal_model_output(source).model_dump_json(),
             ),
         ]
     )
@@ -575,7 +565,6 @@ async def test_agent_receives_document_scoped_source_tools_from_the_runtime() ->
     assert set(model.bound_tool_names) == {
         "read_file",
         "employee_source_get",
-        "ConsultantModelOutput",
     }
 
 
@@ -828,6 +817,55 @@ def test_verifier_accepts_anchored_source_and_selected_skill_dependencies() -> N
         loaded_skill_ids=("task-boundary",),
         employee_sources=(source,),
     )
+
+
+@pytest.mark.parametrize("reference_kind", ["work", "subject"])
+def test_verifier_rejects_model_invented_application_ids(
+    reference_kind: str,
+) -> None:
+    source = _employee_source("我整理採購需求。")
+    invented_id = uuid4()
+    result = _minimal_result(source)
+    if reference_kind == "work":
+        result = result.model_copy(
+            update={
+                "understanding_changes": (
+                    UnderstandingChange(
+                        operation=UnderstandingOperation.ADD,
+                        kind="current_responsibility",
+                        text="員工負責整理採購需求。",
+                        work_ids=(invented_id,),
+                        basis=_basis(source, "task-boundary"),
+                    ),
+                )
+            }
+        )
+    else:
+        result = result.model_copy(
+            update={
+                "attention_changes": (
+                    AttentionChange(
+                        operation=AttentionOperation.ADD,
+                        kind="task_interview",
+                        subject_id=invented_id,
+                        reason="仍需確認完成標準。",
+                        basis=_basis(source, "task-boundary"),
+                    ),
+                )
+            }
+        )
+
+    with pytest.raises(ConsultantVerificationError, match="unknown application ID"):
+        verify_consultant_result(
+            result,
+            execution=_execution(),
+            document_id=source.document_id,
+            selected_skill_ids=("task-boundary",),
+            loaded_skill_ids=("task-boundary",),
+            employee_sources=(source,),
+            known_work_ids=(),
+            known_subject_ids=(),
+        )
 
 
 @pytest.mark.parametrize(

@@ -14,6 +14,7 @@ from langchain.agents.middleware import (
     ToolCallLimitMiddleware,
     ToolRetryMiddleware,
 )
+from langchain.agents.structured_output import ProviderStrategy
 from langchain_core.language_models.fake_chat_models import (
     FakeMessagesListChatModel,
 )
@@ -38,6 +39,7 @@ from app.consultant.model_runtime import (
     resolve_execution,
     verify_attempt_budget,
 )
+from app.consultant.model_output import ConsultantModelOutput
 from app.consultant.verification import (
     ConsultantVerificationError,
     verify_model_attempts,
@@ -293,15 +295,7 @@ async def test_agent_uses_structured_output_and_builtin_limits_without_fallback(
     fake = ToolCapableFakeModel(
         responses=[
             AIMessage(
-                content="",
-                tool_calls=[
-                    {
-                        "name": "ProbeResult",
-                        "args": {"answer": "ok"},
-                        "id": "structured-1",
-                        "type": "tool_call",
-                    }
-                ],
+                content='{"answer":"ok"}',
             )
         ]
     )
@@ -326,7 +320,7 @@ async def test_agent_uses_structured_output_and_builtin_limits_without_fallback(
     )
 
     assert result["structured_response"] == ProbeResult(answer="ok")
-    assert "ProbeResult" in fake.bound_tool_names
+    assert "ProbeResult" not in fake.bound_tool_names
 
 
 def test_agent_rejects_tools_outside_the_resolved_run_policy() -> None:
@@ -358,7 +352,7 @@ def test_agent_rejects_tools_outside_the_resolved_run_policy() -> None:
         )
 
 
-def test_agent_delegates_structured_output_strategy_to_langchain(monkeypatch) -> None:
+def test_agent_uses_a_normalized_provider_native_output_schema(monkeypatch) -> None:
     captured: dict[str, Any] = {}
 
     def capture_create_agent(**kwargs: Any) -> object:
@@ -371,10 +365,29 @@ def test_agent_delegates_structured_output_strategy_to_langchain(monkeypatch) ->
     build_consultant_agent(
         model=model,
         execution=resolve_execution(_profile(), _policy()),
-        response_schema=ProbeResult,
+        response_schema=ConsultantModelOutput,
     )
 
-    assert captured["response_format"] is ProbeResult
+    strategy = captured["response_format"]
+    assert isinstance(strategy, ProviderStrategy)
+    assert strategy.schema_spec.schema is ConsultantModelOutput
+    assert strategy.schema_spec.strict is True
+
+    ref_nodes: list[dict[str, Any]] = []
+
+    def visit(node: Any) -> None:
+        if isinstance(node, dict):
+            if "$ref" in node:
+                ref_nodes.append(node)
+            for value in node.values():
+                visit(value)
+        elif isinstance(node, list):
+            for value in node:
+                visit(value)
+
+    visit(strategy.schema_spec.json_schema)
+    assert "$defs" not in strategy.schema_spec.json_schema
+    assert not ref_nodes
 
 
 @pytest.mark.asyncio
@@ -458,7 +471,7 @@ async def test_framework_retry_emits_one_receipt_per_actual_model_attempt() -> N
     model = RetryThenStructuredModel(
         responses=[
             AIMessage(
-                content="",
+                content='{"answer":"ok"}',
                 response_metadata={
                     "model_name": "anthropic/claude-opus-5-20260801",
                     "provider": "Anthropic",
@@ -469,14 +482,6 @@ async def test_framework_retry_emits_one_receipt_per_actual_model_attempt() -> N
                     "output_tokens": 20,
                     "total_tokens": 120,
                 },
-                tool_calls=[
-                    {
-                        "name": "ProbeResult",
-                        "args": {"answer": "ok"},
-                        "id": "structured-after-retry",
-                        "type": "tool_call",
-                    }
-                ],
             )
         ]
     )
@@ -521,7 +526,7 @@ async def test_summarization_has_no_hidden_retry_and_each_call_has_a_receipt() -
         },
     )
     structured_message = AIMessage(
-        content="",
+        content='{"answer":"ok"}',
         response_metadata={
             "model_name": "anthropic/claude-opus-5-20260801",
             "provider": "Anthropic",
@@ -532,14 +537,6 @@ async def test_summarization_has_no_hidden_retry_and_each_call_has_a_receipt() -
             "output_tokens": 20,
             "total_tokens": 320,
         },
-        tool_calls=[
-            {
-                "name": "ProbeResult",
-                "args": {"answer": "ok"},
-                "id": "structured-after-summary",
-                "type": "tool_call",
-            }
-        ],
     )
     model = ToolCapableFakeModel(responses=[summary_message, structured_message])
     execution = resolve_execution(

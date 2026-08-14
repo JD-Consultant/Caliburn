@@ -254,6 +254,14 @@ async def execute_admitted_consultant_turn(
                 for referenced_source_id in referenced_source_ids
             ]
         )
+        known_work_ids = tuple(UUID(key) for key in snapshot.interview_work)
+        document = snapshot.approved_document
+        known_subject_ids = (
+            *known_work_ids,
+            *(item.duty_id for item in document.duties),
+            *(item.task_id for item in document.tasks),
+            *(item.item_id for item in document.opks),
+        )
         verify_consultant_result(
             result,
             execution=execution,
@@ -261,6 +269,8 @@ async def execute_admitted_consultant_turn(
             selected_skill_ids=CONSULTANT_SKILL_IDS,
             loaded_skill_ids=agent.skill_backend.loaded_skill_ids,
             employee_sources=evidence,
+            known_work_ids=known_work_ids,
+            known_subject_ids=known_subject_ids,
         )
         commit = VerifiedConsultantCommit(
             run_id=run_id,

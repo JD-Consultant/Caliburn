@@ -21,12 +21,14 @@ from langchain.agents.middleware import (
     ToolCallLimitMiddleware,
     ToolRetryMiddleware,
 )
+from langchain.agents.structured_output import ProviderStrategy
 from langchain.agents.middleware.context_editing import ClearToolUsesEdit
 from langchain_core.callbacks import AsyncCallbackHandler
 from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import AIMessage
 from langchain_core.outputs import LLMResult
 from langchain_core.tools import BaseTool
+from langchain_core.utils.function_calling import convert_to_json_schema
 from opentelemetry.trace import Span
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_validator
 from typing_extensions import Annotated
@@ -668,10 +670,16 @@ def build_consultant_agent(
     ineligible_tools = set(tool_ids) - set(execution.allowed_tool_ids)
     if ineligible_tools:
         raise ValueError(f"agent requested ineligible tools: {sorted(ineligible_tools)}")
+    response_format = ProviderStrategy(response_schema, strict=True)
+    # LangChain's ProviderStrategy currently keeps Pydantic's raw $defs/$ref
+    # graph, while the OpenRouter integration's supported structured-output
+    # path normalizes it first.  Keep the Pydantic type for response parsing,
+    # but send the same provider-safe schema used by with_structured_output().
+    response_format.schema_spec.json_schema = convert_to_json_schema(response_schema)
     return create_agent(
         model=model,
         tools=tools,
-        response_format=response_schema,
+        response_format=response_format,
         middleware=build_consultant_middleware(
             model=model,
             execution=execution,

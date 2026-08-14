@@ -42,6 +42,15 @@ SKILLS_SYSTEM_PROMPT = """## Caliburn 專業分析方法
 {skills_list}
 
 讀完本輪實際選用的方法後，把它們共同整合成一份結構化顧問結果。員工畫面只呈現一位顧問、必要的待審文件變更與至多一個主要問題；不得把 Skill 編排暴露成員工要操作的流程。
+
+**提交前的最小契約：**
+- 不得自行編造 UUID。只有 context 明列的既有 ID 才可引用；新理解、新焦點、新 Gap、新 Duty／Task／OPKS 的 ID 或關聯先留空，由應用程式配置。
+- 新增 Duty／Task 時 `display_order=-1`，由應用程式配置排序；每個 ADD 只提交一個實體，讓員工可逐項接受、修改或拒絕。
+- quote anchor 可留空；一般事實可只列 `source_ids`。若使用 anchor，`quote` 必須逐字存在於該來源，`start` 是 0-based 起點、`end` 是 exclusive 終點且等於 `start + len(quote)`；不得填 999 等占位值。
+- O／P／K／S 文件變更必須連到 context 已有的 Task ID；若本輪只有尚待配置 ID 的新 Task，可先分析成理解／Gap，**不要提交無 Task linkage 的 O／P／K／S 文件變更**。
+- `question.kind=none` 時其他 question 欄位全為空、`basis_ordinal=0`。
+- 一般下一題（next）只填 `text`、`answer_target`、`reason`、`basis_ordinal`；`current_understanding、choices、affected_work_ids、affected_branch 全部留空`。
+- 必要澄清（required_clarification）才填 `current_understanding`、2–3 個 `choices`、既有 `affected_work_ids` 與 `affected_branch`，且 `answer_target` 留空。
 """
 
 

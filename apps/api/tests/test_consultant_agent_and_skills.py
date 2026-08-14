@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from decimal import Decimal
 import inspect
+from pathlib import Path
+import subprocess
 from typing import Any
 from uuid import UUID, uuid4
 
@@ -316,6 +318,25 @@ def test_first_release_skill_registry_is_exact_and_has_no_deferred_domains() -> 
     assert "reference" not in CONSULTANT_SKILL_IDS
     assert "competency-level" not in CONSULTANT_SKILL_IDS
     assert "attitude" not in CONSULTANT_SKILL_IDS
+
+
+def test_declared_skill_resources_are_tracked_delivery_assets() -> None:
+    repo_root = Path(__file__).resolve().parents[3]
+
+    for skill_id in CONSULTANT_SKILL_IDS:
+        relative_path = (
+            f"apps/api/app/consultant/skills/{skill_id}/SKILL.md"
+        )
+        result = subprocess.run(
+            ["git", "ls-files", "--error-unmatch", "--", relative_path],
+            cwd=repo_root,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        assert result.returncode == 0, (
+            f"declared consultant Skill is not a Git delivery asset: {relative_path}"
+        )
 
 
 def test_package_skill_backend_is_selected_only_read_only_and_traversal_safe() -> None:

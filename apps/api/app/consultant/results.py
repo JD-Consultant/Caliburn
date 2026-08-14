@@ -200,6 +200,11 @@ class ReviewableDocumentChange(ResultModel):
     task_ids: tuple[UUID, ...] = ()
     indicator_ids: tuple[UUID, ...] = ()
     basis: AnalysisBasis
+    change_ref: str = ""
+    depends_on_change_refs: tuple[str, ...] = ()
+    depends_on_action_ids: tuple[UUID, ...] = ()
+    supersedes_action_ids: tuple[UUID, ...] = ()
+    atomic_group_ref: str = ""
 
     @model_validator(mode="after")
     def references_are_unique(self) -> ReviewableDocumentChange:

@@ -276,6 +276,13 @@ Big-bang 只描述最終切換，不表示做到最後才審核。之後每完�
 - 差異稽核：production 只有三個 `@tool` source definitions 加 framework `read_file`；沒有舊 Tool ID、business write Tool、Tool Search、RAG 或模型可呼叫的 review command。Accepted ADR 0060 工作檔雖因 Windows line-ending stat 顯示 modified，但 working blob 與 `HEAD` SHA-1 同為 `2c065952649784218509dbac243a872f24399eec`，內容零差異且未 stage。
 - 北極星回歸：這次只替換／收斂通用讀取機制，沒有把產品變成 Tool 操作台或多 Agent，也沒有改動動態 Task／Duty／OPKS、員工原話記憶、文件先審後入、澄清／Gap／審核分流、自然離開／續談與單一強制匯出。沒有接 RAG、能力級別／A 或正式 eval。最終判定 **Pass**。
 
+### ADR 0063 Task 1：拆分 final wire 與候選編輯 wire
+
+- 狀態：**Pass**；同一 task commit 為 `refactor: split consultant candidate wire`。
+- 範圍：只將 shared provider evidence wire 抽至 `provider_wire`，並新增 strict `CandidateEditBatch`／同批 local ref resolver；final `ConsultantModelOutput` 的 mapping 行為維持不變。Duty、Task、O／P local ref 只在同一 replacement batch 內以 document ID 與 materialization run ID 的 UUID5 穩定解析；duplicate／unknown／跨批 ref、change dependency cycle／self dependency、非本批 dependency、非法 atomic group ref 與 ADD 偽造 UUID 全部 fail closed。
+- Authority／北極星：沒有新增 agent Tool、approved-document write、RAG、A、UI、第二 authority、workflow 或文件 store；模型仍只提出待審候選，不能直接改變核准文件。單一顧問、動態 Task／Duty／OPKS、員工原話與先審後入方向均未偏移。結果 **Pass**。
+- 驗證：candidate Tool input schema 為 0 defs、62 properties、depth 4、5,669 bytes、0 optional、0 union／`anyOf`、0 open object；bytes 僅作比較訊號，非 provider 官方上限。focused suite 為 `84 passed`。
+
 ## 8. 本次直接使用的一手來源
 
 - [Anthropic — Prompting Claude Opus 5](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5)

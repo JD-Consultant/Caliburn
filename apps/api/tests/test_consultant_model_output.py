@@ -98,6 +98,11 @@ def _output(source_id: UUID, **overrides: Any) -> ConsultantModelOutput:
 
 def _document_change(source_id: UUID, **overrides: Any) -> OutputDocumentChange:
     values: dict[str, Any] = {
+        "change_ref": "change-1",
+        "depends_on_change_refs": (),
+        "depends_on_action_ids": (),
+        "supersedes_action_ids": (),
+        "atomic_group_ref": "",
         "operation": DocumentChangeOperation.REVISE,
         "target": OutputDocumentTarget.JOB_TITLE,
         "target_id": "",
@@ -189,7 +194,7 @@ def test_model_output_schema_is_closed_required_and_union_free() -> None:
 def test_model_output_schema_metrics_are_review_visible() -> None:
     assert _schema_metrics(ConsultantModelOutput.model_json_schema()) == {
         "definitions": 26,
-        "properties": 96,
+        "properties": 107,
         "optional_parameters": 0,
         "union_sites": 0,
         "open_objects": 0,
@@ -235,7 +240,7 @@ def test_langchain_converts_the_same_closed_union_free_pydantic_contract() -> No
     )
     assert _schema_metrics(provider_schema) == {
         "definitions": 0,
-        "properties": 98,
+        "properties": 109,
         "optional_parameters": 0,
         "union_sites": 0,
         "open_objects": 0,
@@ -475,7 +480,14 @@ def test_typed_entity_payloads_preserve_duty_task_and_opks_proposals() -> None:
             target=OutputDocumentTarget.DUTY,
             field=OutputDocumentField.ENTITY,
             text_value="",
-            duties=(OutputDuty(duty_id="", statement="管理採購作業", display_order=-1),),
+            duties=(
+                OutputDuty(
+                    duty_id="",
+                    entity_ref="",
+                    statement="管理採購作業",
+                    display_order=-1,
+                ),
+            ),
         ),
         _document_change(
             source_id,
@@ -487,6 +499,8 @@ def test_typed_entity_payloads_preserve_duty_task_and_opks_proposals() -> None:
                 OutputTask(
                     task_id=str(task_id),
                     duty_id="",
+                    entity_ref="",
+                    duty_ref="",
                     statement="建立請購單",
                     action="建立",
                     object="請購單",
@@ -508,10 +522,13 @@ def test_typed_entity_payloads_preserve_duty_task_and_opks_proposals() -> None:
             opks_items=(
                 OutputOpksItem(
                     item_id="",
+                    entity_ref="",
                     text="完成的請購單",
                     display_order=-1,
                     task_ids=(redundant_item_task_id,),
                     indicator_ids=(),
+                    task_refs=(),
+                    indicator_refs=(),
                 ),
             ),
             opks_kind=OutputOpksKind.OUTPUT,
@@ -557,6 +574,8 @@ def test_unambiguous_model_wire_aliases_normalize_before_domain_mapping() -> Non
                         OutputTask(
                             task_id="",
                             duty_id="",
+                            entity_ref="",
+                            duty_ref="",
                             statement="確認採購需求",
                             action="確認",
                             object="採購需求",
@@ -736,10 +755,13 @@ def test_required_clarification_maps_to_the_employee_form_instead_of_next_questi
                         opks_items=(
                             OutputOpksItem(
                                 item_id=str(uuid4()),
+                                entity_ref="",
                                 text="採購流程知識",
                                 display_order=0,
                                 task_ids=(uuid4(),),
                                 indicator_ids=(),
+                                task_refs=(),
+                                indicator_refs=(),
                             ),
                         ),
                     ),

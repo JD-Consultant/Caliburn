@@ -286,7 +286,7 @@ def _output_document_change(
     task_ids: tuple[UUID, ...] = (),
 ) -> OutputDocumentChange:
     return OutputDocumentChange(
-        change_ref="change-1",
+        change_ref="",
         depends_on_change_refs=(),
         depends_on_action_ids=(),
         supersedes_action_ids=(),

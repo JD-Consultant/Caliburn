@@ -257,6 +257,7 @@ def _source_tool_payload(source: EmployeeSource) -> dict[str, Any]:
     return {
         "source_id": str(source.source_id),
         "kind": source.kind.value,
+        "speaker": source.speaker,
         "text": source.text,
         "created_at": source.created_at.isoformat(),
         "validity": source.validity.value,
@@ -273,58 +274,64 @@ def _source_tool_payload(source: EmployeeSource) -> dict[str, Any]:
     }
 
 
-def build_source_lookup_tools(
+def build_employee_source_tools(
     lookup: DocumentSourceLookup,
     *,
     document_id: UUID,
 ) -> tuple[BaseTool, ...]:
-    """Bind mature LangChain tools to exactly one document's evidence namespace."""
+    """Bind read-only LangChain tools to one document's employee-source namespace."""
 
     @tool(
-        "source_by_id",
+        "employee_source_get",
         description=(
-            "Read one exact employee evidence source by the source ID shown in the "
-            "consultant context. The document scope is fixed by the server."
+            "Get one exact employee-authored source when its stable source ID is known "
+            "but its text is not already available. Returns text, speaker, validity, "
+            "timestamp, and correction pointers. Document scope is server-controlled."
         ),
     )
-    async def source_by_id(source_id: UUID) -> dict[str, Any]:
+    async def employee_source_get(source_id: UUID) -> dict[str, Any]:
         return _source_tool_payload(await lookup.by_id(document_id, source_id))
 
     @tool(
-        "source_lineage",
+        "employee_source_lineage",
         description=(
-            "Read the correction lineage for one employee source, oldest to newest. "
-            "Use it when a source was corrected or superseded."
+            "Get the oldest-to-newest correction lineage for one employee-authored "
+            "source. Use when validity or correction pointers show that wording was "
+            "superseded; do not treat an older version as current."
         ),
     )
-    async def source_lineage(source_id: UUID) -> list[dict[str, Any]]:
+    async def employee_source_lineage(
+        source_id: UUID,
+    ) -> list[dict[str, Any]]:
         return [
             _source_tool_payload(source)
             for source in await lookup.lineage(document_id, source_id)
         ]
 
     @tool(
-        "source_lexical_search",
+        "employee_source_search",
         description=(
-            "Search current employee evidence in this document by exact words. "
-            "Use a concise query and inspect returned source IDs before citing them."
+            "Search current employee-authored sources in this document when the stable "
+            "source ID is unknown. Use a concise text query; the server returns at most "
+            "five exact sources with IDs and correction metadata for verification."
         ),
     )
-    async def source_lexical_search(
-        query: str,
-        limit: int = 5,
-    ) -> list[dict[str, Any]]:
+    async def employee_source_search(query: str) -> list[dict[str, Any]]:
         return [
             _source_tool_payload(source)
             for source in await lookup.search(
                 document_id,
                 query=query,
                 mode=SourceLookupMode.LEXICAL,
-                limit=limit,
+                limit=5,
             )
         ]
 
-    return (source_by_id, source_lineage, source_lexical_search)
+    return (
+        employee_source_get,
+        employee_source_lineage,
+        employee_source_search,
+    )
 
 
 async def _gather_sources(

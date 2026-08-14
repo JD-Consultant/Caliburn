@@ -194,10 +194,9 @@ def build_professional_consultant_agent(
         tool_names=frozenset(
             {
                 "read_file",
-                "source_by_id",
-                "source_lineage",
-                "source_lexical_search",
-                "source_semantic_search",
+                "employee_source_get",
+                "employee_source_lineage",
+                "employee_source_search",
             }
             & set(execution.allowed_tool_ids)
         ),

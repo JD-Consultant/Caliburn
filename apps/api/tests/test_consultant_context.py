@@ -21,7 +21,7 @@ from app.consultant.context import (
     SemanticSourceIndex,
     SourceLookupMode,
     build_consultant_context,
-    build_source_lookup_tools,
+    build_employee_source_tools,
 )
 from app.consultant.document_review import create_document_changeset
 from app.consultant.model_runtime import (
@@ -71,9 +71,9 @@ def _execution(*, max_context_tokens: int = 24_000):
             run_kind="interactive_consultation",
             allowed_skill_ids=("task-boundary", "duty-grouping", "knowledge"),
             allowed_tool_ids=(
-                "source_by_id",
-                "source_lineage",
-                "source_lexical_search",
+                "employee_source_get",
+                "employee_source_lineage",
+                "employee_source_search",
             ),
             max_context_tokens=max_context_tokens,
             max_model_calls=3,
@@ -381,7 +381,7 @@ async def test_context_middleware_rebinds_tagged_source_without_reordering_tool_
                     content="",
                     tool_calls=[
                         {
-                            "name": "source_by_id",
+                            "name": "employee_source_get",
                             "args": {"source_id": str(source_id)},
                             "id": "lookup-1",
                             "type": "tool_call",
@@ -579,29 +579,36 @@ async def test_langchain_source_tools_are_document_scoped_and_expose_exact_evide
 
             tools = {
                 item.name: item
-                for item in build_source_lookup_tools(
+                for item in build_employee_source_tools(
                     DocumentSourceLookup(runtime),
                     document_id=document_id,
                 )
             }
-            exact = await tools["source_by_id"].ainvoke(
+            exact = await tools["employee_source_get"].ainvoke(
                 {"source_id": str(source_id)}
             )
-            found = await tools["source_lexical_search"].ainvoke(
-                {"query": "採購需求", "limit": 5}
+            found = await tools["employee_source_search"].ainvoke(
+                {"query": "採購需求"}
             )
 
             assert exact["source_id"] == str(source_id)
+            assert exact["kind"] == "employee_turn"
+            assert exact["speaker"] == "employee"
             assert exact["text"] == "我每週整理採購需求。"
+            assert exact["validity"] == "current"
+            assert exact["created_at"]
+            assert exact["supersedes_source_id"] is None
+            assert exact["superseded_by_source_id"] is None
             assert found == [exact]
+            assert set(tools["employee_source_search"].args) == {"query"}
             with pytest.raises(KeyError):
-                await tools["source_by_id"].ainvoke(
+                await tools["employee_source_get"].ainvoke(
                     {"source_id": str(other_source_id)}
                 )
             assert set(tools) == {
-                "source_by_id",
-                "source_lineage",
-                "source_lexical_search",
+                "employee_source_get",
+                "employee_source_lineage",
+                "employee_source_search",
             }
         finally:
             await runtime.delete_document(document_id)

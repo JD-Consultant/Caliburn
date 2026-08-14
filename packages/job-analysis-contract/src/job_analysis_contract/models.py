@@ -529,7 +529,9 @@ class DocumentReviewDecisionWrite(BaseModel):
     )
     command: Command
     action_ids: list[UUID] = Field(..., min_length=1)
-    edited_after_by_action_id: dict[str, Any]
+    edited_after_by_action_id: dict[
+        str, str | float | bool | list[Any] | dict[str, Any] | None
+    ]
     rejection_reason: str | None
 
 

@@ -23,10 +23,18 @@ from app.consultant.model_output import ConsultantModelOutput
 from app.consultant.skill_backend import PackageSkillBackend
 
 
+SKILL_READ_TOOL_DESCRIPTION = (
+    "Read one eligible Caliburn analysis Skill in full. "
+    "Use only the exact /skills/<skill-id>/SKILL.md path listed for this run. "
+    "Omit offset and limit; the server scopes access and records the loaded Skill."
+)
+
+
 SKILLS_SYSTEM_PROMPT = """## Caliburn 專業分析方法
 
 你是同一位專業職務分析顧問；下列 Skills 是可按需載入的方法，不是多個人格或固定階段。
 本輪只有列出的 Skills 可用。每個實際用來形成結果的 Skill，都必須先用 read_file 完整讀取一次；不要重複讀取，也不要嘗試其他路徑。
+先判斷現有 context 是否已足夠；足夠時不要為了展示而呼叫 Tool。彼此獨立的 Skill 與員工來源讀取可在同一波平行呼叫，不固定先後；只有前一波結果產生新的資料依賴時才使用第二波。
 
 {skills_locations}{skills_load_warnings}
 
@@ -186,6 +194,9 @@ def build_professional_consultant_agent(
     files = FilesystemMiddleware(
         backend=backend,
         tools=["read_file"],
+        custom_tool_descriptions={
+            "read_file": SKILL_READ_TOOL_DESCRIPTION,
+        },
         system_prompt=None,
         tool_token_limit_before_evict=None,
         human_message_token_limit_before_evict=None,

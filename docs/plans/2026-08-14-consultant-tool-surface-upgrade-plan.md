@@ -122,23 +122,24 @@
 
 **Files:**
 - Modify: `apps/api/tests/test_consultant_agent_and_skills.py`
+- Modify: `apps/api/tests/test_consultant_model_runtime.py`（同步正式 Tool IDs）
 - Modify: `apps/api/app/consultant/agent.py`
 
 **Interfaces:**
 - Consumes: Deep Agents `FilesystemMiddleware(custom_tool_descriptions=...)`、`LookupWaveLimitMiddleware`。
 - Produces: 保留標準 `read_file` 名稱的精簡 Skill reader；同一 wave 可平行讀 Skill 與 employee source；第二 wave 只在前一結果產生新依賴時使用。
 
-- [ ] **Step 1: 先寫會失敗的 model-facing Tool 測試**
+- [x] **Step 1: 先寫會失敗的 model-facing Tool 測試**
 
   擴充 `RecordingToolModel` 記錄實際 bind 的 Tool description。斷言 `read_file` 說明只提及 eligible `/skills/<id>/SKILL.md` 完整讀取，不宣稱編輯、PDF、圖片或分頁能力。
 
-- [ ] **Step 2: 執行紅燈**
+- [x] **Step 2: 執行紅燈**
 
   Run: `cd apps/api; uv run pytest -p no:cacheprovider tests/test_consultant_agent_and_skills.py::test_agent_composes_selected_skills_without_leaking_ineligible_content -q`
 
   Expected: FAIL，原因是 framework 通用 `read_file` description 仍含 filesystem/PDF/edit/paging 說明。
 
-- [ ] **Step 3: 使用 framework 公開 override 實作精簡說明**
+- [x] **Step 3: 使用 framework 公開 override 實作精簡說明**
 
   ```python
   SKILL_READ_TOOL_DESCRIPTION = (
@@ -157,11 +158,11 @@
   )
   ```
 
-- [ ] **Step 4: 移除固定 Tool 順序**
+- [x] **Step 4: 移除固定 Tool 順序**
 
   `SKILLS_SYSTEM_PROMPT` 只規定：context 足夠就不呼叫；獨立讀取可平行；只有前一波結果改變下一步需求才用第二波。`LookupWaveLimitMiddleware` 的 Tool IDs 同步改成 employee-source 新名稱。
 
-- [ ] **Step 5: 執行綠燈與 agent regression**
+- [x] **Step 5: 執行綠燈與 agent regression**
 
   Run: `cd apps/api; uv run pytest -p no:cacheprovider tests/test_consultant_agent_and_skills.py tests/test_consultant_model_runtime.py -q`
 

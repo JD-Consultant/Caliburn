@@ -70,7 +70,11 @@ def _policy(*, skills: tuple[str, ...] = ("work-discovery",)):
         revision=1,
         run_kind="interactive_consultation",
         allowed_skill_ids=skills,
-        allowed_tool_ids=("source_by_id", "source_lineage", "source_lexical_search"),
+        allowed_tool_ids=(
+            "employee_source_get",
+            "employee_source_lineage",
+            "employee_source_search",
+        ),
         max_context_tokens=24_000,
         max_model_calls=3,
         max_lookup_waves=2,
@@ -306,7 +310,7 @@ async def test_agent_uses_structured_output_and_builtin_limits_without_fallback(
 
 def test_agent_rejects_tools_outside_the_resolved_run_policy() -> None:
     @tool
-    def source_by_id(source_id: str) -> str:
+    def employee_source_get(source_id: str) -> str:
         """Read one employee source by its stable ID."""
         return source_id
 
@@ -322,7 +326,7 @@ def test_agent_rejects_tools_outside_the_resolved_run_policy() -> None:
         model=model,
         execution=execution,
         response_schema=ProbeResult,
-        tools=(source_by_id,),
+        tools=(employee_source_get,),
     )
     with pytest.raises(ValueError, match="ineligible tools"):
         build_consultant_agent(

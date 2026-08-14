@@ -98,7 +98,7 @@ def _output(source_id: UUID, **overrides: Any) -> ConsultantModelOutput:
 
 def _document_change(source_id: UUID, **overrides: Any) -> OutputDocumentChange:
     values: dict[str, Any] = {
-        "change_ref": "change-1",
+        "change_ref": "",
         "depends_on_change_refs": (),
         "depends_on_action_ids": (),
         "supersedes_action_ids": (),
@@ -266,6 +266,122 @@ def test_model_output_schema_does_not_expose_free_form_document_json() -> None:
         "tasks",
         "opks_items",
     }
+
+
+def test_shared_document_wire_allows_the_legacy_empty_change_ref_sentinel() -> None:
+    assert _document_change(uuid4(), change_ref="").change_ref == ""
+
+
+@pytest.mark.parametrize(
+    "change",
+    [
+        pytest.param(
+            lambda source_id: _document_change(source_id, change_ref="candidate-1"),
+            id="change-ref",
+        ),
+        pytest.param(
+            lambda source_id: _document_change(
+                source_id, depends_on_change_refs=("candidate-0",)
+            ),
+            id="change-dependency",
+        ),
+        pytest.param(
+            lambda source_id: _document_change(
+                source_id, depends_on_action_ids=(uuid4(),)
+            ),
+            id="action-dependency",
+        ),
+        pytest.param(
+            lambda source_id: _document_change(
+                source_id, supersedes_action_ids=(uuid4(),)
+            ),
+            id="action-supersession",
+        ),
+        pytest.param(
+            lambda source_id: _document_change(
+                source_id, atomic_group_ref="atomic-1"
+            ),
+            id="atomic-group",
+        ),
+        pytest.param(
+            lambda source_id: _document_change(
+                source_id,
+                operation=DocumentChangeOperation.ADD,
+                target=OutputDocumentTarget.DUTY,
+                field=OutputDocumentField.ENTITY,
+                text_value="",
+                duties=(
+                    OutputDuty(
+                        duty_id="",
+                        entity_ref="d1",
+                        statement="管理採購作業",
+                        display_order=-1,
+                    ),
+                ),
+            ),
+            id="duty-local-ref",
+        ),
+        pytest.param(
+            lambda source_id: _document_change(
+                source_id,
+                operation=DocumentChangeOperation.ADD,
+                target=OutputDocumentTarget.TASK,
+                field=OutputDocumentField.ENTITY,
+                text_value="",
+                tasks=(
+                    OutputTask(
+                        task_id="",
+                        duty_id="",
+                        entity_ref="t1",
+                        duty_ref="d1",
+                        statement="建立請購單",
+                        action="建立",
+                        object="請購單",
+                        purpose_result="",
+                        context="",
+                        frequency_text="",
+                        responsibility_role=OutputResponsibilityRole.NONE,
+                        enablers=(),
+                        display_order=-1,
+                    ),
+                ),
+            ),
+            id="task-local-ref",
+        ),
+        pytest.param(
+            lambda source_id: _document_change(
+                source_id,
+                operation=DocumentChangeOperation.ADD,
+                target=OutputDocumentTarget.OPKS,
+                field=OutputDocumentField.ENTITY,
+                text_value="",
+                opks_kind=OutputOpksKind.OUTPUT,
+                opks_items=(
+                    OutputOpksItem(
+                        item_id="",
+                        entity_ref="o1",
+                        text="採購成果",
+                        display_order=-1,
+                        task_ids=(),
+                        indicator_ids=(),
+                        task_refs=("t1",),
+                        indicator_refs=("p1",),
+                    ),
+                ),
+            ),
+            id="opks-local-refs",
+        ),
+    ],
+)
+def test_final_model_output_rejects_non_neutral_candidate_only_slots(
+    change: Any,
+) -> None:
+    source_id = uuid4()
+
+    with pytest.raises(ConsultantOutputMappingError, match="candidate-only"):
+        map_consultant_model_output(
+            _output(source_id, reviewable_document_changes=(change(source_id),))
+        )
 
 
 def test_model_output_normalizes_repeated_evidence_into_one_basis_table() -> None:

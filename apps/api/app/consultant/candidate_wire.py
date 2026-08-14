@@ -110,7 +110,7 @@ class OutputOpksItem(ProviderWireModel):
 
 
 class OutputDocumentChange(ProviderWireModel):
-    change_ref: ChangeRef
+    change_ref: LocalRef
     depends_on_change_refs: tuple[ChangeRef, ...]
     depends_on_action_ids: tuple[UUID, ...]
     supersedes_action_ids: tuple[UUID, ...]
@@ -190,19 +190,22 @@ def map_candidate_edit_batch(
     *,
     document_id: UUID,
     materialization_run_id: UUID,
+    allowed_entity_ids: frozenset[UUID] = frozenset(),
+    allowed_action_ids: frozenset[UUID] = frozenset(),
 ) -> tuple[ReviewableDocumentChange, ...]:
     """Map one replacement batch without giving provider text document authority."""
 
     _validate_change_graph(batch.replacement_changes)
     resolver = _LocalRefResolver(document_id, materialization_run_id)
     resolver.register(batch.replacement_changes)
+    entity_ids = allowed_entity_ids | resolver.issued_entity_ids
     bases = AnalysisBasisTable(batch.analysis_bases)
     mapped = tuple(
-        _map_provider_document_change(
+        _map_candidate_change(
             resolver.resolve_change(value),
-            bases,
-            include_candidate_identities=True,
-            include_candidate_metadata=True,
+            bases=bases,
+            allowed_entity_ids=entity_ids,
+            allowed_action_ids=allowed_action_ids,
         )
         for value in batch.replacement_changes
     )
@@ -215,6 +218,7 @@ def map_provider_document_change(
 ) -> ReviewableDocumentChange:
     """Map the legacy final-output document wire without candidate local refs."""
 
+    _reject_candidate_only_slots(value)
     return _map_provider_document_change(
         value,
         bases,
@@ -225,6 +229,8 @@ def map_provider_document_change(
 
 def _validate_change_graph(values: tuple[OutputDocumentChange, ...]) -> None:
     refs = tuple(value.change_ref for value in values)
+    if any(not change_ref for change_ref in refs):
+        raise CandidateWireMappingError("candidate change_ref must not be empty")
     if len(refs) != len(set(refs)):
         raise CandidateWireMappingError("duplicate change_ref")
     known = set(refs)
@@ -280,6 +286,10 @@ class _LocalRefResolver:
                     self._document_id,
                     f"consultant:{self._materialization_run_id}:local:{kind}:{entity_ref}",
                 )
+
+    @property
+    def issued_entity_ids(self) -> frozenset[UUID]:
+        return frozenset(self._ids.values())
 
     def resolve(self, kind: str, ref: str) -> UUID | None:
         if not ref:
@@ -363,6 +373,83 @@ def _resolved_reference_ids(
     if supplied_ids and local_ids:
         raise CandidateWireMappingError("local refs contradict application-owned IDs")
     return tuple(item for item in local_ids if item is not None) or supplied_ids
+
+
+def _map_candidate_change(
+    value: OutputDocumentChange,
+    *,
+    bases: AnalysisBasisTable,
+    allowed_entity_ids: frozenset[UUID],
+    allowed_action_ids: frozenset[UUID],
+) -> ReviewableDocumentChange:
+    _require_bound_entity_handles(value, allowed_entity_ids)
+    _require_bound_action_handles(value, allowed_action_ids)
+    return _map_provider_document_change(
+        value,
+        bases,
+        include_candidate_identities=True,
+        include_candidate_metadata=True,
+    )
+
+
+def _require_bound_entity_handles(
+    value: OutputDocumentChange, allowed_entity_ids: frozenset[UUID]
+) -> None:
+    _require_entity_handle(value.target_id, allowed_entity_ids)
+    _require_entity_handle(value.uuid_value, allowed_entity_ids)
+    for entity_id in (
+        *value.uuid_values,
+        *value.target_ids,
+        *value.task_ids,
+        *value.indicator_ids,
+        *(duty.duty_id for duty in value.duties),
+        *(task.task_id for task in value.tasks),
+        *(task.duty_id for task in value.tasks),
+        *(item.item_id for item in value.opks_items),
+        *(item_id for item in value.opks_items for item_id in item.task_ids),
+        *(item_id for item in value.opks_items for item_id in item.indicator_ids),
+    ):
+        _require_entity_handle(entity_id, allowed_entity_ids)
+
+
+def _require_entity_handle(
+    value: UUID | str, allowed_entity_ids: frozenset[UUID]
+) -> None:
+    if value == "":
+        return
+    try:
+        entity_id = value if isinstance(value, UUID) else UUID(value)
+    except (TypeError, ValueError, AttributeError) as error:
+        raise CandidateWireMappingError("entity handle must be a UUID") from error
+    if entity_id not in allowed_entity_ids:
+        raise CandidateWireMappingError("unbound entity handle")
+
+
+def _require_bound_action_handles(
+    value: OutputDocumentChange, allowed_action_ids: frozenset[UUID]
+) -> None:
+    for action_id in (*value.depends_on_action_ids, *value.supersedes_action_ids):
+        if action_id not in allowed_action_ids:
+            raise CandidateWireMappingError("unbound action handle")
+
+
+def _reject_candidate_only_slots(value: OutputDocumentChange) -> None:
+    if (
+        value.change_ref
+        or value.depends_on_change_refs
+        or value.depends_on_action_ids
+        or value.supersedes_action_ids
+        or value.atomic_group_ref
+        or any(duty.entity_ref for duty in value.duties)
+        or any(task.entity_ref or task.duty_ref for task in value.tasks)
+        or any(
+            item.entity_ref or item.task_refs or item.indicator_refs
+            for item in value.opks_items
+        )
+    ):
+        raise CandidateWireMappingError(
+            "legacy final output cannot carry candidate-only slots"
+        )
 
 
 def _map_provider_document_change(

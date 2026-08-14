@@ -70,6 +70,7 @@ ADR 是「為什麼」層;搭配 `../specs/`(細節設計)與 `../runbook.md`(�
 | [0059](0059-core-shared-kernel-boundary-clarifications.md) | 0058 `core` shared-kernel 邊界澄清；`core` 已隨 ADR 0060 hard cut 刪除，僅保留決策歷史 | **Accepted；部分被 0060 取代**（2026-08-14） |
 | [0060](0060-langchain-langgraph-consultant-runtime-and-durable-authority.md) | LangChain／LangGraph 職務顧問 runtime：framework 直接替換自寫 workflow／memory／context／proposal／document-state 機制；Postgres Store＋Saver 單一 durable authority；Task／Duty／OPKS 改為按需 Skills；文件 patch 審核、必要澄清與一般 Gap 分流；受限 Big-bang，不建舊 writer compatibility layer | **Accepted**（2026-08-14） |
 | [0061](0061-compact-consultant-wire-progressive-skills-and-tools.md) | 顧問 provider contract 與 rich application result 分離：Pydantic compact wire 全欄 required、零 optional／union／open object；文件變更用 typed target／field／payload，Evidence 以 basis table＋ordinal 正規化，pure mapper fail closed；Tool／Skill 排程另議 | **Accepted**（2026-08-14；owner 本輪只核准 schema 修正，Tool 另議） |
+| [0062](0062-bounded-consultant-read-tools-and-structured-authority.md) | 顧問只暴露四個受限唯讀 Tool；Skill 與員工原話按需讀取，application 注入 scope／limit；文件候選走 Structured Output，accept／edit／reject 走員工 authority command；四個 Tool 不導入 Tool Search，lookup 依賴驅動 | **Accepted**（2026-08-14；owner 完成 Tool 討論後核准直接施工） |
 
 完整脈絡見 [`../specs/2026-06-27-system-architecture-design.md`](../specs/2026-06-27-system-architecture-design.md)。
 契約怎麼選/怎麼交付的規範見 [`../contract-strategy.md`](../contract-strategy.md)（ADR 0004/0010 的一般化、契約 #1–#4 登記）。

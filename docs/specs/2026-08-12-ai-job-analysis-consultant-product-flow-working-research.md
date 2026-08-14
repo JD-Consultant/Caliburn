@@ -2462,22 +2462,33 @@ Agent Skills／Deep Agents 的主流方式不是把所有 Skill 隱藏到模型�
 
 Opus 5 可借鑑的精簡不是刪除分析方法，而是把重複 scaffolding 移出 base prompt：角色／產品邊界／當輪目標常駐，Task／Duty／O／P／K／S 方法留在 Skills；移除模型已自帶或 verifier 已保證的重複「再驗證一次」指令；員工歷史與來源用 stable handles 即時取回。官方 1M context 仍強調 context 有限，應保留最小高訊號 context 與 just-in-time retrieval。[Prompting Claude Opus 5](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5) · [Effective context engineering](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)
 
-#### 9.16.3 Tool 按需載入研究：候選方向，尚未裁決
+#### 9.16.3 Tool 按需載入研究與 owner 裁決（2026-08-14）
 
-現行只有 `read_file` 加三個 source lookup tools，全部定義約 2.9 KB；三個 source tools 合計約 1.0 KB，較大的單項是 framework 通用 `read_file` 約 1.2 KB description，描述了本產品沒有的 editing、PDF、paging 等。`FilesystemMiddleware` 已提供 `custom_tool_descriptions`，所以「縮成只描述完整讀取 eligible `/skills/<id>/SKILL.md`」是後續 Tool 討論的候選，不需要為此重寫工具 framework；本輪沒有核准或實作這項變更。
+本節在 ADR 0061 schema-only 修正完成後另行研究、討論並獲 owner 核准；它不把 Tool 決策倒寫成 ADR 0061 當時已決定。
 
-Anthropic Tool Search 官方建議在約 10 個以上工具、tool definitions 超過 10k tokens、選擇品質下降或多 MCP server 時使用；目前四個小工具不符合。`defer_loading` 也不解本次 strict schema 問題，因為 grammar 仍根據完整 deferred tool set 建立。研究上較合適的候選仍是 standard tool calling：definitions 小且穩定，**實際 tool call 與 tool result 才按需進 context**；只有 typed state 明確表示某工具不可能成功時，才考慮 LangChain 原生 dynamic tool filtering。Opus 5 mid-conversation tool changes 仍是 provider beta，OpenRouter／LangChain 端到端尚未驗證，不列核心依賴。以上只供下一輪 Tool 討論，不由 schema 決策自動生效。[Anthropic Tool Search](https://platform.claude.com/docs/en/agents-and-tools/tool-use/tool-search-tool) · [LangChain dynamic tools](https://docs.langchain.com/oss/python/langchain/agents#dynamic-tools) · [Anthropic mid-conversation tool changes](https://platform.claude.com/docs/en/build-with-claude/mid-conversation-system-messages)
+現行只有 `read_file` 加三個 source lookup tools，全部定義約 2.9 KB；三個 source tools 合計約 1.0 KB，較大的單項是 framework 通用 `read_file` 約 1.2 KB description，描述了本產品沒有的 editing、PDF、paging 等。`FilesystemMiddleware` 已提供 `custom_tool_descriptions`，因此保留成熟 middleware 與標準 `read_file` 名稱，只把說明收斂成「完整讀取 eligible `/skills/<id>/SKILL.md`」。不自寫另一個 Skill loader。
 
-現行 prompt 還把「第一波讀 Skill、第二波查 Source」寫死；研究上它不屬於產品需求，因為員工更正可能要先查 lineage，某些回答也可在同一波平行取得 Skill 與 source。是否保留兩波、如何排序與是否改為 typed availability，全部留待下一輪 Tool 討論；本輪維持現況。
+先前「Anthropic 約 10 個 Tool 就建議 Tool Search」是過度推論，現予更正。官方目前把 Tool Search 定位為數百至數千個 Tool 的大型 catalog，並說一般 Tool 選擇品質可能在約 30–50 個開始下降；它沒有把 10 個列為通用啟用線。OpenAI Tool Search 同樣針對大型 namespace／deferred definitions，且有 model／provider 限制。Caliburn 只有四個小型 Tool，應維持 standard tool calling：definitions 小且穩定，**只有實際 tool call 與 result 按需進 context**。`defer_loading` 也不解 strict grammar，因為 grammar 仍可能根據完整 deferred set 建立。只有未來 Tool 數或實測選擇品質真的出現問題，才評估 LangChain deterministic filtering 或 provider Tool Search；不先加 keyword router、另一個 LLM selector、MCP catalog 或 provider beta。[Anthropic Tool Search](https://platform.claude.com/docs/en/agents-and-tools/tool-use/tool-search-tool) · [OpenAI Tool Search](https://developers.openai.com/api/docs/guides/tools-tool-search) · [LangChain dynamic tools](https://docs.langchain.com/oss/python/langchain/agents#dynamic-tools)
+
+官方共識也支持把三類 primitive 分開：Tool Calling 用於外部資料／系統／動作；Structured Output 用於模型最終交付的 typed response；真正改變業務 authority 的命令由 application／人發出。故本產品的正式 Tool surface 收斂為：
+
+1. `read_file`：讀一份 eligible Skill；
+2. `employee_source_get`：依 stable ID 取同文件員工原話；
+3. `employee_source_lineage`：取更正／被更正鏈；
+4. `employee_source_search`：查找同文件相關原話，名稱不綁目前 lexical backend。
+
+`document_id`、權限與搜尋 `limit=5` 由 application 注入，不要求模型填已知參數。source result 保留 source ID、exact text、speaker、validity、timestamps 與 correction pointers。ADD／REVISE／WITHDRAW／MERGE／SPLIT 等文件候選維持 provider-native Structured Output；員工 accept／edit-accept／reject／defer 維持 LangGraph authority command；必要澄清維持 Structured Output＋interrupt。Focus、Gap 與 Progress 是 graph state／projection，都不為湊 Tool 而 Tool 化。[OpenAI Function Calling](https://developers.openai.com/api/docs/guides/function-calling) · [OpenAI Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs) · [Google Function Calling](https://ai.google.dev/gemini-api/docs/function-calling) · [Google Structured Outputs](https://ai.google.dev/gemini-api/docs/structured-output) · [LangChain Tools](https://docs.langchain.com/oss/python/langchain/tools) · [LangChain Structured Output](https://docs.langchain.com/oss/python/langchain/structured-output)
+
+lookup 不再固定「第一波 Skill、第二波 Source」。context 足夠時可以零 Tool call；彼此獨立的 Skill／source 讀取可在同一波平行；只有第一波結果產生新的資料依賴時才使用第二波。原有最多三次 model call、兩個 lookup waves 與總 Tool／token／timeout budget 不變。完整裁決見 [ADR 0062](../adr/0062-bounded-consultant-read-tools-and-structured-authority.md)。
 
 #### 9.16.4 北極星與施工裁決
 
 - **產品方向沒有偏**：一位顧問、前景焦點／背景吸收、動態 Task／Duty／OPKS、記得並可找回員工原話、LLM 文件內容先審後入、必要澄清／一般 Gap／文件審核分流、可信進度、自然離開／續談與單一可強制匯出皆不變。
 - **修正的是 provider contract，不是刪產品能力**：rich result／framework state 可完整；只有送給模型的 wire 必須 compact，再映回產品結構。
 - **Skill 已是按需正文**：保留成熟 middleware；把 selected／eligible／loaded 名詞與驗證分清。
-- **Tool 尚未裁決**：本節保留 standard calling、縮 description、調整 wave 與 dynamic filtering 的研究證據，但 owner 已把 Tool／Skill loading 排除於 schema 本輪；工具集合、description 與排程維持現況，下一輪另議。
+- **Tool 已在 schema 修正後另行裁決**：ADR 0062 收斂為四個唯讀 Tool、精簡 `read_file` 說明與依賴驅動 lookup；沒有 Tool Search、LLM selector 或 business write Tool。
 - **兩段式降為 contingency**：compact wire exact canary 仍失敗才啟用，不預先增加一次 inference 與 handoff。
-- **決策狀態**：[ADR 0061](../adr/0061-compact-consultant-wire-progressive-skills-and-tools.md) 已由 owner 以 **schema-only** 範圍核准為 Accepted；compact provider wire 生效，Tool／Skill loading 沒有隨之獲得授權。ADR 0060 仍是 runtime 主決策。
+- **決策狀態**：[ADR 0061](../adr/0061-compact-consultant-wire-progressive-skills-and-tools.md) 維持 **schema-only**；後續 Tool 授權與實作範圍由 [ADR 0062](../adr/0062-bounded-consultant-read-tools-and-structured-authority.md) 獨立承接。ADR 0060 仍是 runtime 主決策。
 
 ## 10. 本稿依據
 

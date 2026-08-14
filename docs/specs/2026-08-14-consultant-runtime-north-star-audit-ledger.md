@@ -263,6 +263,16 @@ Big-bang 只描述最終切換，不表示做到最後才審核。之後每完�
 - schema 證據：LangChain 實際轉換後量測為 **0 optional、0 union、0 open object、object depth 4、約 9,754 minified bytes**；bytes 只記錄粗略訊號，不作 provider 上限。compact schema／mapper、LangChain conversion、agent wiring、model runtime 與 run-service focused suite 為 `86 passed`；完整 `test_consultant*.py` 面為 `137 passed, 26 skipped`（未注入 PostgreSQL URL 的 durable tests 依既有條件跳過）。付費 Opus 5 canary 未獲本輪授權、未執行。
 - 北極星回歸：一位顧問、動態 Task／Duty／OPKS、員工原話記憶、文件先審後入、必要澄清／Gap／審核分流、自然續談、可信進度、單一強制匯出、能力級別／A／RAG／eval 延後均未改。判定是**provider contract 形狀修正，無產品偏移**；Tool／Skill loading 應另議，不得從 schema 接線推定已核准。
 
+### Task 11：Tool surface 正式裁決與施工前北極星回歸
+
+- 狀態：**Decision accepted；implementation in progress**。owner 在 schema-only ADR 0061 完成後，另行核准依最新主流 Tool Calling 做法直接施工；決策記於 ADR 0062，沒有事後改寫 ADR 0060／0061。
+- 官方共識：OpenAI、Anthropic、Google 都把 Tool Calling 用於外部資料、系統或動作，把 typed final response 留給 Structured Output；LangChain 對應為 Tool／middleware 與 provider-native response format。Anthropic 強調少量高價值、目的清楚、回傳高訊號且受限的 Tool，Google 建議清楚名稱與強型別，OpenAI 建議不要讓模型填 application 已知參數。
+- Tool Search 更正：先前「約 10 個 Tool 就建議」不是官方通用門檻。Anthropic 目前以數百至數千 Tool catalog 為主要情境，並指出選擇品質常在約 30–50 個才開始下降；OpenAI Tool Search 亦有大型 namespace 與 model/provider 前提。現行四個 Tool 不啟用 Tool Search、MCP catalog、dynamic LLM selector 或 provider beta。
+- 正式 surface：`read_file`、`employee_source_get`、`employee_source_lineage`、`employee_source_search`。全部唯讀且 document-scoped；application 注入 document ID、權限與搜尋上限。source payload 保留 stable ID、exact text、speaker、validity、timestamp 與 correction lineage。
+- primitive 分工：ADD／REVISE／WITHDRAW／MERGE／SPLIT 等是 Structured Output 的 typed review draft，不是模型 write Tool；accept／edit-accept／reject／defer 是 employee authority command；必要澄清是 typed result＋LangGraph interrupt；Focus／Gap／Progress 是 durable graph state／projection。
+- lookup 政策：context 足夠時零呼叫；獨立 Skill／source 可同波平行；只有前一結果產生新依賴才用第二波。保留三次 model call／兩波 lookup 的硬上限，不保留固定「先 Skill、後 Source」順序。
+- 北極星回歸：這次只替換／收斂通用讀取機制，沒有把產品變成 Tool 操作台或多 Agent，也沒有改動動態 Task／Duty／OPKS、員工原話記憶、文件先審後入、澄清／Gap／審核分流、自然離開／續談與單一強制匯出。沒有接 RAG、能力級別／A 或正式 eval。施工前判定 **Pass**。
+
 ## 8. 本次直接使用的一手來源
 
 - [Anthropic — Prompting Claude Opus 5](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5)
@@ -270,6 +280,15 @@ Big-bang 只描述最終切換，不表示做到最後才審核。之後每完�
 - [Anthropic — Mid-conversation system messages and tool changes](https://platform.claude.com/docs/en/build-with-claude/mid-conversation-system-messages)
 - [Anthropic — Citations](https://platform.claude.com/docs/en/build-with-claude/citations)
 - [Anthropic — Effective context engineering for AI agents](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)
+- [Anthropic — How tool use works](https://platform.claude.com/docs/en/agents-and-tools/tool-use/how-tool-use-works)
+- [Anthropic — Tool search tool](https://platform.claude.com/docs/en/agents-and-tools/tool-use/tool-search-tool)
+- [Anthropic — Writing tools for agents](https://www.anthropic.com/engineering/writing-tools-for-agents)
+- [OpenAI — Function calling](https://developers.openai.com/api/docs/guides/function-calling)
+- [OpenAI — Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs)
+- [OpenAI — Tool search](https://developers.openai.com/api/docs/guides/tools-tool-search)
+- [Google Gemini — Function calling](https://ai.google.dev/gemini-api/docs/function-calling)
+- [Google Gemini — Structured output](https://ai.google.dev/gemini-api/docs/structured-output)
+- [LangChain — Tools](https://docs.langchain.com/oss/python/langchain/tools)
 - [LangChain `Citation`](https://reference.langchain.com/python/langchain-core/messages/content/Citation)
 - [W3C Web Annotation Data Model](https://www.w3.org/TR/annotation-model/)
 - [W3C PROV-O](https://www.w3.org/TR/prov-o/)

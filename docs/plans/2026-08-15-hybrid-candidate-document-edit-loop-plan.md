@@ -25,6 +25,49 @@
 - paid canary 僅在 deterministic gates 通過後執行，沿用 owner 已核准的 GPT-5.6 Luna Max；紀錄 route、usage、cost、latency、完整訪談輸入／輸出與修正，不把 smoke 假稱完整品質 eval。
 - 不 push、不開 PR、不 merge；完成後保留 branch、worktree 與本地 tag 供 owner 審核。
 
+## Framework-first Implementation Gate（2026-08-15 最後複核）
+
+實作者不得因現行類別名稱或既有 code 已存在，就直接延伸自寫機制。每個 Task 動手前先對照下表：成熟 primitive 能完整承接通用機制時直接使用；只有框架不知道的 Caliburn 產品語意才寫薄 adapter／validator／projection。若實作中發現新的成熟 primitive 能更完整承接同一目的，先停下更新本計畫或開 successor ADR，不得一邊保留自寫機制一邊再疊一份 framework state。
+
+| 目的 | 採用的成熟 primitive | Caliburn 只保留的薄政策／理由 |
+|---|---|---|
+| Model→Tool→result→model loop | LangChain `create_agent`、Tool execution、`ToolMessage` | 不自寫 provider while-loop；只把 JD candidate Tool 接到 current document scope |
+| Tool dependency injection與 call identity | LangChain `ToolRuntime`／runtime context | `document_id`、run ID、權限、baseline與 DB runtime由 application 注入，模型不可自填 |
+| Tool 對 state 的 durable effect | LangGraph typed state、reducer、`Command`、checkpoint | candidate寫既有 product graph；不替內層 agent再建一套 checkpointer／Store。若 tool不能直接對 parent graph回 `Command`，只允許薄的 `stage_candidate_revision()` adapter呼叫同一 product graph command，不得重寫 state engine |
+| Final typed response | LangChain `ProviderStrategy`／`create_agent.response_format`＋Pydantic strict model | 只定義 Caliburn final effect schema與 pure mapper；不解析自由文字、不自寫 schema engine |
+| Candidate／resume／fault recovery | LangGraph thread state＋`AsyncPostgresSaver` | `CandidateWorkspace` 只定義 run、revision、digest與 persisted changeset；不建 candidate table、event store或自寫 checkpoint |
+| 員工原話與跨 turn記憶 | LangGraph `Store`＋checkpointed thread state | exact source、speaker、更正 lineage、文件 scope與 quote support規則仍屬產品語意；不另建 transcript memory framework |
+| 最小充分 Context | LangChain context middleware、dynamic prompt、context editing／summarization primitives | 只寫「此焦點需要哪些 approved／pending／decision／source slice」的 deterministic selection policy，不自寫 agent lifecycle |
+| 按需分析方法 | Deep Agents `SkillsMiddleware`＋受限 `FilesystemMiddleware(read_file)` | Task／Duty／O／P／K／S 方法內容由 Caliburn研究稿提供；不自寫 Skill lifecycle或多 Agent |
+| Retry、model/tool calls與成本上限 | LangChain `ModelRetryMiddleware`、`ToolRetryMiddleware`、`ModelCallLimitMiddleware`、`ToolCallLimitMiddleware`＋LangGraph recursion limit | 只決定可重試錯誤與產品 budget數值；不得再包另一層隱藏 retry loop |
+| 人工澄清與 durable resume | LangGraph `interrupt()`／`Command(resume=...)`＋PostgreSQL checkpointer | 只決定哪個矛盾會阻擋哪個 branch；不得自寫 pause/resume engine |
+| 員工文件審核 | LangGraph checkpoint／Command承接 durable command channel；Pydantic承接 typed decision | LangChain `HumanInTheLoopMiddleware` 是「Tool執行前 approve/edit/reject並暫停該 agent run」，不等同本產品「候選可先在隔離區反覆修正，final後以多 action dependency／defer／stale整包審核」。因此不套它來攔 candidate Tool；review dependency、edit-accept、defer、read-set與 employee authority是必要產品政策 |
+| Typed JD候選編輯 | LangChain custom client Tool＋Pydantic input/result＋LangGraph state；既有 document-authority apply/validate seam | OpenAI Apply Patch、Anthropic Text Editor與 Deep Agents `StateBackend`／VFS適合檔案／文字／scratchpad，沒有 Duty／Task／OPKS relational invariant、atomic subgroup或員工 authority。第一版用一個 domain-scoped Tool，不展開 `add_task` 等多 Tool，也不使用 host filesystem／shell |
+| Evidence transport與驗證 | Pydantic、LangChain content/citation primitives、既有 Store | 框架可攜帶 citation，但不知道員工來源 validity、更正 lineage、quote是否逐字匹配及證據是否支持某個 Task／OPKS；這些 deterministic verifier必須保留 |
+| ID、atomic group、dependency、supersession、read-set | Pydantic typed models＋LangGraph durable state | generic framework不知道 JD entity graph與員工審核政策；只寫 deterministic resolver／validator，不自建 workflow runtime |
+| Coverage／depth／decision／gap進度 | LangGraph state＋deterministic projection | 進度定義屬職務分析產品語意，不能交給 LLM Structured Output或通用 agent Todo估算 |
+| Provider／模型替換 | LangChain model abstraction＋`langchain-openrouter` profile | 不讓 candidate core依賴 OpenAI／Anthropic專有 editor。OpenAI目前建議 Responses API承接 reasoning/tool/multi-turn；若 adapter採用 Responses，也只能是可替換 transport，不得滲入 domain contract |
+| Tracing與成本證據 | LangChain callbacks＋OpenTelemetry＋provider usage metadata | 只定義本產品必填 route／usage／cost／latency與 fail-closed條件，不自寫 tracing backend |
+
+兩個「最新但本輪不採」的機制也要明確保留理由：
+
+1. **不採 Programmatic Tool Calling 作 candidate主迴圈。** OpenAI目前將它定位為可由程式一次過濾、聚合、排序的大量 bounded tool work；當每個結果可能改變模型下一步判斷、動作需要人工核准或必須保留 citation/artifact時，官方建議 direct tool calls。本產品需要看實際 candidate error後決定如何修正，因此 direct Tool loop更吻合；未來 Reference大量檢索／去重才重新評估 PTC。
+2. **不採 multi-agent。** OpenAI GPT-5.6 multi-agent仍是 beta；Microsoft也建議先用能滿足需求的較簡單 pattern。產品明確是一位顧問，Task／Duty／OPKS是按需 Skills而非多個人格；除非未來有可獨立平行、能量測品質增益的工作流，否則不增加協調成本。
+
+本 gate 的官方依據：
+
+- [OpenAI Model guidance — Responses API、direct／programmatic Tool Calling、精簡 prompts與 approval boundaries](https://developers.openai.com/api/docs/guides/latest-model)
+- [OpenAI GPT-5.6 Luna — Function Calling、Structured Outputs、Tools與成本定位](https://developers.openai.com/api/docs/models/gpt-5.6-luna)
+- [Anthropic — Tool use contract與 user-defined／trained-in tools邊界](https://platform.claude.com/docs/en/agents-and-tools/tool-use/how-tool-use-works)
+- [Google Gemini — Function Calling用於中間動作、Structured Outputs用於 final schema](https://ai.google.dev/gemini-api/docs/tools)
+- [Microsoft Agent Framework — deterministic workflow、agent reasoning與 HITL的混合](https://learn.microsoft.com/en-us/agent-framework/journey/workflows)
+- [LangChain — ToolRuntime、structured Tool result與 Command state update](https://docs.langchain.com/oss/python/langchain/tools)
+- [LangChain — provider-native Structured Output](https://docs.langchain.com/oss/python/langchain/structured-output)
+- [LangChain — Context engineering與 middleware／state／Store／runtime context](https://docs.langchain.com/oss/python/langchain/context-engineering)
+- [LangChain — prebuilt retry、limits、HITL與 context middleware](https://docs.langchain.com/oss/python/langchain/middleware/built-in)
+- [LangGraph — checkpoint persistence、memory、HITL與 fault recovery](https://docs.langchain.com/oss/python/langgraph/persistence)
+- [Deep Agents — State／Store／filesystem backends及其適用邊界](https://docs.langchain.com/oss/python/deepagents/backends)
+
 ---
 
 ### Task 1: 拆分 final wire 與候選編輯 wire
@@ -616,7 +659,7 @@ class ConsultantResult(ResultModel):
 
 - [ ] **Step 2: 用 disposable文件執行真 API訪談**
 
-  以 `DEBUG=false`、owner核准的 GPT-5.6 Luna Max profile、disposable PostgreSQL文件啟動 `apps/api/run_live.py`。至少完成兩輪：第一輪建立 Task＋O/P candidate並發布待審；員工接受部分、拒絕一項 O後，第二輪證明模型看到實際核准 JD與拒絕記憶。另用受控錯誤 batch證明 Tool result→修正→final publication閉環。
+  以 `DEBUG=false`、owner核准的 GPT-5.6 Luna Max profile、disposable PostgreSQL文件啟動 `apps/api/run_live.py`。至少完成兩輪：第一輪建立 Task＋O/P candidate並發布待審；員工接受部分、拒絕一項 O後，第二輪證明模型看到實際核准 JD與拒絕記憶。另用受控錯誤 batch證明 Tool result→修正→final publication閉環。OpenAI目前把 Luna定位為成本敏感／高流量 tier，因此本 smoke只驗證真實工具閉環、schema、記憶與成本，不宣稱 Luna是專業顧問品質冠軍；產品完成後的正式 eval再以相同 provider-neutral profile比較 Luna／Terra／Sol或其他供應商模型。
 
 - [ ] **Step 3: 記錄可複核的 live evidence**
 

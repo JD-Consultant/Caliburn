@@ -104,6 +104,20 @@
         }
       }
     },
+    "EmployeeMessageView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_id", "text", "created_at", "processing_status", "validity", "supersedes_source_id", "superseded_by_source_id"],
+      "properties": {
+        "source_id": { "type": "string", "format": "uuid" },
+        "text": { "type": "string" },
+        "created_at": { "type": "string", "format": "date-time" },
+        "processing_status": { "type": "string", "enum": ["pending", "committed"] },
+        "validity": { "type": "string", "enum": ["current", "superseded"] },
+        "supersedes_source_id": { "type": ["string", "null"], "format": "uuid" },
+        "superseded_by_source_id": { "type": ["string", "null"], "format": "uuid" }
+      }
+    },
     "OpeningNavigationView": {
       "type": "object",
       "additionalProperties": false,
@@ -438,6 +452,19 @@
         "evidence_source_ids": { "type": "array", "items": { "type": "string", "format": "uuid" } }
       }
     },
+    "ApprovedOpksItemWrite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["item_id", "kind", "text", "display_order", "task_ids", "indicator_ids"],
+      "properties": {
+        "item_id": { "type": "string", "format": "uuid" },
+        "kind": { "type": "string", "enum": ["output", "indicator", "knowledge", "skill", "attitude"] },
+        "text": { "type": "string" },
+        "display_order": { "type": "integer", "minimum": 0 },
+        "task_ids": { "type": "array", "items": { "type": "string", "format": "uuid" } },
+        "indicator_ids": { "type": "array", "items": { "type": "string", "format": "uuid" } }
+      }
+    },
     "ApprovedJobDocumentView": {
       "type": "object",
       "additionalProperties": false,
@@ -460,7 +487,25 @@
       }
     },
     "ApprovedJobDocumentWrite": {
-      "allOf": [{ "$ref": "#/$defs/ApprovedJobDocumentView" }]
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["document_id", "job_title", "occupation_category_name", "occupation_name", "occupation_code", "industry_name", "industry_code", "work_description", "competency_level", "notes", "duties", "tasks", "opks"],
+      "properties": {
+        "schema_version": { "type": "integer", "const": 1, "default": 1 },
+        "document_id": { "type": "string", "format": "uuid" },
+        "job_title": { "type": ["string", "null"] },
+        "occupation_category_name": { "type": ["string", "null"] },
+        "occupation_name": { "type": ["string", "null"] },
+        "occupation_code": { "type": ["string", "null"] },
+        "industry_name": { "type": ["string", "null"] },
+        "industry_code": { "type": ["string", "null"] },
+        "work_description": { "type": ["string", "null"] },
+        "competency_level": { "type": ["integer", "null"], "minimum": 1, "maximum": 6 },
+        "notes": { "type": ["string", "null"] },
+        "duties": { "type": "array", "items": { "$ref": "#/$defs/ApprovedDutyView" } },
+        "tasks": { "type": "array", "items": { "$ref": "#/$defs/ApprovedTaskView" } },
+        "opks": { "type": "array", "items": { "$ref": "#/$defs/ApprovedOpksItemWrite" } }
+      }
     },
     "DirectDocumentEditWrite": {
       "type": "object",
@@ -494,7 +539,7 @@
     "ConsultantSnapshotView": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["document_id", "revision", "source_count", "latest_source_id", "run", "opening_navigation", "current_interview", "visible_work", "understanding", "semantic_progress", "messages", "document_review", "required_clarification", "sufficiency", "approved_document", "readiness"],
+      "required": ["document_id", "revision", "source_count", "latest_source_id", "run", "opening_navigation", "current_interview", "visible_work", "understanding", "semantic_progress", "employee_messages", "messages", "document_review", "required_clarification", "sufficiency", "approved_document", "readiness"],
       "properties": {
         "document_id": { "type": "string", "format": "uuid" },
         "revision": { "type": "integer", "minimum": 0 },
@@ -506,6 +551,7 @@
         "visible_work": { "type": "array", "items": { "$ref": "#/$defs/VisibleWorkItemView" } },
         "understanding": { "$ref": "#/$defs/UnderstandingView" },
         "semantic_progress": { "$ref": "#/$defs/SemanticProgressView" },
+        "employee_messages": { "type": "array", "items": { "$ref": "#/$defs/EmployeeMessageView" } },
         "messages": { "type": "array", "items": { "$ref": "#/$defs/ConsultantMessageView" } },
         "document_review": { "$ref": "#/$defs/DocumentReviewView" },
         "required_clarification": { "anyOf": [{ "$ref": "#/$defs/RequiredClarificationView" }, { "type": "null" }] },

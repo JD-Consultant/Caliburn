@@ -12,6 +12,7 @@ from uuid import UUID, uuid5
 from fastapi import APIRouter, BackgroundTasks, Depends, Header, Query, Response
 from fastapi.sse import EventSourceResponse, ServerSentEvent
 from job_analysis_contract import (
+    ApprovedJobDocumentWrite,
     ConsultantDocumentCatalog,
     ConsultantDocumentCatalogItem,
     ConsultantDocumentCreate,
@@ -82,9 +83,42 @@ def _command_receipt(
     )
 
 
+def _approved_document_from_edit(
+    body: ApprovedJobDocumentWrite,
+    current: ApprovedJobDocument,
+    source_id: UUID,
+) -> ApprovedJobDocument:
+    """Restore server-owned evidence and attach this edit to changed OPKS text."""
+
+    payload = body.model_dump(mode="json")
+    existing = {str(item.item_id): item for item in current.opks}
+    for item in payload["opks"]:
+        previous = existing.get(str(item["item_id"]))
+        evidence = (
+            list(previous.evidence_source_ids)
+            if previous is not None
+            else []
+        )
+        if previous is None or item["text"] != previous.text:
+            if source_id not in evidence:
+                evidence.append(source_id)
+        item["evidence_source_ids"] = evidence
+    return ApprovedJobDocument.model_validate(payload)
+
+
 def _catalog_item(value) -> ConsultantDocumentCatalogItem:
     return ConsultantDocumentCatalogItem.model_validate(
         value.model_dump(mode="json")
+    )
+
+
+async def _snapshot_view(
+    runtime: PostgresConsultantRuntime,
+    snapshot,
+) -> ConsultantSnapshotView:
+    return to_consultant_snapshot_view(
+        snapshot,
+        employee_sources=await runtime.list_sources(snapshot.document_id),
     )
 
 
@@ -201,14 +235,65 @@ async def submit_employee_answer(
         return consultant_runtime_error_response(error)
 
 
+@router.post(
+    "/{document_id}/runs/{run_id}/retry",
+    response_model=ConsultantRunAccepted,
+    status_code=202,
+)
+async def retry_consultant_run(
+    document_id: UUID,
+    run_id: UUID,
+    background_tasks: BackgroundTasks,
+    runtime: PostgresConsultantRuntime = Depends(get_consultant_runtime),
+    processor: ConsultantTurnProcessor = Depends(get_consultant_turn_processor),
+):
+    try:
+        snapshot = await runtime.reopen_document(document_id)
+        receipt = (
+            RunReceipt.model_validate(snapshot.latest_run)
+            if snapshot.latest_run is not None
+            else None
+        )
+        if receipt is None or receipt.run_id != run_id:
+            raise ValueError("retry run does not match the current durable run")
+        source = await runtime.get_source(document_id, receipt.source_id)
+        restarted, _ = await runtime.admit_employee_answer(
+            document_id=document_id,
+            run_id=receipt.run_id,
+            source_id=source.source_id,
+            text=source.text,
+            supersedes_source_id=source.supersedes_source_id,
+        )
+        active = RunReceipt.model_validate(restarted.latest_run)
+        if active.status.value == "source_saved" and await processor.claim(
+            document_id, active.run_id
+        ):
+            background_tasks.add_task(
+                processor.process_claimed,
+                document_id,
+                active.run_id,
+                active.source_id,
+                runtime,
+            )
+        return ConsultantRunAccepted(
+            run_id=active.run_id,
+            source_id=active.source_id,
+            status=active.status.value,
+        )
+    except Exception as error:
+        return consultant_runtime_error_response(error)
+
+
 @router.get("/{document_id}/snapshot", response_model=ConsultantSnapshotView)
 async def get_consultant_snapshot(
     document_id: UUID,
     runtime: PostgresConsultantRuntime = Depends(get_consultant_runtime),
 ):
     try:
-        return to_consultant_snapshot_view(
-            await runtime.reopen_document(document_id)
+        snapshot = await runtime.reopen_document(document_id)
+        return await _snapshot_view(
+            runtime,
+            snapshot,
         )
     except Exception as error:
         return consultant_runtime_error_response(error)
@@ -321,7 +406,7 @@ async def review_document_changes(
                 },
             ),
         )
-        return to_consultant_snapshot_view(snapshot)
+        return await _snapshot_view(runtime, snapshot)
     except Exception as error:
         return consultant_runtime_error_response(error)
 
@@ -391,7 +476,7 @@ async def decide_understanding_calibration(
                 },
             ),
         )
-        return to_consultant_snapshot_view(snapshot)
+        return await _snapshot_view(runtime, snapshot)
     except Exception as error:
         return consultant_runtime_error_response(error)
 
@@ -428,7 +513,7 @@ async def answer_required_clarification(
                 },
             ),
         )
-        return to_consultant_snapshot_view(snapshot)
+        return await _snapshot_view(runtime, snapshot)
     except Exception as error:
         return consultant_runtime_error_response(error)
 
@@ -445,14 +530,20 @@ async def edit_approved_document(
     runtime: PostgresConsultantRuntime = Depends(get_consultant_runtime),
 ):
     try:
-        document = ApprovedJobDocument.model_validate(
-            body.document.model_dump(mode="json")
+        source_id = _command_id(
+            document_id, "direct-edit-source", idempotency_key
+        )
+        current = (await runtime.reopen_document(document_id)).approved_document
+        document = _approved_document_from_edit(
+            body.document,
+            current,
+            source_id,
         )
         snapshot = await runtime.apply_direct_edit(
             document_id=document_id,
             expected_revision=expected_revision,
             document=document,
-            source_id=_command_id(document_id, "direct-edit-source", idempotency_key),
+            source_id=source_id,
             command_receipt=_command_receipt(
                 document_id,
                 "direct_document_edit",
@@ -460,7 +551,7 @@ async def edit_approved_document(
                 {"document": body.document.model_dump(mode="json")},
             ),
         )
-        return to_consultant_snapshot_view(snapshot)
+        return await _snapshot_view(runtime, snapshot)
     except Exception as error:
         return consultant_runtime_error_response(error)
 

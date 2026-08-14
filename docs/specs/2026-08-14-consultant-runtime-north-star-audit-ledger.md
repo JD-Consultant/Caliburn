@@ -1,7 +1,7 @@
 # AI 職務顧問 runtime：北極星審核與逐 Task 防偏帳本
 
 - 日期：2026-08-14
-- 狀態：Pre-implementation audit **Passed**；Tasks 1–7 **Passed**
+- 狀態：Pre-implementation audit **Passed**；Tasks 1–8 **Passed**
 - 決策：ADR 0060 Accepted
 - 施工計畫：[`2026-08-13-langgraph-consultant-runtime-big-bang-plan.md`](../plans/2026-08-13-langgraph-consultant-runtime-big-bang-plan.md)
 - 產品 SSOT：[`2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md`](2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md) §1–§8、§9.12–§9.13
@@ -221,6 +221,21 @@ Big-bang 只描述最終切換，不表示做到最後才審核。之後每完�
 - 驗證：contract `18 passed`；codegen 前後 Python／TypeScript SHA-256 完全相同；consultant 群 `146 passed`；sandbox 外完整 PostgreSQL API gate `953 passed`。第一次完整 gate 的唯一 assertion 是 route allowlist 尚未加入 `consultant.py`，已修正；其餘 error 為 Windows pytest temp ACL，改用已確認的 sandbox 外 basetemp 重跑取得完整綠燈。compileall 與 `git diff --check` 另行通過。
 - 北極星回歸：一位顧問、前景焦點／背景吸收、Task／Duty／OPKS 可動態修訂、AI 文件內容先審後入、必要澄清只擋相依 branch、可見 gap／可信進度、自然續談與單一可強制匯出均未偏移。九個方法 Skill 仍按需、能力級別／A 不由 LLM 生成，且 production tool／import／contract 沒有接入 RAG／Reference。結果 **Pass**。
 
+### Task 8：員工顧問工作區
+
+- 狀態：**Pass**；預定同一 task commit 為 `feat: deliver consultant workspace`。
+- 員工效果：文件庫可建立或重開職務分析；同一頁清楚分開訪談對話、目前焦點／理由、可收合的「AI 目前理解」、旁支線索、具體 Gap、Task／Duty／O／P／K／S 分軸進度、足夠性建議、必要澄清、AI 待審文件變更與員工核准正式文件。關頁不需 pause／finish；重新開啟可看到先前員工原話、顧問回覆與 durable saved／processing／failed 狀態。
+- 成熟 primitive：Next.js 16 App Router／React 19 承接頁面與互動元件；TanStack Query 5 承接 revision-monotonic durable projection cache、mutation、失效與衝突後 refetch；瀏覽器 `EventSource` 承接自動重連，FastAPI SSE 只通知 refetch；JSON Schema codegen 承接 Python／TypeScript transport；標準 `localStorage`＋before-unload guard 承接 document-scoped、非權威的可恢復 local draft。沒有自寫 Web state store、SSE reconnect engine、framework checkpoint decoder或第二份 server 訪談／文件狀態。
+- Caliburn 薄政策：只保留框架不知道的四種員工畫面邊界、外部 AI 告知文字、atomic subgroup／accept dependency 選取、dirty draft 衝突處理、職務文件欄位與 OPKS 關聯、具體 readiness gap 與 force-export 語意。Web 不重算 server authority，direct edit 仍由 API deterministic invariant 重驗。
+- 第一輪詳細複審修正：原本 direct-edit write contract 沿用 view，會迫使瀏覽器提交或偽造 OPKS evidence ID；已拆出沒有 evidence 欄位的 `ApprovedOpksItemWrite`，由 server 對實際員工改寫鑄造來源。原 snapshot 只有顧問回覆，員工重開後看不到自己的原話；已加入只投影 employee-turn source 的 `EmployeeMessageView`。failed run 雖能在 runtime 原地重啟，Web 重開後卻沒有原 idempotency key；已新增 same-run／same-source retry command。直接編輯刪除 Task／indicator 後可能留下 K／S dangling relation；現於送出前 deterministic 清理且由 server 再驗。UI 另把 raw status／JSON pointer 改成員工白話，不顯示 technical revision。
+- 第二輪獨立審查共確認六項缺口：失敗回答只能原樣 retry、不能明確更正；純結構 edit-accept 因 candidate source ID 被誤拒；延遲 mutation response 可讓 TanStack cache revision 倒退且 409 未可靠重抓；server 的 blocked-branch projection 未落到 UI；所謂 UI 測試只有純函式；直接編輯草稿可能因 App Router／browser Back 遺失。現已分別補成 `supersedes_source_id` correction admission、只有文字 delta 才鑄 evidence、單調 revision cache＋409 refetch、branch-level answer guard、真實 jsdom component integration tests，以及 document-scoped browser-local recoverable draft。另將結構化審核的 raw JSON textarea 換成 Duty／Task／OPKS 員工欄位；UUID、source、evidence 與 system order 不顯示且原樣保存，重新歸類／排序仍能 typed edit-accept。
+- 第三輪窄複審又確認兩項缺口：欄位級 `enablers`／`task_ids`／`indicator_ids` 曾被誤當 entity 或文字，且 failed run 的一般回答只由 server 擋、UI 仍可誤送。現已依完整 path 深度分流為專用 editor／preview，並在 failed 時只開放 retry 或更正 failed source；無關回答與其他來源更正先停用並說明原因。相同審查者再次逐項複核後回報 clean，未留 P1／P2。
+- 自然續談與 authority：`source_saved` 時第二則 AI 回答被擋，但 read／review／direct edit／export 仍可用；required clarification 只標 affected branch且不 modal-lock 回答區。AI changeset 支援 accept、edit-accept、reject、defer，多 bundle 可並存；只有 accept／edit-accept 改核准文件。能力級別與 A 只在員工直接 editor 中存在，沒有 model-facing path。
+- 實際啟動煙霧：以正式 `run_live.py` 在 Windows Selector loop 啟動 API，`/healthz` 回 `db=true`；Next `/workspace` 回 200。使用獨立 PostgreSQL DB 實際建立／重開文件、直接改核准內容、一般匯出取得 409 gap confirmation、`force=true` 取得 200 XLSX（6114 bytes），全程未送出模型回答。in-app browser 當時沒有任何可連線 browser instance，故沒有把視覺點擊假稱已驗；Task 10 的真模型／真 UI smoke 仍保留。
+- TDD／驗證：修正後 Web `12 files／82 passed`、`npx tsc --noEmit`、ESLint 全綠；component suite 實際涵蓋 SSE lifecycle、branch blocker、force export、draft 離開／返回、delayed response、409 conflict、failed-source correction、結構化 Duty edit-accept，以及 field-level 關聯／enabler request 型別。contract `19 passed`；正式 codegen 的 Python／TypeScript 生成物連續重跑 SHA-256 不變。獨立 Windows temp 下完整 PostgreSQL API `958 passed`；工作區內首次重跑雖執行到 100%，但 pytest session 收尾被 Windows ACL 阻擋，因此沒有冒充通過，改用 sandbox 外隔離 temp 取得可信綠燈。`next build` 在進入產品編譯前因 sandbox 阻止 Next SWC lock repair且 `next/font` 無法連 Google Fonts而中止，未列為通過，也未讓自動 lockfile repair 混入變更。
+- 舊機制誠實性：新 App Router 頁面只掛載 `features/consultant`，但舊 `_components`、舊 route／contract／writer 仍暫留 repo，沒有被新頁面引用也不雙寫。Task 9 必須 hard cut 刪除並以 AST／`rg`／fresh-root migration 證明關閉；Task 8 不能提前宣稱 Big-bang 完成。
+- 北極星回歸：一位顧問、前景焦點／背景吸收、Task／Duty／OPKS 動態演化、員工原話記憶、AI 文件先審後入、澄清／Gap／審核分流、可信語意進度、自然離開／續談與單一可強制匯出均符合。沒有 RAG／Reference consumer、能力級別／A 生成、multi-agent、假百分比、pause／finish、第二 authority或 framework internals UI。結果 **Pass**。
+
 ## 8. 本次直接使用的一手來源
 
 - [LangChain agents](https://docs.langchain.com/oss/python/langchain/agents)
@@ -231,6 +246,9 @@ Big-bang 只描述最終切換，不表示做到最後才審核。之後每完�
 - [Deep Agents `SkillsMiddleware`](https://reference.langchain.com/python/deepagents/middleware/skills/SkillsMiddleware)
 - [Deep Agents `FilesystemMiddleware`](https://reference.langchain.com/python/deepagents/middleware/filesystem/FilesystemMiddleware)
 - [FastAPI Server-Sent Events](https://fastapi.tiangolo.com/tutorial/server-sent-events/)
+- [WHATWG HTML — Server-sent events](https://html.spec.whatwg.org/multipage/server-sent-events.html)
+- [TanStack Query — Query invalidation](https://tanstack.com/query/latest/docs/framework/react/guides/query-invalidation)
+- [Next.js — Server and Client Components](https://nextjs.org/docs/app/getting-started/server-and-client-components)
 - [LangChain 1.3.15 PyPI](https://pypi.org/project/langchain/1.3.15/)
 - [LangGraph 1.2.11 PyPI](https://pypi.org/project/langgraph/1.2.11/)
 - [`langgraph-checkpoint-postgres` 3.1.2 PyPI／security setup](https://pypi.org/project/langgraph-checkpoint-postgres/3.1.2/)

@@ -232,11 +232,11 @@ Big-bang 只代表最後一次硬切，不允許累積十個 Task 後才發現�
 
 **Produces:** One persistent consultant workspace with natural continuation, visible understanding, truthful progress and separate employee interaction channels.
 
-- [ ] Write UI tests for first-use external-AI disclosure, opening navigation, current interview reason, collapsible “AI 目前理解”, soft／blocking calibration, concrete gaps, sufficiency advice, multiple editable review bundles, required clarification, reconnect and dirty-editor protection.
-- [ ] Test natural leave／return: after a completed reply, closing and reopening needs no pause／resume action; during processing, reopening shows completed or recoverable status without losing the employee input.
-- [ ] Keep understanding, pending LLM document changes and approved content visually distinct. Structural review may block dependent analysis but must not modal-lock unrelated work.
-- [ ] Use `EventSource` only to invalidate/refetch durable snapshots. Missing intermediate events must not lose accepted／waiting／completed／failed state.
-- [ ] Run Web tests, `npx tsc --noEmit` and lint; run the common north-star gate, append the Task 8 ledger entry and commit `feat: deliver consultant workspace`.
+- [x] Write UI tests for first-use external-AI disclosure, opening navigation, current interview reason, collapsible “AI 目前理解”, soft／blocking calibration, concrete gaps, sufficiency advice, multiple editable review bundles, required clarification, reconnect and dirty-editor protection.
+- [x] Test natural leave／return: after a completed reply, closing and reopening needs no pause／resume action; during processing, reopening shows completed or recoverable status without losing the employee input.
+- [x] Keep understanding, pending LLM document changes and approved content visually distinct. Structural review may block dependent analysis but must not modal-lock unrelated work.
+- [x] Use `EventSource` only to invalidate/refetch durable snapshots. Missing intermediate events must not lose accepted／waiting／completed／failed state.
+- [x] Run Web tests, `npx tsc --noEmit` and lint; run the common north-star gate, append the Task 8 ledger entry and commit `feat: deliver consultant workspace`.
 
 ### Task 9: Preserve export, hard-cut old mechanisms and update architecture docs
 

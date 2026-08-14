@@ -100,6 +100,29 @@ class ConsultantMessageView(BaseModel):
     next_question: NextQuestionView | None
 
 
+class ProcessingStatus(StrEnum):
+    pending = 'pending'
+    committed = 'committed'
+
+
+class Validity(StrEnum):
+    current = 'current'
+    superseded = 'superseded'
+
+
+class EmployeeMessageView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    source_id: UUID
+    text: str
+    created_at: AwareDatetime
+    processing_status: ProcessingStatus
+    validity: Validity
+    supersedes_source_id: UUID | None
+    superseded_by_source_id: UUID | None
+
+
 class OpeningNavigationView(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -466,6 +489,18 @@ class ApprovedOpksItemView(BaseModel):
     evidence_source_ids: list[UUID]
 
 
+class ApprovedOpksItemWrite(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    item_id: UUID
+    kind: Kind2
+    text: str
+    display_order: conint(ge=0, strict=True)
+    task_ids: list[UUID]
+    indicator_ids: list[UUID]
+
+
 class ApprovedJobDocumentView(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -486,8 +521,24 @@ class ApprovedJobDocumentView(BaseModel):
     opks: list[ApprovedOpksItemView]
 
 
-class ApprovedJobDocumentWrite(ApprovedJobDocumentView):
-    pass
+class ApprovedJobDocumentWrite(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    schema_version: Literal[1] = 1
+    document_id: UUID
+    job_title: str | None
+    occupation_category_name: str | None
+    occupation_name: str | None
+    occupation_code: str | None
+    industry_name: str | None
+    industry_code: str | None
+    work_description: str | None
+    competency_level: conint(ge=1, le=6, strict=True) | None
+    notes: str | None
+    duties: list[ApprovedDutyView]
+    tasks: list[ApprovedTaskView]
+    opks: list[ApprovedOpksItemWrite]
 
 
 class DirectDocumentEditWrite(BaseModel):
@@ -652,7 +703,7 @@ class DocumentReadinessView(BaseModel):
     issues: list[ReadinessIssueView]
 
 
-class Kind3(StrEnum):
+class Kind4(StrEnum):
     tool_system = 'tool_system'
     method = 'method'
     knowledge = 'knowledge'
@@ -664,7 +715,7 @@ class Enabler(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
-    kind: Kind3
+    kind: Kind4
     name: str
 
 
@@ -1057,6 +1108,7 @@ class ConsultantSnapshotView(BaseModel):
     visible_work: list[VisibleWorkItemView]
     understanding: UnderstandingView
     semantic_progress: SemanticProgressView
+    employee_messages: list[EmployeeMessageView]
     messages: list[ConsultantMessageView]
     document_review: DocumentReviewView
     required_clarification: RequiredClarificationView | None

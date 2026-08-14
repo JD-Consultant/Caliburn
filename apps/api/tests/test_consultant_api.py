@@ -14,7 +14,13 @@ from app.adapters.langgraph.postgres import (
 )
 from app.api.deps import get_consultant_runtime, get_consultant_turn_processor
 from app.api.routes import consultant
-from app.consultant.state import RunReceipt, RunStatus, initial_thread_state
+from app.consultant.state import (
+    EmployeeSource,
+    EmployeeSourceKind,
+    RunReceipt,
+    RunStatus,
+    initial_thread_state,
+)
 from app.consultant.views import snapshot_from_state
 
 
@@ -45,6 +51,7 @@ class FakeRuntime:
         self.snapshot = None
         self.active_conflict = False
         self.calls: list[tuple[str, dict]] = []
+        self.sources: list[EmployeeSource] = []
 
     async def list_documents(self):
         if self.document_id is None or self.deleted:
@@ -73,10 +80,28 @@ class FakeRuntime:
         assert document_id == self.document_id
         return self.snapshot
 
+    async def list_sources(self, document_id: UUID):
+        assert document_id == self.document_id
+        return tuple(self.sources)
+
+    async def get_source(self, document_id: UUID, source_id: UUID):
+        assert document_id == self.document_id
+        return next(item for item in self.sources if item.source_id == source_id)
+
     async def admit_employee_answer(self, **kwargs):
         if self.active_conflict:
             raise ActiveConsultantRun("another run is recoverable")
         self.calls.append(("answer", kwargs))
+        if not any(item.source_id == kwargs["source_id"] for item in self.sources):
+            self.sources.append(
+                EmployeeSource.pending(
+                    source_id=kwargs["source_id"],
+                    document_id=kwargs["document_id"],
+                    kind=EmployeeSourceKind.EMPLOYEE_TURN,
+                    text=kwargs["text"],
+                    supersedes_source_id=kwargs["supersedes_source_id"],
+                )
+            )
         run = RunReceipt(
             run_id=kwargs["run_id"],
             status=RunStatus.SOURCE_SAVED,
@@ -216,6 +241,18 @@ async def test_answer_is_source_first_202_idempotent_and_background_owned(api) -
     assert processor.processed == [
         (document_id, UUID(payload["run_id"]), UUID(payload["source_id"]))
     ]
+    reopened = await client.get(f"{BASE}/{document_id}/snapshot")
+    assert reopened.json()["employee_messages"] == [
+        {
+            "source_id": payload["source_id"],
+            "text": "我每天整理採購需求。",
+            "created_at": reopened.json()["employee_messages"][0]["created_at"],
+            "processing_status": "pending",
+            "validity": "current",
+            "supersedes_source_id": None,
+            "superseded_by_source_id": None,
+        }
+    ]
 
     runtime.active_conflict = True
     blocked = await client.post(
@@ -226,6 +263,39 @@ async def test_answer_is_source_first_202_idempotent_and_background_owned(api) -
     assert blocked.status_code == 409
     assert blocked.json()["type"].endswith("/consultant-run-active")
     assert (await client.get(f"{BASE}/{document_id}/snapshot")).status_code == 200
+
+
+async def test_failed_run_retries_the_same_durable_source_after_reopening(api) -> None:
+    client, runtime, processor = api
+    document_id = UUID((await _create(client)).json()["document_id"])
+    accepted = await client.post(
+        f"{BASE}/{document_id}/answers",
+        headers={"Idempotency-Key": "answer-to-retry"},
+        json={"text": "這段原話不能重複建立。", "supersedes_source_id": None},
+    )
+    run_id = UUID(accepted.json()["run_id"])
+    source_id = UUID(accepted.json()["source_id"])
+    runtime.snapshot = _snapshot(
+        document_id,
+        revision=2,
+        run=RunReceipt(
+            run_id=run_id,
+            status=RunStatus.FAILED,
+            source_id=source_id,
+            started_at=datetime.now(UTC),
+            completed_at=datetime.now(UTC),
+            error_code="provider_timeout",
+        ),
+    )
+    processor.processed.clear()
+    processor.claimed.clear()
+
+    retried = await client.post(f"{BASE}/{document_id}/runs/{run_id}/retry")
+
+    assert retried.status_code == 202, retried.text
+    assert retried.json()["source_id"] == str(source_id)
+    assert processor.processed == [(document_id, run_id, source_id)]
+    assert len(runtime.sources) == 1
 
 
 async def test_employee_review_calibration_clarification_and_direct_edit_are_distinct(api) -> None:
@@ -281,8 +351,36 @@ async def test_employee_review_calibration_clarification_and_direct_edit_are_dis
         headers={"Idempotency-Key": "edit-1", "X-Expected-Revision": "1"},
         json={"document": document},
     )
-    assert edited.status_code == 200
+    assert edited.status_code == 200, edited.text
     assert runtime.calls[-1][0] == "direct_edit"
+
+
+async def test_direct_edit_server_mints_opks_evidence_instead_of_trusting_the_browser(api) -> None:
+    client, runtime, _ = api
+    document_id = UUID((await _create(client)).json()["document_id"])
+    document = runtime.snapshot.approved_document.model_dump(mode="json")
+    document["opks"] = [
+        {
+            "item_id": str(uuid4()),
+            "kind": "attitude",
+            "text": "謹慎",
+            "display_order": 0,
+            "task_ids": [],
+            "indicator_ids": [],
+        }
+    ]
+
+    edited = await client.put(
+        f"{BASE}/{document_id}/approved-document",
+        headers={"Idempotency-Key": "edit-opks-1", "X-Expected-Revision": "0"},
+        json={"document": document},
+    )
+
+    assert edited.status_code == 200, edited.text
+    passed_document = runtime.calls[-1][1]["document"]
+    assert passed_document.opks[0].evidence_source_ids == (
+        consultant._command_id(document_id, "direct-edit-source", "edit-opks-1"),
+    )
 
 
 async def test_export_requires_explicit_force_when_readiness_has_gaps(api) -> None:

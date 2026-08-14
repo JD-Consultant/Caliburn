@@ -1,11 +1,18 @@
 import type {
+  ApprovedJobDocumentWrite,
+  ConsultantDocumentCatalog,
+  ConsultantDocumentCatalogItem,
+  ConsultantRunAccepted,
+  ConsultantSnapshotView,
   ConsultationView,
+  DocumentReviewDecisionWrite,
   DocumentMetadataView,
   DocumentSummary,
   DocumentView,
   DutyOrderWrite,
   DutyView,
   DutyWrite,
+  EmployeeAnswerWrite,
   JdHeaderView,
   JdHeaderWrite,
   JdTaskView,
@@ -16,10 +23,13 @@ import type {
   OpksProposalDecisionWrite,
   ProblemDetail,
   ProposalDecisionWrite,
+  RequiredClarificationAnswerWrite,
+  UnderstandingCalibrationDecisionWrite,
 } from "@caliburn/job-analysis-contract";
 
 const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8001";
 const API = `${BASE}/api/v1/job-analysis`;
+const CONSULTANT_API = `${API}/consultant-documents`;
 
 type ReceivedProblem = Omit<ProblemDetail, "type"> & { type: string };
 
@@ -106,6 +116,172 @@ export function getConsultation(documentId: string): Promise<ConsultationView> {
 
 function mutationHeaders(idempotencyKey: string) {
   return { "Idempotency-Key": idempotencyKey };
+}
+
+function commandHeaders(idempotencyKey: string, expectedRevision: number) {
+  return {
+    ...mutationHeaders(idempotencyKey),
+    "X-Expected-Revision": String(expectedRevision),
+  };
+}
+
+export function listConsultantDocuments(): Promise<ConsultantDocumentCatalog> {
+  return request<ConsultantDocumentCatalog>("/consultant-documents", {
+    method: "GET",
+  });
+}
+
+export function createConsultantDocument(
+  title: string,
+  idempotencyKey: string,
+): Promise<ConsultantDocumentCatalogItem> {
+  return request<ConsultantDocumentCatalogItem>("/consultant-documents", {
+    method: "POST",
+    headers: mutationHeaders(idempotencyKey),
+    body: JSON.stringify({ title }),
+  });
+}
+
+export function getConsultantDocument(
+  documentId: string,
+): Promise<ConsultantDocumentCatalogItem> {
+  return request<ConsultantDocumentCatalogItem>(
+    `/consultant-documents/${documentId}`,
+    { method: "GET" },
+  );
+}
+
+export function deleteConsultantDocument(documentId: string): Promise<void> {
+  return request<void>(`/consultant-documents/${documentId}`, {
+    method: "DELETE",
+  });
+}
+
+export function getConsultantSnapshot(
+  documentId: string,
+): Promise<ConsultantSnapshotView> {
+  return request<ConsultantSnapshotView>(
+    `/consultant-documents/${documentId}/snapshot`,
+    { method: "GET" },
+  );
+}
+
+export function submitConsultantAnswer(
+  documentId: string,
+  idempotencyKey: string,
+  answer: EmployeeAnswerWrite,
+): Promise<ConsultantRunAccepted> {
+  return request<ConsultantRunAccepted>(
+    `/consultant-documents/${documentId}/answers`,
+    {
+      method: "POST",
+      headers: mutationHeaders(idempotencyKey),
+      body: JSON.stringify(answer),
+    },
+  );
+}
+
+export function retryConsultantRun(
+  documentId: string,
+  runId: string,
+): Promise<ConsultantRunAccepted> {
+  return request<ConsultantRunAccepted>(
+    `/consultant-documents/${documentId}/runs/${runId}/retry`,
+    { method: "POST" },
+  );
+}
+
+export function reviewDocumentChanges(
+  documentId: string,
+  changesetId: string,
+  idempotencyKey: string,
+  expectedRevision: number,
+  decision: DocumentReviewDecisionWrite,
+): Promise<ConsultantSnapshotView> {
+  return request<ConsultantSnapshotView>(
+    `/consultant-documents/${documentId}/reviews/${changesetId}`,
+    {
+      method: "POST",
+      headers: commandHeaders(idempotencyKey, expectedRevision),
+      body: JSON.stringify(decision),
+    },
+  );
+}
+
+export function decideUnderstandingCalibration(
+  documentId: string,
+  calibrationId: string,
+  idempotencyKey: string,
+  expectedRevision: number | null,
+  decision: UnderstandingCalibrationDecisionWrite,
+): Promise<ConsultantSnapshotView | ConsultantRunAccepted> {
+  return request<ConsultantSnapshotView | ConsultantRunAccepted>(
+    `/consultant-documents/${documentId}/calibrations/${calibrationId}`,
+    {
+      method: "POST",
+      headers:
+        expectedRevision === null
+          ? mutationHeaders(idempotencyKey)
+          : commandHeaders(idempotencyKey, expectedRevision),
+      body: JSON.stringify(decision),
+    },
+  );
+}
+
+export function answerRequiredClarification(
+  documentId: string,
+  clarificationId: string,
+  idempotencyKey: string,
+  expectedRevision: number,
+  answer: RequiredClarificationAnswerWrite,
+): Promise<ConsultantSnapshotView> {
+  return request<ConsultantSnapshotView>(
+    `/consultant-documents/${documentId}/clarifications/${clarificationId}`,
+    {
+      method: "POST",
+      headers: commandHeaders(idempotencyKey, expectedRevision),
+      body: JSON.stringify(answer),
+    },
+  );
+}
+
+export function editApprovedDocument(
+  documentId: string,
+  idempotencyKey: string,
+  expectedRevision: number,
+  document: ApprovedJobDocumentWrite,
+): Promise<ConsultantSnapshotView> {
+  return request<ConsultantSnapshotView>(
+    `/consultant-documents/${documentId}/approved-document`,
+    {
+      method: "PUT",
+      headers: commandHeaders(idempotencyKey, expectedRevision),
+      body: JSON.stringify({ document }),
+    },
+  );
+}
+
+export async function exportConsultantDocument(
+  documentId: string,
+  force: boolean,
+): Promise<Blob> {
+  const suffix = force ? "?force=true" : "";
+  const response = await fetch(
+    `${CONSULTANT_API}/${documentId}/export${suffix}`,
+    { method: "GET" },
+  );
+  if (!response.ok) {
+    const body: unknown = await response.json().catch(() => undefined);
+    throw new JobAnalysisApiError(
+      response.status,
+      isReceivedProblem(body) ? body : undefined,
+    );
+  }
+  return response.blob();
+}
+
+export function consultantEventsUrl(documentId: string): string {
+  return `${CONSULTANT_API}/${documentId}/events`;
 }
 
 export function putJdHeader(
@@ -342,6 +518,12 @@ function knownProblemMessage(type: KnownProblemType): string {
       return "找不到這項提案";
     case "https://caliburn.dev/problems/job-analysis/consultant-unavailable":
       return "顧問暫時無法完成分析，請稍後重試";
+    case "https://caliburn.dev/problems/job-analysis/consultant-run-active":
+      return "上一則回答仍在分析中，請稍候";
+    case "https://caliburn.dev/problems/job-analysis/consultant-command-conflict":
+      return "這項決定已用於不同內容，請重新操作";
+    case "https://caliburn.dev/problems/job-analysis/export-confirmation-required":
+      return "匯出前仍有缺口，請先查看並明確確認";
     default:
       return assertNever(type);
   }
@@ -360,6 +542,9 @@ const KNOWN_PROBLEM_TYPES = new Set<string>([
   "https://caliburn.dev/problems/job-analysis/invalid-request",
   "https://caliburn.dev/problems/job-analysis/proposal-not-found",
   "https://caliburn.dev/problems/job-analysis/consultant-unavailable",
+  "https://caliburn.dev/problems/job-analysis/consultant-run-active",
+  "https://caliburn.dev/problems/job-analysis/consultant-command-conflict",
+  "https://caliburn.dev/problems/job-analysis/export-confirmation-required",
 ] satisfies KnownProblemType[]);
 
 function assertNever(value: never): never {

@@ -16,11 +16,6 @@ export type ConsultantRunStatus = "idle" | "source_saved" | "completed" | "faile
  */
 export type DepthStatus =
   "evidence_present" | "gap" | "interviewing" | "not_yet_deepened" | "sufficient_for_now" | "held_with_reason";
-/**
- * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
- * via the `definition` "ApprovedJobDocumentWrite".
- */
-export type ApprovedJobDocumentWrite = ApprovedJobDocumentView;
 
 /**
  * Local Web contract for the durable professional job-analysis consultant.
@@ -98,6 +93,19 @@ export interface ConsultantMessageView {
   text: string;
   used_skill_ids: string[];
   next_question: NextQuestionView | null;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "EmployeeMessageView".
+ */
+export interface EmployeeMessageView {
+  source_id: string;
+  text: string;
+  created_at: string;
+  processing_status: "pending" | "committed";
+  validity: "current" | "superseded";
+  supersedes_source_id: string | null;
+  superseded_by_source_id: string | null;
 }
 /**
  * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
@@ -399,6 +407,18 @@ export interface ApprovedOpksItemView {
 }
 /**
  * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "ApprovedOpksItemWrite".
+ */
+export interface ApprovedOpksItemWrite {
+  item_id: string;
+  kind: "output" | "indicator" | "knowledge" | "skill" | "attitude";
+  text: string;
+  display_order: number;
+  task_ids: string[];
+  indicator_ids: string[];
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
  * via the `definition` "ApprovedJobDocumentView".
  */
 export interface ApprovedJobDocumentView {
@@ -416,6 +436,26 @@ export interface ApprovedJobDocumentView {
   duties: ApprovedDutyView[];
   tasks: ApprovedTaskView[];
   opks: ApprovedOpksItemView[];
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "ApprovedJobDocumentWrite".
+ */
+export interface ApprovedJobDocumentWrite {
+  schema_version?: 1;
+  document_id: string;
+  job_title: string | null;
+  occupation_category_name: string | null;
+  occupation_name: string | null;
+  occupation_code: string | null;
+  industry_name: string | null;
+  industry_code: string | null;
+  work_description: string | null;
+  competency_level: number | null;
+  notes: string | null;
+  duties: ApprovedDutyView[];
+  tasks: ApprovedTaskView[];
+  opks: ApprovedOpksItemWrite[];
 }
 /**
  * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
@@ -458,6 +498,7 @@ export interface ConsultantSnapshotView {
   visible_work: VisibleWorkItemView[];
   understanding: UnderstandingView;
   semantic_progress: SemanticProgressView;
+  employee_messages: EmployeeMessageView[];
   messages: ConsultantMessageView[];
   document_review: DocumentReviewView;
   required_clarification: RequiredClarificationView | null;

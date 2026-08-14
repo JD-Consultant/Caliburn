@@ -93,8 +93,8 @@ class OutputDocumentTarget(StrEnum):
 
 
 class OutputDocumentField(StrEnum):
-    VALUE = "value"
-    ENTITY = "entity"
+    VALUE = "top_level_value"
+    ENTITY = "whole_entity"
     STATEMENT = "statement"
     DISPLAY_ORDER = "display_order"
     DUTY_ID = "duty_id"
@@ -209,20 +209,30 @@ class OutputOpksItem(OutputModel):
 
 
 class OutputDocumentChange(OutputModel):
-    operation: DocumentChangeOperation
-    target: OutputDocumentTarget
+    operation: DocumentChangeOperation = Field(
+        description="新增完整實體用 add；修改單一欄位用 revise／reassign／reorder"
+    )
+    target: OutputDocumentTarget = Field(description="要變更的文件層級或實體類型")
     target_id: str = Field(
         description='最上層欄位、集合操作或新增實體時填 ""'
     )
-    field: OutputDocumentField
+    field: OutputDocumentField = Field(
+        description="job_title／work_description 使用 top_level_value；完整 Duty／Task／OPKS 使用 whole_entity；單欄修改才使用具名欄位"
+    )
     text_value: str = Field(description='不是文字欄位時填 ""')
     integer_value: int = Field(description='不是排序欄位時填 -1')
     uuid_value: str = Field(description='不是單一 ID 欄位時填 ""')
     uuid_values: tuple[UUID, ...]
     enablers: tuple[OutputEnabler, ...]
-    duties: tuple[OutputDuty, ...]
-    tasks: tuple[OutputTask, ...]
-    opks_items: tuple[OutputOpksItem, ...]
+    duties: tuple[OutputDuty, ...] = Field(
+        description="只有 target=duty 且 field=whole_entity 時填；ADD 只能放一個"
+    )
+    tasks: tuple[OutputTask, ...] = Field(
+        description="只有 target=task 且 field=whole_entity 時填；ADD 只能放一個"
+    )
+    opks_items: tuple[OutputOpksItem, ...] = Field(
+        description="只有 target=opks 且 field=whole_entity 時填；ADD 只能放一個"
+    )
     target_ids: tuple[UUID, ...]
     opks_kind: OutputOpksKind = Field(description='非 OPKS 變更時填 "none"')
     task_ids: tuple[UUID, ...]

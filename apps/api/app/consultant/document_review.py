@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
+from hashlib import sha256
+import json
 from typing import Any, Literal
 from uuid import UUID, uuid5
 
@@ -107,7 +109,16 @@ def _evidence_key(change: ReviewableDocumentChange) -> str:
 
 def _target_key(change: ReviewableDocumentChange) -> str:
     if change.operation is DocumentChangeOperation.ADD:
-        return f"{change.path}#add:{_evidence_key(change)}"
+        canonical_after = json.dumps(
+            change.after,
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+        return (
+            f"{change.path}#add:payload={sha256(canonical_after).hexdigest()};"
+            f"{_evidence_key(change)}"
+        )
     if change.operation in {
         DocumentChangeOperation.MERGE,
         DocumentChangeOperation.SPLIT,
@@ -123,7 +134,7 @@ def _normalized_after(
     document_id: UUID,
     run_id: UUID,
     change_index: int,
-    document: ApprovedJobDocument,
+    allocated_display_order: int | None,
 ) -> JsonValue | None:
     value = change.after
     id_field = _COLLECTION_ID_FIELDS.get(change.path)
@@ -139,16 +150,11 @@ def _normalized_after(
         and isinstance(value, dict)
         and value.get("display_order") is None
     ):
-        collection = (
-            document.duties if change.path == "/duties" else document.tasks
-        )
+        if allocated_display_order is None:
+            raise DocumentReviewError("new document entity requires an allocated order")
         value = {
             **value,
-            "display_order": (
-                max((item.display_order for item in collection), default=-1)
-                + change_index
-                + 1
-            ),
+            "display_order": allocated_display_order,
         }
     if (
         change.path == "/opks"
@@ -157,15 +163,12 @@ def _normalized_after(
     ):
         if change.opks_kind is None:
             raise DocumentReviewError("OPKS add requires an OPKS kind")
-        current_orders = [
-            item.display_order
-            for item in document.opks
-            if item.kind.value == change.opks_kind.value
-        ]
+        if allocated_display_order is None:
+            raise DocumentReviewError("new OPKS item requires an allocated order")
         value = {
             "item_id": generated_id,
             "text": value,
-            "display_order": (max(current_orders, default=-1) + change_index + 1),
+            "display_order": allocated_display_order,
         }
     if (
         id_field is not None
@@ -617,15 +620,48 @@ def create_document_changeset(
         raise DocumentReviewError("cannot create an empty document changeset")
     if document.document_id != document_id:
         raise DocumentReviewError("review document scope does not match")
+    next_display_orders = {
+        "/duties": max(
+            (item.display_order for item in document.duties), default=-1
+        )
+        + 1,
+        "/tasks": max(
+            (item.display_order for item in document.tasks), default=-1
+        )
+        + 1,
+    }
+    for item in document.opks:
+        key = f"/opks:{item.kind.value}"
+        next_display_orders[key] = max(
+            next_display_orders.get(key, 0), item.display_order + 1
+        )
     actions: list[DocumentPatchAction] = []
     for index, change in enumerate(changes):
         _ensure_opks_axis_matches_document(change, document)
+        order_key: str | None = None
+        if change.operation is DocumentChangeOperation.ADD:
+            if (
+                change.path in {"/duties", "/tasks"}
+                and isinstance(change.after, dict)
+                and change.after.get("display_order") is None
+            ):
+                order_key = change.path
+            elif (
+                change.path == "/opks"
+                and isinstance(change.after, str)
+                and change.opks_kind is not None
+            ):
+                order_key = f"/opks:{change.opks_kind.value}"
+        allocated_display_order = None
+        if order_key is not None:
+            allocated_display_order = next_display_orders.get(order_key, 0)
+            next_display_orders[order_key] = allocated_display_order + 1
         after = _normalized_after(
             change,
             document_id=document_id,
             run_id=run_id,
             change_index=index,
-            document=document,
+            allocated_display_order=allocated_display_order,
         )
         read_paths = _read_paths(change, after)
         operation = DocumentPatchOperation(change.operation.value)

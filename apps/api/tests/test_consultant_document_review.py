@@ -1351,6 +1351,51 @@ def test_application_allocates_new_duty_and_task_identity_before_review() -> Non
     assert task_bundle.actions[0].after["display_order"] == 0
 
 
+def test_multiple_adds_get_collection_local_orders_and_distinct_target_keys() -> None:
+    document_id = uuid4()
+    source_id = uuid4()
+    bundle = create_document_changeset(
+        document_id=document_id,
+        run_id=uuid4(),
+        summary="建立職稱與兩項採購任務。",
+        read_revision=0,
+        document=ApprovedJobDocument(document_id=document_id),
+        changes=(
+            _change(
+                source_id=source_id,
+                path="/job_title",
+                after="採購專員",
+            ),
+            _change(
+                source_id=source_id,
+                path="/tasks",
+                operation=DocumentChangeOperation.ADD,
+                after={
+                    "statement": "確認採購需求",
+                    "action": "確認",
+                    "object": "採購需求",
+                },
+            ),
+            _change(
+                source_id=source_id,
+                path="/tasks",
+                operation=DocumentChangeOperation.ADD,
+                after={
+                    "statement": "追蹤採購交期",
+                    "action": "追蹤",
+                    "object": "採購交期",
+                },
+            ),
+        ),
+        existing_review_queue={},
+        interview_work={},
+    )
+
+    task_actions = bundle.actions[1:]
+    assert [action.after["display_order"] for action in task_actions] == [0, 1]
+    assert len({action.target_key for action in task_actions}) == 2
+
+
 def test_one_way_dependency_does_not_become_an_atomic_subgroup() -> None:
     document_id = uuid4()
     source_id = uuid4()

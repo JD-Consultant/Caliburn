@@ -197,6 +197,21 @@ def test_model_output_schema_metrics_are_review_visible() -> None:
     }
 
 
+def test_model_facing_id_anchor_and_question_fields_explain_safe_sentinels() -> None:
+    assert "不得自行編造" in (
+        OutputUnderstandingChange.model_fields["work_ids"].description or ""
+    )
+    assert "可留空" in (
+        OutputAnalysisBasis.model_fields["quote_anchors"].description or ""
+    )
+    assert "exclusive" in (
+        OutputQuoteAnchor.model_fields["end"].description or ""
+    )
+    assert "next 時必須留空" in (
+        OutputQuestion.model_fields["affected_work_ids"].description or ""
+    )
+
+
 def test_langchain_converts_the_same_closed_union_free_pydantic_contract() -> None:
     converted = convert_to_openai_tool(ConsultantModelOutput)
     assert converted["function"]["name"] == "ConsultantModelOutput"
@@ -451,7 +466,7 @@ def test_typed_entity_payloads_preserve_duty_task_and_opks_proposals() -> None:
             target=OutputDocumentTarget.DUTY,
             field=OutputDocumentField.ENTITY,
             text_value="",
-            duties=(OutputDuty(duty_id="", statement="管理採購作業", display_order=0),),
+            duties=(OutputDuty(duty_id="", statement="管理採購作業", display_order=-1),),
         ),
         _document_change(
             source_id,
@@ -471,7 +486,7 @@ def test_typed_entity_payloads_preserve_duty_task_and_opks_proposals() -> None:
                     frequency_text="",
                     responsibility_role=OutputResponsibilityRole.NONE,
                     enablers=(),
-                    display_order=0,
+                    display_order=-1,
                 ),
             ),
         ),
@@ -500,10 +515,11 @@ def test_typed_entity_payloads_preserve_duty_task_and_opks_proposals() -> None:
     ).reviewable_document_changes
 
     assert mapped[0].path == "/duties"
-    assert mapped[0].after == {"statement": "管理採購作業", "display_order": 0}
+    assert mapped[0].after == {"statement": "管理採購作業"}
     assert mapped[1].path == "/tasks"
     assert mapped[1].after["task_id"] == str(task_id)
     assert mapped[1].after["statement"] == "建立請購單"
+    assert "display_order" not in mapped[1].after
     assert mapped[2].path == "/opks"
     assert mapped[2].after == "完成的請購單"
 

@@ -111,15 +111,19 @@ class OutputDocumentField(StrEnum):
 
 
 class OutputQuoteAnchor(OutputModel):
-    source_id: UUID
-    start: int
-    end: int
-    quote: str
+    source_id: UUID = Field(description="必須是 context 明列的員工來源 ID")
+    start: int = Field(description="quote 在來源文字中的 0-based 起點；不得用占位值")
+    end: int = Field(
+        description="quote 的 exclusive 終點，必須等於 start + len(quote)"
+    )
+    quote: str = Field(description="必須逐字存在於指定員工來源")
 
 
 class OutputAnalysisBasis(OutputModel):
     source_ids: tuple[UUID, ...]
-    quote_anchors: tuple[OutputQuoteAnchor, ...]
+    quote_anchors: tuple[OutputQuoteAnchor, ...] = Field(
+        description="無法保證逐字位置時可留空，不得用假 offset 占位"
+    )
     skill_ids: tuple[SkillId, ...]
 
 
@@ -129,7 +133,9 @@ class OutputUnderstandingChange(OutputModel):
     kind: str
     text: str
     impact: UnderstandingImpact
-    work_ids: tuple[UUID, ...]
+    work_ids: tuple[UUID, ...] = Field(
+        description="只引用 context 既有 work ID；新 work 不得自行編造 ID，請留空"
+    )
     basis_ordinal: int = Field(description="analysis_bases 的 1-based ordinal")
 
 
@@ -138,7 +144,9 @@ class OutputAttentionChange(OutputModel):
     attention_id: str = Field(description='新增時填 ""，其餘填既有穩定 ID')
     kind: str
     title: str = Field(description='不適用時填 ""')
-    subject_id: str = Field(description='沒有既有主體時填 ""')
+    subject_id: str = Field(
+        description='只引用 context 既有主體 ID；沒有既有主體時填 ""'
+    )
     reason: str
     missing_before_enough: str = Field(description='不適用時填 ""')
     recommended_next_step: str = Field(description='不適用時填 ""')
@@ -156,7 +164,9 @@ class OutputGap(OutputModel):
     reason: GapReason
     description: str
     subject_kind: str
-    subject_id: str = Field(description='沒有既有主體時填 ""')
+    subject_id: str = Field(
+        description='只引用 context 既有主體 ID；沒有既有主體時填 ""'
+    )
     blocks_dependent_analysis: bool
     basis_ordinal: int = Field(description="analysis_bases 的 1-based ordinal")
 
@@ -169,7 +179,7 @@ class OutputEnabler(OutputModel):
 class OutputDuty(OutputModel):
     duty_id: str = Field(description='由應用程式配置新 ID 時填 ""')
     statement: str
-    display_order: int
+    display_order: int = Field(description="新增時填 -1，由應用程式配置排序")
 
 
 class OutputTask(OutputModel):
@@ -185,7 +195,7 @@ class OutputTask(OutputModel):
         description='尚未確認時填 "none"'
     )
     enablers: tuple[OutputEnabler, ...]
-    display_order: int
+    display_order: int = Field(description="新增時填 -1，由應用程式配置排序")
 
 
 class OutputOpksItem(OutputModel):
@@ -227,7 +237,9 @@ class OutputQuestion(OutputModel):
     reason: str = Field(description='沒有問題時填 ""')
     current_understanding: str = Field(description='非必要澄清時填 ""')
     choices: tuple[str, ...]
-    affected_work_ids: tuple[UUID, ...]
+    affected_work_ids: tuple[UUID, ...] = Field(
+        description="只引用 context 既有 work ID；none／next 時必須留空"
+    )
     affected_branch: str = Field(description='非必要澄清時填 ""')
     basis_ordinal: int = Field(
         description='沒有問題時填 0，其餘填 analysis_bases 的 1-based ordinal'
@@ -650,8 +662,11 @@ def _entity_after(
 def _map_duty(value: OutputDuty) -> dict[str, Any]:
     payload: dict[str, Any] = {
         "statement": _required_text(value.statement, "Duty statement"),
-        "display_order": _non_negative(value.display_order, "Duty display_order"),
     }
+    if value.display_order != NEUTRAL_INTEGER:
+        payload["display_order"] = _non_negative(
+            value.display_order, "Duty display_order"
+        )
     duty_id = _optional_uuid(value.duty_id, "duty_id")
     if duty_id is not None:
         payload["duty_id"] = str(duty_id)
@@ -663,12 +678,15 @@ def _map_task(value: OutputTask) -> dict[str, Any]:
         "statement": _required_text(value.statement, "Task statement"),
         "action": _required_text(value.action, "Task action"),
         "object": _required_text(value.object, "Task object"),
-        "display_order": _non_negative(value.display_order, "Task display_order"),
         "enablers": [
             {"kind": item.kind.value, "name": _required_text(item.name, "enabler name")}
             for item in value.enablers
         ],
     }
+    if value.display_order != NEUTRAL_INTEGER:
+        payload["display_order"] = _non_negative(
+            value.display_order, "Task display_order"
+        )
     task_id = _optional_uuid(value.task_id, "task_id")
     duty_id = _optional_uuid(value.duty_id, "duty_id")
     if task_id is not None:

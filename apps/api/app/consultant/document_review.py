@@ -134,6 +134,23 @@ def _normalized_after(
         )
     )
     if (
+        change.path in {"/duties", "/tasks"}
+        and change.operation is DocumentChangeOperation.ADD
+        and isinstance(value, dict)
+        and value.get("display_order") is None
+    ):
+        collection = (
+            document.duties if change.path == "/duties" else document.tasks
+        )
+        value = {
+            **value,
+            "display_order": (
+                max((item.display_order for item in collection), default=-1)
+                + change_index
+                + 1
+            ),
+        }
+    if (
         change.path == "/opks"
         and change.operation is DocumentChangeOperation.ADD
         and isinstance(value, str)

@@ -1300,13 +1300,14 @@ def test_application_allocates_new_duty_and_task_identity_before_review() -> Non
                 source_id=source_id,
                 path="/duties",
                 operation=DocumentChangeOperation.ADD,
-                after={"statement": "管理採購作業", "display_order": 0},
+                after={"statement": "管理採購作業"},
             ),
         ),
         existing_review_queue={},
         interview_work={},
     )
     assert duty_bundle.actions[0].after["duty_id"]
+    assert duty_bundle.actions[0].after["display_order"] == 0
     update = apply_review_command(
         {
             "approved_document": document.model_dump(mode="json"),
@@ -1340,7 +1341,6 @@ def test_application_allocates_new_duty_and_task_identity_before_review() -> Non
                     "statement": "建立請購單",
                     "action": "建立",
                     "object": "請購單",
-                    "display_order": 0,
                 },
             ),
         ),
@@ -1348,6 +1348,7 @@ def test_application_allocates_new_duty_and_task_identity_before_review() -> Non
         interview_work={},
     )
     assert task_bundle.actions[0].after["task_id"]
+    assert task_bundle.actions[0].after["display_order"] == 0
 
 
 def test_one_way_dependency_does_not_become_an_atomic_subgroup() -> None:

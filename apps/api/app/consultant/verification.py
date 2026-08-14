@@ -135,6 +135,8 @@ def verify_consultant_result(
     selected_skill_ids: Sequence[str],
     loaded_skill_ids: Sequence[str],
     employee_sources: Sequence[EmployeeSource],
+    known_work_ids: Sequence[UUID] | None = None,
+    known_subject_ids: Sequence[UUID] | None = None,
 ) -> None:
     """Fail closed before framework output becomes durable semantic state."""
 
@@ -159,6 +161,31 @@ def verify_consultant_result(
         raise ConsultantVerificationError("superseded employee source cannot support current result")
     if any(source.document_id != document_id for source in employee_sources):
         raise ConsultantVerificationError("employee source crosses document scope")
+
+    if known_work_ids is not None:
+        known_work = set(known_work_ids)
+        referenced_work = {
+            work_id
+            for change in result.understanding_changes
+            for work_id in change.work_ids
+        }
+        if result.required_clarification is not None:
+            referenced_work.update(result.required_clarification.affected_work_ids)
+        if not referenced_work <= known_work:
+            raise ConsultantVerificationError(
+                "result references an unknown application ID for interview work"
+            )
+    if known_subject_ids is not None:
+        known_subjects = set(known_subject_ids)
+        referenced_subjects = {
+            item.subject_id
+            for item in (*result.attention_changes, *result.gaps)
+            if item.subject_id is not None
+        }
+        if not referenced_subjects <= known_subjects:
+            raise ConsultantVerificationError(
+                "result references an unknown application ID for a subject"
+            )
 
     for basis in result.analysis_bases():
         _verify_analysis_basis(

@@ -5,7 +5,7 @@ import inspect
 import json
 from pathlib import Path
 import subprocess
-from typing import Any
+from typing import Any, cast
 from uuid import UUID, uuid4
 
 import pytest
@@ -37,6 +37,7 @@ from app.consultant.model_runtime import (
     RunPolicy,
     resolve_execution,
 )
+from app.consultant.candidate_tool import CandidateEditToolBinding
 from app.consultant.results import (
     AnalysisBasis,
     AttentionChange,
@@ -131,6 +132,7 @@ def _execution(
     *,
     skills: tuple[str, ...] = ALL_FIRST_RELEASE_SKILLS,
     tools: tuple[str, ...] = ("read_file",),
+    max_model_calls: int = 3,
 ):
     profile = ConsultantModelProfile(
         profile_id="primary-consultant",
@@ -147,7 +149,7 @@ def _execution(
         allowed_skill_ids=skills,
         allowed_tool_ids=tools,
         max_context_tokens=24_000,
-        max_model_calls=3,
+        max_model_calls=max_model_calls,
         max_lookup_waves=2,
         max_total_tool_calls=12,
         model_retry_count=0,
@@ -580,10 +582,15 @@ async def test_agent_receives_document_scoped_source_tools_from_the_runtime() ->
 
 def test_interactive_agent_rejects_policy_above_product_call_caps() -> None:
     model = RecordingToolModel(responses=[AIMessage(content="unused")])
-    with pytest.raises(ValueError, match="three model calls"):
+    build_professional_consultant_agent(
+        model=model,
+        execution=_execution(max_model_calls=5),
+        selected_skill_ids=("task-boundary",),
+    )
+    with pytest.raises(ValueError, match="five model calls"):
         build_professional_consultant_agent(
             model=model,
-            execution=_execution().model_copy(update={"max_model_calls": 4}),
+            execution=_execution(max_model_calls=6),
             selected_skill_ids=("task-boundary",),
         )
     with pytest.raises(ValueError, match="two lookup waves"):
@@ -592,6 +599,73 @@ def test_interactive_agent_rejects_policy_above_product_call_caps() -> None:
             execution=_execution().model_copy(update={"max_lookup_waves": 3}),
             selected_skill_ids=("task-boundary",),
         )
+
+
+def test_explicit_candidate_binding_adds_exactly_the_fifth_tool_without_lookup_wave_expansion(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    @tool
+    def employee_source_get(source_id: UUID) -> str:
+        """Read one employee source."""
+        return str(source_id)
+
+    @tool
+    def employee_source_lineage(source_id: UUID) -> str:
+        """Read one employee source lineage."""
+        return str(source_id)
+
+    @tool
+    def employee_source_search(query: str) -> str:
+        """Search document-scoped employee sources."""
+        return query
+
+    binding = CandidateEditToolBinding(
+        runtime=cast(Any, object()),
+        document_id=uuid4(),
+        run_id=uuid4(),
+        baseline_revision=7,
+        selected_skill_ids=("task-boundary",),
+    )
+    model = RecordingToolModel(responses=[AIMessage(content="unused")])
+    captured: dict[str, Any] = {}
+
+    def capture_agent(**kwargs: Any) -> object:
+        captured.update(kwargs)
+        return object()
+
+    monkeypatch.setattr("app.consultant.agent.build_consultant_agent", capture_agent)
+    build_professional_consultant_agent(
+        model=model,
+        execution=_execution(
+            tools=(
+                "read_file",
+                "employee_source_get",
+                "employee_source_lineage",
+                "employee_source_search",
+                "job_document_candidate_edit",
+            ),
+            max_model_calls=5,
+        ),
+        selected_skill_ids=("task-boundary",),
+        source_tools=(
+            employee_source_get,
+            employee_source_lineage,
+            employee_source_search,
+        ),
+        candidate_edit_binding=binding,
+    )
+
+    files = captured["additional_middleware"][1]
+    assert {
+        *(item.name for item in captured["tools"]),
+        *(item.name for item in files.tools),
+    } == {
+        "read_file",
+        "employee_source_get",
+        "employee_source_lineage",
+        "employee_source_search",
+        "job_document_candidate_edit",
+    }
 
 
 def test_parallel_skill_and_employee_source_reads_are_one_lookup_wave() -> None:
@@ -626,6 +700,26 @@ def test_parallel_skill_and_employee_source_reads_are_one_lookup_wave() -> None:
         runtime=None,  # type: ignore[arg-type] - middleware does not use runtime
     )
     assert first == {"run_lookup_wave_count": 1}
+
+    assert middleware.after_model(
+        {
+            "messages": [
+                AIMessage(
+                    content="",
+                    tool_calls=[
+                        {
+                            "name": "job_document_candidate_edit",
+                            "args": {},
+                            "id": "candidate-edit",
+                            "type": "tool_call",
+                        }
+                    ],
+                )
+            ],
+            "run_lookup_wave_count": 1,
+        },
+        runtime=None,  # type: ignore[arg-type] - middleware does not use runtime
+    ) is None
 
     same_wave = middleware.after_model(
         {

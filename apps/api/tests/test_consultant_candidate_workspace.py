@@ -178,6 +178,14 @@ def test_first_candidate_revision_is_materialized_without_mutating_semantic_stat
     assert tuple(receipt.action_ids) == tuple(
         action.action_id for action in workspace.changeset.actions
     )
+    assert receipt.actions[0].before == workspace.changeset.actions[0].before
+    assert receipt.actions[0].after == workspace.changeset.actions[0].after
+    assert receipt.actions[0].depends_on_action_ids == (
+        workspace.changeset.actions[0].depends_on_action_ids
+    )
+    assert receipt.actions[0].atomic_subgroup_id == (
+        workspace.changeset.actions[0].atomic_subgroup_id
+    )
     assert state == semantic_before
 
 

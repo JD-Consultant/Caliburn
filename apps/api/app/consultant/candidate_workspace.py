@@ -8,7 +8,7 @@ import json
 from typing import Annotated, Any, Literal
 from uuid import UUID, uuid5
 
-from pydantic import Field, StringConstraints, model_validator
+from pydantic import Field, JsonValue, StringConstraints, model_validator
 
 from app.consultant.candidate_wire import CandidateEditBatch
 from app.consultant.document_authority import (
@@ -22,6 +22,7 @@ from app.consultant.state import (
     DocumentChangeSet,
     DocumentChangeStatus,
     DocumentPatchAction,
+    DocumentPatchOperation,
     DurableModel,
     NonEmptyText,
 )
@@ -54,6 +55,54 @@ class CandidateDependencyError(CandidateWorkspaceError):
     pass
 
 
+class CandidateEditRejected(CandidateWorkspaceError):
+    """A deterministic candidate-stage issue the model can correct in the same run."""
+
+    def __init__(
+        self,
+        *,
+        baseline_revision: int,
+        candidate_revision: int,
+        issues: Sequence[str],
+    ) -> None:
+        self.baseline_revision = baseline_revision
+        self.candidate_revision = candidate_revision
+        self.issues = tuple(issue for issue in issues if issue.strip())
+        if not self.issues:
+            raise ValueError("candidate rejection requires an actionable issue")
+        super().__init__("; ".join(self.issues))
+
+
+class CandidateEditAction(DurableModel):
+    """Compact semantic projection of one persisted candidate patch action."""
+
+    action_id: UUID
+    operation: DocumentPatchOperation
+    path: NonEmptyText
+    before: JsonValue | None = None
+    after: JsonValue | None = None
+    depends_on_action_ids: tuple[UUID, ...] = ()
+    supersedes_action_ids: tuple[UUID, ...] = ()
+    atomic_subgroup_id: UUID | None = None
+    status: DocumentChangeStatus
+    stale_reason: NonEmptyText | None = None
+
+
+def _edit_action(action: DocumentPatchAction) -> CandidateEditAction:
+    return CandidateEditAction(
+        action_id=action.action_id,
+        operation=action.operation,
+        path=action.path,
+        before=action.before,
+        after=action.after,
+        depends_on_action_ids=action.depends_on_action_ids,
+        supersedes_action_ids=action.supersedes_action_ids,
+        atomic_subgroup_id=action.atomic_subgroup_id,
+        status=action.status,
+        stale_reason=action.stale_reason,
+    )
+
+
 class CandidateToolReceipt(DurableModel):
     request_sha256: Digest
     candidate_revision: int = Field(ge=1)
@@ -61,6 +110,13 @@ class CandidateToolReceipt(DurableModel):
     changeset_id: UUID
     action_ids: tuple[UUID, ...] = Field(min_length=1)
     external_dependency_action_ids: tuple[UUID, ...] = ()
+    actions: tuple[CandidateEditAction, ...] = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def action_projection_matches_handles(self) -> CandidateToolReceipt:
+        if self.action_ids != tuple(action.action_id for action in self.actions):
+            raise ValueError("candidate tool receipt action handles do not match actions")
+        return self
 
 
 class CandidateEditReceipt(DurableModel):
@@ -70,6 +126,13 @@ class CandidateEditReceipt(DurableModel):
     changeset_id: UUID
     action_ids: tuple[UUID, ...] = Field(min_length=1)
     external_dependency_action_ids: tuple[UUID, ...] = ()
+    actions: tuple[CandidateEditAction, ...] = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def action_projection_matches_handles(self) -> CandidateEditReceipt:
+        if self.action_ids != tuple(action.action_id for action in self.actions):
+            raise ValueError("candidate edit receipt action handles do not match actions")
+        return self
 
 
 class CandidateWorkspace(DurableModel):
@@ -102,6 +165,8 @@ class CandidateWorkspace(DurableModel):
             or receipt.changeset_id != self.changeset.changeset_id
             or receipt.action_ids
             != tuple(action.action_id for action in self.changeset.actions)
+            or receipt.actions
+            != tuple(_edit_action(action) for action in self.changeset.actions)
         ):
             raise ValueError("candidate workspace latest receipt does not match changeset")
         return self
@@ -191,7 +256,23 @@ def _receipt_from_tool(receipt: CandidateToolReceipt) -> CandidateEditReceipt:
         changeset_id=receipt.changeset_id,
         action_ids=receipt.action_ids,
         external_dependency_action_ids=receipt.external_dependency_action_ids,
+        actions=receipt.actions,
     )
+
+
+def candidate_edit_receipt_for_tool_call(
+    workspace: CandidateWorkspace,
+    tool_call_id: str,
+) -> CandidateEditReceipt:
+    """Return the persisted result for one payload-bound candidate Tool call."""
+
+    try:
+        receipt = workspace.tool_receipts[tool_call_id]
+    except KeyError as error:
+        raise CandidateToolCallConflict(
+            f"candidate tool call {tool_call_id} has no persisted receipt"
+        ) from error
+    return _receipt_from_tool(receipt)
 
 
 def _review_actions(
@@ -438,6 +519,7 @@ def materialize_candidate_workspace(
         changeset_id=changeset.changeset_id,
         action_ids=tuple(action.action_id for action in changeset.actions),
         external_dependency_action_ids=external_dependencies,
+        actions=tuple(_edit_action(action) for action in changeset.actions),
     )
     receipts = dict(existing.tool_receipts) if existing is not None else {}
     receipts[stage.tool_call_id] = tool_receipt

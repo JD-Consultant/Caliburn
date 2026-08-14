@@ -14,6 +14,8 @@ from langchain.agents.middleware import (
     ToolCallLimitMiddleware,
     ToolRetryMiddleware,
 )
+from langchain.agents.middleware.model_call_limit import ModelCallLimitExceededError
+from langchain.agents.middleware.tool_call_limit import ToolCallLimitExceededError
 from langchain.agents.structured_output import ProviderStrategy
 from langchain_core.language_models.fake_chat_models import (
     FakeMessagesListChatModel,
@@ -399,6 +401,68 @@ def test_agent_uses_a_normalized_provider_native_output_schema(monkeypatch) -> N
     visit(strategy.schema_spec.json_schema)
     assert "$defs" not in strategy.schema_spec.json_schema
     assert not ref_nodes
+
+
+def test_five_step_ceiling_rejects_sixth_model_step_and_keeps_candidate_in_total_tool_cap() -> None:
+    execution = resolve_execution(
+        _profile(),
+        _policy().model_copy(update={"max_model_calls": 5}),
+    )
+    middleware = build_consultant_middleware(
+        model=ToolCapableFakeModel(responses=[]),
+        execution=execution,
+    )
+    model_limit = next(
+        item for item in middleware if isinstance(item, ModelCallLimitMiddleware)
+    )
+    state: dict[str, int] = {}
+    for _ in range(5):
+        assert model_limit.before_model(state, runtime=None) is None  # type: ignore[arg-type]
+        state.update(model_limit.after_model(state, runtime=None) or {})  # type: ignore[arg-type]
+    with pytest.raises(ModelCallLimitExceededError, match=r"run limit \(5/5\)"):
+        model_limit.before_model(state, runtime=None)  # type: ignore[arg-type]
+
+    tool_limit = next(
+        item for item in middleware if isinstance(item, ToolCallLimitMiddleware)
+    )
+    candidate_calls = [
+        {
+            "name": "job_document_candidate_edit",
+            "args": {},
+            "id": f"candidate-{index}",
+            "type": "tool_call",
+        }
+        for index in range(execution.max_total_tool_calls)
+    ]
+    allowed = tool_limit.after_model(
+        {"messages": [AIMessage(content="", tool_calls=candidate_calls)]},
+        runtime=None,  # type: ignore[arg-type] - middleware does not use runtime
+    )
+    assert allowed == {
+        "thread_tool_call_count": {"__all__": execution.max_total_tool_calls},
+        "run_tool_call_count": {"__all__": execution.max_total_tool_calls},
+    }
+    with pytest.raises(ToolCallLimitExceededError, match="Tool call limit reached"):
+        tool_limit.after_model(
+            {
+                "messages": [
+                    AIMessage(
+                        content="",
+                        tool_calls=[
+                            {
+                                "name": "job_document_candidate_edit",
+                                "args": {},
+                                "id": "candidate-over-limit",
+                                "type": "tool_call",
+                            }
+                        ],
+                    )
+                ],
+                "thread_tool_call_count": {"__all__": execution.max_total_tool_calls},
+                "run_tool_call_count": {"__all__": execution.max_total_tool_calls},
+            },
+            runtime=None,  # type: ignore[arg-type] - middleware does not use runtime
+        )
 
 
 @pytest.mark.asyncio

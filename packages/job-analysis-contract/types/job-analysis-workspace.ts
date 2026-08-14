@@ -476,6 +476,14 @@ export interface DocumentReviewDecisionWrite {
    */
   action_ids: [string, ...string[]];
   edited_after_by_action_id: {
+    [k: string]:
+      | string
+      | number
+      | boolean
+      | null
+      | unknown[]
+      | {
+        };
   };
   rejection_reason: string | null;
 }

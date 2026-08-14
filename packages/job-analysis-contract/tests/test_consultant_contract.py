@@ -21,6 +21,9 @@ from job_analysis_contract import (
 SCHEMA_PATH = (
     Path(__file__).parents[1] / "schema" / "job-analysis-workspace.schema.json"
 )
+TYPESCRIPT_PATH = (
+    Path(__file__).parents[1] / "types" / "job-analysis-workspace.ts"
+)
 
 
 def test_consultant_contract_covers_the_durable_employee_workspace() -> None:
@@ -69,6 +72,16 @@ def test_commands_are_typed_and_reject_untrusted_extra_fields() -> None:
         UnderstandingCalibrationDecisionWrite.model_validate(
             {"decision": "confirm", "employee_text": "我確認", "finish": True}
         )
+
+
+def test_review_edit_map_keeps_a_generated_json_value_index_signature() -> None:
+    generated = TYPESCRIPT_PATH.read_text(encoding="utf-8")
+    start = generated.index("export interface DocumentReviewDecisionWrite")
+    end = generated.index("\n}\n", start)
+
+    assert "[k: string]:" in generated[start:end]
+    for member in ("| string", "| number", "| boolean", "| null", "| unknown[]"):
+        assert member in generated[start:end]
 
 
 def test_manual_document_surface_keeps_deferred_fields_without_official_codes() -> None:

@@ -1504,6 +1504,20 @@ async def test_candidate_workspace_survives_runtime_reopen_without_snapshot_leak
         assert catalog_after.updated_at == catalog_before.updated_at
         staged = CandidateWorkspace.model_validate(raw_after["active_candidate"])
         assert staged.revision_digest == receipt.revision_digest
+        assert tuple(action.action_id for action in staged.changeset.actions) == (
+            receipt.action_ids
+        )
+        assert receipt.actions[0].before == staged.changeset.actions[0].before
+        assert receipt.actions[0].after == staged.changeset.actions[0].after
+        assert receipt.actions[0].depends_on_action_ids == (
+            staged.changeset.actions[0].depends_on_action_ids
+        )
+        assert receipt.actions[0].supersedes_action_ids == (
+            staged.changeset.actions[0].supersedes_action_ids
+        )
+        assert receipt.actions[0].atomic_subgroup_id == (
+            staged.changeset.actions[0].atomic_subgroup_id
+        )
 
     async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
         reopened = await runtime.reopen_document(document_id)

@@ -27,21 +27,31 @@ from psycopg.rows import DictRow, dict_row
 
 from app.consultant.graph import StaleThreadRevision, build_consultant_graph
 from app.consultant.clarification import ClarificationAnswer
-from app.consultant.candidate_wire import map_candidate_edit_batch
+from app.consultant.candidate_wire import (
+    CandidateWireMappingError,
+    map_candidate_edit_batch,
+)
 from app.consultant.candidate_workspace import (
     CandidateEditReceipt,
+    CandidateEditRejected,
+    CandidateDependencyError,
     CandidateRevisionConflict,
     CandidateStageRequest,
     CandidateToolCallConflict,
     CandidateWorkspace,
     VerifiedCandidateStage,
+    candidate_edit_receipt_for_tool_call,
     candidate_mapping_authority,
     candidate_request_sha256,
     candidate_staging_baseline,
     materialize_candidate_workspace,
 )
-from app.consultant.document_authority import edited_action_source_payload
-from app.consultant.document_review import apply_review_command
+from app.consultant.document_authority import DocumentAuthorityError, edited_action_source_payload
+from app.consultant.document_review import (
+    DocumentReviewError,
+    RejectedChangeRequiresNewEvidence,
+    apply_review_command,
+)
 from app.consultant.interview import VerifiedConsultantCommit
 from app.consultant.state import (
     ApprovedJobDocument,
@@ -67,7 +77,10 @@ from app.consultant.state import (
     inspect_command_receipt,
 )
 from app.consultant.views import ConsultantSnapshot, snapshot_from_state
-from app.consultant.verification import verify_candidate_document_changes
+from app.consultant.verification import (
+    ConsultantVerificationError,
+    verify_candidate_document_changes,
+)
 
 
 SourceHook = Callable[[EmployeeSource], Awaitable[None]]
@@ -774,109 +787,146 @@ class PostgresConsultantRuntime:
                 raise ActiveConsultantRun(
                     "candidate staging does not match the active consultant run"
                 )
-            expected_baseline = candidate_staging_baseline(
-                raw_state,
-                run_id=request.run_id,
-            )
-            if request.baseline_revision != expected_baseline:
-                raise CandidateRevisionConflict(
-                    f"expected baseline revision {expected_baseline}, "
-                    f"found {request.baseline_revision}"
-                )
-            request_sha256 = candidate_request_sha256(request)
             active_payload = raw_state.get("active_candidate")
             active = (
                 CandidateWorkspace.model_validate(active_payload)
                 if active_payload is not None
                 else None
             )
+            current_candidate_revision = active.candidate_revision if active else 0
+            expected_baseline = candidate_staging_baseline(
+                raw_state,
+                run_id=request.run_id,
+            )
+            if request.baseline_revision != expected_baseline:
+                raise CandidateEditRejected(
+                    baseline_revision=expected_baseline,
+                    candidate_revision=current_candidate_revision,
+                    issues=(
+                        f"expected baseline revision {expected_baseline}, "
+                        f"found {request.baseline_revision}",
+                    ),
+                )
+            request_sha256 = candidate_request_sha256(request)
             if active is not None:
                 replay = active.tool_receipts.get(request.tool_call_id)
                 if replay is not None:
                     if replay.request_sha256 != request_sha256:
-                        raise CandidateToolCallConflict(
-                            f"candidate tool call {request.tool_call_id} was reused "
-                            "with another payload"
+                        raise CandidateEditRejected(
+                            baseline_revision=expected_baseline,
+                            candidate_revision=current_candidate_revision,
+                            issues=(
+                                f"candidate tool call {request.tool_call_id} was reused "
+                                "with another payload",
+                            ),
                         )
-                    await self._require_current_committed_sources(
-                        document_id,
-                        active.changeset.source_ids,
+                    try:
+                        await self._require_current_committed_sources(
+                            document_id,
+                            active.changeset.source_ids,
+                        )
+                    except (
+                        UnknownEvidenceSource,
+                        PendingSourceRequiresReconciliation,
+                        SourceConflict,
+                    ) as error:
+                        raise CandidateEditRejected(
+                            baseline_revision=expected_baseline,
+                            candidate_revision=current_candidate_revision,
+                            issues=(str(error),),
+                        ) from error
+                    return candidate_edit_receipt_for_tool_call(
+                        active,
+                        request.tool_call_id,
                     )
-                    return CandidateEditReceipt(
-                        candidate_revision=replay.candidate_revision,
-                        revision_digest=replay.revision_digest,
-                        changeset_id=replay.changeset_id,
-                        action_ids=replay.action_ids,
-                        external_dependency_action_ids=(
-                            replay.external_dependency_action_ids
-                        ),
-                    )
-            current_candidate_revision = active.candidate_revision if active else 0
             if request.batch.base_candidate_revision != current_candidate_revision:
-                raise CandidateRevisionConflict(
-                    "expected candidate revision "
-                    f"{current_candidate_revision}, found "
-                    f"{request.batch.base_candidate_revision}"
+                raise CandidateEditRejected(
+                    baseline_revision=expected_baseline,
+                    candidate_revision=current_candidate_revision,
+                    issues=(
+                        "expected candidate revision "
+                        f"{current_candidate_revision}, found "
+                        f"{request.batch.base_candidate_revision}",
+                    ),
                 )
-            next_candidate_revision = current_candidate_revision + 1
-            dependency_action_ids = tuple(
-                action_id
-                for change in request.batch.replacement_changes
-                for action_id in change.depends_on_action_ids
-            )
-            superseded_action_ids = tuple(
-                action_id
-                for change in request.batch.replacement_changes
-                for action_id in change.supersedes_action_ids
-            )
-            allowed_entity_ids, allowed_action_ids = candidate_mapping_authority(
-                raw_state,
-                depends_on_action_ids=dependency_action_ids,
-                supersedes_action_ids=superseded_action_ids,
-            )
-            materialization_run_id = uuid5(
-                request.run_id,
-                f"candidate-revision:{next_candidate_revision}",
-            )
-            changes = map_candidate_edit_batch(
-                request.batch,
-                document_id=document_id,
-                materialization_run_id=materialization_run_id,
-                allowed_entity_ids=allowed_entity_ids,
-                allowed_action_ids=allowed_action_ids,
-            )
-            source_ids = tuple(
-                sorted(
-                    {
-                        source_id
-                        for change in changes
-                        for source_id in change.basis.source_ids
-                    },
-                    key=str,
+            try:
+                next_candidate_revision = current_candidate_revision + 1
+                dependency_action_ids = tuple(
+                    action_id
+                    for change in request.batch.replacement_changes
+                    for action_id in change.depends_on_action_ids
                 )
-            )
-            sources = await self._require_current_committed_sources(
-                document_id,
-                source_ids,
-            )
-            used_skill_ids = verify_candidate_document_changes(
-                changes,
-                document_id=document_id,
-                selected_skill_ids=request.selected_skill_ids,
-                loaded_skill_ids=request.loaded_skill_ids,
-                employee_sources=sources,
-            )
-            stage = VerifiedCandidateStage(
-                run_id=request.run_id,
-                baseline_revision=request.baseline_revision,
-                base_candidate_revision=request.batch.base_candidate_revision,
-                tool_call_id=request.tool_call_id,
-                request_sha256=request_sha256,
-                summary=request.batch.summary,
-                changes=changes,
-                used_skill_ids=used_skill_ids,
-            )
-            _, receipt = materialize_candidate_workspace(raw_state, stage)
+                superseded_action_ids = tuple(
+                    action_id
+                    for change in request.batch.replacement_changes
+                    for action_id in change.supersedes_action_ids
+                )
+                allowed_entity_ids, allowed_action_ids = candidate_mapping_authority(
+                    raw_state,
+                    depends_on_action_ids=dependency_action_ids,
+                    supersedes_action_ids=superseded_action_ids,
+                )
+                materialization_run_id = uuid5(
+                    request.run_id,
+                    f"candidate-revision:{next_candidate_revision}",
+                )
+                changes = map_candidate_edit_batch(
+                    request.batch,
+                    document_id=document_id,
+                    materialization_run_id=materialization_run_id,
+                    allowed_entity_ids=allowed_entity_ids,
+                    allowed_action_ids=allowed_action_ids,
+                )
+                source_ids = tuple(
+                    sorted(
+                        {
+                            source_id
+                            for change in changes
+                            for source_id in change.basis.source_ids
+                        },
+                        key=str,
+                    )
+                )
+                sources = await self._require_current_committed_sources(
+                    document_id,
+                    source_ids,
+                )
+                used_skill_ids = verify_candidate_document_changes(
+                    changes,
+                    document_id=document_id,
+                    selected_skill_ids=request.selected_skill_ids,
+                    loaded_skill_ids=request.loaded_skill_ids,
+                    employee_sources=sources,
+                )
+                stage = VerifiedCandidateStage(
+                    run_id=request.run_id,
+                    baseline_revision=request.baseline_revision,
+                    base_candidate_revision=request.batch.base_candidate_revision,
+                    tool_call_id=request.tool_call_id,
+                    request_sha256=request_sha256,
+                    summary=request.batch.summary,
+                    changes=changes,
+                    used_skill_ids=used_skill_ids,
+                )
+                materialize_candidate_workspace(raw_state, stage)
+            except (
+                CandidateDependencyError,
+                CandidateRevisionConflict,
+                CandidateToolCallConflict,
+                CandidateWireMappingError,
+                ConsultantVerificationError,
+                DocumentAuthorityError,
+                DocumentReviewError,
+                RejectedChangeRequiresNewEvidence,
+                UnknownEvidenceSource,
+                PendingSourceRequiresReconciliation,
+                SourceConflict,
+            ) as error:
+                raise CandidateEditRejected(
+                    baseline_revision=expected_baseline,
+                    candidate_revision=current_candidate_revision,
+                    issues=(str(error),),
+                ) from error
             await self.graph.ainvoke(
                 {},
                 self.graph_config(document_id),
@@ -886,7 +936,13 @@ class PostgresConsultantRuntime:
                     "candidate_stage": stage.model_dump(mode="json"),
                 },
             )
-            return receipt
+            persisted = CandidateWorkspace.model_validate(
+                (await self.raw_state(document_id))["active_candidate"]
+            )
+            return candidate_edit_receipt_for_tool_call(
+                persisted,
+                request.tool_call_id,
+            )
 
     @staticmethod
     def _changed_employee_text(

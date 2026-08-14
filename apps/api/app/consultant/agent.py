@@ -20,6 +20,10 @@ from typing_extensions import NotRequired, override
 
 from app.consultant.model_runtime import ResolvedExecution, build_consultant_agent
 from app.consultant.model_output import ConsultantModelOutput
+from app.consultant.candidate_tool import (
+    CandidateEditToolBinding,
+    build_job_document_candidate_edit_tool,
+)
 from app.consultant.skill_backend import PackageSkillBackend
 
 
@@ -182,6 +186,7 @@ def build_professional_consultant_agent(
     execution: ResolvedExecution,
     selected_skill_ids: tuple[str, ...],
     source_tools: Sequence[BaseTool] = (),
+    candidate_edit_binding: CandidateEditToolBinding | None = None,
     context_middleware: AgentMiddleware | None = None,
     context_schema: type[Any] | None = None,
 ) -> ProfessionalConsultantAgent:
@@ -194,12 +199,26 @@ def build_professional_consultant_agent(
         raise ValueError(f"agent requested ineligible Skills: {sorted(ineligible)}")
     if "read_file" not in execution.allowed_tool_ids:
         raise ValueError("resolved run policy must allow the read_file Skill tool")
-    if execution.max_model_calls > 3:
-        raise ValueError("interactive consultant runs allow at most three model calls")
+    if execution.max_model_calls > 5:
+        raise ValueError("interactive consultant runs allow at most five model calls")
     if execution.max_lookup_waves > 2:
         raise ValueError("interactive consultant runs allow at most two lookup waves")
 
     backend = PackageSkillBackend(selected_skill_ids)
+    candidate_tools: tuple[BaseTool, ...] = ()
+    if candidate_edit_binding is not None:
+        if "job_document_candidate_edit" not in execution.allowed_tool_ids:
+            raise ValueError(
+                "resolved run policy must allow the candidate document edit Tool"
+            )
+        if candidate_edit_binding.selected_skill_ids != selected_skill_ids:
+            raise ValueError("candidate Tool binding must match selected Skills")
+        candidate_tools = (
+            build_job_document_candidate_edit_tool(
+                binding=candidate_edit_binding,
+                loaded_skill_ids=lambda: backend.loaded_skill_ids,
+            ),
+        )
     skills = RunScopedSkillsMiddleware(backend=backend)
     files = FilesystemMiddleware(
         backend=backend,
@@ -227,7 +246,7 @@ def build_professional_consultant_agent(
         model=model,
         execution=execution,
         response_schema=ConsultantModelOutput,
-        tools=source_tools,
+        tools=(*source_tools, *candidate_tools),
         additional_middleware=(skills, files, lookup_cap),
         context_middleware=context_middleware,
         context_schema=context_schema,

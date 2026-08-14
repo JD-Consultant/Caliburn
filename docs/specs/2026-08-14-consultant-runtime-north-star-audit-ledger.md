@@ -1,7 +1,7 @@
 # AI 職務顧問 runtime：北極星審核與逐 Task 防偏帳本
 
 - 日期：2026-08-14
-- 狀態：Pre-implementation audit **Passed**；Tasks 1–9 **Passed**；Task 10 schema-only 修正與 Task 11 Tool surface 已通過 focused gates，live canary／完整 gates／最終交付仍待後續
+- 狀態：Pre-implementation audit **Passed**；Tasks 1–9 **Passed**；Task 10 schema-only 修正與 Task 11 Tool surface 已通過完整 deterministic gates，paid live canary／最終產品交付仍待另行授權與後續
 - 決策：ADR 0060 **Accepted**；ADR 0061 **Accepted（schema-only）**；ADR 0062 **Accepted（四個受限唯讀 Tool）**
 - 施工計畫：[`2026-08-13-langgraph-consultant-runtime-big-bang-plan.md`](../plans/2026-08-13-langgraph-consultant-runtime-big-bang-plan.md)
 - 產品 SSOT：[`2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md`](2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md) §1–§8、§9.12–§9.16
@@ -265,14 +265,16 @@ Big-bang 只描述最終切換，不表示做到最後才審核。之後每完�
 
 ### Task 11：Tool surface 正式裁決、實作與北極星回歸
 
-- 狀態：**Focused implementation gates passed；full gates pending**。owner 在 schema-only ADR 0061 完成後，另行核准依最新主流 Tool Calling 做法直接施工；決策記於 ADR 0062，沒有事後改寫 ADR 0060／0061。
+- 狀態：**Pass（完整 deterministic gates）**。owner 在 schema-only ADR 0061 完成後，另行核准依最新主流 Tool Calling 做法直接施工；決策記於 ADR 0062，沒有事後改寫 ADR 0060／0061。
 - 官方共識：OpenAI、Anthropic、Google 都把 Tool Calling 用於外部資料、系統或動作，把 typed final response 留給 Structured Output；LangChain 對應為 Tool／middleware 與 provider-native response format。Anthropic 強調少量高價值、目的清楚、回傳高訊號且受限的 Tool，Google 建議清楚名稱與強型別，OpenAI 建議不要讓模型填 application 已知參數。
 - Tool Search 更正：先前「約 10 個 Tool 就建議」不是官方通用門檻。Anthropic 目前以數百至數千 Tool catalog 為主要情境，並指出選擇品質常在約 30–50 個才開始下降；OpenAI Tool Search 亦有大型 namespace 與 model/provider 前提。現行四個 Tool 不啟用 Tool Search、MCP catalog、dynamic LLM selector 或 provider beta。
 - 正式 surface：`read_file`、`employee_source_get`、`employee_source_lineage`、`employee_source_search`。全部唯讀且 document-scoped；application 注入 document ID、權限與搜尋上限。source payload 保留 stable ID、exact text、speaker、validity、timestamp 與 correction lineage。
 - primitive 分工：ADD／REVISE／WITHDRAW／MERGE／SPLIT 等是 Structured Output 的 typed review draft，不是模型 write Tool；accept／edit-accept／reject／defer 是 employee authority command；必要澄清是 typed result＋LangGraph interrupt；Focus／Gap／Progress 是 durable graph state／projection。
 - lookup 政策：context 足夠時零呼叫；獨立 Skill／source 可同波平行；只有前一結果產生新依賴才用第二波。保留三次 model call／兩波 lookup 的硬上限，不保留固定「先 Skill、後 Source」順序。
 - 實作證據：source builder 的 TDD 紅燈先由缺少 `build_employee_source_tools` 呈現；加入新名稱、server-bound `limit=5`、speaker 與 correction metadata 後，真 PostgreSQL targeted `2 passed`，`context`＋`run_service` 回歸 `10 passed`。`read_file` description 的紅燈實際捕捉到 framework 通用 PDF／image／edit／pagination 文案；改用 `FilesystemMiddleware.custom_tool_descriptions` 後，agent＋model runtime 回歸 `56 passed`。沒有重寫 Tool loop 或 Skill loader。
-- 北極星回歸：這次只替換／收斂通用讀取機制，沒有把產品變成 Tool 操作台或多 Agent，也沒有改動動態 Task／Duty／OPKS、員工原話記憶、文件先審後入、澄清／Gap／審核分流、自然離開／續談與單一強制匯出。沒有接 RAG、能力級別／A 或正式 eval。施工前判定 **Pass**。
+- 完整 gates：Tool／Context／Agent／Model runtime targeted `66 passed`；真 PostgreSQL API `198 passed`；Web `5 files／27 passed`、TypeScript、ESLint；contract codegen clean；sandbox 外 Turbo `5 successful／0 cached`；`git diff --check` clean。首次 codegen／Turbo 分別因使用者全域 uv cache ACL 與 Vite child-process `spawn EPERM` 在進入 assertion 前中止，改綁 workspace cache並依規則在 sandbox 外重跑取得上述綠燈，沒有把環境中止假稱為通過。
+- 差異稽核：production 只有三個 `@tool` source definitions 加 framework `read_file`；沒有舊 Tool ID、business write Tool、Tool Search、RAG 或模型可呼叫的 review command。Accepted ADR 0060 工作檔雖因 Windows line-ending stat 顯示 modified，但 working blob 與 `HEAD` SHA-1 同為 `2c065952649784218509dbac243a872f24399eec`，內容零差異且未 stage。
+- 北極星回歸：這次只替換／收斂通用讀取機制，沒有把產品變成 Tool 操作台或多 Agent，也沒有改動動態 Task／Duty／OPKS、員工原話記憶、文件先審後入、澄清／Gap／審核分流、自然離開／續談與單一強制匯出。沒有接 RAG、能力級別／A 或正式 eval。最終判定 **Pass**。
 
 ## 8. 本次直接使用的一手來源
 

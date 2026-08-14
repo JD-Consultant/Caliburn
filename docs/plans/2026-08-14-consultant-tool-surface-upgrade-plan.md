@@ -215,19 +215,19 @@
 - Consumes: 四個唯讀 Tool、compact structured output、LangGraph authority flow。
 - Produces: 可重跑的 API/Web/monorepo 驗證證據。
 
-- [ ] **Step 1: 執行 Tool/context/agent targeted suite**
+- [x] **Step 1: 執行 Tool/context/agent targeted suite**
 
   Run: `cd apps/api; uv run pytest -p no:cacheprovider tests/test_consultant_context.py tests/test_consultant_agent_and_skills.py tests/test_consultant_model_runtime.py tests/test_consultant_run_service.py -q`
 
   Expected: PASS, 0 unexpected failures。
 
-- [ ] **Step 2: 執行 API 無 DB suite**
+- [x] **Step 2: 執行 API 完整 suite**
 
-  Run: `cd apps/api; uv run pytest -p no:cacheprovider -q`
+  Run: 設定本機 `TEST_DATABASE_URL` 後執行 `cd apps/api; uv run pytest -p no:cacheprovider -q`
 
-  Expected: PASS or only repository ledger 已記錄、與本輪無關的既存外部環境失敗；任何新失敗都必須先診斷。
+  Expected: PASS；任何新失敗都必須先診斷。
 
-- [ ] **Step 3: 執行 Web/contract/monorepo gates**
+- [x] **Step 3: 執行 Web/contract/monorepo gates**
 
   Run: `npm run test -w apps/web`
 
@@ -239,7 +239,7 @@
 
   Run: `npx turbo test`
 
-- [ ] **Step 4: 執行差異與決策審核**
+- [x] **Step 4: 執行差異與決策審核**
 
   Run: `git diff --check`
 
@@ -247,7 +247,7 @@
 
   重讀 ADR 0062 與本計畫，逐項確認沒有 business write Tool、固定 lookup 順序、Tool Search/RAG 或員工審核繞過。
 
-- [ ] **Step 5: 建立最後本地 commit**
+- [x] **Step 5: 建立最後本地 commit**
 
   若本 Task 因 gate 診斷產生修正，只 stage 該修正與對應 regression test：
 

@@ -49,6 +49,7 @@ def _profile(
     revision: int = 1,
     model: str = "anthropic/claude-opus-5",
     provider: str = "Anthropic",
+    reasoning_effort: str = "high",
 ):
     return ConsultantModelProfile(
         profile_id="primary-consultant",
@@ -59,7 +60,7 @@ def _profile(
         top_p=0.9,
         max_output_tokens=4096,
         output_token_parameter=OutputTokenParameter.MAX_TOKENS,
-        reasoning_effort="high",
+        reasoning_effort=reasoning_effort,
         timeout_seconds=90,
     )
 
@@ -109,6 +110,26 @@ def test_profile_resolves_to_one_immutable_route_and_effective_parameters() -> N
     assert replacement.provider_allowlist == ("OpenAI",)
     assert replacement.profile_revision == 2
     assert execution.requested_model == "anthropic/claude-opus-5"
+
+
+def test_gpt_5_6_luna_max_reasoning_is_forwarded_to_openrouter() -> None:
+    execution = resolve_execution(
+        _profile(
+            model="openai/gpt-5.6-luna",
+            provider="OpenAI",
+            reasoning_effort="max",
+        ),
+        _policy(),
+    )
+    model = build_openrouter_chat_model(
+        execution,
+        api_key="test-secret",
+        base_url="https://openrouter.ai/api/v1",
+    )
+
+    assert execution.effective_parameters.reasoning is not None
+    assert execution.effective_parameters.reasoning.effort == "max"
+    assert model.reasoning == {"effort": "max", "exclude": True}
 
 
 def test_skills_cannot_own_or_switch_the_consultant_model() -> None:

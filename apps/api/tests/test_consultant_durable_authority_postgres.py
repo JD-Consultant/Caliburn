@@ -1865,6 +1865,102 @@ async def test_candidate_exact_replay_revalidates_persisted_evidence_source(
 
 
 @pytest.mark.asyncio
+async def test_candidate_exact_replay_revalidates_its_own_receipt_evidence(
+    consultant_database_url: str,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    document_id = uuid4()
+    run_id = uuid4()
+    source_a_id = uuid4()
+    source_b_id = uuid4()
+    correction_source_id = uuid4()
+
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        await runtime.create_document(document_id, title="採購職務")
+        admitted, _ = await runtime.admit_employee_answer(
+            document_id=document_id,
+            run_id=run_id,
+            source_id=source_a_id,
+            text="我負責管理採購作業。",
+        )
+        source_b_snapshot = await runtime.record_employee_source(
+            document_id=document_id,
+            source_id=source_b_id,
+            kind=EmployeeSourceKind.EMPLOYEE_TURN,
+            text="我每週檢視採購需求。",
+        )
+        first_request = _candidate_stage_request(
+            run_id=run_id,
+            source_id=source_a_id,
+            baseline_revision=source_b_snapshot.revision,
+            tool_call_id="candidate-tool-a",
+        )
+        first = await runtime.stage_candidate_revision(
+            document_id=document_id,
+            request=first_request,
+        )
+        second_request = _candidate_stage_request(
+            run_id=run_id,
+            source_id=source_b_id,
+            baseline_revision=source_b_snapshot.revision,
+            base_candidate_revision=1,
+            tool_call_id="candidate-tool-b",
+            summary="以第二則來源更新候選文件。",
+        )
+        second = await runtime.stage_candidate_revision(
+            document_id=document_id,
+            request=second_request,
+        )
+
+        async def fail_after_store(_source: EmployeeSource) -> None:
+            raise RuntimeError("correction-after-store")
+
+        monkeypatch.setattr(runtime, "_after_source_store", fail_after_store)
+        with pytest.raises(RuntimeError, match="correction-after-store"):
+            await runtime.record_employee_source(
+                document_id=document_id,
+                source_id=correction_source_id,
+                kind=EmployeeSourceKind.EMPLOYEE_TURN,
+                text="更正：我改為每日管理採購作業。",
+                supersedes_source_id=source_a_id,
+            )
+
+        raw_before_replay = await runtime.raw_state(document_id)
+        snapshot_before_replay = await runtime.reopen_document(document_id)
+        active_before_replay = CandidateWorkspace.model_validate(
+            raw_before_replay["active_candidate"]
+        )
+        assert active_before_replay.candidate_revision == second.candidate_revision == 2
+        assert active_before_replay.changeset.source_ids == (source_b_id,)
+
+        with pytest.raises(CandidateEditRejected) as rejected:
+            await runtime.stage_candidate_revision(
+                document_id=document_id,
+                request=first_request,
+            )
+        assert rejected.value.baseline_revision == source_b_snapshot.revision
+        assert rejected.value.candidate_revision == second.candidate_revision
+        assert rejected.value.issues == (
+            f"source {source_a_id} was superseded before candidate staging",
+        )
+        assert isinstance(rejected.value.__cause__, SourceConflict)
+        assert str(rejected.value.__cause__) == (
+            f"source {source_a_id} was superseded before candidate staging"
+        )
+
+        latest_replay = await runtime.stage_candidate_revision(
+            document_id=document_id,
+            request=second_request,
+        )
+        snapshot_after_replay = await runtime.reopen_document(document_id)
+        assert first.candidate_revision == 1
+        assert latest_replay == second
+        assert (await runtime.raw_state(document_id)) == raw_before_replay
+        assert snapshot_after_replay.approved_document == snapshot_before_replay.approved_document
+        assert snapshot_after_replay.review_queue == snapshot_before_replay.review_queue
+
+
+@pytest.mark.asyncio
 async def test_direct_edit_clears_candidate_workspace(
     consultant_database_url: str,
 ) -> None:

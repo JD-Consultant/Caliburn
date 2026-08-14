@@ -311,6 +311,12 @@ Big-bang 只描述最終切換，不表示做到最後才審核。之後每完�
 - concurrency 診斷與清理：先前 07:25–07:28 重疊 pytest 導致 local disposable DB 留下 8 個已列舉的孤立 checkpoint thread及 1 個已列舉 source prefix/key；`consultant_documents=0` 且 metadata 集合沒有額外目標。owner 明確授權後，以 parameterized SQL 只刪除這些目標，FK-safe 順序為 writes（77）→ blobs（29）→ checkpoints（22）→ 單一 Store row（1）；沒有 truncate、drop、catalog或其他 namespace刪除。
 - 順序驗證：Task 3 non-DB focused gate `70 passed in 1.48s`；其後唯一的 real PostgreSQL gate `48 passed in 86.45s`、零 skip。post-gate 查詢 `consultant_documents`、`checkpoints`、`checkpoint_blobs`、`checkpoint_writes`、`store` 全為 0，因此沒有把 concurrency residue 誤判成產品 cleanup defect。
 
+### ADR 0063 Task 3：review receipt-evidence fix
+
+- finding A 處置：pre-Task-3 Task 2 checkpoint 的 receipt shape 不含新 private projection，技術上確有 backward-compatibility 問題；但 Task 2／3 均是同一未 push、未 merge 的 big-bang feature branch 內中間 commit，從未部署／發布，disposable local DB 亦為 0。依 current-only direction，這不是 release blocker；沒有為未發布的中間開發狀態加入 speculative migration、versioning 或 compatibility code。
+- finding B 修正：exact replay 原本錯誤重驗 active latest changeset 的 source IDs。每個 durable internal `CandidateToolReceipt` 現保存其自身 materialized `DocumentChangeSet.source_ids`；latest receipt 必須與 workspace changeset 的 source IDs 完全相同；replay 改讀 `replay.source_ids`。公開 `CandidateEditReceipt`／model success JSON 未增加 source IDs，未知 infrastructure error 仍向外傳播。
+- TDD／驗證：以 A 建 revision 1、B 建 revision 2，僅讓 A superseded 並保留 checkpoint。corrected RED 得到 `DID NOT RAISE CandidateEditRejected`，證明舊 code 會誤用 latest B；最小修正後 PostgreSQL regression `1 passed, 32 deselected in 3.35s`，同時證明 rev-1 拒絕且 cause 為 `SourceConflict`、state 不變、latest rev-2 replay 成功。workspace invariant suite `17 passed in 0.25s`；順序 Task 3 non-DB gate `70 passed in 1.51s`；順序 real PostgreSQL gate `50 passed in 89.43s`、零 skip；五張 persistence table 全為 0。
+
 ## 8. 本次直接使用的一手來源
 
 - [Anthropic — Prompting Claude Opus 5](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5)

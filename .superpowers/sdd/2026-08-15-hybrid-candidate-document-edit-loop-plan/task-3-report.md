@@ -106,3 +106,17 @@ Result: `48 passed in 86.45s (0:01:26)`, zero skips. A post-gate read-only query
 ## Concern
 
 No remaining Task 3 pre-review concern. The regression update changes test expectations only; sequential real-PostgreSQL verification did not reveal a product cleanup defect.
+
+## Review round: replayed receipt evidence
+
+Review finding A (Task 2 checkpoint backward compatibility) is technically true only for a deployed checkpoint written before the private receipt projection existed. It is not a release blocker here: Task 2 and Task 3 are unpushed, unmerged commits on the same big-bang feature branch; no product deployment or release occurred at the intermediate Task 2 SHA; and the disposable local database was verified empty. Under the current-only direction, no speculative migration, versioning, or compatibility path was added for that unreleased intermediate state.
+
+Review finding B was confirmed. Exact replay previously called `_require_current_committed_sources` with `active.changeset.source_ids`, which belongs to the newest candidate revision, rather than the replayed Tool receipt. `CandidateToolReceipt` now persists its own private `source_ids` projection from that revision's materialized `DocumentChangeSet`; the latest receipt validator requires it to equal `workspace.changeset.source_ids`; and replay validates `replay.source_ids`. `CandidateEditReceipt` and model-facing applied JSON remain unchanged and do not expose source IDs. Infrastructure errors are still not caught by this replay translation path.
+
+TDD evidence for the confirmed bug:
+
+- Initial fixture attempt failed before the target branch with `CandidateEditRejected: expected baseline revision 2, found 1`; adding source B after candidate revision 1 correctly clears the active candidate under existing authority rules. The fixture was corrected by storing B before both candidate revisions.
+- RED: the corrected real-PostgreSQL test built revision 1 from source A and revision 2 from source B, then made only A superseded while preserving the checkpoint. It asserted latest `changeset.source_ids == (B,)` and failed as required with `Failed: DID NOT RAISE CandidateEditRejected`, proving replay incorrectly used latest evidence.
+- GREEN: the same regression passed (`1 passed, 32 deselected in 3.35s`). It proves revision-1 replay rejects with `CandidateEditRejected` caused by `SourceConflict` for A, leaves candidate/document/review state unchanged, and revision-2 exact replay still succeeds.
+- Additional workspace invariant coverage: `17 passed in 0.25s`, including private receipt/source projection matching and confirmation that public `CandidateEditReceipt` JSON omits `source_ids`.
+- Sequential final gates: Task 3 non-DB focused `70 passed in 1.51s`; real PostgreSQL candidate workspace/durable authority `50 passed in 89.43s (0:01:29)`, zero skips. Post-gate query confirmed `consultant_documents`, `checkpoints`, `checkpoint_blobs`, `checkpoint_writes`, and `store` are all zero.

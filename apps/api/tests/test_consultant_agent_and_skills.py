@@ -17,6 +17,18 @@ from app.consultant.agent import (
     LookupWaveLimitMiddleware,
     RunScopedSkillsMiddleware,
 )
+from app.consultant.model_output import (
+    ConsultantModelOutput,
+    OutputAnalysisBasis,
+    OutputDocumentChange,
+    OutputDocumentField,
+    OutputDocumentTarget,
+    OutputOpksItem,
+    OutputOpksKind,
+    OutputQuestion,
+    OutputQuestionKind,
+    OutputSufficiency,
+)
 from app.consultant.model_runtime import (
     ConsultantModelProfile,
     RunPolicy,
@@ -184,6 +196,98 @@ def _minimal_result(
     )
 
 
+def _output_basis(source_id: UUID, *skills: str) -> OutputAnalysisBasis:
+    return OutputAnalysisBasis(
+        source_ids=(source_id,),
+        quote_anchors=(),
+        skill_ids=skills,
+    )
+
+
+def _no_output_question() -> OutputQuestion:
+    return OutputQuestion(
+        kind=OutputQuestionKind.NONE,
+        text="",
+        answer_target="",
+        reason="",
+        current_understanding="",
+        choices=(),
+        affected_work_ids=(),
+        affected_branch="",
+        basis_ordinal=0,
+    )
+
+
+def _minimal_model_output(
+    source: EmployeeSource,
+    *,
+    skills: tuple[str, ...] = ("task-boundary",),
+) -> ConsultantModelOutput:
+    basis = _output_basis(source.source_id, *skills)
+    return ConsultantModelOutput(
+        visible_reply="我已整理目前線索，接下來只釐清一個關鍵邊界。",
+        analysis_bases=(basis,),
+        reply_basis_ordinal=1,
+        used_skill_ids=skills,
+        understanding_changes=(),
+        attention_changes=(),
+        gaps=(),
+        reviewable_document_changes=(),
+        question=OutputQuestion(
+            kind=OutputQuestionKind.NEXT,
+            text="這件工作完成後，會留下什麼結果或讓什麼狀態改變？",
+            answer_target="task_boundary",
+            reason="目前只有行動，尚無足以界定 Task 的結果。",
+            current_understanding="",
+            choices=(),
+            affected_work_ids=(),
+            affected_branch="",
+            basis_ordinal=1,
+        ),
+        sufficiency=OutputSufficiency(
+            currently_enough=False,
+            reason="Task 邊界仍缺少有意義結果。",
+            remaining_gap_reasons=(GapReason.TASK_BOUNDARY_UNCLEAR,),
+            continuing_benefit="繼續訪談可釐清 Task 的實際結果。",
+            basis_ordinal=1,
+        ),
+    )
+
+
+def _output_document_change(
+    source_id: UUID,
+    *,
+    operation: DocumentChangeOperation,
+    target: OutputDocumentTarget,
+    target_id: str,
+    field: OutputDocumentField,
+    basis_ordinal: int,
+    text_value: str = "",
+    opks_items: tuple[OutputOpksItem, ...] = (),
+    opks_kind: OutputOpksKind = OutputOpksKind.NONE,
+    task_ids: tuple[UUID, ...] = (),
+) -> OutputDocumentChange:
+    return OutputDocumentChange(
+        operation=operation,
+        target=target,
+        target_id=target_id,
+        field=field,
+        text_value=text_value,
+        integer_value=-1,
+        uuid_value="",
+        uuid_values=(),
+        enablers=(),
+        duties=(),
+        tasks=(),
+        opks_items=opks_items,
+        target_ids=(),
+        opks_kind=opks_kind,
+        task_ids=task_ids,
+        indicator_ids=(),
+        basis_ordinal=basis_ordinal,
+    )
+
+
 def _text_seen(messages: list[BaseMessage]) -> str:
     return "\n".join(
         str(message.content)
@@ -229,54 +333,56 @@ def test_package_skill_backend_is_selected_only_read_only_and_traversal_safe() -
 async def test_agent_composes_selected_skills_without_leaking_ineligible_content() -> None:
     task_id = uuid4()
     source_id = uuid4()
-    result_payload = {
-        "visible_reply": "我先把這項工作的邊界與產出一起整理。",
-        "reply_basis": {
-            "source_ids": [str(source_id)],
-            "quote_anchors": [],
-            "skill_ids": ["task-boundary", "output"],
-        },
-        "used_skill_ids": ["task-boundary", "output"],
-        "understanding_changes": [],
-        "attention_changes": [],
-        "gaps": [],
-        "reviewable_document_changes": [
-            {
-                "operation": "revise",
-                "path": f"/tasks/{task_id}/purpose_result",
-                "after": "形成可供主管審核的採購需求",
-                "basis": {
-                    "source_ids": [str(source_id)],
-                    "quote_anchors": [],
-                    "skill_ids": ["task-boundary"],
-                },
-            },
-            {
-                "operation": "add",
-                "path": "/opks",
-                "after": "採購需求文件",
-                "opks_kind": "output",
-                "task_ids": [str(task_id)],
-                "basis": {
-                    "source_ids": [str(source_id)],
-                    "quote_anchors": [],
-                    "skill_ids": ["output"],
-                },
-            },
-        ],
-        "next_question": None,
-        "sufficiency": {
-            "currently_enough": False,
-            "reason": "還需要確認完成標準。",
-            "remaining_gap_reasons": ["completion_standard_missing"],
-            "continuing_benefit": "繼續訪談可確認完成標準。",
-            "basis": {
-                "source_ids": [str(source_id)],
-                "quote_anchors": [],
-                "skill_ids": ["task-boundary", "output"],
-            },
-        },
-    }
+    basis = _output_basis(source_id, "task-boundary", "output")
+    task_basis = _output_basis(source_id, "task-boundary")
+    output_basis = _output_basis(source_id, "output")
+    result_payload = ConsultantModelOutput(
+        visible_reply="我先把這項工作的邊界與產出一起整理。",
+        analysis_bases=(basis, task_basis, output_basis),
+        reply_basis_ordinal=1,
+        used_skill_ids=("task-boundary", "output"),
+        understanding_changes=(),
+        attention_changes=(),
+        gaps=(),
+        reviewable_document_changes=(
+            _output_document_change(
+                source_id,
+                operation=DocumentChangeOperation.REVISE,
+                target=OutputDocumentTarget.TASK,
+                target_id=str(task_id),
+                field=OutputDocumentField.PURPOSE_RESULT,
+                text_value="形成可供主管審核的採購需求",
+                basis_ordinal=2,
+            ),
+            _output_document_change(
+                source_id,
+                operation=DocumentChangeOperation.ADD,
+                target=OutputDocumentTarget.OPKS,
+                target_id="",
+                field=OutputDocumentField.ENTITY,
+                opks_items=(
+                    OutputOpksItem(
+                        item_id="",
+                        text="採購需求文件",
+                        display_order=-1,
+                        task_ids=(),
+                        indicator_ids=(),
+                    ),
+                ),
+                opks_kind=OutputOpksKind.OUTPUT,
+                task_ids=(task_id,),
+                basis_ordinal=3,
+            ),
+        ),
+        question=_no_output_question(),
+        sufficiency=OutputSufficiency(
+            currently_enough=False,
+            reason="還需要確認完成標準。",
+            remaining_gap_reasons=(GapReason.COMPLETION_STANDARD_MISSING,),
+            continuing_benefit="繼續訪談可確認完成標準。",
+            basis_ordinal=1,
+        ),
+    ).model_dump(mode="json")
     model = RecordingToolModel(
         responses=[
             AIMessage(
@@ -306,7 +412,7 @@ async def test_agent_composes_selected_skills_without_leaking_ineligible_content
                 content="",
                 tool_calls=[
                     {
-                        "name": "ConsultantResult",
+                        "name": "ConsultantModelOutput",
                         "args": result_payload,
                         "id": "structured-result",
                         "type": "tool_call",
@@ -335,7 +441,7 @@ async def test_agent_composes_selected_skills_without_leaking_ineligible_content
     )
     assert set(model.bound_tool_names) == {
         "read_file",
-        "ConsultantResult",
+        "ConsultantModelOutput",
     }
     first_call = _text_seen(model.seen_messages[0])
     assert "task-boundary" in first_call
@@ -399,8 +505,8 @@ async def test_agent_receives_document_scoped_source_tools_from_the_runtime() ->
                 content="",
                 tool_calls=[
                     {
-                        "name": "ConsultantResult",
-                        "args": _minimal_result(source).model_dump(mode="json"),
+                        "name": "ConsultantModelOutput",
+                        "args": _minimal_model_output(source).model_dump(mode="json"),
                         "id": "structured-result",
                         "type": "tool_call",
                     }
@@ -421,7 +527,7 @@ async def test_agent_receives_document_scoped_source_tools_from_the_runtime() ->
     assert set(model.bound_tool_names) == {
         "read_file",
         "source_by_id",
-        "ConsultantResult",
+        "ConsultantModelOutput",
     }
 
 
@@ -575,6 +681,24 @@ def test_result_schema_cannot_directly_replace_the_approved_document() -> None:
 
     with pytest.raises(ValidationError, match="approved_document"):
         ConsultantResult.model_validate(payload)
+
+
+def test_result_schema_has_no_provider_native_unconstrained_json_node() -> None:
+    empty_paths: list[str] = []
+
+    def visit(value: object, path: str = "$") -> None:
+        if value == {}:
+            empty_paths.append(path)
+        elif isinstance(value, dict):
+            for key, child in value.items():
+                visit(child, f"{path}.{key}")
+        elif isinstance(value, list):
+            for index, child in enumerate(value):
+                visit(child, f"{path}[{index}]")
+
+    visit(ConsultantResult.model_json_schema())
+
+    assert empty_paths == []
 
 
 def test_verifier_accepts_anchored_source_and_selected_skill_dependencies() -> None:

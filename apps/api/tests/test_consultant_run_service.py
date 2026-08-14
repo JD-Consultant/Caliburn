@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 from datetime import UTC, datetime
 from decimal import Decimal
 from types import SimpleNamespace
@@ -9,6 +10,13 @@ import pytest
 
 from app.config import Settings
 from app.consultant.context import ContextSelectionReceipt
+from app.consultant.model_output import (
+    ConsultantModelOutput,
+    OutputAnalysisBasis,
+    OutputQuestion,
+    OutputQuestionKind,
+    OutputSufficiency,
+)
 from app.consultant.model_runtime import (
     AttemptKind,
     AttemptReceipt,
@@ -81,6 +89,42 @@ def _result(source_id: UUID) -> ConsultantResult:
     )
 
 
+def _model_output(source_id: UUID) -> ConsultantModelOutput:
+    basis = OutputAnalysisBasis(
+        source_ids=(source_id,),
+        quote_anchors=(),
+        skill_ids=("task-boundary",),
+    )
+    return ConsultantModelOutput(
+        visible_reply="我已記錄這項工作，接下來可以再釐清它的完成結果。",
+        analysis_bases=(basis,),
+        reply_basis_ordinal=1,
+        used_skill_ids=("task-boundary",),
+        understanding_changes=(),
+        attention_changes=(),
+        gaps=(),
+        reviewable_document_changes=(),
+        question=OutputQuestion(
+            kind=OutputQuestionKind.NONE,
+            text="",
+            answer_target="",
+            reason="",
+            current_understanding="",
+            choices=(),
+            affected_work_ids=(),
+            affected_branch="",
+            basis_ordinal=0,
+        ),
+        sufficiency=OutputSufficiency(
+            currently_enough=True,
+            reason="目前資訊足以保留這項工作。",
+            remaining_gap_reasons=(),
+            continuing_benefit="繼續訪談仍可補充細節。",
+            basis_ordinal=1,
+        ),
+    )
+
+
 class FakeRuntime:
     def __init__(
         self,
@@ -124,7 +168,9 @@ class FakeRuntime:
 
 
 class FakeAgent:
-    def __init__(self, *, result: ConsultantResult, execution, fail: bool = False):
+    def __init__(
+        self, *, result: ConsultantModelOutput, execution, fail: bool = False
+    ):
         self.result = result
         self.execution = execution
         self.fail = fail
@@ -222,7 +268,7 @@ async def test_admitted_turn_is_verified_then_committed_once() -> None:
         execution=execution,
         model=object(),
         agent_factory=lambda **_: FakeAgent(
-            result=_result(source_id), execution=execution
+            result=_model_output(source_id), execution=execution
         ),
     )
 
@@ -260,7 +306,7 @@ async def test_failed_model_run_is_durably_classified_without_payload() -> None:
             execution=execution,
             model=object(),
             agent_factory=lambda **_: FakeAgent(
-                result=_result(source_id),
+                result=_model_output(source_id),
                 execution=execution,
                 fail=True,
             ),
@@ -274,3 +320,57 @@ async def test_failed_model_run_is_durably_classified_without_payload() -> None:
     assert evidence.resolved_execution["profile_id"] == execution.profile_id
     assert evidence.context_selection_receipts == ()
     assert evidence.attempt_receipts == ()
+
+
+@pytest.mark.asyncio
+async def test_elapsed_run_budget_cancels_hung_agent_and_marks_run_failed() -> None:
+    document_id = uuid4()
+    run_id = uuid4()
+    source_id = uuid4()
+    execution = build_configured_execution(
+        Settings(
+            _env_file=None,
+            openrouter_api_key="test-key",
+            consultant_max_elapsed_seconds=0.02,
+        )
+    )
+    runtime = FakeRuntime(
+        _snapshot(document_id, run_id, source_id),
+        _source(document_id, source_id),
+    )
+
+    class HungAgent:
+        skill_backend = SimpleNamespace(loaded_skill_ids=())
+
+        async def ainvoke(self, payload, *, context, config):
+            del payload, context
+            await config["callbacks"][0].on_chat_model_start(
+                {},
+                [[]],
+                run_id=uuid4(),
+                metadata={},
+            )
+            await asyncio.Event().wait()
+
+    with pytest.raises(TimeoutError):
+        await asyncio.wait_for(
+            execute_admitted_consultant_turn(
+                runtime=runtime,
+                document_id=document_id,
+                run_id=run_id,
+                source_id=source_id,
+                execution=execution,
+                model=object(),
+                agent_factory=lambda **_: HungAgent(),
+            ),
+            timeout=0.25,
+        )
+
+    assert runtime.commits == []
+    assert len(runtime.failures) == 1
+    assert runtime.failures[0][0] == run_id
+    assert runtime.failures[0][1] == "timeout"
+    evidence = runtime.failures[0][2]
+    assert len(evidence.attempt_receipts) == 1
+    assert evidence.attempt_receipts[0]["status"] == "failed"
+    assert evidence.attempt_receipts[0]["error_code"] == "timeout"

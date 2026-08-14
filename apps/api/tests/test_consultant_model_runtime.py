@@ -22,6 +22,7 @@ from langchain_core.tools import tool
 from pydantic import BaseModel, ValidationError
 
 from app.adapters.openrouter.langchain import build_openrouter_chat_model
+import app.consultant.model_runtime as model_runtime
 from app.consultant.model_runtime import (
     AttemptReceiptCallback,
     AttemptReceipt,
@@ -155,6 +156,9 @@ def test_openrouter_adapter_round_trips_only_resolved_parameters() -> None:
         "allow_fallbacks": False,
         "require_parameters": True,
     }
+    assert model.request_timeout == 90_000
+    assert model.client.sdk_configuration.timeout_ms == 90_000
+    assert model.client.sdk_configuration.retry_config is None
     assert model.max_retries == 0
     assert "test-secret" not in repr(model.metadata)
 
@@ -327,6 +331,25 @@ def test_agent_rejects_tools_outside_the_resolved_run_policy() -> None:
             response_schema=ProbeResult,
             tools=(forbidden_shell,),
         )
+
+
+def test_agent_delegates_structured_output_strategy_to_langchain(monkeypatch) -> None:
+    captured: dict[str, Any] = {}
+
+    def capture_create_agent(**kwargs: Any) -> object:
+        captured.update(kwargs)
+        return object()
+
+    monkeypatch.setattr(model_runtime, "create_agent", capture_create_agent)
+    model = ToolCapableFakeModel(responses=[AIMessage(content="unused")])
+
+    build_consultant_agent(
+        model=model,
+        execution=resolve_execution(_profile(), _policy()),
+        response_schema=ProbeResult,
+    )
+
+    assert captured["response_format"] is ProbeResult
 
 
 @pytest.mark.asyncio

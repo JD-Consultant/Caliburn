@@ -517,6 +517,12 @@ class AttemptReceiptCallback(AsyncCallbackHandler):
         start.span.set_attribute("error.type", type(error).__name__)
         start.span.end()
 
+    async def close_open_attempts(self, error: BaseException) -> None:
+        """Finish callbacks cancelled by an outer run deadline."""
+
+        for run_id in tuple(self._starts):
+            await self.on_llm_error(error, run_id=run_id)
+
 
 class ConsultantRunBudgetExceeded(RuntimeError):
     def __init__(self, exceeded: Sequence[str]) -> None:

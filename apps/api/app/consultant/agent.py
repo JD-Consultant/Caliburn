@@ -19,7 +19,7 @@ from langgraph.runtime import Runtime
 from typing_extensions import NotRequired, override
 
 from app.consultant.model_runtime import ResolvedExecution, build_consultant_agent
-from app.consultant.results import ConsultantResult
+from app.consultant.model_output import ConsultantModelOutput
 from app.consultant.skill_backend import PackageSkillBackend
 
 
@@ -33,7 +33,7 @@ SKILLS_SYSTEM_PROMPT = """## Caliburn 專業分析方法
 **本輪可用 Skills：**
 {skills_list}
 
-完整閱讀後，把方法共同整合成一份 ConsultantResult。員工畫面只呈現一位顧問、必要的待審文件變更與至多一個主要問題；不得把 Skill 編排暴露成員工要操作的流程。
+讀完本輪實際選用的方法後，把它們共同整合成一份結構化顧問結果。員工畫面只呈現一位顧問、必要的待審文件變更與至多一個主要問題；不得把 Skill 編排暴露成員工要操作的流程。
 """
 
 
@@ -206,7 +206,7 @@ def build_professional_consultant_agent(
     graph = build_consultant_agent(
         model=model,
         execution=execution,
-        response_schema=ConsultantResult,
+        response_schema=ConsultantModelOutput,
         tools=source_tools,
         additional_middleware=(skills, files, lookup_cap),
         context_middleware=context_middleware,

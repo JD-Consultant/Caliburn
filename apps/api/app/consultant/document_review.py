@@ -419,8 +419,26 @@ def _link_required_groups(
             if entity.get(id_field) is not None:
                 creators[(collection, str(entity[id_field]))] = index
 
+    index_by_action_id = {
+        action.action_id: index for index, action in enumerate(actions)
+    }
     dependencies: dict[int, set[int]] = {index: set() for index in range(len(actions))}
     atomic_links: set[tuple[int, int]] = set()
+
+    for index, action in enumerate(actions):
+        for dependency_id in action.depends_on_action_ids:
+            dependency_index = index_by_action_id.get(dependency_id)
+            if dependency_index is not None and dependency_index != index:
+                dependencies[index].add(dependency_index)
+    grouped_by_explicit_id: dict[UUID, list[int]] = {}
+    for index, action in enumerate(actions):
+        if action.atomic_subgroup_id is not None:
+            grouped_by_explicit_id.setdefault(action.atomic_subgroup_id, []).append(
+                index
+            )
+    for members in grouped_by_explicit_id.values():
+        for member in members[1:]:
+            atomic_links.add((members[0], member))
 
     def depend(consumer: int, prerequisite: int) -> None:
         if consumer != prerequisite:
@@ -587,7 +605,8 @@ def _link_required_groups(
                     "atomic_subgroup_id": group_id,
                     "depends_on_action_ids": tuple(
                         sorted(
-                            {
+                            set(action.depends_on_action_ids)
+                            | {
                                 grouped[prerequisite].action_id
                                 for prerequisite in dependencies[index]
                             },
@@ -613,6 +632,7 @@ def create_document_changeset(
     changes: Sequence[ReviewableDocumentChange],
     existing_review_queue: Mapping[str, dict[str, Any]],
     interview_work: Mapping[str, dict[str, Any]],
+    external_dependency_action_ids: Sequence[UUID] = (),
 ) -> DocumentChangeSet:
     """Turn verified model semantics into replay-stable application patch actions."""
 
@@ -635,6 +655,14 @@ def create_document_changeset(
         next_display_orders[key] = max(
             next_display_orders.get(key, 0), item.display_order + 1
         )
+    action_ids_by_change_ref = {
+        change.change_ref: uuid5(
+            document_id,
+            f"consultant:{run_id}:patch-action:{index}",
+        )
+        for index, change in enumerate(changes)
+        if change.change_ref
+    }
     actions: list[DocumentPatchAction] = []
     for index, change in enumerate(changes):
         _ensure_opks_axis_matches_document(change, document)
@@ -666,10 +694,21 @@ def create_document_changeset(
         read_paths = _read_paths(change, after)
         operation = DocumentPatchOperation(change.operation.value)
         action_id = uuid5(document_id, f"consultant:{run_id}:patch-action:{index}")
-        atomic_group = (
-            uuid5(document_id, f"consultant:{run_id}:atomic:{index}")
-            if operation in {DocumentPatchOperation.MERGE, DocumentPatchOperation.SPLIT}
-            else None
+        if change.atomic_group_ref:
+            atomic_group = uuid5(
+                document_id,
+                f"consultant:{run_id}:atomic-ref:{change.atomic_group_ref}",
+            )
+        elif operation in {
+            DocumentPatchOperation.MERGE,
+            DocumentPatchOperation.SPLIT,
+        }:
+            atomic_group = uuid5(document_id, f"consultant:{run_id}:atomic:{index}")
+        else:
+            atomic_group = None
+        local_dependencies = tuple(
+            action_ids_by_change_ref[change_ref]
+            for change_ref in change.depends_on_change_refs
         )
         action = DocumentPatchAction(
             action_id=action_id,
@@ -688,6 +727,13 @@ def create_document_changeset(
                 for path in read_paths
             ),
             target_ids=change.target_ids,
+            depends_on_action_ids=tuple(
+                sorted(
+                    {*local_dependencies, *change.depends_on_action_ids},
+                    key=str,
+                )
+            ),
+            supersedes_action_ids=change.supersedes_action_ids,
             atomic_subgroup_id=atomic_group,
             affected_work_ids=_affected_work_ids(change, interview_work),
             blocks_dependent_analysis=_blocks_dependent_analysis(
@@ -716,6 +762,9 @@ def create_document_changeset(
             )
         ),
         created_revision=read_revision,
+        external_dependency_action_ids=tuple(
+            dict.fromkeys(external_dependency_action_ids)
+        ),
     )
     existing = existing_review_queue.get(str(bundle.changeset_id))
     if existing is not None and DocumentChangeSet.model_validate(existing) != bundle:
@@ -816,14 +865,27 @@ def _require_atomic_subgroups(
 
 
 def _require_dependencies(
+    review_queue: Mapping[str, dict[str, Any]],
     bundle: DocumentChangeSet,
     selected: Sequence[DocumentPatchAction],
 ) -> None:
     selected_ids = {item.action_id for item in selected}
-    by_id = {item.action_id: item for item in bundle.actions}
+    by_id: dict[UUID, DocumentPatchAction] = {}
+    for raw in review_queue.values():
+        candidate_bundle = DocumentChangeSet.model_validate(raw)
+        for candidate in candidate_bundle.actions:
+            if candidate.action_id in by_id:
+                raise DocumentReviewError(
+                    f"duplicate review action identity {candidate.action_id}"
+                )
+            by_id[candidate.action_id] = candidate
     for action in selected:
         for dependency_id in action.depends_on_action_ids:
-            dependency = by_id[dependency_id]
+            dependency = by_id.get(dependency_id)
+            if dependency is None:
+                raise ReviewDependencyUnresolved(
+                    f"patch action {action.action_id} has missing dependency {dependency_id}"
+                )
             if dependency_id not in selected_ids and dependency.status not in {
                 DocumentChangeStatus.ACCEPTED,
                 DocumentChangeStatus.EDIT_ACCEPTED,
@@ -881,16 +943,57 @@ def revalidate_review_queue(
     *,
     stale_reason: str,
 ) -> dict[str, dict[str, Any]]:
+    action_statuses: dict[UUID, DocumentChangeStatus] = {}
+    for raw in review_queue.values():
+        candidate_bundle = DocumentChangeSet.model_validate(raw)
+        for candidate in candidate_bundle.actions:
+            if candidate.action_id in action_statuses:
+                raise DocumentReviewError(
+                    f"duplicate review action identity {candidate.action_id}"
+                )
+            action_statuses[candidate.action_id] = candidate.status
     updated: dict[str, dict[str, Any]] = {}
     for key, raw in review_queue.items():
         bundle = DocumentChangeSet.model_validate(raw)
+        external_statuses = {
+            action_statuses.get(action_id)
+            for action_id in bundle.external_dependency_action_ids
+        }
+        terminal_external_dependency = bool(
+            external_statuses
+            & {
+                None,
+                DocumentChangeStatus.REJECTED,
+                DocumentChangeStatus.STALE,
+            }
+        )
+        unresolved_external_dependency = bool(
+            external_statuses
+            & {
+                DocumentChangeStatus.PENDING,
+                DocumentChangeStatus.DEFERRED,
+            }
+        )
         actions = tuple(
-            _stale_action(action, stale_reason)
+            _stale_action(
+                action,
+                (
+                    "前置審核動作已被拒絕、失效或不存在，請重新建立這項建議。"
+                    if terminal_external_dependency
+                    else stale_reason
+                ),
+            )
             if action.status in {
                 DocumentChangeStatus.PENDING,
                 DocumentChangeStatus.DEFERRED,
             }
-            and not _read_set_is_current(document, action)
+            and (
+                terminal_external_dependency
+                or (
+                    not unresolved_external_dependency
+                    and not _read_set_is_current(document, action)
+                )
+            )
             else action
             for action in bundle.actions
         )
@@ -914,6 +1017,49 @@ def stale_review_queue_for_source_correction(
             _stale_action(action, reason)
             if action.status in _UNRESOLVED_STATUSES
             and superseded_source_id in action.source_ids
+            else action
+            for action in bundle.actions
+        )
+        actions = _cascade_atomic_staleness(actions, reason)
+        updated[key] = bundle.model_copy(update={"actions": actions}).model_dump(
+            mode="json"
+        )
+    return updated
+
+
+def stale_superseded_review_actions(
+    review_queue: Mapping[str, dict[str, Any]],
+    *,
+    published_changeset: DocumentChangeSet,
+) -> dict[str, dict[str, Any]]:
+    """Atomically preserve and stale only explicitly superseded unresolved actions."""
+
+    superseded_ids = {
+        action_id
+        for action in published_changeset.actions
+        for action_id in action.supersedes_action_ids
+    }
+    if not superseded_ids:
+        return dict(review_queue)
+    known_actions = {
+        action.action_id
+        for raw in review_queue.values()
+        for action in DocumentChangeSet.model_validate(raw).actions
+    }
+    unknown = superseded_ids - known_actions
+    if unknown:
+        raise DocumentReviewError(
+            "supersession references unknown review actions: "
+            + ", ".join(str(item) for item in sorted(unknown, key=str))
+        )
+    reason = "這項待審核建議已被同一顧問回合的新候選明確取代。"
+    updated: dict[str, dict[str, Any]] = {}
+    for key, raw in review_queue.items():
+        bundle = DocumentChangeSet.model_validate(raw)
+        actions = tuple(
+            _stale_action(action, reason)
+            if action.action_id in superseded_ids
+            and action.status in _UNRESOLVED_STATUSES
             else action
             for action in bundle.actions
         )
@@ -1051,7 +1197,7 @@ def apply_review_command(
     selected = _selected_actions(bundle, action_ids)
     _require_atomic_subgroups(bundle, selected)
     if action in {"accept_changes", "edit_and_accept_changes"}:
-        _require_dependencies(bundle, selected)
+        _require_dependencies(review_queue, bundle, selected)
     if action in {"accept_changes", "reject_changes", "defer_changes"} and source_reference:
         raise DocumentReviewError(f"{action} must not create employee evidence")
     if source_reference is not None and source_reference.kind.value != "direct_edit":

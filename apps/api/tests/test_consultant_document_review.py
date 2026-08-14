@@ -11,11 +11,14 @@ from app.consultant.document_review import (
     AtomicSubgroupIncomplete,
     DocumentReviewError,
     RejectedChangeRequiresNewEvidence,
+    ReviewDependencyUnresolved,
     apply_review_command,
     block_review_dependent_work,
     create_document_changeset,
+    stale_superseded_review_actions,
     stale_review_queue_for_direct_edit,
 )
+from app.consultant.document_authority import apply_document_actions
 from app.consultant.graph import build_consultant_graph
 from app.consultant.interview import VerifiedConsultantCommit
 from app.consultant.results import (
@@ -1623,3 +1626,207 @@ def test_duty_merge_and_split_are_atomic_with_task_reassignment(
     assert {item.duty_id for item in approved.duties} == {
         UUID(item["duty_id"]) for item in new_duties
     }
+
+
+def test_external_dependency_must_be_employee_accepted_before_dependent_action() -> None:
+    document_id = uuid4()
+    source_id = uuid4()
+    document = ApprovedJobDocument(
+        document_id=document_id,
+        job_title="採購專員",
+        work_description="執行採購作業。",
+    )
+    prerequisite = create_document_changeset(
+        document_id=document_id,
+        run_id=uuid4(),
+        summary="先修訂職稱。",
+        read_revision=1,
+        document=document,
+        changes=(
+            _change(
+                source_id=source_id,
+                path="/job_title",
+                after="資深採購專員",
+            ),
+        ),
+        existing_review_queue={},
+        interview_work={},
+    )
+    prerequisite_id = prerequisite.actions[0].action_id
+    conditional_document = apply_document_actions(document, prerequisite.actions)
+    dependent_change = _change(
+        source_id=source_id,
+        path="/work_description",
+        after="以資深採購專員角色管理採購作業。",
+    ).model_copy(update={"depends_on_action_ids": (prerequisite_id,)})
+    dependent = create_document_changeset(
+        document_id=document_id,
+        run_id=uuid4(),
+        summary="依職稱前提修訂工作描述。",
+        read_revision=1,
+        document=conditional_document,
+        changes=(dependent_change,),
+        existing_review_queue={
+            str(prerequisite.changeset_id): prerequisite.model_dump(mode="json")
+        },
+        interview_work={},
+        external_dependency_action_ids=(prerequisite_id,),
+    )
+    state = {
+        "approved_document": document.model_dump(mode="json"),
+        "review_queue": {
+            str(prerequisite.changeset_id): prerequisite.model_dump(mode="json"),
+            str(dependent.changeset_id): dependent.model_dump(mode="json"),
+        },
+        "interview_work": {},
+        "understanding": {},
+        "gaps": {},
+    }
+
+    with pytest.raises(ReviewDependencyUnresolved, match=str(prerequisite_id)):
+        apply_review_command(
+            state,
+            action="accept_changes",
+            changeset_id=dependent.changeset_id,
+            action_ids=(dependent.actions[0].action_id,),
+            revision=2,
+        )
+
+    prerequisite_accepted = apply_review_command(
+        state,
+        action="accept_changes",
+        changeset_id=prerequisite.changeset_id,
+        action_ids=(prerequisite_id,),
+        revision=2,
+    )
+    dependent_accepted = apply_review_command(
+        prerequisite_accepted,
+        action="accept_changes",
+        changeset_id=dependent.changeset_id,
+        action_ids=(dependent.actions[0].action_id,),
+        revision=3,
+    )
+
+    approved = ApprovedJobDocument.model_validate(
+        dependent_accepted["approved_document"]
+    )
+    assert approved.job_title == "資深採購專員"
+    assert approved.work_description == "以資深採購專員角色管理採購作業。"
+
+
+def test_rejected_external_dependency_makes_downstream_action_stale() -> None:
+    document_id = uuid4()
+    source_id = uuid4()
+    document = ApprovedJobDocument(document_id=document_id, job_title="採購專員")
+    prerequisite = create_document_changeset(
+        document_id=document_id,
+        run_id=uuid4(),
+        summary="先修訂職稱。",
+        read_revision=1,
+        document=document,
+        changes=(
+            _change(
+                source_id=source_id,
+                path="/job_title",
+                after="資深採購專員",
+            ),
+        ),
+        existing_review_queue={},
+        interview_work={},
+    )
+    prerequisite_id = prerequisite.actions[0].action_id
+    dependent = create_document_changeset(
+        document_id=document_id,
+        run_id=uuid4(),
+        summary="依職稱前提修訂工作描述。",
+        read_revision=1,
+        document=apply_document_actions(document, prerequisite.actions),
+        changes=(
+            _change(
+                source_id=source_id,
+                path="/work_description",
+                after="管理複雜採購案。",
+            ).model_copy(update={"depends_on_action_ids": (prerequisite_id,)}),
+        ),
+        existing_review_queue={
+            str(prerequisite.changeset_id): prerequisite.model_dump(mode="json")
+        },
+        interview_work={},
+        external_dependency_action_ids=(prerequisite_id,),
+    )
+
+    update = apply_review_command(
+        {
+            "approved_document": document.model_dump(mode="json"),
+            "review_queue": {
+                str(prerequisite.changeset_id): prerequisite.model_dump(mode="json"),
+                str(dependent.changeset_id): dependent.model_dump(mode="json"),
+            },
+            "interview_work": {},
+            "understanding": {},
+            "gaps": {},
+        },
+        action="reject_changes",
+        changeset_id=prerequisite.changeset_id,
+        action_ids=(prerequisite_id,),
+        rejection_reason="這不是我的職稱。",
+        revision=2,
+    )
+
+    downstream = DocumentChangeSet.model_validate(
+        update["review_queue"][str(dependent.changeset_id)]
+    )
+    assert downstream.actions[0].status is DocumentChangeStatus.STALE
+    assert "前置" in downstream.actions[0].stale_reason
+
+
+def test_publication_supersession_stales_only_explicit_unresolved_actions() -> None:
+    document_id = uuid4()
+    source_id = uuid4()
+    document = ApprovedJobDocument(document_id=document_id, job_title="採購專員")
+    old = create_document_changeset(
+        document_id=document_id,
+        run_id=uuid4(),
+        summary="舊建議。",
+        read_revision=1,
+        document=document,
+        changes=(
+            _change(
+                source_id=source_id,
+                path="/job_title",
+                after="採購管理師",
+            ),
+        ),
+        existing_review_queue={},
+        interview_work={},
+    )
+    replacement = create_document_changeset(
+        document_id=document_id,
+        run_id=uuid4(),
+        summary="新建議。",
+        read_revision=1,
+        document=document,
+        changes=(
+            _change(
+                source_id=source_id,
+                path="/job_title",
+                after="資深採購管理師",
+            ).model_copy(
+                update={"supersedes_action_ids": (old.actions[0].action_id,)}
+            ),
+        ),
+        existing_review_queue={
+            str(old.changeset_id): old.model_dump(mode="json")
+        },
+        interview_work={},
+    )
+
+    updated = stale_superseded_review_actions(
+        {str(old.changeset_id): old.model_dump(mode="json")},
+        published_changeset=replacement,
+    )
+
+    stale_old = DocumentChangeSet.model_validate(updated[str(old.changeset_id)])
+    assert stale_old.actions[0].status is DocumentChangeStatus.STALE
+    assert "取代" in stale_old.actions[0].stale_reason
+    assert replacement.actions[0].status is DocumentChangeStatus.PENDING

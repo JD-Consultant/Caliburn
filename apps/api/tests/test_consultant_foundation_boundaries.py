@@ -84,3 +84,35 @@ def test_consultant_foundation_directly_imports_langgraph_persistence() -> None:
     assert "langgraph.graph" in imports
     assert "langgraph.checkpoint.postgres.aio" in imports
     assert "langgraph.store.postgres.aio" in imports
+
+
+def test_candidate_workspace_depends_only_on_current_document_authority() -> None:
+    path = API_ROOT / "app" / "consultant" / "candidate_workspace.py"
+    imports = _imports(path)
+    application_imports = {
+        module for module in imports if module.startswith(("app.", "packages."))
+    }
+
+    assert application_imports <= {
+        "app.consultant.candidate_wire",
+        "app.consultant.document_authority",
+        "app.consultant.document_review",
+        "app.consultant.results",
+        "app.consultant.state",
+    }
+    assert not any(
+        module.startswith(
+            (
+                "app.api",
+                "app.core",
+                "app.documents",
+                "app.task_analysis",
+                "app.opks",
+                "app.consultation",
+                "app.adapters",
+                "ocs_contract",
+                "indexer_contract",
+            )
+        )
+        for module in imports
+    )

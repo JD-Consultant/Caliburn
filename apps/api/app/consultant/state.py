@@ -492,6 +492,7 @@ class DocumentPatchAction(DurableModel):
     read_set: tuple[DocumentPathRead, ...] = Field(min_length=1)
     target_ids: tuple[UUID, ...] = ()
     depends_on_action_ids: tuple[UUID, ...] = ()
+    supersedes_action_ids: tuple[UUID, ...] = ()
     atomic_subgroup_id: UUID | None = None
     affected_work_ids: tuple[UUID, ...] = ()
     blocks_dependent_analysis: bool = False
@@ -506,6 +507,7 @@ class DocumentPatchAction(DurableModel):
             ("source_ids", self.source_ids),
             ("target_ids", self.target_ids),
             ("depends_on_action_ids", self.depends_on_action_ids),
+            ("supersedes_action_ids", self.supersedes_action_ids),
             ("affected_work_ids", self.affected_work_ids),
         ):
             if len(values) != len(set(values)):
@@ -529,6 +531,8 @@ class DocumentPatchAction(DurableModel):
             raise ValueError("edit-accepted patch requires the employee value")
         if self.action_id in self.depends_on_action_ids:
             raise ValueError("a patch action cannot depend on itself")
+        if self.action_id in self.supersedes_action_ids:
+            raise ValueError("a patch action cannot supersede itself")
         return self
 
 
@@ -538,6 +542,7 @@ class DocumentChangeSet(DurableModel):
     actions: tuple[DocumentPatchAction, ...] = Field(min_length=1)
     source_ids: tuple[UUID, ...] = Field(min_length=1)
     created_revision: int = Field(ge=0)
+    external_dependency_action_ids: tuple[UUID, ...] = ()
 
     @model_validator(mode="after")
     def action_identity_and_evidence_are_consistent(self) -> DocumentChangeSet:
@@ -546,14 +551,26 @@ class DocumentChangeSet(DurableModel):
             raise ValueError("duplicate patch action_id")
         if len(self.source_ids) != len(set(self.source_ids)):
             raise ValueError("duplicate changeset source_id")
+        if len(self.external_dependency_action_ids) != len(
+            set(self.external_dependency_action_ids)
+        ):
+            raise ValueError("duplicate external dependency action_id")
         if set(self.source_ids) != {
             source_id for action in self.actions for source_id in action.source_ids
         }:
             raise ValueError("changeset evidence must equal its action evidence")
         known_actions = set(action_ids)
+        external_actions = set(self.external_dependency_action_ids)
+        referenced_external: set[UUID] = set()
         for action in self.actions:
-            if not set(action.depends_on_action_ids) <= known_actions:
-                raise ValueError("patch dependency crosses its changeset")
+            dependencies = set(action.depends_on_action_ids)
+            if not dependencies <= known_actions | external_actions:
+                raise ValueError("undeclared patch dependency crosses its changeset")
+            referenced_external.update(dependencies - known_actions)
+        if referenced_external != external_actions:
+            raise ValueError(
+                "declared external dependency closure does not match patch dependencies"
+            )
         return self
 
 
@@ -658,6 +675,7 @@ class ConsultantThreadState(TypedDict, total=False):
     sufficiency: dict[str, Any] | None
     latest_run: dict[str, Any] | None
     command_receipts: dict[str, dict[str, Any]]
+    active_candidate: dict[str, Any] | None
 
 
 class ConsultantCommandContext(TypedDict, total=False):
@@ -673,6 +691,7 @@ class ConsultantCommandContext(TypedDict, total=False):
         "edit_and_accept_changes",
         "reject_changes",
         "defer_changes",
+        "stage_candidate_revision",
     ]
     document_id: str
     expected_revision: int
@@ -687,6 +706,7 @@ class ConsultantCommandContext(TypedDict, total=False):
     rejection_reason: str
     run_receipt: dict[str, Any]
     command_receipt: dict[str, Any]
+    candidate_stage: dict[str, Any]
 
 
 def initial_thread_state(document_id: UUID) -> ConsultantThreadState:
@@ -712,6 +732,7 @@ def initial_thread_state(document_id: UUID) -> ConsultantThreadState:
         "sufficiency": None,
         "latest_run": None,
         "command_receipts": {},
+        "active_candidate": None,
     }
 
 

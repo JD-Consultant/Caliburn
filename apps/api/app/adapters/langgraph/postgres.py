@@ -13,7 +13,7 @@ from contextlib import asynccontextmanager
 from copy import deepcopy
 from datetime import UTC, datetime
 from typing import Any, Literal
-from uuid import UUID
+from uuid import UUID, uuid5
 
 import psycopg
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
@@ -27,6 +27,18 @@ from psycopg.rows import DictRow, dict_row
 
 from app.consultant.graph import StaleThreadRevision, build_consultant_graph
 from app.consultant.clarification import ClarificationAnswer
+from app.consultant.candidate_wire import map_candidate_edit_batch
+from app.consultant.candidate_workspace import (
+    CandidateEditReceipt,
+    CandidateRevisionConflict,
+    CandidateStageRequest,
+    CandidateToolCallConflict,
+    CandidateWorkspace,
+    VerifiedCandidateStage,
+    candidate_mapping_authority,
+    candidate_request_sha256,
+    materialize_candidate_workspace,
+)
 from app.consultant.document_authority import edited_action_source_payload
 from app.consultant.document_review import apply_review_command
 from app.consultant.interview import VerifiedConsultantCommit
@@ -54,6 +66,7 @@ from app.consultant.state import (
     inspect_command_receipt,
 )
 from app.consultant.views import ConsultantSnapshot, snapshot_from_state
+from app.consultant.verification import verify_candidate_document_changes
 
 
 SourceHook = Callable[[EmployeeSource], Awaitable[None]]
@@ -677,6 +690,145 @@ class PostgresConsultantRuntime:
                 raise StaleRevision(str(error)) from error
             await self._touch_catalog(document_id)
             return await self._snapshot(document_id)
+
+    async def stage_candidate_revision(
+        self,
+        *,
+        document_id: UUID,
+        request: CandidateStageRequest,
+    ) -> CandidateEditReceipt:
+        """Stage one verified candidate through the existing product graph."""
+
+        async with self._lock_for(document_id):
+            await self._require_active_catalog(document_id)
+            raw_state = await self.raw_state(document_id)
+            latest_payload = raw_state.get("latest_run")
+            if latest_payload is None:
+                raise ActiveConsultantRun(
+                    "candidate staging requires an active consultant run"
+                )
+            latest = RunReceipt.model_validate(latest_payload)
+            if (
+                latest.run_id != request.run_id
+                or latest.status is not RunStatus.SOURCE_SAVED
+            ):
+                raise ActiveConsultantRun(
+                    "candidate staging does not match the active consultant run"
+                )
+            actual_revision = int(raw_state.get("revision", 0))
+            if actual_revision != request.baseline_revision:
+                raise CandidateRevisionConflict(
+                    f"expected baseline revision {request.baseline_revision}, "
+                    f"found {actual_revision}"
+                )
+            request_sha256 = candidate_request_sha256(request)
+            active_payload = raw_state.get("active_candidate")
+            active = (
+                CandidateWorkspace.model_validate(active_payload)
+                if active_payload is not None
+                else None
+            )
+            if active is not None:
+                replay = active.tool_receipts.get(request.tool_call_id)
+                if replay is not None:
+                    if replay.request_sha256 != request_sha256:
+                        raise CandidateToolCallConflict(
+                            f"candidate tool call {request.tool_call_id} was reused "
+                            "with another payload"
+                        )
+                    return CandidateEditReceipt(
+                        candidate_revision=replay.candidate_revision,
+                        revision_digest=replay.revision_digest,
+                        changeset_id=replay.changeset_id,
+                        action_ids=replay.action_ids,
+                        external_dependency_action_ids=(
+                            replay.external_dependency_action_ids
+                        ),
+                    )
+            current_candidate_revision = active.candidate_revision if active else 0
+            if request.batch.base_candidate_revision != current_candidate_revision:
+                raise CandidateRevisionConflict(
+                    "expected candidate revision "
+                    f"{current_candidate_revision}, found "
+                    f"{request.batch.base_candidate_revision}"
+                )
+            next_candidate_revision = current_candidate_revision + 1
+            dependency_action_ids = tuple(
+                action_id
+                for change in request.batch.replacement_changes
+                for action_id in change.depends_on_action_ids
+            )
+            superseded_action_ids = tuple(
+                action_id
+                for change in request.batch.replacement_changes
+                for action_id in change.supersedes_action_ids
+            )
+            allowed_entity_ids, allowed_action_ids = candidate_mapping_authority(
+                raw_state,
+                depends_on_action_ids=dependency_action_ids,
+                supersedes_action_ids=superseded_action_ids,
+            )
+            materialization_run_id = uuid5(
+                request.run_id,
+                f"candidate-revision:{next_candidate_revision}",
+            )
+            changes = map_candidate_edit_batch(
+                request.batch,
+                document_id=document_id,
+                materialization_run_id=materialization_run_id,
+                allowed_entity_ids=allowed_entity_ids,
+                allowed_action_ids=allowed_action_ids,
+            )
+            source_ids = tuple(
+                sorted(
+                    {
+                        source_id
+                        for change in changes
+                        for source_id in change.basis.source_ids
+                    },
+                    key=str,
+                )
+            )
+            sources = tuple(
+                await asyncio.gather(
+                    *(self.get_source(document_id, source_id) for source_id in source_ids)
+                )
+            )
+            if any(
+                source.processing_status is not SourceProcessingStatus.COMMITTED
+                for source in sources
+            ):
+                raise PendingSourceRequiresReconciliation(
+                    "candidate evidence includes an uncommitted employee source"
+                )
+            used_skill_ids = verify_candidate_document_changes(
+                changes,
+                document_id=document_id,
+                selected_skill_ids=request.selected_skill_ids,
+                loaded_skill_ids=request.loaded_skill_ids,
+                employee_sources=sources,
+            )
+            stage = VerifiedCandidateStage(
+                run_id=request.run_id,
+                baseline_revision=request.baseline_revision,
+                base_candidate_revision=request.batch.base_candidate_revision,
+                tool_call_id=request.tool_call_id,
+                request_sha256=request_sha256,
+                summary=request.batch.summary,
+                changes=changes,
+                used_skill_ids=used_skill_ids,
+            )
+            _, receipt = materialize_candidate_workspace(raw_state, stage)
+            await self.graph.ainvoke(
+                {},
+                self.graph_config(document_id),
+                context={
+                    "action": "stage_candidate_revision",
+                    "document_id": str(document_id),
+                    "candidate_stage": stage.model_dump(mode="json"),
+                },
+            )
+            return receipt
 
     @staticmethod
     def _changed_employee_text(

@@ -25,7 +25,22 @@ from app.adapters.langgraph.postgres import (
     UnknownEvidenceSource,
     open_postgres_consultant_runtime,
 )
+from app.consultant.candidate_wire import (
+    CandidateEditBatch,
+    CandidateWireMappingError,
+    OutputDocumentChange,
+    OutputDocumentField,
+    OutputDocumentTarget,
+    OutputDuty,
+    OutputOpksKind,
+)
+from app.consultant.candidate_workspace import (
+    CandidateStageRequest,
+    CandidateToolCallConflict,
+    CandidateWorkspace,
+)
 from app.consultant.interview import VerifiedConsultantCommit
+from app.consultant.provider_wire import OutputAnalysisBasis
 from app.consultant.results import (
     AnalysisBasis,
     AttentionChange,
@@ -1376,6 +1391,397 @@ async def test_quote_anchor_and_uuid_namespace_are_document_scoped(
             )
         with pytest.raises((TypeError, ValueError)):
             runtime.source_namespace("employee%input")
+
+
+def _candidate_wire_change(**overrides: object) -> OutputDocumentChange:
+    values: dict[str, object] = {
+        "change_ref": "candidate-duty",
+        "depends_on_change_refs": (),
+        "depends_on_action_ids": (),
+        "supersedes_action_ids": (),
+        "atomic_group_ref": "",
+        "operation": DocumentChangeOperation.ADD,
+        "target": OutputDocumentTarget.DUTY,
+        "target_id": "",
+        "field": OutputDocumentField.ENTITY,
+        "text_value": "",
+        "integer_value": -1,
+        "uuid_value": "",
+        "uuid_values": (),
+        "enablers": (),
+        "duties": (
+            OutputDuty(
+                duty_id="",
+                entity_ref="candidate-duty",
+                statement="管理採購作業",
+                display_order=-1,
+            ),
+        ),
+        "tasks": (),
+        "opks_items": (),
+        "target_ids": (),
+        "opks_kind": OutputOpksKind.NONE,
+        "task_ids": (),
+        "indicator_ids": (),
+        "basis_ordinal": 1,
+    }
+    values.update(overrides)
+    return OutputDocumentChange(**values)
+
+
+def _candidate_stage_request(
+    *,
+    run_id: UUID,
+    source_id: UUID,
+    baseline_revision: int,
+    base_candidate_revision: int = 0,
+    tool_call_id: str = "candidate-tool-1",
+    changes: tuple[OutputDocumentChange, ...] | None = None,
+    summary: str = "建立可審核的候選文件。",
+) -> CandidateStageRequest:
+    return CandidateStageRequest(
+        run_id=run_id,
+        baseline_revision=baseline_revision,
+        tool_call_id=tool_call_id,
+        batch=CandidateEditBatch(
+            base_candidate_revision=base_candidate_revision,
+            summary=summary,
+            analysis_bases=(
+                OutputAnalysisBasis(
+                    source_ids=(source_id,),
+                    quote_anchors=(),
+                    skill_ids=("task-boundary",),
+                ),
+            ),
+            replacement_changes=changes or (_candidate_wire_change(),),
+        ),
+        selected_skill_ids=("task-boundary",),
+        loaded_skill_ids=("task-boundary",),
+    )
+
+
+@pytest.mark.asyncio
+async def test_candidate_workspace_survives_runtime_reopen_without_snapshot_leakage(
+    consultant_database_url: str,
+) -> None:
+    document_id = uuid4()
+    run_id = uuid4()
+    source_id = uuid4()
+
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        await runtime.create_document(document_id, title="採購職務")
+        admitted, should_process = await runtime.admit_employee_answer(
+            document_id=document_id,
+            run_id=run_id,
+            source_id=source_id,
+            text="我負責管理採購作業。",
+        )
+        assert should_process is True
+        catalog_before = await runtime.get_document_catalog_entry(document_id)
+        approved_before = admitted.approved_document
+        queue_before = admitted.review_queue
+        revision_before = admitted.revision
+
+        receipt = await runtime.stage_candidate_revision(
+            document_id=document_id,
+            request=_candidate_stage_request(
+                run_id=run_id,
+                source_id=source_id,
+                baseline_revision=revision_before,
+            ),
+        )
+        visible_after = await runtime.reopen_document(document_id)
+        raw_after = await runtime.raw_state(document_id)
+        catalog_after = await runtime.get_document_catalog_entry(document_id)
+
+        assert receipt.status == "applied"
+        assert receipt.candidate_revision == 1
+        assert visible_after == admitted
+        assert "active_candidate" not in visible_after.model_dump(mode="json")
+        assert visible_after.approved_document == approved_before
+        assert visible_after.review_queue == queue_before
+        assert visible_after.revision == revision_before
+        assert catalog_after.updated_at == catalog_before.updated_at
+        staged = CandidateWorkspace.model_validate(raw_after["active_candidate"])
+        assert staged.revision_digest == receipt.revision_digest
+
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        reopened = await runtime.reopen_document(document_id)
+        raw_reopened = await runtime.raw_state(document_id)
+
+        assert reopened.approved_document == approved_before
+        assert reopened.review_queue == queue_before
+        assert reopened.revision == revision_before
+        assert CandidateWorkspace.model_validate(raw_reopened["active_candidate"]) == staged
+        await runtime.delete_document(document_id)
+
+
+@pytest.mark.asyncio
+async def test_candidate_stage_is_payload_bound_and_failed_stage_keeps_last_success(
+    consultant_database_url: str,
+) -> None:
+    document_id = uuid4()
+    run_id = uuid4()
+    source_id = uuid4()
+
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        await runtime.create_document(document_id, title="採購職務")
+        admitted, _ = await runtime.admit_employee_answer(
+            document_id=document_id,
+            run_id=run_id,
+            source_id=source_id,
+            text="我負責管理採購作業。",
+        )
+        request = _candidate_stage_request(
+            run_id=run_id,
+            source_id=source_id,
+            baseline_revision=admitted.revision,
+        )
+        first = await runtime.stage_candidate_revision(
+            document_id=document_id,
+            request=request,
+        )
+        replay = await runtime.stage_candidate_revision(
+            document_id=document_id,
+            request=request,
+        )
+        raw_before_failure = await runtime.raw_state(document_id)
+
+        assert replay == first
+        with pytest.raises(CandidateToolCallConflict):
+            await runtime.stage_candidate_revision(
+                document_id=document_id,
+                request=_candidate_stage_request(
+                    run_id=run_id,
+                    source_id=source_id,
+                    baseline_revision=admitted.revision,
+                    base_candidate_revision=1,
+                    summary="同一 tool-call ID 的不同內容。",
+                ),
+            )
+        invalid_change = _candidate_wire_change(
+            change_ref="invalid",
+            operation=DocumentChangeOperation.REVISE,
+            target_id=str(uuid4()),
+            field=OutputDocumentField.STATEMENT,
+            text_value="不可引用未知 Duty",
+            duties=(),
+        )
+        with pytest.raises(CandidateWireMappingError, match="unbound entity handle"):
+            await runtime.stage_candidate_revision(
+                document_id=document_id,
+                request=_candidate_stage_request(
+                    run_id=run_id,
+                    source_id=source_id,
+                    baseline_revision=admitted.revision,
+                    base_candidate_revision=1,
+                    tool_call_id="candidate-tool-2",
+                    changes=(invalid_change,),
+                ),
+            )
+
+        assert (await runtime.raw_state(document_id))["active_candidate"] == raw_before_failure["active_candidate"]
+
+
+@pytest.mark.asyncio
+async def test_candidate_lifecycle_preserves_failed_retry_and_clears_on_correction(
+    consultant_database_url: str,
+) -> None:
+    document_id = uuid4()
+    run_id = uuid4()
+    source_id = uuid4()
+
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        await runtime.create_document(document_id, title="採購職務")
+        admitted, _ = await runtime.admit_employee_answer(
+            document_id=document_id,
+            run_id=run_id,
+            source_id=source_id,
+            text="我負責管理採購作業。",
+        )
+        await runtime.stage_candidate_revision(
+            document_id=document_id,
+            request=_candidate_stage_request(
+                run_id=run_id,
+                source_id=source_id,
+                baseline_revision=admitted.revision,
+            ),
+        )
+        staged = (await runtime.raw_state(document_id))["active_candidate"]
+
+        await runtime.mark_consultant_run_failed(
+            document_id=document_id,
+            run_id=run_id,
+            error_code="model_unavailable",
+        )
+        assert (await runtime.raw_state(document_id))["active_candidate"] == staged
+        _, should_process = await runtime.admit_employee_answer(
+            document_id=document_id,
+            run_id=run_id,
+            source_id=source_id,
+            text="我負責管理採購作業。",
+        )
+        assert should_process is True
+        assert (await runtime.raw_state(document_id))["active_candidate"] == staged
+
+        await runtime.mark_consultant_run_failed(
+            document_id=document_id,
+            run_id=run_id,
+            error_code="invalid_employee_input",
+        )
+        corrected, should_process = await runtime.admit_employee_answer(
+            document_id=document_id,
+            run_id=uuid4(),
+            source_id=uuid4(),
+            text="更正：我是每週管理採購作業。",
+            supersedes_source_id=source_id,
+        )
+
+        assert should_process is True
+        assert corrected.latest_run is not None
+        assert (await runtime.raw_state(document_id))["active_candidate"] is None
+
+
+@pytest.mark.asyncio
+async def test_direct_edit_clears_candidate_workspace(
+    consultant_database_url: str,
+) -> None:
+    document_id = uuid4()
+    run_id = uuid4()
+    source_id = uuid4()
+
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        await runtime.create_document(document_id, title="採購職務")
+        admitted, _ = await runtime.admit_employee_answer(
+            document_id=document_id,
+            run_id=run_id,
+            source_id=source_id,
+            text="我負責管理採購作業。",
+        )
+        await runtime.stage_candidate_revision(
+            document_id=document_id,
+            request=_candidate_stage_request(
+                run_id=run_id,
+                source_id=source_id,
+                baseline_revision=admitted.revision,
+            ),
+        )
+
+        edited = await runtime.apply_direct_edit(
+            document_id=document_id,
+            expected_revision=admitted.revision,
+            document=admitted.approved_document.model_copy(
+                update={"job_title": "採購管理師"}
+            ),
+            source_id=uuid4(),
+        )
+
+        assert edited.approved_document.job_title == "採購管理師"
+        assert (await runtime.raw_state(document_id))["active_candidate"] is None
+
+
+@pytest.mark.parametrize(
+    "decision",
+    ("accept_changes", "edit_and_accept_changes", "reject_changes", "defer_changes"),
+)
+@pytest.mark.asyncio
+async def test_every_employee_review_decision_clears_candidate_workspace(
+    consultant_database_url: str,
+    decision: str,
+) -> None:
+    document_id = uuid4()
+    evidence_source_id = uuid4()
+    candidate_source_id = uuid4()
+    now = datetime.now(UTC)
+    basis = AnalysisBasis(
+        source_ids=(evidence_source_id,),
+        skill_ids=("task-boundary",),
+    )
+    result = ConsultantResult(
+        visible_reply="我整理了一項 Duty 建議。",
+        reply_basis=basis,
+        used_skill_ids=("task-boundary",),
+        reviewable_document_changes=(
+            ReviewableDocumentChange(
+                operation=DocumentChangeOperation.ADD,
+                path="/duties",
+                after={"statement": "執行採購作業"},
+                basis=basis,
+            ),
+        ),
+        sufficiency=SufficiencyRecommendation(
+            currently_enough=False,
+            reason="仍有工作待盤點。",
+            remaining_gap_reasons=(GapReason.WORK_COVERAGE_MISSING,),
+            continuing_benefit="繼續訪談可補齊工作。",
+            basis=basis,
+        ),
+    )
+
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        await runtime.create_document(document_id, title="採購職務")
+        sourced = await runtime.record_employee_source(
+            document_id=document_id,
+            source_id=evidence_source_id,
+            kind=EmployeeSourceKind.EMPLOYEE_TURN,
+            text="我負責執行採購作業。",
+        )
+        proposed = await runtime.commit_verified_consultant_result(
+            document_id=document_id,
+            expected_revision=sourced.revision,
+            commit=VerifiedConsultantCommit(
+                run_id=uuid4(),
+                answer_source_id=evidence_source_id,
+                started_at=now,
+                completed_at=now,
+                result=result,
+            ),
+        )
+        bundle = proposed.document_review.bundles[0]
+        old_action = bundle.actions[0]
+        candidate_run_id = uuid4()
+        admitted, _ = await runtime.admit_employee_answer(
+            document_id=document_id,
+            run_id=candidate_run_id,
+            source_id=candidate_source_id,
+            text="候選版本還要補上供應商管理。",
+        )
+        await runtime.stage_candidate_revision(
+            document_id=document_id,
+            request=_candidate_stage_request(
+                run_id=candidate_run_id,
+                source_id=candidate_source_id,
+                baseline_revision=admitted.revision,
+                changes=(
+                    _candidate_wire_change(
+                        depends_on_action_ids=(old_action.action_id,),
+                    ),
+                ),
+            ),
+        )
+        kwargs: dict[str, object] = {}
+        if decision == "edit_and_accept_changes":
+            assert isinstance(old_action.after, dict)
+            kwargs["edited_after_by_action_id"] = {
+                old_action.action_id: {
+                    **old_action.after,
+                    "statement": "員工修訂後的採購作業",
+                }
+            }
+            kwargs["source_id"] = uuid4()
+        elif decision == "reject_changes":
+            kwargs["rejection_reason"] = "這不是我的主要工作。"
+
+        await runtime.decide_document_changes(
+            document_id=document_id,
+            expected_revision=admitted.revision,
+            action=decision,
+            changeset_id=bundle.changeset_id,
+            action_ids=(old_action.action_id,),
+            **kwargs,
+        )
+
+        assert (await runtime.raw_state(document_id))["active_candidate"] is None
 
 
 @pytest.mark.asyncio

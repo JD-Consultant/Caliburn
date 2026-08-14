@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 import re
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 from uuid import UUID
 
 from app.consultant.model_runtime import (
@@ -16,7 +16,12 @@ from app.consultant.model_runtime import (
 
 if TYPE_CHECKING:
     from app.consultant.context import ContextSelectionReceipt
-    from app.consultant.results import AnalysisBasis, ConsultantResult
+    from app.consultant.results import (
+        AnalysisBasis,
+        ConsultantResult,
+        ReviewableDocumentChange,
+        SkillId,
+    )
     from app.consultant.state import EmployeeSource
 
 
@@ -62,6 +67,15 @@ _ALLOWED_COLLECTION_PAYLOAD_KEYS = {
     "task_ids",
     "indicator_ids",
     "name",
+}
+_STRUCTURAL_PAYLOAD_KEYS = {
+    "duty_id",
+    "task_id",
+    "item_id",
+    "kind",
+    "display_order",
+    "task_ids",
+    "indicator_ids",
 }
 
 
@@ -140,7 +154,6 @@ def verify_consultant_result(
 ) -> None:
     """Fail closed before framework output becomes durable semantic state."""
 
-    from app.consultant.results import OpksKind
     from app.consultant.state import SourceValidity
 
     selected = set(selected_skill_ids)
@@ -153,6 +166,14 @@ def verify_consultant_result(
         raise ConsultantVerificationError("result used a Skill that was not loaded")
     if not selected <= set(execution.allowed_skill_ids):
         raise ConsultantVerificationError("run selected an ineligible Skill")
+
+    verify_candidate_document_changes(
+        result.reviewable_document_changes,
+        document_id=document_id,
+        selected_skill_ids=selected_skill_ids,
+        loaded_skill_ids=loaded_skill_ids,
+        employee_sources=employee_sources,
+    )
 
     source_by_id = {source.source_id: source for source in employee_sources}
     if len(source_by_id) != len(employee_sources):
@@ -194,8 +215,64 @@ def verify_consultant_result(
             source_by_id=source_by_id,
         )
 
-    for change in result.reviewable_document_changes:
-        if not any(pattern.fullmatch(change.path) for pattern in _SUPPORTED_DOCUMENT_PATHS):
+    for text, basis in result.factual_texts():
+        if _RISKY_SPECIFIC_CLAIM.search(text) and not basis.quote_anchors:
+            raise ConsultantVerificationError(
+                "quantities, named rules and external claims require an anchored employee quote"
+            )
+
+
+def verify_candidate_document_changes(
+    changes: Sequence[ReviewableDocumentChange],
+    *,
+    document_id: UUID,
+    selected_skill_ids: Sequence[str],
+    loaded_skill_ids: Sequence[str],
+    employee_sources: Sequence[EmployeeSource],
+) -> tuple[SkillId, ...]:
+    """Verify candidate document semantics and evidence before graph staging."""
+
+    from app.consultant.results import OpksKind
+    from app.consultant.state import SourceValidity
+
+    if not changes:
+        return ()
+
+    selected = set(selected_skill_ids)
+    loaded = set(loaded_skill_ids)
+    if not loaded <= selected:
+        raise ConsultantVerificationError("run loaded an unselected Skill")
+    source_by_id = {source.source_id: source for source in employee_sources}
+    if len(source_by_id) != len(employee_sources):
+        raise ConsultantVerificationError("duplicate employee source supplied to verifier")
+    if any(source.validity is not SourceValidity.CURRENT for source in employee_sources):
+        raise ConsultantVerificationError(
+            "superseded employee source cannot support current result"
+        )
+    if any(source.document_id != document_id for source in employee_sources):
+        raise ConsultantVerificationError("employee source crosses document scope")
+
+    used_skill_ids = tuple(
+        dict.fromkeys(
+            skill_id
+            for change in changes
+            for skill_id in change.basis.skill_ids
+        )
+    )
+    if not set(used_skill_ids) <= selected:
+        raise ConsultantVerificationError("candidate used an unselected Skill")
+    if not set(used_skill_ids) <= loaded:
+        raise ConsultantVerificationError("candidate used a Skill that was not loaded")
+
+    for change in changes:
+        _verify_analysis_basis(
+            change.basis,
+            selected_skill_ids=selected,
+            source_by_id=source_by_id,
+        )
+        if not any(
+            pattern.fullmatch(change.path) for pattern in _SUPPORTED_DOCUMENT_PATHS
+        ):
             raise ConsultantVerificationError(
                 f"unsupported document change path: {change.path}"
             )
@@ -213,7 +290,10 @@ def verify_consultant_result(
             if change.opks_kind is None:
                 raise ConsultantVerificationError("OPKS change requires an OPKS kind")
             _verify_opks_payload_kind(change.after, change.opks_kind.value)
-            if change.opks_kind in {OpksKind.OUTPUT, OpksKind.PERFORMANCE_INDICATOR}:
+            if change.opks_kind in {
+                OpksKind.OUTPUT,
+                OpksKind.PERFORMANCE_INDICATOR,
+            }:
                 if len(change.task_ids) != 1:
                     raise ConsultantVerificationError(
                         "O/P changes must reference exactly one Task"
@@ -226,17 +306,49 @@ def verify_consultant_result(
                 raise ConsultantVerificationError(
                     "document-level K/S changes require Task linkages"
                 )
-            if change.opks_kind in {OpksKind.KNOWLEDGE, OpksKind.SKILL}:
-                if not change.basis.quote_anchors:
-                    raise ConsultantVerificationError(
-                        "active K/S requires anchored employee evidence"
-                    )
-
-    for text, basis in result.factual_texts():
-        if _RISKY_SPECIFIC_CLAIM.search(text) and not basis.quote_anchors:
+            if change.opks_kind in {OpksKind.KNOWLEDGE, OpksKind.SKILL} and not (
+                change.basis.quote_anchors
+            ):
+                raise ConsultantVerificationError(
+                    "active K/S requires anchored employee evidence"
+                )
+        text = _candidate_change_text(change)
+        if text and _RISKY_SPECIFIC_CLAIM.search(text) and not (
+            change.basis.quote_anchors
+        ):
             raise ConsultantVerificationError(
                 "quantities, named rules and external claims require an anchored employee quote"
             )
+    return cast("tuple[SkillId, ...]", used_skill_ids)
+
+
+def _candidate_change_text(change: ReviewableDocumentChange) -> str:
+    if change.after is None or change.operation.value in {"reassign", "reorder"}:
+        return ""
+    if change.path.endswith(
+        ("/duty_id", "/display_order", "/task_ids", "/indicator_ids")
+    ):
+        return ""
+    if isinstance(change.after, str):
+        return change.after
+    return "\n".join(_payload_factual_texts(change.after))
+
+
+def _payload_factual_texts(value: object) -> tuple[str, ...]:
+    if isinstance(value, str):
+        return (value,)
+    if isinstance(value, dict):
+        return tuple(
+            text
+            for key, nested in value.items()
+            if key not in _STRUCTURAL_PAYLOAD_KEYS
+            for text in _payload_factual_texts(nested)
+        )
+    if isinstance(value, list):
+        return tuple(
+            text for nested in value for text in _payload_factual_texts(nested)
+        )
+    return ()
 
 
 def _verify_analysis_basis(

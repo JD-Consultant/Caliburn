@@ -61,6 +61,7 @@ from app.consultant.skill_backend import (
 from app.consultant.state import EmployeeSource, EmployeeSourceKind, QuoteAnchor
 from app.consultant.verification import (
     ConsultantVerificationError,
+    verify_candidate_document_changes,
     verify_consultant_result,
 )
 
@@ -1446,6 +1447,101 @@ def test_verifier_rejects_unloaded_skill_and_cross_document_evidence() -> None:
             document_id=uuid4(),
             selected_skill_ids=("task-boundary",),
             loaded_skill_ids=("task-boundary",),
+            employee_sources=(source,),
+        )
+
+
+def test_candidate_document_verifier_checks_evidence_before_final_result() -> None:
+    source = _employee_source("我使用採購流程知識來建立請購單。")
+    task_id = uuid4()
+    item_id = uuid4()
+    change = ReviewableDocumentChange(
+        operation=DocumentChangeOperation.ADD,
+        path="/opks",
+        after={
+            "item_id": str(item_id),
+            "kind": "knowledge",
+            "text": "採購流程知識",
+            "display_order": 0,
+            "task_ids": [str(task_id)],
+            "indicator_ids": [],
+        },
+        opks_kind=OpksKind.KNOWLEDGE,
+        task_ids=(task_id,),
+        basis=_basis(
+            source,
+            "knowledge",
+            quote="採購流程知識",
+        ),
+    )
+
+    used = verify_candidate_document_changes(
+        (change,),
+        document_id=source.document_id,
+        selected_skill_ids=("knowledge",),
+        loaded_skill_ids=("knowledge",),
+        employee_sources=(source,),
+    )
+
+    assert used == ("knowledge",)
+
+
+def test_candidate_document_verifier_ignores_application_owned_structural_metadata() -> None:
+    source = _employee_source("我負責管理採購作業。")
+    change = ReviewableDocumentChange(
+        operation=DocumentChangeOperation.ADD,
+        path="/duties",
+        after={
+            "duty_id": str(uuid4()),
+            "statement": "管理採購作業",
+            "display_order": 0,
+        },
+        basis=AnalysisBasis(
+            source_ids=(source.source_id,),
+            skill_ids=("task-boundary",),
+        ),
+    )
+
+    used = verify_candidate_document_changes(
+        (change,),
+        document_id=source.document_id,
+        selected_skill_ids=("task-boundary",),
+        loaded_skill_ids=("task-boundary",),
+        employee_sources=(source,),
+    )
+
+    assert used == ("task-boundary",)
+
+
+@pytest.mark.parametrize("failure", ("unloaded", "invalid_quote", "cross_document"))
+def test_candidate_document_verifier_fails_closed_for_receipt_or_evidence_mismatch(
+    failure: str,
+) -> None:
+    source = _employee_source("我負責管理採購作業。")
+    anchor = _anchor(source, "管理採購作業")
+    if failure == "invalid_quote":
+        anchor = anchor.model_copy(update={"quote": "錯誤引文"})
+    change = ReviewableDocumentChange(
+        operation=DocumentChangeOperation.ADD,
+        path="/duties",
+        after={
+            "duty_id": str(uuid4()),
+            "statement": "管理採購作業",
+            "display_order": 0,
+        },
+        basis=AnalysisBasis(
+            source_ids=(source.source_id,),
+            quote_anchors=(anchor,),
+            skill_ids=("task-boundary",),
+        ),
+    )
+
+    with pytest.raises(ConsultantVerificationError):
+        verify_candidate_document_changes(
+            (change,),
+            document_id=(uuid4() if failure == "cross_document" else source.document_id),
+            selected_skill_ids=("task-boundary",),
+            loaded_skill_ids=(() if failure == "unloaded" else ("task-boundary",)),
             employee_sources=(source,),
         )
 
